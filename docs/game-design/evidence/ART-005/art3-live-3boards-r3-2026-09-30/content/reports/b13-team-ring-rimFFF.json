@@ -1,0 +1,438 @@
+{
+ "schema": "unmatched.t53-team-ring/1",
+ "tool": "tools/art/t53_team_ring.py build",
+ "startedUtc": "2026-09-30T09:32:04+00:00",
+ "editor": "live UnrealEditor of the main checkout via MCP 127.0.0.1:8123",
+ "currentLevel": "/Game/S08/S08Arena",
+ "plan": {
+  "rings": {
+   "p1": {
+    "package": "/Game/ArtTests/ARTMarkers/Meshes/SM_Marker_TeamRing_P1",
+    "spec": {
+     "shape": "circle",
+     "segments": 96,
+     "bands": {
+      "keylineIn": [
+       22.0,
+       23.5
+      ],
+      "fill": [
+       23.5,
+       26.0
+      ],
+      "keylineOut": [
+       26.0,
+       27.5
+      ],
+      "rimOut": [
+       27.5,
+       28.5
+      ]
+     }
+    },
+    "bounds": {
+     "min": [
+      -28.5,
+      -28.5,
+      0.6
+     ],
+     "max": [
+      28.5,
+      28.5,
+      1.2
+     ]
+    },
+    "triangles": 1152
+   },
+   "p2": {
+    "package": "/Game/ArtTests/ARTMarkers/Meshes/SM_Marker_TeamRing_P2",
+    "spec": {
+     "shape": "hexagon",
+     "cornersDeg": [
+      0,
+      60,
+      120,
+      180,
+      240,
+      300
+     ],
+     "measure": "apothem",
+     "bands": {
+      "keylineIn": [
+       21.5,
+       23.0
+      ],
+      "fill": [
+       23.0,
+       25.25
+      ],
+      "keylineOut": [
+       25.25,
+       26.25
+      ],
+      "rimOut": [
+       26.25,
+       27.25
+      ]
+     },
+     "cornerGapUU": 2.0
+    },
+    "bounds": {
+     "min": [
+      -30.8882,
+      -27.25,
+      0.6
+     ],
+     "max": [
+      30.8882,
+      27.25,
+      1.2
+     ]
+    },
+    "triangles": 168
+   }
+  },
+  "zRange": [
+   0.6,
+   1.2
+  ],
+  "why": {
+   "z": "top face +1.2 uu: above the zone marks (glyph fill top +0.58) and far from the tile top z = 0 (the T5.2 disc top was coplanar with the tile top: z-fighting)",
+   "p1Outer": "rim outer 28.5 + 1 uu <= 29.73 uu (clearance 1.23): the nearest zone-glyph piece (bars3, slot (+-32,+-32)) - exact piece geometry of S08GlyphPieces, not the glyph AABB (the diamond AABB corner lies at 27.25 uu, but the diamond itself stays 36.25 uu away)",
+   "p2Outer": "hexagon rim outer apothem 27.25: the 30-degree flat passes the bars3 corner (20,22) at 1.07 uu (>= 1); the outer keyline stays 1.0 uu wide as in r3",
+   "twoTone": "5c-B1 B1-3 (plan rev 2 section 3a): under the rev 5 light the dark keyline against the dark Cobble drops to ~2.5:1, so a light rim (team.rim #FFFFFF; #F2ECDE first, the plan fallback applied in B1-2) sits outside the outer keyline; the keyline keeps its r3 width (the shape classifier and the keyline core need its pixels after anti-aliasing), the rim is paid for by the fill (P1 3.0 -> 2.5 uu, P2 3.0 -> 2.25 uu); rules: tools/art/t5cb1_ring_sim.py check",
+   "fillInner": "P1 fill starts at 23.5 > the target arcs' outer edge 23.0 (SM_Marker_TargetRing, build_markers.py: inner 20.9 / outer 23); P2 fill starts at apothem 23.0 = the arcs' outer edge at the flats only",
+   "gaps": "P2: 2.0 uu across each corner bisector (the side trimmed 2/ (2 sin 60) = 1.1547 uu before the corner)"
+  },
+  "materialInstances": [
+   {
+    "package": "/Game/ArtTests/ARTMarkers/Materials/MI_Marker_TeamRing_Keyline",
+    "parent": "/Game/UM/Materials/M_UM_GameLayer",
+    "hex": "#111317",
+    "linear": [
+     0.005605,
+     0.006512,
+     0.008568,
+     1.0
+    ]
+   },
+   {
+    "package": "/Game/ArtTests/ARTMarkers/Materials/MI_Marker_TeamRing_Fill",
+    "parent": "/Game/UM/Materials/M_UM_GameLayer",
+    "hex": "#E8C06A",
+    "linear": [
+     0.806952,
+     0.527115,
+     0.144128,
+     1.0
+    ],
+    "note": "asset default = team.p1; the client sets the fill per fighter (MID, FromSRGBColor of the token)"
+   },
+   {
+    "package": "/Game/ArtTests/ARTMarkers/Materials/MI_Marker_TeamRing_Rim",
+    "parent": "/Game/UM/Materials/M_UM_GameLayer",
+    "hex": "#FFFFFF",
+    "linear": [
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ],
+    "note": "5c-B1 B1-3: light rim of the two-tone ring edge (team.rim), mesh slot 'Rim' (index 2)"
+   }
+  ],
+  "medusa": [
+   {
+    "package": "/Game/ArtPreview/Medusa/Materials/MI_Medusa_P1",
+    "parent": "/Game/ArtPreview/Medusa/Materials/M_Medusa_Atlas",
+    "team": "P1",
+    "hex": "#E8C06A",
+    "TeamColor": [
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ],
+    "w5brTeamColor": [
+     1.0,
+     0.8266,
+     0.5893,
+     1.0
+    ],
+    "note": "5c-B1 B1-4 (user decision: accents + ring): neutral, the team is on the ring and the chip"
+   },
+   {
+    "package": "/Game/ArtPreview/Medusa/Materials/MI_Medusa_P2",
+    "parent": "/Game/ArtPreview/Medusa/Materials/M_Medusa_Atlas",
+    "team": "P2",
+    "hex": "#5A7F9F",
+    "TeamColor": [
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ],
+    "w5brTeamColor": [
+     0.6474,
+     0.8061,
+     1.0,
+     1.0
+    ],
+    "note": "5c-B1 B1-4 (user decision: accents + ring): neutral, the team is on the ring and the chip"
+   }
+  ],
+  "tokens": {
+   "p1": "#E8C06A",
+   "p2": "#5A7F9F",
+   "keyline": "#111317",
+   "rim": "#FFFFFF"
+  }
+ },
+ "obj": {
+  "p1": {
+   "file": "SM_Marker_TeamRing_P1.obj",
+   "sha256": "27f66c61190bd6f91cfe92738e01affcf13391a84dd10ca5adb2196edd937f49",
+   "triangles": 1152,
+   "expectedBounds": {
+    "min": [
+     -28.5,
+     -28.5,
+     0.6
+    ],
+    "max": [
+     28.5,
+     28.5,
+     1.2
+    ]
+   }
+  },
+  "p2": {
+   "file": "SM_Marker_TeamRing_P2.obj",
+   "sha256": "63eeff2246349f7aac13eac09a53d204874c5f19acc4c436925a4d79fbd8cf39",
+   "triangles": 168,
+   "expectedBounds": {
+    "min": [
+     -30.8882,
+     -27.25,
+     0.6
+    ],
+    "max": [
+     30.8882,
+     27.25,
+     1.2
+    ]
+   }
+  }
+ },
+ "actions": [
+  {
+   "materialInstance": "/Game/ArtTests/ARTMarkers/Materials/MI_Marker_TeamRing_Rim",
+   "created": false,
+   "LayerColor": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "hex": "#FFFFFF"
+  },
+  {
+   "ringMesh": "/Game/ArtTests/ARTMarkers/Meshes/SM_Marker_TeamRing_P1",
+   "imported": false,
+   "reason": "exists (use --force)"
+  },
+  {
+   "ringMesh": "/Game/ArtTests/ARTMarkers/Meshes/SM_Marker_TeamRing_P2",
+   "imported": false,
+   "reason": "exists (use --force)"
+  }
+ ],
+ "saved": {
+  "packages": [
+   "/Game/ArtTests/ARTMarkers/Materials/MI_Marker_TeamRing_Rim"
+  ],
+  "result": true,
+  "dirtyAfter": {
+   "/Game/ArtTests/ARTMarkers/Meshes/SM_Marker_TeamRing_P1": false,
+   "/Game/ArtTests/ARTMarkers/Meshes/SM_Marker_TeamRing_P2": false,
+   "/Game/ArtTests/ARTMarkers/Materials/MI_Marker_TeamRing_Keyline": false,
+   "/Game/ArtTests/ARTMarkers/Materials/MI_Marker_TeamRing_Fill": false,
+   "/Game/ArtTests/ARTMarkers/Materials/MI_Marker_TeamRing_Rim": false,
+   "/Game/ArtPreview/Medusa/Materials/MI_Medusa_P1": false,
+   "/Game/ArtPreview/Medusa/Materials/MI_Medusa_P2": false
+  }
+ },
+ "verify": {
+  "ok": true,
+  "failures": [],
+  "assets": {
+   "/Game/ArtTests/ARTMarkers/Materials/MI_Marker_TeamRing_Keyline": {
+    "exists": true,
+    "LayerColor": {
+     "r": 0.0056050000712275505,
+     "g": 0.006512000225484371,
+     "b": 0.008568000048398972,
+     "a": 1
+    },
+    "parent": {
+     "refPath": "/Game/UM/Materials/M_UM_GameLayer.M_UM_GameLayer"
+    },
+    "file": {
+     "path": "C:/Users/ren/.codex/worktrees/art-foundation/unmached/unreal/Unmatched/Content/ArtTests/ARTMarkers/Materials/MI_Marker_TeamRing_Keyline.uasset",
+     "sha256": "40cfeaac086946ad52d5a62065dc76856a92c61c99fd7704808fb7818062c908",
+     "bytes": 5658
+    }
+   },
+   "/Game/ArtTests/ARTMarkers/Materials/MI_Marker_TeamRing_Fill": {
+    "exists": true,
+    "LayerColor": {
+     "r": 0.8069519996643066,
+     "g": 0.527114987373352,
+     "b": 0.1441279947757721,
+     "a": 1
+    },
+    "parent": {
+     "refPath": "/Game/UM/Materials/M_UM_GameLayer.M_UM_GameLayer"
+    },
+    "file": {
+     "path": "C:/Users/ren/.codex/worktrees/art-foundation/unmached/unreal/Unmatched/Content/ArtTests/ARTMarkers/Materials/MI_Marker_TeamRing_Fill.uasset",
+     "sha256": "31bf62a5dfa4a2a7d9c6ef55348a60742e254cef4e14c9a1bbeaf9ee50432140",
+     "bytes": 7702
+    }
+   },
+   "/Game/ArtTests/ARTMarkers/Materials/MI_Marker_TeamRing_Rim": {
+    "exists": true,
+    "LayerColor": {
+     "r": 1,
+     "g": 1,
+     "b": 1,
+     "a": 1
+    },
+    "parent": {
+     "refPath": "/Game/UM/Materials/M_UM_GameLayer.M_UM_GameLayer"
+    },
+    "file": {
+     "path": "C:/Users/ren/.codex/worktrees/art-foundation/unmached/unreal/Unmatched/Content/ArtTests/ARTMarkers/Materials/MI_Marker_TeamRing_Rim.uasset",
+     "sha256": "35cf7b74e32c9f46db79b6c0fa2c2018e9066b2f02014d144b71818a17e0a6ba",
+     "bytes": 7656
+    }
+   },
+   "/Game/ArtPreview/Medusa/Materials/MI_Medusa_P1": {
+    "exists": true,
+    "TeamColor": {
+     "r": 1,
+     "g": 1,
+     "b": 1,
+     "a": 1
+    },
+    "parent": {
+     "refPath": "/Game/ArtPreview/Medusa/Materials/M_Medusa_Atlas.M_Medusa_Atlas"
+    },
+    "file": {
+     "path": "C:/Users/ren/.codex/worktrees/art-foundation/unmached/unreal/Unmatched/Content/ArtPreview/Medusa/Materials/MI_Medusa_P1.uasset",
+     "sha256": "b70a0965e6a9ae351f9a4d232ae600f7fa8330d2d7aba182be7d5ca9925cd350",
+     "bytes": 7757
+    }
+   },
+   "/Game/ArtPreview/Medusa/Materials/MI_Medusa_P2": {
+    "exists": true,
+    "TeamColor": {
+     "r": 1,
+     "g": 1,
+     "b": 1,
+     "a": 1
+    },
+    "parent": {
+     "refPath": "/Game/ArtPreview/Medusa/Materials/M_Medusa_Atlas.M_Medusa_Atlas"
+    },
+    "file": {
+     "path": "C:/Users/ren/.codex/worktrees/art-foundation/unmached/unreal/Unmatched/Content/ArtPreview/Medusa/Materials/MI_Medusa_P2.uasset",
+     "sha256": "f4e75f984dcbe10bce147619a86c1b1ad5bffaf117059e655f2889722d389045",
+     "bytes": 7757
+    }
+   },
+   "/Game/ArtTests/ARTMarkers/Meshes/SM_Marker_TeamRing_P1": {
+    "exists": true,
+    "bounds": {
+     "min": {
+      "x": -28.5,
+      "y": -28.5,
+      "z": 0.6000000238418579
+     },
+     "max": {
+      "x": 28.5,
+      "y": 28.5,
+      "z": 1.2000000476837158
+     },
+     "isValid": true
+    },
+    "triangles": 1152,
+    "nanite": false,
+    "slots": [
+     "Keyline",
+     "Fill",
+     "Rim"
+    ],
+    "materials": {
+     "Keyline": {
+      "refPath": "/Game/ArtTests/ARTMarkers/Materials/MI_Marker_TeamRing_Keyline.MI_Marker_TeamRing_Keyline"
+     },
+     "Fill": {
+      "refPath": "/Game/ArtTests/ARTMarkers/Materials/MI_Marker_TeamRing_Fill.MI_Marker_TeamRing_Fill"
+     },
+     "Rim": {
+      "refPath": "/Game/ArtTests/ARTMarkers/Materials/MI_Marker_TeamRing_Rim.MI_Marker_TeamRing_Rim"
+     }
+    },
+    "boundsMaxError": 0.0,
+    "file": {
+     "path": "C:/Users/ren/.codex/worktrees/art-foundation/unmached/unreal/Unmatched/Content/ArtTests/ARTMarkers/Meshes/SM_Marker_TeamRing_P1.uasset",
+     "sha256": "8ff20a6a74088b171adaf1cc4f8879a99e8c7ce33fefdffb9e32d785b2027306",
+     "bytes": 43200
+    }
+   },
+   "/Game/ArtTests/ARTMarkers/Meshes/SM_Marker_TeamRing_P2": {
+    "exists": true,
+    "bounds": {
+     "min": {
+      "x": -30.88823890686035,
+      "y": -27.25,
+      "z": 0.6000000238418579
+     },
+     "max": {
+      "x": 30.88823890686035,
+      "y": 27.25,
+      "z": 1.2000000476837158
+     },
+     "isValid": true
+    },
+    "triangles": 168,
+    "nanite": false,
+    "slots": [
+     "Keyline",
+     "Fill",
+     "Rim"
+    ],
+    "materials": {
+     "Keyline": {
+      "refPath": "/Game/ArtTests/ARTMarkers/Materials/MI_Marker_TeamRing_Keyline.MI_Marker_TeamRing_Keyline"
+     },
+     "Fill": {
+      "refPath": "/Game/ArtTests/ARTMarkers/Materials/MI_Marker_TeamRing_Fill.MI_Marker_TeamRing_Fill"
+     },
+     "Rim": {
+      "refPath": "/Game/ArtTests/ARTMarkers/Materials/MI_Marker_TeamRing_Rim.MI_Marker_TeamRing_Rim"
+     }
+    },
+    "boundsMaxError": 4e-05,
+    "file": {
+     "path": "C:/Users/ren/.codex/worktrees/art-foundation/unmached/unreal/Unmatched/Content/ArtTests/ARTMarkers/Meshes/SM_Marker_TeamRing_P2.uasset",
+     "sha256": "a4ffe92e0d9bcf0051f0b9b9277beaa6cc46ecfceb0d3c969a1443cd58d4dd17",
+     "bytes": 22111
+    }
+   }
+  }
+ },
+ "finishedUtc": "2026-09-30T09:32:28+00:00",
+ "mcpCalls": 84
+}

@@ -1,0 +1,623 @@
+{
+ "schema": "unmatched.t5cb-thresholds/1",
+ "status": "ЗАРЕГИСТРИРОВАНО ДО СЪЁМКИ 5c-B1 (группа L, арт-worktree, B1-0): ни одного кадра 5c-B1 (ни редакторного, ни packaged) к моменту регистрации нет; сборка 5c-B1 (B1-6) ещё не выполнялась. Числа — thresholdsProposal плана 5c-B1 (редакция 2), база — t53-thresholds.json W5b-R r3 с ревизией 1. Калибровочные байты zone.red, zone.gray (rev 5) и team.rim снимаются на плоских плитах в B1-2 и дописываются НОВОЙ ревизией revisions[] до первого кадра, к которому они применяются. Менять только ревизиями.",
+ "registeredLocal": "2026-09-30T14:08:24+05:00",
+ "registeredBy": "агент 5c-B1 группа L (решение советника по полномочию «делай все без меня», 2026-09-29; самоприёмка, требует взгляда пользователя)",
+ "plan": {
+  "md": "C:/tmp/p0-review/5cb1-plan.md",
+  "json": "C:/tmp/p0-review/5cb1-plan.json",
+  "jsonSha256": "0f49985634b3c8d6d3fa0ff33ba958fd1398254197a44c2359740746d2a73469",
+  "revision": 2
+ },
+ "base": {
+  "path": "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29/t53-thresholds.json",
+  "sha256": "d87515a867fba165ba297695d3d69d8ac1981f3e0ef5a902591ca4d3ac78bb1e",
+  "revisionsApplied": [
+   1
+  ],
+  "rule": "всё, что ниже не переопределено, действует как в базе (с её ревизией 1)"
+ },
+ "decisions": "docs/game-design/decisions/2026-09-29-board-readability-decisions.md (D-1…D-10, решения советника, подтверждение пользователем на шаге 9); раздел «Пересмотр 2026-09-30: план волны 5c-B1»",
+ "preRegistrationChecks": {
+  "ringSimCheck": {
+   "cmd": "python tools/art/t5cb1_ring_sim.py check",
+   "exit": 0,
+   "b1": {
+    "P1": {
+     "clearanceUU": 1.23,
+     "problems": []
+    },
+    "P2": {
+     "clearanceUU": 1.07,
+     "problems": []
+    }
+   }
+  },
+  "pytest": {
+   "cmd": "python -m pytest -q tools/art/tests/test_t5cb1.py",
+   "result": "24 passed"
+  }
+ },
+ "frames": {
+  "K1": "phase2-board-{host,joiner}-1920x1080.png пары run-phase2-demo (-ArtPreviewBoardId, без зума, снимок на 36 с; хост выделяет свою Medusa флагом — плашка и достижимые клетки; присоединившийся — чистый K1)",
+  "K1_iconProbe": "phase2-board-host-1920x1080.png пары run-phase2-demo с -ArtPreviewIconProbe -ArtPreviewIconSize=24 и =48 на каждой доске (иконка на ближайшем враге; ПРОКСИ размера, не бой)",
+  "K3": "joiner/s09-combat-resolve-revealed.png пары run-combat-demo без зума (цель, иконка 32 px, раскрытые карты); если его нет — первый опубликованный кадр joiner из combat-resolve-window, combat-defense-open с живой иконкой по поздним строкам SHOT",
+  "damage": "joiner/s09-damage-number.png (первый урон партии: способность или бой — помечается по seq в акте) и host/s09-damage-combat.png (урон первого боя: CUE damage цели в пределах 2 снапшотов до первого COMBAT-RESULT, снимок после ≥ 2 стабильных кадров числа)",
+  "provenance": "только packaged-live strict + render-reference (tools/art/classify_evidence.py --require packaged-live --strict --render-reference) и строка «SHOT captured» кадра (см. shotCaptured) — иначе «не годится для приёмки»"
+ },
+ "shotCaptured": {
+  "rule": "у каждого опубликованного кадра есть строка «SHOT captured file=<имя> frame=<N> px=WxH sha256=<sha256 байтов пикселей BGRA>» (UGameViewportClient::OnScreenshotCaptured; PNG пишет клиент из тех же пикселей) и поздние строки SHOT widget/icon/tag/damage того же кадра (конец кадра запроса, FCoreDelegates::OnEndFrame) с frame = N ± 1; sha256 пикселей PNG (распаковка) = sha256 строки",
+  "classify": "classify_evidence --strict: кадр без строки captured или с расхождением frame/sha — не packaged-live strict"
+ },
+ "k3Panels": {
+  "rule": "D-10: HUD-панели (строки SHOT panel … geom=painted) ∩ (FigureScreenRect живых бойцов ∪ проекции клеток атакующего и цели ∪ достижимые клетки) = 0 px² — гейт; перекрытие прочих клеток записывается в px², не гейт. При провале — перенос панели в слот баннеров 02 §4.1 (порт UMG), не камера.",
+  "epsilonPx2": 0.5
+ },
+ "plateVsFigures": {
+  "rule": "плашка ∩ FigureScreenRect другого бойца (с кольцом, r 28 / 21,8 uu) = 0 px² на всех K1 хоста",
+  "epsilonPx2": 0.5
+ },
+ "tags": {
+  "rev": 2,
+  "frames": "три доски × K1 хоста, K1 присоединившегося, K3, кадры урона; цвет, серый, deuteranopia",
+  "textVsBackground": {
+   "method": "ядро текста = пиксели painted-bbox строки (SHOT widget id=board.tag.name / board.tag.hp) с ΔE76 ≤ 10 к байтам tag.text (242,236,222) — сглаженные края букв сюда не входят; подложка = пиксели painted-bbox тега с ΔE76 ≤ 6 к tag.background (22,26,40); WCAG медиан",
+   "minWcag": 4.5,
+   "pass": "100 % строк 100 % тегов",
+   "predicted": 14.7
+  },
+  "backgroundIntegrity": {
+   "rule": "≥ 98 % пикселей painted-bbox тега вне bbox текста, HP-бара (board.tag.bar) и чипа (board.tag.chip) — цвет подложки (ΔE76 ≤ 6)",
+   "min": 0.98
+  },
+  "overlaps": {
+   "rule": "tag∩tag, tag∩icon, tag∩plate, tag∩damage, tag∩HUD-панель (SHOT panel) = 0 px² (ε 0,5) по painted-bbox; tag∩FigureScreenRect другого бойца — записывается, не гейт",
+   "epsilonPx2": 0.5
+  },
+  "textHeight": {
+   "rule": "кегль строки (поле font= строки SHOT widget) ≥ 11 su при 1920×1080",
+   "minSu": 11
+  },
+  "mode": {
+   "rule": "режим тега совпадает с правилом: блок-аут (без арт-фигуры) → full, арт-фигура (Medusa) → compact, владелец плашки → hidden, K2 → compact; -ArtPreviewTagNames=all → full",
+   "pass": "100 %"
+  },
+  "geom": "bbox только из geom=painted"
+ },
+ "damage": {
+  "rev": 2,
+  "textVsCapsule": {
+   "method": "ядро текста ΔE76 ≤ 10 к damage.text (255,224,175), капсула ΔE76 ≤ 6 к (22,26,40), WCAG медиан",
+   "minWcag": 4.5,
+   "predicted": 13.6,
+   "variants": [
+    "color",
+    "gray",
+    "deuteranopia"
+   ]
+  },
+  "overlaps": {
+   "rule": "пересечение bbox числа с любым тегом, иконкой, плашкой = 0 px² (было 25–27 %)",
+   "epsilonPx2": 0.5
+  },
+  "binding": {
+   "rule": "центр числа ближе к FigureScreenRect цели (строка SHOT figure), чем к FigureScreenRect любого другого бойца",
+   "pass": "100 % кадров"
+  },
+  "geom": "geom=painted; счёт CUE = ARTPREVIEW damage-number ровно по одному на обеих сторонах сохраняется (validation.json)",
+  "twoFrames": "в акте два кадра урона: способность (помечено) и бой"
+ },
+ "icon": {
+  "rev": 3,
+  "method": "qa010 icon --mask-texture <glyph mask PNG N×N> --mask-alpha 0.5 по painted-bbox поздней строки SHOT icon кадра: глиф = alpha ≥ 0,5 маски; жетон = форма текстуры (alpha ≥ 0,5 T_UI_Action_AttackToken_N); ободок = внешний 1 px формы; тело = форма − глиф − ободок. Только родной размер кадра (sizes=[N], upscaled=false). Путь и sha256 маски — в JSON.",
+  "sizes": {
+   "24": "K1_iconProbe (прокси размера, не бой)",
+   "32": "K3",
+   "48": "K1_iconProbe (прокси размера, не бой)"
+  },
+  "glyphVsBody": {
+   "minWcag": 3.0,
+   "variants": [
+    "color",
+    "gray",
+    "deuteranopia"
+   ],
+   "predictedOnTexture": "медиана 8,3–9,4 : 1, p10 3,1–3,2 : 1 (tools/art/art004_hud_t22.py tokens, token-manifest.json)"
+  },
+  "edge": {
+   "rule": "max(WCAG(ободок, кольцо 8 px вокруг bbox), WCAG(тело, кольцо вокруг bbox)) ≥ 3 : 1 (WCAG 1.4.11; двухтоновый край)",
+   "minWcag": 3.0
+  },
+  "binding": {
+   "rule": "центр иконки ближе к FigureScreenRect цели, чем к любому другому бойцу; пересечение иконки с FigureScreenRect других бойцов = 0 px²",
+   "pass": "100 % кадров K3 и зонда"
+  },
+  "guard": {
+   "rule": "присутствие иконки в пикселях: NCC(кроп painted-bbox, текстура жетона) по форме жетона ≥ 0,9 И IoU(пиксели, совпавшие с текстурой в пределах max|ΔRGB| ≤ 16, форма жетона) ≥ 0,6; иначе «нет данных», не «pass»",
+   "minNcc": 0.9,
+   "minIou": 0.6
+  },
+  "k3Split": "строка QA-010 K3 делится: «рамка/дуги» и «иконка» — отдельные вердикты"
+ },
+ "teams": {
+  "grayDeltaY": {
+   "rule": "|ΔY′| медиан пикселей заливки двух команд (серый вариант qa010 derive) на одном кадре",
+   "min": 40,
+   "predicted": "screen: Gold Y′ ≈ 196, Silver ≈ 127 → 69"
+  },
+  "colorDeltaE76": {
+   "min": 20
+  },
+  "deutDeltaE76": {
+   "min": 15
+  },
+  "chipMatchesRing": {
+   "rule": "чип команды тега/плашки (пиксели чипа, SHOT widget id=board.tag.chip / plate.teamshape, ΔE76 ≤ 25 к ожидаемому цвету, медиана) совпадает по цвету с заливкой кольца того же бойца на том же кадре: ΔE76 ≤ 6; форма чипа (строка трассы shape=circle|hex) = форма кольца (классификатор)",
+   "maxDeltaE76": 6.0,
+   "pass": "100 %"
+  },
+  "absoluteSameColour": {
+   "rule": "один боец на K1 хоста и K1 присоединившегося: медианы заливки ΔE76 ≤ 10 (абсолютное сопоставление P1/P2)",
+   "maxDeltaE76": 10.0,
+   "pass": "100 %"
+  }
+ },
+ "perf": {
+  "status": "загрязнено фоном H2 (headless Blender/Cycles параллельной линии героев) — не для ACC-022; записывается, не оценивается"
+ },
+ "calibration": {
+  "source": "база: diag/editor-diag.json → calibration (живой редактор главного checkout через MCP, плоские плиты с каждым MI игрового слоя, вид сверху, медиана 13×13 px в центре кадра; кадр diag/frames/calibration-plates.png). 5c-B1: zone.red / zone.gray / team.rim — плоские плиты B1-2 (живой редактор арт-worktree :8124 через MCP, свет rev 5), записываются ревизией до кадров",
+  "note": "Игровой слой unlit + EyeAdaptationInverse проходит тонмаппер: байты на экране ≠ hex (T5.2: синий Cobble ΔE 15 — объяснено). Для классификации пикселей W5b-R берутся ОТКАЛИБРОВАННЫЕ байты ниже (правило плана: «к байтам заливки или к откалиброванным байтам — что записано до съёмки»). Hex остаются в данных (FromSRGBColor); чипы UI рисуют экранный цвет кольца (derived-токены team.p1.screen / team.p2.screen), чтобы чип совпадал с кольцом для зрителя.",
+  "bytes": {
+   "team.p1.fill": {
+    "hex": "#E8C06A",
+    "screen": [
+     218,
+     197,
+     118
+    ],
+    "dE76HexToScreen": 9.45
+   },
+   "team.p2.fill": {
+    "hex": "#5A7F9F",
+    "screen": [
+     87,
+     134,
+     168
+    ],
+    "dE76HexToScreen": 3.58
+   },
+   "mark.keyline": {
+    "hex": "#111317",
+    "screen": [
+     3,
+     4,
+     6
+    ],
+    "dE76HexToScreen": 5.17
+   },
+   "zone.blue": {
+    "hex": "#3B78D8",
+    "screen": [
+     48,
+     132,
+     207
+    ],
+    "dE76HexToScreen": 15.32
+   },
+   "zone.blue-green": {
+    "hex": "#34C3B6",
+    "screen": [
+     65,
+     197,
+     187
+    ],
+    "dE76HexToScreen": 2.71
+   },
+   "zone.brown": {
+    "hex": "#B9784A",
+    "screen": [
+     191,
+     126,
+     70
+    ],
+    "dE76HexToScreen": 5.37
+   },
+   "zone.gray": {
+    "hex": "#6B727A",
+    "screen": null,
+    "forecastScreen": [
+     104,
+     113,
+     122
+    ],
+    "status": "ожидает калибровки B1-2 (ревизия до кадров)",
+    "maxDeltaE76ToForecast": 8.0,
+    "rev4": {
+     "hex": "#7F868E",
+     "screen": [
+      136,
+      144,
+      151
+     ],
+     "dE76HexToScreen": 3.83
+    }
+   },
+   "zone.green": {
+    "hex": "#46B45A",
+    "screen": [
+     64,
+     192,
+     96
+    ],
+    "dE76HexToScreen": 6.3
+   },
+   "zone.light-gray": {
+    "hex": "#F1E8D2",
+    "screen": [
+     218,
+     215,
+     207
+    ],
+    "dE76HexToScreen": 9.69
+   },
+   "zone.light-green": {
+    "hex": "#A6DC66",
+    "screen": [
+     177,
+     214,
+     117
+    ],
+    "dE76HexToScreen": 11.66
+   },
+   "zone.orange": {
+    "hex": "#F2933A",
+    "screen": [
+     228,
+     160,
+     55
+    ],
+    "dE76HexToScreen": 13.06
+   },
+   "zone.purple": {
+    "hex": "#A070DC",
+    "screen": [
+     173,
+     125,
+     210
+    ],
+    "dE76HexToScreen": 13.59
+   },
+   "zone.red": {
+    "hex": "#EC6650",
+    "screen": null,
+    "forecastScreen": [
+     225,
+     108,
+     76
+    ],
+    "status": "ожидает калибровки B1-2 (ревизия до кадров)",
+    "maxDeltaE76ToForecast": 8.0,
+    "rev4": {
+     "hex": "#D8453B",
+     "screen": [
+      214,
+      67,
+      52
+     ],
+     "dE76HexToScreen": 3.05
+    }
+   },
+   "zone.yellow": {
+    "hex": "#F4D24A",
+    "screen": [
+     224,
+     210,
+     84
+    ],
+    "dE76HexToScreen": 10.18
+   },
+   "zone.keyline": {
+    "hex": "#111317",
+    "screen": [
+     3,
+     4,
+     5
+    ],
+    "dE76HexToScreen": 5.35
+   },
+   "team.rim": {
+    "hex": "#F2ECDE",
+    "screen": null,
+    "forecastScreen": [
+     217,
+     215,
+     210
+    ],
+    "status": "ожидает калибровки B1-2 (ревизия до кадров)",
+    "maxDeltaE76ToForecast": 8.0
+   }
+  },
+  "rule": "Пиксель класса X — ΔE76 ≤ pixelDeltaE к screen-байтам X (CIELAB D65, sRGB 8 бит). ΔE hex→экран > 8 у 8 цветов из 15 — поэтому эталон пикселей = screen, а не hex (запись до съёмки, как требует план). Если в packaged-кадре медиана класса отойдёт от screen больше чем на 8 — это записывается (редактор = Epic, packaged = High), порог pixelDeltaE не меняется.",
+  "pixelDeltaE": 15.0
+ },
+ "rings": {
+  "rev": 3,
+  "method": "Зона заливки = проекция полигонов заливки кольца ЭТОГО бойца (форма по его команде из строки ARTPREVIEW team ring … team=P1|P2 shape=…) камерой SHOT-блока, в секторе |θ| ≤ 135° от +Y (к камере; задняя четверть закрыта фигурой). Пиксель команды — ΔE76 ≤ calibration.pixelDeltaE к screen-байтам заливки его команды. Доля = пиксели команды / пиксели зоны.",
+  "minFraction": {
+   "hero": 0.6,
+   "sidekick": 0.45,
+   "why": "у помощников-гарпий крылья блок-аута (y ±36 uu) закрывают до четверти передней дуги — геометрия известна до съёмки"
+  },
+  "frames": "K1 хоста, K1 присоединившегося, K3 всех трёх досок; включая атакующего (жёлтое кольцо выбора r 17,8–20 — внутри полосы) и цель (дуги прицела ≤ 23 uu — не на заливке P1; у P2 касаются внутреннего края заливки только на гранях)",
+  "pass": "0 бойцов ниже порога",
+  "viewIndependence": {
+   "rule": "один боец в одной клетке: |доля хоста − доля присоединившегося| ≤ 0,15 (K1 обоих клиентов; проверка z-fighting)",
+   "maxAbsDelta": 0.15
+  },
+  "overVoid": "не применяется: кольцо ≤ 28 uu лежит внутри плиты (46 uu), бойцы стоят только на проходимых клетках",
+  "fillVsKeyline": {
+   "minWcag": 3.0,
+   "variants": [
+    "color",
+    "gray",
+    "deuteranopia"
+   ],
+   "predicted": "screen-байты: Gold 12,9 : 1, Silver 5,3 : 1"
+  },
+  "rev1": {
+   "status": "для сопоставления с T5.2, НЕ гейт",
+   "method": "t52_art3_live.ring_metrics: кольцевая зона 12..26 uu × FS в плоскости z = 0, пиксели цвета команды по hue (как T5.2), порог 0,05 не применяется"
+  },
+  "tileReference": "t53_readability.ring_tile_reference_rev3. Кольцо r 30·FS..36 uu, |θ| ≤ 135°, без квадратов глиф-слотов. По цвету исключаются кромка, обе заливки команд и зоны СВОЕЙ клетки. Прямоугольниками исключаются UMG (widgets, panels, plate, icon, damage) и FigureScreenRect других бойцов. Нужно ≥ 50 px.",
+  "edgeVsTile": "max(кромка, светлый ободок rimOut) против плитки ≥ 3.0 : 1 в цвете / сером / deuteranopia; сторона засчитывается только при ≥ 10 px ядра (кромка: в её полосах, вне заливки, ΔE ≤ 15; ободок: в полосе rimOut, ΔE ≤ 15 к team.rim)",
+  "minCorePx": 10,
+  "rim": {
+   "hex": "#F2ECDE",
+   "calibration": "team.rim (B1-2)",
+   "P1": [
+    27.5,
+    28.5
+   ],
+   "P2": [
+    26.25,
+    27.25
+   ],
+   "fallbackHex": "#FFFFFF (прогноз Cobble мин. 3.75–3.87 вместо 3.53–3.64)"
+  },
+  "geometry": {
+   "P1": {
+    "keylineIn": [
+     22.0,
+     23.5
+    ],
+    "fill": [
+     23.5,
+     26.0
+    ],
+    "keylineOut": [
+     26.0,
+     27.5
+    ],
+    "rimOut": [
+     27.5,
+     28.5
+    ]
+   },
+   "P2": {
+    "keylineIn": [
+     21.5,
+     23.0
+    ],
+    "fill": [
+     23.0,
+     25.25
+    ],
+    "keylineOut": [
+     25.25,
+     26.25
+    ],
+    "rimOut": [
+     26.25,
+     27.25
+    ],
+    "cornerGapUU": 2.0
+   },
+   "check": "tools/art/t5cb1_ring_sim.py check"
+  },
+  "rev2Geometry": {
+   "source": "tools/art/t53_team_ring.py RING_SPEC (= S08TeamRingSpec, тест Unmatched.S08.BoardArt.TeamRing)",
+   "scale": "FS: герой 1,0, помощник 0,78 (XY); плоскость кольца — верх меша z = +1,2 uu над клеткой бойца (SHOT fighter world)",
+   "P1": "окружность: кромка 22,0–23,5; заливка 23,5–26,5; кромка 26,5–28,0 uu × FS",
+   "P2": "шестигранник (углы 0/60/…/300° от +X), по апофеме: кромка 21,5–23,0; заливка 23,0–26,0; кромка 26,0–27,0 uu × FS; разрыв 2,0 uu поперёк каждого угла"
+  },
+  "keylineVsTileRev2": {
+   "method": "кромка = ΔE76 ≤ pixelDeltaE к screen mark.keyline в проекции внешней и внутренней кромки того же сектора (≥ 10 px); плитка = пиксели клетки бойца в кольце r 30·FS…36 uu того же сектора, вне квадратов глиф-слотов (±32 ± 14 uu) и без пикселей, ближе ΔE76 ≤ 15 к любому цвету зон/кромки (screen). Отклонение от плана («центральный квадрат ±18 uu той же клетки»): центр клетки бойца закрыт подставкой фигуры.",
+   "minWcag": 3.0,
+   "variants": [
+    "color",
+    "gray",
+    "deuteranopia"
+   ]
+  },
+  "note": "rev 3: геометрия B1-3 (двухтоновое кольцо: кромка шириной r3 + светлый ободок rimOut), эталон плитки rev 3 и край = max(кромка, ободок); доля заливки (minFraction), viewIndependence, fillVsKeyline — как rev 2"
+ },
+ "teamShape": {
+  "rev": 2,
+  "method": "t53_readability.classify_shape_v2 / SHAPE_V2. Лучи: 360, θ ∈ [−135, 135] от +Y. Профиль: 16..34 uu × FS, шаг 0.25; метки K (кромка), T (заливка), R (ободок: ΔE ≤ 15 к team.rim в том же варианте), O. Заливка — отрезок T, ограниченный изнутри кромкой, снаружи кромкой ИЛИ ободком (≤ 1.5 uu); r(θ) — центр отрезка. Ободок снаружи нужен потому, что внешняя кромка 1.0 uu рядом со светлым ободком после антиалиасинга может не дать ни одного пикселя в пределах ΔE 15 от кромки (синтетика: P2-помощник без ограничителя-ободка не классифицируется). Подбор двух моделей: окружность (СКО около среднего) и шестигранник r = A / cos φ (углы θ0 + 60k, θ0 свободно). hexagon — если hexRms / circleRms ≤ 0.75 и hexRms ≤ 0.045 r̄. circle — если отношение ≥ 1.35 и circleRms ≤ 0.045 r̄. Нужно ≥ 25 % лучей (67.5°, больше периода шестигранника). Перекрытия только убирают лучи.",
+  "pass": "100 % в цвете, сером и deuteranopia (K1 host, K1 joiner, K3)",
+  "calibratedOn": "кадры r3 W5b-R: 54/54 во всех вариантах; отношение q у окружностей 1.74–5.3, у шестигранников 0.26–0.57",
+  "checkedOnB1": "tools/art/t5cb1_ring_sim.py sweep --zones-rev5 (C:/tmp/p0-review/5cb1-sim/ringsim/ring-sim-zones5.json): кольца r3 K1 (3 доски × host/joiner, 36 колец) перерисованы с антиалиасингом 4×4 и с добавочным размытием σ 0.35 px на свет rev 5: 36/36 во всех вариантах при обеих моделях сглаживания; тесты TwoToneRingAA (1.45 px/uu, наклон −52°, FS 1.0 / 0.78, тёмная и светлая плитка)",
+  "rev1": {
+   "method": "Классификатор формы по центральной линии заливки: 72 отсчёта угла θ ∈ [−135°, +135°] от +Y; на каждом луче в мировой плоскости кольца (z = 1,2) радиальный профиль r ∈ [18, 34] uu × FS шагом 0,25 uu; отсчёт «заливка есть», если ≥ 2 точек профиля — пиксели команды; r(θ) — центроид этих точек. Разрыв — серия из 1–3 соседних отсчётов без заливки между отсчётами с заливкой; серии ≥ 4 — перекрытие фигурой (не считаются). Излом — локальный максимум r(θ) с выступом ≥ 0,06·r̄ над соседями в окне ±15°.",
+   "circle": "0 разрывов и 0 изломов (или размах r(θ) ≤ 0,06·r̄)",
+   "hexagon": "≥ 2 разрыва и ≥ 2 излома",
+   "pass": "форма совпала с командой бойца у 100 % бойцов в цвете, сером и deuteranopia (K1 хоста, K1 присоединившегося, K3)"
+  }
+ },
+ "zones": {
+  "geometry": "S08BoardArt: осевая линия штриха 42 uu, зажата так, чтобы заливка + кромка ≤ 45 uu от центра клетки (тест); двойной — две линии по 3 uu с зазором 3 uu; кромка 1,5 uu (#111317) под каждым штрихом и глифом; глифы в слотах (±32, ±32), выше штрихов",
+  "method": "Для каждой зоны каждой клетки слот i%4: полоса стороны i%4 (расстояние от центра клетки 33…45 uu — внутри плиты 46 uu, шов не входит; вдоль стороны |u| ≤ 46) и квадрат глиф-слота i%4 (±14 uu вокруг центра слота), в проекции SHOT-камеры (плоскость z = 0,4). Пиксели в круге r ≤ 31 uu вокруг занятых клеток исключены (кольцо команды, подставка). Кромка — ΔE76 ≤ pixelDeltaE к screen zone.keyline; заливка — к screen цвета зоны. Отклонение от плана: полоса 33…45 вместо 42 ± 6 (шов 46…54 тоже почти чёрный).",
+  "minKeylinePxPerSlot": 20,
+  "keylineVsTile": {
+   "tile": "центральный квадрат ±18 uu свободных клеток зоны (как T5.2); для занятой мультизонной клетки — свободные клетки той же зоны",
+   "minWcag": 3.0,
+   "variants": [
+    "color",
+    "gray",
+    "deuteranopia"
+   ],
+   "predicted": "фикстуры ≈ 10,3 : 1, Cobble 3,7–5,0 : 1"
+  },
+  "fillVsKeyline": {
+   "minWcag": 3.0,
+   "variants": [
+    "color",
+    "gray",
+    "deuteranopia"
+   ],
+   "predicted": "от 4,3 (blue, red) до 5,0 (gray #7F868E) и 13 (light-gray)"
+  },
+  "multizone": {
+   "rule": "ВСЕ зоны ВСЕХ мультизонных клеток проходят keylineVsTile и fillVsKeyline — Sherwood 14/14, T. Rex 13/13, в том числе в сером; кадр — K1 присоединившегося",
+   "pairsByShape": "пары зон в одной клетке различаются формой штриха или глифа (по данным профиля); gray/yellow в сером |ΔY′| ≈ 73; blue-green/green — «только формой» (pass по зарегистрированному правилу)"
+  },
+  "calibrationMaxDeltaE": {
+   "rule": "байты заливки против hex на плоской калибровке ΔE ≤ 8 — иначе эталон пикселей = screen (записано в calibration до съёмки)",
+   "result": "8 цветов из 15 > 8 → эталон = screen"
+  },
+  "letters": "буквы зон (02 §7.4, UI-ICON-ZONE A–L) — ОТЛОЖЕНО (отдельная волна), в чек-листе «буква — отложено»",
+  "rev2": {
+   "rev": 2
+  },
+  "rev": 3,
+  "colors": {
+   "red": "#EC6650",
+   "gray": "#6B727A"
+  },
+  "rules": "как rev 2 (кромка/плитка ≥ 3, заливка/кромка ≥ 3, мультизоны 100 %)",
+  "grayVsTile": "запись |ΔY′| ≥ 35",
+  "colorsRev4": {
+   "red": "#D8453B",
+   "gray": "#7F868E"
+  }
+ },
+ "light": {
+  "rev": 5,
+  "rotation": [
+   -55,
+   30,
+   0
+  ],
+  "exposure": {
+   "ev100": 2.05,
+   "minBrightness": 4.14106,
+   "maxBrightness": 4.14106,
+   "bias": 0.0
+  },
+  "sky": {
+   "cobble-probe": 11.2,
+   "forest-probe": 11.8,
+   "paddock-probe": 14.1
+  },
+  "keyRotationMeaning": "FRotator(Pitch -55, Yaw 30, Roll 0) — как в пробах и look-dev (было [0,-55,30] = Pitch 0, горизонтальный ключ)",
+  "unchanged": {
+   "keyLux": {
+    "cobble-probe": 4.5,
+    "forest-probe": 4.0,
+    "paddock-probe": 3.5
+   },
+   "pointsCd": {
+    "cobble-probe": [
+     85
+    ],
+    "forest-probe": [
+     150,
+     110,
+     80
+    ],
+    "paddock-probe": [
+     130,
+     85,
+     70
+    ]
+   }
+  }
+ },
+ "heroes": {
+  "step": "B1-5 (look-dev P1.7, редактор)",
+  "how": "В review-config.json четырёх героев (Arthur 20260929-h2ld-ue i2, Merlin и Medusa 20260930-h2ld-ldc-ue c3, Harpy 20260929-h3ld-ue i3): reading_bias_ev −1.0 -> −0.75 (P1.7 EV100 1.3 + bias −0.75 = EV100 2.05; ключ [-55,30,0] уже в ue_hero_lookdev). Съёмка review (reading-кадры, debug, plate) и measure, тег *-b1.",
+  "accept": "допуск (|Y/k − 1| ≤ 0.15, |Δтон| ≤ 12°, |Δнас| ≤ 0.10): Arthur ≥ 5/6, Merlin ≥ 3/5, Medusa 5/5, Harpy ≥ 4/5 (прогноз 17/21, погрешность модели по Y/k ≤ 0.08). Остатки — материал (насыщенность): пояс Arthur +0.18, кожа ремня Merlin −0.12, тёмные перья Harpy +0.16; бронза Merlin не измеряется",
+  "minZones": {
+   "arthur": [
+    5,
+    6
+   ],
+   "merlin": [
+    3,
+    5
+   ],
+   "medusa": [
+    5,
+    5
+   ],
+   "harpy": [
+    4,
+    5
+   ]
+  },
+  "tolerance": {
+   "lumaRatio": 0.15,
+   "hueDeg": 12,
+   "sat": 0.1
+  }
+ },
+ "acceptance": {
+  "heroesLookdev": "B1-5",
+  "boardLumaK1JoinerPassableP50": {
+   "cobble-5x6": [
+    96,
+    108
+   ],
+   "sherwood-forest-8x5": [
+    150,
+    164
+   ],
+   "t-rex-paddock-7x5": [
+    150,
+    164
+   ],
+   "note": "прогноз 102.4 / 157.4 / 157.2 (±6); запись, не гейт; тени ключа Pitch −55 модель не учитывает"
+  },
+  "rings": {
+   "fraction": "как rev 2 (0.60 герой / 0.45 помощник); прогноз для геометрии B1-3 мин. 0.69 / 0.57 (заливка уже на 0.5 / 0.75 uu)",
+   "shapeRev2": "100 % в цвете / сером / deuteranopia (на r3 новым методом 54/54; прогноз для B1-3 36/36 и с ограничителем-ободком, и без него)",
+   "edgeVsTileRev3": "≥ 3.0 : 1 у 100 %, эталон ≥ 50 px, у засчитанной стороны ≥ 10 px ядра (прогноз мин.: Cobble 3.53 по ободку, фикстуры 5.75 по кромке)",
+   "fillVsKeyline": "≥ 3.0 (прогноз для B1-3 ≥ 4.48; на r3 было 4.07–10.7)",
+   "chipShape": "совпадает с кольцом у 100 %"
+  },
+  "zones": {
+   "cobble": "blue 11/11, red 13/13; red заливка/кромка в сером ≥ 3.0 (прогноз 4.72); кромка/плитка ≥ 3.0 (прогноз blue 3.86, red 3.46)",
+   "fixtures": "мультизоны 14/14 и 13/13; кромка/плитка ≥ 3.0 (прогноз ≥ 5.8)",
+   "grayVsTile": "|ΔY′| между заливкой gray и плиткой своей клетки ≥ 35 на фикстурах (запись)"
+  },
+  "teams": "|ΔY′| ≥ 40, ΔE76 ≥ 20 (игровой слой от экспозиции не зависит)",
+  "tagsDamageIconPanels": "как W5b-R r3: теги 14.7 : 1 и привязка 100 %, число 13.6 : 1, край иконки ≥ 3.0 на всех досках (риск — Cobble: край против потемневшей плитки), панели K3 0 px²",
+  "render": "RENDER reference=1, exposure=fixed-histogram, expMin=4.14106 на всех кадрах"
+ },
+ "framesToShoot": [
+  "3 доски × K1 (host + joiner, phase2-board-*-1920x1080.png): кольца, зоны, теги, luma",
+  "3 доски × K3 (joiner s09-combat-resolve-revealed / window / defense-open, s09-damage-number; host|joiner s09-damage-combat; s09-combat-result): иконка, число урона, панели",
+  "3 доски × зонд 24 px и 48 px (K1 host): край жетона против потемневшей плитки",
+  "look-dev P1.7: 4 героя × front / side / back (reading = новый номинал EV100 2.05) + debug + plate, K2 5× reading",
+  "калибровка экранных байтов на плоских плитах до кадров: red #EC6650, gray #6B727A, rim #F2ECDE (team.rim)",
+  "когда будет готова линия 5c-B: те же K1 с героями v2 (-ArtPreviewHeroesV2) — подтверждение героев на доске (не гейт 5c-B1)"
+ ],
+ "deferred": {
+  "C9": "отложено (решение D-8): ΔEV игрового слоя против L4 записывается как прокси (код 3), не норматив",
+  "letters": "отложено (буквы зон)",
+  "light": "снято: ключ rev 5 = Pitch −55 (B1-1); тени ключа модель прогноза не учитывала (риск плана §5)",
+  "Q303": "открыто, ждёт взгляда пользователя"
+ },
+ "revisions": []
+}

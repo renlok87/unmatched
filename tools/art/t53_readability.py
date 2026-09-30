@@ -88,7 +88,20 @@ def point_rect_dist(p, r) -> float:
 
 
 def thresholds(evidence: Path) -> dict:
-    return load_json(evidence / "t53-thresholds.json")
+    """The registered thresholds of an evidence set: t5cb-thresholds.json (5c-B1 and later) or t53-thresholds.json
+    (W5b-R)."""
+    p = evidence / "t5cb-thresholds.json"
+    return load_json(p if p.is_file() else evidence / "t53-thresholds.json")
+
+
+def evidence_ring_bands(th: dict) -> dict:
+    """Ring bands the frames of an evidence set were shot with: the registered geometry of a 5c-B1+ thresholds file
+    (rings.geometry {'P1': {band: [r0, r1]}, 'P2': {...}}), else the W5b-R r3 bands (t53-thresholds.json keeps the
+    geometry as text)."""
+    g = (th.get("rings") or {}).get("geometry")
+    if isinstance(g, dict) and isinstance(g.get("P1"), dict):
+        return {s: {k: list(v) for k, v in g[lk].items() if isinstance(v, list)} for s, lk in (("p1", "P1"), ("p2", "P2"))}
+    return RING.RING_BANDS_R3
 
 
 class Shot:
@@ -286,7 +299,8 @@ def project_many(cam, pts) -> "object":
     return out
 
 
-def ray_centerline(labels, rhos, bound_uu: float, prefer: float, outer=("K",)) -> float | None:
+def ray_centerline(labels, rhos, bound_uu: float, prefer: float, outer=("K",),
+                   rim_bound_uu: float | None = None) -> float | None:
     """One ray of the classifier: labels per radial sample ('K' keyline, 'T' team fill, 'R' light rim of the two-tone
     ring, 'O' other). The fill run must be BOUNDED on both sides: a keyline sample within bound_uu before its first
     sample and a sample of `outer` within bound_uu after its last - a tile pixel of the fill colour (grey variant, light
@@ -294,7 +308,12 @@ def ray_centerline(labels, rhos, bound_uu: float, prefer: float, outer=("K",)) -
     two-tone ring (5c-B1 B1-3) the outer keyline (P2 1.0 uu x FS ~ 1.1 px on a K1 helper) lies between the fill and the
     light rim, anti-aliasing mixes each of its pixels with a light neighbour and may leave no sample within dE 15 of the
     keyline, while the rim right outside it still carries the bound. The inner side stays keyline-only (no rim inside).
-    Of several bounded runs the one nearest `prefer` wins; r = mean rho of its T samples (>= 2)."""
+    Of several bounded runs the one nearest `prefer` wins; r = mean rho of its T samples (>= 2).
+    rim_bound_uu (teamShape rev 2, revision 1 of t5cb-thresholds.json, 5c-B1): an 'R' sample counts as the outer bound
+    within rim_bound_uu after the run (default bound_uu). The rim starts one outer-keyline width after the fill, so
+    classify_shape_v2 passes bound_uu + that width: with the keyline anti-aliased away (the case the rim bound exists
+    for) the first rim sample is >= the keyline width after the last fill sample, and a 1.5-uu window missed it
+    whenever AA also shortened the fill run by one sample (editor K1 diagnostics 2026-09-30)."""
     runs, i, n = [], 0, len(labels)
     while i < n:
         if labels[i] != "T":
@@ -311,7 +330,9 @@ def ray_centerline(labels, rhos, bound_uu: float, prefer: float, outer=("K",)) -
             continue
         lo, hi = rhos[i], rhos[j - 1]
         k_before = any(labels[q] == "K" and lo - bound_uu <= rhos[q] < lo for q in range(max(0, i - 12), i))
-        k_after = any(labels[q] in outer and hi < rhos[q] <= hi + bound_uu for q in range(j, min(n, j + 12)))
+        rb = bound_uu if rim_bound_uu is None else rim_bound_uu
+        k_after = any(labels[q] in outer and hi < rhos[q] <= hi + (rb if labels[q] == "R" else bound_uu)
+                      for q in range(j, min(n, j + 16)))
         if not (k_before and k_after):
             continue
         r = sum(rhos[i:j]) / (j - i)
@@ -372,7 +393,7 @@ def fit_shape(thetas_deg, rs, corner_tol_deg: float = 4.0) -> dict:
 
 
 def classify_shape_v2(shot: Shot, fid: str, team_mask, key_mask, fs: float, z: float, spec: dict | None = None,
-                      rim_mask=None) -> dict:
+                      rim_mask=None, rim_bound_uu: float | None = None) -> dict:
     """teamShape rev 2 (5c-B1): 360 rays in theta in [-135, 135] from +Y; per ray a radial profile 16..34 uu x FS in the
     ring plane labelled K / T / R / O from the keyline, team and (two-tone ring) rim masks of the variant; the fill
     centre-line = the BOUNDED team run (ray_centerline: keyline inside, keyline or rim outside); shape = model fit
@@ -412,7 +433,7 @@ def classify_shape_v2(shot: Shot, fid: str, team_mask, key_mask, fs: float, z: f
                 labels.append("R")
             else:
                 labels.append("O")
-        rs.append(ray_centerline(labels, rhos, sp["boundUU"], prefer=25.0, outer=("K", "R")))
+        rs.append(ray_centerline(labels, rhos, sp["boundUU"], prefer=25.0, outer=("K", "R"), rim_bound_uu=rim_bound_uu))
     fit = fit_shape(thetas, rs, sp["cornerTolDeg"])
     shape = "unclassified"
     if fit.get("filled", 0) >= sp["minFilledShare"] * n and "hexOverCircle" in fit:
@@ -424,7 +445,17 @@ def classify_shape_v2(shot: Shot, fid: str, team_mask, key_mask, fs: float, z: f
     fit["shape"] = shape
     fit["method"] = "teamShape rev 2 (5c-B1)"
     fit["rimBound"] = rim_mask is not None
+    fit["rimBoundUU"] = rim_bound_uu if rim_mask is not None else None
     return fit
+
+
+def rim_bound_uu(look: str) -> float | None:
+    """teamShape rev 2 revision 1 (5c-B1): the outer bound window of a rim sample = boundUU + the outer keyline width of
+    the look (hero-scale uu: P1 1.5 + 1.5 = 3.0, P2 1.5 + 1.0 = 2.5); None for a one-tone ring (no rimOut band)."""
+    b = ring_bands(look)
+    if "rimOut" not in b:
+        return None
+    return SHAPE_V2["boundUU"] + (b["keylineOut"][1] - b["keylineOut"][0])
 
 
 def variant_masks(shot: Shot, look: str, calib: dict, pde: float) -> dict:
@@ -568,7 +599,9 @@ def rings_rev3(shot: Shot, calib: dict, cells: list[dict] | None, pde: float = 1
         masks = variant_masks(shot, look, calib, pde)
         rim_l = rim_of(look, calib, rim)
         rims = variant_mask(shot, rim_l["screen"], pde) if rim_l else {}
-        shapes = {vn: classify_shape_v2(shot, fid, tm, km, fs, z, rim_mask=rims.get(vn)) for vn, (tm, km) in masks.items()}
+        shapes = {vn: classify_shape_v2(shot, fid, tm, km, fs, z, rim_mask=rims.get(vn),
+                                        rim_bound_uu=rim_bound_uu(look) if rims else None)
+                  for vn, (tm, km) in masks.items()}
         want = "circle" if look == "P1" else "hexagon"
         ref = ring_tile_reference_rev3(shot, fid, calib, cells, pde, rim)
         edge_ok = ref["tilePx"] >= min_tile_px and all(
@@ -1223,6 +1256,11 @@ def run_qa(args, json_out):
 
 
 def cmd_analyze(a) -> int:
+    with RING.using_bands(evidence_ring_bands(thresholds(Path(a.evidence).resolve()))):
+        return _cmd_analyze(a)
+
+
+def _cmd_analyze(a) -> int:
     import numpy as np
     evidence = Path(a.evidence).resolve()
     th = thresholds(evidence)
@@ -1905,6 +1943,11 @@ def cmd_k3(a) -> int:
 
 
 def cmd_rings_rev3(a) -> int:
+    with RING.using_bands(evidence_ring_bands(thresholds(Path(a.evidence).resolve()))):
+        return _cmd_rings_rev3(a)
+
+
+def _cmd_rings_rev3(a) -> int:
     """Re-evaluate the published frames of an analysed board (summary.json frames K1_host / K1_joiner / K3) with the
     5c-B1 methods (shape classifier rev 2, ring tile reference rev 3) next to the registered rev 2 verdicts. Read-only
     on the evidence; the JSON goes to --out."""

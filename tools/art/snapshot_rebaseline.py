@@ -24,7 +24,10 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
 BASELINE = REPO / "docs/art-pipeline/evidence/s3-baseline-2026-09-28/production-baseline.json"
-ROOTS = {"repo": REPO, "art-worktree": Path("C:/Users/ren/.codex/worktrees/art-foundation/unmached")}
+# the same roots as snapshot_baseline.py: "repo" is ALWAYS the main checkout (REPO would be the art worktree when the
+# script runs from there - 5c-B1 ran it from the art worktree)
+ROOTS = {"repo": Path("C:/Users/ren/WebstormProjects/unmached/unmached"),
+         "art-worktree": Path("C:/Users/ren/.codex/worktrees/art-foundation/unmached")}
 
 
 def sha256(p: Path) -> str:

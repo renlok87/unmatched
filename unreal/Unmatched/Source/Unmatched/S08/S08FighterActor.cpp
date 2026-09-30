@@ -201,7 +201,10 @@ bool AS08FighterActor::LoadTeamRingAssets() {
   TeamRingMeshP2 = LoadObject<UStaticMesh>(nullptr, S08TeamRingSpec::MeshPath(ES08TeamSlot::P2));
   TeamRingKeyline = LoadObject<UMaterialInterface>(nullptr, S08TeamRingSpec::KeylineMaterialPath);
   TeamRingFill = LoadObject<UMaterialInterface>(nullptr, S08TeamRingSpec::FillMaterialPath);
-  bTeamRingReady = TeamRingMeshP1 && TeamRingMeshP2 && TeamRingKeyline && TeamRingFill;
+  // 5c-B1: the light rim of the two-tone edge (mesh slot 2; the mesh keeps it as its default material too)
+  TeamRingRim = LoadObject<UMaterialInterface>(nullptr, S08TeamRingSpec::RimMaterialPath);
+  bTeamRingReady = TeamRingMeshP1 && TeamRingMeshP2 && TeamRingKeyline && TeamRingFill && TeamRingRim &&
+                   TeamRingMeshP1->GetStaticMaterials().Num() == 3 && TeamRingMeshP2->GetStaticMaterials().Num() == 3;
   if (bTeamRingReady && !TeamRingFillMid) TeamRingFillMid = UMaterialInstanceDynamic::Create(TeamRingFill, this);
   bTeamRingReady = bTeamRingReady && TeamRingFillMid;
   return bTeamRingReady;
@@ -247,7 +250,8 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
         : nullptr;
     UStaticMesh* Pedestal = LoadObject<UStaticMesh>(nullptr,
         TEXT("/Game/ArtPreview/Medusa/Meshes/SM_Medusa_Base_v2Candidate"));
-    // W5b-R D-2: the TeamColor MI by the team look (MI_Medusa_P1 Gold / _P2 Silver, pastel of the hue); the former
+    // W5b-R D-2: the TeamColor MI by the team look (MI_Medusa_P1 / _P2; 5c-B1 B1-4, user decision "accents + ring":
+    // both TeamColor (1,1,1,1) - concept colours, the team shows on the ring and the chip; W5b-R had the pastel); the former
     // own/enemy MI_Medusa_Blue/_Red stay the fallback and the -S08LegacyRender look.
     UMaterialInterface* TeamMaterial = S08LegacyRender() ? nullptr : LoadObject<UMaterialInterface>(nullptr,
         Look == ES08TeamSlot::P1 ? TEXT("/Game/ArtPreview/Medusa/Materials/MI_Medusa_P1")
@@ -439,6 +443,7 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
     TeamRing->SetMaterial(0, TeamRingKeyline);
     TeamRingFillMid->SetVectorParameterValue(TEXT("LayerColor"), S08TeamPalette::RingFill(Look));
     TeamRing->SetMaterial(1, TeamRingFillMid);
+    TeamRing->SetMaterial(2, TeamRingRim);
   }
   TeamRing->SetVisibility(bTeamRingShown);
   Base->SetVisibility(!bTeamRingShown);
@@ -446,14 +451,14 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
     bTeamRingTraced = true;
     const FLinearColor Fill = S08TeamPalette::RingFill(Look);
     FS08Trace::Write(FString::Printf(
-        TEXT("ARTPREVIEW team ring fighter=%s team=%s look=%s mode=%s shape=%s shown=%d mesh=%s fill=%s keyline=%s fillLinear=(%.4f,%.4f,%.4f) zMin=%.2f zMax=%.2f scale=%.2f base=%s blockout=%d art=%d"),
+        TEXT("ARTPREVIEW team ring fighter=%s team=%s look=%s mode=%s shape=%s shown=%d mesh=%s fill=%s keyline=%s fillLinear=(%.4f,%.4f,%.4f) zMin=%.2f zMax=%.2f scale=%.2f base=%s blockout=%d art=%d rim=%s"),
         *Fighter.Id, S08TeamSlotName(Team), S08TeamSlotName(Look), S08TeamColorModeName(TeamMode),
         S08TeamShapeName(Look), bTeamRingShown ? 1 : 0,
         bTeamRingShown ? *TeamRing->GetStaticMesh()->GetName() : TEXT("none"),
         Look == ES08TeamSlot::P1 ? S08TeamPalette::P1Hex : S08TeamPalette::P2Hex, S08TeamPalette::KeylineHex,
         Fill.R, Fill.G, Fill.B, S08TeamRingSpec::ZMin, S08TeamRingSpec::ZMax,
         Fighter.bIsHero ? 1.0f : S08TeamRingSpec::SidekickScale, bTeamRingShown ? TEXT("hidden") : TEXT("shown"),
-        bVisualBlockout ? 1 : 0, bVisualArt ? 1 : 0));
+        bVisualBlockout ? 1 : 0, bVisualArt ? 1 : 0, S08TeamPalette::RimHex));
   }
 
   // SetupCameraForBoard pulls the camera back to fit bigger boards, which

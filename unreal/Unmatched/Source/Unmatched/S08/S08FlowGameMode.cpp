@@ -5444,7 +5444,7 @@ bool AS08FlowGameMode::FigureScreenRect(const FString& FighterId, FS08ScreenRect
   if (!Fighter || !Fighter->IsAlive() || !BoardActor) return false;
   const AS08FighterActor* Actor = BoardActor->FindFighterActor(FighterId);
   const float Height = Actor ? Actor->GetFigureHeightUU() : 60.0f;
-  // W5b-R D-3: an art figure's box includes its team ring (outer edge 28 uu hero / 21.84 sidekick), so the plate,
+  // W5b-R D-3: an art figure's box includes its team ring (outer edge = the rim, 5c-B1: 28.5 uu hero / 22.23 sidekick; r3 28 / 21.84), so the plate,
   // the icon and the tags keep off the rings (T5.2: the Medusa plate touched Arthur's ring on Cobble).
   const float Radius = (Actor && Actor->HasArtFigure())
       ? (Fighter->bIsHero ? S08TeamRingSpec::HeroRectRadiusUU : S08TeamRingSpec::SidekickRectRadiusUU)

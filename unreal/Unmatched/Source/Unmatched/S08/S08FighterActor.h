@@ -125,6 +125,8 @@ private:
   UPROPERTY()
   TObjectPtr<UMaterialInterface> TeamRingFill;
   UPROPERTY()
+  TObjectPtr<UMaterialInterface> TeamRingRim;
+  UPROPERTY()
   TObjectPtr<UMaterialInstanceDynamic> TeamRingFillMid;
 
   UPROPERTY()

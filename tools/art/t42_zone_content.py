@@ -467,8 +467,12 @@ def cmd_keylines(a) -> int:
         live.call("instance", "create", {"folder_path": FOLDER, "asset_name": mi["package"].rsplit("/", 1)[1],
                                          "parent": ref(MASTER)})
         rep["actions"].append({"createMI": mi["package"]})
-    live.call("instance", "set_vector_parameter", {"instance": ref(mi["package"]), "name": COLOR_PARAM,
-                                                   "value": dict(zip("rgba", mi["linear"]))})
+    got = live.call("instance", "get_vector_parameter", {"instance": ref(mi["package"]), "name": COLOR_PARAM})
+    vals = [got.get(k) for k in "rgba"] if isinstance(got, dict) else None
+    if not (vals and all(abs(float(x) - float(y)) <= 1e-5 for x, y in zip(vals, mi["linear"]))):
+        # 5c-B1: set only when it differs - an unconditional set dirtied and re-saved an unchanged keyline MI
+        live.call("instance", "set_vector_parameter", {"instance": ref(mi["package"]), "name": COLOR_PARAM,
+                                                       "value": dict(zip("rgba", mi["linear"]))})
     for m in kp["recolor"]:
         got = live.call("instance", "get_vector_parameter", {"instance": ref(m["package"]), "name": COLOR_PARAM})
         vals = [got.get(k) for k in "rgba"] if isinstance(got, dict) else None

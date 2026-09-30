@@ -49,9 +49,12 @@ inline const TCHAR* const P2Hex = TEXT("#5A7F9F");        // team.p2 (Silver, W4
 inline const TCHAR* const P1ScreenHex = TEXT("#DAC576");  // team.p1.screen (measured on-screen ring fill)
 inline const TCHAR* const P2ScreenHex = TEXT("#5786A8");  // team.p2.screen
 inline const TCHAR* const KeylineHex = TEXT("#111317");   // mark.keyline
+inline const TCHAR* const RimHex = TEXT("#FFFFFF");       // team.rim (5c-B1: light rim of the two-tone ring edge;
+                                                          // #F2ECDE -> the plan fallback #FFFFFF in B1-2)
 /** Ring fill as the game-layer LayerColor: FromSRGBColor(FromHex(team hex)). */
 UNMATCHED_API FLinearColor RingFill(ES08TeamSlot Slot);
 UNMATCHED_API FLinearColor Keyline();
+UNMATCHED_API FLinearColor Rim();
 /** UI chip colour (sRGB bytes, drawn through FLinearColor(FColor) = FromSRGBColor):
  *  the measured ON-SCREEN colour of the ring fill, so the chip equals the ring
  *  for the viewer (the ring passes the tonemapper, the UI does not). */
@@ -65,27 +68,32 @@ namespace S08TeamRingSpec {
 constexpr float ZMin = 0.6f;
 constexpr float ZMax = 1.2f;
 constexpr float SidekickScale = 0.78f;
+// 5c-B1 B1-3 (plan rev 2): two-tone edge - the outer keyline keeps its r3 width, a light rim (team.rim) sits
+// outside it, paid for by the fill (r3: P1 fill 23.5-26.5, keyline out 26.5-28.0; P2 fill 23.0-26.0, 26.0-27.0).
 // P1 circle (radius, uu)
-constexpr float P1KeylineIn0 = 22.0f, P1Fill0 = 23.5f, P1Fill1 = 26.5f, P1KeylineOut1 = 28.0f;
-// P2 hexagon (apothem, uu; corners at 0/60/.../300 deg from +X) + a gap across each corner
-constexpr float P2KeylineIn0 = 21.5f, P2Fill0 = 23.0f, P2Fill1 = 26.0f, P2KeylineOut1 = 27.0f;
+constexpr float P1KeylineIn0 = 22.0f, P1Fill0 = 23.5f, P1Fill1 = 26.0f, P1KeylineOut1 = 27.5f, P1RimOut1 = 28.5f;
+// P2 hexagon (apothem, uu; corners at 0/60/.../300 deg from +X) + a gap across each corner through every band
+constexpr float P2KeylineIn0 = 21.5f, P2Fill0 = 23.0f, P2Fill1 = 25.25f, P2KeylineOut1 = 26.25f, P2RimOut1 = 27.25f;
 constexpr float P2CornerGapUU = 2.0f;
 /** SM_Marker_TargetRing arcs: outer radius (blender/ASSET-MARKERS-001/build_markers.py: inner 20.9, outer 23). */
 constexpr float TargetArcOuterUU = 23.0f;
 /** SM_Marker_SelectionRing: inner 17.8, outer 20. */
 constexpr float SelectionRingOuterUU = 20.0f;
-/** FigureScreenRect half-size with the ring (hero / sidekick): the outer ring edge. */
-constexpr float HeroRectRadiusUU = 28.0f;
-constexpr float SidekickRectRadiusUU = 28.0f * SidekickScale;  // 21.84
+/** FigureScreenRect half-size with the ring (hero / sidekick): the outer ring edge (5c-B1: the rim, was 28.0). */
+constexpr float HeroRectRadiusUU = P1RimOut1;
+constexpr float SidekickRectRadiusUU = P1RimOut1 * SidekickScale;  // 22.23
 inline const TCHAR* MeshPath(ES08TeamSlot Slot) {
   return Slot == ES08TeamSlot::P1 ? TEXT("/Game/ArtTests/ARTMarkers/Meshes/SM_Marker_TeamRing_P1")
                                   : TEXT("/Game/ArtTests/ARTMarkers/Meshes/SM_Marker_TeamRing_P2");
 }
 inline const TCHAR* const KeylineMaterialPath = TEXT("/Game/ArtTests/ARTMarkers/Materials/MI_Marker_TeamRing_Keyline");
 inline const TCHAR* const FillMaterialPath = TEXT("/Game/ArtTests/ARTMarkers/Materials/MI_Marker_TeamRing_Fill");
+/** 5c-B1: material slot 2 of both ring meshes (slots: 0 Keyline, 1 Fill, 2 Rim). */
+inline const TCHAR* const RimMaterialPath = TEXT("/Game/ArtTests/ARTMarkers/Materials/MI_Marker_TeamRing_Rim");
 /** Outer boundary of the ring's top face in the cell plane (hero size, uu): P1 a
- *  96-gon at radius 28, P2 the six trimmed outer hexagon edges (each side two
- *  points; the corner gaps open the polygon, so it is returned side by side). */
+ *  96-gon at radius 28.5 (the rim), P2 the six trimmed outer hexagon edges of the
+ *  rim (each side two points; the corner gaps open the polygon, so it is
+ *  returned side by side). */
 UNMATCHED_API void OuterEdges(ES08TeamSlot Slot, TArray<TPair<FVector2D, FVector2D>>& OutSegments);
 /** Top-face polygons (quads) of the fill band (hero size, uu). */
 UNMATCHED_API void FillQuads(ES08TeamSlot Slot, TArray<TArray<FVector2D>>& OutQuads);

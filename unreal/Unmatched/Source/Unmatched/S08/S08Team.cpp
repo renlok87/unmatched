@@ -42,6 +42,8 @@ FLinearColor RingFill(ES08TeamSlot Slot) {
 
 FLinearColor Keyline() { return FLinearColor::FromSRGBColor(FColor::FromHex(KeylineHex)); }
 
+FLinearColor Rim() { return FLinearColor::FromSRGBColor(FColor::FromHex(RimHex)); }
+
 FColor ChipColor(ES08TeamSlot Slot) {
   FColor C = FColor::FromHex(Slot == ES08TeamSlot::P1 ? P1ScreenHex : P2ScreenHex);
   C.A = 255;
@@ -79,15 +81,15 @@ void OuterEdges(ES08TeamSlot Slot, TArray<TPair<FVector2D, FVector2D>>& OutSegme
     for (int32 I = 0; I < CircleSegments; ++I) {
       const double A0 = 2.0 * PI * I / CircleSegments;
       const double A1 = 2.0 * PI * (I + 1) / CircleSegments;
-      OutSegments.Add({FVector2D(FMath::Cos(A0), FMath::Sin(A0)) * P1KeylineOut1,
-                       FVector2D(FMath::Cos(A1), FMath::Sin(A1)) * P1KeylineOut1});
+      OutSegments.Add({FVector2D(FMath::Cos(A0), FMath::Sin(A0)) * P1RimOut1,
+                       FVector2D(FMath::Cos(A1), FMath::Sin(A1)) * P1RimOut1});
     }
     return;
   }
   TArray<TArray<FVector2D>> Quads;
-  HexBandQuads(P2Fill1, P2KeylineOut1, Quads);
+  HexBandQuads(P2KeylineOut1, P2RimOut1, Quads);
   for (const TArray<FVector2D>& Q : Quads) {
-    OutSegments.Add({Q[1], Q[2]});  // the outer edge of the outer keyline quad
+    OutSegments.Add({Q[1], Q[2]});  // the outer edge of the rim quad
     OutSegments.Add({Q[0], Q[1]});  // gap end (the outer corner of the side)
     OutSegments.Add({Q[3], Q[2]});
   }

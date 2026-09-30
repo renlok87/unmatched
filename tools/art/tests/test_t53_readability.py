@@ -100,6 +100,10 @@ class RingSpecConsistency(unittest.TestCase):
         self.assertEqual((c("P2KeylineIn0"), c("P2Fill0"), c("P2Fill1"), c("P2KeylineOut1")),
                          (p2["keylineIn"][0], p2["fill"][0], p2["fill"][1], p2["keylineOut"][1]))
         self.assertEqual(c("P2CornerGapUU"), RING.RING_SPEC["p2"]["cornerGapUU"])
+        # 5c-B1 B1-3: the outer ring edge is the rim (rimOut[1]); FigureScreenRect uses it
+        self.assertEqual((c("P1RimOut1"), c("P2RimOut1")), (p1["rimOut"][1], p2["rimOut"][1]))
+        self.assertEqual((p1["keylineOut"][1], p2["keylineOut"][1]), (p1["rimOut"][0], p2["rimOut"][0]))
+        self.assertIn("HeroRectRadiusUU = P1RimOut1", h)
         self.assertEqual((c("ZMin"), c("ZMax")), (RING.RING_SPEC["zMin"], RING.RING_SPEC["zMax"]))
         self.assertEqual(c("SidekickScale"), RING.RING_SPEC["sidekickScaleXY"])
 

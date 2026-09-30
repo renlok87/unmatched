@@ -11,21 +11,26 @@ copied byte-for-byte into the art worktree and force-added there (Content/ is gi
 
 What it makes (cooked through the existing +DirectoriesToAlwaysCook /Game/ArtTests/ARTMarkers and /Game/ArtPreview/Medusa):
   * SM_Marker_TeamRing_P1 - a flat annulus (circle) under the art figure of player 1 (seat 0 / host):
-      inner keyline r 22.0-23.5 uu, fill 23.5-26.5, outer keyline 26.5-28.0 (hero size; sidekicks are scaled 0.78
-      in XY by the client), top face at z = +1.2, walls down to z = +0.6 (above the zone marks, z <= 0.58, and the tile
-      top z = 0: the T5.2 disc sat IN the tile plane and z-fought, act T5.2 §4.9);
-  * SM_Marker_TeamRing_P2 - the same band as a hexagon (corners at 0/60/.../300 deg from +X, flats face the camera)
-      measured by apothem: inner keyline 21.5-23.0, fill 23.0-26.0, outer keyline 26.0-27.0 (1.0 uu: the rule
-      'outer edge + 1 uu <= the nearest zone glyph' of the plan, see RING_SPEC), with a 2.0 uu gap across each of the
-      six corners (C-11 'circle vs hexagon' plus a pattern that survives a partial occlusion);
-    two material slots each: 'Keyline' and 'Fill' (OBJ usemtl names);
-  * MI_Marker_TeamRing_Keyline / MI_Marker_TeamRing_Fill - children of the W4-B game-layer master
+      inner keyline r 22.0-23.5 uu, fill 23.5-26.0, outer keyline 26.0-27.5, light rim 27.5-28.5 (5c-B1 B1-3, plan
+      rev 2: the two-tone edge; W5b-R r3 had fill 23.5-26.5, outer keyline 26.5-28.0 and no rim) (hero size; sidekicks
+      are scaled 0.78 in XY by the client), top face at z = +1.2, walls down to z = +0.6 (above the zone marks,
+      z <= 0.58, and the tile top z = 0: the T5.2 disc sat IN the tile plane and z-fought, act T5.2 §4.9);
+  * SM_Marker_TeamRing_P2 - the same bands as a hexagon (corners at 0/60/.../300 deg from +X, flats face the camera)
+      measured by apothem: inner keyline 21.5-23.0, fill 23.0-25.25, outer keyline 25.25-26.25, light rim 26.25-27.25
+      (r3: fill 23.0-26.0, outer keyline 26.0-27.0; the rule 'outer edge + 1 uu <= the nearest zone glyph' holds,
+      see RING_SPEC), with a 2.0 uu gap across each of the six corners through every band (C-11 'circle vs hexagon'
+      plus a pattern that survives a partial occlusion);
+    three material slots each, in this order: 'Keyline' (0), 'Fill' (1), 'Rim' (2) (OBJ usemtl names; the client sets
+    0 and 1 by index, 2 = MI_Marker_TeamRing_Rim, the mesh default, also set by the client after 5c-B2);
+  * MI_Marker_TeamRing_Keyline / MI_Marker_TeamRing_Fill / MI_Marker_TeamRing_Rim - children of the W4-B game-layer master
     /Game/UM/Materials/M_UM_GameLayer (unlit, EyeAdaptationInverse, ISM usage); LayerColor = FLinearColor::FromSRGBColor
     of the hex (keyline #111317, fill = team.p1 #E8C06A as the asset default - the client sets the team fill per
-    fighter through a MID of the fill MI);
+    fighter through a MID of the fill MI; rim = team.rim #FFFFFF - the plan fallback, applied in B1-2 after the editor
+    Cobble frame gave rimVsTile 2.97 < 3.3 for #F2ECDE);
   * MI_Medusa_P1 / MI_Medusa_P2 - the Medusa candidate MI (M_Medusa_Atlas, one TeamColor override like MI_Medusa_Blue /
-    _Red) named by the absolute team (D-2) instead of own/enemy; TeamColor = the pastel of the team hue (see
-    medusa_tint): a whole-figure multiply by the dark Silver #5A7F9F would black the sculpt out.
+    _Red) named by the absolute team (D-2) instead of own/enemy. 5c-B1 B1-4 (user decision "Accents + ring"): TeamColor
+    = (1, 1, 1, 1) in both - the candidate keeps the concept colours, the team shows on the ring and the chip only
+    (W5b-R had the pastel of the team hue, see medusa_tint).
 
 OBJ axes: UE's OBJ importer maps OBJ (x, y, z) to UE (x, -y, z) at 1 uu per unit (measured 2026-09-29 by T4.2); the
 writer stores (x, -y, z) with outward right-handed winding in OBJ space (the importer mirrors Y back).
@@ -34,6 +39,7 @@ Statuses: "технически импортировано" at most; shape and p
 from __future__ import annotations
 
 import argparse
+import contextlib
 import datetime as dt
 import hashlib
 import json
@@ -64,28 +70,55 @@ SCHEMA = "unmatched.t53-team-ring/1"
 RING_SPEC = {
     "zMin": 0.6, "zMax": 1.2,
     "p1": {"shape": "circle", "segments": 96,
-           "bands": {"keylineIn": [22.0, 23.5], "fill": [23.5, 26.5], "keylineOut": [26.5, 28.0]}},
+           "bands": {"keylineIn": [22.0, 23.5], "fill": [23.5, 26.0], "keylineOut": [26.0, 27.5], "rimOut": [27.5, 28.5]}},
     "p2": {"shape": "hexagon", "cornersDeg": [0, 60, 120, 180, 240, 300], "measure": "apothem",
-           "bands": {"keylineIn": [21.5, 23.0], "fill": [23.0, 26.0], "keylineOut": [26.0, 27.0]},
+           "bands": {"keylineIn": [21.5, 23.0], "fill": [23.0, 25.25], "keylineOut": [25.25, 26.25],
+                     "rimOut": [26.25, 27.25]},
            "cornerGapUU": 2.0},
     "sidekickScaleXY": 0.78,
     "why": {
         "z": "top face +1.2 uu: above the zone marks (glyph fill top +0.58) and far from the tile top z = 0 "
              "(the T5.2 disc top was coplanar with the tile top: z-fighting)",
-        "p1Outer": "28.0 + 1 uu <= 29.73 uu: the nearest zone-glyph piece (bars3, slot (+-32,+-32)) - exact piece "
-                   "geometry of S08GlyphPieces, not the glyph AABB (the diamond AABB corner lies at 27.25 uu, but the "
-                   "diamond itself stays 36.25 uu away)",
-        "p2Outer": "hexagon apothem 27.0: the 30-degree flat passes the bars3 corner (20,22) at 1.32 uu; with the "
-                   "plan's 1.5 uu outer keyline (apothem 27.5) the gap would be 0.82 uu < 1 - the plan's fallback "
-                   "'outer keyline 1.0 uu' applies to P2",
+        "p1Outer": "rim outer 28.5 + 1 uu <= 29.73 uu (clearance 1.23): the nearest zone-glyph piece (bars3, slot "
+                   "(+-32,+-32)) - exact piece geometry of S08GlyphPieces, not the glyph AABB (the diamond AABB corner "
+                   "lies at 27.25 uu, but the diamond itself stays 36.25 uu away)",
+        "p2Outer": "hexagon rim outer apothem 27.25: the 30-degree flat passes the bars3 corner (20,22) at 1.07 uu "
+                   "(>= 1); the outer keyline stays 1.0 uu wide as in r3",
+        "twoTone": "5c-B1 B1-3 (plan rev 2 section 3a): under the rev 5 light the dark keyline against the dark Cobble "
+                   "drops to ~2.5:1, so a light rim (team.rim #FFFFFF; #F2ECDE first, the plan fallback applied in B1-2) sits "
+                   "outside the outer keyline; the keyline keeps "
+                   "its r3 width (the shape classifier and the keyline core need its pixels after anti-aliasing), the "
+                   "rim is paid for by the fill (P1 3.0 -> 2.5 uu, P2 3.0 -> 2.25 uu); rules: "
+                   "tools/art/t5cb1_ring_sim.py check",
         "fillInner": "P1 fill starts at 23.5 > the target arcs' outer edge 23.0 (SM_Marker_TargetRing, build_markers.py: "
                      "inner 20.9 / outer 23); P2 fill starts at apothem 23.0 = the arcs' outer edge at the flats only",
         "gaps": "P2: 2.0 uu across each corner bisector (the side trimmed 2/ (2 sin 60) = 1.1547 uu before the corner)"},
 }
+# W5b-R r3 bands: the frames of art3-live-3boards-r2 (r3) were shot with them; analyses of that evidence use them
+RING_BANDS_R3 = {"p1": {"keylineIn": [22.0, 23.5], "fill": [23.5, 26.5], "keylineOut": [26.5, 28.0]},
+                 "p2": {"keylineIn": [21.5, 23.0], "fill": [23.0, 26.0], "keylineOut": [26.0, 27.0]}}
 KEYLINE_HEX = "#111317"
+RIM_HEX = "#FFFFFF"  # team.rim (5c-B1 B1-2: the plan fallback; #F2ECDE first)
 # the .mtl next to each OBJ: without it the OBJ (FBX SDK) importer merges every usemtl group into one 'defaultMat'
-MTL_TEXT = "newmtl Keyline\nKd 0.0056 0.0065 0.0086\n\nnewmtl Fill\nKd 0.807 0.527 0.144\n"
-BAND_SLOT = {"keylineIn": "Keyline", "fill": "Fill", "keylineOut": "Keyline"}
+MTL_TEXT = ("newmtl Keyline\nKd 0.0056 0.0065 0.0086\n\nnewmtl Fill\nKd 0.807 0.527 0.144\n\n"
+            "newmtl Rim\nKd 1.0 1.0 1.0\n")
+BAND_SLOT = {"keylineIn": "Keyline", "fill": "Fill", "keylineOut": "Keyline", "rimOut": "Rim"}
+SLOT_ORDER = ("Keyline", "Fill", "Rim")  # material slot indices 0 / 1 / 2 (S08FighterActor sets them by index)
+
+
+@contextlib.contextmanager
+def using_bands(bands: dict | None):
+    """Temporarily set RING_SPEC['p1'/'p2']['bands'] (the t53 metrics read the bands from RING_SPEC): the frames of an
+    evidence set are measured with the ring geometry they were shot with (None = keep the current spec)."""
+    old = {s: RING_SPEC[s]["bands"] for s in ("p1", "p2")}
+    try:
+        if bands:
+            for s in ("p1", "p2"):
+                RING_SPEC[s]["bands"] = {k: list(v) for k, v in bands[s].items()}
+        yield
+    finally:
+        for s, b in old.items():
+            RING_SPEC[s]["bands"] = b
 
 
 def ring_package(slot: str) -> str:
@@ -94,6 +127,9 @@ def ring_package(slot: str) -> str:
 
 MI_KEYLINE = f"{MAT_FOLDER}/MI_Marker_TeamRing_Keyline"
 MI_FILL = f"{MAT_FOLDER}/MI_Marker_TeamRing_Fill"
+MI_RIM = f"{MAT_FOLDER}/MI_Marker_TeamRing_Rim"
+SLOT_MI = {"keyline": MI_KEYLINE, "fill": MI_FILL, "rim": MI_RIM}
+MEDUSA_TEAM_COLOR = [1.0, 1.0, 1.0, 1.0]  # 5c-B1 B1-4: neutral (concept colours), the team is on the ring and the chip
 MI_MEDUSA = {"p1": f"{MEDUSA_FOLDER}/MI_Medusa_P1", "p2": f"{MEDUSA_FOLDER}/MI_Medusa_P2"}
 
 
@@ -126,11 +162,13 @@ def package_file(content_root: Path, package: str) -> Path:
 def team_hex() -> dict:
     tok = json.loads(TOKENS.read_text(encoding="utf-8"))["colors"]
     return {"p1": tok["team.p1"]["hex"], "p2": tok["team.p2"]["hex"],
-            "keyline": tok.get("mark.keyline", {}).get("hex", KEYLINE_HEX)}
+            "keyline": tok.get("mark.keyline", {}).get("hex", KEYLINE_HEX),
+            "rim": tok.get("team.rim", {}).get("hex", RIM_HEX)}
 
 
 def medusa_tint(hexc: str) -> list[float]:
-    """Pastel of the team hue for the whole-figure multiply of the Medusa candidate (the MI_Medusa_Blue/_Red scheme):
+    """W5b-R only (5c-B1 uses MEDUSA_TEAM_COLOR): pastel of the team hue for the whole-figure multiply of the Medusa
+    candidate (the MI_Medusa_Blue/_Red scheme):
     the linear colour normalised by its largest channel, half-way to white. #E8C06A -> (1.0, 0.827, 0.589);
     #5A7F9F -> (0.647, 0.806, 1.0) (close to the former MI_Medusa_Blue (0.72, 0.85, 1.0))."""
     lin = hex_to_linear(hexc)[:3]
@@ -191,7 +229,7 @@ def ring_obj(slot: str) -> str:
     P2 gap ends, vertical walls down to zMin (outward normals). OBJ stores UE (x, y, z) as (x, -y, z)."""
     z0, z1 = RING_SPEC["zMin"], RING_SPEC["zMax"]
     polys = ring_polygons(slot)
-    groups = {"Keyline": [], "Fill": []}
+    groups = {g: [] for g in SLOT_ORDER}
 
     def add_face(group, pts3, want_normal):
         # pts3 in UE space; write mirrored; fix winding so the OBJ-space normal points along the mirrored want_normal
@@ -210,7 +248,8 @@ def ring_obj(slot: str) -> str:
         group = BAND_SLOT[band]
         for q in quads:
             add_face(group, [(x, y, z1) for (x, y) in q], (0.0, 0.0, 1.0))
-    # walls: inner edge of keylineIn, outer edge of keylineOut (both groups 'Keyline'); P2 gap ends on every band
+    # walls: inner edge of keylineIn ('Keyline'), outer edge of the outermost band (rimOut 'Rim' after B1-3, else
+    # keylineOut 'Keyline'); P2 gap ends on every band
     def edge_wall(p, q, group):
         mx, my = (p[0] + q[0]) / 2.0, (p[1] + q[1]) / 2.0
         dx, dy = q[0] - p[0], q[1] - p[1]
@@ -222,11 +261,12 @@ def ring_obj(slot: str) -> str:
         if n[0] * mid[0] + n[1] * mid[1] > 0:  # inner wall faces the centre
             n = (-n[0], -n[1])
         add_face("Keyline", pts, (n[0], n[1], 0.0))
-    for q in polys["keylineOut"]:
-        n, pts, mid = edge_wall(q[1], q[2], "Keyline")
+    outer = "rimOut" if "rimOut" in polys else "keylineOut"
+    for q in polys[outer]:
+        n, pts, mid = edge_wall(q[1], q[2], BAND_SLOT[outer])
         if n[0] * mid[0] + n[1] * mid[1] < 0:  # outer wall faces away from the centre
             n = (-n[0], -n[1])
-        add_face("Keyline", pts, (n[0], n[1], 0.0))
+        add_face(BAND_SLOT[outer], pts, (n[0], n[1], 0.0))
     if RING_SPEC[slot]["shape"] == "hexagon":
         for band, quads in polys.items():
             for k, q in enumerate(quads):
@@ -239,7 +279,9 @@ def ring_obj(slot: str) -> str:
              # without an .mtl the OBJ (FBX SDK) importer merges every usemtl group into one 'defaultMat' slot
              f"mtllib SM_Marker_TeamRing_{slot.upper()}.mtl", f"o SM_Marker_TeamRing_{slot.upper()}", "s off"]
     verts, uvs, normals, faces = [], [], [], []
-    for group in ("Keyline", "Fill"):
+    for group in SLOT_ORDER:
+        if not groups[group]:
+            continue
         faces.append(("usemtl", group))
         for pts, n in groups[group]:
             base = len(verts)
@@ -284,9 +326,13 @@ def plan() -> dict:
             "materialInstances": [
                 {"package": MI_KEYLINE, "parent": MASTER, "hex": hexes["keyline"], "linear": hex_to_linear(hexes["keyline"])},
                 {"package": MI_FILL, "parent": MASTER, "hex": hexes["p1"], "linear": hex_to_linear(hexes["p1"]),
-                 "note": "asset default = team.p1; the client sets the fill per fighter (MID, FromSRGBColor of the token)"}],
+                 "note": "asset default = team.p1; the client sets the fill per fighter (MID, FromSRGBColor of the token)"},
+                {"package": MI_RIM, "parent": MASTER, "hex": hexes["rim"], "linear": hex_to_linear(hexes["rim"]),
+                 "note": "5c-B1 B1-3: light rim of the two-tone ring edge (team.rim), mesh slot 'Rim' (index 2)"}],
             "medusa": [{"package": MI_MEDUSA[s], "parent": MEDUSA_PARENT, "team": s.upper(), "hex": hexes[s],
-                        "TeamColor": medusa_tint(hexes[s])} for s in ("p1", "p2")],
+                        "TeamColor": list(MEDUSA_TEAM_COLOR), "w5brTeamColor": medusa_tint(hexes[s]),
+                        "note": "5c-B1 B1-4 (user decision: accents + ring): neutral, the team is on the ring and the chip"}
+                       for s in ("p1", "p2")],
             "tokens": hexes}
 
 
@@ -307,6 +353,12 @@ class Live:
 
     def props(self, package: str, names: list[str]) -> dict:
         return self.call("object", "get_properties", {"instance": ref(package), "properties": names})
+
+
+def same_vector(live: "Live", pkg: str, name: str, want: list, tol: float) -> bool:
+    got = live.call("instance", "get_vector_parameter", {"instance": ref(pkg), "name": name})
+    vals = [got.get(k) for k in "rgba"] if isinstance(got, dict) else None
+    return bool(vals) and all(abs(float(x) - float(y)) <= tol for x, y in zip(vals, want))
 
 
 def owned_packages(p: dict) -> list[str]:
@@ -340,18 +392,24 @@ def cmd_build(a) -> int:
         if created:
             live.call("instance", "create", {"folder_path": pkg.rsplit("/", 1)[0], "asset_name": pkg.rsplit("/", 1)[1],
                                              "parent": ref(m["parent"])})
-        live.call("instance", "set_vector_parameter", {"instance": ref(pkg), "name": COLOR_PARAM,
-                                                       "value": dict(zip("rgba", m["linear"]))})
-        rep["actions"].append({"materialInstance": pkg, "created": created, "LayerColor": m["linear"], "hex": m["hex"]})
+        if created or not same_vector(live, pkg, COLOR_PARAM, m["linear"], 1e-5):
+            live.call("instance", "set_vector_parameter", {"instance": ref(pkg), "name": COLOR_PARAM,
+                                                           "value": dict(zip("rgba", m["linear"]))})
+            rep["actions"].append({"materialInstance": pkg, "created": created, "LayerColor": m["linear"],
+                                   "hex": m["hex"]})
     for m in p["medusa"]:
         pkg = m["package"]
         created = not live.exists(pkg)
         if created:
             live.call("instance", "create", {"folder_path": pkg.rsplit("/", 1)[0], "asset_name": pkg.rsplit("/", 1)[1],
                                              "parent": ref(m["parent"])})
-        live.call("instance", "set_vector_parameter", {"instance": ref(pkg), "name": "TeamColor",
-                                                       "value": dict(zip("rgba", m["TeamColor"]))})
-        rep["actions"].append({"medusaMI": pkg, "created": created, "TeamColor": m["TeamColor"], "teamHex": m["hex"]})
+        if created or not same_vector(live, pkg, "TeamColor", m["TeamColor"], 1e-4):
+            before = None if created else live.call("instance", "get_vector_parameter",
+                                                    {"instance": ref(pkg), "name": "TeamColor"})
+            live.call("instance", "set_vector_parameter", {"instance": ref(pkg), "name": "TeamColor",
+                                                           "value": dict(zip("rgba", m["TeamColor"]))})
+            rep["actions"].append({"medusaMI": pkg, "created": created, "TeamColor": m["TeamColor"], "before": before,
+                                   "teamHex": m["hex"]})
     # ring meshes
     for slot, r in p["rings"].items():
         pkg = r["package"]
@@ -376,7 +434,7 @@ def cmd_build(a) -> int:
         slots = live.call("static", "get_material_slots", {"mesh": mesh}) or []
         assigned = {}
         for s in slots:
-            mi = MI_FILL if "fill" in s.lower() else MI_KEYLINE
+            mi = SLOT_MI.get(s.lower(), MI_KEYLINE)
             live.call("static", "set_material", {"mesh": mesh, "slot_name": s, "material": ref(mi)})
             assigned[s] = mi
         rep["actions"].append({"ringMesh": pkg, "imported": True, "deletedFirst": deleted, "source": src,
@@ -454,8 +512,13 @@ def verify(live: Live, p: dict, content_root: Path) -> dict:
                 failures.append(f"{pkg}: {row['triangles']} triangles != {r['triangles']}")
             if row["nanite"]:
                 failures.append(f"{pkg}: Nanite enabled")
-            if sorted(s.lower() for s in slots) != ["fill", "keyline"]:
-                failures.append(f"{pkg}: material slots {slots} != Fill + Keyline")
+            want_slots = [g for g in SLOT_ORDER if any(BAND_SLOT[b] == g for b in RING_SPEC[slot]["bands"])]
+            if [s.lower() for s in slots] != [g.lower() for g in want_slots]:
+                failures.append(f"{pkg}: material slots {slots} != {want_slots} (this order = index 0/1/2)")
+            for s in slots:
+                got_mi = json.dumps(row["materials"].get(s))
+                if SLOT_MI.get(s.lower(), "?").rsplit("/", 1)[1] not in got_mi:
+                    failures.append(f"{pkg}: slot {s} material {got_mi}")
         else:
             failures.append(f"{pkg}: missing")
         row["file"] = file_row(pkg)

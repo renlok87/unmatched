@@ -252,6 +252,29 @@ class TwoToneRingAA(unittest.TestCase):
         lab[16], lab[31] = "R", "K"
         self.assertIsNone(T53.ray_centerline(lab, rh, 1.5, 25.0, outer=("K", "R")))  # no rim inside
 
+    def test_rim_bound_window_spans_the_outer_keyline(self):
+        """Revision 1 of the 5c-B1 thresholds: fill run, the outer keyline anti-aliased away (O), then the rim - bound
+        only with the rim window boundUU + keyline width; a keyline sample keeps the 1.5-uu window."""
+        rh = [18.0 + 0.25 * i for i in range(64)]
+        lab = ["O"] * 64
+        lab[14] = "K"                     # inner keyline at 21.5
+        for i in range(16, 29):           # fill 22.0..25.0
+            lab[i] = "T"
+        for i in range(36, 40):           # rim 27.0..27.75: first rim sample 2.0 uu after the run
+            lab[i] = "R"
+        self.assertIsNone(T53.ray_centerline(lab, rh, 1.5, 25.0, outer=("K", "R")))
+        self.assertIsNotNone(T53.ray_centerline(lab, rh, 1.5, 25.0, outer=("K", "R"), rim_bound_uu=2.5))
+        lab2 = list(lab)
+        for i in range(36, 40):
+            lab2[i] = "K"                 # a keyline sample 2.0 uu after the run: still outside the 1.5-uu window
+        self.assertIsNone(T53.ray_centerline(lab2, rh, 1.5, 25.0, outer=("K", "R"), rim_bound_uu=2.5))
+
+    def test_rim_bound_follows_the_ring_spec(self):
+        self.assertEqual(T53.rim_bound_uu("P1"), 3.0)
+        self.assertEqual(T53.rim_bound_uu("P2"), 2.5)
+        with RING.using_bands(RING.RING_BANDS_R3):
+            self.assertIsNone(T53.rim_bound_uu("P1"))  # one-tone r3 ring
+
     def test_rim_of(self):
         self.assertIsNone(T53.rim_of("P1", self.calib, None))  # r3 thresholds: no 'team.rim' bytes
         rim = {"screen": [1, 2, 3], "bands": {"P1": [(27.5, 28.5)], "P2": [(26.25, 27.25)]}}
@@ -268,7 +291,24 @@ class TwoToneRingAA(unittest.TestCase):
 
 class R3Evidence(unittest.TestCase):
     """The W5b-R r3 Cobble K1 joiner frame (in git): rev 1 left the helpers 'unclassified' and the ring keyline below
-    3:1 against a reference that dropped the light stones; rev 2 / rev 3 read them."""
+    3:1 against a reference that dropped the light stones; rev 2 / rev 3 read them. Measured with the r3 ring bands the
+    frame was shot with (RING_SPEC holds the 5c-B1 two-tone geometry since B1-3)."""
+
+    def setUp(self):
+        self.spec_bands = {s: RING.RING_SPEC[s]["bands"] for s in ("p1", "p2")}  # the generator's (5c-B1) bands
+        self._bands = RING.using_bands(RING.RING_BANDS_R3)
+        self._bands.__enter__()
+        self.addCleanup(self._bands.__exit__, None, None, None)
+
+    def test_evidence_bands_follow_the_thresholds(self):
+        th = json.loads((EVID / "t53-thresholds.json").read_text(encoding="utf-8"))
+        self.assertEqual(T53.evidence_ring_bands(th), RING.RING_BANDS_R3)
+        import t5cb1_ring_sim as R
+        want = {s: {k: list(v) for k, v in R.GEOMETRIES[R.PROPOSAL][lk].items()} for s, lk in (("p1", "P1"), ("p2", "P2"))}
+        b1 = T53.REPO / "docs/game-design/evidence/ART-005/art3-live-3boards-r3-2026-09-30/t5cb-thresholds.json"
+        if b1.is_file():  # the 5c-B1 registration carries the geometry the 5c-B1 frames are shot with
+            self.assertEqual(T53.evidence_ring_bands(json.loads(b1.read_text(encoding="utf-8"))), want)
+        self.assertEqual(self.spec_bands, want)  # B1-3: the generator (and the C++ spec) = the checked proposal
 
     @classmethod
     def setUpClass(cls):
@@ -340,6 +380,45 @@ class SnapshotRebaseline(unittest.TestCase):
             with self.assertRaises(FileNotFoundError):
                 SR.rebaseline(doc2, {"repo": root}, [("repo", "unreal/Unmatched/Content/ArtPreview/Medusa/none.uasset")],
                               "t", "r", "d")
+
+
+class B1Thresholds(unittest.TestCase):
+    """The 5c-B1 registration (B1-0) and its revision 1: the base sha256 is the registration copy, and the registered ring
+    geometry / rim colour are what the generator, the C++ spec and the HUD tokens carry."""
+    B1 = REPO / "docs/game-design/evidence/ART-005/art3-live-3boards-r3-2026-09-30"
+
+    def setUp(self):
+        if not (self.B1 / "t5cb-thresholds.json").is_file():
+            self.skipTest("5c-B1 thresholds not registered")
+        self.th = json.loads((self.B1 / "t5cb-thresholds.json").read_text(encoding="utf-8"))
+
+    def test_revision_base_is_the_registration(self):
+        import hashlib
+        reg = (self.B1 / "t5cb-thresholds.registration-b1-0.json").read_bytes()
+        self.assertEqual(hashlib.sha256(reg).hexdigest(), self.th["revisions"][0]["base"]["sha256"])
+        self.assertEqual(json.loads(reg.decode("utf-8"))["revisions"], [])
+        self.assertLess(json.loads(reg.decode("utf-8"))["registeredLocal"], self.th["revisions"][0]["registeredLocal"])
+
+    def test_rim_colour_is_one_value_everywhere(self):
+        import re
+        tok = json.loads((REPO / "docs/unreal/contracts/hud/hud-style-tokens.json").read_text(encoding="utf-8"))["colors"]
+        h = (REPO / "unreal/Unmatched/Source/Unmatched/S08/S08Team.h").read_text(encoding="utf-8")
+        cpp = re.search(r'RimHex = TEXT\("(#[0-9A-Fa-f]{6})"\)', h).group(1).upper()
+        self.assertEqual({self.th["rings"]["rim"]["hex"].upper(), self.th["calibration"]["bytes"]["team.rim"]["hex"].upper(),
+                          tok["team.rim"]["hex"].upper(), RING.team_hex()["rim"].upper(), cpp}, {"#FFFFFF"})
+        self.assertIsInstance(self.th["calibration"]["bytes"]["team.rim"]["screen"], list)
+        for k in ("zone.red", "zone.gray"):
+            self.assertIsInstance(self.th["calibration"]["bytes"][k]["screen"], list)
+
+    def test_zone_colours_match_the_profiles(self):
+        prof = json.loads((REPO / "unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json").read_text(encoding="utf-8"))
+        for key in ("red", "gray"):
+            self.assertEqual(prof["zoneStyles"][key]["color"].upper(), self.th["zones"]["colors"][key].upper())
+            self.assertEqual(self.th["calibration"]["bytes"]["zone." + key]["hex"].upper(), self.th["zones"]["colors"][key].upper())
+        for lp in prof["lightProfiles"].values():
+            self.assertEqual(lp["directional"]["rotation"], self.th["light"]["rotation"])
+            self.assertEqual(lp["exposure"]["minBrightness"], self.th["light"]["exposure"]["minBrightness"])
+            self.assertAlmostEqual(2 ** lp["exposure"]["ev100"], lp["exposure"]["minBrightness"], places=4)
 
 
 if __name__ == "__main__":

@@ -144,6 +144,13 @@ bool FS08BoardArtShippedTest::RunTest(const FString&) {
     TestTrue(FString::Printf(TEXT("light %s has a SkyLight"), *Light.Key), Light.Value.Sky.bSet);
     TestTrue(FString::Printf(TEXT("light %s fixed exposure"), *Light.Key),
              Light.Value.Exposure.bSet && Light.Value.Exposure.MinBrightness == Light.Value.Exposure.MaxBrightness);
+    // 5c-B1 (profile rev 5): every key is FRotator(Pitch -55, Yaw 30, Roll 0) and every exposure is EV100 2.05
+    // (min = max brightness 2^2.05 = 4.14106, bias 0); plan C:/tmp/p0-review/5cb1-plan.md rev 2, B1-1.
+    TestTrue(FString::Printf(TEXT("light %s key rotation (-55,30,0)"), *Light.Key),
+             Light.Value.bHasDirectional && Light.Value.Directional.Rotation.Equals(FRotator(-55, 30, 0)));
+    TestTrue(FString::Printf(TEXT("light %s exposure EV100 2.05 fixed"), *Light.Key),
+             FMath::IsNearlyEqual(Light.Value.Exposure.MinBrightness, 4.14106f) &&
+                 FMath::IsNearlyEqual(Light.Value.Exposure.Ev100, 2.05f) && FMath::IsNearlyEqual(Light.Value.Exposure.Bias, 0.0f));
     for (const FS08LightSpec& Point : Light.Value.Points) {
       TestFalse(FString::Printf(TEXT("light %s: no point fill ambient"), *Light.Key), Point.Role == TEXT("fill"));
     }
@@ -388,15 +395,15 @@ bool FS08BoardArtCobbleLegacyTest::RunTest(const FString&) {
     TestTrue("diamond at the near-left slot", Diamond->Transform.GetTranslation().Equals(BlueWorld + FVector(-32, 32, 0.38f), 1e-4f));
     TestTrue("diamond rotated 45", Diamond->Transform.Rotator().Equals(FRotator(0, 45, 0), 0.01f));
   }
-  // Probe lights: key 4.5 lux at (-350,-150,600) rot (0,-55,30) with shadow;
-  // warm 85 cd. W4-A: the point fill (700) became the SkyLight, units are
-  // candelas/lux, exposure fixed at EV100 1.3, key CSM 3000 uu / 2 cascades.
+  // Probe lights: key 4.5 lux at (-350,-150,600) rot (-55,30,0) with shadow (5c-B1 rev 5: Pitch -55;
+  // rev 4 had (0,-55,30) = a horizontal key); warm 85 cd. W4-A: the point fill (700) became the SkyLight,
+  // units are candelas/lux, exposure fixed (5c-B1 rev 5: EV100 2.05, was 1.3), key CSM 3000 uu / 2 cascades.
   const FS08LightProfile* Light = Data.LightFor(*P);
   if (TestNotNull("cobble light profile", Light)) {
     const TArray<FS08PlacedLight> Placed = S08PlaceLights(*Light, Board);
     if (TestEqual("1 directional + 1 point", Placed.Num(), 2)) {
       TestTrue("key", Placed[0].Spec.bDirectional && Placed[0].Position.Equals(FVector(-350, -150, 600)) &&
-                          Placed[0].Spec.Rotation.Equals(FRotator(0, -55, 30)) &&
+                          Placed[0].Spec.Rotation.Equals(FRotator(-55, 30, 0)) &&
                           FMath::IsNearlyEqual(Placed[0].Spec.Intensity, 4.5f) && Placed[0].Spec.bCastShadows &&
                           !Placed[0].Spec.bHasColor);
       TestTrue("warm", Placed[1].Position.Equals(FVector(260, -300, 250)) &&
@@ -405,7 +412,7 @@ bool FS08BoardArtCobbleLegacyTest::RunTest(const FString&) {
     }
     TestTrue("candelas/lux", Light->HasPhysicalUnits());
     TestTrue("sky from the ambient dome", Light->Sky.bSet && Light->Sky.CubemapPath == TEXT("/Game/S08/Render/TC_S08_AmbientDome"));
-    TestTrue("exposure EV100 1.3 fixed", Light->Exposure.bSet && FMath::IsNearlyEqual(Light->Exposure.MinBrightness, 2.46229f) &&
+    TestTrue("exposure EV100 2.05 fixed", Light->Exposure.bSet && FMath::IsNearlyEqual(Light->Exposure.MinBrightness, 4.14106f) &&
                                              FMath::IsNearlyEqual(Light->Exposure.Bias, 0.0f));
     TestTrue("key csm", Light->KeyShadow.bSet && Light->KeyShadow.Cascades == 2);
   }
@@ -781,10 +788,14 @@ bool FS08BoardArtTeamRingTest::RunTest(const FString&) {
                            TargetArcOuterUU),
            P2Fill0 >= TargetArcOuterUU);
   TestTrue("selection ring outer inside the keyline", SelectionRingOuterUU < FMath::Min(P1KeylineIn0, P2KeylineIn0));
-  TestTrue("band widths: keyline 1.5, fill 3 (P2 outer keyline 1.0, the plan's fallback)",
-           FMath::IsNearlyEqual(P1Fill0 - P1KeylineIn0, 1.5f) && FMath::IsNearlyEqual(P1Fill1 - P1Fill0, 3.0f) &&
-               FMath::IsNearlyEqual(P1KeylineOut1 - P1Fill1, 1.5f) && FMath::IsNearlyEqual(P2Fill1 - P2Fill0, 3.0f) &&
-               FMath::IsNearlyEqual(P2KeylineOut1 - P2Fill1, 1.0f));
+  // 5c-B1 B1-3 (plan rev 2): outer keyline as wide as r3 (P1 1.5, P2 1.0), rim 1.0, the fill pays for the rim
+  // (P1 2.5, P2 2.25); tools/art/t5cb1_ring_sim.py check holds the same rules
+  TestTrue("band widths: keyline in 1.5, fill 2.5 / 2.25, keyline out 1.5 / 1.0 (r3), rim 1.0",
+           FMath::IsNearlyEqual(P1Fill0 - P1KeylineIn0, 1.5f) && FMath::IsNearlyEqual(P1Fill1 - P1Fill0, 2.5f) &&
+               FMath::IsNearlyEqual(P1KeylineOut1 - P1Fill1, 1.5f) && FMath::IsNearlyEqual(P1RimOut1 - P1KeylineOut1, 1.0f) &&
+               FMath::IsNearlyEqual(P2Fill0 - P2KeylineIn0, 1.5f) && FMath::IsNearlyEqual(P2Fill1 - P2Fill0, 2.25f) &&
+               FMath::IsNearlyEqual(P2KeylineOut1 - P2Fill1, 1.0f) && FMath::IsNearlyEqual(P2RimOut1 - P2KeylineOut1, 1.0f));
+  TestTrue("FigureScreenRect radius = the outer ring edge (rim)", FMath::IsNearlyEqual(HeroRectRadiusUU, P1RimOut1));
   // 3) clearance to the zone glyphs: outer ring edge + 1 uu <= the nearest glyph FILL piece (exact rotated rects of
   //    S08GlyphPieces in all four slots; the glyph AABB would over-count the diamond), for heroes and sidekicks
   for (const ES08TeamSlot Slot : {ES08TeamSlot::P1, ES08TeamSlot::P2}) {
@@ -823,15 +834,22 @@ bool FS08BoardArtTeamRingTest::RunTest(const FString&) {
     const FBox B = Mesh->GetBoundingBox();
     TestTrue(FString::Printf(TEXT("%s z %.2f..%.2f"), S08TeamSlotName(Slot), B.Min.Z, B.Max.Z),
              FMath::IsNearlyEqual(B.Min.Z, ZMin, 0.01) && FMath::IsNearlyEqual(B.Max.Z, ZMax, 0.01));
-    const double Reach = Slot == ES08TeamSlot::P1 ? P1KeylineOut1 : P2KeylineOut1;
+    const double Reach = Slot == ES08TeamSlot::P1 ? P1RimOut1 : P2RimOut1;
     TestTrue(FString::Printf(TEXT("%s XY reach %.2f / %.2f"), S08TeamSlotName(Slot), B.Max.Y, Reach),
              FMath::IsNearlyEqual(B.Max.Y, Reach, 0.02) && FMath::IsNearlyEqual(-B.Min.Y, Reach, 0.02));
-    TestEqual(FString(S08TeamSlotName(Slot)) + TEXT(": two material slots"), Mesh->GetStaticMaterials().Num(), 2);
+    const TArray<FStaticMaterial>& Slots = Mesh->GetStaticMaterials();
+    if (TestEqual(FString(S08TeamSlotName(Slot)) + TEXT(": three material slots"), Slots.Num(), 3)) {
+      TestTrue(FString(S08TeamSlotName(Slot)) + TEXT(": slots Keyline / Fill / Rim in this order"),
+               Slots[0].MaterialSlotName == FName(TEXT("Keyline")) && Slots[1].MaterialSlotName == FName(TEXT("Fill")) &&
+                   Slots[2].MaterialSlotName == FName(TEXT("Rim")));
+      TestTrue(FString(S08TeamSlotName(Slot)) + TEXT(": slot 2 = MI_Marker_TeamRing_Rim"),
+               Slots[2].MaterialInterface && Slots[2].MaterialInterface->GetName() == TEXT("MI_Marker_TeamRing_Rim"));
+    }
 #if WITH_EDITOR
     TestFalse(FString(S08TeamSlotName(Slot)) + TEXT(": Nanite off"), Mesh->IsNaniteEnabled());
 #endif
   }
-  for (const TCHAR* Path : {KeylineMaterialPath, FillMaterialPath}) {
+  for (const TCHAR* Path : {KeylineMaterialPath, FillMaterialPath, RimMaterialPath}) {
     UMaterialInstance* MI = LoadObject<UMaterialInstance>(nullptr, Path);
     if (!TestNotNull(FString(TEXT("MI ")) + Path, MI)) continue;
     TestTrue(FString(Path) + TEXT(": parent M_UM_GameLayer"),
@@ -839,7 +857,8 @@ bool FS08BoardArtTeamRingTest::RunTest(const FString&) {
     FLinearColor Got;
     MI->GetVectorParameterValue(FHashedMaterialParameterInfo(TEXT("LayerColor")), Got);
     const FLinearColor Want = Path == KeylineMaterialPath ? S08TeamPalette::Keyline()
-                                                          : S08TeamPalette::RingFill(ES08TeamSlot::P1);
+                              : Path == RimMaterialPath     ? S08TeamPalette::Rim()
+                                                            : S08TeamPalette::RingFill(ES08TeamSlot::P1);
     TestTrue(FString::Printf(TEXT("%s LayerColor %s == %s"), Path, *Got.ToString(), *Want.ToString()),
              Got.Equals(Want, 1e-5f));
   }
@@ -974,10 +993,11 @@ bool FS08BoardArtKeylineTest::RunTest(const FString&) {
   TestEqual("glyph keylines = glyph pieces", L.GlyphKeylines.Num(), L.Glyphs.Num());
   TestEqual("blueMarks unchanged", L.StrokePiecesByKey.FindRef(TEXT("blue")), 15);
   TestEqual("redMarks unchanged", L.StrokePiecesByKey.FindRef(TEXT("red")), 45);
-  // 6) the data (profile rev 4) and the content
-  TestTrue("revision >= 4", Data.Revision >= 4);
+  // 6) the data (profile rev 4; rev 5 = 5c-B1 zone colours) and the content
+  TestTrue("revision >= 5", Data.Revision >= 5);
   TestTrue("zoneKeyline block", Data.Keyline.bSet && Data.Keyline.Color == FColor(17, 19, 23, 255));
-  TestEqual("gray -> #7F868E (D-4)", Data.StyleFor(TEXT("gray")).ColorHex(), FString(TEXT("#7F868E")));
+  TestEqual("gray -> #6B727A (5c-B1 rev 5; rev 4 #7F868E, D-4)", Data.StyleFor(TEXT("gray")).ColorHex(), FString(TEXT("#6B727A")));
+  TestEqual("red -> #EC6650 (5c-B1 rev 5; rev 4 #D8453B)", Data.StyleFor(TEXT("red")).ColorHex(), FString(TEXT("#EC6650")));
   TestEqual("keyline mesh per glyph", Data.Keyline.GlyphMeshPaths.Num(), 11);
   UMaterialInstance* KeyMI = LoadObject<UMaterialInstance>(nullptr, *Data.Keyline.MaterialInstancePath);
   if (TestNotNull(TEXT("keyline MI ") + Data.Keyline.MaterialInstancePath, KeyMI)) {
