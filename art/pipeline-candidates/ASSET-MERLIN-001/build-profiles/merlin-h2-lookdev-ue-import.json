@@ -251,10 +251,29 @@
     "team_color_mode_note": "rev 2: M_UM_Figure_v2.1 dyes by TeamAccentTexture (static switch UseTeamAccent = true); the v2.0 TeamMask path is off and TeamMaskTexture = T_UM_Mask_Black (mode none), so no MI can fall back to dyeing the whole robe; the deprecated W4-B TeamMask stays a pinned candidate file only (adopt), it is not imported. The base keeps its team side band (M_UM_BaseMarker)",
     "figure_parameters": {
       "TeamDye": 1.0,
-      "TeamDyeGain": 27.1186,
-      "TeamDyeCeiling": 9.018
+      "TeamDyeGain": 27.027,
+      "TeamDyeCeiling": 8.2949
     },
     "figure_parameters_note": "rev 2, team-accent.md rule (LDV-13) as one MI for both teams: TeamDyeGain = 0.8 / Y_p50 (0.0295), TeamDyeCeiling = 0.9 / Y_p95 (0.0998) of the accent texels (reports/ld-team-accent-ue.json); effective gain min(27.12, 9.018 / maxc(team)) = P1 11.17, P2 26.01 (v2.1 accent report hero-merlin). Other v2 knobs at the master defaults",
+    "reimport_5cb1": {
+      "note": "Пины переимпорта 5c-B1 (группа H, 2026-09-30, ue_h5cb1.py reimport в живом редакторе :8123 поверх ассетов прогона, AssetImportTask replace existing; остальные ассеты прогона не менялись). 5c-B0: BC кожи (leather_worn) по кадрам UE (ue_bc_feedback, коэффициент (1.219; 1.0338; 0.803)); LUT ue-inputs пересобран (строка 0, типичное BC); LDV-13 по новому BC. Прежние значения: {\"MatLUT\": \"c7f09bc6…\", \"TeamDyeGain\": 27.1186, \"TeamDyeCeiling\": 9.018}",
+      "report": "art/pipeline-candidates/ASSET-MERLIN-001/20260930-h2ld-5cb1-ue/reimport-5cb1.json",
+      "sources": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_BC_2K.png",
+          "sha256": "a99630dcb69e153cdf1a8ab37c94fb4a14eb341ab32c0c2f5fd5247d47e3db77"
+        },
+        "MatLUT": {
+          "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/ue-inputs/T_UM_MatLUT_Merlin.dds",
+          "sha256": "8cf5b424044827fe9871eab9b5dbd5b3efd447e65d3b9fa462b67a0793299a6d"
+        }
+      },
+      "uasset_sha256": {
+        "BC": "de189ed27d45fe1d9f68f4619ac1a67d4b830e422c1968d6da8e972e2ee59647",
+        "MatLUT": "b6f24f75cfc5f360d8ac56e0f45099a11a4bbe0667ec01a06789f7885d3fa59f",
+        "MI": "47fd05ffbaae06c55ae3428f6ab6f4261fe9db2dca68492bfaaa02f1f37046f1"
+      }
+    },
     "base_marker": {
       "textures": true,
       "parameters": {

@@ -463,7 +463,7 @@ def _cmd_review(a, cfg) -> dict:
             for vn in plan.get("reading", list(ORTHO) + ["k2-5x"]):
                 ss.shot("%s-reading" % vn, vs[vn], {"subject": "%s (%s)" % (cfg["hero"], names["skeletal"]),
                                                     "view_name": vn, "variant": "reading", "material": variants["neutral"],
-                                                    "exposure": "EV100 1.3 fixed + bias %+.1f (reading frame)" % bias})
+                                                    "exposure": "EV100 1.3 fixed + bias %+.2f (reading frame)" % bias})
             report["exposure_restored"] = ss.task(str(HERE / "ue" / "um_v2_scene_ue.py"), "exposure",
                                                   label=EXPOSURE_LABEL, bias=0.0)
     finally:
@@ -809,7 +809,7 @@ def cmd_measure(a, cfg) -> dict:
             else:
                 verdicts[z] = "off on both"
         res["verdicts"] = {"zones": verdicts, "board_exposure": "neutral (EV100 1.3)",
-                           "reading_exposure": "reading (%+.1f EV)" % float(cfg.get("reading_bias_ev", -1.5))}
+                           "reading_exposure": "reading (%+.2f EV)" % float(cfg.get("reading_bias_ev", -1.5))}
     write_json(out / ("measure-%s.json" % tag), res)
     # table to stdout
     for var, ev in (res.get("exposure") or {}).items():
@@ -881,7 +881,7 @@ def cmd_sheets(a, cfg) -> dict:
     cols = [("концепт", None)] + [(p["label"], p) for p in cfg.get("previous") or []] + \
         [("%s %s нейтр." % (label, tag), {"tag": tag, "variant": "neutral"})] + \
         [("%s %s %s" % (label, tag, t), {"tag": tag, "variant": t.lower()}) for t in teams] + \
-        [("%s %s нейтр. %+.1f EV" % (label, tag, float(cfg.get("reading_bias_ev", -1.5))),
+        [("%s %s нейтр. %+.2f EV" % (label, tag, float(cfg.get("reading_bias_ev", -1.5))),
           {"tag": tag, "variant": "reading"})]
     W, H = cw * len(cols), head + (lab + chh) * 3
     sheet = Image.new("RGB", (W, H), (14, 14, 14))

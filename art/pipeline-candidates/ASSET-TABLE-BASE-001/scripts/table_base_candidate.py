@@ -303,6 +303,10 @@ def build_textures(obj, glb, P, out):
         raise RuntimeError("texture sizes not an integer multiple of target: %s" % src_size)
     bc = S.image_array(bc_img)[..., :3]
     bc_lin = S.srgb_to_lin(bc) if bc_img.colorspace_settings.name == "sRGB" else bc
+    bc_factor = [float(v) for v in names["factors"]["basecolor"][:3]]
+    bc_factor_applied = any(f != 1.0 for f in bc_factor)
+    if bc_factor_applied:  # glTF: base colour = factor x texture (linear), as static_prop_candidate.py / atlas CLI
+        bc_lin = bc_lin * np.array(bc_factor, dtype=bc_lin.dtype)
     bc_out = S.lin_to_srgb(S.box_down(bc_lin, factor))
     n_raw = S.image_array(n_img)[..., :3]
     n_len = np.linalg.norm(n_raw * 2 - 1, axis=2)
@@ -352,6 +356,7 @@ def build_textures(obj, glb, P, out):
         "downscale": "box %dx%d (BC in linear light)" % (factor, factor),
         "outputs": {
             "BC": {"path": bc_path.name, "colorspace": "sRGB", "png_color_chunks": tags(bc_path),
+                   "basecolor_factor_applied": bc_factor if bc_factor_applied else None,
                    "sha256": S.sha256(bc_path)},
             "N": {"path": n_path.name, "colorspace": "Linear (Non-Color)",
                   "convention": "DirectX (G flipped from glTF OpenGL)", "png_color_chunks": tags(n_path),

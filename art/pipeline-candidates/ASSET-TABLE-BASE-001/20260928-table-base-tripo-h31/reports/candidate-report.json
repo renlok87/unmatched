@@ -1,0 +1,1245 @@
+{
+  "schema": "unmatched.tripo-pipeline.table-base-candidate/1",
+  "status": "measured",
+  "asset": "ASSET-TABLE-BASE-001",
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "budgets_declared": false
+  },
+  "session": "live Blender GUI through Blender MCP (execute_code), scene 'TableBase'; driver scripts/table_base_live_mcp.py",
+  "blender_version": "5.2.2 LTS",
+  "script_sha256_lf": "4c1c80a3a81ab9382681398d34c9b666b0dd958d52ca3a8c442561aa7655f9ba",
+  "live_driver_sha256_lf": "6cbcdc4607d78eefbd271e87d5128532b333e47e0c65b3000555c583c495046e",
+  "helpers": {
+    "path": "tools/tripo-pipeline/blender/static_prop_candidate.py",
+    "sha256_lf": "b1e67b69c41abf19aa053f3d7126fa507f7d96ebfb1d144ca28b334623a28af6"
+  },
+  "params": {
+    "asset_name": "SM_TableBase",
+    "texture_prefix": "T_TableBase",
+    "material_name": "M_TableBase",
+    "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+    "texture_size": 2048,
+    "footprint_uu_blend_xy": [
+      656,
+      756
+    ],
+    "top_z_uu": -3.0,
+    "top_band_frac": 0.03,
+    "footprint_band_frac": 0.03,
+    "depth_uu": 150,
+    "bake_ao": true,
+    "ao_samples": 64,
+    "ao_distance_m": 0.3,
+    "board_bounds_json": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/reports/board-art005-fbx-bounds.json",
+    "rim_proposed_uu": [
+      40,
+      60
+    ],
+    "coplanar_min_uu": 0.5,
+    "require_closed_manifold": true,
+    "normal_padding_px_source": 32,
+    "source_glb": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/source/table-base-tripo-c2e5e3bf-smartuv-tex2k-pbr.glb",
+    "out_dir": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31",
+    "cut_below_top_frac": 0.025,
+    "body": {
+      "top_z_uu": -15.0,
+      "inset_uu": 6.0,
+      "max_nonuniformity": 0.05,
+      "note": "rock body cut + capped at top_z_uu (inside the lip), its section fitted inside footprint - 2*inset, recessed under the lip"
+    },
+    "lip": {
+      "thickness_uu": 20.0,
+      "bevel_uu": 3.0,
+      "ring_width_uu": 70.0,
+      "bc_value_scale": 0.5,
+      "bomb_window_px": 160,
+      "source_erode_px": 6,
+      "source_px_per_uu": 1.337,
+      "seed": 20260930,
+      "note": "straight bevelled rectangular rock lip = UE 756 x 656 flat top under the board frame (rim 50 uu), textured with the Tripo skirt's own painted-rock texels (bombing), low frequencies damped and darkened so it does not compete with the board in K1",
+      "bc_lowpass_px": 10,
+      "bc_detail_gain": 1.3,
+      "bc_lowfreq_keep": 0.4,
+      "n_lowpass_px": 5,
+      "n_detail_gain": 1.0,
+      "n_lowfreq_keep": 0.3
+    }
+  },
+  "source": {
+    "path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/source/table-base-tripo-c2e5e3bf-smartuv-tex2k-pbr.glb",
+    "sha256": "5193fad469675a27a5099a0fd6443c013fb8226708251c9d9807f8ab2a8ca429",
+    "bytes": 11569308,
+    "gltf_generator": "Tripo"
+  },
+  "board_reference": {
+    "bounds_json": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/reports/board-art005-fbx-bounds.json",
+    "fbx": "blender/ASSET-BOARD-COBBLE-001/variants/B-atlas-v4-woodUV/export/SM_ART005_BoardStoneV4_WoodUV.fbx",
+    "fbx_sha256": "445f514ac9b6a5899746c8c6db64cd25a793b5ed3fa505303cf27d296df030c2",
+    "whole_uu_blend": {
+      "min": [
+        -278.0,
+        -328.0,
+        -31.0
+      ],
+      "max": [
+        278.0,
+        328.0,
+        5.0
+      ]
+    },
+    "size_uu_export_frame": [
+      656.0,
+      556.0,
+      36.0
+    ],
+    "horizontal_face_levels_uu": [
+      {
+        "z_uu": -31.0,
+        "facing": "down",
+        "parts": [
+          "Rock"
+        ]
+      },
+      {
+        "z_uu": -11.0,
+        "facing": "down",
+        "parts": [
+          "Frame"
+        ]
+      },
+      {
+        "z_uu": -7.0,
+        "facing": "up",
+        "parts": [
+          "Rock"
+        ]
+      },
+      {
+        "z_uu": -1.2,
+        "facing": "up",
+        "parts": [
+          "StoneTile"
+        ]
+      },
+      {
+        "z_uu": -1.1,
+        "facing": "up",
+        "parts": [
+          "StoneTile"
+        ]
+      },
+      {
+        "z_uu": -1.0,
+        "facing": "up",
+        "parts": [
+          "StoneTile"
+        ]
+      },
+      {
+        "z_uu": -0.9,
+        "facing": "up",
+        "parts": [
+          "StoneTile"
+        ]
+      },
+      {
+        "z_uu": -0.8,
+        "facing": "up",
+        "parts": [
+          "StoneTile"
+        ]
+      },
+      {
+        "z_uu": -0.7,
+        "facing": "up",
+        "parts": [
+          "StoneTile"
+        ]
+      },
+      {
+        "z_uu": -0.6,
+        "facing": "up",
+        "parts": [
+          "StoneTile"
+        ]
+      },
+      {
+        "z_uu": -0.5,
+        "facing": "up",
+        "parts": [
+          "StoneTile"
+        ]
+      },
+      {
+        "z_uu": -0.4,
+        "facing": "up",
+        "parts": [
+          "StoneTile"
+        ]
+      },
+      {
+        "z_uu": -0.3,
+        "facing": "up",
+        "parts": [
+          "StoneTile"
+        ]
+      },
+      {
+        "z_uu": -0.2,
+        "facing": "up",
+        "parts": [
+          "StoneTile"
+        ]
+      },
+      {
+        "z_uu": -0.1,
+        "facing": "up",
+        "parts": [
+          "StoneTile"
+        ]
+      },
+      {
+        "z_uu": -0.0,
+        "facing": "up",
+        "parts": [
+          "StoneTile"
+        ]
+      },
+      {
+        "z_uu": 5.0,
+        "facing": "up",
+        "parts": [
+          "Frame"
+        ]
+      }
+    ],
+    "undertray_uu_blend": {
+      "min": [
+        -278.0,
+        -328.0,
+        -31.0
+      ],
+      "max": [
+        278.0,
+        328.0,
+        -7.0
+      ]
+    }
+  },
+  "import": {
+    "scene": "TableBase",
+    "mesh_objects": 1,
+    "triangles": 12774,
+    "materials": [
+      "tripo_node_9af0b8e4-1db5-4bb2-a149-caef9f121f72_material"
+    ],
+    "images": [
+      {
+        "name": "rock+cliff+3d+model_basecolor.jpg",
+        "size": [
+          2048,
+          2048
+        ],
+        "colorspace": "sRGB"
+      },
+      {
+        "name": "rock+cliff+3d+model_normal.png",
+        "size": [
+          2048,
+          2048
+        ],
+        "colorspace": "Non-Color"
+      },
+      {
+        "name": "rock+cliff+3d+model_rm.png",
+        "size": [
+          2048,
+          2048
+        ],
+        "colorspace": "Non-Color"
+      }
+    ],
+    "bounds_min_m": [
+      -0.458723,
+      -0.489368,
+      0.0
+    ],
+    "bounds_max_m": [
+      0.458723,
+      0.489368,
+      0.20111
+    ],
+    "dimensions_m": [
+      0.917446,
+      0.978737,
+      0.20111
+    ],
+    "axis_note": "glTF Y-up read by Blender as Z-up: source X = width (front view), Blender Y = source depth (left view)"
+  },
+  "geometry": {
+    "before_cleanup": {
+      "vertices_as_stored": 7280,
+      "vertices_welded_1e-6m": 6389,
+      "faces": 12774,
+      "triangles": 12774,
+      "welded_boundary_edges": 0,
+      "welded_non_manifold_edges": 0,
+      "wire_edges": 0,
+      "loose_vertices": 0,
+      "degenerate_faces_area_lt_1e-12": 1,
+      "faces_with_inconsistent_winding": 0,
+      "connected_shells": 1,
+      "signed_volume_m3": 0.06209875,
+      "raw_vertex_count_before_weld": 7280
+    },
+    "removed": {
+      "note": "no clean-up deletion (it opened a 3-edge hole at a degenerate face); faces above the cut removed"
+    },
+    "winding_faces_reversed": 0,
+    "winding_note": "cap faces oriented +Z",
+    "after_cleanup": {
+      "vertices_as_stored": 7280,
+      "vertices_welded_1e-6m": 6389,
+      "faces": 12774,
+      "triangles": 12774,
+      "welded_boundary_edges": 0,
+      "welded_non_manifold_edges": 0,
+      "wire_edges": 0,
+      "loose_vertices": 0,
+      "degenerate_faces_area_lt_1e-12": 1,
+      "faces_with_inconsistent_winding": 0,
+      "connected_shells": 1,
+      "signed_volume_m3": 0.06209875,
+      "raw_vertex_count_before_weld": 7280
+    },
+    "after_fit_flatten": {
+      "vertices_as_stored": 6760,
+      "vertices_welded_1e-6m": 6760,
+      "faces": 13081,
+      "triangles": 13508,
+      "welded_boundary_edges": 0,
+      "welded_non_manifold_edges": 0,
+      "wire_edges": 0,
+      "loose_vertices": 0,
+      "degenerate_faces_area_lt_1e-12": 0,
+      "faces_with_inconsistent_winding": 0,
+      "connected_shells": 4,
+      "signed_volume_m3": 25.543192847,
+      "raw_vertex_count_before_weld": 6760
+    },
+    "flagged_face_centres_uu": [],
+    "corner_normals_before": {
+      "has_custom_normals": true,
+      "corners_pointing_into_surface": 34,
+      "corner_vs_face_normal_angle_deg_p50_p99_max": [
+        25.15,
+        65.59,
+        180.0
+      ]
+    },
+    "corner_normals_after": {
+      "has_custom_normals": true,
+      "corners_pointing_into_surface": 26,
+      "corner_vs_face_normal_angle_deg_p50_p99_max": [
+        23.61,
+        64.56,
+        110.75
+      ]
+    },
+    "closed_manifold_consistent_after": true
+  },
+  "fit": {
+    "method": "plane cut + flat cap of the rock body at body.top_z_uu (plate removed), recessed under the rectangular lip of step 'lip'",
+    "body": {
+      "top_z_uu": -15.0,
+      "inset_uu": 6.0,
+      "max_nonuniformity": 0.05,
+      "section_size_uu_blend": [
+        644.0,
+        718.986
+      ],
+      "fits_inside_uu_blend": [
+        644.0,
+        744.0
+      ]
+    },
+    "why": "Tripo top = thin plate over the rock body (plate underside 0.26-0.38 % of the source height below the top, overhang up to ~170 uu); flattening folded 410 plate-underside faces into the top plane",
+    "source_dimensions_m": [
+      0.917446,
+      0.978737,
+      0.20111
+    ],
+    "turned_90deg_about_z": false,
+    "turn_reason": "source long axis already Y",
+    "cut_below_top_frac": 0.025,
+    "cut_z_prescale_m": 0.196083,
+    "source_top_z_prescale_m": 0.20111,
+    "footprint_source": "bounds of the rock section at the cut level",
+    "footprint_prescale_m": [
+      0.909685,
+      0.967245
+    ],
+    "footprint_aspect_y_over_x_source": 1.0633,
+    "footprint_aspect_y_over_x_target": 1.1164,
+    "scale_xyz": [
+      7.079376,
+      7.433345,
+      7.037853
+    ],
+    "xy_nonuniformity_pct": 4.762,
+    "z_scale_rule": "depth_uu 150",
+    "source_depth_below_cut_m": 0.196083,
+    "cut": {
+      "welded_seam_vertices": 891,
+      "faces_before": 12774,
+      "faces_after_cut": 12270,
+      "boundary_edges_at_cut": 797,
+      "boundary_edges_off_plane": 0,
+      "cap_faces": 791,
+      "cap_faces_flipped_up": 0,
+      "cap_faces_area_lt_1e-10": 0
+    },
+    "flatten": {
+      "vertices_moved": 0,
+      "faces_in_top_plane_facing_up": 4,
+      "faces_in_top_plane_facing_down_folded": 0,
+      "note": "top plane = lip top (Z top_z_uu); the rock-body cap lies below it"
+    }
+  },
+  "scale_pivot": {
+    "dimensions_m": [
+      6.56,
+      7.56,
+      1.5
+    ],
+    "bounds_min_m": [
+      -3.28,
+      -3.78,
+      -1.53
+    ],
+    "bounds_max_m": [
+      3.28,
+      3.78,
+      -0.03
+    ],
+    "top_plane_z_uu": -3.0,
+    "top_plane_vertices": 8,
+    "top_outline_uu_blend": {
+      "min": [
+        -325.0,
+        -375.0
+      ],
+      "max": [
+        325.0,
+        375.0
+      ],
+      "size": [
+        650.0,
+        750.0
+      ],
+      "note": "flat top = footprint minus the bevel on each side"
+    },
+    "footprint_target_uu_blend_xy": [
+      656.0,
+      756.0
+    ],
+    "depth_below_top_uu": 150.0,
+    "overhang_beyond_footprint_uu": [
+      -0.0,
+      -0.0,
+      -0.0,
+      -0.0
+    ],
+    "pivot": "object origin = board centre (0,0); Z=0 = play plane; tray top at top_z_uu, whole tray below",
+    "collision": "none (04 3.6: not interactive; the board keeps its own UBX selection collision)"
+  },
+  "cap_uv": null,
+  "cap_bake": null,
+  "lip": {
+    "method": "rectangular ring solid: 5-point profile swept along the footprint rectangle (mitred corners), flat faces, joined into the tray as its own closed shell over the recessed rock body",
+    "footprint_uu_blend": [
+      656.0,
+      756.0
+    ],
+    "thickness_uu": 20.0,
+    "bevel_uu": 3.0,
+    "ring_width_uu": 70.0,
+    "inner_opening_uu_blend": [
+      516.0,
+      616.0
+    ],
+    "top_z_uu": -3.0,
+    "bottom_z_uu": -23.0,
+    "faces": 20,
+    "top_faces_up": true,
+    "uv": {
+      "free_rect_px": [
+        16,
+        16,
+        1000,
+        1068
+      ],
+      "free_rect_fraction": 0.2546,
+      "texel_density_px_per_uu": 1.3228,
+      "strip_height_px": 235.77,
+      "gap_px": 16,
+      "strips": {
+        "-X": {
+          "x0": 16.0,
+          "y0": 16.0,
+          "len_uu": 756.0,
+          "w_px": 1000.0,
+          "h_px": 235.77
+        },
+        "+X": {
+          "x0": 16.0,
+          "y0": 267.77,
+          "len_uu": 756.0,
+          "w_px": 1000.0,
+          "h_px": 235.77
+        },
+        "+Y": {
+          "x0": 16.0,
+          "y0": 519.54,
+          "len_uu": 656.0,
+          "w_px": 867.72,
+          "h_px": 235.77
+        },
+        "-Y": {
+          "x0": 16.0,
+          "y0": 771.31,
+          "len_uu": 656.0,
+          "w_px": 867.72,
+          "h_px": 235.77
+        }
+      },
+      "unfold_v_m": {
+        "P1_top_inner": 0.0,
+        "P2_bevel": 0.67,
+        "P3_outer_side": 0.7124,
+        "P4_outer_bottom": 0.8824,
+        "P0_inner_bottom": 1.5824,
+        "end": 1.7824
+      },
+      "rock_cap_island": {
+        "box_px": [
+          899.72,
+          519.54,
+          116.28,
+          487.54
+        ],
+        "texel_density_px_per_uu": 0.1557,
+        "extent_uu": [
+          644.0,
+          718.99
+        ]
+      },
+      "rock_uv_unchanged": true
+    },
+    "rock_custom_normals_max_drift_after_join": 0.0,
+    "vertices_above_top_plane": 0,
+    "top_plane_faces_up": 4,
+    "top_plane_faces_down_folded": 0
+  },
+  "lip_textures": {
+    "method": "texture bombing of Tripo rock windows (Hann, stride win/2, variance-preserving), no mirroring; no new texture source",
+    "window_px": 160,
+    "source_erode_px": 6,
+    "valid_windows": 90158,
+    "source_px_per_uu": 1.337,
+    "seed": 20260930,
+    "rock_bc_mean_srgb_source": [
+      0.312,
+      0.321,
+      0.353
+    ],
+    "rock_bc_p50_value_srgb": 0.349,
+    "regions": {
+      "-X": {
+        "rect_px": [
+          8,
+          8,
+          1016,
+          252
+        ],
+        "density_px_per_uu": 1.3228,
+        "bc_mean_srgb": [
+          0.22,
+          0.227,
+          0.251
+        ],
+        "bc_value_scale": 0.5,
+        "bc_lowpass_px": 10,
+        "bc_detail_gain": 1.3,
+        "bc_lowfreq_keep": 0.4,
+        "n_lowpass_px": 5,
+        "n_lowfreq_keep": 0.3,
+        "normal_xy_rms": 0.2084
+      },
+      "+X": {
+        "rect_px": [
+          8,
+          259,
+          1016,
+          253
+        ],
+        "density_px_per_uu": 1.3228,
+        "bc_mean_srgb": [
+          0.221,
+          0.228,
+          0.252
+        ],
+        "bc_value_scale": 0.5,
+        "bc_lowpass_px": 10,
+        "bc_detail_gain": 1.3,
+        "bc_lowfreq_keep": 0.4,
+        "n_lowpass_px": 5,
+        "n_lowfreq_keep": 0.3,
+        "normal_xy_rms": 0.2088
+      },
+      "+Y": {
+        "rect_px": [
+          8,
+          511,
+          884,
+          253
+        ],
+        "density_px_per_uu": 1.3228,
+        "bc_mean_srgb": [
+          0.219,
+          0.226,
+          0.25
+        ],
+        "bc_value_scale": 0.5,
+        "bc_lowpass_px": 10,
+        "bc_detail_gain": 1.3,
+        "bc_lowfreq_keep": 0.4,
+        "n_lowpass_px": 5,
+        "n_lowfreq_keep": 0.3,
+        "normal_xy_rms": 0.208
+      },
+      "-Y": {
+        "rect_px": [
+          8,
+          763,
+          884,
+          253
+        ],
+        "density_px_per_uu": 1.3228,
+        "bc_mean_srgb": [
+          0.219,
+          0.226,
+          0.25
+        ],
+        "bc_value_scale": 0.5,
+        "bc_lowpass_px": 10,
+        "bc_detail_gain": 1.3,
+        "bc_lowfreq_keep": 0.4,
+        "n_lowpass_px": 5,
+        "n_lowfreq_keep": 0.3,
+        "normal_xy_rms": 0.2033
+      },
+      "rock_cap": {
+        "rect_px": [
+          899,
+          519,
+          117,
+          489
+        ],
+        "density_px_per_uu": 0.1557,
+        "bc_mean_srgb": [
+          0.311,
+          0.32,
+          0.352
+        ],
+        "bc_value_scale": 1.0,
+        "bc_lowpass_px": null,
+        "bc_detail_gain": null,
+        "bc_lowfreq_keep": null,
+        "n_lowpass_px": null,
+        "n_lowfreq_keep": null,
+        "normal_xy_rms": 0.3746
+      }
+    },
+    "texels_written": 1017597,
+    "rock_texels_changed": 0,
+    "normal_convention_written": "OpenGL (as the glTF source; flipped to DirectX with the rest in textures)"
+  },
+  "board_relation": {
+    "rim_flat_top": {
+      "per_side_uu": {
+        "+X": {
+          "min": 46.5,
+          "p50": 46.5,
+          "max": 46.5
+        },
+        "-X": {
+          "min": 47.0,
+          "p50": 47.0,
+          "max": 47.0
+        },
+        "+Y": {
+          "min": 46.5,
+          "p50": 46.5,
+          "max": 46.5
+        },
+        "-Y": {
+          "min": 47.0,
+          "p50": 47.0,
+          "max": 47.0
+        }
+      },
+      "samples": 100,
+      "min_uu": 46.5,
+      "p05_uu": 46.5,
+      "p50_uu": 46.75,
+      "max_uu": 47.0,
+      "samples_top_missing_at_board_edge": 0,
+      "step_uu": 0.5,
+      "board_half_extent_uu_blend": [
+        278.0,
+        328.0
+      ],
+      "board_outline_source": "board FBX bounds (whole mesh, .blend axes)",
+      "proposed_uu": [
+        40,
+        60
+      ],
+      "min_within_proposed": true,
+      "p50_within_proposed": true
+    },
+    "board_horizontal_faces_nearest_top_plane": [
+      {
+        "z_uu": -1.2,
+        "facing": "up",
+        "parts": [
+          "StoneTile"
+        ],
+        "gap_to_top_plane_uu": 1.8
+      },
+      {
+        "z_uu": -1.1,
+        "facing": "up",
+        "parts": [
+          "StoneTile"
+        ],
+        "gap_to_top_plane_uu": 1.9
+      },
+      {
+        "z_uu": -1.0,
+        "facing": "up",
+        "parts": [
+          "StoneTile"
+        ],
+        "gap_to_top_plane_uu": 2.0
+      },
+      {
+        "z_uu": -0.9,
+        "facing": "up",
+        "parts": [
+          "StoneTile"
+        ],
+        "gap_to_top_plane_uu": 2.1
+      }
+    ],
+    "board_top_above_tray_top_uu": 8.0,
+    "board_bottom_below_tray_top_uu": 28.0,
+    "tray_depth_below_board_bottom_uu": 122.0,
+    "board_undertray_enclosed": {
+      "samples": 144,
+      "inside": 114,
+      "fraction_inside": 0.7917,
+      "outside_points_uu_blend_first10": [
+        [
+          278.0,
+          -300.7,
+          -30.5
+        ],
+        [
+          278.0,
+          -246.0,
+          -30.5
+        ],
+        [
+          278.0,
+          82.0,
+          -30.5
+        ],
+        [
+          278.0,
+          136.7,
+          -30.5
+        ],
+        [
+          278.0,
+          191.3,
+          -30.5
+        ],
+        [
+          278.0,
+          246.0,
+          -30.5
+        ],
+        [
+          278.0,
+          300.7,
+          -30.5
+        ],
+        [
+          -278.0,
+          -300.7,
+          -30.5
+        ],
+        [
+          -278.0,
+          -27.3,
+          -30.5
+        ],
+        [
+          -278.0,
+          82.0,
+          -30.5
+        ]
+      ],
+      "heights_uu": [
+        -30.5,
+        -19.0,
+        -7.5
+      ]
+    }
+  },
+  "textures": {
+    "source_images": {
+      "basecolor": "rock+cliff+3d+model_basecolor.jpg",
+      "metallic_roughness": "rock+cliff+3d+model_rm.png",
+      "normal": "rock+cliff+3d+model_normal.png",
+      "occlusion": null,
+      "factors": {
+        "metallic": 1.0,
+        "roughness": 1.0,
+        "basecolor": [
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929,
+          1.0
+        ]
+      }
+    },
+    "source_size_px": 2048,
+    "target_size_px": 2048,
+    "downscale": "box 1x1 (BC in linear light)",
+    "outputs": {
+      "BC": {
+        "path": "T_TableBase_BC.png",
+        "colorspace": "sRGB",
+        "png_color_chunks": [
+          "cHRM",
+          "gAMA",
+          "sRGB"
+        ],
+        "basecolor_factor_applied": [
+          0.800000011920929,
+          0.800000011920929,
+          0.800000011920929
+        ],
+        "sha256": "91e4f956c47370649d6b9be13b71b49bc0e5247ec6ee879d053610a048332558"
+      },
+      "N": {
+        "path": "T_TableBase_N.png",
+        "colorspace": "Linear (Non-Color)",
+        "convention": "DirectX (G flipped from glTF OpenGL)",
+        "png_color_chunks": [],
+        "note": "Linear is an import setting (UE: sRGB off); no sRGB/gAMA/cHRM/iCCP chunk in the file",
+        "sha256": "7afb10a7bc412e1d7b4eaebee2669177be8c74884e97c41419e7ef127892910e"
+      },
+      "ORM": {
+        "path": "T_TableBase_ORM.png",
+        "colorspace": "Linear (Non-Color)",
+        "channels": {
+          "R": "AO baked in Blender Cycles",
+          "G": "roughness from glTF metallicRoughness.G",
+          "B": "metallic from glTF metallicRoughness.B"
+        },
+        "png_color_chunks": [],
+        "note": "Linear is an import setting (UE: sRGB off); no sRGB/gAMA/cHRM/iCCP chunk in the file",
+        "sha256": "e380f8e5ce09cab6e5f68f064173d75a3173379fde7ce11d451f1e773a4dc883"
+      }
+    },
+    "ao_bake": {
+      "measured_on": "texels covered by UV islands",
+      "min": 0.0,
+      "p05": 0.359,
+      "p50": 0.859,
+      "mean": 0.804,
+      "texels_lt_0.2": 57888,
+      "samples": 64,
+      "distance_m": 0.3
+    },
+    "normal_padding": {
+      "background_fraction_source": 0.1875,
+      "dilated_px_at_source": 32,
+      "flat_filled_fraction_source": 0.0457
+    },
+    "channel_stats": {
+      "roughness_mean": 0.911,
+      "metallic_mean": 0.059,
+      "metallic_fraction_gt_0.5": 0.0,
+      "normal_mean_rgb_dx": [
+        0.499,
+        0.513,
+        0.959
+      ]
+    },
+    "teamcolor": "not applicable: the diorama base is not team-owned; M_DioramaMaster TeamColor stays neutral"
+  },
+  "uv0": {
+    "uv_layers": [
+      "UVMap"
+    ],
+    "raster_size_px": 2048,
+    "islands": 25,
+    "triangles_out_of_0_1": 0,
+    "uv_bounds": [
+      0.001672,
+      0.00116,
+      0.998823,
+      0.901692
+    ],
+    "uv_area_used_fraction": 0.5884,
+    "raster_coverage_fraction": 0.5883,
+    "overlap_pixels_between_islands": 0,
+    "overlap_fraction_of_covered": 0.0,
+    "overlap_pixels_inside_islands_strict": 16,
+    "flipped_uv_triangles_vs_island_majority": 2,
+    "zero_area_uv_triangles": 0,
+    "texel_density_px_per_m_at_raster": 128.3,
+    "stretch_area_ratio_p05_p50_p95": [
+      0.015,
+      1.062,
+      2.129
+    ],
+    "stretch_anisotropy_sigma_max_over_min_p50_p95_max": [
+      1.0,
+      1.399,
+      12.128
+    ],
+    "stretch_sigma_max_norm_p95": 1.583,
+    "stretch_sigma_min_norm_p05": 0.121,
+    "min_gutter_px_estimate": 1,
+    "island_pairs_closer_than_4px": 2,
+    "note": "min_gutter_px_estimate / island_pairs_closer_than_4px: 4-neighbour growth at raster_size_px (odd/even estimate +-1 px). raster_metrics: Euclidean distance between centres of pixels of different islands (another metric, counts differ), plus strict in-island overlap from flipped UV triangles; at raster_size_px and 2x.",
+    "raster_metrics": [
+      {
+        "raster_size_px": 2048,
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 16,
+        "raster_coverage_fraction": 0.5883,
+        "min_island_centre_distance_px": 1.0,
+        "island_pairs_centre_distance_lt_4px": 2,
+        "island_pairs_centre_distance_lt_8px": 7,
+        "mip_where_min_distance_drops_below_1_texel": 1
+      },
+      {
+        "raster_size_px": 4096,
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 66,
+        "raster_coverage_fraction": 0.5883,
+        "min_island_centre_distance_px": 1.0,
+        "island_pairs_centre_distance_lt_4px": 2,
+        "island_pairs_centre_distance_lt_8px": 2,
+        "mip_where_min_distance_drops_below_1_texel": 1
+      }
+    ]
+  },
+  "material_slots": 1,
+  "material_names": [
+    "M_TableBase"
+  ],
+  "blend": {
+    "path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/blender/SM_TableBase.blend",
+    "bytes": 710687,
+    "note": "copy of the live session (all scenes); tray in scene 'TableBase'; textures external, relative paths ../export/T_TableBase_*.png"
+  },
+  "blend_cleanup_removed": [],
+  "export": {
+    "fbx": "SM_TableBase.fbx",
+    "sha256": "24977f1826bcad8fd8e6ec0dfa14c88d9e488787e75798c9a0179e19024313cf",
+    "bytes": 490396,
+    "preset": "UM_FBX_v1.json",
+    "settings": {
+      "axis_forward": "-Y",
+      "axis_up": "Z",
+      "export_space_rotation_z_degrees": 90.0,
+      "temporary_data_scale": 100.0,
+      "patch_fbx_unit_scale_to": 1.0,
+      "apply_scale_options": "FBX_SCALE_UNITS",
+      "use_triangles": true,
+      "mesh_smooth_type": "FACE",
+      "path_mode": "AUTO"
+    },
+    "exporter_kwargs": {
+      "add_leaf_bones": false,
+      "apply_scale_options": "FBX_SCALE_UNITS",
+      "apply_unit_scale": true,
+      "axis_forward": "-Y",
+      "axis_up": "Z",
+      "bake_anim": false,
+      "bake_space_transform": false,
+      "embed_textures": false,
+      "mesh_smooth_type": "FACE",
+      "object_types": [
+        "ARMATURE",
+        "MESH"
+      ],
+      "path_mode": "AUTO",
+      "primary_bone_axis": "Y",
+      "secondary_bone_axis": "X",
+      "use_custom_props": false,
+      "use_mesh_edges": false,
+      "use_selection": true,
+      "use_triangles": true
+    },
+    "textures_embedded": false,
+    "texture_paths": "relative to the FBX (absolute checkout path is never written)",
+    "um_fbx_v1_conformance": [
+      {
+        "setting": "Forward / Up (04 1.1)",
+        "standard": [
+          "-Y",
+          "Z"
+        ],
+        "used": [
+          "-Y",
+          "Z"
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Apply Scalings (04 1.1)",
+        "standard": "FBX_SCALE_UNITS",
+        "used": "FBX_SCALE_UNITS",
+        "conforms": true
+      },
+      {
+        "setting": "Apply Unit (04 1.1)",
+        "standard": true,
+        "used": true,
+        "conforms": true
+      },
+      {
+        "setting": "Apply Transform (04 1.1)",
+        "standard": false,
+        "used": false,
+        "conforms": true
+      },
+      {
+        "setting": "Triangulate Faces (04 1.1)",
+        "standard": true,
+        "used": true,
+        "conforms": true
+      },
+      {
+        "setting": "Smoothing (04 1.1)",
+        "standard": "FACE",
+        "used": "FACE",
+        "conforms": true
+      },
+      {
+        "setting": "Object Types (04 1.1)",
+        "standard": [
+          "ARMATURE",
+          "MESH"
+        ],
+        "used": [
+          "ARMATURE",
+          "MESH"
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Loose Edges / Custom Properties (04 1.1)",
+        "standard": [
+          false,
+          false
+        ],
+        "used": [
+          false,
+          false
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Leaf bones / bone axes (04 1.1, preset)",
+        "standard": [
+          false,
+          "Y",
+          "X"
+        ],
+        "used": [
+          false,
+          "Y",
+          "X"
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Bake Animation (04 1.1: skeletal clips only)",
+        "standard": false,
+        "used": false,
+        "conforms": true
+      },
+      {
+        "setting": "Path Mode, textures not embedded (04 1.1)",
+        "standard": [
+          "AUTO",
+          false
+        ],
+        "used": [
+          "AUTO",
+          false
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Export space: +Z rotation deg / data scale / UnitScaleFactor patch (preset)",
+        "standard": [
+          90.0,
+          100.0,
+          1.0
+        ],
+        "used": [
+          90.0,
+          100.0,
+          1.0
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Scene units: metric, unit scale 1.0 (04 1)",
+        "standard": [
+          "METRIC",
+          1.0
+        ],
+        "used": [
+          "METRIC",
+          1.0
+        ],
+        "conforms": true
+      },
+      {
+        "setting": "Transforms applied: object matrix identity (04 1)",
+        "standard": true,
+        "used": true,
+        "conforms": true
+      },
+      {
+        "setting": "Pivot: board centre (0,0) = centre of the top outline; top plane at top_z_uu and nothing above it (04 3.6)",
+        "standard": [
+          0.0,
+          0.0,
+          -3.0
+        ],
+        "used": [
+          0.0,
+          0.0,
+          -3.0
+        ],
+        "conforms": true
+      }
+    ],
+    "um_fbx_v1_conforms": true
+  },
+  "roundtrip": {
+    "mesh_objects": 1,
+    "object_names": [
+      "SM_TableBase.001"
+    ],
+    "triangles": 13508,
+    "expected_triangles": 13508,
+    "material_slots": 1,
+    "uv_layers": 1,
+    "armatures": 0,
+    "dimensions_uu": [
+      756.0,
+      656.0,
+      150.0
+    ],
+    "bounds_min_uu": [
+      -378.0,
+      -328.0,
+      -153.0
+    ],
+    "bounds_max_uu": [
+      378.0,
+      328.0,
+      -3.0
+    ],
+    "top_outline_size_uu": [
+      750.0,
+      650.0
+    ],
+    "top_outline_centre_uu": [
+      0.0,
+      0.0
+    ],
+    "expected_ue_dimensions_uu_at_import_scale_1": [
+      756.0,
+      656.0,
+      150.0
+    ],
+    "object_scale": [
+      0.01,
+      0.01,
+      0.01
+    ],
+    "geometry_readback": {
+      "vertices_as_stored": 6760,
+      "vertices_welded_1e-6m": 6760,
+      "faces": 13508,
+      "triangles": 13508,
+      "welded_boundary_edges": 0,
+      "welded_non_manifold_edges": 0,
+      "wire_edges": 0,
+      "loose_vertices": 0,
+      "degenerate_faces_area_lt_1e-12": 0,
+      "faces_with_inconsistent_winding": 0,
+      "connected_shells": 4,
+      "signed_volume_m3": 25543192.508889277,
+      "raw_vertex_count_before_weld": 6760
+    },
+    "note": "FBX read back in the live Blender (temporary scene, removed) = UM_FBX_v1 export frame (UE shows it as x, -y, z); metres x100 = uu",
+    "xy_bounds_match_footprint_1uu": true
+  },
+  "checks": {
+    "single_mesh": true,
+    "triangles_preserved": true,
+    "one_material_slot": true,
+    "uv0_present": true,
+    "no_armature": true,
+    "top_at_top_z": true,
+    "top_outline_matches_footprint_1uu": true,
+    "top_outline_centred": true,
+    "no_folded_faces_in_top_plane": true,
+    "no_board_horizontal_face_near_top_plane": true,
+    "source_unchanged": true,
+    "um_fbx_v1_conforms": true,
+    "closed_manifold_consistent_winding": true,
+    "readback_closed_manifold": true,
+    "xy_bounds_match_footprint_1uu": true,
+    "lip_rock_texels_unchanged": true
+  },
+  "checks_passed": true,
+  "decisions": {
+    "run": "2026-09-30 fix run (review defects: irregular 860 x 770 top with black notches; light plate-top cap). Supersedes the first 2026-09-30 run (cut + cap at the rock section, cap baked from the Tripo plate top).",
+    "top": "rectangular straight lip, UE 756 x 656 (task footprint, rim 50 uu around the ART-005 board: flat 46.5-47 + 3 uu bevel), 20 uu thick (Z -3..-23), ring solid with a 70 uu wide ring (inner opening UE 616 x 516, under the board frame). The board frame rests on the lip everywhere: no overhang over void, no notches in the top edge. The Tripo plate is not kept: it is 3-4 uu thin (reads as paper at the game camera) and its top texels are the light smooth lavender surface the review rejected",
+    "body": "Tripo rock body cut at 2.5 % of the source height below its top, capped flat at Z -15 (inside the lip), section fitted inside the lip minus 6 uu per side with non-uniform XY limited to 5 % (4.76 %): UE 719 x 644; the long ends stay 18.5 uu further in. The body is recessed under the lip as in the concept; the deep notches of the rock section are under the lip, not in the top surface",
+    "depth": "150 uu from the lip top to the lowest spike (unchanged): body Z scale 7.04",
+    "lip_texture": "no new texture source: the lip strips and the hidden body cap are filled with the painted-rock texels of the Tripo skirt itself (texture bombing of 160 px rock windows, Hann blend with variance preservation, no mirroring), at the rock texel density (lip 1.32 px/uu vs rock 1.34); on the lip the low frequencies of BC are damped (box-blur 10 px x2: detail x1.3, low frequencies x0.4 - the painted crevice shading of the cliff read as cloudy blotches on a flat top) ; the tangent XY of the lip normals likewise (box-blur 5 px x2, low frequencies x0.3: the broad curvature of the cliff faces shaded as large dark blotches on the flat top) and BC x 0.5 (linear) so the lip reads as dark cracked stone and stays darker than the board in K1 (first try x0.85: rim 0.445 vs board 0.514 display luminance); normals copied in the strip UV frame (OpenGL, flipped to DirectX with the rest); AO baked over the whole tray. Rock texels unchanged (0 changed)",
+    "uv": "lip = 4 unfolded strips (top -> bevel -> outer side -> bottom -> inner side, right-handed like the faces) in the atlas rectangle freed by the Tripo plate (px 16,16 1000 x 1068); body cap = small island (0.16 px/uu, hidden under the board). Rock UVs untouched",
+    "normals": "Tripo normal map is OpenGL (+G = +V) (measured in the first run: curl/div 0.50 vs 0.97); G flipped to DirectX for UE (TC_Normalmap, flip green off)",
+    "basecolor_factor": "glTF baseColorFactor 0.8 multiplied into BC in linear light",
+    "weld": "glTF seam-split vertices welded (891) before the cut; UVs and corner normals are loop data and unchanged"
+  }
+}

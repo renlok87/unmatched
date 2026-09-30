@@ -1,0 +1,996 @@
+{
+  "fbx": "SM_TableBase.fbx",
+  "board_fbx": "SM_ART005_BoardStoneV4_WoodUV.fbx",
+  "tray_bounds_uu": {
+    "min": [
+      -378.0,
+      -328.0,
+      -153.0
+    ],
+    "max": [
+      378.0,
+      328.0,
+      -3.0
+    ]
+  },
+  "tray_top_outline_vertices": 8,
+  "material": "rebuilt from T_TableBase_{BC,N,ORM}.png (N DirectX->OpenGL, AO multiplied)",
+  "frame": "UM_FBX_v1 export frame (UE: x, -y, z); board actor rotation not applied",
+  "game_frame": {
+    "resolution": [
+      1200,
+      675
+    ],
+    "aspect": "16:9",
+    "fov_h_deg": 35.0,
+    "sensor_fit": "HORIZONTAL",
+    "fov_v_deg": 20.114,
+    "half_fov_v_deg": 10.057,
+    "source": "03 section 2 (PROPOSED), 04 section 4.4 (vertical FOV ~20 at 16:9)"
+  },
+  "angle_convention": "up_deg > 0 = above the frame centre (far side for a camera looking down), right_deg > 0 = right of centre; in_frame = inside the rendered frame",
+  "shots": {
+    "k1-south-d12m": {
+      "role": "K1 (start camera, 16:9)",
+      "k1": true,
+      "resolution": [
+        1200,
+        675
+      ],
+      "aspect": "16:9",
+      "fov_h_deg": 35.0,
+      "fov_v_deg": 20.114,
+      "pitch_deg": -55.0,
+      "camera_azimuth_deg_export_frame": -90.0,
+      "distance_m": 12.0,
+      "target_uu": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "board": true,
+      "measure": {
+        "tray": {
+          "vertices": 6760,
+          "in_frame_frac": 0.8459,
+          "up_deg": [
+            -15.3,
+            10.78
+          ],
+          "right_deg": [
+            -20.39,
+            20.39
+          ],
+          "cut": {
+            "bottom_near": true,
+            "top_far": true,
+            "left": true,
+            "right": true
+          }
+        },
+        "tray_top_outline": {
+          "vertices": 8,
+          "in_frame_frac": 0.25,
+          "up_deg": [
+            -14.77,
+            10.78
+          ],
+          "right_deg": [
+            -20.26,
+            20.26
+          ],
+          "cut": {
+            "bottom_near": true,
+            "top_far": true,
+            "left": true,
+            "right": true
+          }
+        },
+        "key_points": {
+          "tray_top_near_edge_mid": {
+            "world_uu": [
+              0.0,
+              -325.0,
+              -3.0
+            ],
+            "up_deg": -14.77,
+            "right_deg": 0.0,
+            "in_frame": false
+          },
+          "tray_top_far_edge_mid": {
+            "world_uu": [
+              -0.0,
+              325.0,
+              -3.0
+            ],
+            "up_deg": 10.78,
+            "right_deg": 0.0,
+            "in_frame": false
+          },
+          "board_near_edge_mid_bbox_top": {
+            "world_uu": [
+              0.0,
+              -278.0,
+              5.0
+            ],
+            "up_deg": -12.24,
+            "right_deg": 0.0,
+            "in_frame": false
+          },
+          "board_far_edge_mid_bbox_top": {
+            "world_uu": [
+              -0.0,
+              278.0,
+              5.0
+            ],
+            "up_deg": 9.66,
+            "right_deg": 0.0,
+            "in_frame": true
+          }
+        },
+        "near_skirt_limit": {
+          "z_uu": null,
+          "note": "the top edge itself is below the frame bottom (cut)"
+        },
+        "play_plane_centre_column_visible": {
+          "near_uu": 231.1,
+          "far_uu": -296.7,
+          "note": "distance from the board centre along the camera direction (near > 0); camera-target column"
+        },
+        "board": {
+          "vertices": 790,
+          "in_frame_frac": 0.9367,
+          "up_deg": [
+            -12.97,
+            9.51
+          ],
+          "right_deg": [
+            -17.41,
+            17.41
+          ],
+          "cut": {
+            "bottom_near": true,
+            "top_far": false,
+            "left": false,
+            "right": false
+          }
+        },
+        "board_tiles": {
+          "vertices": 750,
+          "in_frame_frac": 0.96,
+          "up_deg": [
+            -10.93,
+            8.64
+          ],
+          "right_deg": [
+            -15.81,
+            15.81
+          ],
+          "cut": {
+            "bottom_near": true,
+            "top_far": false,
+            "left": false,
+            "right": false
+          }
+        }
+      },
+      "file": "SM_TableBase_k1-south-d12m.jpg"
+    },
+    "game-north-d12m": {
+      "role": "K1 camera from the north - asset inspection, not K1",
+      "k1": false,
+      "resolution": [
+        1200,
+        675
+      ],
+      "aspect": "16:9",
+      "fov_h_deg": 35.0,
+      "fov_v_deg": 20.114,
+      "pitch_deg": -55.0,
+      "camera_azimuth_deg_export_frame": 90.0,
+      "distance_m": 12.0,
+      "target_uu": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "board": true,
+      "measure": {
+        "tray": {
+          "vertices": 6760,
+          "in_frame_frac": 0.8581,
+          "up_deg": [
+            -15.3,
+            10.78
+          ],
+          "right_deg": [
+            -20.39,
+            20.39
+          ],
+          "cut": {
+            "bottom_near": true,
+            "top_far": true,
+            "left": true,
+            "right": true
+          }
+        },
+        "tray_top_outline": {
+          "vertices": 8,
+          "in_frame_frac": 0.25,
+          "up_deg": [
+            -14.77,
+            10.78
+          ],
+          "right_deg": [
+            -20.26,
+            20.26
+          ],
+          "cut": {
+            "bottom_near": true,
+            "top_far": true,
+            "left": true,
+            "right": true
+          }
+        },
+        "key_points": {
+          "tray_top_near_edge_mid": {
+            "world_uu": [
+              0.0,
+              325.0,
+              -3.0
+            ],
+            "up_deg": -14.77,
+            "right_deg": 0.0,
+            "in_frame": false
+          },
+          "tray_top_far_edge_mid": {
+            "world_uu": [
+              -0.0,
+              -325.0,
+              -3.0
+            ],
+            "up_deg": 10.78,
+            "right_deg": 0.0,
+            "in_frame": false
+          },
+          "board_near_edge_mid_bbox_top": {
+            "world_uu": [
+              0.0,
+              278.0,
+              5.0
+            ],
+            "up_deg": -12.24,
+            "right_deg": 0.0,
+            "in_frame": false
+          },
+          "board_far_edge_mid_bbox_top": {
+            "world_uu": [
+              -0.0,
+              -278.0,
+              5.0
+            ],
+            "up_deg": 9.66,
+            "right_deg": 0.0,
+            "in_frame": true
+          }
+        },
+        "near_skirt_limit": {
+          "z_uu": null,
+          "note": "the top edge itself is below the frame bottom (cut)"
+        },
+        "play_plane_centre_column_visible": {
+          "near_uu": 231.1,
+          "far_uu": -296.7,
+          "note": "distance from the board centre along the camera direction (near > 0); camera-target column"
+        },
+        "board": {
+          "vertices": 790,
+          "in_frame_frac": 0.9367,
+          "up_deg": [
+            -12.97,
+            9.51
+          ],
+          "right_deg": [
+            -17.41,
+            17.41
+          ],
+          "cut": {
+            "bottom_near": true,
+            "top_far": false,
+            "left": false,
+            "right": false
+          }
+        },
+        "board_tiles": {
+          "vertices": 750,
+          "in_frame_frac": 0.96,
+          "up_deg": [
+            -10.94,
+            8.64
+          ],
+          "right_deg": [
+            -15.8,
+            15.8
+          ],
+          "cut": {
+            "bottom_near": true,
+            "top_far": false,
+            "left": false,
+            "right": false
+          }
+        }
+      },
+      "file": "SM_TableBase_game-north-d12m.jpg"
+    },
+    "game-east-d12m": {
+      "role": "K1 camera from the east - asset inspection, not K1",
+      "k1": false,
+      "resolution": [
+        1200,
+        675
+      ],
+      "aspect": "16:9",
+      "fov_h_deg": 35.0,
+      "fov_v_deg": 20.114,
+      "pitch_deg": -55.0,
+      "camera_azimuth_deg_export_frame": 0.0,
+      "distance_m": 12.0,
+      "target_uu": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "board": true,
+      "measure": {
+        "tray": {
+          "vertices": 6760,
+          "in_frame_frac": 0.793,
+          "up_deg": [
+            -17.86,
+            12.16
+          ],
+          "right_deg": [
+            -18.36,
+            18.36
+          ],
+          "cut": {
+            "bottom_near": true,
+            "top_far": true,
+            "left": true,
+            "right": true
+          }
+        },
+        "tray_top_outline": {
+          "vertices": 8,
+          "in_frame_frac": 0.0,
+          "up_deg": [
+            -17.37,
+            12.16
+          ],
+          "right_deg": [
+            -18.22,
+            18.22
+          ],
+          "cut": {
+            "bottom_near": true,
+            "top_far": true,
+            "left": true,
+            "right": true
+          }
+        },
+        "key_points": {
+          "tray_top_near_edge_mid": {
+            "world_uu": [
+              375.0,
+              0.0,
+              -3.0
+            ],
+            "up_deg": -17.37,
+            "right_deg": -0.0,
+            "in_frame": false
+          },
+          "tray_top_far_edge_mid": {
+            "world_uu": [
+              -375.0,
+              0.0,
+              -3.0
+            ],
+            "up_deg": 12.16,
+            "right_deg": -0.0,
+            "in_frame": false
+          },
+          "board_near_edge_mid_bbox_top": {
+            "world_uu": [
+              328.0,
+              0.0,
+              5.0
+            ],
+            "up_deg": -14.78,
+            "right_deg": -0.0,
+            "in_frame": false
+          },
+          "board_far_edge_mid_bbox_top": {
+            "world_uu": [
+              -328.0,
+              0.0,
+              5.0
+            ],
+            "up_deg": 11.1,
+            "right_deg": -0.0,
+            "in_frame": false
+          }
+        },
+        "near_skirt_limit": {
+          "z_uu": null,
+          "note": "the top edge itself is below the frame bottom (cut)"
+        },
+        "play_plane_centre_column_visible": {
+          "near_uu": 231.1,
+          "far_uu": -296.7,
+          "note": "distance from the board centre along the camera direction (near > 0); camera-target column"
+        },
+        "board": {
+          "vertices": 790,
+          "in_frame_frac": 0.8253,
+          "up_deg": [
+            -15.44,
+            10.96
+          ],
+          "right_deg": [
+            -15.28,
+            15.28
+          ],
+          "cut": {
+            "bottom_near": true,
+            "top_far": true,
+            "left": false,
+            "right": false
+          }
+        },
+        "board_tiles": {
+          "vertices": 750,
+          "in_frame_frac": 0.8667,
+          "up_deg": [
+            -13.43,
+            10.13
+          ],
+          "right_deg": [
+            -13.62,
+            13.62
+          ],
+          "cut": {
+            "bottom_near": true,
+            "top_far": true,
+            "left": false,
+            "right": false
+          }
+        }
+      },
+      "file": "SM_TableBase_game-east-d12m.jpg"
+    },
+    "game-south-zoom065-d18.5m": {
+      "role": "zoom-out limit 0.65x (16:9), not K1",
+      "k1": false,
+      "resolution": [
+        1200,
+        675
+      ],
+      "aspect": "16:9",
+      "fov_h_deg": 35.0,
+      "fov_v_deg": 20.114,
+      "pitch_deg": -55.0,
+      "camera_azimuth_deg_export_frame": -90.0,
+      "distance_m": 18.462,
+      "target_uu": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "board": true,
+      "measure": {
+        "tray": {
+          "vertices": 6760,
+          "in_frame_frac": 1.0,
+          "up_deg": [
+            -9.54,
+            7.41
+          ],
+          "right_deg": [
+            -12.81,
+            12.81
+          ],
+          "cut": {
+            "bottom_near": false,
+            "top_far": false,
+            "left": false,
+            "right": false
+          }
+        },
+        "tray_top_outline": {
+          "vertices": 8,
+          "in_frame_frac": 1.0,
+          "up_deg": [
+            -9.16,
+            7.41
+          ],
+          "right_deg": [
+            -12.71,
+            12.71
+          ],
+          "cut": {
+            "bottom_near": false,
+            "top_far": false,
+            "left": false,
+            "right": false
+          }
+        },
+        "key_points": {
+          "tray_top_near_edge_mid": {
+            "world_uu": [
+              0.0,
+              -325.0,
+              -3.0
+            ],
+            "up_deg": -9.16,
+            "right_deg": 0.0,
+            "in_frame": true
+          },
+          "tray_top_far_edge_mid": {
+            "world_uu": [
+              -0.0,
+              325.0,
+              -3.0
+            ],
+            "up_deg": 7.41,
+            "right_deg": 0.0,
+            "in_frame": true
+          },
+          "board_near_edge_mid_bbox_top": {
+            "world_uu": [
+              0.0,
+              -278.0,
+              5.0
+            ],
+            "up_deg": -7.61,
+            "right_deg": 0.0,
+            "in_frame": true
+          },
+          "board_far_edge_mid_bbox_top": {
+            "world_uu": [
+              -0.0,
+              278.0,
+              5.0
+            ],
+            "up_deg": 6.57,
+            "right_deg": 0.0,
+            "in_frame": true
+          }
+        },
+        "near_skirt_limit": {
+          "z_uu": -65.7,
+          "depth_below_top_uu": 62.7,
+          "note": "deeper than this the near skirt under the top-outline edge is outside the frame"
+        },
+        "play_plane_centre_column_visible": {
+          "near_uu": 355.6,
+          "far_uu": -456.4,
+          "note": "distance from the board centre along the camera direction (near > 0); camera-target column"
+        },
+        "board": {
+          "vertices": 790,
+          "in_frame_frac": 1.0,
+          "up_deg": [
+            -8.16,
+            6.47
+          ],
+          "right_deg": [
+            -10.97,
+            10.97
+          ],
+          "cut": {
+            "bottom_near": false,
+            "top_far": false,
+            "left": false,
+            "right": false
+          }
+        },
+        "board_tiles": {
+          "vertices": 750,
+          "in_frame_frac": 1.0,
+          "up_deg": [
+            -6.84,
+            5.86
+          ],
+          "right_deg": [
+            -9.97,
+            9.97
+          ],
+          "cut": {
+            "bottom_near": false,
+            "top_far": false,
+            "left": false,
+            "right": false
+          }
+        }
+      },
+      "file": "SM_TableBase_game-south-zoom065-d18.5m.jpg"
+    },
+    "game-south-zoom12-follow-nearrow-d10.0m": {
+      "role": "follow-selection at zoom 1.2x (03 section 2), target = near-row cell centre, not K1",
+      "k1": false,
+      "resolution": [
+        1200,
+        675
+      ],
+      "aspect": "16:9",
+      "fov_h_deg": 35.0,
+      "fov_v_deg": 20.114,
+      "pitch_deg": -55.0,
+      "camera_azimuth_deg_export_frame": -90.0,
+      "distance_m": 10.0,
+      "target_uu": [
+        0.0,
+        -199.3,
+        0.0
+      ],
+      "board": true,
+      "measure": {
+        "tray": {
+          "vertices": 6760,
+          "in_frame_frac": 0.704,
+          "up_deg": [
+            -7.16,
+            18.17
+          ],
+          "right_deg": [
+            -22.1,
+            22.1
+          ],
+          "cut": {
+            "bottom_near": false,
+            "top_far": true,
+            "left": true,
+            "right": true
+          }
+        },
+        "tray_top_outline": {
+          "vertices": 8,
+          "in_frame_frac": 0.0,
+          "up_deg": [
+            -6.42,
+            18.17
+          ],
+          "right_deg": [
+            -21.95,
+            21.95
+          ],
+          "cut": {
+            "bottom_near": false,
+            "top_far": true,
+            "left": true,
+            "right": true
+          }
+        },
+        "key_points": {
+          "tray_top_near_edge_mid": {
+            "world_uu": [
+              0.0,
+              -325.0,
+              -3.0
+            ],
+            "up_deg": -6.42,
+            "right_deg": 0.0,
+            "in_frame": true
+          },
+          "tray_top_far_edge_mid": {
+            "world_uu": [
+              -0.0,
+              325.0,
+              -3.0
+            ],
+            "up_deg": 18.17,
+            "right_deg": 0.0,
+            "in_frame": false
+          },
+          "board_near_edge_mid_bbox_top": {
+            "world_uu": [
+              0.0,
+              -278.0,
+              5.0
+            ],
+            "up_deg": -3.71,
+            "right_deg": 0.0,
+            "in_frame": true
+          },
+          "board_far_edge_mid_bbox_top": {
+            "world_uu": [
+              -0.0,
+              278.0,
+              5.0
+            ],
+            "up_deg": 17.23,
+            "right_deg": 0.0,
+            "in_frame": false
+          }
+        },
+        "near_skirt_limit": {
+          "z_uu": -143.7,
+          "depth_below_top_uu": 140.7,
+          "note": "deeper than this the near skirt under the top-outline edge is outside the frame"
+        },
+        "play_plane_centre_column_visible": {
+          "near_uu": 391.8,
+          "far_uu": -48.0,
+          "note": "distance from the board centre along the camera direction (near > 0); camera-target column"
+        },
+        "board": {
+          "vertices": 790,
+          "in_frame_frac": 0.5367,
+          "up_deg": [
+            -4.8,
+            17.1
+          ],
+          "right_deg": [
+            -18.85,
+            18.85
+          ],
+          "cut": {
+            "bottom_near": false,
+            "top_far": true,
+            "left": true,
+            "right": true
+          }
+        },
+        "board_tiles": {
+          "vertices": 750,
+          "in_frame_frac": 0.56,
+          "up_deg": [
+            -2.41,
+            16.28
+          ],
+          "right_deg": [
+            -17.12,
+            17.12
+          ],
+          "cut": {
+            "bottom_near": false,
+            "top_far": true,
+            "left": false,
+            "right": false
+          }
+        }
+      },
+      "file": "SM_TableBase_game-south-zoom12-follow-nearrow-d10.0m.jpg"
+    },
+    "game-south-zoom16-follow-nearrow-d7.5m": {
+      "role": "follow-selection at zoom 1.6x (03 section 2), target = near-row cell centre, not K1",
+      "k1": false,
+      "resolution": [
+        1200,
+        675
+      ],
+      "aspect": "16:9",
+      "fov_h_deg": 35.0,
+      "fov_v_deg": 20.114,
+      "pitch_deg": -55.0,
+      "camera_azimuth_deg_export_frame": -90.0,
+      "distance_m": 7.5,
+      "target_uu": [
+        0.0,
+        -199.3,
+        0.0
+      ],
+      "board": true,
+      "measure": {
+        "tray": {
+          "vertices": 6760,
+          "in_frame_frac": 0.4993,
+          "up_deg": [
+            -9.69,
+            22.1
+          ],
+          "right_deg": [
+            -29.03,
+            29.03
+          ],
+          "cut": {
+            "bottom_near": false,
+            "top_far": true,
+            "left": true,
+            "right": true
+          }
+        },
+        "tray_top_outline": {
+          "vertices": 8,
+          "in_frame_frac": 0.0,
+          "up_deg": [
+            -8.75,
+            22.1
+          ],
+          "right_deg": [
+            -28.86,
+            28.86
+          ],
+          "cut": {
+            "bottom_near": false,
+            "top_far": true,
+            "left": true,
+            "right": true
+          }
+        },
+        "key_points": {
+          "tray_top_near_edge_mid": {
+            "world_uu": [
+              0.0,
+              -325.0,
+              -3.0
+            ],
+            "up_deg": -8.75,
+            "right_deg": 0.0,
+            "in_frame": true
+          },
+          "tray_top_far_edge_mid": {
+            "world_uu": [
+              -0.0,
+              325.0,
+              -3.0
+            ],
+            "up_deg": 22.1,
+            "right_deg": 0.0,
+            "in_frame": false
+          },
+          "board_near_edge_mid_bbox_top": {
+            "world_uu": [
+              0.0,
+              -278.0,
+              5.0
+            ],
+            "up_deg": -5.03,
+            "right_deg": 0.0,
+            "in_frame": true
+          },
+          "board_far_edge_mid_bbox_top": {
+            "world_uu": [
+              -0.0,
+              278.0,
+              5.0
+            ],
+            "up_deg": 21.12,
+            "right_deg": 0.0,
+            "in_frame": false
+          }
+        },
+        "near_skirt_limit": {
+          "z_uu": -40.2,
+          "depth_below_top_uu": 37.2,
+          "note": "deeper than this the near skirt under the top-outline edge is outside the frame"
+        },
+        "play_plane_centre_column_visible": {
+          "near_uu": 343.7,
+          "far_uu": 13.8,
+          "note": "distance from the board centre along the camera direction (near > 0); camera-target column"
+        },
+        "board": {
+          "vertices": 790,
+          "in_frame_frac": 0.3797,
+          "up_deg": [
+            -6.43,
+            20.97
+          ],
+          "right_deg": [
+            -24.78,
+            24.78
+          ],
+          "cut": {
+            "bottom_near": false,
+            "top_far": true,
+            "left": true,
+            "right": true
+          }
+        },
+        "board_tiles": {
+          "vertices": 750,
+          "in_frame_frac": 0.4,
+          "up_deg": [
+            -3.25,
+            20.03
+          ],
+          "right_deg": [
+            -22.53,
+            22.53
+          ],
+          "cut": {
+            "bottom_near": false,
+            "top_far": true,
+            "left": true,
+            "right": true
+          }
+        }
+      },
+      "file": "SM_TableBase_game-south-zoom16-follow-nearrow-d7.5m.jpg"
+    },
+    "context4x3-notK1-south-d12m": {
+      "role": "NOT K1: 4:3 context; rows outside the 16:9 band dimmed, band edges yellow",
+      "k1": false,
+      "resolution": [
+        1200,
+        900
+      ],
+      "aspect": "4:3",
+      "fov_h_deg": 35.0,
+      "pitch_deg": -55.0,
+      "camera_azimuth_deg_export_frame": -90.0,
+      "distance_m": 12.0,
+      "board": true,
+      "overlay_16x9": {
+        "band_rows_from_top": [
+          112,
+          786
+        ],
+        "band_height_px": 675
+      },
+      "file": "SM_TableBase_context4x3-notK1-south-d12m.jpg"
+    },
+    "context4x3-notK1-south-d18.5m": {
+      "role": "NOT K1: 4:3 context; rows outside the 16:9 band dimmed, band edges yellow",
+      "k1": false,
+      "resolution": [
+        1200,
+        900
+      ],
+      "aspect": "4:3",
+      "fov_h_deg": 35.0,
+      "pitch_deg": -55.0,
+      "camera_azimuth_deg_export_frame": -90.0,
+      "distance_m": 18.462,
+      "board": true,
+      "overlay_16x9": {
+        "band_rows_from_top": [
+          112,
+          786
+        ],
+        "band_height_px": 675
+      },
+      "file": "SM_TableBase_context4x3-notK1-south-d18.5m.jpg"
+    },
+    "ortho-top-with-board": {
+      "file": "SM_TableBase_ortho-top-with-board.jpg",
+      "k1": false,
+      "resolution": [
+        1200,
+        900
+      ],
+      "ortho_scale_m": 8.316
+    },
+    "ortho-front-minusY": {
+      "file": "SM_TableBase_ortho-front-minusY.jpg",
+      "k1": false,
+      "resolution": [
+        1200,
+        900
+      ],
+      "ortho_scale_m": 8.316,
+      "board": false
+    },
+    "ortho-side-plusX": {
+      "file": "SM_TableBase_ortho-side-plusX.jpg",
+      "k1": false,
+      "resolution": [
+        1200,
+        900
+      ],
+      "ortho_scale_m": 8.316,
+      "board": false
+    },
+    "ortho-bottom": {
+      "file": "SM_TableBase_ortho-bottom.jpg",
+      "k1": false,
+      "resolution": [
+        1200,
+        900
+      ],
+      "ortho_scale_m": 8.316,
+      "board": false
+    }
+  }
+}
