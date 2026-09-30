@@ -39,36 +39,36 @@
   },
   "TeamDye": 1.0,
   "TeamDyeGain": {
-   "P1": 11.0,
-   "P2": 26.0
+   "P1": 10.0,
+   "P2": 23.5
   },
   "TeamDyeGain_note": "per team MI: P1 (gold) and P2 (steel blue) differ, both by the same rule",
   "TeamMaskTexture": "T_Merlin_H2LD_TeamAccent",
   "note": "the MIs of the H2LD import (Neutral / Blue / Red; P1 / P2 of the active palette): the TeamMaskTexture slot takes TeamAccent instead of the deprecated TeamMask; TeamDyeGain by the team-accent.md rule",
   "team_dye_gain_rule": {
-   "Y_p50": 0.0295,
-   "Y_p95": 0.0998,
+   "Y_p50": 0.0296,
+   "Y_p95": 0.1085,
    "accent_texels_2k_ge_0_5": 183085,
    "by_team": {
     "P1": {
      "bound_by": "p95",
-     "gain_unrounded": 11.178,
-     "median_dyed_albedo_over_team": 0.325,
-     "p95_dyed_max_channel": 0.886,
-     "team_dye_gain": 11.0,
+     "gain_unrounded": 10.28,
+     "median_dyed_albedo_over_team": 0.296,
+     "p95_dyed_max_channel": 0.876,
+     "team_dye_gain": 10.0,
      "team_max_channel_linear": 0.807
     },
     "P2": {
      "bound_by": "p95",
-     "gain_unrounded": 26.017,
-     "median_dyed_albedo_over_team": 0.768,
-     "p95_dyed_max_channel": 0.899,
-     "team_dye_gain": 26.0,
+     "gain_unrounded": 23.926,
+     "median_dyed_albedo_over_team": 0.696,
+     "p95_dyed_max_channel": 0.884,
+     "team_dye_gain": 23.5,
      "team_max_channel_linear": 0.3467
     }
    },
-   "note": "per team: the p95 condition is on the dyed albedo = TeamColor x Y x gain, so it depends on the team colour; one gain for both (the brightest channel of the palette, P1) would leave the P2 accent at 0.32 x TeamColor (median) - measured 2026-09-30: dE P2 accent vs the blue wool 6-13 at K2",
-   "one_gain_for_both_teams_would_be": 11.0
+   "note": "per team: the p95 condition is on the dyed albedo = TeamColor x Y x gain, so it depends on the team colour; one gain for both (the brightest channel of the palette, P1) would leave the P2 accent at 0.30 x TeamColor (median) - measured 2026-09-30: dE P2 accent vs the blue wool 6-13 at K2",
+   "one_gain_for_both_teams_would_be": 10.0
   }
  },
  "schema": "unmatched.merlin-lookdev.team-accent-ue/1",

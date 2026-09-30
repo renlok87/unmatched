@@ -1,0 +1,375 @@
+{
+ "bc_gain": {
+  "bc_after": {
+   "Y_median": 0.03865,
+   "hue_deg": 22.7,
+   "median_linear": [
+    0.07466,
+    0.03056,
+    0.01417
+   ],
+   "sat": 0.59
+  },
+  "bc_before": {
+   "Y_median": 0.03531,
+   "hue_deg": 21.2,
+   "median_linear": [
+    0.06125,
+    0.02956,
+    0.01764
+   ],
+   "sat": 0.486
+  },
+  "class": "leather_worn",
+  "effective_after": {
+   "Y_median": 0.03865,
+   "hue_deg": 22.7,
+   "median_linear": [
+    0.07466,
+    0.03056,
+    0.01417
+   ],
+   "sat": 0.59
+  },
+  "effective_before": {
+   "Y_median": 0.03531,
+   "hue_deg": 21.2,
+   "median_linear": [
+    0.06125,
+    0.02956,
+    0.01764
+   ],
+   "sat": 0.486
+  },
+  "floor_clamped_share_after": 0.0022,
+  "floor_clamped_share_before": 0.0033,
+  "gain_bc_linear": [
+   1.219,
+   1.0338,
+   0.803
+  ],
+  "lut_column": {
+   "luminanceMax": 0.45,
+   "luminanceMin": 0.012,
+   "maxChannel": 0.9,
+   "specular": 0.4
+  },
+  "ratio_effective_got": [
+   1.219,
+   1.0338,
+   0.803
+  ],
+  "ratio_effective_target": [
+   1.219,
+   1.0338,
+   0.803
+  ],
+  "texels_2k": 286403
+ },
+ "concept": {
+  "hue_deg": 23.6,
+  "luma_Y_linear": 0.0279,
+  "median_srgb": [
+   60.0,
+   43.0,
+   32.0
+  ],
+  "sat": 0.467,
+  "value": 0.235
+ },
+ "created": "2026-09-30T12:23:48+05:00",
+ "fit": {
+  "changed_pixels_by_view": {
+   "back": 7387,
+   "front": 8281,
+   "side": 7483
+  },
+  "file_note": "ue_bc_feedback.py fit output (copied)",
+  "keep_luma": false,
+  "ratio_fit": [
+   1.219,
+   1.0338,
+   0.803
+  ],
+  "ratio_used": [
+   1.219,
+   1.0338,
+   0.803
+  ],
+  "sat_max": null,
+  "scale_applied": 1.0,
+  "select": "class",
+  "weights": "reading=1,neutral=0.5"
+ },
+ "hero": "Merlin",
+ "limits": [
+  "prediction from the look-dev C editor frames (editor-mcp-viewport), not a UE re-shoot; the orchestrator re-imports the BC and re-shoots",
+  "specular / sheen are not separated from the diffuse: the change of saturation is an upper bound",
+  "the exposure k of the measure is the geometric mean of the key zones: an edited key zone moves k and the ratios of the other zones"
+ ],
+ "model": "a lit pixel of a dielectric = light x effective albedo per channel, so a change of the effective albedo of the class by r (per channel, linear) multiplies the linear pixel by r. The pixels changed are those of the zone's MatID class decoded from the debug frame (select \"class\"), or of the render gate of the zone (select \"gate\", every gated pixel: an upper bound when the gate also takes pixels of texels the edit does not touch), or the class pixels the team dye changes (select \"dye\": |P1 - P2| > 40 levels, the TeamAccent texels = e.g. Harpy's dark primary tips, a clean sample of the edited texels). Specular / sheen are not separated (they dilute the change: the prediction is an upper bound of the change of saturation). Measurement = ue_hero_lookdev.cmd_measure itself (same masks, gates, medians, k).",
+ "schema": "unmatched.lookdev-5cb0-ue-feedback/1",
+ "sheet": {
+  "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/preview/ld_5cb0_leather-worn_sheet.png",
+  "sha256": "873d4b0ca5cd2d4bb602d729582d190325cce1aab0894161af45738415da61a5"
+ },
+ "status": "измерено (прогноз)",
+ "table": {
+  "neutral": {
+   "k_after": 0.394,
+   "k_before": 0.394,
+   "zones": {
+    "leather_worn": {
+     "after_predicted": {
+      "Y_ratio_exposure_normalised": 1.209,
+      "all_within": false,
+      "dHue_deg": 1.2,
+      "dSat": -0.025
+     },
+     "before": {
+      "Y_ratio_exposure_normalised": 1.127,
+      "all_within": false,
+      "dHue_deg": -1.6,
+      "dSat": -0.151
+     },
+     "median_srgb_after_predicted": [
+      104.0,
+      77.0,
+      58.0
+     ],
+     "median_srgb_before": [
+      95.0,
+      76.0,
+      65.0
+     ]
+    },
+    "silk": {
+     "after_predicted": {
+      "Y_ratio_exposure_normalised": 0.919,
+      "all_within": false,
+      "dHue_deg": 5.6,
+      "dSat": -0.146
+     },
+     "before": {
+      "Y_ratio_exposure_normalised": 0.919,
+      "all_within": false,
+      "dHue_deg": 5.6,
+      "dSat": -0.146
+     },
+     "median_srgb_after_predicted": [
+      210.0,
+      179.0,
+      135.0
+     ],
+     "median_srgb_before": [
+      210.0,
+      179.0,
+      135.0
+     ]
+    },
+    "skin": {
+     "after_predicted": {
+      "Y_ratio_exposure_normalised": 0.913,
+      "all_within": false,
+      "dHue_deg": 3.6,
+      "dSat": -0.18
+     },
+     "before": {
+      "Y_ratio_exposure_normalised": 0.913,
+      "all_within": false,
+      "dHue_deg": 3.6,
+      "dSat": -0.18
+     },
+     "median_srgb_after_predicted": [
+      221.0,
+      196.0,
+      174.0
+     ],
+     "median_srgb_before": [
+      221.0,
+      196.0,
+      174.0
+     ]
+    },
+    "wood": {
+     "after_predicted": {
+      "Y_ratio_exposure_normalised": 1.374,
+      "all_within": false,
+      "dHue_deg": 1.0,
+      "dSat": -0.039
+     },
+     "before": {
+      "Y_ratio_exposure_normalised": 1.374,
+      "all_within": false,
+      "dHue_deg": 1.0,
+      "dSat": -0.039
+     },
+     "median_srgb_after_predicted": [
+      118.0,
+      89.0,
+      70.0
+     ],
+     "median_srgb_before": [
+      118.0,
+      89.0,
+      70.0
+     ]
+    },
+    "wool_coarse": {
+     "after_predicted": {
+      "Y_ratio_exposure_normalised": 1.191,
+      "all_within": false,
+      "dHue_deg": 3.7,
+      "dSat": 0.009
+     },
+     "before": {
+      "Y_ratio_exposure_normalised": 1.191,
+      "all_within": false,
+      "dHue_deg": 3.7,
+      "dSat": 0.009
+     },
+     "median_srgb_after_predicted": [
+      75.0,
+      84.0,
+      140.0
+     ],
+     "median_srgb_before": [
+      75.0,
+      84.0,
+      140.0
+     ]
+    }
+   }
+  },
+  "reading": {
+   "k_after": 0.8245,
+   "k_before": 0.8245,
+   "zones": {
+    "leather_worn": {
+     "after_predicted": {
+      "Y_ratio_exposure_normalised": 0.898,
+      "all_within": true,
+      "dHue_deg": 1.6,
+      "dSat": 0.025
+     },
+     "before": {
+      "Y_ratio_exposure_normalised": 0.827,
+      "all_within": false,
+      "dHue_deg": -0.7,
+      "dSat": -0.099
+     },
+     "median_srgb_after_predicted": [
+      63.0,
+      45.0,
+      32.0
+     ],
+     "median_srgb_before": [
+      57.0,
+      44.0,
+      36.0
+     ]
+    },
+    "silk": {
+     "after_predicted": {
+      "Y_ratio_exposure_normalised": 1.008,
+      "all_within": true,
+      "dHue_deg": 2.3,
+      "dSat": -0.021
+     },
+     "before": {
+      "Y_ratio_exposure_normalised": 1.008,
+      "all_within": true,
+      "dHue_deg": 2.3,
+      "dSat": -0.021
+     },
+     "median_srgb_after_predicted": [
+      168.0,
+      130.0,
+      87.0
+     ],
+     "median_srgb_before": [
+      168.0,
+      130.0,
+      87.0
+     ]
+    },
+    "skin": {
+     "after_predicted": {
+      "Y_ratio_exposure_normalised": 1.154,
+      "all_within": false,
+      "dHue_deg": 2.2,
+      "dSat": -0.058
+     },
+     "before": {
+      "Y_ratio_exposure_normalised": 1.154,
+      "all_within": false,
+      "dHue_deg": 2.2,
+      "dSat": -0.058
+     },
+     "median_srgb_after_predicted": [
+      188.0,
+      153.0,
+      125.0
+     ],
+     "median_srgb_before": [
+      188.0,
+      153.0,
+      125.0
+     ]
+    },
+    "wood": {
+     "after_predicted": {
+      "Y_ratio_exposure_normalised": 1.01,
+      "all_within": true,
+      "dHue_deg": 0.1,
+      "dSat": 0.02
+     },
+     "before": {
+      "Y_ratio_exposure_normalised": 1.01,
+      "all_within": true,
+      "dHue_deg": 0.1,
+      "dSat": 0.02
+     },
+     "median_srgb_after_predicted": [
+      73.0,
+      52.0,
+      39.0
+     ],
+     "median_srgb_before": [
+      73.0,
+      52.0,
+      39.0
+     ]
+    },
+    "wool_coarse": {
+     "after_predicted": {
+      "Y_ratio_exposure_normalised": 0.86,
+      "all_within": true,
+      "dHue_deg": 4.7,
+      "dSat": 0.083
+     },
+     "before": {
+      "Y_ratio_exposure_normalised": 0.86,
+      "all_within": true,
+      "dHue_deg": 4.7,
+      "dSat": 0.083
+     },
+     "median_srgb_after_predicted": [
+      42.0,
+      48.0,
+      91.0
+     ],
+     "median_srgb_before": [
+      42.0,
+      48.0,
+      91.0
+     ]
+    }
+   }
+  }
+ },
+ "tag": "c3",
+ "ue_frames": "art/pipeline-candidates/ASSET-MERLIN-001/20260930-h2ld-ldc-ue/review/c3",
+ "zone": "leather_worn",
+ "zone_label": "потёртая кожа: пояс, сапоги, обмотка бороды (leather_worn)"
+}

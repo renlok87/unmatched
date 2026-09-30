@@ -109,6 +109,10 @@
    "luma_note": "measured 2026-09-29: luminance ratios concept / model of one material differ by light (skin: face 0.84-1.18, hands 1.71-1.78), so the luminance part of a zone gain is clamped to [0.75, 1.35]; hue and saturation (chroma) are matched fully within [0.6, 1.6] per channel",
    "quantize": 0.01,
    "skip_zones": ["buckle"],
+   "ue_feedback": {"zones": ["belt", "boots", "beard_wrap"], "gain": [1.219, 1.0338, 0.803],
+                   "source": "5c-B0 (2026-09-30): UE look-dev C frames c3 (art/pipeline-candidates/ASSET-MERLIN-001/20260930-h2ld-ldc-ue/review/c3, UE LUT c3: leather_worn luminance [0.012, 0.45], specular 0.4) against the concept; tools/art/material_library/ue_bc_feedback.py fit (zone leather_worn = class pixels of belt, boots and beard wrap; weights reading 1 / board 0.5) -> ratio of the effective albedo (1.219, 1.0338, 0.803); 0.3 % of the class texels sit on the floor, so the BC gain = the ratio (ue_bc_feedback.py gain)",
+                   "why": "UE c3: the worn leather (belt, boots, beard wrap = one MatID class) reads paler than the concept on the reading exposure (-1 EV: Y 0.83, sat -0.099) and on the board (Y 1.13, sat -0.151); specular 0.3-0.5 did not hold both (c1-c3). Predicted after: -1 EV Y 0.90 / sat +0.025 (in tolerance), board Y 1.21 / sat -0.025 (luminance = board light, as the wool 1.19); other zones unchanged (reports/ld-5cb0-ue-feedback.json)",
+                   "note": "multiplied onto the concept-tone gain of each zone (lookdev_tone.py) after the quantisation"},
    "note": "zones whose |gain - 1| < dead_band in every channel keep the H2.1 BC; gains are applied in linear light to the zone's texels (zone map blurred 3 x 3 at 4K so the change has no hard seam); the buckle is a metal (preset F0, Ymed modulation in the shader): its BC is not tone-matched"
   },
   "render": {"ortho_resolution": [1200, 1333], "framing": {"front": [0.058, 0.945], "right": [0.042, 0.935], "back": [0.042, 0.935]},

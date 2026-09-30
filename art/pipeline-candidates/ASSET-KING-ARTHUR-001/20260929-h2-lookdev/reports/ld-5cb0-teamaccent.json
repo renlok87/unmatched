@@ -1,0 +1,261 @@
+{
+ "classes_note": null,
+ "created": "2026-09-30T12:35:02+05:00",
+ "criteria_fixed_before_edit": {
+  "classes": {
+   "border": "cloak border envelope: gold braid bands (embroidery components >= 2000 4K texels) + the red cloth between their threads (morphological closing in the atlas)",
+   "field": "red cloak cloth outside the envelope",
+   "other": "texels of every other zone (steel, gold, embroidery elsewhere, skin, hair, tabard, lining)"
+  },
+  "criteria": {
+   "accent_core_median_min_mips_0_2": 0.5,
+   "border_painted_share_max": 0.15,
+   "field_painted_share_max": 0.15,
+   "figure_3d_share_min": 0.03,
+   "note": "every criterion on every mip 0..3 with both mip filters; figure_3d_share_min is below the 5-12 % of team-accent.md on purpose: the 5 % were reached in rev. 2 only by painting the red inside the gold border, which the user rule 'the gold borders are not dyed, the cloak stays red' forbids",
+   "other_painted_share_max": 0.01
+  },
+  "fixed_at": "2026-09-30, before any edit of the Arthur TeamAccent mask (5c-B0)",
+  "metric": "effective accent of a 2K texel at mip L = bilinear sample of the L-th mip of the 2K TeamAccent at the texel's UV; mips built from 2K as UE does (2x2 box = TMGS_SimpleAverage; Kaiser-windowed sinc as the alternative); 'painted' = effective accent >= 0.25 (25 % of the team colour mixed into the albedo, visible on the dark red cloth); shares weighted by the 3D texel area of the POS bake",
+  "visible_mips": "K2 5x (386 uu, 35 deg): ~1.27 mm per pixel on a facing surface, 2K texel of the cloak 0.72 mm -> mip ~0.8 (1.6 at 55 deg foreshortening without aniso); K2 1.6x (1207 uu): ~3.96 mm per pixel -> mip ~2.5 (3.3 foreshortened); -> criterion on mips 0..3 (2K..256), mip 4 (128) reported only"
+ },
+ "hero": "KingArthur",
+ "rev2": {
+  "box": [
+   {
+    "border": 0.5376,
+    "core_median": 1.0,
+    "field": 0.0934,
+    "mip": 0,
+    "other": 0.0007,
+    "px": 2048,
+    "tabard": 0.0
+   },
+   {
+    "border": 0.7815,
+    "core_median": 1.0,
+    "field": 0.0958,
+    "mip": 1,
+    "other": 0.0035,
+    "px": 1024,
+    "tabard": 0.0
+   },
+   {
+    "border": 0.956,
+    "core_median": 0.993,
+    "field": 0.0989,
+    "mip": 2,
+    "other": 0.0054,
+    "px": 512,
+    "tabard": 0.0
+   },
+   {
+    "border": 0.972,
+    "core_median": 0.892,
+    "field": 0.1054,
+    "mip": 3,
+    "other": 0.007,
+    "px": 256,
+    "tabard": 0.0
+   },
+   {
+    "border": 0.9815,
+    "core_median": 0.713,
+    "field": 0.1116,
+    "mip": 4,
+    "other": 0.0083,
+    "px": 128,
+    "tabard": 0.0
+   }
+  ],
+  "figure_3d_share": 0.0553,
+  "kaiser": [
+   {
+    "border": 0.5376,
+    "core_median": 1.0,
+    "field": 0.0934,
+    "mip": 0,
+    "other": 0.0007,
+    "px": 2048,
+    "tabard": 0.0
+   },
+   {
+    "border": 0.7718,
+    "core_median": 1.0,
+    "field": 0.0957,
+    "mip": 1,
+    "other": 0.0034,
+    "px": 1024,
+    "tabard": 0.0
+   },
+   {
+    "border": 0.9588,
+    "core_median": 0.992,
+    "field": 0.0991,
+    "mip": 2,
+    "other": 0.0055,
+    "px": 512,
+    "tabard": 0.0
+   },
+   {
+    "border": 0.9723,
+    "core_median": 0.889,
+    "field": 0.1061,
+    "mip": 3,
+    "other": 0.0073,
+    "px": 256,
+    "tabard": 0.0
+   },
+   {
+    "border": 0.9807,
+    "core_median": 0.723,
+    "field": 0.1145,
+    "mip": 4,
+    "other": 0.0089,
+    "px": 128,
+    "tabard": 0.0001
+   }
+  ],
+  "label": "rev2 current"
+ },
+ "rev3_ld_maps": {
+  "classes_2k_texels": {
+   "border": 22444,
+   "field": 514378,
+   "other": 908751,
+   "tabard": 74320
+  },
+  "cloak_texel_2k_mm": 0.721,
+  "criteria_result": {
+   "passed": true,
+   "worst": {
+    "border": 0.0049,
+    "core_median_min": 0.945,
+    "field": 0.0894,
+    "other": 0.0066,
+    "tabard": 0.0
+   }
+  },
+  "method": "runtime mask = the 8-bit 2K PNG; mips from it as UE builds them (2 x 2 box = TMGS_SimpleAverage, or a Kaiser-windowed sinc); value of a 2K texel at mip L = bilinear sample of mip L at its UV; painted = value >= threshold; shares weighted by the 3D texel area (lookdev_accent_mips.py)",
+  "rows": {
+   "box": [
+    {
+     "accent_core_median": 1.0,
+     "border": 0.0,
+     "field": 0.0667,
+     "mip": 0,
+     "other": 0.0007,
+     "px": 2048,
+     "tabard": 0.0
+    },
+    {
+     "accent_core_median": 0.999,
+     "border": 0.0,
+     "field": 0.0705,
+     "mip": 1,
+     "other": 0.003,
+     "px": 1024,
+     "tabard": 0.0
+    },
+    {
+     "accent_core_median": 0.946,
+     "border": 0.0001,
+     "field": 0.0766,
+     "mip": 2,
+     "other": 0.0048,
+     "px": 512,
+     "tabard": 0.0
+    },
+    {
+     "accent_core_median": 0.778,
+     "border": 0.0049,
+     "field": 0.0879,
+     "mip": 3,
+     "other": 0.0064,
+     "px": 256,
+     "tabard": 0.0
+    },
+    {
+     "accent_core_median": 0.55,
+     "border": 0.1285,
+     "field": 0.096,
+     "mip": 4,
+     "other": 0.0076,
+     "px": 128,
+     "tabard": 0.0
+    }
+   ],
+   "kaiser": [
+    {
+     "accent_core_median": 1.0,
+     "border": 0.0,
+     "field": 0.0667,
+     "mip": 0,
+     "other": 0.0007,
+     "px": 2048,
+     "tabard": 0.0
+    },
+    {
+     "accent_core_median": 1.0,
+     "border": 0.0,
+     "field": 0.0705,
+     "mip": 1,
+     "other": 0.0029,
+     "px": 1024,
+     "tabard": 0.0
+    },
+    {
+     "accent_core_median": 0.945,
+     "border": 0.0001,
+     "field": 0.077,
+     "mip": 2,
+     "other": 0.0048,
+     "px": 512,
+     "tabard": 0.0
+    },
+    {
+     "accent_core_median": 0.785,
+     "border": 0.0047,
+     "field": 0.0894,
+     "mip": 3,
+     "other": 0.0066,
+     "px": 256,
+     "tabard": 0.0
+    },
+    {
+     "accent_core_median": 0.57,
+     "border": 0.1688,
+     "field": 0.1012,
+     "mip": 4,
+     "other": 0.0083,
+     "px": 128,
+     "tabard": 0.0001
+    }
+   ]
+  },
+  "threshold": 0.25,
+  "visible_mips_by_view": {
+   "k2_1p6x": {
+    "mip_facing": 2.46,
+    "mip_vertical_no_aniso": 3.26,
+    "pixel_mm": 3.964
+   },
+   "k2_5x": {
+    "mip_facing": 0.81,
+    "mip_vertical_no_aniso": 1.62,
+    "pixel_mm": 1.268
+   },
+   "review_200uu": {
+    "mip_facing": -0.13,
+    "mip_vertical_no_aniso": -0.13,
+    "pixel_mm": 0.657
+   }
+  }
+ },
+ "schema": "unmatched.lookdev-5cb0-teamaccent/1",
+ "sheet": {
+  "path": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/preview/ld_5cb0_teamaccent_sheet.png",
+  "sha256": "2d2e71e9a185c14cdabca85facccb31cbfdcca312c51ee7fd23a9578c05a6642"
+ },
+ "status": "измерено"
+}

@@ -432,6 +432,14 @@ def fit(prof_path, run):
             continue
         w = ndimage.uniform_filter(l4["zones"][z], 3, mode="nearest")[..., None]
         mult += w * (np.array(e["gain"], np.float32) - 1.0)
+    # 5c-B0 (2026-09-30): UE feedback gains per zone (profile lookdev.tone.ue_feedback), fitted on the UE look-dev
+    # frames against the concept (tools/art/material_library/ue_bc_feedback.py), multiplied onto the concept-tone
+    # BC of the zone with the same blurred zone weights
+    fb = {z: v for z, v in (tc.get("ue_feedback") or {}).items() if isinstance(v, dict) and "gain" in v}
+    for z, e in fb.items():
+        w = ndimage.uniform_filter(l4["zones"][z], 3, mode="nearest")[..., None]
+        mult *= 1.0 + w * (np.array(e["gain"], np.float32) - 1.0)
+    rep["ue_feedback"] = {z: {"gain": e["gain"], "source": e.get("source")} for z, e in fb.items()}
     bc = np.clip(bc * mult, 0, 1)
     tex = paths["textures"]
     px = ld["prefix"]

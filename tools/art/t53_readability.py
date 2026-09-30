@@ -262,6 +262,328 @@ def classify_shape(shot: Shot, fid: str, team_mask, fs: float, z: float) -> dict
             "profile": [round(r, 2) if r is not None else None for r in rs]}
 
 
+# ------------------------------------------------------------------ 5c-B1 proposal: shape classifier rev 2 (teamShape) and
+# the ring tile reference rev 3. Registered BEFORE the 5c-B re-shoot (plan C:/tmp/p0-review/5cb1-plan.json); the W5b-R
+# methods above stay untouched and keep producing the r3 numbers of the act.
+SHAPE_V2 = {"rays": 360, "rhoMin": 16.0, "rhoMax": 34.0, "rhoStep": 0.25, "boundUU": 1.5, "minFilledShare": 0.25,
+            "hexRatioMax": 0.75, "circleRatioMin": 1.35, "maxResidualShare": 0.045, "cornerTolDeg": 4.0}
+
+
+def project_many(cam, pts) -> "object":
+    """Vectorised Camera.project: (N, 3) world -> (N, 2) screen, NaN behind the near plane."""
+    import numpy as np
+    from qa010lib.projection import NEAR_CLIP_UU
+    f, r, u = (np.asarray(v, dtype=np.float64) for v in cam.axes())
+    d = np.asarray(pts, dtype=np.float64) - np.asarray(cam.pos, dtype=np.float64)
+    depth = d @ f
+    w, h = cam.viewport
+    focal = (w * 0.5) / math.tan(math.radians(cam.hfov_deg) * 0.5)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        sx = w * 0.5 + (d @ r) / depth * focal
+        sy = h * 0.5 - (d @ u) / depth * focal
+    out = np.stack([sx, sy], -1)
+    out[depth <= NEAR_CLIP_UU] = np.nan
+    return out
+
+
+def ray_centerline(labels, rhos, bound_uu: float, prefer: float, outer=("K",)) -> float | None:
+    """One ray of the classifier: labels per radial sample ('K' keyline, 'T' team fill, 'R' light rim of the two-tone
+    ring, 'O' other). The fill run must be BOUNDED on both sides: a keyline sample within bound_uu before its first
+    sample and a sample of `outer` within bound_uu after its last - a tile pixel of the fill colour (grey variant, light
+    fixture tiles) or a wing over the ring is not a bounded run. classify_shape_v2 passes outer = ('K', 'R'): on the
+    two-tone ring (5c-B1 B1-3) the outer keyline (P2 1.0 uu x FS ~ 1.1 px on a K1 helper) lies between the fill and the
+    light rim, anti-aliasing mixes each of its pixels with a light neighbour and may leave no sample within dE 15 of the
+    keyline, while the rim right outside it still carries the bound. The inner side stays keyline-only (no rim inside).
+    Of several bounded runs the one nearest `prefer` wins; r = mean rho of its T samples (>= 2)."""
+    runs, i, n = [], 0, len(labels)
+    while i < n:
+        if labels[i] != "T":
+            i += 1
+            continue
+        j = i
+        while j < n and labels[j] == "T":
+            j += 1
+        runs.append((i, j))
+        i = j
+    best, best_d = None, None
+    for i, j in runs:
+        if j - i < 2:
+            continue
+        lo, hi = rhos[i], rhos[j - 1]
+        k_before = any(labels[q] == "K" and lo - bound_uu <= rhos[q] < lo for q in range(max(0, i - 12), i))
+        k_after = any(labels[q] in outer and hi < rhos[q] <= hi + bound_uu for q in range(j, min(n, j + 12)))
+        if not (k_before and k_after):
+            continue
+        r = sum(rhos[i:j]) / (j - i)
+        d = abs(r - prefer)
+        if best is None or d < best_d:
+            best, best_d = r, d
+    return best
+
+
+def fit_shape(thetas_deg, rs, corner_tol_deg: float = 4.0) -> dict:
+    """Circle (r = R) against hexagon (r = A / cos(phi), phi = angle to the nearest flat normal, corners at theta0 + 60k
+    in the world XY plane, theta0 free) on the filled rays; theta measured from +Y like classify_shape (world angle from
+    +X = 90 - theta). Gaps (runs of empty rays) are classified by position: at a fitted corner = 'cornerGap' (the P2
+    design), elsewhere = 'otherGap' (occlusion by a wing / neighbour) - neither enters the fit."""
+    import numpy as np
+    th = np.asarray(thetas_deg, dtype=np.float64)
+    ok = np.array([r is not None for r in rs])
+    r = np.array([x if x is not None else np.nan for x in rs], dtype=np.float64)
+    res = {"rays": int(len(rs)), "filled": int(ok.sum())}
+    if ok.sum() < 8:
+        return dict(res, shape="unclassified", why="too few filled rays")
+    rv, tv = r[ok], (90.0 - th[ok])
+    rbar = float(rv.mean())
+    rc = float(np.sqrt(np.mean((rv - rbar) ** 2)))
+    best = None
+    for t0 in np.arange(0.0, 60.0, 0.5):
+        phi = ((tv - t0) % 60.0) - 30.0  # corners (phi = -+30) at t0 + 60k, flats (phi = 0) at t0 + 30 + 60k
+        g = 1.0 / np.cos(np.radians(phi))
+        a = float((rv * g).sum() / (g * g).sum())
+        rh = float(np.sqrt(np.mean((rv - a * g) ** 2)))
+        if best is None or rh < best[0]:
+            best = (rh, float(t0), a)
+    rh, t0, apo = best
+    # gaps by position
+    gaps_c, gaps_o = 0, 0
+    i, n = 0, len(rs)
+    corners = [(t0 + 60.0 * k) % 360.0 for k in range(6)]
+    while i < n:
+        if ok[i]:
+            i += 1
+            continue
+        j = i
+        while j < n and not ok[j]:
+            j += 1
+        if i > 0 and j < n:
+            mid = 90.0 - 0.5 * (th[i] + th[j - 1])
+            dmin = min(abs(((mid - c) + 180.0) % 360.0 - 180.0) for c in corners)
+            half = 0.5 * abs(th[j - 1] - th[i])
+            if dmin <= corner_tol_deg + half:
+                gaps_c += 1
+            else:
+                gaps_o += 1
+        i = j
+    q = rh / max(rc, 1e-9)
+    res.update({"meanR": round(rbar, 3), "circleRms": round(rc, 3), "hexRms": round(rh, 3), "hexOverCircle": round(q, 3),
+                "hexTheta0Deg": t0, "hexApothem": round(apo, 3), "cornerGaps": gaps_c, "otherGaps": gaps_o})
+    return res
+
+
+def classify_shape_v2(shot: Shot, fid: str, team_mask, key_mask, fs: float, z: float, spec: dict | None = None,
+                      rim_mask=None) -> dict:
+    """teamShape rev 2 (5c-B1): 360 rays in theta in [-135, 135] from +Y; per ray a radial profile 16..34 uu x FS in the
+    ring plane labelled K / T / R / O from the keyline, team and (two-tone ring) rim masks of the variant; the fill
+    centre-line = the BOUNDED team run (ray_centerline: keyline inside, keyline or rim outside); shape = model fit
+    (fit_shape): hexagon when the hexagon residual is <= hexRatioMax x the circle residual, circle when >= circleRatioMin
+    x, the winning residual <= maxResidualShare x r. Occlusions (wings, neighbours) only remove rays; they are no longer
+    'breaks'. rim_mask None = no R labels (the r3 one-tone ring)."""
+    import numpy as np
+    sp = dict(SHAPE_V2, **(spec or {}))
+    f = shot.fighters[fid]
+    cx, cy = f.world[0], f.world[1]
+    n = int(sp["rays"])
+    thetas = [-135.0 + 270.0 * i / (n - 1) for i in range(n)]
+    rhos = list(np.arange(sp["rhoMin"], sp["rhoMax"] + 1e-6, sp["rhoStep"]))
+    pts = []
+    for t in thetas:
+        tr = math.radians(t)
+        dx, dy = math.sin(tr), math.cos(tr)
+        for rho in rhos:
+            pts.append((cx + rho * fs * dx, cy + rho * fs * dy, z))
+    scr = project_many(shot.proj.camera, pts).reshape(n, len(rhos), 2)
+    rs = []
+    for i in range(n):
+        labels = []
+        for k in range(len(rhos)):
+            x, y = scr[i, k]
+            if not (np.isfinite(x) and np.isfinite(y)):
+                labels.append("O")
+                continue
+            xi, yi = int(math.floor(x)), int(math.floor(y))
+            if not (0 <= xi < shot.w and 0 <= yi < shot.h):
+                labels.append("O")
+            elif key_mask[yi, xi]:
+                labels.append("K")
+            elif team_mask[yi, xi]:
+                labels.append("T")
+            elif rim_mask is not None and rim_mask[yi, xi]:
+                labels.append("R")
+            else:
+                labels.append("O")
+        rs.append(ray_centerline(labels, rhos, sp["boundUU"], prefer=25.0, outer=("K", "R")))
+    fit = fit_shape(thetas, rs, sp["cornerTolDeg"])
+    shape = "unclassified"
+    if fit.get("filled", 0) >= sp["minFilledShare"] * n and "hexOverCircle" in fit:
+        lim = sp["maxResidualShare"] * fit["meanR"]
+        if fit["hexOverCircle"] <= sp["hexRatioMax"] and fit["hexRms"] <= lim:
+            shape = "hexagon"
+        elif fit["hexOverCircle"] >= sp["circleRatioMin"] and fit["circleRms"] <= lim:
+            shape = "circle"
+    fit["shape"] = shape
+    fit["method"] = "teamShape rev 2 (5c-B1)"
+    fit["rimBound"] = rim_mask is not None
+    return fit
+
+
+def variant_masks(shot: Shot, look: str, calib: dict, pde: float) -> dict:
+    """{variant: (team_mask, key_mask)}: pixels within pde of the variant-transformed screen bytes of the fill / keyline."""
+    from qa010lib import color as C
+    np = shot.np
+    fill = np.array(calib["team.p1.fill" if look == "P1" else "team.p2.fill"]["screen"], dtype=np.uint8).reshape(1, 1, 3)
+    key = np.array(calib["mark.keyline"]["screen"], dtype=np.uint8).reshape(1, 1, 3)
+    out = {}
+    for vn, fn in (("color", None), ("gray", C.grayscale), ("deuteranopia", C.deuteranopia)):
+        lab = shot.lab if fn is None else C.linear_to_lab(C.u8_to_linear(shot.variants[vn]))
+        tf = C.linear_to_lab(C.u8_to_linear(fill if fn is None else fn(fill)))[0, 0]
+        tk = C.linear_to_lab(C.u8_to_linear(key if fn is None else fn(key)))[0, 0]
+        out[vn] = (np.linalg.norm(lab - tf, axis=-1) <= pde, np.linalg.norm(lab - tk, axis=-1) <= pde)
+    return out
+
+
+def variant_mask(shot: Shot, screen, pde: float) -> dict:
+    """{variant: mask}: pixels within pde of the variant-transformed screen bytes `screen` (e.g. the ring rim)."""
+    from qa010lib import color as C
+    np = shot.np
+    px = np.array(screen, dtype=np.uint8).reshape(1, 1, 3)
+    out = {}
+    for vn, fn in (("color", None), ("gray", C.grayscale), ("deuteranopia", C.deuteranopia)):
+        lab = shot.lab if fn is None else C.linear_to_lab(C.u8_to_linear(shot.variants[vn]))
+        t = C.linear_to_lab(C.u8_to_linear(px if fn is None else fn(px)))[0, 0]
+        out[vn] = np.linalg.norm(lab - t, axis=-1) <= pde
+    return out
+
+
+def rim_of(look: str, calib: dict, rim: dict | None) -> dict | None:
+    """The rim of the two-tone ring for this look: explicit {'screen', 'bands'} (bands = [(r0, r1), ...] or
+    {'P1': [...], 'P2': [...]}) or, when RING_SPEC already has a 'rimOut' band (after B1-3) and the thresholds calibrate
+    'team.rim', that band with those screen bytes; None = one-tone ring."""
+    if rim is None:
+        b = ring_bands(look).get("rimOut")
+        return {"screen": calib["team.rim"]["screen"], "bands": [tuple(b)]} if b and "team.rim" in calib else None
+    bands = rim["bands"]
+    if isinstance(bands, dict):
+        bands = bands.get(look) or []
+    return {"screen": rim["screen"], "bands": [tuple(x) for x in bands]} if bands else None
+
+
+def umg_rects(shot: Shot) -> list:
+    b = shot.block
+    rects = [w.get("bbox") for w in b.widgets if isinstance(w.get("bbox"), tuple)]
+    rects += [p["bbox"] for p in (getattr(b, "panels", None) or [])]
+    rects += [d["bbox"] for d in (getattr(b, "damage", None) or [])]
+    for t in (b.plate, b.icon):
+        v = getattr(t, "value", None) if t is not None else None
+        if isinstance(v, dict) and v.get("bbox"):
+            rects.append(v["bbox"])
+    return rects
+
+
+def ring_tile_reference_rev3(shot: Shot, fid: str, calib: dict, cells: list[dict] | None, pde: float = 15.0,
+                             rim: dict | None = None, min_px: int = 10) -> dict:
+    """Ring keyline against the tile, reference rev 3 (5c-B1). Same annulus as rev 2 (r 30*FS..36 uu, |theta| <= 135,
+    outside the glyph-slot squares +-32 +- 14 uu - the zone marks are excluded by GEOMETRY). Excluded by colour: the
+    keyline, both team fills and the zones of the fighter's OWN cell only (rev 2 excluded every zone colour of the
+    palette: on Cobble that removed the light stones - they sit within dE 15 of the screen gray #7F868E, a zone Cobble
+    does not have - and on the light fixture tiles it removed the tile itself = light-gray, leaving 0-53 px). Excluded
+    by rect: UMG widgets / panels / plate / icon / damage of the SHOT block and the FigureScreenRect of the OTHER
+    fighters. rim = {'bands': [(r0, r1), ...] | {'P1': [...], 'P2': [...]}, 'screen': [r, g, b]} (two-tone ring, see
+    rim_of): edgeVsTile = max(keyline, rim) vs tile per variant. A side counts only with >= min_px core pixels
+    (keyline: in its bands, outside the fill band, within pde of the keyline; rim: in its bands, within pde of the rim):
+    a thin anti-aliased band must not carry the edge on a handful of colour-selected pixels."""
+    np = shot.np
+    f = shot.fighters[fid]
+    info = shot.rings.get(fid) or {}
+    look = info.get("look", "P1")
+    fs = fighter_scale(fid)
+    z = f.world[2] + RING.RING_SPEC["zMax"]
+    bands = ring_bands(look)
+    fill_m = shot.mask_of(shot.pixels(band_samples(look, bands["fill"][0], bands["fill"][1], fs, f.world, z)))
+    key_band = shot.mask_of(shot.pixels(band_samples(look, bands["keylineIn"][0], bands["keylineIn"][1], fs, f.world, z)) |
+                            shot.pixels(band_samples(look, bands["keylineOut"][0], bands["keylineOut"][1], fs, f.world, z)))
+    key_mask = shot.de_to(calib["mark.keyline"]["screen"]) <= pde
+    key_core = key_band & ~fill_m & key_mask
+    tile_pts = []
+    for i in range(720):
+        t = 2 * math.pi * i / 720
+        dx, dy = math.cos(t), math.sin(t)
+        if not in_sector(dx, dy):
+            continue
+        for rr in np.linspace(30.0 * fs, 36.0, 13):
+            x, y = rr * dx, rr * dy
+            if any(abs(x - gx) <= 14 and abs(y - gy) <= 14 for gx in (-32, 32) for gy in (-32, 32)):
+                continue
+            tile_pts.append((f.world[0] + x, f.world[1] + y, f.world[2]))
+    tile = shot.mask_of(shot.pixels(tile_pts)) & ~key_mask
+    for k in ("team.p1.fill", "team.p2.fill"):
+        tile &= ~(shot.de_to(calib[k]["screen"]) <= pde)
+    own = next((c for c in (cells or []) if (c["x"], c["y"]) == tuple(f.cell)), None)
+    for zk in (own or {}).get("zones", []):
+        if "zone." + zk in calib:
+            tile &= ~(shot.de_to(calib["zone." + zk]["screen"]) <= pde)
+    rects = umg_rects(shot) + [v["bbox"] for k, v in (shot.block.figures or {}).items() if k != fid and v.get("bbox")]
+    for r in rects:
+        x0, y0, x1, y1 = [int(round(v)) for v in r]
+        tile[max(y0, 0):max(y1, 0), max(x0, 0):max(x1, 0)] = False
+    rim = rim_of(look, calib, rim)
+    rim_m = None
+    if rim:
+        pix = set()
+        for r0, r1 in rim["bands"]:
+            pix |= shot.pixels(band_samples(look, r0, r1, fs, f.world, z))
+        rim_m = shot.mask_of(pix) & (shot.de_to(rim["screen"]) <= pde)
+    n_key = int(key_core.sum())
+    n_rim = int(rim_m.sum()) if rim_m is not None else None
+    out = {"tilePx": int(tile.sum()), "keylinePx": n_key, "rimPx": n_rim, "minPx": min_px,
+           "method": "ring tile reference rev 3 (5c-B1)"}
+    for vn in ("color", "gray", "deuteranopia"):
+        lk, lt = shot.med_lum(key_core, vn), shot.med_lum(tile, vn)
+        rec = {"keylineRelLum": lk, "tileRelLum": lt,
+               "keylineVsTile": round(wcag(lk, lt), 3) if lk is not None and lt is not None else None}
+        cand = [rec["keylineVsTile"]] if n_key >= min_px and rec["keylineVsTile"] is not None else []
+        if rim_m is not None:
+            lr = shot.med_lum(rim_m, vn)
+            rec["rimRelLum"] = lr
+            rec["rimVsTile"] = round(wcag(lr, lt), 3) if lr is not None and lt is not None else None
+            if n_rim >= min_px and rec["rimVsTile"] is not None:
+                cand.append(rec["rimVsTile"])
+        rec["edgeVsTile"] = max(cand) if cand else None
+        out[vn] = rec
+    return out
+
+
+def rings_rev3(shot: Shot, calib: dict, cells: list[dict] | None, pde: float = 15.0, min_tile_px: int = 50,
+               min_wcag: float = 3.0, rim: dict | None = None) -> dict:
+    """5c-B1 proposal: per shown ring the shape (classify_shape_v2 in color / gray / deuteranopia) and the edge against
+    the tile (reference rev 3). Not a registered gate until the 5c-B thresholds file registers it before the shots."""
+    rows = []
+    for fid, f in sorted(shot.fighters.items()):
+        info = shot.rings.get(fid)
+        if not info or not info["shown"]:
+            continue
+        look = info["look"]
+        fs = fighter_scale(fid)
+        z = f.world[2] + RING.RING_SPEC["zMax"]
+        masks = variant_masks(shot, look, calib, pde)
+        rim_l = rim_of(look, calib, rim)
+        rims = variant_mask(shot, rim_l["screen"], pde) if rim_l else {}
+        shapes = {vn: classify_shape_v2(shot, fid, tm, km, fs, z, rim_mask=rims.get(vn)) for vn, (tm, km) in masks.items()}
+        want = "circle" if look == "P1" else "hexagon"
+        ref = ring_tile_reference_rev3(shot, fid, calib, cells, pde, rim)
+        edge_ok = ref["tilePx"] >= min_tile_px and all(
+            ref[vn]["edgeVsTile"] is not None and ref[vn]["edgeVsTile"] >= min_wcag for vn in ("color", "gray", "deuteranopia"))
+        rows.append({"fighter": fid, "name": FIGHTER_NAMES.get(fid, fid), "look": look, "scale": fs,
+                     "expectedShape": want, "shape": {vn: s["shape"] for vn, s in shapes.items()},
+                     "shapeDetail": {vn: {k: s.get(k) for k in ("filled", "circleRms", "hexRms", "hexOverCircle",
+                                                                 "hexTheta0Deg", "cornerGaps", "otherGaps", "meanR")}
+                                     for vn, s in shapes.items()},
+                     "shapePass": {vn: s["shape"] == want for vn, s in shapes.items()},
+                     "shapePassAllVariants": all(s["shape"] == want for s in shapes.values()),
+                     "tileReference": ref, "edgeVsTilePass": bool(edge_ok)})
+    return {"frame": L.rel(shot.png), "fighters": rows}
+
+
 def rings_rev2(shot: Shot, th: dict, calib: dict, cells: list[dict] | None = None) -> dict:
     np = shot.np
     rt = th["rings"]
@@ -1582,6 +1904,49 @@ def cmd_k3(a) -> int:
     return r.returncode
 
 
+def cmd_rings_rev3(a) -> int:
+    """Re-evaluate the published frames of an analysed board (summary.json frames K1_host / K1_joiner / K3) with the
+    5c-B1 methods (shape classifier rev 2, ring tile reference rev 3) next to the registered rev 2 verdicts. Read-only
+    on the evidence; the JSON goes to --out."""
+    evidence = Path(a.evidence).resolve()
+    th = thresholds(evidence)
+    calib = th["calibration"]["bytes"]
+    key = a.board
+    cells = T52.board_cells(T52_EVIDENCE if key == "cobble-5x6" else evidence, key)
+    summ = load_json(evidence / "analysis" / key / "summary.json")
+    rev2 = load_json(evidence / "analysis" / key / "team-rings-r2.json")["frames"]
+    doc = {"schema": "unmatched.t53-rings-rev3/1", "status": "измерено по кадрам r3 (предложение 5c-B1, не гейт W5b-R)",
+           "board": key, "shapeSpec": SHAPE_V2, "frames": {}}
+    for tag in ("K1_host", "K1_joiner", "K3"):
+        png = REPO / summ["frames"][tag]
+        trace = _trace_for(png)
+        shot = Shot(png, trace)
+        r3 = rings_rev3(shot, calib, cells, th["calibration"]["pixelDeltaE"])
+        old = {r["fighter"]: r for r in rev2[tag]["fighters"] if "look" in r}
+        for r in r3["fighters"]:
+            o = old.get(r["fighter"]) or {}
+            r["rev2"] = {"shape": (o.get("shape") or {}).get("shape"), "shapeVariants": o.get("shapeVariants"),
+                         "keylineVsTile": {vn: (o.get("variants") or {}).get(vn, {}).get("keylineVsTile")
+                                           for vn in ("color", "gray", "deuteranopia")},
+                         "tilePx": o.get("tilePx")}
+        doc["frames"][tag] = r3
+    rows = [r for f in doc["frames"].values() for r in f["fighters"]]
+    doc["summary"] = {
+        "rings": len(rows),
+        "shapeColorRev2": sum(1 for r in rows if r["rev2"]["shape"] == r["expectedShape"]),
+        "shapeColorRev3": sum(1 for r in rows if r["shapePass"]["color"]),
+        "shapeAllVariantsRev3": sum(1 for r in rows if r["shapePassAllVariants"]),
+        "edgeVsTileRev3Pass": sum(1 for r in rows if r["edgeVsTilePass"]),
+        "edgeVsTileRev3Min": min((r["tileReference"][vn]["edgeVsTile"] for r in rows for vn in ("color", "gray", "deuteranopia")
+                                  if r["tileReference"][vn]["edgeVsTile"] is not None), default=None),
+        "tilePxMin": min((r["tileReference"]["tilePx"] for r in rows), default=None)}
+    out = Path(a.out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    L.write_json(out, doc)
+    print(json.dumps(doc["summary"], ensure_ascii=False))
+    return 0
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -1607,8 +1972,13 @@ def main(argv=None) -> int:
     tb = sub.add_parser("table")
     tb.add_argument("--evidence", required=True)
     tb.add_argument("--t52")
+    r3 = sub.add_parser("rings-rev3")
+    r3.add_argument("--board", required=True, choices=sorted(BOARDS))
+    r3.add_argument("--evidence", required=True)
+    r3.add_argument("--out", required=True)
     a = ap.parse_args(argv)
-    return {"k1": cmd_k1, "k3": cmd_k3, "analyze": cmd_analyze, "sheets": cmd_sheets, "table": cmd_table}[a.cmd](a)
+    return {"k1": cmd_k1, "k3": cmd_k3, "analyze": cmd_analyze, "sheets": cmd_sheets, "table": cmd_table,
+            "rings-rev3": cmd_rings_rev3}[a.cmd](a)
 
 
 if __name__ == "__main__":

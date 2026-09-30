@@ -1,0 +1,456 @@
+// Wave 5c-B automation tests of -ArtPreviewHeroesV2 (S08HeroesV2.h): name -> asset mapping with and
+// without the flag, the +X -> +Y facing offset on both board sides, the height budget scale, the
+// clip choice per combat event, the real look-dev C assets (bounds, skeletons, clip lengths) and the
+// fighter actor end to end (mesh, MI by look, yaw, Idle / HitReact / LungeAttack / DeathSettle).
+// Headless run:
+//   UnrealEditor-Cmd.exe Unmatched.uproject
+//     -ExecCmds="Automation RunTests Unmatched.S08.HeroesV2; Quit" -unattended -nosplash -nullrhi
+#if WITH_AUTOMATION_TESTS
+
+#include "S08HeroesV2.h"
+#include "S08BoardModel.h"
+#include "S08FighterActor.h"
+#include "Animation/AnimSequenceBase.h"
+#include "Animation/Skeleton.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Components/StaticMeshComponent.h"
+#include "Engine/Engine.h"
+#include "Engine/SkeletalMesh.h"
+#include "Engine/StaticMesh.h"
+#include "Engine/World.h"
+#include "Materials/Material.h"
+#include "Materials/MaterialInstance.h"
+#include "Materials/MaterialInterface.h"
+#include "Misc/AutomationTest.h"
+#include "Misc/Paths.h"
+
+namespace S08HeroesV2Test {
+
+// Cyclic distance of two phases in [0, 1).
+float PhaseGap(float A, float B) {
+  const float D = FMath::Abs(A - B);
+  return FMath::Min(D, 1.0f - D);
+}
+
+struct FFlagScope {
+  explicit FFlagScope(bool bOn) { S08HeroesV2::SetFlagOverrideForTest(bOn); }
+  ~FFlagScope() { S08HeroesV2::ResetFlagOverrideForTest(); }
+};
+
+FS08BoardFighter MakeFighter(const TCHAR* Id, const TCHAR* Name, bool bHero, int32 X, int32 Y) {
+  FS08BoardFighter F;
+  F.Id = Id;
+  F.OwnerId = TEXT("owner");
+  F.Name = Name;
+  F.Label = Name;
+  F.bIsHero = bHero;
+  F.Health = 10;
+  F.MaxHealth = 10;
+  F.X = X;
+  F.Y = Y;
+  return F;
+}
+
+const USkeletalMeshComponent* ArtBodyOf(const AS08FighterActor* Actor) {
+  TInlineComponentArray<USkeletalMeshComponent*> Skels(Actor);
+  for (USkeletalMeshComponent* Skel : Skels) {
+    if (Skel->GetFName() == TEXT("ArtBody")) return Skel;
+  }
+  return nullptr;
+}
+
+const UStaticMeshComponent* StaticComponentOf(const AS08FighterActor* Actor, const TCHAR* Name) {
+  TInlineComponentArray<UStaticMeshComponent*> Meshes(Actor);
+  for (UStaticMeshComponent* Mesh : Meshes) {
+    if (Mesh->GetFName() == Name) return Mesh;
+  }
+  return nullptr;
+}
+}  // namespace S08HeroesV2Test
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08HeroesV2MappingTest,
+    "Unmatched.S08.HeroesV2.Mapping fighter name to v2 assets only with -ArtPreview and -ArtPreviewHeroesV2",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08HeroesV2MappingTest::RunTest(const FString&) {
+  using namespace S08HeroesV2;
+  using namespace S08HeroesV2Test;
+  TestEqual("flag name", FString(FlagName), FString(TEXT("ArtPreviewHeroesV2")));
+  {
+    FFlagScope Off(false);
+    TestFalse("override off", FlagEnabled());
+  }
+  {
+    FFlagScope On(true);
+    TestTrue("override on", FlagEnabled());
+  }
+  for (const TCHAR* Name : {TEXT("King Arthur"), TEXT("Merlin"), TEXT("Medusa"), TEXT("Harpies")}) {
+    TestNull(FString::Printf(TEXT("%s: no mapping without the flag"), Name), Find(true, false, Name));
+    TestNull(FString::Printf(TEXT("%s: no mapping without -ArtPreview"), Name), Find(false, true, Name));
+    TestNotNull(FString::Printf(TEXT("%s: mapped with both flags"), Name), Find(true, true, Name));
+  }
+  TestNull("unmapped hero stays legacy", Find(true, true, TEXT("Sinbad")));
+  TestNull("a Harpy label is not a fighter name", Find(true, true, TEXT("Harpies 2")));
+  TestNotNull("case-insensitive name", Find(true, true, TEXT("king arthur")));
+  TestEqual("four heroes", Specs().Num(), 4);
+
+  const FHeroSpec* Arthur = Find(true, true, TEXT("King Arthur"));
+  const FHeroSpec* Merlin = Find(true, true, TEXT("Merlin"));
+  const FHeroSpec* Medusa = Find(true, true, TEXT("Medusa"));
+  const FHeroSpec* Harpy = Find(true, true, TEXT("Harpies"));
+  if (!Arthur || !Merlin || !Medusa || !Harpy) return true;
+  TestEqual("Arthur mesh", MeshPath(*Arthur),
+            FString(TEXT("/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SK_KingArthur_H2LD")));
+  TestEqual("Arthur pedestal", PedestalPath(*Arthur),
+            FString(TEXT("/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SM_KingArthur_H2LD_Base")));
+  TestEqual("Arthur P1 MI", BodyMaterialPath(*Arthur, ES08TeamSlot::P1),
+            FString(TEXT("/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_P1")));
+  TestEqual("Arthur P2 MI", BodyMaterialPath(*Arthur, ES08TeamSlot::P2),
+            FString(TEXT("/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_P2")));
+  TestEqual("Arthur P2 pedestal MI", PedestalMaterialPath(*Arthur, ES08TeamSlot::P2),
+            FString(TEXT("/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_Base_P2")));
+  TestEqual("Arthur skeleton", SkeletonPath(*Arthur),
+            FString(TEXT("/Game/PipelineCandidates/KingArthur/Rig/SK_KingArthur_Skeleton")));
+  TestEqual("Arthur lunge clip", ClipPath(*Arthur, EClip::LungeAttack),
+            FString(TEXT("/Game/PipelineCandidates/KingArthur/H2Anim/AM_KingArthur_LungeAttack")));
+  TestEqual("Merlin P1 MI", BodyMaterialPath(*Merlin, ES08TeamSlot::P1),
+            FString(TEXT("/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_P1")));
+  TestEqual("Medusa P2 pedestal MI", PedestalMaterialPath(*Medusa, ES08TeamSlot::P2),
+            FString(TEXT("/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Base_P2")));
+  TestEqual("Harpy mesh (H3LD)", MeshPath(*Harpy),
+            FString(TEXT("/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD")));
+  TestEqual("Harpy P1 MI (H3LD)", BodyMaterialPath(*Harpy, ES08TeamSlot::P1),
+            FString(TEXT("/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_P1")));
+  TestEqual("Harpy pedestal P1 MI", PedestalMaterialPath(*Harpy, ES08TeamSlot::P1),
+            FString(TEXT("/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_Base_P1")));
+  TestEqual("Harpy death clip (H2Anim)", ClipPath(*Harpy, EClip::DeathSettle),
+            FString(TEXT("/Game/PipelineCandidates/Harpy/H2Anim/AM_Harpy_DeathSettle")));
+  TestTrue("no clip path for None", ClipPath(*Harpy, EClip::None).IsEmpty());
+  TestTrue("Arthur / Medusa are heroes", Arthur->bHero && Medusa->bHero);
+  TestFalse("Merlin is a sidekick", Merlin->bHero);
+  TestFalse("Harpies are sidekicks", Harpy->bHero);
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08HeroesV2FacingTest,
+    "Unmatched.S08.HeroesV2.Facing rig v2 (+X) turned to the legacy +Y / -Y facing on both board sides",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08HeroesV2FacingTest::RunTest(const FString&) {
+  using namespace S08HeroesV2;
+  using namespace S08HeroesV2Test;
+  TestEqual("offset is +90 deg", FacingYawOffsetDeg, 90.0f);
+  // Cells of the 5x6 board (S04 control points): row y=2 -> world Y -50 (near side, faces +Y), row y=3 -> +50.
+  for (const double CellY : {-250.0, -50.0, 50.0, 250.0}) {
+    const FVector Legacy = FRotator(0.0, LegacyFigureYawDeg(CellY), 0.0).RotateVector(FVector::YAxisVector);
+    const FVector V2 = FRotator(0.0, FigureYawDeg(CellY), 0.0).RotateVector(FVector::XAxisVector);
+    TestTrue(FString::Printf(TEXT("cell Y=%.0f: v2 face == legacy face (%s vs %s)"), CellY, *V2.ToString(),
+                             *Legacy.ToString()),
+             V2.Equals(Legacy, 1e-4));
+    // Both sides face the board centre line (Y = 0): the far half looks back toward it.
+    TestTrue(FString::Printf(TEXT("cell Y=%.0f faces the centre line"), CellY), V2.Y * (-CellY) > 0.0);
+  }
+  TestEqual("near side yaw", FigureYawDeg(-50.0), 90.0f);
+  TestEqual("far side yaw", FigureYawDeg(50.0), 270.0f);
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08HeroesV2ScaleTest,
+    "Unmatched.S08.HeroesV2.Scale visible figure height normalised to the per-hero budget",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08HeroesV2ScaleTest::RunTest(const FString&) {
+  using namespace S08HeroesV2;
+  using namespace S08HeroesV2Test;
+  float HeroMin = TNumericLimits<float>::Max();
+  float SidekickMax = 0.0f;
+  for (const FHeroSpec& Spec : Specs()) {
+    const float K = FigureScale(Spec);
+    const float Visible = Spec.FigureTopUU * K;
+    AddInfo(FString::Printf(TEXT("%s: budget %.1f uu (card %.0f..%.0f), measured figure top %.3f uu, bounds top %.2f uu -> scale %.4f, visible %.2f uu, with weapon %.2f uu"),
+                            Spec.Key, Spec.BudgetUU, Spec.BudgetMinUU, Spec.BudgetMaxUU, Spec.FigureTopUU,
+                            Spec.BoundsTopUU, K, Visible, Spec.BoundsTopUU * K));
+    TestTrue(FString::Printf(TEXT("%s visible height == budget"), Spec.Key), FMath::IsNearlyEqual(Visible, Spec.BudgetUU, 0.01f));
+    TestTrue(FString::Printf(TEXT("%s budget inside the 17 4.2 card"), Spec.Key),
+             Spec.BudgetUU >= Spec.BudgetMinUU && Spec.BudgetUU <= Spec.BudgetMaxUU);
+    TestTrue(FString::Printf(TEXT("%s scale is a normalisation, not a resize (|k-1| < 1%%)"), Spec.Key),
+             FMath::Abs(K - 1.0f) < 0.01f);
+    TestTrue(FString::Printf(TEXT("%s weapon/wing top not below the figure"), Spec.Key),
+             Spec.BoundsTopUU + 0.01f >= Spec.FigureTopUU);
+    if (Spec.bHero) HeroMin = FMath::Min(HeroMin, Visible);
+    else SidekickMax = FMath::Max(SidekickMax, Visible);
+  }
+  TestTrue("every hero taller than every sidekick", HeroMin > SidekickMax);
+  // The legacy candidate drew sidekicks at 0.78 of the hero; the v2 budgets keep that proportion (+-0.06).
+  const FHeroSpec* Medusa = Find(true, true, TEXT("Medusa"));
+  for (const TCHAR* Name : {TEXT("Merlin"), TEXT("Harpies")}) {
+    const FHeroSpec* Side = Find(true, true, Name);
+    if (!Medusa || !Side) continue;
+    const float Ratio = Side->BudgetUU / Medusa->BudgetUU;
+    AddInfo(FString::Printf(TEXT("%s / hero = %.3f (legacy sidekick scale 0.78)"), Name, Ratio));
+    TestTrue(FString::Printf(TEXT("%s near the legacy 0.78 sidekick ratio"), Name), FMath::Abs(Ratio - 0.78f) <= 0.06f);
+  }
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08HeroesV2ClipChoiceTest,
+    "Unmatched.S08.HeroesV2.Clips chosen per combat event, Idle phase per fighter",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08HeroesV2ClipChoiceTest::RunTest(const FString&) {
+  using namespace S08HeroesV2;
+  using namespace S08HeroesV2Test;
+  auto Check = [this](EClip Current, EEvent Event, EClip WantClip, bool bWantRestart) {
+    const FClipChoice C = NextClip(Current, Event);
+    const FString What = FString::Printf(TEXT("%s + %s"), ClipName(Current), EventName(Event));
+    TestEqual(What + TEXT(" clip"), FString(ClipName(C.Clip)), FString(ClipName(WantClip)));
+    TestEqual(What + TEXT(" restart"), C.bRestart, bWantRestart);
+  };
+  Check(EClip::None, EEvent::Spawn, EClip::Idle, true);
+  Check(EClip::Idle, EEvent::Spawn, EClip::Idle, false);            // every board sync: no restart
+  Check(EClip::LungeAttack, EEvent::Spawn, EClip::LungeAttack, false);  // a sync does not cut the lunge
+  Check(EClip::Idle, EEvent::Attack, EClip::LungeAttack, true);
+  Check(EClip::Idle, EEvent::Damaged, EClip::HitReact, true);
+  Check(EClip::HitReact, EEvent::Damaged, EClip::HitReact, true);   // a second hit restarts
+  Check(EClip::LungeAttack, EEvent::Damaged, EClip::HitReact, true);
+  Check(EClip::HitReact, EEvent::Attack, EClip::LungeAttack, true);
+  Check(EClip::LungeAttack, EEvent::ClipFinished, EClip::Idle, true);
+  Check(EClip::HitReact, EEvent::ClipFinished, EClip::Idle, true);
+  Check(EClip::Idle, EEvent::ClipFinished, EClip::Idle, false);
+  Check(EClip::HitReact, EEvent::Defeated, EClip::DeathSettle, true);
+  Check(EClip::Idle, EEvent::Defeated, EClip::DeathSettle, true);
+  // The final pose holds: nothing after death restarts or leaves DeathSettle.
+  for (const EEvent E : {EEvent::Spawn, EEvent::Attack, EEvent::Damaged, EEvent::Defeated, EEvent::ClipFinished}) {
+    Check(EClip::DeathSettle, E, EClip::DeathSettle, false);
+  }
+  TestTrue("Idle loops", ClipLoops(EClip::Idle));
+  TestFalse("LungeAttack is one-shot", ClipLoops(EClip::LungeAttack));
+  TestFalse("HitReact is one-shot", ClipLoops(EClip::HitReact));
+  TestFalse("DeathSettle is one-shot (holds)", ClipLoops(EClip::DeathSettle));
+
+  // Idle phase: deterministic per id, three Harpies (either seat) well apart.
+  TestEqual("phase is deterministic", IdlePhase(TEXT("f-1-sk0")), IdlePhase(TEXT("f-1-sk0")));
+  for (const TCHAR* Seat : {TEXT("f-0-"), TEXT("f-1-")}) {
+    const float A = IdlePhase(FString(Seat) + TEXT("sk0"));
+    const float B = IdlePhase(FString(Seat) + TEXT("sk1"));
+    const float C = IdlePhase(FString(Seat) + TEXT("sk2"));
+    AddInfo(FString::Printf(TEXT("%ssk0..2 idle phases %.4f %.4f %.4f"), Seat, A, B, C));
+    for (const float P : {A, B, C}) TestTrue(TEXT("phase in [0,1)"), P >= 0.0f && P < 1.0f);
+    const float MinGap = FMath::Min3(PhaseGap(A, B), PhaseGap(B, C), PhaseGap(A, C));
+    TestTrue(FString::Printf(TEXT("%s Harpies not in sync (min gap %.3f >= 0.2)"), Seat, MinGap), MinGap >= 0.2f);
+  }
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08HeroesV2AssetsTest,
+    "Unmatched.S08.HeroesV2.Assets look-dev C meshes, MIs, canonical skeletons and H2Anim clips load and match",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08HeroesV2AssetsTest::RunTest(const FString&) {
+  using namespace S08HeroesV2;
+  using namespace S08HeroesV2Test;
+  for (const FHeroSpec& Spec : Specs()) {
+    USkeletalMesh* Mesh = LoadObject<USkeletalMesh>(nullptr, *MeshPath(Spec));
+    TestNotNull(FString::Printf(TEXT("%s mesh loads"), Spec.Key), Mesh);
+    if (!Mesh) continue;
+    const USkeleton* Skeleton = Mesh->GetSkeleton();
+    TestNotNull(FString::Printf(TEXT("%s mesh has a skeleton"), Spec.Key), Skeleton);
+    if (Skeleton) {
+      TestEqual(FString::Printf(TEXT("%s canonical skeleton"), Spec.Key), Skeleton->GetPathName(),
+                SkeletonPath(Spec) + TEXT(".") + FPaths::GetBaseFilename(SkeletonPath(Spec)));
+    }
+    const FBox Box = Mesh->GetBounds().GetBox();
+    AddInfo(FString::Printf(TEXT("%s SK bounds (%.2f, %.2f, %.2f)..(%.2f, %.2f, %.2f) uu, top %.2f (report %.2f), figure top %.3f, scale %.4f"),
+                            Spec.Key, Box.Min.X, Box.Min.Y, Box.Min.Z, Box.Max.X, Box.Max.Y, Box.Max.Z, Box.Max.Z,
+                            Spec.BoundsTopUU, Spec.FigureTopUU, FigureScale(Spec)));
+    TestTrue(FString::Printf(TEXT("%s bounds top %.2f == look-dev C report %.2f (+-0.5)"), Spec.Key, Box.Max.Z,
+                             Spec.BoundsTopUU),
+             FMath::IsNearlyEqual(static_cast<float>(Box.Max.Z), Spec.BoundsTopUU, 0.5f));
+    TestTrue(FString::Printf(TEXT("%s stands on the cell (bounds min z %.2f in 0..8 uu: body above the pedestal)"),
+                             Spec.Key, Box.Min.Z),
+             Box.Min.Z >= -0.5 && Box.Min.Z <= 8.0);
+    UStaticMesh* Pedestal = LoadObject<UStaticMesh>(nullptr, *PedestalPath(Spec));
+    TestNotNull(FString::Printf(TEXT("%s pedestal loads"), Spec.Key), Pedestal);
+    if (Pedestal) {
+      const FBox PBox = Pedestal->GetBoundingBox();
+      AddInfo(FString::Printf(TEXT("%s pedestal %.2f x %.2f x %.2f uu, z %.2f..%.2f"), Spec.Key, PBox.GetSize().X,
+                              PBox.GetSize().Y, PBox.GetSize().Z, PBox.Min.Z, PBox.Max.Z));
+    }
+    for (const ES08TeamSlot Look : {ES08TeamSlot::P1, ES08TeamSlot::P2}) {
+      UMaterialInterface* Body = LoadObject<UMaterialInterface>(nullptr, *BodyMaterialPath(Spec, Look));
+      UMaterialInterface* Base = LoadObject<UMaterialInterface>(nullptr, *PedestalMaterialPath(Spec, Look));
+      TestNotNull(FString::Printf(TEXT("%s body MI %s"), Spec.Key, S08TeamSlotName(Look)), Body);
+      TestNotNull(FString::Printf(TEXT("%s pedestal MI %s"), Spec.Key, S08TeamSlotName(Look)), Base);
+      if (Body) {
+        const UMaterial* Master = Body->GetMaterial();
+        TestTrue(FString::Printf(TEXT("%s body MI %s on M_UM_Figure_v2"), Spec.Key, S08TeamSlotName(Look)),
+                 Master && Master->GetPathName().StartsWith(TEXT("/Game/UM/Materials/v2/M_UM_Figure_v2")));
+      }
+    }
+    for (const EClip Clip : {EClip::Idle, EClip::LungeAttack, EClip::HitReact, EClip::DeathSettle}) {
+      UAnimSequenceBase* Anim = LoadObject<UAnimSequenceBase>(nullptr, *ClipPath(Spec, Clip));
+      TestNotNull(FString::Printf(TEXT("%s %s loads"), Spec.Key, ClipName(Clip)), Anim);
+      if (!Anim) continue;
+      TestTrue(FString::Printf(TEXT("%s %s on the mesh skeleton"), Spec.Key, ClipName(Clip)),
+               Anim->GetSkeleton() == Skeleton);
+      const float Len = Anim->GetPlayLength();
+      AddInfo(FString::Printf(TEXT("%s %s len %.3f s (expected %.3f)"), Spec.Key, ClipName(Clip), Len,
+                              ExpectedClipSeconds(Spec, Clip)));
+      TestTrue(FString::Printf(TEXT("%s %s length %.3f == %.3f (+-0.02)"), Spec.Key, ClipName(Clip), Len,
+                               ExpectedClipSeconds(Spec, Clip)),
+               FMath::IsNearlyEqual(Len, ExpectedClipSeconds(Spec, Clip), 0.02f));
+    }
+  }
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08HeroesV2ActorTest,
+    "Unmatched.S08.HeroesV2.Actor fighter actor shows v2 figures only with the flag and plays their clips",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08HeroesV2ActorTest::RunTest(const FString&) {
+  using namespace S08HeroesV2;
+  using namespace S08HeroesV2Test;
+  UWorld* World = UWorld::CreateWorld(EWorldType::Game, false, TEXT("S08HeroesV2ActorWorld"));
+  if (!World) {
+    AddError(TEXT("could not create a test world"));
+    return true;
+  }
+  FWorldContext& Context = GEngine->CreateNewWorldContext(EWorldType::Game);
+  Context.SetCurrentWorld(World);
+  const FVector Near(0.0, -50.0, 0.0);  // cell (2,2)
+  const FVector Far(0.0, 50.0, 0.0);    // cell (2,3)
+
+  // --- without the flag: byte-for-byte the legacy mapping (ART-003 blockout, Medusa candidate)
+  {
+    FFlagScope Off(false);
+    AS08FighterActor* Arthur = World->SpawnActor<AS08FighterActor>(AS08FighterActor::StaticClass(), Near, FRotator::ZeroRotator);
+    AS08FighterActor* Medusa = World->SpawnActor<AS08FighterActor>(AS08FighterActor::StaticClass(), Far, FRotator::ZeroRotator);
+    if (Arthur && Medusa) {
+      Arthur->SetTeam(ES08TeamSlot::P1, ES08TeamSlot::P1, ES08TeamColorMode::Absolute);
+      Arthur->ApplyFighter(MakeFighter(TEXT("f-0-hero"), TEXT("King Arthur"), true, 2, 2), Near, true, true);
+      TestFalse("no flag: Arthur is not v2", Arthur->IsHeroV2());
+      TestTrue("no flag: Arthur keeps the ART-003 blockout", Arthur->IsBlockout());
+      Medusa->SetTeam(ES08TeamSlot::P2, ES08TeamSlot::P2, ES08TeamColorMode::Absolute);
+      Medusa->ApplyFighter(MakeFighter(TEXT("f-1-hero"), TEXT("Medusa"), true, 2, 3), Far, false, true);
+      TestFalse("no flag: Medusa is not v2", Medusa->IsHeroV2());
+      TestTrue("no flag: Medusa keeps the isolated candidate", Medusa->HasMedusaCandidate());
+      const USkeletalMeshComponent* Skel = ArtBodyOf(Medusa);
+      TestTrue("no flag: candidate mesh", Skel && Skel->GetSkeletalMeshAsset() &&
+                   Skel->GetSkeletalMeshAsset()->GetName().StartsWith(TEXT("SK_Medusa_FaceNeck_v2Candidate")));
+      TestEqual("no flag: candidate yaw stays 180 on the far side",
+                Skel ? static_cast<float>(Skel->GetRelativeRotation().Yaw) : -1.0f, 180.0f);
+      TestTrue("no flag: no v2 clip", Medusa->GetHeroClip() == EClip::None);
+      Medusa->NotifyHeroAnimEvent(EEvent::Damaged, 7);
+      TestTrue("no flag: combat events are ignored", Medusa->GetHeroClip() == EClip::None);
+    } else {
+      AddError(TEXT("fighter actors not spawned"));
+    }
+    if (Arthur) Arthur->Destroy();
+    if (Medusa) Medusa->Destroy();
+  }
+
+  // --- with the flag: v2 mesh, MI by look, pedestal, yaw, scale, Idle, combat clips, death hold
+  {
+    FFlagScope On(true);
+    struct FCase {
+      const TCHAR* Id;
+      const TCHAR* Name;
+      bool bHero;
+      ES08TeamSlot Look;
+      FVector Cell;
+      int32 Y;
+    };
+    const FCase Cases[] = {
+        {TEXT("f-0-hero"), TEXT("King Arthur"), true, ES08TeamSlot::P1, Near, 2},
+        {TEXT("f-0-sk0"), TEXT("Merlin"), false, ES08TeamSlot::P1, Near, 2},
+        {TEXT("f-1-hero"), TEXT("Medusa"), true, ES08TeamSlot::P2, Far, 3},
+        {TEXT("f-1-sk0"), TEXT("Harpies"), false, ES08TeamSlot::P2, Far, 3},
+    };
+    for (const FCase& C : Cases) {
+      AS08FighterActor* Actor = World->SpawnActor<AS08FighterActor>(AS08FighterActor::StaticClass(), C.Cell, FRotator::ZeroRotator);
+      if (!Actor) {
+        AddError(TEXT("fighter actor not spawned"));
+        continue;
+      }
+      const FHeroSpec* Spec = Find(true, true, C.Name);
+      Actor->SetTeam(C.Look, C.Look, ES08TeamColorMode::Absolute);
+      FS08BoardFighter F = MakeFighter(C.Id, C.Name, C.bHero, 2, C.Y);
+      Actor->ApplyFighter(F, C.Cell, C.Look == ES08TeamSlot::P1, true);
+      TestTrue(FString::Printf(TEXT("%s is a v2 figure"), C.Name), Actor->IsHeroV2());
+      TestTrue(FString::Printf(TEXT("%s art sculpt (compact tag)"), C.Name), Actor->HasArtSculpt());
+      TestFalse(FString::Printf(TEXT("%s is not the Medusa candidate"), C.Name), Actor->HasMedusaCandidate());
+      TestFalse(FString::Printf(TEXT("%s is not a blockout"), C.Name), Actor->IsBlockout());
+      const USkeletalMeshComponent* Skel = ArtBodyOf(Actor);
+      if (!Spec || !Skel || !Actor->IsHeroV2()) {
+        Actor->Destroy();
+        continue;
+      }
+      TestTrue(FString::Printf(TEXT("%s ArtBody visible"), C.Name), Skel->IsVisible());
+      TestEqual(FString::Printf(TEXT("%s mesh"), C.Name), Skel->GetSkeletalMeshAsset()->GetPathName(),
+                MeshPath(*Spec) + TEXT(".") + FPaths::GetBaseFilename(MeshPath(*Spec)));
+      const UMaterialInterface* Mi = Skel->GetMaterial(0);
+      TestEqual(FString::Printf(TEXT("%s body MI by look %s"), C.Name, S08TeamSlotName(C.Look)),
+                Mi ? Mi->GetPathName() : FString(),
+                BodyMaterialPath(*Spec, C.Look) + TEXT(".") + FPaths::GetBaseFilename(BodyMaterialPath(*Spec, C.Look)));
+      const UStaticMeshComponent* Base = StaticComponentOf(Actor, TEXT("ArtBase"));
+      TestTrue(FString::Printf(TEXT("%s pedestal + pedestal MI %s"), C.Name, S08TeamSlotName(C.Look)),
+               Base && Base->IsVisible() && Base->GetStaticMesh() &&
+                   Base->GetStaticMesh()->GetPathName().StartsWith(PedestalPath(*Spec)) && Base->GetMaterial(0) &&
+                   Base->GetMaterial(0)->GetPathName().StartsWith(PedestalMaterialPath(*Spec, C.Look)));
+      const float Yaw = FRotator::NormalizeAxis(Skel->GetRelativeRotation().Yaw);
+      const float WantYaw = FRotator::NormalizeAxis(FigureYawDeg(C.Cell.Y));
+      TestTrue(FString::Printf(TEXT("%s yaw %.1f == %.1f"), C.Name, Yaw, WantYaw), FMath::IsNearlyEqual(Yaw, WantYaw, 0.01f));
+      const FVector Face = Skel->GetComponentRotation().RotateVector(FVector::XAxisVector);
+      TestTrue(FString::Printf(TEXT("%s faces the centre line (%s)"), C.Name, *Face.ToString()), Face.Y * (-C.Cell.Y) > 0.9 * FMath::Abs(C.Cell.Y));
+      TestTrue(FString::Printf(TEXT("%s scale"), C.Name),
+               Skel->GetRelativeScale3D().Equals(FVector(FigureScale(*Spec)), 1e-4));
+      const float Top = Actor->GetFigureHeightUU();
+      AddInfo(FString::Printf(TEXT("%s on the board: yaw %.1f, scale %.4f, figure height %.2f uu"), C.Name, Yaw,
+                              Actor->GetHeroV2Scale(), Top));
+      TestTrue(FString::Printf(TEXT("%s figure height %.2f = bounds top x scale"), C.Name, Top),
+               FMath::IsNearlyEqual(Top, Spec->BoundsTopUU * FigureScale(*Spec), 0.6f));
+      // Idle at spawn, then the combat clips; a board re-sync does not restart / cut them.
+      TestEqual(FString::Printf(TEXT("%s Idle at spawn"), C.Name), FString(ClipName(Actor->GetHeroClip())), FString(TEXT("Idle")));
+      Actor->ApplyFighter(F, C.Cell, C.Look == ES08TeamSlot::P1, true);
+      TestEqual(FString::Printf(TEXT("%s Idle after re-sync"), C.Name), FString(ClipName(Actor->GetHeroClip())), FString(TEXT("Idle")));
+      Actor->NotifyHeroAnimEvent(EEvent::Attack, 10);
+      TestEqual(FString::Printf(TEXT("%s attack -> LungeAttack"), C.Name), FString(ClipName(Actor->GetHeroClip())), FString(TEXT("LungeAttack")));
+      Actor->ApplyFighter(F, C.Cell, C.Look == ES08TeamSlot::P1, true);
+      TestEqual(FString::Printf(TEXT("%s re-sync keeps the lunge"), C.Name), FString(ClipName(Actor->GetHeroClip())), FString(TEXT("LungeAttack")));
+      Actor->NotifyHeroAnimEvent(EEvent::ClipFinished, -1);
+      TestEqual(FString::Printf(TEXT("%s back to Idle"), C.Name), FString(ClipName(Actor->GetHeroClip())), FString(TEXT("Idle")));
+      Actor->NotifyHeroAnimEvent(EEvent::Damaged, 11);
+      TestEqual(FString::Printf(TEXT("%s damage -> HitReact"), C.Name), FString(ClipName(Actor->GetHeroClip())), FString(TEXT("HitReact")));
+      TestTrue(FString::Printf(TEXT("%s single-node animation asset set"), C.Name),
+               Skel->GetAnimationMode() == EAnimationMode::AnimationSingleNode);
+      // Defeat: DeathSettle plays where the fighter stood, the figure is held (visible) and later cues change nothing.
+      FS08BoardFighter Dead = F;
+      Dead.Health = 0;
+      Dead.X = -1;
+      Dead.Y = -1;
+      const FVector Before = Actor->GetActorLocation();
+      Actor->ApplyFighter(Dead, FVector(-9999.0, -9999.0, 0.0), C.Look == ES08TeamSlot::P1, true);
+      TestEqual(FString::Printf(TEXT("%s defeated -> DeathSettle"), C.Name), FString(ClipName(Actor->GetHeroClip())), FString(TEXT("DeathSettle")));
+      TestTrue(FString::Printf(TEXT("%s death hold keeps the figure"), C.Name), Actor->IsInDeathHold() && !Actor->IsHidden());
+      TestTrue(FString::Printf(TEXT("%s stays on its cell while settling"), C.Name), Actor->GetActorLocation().Equals(Before, 0.01));
+      Actor->NotifyHeroAnimEvent(EEvent::Damaged, 12);
+      Actor->ApplyFighter(Dead, FVector(-9999.0, -9999.0, 0.0), C.Look == ES08TeamSlot::P1, true);
+      TestEqual(FString::Printf(TEXT("%s final pose holds"), C.Name), FString(ClipName(Actor->GetHeroClip())), FString(TEXT("DeathSettle")));
+      Actor->Destroy();
+    }
+    // Unmapped hero under the flag keeps the legacy grey mannequin path.
+    AS08FighterActor* Other = World->SpawnActor<AS08FighterActor>(AS08FighterActor::StaticClass(), Near, FRotator::ZeroRotator);
+    if (Other) {
+      Other->ApplyFighter(MakeFighter(TEXT("f-0-hero"), TEXT("Sinbad"), true, 2, 2), Near, true, true);
+      TestFalse("unmapped hero is not v2", Other->IsHeroV2());
+      Other->Destroy();
+    }
+    // No -ArtPreview: the flag alone changes nothing.
+    AS08FighterActor* Grey = World->SpawnActor<AS08FighterActor>(AS08FighterActor::StaticClass(), Near, FRotator::ZeroRotator);
+    if (Grey) {
+      Grey->ApplyFighter(MakeFighter(TEXT("f-0-hero"), TEXT("King Arthur"), true, 2, 2), Near, true, false);
+      TestFalse("flag without -ArtPreview: grey slice", Grey->IsHeroV2() || Grey->HasArtFigure());
+      Grey->Destroy();
+    }
+  }
+  GEngine->DestroyWorldContext(World);
+  World->DestroyWorld(false);
+  return true;
+}
+
+#endif  // WITH_AUTOMATION_TESTS

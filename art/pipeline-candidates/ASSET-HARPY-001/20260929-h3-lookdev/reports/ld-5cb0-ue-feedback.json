@@ -1,0 +1,375 @@
+{
+ "bc_gain": {
+  "bc_after": {
+   "Y_median": 0.01616,
+   "hue_deg": 25.6,
+   "median_linear": [
+    0.01862,
+    0.01607,
+    0.01431
+   ],
+   "sat": 0.143
+  },
+  "bc_before": {
+   "Y_median": 0.02019,
+   "hue_deg": 12.9,
+   "median_linear": [
+    0.02956,
+    0.0185,
+    0.016
+   ],
+   "sat": 0.292
+  },
+  "class": "feathers",
+  "effective_after": {
+   "Y_median": 0.02,
+   "hue_deg": 18.1,
+   "median_linear": [
+    0.02302,
+    0.0194,
+    0.01795
+   ],
+   "sat": 0.131
+  },
+  "effective_before": {
+   "Y_median": 0.02019,
+   "hue_deg": 12.2,
+   "median_linear": [
+    0.02956,
+    0.0185,
+    0.01614
+   ],
+   "sat": 0.288
+  },
+  "floor_clamped_share_after": 0.8936,
+  "floor_clamped_share_before": 0.3134,
+  "gain_bc_linear": [
+   0.63,
+   0.8686,
+   0.8948
+  ],
+  "lut_column": {
+   "luminanceMax": 0.7,
+   "luminanceMin": 0.02,
+   "maxChannel": 0.9,
+   "specular": 0.575
+  },
+  "ratio_effective_got": [
+   0.7787,
+   1.0485,
+   1.1115
+  ],
+  "ratio_effective_target": [
+   0.7758,
+   1.0446,
+   1.1074
+  ],
+  "texels_2k": 667472
+ },
+ "concept": {
+  "hue_deg": 17.1,
+  "luma_Y_linear": 0.0273,
+  "median_srgb": [
+   50.0,
+   45.0,
+   43.0
+  ],
+  "sat": 0.14,
+  "value": 0.196
+ },
+ "created": "2026-09-30T12:34:56+05:00",
+ "fit": {
+  "changed_pixels_by_view": {
+   "back": 127216,
+   "front": 104302,
+   "side": 77062
+  },
+  "file_note": "ue_bc_feedback.py fit output (copied)",
+  "keep_luma": true,
+  "ratio_fit": [
+   0.862,
+   1.1607,
+   1.2304
+  ],
+  "ratio_used": [
+   0.7758,
+   1.0446,
+   1.1074
+  ],
+  "sat_max": 0.38,
+  "scale_applied": 0.9,
+  "select": "gate_lowsat",
+  "weights": "reading=1,neutral=0.5"
+ },
+ "hero": "Harpy",
+ "limits": [
+  "prediction from the look-dev C editor frames (editor-mcp-viewport), not a UE re-shoot; the orchestrator re-imports the BC and re-shoots",
+  "specular / sheen are not separated from the diffuse: the change of saturation is an upper bound",
+  "the exposure k of the measure is the geometric mean of the key zones: an edited key zone moves k and the ratios of the other zones"
+ ],
+ "model": "a lit pixel of a dielectric = light x effective albedo per channel, so a change of the effective albedo of the class by r (per channel, linear) multiplies the linear pixel by r. The pixels changed are those of the zone's MatID class decoded from the debug frame (select \"class\"), or of the render gate of the zone (select \"gate\", every gated pixel: an upper bound when the gate also takes pixels of texels the edit does not touch; \"gate_lowsat\": the gated pixels below --sat-max on the gate frame, e.g. Harpy's dark primaries without the shaded rufous coverts), or the class pixels the team dye changes (select \"dye\": |P1 - P2| > 40 levels, the TeamAccent texels = e.g. Harpy's dark primary tips, a clean sample of the edited texels). Specular / sheen are not separated (they dilute the change: the prediction is an upper bound of the change of saturation). Measurement = ue_hero_lookdev.cmd_measure itself (same masks, gates, medians, k).",
+ "schema": "unmatched.lookdev-5cb0-ue-feedback/1",
+ "sheet": {
+  "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/preview/ld_5cb0_dark_sheet.png",
+  "sha256": "9e6d6ec4eb2fec1319adc29ba339e8cfbdf7ce109a5a389fd2f9bcf7788d3e2a"
+ },
+ "status": "измерено (прогноз)",
+ "table": {
+  "neutral": {
+   "k_after": 0.5343,
+   "k_before": 0.5323,
+   "zones": {
+    "claw": {
+     "after_predicted": {
+      "Y_ratio_exposure_normalised": 1.133,
+      "all_within": true,
+      "dHue_deg": 90.0,
+      "dSat": -0.009
+     },
+     "before": {
+      "Y_ratio_exposure_normalised": 1.129,
+      "all_within": true,
+      "dHue_deg": 90.0,
+      "dSat": -0.009
+     },
+     "median_srgb_after_predicted": [
+      93.0,
+      91.0,
+      92.0
+     ],
+     "median_srgb_before": [
+      93.0,
+      91.0,
+      92.0
+     ]
+    },
+    "dark": {
+     "after_predicted": {
+      "Y_ratio_exposure_normalised": 1.233,
+      "all_within": false,
+      "dHue_deg": 10.2,
+      "dSat": 0.005
+     },
+     "before": {
+      "Y_ratio_exposure_normalised": 1.242,
+      "all_within": false,
+      "dHue_deg": -0.7,
+      "dSat": 0.122
+     },
+     "median_srgb_after_predicted": [
+      76.0,
+      70.0,
+      65.0
+     ],
+     "median_srgb_before": [
+      84.0,
+      68.0,
+      62.0
+     ]
+    },
+    "gold": {
+     "after_predicted": {
+      "Y_ratio_exposure_normalised": 0.805,
+      "all_within": false,
+      "dHue_deg": -0.5,
+      "dSat": -0.067
+     },
+     "before": {
+      "Y_ratio_exposure_normalised": 0.802,
+      "all_within": false,
+      "dHue_deg": -0.5,
+      "dSat": -0.067
+     },
+     "median_srgb_after_predicted": [
+      199.0,
+      144.0,
+      78.0
+     ],
+     "median_srgb_before": [
+      199.0,
+      144.0,
+      78.0
+     ]
+    },
+    "orange": {
+     "after_predicted": {
+      "Y_ratio_exposure_normalised": 1.045,
+      "all_within": true,
+      "dHue_deg": 2.1,
+      "dSat": -0.083
+     },
+     "before": {
+      "Y_ratio_exposure_normalised": 1.041,
+      "all_within": true,
+      "dHue_deg": 2.1,
+      "dSat": -0.083
+     },
+     "median_srgb_after_predicted": [
+      175.0,
+      130.0,
+      97.0
+     ],
+     "median_srgb_before": [
+      175.0,
+      130.0,
+      97.0
+     ]
+    },
+    "skin": {
+     "after_predicted": {
+      "Y_ratio_exposure_normalised": 0.776,
+      "all_within": false,
+      "dHue_deg": 0.0,
+      "dSat": -0.015
+     },
+     "before": {
+      "Y_ratio_exposure_normalised": 0.773,
+      "all_within": false,
+      "dHue_deg": 0.0,
+      "dSat": -0.015
+     },
+     "median_srgb_after_predicted": [
+      186.0,
+      158.0,
+      130.0
+     ],
+     "median_srgb_before": [
+      186.0,
+      158.0,
+      130.0
+     ]
+    }
+   }
+  },
+  "reading": {
+   "k_after": 1.3646,
+   "k_before": 1.3378,
+   "zones": {
+    "claw": {
+     "after_predicted": {
+      "Y_ratio_exposure_normalised": 1.056,
+      "all_within": true,
+      "dHue_deg": 60.0,
+      "dSat": -0.013
+     },
+     "before": {
+      "Y_ratio_exposure_normalised": 1.035,
+      "all_within": true,
+      "dHue_deg": 60.0,
+      "dSat": -0.013
+     },
+     "median_srgb_after_predicted": [
+      56.0,
+      55.0,
+      56.0
+     ],
+     "median_srgb_before": [
+      56.0,
+      55.0,
+      56.0
+     ]
+    },
+    "dark": {
+     "after_predicted": {
+      "Y_ratio_exposure_normalised": 1.06,
+      "all_within": true,
+      "dHue_deg": 0.0,
+      "dSat": 0.019
+     },
+     "before": {
+      "Y_ratio_exposure_normalised": 1.103,
+      "all_within": false,
+      "dHue_deg": -1.1,
+      "dSat": 0.16
+     },
+     "median_srgb_after_predicted": [
+      44.0,
+      39.0,
+      37.0
+     ],
+     "median_srgb_before": [
+      50.0,
+      39.0,
+      35.0
+     ]
+    },
+    "gold": {
+     "after_predicted": {
+      "Y_ratio_exposure_normalised": 0.995,
+      "all_within": true,
+      "dHue_deg": -4.3,
+      "dSat": 0.026
+     },
+     "before": {
+      "Y_ratio_exposure_normalised": 0.975,
+      "all_within": true,
+      "dHue_deg": -4.3,
+      "dSat": 0.026
+     },
+     "median_srgb_after_predicted": [
+      154.0,
+      98.0,
+      46.0
+     ],
+     "median_srgb_before": [
+      154.0,
+      98.0,
+      46.0
+     ]
+    },
+    "orange": {
+     "after_predicted": {
+      "Y_ratio_exposure_normalised": 1.087,
+      "all_within": true,
+      "dHue_deg": 0.5,
+      "dSat": -0.008
+     },
+     "before": {
+      "Y_ratio_exposure_normalised": 1.065,
+      "all_within": true,
+      "dHue_deg": 0.5,
+      "dSat": -0.008
+     },
+     "median_srgb_after_predicted": [
+      121.0,
+      83.0,
+      58.0
+     ],
+     "median_srgb_before": [
+      121.0,
+      83.0,
+      58.0
+     ]
+    },
+    "skin": {
+     "after_predicted": {
+      "Y_ratio_exposure_normalised": 0.868,
+      "all_within": true,
+      "dHue_deg": -2.3,
+      "dSat": 0.072
+     },
+     "before": {
+      "Y_ratio_exposure_normalised": 0.851,
+      "all_within": true,
+      "dHue_deg": -2.3,
+      "dSat": 0.072
+     },
+     "median_srgb_after_predicted": [
+      134.0,
+      106.0,
+      82.0
+     ],
+     "median_srgb_before": [
+      134.0,
+      106.0,
+      82.0
+     ]
+    }
+   }
+  }
+ },
+ "tag": "i3",
+ "ue_frames": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/review/i3",
+ "zone": "dark",
+ "zone_label": "тёмные маховые перья (feathers, ворота v <= 0.45)"
+}

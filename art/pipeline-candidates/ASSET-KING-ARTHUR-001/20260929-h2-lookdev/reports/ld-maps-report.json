@@ -50,13 +50,13 @@
     },
     "team_accent_area_share": {
       "expected": [
-        0.05,
+        0.03,
         0.12
       ],
       "measured": {
         "share_3d_belt": 0.0076,
-        "share_3d_strip": 0.047,
-        "share_3d_total": 0.0553
+        "share_3d_strip": 0.0272,
+        "share_3d_total": 0.0356
       },
       "note": "share of the figure's 3D surface (body + sword, no base)",
       "passed": true
@@ -64,11 +64,33 @@
     "team_accent_cloak_stays_red": {
       "expected": "<= 0.2 of the red cloth core texels of the cloak carry the accent",
       "measured": {
-        "accent_ge_0_5_share": 0.0907,
+        "accent_ge_0_5_share": 0.062,
         "core_texels_4k": 1928056,
         "part": "tripo_part_0"
       },
       "note": "the cloak stays red (the accent is only a strip / the belt)",
+      "passed": true
+    },
+    "team_accent_mip_chain": {
+      "expected": {
+        "border_max": 0.15,
+        "core_median_min": 0.5,
+        "core_mips_max": 2,
+        "field_max": 0.15,
+        "mips": [
+          0,
+          3
+        ],
+        "other_max": 0.01
+      },
+      "measured": {
+        "border": 0.0049,
+        "core_median_min": 0.945,
+        "field": 0.0894,
+        "other": 0.0066,
+        "tabard": 0.0
+      },
+      "note": "painted share (mip value >= 0.25) of the gold border / the cloak field / every other zone on the visible mips [0, 3], box and Kaiser mips of the 2K mask",
       "passed": true
     },
     "team_accent_tabard_stays_red": {
@@ -182,13 +204,13 @@
   },
   "id_textures": {
     "accent": {
-      "bytes": 317600,
+      "bytes": 311663,
       "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/work/lookdev/id/accent.png",
       "px": [
         2048,
         2048
       ],
-      "sha256": "b039b05cc6752173a951e59c42f32cdfe12bc316ca33163497f742dad90824a7"
+      "sha256": "5db1446211191720a1ea23f0072e8629565b98e2fde2794d9e8c5a3b40c1f572"
     },
     "tabard": {
       "bytes": 295628,
@@ -225,13 +247,13 @@
   "presets_sha256": "863a3c2f5457e0f6352a4ce600e9ee17b79a92badcdc1a5f654a79784cd197e7",
   "previews": {
     "accent": {
-      "bytes": 1569597,
+      "bytes": 1572622,
       "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/preview/ld_teamaccent_1K.png",
       "px": [
         1024,
         1024
       ],
-      "sha256": "73c0670102a9be645d707b8b99cb6751e6c5cd7f6b9e56f7541574ea83d9923d"
+      "sha256": "222d42c4f3b1a6241a4b736b605ad38ed464d2b90ea9e72ae501008cc99b9a64"
     },
     "edge": {
       "bytes": 409388,
@@ -269,21 +291,161 @@
     "area_method": "texel area = |dPOS/drow x dPOS/dcol| of the POS bake (Tripo frame; ratio, so the frame scale cancels), clipped at 8 x median against island-edge jumps; figure = body + sword, without the base part",
     "band_components": 10,
     "band_texels_4k": 45393,
+    "envelope_accent_max_8bit": 0,
+    "envelope_red_between_threads_texels_4k": 42474,
+    "envelope_share_3d": 0.0204,
+    "envelope_texels_4k": 87867,
+    "gap_m_final": 0.003,
+    "mip_chain": {
+      "classes_2k_texels": {
+        "border": 22444,
+        "field": 514378,
+        "other": 908751,
+        "tabard": 74320
+      },
+      "cloak_texel_2k_mm": 0.721,
+      "criteria_result": {
+        "passed": true,
+        "worst": {
+          "border": 0.0049,
+          "core_median_min": 0.945,
+          "field": 0.0894,
+          "other": 0.0066,
+          "tabard": 0.0
+        }
+      },
+      "method": "runtime mask = the 8-bit 2K PNG; mips from it as UE builds them (2 x 2 box = TMGS_SimpleAverage, or a Kaiser-windowed sinc); value of a 2K texel at mip L = bilinear sample of mip L at its UV; painted = value >= threshold; shares weighted by the 3D texel area (lookdev_accent_mips.py)",
+      "rows": {
+        "box": [
+          {
+            "accent_core_median": 1.0,
+            "border": 0.0,
+            "field": 0.0667,
+            "mip": 0,
+            "other": 0.0007,
+            "px": 2048,
+            "tabard": 0.0
+          },
+          {
+            "accent_core_median": 0.999,
+            "border": 0.0,
+            "field": 0.0705,
+            "mip": 1,
+            "other": 0.003,
+            "px": 1024,
+            "tabard": 0.0
+          },
+          {
+            "accent_core_median": 0.946,
+            "border": 0.0001,
+            "field": 0.0766,
+            "mip": 2,
+            "other": 0.0048,
+            "px": 512,
+            "tabard": 0.0
+          },
+          {
+            "accent_core_median": 0.778,
+            "border": 0.0049,
+            "field": 0.0879,
+            "mip": 3,
+            "other": 0.0064,
+            "px": 256,
+            "tabard": 0.0
+          },
+          {
+            "accent_core_median": 0.55,
+            "border": 0.1285,
+            "field": 0.096,
+            "mip": 4,
+            "other": 0.0076,
+            "px": 128,
+            "tabard": 0.0
+          }
+        ],
+        "kaiser": [
+          {
+            "accent_core_median": 1.0,
+            "border": 0.0,
+            "field": 0.0667,
+            "mip": 0,
+            "other": 0.0007,
+            "px": 2048,
+            "tabard": 0.0
+          },
+          {
+            "accent_core_median": 1.0,
+            "border": 0.0,
+            "field": 0.0705,
+            "mip": 1,
+            "other": 0.0029,
+            "px": 1024,
+            "tabard": 0.0
+          },
+          {
+            "accent_core_median": 0.945,
+            "border": 0.0001,
+            "field": 0.077,
+            "mip": 2,
+            "other": 0.0048,
+            "px": 512,
+            "tabard": 0.0
+          },
+          {
+            "accent_core_median": 0.785,
+            "border": 0.0047,
+            "field": 0.0894,
+            "mip": 3,
+            "other": 0.0066,
+            "px": 256,
+            "tabard": 0.0
+          },
+          {
+            "accent_core_median": 0.57,
+            "border": 0.1688,
+            "field": 0.1012,
+            "mip": 4,
+            "other": 0.0083,
+            "px": 128,
+            "tabard": 0.0001
+          }
+        ]
+      },
+      "threshold": 0.25,
+      "visible_mips_by_view": {
+        "k2_1p6x": {
+          "mip_facing": 2.46,
+          "mip_vertical_no_aniso": 3.26,
+          "pixel_mm": 3.964
+        },
+        "k2_5x": {
+          "mip_facing": 0.81,
+          "mip_vertical_no_aniso": 1.62,
+          "pixel_mm": 1.268
+        },
+        "review_200uu": {
+          "mip_facing": -0.13,
+          "mip_vertical_no_aniso": -0.13,
+          "pixel_mm": 0.657
+        }
+      }
+    },
+    "mode": "piping",
     "red_core_share_by_part": {
-      "cloak": 0.0907,
+      "cloak": 0.062,
       "tabard": 0.0
     },
     "seat_scale": 0.613039,
     "share_3d_belt": 0.0076,
     "share_3d_by_part": {
-      "tripo_part_0": 0.0477,
+      "tripo_part_0": 0.028,
       "tripo_part_1": 0.0076
     },
-    "share_3d_strip": 0.047,
-    "share_3d_total": 0.0553,
-    "texels_4k_ge_0_5": 251357,
-    "width_m_final": 0.014,
-    "width_m_tripo": 0.02284
+    "share_3d_strip": 0.0272,
+    "share_3d_total": 0.0356,
+    "texels_4k_ge_0_5": 158447,
+    "width_m_final": 0.009,
+    "width_m_tripo": 0.01468
   },
   "textures": {
     "EdgeMask_2K": {
@@ -332,40 +494,40 @@
       "sha256": "b81214eb6a11638003903f75c5b3cf77fd77536d975ceb5314d924a094211eb6"
     },
     "TeamAccent_2K": {
-      "bytes": 160951,
+      "bytes": 131639,
       "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_TeamAccent_2K.png",
       "px": [
         2048,
         2048
       ],
-      "sha256": "1bee50dd272d88c834b233e2939d665d7893bcb4dad23fc3b03a4a40809c1502"
+      "sha256": "6b6f007c20a709c0ea15270c9b06d86cb3852717c993a33d9c068aa923e1ad5b"
     },
     "TeamAccent_4K": {
-      "bytes": 360725,
+      "bytes": 284605,
       "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_TeamAccent_4K.png",
       "px": [
         4096,
         4096
       ],
-      "sha256": "8f64ab38b105424ff1c392707e18ef28163e8c616c54a0bbb09a56c69c2829ed"
+      "sha256": "013592715738b4cb277b7a45f9f227169d2d6825b40930a674ed2c5267ce41e3"
     },
     "TeamMaskRGBA_2K": {
-      "bytes": 2120886,
+      "bytes": 2099565,
       "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_TeamMaskRGBA_2K.png",
       "px": [
         2048,
         2048
       ],
-      "sha256": "ffcc17c5a429d564451a598e9d9833e2e1e457f8441214062f587fd9f659cef6"
+      "sha256": "2c27798492a1aec9e3f09e71ffa047af56c53d87b12bca4af335a3acc4892250"
     },
     "TeamMaskRGBA_4K": {
-      "bytes": 5319529,
+      "bytes": 5267219,
       "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/textures/T_KingArthur_H2LD_TeamMaskRGBA_4K.png",
       "px": [
         4096,
         4096
       ],
-      "sha256": "14b6cb33066411e4aa5bc434e70bd62aa1fb74f6b3d93967be78e556fd88fd7b"
+      "sha256": "48adcdfb636e59248134758251371f31894d7070ab976f444ae38be1e7c28a42"
     },
     "TeamMask_2K": {
       "bytes": 295041,

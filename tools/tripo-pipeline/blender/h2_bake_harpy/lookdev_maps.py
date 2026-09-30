@@ -271,6 +271,19 @@ def main():
     cord_core = cord & cov
     y_cord = float(np.median(tripo_bc[cord_core] @ LUMA))
     bc[cord] = tripo_bc[cord] * (y_acc_h3 / max(y_cord, 1e-6))
+    # 5c-B0 (2026-09-30): UE feedback gain of the dark primaries (profile lookdev.ue_feedback.dark_primaries), fitted on
+    # the UE look-dev C frames against the concept (tools/art/material_library/ue_bc_feedback.py); weighted by the H3
+    # dark-primary mask on the feather class only, applied before the class luminance clamp (as the v2 core)
+    fb = (ld.get("ue_feedback") or {}).get("dark_primaries")
+    fb_info = None
+    if fb:
+        wd = dark * (lab == col["feathers"])
+        bc_pre = bc.copy()
+        bc = bc * (1.0 + wd[..., None] * (np.asarray(fb["gain"], np.float64) - 1.0))
+        sel_d = (wd >= 0.5) & cov
+        fb_info = {"gain": fb["gain"], "texels_4k_weight_ge_0_5": int(sel_d.sum()),
+                   "bc_median_linear_before": [r(v, 5) for v in np.median(bc_pre[sel_d], 0)],
+                   "bc_median_linear_after_gain": [r(v, 5) for v in np.median(bc[sel_d], 0)]}
     clamp_stats = {}
     allc = dict(byid, **ext)
     col_class = {}
@@ -521,7 +534,7 @@ def main():
                               "TeamDye": ta["dye"]["TeamDye"], "edge_width_source_m": W,
                               "edge_width_final_m": r(W * scale, 4), "silhouette": {"px_m": res_m, "grid": [nz, nx]},
                               "tripo_wing_accent_Y_median": r(y_acc, 4)},
-              "edge_mask": dict(estats, config=ld["edge"]), "luminance_clamp": clamp_stats,
+              "edge_mask": dict(estats, config=ld["edge"]), "luminance_clamp": clamp_stats, "ue_feedback_dark_primaries": fb_info,
               "lut": {"dds": rel(dds), "dds_sha256": S.sha256(dds), "overrides_json": rel(ov_path),
                       "overrides_sha256": S.sha256(ov_path), "applied": applied, "gold_antique_f0_hero": [r(v, 4) for v in gold_f0],
                       "layout": "build_ue_inputs.LUT_ROWS (rows 0-9, 10-15 reserved), column = class index (hero slot 5 = horn_claw)",

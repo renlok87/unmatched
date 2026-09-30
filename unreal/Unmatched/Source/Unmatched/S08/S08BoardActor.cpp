@@ -1078,6 +1078,31 @@ void AS08BoardActor::SyncFighters(const FS08BoardModel& Board,
     FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW allMedusa copies=%d visual=%d"),
                                      FighterActors.Num(), Visual));
   }
+  // Wave 5c-B: one summary per change of the v2 roster (-ArtPreviewHeroesV2 only).
+  if (bArtActive && S08HeroesV2::FlagEnabled() && FighterActors.Num() > 0) {
+    int32 Mapped = 0, V2 = 0;
+    for (const AS08FighterActor* Actor : FighterActors) {
+      if (!Actor) continue;
+      if (S08HeroesV2::Find(true, true, Actor->GetFighter().Name)) ++Mapped;
+      if (Actor->IsHeroV2()) ++V2;
+    }
+    const FString Key = FString::Printf(TEXT("fighters=%d mapped=%d v2=%d"), FighterActors.Num(), Mapped, V2);
+    if (Key != HeroesV2SummaryKey) {
+      HeroesV2SummaryKey = Key;
+      FS08Trace::Write(TEXT("ARTPREVIEW heroesV2 summary ") + Key);
+    }
+  }
+}
+
+void AS08BoardActor::NotifyFighterAnimEvent(const FString& FighterId, S08HeroesV2::EEvent Event,
+                                            int32 SequenceNumber) {
+  if (!bArtActive || !S08HeroesV2::FlagEnabled()) return;
+  AS08FighterActor* Actor = FindFighterActor(FighterId);
+  if (!Actor || !Actor->IsHeroV2()) return;
+  if (!AnimEventDedupe.Accept(FString(S08HeroesV2::EventName(Event)) + TEXT(":") + FighterId, SequenceNumber)) {
+    return;
+  }
+  Actor->NotifyHeroAnimEvent(Event, SequenceNumber);
 }
 
 void AS08BoardActor::SetSelectedFighter(const FString& FighterId,

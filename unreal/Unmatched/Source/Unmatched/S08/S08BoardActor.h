@@ -10,6 +10,7 @@
 #include "S08BoardModel.h"
 #include "S08BoardArt.h"
 #include "S08ArtHud.h"
+#include "S08HeroesV2.h"
 #include "S08Render.h"
 #include "S08Team.h"
 #include "S08BoardActor.generated.h"
@@ -86,6 +87,9 @@ public:
    *  exactly once per (fighter, authoritative seq) - a repeated cue for the
    *  same seq (reapply, reconnect replay) is traced and ignored (T2.2). */
   void ShowDamageNumber(const FString& FighterId, int32 Damage, int32 SequenceNumber);
+  /** Wave 5c-B -ArtPreviewHeroesV2: a combat event (attack / damage) of a fighter drives its v2 clip,
+   *  exactly once per (event, fighter, authoritative seq). A no-op without the flag or a v2 figure. */
+  void NotifyFighterAnimEvent(const FString& FighterId, S08HeroesV2::EEvent Event, int32 SequenceNumber);
 
   /** TASK-022 selection ring + reachable-cell highlights. */
   void SetSelectedFighter(const FString& FighterId, const TSet<uint64>& Reachable);
@@ -230,6 +234,8 @@ private:
   FString LabelPlateFighterId;
   bool bScreenIconMode = false;
   bool bAllMedusaSummaryTraced = false;
+  FS08SeqDedupe AnimEventDedupe;
+  FString HeroesV2SummaryKey;
 
   FS08BoardModel BoardModel;
   TArray<FS08BoardFighter> Fighters;

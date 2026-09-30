@@ -3,7 +3,7 @@
  "profile_id": "king-arthur-h2-lookdev/1",
  "asset_id": "ASSET-KING-ARTHUR-001",
  "status": "proposed",
- "status_note": "Look-dev v2 of King Arthur (2026-09-29, wave LD): the H2.2 rev. 2 game model moved onto the UM material library v1 (docs/art-pipeline/material-library/README.md) for M_UM_Figure_v2: MatID (G8, index x 16 + 8, no mips), hero LUT 16 x 8 RGBA16F, UV1 in metres, EdgeMask, the new TeamAccent mask (docs/art-pipeline/material-library/team-accent.md: narrow strip inside the gold border of the cloak + the belt; the cloak and the tabard stay red, the tabard carries no accent since rev. 2), steel = preset steel_blued with the hero tone measured on the concept relative to the unchanged stone and red cloth of the same frame. Rig, skeleton and geometry are those of the H2 bake run (appended from its work/h2-rig-authored.blend, checked against its FBX). Status: at most 'measured' (Blender only); UE import is the next stage.",
+ "status_note": "Look-dev v2 of King Arthur (2026-09-29, wave LD): the H2.2 rev. 2 game model moved onto the UM material library v1 (docs/art-pipeline/material-library/README.md) for M_UM_Figure_v2: MatID (G8, index x 16 + 8, no mips), hero LUT 16 x 8 RGBA16F, UV1 in metres, EdgeMask, the new TeamAccent mask (docs/art-pipeline/material-library/team-accent.md: piping of the red cloth outside the gold border of the cloak (rev. 3, 5c-B0) + the belt; the gold border, the cloak and the tabard stay red / gold, the tabard carries no accent since rev. 2), steel = preset steel_blued with the hero tone measured on the concept relative to the unchanged stone and red cloth of the same frame. Rig, skeleton and geometry are those of the H2 bake run (appended from its work/h2-rig-authored.blend, checked against its FBX). Status: at most 'measured' (Blender only); UE import is the next stage.",
  "run_dir": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev",
  "blender": "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe",
  "stages": ["ld_state", "ld_export", "ld_maps", "ld_tone_prep", "ld_render_tone", "ld_tone", "ld_render_final", "ld_ue_inputs", "ld_report"],
@@ -47,17 +47,27 @@
    "lining_note": "red texels of the armour parts (the red collar / cloak lining at the gorget, red gems): cloth class, never team-dyed (TeamAccent 0 there)"
   },
   "team_accent": {
-   "strip": {"parts": ["tripo_part_0"], "band_component_min_texels": 2000, "width_m": 0.014, "feather_m": 0.002,
+   "strip": {"mode": "piping", "parts": ["tripo_part_0"], "band_component_min_texels": 2000,
+             "envelope": {"closing_radius_px_4k": 6, "hole_max_px_4k": 3000,
+                          "note": "5c-B0: the gold border as a whole = the braid bands (embroidery components >= band_component_min_texels) + the red cloth between their threads: binary closing with a disk of 6 texels 4K (2.2 mm) inside the cloak, enclosed holes < 3000 texels filled. Measured 2026-09-30: radius 6 / 10 / 14 give 87.9 / 88.5 / 89.0 k texels 4K (stable); the border is one band ~21 mm wide. Never dyed"},
+             "gap_m": 0.003, "width_m": 0.009, "feather_m": 0.001,
              "normal_agree_min": 0.3,
-             "note": "red cloth texels of the CLOAK (tripo_part_0) within width_m (final frame, 3D distance) of a gold border band (8-connected embroidery component of >= band_component_min_texels 4K texels: the hem and edge bands, not the small motifs) whose normal agrees (dot >= normal_agree_min: the other side of the cloth does not count); soft edge smoothstep over feather_m. The gold band itself is never dyed",
+             "note_rev3": "rev. 3 (5c-B0, 2026-09-30, finding of look-dev C group B): the rev. 2 strip (red cloth within 14 mm of a band texel) also covered the red BETWEEN the braid threads; the threads are 1-2 texels wide, so the mips of the mask and of the BC turned the whole border into the team colour in UE (13-65 % of the silk pixels changed colour). Now the envelope of the border is never dyed and the accent is a piping of the red cloth OUTSIDE it, from gap_m to gap_m + width_m (final frame, 3D distance to an envelope texel with an agreeing normal), soft edges over feather_m. Chosen from gap 1.5 / 3 mm x width 5 / 7 / 9 mm by the mip_chain criteria (fixed before the edit): gap 1.5 mm lets the bilinear tail of mip 3 paint 10-12 % of the border, gap 3 mm keeps it <= 0.5 %; width 9 mm keeps the piping core >= 0.94 on mip 2 (K2 5x) and 0.78 on mip 3 (K2 1.6x)",
+             "note": "rev. 2 (mode strip): red cloth texels of the CLOAK (tripo_part_0) within width_m (final frame, 3D distance) of a gold border band (8-connected embroidery component of >= band_component_min_texels 4K texels: the hem and edge bands, not the small motifs) whose normal agrees (dot >= normal_agree_min: the other side of the cloth does not count); soft edge smoothstep over feather_m. The gold band itself is never dyed",
              "tabard_note": "rev. 2 (2026-09-29, review defect): the tabard (tripo_part_5) is OUT of the strip. Its red field between the gold borders is only ~25-30 mm wide on the upper tabard and the lower knot panel is an embroidery component itself, so the rev. 1 strip (10 mm on both inner edges) dyed ~60-70 % of the visible tabard red (render red share 0.85 -> 0.33 / 0.31 with P1 / P2). The front panel of the hero is his main colour and stays red; the lost area is taken by a wider cloak strip (10 -> 14 mm, measured with tools probe: 12 mm gives 4.98 %, 14 mm 5.53 % of the figure)"},
    "red_parts": {"cloak": "tripo_part_0", "tabard": "tripo_part_5", "max_core_share": 0.2,
                  "render_red_share_min_ratio": 0.8,
                  "note": "per part: <= max_core_share of the red cloth core texels of the part carry the accent (>= 0.5); render: the red share of the tabard pixels (tabard ID frame) with P1 / P2 >= render_red_share_min_ratio x the red share without dye, on the Cobble frames"},
    "belt": {"zone": "belt", "note": "the leather belt of the torso (zone belt); the lion buckle and the studs are gold metal and stay out"},
    "blur_sigma_px": 1.0,
-   "area_share_range": [0.05, 0.12],
-   "area_note": "share of the figure's 3D surface (body + sword, without the base; texel area from the POS bake), the task range for Arthur 5-12 %",
+   "area_share_range": [0.03, 0.12],
+   "area_note": "share of the figure's 3D surface (body + sword, without the base; texel area from the POS bake). The task range for Arthur was 5-12 %; rev. 3 (5c-B0) lowers it to 3-12 %: the 5.5 % of rev. 2 came from dyeing the red inside the gold border, which breaks the user rule (the gold borders are not dyed, the cloak stays red); the front readability of the team is carried by the ring / base shape of 5b-R",
+   "mip_chain": {"threshold": 0.25, "levels": 4, "seat_scale": 0.613039,
+                 "views": {"k2_5x": {"figure_px_per_m": 788.8, "pitch_deg": 55.0, "note": "386 uu, 35 deg horizontal, 1920 px"},
+                           "k2_1p6x": {"figure_px_per_m": 252.3, "pitch_deg": 55.0, "note": "1207 uu"},
+                           "review_200uu": {"figure_px_per_m": 1522.0, "pitch_deg": 0.0, "note": "UE look-dev review frames (front / side / back at 200 uu)"}},
+                 "criteria": {"mips": [0, 3], "border_max": 0.15, "field_max": 0.15, "other_max": 0.01, "core_mips_max": 2, "core_median_min": 0.5},
+                 "note": "5c-B0, criteria fixed before the edit (reports/ld-5cb0-teamaccent.json#criteria): on every mip 0-3 (2K..256; K2 5x reads mip ~0.8, K2 1.6x ~2.5, a vertical surface at 55 deg up to ~3.3 without aniso), with box and Kaiser mips of the 2K mask: painted (value >= 0.25) <= 15 % of the gold border and of the cloak field (piping included), <= 1 % of the tabard and of every other zone; the piping core keeps a median >= 0.5 on mips 0-2. Mip 4 (128) is reported, not judged"},
    "palette": {"P1": "#E8C06A", "P2": "#5A7F9F", "source": "art/um-materials/um-masters.json team_palette.active = c11_value_split_proposal (W5b-R, Q-304 open)"},
    "team_dye": 1.0,
    "team_dye_gain_rule": {"median_target": 0.8, "p95_max_albedo": 0.9, "round_to": 0.5,
@@ -108,6 +118,12 @@
     "chroma_clamp": [0.6, 1.6],
     "luma_clamp": [0.75, 1.35],
     "note": "as Merlin (lookdev_tone): gain = chroma x luma per zone, render exposure brought to the concept by the stone (k = concept stone / render stone per view), luma clamped; applied in linear light to the zone's BC texels at 4K (zone weights, 3 x 3 blur); |gain - 1| < dead_band in every channel keeps the H2.2 BC"
+   },
+   "ue_feedback": {
+    "belt": {"gain": [1.2932, 1.6992, 2.322],
+             "source": "5c-B0 (2026-09-30): UE look-dev C frames i2 (art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2ld-ue/review/i2, LUT i2) against the concept; tools/art/material_library/ue_bc_feedback.py fit (zone belt, class pixels, weights reading 1 / board 0.5) -> ratio of the effective albedo (0.9895, 1.3245, 1.7819); gain = ue_bc_feedback.py gain on the 2K BC of the class (UE LUT i2 leather_worn: luminance [0.08, 0.45], maxChannel 0.9; 73 % of the belt texels sat on the 0.08 floor, so the BC gain is larger than the ratio)",
+             "why": "UE i2: the belt is off the concept on the reading exposure (-1 EV: Y 0.76, sat +0.185) and on the board (Y 0.92, sat +0.127) - a saturated baked BC below the class floor; the LUT has no saturation lever. Predicted after: -1 EV Y 0.91 / sat +0.03 / hue -0.6, board Y 1.09 / sat -0.03 (both in tolerance), other zones unchanged (reports/ld-5cb0-ue-feedback.json)"},
+    "note": "per zone gain on the concept-tone BC (lookdev_tone.fit, blurred zone weights, after the dielectric gains): the UE frames are the reference of the final look, the Blender studio_env fit only the first step"
    }
   },
   "concept_zones": {

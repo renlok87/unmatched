@@ -13,6 +13,8 @@
 #include "Engine/StaticMesh.h"
 #include "Engine/Texture2D.h"
 #include "Components/TextRenderComponent.h"
+#include "Animation/AnimSequenceBase.h"
+#include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
 #include "Materials/MaterialInterface.h"
 #include "Materials/MaterialInstance.h"
@@ -208,21 +210,36 @@ bool AS08FighterActor::LoadTeamRingAssets() {
 void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
                                     const FVector& CellCenter, bool bOwn,
                                     bool bArtPreview) {
+  // Wave 5c-B: a v2 figure that was alive plays DeathSettle on the spot and holds the final pose
+  // (DeathHoldSeconds) before the usual hide; the defeated fighter's cell (X = -1) is not used.
+  const bool bWasAlive = bHasApplied && Fighter.IsAlive();
+  bHasApplied = true;
   Fighter = InFighter;
+  if (bHeroV2Visual && !Fighter.IsAlive() && (bWasAlive || bDeathHold)) {
+    if (!bDeathHold && !bDeathDone) BeginHeroDeath();
+    if (bDeathHold) return;
+  }
   SetActorLocation(CellCenter);
 
   bool bVisualArt = false;
   bool bVisualBlockout = false;
+  // Wave 5c-B -ArtPreviewHeroesV2: the look-dev C figure replaces the Medusa candidate / ART-003 blockout of a
+  // mapped fighter; a missing asset falls back to the legacy path (traced). Without the flag V2Spec is null.
+  const S08HeroesV2::FHeroSpec* V2Spec =
+      S08HeroesV2::Find(bArtPreview, S08HeroesV2::FlagEnabled(), Fighter.Name);
+  USkeletalMesh* V2Mesh = nullptr;
+  const bool bHeroV2 = V2Spec && ApplyHeroV2(*V2Spec, CellCenter, V2Mesh);
   // The candidate is a Medusa sculpt, not a substitute for Arthur, Merlin or
   // the three Harpies. Keep their honest grey blockouts in this pilot - except
   // in the opt-in -ArtPreviewAllMedusa review (ART-004 T2.2): six copies of
   // the candidate with the team MI and the hero/sidekick scale, so the art
   // review sees six sculpts in one live frame. Never a production mapping.
   const bool bAllMedusa = S08ArtPreviewAllMedusa();
-  const bool bMedusaCandidate = S08IsMedusaCandidateFighter(
+  const bool bMedusaCandidate = !bHeroV2 && S08IsMedusaCandidateFighter(
       bArtPreview, bAllMedusa, Fighter.bIsHero, Fighter.Name);
-  USkeletalMesh* CandidateMesh = nullptr;
+  USkeletalMesh* CandidateMesh = bHeroV2 ? V2Mesh : nullptr;
   UStaticMesh* BlockoutMesh = nullptr;
+  if (bHeroV2) bVisualArt = true;
   if (bMedusaCandidate) {
     const FS08MedusaCandidate MedusaCandidate = S08SelectMedusaCandidate();
     USkeletalMesh* Mesh = MedusaCandidate.MeshPath
@@ -270,7 +287,7 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
       }
     }
   }
-  if (bArtPreview && !bMedusaCandidate) {
+  if (bArtPreview && !bMedusaCandidate && !bHeroV2) {
     const TCHAR* MeshPath = nullptr;
     if (Fighter.Name.Equals(TEXT("King Arthur"), ESearchCase::IgnoreCase)) {
       MeshPath = TEXT("/Game/ArtTests/ART003/Meshes/SM_ART003_Arthur");
@@ -295,7 +312,8 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
   ArtBase->SetVisibility(bVisualArt);
   ArtPlaceholder->SetVisibility(bVisualBlockout);
   bArtFigureVisible = bArtFigure;
-  bMedusaVisual = bVisualArt;
+  bMedusaVisual = bVisualArt && !bHeroV2;
+  bHeroV2Visual = bHeroV2;
   bBlockoutVisible = bVisualBlockout;
 
   // ART-004 T2.2 click volume. The hidden grey Body box (60x60x120 uu for a
@@ -303,7 +321,7 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
   // figure gets a capsule sized from its own mesh bounds instead, and the
   // hidden box stops blocking. The candidate skeletal meshes have no physics
   // asset (checked and traced), so the capsule is the click contract.
-  const float ArtScale = Fighter.bIsHero ? 1.0f : 0.78f;
+  const float ArtScale = bHeroV2 ? HeroV2Scale : (Fighter.bIsHero ? 1.0f : 0.78f);
   if (bArtFigure) {
     const FBoxSphereBounds MeshBounds = CandidateMesh ? CandidateMesh->GetBounds()
         : (BlockoutMesh ? BlockoutMesh->GetBounds()
@@ -460,9 +478,156 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
 
   ApplyLabelVisibility();
 
-  // Death (isDefeated/health<=0): instant hide, no animations (grey slice).
+  // Death (isDefeated/health<=0): instant hide, no animations (grey slice). A v2 figure first plays
+  // DeathSettle (early return above) and reaches this line after its hold.
   SetActorHiddenInGame(!Fighter.IsAlive());
   SetActorEnableCollision(Fighter.IsAlive());
+  if (bHeroV2 && Fighter.IsAlive()) {
+    const S08HeroesV2::FClipChoice Choice = S08HeroesV2::NextClip(HeroClip, S08HeroesV2::EEvent::Spawn);
+    if (Choice.bRestart) PlayHeroClip(Choice.Clip, S08HeroesV2::EEvent::Spawn, -1);
+  }
+}
+
+bool AS08FighterActor::ApplyHeroV2(const S08HeroesV2::FHeroSpec& Spec, const FVector& CellCenter,
+                                   USkeletalMesh*& OutMesh) {
+  using namespace S08HeroesV2;
+  OutMesh = nullptr;
+  const FString MeshPathV2 = MeshPath(Spec);
+  const FString PedestalPathV2 = PedestalPath(Spec);
+  const FString BodyMiPath = BodyMaterialPath(Spec, Look);
+  const FString BaseMiPath = PedestalMaterialPath(Spec, Look);
+  USkeletalMesh* Mesh = LoadObject<USkeletalMesh>(nullptr, *MeshPathV2);
+  UStaticMesh* Pedestal = LoadObject<UStaticMesh>(nullptr, *PedestalPathV2);
+  UMaterialInterface* BodyMi = LoadObject<UMaterialInterface>(nullptr, *BodyMiPath);
+  UMaterialInterface* BaseMi = LoadObject<UMaterialInterface>(nullptr, *BaseMiPath);
+  FString Missing;
+  if (!Mesh || !Mesh->GetSkeleton()) Missing = MeshPathV2;
+  else if (!Pedestal) Missing = PedestalPathV2;
+  else if (!BodyMi) Missing = BodyMiPath;
+  else if (!BaseMi) Missing = BaseMiPath;
+  if (HeroClips.Num() != ClipCount) HeroClips.SetNum(ClipCount);
+  int32 ClipsLoaded = 0;
+  if (Missing.IsEmpty()) {
+    for (const EClip Clip : {EClip::Idle, EClip::LungeAttack, EClip::HitReact, EClip::DeathSettle}) {
+      TObjectPtr<UAnimSequenceBase>& Slot = HeroClips[static_cast<int32>(Clip)];
+      if (!Slot) Slot = LoadObject<UAnimSequenceBase>(nullptr, *ClipPath(Spec, Clip));
+      // A clip on another skeleton would not pose this mesh: dropped (traced as missing when it is Idle).
+      if (Slot && Slot->GetSkeleton() != Mesh->GetSkeleton()) Slot = nullptr;
+      if (Slot) ++ClipsLoaded;
+    }
+    if (!HeroClips[static_cast<int32>(EClip::Idle)]) Missing = ClipPath(Spec, EClip::Idle);
+  }
+  if (!Missing.IsEmpty()) {
+    const FString Key = TEXT("missing|") + Missing;
+    if (Key != HeroV2TraceKey) {
+      HeroV2TraceKey = Key;
+      FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW heroesV2 fighter=%s missing=%s fallback=legacy"),
+                                       *Fighter.Id, *Missing));
+    }
+    HeroV2Spec = nullptr;
+    return false;
+  }
+  HeroV2Spec = &Spec;
+  HeroV2Yaw = FigureYawDeg(CellCenter.Y);
+  HeroV2Scale = FigureScale(Spec);
+  if (ArtBody->GetSkeletalMeshAsset() != Mesh) {
+    ArtBody->SetSkeletalMeshAsset(Mesh);
+    HeroClip = EClip::None;  // a new mesh starts its Idle again
+  }
+  ArtBase->SetStaticMesh(Pedestal);
+  for (int32 Slot = 0; Slot < ArtBody->GetNumMaterials(); ++Slot) ArtBody->SetMaterial(Slot, BodyMi);
+  for (int32 Slot = 0; Slot < ArtBase->GetNumMaterials(); ++Slot) ArtBase->SetMaterial(Slot, BaseMi);
+  // Rig v2 faces +X: the legacy 0/180 yaw plus FacingYawOffsetDeg keeps the legacy world facing (+Y / -Y).
+  ArtBody->SetRelativeRotation(FRotator(0.0f, HeroV2Yaw, 0.0f));
+  ArtBase->SetRelativeRotation(FRotator(0.0f, HeroV2Yaw, 0.0f));
+  ArtBody->SetRelativeScale3D(FVector(HeroV2Scale));
+  ArtBase->SetRelativeScale3D(FVector(HeroV2Scale));
+  OutMesh = Mesh;
+  const FString Key = FString::Printf(TEXT("%s|%s|%s|%.1f|%.4f"), *MeshPathV2, *BodyMiPath, *BaseMiPath, HeroV2Yaw,
+                                      HeroV2Scale);
+  if (Key != HeroV2TraceKey) {
+    HeroV2TraceKey = Key;
+    const FBoxSphereBounds Bounds = Mesh->GetBounds();
+    FS08Trace::Write(FString::Printf(
+        TEXT("ARTPREVIEW heroesV2 fighter=%s mesh=%s mi=%s yaw=%.1f scale=%.4f name=%s hero=%d look=%s base=%s baseMi=%s skeleton=%s clips=%d/4 boundsTop=%.2f figureTop=%.2f budget=%.1f"),
+        *Fighter.Id, *MeshPathV2, *BodyMiPath, HeroV2Yaw, HeroV2Scale, *Fighter.Name, Fighter.bIsHero ? 1 : 0,
+        S08TeamSlotName(Look), *PedestalPathV2, *BaseMiPath, *Mesh->GetSkeleton()->GetPathName(), ClipsLoaded,
+        static_cast<float>(Bounds.Origin.Z + Bounds.BoxExtent.Z) * HeroV2Scale, Spec.FigureTopUU * HeroV2Scale,
+        Spec.BudgetUU));
+  }
+  return true;
+}
+
+void AS08FighterActor::NotifyHeroAnimEvent(S08HeroesV2::EEvent Event, int32 Seq) {
+  if (!bHeroV2Visual) return;
+  const S08HeroesV2::FClipChoice Choice = S08HeroesV2::NextClip(HeroClip, Event);
+  if (Choice.bRestart) PlayHeroClip(Choice.Clip, Event, Seq);
+}
+
+void AS08FighterActor::PlayHeroClip(S08HeroesV2::EClip Clip, S08HeroesV2::EEvent Event, int32 Seq) {
+  using namespace S08HeroesV2;
+  UAnimSequenceBase* Anim = HeroClips.IsValidIndex(static_cast<int32>(Clip))
+      ? HeroClips[static_cast<int32>(Clip)].Get() : nullptr;
+  if (!Anim) {
+    FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW anim fighter=%s clip=%s missing=1 event=%s seq=%d"),
+                                     *Fighter.Id, ClipName(Clip), EventName(Event), Seq));
+    return;
+  }
+  const bool bLoop = ClipLoops(Clip);
+  const float Len = Anim->GetPlayLength();
+  const float Phase = Clip == EClip::Idle ? IdlePhase(Fighter.Id) : 0.0f;
+  ArtBody->PlayAnimation(Anim, bLoop);
+  if (Phase > 0.0f) ArtBody->SetPosition(Phase * Len, false);
+  HeroClip = Clip;
+  if (UWorld* World = GetWorld()) {
+    FTimerManager& Timers = World->GetTimerManager();
+    Timers.ClearTimer(HeroClipTimer);
+    if (Clip == EClip::LungeAttack || Clip == EClip::HitReact) {
+      Timers.SetTimer(HeroClipTimer, this, &AS08FighterActor::OnHeroClipFinished, FMath::Max(Len, 0.05f), false);
+    }
+  }
+  FS08Trace::Write(FString::Printf(
+      TEXT("ARTPREVIEW anim fighter=%s clip=%s len=%.3f event=%s loop=%d phase=%.4f seq=%d asset=%s"),
+      *Fighter.Id, ClipName(Clip), Len, EventName(Event), bLoop ? 1 : 0, Phase, Seq, *Anim->GetName()));
+}
+
+void AS08FighterActor::OnHeroClipFinished() {
+  NotifyHeroAnimEvent(S08HeroesV2::EEvent::ClipFinished, -1);
+}
+
+void AS08FighterActor::BeginHeroDeath() {
+  using namespace S08HeroesV2;
+  // The figure stays where it fell: labels, selection / combat markers and the click volume go at once;
+  // the pedestal and the team ring stay under the settling figure until the hold ends.
+  bDeathHold = true;
+  SetActorEnableCollision(false);
+  bIsSelected = false;
+  bIsCombatAttacker = false;
+  bIsCombatTarget = false;
+  Label->SetVisibility(false);
+  HpLabel->SetVisibility(false);
+  Ring->SetVisibility(false);
+  TargetRing->SetVisibility(false);
+  TargetIcon->SetVisibility(false);
+  NotifyHeroAnimEvent(EEvent::Defeated, -1);
+  const UAnimSequenceBase* Anim = HeroClips.IsValidIndex(static_cast<int32>(EClip::DeathSettle))
+      ? HeroClips[static_cast<int32>(EClip::DeathSettle)].Get() : nullptr;
+  const float Hold = (Anim ? Anim->GetPlayLength() : 0.0f) + DeathHoldSeconds;
+  if (UWorld* World = GetWorld()) {
+    World->GetTimerManager().SetTimer(DeathHideTimer, this, &AS08FighterActor::OnDeathHoldFinished, Hold, false);
+  }
+  FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW anim fighter=%s death hold=%.3f"), *Fighter.Id, Hold));
+}
+
+void AS08FighterActor::OnDeathHoldFinished() {
+  bDeathHold = false;
+  bDeathDone = true;
+  if (!Fighter.IsAlive()) {
+    SetActorHiddenInGame(true);
+    SetActorEnableCollision(false);
+  }
+  FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW anim fighter=%s death hidden=%d"), *Fighter.Id,
+                                   Fighter.IsAlive() ? 0 : 1));
 }
 
 void AS08FighterActor::SetScreenIconMode(bool bScreen) {
@@ -472,10 +637,10 @@ void AS08FighterActor::SetScreenIconMode(bool bScreen) {
 }
 
 void AS08FighterActor::SetSelected(bool bSelected) {
-  bIsSelected = bSelected;
+  bIsSelected = bSelected && !bDeathHold;
   LastLabelRatio = -1.0f;
-  Ring->SetVisibility(bSelected || (bArtSelectionRingLoaded && bIsCombatAttacker));
-  if (bSelected && bArtSelectionRingLoaded) {
+  Ring->SetVisibility(bIsSelected || (bArtSelectionRingLoaded && bIsCombatAttacker));
+  if (bIsSelected && bArtSelectionRingLoaded) {
     FS08Trace::Write(FString::Printf(
         TEXT("ARTPREVIEW selection ring shown fighter=%s mesh=%s"),
         *Fighter.Name, *Ring->GetStaticMesh()->GetName()));
@@ -537,7 +702,7 @@ void AS08FighterActor::SetWorldLabelsSuppressed(bool bSuppressed) {
 }
 
 void AS08FighterActor::ApplyLabelVisibility() {
-  if (bWorldLabelsSuppressed) {
+  if (bWorldLabelsSuppressed || bDeathHold) {
     Label->SetVisibility(false);
     HpLabel->SetVisibility(false);
     return;

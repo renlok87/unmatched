@@ -10,7 +10,11 @@ Input: the state cache of ld_state (H2.2 rebuilt byte-exact), work/lookdev/uv1-t
    bands of the parts in team_accent.strip.parts (rev. 2: the cloak only, the tabard stays red; 3D distance to a band
    texel whose normal agrees) + the belt; per-part checks that the cloak and the tabard stay red; soft edge
    (normalised Gaussian inside the coverage, atlas fill), multiplied by the dye-allowed zones (never on metal, skin,
-   the embroidery, hair or stone); 3D area share measured with the texel area of the POS bake;
+   the embroidery, hair or stone); 3D area share measured with the texel area of the POS bake.
+   rev. 3 (5c-B0, strip.mode "piping"): the border envelope (bands + the red between the braid threads) is never
+   dyed, the accent is a piping of the red cloth outside it (gap_m .. gap_m + width_m); check team_accent_mip_chain
+   measures the painted share of the border / the cloak field / the other zones on the mips of the 2K mask
+   (lookdev_accent_mips.py);
 4. EdgeMask: convexity of the baked tangent normal (as Merlin, island-aware derivatives);
 5. BC / ORM of the look-dev set: the H2.2 maps, except the cloth group (cloak, tabard) whose embroidery is no longer
    metal: BC = the painted colour there (the H2.2 F0-mapped gold is dropped), ORM.B = 0. N and TeamMask = H2.2
@@ -31,6 +35,7 @@ from scipy import ndimage
 from scipy.spatial import cKDTree
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import lookdev_accent_mips as AM  # noqa: E402
 import lookdev_emul as E  # noqa: E402
 import lookdev_state as S  # noqa: E402
 import materials as M  # noqa: E402
@@ -150,9 +155,30 @@ def uv1_raster(tri_npz, size, cov):
     return uv1.astype(np.float32), info
 
 
+def disk(r):
+    y, x = np.mgrid[-r:r + 1, -r:r + 1]
+    return x * x + y * y <= r * r
+
+
+def border_envelope(band, parts_cov, radius_px, hole_max_px):
+    """The gold border as a whole (5c-B0): the braid bands + the red cloth between their threads = morphological
+    closing of the band texels (disk radius_px, 4K) inside the part, small enclosed holes filled."""
+    env = (ndimage.binary_closing(band, structure=disk(int(radius_px))) & parts_cov) | band
+    holes = ndimage.binary_fill_holes(env) & ~env
+    hl, _hn = ndimage.label(holes)
+    hs = np.bincount(hl.ravel())
+    hs[0] = 0
+    return env | (holes & (hs[hl] < int(hole_max_px)))
+
+
 def team_accent(st, z, zc, tcfg, area, scale):
+    """mode "strip" (rev. 1-2): red cloth within width_m of a border band texel (the red between the braid threads
+    included). mode "piping" (rev. 3, 5c-B0): the border envelope (bands + the red between the threads) is never dyed;
+    the accent is a piping of the red cloth OUTSIDE the envelope, between gap_m and gap_m + width_m (3D distance to an
+    envelope texel with an agreeing normal), so the mip chain does not mix the team colour into the gold border."""
     names, pid, cov, pos = st["names"], st["pid"], st["covered"], st["pos"]
     sc = tcfg["strip"]
+    mode = sc.get("mode", "strip")
     parts = np.isin(pid, [names.index(p) + 1 for p in sc["parts"]])
     m = st["metal"]
     emb = parts & cov & (m >= 0.5)
@@ -161,15 +187,29 @@ def team_accent(st, z, zc, tcfg, area, scale):
     sizes[0] = 0
     band = sizes[lab] >= int(sc["band_component_min_texels"])
     _t, _b, nrm = T.pos_frames(pos)
-    tree = cKDTree(pos[band])
-    bn = nrm[band]
+    env = None
+    if mode == "piping":
+        ec = sc["envelope"]
+        env = border_envelope(band, parts & cov, ec["closing_radius_px_4k"], ec["hole_max_px_4k"])
+        ref = env
+    else:
+        ref = band
+    tree = cKDTree(pos[ref])
+    bn = nrm[ref]
     cand = parts & cov & (z["cloth"] > 0)
+    if env is not None:
+        cand &= ~env
     d, j = tree.query(pos[cand], k=1)
     agree = (nrm[cand] * bn[j]).sum(-1) >= float(sc["normal_agree_min"])
     w_t = float(sc["width_m"]) / scale
     f_t = float(sc["feather_m"]) / scale
     strip = np.zeros(pid.shape, np.float32)
-    strip[cand] = (smoothstep((w_t - d) / f_t) * agree * st["red"][cand] * z["cloth"][cand]).astype(np.float32)
+    if mode == "piping":
+        g_t = float(sc["gap_m"]) / scale
+        prof = smoothstep((d - g_t) / f_t + 0.5) * smoothstep((g_t + w_t - d) / f_t + 0.5)
+    else:
+        prof = smoothstep((w_t - d) / f_t)
+    strip[cand] = (prof * agree * st["red"][cand] * z["cloth"][cand]).astype(np.float32)
     belt = z[tcfg["belt"]["zone"]]
     raw = np.maximum(strip, belt) * cov
     sig = float(tcfg["blur_sigma_px"])
@@ -178,10 +218,12 @@ def team_accent(st, z, zc, tcfg, area, scale):
     soft = np.where(cov, num / np.maximum(den, 1e-6), 0.0).astype(np.float32)
     soft = T.nearest_fill(soft, cov)
     allowed = z["cloth"] + z["belt"]     # the lining (collar, gems) is wool too, but stays out of the accent
+    if env is not None:
+        allowed = allowed * ~env          # the soft edge never reaches into the gold border
     acc = np.clip(soft * allowed, 0, 1).astype(np.float32)
     fig = cov & (pid != names.index("tripo_part_4") + 1)
     fa = float(area[fig].sum())
-    info = {"band_texels_4k": int(band.sum()), "band_components": int((np.bincount(lab[band]) > 0).sum()),
+    info = {"mode": mode, "band_texels_4k": int(band.sum()), "band_components": int((np.bincount(lab[band]) > 0).sum()),
             "width_m_final": sc["width_m"], "width_m_tripo": P.r(w_t, 5), "seat_scale": scale,
             "share_3d_total": P.r(float((acc * area)[fig].sum()) / fa, 4),
             "share_3d_strip": P.r(float((np.minimum(acc, strip) * area)[fig].sum()) / fa, 4),
@@ -192,7 +234,55 @@ def team_accent(st, z, zc, tcfg, area, scale):
             "area_method": "texel area = |dPOS/drow x dPOS/dcol| of the POS bake (Tripo frame; ratio, so the frame "
                            "scale cancels), clipped at 8 x median against island-edge jumps; figure = body + sword, "
                            "without the base part"}
-    return acc, strip, belt, info
+    if env is not None:
+        info.update({"gap_m_final": sc["gap_m"], "envelope_texels_4k": int(env.sum()),
+                     "envelope_red_between_threads_texels_4k": int((env & ~band).sum()),
+                     "envelope_accent_max_8bit": int(T.q8(acc)[env].max()) if env.any() else 0,
+                     "envelope_share_3d": P.r(float(area[env & fig].sum()) / fa, 4)})
+    return acc, strip, belt, info, env
+
+
+def accent_mip_chain(st, z, acc, strip, env, area, mc, rp):
+    """Classes at 2K (box of the 4K masks >= 0.5): border = the envelope of the cloak's gold borders, field = the red
+    cloth of the cloak outside it, tabard = the red cloth of the tabard, other = every other covered texel except the
+    accent's own classes (the belt, the cloak field). The runtime mask = the 8-bit 2K PNG."""
+    names, pid, cov = st["names"], st["pid"], st["covered"]
+    b2 = T.box2
+    cloak = (pid == names.index(rp["cloak"]) + 1) & cov
+    tabard = (pid == names.index(rp["tabard"]) + 1) & cov
+    cls = {"border": b2(env.astype(np.float32)) >= 0.5,
+           "field": b2((cloak & ~env & (z["cloth"] > 0.5)).astype(np.float32)) >= 0.5,
+           "tabard": b2((tabard & (z["cloth"] > 0.5)).astype(np.float32)) >= 0.5}
+    cov2 = b2(cov.astype(np.float32)) >= 0.5
+    cls["other"] = cov2 & ~cls["border"] & ~cls["field"] & (b2(z["belt"]) < 0.5) & (b2((cloak & (z["cloth"] > 0)).astype(np.float32)) < 0.5)
+    w2 = b2(area) * 4
+    core = b2((strip >= 0.99).astype(np.float32)) >= 0.99
+    mask2 = T.q8(b2(acc)).astype(np.float64) / 255.0
+    thr = float(mc["threshold"])
+    rows = AM.painted_shares(mask2, cls, w2, levels=int(mc["levels"]), threshold=thr, core=core)
+    cr = mc["criteria"]
+    lo_m, hi_m = cr["mips"]
+    worst = {}
+    ok = True
+    for kind, rr in rows.items():
+        for row in rr:
+            if not lo_m <= row["mip"] <= hi_m:
+                continue
+            for name, lim in (("border", cr["border_max"]), ("field", cr["field_max"]), ("tabard", cr["other_max"]),
+                              ("other", cr["other_max"])):
+                worst[name] = max(worst.get(name, 0.0), row[name])
+                ok &= row[name] <= lim
+            if row["mip"] <= cr["core_mips_max"]:
+                worst["core_median_min"] = min(worst.get("core_median_min", 1.0), row["accent_core_median"])
+                ok &= row["accent_core_median"] >= cr["core_median_min"]
+    tex_m = float(np.median(np.sqrt(area[cloak]))) * float(mc["seat_scale"]) * (st["size"] / 2048.0)
+    vis = {k: AM.visible_mips(tex_m, v["figure_px_per_m"], v["pitch_deg"]) for k, v in mc["views"].items()}
+    return {"threshold": thr, "classes_2k_texels": {k: int(v.sum()) for k, v in cls.items()},
+            "cloak_texel_2k_mm": P.r(tex_m * 1e3, 3), "visible_mips_by_view": vis, "rows": rows,
+            "criteria_result": {"passed": bool(ok), "worst": {k: P.r(v, 4) for k, v in worst.items()}},
+            "method": "runtime mask = the 8-bit 2K PNG; mips from it as UE builds them (2 x 2 box = TMGS_SimpleAverage, "
+                      "or a Kaiser-windowed sinc); value of a 2K texel at mip L = bilinear sample of mip L at its UV; "
+                      "painted = value >= threshold; shares weighted by the 3D texel area (lookdev_accent_mips.py)"}
 
 
 def main():
@@ -247,7 +337,7 @@ def main():
     area[~cov] = 0
     area = np.minimum(area, float(np.median(area[cov])) * 8)
     tcfg = ld["team_accent"]
-    acc, strip, belt, acc_info = team_accent(st, z, zc, tcfg, area, scale)
+    acc, strip, belt, acc_info, env = team_accent(st, z, zc, tcfg, area, scale)
     lo, hi = tcfg["area_share_range"]
     check(checks, "team_accent_area_share", lo <= acc_info["share_3d_total"] <= hi,
           {k: acc_info[k] for k in ("share_3d_total", "share_3d_strip", "share_3d_belt")}, [lo, hi],
@@ -271,6 +361,14 @@ def main():
               "<= %s of the red cloth core texels of the %s carry the accent" % (rp["max_core_share"], role),
               "the %s stays red (the accent is only a strip / the belt)" % role)
     acc_info["red_core_share_by_part"] = {k: P.r(v, 4) for k, v in part_core.items()}
+    # the mip chain (5c-B0): what the board frames read from the 2K mask, per class, on every visible mip
+    mc = tcfg.get("mip_chain")
+    if mc is not None and env is not None:
+        acc_info["mip_chain"] = accent_mip_chain(st, z, acc, strip, env, area, mc, rp)
+        crit = acc_info["mip_chain"]["criteria_result"]
+        check(checks, "team_accent_mip_chain", crit["passed"], crit["worst"], mc["criteria"],
+              "painted share (mip value >= %s) of the gold border / the cloak field / every other zone on the visible "
+              "mips %s, box and Kaiser mips of the 2K mask" % (mc["threshold"], mc["criteria"]["mips"]))
     # ---------------------------------------------------------------- EdgeMask, UV1
     edge, edge_info = edge_mask(st["normal_enc"], st["isl"], cov)
     uv1, uv1_info = uv1_raster(paths["work"] / "lookdev" / "uv1-triangles.npz", size, cov)

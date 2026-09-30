@@ -186,6 +186,16 @@ def main():
         gains[z] = [float(x) for x in g]
         per_zone[z]["gain"] = C.rv(g, 3)
     C.check(checks, "exposure_k_from_zones", len(lum_ratios) >= 6, {"k": C.r(k, 4), "zones": len(lum_ratios)}, ">= 6 zones")
+    # 5c-B0 (2026-09-30): UE feedback gains (profile lookdev.tone.ue_feedback), fitted on the UE look-dev C frames
+    # against the concept (tools/art/material_library/ue_bc_feedback.py): multiplied onto the concept-tone gain
+    fb = tone.get("ue_feedback") or {}
+    fb_gain = fb.get("gain")
+    for z in fb.get("zones", []) if fb_gain else []:
+        g = np.asarray(gains[z], np.float64) * np.asarray(fb_gain, np.float64)
+        gains[z] = [round(float(x), 4) for x in g]
+        per_zone[z]["gain_before_ue_feedback"] = per_zone[z].get("gain")
+        per_zone[z]["gain"] = C.rv(g, 4)
+        per_zone[z]["ue_feedback_gain"] = C.rv(np.asarray(fb_gain), 4)
     # ---------------------------------------------------------------- BC
     stt = np.load(prof.work / "lookdev" / "state.npz")
     zone_id = stt["zone_id"]

@@ -43,6 +43,12 @@
    "dielectric_clamp": "shader",
    "dielectric_clamp_note": "clamp(Y, lo, hi) of the v2 core applied in the texture (not the Medusa toe): measured 2026-09-29, the toe lifted every feather texel below Y 0.04 (41 % of the feathers) and the Cobble K2 dark share of the body fell from 17 % (H3) to 11 % against 34 % of the concept; the hard clamp moves only the texels below the albedo floor 0.02"
   },
+  "ue_feedback": {
+   "dark_primaries": {"gain": [0.63, 0.8686, 0.8948],
+                      "source": "5c-B0 (2026-09-30): UE look-dev C frames i3 (art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/review/i3, UE LUT i3: feathers luminance [0.02, 0.7], maxChannel 0.9) against the concept; tools/art/material_library/ue_bc_feedback.py fit (zone dark, pixels = the value gate v <= 0.45 of the zone AND sat < 0.38 on the board frame: the dark primaries without the shaded rufous coverts the gate also takes, sat 0.4-0.7; keep-luma fit (0.862, 1.1607, 1.2304) scaled x 0.9 -> ratio of the effective albedo (0.7758, 1.0446, 1.1074), the scale that keeps every other zone's verdict (the exposure k moves with the dark zone, a key zone)); gain = ue_bc_feedback.py gain on the 2K BC of the feather class under the H3 dark-primary mask (T_Harpy_H3LD_TeamMask, deprecated W4-B mask), 31 % of those texels on the 0.02 floor",
+                      "why": "UE i3: the dark primaries read brown-rust (sat +0.16 on the reading exposure -1 EV, +0.12 on the board), the concept is near grey (50 45 43, sat 0.14); rufous coverts and dark primaries share the feathers class, so the LUT has no separate lever. Predicted after: -1 EV Y 1.06 / sat +0.02 / hue within (in tolerance), board Y 1.23 / sat +0.005 (luminance = board light, as before 1.24); rufous feathers, skin, gold, claws keep their verdicts (reports/ld-5cb0-ue-feedback.json)"},
+   "note": "BC gain of the H3 dark-primary mask texels of the feather class (lookdev_maps.py, before the class luminance clamp)"
+  },
   "team_accent": {
    "wing_parts": ["tripo_part_0", "tripo_part_1", "tripo_part_3", "tripo_part_7"],
    "dark_mask": "the W4-B TeamMask of H3 (dark flight feathers, v <= 0.22, ramp 0.05, blur 3 x 3)",

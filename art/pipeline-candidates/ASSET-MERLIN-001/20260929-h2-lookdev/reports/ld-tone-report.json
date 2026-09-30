@@ -52,15 +52,15 @@
   },
   "beard_wrap": {
    "after": {
-    "hue_deg": 20.9,
+    "hue_deg": 21.7,
     "linear": [
-     0.09324,
-     0.03608,
-     0.01752
+     0.11352,
+     0.0373,
+     0.01407
     ],
-    "luma_Y": 0.04689,
-    "sat": 0.5834,
-    "value": 0.3376
+    "luma_Y": 0.05182,
+    "sat": 0.6671,
+    "value": 0.3711
    },
    "before": {
     "hue_deg": 21.5,
@@ -77,15 +77,15 @@
   },
   "belt": {
    "after": {
-    "hue_deg": 22.1,
+    "hue_deg": 22.6,
     "linear": [
-     0.1107,
-     0.04462,
-     0.02104
+     0.13486,
+     0.04612,
+     0.01699
     ],
-    "luma_Y": 0.05697,
-    "sat": 0.5743,
-    "value": 0.3667
+    "luma_Y": 0.06288,
+    "sat": 0.6572,
+    "value": 0.4028
    },
    "before": {
     "hue_deg": 22.6,
@@ -102,15 +102,15 @@
   },
   "boots": {
    "after": {
-    "hue_deg": 21.2,
+    "hue_deg": 22.7,
     "linear": [
-     0.0579,
-     0.02773,
-     0.0164
+     0.07057,
+     0.02867,
+     0.01317
     ],
-    "luma_Y": 0.03333,
-    "sat": 0.4929,
-    "value": 0.2669
+    "luma_Y": 0.03646,
+    "sat": 0.5971,
+    "value": 0.2946
    },
    "before": {
     "hue_deg": 25.0,
@@ -129,13 +129,13 @@
    "after": {
     "hue_deg": 22.9,
     "linear": [
-     0.27812,
+     0.27911,
      0.15667,
-     0.10099
+     0.10085
     ],
-    "luma_Y": 0.17847,
-    "sat": 0.3779,
-    "value": 0.564
+    "luma_Y": 0.17867,
+    "sat": 0.3793,
+    "value": 0.5649
    },
    "before": {
     "hue_deg": 23.0,
@@ -181,7 +181,7 @@
     "linear": [
      0.29619,
      0.1592,
-     0.07468
+     0.07467
     ],
     "luma_Y": 0.18222,
     "sat": 0.4782,
@@ -403,19 +403,19 @@
    1.32
   ],
   "beard_wrap": [
-   0.95,
-   0.71,
-   0.55
+   1.158,
+   0.734,
+   0.442
   ],
   "belt": [
-   1.21,
-   0.96,
-   0.76
+   1.475,
+   0.992,
+   0.61
   ],
   "boots": [
-   0.86,
-   0.71,
-   0.68
+   1.048,
+   0.734,
+   0.546
   ],
   "buckle": [
    1.0,
@@ -455,7 +455,7 @@
  },
  "lut": {
   "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_MatLUT.exr",
-  "sha256": "87882ed6dcac1c855e12c2b1fb17dfabd8525fa7ba1c00ca64fceabab8e2f514"
+  "sha256": "c3f8f5668e2b241767f6d6cabf19897dc708ef31bdbce5b76f5cac35ccfc1553"
  },
  "method": "gain_zone = chroma x luma: chroma = (concept / render zone median per linear channel) normalised to keep the zone's luminance, luma = zone luminance ratio / k (k = median over zones: the concept's exposure is unknown), clamped; render = the H2.1 model in the same Blender studio light and the concept framing (ortho front/right/back), zone pixels from an ID pass of the same camera; per zone the median over the views that see it",
  "passed": true,
@@ -464,24 +464,24 @@
  "stage": "ld_tone",
  "textures": {
   "BC_2K": {
-   "bytes": 4884244,
+   "bytes": 4888196,
    "mode": "RGB",
    "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_BC_2K.png",
    "px": [
     2048,
     2048
    ],
-   "sha256": "935726e64dff7a4704a2edf125de7ed55b8813dba9947a65b5987f6caaed3d16"
+   "sha256": "a99630dcb69e153cdf1a8ab37c94fb4a14eb341ab32c0c2f5fd5247d47e3db77"
   },
   "BC_4K": {
-   "bytes": 14527250,
+   "bytes": 14539727,
    "mode": "RGB",
    "path": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-lookdev/textures/T_Merlin_H2LD_BC_4K.png",
    "px": [
     4096,
     4096
    ],
-   "sha256": "e13c59f44bed6b7141b05af8130b8d4fd7871487465f8e76d7220fdddd0656dc"
+   "sha256": "cfee364c6c2a378a335d20c1440d024fc5480db7396da22b7a7d0541b8487a9d"
   }
  },
  "zones": {
@@ -685,6 +685,11 @@
     0.6957
    ],
    "gain": [
+    1.1581,
+    0.734,
+    0.4417
+   ],
+   "gain_before_ue_feedback": [
     0.95,
     0.71,
     0.55
@@ -699,6 +704,11 @@
     1.0524,
     0.7824,
     0.6038
+   ],
+   "ue_feedback_gain": [
+    1.219,
+    1.0338,
+    0.803
    ],
    "views": {
     "back": {
@@ -758,6 +768,11 @@
     0.74
    ],
    "gain": [
+    1.475,
+    0.9924,
+    0.6103
+   ],
+   "gain_before_ue_feedback": [
     1.21,
     0.96,
     0.76
@@ -773,6 +788,11 @@
     1.3366,
     1.0582,
     0.8411
+   ],
+   "ue_feedback_gain": [
+    1.219,
+    1.0338,
+    0.803
    ],
    "views": {
     "back": {
@@ -854,6 +874,11 @@
     0.9035
    ],
    "gain": [
+    1.0483,
+    0.734,
+    0.546
+   ],
+   "gain_before_ue_feedback": [
     0.86,
     0.71,
     0.68
@@ -870,6 +895,11 @@
     0.7481,
     0.6179,
     0.5918
+   ],
+   "ue_feedback_gain": [
+    1.219,
+    1.0338,
+    0.803
    ],
    "views": {
     "back": {

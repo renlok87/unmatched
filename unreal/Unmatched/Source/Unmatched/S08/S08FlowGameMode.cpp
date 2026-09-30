@@ -498,6 +498,17 @@ void AS08FlowGameMode::TrackCombatResult(const FS08Snapshot& Snapshot,
   const bool bNowCombat =
       Snapshot.Phase == TEXT("COMBAT") || Snapshot.Phase == TEXT("COMBAT_RESOLVE");
   const FS08Snapshot Baseline = PrevApplied; // copy before the bookkeeping
+  if (Decision == ES08SeqDecision::Apply && !bPrevCombat && bNowCombat) bCombatLungeSent = false;
+  // Wave 5c-B: the attacker lunges when the combat resolves (a no-op without -ArtPreviewHeroesV2).
+  if (Decision == ES08SeqDecision::Apply && Snapshot.Phase == TEXT("COMBAT_RESOLVE") && !bCombatLungeSent &&
+      BoardActor) {
+    FS08CombatInfo Resolving;
+    if (FS08Contracts::CombatInfo(Snapshot, Resolving) && !Resolving.AttackerId.IsEmpty()) {
+      bCombatLungeSent = true;
+      BoardActor->NotifyFighterAnimEvent(Resolving.AttackerId, S08HeroesV2::EEvent::Attack,
+                                         Snapshot.SequenceNumber);
+    }
+  }
   if (Decision == ES08SeqDecision::Apply && !bPrevCombat && bNowCombat) {
     CombatStartTargetId.Reset();
     CombatStartTargetHealth = -1;
@@ -528,6 +539,10 @@ void AS08FlowGameMode::TrackCombatResult(const FS08Snapshot& Snapshot,
 
   FS08CombatInfo PrevCombat;
   const bool bHadCombat = FS08Contracts::CombatInfo(Baseline, PrevCombat);
+  if (bHadCombat && !bCombatLungeSent && BoardActor && !PrevCombat.AttackerId.IsEmpty()) {
+    BoardActor->NotifyFighterAnimEvent(PrevCombat.AttackerId, S08HeroesV2::EEvent::Attack, Snapshot.SequenceNumber);
+  }
+  bCombatLungeSent = false;
   if (!bHadCombat) {
     CombatStartTargetId.Reset();
     CombatStartTargetHealth = -1;
@@ -809,6 +824,10 @@ void AS08FlowGameMode::HandleCues(const TArray<FS08Cue>& Cues) {
                              Cue.SequenceNumber);
       if (BoardActor) {
         BoardActor->ShowDamageNumber(Cue.FighterId, Cue.Damage, Cue.SequenceNumber);
+        // Wave 5c-B: HitReact of a v2 figure (a no-op without -ArtPreviewHeroesV2).
+        if (Cue.Damage > 0) {
+          BoardActor->NotifyFighterAnimEvent(Cue.FighterId, S08HeroesV2::EEvent::Damaged, Cue.SequenceNumber);
+        }
         if (BoardActor->IsArtActive() && !bS09ShotDamage &&
             DamageShotAtElapsed < 0.0f && !S09ShotDir.IsEmpty()) {
           DamageShotAtElapsed = Elapsed + 0.2f;
@@ -5886,7 +5905,7 @@ void AS08FlowGameMode::UpdateBoardLabels(bool bActive, const FString& IconTarget
       Mode = ES08TagMode::Compact;
     } else if (F->Id == ArtHud.HoveredFighterId || F->Id == SelectedId) {
       Mode = ES08TagMode::Full;
-    } else if (!Actor || !Actor->HasMedusaCandidate()) {
+    } else if (!Actor || !Actor->HasArtSculpt()) {
       Mode = ES08TagMode::Full;
     }
     const ES08TeamSlot Team = BoardActor->TeamOfFighter(*F);

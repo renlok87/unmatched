@@ -35,6 +35,12 @@ param(
   # hero/sidekick scale) - the six-copies review; asserted as six
   # 'ARTPREVIEW allMedusa copy ... visual=1 mesh=' lines per client.
   [switch]$ArtPreviewAllMedusa,
+  # Wave 5c-B (ArtPreviewBoardId only, not with ArtPreviewAllMedusa): both clients get
+  # -ArtPreviewHeroesV2 - King Arthur, Merlin, Medusa and the three Harpies on the look-dev C
+  # figures (SK_<Hero>_H2LD / SK_Harpy_H3LD, team MI by look, H2Anim clips). Asserted as
+  # 'ARTPREVIEW heroesV2 summary fighters=6 mapped=6 v2=6', six 'ARTPREVIEW heroesV2 fighter=' lines
+  # and an Idle 'ARTPREVIEW anim' line per client, no 'missing=' fallback.
+  [switch]$ArtPreviewHeroesV2,
   # Host-only flag input emulation after its evidence shot ('+'-separated:
   # wheelin, wheelout, space, clickhero, clickabove, clickcell, token*N). Every
   # step is traced 'INPUT ... src=flag'; real OS input is T4.3.
@@ -145,8 +151,11 @@ if ($ArtPreviewBoardId) {
   $ArtBoardLegacy = [bool]$ArtBoard.legacyCobbleTrace
   Write-Output "art board: profile=$($ArtBoard.id) size=$ArtBoardSize light=$($ArtBoard.light) legacyCobble=$ArtBoardLegacy"
 }
-if (($ArtPreviewAllMedusa -or $ArtPreviewInputPlan -or $ArtPreviewIconSize -gt 0 -or $ArtPreviewIconProbe) -and -not $ArtPreviewBoardId) {
-  throw 'ArtPreviewAllMedusa / ArtPreviewInputPlan / ArtPreviewIconSize / ArtPreviewIconProbe require ArtPreviewBoardId'
+if (($ArtPreviewAllMedusa -or $ArtPreviewHeroesV2 -or $ArtPreviewInputPlan -or $ArtPreviewIconSize -gt 0 -or $ArtPreviewIconProbe) -and -not $ArtPreviewBoardId) {
+  throw 'ArtPreviewAllMedusa / ArtPreviewHeroesV2 / ArtPreviewInputPlan / ArtPreviewIconSize / ArtPreviewIconProbe require ArtPreviewBoardId'
+}
+if ($ArtPreviewHeroesV2 -and $ArtPreviewAllMedusa) {
+  throw 'ArtPreviewHeroesV2 and ArtPreviewAllMedusa are separate reviews; pass one of them'
 }
 if ($ArtPreviewInputPlan -and $ArtPreviewInputPlan -notmatch '^[A-Za-z]+(\*[0-9]+)?(\+[A-Za-z]+(\*[0-9]+)?)*$') {
   throw "ArtPreviewInputPlan '$ArtPreviewInputPlan' is not a '+'-separated token list"
@@ -158,6 +167,9 @@ $ExpectedMedusaMesh = @{
   'face-neck-v2' = 'SK_Medusa_FaceNeck_v2Candidate'
   'head-tilt-v3' = 'SK_Medusa_HeadTilt_v3Candidate'
 }[$ArtPreviewMedusaVariant]
+# The live Medusa figure: the isolated candidate, or the look-dev C mesh with -ArtPreviewHeroesV2
+# (the board still loads and traces the candidate as its asset-readiness line).
+$ExpectedFigureMedusaMesh = if ($ArtPreviewHeroesV2) { 'SK_Medusa_H2LD' } else { $ExpectedMedusaMesh }
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 if (-not $Exe) { $Exe = Join-Path $RepoRoot 'unreal\Unmatched\Saved\StagedBuilds\Windows\Unmatched.exe' }
 if (-not $EvidenceDir) { $EvidenceDir = Join-Path $RepoRoot 'docs\game-design\evidence\S08\run' }
@@ -430,6 +442,7 @@ function Invoke-Phase2Demo {
   if ($ArtPreviewMedusaVariant -ne 'face-neck-v2' -or $MedusaVariantExplicit) { $common += "-ArtPreviewMedusaVariant=$ArtPreviewMedusaVariant" }
   if ($ClientPerf) { $common += '-S08Perf' }
   if ($ArtPreviewAllMedusa) { $common += '-ArtPreviewAllMedusa' }
+  if ($ArtPreviewHeroesV2) { $common += '-ArtPreviewHeroesV2' }
   if ($ClientCsvFrames -gt 0) { $common += @("-csvCaptureFrames=$ClientCsvFrames", '-csvGpuStats') }
   $hostArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
     "-S08Auto", "-S08Create",
@@ -629,8 +642,8 @@ function Invoke-Phase2Demo {
       $requestedLabel = if ($MedusaVariantExplicit) { $ArtPreviewMedusaVariant } else { '(default)' }
       foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
         Assert-Trace $pair[1] @("ARTPREVIEW medusa candidate variant=$ArtPreviewMedusaVariant mesh=$ExpectedMedusaMesh requested=$requestedLabel",
-          "visual=1 mesh=$ExpectedMedusaMesh", 'boardValid=1', 'HUD seq=',
-          "SHOT head fighter=", "socket=Head mesh=$ExpectedMedusaMesh") "$($pair[0]) Medusa candidate"
+          "visual=1 mesh=$ExpectedFigureMedusaMesh", 'boardValid=1', 'HUD seq=',
+          "SHOT head fighter=", "socket=Head mesh=$ExpectedFigureMedusaMesh") "$($pair[0]) Medusa candidate"
         if ($ClientPerf) { Assert-Trace $pair[1] @('PERF config', 'PERF summary scope=started') "$($pair[0]) perf" }
         # W4-A: every SHOT carries a RENDER fingerprint; acceptance runs
         # (-RequireRenderReference) also need it on the reference.
@@ -664,6 +677,19 @@ function Invoke-Phase2Demo {
           Assert-Trace $pair[1] @('ARTPREVIEW allMedusa copies=6 visual=6') "$($pair[0]) all-Medusa"
         }
       }
+      if ($ArtPreviewHeroesV2) {
+        foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
+          Assert-Trace $pair[1] @('ARTPREVIEW heroesV2 summary fighters=6 mapped=6 v2=6', 'ARTPREVIEW anim fighter=') "$($pair[0]) heroes v2"
+          $v2 = @(Select-String -LiteralPath $pair[1] -Pattern 'ARTPREVIEW heroesV2 fighter=(\S+) mesh=/Game/PipelineCandidates/\S+ mi=/Game/PipelineCandidates/\S+_P[12] yaw=' |
+            ForEach-Object { $_.Matches[0].Groups[1].Value } | Sort-Object -Unique)
+          if ($v2.Count -ne 6) { throw "$($pair[0]) trace shows $($v2.Count)/6 v2 figures" }
+          $idle = @(Select-String -LiteralPath $pair[1] -Pattern 'ARTPREVIEW anim fighter=(\S+) clip=Idle len=' |
+            ForEach-Object { $_.Matches[0].Groups[1].Value } | Sort-Object -Unique)
+          if ($idle.Count -ne 6) { throw "$($pair[0]) trace shows Idle on $($idle.Count)/6 v2 figures" }
+          $missing = Select-String -LiteralPath $pair[1] -Pattern 'ARTPREVIEW (heroesV2 fighter=\S+ missing=|anim fighter=\S+ clip=\S+ missing=1)' | Select-Object -First 1
+          if ($missing) { throw "$($pair[0]) v2 asset missing in the pak: $($missing.Line)" }
+        }
+      }
       if ($ArtPreviewInputPlan) {
         Assert-Trace $hostTrace @('INPUT plan src=flag steps=', 'INPUT plan done src=flag') 'host input plan'
         $clicks = @(Select-String -LiteralPath $hostTrace -Pattern 'INPUT click button=left src=flag step=(\w+) .* match=(\d)')
@@ -693,7 +719,7 @@ function Invoke-Phase2Demo {
     }
     if ($ArtPreviewBoardId) {
       [System.IO.File]::WriteAllText((Join-Path $Script:Staging 'art-preview-status.json'),
-        (([ordered]@{ boardId = $ArtPreviewBoardId; artBoardProfile = $ArtBoard.id; boardSize = $ArtBoardSize; lightProfile = $ArtBoard.light; artFixture = [bool]$ArtBoard.artFixture; multizoneCells = $ArtBoard.expect.multizoneCells; hostAssetsLoaded = $true; joinerAssetsLoaded = $true; hostLiveZones = $ArtBoard.expect.zoneCells; joinerLiveZones = $ArtBoard.expect.zoneCells; hostFocusZoom = $ArtPreviewFocusZoom; medusaVariant = $ArtPreviewMedusaVariant; medusaVariantExplicit = $MedusaVariantExplicit; shotAfterSeconds = $ArtPreviewShotAfter; runSeconds = $RunSeconds; clientFps = $ClientFps; clientPerf = [bool]$ClientPerf; allMedusa = [bool]$ArtPreviewAllMedusa; inputPlan = $ArtPreviewInputPlan; iconSize = $ArtPreviewIconSize; iconProbe = [bool]$ArtPreviewIconProbe }) | ConvertTo-Json), $Utf8NoBom)
+        (([ordered]@{ boardId = $ArtPreviewBoardId; artBoardProfile = $ArtBoard.id; boardSize = $ArtBoardSize; lightProfile = $ArtBoard.light; artFixture = [bool]$ArtBoard.artFixture; multizoneCells = $ArtBoard.expect.multizoneCells; hostAssetsLoaded = $true; joinerAssetsLoaded = $true; hostLiveZones = $ArtBoard.expect.zoneCells; joinerLiveZones = $ArtBoard.expect.zoneCells; hostFocusZoom = $ArtPreviewFocusZoom; medusaVariant = $ArtPreviewMedusaVariant; medusaVariantExplicit = $MedusaVariantExplicit; shotAfterSeconds = $ArtPreviewShotAfter; runSeconds = $RunSeconds; clientFps = $ClientFps; clientPerf = [bool]$ClientPerf; allMedusa = [bool]$ArtPreviewAllMedusa; heroesV2 = [bool]$ArtPreviewHeroesV2; inputPlan = $ArtPreviewInputPlan; iconSize = $ArtPreviewIconSize; iconProbe = [bool]$ArtPreviewIconProbe }) | ConvertTo-Json), $Utf8NoBom)
     }
 
     # ProjectWorldLocationToScreen can return true even for offscreen pixels.

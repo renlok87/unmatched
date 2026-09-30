@@ -334,6 +334,9 @@ private:
   bool bHasPrevApplied = false;
   FString CombatStartTargetId;
   int32 CombatStartTargetHealth = -1;
+  // Wave 5c-B -ArtPreviewHeroesV2: the attacker's LungeAttack fires once per combat (at COMBAT_RESOLVE, or at
+  // the close when the resolve snapshot was merged away).
+  bool bCombatLungeSent = false;
   // auto plan tokens: attack | defend | nodefense | resolve | scheme
   TArray<FString> S09CombatPlan;
   bool bS09ShotDefense = false;

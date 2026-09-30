@@ -61,12 +61,12 @@
    "expected": "H3 BC except the cord texels and the dielectric luminance clamp",
    "measured": {
     "by_class": {
-     "feathers": 2275926,
+     "feathers": 4759370,
      "horn_claw": 86031,
      "leather_smooth": 48113,
      "skin": 9582
     },
-    "changed_texels_4k": 2419652
+    "changed_texels_4k": 4903096
    },
    "passed": true
   },
@@ -164,7 +164,7 @@
    "expected": "half values equal",
    "measured": {
     "bytes": 2196,
-    "dds_sha256": "c19a4e5f57ffa040810781aebff44c047f712e62648d00c60c2f694272c86ea8"
+    "dds_sha256": "2d2d8af2709118c43a542b5000c1b2bdd40969a9375da1543f6087b2b4955d78"
    },
    "passed": true
   },
@@ -317,13 +317,13 @@
   "feathers": {
    "Y_p5_p50_p95": [
     0.02,
-    0.0495,
+    0.0493,
     0.2021
    ],
    "bc_linear_median": [
-    0.0816,
-    0.0418,
-    0.026
+    0.0811,
+    0.0417,
+    0.0258
    ],
    "column": 12,
    "edge_mask_mean": 0.1196,
@@ -488,9 +488,9 @@
  },
  "luminance_clamp": {
   "feathers": {
-   "in_toe_below_2lo": 0.4149,
+   "in_toe_below_2lo": 0.4189,
    "lowered_above_hi": 0.0,
-   "raised_below_lo": 0.1349
+   "raised_below_lo": 0.1624
   },
   "horn_claw": {
    "in_toe_below_2lo": 0.9345,
@@ -693,15 +693,15 @@
     "class": "feathers",
     "field": "bc",
     "value": [
-     0.0816,
-     0.0418,
-     0.026
+     0.0811,
+     0.0417,
+     0.0258
     ]
    },
    {
     "class": "feathers",
     "field": "ymedClassHero",
-    "value": 0.04946
+    "value": 0.0493
    },
    {
     "class": "gold_antique",
@@ -748,7 +748,7 @@
   ],
   "builder": "tools/art/material_library/build_ue_inputs.py 2.0.0 (imported, main() not run)",
   "dds": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/T_UM_MatLUT_Harpy.dds",
-  "dds_sha256": "c19a4e5f57ffa040810781aebff44c047f712e62648d00c60c2f694272c86ea8",
+  "dds_sha256": "2d2d8af2709118c43a542b5000c1b2bdd40969a9375da1543f6087b2b4955d78",
   "gold_antique_f0_hero": [
    1.0,
    0.437,
@@ -756,35 +756,35 @@
   ],
   "layout": "build_ue_inputs.LUT_ROWS (rows 0-9, 10-15 reserved), column = class index (hero slot 5 = horn_claw)",
   "overrides_json": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/T_UM_MatLUT_Harpy.overrides.json",
-  "overrides_sha256": "97ce30e716e440857f60929967f0ccebef6c91a2024494ce7453ccce5af577c3"
+  "overrides_sha256": "a886dfb43982a7cfce2b739969abdea506043ca9d3abedbee17e30daa47533a8"
  },
  "passed": true,
  "preview_textures": {
   "BC_P1": {
-   "bytes": 5177085,
+   "bytes": 5218291,
    "mode": "RGB",
    "path": "work/lookdev/preview/LD_BC_P1.png",
-   "sha256": "06bdc2d5987d345f6a2705d56a6a63893ce4590d15ee63daae7f1b5069b376b0",
+   "sha256": "33aa39411dd8b73e63d5ecf61f7525f74ef90444616cf4c10aeba890ea742dac",
    "size": [
     2048,
     2048
    ]
   },
   "BC_P2": {
-   "bytes": 5120747,
+   "bytes": 5161515,
    "mode": "RGB",
    "path": "work/lookdev/preview/LD_BC_P2.png",
-   "sha256": "879949763fec120232a16441a4319841b0c71a128469fe327e4a20b80369c333",
+   "sha256": "16b38e81c3cc64d0556e241951f9aedf1174480940598151b2d7f664f44d295d",
    "size": [
     2048,
     2048
    ]
   },
   "BC_none": {
-   "bytes": 5072333,
+   "bytes": 5118222,
    "mode": "RGB",
    "path": "work/lookdev/preview/LD_BC_none.png",
-   "sha256": "d1a76b12df0babe15aca8b6a89fe4f6cfe1398f0fc41cdb91e36195b528d3ab0",
+   "sha256": "45708d4017dd4264a5488ad5598af6054ebf4d2c2cf27612b0d44e094b1c782b",
    "size": [
     2048,
     2048
@@ -833,11 +833,11 @@
  "team_accent": {
   "TeamDye": 1.0,
   "accent_median_Y_bc": 0.02,
-  "accent_p95_Y_bc": 0.0272,
+  "accent_p95_Y_bc": 0.0243,
   "cord_share": 0.0024,
   "edge_width_final_m": 0.0163,
   "edge_width_source_m": 0.025,
-  "gain_cap_p95": 40.99,
+  "gain_cap_p95": 45.97,
   "gain_for_median": 40.0,
   "old_teammask_share": 0.1594,
   "share_of_figure_area": 0.0619,
@@ -855,10 +855,10 @@
  "textures": {
   "2k": {
    "BC": {
-    "bytes": 5079324,
+    "bytes": 5125253,
     "mode": "RGB",
     "path": "textures/2k/T_Harpy_H3LD_BC.png",
-    "sha256": "0a32c05341796c3b833e94225d56ba8f0b30b4bd2026b6c7067e078153a4132a",
+    "sha256": "980ecbf34b7234c8723e26bd4d189f851ead1ead1d33f35f52346c7f55dafa0d",
     "size": [
      2048,
      2048
@@ -928,10 +928,10 @@
   },
   "4k": {
    "BC": {
-    "bytes": 14273974,
+    "bytes": 14645228,
     "mode": "RGB",
     "path": "textures/4k/T_Harpy_H3LD_BC.png",
-    "sha256": "8cc2996992699ea8f61a1ff551aed190fdf0498045537dc2295eadc233404a5e",
+    "sha256": "0d0f674325c6c442d3da7e91d9f26acebbfe1392a76f5bf37e4a9fe068e1002b",
     "size": [
      4096,
      4096
@@ -999,5 +999,23 @@
     "sha256": "fda605df327bfa8312cba6187deb375bbbd0554e2ca169041347f035076ce5ca"
    }
   }
+ },
+ "ue_feedback_dark_primaries": {
+  "bc_median_linear_after_gain": [
+   0.01749,
+   0.01402,
+   0.01257
+  ],
+  "bc_median_linear_before": [
+   0.02578,
+   0.01586,
+   0.01381
+  ],
+  "gain": [
+   0.63,
+   0.8686,
+   0.8948
+  ],
+  "texels_4k_weight_ge_0_5": 1118988
  }
 }

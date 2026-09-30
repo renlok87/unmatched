@@ -6,7 +6,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "S08BoardModel.h"
+#include "S08HeroesV2.h"
 #include "S08Team.h"
+#include "TimerManager.h"
 #include "S08FighterActor.generated.h"
 
 class UStaticMeshComponent;
@@ -15,6 +17,7 @@ class UTextRenderComponent;
 class UBillboardComponent;
 class UCapsuleComponent;
 class UMaterialInstanceDynamic;
+class UAnimSequenceBase;
 
 /** ART-004 T2.2 world-label presentation: the plate owner hides its world
  *  labels (the screen plate replaces them); neighbours show one compact line. */
@@ -73,6 +76,20 @@ public:
   float GetFigureHeightUU() const;
   bool HasArtFigure() const { return bArtFigureVisible; }
   bool HasMedusaCandidate() const { return bMedusaVisual; }
+  /** A skeletal art sculpt is shown: the isolated Medusa candidate or a -ArtPreviewHeroesV2 figure
+   *  (without the flag this equals HasMedusaCandidate()). */
+  bool HasArtSculpt() const { return bMedusaVisual || bHeroV2Visual; }
+  /** Wave 5c-B: a -ArtPreviewHeroesV2 figure (SK_<Hero>_H2LD / SK_Harpy_H3LD) is shown. */
+  bool IsHeroV2() const { return bHeroV2Visual; }
+  const S08HeroesV2::FHeroSpec* GetHeroV2Spec() const { return bHeroV2Visual ? HeroV2Spec : nullptr; }
+  S08HeroesV2::EClip GetHeroClip() const { return HeroClip; }
+  /** Yaw / uniform scale applied to the v2 figure (0 / 0 when none). */
+  float GetHeroV2Yaw() const { return bHeroV2Visual ? HeroV2Yaw : 0.0f; }
+  float GetHeroV2Scale() const { return bHeroV2Visual ? HeroV2Scale : 0.0f; }
+  /** Combat event of this fighter (attack / damage); a no-op unless a v2 figure is shown. */
+  void NotifyHeroAnimEvent(S08HeroesV2::EEvent Event, int32 Seq);
+  /** The death hold (DeathSettle final pose) is running: the defeated figure is still visible. */
+  bool IsInDeathHold() const { return bDeathHold; }
   /** Screen-space combat icon mode: the world billboard stays hidden while
    *  the HUD draws the exact-size icon (the trace still reports icon=1). */
   void SetScreenIconMode(bool bScreen);
@@ -160,6 +177,27 @@ private:
   ES08TeamSlot Look = ES08TeamSlot::P1;
   ES08TeamColorMode TeamMode = ES08TeamColorMode::Absolute;
   void ApplyLabelVisibility();
+
+  // Wave 5c-B -ArtPreviewHeroesV2 figure and its clips (indexed by S08HeroesV2::EClip).
+  UPROPERTY()
+  TArray<TObjectPtr<UAnimSequenceBase>> HeroClips;
+  const S08HeroesV2::FHeroSpec* HeroV2Spec = nullptr;
+  bool bHeroV2Visual = false;
+  bool bHasApplied = false;
+  bool bDeathHold = false;
+  bool bDeathDone = false;
+  float HeroV2Yaw = 0.0f;
+  float HeroV2Scale = 1.0f;
+  S08HeroesV2::EClip HeroClip = S08HeroesV2::EClip::None;
+  FString HeroV2TraceKey;
+  FTimerHandle HeroClipTimer;
+  FTimerHandle DeathHideTimer;
+  /** Loads and applies the v2 figure; false (nothing changed) when an asset is missing. */
+  bool ApplyHeroV2(const S08HeroesV2::FHeroSpec& Spec, const FVector& CellCenter, USkeletalMesh*& OutMesh);
+  void PlayHeroClip(S08HeroesV2::EClip Clip, S08HeroesV2::EEvent Event, int32 Seq);
+  void OnHeroClipFinished();
+  void OnDeathHoldFinished();
+  void BeginHeroDeath();
 
   FS08BoardFighter Fighter;
 };
