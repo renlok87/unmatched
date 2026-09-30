@@ -2162,8 +2162,8 @@
       "backlog": ["ART-009"],
       "parent": null,
       "instances": 1,
-      "status": "предложено",
-      "stage": "reference-images",
+      "status": "технически импортировано",
+      "stage": "live-packaged-probe",
       "ownership": {"existingFiles": "shared", "nextCandidates": "pipeline", "acceptance": "art-chat"},
       "sourceImages": {
         "selectionManifest": {"path": "art/imagegen/mvp-v1/generation-inputs.json", "root": "repo", "kind": "file", "expect": "exists", "role": "selection manifest (REF-TABLE-BASE)"},
@@ -2176,7 +2176,8 @@
         "note": "Генерировать можно только скальный низ; верх и рамку — вручную по S04 (5×6). T2 (imagegen-inputs/manifest.json → sets[REF-TABLE-BASE].propTripoSlotProposal, предложено): front ← front, left ← side, three-quarter — только референс для человека. WARN: серая кромка скалы близка к фону #808080 (18 % / 12,8 % внутренней кромки front/side) — риск среза при удалении фона в Tripo."
       },
       "source3d": [
-        {"path": "blender/S05/export/SM_S05_TableBase.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "S05 блок-аут, 252 tris, 612.6×714.5×40 uu (исторический)"}
+        {"path": "blender/S05/export/SM_S05_TableBase.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "S05 блок-аут, 252 tris, 612.6×714.5×40 uu (исторический)"},
+        {"path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/source/table-base-tripo-c2e5e3bf-smartuv-tex2k-pbr.glb", "root": "repo", "kind": "file", "expect": "exists", "role": "Tripo H3.1 multi-view front/left rock-white (task c2e5e3bf) → Quad-ретопология 6 984 → Smart UV → текстура 2K → PBR; 12 774 tris; 105 Studio-кредитов", "sha256": "5193fad469675a27a5099a0fd6443c013fb8226708251c9d9807f8ab2a8ca429"}
       ],
       "layers": [
         {
@@ -2188,14 +2189,76 @@
             {"path": "/Game/S05/Meshes/SM_S05_TableBase", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "UE S05"}
           ],
           "note": "Исторический S05; не производственный ассет. Проба ART-005 имеет свой foundation-меш внутри доски."
+        },
+        {
+          "layer": "tripo-source c2e5e3bf",
+          "stage": "tripo-source",
+          "status": "измерено",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/reports/tripo-run-20260930.json", "root": "repo", "kind": "file", "expect": "exists", "role": "Studio: задача c2e5e3bf, этапы, кредиты"},
+            {"path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/reports/tripo-stage-plan.json", "root": "repo", "kind": "file", "expect": "exists", "role": "план Tripo-этапа"},
+            {"path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/inputs/inputs-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "входы front/left rock-white"}
+          ],
+          "note": "Tripo-этап выполнил оркестратор 2026-09-30: задача c2e5e3bf, 105 из плановых 130 Studio-кредитов. Верх GLB — тонкая плита (≈3–4 uu), скальное тело под ней утоплено; плита удалена в Blender-этапе."
+        },
+        {
+          "layer": "blender-candidate SM_TableBase (исправление по ревью: прямая кромка 756×656)",
+          "stage": "blender-candidate",
+          "status": "измерено",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/scripts/table_base_live_mcp.py", "root": "repo", "kind": "file", "expect": "exists", "role": "драйвер живого Blender (шаги setup…report)"},
+            {"path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/reports/candidate-params.json", "root": "repo", "kind": "file", "expect": "exists", "role": "параметры кандидата (блоки body и lip)"},
+            {"path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/export/SM_TableBase.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "FBX UM_FBX_v1", "sha256": "24977f1826bcad8fd8e6ec0dfa14c88d9e488787e75798c9a0179e19024313cf"},
+            {"path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/export/T_TableBase_BC.png", "root": "repo", "kind": "file", "expect": "exists", "role": "2K BC sRGB", "sha256": "91e4f956c47370649d6b9be13b71b49bc0e5247ec6ee879d053610a048332558"},
+            {"path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/export/T_TableBase_N.png", "root": "repo", "kind": "file", "expect": "exists", "role": "2K Normal DirectX", "sha256": "7afb10a7bc412e1d7b4eaebee2669177be8c74884e97c41419e7ef127892910e"},
+            {"path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/export/T_TableBase_ORM.png", "root": "repo", "kind": "file", "expect": "exists", "role": "2K ORM (AO Cycles)", "sha256": "e380f8e5ce09cab6e5f68f064173d75a3173379fde7ce11d451f1e773a4dc883"},
+            {"path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/reports/candidate-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "измерения и решения кандидата, проверки 16/16"},
+            {"path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/reports/fbx-readback.json", "root": "repo", "kind": "file", "expect": "exists", "role": "readback FBX (check_static_prop_fbx.py)"}
+          ],
+          "note": "Живой Blender через Blender MCP (сцена TableBase). Прямая каменная кромка UE 756×656 (кайма 50 uu = 47 плоских + фаска 3), толщина 20 uu; тело скалы Tripo утоплено под кромкой (UE 719×644), глубина 150 uu, верх Z −3, низ −153. 13 508 tris (кромка 40 + тело 13 468), 1 слот M_TableBase, 4 оболочки, 0 открытых/неманифолдных рёбер. Камень кромки собран из текселов юбки Tripo (texture bombing), новых источников нет. Проверки Blender 16/16; независимый readback check_static_prop_fbx.py совпал. Первый прогон 860×770 (неровный уступ, светлая крышка) заменён; его хэши в отчёте — история. Числа не являются бюджетом (10–20k — предложено)."
+        },
+        {
+          "layer": "ue-editor-import /Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31 (MI на M_UM_Figure)",
+          "stage": "ue-editor-frames",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/scripts/table_base_ue.py", "root": "repo", "kind": "file", "expect": "exists", "role": "UE-шаг: import / measure / scene"},
+            {"path": "/Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31/Meshes/SM_TableBase", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "UE меш (отслеживается)"},
+            {"path": "/Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31/Materials/MI_TableBase_Candidate", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "MI от M_UM_Figure"},
+            {"path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/ue/ue-import.json", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт импорта UE"},
+            {"path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/ue/ue-measure.json", "root": "repo", "kind": "file", "expect": "exists", "role": "чтение из UE: bounds, tris, текстуры"},
+            {"path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/ue/ue-scene.json", "root": "repo", "kind": "file", "expect": "exists", "role": "редакторные кадры контрольной сцены"},
+            {"path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/preview/ue-fix-before-after-k1-edges.jpg", "root": "repo", "kind": "file", "expect": "exists", "role": "K1 до/после исправления кромки"}
+          ],
+          "note": "Импорт скриптом table_base_ue.py (CLI ue-import не подходит: профиль требует pivot_base_centre). Чтение из UE: bounds 756×656×150, 13 508 tris, 1 UV, Nanite выкл., коллизии нет; BC sRGB, N TC_Normalmap без flip (карта Tripo OpenGL, G перевёрнут по замеру), ORM TC_Masks, все 2048. MI_TableBase_Candidate на M_UM_Figure, TeamColor белый (маршрут декора, как у бочки W4-B). Редакторные кадры L_P17ControlScene (Cobble, EV100 1,3, High): K1, 0,65×, слежение 1,2×, шов 4×, A/B без подноса. K1: ближняя кайма / доска 0,71 по яркости дисплея. Юбка скалы в свете Cobble почти чёрная — вопрос света/художественной приёмки."
+        },
+        {
+          "layer": "live-packaged S08 -ArtPreviewDiorama (волны 5c-B2, 6B)",
+          "stage": "live-packaged-probe",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "unreal/Unmatched/Source/Unmatched/S08/S08Diorama.cpp", "root": "repo", "kind": "file", "expect": "exists", "role": "спавн и подгонка подноса (FitTray)"},
+            {"path": "unreal/Unmatched/Source/Unmatched/S08/S08DioramaTests.cpp", "root": "repo", "kind": "file", "expect": "exists", "role": "автотесты Unmatched.S08.Diorama.{Fit, Assets, Actor}"},
+            {"path": "unreal/Unmatched/Config/DefaultGame.ini", "root": "repo", "kind": "file", "expect": "exists", "role": "DirectoriesToAlwaysCook для TableBase"},
+            {"path": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30.md", "root": "repo", "kind": "file", "expect": "exists", "role": "5c-B2: packaged-кадры с героями v2 и подносом на трёх досках"},
+            {"path": "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/runs-2026-09-30.md", "root": "repo", "kind": "file", "expect": "exists", "role": "6B: набор B приёмки GD-058 interim, поднос на всех клиентах, perf v2+поднос"},
+            {"path": "docs/game-design/evidence/GD-058/interim-2026-09-30/package-2026-09-30.md", "root": "repo", "kind": "file", "expect": "exists", "role": "6B: состав пака (TableBase в паке)"}
+          ],
+          "note": "Флаг -ArtPreviewDiorama (только вместе с -ArtPreview): компонент ArtDioramaTray на акторе доски, NoCollision, подгонка S08Diorama::FitTray (кайма 50 uu, Z не масштабируется, верх −3). Кук: DirectoriesToAlwaysCook /Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31. Packaged Development: 5c-B2 (bd60e1e4) — три доски с героями v2, поднос виден на всех кадрах; 6B (c52b96c6) — набор B приёмки GD-058 interim, на всех клиентах tray=SM_TableBase, missing/hidden нет; Cobble 656×756×150, Sherwood 948×648×150, T. Rex 848×648×150. Герои v2 + поднос: +4 % GPU на K1, +7,5 % на K2 5×. Художественной приёмки нет."
         }
       ],
       "manifest06": {"verificationStatusIn06": "planned", "drift": "Нет расхождения.", "proposedChange": "Нет."},
-      "nextStep": "После фиксации габарита доски: пакет входов для скального низа (Tripo — только при отдельном разрешении расходов), верх/рамка вручную.",
-      "blocker": "Габарит финальной доски (AD-OPEN-36); внутреннее противоречие слотов 04 §3.6 (AD-CNF-18).",
+      "nextStep": "Художественная приёмка подноса человеком (кромка, тон камня, почти чёрная юбка скалы в свете Cobble — нужен свет/заливка диорамы или решение «так и надо»); масштаб и неравномерность подноса под оригинальные карты сессии ENV-MAPS; build-профиль table-base-static-um-fbx-v1 и CLI ue-import (pivot_base_centre) — привести к реальному контуру.",
+      "blocker": "Художественной приёмки нет (GD-058 принят только промежуточно, без окружения и оригинальных карт); габарит финальной доски (AD-OPEN-36); слоты 04 §3.6 (AD-CNF-18): у M_DioramaMaster нет текстурных параметров, поэтому MI на M_UM_Figure.",
       "doneCriteria": "На K1 за краем нет читаемых объектов; нет z-fighting с доской; кайма 40–60 uu (предложено).",
       "acceptanceEvidence": [],
-      "evidence": [],
+      "evidence": [
+        {"path": "docs/art-pipeline/table-base-report.md", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт Tripo → Blender → UE → S08 (2026-09-30)"}
+      ],
       "plannedPaths": [
         {"path": "blender/ASSET-TABLE-BASE-001", "root": "repo", "kind": "file", "expect": "planned", "role": "производственный каталог по 04 §3.6"}
       ]
@@ -2380,8 +2443,8 @@
       "backlog": ["ART-009"],
       "parent": "ASSET-DECOR-KIT-001",
       "instances": 3,
-      "status": "предложено",
-      "stage": "reference-images",
+      "status": "измерено",
+      "stage": "blender-candidate",
       "ownership": {"existingFiles": "shared", "nextCandidates": "pipeline", "acceptance": "art-chat"},
       "sourceImages": {
         "selectionManifest": null,
@@ -2396,13 +2459,36 @@
       "source3d": [
         {"path": "blender/S05/export/SM_S05_Facade.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "S05 блок-аут, 16 tris (исторический)"}
       ],
-      "layers": [],
+      "layers": [
+        {
+          "layer": "blender-candidate SM_Decor_FacadeA/B/C (плоские кулисы, 20260928-facades-flat-v1)",
+          "stage": "blender-candidate",
+          "status": "измерено",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/scripts/facades_build.py", "root": "repo", "kind": "file", "expect": "exists", "role": "build script (Blender headless)"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/scripts/facades_trace.py", "root": "repo", "kind": "file", "expect": "exists", "role": "трассировка контура и атлас"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/export/SM_Decor_FacadeA.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "FBX UM_FBX_v1 A", "sha256": "93a6d848a6309f6c52033df54bddb85ebfa098d5aacb1bb4b450ed56f4558010"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/export/SM_Decor_FacadeB.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "FBX UM_FBX_v1 B", "sha256": "fa034b31b9f4393c266bf45121beabfbfe37f59ec404c2afc142a4c9bfb6a9e8"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/export/SM_Decor_FacadeC.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "FBX UM_FBX_v1 C", "sha256": "ecb1bf3431071c2a93f4ca56552827c3ca93494eaf76063e36d104db941c3023"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/textures/T_Decor_Facades_BC.png", "root": "repo", "kind": "file", "expect": "exists", "role": "1K BC sRGB (общий атлас)", "sha256": "00cc76dd15f02bf4e5c6ca6dd230258dfa85aff4b8e637940942489336661d24"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/textures/T_Decor_Facades_N.png", "root": "repo", "kind": "file", "expect": "exists", "role": "1K Normal DirectX", "sha256": "d687d21a2890b3121bf4c31eeb13d21bca84c78b96fbede3356cef891d94c1ed"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/textures/T_Decor_Facades_ORM.png", "root": "repo", "kind": "file", "expect": "exists", "role": "1K ORM", "sha256": "5e60660117669153145eb2d2b5433d49c9513c387102b6c295c1ebd9cd79ba7b"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/reports/build-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт сборки"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-facades-flat-v1/reports/fbx-readback-A.json", "root": "repo", "kind": "file", "expect": "exists", "role": "readback FBX (check_static_prop_fbx.py); B и C — рядом"}
+          ],
+          "note": "Статус по facades-report: измерено; Tripo не нужен (норма 04 — плоские кулисы, концепты — коллажи). Контур трассирован из коллажей, сборка Blender headless. A 394,7×110×8 uu / 372 tris / 2 слота, B 304,7×120×8 / 236 / 2, C 306,1×105×8 / 264 / 1; вместе 872 tris. Общий 1K-атлас BC/N/ORM. Повторный прогон — побайтно те же FBX и PNG. UE не запускался, художественной приёмки нет. Числа не являются бюджетом."
+        }
+      ],
       "manifest06": {"verificationStatusIn06": "planned", "drift": "AD-CNF-19; сторона размещения — AD-CNF-08.", "proposedChange": "Нет."},
-      "nextStep": "Решить, нужны ли фасады в раннем gate; при необходимости — вручную как плоские кулисы.",
-      "blocker": "Нет ортографических видов; ART-009 после GD-058.",
+      "nextStep": "UE-импорт (facades-report §9): масштаб 1, без коллизии, MI с эмиссией окон; кадры K1 в контрольной сцене; размещение и fade — после решения по окружению оригинальных карт (сессия ENV-MAPS).",
+      "blocker": "ART-009 после GD-058 (финальный GD-058 — с окружением и оригинальными картами); сторона размещения — AD-CNF-08.",
       "doneCriteria": "Плоские кулисы ≤120 uu на дальней стороне; fade при зуме; не закрывают клетки.",
       "acceptanceEvidence": [],
-      "evidence": [],
+      "evidence": [
+        {"path": "docs/art-pipeline/facades-report.md", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт фасадов"},
+        {"path": "docs/art-pipeline/facades-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт фасадов (json)"}
+      ],
       "plannedPaths": []
     },
     {
@@ -2414,8 +2500,8 @@
       "backlog": ["ART-009"],
       "parent": "ASSET-DECOR-KIT-001",
       "instances": 1,
-      "status": "предложено",
-      "stage": "reference-images",
+      "status": "измерено",
+      "stage": "blender-candidate",
       "ownership": {"existingFiles": "shared", "nextCandidates": "pipeline", "acceptance": "art-chat"},
       "sourceImages": {
         "selectionManifest": null,
@@ -2426,13 +2512,35 @@
         "note": "Один коллаж без отдельных видов."
       },
       "source3d": [],
-      "layers": [],
+      "layers": [
+        {
+          "layer": "blender-candidate SM_Decor_Crate (ручная модель, 20260928-crate-manual-v1)",
+          "stage": "blender-candidate",
+          "status": "измерено",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/scripts/crate_build.py", "root": "repo", "kind": "file", "expect": "exists", "role": "build script (Blender headless)"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/scripts/crate_params.json", "root": "repo", "kind": "file", "expect": "exists", "role": "параметры сборки"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/export/SM_Decor_Crate.fbx", "root": "repo", "kind": "file", "expect": "exists", "role": "FBX UM_FBX_v1", "sha256": "3c3e45fc435dbfc37495810c4174198b2c7e5edfc0221ff295958db6e9e33b98"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/textures/T_Decor_Crate_BC.png", "root": "repo", "kind": "file", "expect": "exists", "role": "1K BC sRGB", "sha256": "32b836dd98eb05ba968d6dbc205d1f1a57193bd223fffb7abe15444dfe6242f9"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/textures/T_Decor_Crate_N.png", "root": "repo", "kind": "file", "expect": "exists", "role": "1K Normal DirectX", "sha256": "bd38f837e52c6057400e0fa435762f0d92566a47a77af49117b270e4a4f7db95"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/textures/T_Decor_Crate_ORM.png", "root": "repo", "kind": "file", "expect": "exists", "role": "1K ORM", "sha256": "4b8ab44840328c3e8d24bdd5f3fc9cc5ca788631fe471ee48beb08476d1954c1"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/reports/build-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт сборки"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/reports/crate-readback.json", "root": "repo", "kind": "file", "expect": "exists", "role": "readback 16/16 (crate_readback.py)"},
+            {"path": "art/pipeline-candidates/ASSET-DECOR-KIT-001/20260928-crate-manual-v1/reports/fbx-readback.json", "root": "repo", "kind": "file", "expect": "exists", "role": "readback FBX (check_static_prop_fbx.py)"}
+          ],
+          "note": "Статус по crate-report: измерено; Tripo пропущен (ручная модель по nextStep), концепт — только визуальный референс. 25,0×25,0×25,0 uu, pivot в центре основания, 3 104 tris, 61 оболочка, 1 слот M_Decor_Crate, 0 открытых/неманифолдных рёбер, без коллизии; текстуры 1K запечены в Cycles. Readback 16/16 + check_static_prop_fbx.py. UE не запускался, художественной приёмки нет. Числа не являются бюджетом."
+        }
+      ],
       "manifest06": {"verificationStatusIn06": "planned", "drift": "AD-CNF-19.", "proposedChange": "Нет."},
-      "nextStep": "Простая ручная модель 25 uu; низкий приоритет (декор сокращается первым).",
+      "nextStep": "UE-импорт (crate-report §10): масштаб 1, без коллизии, BC sRGB / N без flip / ORM linear; кадры K1 в контрольной сцене; низкий приоритет (декор сокращается первым).",
       "blocker": "ART-009 после GD-058.",
       "doneCriteria": "25 uu (предложено), ≤2 слота, 1K, без коллизии.",
       "acceptanceEvidence": [],
-      "evidence": [],
+      "evidence": [
+        {"path": "docs/art-pipeline/crate-report.md", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт ящика"},
+        {"path": "docs/art-pipeline/crate-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт ящика (json)"}
+      ],
       "plannedPaths": []
     },
     {

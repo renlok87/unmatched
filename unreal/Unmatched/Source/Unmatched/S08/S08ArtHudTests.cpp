@@ -275,6 +275,88 @@ bool FS08ArtHudPlacementTest::RunTest(const FString&) {
   return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08ArtHudPlateOwnerTest,
+    "Unmatched.S08.ArtHud.Plate stays nearest its owner on Cobble K1 (W7 on-owner fallback, GD-058 interim item 13)",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08ArtHudPlateOwnerTest::RunTest(const FString&) {
+  // Packaged host trace k1/cobble-5x6/run-20260930-211621 (GD-058 interim 2026-09-30): SHOT ctx cam=(0,1107,1582)
+  // rot=(-55,-90,0) 1920x1080; Medusa f-0-hero at (2,2) selected, 13 destinations; SHOT figure / SHOT panel boxes.
+  FS08PinholeCamera Cam;
+  Cam.Position = FVector(0.0, 1107.0, 1582.0);
+  Cam.Rotation = FRotator(-55.0, -90.0, 0.0);
+  const FS08BoardModel Board = CobbleBoard();
+  const TArray<FIntPoint> Reach = {{1, 0}, {2, 0}, {3, 0}, {0, 1}, {1, 1}, {3, 1}, {4, 1},
+                                   {0, 2}, {4, 2}, {0, 3}, {1, 3}, {4, 3}, {1, 4}};
+  TArray<FS08CellQuad> Quads;
+  for (const FIntPoint& Cell : Reach) {
+    FS08CellQuad Quad;
+    Quad.Cell = Cell;
+    const FVector C = Board.CellToWorld(Cell.X, Cell.Y);
+    for (const FVector2D& D : {FVector2D(-50, -50), FVector2D(50, -50), FVector2D(50, 50), FVector2D(-50, 50)}) {
+      FVector2D S;
+      if (Cam.Project(C + FVector(D.X, D.Y, 0.0), S)) Quad.Screen.Add(S);
+    }
+    Quads.Add(Quad);
+  }
+  FVector2D OwnScreen;
+  TestTrue("Medusa's cell projects", Cam.Project(Board.CellToWorld(2, 2), OwnScreen));
+  TestTrue("camera model matches the trace (SHOT fighter f-0-hero screen=(960,476))",
+           FVector2D::Distance(OwnScreen, FVector2D(960, 476)) < 2.0);
+  const FS08ScreenRect Medusa(914, 389, 1006, 512);
+  const TArray<FS08ScreenRect> Others = {
+      FS08ScreenRect(1080, 409, 1155, 504),   // Harpy 1
+      FS08ScreenRect(926, 288, 994, 381),     // Harpy 2
+      FS08ScreenRect(765, 409, 840, 504),     // Harpy 3
+      FS08ScreenRect(913, 513, 1007, 644),    // King Arthur
+      FS08ScreenRect(1084, 531, 1161, 635)};  // Merlin
+  S08ArtHud::FPlacementInput In;
+  In.Viewport = FVector2D(1920, 1080);
+  In.PlateSize = FVector2D(172, 54);
+  In.Anchor = Medusa;
+  In.Forbidden = Quads;
+  In.Soft = {Medusa};
+  In.Soft.Append(Others);
+  In.Soft.Append({FS08ScreenRect(0, 0, 601, 138), FS08ScreenRect(1432, 0, 1920, 121),
+                  FS08ScreenRect(435, 985, 1486, 1080)});  // hud.command / hud.side / hud.hand
+  In.BindTarget = Medusa;
+  In.BindOthers = Others;
+  auto NearestIsOwner = [&](const FS08ScreenRect& Plate) {
+    const double Own = S08ArtHud::RectGap(Plate, Medusa);
+    for (const FS08ScreenRect& O : Others) {
+      if (S08ArtHud::RectGap(Plate, O) <= Own) return false;
+    }
+    return true;
+  };
+
+  // Pre-W7 behaviour (the defect): the least bad place is off the destination cells but next to a foreign figure.
+  S08ArtHud::FPlacementInput Old = In;
+  Old.bAllowOnOwner = false;
+  const S08ArtHud::FPlacementResult Before = S08ArtHud::ChoosePlateRect(Old);
+  TestFalse("pre-W7: no clean place on Cobble K1", Before.bClean);
+  TestFalse("pre-W7: the plate is not bound (reads as Merlin's / King Arthur's)", Before.bBound);
+  TestFalse("pre-W7: nearest figure is not the owner", NearestIsOwner(Before.Rect));
+
+  const S08ArtHud::FPlacementResult R = S08ArtHud::ChoosePlateRect(In);
+  TestEqual("on-owner candidate", R.Candidate, FString(TEXT("on-owner")));
+  TestTrue("bound to the owner", R.bBound);
+  TestTrue("nearest figure is the owner (rect gap, plate_owner_proximity rule)", NearestIsOwner(R.Rect));
+  TestEqual("covers no destination cell (exact qa010 rule, K-2 gate kept)",
+            S08ArtHud::CountOverlaps(R.Rect, In.Forbidden, S08ArtHud::OverlapEpsilonPx2), 0);
+  TestEqual("covers no destination cell with the placement margin", R.ForbiddenOverlaps, 0);
+  TestTrue("plate size kept", FMath::IsNearlyEqual(R.Rect.Width(), 172.0f) && FMath::IsNearlyEqual(R.Rect.Height(), 54.0f));
+  TestTrue("plate fully inside the viewport", FS08ScreenRect(0, 0, 1920, 1080).Contains(R.Rect));
+  TestTrue("centred under the owner (|dx| <= 4 px)", FMath::Abs(R.Rect.Center().X - Medusa.Center().X) <= 4.0);
+  // Nameplate "above the head", slid down into the box only past the destination cells of row 1: the base and the
+  // team ring (bottom quarter of the box) stay visible.
+  TestTrue("the plate starts in the owner's upper half", R.Rect.Y0 < Medusa.Center().Y);
+  TestTrue("the owner's base and team ring stay uncovered (bottom quarter of the box)",
+           R.Rect.Y1 <= Medusa.Y1 - 0.25f * Medusa.Height());
+  for (const FS08ScreenRect& O : Others) {
+    TestTrue("no foreign figure touched", S08ArtHud::RectGap(R.Rect, O) > 0.0);
+  }
+  return true;
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08ArtHudTraceFormatTest,
     "Unmatched.S08.ArtHud.Trace SHOT reachable/plate/icon lines match the qa010 parser format",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)

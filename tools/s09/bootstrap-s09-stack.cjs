@@ -8,13 +8,31 @@
 // original checkout is never read) targets the S09 stack endpoints, so the
 // original checkout's DB (55433/3100 stack) can never be written from here.
 //
-// Usage (from the worktree root): node tools/s09/bootstrap-s09-stack.cjs
+// Hero attack types (GD-058 interim 2026-09-30 §8 item 9, wave 7): seed-scraped
+// used to skip heroes that already exist, and the engine reads a missing
+// Hero.properties.attackType as 'melee' - Medusa (scraped attack=range) played
+// as a melee fighter on this stack. The chain therefore runs
+// prisma/backfill-attack-type.ts (idempotent) and gates on its --check.
+//
+// Usage (from the worktree root): node tools/s09/bootstrap-s09-stack.cjs [--dry-run] [--env-file <path>]
+//   --dry-run        guards + the step plan; runs only the read-only
+//                    `backfill-attack-type.ts --dry-run` (no seed writes).
+//   --env-file PATH  read the S09 endpoints from another backend/.env (read
+//                    only, e.g. the art worktree's); the same guards apply.
 const { spawnSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
+const argv = process.argv.slice(2);
+const dryRun = argv.includes('--dry-run');
+const envFileIdx = argv.indexOf('--env-file');
+if (envFileIdx >= 0 && !argv[envFileIdx + 1]) {
+  console.error('--env-file needs a path');
+  process.exit(2);
+}
+
 const root = path.resolve(__dirname, '..', '..');
-const envPath = path.join(root, 'backend', '.env');
+const envPath = envFileIdx >= 0 ? path.resolve(argv[envFileIdx + 1]) : path.join(root, 'backend', '.env');
 
 const env = { ...process.env };
 for (const line of fs.readFileSync(envPath, 'utf8').split(/\r?\n/)) {
@@ -62,18 +80,29 @@ if (!isLocalHost(redisHost) || redisPort !== '6381') {
   process.exit(2);
 }
 
-const steps = [
+const allSteps = [
   ['seed admin', ['prisma/seed-admin.ts']],
   ['seed maps/villains/minions', ['prisma/seed-all-scraped.ts']],
   ['seed heroes/cards', ['prisma/seed-scraped.ts']],
+  ['backfill hero attackType (scraped)', ['prisma/backfill-attack-type.ts']],
+  ['verify hero attackType (Medusa ranged, Merlin ranged, King Arthur melee, Harpies melee)',
+    ['prisma/backfill-attack-type.ts', '--check']],
   ['backfill board cells (zones)', ['prisma/backfill-board-cells.ts']],
   ['demo users', [path.join('..', 'tools', 's09', 'ensure-demo-users.cjs')], true],
 ];
+const steps = dryRun
+  ? [['dry-run: hero attackType plan (read-only)', ['prisma/backfill-attack-type.ts', '--dry-run']]]
+  : allSteps;
+console.log(`endpoints OK: ${dbUrl.hostname}:${dbUrl.port} / redis ${redisHost}:${redisPort} (env ${envPath})`);
+if (dryRun) {
+  console.log('DRY RUN - planned steps (not executed):');
+  for (const [label, args] of allSteps) console.log(`  - ${label}: ${args.join(' ')}`);
+}
 
 let failed = false;
 for (const [label, args, isNodeScript] of steps) {
   console.log(`\n=== ${label} ===`);
-  const command = isNodeScript ? ['node', args] : ['node', '-r', 'ts-node/register/transpile-only', args];
+  const command = isNodeScript ? ['node', ...args] : ['node', '-r', 'ts-node/register/transpile-only', ...args];
   const r = spawnSync(command[0], command.slice(1), {
     cwd: path.join(root, 'backend'),
     env,
@@ -87,7 +116,9 @@ for (const [label, args, isNodeScript] of steps) {
   }
 }
 
-if (!failed) {
+if (!failed && dryRun) {
+  console.log('\nDry run OK: nothing was written.');
+} else if (!failed) {
   // Count boards whose cells is not a nonempty JSON array, or that lack any
   // cell with a nonempty zones array. Every jsonb_array_* call sits in its own
   // nested CASE arm (never in an OR that a planner could reorder), so the

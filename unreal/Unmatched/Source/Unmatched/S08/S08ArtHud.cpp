@@ -337,6 +337,47 @@ FPlacementResult ChoosePlateRect(const FPlacementInput& In) {
       return RingBest;
     }
   }
+  // W7 on-owner pass (GD-058 interim §8 item 13): nothing clean and the least bad place is not bound to the owner ->
+  // a plate ON the owner's box reads as the owner's (rect gap 0 to it, > 0 to every other figure). It stays off every
+  // destination cell; among such places: least overlap with soft obstacles other than the owner (HUD panels), then
+  // the plate's bottom-centre nearest to the owner's top-centre: the plain nameplate "above the head", slid down into
+  // the figure box only as far as the destination cells and the neighbours force it. The box top is the figure height
+  // (headroom above the sculpture), and the team ring / selection mark at the base stay visible.
+  if (In.bAllowOnOwner && !In.BindTarget.IsEmpty() && !In.Anchor.IsEmpty() &&
+      !(bHaveBest && Best.ForbiddenOverlaps == 0 && Best.bBound)) {
+    const float Fine = FMath::Max(2.0f, Step * 0.5f);
+    const FVector2D Head(AC.X, In.Anchor.Y0);
+    FPlacementResult OnBest;
+    bool bHaveOn = false;
+    double OnBestOther = 0.0, OnBestDist = 0.0;
+    for (float Y0 = In.Anchor.Y0 - H + 1.0f; Y0 <= In.Anchor.Y1 - 1.0f; Y0 += Fine) {
+      for (float X0 = In.Anchor.X0 - W + 1.0f; X0 <= In.Anchor.X1 - 1.0f; X0 += Fine) {
+        FPlacementResult Try;
+        if (!Evaluate(X0, Y0, TEXT("on-owner"), 0, Try)) continue;
+        ++Tested;
+        if (Try.ForbiddenOverlaps != 0 || !Try.bBound) continue;
+        double Other = 0.0;
+        const FS08ScreenRect Grown = Try.Rect.Expand(2.0f);
+        for (const FS08ScreenRect& Soft : In.Soft) {
+          const bool bOwner = FMath::IsNearlyEqual(Soft.X0, In.Anchor.X0) && FMath::IsNearlyEqual(Soft.Y0, In.Anchor.Y0) &&
+                              FMath::IsNearlyEqual(Soft.X1, In.Anchor.X1) && FMath::IsNearlyEqual(Soft.Y1, In.Anchor.Y1);
+          if (!bOwner) Other += Grown.IntersectionArea(Soft);
+        }
+        const double Dist = FVector2D::Distance(FVector2D(Try.Rect.Center().X, Try.Rect.Y1), Head);
+        if (!bHaveOn || Other < OnBestOther - 0.5 ||
+            (FMath::Abs(Other - OnBestOther) <= 0.5 && Dist < OnBestDist - 0.01)) {
+          OnBest = Try;
+          OnBestOther = Other;
+          OnBestDist = Dist;
+          bHaveOn = true;
+        }
+      }
+    }
+    if (bHaveOn) {
+      OnBest.Tested = Tested;
+      return OnBest;
+    }
+  }
   Best.Tested = Tested;
   return Best;
 }

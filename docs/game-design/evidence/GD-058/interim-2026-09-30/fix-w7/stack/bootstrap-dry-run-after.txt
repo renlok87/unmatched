@@ -1,0 +1,24 @@
+endpoints OK: 127.0.0.1:55434 / redis 127.0.0.1:6381 (env C:\Users\ren\.codex\worktrees\art-foundation\unmached\backend\.env)
+DRY RUN - planned steps (not executed):
+  - seed admin: prisma/seed-admin.ts
+  - seed maps/villains/minions: prisma/seed-all-scraped.ts
+  - seed heroes/cards: prisma/seed-scraped.ts
+  - backfill hero attackType (scraped): prisma/backfill-attack-type.ts
+  - verify hero attackType (Medusa ranged, Merlin ranged, King Arthur melee, Harpies melee): prisma/backfill-attack-type.ts --check
+  - backfill board cells (zones): prisma/backfill-board-cells.ts
+  - demo users: ..\tools\s09\ensure-demo-users.cjs
+
+=== dry-run: hero attackType plan (read-only) ===
+🏹 Backfill: attackType героев и помощников (без записи)...
+
+
+📊 Статистика backfill:
+   ✅ Обновлено: 0
+   🔎 Требует правки (не записано): 0
+   ⏭️  Уже согласовано: 70
+   ⚠️  Пропущено (нет файла/парс): 12
+   ❓ Не найдено в БД: 0
+   🎯 Medusa: ranged (range); помощники: Harpies=melee(melee), Harpies=melee(melee), Harpies=melee(melee)
+   🎯 King Arthur: melee (melee); помощники: Merlin=ranged(range)
+
+Dry run OK: nothing was written.

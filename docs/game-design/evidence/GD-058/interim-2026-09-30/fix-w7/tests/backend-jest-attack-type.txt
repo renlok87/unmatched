@@ -1,0 +1,9 @@
+    √ reads the S09 roster attack types from scraped-data (3 ms)
+    √ readScrapedAttacks covers the hero list and reports missing files (14 ms)
+    √ a Medusa row without attackType (the S09 stand) is patched so the engine sees ranged, Harpies melee (2 ms)
+    √ King Arthur: hero melee kept explicit, Merlin fixed to ranged (sidekicks stored as JSON string) (1 ms)
+    √ no-op when the stored value already means the same to the engine; unknown sidekicks untouched (1 ms)
+    √ the seed-side copy of the canon matches normalizeAttackType (1 ms)
+      √ dry-run writes nothing and lists the pending change (3 ms)
+      √ apply updates once, a second run is a no-op (2 ms)
+Tests:       8 passed, 8 total

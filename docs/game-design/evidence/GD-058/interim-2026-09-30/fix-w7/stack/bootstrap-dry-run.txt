@@ -1,0 +1,94 @@
+endpoints OK: 127.0.0.1:55434 / redis 127.0.0.1:6381 (env C:\Users\ren\.codex\worktrees\art-foundation\unmached\backend\.env)
+DRY RUN - planned steps (not executed):
+  - seed admin: prisma/seed-admin.ts
+  - seed maps/villains/minions: prisma/seed-all-scraped.ts
+  - seed heroes/cards: prisma/seed-scraped.ts
+  - backfill hero attackType (scraped): prisma/backfill-attack-type.ts
+  - verify hero attackType (Medusa ranged, Merlin ranged, King Arthur melee, Harpies melee): prisma/backfill-attack-type.ts --check
+  - backfill board cells (zones): prisma/backfill-board-cells.ts
+  - demo users: ..\tools\s09\ensure-demo-users.cjs
+
+=== dry-run: hero attackType plan (read-only) ===
+🏹 Backfill: attackType героев и помощников (без записи)...
+
+🔎 [dry-run] Achilles: attackType <none> -> melee
+🔎 [dry-run] Alice: attackType <none> -> melee
+🔎 [dry-run] Ancient Leshen: attackType <none> -> range
+🔎 [dry-run] Angel: attackType <none> -> melee
+🔎 [dry-run] Annie Christmas: attackType <none> -> melee
+🔎 [dry-run] Beowulf: attackType <none> -> melee
+🔎 [dry-run] Bigfoot: attackType <none> -> melee
+🔎 [dry-run] Black Panther: attackType <none> -> melee
+🔎 [dry-run] Black Widow: attackType <none> -> range
+🔎 [dry-run] Blackbeard: attackType <none> -> range
+🔎 [dry-run] Bloody Mary: attackType <none> -> melee
+🔎 [dry-run] Bruce Lee: attackType <none> -> melee
+🔎 [dry-run] Buffy: attackType <none> -> melee
+🔎 [dry-run] Bullseye: attackType <none> -> range
+🔎 [dry-run] Chupacabra: attackType <none> -> melee
+🔎 [dry-run] Ciri: attackType <none> -> melee
+🔎 [dry-run] Cloak Dagger: attackType <none> -> melee
+🔎 [dry-run] Daredevil: attackType <none> -> melee
+🔎 [dry-run] Deadpool: attackType <none> -> melee
+🔎 [dry-run] Doctor Strange: attackType <none> -> range
+🔎 [dry-run] Donatello: attackType <none> -> melee
+🔎 [dry-run] Dr. Jill Trent: attackType <none> -> melee
+🔎 [dry-run] Dr. Sattler: attackType <none> -> melee
+🔎 [dry-run] Dracula: attackType <none> -> melee
+🔎 [dry-run] Elektra: attackType <none> -> melee
+🔎 [dry-run] Eredin: attackType <none> -> melee
+🔎 [dry-run] Geralt of Rivia: attackType <none> -> melee
+🔎 [dry-run] Ghost Rider: attackType <none> -> melee
+🔎 [dry-run] Golden Bat: attackType <none> -> melee
+🔎 [dry-run] Hamlet: attackType <none> -> melee
+🔎 [dry-run] Harry Houdini: attackType <none> -> melee
+🔎 [dry-run] Invisible Man: attackType <none> -> melee
+🔎 [dry-run] Jekyll & Hyde: attackType <none> -> melee
+🔎 [dry-run] King Arthur: attackType <none> -> melee
+🔎 [dry-run] Krang: attackType <none> -> melee
+🔎 [dry-run] Leonardo: attackType <none> -> melee
+🔎 [dry-run] Little Red: attackType <none> -> melee
+🔎 [dry-run] Loki: attackType <none> -> melee
+🔎 [dry-run] Luke Cage: attackType <none> -> melee
+🔎 [dry-run] Medusa: attackType <none> -> range
+🔎 [dry-run] Michelangelo: attackType <none> -> melee
+🔎 [dry-run] Moon Knight: attackType <none> -> melee
+🔎 [dry-run] Ms. Marvel: attackType <none> -> melee
+🔎 [dry-run] Muhammad Ali: attackType <none> -> melee
+🔎 [dry-run] Nikola Tesla: attackType <none> -> range
+🔎 [dry-run] Oda Nobunaga: attackType <none> -> melee
+🔎 [dry-run] Pandora: attackType <none> -> melee
+🔎 [dry-run] Philippa: attackType <none> -> range
+🔎 [dry-run] Raphael: attackType <none> -> melee
+🔎 [dry-run] Raptors: attackType <none> -> melee
+🔎 [dry-run] Robert Muldoon: attackType <none> -> range
+🔎 [dry-run] Robin Hood: attackType <none> -> range
+🔎 [dry-run] Shakespeare: attackType <none> -> melee
+🔎 [dry-run] She Hulk: attackType <none> -> melee
+🔎 [dry-run] Sherlock Holmes: attackType <none> -> melee
+🔎 [dry-run] Shredder: attackType <none> -> melee
+🔎 [dry-run] Sinbad: attackType <none> -> melee
+🔎 [dry-run] Spiderman: attackType <none> -> melee
+🔎 [dry-run] Spike: attackType <none> -> melee
+🔎 [dry-run] Squirrel Girl: attackType <none> -> melee
+🔎 [dry-run] Sun Wukong: attackType <none> -> melee
+🔎 [dry-run] T. Rex: attackType <none> -> melee
+🔎 [dry-run] The Genie: attackType <none> -> range
+🔎 [dry-run] The Wayward Sisters: attackType <none> -> melee
+🔎 [dry-run] Titania: attackType <none> -> range
+🔎 [dry-run] Tomoe Gozen: attackType <none> -> range
+🔎 [dry-run] Willow: attackType <none> -> range
+🔎 [dry-run] Winter Soldier: attackType <none> -> range
+🔎 [dry-run] Yennefer & Triss: attackType <none> -> range
+🔎 [dry-run] Yennenga: attackType <none> -> range
+
+📊 Статистика backfill:
+   ✅ Обновлено: 0
+   🔎 Требует правки (не записано): 70
+   ⏭️  Уже согласовано: 0
+   ⚠️  Пропущено (нет файла/парс): 12
+   ❓ Не найдено в БД: 0
+   🎯 Medusa: melee (<none>); помощники: Harpies=melee(melee), Harpies=melee(melee), Harpies=melee(melee)
+   🎯 King Arthur: melee (<none>); помощники: Merlin=ranged(range)
+
+Dry run OK: nothing was written.
