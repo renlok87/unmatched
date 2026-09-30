@@ -52,8 +52,9 @@
     "textures_note": "карты фигуры 2K (коммит) + текстуры подставки 1K (UV0 подставки свой, harpy-h3-bake.json base_material); 4K-мастера локальные. Прежний TeamMask (все тёмные маховые) deprecated и не импортируется",
     "library_inputs": {
       "LUT": {
-        "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/lut/T_UM_MatLUT_Harpy_UE.dds",
-        "sha256": "e98447bd48ec9d7d5617088005365bc340e746edfd7a1b181a772706acd95780",
+        "path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/lut/T_UM_MatLUT_Harpy_UE_r2.dds",
+        "sha256": "60d5b91298c0bcaef494d320674c9e1827dafb4946da3a5ce3ea03c71c5286b5",
+        "was": "lut/T_UM_MatLUT_Harpy_UE.dds e98447bd… (i3); r2 — одна ячейка: feathers luminanceMin 0.02 -> 0.008",
         "note": "LUT героя 16 x 16 RGBA16F текущей итерации UE look-dev; i0 = textures/T_UM_MatLUT_Harpy.dds look-dev байт в байт (столбец 5 = horn_claw)"
       }
     },
@@ -168,11 +169,11 @@
     "team_color_mode_note": "v2.1: краситель по TeamAccentTexture (UseTeamAccent = true), TeamMaskTexture = T_UM_Mask_Black; перья в цветах концепта",
     "figure_parameters": {
       "TeamDye": 1.0,
-      "TeamDyeGain": 40.0,
-      "TeamDyeCeiling": 37.037
+      "TeamDyeGain": 56.7376,
+      "TeamDyeCeiling": 45.0
     },
     "figure_parameters_note": "team-accent.md (LDV-13): TeamDyeGain = 0.8 / Y_p50 = 0.8 / 0.020, TeamDyeCeiling = 0.9 / Y_p95 = 0.9 / 0.0272 (ld-maps-report.json team_accent accent_median_Y_bc / accent_p95_Y_bc); P1 (max 0.807) -> min(40, 41.0) = 40, P2 -> 40 (= Blender-предложение 40). ld-team-accent-ue.json у Harpy нет",
-    "lookdev_r2_pending": {"status": "подготовлено, не импортировано (UE не запускался; переимпорт после 5c-B2, docs/art-pipeline/evidence/lookdev-r2-2026-09-30/reimport-plan.json)", "sources": {"T_Harpy_H3LD_BC": {"path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/2k/T_Harpy_H3LD_BC.png", "sha256": "dae99d8ff44524db409eb8963cde59fd914077a330fd1c5c4024cf0b28c2dde2", "was_sha256": "980ecbf34b7234c8723e26bd4d189f851ead1ead1d33f35f52346c7f55dafa0d"}, "T_UM_MatLUT_Harpy": {"path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/lut/T_UM_MatLUT_Harpy_UE_r2.dds", "sha256": "60d5b91298c0bcaef494d320674c9e1827dafb4946da3a5ce3ea03c71c5286b5", "was_sha256": "e98447bd48ec9d7d5617088005365bc340e746edfd7a1b181a772706acd95780"}}, "figure_parameters": {"TeamDyeGain": 56.7376, "TeamDyeCeiling": 45.0}, "note": "look-dev round 2 (2026-09-30): при переимпорте перенести figure_parameters сюда -> ue.figure_parameters, library_inputs.LUT -> lut/T_UM_MatLUT_Harpy_UE_r2.dds (60d5b912…) и записать uasset sha (как reimport_5cb1)"},
+    "reimport_r2": {"note": "Пины переимпорта look-dev раунда 2 (2026-09-30, ue_h5cb1.py reimport-r2 в живом редакторе :8123 поверх ассетов прогона, AssetImportTask replace existing, источники сверены с reimport-plan.json; остальные ассеты прогона не менялись). Прежние значения: {\"TeamDyeGain\": 40.0, \"TeamDyeCeiling\": 37.037}", "plan": "docs/art-pipeline/evidence/lookdev-r2-2026-09-30/reimport-plan.json", "report": "art/pipeline-candidates/ASSET-HARPY-001/20260930-h3ld-r2-ue/reimport-r2.json", "sources": {"T_Harpy_H3LD_BC": {"path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/2k/T_Harpy_H3LD_BC.png", "sha256": "dae99d8ff44524db409eb8963cde59fd914077a330fd1c5c4024cf0b28c2dde2"}, "T_UM_MatLUT_Harpy": {"path": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/lut/T_UM_MatLUT_Harpy_UE_r2.dds", "sha256": "60d5b91298c0bcaef494d320674c9e1827dafb4946da3a5ce3ea03c71c5286b5"}}, "uasset_sha256": {"BC": "fda190a1641e4d76b81e997559aaf4f739fb5e4c687635062aaa403c6c6e8808", "LUT": "8487348ec8e145b7e72f7e0d88253b9589ed1315ea56c776b0844a2a9f8b3177", "MI": "d7c657467000abc7b438471c48740326aff42a760c31b1424de49975aed818d2"}, "measured": "art/pipeline-candidates/…/review/b2 (docs/art-pipeline/evidence/lookdev-r2-2026-09-30/ue-b2-summary.json)"},
     "reimport_5cb1": {
       "note": "Пины переимпорта 5c-B1 (группа H, 2026-09-30, ue_h5cb1.py reimport в живом редакторе :8123 поверх ассетов прогона, AssetImportTask replace existing; остальные ассеты прогона не менялись). 5c-B0: BC тёмных маховых перьев по кадрам UE (ue_bc_feedback, коэффициент (0.63; 0.8686; 0.8948)), TeamDyeCeiling = 0.9 / p95 акцента по новому BC. Прежние значения: {\"TeamDyeCeiling\": 33.0882}",
       "report": "art/pipeline-candidates/ASSET-HARPY-001/20260930-h3ld-5cb1-ue/reimport-5cb1.json",

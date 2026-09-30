@@ -410,7 +410,12 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
   Base->SetRelativeLocation(FVector(0, 0, 3.0f));
   Ring->SetWorldScale3D(FVector(1.15f, 1.15f, 0.04f));
   Ring->SetRelativeLocation(FVector(0, 0, 1.0f));
-  TargetRing->SetRelativeScale3D(FVector(Fighter.bIsHero ? 1.0f : 0.78f));
+  {
+    // 5c-B3: the arcs sit inside the ring's inner keyline (S08TeamRingSpec::TargetArcScale, XY only).
+    const float ArcSize = Fighter.bIsHero ? 1.0f : 0.78f;
+    const float ArcXY = ArcSize * S08TeamRingSpec::TargetArcScale;
+    TargetRing->SetRelativeScale3D(FVector(ArcXY, ArcXY, ArcSize));
+  }
   TargetRing->SetRelativeLocation(FVector::ZeroVector);
   // Grid boards keep the column rule `Fighter.X >= 4` (Cobble and the
   // Sherwood / T-Rex art-fixture frames unchanged). On an original map
@@ -672,12 +677,13 @@ void AS08FighterActor::SetCombatMarkers(bool bAttacker, bool bTarget) {
   // icon=1 means "the target icon is bound to this fighter"; iconMode says
   // whether the world billboard or the exact-size HUD icon (T2.2) draws it.
   FS08Trace::Write(FString::Printf(
-      TEXT("ARTPREVIEW combat marker fighter=%s attacker=%d target=%d icon=%d targetMesh=%s iconMode=%s"),
+      TEXT("ARTPREVIEW combat marker fighter=%s attacker=%d target=%d icon=%d targetMesh=%s iconMode=%s "
+           "targetArcScaleXY=%.3f"),
       *Fighter.Name, bIsCombatAttacker ? 1 : 0, bIsCombatTarget ? 1 : 0,
       bIsCombatTarget && bArtTargetIconLoaded ? 1 : 0,
       TargetRing->GetStaticMesh() ? *TargetRing->GetStaticMesh()->GetName()
                                   : TEXT("none"),
-      bScreenIconMode ? TEXT("screen") : TEXT("world")));
+      bScreenIconMode ? TEXT("screen") : TEXT("world"), TargetRing->GetRelativeScale3D().X));
 }
 
 void AS08FighterActor::SetLabelZoomRatio(float DistanceRatio,

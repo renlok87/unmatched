@@ -141,36 +141,72 @@ def dirty_map(ue, pkgs):
 
 # ------------------------------------------------------------------ 1) re-import
 def cmd_reimport(a) -> dict:
-    from ue_live import Ue
-    from ue_lock import ue_lock
     h = HEROES[a.hero]
     run = PC / h["asset_dir"] / h["run"]
     ld = PC / h["asset_dir"] / h["lookdev"]
-    tmp = TMP / a.hero
-    tmp.mkdir(parents=True, exist_ok=True)
-    texs, pkgs = [], []
+    texs = []
     for t in h["textures"]:
         src = (ld / t["file"]).resolve()
         digest = sha(src)
         if not digest.startswith(t["sha"]):
             raise SystemExit("source %s sha %s != pinned %s" % (src, digest[:12], t["sha"]))
         texs.append({"asset": t["asset"], "source_file": src.as_posix(), "settings": t["settings"], "sha256": digest})
-        pkgs.append(t["asset"])
-    pkgs += list(h["mi"])
+    return _reimport(a.hero, h, texs, h["mi"], run / "reimport-5cb1.json", "unmatched.h5cb1-reimport/1",
+                     "5c-B0 next_ue_steps (C:/tmp/p0-review/5cb0.json track blender)", "h5cb1 reimport")
+
+
+# look-dev round 2 (2026-09-30): the prepared re-import (docs/art-pipeline/evidence/lookdev-r2-2026-09-30/reimport-plan.json)
+R2_PLAN = REPO / "docs" / "art-pipeline" / "evidence" / "lookdev-r2-2026-09-30" / "reimport-plan.json"
+R2_RUN = {"harpy": "20260930-h3ld-r2-ue", "medusa": "20260930-h2ld-r2-ue", "merlin": "20260930-h2ld-r2-ue"}
+# properties written after the import (UE Python enum names); the BC's mip generation and every pixel size of the plan
+# are read back and checked, not written (replace_existing_settings False keeps them)
+R2_SET = ("srgb", "compression_settings", "filter", "never_stream")
+R2_MIP = {"FromTextureGroup": "TMGS_FROM_TEXTURE_GROUP", "TMGS_NO_MIPMAPS": "TMGS_NO_MIPMAPS"}
+
+
+def cmd_reimport_r2(a) -> dict:
+    """Look-dev round 2: the textures + MI dye knobs of reimport-plan.json over the existing assets, sources checked
+    against the plan's sha256 first; LUTs get the full LUT settings (NoMipmaps included)."""
+    plan = json.loads(R2_PLAN.read_text(encoding="utf-8"))
+    ph = plan["heroes"][a.hero]
+    h = HEROES[a.hero]
+    texs = []
+    for t in ph["textures"]:
+        src = (REPO / t["file"]).resolve()
+        digest = sha(src)
+        if digest != t["sha256"]:
+            raise SystemExit("source %s sha %s != plan %s" % (src, digest[:12], t["sha256"][:12]))
+        st = {k: t["settings"][k] for k in R2_SET if k in t["settings"]}
+        if t["settings"].get("mip_gen_settings") == "TMGS_NO_MIPMAPS":
+            st["mip_gen_settings"] = "TMGS_NO_MIPMAPS"
+        texs.append({"asset": t["asset"], "source_file": src.as_posix(), "settings": st, "sha256": digest,
+                     "was_sha256": t["was_sha256"], "plan_settings": t["settings"]})
+    mi = {p: {"scalars": v["scalars"]} for p, v in ph["mi"].items()}
+    out = PC / HEROES[a.hero]["asset_dir"] / R2_RUN[a.hero] / "reimport-r2.json"
+    return _reimport(a.hero, h, texs, mi, out, "unmatched.lookdev-r2-reimport/1",
+                     "look-dev round 2 plan %s (commit ee96aaf6)" % R2_PLAN.relative_to(REPO).as_posix(),
+                     "lookdev-r2 reimport")
+
+
+def _reimport(hero, h, texs, mi_spec, out_json: Path, schema: str, source: str, step: str) -> dict:
+    from ue_live import Ue
+    from ue_lock import ue_lock
+    tmp = TMP / hero
+    tmp.mkdir(parents=True, exist_ok=True)
+    pkgs = [t["asset"] for t in texs] + list(mi_spec)
     before = {p: sha(uasset_file(p)) for p in pkgs}
-    rep = {"schema": "unmatched.h5cb1-reimport/1", "hero": h["key"], "started_at": now(),
-           "tool": "tools/art/material_library/ue_h5cb1.py reimport (ue/h5cb1_ue.py reimport + mi_params + readback)",
+    rep = {"schema": schema, "hero": h["key"], "started_at": now(),
+           "tool": "tools/art/material_library/ue_h5cb1.py (ue/h5cb1_ue.py reimport + mi_params + readback)",
            "editor": os.environ.get("UE_MCP_URL", "http://127.0.0.1:8123/mcp"),
-           "source": "5c-B0 next_ue_steps (C:/tmp/p0-review/5cb0.json track blender)", "textures": texs,
-           "mi_parameters": h["mi"], "uasset_sha256_before": before}
+           "source": source, "textures": texs, "mi_parameters": mi_spec, "uasset_sha256_before": before}
     ue = Ue()
-    with ue_lock("h5cb1 reimport %s" % h["key"]) as lock:
+    with ue_lock("%s %s" % (step, h["key"])) as lock:
         level = ue.call("scene", "get_current_level", record=False)
         rep["level_during"] = level
         rep["dirty_before"] = dirty_map(ue, pkgs)
         r1 = ue.run_task(str(TASK), str(tmp / "_task.json"), timeout=600, op="reimport",
                          textures=[{k: t[k] for k in ("asset", "source_file", "settings")} for t in texs])
-        r2 = ue.run_task(str(TASK), str(tmp / "_task.json"), timeout=600, op="mi_params", instances=h["mi"])
+        r2 = ue.run_task(str(TASK), str(tmp / "_task.json"), timeout=600, op="mi_params", instances=mi_spec)
         insts = sorted(p for p in json.loads(json.dumps(
             ue.run_task(str(TASK), str(tmp / "_task.json"), timeout=600, op="readback", folder=folder_of(h),
                         textures=[], instances=[])["folder_packages"])) if "/Materials/MI_" in p)
@@ -191,16 +227,22 @@ def cmd_reimport(a) -> dict:
         want = t["settings"]
         ok = all((rb.get(k) if k != "srgb" else rb["srgb"]) == v or str(rb.get(k)).upper() == str(v).upper()
                  for k, v in want.items())
+        ps = t.get("plan_settings") or {}
+        if "px" in ps:
+            ok = ok and list(rb.get("size") or []) == list(ps["px"])
+        if "mip_gen_settings" in ps:
+            ok = ok and str(rb.get("mip_gen_settings")).upper() == R2_MIP.get(ps["mip_gen_settings"],
+                                                                              ps["mip_gen_settings"]).upper()
         src_ok = any(Path(s).resolve() == Path(t["source_file"]).resolve() for s in rb.get("source_files") or [])
         checks["texture " + t["asset"].rsplit("/", 1)[1]] = {"passed": bool(ok and src_ok), "settings": {
             k: rb.get(k) for k in ("srgb", "compression_settings", "filter", "mip_gen_settings", "never_stream", "size")},
             "source_files": rb.get("source_files"), "changed_uasset": before[t["asset"]] != after[t["asset"]]}
-    for p, spec in h["mi"].items():
+    for p, spec in mi_spec.items():
         eff = r3["instances"][p]["effective"]
         checks["mi " + p.rsplit("/", 1)[1]] = {"passed": all(abs(eff[k] - v) < 1e-3 for k, v in spec["scalars"].items()),
                                                "effective": eff}
     over = {p: {k: v for k, v in r3["instances"][p]["scalars"].items() if k in ("TeamDyeGain", "TeamDyeCeiling")}
-            for p in insts if p not in h["mi"]}
+            for p in insts if p not in mi_spec}
     checks["children_do_not_override_dye_knobs"] = {"passed": not any(over.values()), "overrides": over}
     checks["effective_on_team_mis"] = {"passed": True, "values": {p: r3["instances"][p]["effective"] for p in insts}}
     checks["no_numbered_copies"] = {"passed": not r3["numbered_copies"], "numbered": r3["numbered_copies"],
@@ -209,7 +251,7 @@ def cmd_reimport(a) -> dict:
     rep["checks"] = checks
     rep["passed"] = all(c["passed"] for c in checks.values())
     rep["finished_at"] = now()
-    write_json(run / "reimport-5cb1.json", rep)
+    write_json(out_json, rep)
     for k, c in checks.items():
         print("%-48s %s" % (k, "PASS" if c["passed"] else "FAIL"))
     print("uasset:", json.dumps({p.rsplit("/", 1)[1]: [before[p][:12], after[p][:12]] for p in pkgs}))
@@ -587,13 +629,15 @@ def cmd_game_sheets(a) -> dict:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("command", choices=["reimport", "review", "game", "game-sheets"])
+    ap.add_argument("command", choices=["reimport", "reimport-r2", "review", "game", "game-sheets"])
     ap.add_argument("--hero", choices=sorted(HEROES))
     ap.add_argument("--step", choices=["ref", "accent"] + CLIPS)
     ap.add_argument("--tag", default="b1")
     a = ap.parse_args()
     if a.command == "reimport":
         cmd_reimport(a)
+    elif a.command == "reimport-r2":
+        cmd_reimport_r2(a)
     elif a.command == "review":
         cmd_review(a)
     elif a.command == "game-sheets":
