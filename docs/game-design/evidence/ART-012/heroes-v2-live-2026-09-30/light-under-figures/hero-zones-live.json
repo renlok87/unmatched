@@ -1,0 +1,8527 @@
+{
+ "schema": "unmatched.t5cb2-hero-zones/1",
+ "status": "измерено (прокси цветовой классификации, не метод MatID)",
+ "method": "Why a proxy. The registered method (tools/art/material_library/ue_hero_lookdev.py measure) takes the zone of a pixel from the MatID class of a DebugView-1 frame (debug MI) shot on the same camera as a plate frame. A packaged client renders the game MIs only: there is no debug frame and no plate of a live board. So on the live frames the zone of a pixel is taken by COLOUR: kNN (Lab) against prototypes = the pixels of each zone of the look-dev b1 frames of the same hero (true MatID masks, eroded 1 px, the render gates of the config), the team MI frame of the side the fighter plays (P1 / P2) moved to the reading exposure by the validated Filmic model (tools/art/ue_filmic.py shift_display_u8, reading_bias_ev of the config = EV100 2.05). Extra classes: «other» (figure / base pixels outside the tolerance zones), «board» (on the live frame: the tile annulus of the fighter's own cell, r 30..45 uu, sector towards the camera; on the look-dev frame: the plate), «ring» (the calibrated screen bytes of the team ring: fill, keyline, rim). A pixel is kept for a zone when its kNN vote is that zone and its nearest prototype is within --max-de; the zone masks are eroded 1 px (as the method). Zone statistics, k (geometric mean over key zones) and the verdict (|Y/k - 1| <= 0.15, |dHue| <= 12, |dSat| <= 0.10) are the method's (ue_hero_lookdev.cmd_measure formulas).",
+ "tolerance": {
+  "lumaRatio": 0.15,
+  "hueDeg": 12,
+  "sat": 0.1
+ },
+ "b15Criteria": {
+  "arthur": [
+   5,
+   6
+  ],
+  "merlin": [
+   3,
+   5
+  ],
+  "medusa": [
+   5,
+   5
+  ],
+  "harpy": [
+   4,
+   5
+  ]
+ },
+ "params": {
+  "k": 7,
+  "maxDeltaE": 12.0,
+  "minPxLive": 60,
+  "lookdevTag": "b1",
+  "readingBiasEv": {
+   "KingArthur": -0.75,
+   "Merlin": -0.75,
+   "Medusa": -0.75,
+   "Harpy": -0.75
+  }
+ },
+ "validation": {
+  "KingArthur": {
+   "team": "P2",
+   "method": {
+    "k": 0.6057,
+    "key_zones": [
+     "steel",
+     "gold",
+     "cloth",
+     "face_skin"
+    ],
+    "deltas": {
+     "steel": {
+      "Yk": 0.918,
+      "dHue": -15.4,
+      "dSat": 0.01,
+      "within": {
+       "luma": true,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": true,
+      "pixels": 60284,
+      "tolerance_zone": true
+     },
+     "gold": {
+      "Yk": 1.022,
+      "dHue": 2.3,
+      "dSat": 0.075,
+      "within": {
+       "luma": true,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": true,
+      "pixels": 70067,
+      "tolerance_zone": true
+     },
+     "embroidery": {
+      "Yk": 1.082,
+      "dHue": 3.3,
+      "dSat": 0.005,
+      "within": {
+       "luma": true,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": true,
+      "pixels": 9075,
+      "tolerance_zone": true
+     },
+     "cloth": {
+      "Yk": 1.078,
+      "dHue": -1.2,
+      "dSat": 0.034,
+      "within": {
+       "luma": true,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": true,
+      "pixels": 306930,
+      "tolerance_zone": true
+     },
+     "belt": {
+      "Yk": 4.226,
+      "dHue": -168.9,
+      "dSat": -0.096,
+      "within": {
+       "luma": false,
+       "hue": false,
+       "sat": true
+      },
+      "all_within": false,
+      "pixels": 1233,
+      "tolerance_zone": true
+     },
+     "face_skin": {
+      "Yk": 0.989,
+      "dHue": 2.3,
+      "dSat": 0.051,
+      "within": {
+       "luma": true,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": true,
+      "pixels": 3832,
+      "tolerance_zone": true
+     },
+     "hair": {
+      "Yk": 0.091,
+      "dHue": -158.5,
+      "dSat": -0.017,
+      "within": {
+       "luma": false,
+       "hue": false,
+       "sat": true
+      },
+      "all_within": false,
+      "pixels": 566,
+      "tolerance_zone": false
+     }
+    }
+   },
+   "proxy": {
+    "k": 0.6366,
+    "key_zones": [
+     "steel",
+     "gold",
+     "cloth",
+     "face_skin"
+    ],
+    "deltas": {
+     "steel": {
+      "Yk": 0.926,
+      "dHue": -14.0,
+      "dSat": -0.003,
+      "within": {
+       "luma": true,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": true,
+      "pixels": 52701,
+      "tolerance_zone": true
+     },
+     "gold": {
+      "Yk": 0.934,
+      "dHue": 2.1,
+      "dSat": 0.102,
+      "within": {
+       "luma": true,
+       "hue": true,
+       "sat": false
+      },
+      "all_within": false,
+      "pixels": 59183,
+      "tolerance_zone": true
+     },
+     "embroidery": {
+      "Yk": 1.192,
+      "dHue": 3.8,
+      "dSat": -0.002,
+      "within": {
+       "luma": false,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": false,
+      "pixels": 11894,
+      "tolerance_zone": true
+     },
+     "cloth": {
+      "Yk": 1.145,
+      "dHue": -1.0,
+      "dSat": 0.056,
+      "within": {
+       "luma": true,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": true,
+      "pixels": 256040,
+      "tolerance_zone": true
+     },
+     "belt": {
+      "Yk": 2.947,
+      "dHue": -168.5,
+      "dSat": -0.008,
+      "within": {
+       "luma": false,
+       "hue": false,
+       "sat": true
+      },
+      "all_within": false,
+      "pixels": 6747,
+      "tolerance_zone": true
+     },
+     "face_skin": {
+      "Yk": 1.009,
+      "dHue": 2.3,
+      "dSat": 0.056,
+      "within": {
+       "luma": true,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": true,
+      "pixels": 3176,
+      "tolerance_zone": true
+     },
+     "hair": {
+      "Yk": 0.096,
+      "dHue": -158.5,
+      "dSat": -0.017,
+      "within": {
+       "luma": false,
+       "hue": false,
+       "sat": true
+      },
+      "all_within": false,
+      "pixels": 574,
+      "tolerance_zone": false
+     }
+    }
+   },
+   "methodWithin": [
+    5,
+    6
+   ],
+   "proxyWithin": [
+    3,
+    6
+   ],
+   "verdictAgreement": "4/6",
+   "maxAbsDeltaYk": 1.279,
+   "maxAbsDeltaSat": 0.088
+  },
+  "Merlin": {
+   "team": "P2",
+   "method": {
+    "k": 0.8275,
+    "key_zones": [
+     "wool_coarse",
+     "silk",
+     "skin"
+    ],
+    "deltas": {
+     "wool_coarse": {
+      "Yk": 0.905,
+      "dHue": 4.9,
+      "dSat": 0.088,
+      "within": {
+       "luma": true,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": true,
+      "pixels": 244468,
+      "tolerance_zone": true
+     },
+     "silk": {
+      "Yk": 1.043,
+      "dHue": 1.8,
+      "dSat": 0.006,
+      "within": {
+       "luma": true,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": true,
+      "pixels": 4718,
+      "tolerance_zone": true
+     },
+     "bronze": {
+      "Yk": 1.213,
+      "dHue": 3.9,
+      "dSat": 0.065,
+      "within": {
+       "luma": false,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": false,
+      "pixels": 185,
+      "tolerance_zone": true
+     },
+     "skin": {
+      "Yk": 1.06,
+      "dHue": 2.5,
+      "dSat": -0.018,
+      "within": {
+       "luma": true,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": true,
+      "pixels": 10331,
+      "tolerance_zone": true
+     },
+     "leather_worn": {
+      "Yk": 0.43,
+      "dHue": -3.6,
+      "dSat": 0.021,
+      "within": {
+       "luma": false,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": false,
+      "pixels": 20692,
+      "tolerance_zone": true
+     },
+     "wood": {
+      "Yk": 0.785,
+      "dHue": -0.3,
+      "dSat": 0.046,
+      "within": {
+       "luma": false,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": false,
+      "pixels": 34520,
+      "tolerance_zone": false
+     }
+    }
+   },
+   "proxy": {
+    "k": 0.7527,
+    "key_zones": [
+     "wool_coarse",
+     "silk",
+     "skin"
+    ],
+    "deltas": {
+     "wool_coarse": {
+      "Yk": 0.802,
+      "dHue": 5.2,
+      "dSat": 0.103,
+      "within": {
+       "luma": false,
+       "hue": true,
+       "sat": false
+      },
+      "all_within": false,
+      "pixels": 211804,
+      "tolerance_zone": true
+     },
+     "silk": {
+      "Yk": 1.038,
+      "dHue": 2.7,
+      "dSat": 0.005,
+      "within": {
+       "luma": true,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": true,
+      "pixels": 6643,
+      "tolerance_zone": true
+     },
+     "skin": {
+      "Yk": 1.202,
+      "dHue": 3.2,
+      "dSat": -0.065,
+      "within": {
+       "luma": false,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": false,
+      "pixels": 8010,
+      "tolerance_zone": true
+     },
+     "leather_worn": {
+      "Yk": 0.181,
+      "dHue": -9.8,
+      "dSat": 0.014,
+      "within": {
+       "luma": false,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": false,
+      "pixels": 9817,
+      "tolerance_zone": true
+     },
+     "wood": {
+      "Yk": 0.812,
+      "dHue": -1.6,
+      "dSat": 0.04,
+      "within": {
+       "luma": false,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": false,
+      "pixels": 11988,
+      "tolerance_zone": false
+     }
+    }
+   },
+   "methodWithin": [
+    3,
+    5
+   ],
+   "proxyWithin": [
+    1,
+    4
+   ],
+   "verdictAgreement": "2/4",
+   "maxAbsDeltaYk": 0.249,
+   "maxAbsDeltaSat": 0.047
+  },
+  "Medusa": {
+   "team": "P1",
+   "method": {
+    "k": 1.0545,
+    "key_zones": [
+     "gold_antique",
+     "linen",
+     "skin"
+    ],
+    "deltas": {
+     "gold_antique": {
+      "Yk": 0.979,
+      "dHue": -0.9,
+      "dSat": 0.072,
+      "within": {
+       "luma": true,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": true,
+      "pixels": 72351,
+      "tolerance_zone": true
+     },
+     "linen": {
+      "Yk": 1.085,
+      "dHue": 13.1,
+      "dSat": 0.064,
+      "within": {
+       "luma": true,
+       "hue": false,
+       "sat": true
+      },
+      "all_within": false,
+      "pixels": 184012,
+      "tolerance_zone": true
+     },
+     "skin": {
+      "Yk": 0.941,
+      "dHue": 1.3,
+      "dSat": 0.162,
+      "within": {
+       "luma": true,
+       "hue": true,
+       "sat": false
+      },
+      "all_within": false,
+      "pixels": 65127,
+      "tolerance_zone": true
+     },
+     "leather_smooth": {
+      "Yk": 0.898,
+      "dHue": -2.3,
+      "dSat": 0.102,
+      "within": {
+       "luma": true,
+       "hue": true,
+       "sat": false
+      },
+      "all_within": false,
+      "pixels": 18773,
+      "tolerance_zone": true
+     },
+     "leather_worn": {
+      "Yk": 0.807,
+      "dHue": -3.0,
+      "dSat": 0.085,
+      "within": {
+       "luma": false,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": false,
+      "pixels": 7886,
+      "tolerance_zone": true
+     },
+     "wood": {
+      "Yk": 0.728,
+      "dHue": -5.1,
+      "dSat": 0.124,
+      "within": {
+       "luma": false,
+       "hue": true,
+       "sat": false
+      },
+      "all_within": false,
+      "pixels": 11859,
+      "tolerance_zone": false
+     }
+    }
+   },
+   "proxy": {
+    "k": 0.9033,
+    "key_zones": [
+     "gold_antique",
+     "linen",
+     "skin"
+    ],
+    "deltas": {
+     "gold_antique": {
+      "Yk": 1.397,
+      "dHue": -0.1,
+      "dSat": 0.054,
+      "within": {
+       "luma": false,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": false,
+      "pixels": 41470,
+      "tolerance_zone": true
+     },
+     "linen": {
+      "Yk": 0.769,
+      "dHue": 9.1,
+      "dSat": 0.036,
+      "within": {
+       "luma": false,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": false,
+      "pixels": 117281,
+      "tolerance_zone": true
+     },
+     "skin": {
+      "Yk": 0.931,
+      "dHue": 3.9,
+      "dSat": 0.13,
+      "within": {
+       "luma": true,
+       "hue": true,
+       "sat": false
+      },
+      "all_within": false,
+      "pixels": 54796,
+      "tolerance_zone": true
+     },
+     "leather_smooth": {
+      "Yk": 9.755,
+      "dHue": 22.8,
+      "dSat": -0.022,
+      "within": {
+       "luma": false,
+       "hue": false,
+       "sat": true
+      },
+      "all_within": false,
+      "pixels": 12896,
+      "tolerance_zone": true
+     },
+     "leather_worn": {
+      "Yk": 0.848,
+      "dHue": -3.7,
+      "dSat": 0.076,
+      "within": {
+       "luma": false,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": false,
+      "pixels": 3509,
+      "tolerance_zone": true
+     },
+     "wood": {
+      "Yk": 0.765,
+      "dHue": -5.8,
+      "dSat": 0.143,
+      "within": {
+       "luma": false,
+       "hue": true,
+       "sat": false
+      },
+      "all_within": false,
+      "pixels": 4247,
+      "tolerance_zone": false
+     }
+    }
+   },
+   "methodWithin": [
+    1,
+    5
+   ],
+   "proxyWithin": [
+    0,
+    5
+   ],
+   "verdictAgreement": "4/5",
+   "maxAbsDeltaYk": 8.857,
+   "maxAbsDeltaSat": 0.124
+  },
+  "Harpy": {
+   "team": "P1",
+   "method": {
+    "k": 1.0036,
+    "key_zones": [
+     "orange",
+     "dark",
+     "skin"
+    ],
+    "deltas": {
+     "orange": {
+      "Yk": 1.005,
+      "dHue": 1.0,
+      "dSat": -0.014,
+      "within": {
+       "luma": true,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": true,
+      "pixels": 201196,
+      "tolerance_zone": true
+     },
+     "dark": {
+      "Yk": 1.294,
+      "dHue": 1.8,
+      "dSat": 0.162,
+      "within": {
+       "luma": false,
+       "hue": true,
+       "sat": false
+      },
+      "all_within": false,
+      "pixels": 395205,
+      "tolerance_zone": true
+     },
+     "skin": {
+      "Yk": 0.769,
+      "dHue": -1.6,
+      "dSat": 0.063,
+      "within": {
+       "luma": false,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": false,
+      "pixels": 12398,
+      "tolerance_zone": true
+     },
+     "gold": {
+      "Yk": 0.882,
+      "dHue": -0.8,
+      "dSat": 0.023,
+      "within": {
+       "luma": true,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": true,
+      "pixels": 1757,
+      "tolerance_zone": true
+     },
+     "claw": {
+      "Yk": 0.899,
+      "dHue": 120.0,
+      "dSat": 0.017,
+      "within": {
+       "luma": true,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": true,
+      "pixels": 6167,
+      "tolerance_zone": true
+     }
+    }
+   },
+   "proxy": {
+    "k": 0.9724,
+    "key_zones": [
+     "orange",
+     "dark",
+     "skin"
+    ],
+    "deltas": {
+     "orange": {
+      "Yk": 1.032,
+      "dHue": 0.5,
+      "dSat": -0.004,
+      "within": {
+       "luma": true,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": true,
+      "pixels": 138155,
+      "tolerance_zone": true
+     },
+     "dark": {
+      "Yk": 1.208,
+      "dHue": -5.1,
+      "dSat": 0.106,
+      "within": {
+       "luma": false,
+       "hue": true,
+       "sat": false
+      },
+      "all_within": false,
+      "pixels": 218702,
+      "tolerance_zone": true
+     },
+     "skin": {
+      "Yk": 0.803,
+      "dHue": -2.7,
+      "dSat": 0.051,
+      "within": {
+       "luma": false,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": false,
+      "pixels": 12945,
+      "tolerance_zone": true
+     },
+     "gold": {
+      "Yk": 0.984,
+      "dHue": 5.2,
+      "dSat": -0.031,
+      "within": {
+       "luma": true,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": true,
+      "pixels": 1859,
+      "tolerance_zone": true
+     },
+     "claw": {
+      "Yk": 0.709,
+      "dHue": 120.0,
+      "dSat": 0.023,
+      "within": {
+       "luma": false,
+       "hue": true,
+       "sat": true
+      },
+      "all_within": false,
+      "pixels": 11819,
+      "tolerance_zone": true
+     }
+    }
+   },
+   "methodWithin": [
+    3,
+    5
+   ],
+   "proxyWithin": [
+    2,
+    5
+   ],
+   "verdictAgreement": "4/5",
+   "maxAbsDeltaYk": 0.19,
+   "maxAbsDeltaSat": 0.056
+  }
+ },
+ "lookdevOfficial": {
+  "KingArthur": {
+   "file": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2ld-ue/review/b1/measure-b1.json",
+   "k": 0.5732,
+   "within": [
+    6,
+    6
+   ],
+   "verdicts": {
+    "belt": "board light",
+    "cloth": "board light",
+    "embroidery": "board light",
+    "face_skin": "board light",
+    "gold": "within both",
+    "steel": "within both"
+   },
+   "deltas": {
+    "belt": {
+     "Y_ratio_exposure_normalised": 0.974,
+     "dHue_deg": -1.0,
+     "dSat": 0.048,
+     "all_within": true
+    },
+    "cloth": {
+     "Y_ratio_exposure_normalised": 1.074,
+     "dHue_deg": -0.2,
+     "dSat": 0.051,
+     "all_within": true
+    },
+    "embroidery": {
+     "Y_ratio_exposure_normalised": 1.024,
+     "dHue_deg": 3.5,
+     "dSat": 0.01,
+     "all_within": true
+    },
+    "face_skin": {
+     "Y_ratio_exposure_normalised": 0.946,
+     "dHue_deg": 2.1,
+     "dSat": 0.04,
+     "all_within": true
+    },
+    "gold": {
+     "Y_ratio_exposure_normalised": 1.021,
+     "dHue_deg": 3.1,
+     "dSat": 0.07,
+     "all_within": true
+    },
+    "hair": {
+     "Y_ratio_exposure_normalised": 0.252,
+     "dHue_deg": 41.5,
+     "dSat": -0.267,
+     "all_within": false
+    },
+    "steel": {
+     "Y_ratio_exposure_normalised": 0.964,
+     "dHue_deg": -24.0,
+     "dSat": 0.003,
+     "all_within": true
+    }
+   }
+  },
+  "Merlin": {
+   "file": "art/pipeline-candidates/ASSET-MERLIN-001/20260930-h2ld-ldc-ue/review/b1/measure-b1.json",
+   "k": 0.8342,
+   "within": [
+    3,
+    4
+   ],
+   "verdicts": {
+    "bronze": "not measured",
+    "leather_worn": "off on both",
+    "silk": "within both",
+    "skin": "board light",
+    "wool_coarse": "within both"
+   },
+   "deltas": {
+    "leather_worn": {
+     "Y_ratio_exposure_normalised": 0.478,
+     "dHue_deg": -3.6,
+     "dSat": 0.0,
+     "all_within": false
+    },
+    "silk": {
+     "Y_ratio_exposure_normalised": 1.068,
+     "dHue_deg": 1.8,
+     "dSat": 0.003,
+     "all_within": true
+    },
+    "skin": {
+     "Y_ratio_exposure_normalised": 1.072,
+     "dHue_deg": 2.1,
+     "dSat": -0.015,
+     "all_within": true
+    },
+    "wood": {
+     "Y_ratio_exposure_normalised": 0.829,
+     "dHue_deg": -1.0,
+     "dSat": 0.047,
+     "all_within": false
+    },
+    "wool_coarse": {
+     "Y_ratio_exposure_normalised": 0.873,
+     "dHue_deg": 5.6,
+     "dSat": 0.067,
+     "all_within": true
+    }
+   }
+  },
+  "Medusa": {
+   "file": "art/pipeline-candidates/ASSET-MEDUSA-001/20260930-h2ld-ldc-ue/review/b1/measure-b1.json",
+   "k": 1.128,
+   "within": [
+    3,
+    5
+   ],
+   "verdicts": {
+    "gold_antique": "within both",
+    "leather_smooth": "off on the reading exposure only",
+    "leather_worn": "within both",
+    "linen": "within both",
+    "skin": "off on both"
+   },
+   "deltas": {
+    "gold_antique": {
+     "Y_ratio_exposure_normalised": 1.097,
+     "dHue_deg": -0.9,
+     "dSat": 0.061,
+     "all_within": true
+    },
+    "leather_smooth": {
+     "Y_ratio_exposure_normalised": 0.796,
+     "dHue_deg": -1.4,
+     "dSat": 0.104,
+     "all_within": false
+    },
+    "leather_worn": {
+     "Y_ratio_exposure_normalised": 0.902,
+     "dHue_deg": -2.2,
+     "dSat": 0.06,
+     "all_within": true
+    },
+    "linen": {
+     "Y_ratio_exposure_normalised": 0.891,
+     "dHue_deg": 1.1,
+     "dSat": 0.006,
+     "all_within": true
+    },
+    "skin": {
+     "Y_ratio_exposure_normalised": 1.023,
+     "dHue_deg": 3.1,
+     "dSat": 0.153,
+     "all_within": false
+    },
+    "wood": {
+     "Y_ratio_exposure_normalised": 0.813,
+     "dHue_deg": -5.1,
+     "dSat": 0.113,
+     "all_within": false
+    }
+   }
+  },
+  "Harpy": {
+   "file": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/review/b1/measure-b1.json",
+   "k": 1.0735,
+   "within": [
+    3,
+    5
+   ],
+   "verdicts": {
+    "claw": "board light",
+    "dark": "off on both",
+    "gold": "board light",
+    "orange": "within both",
+    "skin": "off on both"
+   },
+   "deltas": {
+    "claw": {
+     "Y_ratio_exposure_normalised": 1.052,
+     "dHue_deg": 90.0,
+     "dSat": 0.0,
+     "all_within": true
+    },
+    "dark": {
+     "Y_ratio_exposure_normalised": 1.117,
+     "dHue_deg": 2.9,
+     "dSat": 0.133,
+     "all_within": false
+    },
+    "gold": {
+     "Y_ratio_exposure_normalised": 0.923,
+     "dHue_deg": -3.2,
+     "dSat": 0.02,
+     "all_within": true
+    },
+    "orange": {
+     "Y_ratio_exposure_normalised": 1.076,
+     "dHue_deg": 0.5,
+     "dSat": -0.022,
+     "all_within": true
+    },
+    "skin": {
+     "Y_ratio_exposure_normalised": 0.832,
+     "dHue_deg": -0.5,
+     "dSat": 0.063,
+     "all_within": false
+    }
+   }
+  }
+ },
+ "live": [
+  {
+   "label": "K1 cobble-5x6 host",
+   "frame": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/k1/cobble-5x6/run-20260930-165404/phase2-board-host-1920x1080.png",
+   "trace": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/k1/cobble-5x6/run-20260930-165404/phase2-client-host.trace.log",
+   "board": "cobble-5x6",
+   "render": {
+    "expMin": "4.14106"
+   },
+   "fighters": [
+    {
+     "fighter": "f-0-hero",
+     "hero": "Medusa",
+     "team": "P1",
+     "mesh": "SK_Medusa_H2LD",
+     "rect": [
+      914.0,
+      389.0,
+      1006.0,
+      512.0
+     ],
+     "headPx": 11.5,
+     "classCounts": {
+      "base": 636,
+      "board": 3928,
+      "dropped": 549,
+      "gold_antique": 125,
+      "leather_smooth": 259,
+      "leather_worn": 54,
+      "legacy_bake": 4,
+      "linen": 702,
+      "other": 312,
+      "ring": 2137,
+      "skin": 582,
+      "wood": 4
+     },
+     "boardSamples": 8569,
+     "ringSamples": 1454,
+     "baseSamples": 466,
+     "zonesMeasured": [
+      "linen",
+      "skin"
+     ],
+     "verdicts": {
+      "k": 0.6457,
+      "key_zones": [
+       "linen",
+       "skin"
+      ],
+      "deltas": {
+       "linen": {
+        "Yk": 1.167,
+        "dHue": 26.0,
+        "dSat": 0.143,
+        "within": {
+         "luma": false,
+         "hue": false,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 99,
+        "tolerance_zone": true
+       },
+       "skin": {
+        "Yk": 0.857,
+        "dHue": 5.7,
+        "dSat": 0.046,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 148,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      1,
+      2
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-cobble-5x6-host-f-0-hero-Medusa.jpg",
+     "vsLookdev": {
+      "linen": {
+       "Yratio": 1.518,
+       "dSat": 0.107,
+       "dHue": 16.9,
+       "proxyReliable": false
+      },
+      "skin": {
+       "Yratio": 0.921,
+       "dSat": -0.084,
+       "dHue": 1.8,
+       "proxyReliable": true
+      }
+     },
+     "attribution": {
+      "linen": "прокси ненадёжен для зоны (не атрибутируется)",
+      "skin": "в допуске (в look-dev вне: свет доски / ракурс помогают)"
+     }
+    },
+    {
+     "fighter": "f-0-sk0",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      1080.0,
+      409.0,
+      1155.0,
+      504.0
+     ],
+     "headPx": 11.4,
+     "classCounts": {
+      "base": 318,
+      "board": 2470,
+      "claw": 809,
+      "dark": 592,
+      "dropped": 299,
+      "gold": 16,
+      "orange": 844,
+      "other": 454,
+      "ring": 1050,
+      "skin": 273
+     },
+     "boardSamples": 8227,
+     "ringSamples": 909,
+     "baseSamples": 269,
+     "zonesMeasured": [
+      "claw",
+      "dark",
+      "orange"
+     ],
+     "verdicts": {
+      "k": 0.6497,
+      "key_zones": [
+       "orange",
+       "dark"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 0.826,
+        "dHue": 3.2,
+        "dSat": -0.009,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 383,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 1.211,
+        "dHue": 8.1,
+        "dSat": 0.191,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 146,
+        "tolerance_zone": true
+       },
+       "claw": {
+        "Yk": 0.518,
+        "dHue": 120.0,
+        "dSat": -0.013,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 191,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      0,
+      3
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-cobble-5x6-host-f-0-sk0-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 0.8,
+       "dSat": -0.005,
+       "dHue": 2.7,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 1.002,
+       "dSat": 0.085,
+       "dHue": 13.2,
+       "proxyReliable": false
+      },
+      "claw": {
+       "Yratio": 0.731,
+       "dSat": -0.036,
+       "dHue": 0.0,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "orange": "свет доски / ракурс",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+      "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-0-sk1",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      926.0,
+      288.0,
+      994.0,
+      381.0
+     ],
+     "headPx": 11.6,
+     "classCounts": {
+      "base": 302,
+      "board": 1842,
+      "claw": 975,
+      "dark": 464,
+      "dropped": 297,
+      "gold": 19,
+      "orange": 833,
+      "other": 356,
+      "ring": 992,
+      "skin": 244
+     },
+     "boardSamples": 7506,
+     "ringSamples": 829,
+     "baseSamples": 258,
+     "zonesMeasured": [
+      "claw",
+      "dark",
+      "orange"
+     ],
+     "verdicts": {
+      "k": 0.4427,
+      "key_zones": [
+       "orange",
+       "dark"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 0.589,
+        "dHue": 2.2,
+        "dSat": -0.017,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 348,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 1.698,
+        "dHue": 17.2,
+        "dSat": 0.365,
+        "within": {
+         "luma": false,
+         "hue": false,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 73,
+        "tolerance_zone": true
+       },
+       "claw": {
+        "Yk": 0.366,
+        "dHue": 120.0,
+        "dSat": -0.014,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 355,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      0,
+      3
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-cobble-5x6-host-f-0-sk1-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 0.571,
+       "dSat": -0.013,
+       "dHue": 1.7,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 1.406,
+       "dSat": 0.259,
+       "dHue": 22.3,
+       "proxyReliable": false
+      },
+      "claw": {
+       "Yratio": 0.516,
+       "dSat": -0.037,
+       "dHue": 0.0,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "orange": "свет доски / ракурс",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+      "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-0-sk2",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      765.0,
+      409.0,
+      840.0,
+      504.0
+     ],
+     "headPx": 11.3,
+     "classCounts": {
+      "base": 280,
+      "board": 2380,
+      "claw": 1009,
+      "dark": 553,
+      "dropped": 392,
+      "gold": 10,
+      "orange": 808,
+      "other": 400,
+      "ring": 1016,
+      "skin": 277
+     },
+     "boardSamples": 8710,
+     "ringSamples": 909,
+     "baseSamples": 269,
+     "zonesMeasured": [
+      "claw",
+      "dark",
+      "orange"
+     ],
+     "verdicts": {
+      "k": 0.4134,
+      "key_zones": [
+       "orange",
+       "dark"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 0.529,
+        "dHue": 2.4,
+        "dSat": -0.012,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 341,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 1.891,
+        "dHue": 20.3,
+        "dSat": 0.385,
+        "within": {
+         "luma": false,
+         "hue": false,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 126,
+        "tolerance_zone": true
+       },
+       "claw": {
+        "Yk": 0.377,
+        "dHue": 120.0,
+        "dSat": -0.015,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 327,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      0,
+      3
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-cobble-5x6-host-f-0-sk2-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 0.513,
+       "dSat": -0.008,
+       "dHue": 1.9,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 1.565,
+       "dSat": 0.279,
+       "dHue": 25.4,
+       "proxyReliable": false
+      },
+      "claw": {
+       "Yratio": 0.532,
+       "dSat": -0.038,
+       "dHue": 0.0,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "orange": "свет доски / ракурс",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+      "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-1-hero",
+     "hero": "KingArthur",
+     "team": "P2",
+     "mesh": "SK_KingArthur_H2LD",
+     "rect": [
+      913.0,
+      513.0,
+      1007.0,
+      644.0
+     ],
+     "headPx": 11.2,
+     "classCounts": {
+      "base": 582,
+      "belt": 172,
+      "board": 5327,
+      "cloth": 923,
+      "dropped": 852,
+      "embroidery": 73,
+      "face_skin": 145,
+      "gold": 149,
+      "hair": 22,
+      "other": 609,
+      "ring": 2228,
+      "steel": 556,
+      "unknown": 676
+     },
+     "boardSamples": 7328,
+     "ringSamples": 1402,
+     "baseSamples": 480,
+     "zonesMeasured": [
+      "cloth",
+      "steel"
+     ],
+     "verdicts": {
+      "k": 0.5083,
+      "key_zones": [
+       "steel",
+       "cloth"
+      ],
+      "deltas": {
+       "steel": {
+        "Yk": 0.73,
+        "dHue": -44.0,
+        "dSat": -0.025,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 124,
+        "tolerance_zone": true
+       },
+       "cloth": {
+        "Yk": 1.371,
+        "dHue": 0.5,
+        "dSat": -0.028,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 637,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      0,
+      2
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-cobble-5x6-host-f-1-hero-KingArthur.jpg",
+     "vsLookdev": {
+      "steel": {
+       "Yratio": 0.788,
+       "dSat": -0.022,
+       "dHue": -30.0,
+       "proxyReliable": true
+      },
+      "cloth": {
+       "Yratio": 1.197,
+       "dSat": -0.084,
+       "dHue": 1.5,
+       "proxyReliable": true
+      }
+     },
+     "attribution": {
+      "steel": "свет доски / ракурс",
+      "cloth": "свет доски / ракурс"
+     }
+    },
+    {
+     "fighter": "f-1-sk0",
+     "hero": "Merlin",
+     "team": "P2",
+     "mesh": "SK_Merlin_H2LD",
+     "rect": [
+      1084.0,
+      531.0,
+      1161.0,
+      635.0
+     ],
+     "headPx": 11.1,
+     "classCounts": {
+      "base": 353,
+      "board": 3958,
+      "dropped": 530,
+      "leather_worn": 2,
+      "other": 444,
+      "ring": 1587,
+      "skin": 16,
+      "wood": 22,
+      "wool_coarse": 1096
+     },
+     "boardSamples": 6441,
+     "ringSamples": 868,
+     "baseSamples": 289,
+     "zonesMeasured": [
+      "wool_coarse"
+     ],
+     "verdicts": {
+      "k": 0.9877,
+      "key_zones": [
+       "wool_coarse"
+      ],
+      "deltas": {
+       "wool_coarse": {
+        "Yk": 1.0,
+        "dHue": 4.8,
+        "dSat": 0.094,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 669,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      1,
+      1
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-cobble-5x6-host-f-1-sk0-Merlin.jpg",
+     "vsLookdev": {
+      "wool_coarse": {
+       "Yratio": 1.247,
+       "dSat": -0.009,
+       "dHue": -0.4,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "wool_coarse": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    }
+   ]
+  },
+  {
+   "label": "K1 cobble-5x6 joiner",
+   "frame": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/k1/cobble-5x6/run-20260930-165404/phase2-board-joiner-1920x1080.png",
+   "trace": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/k1/cobble-5x6/run-20260930-165404/phase2-client-joiner.trace.log",
+   "board": "cobble-5x6",
+   "render": {
+    "expMin": "4.14106"
+   },
+   "fighters": [
+    {
+     "fighter": "f-0-hero",
+     "hero": "Medusa",
+     "team": "P1",
+     "mesh": "SK_Medusa_H2LD",
+     "rect": [
+      914.0,
+      389.0,
+      1006.0,
+      512.0
+     ],
+     "headPx": 11.5,
+     "classCounts": {
+      "base": 484,
+      "board": 4420,
+      "dropped": 624,
+      "gold_antique": 157,
+      "leather_smooth": 243,
+      "leather_worn": 57,
+      "legacy_bake": 1,
+      "linen": 852,
+      "other": 243,
+      "ring": 1668,
+      "skin": 542,
+      "wood": 1
+     },
+     "boardSamples": 8569,
+     "ringSamples": 1454,
+     "baseSamples": 466,
+     "zonesMeasured": [
+      "linen",
+      "skin"
+     ],
+     "verdicts": {
+      "k": 0.6797,
+      "key_zones": [
+       "linen",
+       "skin"
+      ],
+      "deltas": {
+       "linen": {
+        "Yk": 1.107,
+        "dHue": 19.1,
+        "dSat": 0.092,
+        "within": {
+         "luma": true,
+         "hue": false,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 128,
+        "tolerance_zone": true
+       },
+       "skin": {
+        "Yk": 0.903,
+        "dHue": 5.6,
+        "dSat": 0.05,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 145,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      1,
+      2
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-cobble-5x6-joiner-f-0-hero-Medusa.jpg",
+     "vsLookdev": {
+      "linen": {
+       "Yratio": 1.44,
+       "dSat": 0.056,
+       "dHue": 10.0,
+       "proxyReliable": false
+      },
+      "skin": {
+       "Yratio": 0.97,
+       "dSat": -0.08,
+       "dHue": 1.7,
+       "proxyReliable": true
+      }
+     },
+     "attribution": {
+      "linen": "прокси ненадёжен для зоны (не атрибутируется)",
+      "skin": "в допуске (в look-dev вне: свет доски / ракурс помогают)"
+     }
+    },
+    {
+     "fighter": "f-0-sk0",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      1080.0,
+      409.0,
+      1155.0,
+      504.0
+     ],
+     "headPx": 11.3,
+     "classCounts": {
+      "base": 310,
+      "board": 2553,
+      "claw": 791,
+      "dark": 525,
+      "dropped": 359,
+      "gold": 10,
+      "orange": 798,
+      "other": 464,
+      "ring": 1038,
+      "skin": 277
+     },
+     "boardSamples": 8227,
+     "ringSamples": 909,
+     "baseSamples": 269,
+     "zonesMeasured": [
+      "claw",
+      "dark",
+      "orange"
+     ],
+     "verdicts": {
+      "k": 0.4868,
+      "key_zones": [
+       "orange",
+       "dark"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 0.645,
+        "dHue": 2.9,
+        "dSat": -0.012,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 337,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 1.549,
+        "dHue": 13.5,
+        "dSat": 0.321,
+        "within": {
+         "luma": false,
+         "hue": false,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 105,
+        "tolerance_zone": true
+       },
+       "claw": {
+        "Yk": 0.416,
+        "dHue": 120.0,
+        "dSat": -0.014,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 191,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      0,
+      3
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-cobble-5x6-joiner-f-0-sk0-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 0.625,
+       "dSat": -0.008,
+       "dHue": 2.4,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 1.282,
+       "dSat": 0.215,
+       "dHue": 18.6,
+       "proxyReliable": false
+      },
+      "claw": {
+       "Yratio": 0.587,
+       "dSat": -0.037,
+       "dHue": 0.0,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "orange": "свет доски / ракурс",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+      "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-0-sk1",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      926.0,
+      288.0,
+      994.0,
+      381.0
+     ],
+     "headPx": 11.6,
+     "classCounts": {
+      "base": 280,
+      "board": 1876,
+      "claw": 960,
+      "dark": 516,
+      "dropped": 338,
+      "gold": 23,
+      "orange": 849,
+      "other": 320,
+      "ring": 893,
+      "skin": 269
+     },
+     "boardSamples": 7506,
+     "ringSamples": 829,
+     "baseSamples": 258,
+     "zonesMeasured": [
+      "claw",
+      "dark",
+      "orange"
+     ],
+     "verdicts": {
+      "k": 0.3603,
+      "key_zones": [
+       "orange",
+       "dark"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 0.436,
+        "dHue": 2.9,
+        "dSat": 0.005,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 378,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 2.296,
+        "dHue": 22.4,
+        "dSat": 0.428,
+        "within": {
+         "luma": false,
+         "hue": false,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 79,
+        "tolerance_zone": true
+       },
+       "claw": {
+        "Yk": 0.297,
+        "dHue": 120.0,
+        "dSat": -0.014,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 354,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      0,
+      3
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-cobble-5x6-joiner-f-0-sk1-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 0.422,
+       "dSat": 0.009,
+       "dHue": 2.4,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 1.901,
+       "dSat": 0.322,
+       "dHue": 27.5,
+       "proxyReliable": false
+      },
+      "claw": {
+       "Yratio": 0.419,
+       "dSat": -0.037,
+       "dHue": 0.0,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "orange": "свет доски / ракурс",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+      "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-0-sk2",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      765.0,
+      409.0,
+      840.0,
+      504.0
+     ],
+     "headPx": 11.3,
+     "classCounts": {
+      "base": 301,
+      "board": 2331,
+      "claw": 967,
+      "dark": 612,
+      "dropped": 321,
+      "gold": 12,
+      "orange": 855,
+      "other": 434,
+      "ring": 1020,
+      "skin": 272
+     },
+     "boardSamples": 8710,
+     "ringSamples": 909,
+     "baseSamples": 269,
+     "zonesMeasured": [
+      "claw",
+      "dark",
+      "orange"
+     ],
+     "verdicts": {
+      "k": 0.4988,
+      "key_zones": [
+       "orange",
+       "dark"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 0.636,
+        "dHue": 3.0,
+        "dSat": -0.007,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 372,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 1.573,
+        "dHue": 16.0,
+        "dSat": 0.345,
+        "within": {
+         "luma": false,
+         "hue": false,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 151,
+        "tolerance_zone": true
+       },
+       "claw": {
+        "Yk": 0.439,
+        "dHue": 150.0,
+        "dSat": 0.002,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 308,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      0,
+      3
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-cobble-5x6-joiner-f-0-sk2-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 0.616,
+       "dSat": -0.003,
+       "dHue": 2.5,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 1.302,
+       "dSat": 0.239,
+       "dHue": 21.1,
+       "proxyReliable": false
+      },
+      "claw": {
+       "Yratio": 0.619,
+       "dSat": -0.021,
+       "dHue": 30.0,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "orange": "свет доски / ракурс",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+      "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-1-hero",
+     "hero": "KingArthur",
+     "team": "P2",
+     "mesh": "SK_KingArthur_H2LD",
+     "rect": [
+      913.0,
+      513.0,
+      1007.0,
+      644.0
+     ],
+     "headPx": 11.2,
+     "classCounts": {
+      "base": 557,
+      "belt": 172,
+      "board": 5278,
+      "cloth": 933,
+      "dropped": 889,
+      "embroidery": 74,
+      "face_skin": 151,
+      "gold": 158,
+      "hair": 22,
+      "other": 612,
+      "ring": 2228,
+      "steel": 532,
+      "unknown": 708
+     },
+     "boardSamples": 8317,
+     "ringSamples": 1402,
+     "baseSamples": 480,
+     "zonesMeasured": [
+      "cloth",
+      "steel"
+     ],
+     "verdicts": {
+      "k": 0.511,
+      "key_zones": [
+       "steel",
+       "cloth"
+      ],
+      "deltas": {
+       "steel": {
+        "Yk": 0.715,
+        "dHue": -24.0,
+        "dSat": -0.032,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 117,
+        "tolerance_zone": true
+       },
+       "cloth": {
+        "Yk": 1.399,
+        "dHue": -0.1,
+        "dSat": -0.026,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 642,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      0,
+      2
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-cobble-5x6-joiner-f-1-hero-KingArthur.jpg",
+     "vsLookdev": {
+      "steel": {
+       "Yratio": 0.772,
+       "dSat": -0.029,
+       "dHue": -10.0,
+       "proxyReliable": true
+      },
+      "cloth": {
+       "Yratio": 1.222,
+       "dSat": -0.082,
+       "dHue": 0.9,
+       "proxyReliable": true
+      }
+     },
+     "attribution": {
+      "steel": "свет доски / ракурс",
+      "cloth": "свет доски / ракурс"
+     }
+    },
+    {
+     "fighter": "f-1-sk0",
+     "hero": "Merlin",
+     "team": "P2",
+     "mesh": "SK_Merlin_H2LD",
+     "rect": [
+      1084.0,
+      531.0,
+      1161.0,
+      635.0
+     ],
+     "headPx": 11.1,
+     "classCounts": {
+      "base": 376,
+      "board": 3970,
+      "dropped": 555,
+      "leather_worn": 10,
+      "other": 473,
+      "ring": 1487,
+      "silk": 1,
+      "skin": 14,
+      "wood": 20,
+      "wool_coarse": 1102
+     },
+     "boardSamples": 8822,
+     "ringSamples": 868,
+     "baseSamples": 289,
+     "zonesMeasured": [
+      "wool_coarse"
+     ],
+     "verdicts": {
+      "k": 0.9817,
+      "key_zones": [
+       "wool_coarse"
+      ],
+      "deltas": {
+       "wool_coarse": {
+        "Yk": 1.0,
+        "dHue": 4.9,
+        "dSat": 0.099,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 661,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      1,
+      1
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-cobble-5x6-joiner-f-1-sk0-Merlin.jpg",
+     "vsLookdev": {
+      "wool_coarse": {
+       "Yratio": 1.247,
+       "dSat": -0.004,
+       "dHue": -0.3,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "wool_coarse": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    }
+   ]
+  },
+  {
+   "label": "K1 sherwood-forest-8x5 host",
+   "frame": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/k1/sherwood-forest-8x5/run-20260930-165706/phase2-board-host-1920x1080.png",
+   "trace": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/k1/sherwood-forest-8x5/run-20260930-165706/phase2-client-host.trace.log",
+   "board": "sherwood-forest-8x5",
+   "render": {
+    "expMin": "4.14106"
+   },
+   "fighters": [
+    {
+     "fighter": "f-0-hero",
+     "hero": "Medusa",
+     "team": "P1",
+     "mesh": "SK_Medusa_H2LD",
+     "rect": [
+      623.0,
+      438.0,
+      741.0,
+      583.0
+     ],
+     "headPx": 13.2,
+     "classCounts": {
+      "base": 1660,
+      "board": 9693,
+      "dropped": 404,
+      "gold_antique": 79,
+      "leather_smooth": 119,
+      "leather_worn": 15,
+      "legacy_bake": 3,
+      "linen": 591,
+      "other": 124,
+      "ring": 4267,
+      "skin": 152,
+      "wood": 3
+     },
+     "boardSamples": 7440,
+     "ringSamples": 2005,
+     "baseSamples": 628,
+     "zonesMeasured": [],
+     "verdicts": {
+      "k": null,
+      "deltas": {}
+     },
+     "within": [
+      0,
+      0
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-sherwood-forest-8x5-host-f-0-hero-Medusa.jpg",
+     "vsLookdev": {},
+     "attribution": {}
+    },
+    {
+     "fighter": "f-0-sk0",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      825.0,
+      462.0,
+      910.0,
+      573.0
+     ],
+     "headPx": 13.0,
+     "classCounts": {
+      "base": 506,
+      "board": 4159,
+      "claw": 96,
+      "dark": 672,
+      "dropped": 352,
+      "gold": 80,
+      "orange": 735,
+      "other": 397,
+      "ring": 1940,
+      "skin": 498
+     },
+     "boardSamples": 9159,
+     "ringSamples": 1247,
+     "baseSamples": 374,
+     "zonesMeasured": [
+      "dark",
+      "orange"
+     ],
+     "verdicts": {
+      "k": 0.2665,
+      "key_zones": [
+       "orange",
+       "dark"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 0.328,
+        "dHue": 5.6,
+        "dSat": 0.016,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 255,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 3.051,
+        "dHue": 24.1,
+        "dSat": 0.399,
+        "within": {
+         "luma": false,
+         "hue": false,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 85,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      0,
+      2
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-sherwood-forest-8x5-host-f-0-sk0-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 0.318,
+       "dSat": 0.02,
+       "dHue": 5.1,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 2.526,
+       "dSat": 0.293,
+       "dHue": 29.2,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "orange": "свет доски / ракурс",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-0-sk1",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      450.0,
+      462.0,
+      548.0,
+      573.0
+     ],
+     "headPx": 13.3,
+     "classCounts": {
+      "base": 594,
+      "board": 4383,
+      "claw": 173,
+      "dark": 620,
+      "dropped": 629,
+      "gold": 347,
+      "orange": 844,
+      "other": 430,
+      "ring": 2159,
+      "skin": 699
+     },
+     "boardSamples": 9024,
+     "ringSamples": 1240,
+     "baseSamples": 376,
+     "zonesMeasured": [
+      "dark",
+      "orange",
+      "skin"
+     ],
+     "verdicts": {
+      "k": 1.228,
+      "key_zones": [
+       "orange",
+       "dark",
+       "skin"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 1.289,
+        "dHue": 5.5,
+        "dSat": 0.037,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 235,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 1.538,
+        "dHue": 12.9,
+        "dSat": 0.221,
+        "within": {
+         "luma": false,
+         "hue": false,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 105,
+        "tolerance_zone": true
+       },
+       "skin": {
+        "Yk": 0.504,
+        "dHue": -2.7,
+        "dSat": 0.133,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 128,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      0,
+      3
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-sherwood-forest-8x5-host-f-0-sk1-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 1.249,
+       "dSat": 0.041,
+       "dHue": 5.0,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 1.273,
+       "dSat": 0.115,
+       "dHue": 18.0,
+       "proxyReliable": false
+      },
+      "skin": {
+       "Yratio": 0.628,
+       "dSat": 0.082,
+       "dHue": 0.0,
+       "proxyReliable": true
+      }
+     },
+     "attribution": {
+      "orange": "свет доски / ракурс",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+      "skin": "материал"
+     }
+    },
+    {
+     "fighter": "f-0-sk2",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      1010.0,
+      462.0,
+      1095.0,
+      573.0
+     ],
+     "headPx": 13.0,
+     "classCounts": {
+      "base": 534,
+      "board": 3685,
+      "claw": 122,
+      "dark": 784,
+      "dropped": 432,
+      "gold": 129,
+      "orange": 859,
+      "other": 394,
+      "ring": 1941,
+      "skin": 555
+     },
+     "boardSamples": 9563,
+     "ringSamples": 1247,
+     "baseSamples": 374,
+     "zonesMeasured": [
+      "dark",
+      "orange",
+      "skin"
+     ],
+     "verdicts": {
+      "k": 0.7002,
+      "key_zones": [
+       "orange",
+       "dark",
+       "skin"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 0.793,
+        "dHue": 4.4,
+        "dSat": 0.034,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 296,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 4.983,
+        "dHue": 22.7,
+        "dSat": 0.428,
+        "within": {
+         "luma": false,
+         "hue": false,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 153,
+        "tolerance_zone": true
+       },
+       "skin": {
+        "Yk": 0.253,
+        "dHue": -2.2,
+        "dSat": 0.134,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 60,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      0,
+      3
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-sherwood-forest-8x5-host-f-0-sk2-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 0.768,
+       "dSat": 0.038,
+       "dHue": 3.9,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 4.125,
+       "dSat": 0.322,
+       "dHue": 27.8,
+       "proxyReliable": false
+      },
+      "skin": {
+       "Yratio": 0.315,
+       "dSat": 0.083,
+       "dHue": 0.5,
+       "proxyReliable": true
+      }
+     },
+     "attribution": {
+      "orange": "свет доски / ракурс",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+      "skin": "материал"
+     }
+    },
+    {
+     "fighter": "f-1-hero",
+     "hero": "KingArthur",
+     "team": "P2",
+     "mesh": "SK_KingArthur_H2LD",
+     "rect": [
+      1179.0,
+      433.0,
+      1298.0,
+      583.0
+     ],
+     "headPx": 13.3,
+     "classCounts": {
+      "base": 1184,
+      "belt": 95,
+      "board": 9807,
+      "cloth": 1108,
+      "dropped": 459,
+      "embroidery": 187,
+      "face_skin": 188,
+      "gold": 261,
+      "other": 560,
+      "ring": 3817,
+      "steel": 179,
+      "unknown": 5
+     },
+     "boardSamples": 9184,
+     "ringSamples": 1767,
+     "baseSamples": 628,
+     "zonesMeasured": [
+      "cloth"
+     ],
+     "verdicts": {
+      "k": 0.3956,
+      "key_zones": [
+       "cloth"
+      ],
+      "deltas": {
+       "cloth": {
+        "Yk": 1.0,
+        "dHue": 2.5,
+        "dSat": -0.008,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 805,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      1,
+      1
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-sherwood-forest-8x5-host-f-1-hero-KingArthur.jpg",
+     "vsLookdev": {
+      "cloth": {
+       "Yratio": 0.873,
+       "dSat": -0.064,
+       "dHue": 3.5,
+       "proxyReliable": true
+      }
+     },
+     "attribution": {
+      "cloth": "в допуске"
+     }
+    },
+    {
+     "fighter": "f-1-sk0",
+     "hero": "Merlin",
+     "team": "P2",
+     "mesh": "SK_Merlin_H2LD",
+     "rect": [
+      1199.0,
+      608.0,
+      1296.0,
+      730.0
+     ],
+     "headPx": 12.6,
+     "classCounts": {
+      "base": 605,
+      "board": 6006,
+      "bronze": 5,
+      "dropped": 444,
+      "leather_worn": 179,
+      "other": 451,
+      "ring": 2859,
+      "silk": 13,
+      "skin": 18,
+      "unknown": 1,
+      "wood": 40,
+      "wool_coarse": 1213
+     },
+     "boardSamples": 9785,
+     "ringSamples": 1211,
+     "baseSamples": 397,
+     "zonesMeasured": [
+      "wool_coarse"
+     ],
+     "verdicts": {
+      "k": 0.8193,
+      "key_zones": [
+       "wool_coarse"
+      ],
+      "deltas": {
+       "wool_coarse": {
+        "Yk": 1.0,
+        "dHue": 2.4,
+        "dSat": 0.071,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 881,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      1,
+      1
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-sherwood-forest-8x5-host-f-1-sk0-Merlin.jpg",
+     "vsLookdev": {
+      "wool_coarse": {
+       "Yratio": 1.247,
+       "dSat": -0.032,
+       "dHue": -2.8,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "wool_coarse": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    }
+   ]
+  },
+  {
+   "label": "K1 sherwood-forest-8x5 joiner",
+   "frame": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/k1/sherwood-forest-8x5/run-20260930-165706/phase2-board-joiner-1920x1080.png",
+   "trace": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/k1/sherwood-forest-8x5/run-20260930-165706/phase2-client-joiner.trace.log",
+   "board": "sherwood-forest-8x5",
+   "render": {
+    "expMin": "4.14106"
+   },
+   "fighters": [
+    {
+     "fighter": "f-0-hero",
+     "hero": "Medusa",
+     "team": "P1",
+     "mesh": "SK_Medusa_H2LD",
+     "rect": [
+      623.0,
+      438.0,
+      741.0,
+      583.0
+     ],
+     "headPx": 13.2,
+     "classCounts": {
+      "base": 1630,
+      "board": 9044,
+      "dropped": 439,
+      "gold_antique": 111,
+      "leather_smooth": 123,
+      "leather_worn": 10,
+      "legacy_bake": 6,
+      "linen": 698,
+      "other": 140,
+      "ring": 4743,
+      "skin": 159,
+      "wood": 7
+     },
+     "boardSamples": 9514,
+     "ringSamples": 2005,
+     "baseSamples": 628,
+     "zonesMeasured": [
+      "linen"
+     ],
+     "verdicts": {
+      "k": 0.5561,
+      "key_zones": [
+       "linen"
+      ],
+      "deltas": {
+       "linen": {
+        "Yk": 1.0,
+        "dHue": 22.4,
+        "dSat": 0.048,
+        "within": {
+         "luma": true,
+         "hue": false,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 73,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      0,
+      1
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-sherwood-forest-8x5-joiner-f-0-hero-Medusa.jpg",
+     "vsLookdev": {
+      "linen": {
+       "Yratio": 1.3,
+       "dSat": 0.012,
+       "dHue": 13.3,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "linen": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-0-sk0",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      825.0,
+      462.0,
+      910.0,
+      573.0
+     ],
+     "headPx": 13.0,
+     "classCounts": {
+      "base": 490,
+      "board": 4125,
+      "claw": 77,
+      "dark": 736,
+      "dropped": 344,
+      "gold": 128,
+      "orange": 775,
+      "other": 368,
+      "ring": 1856,
+      "skin": 536
+     },
+     "boardSamples": 9563,
+     "ringSamples": 1247,
+     "baseSamples": 374,
+     "zonesMeasured": [
+      "dark",
+      "orange",
+      "skin"
+     ],
+     "verdicts": {
+      "k": 0.5519,
+      "key_zones": [
+       "orange",
+       "dark",
+       "skin"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 0.674,
+        "dHue": 6.7,
+        "dSat": 0.027,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 271,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 6.283,
+        "dHue": 23.5,
+        "dSat": 0.384,
+        "within": {
+         "luma": false,
+         "hue": false,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 86,
+        "tolerance_zone": true
+       },
+       "skin": {
+        "Yk": 0.236,
+        "dHue": -1.8,
+        "dSat": 0.131,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 65,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      0,
+      3
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-sherwood-forest-8x5-joiner-f-0-sk0-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 0.653,
+       "dSat": 0.031,
+       "dHue": 6.2,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 5.201,
+       "dSat": 0.278,
+       "dHue": 28.6,
+       "proxyReliable": false
+      },
+      "skin": {
+       "Yratio": 0.294,
+       "dSat": 0.08,
+       "dHue": 0.9,
+       "proxyReliable": true
+      }
+     },
+     "attribution": {
+      "orange": "свет доски / ракурс",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+      "skin": "материал"
+     }
+    },
+    {
+     "fighter": "f-0-sk1",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      450.0,
+      462.0,
+      548.0,
+      573.0
+     ],
+     "headPx": 13.3,
+     "classCounts": {
+      "base": 602,
+      "board": 4322,
+      "claw": 217,
+      "dark": 601,
+      "dropped": 632,
+      "gold": 337,
+      "orange": 836,
+      "other": 498,
+      "ring": 2221,
+      "skin": 612
+     },
+     "boardSamples": 9581,
+     "ringSamples": 1240,
+     "baseSamples": 376,
+     "zonesMeasured": [
+      "dark",
+      "orange",
+      "skin"
+     ],
+     "verdicts": {
+      "k": 1.0772,
+      "key_zones": [
+       "orange",
+       "dark",
+       "skin"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 1.206,
+        "dHue": 5.2,
+        "dSat": 0.028,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 213,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 1.768,
+        "dHue": 11.9,
+        "dSat": 0.263,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 113,
+        "tolerance_zone": true
+       },
+       "skin": {
+        "Yk": 0.469,
+        "dHue": -2.0,
+        "dSat": 0.139,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 80,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      0,
+      3
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-sherwood-forest-8x5-joiner-f-0-sk1-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 1.169,
+       "dSat": 0.032,
+       "dHue": 4.7,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 1.464,
+       "dSat": 0.157,
+       "dHue": 17.0,
+       "proxyReliable": false
+      },
+      "skin": {
+       "Yratio": 0.584,
+       "dSat": 0.088,
+       "dHue": 0.7,
+       "proxyReliable": true
+      }
+     },
+     "attribution": {
+      "orange": "свет доски / ракурс",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+      "skin": "материал"
+     }
+    },
+    {
+     "fighter": "f-0-sk2",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      1010.0,
+      462.0,
+      1095.0,
+      573.0
+     ],
+     "headPx": 13.0,
+     "classCounts": {
+      "base": 496,
+      "board": 3825,
+      "claw": 116,
+      "dark": 726,
+      "dropped": 426,
+      "gold": 110,
+      "orange": 823,
+      "other": 360,
+      "ring": 2015,
+      "skin": 538
+     },
+     "boardSamples": 9563,
+     "ringSamples": 1247,
+     "baseSamples": 374,
+     "zonesMeasured": [
+      "dark",
+      "orange"
+     ],
+     "verdicts": {
+      "k": 0.4929,
+      "key_zones": [
+       "orange",
+       "dark"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 0.577,
+        "dHue": 4.8,
+        "dSat": 0.023,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 269,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 1.733,
+        "dHue": 13.9,
+        "dSat": 0.387,
+        "within": {
+         "luma": false,
+         "hue": false,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 115,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      0,
+      2
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-sherwood-forest-8x5-joiner-f-0-sk2-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 0.559,
+       "dSat": 0.027,
+       "dHue": 4.3,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 1.435,
+       "dSat": 0.281,
+       "dHue": 19.0,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "orange": "свет доски / ракурс",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-1-hero",
+     "hero": "KingArthur",
+     "team": "P2",
+     "mesh": "SK_KingArthur_H2LD",
+     "rect": [
+      1179.0,
+      433.0,
+      1298.0,
+      583.0
+     ],
+     "headPx": 13.3,
+     "classCounts": {
+      "base": 1176,
+      "belt": 76,
+      "board": 9785,
+      "cloth": 1088,
+      "dropped": 501,
+      "embroidery": 178,
+      "face_skin": 202,
+      "gold": 249,
+      "other": 578,
+      "ring": 3793,
+      "steel": 222,
+      "unknown": 2
+     },
+     "boardSamples": 9184,
+     "ringSamples": 1767,
+     "baseSamples": 628,
+     "zonesMeasured": [
+      "cloth"
+     ],
+     "verdicts": {
+      "k": 0.3956,
+      "key_zones": [
+       "cloth"
+      ],
+      "deltas": {
+       "cloth": {
+        "Yk": 1.0,
+        "dHue": 2.5,
+        "dSat": -0.008,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 779,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      1,
+      1
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-sherwood-forest-8x5-joiner-f-1-hero-KingArthur.jpg",
+     "vsLookdev": {
+      "cloth": {
+       "Yratio": 0.873,
+       "dSat": -0.064,
+       "dHue": 3.5,
+       "proxyReliable": true
+      }
+     },
+     "attribution": {
+      "cloth": "в допуске"
+     }
+    },
+    {
+     "fighter": "f-1-sk0",
+     "hero": "Merlin",
+     "team": "P2",
+     "mesh": "SK_Merlin_H2LD",
+     "rect": [
+      1199.0,
+      608.0,
+      1296.0,
+      730.0
+     ],
+     "headPx": 12.6,
+     "classCounts": {
+      "base": 605,
+      "board": 6329,
+      "bronze": 4,
+      "dropped": 351,
+      "leather_worn": 98,
+      "other": 447,
+      "ring": 2708,
+      "silk": 10,
+      "skin": 21,
+      "wood": 37,
+      "wool_coarse": 1224
+     },
+     "boardSamples": 9785,
+     "ringSamples": 1211,
+     "baseSamples": 397,
+     "zonesMeasured": [
+      "wool_coarse"
+     ],
+     "verdicts": {
+      "k": 0.8193,
+      "key_zones": [
+       "wool_coarse"
+      ],
+      "deltas": {
+       "wool_coarse": {
+        "Yk": 1.0,
+        "dHue": 2.4,
+        "dSat": 0.071,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 888,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      1,
+      1
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-sherwood-forest-8x5-joiner-f-1-sk0-Merlin.jpg",
+     "vsLookdev": {
+      "wool_coarse": {
+       "Yratio": 1.247,
+       "dSat": -0.032,
+       "dHue": -2.8,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "wool_coarse": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    }
+   ]
+  },
+  {
+   "label": "K1 t-rex-paddock-7x5 host",
+   "frame": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/k1/t-rex-paddock-7x5/run-20260930-170028/phase2-board-host-1920x1080.png",
+   "trace": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/k1/t-rex-paddock-7x5/run-20260930-170028/phase2-client-host.trace.log",
+   "board": "t-rex-paddock-7x5",
+   "render": {
+    "expMin": "4.14106"
+   },
+   "fighters": [
+    {
+     "fighter": "f-0-hero",
+     "hero": "Medusa",
+     "team": "P1",
+     "mesh": "SK_Medusa_H2LD",
+     "rect": [
+      717.0,
+      438.0,
+      831.0,
+      583.0
+     ],
+     "headPx": 13.2,
+     "classCounts": {
+      "base": 644,
+      "board": 8614,
+      "dropped": 1018,
+      "gold_antique": 62,
+      "leather_smooth": 101,
+      "leather_worn": 42,
+      "legacy_bake": 2,
+      "linen": 1326,
+      "other": 350,
+      "ring": 4145,
+      "skin": 222,
+      "wood": 4
+     },
+     "boardSamples": 8118,
+     "ringSamples": 2004,
+     "baseSamples": 623,
+     "zonesMeasured": [
+      "linen"
+     ],
+     "verdicts": {
+      "k": 0.6096,
+      "key_zones": [
+       "linen"
+      ],
+      "deltas": {
+       "linen": {
+        "Yk": 1.0,
+        "dHue": 22.9,
+        "dSat": 0.033,
+        "within": {
+         "luma": true,
+         "hue": false,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 419,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      0,
+      1
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-t-rex-paddock-7x5-host-f-0-hero-Medusa.jpg",
+     "vsLookdev": {
+      "linen": {
+       "Yratio": 1.3,
+       "dSat": -0.003,
+       "dHue": 13.8,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "linen": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-0-sk0",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      723.0,
+      616.0,
+      815.0,
+      730.0
+     ],
+     "headPx": 12.6,
+     "classCounts": {
+      "base": 408,
+      "board": 4494,
+      "claw": 599,
+      "dark": 763,
+      "dropped": 396,
+      "gold": 1,
+      "orange": 970,
+      "other": 967,
+      "ring": 1588,
+      "skin": 302
+     },
+     "boardSamples": 9824,
+     "ringSamples": 1377,
+     "baseSamples": 400,
+     "zonesMeasured": [
+      "claw",
+      "dark",
+      "orange"
+     ],
+     "verdicts": {
+      "k": 0.4593,
+      "key_zones": [
+       "orange",
+       "dark"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 0.603,
+        "dHue": 1.9,
+        "dSat": -0.029,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 396,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 1.659,
+        "dHue": 17.2,
+        "dSat": 0.322,
+        "within": {
+         "luma": false,
+         "hue": false,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 237,
+        "tolerance_zone": true
+       },
+       "claw": {
+        "Yk": 0.47,
+        "dHue": -60.0,
+        "dSat": -0.023,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 102,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      0,
+      3
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-t-rex-paddock-7x5-host-f-0-sk0-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 0.584,
+       "dSat": -0.025,
+       "dHue": 1.4,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 1.373,
+       "dSat": 0.216,
+       "dHue": 22.3,
+       "proxyReliable": false
+      },
+      "claw": {
+       "Yratio": 0.663,
+       "dSat": -0.046,
+       "dHue": -180.0,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "orange": "свет доски / ракурс",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+      "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-0-sk1",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      739.0,
+      319.0,
+      824.0,
+      427.0
+     ],
+     "headPx": 13.4,
+     "classCounts": {
+      "base": 333,
+      "board": 3066,
+      "claw": 890,
+      "dark": 693,
+      "dropped": 434,
+      "gold": 12,
+      "orange": 940,
+      "other": 694,
+      "ring": 1707,
+      "skin": 411
+     },
+     "boardSamples": 8748,
+     "ringSamples": 1129,
+     "baseSamples": 350,
+     "zonesMeasured": [
+      "claw",
+      "dark",
+      "orange"
+     ],
+     "verdicts": {
+      "k": 0.2591,
+      "key_zones": [
+       "orange",
+       "dark"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 0.373,
+        "dHue": 3.2,
+        "dSat": -0.032,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 349,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 2.678,
+        "dHue": 22.9,
+        "dSat": 0.372,
+        "within": {
+         "luma": false,
+         "hue": false,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 189,
+        "tolerance_zone": true
+       },
+       "claw": {
+        "Yk": 0.78,
+        "dHue": 142.1,
+        "dSat": 0.053,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 196,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      0,
+      3
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-t-rex-paddock-7x5-host-f-0-sk1-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 0.361,
+       "dSat": -0.028,
+       "dHue": 2.7,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 2.217,
+       "dSat": 0.266,
+       "dHue": 28.0,
+       "proxyReliable": false
+      },
+      "claw": {
+       "Yratio": 1.1,
+       "dSat": 0.03,
+       "dHue": 22.1,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "orange": "свет доски / ракурс",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+      "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-0-sk2",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      544.0,
+      462.0,
+      639.0,
+      573.0
+     ],
+     "headPx": 13.2,
+     "classCounts": {
+      "base": 498,
+      "board": 4651,
+      "claw": 491,
+      "dark": 919,
+      "dropped": 289,
+      "gold": 3,
+      "orange": 962,
+      "other": 912,
+      "ring": 1530,
+      "skin": 290
+     },
+     "boardSamples": 9450,
+     "ringSamples": 1247,
+     "baseSamples": 377,
+     "zonesMeasured": [
+      "dark",
+      "orange"
+     ],
+     "verdicts": {
+      "k": 0.7889,
+      "key_zones": [
+       "orange",
+       "dark"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 0.923,
+        "dHue": 2.1,
+        "dSat": -0.029,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 409,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 1.084,
+        "dHue": 0.5,
+        "dSat": 0.126,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 319,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      1,
+      2
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-t-rex-paddock-7x5-host-f-0-sk2-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 0.894,
+       "dSat": -0.025,
+       "dHue": 1.6,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 0.897,
+       "dSat": 0.02,
+       "dHue": 5.6,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "orange": "в допуске",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-1-hero",
+     "hero": "KingArthur",
+     "team": "P2",
+     "mesh": "SK_KingArthur_H2LD",
+     "rect": [
+      1089.0,
+      433.0,
+      1204.0,
+      583.0
+     ],
+     "headPx": 13.2,
+     "classCounts": {
+      "base": 833,
+      "belt": 72,
+      "board": 8079,
+      "cloth": 1285,
+      "dropped": 623,
+      "embroidery": 104,
+      "face_skin": 193,
+      "gold": 147,
+      "hair": 158,
+      "other": 828,
+      "ring": 3958,
+      "steel": 970
+     },
+     "boardSamples": 9224,
+     "ringSamples": 1766,
+     "baseSamples": 623,
+     "zonesMeasured": [
+      "cloth",
+      "steel"
+     ],
+     "verdicts": {
+      "k": 0.2369,
+      "key_zones": [
+       "steel",
+       "cloth"
+      ],
+      "deltas": {
+       "steel": {
+        "Yk": 1.469,
+        "dHue": -24.0,
+        "dSat": -0.073,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 221,
+        "tolerance_zone": true
+       },
+       "cloth": {
+        "Yk": 0.681,
+        "dHue": -0.9,
+        "dSat": -0.047,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 923,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      0,
+      2
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-t-rex-paddock-7x5-host-f-1-hero-KingArthur.jpg",
+     "vsLookdev": {
+      "steel": {
+       "Yratio": 1.586,
+       "dSat": -0.07,
+       "dHue": -10.0,
+       "proxyReliable": true
+      },
+      "cloth": {
+       "Yratio": 0.595,
+       "dSat": -0.103,
+       "dHue": 0.1,
+       "proxyReliable": true
+      }
+     },
+     "attribution": {
+      "steel": "свет доски / ракурс",
+      "cloth": "свет доски / ракурс"
+     }
+    },
+    {
+     "fighter": "f-1-sk0",
+     "hero": "Merlin",
+     "team": "P2",
+     "mesh": "SK_Merlin_H2LD",
+     "rect": [
+      1281.0,
+      454.0,
+      1378.0,
+      573.0
+     ],
+     "headPx": 13.2,
+     "classCounts": {
+      "base": 462,
+      "board": 6152,
+      "dropped": 616,
+      "leather_worn": 29,
+      "other": 491,
+      "ring": 2469,
+      "skin": 14,
+      "wood": 19,
+      "wool_coarse": 1291
+     },
+     "boardSamples": 9534,
+     "ringSamples": 1103,
+     "baseSamples": 377,
+     "zonesMeasured": [
+      "wool_coarse"
+     ],
+     "verdicts": {
+      "k": 0.6169,
+      "key_zones": [
+       "wool_coarse"
+      ],
+      "deltas": {
+       "wool_coarse": {
+        "Yk": 1.0,
+        "dHue": 3.2,
+        "dSat": 0.121,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 989,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      0,
+      1
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-t-rex-paddock-7x5-host-f-1-sk0-Merlin.jpg",
+     "vsLookdev": {
+      "wool_coarse": {
+       "Yratio": 1.247,
+       "dSat": 0.018,
+       "dHue": -2.0,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "wool_coarse": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    }
+   ]
+  },
+  {
+   "label": "K1 t-rex-paddock-7x5 joiner",
+   "frame": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/k1/t-rex-paddock-7x5/run-20260930-170028/phase2-board-joiner-1920x1080.png",
+   "trace": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/k1/t-rex-paddock-7x5/run-20260930-170028/phase2-client-joiner.trace.log",
+   "board": "t-rex-paddock-7x5",
+   "render": {
+    "expMin": "4.14106"
+   },
+   "fighters": [
+    {
+     "fighter": "f-0-hero",
+     "hero": "Medusa",
+     "team": "P1",
+     "mesh": "SK_Medusa_H2LD",
+     "rect": [
+      717.0,
+      438.0,
+      831.0,
+      583.0
+     ],
+     "headPx": 13.2,
+     "classCounts": {
+      "base": 830,
+      "board": 8175,
+      "dropped": 884,
+      "gold_antique": 52,
+      "leather_smooth": 111,
+      "leather_worn": 47,
+      "legacy_bake": 1,
+      "linen": 1224,
+      "other": 484,
+      "ring": 4506,
+      "skin": 212,
+      "wood": 4
+     },
+     "boardSamples": 9127,
+     "ringSamples": 2004,
+     "baseSamples": 623,
+     "zonesMeasured": [
+      "linen"
+     ],
+     "verdicts": {
+      "k": 0.6539,
+      "key_zones": [
+       "linen"
+      ],
+      "deltas": {
+       "linen": {
+        "Yk": 1.0,
+        "dHue": 27.9,
+        "dSat": 0.057,
+        "within": {
+         "luma": true,
+         "hue": false,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 327,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      0,
+      1
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-t-rex-paddock-7x5-joiner-f-0-hero-Medusa.jpg",
+     "vsLookdev": {
+      "linen": {
+       "Yratio": 1.3,
+       "dSat": 0.021,
+       "dHue": 18.8,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "linen": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-0-sk0",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      723.0,
+      616.0,
+      815.0,
+      730.0
+     ],
+     "headPx": 12.5,
+     "classCounts": {
+      "base": 412,
+      "board": 4456,
+      "claw": 553,
+      "dark": 822,
+      "dropped": 381,
+      "gold": 2,
+      "orange": 1072,
+      "other": 977,
+      "ring": 1526,
+      "skin": 287
+     },
+     "boardSamples": 9824,
+     "ringSamples": 1377,
+     "baseSamples": 400,
+     "zonesMeasured": [
+      "claw",
+      "dark",
+      "orange"
+     ],
+     "verdicts": {
+      "k": 0.6515,
+      "key_zones": [
+       "orange",
+       "dark"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 0.83,
+        "dHue": 1.8,
+        "dSat": -0.029,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 487,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 1.205,
+        "dHue": 1.5,
+        "dSat": 0.14,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 260,
+        "tolerance_zone": true
+       },
+       "claw": {
+        "Yk": 0.692,
+        "dHue": 0.0,
+        "dSat": -0.008,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 100,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      0,
+      3
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-t-rex-paddock-7x5-joiner-f-0-sk0-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 0.804,
+       "dSat": -0.025,
+       "dHue": 1.3,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 0.998,
+       "dSat": 0.034,
+       "dHue": 6.6,
+       "proxyReliable": false
+      },
+      "claw": {
+       "Yratio": 0.976,
+       "dSat": -0.031,
+       "dHue": -120.0,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "orange": "свет доски / ракурс",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+      "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-0-sk1",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      739.0,
+      319.0,
+      824.0,
+      427.0
+     ],
+     "headPx": 13.4,
+     "classCounts": {
+      "base": 349,
+      "board": 3006,
+      "claw": 858,
+      "dark": 728,
+      "dropped": 476,
+      "gold": 30,
+      "orange": 992,
+      "other": 610,
+      "ring": 1705,
+      "skin": 425,
+      "unknown": 1
+     },
+     "boardSamples": 8792,
+     "ringSamples": 1129,
+     "baseSamples": 350,
+     "zonesMeasured": [
+      "claw",
+      "dark",
+      "orange"
+     ],
+     "verdicts": {
+      "k": 0.3775,
+      "key_zones": [
+       "orange",
+       "dark"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 0.505,
+        "dHue": 2.6,
+        "dSat": -0.036,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 373,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 1.981,
+        "dHue": 18.9,
+        "dSat": 0.336,
+        "within": {
+         "luma": false,
+         "hue": false,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 219,
+        "tolerance_zone": true
+       },
+       "claw": {
+        "Yk": 1.039,
+        "dHue": 150.0,
+        "dSat": 0.044,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 234,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      1,
+      3
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-t-rex-paddock-7x5-joiner-f-0-sk1-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 0.489,
+       "dSat": -0.032,
+       "dHue": 2.1,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 1.64,
+       "dSat": 0.23,
+       "dHue": 24.0,
+       "proxyReliable": false
+      },
+      "claw": {
+       "Yratio": 1.465,
+       "dSat": 0.021,
+       "dHue": 30.0,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "orange": "свет доски / ракурс",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+      "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-0-sk2",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      544.0,
+      462.0,
+      639.0,
+      573.0
+     ],
+     "headPx": 13.2,
+     "classCounts": {
+      "base": 485,
+      "board": 4719,
+      "claw": 482,
+      "dark": 848,
+      "dropped": 330,
+      "gold": 1,
+      "orange": 888,
+      "other": 904,
+      "ring": 1583,
+      "skin": 305
+     },
+     "boardSamples": 9450,
+     "ringSamples": 1247,
+     "baseSamples": 377,
+     "zonesMeasured": [
+      "dark",
+      "orange"
+     ],
+     "verdicts": {
+      "k": 0.7866,
+      "key_zones": [
+       "orange",
+       "dark"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 0.925,
+        "dHue": 1.7,
+        "dSat": -0.026,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 361,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 1.081,
+        "dHue": 0.5,
+        "dSat": 0.126,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 274,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      1,
+      2
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-t-rex-paddock-7x5-joiner-f-0-sk2-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 0.896,
+       "dSat": -0.022,
+       "dHue": 1.2,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 0.895,
+       "dSat": 0.02,
+       "dHue": 5.6,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "orange": "в допуске",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-1-hero",
+     "hero": "KingArthur",
+     "team": "P2",
+     "mesh": "SK_KingArthur_H2LD",
+     "rect": [
+      1089.0,
+      433.0,
+      1204.0,
+      583.0
+     ],
+     "headPx": 13.2,
+     "classCounts": {
+      "base": 839,
+      "belt": 63,
+      "board": 8041,
+      "cloth": 1259,
+      "dropped": 696,
+      "embroidery": 94,
+      "face_skin": 206,
+      "gold": 165,
+      "hair": 181,
+      "other": 797,
+      "ring": 3997,
+      "steel": 912
+     },
+     "boardSamples": 9566,
+     "ringSamples": 1766,
+     "baseSamples": 623,
+     "zonesMeasured": [
+      "cloth",
+      "steel"
+     ],
+     "verdicts": {
+      "k": 0.2361,
+      "key_zones": [
+       "steel",
+       "cloth"
+      ],
+      "deltas": {
+       "steel": {
+        "Yk": 1.474,
+        "dHue": -54.0,
+        "dSat": -0.065,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 201,
+        "tolerance_zone": true
+       },
+       "cloth": {
+        "Yk": 0.679,
+        "dHue": -0.9,
+        "dSat": -0.047,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 912,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      0,
+      2
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-t-rex-paddock-7x5-joiner-f-1-hero-KingArthur.jpg",
+     "vsLookdev": {
+      "steel": {
+       "Yratio": 1.592,
+       "dSat": -0.062,
+       "dHue": -40.0,
+       "proxyReliable": true
+      },
+      "cloth": {
+       "Yratio": 0.593,
+       "dSat": -0.103,
+       "dHue": 0.1,
+       "proxyReliable": true
+      }
+     },
+     "attribution": {
+      "steel": "свет доски / ракурс",
+      "cloth": "свет доски / ракурс"
+     }
+    },
+    {
+     "fighter": "f-1-sk0",
+     "hero": "Merlin",
+     "team": "P2",
+     "mesh": "SK_Merlin_H2LD",
+     "rect": [
+      1281.0,
+      454.0,
+      1378.0,
+      573.0
+     ],
+     "headPx": 13.2,
+     "classCounts": {
+      "base": 465,
+      "board": 6172,
+      "dropped": 647,
+      "leather_worn": 30,
+      "other": 472,
+      "ring": 2425,
+      "skin": 16,
+      "wood": 18,
+      "wool_coarse": 1298
+     },
+     "boardSamples": 9534,
+     "ringSamples": 1103,
+     "baseSamples": 377,
+     "zonesMeasured": [
+      "wool_coarse"
+     ],
+     "verdicts": {
+      "k": 0.6169,
+      "key_zones": [
+       "wool_coarse"
+      ],
+      "deltas": {
+       "wool_coarse": {
+        "Yk": 1.0,
+        "dHue": 3.2,
+        "dSat": 0.121,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 990,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      0,
+      1
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K1-t-rex-paddock-7x5-joiner-f-1-sk0-Merlin.jpg",
+     "vsLookdev": {
+      "wool_coarse": {
+       "Yratio": 1.247,
+       "dSat": 0.018,
+       "dHue": -2.0,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "wool_coarse": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    }
+   ]
+  },
+  {
+   "label": "K2 1.6x cobble host",
+   "frame": "docs/game-design/evidence/ART-018/long-k2-2026-09-30/k2-zoom-1.6/cobble-5x6/run-20260930-164456/phase2-board-host-1920x1080.png",
+   "trace": "docs/game-design/evidence/ART-018/long-k2-2026-09-30/k2-zoom-1.6/cobble-5x6/run-20260930-164456/phase2-client-host.trace.log",
+   "board": "cobble-5x6",
+   "render": {
+    "expMin": "4.14106"
+   },
+   "fighters": [
+    {
+     "fighter": "f-0-hero",
+     "hero": "Medusa",
+     "team": "P1",
+     "mesh": "SK_Medusa_H2LD",
+     "rect": [
+      886.0,
+      442.0,
+      1034.0,
+      639.0
+     ],
+     "headPx": 17.8,
+     "classCounts": {
+      "base": 1634,
+      "board": 14636,
+      "dropped": 1592,
+      "gold_antique": 398,
+      "leather_smooth": 465,
+      "leather_worn": 182,
+      "legacy_bake": 5,
+      "linen": 1847,
+      "other": 390,
+      "ring": 6823,
+      "skin": 1159,
+      "wood": 25
+     },
+     "boardSamples": 10410,
+     "ringSamples": 3681,
+     "baseSamples": 1054,
+     "zonesMeasured": [
+      "gold_antique",
+      "linen",
+      "skin"
+     ],
+     "verdicts": {
+      "k": 0.7731,
+      "key_zones": [
+       "gold_antique",
+       "linen",
+       "skin"
+      ],
+      "deltas": {
+       "gold_antique": {
+        "Yk": 1.527,
+        "dHue": 0.7,
+        "dSat": 0.021,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 98,
+        "tolerance_zone": true
+       },
+       "linen": {
+        "Yk": 0.662,
+        "dHue": 10.5,
+        "dSat": 0.069,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 673,
+        "tolerance_zone": true
+       },
+       "skin": {
+        "Yk": 0.989,
+        "dHue": 3.7,
+        "dSat": 0.066,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 435,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      1,
+      3
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K2-1.6x-cobble-host-f-0-hero-Medusa.jpg",
+     "vsLookdev": {
+      "gold_antique": {
+       "Yratio": 1.093,
+       "dSat": -0.033,
+       "dHue": 0.8,
+       "proxyReliable": false
+      },
+      "linen": {
+       "Yratio": 0.861,
+       "dSat": 0.033,
+       "dHue": 1.4,
+       "proxyReliable": false
+      },
+      "skin": {
+       "Yratio": 1.062,
+       "dSat": -0.064,
+       "dHue": -0.2,
+       "proxyReliable": true
+      }
+     },
+     "attribution": {
+      "gold_antique": "прокси ненадёжен для зоны (не атрибутируется)",
+      "linen": "прокси ненадёжен для зоны (не атрибутируется)",
+      "skin": "в допуске (в look-dev вне: свет доски / ракурс помогают)"
+     }
+    },
+    {
+     "fighter": "f-0-sk0",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      1151.0,
+      474.0,
+      1275.0,
+      626.0
+     ],
+     "headPx": 17.6,
+     "classCounts": {
+      "base": 945,
+      "board": 6275,
+      "claw": 1550,
+      "dark": 1681,
+      "dropped": 1020,
+      "gold": 39,
+      "orange": 2177,
+      "other": 885,
+      "ring": 3792,
+      "skin": 484
+     },
+     "boardSamples": 10130,
+     "ringSamples": 2276,
+     "baseSamples": 662,
+     "zonesMeasured": [
+      "claw",
+      "dark",
+      "orange"
+     ],
+     "verdicts": {
+      "k": 0.7056,
+      "key_zones": [
+       "orange",
+       "dark"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 0.885,
+        "dHue": 2.9,
+        "dSat": -0.002,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 1162,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 1.129,
+        "dHue": -1.3,
+        "dSat": 0.131,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 745,
+        "tolerance_zone": true
+       },
+       "claw": {
+        "Yk": 0.437,
+        "dHue": 150.0,
+        "dSat": 0.009,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 283,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      1,
+      3
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K2-1.6x-cobble-host-f-0-sk0-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 0.858,
+       "dSat": 0.002,
+       "dHue": 2.4,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 0.935,
+       "dSat": 0.025,
+       "dHue": 3.8,
+       "proxyReliable": false
+      },
+      "claw": {
+       "Yratio": 0.616,
+       "dSat": -0.014,
+       "dHue": 30.0,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "orange": "в допуске",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+      "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-0-sk1",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      905.0,
+      280.0,
+      1015.0,
+      426.0
+     ],
+     "headPx": 18.2,
+     "classCounts": {
+      "base": 846,
+      "board": 4698,
+      "claw": 2169,
+      "dark": 1241,
+      "dropped": 762,
+      "gold": 37,
+      "orange": 2024,
+      "other": 912,
+      "ring": 2905,
+      "skin": 466
+     },
+     "boardSamples": 10096,
+     "ringSamples": 1991,
+     "baseSamples": 618,
+     "zonesMeasured": [
+      "claw",
+      "dark",
+      "orange"
+     ],
+     "verdicts": {
+      "k": 0.3988,
+      "key_zones": [
+       "orange",
+       "dark"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 0.553,
+        "dHue": 2.6,
+        "dSat": -0.006,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 1067,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 1.807,
+        "dHue": 18.7,
+        "dSat": 0.343,
+        "within": {
+         "luma": false,
+         "hue": false,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 483,
+        "tolerance_zone": true
+       },
+       "claw": {
+        "Yk": 0.267,
+        "dHue": 120.0,
+        "dSat": -0.012,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 839,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      0,
+      3
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K2-1.6x-cobble-host-f-0-sk1-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 0.536,
+       "dSat": -0.002,
+       "dHue": 2.1,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 1.496,
+       "dSat": 0.237,
+       "dHue": 23.8,
+       "proxyReliable": false
+      },
+      "claw": {
+       "Yratio": 0.377,
+       "dSat": -0.035,
+       "dHue": 0.0,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "orange": "свет доски / ракурс",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+      "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-0-sk2",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      645.0,
+      474.0,
+      769.0,
+      626.0
+     ],
+     "headPx": 17.6,
+     "classCounts": {
+      "base": 1104,
+      "board": 6032,
+      "claw": 2324,
+      "dark": 1399,
+      "dropped": 988,
+      "gold": 29,
+      "orange": 2127,
+      "other": 889,
+      "ring": 3516,
+      "skin": 440
+     },
+     "boardSamples": 10712,
+     "ringSamples": 2276,
+     "baseSamples": 662,
+     "zonesMeasured": [
+      "claw",
+      "dark",
+      "orange"
+     ],
+     "verdicts": {
+      "k": 0.6687,
+      "key_zones": [
+       "orange",
+       "dark"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 0.907,
+        "dHue": 2.5,
+        "dSat": -0.013,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 1132,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 1.102,
+        "dHue": 0.9,
+        "dSat": 0.142,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 532,
+        "tolerance_zone": true
+       },
+       "claw": {
+        "Yk": 0.556,
+        "dHue": 120.0,
+        "dSat": 0.003,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 824,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      1,
+      3
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K2-1.6x-cobble-host-f-0-sk2-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 0.879,
+       "dSat": -0.009,
+       "dHue": 2.0,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 0.912,
+       "dSat": 0.036,
+       "dHue": 6.0,
+       "proxyReliable": false
+      },
+      "claw": {
+       "Yratio": 0.784,
+       "dSat": -0.02,
+       "dHue": 0.0,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "orange": "в допуске",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+      "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-1-hero",
+     "hero": "KingArthur",
+     "team": "P2",
+     "mesh": "SK_KingArthur_H2LD",
+     "rect": [
+      882.0,
+      647.0,
+      1038.0,
+      860.0
+     ],
+     "headPx": 16.9,
+     "classCounts": {
+      "base": 2341,
+      "belt": 113,
+      "board": 12669,
+      "cloth": 2475,
+      "dropped": 2059,
+      "embroidery": 230,
+      "face_skin": 303,
+      "gold": 419,
+      "hair": 33,
+      "other": 1218,
+      "ring": 8287,
+      "steel": 1444,
+      "unknown": 1637
+     },
+     "boardSamples": 9556,
+     "ringSamples": 3732,
+     "baseSamples": 1134,
+     "zonesMeasured": [
+      "cloth",
+      "steel"
+     ],
+     "verdicts": {
+      "k": 0.6056,
+      "key_zones": [
+       "steel",
+       "cloth"
+      ],
+      "deltas": {
+       "steel": {
+        "Yk": 0.668,
+        "dHue": -24.0,
+        "dSat": -0.007,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 456,
+        "tolerance_zone": true
+       },
+       "cloth": {
+        "Yk": 1.497,
+        "dHue": -0.2,
+        "dSat": -0.013,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 1947,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      0,
+      2
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K2-1.6x-cobble-host-f-1-hero-KingArthur.jpg",
+     "vsLookdev": {
+      "steel": {
+       "Yratio": 0.721,
+       "dSat": -0.004,
+       "dHue": -10.0,
+       "proxyReliable": true
+      },
+      "cloth": {
+       "Yratio": 1.307,
+       "dSat": -0.069,
+       "dHue": 0.8,
+       "proxyReliable": true
+      }
+     },
+     "attribution": {
+      "steel": "свет доски / ракурс",
+      "cloth": "свет доски / ракурс"
+     }
+    },
+    {
+     "fighter": "f-1-sk0",
+     "hero": "Merlin",
+     "team": "P2",
+     "mesh": "SK_Merlin_H2LD",
+     "rect": [
+      1160.0,
+      677.0,
+      1293.0,
+      845.0
+     ],
+     "headPx": 16.8,
+     "classCounts": {
+      "base": 1090,
+      "board": 12112,
+      "dropped": 1059,
+      "leather_worn": 40,
+      "other": 813,
+      "ring": 4690,
+      "skin": 36,
+      "wood": 61,
+      "wool_coarse": 2443
+     },
+     "boardSamples": 9224,
+     "ringSamples": 2293,
+     "baseSamples": 716,
+     "zonesMeasured": [
+      "wool_coarse"
+     ],
+     "verdicts": {
+      "k": 0.7835,
+      "key_zones": [
+       "wool_coarse"
+      ],
+      "deltas": {
+       "wool_coarse": {
+        "Yk": 1.0,
+        "dHue": 5.5,
+        "dSat": 0.084,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 1948,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      1,
+      1
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K2-1.6x-cobble-host-f-1-sk0-Merlin.jpg",
+     "vsLookdev": {
+      "wool_coarse": {
+       "Yratio": 1.247,
+       "dSat": -0.019,
+       "dHue": 0.3,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "wool_coarse": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    }
+   ]
+  },
+  {
+   "label": "K2 2.5x cobble host",
+   "frame": "docs/game-design/evidence/ART-018/long-k2-2026-09-30/k2-zoom-2.5/cobble-5x6/run-20260930-164602/phase2-board-host-1920x1080.png",
+   "trace": "docs/game-design/evidence/ART-018/long-k2-2026-09-30/k2-zoom-2.5/cobble-5x6/run-20260930-164602/phase2-client-host.trace.log",
+   "board": "cobble-5x6",
+   "render": {
+    "expMin": "4.14106"
+   },
+   "fighters": [
+    {
+     "fighter": "f-0-hero",
+     "hero": "Medusa",
+     "team": "P1",
+     "mesh": "SK_Medusa_H2LD",
+     "rect": [
+      842.0,
+      386.0,
+      1078.0,
+      694.0
+     ],
+     "headPx": 28.2,
+     "classCounts": {
+      "base": 6616,
+      "board": 37239,
+      "dropped": 4012,
+      "gold_antique": 1113,
+      "leather_smooth": 1001,
+      "leather_worn": 401,
+      "linen": 4025,
+      "other": 567,
+      "ring": 14866,
+      "skin": 2762,
+      "wood": 86
+     },
+     "boardSamples": 10858,
+     "ringSamples": 5819,
+     "baseSamples": 2338,
+     "zonesMeasured": [
+      "gold_antique",
+      "linen",
+      "skin"
+     ],
+     "verdicts": {
+      "k": 0.8024,
+      "key_zones": [
+       "gold_antique",
+       "linen",
+       "skin"
+      ],
+      "deltas": {
+       "gold_antique": {
+        "Yk": 1.496,
+        "dHue": 0.4,
+        "dSat": 0.032,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 396,
+        "tolerance_zone": true
+       },
+       "linen": {
+        "Yk": 0.655,
+        "dHue": 12.2,
+        "dSat": 0.059,
+        "within": {
+         "luma": false,
+         "hue": false,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 1979,
+        "tolerance_zone": true
+       },
+       "skin": {
+        "Yk": 1.021,
+        "dHue": 5.6,
+        "dSat": 0.077,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 1272,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      1,
+      3
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K2-2.5x-cobble-host-f-0-hero-Medusa.jpg",
+     "vsLookdev": {
+      "gold_antique": {
+       "Yratio": 1.071,
+       "dSat": -0.022,
+       "dHue": 0.5,
+       "proxyReliable": false
+      },
+      "linen": {
+       "Yratio": 0.852,
+       "dSat": 0.023,
+       "dHue": 3.1,
+       "proxyReliable": false
+      },
+      "skin": {
+       "Yratio": 1.097,
+       "dSat": -0.053,
+       "dHue": 1.7,
+       "proxyReliable": true
+      }
+     },
+     "attribution": {
+      "gold_antique": "прокси ненадёжен для зоны (не атрибутируется)",
+      "linen": "прокси ненадёжен для зоны (не атрибутируется)",
+      "skin": "в допуске (в look-dev вне: свет доски / ракурс помогают)"
+     }
+    },
+    {
+     "fighter": "f-0-sk0",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      1253.0,
+      437.0,
+      1457.0,
+      673.0
+     ],
+     "headPx": 27.9,
+     "classCounts": {
+      "base": 3210,
+      "board": 16855,
+      "claw": 2416,
+      "dark": 4580,
+      "dropped": 1955,
+      "gold": 60,
+      "orange": 5213,
+      "other": 1938,
+      "ring": 10970,
+      "skin": 947
+     },
+     "boardSamples": 11190,
+     "ringSamples": 4789,
+     "baseSamples": 1444,
+     "zonesMeasured": [
+      "claw",
+      "dark",
+      "orange",
+      "skin"
+     ],
+     "verdicts": {
+      "k": 0.8216,
+      "key_zones": [
+       "orange",
+       "dark",
+       "skin"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 0.999,
+        "dHue": 2.5,
+        "dSat": 0.008,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 3329,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 1.18,
+        "dHue": -0.4,
+        "dSat": 0.133,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 2385,
+        "tolerance_zone": true
+       },
+       "skin": {
+        "Yk": 0.849,
+        "dHue": -0.5,
+        "dSat": 0.044,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 128,
+        "tolerance_zone": true
+       },
+       "claw": {
+        "Yk": 0.632,
+        "dHue": 150.0,
+        "dSat": 0.005,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 411,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      1,
+      4
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K2-2.5x-cobble-host-f-0-sk0-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 0.968,
+       "dSat": 0.012,
+       "dHue": 2.0,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 0.977,
+       "dSat": 0.027,
+       "dHue": 4.7,
+       "proxyReliable": false
+      },
+      "skin": {
+       "Yratio": 1.057,
+       "dSat": -0.007,
+       "dHue": 2.2,
+       "proxyReliable": true
+      },
+      "claw": {
+       "Yratio": 0.891,
+       "dSat": -0.018,
+       "dHue": 30.0,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "orange": "в допуске",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+      "skin": "материал",
+      "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-0-sk1",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      876.0,
+      144.0,
+      1044.0,
+      367.0
+     ],
+     "headPx": 29.1,
+     "classCounts": {
+      "base": 2620,
+      "board": 11083,
+      "claw": 3661,
+      "dark": 3198,
+      "dropped": 1887,
+      "gold": 66,
+      "orange": 4668,
+      "other": 1653,
+      "ring": 7685,
+      "skin": 943
+     },
+     "boardSamples": 11108,
+     "ringSamples": 4281,
+     "baseSamples": 1266,
+     "zonesMeasured": [
+      "claw",
+      "dark",
+      "orange",
+      "skin"
+     ],
+     "verdicts": {
+      "k": 0.7336,
+      "key_zones": [
+       "orange",
+       "dark",
+       "skin"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 0.959,
+        "dHue": 2.9,
+        "dSat": 0.001,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 2863,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 1.19,
+        "dHue": 2.9,
+        "dSat": 0.121,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 1381,
+        "tolerance_zone": true
+       },
+       "skin": {
+        "Yk": 0.876,
+        "dHue": -0.5,
+        "dSat": 0.004,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 122,
+        "tolerance_zone": true
+       },
+       "claw": {
+        "Yk": 0.528,
+        "dHue": 120.0,
+        "dSat": -0.012,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 1318,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      2,
+      4
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K2-2.5x-cobble-host-f-0-sk1-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 0.929,
+       "dSat": 0.005,
+       "dHue": 2.4,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 0.985,
+       "dSat": 0.015,
+       "dHue": 8.0,
+       "proxyReliable": false
+      },
+      "skin": {
+       "Yratio": 1.091,
+       "dSat": -0.047,
+       "dHue": 2.2,
+       "proxyReliable": true
+      },
+      "claw": {
+       "Yratio": 0.745,
+       "dSat": -0.035,
+       "dHue": 0.0,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "orange": "в допуске",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+      "skin": "в допуске (в look-dev вне: свет доски / ракурс помогают)",
+      "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-0-sk2",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      463.0,
+      437.0,
+      667.0,
+      673.0
+     ],
+     "headPx": 27.8,
+     "classCounts": {
+      "base": 3740,
+      "board": 16343,
+      "claw": 3274,
+      "dark": 3704,
+      "dropped": 2308,
+      "gold": 93,
+      "orange": 4871,
+      "other": 2276,
+      "ring": 10656,
+      "skin": 879
+     },
+     "boardSamples": 10941,
+     "ringSamples": 4789,
+     "baseSamples": 1444,
+     "zonesMeasured": [
+      "claw",
+      "dark",
+      "orange",
+      "skin"
+     ],
+     "verdicts": {
+      "k": 0.738,
+      "key_zones": [
+       "orange",
+       "dark",
+       "skin"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 0.954,
+        "dHue": 2.2,
+        "dSat": 0.001,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 3012,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 1.168,
+        "dHue": 1.8,
+        "dSat": 0.135,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 1799,
+        "tolerance_zone": true
+       },
+       "skin": {
+        "Yk": 0.898,
+        "dHue": -1.1,
+        "dSat": 0.006,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 105,
+        "tolerance_zone": true
+       },
+       "claw": {
+        "Yk": 0.606,
+        "dHue": 160.0,
+        "dSat": 0.021,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 1014,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      2,
+      4
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K2-2.5x-cobble-host-f-0-sk2-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 0.924,
+       "dSat": 0.005,
+       "dHue": 1.7,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 0.967,
+       "dSat": 0.029,
+       "dHue": 6.9,
+       "proxyReliable": false
+      },
+      "skin": {
+       "Yratio": 1.118,
+       "dSat": -0.045,
+       "dHue": 1.6,
+       "proxyReliable": true
+      },
+      "claw": {
+       "Yratio": 0.855,
+       "dSat": -0.002,
+       "dHue": 40.0,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "orange": "в допуске",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+      "skin": "в допуске (в look-dev вне: свет доски / ракурс помогают)",
+      "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-1-hero",
+     "hero": "KingArthur",
+     "team": "P2",
+     "mesh": "SK_KingArthur_H2LD",
+     "rect": [
+      831.0,
+      714.0,
+      1089.0,
+      1052.0
+     ],
+     "headPx": 25.8,
+     "classCounts": {
+      "base": 5917,
+      "belt": 460,
+      "board": 31092,
+      "cloth": 6010,
+      "dropped": 5108,
+      "embroidery": 723,
+      "face_skin": 575,
+      "gold": 1273,
+      "hair": 493,
+      "other": 2624,
+      "ring": 8514,
+      "steel": 3085,
+      "unknown": 4044
+     },
+     "boardSamples": 3916,
+     "ringSamples": 1034,
+     "baseSamples": 1448,
+     "zonesMeasured": [
+      "cloth",
+      "embroidery",
+      "gold",
+      "hair",
+      "steel"
+     ],
+     "verdicts": {
+      "k": 0.6197,
+      "key_zones": [
+       "steel",
+       "gold",
+       "cloth"
+      ],
+      "deltas": {
+       "steel": {
+        "Yk": 0.609,
+        "dHue": -14.0,
+        "dSat": 0.017,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 970,
+        "tolerance_zone": true
+       },
+       "gold": {
+        "Yk": 1.071,
+        "dHue": 2.2,
+        "dSat": 0.022,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 287,
+        "tolerance_zone": true
+       },
+       "embroidery": {
+        "Yk": 0.793,
+        "dHue": -2.1,
+        "dSat": 0.054,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 76,
+        "tolerance_zone": true
+       },
+       "cloth": {
+        "Yk": 1.532,
+        "dHue": -0.2,
+        "dSat": -0.013,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 4990,
+        "tolerance_zone": true
+       },
+       "hair": {
+        "Yk": 0.097,
+        "dHue": -138.5,
+        "dSat": -0.044,
+        "within": {
+         "luma": false,
+         "hue": false,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 190,
+        "tolerance_zone": false
+       }
+      }
+     },
+     "within": [
+      1,
+      4
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K2-2.5x-cobble-host-f-1-hero-KingArthur.jpg",
+     "vsLookdev": {
+      "steel": {
+       "Yratio": 0.658,
+       "dSat": 0.02,
+       "dHue": 0.0,
+       "proxyReliable": true
+      },
+      "gold": {
+       "Yratio": 1.147,
+       "dSat": -0.08,
+       "dHue": 0.1,
+       "proxyReliable": false
+      },
+      "embroidery": {
+       "Yratio": 0.665,
+       "dSat": 0.056,
+       "dHue": -5.9,
+       "proxyReliable": false
+      },
+      "cloth": {
+       "Yratio": 1.338,
+       "dSat": -0.069,
+       "dHue": 0.8,
+       "proxyReliable": true
+      }
+     },
+     "attribution": {
+      "steel": "свет доски / ракурс",
+      "gold": "прокси ненадёжен для зоны (не атрибутируется)",
+      "embroidery": "прокси ненадёжен для зоны (не атрибутируется)",
+      "cloth": "свет доски / ракурс"
+     }
+    },
+    {
+     "fighter": "f-1-sk0",
+     "hero": "Merlin",
+     "team": "P2",
+     "mesh": "SK_Merlin_H2LD",
+     "rect": [
+      1275.0,
+      760.0,
+      1504.0,
+      1028.0
+     ],
+     "headPx": 25.8,
+     "classCounts": {
+      "base": 2835,
+      "board": 31573,
+      "bronze": 1,
+      "dropped": 1731,
+      "leather_worn": 106,
+      "other": 1607,
+      "ring": 6988,
+      "silk": 9,
+      "skin": 104,
+      "wood": 160,
+      "wool_coarse": 6411
+     },
+     "boardSamples": 4866,
+     "ringSamples": 1698,
+     "baseSamples": 1473,
+     "zonesMeasured": [
+      "wool_coarse"
+     ],
+     "verdicts": {
+      "k": 0.902,
+      "key_zones": [
+       "wool_coarse"
+      ],
+      "deltas": {
+       "wool_coarse": {
+        "Yk": 1.0,
+        "dHue": 5.3,
+        "dSat": 0.102,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 5493,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      0,
+      1
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K2-2.5x-cobble-host-f-1-sk0-Merlin.jpg",
+     "vsLookdev": {
+      "wool_coarse": {
+       "Yratio": 1.247,
+       "dSat": -0.001,
+       "dHue": 0.1,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "wool_coarse": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    }
+   ]
+  },
+  {
+   "label": "K2 3.5x cobble host",
+   "frame": "docs/game-design/evidence/ART-018/long-k2-2026-09-30/k2-zoom-3.5/cobble-5x6/run-20260930-164709/phase2-board-host-1920x1080.png",
+   "trace": "docs/game-design/evidence/ART-018/long-k2-2026-09-30/k2-zoom-3.5/cobble-5x6/run-20260930-164709/phase2-client-host.trace.log",
+   "board": "cobble-5x6",
+   "render": {
+    "expMin": "4.14106"
+   },
+   "fighters": [
+    {
+     "fighter": "f-0-hero",
+     "hero": "Medusa",
+     "team": "P1",
+     "mesh": "SK_Medusa_H2LD",
+     "rect": [
+      791.0,
+      323.0,
+      1129.0,
+      755.0
+     ],
+     "headPx": 40.2,
+     "classCounts": {
+      "base": 13565,
+      "board": 78282,
+      "dropped": 7124,
+      "gold_antique": 2440,
+      "leather_smooth": 1785,
+      "leather_worn": 894,
+      "legacy_bake": 393,
+      "linen": 7338,
+      "other": 1414,
+      "ring": 27093,
+      "skin": 5428,
+      "wood": 260
+     },
+     "boardSamples": 10297,
+     "ringSamples": 7143,
+     "baseSamples": 3743,
+     "zonesMeasured": [
+      "gold_antique",
+      "leather_smooth",
+      "leather_worn",
+      "linen",
+      "skin"
+     ],
+     "verdicts": {
+      "k": 0.8039,
+      "key_zones": [
+       "gold_antique",
+       "linen",
+       "skin"
+      ],
+      "deltas": {
+       "gold_antique": {
+        "Yk": 1.393,
+        "dHue": 0.1,
+        "dSat": 0.037,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 1050,
+        "tolerance_zone": true
+       },
+       "linen": {
+        "Yk": 0.707,
+        "dHue": 12.2,
+        "dSat": 0.05,
+        "within": {
+         "luma": false,
+         "hue": false,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 3673,
+        "tolerance_zone": true
+       },
+       "skin": {
+        "Yk": 1.015,
+        "dHue": 4.6,
+        "dSat": 0.077,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 2644,
+        "tolerance_zone": true
+       },
+       "leather_smooth": {
+        "Yk": 0.702,
+        "dHue": 4.2,
+        "dSat": 0.045,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 111,
+        "tolerance_zone": true
+       },
+       "leather_worn": {
+        "Yk": 1.166,
+        "dHue": -2.5,
+        "dSat": 0.047,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 78,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      1,
+      5
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K2-3.5x-cobble-host-f-0-hero-Medusa.jpg",
+     "vsLookdev": {
+      "gold_antique": {
+       "Yratio": 0.997,
+       "dSat": -0.017,
+       "dHue": 0.2,
+       "proxyReliable": false
+      },
+      "linen": {
+       "Yratio": 0.919,
+       "dSat": 0.014,
+       "dHue": 3.1,
+       "proxyReliable": false
+      },
+      "skin": {
+       "Yratio": 1.09,
+       "dSat": -0.053,
+       "dHue": 0.7,
+       "proxyReliable": true
+      },
+      "leather_smooth": {
+       "Yratio": 0.072,
+       "dSat": 0.067,
+       "dHue": -18.6,
+       "proxyReliable": false
+      },
+      "leather_worn": {
+       "Yratio": 1.375,
+       "dSat": -0.029,
+       "dHue": 1.2,
+       "proxyReliable": true
+      }
+     },
+     "attribution": {
+      "gold_antique": "прокси ненадёжен для зоны (не атрибутируется)",
+      "linen": "прокси ненадёжен для зоны (не атрибутируется)",
+      "skin": "в допуске (в look-dev вне: свет доски / ракурс помогают)",
+      "leather_smooth": "прокси ненадёжен для зоны (не атрибутируется)",
+      "leather_worn": "материал"
+     }
+    },
+    {
+     "fighter": "f-0-sk0",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      1363.0,
+      396.0,
+      1666.0,
+      726.0
+     ],
+     "headPx": 39.8,
+     "classCounts": {
+      "base": 8189,
+      "board": 37838,
+      "claw": 5795,
+      "dark": 10259,
+      "dropped": 3145,
+      "gold": 66,
+      "orange": 9698,
+      "other": 3402,
+      "ring": 19944,
+      "skin": 1654
+     },
+     "boardSamples": 10385,
+     "ringSamples": 6159,
+     "baseSamples": 2609,
+     "zonesMeasured": [
+      "claw",
+      "dark",
+      "orange",
+      "skin"
+     ],
+     "verdicts": {
+      "k": 0.8644,
+      "key_zones": [
+       "orange",
+       "dark",
+       "skin"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 0.995,
+        "dHue": 1.6,
+        "dSat": 0.006,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 6840,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 1.146,
+        "dHue": 0.5,
+        "dSat": 0.13,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 6501,
+        "tolerance_zone": true
+       },
+       "skin": {
+        "Yk": 0.877,
+        "dHue": -1.1,
+        "dSat": 0.03,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 292,
+        "tolerance_zone": true
+       },
+       "claw": {
+        "Yk": 0.954,
+        "dHue": 140.0,
+        "dSat": 0.013,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 1156,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      3,
+      4
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K2-3.5x-cobble-host-f-0-sk0-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 0.964,
+       "dSat": 0.01,
+       "dHue": 1.1,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 0.949,
+       "dSat": 0.024,
+       "dHue": 5.6,
+       "proxyReliable": false
+      },
+      "skin": {
+       "Yratio": 1.092,
+       "dSat": -0.021,
+       "dHue": 1.6,
+       "proxyReliable": true
+      },
+      "claw": {
+       "Yratio": 1.346,
+       "dSat": -0.01,
+       "dHue": 20.0,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "orange": "в допуске",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+      "skin": "в допуске (в look-dev вне: свет доски / ракурс помогают)",
+      "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-0-sk1",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      844.0,
+      0.0,
+      1076.0,
+      306.0
+     ],
+     "headPx": 41.6,
+     "classCounts": {
+      "base": 5819,
+      "board": 21588,
+      "claw": 4628,
+      "dark": 6537,
+      "dropped": 3590,
+      "gold": 88,
+      "orange": 8647,
+      "other": 3197,
+      "ring": 15346,
+      "skin": 1537,
+      "unknown": 15
+     },
+     "boardSamples": 11255,
+     "ringSamples": 5585,
+     "baseSamples": 2133,
+     "zonesMeasured": [
+      "claw",
+      "dark",
+      "orange",
+      "skin"
+     ],
+     "verdicts": {
+      "k": 0.804,
+      "key_zones": [
+       "orange",
+       "dark",
+       "skin"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 0.996,
+        "dHue": 2.5,
+        "dSat": 0.005,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 5822,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 1.116,
+        "dHue": -3.0,
+        "dSat": 0.122,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 3480,
+        "tolerance_zone": true
+       },
+       "skin": {
+        "Yk": 0.899,
+        "dHue": -0.5,
+        "dSat": 0.017,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 314,
+        "tolerance_zone": true
+       },
+       "claw": {
+        "Yk": 0.64,
+        "dHue": 150.0,
+        "dSat": 0.004,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 1434,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      2,
+      4
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K2-3.5x-cobble-host-f-0-sk1-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 0.965,
+       "dSat": 0.009,
+       "dHue": 2.0,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 0.924,
+       "dSat": 0.016,
+       "dHue": 2.1,
+       "proxyReliable": false
+      },
+      "skin": {
+       "Yratio": 1.12,
+       "dSat": -0.034,
+       "dHue": 2.2,
+       "proxyReliable": true
+      },
+      "claw": {
+       "Yratio": 0.903,
+       "dSat": -0.019,
+       "dHue": 30.0,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "orange": "в допуске",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+      "skin": "в допуске (в look-dev вне: свет доски / ракурс помогают)",
+      "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-0-sk2",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      254.0,
+      396.0,
+      557.0,
+      726.0
+     ],
+     "headPx": 39.8,
+     "classCounts": {
+      "base": 9882,
+      "board": 37042,
+      "claw": 5550,
+      "dark": 8115,
+      "dropped": 4914,
+      "gold": 107,
+      "orange": 9135,
+      "other": 3964,
+      "ring": 19758,
+      "skin": 1523
+     },
+     "boardSamples": 10781,
+     "ringSamples": 6169,
+     "baseSamples": 2607,
+     "zonesMeasured": [
+      "claw",
+      "dark",
+      "orange",
+      "skin"
+     ],
+     "verdicts": {
+      "k": 0.8614,
+      "key_zones": [
+       "orange",
+       "dark",
+       "skin"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 1.048,
+        "dHue": 2.1,
+        "dSat": 0.002,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 6288,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 1.076,
+        "dHue": -3.0,
+        "dSat": 0.134,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 4783,
+        "tolerance_zone": true
+       },
+       "skin": {
+        "Yk": 0.886,
+        "dHue": 0.0,
+        "dSat": 0.04,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 223,
+        "tolerance_zone": true
+       },
+       "claw": {
+        "Yk": 0.808,
+        "dHue": 160.0,
+        "dSat": 0.017,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 1936,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      2,
+      4
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K2-3.5x-cobble-host-f-0-sk2-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 1.016,
+       "dSat": 0.006,
+       "dHue": 1.6,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 0.891,
+       "dSat": 0.028,
+       "dHue": 2.1,
+       "proxyReliable": false
+      },
+      "skin": {
+       "Yratio": 1.103,
+       "dSat": -0.011,
+       "dHue": 2.7,
+       "proxyReliable": true
+      },
+      "claw": {
+       "Yratio": 1.14,
+       "dSat": -0.006,
+       "dHue": 40.0,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "orange": "в допуске",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+      "skin": "в допуске (в look-dev вне: свет доски / ракурс помогают)",
+      "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-1-hero",
+     "hero": "KingArthur",
+     "team": "P2",
+     "mesh": "SK_KingArthur_H2LD",
+     "rect": [
+      768.0,
+      793.0,
+      1152.0,
+      1277.0
+     ],
+     "headPx": 35.0,
+     "classCounts": {
+      "belt": 41,
+      "board": 34723,
+      "cloth": 805,
+      "dropped": 1560,
+      "embroidery": 167,
+      "face_skin": 61,
+      "gold": 708,
+      "hair": 779,
+      "other": 16201,
+      "ring": 3979,
+      "steel": 6425,
+      "unknown": 8279
+     },
+     "boardSamples": 925,
+     "ringSamples": 0,
+     "baseSamples": 0,
+     "zonesMeasured": [
+      "cloth",
+      "gold",
+      "hair",
+      "steel"
+     ],
+     "verdicts": {
+      "k": 0.3206,
+      "key_zones": [
+       "steel",
+       "gold",
+       "cloth"
+      ],
+      "deltas": {
+       "steel": {
+        "Yk": 1.319,
+        "dHue": -24.0,
+        "dSat": -0.068,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 2300,
+        "tolerance_zone": true
+       },
+       "gold": {
+        "Yk": 0.601,
+        "dHue": 4.2,
+        "dSat": 0.038,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 186,
+        "tolerance_zone": true
+       },
+       "cloth": {
+        "Yk": 1.262,
+        "dHue": -0.5,
+        "dSat": 0.005,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 645,
+        "tolerance_zone": true
+       },
+       "hair": {
+        "Yk": 0.048,
+        "dHue": -155.6,
+        "dSat": 0.221,
+        "within": {
+         "luma": false,
+         "hue": false,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 74,
+        "tolerance_zone": false
+       }
+      }
+     },
+     "within": [
+      0,
+      3
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K2-3.5x-cobble-host-f-1-hero-KingArthur.jpg",
+     "vsLookdev": {
+      "steel": {
+       "Yratio": 1.424,
+       "dSat": -0.065,
+       "dHue": -10.0,
+       "proxyReliable": true
+      },
+      "gold": {
+       "Yratio": 0.643,
+       "dSat": -0.064,
+       "dHue": 2.1,
+       "proxyReliable": false
+      },
+      "cloth": {
+       "Yratio": 1.102,
+       "dSat": -0.051,
+       "dHue": 0.5,
+       "proxyReliable": true
+      }
+     },
+     "attribution": {
+      "steel": "свет доски / ракурс",
+      "gold": "прокси ненадёжен для зоны (не атрибутируется)",
+      "cloth": "свет доски / ракурс"
+     }
+    },
+    {
+     "fighter": "f-1-sk0",
+     "hero": "Merlin",
+     "team": "P2",
+     "mesh": "SK_Merlin_H2LD",
+     "rect": [
+      1407.0,
+      860.0,
+      1762.0,
+      1241.0
+     ],
+     "headPx": 35.8,
+     "classCounts": {
+      "board": 52159,
+      "bronze": 2,
+      "dropped": 1537,
+      "leather_worn": 365,
+      "other": 14061,
+      "ring": 1286,
+      "silk": 22,
+      "skin": 186,
+      "wood": 361,
+      "wool_coarse": 8121
+     },
+     "boardSamples": 1370,
+     "ringSamples": 0,
+     "baseSamples": 0,
+     "zonesMeasured": [
+      "skin",
+      "wood",
+      "wool_coarse"
+     ],
+     "verdicts": {
+      "k": 0.6733,
+      "key_zones": [
+       "wool_coarse",
+       "skin"
+      ],
+      "deltas": {
+       "wool_coarse": {
+        "Yk": 0.826,
+        "dHue": 4.5,
+        "dSat": 0.099,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 6896,
+        "tolerance_zone": true
+       },
+       "skin": {
+        "Yk": 1.211,
+        "dHue": 5.3,
+        "dSat": -0.075,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 102,
+        "tolerance_zone": true
+       },
+       "wood": {
+        "Yk": 0.694,
+        "dHue": 0.1,
+        "dSat": 0.054,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 101,
+        "tolerance_zone": false
+       }
+      }
+     },
+     "within": [
+      0,
+      2
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K2-3.5x-cobble-host-f-1-sk0-Merlin.jpg",
+     "vsLookdev": {
+      "wool_coarse": {
+       "Yratio": 1.03,
+       "dSat": -0.004,
+       "dHue": -0.7,
+       "proxyReliable": false
+      },
+      "skin": {
+       "Yratio": 1.007,
+       "dSat": -0.01,
+       "dHue": 2.1,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "wool_coarse": "прокси ненадёжен для зоны (не атрибутируется)",
+      "skin": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    }
+   ]
+  },
+  {
+   "label": "K2 5x cobble host",
+   "frame": "docs/game-design/evidence/ART-018/long-k2-2026-09-30/k2-zoom-5/cobble-5x6/run-20260930-164816/phase2-board-host-1920x1080.png",
+   "trace": "docs/game-design/evidence/ART-018/long-k2-2026-09-30/k2-zoom-5/cobble-5x6/run-20260930-164816/phase2-client-host.trace.log",
+   "board": "cobble-5x6",
+   "render": {
+    "expMin": "4.14106"
+   },
+   "fighters": [
+    {
+     "fighter": "f-0-hero",
+     "hero": "Medusa",
+     "team": "P1",
+     "mesh": "SK_Medusa_H2LD",
+     "rect": [
+      710.0,
+      229.0,
+      1210.0,
+      845.0
+     ],
+     "headPx": 58.8,
+     "classCounts": {
+      "base": 24431,
+      "board": 168348,
+      "dropped": 14922,
+      "gold_antique": 5330,
+      "leather_smooth": 3553,
+      "leather_worn": 1826,
+      "legacy_bake": 599,
+      "linen": 15859,
+      "other": 2565,
+      "ring": 58491,
+      "skin": 10258,
+      "unknown": 3,
+      "wood": 555
+     },
+     "boardSamples": 8401,
+     "ringSamples": 7764,
+     "baseSamples": 5402,
+     "zonesMeasured": [
+      "gold_antique",
+      "leather_smooth",
+      "leather_worn",
+      "linen",
+      "skin"
+     ],
+     "verdicts": {
+      "k": 0.7737,
+      "key_zones": [
+       "gold_antique",
+       "linen",
+       "skin"
+      ],
+      "deltas": {
+       "gold_antique": {
+        "Yk": 1.352,
+        "dHue": -0.4,
+        "dSat": 0.041,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 2526,
+        "tolerance_zone": true
+       },
+       "linen": {
+        "Yk": 0.742,
+        "dHue": 10.5,
+        "dSat": 0.055,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 8651,
+        "tolerance_zone": true
+       },
+       "skin": {
+        "Yk": 0.997,
+        "dHue": 5.2,
+        "dSat": 0.071,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 5704,
+        "tolerance_zone": true
+       },
+       "leather_smooth": {
+        "Yk": 0.717,
+        "dHue": 3.2,
+        "dSat": -0.003,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 320,
+        "tolerance_zone": true
+       },
+       "leather_worn": {
+        "Yk": 1.074,
+        "dHue": -2.2,
+        "dSat": 0.071,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 230,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      2,
+      5
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K2-5x-cobble-host-f-0-hero-Medusa.jpg",
+     "vsLookdev": {
+      "gold_antique": {
+       "Yratio": 0.968,
+       "dSat": -0.013,
+       "dHue": -0.3,
+       "proxyReliable": false
+      },
+      "linen": {
+       "Yratio": 0.965,
+       "dSat": 0.019,
+       "dHue": 1.4,
+       "proxyReliable": false
+      },
+      "skin": {
+       "Yratio": 1.071,
+       "dSat": -0.059,
+       "dHue": 1.3,
+       "proxyReliable": true
+      },
+      "leather_smooth": {
+       "Yratio": 0.074,
+       "dSat": 0.019,
+       "dHue": -19.6,
+       "proxyReliable": false
+      },
+      "leather_worn": {
+       "Yratio": 1.267,
+       "dSat": -0.005,
+       "dHue": 1.5,
+       "proxyReliable": true
+      }
+     },
+     "attribution": {
+      "gold_antique": "прокси ненадёжен для зоны (не атрибутируется)",
+      "linen": "прокси ненадёжен для зоны (не атрибутируется)",
+      "skin": "в допуске (в look-dev вне: свет доски / ракурс помогают)",
+      "leather_smooth": "прокси ненадёжен для зоны (не атрибутируется)",
+      "leather_worn": "в допуске (в look-dev вне: свет доски / ракурс помогают)"
+     }
+    },
+    {
+     "fighter": "f-0-sk0",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      1521.0,
+      334.0,
+      1988.0,
+      803.0
+     ],
+     "headPx": 59.1,
+     "classCounts": {
+      "base": 20325,
+      "board": 65461,
+      "claw": 6187,
+      "dark": 21006,
+      "dropped": 5938,
+      "gold": 166,
+      "orange": 17946,
+      "other": 4822,
+      "ring": 42177,
+      "skin": 3103
+     },
+     "boardSamples": 6458,
+     "ringSamples": 7417,
+     "baseSamples": 4149,
+     "zonesMeasured": [
+      "claw",
+      "dark",
+      "orange",
+      "skin"
+     ],
+     "verdicts": {
+      "k": 1.0637,
+      "key_zones": [
+       "orange",
+       "dark",
+       "skin"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 1.075,
+        "dHue": 2.3,
+        "dSat": 0.022,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 13278,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 1.048,
+        "dHue": -2.1,
+        "dSat": 0.151,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 13393,
+        "tolerance_zone": true
+       },
+       "skin": {
+        "Yk": 0.888,
+        "dHue": -1.1,
+        "dSat": 0.057,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 720,
+        "tolerance_zone": true
+       },
+       "claw": {
+        "Yk": 1.074,
+        "dHue": 120.0,
+        "dSat": 0.0,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 1375,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      3,
+      4
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K2-5x-cobble-host-f-0-sk0-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 1.042,
+       "dSat": 0.026,
+       "dHue": 1.8,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 0.868,
+       "dSat": 0.045,
+       "dHue": 3.0,
+       "proxyReliable": false
+      },
+      "skin": {
+       "Yratio": 1.106,
+       "dSat": 0.006,
+       "dHue": 1.6,
+       "proxyReliable": true
+      },
+      "claw": {
+       "Yratio": 1.515,
+       "dSat": -0.023,
+       "dHue": 0.0,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "orange": "в допуске",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+      "skin": "в допуске (в look-dev вне: свет доски / ракурс помогают)",
+      "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-0-sk1",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      799.0,
+      -200.0,
+      1121.0,
+      220.0
+     ],
+     "headPx": 60.9,
+     "classCounts": {
+      "base": 11236,
+      "board": 14909,
+      "claw": 5210,
+      "dark": 2125,
+      "dropped": 3570,
+      "gold": 104,
+      "orange": 4878,
+      "other": 3667,
+      "ring": 23620,
+      "skin": 1521
+     },
+     "boardSamples": 9915,
+     "ringSamples": 6850,
+     "baseSamples": 3291,
+     "zonesMeasured": [
+      "claw",
+      "dark",
+      "orange",
+      "skin"
+     ],
+     "verdicts": {
+      "k": 0.7675,
+      "key_zones": [
+       "orange",
+       "dark",
+       "skin"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 0.976,
+        "dHue": 2.8,
+        "dSat": -0.015,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 3070,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 1.001,
+        "dHue": -1.3,
+        "dSat": 0.157,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 515,
+        "tolerance_zone": true
+       },
+       "skin": {
+        "Yk": 1.023,
+        "dHue": 0.5,
+        "dSat": -0.009,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 631,
+        "tolerance_zone": true
+       },
+       "claw": {
+        "Yk": 0.744,
+        "dHue": 150.0,
+        "dSat": 0.001,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 1304,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      2,
+      4
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K2-5x-cobble-host-f-0-sk1-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 0.946,
+       "dSat": -0.011,
+       "dHue": 2.3,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 0.829,
+       "dSat": 0.051,
+       "dHue": 3.8,
+       "proxyReliable": false
+      },
+      "skin": {
+       "Yratio": 1.274,
+       "dSat": -0.06,
+       "dHue": 3.2,
+       "proxyReliable": true
+      },
+      "claw": {
+       "Yratio": 1.049,
+       "dSat": -0.022,
+       "dHue": 30.0,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "orange": "в допуске",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+      "skin": "в допуске (в look-dev вне: свет доски / ракурс помогают)",
+      "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-0-sk2",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      -68.0,
+      334.0,
+      399.0,
+      803.0
+     ],
+     "headPx": 59.1,
+     "classCounts": {
+      "base": 23238,
+      "board": 63418,
+      "claw": 10842,
+      "dark": 17055,
+      "dropped": 8383,
+      "gold": 334,
+      "orange": 16763,
+      "other": 6245,
+      "ring": 37993,
+      "skin": 2860
+     },
+     "boardSamples": 6498,
+     "ringSamples": 7449,
+     "baseSamples": 4080,
+     "zonesMeasured": [
+      "claw",
+      "dark",
+      "orange",
+      "skin"
+     ],
+     "verdicts": {
+      "k": 0.9781,
+      "key_zones": [
+       "orange",
+       "dark",
+       "skin"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 1.076,
+        "dHue": 2.0,
+        "dSat": 0.01,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 11939,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 1.01,
+        "dHue": -3.0,
+        "dSat": 0.158,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 10461,
+        "tolerance_zone": true
+       },
+       "skin": {
+        "Yk": 0.92,
+        "dHue": -1.0,
+        "dSat": 0.051,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 589,
+        "tolerance_zone": true
+       },
+       "claw": {
+        "Yk": 0.837,
+        "dHue": 150.0,
+        "dSat": 0.036,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 3811,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      2,
+      4
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K2-5x-cobble-host-f-0-sk2-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 1.043,
+       "dSat": 0.014,
+       "dHue": 1.5,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 0.836,
+       "dSat": 0.052,
+       "dHue": 2.1,
+       "proxyReliable": false
+      },
+      "skin": {
+       "Yratio": 1.146,
+       "dSat": 0.0,
+       "dHue": 1.7,
+       "proxyReliable": true
+      },
+      "claw": {
+       "Yratio": 1.181,
+       "dSat": 0.013,
+       "dHue": 30.0,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "orange": "в допуске",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+      "skin": "в допуске (в look-dev вне: свет доски / ракурс помогают)",
+      "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-1-hero",
+     "hero": "KingArthur",
+     "team": "P2",
+     "mesh": "SK_KingArthur_H2LD",
+     "rect": [
+      657.0,
+      924.0,
+      1263.0,
+      1641.0
+     ],
+     "headPx": 46.2,
+     "classCounts": {
+      "belt": 6,
+      "board": 6117,
+      "dropped": 653,
+      "hair": 1722,
+      "other": 7115,
+      "ring": 5733,
+      "steel": 1165,
+      "unknown": 14455
+     },
+     "boardSamples": 87,
+     "ringSamples": 0,
+     "baseSamples": 0,
+     "zonesMeasured": [
+      "hair",
+      "steel"
+     ],
+     "verdicts": {
+      "k": 0.2772,
+      "key_zones": [
+       "steel"
+      ],
+      "deltas": {
+       "steel": {
+        "Yk": 1.0,
+        "dHue": -24.0,
+        "dSat": -0.066,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 286,
+        "tolerance_zone": true
+       },
+       "hair": {
+        "Yk": 0.033,
+        "dHue": -148.5,
+        "dSat": 0.228,
+        "within": {
+         "luma": false,
+         "hue": false,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 501,
+        "tolerance_zone": false
+       }
+      }
+     },
+     "within": [
+      1,
+      1
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K2-5x-cobble-host-f-1-hero-KingArthur.jpg",
+     "vsLookdev": {
+      "steel": {
+       "Yratio": 1.08,
+       "dSat": -0.063,
+       "dHue": -10.0,
+       "proxyReliable": true
+      }
+     },
+     "attribution": {
+      "steel": "в допуске"
+     }
+    },
+    {
+     "fighter": "f-1-sk0",
+     "hero": "Merlin",
+     "team": "P2",
+     "mesh": "SK_Merlin_H2LD",
+     "rect": [
+      1610.0,
+      1023.0,
+      2207.0,
+      1584.0
+     ],
+     "headPx": 52.1,
+     "classCounts": {
+      "board": 15391,
+      "dropped": 593,
+      "other": 1686
+     },
+     "boardSamples": 830,
+     "ringSamples": 0,
+     "baseSamples": 0,
+     "zonesMeasured": [],
+     "verdicts": {
+      "k": null,
+      "deltas": {}
+     },
+     "within": [
+      0,
+      0
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K2-5x-cobble-host-f-1-sk0-Merlin.jpg",
+     "vsLookdev": {},
+     "attribution": {}
+    }
+   ]
+  },
+  {
+   "label": "K2 5x @245s cobble host",
+   "frame": "docs/game-design/evidence/ART-018/long-k2-2026-09-30/k2-long-245s/cobble-5x6/run-20260930-164925/phase2-board-host-1920x1080.png",
+   "trace": "docs/game-design/evidence/ART-018/long-k2-2026-09-30/k2-long-245s/cobble-5x6/run-20260930-164925/phase2-client-host.trace.log",
+   "board": "cobble-5x6",
+   "render": {
+    "expMin": "4.14106"
+   },
+   "fighters": [
+    {
+     "fighter": "f-0-hero",
+     "hero": "Medusa",
+     "team": "P1",
+     "mesh": "SK_Medusa_H2LD",
+     "rect": [
+      710.0,
+      229.0,
+      1210.0,
+      845.0
+     ],
+     "headPx": 59.0,
+     "classCounts": {
+      "base": 24744,
+      "board": 168367,
+      "dropped": 14191,
+      "gold_antique": 5520,
+      "leather_smooth": 3617,
+      "leather_worn": 2010,
+      "legacy_bake": 613,
+      "linen": 15677,
+      "other": 2683,
+      "ring": 58088,
+      "skin": 10602,
+      "unknown": 3,
+      "wood": 625
+     },
+     "boardSamples": 8497,
+     "ringSamples": 7764,
+     "baseSamples": 5402,
+     "zonesMeasured": [
+      "gold_antique",
+      "leather_smooth",
+      "leather_worn",
+      "linen",
+      "skin"
+     ],
+     "verdicts": {
+      "k": 0.7864,
+      "key_zones": [
+       "gold_antique",
+       "linen",
+       "skin"
+      ],
+      "deltas": {
+       "gold_antique": {
+        "Yk": 1.366,
+        "dHue": -0.1,
+        "dSat": 0.038,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 2622,
+        "tolerance_zone": true
+       },
+       "linen": {
+        "Yk": 0.72,
+        "dHue": 12.2,
+        "dSat": 0.046,
+        "within": {
+         "luma": false,
+         "hue": false,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 8084,
+        "tolerance_zone": true
+       },
+       "skin": {
+        "Yk": 1.017,
+        "dHue": 4.1,
+        "dSat": 0.069,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 5977,
+        "tolerance_zone": true
+       },
+       "leather_smooth": {
+        "Yk": 0.823,
+        "dHue": 6.7,
+        "dSat": 0.017,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 308,
+        "tolerance_zone": true
+       },
+       "leather_worn": {
+        "Yk": 1.077,
+        "dHue": -1.8,
+        "dSat": 0.066,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 260,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      2,
+      5
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K2-5x-245s-cobble-host-f-0-hero-Medusa.jpg",
+     "vsLookdev": {
+      "gold_antique": {
+       "Yratio": 0.978,
+       "dSat": -0.016,
+       "dHue": 0.0,
+       "proxyReliable": false
+      },
+      "linen": {
+       "Yratio": 0.936,
+       "dSat": 0.01,
+       "dHue": 3.1,
+       "proxyReliable": false
+      },
+      "skin": {
+       "Yratio": 1.092,
+       "dSat": -0.061,
+       "dHue": 0.2,
+       "proxyReliable": true
+      },
+      "leather_smooth": {
+       "Yratio": 0.084,
+       "dSat": 0.039,
+       "dHue": -16.1,
+       "proxyReliable": false
+      },
+      "leather_worn": {
+       "Yratio": 1.27,
+       "dSat": -0.01,
+       "dHue": 1.9,
+       "proxyReliable": true
+      }
+     },
+     "attribution": {
+      "gold_antique": "прокси ненадёжен для зоны (не атрибутируется)",
+      "linen": "прокси ненадёжен для зоны (не атрибутируется)",
+      "skin": "в допуске (в look-dev вне: свет доски / ракурс помогают)",
+      "leather_smooth": "прокси ненадёжен для зоны (не атрибутируется)",
+      "leather_worn": "в допуске (в look-dev вне: свет доски / ракурс помогают)"
+     }
+    },
+    {
+     "fighter": "f-0-sk0",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      1521.0,
+      334.0,
+      1988.0,
+      803.0
+     ],
+     "headPx": 59.0,
+     "classCounts": {
+      "base": 19856,
+      "board": 70859,
+      "claw": 6080,
+      "dark": 18782,
+      "dropped": 5612,
+      "gold": 143,
+      "orange": 16270,
+      "other": 4436,
+      "ring": 42020,
+      "skin": 3073
+     },
+     "boardSamples": 6519,
+     "ringSamples": 7417,
+     "baseSamples": 4149,
+     "zonesMeasured": [
+      "claw",
+      "dark",
+      "orange",
+      "skin"
+     ],
+     "verdicts": {
+      "k": 1.1082,
+      "key_zones": [
+       "orange",
+       "dark",
+       "skin"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 1.143,
+        "dHue": 1.8,
+        "dSat": 0.011,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 11950,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 1.088,
+        "dHue": 0.5,
+        "dSat": 0.169,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 11997,
+        "tolerance_zone": true
+       },
+       "skin": {
+        "Yk": 0.804,
+        "dHue": -1.1,
+        "dSat": 0.078,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 841,
+        "tolerance_zone": true
+       },
+       "claw": {
+        "Yk": 1.05,
+        "dHue": 120.0,
+        "dSat": 0.001,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 1291,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      2,
+      4
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K2-5x-245s-cobble-host-f-0-sk0-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 1.108,
+       "dSat": 0.015,
+       "dHue": 1.3,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 0.901,
+       "dSat": 0.063,
+       "dHue": 5.6,
+       "proxyReliable": false
+      },
+      "skin": {
+       "Yratio": 1.001,
+       "dSat": 0.027,
+       "dHue": 1.6,
+       "proxyReliable": true
+      },
+      "claw": {
+       "Yratio": 1.481,
+       "dSat": -0.022,
+       "dHue": 0.0,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "orange": "в допуске",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+      "skin": "материал",
+      "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-0-sk1",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      799.0,
+      -200.0,
+      1121.0,
+      220.0
+     ],
+     "headPx": 60.9,
+     "classCounts": {
+      "base": 11130,
+      "board": 14783,
+      "claw": 4664,
+      "dark": 2081,
+      "dropped": 4277,
+      "gold": 89,
+      "orange": 4838,
+      "other": 3694,
+      "ring": 23724,
+      "skin": 1560
+     },
+     "boardSamples": 9915,
+     "ringSamples": 6850,
+     "baseSamples": 3291,
+     "zonesMeasured": [
+      "claw",
+      "dark",
+      "orange",
+      "skin"
+     ],
+     "verdicts": {
+      "k": 0.7502,
+      "key_zones": [
+       "orange",
+       "dark",
+       "skin"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 0.954,
+        "dHue": 2.8,
+        "dSat": -0.015,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 3031,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 1.083,
+        "dHue": 0.9,
+        "dSat": 0.159,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 475,
+        "tolerance_zone": true
+       },
+       "skin": {
+        "Yk": 0.968,
+        "dHue": 1.6,
+        "dSat": -0.003,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 664,
+        "tolerance_zone": true
+       },
+       "claw": {
+        "Yk": 0.711,
+        "dHue": 120.0,
+        "dSat": 0.001,
+        "within": {
+         "luma": false,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": false,
+        "pixels": 1181,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      2,
+      4
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K2-5x-245s-cobble-host-f-0-sk1-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 0.924,
+       "dSat": -0.011,
+       "dHue": 2.3,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 0.897,
+       "dSat": 0.053,
+       "dHue": 6.0,
+       "proxyReliable": false
+      },
+      "skin": {
+       "Yratio": 1.205,
+       "dSat": -0.054,
+       "dHue": 4.3,
+       "proxyReliable": true
+      },
+      "claw": {
+       "Yratio": 1.003,
+       "dSat": -0.022,
+       "dHue": 0.0,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "orange": "в допуске",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+      "skin": "в допуске (в look-dev вне: свет доски / ракурс помогают)",
+      "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-0-sk2",
+     "hero": "Harpy",
+     "team": "P1",
+     "mesh": "SK_Harpy_H3LD",
+     "rect": [
+      -68.0,
+      334.0,
+      399.0,
+      803.0
+     ],
+     "headPx": 59.2,
+     "classCounts": {
+      "base": 22704,
+      "board": 59457,
+      "claw": 10606,
+      "dark": 19771,
+      "dropped": 8561,
+      "gold": 459,
+      "orange": 17801,
+      "other": 6188,
+      "ring": 38327,
+      "skin": 3257
+     },
+     "boardSamples": 6560,
+     "ringSamples": 7449,
+     "baseSamples": 4080,
+     "zonesMeasured": [
+      "claw",
+      "dark",
+      "orange",
+      "skin"
+     ],
+     "verdicts": {
+      "k": 1.0056,
+      "key_zones": [
+       "orange",
+       "dark",
+       "skin"
+      ],
+      "deltas": {
+       "orange": {
+        "Yk": 1.092,
+        "dHue": 1.6,
+        "dSat": 0.017,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 12631,
+        "tolerance_zone": true
+       },
+       "dark": {
+        "Yk": 1.039,
+        "dHue": -3.0,
+        "dSat": 0.158,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 12052,
+        "tolerance_zone": true
+       },
+       "skin": {
+        "Yk": 0.882,
+        "dHue": -0.5,
+        "dSat": 0.057,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 866,
+        "tolerance_zone": true
+       },
+       "claw": {
+        "Yk": 0.863,
+        "dHue": 140.0,
+        "dSat": 0.019,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 3629,
+        "tolerance_zone": true
+       }
+      }
+     },
+     "within": [
+      3,
+      4
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K2-5x-245s-cobble-host-f-0-sk2-Harpy.jpg",
+     "vsLookdev": {
+      "orange": {
+       "Yratio": 1.058,
+       "dSat": 0.021,
+       "dHue": 1.1,
+       "proxyReliable": true
+      },
+      "dark": {
+       "Yratio": 0.86,
+       "dSat": 0.052,
+       "dHue": 2.1,
+       "proxyReliable": false
+      },
+      "skin": {
+       "Yratio": 1.098,
+       "dSat": 0.006,
+       "dHue": 2.2,
+       "proxyReliable": true
+      },
+      "claw": {
+       "Yratio": 1.217,
+       "dSat": -0.004,
+       "dHue": 20.0,
+       "proxyReliable": false
+      }
+     },
+     "attribution": {
+      "orange": "в допуске",
+      "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+      "skin": "в допуске (в look-dev вне: свет доски / ракурс помогают)",
+      "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+     }
+    },
+    {
+     "fighter": "f-1-hero",
+     "hero": "KingArthur",
+     "team": "P2",
+     "mesh": "SK_KingArthur_H2LD",
+     "rect": [
+      657.0,
+      924.0,
+      1263.0,
+      1641.0
+     ],
+     "headPx": 45.9,
+     "classCounts": {
+      "belt": 5,
+      "board": 6272,
+      "dropped": 597,
+      "hair": 1742,
+      "other": 7043,
+      "ring": 5709,
+      "steel": 1146,
+      "unknown": 14452
+     },
+     "boardSamples": 87,
+     "ringSamples": 0,
+     "baseSamples": 0,
+     "zonesMeasured": [
+      "hair",
+      "steel"
+     ],
+     "verdicts": {
+      "k": 0.2767,
+      "key_zones": [
+       "steel"
+      ],
+      "deltas": {
+       "steel": {
+        "Yk": 1.0,
+        "dHue": -44.0,
+        "dSat": -0.066,
+        "within": {
+         "luma": true,
+         "hue": true,
+         "sat": true
+        },
+        "all_within": true,
+        "pixels": 273,
+        "tolerance_zone": true
+       },
+       "hair": {
+        "Yk": 0.033,
+        "dHue": -148.5,
+        "dSat": 0.228,
+        "within": {
+         "luma": false,
+         "hue": false,
+         "sat": false
+        },
+        "all_within": false,
+        "pixels": 515,
+        "tolerance_zone": false
+       }
+      }
+     },
+     "within": [
+      1,
+      1
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K2-5x-245s-cobble-host-f-1-hero-KingArthur.jpg",
+     "vsLookdev": {
+      "steel": {
+       "Yratio": 1.08,
+       "dSat": -0.063,
+       "dHue": -30.0,
+       "proxyReliable": true
+      }
+     },
+     "attribution": {
+      "steel": "в допуске"
+     }
+    },
+    {
+     "fighter": "f-1-sk0",
+     "hero": "Merlin",
+     "team": "P2",
+     "mesh": "SK_Merlin_H2LD",
+     "rect": [
+      1610.0,
+      1023.0,
+      2207.0,
+      1584.0
+     ],
+     "headPx": 52.0,
+     "classCounts": {
+      "board": 14930,
+      "dropped": 711,
+      "other": 2029
+     },
+     "boardSamples": 898,
+     "ringSamples": 0,
+     "baseSamples": 0,
+     "zonesMeasured": [],
+     "verdicts": {
+      "k": null,
+      "deltas": {}
+     },
+     "within": [
+      0,
+      0
+     ],
+     "crop": "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/light-under-figures/crops/K2-5x-245s-cobble-host-f-1-sk0-Merlin.jpg",
+     "vsLookdev": {},
+     "attribution": {}
+    }
+   ]
+  }
+ ],
+ "summary": [
+  {
+   "hero": "Harpy",
+   "frame": "K1 cobble-5x6 host",
+   "px": 794,
+   "within": [
+    0,
+    3
+   ],
+   "fighter": "f-0-sk2",
+   "k": 0.4134,
+   "attribution": {
+    "orange": "свет доски / ракурс",
+    "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+    "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+   }
+  },
+  {
+   "hero": "Harpy",
+   "frame": "K1 cobble-5x6 joiner",
+   "px": 831,
+   "within": [
+    0,
+    3
+   ],
+   "fighter": "f-0-sk2",
+   "k": 0.4988,
+   "attribution": {
+    "orange": "свет доски / ракурс",
+    "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+    "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+   }
+  },
+  {
+   "hero": "Harpy",
+   "frame": "K1 sherwood-forest-8x5 host",
+   "px": 509,
+   "within": [
+    0,
+    3
+   ],
+   "fighter": "f-0-sk2",
+   "k": 0.7002,
+   "attribution": {
+    "orange": "свет доски / ракурс",
+    "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+    "skin": "материал"
+   }
+  },
+  {
+   "hero": "Harpy",
+   "frame": "K1 sherwood-forest-8x5 joiner",
+   "px": 422,
+   "within": [
+    0,
+    3
+   ],
+   "fighter": "f-0-sk0",
+   "k": 0.5519,
+   "attribution": {
+    "orange": "свет доски / ракурс",
+    "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+    "skin": "материал"
+   }
+  },
+  {
+   "hero": "Harpy",
+   "frame": "K1 t-rex-paddock-7x5 host",
+   "px": 735,
+   "within": [
+    0,
+    3
+   ],
+   "fighter": "f-0-sk0",
+   "k": 0.4593,
+   "attribution": {
+    "orange": "свет доски / ракурс",
+    "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+    "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+   }
+  },
+  {
+   "hero": "Harpy",
+   "frame": "K1 t-rex-paddock-7x5 joiner",
+   "px": 847,
+   "within": [
+    0,
+    3
+   ],
+   "fighter": "f-0-sk0",
+   "k": 0.6515,
+   "attribution": {
+    "orange": "свет доски / ракурс",
+    "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+    "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+   }
+  },
+  {
+   "hero": "Harpy",
+   "frame": "K2 1.6x cobble host",
+   "px": 2488,
+   "within": [
+    1,
+    3
+   ],
+   "fighter": "f-0-sk2",
+   "k": 0.6687,
+   "attribution": {
+    "orange": "в допуске",
+    "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+    "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+   }
+  },
+  {
+   "hero": "Harpy",
+   "frame": "K2 2.5x cobble host",
+   "px": 6253,
+   "within": [
+    1,
+    4
+   ],
+   "fighter": "f-0-sk0",
+   "k": 0.8216,
+   "attribution": {
+    "orange": "в допуске",
+    "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+    "skin": "материал",
+    "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+   }
+  },
+  {
+   "hero": "Harpy",
+   "frame": "K2 3.5x cobble host",
+   "px": 14789,
+   "within": [
+    3,
+    4
+   ],
+   "fighter": "f-0-sk0",
+   "k": 0.8644,
+   "attribution": {
+    "orange": "в допуске",
+    "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+    "skin": "в допуске (в look-dev вне: свет доски / ракурс помогают)",
+    "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+   }
+  },
+  {
+   "hero": "Harpy",
+   "frame": "K2 5x @245s cobble host",
+   "px": 29178,
+   "within": [
+    3,
+    4
+   ],
+   "fighter": "f-0-sk2",
+   "k": 1.0056,
+   "attribution": {
+    "orange": "в допуске",
+    "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+    "skin": "в допуске (в look-dev вне: свет доски / ракурс помогают)",
+    "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+   }
+  },
+  {
+   "hero": "Harpy",
+   "frame": "K2 5x cobble host",
+   "px": 28766,
+   "within": [
+    3,
+    4
+   ],
+   "fighter": "f-0-sk0",
+   "k": 1.0637,
+   "attribution": {
+    "orange": "в допуске",
+    "dark": "прокси ненадёжен для зоны (не атрибутируется)",
+    "skin": "в допуске (в look-dev вне: свет доски / ракурс помогают)",
+    "claw": "прокси ненадёжен для зоны (не атрибутируется)"
+   }
+  },
+  {
+   "hero": "KingArthur",
+   "frame": "K1 cobble-5x6 host",
+   "px": 761,
+   "within": [
+    0,
+    2
+   ],
+   "fighter": "f-1-hero",
+   "k": 0.5083,
+   "attribution": {
+    "steel": "свет доски / ракурс",
+    "cloth": "свет доски / ракурс"
+   }
+  },
+  {
+   "hero": "KingArthur",
+   "frame": "K1 cobble-5x6 joiner",
+   "px": 759,
+   "within": [
+    0,
+    2
+   ],
+   "fighter": "f-1-hero",
+   "k": 0.511,
+   "attribution": {
+    "steel": "свет доски / ракурс",
+    "cloth": "свет доски / ракурс"
+   }
+  },
+  {
+   "hero": "KingArthur",
+   "frame": "K1 sherwood-forest-8x5 host",
+   "px": 805,
+   "within": [
+    1,
+    1
+   ],
+   "fighter": "f-1-hero",
+   "k": 0.3956,
+   "attribution": {
+    "cloth": "в допуске"
+   }
+  },
+  {
+   "hero": "KingArthur",
+   "frame": "K1 sherwood-forest-8x5 joiner",
+   "px": 779,
+   "within": [
+    1,
+    1
+   ],
+   "fighter": "f-1-hero",
+   "k": 0.3956,
+   "attribution": {
+    "cloth": "в допуске"
+   }
+  },
+  {
+   "hero": "KingArthur",
+   "frame": "K1 t-rex-paddock-7x5 host",
+   "px": 1144,
+   "within": [
+    0,
+    2
+   ],
+   "fighter": "f-1-hero",
+   "k": 0.2369,
+   "attribution": {
+    "steel": "свет доски / ракурс",
+    "cloth": "свет доски / ракурс"
+   }
+  },
+  {
+   "hero": "KingArthur",
+   "frame": "K1 t-rex-paddock-7x5 joiner",
+   "px": 1113,
+   "within": [
+    0,
+    2
+   ],
+   "fighter": "f-1-hero",
+   "k": 0.2361,
+   "attribution": {
+    "steel": "свет доски / ракурс",
+    "cloth": "свет доски / ракурс"
+   }
+  },
+  {
+   "hero": "KingArthur",
+   "frame": "K2 1.6x cobble host",
+   "px": 2403,
+   "within": [
+    0,
+    2
+   ],
+   "fighter": "f-1-hero",
+   "k": 0.6056,
+   "attribution": {
+    "steel": "свет доски / ракурс",
+    "cloth": "свет доски / ракурс"
+   }
+  },
+  {
+   "hero": "KingArthur",
+   "frame": "K2 2.5x cobble host",
+   "px": 6513,
+   "within": [
+    1,
+    4
+   ],
+   "fighter": "f-1-hero",
+   "k": 0.6197,
+   "attribution": {
+    "steel": "свет доски / ракурс",
+    "gold": "прокси ненадёжен для зоны (не атрибутируется)",
+    "embroidery": "прокси ненадёжен для зоны (не атрибутируется)",
+    "cloth": "свет доски / ракурс"
+   }
+  },
+  {
+   "hero": "KingArthur",
+   "frame": "K2 3.5x cobble host",
+   "px": 3205,
+   "within": [
+    0,
+    3
+   ],
+   "fighter": "f-1-hero",
+   "k": 0.3206,
+   "attribution": {
+    "steel": "свет доски / ракурс",
+    "gold": "прокси ненадёжен для зоны (не атрибутируется)",
+    "cloth": "свет доски / ракурс"
+   }
+  },
+  {
+   "hero": "KingArthur",
+   "frame": "K2 5x @245s cobble host",
+   "px": 788,
+   "within": [
+    1,
+    1
+   ],
+   "fighter": "f-1-hero",
+   "k": 0.2767,
+   "attribution": {
+    "steel": "в допуске"
+   }
+  },
+  {
+   "hero": "KingArthur",
+   "frame": "K2 5x cobble host",
+   "px": 787,
+   "within": [
+    1,
+    1
+   ],
+   "fighter": "f-1-hero",
+   "k": 0.2772,
+   "attribution": {
+    "steel": "в допуске"
+   }
+  },
+  {
+   "hero": "Medusa",
+   "frame": "K1 cobble-5x6 host",
+   "px": 247,
+   "within": [
+    1,
+    2
+   ],
+   "fighter": "f-0-hero",
+   "k": 0.6457,
+   "attribution": {
+    "linen": "прокси ненадёжен для зоны (не атрибутируется)",
+    "skin": "в допуске (в look-dev вне: свет доски / ракурс помогают)"
+   }
+  },
+  {
+   "hero": "Medusa",
+   "frame": "K1 cobble-5x6 joiner",
+   "px": 273,
+   "within": [
+    1,
+    2
+   ],
+   "fighter": "f-0-hero",
+   "k": 0.6797,
+   "attribution": {
+    "linen": "прокси ненадёжен для зоны (не атрибутируется)",
+    "skin": "в допуске (в look-dev вне: свет доски / ракурс помогают)"
+   }
+  },
+  {
+   "hero": "Medusa",
+   "frame": "K1 sherwood-forest-8x5 host",
+   "px": 0,
+   "within": [
+    0,
+    0
+   ],
+   "fighter": "f-0-hero",
+   "k": null,
+   "attribution": {}
+  },
+  {
+   "hero": "Medusa",
+   "frame": "K1 sherwood-forest-8x5 joiner",
+   "px": 73,
+   "within": [
+    0,
+    1
+   ],
+   "fighter": "f-0-hero",
+   "k": 0.5561,
+   "attribution": {
+    "linen": "прокси ненадёжен для зоны (не атрибутируется)"
+   }
+  },
+  {
+   "hero": "Medusa",
+   "frame": "K1 t-rex-paddock-7x5 host",
+   "px": 419,
+   "within": [
+    0,
+    1
+   ],
+   "fighter": "f-0-hero",
+   "k": 0.6096,
+   "attribution": {
+    "linen": "прокси ненадёжен для зоны (не атрибутируется)"
+   }
+  },
+  {
+   "hero": "Medusa",
+   "frame": "K1 t-rex-paddock-7x5 joiner",
+   "px": 327,
+   "within": [
+    0,
+    1
+   ],
+   "fighter": "f-0-hero",
+   "k": 0.6539,
+   "attribution": {
+    "linen": "прокси ненадёжен для зоны (не атрибутируется)"
+   }
+  },
+  {
+   "hero": "Medusa",
+   "frame": "K2 1.6x cobble host",
+   "px": 1206,
+   "within": [
+    1,
+    3
+   ],
+   "fighter": "f-0-hero",
+   "k": 0.7731,
+   "attribution": {
+    "gold_antique": "прокси ненадёжен для зоны (не атрибутируется)",
+    "linen": "прокси ненадёжен для зоны (не атрибутируется)",
+    "skin": "в допуске (в look-dev вне: свет доски / ракурс помогают)"
+   }
+  },
+  {
+   "hero": "Medusa",
+   "frame": "K2 2.5x cobble host",
+   "px": 3647,
+   "within": [
+    1,
+    3
+   ],
+   "fighter": "f-0-hero",
+   "k": 0.8024,
+   "attribution": {
+    "gold_antique": "прокси ненадёжен для зоны (не атрибутируется)",
+    "linen": "прокси ненадёжен для зоны (не атрибутируется)",
+    "skin": "в допуске (в look-dev вне: свет доски / ракурс помогают)"
+   }
+  },
+  {
+   "hero": "Medusa",
+   "frame": "K2 3.5x cobble host",
+   "px": 7556,
+   "within": [
+    1,
+    5
+   ],
+   "fighter": "f-0-hero",
+   "k": 0.8039,
+   "attribution": {
+    "gold_antique": "прокси ненадёжен для зоны (не атрибутируется)",
+    "linen": "прокси ненадёжен для зоны (не атрибутируется)",
+    "skin": "в допуске (в look-dev вне: свет доски / ракурс помогают)",
+    "leather_smooth": "прокси ненадёжен для зоны (не атрибутируется)",
+    "leather_worn": "материал"
+   }
+  },
+  {
+   "hero": "Medusa",
+   "frame": "K2 5x @245s cobble host",
+   "px": 17251,
+   "within": [
+    2,
+    5
+   ],
+   "fighter": "f-0-hero",
+   "k": 0.7864,
+   "attribution": {
+    "gold_antique": "прокси ненадёжен для зоны (не атрибутируется)",
+    "linen": "прокси ненадёжен для зоны (не атрибутируется)",
+    "skin": "в допуске (в look-dev вне: свет доски / ракурс помогают)",
+    "leather_smooth": "прокси ненадёжен для зоны (не атрибутируется)",
+    "leather_worn": "в допуске (в look-dev вне: свет доски / ракурс помогают)"
+   }
+  },
+  {
+   "hero": "Medusa",
+   "frame": "K2 5x cobble host",
+   "px": 17431,
+   "within": [
+    2,
+    5
+   ],
+   "fighter": "f-0-hero",
+   "k": 0.7737,
+   "attribution": {
+    "gold_antique": "прокси ненадёжен для зоны (не атрибутируется)",
+    "linen": "прокси ненадёжен для зоны (не атрибутируется)",
+    "skin": "в допуске (в look-dev вне: свет доски / ракурс помогают)",
+    "leather_smooth": "прокси ненадёжен для зоны (не атрибутируется)",
+    "leather_worn": "в допуске (в look-dev вне: свет доски / ракурс помогают)"
+   }
+  },
+  {
+   "hero": "Merlin",
+   "frame": "K1 cobble-5x6 host",
+   "px": 669,
+   "within": [
+    1,
+    1
+   ],
+   "fighter": "f-1-sk0",
+   "k": 0.9877,
+   "attribution": {
+    "wool_coarse": "прокси ненадёжен для зоны (не атрибутируется)"
+   }
+  },
+  {
+   "hero": "Merlin",
+   "frame": "K1 cobble-5x6 joiner",
+   "px": 661,
+   "within": [
+    1,
+    1
+   ],
+   "fighter": "f-1-sk0",
+   "k": 0.9817,
+   "attribution": {
+    "wool_coarse": "прокси ненадёжен для зоны (не атрибутируется)"
+   }
+  },
+  {
+   "hero": "Merlin",
+   "frame": "K1 sherwood-forest-8x5 host",
+   "px": 881,
+   "within": [
+    1,
+    1
+   ],
+   "fighter": "f-1-sk0",
+   "k": 0.8193,
+   "attribution": {
+    "wool_coarse": "прокси ненадёжен для зоны (не атрибутируется)"
+   }
+  },
+  {
+   "hero": "Merlin",
+   "frame": "K1 sherwood-forest-8x5 joiner",
+   "px": 888,
+   "within": [
+    1,
+    1
+   ],
+   "fighter": "f-1-sk0",
+   "k": 0.8193,
+   "attribution": {
+    "wool_coarse": "прокси ненадёжен для зоны (не атрибутируется)"
+   }
+  },
+  {
+   "hero": "Merlin",
+   "frame": "K1 t-rex-paddock-7x5 host",
+   "px": 989,
+   "within": [
+    0,
+    1
+   ],
+   "fighter": "f-1-sk0",
+   "k": 0.6169,
+   "attribution": {
+    "wool_coarse": "прокси ненадёжен для зоны (не атрибутируется)"
+   }
+  },
+  {
+   "hero": "Merlin",
+   "frame": "K1 t-rex-paddock-7x5 joiner",
+   "px": 990,
+   "within": [
+    0,
+    1
+   ],
+   "fighter": "f-1-sk0",
+   "k": 0.6169,
+   "attribution": {
+    "wool_coarse": "прокси ненадёжен для зоны (не атрибутируется)"
+   }
+  },
+  {
+   "hero": "Merlin",
+   "frame": "K2 1.6x cobble host",
+   "px": 1948,
+   "within": [
+    1,
+    1
+   ],
+   "fighter": "f-1-sk0",
+   "k": 0.7835,
+   "attribution": {
+    "wool_coarse": "прокси ненадёжен для зоны (не атрибутируется)"
+   }
+  },
+  {
+   "hero": "Merlin",
+   "frame": "K2 2.5x cobble host",
+   "px": 5493,
+   "within": [
+    0,
+    1
+   ],
+   "fighter": "f-1-sk0",
+   "k": 0.902,
+   "attribution": {
+    "wool_coarse": "прокси ненадёжен для зоны (не атрибутируется)"
+   }
+  },
+  {
+   "hero": "Merlin",
+   "frame": "K2 3.5x cobble host",
+   "px": 7099,
+   "within": [
+    0,
+    2
+   ],
+   "fighter": "f-1-sk0",
+   "k": 0.6733,
+   "attribution": {
+    "wool_coarse": "прокси ненадёжен для зоны (не атрибутируется)",
+    "skin": "прокси ненадёжен для зоны (не атрибутируется)"
+   }
+  },
+  {
+   "hero": "Merlin",
+   "frame": "K2 5x @245s cobble host",
+   "px": 0,
+   "within": [
+    0,
+    0
+   ],
+   "fighter": "f-1-sk0",
+   "k": null,
+   "attribution": {}
+  },
+  {
+   "hero": "Merlin",
+   "frame": "K2 5x cobble host",
+   "px": 0,
+   "within": [
+    0,
+    0
+   ],
+   "fighter": "f-1-sk0",
+   "k": null,
+   "attribution": {}
+  }
+ ]
+}

@@ -41,6 +41,11 @@ param(
   # 'ARTPREVIEW heroesV2 summary fighters=6 mapped=6 v2=6', six 'ARTPREVIEW heroesV2 fighter=' lines
   # and an Idle 'ARTPREVIEW anim' line per client, no 'missing=' fallback.
   [switch]$ArtPreviewHeroesV2,
+  # Wave 5c-B (ArtPreviewBoardId only): both clients get -ArtPreviewDiorama - the diorama tray
+  # SM_TableBase (ASSET-TABLE-BASE-001 candidate) under the art board, NoCollision, top on Z -3.
+  # Asserted as 'ARTPREVIEW diorama tray=/Game/PipelineCandidates/TableBase/... bounds=' per client,
+  # no 'diorama tray missing'. Changes the lit scene (Lumen GI): its frames are a separate set.
+  [switch]$ArtPreviewDiorama,
   # Host-only flag input emulation after its evidence shot ('+'-separated:
   # wheelin, wheelout, space, clickhero, clickabove, clickcell, token*N). Every
   # step is traced 'INPUT ... src=flag'; real OS input is T4.3.
@@ -153,6 +158,9 @@ if ($ArtPreviewBoardId) {
 }
 if (($ArtPreviewAllMedusa -or $ArtPreviewHeroesV2 -or $ArtPreviewInputPlan -or $ArtPreviewIconSize -gt 0 -or $ArtPreviewIconProbe) -and -not $ArtPreviewBoardId) {
   throw 'ArtPreviewAllMedusa / ArtPreviewHeroesV2 / ArtPreviewInputPlan / ArtPreviewIconSize / ArtPreviewIconProbe require ArtPreviewBoardId'
+}
+if ($ArtPreviewDiorama -and -not $ArtPreviewBoardId) {
+  throw 'ArtPreviewDiorama requires ArtPreviewBoardId'
 }
 if ($ArtPreviewHeroesV2 -and $ArtPreviewAllMedusa) {
   throw 'ArtPreviewHeroesV2 and ArtPreviewAllMedusa are separate reviews; pass one of them'
@@ -443,6 +451,7 @@ function Invoke-Phase2Demo {
   if ($ClientPerf) { $common += '-S08Perf' }
   if ($ArtPreviewAllMedusa) { $common += '-ArtPreviewAllMedusa' }
   if ($ArtPreviewHeroesV2) { $common += '-ArtPreviewHeroesV2' }
+  if ($ArtPreviewDiorama) { $common += '-ArtPreviewDiorama' }
   if ($ClientCsvFrames -gt 0) { $common += @("-csvCaptureFrames=$ClientCsvFrames", '-csvGpuStats') }
   $hostArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
     "-S08Auto", "-S08Create",
@@ -597,13 +606,16 @@ function Invoke-Phase2Demo {
       } else {
         $artLines += @('ARTPREVIEW board assets ready cobbleMesh=', ' tiles=1 ')
       }
+      # 5c-B2: with -ArtPreviewHeroesV2 the look-dev C figure replaces the Medusa candidate, so the
+      # client reports the candidate as not eligible (bMedusaCandidate = !bHeroV2 && ...) with the v2 mesh.
+      $medusaFighterLine = if ($ArtPreviewHeroesV2) { 'ARTPREVIEW fighter=Medusa hero=1 eligible=0 visual=1 mesh=SK_Medusa_H2LD' } else { 'ARTPREVIEW fighter=Medusa hero=1 eligible=1 visual=1' }
       Assert-Trace $hostTrace (@('SNAPSHOT applied', $expectedBoard, 'FIGHTERS synced n=6', 'SHOT ctx',
-        'ARTPREVIEW fighter=Medusa hero=1 eligible=1 visual=1',
+        $medusaFighterLine,
         'ARTPREVIEW selection ownHero=1 selected=1 fighter=Medusa',
         'ARTPREVIEW selection ring shown fighter=Medusa mesh=SM_Marker_SelectionRing') + $artLines) 'host'
       Assert-Trace $joinTrace (@('SNAPSHOT applied', $expectedBoard, 'FIGHTERS synced n=6', 'SHOT ctx',
         'WS DROPPED', 'WS closed', 'WS reconnect attempt', 'WS reconnected',
-        'ARTPREVIEW fighter=Medusa hero=1 eligible=1 visual=1') + $artLines) 'joiner'
+        $medusaFighterLine) + $artLines) 'joiner'
       foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
         $active = Select-String -LiteralPath $pair[1] -Pattern ('ARTPREVIEW board active profile=' + [regex]::Escape($ArtBoard.id) + ' .* expectOk=(\d)') | Select-Object -Last 1
         if (-not $active -or $active.Matches[0].Groups[1].Value -ne '1') {
@@ -690,6 +702,13 @@ function Invoke-Phase2Demo {
           if ($missing) { throw "$($pair[0]) v2 asset missing in the pak: $($missing.Line)" }
         }
       }
+      if ($ArtPreviewDiorama) {
+        foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
+          Assert-Trace $pair[1] @('ARTPREVIEW diorama requested mesh=/Game/PipelineCandidates/TableBase/', 'ARTPREVIEW diorama tray=/Game/PipelineCandidates/TableBase/') "$($pair[0]) diorama"
+          $trayMissing = Select-String -LiteralPath $pair[1] -Pattern 'ARTPREVIEW diorama tray missing' | Select-Object -First 1
+          if ($trayMissing) { throw "$($pair[0]) diorama tray not shown: $($trayMissing.Line)" }
+        }
+      }
       if ($ArtPreviewInputPlan) {
         Assert-Trace $hostTrace @('INPUT plan src=flag steps=', 'INPUT plan done src=flag') 'host input plan'
         $clicks = @(Select-String -LiteralPath $hostTrace -Pattern 'INPUT click button=left src=flag step=(\w+) .* match=(\d)')
@@ -718,8 +737,9 @@ function Invoke-Phase2Demo {
         'WS DROPPED', 'WS closed', 'WS reconnect attempt', 'WS reconnected', 'CUE move') 'joiner'
     }
     if ($ArtPreviewBoardId) {
-      [System.IO.File]::WriteAllText((Join-Path $Script:Staging 'art-preview-status.json'),
-        (([ordered]@{ boardId = $ArtPreviewBoardId; artBoardProfile = $ArtBoard.id; boardSize = $ArtBoardSize; lightProfile = $ArtBoard.light; artFixture = [bool]$ArtBoard.artFixture; multizoneCells = $ArtBoard.expect.multizoneCells; hostAssetsLoaded = $true; joinerAssetsLoaded = $true; hostLiveZones = $ArtBoard.expect.zoneCells; joinerLiveZones = $ArtBoard.expect.zoneCells; hostFocusZoom = $ArtPreviewFocusZoom; medusaVariant = $ArtPreviewMedusaVariant; medusaVariantExplicit = $MedusaVariantExplicit; shotAfterSeconds = $ArtPreviewShotAfter; runSeconds = $RunSeconds; clientFps = $ClientFps; clientPerf = [bool]$ClientPerf; allMedusa = [bool]$ArtPreviewAllMedusa; heroesV2 = [bool]$ArtPreviewHeroesV2; inputPlan = $ArtPreviewInputPlan; iconSize = $ArtPreviewIconSize; iconProbe = [bool]$ArtPreviewIconProbe }) | ConvertTo-Json), $Utf8NoBom)
+      $artStatus = [ordered]@{ boardId = $ArtPreviewBoardId; artBoardProfile = $ArtBoard.id; boardSize = $ArtBoardSize; lightProfile = $ArtBoard.light; artFixture = [bool]$ArtBoard.artFixture; multizoneCells = $ArtBoard.expect.multizoneCells; hostAssetsLoaded = $true; joinerAssetsLoaded = $true; hostLiveZones = $ArtBoard.expect.zoneCells; joinerLiveZones = $ArtBoard.expect.zoneCells; hostFocusZoom = $ArtPreviewFocusZoom; medusaVariant = $ArtPreviewMedusaVariant; medusaVariantExplicit = $MedusaVariantExplicit; shotAfterSeconds = $ArtPreviewShotAfter; runSeconds = $RunSeconds; clientFps = $ClientFps; clientPerf = [bool]$ClientPerf; allMedusa = [bool]$ArtPreviewAllMedusa; heroesV2 = [bool]$ArtPreviewHeroesV2; inputPlan = $ArtPreviewInputPlan; iconSize = $ArtPreviewIconSize; iconProbe = [bool]$ArtPreviewIconProbe }
+      if ($ArtPreviewDiorama) { $artStatus.diorama = $true }
+      [System.IO.File]::WriteAllText((Join-Path $Script:Staging 'art-preview-status.json'), ($artStatus | ConvertTo-Json), $Utf8NoBom)
     }
 
     # ProjectWorldLocationToScreen can return true even for offscreen pixels.

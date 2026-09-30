@@ -285,8 +285,10 @@ def cmd_k3(a) -> int:
     win = (both[0], both[-1]) if both else None
     in_win = [r for r in gpu if win and win[0] <= r["t"] <= win[1]]
     perf = {"schema": "unmatched.art004-perf/1",
-            "status": "измерено; ЗАГРЯЗНЕНО фоном H2 (headless Blender/Cycles параллельной линии героев) — не для ACC-022",
+            "status": getattr(a, "perf_status", None) or
+                      "измерено; ЗАГРЯЗНЕНО фоном H2 (headless Blender/Cycles параллельной линии героев) — не для ACC-022",
             "scope": "текущий ПК разработки (RTX 4090), не целевой ПК D-07",
+            "concurrentGpuUsers": getattr(a, "concurrent_gpu_users", None),
             "clientFpsCap": a.client_fps, "clients": {},
             "gpuTotal": {"window": [win[0].isoformat(), win[1].isoformat()] if win else None,
                          "utilizationPct": L.stats([r["gpu"] for r in in_win]),
@@ -1590,6 +1592,10 @@ def main(argv=None) -> int:
     k.add_argument("--package-record", required=True)
     k.add_argument("--extra-demo-arg", action="append",
                    help="W5b-R: extra run-combat-demo.ps1 token per occurrence (use --extra-demo-arg=-Flag)")
+    k.add_argument("--perf-status", default=None,
+                   help="5c-B2: status text of perf.json (default: the W5b-R H2-background label)")
+    k.add_argument("--concurrent-gpu-users", default=None,
+                   help="5c-B2: free-text note of other GPU users during the run (perf.json)")
     rv = sub.add_parser("revalidate", help="recompute validation.json of a published combat run")
     rv.add_argument("run_dir")
     an = sub.add_parser("analyze", help="QA-010 measurements of one board")

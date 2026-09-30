@@ -94,6 +94,31 @@ def thresholds(evidence: Path) -> dict:
     return load_json(p if p.is_file() else evidence / "t53-thresholds.json")
 
 
+def analysis_thresholds(evidence: Path) -> dict:
+    """Thresholds as the analysis applies them. t53-thresholds.json (W5b-R): as registered. t5cb-thresholds.json
+    (5c-B1+): its rule «всё, что ниже не переопределено, действует как в базе (с её ревизией 1)» - every top-level
+    section is the base section updated by the 5c-B1 keys (shallow, per section), and `revisions` are the BASE
+    revisions (revision 1 of the base = tag binding / plate-owner mode, which the 5c-B1 file inherits); the 5c-B1 own
+    revisions (calibration of red / gray / rim, rim-bound window) are already folded into its sections and stay in
+    `revisionsOwn`. Read-only: the registered files are not touched."""
+    th = thresholds(evidence)
+    base = th.get("base") or {}
+    if not base.get("path"):
+        return th
+    bp = REPO / base["path"]
+    bdoc = load_json(bp)
+    merged = dict(bdoc)
+    for k, v in th.items():
+        if isinstance(v, dict) and isinstance(bdoc.get(k), dict):
+            merged[k] = {**bdoc[k], **v}
+        else:
+            merged[k] = v
+    merged["revisionsOwn"] = th.get("revisions") or []
+    merged["revisions"] = [r for r in bdoc.get("revisions") or [] if r.get("revision") in (base.get("revisionsApplied") or [])]
+    merged["_sources"] = {"thresholds": L.rel(evidence / "t5cb-thresholds.json"), "base": L.rel(bp)}
+    return merged
+
+
 def evidence_ring_bands(th: dict) -> dict:
     """Ring bands the frames of an evidence set were shot with: the registered geometry of a 5c-B1+ thresholds file
     (rings.geometry {'P1': {band: [r0, r1]}, 'P2': {...}}), else the W5b-R r3 bands (t53-thresholds.json keeps the
@@ -1263,7 +1288,7 @@ def cmd_analyze(a) -> int:
 def _cmd_analyze(a) -> int:
     import numpy as np
     evidence = Path(a.evidence).resolve()
-    th = thresholds(evidence)
+    th = analysis_thresholds(evidence)
     calib = th["calibration"]["bytes"]
     key = a.board
     spec = BOARDS[key]
@@ -1300,7 +1325,7 @@ def _cmd_analyze(a) -> int:
             rr = Path(run).resolve()
             probes[size] = (rr / "phase2-board-host-1920x1080.png", rr / "phase2-client-host.trace.log", "host")
     summary = {"schema": "unmatched.t53-analysis/1", "board": key, "boardId": spec["boardId"],
-               "status": "измерено (не приёмка)", "thresholds": L.rel(evidence / "t53-thresholds.json"),
+               "status": "измерено (не приёмка)", "thresholds": (th.get("_sources") or {}).get("thresholds") or L.rel(evidence / "t53-thresholds.json"),
                "frames": {k: L.rel(v[0]) for k, v in {**frames, **dmg_frames}.items()},
                "probes": {k: L.rel(v[0]) for k, v in probes.items()}, "k3Frame": k3_main}
     shots = {k: Shot(*v[:2]) for k, v in {**frames, **dmg_frames, **{f"probe{k}": v for k, v in probes.items()}}.items()}

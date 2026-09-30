@@ -44,6 +44,14 @@ public:
   /** W4-A: light units / SkyLight / exposure / profile sha actually applied
    *  (input of the RENDER fingerprint line of every SHOT). */
   const FS08AppliedRender& GetAppliedRender() const { return AppliedRender; }
+  /** Wave 5c-B -ArtPreviewDiorama tray component (nullptr without the flag). */
+  const UStaticMeshComponent* GetDioramaTray() const { return DioramaTray; }
+  /** Wave 5c-B: creates the diorama tray component when S08Diorama::Enabled(bArtPreview) (called from BeginPlay;
+   *  a no-op without -ArtPreview -ArtPreviewDiorama). Returns true when the tray component exists. */
+  bool EnsureDioramaTray(bool bArtPreview);
+  /** Wave 5c-B: shows the tray fitted to a board frame of world half extent BoardHalf (S08Diorama::FitTray), or
+   *  hides it; writes the 'ARTPREVIEW diorama tray=' line. Public for the automation test. */
+  void PlaceDioramaTray(bool bVisible, const FVector2D& BoardHalf, const TCHAR* Surface);
 
   /** Syncs fighter actors with the latest decoded fighters (spawn/move/
    *  re-label by stable fighter id; dead fighters hide instantly). */
@@ -219,6 +227,8 @@ private:
   void ClearArtLights();
   void ApplyArtLights(const FS08LightProfile& Light, bool bLegacyCobbleTrace);
   void ApplySurfaceMaterials();
+  /** Wave 5c-B -ArtPreviewDiorama: shows / hides and fits the tray under the active art board (traced). */
+  void UpdateDioramaTray(const FS08BoardModel& Board);
 
   UPROPERTY()
   TObjectPtr<AActor> IllegalCell;
@@ -236,6 +246,9 @@ private:
   bool bAllMedusaSummaryTraced = false;
   FS08SeqDedupe AnimEventDedupe;
   FString HeroesV2SummaryKey;
+  // Wave 5c-B -ArtPreviewDiorama (S08Diorama.h): created at runtime only with the flag, nullptr otherwise.
+  UPROPERTY()
+  TObjectPtr<UStaticMeshComponent> DioramaTray;
 
   FS08BoardModel BoardModel;
   TArray<FS08BoardFighter> Fighters;

@@ -1,0 +1,103 @@
+{
+  "schema": "unmatched.art004-package/1",
+  "label": "5cb2-P1",
+  "wave": "5c-B, B1-6 часть 2 (кук и пакет)",
+  "date": "2026-09-30",
+  "status": "измерено: кук и пакет Development собраны; художественная приёмка не выставляется",
+  "checkout": "C:/Users/ren/WebstormProjects/unmached/unmached (fix/admin-panel, HEAD 11445e7e + незакоммиченные правки 5c-B/B1)",
+  "startedLocal": "2026-09-30T16:02:11+05:00",
+  "finishedLocal": "2026-09-30T16:03:16+05:00",
+  "lock": "C:/tmp/unmatched-package.lock — взят перед запуском, снят после проверки",
+  "mode": "tools/s08/package-client.ps1 -SkipBuild (BuildCookRun -cook -stage -pak -package -compressed -skipbuild, Win64 Development)",
+  "whySkipBuild": "игровой таргет Unmatched Win64 Development собран на этапе BUILD (Result: Succeeded, Binaries 15:47); файлов в Source/Config новее Unmatched.exe нет; guard -SkipBuild (WITH_LIVE_CODING 0 в SharedDefinitions) пройден",
+  "log": "docs/game-design/evidence/ART-005/art3-live-3boards-r3-2026-09-30/build/P1-package.log",
+  "logSha256": "678cec75738b6057fddb1f01b4377274e5cad27116f08567aa9faa6efd9bd707",
+  "cookCommandletLog": "C:/Program Files/Epic Games/UE_5.8/Engine/Programs/AutomationTool/Saved/Cook-2026.09.30-16.02.19.txt (вывод кука также есть в P1-package.log через -stdout)",
+  "uatExit": 0,
+  "scriptExit": 0,
+  "buildSuccessful": true,
+  "durationS": 58.55,
+  "cook": {
+    "commandTimeS": 20.1,
+    "packagesCooked": 770,
+    "packagesSkippedByPlatform": 7,
+    "totalPackages": 777,
+    "commandletResult": "Success - 0 error(s), 0 warning(s)",
+    "logCounts": { "warning": 0, "error": 0, "failedToCompile": 0, "doesNotExist": 1 },
+    "knownNonBlocking": "LogCook Display: SK_Medusa_FaceNeck_v2Candidate ссылается на несуществующий _PhysicsAsset — та же строка в r2 P1/P3, не warning; missing package по героям v2, TableBase и v2 нет"
+  },
+  "shaders": {
+    "M_UM_Figure_v2": {
+      "SM6": "Missing cached shadermap … PCD3D_SM6 (DDC 3ae0343c…) → compiling; ошибок нет; есть в ShaderAssetInfo-Unmatched-PCD3D_SM6",
+      "SM5": "Missing cached shadermap … PCD3D_SM5 (DDC 0be51906…) → compiling; ошибок нет; есть в ShaderAssetInfo-Unmatched-PCD3D_SM5"
+    },
+    "alsoRecompiled": ["MI_KingArthur_H2LD SM6/SM5", "MI_Medusa_H2LD SM5", "M_UM_Figure SM6/SM5", "M_UM_BaseMarker SM6/SM5"],
+    "shaderCompilerStats": "Shaders Compiled: 3, jobs 3/3 (остальное — кэш/DDC)"
+  },
+  "contentInPak": {
+    "method": "имена .uasset каждого исходного каталога найдены в индексе Unmatched-Windows.utoc; число пакетов сверено с Metadata/ReferencedSet.txt",
+    "PipelineCandidates": {
+      "KingArthur/H2LD": { "source": 17, "cooked": 17, "missingInUtoc": 0 },
+      "KingArthur/Rig": { "source": 2, "cooked": 2, "missingInUtoc": 0 },
+      "KingArthur/H2Anim": { "source": 4, "cooked": 4, "missingInUtoc": 0 },
+      "Merlin/H2LD": { "source": 20, "cooked": 20, "missingInUtoc": 0 },
+      "Merlin/Rig": { "source": 2, "cooked": 2, "missingInUtoc": 0 },
+      "Merlin/H2Anim": { "source": 4, "cooked": 4, "missingInUtoc": 0 },
+      "Medusa/H2LD": { "source": 17, "cooked": 17, "missingInUtoc": 0 },
+      "Medusa/Rig": { "source": 2, "cooked": 2, "missingInUtoc": 0 },
+      "Medusa/H2Anim": { "source": 4, "cooked": 4, "missingInUtoc": 0 },
+      "Harpy/H3LD": { "source": 20, "cooked": 20, "missingInUtoc": 0 },
+      "Harpy/Rig": { "source": 2, "cooked": 2, "missingInUtoc": 0 },
+      "Harpy/H2Anim": { "source": 4, "cooked": 4, "missingInUtoc": 0 },
+      "TableBase/20260928-table-base-tripo-h31": { "source": 5, "cooked": 5, "missingInUtoc": 0 }
+    },
+    "UM/Materials/v2": {
+      "source": 6,
+      "cooked": 6,
+      "missingInUtoc": 0,
+      "assets": ["M_UM_Figure_v2", "MI_UM_Figure_v2_Template", "T_UM_DetailN_Array", "T_UM_DetailRMH_Array", "T_UM_MatLUT_Global", "T_UM_MatID_Legacy"]
+    },
+    "UM/Materials/v2/Test": {
+      "sourceAssets": 70,
+      "cooked": 0,
+      "inUtoc": 0,
+      "note": "исключён DirectoriesToNeverCook; строки 'never cook package list' в логе нет — исключение подтверждено отсутствием всех 70 пакетов в ReferencedSet и .utoc"
+    }
+  },
+  "assetRegistry": {
+    "path": "unreal/Unmatched/Saved/Cooked/Windows/Unmatched/Metadata/DevelopmentAssetRegistry.bin",
+    "sha256": "efe2af4a7eaa815d2241e0d05e575557d633e4f24fd38856aee3e208af6b3518"
+  },
+  "paks": {
+    "Unmatched-Windows.pak": "84e68fbe1bf31c1931cb1bc0860957310b5c2fa22e0a66f12cc8b6da097e347b",
+    "Unmatched-Windows.ucas": "b05faf4a562085e5f0320afc784bb90f22cb5797567f79769d22b796a7453a43",
+    "Unmatched-Windows.utoc": "a7a8ccffff4ca72ecd11f300dfda80dfbe2b29cc2771bea2bc35b4089261256e",
+    "global.ucas": "f112ef2d5efe4c8a3b0f2f790ca4151f2473db21b7bf059dd0fd959d52278799",
+    "global.utoc": "5004628eb157c5e5469dad19739ddf475653405e394fb9276bc96ec18c2efc49"
+  },
+  "exe": {
+    "binariesSha256": "8d228fae4f60c78002d6009b4fef1c0ec308275146fad5b6244c7a1b846d3b35",
+    "stagedInnerSha256": "8d228fae4f60c78002d6009b4fef1c0ec308275146fad5b6244c7a1b846d3b35",
+    "stagedRootStubSha256": "1d70715ffd5478c7a3cd620db247488cea8baaaef21b5cac84b10a62d7b027bc",
+    "stagedInnerPath": "unreal/Unmatched/Saved/StagedBuilds/Windows/Unmatched/Binaries/Win64/Unmatched.exe",
+    "note": "корневой staged Unmatched.exe — стаб-лаунчер; сравнивается только внутренний Binaries/Win64 exe",
+    "innerEqualsBinaries": true
+  },
+  "frameRateLimit": {
+    "defaultGameUserSettings": "60.000000",
+    "defaultGameUserSettingsSha256": "69ab7cda46545edf1ffaa7db8680703168c48081c71900ca722b325fab2f09c6",
+    "stagedAs": "Unmatched/Config/DefaultGameUserSettings.ini в Unmatched-Windows.pak (Manifest_UFSFiles_Win64)",
+    "stagedSavedGameUserSettingsExists": false,
+    "localAppDataSavedGameUserSettingsExists": false,
+    "effective": "60 (сохранённых GameUserSettings, которые могли бы перекрыть значение, нет); в паре S08 run-phase2-demo ставит t.MaxFPS 30 на клиента"
+  },
+  "config": {
+    "DefaultGame.ini": "40409f8a902b6792f8dc4663477cb5c94bab1b71601403316a9e448a2d91530e (с TableBase в DirectoriesToAlwaysCook, этап BUILD)"
+  },
+  "smoke": "отдельный 45-секундный смок не запускался: трассы heroesV2/anim/diorama, отсутствие missing и хеши кадров проверяет run-phase2-demo.ps1 в B1-7",
+  "nextSteps": [
+    "B1-7: 12 прогонов r3 (3 доски × K1, K3, зонды 24/48; пара offscreen-клиентов по 30 FPS, -RequireRenderReference -RequireShotCaptured) на этом пакете",
+    "Отдельный набор с -ArtPreviewHeroesV2 (и при желании -ArtPreviewDiorama): run-phase2-demo сверит summary 6/6, Idle 6/6, отсутствие missing, SK_Medusa_H2LD"
+  ],
+  "processesLeft": "нет: UAT, UnrealEditor-Cmd, ShaderCompileWorker и UnrealPak завершились сами"
+}

@@ -1,0 +1,139 @@
+{
+  "schema": "unmatched.art004-perf-csv/1",
+  "status": "измерено; dev-PC (RTX 4090), не D-07; машина не тихая (открыты Blender GUI :9876/:9877, параллельно чтение/документы ENV-0) — не для ACC-022",
+  "method": "UE CSV profiler (-csvCaptureFrames, -csvGpuStats); first 150 frames skipped as warm-up",
+  "gpuBusyDefinition": "sum of the named GPU/<pass> times per frame (D3D11 timestamp queries), GPU/Unaccounted excluded; means are inflated by rare long passes when other processes preempt the GPU, p50 is the typical per-frame GPU cost",
+  "gpuUnaccountedDefinition": "GPU/Unaccounted = BeginWork..EndWork time not covered by named passes (idle gaps and other processes' work on the shared GPU)",
+  "gpuTimeCaveat": "GPUTime (and PERF gpuMs in the trace) is the D3D11 BeginWork..EndWork interval, which spans the whole frame period under t.MaxFPS; use GPUBusy for the per-client GPU load",
+  "rawOutsideGit": [
+    {
+      "path": "unreal/Unmatched/Artifacts/ART004Face/t11-raw/run-20260930-164925/client-csv/host-Profile-20260930_164925.csv",
+      "bytes": 15728640,
+      "sha256": "e21e1f570f50625c97c0b9eb8b3d4c9e90ed578a7c7e4946778e2d681bd98bbb"
+    },
+    {
+      "path": "unreal/Unmatched/Artifacts/ART004Face/t11-raw/run-20260930-164925/client-csv/joiner-Profile-20260930_164931.csv",
+      "bytes": 15728640,
+      "sha256": "925836f8dd587207918e08a9e51e874cf03d1cc4d81a84757c7dd0b021703bba"
+    }
+  ],
+  "clients": {
+    "host": {
+      "file": "host-Profile-20260930_164925.csv",
+      "framesTotal": 7677,
+      "warmupFramesSkipped": 150,
+      "gpuPassColumns": 27,
+      "metadata": {},
+      "FrameTime": {
+        "n": 7527,
+        "mean": 33.43,
+        "p50": 33.3325,
+        "p95": 33.9699,
+        "max": 300.4737
+      },
+      "GameThreadTime": {
+        "n": 7527,
+        "mean": 1.92,
+        "p50": 1.6056,
+        "p95": 2.9842,
+        "max": 243.7352
+      },
+      "RenderThreadTime": {
+        "n": 7527,
+        "mean": 4.05,
+        "p50": 3.4579,
+        "p95": 6.9043,
+        "max": 172.0359
+      },
+      "RHIThreadTime": {
+        "n": 7527,
+        "mean": 1.95,
+        "p50": 1.7715,
+        "p95": 3.2057,
+        "max": 44.0424
+      },
+      "GPUTime": {
+        "n": 7527,
+        "mean": 1.87,
+        "p50": 1.8689,
+        "p95": 2.1155,
+        "max": 4.217
+      },
+      "GPUBusy": {
+        "n": 7527,
+        "mean": 1.07,
+        "p50": 1.0666999999999998,
+        "p95": 1.2174999999999998,
+        "max": 3.4755000000000003
+      },
+      "GPUUnaccounted": {
+        "n": 7527,
+        "mean": 0.44,
+        "p50": 0.3668,
+        "p95": 0.6974,
+        "max": 2.6305
+      },
+      "effectiveFps": 29.92,
+      "hitchesOver50ms": 13
+    },
+    "joiner": {
+      "file": "joiner-Profile-20260930_164931.csv",
+      "framesTotal": 7672,
+      "warmupFramesSkipped": 150,
+      "gpuPassColumns": 27,
+      "metadata": {},
+      "FrameTime": {
+        "n": 7522,
+        "mean": 33.39,
+        "p50": 33.3325,
+        "p95": 33.9317,
+        "max": 214.5487
+      },
+      "GameThreadTime": {
+        "n": 7522,
+        "mean": 1.78,
+        "p50": 1.4719,
+        "p95": 3.0095,
+        "max": 153.6356
+      },
+      "RenderThreadTime": {
+        "n": 7522,
+        "mean": 3.99,
+        "p50": 3.4136,
+        "p95": 6.8895,
+        "max": 57.0858
+      },
+      "RHIThreadTime": {
+        "n": 7522,
+        "mean": 1.79,
+        "p50": 1.6445,
+        "p95": 2.7899,
+        "max": 43.1663
+      },
+      "GPUTime": {
+        "n": 7522,
+        "mean": 1.88,
+        "p50": 1.88,
+        "p95": 2.094,
+        "max": 3.9891
+      },
+      "GPUBusy": {
+        "n": 7522,
+        "mean": 1.08,
+        "p50": 1.0655000000000001,
+        "p95": 1.2203,
+        "max": 4.0862
+      },
+      "GPUUnaccounted": {
+        "n": 7522,
+        "mean": 0.43,
+        "p50": 0.4101,
+        "p95": 0.6431,
+        "max": 2.3525
+      },
+      "effectiveFps": 29.95,
+      "hitchesOver50ms": 6
+    }
+  },
+  "roleNote": "5c-B2: оба CSV обрезаны на 15 МиБ без футера метаданных (-csvCaptureFrames 8200 больше кадров сессии, клиент вышел до конца захвата), поэтому гарнитура не нашла роль ('unknown'). Роли назначены по времени старта: хост стартует первым (164925), присоединившийся через 6 с (164931), как во всех прогонах с найденной ролью; файлы вне git переименованы unknown- → host-/joiner-."
+}

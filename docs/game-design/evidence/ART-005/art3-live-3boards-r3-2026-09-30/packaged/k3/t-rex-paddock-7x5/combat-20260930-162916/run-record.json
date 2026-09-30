@@ -1,0 +1,121 @@
+{
+  "schema": "unmatched.t52-k3-run/1",
+  "label": "K3-t-rex-paddock-7x5",
+  "startedLocal": "2026-09-30T16:29:12+05:00",
+  "argv": [
+    "powershell",
+    "-NoProfile",
+    "-ExecutionPolicy",
+    "Bypass",
+    "-File",
+    "tools/s09/run-combat-demo.ps1",
+    "-Api",
+    "http://localhost:3120/graphql",
+    "-EvidenceDir",
+    "docs/game-design/evidence/ART-005/art3-live-3boards-r3-2026-09-30/packaged/k3/t-rex-paddock-7x5",
+    "-ArtPreview",
+    "-FullHd",
+    "-ClientFps",
+    "30",
+    "-ArtPreviewBoardId",
+    "c70e9f624617750c2a2b856fd",
+    "-ArtPreviewMedusaVariant",
+    "face-neck-v2",
+    "-RunSeconds",
+    "240",
+    "-ClientRenderPreset",
+    "High",
+    "-RequireRenderReference",
+    "-ClientPerf",
+    "-RequireShotCaptured"
+  ],
+  "credentials": "S08_DEMO_* from backend/.env injected as S09_DEMO_* into the child environment only",
+  "backend": {
+    "port": 3120,
+    "pid": 42656,
+    "process": {
+      "pid": 42656,
+      "parent": 47856,
+      "name": "node.exe",
+      "exe": "C:\\nvm4w\\nodejs\\node.exe",
+      "cmd": "\"C:\\nvm4w\\nodejs\\node.exe\" -r dotenv/config dist/src/main.js ",
+      "created": "2026-09-30T16:15:09.7893530+05:00"
+    }
+  },
+  "artBoard": {
+    "boardId": "c70e9f624617750c2a2b856fd",
+    "profile": "t-rex-paddock-art-fixture",
+    "size": "7x5",
+    "light": "paddock-probe",
+    "artFixture": true
+  },
+  "clientFps": 30,
+  "runSeconds": 240,
+  "variant": "face-neck-v2",
+  "staged": {
+    "global.ucas": "f112ef2d5efe4c8a3b0f2f790ca4151f2473db21b7bf059dd0fd959d52278799",
+    "global.utoc": "5004628eb157c5e5469dad19739ddf475653405e394fb9276bc96ec18c2efc49",
+    "Unmatched-Windows.pak": "84e68fbe1bf31c1931cb1bc0860957310b5c2fa22e0a66f12cc8b6da097e347b",
+    "Unmatched-Windows.ucas": "b05faf4a562085e5f0320afc784bb90f22cb5797567f79769d22b796a7453a43",
+    "Unmatched-Windows.utoc": "a7a8ccffff4ca72ecd11f300dfda80dfbe2b29cc2771bea2bc35b4089261256e",
+    "Unmatched.exe(inner)": "8d228fae4f60c78002d6009b4fef1c0ec308275146fad5b6244c7a1b846d3b35"
+  },
+  "demoExit": 0,
+  "finishedLocal": "2026-09-30T16:30:49+05:00",
+  "durationS": 96.0,
+  "staging": "C:\\Users\\ren\\AppData\\Local\\Temp\\s09-combat-20260930-162916-53372",
+  "cleanupLine": "cleanup: game cmuo0w0ef00mpwiwwodgt5wbv already terminal (FINISHED)",
+  "roomStatus": "FINISHED",
+  "runDir": "docs/game-design/evidence/ART-005/art3-live-3boards-r3-2026-09-30/packaged/k3/t-rex-paddock-7x5/combat-20260930-162916",
+  "clientLogs": [
+    {
+      "name": "Unmatched.log",
+      "bytes": 122871,
+      "sha256": "3ddf08b6a0834e0f69a1d0599765ed65463eb46f0b53aeb9ca98d30a90d529fa",
+      "roomCodeRedacted": false
+    },
+    {
+      "name": "Unmatched_2.log",
+      "bytes": 130618,
+      "sha256": "95a31394f61aa94865bbf97ccd6e607c1fa95535f2b4a242d8affce60ff1ecfc",
+      "roomCodeRedacted": false
+    }
+  ],
+  "rawOutsideGit": [
+    {
+      "path": "unreal/Unmatched/Artifacts/ART004Face/t11-raw/t52-combat-20260930-162916/nvidia-smi-pmon.txt",
+      "sha256": "38d6ca4c559bb631bb0305cd2eabe94cd3f2ffa1f632e3e6b94eb50faaf45deb"
+    }
+  ],
+  "crashLines": [],
+  "clientProcesses": [
+    {
+      "pid": 5056,
+      "parent": 53372,
+      "exe": "C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched.exe",
+      "created": "2026-09-30T16:29:16.7754210+05:00"
+    },
+    {
+      "pid": 52280,
+      "parent": 5056,
+      "exe": "C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched\\Binaries\\Win64\\Unmatched.exe",
+      "created": "2026-09-30T16:29:16.7856650+05:00"
+    },
+    {
+      "pid": 34100,
+      "parent": 53372,
+      "exe": "C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched.exe",
+      "created": "2026-09-30T16:29:22.4935840+05:00"
+    },
+    {
+      "pid": 60824,
+      "parent": 34100,
+      "exe": "C:\\Users\\ren\\WebstormProjects\\unmached\\unmached\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched\\Binaries\\Win64\\Unmatched.exe",
+      "created": "2026-09-30T16:29:22.5046070+05:00"
+    }
+  ],
+  "validation": {
+    "status": "pass_technical_evidence_only",
+    "problems": []
+  }
+}

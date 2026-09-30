@@ -37,7 +37,16 @@
   [switch]$RequireShotCaptured,
   # Opt-in per-client frame timing in the trace (PERF config/window/summary),
   # as run-phase2-demo -ClientPerf. Measurement only.
-  [switch]$ClientPerf
+  [switch]$ClientPerf,
+  # Wave 5c-B2 port of the run-phase2-demo 5c-B flags (-ArtPreview + -ArtPreviewBoardId only):
+  # both clients get -ArtPreviewHeroesV2 (King Arthur, Merlin, Medusa and the three Harpies on the
+  # look-dev C figures with the H2Anim clips) and/or -ArtPreviewDiorama (SM_TableBase under the board).
+  # Asserted as in run-phase2-demo: 'ARTPREVIEW heroesV2 summary fighters=6 mapped=6 v2=6', six v2
+  # 'ARTPREVIEW heroesV2 fighter=' lines, Idle on 6/6, no 'missing=' fallback; the diorama tray line
+  # and no 'diorama tray missing'. The combat clip lines (LungeAttack / HitReact / DeathSettle) are
+  # counted into the manifest (heroesV2Anim), not gated: which of them fire depends on the duel.
+  [switch]$ArtPreviewHeroesV2,
+  [switch]$ArtPreviewDiorama
 )
 
 # W5b-R (t53-thresholds.json shotCaptured): every published frame must carry its pixel provenance line
@@ -78,6 +87,9 @@ $MedusaVariantExplicit = $PSBoundParameters.ContainsKey('ArtPreviewMedusaVariant
 if (($ArtPreviewBoardId -or $MedusaVariantExplicit -or $ArtPreviewSelectOwnHero -or $ArtPreviewFocusZoom -gt 0 -or
      $ArtPreviewShotAfter -gt 0) -and -not $ArtPreview) {
   throw 'ArtPreviewBoardId / ArtPreviewMedusaVariant / ArtPreviewSelectOwnHero / ArtPreviewFocusZoom / ArtPreviewShotAfter require -ArtPreview'
+}
+if (($ArtPreviewHeroesV2 -or $ArtPreviewDiorama) -and -not ($ArtPreview -and $ArtPreviewBoardId)) {
+  throw 'ArtPreviewHeroesV2 / ArtPreviewDiorama require -ArtPreview and -ArtPreviewBoardId'
 }
 if ($ArtPreviewFocusZoom -gt 0 -and ($ArtPreviewFocusZoom -le 1 -or -not $ArtPreviewSelectOwnHero)) {
   throw 'ArtPreviewFocusZoom requires -ArtPreviewSelectOwnHero and a zoom greater than 1'
@@ -293,6 +305,8 @@ function Invoke-CombatDemo {
   if ($MedusaVariantExplicit) { $common += "-ArtPreviewMedusaVariant=$ArtPreviewMedusaVariant" }
   if ($ClientRenderPreset -ne 'None') { $common += "-S08RenderPreset=$ClientRenderPreset" }
   if ($ClientPerf) { $common += '-S08Perf' }
+  if ($ArtPreviewHeroesV2) { $common += '-ArtPreviewHeroesV2' }
+  if ($ArtPreviewDiorama) { $common += '-ArtPreviewDiorama' }
   $hostArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
     "-S08Auto", "-S08Create", "-S08HeroId=$heroA", "-S08Trace=$hostTrace",
     "-S09Flow", "-S09Combat=attack", "-S09ShotDir=$hostShots", "-S08ExitAfter=$RunSeconds")
@@ -534,6 +548,34 @@ function Invoke-CombatDemo {
     if ($ArtPreviewSelectOwnHero) {
       Assert-Trace $hostTrace @('ARTPREVIEW selection ownHero=1 selected=1', 'INPUT select src=flag') 'host flag selection'
     }
+    $HeroesV2Anim = $null
+    if ($ArtPreviewHeroesV2) {
+      $HeroesV2Anim = [ordered]@{}
+      foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
+        Assert-Trace $pair[1] @('ARTPREVIEW heroesV2 summary fighters=6 mapped=6 v2=6', 'ARTPREVIEW anim fighter=') "$($pair[0]) heroes v2"
+        $v2 = @(Select-String -LiteralPath $pair[1] -Pattern 'ARTPREVIEW heroesV2 fighter=(\S+) mesh=/Game/PipelineCandidates/\S+ mi=/Game/PipelineCandidates/\S+_P[12] yaw=' |
+          ForEach-Object { $_.Matches[0].Groups[1].Value } | Sort-Object -Unique)
+        if ($v2.Count -ne 6) { throw "$($pair[0]) trace shows $($v2.Count)/6 v2 figures" }
+        $idle = @(Select-String -LiteralPath $pair[1] -Pattern 'ARTPREVIEW anim fighter=(\S+) clip=Idle len=' |
+          ForEach-Object { $_.Matches[0].Groups[1].Value } | Sort-Object -Unique)
+        if ($idle.Count -ne 6) { throw "$($pair[0]) trace shows Idle on $($idle.Count)/6 v2 figures" }
+        $missing = Select-String -LiteralPath $pair[1] -Pattern 'ARTPREVIEW (heroesV2 fighter=\S+ missing=|anim fighter=\S+ clip=\S+ missing=1)' | Select-Object -First 1
+        if ($missing) { throw "$($pair[0]) v2 asset missing in the pak: $($missing.Line)" }
+        $clips = [ordered]@{}
+        foreach ($clip in @('Idle', 'LungeAttack', 'HitReact', 'DeathSettle')) {
+          $clips[$clip] = @(Select-String -LiteralPath $pair[1] -Pattern ('ARTPREVIEW anim fighter=\S+ clip=' + $clip + ' ')).Count
+        }
+        $HeroesV2Anim[$pair[0]] = $clips
+        Write-Output ("heroes v2 {0}: figures={1} idle={2} clips Idle={3} LungeAttack={4} HitReact={5} DeathSettle={6}" -f $pair[0], $v2.Count, $idle.Count, $clips.Idle, $clips.LungeAttack, $clips.HitReact, $clips.DeathSettle)
+      }
+    }
+    if ($ArtPreviewDiorama) {
+      foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
+        Assert-Trace $pair[1] @('ARTPREVIEW diorama requested mesh=/Game/PipelineCandidates/TableBase/', 'ARTPREVIEW diorama tray=/Game/PipelineCandidates/TableBase/') "$($pair[0]) diorama"
+        $trayMissing = Select-String -LiteralPath $pair[1] -Pattern 'ARTPREVIEW diorama tray missing' | Select-Object -First 1
+        if ($trayMissing) { throw "$($pair[0]) diorama tray not shown: $($trayMissing.Line)" }
+      }
+    }
     # T5.2: W4-A render reference on every evidence SHOT of both clients that
     # shows the board. The lobby-return shot is taken after leaving the room:
     # no board and no art profile, so its fingerprint reports noArtProfile by
@@ -705,7 +747,8 @@ function Invoke-CombatDemo {
       stamp   = $Stamp
       verdict = "GD-034 P1: live attack->defense->resolve two-client demo, defense/resolve/result state-marker shots at exact ${ShotWidth}x${ShotHeight} with swap/negative controls, role-gated traces, privacy-clean logs, seq convergence; artPreview=$([bool]$ArtPreview); clientFpsCap=$ClientFps"
       artBoard = if ($ArtBoard) { [ordered]@{ boardId = $ArtPreviewBoardId; profile = $ArtBoard.id; size = $ArtBoardSize; light = $ArtBoard.light; artFixture = [bool]$ArtBoard.artFixture } } else { $null }
-      artPreviewFlags = [ordered]@{ medusaVariant = $(if ($MedusaVariantExplicit) { $ArtPreviewMedusaVariant } else { '(default)' }); selectOwnHero = [bool]$ArtPreviewSelectOwnHero; focusZoom = $ArtPreviewFocusZoom; shotAfter = $ArtPreviewShotAfter }
+      artPreviewFlags = [ordered]@{ medusaVariant = $(if ($MedusaVariantExplicit) { $ArtPreviewMedusaVariant } else { '(default)' }); selectOwnHero = [bool]$ArtPreviewSelectOwnHero; focusZoom = $ArtPreviewFocusZoom; shotAfter = $ArtPreviewShotAfter; heroesV2 = [bool]$ArtPreviewHeroesV2; diorama = [bool]$ArtPreviewDiorama }
+      heroesV2Anim = $HeroesV2Anim
       render = [ordered]@{ clientRenderPreset = $ClientRenderPreset; requireRenderReference = [bool]$RequireRenderReference; clientPerf = [bool]$ClientPerf }
       revealProof = $RevealProof
       files   = @()

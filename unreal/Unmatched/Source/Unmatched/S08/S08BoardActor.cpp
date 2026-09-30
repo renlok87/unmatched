@@ -1,6 +1,7 @@
 #include "S08BoardActor.h"
 #include "S08ArtHudText.h"
 #include "S08ArtPreviewMedusa.h"
+#include "S08Diorama.h"
 #include "S08FighterActor.h"
 #include "S08Render.h"
 #include "S08TraceLog.h"
@@ -14,6 +15,7 @@
 #include "Engine/TextureCube.h"
 #include "Components/SceneComponent.h"
 #include "Components/TextRenderComponent.h"
+#include "Engine/CollisionProfile.h"
 #include "Engine/DirectionalLight.h"
 #include "Engine/PointLight.h"
 #include "Engine/SkeletalMesh.h"
@@ -116,6 +118,8 @@ void AS08BoardActor::BeginPlay() {
     ArtVoidMaterial->SetVectorParameterValue(TEXT("Tint"), FLinearColor(0.012f, 0.012f, 0.016f));
   }
   if (!FParse::Param(FCommandLine::Get(), TEXT("ArtPreview"))) return;
+  // Wave 5c-B: the diorama tray only with -ArtPreviewDiorama (hidden until an art profile is active).
+  EnsureDioramaTray(true);
 
   // T3.2 board data: zone palette/glyphs per key, light profiles, board
   // profiles. Without valid data no board gets art (grey board, traced).
@@ -735,6 +739,69 @@ void AS08BoardActor::ApplySurfaceMaterials() {
   if (Underlay) UnderlayTiles->SetMaterial(0, Underlay);
 }
 
+bool AS08BoardActor::EnsureDioramaTray(bool bArtPreview) {
+  if (DioramaTray) return true;
+  if (!S08Diorama::Enabled(bArtPreview)) return false;
+  UStaticMesh* TrayMesh = LoadObject<UStaticMesh>(nullptr, S08Diorama::MeshPath);
+  UMaterialInterface* TrayMi = LoadObject<UMaterialInterface>(nullptr, S08Diorama::MaterialPath);
+  if (!TrayMesh) {
+    FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW diorama tray missing mesh=%s mi=%d (no tray)"),
+                                     S08Diorama::MeshPath, TrayMi ? 1 : 0));
+    return false;
+  }
+  DioramaTray = NewObject<UStaticMeshComponent>(this, TEXT("ArtDioramaTray"));
+  DioramaTray->SetupAttachment(RootComponent);
+  DioramaTray->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+  DioramaTray->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+  DioramaTray->SetGenerateOverlapEvents(false);
+  DioramaTray->SetCanEverAffectNavigation(false);
+  DioramaTray->SetStaticMesh(TrayMesh);
+  if (TrayMi) DioramaTray->SetMaterial(0, TrayMi);
+  DioramaTray->SetRelativeLocation(FVector::ZeroVector);
+  DioramaTray->SetVisibility(false);
+  DioramaTray->RegisterComponent();
+  FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW diorama requested mesh=%s mi=%s"), *TrayMesh->GetPathName(),
+                                   TrayMi ? *TrayMi->GetName() : TEXT("missing(mesh default)")));
+  return true;
+}
+
+void AS08BoardActor::PlaceDioramaTray(bool bVisible, const FVector2D& BoardHalf, const TCHAR* Surface) {
+  if (!DioramaTray) return;
+  if (!bVisible) {
+    DioramaTray->SetVisibility(false);
+    FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW diorama tray hidden surface=%s (no art board)"), Surface));
+    return;
+  }
+  const S08Diorama::FTrayFit Fit = S08Diorama::FitTray(BoardHalf);
+  DioramaTray->SetRelativeLocationAndRotation(FVector::ZeroVector, FRotator(0.0f, Fit.YawDeg, 0.0f));
+  DioramaTray->SetRelativeScale3D(Fit.Scale);
+  DioramaTray->SetVisibility(true);
+  const UStaticMesh* Mesh = DioramaTray->GetStaticMesh();
+  const FBox Box = Mesh ? Mesh->GetBoundingBox().TransformBy(DioramaTray->GetComponentTransform()) : FBox(ForceInit);
+  const UMaterialInterface* Mi = DioramaTray->GetMaterial(0);
+  const FVector Size = Box.GetSize();
+  FS08Trace::Write(FString::Printf(
+      TEXT("ARTPREVIEW diorama tray=%s mi=%s surface=%s yaw=%.1f scale=%.3fx%.3fx%.3f bounds=(%.1f,%.1f,%.1f)..(%.1f,%.1f,%.1f) size=%.1fx%.1fx%.1f topZ=%.1f boardHalf=%.1fx%.1f rimUU=%.1f collision=none"),
+      Mesh ? *Mesh->GetPathName() : TEXT("-"), Mi ? *Mi->GetName() : TEXT("-"), Surface, Fit.YawDeg, Fit.Scale.X,
+      Fit.Scale.Y, Fit.Scale.Z, Box.Min.X, Box.Min.Y, Box.Min.Z, Box.Max.X, Box.Max.Y, Box.Max.Z, Size.X, Size.Y,
+      Size.Z, Box.Max.Z, BoardHalf.X, BoardHalf.Y, S08Diorama::RimUU));
+}
+
+void AS08BoardActor::UpdateDioramaTray(const FS08BoardModel& Board) {
+  if (!DioramaTray) return;
+  if (!bArtActive) {
+    PlaceDioramaTray(false, FVector2D::ZeroVector, TEXT("grey"));
+    return;
+  }
+  FVector2D Half = S08Diorama::TilesFrameHalf(Board.Width, Board.Height, FS08BoardModel::CellSizeUU, ArtFrameUU);
+  if (!bArtTiles && ArtBoard->GetStaticMesh()) {
+    // cobble-5x6-mesh: the frame of the ART-005 slab itself (world +-278 x +-328 at yaw -90).
+    const FBox B = ArtBoard->GetStaticMesh()->GetBoundingBox().TransformBy(ArtBoard->GetRelativeTransform());
+    Half = FVector2D(FMath::Max(-B.Min.X, B.Max.X), FMath::Max(-B.Min.Y, B.Max.Y));
+  }
+  PlaceDioramaTray(true, Half, S08BoardSurfaceName(ActiveProfile.Surface));
+}
+
 bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
   if (Board.Width <= 0 || Board.Height <= 0) return false;
   if (BoardModel.Width == Board.Width && BoardModel.Height == Board.Height &&
@@ -1016,6 +1083,7 @@ bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
       FS08Trace::Write(TEXT("ARTPREVIEW board multizone cell=") + Line);
     }
   }
+  UpdateDioramaTray(Board);
   ClearChildren();
   return true;
 }

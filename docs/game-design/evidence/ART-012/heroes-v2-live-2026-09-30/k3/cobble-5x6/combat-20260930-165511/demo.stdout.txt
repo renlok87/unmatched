@@ -1,0 +1,76 @@
+art board: profile=cobble-city size=5x6 light=cobble-probe
+staged GameUserSettings -> 1920x1080 (windowed): C:\Users\ren\WebstormProjects\unmached\unmached\unreal\Unmatched\Saved\StagedBuilds\Windows\Unmatched\Saved\Config\Windows\GameUserSettings.ini
+heroA=cmuhgvgke00skwi9glfew6898 heroB=cmuhgvghu00oawi9gv9ehihmg
+staging: C:\Users\ren\AppData\Local\Temp\s09-combat-20260930-165511-22400
+host pid=5064
+room created by this run (code redacted from output; id=cmuo1tbx701cdwiww2yg05pmv)
+art board id verified against the authoritative game row
+joiner pid=6416
+both clients exited
+markers joiner: defense(def=1946 atk=0 res=0 rst=0) resolve(res=2590 def=0 rst=0) result(rst=2387 res=0 def=0) host: result(rst=2366 res=0 def=0)
+heroes v2 host: figures=6 idle=6 clips Idle=25 LungeAttack=7 HitReact=13 DeathSettle=1
+heroes v2 joiner: figures=6 idle=6 clips Idle=25 LungeAttack=7 HitReact=13 DeathSettle=1
+render fingerprint host: shots=14 gated=13 offReference=0 lobbyShots=1 preset=High
+render fingerprint joiner: shots=15 gated=14 offReference=0 lobbyShots=1 preset=High
+reveal markers joiner: resolve(res=2373) reveal(rvl=3129 def=0 rst=0)
+WARN: scheme not played this run (no legal card/action left) - not a gate
+convergence: host maxSeq=135 joiner maxSeq=135
+shot captured host s09-combat-result.png: frame=758 lateFrame=758 px=1920x1080 sha256=49d29d908141
+shot captured joiner s09-combat-defense-open.png: frame=453 lateFrame=453 px=1920x1080 sha256=c6e6dd901057
+shot captured joiner s09-combat-resolve-window.png: frame=460 lateFrame=460 px=1920x1080 sha256=4ae4f175ddd1
+shot captured joiner s09-combat-result.png: frame=583 lateFrame=583 px=1920x1080 sha256=b3fb0751b1e6
+shot captured joiner s09-combat-resolve-revealed.png: frame=464 lateFrame=464 px=1920x1080 sha256=2e2a42e4964e
+shot captured joiner s09-damage-number.png: frame=586 lateFrame=586 px=1920x1080 sha256=421d4a7dfa3b
+shot captured host s09-damage-combat.png: frame=762 lateFrame=762 px=1920x1080 sha256=ecaa987fbe7c
+shot captured joiner s09-damage-combat.png: frame=587 lateFrame=587 px=1920x1080 sha256=7d2affc50026
+published evidence run dir: C:\Users\ren\WebstormProjects\unmached\unmached\docs\game-design\evidence\ART-012\heroes-v2-live-2026-09-30\k3\cobble-5x6\combat-20260930-165511 (pointer: latest-combat.json)
+--- host trace (combat tail) ---
+
+2026.09.30-11.56.38 RESOLVE panel revealed: A2+B0 vs D4
+2026.09.30-11.56.38 MODE seq=129 mode=0 combat=0 pending=0
+2026.09.30-11.56.38 S09AUTO drive mode=0 plan=[attack] phase=ACTION_MANEUVER turn=cmukie57j0001wiaofr67k2vd
+2026.09.30-11.56.38 MODE seq=130 mode=0 combat=0 pending=0
+2026.09.30-11.56.38 MODE seq=131 mode=0 combat=0 pending=0
+2026.09.30-11.56.39 MODE seq=132 mode=0 combat=0 pending=0
+2026.09.30-11.56.39 MODE seq=133 mode=0 combat=0 pending=0
+2026.09.30-11.56.41 MODE seq=134 mode=6 combat=0 pending=1
+2026.09.30-11.56.41 S09AUTO drive mode=6 plan=[attack] phase=ACTION_MANEUVER turn=cmukie55u0000wiao06h107t9
+2026.09.30-11.56.41 S09AUTO own turn #12 (turnCount=25)
+2026.09.30-11.56.41 PEND-RESOLVE sent type=TARGET_FIGHTER stage=0 id=ability-medusa-target-p0
+2026.09.30-11.56.41 S09AUTO pending picked (type=TARGET_FIGHTER stage=0)
+2026.09.30-11.56.41 MODE seq=135 mode=0 combat=0 pending=1
+2026.09.30-11.56.41 PEND resolve done seq=135 (apply) phase=GAME_OVER
+2026.09.30-11.56.41 MODE seq=135 mode=0 combat=0 pending=1
+2026.09.30-11.56.43 S09AUTO result-screen shot
+2026.09.30-11.56.43 SHOT requested: FScreenshotRequest(bShowUI) -> C:\Users\ren\AppData\Local\Temp\s09-combat-20260930-
+165511-22400\host/s09-result-screen.png
+2026.09.30-11.56.47 S09AUTO lobby-return shot
+2026.09.30-11.56.47 SHOT requested: FScreenshotRequest(bShowUI) -> C:\Users\ren\AppData\Local\Temp\s09-combat-20260930-
+165511-22400\host/s09-lobby-return.png
+2026.09.30-11.56.47 S09AUTO duel flow complete (GAME_OVER -> result shown -> lobby return) - exiting
+--- joiner trace (combat tail) ---
+2026.09.30-11.56.38 MODE seq=130 mode=1 combat=0 pending=0
+2026.09.30-11.56.38 S09AUTO drive mode=1 plan=[defend+resolve] phase=ACTION_MANEUVER turn=cmukie57j0001wiaofr67k2vd
+2026.09.30-11.56.38 MODE seq=131 mode=0 combat=0 pending=0
+2026.09.30-11.56.38 MODE seq=131 mode=0 combat=0 pending=0
+2026.09.30-11.56.39 S09AUTO drive mode=0 plan=[defend+resolve] phase=ACTION_MANEUVER turn=cmukie57j0001wiaofr67k2vd
+2026.09.30-11.56.39 MODE seq=132 mode=1 combat=0 pending=0
+2026.09.30-11.56.39 MODE seq=132 mode=1 combat=0 pending=0
+2026.09.30-11.56.39 S09AUTO drive mode=1 plan=[defend+resolve] phase=ACTION_MANEUVER turn=cmukie57j0001wiaofr67k2vd
+2026.09.30-11.56.40 MODE seq=133 mode=2 combat=0 pending=0
+2026.09.30-11.56.40 MODE seq=133 mode=2 combat=0 pending=0
+2026.09.30-11.56.41 S09AUTO drive mode=2 plan=[defend+resolve] phase=TURN_END turn=cmukie57j0001wiaofr67k2vd
+2026.09.30-11.56.41 S09AUTO discard picks=1
+2026.09.30-11.56.41 MODE seq=134 mode=0 combat=0 pending=1
+2026.09.30-11.56.41 MODE seq=134 mode=0 combat=0 pending=1
+2026.09.30-11.56.41 MODE seq=135 mode=0 combat=0 pending=1
+2026.09.30-11.56.43 S09AUTO result-screen shot
+2026.09.30-11.56.43 SHOT requested: FScreenshotRequest(bShowUI) -> C:\Users\ren\AppData\Local\Temp\s09-combat-20260930-
+165511-22400\joiner/s09-result-screen.png
+2026.09.30-11.56.47 S09AUTO lobby-return shot
+2026.09.30-11.56.47 SHOT requested: FScreenshotRequest(bShowUI) -> C:\Users\ren\AppData\Local\Temp\s09-combat-20260930-
+165511-22400\joiner/s09-lobby-return.png
+2026.09.30-11.56.47 S09AUTO duel flow complete (GAME_OVER -> result shown -> lobby return) - exiting
+cleanup: game cmuo1tbx701cdwiww2yg05pmv already terminal (FINISHED)
+
+

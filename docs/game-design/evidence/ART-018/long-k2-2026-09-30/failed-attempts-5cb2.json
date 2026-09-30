@@ -1,0 +1,98 @@
+{
+ "schema": "unmatched.t5cb2-failed-attempts/1",
+ "status": "измерено (прогоны не прошли гейт скрипта; не доказательства K2)",
+ "cause": "tools/s08/run-phase2-demo.ps1 требовал 'ARTPREVIEW fighter=Medusa hero=1 eligible=1 visual=1' и с -ArtPreviewHeroesV2. Клиент в этом режиме честно пишет eligible=0 visual=1 mesh=SK_Medusa_H2LD (bMedusaCandidate = !bHeroV2 && …, S08FighterActor.cpp). Ошибка скрипта 5c-B0 (packaged-прогона с флагом до этого не было), клиент и бинарник ни при чём.",
+ "fix": "run-phase2-demo.ps1: при -ArtPreviewHeroesV2 ожидается 'ARTPREVIEW fighter=Medusa hero=1 eligible=0 visual=1 mesh=SK_Medusa_H2LD' (хост и присоединившийся); без флага строка прежняя. Тот же бинарник 8d228fae…; повторы прошли (k2-zoom-*, k2-long-245s).",
+ "attempts": [
+  {
+   "label": "C3-K2long-5-cobble-5x6-v2",
+   "startedLocal": "2026-09-30T16:39:39+05:00",
+   "demoExit": 1,
+   "room": "ABORTED",
+   "cleanupLine": "cleanup: aborted THIS run's game id=cmuo19ffo0165wiww75hgqz63 status=ABORTED (verified)",
+   "originalRunDir": "docs/game-design/evidence/ART-018/long-k2-2026-09-30/k2-long-245s/cobble-5x6/failed-20260930-164416",
+   "outsideGit": "C:/tmp/5cb2-runs/failed-attempts/ART-018__long-k2-2026-09-30__k2-long-245s__cobble-5x6__failed-20260930-164416",
+   "failure": "host trace missing 'ARTPREVIEW fighter=Medusa hero=1 eligible=1 visual=1'",
+   "crashLines": 0,
+   "filesSha256": {
+    "phase2-board-host-1920x1080.png": "84b1c8387a3bc25a2e99aceb013ce066ed7a65790d9a6b99cb6e3172ce99a0ec",
+    "phase2-board-joiner-1920x1080.png": "4a4dedefa250ad8153013a920c0d753c06196f43e674bfc8f898fd9fad4a5e00",
+    "phase2-client-host.trace.log": "a50dd66a3d29c2f23a467e526284f10b2e7061f92def63ae024707347c6883dd",
+    "phase2-client-joiner.trace.log": "0df1688080f961a93737242c68cce865df3b9cedea01b09fbbb4e333bada5fcd",
+    "run-record.json": "2bdf2804ba2b40efbc7216b1ab249e8dc80c3ea9b2b87d48904dc0581254a15a"
+   }
+  },
+  {
+   "label": "C2-K2-1.6-cobble-5x6-v2",
+   "startedLocal": "2026-09-30T16:35:16+05:00",
+   "demoExit": 1,
+   "room": "ABORTED",
+   "cleanupLine": "cleanup: aborted THIS run's game id=cmuo13sq4012lwiwwswdkl7rq status=ABORTED (verified)",
+   "originalRunDir": "docs/game-design/evidence/ART-018/long-k2-2026-09-30/k2-zoom-1.6/cobble-5x6/failed-20260930-163622",
+   "outsideGit": "C:/tmp/5cb2-runs/failed-attempts/ART-018__long-k2-2026-09-30__k2-zoom-1.6__cobble-5x6__failed-20260930-163622",
+   "failure": "host trace missing 'ARTPREVIEW fighter=Medusa hero=1 eligible=1 visual=1'",
+   "crashLines": 0,
+   "filesSha256": {
+    "phase2-board-host-1920x1080.png": "0a116817c249d225a505b0d77f898aac9f21a0a266fb89b0a79d45e5cc591b61",
+    "phase2-board-joiner-1920x1080.png": "51c3c5dd0daa0ea28c812e2222e8d170cf7be11c27254dc9fcfd7c8fc42ee8d1",
+    "phase2-client-host.trace.log": "032bb4620429974b9ef24dcb79422fb29f0f4de34db9fb914b871511b39493a8",
+    "phase2-client-joiner.trace.log": "9390d228fac78caeb918d0f73195ee2828362227e45de36559e16871ab6bbeb7",
+    "run-record.json": "ded3e9b692ea0fbfb89de24e8f2b93739d67986bc594d83e0b0f5afb625a81ef"
+   }
+  },
+  {
+   "label": "C2-K2-2.5-cobble-5x6-v2",
+   "startedLocal": "2026-09-30T16:36:22+05:00",
+   "demoExit": 1,
+   "room": "ABORTED",
+   "cleanupLine": "cleanup: aborted THIS run's game id=cmuo157jg013hwiww3np96e1p status=ABORTED (verified)",
+   "originalRunDir": "docs/game-design/evidence/ART-018/long-k2-2026-09-30/k2-zoom-2.5/cobble-5x6/failed-20260930-163728",
+   "outsideGit": "C:/tmp/5cb2-runs/failed-attempts/ART-018__long-k2-2026-09-30__k2-zoom-2.5__cobble-5x6__failed-20260930-163728",
+   "failure": "host trace missing 'ARTPREVIEW fighter=Medusa hero=1 eligible=1 visual=1'",
+   "crashLines": 0,
+   "filesSha256": {
+    "phase2-board-host-1920x1080.png": "294298c124ac9a6969a3db06367f2dfe125720d24a223a30b01121d62874142b",
+    "phase2-board-joiner-1920x1080.png": "4c9842b9ad504189d2d5d4a5c76cd9ab49dfc9fb2846665ab31d2e2abc637194",
+    "phase2-client-host.trace.log": "84ac9597006e3d45044403f17258c26fe94daf6f1f5d923e66a00677774f1b84",
+    "phase2-client-joiner.trace.log": "7624eae3c2ef6d326c9833912708dc25431a3293523b948d7c81ad5934f2cd32",
+    "run-record.json": "0fa11a3486428e81ce908f739f87ef96bb508118ff8791c853abcfbbfb95bf4f"
+   }
+  },
+  {
+   "label": "C2-K2-3.5-cobble-5x6-v2",
+   "startedLocal": "2026-09-30T16:37:28+05:00",
+   "demoExit": 1,
+   "room": "ABORTED",
+   "cleanupLine": "cleanup: aborted THIS run's game id=cmuo16mcb014dwiwwchrxmptt status=ABORTED (verified)",
+   "originalRunDir": "docs/game-design/evidence/ART-018/long-k2-2026-09-30/k2-zoom-3.5/cobble-5x6/failed-20260930-163834",
+   "outsideGit": "C:/tmp/5cb2-runs/failed-attempts/ART-018__long-k2-2026-09-30__k2-zoom-3.5__cobble-5x6__failed-20260930-163834",
+   "failure": "host trace missing 'ARTPREVIEW fighter=Medusa hero=1 eligible=1 visual=1'",
+   "crashLines": 0,
+   "filesSha256": {
+    "phase2-board-host-1920x1080.png": "776dd7a4178a74dcda4ba93fbc89f1f39f18f0526fcb3361df2b82676995941d",
+    "phase2-board-joiner-1920x1080.png": "b06a3d79399dc64328e0d9875917fe6749e2579b4ea917d5747bdc746d28e303",
+    "phase2-client-host.trace.log": "aaaebce9cac4b0034a8d90f37c5077a81d12c6e8587ac5b8b4530d18dde765eb",
+    "phase2-client-joiner.trace.log": "c32c38e6399f99c3dc2578b516ac1ebe182044d433f85d24089883af57497a5a",
+    "run-record.json": "1b8ca04a242eec2af192c05447d4b5337521a1d1264ef423a6bd71b922016169"
+   }
+  },
+  {
+   "label": "C2-K2-5-cobble-5x6-v2",
+   "startedLocal": "2026-09-30T16:38:34+05:00",
+   "demoExit": 1,
+   "room": "ABORTED",
+   "cleanupLine": "cleanup: aborted THIS run's game id=cmuo181920159wiwwhft7qwwm status=ABORTED (verified)",
+   "originalRunDir": "docs/game-design/evidence/ART-018/long-k2-2026-09-30/k2-zoom-5/cobble-5x6/failed-20260930-163939",
+   "outsideGit": "C:/tmp/5cb2-runs/failed-attempts/ART-018__long-k2-2026-09-30__k2-zoom-5__cobble-5x6__failed-20260930-163939",
+   "failure": "host trace missing 'ARTPREVIEW fighter=Medusa hero=1 eligible=1 visual=1'",
+   "crashLines": 0,
+   "filesSha256": {
+    "phase2-board-host-1920x1080.png": "9784d38f47f346ff28819dbc58f1eec52f19b3dd98b8a41b6103e48cf99bd93d",
+    "phase2-board-joiner-1920x1080.png": "ae65ca39fc804f1c8370b3c608651f9558682932db8adade9007634101386f2f",
+    "phase2-client-host.trace.log": "764024d4dfcfb2bd80df0b562c39744834e3dcbe7b7ee6f93401fefaea4ca380",
+    "phase2-client-joiner.trace.log": "549196750462fa6ccc58dda082bbe3ef3111056d54adfe6717342b31acdb0b4e",
+    "run-record.json": "03514fea0b34e5a308de332de801df33e7f33b8b66672823b938f646c17104ed"
+   }
+  }
+ ]
+}

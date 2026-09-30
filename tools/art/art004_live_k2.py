@@ -76,7 +76,9 @@ ASSET_REGISTRY = PROJECT_DIR / "Saved" / "Cooked" / "Windows" / "Unmatched" / "M
 GAME_DEFS = PROJECT_DIR / "Intermediate" / "Build" / "Win64" / "x64" / "Unmatched" / "Development"
 DEMO = REPO / "tools" / "s08" / "run-phase2-demo.ps1"
 PACKAGE = REPO / "tools" / "s08" / "package-client.ps1"
-BACKEND_ENV = REPO / "backend" / ".env"
+# 5c-B2: the demo accounts (S08_DEMO_*) live in the .env of the checkout whose backend serves :3120.
+# The main checkout's backend/.env has none, so UNMATCHED_BACKEND_ENV may point at that file (read only).
+BACKEND_ENV = Path(os.environ.get("UNMATCHED_BACKEND_ENV") or (REPO / "backend" / ".env"))
 REVIEW_BOARD_ID = "cmuhgs4b2001mwik4f2b2xtf8"  # Board row of the 5x6 Cobble review board
 # T3.2: every art board (Cobble + the art fixtures) is registered in the client's own data file;
 # run accepts exactly the Board row ids listed there (boards[].match.boardIds).

@@ -250,14 +250,15 @@
       "evidence": [
         "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2-measured-2026-09-28.md",
         "docs/game-design/evidence/ART-004/live-v2-k2-control/",
-        "docs/game-design/evidence/ART-004/v3-live-hookup-diagnosis-2026-09-28.md"
+        "docs/game-design/evidence/ART-004/v3-live-hookup-diagnosis-2026-09-28.md",
+        "docs/game-design/evidence/ART-018/long-k2-2026-09-30.md"
       ],
-      "next": "Длинный packaged K2 ≥240 с на High с героями v2 (волна 5c-B2 = ART-018).",
-      "blocker": "Нужны код 5c-B0 (герои v2 и клипы в S08) и UE-этап 5c-B1.",
+      "next": "Лицо/змеи/лук на K2 с H2LD — наблюдение агента (ART-018 §3а); K2-метрики и приёмка — после ID-маски H2LD и взгляда пользователя.",
+      "blocker": null,
       "assets": [
         "ASSET-MEDUSA-001"
       ],
-      "updated": "2026-09-30T07:15:00Z",
+      "updated": "2026-09-30T13:30:00Z",
       "note": "Причина падения v3 в live найдена и обойдена (T1.1): 22 кадра packaged-live strict. Прогон ≥240 с до FINISHED не сделан."
     },
     {
@@ -601,20 +602,21 @@
       "title": "Арт 2: длинный packaged K2 ≥240 с",
       "track": "art",
       "source": "stage3",
-      "status": "open",
+      "status": "in_progress",
       "art_status": null,
       "evidence": [
-        "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2-measured-2026-09-28.md"
+        "docs/game-design/evidence/ART-004/live-head-tilt-v3-k2-measured-2026-09-28.md",
+        "docs/game-design/evidence/ART-018/long-k2-2026-09-30.md"
       ],
-      "next": "Перенесено в волну 5c-B2 (ART-018) — уже с героями v2 и клипами.",
-      "blocker": "5c-B0/5c-B1.",
+      "next": "Разложен на C1/C2/C3 (ART-018); дословный ≥ 240 с до FINISHED одним прогоном — открыт.",
+      "blocker": null,
       "assets": [
         "ASSET-MEDUSA-001",
         "ASSET-KING-ARTHUR-001",
         "ASSET-MERLIN-001",
         "ASSET-HARPY-001"
       ],
-      "updated": "2026-09-30T07:15:00Z"
+      "updated": "2026-09-30T13:30:00Z"
     },
     {
       "id": "T5.2",
@@ -1159,14 +1161,17 @@
       "art_status": "измерено",
       "evidence": [
         "docs/game-design/evidence/ART-005/README.md",
-        "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29.md"
+        "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29.md",
+        "docs/game-design/evidence/ART-005/art3-live-3boards-r3-2026-09-30/art3-live-3boards-r3-2026-09-30.md",
+        "docs/game-design/evidence/ART-005/art3-live-3boards-r3-2026-09-30/packaged-5cb2-runs-2026-09-30.md"
       ],
-      "next": "ART-014/015 → ART-018 → волна 6.",
+      "next": "Свет rev 5 и остатки 5b-R пересняты (5c-B2, B1-8): кольца край ≥ 4,14 у 54/54, red Cobble в сером 4,65, мультизоны 14/14 и 13/13. Открыто: форма P2 на K3 в сером (дуги прицела ≈ серебро, 2/54), запас кромки зон Cobble 0,20; далее волна 6 (GD-058).",
       "blocker": null,
       "assets": [
         "ASSET-BOARD-COBBLE-001"
       ],
-      "updated": "2026-09-30T07:15:00Z"
+      "updated": "2026-09-30T13:30:00Z",
+      "note": "B1-8 по зарегистрированным t5cb-thresholds.json: FAIL только «форма кольца 100 % во всех вариантах» (52/54). Художественная приёмка не выставлялась."
     },
     {
       "id": "ART-006",
@@ -1285,12 +1290,13 @@
       "track": "tech",
       "source": "session",
       "status": "in_progress",
-      "art_status": null,
+      "art_status": "технически импортировано",
       "evidence": [
         "docs/game-design/decisions/2026-09-29-anim-v2-decisions.md",
-        "docs/art-pipeline/rig/RIG-CONTRACT.md"
+        "docs/art-pipeline/rig/RIG-CONTRACT.md",
+        "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30.md"
       ],
-      "next": "Завершить 5c-B0 (код в рабочем дереве: S08HeroesV2.*, S08FighterActor.*, S08BoardActor.*, DefaultGame.ini — не закоммичен), сборка editor+game, автотесты.",
+      "next": "Правило yaw «лицом к сопернику» на фикстурах (сейчас по знаку Y клетки: на Sherwood все 6 фигур yaw 270); свет фигур Arthur (сталь темнее, плащ светлее концепта на K2 — свет доски/ракурс).",
       "blocker": null,
       "assets": [
         "ASSET-MEDUSA-001",
@@ -1298,8 +1304,8 @@
         "ASSET-MERLIN-001",
         "ASSET-HARPY-001"
       ],
-      "updated": "2026-09-30T07:15:00Z",
-      "note": "Новая задача: в S08 не было ни проигрывания анимаций, ни героев v2 — только Medusa v2 и блок-ауты ART003."
+      "updated": "2026-09-30T13:30:00Z",
+      "note": "5c-B2: packaged K1/K3 трёх досок с -ArtPreviewHeroesV2 -ArtPreviewDiorama — 6/6 фигур v2, Idle 6/6, missing 0, поднос виден, 30/30 кадров packaged-live strict."
     },
     {
       "id": "ART-013",
@@ -1307,11 +1313,13 @@
       "track": "tech",
       "source": "session",
       "status": "in_progress",
-      "art_status": null,
+      "art_status": "технически импортировано",
       "evidence": [
-        "docs/art-pipeline/animation-library/clip-manifest.json"
+        "docs/art-pipeline/animation-library/clip-manifest.json",
+        "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30.md",
+        "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30/clip-pixel-diff-k3.json"
       ],
-      "next": "Idle / LungeAttack на атаке / HitReact на уроне / DeathSettle на смерти по seq; проверка в 5c-B2.",
+      "next": "Пиксельная проверка LungeAttack и DeathSettle (опубликованных кадров нет); root motion в packaged не мерился.",
       "blocker": null,
       "assets": [
         "ASSET-MEDUSA-001",
@@ -1319,8 +1327,8 @@
         "ASSET-MERLIN-001",
         "ASSET-HARPY-001"
       ],
-      "updated": "2026-09-30T07:15:00Z",
-      "note": "Новая задача."
+      "updated": "2026-09-30T13:30:00Z",
+      "note": "5c-B2: клипы по событиям (LungeAttack = бои, HitReact = CUE урона кроме смертельного, DeathSettle hold 2,875), длительности = clip-manifest ±0,05 с; HitReact меняет силуэт цели (12–14 % пикселей на Cobble/Sherwood)."
     },
     {
       "id": "ART-014",
@@ -1331,9 +1339,12 @@
       "art_status": "измерено",
       "evidence": [
         "docs/art-pipeline/medusa-lookdev-v2.md",
-        "docs/game-design/decisions/2026-09-29-lookdev-v2-decisions.md"
+        "docs/game-design/decisions/2026-09-29-lookdev-v2-decisions.md",
+        "docs/game-design/evidence/ART-005/art3-live-3boards-r3-2026-09-30/art3-live-3boards-r3-2026-09-30.md",
+        "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30.md",
+        "docs/game-design/evidence/ART-005/art3-live-3boards-r3-2026-09-30/5cb1-editor-2026-09-30.md"
       ],
-      "next": "План значений света (5c-B0, трек plan) → применение в UE (5c-B1) → кадры с RENDER.",
+      "next": "Материал: кожа Medusa и тёмные перья Harpy (Blender, ART-016); свет фигур Arthur на K2 (сталь/плащ); B1-5 look-dev: Medusa 3/5, Harpy 3/5 ниже критерия.",
       "blocker": null,
       "assets": [
         "ASSET-MEDUSA-001",
@@ -1342,8 +1353,8 @@
         "ASSET-HARPY-001",
         "ASSET-BOARD-COBBLE-001"
       ],
-      "updated": "2026-09-30T07:15:00Z",
-      "note": "Новая задача из look-dev A/C: при EV100 1,3 и небе 11,2 кожа/вышивка/платье уходят в плечо тонмаппера, металлы клипуются; проходят при −1,0 EV."
+      "updated": "2026-09-30T13:30:00Z",
+      "note": "Свет rev 5 (ключ Pitch −55, EV100 2,05) в игре: RENDER expMin 4,14106 на всех кадрах, K1 p50 100/152/154 (в коридорах). Look-dev b1 при 2,05 — 15/21; на K2 5× (прокси по цвету) кожа Medusa и Harpy в допуске, тёмные перья Harpy — нет (материал)."
     },
     {
       "id": "ART-015",
@@ -1354,17 +1365,18 @@
       "art_status": "измерено",
       "evidence": [
         "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29.md",
-        "docs/art-pipeline/evidence/s3-baseline-2026-09-28/production-baseline.json"
+        "docs/art-pipeline/evidence/s3-baseline-2026-09-28/production-baseline.json",
+        "docs/game-design/evidence/ART-005/art3-live-3boards-r3-2026-09-30/art3-live-3boards-r3-2026-09-30.md"
       ],
-      "next": "Причины и правки инструментов (5c-B0 plan) → UE (5c-B1) → пересъёмка (5c-B2).",
+      "next": "Форма P2 на K3 в сером: дуги прицела вплотную к заливке и равны ей по яркости в сером — развести/перекрасить дуги или новой регистрацией исключить их из профиля.",
       "blocker": null,
       "assets": [
         "ASSET-MARKERS-001",
         "ASSET-BOARD-COBBLE-001",
         "ASSET-MEDUSA-001"
       ],
-      "updated": "2026-09-30T07:15:00Z",
-      "note": "Новая задача: кейлайн кольца на Cobble <3:1, красная зона Cobble сливается в сером, классификатор формы 20/54, MI_Medusa_P1/P2 (пастельная ткань, D-2) противоречат решению «акценты + кольцо»."
+      "updated": "2026-09-30T13:30:00Z",
+      "note": "Три неудачи 5b-R: кромка кольца Cobble — закрыта (край 4,14–4,98 по ободку); red Cobble в сером — закрыта (4,65–5,13, 13/13); классификатор формы — 54/54 в цвете, 52/54 во всех вариантах (FAIL на K3). MI_Medusa_P1/P2 заменены (miSha256 605ba814…)."
     },
     {
       "id": "ART-016",
@@ -1416,12 +1428,15 @@
       "title": "Длинный packaged K2 и пересъёмка трёх досок с героями v2",
       "track": "art",
       "source": "session",
-      "status": "open",
-      "art_status": null,
+      "status": "in_progress",
+      "art_status": "измерено",
       "evidence": [
-        "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29.md"
+        "docs/game-design/evidence/ART-005/art3-live-3boards-r2-2026-09-29.md",
+        "docs/game-design/evidence/ART-018/long-k2-2026-09-30.md",
+        "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30.md",
+        "docs/game-design/evidence/ART-005/art3-live-3boards-r3-2026-09-30/art3-live-3boards-r3-2026-09-30.md"
       ],
-      "next": "Волна 5c-B2: run-combat-demo ≥240 с до FINISHED на High, K2 1,6×/2,5×/3,5×/5×, K1/K3 трёх досок, perf пары по 30 FPS.",
+      "next": "«Один прогон ≥ 240 с до FINISHED» дословно не выполнен (партия 52–88 с, одна фокусировка на процесс): нужен код (серия зумов в одном процессе или длинная партия). K2-метрики для SK_Medusa_H2LD — нужна ID-маска H2LD.",
       "blocker": "ART-012…016.",
       "assets": [
         "ASSET-MEDUSA-001",
@@ -1430,8 +1445,8 @@
         "ASSET-HARPY-001",
         "ASSET-BOARD-COBBLE-001"
       ],
-      "updated": "2026-09-30T07:15:00Z",
-      "note": "Новая задача: бывший T5.1 + повтор T5.2 с героями v2."
+      "updated": "2026-09-30T13:30:00Z",
+      "note": "5c-B2: C1 бой до FINISHED (71 с, seq 133/133), C2 K2 1,6×/2,5×/3,5×/5× (голова 17,8–58,8 px), C3 живая сессия 262 с с K2 5× на 245 с; пересъёмка трёх досок с героями v2 — ART-012. Perf пары 30 FPS, dev-PC, не D-07."
     },
     {
       "id": "GD-058",
@@ -1654,7 +1669,7 @@
     {
       "id": "5c-B1",
       "title": "UE: переимпорт текстур, свет доски, остатки 5b-R, MI Medusa, sha реестра",
-      "status": "open",
+      "status": "in_progress",
       "tasks": [
         "ART-014",
         "ART-015",
@@ -1666,7 +1681,7 @@
     {
       "id": "5c-B2",
       "title": "Packaged: пересъёмка 3 досок с героями v2, длинный K2 ≥240 с на High",
-      "status": "open",
+      "status": "in_progress",
       "tasks": [
         "ART-018",
         "T5.1",

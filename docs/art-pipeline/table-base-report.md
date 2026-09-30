@@ -319,9 +319,21 @@
 - Художественная приёмка: кромка, тон камня, чёрная юбка в Cobble.
 - Build profile `table-base-static-um-fbx-v1.json` ждёт `top_outline_uu_ue` 756×656. Теперь это габарит XY, а плоская часть верха — 750×650 из-за фаски. CLI `ue-import` по-прежнему требует `pivot_base_centre`, поэтому UE-шаг идёт скриптом `table_base_ue.py`.
 - `table_base_preview.py`: модель камеры 12 м расходится с UpdateBoardCamera (1931 uu).
-- Спавн подноса под доской в S08 (код) — отдельная задача.
+- ~~Спавн подноса под доской в S08 (код) — отдельная задача.~~ Сделано 2026-09-30, см. [«Спавн в S08 за флагом -ArtPreviewDiorama»](#спавн-в-s08-за-флагом--artpreviewdiorama).
 
 ### Воспроизведение (исправление)
 
 - **Blender** (живой, Blender MCP): `STEP='setup'`, `'import'`, `'cut'`, `'lip'`, `'liptex'`, `'relation'`, `'textures'`, `'export'`, `'roundtrip'`, `'report'` с `PARAMS=<run>/reports/candidate-params.json` (команда — в docstring `table_base_live_mcp.py`). Блок `decisions` отчёта задаётся перед `report` отдельным вызовом. Затем headless `check_static_prop_fbx.py` и `table_base_preview.py` (пути абсолютные).
 - **UE:** `python art/pipeline-candidates/ASSET-TABLE-BASE-001/scripts/table_base_ue.py import`, потом `measure`, потом `scene`.
+
+## Спавн в S08 за флагом -ArtPreviewDiorama
+
+2026-09-30, волна 5c-B, этап B1-6. Статус — «технически импортировано»: код собран и покрыт автотестами, кадров с подносом пока нет, художественной приёмки нет.
+
+- **Флаг.** `-ArtPreviewDiorama` работает только вместе с `-ArtPreview`. Без флага актор доски не создаёт компонент и ничего не загружает: поведение и трасса прежние. Код: `S08Diorama.h/.cpp`, `AS08BoardActor::EnsureDioramaTray / PlaceDioramaTray / UpdateDioramaTray`.
+- **Размещение.** Компонент `ArtDioramaTray` сидит на акторе доски в (0,0,0), `NoCollision`, без оверлапов и навигации, меш `SM_TableBase`, материал `MI_TableBase_Candidate`. Пока арт-профиль не активен (серая доска), поднос скрыт.
+- **Подгонка** (`S08Diorama::FitTray`). Длинная сторона подноса (X меша) идёт вдоль длинной оси рамки доски, масштаб XY держит кайму 50 uu, Z не масштабируется (верх на −3). На Cobble 5×6 рамка слэба ART-005 ±278×±328 даёт ровно размещение из отчёта: yaw −90, масштаб 1, мир (−328,−378,−153)…(328,378,−3). У досок `tiles` другой габарит: Sherwood 8×5 (рамка ±424×±274) — yaw 0, масштаб 1,254×0,988; T-Rex 7×5 (±374×±274) — yaw 0, 1,122×0,988. Это техническая подгонка по замеру, а не художественное решение: растянутую скалу на досках `tiles` нужно смотреть отдельно.
+- **Трасса.** При создании пишется `ARTPREVIEW diorama requested mesh=<path> mi=<name>`, при каждой перестройке доски — `ARTPREVIEW diorama tray=<path> mi=… surface=… yaw=… scale=…x…x… bounds=(…)..(…) size=… topZ=-3.0 boardHalf=… rimUU=50.0 collision=none`. Если доска серая — `ARTPREVIEW diorama tray hidden`, если меша нет в паке — `ARTPREVIEW diorama tray missing`.
+- **Кук.** В `DirectoriesToAlwaysCook` добавлен `/Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31`.
+- **Демо.** `tools/s08/run-phase2-demo.ps1 -ArtPreviewDiorama` (нужен `-ArtPreviewBoardId`) передаёт флаг обоим клиентам и проверяет в трассе каждого строки `requested` и `tray=`, а также отсутствие `missing`. Поднос меняет освещённую сцену (Lumen GI), поэтому кадры с ним — отдельный набор. Прежние K1/K3 и пороги T5cB он не заменяет.
+- **Автотесты** `Unmatched.S08.Diorama.{Fit, Assets, Actor}`: математика подгонки на трёх досках; bounds меша 756×656×150 и верх −3; слэб Cobble даёт yaw −90 и масштаб 1; актор создаёт поднос только при флаге вместе с `-ArtPreview`; `NoCollision`; на серой доске поднос скрыт; мировые bounds.

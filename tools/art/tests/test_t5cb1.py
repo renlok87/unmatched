@@ -394,7 +394,8 @@ class B1Thresholds(unittest.TestCase):
 
     def test_revision_base_is_the_registration(self):
         import hashlib
-        reg = (self.B1 / "t5cb-thresholds.registration-b1-0.json").read_bytes()
+        # Hash the committed (LF) bytes: a core.autocrlf=true checkout rewrites the file with CRLF.
+        reg = (self.B1 / "t5cb-thresholds.registration-b1-0.json").read_bytes().replace(b"\r\n", b"\n")
         self.assertEqual(hashlib.sha256(reg).hexdigest(), self.th["revisions"][0]["base"]["sha256"])
         self.assertEqual(json.loads(reg.decode("utf-8"))["revisions"], [])
         self.assertLess(json.loads(reg.decode("utf-8"))["registeredLocal"], self.th["revisions"][0]["registeredLocal"])

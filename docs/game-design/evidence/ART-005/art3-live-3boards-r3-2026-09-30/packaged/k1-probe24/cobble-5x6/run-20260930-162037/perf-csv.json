@@ -1,0 +1,150 @@
+{
+  "schema": "unmatched.art004-perf-csv/1",
+  "status": "измерено; dev-PC (RTX 4090), не D-07; машина не тихая (открыты Blender GUI :9876/:9877, параллельно чтение/документы ENV-0) — не для ACC-022",
+  "method": "UE CSV profiler (-csvCaptureFrames, -csvGpuStats); first 150 frames skipped as warm-up",
+  "gpuBusyDefinition": "sum of the named GPU/<pass> times per frame (D3D11 timestamp queries), GPU/Unaccounted excluded; means are inflated by rare long passes when other processes preempt the GPU, p50 is the typical per-frame GPU cost",
+  "gpuUnaccountedDefinition": "GPU/Unaccounted = BeginWork..EndWork time not covered by named passes (idle gaps and other processes' work on the shared GPU)",
+  "gpuTimeCaveat": "GPUTime (and PERF gpuMs in the trace) is the D3D11 BeginWork..EndWork interval, which spans the whole frame period under t.MaxFPS; use GPUBusy for the per-client GPU load",
+  "rawOutsideGit": [
+    {
+      "path": "unreal/Unmatched/Artifacts/ART004Face/t11-raw/run-20260930-162037/client-csv/host-Profile-20260930_162037.csv",
+      "bytes": 2482263,
+      "sha256": "ae9c8ccf7f7bb78b5c011ec6316fa79091892af2dc9697b7ae6fa4183bc67cec"
+    },
+    {
+      "path": "unreal/Unmatched/Artifacts/ART004Face/t11-raw/run-20260930-162037/client-csv/joiner-Profile-20260930_162043.csv",
+      "bytes": 2503585,
+      "sha256": "c91adb67de3b8cc3eca4ec1b2be8e7a8927519f250e11c4bae2e778b6848b24d"
+    }
+  ],
+  "clients": {
+    "host": {
+      "file": "host-Profile-20260930_162037.csv",
+      "framesTotal": 1200,
+      "warmupFramesSkipped": 150,
+      "gpuPassColumns": 27,
+      "metadata": {
+        "config": "Development",
+        "buildversion": "++UE5+Release-5.8-CL-56702186",
+        "targetframerate": "240",
+        "vsyncenabled": "0",
+        "commandline": "\" Unmatched /Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode -windowed -resx=1920 -resy=1080 -RenderOffScreen log=GrepLog -ForceAbandonSequences -S08Api=http://localhost:3120/graphql -S08RenderPreset=High -ArtPreview -ForceRes -ArtPreviewMedusaVariant=face-neck-v2 -S08Perf -csvCaptureFrames=1200 -csvGpuStats -S08Auto -S08Create -S08HeroId=cmuhgvgke00skwi9glfew6898 -S08Trace=C:\\Users\\ren\\AppData\\Local\\Temp\\s08-phase2-20260930-162037-56684\\phase2-client-host.trace.log -S08Shot=C:\\Users\\ren\\AppData\\Local\\Temp\\s08-phase2-20260930-162037-56684\\phase2-board-host-1920x1080.png -S08ExitAfter=50 -ArtPreviewBoardId=cmuhgs4b2001mwik4f2b2xtf8 -ArtPreviewShotAfter=36 -ArtPreviewSelectOwnHero -ArtPreviewIconSize=24 -ArtPreviewIconProbe -ExecCmds=\"t.MaxFPS 30"
+      },
+      "FrameTime": {
+        "n": 1050,
+        "mean": 33.46,
+        "p50": 33.3328,
+        "p95": 33.6588,
+        "max": 177.9285
+      },
+      "GameThreadTime": {
+        "n": 1050,
+        "mean": 1.62,
+        "p50": 1.3554,
+        "p95": 1.8465,
+        "max": 121.2686
+      },
+      "RenderThreadTime": {
+        "n": 1050,
+        "mean": 3.01,
+        "p50": 2.83,
+        "p95": 4.1539,
+        "max": 49.5474
+      },
+      "RHIThreadTime": {
+        "n": 1050,
+        "mean": 1.59,
+        "p50": 1.5116,
+        "p95": 2.0649,
+        "max": 54.9143
+      },
+      "GPUTime": {
+        "n": 1050,
+        "mean": 1.63,
+        "p50": 1.7651,
+        "p95": 1.9417,
+        "max": 3.0407
+      },
+      "GPUBusy": {
+        "n": 1050,
+        "mean": 0.96,
+        "p50": 1.0047,
+        "p95": 1.1848999999999998,
+        "max": 2.2725999999999997
+      },
+      "GPUUnaccounted": {
+        "n": 1050,
+        "mean": 0.6,
+        "p50": 0.4372,
+        "p95": 1.9522,
+        "max": 2.7598
+      },
+      "effectiveFps": 29.89,
+      "hitchesOver50ms": 2
+    },
+    "joiner": {
+      "file": "joiner-Profile-20260930_162043.csv",
+      "framesTotal": 1200,
+      "warmupFramesSkipped": 150,
+      "gpuPassColumns": 27,
+      "metadata": {
+        "config": "Development",
+        "buildversion": "++UE5+Release-5.8-CL-56702186",
+        "targetframerate": "240",
+        "vsyncenabled": "0",
+        "commandline": "\" Unmatched /Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode -windowed -resx=1920 -resy=1080 -RenderOffScreen log=GrepLog -ForceAbandonSequences -S08Api=http://localhost:3120/graphql -S08RenderPreset=High -ArtPreview -ForceRes -ArtPreviewMedusaVariant=face-neck-v2 -S08Perf -csvCaptureFrames=1200 -csvGpuStats -S08Auto -S08HeroId=cmuhgvghu00oawi9gv9ehihmg -S08Trace=C:\\Users\\ren\\AppData\\Local\\Temp\\s08-phase2-20260930-162037-56684\\phase2-client-joiner.trace.log -S08Shot=C:\\Users\\ren\\AppData\\Local\\Temp\\s08-phase2-20260930-162037-56684\\phase2-board-joiner-1920x1080.png -S08DropWsAfter=12 -S08ExitAfter=50 -ArtPreviewShotAfter=36 -ExecCmds=\"t.MaxFPS 30"
+      },
+      "FrameTime": {
+        "n": 1050,
+        "mean": 33.45,
+        "p50": 33.3299,
+        "p95": 33.7052,
+        "max": 172.7639
+      },
+      "GameThreadTime": {
+        "n": 1050,
+        "mean": 1.65,
+        "p50": 1.4364,
+        "p95": 1.8232,
+        "max": 117.779
+      },
+      "RenderThreadTime": {
+        "n": 1050,
+        "mean": 3.07,
+        "p50": 2.9871,
+        "p95": 3.9144,
+        "max": 59.0004
+      },
+      "RHIThreadTime": {
+        "n": 1050,
+        "mean": 1.48,
+        "p50": 1.4623,
+        "p95": 1.943,
+        "max": 38.5415
+      },
+      "GPUTime": {
+        "n": 1050,
+        "mean": 1.71,
+        "p50": 1.8202,
+        "p95": 2.0185,
+        "max": 2.3543
+      },
+      "GPUBusy": {
+        "n": 1050,
+        "mean": 1.01,
+        "p50": 0.995,
+        "p95": 1.3518999999999999,
+        "max": 3.2268000000000003
+      },
+      "GPUUnaccounted": {
+        "n": 1050,
+        "mean": 0.42,
+        "p50": 0.3843,
+        "p95": 0.6449,
+        "max": 2.0886
+      },
+      "effectiveFps": 29.9,
+      "hitchesOver50ms": 3
+    }
+  }
+}

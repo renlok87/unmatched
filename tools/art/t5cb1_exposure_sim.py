@@ -8,6 +8,8 @@ EyeAdaptationInverse: rings, zone marks, keylines) and UMG widgets do not follow
     python tools/art/t5cb1_exposure_sim.py heroes    --out C:/tmp/p0-review/5cb1-sim [--evs -0.5,-0.75,-1,-1.25]
     python tools/art/t5cb1_exposure_sim.py board     --out C:/tmp/p0-review/5cb1-sim [--evs ...] [--key-fix]
     python tools/art/t5cb1_exposure_sim.py colours   --out C:/tmp/p0-review/5cb1-sim
+    python tools/art/t5cb1_exposure_sim.py validate  --out <dir> --lookdev-tag b1
+    python tools/art/t5cb1_exposure_sim.py packaged  --out <dir> --evidence <5c-B2 evidence dir> [--forecast board.json]
 
 validate: (1) the model against the W5b-R calibration bytes of the game layer (hex -> screen, live editor);
 (2) the sky series of T4.2 / W4-A (board K1 p50 luma at sky 8/12/16 must be linear in scene light after the inverse
@@ -216,7 +218,13 @@ def validate_lookdev(tmp: Path) -> dict:
 
 def cmd_validate(a) -> int:
     out = Path(a.out)
+    if getattr(a, "lookdev_tag", None):
+        # frames of another look-dev tag (e.g. b1 of 5c-B1: shot at the reading_bias_ev now in the configs); the
+        # default tags (i2 / c3 / i3) were shot at -1.0 EV and no longer match the configs' -0.75
+        for h in HEROES:
+            HEROES[h] = (HEROES[h][0], a.lookdev_tag)
     doc = {"schema": "unmatched.t5cb1-sim-validate/1", "status": "оценено по имеющимся кадрам (модель, не захват)",
+           "lookdevTags": {h: v[1] for h, v in HEROES.items()},
            "model": "tools/art/ue_filmic.py (UE 5.8 Filmic, defaults)", "layer": validate_layer(),
            "sky": validate_sky(), "lookdev": validate_lookdev(out / "tmp")}
     write_json(out / "validate.json", doc)
@@ -512,16 +520,75 @@ def cmd_colours(a) -> int:
     return 0
 
 
+# ------------------------------------------------------------------ packaged (5c-B2): forecast vs measurement
+def cmd_packaged(a) -> int:
+    """The board forecast of the plan (board.json row '<ev> EV + key fix', W5b-R r3 K1 frames moved by the model)
+    against the packaged 5c-B2 K1 frames analysed by t53_readability analyze / rings-rev3 (<evidence>/analysis/<board>):
+    passable luma p50 / p90 of K1 joiner, zone medians (keyline vs tile, fill vs keyline) and the ring tile reference
+    rev 3 (tile relative luminance). Zones whose colour changed in B1-2 (red, gray) are compared for keyline vs tile
+    only (the tile side of the forecast is valid, the fill side is not)."""
+    out = Path(a.out)
+    ev_dir = Path(a.evidence)
+    fc = json.loads(Path(a.forecast).read_text(encoding="utf-8"))
+    row_key = f"{float(a.ev):+.2f} EV + key fix"
+    doc = {"schema": "unmatched.t5cb1-sim-packaged/1", "status": "измерено (прогноз плана против packaged-кадров 5c-B2)",
+           "forecast": rel(Path(a.forecast)), "forecastRow": row_key, "evidence": rel(ev_dir), "boards": {}}
+    for key in R3_K1:
+        an = ev_dir / "analysis" / key
+        lum = json.loads((an / "luma-sections.json").read_text(encoding="utf-8"))["frames"]["K1_joiner"]["passable"]["color"]
+        zr = json.loads((an / "zone-contrast-r2.json").read_text(encoding="utf-8"))["frames"]["K1_joiner"]["zones"]
+        r3 = json.loads((an / "rings-rev3.json").read_text(encoding="utf-8"))["frames"]["K1_joiner"]["fighters"]
+        f = fc["boards"][key]["sides"]["joiner"]["rows"].get(row_key)
+        base = fc["boards"][key]["sides"]["joiner"]["rows"]["base"]
+        if f is None:
+            continue
+        zones = {}
+        for z, v in zr.items():
+            fz = (f.get("zones") or {}).get(z)
+            if not fz:
+                continue
+            changed = z in ("red", "gray")
+            zones[z] = {"keylineVsTile": {"forecast": fz["keylineVsTile"]["color"], "packaged": v["variants"]["color"]["keylineVsTile"]},
+                        "fillVsKeyline": {"forecast": None if changed else fz["fillVsKeyline"]["color"],
+                                          "packaged": v["variants"]["color"]["fillVsKeyline"]},
+                        "colourChangedInB1_2": changed}
+        tile_f = {r["name"]: r["rev3TileRelLum"][0] for r in f["rings"] if r.get("rev3TileRelLum")}
+        tile_b = {r["name"]: r["rev3TileRelLum"][0] for r in base["rings"] if r.get("rev3TileRelLum")}
+        tiles = []
+        for r in r3:
+            tr = (r.get("tileReference") or {}).get("color") or {}
+            if r["name"] in tile_f and tr.get("tileRelLum"):
+                tiles.append({"name": r["name"], "r3": round(tile_b.get(r["name"]), 4) if tile_b.get(r["name"]) else None,
+                              "forecast": round(tile_f[r["name"]], 4), "packaged": round(tr["tileRelLum"], 4),
+                              "ratioPackagedOverForecast": round(tr["tileRelLum"] / tile_f[r["name"]], 3)})
+        rat = [t["ratioPackagedOverForecast"] for t in tiles]
+        doc["boards"][key] = {
+            "passableLumaK1Joiner": {"r3": base["passableLuma"], "forecast": f["passableLuma"],
+                                     "packaged": {"p50": round(lum["luma_p50"], 1), "p90": round(lum["luma_p90"], 1)},
+                                     "deltaP50": round(lum["luma_p50"] - f["passableLuma"]["p50"], 1)},
+            "boardEv": f.get("boardEv"), "zones": zones, "ringTileRev3": tiles,
+            "ringTileRatioMedian": round(float(np.median(rat)), 3) if rat else None,
+            "ringTileEvError": round(float(np.log2(np.median(rat))), 3) if rat else None}
+        print(key, doc["boards"][key]["passableLumaK1Joiner"], doc["boards"][key]["ringTileRatioMedian"], flush=True)
+    write_json(out / "packaged-vs-forecast.json", doc)
+    return 0
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("command", choices=["validate", "heroes", "board", "colours"])
+    ap.add_argument("command", choices=["validate", "heroes", "board", "colours", "packaged"])
     ap.add_argument("--out", required=True)
     ap.add_argument("--evs", default="-0.5,-0.75,-1.0,-1.25")
     ap.add_argument("--key-fix", action="store_true")
     ap.add_argument("--save-frames", action="store_true")
     ap.add_argument("--sides", default="joiner,host")
+    ap.add_argument("--lookdev-tag", help="validate: look-dev tag of the frames (default: i2 / c3 / c3 / i3)")
+    ap.add_argument("--evidence", help="packaged: evidence dir with analysis/<board> (t53 analyze + rings-rev3)")
+    ap.add_argument("--forecast", default="C:/tmp/p0-review/5cb1-sim/board.json", help="packaged: board.json of the plan")
+    ap.add_argument("--ev", default="-0.75", help="packaged: the exposure row of the forecast")
     a = ap.parse_args(argv)
-    return {"validate": cmd_validate, "heroes": cmd_heroes, "board": cmd_board, "colours": cmd_colours}[a.command](a)
+    return {"validate": cmd_validate, "heroes": cmd_heroes, "board": cmd_board, "colours": cmd_colours,
+            "packaged": cmd_packaged}[a.command](a)
 
 
 if __name__ == "__main__":
