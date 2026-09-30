@@ -555,7 +555,9 @@ FS08EnvSpawnStats Spawn(const FS08EnvLayout& Layout, AActor& Owner, USceneCompon
     C->SetupAttachment(Attach);
     C->SetMobility(EComponentMobility::Movable);
     // W4-A G01: a runtime point light starts Unitless (1 = 16 internal); the layout is in candelas -> units first.
-    C->SetIntensityUnits(ELightUnits::Candelas);
+    // -S08LegacyRender keeps Unitless, as the profile points (S08BoardActor ApplyArtLights), for consistent A/B frames.
+    const bool bCandelas = !S08LegacyRender();
+    if (bCandelas) C->SetIntensityUnits(ELightUnits::Candelas);
     C->SetIntensity(L.IntensityCd);
     C->SetAttenuationRadius(L.RadiusUU);
     C->SetCastShadows(false);
@@ -565,8 +567,9 @@ FS08EnvSpawnStats Spawn(const FS08EnvLayout& Layout, AActor& Owner, USceneCompon
     OutLights.Add(C);
     ++S.Lights;
     FS08Trace::Write(FString::Printf(
-        TEXT("ARTPREVIEW envlayout light id=%s kind=point at=%s intensity=%g units=candelas radius=%g color=%s shadow=0"),
-        *L.Id, *EnvVec(L.Loc), L.IntensityCd, L.RadiusUU, *L.ColorHex()));
+        TEXT("ARTPREVIEW envlayout light id=%s kind=point at=%s intensity=%g units=%s radius=%g color=%s shadow=0"),
+        *L.Id, *EnvVec(L.Loc), L.IntensityCd, bCandelas ? TEXT("candelas") : TEXT("unitless-legacy"), L.RadiusUU,
+        *L.ColorHex()));
   }
   return S;
 }

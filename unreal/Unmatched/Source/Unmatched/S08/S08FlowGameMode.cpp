@@ -6651,7 +6651,8 @@ void S08BenchSetCvar(const TCHAR* Name, const FString& Value) {
 }
 
 float S08BenchViewZoom(const FString& View) {
-  // "K1" = overview, "K2x5" = zoom 5 on the hero, "K2x1.6" = 1.6.
+  // "K1" = overview, "K2x5" = zoom 5 on the hero, "K2x1.6" = 1.6,
+  // "K1x0.65" = wheel zoom-out of the overview (ENV-MAPS first frames).
   int32 X = INDEX_NONE;
   if (View.FindChar(TCHAR('x'), X)) return FCString::Atof(*View.Mid(X + 1));
   return 1.0f;
@@ -6731,6 +6732,20 @@ void AS08FlowGameMode::RunRenderBench() {
         const FS08ZoomStep ZoomStep = CameraZoom.FocusZoom(Zoom);
         FS08Trace::Write(FString::Printf(TEXT("BENCH view=%s focus hero=%s zoom=%.2f target=%.1f clamp=%d"), *View,
                                          *B.HeroId, Zoom, ZoomStep.To, ZoomStep.bClamped ? 1 : 0));
+      } else if (Zoom > 0.0f && Zoom < 1.0f) {
+        // ENV-MAPS "K1x0.65": zoom-out from the overview by wheel notches (the
+        // player's own path), stopping at the requested zoom or the far limit
+        // (overview / OverviewOutRatio = 0.65x by default).
+        SelectFighter(FString());
+        FS08ZoomStep ZoomStep = CameraZoom.ReturnToOverview();
+        const float Wanted = CameraZoom.Overview / Zoom;
+        for (int32 Notch = 0; Notch < 16 && CameraZoom.Target < Wanted - 0.5f && ZoomStep.Limit != ES08ZoomLimit::Far;
+             ++Notch) {
+          ZoomStep = CameraZoom.Wheel(-1);
+        }
+        FS08Trace::Write(FString::Printf(TEXT("BENCH view=%s zoom-out wanted=%.2f target=%.1f zoom=%.2f limit=%s"),
+                                         *View, Zoom, CameraZoom.Target, CameraZoom.ZoomOf(CameraZoom.Target),
+                                         S08ZoomLimitName(ZoomStep.Limit)));
       } else {
         SelectFighter(FString());
         CameraZoom.ReturnToOverview();

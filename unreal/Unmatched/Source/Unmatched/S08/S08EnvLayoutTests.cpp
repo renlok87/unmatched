@@ -937,7 +937,9 @@ bool FS08EnvLayoutKitAssetsTest::RunTest(const FString&) {
       UTexture* N = LoadObject<UTexture>(nullptr, *(Folder + TEXT("T_Env_") + Name + TEXT("_N")));
       UTexture* Orm = LoadObject<UTexture>(nullptr, *(Folder + TEXT("T_Env_") + Name + TEXT("_ORM")));
       if (!TestTrue(Name + TEXT(": mesh, MI and three textures load"), Mesh && Mi && Bc && N && Orm)) continue;
+#if WITH_EDITORONLY_DATA
       TestFalse(Name + TEXT(": Nanite off"), Mesh->IsNaniteEnabled());
+#endif
       const UBodySetup* Body = Mesh->GetBodySetup();
       TestTrue(Name + TEXT(": no simple collision"), !Body || Body->AggGeom.GetElementCount() == 0);
       const TArray<FStaticMaterial>& Slots = Mesh->GetStaticMaterials();
@@ -955,6 +957,13 @@ bool FS08EnvLayoutKitAssetsTest::RunTest(const FString&) {
                Mi->GetTextureParameterValue(FHashedMaterialParameterInfo(TEXT("NormalTexture")), Bound) && Bound == N);
       TestTrue(Name + TEXT(": ORMTexture bound"),
                Mi->GetTextureParameterValue(FHashedMaterialParameterInfo(TEXT("ORMTexture")), Bound) && Bound == Orm);
+      // P1b review: meshes with inward-wound faces get a TwoSided MI override (ue_import_env_kit.py TWO_SIDED).
+      const bool bWantTwoSided = Name == TEXT("Cypress") || Name == TEXT("Rope") || Name == TEXT("Tree") ||
+                                 Name == TEXT("Cherry") || Name == TEXT("Urn");
+      const bool bTwoSided = Mi->BasePropertyOverrides.bOverride_TwoSided && Mi->BasePropertyOverrides.TwoSided;
+      TestTrue(FString::Printf(TEXT("%s: MI TwoSided override %d, expected %d (ue_import_env_kit.py TWO_SIDED)"), *Name,
+                               bTwoSided ? 1 : 0, bWantTwoSided ? 1 : 0),
+               bTwoSided == bWantTwoSided);
       TestTrue(Name + TEXT(": BC sRGB default"), Bc->SRGB && Bc->CompressionSettings == TC_Default);
       TestTrue(Name + TEXT(": N linear normal map"), !N->SRGB && N->CompressionSettings == TC_Normalmap);
       TestTrue(Name + TEXT(": ORM linear masks"), !Orm->SRGB && Orm->CompressionSettings == TC_Masks);

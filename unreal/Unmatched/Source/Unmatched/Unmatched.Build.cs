@@ -35,6 +35,10 @@ public class Unmatched : ModuleRules {
     // W4-A -Bench: the captured Cobble 5x6 game state the backend-less render
     // bench replays (S08FlowGameMode.cpp RunRenderBench).
     RuntimeDependencies.Add("$(ProjectDir)/Config/Bench/S08BenchCobble.json", StagedFileType.UFS);
+    // ENV-MAPS: the same scene on the original maps (-BenchFixture=<file>; generated from the topology
+    // fixtures by tools/art/render/env_bench_fixtures.cts).
+    RuntimeDependencies.Add("$(ProjectDir)/Config/Bench/S08BenchMarmoreal.json", StagedFileType.UFS);
+    RuntimeDependencies.Add("$(ProjectDir)/Config/Bench/S08BenchSarpedon.json", StagedFileType.UFS);
     // W4-C: the art HUD string table (LOCTABLE_FROMFILE_GAME, Content-relative)
     // is a CSV, not an asset - staged into the pak like the board profiles.
     RuntimeDependencies.Add("$(ProjectDir)/Content/Localization/StringTables/S08ArtHud.csv", StagedFileType.UFS);

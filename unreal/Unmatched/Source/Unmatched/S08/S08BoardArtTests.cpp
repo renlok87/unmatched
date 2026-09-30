@@ -17,6 +17,7 @@
 #include "S08BoardArt.h"
 #include "S08BoardModel.h"
 #include "S08Diorama.h"
+#include "S08EnvLayout.h"
 #include "S08FighterActor.h"
 #include "S08Team.h"
 #include "Components/BoxComponent.h"
@@ -1361,8 +1362,24 @@ bool FS08BoardArtMapProfilesTest::RunTest(const FString&) {
                                  Pl.Position.X, Pl.Position.Y),
                  FMath::Abs(Pl.Position.X) <= Half.X * 1.2 && FMath::Abs(Pl.Position.Y) <= Half.Y * 1.2);
       }
-      TestTrue(Name + TEXT(": warm and cool spots"), Warm >= 1 && Cool >= 1);
+      // S08ArtBoardProfiles rev 7 (ENV-MAPS P1b review): the warm lamp / fire pools moved from the night profile
+      // to the map's env layout (Config/ArtBoards/EnvLayouts/<map>.layout.json, whose points S08EnvLayout adds to
+      // these), so profile + layout stay within 1 key + <= 6 points. The profile keeps the cool fill; warm comes
+      // from the layout (warm = sRGB red above blue).
+      const FString EnvFile = S08EnvLayout::FileFor(S08EnvLayout::DefaultDir(), S08EnvLayout::MapKeyOf(M.Name));
+      FS08EnvLayout Env;
+      TArray<FString> EnvErrors;
+      int32 EnvWarm = 0;
+      if (TestTrue(Name + TEXT(": env layout ") + EnvFile, FPaths::FileExists(EnvFile) && Env.LoadFile(EnvFile, EnvErrors))) {
+        for (const FS08EnvLight& L : Env.Lights) EnvWarm += L.Color.R > L.Color.B;
+      }
+      int32 Points = 0;
+      for (const FS08PlacedLight& Pl : Placed) Points += !Pl.Spec.bDirectional;
+      TestTrue(Name + TEXT(": cool spot in the profile"), Cool >= 1);
+      TestTrue(FString::Printf(TEXT("%s: warm pools (profile %d + env layout %d)"), *Name, Warm, EnvWarm), Warm + EnvWarm >= 1);
       TestTrue(Name + TEXT(": budget"), Placed.Num() <= 7);
+      TestTrue(FString::Printf(TEXT("%s: combined points %d + %d <= 6"), *Name, Points, Env.Lights.Num()),
+               Points + Env.Lights.Num() <= 6);
     }
   }
   return true;

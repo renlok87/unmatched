@@ -367,14 +367,18 @@ bool FS09EndTurnPhaseGateTest::RunTest(const FString&) {
   PhaseBlocked(TEXT("TURN_START"));
   PhaseBlocked(TEXT("TURN_END"));
 
-  // Legal action phases: the gate opens (the leg goes in flight against the
-  // dead test port - the send itself is the point).
+  // Legal action phases: the gate opens (the send itself is the point). The
+  // leg stays in flight on a deferred harness answer that is never delivered:
+  // a real POST to the dead test port answers ~2 s later (Windows connect-
+  // refused retries) into this destroyed controller (EndTurn captures `this`),
+  // a use-after-free once later tests keep the process running.
   {
     FS08Snapshot Snap = Base;
     Snap.Phase = TEXT("ACTION_MANEUVER");
     Snap.SequenceNumber = Flow.GetAppliedSnapshot().SequenceNumber + 1;
     Flow.ApplySnapshot(Snap);
     Traces.Reset();
+    Flow.QueueHttpResultForTest(false, {}, /*bDeferDelivery=*/true);
     TestTrue("endTurn dispatched", Flow.EndTurn());
     TestFalse("endTurn not blocked in ACTION_MANEUVER",
               Traces.ContainsByPredicate([](const FString& Line) {

@@ -35,8 +35,9 @@ Checks (every one is an error unless marked warn):
  6. occlusion: every prop's oriented bounding box (processed size x scale; tall tops included) is
     projected with the K1 camera model (tools/art/map_surface/k1_mock.py: HFOV 35, pitch -55,
     yaw -90, 1920 x 1080) at the overview distance D0 = s08_fit_distance(map half extents)
-    (~1872 uu), zoom-out 0.65x (D0 / 0.65) and zoom-in 1.2x / 1.6x (D0 / 1.2, D0 / 1.6), looking at
-    the board centre and - for zoom-in (follow mode, focus = space centre + 28 uu Z, as
+    (~1872 uu) and every distance the mouse wheel can settle on (wheel_zooms: notches of x1.25 clamped to
+    [300 uu, D0 / 0.65], i.e. zoom 0.65x .. 6.24x, FS08CameraZoomConfig defaults) plus 1.2x / 1.6x, looking at
+    the board centre and - from 1.2x on (follow mode, focus = space centre + 28 uu Z, as
     AS08FlowGameMode::UpdateBoardCamera) - at every space. The convex hull of the projected box must
     stay MARGIN_PX (4 px at 1080p) away from every space circle's projected disk (radius =
     spaceRadiusPx + 0.5 px painted ring). A prop point above the ground whose projection falls inside a
@@ -51,7 +52,7 @@ Usage:
   python -B tools/art/env_kit/layout_check.py                       # both maps, text report
   python -B tools/art/env_kit/layout_check.py --maps sarpedon --images C:/tmp/envmaps-research/p1b/layout
   python -B tools/art/env_kit/layout_check.py --json report.json
-  python -B tools/art/env_kit/layout_check.py --selftest            # synthetic negative cases (13)
+  python -B tools/art/env_kit/layout_check.py --selftest            # synthetic negative cases (14)
 Prop sizes come from the env kit build reports (--build-reports, reports/assets/SM_Env_<Name>.build.json:
 UE X = depth, Y = width, Z = height) when present, else from the KIT table; the run prints whether they agree.
 Debug images (--images DIR, CPU / PIL only): <map>-top.png (orthographic top view, footprints, lights,
@@ -88,8 +89,15 @@ TRAY_TOP_Z = -3.0
 RING_EXTRA_PX = 0.5          # painted ring outer edge 63.43 px vs spaceRadiusPx 63
 MARGIN_PX = 4.0              # clearance around every circle at 1080p
 SCREEN = (1920, 1080)
-ZOOM_OUT, ZOOMS_IN = 0.65, (1.2, 1.6)
+# FS08CameraZoomConfig defaults (S08ArtHud.h): farthest = D0 / OverviewOutRatio, nearest = MinDistanceUU, one wheel
+# notch = x / WheelStepFactor, follow-selection from FollowFromZoom. The wheel steps are computed in camera_set().
+ZOOM_OUT = 0.65              # OverviewOutRatio
+WHEEL_STEP = 1.25            # WheelStepFactor
+MIN_DIST_UU = 300.0          # MinDistanceUU
+FOLLOW_FROM = 1.2            # FollowFromZoom
+ZOOMS_FIXED = (1.2, 1.6)     # the follow threshold and the 03 §2 K2 zoom (FocusZoom), besides the wheel steps
 FOLLOW_Z = 28.0              # UpdateBoardCamera: focus = CellToWorld + (0, 0, 28)
+NEAR_UU = 10.0               # UE near clip plane (GNearClippingPlane): nothing nearer to the camera is drawn
 LIP_UU = 8.0                 # base footprint stays this far inside the tray edge
 FRAME_GAP_UU = 2.0
 NEAR_MAX_H_UU = 25.0
@@ -262,11 +270,62 @@ def make_camera(distance: float, focus=(0.0, 0.0, 0.0), size=SCREEN) -> k1_mock.
     return cam
 
 
+def clip_front(cam: k1_mock.Camera, pts: np.ndarray, closed: bool = False) -> np.ndarray:
+    """The part of a convex point set in front of the near plane (depth >= NEAR_UU), so that the pinhole projection
+    stays valid at the close wheel zooms (D down to 300 uu: props and circles on the near side end up behind the
+    camera). closed=True: `pts` is an ordered planar polygon (Sutherland-Hodgman, order kept); otherwise the vertices
+    of a convex solid (front vertices + the crossing of every front / behind pair; their hull is the clipped solid).
+    Returns (0, 3) when everything is behind the camera."""
+    depth = (pts - cam.pos) @ cam.fwd - NEAR_UU
+    if (depth >= 0).all():
+        return pts
+    if closed:
+        out = []
+        for i in range(len(pts)):
+            j = (i + 1) % len(pts)
+            if depth[i] >= 0:
+                out.append(pts[i])
+            if (depth[i] >= 0) != (depth[j] >= 0):
+                out.append(pts[i] + (pts[j] - pts[i]) * (depth[i] / (depth[i] - depth[j])))
+        return np.array(out, float).reshape(-1, 3)
+    front, dfront = pts[depth >= 0], depth[depth >= 0]
+    back, dback = pts[depth < 0], depth[depth < 0]
+    cross = [f + (b - f) * (a / (a - c)) for f, a in zip(front, dfront) for b, c in zip(back, dback)]
+    return np.vstack([front, *cross]) if cross else front.reshape(-1, 3)
+
+
+def wheel_zooms(d0: float) -> list[float]:
+    """Every zoom (D0 / D) the wheel can settle on. FS08CameraZoom::Wheel divides / multiplies the TARGET distance
+    by WHEEL_STEP and clamps it to [min(MIN_DIST_UU, D0), D0 / ZOOM_OUT], so the settled distances are the closure
+    of D0 under those two moves: D0 * 1.25^k and, after hitting a limit, MinDistance * 1.25^m / MaxDistance / 1.25^n
+    (Marmoreal / Sarpedon: 1.25 .. 5.96 and 6.24 = D0 / 300 from the overview, 0.8 / 0.65 out, plus both clamp
+    lattices)."""
+    lo, hi = min(MIN_DIST_UU, d0), d0 / ZOOM_OUT
+    seen: dict[float, float] = {}
+    todo = [d0]
+    while todo:
+        d = todo.pop()
+        if round(d, 3) in seen:
+            continue
+        seen[round(d, 3)] = d
+        todo += [min(max(d / WHEEL_STEP, lo), hi), min(max(d * WHEEL_STEP, lo), hi)]
+    return sorted({round(d0 / d, 4) for d in seen.values()})
+
+
 def camera_set(spaces: list[dict]) -> list[tuple[str, float, tuple]]:
+    """K1, every wheel zoom (centred) and ZOOMS_FIXED; from FOLLOW_FROM on also following every space."""
     d0 = k1_mock.s08_fit_distance(MAP_HX, MAP_HY)
-    out = [("K1", d0, (0.0, 0.0, 0.0)), (f"out{ZOOM_OUT}", d0 / ZOOM_OUT, (0.0, 0.0, 0.0))]
-    for z in ZOOMS_IN:
-        out.append((f"in{z}@centre", d0 / z, (0.0, 0.0, 0.0)))
+    out = []
+    for z in sorted(set(wheel_zooms(d0)) | set(ZOOMS_FIXED)):
+        if z == 1.0:
+            out.append(("K1", d0, (0.0, 0.0, 0.0)))
+            continue
+        if z < 1.0:
+            out.append((f"out{z:g}", d0 / z, (0.0, 0.0, 0.0)))
+            continue
+        out.append((f"in{z:g}@centre", d0 / z, (0.0, 0.0, 0.0)))
+        if z < FOLLOW_FROM - 1e-6:
+            continue
         for s in spaces:
             fx = min(max(s["X"], -MAP_HX), MAP_HX)
             fy = min(max(s["Y"], -MAP_HY), MAP_HY)
@@ -298,21 +357,31 @@ def occlusion(layout: dict, spaces: list[dict]) -> dict:
     worst = {p["id"]: {"px": math.inf, "camera": "", "space": ""} for p in props}
     for label, dist, focus in camera_set(spaces):
         cam = make_camera(dist, focus)
-        cpolys = [cam.project(c) for c in circ]
+        vis, cpolys = [], []  # circles (partly) in front of the camera; the rest cannot be covered
+        for i, c in enumerate(circ):
+            f = clip_front(cam, c, closed=True)
+            if len(f) >= 3:
+                vis.append(i)
+                cpolys.append(cam.project(f))
+        if not vis:
+            continue
         cbb = np.array([[c[:, 0].min(), c[:, 1].min(), c[:, 0].max(), c[:, 1].max()] for c in cpolys])
         for p, b in zip(props, boxes):
-            hull = convex_hull(cam.project(b))
+            f = clip_front(cam, b)
+            if len(f) < 3:
+                continue  # entirely behind the camera
+            hull = convex_hull(cam.project(f))
             bb = np.array([hull[:, 0].min(), hull[:, 1].min(), hull[:, 0].max(), hull[:, 1].max()])
             gx = np.maximum(0, np.maximum(cbb[:, 0] - bb[2], bb[0] - cbb[:, 2]))
             gy = np.maximum(0, np.maximum(cbb[:, 1] - bb[3], bb[1] - cbb[:, 3]))
             gap = np.hypot(gx, gy)  # lower bound of the exact clearance
             w = worst[p["id"]]
-            for i in np.argsort(gap):
-                if gap[i] >= w["px"]:
+            for k in np.argsort(gap):
+                if gap[k] >= w["px"]:
                     break
-                c = poly_clearance(hull, cpolys[i])
+                c = poly_clearance(hull, cpolys[k])
                 if c < w["px"]:
-                    w.update(px=c, camera=label, space=spaces[i]["id"])
+                    w.update(px=c, camera=label, space=spaces[vis[k]]["id"])
     return worst
 
 
@@ -845,6 +914,8 @@ def selftest() -> int:
          [P("a", "ArcadeBay", -76.1, -425, 90, 1.45), P("b", "ArcadeBay", 76.1, -425, 90, 1.45)], [], [], ["overlap"]),
         ("point light with shadows", [], [Lt("a", shadow=True)], ["cast no shadows"], []),
         ("seven point lights", [], [Lt(f"l{i}", x=-520.0 + 40 * i) for i in range(7)], ["point lights >"], []),
+        ("near-corner post behind the close wheel cameras is clipped, not projected",
+         [P("t", "PlinthBall", -525, 368)], [], [], ["covers"]),
     ]
     fails = 0
     for name, props, lights, must, must_not in cases:

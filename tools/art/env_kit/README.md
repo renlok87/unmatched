@@ -73,7 +73,10 @@ or the `BLENDER` environment variable.
   - ORM: linear, `TC_Masks`; R = AO (1.0 here), G = roughness, B = metallic.
 - **Material and collision.** One material slot `M_Env_<Name>`; in UE it receives `MI_Env_<Name>`. No
   collision, because these props are decor and not interactive.
-- **UE folders.** `/Game/EnvKit/<Board>/`. The proposed sub-folders are `Meshes`, `Textures` and `Materials`.
+- **UE folder (fixed contract).** Flat `/Game/EnvKit/<Board>/` holding `SM_Env_<Name>`,
+  `T_Env_<Name>_{BC,N,ORM}` and `MI_Env_<Name>`; no sub-folders (S08EnvLayout and the layouts load these exact
+  paths). Import with `tools/art/env_kit/ue_import_env_kit.py`; layouts are validated by
+  `tools/art/env_kit/layout_check.py`.
 
 ## Orientation check (no renderer)
 

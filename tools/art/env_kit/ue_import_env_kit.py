@@ -18,7 +18,8 @@ Targets (the fixed UE naming contract of S08EnvLayout.h; the layouts in Config/A
   /Game/EnvKit/<Map>/MI_Env_<Name>          child of /Game/UM/Materials/M_UM_Figure (the decor route of the table base
                                             ASSET-TABLE-BASE-001 and the W4-B barrel): BaseColorTexture / NormalTexture /
                                             ORMTexture bound, TeamColor white, TeamMaskTexture = T_UM_Mask_Black (no team
-                                            colour on the environment)
+                                            colour on the environment); base property override TwoSided on for
+                                            TWO_SIDED (Cypress Rope Tree Cherry Urn: inward-wound faces), off otherwise
   Marmoreal: ArcadeBay Portal Cherry PlinthBall LanternPlinth Urn Cypress
   Sarpedon:  FortRuin Tree Hull Cannon Campfire Palisade Rope
 DefaultGame.ini always cooks /Game/EnvKit (the board actor loads the meshes at runtime by the layout paths).
@@ -94,6 +95,10 @@ KIT = {
 }
 MAPS = {"marmoreal": "Marmoreal", "sarpedon": "Sarpedon"}
 SIZE_OK, SIZE_WARN = 0.01, 0.10  # relative error of the target dimension
+# Meshes with inward-wound faces (track A build report: Cypress 42.9 %, Rope 13.9 %, Tree 12.8 %, Cherry 10.2 %,
+# Urn 4.9 %). M_UM_Figure is one-sided, so their MI overrides TwoSided (P1b review quick fix; the clean fix is a
+# rebuild with static_prop_candidate.fix_winding, after which this set can be emptied).
+TWO_SIDED = {"Cypress", "Rope", "Tree", "Cherry", "Urn"}
 
 
 def rel(path: Path) -> str:
@@ -339,14 +344,18 @@ def ensure_instance(name: str, master, textures: dict, mask) -> dict:
     if mi is None:
         raise RuntimeError(f"could not create {path}")
     white = u.LinearColor(1.0, 1.0, 1.0, 1.0)
+    two_sided = name in TWO_SIDED
 
     def rgba(c) -> tuple:  # compared as numbers (struct == is not relied upon)
         return tuple(round(float(getattr(c, k)), 5) for k in ("r", "g", "b", "a"))
 
     def current() -> dict:
         parent = mi.get_editor_property("parent")
+        ov = mi.get_editor_property("base_property_overrides")
         state = {"parent": parent.get_path_name() if parent else None,
-                 PARAM_TEAM: rgba(mel.get_material_instance_vector_parameter_value(mi, PARAM_TEAM))}
+                 PARAM_TEAM: rgba(mel.get_material_instance_vector_parameter_value(mi, PARAM_TEAM)),
+                 "twoSided": (bool(ov.get_editor_property("override_two_sided")),
+                              bool(ov.get_editor_property("two_sided")))}
         for key, param in PARAMS.items():
             bound = mel.get_material_instance_texture_parameter_value(mi, param)
             state[param] = bound.get_path_name() if bound else None
@@ -355,7 +364,7 @@ def ensure_instance(name: str, master, textures: dict, mask) -> dict:
             state[PARAM_MASK] = bound.get_path_name() if bound else None
         return state
 
-    want = {"parent": master.get_path_name(), PARAM_TEAM: rgba(white)}
+    want = {"parent": master.get_path_name(), PARAM_TEAM: rgba(white), "twoSided": (two_sided, two_sided)}
     want.update({param: textures[key].get_path_name() for key, param in PARAMS.items()})
     if mask is not None:
         want[PARAM_MASK] = mask.get_path_name()
@@ -367,6 +376,10 @@ def ensure_instance(name: str, master, textures: dict, mask) -> dict:
     if mask is not None:
         mel.set_material_instance_texture_parameter_value(mi, PARAM_MASK, mask)
     mel.set_material_instance_vector_parameter_value(mi, PARAM_TEAM, white)
+    ov = mi.get_editor_property("base_property_overrides")  # a copy: set the fields, then write it back
+    ov.set_editor_property("override_two_sided", two_sided)
+    ov.set_editor_property("two_sided", two_sided)
+    mi.set_editor_property("base_property_overrides", ov)
     mel.update_material_instance(mi)
     if not eal.save_loaded_asset(mi, False):
         raise RuntimeError(f"could not save {path}")
@@ -425,6 +438,10 @@ def sm_api():
     is not available in this commandlet."""
     sms = None
     try:
+        # -run=pythonscript does not load the StaticMeshEditor module, so its editor subsystem does not exist yet
+        # (get_editor_subsystem returns None and the deprecated EditorStaticMeshLibrary answers -1); loading the
+        # module creates it (UE 5.8, measured 2026-09-30)
+        u.load_module("StaticMeshEditor")
         sms = u.get_editor_subsystem(u.StaticMeshEditorSubsystem)
     except Exception:  # noqa: BLE001 - engine / commandlet dependent
         sms = None

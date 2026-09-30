@@ -592,6 +592,12 @@ bool FS09DoubleFireGateTest::RunTest(const FString&) {
   TestTrue("first delivered frame proves the stream live", Flow.IsStreamReady());
   TestEqual("no HTTP leg sent yet", Flow.GetTestHttpSendCountForTest(), 0);
 
+  // The leg must stay in flight WITHOUT a real socket: a real POST to the dead
+  // port answers ~2 s later (Windows connect-refused retries) into a controller
+  // this test already destroyed (DiscardToLimit captures `this`), a use-after-
+  // free when later tests keep the process running (S08+S09+S10 in one run).
+  // A deferred harness answer is never delivered and dies with the controller.
+  Flow.QueueHttpResultForTest(false, {}, /*bDeferDelivery=*/true);
   const TArray<FString> Cards = {TEXT("card::1"), TEXT("card::2")};
   TestTrue("first discard dispatched", Flow.DiscardToLimit(TEXT("discard:1:9"), Cards));
   TestEqual("first discard passes the gate (no block)", Count(TEXT("DISCARD blocked")), 0);
@@ -604,7 +610,7 @@ bool FS09DoubleFireGateTest::RunTest(const FString&) {
   TestEqual("no other block reason invented", Count(TEXT("DISCARD blocked")), 1);
 
   // Same defect class on the maneuver submit leg (separate controller: the
-  // discard leg above stays in flight against the dead port).
+  // discard leg above stays in flight on its deferred harness answer).
   FS08Snapshot ManeuverSnap = F.Snapshot;
   WithPendingManeuver(ManeuverSnap, HostId, TEXT("maneuver-1"));
   FS08FlowController Flow2(TEXT("http://127.0.0.1:9/graphql"),
@@ -618,6 +624,7 @@ bool FS09DoubleFireGateTest::RunTest(const FString&) {
   TestTrue("first delivered frame proves the submit stream live", Flow2.IsStreamReady());
   TestEqual("no HTTP leg sent yet (submit controller)", Flow2.GetTestHttpSendCountForTest(), 0);
   const TArray<FS08ManeuverMove> NoMoves;
+  Flow2.QueueHttpResultForTest(false, {}, /*bDeferDelivery=*/true); // same: no real POST
   TestTrue("first submit dispatched", Flow2.SubmitManeuver(TEXT("maneuver-1"), NoMoves));
   TestEqual("first submit passes the gate", Count(TEXT("MANEUVER submit blocked")), 0);
   TestEqual("first submit: exactly one HTTP leg", Flow2.GetTestHttpSendCountForTest(), 1);
