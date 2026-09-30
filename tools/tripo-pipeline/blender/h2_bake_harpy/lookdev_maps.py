@@ -315,19 +315,21 @@ def main():
     # "mask": "dark_primaries" (H3 W4-B dark-primary mask, weighted) | null, "ratio_effective": [r, g, b]}]. A ratio
     # below 1 on texels at the preset floor needs a lower hero floor (classes.luminance_range_hero + lut_overrides
     # luminanceMin): the texture then carries the albedo below the preset floor on purpose
-    r2_info = []
-    for e2 in ld.get("ue_feedback_r2") or []:
+    # look-dev round 3 (2026-09-30, after the UE capture b2): lookdev.ue_feedback_r3, same form, applied after r2 (the
+    # UE capture b3.x decides, not a forecast)
+    r2_info, r3_info = [], []
+    for key, e2, info in [("ue_feedback_r2", e, r2_info) for e in ld.get("ue_feedback_r2") or []] +                          [("ue_feedback_r3", e, r3_info) for e in ld.get("ue_feedback_r3") or []]:
         w2 = (lab == col[e2["class"]]).astype(np.float64)
         if e2.get("mask") == "dark_primaries":
             w2 = w2 * dark
         elif e2.get("mask"):
-            raise ValueError("ue_feedback_r2 %s: unknown mask %s" % (e2["name"], e2["mask"]))
+            raise ValueError("%s %s: unknown mask %s" % (key, e2["name"], e2["mask"]))
         sel2 = (w2 >= 0.5) & cov
         b0 = bc[sel2].copy()
         bc = bc * (1.0 + w2[..., None] * (np.asarray(e2["ratio_effective"], np.float64) - 1.0))
         c2 = allc[e2["class"]]
         bc = np.where((lab == col[e2["class"]])[..., None], np.minimum(bc, float(c2["baseColor"].get("maxChannel", 0.9))), bc)
-        r2_info.append({"name": e2["name"], "class": e2["class"], "mask": e2.get("mask"),
+        info.append({"name": e2["name"], "class": e2["class"], "mask": e2.get("mask"),
                         "ratio_effective": e2["ratio_effective"], "texels_4k_weight_ge_0_5": int(sel2.sum()),
                         "bc_median_linear_before": [r(v, 5) for v in np.median(b0, 0)],
                         "bc_median_linear_after": [r(v, 5) for v in np.median(bc[sel2], 0)],
@@ -558,7 +560,7 @@ def main():
                               "edge_width_final_m": r(W * scale, 4), "silhouette": {"px_m": res_m, "grid": [nz, nx]},
                               "tripo_wing_accent_Y_median": r(y_acc, 4)},
               "edge_mask": dict(estats, config=ld["edge"]), "luminance_clamp": clamp_stats, "ue_feedback_dark_primaries": fb_info,
-              "ue_feedback_r2": r2_info,
+              "ue_feedback_r2": r2_info, **({"ue_feedback_r3": r3_info} if r3_info else {}),
               "lut": {"dds": rel(dds), "dds_sha256": S.sha256(dds), "overrides_json": rel(ov_path),
                       "overrides_sha256": S.sha256(ov_path), "applied": applied, "gold_antique_f0_hero": [r(v, 4) for v in gold_f0],
                       "layout": "build_ue_inputs.LUT_ROWS (rows 0-9, 10-15 reserved), column = class index (hero slot 5 = horn_claw)",

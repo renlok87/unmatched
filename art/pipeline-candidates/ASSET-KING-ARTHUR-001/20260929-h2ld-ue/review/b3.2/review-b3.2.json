@@ -1,0 +1,1718 @@
+{
+ "anti_aliasing_method": 4,
+ "assets": {
+  "base": "/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SM_KingArthur_H2LD_Base",
+  "base_instance": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_Base",
+  "extra:MI_KingArthur_H2LD_DebugClass": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_DebugClass",
+  "extra:MI_KingArthur_H2LD_Neutral": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_Neutral",
+  "figure_instance": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD",
+  "skeletal": "/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SK_KingArthur_H2LD",
+  "team:base:P1": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_Base_P1",
+  "team:base:P2": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_Base_P2",
+  "team:figure:P1": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_P1",
+  "team:figure:P2": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_P2",
+  "texture:BC": "/Game/PipelineCandidates/KingArthur/H2LD/Textures/T_KingArthur_H2LD_BC",
+  "texture:EdgeMask": "/Game/PipelineCandidates/KingArthur/H2LD/Textures/T_KingArthur_H2LD_EdgeMask",
+  "texture:LUT": "/Game/PipelineCandidates/KingArthur/H2LD/Textures/T_UM_MatLUT_Arthur",
+  "texture:MatID": "/Game/PipelineCandidates/KingArthur/H2LD/Textures/T_KingArthur_H2LD_MatID",
+  "texture:N": "/Game/PipelineCandidates/KingArthur/H2LD/Textures/T_KingArthur_H2LD_N",
+  "texture:ORM": "/Game/PipelineCandidates/KingArthur/H2LD/Textures/T_KingArthur_H2LD_ORM",
+  "texture:TeamAccent": "/Game/PipelineCandidates/KingArthur/H2LD/Textures/T_KingArthur_H2LD_TeamAccent"
+ },
+ "cell": [
+  0.0,
+  50.0,
+  0.0
+ ],
+ "cleanup": {
+  "destroyed": [
+   "LDue figure - temporary",
+   "LDue base - temporary",
+   "LDue sky - temporary",
+   "LDue camera - temporary"
+  ],
+  "op": "cleanup"
+ },
+ "config": {
+  "anchor_zone": "cloth",
+  "base_mi": {
+   "P1": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_Base_P1",
+   "P2": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_Base_P2",
+   "debug": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_Base",
+   "neutral": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_Base"
+  },
+  "concept": {
+   "back": "art/imagegen/hero-quality-v1/king-arthur/king-arthur-back.png",
+   "front": "art/imagegen/hero-quality-v1/king-arthur/king-arthur-front.png",
+   "side": "art/imagegen/hero-quality-v1/king-arthur/king-arthur-side.png"
+  },
+  "concept_zones": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2ld-ue/concept-zones.json",
+  "debug_calibration": {
+   "0": [
+    16.1,
+    16.4,
+    16.3
+   ],
+   "1": [
+    145.9,
+    186.9,
+    219.2
+   ],
+   "10": [
+    219.9,
+    224.0,
+    159.6
+   ],
+   "11": [
+    220.9,
+    153.8,
+    220.2
+   ],
+   "12": [
+    159.1,
+    218.4,
+    198.0
+   ],
+   "13": [
+    223.9,
+    177.7,
+    146.8
+   ],
+   "14": [
+    145.1,
+    164.7,
+    219.3
+   ],
+   "15": [
+    187.9,
+    220.5,
+    149.7
+   ],
+   "2": [
+    203.3,
+    222.2,
+    154.1
+   ],
+   "3": [
+    227.7,
+    148.4,
+    214.8
+   ],
+   "4": [
+    166.1,
+    219.9,
+    214.6
+   ],
+   "5": [
+    224.5,
+    205.9,
+    154.9
+   ],
+   "6": [
+    185.3,
+    155.9,
+    221.9
+   ],
+   "7": [
+    158.1,
+    223.7,
+    152.2
+   ],
+   "8": [
+    228.6,
+    147.7,
+    188.0
+   ],
+   "9": [
+    158.8,
+    209.9,
+    221.2
+   ]
+  },
+  "debug_calibration_source": "docs/art-pipeline/material-library/evidence/v2.1-accent/wall/um-v2-accent-report.json measurements.debug_class_calibration_srgb (look-dev C, M_UM_Figure_v2.1 DebugView 1 on the P1.7 Cobble scene, EV100 1.3; the hue decode cannot split steel_blued 1 from wool_coarse 9)",
+  "decode_classes": [
+   "steel_blued",
+   "steel_polished",
+   "gold_antique",
+   "silk",
+   "wool_coarse",
+   "leather_worn",
+   "skin"
+  ],
+  "gate_on_variant": "neutral",
+  "hero": "KingArthur",
+  "key_zones": [
+   "steel",
+   "gold",
+   "cloth",
+   "face_skin"
+  ],
+  "min_px": 150,
+  "previous": [],
+  "reading_bias_ev": -0.75,
+  "render_gates": {},
+  "run_dir": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2ld-ue-import",
+  "sheet_label": "UE H2LD",
+  "shots": {
+   "P1": [
+    "front",
+    "side",
+    "back",
+    "k2-5x",
+    "k2-1p6"
+   ],
+   "P2": [
+    "front",
+    "side",
+    "back",
+    "k2-5x",
+    "k2-1p6"
+   ],
+   "debug": [
+    "front",
+    "side",
+    "back"
+   ],
+   "neutral": [
+    "front",
+    "side",
+    "back",
+    "k2-5x",
+    "k2-1p6"
+   ],
+   "plate": [
+    "front",
+    "side",
+    "back"
+   ],
+   "reading": [
+    "front",
+    "side",
+    "back",
+    "k2-5x"
+   ]
+  },
+  "team_variants": [
+   "P1",
+   "P2"
+  ],
+  "tolerance": {
+   "hue_deg": 12.0,
+   "hue_min_sat": 0.1,
+   "luma_ratio": 0.15,
+   "sat": 0.1
+  },
+  "tolerance_zones": [
+   "steel",
+   "gold",
+   "embroidery",
+   "cloth",
+   "belt",
+   "face_skin"
+  ],
+  "variants": {
+   "P1": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_P1",
+   "P2": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_P2",
+   "debug": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_DebugClass",
+   "neutral": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_Neutral"
+  },
+  "zone_class": {
+   "belt": "leather_worn",
+   "cloth": "wool_coarse",
+   "embroidery": "silk",
+   "face_skin": "skin",
+   "gold": "gold_antique",
+   "hair": "legacy_bake",
+   "steel": "steel_blued"
+  },
+  "zones": [
+   "steel",
+   "gold",
+   "embroidery",
+   "cloth",
+   "belt",
+   "face_skin",
+   "hair"
+  ]
+ },
+ "console": [
+  "sg.ViewDistanceQuality 2",
+  "sg.AntiAliasingQuality 2",
+  "sg.ShadowQuality 2",
+  "sg.GlobalIlluminationQuality 2",
+  "sg.ReflectionQuality 2",
+  "sg.PostProcessQuality 2",
+  "sg.TextureQuality 2",
+  "sg.EffectsQuality 2",
+  "sg.FoliageQuality 2",
+  "sg.ShadingQuality 2",
+  "ShowFlag.Grid 0",
+  "ShowFlag.BillboardSprites 0",
+  "ShowFlag.Volumes 0",
+  "ShowFlag.Bloom 0",
+  "ShowFlag.Bloom 2",
+  "sg.ViewDistanceQuality 3",
+  "sg.AntiAliasingQuality 3",
+  "sg.ShadowQuality 3",
+  "sg.GlobalIlluminationQuality 3",
+  "sg.ReflectionQuality 3",
+  "sg.PostProcessQuality 3",
+  "sg.TextureQuality 3",
+  "sg.EffectsQuality 3",
+  "sg.FoliageQuality 3",
+  "sg.ShadingQuality 3",
+  "ShowFlag.Grid 2",
+  "ShowFlag.BillboardSprites 2",
+  "ShowFlag.Volumes 2",
+  "ShowFlag.Bloom 2"
+ ],
+ "editor_lock": {
+  "owner": "lookdev-r3",
+  "stale_taken": null,
+  "stamp": "lookdev-r3 2026-09-30T15:10:43+00:00 h5cb1 review KingArthur b3.2",
+  "step": "h5cb1 review KingArthur b3.2",
+  "waited_s": 0.0
+ },
+ "exposure_reading": {
+  "exposure": {
+   "auto_exposure_bias": -0.75,
+   "label": "P17 exposure EV100 1.3 - fixed",
+   "max_brightness": 2.462290048599243,
+   "method": "<AutoExposureMethod.AEM_HISTOGRAM: 0>",
+   "min_brightness": 2.462290048599243
+  },
+  "op": "exposure"
+ },
+ "exposure_restored": {
+  "exposure": {
+   "auto_exposure_bias": 0.0,
+   "label": "P17 exposure EV100 1.3 - fixed",
+   "max_brightness": 2.462290048599243,
+   "method": "<AutoExposureMethod.AEM_HISTOGRAM: 0>",
+   "min_brightness": 2.462290048599243
+  },
+  "op": "exposure"
+ },
+ "finished_at": "2026-09-30T15:15:14+00:00",
+ "frames": {
+  "back-debug": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "kingarthur-b3.2-back-debug.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_DebugClass",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4981,
+    0.4724,
+    0.4333
+   ],
+   "sha256": "c31e773eaee29f4eed2efe9a5c768281338beb108bd9633276060321d2868275",
+   "subject": "KingArthur (/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SK_KingArthur_H2LD)",
+   "variant": "debug",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "back-neutral": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "kingarthur-b3.2-back-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.449,
+    0.446,
+    0.4477
+   ],
+   "sha256": "97ec04722cb32d61e95a4e888eb7d65a30b3ed3193bdc8b22314cb2543c5b7e4",
+   "subject": "KingArthur (/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SK_KingArthur_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "back-p1": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "kingarthur-b3.2-back-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4717,
+    0.447,
+    0.4521
+   ],
+   "sha256": "85e9b229e8b47ba753aa40fc82f211866e3f4547a1b2e7270b7ff1e4f3e6c7fb",
+   "subject": "KingArthur (/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SK_KingArthur_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "back-p2": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "kingarthur-b3.2-back-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4646,
+    0.4541,
+    0.4574
+   ],
+   "sha256": "d7c0e886e3586a211ac19582b46760d63ffdf0478df5d77b434df1bcf6ff7074",
+   "subject": "KingArthur (/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SK_KingArthur_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "back-plate": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "kingarthur-b3.2-back-plate.png",
+   "fov": 35.0,
+   "material": null,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4001,
+    0.3872,
+    0.385
+   ],
+   "sha256": "741bea1764e04513e56098c1d2b94f212234c520764be822a1da00594ef1cd71",
+   "subject": "KingArthur (/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SK_KingArthur_H2LD)",
+   "variant": "plate",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "back-reading": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "kingarthur-b3.2-back-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3798,
+    0.3754,
+    0.3705
+   ],
+   "sha256": "a170181bd632ca6867704b2d804adc191fb51d2a9fb3471e5bf5baf7fefdec4c",
+   "subject": "KingArthur (/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SK_KingArthur_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "front-debug": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "kingarthur-b3.2-front-debug.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_DebugClass",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5005,
+    0.4394,
+    0.4721
+   ],
+   "sha256": "4292097f4ca87f8a9613566dc10bdb8d46933d6a62ae7210af68eed40f110bb8",
+   "subject": "KingArthur (/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SK_KingArthur_H2LD)",
+   "variant": "debug",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "front-neutral": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "kingarthur-b3.2-front-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5062,
+    0.4916,
+    0.5067
+   ],
+   "sha256": "b8a78f82431cf651b6c90b683f506e2eb75ef60f61ea4959111fbcfb4427d7fd",
+   "subject": "KingArthur (/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SK_KingArthur_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "front-p1": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "kingarthur-b3.2-front-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5588,
+    0.5091,
+    0.507
+   ],
+   "sha256": "1ebde39ea397e21be315581eea573c7265d397c82a69d5ac5822f3429bf498fa",
+   "subject": "KingArthur (/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SK_KingArthur_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "front-p2": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "kingarthur-b3.2-front-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5387,
+    0.5179,
+    0.5019
+   ],
+   "sha256": "a9e767d07fe32a975ae9cfe65acdc63824cee9756e28b8977f919543961257d3",
+   "subject": "KingArthur (/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SK_KingArthur_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "front-plate": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "kingarthur-b3.2-front-plate.png",
+   "fov": 35.0,
+   "material": null,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4352,
+    0.4036,
+    0.4073
+   ],
+   "sha256": "fdf24340b1afe25bc8c383a21f96b5e69f8c16f4afeb6d6ba6062f49529ed80f",
+   "subject": "KingArthur (/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SK_KingArthur_H2LD)",
+   "variant": "plate",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "front-reading": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "kingarthur-b3.2-front-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4811,
+    0.4292,
+    0.4243
+   ],
+   "sha256": "11514184fcd2a60c35600b61f2d89c309befeb1817aaeb1b84bf2b38a49171aa",
+   "subject": "KingArthur (/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SK_KingArthur_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "k2-1p6-neutral": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "kingarthur-b3.2-k2-1p6-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5499,
+    0.5338,
+    0.5309
+   ],
+   "sha256": "e8ebad01d9f0c7d2934821730371eb0735b10624b970bcbfca35ce21ec3af590",
+   "subject": "KingArthur (/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SK_KingArthur_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "kind": "game camera K2 1.6x (1207 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "k2-1p6-p1": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "kingarthur-b3.2-k2-1p6-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5526,
+    0.5408,
+    0.5402
+   ],
+   "sha256": "dddfdee0c4ebf1a6b70e55828d39baab3db04fb7b6fd2e7b56673d07ad007b6d",
+   "subject": "KingArthur (/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SK_KingArthur_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "kind": "game camera K2 1.6x (1207 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "k2-1p6-p2": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "kingarthur-b3.2-k2-1p6-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5508,
+    0.527,
+    0.5218
+   ],
+   "sha256": "629eb168097ae7f4e32d9c2bae0b53dd7a7cfec4228a54c0c455a5ef4a581dbb",
+   "subject": "KingArthur (/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SK_KingArthur_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "kind": "game camera K2 1.6x (1207 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "k2-5x-neutral": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "kingarthur-b3.2-k2-5x-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.7217,
+    0.7004,
+    0.7012
+   ],
+   "sha256": "a89c4d984251de7030cccb3a3df1adfdb17ffb035637f88aefd3808cfd11ead3",
+   "subject": "KingArthur (/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SK_KingArthur_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "k2-5x-p1": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "kingarthur-b3.2-k2-5x-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.7292,
+    0.7077,
+    0.7067
+   ],
+   "sha256": "e5567bbb0a813c928cf70bda04dfc1011b6427a99bf9171c6c35a4b66452900a",
+   "subject": "KingArthur (/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SK_KingArthur_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "k2-5x-p2": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "kingarthur-b3.2-k2-5x-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.7304,
+    0.6975,
+    0.7044
+   ],
+   "sha256": "ac100b401945e1f6fb78a028c5539557ecf86aeb01a2a6a748a55cc64ec29979",
+   "subject": "KingArthur (/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SK_KingArthur_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "k2-5x-reading": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "kingarthur-b3.2-k2-5x-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.501,
+    0.5404,
+    0.5318
+   ],
+   "sha256": "6a85388e37e649172556357a200e4a8c3060c99ad6a544f570e93279773e33e7",
+   "subject": "KingArthur (/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SK_KingArthur_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "side-debug": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "kingarthur-b3.2-side-debug.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_DebugClass",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3773,
+    0.3601,
+    0.3617
+   ],
+   "sha256": "9e50e60e0b4966220fea8a7813a928202b9d40a22c8cb8694b407f51c2cf7186",
+   "subject": "KingArthur (/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SK_KingArthur_H2LD)",
+   "variant": "debug",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "side-neutral": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "kingarthur-b3.2-side-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4069,
+    0.3749,
+    0.3752
+   ],
+   "sha256": "51961e3769b0f6cb43e1c29de11467a5798ce2140ef01a2419e8f40abba3a8be",
+   "subject": "KingArthur (/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SK_KingArthur_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "side-p1": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "kingarthur-b3.2-side-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.378,
+    0.3861,
+    0.3811
+   ],
+   "sha256": "57fe75bc97cb53eb75b48c2e5553a2cbfe8a5511fe3b1c4ee271b27da0f4c57c",
+   "subject": "KingArthur (/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SK_KingArthur_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "side-p2": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "kingarthur-b3.2-side-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.388,
+    0.3874,
+    0.3915
+   ],
+   "sha256": "9b8118fa4be27546dcde2848b53f6d9eed58ce2830461877f644a2a3da2936e4",
+   "subject": "KingArthur (/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SK_KingArthur_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "side-plate": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "kingarthur-b3.2-side-plate.png",
+   "fov": 35.0,
+   "material": null,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3297,
+    0.3141,
+    0.2937
+   ],
+   "sha256": "296ee0ece8af70e5bd63a90ce53697fe31dbc2e573625bfdf7f664b00565f36a",
+   "subject": "KingArthur (/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SK_KingArthur_H2LD)",
+   "variant": "plate",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "side-reading": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "kingarthur-b3.2-side-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.329,
+    0.3382,
+    0.3311
+   ],
+   "sha256": "332408c51c0e6f7c1180b670dfa7cf3dc170f496d4e64979ac446d206034c006",
+   "subject": "KingArthur (/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SK_KingArthur_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the left as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     180.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  }
+ },
+ "gi_reflections": {
+  "r.DynamicGlobalIlluminationMethod": 1,
+  "r.ReflectionMethod": 1
+ },
+ "key_rotation_pitch_yaw_roll": [
+  -55.0,
+  30.0,
+  0.0
+ ],
+ "kind": "EDITOR review frames (live UnrealEditor via MCP): not packaged, no HUD, no RENDER fingerprint, not K1/K2 acceptance",
+ "light_profile": {
+  "data": {
+   "directional": {
+    "castShadows": true,
+    "intensity": 4.5,
+    "name": "key",
+    "posUU": [
+     -350,
+     -150,
+     600
+    ],
+    "rotation": [
+     -55,
+     30,
+     0
+    ],
+    "shadow": {
+     "cascades": 2,
+     "contactShadowLength": 0.0,
+     "distanceUU": 3000
+    }
+   },
+   "exposure": {
+    "bias": 0.0,
+    "ev100": 2.05,
+    "maxBrightness": 4.14106,
+    "method": "histogram-fixed",
+    "minBrightness": 4.14106
+   },
+   "points": [
+    {
+     "intensity": 85,
+     "name": "warm",
+     "posUU": [
+      260,
+      -300,
+      250
+     ],
+     "radiusUU": 450,
+     "role": "warm"
+    }
+   ],
+   "sky": {
+    "calibration": "W4-A bench: K1 board ROI median luma of the packaged DX12 + Lumen frame matched to the P17 editor K1 (131.2): sky 8 -> 112.1, 12 -> 139.4, 16 -> 159.5; 11.2 = x1.4 (K2 5x cobble corner 105.2 in P17 matched at x1.5)",
+    "colorLinear": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "cubemap": "/Game/S08/Render/TC_S08_AmbientDome",
+    "intensity": 11.2,
+    "lowerHemisphereIsBlack": false,
+    "replaces": "point fill 700 cd at (0,-100,550), radius 1800 (pre-W4)",
+    "source": "cubemap"
+   },
+   "source": "ART-005 editor probe reproduced for the opt-in Cobble review (S08BoardActor before T3.2); measured candidate, not a lighting norm",
+   "units": {
+    "directional": "lux",
+    "point": "candelas"
+   }
+  },
+  "source": "unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json lightProfiles.cobble-probe"
+ },
+ "original_level": "/Game/S08/S08Arena",
+ "restored_level": "/Game/S08/S08Arena",
+ "restored_level_dirty": false,
+ "review_level": "/Game/ArtTests/P17ControlScene/L_P17ControlScene",
+ "review_level_dirty_after_reload": false,
+ "run_assets_dirty": {
+  "base": false,
+  "base_instance": false,
+  "extra:MI_KingArthur_H2LD_DebugClass": false,
+  "extra:MI_KingArthur_H2LD_Neutral": false,
+  "figure_instance": false,
+  "skeletal": false,
+  "team:base:P1": false,
+  "team:base:P2": false,
+  "team:figure:P1": false,
+  "team:figure:P2": false,
+  "texture:BC": false,
+  "texture:EdgeMask": false,
+  "texture:LUT": false,
+  "texture:MatID": false,
+  "texture:N": false,
+  "texture:ORM": false,
+  "texture:TeamAccent": false
+ },
+ "scalability_after": {
+  "sg.AntiAliasingQuality": 3,
+  "sg.EffectsQuality": 3,
+  "sg.FoliageQuality": 3,
+  "sg.GlobalIlluminationQuality": 3,
+  "sg.PostProcessQuality": 3,
+  "sg.ReflectionQuality": 3,
+  "sg.ShadingQuality": 3,
+  "sg.ShadowQuality": 3,
+  "sg.TextureQuality": 3,
+  "sg.ViewDistanceQuality": 3
+ },
+ "scalability_before": {
+  "sg.AntiAliasingQuality": 3,
+  "sg.EffectsQuality": 3,
+  "sg.FoliageQuality": 3,
+  "sg.GlobalIlluminationQuality": 3,
+  "sg.PostProcessQuality": 3,
+  "sg.ReflectionQuality": 3,
+  "sg.ShadingQuality": 3,
+  "sg.ShadowQuality": 3,
+  "sg.TextureQuality": 3,
+  "sg.ViewDistanceQuality": 3
+ },
+ "scalability_during": {
+  "sg.AntiAliasingQuality": 2,
+  "sg.EffectsQuality": 2,
+  "sg.FoliageQuality": 2,
+  "sg.GlobalIlluminationQuality": 2,
+  "sg.PostProcessQuality": 2,
+  "sg.ReflectionQuality": 2,
+  "sg.ShadingQuality": 2,
+  "sg.ShadowQuality": 2,
+  "sg.TextureQuality": 2,
+  "sg.ViewDistanceQuality": 2
+ },
+ "schema": "unmatched.um-v2-hero-lookdev/1",
+ "screen_percentage": {
+  "r.Editor.Viewport.ScreenPercentage": 100,
+  "r.ScreenPercentage": 100
+ },
+ "setup": {
+  "hidden_review_actors": [
+   "P17 arthur base",
+   "P17 arthur figure",
+   "P17 barrel",
+   "P17 harpy1 base",
+   "P17 harpy1 figure",
+   "P17 harpy2 base",
+   "P17 harpy2 figure",
+   "P17 harpy3 base",
+   "P17 harpy3 figure",
+   "P17 medusa base",
+   "P17 medusa figure",
+   "P17 merlin base",
+   "P17 merlin figure"
+  ],
+  "level": "/Game/ArtTests/P17ControlScene/L_P17ControlScene",
+  "lights_after": [
+   {
+    "cast_shadows": true,
+    "class": "DirectionalLight",
+    "dynamic_shadow_cascades": 2,
+    "dynamic_shadow_distance_movable_light": 3000.0,
+    "hidden_in_editor": false,
+    "intensity": 4.5,
+    "label": "ART005 cool scene key - proposed",
+    "location": [
+     -350.0,
+     -150.0,
+     600.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     -55.0,
+     30.0,
+     -0.0
+    ]
+   },
+   {
+    "attenuation_radius": 1800.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": true,
+    "intensity": 0.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 neutral readability fill - review only",
+    "location": [
+     0.0,
+     100.0,
+     500.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "attenuation_radius": 450.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 85.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 warm lantern accent - proposed",
+    "location": [
+     260.0,
+     -300.0,
+     250.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "cast_shadows": true,
+    "class": "SkyLight",
+    "cubemap": "/Game/S08/Render/TC_S08_AmbientDome",
+    "hidden_in_editor": false,
+    "intensity": 11.2,
+    "label": "LDue sky - temporary",
+    "location": [
+     0.0,
+     0.0,
+     300.0
+    ],
+    "lower_hemisphere_is_black": false,
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "real_time_capture": false,
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "source_type": "<SkyLightSourceType.SLS_SPECIFIED_CUBEMAP: 1>"
+   }
+  ],
+  "lights_before": [
+   {
+    "cast_shadows": true,
+    "class": "DirectionalLight",
+    "dynamic_shadow_cascades": 4,
+    "dynamic_shadow_distance_movable_light": 40000.0,
+    "hidden_in_editor": false,
+    "intensity": 4.5,
+    "label": "ART005 cool scene key - proposed",
+    "location": [
+     -350.0,
+     -150.0,
+     600.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     -55.0,
+     30.0,
+     -0.0
+    ]
+   },
+   {
+    "attenuation_radius": 1800.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 700.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 neutral readability fill - review only",
+    "location": [
+     0.0,
+     100.0,
+     500.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "attenuation_radius": 450.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 85.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 warm lantern accent - proposed",
+    "location": [
+     260.0,
+     -300.0,
+     250.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   }
+  ],
+  "op": "setup"
+ },
+ "started_at": "2026-09-30T15:10:44+00:00",
+ "tag": "b3.2",
+ "throttle_cpu_when_not_foreground": {
+  "restored": {
+   "after": {
+    "bThrottleCPUWhenNotForeground": true
+   },
+   "before": {
+    "bThrottleCPUWhenNotForeground": false
+   }
+  },
+  "set": {
+   "after": {
+    "bThrottleCPUWhenNotForeground": false
+   },
+   "before": {
+    "bThrottleCPUWhenNotForeground": true
+   }
+  }
+ },
+ "tool": "tools/art/material_library/ue_hero_lookdev.py",
+ "warmup_mean_abs_diff": [
+  0.8139,
+  0.5468,
+  0.5615,
+  0.5576,
+  0.558,
+  0.5601,
+  0.5597,
+  0.5624,
+  0.5671,
+  0.5546,
+  0.555,
+  0.5603,
+  0.556,
+  0.5671,
+  0.5652,
+  0.561,
+  0.5562,
+  0.5619,
+  0.5603,
+  0.5547,
+  0.5593,
+  0.5621,
+  0.5546,
+  0.5609,
+  0.5582,
+  0.5658,
+  0.5622,
+  0.5559,
+  0.5621,
+  0.5587,
+  0.5638,
+  0.5622,
+  0.559,
+  0.5614,
+  0.5683,
+  0.5661,
+  0.5638,
+  0.5559,
+  0.5519
+ ]
+}

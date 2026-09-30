@@ -164,10 +164,29 @@ R2_SET = ("srgb", "compression_settings", "filter", "never_stream")
 R2_MIP = {"FromTextureGroup": "TMGS_FROM_TEXTURE_GROUP", "TMGS_NO_MIPMAPS": "TMGS_NO_MIPMAPS"}
 
 
-def cmd_reimport_r2(a) -> dict:
+# look-dev round 3 (2026-09-30, after the UE capture b2): iterations r3.N, one plan per iteration
+R3_DIR = REPO / "docs" / "art-pipeline" / "evidence" / "lookdev-r3-2026-09-30"
+R3_RUN = {"harpy": "20260930-h3ld-r3-ue", "medusa": "20260930-h2ld-r3-ue", "merlin": "20260930-h2ld-r3-ue"}
+
+
+def cmd_reimport_r3(a) -> dict:
+    """Look-dev round 3: reimport-plan-<iter>.json of R3_DIR (same form as the round-2 plan); heroes absent from the
+    plan are skipped."""
+    plan_path = R3_DIR / ("reimport-plan-%s.json" % a.iter)
+    plan = json.loads(plan_path.read_text(encoding="utf-8"))
+    if a.hero not in plan["heroes"]:
+        raise SystemExit("hero %s not in %s" % (a.hero, plan_path))
+    return cmd_reimport_r2(a, plan=plan, out=PC / HEROES[a.hero]["asset_dir"] / R3_RUN[a.hero] /
+                           ("reimport-%s.json" % a.iter), schema="unmatched.lookdev-r3-reimport/1",
+                           source="look-dev round 3 plan %s" % plan_path.relative_to(REPO).as_posix(),
+                           step="lookdev-r3 reimport %s" % a.iter)
+
+
+def cmd_reimport_r2(a, plan=None, out=None, schema="unmatched.lookdev-r2-reimport/1", source=None,
+                    step="lookdev-r2 reimport") -> dict:
     """Look-dev round 2: the textures + MI dye knobs of reimport-plan.json over the existing assets, sources checked
     against the plan's sha256 first; LUTs get the full LUT settings (NoMipmaps included)."""
-    plan = json.loads(R2_PLAN.read_text(encoding="utf-8"))
+    plan = plan or json.loads(R2_PLAN.read_text(encoding="utf-8"))
     ph = plan["heroes"][a.hero]
     h = HEROES[a.hero]
     texs = []
@@ -181,11 +200,11 @@ def cmd_reimport_r2(a) -> dict:
             st["mip_gen_settings"] = "TMGS_NO_MIPMAPS"
         texs.append({"asset": t["asset"], "source_file": src.as_posix(), "settings": st, "sha256": digest,
                      "was_sha256": t["was_sha256"], "plan_settings": t["settings"]})
-    mi = {p: {"scalars": v["scalars"]} for p, v in ph["mi"].items()}
-    out = PC / HEROES[a.hero]["asset_dir"] / R2_RUN[a.hero] / "reimport-r2.json"
-    return _reimport(a.hero, h, texs, mi, out, "unmatched.lookdev-r2-reimport/1",
-                     "look-dev round 2 plan %s (commit ee96aaf6)" % R2_PLAN.relative_to(REPO).as_posix(),
-                     "lookdev-r2 reimport")
+    mi = {p: {"scalars": v["scalars"]} for p, v in (ph.get("mi") or {}).items()}
+    out = out or PC / HEROES[a.hero]["asset_dir"] / R2_RUN[a.hero] / "reimport-r2.json"
+    return _reimport(a.hero, h, texs, mi, out, schema,
+                     source or "look-dev round 2 plan %s (commit ee96aaf6)" % R2_PLAN.relative_to(REPO).as_posix(),
+                     step)
 
 
 def _reimport(hero, h, texs, mi_spec, out_json: Path, schema: str, source: str, step: str) -> dict:
@@ -241,8 +260,10 @@ def _reimport(hero, h, texs, mi_spec, out_json: Path, schema: str, source: str, 
         eff = r3["instances"][p]["effective"]
         checks["mi " + p.rsplit("/", 1)[1]] = {"passed": all(abs(eff[k] - v) < 1e-3 for k, v in spec["scalars"].items()),
                                                "effective": eff}
+    # the hero MI itself carries the knobs (the parent of the team MIs): excluded also when this plan leaves it as is
+    hero_mi = "%s/Materials/MI_%s_%s" % (folder_of(h), h["key"], h["stage"])
     over = {p: {k: v for k, v in r3["instances"][p]["scalars"].items() if k in ("TeamDyeGain", "TeamDyeCeiling")}
-            for p in insts if p not in mi_spec}
+            for p in insts if p not in mi_spec and p != hero_mi}
     checks["children_do_not_override_dye_knobs"] = {"passed": not any(over.values()), "overrides": over}
     checks["effective_on_team_mis"] = {"passed": True, "values": {p: r3["instances"][p]["effective"] for p in insts}}
     checks["no_numbered_copies"] = {"passed": not r3["numbered_copies"], "numbered": r3["numbered_copies"],
@@ -629,7 +650,8 @@ def cmd_game_sheets(a) -> dict:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("command", choices=["reimport", "reimport-r2", "review", "game", "game-sheets"])
+    ap.add_argument("command", choices=["reimport", "reimport-r2", "reimport-r3", "review", "game", "game-sheets"])
+    ap.add_argument("--iter", default="r3.1", help="reimport-r3: iteration of the round-3 plan (reimport-plan-<iter>.json)")
     ap.add_argument("--hero", choices=sorted(HEROES))
     ap.add_argument("--step", choices=["ref", "accent"] + CLIPS)
     ap.add_argument("--tag", default="b1")
@@ -638,6 +660,8 @@ def main() -> int:
         cmd_reimport(a)
     elif a.command == "reimport-r2":
         cmd_reimport_r2(a)
+    elif a.command == "reimport-r3":
+        cmd_reimport_r3(a)
     elif a.command == "review":
         cmd_review(a)
     elif a.command == "game-sheets":

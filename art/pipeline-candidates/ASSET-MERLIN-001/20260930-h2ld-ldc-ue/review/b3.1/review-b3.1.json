@@ -1,0 +1,1775 @@
+{
+ "anti_aliasing_method": 4,
+ "assets": {
+  "base": "/Game/PipelineCandidates/Merlin/H2LD/Meshes/SM_Merlin_H2LD_Base",
+  "base_instance": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_Base",
+  "extra:MI_Merlin_H2LD_DebugClass": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_DebugClass",
+  "extra:MI_Merlin_H2LD_DebugZones": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_DebugZones",
+  "extra:MI_Merlin_H2LD_Neutral": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_Neutral",
+  "figure_instance": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD",
+  "skeletal": "/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD",
+  "team:base:P1": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_Base_P1",
+  "team:base:P2": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_Base_P2",
+  "team:figure:P1": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_P1",
+  "team:figure:P2": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_P2",
+  "texture:BC": "/Game/PipelineCandidates/Merlin/H2LD/Textures/T_Merlin_H2LD_BC",
+  "texture:EdgeMask": "/Game/PipelineCandidates/Merlin/H2LD/Textures/T_Merlin_H2LD_EdgeMask",
+  "texture:MatID": "/Game/PipelineCandidates/Merlin/H2LD/Textures/T_Merlin_H2LD_MatID",
+  "texture:MatLUT": "/Game/PipelineCandidates/Merlin/H2LD/Textures/T_UM_MatLUT_Merlin",
+  "texture:N": "/Game/PipelineCandidates/Merlin/H2LD/Textures/T_Merlin_H2LD_N",
+  "texture:ORM": "/Game/PipelineCandidates/Merlin/H2LD/Textures/T_Merlin_H2LD_ORM",
+  "texture:TeamAccent": "/Game/PipelineCandidates/Merlin/H2LD/Textures/T_Merlin_H2LD_TeamAccent",
+  "texture:ZoneID": "/Game/PipelineCandidates/Merlin/H2LD/Textures/T_Merlin_H2LD_ZoneID_Debug",
+  "texture:ZoneLUT": "/Game/PipelineCandidates/Merlin/H2LD/Textures/T_Merlin_H2LD_ZoneLUT_Debug"
+ },
+ "cell": [
+  0.0,
+  50.0,
+  0.0
+ ],
+ "cleanup": {
+  "destroyed": [
+   "LDue figure - temporary",
+   "LDue base - temporary",
+   "LDue sky - temporary",
+   "LDue camera - temporary"
+  ],
+  "op": "cleanup"
+ },
+ "config": {
+  "anchor_zone": "wool_coarse",
+  "base_mi": {
+   "P1": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_Base_P1",
+   "P2": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_Base_P2",
+   "debug": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_Base",
+   "neutral": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_Base"
+  },
+  "concept": {
+   "back": "art/imagegen/hero-quality-v1/merlin/merlin-back.png",
+   "front": "art/imagegen/hero-quality-v1/merlin/merlin-front.png",
+   "side": "art/imagegen/hero-quality-v1/merlin/merlin-side.png"
+  },
+  "concept_boxes": {
+   "extra_profile": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-lookdev-ue-lut.json",
+   "note": "Merlin has no class-mask concept measurement: the look-dev zone boxes (+ the buckle frame boxes of the UE LUT config) are pooled by the MatID class of the zone; crystal and beard (both legacy_bake, one gem and one white hair) and the base (M_UM_BaseMarker in UE) are not pooled",
+   "profile": "art/pipeline-candidates/ASSET-MERLIN-001/build-profiles/merlin-h2-lookdev.json",
+   "replace_zones_by_extra": [
+    "buckle"
+   ],
+   "zone_class": {
+    "beard_wrap": "leather_worn",
+    "belt": "leather_worn",
+    "boots": "leather_worn",
+    "buckle": "bronze",
+    "embroidery": "silk",
+    "face_skin": "skin",
+    "hands_skin": "skin",
+    "wood": "wood",
+    "wool": "wool_coarse"
+   }
+  },
+  "concept_zones": "art/pipeline-candidates/ASSET-MERLIN-001/20260930-h2ld-ldc-ue/concept-classes.json",
+  "hero": "Merlin",
+  "key_zones": [
+   "wool_coarse",
+   "silk",
+   "skin"
+  ],
+  "min_px": 150,
+  "never_dye_zones": [
+   "bronze",
+   "silk",
+   "skin",
+   "wood"
+  ],
+  "note": "look-dev C group A (2026-09-30): H2LD rev 2 (already on the canonical skeleton since look-dev A), M_UM_Figure_v2.1 UseTeamAccent, teams P1/P2 of the active C-11 palette. Frames: P1.7 Cobble control level, light profile cobble-probe, High, SP 100; neutral / P1 / P2 / DebugClass / plate, reading exposure -1.0 EV. Editor frames (diagnostic), not K1/K2 acceptance",
+  "reading_bias_ev": -0.75,
+  "restore_level": "/Game/S08/S08Arena",
+  "run_dir": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2ld-ue-import",
+  "side_camera": "-X",
+  "teams": [
+   "P1",
+   "P2"
+  ],
+  "tolerance": {
+   "hue_deg": 12.0,
+   "luma_ratio": 0.15,
+   "sat": 0.1
+  },
+  "tolerance_zones": [
+   "wool_coarse",
+   "silk",
+   "bronze",
+   "skin",
+   "leather_worn"
+  ],
+  "variants": {
+   "P1": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_P1",
+   "P2": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_P2",
+   "debug": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_DebugClass",
+   "neutral": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_Neutral"
+  },
+  "verify": {
+   "clips_folder": "/Game/PipelineCandidates/Merlin/H2Anim",
+   "clips_reference": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2anim/reports/ue-measure-clips.json",
+   "default_mi_key": "team:figure:P1",
+   "expect": {
+    "base_uv_channels": 2,
+    "bone_names": [
+     "SKEL_UM_Humanoid",
+     "root",
+     "hips",
+     "spine",
+     "head",
+     "arm_upper_L",
+     "arm_lower_L",
+     "hand_L",
+     "arm_upper_R",
+     "arm_lower_R",
+     "hand_R",
+     "weapon_R",
+     "leg_upper_L",
+     "leg_lower_L",
+     "foot_L",
+     "leg_upper_R",
+     "leg_lower_R",
+     "foot_R"
+    ],
+    "bones": 18,
+    "clips": 4,
+    "triangles": 33967
+   },
+   "folder": "/Game/PipelineCandidates/Merlin/H2LD",
+   "height_uu": 49.42,
+   "hero_root": "/Game/PipelineCandidates/Merlin",
+   "instances": {
+    "extra:MI_Merlin_H2LD_DebugClass": {
+     "parent": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD",
+     "scalars": {
+      "DebugView": 1.0
+     }
+    },
+    "extra:MI_Merlin_H2LD_Neutral": {
+     "parent": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD",
+     "scalars": {
+      "TeamDye": 0.0
+     },
+     "vectors": {
+      "TeamColor": [
+       1.0,
+       1.0,
+       1.0,
+       1.0
+      ]
+     }
+    },
+    "figure_instance": {
+     "parent": "/Game/UM/Materials/v2/M_UM_Figure_v2",
+     "scalars": {
+      "TeamDye": 1.0,
+      "TeamDyeCeiling": 9.018,
+      "TeamDyeGain": 27.1186
+     },
+     "switches": {
+      "UseTeamAccent": true,
+      "UseUV1Metres": true
+     },
+     "textures": {
+      "EdgeMaskTexture": "/Game/PipelineCandidates/Merlin/H2LD/Textures/T_Merlin_H2LD_EdgeMask",
+      "MatIDTexture": "/Game/PipelineCandidates/Merlin/H2LD/Textures/T_Merlin_H2LD_MatID",
+      "MatLUT": "/Game/PipelineCandidates/Merlin/H2LD/Textures/T_UM_MatLUT_Merlin",
+      "TeamAccentTexture": "/Game/PipelineCandidates/Merlin/H2LD/Textures/T_Merlin_H2LD_TeamAccent",
+      "TeamMaskTexture": "/Game/UM/Materials/Textures/T_UM_Mask_Black"
+     }
+    },
+    "team:base:P1": {
+     "parent": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_Base",
+     "vectors": {
+      "TeamColor": [
+       0.807,
+       0.5271,
+       0.1441,
+       1.0
+      ]
+     }
+    },
+    "team:base:P2": {
+     "parent": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_Base",
+     "vectors": {
+      "TeamColor": [
+       0.1022,
+       0.2122,
+       0.3467,
+       1.0
+      ]
+     }
+    },
+    "team:figure:P1": {
+     "parent": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD",
+     "switches": {
+      "UseTeamAccent": true
+     },
+     "vectors": {
+      "TeamColor": [
+       0.807,
+       0.5271,
+       0.1441,
+       1.0
+      ]
+     }
+    },
+    "team:figure:P2": {
+     "parent": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD",
+     "switches": {
+      "UseTeamAccent": true
+     },
+     "vectors": {
+      "TeamColor": [
+       0.1022,
+       0.2122,
+       0.3467,
+       1.0
+      ]
+     }
+    }
+   },
+   "skeleton": "/Game/PipelineCandidates/Merlin/Rig/SK_Merlin_Skeleton",
+   "textures": {
+    "BC": {
+     "compression_settings": "TC_DEFAULT",
+     "srgb": "True"
+    },
+    "EdgeMask": {
+     "compression_settings": "TC_GRAYSCALE",
+     "srgb": "False"
+    },
+    "MatID": {
+     "compression_settings": "TC_GRAYSCALE",
+     "filter": "TF_NEAREST",
+     "mip_gen_settings": "TMGS_NO_MIPMAPS",
+     "never_stream": "True",
+     "srgb": "False"
+    },
+    "MatLUT": {
+     "compression_settings": "TC_HDR",
+     "filter": "TF_NEAREST",
+     "mip_gen_settings": "TMGS_NO_MIPMAPS",
+     "never_stream": "True",
+     "size": [
+      16,
+      16
+     ],
+     "srgb": "False"
+    },
+    "N": {
+     "compression_settings": "TC_NORMALMAP",
+     "srgb": "False"
+    },
+    "ORM": {
+     "compression_settings": "TC_MASKS",
+     "srgb": "False"
+    },
+    "TeamAccent": {
+     "compression_settings": "TC_GRAYSCALE",
+     "mip_gen_settings": "TMGS_FROM_TEXTURE_GROUP",
+     "size": [
+      2048,
+      2048
+     ],
+     "srgb": "False"
+    }
+   }
+  },
+  "zones": [
+   "wool_coarse",
+   "silk",
+   "bronze",
+   "skin",
+   "leather_worn",
+   "wood"
+  ]
+ },
+ "console": [
+  "sg.ViewDistanceQuality 2",
+  "sg.AntiAliasingQuality 2",
+  "sg.ShadowQuality 2",
+  "sg.GlobalIlluminationQuality 2",
+  "sg.ReflectionQuality 2",
+  "sg.PostProcessQuality 2",
+  "sg.TextureQuality 2",
+  "sg.EffectsQuality 2",
+  "sg.FoliageQuality 2",
+  "sg.ShadingQuality 2",
+  "ShowFlag.Grid 0",
+  "ShowFlag.BillboardSprites 0",
+  "ShowFlag.Volumes 0",
+  "ShowFlag.Bloom 0",
+  "ShowFlag.Bloom 2",
+  "sg.ViewDistanceQuality 3",
+  "sg.AntiAliasingQuality 3",
+  "sg.ShadowQuality 3",
+  "sg.GlobalIlluminationQuality 3",
+  "sg.ReflectionQuality 3",
+  "sg.PostProcessQuality 3",
+  "sg.TextureQuality 3",
+  "sg.EffectsQuality 3",
+  "sg.FoliageQuality 3",
+  "sg.ShadingQuality 3",
+  "ShowFlag.Grid 2",
+  "ShowFlag.BillboardSprites 2",
+  "ShowFlag.Volumes 2",
+  "ShowFlag.Bloom 2"
+ ],
+ "editor_lock": {
+  "owner": "lookdev-r3",
+  "stale_taken": null,
+  "stamp": "lookdev-r3 2026-09-30T15:00:11+00:00 h5cb1 review Merlin b3.1",
+  "step": "h5cb1 review Merlin b3.1",
+  "waited_s": 0.0
+ },
+ "exposure_reading": {
+  "exposure": {
+   "auto_exposure_bias": -0.75,
+   "label": "P17 exposure EV100 1.3 - fixed",
+   "max_brightness": 2.462290048599243,
+   "method": "<AutoExposureMethod.AEM_HISTOGRAM: 0>",
+   "min_brightness": 2.462290048599243
+  },
+  "op": "exposure"
+ },
+ "exposure_restored": {
+  "exposure": {
+   "auto_exposure_bias": 0.0,
+   "label": "P17 exposure EV100 1.3 - fixed",
+   "max_brightness": 2.462290048599243,
+   "method": "<AutoExposureMethod.AEM_HISTOGRAM: 0>",
+   "min_brightness": 2.462290048599243
+  },
+  "op": "exposure"
+ },
+ "finished_at": "2026-09-30T15:04:43+00:00",
+ "frames": {
+  "back-debug": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "merlin-b3.1-back-debug.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_DebugClass",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3922,
+    0.4167,
+    0.4084
+   ],
+   "sha256": "e6faf46c55ac13fe746e665ff9abbc79f155d9c888de0f64c9d12ae9699994bd",
+   "subject": "Merlin (/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD)",
+   "variant": "debug",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "back-neutral": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "merlin-b3.1-back-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4111,
+    0.3976,
+    0.3966
+   ],
+   "sha256": "b46656b1e9b81d026f048ea3c60294fff4c609bd6e6795dab0e26a5f8e13761e",
+   "subject": "Merlin (/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "back-p1": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "merlin-b3.1-back-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4006,
+    0.4027,
+    0.4049
+   ],
+   "sha256": "0d768e33a3d21e0c31ce1ec13044b7ab39276bf6d85e3c9eb789ed5f98a1d8ec",
+   "subject": "Merlin (/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "back-p2": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "merlin-b3.1-back-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4241,
+    0.4046,
+    0.4085
+   ],
+   "sha256": "95d5a6896929390e63f51d9b8baddff51863a03540ef9bae79c2c0ee438ca091",
+   "subject": "Merlin (/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "back-plate": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "merlin-b3.1-back-plate.png",
+   "fov": 35.0,
+   "material": null,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4026,
+    0.3918,
+    0.3838
+   ],
+   "sha256": "9dac6f12294342fb51c31b52e63150d447d3d4a20b52ae4ef18c1dc80aba86f1",
+   "subject": "Merlin (/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD)",
+   "variant": "plate",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "back-reading": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "merlin-b3.1-back-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3532,
+    0.3355,
+    0.3391
+   ],
+   "sha256": "056a45efff02ad81b2db00edbbfbccfa76f4dea1da6a892a01938856851fcf45",
+   "subject": "Merlin (/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "front-debug": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "merlin-b3.1-front-debug.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_DebugClass",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4914,
+    0.478,
+    0.4594
+   ],
+   "sha256": "9bbcce5a4fad7d69b4b7da42ad845f0d304355e0868476ed1c7bcbedc228ff1d",
+   "subject": "Merlin (/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD)",
+   "variant": "debug",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "front-neutral": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "merlin-b3.1-front-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4157,
+    0.4276,
+    0.4287
+   ],
+   "sha256": "32a5d5b536463c92d07bf66e3a693f12f64e49d9c139832e60a4625b0ce4c0e2",
+   "subject": "Merlin (/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "front-p1": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "merlin-b3.1-front-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4637,
+    0.4349,
+    0.429
+   ],
+   "sha256": "ae8089136f023d8d5cc57889cc21b407de1a6fd4fa4cc05aaaa8e84d33b57294",
+   "subject": "Merlin (/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "front-p2": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "merlin-b3.1-front-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4505,
+    0.4346,
+    0.4356
+   ],
+   "sha256": "36de709131727363ceb09f97e33db4c73d9415a60cdd326996b680bbf42e64d2",
+   "subject": "Merlin (/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "front-plate": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "merlin-b3.1-front-plate.png",
+   "fov": 35.0,
+   "material": null,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4312,
+    0.4128,
+    0.4131
+   ],
+   "sha256": "adc23a8fb5a7d47a12b9f3fcfe80abd9bb73e865bad9bf37df6825e0439ae068",
+   "subject": "Merlin (/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD)",
+   "variant": "plate",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "front-reading": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "merlin-b3.1-front-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3748,
+    0.3738,
+    0.3735
+   ],
+   "sha256": "76bc3167be39fd523fd9c36631237f2d98e3b23b83356a5cefb4808755a2b24b",
+   "subject": "Merlin (/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "k2-1p6-neutral": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "merlin-b3.1-k2-1p6-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5434,
+    0.536,
+    0.5345
+   ],
+   "sha256": "82a1703b88682a7a042c269840ab9671a0ed113c26774007497052d4f826242f",
+   "subject": "Merlin (/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "kind": "game camera K2 1.6x (1207 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "k2-1p6-p1": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "merlin-b3.1-k2-1p6-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5458,
+    0.5427,
+    0.5398
+   ],
+   "sha256": "402f76b7dfc8cad125c7eca66dbb8533608ac5862d4e86e44b9a7f16ebe3aaa2",
+   "subject": "Merlin (/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "kind": "game camera K2 1.6x (1207 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "k2-1p6-p2": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "merlin-b3.1-k2-1p6-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5538,
+    0.5365,
+    0.5343
+   ],
+   "sha256": "7ff06d0fbbb98fe966243a3c632ebd55f0ff310b21b8df52c94da26db6bdfe83",
+   "subject": "Merlin (/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "kind": "game camera K2 1.6x (1207 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "k2-5x-neutral": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "merlin-b3.1-k2-5x-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.7079,
+    0.6836,
+    0.6877
+   ],
+   "sha256": "b6b74a32d8f4d390f874c83e075f2fcfc41242cfa80c7bda918026e20827d1de",
+   "subject": "Merlin (/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "k2-5x-p1": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "merlin-b3.1-k2-5x-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.7092,
+    0.6715,
+    0.6882
+   ],
+   "sha256": "220f1a95c639a4409cca6c6de6f88f342357dd245c50b94383a22965ae15b426",
+   "subject": "Merlin (/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "k2-5x-p2": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "merlin-b3.1-k2-5x-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.7062,
+    0.6848,
+    0.6972
+   ],
+   "sha256": "b1daf405197012f6312e53ff63280389d2ea2a87ce11b52ed833e520e3625458",
+   "subject": "Merlin (/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "k2-5x-reading": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "merlin-b3.1-k2-5x-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5461,
+    0.5265,
+    0.5233
+   ],
+   "sha256": "4152807d73306d5de5562b70d3ffde9239e79e2b35cdce63a2a5146d7e8c2109",
+   "subject": "Merlin (/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "side-debug": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "merlin-b3.1-side-debug.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_DebugClass",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3727,
+    0.3386,
+    0.3351
+   ],
+   "sha256": "fe080f8f61addc2bed2901f402f9545e732ed97691afb08b68269df7b58a7ec9",
+   "subject": "Merlin (/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD)",
+   "variant": "debug",
+   "view": {
+    "eye": [
+     -200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the right as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "side-neutral": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "merlin-b3.1-side-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3487,
+    0.3312,
+    0.337
+   ],
+   "sha256": "924bf77822046708852aeac3ac8a76bc988f55a6b414e1b87b51308347cb6a01",
+   "subject": "Merlin (/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     -200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the right as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "side-p1": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "merlin-b3.1-side-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3605,
+    0.3457,
+    0.3479
+   ],
+   "sha256": "653306db0a1a73a9eea4fccb43c98d30ddba32020c80f41b797991c18265505a",
+   "subject": "Merlin (/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     -200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the right as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "side-p2": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "merlin-b3.1-side-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3469,
+    0.3479,
+    0.349
+   ],
+   "sha256": "b637a2fb2257f92dc7994786ec6c4c915eb8a1277441d8b04a4a65be7b8c7f14",
+   "subject": "Merlin (/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     -200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the right as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "side-plate": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "merlin-b3.1-side-plate.png",
+   "fov": 35.0,
+   "material": null,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3258,
+    0.3115,
+    0.3059
+   ],
+   "sha256": "49d47974aa5028d5e7ed934c9bb965d28f47289c49c2370af877dc6e7722d40a",
+   "subject": "Merlin (/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD)",
+   "variant": "plate",
+   "view": {
+    "eye": [
+     -200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the right as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "side-reading": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "merlin-b3.1-side-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.31,
+    0.2923,
+    0.2964
+   ],
+   "sha256": "8a8e1797efe9aa7cf6f91c3bf6da09761ccd4cd27f648997810d33bd1977fa53",
+   "subject": "Merlin (/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     -200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the right as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  }
+ },
+ "gi_reflections": {
+  "r.DynamicGlobalIlluminationMethod": 1,
+  "r.ReflectionMethod": 1
+ },
+ "key_rotation_pitch_yaw_roll": [
+  -55.0,
+  30.0,
+  0.0
+ ],
+ "kind": "EDITOR review frames (live UnrealEditor via MCP): not packaged, no HUD, no RENDER fingerprint, not K1/K2 acceptance",
+ "light_profile": {
+  "data": {
+   "directional": {
+    "castShadows": true,
+    "intensity": 4.5,
+    "name": "key",
+    "posUU": [
+     -350,
+     -150,
+     600
+    ],
+    "rotation": [
+     -55,
+     30,
+     0
+    ],
+    "shadow": {
+     "cascades": 2,
+     "contactShadowLength": 0.0,
+     "distanceUU": 3000
+    }
+   },
+   "exposure": {
+    "bias": 0.0,
+    "ev100": 2.05,
+    "maxBrightness": 4.14106,
+    "method": "histogram-fixed",
+    "minBrightness": 4.14106
+   },
+   "points": [
+    {
+     "intensity": 85,
+     "name": "warm",
+     "posUU": [
+      260,
+      -300,
+      250
+     ],
+     "radiusUU": 450,
+     "role": "warm"
+    }
+   ],
+   "sky": {
+    "calibration": "W4-A bench: K1 board ROI median luma of the packaged DX12 + Lumen frame matched to the P17 editor K1 (131.2): sky 8 -> 112.1, 12 -> 139.4, 16 -> 159.5; 11.2 = x1.4 (K2 5x cobble corner 105.2 in P17 matched at x1.5)",
+    "colorLinear": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "cubemap": "/Game/S08/Render/TC_S08_AmbientDome",
+    "intensity": 11.2,
+    "lowerHemisphereIsBlack": false,
+    "replaces": "point fill 700 cd at (0,-100,550), radius 1800 (pre-W4)",
+    "source": "cubemap"
+   },
+   "source": "ART-005 editor probe reproduced for the opt-in Cobble review (S08BoardActor before T3.2); measured candidate, not a lighting norm",
+   "units": {
+    "directional": "lux",
+    "point": "candelas"
+   }
+  },
+  "source": "unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json lightProfiles.cobble-probe"
+ },
+ "original_level": "/Game/S08/S08Arena",
+ "restored_level": "/Game/S08/S08Arena",
+ "restored_level_dirty": false,
+ "review_level": "/Game/ArtTests/P17ControlScene/L_P17ControlScene",
+ "review_level_dirty_after_reload": false,
+ "run_assets_dirty": {
+  "base": false,
+  "base_instance": false,
+  "extra:MI_Merlin_H2LD_DebugClass": false,
+  "extra:MI_Merlin_H2LD_DebugZones": false,
+  "extra:MI_Merlin_H2LD_Neutral": false,
+  "figure_instance": false,
+  "skeletal": false,
+  "team:base:P1": false,
+  "team:base:P2": false,
+  "team:figure:P1": false,
+  "team:figure:P2": false,
+  "texture:BC": false,
+  "texture:EdgeMask": false,
+  "texture:MatID": false,
+  "texture:MatLUT": false,
+  "texture:N": false,
+  "texture:ORM": false,
+  "texture:TeamAccent": false,
+  "texture:ZoneID": false,
+  "texture:ZoneLUT": false
+ },
+ "scalability_after": {
+  "sg.AntiAliasingQuality": 3,
+  "sg.EffectsQuality": 3,
+  "sg.FoliageQuality": 3,
+  "sg.GlobalIlluminationQuality": 3,
+  "sg.PostProcessQuality": 3,
+  "sg.ReflectionQuality": 3,
+  "sg.ShadingQuality": 3,
+  "sg.ShadowQuality": 3,
+  "sg.TextureQuality": 3,
+  "sg.ViewDistanceQuality": 3
+ },
+ "scalability_before": {
+  "sg.AntiAliasingQuality": 3,
+  "sg.EffectsQuality": 3,
+  "sg.FoliageQuality": 3,
+  "sg.GlobalIlluminationQuality": 3,
+  "sg.PostProcessQuality": 3,
+  "sg.ReflectionQuality": 3,
+  "sg.ShadingQuality": 3,
+  "sg.ShadowQuality": 3,
+  "sg.TextureQuality": 3,
+  "sg.ViewDistanceQuality": 3
+ },
+ "scalability_during": {
+  "sg.AntiAliasingQuality": 2,
+  "sg.EffectsQuality": 2,
+  "sg.FoliageQuality": 2,
+  "sg.GlobalIlluminationQuality": 2,
+  "sg.PostProcessQuality": 2,
+  "sg.ReflectionQuality": 2,
+  "sg.ShadingQuality": 2,
+  "sg.ShadowQuality": 2,
+  "sg.TextureQuality": 2,
+  "sg.ViewDistanceQuality": 2
+ },
+ "schema": "unmatched.um-v2-hero-lookdev/1",
+ "screen_percentage": {
+  "r.Editor.Viewport.ScreenPercentage": 100,
+  "r.ScreenPercentage": 100
+ },
+ "setup": {
+  "hidden_review_actors": [
+   "P17 arthur base",
+   "P17 arthur figure",
+   "P17 barrel",
+   "P17 harpy1 base",
+   "P17 harpy1 figure",
+   "P17 harpy2 base",
+   "P17 harpy2 figure",
+   "P17 harpy3 base",
+   "P17 harpy3 figure",
+   "P17 medusa base",
+   "P17 medusa figure",
+   "P17 merlin base",
+   "P17 merlin figure"
+  ],
+  "level": "/Game/ArtTests/P17ControlScene/L_P17ControlScene",
+  "lights_after": [
+   {
+    "cast_shadows": true,
+    "class": "DirectionalLight",
+    "dynamic_shadow_cascades": 2,
+    "dynamic_shadow_distance_movable_light": 3000.0,
+    "hidden_in_editor": false,
+    "intensity": 4.5,
+    "label": "ART005 cool scene key - proposed",
+    "location": [
+     -350.0,
+     -150.0,
+     600.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     -55.0,
+     30.0,
+     -0.0
+    ]
+   },
+   {
+    "attenuation_radius": 1800.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": true,
+    "intensity": 0.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 neutral readability fill - review only",
+    "location": [
+     0.0,
+     100.0,
+     500.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "attenuation_radius": 450.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 85.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 warm lantern accent - proposed",
+    "location": [
+     260.0,
+     -300.0,
+     250.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "cast_shadows": true,
+    "class": "SkyLight",
+    "cubemap": "/Game/S08/Render/TC_S08_AmbientDome",
+    "hidden_in_editor": false,
+    "intensity": 11.2,
+    "label": "LDue sky - temporary",
+    "location": [
+     0.0,
+     0.0,
+     300.0
+    ],
+    "lower_hemisphere_is_black": false,
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "real_time_capture": false,
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "source_type": "<SkyLightSourceType.SLS_SPECIFIED_CUBEMAP: 1>"
+   }
+  ],
+  "lights_before": [
+   {
+    "cast_shadows": true,
+    "class": "DirectionalLight",
+    "dynamic_shadow_cascades": 4,
+    "dynamic_shadow_distance_movable_light": 40000.0,
+    "hidden_in_editor": false,
+    "intensity": 4.5,
+    "label": "ART005 cool scene key - proposed",
+    "location": [
+     -350.0,
+     -150.0,
+     600.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     -55.0,
+     30.0,
+     -0.0
+    ]
+   },
+   {
+    "attenuation_radius": 1800.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 700.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 neutral readability fill - review only",
+    "location": [
+     0.0,
+     100.0,
+     500.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "attenuation_radius": 450.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 85.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 warm lantern accent - proposed",
+    "location": [
+     260.0,
+     -300.0,
+     250.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   }
+  ],
+  "op": "setup"
+ },
+ "started_at": "2026-09-30T15:00:12+00:00",
+ "tag": "b3.1",
+ "throttle_cpu_when_not_foreground": {
+  "restored": {
+   "after": {
+    "bThrottleCPUWhenNotForeground": true
+   },
+   "before": {
+    "bThrottleCPUWhenNotForeground": false
+   }
+  },
+  "set": {
+   "after": {
+    "bThrottleCPUWhenNotForeground": false
+   },
+   "before": {
+    "bThrottleCPUWhenNotForeground": true
+   }
+  }
+ },
+ "tool": "tools/art/material_library/ue_hero_lookdev.py",
+ "warmup_mean_abs_diff": [
+  0.5878,
+  0.482,
+  0.4786,
+  0.4829,
+  0.4796,
+  0.4715,
+  0.4748,
+  0.4785,
+  0.4808,
+  0.4866,
+  0.4809,
+  0.4821,
+  0.4736,
+  0.4833,
+  0.4844,
+  0.4859,
+  0.4832,
+  0.4794,
+  0.475,
+  0.4816,
+  0.4795,
+  0.4837,
+  0.4778,
+  0.475,
+  0.475,
+  0.4775,
+  0.4813,
+  0.4788,
+  0.4849,
+  0.4822,
+  0.4738,
+  0.475,
+  0.4834,
+  0.4814,
+  0.4808,
+  0.478,
+  0.4715,
+  0.448,
+  0.4773
+ ]
+}

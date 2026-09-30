@@ -99,7 +99,7 @@
       0.03,
       0.6
      ],
-     "share_outside": 0.0022
+     "share_outside": 0.0011
     }
    },
    "passed": true
@@ -164,7 +164,7 @@
    "expected": "half values equal",
    "measured": {
     "bytes": 2196,
-    "dds_sha256": "7a1d3e68361649225aff4d525004f793fb654bd83d35e1973e9ac9a27307b65b"
+    "dds_sha256": "732baf0a1a061e06fa01d70611e9ba3879e39935a3a04620d4c93d4552033fe4"
    },
    "passed": true
   },
@@ -388,14 +388,14 @@
   },
   "skin": {
    "Y_p5_p50_p95": [
-    0.195,
-    0.3495,
-    0.4508
+    0.1657,
+    0.2971,
+    0.3832
    ],
    "bc_linear_median": [
-    0.4811,
-    0.3246,
-    0.2117
+    0.409,
+    0.2759,
+    0.1799
    ],
    "column": 13,
    "edge_mask_mean": 0.0617,
@@ -740,20 +740,20 @@
     "class": "skin",
     "field": "bc",
     "value": [
-     0.4811,
-     0.3246,
-     0.2117
+     0.409,
+     0.2759,
+     0.1799
     ]
    },
    {
     "class": "skin",
     "field": "ymedClassHero",
-    "value": 0.34949
+    "value": 0.29706
    }
   ],
   "builder": "tools/art/material_library/build_ue_inputs.py 2.0.0 (imported, main() not run)",
   "dds": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/T_UM_MatLUT_Harpy.dds",
-  "dds_sha256": "7a1d3e68361649225aff4d525004f793fb654bd83d35e1973e9ac9a27307b65b",
+  "dds_sha256": "732baf0a1a061e06fa01d70611e9ba3879e39935a3a04620d4c93d4552033fe4",
   "gold_antique_f0_hero": [
    1.0,
    0.437,
@@ -761,35 +761,35 @@
   ],
   "layout": "build_ue_inputs.LUT_ROWS (rows 0-9, 10-15 reserved), column = class index (hero slot 5 = horn_claw)",
   "overrides_json": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/T_UM_MatLUT_Harpy.overrides.json",
-  "overrides_sha256": "f91a739a4ceef32047179d8085080cce22033745222c817a280ba1610518f521"
+  "overrides_sha256": "f89d5857951ee77ab93da39658940b42cc0d5df68a10b6f84001a87a7c762a4b"
  },
  "passed": true,
  "preview_textures": {
   "BC_P1": {
-   "bytes": 5304128,
+   "bytes": 5297144,
    "mode": "RGB",
    "path": "work/lookdev/preview/LD_BC_P1.png",
-   "sha256": "9f76ff28ee00ec98109d3bb377df363223dbd4d518406ea63d8cae3753e049f0",
+   "sha256": "463474c7723fe1f1b1d515670f3f63f828610058a054d64f3d1c418eba369b7c",
    "size": [
     2048,
     2048
    ]
   },
   "BC_P2": {
-   "bytes": 5245172,
+   "bytes": 5238036,
    "mode": "RGB",
    "path": "work/lookdev/preview/LD_BC_P2.png",
-   "sha256": "6e0fc1301e44cfb54e071c3cc44dfca0e08259255c9323329eed1bb4cfcff4d2",
+   "sha256": "cb15b77b5359711abb2dc8f6df8840e73c86cca2965dc65e6c5370016f6be4cc",
    "size": [
     2048,
     2048
    ]
   },
   "BC_none": {
-   "bytes": 5209834,
+   "bytes": 5202624,
    "mode": "RGB",
    "path": "work/lookdev/preview/LD_BC_none.png",
-   "sha256": "03e17ec2cc5f65efcec92d9f5b90254d591cc75725f0157f80ee742043de6a32",
+   "sha256": "e6714641fa1bce5b2a5479b9c7d2915e00393755f3099c2544bd9a1790dacc1c",
    "size": [
     2048,
     2048
@@ -860,10 +860,10 @@
  "textures": {
   "2k": {
    "BC": {
-    "bytes": 5216820,
+    "bytes": 5209649,
     "mode": "RGB",
     "path": "textures/2k/T_Harpy_H3LD_BC.png",
-    "sha256": "dae99d8ff44524db409eb8963cde59fd914077a330fd1c5c4024cf0b28c2dde2",
+    "sha256": "824b11f1ab10d88b7a00e4f882897533810ec66725add8de22604e2f1851c50a",
     "size": [
      2048,
      2048
@@ -933,10 +933,10 @@
   },
   "4k": {
    "BC": {
-    "bytes": 14909802,
+    "bytes": 14890390,
     "mode": "RGB",
     "path": "textures/4k/T_Harpy_H3LD_BC.png",
-    "sha256": "cefcd805ec20538d32f17f7e3808188f53fda66d3c00ecde0ff5e71af5e13a4f",
+    "sha256": "18656c5c04055791442699a18f17bb1b4c0c3de60bf7e3a4f338a1d1449dacb3",
     "size": [
      4096,
      4096
@@ -1071,6 +1071,33 @@
     1.32,
     1.4,
     1.48
+   ],
+   "texels_4k_weight_ge_0_5": 443739
+  }
+ ],
+ "ue_feedback_r3": [
+  {
+   "Y_median_before_after": [
+    0.34949,
+    0.29706
+   ],
+   "bc_median_linear_after": [
+    0.40895,
+    0.27595,
+    0.17991
+   ],
+   "bc_median_linear_before": [
+    0.48112,
+    0.32465,
+    0.21165
+   ],
+   "class": "skin",
+   "mask": null,
+   "name": "skin_r3",
+   "ratio_effective": [
+    0.85,
+    0.85,
+    0.85
    ],
    "texels_4k_weight_ge_0_5": 443739
   }

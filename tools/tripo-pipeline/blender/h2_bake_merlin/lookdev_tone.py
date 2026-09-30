@@ -205,6 +205,15 @@ def main():
         per_zone[z]["gain_before_ue_feedback_r2"] = per_zone[z].get("gain")
         per_zone[z]["gain"] = C.rv(g, 4)
         per_zone[z]["ue_feedback_r2_gain"] = C.rv(np.asarray(fb2["gain"]), 4)
+    # look-dev round 3 (2026-09-30, after the UE capture b2): a third UE feedback (profile lookdev.tone.ue_feedback_r3),
+    # multiplied onto the gain above; the UE capture b3.x decides, not a forecast
+    fb3 = tone.get("ue_feedback_r3") or {}
+    for z in fb3.get("zones", []) if fb3.get("gain") else []:
+        g = np.asarray(gains[z], np.float64) * np.asarray(fb3["gain"], np.float64)
+        gains[z] = [round(float(x), 4) for x in g]
+        per_zone[z]["gain_before_ue_feedback_r3"] = per_zone[z].get("gain")
+        per_zone[z]["gain"] = C.rv(g, 4)
+        per_zone[z]["ue_feedback_r3_gain"] = C.rv(np.asarray(fb3["gain"]), 4)
     # ---------------------------------------------------------------- BC
     stt = np.load(prof.work / "lookdev" / "state.npz")
     zone_id = stt["zone_id"]
