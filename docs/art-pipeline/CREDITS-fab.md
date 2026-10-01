@@ -18,11 +18,16 @@ gitignored `unreal/Unmatched/Content/<Pack>/` и в git не попадают. �
 | [Particles and Wind Control System](https://www.fab.com/listings/f673ef70-1c66-4c7f-8751-9f84ddb8b083) | Dragon Motion | бесплатно (Permanent Collection) | разрешён | `Particles_Wind_Control_System` | 5.8 | светлячки, парящие огоньки, ветер |
 | [Free Niagara Particles (CC BY 4.0)](https://www.fab.com/listings/183732bc-c2fb-465c-9453-f70a1ce7ba2c) | SoftTofuVFX | **CC BY 4.0** | разрешён | `FreeParticle_SoftTofu` | 5.8 | лепестки, перья, искры |
 | [Water Materials](https://www.fab.com/listings/063155ea-d9d2-4f29-b09f-33270b0bc861) | tharlevfx | **CC BY 4.0** | разрешён | `WaterMaterials` (по факту папки) | 5.8 | вода реки/прибоя/водопада Sarpedon |
+| FREE Stylized Rocks Pack - Stylized Stones & Boulders | StyleHex Studio | Fab Standard | **NoAI** | `StyleHex_Studio` | 5.8 | добавил пользователь 2026-10-01; только вариант раскладки для пользователя, кадры не подаются ИИ |
 
 ## Атрибуция CC BY 4.0
 
 - «Free Niagara Particles» © SoftTofuVFX, CC BY 4.0, https://www.fab.com/listings/183732bc-c2fb-465c-9453-f70a1ce7ba2c — используется с изменениями (цвет/масштаб под ночную сцену).
 - «Water Materials» © tharlevfx, CC BY 4.0, https://www.fab.com/listings/063155ea-d9d2-4f29-b09f-33270b0bc861 — используется с изменениями (параметры материала).
+
+## Состояние загрузок
+
+Все паки из таблицы скачаны и лежат в `unreal/Unmatched/Content/<Папка>/` worktree и основной копии (2026-10-01 ~14:00).
 
 ## Отложено
 
