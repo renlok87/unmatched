@@ -103,6 +103,10 @@ constexpr int32 MaxFlows = 2;
 constexpr float FlowFeatherPx = 8.0f;  // the region edge feather of the shader
 constexpr int32 MaxLights = 6;
 constexpr int32 MaxAnims = 32;
+/** P7c "winds": env-layout props whose material wind (WPO) runs in live runs: scalar WindLive = 1 on a MID per slot
+ *  (MI_EnvCP_Banner keeps 0 = a still cloth, so the frozen -Bench stays reproducible). */
+constexpr int32 MaxWinds = 8;
+inline const TCHAR* const WindLiveParamName = TEXT("WindLive");
 constexpr int32 MaxShadowBlobs = 16;
 constexpr int32 MinSkySegments = 8;
 constexpr int32 MaxSkySegments = 128;
@@ -252,6 +256,7 @@ struct UNMATCHED_API FS08ConceptPasteSpec {
   FS08ConceptHide Hide;
   TArray<FS08ConceptLight> Lights;
   TArray<FS08ConceptAnim> Anims;
+  TArray<FString> WindProps;      // "winds": prop ids (P7c: the banner cloth's WPO wind runs live only)
   TArray<FS08ConceptShadowBlob> ShadowBlobs;
   TArray<FS08ConceptFlow> Flows;  // <= MaxFlows
   FS08ConceptSeaFlow SeaFlow;
@@ -276,7 +281,7 @@ struct UNMATCHED_API FS08ConceptPasteInputs {
 struct UNMATCHED_API FS08ConceptPasteMode {
   bool bOn = false;
   FString Reason = TEXT("no-block");  // no-block | gate | flag-on | flag-off | variant | variant-off | variant-other |
-                                      // default | missing-assets | overlay-absent | overlay-invalid
+                                      // default | missing-assets | overlay-absent | overlay-invalid | apply-failed
   bool bOverrideVariant = false;
   FString Variant;
 };
@@ -342,7 +347,8 @@ struct UNMATCHED_API FS08ConceptPasteRuntime {
   FString ProfileId;
   FString Key;                 // profile | mode | variant status: the same key = keep the parts
   FS08ConceptPasteMode Mode;
-  /** off | ok | missing (status of the parts; 'off' also when the mode is off) */
+  /** off | ok | missing | failed (status of the parts; 'off' also when the mode is off; P7c: anything but ok -> the board
+   *  actor falls back to the full P5c look, reason 'apply-failed') */
   FString Status = TEXT("off");
   bool bTraced = false;        // a concept-paste line was ever written (a grid-only run writes none)
   int32 SheetParts = 0;
@@ -375,6 +381,9 @@ UNMATCHED_API FS08ConceptPasteMode FallbackOff(const FS08ConceptPasteSpec& Spec,
 /** Automation only: inputs from this fake command line instead of FCommandLine (Reset -> the real one). */
 UNMATCHED_API void SetCommandLineOverrideForTest(const FString& FakeCommandLine);
 UNMATCHED_API void ResetCommandLineOverrideForTest();
+/** Automation only (P7c): every Apply ends with status 'failed' after the asset check (nothing spawned), so the board
+ *  actor's Apply-failure fallback (the full P5c look) can be exercised with the real assets. */
+UNMATCHED_API void SetForceApplyFailureForTest(bool bFail);
 UNMATCHED_API FS08ConceptPasteInputs InputsFromCommandLine(const TCHAR* CommandLine);
 
 /** Engine plane (100 uu, normal +Z) as the sea plane: 2 R x 2 R around the centre at Z. */
@@ -407,7 +416,7 @@ UNMATCHED_API FString MissingLine(const FString& Path);
 UNMATCHED_API FS08ConceptPasteAssets LoadAssets(const FS08ConceptPasteSpec& Spec);
 
 /** Spawns the sheet, the sea layer, the lights and the blobs under Root (owned by Owner), clears the previous ones;
- *  writes the trace. Status ok / missing (Assets.RequiredOk false: nothing spawned). */
+ *  writes the trace. Status ok / missing (Assets.RequiredOk false: nothing spawned) / failed (test hook). */
 UNMATCHED_API void Apply(const FS08ConceptPasteSpec& Spec, const FS08ConceptPasteAssets& Assets, const FVector2D& FrameHalf,
                          ES08ConceptGrade Grade, float EmissiveScale, bool bCalib, bool bFreezeFlow, AActor& Owner,
                          USceneComponent* Root,
@@ -428,7 +437,7 @@ UNMATCHED_API int32 RestoreHides(FS08ConceptPasteRuntime& Runtime);
 UNMATCHED_API FString GroundKindOf(const FString& ComponentName);
 }  // namespace S08ConceptPaste
 
-/** Drives the flicker of the concept lights and the sway of named props (world time). Created by the board actor only
+/** Drives the flicker of the concept lights, the sway of named props (world time) and the material wind of the "winds". Created by the board actor only
  *  when the block has an animation and the run is not frozen (-Bench without -EnvFxLive, or -EnvFxFreeze): frozen runs
  *  keep the base intensity / rotation, so evidence frames stay reproducible. */
 UCLASS()
@@ -439,7 +448,10 @@ public:
   US08ConceptPasteAnimComponent();
   void AddFlicker(UPointLightComponent* Light, const FS08ConceptLight& Spec);
   void AddSway(USceneComponent* Prop, const FS08ConceptAnim& Spec);
-  int32 Num() const { return Flickers.Num() + Sways.Num(); }
+  /** P7c: the material wind of a prop (a MID per slot with WindLive = 1; RestoreBase sets 0). */
+  void AddWind(UStaticMeshComponent* Prop);
+  int32 Num() const { return Flickers.Num() + Sways.Num() + Winds.Num(); }
+  int32 NumWinds() const { return Winds.Num(); }
   /** Back to the base intensity / rotation (before the component goes away). */
   void RestoreBase();
   virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -457,4 +469,5 @@ private:
   };
   TArray<FFlicker> Flickers;
   TArray<FSway> Sways;
+  TArray<TWeakObjectPtr<UStaticMeshComponent>> Winds;
 };

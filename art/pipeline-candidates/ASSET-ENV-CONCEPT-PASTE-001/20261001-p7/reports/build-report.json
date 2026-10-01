@@ -9,13 +9,13 @@
   },
   "blender_version": "5.2.2 LTS",
   "script_sha256_lf": {
-    "tools/art/concept_paste/blender_cp_assets.py": "23d90ec819bfdde6619a2d28c681dbc7f7785f74aa9aaac5c53dc1ad2c689c74",
+    "tools/art/concept_paste/blender_cp_assets.py": "6661a348fd97b7a6c69fc880f4f5e5b3e3b67b472617426500c748780c9ed92e",
     "tools/art/concept_paste/cp_proxies.py": "e2b80a35e378513f77115c0354adb7837d822d499c6a8ff4a49ca3da075845c5",
     "tools/art/env_kit/k_blender.py": "b291e157bf8d206bdad92632a3021596d3deeff579549ab34d3a56d62ac3955b"
   },
   "params": {
     "path": "art/pipeline-candidates/ASSET-ENV-CONCEPT-PASTE-001/20261001-p7/scripts/cp-assets-params.json",
-    "sha256": "593f6e1d0c2aeff580f43569807a08a8cad0050a7c2fc12813a541705469dd3d"
+    "sha256": "f93e07e401699fb18674b365e0121b7011a1d57aa0de223b99255dccc0b58f27"
   },
   "numpy": {
     "_camPosUE": [
@@ -867,8 +867,8 @@
     },
     {
       "fbx": "art/pipeline-candidates/ASSET-ENV-CONCEPT-PASTE-001/20261001-p7/export/SM_EnvCP_BannerCloth.fbx",
-      "sha256": "6b4dea4c53a60e72d6e72bb06af1609fbdea1909b53a30311ff7de7dba104be0",
-      "bytes": 214460,
+      "sha256": "c6bd831a9a502812d7a16310ea3447cbaf2c93b0023adbdd4a9ee0f463f9b313",
+      "bytes": 35932,
       "preset": "UM_FBX_v1.json",
       "exporter_kwargs": {
         "add_leaf_bones": false,
@@ -1025,40 +1025,40 @@
           "conforms": true
         },
         {
-          "setting": "Pivot: base centre after the stretch (XY bounds centre, min Z = lowest cloth tatter)",
+          "setting": "Pivot: base centre (XY bounds centre, min Z = the lowest hem tooth)",
           "standard": true,
           "used": true,
           "conforms": true
         }
       ],
       "name": "SM_EnvCP_BannerCloth",
-      "triangles": 3714,
+      "triangles": 828,
       "boundsUeLocalUU": {
         "min": [
-          -6.223,
-          -28.532,
+          -47.124,
+          -64.599,
           0.0
         ],
         "max": [
-          6.223,
-          28.532,
-          109.766
+          47.124,
+          64.599,
+          97.455
         ],
         "size": [
-          12.446,
-          57.065,
-          109.766
+          94.247,
+          129.198,
+          97.455
         ]
       },
       "roundtrip": {
         "mesh_objects": 1,
-        "triangles": 3714,
-        "expected_triangles": 3714,
+        "triangles": 828,
+        "expected_triangles": 828,
         "material_slots": [
-          "M_Env_Banner"
+          "MI_EnvCP_Banner"
         ],
         "expected_slots": [
-          "M_Env_Banner"
+          "MI_EnvCP_Banner"
         ],
         "uv_layers": [
           "UVMap"
@@ -1066,36 +1066,45 @@
         "color_attributes": [],
         "bounds_as_ue_uu": {
           "min": [
-            -6.223,
-            -28.532,
+            -47.124,
+            -64.599,
             0.0
           ],
           "max": [
-            6.223,
-            28.532,
-            109.766
+            47.124,
+            64.599,
+            97.455
           ]
         },
         "note": "read-back frame: UE = (x, -y, z)",
         "ue_frame_matches_build": true
       },
       "source": {
-        "fbx": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/SM_Env_Banner.fbx",
-        "sha256": "ecdbb7b845b0ee1d3d6f78941a166a0d6267a7f44fe54deee1e3cdbfa4b74164",
-        "triangles": 4637
+        "procedural": true,
+        "params": "bannerCloth (cp-assets-params.json)"
       },
-      "facesDeleted": 923,
-      "stretchZ": 1.6747,
-      "clothWidthUU": 41.566,
-      "clothLengthUU": 102.251,
-      "crossbarTopUU": 109.296,
-      "crossbarBottomUU": 102.251,
-      "pivotInSourceUU": [
-        -2.348,
-        0.0,
-        -6.439
+      "clothWidthUU": 40.0,
+      "clothLengthUU": 160.0,
+      "clothLengthToHemUU": 94.655,
+      "hangLocal": [
+        0.5973,
+        -0.5605,
+        -0.5736
       ],
-      "hangNote": "attach point = (0, 0, crossbarTopUU) x scale above the pivot",
+      "crossbarTopUU": 97.455,
+      "crossbarBottomUU": 95.255,
+      "crossbarXUU": -46.024,
+      "crossbarYUU": 40.599,
+      "clothTopUU": 94.655,
+      "pivotShiftUU": [
+        46.024,
+        -40.599,
+        65.345
+      ],
+      "uv": {
+        "UVMap": "u across the cloth, v 0 at the rail .. 1 at the hem (UE V down); the rod v 1.04..1.06 in Blender = -0.06..-0.04 in UE"
+      },
+      "hangNote": "attach point = (crossbarXUU, crossbarYUU, crossbarTopUU) x scale from the pivot (the sheared hang moves the bounds centre off the rail)",
       "checks": {
         "single_mesh": true,
         "triangles_preserved": true,
@@ -1138,5 +1147,8 @@
     "SM_EnvCP_BannerCloth": true,
     "measure:SM_Env_Cannon": true
   },
-  "checks_passed": true
+  "checks_passed": true,
+  "partialRebuilds": [
+    "banner (P7c --only)"
+  ]
 }

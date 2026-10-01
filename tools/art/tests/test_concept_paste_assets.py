@@ -240,10 +240,21 @@ class Proxies(unittest.TestCase):
         self.assertTrue(all(e["checks"].values()))
 
     def test_banner_cloth(self):
+        # P7c: a procedural cloth hanging along the C0 screen-down (hangLocal), the rail on top
         e = self.exports["SM_EnvCP_BannerCloth"]
         self.assertAlmostEqual(e["clothLengthUU"] / e["clothWidthUU"], self.params["bannerCloth"]["clothAspect"], places=2)
-        self.assertGreater(e["crossbarTopUU"], e["clothLengthUU"])
+        self.assertTrue(e["source"].get("procedural"))
         self.assertAlmostEqual(e["boundsUeLocalUU"]["max"][2], e["crossbarTopUU"], delta=1.0)
+        self.assertEqual(e["hangLocal"], self.params["bannerCloth"]["hangLocal"])
+        # the rail is the highest part; the cloth spans hangLocal.z x its length below it
+        self.assertAlmostEqual(e["crossbarTopUU"] - e["clothTopUU"], 2 * self.params["bannerCloth"]["rodRadiusUU"]
+                               + self.params["bannerCloth"]["rodClearUU"], delta=0.01)
+        self.assertGreater(e["clothTopUU"], -e["hangLocal"][2] * e["clothLengthUU"] * 0.8)
+        self.assertEqual(e["roundtrip"]["material_slots"], ["MI_EnvCP_Banner"])
+        self.assertTrue(all(e["checks"].values()))
+
+    def test_banner_hang_is_the_c0_screen_down(self):
+        self.assertEqual(LY.banner_hang_local(pp.load_spec("sarpedon")), self.params["bannerCloth"]["hangLocal"])
 
     def test_kit_cannon_measured(self):
         m = self.report["kitMeasurements"]["SM_Env_Cannon"]
@@ -294,7 +305,19 @@ class Overlays(unittest.TestCase):
             elif pid.startswith("cannon"):
                 pt = loc + LY.rot_yaw([0.0, cannon["barrelAxisYUU"] * s, cannon["barrelAxisZUU"] * s], yaw)
             else:
-                pt = loc + np.array([0.0, 0.0, ban["crossbarTopUU"] * s])
+                # P7c: the rail moved towardC0UU along the C0 ray of the design point (same C0 pixel, scaled)
+                rail = np.array([ban["crossbarXUU"], ban["crossbarYUU"], ban["crossbarTopUU"]])
+                pt = loc + LY.rot_yaw(rail * s, yaw)
+                cam0 = C.concept_cam()
+                tow = json.loads((HERE.parent / "concept_paste" / "sarpedon.paste.json").read_text(
+                    encoding="utf-8"))["layout"]["banner"]["towardC0UU"]
+                ray = np.array(DESIGN_WORLD[pid]) - cam0.pos
+                np.testing.assert_allclose(pt, np.array(DESIGN_WORLD[pid]) - ray / np.linalg.norm(ray) * tow,
+                                           atol=0.05, err_msg=pid)
+                got, _ = cam0.project(pt)
+                want, _ = cam0.project(np.array(DESIGN_WORLD[pid]))
+                self.assertLess(float(np.hypot(*(got - want))), 0.05, pid)
+                continue
             np.testing.assert_allclose(pt, DESIGN_WORLD[pid], atol=0.05, err_msg=pid)
             self.assertFalse(p["castShadow"])
         for fid in ("fire-fort", "fire-brazier"):
@@ -311,6 +334,9 @@ class Overlays(unittest.TestCase):
         self.assertNotIn("fireflies-beach", fx)
         self.assertEqual(fx["fireflies-forest-n"]["loc"], [-707.6, -118.9, 150.0])
         self.assertTrue(all(p["mesh"].startswith("/Game/EnvKit/") for p in merged["props"]))
+        # P7c: the dark-iron copy of the kit cannon
+        self.assertTrue(all(props[c]["mesh"] == "/Game/EnvKit/ConceptPaste/SM_EnvCP_Cannon"
+                            for c in ("cannon-1", "cannon-2", "cannon-3")))
 
     def test_banner_faces_the_camera_side(self):
         p = next(x for x in load(LAYOUTS / "sarpedon.concept.layout.json")["props"]["add"] if x["id"] == "banner-ship")

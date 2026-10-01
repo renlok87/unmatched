@@ -421,6 +421,14 @@ private:
   /** Decides the mode for the active board (gate, command line, block default) and loads its assets; a missing required
    *  asset falls back to off (P5c look). Called by UpdateEnvLayout before the layout (the mode picks the overlay). */
   void ResolveConceptPasteMode();
+  /** The env-layout request of the active board with the current concept mode (UpdateEnvLayout after the decision; the
+   *  Apply-failure fallback re-runs it without the concept overlay). */
+  void ApplyEnvLayout();
+  /** P7c: Apply ended != ok although the assets loaded: off ('apply-failed'), the env layout again without the concept
+   *  overlay (the P5c composition) and the backdrop back; remembered per profile (ResolveConceptPasteMode). */
+  void FallBackAfterApplyFailure();
+  /** profile | mode | reason | env-layout key | calib: the same key = keep the parts. */
+  FString ConceptPasteKey() const;
   /** After the env layout: off if the concept overlay did not apply; spawns / keeps / clears the parts, hides what the
    *  block lists (env components, fog), drives the anim component; traced. */
   void UpdateConceptPaste();
@@ -437,6 +445,8 @@ private:
   TArray<TObjectPtr<UObject>> ConceptAssetRefs;
   FS08ConceptPasteAssets ConceptAssets;
   FString ConceptAssetsProfileId;
+  /** P7c: the profile whose Apply failed (cleared when the assets of another profile load). */
+  FString ConceptApplyFailedProfileId;
   FS08ConceptPasteInputs ConceptInputs;
   FS08ConceptPasteMode ConceptMode;
   FS08ConceptPasteRuntime ConceptRuntime;

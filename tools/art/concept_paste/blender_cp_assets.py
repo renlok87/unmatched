@@ -1,6 +1,8 @@
 """ENV-MAPS P7 track A, Blender side of cp_proxies.py (headless `blender -b --factory-startup`, CPU only).
 
   blender -b --factory-startup --python tools/art/concept_paste/blender_cp_assets.py -- <params.json> <prepare.json>
+  blender -b --factory-startup --python tools/art/concept_paste/blender_cp_assets.py -- <params.json> - --only banner
+      (P7c: rebuild only these details and patch their entries into the existing build report)
 
 Builds (UM_FBX_v1 through tools/art/env_kit/k_blender.py; geometry authored in UE numbers):
   SM_<Name>_ConceptSheet (+ optional _ConceptSea)  from the numpy grids of cp_proxies.prepare (quads CCW seen from C0,
@@ -8,8 +10,8 @@ Builds (UM_FBX_v1 through tools/art/env_kit/k_blender.py; geometry authored in U
                                           (Blender V up -> UE V down)); planar regions dissolved, triangulated
   SM_EnvCP_LanternHead                    the hanging lantern of SM_Env_LanternPost (faces kept by centroid), pivot =
                                           base centre, custom normals / UVs / slot as the source
-  SM_EnvCP_BannerCloth                    cloth + cross-bar of SM_Env_Banner, the cloth stretched along Z to the painted
-                                          aspect, pivot = base centre
+  SM_EnvCP_BannerCloth                    P7c: a procedural cloth grid (aspect 4.0 of the painted banner, folds, toothed
+                                          hem, UV0 for the sigil / wind of M_EnvCP_Banner) + a rod, pivot = base centre
 and writes <run>/reports/build-report.json (schema unmatched.concept-paste.assets-build/1) + an FBX read-back per mesh.
 """
 import json
@@ -205,59 +207,105 @@ def build_lantern(P: dict, run: Path) -> dict:
 
 
 def build_banner(P: dict, run: Path) -> dict:
+    """P7c: a procedural hanging banner (the painted one: a long crimson cloth on a rail with a pale hexagram).
+
+    Why not the kit SM_Env_Banner any more (P7b): the painted cloth is 81 x 325 uu (aspect 4.0, design.json 5_elements),
+    the kit cloth 2.46 - a 1.6x Z stretch smears its Tripo texture; the Tripo atlas UVs cannot carry the painted sigil;
+    the WPO wind needs the hang height. Here: a cloth grid (UV0 u across, v 0 at the rail .. 1 at the hem, UE V down),
+    gentle folds growing to the hem, gathered top, a toothed hem, and a thin rod (UV v < 0: the material paints it as
+    the rod and keeps it still). UE mesh frame: front +X, width Y, up Z; pivot = base centre (XY bounds centre, min Z).
+    """
     Bp = P["bannerCloth"]
-    src = REPO / Bp["source"]
-    if S.sha256(src) != Bp["sourceSha256"]:
-        raise RuntimeError(f"{src}: sha256 differs from the params")
-    obj = import_source(src)
-    tris_in = S.triangles(obj)
-    c = face_centroids_ue(obj)
-    V = mesh_ue_verts(obj)
-    polys = list(obj.data.polygons)
-    fz_min = np.array([V[list(p.vertices), 2].min() for p in polys])
-    fz_max = np.array([V[list(p.vertices), 2].max() for p in polys])
-    # the cross-bar: faces beyond the cloth width; the cloth: off the pole axis, above the pole foot, below the bar
-    bar = np.abs(c[:, 1]) > float(Bp["crossbarMinAbsY"])
-    bar_v = np.unique(np.concatenate([list(polys[i].vertices) for i in np.nonzero(bar)[0]]))
-    zc_lo, zc_hi = float(V[bar_v, 2].min()), float(V[bar_v, 2].max())
-    cloth = ((np.abs(c[:, 1]) > float(Bp["clothMinAbsY"])) & (c[:, 2] > float(Bp["clothMinZ"]))
-             & (c[:, 2] < zc_lo - 0.5))
-    cloth_v = np.unique(np.concatenate([list(polys[i].vertices) for i in np.nonzero(cloth)[0]]))
-    zb = float(V[cloth_v, 2].min())
-    cloth_w = float(V[cloth_v, 1].max() - V[cloth_v, 1].min())
-    # delete every face reaching below the lowest cloth vertex (pole foot, base plate, the long pole quads) or above
-    # the cross-bar (spear tip)
-    doomed = (fz_min < zb - 0.5) | (fz_max > zc_hi + 0.5)
-    deleted = delete_faces(obj, doomed)
-    # stretch everything below the cross-bar bottom along Z (cloth length / width -> clothAspect)
-    length0 = zc_lo - zb
-    k = float(Bp["clothAspect"]) * cloth_w / length0
-    me = obj.data
-    n = len(me.vertices)
-    buf = np.zeros(n * 3)
-    me.vertices.foreach_get("co", buf)
-    co = buf.reshape(-1, 3)
-    zs = zc_lo / 100.0
-    below = co[:, 2] < zs
-    co[below, 2] = zs - (zs - co[below, 2]) * k
-    me.vertices.foreach_set("co", co.ravel())
-    me.update()
-    piv = move_pivot_to_base_centre(obj)
-    rename(obj, Bp["asset"])
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    W, L = float(Bp["widthUU"]), float(Bp["lengthUU"])
+    nu, nv = int(Bp["gridU"]), int(Bp["gridV"])
+    fold_a, folds, curl = float(Bp["foldAmpUU"]), float(Bp["folds"]), float(Bp["curlUU"])
+    gather = float(Bp["gatherTop"])
+    # the hang direction of the cloth in the mesh frame (unit; default straight down). P7c: the C0 screen-down
+    # direction in the yaw frame of the overlay (cp_layout.banner_hang_local), so the cloth hangs straight down in the
+    # concept view as painted, its top edge along the rail (a sheared panel); cp_layout --check verifies the numbers
+    hang = np.array(Bp.get("hangLocal", [0.0, 0.0, -1.0]), float)
+    hang /= np.linalg.norm(hang)
+    nrm = np.cross(np.array([0.0, 1.0, 0.0]), hang)  # the cloth normal (folds), towards +X for a downward hang
+    nrm /= np.linalg.norm(nrm)
+    tat, teeth = float(Bp["tatterUU"]), int(Bp["tatterTeeth"])
+    rod_r, rod_over, rod_clear = float(Bp["rodRadiusUU"]), float(Bp["rodOverhangUU"]), float(Bp["rodClearUU"])
+    top = L  # the cloth top (before the pivot shift), the hem near Z 0
+    rng = np.random.default_rng(int(Bp.get("seed", 7)))
+    jit = rng.uniform(0.35, 1.0, size=nu + 1)
+
+    def hem_lift(u: float, i: int) -> float:
+        # toothed hem: a triangle wave of `teeth` teeth x a fixed per-column jitter (deterministic seed)
+        t = abs(((u * teeth) % 1.0) - 0.5) * 2.0
+        return tat * t * jit[i]
+
+    mb = K.MeshBuilder(Bp["asset"], n_uv=1)
+    grid = np.zeros((nv + 1, nu + 1), dtype=int)
+    uvs = {}
+    for j in range(nv + 1):
+        v = j / nv
+        width_k = gather + (1.0 - gather) * min(1.0, v / 0.12)
+        for i in range(nu + 1):
+            u = i / nu
+            y = (u - 0.5) * W * width_k
+            dl = v * L  # distance down the cloth from the rail
+            if j == nv:
+                dl -= hem_lift(u, i)
+            elif j == nv - 1:
+                dl -= 0.35 * hem_lift(u, i)
+            vv = dl / L
+            off = fold_a * (0.35 + 0.65 * vv) * math.sin(2.0 * math.pi * folds * u + 0.7) + curl * vv * vv
+            pos = np.array([0.0, y, top]) + dl * hang + off * nrm
+            grid[j, i] = mb.add_verts([tuple(float(c) for c in pos)])
+            uvs[int(grid[j, i])] = (u, 1.0 - vv)  # Blender V up (UE V down after the FBX)
+    for j in range(nv):
+        for i in range(nu):
+            q = [int(grid[j + 1, i]), int(grid[j + 1, i + 1]), int(grid[j, i + 1]), int(grid[j, i])]  # CCW seen from +X
+            mb.add_face(q, [uvs[k] for k in q], 0)
+    # the rod: an 8-sided cylinder along Y above the cloth (UV v < 0 -> the material's rod colour, no wind)
+    sides = 8
+    zc = top + rod_clear + rod_r
+    y0, y1 = -W / 2 - rod_over, W / 2 + rod_over
+    ring0, ring1 = [], []
+    for k in range(sides):
+        a = 2.0 * math.pi * k / sides
+        x, z = rod_r * math.cos(a), zc + rod_r * math.sin(a)
+        ring0.append(mb.add_verts([(x, y0, z)]))
+        ring1.append(mb.add_verts([(x, y1, z)]))
+    for k in range(sides):
+        k2 = (k + 1) % sides
+        q = [ring0[k], ring0[k2], ring1[k2], ring1[k]]
+        mb.add_face(q, [(0.0, 1.06), (0.0, 1.04), (1.0, 1.04), (1.0, 1.06)], 0)
+    mb.add_face(list(reversed(ring0)), [(0.5, 1.05)] * sides, 0)
+    mb.add_face(ring1, [(0.5, 1.05)] * sides, 0)
+    # pivot: base centre
+    V = mb.verts()
+    lo, hi = V.min(0), V.max(0)
+    piv = np.array([(lo[0] + hi[0]) / 2.0, (lo[1] + hi[1]) / 2.0, lo[2]])
+    mb.V = [tuple(float(c) for c in (np.array(v) - piv)) for v in mb.V]
+    obj = mb.to_object([K.flat_material(Bp["slot"], (0.35, 0.03, 0.025), 0.85)])
+    for poly in obj.data.polygons:
+        poly.use_smooth = True
+    obj.data.update()
     slots = [m.name if m else None for m in obj.data.materials]
-    b = bounds_ue(obj)
     tris = S.triangles(obj)
-    bar_top = round(zc_hi - piv[2], 3)
+    cloth_len = float(top - piv[2])  # rail to the lowest hem point (Z)
+    bar_top = round(float(zc + rod_r - piv[2]), 3)
+    aspect = L / W
     return finish(obj, run / "export" / f"{Bp['asset']}.fbx", slots,
                   {"triangles_within_budget": tris <= int(Bp["maxTriangles"]),
-                   "aspect_reached": abs((zc_lo - zb) * k / cloth_w - float(Bp["clothAspect"])) < 0.01},
-                  {"_pivot": "base centre after the stretch (XY bounds centre, min Z = lowest cloth tatter)",
-                   "source": {"fbx": Bp["source"], "sha256": Bp["sourceSha256"], "triangles": tris_in},
-                   "facesDeleted": deleted, "stretchZ": round(k, 4),
-                   "clothWidthUU": round(cloth_w, 3), "clothLengthUU": round((zc_lo - zb) * k, 3),
-                   "crossbarTopUU": bar_top, "crossbarBottomUU": round(zc_lo - piv[2], 3),
-                   "pivotInSourceUU": [round(v, 3) for v in piv],
-                   "hangNote": "attach point = (0, 0, crossbarTopUU) x scale above the pivot"})
+                   "aspect_reached": abs(aspect - float(Bp["clothAspect"])) < 0.01},
+                  {"_pivot": "base centre (XY bounds centre, min Z = the lowest hem tooth)",
+                   "source": {"procedural": True, "params": "bannerCloth (cp-assets-params.json)"},
+                   "clothWidthUU": round(W, 3), "clothLengthUU": round(L, 3), "clothLengthToHemUU": round(cloth_len, 3),
+                   "hangLocal": [round(float(c), 4) for c in hang],
+                   "crossbarTopUU": bar_top, "crossbarBottomUU": round(float(zc - rod_r - piv[2]), 3),
+                   "crossbarXUU": round(float(-piv[0]), 3), "crossbarYUU": round(float(-piv[1]), 3),
+                   "clothTopUU": round(float(top - piv[2]), 3), "pivotShiftUU": [round(float(v), 3) for v in piv],
+                   "uv": {"UVMap": "u across the cloth, v 0 at the rail .. 1 at the hem (UE V down); the rod v 1.04..1.06 "
+                                   "in Blender = -0.06..-0.04 in UE"},
+                   "hangNote": "attach point = (crossbarXUU, crossbarYUU, crossbarTopUU) x scale from the pivot (the "
+                               "sheared hang moves the bounds centre off the rail)"})
 
 
 def measure_kit(P: dict) -> dict:
@@ -279,9 +327,34 @@ def measure_kit(P: dict) -> dict:
     return out
 
 
+def main_only(P: dict, only: list) -> None:
+    """P7c: rebuild only the named detail builders (lantern / banner) and patch their entries into the existing
+    build-report.json (the depth sheets, their FBX bytes and the numpy prepare are left as they are)."""
+    run = P["_run"]
+    path = run / "reports" / "build-report.json"
+    report = json.loads(path.read_text(encoding="utf-8"))
+    builders = {"lantern": build_lantern, "banner": build_banner}
+    for key in only:
+        e = builders[key](P, run)
+        report["exports"] = [x for x in report["exports"] if x["name"] != e["name"]] + [e]
+        print("CP-ASSETS %s tris=%d checks=%s" % (e["name"], e["triangles"], all(e["checks"].values())))
+    checks = {e["name"]: all(e["checks"].values()) for e in report["exports"]}
+    checks.update({f"measure:{k}": v["sha256Ok"] for k, v in report.get("kitMeasurements", {}).items()})
+    report["checks"] = checks
+    report["checks_passed"] = all(checks.values())
+    report["script_sha256_lf"][K.rel(HERE)] = S.text_sha256_lf(HERE)
+    report["params"] = {"path": K.rel(P["_params_path"]), "sha256": S.sha256(P["_params_path"])}
+    report["partialRebuilds"] = sorted(set(report.get("partialRebuilds", [])) | {f"{k} (P7c --only)" for k in only})
+    K.write_json(path, report)
+    print("CP-ASSETS-BUILD", json.dumps(checks))
+
+
 def main():
     args = K.script_args()
     P = K.load_params(args[0])
+    if "--only" in args:
+        main_only(P, [x.strip() for x in args[args.index("--only") + 1].split(",") if x.strip()])
+        return
     prep = json.loads(Path(args[1]).read_text(encoding="utf-8"))
     run = P["_run"]
     pr = P["proxies"]

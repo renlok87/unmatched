@@ -993,6 +993,10 @@ bool AS08BoardActor::EnsureEnvLayout(bool bArtPreview) {
 void AS08BoardActor::UpdateEnvLayout() {
   // ENV-MAPS P7: the concept-paste mode first - it picks the env-layout variant (the concept overlay, or the base).
   ResolveConceptPasteMode();
+  ApplyEnvLayout();
+}
+
+void AS08BoardActor::ApplyEnvLayout() {
   // Without the flags nothing was ever created: a grid board (and every run without -ArtPreviewDiorama) is untouched.
   if (!bEnvLayoutEnabled && !EnvRuntime.bApplied && EnvProps.IsEmpty() && EnvLights.IsEmpty()) return;
   FS08EnvLayoutRequest Request;
@@ -1030,6 +1034,7 @@ void AS08BoardActor::ResolveConceptPasteMode() {
     // once per profile: the out-of-git imports (ue_import_concept_paste.py, ue_concept_material.py) are there or not
     ConceptAssets = S08ConceptPaste::LoadAssets(Spec);
     ConceptAssetsProfileId = ActiveProfile.Id;
+    ConceptApplyFailedProfileId.Reset();
     ConceptAssetRefs.Reset();
     for (UObject* Asset : TArray<UObject*>{ConceptAssets.Material, ConceptAssets.Sheet, ConceptAssets.Plane,
                                            ConceptAssets.PlateA, ConceptAssets.PlateB, ConceptAssets.Sea,
@@ -1046,7 +1051,39 @@ void AS08BoardActor::ResolveConceptPasteMode() {
   if (!ConceptAssets.RequiredOk()) {
     // P5c stays: no paste, no hides, and no concept overlay (its props are removed for the painted surround)
     ConceptMode = S08ConceptPaste::FallbackOff(Spec, ConceptInputs, TEXT("missing-assets"));
+  } else if (ConceptApplyFailedProfileId == ActiveProfile.Id) {
+    // P7c: Apply failed on this profile before (FallBackAfterApplyFailure): straight to the P5c look, no flip-flop of the
+    // env layout on every rebuild
+    ConceptMode = S08ConceptPaste::FallbackOff(Spec, ConceptInputs, TEXT("apply-failed"));
   }
+}
+
+FString AS08BoardActor::ConceptPasteKey() const {
+  return FString::Printf(TEXT("%s|%d|%s|%s|calib=%d"), *ActiveProfile.Id, ConceptMode.bOn ? 1 : 0, *ConceptMode.Reason,
+                         *EnvRuntime.Key, ConceptInputs.bCalib ? 1 : 0);
+}
+
+void AS08BoardActor::FallBackAfterApplyFailure() {
+  // ENV-MAPS P7c: the assets loaded but Apply did not end 'ok'. The concept overlay is already applied (it removed the
+  // 54 painted-over P5c props) and the backdrop went with the mode: re-run the env layout WITHOUT the overlay (the P5c
+  // composition), bring the backdrop back; tray / fog / layout lights were never hidden (ApplyHides runs after an ok).
+  const FS08ConceptPasteSpec& Spec = ActiveProfile.ConceptPaste;
+  const FString Failed = ConceptRuntime.Status;
+  ConceptApplyFailedProfileId = ActiveProfile.Id;
+  S08ConceptPaste::Clear(ConceptParts, ConceptLights, ConceptRuntime);
+  S08ConceptPaste::RestoreHides(ConceptRuntime);
+  ConceptMode = S08ConceptPaste::FallbackOff(Spec, ConceptInputs, TEXT("apply-failed"));
+  ApplyEnvLayout();
+  UpdateBackdrop();
+  ConceptRuntime.Mode = ConceptMode;
+  ConceptRuntime.Key = ConceptPasteKey();
+  ConceptRuntime.bTraced = true;
+  FS08Trace::Write(FString::Printf(
+      TEXT("ARTPREVIEW concept-paste mode=off profile=%s map=%s reason=apply-failed status=%s fallback=base envVariant=%s:%s props=%d lights=%d backdrop=%s"),
+      *ActiveProfile.Id, *S08EnvLayout::MapKeyOf(ActiveProfile.Map.Name), *Failed,
+      EnvRuntime.Variant.Name.IsEmpty() ? TEXT("none") : *EnvRuntime.Variant.Name,
+      EnvRuntime.Variant.Status.IsEmpty() ? TEXT("-") : *EnvRuntime.Variant.Status, EnvProps.Num(), EnvLights.Num(),
+      BackdropRuntime.Status.IsEmpty() ? TEXT("-") : *BackdropRuntime.Status));
 }
 
 void AS08BoardActor::UpdateConceptPaste() {
@@ -1056,8 +1093,7 @@ void AS08BoardActor::UpdateConceptPaste() {
     if (const AExponentialHeightFog* FogActor = Cast<AExponentialHeightFog>(Actor)) Fog = FogActor->GetComponent();
   }
   const FString MapKey = S08EnvLayout::MapKeyOf(ActiveProfile.Map.Name);
-  const FString Key = FString::Printf(TEXT("%s|%d|%s|%s|calib=%d"), *ActiveProfile.Id, ConceptMode.bOn ? 1 : 0,
-                                      *ConceptMode.Reason, *EnvRuntime.Key, ConceptInputs.bCalib ? 1 : 0);
+  const FString Key = ConceptPasteKey();
   auto StopAnim = [this]() {
     if (ConceptAnim) {
       ConceptAnim->RestoreBase();
@@ -1120,7 +1156,10 @@ void AS08BoardActor::UpdateConceptPaste() {
   const FS08EnvFxOptions FxOptions = FS08EnvFxOptions::FromCommandLine();
   S08ConceptPaste::Apply(Spec, ConceptAssets, ActiveProfile.Map.FrameHalfUU(), Grade, EmissiveScale, ConceptInputs.bCalib,
                          FxOptions.bFreeze, *this, RootComponent, ConceptParts, ConceptLights, ConceptRuntime);
-  if (ConceptRuntime.Status != TEXT("ok")) return;
+  if (ConceptRuntime.Status != TEXT("ok")) {
+    FallBackAfterApplyFailure();  // P7c: the full P5c look, never a board without props and without the paste
+    return;
+  }
   // the painted surround replaces the env props / fx / lights / ground parts of the hide list and the fog (the backdrop
   // went with UpdateBackdrop, the tray goes with HideTrayForConceptPaste)
   S08ConceptPaste::ApplyHides(Spec.Hide, EnvRuntime, EnvProps, EnvLights, Fog, ConceptRuntime);
@@ -1154,6 +1193,19 @@ void AS08BoardActor::UpdateConceptPaste() {
                                        *Anim.Prop));
     }
   }
+  // P7c: the material wind of the "winds" props (the banner cloth): live runs only; frozen ones keep the still MI default
+  TArray<UStaticMeshComponent*> WindTargets;
+  for (const FString& Prop : Spec.WindProps) {
+    const int32 Index = EnvRuntime.Stats.PropComponentIds.IndexOfByKey(Prop);
+    UStaticMeshComponent* Target = Index != INDEX_NONE && EnvProps.IsValidIndex(Index) ? EnvProps[Index].Get() : nullptr;
+    if (Target) {
+      WindTargets.Add(Target);
+    } else {
+      ++MissingTargets;
+      FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW concept-paste wind prop=%s missing (not a spawned env-layout prop)"), *Prop));
+    }
+  }
+  int32 Winds = 0;
   if (!FxOptions.bFreeze) {
     US08ConceptPasteAnimComponent* Anim = NewObject<US08ConceptPasteAnimComponent>(
         this, MakeUniqueObjectName(this, US08ConceptPasteAnimComponent::StaticClass(), TEXT("ConceptPasteAnim")));
@@ -1161,6 +1213,8 @@ void AS08BoardActor::UpdateConceptPaste() {
     Flickers = Anim->Num();
     for (int32 I = 0; I < Spec.Anims.Num(); ++I) Anim->AddSway(SwayTargets[I], Spec.Anims[I]);
     Sways = Anim->Num() - Flickers;
+    for (UStaticMeshComponent* Target : WindTargets) Anim->AddWind(Target);
+    Winds = Anim->NumWinds();
     if (Anim->Num() > 0) {
       Anim->RegisterComponent();
       ConceptAnim = Anim;
@@ -1168,10 +1222,10 @@ void AS08BoardActor::UpdateConceptPaste() {
       Anim->MarkAsGarbage();
     }
   }
-  ConceptRuntime.Anims = Flickers + Sways;
-  FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW concept-paste anim profile=%s mode=%s flickers=%d sways=%d missingProps=%d"),
+  ConceptRuntime.Anims = Flickers + Sways + Winds;
+  FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW concept-paste anim profile=%s mode=%s flickers=%d sways=%d winds=%d/%d missingProps=%d"),
                                    *ActiveProfile.Id, FxOptions.bFreeze ? TEXT("frozen") : TEXT("live"), Flickers, Sways,
-                                   MissingTargets));
+                                   Winds, WindTargets.Num(), MissingTargets));
 }
 
 void AS08BoardActor::HideTrayForConceptPaste() {

@@ -23,6 +23,7 @@
 
 namespace S08ConceptPastePrivate {
 TOptional<FString> GFakeCommandLine;
+bool GForceApplyFailure = false;  // automation only (SetForceApplyFailureForTest)
 
 FString CpPackageOf(const FString& Path) {
   int32 Dot = INDEX_NONE;
@@ -301,7 +302,7 @@ bool ParseJson(const FString& BoardId, const TSharedPtr<FJsonObject>& O, FS08Con
                        TEXT("material"), TEXT("sheetMesh"), TEXT("plateA"), TEXT("plateB"), TEXT("seaPlate"),
                        TEXT("mask"), TEXT("lut"), TEXT("waterMask"), TEXT("camera"), TEXT("homography"), TEXT("rectA"), TEXT("rectB"),
                        TEXT("featherPx"), TEXT("outside"), TEXT("cut"), TEXT("grade"), TEXT("sea"), TEXT("hide"),
-                       TEXT("lights"), TEXT("anims"), TEXT("shadowBlobs"), TEXT("flow")},
+                       TEXT("lights"), TEXT("anims"), TEXT("winds"), TEXT("shadowBlobs"), TEXT("flow")},
                    Unknown)) {
     Fail(FString::Printf(TEXT("%s is not a field"), *Unknown));
   }
@@ -551,6 +552,21 @@ bool ParseJson(const FString& BoardId, const TSharedPtr<FJsonObject>& O, FS08Con
       }
     }
   }
+  if (O->HasField(TEXT("winds"))) {
+    const TArray<TSharedPtr<FJsonValue>>* Winds = nullptr;
+    if (!O->TryGetArrayField(TEXT("winds"), Winds) || !Winds || Winds->Num() > S08ConceptPasteSpec::MaxWinds) {
+      Fail(FString::Printf(TEXT("winds must be an array of at most %d prop ids"), S08ConceptPasteSpec::MaxWinds));
+    } else {
+      for (int32 I = 0; I < Winds->Num(); ++I) {
+        FString Prop;
+        if (!(*Winds)[I].IsValid() || !(*Winds)[I]->TryGetString(Prop) || !CpIsId(Prop) || Out.WindProps.Contains(Prop)) {
+          Fail(FString::Printf(TEXT("winds[%d] must be a unique env-layout prop id"), I));
+          continue;
+        }
+        Out.WindProps.Add(Prop);
+      }
+    }
+  }
   if (O->HasField(TEXT("shadowBlobs"))) {
     const TArray<TSharedPtr<FJsonValue>>* Blobs = nullptr;
     TSet<FString> BlobIds;
@@ -676,6 +692,8 @@ void SetCommandLineOverrideForTest(const FString& FakeCommandLine) {
 }
 
 void ResetCommandLineOverrideForTest() { S08ConceptPastePrivate::GFakeCommandLine.Reset(); }
+
+void SetForceApplyFailureForTest(bool bFail) { S08ConceptPastePrivate::GForceApplyFailure = bFail; }
 
 FS08ConceptPasteMode ResolveMode(const FS08ConceptPasteSpec& Spec, const FS08ConceptPasteInputs& In, bool bGate) {
   FS08ConceptPasteMode M;
@@ -968,6 +986,13 @@ void Apply(const FS08ConceptPasteSpec& Spec, const FS08ConceptPasteAssets& Asset
                                      *Runtime.ProfileId));
     return;
   }
+  if (GForceApplyFailure) {
+    // automation only (P7c): the assets are there, Apply fails anyway -> the board actor's full P5c fallback
+    Runtime.Status = TEXT("failed");
+    FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW concept-paste status=failed profile=%s (forced by the automation hook) -> no paste"),
+                                     *Runtime.ProfileId));
+    return;
+  }
   // the sheet: the depth mesh in board space (identity under the actor root, which sits at the world origin)
   UMaterialInstanceDynamic* SheetMid = UMaterialInstanceDynamic::Create(Assets.Material, &Owner);
   FS08ConceptMaterialParams SheetParams =
@@ -1154,7 +1179,28 @@ void US08ConceptPasteAnimComponent::AddSway(USceneComponent* Prop, const FS08Con
   S.BaseRotation = Prop->GetRelativeRotation();
 }
 
+void US08ConceptPasteAnimComponent::AddWind(UStaticMeshComponent* Prop) {
+  if (!Prop) return;
+  for (int32 Slot = 0; Slot < Prop->GetNumMaterials(); ++Slot) {
+    UMaterialInterface* Mat = Prop->GetMaterial(Slot);
+    if (!Mat) continue;
+    UMaterialInstanceDynamic* Mid = Cast<UMaterialInstanceDynamic>(Mat);
+    if (!Mid) Mid = Prop->CreateDynamicMaterialInstance(Slot, Mat);
+    if (Mid) Mid->SetScalarParameterValue(S08ConceptPasteSpec::WindLiveParamName, 1.0f);
+  }
+  Winds.Add(Prop);
+}
+
 void US08ConceptPasteAnimComponent::RestoreBase() {
+  for (const TWeakObjectPtr<UStaticMeshComponent>& W : Winds) {
+    UStaticMeshComponent* P = W.Get();
+    if (!P) continue;
+    for (int32 Slot = 0; Slot < P->GetNumMaterials(); ++Slot) {
+      if (UMaterialInstanceDynamic* Mid = Cast<UMaterialInstanceDynamic>(P->GetMaterial(Slot))) {
+        Mid->SetScalarParameterValue(S08ConceptPasteSpec::WindLiveParamName, 0.0f);
+      }
+    }
+  }
   for (const FFlicker& F : Flickers) {
     if (UPointLightComponent* L = F.Light.Get()) L->SetIntensity(F.BaseIntensity);
   }

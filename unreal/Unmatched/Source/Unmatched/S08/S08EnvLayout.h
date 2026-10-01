@@ -246,7 +246,7 @@ struct UNMATCHED_API FS08EnvSpawnStats {
 struct UNMATCHED_API FS08EnvFxOptions {
   bool bSpawn = true;     // false = -ArtPreviewNoFx
   bool bActivate = true;  // false: components are created and configured but never simulated (automation)
-  bool bFreeze = false;   // pause after the warmup (-Bench unless -EnvFxLive, or -EnvFxFreeze)
+  bool bFreeze = false;   // still after the warmup (-Bench unless -EnvFxLive, or -EnvFxFreeze): time dilation 0 (P7c)
   bool bBench = false;
   /** Automation only: systems by layout path instead of loading packages. */
   TMap<FString, UNiagaraSystem*> Preloaded;
@@ -271,6 +271,7 @@ struct UNMATCHED_API FS08EnvFxStats {
   int32 Particles = 0;             // live particles after the warmup (0 when not activated)
   int32 UserSet = 0;               // user parameters applied
   int32 UserMissing = 0;           // user parameters the system does not expose (or with the wrong arity)
+  int32 Frozen = 0;                // ENV-MAPS P7c: fx frozen by time dilation 0 after the warmup (trace 'still=')
   FString Mode;
   TArray<FString> MissingPaths;
   /** ENV-MAPS P7: the id of every component SpawnFx appended, in the order of OutFx. */
@@ -389,7 +390,7 @@ UNMATCHED_API int32 Clear(TArray<TObjectPtr<UStaticMeshComponent>>& Props,
                           TArray<TObjectPtr<UPointLightComponent>>& Lights);
 /** P5c: one UNiagaraComponent per enabled fx entry under Parent, owned by Owner (no collision, no shadow, no
  *  scalability culling, the fixed seed, the user parameters typed by the system's exposed parameters), activated,
- *  warmed up in WarmupTicks() fixed ticks and paused when Options.bFreeze; traced per fx. Skips (traced): disabled,
+ *  warmed up in WarmupTicks() fixed ticks and held still (time dilation 0, P7c) when Options.bFreeze; traced per fx. Skips (traced): disabled,
  *  anchor prop not in SpawnedPropIds, pivot on the painted map, missing system, a system with an enabled Light /
  *  Component renderer. FrameHalf feeds the near-band count. Nothing when !Options.bSpawn. */
 UNMATCHED_API FS08EnvFxStats SpawnFx(const FS08EnvLayout& Layout, AActor& Owner, USceneComponent* Parent,

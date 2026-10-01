@@ -9,6 +9,7 @@
 //   Geometry   sea plane + sky cylinder transforms, the shader mirror (cut under the frame, plate rectangles, feather,
 //              behind the camera), grade fallbacks, inverse ACES, flicker / sway
 //   EnvIds     what the board actor hides by: overlay-added / replaced ids (MergeOverlay), the spawned component ids
+//   ApplyFailure  P7c: Apply != ok with the assets loaded -> the full P5c look (base layout, backdrop, tray, fog)
 //   Actor      the board actor: nothing on grids or a refused map profile (no line), the shipped Sarpedon / Marmoreal
 //              once the map import ran (paste on or the traced P5c fallback; -EnvLayoutVariant=p5c; Marmoreal off)
 //   UnrealEditor-Cmd.exe Unmatched.uproject
@@ -414,6 +415,9 @@ bool FS08ConceptPasteParserTest::RunTest(const FString&) {
       {TEXT("light flicker"), BlockWith(TEXT("lights"), TEXT("[{\"id\":\"l\",\"loc\":[0,0,0],\"colorSrgb\":\"#FFFFFF\",\"intensityCd\":5,\"radius\":9,\"flicker\":{\"amp\":0.9}}]")), FString(), TEXT("lights[0] needs")},
       {TEXT("budget with the profile"), BlockWith(TEXT("lights"), Six), FString(), TEXT("conceptPaste lights 6 + light profile L points 1 > 6")},
       {TEXT("anim"), BlockWith(TEXT("anims"), TEXT("[{\"prop\":\"x\",\"swayDeg\":40,\"swayHz\":1}]")), FString(), TEXT("anims[0] needs")},
+      {TEXT("wind id"), BlockWith(TEXT("winds"), TEXT("[\"banner ship\"]")), FString(), TEXT("winds[0] must be")},
+      {TEXT("wind duplicate"), BlockWith(TEXT("winds"), TEXT("[\"b\",\"b\"]")), FString(), TEXT("winds[1] must be")},
+      {TEXT("winds not a list"), BlockWith(TEXT("winds"), TEXT("{\"b\":1}")), FString(), TEXT("winds must be")},
       {TEXT("blob"), BlockWith(TEXT("shadowBlobs"), TEXT("[{\"id\":\"b\",\"loc\":[0,0],\"diameterUU\":70}]")), FString(), TEXT("shadowBlobs[0] needs")},
       {TEXT("flow amplitude"), BlockWith(TEXT("flow"), TEXT("{\"regions\":[{\"id\":\"w\",\"rectPx\":[0,0,10,10],\"velocityPx\":[0,1],\"ampPx\":9}]}")), FString(), TEXT("flow.regions[0] needs")},
       {TEXT("flow regions"), BlockWith(TEXT("flow"), TEXT("{\"regions\":[{},{},{}]}")), FString(), TEXT("flow.regions must be")},
@@ -565,7 +569,10 @@ bool FS08ConceptPasteShippedTest::RunTest(const FString&) {
     TestTrue(L.Id + TEXT(": outside the painted map"), FMath::Abs(L.Loc.X) > Sarpedon->Map.HalfUU().X ||
                                                            FMath::Abs(L.Loc.Y) > Sarpedon->Map.HalfUU().Y);
   }
+  TestTrue("sarpedon: the banner cloth's material wind (P7c, live runs only)",
+           S.WindProps.Num() == 1 && S.WindProps[0] == TEXT("banner-ship"));
   const FS08ConceptPasteSpec& M = Marmoreal->ConceptPaste;
+  TestTrue("marmoreal: no material wind", M.WindProps.IsEmpty());
   TestTrue("marmoreal: block present, OFF by default (the accepted look)", M.bSet && !M.bDefaultOn && M.Variant == TEXT("concept"));
   TestTrue("marmoreal: no lights of its own, the layout lights stay, no sea", M.Lights.IsEmpty() && !M.Hide.bLayoutLights && !M.Sea.bSet);
   TestTrue("marmoreal: rectified plates A + B, edge clamp", M.Homography.IsIdentity() && !M.PlateAPath.IsEmpty() &&
@@ -943,6 +950,111 @@ bool FS08ConceptPasteActorTest::RunTest(const FString&) {
       NoPaste(A, TEXT("p5c"));
       A->Destroy();
     }
+  }
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08ConceptPasteApplyFailureTest,
+    "Unmatched.S08.ConceptPaste.ApplyFailure Apply != ok with the assets loaded: the full P5c look (base layout, backdrop, tray, fog, layout lights), no flip-flop",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08ConceptPasteApplyFailureTest::RunTest(const FString&) {
+  using namespace S08ConceptPasteTest;
+  // one FScope at a time: its destructor resets the overrides (a nested scope would end the outer one's)
+  FWorld W(TEXT("S08ConceptPasteApplyFailure"));
+  if (!TestNotNull("test world", W.World)) return false;
+  FS08BoardArtData Shipped;
+  TArray<FString> Errors;
+  if (!TestTrue("shipped data", Shipped.LoadFile(FS08BoardArtData::DefaultPath(), Errors))) return false;
+  const FS08BoardArtProfile* Sarpedon = Find(Shipped, TEXT("sarpedon-original"));
+  FS08BoardModel SarBoard;
+  FString SarId;
+  if (!Sarpedon || !TopologyBoard(TEXT("sarpedon.topology.json"), SarBoard, SarId)) {
+    AddError(TEXT("shipped Sarpedon profile or topology fixture missing"));
+    return false;
+  }
+  const FS08ConceptPasteSpec& S = Sarpedon->ConceptPaste;
+  const bool bMap = FPackageName::DoesPackageExist(Sarpedon->Map.MaterialInstancePath);
+  const bool bAssets = FPackageName::DoesPackageExist(S.SheetMeshPath) && FPackageName::DoesPackageExist(S.PlateBPath) &&
+                       FPackageName::DoesPackageExist(PackageOf(S.MaterialPath));
+  const bool bOverlay = FPaths::FileExists(S08EnvLayout::OverlayFileFor(S08EnvLayout::DefaultDir(), TEXT("sarpedon"), S.Variant));
+  if (!bMap || !bAssets || !bOverlay) {
+    AddWarning(TEXT("map / concept assets or the concept overlay not there (out of git): the Apply-failure fallback was NOT exercised"));
+    return true;
+  }
+  struct FLook {
+    int32 Props = 0, VisibleProps = 0, Lights = 0, VisibleLights = 0, BackdropParts = 0;
+    FString Variant, Backdrop;
+    bool bFog = false, bTray = false;
+  };
+  auto LookOf = [](const AS08BoardActor* A) {
+    FLook L;
+    for (const UStaticMeshComponent* C : A->GetEnvProps()) {
+      L.Props += C ? 1 : 0;
+      L.VisibleProps += C && C->IsVisible() ? 1 : 0;
+    }
+    for (const UPointLightComponent* C : A->GetEnvLights()) {
+      L.Lights += C ? 1 : 0;
+      L.VisibleLights += C && C->IsVisible() ? 1 : 0;
+    }
+    L.BackdropParts = A->GetBackdropParts().Num();
+    L.Variant = A->GetEnvLayoutRuntime().Variant.Name;
+    L.Backdrop = A->GetBackdropRuntime().Status;
+    L.bFog = A->GetAppliedRender().bFog;
+    L.bTray = A->GetDioramaTray() && A->GetDioramaTray()->IsVisible();
+    return L;
+  };
+  // the reference: the P5c composition of the same board (-EnvLayoutVariant=p5c)
+  FLook P5c;
+  {
+    FScope Off(TEXT("-EnvLayoutVariant=p5c"));
+    AS08BoardActor* A = W.Spawn();
+    if (!TestNotNull("board actor (p5c reference)", A)) return false;
+    A->EnsureDioramaTray(true);
+    TestTrue("env gate armed", A->EnsureEnvLayout(true));
+    A->SetArtDataForTest(Shipped);
+    A->SetRoomBoardId(SarId);
+    TestTrue("rebuild Sarpedon (p5c)", A->Rebuild(SarBoard));
+    P5c = LookOf(A);
+    A->Destroy();
+  }
+  TestTrue(FString::Printf(TEXT("P5c reference has props (%d) and layout lights (%d)"), P5c.Props, P5c.Lights),
+           P5c.Props > 0 && P5c.Lights > 0);
+  {
+    struct FHook {
+      FHook() { S08ConceptPaste::SetForceApplyFailureForTest(true); }
+      ~FHook() { S08ConceptPaste::SetForceApplyFailureForTest(false); }
+    } Hook;
+    FScope Default(TEXT(""));
+    AS08BoardActor* A = W.Spawn();
+    if (!TestNotNull("board actor (forced Apply failure)", A)) return false;
+    A->EnsureDioramaTray(true);
+    TestTrue("env gate armed", A->EnsureEnvLayout(true));
+    A->SetArtDataForTest(Shipped);
+    A->SetRoomBoardId(SarId);
+    TestTrue("rebuild Sarpedon (Apply fails)", A->Rebuild(SarBoard));
+    const FS08ConceptPasteMode& M = A->GetConceptPasteMode();
+    TestTrue(TEXT("mode off, reason apply-failed: ") + M.Reason, !M.bOn && M.Reason == TEXT("apply-failed"));
+    TestFalse("the paste is off", A->IsConceptPasteOn());
+    TestTrue("no concept part / light / hide / anim",
+             A->GetConceptPasteParts().IsEmpty() && A->GetConceptPasteLights().IsEmpty() &&
+                 A->GetConceptPasteRuntime().Hidden.IsEmpty() && A->GetConceptPasteAnim() == nullptr);
+    const FLook L = LookOf(A);
+    TestTrue(TEXT("env layout re-run without the concept overlay (variant: ") + L.Variant + TEXT(")"), L.Variant.IsEmpty());
+    TestEqual("the P5c props are back", L.Props, P5c.Props);
+    TestEqual("... all visible", L.VisibleProps, P5c.VisibleProps);
+    TestEqual("the P5c layout lights", L.Lights, P5c.Lights);
+    TestEqual("... all visible", L.VisibleLights, P5c.VisibleLights);
+    TestEqual(TEXT("the backdrop as in P5c"), L.Backdrop, P5c.Backdrop);
+    TestEqual("backdrop parts as in P5c", L.BackdropParts, P5c.BackdropParts);
+    TestEqual("the fog as in P5c", L.bFog, P5c.bFog);
+    TestEqual("the tray as in P5c", L.bTray, P5c.bTray);
+    // the same board again: remembered per profile, straight to P5c (the env layout is not respawned)
+    const FString EnvKey = A->GetEnvLayoutRuntime().Key;
+    TestTrue("rebuild Sarpedon again", A->Rebuild(SarBoard));
+    TestTrue("still apply-failed", !A->GetConceptPasteMode().bOn && A->GetConceptPasteMode().Reason == TEXT("apply-failed"));
+    TestEqual("the env layout kept (no flip-flop)", A->GetEnvLayoutRuntime().Key, EnvKey);
+    TestEqual("props unchanged", LookOf(A).VisibleProps, P5c.VisibleProps);
+    A->Destroy();
   }
   return true;
 }

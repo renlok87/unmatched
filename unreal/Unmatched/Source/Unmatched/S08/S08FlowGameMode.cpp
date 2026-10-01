@@ -6885,6 +6885,12 @@ void AS08FlowGameMode::RunRenderBench() {
       return;
     case 5:  // shot (after the ProfileGPU frame)
       if (Elapsed < B.NextAt) return;
+      // ENV-MAPS P7c: the camera of the frame itself (the 'camera settled' line is written when the tween enters the 1 %
+      // band, e.g. Fitx1.45 2707.3 of 2714.6; the tween ends on the target before the settle + measure windows end)
+      FS08Trace::Write(FString::Printf(TEXT("BENCH view=%s shot-camera dist=%.1f target=%.1f exact=%d focus=%s"), *View,
+                                       CameraZoom.Current, CameraZoom.Target,
+                                       FMath::IsNearlyEqual(CameraZoom.Current, CameraZoom.Target, 0.05f) ? 1 : 0,
+                                       *CameraZoom.CurrentFocus.ToCompactString()));
       B.ShotPath = FPaths::Combine(B.OutDir, FString::Printf(TEXT("bench-%s-1920x1080.png"),
                                                              *View.Replace(TEXT("."), TEXT("p"))));
       TakeEvidenceShot(B.ShotPath);

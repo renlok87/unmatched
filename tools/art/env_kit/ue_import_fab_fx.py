@@ -4,8 +4,8 @@ Every entry of FX_SPECS is duplicated from its pack system (never edited in plac
 are not cooked as a whole) into /Game/EnvKit/FX/<name> (cooked through DirectoriesToAlwaysCook /Game/EnvKit; the
 cooker follows the hard references into the pack folders for materials / textures) and tuned for the night boards:
   * system  (EditAnywhere, set from Python): bDeterminism on + a fixed RandomSeed (the layout adds a per-fx
-            RandomSeedOffset; S08EnvLayout.cpp warms every fx up in fixed 1/30 s ticks and pauses it in -Bench, so the
-            -Bench frames are reproducible), WarmupTime 0 (the warmup is per component)
+            RandomSeedOffset; S08EnvLayout.cpp warms every fx up in fixed 1/30 s ticks and holds it still in -Bench
+            (P7c: time dilation 0), so the -Bench frames are reproducible), WarmupTime 0 (the warmup is per component)
   * tune    (C++ US08EnvFxAuthoringLibrary.TuneNiagaraSystem, S08EnvFxAuthoring.cpp - the emitter data and the module
             constants are not reachable from editor Python): every emitter CPU sim + emitter determinism / seed, Light
             and Component renderers disabled (no dynamic light from VFX; budget 1 key + <= 6 points per map), the

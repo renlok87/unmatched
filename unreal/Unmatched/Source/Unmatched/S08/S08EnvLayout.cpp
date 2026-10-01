@@ -1272,7 +1272,18 @@ FS08EnvFxStats SpawnFx(const FS08EnvLayout& Layout, AActor& Owner, USceneCompone
     if (Options.bActivate) {
       C->Activate(true);
       if (Ticks > 0) C->AdvanceSimulation(Ticks, S08EnvLayoutSpec::FxWarmupTickS);
-      if (Options.bFreeze) C->SetPaused(true);
+      if (Options.bFreeze) {
+        // ENV-MAPS P7c: frozen = time dilation 0 (the component ticks with dt 0: no emitter update, the warmed particles
+        // stay as they are, but every tick re-sends the render data), NOT SetPaused. Root cause, measured in the cooked
+        // client (P6 / P7b packaged -Bench, P7c experiments): with PSO precaching (on in cooked builds, off in the
+        // editor) UNiagaraComponent::CreateSceneProxy is skipped while the system's PSOs are still compiling (the first
+        // component of a system usually gets its proxy before the precache request is in flight, every later one does
+        // not); the proxy is created a few frames later, but a PAUSED instance never ticks again, so the late proxy never
+        // receives dynamic data: the brazier / P6 campfire-w / every lantern flame after the first drew nothing although
+        // the trace counted their particles. -dpcvars=r.PSOPrecaching=0 showed them; SetForceSolo did not.
+        C->SetCustomTimeDilation(0.0f);
+        ++S.Frozen;
+      }
       Particles = EnvLiveParticles(*C);
     }
     OutFx.Add(C);
@@ -1316,10 +1327,10 @@ int32 ClearFx(TArray<TWeakObjectPtr<UNiagaraComponent>>& Fx) {
 
 FString FxSummaryLine(const FString& MapKey, const FS08EnvFxStats& S) {
   return FString::Printf(
-      TEXT("ARTPREVIEW envlayout fx map=%s fx=%d layoutFx=%d missingSystems=%d skippedMissing=%d skippedDisabled=%d skippedAnchor=%d skippedInsideMap=%d skippedLightRenderer=%d nearBand=%d gpuEmitters=%d nonDeterministic=%d particles=%d userSet=%d userMissing=%d mode=%s"),
+      TEXT("ARTPREVIEW envlayout fx map=%s fx=%d layoutFx=%d missingSystems=%d skippedMissing=%d skippedDisabled=%d skippedAnchor=%d skippedInsideMap=%d skippedLightRenderer=%d nearBand=%d gpuEmitters=%d nonDeterministic=%d particles=%d userSet=%d userMissing=%d mode=%s still=%d"),
       MapKey.IsEmpty() ? TEXT("-") : *MapKey, S.Fx, S.LayoutFx, S.MissingSystems, S.SkippedMissing, S.SkippedDisabled,
       S.SkippedAnchor, S.SkippedInsideMap, S.SkippedLightRenderer, S.NearBand, S.GpuEmitters, S.NonDeterministic,
-      S.Particles, S.UserSet, S.UserMissing, S.Mode.IsEmpty() ? TEXT("-") : *S.Mode);
+      S.Particles, S.UserSet, S.UserMissing, S.Mode.IsEmpty() ? TEXT("-") : *S.Mode, S.Frozen);
 }
 
 int32 Clear(TArray<TObjectPtr<UStaticMeshComponent>>& Props, TArray<TObjectPtr<UPointLightComponent>>& Lights) {

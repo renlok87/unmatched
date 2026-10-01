@@ -83,6 +83,16 @@ def ship_yaw(spec: dict) -> float:
     return math.degrees(math.atan2(n[1], n[0]))
 
 
+def banner_hang_local(spec: dict) -> list[float]:
+    """P7c: the C0 screen-down direction (-C0 up) in the banner's yaw frame (local X = the ship flat's normal to C0,
+    local Y along the rail): the hang of SM_EnvCP_BannerCloth (cp-assets-params.json bannerCloth.hangLocal)."""
+    yaw = math.radians(round(ship_yaw(spec), 2))
+    d = -C.concept_cam().up
+    xl = np.array([math.cos(yaw), math.sin(yaw), 0.0])
+    yl = np.array([-math.sin(yaw), math.cos(yaw), 0.0])
+    return [round(float(d @ xl), 4), round(float(d @ yl), 4), round(float(d[2]), 4)]
+
+
 def clamp(v, lo_hi):
     return min(max(float(v), float(lo_hi[0])), float(lo_hi[1]))
 
@@ -107,7 +117,8 @@ def build(map_key: str, base: dict, spec: dict, report: dict | None) -> tuple[di
         lant = export_of(report, Path(L["lantern"]["mesh"]).name)
         head_h = float(lant["boundsUeLocalUU"]["size"][2])
         glow = np.array(lant["glowOffsetUU"], float)
-        cannon = report["kitMeasurements"][Path(L["cannon"]["mesh"]).name]
+        # P7c: the overlay places the dark-iron copy (SM_EnvCP_Cannon, ue_import_concept_paste.py), measured on the kit mesh
+        cannon = report["kitMeasurements"][L["cannon"].get("measureMesh", Path(L["cannon"]["mesh"]).name)]
         can_len = float(cannon["boundsUU"]["max"][0]) - float(cannon["boundsUU"]["min"][0])
         ban = export_of(report, Path(L["banner"]["mesh"]).name)
         cloth_w = float(ban["clothWidthUU"])
@@ -137,11 +148,23 @@ def build(map_key: str, base: dict, spec: dict, report: dict | None) -> tuple[di
             elif d["kind"] == "banner":
                 yaw = round(ship_yaw(spec), 2)
                 s = clamp(d["sizeUU"][0] / cloth_w, L["banner"]["scaleRange"])
-                loc = P - np.array([0.0, 0.0, bar_top * s])
+                # P7c "towardC0UU": the whole cloth moves along the C0 ray of its top attachment towards the camera (same
+                # C0 pixel), the scale x (D - d) / D keeps its C0 size: a rigid shift off the ship's hull plane of the
+                # depth sheet by d x (ray . hull normal), so the sheet no longer clips it (P7b review: 115 of ~360 px)
+                tow = float(L["banner"].get("towardC0UU", 0.0))
+                if tow > 0.0:
+                    ray = P - C.concept_cam().pos
+                    D = float(np.linalg.norm(ray))
+                    P = P - ray / D * tow
+                    s = s * (D - tow) / D
+                # P7c: the sheared cloth (hangLocal) puts the rail off the pivot axis
+                rail = np.array([float(ban.get("crossbarXUU", 0.0)), float(ban.get("crossbarYUU", 0.0)), bar_top])
+                loc = P - rot_yaw(rail * s, yaw)
                 add_props.append({"id": pid, "mesh": L["banner"]["mesh"], "loc": [r2(v) for v in loc], "yawDeg": yaw,
                                   "scale": round(s, 3), "castShadow": shadow})
                 placed[d["id"]] = {"kind": "banner", "scale": round(s, 3), "topWorld": [r2(v) for v in P],
-                                   "clothLengthUU": r2(float(ban["clothLengthUU"]) * s)}
+                                   "clothLengthUU": r2(float(ban["clothLengthUU"]) * s),
+                                   "towardC0UU": float(L["banner"].get("towardC0UU", 0.0))}
             elif d["kind"] in ("campfire", "brazier"):
                 F = L["fire"]
                 k = F[d["kind"]]
@@ -268,6 +291,13 @@ def validate(map_key: str, base: dict, overlay: dict) -> list[str]:
             x, y = f["loc"][:2]
             if abs(x) < C.MAP_HX and abs(y) < C.MAP_HY:
                 err.append(f"fx {f['id']}: pivot on the painted map")
+    if map_key == "sarpedon" and BUILD_REPORT.is_file():
+        rep = load(BUILD_REPORT)
+        ban = next((e for e in rep["exports"] if e["name"] == "SM_EnvCP_BannerCloth"), None)
+        want = banner_hang_local(pp.load_spec(map_key))
+        got = (ban or {}).get("hangLocal")
+        if got is None or max(abs(a - b) for a, b in zip(got, want)) > 2e-3:
+            err.append(f"SM_EnvCP_BannerCloth hangLocal {got} != the C0 screen-down {want} (blender_cp_assets.py --only banner)")
     lights = overlay.get("conceptPaste", {}).get("lights", {})
     ref = lights.get("reference", [])
     n_lights = len(ref) if lights.get("mode") == "profile" else len(base.get("lights", []))
