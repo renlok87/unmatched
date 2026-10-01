@@ -1,0 +1,82 @@
+{
+ "schema": "unmatched.concept-paste.spec/1",
+ "map": "sarpedon",
+ "status": "предложено (ENV-MAPS P7 prototype + design; no UE yet)",
+ "coords": "C0 px = pixel coordinates of the concept camera frame 1920x1080 (pinhole HFOV 35, pitch -55, yaw -90, distance 1.45 x fit = 2714.63 uu, looking at the map centre); the outpainted extended canvas = the same camera with a larger image plane, C0 px -383.5..2303.5 x -215.8..1295.8. World = S08 board space (X right, Y towards the K1 camera, Z up, map plane Z 0, tray top Z -3).",
+ "plates": {
+  "dir": "C:/tmp/envmaps-research/p7/plates",
+  "manifest": "manifest.json",
+  "colour": {"file": "sarpedon-extended-2x.png", "size": [4680, 2634], "conceptRectPx": [668, 376, 3344, 1882],
+             "note": "the clean plate (painted lanterns / fires / cannons / banner removed) at x2 detail, pasted into the outpainted canvas; concept framing = rect [x0, y0, w, h]"},
+  "colourFallback": {"file": "sarpedon-clean.png", "size": [1672, 941], "conceptRectPx": [0, 0, 1672, 941]},
+  "concept": {"file": "C:/Users/ren/WebstormProjects/unmached/unmached/scraped-data/derived/concepts/env-v1/sarpedon-v2.png", "size": [1672, 941], "conceptRectPx": [0, 0, 1672, 941]},
+  "seaSky": {"file": "sarpedon-sea-sky.png", "size": [1920, 1080], "conceptRectPx": [0, 0, 1920, 1080],
+             "note": "night sea + cloud glow without the island; only used behind the island silhouette (disocclusion) after a luma / chroma match to the extended plate's sea"}
+ },
+ "registration": {"file": "registration.json (proto out dir)", "model": "homography C0 px -> concept px, identity within 1 px; TPS not needed"},
+ "geometry": {
+  "groundZ": -3.0,
+  "seaZ": -300.0,
+  "skyCylinder": {"centre": [0.0, -45.0], "radius": 1900.0, "note": "backdrop shell for the painted sky / moon glow"},
+  "vertexStepPx": 8,
+  "heightZones": [
+   {"id": "forest-canopy", "z": 150.0, "smoothPx": 14,
+    "poly": [[-383, 250], [-150, 200], [0, 60], [60, -100], [200, -170], [330, -216], [470, -216], [360, -20], [330, 120], [330, 200], [300, 260], [250, 380], [215, 540], [190, 690], [130, 760], [40, 760], [-60, 700], [-383, 600]]},
+   {"id": "bay-water", "z": -60.0, "smoothPx": 30,
+    "poly": [[870, -216], [1330, -216], [1320, 30], [1270, 105], [1180, 145], [1060, 140], [960, 110], [900, 55], [860, -10]]}
+  ],
+  "planeZones": [
+   {"id": "front-cliff", "type": "slope", "line0": {"Y": 342.0, "z": -3.0}, "line1": {"Y": 442.0, "z": -176.2},
+    "poly": [[120, 830], [250, 860], [330, 885], [1500, 885], [1600, 860], [1700, 840], [1790, 835], [1800, 1296], [250, 1296], [120, 1000], [60, 880]]},
+   {"id": "fort", "type": "vplane", "basePx": [[330, 172], [645, 172]],
+    "poly": [[330, -216], [660, -216], [655, 120], [645, 172], [330, 172], [335, 100]]},
+   {"id": "post-bay", "type": "vplane", "basePx": [[790, 205], [845, 205]],
+    "poly": [[788, -60], [848, -60], [848, 206], [788, 206]]},
+   {"id": "post-left", "type": "vplane", "basePx": [[250, 500], [335, 500]],
+    "poly": [[250, 320], [335, 320], [335, 502], [250, 502]]},
+   {"id": "post-stern", "type": "vplane", "basePx": [[1372, 182], [1442, 182]],
+    "poly": [[1372, -60], [1442, -60], [1442, 184], [1372, 184]]},
+   {"id": "crate-deck-n", "type": "vplane", "basePx": [[1500, 402], [1585, 402]],
+    "poly": [[1500, 300], [1585, 300], [1585, 404], [1500, 404]]},
+   {"id": "crate-deck-se", "type": "vplane", "basePx": [[1675, 762], [1770, 762]],
+    "poly": [[1675, 635], [1770, 635], [1770, 764], [1675, 764]]},
+   {"id": "stump-brazier", "type": "vplane", "basePx": [[242, 728], [332, 728]],
+    "poly": [[242, 600], [332, 600], [332, 730], [242, 730]]},
+   {"id": "ship", "type": "vplane", "basePx": [[1528, 205], [1863, 421]],
+    "poly": [[1490, -216], [2304, -216], [2304, 1060], [2150, 1010], [1990, 950], [1850, 890], [1800, 860], [1863, 421], [1528, 205], [1490, 180]]}
+  ],
+  "islandMatte": {"featherPx": 3,
+   "poly": [[-383, 250], [-150, 200], [0, 60], [60, -100], [200, -170], [330, -216], [480, -216], [520, -60], [700, -40], [1330, -40], [1360, -216], [2304, -216], [2304, 1060], [2150, 1010], [1990, 950], [1850, 890], [1780, 940], [1740, 1100], [1760, 1296], [330, 1296], [260, 1100], [200, 960], [120, 860], [40, 790], [-60, 720], [-383, 620]],
+   "note": "island + ship = the depth sheet; the rest = sea layer (sea plane + sky cylinder). The bay water (y -40..150) stays on the sheet and ramps down to the sea level, so the matte edge across the open water at y -40 has no depth step."},
+  "skyPoly": [[-383, -216], [330, -216], [200, -170], [60, -100], [0, 60], [-150, 200], [-383, 250]]
+ },
+ "cut": {
+  "note": "what stays real: the original map + the 3D frame-002 (4b keep). The painted surround starts 2 uu UNDER the 3D frame's outer foot, so the seam is covered by the frame; the painted frame of the concept is about 2x wider than frame-002 (outer edge ~49-50 uu from the map vs 24 uu), so the band between our frame's outer edge and the painted frame's outer edge is replaced by a mirror fill of the ground just outside it.",
+  "underFrameUU": 2.0,
+  "paintedFrameOuterUU": {"far": 51.0, "east": 63.0, "west": 61.0, "near": 87.0},
+  "paintedFrameMeasured": "luma profiles across the registered concept frame on the ground plane (proto measure): wood ends at ~48-50 uu (far, sand starts), ~61 (east), ~59 (west), ~85 (near: top + front face down to the rocks) from the map edge; frame-002 = 24 uu",
+  "paintedCornerUU": 78.0,
+  "mirrorFeatherUU": 4.0
+ },
+ "details": [
+  {"id": "lantern-bay", "kind": "lantern", "px": [818, 60], "on": "post-bay", "light": false, "anim": "flicker", "sizePx": [34, 50]},
+  {"id": "lantern-left", "kind": "lantern", "px": [301, 393], "on": "post-left", "light": true, "anim": "flicker", "sizePx": [34, 52]},
+  {"id": "lantern-stern", "kind": "lantern", "px": [1408, 76], "on": "post-stern", "light": false, "anim": "flicker", "sizePx": [30, 46]},
+  {"id": "lantern-rail", "kind": "lantern", "px": [1783, 247], "on": "ship", "light": false, "anim": "flicker+sway", "sizePx": [40, 60]},
+  {"id": "lantern-deck-n", "kind": "lantern", "px": [1541, 344], "on": "crate-deck-n", "light": true, "anim": "flicker", "sizePx": [32, 48]},
+  {"id": "lantern-deck-se", "kind": "lantern", "px": [1719, 695], "on": "crate-deck-se", "light": true, "anim": "flicker", "sizePx": [44, 66]},
+  {"id": "fire-fort", "kind": "campfire", "px": [454, 182], "on": "ground", "light": true, "anim": "fire+smoke+sparks", "sizePx": [70, 60]},
+  {"id": "fire-brazier", "kind": "brazier", "px": [287, 655], "on": "stump-brazier", "light": true, "anim": "fire+sparks", "sizePx": [50, 50]},
+  {"id": "cannon-1", "kind": "cannon", "px": [1579, 241], "on": "ground", "heightUU": 22.0, "light": false, "anim": "none (static; optional recoil idle off)", "sizePx": [90, 40]},
+  {"id": "cannon-2", "kind": "cannon", "px": [1654, 339], "on": "ground", "heightUU": 22.0, "light": false, "anim": "none", "sizePx": [90, 40]},
+  {"id": "cannon-3", "kind": "cannon", "px": [1768, 496], "on": "ground", "heightUU": 22.0, "light": false, "anim": "none", "sizePx": [100, 45]},
+  {"id": "banner-ship", "kind": "banner", "px": [1880, 388], "on": "ship", "light": false, "anim": "wind (WPO cloth sway)", "sizePx": [90, 360], "note": "px = top attachment; hangs down ~360 px in the concept"}
+ ],
+ "overlays": [
+  {"id": "waterfall", "kind": "flow overlay", "on": "front-cliff", "pxRect": [640, 885, 1000, 1296], "anim": "panning foam + normal distortion of the painted water, additive / masked by the painted water luma"},
+  {"id": "surf-bay", "kind": "surf overlay", "on": "bay-water", "pxRect": [870, -216, 1330, 150], "anim": "foam lines (panner) masked to the painted surf"},
+  {"id": "surf-sea", "kind": "surf overlay", "on": "sea", "anim": "UV flow distortion of the sea layer + foam panner (the sea plate already holds the painted foam)"},
+  {"id": "fireflies-forest", "kind": "particles", "on": "forest-canopy", "px": [150, 330], "anim": "NS_Env_Fireflies (existing, CPU, frozen in bench)"},
+  {"id": "cloud-drift", "kind": "optional", "on": "sky", "anim": "slow UV pan of a cloud layer (optional)"}
+ ]
+}
