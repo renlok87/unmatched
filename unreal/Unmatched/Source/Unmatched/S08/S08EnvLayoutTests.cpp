@@ -9,6 +9,15 @@
 //             the shipped Marmoreal board once the map, the kit and the layout exist (else AddWarning)
 //   Shipped   Config/ArtBoards/EnvLayouts/{marmoreal,sarpedon}.layout.json against the contract (AddWarning if absent)
 //   KitAssets the imported /Game/EnvKit kit against tools/art/env_kit/ue_import_env_kit.py (AddWarning if absent)
+//   P5c track V:
+//   FxParse   the optional "fx" section: fields, user parameters, seed / warmup, anchored transform; rejection table
+//   Variant   -EnvLayoutVariant overlays: merge (remove / replace / add, fx dropped with their anchor), rejection
+//             table, ApplyVariant none / absent / invalid fallback / ok, overlay files never resolve as a base
+//   FxSpawn   a fake map-image board: Niagara components (transient system, not activated) - counts, settings,
+//             anchored transform, skips (disabled / anchor / on the map / missing system), near band, -ArtPreviewNoFx,
+//             Update with a variant overlay + fx (keep / respawn / fallback), board change and grid clear the fx
+//   FxAssets  the derived /Game/EnvKit/FX systems of the shipped layouts: CPU, deterministic, no light / component
+//             renderer (tools/art/env_kit/ue_import_fab_fx.py; AddWarning if absent)
 //   UnrealEditor-Cmd.exe Unmatched.uproject
 //     -ExecCmds="Automation RunTests Unmatched.S08.EnvLayout; Quit" -unattended -nosplash -nullrhi
 #if WITH_AUTOMATION_TESTS
@@ -32,10 +41,19 @@
 #include "Materials/MaterialInstance.h"
 #include "Materials/MaterialInterface.h"
 #include "Misc/AutomationTest.h"
+#include "Misc/Crc.h"
 #include "Misc/FileHelper.h"
 #include "Misc/PackageName.h"
 #include "Misc/Paths.h"
+#include "NiagaraComponent.h"
+#include "NiagaraComponentRendererProperties.h"
+#include "NiagaraEmitter.h"
+#include "NiagaraEmitterHandle.h"
+#include "NiagaraLightRendererProperties.h"
+#include "NiagaraRendererProperties.h"
+#include "NiagaraSystem.h"
 #include "PhysicsEngine/BodySetup.h"
+#include "UObject/Package.h"
 
 namespace S08EnvLayoutTest {
 struct FGateScope {
@@ -689,6 +707,7 @@ bool FS08EnvLayoutActorTest::RunTest(const FString&) {
   if (!TestNotNull("test world", W.World)) return false;
   auto NoEnv = [this](const AS08BoardActor* A, const TCHAR* What) {
     TestTrue(FString::Printf(TEXT("%s: no env components"), What), A->GetEnvProps().Num() == 0 && A->GetEnvLights().Num() == 0);
+    TestEqual(FString::Printf(TEXT("%s: no env fx (P5c)"), What), A->GetEnvLayoutRuntime().Fx.Num(), 0);
     TestFalse(FString::Printf(TEXT("%s: env never applied"), What), A->GetEnvLayoutRuntime().bApplied);
   };
   // 1) no -ArtPreviewDiorama: the gate stays shut; grid and topology boards alike
@@ -869,6 +888,7 @@ bool FS08EnvLayoutActorTest::RunTest(const FString&) {
         TestTrue("rebuild grid 5x6", A->Rebuild(EnvGridBoard(5, 6)));
         TestTrue("board change clears the environment", A->GetEnvProps().Num() == 0 && A->GetEnvLights().Num() == 0 &&
                                                             A->GetEnvLayoutRuntime().Ground.Num() == 0);
+        TestEqual("board change clears the fx (grid board: none)", A->GetEnvLayoutRuntime().Fx.Num(), 0);
         A->Destroy();
       }
     }
@@ -914,8 +934,32 @@ bool FS08EnvLayoutShippedTest::RunTest(const FString&) {
       const FString Folder = FString(S08EnvLayoutSpec::KitRoot) + B.Map.Name + TEXT("/");
       const bool bKit = P.Mesh.StartsWith(Folder) && Leaf.StartsWith(TEXT("SM_Env_")) && Names &&
                         Names->Contains(Leaf.RightChop(7));
-      TestTrue(FString::Printf(TEXT("%s/%s: mesh %s is a %sSM_Env_<kit name> of this map"), *Key, *P.Id, *P.Mesh, *Folder),
-               bKit);
+      // P5c: the AI-allowed Fab duplicates (tools/art/env_kit/ue_import_fab_picks.py) live in /Game/EnvKit/Fab/<Map>/
+      const FString FabFolder = FString(S08EnvLayoutSpec::KitRoot) + TEXT("Fab/") + B.Map.Name + TEXT("/");
+      const bool bFab = P.Mesh.StartsWith(FabFolder);
+      TestTrue(FString::Printf(TEXT("%s/%s: mesh %s is a %sSM_Env_<kit name> of this map or a %s duplicate"), *Key, *P.Id,
+                               *P.Mesh, *Folder, *FabFolder),
+               bKit || bFab);
+    }
+    // P5c fx: derived systems under /Game/EnvKit/FX/, emitters beside the painted map, anchors on props of this layout
+    for (const FS08EnvFx& F : L.Fx) {
+      TestTrue(FString::Printf(TEXT("%s/%s: fx system %s under /Game/EnvKit/FX/"), *Key, *F.Id, *F.System),
+               F.System.StartsWith(TEXT("/Game/EnvKit/FX/")));
+      const FTransform T = F.Transform(F.Anchor.IsEmpty() ? nullptr : L.FindProp(F.Anchor));
+      TestFalse(FString::Printf(TEXT("%s/%s: fx pivot %s off the painted map"), *Key, *F.Id, *T.GetTranslation().ToString()),
+                S08EnvLayout::PivotInsideMap(T.GetTranslation(), Half));
+    }
+    // P5c variants: every overlay of this map in the folder merges into a valid layout
+    TArray<FString> OverlayNames;
+    IFileManager::Get().FindFiles(OverlayNames, *FPaths::Combine(S08EnvLayout::DefaultDir(), Key + TEXT(".*.layout.json")),
+                                  true, false);
+    for (const FString& Name : OverlayNames) {
+      const FString Variant = FPaths::GetBaseFilename(Name).LeftChop(7).RightChop(Key.Len() + 1);  // <map>.<v>.layout
+      FS08EnvLayout Merged = L;
+      const FS08EnvVariantResult R = S08EnvLayout::ApplyVariant(S08EnvLayout::DefaultDir(), Key, Variant, Merged);
+      TestEqual(FString::Printf(TEXT("%s: overlay %s merges (%s)"), *Key, *Name, *FString::Join(R.Errors, TEXT(" | "))),
+                R.Status, FString(TEXT("ok")));
+      AddInfo(R.TraceLine(Key));
     }
     TestTrue(Key + TEXT(": <= 6 point lights"), L.Lights.Num() <= S08EnvLayoutSpec::MaxPointLights);
     if (L.Tray.bSet || L.Apron.bSet) {
@@ -1019,6 +1063,543 @@ bool FS08EnvLayoutKitAssetsTest::RunTest(const FString&) {
   int32 Total = 0;
   for (const TPair<FString, TArray<FString>>& Map : KitNames()) Total += Map.Value.Num();
   AddInfo(FString::Printf(TEXT("env kit meshes checked: %d / %d"), Checked, Total));
+  return true;
+}
+
+// ---- P5c track V: fx section + layout variants ------------------------------------------------------------------
+
+namespace S08EnvLayoutFxTest {
+const TCHAR* const TestSystemPath = TEXT("/Game/EnvKit/FX/NS_S08EnvFxTest");
+const TCHAR* const MissingSystemPath = TEXT("/Game/EnvKit/FX/NS_NoSuchFxTest");
+
+FString FxJson(const FString& Id, const FString& System, const FVector& Loc, const FString& Extra = FString()) {
+  return FString::Printf(TEXT("{\"id\":\"%s\",\"system\":\"%s\",\"loc\":[%.3f,%.3f,%.3f]%s}"), *Id, *System, Loc.X, Loc.Y,
+                         Loc.Z, *Extra);
+}
+
+FString WithFx(const TArray<FString>& Fx) { return TEXT(",\"fx\":[") + FString::Join(Fx, TEXT(",")) + TEXT("]"); }
+
+FString OverlayJson(const FString& Map, const FString& Variant, const FString& Body) {
+  return FString::Printf(TEXT("{\"schema\":\"unmatched.env-layout-overlay/1\",\"map\":\"%s\",\"variant\":\"%s\"%s}"), *Map,
+                         *Variant, *Body);
+}
+
+/** A transient, empty Niagara system: components can be created and configured, never activated (automation). */
+UNiagaraSystem* TransientSystem() {
+  return NewObject<UNiagaraSystem>(GetTransientPackage(), MakeUniqueObjectName(GetTransientPackage(),
+                                                                               UNiagaraSystem::StaticClass(),
+                                                                               FName(TEXT("NS_S08EnvFxTest"))),
+                                   RF_Transient);
+}
+
+FS08EnvFxOptions InactiveOptions(UNiagaraSystem* System) {
+  FS08EnvFxOptions O;
+  O.bActivate = false;
+  if (System) {
+    O.Preloaded.Add(TestSystemPath, System);
+    O.Preloaded.Add(FString(TestSystemPath) + TEXT(".NS_S08EnvFxTest"), System);
+  }
+  return O;
+}
+}  // namespace S08EnvLayoutFxTest
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08EnvLayoutFxParseTest,
+    "Unmatched.S08.EnvLayout.FxParse the fx section keeps every field, anchors turn with their prop; every structural error rejects the layout",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08EnvLayoutFxParseTest::RunTest(const FString&) {
+  using namespace S08EnvLayoutTest;
+  using namespace S08EnvLayoutFxTest;
+  const FString Board = TEXT("c121b47f8d6eb28daccb76d05");
+  const FString Camp = PropJson(TEXT("camp"), CubePath, FVector(-560, -400, -3), TEXT(",\"yawDeg\":90"));
+  const FString Fire = FxJson(TEXT("fire"), TestSystemPath, FVector(10, 0, 6),
+                              TEXT(",\"anchor\":\"camp\",\"yawDeg\":15,\"scale\":0.5,\"seed\":77,\"warmupS\":1.5,"
+                                   "\"user\":{\"User.SpawnRate\":8,\"Color\":[1.6,0.8,1,1],\"Sprite Size Min\":[3,3],\"On\":true}"));
+  const FString Flies = FxJson(TEXT("flies"), TEXT("/Game/EnvKit/FX/NS_Env_Fireflies.NS_Env_Fireflies"),
+                               FVector(-650, 100, 40), TEXT(",\"enabled\":false"));
+  FS08EnvLayout L;
+  TArray<FString> Errors;
+  if (!TestTrue(TEXT("layout with fx parses: ") + FString::Join(Errors, TEXT(" | ")),
+                L.ParseJson(LayoutJson(TEXT("marmoreal"), Board, {Camp}, {}, WithFx({Fire, Flies})), Errors))) {
+    return false;
+  }
+  if (!TestEqual("2 fx", L.Fx.Num(), 2)) return false;
+  const FS08EnvFx& A = L.Fx[0];
+  TestTrue("fire: id / system / anchor", A.Id == TEXT("fire") && A.System == TestSystemPath && A.Anchor == TEXT("camp"));
+  TestTrue("fire: loc / yaw / scale", A.Loc.Equals(FVector(10, 0, 6)) && A.YawDeg == 15.0f && A.Scale == 0.5f);
+  TestTrue("fire: seed 77 kept", A.bSeedSet && A.Seed == 77 && A.EffectiveSeed() == 77);
+  TestEqual("fire: warmup 1.5 s = 45 fixed ticks of 1/30 s", A.WarmupTicks(), 45);
+  TestTrue("fire: enabled by default", A.bEnabled);
+  if (TestEqual("fire: 4 user parameters", A.User.Num(), 4)) {
+    // sorted by the raw key: Color, On, Sprite Size Min, User.SpawnRate (-> SpawnRate)
+    TestTrue("user[0] Color = 4 numbers", A.User[0].Name == TEXT("Color") && A.User[0].Num == 4 &&
+                                              A.User[0].Value.Equals(FVector4(1.6, 0.8, 1.0, 1.0)));
+    TestEqual("user[0] value string", A.User[0].ValueString(), FString(TEXT("(1.6,0.8,1,1)")));
+    TestTrue("user[1] On = bool 1", A.User[1].Name == TEXT("On") && A.User[1].Num == 1 && A.User[1].Value.X == 1.0);
+    TestTrue("user[2] Sprite Size Min = 2 numbers", A.User[2].Name == TEXT("Sprite Size Min") && A.User[2].Num == 2);
+    TestTrue("user[3] 'User.' prefix stripped", A.User[3].Name == TEXT("SpawnRate") && A.User[3].Value.X == 8.0);
+  }
+  const FS08EnvFx& B = L.Fx[1];
+  TestFalse("flies: disabled", B.bEnabled);
+  TestFalse("flies: no explicit seed", B.bSeedSet);
+  TestEqual("flies: seed = CRC of the id (stable)", B.EffectiveSeed(),
+            static_cast<int32>(FCrc::StrCrc32(TEXT("flies")) & 0x7FFFFFFFu));
+  TestEqual("flies: default warmup 2 s = 60 ticks", B.WarmupTicks(), 60);
+  TestEqual("2 unique systems", L.UniqueFxSystemPaths().Num(), 2);
+  // anchored transform: the offset turns with the prop (yaw 90: +X -> +Y), not scaled; yaws add up
+  const FS08EnvProp* CampProp = L.FindProp(TEXT("camp"));
+  if (TestNotNull("anchor prop", CampProp)) {
+    const FTransform T = A.Transform(CampProp);
+    AddInfo(FString::Printf(TEXT("anchored fire at %s yaw %.1f"), *T.GetTranslation().ToString(), T.Rotator().Yaw));
+    TestTrue("anchored location = prop pivot + yawed offset", T.GetTranslation().Equals(FVector(-560, -390, 3), 1e-3));
+    TestTrue("anchored yaw = 90 + 15", FMath::IsNearlyEqual(T.Rotator().Yaw, 105.0, 1e-3));
+    TestTrue("fx scale", T.GetScale3D().Equals(FVector(0.5), 1e-6));
+  }
+  TestTrue("board-space transform", B.Transform(nullptr).GetTranslation().Equals(FVector(-650, 100, 40)));
+  // a layout without "fx" has none
+  Errors.Reset();
+  FS08EnvLayout NoFx;
+  TestTrue("layout without fx parses", NoFx.ParseJson(LayoutJson(TEXT("marmoreal"), Board, {Camp}, {}), Errors));
+  TestEqual("no fx", NoFx.Fx.Num(), 0);
+
+  // rejection table
+  TArray<FString> TooMany;
+  for (int32 I = 0; I <= S08EnvLayoutSpec::MaxFx; ++I) {
+    TooMany.Add(FxJson(FString::Printf(TEXT("f%d"), I), TestSystemPath, FVector(-600, 0, 10)));
+  }
+  FString SeventeenParams = TEXT(",\"user\":{");
+  for (int32 I = 0; I <= S08EnvLayoutSpec::MaxFxUserParams; ++I) {
+    SeventeenParams += FString::Printf(TEXT("%s\"P%d\":1"), I ? TEXT(",") : TEXT(""), I);
+  }
+  SeventeenParams += TEXT("}");
+  const FString Ok = FxJson(TEXT("f"), TestSystemPath, FVector(-600, 0, 10));
+  struct FCase {
+    const TCHAR* Name;
+    FString Fx;  // the ",\"fx\":..." fragment
+    const TCHAR* Expect;
+  };
+  auto One = [](const FString& Extra) { return WithFx({FxJson(TEXT("f"), TestSystemPath, FVector(-600, 0, 10), Extra)}); };
+  const FCase Cases[] = {
+      {TEXT("fx not an array"), TEXT(",\"fx\":{}"), TEXT("fx is not an array")},
+      {TEXT("49 fx"), WithFx(TooMany), TEXT("fx >")},
+      {TEXT("fx entry not an object"), TEXT(",\"fx\":[3]"), TEXT("is not an object")},
+      {TEXT("fx id missing"), TEXT(",\"fx\":[{\"system\":\"/Game/EnvKit/FX/NS_A\",\"loc\":[-600,0,0]}]"), TEXT("id missing")},
+      {TEXT("duplicate fx id"), WithFx({Ok, Ok}), TEXT("duplicate id")},
+      {TEXT("system in a pack folder"),
+       WithFx({FxJson(TEXT("f"), TEXT("/Game/Stylish_Fire_VFX/Niagara/NS_Stylish_Fire_2"), FVector(-600, 0, 10))}),
+       TEXT("is not under /Game/EnvKit/")},
+      {TEXT("system without a root"), WithFx({FxJson(TEXT("f"), TEXT("Game/EnvKit/FX/NS_A"), FVector(-600, 0, 10))}),
+       TEXT("package path")},
+      {TEXT("anchor not a prop"), One(TEXT(",\"anchor\":\"nosuch\"")), TEXT("is not a prop id")},
+      {TEXT("anchor empty"), One(TEXT(",\"anchor\":\"\"")), TEXT("anchor is not")},
+      {TEXT("loc with 2 numbers"), TEXT(",\"fx\":[{\"id\":\"f\",\"system\":\"/Game/EnvKit/FX/NS_A\",\"loc\":[1,2]}]"), TEXT("loc")},
+      {TEXT("scale 0"), One(TEXT(",\"scale\":0")), TEXT("scale")},
+      {TEXT("scale 11"), One(TEXT(",\"scale\":11")), TEXT("scale")},
+      {TEXT("warmupS 11"), One(TEXT(",\"warmupS\":11")), TEXT("warmupS")},
+      {TEXT("warmupS negative"), One(TEXT(",\"warmupS\":-1")), TEXT("warmupS")},
+      {TEXT("seed negative"), One(TEXT(",\"seed\":-1")), TEXT("seed")},
+      {TEXT("seed fractional"), One(TEXT(",\"seed\":1.5")), TEXT("seed")},
+      {TEXT("seed string"), One(TEXT(",\"seed\":\"7\"")), TEXT("seed")},
+      {TEXT("enabled not a bool"), One(TEXT(",\"enabled\":\"yes\"")), TEXT("enabled")},
+      {TEXT("user not an object"), One(TEXT(",\"user\":[1]")), TEXT("user is not an object")},
+      {TEXT("user value string"), One(TEXT(",\"user\":{\"Color\":\"pink\"}")), TEXT("needs a number")},
+      {TEXT("user value 5 numbers"), One(TEXT(",\"user\":{\"Color\":[1,2,3,4,5]}")), TEXT("needs a number")},
+      {TEXT("17 user parameters"), One(SeventeenParams), TEXT("user parameters >")},
+      {TEXT("user name with a slash"), One(TEXT(",\"user\":{\"a/b\":1}")), TEXT("invalid or duplicated")},
+      {TEXT("user name twice (prefix)"), One(TEXT(",\"user\":{\"User.A\":1,\"A\":2}")), TEXT("invalid or duplicated")},
+  };
+  {
+    FS08EnvLayout Control;
+    TArray<FString> E;
+    TestTrue(TEXT("control: one plain fx parses: ") + FString::Join(E, TEXT(" | ")),
+             Control.ParseJson(LayoutJson(TEXT("marmoreal"), Board, {Camp}, {}, WithFx({Ok})), E));
+    TArray<FString> MaxFx = TooMany;
+    MaxFx.RemoveAt(MaxFx.Num() - 1);
+    E.Reset();
+    TestTrue(TEXT("control: exactly 48 fx parse: ") + FString::Join(E, TEXT(" | ")),
+             Control.ParseJson(LayoutJson(TEXT("marmoreal"), Board, {Camp}, {}, WithFx(MaxFx)), E));
+  }
+  for (const FCase& C : Cases) {
+    FS08EnvLayout Bad;
+    TArray<FString> E;
+    TestFalse(FString::Printf(TEXT("%s: rejected"), C.Name),
+              Bad.ParseJson(LayoutJson(TEXT("marmoreal"), Board, {Camp}, {}, C.Fx), E));
+    const FString All = FString::Join(E, TEXT(" | "));
+    TestTrue(FString::Printf(TEXT("%s: error mentions '%s' (%s)"), C.Name, C.Expect, *All), All.Contains(C.Expect));
+  }
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08EnvLayoutVariantTest,
+    "Unmatched.S08.EnvLayout.Variant overlays merge props / fx (remove, replace, add), invalid or missing overlays fall back to the base",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08EnvLayoutVariantTest::RunTest(const FString&) {
+  using namespace S08EnvLayoutTest;
+  using namespace S08EnvLayoutFxTest;
+  const FString Board = TEXT("cidEnv");
+  const TArray<FString> Props = {PropJson(TEXT("west"), CubePath, FVector(-600, 0, -3), TEXT(",\"yawDeg\":90")),
+                                 PropJson(TEXT("east"), CubePath, FVector(600, 0, -3)),
+                                 PropJson(TEXT("far"), CubePath, FVector(0, -420, -3))};
+  const TArray<FString> Fx = {FxJson(TEXT("fx-w"), TestSystemPath, FVector(0, 0, 20), TEXT(",\"anchor\":\"west\"")),
+                              FxJson(TEXT("fx-e"), TestSystemPath, FVector(0, 0, 20), TEXT(",\"anchor\":\"east\"")),
+                              FxJson(TEXT("fx-free"), TestSystemPath, FVector(-650, 200, 40))};
+  const FString BaseText = LayoutJson(TEXT("envtest"), Board, Props, {LightJson(TEXT("lamp"), FVector(-600, 0, 150))},
+                                      WithFx(Fx));
+  {
+    FS08EnvLayout Base;
+    TArray<FString> E;
+    if (!TestTrue(TEXT("base parses: ") + FString::Join(E, TEXT(" | ")), Base.ParseJson(BaseText, E))) return false;
+  }
+  // 1) a full overlay
+  const FString Body = FString::Printf(
+      TEXT(",\"boardId\":\"cidEnv\",\"notes\":\"t\","
+           "\"props\":{\"remove\":[\"east\"],\"replace\":[{\"id\":\"west\",\"mesh\":\"/Engine/BasicShapes/Sphere\",\"scale\":0.25}],"
+           "\"add\":[{\"id\":\"extra\",\"mesh\":\"%s\",\"loc\":[0,-460,-3]}]},"
+           "\"fx\":{\"remove\":[\"fx-e\"],\"replace\":[{\"id\":\"fx-free\",\"enabled\":false,\"user\":{\"SpawnRate\":2}}],"
+           "\"add\":[{\"id\":\"fx-new\",\"system\":\"%s\",\"anchor\":\"extra\",\"loc\":[0,0,10]}]}"),
+      CubePath, TestSystemPath);
+  FS08EnvLayout Merged;
+  FS08EnvVariantResult R;
+  if (!TestTrue(TEXT("overlay merges: ") + FString::Join(R.Errors, TEXT(" | ")),
+                S08EnvLayout::MergeOverlay(BaseText, OverlayJson(TEXT("envtest"), TEXT("user"), Body), TEXT("envtest"),
+                                           TEXT("user"), Merged, R))) {
+    return false;
+  }
+  TestTrue("counts: props -1 ~1 +1", R.PropsRemoved == 1 && R.PropsReplaced == 1 && R.PropsAdded == 1);
+  TestTrue("counts: fx-e went with its anchor (its explicit remove is tolerated), ~1 +1",
+           R.FxRemovedWithAnchor == 1 && R.FxRemoved == 0 && R.FxReplaced == 1 && R.FxAdded == 1);
+  TestEqual("3 props", Merged.Props.Num(), 3);
+  const FS08EnvProp* West = Merged.FindProp(TEXT("west"));
+  TestTrue("west: mesh + scale replaced, loc / yaw kept",
+           West && West->Mesh == TEXT("/Engine/BasicShapes/Sphere") && West->Scale == 0.25f &&
+               West->Loc.Equals(FVector(-600, 0, -3)) && West->YawDeg == 90.0f);
+  TestNull("east removed", Merged.FindProp(TEXT("east")));
+  TestNotNull("extra added", Merged.FindProp(TEXT("extra")));
+  TestEqual("lights untouched", Merged.Lights.Num(), 1);
+  if (TestEqual("3 fx", Merged.Fx.Num(), 3)) {
+    const FS08EnvFx* Free = Merged.Fx.FindByPredicate([](const FS08EnvFx& F) { return F.Id == TEXT("fx-free"); });
+    TestTrue("fx-free: disabled with a user override, loc kept",
+             Free && !Free->bEnabled && Free->User.Num() == 1 && Free->User[0].Name == TEXT("SpawnRate") &&
+                 Free->Loc.Equals(FVector(-650, 200, 40)));
+    TestTrue("fx-e gone", !Merged.Fx.ContainsByPredicate([](const FS08EnvFx& F) { return F.Id == TEXT("fx-e"); }));
+    TestTrue("fx-new on the added prop",
+             Merged.Fx.ContainsByPredicate([](const FS08EnvFx& F) { return F.Id == TEXT("fx-new") && F.Anchor == TEXT("extra"); }));
+  }
+  // 2) rejection table (the base stays the caller's)
+  struct FCase {
+    const TCHAR* Name;
+    FString Overlay;
+    const TCHAR* Expect;
+  };
+  const FCase Cases[] = {
+      {TEXT("not JSON"), TEXT("nope"), TEXT("overlay: invalid JSON")},
+      {TEXT("base layout schema"), BaseText, TEXT("overlay schema")},
+      {TEXT("other map"), OverlayJson(TEXT("other"), TEXT("user"), FString()), TEXT("overlay map")},
+      {TEXT("other variant"), OverlayJson(TEXT("envtest"), TEXT("night"), FString()), TEXT("overlay variant")},
+      {TEXT("other board"), OverlayJson(TEXT("envtest"), TEXT("user"), TEXT(",\"boardId\":\"cidOther\"")), TEXT("overlay boardId")},
+      {TEXT("lights"), OverlayJson(TEXT("envtest"), TEXT("user"), TEXT(",\"lights\":[]")), TEXT("cannot change 'lights'")},
+      {TEXT("ground"), OverlayJson(TEXT("envtest"), TEXT("user"), TEXT(",\"ground\":{}")), TEXT("cannot change 'ground'")},
+      {TEXT("props not an object"), OverlayJson(TEXT("envtest"), TEXT("user"), TEXT(",\"props\":[]")), TEXT("is not an object")},
+      {TEXT("unknown operation"), OverlayJson(TEXT("envtest"), TEXT("user"), TEXT(",\"props\":{\"move\":[]}")),
+       TEXT("unknown operation")},
+      {TEXT("remove unknown id"), OverlayJson(TEXT("envtest"), TEXT("user"), TEXT(",\"props\":{\"remove\":[\"nosuch\"]}")),
+       TEXT("is not in the base layout")},
+      {TEXT("replace unknown id"),
+       OverlayJson(TEXT("envtest"), TEXT("user"), TEXT(",\"props\":{\"replace\":[{\"id\":\"nosuch\",\"scale\":1}]}")),
+       TEXT("use add")},
+      {TEXT("replace a field that is not replaceable"),
+       OverlayJson(TEXT("envtest"), TEXT("user"), TEXT(",\"props\":{\"replace\":[{\"id\":\"west\",\"colour\":1}]}")),
+       TEXT("cannot be replaced")},
+      {TEXT("add an existing id"),
+       OverlayJson(TEXT("envtest"), TEXT("user"),
+                   FString::Printf(TEXT(",\"props\":{\"add\":[{\"id\":\"far\",\"mesh\":\"%s\",\"loc\":[0,-460,-3]}]}"), CubePath)),
+       TEXT("already exists")},
+      {TEXT("add without an id"), OverlayJson(TEXT("envtest"), TEXT("user"), TEXT(",\"fx\":{\"add\":[{\"loc\":[0,0,0]}]}")),
+       TEXT("with an id")},
+      {TEXT("merged prop invalid"),
+       OverlayJson(TEXT("envtest"), TEXT("user"), TEXT(",\"props\":{\"replace\":[{\"id\":\"west\",\"scale\":0}]}")),
+       TEXT("merged layout")},
+      {TEXT("fx anchored on a prop the overlay removed"),
+       OverlayJson(TEXT("envtest"), TEXT("user"),
+                   FString::Printf(TEXT(",\"props\":{\"remove\":[\"far\"]},\"fx\":{\"add\":[{\"id\":\"x\",\"system\":\"%s\","
+                                        "\"anchor\":\"far\",\"loc\":[0,0,0]}]}"),
+                                   TestSystemPath)),
+       TEXT("merged layout")},
+  };
+  for (const FCase& C : Cases) {
+    FS08EnvLayout Out;
+    FS08EnvVariantResult Bad;
+    TestFalse(FString::Printf(TEXT("%s: rejected"), C.Name),
+              S08EnvLayout::MergeOverlay(BaseText, C.Overlay, TEXT("envtest"), TEXT("user"), Out, Bad));
+    const FString All = FString::Join(Bad.Errors, TEXT(" | "));
+    TestTrue(FString::Printf(TEXT("%s: error mentions '%s' (%s)"), C.Name, C.Expect, *All), All.Contains(C.Expect));
+  }
+  // 3) files: ApplyVariant none / invalid name / absent / ok / invalid document; overlays never resolve as a base
+  TestTrue("variant names", S08EnvLayout::IsVariantName(TEXT("user")) && S08EnvLayout::IsVariantName(TEXT("night-2")) &&
+                                !S08EnvLayout::IsVariantName(TEXT("User")) && !S08EnvLayout::IsVariantName(TEXT("a.b")) &&
+                                !S08EnvLayout::IsVariantName(FString()));
+  TestTrue("overlay file names", S08EnvLayout::IsOverlayFileName(TEXT("marmoreal.user.layout.json")) &&
+                                     !S08EnvLayout::IsOverlayFileName(TEXT("marmoreal.layout.json")) &&
+                                     !S08EnvLayout::IsOverlayFileName(TEXT("c7fa64a26c29a0835f2383e63.layout.json")));
+  TestTrue("overlay file", S08EnvLayout::OverlayFileFor(TEXT("D:/x"), TEXT("sarpedon"), TEXT("user"))
+                               .EndsWith(TEXT("/sarpedon.user.layout.json")));
+  const FString Dir = TempDir(TEXT("Variant"));
+  TestTrue("write base", WriteText(S08EnvLayout::FileFor(Dir, TEXT("envtest")), BaseText));
+  FS08EnvLayout L;
+  TArray<FString> Errors;
+  bool bAbsent = false;
+  if (!TestTrue("resolve base", S08EnvLayout::Resolve(Dir, TEXT("envtest"), {Board}, L, Errors, bAbsent))) return false;
+  const FString BaseSha = L.SourceSha256;
+  FS08EnvVariantResult NoVariant = S08EnvLayout::ApplyVariant(Dir, TEXT("envtest"), FString(), L);
+  TestTrue("no variant: none, base kept", NoVariant.Status == TEXT("none") && L.Props.Num() == 3 && L.Variant.IsEmpty());
+  TestEqual("none trace", NoVariant.TraceLine(TEXT("envtest")), FString(TEXT("ARTPREVIEW envlayout variant=none map=envtest")));
+  FS08EnvVariantResult BadName = S08EnvLayout::ApplyVariant(Dir, TEXT("envtest"), TEXT("Bad_Name"), L);
+  TestTrue("bad name: invalid, base kept", BadName.Status == TEXT("invalid") && L.Props.Num() == 3);
+  FS08EnvVariantResult Absent = S08EnvLayout::ApplyVariant(Dir, TEXT("envtest"), TEXT("absentv"), L);
+  TestTrue("missing overlay: absent, base kept (clean fallback)", Absent.Status == TEXT("absent") && L.Props.Num() == 3 &&
+                                                                     L.Fx.Num() == 3 && L.Variant.IsEmpty());
+  TestTrue(TEXT("absent trace: ") + Absent.TraceLine(TEXT("envtest")),
+           Absent.TraceLine(TEXT("envtest")).Contains(TEXT("variant=absentv map=envtest status=absent")) &&
+               Absent.TraceLine(TEXT("envtest")).EndsWith(TEXT("fallback=base")));
+  TestTrue("write broken overlay", WriteText(S08EnvLayout::OverlayFileFor(Dir, TEXT("envtest"), TEXT("broken")),
+                                             OverlayJson(TEXT("envtest"), TEXT("broken"), TEXT(",\"lights\":[]"))));
+  FS08EnvVariantResult Broken = S08EnvLayout::ApplyVariant(Dir, TEXT("envtest"), TEXT("broken"), L);
+  TestTrue("invalid overlay: invalid, base kept", Broken.Status == TEXT("invalid") && L.Props.Num() == 3 &&
+                                                      Broken.Sha256.Len() == 64 && Broken.Errors.Num() > 0);
+  TestTrue("write user overlay", WriteText(S08EnvLayout::OverlayFileFor(Dir, TEXT("envtest"), TEXT("user")),
+                                           OverlayJson(TEXT("envtest"), TEXT("user"), Body)));
+  FS08EnvVariantResult Ok = S08EnvLayout::ApplyVariant(Dir, TEXT("envtest"), TEXT("user"), L);
+  TestTrue(TEXT("user overlay: ok ") + FString::Join(Ok.Errors, TEXT(" | ")), Ok.Status == TEXT("ok"));
+  TestTrue("merged layout in place", L.Props.Num() == 3 && L.FindProp(TEXT("extra")) && !L.FindProp(TEXT("east")));
+  TestTrue("variant fields", L.Variant == TEXT("user") && L.OverlaySha256.Len() == 64 && L.OverlayPath.EndsWith(TEXT("envtest.user.layout.json")));
+  TestEqual("base sha256 kept", L.SourceSha256, BaseSha);
+  AddInfo(Ok.TraceLine(TEXT("envtest")));
+  TestTrue("ok trace", Ok.TraceLine(TEXT("envtest")).Contains(TEXT("variant=user map=envtest status=ok file=envtest.user.layout.json")) &&
+                           !Ok.TraceLine(TEXT("envtest")).Contains(TEXT("fallback")));
+  // an overlay-shaped file name never resolves as a base layout (fallback scan by board id)
+  const FString Only = TempDir(TEXT("VariantOnlyOverlay"));
+  TestTrue("write a layout under an overlay name", WriteText(FPaths::Combine(Only, TEXT("envtest.user.layout.json")), BaseText));
+  Errors.Reset();
+  FS08EnvLayout Nothing;
+  TestFalse("overlay name is not a base", S08EnvLayout::Resolve(Only, TEXT("envtest"), {Board}, Nothing, Errors, bAbsent));
+  TestTrue("-> absent", bAbsent);
+  IFileManager::Get().DeleteDirectory(*FPaths::Combine(FPaths::AutomationTransientDir(), TEXT("S08EnvLayout")), false, true);
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08EnvLayoutFxSpawnTest,
+    "Unmatched.S08.EnvLayout.FxSpawn fake map-image board: Niagara components, skips, -ArtPreviewNoFx, Update with a variant, board change / grid clear",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08EnvLayoutFxSpawnTest::RunTest(const FString&) {
+  using namespace S08EnvLayoutTest;
+  using namespace S08EnvLayoutFxTest;
+  FTestWorld W(TEXT("S08EnvLayoutFxSpawn"));
+  if (!TestNotNull("test world", W.World)) return false;
+  AS08BoardActor* Actor = W.SpawnBoard();
+  if (!TestNotNull("board actor", Actor)) return false;
+  USceneComponent* Root = Actor->GetRootComponent();
+  UNiagaraSystem* System = TransientSystem();
+  if (!TestNotNull("transient Niagara system", System)) return false;
+  const FString Board = TEXT("cidEnv");
+  const TArray<FString> Props = {PropJson(TEXT("west"), CubePath, FVector(-600, 0, -3), TEXT(",\"yawDeg\":90")),
+                                 PropJson(TEXT("far"), CubePath, FVector(0, -420, -3)),
+                                 PropJson(TEXT("gone"), MissingMeshPath, FVector(600, -380, -3))};
+  const TArray<FString> Fx = {
+      FxJson(TEXT("a"), TestSystemPath, FVector(10, 0, 20), TEXT(",\"anchor\":\"west\",\"seed\":5,\"user\":{\"SpawnRate\":3}")),
+      FxJson(TEXT("b"), TestSystemPath, FVector(650, 100, 40)),
+      FxJson(TEXT("c"), TestSystemPath, FVector(0, 0, 20), TEXT(",\"anchor\":\"gone\"")),
+      FxJson(TEXT("d"), TestSystemPath, FVector(100, 50, 30)),
+      FxJson(TEXT("e"), TestSystemPath, FVector(-650, 0, 30), TEXT(",\"enabled\":false")),
+      FxJson(TEXT("f"), MissingSystemPath, FVector(-650, 50, 30)),
+      FxJson(TEXT("g"), TestSystemPath, FVector(0, 400, 20))};
+  FS08EnvLayout L;
+  TArray<FString> Errors;
+  if (!TestTrue(TEXT("layout parses: ") + FString::Join(Errors, TEXT(" | ")),
+                L.ParseJson(LayoutJson(TEXT("envtest"), Board, Props, {}, WithFx(Fx)), Errors))) {
+    return false;
+  }
+  // 1) SpawnFx directly (after the props: anchors need spawned props)
+  TArray<TObjectPtr<UStaticMeshComponent>> PropComps;
+  TArray<TObjectPtr<UPointLightComponent>> LightComps;
+  const FS08EnvSpawnStats PS = S08EnvLayout::Spawn(L, *Actor, Root, MapHalf, FBox2D(ForceInit), PropComps, LightComps);
+  TestTrue("spawned prop ids: west + far (gone is missing)",
+           PS.SpawnedPropIds.Num() == 2 && PS.SpawnedPropIds.Contains(TEXT("west")) && !PS.SpawnedPropIds.Contains(TEXT("gone")));
+  TArray<TWeakObjectPtr<UNiagaraComponent>> FxComps;
+  const FS08EnvFxStats S = S08EnvLayout::SpawnFx(L, *Actor, Root, MapHalf, FrameHalf, PS.SpawnedPropIds,
+                                                 InactiveOptions(System), FxComps);
+  AddInfo(S08EnvLayout::FxSummaryLine(TEXT("envtest"), S));
+  TestEqual("layout fx", S.LayoutFx, 7);
+  TestEqual("3 fx components (a, b, g)", S.Fx, 3);
+  TestEqual("3 in the array", FxComps.Num(), 3);
+  TestEqual("c: anchor not spawned", S.SkippedAnchor, 1);
+  TestEqual("d: on the painted map", S.SkippedInsideMap, 1);
+  TestEqual("e: disabled", S.SkippedDisabled, 1);
+  TestTrue("f: missing system", S.SkippedMissing == 1 && S.MissingSystems == 1 && S.MissingPaths.Num() == 1 &&
+                                         S.MissingPaths[0] == MissingSystemPath);
+  TestEqual("g: in the near band (traced, not refused)", S.NearBand, 1);
+  TestTrue("a: SpawnRate not exposed by the empty system -> counted missing", S.UserMissing == 1 && S.UserSet == 0);
+  TestTrue("not activated: no particles, mode inactive", S.Particles == 0 && S.Mode == TEXT("inactive"));
+  TestEqual("the empty system has no determinism: 3 non-deterministic", S.NonDeterministic, 3);
+  for (const TWeakObjectPtr<UNiagaraComponent>& Weak : FxComps) {
+    UNiagaraComponent* C = Weak.Get();
+    if (!TestNotNull("fx component", C)) continue;
+    TestTrue(C->GetName() + TEXT(": registered under the board root, owned by the actor"),
+             C->IsRegistered() && C->GetAttachParent() == Root && C->GetOwner() == Actor);
+    TestTrue(C->GetName() + TEXT(": the system"), C->GetAsset() == System);
+    TestFalse(C->GetName() + TEXT(": not active (bActivate false)"), C->IsActive());
+    TestFalse(C->GetName() + TEXT(": no shadow"), static_cast<bool>(C->CastShadow));
+    TestTrue(C->GetName() + TEXT(": NoCollision"), C->GetCollisionEnabled() == ECollisionEnabled::NoCollision);
+  }
+  if (FxComps.Num() == 3 && FxComps[0].IsValid() && FxComps[1].IsValid()) {
+    const UNiagaraComponent* A = FxComps[0].Get();
+    TestTrue(FString::Printf(TEXT("a: anchored location %s"), *A->GetRelativeLocation().ToString()),
+             A->GetRelativeLocation().Equals(FVector(-600, 10, 17), 1e-3));
+    TestTrue("a: yaw of the anchor", FMath::IsNearlyEqual(A->GetRelativeRotation().Yaw, 90.0, 1e-3));
+    TestEqual("a: explicit seed", A->GetRandomSeedOffset(), 5);
+    TestEqual("b: CRC seed", FxComps[1]->GetRandomSeedOffset(), static_cast<int32>(FCrc::StrCrc32(TEXT("b")) & 0x7FFFFFFFu));
+  }
+  TArray<UNiagaraComponent*> Before;
+  for (const TWeakObjectPtr<UNiagaraComponent>& Weak : FxComps) Before.Add(Weak.Get());
+  TestEqual("ClearFx destroys 3", S08EnvLayout::ClearFx(FxComps), 3);
+  for (UNiagaraComponent* C : Before) TestTrue("fx destroyed", Destroyed(C));
+  // -ArtPreviewNoFx (bSpawn false): nothing
+  {
+    FS08EnvFxOptions Off = InactiveOptions(System);
+    Off.bSpawn = false;
+    TArray<TWeakObjectPtr<UNiagaraComponent>> NoFxComps;
+    const FS08EnvFxStats SO = S08EnvLayout::SpawnFx(L, *Actor, Root, MapHalf, FrameHalf, PS.SpawnedPropIds, Off, NoFxComps);
+    TestTrue("-ArtPreviewNoFx: no component, mode off", NoFxComps.Num() == 0 && SO.Fx == 0 && SO.Mode == TEXT("off"));
+  }
+  S08EnvLayout::Clear(PropComps, LightComps);
+  {
+    FS08EnvFxOptions Bench;
+    Bench.bBench = true;
+    Bench.bFreeze = true;
+    TestEqual("bench options: frozen", Bench.Mode(), FString(TEXT("frozen")));
+    TestEqual("default options: live", FS08EnvFxOptions().Mode(), FString(TEXT("live")));
+  }
+
+  // 2) Update: base + variant overlay, keep / respawn / fallback, board change and grid clear
+  const FString Dir = TempDir(TEXT("FxUpdate"));
+  const TArray<FString> UpdProps = {Props[0], Props[1]};
+  const TArray<FString> UpdFx = {Fx[0], Fx[1]};
+  TestTrue("write base", WriteText(S08EnvLayout::FileFor(Dir, TEXT("envtest")),
+                                   LayoutJson(TEXT("envtest"), Board, UpdProps, {}, WithFx(UpdFx))));
+  TestTrue("write user overlay",
+           WriteText(S08EnvLayout::OverlayFileFor(Dir, TEXT("envtest"), TEXT("user")),
+                     OverlayJson(TEXT("envtest"), TEXT("user"),
+                                 FString::Printf(TEXT(",\"props\":{\"remove\":[\"west\"]},\"fx\":{\"add\":[%s]}"),
+                                                 *FxJson(TEXT("h"), TestSystemPath, FVector(0, 0, 30), TEXT(",\"anchor\":\"far\""))))));
+  TestTrue("write invalid overlay", WriteText(S08EnvLayout::OverlayFileFor(Dir, TEXT("envtest"), TEXT("bad")),
+                                             OverlayJson(TEXT("envtest"), TEXT("bad"), TEXT(",\"ground\":{}"))));
+  FS08EnvLayoutRequest Req;
+  Req.bEnabled = true;
+  Req.bMapImageActive = true;
+  Req.ProfileId = TEXT("envmap");
+  Req.MapKey = TEXT("envtest");
+  Req.RoomBoardId = Board;
+  Req.ProfileBoardIds = {Board};
+  Req.MapHalf = MapHalf;
+  Req.FrameHalf = FrameHalf;
+  Req.Dir = Dir;
+  Req.Variant = FString();
+  Req.FxOptions = InactiveOptions(System);
+  FS08EnvLayoutRuntime Rt;
+  TArray<TObjectPtr<UStaticMeshComponent>> EnvProps;
+  TArray<TObjectPtr<UPointLightComponent>> EnvLights;
+  S08EnvLayout::Update(Req, *Actor, Root, Rt, EnvProps, EnvLights);
+  TestTrue("base: ok, no variant", Rt.Status == TEXT("ok") && Rt.Variant.Status == TEXT("none"));
+  TestTrue("base: 2 props, 2 fx", EnvProps.Num() == 2 && Rt.Fx.Num() == 2 && Rt.FxStats.Fx == 2);
+  UNiagaraComponent* FirstFx = Rt.Fx.Num() ? Rt.Fx[0].Get() : nullptr;
+  S08EnvLayout::Update(Req, *Actor, Root, Rt, EnvProps, EnvLights);
+  TestTrue("same layout again: the same fx (no respawn)", Rt.Fx.Num() == 2 && Rt.Fx[0].Get() == FirstFx && !Destroyed(FirstFx));
+  Req.Variant = FString(TEXT("user"));
+  S08EnvLayout::Update(Req, *Actor, Root, Rt, EnvProps, EnvLights);
+  TestTrue(TEXT("variant user: ok ") + FString::Join(Rt.Variant.Errors, TEXT(" | ")), Rt.Variant.Status == TEXT("ok"));
+  TestTrue("variant user: west removed (1 prop), a dropped with it, b + h", EnvProps.Num() == 1 && Rt.Fx.Num() == 2 &&
+                                                                               Rt.Variant.FxRemovedWithAnchor == 1);
+  TestTrue("variant: old fx destroyed", Destroyed(FirstFx));
+  TestEqual("variant: the layout says so", Rt.Layout.Variant, FString(TEXT("user")));
+  Req.Variant = FString(TEXT("missing"));
+  S08EnvLayout::Update(Req, *Actor, Root, Rt, EnvProps, EnvLights);
+  TestTrue("missing overlay: absent -> the base (2 props, 2 fx)",
+           Rt.Variant.Status == TEXT("absent") && EnvProps.Num() == 2 && Rt.Fx.Num() == 2 && Rt.Layout.Variant.IsEmpty());
+  Req.Variant = FString(TEXT("bad"));
+  S08EnvLayout::Update(Req, *Actor, Root, Rt, EnvProps, EnvLights);
+  TestTrue("invalid overlay: invalid -> the base", Rt.Variant.Status == TEXT("invalid") && Rt.Status == TEXT("ok") &&
+                                                       EnvProps.Num() == 2 && Rt.Fx.Num() == 2);
+  // fx options are part of the key: -ArtPreviewNoFx respawns without fx
+  FS08EnvFxOptions NoFx = InactiveOptions(System);
+  NoFx.bSpawn = false;
+  Req.FxOptions = NoFx;
+  S08EnvLayout::Update(Req, *Actor, Root, Rt, EnvProps, EnvLights);
+  TestTrue("-ArtPreviewNoFx: props stay, no fx", EnvProps.Num() == 2 && Rt.Fx.Num() == 0 && Rt.FxStats.Mode == TEXT("off"));
+  Req.FxOptions = InactiveOptions(System);
+  S08EnvLayout::Update(Req, *Actor, Root, Rt, EnvProps, EnvLights);
+  TArray<UNiagaraComponent*> Live;
+  for (const TWeakObjectPtr<UNiagaraComponent>& Weak : Rt.Fx) Live.Add(Weak.Get());
+  TestEqual("fx back", Live.Num(), 2);
+  // board change: a grid / grey board clears everything incl. the fx
+  Req.bMapImageActive = false;
+  S08EnvLayout::Update(Req, *Actor, Root, Rt, EnvProps, EnvLights);
+  TestTrue("board change: nothing left", EnvProps.Num() == 0 && Rt.Fx.Num() == 0 && !Rt.bApplied);
+  for (UNiagaraComponent* C : Live) TestTrue("fx destroyed on the board change", Destroyed(C));
+  // grid regression: a fresh runtime on a non-map-image board never spawns, never applies
+  FS08EnvLayoutRuntime GridRt;
+  TArray<TObjectPtr<UStaticMeshComponent>> GridProps;
+  TArray<TObjectPtr<UPointLightComponent>> GridLights;
+  S08EnvLayout::Update(Req, *Actor, Root, GridRt, GridProps, GridLights);
+  TestTrue("grid board: no env, no fx, not applied", GridProps.Num() == 0 && GridLights.Num() == 0 && GridRt.Fx.Num() == 0 &&
+                                                       !GridRt.bApplied);
+  Actor->Destroy();
+  IFileManager::Get().DeleteDirectory(*FPaths::Combine(FPaths::AutomationTransientDir(), TEXT("S08EnvLayout")), false, true);
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08EnvLayoutFxAssetsTest,
+    "Unmatched.S08.EnvLayout.FxAssets derived /Game/EnvKit/FX systems of the shipped layouts: CPU, deterministic, no light renderer",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08EnvLayoutFxAssetsTest::RunTest(const FString&) {
+  TSet<FString> Systems;
+  for (const TCHAR* Key : {TEXT("marmoreal"), TEXT("sarpedon")}) {
+    FS08EnvLayout L;
+    TArray<FString> Errors;
+    const FString File = S08EnvLayout::FileFor(S08EnvLayout::DefaultDir(), Key);
+    if (!FPaths::FileExists(File) || !L.LoadFile(File, Errors)) continue;
+    for (const FString& Path : L.UniqueFxSystemPaths()) Systems.Add(Path);
+  }
+  int32 Checked = 0;
+  for (const FString& Path : Systems) {
+    int32 Dot = INDEX_NONE;
+    const FString Pkg = Path.FindChar(TEXT('.'), Dot) ? Path.Left(Dot) : Path;
+    if (!FPackageName::DoesPackageExist(Pkg)) {
+      AddWarning(FString::Printf(TEXT("%s not imported (tools/art/env_kit/ue_import_fab_fx.py)"), *Pkg));
+      continue;
+    }
+    UNiagaraSystem* System = LoadObject<UNiagaraSystem>(nullptr, *Path);
+    if (!TestNotNull(Path + TEXT(": loads as a Niagara system"), System)) continue;
+    ++Checked;
+    int32 Emitters = 0, Gpu = 0, LightRenderers = 0, ComponentRenderers = 0;
+    for (const FNiagaraEmitterHandle& H : System->GetEmitterHandles()) {
+      if (!H.GetIsEnabled()) continue;
+      ++Emitters;
+      const FVersionedNiagaraEmitterData* D = H.GetEmitterData();
+      if (!D) continue;
+      Gpu += D->SimTarget == ENiagaraSimTarget::GPUComputeSim ? 1 : 0;
+      for (const UNiagaraRendererProperties* R : D->GetRenderers()) {
+        if (!R || !R->GetIsEnabled()) continue;
+        LightRenderers += R->IsA<UNiagaraLightRendererProperties>() ? 1 : 0;
+        ComponentRenderers += R->IsA<UNiagaraComponentRendererProperties>() ? 1 : 0;
+      }
+    }
+    AddInfo(FString::Printf(TEXT("%s: emitters %d gpu %d light renderers %d component renderers %d determinism %d"), *Pkg,
+                            Emitters, Gpu, LightRenderers, ComponentRenderers, System->NeedsDeterminism() ? 1 : 0));
+    TestTrue(Pkg + TEXT(": at least one enabled emitter"), Emitters > 0);
+    TestEqual(Pkg + TEXT(": CPU simulation only (ue_import_fab_fx.py simTarget cpu)"), Gpu, 0);
+    TestEqual(Pkg + TEXT(": no Light renderer (light budget)"), LightRenderers, 0);
+    TestEqual(Pkg + TEXT(": no Component renderer"), ComponentRenderers, 0);
+    TestTrue(Pkg + TEXT(": system determinism (fixed seed)"), System->NeedsDeterminism());
+  }
+  AddInfo(FString::Printf(TEXT("fx systems checked: %d / %d"), Checked, Systems.Num()));
   return true;
 }
 

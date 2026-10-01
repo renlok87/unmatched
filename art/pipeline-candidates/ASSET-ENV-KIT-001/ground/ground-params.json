@@ -345,7 +345,7 @@
     "roughness": 0.85
    },
    "water": {
-    "role": "review gap 1: water at both river mouths (N beach -> sea surf, S -> waterfall over the near tray edge), tinted to the map's river colour; drawn by M_EnvGround from aux.R/G/A, the falls are engine-plane cards (S08EnvGround waterfalls, M_EnvWaterfall)",
+    "role": "review gap 1: water at both river mouths (N beach -> sea surf, S -> waterfall over the near tray edge), tinted to the map's river colour; drawn by M_EnvGround from aux.R/G/A, the falls are engine-plane cards (S08EnvGround waterfalls, M_EnvWaterfall) || P5c track W: whiter foam (0.62, 0.66, 0.7) -> (0.78, 0.83, 0.88) on the river mouths and the waterfall (both read WaterFoam); the river water itself stays M_EnvGround (the pack's M_Rapids would need its own strip meshes at the mouths - not in this stage)",
     "colorSrgb": [
      40,
      76,
@@ -367,9 +367,9 @@
      2.0
     ],
     "foamColor": [
-     0.62,
-     0.66,
-     0.7
+     0.78,
+     0.83,
+     0.88
     ],
     "foamOpacity": 0.85,
     "foamScaleUU": 9.0,
@@ -385,7 +385,7 @@
       "spillUU": 60.0,
       "flowUUps": 40.0,
       "streakScaleUU": 5.0,
-      "edgeFadeUU": 12.0,
+      "edgeFadeUU": 16.0,
       "bottomFade": 0.15,
       "spillFadeUU": 18.0,
       "dither": 0.15,
@@ -393,12 +393,25 @@
        "note": "P5 track B: the lane K meshes replace the vertical plane card (the spill plane stays): sheet (FallCard from the build), foam + mist (slot MIDs, kind 1), the optional rock lip (MI_TableBase_T2b_<Map>); the plane card is the fallback while the sheet mesh is not imported",
        "run": "art/pipeline-candidates/ASSET-ENV-S-WATERFALL-001/20261001-waterfall-v1",
        "lip": true
+      },
+      "look": {
+       "note": "P5c track W (P5b review: chunky masked streaks, hard rectangular outline): M_EnvWaterfall graph 3 is lit translucent (per-pixel surface lighting) - a clear-ish body (bodyOpacity) with nearly opaque foam / streaks (foamOpacity), side fades whose width wobbles along the flow (edgeWobble), the Water Materials T_Waterfall_Foam streaks in two layers (pack, packTileUU across / along, packSpeedRatio); blend 'masked' = the graph 2 dithered look through an MI blend-mode override (fallback without a code change)",
+       "blend": "translucent",
+       "bodyOpacity": 0.6,
+       "foamOpacity": 0.95,
+       "edgeWobble": 0.6,
+       "pack": true,
+       "packTileUU": [
+        40.0,
+        120.0
+       ],
+       "packSpeedRatio": 1.6
       }
      }
     ]
    },
    "sea": {
-    "role": "P5 track B (review gap 8, Sarpedon only): the dark sea ring under the island (lane K SM_Env_S_SeaRing: Col.R foam band at the cliffs, Col.G far fade, UV0 = board XY / 600 uu) with M_EnvSea / MI_EnvSea_<Map> (tools/art/env_kit/ue_import_env_ground.py); placed by S08EnvGround from the layout ground.sea at (0, tray offsetY, the fall bottom z)",
+    "role": "P5 track B (review gap 8, Sarpedon only): the dark sea ring under the island (lane K SM_Env_S_SeaRing: Col.R foam band at the cliffs, Col.G far fade, UV0 = board XY / 600 uu) with M_EnvSea / MI_EnvSea_<Map> (tools/art/env_kit/ue_import_env_ground.py); placed by S08EnvGround from the layout ground.sea at (0, tray offsetY, the fall bottom z) || P5c track W (P5b review: no waves / surf, the foam band read as grey fog, the background a flat dark navy): M_EnvSea graph 2 - still opaque - samples the Water Materials pack (tharlevfx, CC BY 4.0: T_Ocean_Foam lace, T_Water_Normal / _Large waves; pack false or a missing pack = the procedural graph 1 lace): a sharper, whiter shore band (shoreSharpness / shoreThreshold), surf crest lines running in towards the cliffs (surf: spacing, cycles / s, reach from the inner ring edge = the lane K UV1 distance, V flipped by the FBX import), facet shade + sparse whitecaps from the wave normals (waves), foamLift = the foam's own emissive lift (was the water lift 3.0), and a dim night-sky reflection with slow cloud variation on the far sea (sky; the only background the opaque ring leaves visible). Status: предложено (values to be measured in UE frames). || P5c tune (UE frames): sky.intensity 1.0 -> 1.8 - the background band round the tray at K1x0.65 17.8 -> 20.9 luma (target ~20-26, P4 25.5), texture std 5.2 (P5b 2.15).",
     "run": "art/pipeline-candidates/ASSET-ENV-S-WATERFALL-001/20261001-waterfall-v1",
     "colorSrgb": [
      20,
@@ -412,14 +425,14 @@
     ],
     "farStrength": 1.0,
     "foamColor": [
-     0.62,
-     0.66,
-     0.7
+     0.85,
+     0.9,
+     0.94
     ],
-    "foamOpacity": 0.7,
+    "foamOpacity": 0.95,
     "roughness": 0.08,
     "specular": 0.3,
-    "normalStrength": 0.5,
+    "normalStrength": 0.8,
     "lift": 3.0,
     "rippleTileUU": 160.0,
     "panUUps": [
@@ -428,7 +441,50 @@
     ],
     "foamScaleUU": 14.0,
     "foamSpeed": 0.3,
-    "uvTileUU": 600.0
+    "uvTileUU": 600.0,
+    "pack": true,
+    "foamTileUU": 64.0,
+    "shoreSharpness": 4.0,
+    "shoreThreshold": 0.2,
+    "foamLift": 2.0,
+    "waves": {
+     "normalTileUU": [
+      130.0,
+      380.0
+     ],
+     "shade": 0.8,
+     "whitecaps": 0.25,
+     "whitecapThreshold": 0.85,
+     "dir": [
+      -0.87,
+      0.5
+     ]
+    },
+    "surf": {
+     "spacingUU": 34.0,
+     "cyclesPerSec": 0.1,
+     "reachUU": 170.0,
+     "crestWidth": 0.32,
+     "opacity": 0.85,
+     "breakup": 0.55,
+     "uv1FlipV": true
+    },
+    "sky": {
+     "colorLinear": [
+      0.022,
+      0.036,
+      0.07
+     ],
+     "intensity": 1.8,
+     "noiseUU": 650.0,
+     "amplitude": 0.45,
+     "panUUps": 5.0,
+     "rampVcG": [
+      0.0,
+      0.1
+     ],
+     "atCliffs": 0.5
+    }
    },
    "rules": {
     "note": "review gaps 1 / 5 / 7 (P4): noise-broken, blurred edges; feathered fire sand; deck beam; water + pebble rim + foam / surf",
@@ -469,7 +525,7 @@
     "beachScatter": 0.35
    },
    "trayLook": {
-    "note": "damp dark sea-cliff rock: darker, cooler, less rough; thin dark moss; the cliff darkens towards the sea",
+    "note": "damp dark sea-cliff rock: darker, cooler, less rough; the cliff darkens towards the sea; P5c (P5b review: a yellow-green moss line round every tray edge and cushions on the waterfall lip): thin dark moss patches only - MossAmount 0.9 -> 0.38, MossBreakup 0.6 -> 0.9, tint (0.35, 0.45, 0.3) -> (0.2, 0.26, 0.19) (CPU mirror at VC.r 1: moss mean 1.0 -> 0.22, share > 0.5 1.0 -> 0.17); Marmoreal unchanged",
     "RockTint": [
      0.72,
      0.76,
@@ -478,17 +534,18 @@
     "RockRoughScale": 0.7,
     "RockRoughMin": 0.25,
     "MossTint": [
-     0.35,
-     0.45,
-     0.3
+     0.2,
+     0.26,
+     0.19
     ],
-    "MossAmount": 0.9,
+    "MossAmount": 0.38,
     "DepthTint": [
      0.35,
      0.4,
      0.48,
      0.8
-    ]
+    ],
+    "MossBreakup": 0.9
    }
   }
  }

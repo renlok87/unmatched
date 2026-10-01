@@ -568,8 +568,10 @@ bool ParseBackdrop(const FString& BoardId, const TSharedPtr<FJsonObject>& Object
         !OptionalNumber(*Moon, TEXT("intensity"), 0.0, 50.0, M.Intensity) || M.Intensity <= 0.0f ||
         !OptionalNumber(*Moon, TEXT("softness"), 0.05, 1.0, M.Softness) ||
         !OptionalNumber(*Moon, TEXT("discRadius"), 0.0, 0.5, M.DiscRadius) ||
-        !OptionalNumber(*Moon, TEXT("discIntensity"), 0.0, 50.0, M.DiscIntensity)) {
-      Fail(TEXT("moon needs optional screenAnchor [-1..1, -1..1], depthUU 500..20000, diameterUU 50..5000, colorLinear 0..4, intensity (0, 50], softness 0.05..1, discRadius 0..0.5, discIntensity 0..50"));
+        !OptionalNumber(*Moon, TEXT("discIntensity"), 0.0, 50.0, M.DiscIntensity) ||
+        !OptionalNumber(*Moon, TEXT("discSoftness"), 0.02, 0.95, M.DiscSoftness) ||
+        !OptionalNumber(*Moon, TEXT("discLimb"), 0.0, 1.0, M.DiscLimb)) {
+      Fail(TEXT("moon needs optional screenAnchor [-1..1, -1..1], depthUU 500..20000, diameterUU 50..5000, colorLinear 0..4, intensity (0, 50], softness 0.05..1, discRadius 0..0.5, discIntensity 0..50, discSoftness 0.02..0.95, discLimb 0..1"));
     } else {
       M.bSet = true;
     }

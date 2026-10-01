@@ -2,27 +2,27 @@
   "schema": "unmatched.env-prop-look/1",
   "status": "предложено (ENV-MAPS P5 track A, 2026-10-01): measured on the committed BC textures by tools/art/env_kit/env_prop_look.py --check; UE frames are the integrate stage's; художественная приёмка - решение пользователя",
   "master": "/Game/EnvKit/Shared/M_EnvProp",
-  "notes": "Looks of the P5 props (run 20261001-tripo-h31-p5) and of the Blender back wall (ASSET-ENV-M-BACKWALL-001, material set 'BackWall' = MI_Env_BackWall shared by SM_Env_BackWall_{BayDoor,BayWindows,Centre}; its BC is the 'bc' path). Every entry gets MI_Env_<Name> parented to M_EnvProp (tools/art/env_kit/ue_import_env_kit.py merges this file with the P4 file of 20260930-tripo-h31). Night-friendly: the Tripo albedos of the new wood / cloth / stone / hedge props are brighter or more saturated than the kit they join (Sarpedon hull V 0.24 S 0.28, cannon V 0.28; barrel V 0.37 S 0.62, banner S 0.68), so the rest of each texture is pulled down 8-20 % in V and 10-25 % in S - no region recolour, the texture stays as committed. The balustrade marble is kept a step below the colonnade (ArcadeBay V 0.63 on M_UM_Figure) so the long edge runs do not outshine the palace. Emissive-only warm accents (no point light added; 1 key + <= 6 points per map unchanged): the lantern-post glass panes (pale amber, hue ~42, V >= 0.68: 1.1 % of the texels) at x6 like the LanternPlinth glass (mean emissive luminance 1.60 vs 1.75), and the back-wall window / door glow (the narrow HSV window of the lane-K report: hue 31 +- 12, S >= 0.5, V >= 0.8; with the default soft edges it lights 98.4 % of the T_Env_BackWall_E glow texels and 0.004 % of the rest) at x4.5 (mean 1.79, the lantern-glass order, ENV-M-BACKWALL contract). P5b tune (2026-10-01, UE frames): x4.5 (1.0, 0.62, 0.3) clipped 12.6 % of the back-wall pixels at K1 in saturated orange; now x2.8 with a paler warm (1.0, 0.7, 0.42): mean 1.19, the target floor lowered to 0.9.",
+  "notes": "Looks of the P5 props (run 20261001-tripo-h31-p5) and of the Blender back wall (ASSET-ENV-M-BACKWALL-001, material set 'BackWall' = MI_Env_BackWall shared by SM_Env_BackWall_{BayDoor,BayWindows,Centre}; its BC is the 'bc' path). Every entry gets MI_Env_<Name> parented to M_EnvProp (tools/art/env_kit/ue_import_env_kit.py merges this file with the P4 file of 20260930-tripo-h31). Night-friendly: the Tripo albedos of the new wood / cloth / stone / hedge props are brighter or more saturated than the kit they join (Sarpedon hull V 0.24 S 0.28, cannon V 0.28; barrel V 0.37 S 0.62, banner S 0.68), so the rest of each texture is pulled down 8-20 % in V and 10-25 % in S - no region recolour, the texture stays as committed. The balustrade marble is kept a step below the colonnade (ArcadeBay V 0.63 on M_UM_Figure) so the long edge runs do not outshine the palace. Emissive-only warm accents (no point light added; 1 key + <= 6 points per map unchanged): the lantern-post glass panes (pale amber, hue ~42, V >= 0.68: 1.1 % of the texels) at x6 like the LanternPlinth glass (mean emissive luminance 1.60 vs 1.75), and the back-wall window / door glow (the narrow HSV window of the lane-K report: hue 31 +- 12, S >= 0.5, V >= 0.8; with the default soft edges it lights 98.4 % of the T_Env_BackWall_E glow texels and 0.004 % of the rest) at x4.5 (mean 1.79, the lantern-glass order, ENV-M-BACKWALL contract). P5b tune (2026-10-01, UE frames): x4.5 (1.0, 0.62, 0.3) clipped 12.6 % of the back-wall pixels at K1 in saturated orange; now x2.8 with a paler warm (1.0, 0.7, 0.42): mean 1.19, the target floor lowered to 0.9. P5c track F (2026-10-01, P5b review follow-ups, measured on the textures only - the UE frames are the integrate stage's): the back wall darker (stone x0.86, the brightest texels x0.7) with a calmer window glow (x2.1, paler warm), the barrels darker / the crates greyer (value separation on the deck), the rock outcrops dark wet rock (x0.6, roughness <= 0.6), the lantern-post glass lit over a larger area (x1.6 texels at the plinth order).",
   "soft": {"hueDeg": 8.0, "sv": 0.06},
   "props": {
     "Barrel": {
-      "gap": "concept-review rank 4: deck dressing; the orange Tripo wood (S 0.62) quieted towards the dark hull planks",
-      "rest": {"satMul": 0.75, "valMul": 0.85},
-      "target": {"restValRatio": [0.83, 0.87], "restSatRatio": [0.73, 0.77]}
+      "gap": "concept-review rank 4: deck dressing; the orange Tripo wood (S 0.62) quieted towards the dark hull planks. P5c track F (P5b review: barrels / crates brown on brown): the barrels a clear step darker (V 0.37 -> 0.26 on the texture) so the paler crates separate from them",
+      "rest": {"satMul": 0.7, "valMul": 0.7},
+      "target": {"restValRatio": [0.68, 0.72], "restSatRatio": [0.68, 0.72]}
     },
     "CrateStack": {
-      "gap": "concept-review rank 4: deck dressing, slightly darker / quieter",
-      "rest": {"satMul": 0.85, "valMul": 0.9},
-      "target": {"restValRatio": [0.88, 0.92], "restSatRatio": [0.83, 0.87]}
+      "gap": "concept-review rank 4: deck dressing. P5c track F (P5b review: brown on brown): weathered grey-brown planks - value kept (V 0.38), saturation x0.6 (S 0.45 -> 0.27): 1.47x the barrel value",
+      "rest": {"satMul": 0.6, "valMul": 1.0},
+      "target": {"restValRatio": [0.99, 1.005], "restSatRatio": [0.58, 0.62]}
     },
     "LanternPost": {
-      "gap": "concept-review ranks 4 + 7 + 14: standing lantern posts on the deck and the palisade, emissive glass only (no new point light)",
+      "gap": "concept-review ranks 4 + 7 + 14: standing lantern posts on the deck and the palisade, emissive glass only (no new point light). P5c track F (P5b review: the glass barely glows): the window reaches the dimmer glass texels (valMin 0.68 -> 0.62: 1.13 % -> 1.76 % of the texels) at x7.6 - the lit area x1.6, the mean the order of the LanternPlinth glass (1.74 vs 1.75)",
       "emissive": {
-        "window": {"hueDeg": 42.0, "halfWidthDeg": 12.0, "satMin": 0.28, "valMin": 0.68},
+        "window": {"hueDeg": 42.0, "halfWidthDeg": 12.0, "satMin": 0.28, "valMin": 0.62},
         "colorLinear": [1.0, 0.62, 0.3],
-        "intensity": 6.0
+        "intensity": 7.6
       },
-      "target": {"emissiveFraction": [0.005, 0.03], "emissiveMeanLuminance": [1.2, 2.5], "restValRatio": [0.995, 1.005]}
+      "target": {"emissiveFraction": [0.015, 0.03], "emissiveMeanLuminance": [1.5, 2.2], "restValRatio": [0.995, 1.005]}
     },
     "Banner": {
       "gap": "concept-review rank 4: the red banner, kept red, a step darker for the night profile",
@@ -30,9 +30,10 @@
       "target": {"restValRatio": [0.88, 0.92], "restSatRatio": [0.88, 0.92]}
     },
     "RockOutcrop": {
-      "gap": "concept-review rank 7: rock outcrops in the dark west forest (concept Y 26 vs the render's 54)",
-      "rest": {"satMul": 0.85, "valMul": 0.8},
-      "target": {"restValRatio": [0.78, 0.82], "restSatRatio": [0.83, 0.87]}
+      "gap": "concept-review rank 7: rock outcrops in the dark west forest (concept Y 26 vs the render's 54). P5c track F (P5b review: the outcrops read too pale): dark wet rock - V x0.6 (0.41 -> 0.25 on the texture), S x0.8, roughness capped at 0.6 (wet sheen under the key light)",
+      "rest": {"satMul": 0.8, "valMul": 0.6},
+      "surface": {"RoughnessMax": 0.6},
+      "target": {"restValRatio": [0.58, 0.62], "restSatRatio": [0.78, 0.82]}
     },
     "Balustrade": {
       "gap": "concept-review rank 6: marble balustrade runs along the W / E / front tray edges, a step below the colonnade marble",
@@ -45,14 +46,19 @@
       "target": {"restValRatio": [0.83, 0.87], "restSatRatio": [0.83, 0.87]}
     },
     "BackWall": {
-      "gap": "concept-review rank 12 (+14): warm-lit windows / doors behind the colonnade arches, emissive only",
+      "gap": "concept-review rank 12 (+14): warm-lit windows / doors behind the colonnade arches, emissive only. P5c track F (P5b review, UE K1: wall mean luma 121 vs the map's 117.9, the top band 91 -> 135, windows flat saturated S 0.69 V 0.91, 7.4 % clipped): the stone V x0.86 and its brightest texels (V >= 0.72, any hue: the pale ashlar highlights and the pink blossom chips of the atlas, 8 % of the texels, mean hue 318 / S 0.28) x0.7 - albedo luminance 0.227 -> 0.155 on the texture, i.e. the wall mean ~121 -> ~103 (< 105) if the frame scales with it; the window glow x2.8 -> x2.1 in a paler warm (1.0, 0.74, 0.48), mean 1.19 -> 0.92. The vertical / interior window gradient is NOT possible with M_EnvProp parameters (no UV term; the BC windows are flat): open issue (master feature or a gradient in T_Env_BackWall_BC / _E). The vine garlands of the P5c layout cover part of the top band. P5c tune t1 (UE K1 after the integrate: wall mean 103.4 but the K1 top band 113.8 vs P4 91.9 - the wall fills the arcade openings that showed the night sky in P4, glow S 0.715 / 6.7 % clipped): stone x0.86 -> x0.52, the brightest texels x0.7 -> x0.45, glow x2.1 -> x1.2 (t1 x0.68 / x0.55 / x1.7: top band 104.4, wall 95.5; t2 x0.6 / x0.5 / x1.2: top band 98.9, wall 91.2, the windows no longer clip - the remaining clipped pixels are the centre door / steps under the portal-glow point light)",
       "bc": "art/pipeline-candidates/ASSET-ENV-M-BACKWALL-001/20261001-backwall-v1/export/T_Env_BackWall_BC.png",
+      "region": {
+        "window": {"hueDeg": 30.0, "halfWidthDeg": 180.0, "satMin": 0.0, "valMin": 0.72},
+        "adjust": {"hueShiftDeg": 0.0, "satMul": 0.95, "valMul": 0.45}
+      },
+      "rest": {"satMul": 0.95, "valMul": 0.52},
       "emissive": {
         "window": {"hueDeg": 31.0, "halfWidthDeg": 12.0, "satMin": 0.5, "valMin": 0.8},
-        "colorLinear": [1.0, 0.7, 0.42],
-        "intensity": 2.8
+        "colorLinear": [1.0, 0.74, 0.48],
+        "intensity": 1.2
       },
-      "target": {"emissiveFraction": [0.012, 0.03], "emissiveMeanLuminance": [0.9, 2.5], "restValRatio": [0.995, 1.005]}
+      "target": {"regionFraction": [0.06, 0.1], "valRatio": [0.45, 0.5], "emissiveFraction": [0.012, 0.03], "emissiveMeanLuminance": [0.45, 0.7], "restValRatio": [0.5, 0.54], "restSatRatio": [0.93, 0.97]}
     }
   }
 }

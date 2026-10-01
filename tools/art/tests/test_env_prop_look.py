@@ -234,7 +234,8 @@ class Layouts(unittest.TestCase):
 
     def test_sarpedon_west_forest(self):
         lay, _, _, _ = self._errors("sarpedon")
-        trees = [p for p in lay["props"] if LC.mesh_name(p) == "Tree"]
+        # by id: P5c swapped the kit Tree mesh for the Fab forest (SM_EnvFab_*), the ids stayed
+        trees = [p for p in lay["props"] if p["id"].startswith("tree-")]
         self.assertGreaterEqual(len(trees), 6)
         self.assertTrue(all(p["loc"][0] < -LC.FRAME_HX - 100 for p in trees))  # behind the W palisade
         self.assertGreater(len({p["scale"] for p in trees}), 3)
@@ -243,7 +244,7 @@ class Layouts(unittest.TestCase):
     def test_marmoreal_corners(self):
         lay, sp, err, warn = self._errors("marmoreal")
         self.assertEqual(err, [])
-        cherries = [p for p in lay["props"] if LC.mesh_name(p) == "Cherry"]
+        cherries = [p for p in lay["props"] if p["id"].startswith("cherry-")]  # P5c: Fab sakura, ids kept
         posts = [p for p in lay["props"] if LC.mesh_name(p) == "PlinthBall"]
         self.assertEqual(len(cherries), 4)
         self.assertEqual(len(posts), 4)

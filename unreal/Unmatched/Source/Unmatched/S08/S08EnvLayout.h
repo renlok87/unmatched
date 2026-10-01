@@ -28,6 +28,24 @@
 //   ARTPREVIEW envlayout prop id=.. / light id=.. / missing mesh=.. / skipped id=.. / tray ... / off ...
 // Everything except Spawn / Update / Clear is world-free and automation-tested (S08EnvLayoutTests.cpp,
 // Unmatched.S08.EnvLayout.*).
+//
+// ENV-MAPS P5c track V:
+//  * optional "fx" section - Niagara systems (derived copies under /Game/EnvKit/, never a pack folder in place):
+//      "fx": [ {"id":"fire-campfire-nw", "system":"/Game/EnvKit/FX/NS_Env_Campfire", "anchor":"campfire-nw",
+//               "loc":[0,0,6], "yawDeg":0, "scale":1, "seed":1234, "warmupS":1.5, "enabled":true,
+//               "user":{"SpawnRate":8, "Color":[1.6,0.8,1.0,1]}} ]
+//    "anchor" (optional) = a prop id: loc is then an offset from that prop's pivot (rotated by its yaw, not scaled) and
+//    the fx spawns only when the prop spawned. Spawned only on map-image boards (Update), never with -ArtPreviewNoFx;
+//    a system with an enabled Light / Component renderer is refused (light budget: no dynamic lights from VFX); an fx
+//    whose pivot lies on the painted map is skipped. Deterministic frames: a fixed random seed per fx (seed, else the
+//    CRC of the id), warmup = warmupS of simulation in fixed 1/30 s ticks at spawn (AdvanceSimulation), and in -Bench
+//    (or with -EnvFxFreeze) the systems are paused after the warmup (-EnvFxLive keeps them running in -Bench).
+//    Trace: 'ARTPREVIEW envlayout fx id=.. system=.. ...' per fx and 'ARTPREVIEW envlayout fx map=.. fx=N ...'.
+//  * layout variants: -EnvLayoutVariant=<name> overlays <Dir>/<map>.<name>.layout.json (schema
+//    "unmatched.env-layout-overlay/1": props / fx {remove:[ids], replace:[{id, fields..}], add:[entries]}) on the base
+//    layout; the merged document is validated like a base layout. No flag = no overlay (the base, byte for byte); a
+//    missing or invalid overlay falls back to the base (traced 'ARTPREVIEW envlayout variant=<name> ... status=absent|
+//    invalid fallback=base'). Removing a prop also removes the fx anchored on it.
 #pragma once
 
 #include "CoreMinimal.h"
@@ -38,6 +56,8 @@ class AActor;
 class USceneComponent;
 class UStaticMeshComponent;
 class UPointLightComponent;
+class UNiagaraComponent;
+class UNiagaraSystem;
 
 namespace S08EnvLayoutSpec {
 inline const TCHAR* const Schema = TEXT("unmatched.env-layout/1");
@@ -57,6 +77,25 @@ constexpr float MaxPropScale = 20.0f;
 constexpr int32 CombinedPointBudget = 6;
 /** Tolerance of the tray-vs-apron consistency note (uu). */
 constexpr float TrayApronToleranceUU = 1.0f;
+/** P5c "fx" section (Niagara). Budget per board: a few hundred particles (the trace sums them after the warmup). */
+constexpr int32 MaxFx = 48;
+constexpr int32 MaxFxUserParams = 16;
+constexpr float MaxFxScale = 10.0f;
+constexpr float DefaultFxWarmupS = 2.0f;
+constexpr float MaxFxWarmupS = 10.0f;
+/** Fixed warmup tick (AdvanceSimulation): the same ticks on every run = reproducible -Bench frames. */
+constexpr float FxWarmupTickS = 1.0f / 30.0f;
+/** Fx systems are derived copies under the kit root (cooked by DirectoriesToAlwaysCook /Game/EnvKit). */
+inline const TCHAR* const FxRoot = TEXT("/Game/EnvKit/");
+/** -ArtPreviewNoFx: keep the environment but spawn no fx (A/B frames, perf gate). */
+inline const TCHAR* const NoFxFlagName = TEXT("ArtPreviewNoFx");
+/** -EnvFxFreeze: pause every fx after its warmup (also outside -Bench); -EnvFxLive: keep them running in -Bench. */
+inline const TCHAR* const FxFreezeFlagName = TEXT("EnvFxFreeze");
+inline const TCHAR* const FxLiveFlagName = TEXT("EnvFxLive");
+inline const TCHAR* const BenchFlagName = TEXT("Bench");
+/** -EnvLayoutVariant=<name>: overlay <Dir>/<map>.<name>.layout.json on the base layout. */
+inline const TCHAR* const VariantParam = TEXT("EnvLayoutVariant=");
+inline const TCHAR* const OverlaySchema = TEXT("unmatched.env-layout-overlay/1");
 }  // namespace S08EnvLayoutSpec
 
 /** "tray": outer half extents of the diorama tray top (incl. the apron) and its Y shift (board space). */
@@ -99,6 +138,36 @@ struct UNMATCHED_API FS08EnvLight {
   FString ColorHex() const;
 };
 
+/** One Niagara user parameter override of an fx entry: 1..4 numbers (the type comes from the system's exposed
+ *  parameter at spawn: float / int / bool / vec2 / vec3 / position / vec4 / colour). */
+struct UNMATCHED_API FS08EnvFxParam {
+  FString Name;  // without the "User." prefix
+  int32 Num = 1;
+  FVector4 Value = FVector4(0.0, 0.0, 0.0, 0.0);
+  FString ValueString() const;
+};
+
+/** One entry of the optional "fx" section. */
+struct UNMATCHED_API FS08EnvFx {
+  FString Id;
+  FString System;  // /Game/EnvKit/... package path of a UNiagaraSystem, optionally "Pkg.Obj"
+  FString Anchor;  // optional prop id: Loc is then relative to that prop's pivot (rotated by its yaw)
+  FVector Loc = FVector::ZeroVector;
+  float YawDeg = 0.0f;
+  float Scale = 1.0f;
+  bool bSeedSet = false;
+  int32 Seed = 0;
+  float WarmupS = S08EnvLayoutSpec::DefaultFxWarmupS;
+  bool bEnabled = true;
+  TArray<FS08EnvFxParam> User;
+  /** Seed, or a stable CRC of the id (the same on every run). */
+  int32 EffectiveSeed() const;
+  /** Fixed warmup ticks of FxWarmupTickS. */
+  int32 WarmupTicks() const;
+  /** Relative transform under the board actor root; AnchorProp = the prop named by Anchor (nullptr = board space). */
+  FTransform Transform(const FS08EnvProp* AnchorProp) const;
+};
+
 /** One parsed layout document (world-free). */
 struct UNMATCHED_API FS08EnvLayout {
   FString Map;      // "marmoreal" | "sarpedon" (lower-case map key)
@@ -109,16 +178,43 @@ struct UNMATCHED_API FS08EnvLayout {
   TArray<FS08EnvLight> Lights;
   /** ENV-U10: the optional themed ground (S08EnvGround.h); an invalid "ground" makes the whole layout invalid. */
   FS08EnvGround Ground;
+  /** P5c: the optional Niagara fx (an invalid entry makes the whole layout invalid, like a prop). */
+  TArray<FS08EnvFx> Fx;
   FString Notes;
   /** LoadFile only: the file and the sha256 of its bytes (evidence). */
   FString SourcePath;
   FString SourceSha256;
+  /** S08EnvLayout::ApplyVariant only: the overlay applied on top of the base (empty = none). */
+  FString Variant;
+  FString OverlayPath;
+  FString OverlaySha256;
 
   /** Parses and validates the whole document; any structural error makes it invalid (false, nothing spawns). */
   bool ParseJson(const FString& Text, TArray<FString>& OutErrors);
   bool LoadFile(const FString& Path, TArray<FString>& OutErrors);
   /** Unique mesh package paths of the props (first-use order). */
   TArray<FString> UniqueMeshPaths() const;
+  /** Unique Niagara system paths of the fx (first-use order). */
+  TArray<FString> UniqueFxSystemPaths() const;
+  const FS08EnvProp* FindProp(const FString& Id) const;
+};
+
+/** What -EnvLayoutVariant did (also its trace line). */
+struct UNMATCHED_API FS08EnvVariantResult {
+  FString Name;           // empty = no variant requested
+  FString Status;         // none | ok | absent | invalid
+  FString Path;           // overlay file
+  FString Sha256;         // of the overlay bytes (ok / invalid)
+  int32 PropsRemoved = 0;
+  int32 PropsReplaced = 0;
+  int32 PropsAdded = 0;
+  int32 FxRemoved = 0;
+  int32 FxRemovedWithAnchor = 0;  // fx dropped because the overlay removed their anchor prop
+  int32 FxReplaced = 0;
+  int32 FxAdded = 0;
+  TArray<FString> Errors;
+  /** 'ARTPREVIEW envlayout variant=<name|none> map=<m> status=.. ...' */
+  FString TraceLine(const FString& MapKey) const;
 };
 
 /** What one Spawn did (also the trace numbers). */
@@ -135,6 +231,41 @@ struct UNMATCHED_API FS08EnvSpawnStats {
   int32 OutsideKit = 0;        // props whose mesh is not under /Game/EnvKit (cooked only by another rule)
   int32 ShadowCasters = 0;
   TArray<FString> MissingPaths;
+  /** Ids of the props that got a component (fx anchors need a spawned prop). */
+  TSet<FString> SpawnedPropIds;
+};
+
+/** How fx spawn (FromCommandLine for the board actor; tests build their own). */
+struct UNMATCHED_API FS08EnvFxOptions {
+  bool bSpawn = true;     // false = -ArtPreviewNoFx
+  bool bActivate = true;  // false: components are created and configured but never simulated (automation)
+  bool bFreeze = false;   // pause after the warmup (-Bench unless -EnvFxLive, or -EnvFxFreeze)
+  bool bBench = false;
+  /** Automation only: systems by layout path instead of loading packages. */
+  TMap<FString, UNiagaraSystem*> Preloaded;
+  static FS08EnvFxOptions FromCommandLine();
+  /** off | frozen | live | inactive */
+  FString Mode() const;
+};
+
+/** What one SpawnFx did (also the fx summary trace). */
+struct UNMATCHED_API FS08EnvFxStats {
+  int32 LayoutFx = 0;
+  int32 Fx = 0;                    // Niagara components created
+  int32 MissingSystems = 0;        // unique system paths that did not load
+  int32 SkippedMissing = 0;
+  int32 SkippedDisabled = 0;       // "enabled": false
+  int32 SkippedAnchor = 0;         // anchor prop not spawned (missing mesh / removed / inside the map)
+  int32 SkippedInsideMap = 0;      // pivot on the painted map (circles stay readable)
+  int32 SkippedLightRenderer = 0;  // the system has an enabled Light / Component renderer (light budget)
+  int32 NearBand = 0;              // spawned between the map and the K1 camera (traced, not refused)
+  int32 GpuEmitters = 0;           // enabled GPU-sim emitters of the spawned systems (not deterministic)
+  int32 NonDeterministic = 0;      // spawned fx whose system lacks bDeterminism or simulates on the GPU
+  int32 Particles = 0;             // live particles after the warmup (0 when not activated)
+  int32 UserSet = 0;               // user parameters applied
+  int32 UserMissing = 0;           // user parameters the system does not expose (or with the wrong arity)
+  FString Mode;
+  TArray<FString> MissingPaths;
 };
 
 /** Inputs of one board-actor update (the actor fills it from its active art profile). */
@@ -150,6 +281,9 @@ struct UNMATCHED_API FS08EnvLayoutRequest {
   FVector2D ProfileTrayOffset = FVector2D::ZeroVector;  // FS08MapImageSpec::TrayOffsetUU (placeholder fit)
   int32 ProfilePointLights = 0;  // point lights of the art light profile (combined budget trace)
   FString Dir;                   // empty = S08EnvLayout::ResolveDir()
+  /** P5c: unset = the command line (-EnvLayoutVariant=, -ArtPreviewNoFx, -Bench, -EnvFxFreeze / -EnvFxLive). */
+  TOptional<FString> Variant;
+  TOptional<FS08EnvFxOptions> FxOptions;
 };
 
 /** The environment state of one board actor (the components themselves are UPROPERTY arrays of the actor). */
@@ -165,6 +299,10 @@ struct UNMATCHED_API FS08EnvLayoutRuntime {
    *  (OwnedComponents); Update clears them together with the props and lights. */
   TArray<TWeakObjectPtr<UStaticMeshComponent>> Ground;
   FS08EnvGroundStats GroundStats;
+  /** P5c: the Niagara fx of Layout.Fx (SpawnFx). Weak like Ground: the board actor owns the components. */
+  TArray<TWeakObjectPtr<UNiagaraComponent>> Fx;
+  FS08EnvFxStats FxStats;
+  FS08EnvVariantResult Variant;
 };
 
 namespace S08EnvLayout {
@@ -178,6 +316,26 @@ UNMATCHED_API bool Arm(bool bArtPreview);
 /** Automation only: force -ArtPreviewNoEnv on/off (Reset -> command line). The diorama flag has its own override. */
 UNMATCHED_API void SetOptOutOverrideForTest(bool bOptOut);
 UNMATCHED_API void ResetOptOutOverrideForTest();
+/** -ArtPreviewNoFx. */
+UNMATCHED_API bool FxOptOut();
+/** -EnvLayoutVariant=<name> (empty = none; an invalid name is traced by Update and ignored). */
+UNMATCHED_API FString VariantFromCommandLine();
+/** Variant names: [a-z0-9-], 1..32 characters. */
+UNMATCHED_API bool IsVariantName(const FString& Name);
+/** <Dir>/<MapKey>.<Variant>.layout.json */
+UNMATCHED_API FString OverlayFileFor(const FString& Dir, const FString& MapKey, const FString& Variant);
+/** True for an overlay file name ("<map>.<variant>.layout.json"): never a base layout (Resolve / Arm skip it). */
+UNMATCHED_API bool IsOverlayFileName(const FString& FileName);
+/** World-free merge: applies the overlay document OverlayText on the base document BaseText (props / fx remove ->
+ *  replace -> add) and validates the merged document as a layout (Out). False with errors (Out untouched) when the
+ *  overlay or the merged document is invalid. Counts go to InOutResult. */
+UNMATCHED_API bool MergeOverlay(const FString& BaseText, const FString& OverlayText, const FString& MapKey,
+                                const FString& Variant, FS08EnvLayout& Out, FS08EnvVariantResult& InOutResult);
+/** Applies -EnvLayoutVariant (Variant) to a valid base layout loaded from InOutLayout.SourcePath: none (empty name) /
+ *  absent (no overlay file) / invalid (bad name or document: the base stays) / ok (InOutLayout = the merged layout,
+ *  Variant / OverlayPath / OverlaySha256 set; SourcePath / SourceSha256 stay the base's). */
+UNMATCHED_API FS08EnvVariantResult ApplyVariant(const FString& Dir, const FString& MapKey, const FString& Variant,
+                                                FS08EnvLayout& InOutLayout);
 
 /** <ProjectConfigDir>/ArtBoards/EnvLayouts. */
 UNMATCHED_API FString DefaultDir();
@@ -220,10 +378,24 @@ UNMATCHED_API FS08EnvSpawnStats Spawn(const FS08EnvLayout& Layout, AActor& Owner
 /** Destroys every spawned component; returns how many there were. */
 UNMATCHED_API int32 Clear(TArray<TObjectPtr<UStaticMeshComponent>>& Props,
                           TArray<TObjectPtr<UPointLightComponent>>& Lights);
+/** P5c: one UNiagaraComponent per enabled fx entry under Parent, owned by Owner (no collision, no shadow, no
+ *  scalability culling, the fixed seed, the user parameters typed by the system's exposed parameters), activated,
+ *  warmed up in WarmupTicks() fixed ticks and paused when Options.bFreeze; traced per fx. Skips (traced): disabled,
+ *  anchor prop not in SpawnedPropIds, pivot on the painted map, missing system, a system with an enabled Light /
+ *  Component renderer. FrameHalf feeds the near-band count. Nothing when !Options.bSpawn. */
+UNMATCHED_API FS08EnvFxStats SpawnFx(const FS08EnvLayout& Layout, AActor& Owner, USceneComponent* Parent,
+                                     const FVector2D& MapHalf, const FVector2D& FrameHalf,
+                                     const TSet<FString>& SpawnedPropIds, const FS08EnvFxOptions& Options,
+                                     TArray<TWeakObjectPtr<UNiagaraComponent>>& OutFx);
+UNMATCHED_API int32 ClearFx(TArray<TWeakObjectPtr<UNiagaraComponent>>& Fx);
+/** 'ARTPREVIEW envlayout fx map=<m> fx=N layoutFx=M ...' */
+UNMATCHED_API FString FxSummaryLine(const FString& MapKey, const FS08EnvFxStats& Stats);
 /** The board-actor hook: clears on a board change / gate off, (re)loads and spawns the layout of the active map-image
  *  profile, keeps the components when the same layout applies again; writes the summary trace. ENV-U10: a layout with
  *  a "ground" section also gets its ground strips (S08EnvGround::Spawn on the same tray top rectangle, kept in
- *  Runtime.Ground, traced 'ARTPREVIEW envlayout ground ...') and loses them with the props. */
+ *  Runtime.Ground, traced 'ARTPREVIEW envlayout ground ...') and loses them with the props. P5c: the -EnvLayoutVariant
+ *  overlay is applied before anything spawns (part of the same-layout key), and the "fx" section spawns after the
+ *  ground (Runtime.Fx, cleared with the props). */
 UNMATCHED_API void Update(const FS08EnvLayoutRequest& Request, AActor& Owner, USceneComponent* Parent,
                           FS08EnvLayoutRuntime& Runtime, TArray<TObjectPtr<UStaticMeshComponent>>& Props,
                           TArray<TObjectPtr<UPointLightComponent>>& Lights);

@@ -24,6 +24,8 @@ REPO = Path(__file__).resolve().parents[5]
 LAYOUTS = REPO / "unreal/Unmatched/Config/ArtBoards/EnvLayouts"
 BACKWALL_LAYOUT = REPO / "art/pipeline-candidates/ASSET-ENV-M-BACKWALL-001/20261001-backwall-v1/reports/backwall-layout.json"
 NOTE_MARK = " P5 track A (2026-10-01):"
+P5C_SCRIPT = REPO / "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-fab-p5c/scripts/p5c_layout_props.py"
+P5C_NOTE_MARK = " P5c track F (2026-10-01):"
 
 
 def prop(pid: str, kit: str, name: str, x: float, y: float, yaw: float, scale: float = 1.0, shadow: bool = True) -> dict:
@@ -100,6 +102,18 @@ NOTES = {
 }
 
 
+def _p5c():
+    """The P5c track F generator (20261001-fab-p5c), which moves some P5 props (deck dressing, lantern posts) - None
+    when that run is absent."""
+    if not P5C_SCRIPT.is_file():
+        return None
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("p5c_layout_props", P5C_SCRIPT)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
 def apply(key: str, layout: dict) -> dict:
     new = P5_PROPS[key]()
     ids = {p["id"] for p in new}
@@ -109,6 +123,12 @@ def apply(key: str, layout: dict) -> dict:
     if NOTE_MARK in notes:
         notes = notes[: notes.index(NOTE_MARK)]
     out["notes"] = notes + NOTES[key]
+    # a layout the P5c generator already wrote (its note paragraph is there) gets P5c re-applied on top, so this
+    # generator stays idempotent on the merged result (P5c moves barrel-* / crate-* / lantern-w / lantern-n)
+    if P5C_NOTE_MARK in layout.get("notes", ""):
+        nxt = _p5c()
+        if nxt is not None:
+            out = nxt.apply(key, out)
     return out
 
 

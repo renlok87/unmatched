@@ -28,9 +28,14 @@ Three stages, one file:
            /Game/EnvKit/Ground/MI_EnvGround_<Map>                  per map: layer sets, tiling, tints, per-layer
                                                                   roughness / specular / normal / macro, edge band,
                                                                   water, accent, grade, SplatRect
-           /Game/EnvKit/Ground/M_EnvWaterfall                      P4: the waterfall card material (masked, lit)
+           /Game/EnvKit/Ground/M_EnvWaterfall                      P4: the waterfall material (P5c graph 3: lit
+                                                                  translucent + Water Materials streaks)
            /Game/EnvKit/Ground/MI_EnvWaterfall_<Map>               only maps with ground-params 'water.falls'
-           /Game/EnvKit/Ground/M_EnvSea                            P5 track B: the sea ring material (opaque, lit)
+           /Game/EnvKit/Ground/M_EnvSea                            P5 track B: the sea ring material (opaque, lit;
+                                                                  P5c graph 2: Water Materials lace / waves, surf, sky)
+           (P5c: both derived materials reference /Game/WaterMaterials/Textures/{T_Ocean_Foam, T_Water_Normal,
+            T_Water_Normal_Large, T_Waterfall_Foam} - tharlevfx, CC BY 4.0, docs/art-pipeline/CREDITS-fab.md; the
+            gitignored pack is never modified, the cooker follows the references from /Game/EnvKit)
            /Game/EnvKit/Ground/MI_EnvSea_<Map>                     only maps with ground-params 'sea' (Sarpedon)
            /Game/EnvKit/Ground/<Map>/SM_Env_S_{Waterfall,WaterfallFoam,WaterfallLip,SeaRing}
                                                                   P5 track B: the lane K meshes (art/pipeline-candidates/
@@ -68,19 +73,31 @@ M_EnvGround (graph 2; lit, opaque, one-sided; every texture on a SHARED sampler 
              WaterSurface.x, foam -> 0.7
   specular = sum w_i LayerSpecular_i, water -> WaterSurface.y;  AO / metallic = sum w_i ORMH_i.rb
   emissive = graded WaterColor * WaterSurface.w * water * (1 - foam)  (the map's river is lifted; 0 without water)
-M_EnvWaterfall (masked, clip 0.5, lit, two-sided): FallCard = (width, height, kind 0 card / 1 spill, flip) per
-  component (S08EnvGround sets it on the MID; flip 1 = v := 1 - v for the lane K sheet / foam meshes, whose v was authored
-  top -> bottom in Blender and is flipped by the FBX import; 0 for the engine-plane card / spill); streaks scroll along +v at FallFlow.x uu/s (v runs down the card and
-  towards the lip on the spill), foam at the lip and in the streaks, side fade FallFlow.z uu, bottom fade FallFlow.w,
-  spill far-edge fade FallSpill.x uu, the soft fades dithered in screen space (interleaved gradient noise on
-  SvPosition, amount FallSpill.y; no DitherTemporalAA node - it is not in the UE 5.8 headers); ripple normal along the
-  flow; emissive = graded colour * FallShade.w.
-M_EnvSea (P5 track B; opaque, lit, one-sided): UV0 = board XY / SeaTile.x uu (the lane K ring), VertexColor R = the foam
-  band at the cliffs (broken by two drifting value noises, SeaFlow.zw = foam scale uu / speed), G = the far fade (0 at the
-  cliffs, 1 from 3500 uu out) -> SeaFar.rgb (strength SeaFar.a); base = lerp(SeaColor, SeaFoam.rgb, foam * SeaFoam.a),
-  night grade as M_EnvWaterfall; ripple normal (WaterRippleN, panned SeaFlow.xy uu/s at SeaTile.y uu) of strength
-  SeaShade.z fading out far; roughness SeaShade.x (foam 0.7, far 0.95), specular SeaShade.y (0 far), emissive = graded *
-  SeaShade.w * (1 - far) (the sea stays readable under the night grade without a light).
+M_EnvWaterfall (graph 3, P5c; lit TRANSLUCENT with per-pixel surface lighting, two-sided; graph 2 was masked, clip
+  0.5): FallCard = (width, height, kind 0 card / 1 spill, flip) per component (S08EnvGround sets it on the MID; flip 1 =
+  v := 1 - v for the lane K sheet / foam meshes, whose v was authored top -> bottom in Blender and is flipped by the FBX
+  import; 0 for the engine-plane card / spill); streaks scroll along +v at FallFlow.x uu/s (v runs down the card and
+  towards the lip on the spill): the Water Materials T_Waterfall_Foam (CC BY 4.0) in two layers (FallTex = uu across /
+  along, speed ratio of the 2nd) weighted by FallLook.w, else the graph 2 value noise; foam at the lip and in the
+  streaks; side fades FallFlow.z uu whose width wobbles along the flow (FallLook.z: no straight rectangular outline),
+  bottom fade FallFlow.w, spill far-edge fade FallSpill.x uu; Opacity = side x along x lerp(FallLook.x body, FallLook.y
+  foam, foam); OpacityMask = the graph 2 dithered mask (screen-space interleaved gradient noise, amount FallSpill.y) for
+  an MI that overrides the blend mode back to Masked (ground-params falls[0].look.blend 'masked'); ripple normal along
+  the flow; emissive = graded colour * FallShade.w.
+M_EnvSea (graph 2, P5c; still OPAQUE, lit, one-sided): UV0 = board XY / SeaTile.x uu (the lane K ring), UV1.y = the
+  distance from the inner ring edge / 1000 uu (V flipped by the FBX import: SeaSurf.w = 1), VertexColor R = the foam band
+  at the cliffs, G = the far fade (0 at the cliffs, 1 from 3500 uu out). Lace = the Water Materials T_Ocean_Foam (two
+  pans at SeaPack.y uu) when SeaPack.x = 1, else the graph 1 value noise; shore foam = saturate((R (0.55 + 0.9 lace) -
+  SeaPack.w) SeaPack.z); surf = crest lines every SeaSurf.x uu running in at SeaSurf.y cycles/s up to SeaSurf.z uu out
+  (SeaSurfLook = crest width, opacity, lace breakup, foam emissive lift); waves = T_Water_Normal / _Large panned at
+  SeaWaveTile uu -> a facet shade towards SeaWaveDir (SeaWave.x) and sparse whitecaps (SeaWave.y above SeaWave.z);
+  base = lerp(lerp(SeaColor x (1 + shade), SeaFoam.rgb, foam), SeaFar.rgb, far (1 - foam)), night grade as
+  M_EnvWaterfall; normal = the two wave normals x SeaShade.z fading out far; roughness SeaShade.x (foam 0.7, far 0.95),
+  specular SeaShade.y (0 far); emissive = graded (SeaShade.w (1 - far)(1 - foam) + SeaSurfLook.w foam) + the sky lift
+  SeaSky.rgb x SeaSky.a x lerp(SeaSkyRamp.z, 1, smoothstep(SeaSkyRamp.xy, VC.g)) with slow cloud variation (SeaSkyNoise =
+  scale uu, amplitude, pan uu/s). At the material defaults (no pack, no surf / waves / sky) it equals graph 1.
+  sea_cpu / sea_graph1_cpu are numpy mirrors (tests and statistics, not a render); hlsl_check.py compiles every Custom
+  node with the Windows SDK DXC.
 Idempotent: textures carry EnvGroundSourceSha256 (re-imported only when the source changes or --force), the materials
 carry EnvGroundGraphVersion (rebuilt only when their graph version changes or --force), the MIs are compared parameter by
 parameter and only written when they differ. Report: 'ENVGROUND-IMPORT-REPORT {...}' / 'ENVGROUND-IMPORT-RESULT ok|failed'
@@ -123,7 +140,7 @@ FALL_MATERIAL_NAME = "M_EnvWaterfall"
 FALL_MATERIAL_PATH = f"{ROOT}/{FALL_MATERIAL_NAME}"
 SEA_MATERIAL_NAME = "M_EnvSea"
 SEA_MATERIAL_PATH = f"{ROOT}/{SEA_MATERIAL_NAME}"
-SEA_GRAPH_VERSION = "1"
+SEA_GRAPH_VERSION = "2"  # P5c: pack textures (Water Materials), surf, waves, sky lift
 # P5 track B: the lane K meshes of a map (part -> (asset name, vertex colours)); folder /Game/EnvKit/Ground/<Map>
 ENV_MESHES = {"sheet": ("SM_Env_S_Waterfall", "ignore"), "foam": ("SM_Env_S_WaterfallFoam", "ignore"),
               "lip": ("SM_Env_S_WaterfallLip", "replace"), "sea": ("SM_Env_S_SeaRing", "replace")}
@@ -135,7 +152,7 @@ T2B_MI_PREFIX = "/Game/PipelineCandidates/TableBase/T2b/MI_TableBase_T2b_"
 SHA_TAG = "EnvGroundSourceSha256"
 GRAPH_TAG = "EnvGroundGraphVersion"
 GRAPH_VERSION = "2"
-FALL_GRAPH_VERSION = "2"  # P5b tune: FallCard.w = 1 flips v (lane K meshes)
+FALL_GRAPH_VERSION = "3"  # P5b tune: FallCard.w = 1 flips v (graph 2); P5c: translucent + pack streaks (graph 3)
 PREP_VERSION = "1"
 KEYS = ("BC", "N", "ORMH")
 LAYERS = 4
@@ -481,6 +498,14 @@ def plan(params: dict, keys: list[str], staging: Path, params_path: Path) -> dic
         t.update(ok=False, error="the staged ripple was built with another RIPPLE recipe (re-run --prep)")
     out["sets"][RIPPLE_SET] = {"textures": {"N": t}, "ok": t["ok"]}
     out["ok"] = out["ok"] and t["ok"]
+    # P5c: the Water Materials textures (gitignored pack; missing = the procedural fallback, a warning, not an error)
+    out["pack"] = pack_plan()
+    for key in keys:
+        try:
+            fall_mi_want(key, params)  # validates falls[0].look (blend)
+        except ValueError as exc:
+            out["ok"] = False
+            out.setdefault("errors", []).append(str(exc))
     for key in keys:
         m = {"ok": True, "splatAsset": splat_asset(key), "auxAsset": aux_asset(key), "mi": mi_asset(key)}
         if has_falls(params, key):
@@ -986,8 +1011,77 @@ def build_material(defaults: dict, splat_default, aux_default, ripple_default, f
             "textureParams": sorted(str(n) for n in mel.get_texture_parameter_names(material))}
 
 
-# --- M_EnvWaterfall (P4, review gap 1): the waterfall card + the spill over the T2 lip ---------------------------------
-HLSL_FALL_CORE = """// P4 M_EnvWaterfall: FallCard = (width uu, height uu, kind: 0 the vertical card / 1 the flat spill, 0) per component
+# --- P5c track W: Water Materials (tharlevfx, CC BY 4.0 - docs/art-pipeline/CREDITS-fab.md) ---------------------------
+# Our derived materials (M_EnvSea graph 2, M_EnvWaterfall graph 3) sample four textures of the gitignored pack folder
+# /Game/WaterMaterials by hard reference (the pack is never modified; the cooker follows the references from the
+# always-cooked /Game/EnvKit). Sampler types as the pack's own materials use them (Scout T3D of M_Ocean / M_Waterfall /
+# M_Rapids): T_Ocean_Foam Color (sRGB; R / G / B = three foam patterns), T_Water_Normal and T_Water_Normal_Large Normal,
+# T_Waterfall_Foam LinearColor (R / G / B / A = four streak patterns); the UE stage still derives the sampler type from
+# the texture's actual compression / sRGB (sampler_type_for). Without the pack (a fresh checkout) the materials build
+# with stand-in textures and the MIs set the pack weight to 0: the graph 2 procedural look (reported as 'fallback').
+PACK_ROOT = "/Game/WaterMaterials/Textures"
+PACK_CONTENT_DIR = REPO / "unreal/Unmatched/Content/WaterMaterials/Textures"
+PACK_TEXTURES = {  # material parameter -> (pack texture, sampler kind the pack uses)
+    "SeaFoamTex": ("T_Ocean_Foam", "color"),
+    "SeaNormalA": ("T_Water_Normal", "normal"),
+    "SeaNormalB": ("T_Water_Normal_Large", "normal"),
+    "FallStreakTex": ("T_Waterfall_Foam", "linear"),
+}
+SEA_PACK_PARAMS = ("SeaFoamTex", "SeaNormalA", "SeaNormalB")
+PACK_FALLBACK_COLOR = "/Engine/EngineResources/DefaultTexture"
+
+
+def pack_asset(param: str) -> str:
+    name = PACK_TEXTURES[param][0]
+    return f"{PACK_ROOT}/{name}"
+
+
+def pack_plan() -> dict:
+    """Plain Python: which pack textures are in the worktree Content (the UE stage loads them; missing = fallback)."""
+    out = {}
+    for param, (name, kind) in PACK_TEXTURES.items():
+        f = PACK_CONTENT_DIR / f"{name}.uasset"
+        out[param] = {"asset": pack_asset(param), "sampler": kind, "present": f.is_file()}
+    return out
+
+
+def sampler_type_for(texture):
+    """UE: the material sampler type that matches a texture's compression / sRGB (a mismatch fails the compile)."""
+    st, tcs = u.MaterialSamplerType, u.TextureCompressionSettings
+    cs = texture.get_editor_property("compression_settings")
+    srgb = bool(texture.get_editor_property("srgb"))
+
+    def is_(name):
+        return getattr(tcs, name, None) is not None and cs == getattr(tcs, name)
+    if is_("TC_NORMALMAP"):
+        return st.SAMPLERTYPE_NORMAL
+    if is_("TC_MASKS"):
+        return st.SAMPLERTYPE_MASKS
+    if is_("TC_GRAYSCALE"):
+        return st.SAMPLERTYPE_GRAYSCALE if srgb else st.SAMPLERTYPE_LINEAR_GRAYSCALE
+    if is_("TC_ALPHA"):
+        return st.SAMPLERTYPE_ALPHA
+    return st.SAMPLERTYPE_COLOR if srgb else st.SAMPLERTYPE_LINEAR_COLOR
+
+
+def load_pack(ripple) -> tuple[dict, dict]:
+    """UE: ({param: texture}, {param: 'pack' | 'fallback'}) - the pack texture, else the ripple normal (normal slots) or
+    the engine default texture (colour slots)."""
+    eal = u.EditorAssetLibrary
+    tex, src = {}, {}
+    for param, (name, kind) in PACK_TEXTURES.items():
+        path = pack_asset(param)
+        t = u.load_asset(path) if eal.does_asset_exist(path) else None
+        if t is not None:
+            tex[param], src[param] = t, "pack"
+        else:
+            tex[param] = ripple if kind == "normal" else u.load_asset(PACK_FALLBACK_COLOR)
+            src[param] = "fallback"
+    return tex, src
+
+
+# --- M_EnvWaterfall (P4, review gap 1; P5c graph 3): the waterfall sheet / foam / mist + the spill over the T2 lip ----
+HLSL_FALL_CORE = """// P5c M_EnvWaterfall graph 3: FallCard = (width uu, height uu, kind: 0 the vertical card / 1 the flat spill, flip)
 struct FEnvFallFns {
   float Hash12(float2 p) {
     float3 p3 = frac(float3(p.xyx) * 0.1031);
@@ -1013,52 +1107,89 @@ float2 uvf = FallCard.w > 0.5 ? float2(UV.x, 1.0 - UV.y) : UV;
 float2 p = uvf * size;  // uu: x across the fall, y along the flow (down the card / towards the lip on the spill)
 float sc = max(FallFlow.y, 1.0);
 float2 q = float2(p.x / sc, (p.y - Time * FallFlow.x) / (sc * 5.0));
-float streak = 0.6 * F.ValueNoise(q) + 0.4 * F.ValueNoise(q * float2(2.1, 1.7) + 7.3);
+float streakP = 0.6 * F.ValueNoise(q) + 0.4 * F.ValueNoise(q * float2(2.1, 1.7) + 7.3);
+// P5c: the Water Materials streaks (T_Waterfall_Foam, two layers panned down the fall at two speeds), else graph 2 noise
+float streakT = saturate(0.55 * StreakA.r + 0.45 * StreakB.g);
+float streak = lerp(streakP, streakT, saturate(FallLook.w));
 float foam = spill ? saturate(uvf.y * 1.4 - 0.5) * (0.5 + streak)
                    : saturate(streak * 1.5 - 0.35) * (0.55 + 0.45 * saturate(1.0 - uvf.y * 1.5)) + 0.6 * saturate(1.0 - p.y / 14.0);
 foam = saturate(foam) * WaterFoam.a;
-float side = smoothstep(0.0, max(FallFlow.z, 0.5), p.x) * smoothstep(0.0, max(FallFlow.z, 0.5), size.x - p.x);
-float alpha = side * (0.75 + 0.5 * streak);
-alpha *= spill ? smoothstep(0.0, max(FallSpill.x, 0.5), p.y)
-               : 1.0 - smoothstep(1.0 - FallFlow.w, 1.0, uvf.y + 0.25 * (streak - 0.5));
+// soft sides whose width wobbles along the flow (no straight rectangular outline; FallLook.z = wobble 0..1)
+float2 wq = float2(0.0, (p.y - Time * FallFlow.x * 0.5) / 29.0);
+float ewl = max(FallFlow.z * (1.0 + FallLook.z * (F.ValueNoise(wq + float2(1.3, 0.0)) - 0.5) * 1.6), 0.5);
+float ewr = max(FallFlow.z * (1.0 + FallLook.z * (F.ValueNoise(wq + float2(8.9, 0.0)) - 0.5) * 1.6), 0.5);
+float side = smoothstep(0.0, ewl, p.x) * smoothstep(0.0, ewr, size.x - p.x);
+float along = spill ? smoothstep(0.0, max(FallSpill.x, 0.5), p.y)
+                    : 1.0 - smoothstep(1.0 - FallFlow.w, 1.0, uvf.y + 0.25 * (streak - 0.5));
+// translucent body: the water clear-ish (FallLook.x), the foam / streaks nearly opaque (FallLook.y)
+float alphaT = saturate(side * along * lerp(FallLook.x, FallLook.y, foam) * (0.85 + 0.3 * streak));
+// the graph 2 masked opacity (an MI may override the blend mode back to Masked: ground-params falls[].blend)
+float alphaM = side * along * (0.75 + 0.5 * streak);
 float3 base = lerp(WaterColor.rgb, WaterFoam.rgb, foam);
 float3 lit = base * exp2(NightEV) * NightTint;
 float luma = dot(lit, float3(0.2126, 0.7152, 0.0722));
 float3 graded = max(lerp(luma.xxx, lit, NightSaturation), 0.0);
 """
-FALL_CORE_INPUTS = ("UV", "Time", "FallCard", "FallFlow", "FallSpill", "WaterColor", "WaterFoam", "NightEV",
-                    "NightSaturation", "NightTint")
+FALL_CORE_INPUTS = ("UV", "Time", "FallCard", "FallFlow", "FallSpill", "FallLook", "StreakA", "StreakB", "WaterColor",
+                    "WaterFoam", "NightEV", "NightSaturation", "NightTint")
 HLSL_FALL_ALBEDO = HLSL_FALL_CORE + "return graded;\n"
 HLSL_FALL_EMISSIVE = HLSL_FALL_CORE + "return graded * FallShade.w;\n"
-HLSL_FALL_OPACITY = HLSL_FALL_CORE + """// screen-space dither of the soft fades (opacity mask clip 0.5; TSR smooths it)
+HLSL_FALL_OPACITY = HLSL_FALL_CORE + "return alphaT;\n"
+HLSL_FALL_OPACITY_MASK = HLSL_FALL_CORE + """// screen-space dither of the soft fades (masked override only: clip 0.5; TSR smooths it)
 float2 px = Parameters.SvPosition.xy;
 float ign = frac(52.9829189 * frac(dot(px, float2(0.06711056, 0.00583715))));
-return saturate(alpha + (ign - 0.5) * FallSpill.y);
+return saturate(alphaM + (ign - 0.5) * FallSpill.y);
 """
 HLSL_FALL_ROUGH = HLSL_FALL_CORE + "return saturate(lerp(FallShade.x, 0.6, foam));\n"
 HLSL_FALL_RIPPLE_UV = """float2 p = (FallCard.w > 0.5 ? float2(UV.x, 1.0 - UV.y) : UV) * max(FallCard.xy, float2(1.0, 1.0));
 return float2(p.x, p.y - Time * FallFlow.x) / max(RippleTileUU, 1.0);
+"""
+# the two streak layers: uu across / along the flow (FallTex.xy), the second one faster (FallTex.z) and offset
+HLSL_FALL_STREAK_UV1 = """float2 p = (FallCard.w > 0.5 ? float2(UV.x, 1.0 - UV.y) : UV) * max(FallCard.xy, float2(1.0, 1.0));
+return float2(p.x / max(FallTex.x, 1.0), (p.y - Time * FallFlow.x) / max(FallTex.y, 1.0));
+"""
+HLSL_FALL_STREAK_UV2 = """float2 p = (FallCard.w > 0.5 ? float2(UV.x, 1.0 - UV.y) : UV) * max(FallCard.xy, float2(1.0, 1.0));
+return float2(p.x / max(FallTex.x * 0.71, 1.0) + 0.37, (p.y - Time * FallFlow.x * max(FallTex.z, 0.1)) / max(FallTex.y * 1.3, 1.0));
 """
 HLSL_FALL_NORMAL = "return normalize(float3(R.xy * FallShade.z, 1.0));"
 HLSL_FALL_SPECULAR = "return saturate(FallShade.y);"
 FALL_SCALAR_DEFAULTS = {"NightEV": -1.0, "NightSaturation": 0.7, "RippleTileUU": 70.0}
 FALL_VECTOR_DEFAULTS = {"FallCard": (200.0, 230.0, 0.0, 0.0), "FallFlow": (55.0, 9.0, 12.0, 0.35),
                         "FallSpill": (18.0, 0.5, 0.0, 0.0), "FallShade": (0.08, 0.25, 0.5, 0.6),
+                        "FallLook": (0.55, 0.95, 0.6, 0.0), "FallTex": (36.0, 110.0, 1.6, 0.0),
                         "WaterColor": (0.0159, 0.0497, 0.141, 0.55), "WaterFoam": (0.62, 0.66, 0.7, 0.85),
                         "NightTint": (0.9317, 1.0042, 1.1595, 1.0)}
+FALL_BLENDS = ("translucent", "masked")
 
 
-def build_waterfall_material(ripple_default, force: bool) -> dict:
+def _translucent_lit(material) -> dict:
+    """Lit translucent with per-pixel surface lighting (the sheet takes the key light and its specular like an opaque
+    surface; the volumetric default reads flat). Engine-version dependent names are reported, not assumed."""
+    material.set_editor_property("blend_mode", u.BlendMode.BLEND_TRANSLUCENT)
+    flags = {}
+    tlm = getattr(getattr(u, "TranslucencyLightingMode", None), "TLM_SURFACE_PER_PIXEL_LIGHTING", None)
+    if tlm is not None:
+        try:
+            material.set_editor_property("translucency_lighting_mode", tlm)
+            flags["translucencyLightingMode"] = "TLM_SURFACE_PER_PIXEL_LIGHTING"
+        except Exception as exc:  # noqa: BLE001 - engine-version dependent
+            flags["translucencyLightingMode"] = f"n/a ({type(exc).__name__}: {exc})"
+    else:
+        flags["translucencyLightingMode"] = "n/a (enum missing: engine default)"
+    return flags
+
+
+def build_waterfall_material(ripple_default, streak_default, force: bool) -> dict:
     material, action = _begin_material(FALL_MATERIAL_PATH, FALL_MATERIAL_NAME, FALL_GRAPH_VERSION, force)
     if action == "unchanged":
         return {"action": "unchanged", "path": FALL_MATERIAL_PATH, "graphVersion": FALL_GRAPH_VERSION}
     mel = u.MaterialEditingLibrary
     material.set_editor_property("shading_model", u.MaterialShadingModel.MSM_DEFAULT_LIT)
-    material.set_editor_property("blend_mode", u.BlendMode.BLEND_MASKED)
-    material.set_editor_property("opacity_mask_clip_value", 0.5)
+    flags = _translucent_lit(material)
+    material.set_editor_property("opacity_mask_clip_value", 0.5)  # the masked MI override (falls[].blend 'masked')
     material.set_editor_property("two_sided", True)
     g = _Graph(material)
-    cmot, st, ssm = u.CustomMaterialOutputType, u.MaterialSamplerType, u.SamplerSourceMode
+    cmot, ssm = u.CustomMaterialOutputType, u.SamplerSourceMode
     uv = g.expr(u.MaterialExpressionTextureCoordinate, -2000)
     uv.set_editor_property("coordinate_index", 0)
     t = g.expr(u.MaterialExpressionTime, -2000)
@@ -1066,23 +1197,34 @@ def build_waterfall_material(ripple_default, force: bool) -> dict:
     v = {name: g.vector(name, val) for name, val in FALL_VECTOR_DEFAULTS.items()}
     src = {"UV": (uv, ""), "Time": (t, ""), "NightEV": (s["NightEV"], ""),
            "NightSaturation": (s["NightSaturation"], ""), "NightTint": (v["NightTint"], "RGB")}
-    for name in ("FallCard", "FallFlow", "FallSpill", "WaterColor", "WaterFoam", "FallShade"):
+    for name in ("FallCard", "FallFlow", "FallSpill", "FallLook", "FallTex", "WaterColor", "WaterFoam", "FallShade"):
         src[name] = (v[name], "RGBA")
+    streak_type = sampler_type_for(streak_default)
+    for idx, code in ((1, HLSL_FALL_STREAK_UV1), (2, HLSL_FALL_STREAK_UV2)):
+        suv = g.custom(f"FallStreakUV{idx}", cmot.CMOT_FLOAT2, ("UV", "Time", "FallCard", "FallFlow", "FallTex"), code,
+                       -1500, 1100 + 220 * idx)
+        g.wire(suv, {k: src[k] for k in ("UV", "Time", "FallCard", "FallFlow", "FallTex")})
+        node = g.sample("FallStreakTex", streak_type, streak_default, ssm.SSM_WRAP_WORLD_GROUP_SETTINGS, -1200,
+                        1100 + 220 * idx)
+        g.connect(suv, "", node, "UVs")
+        src["StreakA" if idx == 1 else "StreakB"] = (node, "RGBA")
     nodes = {}
     for desc, code, out_type, extra, y in (
             ("FallAlbedo", HLSL_FALL_ALBEDO, cmot.CMOT_FLOAT3, (), -300),
             ("FallEmissive", HLSL_FALL_EMISSIVE, cmot.CMOT_FLOAT3, ("FallShade",), 0),
             ("FallOpacity", HLSL_FALL_OPACITY, cmot.CMOT_FLOAT1, (), 300),
+            ("FallOpacityMask", HLSL_FALL_OPACITY_MASK, cmot.CMOT_FLOAT1, (), 450),
             ("FallRoughness", HLSL_FALL_ROUGH, cmot.CMOT_FLOAT1, ("FallShade",), 600)):
         pins = FALL_CORE_INPUTS + extra
         node = g.custom(desc, out_type, pins, code, -800, y)
-        g.wire(node, {p: src[p] for p in pins})
+        g.wire(node, {p_: src[p_] for p_ in pins})
         nodes[desc] = node
     ruv = g.custom("FallRippleUV", cmot.CMOT_FLOAT2, ("UV", "Time", "FallCard", "FallFlow", "RippleTileUU"),
                    HLSL_FALL_RIPPLE_UV, -1500, 900)
     g.wire(ruv, {"UV": src["UV"], "Time": src["Time"], "FallCard": src["FallCard"], "FallFlow": src["FallFlow"],
                  "RippleTileUU": (s["RippleTileUU"], "")})
-    rs = g.sample("WaterRippleN", st.SAMPLERTYPE_NORMAL, ripple_default, ssm.SSM_WRAP_WORLD_GROUP_SETTINGS, -1200, 900)
+    rs = g.sample("WaterRippleN", u.MaterialSamplerType.SAMPLERTYPE_NORMAL, ripple_default,
+                  ssm.SSM_WRAP_WORLD_GROUP_SETTINGS, -1200, 900)
     g.connect(ruv, "", rs, "UVs")
     normal = g.custom("FallNormal", cmot.CMOT_FLOAT3, ("R", "FallShade"), HLSL_FALL_NORMAL, -800, 900)
     g.wire(normal, {"R": (rs, "RGB"), "FallShade": src["FallShade"]})
@@ -1090,17 +1232,23 @@ def build_waterfall_material(ripple_default, force: bool) -> dict:
     g.wire(spec, {"FallShade": src["FallShade"]})
     mel.connect_material_property(nodes["FallAlbedo"], "", u.MaterialProperty.MP_BASE_COLOR)
     mel.connect_material_property(nodes["FallEmissive"], "", u.MaterialProperty.MP_EMISSIVE_COLOR)
-    mel.connect_material_property(nodes["FallOpacity"], "", u.MaterialProperty.MP_OPACITY_MASK)
+    mel.connect_material_property(nodes["FallOpacity"], "", u.MaterialProperty.MP_OPACITY)
+    mel.connect_material_property(nodes["FallOpacityMask"], "", u.MaterialProperty.MP_OPACITY_MASK)
     mel.connect_material_property(nodes["FallRoughness"], "", u.MaterialProperty.MP_ROUGHNESS)
     mel.connect_material_property(normal, "", u.MaterialProperty.MP_NORMAL)
     mel.connect_material_property(spec, "", u.MaterialProperty.MP_SPECULAR)
     _finish_material(material, FALL_MATERIAL_PATH, FALL_GRAPH_VERSION)
-    return {"action": action, "path": FALL_MATERIAL_PATH, "graphVersion": FALL_GRAPH_VERSION,
-            "expressions": int(mel.get_num_material_expressions(material))}
+    return {"action": action, "path": FALL_MATERIAL_PATH, "graphVersion": FALL_GRAPH_VERSION, "blend": "translucent",
+            "flags": flags, "expressions": int(mel.get_num_material_expressions(material))}
 
 
-# --- M_EnvSea (P5 track B, review gap 8): the dark sea ring under the Sarpedon island -----------------------------------
-HLSL_SEA_CORE = """// P5 M_EnvSea: VC.r = the foam band at the cliffs, VC.g = the far fade (lane K SM_Env_S_SeaRing); UV0 = XY / SeaTile.x
+# --- M_EnvSea (P5 track B, review gap 8; P5c graph 2): the sea ring under the Sarpedon island ---------------------------
+# Graph 2 stays OPAQUE (lit, one-sided). The pack's M_Ocean was not used as is: it is translucent and depth-faded (it
+# needs a seabed under the ring, adds translucency over Lumen, its waves are world-scale WPO at 1024..8192 uu and its
+# colour depends on the depth below) - with an opaque ring the measured surround / map ratio and the background band
+# stay predictable, and the pack's own foam / normal textures give the waves, the surf and the whiter foam here.
+HLSL_SEA_CORE = """// P5c M_EnvSea graph 2: VC.r = the foam band at the cliffs, VC.g = the far fade, UV1.y = distance from the inner ring
+// edge / 1000 uu (lane K SM_Env_S_SeaRing; the FBX import flips V: SeaSurf.w = 1), UV0 = XY / SeaTile.x
 struct FEnvSeaFns {
   float Hash12(float2 p) {
     float3 p3 = frac(float3(p.xyx) * 0.1031);
@@ -1120,34 +1268,89 @@ struct FEnvSeaFns {
 };
 FEnvSeaFns F;
 float2 p = UV * max(SeaTile.x, 1.0);  // board uu
+float far = saturate(VC.g) * SeaFar.a;
+float nearW = 1.0 - saturate(VC.g);
+// lace: the pack foam (T_Ocean_Foam, two pans) or the graph 1 value noise (SeaPack.x = 0: no pack)
 float sc = max(SeaFlow.z, 1.0);
 float n = 0.6 * F.ValueNoise(p / sc + Time * SeaFlow.w * float2(0.7, 0.3))
         + 0.4 * F.ValueNoise(p / (sc * 0.43) - Time * SeaFlow.w * float2(0.2, 0.6) + 5.1);
-float foam = saturate((saturate(VC.r) * (0.55 + 0.9 * n) - 0.3) * 2.0) * SeaFoam.a;
-float far = saturate(VC.g) * SeaFar.a;
-float3 base = lerp(lerp(SeaColor.rgb, SeaFoam.rgb, foam), SeaFar.rgb, far);
+float lace = lerp(n, saturate(0.6 * FoamA.r + 0.4 * FoamB.g), saturate(SeaPack.x));
+// shore foam: the VC.r band at the cliffs, sharper (SeaPack.z) from the threshold SeaPack.w, broken by the lace
+float shore = saturate((saturate(VC.r) * (0.55 + 0.9 * lace) - SeaPack.w) * max(SeaPack.z, 0.5)) * SeaFoam.a;
+// surf: crest lines parallel to the cliffs, running in towards them (SeaSurf = spacing uu, cycles / s, reach uu, flip)
+float d = (SeaSurf.w > 0.5 ? 1.0 - UV1.y : UV1.y) * 1000.0;
+float ph = d / max(SeaSurf.x, 1.0) + Time * SeaSurf.y + (F.ValueNoise(p / 70.0 + 3.7) - 0.5) * 0.9;
+float x = frac(ph);
+float w = clamp(SeaSurfLook.x, 0.02, 0.9);
+float crest = smoothstep(1.0 - w, 1.0 - 0.8 * w, x) * (1.0 - smoothstep(1.0 - 0.8 * w, 1.0, x));
+float env = 1.0 - smoothstep(0.35 * max(SeaSurf.z, 1.0), max(SeaSurf.z, 1.0), d);
+float surf = crest * env * lerp(1.0, smoothstep(0.3, 0.65, lace), saturate(SeaSurfLook.z)) * SeaSurfLook.y;
+// waves: two panned normals (pack T_Water_Normal / _Large, else the ripple) -> a facet shade towards SeaWaveDir and
+// sparse whitecaps on the lit facets
+float2 slope = NA.xy * 0.6 + NB.xy * 0.4;
+float shade = dot(slope, normalize(SeaWaveDir.xy + float2(1e-4, 0.0)));
+float waveShade = clamp(shade * SeaWave.x, -0.6, 0.6) * nearW;
+float caps = lace * (0.6 + 0.8 * F.ValueNoise(p / 260.0 + Time * 0.02 * float2(1.0, 0.4)));
+float whitecap = smoothstep(SeaWave.z, SeaWave.z + 0.12, caps) * saturate(0.5 + 2.0 * shade) * SeaWave.y
+               * nearW * nearW * nearW;
+float foam = saturate(max(max(shore, surf), whitecap));
+float3 water = SeaColor.rgb * max(1.0 + waveShade, 0.0);
+float3 base = lerp(lerp(water, SeaFoam.rgb, foam), SeaFar.rgb, far * (1.0 - foam));
 float3 lit = base * exp2(NightEV) * NightTint;
 float luma = dot(lit, float3(0.2126, 0.7152, 0.0722));
 float3 graded = max(lerp(luma.xxx, lit, NightSaturation), 0.0);
+// sky lift (P5c): the open sea mirrors a dim night sky with slow cloud reflections (SeaSky rgb x a; SeaSkyNoise = scale
+// uu, amplitude, pan uu / s; SeaSkyRamp = VC.g where it starts / is full, the share already at the cliffs) - the only
+// background the opaque ring leaves visible around the island
+float skyW = lerp(saturate(SeaSkyRamp.z), 1.0, smoothstep(SeaSkyRamp.x, max(SeaSkyRamp.y, SeaSkyRamp.x + 0.001), saturate(VC.g)));
+float2 cq = p / max(SeaSkyNoise.x, 1.0) + Time * SeaSkyNoise.z / max(SeaSkyNoise.x, 1.0) * float2(0.6, 0.2);
+float cloud = 0.65 * F.ValueNoise(cq) + 0.35 * F.ValueNoise(cq * 2.2 + 9.2);
+float3 sky = SeaSky.rgb * SeaSky.a * skyW * max(1.0 + SeaSkyNoise.y * (cloud - 0.5) * 2.0, 0.0);
 """
-SEA_CORE_INPUTS = ("UV", "Time", "VC", "SeaColor", "SeaFar", "SeaFoam", "SeaFlow", "SeaTile", "NightEV",
-                   "NightSaturation", "NightTint")
+SEA_CORE_INPUTS = ("UV", "UV1", "Time", "VC", "FoamA", "FoamB", "NA", "NB", "SeaColor", "SeaFar", "SeaFoam", "SeaFlow",
+                   "SeaTile", "SeaPack", "SeaSurf", "SeaSurfLook", "SeaWave", "SeaWaveDir", "SeaSky", "SeaSkyNoise",
+                   "SeaSkyRamp", "NightEV", "NightSaturation", "NightTint")
 HLSL_SEA_ALBEDO = HLSL_SEA_CORE + "return graded;\n"
-HLSL_SEA_EMISSIVE = HLSL_SEA_CORE + "return graded * SeaShade.w * (1.0 - far);\n"
+HLSL_SEA_EMISSIVE = HLSL_SEA_CORE + ("return graded * (SeaShade.w * (1.0 - far) * (1.0 - foam) + SeaSurfLook.w * foam)"
+                                     " + sky;\n")
 HLSL_SEA_ROUGH = HLSL_SEA_CORE + "return saturate(lerp(lerp(SeaShade.x, 0.7, foam), 0.95, far));\n"
 HLSL_SEA_SPECULAR = HLSL_SEA_CORE + "return saturate(SeaShade.y * (1.0 - far));\n"
-HLSL_SEA_RIPPLE_UV = """float2 p = UV * max(SeaTile.x, 1.0);
-return (p + Time * SeaFlow.xy) / max(SeaTile.y, 1.0);
+HLSL_SEA_NORMAL = """float2 slope = NA.xy * 0.6 + NB.xy * 0.4;
+return normalize(float3(slope * SeaShade.z * (1.0 - saturate(VC.g)), 1.0));
 """
-HLSL_SEA_NORMAL = "return normalize(float3(R.xy * SeaShade.z * (1.0 - saturate(VC.g)), 1.0));"
+# sample UVs (board uu p = UV0 * SeaTile.x): normals A / B at SeaWaveTile.x / .y uu panned by SeaFlow.xy (B rotated,
+# slower, opposite), foam A / B at SeaPack.y uu drifting at SeaFlow.w * 0.1 tiles / s
+HLSL_SEA_UV_NA = """float2 p = UV * max(SeaTile.x, 1.0);
+return (p + Time * SeaFlow.xy) / max(SeaWaveTile.x, 1.0);
+"""
+HLSL_SEA_UV_NB = """float2 p = UV * max(SeaTile.x, 1.0);
+float2 r = float2(p.x * 0.8 - p.y * 0.6, p.x * 0.6 + p.y * 0.8);
+return (r - Time * SeaFlow.yx * 0.6) / max(SeaWaveTile.y, 1.0);
+"""
+HLSL_SEA_UV_FA = """float2 p = UV * max(SeaTile.x, 1.0);
+return p / max(SeaPack.y, 1.0) + Time * SeaFlow.w * 0.1 * float2(0.7, 0.3);
+"""
+HLSL_SEA_UV_FB = """float2 p = UV * max(SeaTile.x, 1.0);
+float2 r = float2(p.x * 0.6 + p.y * 0.8, -p.x * 0.8 + p.y * 0.6);
+return r / max(SeaPack.y * 1.37, 1.0) - Time * SeaFlow.w * 0.07 * float2(0.2, 0.6) + 0.31;
+"""
+SEA_UV_NODES = (("NA", "SeaNormalA", HLSL_SEA_UV_NA, "SeaWaveTile"), ("NB", "SeaNormalB", HLSL_SEA_UV_NB, "SeaWaveTile"),
+                ("FoamA", "SeaFoamTex", HLSL_SEA_UV_FA, "SeaPack"), ("FoamB", "SeaFoamTex", HLSL_SEA_UV_FB, "SeaPack"))
 SEA_SCALAR_DEFAULTS = {"NightEV": -1.0, "NightSaturation": 0.85}
+# the defaults keep the graph 1 look apart from the textures: no pack (procedural lace), shore sharpness 2 from 0.3,
+# no surf / whitecaps / wave shade / sky lift; ground-params 'sea' turns them on
 SEA_VECTOR_DEFAULTS = {"SeaColor": (0.0052, 0.0160, 0.0423, 1.0), "SeaFar": (0.0018, 0.0033, 0.0070, 1.0),
                        "SeaFoam": (0.62, 0.66, 0.7, 0.7), "SeaFlow": (3.0, 1.5, 14.0, 0.3),
                        "SeaTile": (600.0, 160.0, 0.0, 0.0), "SeaShade": (0.08, 0.3, 0.5, 1.5),
+                       "SeaPack": (0.0, 70.0, 2.0, 0.3), "SeaSurf": (30.0, 0.12, 150.0, 1.0),
+                       "SeaSurfLook": (0.35, 0.0, 0.6, 1.5), "SeaWave": (0.0, 0.0, 0.65, 0.0),
+                       "SeaWaveDir": (-0.87, 0.5, 0.0, 0.0), "SeaWaveTile": (140.0, 420.0, 0.0, 0.0),
+                       "SeaSky": (0.0, 0.0, 0.0, 0.0), "SeaSkyNoise": (700.0, 0.0, 4.0, 0.0),
+                       "SeaSkyRamp": (0.0, 0.1, 0.0, 0.0),
                        "NightTint": (0.97, 1.0, 1.08, 1.0)}
 
 
-def build_sea_material(ripple_default, force: bool) -> dict:
+def build_sea_material(pack_tex: dict, force: bool) -> dict:
     material, action = _begin_material(SEA_MATERIAL_PATH, SEA_MATERIAL_NAME, SEA_GRAPH_VERSION, force)
     if action == "unchanged":
         return {"action": "unchanged", "path": SEA_MATERIAL_PATH, "graphVersion": SEA_GRAPH_VERSION}
@@ -1156,17 +1359,28 @@ def build_sea_material(ripple_default, force: bool) -> dict:
     material.set_editor_property("blend_mode", u.BlendMode.BLEND_OPAQUE)
     material.set_editor_property("two_sided", False)
     g = _Graph(material)
-    cmot, st, ssm = u.CustomMaterialOutputType, u.MaterialSamplerType, u.SamplerSourceMode
+    cmot, ssm = u.CustomMaterialOutputType, u.SamplerSourceMode
     uv = g.expr(u.MaterialExpressionTextureCoordinate, -2000)
     uv.set_editor_property("coordinate_index", 0)
+    uv1 = g.expr(u.MaterialExpressionTextureCoordinate, -2000)
+    uv1.set_editor_property("coordinate_index", 1)
     t = g.expr(u.MaterialExpressionTime, -2000)
     vc = g.expr(u.MaterialExpressionVertexColor, -2000)
     s = {name: g.scalar(name, val) for name, val in SEA_SCALAR_DEFAULTS.items()}
     v = {name: g.vector(name, val) for name, val in SEA_VECTOR_DEFAULTS.items()}
-    src = {"UV": (uv, ""), "Time": (t, ""), "VC": (vc, ""), "NightEV": (s["NightEV"], ""),
+    src = {"UV": (uv, ""), "UV1": (uv1, ""), "Time": (t, ""), "VC": (vc, ""), "NightEV": (s["NightEV"], ""),
            "NightSaturation": (s["NightSaturation"], ""), "NightTint": (v["NightTint"], "RGB")}
-    for name in ("SeaColor", "SeaFar", "SeaFoam", "SeaFlow", "SeaTile", "SeaShade"):
-        src[name] = (v[name], "RGBA")
+    for name in SEA_VECTOR_DEFAULTS:
+        if name != "NightTint":
+            src[name] = (v[name], "RGBA")
+    for i, (pin, param, code, tile) in enumerate(SEA_UV_NODES):
+        uv_pins = ("UV", "Time", "SeaTile", "SeaFlow", tile)
+        node_uv = g.custom(f"Sea{pin}UV", cmot.CMOT_FLOAT2, uv_pins, code, -1500, 900 + 220 * i)
+        g.wire(node_uv, {k: src[k] for k in uv_pins})
+        tex = pack_tex[param]
+        node = g.sample(param, sampler_type_for(tex), tex, ssm.SSM_WRAP_WORLD_GROUP_SETTINGS, -1200, 900 + 220 * i)
+        g.connect(node_uv, "", node, "UVs")
+        src[pin] = (node, "RGB" if pin in ("NA", "NB") else "RGBA")
     nodes = {}
     for desc, code, out_type, extra, y in (
             ("SeaAlbedo", HLSL_SEA_ALBEDO, cmot.CMOT_FLOAT3, (), -300),
@@ -1177,12 +1391,8 @@ def build_sea_material(ripple_default, force: bool) -> dict:
         node = g.custom(desc, out_type, pins, code, -800, y)
         g.wire(node, {p_: src[p_] for p_ in pins})
         nodes[desc] = node
-    ruv = g.custom("SeaRippleUV", cmot.CMOT_FLOAT2, ("UV", "Time", "SeaFlow", "SeaTile"), HLSL_SEA_RIPPLE_UV, -1500, 900)
-    g.wire(ruv, {k: src[k] for k in ("UV", "Time", "SeaFlow", "SeaTile")})
-    rs = g.sample("WaterRippleN", st.SAMPLERTYPE_NORMAL, ripple_default, ssm.SSM_WRAP_WORLD_GROUP_SETTINGS, -1200, 900)
-    g.connect(ruv, "", rs, "UVs")
-    normal = g.custom("SeaNormal", cmot.CMOT_FLOAT3, ("R", "SeaShade", "VC"), HLSL_SEA_NORMAL, -800, 900)
-    g.wire(normal, {"R": (rs, "RGB"), "SeaShade": src["SeaShade"], "VC": src["VC"]})
+    normal = g.custom("SeaNormal", cmot.CMOT_FLOAT3, ("NA", "NB", "SeaShade", "VC"), HLSL_SEA_NORMAL, -800, 900)
+    g.wire(normal, {k: src[k] for k in ("NA", "NB", "SeaShade", "VC")})
     mel.connect_material_property(nodes["SeaAlbedo"], "", u.MaterialProperty.MP_BASE_COLOR)
     mel.connect_material_property(nodes["SeaEmissive"], "", u.MaterialProperty.MP_EMISSIVE_COLOR)
     mel.connect_material_property(nodes["SeaRoughness"], "", u.MaterialProperty.MP_ROUGHNESS)
@@ -1193,24 +1403,151 @@ def build_sea_material(ripple_default, force: bool) -> dict:
             "expressions": int(mel.get_num_material_expressions(material))}
 
 
-def sea_mi_want(key: str, params: dict, ripple=None) -> dict:
-    """MI_EnvSea_<Map>: ground-params maps.<key>.sea + the map's night grade."""
+def _sub(block: dict, name: str) -> dict:
+    v = block.get(name)
+    return v if isinstance(v, dict) else {}
+
+
+def _np_hash12(px, py):
+    """FEnvSeaFns::Hash12 in numpy (float64; the shader's float32 differs in the last bits only)."""
+    import numpy as np
+    x, y = np.asarray(px, float), np.asarray(py, float)
+    p3 = np.stack([x, y, x], -1) * 0.1031
+    p3 = p3 - np.floor(p3)
+    dot = (p3 * (p3[..., [1, 2, 0]] + 33.33)).sum(-1)
+    p3 = p3 + dot[..., None]
+    v = (p3[..., 0] + p3[..., 1]) * p3[..., 2]
+    return v - np.floor(v)
+
+
+def _np_value_noise(qx, qy):
+    import numpy as np
+    qx, qy = np.asarray(qx, float), np.asarray(qy, float)
+    ix, iy = np.floor(qx), np.floor(qy)
+    fx, fy = qx - ix, qy - iy
+    sx, sy = fx * fx * (3 - 2 * fx), fy * fy * (3 - 2 * fy)
+    a, b = _np_hash12(ix, iy), _np_hash12(ix + 1, iy)
+    c, d = _np_hash12(ix, iy + 1), _np_hash12(ix + 1, iy + 1)
+    return (a + (b - a) * sx) * (1 - sy) + (c + (d - c) * sx) * sy
+
+
+def _np_sstep(e0, e1, x):
+    import numpy as np
+    t = np.clip((np.asarray(x, float) - e0) / (e1 - e0), 0.0, 1.0)
+    return t * t * (3 - 2 * t)
+
+
+def sea_cpu(want: dict, px, py, d_uu, vc_r, vc_g, t: float = 0.0, lace_tex=None, slope=(0.0, 0.0)) -> dict:
+    """numpy mirror of HLSL_SEA_CORE + the emissive (plain Python; statistics / tests, not a render). px, py = board
+    uu (p = UV0 * SeaTile.x), d_uu = distance from the inner ring edge (UV1, already unflipped), vc_r / vc_g = the ring
+    vertex colours, lace_tex = the pack lace 0.6 FoamA.r + 0.4 FoamB.g (None: 0.5), slope = (NA, NB) mixed xy."""
+    import numpy as np
+    v, sc_ = want["vector"], want["scalar"]
+    px, py, d_uu = (np.asarray(a, float) for a in (px, py, d_uu))
+    vc_r, vc_g = np.clip(np.asarray(vc_r, float), 0, 1), np.clip(np.asarray(vc_g, float), 0, 1)
+    flow, pack, surf_v, look = v["SeaFlow"], v["SeaPack"], v["SeaSurf"], v["SeaSurfLook"]
+    far = vc_g * v["SeaFar"][3]
+    near = 1.0 - vc_g
+    sc = max(flow[2], 1.0)
+    n = (0.6 * _np_value_noise(px / sc + t * flow[3] * 0.7, py / sc + t * flow[3] * 0.3)
+         + 0.4 * _np_value_noise(px / (sc * 0.43) - t * flow[3] * 0.2 + 5.1, py / (sc * 0.43) - t * flow[3] * 0.6 + 5.1))
+    tex = np.full_like(px, 0.5) if lace_tex is None else np.asarray(lace_tex, float)
+    lace = n + (np.clip(tex, 0, 1) - n) * min(max(pack[0], 0.0), 1.0)
+    shore = np.clip((vc_r * (0.55 + 0.9 * lace) - pack[3]) * max(pack[2], 0.5), 0, 1) * v["SeaFoam"][3]
+    ph = d_uu / max(surf_v[0], 1.0) + t * surf_v[1] + (_np_value_noise(px / 70.0 + 3.7, py / 70.0 + 3.7) - 0.5) * 0.9
+    x = ph - np.floor(ph)
+    w = min(max(look[0], 0.02), 0.9)
+    crest = _np_sstep(1 - w, 1 - 0.8 * w, x) * (1 - _np_sstep(1 - 0.8 * w, 1.0, x))
+    env = 1.0 - _np_sstep(0.35 * max(surf_v[2], 1.0), max(surf_v[2], 1.0), d_uu)
+    surf = crest * env * (1.0 + (_np_sstep(0.3, 0.65, lace) - 1.0) * min(max(look[2], 0.0), 1.0)) * look[1]
+    wd = np.array(v["SeaWaveDir"][:2], float) + [1e-4, 0.0]
+    wd /= np.linalg.norm(wd)
+    shade = slope[0] * wd[0] + slope[1] * wd[1]
+    wave_shade = np.clip(shade * v["SeaWave"][0], -0.6, 0.6) * near
+    caps = lace * (0.6 + 0.8 * _np_value_noise(px / 260.0 + t * 0.02, py / 260.0 + t * 0.008))
+    whitecap = (_np_sstep(v["SeaWave"][2], v["SeaWave"][2] + 0.12, caps) * np.clip(0.5 + 2 * shade, 0, 1)
+                * v["SeaWave"][1] * near ** 3)
+    foam = np.clip(np.maximum(np.maximum(shore, surf), whitecap), 0, 1)
+    water = np.array(v["SeaColor"][:3]) * np.maximum(1.0 + wave_shade, 0.0)[..., None]
+    fc = np.array(v["SeaFoam"][:3])
+    base = water + (fc - water) * foam[..., None]
+    base = base + (np.array(v["SeaFar"][:3]) - base) * (far * (1 - foam))[..., None]
+    lit = base * 2.0 ** sc_["NightEV"] * np.array(v["NightTint"][:3])
+    luma = lit @ np.array([0.2126, 0.7152, 0.0722])
+    graded = np.maximum(luma[..., None] + (lit - luma[..., None]) * sc_["NightSaturation"], 0.0)
+    ramp = v["SeaSkyRamp"]
+    sky_w = min(max(ramp[2], 0.0), 1.0) + (1.0 - min(max(ramp[2], 0.0), 1.0)) * _np_sstep(ramp[0], max(ramp[1], ramp[0] + 0.001), vc_g)
+    ns = max(v["SeaSkyNoise"][0], 1.0)
+    cqx, cqy = px / ns + t * v["SeaSkyNoise"][2] / ns * 0.6, py / ns + t * v["SeaSkyNoise"][2] / ns * 0.2
+    cloud = 0.65 * _np_value_noise(cqx, cqy) + 0.35 * _np_value_noise(cqx * 2.2 + 9.2, cqy * 2.2 + 9.2)
+    sky = (np.array(v["SeaSky"][:3]) * v["SeaSky"][3] * (sky_w * np.maximum(1 + v["SeaSkyNoise"][1] * (cloud - 0.5) * 2, 0))[..., None])
+    emissive = graded * (v["SeaShade"][3] * (1 - far) * (1 - foam) + look[3] * foam)[..., None] + sky
+    return {"foam": foam, "shore": shore, "surf": surf, "whitecap": whitecap, "albedo": graded, "emissive": emissive,
+            "sky": sky, "far": far}
+
+
+def sea_graph1_cpu(want: dict, px, py, vc_r, vc_g, t: float = 0.0) -> dict:
+    """numpy mirror of the P5 graph 1 sea (the reference of 'the defaults keep the graph 1 look')."""
+    import numpy as np
+    v, sc_ = want["vector"], want["scalar"]
+    px, py = np.asarray(px, float), np.asarray(py, float)
+    flow = v["SeaFlow"]
+    sc = max(flow[2], 1.0)
+    n = (0.6 * _np_value_noise(px / sc + t * flow[3] * 0.7, py / sc + t * flow[3] * 0.3)
+         + 0.4 * _np_value_noise(px / (sc * 0.43) - t * flow[3] * 0.2 + 5.1, py / (sc * 0.43) - t * flow[3] * 0.6 + 5.1))
+    foam = np.clip((np.clip(vc_r, 0, 1) * (0.55 + 0.9 * n) - 0.3) * 2.0, 0, 1) * v["SeaFoam"][3]
+    far = np.clip(vc_g, 0, 1) * v["SeaFar"][3]
+    sea = np.array(v["SeaColor"][:3])
+    base = sea + (np.array(v["SeaFoam"][:3]) - sea) * foam[..., None]
+    base = base + (np.array(v["SeaFar"][:3]) - base) * far[..., None]
+    lit = base * 2.0 ** sc_["NightEV"] * np.array(v["NightTint"][:3])
+    luma = lit @ np.array([0.2126, 0.7152, 0.0722])
+    graded = np.maximum(luma[..., None] + (lit - luma[..., None]) * sc_["NightSaturation"], 0.0)
+    return {"foam": foam, "albedo": graded, "emissive": graded * (v["SeaShade"][3] * (1 - far))[..., None]}
+
+
+def sea_mi_want(key: str, params: dict, pack=None, pack_src=None) -> dict:
+    """MI_EnvSea_<Map>: ground-params maps.<key>.sea + the map's night grade. pack = {param: texture} (UE; any stand-ins
+    in the tests); pack_src = {param: 'pack' | 'fallback'}: SeaPack.x = 1 only when ground-params sea.pack is true and
+    the three sea textures come from the pack."""
     mp = params["maps"][key]
     sp = mp.get("sea") or {}
     gr = mp["grade"]
-    color = srgb8_to_linear(sp["colorSrgb"]) if "colorSrgb" in sp else SEA_VECTOR_DEFAULTS["SeaColor"][:3]
-    far = srgb8_to_linear(sp["farSrgb"]) if "farSrgb" in sp else SEA_VECTOR_DEFAULTS["SeaFar"][:3]
-    pan = sp.get("panUUps", SEA_VECTOR_DEFAULTS["SeaFlow"][:2])
-    tex = {"WaterRippleN": ripple} if ripple is not None else {}
+    d = SEA_VECTOR_DEFAULTS
+    color = srgb8_to_linear(sp["colorSrgb"]) if "colorSrgb" in sp else d["SeaColor"][:3]
+    far = srgb8_to_linear(sp["farSrgb"]) if "farSrgb" in sp else d["SeaFar"][:3]
+    pan = sp.get("panUUps", d["SeaFlow"][:2])
+    tex = {k: pack[k] for k in SEA_PACK_PARAMS} if pack is not None else {}
+    from_pack = bool(sp.get("pack", False)) and (pack_src is None or all(pack_src.get(k) == "pack"
+                                                                           for k in SEA_PACK_PARAMS))
+    surf, wave, sky = _sub(sp, "surf"), _sub(sp, "waves"), _sub(sp, "sky")
+    wtile = wave.get("normalTileUU", [sp.get("rippleTileUU", d["SeaWaveTile"][0]), d["SeaWaveTile"][1]])
+    wdir = wave.get("dir", d["SeaWaveDir"][:2])
     scal = {"NightEV": float(gr["ev"]), "NightSaturation": float(gr["saturation"])}
     vec = {"SeaColor": tuple(round(c, 5) for c in color) + (1.0,),
            "SeaFar": tuple(round(c, 5) for c in far) + (float(sp.get("farStrength", 1.0)),),
-           "SeaFoam": tuple(float(c) for c in sp.get("foamColor", SEA_VECTOR_DEFAULTS["SeaFoam"][:3]))
-           + (float(sp.get("foamOpacity", 0.7)),),
+           "SeaFoam": tuple(float(c) for c in sp.get("foamColor", d["SeaFoam"][:3])) + (float(sp.get("foamOpacity", 0.7)),),
            "SeaFlow": (float(pan[0]), float(pan[1]), float(sp.get("foamScaleUU", 14.0)), float(sp.get("foamSpeed", 0.3))),
            "SeaTile": (float(sp.get("uvTileUU", 600.0)), float(sp.get("rippleTileUU", 160.0)), 0.0, 0.0),
            "SeaShade": (float(sp.get("roughness", 0.08)), float(sp.get("specular", 0.3)),
                         float(sp.get("normalStrength", 0.5)), float(sp.get("lift", 1.5))),
+           "SeaPack": (1.0 if from_pack else 0.0, float(sp.get("foamTileUU", d["SeaPack"][1])),
+                       float(sp.get("shoreSharpness", d["SeaPack"][2])), float(sp.get("shoreThreshold", d["SeaPack"][3]))),
+           "SeaSurf": (float(surf.get("spacingUU", d["SeaSurf"][0])), float(surf.get("cyclesPerSec", d["SeaSurf"][1])),
+                       float(surf.get("reachUU", d["SeaSurf"][2])), 1.0 if surf.get("uv1FlipV", True) else 0.0),
+           "SeaSurfLook": (float(surf.get("crestWidth", d["SeaSurfLook"][0])),
+                           float(surf.get("opacity", d["SeaSurfLook"][1])),
+                           float(surf.get("breakup", d["SeaSurfLook"][2])),
+                           float(sp.get("foamLift", sp.get("lift", d["SeaSurfLook"][3])))),
+           "SeaWave": (float(wave.get("shade", d["SeaWave"][0])), float(wave.get("whitecaps", d["SeaWave"][1])),
+                       float(wave.get("whitecapThreshold", d["SeaWave"][2])), 0.0),
+           "SeaWaveDir": (float(wdir[0]), float(wdir[1]), 0.0, 0.0),
+           "SeaWaveTile": (float(wtile[0]), float(wtile[1]), 0.0, 0.0),
+           "SeaSky": tuple(float(c) for c in sky.get("colorLinear", d["SeaSky"][:3])) + (float(sky.get("intensity", 0.0)),),
+           "SeaSkyNoise": (float(sky.get("noiseUU", d["SeaSkyNoise"][0])), float(sky.get("amplitude", d["SeaSkyNoise"][1])),
+                           float(sky.get("panUUps", d["SeaSkyNoise"][2])), 0.0),
+           "SeaSkyRamp": (float(sky.get("rampVcG", d["SeaSkyRamp"][:2])[0]), float(sky.get("rampVcG", d["SeaSkyRamp"][:2])[1]),
+                          float(sky.get("atCliffs", d["SeaSkyRamp"][2])), 0.0),
            "NightTint": tuple(float(v) for v in gr["tint"]) + (1.0,)}
     return {"tex": tex, "scalar": scal, "vector": vec}
 
@@ -1341,6 +1678,10 @@ def measure_mesh(mesh, item: dict) -> dict:
         out["hasVertexColors"] = bool(sms.has_vertex_colors(mesh))
     except Exception as exc:  # noqa: BLE001 - measurement only
         out["hasVertexColors"] = f"n/a ({type(exc).__name__})"
+    try:  # P5c: M_EnvSea graph 2 reads the sea ring's UV1 (distance from the inner edge) for the surf
+        out["uvChannels"] = int(sms.get_num_uv_channels(mesh, 0))
+    except Exception as exc:  # noqa: BLE001 - measurement only
+        out["uvChannels"] = f"n/a ({type(exc).__name__})"
     out.update(compare_mesh(out, item))
     return out
 
@@ -1389,6 +1730,8 @@ def import_env_meshes(key: str, items: dict, materials: dict, force: bool) -> tu
                 problems.append(f"triangles differ from the build: {m.get('triangles')}")
             if it["vertexColors"] == "replace" and m.get("hasVertexColors") is False:
                 problems.append("vertex colours missing (REPLACE)")
+            if part == "sea" and isinstance(m.get("uvChannels"), int) and m["uvChannels"] < 2:
+                problems.append("sea ring without UV1 (the M_EnvSea surf distance): re-import")
             if len(m["slots"]) != it.get("slots", len(m["slots"])):
                 problems.append(f"{len(m['slots'])} slots, the build has {it.get('slots')}")
             r["problems"] = problems
@@ -1460,14 +1803,26 @@ def mi_want(key: str, params: dict, textures: dict, splat, rect: list, aux=None,
     return {"tex": tex, "scalar": scal, "vector": vec}
 
 
-def fall_mi_want(key: str, params: dict, ripple=None) -> dict:
-    """MI_EnvWaterfall_<Map>: the water colour / foam / grade of the map and the look of its first fall entry."""
+def fall_mi_want(key: str, params: dict, ripple=None, streak=None, streak_src: str | None = None) -> dict:
+    """MI_EnvWaterfall_<Map>: the water colour / foam / grade of the map and the look of its first fall entry. P5c:
+    falls[0].look = {blend 'translucent' (graph 3 default) | 'masked' (the graph 2 dithered look, an MI blend-mode
+    override), bodyOpacity, foamOpacity, edgeWobble, pack (the Water Materials streaks; FallLook.w = 1 only when the
+    texture came from the pack), packTileUU [across, along], packSpeedRatio}."""
     mp = params["maps"][key]
     w = mp.get("water") or {}
     f = (w.get("falls") or [{}])[0]
+    look = f.get("look") if isinstance(f.get("look"), dict) else {}
     gr = mp["grade"]
     wv = _water(params, key)
+    d = FALL_VECTOR_DEFAULTS
     tex = {"WaterRippleN": ripple} if ripple is not None else {}
+    if streak is not None:
+        tex["FallStreakTex"] = streak
+    use_pack = bool(look.get("pack", False)) and streak_src in (None, "pack")
+    blend = str(look.get("blend", "translucent"))
+    if blend not in FALL_BLENDS:
+        raise ValueError(f"{key}: water.falls[0].look.blend {blend!r} not in {FALL_BLENDS}")
+    tile = look.get("packTileUU", d["FallTex"][:2])
     scal = {"NightEV": float(gr["ev"]), "NightSaturation": float(gr["saturation"]),
             "RippleTileUU": float(wv["WaterRipple"][0])}
     vec = {"WaterColor": wv["WaterColor"], "WaterFoam": wv["WaterFoam"],
@@ -1476,8 +1831,26 @@ def fall_mi_want(key: str, params: dict, ripple=None) -> dict:
                         float(f.get("edgeFadeUU", 12.0)), float(f.get("bottomFade", 0.35))),
            "FallSpill": (float(f.get("spillFadeUU", 18.0)), float(f.get("dither", 0.5)), 0.0, 0.0),
            "FallShade": (wv["WaterSurface"][0] + 0.02, wv["WaterSurface"][1], wv["WaterSurface"][2],
-                         wv["WaterSurface"][3])}
-    return {"tex": tex, "scalar": scal, "vector": vec}
+                         wv["WaterSurface"][3]),
+           "FallLook": (float(look.get("bodyOpacity", d["FallLook"][0])), float(look.get("foamOpacity", d["FallLook"][1])),
+                        float(look.get("edgeWobble", 0.0)), 1.0 if use_pack else 0.0),
+           "FallTex": (float(tile[0]), float(tile[1]), float(look.get("packSpeedRatio", d["FallTex"][2])), 0.0)}
+    return {"tex": tex, "scalar": scal, "vector": vec, "blend": blend}
+
+
+def _blend_override(mi) -> bool:
+    """True when the MI overrides its parent's blend mode to Masked (P5c waterfall fallback)."""
+    ov = mi.get_editor_property("base_property_overrides")
+    return (bool(ov.get_editor_property("override_blend_mode"))
+            and ov.get_editor_property("blend_mode") == u.BlendMode.BLEND_MASKED)
+
+
+def _set_blend_override(mi, masked: bool) -> None:
+    ov = mi.get_editor_property("base_property_overrides")
+    ov.set_editor_property("override_blend_mode", bool(masked))
+    if masked:
+        ov.set_editor_property("blend_mode", u.BlendMode.BLEND_MASKED)
+    mi.set_editor_property("base_property_overrides", ov)
 
 
 def ensure_instance(path: str, material, want: dict) -> dict:
@@ -1505,15 +1878,21 @@ def ensure_instance(path: str, material, want: dict) -> dict:
             st["s:" + name] = round(float(mel.get_material_instance_scalar_parameter_value(mi, name)), 5)
         for name in want["vector"]:
             st["v:" + name] = rgba(mel.get_material_instance_vector_parameter_value(mi, name))
+        if want.get("blend") is not None:
+            st["blendOverride"] = _blend_override(mi)
         return st
 
     target = {"parent": material.get_path_name()}
     target.update({"t:" + k: v.get_path_name() for k, v in want["tex"].items()})
     target.update({"s:" + k: round(v, 5) for k, v in want["scalar"].items()})
     target.update({"v:" + k: tuple(round(x, 5) for x in v) for k, v in want["vector"].items()})
+    if want.get("blend") is not None:  # P5c: falls[].look.blend 'masked' = a blend-mode override on the MI
+        target["blendOverride"] = want["blend"] == "masked"
     if action == "updated" and current() == target:
         return {"action": "unchanged", "path": path}
     mel.set_material_instance_parent(mi, material)
+    if want.get("blend") is not None:
+        _set_blend_override(mi, want["blend"] == "masked")
     for name, t in want["tex"].items():
         mel.set_material_instance_texture_parameter_value(mi, name, t)
     for name, v in want["scalar"].items():
@@ -1579,10 +1958,14 @@ def run_import(pl: dict, params: dict, keys: list[str], force: bool) -> tuple[di
     except Exception as exc:  # noqa: BLE001
         result["material"] = {"action": "failed", "error": f"{type(exc).__name__}: {exc}"}
         return result, False
+    pack_tex, pack_src = load_pack(ripple)  # P5c: the Water Materials textures (CC BY 4.0) or the stand-ins
+    result["pack"] = {param: {"asset": pack_asset(param), "source": pack_src[param],
+                              "texture": pack_tex[param].get_path_name() if pack_tex[param] else None}
+                      for param in PACK_TEXTURES}
     sea_material = None
     if any(has_sea(params, k) for k in ready):
         try:
-            result["seaMaterial"] = build_sea_material(ripple, force)
+            result["seaMaterial"] = build_sea_material(pack_tex, force)
             sea_material = u.load_asset(SEA_MATERIAL_PATH)
         except Exception as exc:  # noqa: BLE001
             result["seaMaterial"] = {"action": "failed", "error": f"{type(exc).__name__}: {exc}"}
@@ -1590,7 +1973,7 @@ def run_import(pl: dict, params: dict, keys: list[str], force: bool) -> tuple[di
     fall_material = None
     if any(has_falls(params, k) for k in ready):
         try:
-            result["waterfallMaterial"] = build_waterfall_material(ripple, force)
+            result["waterfallMaterial"] = build_waterfall_material(ripple, pack_tex["FallStreakTex"], force)
             fall_material = u.load_asset(FALL_MATERIAL_PATH)
         except Exception as exc:  # noqa: BLE001
             result["waterfallMaterial"] = {"action": "failed", "error": f"{type(exc).__name__}: {exc}"}
@@ -1613,7 +1996,8 @@ def run_import(pl: dict, params: dict, keys: list[str], force: bool) -> tuple[di
                 continue
             try:
                 result["maps"][key]["waterfallInstance"] = ensure_instance(
-                    fall_mi_asset(key), fall_material, fall_mi_want(key, params, ripple))
+                    fall_mi_asset(key), fall_material,
+                    fall_mi_want(key, params, ripple, pack_tex["FallStreakTex"], pack_src["FallStreakTex"]))
             except Exception as exc:  # noqa: BLE001
                 result["maps"][key]["waterfallInstance"] = {"action": "failed",
                                                             "error": f"{type(exc).__name__}: {exc}"}
@@ -1625,7 +2009,7 @@ def run_import(pl: dict, params: dict, keys: list[str], force: bool) -> tuple[di
             else:
                 try:
                     result["maps"][key]["seaInstance"] = ensure_instance(
-                        sea_mi_asset(key), sea_material, sea_mi_want(key, params, ripple))
+                        sea_mi_asset(key), sea_material, sea_mi_want(key, params, pack_tex, pack_src))
                 except Exception as exc:  # noqa: BLE001
                     result["maps"][key]["seaInstance"] = {"action": "failed", "error": f"{type(exc).__name__}: {exc}"}
                     ok = False
@@ -1682,7 +2066,7 @@ def main(argv: list | None = None) -> int:
               "mode": mode, "params": rel(params_path), "staging": staging.as_posix(), "contentRoot": ROOT,
               "material": MATERIAL_PATH, "graphVersion": GRAPH_VERSION, "waterfallMaterial": FALL_MATERIAL_PATH,
               "waterfallGraphVersion": FALL_GRAPH_VERSION, "seaMaterial": SEA_MATERIAL_PATH,
-              "seaGraphVersion": SEA_GRAPH_VERSION, "maps": keys}
+              "seaGraphVersion": SEA_GRAPH_VERSION, "packRoot": PACK_ROOT, "maps": keys}
     ok = True
     if mode == "prep":
         if u is not None:
@@ -1712,6 +2096,10 @@ def main(argv: list | None = None) -> int:
         report_path.write_bytes((text + "\n").encode("utf-8"))
     bad = [f"{s}/{k}: {t.get('error')}" for s, it in pl["sets"].items() for k, t in it["textures"].items() if not t["ok"]]
     bad += [f"{k}: {m.get('error')}" for k, m in pl["maps"].items() if not m["ok"]]
+    bad += list(pl.get("errors") or [])
+    for param, it in (pl.get("pack") or {}).items():
+        if not it["present"]:
+            print(f"  WARN  pack texture {it['asset']} ({param}) missing: the procedural fallback is used")
     for b in bad:
         print("  ERROR " + b)
     print("ENVGROUND-IMPORT-REPORT " + json.dumps(report, ensure_ascii=False, default=str))

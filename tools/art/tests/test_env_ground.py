@@ -135,14 +135,14 @@ class SplatRules(unittest.TestCase):
         lay = layout("marmoreal")
         self.assertGreater(sample(res, 0, -360)[2], 0.95)  # palace terrace: paving
         self.assertGreater(sample(res, -490, 0)[2], 0.95)  # W walkway next to the frame
-        cherry = next(p for p in lay["props"] if p["id"] == "cherry-w")
-        c = sample(res, *cherry["loc"][:2])
+        # P5c: the cherry crown centre of the role rules (= loc on the kit mesh, the footprint centre on a Fab tree)
+        cherry = next(q for q in GS.role_props(lay, "Cherry") if q.prop["id"] == "cherry-w")
+        c = sample(res, cherry.cx, cherry.cy)
         self.assertLess(c[2], 0.05)  # no paving under the cherry
         self.assertGreater(c[3], 0.8)  # a carpet of petals
         self.assertGreater(sample(res, -776, 100)[0], 0.5)  # moss along the tray rim
-        for p in lay["props"]:
-            if LC.mesh_name(p) == "LanternPlinth":
-                self.assertGreater(sample(res, *p["loc"][:2])[2], 0.95, p["id"])  # lamp pads are paved
+        for q in GS.role_props(lay, "LanternPlinth"):
+            self.assertGreater(sample(res, q.cx, q.cy)[2], 0.95, q.prop["id"])  # lamp pads are paved
 
     def test_sarpedon_regions(self):
         res = generated("sarpedon")
@@ -160,8 +160,8 @@ class SplatRules(unittest.TestCase):
         self.assertGreater(sample(res, 0, -420)[0], 0.9)  # beach N-centre: sand
         forest = sample(res, -700, 150)
         self.assertLess(max(forest[:3]), 0.1)  # the forest floor base (W)
-        fort = next(p for p in lay["props"] if LC.mesh_name(p) == "FortRuin")
-        self.assertGreater(max(sample(res, *fort["loc"][:2])[:2]), 0.5)  # fort dust / rubble
+        fort = GS.role_props(lay, "FortRuin")[0]
+        self.assertGreater(max(sample(res, fort.cx, fort.cy)[:2]), 0.5)  # fort dust / rubble
 
     def test_marmoreal_curb_and_petal_mask(self):
         res = generated("marmoreal")
@@ -174,8 +174,9 @@ class SplatRules(unittest.TestCase):
         self.assertGreater(float(edge[max(out - 5, 0):out].max()), 0.8)  # the curb just inside the paving border
         self.assertLess(float(edge[:max(out - 20, 1)].max()), 0.1)  # no curb next to the frame
         self.assertLess(float(edge[out + 10:].max()), 0.1)  # none on the earth
-        cherry = next(p for p in layout("marmoreal")["props"] if p["id"] == "cherry-w")
-        self.assertGreater(sample(res, *cherry["loc"][:2])[3], 0.8)  # dense under the tree
+        # the crown centre (role rules): on the P5c Fab sakura the pivot is the trunk base, ~90 uu off the crown
+        cherry = next(q for q in GS.role_props(layout("marmoreal"), "Cherry") if q.prop["id"] == "cherry-w")
+        self.assertGreater(sample(res, cherry.cx, cherry.cy)[3], 0.8)  # dense under the tree
         self.assertLess(sample(res, -600, 300)[3], 0.1)  # sparse confetti far from the trees
 
     def test_sarpedon_water_follows_the_painted_river(self):
@@ -546,9 +547,11 @@ class MeshPieces(unittest.TestCase):
         self.assertFalse(x100["triangles"]["ok"])
 
     def test_sea_material_instance(self):
-        want = IMP.sea_mi_want("sarpedon", PARAMS, "ripple")
+        pack = {k: f"tex:{k}" for k in IMP.PACK_TEXTURES}
+        want = IMP.sea_mi_want("sarpedon", PARAMS, pack, {k: "pack" for k in IMP.PACK_TEXTURES})
         sp = PARAMS["maps"]["sarpedon"]["sea"]
-        self.assertEqual(want["tex"], {"WaterRippleN": "ripple"})
+        # P5c graph 2: the Water Materials foam + two normals (no WaterRippleN any more)
+        self.assertEqual(want["tex"], {k: f"tex:{k}" for k in IMP.SEA_PACK_PARAMS})
         col = want["vector"]["SeaColor"]
         far = want["vector"]["SeaFar"]
         water = IMP.mi_want("sarpedon", PARAMS, {(s, k): "t" for s in list(PARAMS["sets"]) + [IMP.RIPPLE_SET]
@@ -564,10 +567,10 @@ class MeshPieces(unittest.TestCase):
         self.assertFalse(IMP.has_sea(PARAMS, "marmoreal"))
 
     def test_sea_hlsl_declares_what_it_reads(self):
-        for code, pins in ((IMP.HLSL_SEA_ALBEDO, IMP.SEA_CORE_INPUTS),
+        uv_codes = [(code, ("UV", "Time", "SeaTile", "SeaFlow", tile)) for _, _, code, tile in IMP.SEA_UV_NODES]
+        for code, pins in [(IMP.HLSL_SEA_ALBEDO, IMP.SEA_CORE_INPUTS),
                            (IMP.HLSL_SEA_EMISSIVE, IMP.SEA_CORE_INPUTS + ("SeaShade",)),
-                           (IMP.HLSL_SEA_RIPPLE_UV, ("UV", "Time", "SeaFlow", "SeaTile")),
-                           (IMP.HLSL_SEA_NORMAL, ("R", "SeaShade", "VC"))):
+                           (IMP.HLSL_SEA_NORMAL, ("NA", "NB", "SeaShade", "VC"))] + uv_codes:
             for pin in pins:
                 self.assertIn(pin, code)
         self.assertIn("VC.r", IMP.HLSL_SEA_CORE)  # foam band

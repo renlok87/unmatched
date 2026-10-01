@@ -54,6 +54,12 @@ P5 track B (lane K meshes, art/pipeline-candidates/ASSET-ENV-S-WATERFALL-001): a
   Both are taken from the run's reports (build-report.json, waterfall-layout.json); --check also verifies that the run
   was built for this fall (top width = x1 - x0, centre, tray edge) and this tray (else: rebuild the waterfall run).
 
+P5c (track W): the region rules key on prop ROLES (the "role" field, else the env-kit mesh, else the id prefix:
+cherry-*, cypress-*, lamp-*, plinth-*, urn-*, portal, arcade-*, campfire-*, fort-*), not on mesh names, so the Fab
+swaps (ENV-U13 / U14) keep petals, moss, paving pads and fire clearings; on a non-kit mesh the centre / scale come
+from its footprint (layout_check or FAB_BOUNDS), normalised to the role's kit mesh (see ROLES / role_props). Layouts
+whose role props are still on their kit meshes give byte-identical splats; the meta lists 'roles' only otherwise.
+
 Usage (repository root; plain Python: numpy, PIL):
   python -B tools/art/env_kit/ground_splat.py                        # both maps: splat + meta + preview
   python -B tools/art/env_kit/ground_splat.py --write-layouts        # + the layouts' 'ground' sections
@@ -245,7 +251,157 @@ def grid(rect, size):
 
 
 def props_of(layout: dict, *names: str) -> list[dict]:
+    """Props whose mesh is one of the env-kit meshes 'names' (SM_Env_<Name>; the overlay and older callers)."""
     return [p for p in layout.get("props", []) if lc.mesh_name(p) in names]
+
+
+# ------------------------------------------------------------------------------------------------ prop roles (P5c)
+# P5c track W: the region rules key on prop ROLES, not on mesh names, so a Fab mesh swap (ENV-U13 / U14: pink Forest
+# trees instead of the Tripo cherries, ...) keeps the petals, the moss under the crowns, the paving pads and the fire
+# clearings. A prop has the role of rules key R when (first match wins):
+#   1. its "role" field names R (case-insensitive: the role or one of its id prefixes) - an explicit override;
+#   2. its mesh is R's env-kit mesh /Game/EnvKit/<Map>/SM_Env_<R> (the P2..P5b layouts: exactly the old mesh-name
+#      rule, so unchanged layouts give byte-identical splats);
+#   3. its mesh is anything else (a Fab duplicate, ...) and its id is '<prefix>' or '<prefix>-<one place token>' with a
+#      prefix of R (cherry-w, cherry-nw, lamp-ne, fort-nw ...); 'fort-nw-vine' (decor next to a role prop) is not.
+# Geometry of a matched prop: on R's own mesh the old numbers (centre = loc, scale = scale, polygon =
+# layout_check.footprint); on another mesh the centre is the centre of its footprint (a Forest tree's pivot is the
+# trunk base, its crown sits ~87 uu off) and the scale is normalised to R's kit mesh: s = mean footprint extent of the
+# prop / mean extent of SM_Env_<R> at scale 1, so the 110 uu cherry radius means 'the crown' whatever the mesh. The
+# footprint comes from layout_check (when it knows the mesh: Track F) or from FAB_BOUNDS (the Scout catalog, local
+# XY bounds at scale 1 by asset name); optional per-prop overrides "groundScale" (s) and "groundCentre" [x, y].
+# Unknown footprint and no override -> centre = loc, s = 1 and a note (meta 'roles').
+ROLES = {
+    "Cherry": ("cherry",), "Cypress": ("cypress",), "LanternPlinth": ("lamp",), "PlinthBall": ("plinth",),
+    "Urn": ("urn",), "Portal": ("portal",), "ArcadeBay": ("arcade",), "Campfire": ("campfire",),
+    "FortRuin": ("fort",),
+}
+# local XY bounds ((min x, min y), (max x, max y)) at scale 1 of the AI-allowed Fab picks (C:/tmp/envmaps-research/p5c/
+# scout/picks.json, UE commandlet bounds); matched against the mesh asset name (also inside a duplicate's name)
+FAB_BOUNDS = {
+    "SM_Env_Tree_Large_Twisted_Pink": ((-61.06, -311.05), (1073.06, 220.31)),
+    "SM_Env_Tree_Large_Twisted_Purple": ((-61.06, -311.05), (1073.06, 220.31)),
+    "SM_Env_Tree_Small_Birch_Thin_Pink": ((-436.24, -441.09), (514.57, 340.9)),
+    "SM_Env_Tree_Small_Birch_Thin_Purple": ((-436.24, -441.09), (514.57, 340.9)),
+    # Track F's duplicates (fab-picks.json dest names; layout_check knows them when the pick file is present)
+    "SM_EnvFab_SakuraTwisted": ((-61.06, -311.05), (1073.06, 220.31)),
+    "SM_EnvFab_SakuraBirch": ((-436.24, -441.09), (514.57, 340.9)),
+}
+
+
+def _prop_index(layout: dict, prop: dict) -> int:
+    for i, p in enumerate(layout.get("props", [])):
+        if p is prop:
+            return i
+    return -1
+
+
+class RoleProp:
+    """One prop matched to a rules role: centre (cx, cy), normalised scale s, footprint polygon (or None)."""
+
+    def __init__(self, prop: dict, cx: float, cy: float, s: float, poly, how: str):
+        self.prop, self.cx, self.cy, self.s, self.poly, self.how = prop, cx, cy, s, poly, how
+
+
+def _role_key(name: str) -> str:
+    n = str(name).strip().lower()
+    for role, prefixes in ROLES.items():
+        if n == role.lower() or n in prefixes:
+            return role
+    return ""
+
+
+def prop_role(p: dict) -> tuple[str, str]:
+    """(role, how): how = 'role' (explicit field), 'mesh' (the role's kit mesh) or 'id' (id prefix, other mesh)."""
+    if isinstance(p.get("role"), str) and p["role"].strip():
+        return _role_key(p["role"]), "role"
+    name = lc.mesh_name(p)
+    if name in ROLES:
+        return name, "mesh"
+    pid = str(p.get("id", "")).lower()
+    parts = pid.split("-")
+    if 1 <= len(parts) <= 2 and parts[0]:
+        role = _role_key(parts[0])
+        if role:
+            return role, "id"
+    return "", ""
+
+
+def _fab_bounds(p: dict):
+    leaf = str(p.get("mesh", "")).rsplit("/", 1)[-1].split(".")[0]
+    for name, b in FAB_BOUNDS.items():
+        if leaf == name or name in leaf:
+            return b
+    return None
+
+
+def _footprint_any(p: dict):
+    """(4, 2) board-XY footprint of any prop: layout_check (kit meshes, or Fab meshes it knows), else FAB_BOUNDS."""
+    try:
+        if lc.mesh_name(p):
+            return np.asarray(lc.footprint(p), float)
+    except (KeyError, TypeError, ValueError):
+        pass
+    b = _fab_bounds(p)
+    if b is None:
+        return None
+    s = float(p.get("scale", 1.0))
+    (x0, y0), (x1, y1) = b
+    c = np.array([[x0, y0], [x1, y0], [x1, y1], [x0, y1]], float) * s
+    a = math.radians(float(p.get("yawDeg", 0.0)))
+    rot = np.array([[math.cos(a), -math.sin(a)], [math.sin(a), math.cos(a)]])
+    return c @ rot.T + np.array(p["loc"][:2], float)
+
+
+def _extent(poly) -> float:
+    """Mean of the two side lengths of a (4, 2) rectangle footprint."""
+    return 0.5 * (float(np.linalg.norm(poly[1] - poly[0])) + float(np.linalg.norm(poly[2] - poly[1])))
+
+
+def role_props(layout: dict, role: str, notes: list | None = None) -> list[RoleProp]:
+    out = []
+    for p in layout.get("props", []):
+        r, how = prop_role(p)
+        if r != role:
+            continue
+        if lc.mesh_name(p) == role:  # the role's own kit mesh: the P2..P5b numbers, bit for bit
+            out.append(RoleProp(p, p["loc"][0], p["loc"][1], p["scale"], None, how))
+            continue
+        poly = _footprint_any(p)
+        if poly is not None:
+            cx, cy = (float(v) for v in poly.mean(axis=0))
+            ref = _extent(np.asarray(lc.footprint({"mesh": f"/Game/EnvKit/{lc.KIT[role][0]}/SM_Env_{role}",
+                                                   "loc": [0.0, 0.0, 0.0], "yawDeg": 0.0, "scale": 1.0}), float))
+            s = _extent(poly) / ref if ref > 0 else 1.0
+        else:
+            cx, cy, s = float(p["loc"][0]), float(p["loc"][1]), 1.0
+            if notes is not None and "groundScale" not in p:
+                notes.append(f"{p.get('id')}: role {role} ({how}) on an unknown mesh footprint - centre = loc, "
+                             "scale 1 (set 'groundScale' / 'groundCentre')")
+        if "groundScale" in p:
+            s = float(p["groundScale"])
+        if "groundCentre" in p:
+            cx, cy = float(p["groundCentre"][0]), float(p["groundCentre"][1])
+        out.append(RoleProp(p, cx, cy, s, poly, how))
+        if notes is not None:
+            notes.append(f"{p.get('id')}: role {role} via {how}, centre ({cx:.1f}, {cy:.1f}), ground scale {s:.3f}")
+    return out
+
+
+def _kit_stand_in(role: str, rp: RoleProp) -> dict:
+    """The role's kit mesh at the role prop's centre / yaw / normalised scale (fallback footprint of an unknown mesh)."""
+    return {"mesh": f"/Game/EnvKit/{lc.KIT[role][0]}/SM_Env_{role}", "loc": [rp.cx, rp.cy, 0.0],
+            "yawDeg": float(rp.prop.get("yawDeg", 0.0)), "scale": rp.s}
+
+
+def role_poly(rp: RoleProp, role: str):
+    """The footprint polygon of a role prop: its own (kit mesh: layout_check.footprint, as before; Fab: the bounds),
+    else the role's kit mesh standing in at its centre and normalised scale."""
+    if rp.poly is not None:
+        return rp.poly
+    if lc.mesh_name(rp.prop) == role:
+        return lc.footprint(rp.prop)
+    return lc.footprint(_kit_stand_in(role, rp))
 
 
 def props_hash(layout: dict) -> str:
@@ -283,7 +439,8 @@ def gauss_blur(a: np.ndarray, sigma_px: tuple) -> np.ndarray:
     return out
 
 
-def rules_marmoreal(X, Y, layout: dict, tray, nz: Noise, rules: dict | None = None) -> dict:
+def rules_marmoreal(X, Y, layout: dict, tray, nz: Noise, rules: dict | None = None,
+                    notes: list | None = None) -> dict:
     rules = rules or {}
     tx0, ty0, tx1, ty1 = tray
     d_frame = sd_box(X, Y, -FX, -FY, FX, FY)          # > 0 outside the frame
@@ -294,12 +451,13 @@ def rules_marmoreal(X, Y, layout: dict, tray, nz: Noise, rules: dict | None = No
     mid = nz.signed(20.0, 9, 2)
     # B: marble paving - walkway round the frame, the palace terrace N (under / behind the colonnade), pads
     d_pave = np.minimum(d_frame - 72.0, sd_box(X, Y, -410.0, ty0 - 50.0, 410.0, -300.0))
-    for p in props_of(layout, "LanternPlinth"):
-        d_pave = np.minimum(d_pave, sd_circle(X, Y, p["loc"][0], p["loc"][1], 48.0 * p["scale"]))
-    for p in props_of(layout, "PlinthBall"):
-        d_pave = np.minimum(d_pave, sd_circle(X, Y, p["loc"][0], p["loc"][1], 42.0 * p["scale"]))
-    for p in props_of(layout, "Urn", "Portal", "ArcadeBay"):
-        d_pave = np.minimum(d_pave, sd_poly(X, Y, lc.footprint(p)) - 14.0)
+    for q in role_props(layout, "LanternPlinth", notes):
+        d_pave = np.minimum(d_pave, sd_circle(X, Y, q.cx, q.cy, 48.0 * q.s))
+    for q in role_props(layout, "PlinthBall", notes):
+        d_pave = np.minimum(d_pave, sd_circle(X, Y, q.cx, q.cy, 42.0 * q.s))
+    for q, role in sorted(((q, r) for r in ("Urn", "Portal", "ArcadeBay") for q in role_props(layout, r, notes)),
+                          key=lambda t: _prop_index(layout, t[0].prop)):
+        d_pave = np.minimum(d_pave, sd_poly(X, Y, role_poly(q, role)) - 14.0)
     # noise-broken border (P4 gap 10: three octaves instead of the torn-paper single warp)
     d_pave_n = (d_pave + _rule(rules, "paveWarpUU", 13.0) * warp + _rule(rules, "paveMidUU", 0.0) * mid
                 + _rule(rules, "paveFineUU", 5.0) * fine)
@@ -312,11 +470,12 @@ def rules_marmoreal(X, Y, layout: dict, tray, nz: Noise, rules: dict | None = No
             else np.zeros_like(X))
     # R: moss under the cherries, round the cypresses, along the tray rim, a ring along the paving edge, patches
     d_cherry = np.full(X.shape, np.inf)
-    for p in props_of(layout, "Cherry"):
-        d_cherry = np.minimum(d_cherry, sd_circle(X, Y, p["loc"][0], p["loc"][1], 110.0 * p["scale"]))
+    cherries = role_props(layout, "Cherry", notes)
+    for q in cherries:
+        d_cherry = np.minimum(d_cherry, sd_circle(X, Y, q.cx, q.cy, 110.0 * q.s))
     d_cyp = np.full(X.shape, np.inf)
-    for p in props_of(layout, "Cypress"):
-        d_cyp = np.minimum(d_cyp, sd_circle(X, Y, p["loc"][0], p["loc"][1], 48.0 * p["scale"]))
+    for q in role_props(layout, "Cypress", notes):
+        d_cyp = np.minimum(d_cyp, sd_circle(X, Y, q.cx, q.cy, 48.0 * q.s))
     # (the cherry beds stay dark earth under a carpet of petals, as in the concept)
     under_cherry = inside(d_cherry + 24.0 * big + 8.0 * warp, 18.0)
     moss = np.maximum.reduce([
@@ -334,9 +493,9 @@ def rules_marmoreal(X, Y, layout: dict, tray, nz: Noise, rules: dict | None = No
     base = _rule(rules, "petalGlobal", 1.0) * (0.05 + 0.06 * (nz.fbm(60.0, 6) - 0.5))
     lobes = np.zeros_like(X)
     tree_r, drift = _rule(rules, "petalTreeRadiusUU", 125.0), _rule(rules, "petalDrift", 0.55)
-    for p in props_of(layout, "Cherry"):
-        cx, cy = p["loc"][0], p["loc"][1]
-        lobes = lobes + np.exp(-((np.hypot(X - cx, Y - cy) / (tree_r * p["scale"])) ** 2))
+    for q in cherries:
+        cx, cy = q.cx, q.cy
+        lobes = lobes + np.exp(-((np.hypot(X - cx, Y - cy) / (tree_r * q.s)) ** 2))
         dx = -math.copysign(120.0, cx) if cx else 0.0
         lobes = lobes + drift * np.exp(-((np.hypot(X - (cx + dx), Y - (cy + 40.0)) / 150.0) ** 2))
     beds = inside(np.abs(Y + 392.0) - 10.0 + 6.0 * warp, 8.0) * (np.abs(X) < 405.0)
@@ -361,7 +520,8 @@ def river_tubes(params: dict, tray) -> tuple[list, list]:
     return far, near
 
 
-def rules_sarpedon(X, Y, layout: dict, tray, nz: Noise, params: dict, rules: dict | None = None) -> dict:
+def rules_sarpedon(X, Y, layout: dict, tray, nz: Noise, params: dict, rules: dict | None = None,
+                   notes: list | None = None) -> dict:
     rules = rules or {}
     tx0, ty0, tx1, ty1 = tray
     d_edge = -sd_box(X, Y, tx0, ty0, tx1, ty1)
@@ -390,12 +550,13 @@ def rules_sarpedon(X, Y, layout: dict, tray, nz: Noise, params: dict, rules: dic
     fires = np.zeros_like(X)
     f_r, f_w, f_s = _rule(rules, "fireRadiusUU", 58.0), _rule(rules, "fireWarpUU", 14.0), _rule(rules, "fireSoftUU", 10.0)
     f_peak = _rule(rules, "firePeak", 0.85)
-    for p in props_of(layout, "Campfire"):
-        fires = np.maximum(fires, f_peak * inside(sd_circle(X, Y, p["loc"][0], p["loc"][1], f_r * p["scale"])
+    for q in role_props(layout, "Campfire", notes):
+        fires = np.maximum(fires, f_peak * inside(sd_circle(X, Y, q.cx, q.cy, f_r * q.s)
                                                   + f_w * warp + 4.0 * fine, f_s))
     fort = np.zeros_like(X)
-    for p in props_of(layout, "FortRuin"):
-        fort = np.maximum(fort, 0.6 * inside(sd_circle(X, Y, p["loc"][0], p["loc"][1], 115.0) + 30.0 * warp, 20.0))
+    forts = role_props(layout, "FortRuin", notes)
+    for q in forts:
+        fort = np.maximum(fort, 0.6 * inside(sd_circle(X, Y, q.cx, q.cy, 115.0) + 30.0 * warp, 20.0))
     sand = np.maximum.reduce([beach, sband, banks, fires, fort])
     # W / D / F (aux R / A / G): water in both river mouths (P4 gap 1), its depth and the foam on the shore + the surf
     d_w = d_river + _rule(rules, "waterWarpUU", 6.0) * warp + 2.0 * fine
@@ -414,8 +575,8 @@ def rules_sarpedon(X, Y, layout: dict, tray, nz: Noise, params: dict, rules: dic
     rim = inside(d_w - _rule(rules, "pebbleRimUU", 9.0), 3.0)
     bank_peb = inside(d_river - 22.0 + 10.0 * warp, 8.0) * sstep(0.42, 0.6, nz.fbm(30.0, 3))
     rubble = np.zeros_like(X)
-    for p in props_of(layout, "FortRuin"):
-        rubble = np.maximum(rubble, inside(sd_circle(X, Y, p["loc"][0], p["loc"][1], 95.0) + 25.0 * warp, 15.0)
+    for q in forts:
+        rubble = np.maximum(rubble, inside(sd_circle(X, Y, q.cx, q.cy, 95.0) + 25.0 * warp, 15.0)
                             * sstep(0.5, 0.7, nz.fbm(26.0, 4)) * 0.8)
     scatter = beach * sstep(0.72, 0.86, nz.fbm(28.0, 5)) * _rule(rules, "beachScatter", 0.6)
     gravel = np.maximum.reduce([rim, _rule(rules, "bankPebbles", 0.85) * bank_peb, 0.9 * rubble, scatter])
@@ -679,8 +840,9 @@ def generate(key: str, params: dict, layout: dict) -> dict:
     nz = Noise(X, Y, SEEDS[key])
     tray = tray_rect(params["tray"])
     rules = params["maps"][key].get("rules") or {}
-    ch = (rules_marmoreal(X, Y, layout, tray, nz, rules) if key == "marmoreal"
-          else rules_sarpedon(X, Y, layout, tray, nz, params, rules))
+    role_notes: list[str] = []
+    ch = (rules_marmoreal(X, Y, layout, tray, nz, rules, role_notes) if key == "marmoreal"
+          else rules_sarpedon(X, Y, layout, tray, nz, params, rules, role_notes))
     # P4: blur per channel (uu -> px on each axis); the depth follows the water
     blur = rules.get("blurUU") or {}
     upx = ((rect[2] - rect[0]) / size[0], (rect[3] - rect[1]) / size[1])
@@ -700,7 +862,8 @@ def generate(key: str, params: dict, layout: dict) -> dict:
     aux = np.concatenate([aux_rgb, aux_a[..., None]], axis=-1).astype(np.uint8)
     aux_png = _png(aux)
     res = {"key": key, "rect": rect, "size": size, "X": X, "Y": Y, "channels": ch, "array": arr, "png": png,
-           "sha256": sha256_bytes(png), "tray": tray, "aux": aux, "auxPng": aux_png, "auxSha256": sha256_bytes(aux_png)}
+           "sha256": sha256_bytes(png), "tray": tray, "aux": aux, "auxPng": aux_png, "auxSha256": sha256_bytes(aux_png),
+           "roleNotes": role_notes}
     res["falls"] = waterfalls(key, params, res)
     res["sea"] = sea_section(key, params, tray)
     return res
@@ -796,9 +959,10 @@ def _draw_overlay(img: Image.Image, res: dict, layout: dict, to_px, font, light:
     tx0, ty0, tx1, ty1 = res["tray"]
     d.rectangle([*to_px(tx0, ty0), *to_px(tx1, ty1)], outline=(255, 210, 90, 255), width=2)
     for p in layout.get("props", []):
-        if not lc.mesh_name(p):
+        fp = _footprint_any(p)  # P5c: Fab meshes too (layout_check or FAB_BOUNDS); unknown meshes are skipped
+        if fp is None:
             continue
-        poly = [to_px(*q) for q in lc.footprint(p)]
+        poly = [to_px(*q) for q in fp]
         d.polygon(poly, outline=ink)
         x, y = to_px(*p["loc"][:2])
         d.text((x + 3, y - 6), p["id"], fill=ink, font=font)
@@ -1122,6 +1286,7 @@ def run(args) -> int:
             "waterfalls": res["falls"],
             **({"sea": res["sea"]} if res.get("sea") else {}),
             "kit": kit_msgs[:3], "notes": notes,
+            **({"roles": res["roleNotes"]} if res.get("roleNotes") else {}),  # P5c: only when a role left its kit mesh
         }
         if args.check:
             errs = compare_png(key, png_path, res["sha256"], res["array"])

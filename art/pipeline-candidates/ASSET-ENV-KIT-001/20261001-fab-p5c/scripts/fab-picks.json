@@ -1,0 +1,958 @@
+{
+  "schema": "unmatched.env-fab-picks/1",
+  "date": "2026-10-01",
+  "status": "предложено (ENV-MAPS P5c track F): picks of the P5c scout (C:/tmp/envmaps-research/p5c/scout/picks.json, editor captures, not the render reference); технически импортировано only after tools/art/env_kit/ue_import_fab_picks.py ran in the integrate stage; художественная приёмка - решение пользователя",
+  "scout": "C:/tmp/envmaps-research/p5c/scout/catalog.json",
+  "root": "/Game/EnvKit/Fab",
+  "aiAllowedPacks": [
+    "StylizedForest",
+    "Fantasy_Forest",
+    "Vine_Plants",
+    "Flowers_Pots"
+  ],
+  "noAiPacks": [
+    "Megaplant_Library",
+    "StyleHex_Studio"
+  ],
+  "nightParams": {
+    "value": "NightValue",
+    "saturation": "NightSaturation"
+  },
+  "notes": "Every mesh is duplicated from its AI-allowed pack into /Game/EnvKit/Fab/<Map>/SM_EnvFab_<Name> (the pack folders stay pristine; the cooker follows the hard references of the duplicates and their MIs into the packs, DefaultGame.ini cooks /Game/EnvKit). Slots with a 'night' material get that night MI; trunk / bark slots keep the pack material (nothing to mute, already dark). Pack materials without colour parameters are copied once to /Game/EnvKit/Fab/Shared/M_EnvFab_* ('wrap': BaseColor -> lerp(luma, rgb, NightSaturation) x NightValue, defaults 1 = the pack look) and their night MIs are children of the copy; the parametrised pack MIs (Fantasy_Forest Mi_Foliage_01 / MI_rocks_Inst, Vine_Plants MM_Creepers_0x) get direct child MIs. bboxMin / bboxMax: the pack mesh bounds at scale 1 (UE local cm; the pivot is the pack pivot - the trunk base for the trees, NOT the bounds centre); base: the trunk / root footprint box [x0, y0, x1, y1] at scale 1 (layout_check check 5), null = the whole bounds footprint; tris: LOD0 (scout inventory, UE 5.8). The NoAI packs never appear here (UserVariant overlay only).",
+  "materials": {
+    "M_EnvFab_PinkLeaves": {
+      "kind": "wrap",
+      "source": "/Game/StylizedForest/Materials/M_Pink_leaves_Mat",
+      "dest": "/Game/EnvKit/Fab/Shared/M_EnvFab_PinkLeaves",
+      "why": "the pack material has no colour parameter (only the wind Intensity / Weight / WPO)"
+    },
+    "M_EnvFab_DarkGreenLeaves": {
+      "kind": "wrap",
+      "source": "/Game/StylizedForest/Materials/M_Dark_Green_leaves_Mat",
+      "dest": "/Game/EnvKit/Fab/Shared/M_EnvFab_DarkGreenLeaves",
+      "why": "no colour parameter (only the wind)"
+    },
+    "M_EnvFab_FlowerBush": {
+      "kind": "wrap",
+      "source": "/Game/StylizedForest/Materials/M_flower_bush_Mat",
+      "dest": "/Game/EnvKit/Fab/Shared/M_EnvFab_FlowerBush",
+      "why": "no parameter at all"
+    },
+    "M_EnvFab_Jug": {
+      "kind": "wrap",
+      "source": "/Game/Flowers_Pots/Materials/M_jug1",
+      "dest": "/Game/EnvKit/Fab/Shared/M_EnvFab_Jug",
+      "why": "texture parameters only (BaseColor / Normal / MetRouAo)"
+    },
+    "MI_EnvFab_SakuraLeavesNight": {
+      "kind": "instance",
+      "parent": "M_EnvFab_PinkLeaves",
+      "dest": "/Game/EnvKit/Fab/Marmoreal/MI_EnvFab_SakuraLeavesNight",
+      "scalar": {
+        "NightValue": 0.7,
+        "NightSaturation": 0.85,
+        "WPO": 0.0,
+        "Intensity": 0.0,
+        "Weight": 0.0
+      },
+      "why": "night muting of the pack pink only (V x0.78, S x0.85, hue unchanged); WPO 0 freezes the wind (-Bench determinism) || P5c tune t1: under the warm Marmoreal lamps the pack pink read salmon / orange (K1 crowns: 35 % salmon hue 8..40 deg) -> NightTint (0.85, 0.78, 1.25) pulls it back to a cool night pink, V 0.78 -> 0.7 || P5c tune (determinism): the pack WPO default is already 0, the wind runs on Intensity / Weight (0.5 / 0.5) - two -Bench runs differed over the whole cherry-w crown -> Intensity 0, Weight 0",
+      "vector": {
+        "NightTint": [
+          0.85,
+          0.78,
+          1.25,
+          1.0
+        ]
+      }
+    },
+    "MI_EnvFab_OakLeavesNight": {
+      "kind": "instance",
+      "parent": "M_EnvFab_DarkGreenLeaves",
+      "dest": "/Game/EnvKit/Fab/Sarpedon/MI_EnvFab_OakLeavesNight",
+      "scalar": {
+        "NightValue": 1.0,
+        "NightSaturation": 0.9,
+        "WPO": 0.0,
+        "Intensity": 0.0,
+        "Weight": 0.0
+      },
+      "why": "already the darkest pick: a slight muting, wind frozen || P5c tune t1: the crowns read blue-black next to the lit trunks -> V 0.85 -> 1.0, a slightly warmer green tint (0.95, 1.05, 0.8) || P5c tune (determinism): the pack WPO default is already 0, the wind runs on Intensity / Weight (0.5 / 0.5) - two -Bench runs differed over the whole cherry-w crown -> Intensity 0, Weight 0",
+      "vector": {
+        "NightTint": [
+          0.95,
+          1.05,
+          0.8,
+          1.0
+        ]
+      }
+    },
+    "MI_EnvFab_BushNight": {
+      "kind": "instance",
+      "parent": "M_EnvFab_FlowerBush",
+      "dest": "/Game/EnvKit/Fab/Sarpedon/MI_EnvFab_BushNight",
+      "scalar": {
+        "NightValue": 0.35,
+        "NightSaturation": 0.55
+      },
+      "why": "the small white flowers stay as night accents, the whole bush a step darker || P5c tune t1: read as a bright lime ball in the campfire light -> V 0.7 -> 0.35, S 0.8 -> 0.55, a cooler tint (0.75, 0.9, 1.0)",
+      "vector": {
+        "NightTint": [
+          0.75,
+          0.9,
+          1.0,
+          1.0
+        ]
+      }
+    },
+    "MI_EnvFab_FlowersNight": {
+      "kind": "instance",
+      "parent": "M_EnvFab_Jug",
+      "dest": "/Game/EnvKit/Fab/Marmoreal/MI_EnvFab_FlowersNight",
+      "scalar": {
+        "NightValue": 0.55,
+        "NightSaturation": 0.7
+      },
+      "why": "the saturated pink / violet / blue flowers muted for the night profile || P5c tune t2: the star-leaf clumps (Sm_Flower_019 / 022) by the W / E hedge beds read as lime-green stars in the side-lamp light -> V 0.72 -> 0.55, S 0.75 -> 0.7, NightTint (1.0, 0.72, 0.95) quiets the green leaves and keeps the pink / violet blossoms",
+      "vector": {
+        "NightTint": [
+          1.0,
+          0.72,
+          0.95,
+          1.0
+        ]
+      }
+    },
+    "MI_EnvFab_LavenderNight": {
+      "kind": "instance",
+      "parent": "M_EnvFab_Jug",
+      "dest": "/Game/EnvKit/Fab/Marmoreal/MI_EnvFab_LavenderNight",
+      "scalar": {
+        "NightValue": 0.45,
+        "NightSaturation": 0.6
+      },
+      "vector": {
+        "NightTint": [
+          0.95,
+          0.82,
+          1.1,
+          1.0
+        ]
+      },
+      "why": "P5c tune t1: the lavender clumps stand 36 uu from the side-lamp point lights (lamp-w / lamp-e) and burnt out -> their own MI: V 0.45, S 0.6, a violet tint (0.95, 0.82, 1.1); the beds / urns keep MI_EnvFab_FlowersNight"
+    },
+    "MI_EnvFab_ForestNight": {
+      "kind": "instance",
+      "parent": "/Game/Fantasy_Forest/Materials_Instance/Mi_Foliage_01",
+      "dest": "/Game/EnvKit/Fab/Sarpedon/MI_EnvFab_ForestNight",
+      "scalar": {
+        "Color Variation": 0.0,
+        "Hue Shift": 0.0,
+        "Brightness": 0.65,
+        "Desaturation": 0.3,
+        "Wind Intensity": 0.0,
+        "Branch Wind Intensity": 0.0
+      },
+      "vector": {
+        "Base Color": [
+          0.05,
+          0.09,
+          0.07,
+          1.0
+        ],
+        "Tint Color": [
+          0.6,
+          0.8,
+          0.55,
+          1.0
+        ]
+      },
+      "why": "Mi_Foliage_01 tints every placement by its world position (Color Variation 0.71, Hue Shift 1.15: pale lavender at the forest edge): one dark night green, wind off || P5c tune t1: blue-black crowns -> Brightness 0.5 -> 0.65, Tint Color (0.55, 0.75, 0.65) -> (0.6, 0.8, 0.55)"
+    },
+    "MI_EnvFab_Vine01Night": {
+      "kind": "instance",
+      "parent": "/Game/Vine_Plants/Materials_Instance/MM_Creepers_01",
+      "dest": "/Game/EnvKit/Fab/Shared/MI_EnvFab_Vine01Night",
+      "scalar": {
+        "Brightness": 0.62,
+        "Desaturation": 0.25,
+        "Color Variation": 0.0
+      },
+      "twoSided": true,
+      "why": "pack Brightness 1.0 -> 0.62, a little desaturated; TwoSided override: the vine cards are one-sided in the pack"
+    },
+    "MI_EnvFab_Vine02Night": {
+      "kind": "instance",
+      "parent": "/Game/Vine_Plants/Materials_Instance/MM_Creepers_02",
+      "dest": "/Game/EnvKit/Fab/Shared/MI_EnvFab_Vine02Night",
+      "scalar": {
+        "Brightness": 0.3,
+        "Desaturation": 0.25,
+        "Color Variation": 0.0
+      },
+      "twoSided": true,
+      "why": "pack Brightness 0.458 -> 0.3"
+    },
+    "MI_EnvFab_Vine03Night": {
+      "kind": "instance",
+      "parent": "/Game/Vine_Plants/Materials_Instance/MM_Creepers_03",
+      "dest": "/Game/EnvKit/Fab/Shared/MI_EnvFab_Vine03Night",
+      "scalar": {
+        "Brightness": 0.3,
+        "Desaturation": 0.25,
+        "Color Variation": 0.0
+      },
+      "twoSided": true,
+      "why": "pack Brightness 0.458 -> 0.3"
+    },
+    "MI_EnvFab_RockWet": {
+      "kind": "instance",
+      "parent": "/Game/Fantasy_Forest/Materials_Instance/MI_rocks_Inst",
+      "dest": "/Game/EnvKit/Fab/Sarpedon/MI_EnvFab_RockWet",
+      "scalar": {
+        "roughness rock": 0.35
+      },
+      "vector": {
+        "hue_color": [
+          0.25,
+          0.24,
+          0.22,
+          1.0
+        ]
+      },
+      "why": "P5b review: the rocks read too pale -> dark wet rock (pack hue_color 0.995, roughness 0.7)"
+    }
+  },
+  "meshes": {
+    "SakuraTwisted": {
+      "map": "Marmoreal",
+      "kind": "tree",
+      "pack": "StylizedForest",
+      "source": "/Game/StylizedForest/Meshes/Env_Tree_Large_Twisted/SM_Env_Tree_Large_Twisted_Pink",
+      "dest": "/Game/EnvKit/Fab/Marmoreal/SM_EnvFab_SakuraTwisted",
+      "bboxMin": [
+        -61.06,
+        -311.05,
+        -0.04
+      ],
+      "bboxMax": [
+        1073.06,
+        220.31,
+        934.38
+      ],
+      "tris": 14908,
+      "lods": 1,
+      "nanite": false,
+      "base": [
+        -61,
+        -70,
+        70,
+        70
+      ],
+      "scaleRange": [
+        0.1,
+        0.3
+      ],
+      "slots": [
+        {
+          "index": 0,
+          "slot": "M_Env_Tree_Large_Twisted",
+          "source": "/Game/StylizedForest/Materials/M_Env_Tree_Large_Twisted",
+          "night": null
+        },
+        {
+          "index": 1,
+          "slot": "M_Pink_leaves",
+          "source": "/Game/StylizedForest/Materials/M_Pink_leaves_Mat",
+          "night": "MI_EnvFab_SakuraLeavesNight"
+        }
+      ]
+    },
+    "SakuraBirch": {
+      "map": "Marmoreal",
+      "kind": "tree",
+      "pack": "StylizedForest",
+      "source": "/Game/StylizedForest/Meshes/Env_Tree_Small_Birch_Thin/SM_Env_Tree_Small_Birch_Thin_Pink",
+      "dest": "/Game/EnvKit/Fab/Marmoreal/SM_EnvFab_SakuraBirch",
+      "bboxMin": [
+        -436.24,
+        -441.09,
+        -0.0
+      ],
+      "bboxMax": [
+        514.57,
+        340.9,
+        911.26
+      ],
+      "tris": 3392,
+      "lods": 1,
+      "nanite": false,
+      "base": [
+        -70,
+        -70,
+        70,
+        70
+      ],
+      "scaleRange": [
+        0.08,
+        0.3
+      ],
+      "slots": [
+        {
+          "index": 0,
+          "slot": "M_Pink_leaves",
+          "source": "/Game/StylizedForest/Materials/M_Pink_leaves_Mat",
+          "night": "MI_EnvFab_SakuraLeavesNight"
+        },
+        {
+          "index": 1,
+          "slot": "SM_Env_Tree_Small_Birch_Thin",
+          "source": "/Game/StylizedForest/Materials/M_Env_Tree_Small_Thin",
+          "night": null
+        }
+      ]
+    },
+    "VineGarland": {
+      "map": "Marmoreal",
+      "kind": "vine",
+      "pack": "Vine_Plants",
+      "source": "/Game/Vine_Plants/Statick_Meshes/Sm_Lines_36",
+      "dest": "/Game/EnvKit/Fab/Marmoreal/SM_EnvFab_VineGarland",
+      "bboxMin": [
+        -89.08,
+        -15.72,
+        -0.93
+      ],
+      "bboxMax": [
+        73.3,
+        0.0,
+        22.83
+      ],
+      "tris": 20,
+      "lods": 1,
+      "nanite": false,
+      "base": null,
+      "scaleRange": [
+        0.5,
+        1.5
+      ],
+      "slots": [
+        {
+          "index": 0,
+          "slot": "Material_001",
+          "source": "/Game/Vine_Plants/Materials_Instance/MM_Creepers_02",
+          "night": "MI_EnvFab_Vine02Night"
+        }
+      ]
+    },
+    "VineCurtain": {
+      "map": "Marmoreal",
+      "kind": "vine",
+      "pack": "Vine_Plants",
+      "source": "/Game/Vine_Plants/Statick_Meshes/Sm_Lines_48",
+      "dest": "/Game/EnvKit/Fab/Marmoreal/SM_EnvFab_VineCurtain",
+      "bboxMin": [
+        -64.69,
+        -4.72,
+        -45.07
+      ],
+      "bboxMax": [
+        80.58,
+        1.45,
+        89.03
+      ],
+      "tris": 144,
+      "lods": 1,
+      "nanite": false,
+      "base": null,
+      "scaleRange": [
+        0.5,
+        1.5
+      ],
+      "slots": [
+        {
+          "index": 0,
+          "slot": "Material_001",
+          "source": "/Game/Vine_Plants/Materials_Instance/MM_Creepers_02",
+          "night": "MI_EnvFab_Vine02Night"
+        }
+      ]
+    },
+    "VineCurtainB": {
+      "map": "Marmoreal",
+      "kind": "vine",
+      "pack": "Vine_Plants",
+      "source": "/Game/Vine_Plants/Statick_Meshes/Sm_Lines_53",
+      "dest": "/Game/EnvKit/Fab/Marmoreal/SM_EnvFab_VineCurtainB",
+      "bboxMin": [
+        -20.01,
+        5.5,
+        -12.79
+      ],
+      "bboxMax": [
+        116.08,
+        9.59,
+        95.44
+      ],
+      "tris": 132,
+      "lods": 1,
+      "nanite": false,
+      "base": null,
+      "scaleRange": [
+        0.4,
+        1.5
+      ],
+      "slots": [
+        {
+          "index": 0,
+          "slot": "Material_001",
+          "source": "/Game/Vine_Plants/Materials_Instance/MM_Creepers_02",
+          "night": "MI_EnvFab_Vine02Night"
+        }
+      ]
+    },
+    "VineArcade": {
+      "map": "Marmoreal",
+      "kind": "vine",
+      "pack": "Vine_Plants",
+      "source": "/Game/Vine_Plants/Statick_Meshes/Sm_Lines_30",
+      "dest": "/Game/EnvKit/Fab/Marmoreal/SM_EnvFab_VineArcade",
+      "bboxMin": [
+        -35.9,
+        -8.75,
+        -9.98
+      ],
+      "bboxMax": [
+        108.76,
+        1.26,
+        129.26
+      ],
+      "tris": 145,
+      "lods": 1,
+      "nanite": false,
+      "base": null,
+      "scaleRange": [
+        0.5,
+        1.5
+      ],
+      "slots": [
+        {
+          "index": 0,
+          "slot": "Material",
+          "source": "/Game/Vine_Plants/Materials_Instance/MM_Creepers_01",
+          "night": "MI_EnvFab_Vine01Night"
+        }
+      ]
+    },
+    "FlowerUrn": {
+      "map": "Marmoreal",
+      "kind": "flower",
+      "pack": "Flowers_Pots",
+      "source": "/Game/Flowers_Pots/Statick_Meshes/Sm_Flower_021",
+      "dest": "/Game/EnvKit/Fab/Marmoreal/SM_EnvFab_FlowerUrn",
+      "bboxMin": [
+        -55.69,
+        -54.97,
+        0.0
+      ],
+      "bboxMax": [
+        55.43,
+        54.07,
+        54.28
+      ],
+      "tris": 592,
+      "lods": 1,
+      "nanite": false,
+      "base": null,
+      "scaleRange": [
+        0.15,
+        0.6
+      ],
+      "slots": [
+        {
+          "index": 0,
+          "slot": "Material_001",
+          "source": "/Game/Flowers_Pots/Materials/M_jug1",
+          "night": "MI_EnvFab_FlowersNight"
+        }
+      ]
+    },
+    "FlowerBed": {
+      "map": "Marmoreal",
+      "kind": "flower",
+      "pack": "Flowers_Pots",
+      "source": "/Game/Flowers_Pots/Statick_Meshes/Sm_Flower_019",
+      "dest": "/Game/EnvKit/Fab/Marmoreal/SM_EnvFab_FlowerBed",
+      "bboxMin": [
+        -51.2,
+        -51.45,
+        0.0
+      ],
+      "bboxMax": [
+        55.97,
+        54.55,
+        46.05
+      ],
+      "tris": 560,
+      "lods": 1,
+      "nanite": false,
+      "base": null,
+      "scaleRange": [
+        0.2,
+        0.6
+      ],
+      "slots": [
+        {
+          "index": 0,
+          "slot": "Material_001",
+          "source": "/Game/Flowers_Pots/Materials/M_jug1",
+          "night": "MI_EnvFab_FlowersNight"
+        }
+      ]
+    },
+    "FlowerBedB": {
+      "map": "Marmoreal",
+      "kind": "flower",
+      "pack": "Flowers_Pots",
+      "source": "/Game/Flowers_Pots/Statick_Meshes/Sm_Flower_022",
+      "dest": "/Game/EnvKit/Fab/Marmoreal/SM_EnvFab_FlowerBedB",
+      "bboxMin": [
+        -52.12,
+        -53.37,
+        0.0
+      ],
+      "bboxMax": [
+        55.23,
+        60.6,
+        51.81
+      ],
+      "tris": 512,
+      "lods": 1,
+      "nanite": false,
+      "base": null,
+      "scaleRange": [
+        0.2,
+        0.6
+      ],
+      "slots": [
+        {
+          "index": 0,
+          "slot": "Material_001",
+          "source": "/Game/Flowers_Pots/Materials/M_jug1",
+          "night": "MI_EnvFab_FlowersNight"
+        }
+      ]
+    },
+    "FlowerLavender": {
+      "map": "Marmoreal",
+      "kind": "flower",
+      "pack": "Flowers_Pots",
+      "source": "/Game/Flowers_Pots/Statick_Meshes/Sm_Flower_09",
+      "dest": "/Game/EnvKit/Fab/Marmoreal/SM_EnvFab_FlowerLavender",
+      "bboxMin": [
+        -21.37,
+        -21.4,
+        0.0
+      ],
+      "bboxMax": [
+        20.34,
+        20.98,
+        38.38
+      ],
+      "tris": 168,
+      "lods": 1,
+      "nanite": false,
+      "base": null,
+      "scaleRange": [
+        0.3,
+        1.0
+      ],
+      "slots": [
+        {
+          "index": 0,
+          "slot": "Material_001",
+          "source": "/Game/Flowers_Pots/Materials/M_jug1",
+          "night": "MI_EnvFab_LavenderNight"
+        }
+      ]
+    },
+    "OakDark": {
+      "map": "Sarpedon",
+      "kind": "tree",
+      "pack": "StylizedForest",
+      "source": "/Game/StylizedForest/Meshes/M_Env_Tree_Medium_Oak_Full/SM_Env_Tree_Medium_Oak_Dark_Green",
+      "dest": "/Game/EnvKit/Fab/Sarpedon/SM_EnvFab_OakDark",
+      "bboxMin": [
+        -589.96,
+        -458.73,
+        -0.0
+      ],
+      "bboxMax": [
+        642.4,
+        515.93,
+        1407.55
+      ],
+      "tris": 16232,
+      "lods": 1,
+      "nanite": false,
+      "base": [
+        -60,
+        -60,
+        60,
+        60
+      ],
+      "scaleRange": [
+        0.08,
+        0.2
+      ],
+      "slots": [
+        {
+          "index": 0,
+          "slot": "M_Dark_Green_leaves",
+          "source": "/Game/StylizedForest/Materials/M_Dark_Green_leaves_Mat",
+          "night": "MI_EnvFab_OakLeavesNight"
+        },
+        {
+          "index": 1,
+          "slot": "M_Env_Tree_Medium_Oak_Full",
+          "source": "/Game/StylizedForest/Materials/M_Env_Tree_Medium_Oak_Full",
+          "night": null
+        }
+      ]
+    },
+    "ForestNarrow": {
+      "map": "Sarpedon",
+      "kind": "tree",
+      "pack": "Fantasy_Forest",
+      "source": "/Game/Fantasy_Forest/Statick_Meshes/Sm_Wood_6",
+      "dest": "/Game/EnvKit/Fab/Sarpedon/SM_EnvFab_ForestNarrow",
+      "bboxMin": [
+        -192.44,
+        -221.85,
+        0.0
+      ],
+      "bboxMax": [
+        227.6,
+        244.19,
+        1304.89
+      ],
+      "tris": 3692,
+      "lods": 1,
+      "nanite": false,
+      "base": [
+        -40,
+        -40,
+        40,
+        40
+      ],
+      "scaleRange": [
+        0.08,
+        0.25
+      ],
+      "slots": [
+        {
+          "index": 0,
+          "slot": "tree_painterlySimple03",
+          "source": "/Game/Fantasy_Forest/Materials_Instance/MI_bark",
+          "night": null
+        },
+        {
+          "index": 1,
+          "slot": "leaves04",
+          "source": "/Game/Fantasy_Forest/Materials_Instance/Mi_Foliage_01",
+          "night": "MI_EnvFab_ForestNight"
+        }
+      ]
+    },
+    "ForestRound": {
+      "map": "Sarpedon",
+      "kind": "tree",
+      "pack": "Fantasy_Forest",
+      "source": "/Game/Fantasy_Forest/Statick_Meshes/SM_Wood_11",
+      "dest": "/Game/EnvKit/Fab/Sarpedon/SM_EnvFab_ForestRound",
+      "bboxMin": [
+        -407.92,
+        -296.13,
+        0.0
+      ],
+      "bboxMax": [
+        361.39,
+        323.05,
+        1259.01
+      ],
+      "tris": 2982,
+      "lods": 1,
+      "nanite": false,
+      "base": [
+        -40,
+        -40,
+        40,
+        40
+      ],
+      "scaleRange": [
+        0.08,
+        0.25
+      ],
+      "slots": [
+        {
+          "index": 0,
+          "slot": "1_001",
+          "source": "/Game/Fantasy_Forest/Materials_Instance/MI_bark",
+          "night": null
+        },
+        {
+          "index": 1,
+          "slot": "2_009",
+          "source": "/Game/Fantasy_Forest/Materials_Instance/Mi_Foliage_01",
+          "night": "MI_EnvFab_ForestNight"
+        }
+      ]
+    },
+    "ForestSmall": {
+      "map": "Sarpedon",
+      "kind": "tree",
+      "pack": "Fantasy_Forest",
+      "source": "/Game/Fantasy_Forest/Statick_Meshes/SM_Wood_17",
+      "dest": "/Game/EnvKit/Fab/Sarpedon/SM_EnvFab_ForestSmall",
+      "bboxMin": [
+        -263.62,
+        -243.64,
+        0.0
+      ],
+      "bboxMax": [
+        312.58,
+        250.85,
+        1198.22
+      ],
+      "tris": 3402,
+      "lods": 1,
+      "nanite": false,
+      "base": [
+        -40,
+        -40,
+        40,
+        40
+      ],
+      "scaleRange": [
+        0.08,
+        0.25
+      ],
+      "slots": [
+        {
+          "index": 0,
+          "slot": "1_001",
+          "source": "/Game/Fantasy_Forest/Materials_Instance/MI_bark",
+          "night": null
+        },
+        {
+          "index": 1,
+          "slot": "2_009",
+          "source": "/Game/Fantasy_Forest/Materials_Instance/Mi_Foliage_01",
+          "night": "MI_EnvFab_ForestNight"
+        }
+      ]
+    },
+    "Bush": {
+      "map": "Sarpedon",
+      "kind": "bush",
+      "pack": "StylizedForest",
+      "source": "/Game/StylizedForest/Meshes/SM_Env_Bush_Large_Round/SM_Env_Bush_Large_Round",
+      "dest": "/Game/EnvKit/Fab/Sarpedon/SM_EnvFab_Bush",
+      "bboxMin": [
+        -118.88,
+        -102.59,
+        -11.3
+      ],
+      "bboxMax": [
+        105.34,
+        108.57,
+        169.35
+      ],
+      "tris": 4966,
+      "lods": 1,
+      "nanite": false,
+      "base": [
+        -60,
+        -55,
+        55,
+        60
+      ],
+      "scaleRange": [
+        0.15,
+        0.5
+      ],
+      "slots": [
+        {
+          "index": 0,
+          "slot": "M_Env_Bush_Large_Round",
+          "source": "/Game/StylizedForest/Materials/M_flower_bush_Mat",
+          "night": "MI_EnvFab_BushNight"
+        }
+      ]
+    },
+    "RockWet": {
+      "map": "Sarpedon",
+      "kind": "rock",
+      "pack": "Fantasy_Forest",
+      "source": "/Game/Fantasy_Forest/Statick_Meshes/SM_rock_01",
+      "dest": "/Game/EnvKit/Fab/Sarpedon/SM_EnvFab_RockWet",
+      "bboxMin": [
+        -137.13,
+        -117.42,
+        -83.51
+      ],
+      "bboxMax": [
+        137.13,
+        136.7,
+        123.12
+      ],
+      "tris": 518,
+      "lods": 3,
+      "nanite": false,
+      "base": null,
+      "scaleRange": [
+        0.1,
+        0.6
+      ],
+      "slots": [
+        {
+          "index": 0,
+          "slot": "Rock",
+          "source": "/Game/Fantasy_Forest/Materials_Instance/MI_rocks_Inst",
+          "night": "MI_EnvFab_RockWet"
+        }
+      ]
+    },
+    "VineSwag": {
+      "map": "Sarpedon",
+      "kind": "vine",
+      "pack": "Vine_Plants",
+      "source": "/Game/Vine_Plants/Statick_Meshes/Sm_Lines_25",
+      "dest": "/Game/EnvKit/Fab/Sarpedon/SM_EnvFab_VineSwag",
+      "bboxMin": [
+        -29.31,
+        -0.0,
+        0.0
+      ],
+      "bboxMax": [
+        25.51,
+        0.0,
+        64.27
+      ],
+      "tris": 41,
+      "lods": 1,
+      "nanite": false,
+      "base": null,
+      "scaleRange": [
+        0.5,
+        1.5
+      ],
+      "slots": [
+        {
+          "index": 0,
+          "slot": "Material",
+          "source": "/Game/Vine_Plants/Materials_Instance/MM_Creepers_01",
+          "night": "MI_EnvFab_Vine01Night"
+        }
+      ]
+    },
+    "VinePost": {
+      "map": "Sarpedon",
+      "kind": "vine",
+      "pack": "Vine_Plants",
+      "source": "/Game/Vine_Plants/Statick_Meshes/Sm_Lines_29",
+      "dest": "/Game/EnvKit/Fab/Sarpedon/SM_EnvFab_VinePost",
+      "bboxMin": [
+        -30.33,
+        -7.32,
+        -0.72
+      ],
+      "bboxMax": [
+        43.81,
+        1.64,
+        126.22
+      ],
+      "tris": 83,
+      "lods": 1,
+      "nanite": false,
+      "base": null,
+      "scaleRange": [
+        0.4,
+        1.5
+      ],
+      "slots": [
+        {
+          "index": 0,
+          "slot": "Material",
+          "source": "/Game/Vine_Plants/Materials_Instance/MM_Creepers_01",
+          "night": "MI_EnvFab_Vine01Night"
+        }
+      ]
+    },
+    "VineFort": {
+      "map": "Sarpedon",
+      "kind": "vine",
+      "pack": "Vine_Plants",
+      "source": "/Game/Vine_Plants/Statick_Meshes/Sm_Lines_14",
+      "dest": "/Game/EnvKit/Fab/Sarpedon/SM_EnvFab_VineFort",
+      "bboxMin": [
+        -78.81,
+        -11.62,
+        -31.8
+      ],
+      "bboxMax": [
+        61.41,
+        4.86,
+        81.94
+      ],
+      "tris": 215,
+      "lods": 1,
+      "nanite": false,
+      "base": null,
+      "scaleRange": [
+        0.4,
+        1.5
+      ],
+      "slots": [
+        {
+          "index": 0,
+          "slot": "Material_002",
+          "source": "/Game/Vine_Plants/Materials_Instance/MM_Creepers_03",
+          "night": "MI_EnvFab_Vine03Night"
+        }
+      ]
+    },
+    "VineFortB": {
+      "map": "Sarpedon",
+      "kind": "vine",
+      "pack": "Vine_Plants",
+      "source": "/Game/Vine_Plants/Statick_Meshes/Sm_Lines_53",
+      "dest": "/Game/EnvKit/Fab/Sarpedon/SM_EnvFab_VineFortB",
+      "bboxMin": [
+        -20.01,
+        5.5,
+        -12.79
+      ],
+      "bboxMax": [
+        116.08,
+        9.59,
+        95.44
+      ],
+      "tris": 132,
+      "lods": 1,
+      "nanite": false,
+      "base": null,
+      "scaleRange": [
+        0.4,
+        1.5
+      ],
+      "slots": [
+        {
+          "index": 0,
+          "slot": "Material_001",
+          "source": "/Game/Vine_Plants/Materials_Instance/MM_Creepers_02",
+          "night": "MI_EnvFab_Vine02Night"
+        }
+      ]
+    }
+  }
+}

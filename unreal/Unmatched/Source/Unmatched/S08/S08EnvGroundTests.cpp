@@ -744,6 +744,20 @@ bool FS08EnvGroundShippedTest::RunTest(const FString&) {
       UTexture* Ripple = nullptr;
       TestTrue(Id + TEXT(": WaterRippleN bound"),
                FallMi->GetTextureParameterValue(FHashedMaterialParameterInfo(TEXT("WaterRippleN")), Ripple) && Ripple);
+      // P5c graph 3: lit translucent (or the MI's Masked override, ground-params falls[].look.blend), the Water
+      // Materials streak texture bound (a stand-in without the pack: FallLook.w = 0)
+      FLinearColor FallLook;
+      if (FallMi->GetVectorParameterValue(FHashedMaterialParameterInfo(TEXT("FallLook")), FallLook)) {
+        UTexture* Streak = nullptr;
+        TestTrue(Id + TEXT(": FallStreakTex bound (graph 3)"),
+                 FallMi->GetTextureParameterValue(FHashedMaterialParameterInfo(TEXT("FallStreakTex")), Streak) && Streak);
+        const EBlendMode Blend = FallMi->GetBlendMode();
+        TestTrue(Id + TEXT(": translucent sheet (or the masked MI fallback)"),
+                 Blend == BLEND_Translucent || Blend == BLEND_Masked);
+        if (FallLook.A < 0.5f) AddWarning(Id + TEXT(": procedural streaks (no Water Materials pack texture)"));
+      } else {
+        AddWarning(Id + TEXT(": M_EnvWaterfall is older than graph 3 (re-run tools/art/env_kit/ue_import_env_ground.py)"));
+      }
     }
     if (G.Sea.bSet) {
       // P5 track B: the sea ring under the tray centre, below the tray top and above the bottom of either shared tray
@@ -764,6 +778,20 @@ bool FS08EnvGroundShippedTest::RunTest(const FString&) {
         UMaterialInstance* SeaMi = LoadObject<UMaterialInstance>(nullptr, *Sea.Material);
         TestTrue(Key + TEXT(": MI_EnvSea parent M_EnvSea"),
                  SeaMi && SeaMi->Parent && SeaMi->Parent->GetPathName() == TEXT("/Game/EnvKit/Ground/M_EnvSea.M_EnvSea"));
+        // P5c graph 2: still opaque; the Water Materials foam + two wave normals bound (SeaPack.x = 0: the fallback)
+        FLinearColor Pack;
+        if (SeaMi && SeaMi->GetVectorParameterValue(FHashedMaterialParameterInfo(TEXT("SeaPack")), Pack)) {
+          for (const TCHAR* Name : {TEXT("SeaFoamTex"), TEXT("SeaNormalA"), TEXT("SeaNormalB")}) {
+            UTexture* Bound = nullptr;
+            TestTrue(Key + TEXT(": ") + Name + TEXT(" bound (sea graph 2)"),
+                     SeaMi->GetTextureParameterValue(FHashedMaterialParameterInfo(Name), Bound) && Bound != nullptr);
+          }
+          TestEqual(Key + TEXT(": the sea ring stays opaque"), static_cast<int32>(SeaMi->GetBlendMode()),
+                    static_cast<int32>(BLEND_Opaque));
+          if (Pack.R < 0.5f) AddWarning(Key + TEXT(": the sea uses the procedural lace (no Water Materials pack)"));
+        } else if (SeaMi) {
+          AddWarning(Key + TEXT(": M_EnvSea is older than graph 2 (re-run tools/art/env_kit/ue_import_env_ground.py)"));
+        }
       }
     }
     const FString Pkg = PackageOf(G.Material);

@@ -129,10 +129,11 @@ class Looks(unittest.TestCase):
         p4 = LOOK.load_look()
         plinth = LOOK.measure("LanternPlinth", p4)["emissive"]["meanLuminance"]
         # the lantern glass: the order of the P4 LanternPlinth (x6); the back-wall windows a step below it (P5b tune:
-        # at the lantern order their large area clipped to flat orange in the UE frames)
+        # at the lantern order their large area clipped to flat orange in the UE frames; P5c tune: x1.2 - the K1 top
+        # band 113.8 -> 96 vs P4 91.9, the windows no longer clip: ~0.3 of the plinth glass)
         self.assertLess(abs(self.res["LanternPost"]["emissive"]["meanLuminance"] / plinth - 1.0), 0.25)
         ratio = self.res["BackWall"]["emissive"]["meanLuminance"] / plinth
-        self.assertTrue(0.5 <= ratio <= 1.0, ratio)
+        self.assertTrue(0.25 <= ratio <= 1.0, ratio)
 
     def test_night_friendly_rest(self):  # no prop gets brighter or more saturated
         for name, res in self.res.items():

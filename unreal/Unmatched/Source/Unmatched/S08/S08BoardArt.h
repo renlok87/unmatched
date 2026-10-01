@@ -164,6 +164,10 @@ inline const TCHAR* const ParamBackdropIntensity = TEXT("Intensity");  // moon: 
 inline const TCHAR* const ParamBackdropSoftness = TEXT("Softness");    // moon: gaussian width (fraction of the radius)
 inline const TCHAR* const ParamBackdropDiscRadius = TEXT("DiscRadius");
 inline const TCHAR* const ParamBackdropDiscIntensity = TEXT("DiscIntensity");
+/** ENV-MAPS P5c (P5b review: the Marmoreal moon read as a hard flat disc): the disc edge falloff as a fraction of the disc
+ *  radius (0.15 = the P5 edge) and a limb shading 0..1 (0 = flat, the P5 look) of M_MapBackdropMoon graph 2. */
+inline const TCHAR* const ParamBackdropDiscSoftness = TEXT("DiscSoftness");
+inline const TCHAR* const ParamBackdropDiscLimb = TEXT("DiscLimb");
 constexpr int32 BackdropMaxMist = 2;
 /** Every backdrop part stays below this Z (the T2b rocky tray bottom is at about -216): the opaque tray, frame and props
  *  are always in front of it, so the backdrop can never draw over the board. */
@@ -424,6 +428,8 @@ struct UNMATCHED_API FS08BackdropMoonSpec {
   float Softness = 0.4f;                                    // 0.05 .. 1
   float DiscRadius = 0.06f;                                 // 0 .. 0.5 of the card radius (0 = glow only)
   float DiscIntensity = 2.0f;                               // 0 .. 50
+  float DiscSoftness = 0.15f;                               // 0.02 .. 0.95 of the disc radius (P5c; 0.15 = the P5 edge)
+  float DiscLimb = 0.0f;                                    // 0 .. 1 limb shading (P5c; 0 = flat, the P5 disc)
 };
 
 /** ENV-MAPS P5 track C (gap 8): the optional "backdrop" block of a map-image board (grids reject it). Status:

@@ -1,0 +1,482 @@
+{
+ "schema": "unmatched.env-user-fab/1",
+ "date": "2026-10-01",
+ "status": "предложено (ENV-MAPS P5c UserVariant): NoAI-ассеты только для варианта пользователя (-EnvLayoutVariant=user); технически импортировано после tools/art/env_kit/ue_import_user_fab.py; художественная оценка - только пользователь (агенты кадры с ними не смотрят)",
+ "root": "/Game/EnvKit/UserFab",
+ "noAiPacks": [
+  "Megaplant_Library",
+  "StyleHex_Studio"
+ ],
+ "rule": "ENV-U14 NoAI: only asset paths and UE technical data (class, bounds, triangles, dependencies, plugins, trace lines); no texture / thumbnail / frame is opened, rendered for an agent, read or described; placed only by Config/ArtBoards/EnvLayouts/<map>.user.layout.json",
+ "notes": "measured = written by --adopt-report from the UE import report (bounds at scale 1 in UE local cm, pivot = the pack pivot; base = the trunk-foot XY box of a bake). The bakes need no plugin at runtime: the Yoshino tree skeletal meshes are Nanite assemblies (r.Nanite.Foliage / r.Nanite.AllowAssemblies, DynamicWind) - the static bake reproduces the reference pose with the static twig meshes at their Nanite fallback.",
+ "materials": {
+  "M_UserFab_Tree": {
+   "kind": "master",
+   "dest": "/Game/EnvKit/UserFab/Shared/M_UserFab_Tree",
+   "why": "the Megaplants MIs have their parent in the experimental ProceduralVegetationEditor plugin content (MA_Foliage_Trees) and load parent-less without it; this small opaque master takes the pack textures by path (BaseColorMap x Tint -> UserFabNight -> BaseColor), no normal map, no new plugin"
+  },
+  "MI_UserFab_YoshinoBark": {
+   "kind": "instance",
+   "parent": "M_UserFab_Tree",
+   "dest": "/Game/EnvKit/UserFab/Marmoreal/MI_UserFab_YoshinoBark",
+   "textures": {
+    "BaseColorMap": "/Game/Megaplant_Library/Tree_Yoshino_Cherry/Textures/T_Yoshino_Cherry_01_Bark_C"
+   },
+   "scalar": {
+    "NightValue": 0.75,
+    "NightSaturation": 0.9,
+    "Roughness": 0.85,
+    "Specular": 0.3
+   },
+   "twoSided": false,
+   "why": "trunk / branch bark (material id 0); night muting like the main variant's bark"
+  },
+  "MI_UserFab_YoshinoBlossom": {
+   "kind": "instance",
+   "parent": "M_UserFab_Tree",
+   "dest": "/Game/EnvKit/UserFab/Marmoreal/MI_UserFab_YoshinoBlossom",
+   "textures": {
+    "BaseColorMap": "/Game/Megaplant_Library/Tree_Yoshino_Cherry/Textures/T_Yoshino_Cherry_01_Foliage_CA"
+   },
+   "scalar": {
+    "NightValue": 0.7,
+    "NightSaturation": 0.85,
+    "Roughness": 0.65,
+    "Specular": 0.35
+   },
+   "vector": {
+    "Tint": [
+     0.85,
+     0.78,
+     1.25,
+     1.0
+    ]
+   },
+   "twoSided": true,
+   "why": "blossom / leaf geometry (material id 1, opaque two-sided like the pack MI override); the night values of the main variant's sakura MI (MI_EnvFab_SakuraLeavesNight: V 0.7, S 0.85, NightTint (0.85, 0.78, 1.25)) - not tuned on frames (NoAI: no agent looks at them)"
+  },
+  "MI_UserFab_StoneCluster1Wet": {
+   "kind": "instance",
+   "parent": "/Game/StyleHex_Studio/Free_Packs/FREE_Stylized_Rocks_and_Stones/Materials/Mat_Stones/MI_Stone_Cluster_1",
+   "dest": "/Game/EnvKit/UserFab/Sarpedon/MI_UserFab_StoneCluster1Wet",
+   "vector": {
+    "Color Tint": [
+     0.42,
+     0.42,
+     0.45,
+     1.0
+    ]
+   },
+   "why": "Sarpedon night: dark wet rock like the main variant's MI_EnvFab_RockWet (P5b: the rocks read too pale). The pack master M_Environment_Basic multiplies its base colour texture by 'Color Tint' only behind the static switch 'Use Color Tint?' (pack MIs: switch off, tint 0) - technical graph data from its T3D text; the value is set blind (NoAI: not tuned on frames)",
+   "switch": {
+    "Use Color Tint?": true
+   }
+  },
+  "MI_UserFab_StoneCluster2Wet": {
+   "kind": "instance",
+   "parent": "/Game/StyleHex_Studio/Free_Packs/FREE_Stylized_Rocks_and_Stones/Materials/Mat_Stones/MI_Stone_Cluster_2",
+   "dest": "/Game/EnvKit/UserFab/Sarpedon/MI_UserFab_StoneCluster2Wet",
+   "vector": {
+    "Color Tint": [
+     0.42,
+     0.42,
+     0.45,
+     1.0
+    ]
+   },
+   "why": "Sarpedon night: dark wet rock like the main variant's MI_EnvFab_RockWet (P5b: the rocks read too pale). The pack master M_Environment_Basic multiplies its base colour texture by 'Color Tint' only behind the static switch 'Use Color Tint?' (pack MIs: switch off, tint 0) - technical graph data from its T3D text; the value is set blind (NoAI: not tuned on frames)",
+   "switch": {
+    "Use Color Tint?": true
+   }
+  },
+  "MI_UserFab_StoneLarge1Wet": {
+   "kind": "instance",
+   "parent": "/Game/StyleHex_Studio/Free_Packs/FREE_Stylized_Rocks_and_Stones/Materials/Mat_Stones/MI_Stone_Large",
+   "dest": "/Game/EnvKit/UserFab/Sarpedon/MI_UserFab_StoneLarge1Wet",
+   "vector": {
+    "Color Tint": [
+     0.42,
+     0.42,
+     0.45,
+     1.0
+    ]
+   },
+   "why": "Sarpedon night: dark wet rock like the main variant's MI_EnvFab_RockWet (P5b: the rocks read too pale). The pack master M_Environment_Basic multiplies its base colour texture by 'Color Tint' only behind the static switch 'Use Color Tint?' (pack MIs: switch off, tint 0) - technical graph data from its T3D text; the value is set blind (NoAI: not tuned on frames)",
+   "switch": {
+    "Use Color Tint?": true
+   }
+  },
+  "MI_UserFab_StoneSmall1Wet": {
+   "kind": "instance",
+   "parent": "/Game/StyleHex_Studio/Free_Packs/FREE_Stylized_Rocks_and_Stones/Materials/Mat_Stones/MI_Stone_Small_1",
+   "dest": "/Game/EnvKit/UserFab/Sarpedon/MI_UserFab_StoneSmall1Wet",
+   "vector": {
+    "Color Tint": [
+     0.42,
+     0.42,
+     0.45,
+     1.0
+    ]
+   },
+   "why": "Sarpedon night: dark wet rock like the main variant's MI_EnvFab_RockWet (P5b: the rocks read too pale). The pack master M_Environment_Basic multiplies its base colour texture by 'Color Tint' only behind the static switch 'Use Color Tint?' (pack MIs: switch off, tint 0) - technical graph data from its T3D text; the value is set blind (NoAI: not tuned on frames)",
+   "switch": {
+    "Use Color Tint?": true
+   }
+  },
+  "MI_UserFab_StoneSmall3Wet": {
+   "kind": "instance",
+   "parent": "/Game/StyleHex_Studio/Free_Packs/FREE_Stylized_Rocks_and_Stones/Materials/Mat_Stones/MI_Stone_Small_3",
+   "dest": "/Game/EnvKit/UserFab/Sarpedon/MI_UserFab_StoneSmall3Wet",
+   "vector": {
+    "Color Tint": [
+     0.42,
+     0.42,
+     0.45,
+     1.0
+    ]
+   },
+   "why": "Sarpedon night: dark wet rock like the main variant's MI_EnvFab_RockWet (P5b: the rocks read too pale). The pack master M_Environment_Basic multiplies its base colour texture by 'Color Tint' only behind the static switch 'Use Color Tint?' (pack MIs: switch off, tint 0) - technical graph data from its T3D text; the value is set blind (NoAI: not tuned on frames)",
+   "switch": {
+    "Use Color Tint?": true
+   }
+  },
+  "MI_UserFab_StoneSmall5Wet": {
+   "kind": "instance",
+   "parent": "/Game/StyleHex_Studio/Free_Packs/FREE_Stylized_Rocks_and_Stones/Materials/Mat_Stones/MI_Stone_Small_5",
+   "dest": "/Game/EnvKit/UserFab/Sarpedon/MI_UserFab_StoneSmall5Wet",
+   "vector": {
+    "Color Tint": [
+     0.42,
+     0.42,
+     0.45,
+     1.0
+    ]
+   },
+   "why": "Sarpedon night: dark wet rock like the main variant's MI_EnvFab_RockWet (P5b: the rocks read too pale). The pack master M_Environment_Basic multiplies its base colour texture by 'Color Tint' only behind the static switch 'Use Color Tint?' (pack MIs: switch off, tint 0) - technical graph data from its T3D text; the value is set blind (NoAI: not tuned on frames)",
+   "switch": {
+    "Use Color Tint?": true
+   }
+  }
+ },
+ "meshes": {
+  "YoshinoC": {
+   "kind": "bake",
+   "map": "Marmoreal",
+   "source": "/Game/Megaplant_Library/Tree_Yoshino_Cherry/Tree_Yoshino_Cherry_01/Tree_Yoshino_Cherry_01_C",
+   "dest": "/Game/EnvKit/UserFab/Marmoreal/SM_UserFab_YoshinoC",
+   "maxTris": 900000,
+   "nanite": true,
+   "scaleRange": [
+    0.3,
+    1.2
+   ],
+   "slots": [
+    {
+     "index": 0,
+     "material": "MI_UserFab_YoshinoBark"
+    },
+    {
+     "index": 1,
+     "material": "MI_UserFab_YoshinoBlossom"
+    }
+   ],
+   "why": "Yoshino C (268 x 308 x 326 uu, 239 twig nodes): the wide crown for cherry-nw / -w / -e",
+   "measured": {
+    "bboxMin": [
+     -224.48,
+     -198.92,
+     -0.84
+    ],
+    "bboxMax": [
+     163.57,
+     216.33,
+     395.29
+    ],
+    "tris": 899778,
+    "base": [
+     -5.71,
+     -6.68,
+     6.55,
+     6.49
+    ],
+    "parts": [
+     {
+      "part": 0,
+      "twin": "/Game/Megaplant_Library/Tree_Yoshino_Cherry/Instances/Twig_Yoshino_Cherry_01",
+      "lod": "renderData",
+      "tris": 6349,
+      "nodes": 117,
+      "simplifiedTo": 4083
+     },
+     {
+      "part": 1,
+      "twin": "/Game/Megaplant_Library/Tree_Yoshino_Cherry/Instances/Twig_Yoshino_Cherry_02",
+      "lod": "renderData",
+      "tris": 5421,
+      "nodes": 29,
+      "simplifiedTo": 3486
+     },
+     {
+      "part": 2,
+      "twin": "/Game/Megaplant_Library/Tree_Yoshino_Cherry/Instances/Twig_Yoshino_Cherry_03",
+      "lod": "renderData",
+      "tris": 3919,
+      "nodes": 93,
+      "simplifiedTo": 2519
+     }
+    ]
+   }
+  },
+  "YoshinoD": {
+   "kind": "bake",
+   "map": "Marmoreal",
+   "source": "/Game/Megaplant_Library/Tree_Yoshino_Cherry/Tree_Yoshino_Cherry_01/Tree_Yoshino_Cherry_01_D",
+   "dest": "/Game/EnvKit/UserFab/Marmoreal/SM_UserFab_YoshinoD",
+   "maxTris": 450000,
+   "nanite": true,
+   "scaleRange": [
+    0.4,
+    1.6
+   ],
+   "slots": [
+    {
+     "index": 0,
+     "material": "MI_UserFab_YoshinoBark"
+    },
+    {
+     "index": 1,
+     "material": "MI_UserFab_YoshinoBlossom"
+    }
+   ],
+   "why": "Yoshino D (129 x 150 x 213 uu, 82 twig nodes): the small tree for cherry-se",
+   "measured": {
+    "bboxMin": [
+     -103.97,
+     -130.62,
+     0.0
+    ],
+    "bboxMax": [
+     144.03,
+     136.71,
+     272.06
+    ],
+    "tris": 448665,
+    "base": [
+     -4.24,
+     -5.05,
+     4.52,
+     4.45
+    ],
+    "parts": [
+     {
+      "part": 0,
+      "twin": "/Game/Megaplant_Library/Tree_Yoshino_Cherry/Instances/Twig_Yoshino_Cherry_01",
+      "lod": "renderData",
+      "tris": 6349,
+      "nodes": 28
+     },
+     {
+      "part": 1,
+      "twin": "/Game/Megaplant_Library/Tree_Yoshino_Cherry/Instances/Twig_Yoshino_Cherry_02",
+      "lod": "renderData",
+      "tris": 5421,
+      "nodes": 23
+     },
+     {
+      "part": 2,
+      "twin": "/Game/Megaplant_Library/Tree_Yoshino_Cherry/Instances/Twig_Yoshino_Cherry_03",
+      "lod": "renderData",
+      "tris": 3919,
+      "nodes": 31
+     }
+    ]
+   }
+  },
+  "StoneCluster1": {
+   "kind": "duplicate",
+   "map": "Sarpedon",
+   "source": "/Game/StyleHex_Studio/Free_Packs/FREE_Stylized_Rocks_and_Stones/Meshes/SM_Stone_Cluster_1",
+   "dest": "/Game/EnvKit/UserFab/Sarpedon/SM_UserFab_StoneCluster1",
+   "scaleRange": [
+    0.15,
+    1.2
+   ],
+   "slots": [
+    {
+     "slot": "WorldGridMaterial",
+     "material": "MI_UserFab_StoneCluster1Wet"
+    }
+   ],
+   "why": "StyleHex rock for the Sarpedon outcrops / wet rocks of the user variant",
+   "measured": {
+    "bboxMin": [
+     -127.14,
+     -98.9,
+     -0.1
+    ],
+    "bboxMax": [
+     104.78,
+     90.31,
+     138.27
+    ],
+    "tris": 999,
+    "base": null
+   }
+  },
+  "StoneCluster2": {
+   "kind": "duplicate",
+   "map": "Sarpedon",
+   "source": "/Game/StyleHex_Studio/Free_Packs/FREE_Stylized_Rocks_and_Stones/Meshes/SM_Stone_Cluster_2",
+   "dest": "/Game/EnvKit/UserFab/Sarpedon/SM_UserFab_StoneCluster2",
+   "scaleRange": [
+    0.15,
+    1.2
+   ],
+   "slots": [
+    {
+     "slot": "WorldGridMaterial",
+     "material": "MI_UserFab_StoneCluster2Wet"
+    }
+   ],
+   "why": "StyleHex rock for the Sarpedon outcrops / wet rocks of the user variant",
+   "measured": {
+    "bboxMin": [
+     -230.73,
+     -147.26,
+     -0.14
+    ],
+    "bboxMax": [
+     126.27,
+     189.69,
+     134.96
+    ],
+    "tris": 1525,
+    "base": null
+   }
+  },
+  "StoneLarge1": {
+   "kind": "duplicate",
+   "map": "Sarpedon",
+   "source": "/Game/StyleHex_Studio/Free_Packs/FREE_Stylized_Rocks_and_Stones/Meshes/SM_Stone_Large_1",
+   "dest": "/Game/EnvKit/UserFab/Sarpedon/SM_UserFab_StoneLarge1",
+   "scaleRange": [
+    0.15,
+    1.2
+   ],
+   "slots": [
+    {
+     "slot": "WorldGridMaterial",
+     "material": "MI_UserFab_StoneLarge1Wet"
+    }
+   ],
+   "why": "StyleHex rock for the Sarpedon outcrops / wet rocks of the user variant",
+   "measured": {
+    "bboxMin": [
+     -156.87,
+     -120.49,
+     -71.51
+    ],
+    "bboxMax": [
+     145.92,
+     120.1,
+     95.49
+    ],
+    "tris": 786,
+    "base": null
+   }
+  },
+  "StoneSmall1": {
+   "kind": "duplicate",
+   "map": "Sarpedon",
+   "source": "/Game/StyleHex_Studio/Free_Packs/FREE_Stylized_Rocks_and_Stones/Meshes/SM_Stone_Small_1",
+   "dest": "/Game/EnvKit/UserFab/Sarpedon/SM_UserFab_StoneSmall1",
+   "scaleRange": [
+    0.15,
+    1.2
+   ],
+   "slots": [
+    {
+     "slot": "WorldGridMaterial",
+     "material": "MI_UserFab_StoneSmall1Wet"
+    }
+   ],
+   "why": "StyleHex rock for the Sarpedon outcrops / wet rocks of the user variant",
+   "measured": {
+    "bboxMin": [
+     -46.04,
+     -46.84,
+     -40.65
+    ],
+    "bboxMax": [
+     42.61,
+     48.06,
+     41.8
+    ],
+    "tris": 602,
+    "base": null
+   }
+  },
+  "StoneSmall3": {
+   "kind": "duplicate",
+   "map": "Sarpedon",
+   "source": "/Game/StyleHex_Studio/Free_Packs/FREE_Stylized_Rocks_and_Stones/Meshes/SM_Stone_Small_3",
+   "dest": "/Game/EnvKit/UserFab/Sarpedon/SM_UserFab_StoneSmall3",
+   "scaleRange": [
+    0.15,
+    1.2
+   ],
+   "slots": [
+    {
+     "slot": "WorldGridMaterial",
+     "material": "MI_UserFab_StoneSmall3Wet"
+    }
+   ],
+   "why": "StyleHex rock for the Sarpedon outcrops / wet rocks of the user variant",
+   "measured": {
+    "bboxMin": [
+     -67.43,
+     -63.59,
+     -51.7
+    ],
+    "bboxMax": [
+     67.45,
+     66.01,
+     56.14
+    ],
+    "tris": 724,
+    "base": null
+   }
+  },
+  "StoneSmall5": {
+   "kind": "duplicate",
+   "map": "Sarpedon",
+   "source": "/Game/StyleHex_Studio/Free_Packs/FREE_Stylized_Rocks_and_Stones/Meshes/SM_Stone_Small_5",
+   "dest": "/Game/EnvKit/UserFab/Sarpedon/SM_UserFab_StoneSmall5",
+   "scaleRange": [
+    0.15,
+    1.2
+   ],
+   "slots": [
+    {
+     "slot": "WorldGridMaterial",
+     "material": "MI_UserFab_StoneSmall5Wet"
+    }
+   ],
+   "why": "StyleHex rock for the Sarpedon outcrops / wet rocks of the user variant",
+   "measured": {
+    "bboxMin": [
+     -53.52,
+     -52.36,
+     -43.76
+    ],
+    "bboxMax": [
+     57.09,
+     55.83,
+     49.28
+    ],
+    "tris": 608,
+    "base": null
+   }
+  }
+ }
+}

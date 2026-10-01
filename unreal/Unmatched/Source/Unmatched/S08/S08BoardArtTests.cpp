@@ -2363,7 +2363,8 @@ const TCHAR* const Blocks = TEXT(
     "\"opacity\":0.3,\"noiseScaleUU\":650,\"panUUPerSec\":[7,-2.5],\"edgeFade\":0.3,\"coverage\":0.42,\"seed\":3},"
     "{\"zUU\":-900,\"halfUU\":[2900,2100],\"opacity\":0.5}],"
     "\"moon\":{\"screenAnchor\":[-0.9,0.82],\"depthUU\":5200,\"diameterUU\":1800,\"colorLinear\":[0.72,0.8,1.0],"
-    "\"intensity\":1.2,\"softness\":0.4,\"discRadius\":0.06,\"discIntensity\":2.5}},");
+    "\"intensity\":1.2,\"softness\":0.4,\"discRadius\":0.06,\"discIntensity\":2.5,\"discSoftness\":0.5,"
+    "\"discLimb\":0.4}},");
 
 FString MapDocWith(const FString& Extra) {
   FString Doc = S08MapTest::MapDoc();
@@ -2496,6 +2497,9 @@ bool FS08BoardArtFrameBackdropParserTest::RunTest(const FString&) {
       TestTrue("moon values", B.Moon.ScreenAnchor.Equals(FVector2D(-0.9, 0.82), 1e-6) && B.Moon.DepthUU == 5200.0f &&
                                   B.Moon.DiameterUU == 1800.0f && FMath::IsNearlyEqual(B.Moon.Intensity, 1.2f) &&
                                   FMath::IsNearlyEqual(B.Moon.DiscIntensity, 2.5f));
+      // P5c: the soft disc edge and the limb shading
+      TestTrue("moon disc edge / limb", FMath::IsNearlyEqual(B.Moon.DiscSoftness, 0.5f) &&
+                                            FMath::IsNearlyEqual(B.Moon.DiscLimb, 0.4f));
     }
     TestTrue("the grid profile has neither block", Grid && !Grid->MapFrame.bSet && !Grid->Backdrop.bSet);
   }
@@ -2511,6 +2515,9 @@ bool FS08BoardArtFrameBackdropParserTest::RunTest(const FString&) {
     const FS08BoardArtProfile* M = MoonOnly.Boards.FindByPredicate([](const FS08BoardArtProfile& B) { return B.Id == TEXT("map"); });
     TestTrue("moon only: no mist, default moon", M && M->Backdrop.bSet && M->Backdrop.Mist.IsEmpty() && M->Backdrop.Moon.bSet &&
                                                      M->Backdrop.Moon.DepthUU == FS08BackdropMoonSpec().DepthUU);
+    // P5c: absent discSoftness / discLimb keep the P5 disc (edge 0.15 of the radius, flat)
+    TestTrue("moon only: P5 disc edge, no limb", M && FMath::IsNearlyEqual(M->Backdrop.Moon.DiscSoftness, 0.15f) &&
+                                                     M->Backdrop.Moon.DiscLimb == 0.0f);
   }
   auto Expect = [this](const FString& Name, const FString& Doc, const FString& ErrorPart) {
     FS08BoardArtData Broken;
@@ -2548,6 +2555,8 @@ bool FS08BoardArtFrameBackdropParserTest::RunTest(const FString&) {
       TEXT("backdrop.moon"));
   Bad(TEXT("moon colour negative"), TEXT("\"colorLinear\":[0.72,0.8,1.0]"), TEXT("\"colorLinear\":[-1,0.8,1.0]"),
       TEXT("backdrop.moon"));
+  Bad(TEXT("moon disc edge too wide"), TEXT("\"discSoftness\":0.5"), TEXT("\"discSoftness\":1.5"), TEXT("backdrop.moon"));
+  Bad(TEXT("moon limb negative"), TEXT("\"discLimb\":0.4"), TEXT("\"discLimb\":-0.1"), TEXT("backdrop.moon"));
   Expect(TEXT("empty backdrop"), MapDocWith(TEXT("\"backdrop\":{},")), TEXT("at least one mist plane or the moon"));
   {
     // the modules are 24 uu wide: another frameUU is refused with the kit
@@ -2576,7 +2585,11 @@ bool FS08BoardArtFrameBackdropParserTest::RunTest(const FString&) {
       TestTrue(B.Id + TEXT(": backdrop with the moon"), B.Backdrop.bSet && B.Backdrop.Moon.bSet);
       TestTrue(B.Id + TEXT(": placement ok (everything below the board)"),
                S08BackdropPlacementProblem(B.Backdrop, B.Map.HalfUU()).IsEmpty());
-      if (B.Id == TEXT("marmoreal-original")) TestEqual("marmoreal: 2 mist planes", B.Backdrop.Mist.Num(), 2);
+      if (B.Id == TEXT("marmoreal-original")) {
+        TestEqual("marmoreal: 2 mist planes", B.Backdrop.Mist.Num(), 2);
+        // P5c (P5b review: a hard flat disc): a soft edge wider than the P5 0.15 and some limb shading
+        TestTrue("marmoreal: soft moon disc", B.Backdrop.Moon.DiscSoftness > 0.3f && B.Backdrop.Moon.DiscLimb > 0.0f);
+      }
     }
     TestEqual("two map-image profiles", Maps, 2);
   }

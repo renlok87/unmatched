@@ -48,7 +48,7 @@ Checks (every one is an error unless marked warn):
  7. shadows: the key light of the art profiles (k1_mock.KEY_LIGHT_ROT = (-55, 30, 0), travelling
     towards +X / +Y) projects every castShadow prop's box onto Z = 0; the shadow must not touch any
     space circle (warn below SHADOW_WARN_UU);
- 8. warn: 10..48 props (PROPS_RANGE); tall props (> TALL_H_UU) in the near half (Y > 0) whose footprint reaches the frame's X
+ 8. warn: 10..72 props (PROPS_RANGE); tall props (> TALL_H_UU) in the near half (Y > 0) whose footprint reaches the frame's X
     columns (+ TALL_SIDE_UU; a tall prop wholly beside the frame leans outwards in the K1 perspective and check 6
     measures it exactly); crowns overhanging the tray edge by > 60 uu; lights inside the frame rectangle or off the tray.
  9. ground (ENV-U10, optional section - warn when absent; validate_ground, = S08EnvGround.cpp): mode 'runtime',
@@ -59,6 +59,16 @@ Checks (every one is an error unless marked warn):
 10. K1 framing (P4, concept review gap 4): every prop of K1_FRAMED[<map>] has its whole oriented box inside the K1
     overview frame (D0, 1920 x 1080, >= K1_FRAME_MARGIN_PX from the edge); every prop's in-frame share of its projected
     box is reported (column 'K1 in frame', * = K1_FRAMED).
+11. Fab duplicates (P5c track F): /Game/EnvKit/Fab/<Kit>/SM_EnvFab_<Name> of the pick file FAB_PICKS
+    (art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-fab-p5c/scripts/fab-picks.json, written for
+    tools/art/env_kit/ue_import_fab_picks.py). Their pivot is the pack pivot, not the base centre: the box is the pack
+    bounds (bboxMin / bboxMax at scale 1) x scale, rotated about the pivot; the base footprint of check 5 is the pick's
+    'base' box (tree trunk / bush root) or the whole bounds footprint; the scale must lie in the pick's scaleRange.
+    A Fab prop whose loc z is above the tray top (+ MOUNT_DZ_UU) is 'mounted' (vines on walls / palisades, flowers in
+    urns): it skips the base-overlap check 5 and the z warning; every other check applies. A path into a pack folder
+    (the duplicates are the only way in) is an error, a NoAI pack path (Megaplant_Library, StyleHex_Studio) names the
+    rule: NoAI assets only in the user's layout variant overlay, never in <map>.layout.json. The report adds the
+    instance triangles per map (ENVKIT_TRIS / the picks' LOD0 'tris').
 
 Usage:
   python -B tools/art/env_kit/layout_check.py                       # both maps, text report
@@ -137,7 +147,10 @@ MAX_POINT_LIGHTS = 6
 # measured the whole environment at +0.4-0.46 ms GPU at K1, mostly the point lights and Lumen; the props are decor
 # meshes of <= 12k triangles without collision, so a few more instances stay far inside the budget (perf was NOT
 # re-measured in P4: re-measure with tools/art/render/render_bench.py at the next packaged run).
-PROPS_RANGE = (10, 48)
+# P5c track F (2026-10-01): 48 -> 72 (WARN guide only). The Fab vines / flower clumps are tiny instances (20-600
+# triangles, the vines mounted on walls), so the prop count grows faster than the cost; the per-map instance triangles
+# are reported instead (tris_report) and are what the integrate stage re-measures with render_bench.py.
+PROPS_RANGE = (10, 72)
 CROWN_OVERHANG_WARN_UU = 60.0
 SHADOW_WARN_UU = 10.0
 MODULAR = {"ArcadeBay", "Portal", "Palisade", "Hull", "Balustrade",  # wall modules may interpenetrate at a joint
@@ -190,12 +203,78 @@ PROCESSED: dict[str, tuple[float, float, float]] = {}  # name -> (w, d, h) at sc
 TURNS: dict[str, float] = {}  # name -> yaw the processing track applied to the raw mesh (.blend +Z, deg)
 MESH_RE = re.compile(r"^/Game/EnvKit/(Marmoreal|Sarpedon)/SM_Env_([A-Za-z]+(?:_[A-Za-z]+)?)$")
 HEX_RE = re.compile(r"^#[0-9A-Fa-f]{6}$")
+# 11. P5c track F: the Fab duplicates (tools/art/env_kit/ue_import_fab_picks.py); mesh_name() gives FAB_PREFIX + Name
+FAB_PICKS = ROOT / "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-fab-p5c/scripts/fab-picks.json"
+FAB_MESH_RE = re.compile(r"^/Game/EnvKit/Fab/(Marmoreal|Sarpedon)/SM_EnvFab_([A-Za-z0-9]+)$")
+FAB_PREFIX = "Fab_"
+MOUNT_DZ_UU = 1.0            # a Fab prop with loc z > TRAY_TOP_Z + this hangs on / stands in another prop
+FAB_MIN_THICK_UU = 1.0       # flat vine cards (0-uu bounds) get this footprint thickness
+PACK_ROOTS = ("StylizedForest", "Fantasy_Forest", "Vine_Plants", "Flowers_Pots", "Stylish_Fire_VFX",
+              "FreeParticle_SoftTofu", "Particles_Wind_Control_System", "WaterMaterials")
+NOAI_ROOTS = ("Megaplant_Library", "StyleHex_Studio")  # ENV-U14: only the user's variant overlay, never here
+
+
+def load_fab(path: Path = FAB_PICKS) -> dict:
+    """Name -> pick entry (map, kind, bboxMin / bboxMax at scale 1, base, scaleRange, tris) of the Fab pick file;
+    {} without the file (then every Fab path is an 'unknown Fab mesh' error)."""
+    if not Path(path).is_file():
+        return {}
+    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    return {name: e for name, e in data.get("meshes", {}).items()}
+
+
+FAB: dict[str, dict] = load_fab()
+# LOD0 triangles of the env-kit meshes (UE 5.8 inventory of the P5c scout, C:/tmp/envmaps-research/p5c/scout/
+# envkit_bounds.json; the Tripo props are <= 12k by contract, the lane-K back wall 9.4k-9.7k) - the per-map instance
+# triangle report (tris_report); Fab meshes carry theirs in FAB_PICKS
+ENVKIT_TRIS = {"ArcadeBay": 6460, "BackWall_BayDoor": 9674, "BackWall_BayWindows": 9694, "BackWall_Centre": 9404,
+               "Balustrade": 7791, "Cherry": 10039, "Cypress": 3617, "HedgeBed": 6990, "LanternPlinth": 3892,
+               "PlinthBall": 2195, "Portal": 7797, "Urn": 3898, "Banner": 4637, "Barrel": 4267, "Campfire": 4060,
+               "Cannon": 5046, "CrateStack": 6200, "FortRuin": 6896, "Hull": 8312, "LanternPost": 6722,
+               "Palisade": 5373, "RockOutcrop": 5909, "Rope": 2768, "Tree": 7791}
+
+
+def fab_entry(name: str) -> dict | None:
+    """The pick entry of a mesh_name() 'Fab_<Name>' (None for kit meshes / unknown picks)."""
+    return FAB.get(name[len(FAB_PREFIX):]) if name.startswith(FAB_PREFIX) else None
+
+
+def is_mounted(p: dict) -> bool:
+    """11. A Fab prop above the tray top hangs on a wall / palisade or stands in an urn."""
+    return (fab_entry(mesh_name(p)) is not None and isinstance(p.get("loc"), list) and len(p["loc"]) == 3
+            and float(p["loc"][2]) > TRAY_TOP_Z + MOUNT_DZ_UU)
+
+
+def prop_tris(p: dict) -> int:
+    """LOD0 triangles of one prop instance (0 when unknown)."""
+    name = mesh_name(p)
+    fab = fab_entry(name)
+    return int(fab["tris"]) if fab else int(ENVKIT_TRIS.get(name, 0))
+
+
+def tris_report(layout: dict) -> dict:
+    """Instance triangles of a layout: total, the Fab share, per mesh name (count, triangles)."""
+    per: dict[str, list] = {}
+    for p in layout.get("props", []):
+        name = mesh_name(p) or "?"
+        e = per.setdefault(name, [0, 0])
+        e[0] += 1
+        e[1] += prop_tris(p)
+    total = sum(v[1] for v in per.values())
+    fab = sum(v[1] for k, v in per.items() if k.startswith(FAB_PREFIX))
+    return {"total": total, "fab": fab, "props": len(layout.get("props", [])),
+            "perMesh": {k: {"count": v[0], "tris": v[1]} for k, v in sorted(per.items())}}
 
 
 # ------------------------------------------------------------------ geometry
 def dims(name: str, scale: float = 1.0) -> tuple[float, float, float]:
     """Processed size (w = width along local Y, d = depth along local X = front, h) x scale, uu: from the
-    processing track's build report when loaded (kit_crosscheck), else from the KIT table."""
+    processing track's build report when loaded (kit_crosscheck), else from the KIT table; Fab picks: the pack
+    bounds x scale."""
+    fab = fab_entry(name)
+    if fab is not None:
+        (x0, y0, z0), (x1, y1, z1) = fab["bboxMin"], fab["bboxMax"]
+        return (y1 - y0) * scale, (x1 - x0) * scale, (z1 - z0) * scale
     if name in PROCESSED:
         return tuple(v * scale for v in PROCESSED[name])
     _, _, (ex, ey, ez), (kind, val), _ = KIT[name]
@@ -210,8 +289,23 @@ def _rot(yaw_deg: float) -> np.ndarray:
 
 
 def footprint(p: dict, base: bool = False) -> np.ndarray:
-    """Oriented footprint (4, 2) in board XY; base=True uses the base fraction (tree trunks)."""
+    """Oriented footprint (4, 2) in board XY; base=True uses the base fraction (tree trunks). Fab picks: the pack
+    bounds (or the pick's 'base' box) about the pack pivot, cards at least FAB_MIN_THICK_UU thick."""
     name = mesh_name(p)
+    fab = fab_entry(name)
+    if fab is not None:
+        s = float(p["scale"])
+        if base and fab.get("base"):
+            x0, y0, x1, y1 = (float(v) * s for v in fab["base"])
+        else:
+            x0, y0, x1, y1 = (fab["bboxMin"][0] * s, fab["bboxMin"][1] * s, fab["bboxMax"][0] * s,
+                              fab["bboxMax"][1] * s)
+        if x1 - x0 < FAB_MIN_THICK_UU:
+            x0, x1 = (x0 + x1 - FAB_MIN_THICK_UU) / 2, (x0 + x1 + FAB_MIN_THICK_UU) / 2
+        if y1 - y0 < FAB_MIN_THICK_UU:
+            y0, y1 = (y0 + y1 - FAB_MIN_THICK_UU) / 2, (y0 + y1 + FAB_MIN_THICK_UU) / 2
+        c = np.array([[x0, y0], [x1, y0], [x1, y1], [x0, y1]])
+        return c @ _rot(p["yawDeg"]).T + np.array(p["loc"][:2], float)
     w, d, _ = dims(name, p["scale"])
     frac = KIT[name][4] if base else None
     if frac:
@@ -223,16 +317,27 @@ def footprint(p: dict, base: bool = False) -> np.ndarray:
 
 
 def box_corners(p: dict) -> np.ndarray:
-    """8 corners (8, 3) of the prop's oriented bounding box in board space."""
-    _, _, h = dims(mesh_name(p), p["scale"])
+    """8 corners (8, 3) of the prop's oriented bounding box in board space (Fab picks: pack bounds z0 .. z1 x scale
+    above the pivot - a hanging vine card reaches below it)."""
+    name = mesh_name(p)
+    _, _, h = dims(name, p["scale"])
     fp = footprint(p)
     z0 = float(p["loc"][2])
+    fab = fab_entry(name)
+    if fab is not None:
+        z0 += float(fab["bboxMin"][2]) * float(p["scale"])
     return np.vstack([np.c_[fp, np.full(4, z0)], np.c_[fp, np.full(4, z0 + h)]])
 
 
 def mesh_name(p: dict) -> str:
-    m = MESH_RE.match(p.get("mesh", ""))
-    return m.group(2) if m else ""
+    """'<Name>' of /Game/EnvKit/<Kit>/SM_Env_<Name>, FAB_PREFIX + '<Name>' of /Game/EnvKit/Fab/<Kit>/SM_EnvFab_<Name>,
+    '' otherwise."""
+    mesh = p.get("mesh", "") if isinstance(p.get("mesh"), str) else ""
+    m = MESH_RE.match(mesh)
+    if m:
+        return m.group(2)
+    m = FAB_MESH_RE.match(mesh)
+    return FAB_PREFIX + m.group(2) if m else ""
 
 
 def convex_hull(pts: np.ndarray) -> np.ndarray:
@@ -477,7 +582,9 @@ def validate(layout: dict, key: str, spaces: list[dict]) -> tuple[list[str], lis
     for k, t in need.items():
         if not isinstance(layout.get(k), t):
             err.append(f"key '{k}' missing or not {t.__name__}")
-    extra = set(layout) - set(need) - {"ground"}  # 'ground' is optional (check 9, validate_ground)
+    # 'ground' is optional (check 9, validate_ground); 'fx' (P5c track V: Niagara placements, S08EnvLayout) is
+    # validated by its own generator / the C++ parser
+    extra = set(layout) - set(need) - {"ground", "fx"}
     if extra:
         warn.append(f"unknown top-level keys {sorted(extra)}")
     if err:
@@ -527,32 +634,58 @@ def validate(layout: dict, key: str, spaces: list[dict]) -> tuple[list[str], lis
         elif pid in ids:
             err.append(f"prop {pid}: duplicate id")
         ids.add(pid)
-        m = MESH_RE.match(p.get("mesh", "") if isinstance(p.get("mesh"), str) else "")
-        if not m or m.group(2) not in KIT:
+        mesh = p.get("mesh", "") if isinstance(p.get("mesh"), str) else ""
+        m, fm = MESH_RE.match(mesh), FAB_MESH_RE.match(mesh)
+        pack = mesh.split("/")[2] if mesh.startswith("/Game/") and mesh.count("/") >= 3 else ""
+        if pack in NOAI_ROOTS:
+            err.append(f"prop {pid}: mesh {mesh!r} is a NoAI pack asset (ENV-U14) - only the user's layout variant "
+                       f"overlay may place it, never <map>.layout.json")
+            continue
+        if pack in PACK_ROOTS:
+            err.append(f"prop {pid}: mesh {mesh!r} points into the pack folder - place the duplicate "
+                       f"/Game/EnvKit/Fab/<Kit>/SM_EnvFab_<Name> (tools/art/env_kit/ue_import_fab_picks.py)")
+            continue
+        if fm:
+            fab = FAB.get(fm.group(2))
+            if fab is None:
+                err.append(f"prop {pid}: SM_EnvFab_{fm.group(2)} is not in the Fab pick file {FAB_PICKS.name}")
+                continue
+            if fab["map"] != fm.group(1):
+                err.append(f"prop {pid}: SM_EnvFab_{fm.group(2)} lives in /Game/EnvKit/Fab/{fab['map']}/, "
+                           f"not {fm.group(1)}")
+                continue
+            kit_folder, lo_hi = fm.group(1), tuple(float(v) for v in fab.get("scaleRange", (0.05, 3.0)))
+        elif not m or m.group(2) not in KIT:
             err.append(f"prop {pid}: mesh {p.get('mesh')!r} is not /Game/EnvKit/<Kit>/SM_Env_<Name> of the kit")
             continue
-        if KIT[m.group(2)][0] != m.group(1):
+        elif KIT[m.group(2)][0] != m.group(1):
             err.append(f"prop {pid}: SM_Env_{m.group(2)} lives in /Game/EnvKit/{KIT[m.group(2)][0]}/, not {m.group(1)}")
             continue
-        if m.group(1) != MAPS[key]["kit"]:
-            warn.append(f"prop {pid}: uses the {m.group(1)} kit on {key}")
+        else:
+            kit_folder, lo_hi = m.group(1), (0.2, 3.0)
+        name = mesh_name(p)
+        if kit_folder != MAPS[key]["kit"]:
+            warn.append(f"prop {pid}: uses the {kit_folder} kit on {key}")
         if not (isinstance(p.get("loc"), list) and len(p["loc"]) == 3 and all(num(v) for v in p["loc"])):
             err.append(f"prop {pid}: loc must be [x, y, z]")
             continue
         if not num(p.get("yawDeg")):
             err.append(f"prop {pid}: yawDeg missing")
             continue
-        if not num(p.get("scale")) or not (0.2 <= p["scale"] <= 3.0):
-            err.append(f"prop {pid}: scale must be a number in 0.2..3")
+        if not num(p.get("scale")) or not (lo_hi[0] <= p["scale"] <= lo_hi[1]):
+            err.append(f"prop {pid}: scale must be a number in {lo_hi[0]:g}..{lo_hi[1]:g}")
             continue
         if not isinstance(p.get("castShadow"), bool):
             err.append(f"prop {pid}: castShadow must be a bool")
-        if abs(p["loc"][2] - TRAY_TOP_Z) > 0.01:
+        if abs(p["loc"][2] - TRAY_TOP_Z) > 0.01 and not is_mounted(p):
             warn.append(f"prop {pid}: z {p['loc'][2]} is not the tray top {TRAY_TOP_Z}")
         ok_props.append(p)
-        w, d, h = dims(m.group(2), p["scale"])
+        w, d, h = dims(name, p["scale"])
         full, base = footprint(p), footprint(p, base=True)
-        info["props"][pid] = {"mesh": m.group(2), "size_uu": [round(w, 1), round(d, 1), round(h, 1)]}
+        info["props"][pid] = {"mesh": name, "size_uu": [round(w, 1), round(d, 1), round(h, 1)],
+                              "tris": prop_tris(p)}
+        if is_mounted(p):
+            info["props"][pid]["mounted"] = True
         # 2. on the tray
         bx0, by0 = base.min(0)
         bx1, by1 = base.max(0)
@@ -587,10 +720,11 @@ def validate(layout: dict, key: str, spaces: list[dict]) -> tuple[list[str], lis
     info["parsed"] = len(ok_props) == n
     if not PROPS_RANGE[0] <= n <= PROPS_RANGE[1]:
         warn.append(f"{n} props (guide {PROPS_RANGE[0]}..{PROPS_RANGE[1]})")
-    # 5. base overlaps
-    for i in range(len(ok_props)):
-        for j in range(i + 1, len(ok_props)):
-            a, b = ok_props[i], ok_props[j]
+    # 5. base overlaps (11: mounted Fab props hang on / stand in another prop - not a base)
+    grounded = [p for p in ok_props if not is_mounted(p)]
+    for i in range(len(grounded)):
+        for j in range(i + 1, len(grounded)):
+            a, b = grounded[i], grounded[j]
             tol = JOINT_TOL_UU if {mesh_name(a), mesh_name(b)} <= MODULAR else 0.5
             pen = -poly_clearance(footprint(a, True), footprint(b, True))
             if pen > tol:
@@ -866,12 +1000,14 @@ def _glb_preview(path: Path, cache_dir: Path | None, tex: int = 256):
 def _prop_tris(p: dict, glb_dir: Path | None, cache_dir: Path | None):
     """World triangles (F, 3, 3) and sRGB colours (F, 3) of a prop (real mesh or its box)."""
     name = mesh_name(p)
-    kit, src, (ex, ey, ez), (kind, val), _ = KIT[name]
-    ref = ey if kind == "height" else max(ex, ez)
-    k = val / ref * p["scale"]
+    glb = None
+    if name in KIT:  # Fab picks (11.) are drawn as their boxes
+        kit, src, (ex, ey, ez), (kind, val), _ = KIT[name]
+        ref = ey if kind == "height" else max(ex, ez)
+        k = val / ref * p["scale"]
+        glb = (GLB_DIR_OF.get(name, glb_dir) / f"{src}.glb") if glb_dir else None
     R = _rot(p["yawDeg"])
     loc = np.asarray(p["loc"], float)
-    glb = (GLB_DIR_OF.get(name, glb_dir) / f"{src}.glb") if glb_dir else None
     if glb and glb.exists():
         v, f, c = _glb_preview(glb, cache_dir)
         # glTF -> .blend (x, -z, y), the processing turn about .blend +Z, then .blend -> UM_FBX_v1 local
@@ -1172,6 +1308,37 @@ def selftest() -> int:
          [], {"halfX": FRAME_HX + 260.0, "halfY": FRAME_HY + 130.0, "offsetY": -40.0},
          {"n": 170.0, "s": 90.0, "w": 260.0, "e": 260.0}),
     ]
+    if FAB:  # 11. (P5c track F) the Fab duplicates of the pick file
+        def F(pid, name, x, y, yaw=0.0, scale=None, z=TRAY_TOP_Z, shadow=False):
+            e = FAB[name]
+            return {"id": pid, "mesh": e["dest"], "loc": [x, y, z], "yawDeg": yaw,
+                    "scale": scale if scale is not None else sum(e["scaleRange"]) / 2, "castShadow": shadow}
+        cases += [
+            ("Fab twisted cherry on its pivot, crown along the W apron",
+             [F("t", "SakuraTwisted", -650.9, -68.8, 270.0, 0.2, shadow=True)], [], [],
+             ["covers", "frame", "shadow", "overlap", "scale"]),
+            ("the same tree turned so its crown reaches over the W circles",
+             [F("t", "SakuraTwisted", -650.9, -68.8, 0.0, 0.3, shadow=True)], [], ["enters the map frame"], []),
+            ("Fab mesh missing from the pick file",
+             [dict(F("t", "SakuraBirch", -660, -395), mesh="/Game/EnvKit/Fab/Marmoreal/SM_EnvFab_Nope")], [],
+             ["not in the Fab pick file"], []),
+            ("Fab duplicate of the other map's folder",
+             [dict(F("t", "SakuraBirch", -660, -395), mesh="/Game/EnvKit/Fab/Sarpedon/SM_EnvFab_SakuraBirch")], [],
+             ["lives in /Game/EnvKit/Fab/Marmoreal/"], []),
+            ("NoAI pack mesh in the main layout",
+             [dict(F("t", "SakuraBirch", -660, -395), mesh="/Game/Megaplant_Library/Trees/SM_Tree")], [],
+             ["NoAI pack asset"], []),
+            ("pack mesh placed directly (not the duplicate)",
+             [dict(F("t", "SakuraBirch", -660, -395), mesh=FAB["SakuraBirch"]["source"])], [],
+             ["points into the pack folder"], []),
+            ("Fab scale outside the pick's range", [F("t", "SakuraTwisted", -650.9, -68.8, 270.0, 1.0)], [],
+             ["scale must be a number in"], []),
+            ("a vine mounted on the back wall is no base overlap",
+             [P("w", "BackWall_BayWindows", -169.2, -465.866),
+              F("v", "VineGarland", -162.1, -436.4, 0.0, 0.9, z=205.5)], [], [], ["overlap", "covers"]),
+            ("a grounded Fab flower bed on an urn overlaps",
+             [P("a", "Urn", 0, -372), F("b", "FlowerBed", 5, -372, 0.0, 0.3)], [], ["base footprints overlap"], []),
+        ]
     fails = 0
     for name, props, lights, must, must_not, *own in cases:
         lay = {"schema": SCHEMA, "map": "marmoreal", "boardId": MAPS["marmoreal"]["boardId"],
@@ -1277,6 +1444,8 @@ def main(argv=None) -> int:
               f"follow from {FOLLOW_FROM:g}x = {d0 / FOLLOW_FROM:.1f} uu")
         if "tray" in res["info"]:
             print(f"   tray x{res['info']['tray']['x']} y{res['info']['tray']['y']}  apron {lay['apron']}")
+        tr = tris_report(lay)
+        print(f"   tris: {tr['total']} LOD0 instance triangles in {tr['props']} props (Fab picks {tr['fab']})")
         if res["info"].get("ground"):
             gi = res["info"]["ground"]
             print(f"   ground: {gi.get('strips')} strips, {gi.get('areaUU2', 0):.0f} uu2, splatRect {gi.get('splatRect')}, "
@@ -1302,7 +1471,7 @@ def main(argv=None) -> int:
             mi = write_images(res, Path(a.images), glb, Path(a.map_images) if a.map_images else None)
             print(f"   images -> {a.images} ({'meshes' if glb else 'boxes'}, map {'yes' if mi else 'missing'})")
         report[key] = {"errors": res["errors"], "warnings": res["warnings"], "info": res["info"],
-                       "cameras": res["cameras"], "camera": rig, "marginPx": MARGIN_PX}
+                       "cameras": res["cameras"], "camera": rig, "marginPx": MARGIN_PX, "tris": tr}
     if a.json:
         Path(a.json).write_text(json.dumps(report, indent=1, ensure_ascii=False), encoding="utf-8")
     return 1 if failed else 0

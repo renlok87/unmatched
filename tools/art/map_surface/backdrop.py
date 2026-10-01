@@ -39,13 +39,15 @@ MOON_PATH = "/Game/EnvMaps/M_MapBackdropMoon"
 MIST_DEFAULTS = {"centerUU": [0.0, 0.0], "halfUU": [1900.0, 1350.0], "colorLinear": [0.3, 0.38, 0.62], "opacity": 0.3,
                  "noiseScaleUU": 700.0, "panUUPerSec": [6.0, -3.0], "edgeFade": 0.3, "coverage": 0.5, "seed": 0.0}
 MOON_DEFAULTS = {"screenAnchor": [-0.9, 0.82], "depthUU": 5200.0, "diameterUU": 1800.0, "colorLinear": [0.72, 0.8, 1.0],
-                 "intensity": 1.0, "softness": 0.4, "discRadius": 0.06, "discIntensity": 2.0}
+                 "intensity": 1.0, "softness": 0.4, "discRadius": 0.06, "discIntensity": 2.0,
+                 "discSoftness": 0.15, "discLimb": 0.0}  # P5c: the disc edge / limb (defaults = the P5 hard flat disc)
 
 # ---- material graph parameters (S08MapSurfaceSpec::ParamBackdrop*) and their defaults in the UE materials
 MIST_PARAMS = {"vector": {"Tint": (0.3, 0.38, 0.62, 1.0), "SizeUU": (3800.0, 2700.0, 0.0, 0.0), "PanUU": (6.0, -3.0, 0.0, 0.0)},
                "scalar": {"Opacity": 0.3, "NoiseScaleUU": 700.0, "EdgeFade": 0.3, "Coverage": 0.5, "Seed": 0.0}}
 MOON_PARAMS = {"vector": {"Tint": (0.72, 0.8, 1.0, 1.0)},
-               "scalar": {"Intensity": 1.0, "Softness": 0.4, "DiscRadius": 0.06, "DiscIntensity": 2.0}}
+               "scalar": {"Intensity": 1.0, "Softness": 0.4, "DiscRadius": 0.06, "DiscIntensity": 2.0,
+                          "DiscSoftness": 0.15, "DiscLimb": 0.0}}
 
 # Custom node 'MapBackdropMist' (CMOT_FLOAT1): inputs UV, Time, Size (.xy), Pan (.xy), NoiseScale, EdgeFade, Coverage, Seed.
 # Three octaves of value noise (sin hash) in uu, panned by Pan * Time; coverage threshold; elliptic edge fade.
@@ -75,13 +77,21 @@ float r = length((UV - 0.5) * 2.0);
 float fade = 1.0 - smoothstep(1.0 - clamp(EdgeFade, 0.01, 1.0), 1.0, r);
 return d * fade;
 """
-# Custom node 'MapBackdropMoon' (CMOT_FLOAT3): inputs UV, Tint (.rgb), Intensity, Softness, DiscRadius, DiscIntensity.
-MOON_INPUTS = ("UV", "Tint", "Intensity", "Softness", "DiscRadius", "DiscIntensity")
-MOON_HLSL = """// ENV-MAPS P5 M_MapBackdropMoon (additive, unlit; tools/art/map_surface/backdrop.py mirrors it): soft glow + disc.
+# Custom node 'MapBackdropMoon' (CMOT_FLOAT3): inputs UV, Tint (.rgb), Intensity, Softness, DiscRadius, DiscIntensity,
+# DiscSoftness, DiscLimb (graph 2, ENV-MAPS P5c: the P5b review measured a hard flat disc - centre = half-radius luma
+# 170; the disc edge now falls off over DiscSoftness of the radius and DiscLimb darkens it towards the limb; at 0.15 / 0
+# the graph-1 disc exactly).
+MOON_INPUTS = ("UV", "Tint", "Intensity", "Softness", "DiscRadius", "DiscIntensity", "DiscSoftness", "DiscLimb")
+MOON_HLSL = """// ENV-MAPS P5c M_MapBackdropMoon graph 2 (additive, unlit; tools/art/map_surface/backdrop.py mirrors it): soft glow +
+// a disc with a soft edge (DiscSoftness of its radius) and limb shading (DiscLimb).
 float r = length(UV * 2.0 - 1.0);
 float s = max(Softness, 0.02);
 float glow = exp(-(r * r) / (s * s)) * saturate((1.0 - r) * 5.0);
-float disc = step(0.0001, DiscRadius) * (1.0 - smoothstep(DiscRadius * 0.85, DiscRadius + 0.0001, r));
+float ds = clamp(DiscSoftness, 0.02, 0.95);
+float edge = 1.0 - smoothstep(DiscRadius * (1.0 - ds), DiscRadius + 0.0001, r);
+float rr = saturate(r / max(DiscRadius, 0.0001));
+float limb = lerp(1.0, 0.4 + 0.6 * sqrt(saturate(1.0 - rr * rr)), saturate(DiscLimb));
+float disc = step(0.0001, DiscRadius) * edge * limb;
 return Tint.rgb * (max(Intensity, 0.0) * glow + max(DiscIntensity, 0.0) * disc);
 """
 
@@ -186,7 +196,8 @@ def validate_block(block, half: tuple[float, float], bid: str = "?") -> list[str
         ok = isinstance(moon, dict)
         if ok:
             for k, (lo, hi) in {"depthUU": (500, 20000), "diameterUU": (50, 5000), "intensity": (0, 50),
-                                "softness": (0.05, 1), "discRadius": (0, 0.5), "discIntensity": (0, 50)}.items():
+                                "softness": (0.05, 1), "discRadius": (0, 0.5), "discIntensity": (0, 50),
+                                "discSoftness": (0.02, 0.95), "discLimb": (0, 1)}.items():
                 if k in moon and not (_num(moon[k]) and lo <= moon[k] <= hi):
                     ok = False
             ok = ok and ("intensity" not in moon or moon["intensity"] > 0)
@@ -270,7 +281,12 @@ def moon_glow(uv, p: dict):
     r = np.linalg.norm(uv * 2.0 - 1.0, axis=-1)
     s = max(p["Softness"], 0.02)
     glow = np.exp(-(r * r) / (s * s)) * np.clip((1.0 - r) * 5.0, 0.0, 1.0)
-    disc = (1.0 if p["DiscRadius"] >= 0.0001 else 0.0) * (1.0 - _smoothstep(p["DiscRadius"] * 0.85, p["DiscRadius"] + 0.0001, r))
+    ds = min(max(p.get("DiscSoftness", 0.15), 0.02), 0.95)
+    edge = 1.0 - _smoothstep(p["DiscRadius"] * (1.0 - ds), p["DiscRadius"] + 0.0001, r)
+    rr = np.clip(r / max(p["DiscRadius"], 0.0001), 0.0, 1.0)
+    lw = min(max(p.get("DiscLimb", 0.0), 0.0), 1.0)
+    limb = 1.0 + (0.4 + 0.6 * np.sqrt(np.clip(1.0 - rr * rr, 0.0, 1.0)) - 1.0) * lw
+    disc = (1.0 if p["DiscRadius"] >= 0.0001 else 0.0) * edge * limb
     k = max(p["Intensity"], 0.0) * glow + max(p["DiscIntensity"], 0.0) * disc
     return k[..., None] * np.asarray(p["Tint"][:3])
 
@@ -285,7 +301,8 @@ def mist_params(mist: dict) -> dict:
 def moon_params(moon: dict) -> dict:
     m = {**MOON_DEFAULTS, **moon}
     return {"Tint": tuple(m["colorLinear"]) + (1.0,), "Intensity": m["intensity"], "Softness": m["softness"],
-            "DiscRadius": m["discRadius"], "DiscIntensity": m["discIntensity"]}
+            "DiscRadius": m["discRadius"], "DiscIntensity": m["discIntensity"], "DiscSoftness": m["discSoftness"],
+            "DiscLimb": m["discLimb"]}
 
 
 # ------------------------------------------------------------------------------------------------ scratch mock

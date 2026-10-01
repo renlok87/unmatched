@@ -22,6 +22,10 @@ public class Unmatched : ModuleRules {
     // target links them implicitly; the modular UnmatchedEditor target (T2.2
     // automation tests) needs the explicit private dependencies.
     PrivateDependencyModuleNames.AddRange(new string[] { "RHI", "RenderCore" });
+    // ENV-MAPS P5c track V: the "fx" section of the environment layouts spawns UNiagaraComponents
+    // (S08EnvLayout.cpp SpawnFx) and the editor-only S08EnvFxAuthoring.cpp tunes the derived systems under
+    // /Game/EnvKit/FX (tools/art/env_kit/ue_import_fab_fx.py). Niagara is an engine plugin enabled by default.
+    PrivateDependencyModuleNames.Add("Niagara");
     // ART-005 / stage 3 T3.2: the -ArtPreview board profiles (zone palette and
     // glyphs per zone key, light profiles, board matches) are data read at
     // runtime from <Project>/Config/ArtBoards; staged into the pak (UFS) so

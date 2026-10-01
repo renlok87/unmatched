@@ -434,6 +434,34 @@ class Backdrop(unittest.TestCase):
         no_disc = bd.moon_glow(uv, dict(p, DiscRadius=0.0))
         self.assertLess(float(no_disc.max()), float(e.max()))
 
+    def test_moon_soft_disc(self):
+        # ENV-MAPS P5c (P5b review: a hard flat disc, centre = half-radius luma): the defaults keep the graph-1 disc
+        # bit for bit; DiscSoftness widens the edge falloff, DiscLimb darkens the disc towards its limb
+        import backdrop as bd
+        n = 401
+        g = np.linspace(0.0, 1.0, n)
+        uv = np.stack(np.meshgrid(g, g), -1)
+        r = np.linalg.norm(uv * 2.0 - 1.0, axis=-1)
+        p = dict(bd.moon_params({}), Intensity=0.0)  # the disc alone
+        old = (1.0 - bd._smoothstep(p["DiscRadius"] * 0.85, p["DiscRadius"] + 0.0001, r)) * p["DiscIntensity"]
+        np.testing.assert_allclose(bd.moon_glow(uv, p)[..., 0] / p["Tint"][0], old, atol=1e-12)
+        self.assertIn("DiscSoftness", bd.MOON_HLSL)
+        self.assertIn("DiscLimb", bd.MOON_HLSL)
+        shipped = bd.moon_params(bd.shipped_blocks()["marmoreal-original"]["backdrop"]["moon"])
+        soft = dict(shipped, Intensity=0.0)
+        hard = dict(soft, DiscSoftness=0.15, DiscLimb=0.0)
+        R = soft["DiscRadius"]
+
+        def ring(params, frac):
+            m = np.abs(r - frac * R) < 0.5 / n * 2
+            return float(bd.moon_glow(uv, params)[..., 2][m].mean())
+        centre = ring(soft, 0.0) if ring(soft, 0.0) > 0 else float(bd.moon_glow(uv, soft)[..., 2].max())
+        # the shipped disc: darker at half the radius than in the centre (the P5 disc was flat there)
+        self.assertLess(ring(soft, 0.5), 0.97 * centre)
+        self.assertAlmostEqual(ring(hard, 0.5), float(bd.moon_glow(uv, hard)[..., 2].max()), places=6)
+        # a wider edge: at 0.8 R the hard disc is still full, the soft one already falls off
+        self.assertLess(ring(soft, 0.8), 0.8 * ring(hard, 0.8))
+
     def test_mock_view_runs(self):
         import backdrop as bd
         board = bd.shipped_blocks()["marmoreal-original"]

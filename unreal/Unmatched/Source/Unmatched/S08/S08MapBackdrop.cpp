@@ -113,15 +113,19 @@ void Update(bool bActive, const FString& ProfileId, const FS08BackdropSpec& Spec
     Mid->SetScalarParameterValue(FName(ParamBackdropSoftness), M.Softness);
     Mid->SetScalarParameterValue(FName(ParamBackdropDiscRadius), M.DiscRadius);
     Mid->SetScalarParameterValue(FName(ParamBackdropDiscIntensity), M.DiscIntensity);
+    // P5c: soft disc edge + limb shading (M_MapBackdropMoon graph 2; an older graph-1 material ignores them)
+    Mid->SetScalarParameterValue(FName(ParamBackdropDiscSoftness), M.DiscSoftness);
+    Mid->SetScalarParameterValue(FName(ParamBackdropDiscLimb), M.DiscLimb);
     double TopZ = 0.0;
     const FTransform Card = S08BackdropMoonTransform(M, MapHalf, &TopZ);
     Parts.Add(SpawnPart(Owner, Root, Plane, MoonComponentName(), Mid, Card));
     Runtime.bMoon = true;
     const FVector C = Card.GetTranslation();
     FS08Trace::Write(FString::Printf(
-        TEXT("ARTPREVIEW backdrop moon profile=%s anchor=(%.2f,%.2f) farViewUU=%.1f depthUU=%.0f at=(%.0f,%.0f,%.0f) topZ=%.0f diameterUU=%.0f color=(%.3f,%.3f,%.3f) intensity=%.2f softness=%.2f disc=%.2f/%.2f fog=0 lit=0"),
+        TEXT("ARTPREVIEW backdrop moon profile=%s anchor=(%.2f,%.2f) farViewUU=%.1f depthUU=%.0f at=(%.0f,%.0f,%.0f) topZ=%.0f diameterUU=%.0f color=(%.3f,%.3f,%.3f) intensity=%.2f softness=%.2f disc=%.2f/%.2f fog=0 lit=0 discEdge=%.2f limb=%.2f"),
         *ProfileId, M.ScreenAnchor.X, M.ScreenAnchor.Y, S08BackdropFarViewDistanceUU(MapHalf), M.DepthUU, C.X, C.Y, C.Z,
-        TopZ, M.DiameterUU, M.Color.R, M.Color.G, M.Color.B, M.Intensity, M.Softness, M.DiscRadius, M.DiscIntensity));
+        TopZ, M.DiameterUU, M.Color.R, M.Color.G, M.Color.B, M.Intensity, M.Softness, M.DiscRadius, M.DiscIntensity,
+        M.DiscSoftness, M.DiscLimb));
   }
   Runtime.Status = TEXT("ok");
   FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW backdrop profile=%s status=ok mist=%d moon=%d maxZ=%.0f sortPriority=%d"),

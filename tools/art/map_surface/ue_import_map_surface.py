@@ -33,7 +33,8 @@ numpy mirror in backdrop.py; Apply Fogging off on both - the night fog would was
   /Game/EnvMaps/M_MapBackdropMist   unlit, BLEND_TRANSLUCENT: 3-octave value-noise mist in uu (SizeUU, PanUU x Time,
                                     NoiseScaleUU, Coverage, Seed), elliptic EdgeFade; Emissive = Tint, Opacity x density
   /Game/EnvMaps/M_MapBackdropMoon   unlit, BLEND_ADDITIVE: soft gaussian glow + small disc (Tint, Intensity, Softness,
-                                    DiscRadius, DiscIntensity) on the engine plane (UV 0..1)
+                                    DiscRadius, DiscIntensity; graph 2 / P5c: DiscSoftness = the disc edge falloff,
+                                    DiscLimb = limb shading) on the engine plane (UV 0..1)
 The SDF and the space-ID map are imported for the next steps (highlight by ID, crisp game layer) and are not
 sampled by M_MapBoard yet; they sit under /Game/EnvMaps/Data (never cooked, ~0.4 GB kept out of the pak). Once
 M_MapBoard samples them, move them out of Data and drop the DirectoriesToNeverCook line (the cooker drops a
@@ -143,6 +144,7 @@ BACKDROP_MIST_PATH = f"{ROOT}/{BACKDROP_MIST_NAME}"
 BACKDROP_MOON_NAME = "M_MapBackdropMoon"
 BACKDROP_MOON_PATH = f"{ROOT}/{BACKDROP_MOON_NAME}"
 BACKDROP_VERSION = "1"
+BACKDROP_MOON_VERSION = "2"  # ENV-MAPS P5c: DiscSoftness / DiscLimb (soft disc edge, limb shading)
 
 
 def mi_params(grade: dict) -> dict:
@@ -599,9 +601,9 @@ def build_backdrop_mist(force: bool) -> dict:
 def build_backdrop_moon(force: bool) -> dict:
     """M_MapBackdropMoon (ENV-MAPS P5 gap 8): unlit additive moon glow (backdrop.MOON_HLSL), no fog."""
     mel = u.MaterialEditingLibrary
-    material, action = _new_material(BACKDROP_MOON_PATH, BACKDROP_MOON_NAME, GRAPH_TAG, BACKDROP_VERSION, force)
+    material, action = _new_material(BACKDROP_MOON_PATH, BACKDROP_MOON_NAME, GRAPH_TAG, BACKDROP_MOON_VERSION, force)
     if action is None:
-        return {"action": "unchanged", "path": BACKDROP_MOON_PATH, "graphVersion": BACKDROP_VERSION}
+        return {"action": "unchanged", "path": BACKDROP_MOON_PATH, "graphVersion": BACKDROP_MOON_VERSION}
     flags = _translucent_unlit(material, u.BlendMode.BLEND_ADDITIVE)
     P = backdrop_lib.MOON_PARAMS
     uv = mel.create_material_expression(material, u.MaterialExpressionTextureCoordinate, -1100, -200)
@@ -610,10 +612,10 @@ def build_backdrop_moon(force: bool) -> dict:
     glow = _custom_node(material, "MapBackdropMoon", -500, 0, backdrop_lib.MOON_INPUTS, backdrop_lib.MOON_HLSL)
     _connect(uv, "", glow, "UV")
     _connect(tint, "RGB", glow, "Tint")
-    for pin in ("Intensity", "Softness", "DiscRadius", "DiscIntensity"):
+    for pin in backdrop_lib.MOON_INPUTS[2:]:  # Intensity, Softness, DiscRadius, DiscIntensity, DiscSoftness, DiscLimb
         _connect(sca[pin], "", glow, pin)
     mel.connect_material_property(glow, "", u.MaterialProperty.MP_EMISSIVE_COLOR)
-    out = _finish(material, BACKDROP_MOON_PATH, GRAPH_TAG, BACKDROP_VERSION, action)
+    out = _finish(material, BACKDROP_MOON_PATH, GRAPH_TAG, BACKDROP_MOON_VERSION, action)
     out.update(flags=flags, params=_check_params(material, BACKDROP_MOON_PATH, P), blend="additive")
     return out
 
