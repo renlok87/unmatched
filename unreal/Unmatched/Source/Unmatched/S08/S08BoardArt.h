@@ -91,6 +91,39 @@ inline const TCHAR* const ParamNightEV = TEXT("NightEV");
 inline const TCHAR* const ParamNightSaturation = TEXT("NightSaturation");
 inline const TCHAR* const ParamLift = TEXT("Lift");
 inline const TCHAR* const ParamNightTint = TEXT("NightTint");
+/** ENV-MAPS P4 (M_MapBoard graph v2, zone separation inside the game mask): a mask-only saturation of the lit share,
+ *  a mask-only inverse tint (cancels the cool lit gain inside the circles) and the saturation of the emissive lift.
+ *  Identity defaults (1, 1, (1,1,1)) keep the graph-v1 look; a graph-v1 material simply lacks them (traced). */
+inline const TCHAR* const ParamMaskSaturation = TEXT("MaskSaturation");
+inline const TCHAR* const ParamLiftSaturation = TEXT("LiftSaturation");
+inline const TCHAR* const ParamMaskInverseTint = TEXT("MaskInverseTint");
+/** ENV-MAPS P4 readability materials (map-image boards only; built out of git by ue_import_map_surface.py, cooked
+ *  through DirectoriesToAlwaysCook /Game/EnvMaps). A missing one keeps the old look (traced). */
+inline const TCHAR* const FrameWoodMaterialPath = TEXT("/Game/EnvMaps/M_MapFrameWood.M_MapFrameWood");
+inline const TCHAR* const ParamFrameValueScale = TEXT("FrameValueScale");  // linear albedo multiplier
+inline const TCHAR* const ParamFrameSaturation = TEXT("FrameSaturation");
+inline const TCHAR* const ContactShadowMaterialPath = TEXT("/Game/EnvMaps/M_MapContactShadow.M_MapContactShadow");
+inline const TCHAR* const ParamShadowStrength = TEXT("Strength");
+inline const TCHAR* const ParamShadowSoftness = TEXT("Softness");
+// Readability geometry (uu, z relative to the play plane): the contact-shadow blob lies between the map plane
+// (-0.5) and the team ring (+0.6); the leader pip sits on the near side (+Y, towards the K1 camera) just outside the
+// team ring, at the team-ring height band; its dark keyline under it.
+constexpr float ContactShadowZ = -0.25f;
+constexpr float ContactShadowOffsetX = 4.0f;  // along the key light (-55, 30, 0): the shadow falls to +X / +Y
+constexpr float ContactShadowOffsetY = 3.0f;
+// pip centre = team ring outer radius x ring scale + gap; the keyline diamond (half diagonal 5.6) clears the team
+// ring (28.5) on the inside and stays inside the painted rim (41.6): 28.5 + 6 = 34.5, 28.9 .. 40.1
+constexpr float LeaderPipGapUU = 6.0f;
+constexpr float LeaderPipSizeUU = 5.5f;       // diamond side (cube rotated 45 deg)
+constexpr float LeaderPipZ = 1.1f;            // fill 0.5 .. 1.7
+constexpr float LeaderPipDepth = 0.012f;
+constexpr float LeaderPipKeylineUU = 1.2f;    // keyline grows the diamond by this much per side
+constexpr float LeaderPipKeylineZ = 0.9f;     // keyline 0.5 .. 1.3 (under the fill top)
+constexpr float LeaderPipKeylineDepth = 0.008f;
+// Reachable ring stroke (map-image readability): the dark outer stroke sits under the fill (top 1.8 < fill top 2.05)
+// and above the team ring (bottom 1.4 > 1.2).
+constexpr float ReachStrokeZ = 1.6f;
+constexpr float ReachStrokeDepth = 0.004f;
 /** ENV-O8 T1: the placeholder tray is stretched non-uniformly under a map (see S08Diorama.h). */
 inline const TCHAR* const TrayWaiver = TEXT("T1-placeholder");
 }  // namespace S08MapSurfaceSpec
@@ -198,6 +231,16 @@ struct UNMATCHED_API FS08MapGradeSpec {
   float Lift = 0.35f;
   bool bHasTint = false;
   FLinearColor NightTint = FLinearColor::White;  // linear
+  /** ENV-MAPS P4 (optional, M_MapBoard graph v2): zone separation inside the game mask under the night light.
+   *  maskSaturation scales the chroma of the lit share inside the mask (luma kept), maskInverseTintLinear multiplies
+   *  the lit share inside the mask (cancels the cool lit gain), liftSaturation scales the chroma of the emissive lift.
+   *  Identity (1, (1,1,1), 1) = the graph-v1 look. Ranges: saturations 0..3, inverse tint 0..4. */
+  float MaskSaturation = 1.0f;
+  float LiftSaturation = 1.0f;
+  FLinearColor MaskInverseTint = FLinearColor::White;  // linear
+  bool HasMaskTerms() const {
+    return MaskSaturation != 1.0f || LiftSaturation != 1.0f || MaskInverseTint != FLinearColor::White;  // exact: Equals(.., 0) is always false (strict <)
+  }
 };
 
 struct UNMATCHED_API FS08LightProfile {
@@ -268,6 +311,37 @@ struct UNMATCHED_API FS08MapImageSpec {
   bool MatchesDefaultLayoutFrame() const;
 };
 
+/** ENV-MAPS P4 (concept review 2026-10-01 'readability'): the optional "readability" block of a board profile. Only a
+ *  'map-image' board may carry it (the parser rejects it on grids, so Cobble and the art fixtures stay bit for bit);
+ *  every sub-block is optional and off when absent. Status: предложено (proposed, not artistically accepted). */
+struct UNMATCHED_API FS08BoardReadabilitySpec {
+  bool bSet = false;
+  /** "labelPlates": screen tags on a dark semi-opaque rounded plate with a 1 px team-colour outline, placed with a
+   *  hard padding so stacked tags keep a gap (S08ArtHud::FLabelPlacementInput::HardPadPx). */
+  bool bLabelPlates = false;
+  /** "reach": the reachable-space ring in a colour outside the zone palette with a thin dark outer stroke and more
+   *  segments (the default map ring is 12 mint-green pieces). */
+  bool bReach = false;
+  FColor ReachColor = FColor(255, 200, 87, 255);  // sRGB bytes ("colorSrgb")
+  FColor ReachStroke = FColor(20, 17, 12, 255);   // sRGB bytes ("strokeSrgb")
+  int32 ReachSegments = 48;                       // 12..96
+  float ReachWidthUU = 3.5f;                      // fill width (radial), 1..6
+  float ReachStrokeUU = 1.0f;                     // stroke per side, 0.25..3
+  /** "contactShadow": a soft dark blob (M_MapContactShadow, modulate) under every fighter base. */
+  bool bContactShadow = false;
+  float ShadowDiameterUU = 64.0f;  // at ring scale 1 (a sidekick's blob scales with its team ring), 20..160
+  float ShadowStrength = 0.5f;     // 0..1 darkening at the centre
+  float ShadowSoftness = 0.55f;    // gaussian width as a fraction of the radius, 0.1..1
+  /** "leaderPip": a small team-colour diamond on the near side of every hero's base (Medusa vs the Harpies). */
+  bool bLeaderPip = false;
+  /** "frameWood": the map frame on M_MapFrameWood (the ART-005 wood, darker and less saturated). */
+  bool bFrameWood = false;
+  float FrameValueScaleSrgb = 0.7f;  // display value (V) multiplier 0.2..1; the material gets its linear power 2.2
+  float FrameSaturation = 0.75f;     // 0..1
+  /** Linear albedo multiplier of FrameValueScaleSrgb (V^2.2). */
+  float FrameValueScaleLinear() const { return FMath::Pow(FMath::Clamp(FrameValueScaleSrgb, 0.0f, 1.0f), 2.2f); }
+};
+
 struct UNMATCHED_API FS08BoardArtProfile {
   FString Id;
   TArray<FString> MatchBoardIds;
@@ -292,6 +366,8 @@ struct UNMATCHED_API FS08BoardArtProfile {
   float K1DistanceMul = 1.0f;
   static constexpr float MinK1DistanceMul = 1.0f;  // never nearer than the fit (the whole board stays in K1)
   static constexpr float MaxK1DistanceMul = 2.0f;
+  /** ENV-MAPS P4: optional "readability" block (map-image boards only, see FS08BoardReadabilitySpec). */
+  FS08BoardReadabilitySpec Readability;
 };
 
 /** Counts of one decoded board (what the art and the trace describe). */
@@ -449,3 +525,20 @@ UNMATCHED_API void S08RingPieces(float RadiusUU, float WidthUU, int32 Segments, 
  *  false when nothing is left between the discs. */
 UNMATCHED_API bool S08LinkBarTransform(const FVector& A, const FVector& B, float TrimUU, float WidthUU, float Z,
                                        float DepthScale, FTransform& Out);
+
+// ---- ENV-MAPS P4 readability (map-image boards; world-free, automation-tested) ------------------------------
+
+/** Reachable ring of a map-image board with a "reach" block: Fill = Segments tangent pieces of width ReachWidthUU on
+ *  RingRadiusUU at RingZ; Stroke = the same circle, width ReachWidthUU + 2 x ReachStrokeUU, at ReachStrokeZ (under the
+ *  fill, above the team ring). Without the block (bReach false): Fill = the default 12-piece ring, Stroke empty. */
+UNMATCHED_API void S08ReachRingPieces(const FS08BoardReadabilitySpec& Spec, TArray<FTransform>& OutFill,
+                                      TArray<FTransform>& OutStroke);
+/** Leader pip of a hero on a map-image board, relative to the fighter actor (actor yaw 0 on the board): a diamond
+ *  (engine cube, yaw 45) on the near side (+Y) at radius RingOuterUU x RingScale + LeaderPipGapUU, and its keyline
+ *  diamond under it. */
+UNMATCHED_API void S08LeaderPipTransforms(float RingOuterUU, float RingScale, FTransform& OutFill, FTransform& OutKeyline);
+/** Contact-shadow blob relative to the fighter actor: /Engine/BasicShapes/Plane (100 uu) scaled to
+ *  ShadowDiameterUU x RingScale, shifted along the key light, at ContactShadowZ. */
+UNMATCHED_API FTransform S08ContactShadowTransform(const FS08BoardReadabilitySpec& Spec, float RingScale);
+/** "#RRGGBB" of a colour (trace lines). */
+UNMATCHED_API FString S08ColorHex(const FColor& Color);

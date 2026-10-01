@@ -52,6 +52,38 @@ def k1_distance_mul(board_id: str, profiles: Path | None = None) -> float:
     raise ValueError(f"no board profile matches board id {board_id!r} in {profiles or PROFILES}")
 
 
+MAP_GRADE_SCHEMA = {"ev": "nightEV", "saturation": "nightSaturation", "lift": "lift",
+                    "mask_saturation": "maskSaturation", "lift_saturation": "liftSaturation"}
+
+
+def profile_map_grade(map_key: str, profiles: Path | None = None) -> dict:
+    """ENV-MAPS P4: the night grade the ENGINE renders a map with - the "mapGrade" of the light profile of the
+    map-image board whose mapImage.manifest is tools/art/map_surface/manifest.<map_key>.json (S08ArtBoardProfiles.json,
+    AS08BoardActor::ApplyMapGrade sets it on the M_MapBoard MID). Returned in the k1_mock grade format:
+    {ev, saturation, lift, tint_lin, mask_saturation, lift_saturation, mask_inverse_tint_lin, source}; the optional
+    graph-v2 terms default to identity, a missing nightTintLinear to (1, 1, 1). ValueError without a board / grade."""
+    path = profiles or PROFILES
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    manifest = f"tools/art/map_surface/manifest.{map_key}.json"
+    board = next((b for b in doc.get("boards", []) if (b.get("mapImage") or {}).get("manifest") == manifest), None)
+    if board is None:
+        raise ValueError(f"no map-image board profile with mapImage.manifest {manifest} in {path}")
+    light = (doc.get("lightProfiles") or {}).get(board.get("light"))
+    grade = (light or {}).get("mapGrade")
+    if not isinstance(grade, dict):
+        raise ValueError(f"board {board.get('id')}: light profile {board.get('light')!r} has no mapGrade")
+    out = {k: float(grade.get(src, 1.0 if k in ("mask_saturation", "lift_saturation") else 0.0))
+           for k, src in MAP_GRADE_SCHEMA.items()}
+    for k in ("ev", "saturation", "lift"):
+        if MAP_GRADE_SCHEMA[k] not in grade:
+            raise ValueError(f"light {board.get('light')}: mapGrade.{MAP_GRADE_SCHEMA[k]} missing")
+    out["tint_lin"] = [float(x) for x in grade.get("nightTintLinear", [1.0, 1.0, 1.0])]
+    out["mask_inverse_tint_lin"] = [float(x) for x in grade.get("maskInverseTintLinear", [1.0, 1.0, 1.0])]
+    out["source"] = (f"unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json rev {doc.get('revision')} board "
+                     f"{board.get('id')} light {board.get('light')} mapGrade")
+    return out
+
+
 def s08_overview_distance(extent_x: float, extent_y: float, k1_mul: float = 1.0) -> float:
     """ENV-U9: the K1 overview (S08K1OverviewDistanceUU) = s08_fit_distance x k1DistanceMul; 1.0 = the fit itself.
     The camera rig keeps its zoom ratios relative to this overview, its near limit at 300 uu and its far limit at
@@ -293,16 +325,30 @@ def _light_dir(rot):
     return np.array([math.cos(p) * math.cos(y), math.cos(p) * math.sin(y), math.sin(p)])
 
 
+def _saturate(c: np.ndarray, s: float) -> np.ndarray:
+    """Luma-preserving saturation in linear light (M_MapBoard: max(lerp(luma, c, s), 0))."""
+    if s == 1.0:
+        return c
+    y = (c @ LUMA)[:, None]
+    return np.maximum(y + (c - y) * np.float32(s), 0.0)
+
+
 def _night(c: np.ndarray, mask, grade: dict) -> np.ndarray:
-    """Night grade: light = 2^EV * cool tint everywhere; outside the game-layer mask additionally
-    desaturated; inside the mask an unlit lift of 'lift' x albedo is added (UE emissive)."""
+    """Night grade = the M_MapBoard graph (tools/art/map_surface/ue_import_map_surface.py BASE_HLSL / LIFT_HLSL):
+    lit = albedo * 2^EV * tint everywhere; outside the game-layer mask desaturated by 'saturation'; inside the mask
+    (graph v2, ENV-MAPS P4) lit * mask_inverse_tint_lin with chroma x mask_saturation, plus the unlit lift
+    'lift' x albedo with chroma x lift_saturation (UE emissive). The graph-v2 terms default to identity, so a grade
+    without them is the graph-v1 formula exactly."""
     light = (2.0 ** grade["ev"]) * np.asarray(grade["tint_lin"], np.float32)
     lit = c * light
     y = (lit @ LUMA)[:, None]
     outside = y + (lit - y) * grade["saturation"]
     if mask is None:
         return outside
-    inside = lit + grade["lift"] * c
+    inv = np.asarray(grade.get("mask_inverse_tint_lin", (1.0, 1.0, 1.0)), np.float32)
+    lit_in = lit if np.all(inv == 1.0) else lit * inv
+    inside = (_saturate(lit_in, float(grade.get("mask_saturation", 1.0)))
+              + grade["lift"] * _saturate(c, float(grade.get("lift_saturation", 1.0))))
     m = mask.reshape(-1, 1) if mask.ndim == 1 else mask
     return outside * (1 - m) + inside * m
 

@@ -22,8 +22,21 @@
 // (the engine plane maps local (-50,-50) -> UV (0,0), u along +X, v along +Y), so the strips sample ONE continuous
 // board-space texture: tools/art/env_kit/ue_import_env_ground.py builds M_EnvGround and MI_EnvGround_<Map>.
 // A missing material spawns no strip (traced; the props and lights of the layout still spawn).
+//
+// Waterfalls (ENV-MAPS P4, review gap 1; optional "waterfalls" array of the same section, written by ground_splat.py from
+// ground-params.json 'water.falls'; Sarpedon only):
+//   "waterfalls": [{"id":"fall-s", "material":"/Game/EnvKit/Ground/MI_EnvWaterfall_Sarpedon", "x0":-241, "x1":-47,
+//                   "y":457, "topZ":2.5, "dropUU":230, "spillUU":60}]
+// Each entry spawns (with the strips, only when the ground status is 'ok') one more /Engine/BasicShapes/Plane: the
+// vertical card x0..x1 at Y = y facing +Y (the K1 camera) from Z = topZ down to topZ - dropUU (local +Z -> +Y, local +Y ->
+// -Z, so UV v runs down the card), plus, when spillUU > 0, a flat spill x0..x1, y - spillUU..y at Z = topZ (above the T2
+// rocky lip, which rises to Z +2 within 20 uu of the tray edge; v runs towards the lip). Both are NoCollision, no shadow,
+// MID of the entry's material with FallCard = (width, height, kind 0 card / 1 spill, 0) (M_EnvWaterfall scrolls its
+// streaks along +v). The ground water itself is not a component: M_EnvGround draws it from the aux mask of the MI. A
+// missing waterfall material skips that entry (counted in the trace). Grid boards never reach this code (no layout).
 // Trace: 'ARTPREVIEW envlayout ground map=<m> mode=runtime strips=N material=<name> z=.. outer=(..)..(..) hole=(..)..(..)
-//         splatRect=(..)..(..)|- splatCovers=0|1 areaUU2=.. status=ok|off|no-tray|no-strips|missing-plane|missing-material'
+//         splatRect=(..)..(..)|- splatCovers=0|1 areaUU2=.. falls=<spawned>/<declared> fallCards=K
+//         status=ok|off|no-tray|no-strips|missing-plane|missing-material'
 #pragma once
 
 #include "CoreMinimal.h"
@@ -53,7 +66,33 @@ constexpr float MaxInsetUU = 200.0f;
 constexpr float PlaneSizeUU = 100.0f;
 /** Strips thinner than this are dropped. */
 constexpr float MinStripUU = 0.5f;
+/** P4 waterfalls (the "waterfalls" array; tools/art/env_kit/ground_splat.py validate_waterfalls mirrors the limits). */
+inline const TCHAR* const ParamFallCard = TEXT("FallCard");
+constexpr int32 MaxWaterfalls = 4;
+constexpr float FallMinTopZ = -3.0f;
+constexpr float FallMaxTopZ = 20.0f;
+constexpr float DefaultFallTopZ = 2.5f;
+constexpr float MaxFallDropUU = 1000.0f;
+constexpr float MaxFallSpillUU = 200.0f;
+constexpr float MaxFallWidthUU = 2000.0f;
+/** |x0|, |x1|, |y| bound (board space; the trays are ~800 uu). */
+constexpr float MaxFallAbsXYUU = 5000.0f;
+/** FallCard.z of the two parts. */
+constexpr float FallKindCard = 0.0f;
+constexpr float FallKindSpill = 1.0f;
 }  // namespace S08EnvGroundSpec
+
+/** One "waterfalls" entry: a vertical card (and an optional flat spill) at the near tray edge (board space). */
+struct UNMATCHED_API FS08EnvWaterfall {
+  FString Id;
+  FString Material;  // MI package path (/Game/... or /Engine/...), optionally "Pkg.Obj"
+  float X0 = 0.0f;
+  float X1 = 0.0f;
+  float Y = 0.0f;
+  float TopZ = S08EnvGroundSpec::DefaultFallTopZ;
+  float DropUU = 0.0f;
+  float SpillUU = 0.0f;
+};
 
 /** The parsed "ground" section of a layout (bSet false = the layout has none: no ground). */
 struct UNMATCHED_API FS08EnvGround {
@@ -65,6 +104,8 @@ struct UNMATCHED_API FS08EnvGround {
   float InsetUU = 0.0f;
   bool bSplatRect = false;
   FBox2D SplatRect = FBox2D(ForceInit);  // board XY covered by the splat texture
+  /** P4: the optional "waterfalls" (empty = none). */
+  TArray<FS08EnvWaterfall> Waterfalls;
 };
 
 /** What one ground spawn did (also the trace numbers). */
@@ -77,6 +118,10 @@ struct UNMATCHED_API FS08EnvGroundStats {
   /** The splat rectangle contains the outer rectangle (true without a "splatRect": the MI's value is used). */
   bool bSplatCoversOuter = false;
   FString MaterialName;
+  /** P4 waterfalls: entries spawned / entries whose material is missing / plane components (card + spill). */
+  int32 Falls = 0;
+  int32 FallsMissing = 0;
+  int32 FallCards = 0;
 };
 
 namespace S08EnvGround {
@@ -94,9 +139,18 @@ UNMATCHED_API TArray<FBox2D> Strips(const FBox2D& Outer, const FBox2D& Hole);
 UNMATCHED_API FTransform StripTransform(const FBox2D& Strip, float Z);
 /** (min.x, min.y, size.x, size.y): the GroundStrip / SplatRect parameter value of a rectangle. */
 UNMATCHED_API FLinearColor RectParam(const FBox2D& Rect);
+/** Relative transform of the engine plane that is the vertical card of a waterfall: centre ((x0+x1)/2, y, topZ - drop/2),
+ *  local +X -> +X, local +Z (the plane normal) -> +Y (towards the K1 camera), local +Y -> -Z (UV v runs down), scale
+ *  (width / 100, drop / 100, 1). */
+UNMATCHED_API FTransform FallCardTransform(const FS08EnvWaterfall& Fall);
+/** Relative transform of the flat spill of a waterfall: x0..x1, y - spillUU..y at Z = topZ, no rotation (v runs +Y). */
+UNMATCHED_API FTransform FallSpillTransform(const FS08EnvWaterfall& Fall);
+/** FallCard = (width, height, kind, 0): height = dropUU (card) or spillUU (spill), kind = FallKindCard | FallKindSpill. */
+UNMATCHED_API FLinearColor FallCardParam(const FS08EnvWaterfall& Fall, bool bSpill);
 /** Creates one plane component per strip of (OuterRect(TrayTop), HoleRect(FrameHalf)) under Parent (owned by Owner),
- *  each with a MID of Ground.Material carrying GroundStrip / SplatRect; appends them to Out (weak: the actor owns
- *  them). Nothing is created unless the status is 'ok'. */
+ *  each with a MID of Ground.Material carrying GroundStrip / SplatRect, then the waterfall cards / spills of
+ *  Ground.Waterfalls (MID of their material with FallCard); appends them to Out (weak: the actor owns them). Nothing is
+ *  created unless the status is 'ok'. */
 UNMATCHED_API FS08EnvGroundStats Spawn(const FS08EnvGround& Ground, AActor& Owner, USceneComponent* Parent,
                                        const FBox2D& TrayTop, const FVector2D& FrameHalf,
                                        TArray<TWeakObjectPtr<UStaticMeshComponent>>& Out);

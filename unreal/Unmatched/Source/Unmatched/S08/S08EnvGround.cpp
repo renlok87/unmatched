@@ -10,6 +10,7 @@
 #include "HAL/PlatformProperties.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInterface.h"
+#include "Math/RotationMatrix.h"
 #include "Misc/PackageName.h"
 #include "UObject/UObjectGlobals.h"
 
@@ -53,6 +54,126 @@ FString GroundPackageOf(const FString& Path) {
 FString GroundBox(const FBox2D& B) {
   return B.bIsValid ? FString::Printf(TEXT("(%.1f,%.1f)..(%.1f,%.1f)"), B.Min.X, B.Min.Y, B.Max.X, B.Max.Y)
                     : FString(TEXT("-"));
+}
+
+/** Required number field: present and a JSON number. */
+bool GroundRequiredNumber(const TSharedPtr<FJsonObject>& Obj, const TCHAR* Field, double& Out) {
+  return GroundNumber(Obj->TryGetField(Field), Out);
+}
+
+/** An id as a component-name fragment ([A-Za-z0-9_]). */
+FString GroundSafeName(const FString& Id) {
+  FString S = Id;
+  for (int32 I = 0; I < S.Len(); ++I) {
+    if (!FChar::IsAlnum(S[I])) S[I] = TEXT('_');
+  }
+  return S;
+}
+
+/** The optional "waterfalls" array (P4): absent / null -> none; anything invalid adds 'ground: waterfalls...' errors. */
+void GroundParseWaterfalls(const TSharedPtr<FJsonValue>& Value, TArray<FS08EnvWaterfall>& Out,
+                           TArray<FString>& OutErrors) {
+  if (!Value.IsValid() || Value->Type == EJson::Null) return;
+  const TArray<TSharedPtr<FJsonValue>>* Items = nullptr;
+  if (!Value->TryGetArray(Items) || !Items) {
+    OutErrors.Add(TEXT("ground: waterfalls is not an array"));
+    return;
+  }
+  if (Items->Num() > S08EnvGroundSpec::MaxWaterfalls) {
+    OutErrors.Add(FString::Printf(TEXT("ground: waterfalls has %d entries (max %d)"), Items->Num(),
+                                  S08EnvGroundSpec::MaxWaterfalls));
+    return;
+  }
+  TSet<FString> Ids;
+  for (int32 I = 0; I < Items->Num(); ++I) {
+    const FString Where = FString::Printf(TEXT("ground: waterfalls[%d]"), I);
+    const TSharedPtr<FJsonObject>* ObjPtr = nullptr;
+    if (!(*Items)[I].IsValid() || !(*Items)[I]->TryGetObject(ObjPtr) || !ObjPtr || !ObjPtr->IsValid()) {
+      OutErrors.Add(Where + TEXT(" is not an object"));
+      continue;
+    }
+    const TSharedPtr<FJsonObject>& Obj = *ObjPtr;
+    const int32 Before = OutErrors.Num();
+    FS08EnvWaterfall F;
+    if (!Obj->TryGetStringField(TEXT("id"), F.Id) || F.Id.IsEmpty() || Ids.Contains(F.Id)) {
+      OutErrors.Add(FString::Printf(TEXT("%s: id '%s' is empty or a duplicate"), *Where, *F.Id));
+    }
+    Ids.Add(F.Id);
+    if (!Obj->TryGetStringField(TEXT("material"), F.Material) || !GroundIsPackagePath(F.Material)) {
+      OutErrors.Add(FString::Printf(TEXT("%s: material '%s' is not a /Game/ or /Engine/ package path"), *Where,
+                                    *F.Material));
+    }
+    double X0 = 0.0, X1 = 0.0, Y = 0.0, Drop = 0.0;
+    double TopZ = S08EnvGroundSpec::DefaultFallTopZ, Spill = 0.0;
+    const double MaxXY = S08EnvGroundSpec::MaxFallAbsXYUU;
+    if (!GroundRequiredNumber(Obj, TEXT("x0"), X0) || !GroundRequiredNumber(Obj, TEXT("x1"), X1) ||
+        !GroundRequiredNumber(Obj, TEXT("y"), Y)) {
+      OutErrors.Add(Where + TEXT(": x0 / x1 / y must be numbers"));
+    } else if (X1 - X0 <= 0.0 || X1 - X0 > S08EnvGroundSpec::MaxFallWidthUU || FMath::Abs(X0) > MaxXY ||
+               FMath::Abs(X1) > MaxXY || FMath::Abs(Y) > MaxXY) {
+      OutErrors.Add(FString::Printf(TEXT("%s: x1 - x0 must be in (0, %.0f] and |x0|, |x1|, |y| <= %.0f"), *Where,
+                                    S08EnvGroundSpec::MaxFallWidthUU, MaxXY));
+    }
+    if (!GroundRequiredNumber(Obj, TEXT("dropUU"), Drop) || Drop <= 0.0 || Drop > S08EnvGroundSpec::MaxFallDropUU) {
+      OutErrors.Add(FString::Printf(TEXT("%s: dropUU must be a number in (0, %.0f]"), *Where,
+                                    S08EnvGroundSpec::MaxFallDropUU));
+    }
+    if (!GroundOptionalNumber(Obj, TEXT("topZ"), TopZ) || TopZ < S08EnvGroundSpec::FallMinTopZ ||
+        TopZ > S08EnvGroundSpec::FallMaxTopZ) {
+      OutErrors.Add(FString::Printf(TEXT("%s: topZ must be a number in [%.0f, %.0f]"), *Where,
+                                    S08EnvGroundSpec::FallMinTopZ, S08EnvGroundSpec::FallMaxTopZ));
+    }
+    if (!GroundOptionalNumber(Obj, TEXT("spillUU"), Spill) || Spill < 0.0 || Spill > S08EnvGroundSpec::MaxFallSpillUU) {
+      OutErrors.Add(FString::Printf(TEXT("%s: spillUU must be a number in [0, %.0f]"), *Where,
+                                    S08EnvGroundSpec::MaxFallSpillUU));
+    }
+    if (OutErrors.Num() != Before) continue;
+    F.X0 = static_cast<float>(X0);
+    F.X1 = static_cast<float>(X1);
+    F.Y = static_cast<float>(Y);
+    F.TopZ = static_cast<float>(TopZ);
+    F.DropUU = static_cast<float>(Drop);
+    F.SpillUU = static_cast<float>(Spill);
+    Out.Add(F);
+  }
+}
+
+/** One decor plane under the board actor: the engine plane, NoCollision, no navigation, no shadow, a MID of Material
+ *  (Params fills it). Registered and appended to Out. */
+template <typename FParams>
+UStaticMeshComponent* GroundAddPlane(AActor& Owner, USceneComponent* Attach, UStaticMesh* Plane,
+                                     const FString& BaseName, const FTransform& Relative,
+                                     UMaterialInterface* Material, const FParams& Params,
+                                     TArray<TWeakObjectPtr<UStaticMeshComponent>>& Out) {
+  const FName Name = MakeUniqueObjectName(&Owner, UStaticMeshComponent::StaticClass(), FName(*BaseName));
+  UStaticMeshComponent* C = NewObject<UStaticMeshComponent>(&Owner, Name);
+  C->SetupAttachment(Attach);
+  C->SetStaticMesh(Plane);
+  // A flat decor layer: never a click / cursor surface (the map pick box is), never navigation, no shadow of its own.
+  C->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+  C->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+  C->SetGenerateOverlapEvents(false);
+  C->SetCanEverAffectNavigation(false);
+  C->SetCastShadow(false);
+  C->SetRelativeTransform(Relative);
+  UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(Material, C);
+  if (Mid) {
+    Params(*Mid);
+    C->SetMaterial(0, Mid);
+  } else {
+    C->SetMaterial(0, Material);
+  }
+  C->RegisterComponent();
+  Out.Emplace(C);
+  return C;
+}
+
+/** Uncooked runs (editor, automation) ask the package first: an asset that was never imported reaches no loader
+ *  warning (the automation log collects them). Cooked runs load directly, as the props of S08EnvLayout do. */
+UMaterialInterface* GroundLoadMaterial(const FString& Path) {
+  const bool bMayExist =
+      FPlatformProperties::RequiresCookedData() || FPackageName::DoesPackageExist(GroundPackageOf(Path));
+  return bMayExist ? LoadObject<UMaterialInterface>(nullptr, *Path, nullptr, LOAD_NoWarn) : nullptr;
 }
 }  // namespace S08EnvGroundPrivate
 
@@ -104,6 +225,7 @@ bool ParseJson(const TSharedPtr<FJsonObject>& Obj, FS08EnvGround& Out, TArray<FS
       G.SplatRect = FBox2D(FVector2D(N[0], N[1]), FVector2D(N[2], N[3]));
     }
   }
+  GroundParseWaterfalls(Obj->TryGetField(TEXT("waterfalls")), G.Waterfalls, OutErrors);
   if (OutErrors.Num() != Before) return false;
   G.bSet = true;
   Out = G;
@@ -154,6 +276,29 @@ FLinearColor RectParam(const FBox2D& Rect) {
                       static_cast<float>(Size.Y));
 }
 
+FTransform FallCardTransform(const FS08EnvWaterfall& Fall) {
+  // plane normal (local +Z) -> +Y, local +X stays +X, local +Y -> -Z (MakeFromXZ: Y = Z ^ X)
+  const FQuat Rotation = FRotationMatrix::MakeFromXZ(FVector(1.0, 0.0, 0.0), FVector(0.0, 1.0, 0.0)).ToQuat();
+  const double Width = static_cast<double>(Fall.X1) - static_cast<double>(Fall.X0);
+  return FTransform(Rotation,
+                    FVector((static_cast<double>(Fall.X0) + Fall.X1) * 0.5, Fall.Y,
+                            static_cast<double>(Fall.TopZ) - Fall.DropUU * 0.5),
+                    FVector(Width / S08EnvGroundSpec::PlaneSizeUU, Fall.DropUU / S08EnvGroundSpec::PlaneSizeUU, 1.0));
+}
+
+FTransform FallSpillTransform(const FS08EnvWaterfall& Fall) {
+  const double Width = static_cast<double>(Fall.X1) - static_cast<double>(Fall.X0);
+  return FTransform(FQuat::Identity,
+                    FVector((static_cast<double>(Fall.X0) + Fall.X1) * 0.5,
+                            static_cast<double>(Fall.Y) - Fall.SpillUU * 0.5, Fall.TopZ),
+                    FVector(Width / S08EnvGroundSpec::PlaneSizeUU, Fall.SpillUU / S08EnvGroundSpec::PlaneSizeUU, 1.0));
+}
+
+FLinearColor FallCardParam(const FS08EnvWaterfall& Fall, bool bSpill) {
+  return FLinearColor(Fall.X1 - Fall.X0, bSpill ? Fall.SpillUU : Fall.DropUU,
+                      bSpill ? S08EnvGroundSpec::FallKindSpill : S08EnvGroundSpec::FallKindCard, 0.0f);
+}
+
 FS08EnvGroundStats Spawn(const FS08EnvGround& Ground, AActor& Owner, USceneComponent* Parent, const FBox2D& TrayTop,
                          const FVector2D& FrameHalf, TArray<TWeakObjectPtr<UStaticMeshComponent>>& Out) {
   using namespace S08EnvGroundPrivate;
@@ -177,12 +322,7 @@ FS08EnvGroundStats Spawn(const FS08EnvGround& Ground, AActor& Owner, USceneCompo
     S.Status = TEXT("missing-plane");
     return S;
   }
-  // Uncooked runs (editor, automation) ask the package first: a ground that was never imported reaches no loader
-  // warning (the automation log collects them). Cooked runs load directly, as the props of S08EnvLayout do.
-  const bool bMayExist =
-      FPlatformProperties::RequiresCookedData() || FPackageName::DoesPackageExist(GroundPackageOf(Ground.Material));
-  UMaterialInterface* Material =
-      bMayExist ? LoadObject<UMaterialInterface>(nullptr, *Ground.Material, nullptr, LOAD_NoWarn) : nullptr;
+  UMaterialInterface* Material = GroundLoadMaterial(Ground.Material);
   if (!Material) {
     S.Status = TEXT("missing-material");
     return S;
@@ -191,32 +331,40 @@ FS08EnvGroundStats Spawn(const FS08EnvGround& Ground, AActor& Owner, USceneCompo
   USceneComponent* Attach = Parent ? Parent : Owner.GetRootComponent();
   for (int32 I = 0; I < Rects.Num(); ++I) {
     const FBox2D& R = Rects[I];
-    const FName Name = MakeUniqueObjectName(&Owner, UStaticMeshComponent::StaticClass(),
-                                            FName(*FString::Printf(TEXT("EnvGround_%d"), I)));
-    UStaticMeshComponent* C = NewObject<UStaticMeshComponent>(&Owner, Name);
-    C->SetupAttachment(Attach);
-    C->SetStaticMesh(Plane);
-    // A flat decor layer: never a click / cursor surface (the map pick box is), never navigation, no shadow of its own.
-    C->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-    C->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
-    C->SetGenerateOverlapEvents(false);
-    C->SetCanEverAffectNavigation(false);
-    C->SetCastShadow(false);
-    C->SetRelativeTransform(StripTransform(R, Ground.Z));
-    UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(Material, C);
-    if (Mid) {
-      Mid->SetVectorParameterValue(FName(S08EnvGroundSpec::ParamGroundStrip), RectParam(R));
-      if (Ground.bSplatRect) {
-        Mid->SetVectorParameterValue(FName(S08EnvGroundSpec::ParamSplatRect), RectParam(Ground.SplatRect));
-      }
-      C->SetMaterial(0, Mid);
-    } else {
-      C->SetMaterial(0, Material);
-    }
-    C->RegisterComponent();
-    Out.Emplace(C);
+    GroundAddPlane(Owner, Attach, Plane, FString::Printf(TEXT("EnvGround_%d"), I), StripTransform(R, Ground.Z),
+                   Material,
+                   [&Ground, &R](UMaterialInstanceDynamic& Mid) {
+                     Mid.SetVectorParameterValue(FName(S08EnvGroundSpec::ParamGroundStrip), RectParam(R));
+                     if (Ground.bSplatRect) {
+                       Mid.SetVectorParameterValue(FName(S08EnvGroundSpec::ParamSplatRect),
+                                                   RectParam(Ground.SplatRect));
+                     }
+                   },
+                   Out);
     ++S.Strips;
     S.AreaUU2 += R.GetArea();
+  }
+  // P4 waterfalls: the vertical card and the optional flat spill of every entry (the same engine plane, own material)
+  for (const FS08EnvWaterfall& Fall : Ground.Waterfalls) {
+    UMaterialInterface* FallMaterial = GroundLoadMaterial(Fall.Material);
+    if (!FallMaterial) {
+      ++S.FallsMissing;
+      continue;
+    }
+    for (int32 Part = 0; Part < 2; ++Part) {
+      const bool bSpill = Part == 1;
+      if (bSpill && Fall.SpillUU <= 0.0f) continue;
+      GroundAddPlane(Owner, Attach, Plane,
+                     FString::Printf(TEXT("EnvWaterfall_%s_%s"), *GroundSafeName(Fall.Id),
+                                     bSpill ? TEXT("Spill") : TEXT("Card")),
+                     bSpill ? FallSpillTransform(Fall) : FallCardTransform(Fall), FallMaterial,
+                     [&Fall, bSpill](UMaterialInstanceDynamic& Mid) {
+                       Mid.SetVectorParameterValue(FName(S08EnvGroundSpec::ParamFallCard), FallCardParam(Fall, bSpill));
+                     },
+                     Out);
+      ++S.FallCards;
+    }
+    ++S.Falls;
   }
   S.Status = TEXT("ok");
   return S;
@@ -237,11 +385,12 @@ int32 Clear(TArray<TWeakObjectPtr<UStaticMeshComponent>>& Components) {
 FString TraceLine(const FString& MapKey, const FS08EnvGround& Ground, const FS08EnvGroundStats& Stats) {
   using namespace S08EnvGroundPrivate;
   return FString::Printf(
-      TEXT("ARTPREVIEW envlayout ground map=%s mode=%s strips=%d material=%s z=%.1f outer=%s hole=%s splatRect=%s splatCovers=%d areaUU2=%.0f status=%s"),
+      TEXT("ARTPREVIEW envlayout ground map=%s mode=%s strips=%d material=%s z=%.1f outer=%s hole=%s splatRect=%s splatCovers=%d areaUU2=%.0f falls=%d/%d fallCards=%d status=%s"),
       MapKey.IsEmpty() ? TEXT("-") : *MapKey, Ground.Mode.IsEmpty() ? TEXT("-") : *Ground.Mode, Stats.Strips,
       Stats.MaterialName.IsEmpty() ? *Ground.Material : *Stats.MaterialName, Ground.Z, *GroundBox(Stats.Outer),
       *GroundBox(Stats.Hole), Ground.bSplatRect ? *GroundBox(Ground.SplatRect) : TEXT("-"),
-      Stats.bSplatCoversOuter ? 1 : 0, Stats.AreaUU2, *Stats.Status);
+      Stats.bSplatCoversOuter ? 1 : 0, Stats.AreaUU2, Stats.Falls, Ground.Waterfalls.Num(), Stats.FallCards,
+      *Stats.Status);
 }
 
 }  // namespace S08EnvGround

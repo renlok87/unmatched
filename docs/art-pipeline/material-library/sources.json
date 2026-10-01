@@ -1266,6 +1266,12 @@
    "class": "skin",
    "generator": "procedural:skin",
    "reason": "CC0-наборов кожи персонажа нет. Поры (гауссовы лунки) + слабые перекрёстные морщинки ±35° + мягкая волна, всё периодично (FFT на торе)."
+  },
+  {
+   "class": "water_ripple",
+   "generator": "procedural:water_ripple_normal",
+   "track": "ENV-MAPS",
+   "reason": "P4 (ревью, gap 1: вода в устьях реки Сарпедона). CC0-нормали воды нет ни на ambientCG (поиск water / wave / foam даёт только декали Leaking и HDRI), ни на Poly Haven (только песок и галька побережья), а бюджет ENV-U5 (+10 наборов / +300 МБ) уже выбран: 10 наборов, 282 МБ. Поэтому нормаль ряби своя, процедурная: полосовой гауссов шум в Фурье-области только с целыми частотами (тайл бесшовный), 3–12 периодов на тайл, точный спектральный градиент, DirectX. Генератор: tools/art/env_kit/ue_import_env_ground.py --prep (RIPPLE), staging вне git, в UE /Game/EnvKit/Ground/Sets/T_Ground_WaterRipple_N. Пена и водопад тоже процедурные (шум в HLSL M_EnvGround / M_EnvWaterfall). Статус: предложено."
   }
  ]
 }

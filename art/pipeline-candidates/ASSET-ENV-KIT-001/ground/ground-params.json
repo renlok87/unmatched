@@ -1,9 +1,10 @@
 {
  "schema": "unmatched.env-ground-params/1",
- "decision": "ENV-U10 (user, 2026-09-30): themed CC0 ground between the map frame and the tray edge - Marmoreal: marble paving by the palace + dark earth with petals; Sarpedon: forest floor, sand, ship deck planks under the ship, pebbles at the river mouth. ENV-U5: only the downloaded CC0 sets (no new downloads).",
+ "decision": "ENV-U10 (user, 2026-09-30): themed CC0 ground between the map frame and the tray edge - Marmoreal: marble paving by the palace + dark earth with petals; Sarpedon: forest floor, sand, ship deck planks under the ship, pebbles at the river mouth. ENV-U5: only the downloaded CC0 sets (the +10 sets / +300 MB of ENV-U5 are used up: 10 sets, 282 MB; neither ambientCG nor Poly Haven has a CC0 water normal) - the P4 water ripple normal is procedural (ue_import_env_ground.py --prep).",
  "tools": {
   "splat": "tools/art/env_kit/ground_splat.py (splat masks + previews + layout 'ground' sections)",
-  "import": "tools/art/env_kit/ue_import_env_ground.py (--prep: CC0 -> 2K BC/N/ORMH staging PNGs; UE: textures, M_EnvGround, MI_EnvGround_<Map>)"
+  "import": "tools/art/env_kit/ue_import_env_ground.py (--prep: CC0 -> 2K BC/N/ORMH staging PNGs; UE: textures, M_EnvGround, MI_EnvGround_<Map>)",
+  "aux": "ground_splat.py also writes <map>.aux.png (RGBA8, the splat grid: R water, G foam, B edge band (Marmoreal curb / Sarpedon deck beam), A = 1 + water depth * 254) and the layout 'ground.waterfalls'"
  },
  "cc0Raw": "C:/Users/ren/WebstormProjects/unmached/unmached/art/material-library/cc0-raw",
  "tray": {
@@ -29,13 +30,14 @@
   "insetUU": 0.0
  },
  "material": {
-  "graphVersion": "1",
+  "graphVersion": "2",
   "heightContrast": 0.25,
   "normalStrength": 1.0,
   "macroStrength": 0.14,
   "macroScaleUU": 240.0,
   "specular": 0.4,
-  "note": "heightBlend per layer L1..L3 (0..1) scales how much the layer's height shapes its border; accent.carpet = the pink carpet strength under dense petals (petals mode only)"
+  "layerMacroScaleUU": 33.0,
+  "note": "heightBlend per layer L1..L3 (0..1) scales how much the layer's height shapes its border; accent.carpet = the pink carpet strength under dense petals (petals mode only). P4 (graph 2), optional per layer: roughMin / roughScale (roughness = max(tex * roughScale, roughMin)), specular (default material.specular), normalStrength (x material.normalStrength), macro (extra +-value noise at layerMacroScaleUU on that layer only, ~ one paving tile). Per map: edge = the aux.B band (albedo x color, roughness -> roughness, strength), water = the aux.R/G/A water layer (Sarpedon river mouths), rules = splat-rule numbers (ground_splat.py; every number has a code default)."
  },
  "sets": {
   "Tiles143": {
@@ -114,7 +116,7 @@
      "slot": "L3",
      "channel": "B",
      "set": "Tiles143",
-     "role": "marble paving: palace terrace N, walkway round the frame, lamp / plinth pads",
+     "role": "marble paving: palace terrace N, walkway round the frame, lamp / plinth pads; a 1-tile curb band (aux.B edge) along its border to the earth / moss",
      "tileUU": 200.0,
      "tint": [
       0.48,
@@ -122,7 +124,11 @@
       0.56
      ],
      "saturation": 0.25,
-     "heightBlend": 1.0
+     "heightBlend": 1.0,
+     "roughMin": 0.8,
+     "roughScale": 1.6,
+     "specular": 0.28,
+     "macro": 0.08
     }
    ],
    "accent": {
@@ -140,12 +146,42 @@
    },
    "grade": {
     "ev": -1.0,
-    "saturation": 0.7,
+    "saturation": 0.82,
     "tint": [
-     0.9317,
-     1.0042,
-     1.1595
+     0.96,
+     1.0,
+     1.1
     ]
+   },
+   "edge": {
+    "role": "curb: the outermost paving tile row, darker and rougher (review gap 10)",
+    "color": [
+     0.62,
+     0.6,
+     0.58
+    ],
+    "strength": 1.0,
+    "roughness": 0.9
+   },
+   "rules": {
+    "note": "review gaps 10 / 13 (P4): noise-broken, blurred paving edge + 1-tile curb; petals masked round the cherries and the colonnade beds, global confetti x0.5",
+    "paveWarpUU": 18.0,
+    "paveMidUU": 8.0,
+    "paveFineUU": 4.0,
+    "paveSoftUU": 6.0,
+    "curbWidthUU": 24.0,
+    "curbSoftUU": 2.0,
+    "petalGlobal": 0.5,
+    "petalTreeRadiusUU": 85.0,
+    "petalDrift": 0.28,
+    "petalBeds": 0.5,
+    "blurUU": {
+     "R": 4.0,
+     "G": 4.0,
+     "B": 3.0,
+     "A": 3.0,
+     "E": 1.5
+    }
    }
   },
   "sarpedon": {
@@ -153,12 +189,12 @@
     {
      "slot": "L0",
      "set": "Moss002",
-     "role": "forest floor (base; W / NW)",
+     "role": "forest floor (base; W / NW) - darker (review gap 7: concept Y ~26 against 54)",
      "tileUU": 200.0,
      "tint": [
-      0.42,
-      0.45,
-      0.33
+      0.22,
+      0.24,
+      0.17
      ],
      "saturation": 0.5
     },
@@ -166,43 +202,44 @@
      "slot": "L1",
      "channel": "R",
      "set": "Ground055S",
-     "role": "sand: beach N-centre, river banks, fire clearings",
+     "role": "sand: beach N-centre, river banks, fire clearings (warmer, review gap 5)",
      "tileUU": 250.0,
      "tint": [
-      0.62,
-      0.51,
-      0.37
+      1.15,
+      0.72,
+      0.36
      ],
-     "saturation": 1.0,
-     "heightBlend": 0.3
+     "saturation": 1.4,
+     "heightBlend": 0.12
     },
     {
      "slot": "L2",
      "channel": "G",
      "set": "Gravel021",
-     "role": "pebbles: both river channels (mouth N, waterfall exit S), fort rubble",
+     "role": "pebbles: a thin, brighter rim round the water of both river mouths, fort rubble, beach scatter",
      "tileUU": 160.0,
      "tint": [
-      1.25,
-      1.25,
-      1.3
+      3.6,
+      3.4,
+      3.1
      ],
-     "saturation": 0.7,
+     "saturation": 0.8,
      "heightBlend": 1.0
     },
     {
      "slot": "L3",
      "channel": "B",
      "set": "Planks023A",
-     "role": "ship deck planks: E band under the hull and cannons, quay N-E and S-E",
-     "tileUU": 105.0,
+     "role": "ship deck planks: E band under the hull and cannons, quay N-E and S-E; a beam (aux.B edge) where the planks end",
+     "tileUU": 84.0,
      "tint": [
-      1.1,
-      0.95,
-      0.8
+      1.7,
+      1.35,
+      0.95
      ],
      "saturation": 1.0,
-     "heightBlend": 0.4
+     "heightBlend": 0.4,
+     "normalStrength": 1.8
     }
    ],
    "accent": {
@@ -220,11 +257,11 @@
    },
    "grade": {
     "ev": -1.0,
-    "saturation": 0.7,
+    "saturation": 0.85,
     "tint": [
-     0.9317,
-     1.0042,
-     1.1595
+     0.97,
+     1.0,
+     1.08
     ]
    },
    "river": {
@@ -237,6 +274,102 @@
      -227.0,
      -44.0
     ]
+   },
+   "edge": {
+    "role": "deck beam: the timber edge where the planks end (review gap 5)",
+    "color": [
+     0.5,
+     0.42,
+     0.36
+    ],
+    "strength": 1.0,
+    "roughness": 0.85
+   },
+   "water": {
+    "role": "review gap 1: water at both river mouths (N beach -> sea surf, S -> waterfall over the near tray edge), tinted to the map's river colour; drawn by M_EnvGround from aux.R/G/A, the falls are engine-plane cards (S08EnvGround waterfalls, M_EnvWaterfall)",
+    "colorSrgb": [
+     40,
+     76,
+     128
+    ],
+    "shallowMix": 0.55,
+    "roughness": 0.06,
+    "specular": 0.25,
+    "normalStrength": 0.55,
+    "lift": 4.0,
+    "rippleTileUU": [
+     70.0,
+     130.0
+    ],
+    "panUUps": [
+     2.5,
+     1.2,
+     -1.4,
+     2.0
+    ],
+    "foamColor": [
+     0.62,
+     0.66,
+     0.7
+    ],
+    "foamOpacity": 0.85,
+    "foamScaleUU": 9.0,
+    "foamSpeed": 0.6,
+    "falls": [
+     {
+      "id": "fall-s",
+      "river": "near",
+      "offsetUU": 32.0,
+      "insetUU": 4.0,
+      "topZ": 2.5,
+      "dropUU": 120.0,
+      "spillUU": 60.0,
+      "flowUUps": 40.0,
+      "streakScaleUU": 4.0,
+      "edgeFadeUU": 12.0,
+      "bottomFade": 0.9,
+      "spillFadeUU": 18.0,
+      "dither": 0.15
+     }
+    ]
+   },
+   "rules": {
+    "note": "review gaps 1 / 5 / 7 (P4): noise-broken, blurred edges; feathered fire sand; deck beam; water + pebble rim + foam / surf",
+    "edgeNoise": 1.6,
+    "fireRadiusUU": 58.0,
+    "fireWarpUU": 22.0,
+    "fireSoftUU": 26.0,
+    "firePeak": 0.75,
+    "beamWidthUU": 8.0,
+    "waterInsetUU": 3.0,
+    "waterWarpUU": 7.0,
+    "pebbleRimUU": 9.0,
+    "bankPebbles": 0.5,
+    "foamWidthUU": 5.0,
+    "depthUU": 30.0,
+    "surf": [
+     [
+      30.0,
+      3.0,
+      1.0
+     ],
+     [
+      54.0,
+      2.5,
+      0.7
+     ]
+    ],
+    "blurUU": {
+     "R": 7.0,
+     "G": 3.0,
+     "B": 1.0,
+     "A": 5.0,
+     "W": 1.5,
+     "F": 1.0,
+     "E": 0.8
+    },
+    "foamShore": 0.8,
+    "beachScatter": 0.35
    }
   }
  }

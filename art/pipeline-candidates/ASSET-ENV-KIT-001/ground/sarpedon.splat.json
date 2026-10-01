@@ -4,12 +4,12 @@
  "tool": "tools/art/env_kit/ground_splat.py",
  "params": {
   "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/ground/ground-params.json",
-  "sha256": "f24d7364403f138b456338c423770d74b5f2194d5fe78996f39b94488cfa910e"
+  "sha256": "0acb86ad72b416cacc5a974ee6c452ce0452253fa2eb3f6bf9778d7beef5a96c"
  },
  "layout": {
   "path": "unreal/Unmatched/Config/ArtBoards/EnvLayouts/sarpedon.layout.json",
-  "propsSha256": "ac330677063a3b23452924ab47f296c61ab15745f138c0be6647d2a87b05442d",
-  "props": 18
+  "propsSha256": "8b88114d77b05572452f4d03a4601795aba8407cf78dc5a98ae84fb6ba3e799c",
+  "props": 24
  },
  "tray": {
   "minX": -780.0,
@@ -33,10 +33,10 @@
  ],
  "orientation": "row 0 = far side (-Y, UE texture V = 0), column 0 = -X; SplatUV = (P - rect.min) / rect.size",
  "channels": {
-  "base": "L0 Moss002 - forest floor (base; W / NW)",
-  "R": "L1 Ground055S - sand: beach N-centre, river banks, fire clearings",
-  "G": "L2 Gravel021 - pebbles: both river channels (mouth N, waterfall exit S), fort rubble",
-  "B": "L3 Planks023A - ship deck planks: E band under the hull and cannons, quay N-E and S-E"
+  "base": "L0 Moss002 - forest floor (base; W / NW) - darker (review gap 7: concept Y ~26 against 54)",
+  "R": "L1 Ground055S - sand: beach N-centre, river banks, fire clearings (warmer, review gap 5)",
+  "G": "L2 Gravel021 - pebbles: a thin, brighter rim round the water of both river mouths, fort rubble, beach scatter",
+  "B": "L3 Planks023A - ship deck planks: E band under the hull and cannons, quay N-E and S-E; a beam (aux.B edge) where the planks end"
  },
  "accent": {
   "mode": "wet",
@@ -52,27 +52,92 @@
   "carpet": 0.0
  },
  "coverage": {
-  "L0": 0.3409,
-  "L1": 0.1665,
-  "L2": 0.1002,
+  "L0": 0.3498,
+  "L1": 0.1741,
+  "L2": 0.0837,
   "L3": 0.3924,
-  "accentMean": 0.093,
+  "accentMean": 0.0931,
+  "water": 0.0659,
+  "foam": 0.0017,
+  "edge": 0.0074,
   "groundPixels": 273586
  },
  "seed": 2203,
  "png": {
   "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/ground/sarpedon.splat.png",
-  "sha256": "0f59eadc54e432a36c4520dd109f4720650278c22095bf525e9cf34d880b539b",
-  "bytes": 149500,
+  "sha256": "77a887a9d9939d60f01cfd1de6e12bf5401a1b81c218d4cc881056db9ce05098",
+  "bytes": 139607,
   "format": "PNG RGBA8"
  },
+ "aux": {
+  "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/ground/sarpedon.aux.png",
+  "sha256": "fd0904c3aac088a2466a8e8b6f331259d78ebf210c7326d7fab257fff77c7e02",
+  "bytes": 30202,
+  "format": "PNG RGBA8",
+  "channels": {
+   "R": "water coverage (river mouths)",
+   "G": "foam (shore band, surf)",
+   "B": "edge band (Marmoreal curb / Sarpedon deck beam)",
+   "A": "1 + water depth * 254"
+  }
+ },
+ "rules": {
+  "note": "review gaps 1 / 5 / 7 (P4): noise-broken, blurred edges; feathered fire sand; deck beam; water + pebble rim + foam / surf",
+  "edgeNoise": 1.6,
+  "fireRadiusUU": 58.0,
+  "fireWarpUU": 22.0,
+  "fireSoftUU": 26.0,
+  "firePeak": 0.75,
+  "beamWidthUU": 8.0,
+  "waterInsetUU": 3.0,
+  "waterWarpUU": 7.0,
+  "pebbleRimUU": 9.0,
+  "bankPebbles": 0.5,
+  "foamWidthUU": 5.0,
+  "depthUU": 30.0,
+  "surf": [
+   [
+    30.0,
+    3.0,
+    1.0
+   ],
+   [
+    54.0,
+    2.5,
+    0.7
+   ]
+  ],
+  "blurUU": {
+   "R": 7.0,
+   "G": 3.0,
+   "B": 1.0,
+   "A": 5.0,
+   "W": 1.5,
+   "F": 1.0,
+   "E": 0.8
+  },
+  "foamShore": 0.8,
+  "beachScatter": 0.35
+ },
+ "waterfalls": [
+  {
+   "id": "fall-s",
+   "material": "/Game/EnvKit/Ground/MI_EnvWaterfall_Sarpedon",
+   "x0": -241.0,
+   "x1": -47.2,
+   "y": 457.0,
+   "topZ": 2.5,
+   "dropUU": 120.0,
+   "spillUU": 60.0
+  }
+ ],
  "kit": [
   "kit: 14/14 build reports equal the KIT sizes (1 %) and keep the Tripo front (C:/tmp/wt-envmaps/art/pipeline-candidates/ASSET-ENV-KIT-001/20260930-tripo-h31/reports/assets)"
  ],
  "notes": [],
  "preview": {
   "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/ground/sarpedon.preview.png",
-  "sha256": "5d0725e52739fe3ecd8a40cdc234ba06cad7eea8d4aad159908fa7a5aaf3ac81",
+  "sha256": "6bf8f0c9a6d31e1888b052e80507ebf2f5463658a70fcabf76455faba9510c0b",
   "size": [
    820,
    1034

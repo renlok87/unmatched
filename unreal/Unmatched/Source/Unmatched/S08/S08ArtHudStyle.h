@@ -124,7 +124,33 @@ struct UNMATCHED_API FS08ArtHudTagStyle {
   float BarWidthSu = 34.0f;
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD|Size")
   float BarHeightSu = 5.0f;
+  /** ENV-MAPS P4 (concept review readability, map-image boards with "labelPlates" only): the tag sits on a dark
+   *  SEMI-opaque rounded plate with a 1 su outline in the team's on-screen colour (the team accent), so light circles
+   *  under it no longer swallow the text. Grid boards keep the flat opaque Background above. */
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD|Board plate")
+  // #10131E at 84 %: over a white circle the plate reads ~#363944 (gamma-space UI blend), text #F2ECDE ~10:1
+  FColor BoardPlateBackground = FColor(16, 19, 30, 214);
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD|Board plate", meta = (ClampMin = "0"))
+  float BoardPlateCornerSu = 4.0f;
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD|Board plate", meta = (ClampMin = "0"))
+  float BoardPlateOutlineSu = 1.0f;
+  /** Outline (team accent) opacity over the team chip colour (FS08ArtHudPlateStyle::TeamChipP1 / P2). */
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD|Board plate", meta = (ClampMin = "0", ClampMax = "1"))
+  float BoardPlateOutlineAlpha = 0.9f;
+  /** Linear colours of the board plate (sRGB bytes through FLinearColor(FColor), alpha kept). */
+  FLinearColor BoardPlateFill() const { return FLinearColor(BoardPlateBackground); }
+  FLinearColor BoardPlateOutline(const FColor& TeamChip) const {
+    FLinearColor C(TeamChip);
+    C.A = FMath::Clamp(BoardPlateOutlineAlpha, 0.0f, 1.0f);
+    return C;
+  }
 };
+
+/** ENV-MAPS P4: stacked board-plate tags keep at least this gap (px) between each other and to the plate / icon /
+ *  damage number (S08ArtHud::FLabelPlacementInput::HardPadPx; 0 on grids). */
+namespace S08ArtHudBoardPlate {
+constexpr float TagHardPadPx = 3.0f;
+}  // namespace S08ArtHudBoardPlate
 
 /** W5b-R D-1: the damage number capsule (UI-HUD-DAMAGE proposal). */
 USTRUCT(BlueprintType)

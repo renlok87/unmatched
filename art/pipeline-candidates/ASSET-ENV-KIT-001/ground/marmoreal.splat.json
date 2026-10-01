@@ -4,12 +4,12 @@
  "tool": "tools/art/env_kit/ground_splat.py",
  "params": {
   "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/ground/ground-params.json",
-  "sha256": "f24d7364403f138b456338c423770d74b5f2194d5fe78996f39b94488cfa910e"
+  "sha256": "0acb86ad72b416cacc5a974ee6c452ce0452253fa2eb3f6bf9778d7beef5a96c"
  },
  "layout": {
   "path": "unreal/Unmatched/Config/ArtBoards/EnvLayouts/marmoreal.layout.json",
-  "propsSha256": "eb051998b75242a9d7ddf87546f664f79a52059371fea1cb2d294dc30307a229",
-  "props": 17
+  "propsSha256": "50baadba1844b4bd156b0589e67d8e6e4906ecae53df36fcc86776fd2484d7bc",
+  "props": 21
  },
  "tray": {
   "minX": -780.0,
@@ -36,7 +36,7 @@
   "base": "L0 Ground076 - dark earth (base; the cherry beds under a carpet of petals)",
   "R": "L1 Moss002 - moss under the cherries, round the cypresses, along the tray rim and the paving edge",
   "G": "L2 Grass005 - grass tufts in the outer W / E beds",
-  "B": "L3 Tiles143 - marble paving: palace terrace N, walkway round the frame, lamp / plinth pads"
+  "B": "L3 Tiles143 - marble paving: palace terrace N, walkway round the frame, lamp / plinth pads; a 1-tile curb band (aux.B edge) along its border to the earth / moss"
  },
  "accent": {
   "mode": "petals",
@@ -52,27 +52,63 @@
   "carpet": 0.55
  },
  "coverage": {
-  "L0": 0.2824,
-  "L1": 0.2309,
-  "L2": 0.0853,
-  "L3": 0.4014,
-  "accentMean": 0.2477,
+  "L0": 0.3185,
+  "L1": 0.2023,
+  "L2": 0.0729,
+  "L3": 0.4062,
+  "accentMean": 0.1968,
+  "water": 0.0,
+  "foam": 0.0,
+  "edge": 0.1179,
   "groundPixels": 273586
  },
  "seed": 1101,
  "png": {
   "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/ground/marmoreal.splat.png",
-  "sha256": "714a1e00845002a7b55733806c029ad429aff93000d17c3d615934b5947a03c8",
-  "bytes": 308988,
+  "sha256": "f2960b786cdd792b3644221661b81a36e3f655f72149ade108fcf5a7c5283a48",
+  "bytes": 280610,
   "format": "PNG RGBA8"
  },
+ "aux": {
+  "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/ground/marmoreal.aux.png",
+  "sha256": "b5f467eddab1d3b2da920163e8282cae8d260dddc32db4386b78e112855a8185",
+  "bytes": 63248,
+  "format": "PNG RGBA8",
+  "channels": {
+   "R": "water coverage (river mouths)",
+   "G": "foam (shore band, surf)",
+   "B": "edge band (Marmoreal curb / Sarpedon deck beam)",
+   "A": "1 + water depth * 254"
+  }
+ },
+ "rules": {
+  "note": "review gaps 10 / 13 (P4): noise-broken, blurred paving edge + 1-tile curb; petals masked round the cherries and the colonnade beds, global confetti x0.5",
+  "paveWarpUU": 18.0,
+  "paveMidUU": 8.0,
+  "paveFineUU": 4.0,
+  "paveSoftUU": 6.0,
+  "curbWidthUU": 24.0,
+  "curbSoftUU": 2.0,
+  "petalGlobal": 0.5,
+  "petalTreeRadiusUU": 85.0,
+  "petalDrift": 0.28,
+  "petalBeds": 0.5,
+  "blurUU": {
+   "R": 4.0,
+   "G": 4.0,
+   "B": 3.0,
+   "A": 3.0,
+   "E": 1.5
+  }
+ },
+ "waterfalls": [],
  "kit": [
   "kit: 14/14 build reports equal the KIT sizes (1 %) and keep the Tripo front (C:/tmp/wt-envmaps/art/pipeline-candidates/ASSET-ENV-KIT-001/20260930-tripo-h31/reports/assets)"
  ],
  "notes": [],
  "preview": {
   "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/ground/marmoreal.preview.png",
-  "sha256": "ba5109de06e09afb841e101f43ed8e5f625c9e6c32535465bb7dda5937390550",
+  "sha256": "3a4da0755a392bd7a16142046165f7ed8b0fce87c8210afbd0bd10f25806e2c7",
   "size": [
    820,
    1034

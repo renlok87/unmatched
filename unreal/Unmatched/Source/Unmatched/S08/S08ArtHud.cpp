@@ -446,7 +446,8 @@ FLabelPlacementResult ChooseLabelRect(const FLabelPlacementInput& In) {
     R.Rect = Rect;
     R.Candidate = Name;
     R.Ring = Ring;
-    R.HardArea = OverlapArea(Rect, In.Hard);
+    // ENV-MAPS P4: board plates keep HardPadPx to the hard rects (the padded rect is only the test, not the result)
+    R.HardArea = OverlapArea(In.HardPadPx > 0.0f ? Rect.Expand(In.HardPadPx) : Rect, In.Hard);
     R.SoftArea = OverlapArea(Rect, In.Soft);
     R.bBound = IsBoundTo(Rect.Center(), In.BindTarget, In.BindOthers);
     R.bHardClean = R.HardArea <= 0.5 && R.bBound;
@@ -530,7 +531,8 @@ FLabelPlacementResult ChooseLabelRect(const FLabelPlacementInput& In) {
 }
 
 FLabelPlacementInput MakeTagPlacementInput(const FVector2D& Viewport, const FVector2D& Size, const FS08ScreenRect& Owner,
-                                           const TArray<FS08ScreenRect>& Others, const TArray<FS08ScreenRect>& Hard) {
+                                           const TArray<FS08ScreenRect>& Others, const TArray<FS08ScreenRect>& Hard,
+                                           float HardPadPx) {
   FLabelPlacementInput In;
   In.Viewport = Viewport;
   In.Size = Size;
@@ -543,6 +545,7 @@ FLabelPlacementInput MakeTagPlacementInput(const FVector2D& Viewport, const FVec
   In.BindOthers = Others;
   In.bInset = true;
   In.NearRings = 2;
+  In.HardPadPx = FMath::Max(0.0f, HardPadPx);
   return In;
 }
 

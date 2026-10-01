@@ -255,6 +255,9 @@ struct FLabelPlacementInput {
   // (other figures) wins over searching further rings for a fully clean spot (T5.2/W5b-R G3: the Medusa tag went
   // out to ring 16, 98 px from Medusa and next to the Harpies 2 tag).
   int32 NearRings = 0;
+  // ENV-MAPS P4 (map-image board plates): a candidate counts as hard-clean only when the candidate grown by this many
+  // px on each side overlaps no hard rect, i.e. stacked board-plate tags keep a visible gap (0 = the old rule).
+  float HardPadPx = 0.0f;
 };
 
 struct FLabelPlacementResult {
@@ -290,9 +293,11 @@ FLabelPlacementResult ChooseLabelRect(const FLabelPlacementInput& In);
  *  is bound to it (centre strictly nearer Owner than any rect of Others), the other figures are soft obstacles, Hard
  *  holds the placed tags / icon / plate / damage number / HUD panels, the inset candidate is on and the search keeps
  *  to the first two rings when a bound hard-clean candidate exists there. The game mode and the tests use this one
- *  builder. */
+ *  builder. ENV-MAPS P4: HardPadPx > 0 (map-image board plates, S08ArtHudBoardPlate::TagHardPadPx) keeps that gap to
+ *  every hard rect. */
 FLabelPlacementInput MakeTagPlacementInput(const FVector2D& Viewport, const FVector2D& Size, const FS08ScreenRect& Owner,
-                                           const TArray<FS08ScreenRect>& Others, const TArray<FS08ScreenRect>& Hard);
+                                           const TArray<FS08ScreenRect>& Others, const TArray<FS08ScreenRect>& Hard,
+                                           float HardPadPx = 0.0f);
 
 struct FIconAnchorInput {
   FVector2D Viewport = FVector2D::ZeroVector;
@@ -488,6 +493,7 @@ struct FS08ArtHudRuntime {
   };
   TArray<FTagSlot> Tags;
   bool bTagsEnabled = false;          // -ArtPreview board with the UMG tag widgets (not -S08LegacyRender)
+  int8 BoardPlateTraced = -1;         // ENV-MAPS P4: last traced board-plate state of the tags (-1 = never)
   bool bTagNamesAll = false;          // -ArtPreviewTagNames=all
   FString LabelSignature;             // inputs of the last tag/icon/damage layout
   TObjectPtr<US08ArtDamageWidget> DamageWidget = nullptr;

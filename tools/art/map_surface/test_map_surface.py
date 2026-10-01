@@ -186,6 +186,141 @@ class CommittedManifests(unittest.TestCase):
             self.assertTrue(all(p.startswith("<mocks>/") for p in mocks), mocks)
             self.assertEqual(set(m["roots"]), {"scraped-data/derived/maps", "<mocks>"})
 
+    def test_k1_grade_is_the_profile_map_grade(self):
+        # ENV-MAPS P4: the mocks b / c and the MI are graded with the ENGINE grade (the light profile's mapGrade).
+        for key, m in self.manifests():
+            g = m["k1"]["grade_b_c"]
+            p = k1_mock.profile_map_grade(key)
+            for k in ("ev", "saturation", "lift", "mask_saturation", "lift_saturation"):
+                self.assertAlmostEqual(g[k], p[k], places=6, msg=f"{key} {k}")
+            self.assertEqual(g["tint_lin"], p["tint_lin"], key)
+            self.assertEqual(g["tint_lin_luma_normalised"], p["tint_lin"], key)
+            self.assertEqual(g["mask_inverse_tint_lin"], p["mask_inverse_tint_lin"], key)
+            self.assertIn("S08ArtBoardProfiles.json", g["source"])
+
+
+class EngineGrade(unittest.TestCase):
+    """ENV-MAPS P4: k1_mock._night = M_MapBoard graph v2 (ue_import_map_surface.py), profile grade reader."""
+
+    def setUp(self):
+        rng = np.random.default_rng(4)
+        self.c = rng.uniform(0.02, 0.9, size=(500, 3)).astype(np.float32)
+        self.g1 = {"ev": -0.35, "saturation": 0.75, "lift": 1.5, "tint_lin": [0.97, 1.0, 1.05]}
+
+    def test_profile_map_grade(self):
+        for key in ("marmoreal", "sarpedon"):
+            g = k1_mock.profile_map_grade(key)
+            self.assertGreater(g["mask_saturation"], 1.0, key)
+            self.assertGreaterEqual(g["lift_saturation"], 1.0, key)
+            self.assertEqual(len(g["mask_inverse_tint_lin"]), 3, key)
+            self.assertIn(f"{key}-original", g["source"])
+        with self.assertRaises(ValueError):
+            k1_mock.profile_map_grade("no-such-map")
+
+    def test_identity_terms_are_graph_v1(self):
+        # without the graph-v2 terms (or at identity) the grade is the pre-P4 formula exactly
+        light = (2.0 ** self.g1["ev"]) * np.asarray(self.g1["tint_lin"], np.float32)
+        lit = self.c * light
+        v1_inside = lit + self.g1["lift"] * self.c
+        got = k1_mock._night(self.c, np.ones(len(self.c), np.float32), self.g1)
+        np.testing.assert_allclose(got, v1_inside, rtol=1e-6, atol=1e-7)
+        ident = dict(self.g1, mask_saturation=1.0, lift_saturation=1.0, mask_inverse_tint_lin=[1.0, 1.0, 1.0])
+        np.testing.assert_allclose(k1_mock._night(self.c, np.ones(len(self.c), np.float32), ident), v1_inside,
+                                   rtol=1e-6, atol=1e-7)
+
+    def test_mask_terms_raise_chroma_inside_only(self):
+        g2 = dict(self.g1, mask_saturation=1.5, lift_saturation=1.6, mask_inverse_tint_lin=[1.0, 1.0, 1.0])
+        luma = k1_mock.LUMA
+        inside1 = k1_mock._night(self.c, np.ones(len(self.c), np.float32), self.g1)
+        inside2 = k1_mock._night(self.c, np.ones(len(self.c), np.float32), g2)
+        outside1 = k1_mock._night(self.c, np.zeros(len(self.c), np.float32), self.g1)
+        outside2 = k1_mock._night(self.c, np.zeros(len(self.c), np.float32), g2)
+        np.testing.assert_array_equal(outside1, outside2)  # outside the game mask nothing changes
+
+        def spread(x):
+            return np.abs(x - (x @ luma)[:, None]).sum(axis=1)
+        lit = self.c * (2.0 ** g2["ev"]) * np.asarray(g2["tint_lin"], np.float32)
+
+        def raw_sat(x, s):
+            y = (x @ luma)[:, None]
+            return y + (x - y) * s
+        # rows where neither saturated term clips at 0 (max(..., 0) is what keeps the colour valid)
+        unclipped = (raw_sat(lit, 1.5) > 0).all(axis=1) & (raw_sat(self.c, 1.6) > 0).all(axis=1)
+        self.assertGreater(int(unclipped.sum()), 100)
+        self.assertTrue((spread(inside2)[unclipped] >= spread(inside1)[unclipped] - 1e-6).all())
+        # luma is kept by the saturation (exactly where nothing clips at 0)
+        np.testing.assert_allclose((inside2 @ luma)[unclipped], (inside1 @ luma)[unclipped], rtol=1e-5, atol=1e-6)
+
+    def test_import_mi_params_follow_the_grade(self):
+        import ue_import_map_surface as imp
+        for key in ("marmoreal", "sarpedon"):
+            p = imp.mi_params(imp.load_manifest(key)["k1"]["grade_b_c"])
+            g = k1_mock.profile_map_grade(key)
+            self.assertEqual(p["scalar"], {"NightEV": g["ev"], "NightSaturation": g["saturation"], "Lift": g["lift"],
+                                           "MaskSaturation": g["mask_saturation"],
+                                           "LiftSaturation": g["lift_saturation"]})
+            self.assertEqual(p["vector"], {"NightTint": g["tint_lin"], "MaskInverseTint": g["mask_inverse_tint_lin"]})
+        # a pre-P4 grade (no graph-v2 keys) keeps the identity terms
+        p = imp.mi_params({"ev": -0.7, "saturation": 0.7, "lift": 0.35})
+        self.assertEqual((p["scalar"]["MaskSaturation"], p["scalar"]["LiftSaturation"], p["vector"]["MaskInverseTint"]),
+                         (1.0, 1.0, [1.0, 1.0, 1.0]))
+        self.assertEqual(imp.GRAPH_VERSION, "2")
+        for hlsl, names in ((imp.BASE_HLSL, ("MaskSaturation", "MaskInverseTint", "NightSaturation")),
+                            (imp.LIFT_HLSL, ("LiftSaturation", "Lift")),
+                            (imp.FRAME_WOOD_HLSL, ("FrameValueScale", "FrameSaturation")),
+                            (imp.CONTACT_SHADOW_HLSL, ("Strength", "Softness"))):
+            for name in names:
+                self.assertIn(name, hlsl)
+
+
+class ZoneSeparation(unittest.TestCase):
+    """ENV-MAPS P4: the pure parts of zone_separation.py (trace parsing, colour, pairs, camera)."""
+
+    def test_lab(self):
+        import zone_separation as zs
+        np.testing.assert_allclose(zs.lab(np.array([[255.0, 255.0, 255.0]]))[0], [100.0, 0.0, 0.0], atol=0.05)
+        np.testing.assert_allclose(zs.lab(np.array([[0.0, 0.0, 0.0]]))[0], [0.0, 0.0, 0.0], atol=1e-6)
+        x = np.linspace(0.0, 2.0, 50)
+        np.testing.assert_allclose(zs.aces_inv(zs.aces(x))[zs.aces(x) < 0.99], x[zs.aces(x) < 0.99], rtol=1e-6, atol=1e-6)
+
+    def test_trace_parsing(self):
+        import tempfile
+        import zone_separation as zs
+        v1 = ("2026.10.01-01.38.11 ARTPREVIEW map grade profile=marmoreal-night source=profile nightEV=-0.35 "
+              "nightSaturation=0.75 lift=1.50 nightTint=(0.9700,1.0000,1.0500)")
+        v2 = ("2026.10.02-01.00.00 ARTPREVIEW map grade profile=marmoreal-night source=profile nightEV=-0.35 "
+              "nightSaturation=0.75 lift=1.65 nightTint=(0.9700,1.0000,1.0500) maskSaturation=1.50 liftSaturation=1.60 "
+              "maskInverseTint=(0.9830,1.0100,0.9470) graph=v2 maskTerms=1")
+        ctx = ("2026.10.01-01.39.26 SHOT ctx viewport=1920x1080 viewTarget=CameraActor_0 cam=(0,1342,1917) rot=(-55,-90,-0)\n"
+               "2026.10.01-01.39.27 SHOT captured file=bench-K1-1920x1080.png frame=767\n")
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "t.log"
+            p.write_text(v1 + "\n" + ctx, encoding="utf-8")
+            g = zs.trace_grade(p)
+            self.assertEqual((g["lift"], g["mask_saturation"], g["mask_inverse_tint_lin"]), (1.5, 1.0, [1.0, 1.0, 1.0]))
+            self.assertEqual(zs.shot_camera(p, "bench-K1-1920x1080.png"), ([0.0, 1342.0, 1917.0], -55.0, -90.0))
+            p.write_text(v1 + "\n" + v2 + "\n", encoding="utf-8")
+            g = zs.trace_grade(p)  # the last line wins
+            self.assertEqual((g["lift"], g["mask_saturation"], g["lift_saturation"]), (1.65, 1.5, 1.6))
+            self.assertEqual(g["mask_inverse_tint_lin"], [0.983, 1.01, 0.947])
+            v2_on_v1 = v2.replace("graph=v2", "graph=v1")  # a graph-v1 material ignores the terms
+            p.write_text(v2_on_v1 + "\n", encoding="utf-8")
+            self.assertEqual(zs.trace_grade(p)["mask_saturation"], 1.0)
+
+    def test_pairs_and_camera(self):
+        import zone_separation as zs
+        zones = {"a": np.array([50.0, 0, 0]), "b": np.array([50.0, 3, 4]), "c": np.array([80.0, 0, 0])}
+        t = zs.pair_table(zones, [("a", "b")])
+        self.assertEqual(t["adjacent"], {"a-b": 5.0})
+        self.assertEqual(t["minAll"], ["a-b", 5.0])
+        self.assertEqual(t["all"]["a-c"], 30.0)
+        cam = zs.Cam([0.0, 1342.0, 1917.0], -55.0, -90.0)
+        xy = cam.project([[0.0, 0.0, 0.0]])[0]
+        self.assertAlmostEqual(xy[0], 960.0, delta=0.5)  # the board centre is on the optical axis (K1)
+        self.assertAlmostEqual(xy[1], 540.0, delta=1.0)
+        right = cam.project([[100.0, 0.0, 0.0]])[0]
+        self.assertGreater(right[0], xy[0])  # +X (east) is screen right
+
 
 if __name__ == "__main__":
     unittest.main()

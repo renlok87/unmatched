@@ -243,20 +243,29 @@
    ]
   },
   "grade_b_c": {
-   "ev": -0.7,
-   "saturation": 0.7,
-   "tint_srgb_mul": [
-    0.9,
+   "source": "unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json rev 11 board sarpedon-original light sarpedon-night mapGrade",
+   "ev": -0.35,
+   "saturation": 0.75,
+   "lift": 1.7,
+   "tint_lin": [
     0.97,
-    1.12
+    1.0,
+    1.05
    ],
-   "lift": 0.35,
    "tint_lin_luma_normalised": [
-    0.9317,
-    1.0042,
-    1.1595
+    0.97,
+    1.0,
+    1.05
    ],
-   "formula": "lit = albedo * 2^ev * tint; outside = desaturate(lit, saturation); inside = lit + lift * albedo (unlit / emissive share); mix by GameMask"
+   "mask_saturation": 1.05,
+   "lift_saturation": 1.1,
+   "mask_inverse_tint_lin": [
+    1.05,
+    0.996,
+    0.891
+   ],
+   "formula": "lit = albedo * 2^ev * tint_lin; outside = desaturate(lit, saturation); inside = saturate(lit * mask_inverse_tint_lin, mask_saturation) + lift * saturate(albedo, lift_saturation) (unlit / emissive share); mix by GameMask (= M_MapBoard graph v2, tools/art/map_surface/ue_import_map_surface.py)",
+   "note": "the mock lights the map with 2^ev * tint only (no key / moon-pool / sky lights, no tonemapper): same grade parameters as the engine, not the engine render"
   },
   "render": {
    "supersampling": 3,
@@ -272,28 +281,28 @@
    },
    "b": {
     "path": "<mocks>/sarpedon-b.png",
-    "bytes": 2312958,
-    "sha256": "7e0a256825c3e5621ecb6ae93abef05c1bea884981eb3a6af6e416fd19bbda00",
+    "bytes": 2411024,
+    "sha256": "9dd334f349792cdbe82e30a543a348b8482f99a73d253a6395e770fe00740c34",
     "width": 1920,
     "height": 1080
    },
    "c": {
     "path": "<mocks>/sarpedon-c.png",
-    "bytes": 2309452,
-    "sha256": "4c3f216b6ba93888f634fa6b3a47632a2138aa5b00c6e73cfa02d02b93d042f5",
+    "bytes": 2407169,
+    "sha256": "d0ddc62e0d809ece3216f79ad6d378cf4d26052ce1ad324a74cf724870b43c07",
     "width": 1920,
     "height": 1080
    },
    "ab_split": {
     "path": "<mocks>/sarpedon-ab-split.png",
-    "bytes": 2361272,
-    "sha256": "842ee7d9e13f2f436c2629f157482c41737835e24d8561e2075151a72ec16c5f"
+    "bytes": 2420739,
+    "sha256": "c19cfc9910826e49e1849f878b2f648254698b313adc58a2d77cf5f7cb1c1445"
    },
    "ab_ev": {
     "path": "<mocks>/sarpedon-ab-ev.png",
     "legend": "log2(b/a) luminance: blue = -1 EV, red = +0.2 EV",
-    "bytes": 1390969,
-    "sha256": "82097516dae32ecaf55a37de954a79f2fd1c635067d8fef097678f2f7eb33e23"
+    "bytes": 899419,
+    "sha256": "0e5b81d977385b0423d6cf05804e766b878798a3b7a788a02fefa17270c78325"
    }
   },
   "measurement": {
@@ -795,9 +804,9 @@
     }
    ],
    "grade_b_vs_a_ev": {
-    "inside_mask_median": -0.057,
-    "outside_mask_median": -0.708,
-    "inside_minus_outside": 0.651,
+    "inside_mask_median": 1.293,
+    "outside_mask_median": -0.356,
+    "inside_minus_outside": 1.649,
     "screen_px_inside": 567060,
     "screen_px_outside": 549881
    }

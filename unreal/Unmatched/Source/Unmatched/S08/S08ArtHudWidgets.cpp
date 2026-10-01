@@ -463,7 +463,7 @@ void US08ArtTagWidget::NativePreConstruct() {
 
 void US08ArtTagWidget::ApplyStyle() {
   if (TagBackground) {
-    TagBackground->SetBrushColor(FS08ArtHudPlateStyle::Linear(Style.Background));
+    if (!bBoardPlate) TagBackground->SetBrushColor(FS08ArtHudPlateStyle::Linear(Style.Background));
     TagBackground->SetPadding(Style.Padding);
   }
   if (ChipBox) {
@@ -491,6 +491,35 @@ void US08ArtTagWidget::ApplyDynamic() {
     NameText->SetVisibility(Mode == ES08TagMode::Full ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
   }
   if (HpFill) HpFill->SetWidthOverride(FMath::Max(1.0f, Style.BarWidthSu * HpFraction));
+  ApplyBackground();
+}
+
+FSlateBrush US08ArtTagWidget::MakeBoardPlateBrush(const FS08ArtHudTagStyle& InStyle, uint8 InTeamSlot) {
+  const FS08ArtHudPlateStyle Plate;
+  const FColor Accent = InTeamSlot ? Plate.TeamChipP2 : Plate.TeamChipP1;
+  return FSlateRoundedBoxBrush(InStyle.BoardPlateFill(), InStyle.BoardPlateCornerSu, InStyle.BoardPlateOutline(Accent),
+                               InStyle.BoardPlateOutlineSu);
+}
+
+void US08ArtTagWidget::ApplyBackground() {
+  if (!TagBackground) return;
+  if (bBoardPlate) {
+    // The fill / outline colours live in the brush; the border tint stays white so nothing multiplies them.
+    TagBackground->SetBrush(MakeBoardPlateBrush(Style, TeamSlot));
+    TagBackground->SetBrushColor(FLinearColor::White);
+    bBoardPlateBrush = true;
+  } else if (bBoardPlateBrush) {
+    // Back to the flat opaque tag of the grid boards (the code default tree's brush and colour).
+    TagBackground->SetBrush(S08WhiteBrush());
+    TagBackground->SetBrushColor(FS08ArtHudPlateStyle::Linear(Style.Background));
+    bBoardPlateBrush = false;
+  }
+}
+
+void US08ArtTagWidget::SetBoardPlate(bool bPlate) {
+  if (bBoardPlate == bPlate && bBoardPlateBrush == bPlate) return;
+  bBoardPlate = bPlate;
+  ApplyBackground();
 }
 
 void US08ArtTagWidget::SetTeamShapeBrushes(const FSlateBrush& Circle, const FSlateBrush& Hex) {

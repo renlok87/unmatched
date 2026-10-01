@@ -1,0 +1,59 @@
+{
+  "schema": "unmatched.env-prop-look/1",
+  "status": "предложено (ENV-MAPS P4 track B, 2026-10-01): measured on the committed BC textures by tools/art/env_kit/env_prop_look.py --check; UE frames and the warm-share measurement are the integrate stage's; художественная приёмка - решение пользователя",
+  "master": "/Game/EnvKit/Shared/M_EnvProp",
+  "notes": "Material-only fixes of the concept review (docs/game-design/evidence/ENV-MAPS/p2-frames-2026-10-01/concept-review.json) - no new or rewritten textures: the props listed here get MI_Env_<Name> parented to M_EnvProp (tools/art/env_kit/ue_import_env_kit.py), every other prop stays on M_UM_Figure as before. Windows are measured in sRGB HSV on the PNG values (hue deg, S, V in 0..1). Emissive is emissive-only light: no point light is added (1 key + <= 6 points per map unchanged). Emissive intensity is in the units of the map's emissive Lift (mapGrade.lift 1.5 on M_MapBoard): at the night profiles' fixed exposure (EV100 2.05, x ~0.2) an emissive texel of linear luminance L x intensity I shows ~0.2 L I before the tonemapper, so the lantern glass (L ~0.45) at I 6 lands at ~0.55 - 4x the map Lift (rank 13: 'x3-5 so bloom gives a halo').",
+  "soft": {"hueDeg": 8.0, "sv": 0.06},
+  "props": {
+    "Cherry": {
+      "gap": "concept-review rank 2 (quick win): blossom hue ~335-345, S ~0.35, V +20 %",
+      "region": {
+        "window": {"hueDeg": 340.0, "halfWidthDeg": 24.0, "satMin": 0.3, "valMin": 0.45},
+        "adjust": {"hueShiftDeg": 4.0, "satMul": 0.42, "valMul": 1.2}
+      },
+      "target": {"hueDeg": [335.0, 345.0], "sat": [0.22, 0.4], "valRatio": [1.12, 1.22], "regionFraction": [0.45, 0.7], "restValRatio": [0.995, 1.005]}
+    },
+    "Cypress": {
+      "gap": "concept-review rank 15: the red/magenta baubles darker and desaturated (no 'Christmas tree'), darker foliage",
+      "region": {
+        "window": {"hueDeg": 343.0, "halfWidthDeg": 20.0, "satMin": 0.42, "valMin": 0.45},
+        "adjust": {"hueShiftDeg": 0.0, "satMul": 0.4, "valMul": 0.45}
+      },
+      "rest": {"satMul": 0.85, "valMul": 0.78},
+      "target": {"sat": [0.2, 0.32], "valRatio": [0.4, 0.5], "regionFraction": [0.05, 0.15],
+                 "restValRatio": [0.74, 0.82], "restSatRatio": [0.8, 0.9]}
+    },
+    "Tree": {
+      "gap": "concept-review rank 7: MI_Env_Tree V -25 %, S -20 % (darker, quieter forest)",
+      "rest": {"satMul": 0.8, "valMul": 0.75},
+      "target": {"restValRatio": [0.72, 0.78], "restSatRatio": [0.77, 0.83]}
+    },
+    "LanternPlinth": {
+      "gap": "concept-review ranks 13 + 14: the amber lantern glass glows (emissive only) so bloom draws a halo",
+      "emissive": {
+        "window": {"hueDeg": 40.0, "halfWidthDeg": 14.0, "satMin": 0.45, "valMin": 0.6},
+        "colorLinear": [1.0, 0.62, 0.3],
+        "intensity": 6.0
+      },
+      "target": {"emissiveFraction": [0.04, 0.15], "emissiveMeanLuminance": [1.2, 2.5]}
+    },
+    "Campfire": {
+      "gap": "concept-review rank 14: warm emissive-only accent - the logs of both Sarpedon campfires smoulder (ember glow under the existing campfire point lights; the stone ring stays unlit)",
+      "emissive": {
+        "window": {"hueDeg": 25.0, "halfWidthDeg": 12.0, "satMin": 0.5, "valMin": 0.3},
+        "colorLinear": [1.0, 0.42, 0.12],
+        "intensity": 10.0
+      },
+      "target": {"emissiveFraction": [0.1, 0.25], "emissiveMeanLuminance": [0.3, 0.8]}
+    },
+    "Portal": {
+      "gap": "concept-review rank 14: warm emissive-only accent - the gilded door studs and trim of the palace portal glint (small, 2-3 % of the texels; the door wood itself is left to the portal-glow light)",
+      "emissive": {
+        "window": {"hueDeg": 40.0, "halfWidthDeg": 12.0, "satMin": 0.55, "valMin": 0.6},
+        "colorLinear": [1.0, 0.7, 0.38],
+        "intensity": 3.0
+      },
+      "target": {"emissiveFraction": [0.01, 0.05], "emissiveMeanLuminance": [0.3, 0.9]}
+    }
+  }
+}

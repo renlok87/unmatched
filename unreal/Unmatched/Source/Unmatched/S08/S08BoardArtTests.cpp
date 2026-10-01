@@ -1878,16 +1878,455 @@ bool FS08BoardArtMapAssetsTest::RunTest(const FString&) {
     UTexture* Bound = nullptr;
     TestTrue(B.Id + TEXT(": BaseColor bound"), Mi->GetTextureParameterValue(FHashedMaterialParameterInfo(S08MapSurfaceSpec::ParamBaseColor), Bound) && Bound == Bc);
     TestTrue(B.Id + TEXT(": GameMask bound"), Mi->GetTextureParameterValue(FHashedMaterialParameterInfo(S08MapSurfaceSpec::ParamGameMask), Bound) && Bound == Mask);
-    float Value = 0.0f;
-    TestTrue(B.Id + TEXT(": NightEV -0.7"), Mi->GetScalarParameterValue(FHashedMaterialParameterInfo(TEXT("NightEV")), Value) && FMath::IsNearlyEqual(Value, -0.7f, 1e-4f));
-    TestTrue(B.Id + TEXT(": NightSaturation 0.7"), Mi->GetScalarParameterValue(FHashedMaterialParameterInfo(TEXT("NightSaturation")), Value) && FMath::IsNearlyEqual(Value, 0.7f, 1e-4f));
-    TestTrue(B.Id + TEXT(": Lift 0.35"), Mi->GetScalarParameterValue(FHashedMaterialParameterInfo(TEXT("Lift")), Value) && FMath::IsNearlyEqual(Value, 0.35f, 1e-4f));
+    // ENV-MAPS P4: the MI carries the light profile's mapGrade (manifest k1.grade_b_c = k1_mock.profile_map_grade),
+    // incl. the M_MapBoard graph-v2 zone-separation terms; the board actor sets the same values on its MID.
+    const FS08LightProfile* Night = Data.LightFor(B);
+    if (!TestTrue(B.Id + TEXT(": night light profile with a mapGrade"), Night && Night->MapGrade.bSet)) continue;
+    const FS08MapGradeSpec& G = Night->MapGrade;
+    auto Scalar = [&](const TCHAR* Name, float Want) {
+      float Value = -1000.0f;
+      const bool bFound = Mi->GetScalarParameterValue(FHashedMaterialParameterInfo(Name), Value);
+      TestTrue(FString::Printf(TEXT("%s: MI %s %.3f == profile %.3f"), *B.Id, Name, Value, Want),
+               bFound && FMath::IsNearlyEqual(Value, Want, 1e-4f));
+    };
+    Scalar(S08MapSurfaceSpec::ParamNightEV, G.NightEV);
+    Scalar(S08MapSurfaceSpec::ParamNightSaturation, G.NightSaturation);
+    Scalar(S08MapSurfaceSpec::ParamLift, G.Lift);
+    Scalar(S08MapSurfaceSpec::ParamMaskSaturation, G.MaskSaturation);
+    Scalar(S08MapSurfaceSpec::ParamLiftSaturation, G.LiftSaturation);
     FLinearColor Tint;
     TestTrue(B.Id + TEXT(": NightTint"), Mi->GetVectorParameterValue(FHashedMaterialParameterInfo(TEXT("NightTint")), Tint));
+    FLinearColor Inverse(-1.0f, -1.0f, -1.0f);
+    const bool bInverse =
+        Mi->GetVectorParameterValue(FHashedMaterialParameterInfo(S08MapSurfaceSpec::ParamMaskInverseTint), Inverse);
+    TestTrue(FString::Printf(TEXT("%s: MaskInverseTint %s == profile %s (graph v2)"), *B.Id, *Inverse.ToString(),
+                             *G.MaskInverseTint.ToString()),
+             bInverse && FVector3f(Inverse.R, Inverse.G, Inverse.B)
+                             .Equals(FVector3f(G.MaskInverseTint.R, G.MaskInverseTint.G, G.MaskInverseTint.B), 1e-4f));
     const UMaterial* Base = Mi->GetMaterial();
     TestTrue(B.Id + TEXT(": lit surface material"), Base && Base->GetShadingModels().HasShadingModel(MSM_DefaultLit));
   }
   AddInfo(FString::Printf(TEXT("map-image profiles checked against imported assets: %d"), Checked));
+  // ENV-MAPS P4 readability materials (same import script): the frame wood is lit, the contact shadow an unlit
+  // modulate blob; both carry the parameters the board actor sets.
+  if (Checked > 0) {
+    const UMaterial* Wood = LoadObject<UMaterial>(nullptr, S08MapSurfaceSpec::FrameWoodMaterialPath, nullptr, LOAD_NoWarn);
+    const UMaterial* Blob = LoadObject<UMaterial>(nullptr, S08MapSurfaceSpec::ContactShadowMaterialPath, nullptr, LOAD_NoWarn);
+    float Probe = 0.0f;
+    if (TestNotNull("M_MapFrameWood imported", Wood)) {
+      TestTrue("M_MapFrameWood lit", Wood->GetShadingModels().HasShadingModel(MSM_DefaultLit));
+      TestTrue("M_MapFrameWood FrameValueScale / FrameSaturation",
+               Wood->GetScalarParameterValue(FHashedMaterialParameterInfo(S08MapSurfaceSpec::ParamFrameValueScale), Probe) &&
+                   Wood->GetScalarParameterValue(FHashedMaterialParameterInfo(S08MapSurfaceSpec::ParamFrameSaturation), Probe));
+    }
+    if (TestNotNull("M_MapContactShadow imported", Blob)) {
+      TestTrue("M_MapContactShadow unlit modulate", Blob->GetBlendMode() == BLEND_Modulate &&
+                                                       Blob->GetShadingModels().HasShadingModel(MSM_Unlit));
+      TestTrue("M_MapContactShadow Strength / Softness",
+               Blob->GetScalarParameterValue(FHashedMaterialParameterInfo(S08MapSurfaceSpec::ParamShadowStrength), Probe) &&
+                   Blob->GetScalarParameterValue(FHashedMaterialParameterInfo(S08MapSurfaceSpec::ParamShadowSoftness), Probe));
+    }
+  }
+  return true;
+}
+
+// ---- ENV-MAPS P4 readability (concept review 2026-10-01): map-image boards only, grids bit for bit -------------
+
+namespace S08ReadabilityTest {
+/** The map board's readability block of the tests (the shipped Marmoreal values). */
+const TCHAR* const Block = TEXT(
+    "\"readability\":{\"labelPlates\":true,\"leaderPip\":true,"
+    "\"reach\":{\"colorSrgb\":\"#FFC857\",\"strokeSrgb\":\"#14110C\",\"segments\":48,\"widthUU\":3.5,\"strokeUU\":1.0},"
+    "\"contactShadow\":{\"diameterUU\":64,\"strength\":0.5,\"softness\":0.55},"
+    "\"frameWood\":{\"valueScaleSrgb\":0.7,\"saturation\":0.75}},");
+
+FString MapDocWithReadability(const FString& Readability) {
+  FString Doc = S08MapTest::MapDoc();
+  Doc.ReplaceInline(S08MapTest::MapLightAnchor, *(FString(S08MapTest::MapLightAnchor) + Readability));
+  return Doc;
+}
+
+const UStaticMeshComponent* FindPart(const AActor* Actor, const TCHAR* Name) {
+  if (!Actor) return nullptr;
+  TInlineComponentArray<UStaticMeshComponent*> Parts(Actor);
+  for (const UStaticMeshComponent* Part : Parts) {
+    if (Part && Part->GetFName() == FName(Name)) return Part;
+  }
+  return nullptr;
+}
+}  // namespace S08ReadabilityTest
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08BoardArtReadabilityParserTest,
+    "Unmatched.S08.BoardArt.ReadabilityParser map-image readability block: parsed, optional, map-image only, ranges",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08BoardArtReadabilityParserTest::RunTest(const FString&) {
+  using namespace S08ReadabilityTest;
+  {
+    FS08BoardArtData Data;
+    TArray<FString> Errors;
+    if (!TestTrue(TEXT("map doc with readability parses: ") + FString::Join(Errors, TEXT(" | ")),
+                  Data.ParseJson(MapDocWithReadability(Block), Errors))) {
+      return false;
+    }
+    const FS08BoardArtProfile* Map = Data.Boards.FindByPredicate([](const FS08BoardArtProfile& B) { return B.Id == TEXT("map"); });
+    const FS08BoardArtProfile* Grid = Data.Boards.FindByPredicate([](const FS08BoardArtProfile& B) { return B.Id == TEXT("one"); });
+    if (TestNotNull("map profile", Map)) {
+      const FS08BoardReadabilitySpec& R = Map->Readability;
+      TestTrue("block set", R.bSet);
+      TestTrue("label plates + leader pip", R.bLabelPlates && R.bLeaderPip);
+      TestTrue("reach colour / stroke as sRGB bytes", R.bReach && S08ColorHex(R.ReachColor) == TEXT("#FFC857") &&
+                                                          S08ColorHex(R.ReachStroke) == TEXT("#14110C"));
+      TestTrue("reach 48 segments, width 3.5, stroke 1", R.ReachSegments == 48 &&
+                                                            FMath::IsNearlyEqual(R.ReachWidthUU, 3.5f) &&
+                                                            FMath::IsNearlyEqual(R.ReachStrokeUU, 1.0f));
+      TestTrue("contact shadow", R.bContactShadow && FMath::IsNearlyEqual(R.ShadowDiameterUU, 64.0f) &&
+                                     FMath::IsNearlyEqual(R.ShadowStrength, 0.5f) &&
+                                     FMath::IsNearlyEqual(R.ShadowSoftness, 0.55f));
+      TestTrue(FString::Printf(TEXT("frame wood V 0.7 -> linear %.4f (0.7^2.2 = 0.4563)"), R.FrameValueScaleLinear()),
+               R.bFrameWood && FMath::IsNearlyEqual(R.FrameValueScaleLinear(), 0.4563f, 1e-3f) &&
+                   FMath::IsNearlyEqual(R.FrameSaturation, 0.75f));
+    }
+    TestTrue("the grid profile has no readability block", Grid && !Grid->Readability.bSet && !Grid->Readability.bLabelPlates);
+  }
+  {
+    // absent block = all off; a partial block switches on only what it names
+    FS08BoardArtData Data;
+    TArray<FString> Errors;
+    TestTrue("map doc without readability parses", Data.ParseJson(S08MapTest::MapDoc(), Errors));
+    const FS08BoardArtProfile* Map = Data.Boards.FindByPredicate([](const FS08BoardArtProfile& B) { return B.Id == TEXT("map"); });
+    TestTrue("absent block: off", Map && !Map->Readability.bSet && !Map->Readability.bReach &&
+                                      !Map->Readability.bContactShadow && !Map->Readability.bLeaderPip &&
+                                      !Map->Readability.bFrameWood && !Map->Readability.bLabelPlates);
+    FS08BoardArtData Partial;
+    TestTrue("partial block parses",
+             Partial.ParseJson(MapDocWithReadability(TEXT("\"readability\":{\"labelPlates\":true},")), Errors));
+    const FS08BoardArtProfile* P = Partial.Boards.FindByPredicate([](const FS08BoardArtProfile& B) { return B.Id == TEXT("map"); });
+    TestTrue("partial: only the label plates", P && P->Readability.bSet && P->Readability.bLabelPlates &&
+                                                   !P->Readability.bReach && !P->Readability.bContactShadow &&
+                                                   !P->Readability.bLeaderPip && !P->Readability.bFrameWood);
+  }
+  auto Expect = [this](const FString& Name, const FString& Doc, const FString& ErrorPart) {
+    FS08BoardArtData Broken;
+    TArray<FString> Errs;
+    TestFalse(Name + TEXT(": rejected"), Broken.ParseJson(Doc, Errs));
+    TestTrue(Name + TEXT(": reason '") + ErrorPart + TEXT("' in ") + FString::Join(Errs, TEXT(" | ")),
+             FString::Join(Errs, TEXT(" | ")).Contains(ErrorPart));
+  };
+  {
+    // grids never carry it (Cobble and the art fixtures stay bit for bit)
+    FString OnGrid = S08MapTest::MapDoc();
+    TestTrue("grid anchor present", OnGrid.Contains(TEXT("\"surface\":\"tiles\",")));
+    OnGrid.ReplaceInline(TEXT("\"surface\":\"tiles\","), TEXT("\"surface\":\"tiles\",\"readability\":{\"labelPlates\":true},"));
+    Expect(TEXT("readability on a grid"), OnGrid, TEXT("readability is for map-image boards only"));
+  }
+  auto Bad = [&](const FString& Name, const TCHAR* From, const TCHAR* To, const TCHAR* ErrorPart) {
+    FString B = Block;
+    TestTrue(Name + TEXT(": patch applies"), B.Contains(From));
+    B.ReplaceInline(From, To);
+    Expect(Name, MapDocWithReadability(B), ErrorPart);
+  };
+  Bad(TEXT("segments 8"), TEXT("\"segments\":48"), TEXT("\"segments\":8"), TEXT("readability.reach"));
+  Bad(TEXT("segments 47.5"), TEXT("\"segments\":48"), TEXT("\"segments\":47.5"), TEXT("readability.reach"));
+  Bad(TEXT("colour name"), TEXT("\"colorSrgb\":\"#FFC857\""), TEXT("\"colorSrgb\":\"gold\""), TEXT("readability.reach"));
+  Bad(TEXT("ring off the circle"), TEXT("\"widthUU\":3.5,\"strokeUU\":1.0"), TEXT("\"widthUU\":6,\"strokeUU\":3"),
+      TEXT("between r 30 and r 40"));
+  Bad(TEXT("shadow diameter 500"), TEXT("\"diameterUU\":64"), TEXT("\"diameterUU\":500"), TEXT("readability.contactShadow"));
+  Bad(TEXT("shadow strength 1.5"), TEXT("\"strength\":0.5"), TEXT("\"strength\":1.5"), TEXT("readability.contactShadow"));
+  Bad(TEXT("frame V 0.1"), TEXT("\"valueScaleSrgb\":0.7"), TEXT("\"valueScaleSrgb\":0.1"), TEXT("readability.frameWood"));
+  Bad(TEXT("label plates not a bool"), TEXT("\"labelPlates\":true"), TEXT("\"labelPlates\":\"yes\""),
+      TEXT("readability.labelPlates"));
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08BoardArtMapGradeMaskTermsTest,
+    "Unmatched.S08.BoardArt.MapGradeMaskTerms mapGrade maskSaturation / liftSaturation / maskInverseTintLinear (identity default, ranges)",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08BoardArtMapGradeMaskTermsTest::RunTest(const FString&) {
+  auto Doc = [](const FString& Grade) {
+    FString D = MinimalDoc;
+    D.ReplaceInline(TEXT("\"L\":{"), *(TEXT("\"L\":{\"mapGrade\":{") + Grade + TEXT("},")));
+    return D;
+  };
+  const FString Base = TEXT("\"nightEV\":-0.35,\"nightSaturation\":0.75,\"lift\":1.65");
+  {
+    FS08BoardArtData Data;
+    TArray<FString> Errors;
+    TestTrue(TEXT("grade without mask terms: ") + FString::Join(Errors, TEXT(" | ")), Data.ParseJson(Doc(Base), Errors));
+    const FS08LightProfile* L = Data.Lights.Find(TEXT("L"));
+    TestTrue("identity mask terms by default", L && L->MapGrade.bSet && !L->MapGrade.HasMaskTerms() &&
+                                                   L->MapGrade.MaskSaturation == 1.0f && L->MapGrade.LiftSaturation == 1.0f &&
+                                                   L->MapGrade.MaskInverseTint == FLinearColor::White);
+  }
+  {
+    FS08BoardArtData Data;
+    TArray<FString> Errors;
+    const FString Terms =
+        Base + TEXT(",\"maskSaturation\":1.5,\"liftSaturation\":1.6,\"maskInverseTintLinear\":[0.983,1.01,0.947]");
+    TestTrue(TEXT("grade with mask terms: ") + FString::Join(Errors, TEXT(" | ")), Data.ParseJson(Doc(Terms), Errors));
+    const FS08LightProfile* L = Data.Lights.Find(TEXT("L"));
+    TestTrue("mask terms parsed", L && L->MapGrade.HasMaskTerms() && FMath::IsNearlyEqual(L->MapGrade.MaskSaturation, 1.5f) &&
+                                      FMath::IsNearlyEqual(L->MapGrade.LiftSaturation, 1.6f) &&
+                                      FMath::IsNearlyEqual(L->MapGrade.MaskInverseTint.B, 0.947f) &&
+                                      FMath::IsNearlyEqual(L->MapGrade.Lift, 1.65f));
+  }
+  for (const TCHAR* BadTerm : {TEXT(",\"maskSaturation\":4"), TEXT(",\"liftSaturation\":-1"),
+                               TEXT(",\"maskInverseTintLinear\":[1,1]"), TEXT(",\"maskSaturation\":\"high\"")}) {
+    FS08BoardArtData Data;
+    TArray<FString> Errors;
+    Data.ParseJson(Doc(Base + BadTerm), Errors);
+    TestFalse(FString::Printf(TEXT("%s: profile rejected"), BadTerm), Data.Lights.Contains(TEXT("L")));
+    TestTrue(FString::Printf(TEXT("%s: reason in %s"), BadTerm, *FString::Join(Errors, TEXT(" | "))),
+             FString::Join(Errors, TEXT(" | ")).Contains(TEXT("mapGrade optional")));
+  }
+  // The shipped night profiles carry the P4 zone-separation terms (maskSaturation > 1 inside the game mask).
+  FS08BoardArtData Shipped;
+  TArray<FString> Errors;
+  if (TestTrue("shipped data", LoadShipped(Shipped, Errors))) {
+    for (const TCHAR* Id : {TEXT("marmoreal-night"), TEXT("sarpedon-night")}) {
+      const FS08LightProfile* L = Shipped.Lights.Find(Id);
+      TestTrue(FString::Printf(TEXT("%s: mask terms set (maskSaturation %.2f > 1, liftSaturation %.2f >= 1)"), Id,
+                               L ? L->MapGrade.MaskSaturation : 0.0f, L ? L->MapGrade.LiftSaturation : 0.0f),
+               L && L->MapGrade.bSet && L->MapGrade.HasMaskTerms() && L->MapGrade.MaskSaturation > 1.0f &&
+                   L->MapGrade.LiftSaturation >= 1.0f);
+    }
+    for (const TPair<FString, FS08LightProfile>& Light : Shipped.Lights) {
+      if (Light.Key.EndsWith(TEXT("-night"))) continue;
+      TestFalse(Light.Key + TEXT(": grid light profiles carry no map grade"), Light.Value.MapGrade.bSet);
+    }
+  }
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08BoardArtReadabilityGeometryTest,
+    "Unmatched.S08.BoardArt.ReadabilityGeometry reach ring + stroke, leader pip and contact shadow stay between the team ring and the painted rim",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08BoardArtReadabilityGeometryTest::RunTest(const FString&) {
+  using namespace S08MapSurfaceSpec;
+  // 1) without a reach block: exactly the 12-piece default ring, no stroke (the pre-P4 map ring, bit for bit)
+  {
+    FS08BoardReadabilitySpec Off;
+    TArray<FTransform> Fill, Stroke, Legacy;
+    S08ReachRingPieces(Off, Fill, Stroke);
+    S08RingPieces(RingRadiusUU, RingWidthUU, RingSegments, RingZ, RingDepth, Legacy);
+    bool bSame = Fill.Num() == Legacy.Num();
+    for (int32 I = 0; bSame && I < Fill.Num(); ++I) bSame = Fill[I].Equals(Legacy[I], 0.0);
+    TestTrue("no reach block: the default 12-piece ring exactly", bSame && Fill.Num() == 12);
+    TestEqual("no reach block: no stroke", Stroke.Num(), 0);
+  }
+  // 2) the readability ring: 48 fill + 48 stroke pieces, between the team ring and the painted rim, stroke under fill
+  FS08BoardReadabilitySpec On;
+  On.bSet = On.bReach = true;
+  TArray<FTransform> Fill, Stroke;
+  S08ReachRingPieces(On, Fill, Stroke);
+  TestEqual("48 fill pieces", Fill.Num(), 48);
+  TestEqual("48 stroke pieces", Stroke.Num(), 48);
+  auto Reach = [](const TArray<FTransform>& Pieces, double& OutInner, double& OutOuter, double& OutTop, double& OutBottom) {
+    OutInner = TNumericLimits<double>::Max();
+    OutOuter = 0.0;
+    OutTop = -TNumericLimits<double>::Max();
+    OutBottom = TNumericLimits<double>::Max();
+    for (const FTransform& Piece : Pieces) {
+      for (const FVector& C : {FVector(-50, -50, 50), FVector(50, -50, 50), FVector(50, 50, -50), FVector(-50, 50, -50)}) {
+        const FVector P = Piece.TransformPosition(C);
+        OutOuter = FMath::Max(OutOuter, FVector2D(P).Size());
+        OutTop = FMath::Max(OutTop, P.Z);
+        OutBottom = FMath::Min(OutBottom, P.Z);
+      }
+      OutInner = FMath::Min(OutInner, FVector2D(Piece.TransformPosition(FVector(0, -50, 0))).Size());
+      OutInner = FMath::Min(OutInner, FVector2D(Piece.TransformPosition(FVector(0, 50, 0))).Size());
+    }
+  };
+  double FillIn = 0.0, FillOut = 0.0, FillTop = 0.0, FillBottom = 0.0;
+  double StrokeIn = 0.0, StrokeOut = 0.0, StrokeTop = 0.0, StrokeBottom = 0.0;
+  Reach(Fill, FillIn, FillOut, FillTop, FillBottom);
+  Reach(Stroke, StrokeIn, StrokeOut, StrokeTop, StrokeBottom);
+  TestTrue(FString::Printf(TEXT("stroke outer %.2f < painted rim 41.6 - 1"), StrokeOut), StrokeOut < 40.6);
+  TestTrue(FString::Printf(TEXT("stroke inner %.2f > team ring outer %.1f + 1"), StrokeIn, S08TeamRingSpec::P1RimOut1),
+           StrokeIn > S08TeamRingSpec::P1RimOut1 + 1.0);
+  TestTrue(FString::Printf(TEXT("stroke wider than the fill on both sides (%.2f..%.2f vs %.2f..%.2f)"), StrokeIn, StrokeOut,
+                           FillIn, FillOut),
+           StrokeIn < FillIn - 0.5 && StrokeOut > FillOut + 0.5);
+  TestTrue(FString::Printf(TEXT("stroke top %.2f under the fill top %.2f, bottom %.2f above the team ring %.1f"), StrokeTop,
+                           FillTop, StrokeBottom, S08TeamRingSpec::ZMax),
+           StrokeTop < FillTop && StrokeBottom > S08TeamRingSpec::ZMax);
+  // 3) leader pip: near side (+Y), just outside the team ring, inside the painted rim, keyline under the fill
+  for (const float Scale : {1.0f, S08TeamRingSpec::SidekickScale}) {
+    FTransform Pip, Key;
+    S08LeaderPipTransforms(S08TeamRingSpec::P1RimOut1, Scale, Pip, Key);
+    const double Radius = Pip.GetTranslation().Y;
+    TestTrue(FString::Printf(TEXT("scale %.2f: pip on the near side, centre r %.2f = ring %.2f + gap"), Scale, Radius,
+                             S08TeamRingSpec::P1RimOut1 * Scale),
+             FMath::IsNearlyZero(Pip.GetTranslation().X) &&
+                 FMath::IsNearlyEqual(Radius, S08TeamRingSpec::P1RimOut1 * Scale + LeaderPipGapUU, 1e-3));
+    const double KeyHalfDiag = Key.GetScale3D().X * 50.0 * UE_SQRT_2;
+    TestTrue(FString::Printf(TEXT("scale %.2f: pip reach %.2f inside the painted rim 41.6"), Scale, Radius + KeyHalfDiag),
+             Radius + KeyHalfDiag < 41.6);
+    TestTrue(FString::Printf(TEXT("scale %.2f: pip inner edge %.2f clear of the team ring %.2f"), Scale,
+                             Radius - KeyHalfDiag, S08TeamRingSpec::P1RimOut1 * Scale),
+             Radius - KeyHalfDiag > S08TeamRingSpec::P1RimOut1 * Scale - 0.01);
+    const double PipTop = Pip.GetTranslation().Z + Pip.GetScale3D().Z * 50.0;
+    const double KeyTop = Key.GetTranslation().Z + Key.GetScale3D().Z * 50.0;
+    TestTrue("pip fill above its keyline", PipTop > KeyTop && Key.GetScale3D().X > Pip.GetScale3D().X);
+    TestTrue("pip turned 45 deg (diamond)", FMath::IsNearlyEqual(Pip.Rotator().Yaw, 45.0, 1e-3));
+  }
+  // 4) contact shadow: between the map plane and the team ring, shifted along the key light, scaled with the ring
+  FS08BoardReadabilitySpec Shadow;
+  Shadow.bContactShadow = true;
+  const FTransform Hero = S08ContactShadowTransform(Shadow, 1.0f);
+  const FTransform Side = S08ContactShadowTransform(Shadow, S08TeamRingSpec::SidekickScale);
+  TestTrue(FString::Printf(TEXT("blob z %.2f between the map plane %.1f and the team ring %.1f"), Hero.GetTranslation().Z,
+                           PlaneZ, S08TeamRingSpec::ZMin),
+           Hero.GetTranslation().Z > PlaneZ && Hero.GetTranslation().Z < S08TeamRingSpec::ZMin);
+  TestTrue("blob 64 uu at ring scale 1", FMath::IsNearlyEqual(Hero.GetScale3D().X, 0.64, 1e-4));
+  TestTrue("blob shifted to +X / +Y (the key light falls from W-NW)", Hero.GetTranslation().X > 0.0 && Hero.GetTranslation().Y > 0.0);
+  TestTrue("sidekick blob scaled 0.78", FMath::IsNearlyEqual(Side.GetScale3D().X, 0.64 * S08TeamRingSpec::SidekickScale, 1e-4));
+  // 5) the shipped data: only the two map-image boards carry the block, warm reach colour, darker frame
+  FS08BoardArtData Shipped;
+  TArray<FString> Errors;
+  if (TestTrue("shipped data", LoadShipped(Shipped, Errors))) {
+    int32 Maps = 0;
+    for (const FS08BoardArtProfile& B : Shipped.Boards) {
+      if (B.Surface != ES08BoardSurface::MapImage) {
+        TestFalse(B.Id + TEXT(": grids carry no readability block"), B.Readability.bSet);
+        continue;
+      }
+      ++Maps;
+      const FS08BoardReadabilitySpec& R = B.Readability;
+      TestTrue(B.Id + TEXT(": readability block with label plates, reach, contact shadow, leader pip, frame wood"),
+               R.bSet && R.bLabelPlates && R.bReach && R.bContactShadow && R.bLeaderPip && R.bFrameWood);
+      TestTrue(FString::Printf(TEXT("%s: reach >= 48 segments (%d)"), *B.Id, R.ReachSegments), R.ReachSegments >= 48);
+      // not the mint green of the default ring: a warm colour (R > G > B) with a dark stroke
+      TestTrue(FString::Printf(TEXT("%s: warm reach colour %s, dark stroke %s"), *B.Id, *S08ColorHex(R.ReachColor),
+                               *S08ColorHex(R.ReachStroke)),
+               R.ReachColor.R > R.ReachColor.G && R.ReachColor.G > R.ReachColor.B &&
+                   R.ReachStroke.R + R.ReachStroke.G + R.ReachStroke.B < 120);
+      TestTrue(FString::Printf(TEXT("%s: frame darker (V x %.2f, about -30 %%)"), *B.Id, R.FrameValueScaleSrgb),
+               R.FrameValueScaleSrgb >= 0.6f && R.FrameValueScaleSrgb <= 0.8f && R.FrameSaturation < 1.0f);
+    }
+    TestEqual("two map-image profiles with readability", Maps, 2);
+  }
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08BoardArtReadabilityActorTest,
+    "Unmatched.S08.BoardArt.ReadabilityActor map-image board: blob + leader pip on the fighters, label plates, frame wood; grey / grid boards none",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08BoardArtReadabilityActorTest::RunTest(const FString&) {
+  using namespace S08MapTest;
+  using namespace S08ReadabilityTest;
+  UWorld* World = UWorld::CreateWorld(EWorldType::Game, false, FName(TEXT("S08BoardArtReadabilityActor")));
+  if (!TestNotNull("test world", World)) return false;
+  FWorldContext& Context = GEngine->CreateNewWorldContext(EWorldType::Game);
+  Context.SetCurrentWorld(World);
+  auto Fighters = [](const FS08BoardModel& Board) {
+    TArray<FS08BoardFighter> Out;
+    for (int32 Y = 0; Y < Board.Height && Out.Num() < 2; ++Y) {
+      for (int32 X = 0; X < Board.Width && Out.Num() < 2; ++X) {
+        if (!Board.IsBoardSpace(X, Y)) continue;
+        FS08BoardFighter F;
+        F.Id = Out.Num() == 0 ? TEXT("f-0-hero") : TEXT("f-0-sk0");
+        F.OwnerId = TEXT("host");
+        F.Name = Out.Num() == 0 ? TEXT("Medusa") : TEXT("Harpies");
+        F.Label = F.Name;
+        F.bIsHero = Out.Num() == 0;
+        F.Health = F.MaxHealth = 7;
+        F.X = X;
+        F.Y = Y;
+        Out.Add(F);
+      }
+    }
+    return Out;
+  };
+  // 1) grey topology view (no art data), a grid, and a refused map-image profile: no readability, no parts
+  FS08BoardModel Topo;
+  if (TestTrue("synthetic topology board", SyntheticTopology(Topo))) {
+    AS08BoardActor* Grey = World->SpawnActor<AS08BoardActor>(AS08BoardActor::StaticClass(), FVector::ZeroVector,
+                                                             FRotator::ZeroRotator);
+    if (TestNotNull("board actor (grey)", Grey)) {
+      TestTrue("rebuild", Grey->Rebuild(Topo));
+      TestNull("grey: no active readability", Grey->GetActiveReadability());
+      TestFalse("grey: no label plates", Grey->UsesLabelPlates());
+      Grey->SyncFighters(Topo, Fighters(Topo), TEXT("host"));
+      const AS08FighterActor* Hero = Grey->FindFighterActor(TEXT("f-0-hero"));
+      TestTrue("grey: no blob / pip on the hero",
+               Hero && !FindPart(Hero, TEXT("MapContactShadow")) && !FindPart(Hero, TEXT("MapLeaderPip")));
+      FS08BoardArtData Data;
+      TArray<FString> Errors;
+      if (TestTrue("readability doc", Data.ParseJson(MapDocWithReadability(Block), Errors))) {
+        Grey->SetArtDataForTest(Data);
+        // a 3x2 grid matching the grid profile "one": the readability block of the map board never applies
+        FS08BoardModel Grid = MakeBoard(3, 2);
+        for (FS08Cell& Cell : Grid.Cells) Cell.Zones = {Cell.X == 0 ? TEXT("a") : TEXT("b")};
+        TestTrue("rebuild grid", Grey->Rebuild(Grid));
+        TestNull("grid: no active readability", Grey->GetActiveReadability());
+        TestFalse("grid: no label plates", Grey->UsesLabelPlates());
+        // the map profile refused (assets missing): no readability either
+        Grey->SetRoomBoardId(TEXT("cidMap"));
+        TestTrue("rebuild topology (assets missing)", Grey->Rebuild(Topo));
+        TestFalse("refused map-image", Grey->IsMapImageActive());
+        TestNull("refused map-image: no active readability", Grey->GetActiveReadability());
+      }
+      Grey->Destroy();
+    }
+  }
+  // 2) the shipped Marmoreal profile once the map import ran: the block is active on the board and on the fighters
+  FS08BoardArtData Shipped;
+  TArray<FString> Errors;
+  if (TestTrue("shipped data", LoadShipped(Shipped, Errors))) {
+    const FS08BoardArtProfile* Marmoreal =
+        Shipped.Boards.FindByPredicate([](const FS08BoardArtProfile& B) { return B.Id == TEXT("marmoreal-original"); });
+    TSharedPtr<FJsonValue> State;
+    TSharedPtr<FJsonObject> Root;
+    FString BoardId;
+    FS08BoardModel Board;
+    const bool bBoard = TopologyBoardState(FPaths::Combine(TopologyFixtureDir(), TEXT("marmoreal.topology.json")), State,
+                                           BoardId, Root) &&
+                        Board.Decode(State);
+    if (!Marmoreal || !bBoard) {
+      AddError(TEXT("marmoreal-original profile or fixture missing"));
+    } else if (!FPackageName::DoesPackageExist(Marmoreal->Map.MaterialInstancePath)) {
+      AddWarning(TEXT("map assets not imported: run tools/art/map_surface/ue_import_map_surface.py (ENV-U3: out of git); ")
+                 TEXT("the map-image readability path of this test was NOT exercised"));
+    } else {
+      AS08BoardActor* Map = World->SpawnActor<AS08BoardActor>(AS08BoardActor::StaticClass(), FVector::ZeroVector,
+                                                              FRotator::ZeroRotator);
+      if (TestNotNull("board actor (map-image)", Map)) {
+        Map->SetArtDataForTest(Shipped);
+        Map->SetRoomBoardId(BoardId);
+        TestTrue("rebuild Marmoreal", Map->Rebuild(Board));
+        const FS08BoardReadabilitySpec* R = Map->GetActiveReadability();
+        TestTrue("active readability = the profile block", R && R->bLabelPlates && R->bReach && R->bLeaderPip);
+        TestTrue("label plates on", Map->UsesLabelPlates());
+        const bool bWood = FPackageName::DoesPackageExist(TEXT("/Game/EnvMaps/M_MapFrameWood"));
+        TestEqual("frame wood source", Map->GetMapFrameWoodSource(), FString(bWood ? TEXT("frame-wood") : TEXT("missing")));
+        Map->SyncFighters(Board, Fighters(Board), TEXT("host"));
+        const AS08FighterActor* Hero = Map->FindFighterActor(TEXT("f-0-hero"));
+        const AS08FighterActor* Side = Map->FindFighterActor(TEXT("f-0-sk0"));
+        TestTrue("the hero has the leader pip + keyline", Hero && FindPart(Hero, TEXT("MapLeaderPip")) &&
+                                                             FindPart(Hero, TEXT("MapLeaderPipKeyline")));
+        TestTrue("the sidekick has no leader pip", Side && !FindPart(Side, TEXT("MapLeaderPip")));
+        if (FPackageName::DoesPackageExist(TEXT("/Game/EnvMaps/M_MapContactShadow"))) {
+          TestTrue("hero and sidekick stand on a contact shadow",
+                   FindPart(Hero, TEXT("MapContactShadow")) && FindPart(Side, TEXT("MapContactShadow")));
+        } else {
+          AddWarning(TEXT("M_MapContactShadow not imported (ue_import_map_surface.py): the blob part was NOT checked"));
+        }
+        // a second sync keeps one part each (no duplicates)
+        Map->SyncFighters(Board, Fighters(Board), TEXT("host"));
+        int32 Pips = 0;
+        if (Hero) {
+          TInlineComponentArray<UStaticMeshComponent*> Parts(Hero);
+          for (const UStaticMeshComponent* Part : Parts) Pips += (Part && Part->GetFName() == FName(TEXT("MapLeaderPip"))) ? 1 : 0;
+        }
+        TestEqual("one leader pip after a resync", Pips, 1);
+        // reachable readability rings around the sidekick's space: no crash, traced
+        if (Side) Map->SetSelectedFighter(TEXT("f-0-hero"), {FS08BoardModel::CellKey(Side->GetFighter().X, Side->GetFighter().Y)});
+        Map->Destroy();
+      }
+    }
+  }
+  GEngine->DestroyWorldContext(World);
+  World->DestroyWorld(false);
   return true;
 }
 

@@ -248,6 +248,62 @@ class CommittedFixtures(unittest.TestCase):
         del lp["fog"], lp["mapGrade"]
         self.assertEqual(F.check_night_blocks("marmoreal-night", lp), [])
 
+    def test_map_grade_mask_terms(self):
+        # ENV-MAPS P4 (rev 10): the night grades carry the M_MapBoard graph-v2 mask terms; bad ones are reported.
+        profiles = json.loads(F.DEFAULT_PROFILES.read_text(encoding="utf-8"))
+        for lid in ("marmoreal-night", "sarpedon-night"):
+            g = profiles["lightProfiles"][lid]["mapGrade"]
+            self.assertGreater(g["maskSaturation"], 1.0)
+            self.assertGreaterEqual(g["liftSaturation"], 1.0)
+            self.assertEqual(len(g["maskInverseTintLinear"]), 3)
+        lp = json.loads(json.dumps(profiles["lightProfiles"]["sarpedon-night"]))
+        for key, bad in (("maskSaturation", 4), ("liftSaturation", -1), ("maskInverseTintLinear", [1, 1]),
+                         ("maskSaturation", True)):
+            lp2 = json.loads(json.dumps(lp))
+            lp2["mapGrade"][key] = bad
+            self.assertTrue(any("mapGrade optional" in e for e in F.check_night_blocks("x", lp2)), (key, bad))
+        for key in ("maskSaturation", "liftSaturation", "maskInverseTintLinear"):
+            del lp["mapGrade"][key]
+        self.assertEqual(F.check_night_blocks("x", lp), [])  # identity when absent
+
+    def test_readability_blocks(self):
+        # ENV-MAPS P4: the readability block is on the two map-image boards only and passes the C++ parser rules.
+        profiles = json.loads(F.DEFAULT_PROFILES.read_text(encoding="utf-8"))
+        with_block = sorted(b["id"] for b in profiles["boards"] if "readability" in b)
+        self.assertEqual(with_block, ["marmoreal-original", "sarpedon-original"])
+        for b in profiles["boards"]:
+            self.assertEqual(F.check_readability_block(b["id"], b), [])
+            if "readability" in b:
+                r = b["readability"]
+                self.assertTrue(r["labelPlates"] and r["leaderPip"])
+                self.assertGreaterEqual(r["reach"]["segments"], 48)
+                rgb = [int(r["reach"]["colorSrgb"][i:i + 2], 16) for i in (1, 3, 5)]
+                self.assertTrue(rgb[0] > rgb[1] > rgb[2], "warm reach colour (not the mint green)")
+                self.assertAlmostEqual(r["frameWood"]["valueScaleSrgb"], 0.7, delta=0.1)
+        grid = json.loads(json.dumps(next(b for b in profiles["boards"] if b["id"] == "cobble-city")))
+        grid["readability"] = {"labelPlates": True}
+        self.assertEqual(F.check_readability_block("cobble-city", grid),
+                         ["board cobble-city: readability is for map-image boards only"])
+        mp = json.loads(json.dumps(next(b for b in profiles["boards"] if b["id"] == "marmoreal-original")))
+        cases = (
+            (("reach", "segments"), 8, "readability.reach"),
+            (("reach", "segments"), 47.5, "readability.reach"),
+            (("reach", "colorSrgb"), "gold", "readability.reach"),
+            (("contactShadow", "diameterUU"), 500, "readability.contactShadow"),
+            (("frameWood", "valueScaleSrgb"), 0.1, "readability.frameWood"),
+            (("labelPlates",), "yes", "readability.labelPlates"),
+        )
+        for path, value, part in cases:
+            b = json.loads(json.dumps(mp))
+            node = b["readability"]
+            for k in path[:-1]:
+                node = node[k]
+            node[path[-1]] = value
+            self.assertTrue(any(part in e for e in F.check_readability_block(b["id"], b)), (path, value))
+        b = json.loads(json.dumps(mp))
+        b["readability"]["reach"].update(widthUU=6, strokeUU=3)
+        self.assertTrue(any("between r 30 and r 40" in e for e in F.check_readability_block(b["id"], b)))
+
     def test_profile_content_rules_detect_violations(self):
         # T4.2: zone MI per style (and fallback), one /Game/ glyph mesh per known glyph, every used glyph covered.
         profiles = json.loads(F.DEFAULT_PROFILES.read_text(encoding="utf-8"))

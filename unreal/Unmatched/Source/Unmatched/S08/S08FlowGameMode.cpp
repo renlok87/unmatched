@@ -5965,6 +5965,15 @@ void AS08FlowGameMode::UpdateBoardLabels(bool bActive, const FString& IconTarget
   const bool bBoard = BoardActor && BoardActor->IsArtActive() && Flow.IsValid() &&
                       Flow->GetStage() == ES08Stage::Started && Ppu > 0.0f;
   const bool bTagsActive = ArtHud.bTagsEnabled && bBoard && !Hud.bGameOver;
+  // ENV-MAPS P4: map-image boards whose profile has readability.labelPlates draw the tags on the board plate (dark
+  // semi-opaque rounded plate, team-colour outline) and keep a hard gap between stacked tags; grids never do.
+  const bool bBoardPlates = bTagsActive && BoardActor->UsesLabelPlates();
+  const float TagHardPadPx = bBoardPlates ? S08ArtHudBoardPlate::TagHardPadPx : 0.0f;
+  if (static_cast<int8>(bBoardPlates ? 1 : 0) != ArtHud.BoardPlateTraced && bTagsActive) {
+    ArtHud.BoardPlateTraced = bBoardPlates ? 1 : 0;
+    FS08Trace::Write(FString::Printf(TEXT("HUD tags boardPlate=%d hardPadPx=%.0f profile=%s"), bBoardPlates ? 1 : 0,
+                                     TagHardPadPx, *BoardActor->GetArtProfileId()));
+  }
   const TMap<FString, FS08ScreenRect> Figures = bBoard ? FigureScreenRects() : TMap<FString, FS08ScreenRect>();
   TArray<FS08ScreenRect> Panels;
   for (const TWeakPtr<SWidget>& Panel : {ArtHud.CommandPanel, ArtHud.SidePanel, ArtHud.HandPanel}) {
@@ -5986,6 +5995,7 @@ void AS08FlowGameMode::UpdateBoardLabels(bool bActive, const FString& IconTarget
   FString Signature = FString::Printf(TEXT("%d|%d|%.0fx%.0f|%s|%s|%d|%d|"), bTagsActive ? 1 : 0, bActive ? 1 : 0,
                                       ViewportPx.X, ViewportPx.Y, *IconTarget, *IconSource, ArtHud.IconSize,
                                       bK2 ? 1 : 0);
+  if (bBoardPlates) Signature += TEXT("plates|");
   for (int32 I = 0; I < ArtHud.Tags.Num(); ++I) {
     FS08ArtHudRuntime::FTagSlot& T = ArtHud.Tags[I];
     const FS08BoardFighter* F = (bTagsActive && I < Alive.Num()) ? Alive[I] : nullptr;
@@ -6029,6 +6039,7 @@ void AS08FlowGameMode::UpdateBoardLabels(bool bActive, const FString& IconTarget
       T.Widget->ApplyModel(Texts);
       T.ContentKey = Key;
     }
+    if (T.Widget) T.Widget->SetBoardPlate(bBoardPlates);  // no-op while unchanged (grids: always off)
     T.FighterId = F->Id;
     T.Mode = static_cast<uint8>(Mode);
     T.TeamSlot = Look == ES08TeamSlot::P1 ? 0 : 1;
@@ -6076,7 +6087,7 @@ void AS08FlowGameMode::UpdateBoardLabels(bool bActive, const FString& IconTarget
     // W5b-R r3 (t53 revision 1, tags.binding): bound to the owner's figure, inset fallback, first two rings
     const S08ArtHud::FLabelPlacementInput In = S08ArtHud::MakeTagPlacementInput(
         ViewportPx, FVector2D(FMath::CeilToFloat(Desired.X * Ppu), FMath::CeilToFloat(Desired.Y * Ppu)), T.Figure,
-        OthersOf(T.FighterId), Hard);
+        OthersOf(T.FighterId), Hard, TagHardPadPx);
     const S08ArtHud::FLabelPlacementResult R = S08ArtHud::ChooseLabelRect(In);
     T.Planned = R.Rect;
     T.Candidate = R.Candidate;

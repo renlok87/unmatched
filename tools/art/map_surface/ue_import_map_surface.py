@@ -14,11 +14,20 @@ except /Game/EnvMaps/Data, which DefaultGame.ini never cooks):
   /Game/EnvMaps/Data/<Name>/T_<Name>_Map_SpaceID_4K linear half float (R16F), nearest filter, no mips
   /Game/EnvMaps/<Name>/MI_<Name>_MapBoard           child of M_MapBoard with the map's BC / mask and night grade
 
-M_MapBoard (lit, default surface; parameters BaseColor, GameMask, NightEV, NightSaturation, NightTint, Lift) is the
-night grade of the K1 mocks (manifest.<key>.json k1.grade_b_c):
+M_MapBoard (lit, default surface; parameters BaseColor, GameMask, NightEV, NightSaturation, NightTint, Lift and, since
+graph v2 (ENV-MAPS P4, zone separation under the night light), MaskSaturation, MaskInverseTint, LiftSaturation) is the
+night grade of the K1 mocks (k1_mock._night; manifest.<key>.json k1.grade_b_c = the light profile's mapGrade):
   lit      = BC * 2^NightEV * NightTint
-  base     = lerp(desaturate(lit, NightSaturation), lit, mask)      (outside the game layer: graded + desaturated)
-  emissive = Lift * BC * mask                                       (inside: a readability lift, unlit share)
+  inside   = max(lerp(luma, lit * MaskInverseTint, MaskSaturation), 0)        (graph v2; identity at 1 / (1,1,1))
+  base     = lerp(desaturate(lit, NightSaturation), inside, mask)    (outside the game layer: graded + desaturated)
+  emissive = Lift * max(lerp(luma, BC, LiftSaturation), 0) * mask    (inside: a readability lift, unlit share)
+The MI carries the profile grade (the board actor sets the same values on its MID at runtime, ApplyMapGrade).
+
+ENV-MAPS P4 readability materials (map-image boards whose profile has a "readability" block; shared by both maps):
+  /Game/EnvMaps/M_MapFrameWood      lit: the ART-005 wood (T_old_wood_D/N/ORM_1024) with FrameValueScale (linear albedo
+                                    multiplier) and FrameSaturation - the darker map frame (review gap 9)
+  /Game/EnvMaps/M_MapContactShadow  unlit, BLEND_MODULATE: a soft radial blob (Strength, Softness) on the engine plane
+                                    under every fighter base
 The SDF and the space-ID map are imported for the next steps (highlight by ID, crisp game layer) and are not
 sampled by M_MapBoard yet; they sit under /Game/EnvMaps/Data (never cooked, ~0.4 GB kept out of the pak). Once
 M_MapBoard samples them, move them out of Data and drop the DirectoriesToNeverCook line (the cooker drops a
@@ -65,7 +74,7 @@ MATERIAL_NAME = "M_MapBoard"
 MATERIAL_PATH = f"{ROOT}/{MATERIAL_NAME}"
 SHA_TAG = "EnvMapsSourceSha256"
 GRAPH_TAG = "EnvMapsGraphVersion"
-GRAPH_VERSION = "1"
+GRAPH_VERSION = "2"  # v2 (ENV-MAPS P4): MaskSaturation / MaskInverseTint / LiftSaturation
 # manifest output key -> file/asset suffix (T_<Name>_Map_<suffix>_4K)
 LAYERS = {"bc": "BC", "mask": "GameMask", "sdf": "GameSDF", "id": "SpaceID"}
 # not sampled by M_MapBoard yet: imported under DATA_ROOT, which DefaultGame.ini never cooks (S08MapSurfaceSpec::DataRoot)
@@ -74,14 +83,62 @@ DATA_LAYERS = ("sdf", "id")
 # Profile contract of S08BoardArt.h (S08MapSurfaceSpec::ParamBaseColor / ParamGameMask)
 PARAM_BC = "BaseColor"
 PARAM_MASK = "GameMask"
-DEFAULT_GRADE = {"ev": -0.7, "saturation": 0.7, "lift": 0.35, "tint_lin_luma_normalised": [0.9317, 1.0042, 1.1595]}
+DEFAULT_GRADE = {"ev": -0.7, "saturation": 0.7, "lift": 0.35, "tint_lin_luma_normalised": [0.9317, 1.0042, 1.1595],
+                 "mask_saturation": 1.0, "lift_saturation": 1.0, "mask_inverse_tint_lin": [1.0, 1.0, 1.0]}
 
-BASE_HLSL = """// ENV-MAPS M_MapBoard (tools/art/map_surface/ue_import_map_surface.py): night grade of the K1 mocks
+BASE_HLSL = """// ENV-MAPS M_MapBoard graph v2 (tools/art/map_surface/ue_import_map_surface.py): night grade of the K1 mocks
+// + mask-only zone separation (P4). MaskSaturation 1 / MaskInverseTint (1,1,1) = graph v1 exactly.
+float3 LumaW = float3(0.2126, 0.7152, 0.0722);
 float3 lit = BC.rgb * exp2(NightEV) * NightTint.rgb;
-float luma = dot(lit, float3(0.2126, 0.7152, 0.0722));
-float3 outside = lerp(luma.xxx, lit, NightSaturation);
-return lerp(outside, lit, saturate(Mask.r));
+float3 outside = lerp(dot(lit, LumaW).xxx, lit, NightSaturation);
+float3 litIn = lit * MaskInverseTint.rgb;
+float3 inside = max(lerp(dot(litIn, LumaW).xxx, litIn, MaskSaturation), 0.0);
+return lerp(outside, inside, saturate(Mask.r));
 """
+
+LIFT_HLSL = """// ENV-MAPS M_MapBoard graph v2: the unlit readability lift inside the game mask, chroma x LiftSaturation (P4)
+float3 LumaW = float3(0.2126, 0.7152, 0.0722);
+float3 c = max(lerp(dot(BC.rgb, LumaW).xxx, BC.rgb, LiftSaturation), 0.0);
+return Lift * c * saturate(Mask.r);
+"""
+
+# ---- ENV-MAPS P4 readability materials (S08BoardArt.h S08MapSurfaceSpec::FrameWoodMaterialPath / ContactShadowMaterialPath)
+FRAME_WOOD_NAME = "M_MapFrameWood"
+FRAME_WOOD_PATH = f"{ROOT}/{FRAME_WOOD_NAME}"
+FRAME_WOOD_VERSION = "1"
+FRAME_WOOD_TEXTURES = {"D": "/Game/ArtTests/ART005/Textures/T_old_wood_D_1024",
+                       "N": "/Game/ArtTests/ART005/Textures/T_old_wood_N_1024",
+                       "ORM": "/Game/ArtTests/ART005/Textures/T_old_wood_ORM_1024"}  # = M_ART005_Wood_Probe's textures
+FRAME_WOOD_DEFAULTS = {"FrameValueScale": round(0.7 ** 2.2, 4), "FrameSaturation": 0.75}
+FRAME_WOOD_HLSL = """// ENV-MAPS P4 M_MapFrameWood: the ART-005 frame wood, darker (FrameValueScale = linear albedo multiplier, the
+// profile's display V scale ^ 2.2) and less saturated (FrameSaturation).
+float3 LumaW = float3(0.2126, 0.7152, 0.0722);
+return max(lerp(dot(D, LumaW).xxx, D, FrameSaturation), 0.0) * FrameValueScale;
+"""
+CONTACT_SHADOW_NAME = "M_MapContactShadow"
+CONTACT_SHADOW_PATH = f"{ROOT}/{CONTACT_SHADOW_NAME}"
+CONTACT_SHADOW_VERSION = "1"
+CONTACT_SHADOW_DEFAULTS = {"Strength": 0.5, "Softness": 0.55}
+CONTACT_SHADOW_HLSL = """// ENV-MAPS P4 M_MapContactShadow (BLEND_MODULATE, unlit): the scene behind is multiplied by this - 1 at the
+// plane edge, 1 - Strength at the centre, gaussian of width Softness (fraction of the radius).
+float2 d = UV * 2.0 - 1.0;
+float r = length(d);
+float a = Strength * exp(-(r * r) / max(Softness * Softness, 1e-4)) * saturate((1.0 - r) * 6.0);
+return (1.0 - saturate(a)).xxx;
+"""
+
+
+def mi_params(grade: dict) -> dict:
+    """MI_<Name>_MapBoard scalar / vector parameters of a grade (manifest k1.grade_b_c, i.e. the profile mapGrade; the
+    graph-v2 terms default to identity). Pure Python: tools/art/map_surface/test_map_surface.py checks it."""
+    tint = (grade.get("tint_lin_luma_normalised") or grade.get("tint_lin") or DEFAULT_GRADE["tint_lin_luma_normalised"])[:3]
+    inv = (grade.get("mask_inverse_tint_lin") or DEFAULT_GRADE["mask_inverse_tint_lin"])[:3]
+    return {"scalar": {"NightEV": float(grade.get("ev", DEFAULT_GRADE["ev"])),
+                       "NightSaturation": float(grade.get("saturation", DEFAULT_GRADE["saturation"])),
+                       "Lift": float(grade.get("lift", DEFAULT_GRADE["lift"])),
+                       "MaskSaturation": float(grade.get("mask_saturation", 1.0)),
+                       "LiftSaturation": float(grade.get("lift_saturation", 1.0))},
+            "vector": {"NightTint": [float(x) for x in tint], "MaskInverseTint": [float(x) for x in inv]}}
 
 
 def asset_name(name: str, layer: str) -> str:
@@ -260,30 +317,47 @@ def build_material(bc_texture, mask_texture, force: bool) -> dict:
     lift = expr(u.MaterialExpressionScalarParameter, -1100, 850)
     lift.set_editor_property("parameter_name", "Lift")
     lift.set_editor_property("default_value", DEFAULT_GRADE["lift"])
+    # graph v2 (ENV-MAPS P4): mask-only zone separation, identity defaults
+    mask_sat = expr(u.MaterialExpressionScalarParameter, -1100, 950)
+    mask_sat.set_editor_property("parameter_name", "MaskSaturation")
+    mask_sat.set_editor_property("default_value", 1.0)
+    lift_sat = expr(u.MaterialExpressionScalarParameter, -1100, 1050)
+    lift_sat.set_editor_property("parameter_name", "LiftSaturation")
+    lift_sat.set_editor_property("default_value", 1.0)
+    inv_tint = expr(u.MaterialExpressionVectorParameter, -1100, 1150)
+    inv_tint.set_editor_property("parameter_name", "MaskInverseTint")
+    inv_tint.set_editor_property("default_value", u.LinearColor(1.0, 1.0, 1.0, 1.0))
 
-    base = expr(u.MaterialExpressionCustom, -500, 0)
-    base.set_editor_property("description", "MapBoardNightGrade")
-    base.set_editor_property("output_type", u.CustomMaterialOutputType.CMOT_FLOAT3)
-    inputs = []
-    for input_name in ("BC", "Mask", "NightEV", "NightSaturation", "NightTint"):
-        ci = u.CustomInput()
-        ci.set_editor_property("input_name", input_name)
-        inputs.append(ci)
-    base.set_editor_property("inputs", inputs)
-    base.set_editor_property("code", BASE_HLSL)
+    def custom(name, x, y, input_names, code):
+        node = expr(u.MaterialExpressionCustom, x, y)
+        node.set_editor_property("description", name)
+        node.set_editor_property("output_type", u.CustomMaterialOutputType.CMOT_FLOAT3)
+        pins = []
+        for input_name in input_names:
+            ci = u.CustomInput()
+            ci.set_editor_property("input_name", input_name)
+            pins.append(ci)
+        node.set_editor_property("inputs", pins)
+        node.set_editor_property("code", code)
+        return node
+
+    base = custom("MapBoardNightGrade", -500, 0,
+                  ("BC", "Mask", "NightEV", "NightSaturation", "NightTint", "MaskSaturation", "MaskInverseTint"),
+                  BASE_HLSL)
     connect(bc, "RGB", base, "BC")
     connect(mask, "R", base, "Mask")
     connect(ev, "", base, "NightEV")
     connect(sat, "", base, "NightSaturation")
     connect(tint, "", base, "NightTint")
+    connect(mask_sat, "", base, "MaskSaturation")
+    connect(inv_tint, "", base, "MaskInverseTint")
     mel.connect_material_property(base, "", u.MaterialProperty.MP_BASE_COLOR)
 
-    lift_bc = expr(u.MaterialExpressionMultiply, -500, 500)
-    connect(bc, "RGB", lift_bc, "A")
-    connect(lift, "", lift_bc, "B")
-    emissive = expr(u.MaterialExpressionMultiply, -300, 500)
-    connect(lift_bc, "", emissive, "A")
-    connect(mask, "R", emissive, "B")
+    emissive = custom("MapBoardLift", -500, 500, ("BC", "Mask", "Lift", "LiftSaturation"), LIFT_HLSL)
+    connect(bc, "RGB", emissive, "BC")
+    connect(mask, "R", emissive, "Mask")
+    connect(lift, "", emissive, "Lift")
+    connect(lift_sat, "", emissive, "LiftSaturation")
     mel.connect_material_property(emissive, "", u.MaterialProperty.MP_EMISSIVE_COLOR)
 
     rough = expr(u.MaterialExpressionConstant, -300, 750)
@@ -315,12 +389,11 @@ def build_instance(name: str, material, textures: dict, grade: dict) -> dict:
     mel.set_material_instance_parent(mi, material)
     mel.set_material_instance_texture_parameter_value(mi, PARAM_BC, textures["bc"])
     mel.set_material_instance_texture_parameter_value(mi, PARAM_MASK, textures["mask"])
-    ev, sat, lift = float(grade.get("ev", -0.7)), float(grade.get("saturation", 0.7)), float(grade.get("lift", 0.35))
-    r, g, b = (grade.get("tint_lin_luma_normalised") or DEFAULT_GRADE["tint_lin_luma_normalised"])[:3]
-    mel.set_material_instance_scalar_parameter_value(mi, "NightEV", ev)
-    mel.set_material_instance_scalar_parameter_value(mi, "NightSaturation", sat)
-    mel.set_material_instance_scalar_parameter_value(mi, "Lift", lift)
-    mel.set_material_instance_vector_parameter_value(mi, "NightTint", u.LinearColor(r, g, b, 1.0))
+    params = mi_params(grade)
+    for pname, value in params["scalar"].items():
+        mel.set_material_instance_scalar_parameter_value(mi, pname, value)
+    for pname, (r, g, b) in params["vector"].items():
+        mel.set_material_instance_vector_parameter_value(mi, pname, u.LinearColor(r, g, b, 1.0))
     mel.update_material_instance(mi)
     if not eal.save_loaded_asset(mi, False):
         raise RuntimeError(f"could not save {path}")
@@ -329,12 +402,130 @@ def build_instance(name: str, material, textures: dict, grade: dict) -> dict:
     if bound_bc != textures["bc"] or bound_mask != textures["mask"]:
         raise RuntimeError(f"{path}: texture parameters did not bind ({bound_bc}, {bound_mask})")
     return {"action": action, "path": path, "parent": MATERIAL_PATH,
-            "params": {"NightEV": ev, "NightSaturation": sat, "Lift": lift, "NightTint": [r, g, b],
+            "params": {**params["scalar"], **params["vector"],
                        PARAM_BC: textures["bc"].get_path_name(), PARAM_MASK: textures["mask"].get_path_name()}}
+
+
+def _new_material(path: str, name: str, version_tag: str, version: str, force: bool):
+    """(material, action) for a rebuild, or (material, None) when its version tag is current (and not --force)."""
+    eal, mel = u.EditorAssetLibrary, u.MaterialEditingLibrary
+    material = u.load_asset(path) if eal.does_asset_exist(path) else None
+    if material is not None and not force and eal.get_metadata_tag(material, version_tag) == version:
+        return material, None
+    action = "rebuilt" if material is not None else "created"
+    if material is None:
+        material = u.AssetToolsHelpers.get_asset_tools().create_asset(name, ROOT, u.Material, u.MaterialFactoryNew())
+    if material is None:
+        raise RuntimeError(f"could not create {path}")
+    mel.delete_all_material_expressions(material)
+    return material, action
+
+
+def _custom_node(material, name, x, y, input_names, code):
+    node = u.MaterialEditingLibrary.create_material_expression(material, u.MaterialExpressionCustom, x, y)
+    if node is None:
+        raise RuntimeError("could not create a Custom node")
+    node.set_editor_property("description", name)
+    node.set_editor_property("output_type", u.CustomMaterialOutputType.CMOT_FLOAT3)
+    pins = []
+    for input_name in input_names:
+        ci = u.CustomInput()
+        ci.set_editor_property("input_name", input_name)
+        pins.append(ci)
+    node.set_editor_property("inputs", pins)
+    node.set_editor_property("code", code)
+    return node
+
+
+def _connect(src, out, dst, inp):
+    if not u.MaterialEditingLibrary.connect_material_expressions(src, out, dst, inp):
+        raise RuntimeError(f"could not connect {src.get_name()}.{out or '<0>'} -> {dst.get_name()}.{inp}")
+
+
+def _scalar(material, name, value, x, y):
+    node = u.MaterialEditingLibrary.create_material_expression(material, u.MaterialExpressionScalarParameter, x, y)
+    node.set_editor_property("parameter_name", name)
+    node.set_editor_property("default_value", value)
+    return node
+
+
+def _finish(material, path: str, tag: str, version: str, action: str) -> dict:
+    eal, mel = u.EditorAssetLibrary, u.MaterialEditingLibrary
+    mel.layout_material_expressions(material)
+    mel.recompile_material(material)
+    eal.set_metadata_tag(material, tag, version)
+    if not eal.save_loaded_asset(material, False):
+        raise RuntimeError(f"could not save {path}")
+    return {"action": action, "path": path, "graphVersion": version,
+            "expressions": int(mel.get_num_material_expressions(material))}
+
+
+def build_frame_wood(force: bool) -> dict:
+    """M_MapFrameWood (ENV-MAPS P4, review gap 9): the ART-005 probe wood, darker and less saturated, lit."""
+    mel = u.MaterialEditingLibrary
+    material, action = _new_material(FRAME_WOOD_PATH, FRAME_WOOD_NAME, GRAPH_TAG, FRAME_WOOD_VERSION, force)
+    if action is None:
+        return {"action": "unchanged", "path": FRAME_WOOD_PATH, "graphVersion": FRAME_WOOD_VERSION}
+    textures = {k: u.load_asset(v) for k, v in FRAME_WOOD_TEXTURES.items()}
+    missing = [FRAME_WOOD_TEXTURES[k] for k, t in textures.items() if t is None]
+    if missing:
+        raise RuntimeError(f"{FRAME_WOOD_PATH}: wood textures missing {missing}")
+    material.set_editor_property("shading_model", u.MaterialShadingModel.MSM_DEFAULT_LIT)
+    material.set_editor_property("two_sided", False)
+    samplers = {}
+    for i, (key, sampler) in enumerate((("D", u.MaterialSamplerType.SAMPLERTYPE_COLOR),
+                                        ("N", u.MaterialSamplerType.SAMPLERTYPE_NORMAL),
+                                        ("ORM", u.MaterialSamplerType.SAMPLERTYPE_MASKS))):
+        node = mel.create_material_expression(material, u.MaterialExpressionTextureSample, -1100, -200 + 300 * i)
+        node.set_editor_property("sampler_type", sampler)
+        node.set_editor_property("texture", textures[key])
+        samplers[key] = node
+    value = _scalar(material, "FrameValueScale", FRAME_WOOD_DEFAULTS["FrameValueScale"], -1100, 700)
+    satur = _scalar(material, "FrameSaturation", FRAME_WOOD_DEFAULTS["FrameSaturation"], -1100, 800)
+    grade = _custom_node(material, "MapFrameWoodGrade", -500, -200, ("D", "FrameValueScale", "FrameSaturation"),
+                         FRAME_WOOD_HLSL)
+    _connect(samplers["D"], "RGB", grade, "D")
+    _connect(value, "", grade, "FrameValueScale")
+    _connect(satur, "", grade, "FrameSaturation")
+    mel.connect_material_property(grade, "", u.MaterialProperty.MP_BASE_COLOR)
+    mel.connect_material_property(samplers["N"], "RGB", u.MaterialProperty.MP_NORMAL)
+    mel.connect_material_property(samplers["ORM"], "R", u.MaterialProperty.MP_AMBIENT_OCCLUSION)
+    mel.connect_material_property(samplers["ORM"], "G", u.MaterialProperty.MP_ROUGHNESS)
+    mel.connect_material_property(samplers["ORM"], "B", u.MaterialProperty.MP_METALLIC)
+    return _finish(material, FRAME_WOOD_PATH, GRAPH_TAG, FRAME_WOOD_VERSION, action)
+
+
+def build_contact_shadow(force: bool) -> dict:
+    """M_MapContactShadow (ENV-MAPS P4): unlit modulate radial blob on the engine plane (UV 0..1)."""
+    mel = u.MaterialEditingLibrary
+    material, action = _new_material(CONTACT_SHADOW_PATH, CONTACT_SHADOW_NAME, GRAPH_TAG, CONTACT_SHADOW_VERSION, force)
+    if action is None:
+        return {"action": "unchanged", "path": CONTACT_SHADOW_PATH, "graphVersion": CONTACT_SHADOW_VERSION}
+    material.set_editor_property("shading_model", u.MaterialShadingModel.MSM_UNLIT)
+    material.set_editor_property("blend_mode", u.BlendMode.BLEND_MODULATE)
+    material.set_editor_property("two_sided", False)
+    uv = mel.create_material_expression(material, u.MaterialExpressionTextureCoordinate, -1100, 0)
+    strength = _scalar(material, "Strength", CONTACT_SHADOW_DEFAULTS["Strength"], -1100, 200)
+    softness = _scalar(material, "Softness", CONTACT_SHADOW_DEFAULTS["Softness"], -1100, 300)
+    blob = _custom_node(material, "MapContactShadow", -500, 0, ("UV", "Strength", "Softness"), CONTACT_SHADOW_HLSL)
+    _connect(uv, "", blob, "UV")
+    _connect(strength, "", blob, "Strength")
+    _connect(softness, "", blob, "Softness")
+    mel.connect_material_property(blob, "", u.MaterialProperty.MP_EMISSIVE_COLOR)
+    return _finish(material, CONTACT_SHADOW_PATH, GRAPH_TAG, CONTACT_SHADOW_VERSION, action)
 
 
 def run_import(plan: dict, force: bool) -> tuple[dict, bool]:
     result, ok, material = {}, True, None
+    # ENV-MAPS P4 readability materials (map independent; a failure is reported, the maps still import)
+    readability = {}
+    for key, builder in (("frameWood", build_frame_wood), ("contactShadow", build_contact_shadow)):
+        try:
+            readability[key] = builder(force)
+        except Exception as exc:  # report and continue
+            readability[key] = {"action": "failed", "error": str(exc)}
+            ok = False
+    result["_readability"] = readability
     for key, entry in plan.items():
         name = entry["name"]
         out = {"layers": {}}
@@ -384,12 +575,14 @@ def main(argv: list[str] | None = None) -> int:
     root = derived_root(args.derived)
     report = {"schema": "unmatched.env-maps-ue-import/1", "tool": "tools/art/map_surface/ue_import_map_surface.py",
               "mode": "check" if (args.check or u is None) else "import", "derivedRoot": str(root),
-              "contentRoot": ROOT, "dataRoot": DATA_ROOT, "material": MATERIAL_PATH, "maps": {}}
+              "contentRoot": ROOT, "dataRoot": DATA_ROOT, "material": MATERIAL_PATH, "graphVersion": GRAPH_VERSION,
+              "readability": {"frameWood": FRAME_WOOD_PATH, "contactShadow": CONTACT_SHADOW_PATH}, "maps": {}}
     plan = verify_sources(keys, root)
     ok = all(entry["ok"] for entry in plan.values())
     report["maps"] = plan
     if report["mode"] == "import":
         imported, import_ok = run_import(plan, args.force)
+        report["readabilityMaterials"] = imported.pop("_readability", {})
         for key, value in imported.items():
             report["maps"][key]["ue"] = value
         ok = ok and import_ok

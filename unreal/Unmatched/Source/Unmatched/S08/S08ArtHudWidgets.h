@@ -142,6 +142,12 @@ public:
   bool UsesCodeDefaultTree() const { return bCodeDefaultTree; }
   int32 NameFontSize() const { return Style.NameFont.Size; }
   int32 HpFontSize() const { return Style.HpFont.Size; }
+  /** ENV-MAPS P4 (map-image boards with the profile flag "labelPlates"): the semi-opaque rounded board plate with
+   *  the 1 su team-colour outline instead of the flat opaque background; false restores the flat background. */
+  void SetBoardPlate(bool bPlate);
+  bool IsBoardPlate() const { return bBoardPlate; }
+  /** The background brush the board plate paints (fill, corner radius, team outline) for a team look slot. */
+  static FSlateBrush MakeBoardPlateBrush(const FS08ArtHudTagStyle& InStyle, uint8 InTeamSlot);
 
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD")
   FS08ArtHudTagStyle Style;
@@ -170,12 +176,15 @@ protected:
 
 private:
   void ApplyDynamic();
+  void ApplyBackground();
   bool bCodeDefaultTree = false;
   uint8 TeamSlot = 0;
   float HpFraction = 1.0f;
   ES08TagMode Mode = ES08TagMode::Compact;
   FSlateBrush ShapeBrushes[2];
   bool bShapeBrushes = false;
+  bool bBoardPlate = false;
+  bool bBoardPlateBrush = false;  // the background currently carries the board-plate brush
 };
 
 /** W5b-R D-1 (proposal UI-HUD-DAMAGE): the "-N" damage number capsule. */

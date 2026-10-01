@@ -278,9 +278,26 @@ bool ParseRenderBlocks(const FString& ProfileId, const TSharedPtr<FJsonObject>& 
                           (*Grade)->TryGetNumberField(TEXT("lift"), Lift);
     const bool bHasTint = (*Grade)->HasField(TEXT("nightTintLinear"));
     const bool bTint = !bHasTint || (ReadNumberArray(*Grade, TEXT("nightTintLinear"), 3, Tint) && Finite3(Tint, 4.0));
+    // ENV-MAPS P4 (M_MapBoard graph v2): optional mask-only zone-separation terms (identity when absent).
+    auto OptionalNumber = [&Grade](const TCHAR* Field, double Default, double Min, double Max, double& Out) {
+      Out = Default;
+      if (!(*Grade)->HasField(Field)) return true;
+      return (*Grade)->TryGetNumberField(Field, Out) && FMath::IsFinite(Out) && Out >= Min && Out <= Max;
+    };
+    double MaskSaturation = 1.0, LiftSaturation = 1.0;
+    const bool bMaskSaturation = OptionalNumber(TEXT("maskSaturation"), 1.0, 0.0, 3.0, MaskSaturation);
+    const bool bLiftSaturation = OptionalNumber(TEXT("liftSaturation"), 1.0, 0.0, 3.0, LiftSaturation);
+    TArray<double> InverseTint;
+    const bool bHasInverseTint = (*Grade)->HasField(TEXT("maskInverseTintLinear"));
+    const bool bInverseTint = !bHasInverseTint || (ReadNumberArray(*Grade, TEXT("maskInverseTintLinear"), 3, InverseTint) &&
+                                                   Finite3(InverseTint, 4.0));
     if (!bNumbers || !bTint || !(Ev >= -4.0 && Ev <= 2.0) || !(Saturation >= 0.0 && Saturation <= 1.5) ||
         !(Lift >= 0.0 && Lift <= 20.0)) {
       Errors.Add(FString::Printf(TEXT("light profile %s: mapGrade needs nightEV -4..2, nightSaturation 0..1.5, lift 0..20 and an optional nightTintLinear [r,g,b] 0..4"),
+                                 *ProfileId));
+      bOk = false;
+    } else if (!bMaskSaturation || !bLiftSaturation || !bInverseTint) {
+      Errors.Add(FString::Printf(TEXT("light profile %s: mapGrade optional maskSaturation 0..3, liftSaturation 0..3 and maskInverseTintLinear [r,g,b] 0..4"),
                                  *ProfileId));
       bOk = false;
     } else {
@@ -290,6 +307,9 @@ bool ParseRenderBlocks(const FString& ProfileId, const TSharedPtr<FJsonObject>& 
       G.Lift = static_cast<float>(Lift);
       G.bHasTint = bHasTint;
       if (bHasTint) G.NightTint = FLinearColor(Tint[0], Tint[1], Tint[2]);
+      G.MaskSaturation = static_cast<float>(MaskSaturation);
+      G.LiftSaturation = static_cast<float>(LiftSaturation);
+      if (bHasInverseTint) G.MaskInverseTint = FLinearColor(InverseTint[0], InverseTint[1], InverseTint[2]);
     }
   }
   return bOk;
@@ -356,6 +376,84 @@ bool ParseMapImage(const FString& BoardId, const TSharedPtr<FJsonObject>& Object
       bOk = false;
     } else {
       Out.TrayOffsetUU = FVector2D(N[0], N[1]);
+    }
+  }
+  Out.bSet = bOk;
+  return bOk;
+}
+
+// ENV-MAPS P4: the "readability" block of a map-image board. Every sub-block is optional; a present sub-block is
+// validated completely (a broken one rejects the board and so the document, never a silent default).
+bool ParseReadability(const FString& BoardId, const TSharedPtr<FJsonObject>& Object, FS08BoardReadabilitySpec& Out,
+                      TArray<FString>& Errors) {
+  Out = FS08BoardReadabilitySpec();
+  bool bOk = true;
+  auto Fail = [&](const TCHAR* What) {
+    Errors.Add(FString::Printf(TEXT("board %s: readability.%s"), *BoardId, What));
+    bOk = false;
+  };
+  // Optional number in [Min, Max] (absent = Default).
+  auto Number = [](const TSharedPtr<FJsonObject>& O, const TCHAR* Field, double Min, double Max, float& InOut) {
+    if (!O->HasField(Field)) return true;
+    double V = 0.0;
+    if (!O->TryGetNumberField(Field, V) || !FMath::IsFinite(V) || V < Min || V > Max) return false;
+    InOut = static_cast<float>(V);
+    return true;
+  };
+  auto Hex = [](const TSharedPtr<FJsonObject>& O, const TCHAR* Field, FColor& InOut) {
+    if (!O->HasField(Field)) return true;
+    FString Text;
+    return O->TryGetStringField(Field, Text) && ParseHexColor(Text, InOut);
+  };
+  // A JSON boolean only (FJsonObject::TryGetBoolField would also accept the strings "yes" / "1").
+  auto StrictBool = [&Object](const TCHAR* Field, bool& InOut) {
+    if (!Object->HasField(Field)) return true;
+    const TSharedPtr<FJsonValue> Value = Object->TryGetField(Field);
+    if (!Value.IsValid() || Value->Type != EJson::Boolean) return false;
+    InOut = Value->AsBool();
+    return true;
+  };
+  if (!StrictBool(TEXT("labelPlates"), Out.bLabelPlates)) Fail(TEXT("labelPlates must be true|false"));
+  if (!StrictBool(TEXT("leaderPip"), Out.bLeaderPip)) Fail(TEXT("leaderPip must be true|false"));
+  const TSharedPtr<FJsonObject>* Reach = nullptr;
+  if (Object->HasField(TEXT("reach"))) {
+    float Segments = static_cast<float>(Out.ReachSegments);
+    if (!Object->TryGetObjectField(TEXT("reach"), Reach) || !Reach || !Reach->IsValid() ||
+        !Hex(*Reach, TEXT("colorSrgb"), Out.ReachColor) || !Hex(*Reach, TEXT("strokeSrgb"), Out.ReachStroke) ||
+        !Number(*Reach, TEXT("segments"), 12.0, 96.0, Segments) || Segments != FMath::RoundToFloat(Segments) ||
+        !Number(*Reach, TEXT("widthUU"), 1.0, 6.0, Out.ReachWidthUU) ||
+        !Number(*Reach, TEXT("strokeUU"), 0.25, 3.0, Out.ReachStrokeUU)) {
+      Fail(TEXT("reach needs colorSrgb / strokeSrgb #RRGGBB, segments 12..96 (whole), widthUU 1..6, strokeUU 0.25..3"));
+    } else {
+      Out.bReach = true;
+      Out.ReachSegments = static_cast<int32>(Segments);
+      // The ring with its stroke stays inside the painted rim (41.6 uu) and outside the team ring (28.5 uu).
+      const float Half = Out.ReachWidthUU * 0.5f + Out.ReachStrokeUU;
+      if (S08MapSurfaceSpec::RingRadiusUU + Half > 40.0f || S08MapSurfaceSpec::RingRadiusUU - Half < 30.0f) {
+        Fail(TEXT("reach widthUU / 2 + strokeUU must keep the ring between r 30 and r 40"));
+        Out.bReach = false;
+      }
+    }
+  }
+  const TSharedPtr<FJsonObject>* Shadow = nullptr;
+  if (Object->HasField(TEXT("contactShadow"))) {
+    if (!Object->TryGetObjectField(TEXT("contactShadow"), Shadow) || !Shadow || !Shadow->IsValid() ||
+        !Number(*Shadow, TEXT("diameterUU"), 20.0, 160.0, Out.ShadowDiameterUU) ||
+        !Number(*Shadow, TEXT("strength"), 0.0, 1.0, Out.ShadowStrength) ||
+        !Number(*Shadow, TEXT("softness"), 0.1, 1.0, Out.ShadowSoftness)) {
+      Fail(TEXT("contactShadow needs diameterUU 20..160, strength 0..1, softness 0.1..1"));
+    } else {
+      Out.bContactShadow = true;
+    }
+  }
+  const TSharedPtr<FJsonObject>* Wood = nullptr;
+  if (Object->HasField(TEXT("frameWood"))) {
+    if (!Object->TryGetObjectField(TEXT("frameWood"), Wood) || !Wood || !Wood->IsValid() ||
+        !Number(*Wood, TEXT("valueScaleSrgb"), 0.2, 1.0, Out.FrameValueScaleSrgb) ||
+        !Number(*Wood, TEXT("saturation"), 0.0, 1.0, Out.FrameSaturation)) {
+      Fail(TEXT("frameWood needs valueScaleSrgb 0.2..1 and saturation 0..1"));
+    } else {
+      Out.bFrameWood = true;
     }
   }
   Out.bSet = bOk;
@@ -750,6 +848,19 @@ bool FS08BoardArtData::ParseJson(const FString& Text, TArray<FString>& OutErrors
         }
         B.K1DistanceMul = static_cast<float>(Mul);
       }
+      // ENV-MAPS P4: optional readability block, map-image boards only (grids stay bit for bit).
+      if ((*Obj)->HasField(TEXT("readability"))) {
+        const TSharedPtr<FJsonObject>* Read = nullptr;
+        if (B.Surface != ES08BoardSurface::MapImage) {
+          OutErrors.Add(FString::Printf(TEXT("board %s: readability is for map-image boards only"), *B.Id));
+          continue;
+        }
+        if (!(*Obj)->TryGetObjectField(TEXT("readability"), Read) || !Read || !Read->IsValid() ||
+            !ParseReadability(B.Id, *Read, B.Readability, OutErrors)) {
+          if (!Read) OutErrors.Add(FString::Printf(TEXT("board %s: readability must be an object"), *B.Id));
+          continue;
+        }
+      }
       const TSharedPtr<FJsonObject>* Expect = nullptr;
       if ((*Obj)->TryGetObjectField(TEXT("expect"), Expect) && Expect) {
         auto ReadInt = [&](const TCHAR* Field, int32& Out) {
@@ -1138,4 +1249,43 @@ bool S08LinkBarTransform(const FVector& A, const FVector& B, float TrimUU, float
   const double Yaw = FMath::RadiansToDegrees(FMath::Atan2(D.Y, D.X));
   Out = FTransform(FRotator(0.0, Yaw, 0.0), Mid, FVector(Length / 100.0, WidthUU / 100.0, DepthScale));
   return true;
+}
+
+void S08ReachRingPieces(const FS08BoardReadabilitySpec& Spec, TArray<FTransform>& OutFill, TArray<FTransform>& OutStroke) {
+  using namespace S08MapSurfaceSpec;
+  OutFill.Reset();
+  OutStroke.Reset();
+  if (!Spec.bReach) {
+    S08RingPieces(RingRadiusUU, RingWidthUU, RingSegments, RingZ, RingDepth, OutFill);
+    return;
+  }
+  S08RingPieces(RingRadiusUU, Spec.ReachWidthUU, Spec.ReachSegments, RingZ, RingDepth, OutFill);
+  if (Spec.ReachStrokeUU > 0.0f) {
+    S08RingPieces(RingRadiusUU, Spec.ReachWidthUU + 2.0f * Spec.ReachStrokeUU, Spec.ReachSegments, ReachStrokeZ,
+                  ReachStrokeDepth, OutStroke);
+  }
+}
+
+void S08LeaderPipTransforms(float RingOuterUU, float RingScale, FTransform& OutFill, FTransform& OutKeyline) {
+  using namespace S08MapSurfaceSpec;
+  // Near side (+Y, towards the K1 camera, yaw -90): in front of the base, never behind the figure.
+  const float Radius = RingOuterUU * FMath::Max(RingScale, 0.1f) + LeaderPipGapUU;
+  const float Fill = LeaderPipSizeUU / 100.0f;
+  const float Key = (LeaderPipSizeUU + 2.0f * LeaderPipKeylineUU) / 100.0f;
+  OutFill = FTransform(FRotator(0.0f, 45.0f, 0.0f), FVector(0.0f, Radius, LeaderPipZ), FVector(Fill, Fill, LeaderPipDepth));
+  OutKeyline = FTransform(FRotator(0.0f, 45.0f, 0.0f), FVector(0.0f, Radius, LeaderPipKeylineZ),
+                          FVector(Key, Key, LeaderPipKeylineDepth));
+}
+
+FTransform S08ContactShadowTransform(const FS08BoardReadabilitySpec& Spec, float RingScale) {
+  using namespace S08MapSurfaceSpec;
+  const float Scale = FMath::Max(RingScale, 0.1f);
+  const float Size = Spec.ShadowDiameterUU * Scale / 100.0f;  // the engine plane is 100 x 100 uu
+  return FTransform(FRotator::ZeroRotator,
+                    FVector(ContactShadowOffsetX * Scale, ContactShadowOffsetY * Scale, ContactShadowZ),
+                    FVector(Size, Size, 1.0f));
+}
+
+FString S08ColorHex(const FColor& Color) {
+  return FString::Printf(TEXT("#%02X%02X%02X"), Color.R, Color.G, Color.B);
 }

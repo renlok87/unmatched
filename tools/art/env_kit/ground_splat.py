@@ -13,9 +13,17 @@ one RGBA8 splat texture per map made here from region rules tied to the env layo
              | G Gravel021 pebbles (both river channels, fort rubble, beach scatter) | B Planks023A deck (E band under the
              hull / cannons, quay N-E and S-E) | A wetness (river channels, sea spray)
 
-Borders are soft and noisy (deterministic value-noise fBm, seeded per map), the deck keeps straight plank-end edges.
-Everything is our own procedural art (no original-map pixels): the only map-derived inputs are coordinates (frame
-size, the Sarpedon river x-runs measured at the map edges, ground-params.json 'river').
+A second RGBA8 texture on the same grid, the aux mask (P4, review gaps 1 / 5 / 10), drives what the splat layers cannot:
+
+  R = water coverage (Sarpedon river mouths: N into the sea surf, S to the waterfall), G = foam (shore band, surf
+  lines), B = edge band (Marmoreal: the 1-tile curb of the paving; Sarpedon: the deck beam where the planks end),
+  A = 1 + water depth * 254 (0 at the shore, 1 at ground-params 'rules.depthUU' into the water; never a zero alpha)
+
+Borders are soft and noisy (deterministic value-noise fBm, seeded per map) and blurred per channel ('rules.blurUU', a
+separable Gaussian in uu), the deck keeps straight plank-end edges. Everything is our own procedural art (no original-map
+pixels): the only map-derived inputs are coordinates (frame size, the Sarpedon river x-runs measured at the map edges,
+ground-params.json 'river'). Every rule number has a code default and may be overridden in ground-params.json
+'maps.<key>.rules' (the Tune stage iterates there).
 
 Board-actor space (uu): origin = map centre, +X right on the K1 screen, +Y towards the K1 camera (near side); frame
 outer |X| <= 469.667, |Y| <= 312.667; the tray is ground-params.json 'tray' (shared by both maps). The splat covers
@@ -25,12 +33,15 @@ M_EnvGround's SplatUV = (P - SplatRect.xy) / SplatRect.zw.
 
 Outputs (art/pipeline-candidates/ASSET-ENV-KIT-001/ground/, our derived art, small, git):
   <map>.splat.png      RGBA8 (the texture ue_import_env_ground.py imports as T_EnvGround_<Map>_Splat)
-  <map>.splat.json     meta: rect, size, channels, coverage, sha256 of the PNG, params, layout props hash
+  <map>.aux.png        RGBA8 aux mask (T_EnvGround_<Map>_Aux): water / foam / edge band / water depth
+  <map>.splat.json     meta: rect, size, channels, coverage, sha256 of the PNGs, params, layout props hash, waterfalls
   <map>.preview.png    top: false-colour layers + accent, frame / map / props / tray; bottom: albedo preview with
                        the CC0 textures at their tiling (needs the raw sets, ground-params.json 'cc0Raw')
 With --write-layouts the 'ground' section of Config/ArtBoards/EnvLayouts/<map>.layout.json is (re)written:
   {"mode":"runtime", "material":"/Game/EnvKit/Ground/MI_EnvGround_<Map>", "z", "frameOverlapUU", "insetUU",
-   "splatRect":[minX, minY, maxX, maxY], "splat":"<repo-relative png>", "splatSha256", "notes"}
+   "splatRect":[minX, minY, maxX, maxY], "splat":"<repo-relative png>", "splatSha256", "aux", "auxSha256",
+   "waterfalls":[{"id", "material":"/Game/EnvKit/Ground/MI_EnvWaterfall_<Map>", "x0", "x1", "y", "topZ", "dropUU",
+                  "spillUU"}]  (only maps with ground-params 'water.falls'; S08EnvGround spawns them), "notes"}
 
 Usage (repository root; plain Python: numpy, PIL):
   python -B tools/art/env_kit/ground_splat.py                        # both maps: splat + meta + preview
@@ -231,13 +242,45 @@ def props_hash(layout: dict) -> str:
 
 
 # ------------------------------------------------------------------------------------------------ region rules
-def rules_marmoreal(X, Y, layout: dict, tray, nz: Noise) -> dict:
+def _rule(rules: dict, name: str, default: float) -> float:
+    """A splat-rule number: ground-params.json 'maps.<key>.rules.<name>', else the code default."""
+    v = rules.get(name, default)
+    if isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v):
+        raise SystemExit(f"ground-params rules.{name} = {v!r} is not a number")
+    return float(v)
+
+
+def gauss_blur(a: np.ndarray, sigma_px: tuple) -> np.ndarray:
+    """Separable Gaussian blur (reflect padding, 3 sigma) with sigma in pixels along x (columns) and y (rows)."""
+    out = np.asarray(a, float)
+    for axis, sig in ((1, float(sigma_px[0])), (0, float(sigma_px[1]))):
+        if sig <= 0.05:
+            continue
+        r = max(1, int(math.ceil(3.0 * sig)))
+        k = np.exp(-0.5 * (np.arange(-r, r + 1) / sig) ** 2)
+        k /= k.sum()
+        pad = [(0, 0), (0, 0)]
+        pad[axis] = (r, r)
+        ap = np.pad(out, pad, mode="reflect")
+        acc = np.zeros_like(out)
+        n = out.shape[axis]
+        for i, w in enumerate(k):
+            sl = [slice(None), slice(None)]
+            sl[axis] = slice(i, i + n)
+            acc += w * ap[tuple(sl)]
+        out = acc
+    return out
+
+
+def rules_marmoreal(X, Y, layout: dict, tray, nz: Noise, rules: dict | None = None) -> dict:
+    rules = rules or {}
     tx0, ty0, tx1, ty1 = tray
     d_frame = sd_box(X, Y, -FX, -FY, FX, FY)          # > 0 outside the frame
     d_edge = -sd_box(X, Y, tx0, ty0, tx1, ty1)         # > 0 inside the tray (distance to its edge)
     warp = nz.signed(36.0, 1)
     fine = nz.signed(12.0, 2, 2)
     big = nz.signed(110.0, 3)
+    mid = nz.signed(20.0, 9, 2)
     # B: marble paving - walkway round the frame, the palace terrace N (under / behind the colonnade), pads
     d_pave = np.minimum(d_frame - 72.0, sd_box(X, Y, -410.0, ty0 - 50.0, 410.0, -300.0))
     for p in props_of(layout, "LanternPlinth"):
@@ -246,9 +289,16 @@ def rules_marmoreal(X, Y, layout: dict, tray, nz: Noise) -> dict:
         d_pave = np.minimum(d_pave, sd_circle(X, Y, p["loc"][0], p["loc"][1], 42.0 * p["scale"]))
     for p in props_of(layout, "Urn", "Portal", "ArcadeBay"):
         d_pave = np.minimum(d_pave, sd_poly(X, Y, lc.footprint(p)) - 14.0)
-    d_pave_n = d_pave + 13.0 * warp + 5.0 * fine
-    rim = sstep(14.0, 32.0, d_edge + 9.0 * warp)
-    pave = inside(d_pave_n, 3.0) * rim
+    # noise-broken border (P4 gap 10: three octaves instead of the torn-paper single warp)
+    d_pave_n = (d_pave + _rule(rules, "paveWarpUU", 13.0) * warp + _rule(rules, "paveMidUU", 0.0) * mid
+                + _rule(rules, "paveFineUU", 5.0) * fine)
+    # the paving stops short of the tray rim (moss there): one signed distance for both borders, so the curb follows both
+    d_pave_t = np.maximum(d_pave_n, 23.0 - (d_edge + 9.0 * warp))
+    pave = inside(d_pave_t, _rule(rules, "paveSoftUU", 3.0))
+    # E (aux B): the curb - the outermost paving tile row (curbWidthUU ~ one Tiles143 tile at L3 tileUU 200 / 6)
+    cw = _rule(rules, "curbWidthUU", 0.0)
+    curb = (inside(np.abs(d_pave_t + cw / 2.0) - cw / 2.0, _rule(rules, "curbSoftUU", 2.0)) if cw > 0
+            else np.zeros_like(X))
     # R: moss under the cherries, round the cypresses, along the tray rim, a ring along the paving edge, patches
     d_cherry = np.full(X.shape, np.inf)
     for p in props_of(layout, "Cherry"):
@@ -261,25 +311,29 @@ def rules_marmoreal(X, Y, layout: dict, tray, nz: Noise) -> dict:
     moss = np.maximum.reduce([
         0.9 * inside(d_cyp + 12.0 * warp, 10.0),
         0.85 * (1.0 - sstep(8.0, 46.0, d_edge + 16.0 * warp)),
-        0.6 * sstep(0.6, 0.76, nz.fbm(80.0, 4)) * sstep(0.0, 30.0, d_pave_n) * (1.0 - under_cherry),
-        0.65 * inside(np.abs(d_pave_n - 7.0) - 6.0 + 3.0 * fine, 3.0),
+        0.6 * sstep(0.6, 0.76, nz.fbm(80.0, 4)) * sstep(0.0, 30.0, d_pave_t) * (1.0 - under_cherry),
+        0.65 * inside(np.abs(d_pave_t - 7.0) - 6.0 + 3.0 * fine, 3.0),
     ])
     # G: grass tufts in the outer W / E beds (not under the cherry crowns, not on the rim moss)
     outer = sstep(545.0, 610.0, np.abs(X)) + sstep(-330.0, -380.0, Y) * sstep(430.0, 470.0, np.abs(X))
     grass = np.clip(outer, 0, 1) * sstep(0.56, 0.72, nz.fbm(55.0, 5)) * (1.0 - 0.9 * under_cherry)
     grass *= sstep(18.0, 40.0, d_edge)
-    # A: petals - Gaussian lobes round every cherry, a drift lobe towards the board, the colonnade flower beds
-    petals = 0.05 + 0.06 * (nz.fbm(60.0, 6) - 0.5)
+    # A: petals (P4 gap 10) - a density mask of Gaussian lobes round every cherry, a drift lobe towards the board and
+    # the colonnade flower beds; the even confetti elsewhere is scaled by petalGlobal
+    base = _rule(rules, "petalGlobal", 1.0) * (0.05 + 0.06 * (nz.fbm(60.0, 6) - 0.5))
+    lobes = np.zeros_like(X)
+    tree_r, drift = _rule(rules, "petalTreeRadiusUU", 125.0), _rule(rules, "petalDrift", 0.55)
     for p in props_of(layout, "Cherry"):
         cx, cy = p["loc"][0], p["loc"][1]
-        petals = petals + np.exp(-((np.hypot(X - cx, Y - cy) / (125.0 * p["scale"])) ** 2))
+        lobes = lobes + np.exp(-((np.hypot(X - cx, Y - cy) / (tree_r * p["scale"])) ** 2))
         dx = -math.copysign(120.0, cx) if cx else 0.0
-        petals = petals + 0.55 * np.exp(-((np.hypot(X - (cx + dx), Y - (cy + 40.0)) / 150.0) ** 2))
+        lobes = lobes + drift * np.exp(-((np.hypot(X - (cx + dx), Y - (cy + 40.0)) / 150.0) ** 2))
     beds = inside(np.abs(Y + 392.0) - 10.0 + 6.0 * warp, 8.0) * (np.abs(X) < 405.0)
-    petals = petals + 0.3 * beds * sstep(0.4, 0.6, nz.fbm(24.0, 7))
-    petals = np.clip(petals, 0.0, 1.0) * (0.8 + 0.2 * nz.fbm(9.0, 8, 2))
-    return {"R": moss, "G": grass, "B": pave, "A": petals,
-            "debug": {"paveEdge": d_pave_n, "cherry": d_cherry}}
+    lobes = lobes + _rule(rules, "petalBeds", 0.3) * beds * sstep(0.4, 0.6, nz.fbm(24.0, 7))
+    petals = np.clip(base + lobes, 0.0, 1.0) * (0.8 + 0.2 * nz.fbm(9.0, 8, 2))
+    zero = np.zeros_like(X)
+    return {"R": moss, "G": grass, "B": pave, "A": petals, "W": zero, "F": zero, "E": curb, "D": zero,
+            "debug": {"paveEdge": d_pave_t, "cherry": d_cherry}}
 
 
 def river_tubes(params: dict, tray) -> tuple[list, list]:
@@ -296,11 +350,13 @@ def river_tubes(params: dict, tray) -> tuple[list, list]:
     return far, near
 
 
-def rules_sarpedon(X, Y, layout: dict, tray, nz: Noise, params: dict) -> dict:
+def rules_sarpedon(X, Y, layout: dict, tray, nz: Noise, params: dict, rules: dict | None = None) -> dict:
+    rules = rules or {}
     tx0, ty0, tx1, ty1 = tray
     d_edge = -sd_box(X, Y, tx0, ty0, tx1, ty1)
     warp = nz.signed(40.0, 1)
     fine = nz.signed(12.0, 2, 2)
+    en = _rule(rules, "edgeNoise", 1.0)  # P4 gap 5: scales the border noise of the sand regions
     far, near = river_tubes(params, tray)
     d_rf = sd_tube(X, Y, *far)
     d_rn = sd_tube(X, Y, *near)
@@ -313,32 +369,50 @@ def rules_sarpedon(X, Y, layout: dict, tray, nz: Noise, params: dict) -> dict:
         sd_box(X, Y, 120.0, FY - 10.0, big, big),
     ])
     deck = inside(d_deck + 1.5 * fine, 1.5)
+    # E (aux B): the beam where the planks end - a band just inside the deck border
+    bw = _rule(rules, "beamWidthUU", 0.0)
+    beam = inside(np.abs(d_deck + bw / 2.0) - bw / 2.0, 0.8) if bw > 0 else np.zeros_like(X)
     # R: sand - beach N-centre, river banks, the S bank round the waterfall, fire clearings, fort dust
-    beach = inside(sd_box(X, Y, -300.0, -big, 420.0, -FY + 10.0) + 35.0 * warp, 18.0)
-    sband = inside(sd_box(X, Y, -345.0, FY - 10.0, 160.0, big) + 25.0 * warp, 14.0)
-    banks = inside(d_river - 48.0 + 14.0 * warp, 12.0)
+    beach = inside(sd_box(X, Y, -300.0, -big, 420.0, -FY + 10.0) + 35.0 * en * warp, 18.0)
+    sband = inside(sd_box(X, Y, -345.0, FY - 10.0, 160.0, big) + 25.0 * en * warp, 14.0)
+    banks = inside(d_river - 48.0 + 14.0 * en * warp, 12.0)
     fires = np.zeros_like(X)
+    f_r, f_w, f_s = _rule(rules, "fireRadiusUU", 58.0), _rule(rules, "fireWarpUU", 14.0), _rule(rules, "fireSoftUU", 10.0)
+    f_peak = _rule(rules, "firePeak", 0.85)
     for p in props_of(layout, "Campfire"):
-        fires = np.maximum(fires, 0.85 * inside(sd_circle(X, Y, p["loc"][0], p["loc"][1], 58.0 * p["scale"])
-                                                + 14.0 * warp, 10.0))
+        fires = np.maximum(fires, f_peak * inside(sd_circle(X, Y, p["loc"][0], p["loc"][1], f_r * p["scale"])
+                                                  + f_w * warp + 4.0 * fine, f_s))
     fort = np.zeros_like(X)
     for p in props_of(layout, "FortRuin"):
         fort = np.maximum(fort, 0.6 * inside(sd_circle(X, Y, p["loc"][0], p["loc"][1], 115.0) + 30.0 * warp, 20.0))
     sand = np.maximum.reduce([beach, sband, banks, fires, fort])
-    # G: pebbles - both channels, pebbly banks, fort rubble, a scatter on the beach
-    channel = inside(d_river + 6.0 * warp + 2.0 * fine, 4.0)
+    # W / D / F (aux R / A / G): water in both river mouths (P4 gap 1), its depth and the foam on the shore + the surf
+    d_w = d_river + _rule(rules, "waterWarpUU", 6.0) * warp + 2.0 * fine
+    inset = _rule(rules, "waterInsetUU", 3.0)
+    water = inside(d_w + inset, 2.0)
+    depth = np.clip(-(d_w + inset) / max(_rule(rules, "depthUU", 30.0), 1.0), 0.0, 1.0)
+    fw = _rule(rules, "foamWidthUU", 6.0)
+    foam = (inside(np.abs(d_w + inset + fw / 2.0) - fw / 2.0, 1.2) * _rule(rules, "foamShore", 1.0)
+            * sstep(0.4, 0.75, nz.fbm(14.0, 10)))
+    sea = sstep(-FY - 20.0, -FY - 80.0, Y)  # the far mouth opens into the sea at the far tray edge
+    for row in rules.get("surf", []):
+        dist, width, amp = (float(v) for v in row)
+        line = inside(np.abs(Y - ty0 - dist + 9.0 * warp + 3.0 * fine) - width / 2.0, 1.0) * amp
+        foam = np.maximum(foam, line * water * sea * sstep(0.2, 0.5, nz.fbm(18.0, 11)))
+    # G: pebbles - a thin rim round the water (the bed under it), pebbly banks, fort rubble, a scatter on the beach
+    rim = inside(d_w - _rule(rules, "pebbleRimUU", 9.0), 3.0)
     bank_peb = inside(d_river - 22.0 + 10.0 * warp, 8.0) * sstep(0.42, 0.6, nz.fbm(30.0, 3))
     rubble = np.zeros_like(X)
     for p in props_of(layout, "FortRuin"):
         rubble = np.maximum(rubble, inside(sd_circle(X, Y, p["loc"][0], p["loc"][1], 95.0) + 25.0 * warp, 15.0)
                             * sstep(0.5, 0.7, nz.fbm(26.0, 4)) * 0.8)
-    scatter = beach * sstep(0.72, 0.86, nz.fbm(28.0, 5)) * 0.6
-    gravel = np.maximum.reduce([channel, 0.85 * bank_peb, 0.9 * rubble, scatter])
+    scatter = beach * sstep(0.72, 0.86, nz.fbm(28.0, 5)) * _rule(rules, "beachScatter", 0.6)
+    gravel = np.maximum.reduce([rim, _rule(rules, "bankPebbles", 0.85) * bank_peb, 0.9 * rubble, scatter])
     # A: wetness - the channels, a falloff over the banks, sea spray along the far edge on the beach
     wet = np.where(d_river <= 0, 1.0, np.exp(-np.maximum(d_river, 0.0) / 38.0))
     spray = 0.35 * np.exp(-np.maximum(d_edge, 0.0) / 55.0) * beach * (Y < 0)
     wet = np.clip(np.maximum(wet, spray) * (0.82 + 0.18 * nz.fbm(10.0, 6, 2)), 0.0, 1.0)
-    return {"R": sand, "G": gravel, "B": deck, "A": wet,
+    return {"R": sand, "G": gravel, "B": deck, "A": wet, "W": water, "F": foam, "E": beam, "D": depth,
             "debug": {"river": d_river, "deck": d_deck, "farTube": far, "nearTube": near}}
 
 
@@ -351,6 +425,48 @@ def ensure_kit_sizes() -> list[str]:
     return []
 
 
+def _png(arr: np.ndarray) -> bytes:
+    buf = io.BytesIO()
+    Image.fromarray(arr, "RGBA").save(buf, format="PNG", compress_level=9)
+    return buf.getvalue()
+
+
+def waterfalls(key: str, params: dict, res: dict) -> list[dict]:
+    """The layout 'ground.waterfalls' of a map (ground-params 'water.falls'): x-run = the water of the aux mask on the
+    row just inside the near tray edge (the longest run >= 0.5, so the fall lines up with the painted river through the
+    river tube), shrunk by insetUU; y = the near tray edge + offsetUU (in front of the T2 overhang, <= 30 uu)."""
+    falls = (params["maps"][key].get("water") or {}).get("falls") or []
+    out = []
+    tx0, ty0, tx1, ty1 = res["tray"]
+    W = res["channels"]["W"]
+    X, Y = res["X"], res["Y"]
+    root = params["ground"]["materialRoot"]
+    for f in falls:
+        if f.get("river", "near") != "near":
+            raise SystemExit(f"{key}: waterfall {f.get('id')!r}: only river 'near' (the near tray edge) is supported")
+        j = int(np.argmin(np.abs(Y[:, 0] - (ty1 - 3.0))))
+        row = W[j] >= 0.5
+        best, start = (0, -1, -1), None
+        for i, v in enumerate(list(row) + [False]):
+            if v and start is None:
+                start = i
+            elif not v and start is not None:
+                if i - start > best[0]:
+                    best = (i - start, start, i - 1)
+                start = None
+        if best[0] == 0:
+            raise SystemExit(f"{key}: waterfall {f.get('id')!r}: no water at the near tray edge (y {ty1 - 3.0})")
+        half_px = (X[0, 1] - X[0, 0]) / 2.0
+        inset = float(f.get("insetUU", 0.0))
+        x0, x1 = X[j, best[1]] - half_px + inset, X[j, best[2]] + half_px - inset
+        out.append({"id": str(f["id"]), "material": f"{root}/MI_EnvWaterfall_{MAPS[key]}",
+                    "x0": round(float(x0), 1), "x1": round(float(x1), 1),
+                    "y": round(float(ty1 + float(f.get("offsetUU", 30.0))), 1),
+                    "topZ": float(f.get("topZ", 2.5)), "dropUU": float(f.get("dropUU", 200.0)),
+                    "spillUU": float(f.get("spillUU", 0.0))})
+    return out
+
+
 def generate(key: str, params: dict, layout: dict) -> dict:
     ensure_kit_sizes()
     rect = splat_rect(params, layout)
@@ -358,17 +474,31 @@ def generate(key: str, params: dict, layout: dict) -> dict:
     X, Y = grid(rect, size)
     nz = Noise(X, Y, SEEDS[key])
     tray = tray_rect(params["tray"])
-    ch = rules_marmoreal(X, Y, layout, tray, nz) if key == "marmoreal" else rules_sarpedon(X, Y, layout, tray, nz, params)
+    rules = params["maps"][key].get("rules") or {}
+    ch = (rules_marmoreal(X, Y, layout, tray, nz, rules) if key == "marmoreal"
+          else rules_sarpedon(X, Y, layout, tray, nz, params, rules))
+    # P4: blur per channel (uu -> px on each axis); the depth follows the water
+    blur = rules.get("blurUU") or {}
+    upx = ((rect[2] - rect[0]) / size[0], (rect[3] - rect[1]) / size[1])
+    for c in ("R", "G", "B", "A", "W", "F", "E", "D"):
+        b = float(blur.get("W" if c == "D" else c, 0.0))
+        if b > 0:
+            ch[c] = np.clip(gauss_blur(ch[c], (b / upx[0], b / upx[1])), 0.0, 1.0)
     rgb = np.clip(np.rint(np.stack([ch["R"], ch["G"], ch["B"]], axis=-1) * 255.0), 0, 255)
     # A is stored as 1 + a * 254 (never 0): UE's PNG import may infill the RGB of zero-alpha pixels
     # (TextureImporter FillPNGZeroAlpha); M_EnvGround decodes a = saturate((A * 255 - 1) / 254).
     alpha = 1.0 + np.rint(np.clip(ch["A"], 0.0, 1.0) * 254.0)
     arr = np.concatenate([rgb, alpha[..., None]], axis=-1).astype(np.uint8)
-    buf = io.BytesIO()
-    Image.fromarray(arr, "RGBA").save(buf, format="PNG", compress_level=9)
-    png = buf.getvalue()
-    return {"key": key, "rect": rect, "size": size, "X": X, "Y": Y, "channels": ch, "array": arr, "png": png,
-            "sha256": sha256_bytes(png), "tray": tray}
+    png = _png(arr)
+    # the aux mask: R water, G foam, B edge band, A = 1 + depth * 254 (the same never-zero alpha rule)
+    aux_rgb = np.clip(np.rint(np.stack([ch["W"], ch["F"], ch["E"]], axis=-1) * 255.0), 0, 255)
+    aux_a = 1.0 + np.rint(np.clip(ch["D"], 0.0, 1.0) * 254.0)
+    aux = np.concatenate([aux_rgb, aux_a[..., None]], axis=-1).astype(np.uint8)
+    aux_png = _png(aux)
+    res = {"key": key, "rect": rect, "size": size, "X": X, "Y": Y, "channels": ch, "array": arr, "png": png,
+           "sha256": sha256_bytes(png), "tray": tray, "aux": aux, "auxPng": aux_png, "auxSha256": sha256_bytes(aux_png)}
+    res["falls"] = waterfalls(key, params, res)
+    return res
 
 
 def stacked_weights(r, g, b, h=(0.5, 0.5, 0.5), contrast: float = 0.25, blend=(1.0, 1.0, 1.0)):
@@ -387,7 +517,7 @@ def stacked_weights(r, g, b, h=(0.5, 0.5, 0.5), contrast: float = 0.25, blend=(1
 
 
 def decode(arr: np.ndarray) -> np.ndarray:
-    """RGBA8 splat -> float (R, G, B coverage, A accent density with the 1 + a * 254 encoding undone)."""
+    """RGBA8 splat / aux -> float (R, G, B, and A with the 1 + a * 254 encoding undone)."""
     a = arr.astype(float) / 255.0
     a[..., 3] = np.clip((arr[..., 3].astype(float) - 1.0) / 254.0, 0.0, 1.0)
     return a
@@ -401,6 +531,10 @@ def coverage(res: dict, params: dict) -> dict:
     w = stacked_weights(a[..., 0], a[..., 1], a[..., 2], contrast=params["material"]["heightContrast"])
     out = {f"L{i}": round(float(w[i][ground].mean()), 4) for i in range(4)}
     out["accentMean"] = round(float(a[..., 3][ground].mean()), 4)
+    aux = decode(res["aux"])
+    out["water"] = round(float(aux[..., 0][ground].mean()), 4)
+    out["foam"] = round(float(aux[..., 1][ground].mean()), 4)
+    out["edge"] = round(float(aux[..., 2][ground].mean()), 4)
     out["groundPixels"] = int(ground.sum())
     return out
 
@@ -466,6 +600,11 @@ def _draw_overlay(img: Image.Image, res: dict, layout: dict, to_px, font, light:
     for lt in layout.get("lights", []):
         x, y = to_px(*lt["loc"][:2])
         d.ellipse([x - 3, y - 3, x + 3, y + 3], outline=(255, 190, 90, 255), width=2)
+    for f in res.get("falls", []):  # waterfall cards: the spill (dashed box) and the fall line at y
+        d.rectangle([*to_px(f["x0"], f["y"] - f["spillUU"]), *to_px(f["x1"], f["y"])], outline=(120, 220, 255, 255))
+        d.line([to_px(f["x0"], f["y"]), to_px(f["x1"], f["y"])], fill=(120, 220, 255, 255), width=3)
+        x, y = to_px(f["x1"], f["y"])
+        d.text((x + 4, y - 12), f"{f['id']} drop {f['dropUU']:g}", fill=(120, 220, 255, 255), font=font)
 
 
 def preview(res: dict, params: dict, layout: dict, out_png: Path) -> dict:
@@ -478,7 +617,11 @@ def preview(res: dict, params: dict, layout: dict, out_png: Path) -> dict:
     a = decode(np.stack([np.asarray(Image.fromarray(res["array"][..., k], "L").resize((W, H), Image.BILINEAR))
                          for k in range(4)], axis=-1))
     r, g, b, acc = a[..., 0], a[..., 1], a[..., 2], a[..., 3]
+    x_aux = decode(np.stack([np.asarray(Image.fromarray(res["aux"][..., k], "L").resize((W, H), Image.BILINEAR))
+                             for k in range(4)], axis=-1))
+    wat, foam, edge, depth = x_aux[..., 0], x_aux[..., 1], x_aux[..., 2], x_aux[..., 3]
     contrast = params["material"]["heightContrast"]
+    mp = params["maps"][key]
     font = _font(11)
 
     def to_px(x, y):
@@ -488,14 +631,19 @@ def preview(res: dict, params: dict, layout: dict, out_png: Path) -> dict:
     w = stacked_weights(r, g, b, contrast=contrast)
     fc = sum(w[i][..., None] * np.array(FALSE[key][i], float) for i in range(4))
     fc = fc * (1 - 0.6 * acc[..., None]) + 0.6 * acc[..., None] * np.array(ACCENT_FALSE[key], float)
+    fc = fc * (1 - 0.55 * edge[..., None])  # curb / beam band darker
+    fc = fc * (1 - wat[..., None]) + wat[..., None] * (np.array([60, 110, 210], float) * (1 - 0.5 * depth[..., None]))
+    fc = fc * (1 - foam[..., None]) + foam[..., None] * 255.0
     top = Image.fromarray(np.clip(fc, 0, 255).astype(np.uint8), "RGB")
     _draw_overlay(top, res, layout, to_px, font, light=True)
     ImageDraw.Draw(top).text((6, 4), f"{MAPS[key]} splat: " + " | ".join(
         f"{lay.get('channel', 'base')} {lay['set']}" for lay in params["maps"][key]["layers"])
-        + f" | A {params['maps'][key]['accent']['mode']}", fill=(255, 255, 255), font=_font(13))
+        + f" | A {params['maps'][key]['accent']['mode']} | aux: water blue, foam white, edge dark",
+        fill=(255, 255, 255), font=_font(13))
     # panel 2: albedo preview with the raw CC0 textures
     raw_root = Path(params["cc0Raw"])
-    note = "albedo preview (CC0 textures at their tiling, tint / saturation / accent; no lighting, no night grade)"
+    note = ("albedo preview (CC0 textures at their tiling, tint / saturation / layer macro / accent / edge / water + "
+            "foam; no lighting, no night grade, no ripples)")
     try:
         cols, hts = [], []
         for lay in params["maps"][key]["layers"]:
@@ -507,6 +655,9 @@ def preview(res: dict, params: dict, layout: dict, out_png: Path) -> dict:
             col = c[vi, ui]
             luma = (col * np.array([0.2126, 0.7152, 0.0722])).sum(-1, keepdims=True)
             col = (luma + (col - luma) * float(lay["saturation"])) * np.array(lay["tint"], float)
+            if float(lay.get("macro", 0.0)) > 0:  # LayerMacro (M_EnvGround graph 2): +-macro at layerMacroScaleUU
+                lm = Noise(Xp, Yp, 78).signed(float(params["material"].get("layerMacroScaleUU", 33.0)), 2, 2)
+                col = col * (1.0 + float(lay["macro"]) * lm[..., None])
             cols.append(col)
             hts.append(h[vi, ui])
         blend = tuple(float(lay.get("heightBlend", 1.0)) for lay in params["maps"][key]["layers"][1:])
@@ -526,6 +677,17 @@ def preview(res: dict, params: dict, layout: dict, out_png: Path) -> dict:
         else:
             k = (acc * float(ac["opacity"]))[..., None]
             alb = alb * (1 - k) + alb * acol * k
+        if mp.get("edge"):
+            e = (edge * float(mp["edge"].get("strength", 1.0)))[..., None]
+            alb = alb * (1 - e + e * np.array(mp["edge"]["color"], float))
+        if mp.get("water"):
+            wp = mp["water"]
+            wc = srgb_to_lin(np.array(wp["colorSrgb"], float) / 255.0)
+            shallow = alb * (1 - float(wp["shallowMix"])) + wc * float(wp["shallowMix"])
+            wcol = shallow * (1 - depth[..., None]) + wc * depth[..., None]
+            alb = alb * (1 - wat[..., None]) + wcol * wat[..., None]
+            fo = np.clip(foam * float(wp["foamOpacity"]), 0, 1)[..., None]
+            alb = alb * (1 - fo) + fo * np.array(wp["foamColor"], float)
         bot = Image.fromarray((lin_to_srgb(alb) * 255).astype(np.uint8), "RGB")
     except (OSError, KeyError) as exc:
         bot = Image.new("RGB", (W, H), (30, 30, 30))
@@ -573,7 +735,8 @@ def petal_specks(X, Y, density, size_uu: float):
 def ground_section(key: str, params: dict, res: dict, png_path: Path) -> dict:
     g = params["ground"]
     x0, y0, x1, y1 = res["rect"]
-    return {
+    aux_path = Path(png_path).with_name(f"{key}.aux.png")
+    sec = {
         "mode": g["mode"],
         "material": f"{g['materialRoot']}/MI_EnvGround_{MAPS[key]}",
         "z": float(g["z"]),
@@ -582,11 +745,67 @@ def ground_section(key: str, params: dict, res: dict, png_path: Path) -> dict:
         "splatRect": [float(x0), float(y0), float(x1), float(y1)],
         "splat": rel(png_path),
         "splatSha256": res["sha256"],
-        "notes": ("ENV-U10 themed ground (tools/art/env_kit/ground_splat.py, ground-params.json): runtime = four "
-                  "/Engine/BasicShapes/Plane strips = tray top minus the frame (hole = frame outer - frameOverlapUU, "
-                  "outer = tray top - insetUU) at z, NoCollision, no shadow casting; material MI_EnvGround_<Map> "
-                  "(tools/art/env_kit/ue_import_env_ground.py) gets GroundStrip / SplatRect per strip (MID)."),
+        "aux": rel(aux_path),
+        "auxSha256": res["auxSha256"],
     }
+    if res.get("falls"):
+        sec["waterfalls"] = [dict(f) for f in res["falls"]]
+    sec["notes"] = ("ENV-U10 themed ground (tools/art/env_kit/ground_splat.py, ground-params.json): runtime = four "
+                    "/Engine/BasicShapes/Plane strips = tray top minus the frame (hole = frame outer - frameOverlapUU, "
+                    "outer = tray top - insetUU) at z, NoCollision, no shadow casting; material MI_EnvGround_<Map> "
+                    "(tools/art/env_kit/ue_import_env_ground.py) gets GroundStrip / SplatRect per strip (MID); the aux "
+                    "mask (water / foam / edge band / depth) is bound in the MI. P4 waterfalls (S08EnvGround): per "
+                    "entry a vertical engine-plane card x0..x1 at y from topZ down dropUU plus a flat spill (y - "
+                    "spillUU .. y at topZ) over the T2 lip, MI_EnvWaterfall_<Map>, no collision, no shadow.")
+    return sec
+
+
+# S08EnvGroundSpec waterfall limits (S08EnvGround.h): the C++ parser rejects the whole layout outside them
+FALL_MAX = 4
+FALL_TOP_Z = (-3.0, 20.0)      # inclusive
+FALL_MAX_DROP_UU = 1000.0      # (0, max]
+FALL_MAX_SPILL_UU = 200.0      # [0, max]
+FALL_MAX_WIDTH_UU = 2000.0
+
+
+def validate_waterfalls(key: str, falls, tray) -> list[str]:
+    """The layout 'ground.waterfalls' against the S08EnvGround parse rules and the tray (the card stands in front of
+    the near tray edge, within the T2 overhang + 40 uu)."""
+    if falls is None:
+        return []
+    if not isinstance(falls, list):
+        return [f"{key}: ground.waterfalls is not an array"]
+    errs, ids = [], set()
+    if len(falls) > FALL_MAX:
+        errs.append(f"{key}: {len(falls)} waterfalls > {FALL_MAX}")
+    for f in falls:
+        if not isinstance(f, dict):
+            errs.append(f"{key}: a waterfall is not an object")
+            continue
+        fid = f.get("id")
+        if not isinstance(fid, str) or not fid or fid in ids:
+            errs.append(f"{key}: waterfall id {fid!r} empty or duplicate")
+        ids.add(fid)
+        num = {k: f.get(k) for k in ("x0", "x1", "y", "topZ", "dropUU", "spillUU")}
+        if not all(isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v) for v in num.values()):
+            errs.append(f"{key}: waterfall {fid}: x0 / x1 / y / topZ / dropUU / spillUU must be numbers")
+            continue
+        if not 0.0 < num["x1"] - num["x0"] <= FALL_MAX_WIDTH_UU:
+            errs.append(f"{key}: waterfall {fid}: width x1 - x0 not in (0, {FALL_MAX_WIDTH_UU:g}]")
+        if not FALL_TOP_Z[0] <= num["topZ"] <= FALL_TOP_Z[1]:
+            errs.append(f"{key}: waterfall {fid}: topZ not in [{FALL_TOP_Z[0]:g}, {FALL_TOP_Z[1]:g}]")
+        if not 0.0 < num["dropUU"] <= FALL_MAX_DROP_UU:
+            errs.append(f"{key}: waterfall {fid}: dropUU not in (0, {FALL_MAX_DROP_UU:g}]")
+        if not 0.0 <= num["spillUU"] <= FALL_MAX_SPILL_UU:
+            errs.append(f"{key}: waterfall {fid}: spillUU not in [0, {FALL_MAX_SPILL_UU:g}]")
+        tx0, ty0, tx1, ty1 = tray
+        if not (ty1 <= num["y"] <= ty1 + 40.0) or num["x0"] < tx0 or num["x1"] > tx1:
+            errs.append(f"{key}: waterfall {fid}: not at the near tray edge (y {num['y']} vs {ty1}, x {num['x0']}..{num['x1']})")
+        if num["y"] - num["spillUU"] > ty1 or num["y"] - num["spillUU"] < ty1 - 120.0:
+            errs.append(f"{key}: waterfall {fid}: the spill {num['y'] - num['spillUU']}..{num['y']} does not start on the tray top near its edge")
+        if not isinstance(f.get("material"), str) or not f["material"].startswith("/Game/EnvKit/Ground/MI_EnvWaterfall_"):
+            errs.append(f"{key}: waterfall {fid}: material {f.get('material')!r} is not /Game/EnvKit/Ground/MI_EnvWaterfall_<Map>")
+    return errs
 
 
 def write_layout_ground(layout_path: Path, section: dict) -> bool:
@@ -617,13 +836,35 @@ def check_layout_ground(key: str, layout: dict, res: dict, params: dict) -> list
     if not isinstance(g, dict):
         return [f"{key}: layout has no 'ground' section (run with --write-layouts)"]
     want = ground_section(key, params, res, Path(REPO / g.get("splat", "")))
-    for k in ("mode", "material", "z", "frameOverlapUU", "insetUU", "splatRect", "splatSha256"):
+    for k in ("mode", "material", "z", "frameOverlapUU", "insetUU", "splatRect", "splatSha256", "aux", "auxSha256"):
         if g.get(k) != want[k]:
             errs.append(f"{key}: layout ground.{k} = {g.get(k)!r}, generator gives {want[k]!r}")
+    if g.get("waterfalls") != want.get("waterfalls"):
+        errs.append(f"{key}: layout ground.waterfalls = {g.get('waterfalls')!r}, generator gives {want.get('waterfalls')!r}")
+    errs += validate_waterfalls(key, g.get("waterfalls"), res["tray"])
     return errs
 
 
 # ------------------------------------------------------------------------------------------------ entry
+AUX_CHANNELS = {"R": "water coverage (river mouths)", "G": "foam (shore band, surf)",
+                "B": "edge band (Marmoreal curb / Sarpedon deck beam)", "A": "1 + water depth * 254"}
+
+
+def compare_png(key: str, path: Path, sha: str, arr: np.ndarray) -> list[str]:
+    """--check: the committed PNG against the regenerated array (<= 1 LSB of float drift is accepted)."""
+    if not path.is_file():
+        return [f"{key}: {rel(path)} missing"]
+    have = path.read_bytes()
+    if sha256_bytes(have) == sha:
+        return []
+    old = np.asarray(Image.open(io.BytesIO(have)).convert("RGBA"), int)
+    diff = int(np.abs(old - arr.astype(int)).max()) if old.shape == arr.shape else 999
+    if diff > 1:
+        return [f"{key}: {rel(path)} differs from the rules (max |diff| {diff}); re-run"]
+    print(f"  {key}: {path.name} bytes differ by <= 1 LSB (float drift) - accepted")
+    return []
+
+
 def run(args) -> int:
     params = load_params(Path(args.params))
     out_dir = Path(args.out) if args.out else Path(args.params).resolve().parent
@@ -640,6 +881,7 @@ def run(args) -> int:
         layout = json.loads(layout_path.read_text(encoding="utf-8"))
         res = generate(key, params, layout)
         png_path = out_dir / f"{key}.splat.png"
+        aux_path = out_dir / f"{key}.aux.png"
         meta_path = out_dir / f"{key}.splat.json"
         notes = tray_notes(params, layout, extents)
         cov = coverage(res, params)
@@ -656,29 +898,27 @@ def run(args) -> int:
                          for lay in params["maps"][key]["layers"]},
             "accent": params["maps"][key]["accent"], "coverage": cov, "seed": SEEDS[key],
             "png": {"path": rel(png_path), "sha256": res["sha256"], "bytes": len(res["png"]), "format": "PNG RGBA8"},
+            "aux": {"path": rel(aux_path), "sha256": res["auxSha256"], "bytes": len(res["auxPng"]),
+                    "format": "PNG RGBA8", "channels": AUX_CHANNELS},
+            "rules": params["maps"][key].get("rules") or {},
+            "waterfalls": res["falls"],
             "kit": kit_msgs[:3], "notes": notes,
         }
         if args.check:
-            errs = []
-            if not png_path.is_file():
-                errs.append(f"{key}: {rel(png_path)} missing")
-            else:
-                have = png_path.read_bytes()
-                if sha256_bytes(have) != res["sha256"]:
-                    old = np.asarray(Image.open(io.BytesIO(have)).convert("RGBA"), int)
-                    diff = int(np.abs(old - res["array"].astype(int)).max()) if old.shape == res["array"].shape else 999
-                    if diff > 1:
-                        errs.append(f"{key}: {rel(png_path)} differs from the rules (max |diff| {diff}); re-run")
-                    else:
-                        print(f"  {key}: png bytes differ by <= 1 LSB (float drift) - accepted")
+            errs = compare_png(key, png_path, res["sha256"], res["array"])
+            errs += compare_png(key, aux_path, res["auxSha256"], res["aux"])
             if meta_path.is_file():
                 m_old = json.loads(meta_path.read_text(encoding="utf-8"))
-                if m_old.get("png", {}).get("sha256") != (sha256_bytes(png_path.read_bytes()) if png_path.is_file() else None):
-                    errs.append(f"{key}: {rel(meta_path)} png.sha256 does not match the file")
+                for field, path in (("png", png_path), ("aux", aux_path)):
+                    if (m_old.get(field) or {}).get("sha256") != (sha256_bytes(path.read_bytes()) if path.is_file() else None):
+                        errs.append(f"{key}: {rel(meta_path)} {field}.sha256 does not match {rel(path)}")
+                if m_old.get("waterfalls", []) != res["falls"]:
+                    errs.append(f"{key}: {rel(meta_path)} waterfalls differ from the rules; re-run")
             else:
                 errs.append(f"{key}: {rel(meta_path)} missing")
-            if png_path.is_file():
-                res_file = dict(res, sha256=sha256_bytes(png_path.read_bytes()))
+            if png_path.is_file() and aux_path.is_file():
+                res_file = dict(res, sha256=sha256_bytes(png_path.read_bytes()),
+                                auxSha256=sha256_bytes(aux_path.read_bytes()))
                 errs += check_layout_ground(key, layout, res_file, params)
             for e in errs:
                 print("  ERROR " + e)
@@ -688,14 +928,16 @@ def run(args) -> int:
             ok = ok and not errs
             continue
         png_path.write_bytes(res["png"])
+        aux_path.write_bytes(res["auxPng"])
         if not args.no_preview:
             meta["preview"] = preview(res, params, layout, out_dir / f"{key}.preview.png")
         meta_path.write_bytes((json.dumps(meta, indent=1, ensure_ascii=False) + "\n").encode("utf-8"))  # LF
         changed = None
         if args.write_layouts:
             changed = write_layout_ground(layout_path, ground_section(key, params, res, png_path))
-        print(f"== {key}: {rel(png_path)} {res['size'][0]}x{res['size'][1]} sha256 {res['sha256'][:16]} "
-              f"rect {res['rect']} coverage {cov}" + ("" if changed is None else f" layout ground {'updated' if changed else 'unchanged'}"))
+        print(f"== {key}: {rel(png_path)} {res['size'][0]}x{res['size'][1]} sha256 {res['sha256'][:16]} aux "
+              f"{res['auxSha256'][:16]} rect {res['rect']} coverage {cov} waterfalls {res['falls']}"
+              + ("" if changed is None else f" layout ground {'updated' if changed else 'unchanged'}"))
         for n in notes:
             print("  note  " + n)
     return 0 if ok else 1

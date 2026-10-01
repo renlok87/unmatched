@@ -16,7 +16,11 @@ UE, Blender, GPU и платные сервисы не нужны.
 ```bash
 python -B tools/art/map_surface/build_map_textures.py              # обе карты, ≈55 с на карту
 python -B tools/art/map_surface/build_map_textures.py --maps sarpedon
+python -B tools/art/map_surface/build_map_textures.py --refresh-k1   # только моки K1 с грейдом профиля (ENV-MAPS P4)
 ```
+
+`--refresh-k1` читает уже собранные BC и маску (sha256 сверяется с манифестом, файлы только читаются), перерисовывает
+моки a/b/c и обновляет в `manifest.<key>.json` только `k1.grade_b_c`, `k1.mocks` и `k1.measurement.grade_b_vs_a_ev`.
 
 По умолчанию входы и выходы лежат в главном checkout (`--images`, `--maps-json`, `--topology`, `--derived`,
 `--mocks` переопределяют пути):
@@ -158,7 +162,10 @@ sha256 топологии считается по тексту с LF, то ес�
 
 **Варианты:**
 - **a** — BC без освещения;
-- **b** — ночной грейд:
+- **b** — ночной грейд. С ENV-MAPS P4 (2026-10-01) это грейд движка: `mapGrade` светового профиля доски
+  map-image в `S08ArtBoardProfiles.json` (`k1_mock.profile_map_grade`; формула = граф M_MapBoard v2, `k1_mock._night`).
+  Свет мока по-прежнему только `2^EV · тинт` (без ключа, лунного пятна, неба и тонмаппера), поэтому мок совпадает с
+  движком по параметрам грейда, а не по кадру. Ниже — исходный грейд S-prep (значения по умолчанию графа v1):
   - `lit = albedo · 2^−0,7 · холодный тинт`;
   - вне маски `lit` обесцвечен ×0,7;
   - внутри маски `lit + 0,35 · albedo` (unlit-доля);
@@ -188,3 +195,43 @@ sha256 топологии считается по тексту с LF, то ес�
 - Ореол маски: расширение на 6 px видно в b/c как светлая кайма вокруг кругов и связей.
   Это «подъём читаемости» из брифа; его ширину решает художественная приёмка.
 - Моки — геометрическая подложка под концепты, а не рендер UE: нет теней от подноса, TAA и тонмаппинга UE.
+
+## M_MapBoard v2 и материалы читаемости (ENV-MAPS P4, трек C)
+
+`ue_import_map_surface.py` строит граф M_MapBoard версии 2 (тег `EnvMapsGraphVersion` = 2, пересборка без `--force`).
+Новые параметры работают только внутри игровой маски, по умолчанию тождественны (граф v1 бит в бит):
+
+| Параметр | Что делает | Профиль (`lightProfiles.<map>-night.mapGrade`) |
+|---|---|---|
+| `MaskSaturation` | насыщенность освещённой доли внутри маски, яркость (luma) сохраняется | `maskSaturation` 0..3 |
+| `MaskInverseTint` | множитель освещённой доли внутри маски: гасит холодный оттенок света на кругах | `maskInverseTintLinear` [r,g,b] 0..4 |
+| `LiftSaturation` | насыщенность эмиссивного подъёма (Lift) | `liftSaturation` 0..3 |
+
+MI получает значения профиля (через `manifest.<key>.json` → `k1.grade_b_c`), актёр доски ставит их же на MID
+(`ApplyMapGrade`, строка трассы `ARTPREVIEW map grade ... graph=v2 maskTerms=1`). Без переимпорта (граф v1) параметры
+не действуют, трасса пишет `graph=v1` и `mask terms ignored`.
+
+Там же два общих материала для блока `readability` досок map-image:
+
+- `/Game/EnvMaps/M_MapFrameWood` — дерево рамки ART-005 (`T_old_wood_D/N/ORM_1024`) с `FrameValueScale`
+  (линейный множитель альбедо; профиль задаёт `valueScaleSrgb`, актёр передаёт его в степени 2,2) и `FrameSaturation`;
+- `/Game/EnvMaps/M_MapContactShadow` — unlit, BLEND_MODULATE: мягкое радиальное пятно на плоскости движка под базой
+  каждой фигуры (`Strength`, `Softness`).
+
+Без этих материалов доска остаётся прежней (рамка из пробного дерева, без пятна; трасса `ARTPREVIEW map frame
+wood=missing`, `ARTPREVIEW readability contact shadow ... loaded=0`). Статус всего блока — предложено.
+
+### Замер разделения зон (`zone_separation.py`)
+
+```bash
+python -B tools/art/map_surface/zone_separation.py measure <map> <frame.png> <bench.trace.log> --json m.json
+python -B tools/art/map_surface/zone_separation.py fit <map> <frame.png> <bench.trace.log> --out model.json
+python -B tools/art/map_surface/zone_separation.py predict <map> --model model.json --measured m.json
+```
+
+`measure` — медиана CIELAB каждой зоны по секторам кругов (лучи-разделители из `<map>.vector-layer.json`) на оригинале
+и на кадре, ΔE76 всех пар (соседние = общий круг или связь). `fit` — модель плоскости карты по кадру (канальные
+множители света, гладкое поле лунного пятна, доля эмиссии, тонмаппинг ~ACES; грейд берётся из строки трассы
+`ARTPREVIEW map grade`). `predict` — оценка ΔE при грейде профиля: замер × модель(новый) / модель(подогнанный).
+Это прогноз, не замер. На кадрах P2 (K1): минимальная пара Marmoreal red–violet 19,9 (оригинал 25,0), Sarpedon
+blue–purple 22,4 (27,7); прогноз для грейда rev 10 — 26,5 и 30,4, яркость карты −0,4 / −1,1, ΔL* контура +0,4 / +0,6.

@@ -778,6 +778,10 @@ void AS08BoardActor::ApplyMapGrade(const FS08LightProfile& Light) {
     Mid->SetScalarParameterValue(FName(S08MapSurfaceSpec::ParamNightSaturation), G.NightSaturation);
     Mid->SetScalarParameterValue(FName(S08MapSurfaceSpec::ParamLift), G.Lift);
     if (G.bHasTint) Mid->SetVectorParameterValue(FName(S08MapSurfaceSpec::ParamNightTint), G.NightTint);
+    // ENV-MAPS P4 (M_MapBoard graph v2): the mask-only zone-separation terms (identity unless the profile sets them).
+    Mid->SetScalarParameterValue(FName(S08MapSurfaceSpec::ParamMaskSaturation), G.MaskSaturation);
+    Mid->SetScalarParameterValue(FName(S08MapSurfaceSpec::ParamLiftSaturation), G.LiftSaturation);
+    Mid->SetVectorParameterValue(FName(S08MapSurfaceSpec::ParamMaskInverseTint), G.MaskInverseTint);
   }
   // Read back what the MID renders with (the profile values, or the MI values of the import script).
   float Ev = 0.0f, Saturation = 0.0f, Lift = 0.0f;
@@ -786,9 +790,31 @@ void AS08BoardActor::ApplyMapGrade(const FS08LightProfile& Light) {
   Mid->GetScalarParameterValue(FHashedMaterialParameterInfo(S08MapSurfaceSpec::ParamNightSaturation), Saturation);
   Mid->GetScalarParameterValue(FHashedMaterialParameterInfo(S08MapSurfaceSpec::ParamLift), Lift);
   Mid->GetVectorParameterValue(FHashedMaterialParameterInfo(S08MapSurfaceSpec::ParamNightTint), Tint);
+  // Graph v2 parameters: a graph-v1 M_MapBoard (import not re-run) lacks them -> 'graph=v1' (the terms are inert).
+  // Existence is asked of the base material (a MID keeps any value it was given, known to the graph or not).
+  const UMaterial* BaseMaterial = Mid->GetMaterial();
+  float Probe = 0.0f;
+  FLinearColor ProbeColor = FLinearColor::White;
+  const bool bGraphV2 =
+      BaseMaterial &&
+      BaseMaterial->GetScalarParameterValue(FHashedMaterialParameterInfo(S08MapSurfaceSpec::ParamMaskSaturation), Probe) &&
+      BaseMaterial->GetScalarParameterValue(FHashedMaterialParameterInfo(S08MapSurfaceSpec::ParamLiftSaturation), Probe) &&
+      BaseMaterial->GetVectorParameterValue(FHashedMaterialParameterInfo(S08MapSurfaceSpec::ParamMaskInverseTint), ProbeColor);
+  float MaskSaturation = 1.0f, LiftSaturation = 1.0f;
+  FLinearColor InverseTint = FLinearColor::White;
+  if (bGraphV2) {
+    Mid->GetScalarParameterValue(FHashedMaterialParameterInfo(S08MapSurfaceSpec::ParamMaskSaturation), MaskSaturation);
+    Mid->GetScalarParameterValue(FHashedMaterialParameterInfo(S08MapSurfaceSpec::ParamLiftSaturation), LiftSaturation);
+    Mid->GetVectorParameterValue(FHashedMaterialParameterInfo(S08MapSurfaceSpec::ParamMaskInverseTint), InverseTint);
+  }
   FS08Trace::Write(FString::Printf(
-      TEXT("ARTPREVIEW map grade profile=%s source=%s nightEV=%.2f nightSaturation=%.2f lift=%.2f nightTint=(%.4f,%.4f,%.4f)"),
-      *Light.Id, G.bSet ? TEXT("profile") : TEXT("mi"), Ev, Saturation, Lift, Tint.R, Tint.G, Tint.B));
+      TEXT("ARTPREVIEW map grade profile=%s source=%s nightEV=%.2f nightSaturation=%.2f lift=%.2f nightTint=(%.4f,%.4f,%.4f) maskSaturation=%.2f liftSaturation=%.2f maskInverseTint=(%.4f,%.4f,%.4f) graph=%s maskTerms=%d"),
+      *Light.Id, G.bSet ? TEXT("profile") : TEXT("mi"), Ev, Saturation, Lift, Tint.R, Tint.G, Tint.B, MaskSaturation,
+      LiftSaturation, InverseTint.R, InverseTint.G, InverseTint.B, bGraphV2 ? TEXT("v2") : TEXT("v1"),
+      G.bSet && G.HasMaskTerms() ? 1 : 0));
+  if (G.bSet && G.HasMaskTerms() && !bGraphV2) {
+    FS08Trace::Write(TEXT("ARTPREVIEW map grade mask terms ignored: M_MapBoard graph v1 (re-run tools/art/map_surface/ue_import_map_surface.py)"));
+  }
 }
 
 void AS08BoardActor::ApplySurfaceMaterials() {
@@ -1366,6 +1392,8 @@ void AS08BoardActor::SyncFighters(const FS08BoardModel& Board,
       Actor->SetLabelMode(LabelPlateFighterId.IsEmpty() ? ES08FighterLabelMode::Full
                           : Fighter.Id == LabelPlateFighterId ? ES08FighterLabelMode::Hidden
                                                               : ES08FighterLabelMode::Compact);
+      // ENV-MAPS P4: contact-shadow blob + leader pip (map-image boards with a readability block only).
+      ApplyFighterReadability(Actor, Fighter, S08TeamLook(Team, bOwn, TeamColorMode));
     }
   }
   // ART-004 T2.2 six-copies review: one summary once every fighter applied.
@@ -1428,6 +1456,8 @@ void AS08BoardActor::SetSelectedFighter(const FString& FighterId,
   }
   int32 ArtOutlineCells = 0;
   bool bArtOutlinePositionsCorrect = true;
+  // ENV-MAPS P4: the map-image readability ring (nullptr on grids / without the profile block: the old rings).
+  const FS08BoardReadabilitySpec* ReachSpec = GetActiveReadability();
   for (const uint64 Key : ReachableCells) {
     const int32 X = static_cast<int32>(Key >> 32);
     const int32 Y = static_cast<int32>(Key & 0xFFFFFFFF);
@@ -1482,7 +1512,29 @@ void AS08BoardActor::SetSelectedFighter(const FString& FighterId,
       Mesh->RegisterComponent();
     };
     if (bTopologyBoard) {
-      if (bArtActive) {
+      if (bArtActive && ReachSpec && ReachSpec->bReach) {
+        // ENV-MAPS P4 readability: a ring in a colour outside the zone palette with a thin dark outer stroke, many
+        // segments; fill and stroke are one ISM each per space (not 2 x Segments components).
+        TArray<FTransform> Fill, Stroke;
+        S08ReachRingPieces(*ReachSpec, Fill, Stroke);
+        auto AddRing = [&](const TCHAR* Name, const TArray<FTransform>& Pieces, const FColor& Srgb) {
+          if (Pieces.Num() == 0) return;
+          UInstancedStaticMeshComponent* Ism = NewObject<UInstancedStaticMeshComponent>(Tile, FName(Name));
+          Ism->SetupAttachment(Root);
+          Ism->SetStaticMesh(BlockerTiles->GetStaticMesh());
+          Ism->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+          if (Solid) {
+            UMaterialInstanceDynamic* RingMid = UMaterialInstanceDynamic::Create(Solid, Tile);
+            RingMid->SetVectorParameterValue(TEXT("Tint"), FLinearColor(Srgb));  // sRGB bytes -> linear (trap 9)
+            Ism->SetMaterial(0, RingMid);
+          }
+          S08ApplyGameLayerPrimitive(Ism);
+          Ism->RegisterComponent();
+          for (const FTransform& Piece : Pieces) Ism->AddInstance(Piece, false);  // relative to the space centre
+        };
+        AddRing(TEXT("ReachStroke"), Stroke, ReachSpec->ReachStroke);
+        AddRing(TEXT("ReachFill"), Fill, ReachSpec->ReachColor);
+      } else if (bArtActive) {
         // A ring inside the painted circle (the map keeps its zone colours readable under it).
         TArray<FTransform> Pieces;
         S08RingPieces(S08MapSurfaceSpec::RingRadiusUU, S08MapSurfaceSpec::RingWidthUU,
@@ -1511,7 +1563,13 @@ void AS08BoardActor::SetSelectedFighter(const FString& FighterId,
     }
     HighlightTiles.Add(Tile);
   }
-  if (bArtActive && bTopologyBoard) {
+  if (bArtActive && bTopologyBoard && ReachSpec && ReachSpec->bReach) {
+    FS08Trace::Write(FString::Printf(
+        TEXT("ARTPREVIEW reachable rings cells=%d placed=%d radiusUU=%.0f segments=%d style=readability color=%s stroke=%s widthUU=%.2f strokeUU=%.2f"),
+        ArtOutlineCells, bArtOutlinePositionsCorrect ? 1 : 0, S08MapSurfaceSpec::RingRadiusUU, ReachSpec->ReachSegments,
+        *S08ColorHex(ReachSpec->ReachColor), *S08ColorHex(ReachSpec->ReachStroke), ReachSpec->ReachWidthUU,
+        ReachSpec->ReachStrokeUU));
+  } else if (bArtActive && bTopologyBoard) {
     FS08Trace::Write(FString::Printf(
         TEXT("ARTPREVIEW reachable rings cells=%d placed=%d radiusUU=%.0f segments=%d"), ArtOutlineCells,
         bArtOutlinePositionsCorrect ? 1 : 0, S08MapSurfaceSpec::RingRadiusUU, S08MapSurfaceSpec::RingSegments));
@@ -1763,12 +1821,14 @@ void AS08BoardActor::BuildMapImageSurface(const FS08BoardModel& Board, const FS0
     const double SpanX = (Size.X + 2.0 * F) / 100.0;
     const double SpanY = Size.Y / 100.0;
     const double T = F / 100.0;
+    // ENV-MAPS P4 (review gap 9, quick): a profile "frameWood" block puts the frame on the darker M_MapFrameWood.
+    UMaterialInterface* FrameWood = MapFrameMaterial();
     for (const FTransform& Bar : {
              FTransform(FRotator::ZeroRotator, FVector(0, Half.Y + F * 0.5, FrameCentreZ), FVector(SpanX, T, 0.14)),
              FTransform(FRotator::ZeroRotator, FVector(0, -Half.Y - F * 0.5, FrameCentreZ), FVector(SpanX, T, 0.14)),
              FTransform(FRotator::ZeroRotator, FVector(-Half.X - F * 0.5, 0, FrameCentreZ), FVector(T, SpanY, 0.14)),
              FTransform(FRotator::ZeroRotator, FVector(Half.X + F * 0.5, 0, FrameCentreZ), FVector(T, SpanY, 0.14))}) {
-      AddArtSurfacePart(ArtWoodMaterial, Bar);
+      AddArtSurfacePart(FrameWood, Bar);
     }
   }
   for (const TPair<FVector, float>& Corner : {
@@ -1791,5 +1851,118 @@ void AS08BoardActor::BuildMapImageSurface(const FS08BoardModel& Board, const FS0
   for (const FString& Key : Summary.ZoneKeys) {
     FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW board map zone key=%s spaces=%d (painted, no zone marks)"), *Key,
                                      Summary.ZoneCellCounts.FindRef(Key)));
+  }
+}
+
+// ---- ENV-MAPS P4 readability (map-image boards with a profile "readability" block) --------------------------
+
+UMaterialInterface* AS08BoardActor::MapFrameMaterial() {
+  const FS08BoardReadabilitySpec* R = GetActiveReadability();
+  if (!R || !R->bFrameWood) {
+    MapFrameWoodSource = TEXT("probe");
+    return ArtWoodMaterial.Get();
+  }
+  if (!bMapFrameWoodTried) {
+    // Loaded on the first map-image board with the block; a run that never shows one loads nothing new.
+    bMapFrameWoodTried = true;
+    UMaterialInterface* Base =
+        LoadObject<UMaterialInterface>(nullptr, S08MapSurfaceSpec::FrameWoodMaterialPath, nullptr, LOAD_NoWarn);
+    if (Base) MapFrameWoodMid = UMaterialInstanceDynamic::Create(Base, this);
+  }
+  if (!MapFrameWoodMid) {
+    MapFrameWoodSource = TEXT("missing");
+    FS08Trace::Write(FString::Printf(
+        TEXT("ARTPREVIEW map frame wood=missing material=%s (run tools/art/map_surface/ue_import_map_surface.py) -> probe wood"),
+        S08MapSurfaceSpec::FrameWoodMaterialPath));
+    return ArtWoodMaterial.Get();
+  }
+  MapFrameWoodMid->SetScalarParameterValue(FName(S08MapSurfaceSpec::ParamFrameValueScale), R->FrameValueScaleLinear());
+  MapFrameWoodMid->SetScalarParameterValue(FName(S08MapSurfaceSpec::ParamFrameSaturation), R->FrameSaturation);
+  MapFrameWoodSource = TEXT("frame-wood");
+  FS08Trace::Write(FString::Printf(
+      TEXT("ARTPREVIEW map frame wood=frame-wood material=M_MapFrameWood valueScaleSrgb=%.2f valueScaleLinear=%.4f saturation=%.2f"),
+      R->FrameValueScaleSrgb, R->FrameValueScaleLinear(), R->FrameSaturation));
+  return MapFrameWoodMid.Get();
+}
+
+void AS08BoardActor::ApplyFighterReadability(AS08FighterActor* Actor, const FS08BoardFighter& Fighter,
+                                             ES08TeamSlot Look) {
+  const FS08BoardReadabilitySpec* R = GetActiveReadability();
+  if (!Actor || !R || !(R->bContactShadow || R->bLeaderPip)) return;
+  USceneComponent* Root = Actor->GetRootComponent();
+  if (!Root) return;
+  // A sidekick's base and team ring are smaller (ring scale 0.78): blob and pip follow the ring.
+  const float RingScale = Actor->HasTeamRing() ? static_cast<float>(Actor->GetTeamRingScale().X) : 1.0f;
+  auto FindPart = [Actor](const FName Name) -> UStaticMeshComponent* {
+    TInlineComponentArray<UStaticMeshComponent*> Parts(Actor);
+    for (UStaticMeshComponent* Part : Parts) {
+      if (Part && Part->GetFName() == Name) return Part;
+    }
+    return nullptr;
+  };
+  // Components of the FIGHTER actor (they follow it, hide with it when it dies, go with it on a rebuild).
+  auto EnsurePart = [&](const FName Name, UStaticMesh* Mesh, UMaterialInterface* Material,
+                        const FTransform& Relative) -> UStaticMeshComponent* {
+    UStaticMeshComponent* Part = FindPart(Name);
+    if (!Part) {
+      Part = NewObject<UStaticMeshComponent>(Actor, Name);
+      Part->SetupAttachment(Root);
+      Part->SetStaticMesh(Mesh);
+      Part->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+      Part->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+      Part->SetGenerateOverlapEvents(false);
+      Part->SetCanEverAffectNavigation(false);
+      S08ApplyGameLayerPrimitive(Part);
+      Part->SetCastShadow(false);
+      Part->RegisterComponent();
+    }
+    Part->SetRelativeTransform(Relative);
+    if (Material) Part->SetMaterial(0, Material);
+    return Part;
+  };
+  bool bShadow = false, bPip = false;
+  if (R->bContactShadow && PlaneMesh) {
+    if (!bContactShadowTried) {
+      bContactShadowTried = true;
+      UMaterialInterface* Base =
+          LoadObject<UMaterialInterface>(nullptr, S08MapSurfaceSpec::ContactShadowMaterialPath, nullptr, LOAD_NoWarn);
+      if (Base) ContactShadowMid = UMaterialInstanceDynamic::Create(Base, this);
+      FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW readability contact shadow material=%s loaded=%d%s"),
+                                       S08MapSurfaceSpec::ContactShadowMaterialPath, ContactShadowMid ? 1 : 0,
+                                       ContactShadowMid ? TEXT("") : TEXT(" (run tools/art/map_surface/ue_import_map_surface.py) -> no blob")));
+    }
+    if (ContactShadowMid) {
+      ContactShadowMid->SetScalarParameterValue(FName(S08MapSurfaceSpec::ParamShadowStrength), R->ShadowStrength);
+      ContactShadowMid->SetScalarParameterValue(FName(S08MapSurfaceSpec::ParamShadowSoftness), R->ShadowSoftness);
+      EnsurePart(FName(TEXT("MapContactShadow")), PlaneMesh.Get(), ContactShadowMid.Get(), S08ContactShadowTransform(*R, RingScale));
+      bShadow = true;
+    }
+  }
+  if (R->bLeaderPip && Fighter.bIsHero) {
+    UMaterialInterface* Solid = S08GameLayerMaterial();
+    TObjectPtr<UMaterialInstanceDynamic>& Fill = Look == ES08TeamSlot::P1 ? LeaderPipMidP1 : LeaderPipMidP2;
+    if (Solid && !Fill) {
+      Fill = UMaterialInstanceDynamic::Create(Solid, this);
+      Fill->SetVectorParameterValue(TEXT("Tint"), S08TeamPalette::RingFill(Look));
+    }
+    if (Solid && !LeaderPipKeylineMid) {
+      LeaderPipKeylineMid = UMaterialInstanceDynamic::Create(Solid, this);
+      LeaderPipKeylineMid->SetVectorParameterValue(TEXT("Tint"), S08TeamPalette::Keyline());
+    }
+    FTransform PipFill, PipKey;
+    S08LeaderPipTransforms(S08TeamRingSpec::P1RimOut1, RingScale, PipFill, PipKey);
+    UStaticMesh* Cube = BlockerTiles->GetStaticMesh();
+    EnsurePart(FName(TEXT("MapLeaderPipKeyline")), Cube, LeaderPipKeylineMid.Get(), PipKey);
+    EnsurePart(FName(TEXT("MapLeaderPip")), Cube, Fill.Get(), PipFill);
+    bPip = true;
+  }
+  const FString Key = FString::Printf(TEXT("%s|%d|%d|%.2f|%d"), *Fighter.Id, bShadow ? 1 : 0, bPip ? 1 : 0, RingScale,
+                                      static_cast<int32>(Look));
+  if (!ReadabilityFightersTraceKey.Contains(Key)) {
+    ReadabilityFightersTraceKey += Key + TEXT(";");
+    FS08Trace::Write(FString::Printf(
+        TEXT("ARTPREVIEW readability fighter=%s hero=%d contactShadow=%d diameterUU=%.1f strength=%.2f leaderPip=%d look=%s ringScale=%.2f"),
+        *Fighter.Id, Fighter.bIsHero ? 1 : 0, bShadow ? 1 : 0, R->ShadowDiameterUU * RingScale, R->ShadowStrength,
+        bPip ? 1 : 0, S08TeamSlotName(Look), RingScale));
   }
 }

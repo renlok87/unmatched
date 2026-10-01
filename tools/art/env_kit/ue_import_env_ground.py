@@ -8,42 +8,67 @@ Three stages, one file:
            <staging>/<Set>/T_Ground_<Set>_ORMH.png  linear RGBA: R = AO (1 when the set has none), G = roughness,
                                                     B = metalness (0 when none), A = height (_Displacement normalised to
                                                     its 1..99 % percentiles, stored 1..255 - never 0, see the splat)
+           <staging>/WaterRipple/T_Ground_WaterRipple_N.png   P4: the procedural water ripple normal (DirectX, tileable:
+                                                    band-limited FFT noise with integer frequencies, RIPPLE recipe; no
+                                                    CC0 water normal exists on ambientCG / Poly Haven and the ENV-U5
+                                                    budget is used up)
            <staging>/ground-sources.json            sha256 of every raw input and output + the recipe
            Default staging: <repo>/unreal/Unmatched/Saved/EnvKit/GroundSources (gitignored; ~100 MB).
-  --check  (plain Python) staging files against the manifest, splat PNGs against <map>.splat.json, and the layouts'
-           'ground' sections against the splats (sha256 / rect / material path).
+  --check  (plain Python) staging files against the manifest, splat / aux PNGs against <map>.splat.json, and the
+           layouts' 'ground' sections against the splats (sha256 / rect / material path / waterfalls).
   (UE)     UnrealEditor-Cmd -run=pythonscript: imports into
            /Game/EnvKit/Ground/Sets/T_Ground_<Set>_{BC,N,ORMH}   BC sRGB TC_Default; N TC_Normalmap (DirectX, no green
                                                                   flip); ORMH TC_Masks linear; group World(NormalMap)
+           /Game/EnvKit/Ground/Sets/T_Ground_WaterRipple_N         TC_Normalmap, wrap (the water ripples, both maps)
            /Game/EnvKit/Ground/T_EnvGround_<Map>_Splat            TC_VectorDisplacementmap (RGBA8, uncompressed), linear,
                                                                   clamp addressing
+           /Game/EnvKit/Ground/T_EnvGround_<Map>_Aux              the same settings: R water, G foam, B edge band,
+                                                                  A = 1 + water depth * 254 (ground_splat.py)
            /Game/EnvKit/Ground/M_EnvGround                         the 4-layer splat material (graph below)
-           /Game/EnvKit/Ground/MI_EnvGround_<Map>                  per map: layer sets, tiling, tints, accent, grade,
-                                                                  SplatRect (= the layout 'ground.splatRect')
-           (DefaultGame.ini cooks /Game/EnvKit already; S08EnvGround.cpp loads the MI by the layout path.)
+           /Game/EnvKit/Ground/MI_EnvGround_<Map>                  per map: layer sets, tiling, tints, per-layer
+                                                                  roughness / specular / normal / macro, edge band,
+                                                                  water, accent, grade, SplatRect
+           /Game/EnvKit/Ground/M_EnvWaterfall                      P4: the waterfall card material (masked, lit)
+           /Game/EnvKit/Ground/MI_EnvWaterfall_<Map>               only maps with ground-params 'water.falls'
+           (DefaultGame.ini cooks /Game/EnvKit already; S08EnvGround.cpp loads the MIs by the layout paths.)
 
-M_EnvGround (lit, opaque, one-sided; every texture on a SHARED sampler - 13 samples use no sampler slot):
+M_EnvGround (graph 2; lit, opaque, one-sided; every texture on a SHARED sampler - 16 samples use no sampler slot):
   P        = GroundStrip.xy + TexCoord0 * GroundStrip.zw        board XY (uu) of the strip pixel; the runtime sets
                                                                 GroundStrip = (min.x, min.y, size.x, size.y) of each
                                                                 /Engine/BasicShapes/Plane strip on its MID (engine plane:
                                                                 UV (0,0) at local (-50,-50), u along +X, v along +Y)
   layer i  = L{i}_BC / L{i}_N / L{i}_ORMH at P / L{i}_TileUU      (i = 0..3, wrap)
   splat    = Splat at (P - SplatRect.xy) / SplatRect.zw           (clamp; RGB = L1..L3 coverage, A = 1 + accent * 254)
+  aux      = Aux at the same UV                                   (clamp; R water, G foam mask, B edge, A = 1 + depth*254)
   weights  = height-lerp stack: a_k = saturate((lerp(0.5, H_k, L{k}_HeightBlend) - 1 + splat_k * (1 + c)) / c),
              L3 over L2 over L1 over L0
-  albedo   = sum w_i * lerp(luma, BC_i, L{i}_Tint.a) * L{i}_Tint.rgb, x (1 + MacroStrength * value noise),
+  water    = (aux.r, foam = saturate((aux.g * (0.4 + 1.2 * noise(P + t * pan)) - 0.25) * 2) * WaterFoam.a, depth)
+  albedo   = sum w_i * (1 + LayerMacro_i * noise(P / LayerMacroScaleUU)) * lerp(luma, BC_i, L{i}_Tint.a) * L{i}_Tint.rgb,
+             x (1 + MacroStrength * value noise), x lerp(1, EdgeTint.rgb, aux.b * EdgeTint.a),
              accent: PetalSizeUU > 0 -> petals (a pink carpet of strength AccentCarpet + one jittered petal per
              PetalSizeUU cell, density = accent * AccentOpacity); PetalSizeUU = 0 -> wetness (albedo *= lerp(1, AccentColor, accent * opacity),
-             roughness -> AccentRoughness)
+             roughness -> AccentRoughness); water: lerp(albedo, lerp(lerp(albedo, WaterColor, WaterColor.a), WaterColor,
+             depth), water), then foam -> WaterFoam.rgb
   base     = night grade of M_MapBoard: lit = albedo * 2^NightEV * NightTint; lerp(luma, lit, NightSaturation)
-  normal   = normalize(sum w_i N_i with xy * NormalStrength); AO / roughness / metallic = sum w_i ORMH_i.rgb
-Idempotent: textures carry EnvGroundSourceSha256 (re-imported only when the source changes or --force), the material
-carries EnvGroundGraphVersion (rebuilt only when GRAPH_VERSION changes or --force), the MIs are compared parameter by
+  normal   = per layer xy * NormalStrength * LayerNormal_i, blended; water: two panned WaterRippleN samples
+             (WaterRipple.xy tiling, WaterPan uu/s) at WaterSurface.z, lerp by water * (1 - 0.6 foam)
+  rough    = sum w_i max(ORMH_i.g * LayerRoughScale_i, LayerRoughMin_i), wetness, edge -> EdgeRoughness, water ->
+             WaterSurface.x, foam -> 0.7
+  specular = sum w_i LayerSpecular_i, water -> WaterSurface.y;  AO / metallic = sum w_i ORMH_i.rb
+  emissive = graded WaterColor * WaterSurface.w * water * (1 - foam)  (the map's river is lifted; 0 without water)
+M_EnvWaterfall (masked, clip 0.5, lit, two-sided): FallCard = (width, height, kind 0 card / 1 spill, 0) per
+  component (S08EnvGround sets it on the MID); streaks scroll along +v at FallFlow.x uu/s (v runs down the card and
+  towards the lip on the spill), foam at the lip and in the streaks, side fade FallFlow.z uu, bottom fade FallFlow.w,
+  spill far-edge fade FallSpill.x uu, the soft fades dithered in screen space (interleaved gradient noise on
+  SvPosition, amount FallSpill.y; no DitherTemporalAA node - it is not in the UE 5.8 headers); ripple normal along the
+  flow; emissive = graded colour * FallShade.w.
+Idempotent: textures carry EnvGroundSourceSha256 (re-imported only when the source changes or --force), the materials
+carry EnvGroundGraphVersion (rebuilt only when their graph version changes or --force), the MIs are compared parameter by
 parameter and only written when they differ. Report: 'ENVGROUND-IMPORT-REPORT {...}' / 'ENVGROUND-IMPORT-RESULT ok|failed'
 and <project>/Saved/EnvKit/ue-ground-import-report.json (or --report).
 
 Run (repository root; the editor must be CLOSED; never inside a GPU-measurement window):
-  python -B tools/art/env_kit/ground_splat.py --write-layouts          # splats + layout sections (git)
+  python -B tools/art/env_kit/ground_splat.py --write-layouts          # splats + aux + layout sections (git)
   python -B tools/art/env_kit/ue_import_env_ground.py --prep           # staging PNGs (out of git)
   python -B tools/art/env_kit/ue_import_env_ground.py --check
   UnrealEditor-Cmd.exe <repo>/unreal/Unmatched/Unmatched.uproject -run=pythonscript
@@ -75,13 +100,20 @@ ROOT = "/Game/EnvKit/Ground"
 SETS_ROOT = f"{ROOT}/Sets"
 MATERIAL_NAME = "M_EnvGround"
 MATERIAL_PATH = f"{ROOT}/{MATERIAL_NAME}"
+FALL_MATERIAL_NAME = "M_EnvWaterfall"
+FALL_MATERIAL_PATH = f"{ROOT}/{FALL_MATERIAL_NAME}"
 SHA_TAG = "EnvGroundSourceSha256"
 GRAPH_TAG = "EnvGroundGraphVersion"
-GRAPH_VERSION = "1"
+GRAPH_VERSION = "2"
+FALL_GRAPH_VERSION = "1"
 PREP_VERSION = "1"
 KEYS = ("BC", "N", "ORMH")
 LAYERS = 4
 MANIFEST_SCHEMA = "unmatched.env-ground-sources/1"
+# P4: the procedural water ripple normal (no CC0 water normal on ambientCG / Poly Haven; the ENV-U5 budget is used up)
+RIPPLE_SET = "WaterRipple"
+RIPPLE = {"version": "1", "size": 512, "seed": 4111, "lowCycles": 3.0, "highCycles": 12.0, "slopeP99": 0.55,
+          "stretchY": 1.6}
 
 
 def rel(path: Path) -> str:
@@ -123,8 +155,33 @@ def splat_asset(key: str) -> str:
     return f"{ROOT}/T_EnvGround_{MAPS[key]}_Splat"
 
 
+def aux_asset(key: str) -> str:
+    return f"{ROOT}/T_EnvGround_{MAPS[key]}_Aux"
+
+
+def ripple_asset() -> str:
+    return texture_asset(RIPPLE_SET, "N")
+
+
 def mi_asset(key: str) -> str:
     return f"{ROOT}/MI_EnvGround_{MAPS[key]}"
+
+
+def fall_mi_asset(key: str) -> str:
+    return f"{ROOT}/MI_EnvWaterfall_{MAPS[key]}"
+
+
+def has_falls(params: dict, key: str) -> bool:
+    return bool((params["maps"][key].get("water") or {}).get("falls"))
+
+
+def srgb8_to_linear(c) -> tuple:
+    """sRGB bytes (0..255) -> linear floats (the water colour of ground-params 'water.colorSrgb')."""
+    out = []
+    for v in c:
+        x = float(v) / 255.0
+        out.append(x / 12.92 if x <= 0.04045 else ((x + 0.055) / 1.055) ** 2.4)
+    return tuple(out)
 
 
 # ================================================================================================ prep (plain Python)
@@ -150,6 +207,43 @@ def rot90_dx_normal(n):
     out = n.copy()
     out[..., 0], out[..., 1] = n[..., 1], 255 - n[..., 0]
     return np.rot90(out, 1)
+
+
+def water_ripple_normal(recipe: dict | None = None):
+    """The procedural water ripple normal (H, W, 3) uint8, DirectX (x right, y down, the convention of rot90_dx_normal):
+    a height field of band-limited Gaussian noise built in the Fourier domain with integer frequencies only (so the tile
+    wraps seamlessly), cycles per tile in [lowCycles, highCycles] with a 1/k falloff, slightly stretched across the flow
+    (stretchY > 1: crests longer along x); its exact spectral gradient is scaled so the 99th slope percentile is
+    slopeP99. Deterministic (numpy default_rng(seed))."""
+    import numpy as np
+
+    r = dict(RIPPLE, **(recipe or {}))
+    n = int(r["size"])
+    rng = np.random.default_rng(int(r["seed"]))
+    spec = np.fft.fft2(rng.standard_normal((n, n)))
+    f = np.fft.fftfreq(n) * n  # integer cycles per tile
+    kx, ky = np.meshgrid(f, f)  # kx along columns (x), ky along rows (y)
+    k = np.hypot(kx, ky * float(r["stretchY"]))
+    lo, hi = float(r["lowCycles"]), float(r["highCycles"])
+    amp = (1.0 - np.exp(-(k / lo) ** 2)) * np.exp(-(k / hi) ** 2) / np.maximum(k, 1.0)
+    hf = spec * amp
+    hf[0, 0] = 0.0
+    dx = np.real(np.fft.ifft2(hf * (2j * np.pi * kx / n)))  # dh / dpixel along x
+    dy = np.real(np.fft.ifft2(hf * (2j * np.pi * ky / n)))  # dh / dpixel along y (down)
+    slope = np.hypot(dx, dy)
+    s = float(r["slopeP99"]) / max(float(np.percentile(slope, 99)), 1e-12)
+    v = np.stack([-dx * s, -dy * s, np.ones_like(dx)], axis=-1)
+    v /= np.linalg.norm(v, axis=-1, keepdims=True)
+    return np.clip(np.rint((v * 0.5 + 0.5) * 255.0), 0, 255).astype(np.uint8)
+
+
+def build_ripple(out_dir: Path) -> dict:
+    from PIL import Image
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+    path = out_dir / f"T_Ground_{RIPPLE_SET}_N.png"
+    Image.fromarray(water_ripple_normal(), "RGB").save(path, format="PNG", compress_level=6)
+    return {"N": path}
 
 
 def build_set(set_id: str, spec: dict, raw_root: Path, out_dir: Path) -> dict:
@@ -188,6 +282,11 @@ def build_set(set_id: str, spec: dict, raw_root: Path, out_dir: Path) -> dict:
     return paths
 
 
+def _outputs_fresh(outs: dict, count: int) -> bool:
+    return (len(outs) == count
+            and all(Path(o["path"]).is_file() and sha256_file(Path(o["path"])) == o["sha256"] for o in outs.values()))
+
+
 def prep(params: dict, keys: list[str], staging: Path, force: bool) -> tuple[dict, bool]:
     raw_root = Path(params["cc0Raw"])
     manifest_path = staging / "ground-sources.json"
@@ -213,9 +312,7 @@ def prep(params: dict, keys: list[str], staging: Path, force: bool) -> tuple[dic
             prev = old.get(set_id) or {}
             outs = prev.get("outputs") or {}
             fresh = (not force and prev.get("inputs") == entry["inputs"] and prev.get("recipe") == entry["recipe"]
-                     and len(outs) == len(KEYS)
-                     and all(Path(o["path"]).is_file() and sha256_file(Path(o["path"])) == o["sha256"]
-                             for o in outs.values()))
+                     and _outputs_fresh(outs, len(KEYS)))
             if fresh:
                 entry["outputs"], entry["action"] = outs, "unchanged"
             else:
@@ -228,6 +325,24 @@ def prep(params: dict, keys: list[str], staging: Path, force: bool) -> tuple[dic
             ok = False
         sets[set_id] = entry
         print(f"  prep {set_id}: {entry.get('action', 'FAILED')} {entry.get('error', '')}")
+    # P4: the procedural water ripple normal (shared by every map; tiny, always prepared)
+    entry = {"recipe": dict(RIPPLE, procedural="water_ripple_normal"),
+             "library": {"note": "procedural (ue_import_env_ground.water_ripple_normal), our own art, no CC0 source"}}
+    try:
+        prev = old.get(RIPPLE_SET) or {}
+        outs = prev.get("outputs") or {}
+        if not force and prev.get("recipe") == entry["recipe"] and _outputs_fresh(outs, 1):
+            entry["outputs"], entry["action"] = outs, "unchanged"
+        else:
+            paths = build_ripple(staging / RIPPLE_SET)
+            entry["outputs"] = {k: {"path": p.as_posix(), "sha256": sha256_file(p), "bytes": p.stat().st_size}
+                                for k, p in paths.items()}
+            entry["action"] = "built"
+    except (OSError, ValueError) as exc:
+        entry["error"] = f"{type(exc).__name__}: {exc}"
+        ok = False
+    sets[RIPPLE_SET] = entry
+    print(f"  prep {RIPPLE_SET}: {entry.get('action', 'FAILED')} {entry.get('error', '')}")
     manifest = {"schema": MANIFEST_SCHEMA, "tool": "tools/art/env_kit/ue_import_env_ground.py --prep",
                 "cc0Raw": raw_root.as_posix(), "staging": staging.as_posix(), "sets": sets}
     staging.mkdir(parents=True, exist_ok=True)
@@ -236,9 +351,27 @@ def prep(params: dict, keys: list[str], staging: Path, force: bool) -> tuple[dic
 
 
 # ================================================================================================ check (plain Python)
+def _staged(entry: dict, key: str, asset: str) -> dict:
+    o = (entry.get("outputs") or {}).get(key)
+    t = {"asset": asset}
+    if not o:
+        t.update(ok=False, error="not in the staging manifest (run --prep)")
+        return t
+    p = Path(o["path"])
+    t.update(source=p.as_posix(), sha256=o["sha256"])
+    if not p.is_file():
+        t.update(ok=False, error="staging file missing (run --prep)")
+    else:
+        got = sha256_file(p)
+        t["ok"] = got == o["sha256"]
+        if not t["ok"]:
+            t["error"] = f"sha256 {got} != manifest (re-run --prep)"
+    return t
+
+
 def plan(params: dict, keys: list[str], staging: Path, params_path: Path) -> dict:
-    """What the UE stage imports: staging textures (verified against the manifest), splats (against their meta), the
-    layout sections. Every item carries ok / error."""
+    """What the UE stage imports: staging textures (verified against the manifest), splats and aux masks (against their
+    meta), the layout sections. Every item carries ok / error."""
     out = {"sets": {}, "maps": {}, "ok": True}
     manifest_path = staging / "ground-sources.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.is_file() else {"sets": {}}
@@ -249,49 +382,60 @@ def plan(params: dict, keys: list[str], staging: Path, params_path: Path) -> dic
         entry = (manifest.get("sets") or {}).get(set_id) or {}
         item = {"textures": {}, "ok": True}
         for key in KEYS:
-            o = (entry.get("outputs") or {}).get(key)
-            t = {"asset": texture_asset(set_id, key)}
-            if not o:
-                t.update(ok=False, error="not in the staging manifest (run --prep)")
-            else:
-                p = Path(o["path"])
-                t.update(source=p.as_posix(), sha256=o["sha256"])
-                if not p.is_file():
-                    t.update(ok=False, error="staging file missing (run --prep)")
-                else:
-                    got = sha256_file(p)
-                    t["ok"] = got == o["sha256"]
-                    if not t["ok"]:
-                        t["error"] = f"sha256 {got} != manifest (re-run --prep)"
+            t = _staged(entry, key, texture_asset(set_id, key))
             item["textures"][key] = t
             item["ok"] = item["ok"] and t["ok"]
         out["sets"][set_id] = item
         out["ok"] = out["ok"] and item["ok"]
+    entry = (manifest.get("sets") or {}).get(RIPPLE_SET) or {}
+    t = _staged(entry, "N", ripple_asset())
+    if t["ok"] and entry.get("recipe") != dict(RIPPLE, procedural="water_ripple_normal"):
+        t.update(ok=False, error="the staged ripple was built with another RIPPLE recipe (re-run --prep)")
+    out["sets"][RIPPLE_SET] = {"textures": {"N": t}, "ok": t["ok"]}
+    out["ok"] = out["ok"] and t["ok"]
     for key in keys:
-        m = {"ok": True, "splatAsset": splat_asset(key), "mi": mi_asset(key)}
+        m = {"ok": True, "splatAsset": splat_asset(key), "auxAsset": aux_asset(key), "mi": mi_asset(key)}
+        if has_falls(params, key):
+            m["fallMi"] = fall_mi_asset(key)
         meta_path = params_path.parent / f"{key}.splat.json"
         png_path = params_path.parent / f"{key}.splat.png"
+        aux_path = params_path.parent / f"{key}.aux.png"
         try:
             meta = json.loads(meta_path.read_text(encoding="utf-8"))
             m["splatRect"] = meta["splatRect"]
             m["source"] = png_path.as_posix()
             m["sha256"] = sha256_file(png_path)
+            m["auxSource"] = aux_path.as_posix()
+            m["auxSha256"] = sha256_file(aux_path)
+            probs = []
             if m["sha256"] != meta["png"]["sha256"]:
-                m.update(ok=False, error=f"{rel(png_path)} sha256 != {rel(meta_path)} (re-run ground_splat.py)")
+                probs.append(f"{rel(png_path)} sha256 != {rel(meta_path)} (re-run ground_splat.py)")
+            if m["auxSha256"] != (meta.get("aux") or {}).get("sha256"):
+                probs.append(f"{rel(aux_path)} sha256 != {rel(meta_path)} aux (re-run ground_splat.py)")
             layout = json.loads((LAYOUT_DIR / f"{key}.layout.json").read_text(encoding="utf-8"))
             g = layout.get("ground")
             if not isinstance(g, dict):
-                m.update(ok=False, error="layout has no 'ground' section (ground_splat.py --write-layouts)")
+                probs.append("layout has no 'ground' section (ground_splat.py --write-layouts)")
             else:
-                probs = []
                 if g.get("material") != mi_asset(key):
                     probs.append(f"ground.material {g.get('material')!r} != {mi_asset(key)!r}")
                 if g.get("splatRect") != meta["splatRect"]:
                     probs.append(f"ground.splatRect {g.get('splatRect')} != splat meta {meta['splatRect']}")
                 if g.get("splatSha256") != m["sha256"]:
                     probs.append("ground.splatSha256 != the splat PNG")
-                if probs:
-                    m.update(ok=False, error="; ".join(probs) + " (ground_splat.py --write-layouts)")
+                if g.get("auxSha256") != m["auxSha256"]:
+                    probs.append("ground.auxSha256 != the aux PNG")
+                falls = g.get("waterfalls") or []
+                if falls != (meta.get("waterfalls") or []):
+                    probs.append("ground.waterfalls != the splat meta waterfalls")
+                if bool(falls) != has_falls(params, key):
+                    probs.append("ground.waterfalls present / absent unlike ground-params water.falls")
+                for f in falls:
+                    if f.get("material") != fall_mi_asset(key):
+                        probs.append(f"waterfall {f.get('id')} material {f.get('material')!r} != {fall_mi_asset(key)!r}")
+                m["waterfalls"] = len(falls)
+            if probs:
+                m.update(ok=False, error="; ".join(probs) + " (ground_splat.py --write-layouts)")
         except (OSError, ValueError, KeyError) as exc:
             m.update(ok=False, error=f"{type(exc).__name__}: {exc}")
         out["maps"][key] = m
@@ -310,7 +454,7 @@ def texture_settings(key: str) -> dict:
                   "lod_group": grp.TEXTUREGROUP_WORLD_NORMAL_MAP, "flip_green_channel": False}
     elif key == "ORMH":
         wanted = {"compression_settings": tcs.TC_MASKS, "srgb": False, "lod_group": grp.TEXTUREGROUP_WORLD}
-    elif key == "Splat":
+    elif key in ("Splat", "Aux"):
         wanted = {"compression_settings": tcs.TC_VECTOR_DISPLACEMENTMAP, "srgb": False,
                   "lod_group": grp.TEXTUREGROUP_WORLD, "address_x": u.TextureAddress.TA_CLAMP,
                   "address_y": u.TextureAddress.TA_CLAMP}
@@ -379,7 +523,34 @@ float w2 = a2 * (1.0 - a3);
 float w1 = a1 * (1.0 - a2) * (1.0 - a3);
 return float4(saturate(1.0 - w1 - w2 - w3), w1, w2, w3);
 """
-HLSL_ALBEDO = """// ENV-U10 M_EnvGround: layer blend + macro variation + accent (petals / wetness) + the M_MapBoard night grade
+HLSL_WATER = """// P4 M_EnvGround: water / foam / depth from the aux mask (ground_splat.py: R water, G foam, B edge, A = 1 + depth * 254)
+struct FEnvWaterFns {
+  float Hash12(float2 p) {
+    float3 p3 = frac(float3(p.xyx) * 0.1031);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return frac((p3.x + p3.y) * p3.z);
+  }
+  float ValueNoise(float2 q) {
+    float2 i0 = floor(q);
+    float2 f = frac(q);
+    float2 s = f * f * (3.0 - 2.0 * f);
+    float a = Hash12(i0);
+    float b = Hash12(i0 + float2(1.0, 0.0));
+    float c = Hash12(i0 + float2(0.0, 1.0));
+    float d = Hash12(i0 + float2(1.0, 1.0));
+    return lerp(lerp(a, b, s.x), lerp(c, d, s.x), s.y);
+  }
+};
+FEnvWaterFns F;
+float water = saturate(Aux.r);
+float depth = saturate((Aux.a * 255.0 - 1.0) / 254.0);
+float2 q = (P + Time * WaterPan.xy * WaterRipple.w) / max(WaterRipple.z, 1.0);
+float n = 0.6 * F.ValueNoise(q) + 0.4 * F.ValueNoise(q * 2.3 + 5.1);
+float foam = saturate((Aux.g * (0.4 + 1.2 * n) - 0.25) * 2.0) * WaterFoam.a;
+return float4(water, foam, depth, 0.0);
+"""
+HLSL_ALBEDO = """// ENV-U10 M_EnvGround: layer blend + macro variation + edge band + accent (petals / wetness) + water / foam
+// + the M_MapBoard night grade (P4 graph 2: LayerMacro, EdgeTint, Water)
 struct FEnvGroundFns {
   float Hash12(float2 p) {  // Dave Hoskins, hash without sine (ground_splat._hash12)
     float3 p3 = frac(float3(p.xyx) * 0.1031);
@@ -402,10 +573,14 @@ struct FEnvGroundFns {
   }
 };
 FEnvGroundFns F;
-float3 c = W.x * F.Grade(C0, T0) + W.y * F.Grade(C1, T1) + W.z * F.Grade(C2, T2) + W.w * F.Grade(C3, T3);
+float lm = F.ValueNoise(P / max(LayerMacroScaleUU, 1.0) + 31.7) * 2.0 - 1.0;
+float4 k = 1.0 + LayerMacro * lm;
+float3 c = W.x * k.x * F.Grade(C0, T0) + W.y * k.y * F.Grade(C1, T1) + W.z * k.z * F.Grade(C2, T2) +
+           W.w * k.w * F.Grade(C3, T3);
 float2 q = P / max(MacroScaleUU, 1.0);
 float m = 0.65 * F.ValueNoise(q) + 0.35 * F.ValueNoise(q * 2.03 + 17.0);
 c *= 1.0 + MacroStrength * (m * 2.0 - 1.0);
+c *= lerp(float3(1.0, 1.0, 1.0), EdgeTint.rgb, saturate(Edge) * EdgeTint.a);
 float a = saturate((Accent * 255.0 - 1.0) / 254.0);
 if (PetalSizeUU > 0.0) {
   float carpet = saturate(a * 1.5 - 0.3) * AccentCarpet;
@@ -438,71 +613,88 @@ if (PetalSizeUU > 0.0) {
 } else {
   c = lerp(c, c * AccentColor, a * AccentOpacity);
 }
+float3 shallow = lerp(c, WaterColor.rgb, WaterColor.a);
+c = lerp(c, lerp(shallow, WaterColor.rgb, Water.z), Water.x);
+c = lerp(c, WaterFoam.rgb, Water.y);
 float3 lit = c * exp2(NightEV) * NightTint;
 float luma = dot(lit, float3(0.2126, 0.7152, 0.0722));
 return max(lerp(luma.xxx, lit, NightSaturation), 0.0);
 """
-HLSL_NORMAL = """float3 n = W.x * N0 + W.y * N1 + W.z * N2 + W.w * N3;
-n.xy *= NormalStrength;
-return normalize(float3(n.xy, max(n.z, 0.001)));
+HLSL_NORMAL = """// P4 graph 2: per-layer normal strength, the water ripples (two panned samples) over the water
+float4 s = LayerNormal * NormalStrength;
+float2 xy = W.x * N0.xy * s.x + W.y * N1.xy * s.y + W.z * N2.xy * s.z + W.w * N3.xy * s.w;
+float z = W.x * N0.z + W.y * N1.z + W.z * N2.z + W.w * N3.z;
+float3 n = normalize(float3(xy, max(z, 0.001)));
+float3 r = normalize(float3((R1.xy + R2.xy) * WaterSurface.z, 1.0));
+return normalize(lerp(n, r, saturate(Water.x * (1.0 - 0.6 * Water.y))));
 """
+HLSL_RIPPLE_UV1 = "return (P + Time * WaterPan.xy) / max(WaterRipple.x, 1.0);"
+HLSL_RIPPLE_UV2 = "return (P + Time * WaterPan.zw) / max(WaterRipple.y, 1.0) + float2(0.37, 0.61);"
 HLSL_AO = "return saturate(dot(W, float4(M0.r, M1.r, M2.r, M3.r)));"
 HLSL_METAL = "return saturate(dot(W, float4(M0.b, M1.b, M2.b, M3.b)));"
-HLSL_ROUGH = """float r = dot(W, float4(M0.g, M1.g, M2.g, M3.g));
+HLSL_ROUGH = """float4 rr = max(float4(M0.g, M1.g, M2.g, M3.g) * LayerRoughScale, LayerRoughMin);
+float r = dot(W, rr);
 float a = saturate((Accent * 255.0 - 1.0) / 254.0) * AccentOpacity;
-return saturate(PetalSizeUU > 0.0 ? r : lerp(r, AccentRoughness, a));
+r = PetalSizeUU > 0.0 ? r : lerp(r, AccentRoughness, a);
+r = lerp(r, EdgeRoughness, saturate(Edge) * EdgeTint.a);
+r = lerp(r, WaterSurface.x, Water.x);
+r = lerp(r, 0.7, Water.y);
+return saturate(r);
+"""
+HLSL_SPECULAR = "return saturate(lerp(dot(W, LayerSpecular), WaterSurface.y, Water.x * (1.0 - Water.y)));"
+HLSL_EMISSIVE = """// P4: the water glows a little like the lifted river of the map (M_MapBoard); 0 without water
+float3 lit = WaterColor.rgb * exp2(NightEV) * NightTint;
+float luma = dot(lit, float3(0.2126, 0.7152, 0.0722));
+float3 g = max(lerp(luma.xxx, lit, NightSaturation), 0.0);
+return g * WaterSurface.w * Water.x * (1.0 - Water.y);
 """
 
 SCALAR_DEFAULTS = {"HeightContrast": 0.25, "NormalStrength": 1.0, "MacroStrength": 0.14, "MacroScaleUU": 240.0,
                    "AccentOpacity": 0.9, "AccentRoughness": 0.6, "AccentCarpet": 0.55, "PetalSizeUU": 7.0,
                    "NightEV": -0.7, "L1_HeightBlend": 1.0, "L2_HeightBlend": 1.0, "L3_HeightBlend": 1.0,
-                   "NightSaturation": 0.7}
+                   "NightSaturation": 0.7, "LayerMacroScaleUU": 33.0, "EdgeRoughness": 0.8}
+VECTOR_DEFAULTS = {"LayerRoughMin": (0.0, 0.0, 0.0, 0.0), "LayerRoughScale": (1.0, 1.0, 1.0, 1.0),
+                   "LayerSpecular": (0.4, 0.4, 0.4, 0.4), "LayerNormal": (1.0, 1.0, 1.0, 1.0),
+                   "LayerMacro": (0.0, 0.0, 0.0, 0.0), "EdgeTint": (1.0, 1.0, 1.0, 0.0),
+                   "WaterColor": (0.0159, 0.0497, 0.141, 0.55), "WaterFoam": (0.62, 0.66, 0.7, 0.0),
+                   "WaterSurface": (0.06, 0.25, 0.55, 0.0), "WaterRipple": (70.0, 130.0, 9.0, 0.6),
+                   "WaterPan": (2.5, 1.2, -1.4, 2.0)}
 
 
-def build_material(defaults: dict, splat_default, specular: float, force: bool) -> dict:
-    """M_EnvGround. defaults = {param name: texture} for the 12 layer textures (the first map's sets)."""
-    eal, mel = u.EditorAssetLibrary, u.MaterialEditingLibrary
-    material = u.load_asset(MATERIAL_PATH) if eal.does_asset_exist(MATERIAL_PATH) else None
-    if material is not None and not force and eal.get_metadata_tag(material, GRAPH_TAG) == GRAPH_VERSION:
-        return {"action": "unchanged", "path": MATERIAL_PATH, "graphVersion": GRAPH_VERSION}
-    action = "rebuilt" if material is not None else "created"
-    if material is None:
-        material = u.AssetToolsHelpers.get_asset_tools().create_asset(MATERIAL_NAME, ROOT, u.Material,
-                                                                      u.MaterialFactoryNew())
-    if material is None:
-        raise RuntimeError(f"could not create {MATERIAL_PATH}")
-    material.set_editor_property("shading_model", u.MaterialShadingModel.MSM_DEFAULT_LIT)
-    material.set_editor_property("blend_mode", u.BlendMode.BLEND_OPAQUE)
-    material.set_editor_property("two_sided", False)
-    mel.delete_all_material_expressions(material)
-    ypos = [0]
+class _Graph:
+    """Expression helpers of one material (MaterialEditingLibrary): nodes, parameters, Custom nodes, connections."""
 
-    def expr(cls, x, y=None):
-        node = mel.create_material_expression(material, cls, x, ypos[0] if y is None else y)
+    def __init__(self, material):
+        self.material = material
+        self.mel = u.MaterialEditingLibrary
+        self.ypos = 0
+
+    def expr(self, cls, x, y=None):
+        node = self.mel.create_material_expression(self.material, cls, x, self.ypos if y is None else y)
         if node is None:
             raise RuntimeError(f"could not create {cls}")
         if y is None:
-            ypos[0] += 120
+            self.ypos += 120
         return node
 
-    def connect(src, out, dst, inp):
-        if not mel.connect_material_expressions(src, out, dst, inp):
+    def connect(self, src, out, dst, inp):
+        if not self.mel.connect_material_expressions(src, out, dst, inp):
             raise RuntimeError(f"could not connect {src.get_name()}.{out or '<0>'} -> {dst.get_name()}.{inp}")
 
-    def scalar(name, value):
-        node = expr(u.MaterialExpressionScalarParameter, -2600)
+    def scalar(self, name, value):
+        node = self.expr(u.MaterialExpressionScalarParameter, -2600)
         node.set_editor_property("parameter_name", name)
         node.set_editor_property("default_value", float(value))
         return node
 
-    def vector(name, value):
-        node = expr(u.MaterialExpressionVectorParameter, -2600)
+    def vector(self, name, value):
+        node = self.expr(u.MaterialExpressionVectorParameter, -2600)
         node.set_editor_property("parameter_name", name)
         node.set_editor_property("default_value", u.LinearColor(*[float(v) for v in value]))
         return node
 
-    def custom(desc, out_type, inputs, code, x, y):
-        node = expr(u.MaterialExpressionCustom, x, y)
+    def custom(self, desc, out_type, inputs, code, x, y):
+        node = self.expr(u.MaterialExpressionCustom, x, y)
         node.set_editor_property("description", desc)
         node.set_editor_property("output_type", out_type)
         pins = []
@@ -514,110 +706,313 @@ def build_material(defaults: dict, splat_default, specular: float, force: bool) 
         node.set_editor_property("code", code)
         return node
 
-    def sample(name, sampler_type, texture, source, x, y):
-        node = expr(u.MaterialExpressionTextureSampleParameter2D, x, y)
+    def sample(self, name, sampler_type, texture, source, x, y):
+        node = self.expr(u.MaterialExpressionTextureSampleParameter2D, x, y)
         node.set_editor_property("parameter_name", name)
         node.set_editor_property("sampler_type", sampler_type)
         node.set_editor_property("texture", texture)  # after the sampler type: AutoSetSampleType keeps them consistent
         node.set_editor_property("sampler_source", source)
         return node
 
+    def wire(self, node, sources: dict):
+        """sources = {pin: (node, output)}"""
+        for pin, (src, out) in sources.items():
+            self.connect(src, out, node, pin)
+
+
+def _begin_material(path: str, name: str, version: str, force: bool):
+    eal = u.EditorAssetLibrary
+    material = u.load_asset(path) if eal.does_asset_exist(path) else None
+    if material is not None and not force and eal.get_metadata_tag(material, GRAPH_TAG) == version:
+        return material, "unchanged"
+    action = "rebuilt" if material is not None else "created"
+    if material is None:
+        material = u.AssetToolsHelpers.get_asset_tools().create_asset(name, ROOT, u.Material, u.MaterialFactoryNew())
+    if material is None:
+        raise RuntimeError(f"could not create {path}")
+    u.MaterialEditingLibrary.delete_all_material_expressions(material)
+    return material, action
+
+
+def _finish_material(material, path: str, version: str) -> None:
+    u.MaterialEditingLibrary.recompile_material(material)
+    u.EditorAssetLibrary.set_metadata_tag(material, GRAPH_TAG, version)
+    if not u.EditorAssetLibrary.save_loaded_asset(material, False):
+        raise RuntimeError(f"could not save {path}")
+
+
+def build_material(defaults: dict, splat_default, aux_default, ripple_default, force: bool) -> dict:
+    """M_EnvGround (graph 2). defaults = {param name: texture} for the 12 layer textures (the first map's sets)."""
+    material, action = _begin_material(MATERIAL_PATH, MATERIAL_NAME, GRAPH_VERSION, force)
+    if action == "unchanged":
+        return {"action": "unchanged", "path": MATERIAL_PATH, "graphVersion": GRAPH_VERSION}
+    mel = u.MaterialEditingLibrary
+    material.set_editor_property("shading_model", u.MaterialShadingModel.MSM_DEFAULT_LIT)
+    material.set_editor_property("blend_mode", u.BlendMode.BLEND_OPAQUE)
+    material.set_editor_property("two_sided", False)
+    g = _Graph(material)
     cmot, st, ssm = u.CustomMaterialOutputType, u.MaterialSamplerType, u.SamplerSourceMode
-    uv = expr(u.MaterialExpressionTextureCoordinate, -2600)
+    uv = g.expr(u.MaterialExpressionTextureCoordinate, -2600)
     uv.set_editor_property("coordinate_index", 0)
-    strip = vector("GroundStrip", (-820.0, -560.0, 1640.0, 1030.0))
-    rect = vector("SplatRect", (-820.0, -560.0, 1640.0, 1030.0))
-    board = custom("GroundBoardXY", cmot.CMOT_FLOAT2, ("UV", "Strip"), HLSL_BOARD_XY, -2200, 0)
-    connect(uv, "", board, "UV")
-    connect(strip, "RGBA", board, "Strip")
-    splat_uv = custom("GroundSplatUV", cmot.CMOT_FLOAT2, ("P", "Rect"), HLSL_SPLAT_UV, -1900, -300)
-    connect(board, "", splat_uv, "P")
-    connect(rect, "RGBA", splat_uv, "Rect")
-    splat = sample("Splat", st.SAMPLERTYPE_LINEAR_COLOR, splat_default, ssm.SSM_CLAMP_WORLD_GROUP_SETTINGS, -1600, -300)
-    connect(splat_uv, "", splat, "UVs")
+    t = g.expr(u.MaterialExpressionTime, -2600)
+    strip = g.vector("GroundStrip", (-820.0, -560.0, 1640.0, 1030.0))
+    rect = g.vector("SplatRect", (-820.0, -560.0, 1640.0, 1030.0))
+    board = g.custom("GroundBoardXY", cmot.CMOT_FLOAT2, ("UV", "Strip"), HLSL_BOARD_XY, -2200, 0)
+    g.wire(board, {"UV": (uv, ""), "Strip": (strip, "RGBA")})
+    splat_uv = g.custom("GroundSplatUV", cmot.CMOT_FLOAT2, ("P", "Rect"), HLSL_SPLAT_UV, -1900, -300)
+    g.wire(splat_uv, {"P": (board, ""), "Rect": (rect, "RGBA")})
+    splat = g.sample("Splat", st.SAMPLERTYPE_LINEAR_COLOR, splat_default, ssm.SSM_CLAMP_WORLD_GROUP_SETTINGS, -1600, -300)
+    g.connect(splat_uv, "", splat, "UVs")
+    aux = g.sample("Aux", st.SAMPLERTYPE_LINEAR_COLOR, aux_default, ssm.SSM_CLAMP_WORLD_GROUP_SETTINGS, -1600, -520)
+    g.connect(splat_uv, "", aux, "UVs")
     samples = {}
     for i in range(LAYERS):
-        tile = scalar(f"L{i}_TileUU", 200.0)
-        div = expr(u.MaterialExpressionDivide, -1900, 200 + 700 * i)
-        connect(board, "", div, "A")
-        connect(tile, "", div, "B")
+        tile = g.scalar(f"L{i}_TileUU", 200.0)
+        div = g.expr(u.MaterialExpressionDivide, -1900, 200 + 700 * i)
+        g.connect(board, "", div, "A")
+        g.connect(tile, "", div, "B")
         for k, (stype, dy) in {"BC": (st.SAMPLERTYPE_COLOR, 0), "N": (st.SAMPLERTYPE_NORMAL, 220),
                                "ORMH": (st.SAMPLERTYPE_MASKS, 440)}.items():
-            node = sample(f"L{i}_{k}", stype, defaults[f"L{i}_{k}"], ssm.SSM_WRAP_WORLD_GROUP_SETTINGS, -1600,
-                          200 + 700 * i + dy)
-            connect(div, "", node, "UVs")
+            node = g.sample(f"L{i}_{k}", stype, defaults[f"L{i}_{k}"], ssm.SSM_WRAP_WORLD_GROUP_SETTINGS, -1600,
+                            200 + 700 * i + dy)
+            g.connect(div, "", node, "UVs")
             samples[(i, k)] = node
-    s = {name: scalar(name, SCALAR_DEFAULTS[name]) for name in SCALAR_DEFAULTS}
-    tints = [vector(f"L{i}_Tint", (1.0, 1.0, 1.0, 1.0)) for i in range(LAYERS)]
-    accent_color = vector("AccentColor", (0.87, 0.4, 0.51, 1.0))
-    night_tint = vector("NightTint", (0.9317, 1.0042, 1.1595, 1.0))
+    s = {name: g.scalar(name, SCALAR_DEFAULTS[name]) for name in SCALAR_DEFAULTS}
+    v = {name: g.vector(name, VECTOR_DEFAULTS[name]) for name in VECTOR_DEFAULTS}
+    tints = [g.vector(f"L{i}_Tint", (1.0, 1.0, 1.0, 1.0)) for i in range(LAYERS)]
+    accent_color = g.vector("AccentColor", (0.87, 0.4, 0.51, 1.0))
+    night_tint = g.vector("NightTint", (0.9317, 1.0042, 1.1595, 1.0))
 
-    weights = custom("GroundWeights", cmot.CMOT_FLOAT4, ("Splat", "H1", "H2", "H3", "B1", "B2", "B3", "Contrast"),
-                     HLSL_WEIGHTS, -1100, -300)
-    connect(splat, "RGBA", weights, "Splat")
+    weights = g.custom("GroundWeights", cmot.CMOT_FLOAT4, ("Splat", "H1", "H2", "H3", "B1", "B2", "B3", "Contrast"),
+                       HLSL_WEIGHTS, -1100, -300)
+    g.connect(splat, "RGBA", weights, "Splat")
     for i in (1, 2, 3):
-        connect(samples[(i, "ORMH")], "A", weights, f"H{i}")
-        connect(s[f"L{i}_HeightBlend"], "", weights, f"B{i}")
-    connect(s["HeightContrast"], "", weights, "Contrast")
+        g.connect(samples[(i, "ORMH")], "A", weights, f"H{i}")
+        g.connect(s[f"L{i}_HeightBlend"], "", weights, f"B{i}")
+    g.connect(s["HeightContrast"], "", weights, "Contrast")
+
+    water = g.custom("GroundWater", cmot.CMOT_FLOAT4, ("Aux", "P", "Time", "WaterPan", "WaterRipple", "WaterFoam"),
+                     HLSL_WATER, -1100, -600)
+    g.wire(water, {"Aux": (aux, "RGBA"), "P": (board, ""), "Time": (t, ""), "WaterPan": (v["WaterPan"], "RGBA"),
+                   "WaterRipple": (v["WaterRipple"], "RGBA"), "WaterFoam": (v["WaterFoam"], "RGBA")})
+    ripple = {}
+    for idx, code in ((1, HLSL_RIPPLE_UV1), (2, HLSL_RIPPLE_UV2)):
+        ruv = g.custom(f"GroundRippleUV{idx}", cmot.CMOT_FLOAT2, ("P", "Time", "WaterPan", "WaterRipple"), code,
+                       -1900, -900 - 220 * idx)
+        g.wire(ruv, {"P": (board, ""), "Time": (t, ""), "WaterPan": (v["WaterPan"], "RGBA"),
+                     "WaterRipple": (v["WaterRipple"], "RGBA")})
+        node = g.sample("WaterRippleN", st.SAMPLERTYPE_NORMAL, ripple_default, ssm.SSM_WRAP_WORLD_GROUP_SETTINGS,
+                        -1600, -900 - 220 * idx)
+        g.connect(ruv, "", node, "UVs")
+        ripple[idx] = node
 
     albedo_inputs = (["W"] + [f"C{i}" for i in range(LAYERS)] + [f"T{i}" for i in range(LAYERS)]
                      + ["P", "Accent", "AccentColor", "AccentOpacity", "AccentCarpet", "PetalSizeUU", "MacroStrength",
-                        "MacroScaleUU", "NightEV", "NightSaturation", "NightTint"])
-    albedo = custom("GroundAlbedo", cmot.CMOT_FLOAT3, albedo_inputs, HLSL_ALBEDO, -600, -300)
-    connect(weights, "", albedo, "W")
+                        "MacroScaleUU", "LayerMacro", "LayerMacroScaleUU", "Edge", "EdgeTint", "Water", "WaterColor",
+                        "WaterFoam", "NightEV", "NightSaturation", "NightTint"])
+    albedo = g.custom("GroundAlbedo", cmot.CMOT_FLOAT3, albedo_inputs, HLSL_ALBEDO, -600, -300)
+    g.connect(weights, "", albedo, "W")
     for i in range(LAYERS):
-        connect(samples[(i, "BC")], "RGB", albedo, f"C{i}")
-        connect(tints[i], "RGBA", albedo, f"T{i}")
-    connect(board, "", albedo, "P")
-    connect(splat, "A", albedo, "Accent")
-    connect(accent_color, "RGB", albedo, "AccentColor")
-    for name in ("AccentOpacity", "AccentCarpet", "PetalSizeUU", "MacroStrength", "MacroScaleUU", "NightEV",
-                 "NightSaturation"):
-        connect(s[name], "", albedo, name)
-    connect(night_tint, "RGB", albedo, "NightTint")
+        g.connect(samples[(i, "BC")], "RGB", albedo, f"C{i}")
+        g.connect(tints[i], "RGBA", albedo, f"T{i}")
+    g.wire(albedo, {"P": (board, ""), "Accent": (splat, "A"), "AccentColor": (accent_color, "RGB"),
+                    "Edge": (aux, "B"), "Water": (water, ""), "NightTint": (night_tint, "RGB")})
+    for name in ("AccentOpacity", "AccentCarpet", "PetalSizeUU", "MacroStrength", "MacroScaleUU", "LayerMacroScaleUU",
+                 "NightEV", "NightSaturation"):
+        g.connect(s[name], "", albedo, name)
+    for name in ("LayerMacro", "EdgeTint", "WaterColor", "WaterFoam"):
+        g.connect(v[name], "RGBA", albedo, name)
     mel.connect_material_property(albedo, "", u.MaterialProperty.MP_BASE_COLOR)
 
-    normal = custom("GroundNormal", cmot.CMOT_FLOAT3, ["W"] + [f"N{i}" for i in range(LAYERS)] + ["NormalStrength"],
-                    HLSL_NORMAL, -600, 300)
-    connect(weights, "", normal, "W")
+    normal = g.custom("GroundNormal", cmot.CMOT_FLOAT3,
+                      ["W"] + [f"N{i}" for i in range(LAYERS)]
+                      + ["NormalStrength", "LayerNormal", "Water", "R1", "R2", "WaterSurface"], HLSL_NORMAL, -600, 300)
+    g.connect(weights, "", normal, "W")
     for i in range(LAYERS):
-        connect(samples[(i, "N")], "RGB", normal, f"N{i}")
-    connect(s["NormalStrength"], "", normal, "NormalStrength")
+        g.connect(samples[(i, "N")], "RGB", normal, f"N{i}")
+    g.wire(normal, {"NormalStrength": (s["NormalStrength"], ""), "LayerNormal": (v["LayerNormal"], "RGBA"),
+                    "Water": (water, ""), "R1": (ripple[1], "RGB"), "R2": (ripple[2], "RGB"),
+                    "WaterSurface": (v["WaterSurface"], "RGBA")})
     mel.connect_material_property(normal, "", u.MaterialProperty.MP_NORMAL)
 
     orm_pins = ["W"] + [f"M{i}" for i in range(LAYERS)]
-    for desc, code, prop, extra, y in (
-            ("GroundAO", HLSL_AO, u.MaterialProperty.MP_AMBIENT_OCCLUSION, [], 600),
-            ("GroundRoughness", HLSL_ROUGH, u.MaterialProperty.MP_ROUGHNESS,
-             ["Accent", "AccentOpacity", "AccentRoughness", "PetalSizeUU"], 750),
-            ("GroundMetallic", HLSL_METAL, u.MaterialProperty.MP_METALLIC, [], 900)):
-        node = custom(desc, cmot.CMOT_FLOAT1, orm_pins + extra, code, -600, y)
-        connect(weights, "", node, "W")
+    for desc, code, prop, y in (("GroundAO", HLSL_AO, u.MaterialProperty.MP_AMBIENT_OCCLUSION, 600),
+                                ("GroundMetallic", HLSL_METAL, u.MaterialProperty.MP_METALLIC, 900)):
+        node = g.custom(desc, cmot.CMOT_FLOAT1, orm_pins, code, -600, y)
+        g.connect(weights, "", node, "W")
         for i in range(LAYERS):
-            connect(samples[(i, "ORMH")], "RGB", node, f"M{i}")
-        if extra:
-            connect(splat, "A", node, "Accent")
-            for name in ("AccentOpacity", "AccentRoughness", "PetalSizeUU"):
-                connect(s[name], "", node, name)
+            g.connect(samples[(i, "ORMH")], "RGB", node, f"M{i}")
         mel.connect_material_property(node, "", prop)
-    spec = expr(u.MaterialExpressionConstant, -600, 1050)
-    spec.set_editor_property("r", float(specular))
+    rough = g.custom("GroundRoughness", cmot.CMOT_FLOAT1,
+                     orm_pins + ["Accent", "AccentOpacity", "AccentRoughness", "PetalSizeUU", "LayerRoughMin",
+                                 "LayerRoughScale", "Edge", "EdgeTint", "EdgeRoughness", "Water", "WaterSurface"],
+                     HLSL_ROUGH, -600, 750)
+    g.connect(weights, "", rough, "W")
+    for i in range(LAYERS):
+        g.connect(samples[(i, "ORMH")], "RGB", rough, f"M{i}")
+    g.wire(rough, {"Accent": (splat, "A"), "Edge": (aux, "B"), "Water": (water, "")})
+    for name in ("AccentOpacity", "AccentRoughness", "PetalSizeUU", "EdgeRoughness"):
+        g.connect(s[name], "", rough, name)
+    for name in ("LayerRoughMin", "LayerRoughScale", "EdgeTint", "WaterSurface"):
+        g.connect(v[name], "RGBA", rough, name)
+    mel.connect_material_property(rough, "", u.MaterialProperty.MP_ROUGHNESS)
+    spec = g.custom("GroundSpecular", cmot.CMOT_FLOAT1, ("W", "LayerSpecular", "Water", "WaterSurface"), HLSL_SPECULAR,
+                    -600, 1050)
+    g.wire(spec, {"W": (weights, ""), "LayerSpecular": (v["LayerSpecular"], "RGBA"), "Water": (water, ""),
+                  "WaterSurface": (v["WaterSurface"], "RGBA")})
     mel.connect_material_property(spec, "", u.MaterialProperty.MP_SPECULAR)
+    emis = g.custom("GroundEmissive", cmot.CMOT_FLOAT3,
+                    ("Water", "WaterColor", "WaterSurface", "NightEV", "NightSaturation", "NightTint"), HLSL_EMISSIVE,
+                    -600, 1200)
+    g.wire(emis, {"Water": (water, ""), "WaterColor": (v["WaterColor"], "RGBA"),
+                  "WaterSurface": (v["WaterSurface"], "RGBA"), "NightEV": (s["NightEV"], ""),
+                  "NightSaturation": (s["NightSaturation"], ""), "NightTint": (night_tint, "RGB")})
+    mel.connect_material_property(emis, "", u.MaterialProperty.MP_EMISSIVE_COLOR)
 
-    mel.recompile_material(material)
-    eal.set_metadata_tag(material, GRAPH_TAG, GRAPH_VERSION)
-    if not eal.save_loaded_asset(material, False):
-        raise RuntimeError(f"could not save {MATERIAL_PATH}")
+    _finish_material(material, MATERIAL_PATH, GRAPH_VERSION)
     return {"action": action, "path": MATERIAL_PATH, "graphVersion": GRAPH_VERSION,
             "expressions": int(mel.get_num_material_expressions(material)),
             "textureParams": sorted(str(n) for n in mel.get_texture_parameter_names(material))}
 
 
-def mi_want(key: str, params: dict, textures: dict, splat, rect: list) -> dict:
+# --- M_EnvWaterfall (P4, review gap 1): the waterfall card + the spill over the T2 lip ---------------------------------
+HLSL_FALL_CORE = """// P4 M_EnvWaterfall: FallCard = (width uu, height uu, kind: 0 the vertical card / 1 the flat spill, 0) per component
+struct FEnvFallFns {
+  float Hash12(float2 p) {
+    float3 p3 = frac(float3(p.xyx) * 0.1031);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return frac((p3.x + p3.y) * p3.z);
+  }
+  float ValueNoise(float2 q) {
+    float2 i0 = floor(q);
+    float2 f = frac(q);
+    float2 s = f * f * (3.0 - 2.0 * f);
+    float a = Hash12(i0);
+    float b = Hash12(i0 + float2(1.0, 0.0));
+    float c = Hash12(i0 + float2(0.0, 1.0));
+    float d = Hash12(i0 + float2(1.0, 1.0));
+    return lerp(lerp(a, b, s.x), lerp(c, d, s.x), s.y);
+  }
+};
+FEnvFallFns F;
+float2 size = max(FallCard.xy, float2(1.0, 1.0));
+bool spill = FallCard.z > 0.5;
+float2 p = UV * size;  // uu: x across the fall, y along the flow (down the card / towards the lip on the spill)
+float sc = max(FallFlow.y, 1.0);
+float2 q = float2(p.x / sc, (p.y - Time * FallFlow.x) / (sc * 5.0));
+float streak = 0.6 * F.ValueNoise(q) + 0.4 * F.ValueNoise(q * float2(2.1, 1.7) + 7.3);
+float foam = spill ? saturate(UV.y * 1.4 - 0.5) * (0.5 + streak)
+                   : saturate(streak * 1.5 - 0.35) * (0.55 + 0.45 * saturate(1.0 - UV.y * 1.5)) + 0.6 * saturate(1.0 - p.y / 14.0);
+foam = saturate(foam) * WaterFoam.a;
+float side = smoothstep(0.0, max(FallFlow.z, 0.5), p.x) * smoothstep(0.0, max(FallFlow.z, 0.5), size.x - p.x);
+float alpha = side * (0.75 + 0.5 * streak);
+alpha *= spill ? smoothstep(0.0, max(FallSpill.x, 0.5), p.y)
+               : 1.0 - smoothstep(1.0 - FallFlow.w, 1.0, UV.y + 0.25 * (streak - 0.5));
+float3 base = lerp(WaterColor.rgb, WaterFoam.rgb, foam);
+float3 lit = base * exp2(NightEV) * NightTint;
+float luma = dot(lit, float3(0.2126, 0.7152, 0.0722));
+float3 graded = max(lerp(luma.xxx, lit, NightSaturation), 0.0);
+"""
+FALL_CORE_INPUTS = ("UV", "Time", "FallCard", "FallFlow", "FallSpill", "WaterColor", "WaterFoam", "NightEV",
+                    "NightSaturation", "NightTint")
+HLSL_FALL_ALBEDO = HLSL_FALL_CORE + "return graded;\n"
+HLSL_FALL_EMISSIVE = HLSL_FALL_CORE + "return graded * FallShade.w;\n"
+HLSL_FALL_OPACITY = HLSL_FALL_CORE + """// screen-space dither of the soft fades (opacity mask clip 0.5; TSR smooths it)
+float2 px = Parameters.SvPosition.xy;
+float ign = frac(52.9829189 * frac(dot(px, float2(0.06711056, 0.00583715))));
+return saturate(alpha + (ign - 0.5) * FallSpill.y);
+"""
+HLSL_FALL_ROUGH = HLSL_FALL_CORE + "return saturate(lerp(FallShade.x, 0.6, foam));\n"
+HLSL_FALL_RIPPLE_UV = """float2 p = UV * max(FallCard.xy, float2(1.0, 1.0));
+return float2(p.x, p.y - Time * FallFlow.x) / max(RippleTileUU, 1.0);
+"""
+HLSL_FALL_NORMAL = "return normalize(float3(R.xy * FallShade.z, 1.0));"
+HLSL_FALL_SPECULAR = "return saturate(FallShade.y);"
+FALL_SCALAR_DEFAULTS = {"NightEV": -1.0, "NightSaturation": 0.7, "RippleTileUU": 70.0}
+FALL_VECTOR_DEFAULTS = {"FallCard": (200.0, 230.0, 0.0, 0.0), "FallFlow": (55.0, 9.0, 12.0, 0.35),
+                        "FallSpill": (18.0, 0.5, 0.0, 0.0), "FallShade": (0.08, 0.25, 0.5, 0.6),
+                        "WaterColor": (0.0159, 0.0497, 0.141, 0.55), "WaterFoam": (0.62, 0.66, 0.7, 0.85),
+                        "NightTint": (0.9317, 1.0042, 1.1595, 1.0)}
+
+
+def build_waterfall_material(ripple_default, force: bool) -> dict:
+    material, action = _begin_material(FALL_MATERIAL_PATH, FALL_MATERIAL_NAME, FALL_GRAPH_VERSION, force)
+    if action == "unchanged":
+        return {"action": "unchanged", "path": FALL_MATERIAL_PATH, "graphVersion": FALL_GRAPH_VERSION}
+    mel = u.MaterialEditingLibrary
+    material.set_editor_property("shading_model", u.MaterialShadingModel.MSM_DEFAULT_LIT)
+    material.set_editor_property("blend_mode", u.BlendMode.BLEND_MASKED)
+    material.set_editor_property("opacity_mask_clip_value", 0.5)
+    material.set_editor_property("two_sided", True)
+    g = _Graph(material)
+    cmot, st, ssm = u.CustomMaterialOutputType, u.MaterialSamplerType, u.SamplerSourceMode
+    uv = g.expr(u.MaterialExpressionTextureCoordinate, -2000)
+    uv.set_editor_property("coordinate_index", 0)
+    t = g.expr(u.MaterialExpressionTime, -2000)
+    s = {name: g.scalar(name, val) for name, val in FALL_SCALAR_DEFAULTS.items()}
+    v = {name: g.vector(name, val) for name, val in FALL_VECTOR_DEFAULTS.items()}
+    src = {"UV": (uv, ""), "Time": (t, ""), "NightEV": (s["NightEV"], ""),
+           "NightSaturation": (s["NightSaturation"], ""), "NightTint": (v["NightTint"], "RGB")}
+    for name in ("FallCard", "FallFlow", "FallSpill", "WaterColor", "WaterFoam", "FallShade"):
+        src[name] = (v[name], "RGBA")
+    nodes = {}
+    for desc, code, out_type, extra, y in (
+            ("FallAlbedo", HLSL_FALL_ALBEDO, cmot.CMOT_FLOAT3, (), -300),
+            ("FallEmissive", HLSL_FALL_EMISSIVE, cmot.CMOT_FLOAT3, ("FallShade",), 0),
+            ("FallOpacity", HLSL_FALL_OPACITY, cmot.CMOT_FLOAT1, (), 300),
+            ("FallRoughness", HLSL_FALL_ROUGH, cmot.CMOT_FLOAT1, ("FallShade",), 600)):
+        pins = FALL_CORE_INPUTS + extra
+        node = g.custom(desc, out_type, pins, code, -800, y)
+        g.wire(node, {p: src[p] for p in pins})
+        nodes[desc] = node
+    ruv = g.custom("FallRippleUV", cmot.CMOT_FLOAT2, ("UV", "Time", "FallCard", "FallFlow", "RippleTileUU"),
+                   HLSL_FALL_RIPPLE_UV, -1500, 900)
+    g.wire(ruv, {"UV": src["UV"], "Time": src["Time"], "FallCard": src["FallCard"], "FallFlow": src["FallFlow"],
+                 "RippleTileUU": (s["RippleTileUU"], "")})
+    rs = g.sample("WaterRippleN", st.SAMPLERTYPE_NORMAL, ripple_default, ssm.SSM_WRAP_WORLD_GROUP_SETTINGS, -1200, 900)
+    g.connect(ruv, "", rs, "UVs")
+    normal = g.custom("FallNormal", cmot.CMOT_FLOAT3, ("R", "FallShade"), HLSL_FALL_NORMAL, -800, 900)
+    g.wire(normal, {"R": (rs, "RGB"), "FallShade": src["FallShade"]})
+    spec = g.custom("FallSpecular", cmot.CMOT_FLOAT1, ("FallShade",), HLSL_FALL_SPECULAR, -800, 1100)
+    g.wire(spec, {"FallShade": src["FallShade"]})
+    mel.connect_material_property(nodes["FallAlbedo"], "", u.MaterialProperty.MP_BASE_COLOR)
+    mel.connect_material_property(nodes["FallEmissive"], "", u.MaterialProperty.MP_EMISSIVE_COLOR)
+    mel.connect_material_property(nodes["FallOpacity"], "", u.MaterialProperty.MP_OPACITY_MASK)
+    mel.connect_material_property(nodes["FallRoughness"], "", u.MaterialProperty.MP_ROUGHNESS)
+    mel.connect_material_property(normal, "", u.MaterialProperty.MP_NORMAL)
+    mel.connect_material_property(spec, "", u.MaterialProperty.MP_SPECULAR)
+    _finish_material(material, FALL_MATERIAL_PATH, FALL_GRAPH_VERSION)
+    return {"action": action, "path": FALL_MATERIAL_PATH, "graphVersion": FALL_GRAPH_VERSION,
+            "expressions": int(mel.get_num_material_expressions(material))}
+
+
+def _water(params: dict, key: str) -> dict:
+    """The water block of a map with every value resolved (maps without water: the material defaults, strength 0)."""
+    w = params["maps"][key].get("water") or {}
+    color = srgb8_to_linear(w["colorSrgb"]) if "colorSrgb" in w else VECTOR_DEFAULTS["WaterColor"][:3]
+    tiles = w.get("rippleTileUU", VECTOR_DEFAULTS["WaterRipple"][:2])
+    return {
+        "WaterColor": tuple(round(c, 5) for c in color) + (float(w.get("shallowMix", 0.55)),),
+        "WaterFoam": tuple(float(c) for c in w.get("foamColor", VECTOR_DEFAULTS["WaterFoam"][:3]))
+        + (float(w.get("foamOpacity", 0.0)) if w else 0.0,),
+        "WaterSurface": (float(w.get("roughness", 0.06)), float(w.get("specular", 0.25)),
+                         float(w.get("normalStrength", 0.55)), float(w.get("lift", 0.0)) if w else 0.0),
+        "WaterRipple": (float(tiles[0]), float(tiles[1]), float(w.get("foamScaleUU", 9.0)),
+                        float(w.get("foamSpeed", 0.6))),
+        "WaterPan": tuple(float(c) for c in w.get("panUUps", VECTOR_DEFAULTS["WaterPan"])),
+    }
+
+
+def mi_want(key: str, params: dict, textures: dict, splat, rect: list, aux=None, ripple=None) -> dict:
     """The MI parameters of one map: {'tex': {name: texture}, 'scalar': {name: value}, 'vector': {name: rgba}}."""
     mp = params["maps"][key]
     m = params["material"]
     tex, scal, vec = {"Splat": splat}, {}, {}
+    if aux is not None:
+        tex["Aux"] = aux
+    if ripple is not None:
+        tex["WaterRippleN"] = ripple
+    rmin, rscale, spec, nrm, macro = [], [], [], [], []
     for i, lay in enumerate(mp["layers"]):
         for k in KEYS:
             tex[f"L{i}_{k}"] = textures[(lay["set"], k)]
@@ -625,23 +1020,55 @@ def mi_want(key: str, params: dict, textures: dict, splat, rect: list) -> dict:
         if i > 0:
             scal[f"L{i}_HeightBlend"] = float(lay.get("heightBlend", 1.0))
         vec[f"L{i}_Tint"] = tuple(float(v) for v in lay["tint"]) + (float(lay["saturation"]),)
+        rmin.append(float(lay.get("roughMin", 0.0)))
+        rscale.append(float(lay.get("roughScale", 1.0)))
+        spec.append(float(lay.get("specular", m["specular"])))
+        nrm.append(float(lay.get("normalStrength", 1.0)))
+        macro.append(float(lay.get("macro", 0.0)))
     ac, gr = mp["accent"], mp["grade"]
+    edge = mp.get("edge") or {}
     scal.update({"HeightContrast": float(m["heightContrast"]), "NormalStrength": float(m["normalStrength"]),
                  "MacroStrength": float(m["macroStrength"]), "MacroScaleUU": float(m["macroScaleUU"]),
                  "AccentOpacity": float(ac["opacity"]), "AccentRoughness": float(ac["roughness"]),
                  "AccentCarpet": float(ac.get("carpet", 0.0)),
                  "PetalSizeUU": float(ac["petalSizeUU"]), "NightEV": float(gr["ev"]),
-                 "NightSaturation": float(gr["saturation"])})
+                 "NightSaturation": float(gr["saturation"]),
+                 "LayerMacroScaleUU": float(m.get("layerMacroScaleUU", 33.0)),
+                 "EdgeRoughness": float(edge.get("roughness", 0.8))})
     x0, y0, x1, y1 = (float(v) for v in rect)
     vec.update({"AccentColor": tuple(float(v) for v in ac["color"]) + (1.0,),
                 "NightTint": tuple(float(v) for v in gr["tint"]) + (1.0,),
-                "SplatRect": (x0, y0, x1 - x0, y1 - y0), "GroundStrip": (x0, y0, x1 - x0, y1 - y0)})
+                "SplatRect": (x0, y0, x1 - x0, y1 - y0), "GroundStrip": (x0, y0, x1 - x0, y1 - y0),
+                "LayerRoughMin": tuple(rmin), "LayerRoughScale": tuple(rscale), "LayerSpecular": tuple(spec),
+                "LayerNormal": tuple(nrm), "LayerMacro": tuple(macro),
+                "EdgeTint": tuple(float(v) for v in edge.get("color", (1.0, 1.0, 1.0)))
+                + (float(edge.get("strength", 1.0)) if edge else 0.0,)})
+    vec.update(_water(params, key))
     return {"tex": tex, "scalar": scal, "vector": vec}
 
 
-def ensure_instance(key: str, material, want: dict) -> dict:
+def fall_mi_want(key: str, params: dict, ripple=None) -> dict:
+    """MI_EnvWaterfall_<Map>: the water colour / foam / grade of the map and the look of its first fall entry."""
+    mp = params["maps"][key]
+    w = mp.get("water") or {}
+    f = (w.get("falls") or [{}])[0]
+    gr = mp["grade"]
+    wv = _water(params, key)
+    tex = {"WaterRippleN": ripple} if ripple is not None else {}
+    scal = {"NightEV": float(gr["ev"]), "NightSaturation": float(gr["saturation"]),
+            "RippleTileUU": float(wv["WaterRipple"][0])}
+    vec = {"WaterColor": wv["WaterColor"], "WaterFoam": wv["WaterFoam"],
+           "NightTint": tuple(float(v) for v in gr["tint"]) + (1.0,),
+           "FallFlow": (float(f.get("flowUUps", 55.0)), float(f.get("streakScaleUU", 9.0)),
+                        float(f.get("edgeFadeUU", 12.0)), float(f.get("bottomFade", 0.35))),
+           "FallSpill": (float(f.get("spillFadeUU", 18.0)), float(f.get("dither", 0.5)), 0.0, 0.0),
+           "FallShade": (wv["WaterSurface"][0] + 0.02, wv["WaterSurface"][1], wv["WaterSurface"][2],
+                         wv["WaterSurface"][3])}
+    return {"tex": tex, "scalar": scal, "vector": vec}
+
+
+def ensure_instance(path: str, material, want: dict) -> dict:
     eal, mel = u.EditorAssetLibrary, u.MaterialEditingLibrary
-    path = mi_asset(key)
     mi = u.load_asset(path) if eal.does_asset_exist(path) else None
     action = "updated"
     if mi is None:
@@ -707,7 +1134,8 @@ def run_import(pl: dict, params: dict, keys: list[str], force: bool) -> tuple[di
             except Exception as exc:  # noqa: BLE001 - report and continue
                 out[key] = {"action": "failed", "error": f"{type(exc).__name__}: {exc}"}
                 ok = False
-    splats = {}
+    ripple = textures.get((RIPPLE_SET, "N"))
+    splats, auxes = {}, {}
     for key in keys:
         m = pl["maps"][key]
         out = {}
@@ -716,14 +1144,16 @@ def run_import(pl: dict, params: dict, keys: list[str], force: bool) -> tuple[di
             out["splat"] = {"action": "skipped", "error": m.get("error")}
             ok = False
             continue
-        try:
-            out["splat"] = import_texture(m["source"], m["sha256"], m["splatAsset"], "Splat", force)
-            splats[key] = u.load_asset(m["splatAsset"])
-        except Exception as exc:  # noqa: BLE001
-            out["splat"] = {"action": "failed", "error": f"{type(exc).__name__}: {exc}"}
-            ok = False
-    ready = [k for k in keys if k in splats and all((lay["set"], kk) in textures
-                                                     for lay in params["maps"][k]["layers"] for kk in KEYS)]
+        for kind, src, sha, asset, store in (("splat", "source", "sha256", "splatAsset", splats),
+                                             ("aux", "auxSource", "auxSha256", "auxAsset", auxes)):
+            try:
+                out[kind] = import_texture(m[src], m[sha], m[asset], "Splat" if kind == "splat" else "Aux", force)
+                store[key] = u.load_asset(m[asset])
+            except Exception as exc:  # noqa: BLE001
+                out[kind] = {"action": "failed", "error": f"{type(exc).__name__}: {exc}"}
+                ok = False
+    ready = [k for k in keys if k in splats and k in auxes and ripple is not None
+             and all((lay["set"], kk) in textures for lay in params["maps"][k]["layers"] for kk in KEYS)]
     if not ready:
         result["material"] = {"action": "skipped", "error": "no map has all its textures"}
         return result, False
@@ -731,28 +1161,55 @@ def run_import(pl: dict, params: dict, keys: list[str], force: bool) -> tuple[di
     defaults = {f"L{i}_{k}": textures[(lay["set"], k)] for i, lay in enumerate(params["maps"][first]["layers"])
                 for k in KEYS}
     try:
-        result["material"] = build_material(defaults, splats[first], float(params["material"]["specular"]), force)
+        result["material"] = build_material(defaults, splats[first], auxes[first], ripple, force)
         material = u.load_asset(MATERIAL_PATH)
     except Exception as exc:  # noqa: BLE001
         result["material"] = {"action": "failed", "error": f"{type(exc).__name__}: {exc}"}
         return result, False
+    fall_material = None
+    if any(has_falls(params, k) for k in ready):
+        try:
+            result["waterfallMaterial"] = build_waterfall_material(ripple, force)
+            fall_material = u.load_asset(FALL_MATERIAL_PATH)
+        except Exception as exc:  # noqa: BLE001
+            result["waterfallMaterial"] = {"action": "failed", "error": f"{type(exc).__name__}: {exc}"}
+            ok = False
     for key in keys:
         if key not in ready:
             result["maps"][key]["materialInstance"] = {"action": "skipped", "error": "textures missing"}
             ok = False
             continue
         try:
-            want = mi_want(key, params, textures, splats[key], pl["maps"][key]["splatRect"])
-            result["maps"][key]["materialInstance"] = ensure_instance(key, material, want)
+            want = mi_want(key, params, textures, splats[key], pl["maps"][key]["splatRect"], auxes[key], ripple)
+            result["maps"][key]["materialInstance"] = ensure_instance(mi_asset(key), material, want)
         except Exception as exc:  # noqa: BLE001
             result["maps"][key]["materialInstance"] = {"action": "failed", "error": f"{type(exc).__name__}: {exc}"}
             ok = False
+        if has_falls(params, key):
+            if fall_material is None:
+                result["maps"][key]["waterfallInstance"] = {"action": "skipped", "error": "no M_EnvWaterfall"}
+                ok = False
+                continue
+            try:
+                result["maps"][key]["waterfallInstance"] = ensure_instance(
+                    fall_mi_asset(key), fall_material, fall_mi_want(key, params, ripple))
+            except Exception as exc:  # noqa: BLE001
+                result["maps"][key]["waterfallInstance"] = {"action": "failed",
+                                                            "error": f"{type(exc).__name__}: {exc}"}
+                ok = False
     listing = sorted(str(p).split(".")[0] for p in u.EditorAssetLibrary.list_assets(ROOT, recursive=True,
                                                                                       include_folder=False))
-    planned = {MATERIAL_PATH} | {mi_asset(k) for k in MAPS} | {splat_asset(k) for k in MAPS}
-    planned |= {texture_asset(s, k) for s in params["sets"] for k in KEYS}
-    result["folder"] = {"assets": len(listing), "foreign": [a for a in listing if a not in planned]}
+    result["folder"] = {"assets": len(listing), "foreign": [a for a in listing if a not in planned_assets(params)]}
     return result, ok
+
+
+def planned_assets(params: dict) -> set:
+    """Every asset this tool may own under /Game/EnvKit/Ground (the 'foreign' listing of the report)."""
+    planned = {MATERIAL_PATH, FALL_MATERIAL_PATH, ripple_asset()}
+    planned |= {mi_asset(k) for k in MAPS} | {splat_asset(k) for k in MAPS} | {aux_asset(k) for k in MAPS}
+    planned |= {fall_mi_asset(k) for k in MAPS}
+    planned |= {texture_asset(s, k) for s in params["sets"] for k in KEYS}
+    return planned
 
 
 # ================================================================================================ entry
@@ -778,7 +1235,8 @@ def main(argv: list | None = None) -> int:
     mode = "prep" if args.prep else ("check" if (args.check or u is None) else "import")
     report = {"schema": "unmatched.env-ground-ue-import/1", "tool": "tools/art/env_kit/ue_import_env_ground.py",
               "mode": mode, "params": rel(params_path), "staging": staging.as_posix(), "contentRoot": ROOT,
-              "material": MATERIAL_PATH, "graphVersion": GRAPH_VERSION, "maps": keys}
+              "material": MATERIAL_PATH, "graphVersion": GRAPH_VERSION, "waterfallMaterial": FALL_MATERIAL_PATH,
+              "waterfallGraphVersion": FALL_GRAPH_VERSION, "maps": keys}
     ok = True
     if mode == "prep":
         if u is not None:

@@ -1,14 +1,18 @@
-"""Tests for the ENV-U10 themed ground tools (ENV-MAPS P2 track GROUND):
-tools/art/env_kit/ground_splat.py (splat masks + layout 'ground' sections), tools/art/env_kit/ue_import_env_ground.py
-(the plain-Python stages) and the ground check of tools/art/env_kit/layout_check.py.
+"""Tests for the ENV-U10 themed ground tools (ENV-MAPS P2 track GROUND, P4 water / edges / petals):
+tools/art/env_kit/ground_splat.py (splat + aux masks, layout 'ground' sections, waterfalls), tools/art/env_kit/
+ue_import_env_ground.py (the plain-Python stages, the procedural water ripple, the MI parameters) and the ground check of
+tools/art/env_kit/layout_check.py.
 
 The splat tests run everywhere (numpy / PIL, committed layouts and params). The staging test needs the gitignored
-staging folder of ue_import_env_ground.py --prep and skips cleanly without it.
+staging folder of ue_import_env_ground.py --prep and skips cleanly without it. The two 'committed' checks
+(test_layout_sections_match_the_splats, test_plan_against_the_staging) need the layouts' ground sections written by
+ground_splat.py --write-layouts after the last layout / params change.
 
   python -m pytest tools/art/tests/test_env_ground.py -q
 """
 from __future__ import annotations
 
+import copy
 import json
 import sys
 import unittest
@@ -41,13 +45,22 @@ def generated(key: str) -> dict:
     return _CACHE[key]
 
 
-def sample(res: dict, x: float, y: float) -> np.ndarray:
-    """Decoded splat value (R, G, B coverage, A accent) at board XY (nearest pixel)."""
+def sample(res: dict, x: float, y: float, key: str = "array") -> np.ndarray:
+    """Decoded splat value (R, G, B coverage, A accent) - or with key 'aux' the aux mask (R water, G foam, B edge,
+    A depth) - at board XY (nearest pixel)."""
     x0, y0, x1, y1 = res["rect"]
     w, h = res["size"]
     i = min(max(int((x - x0) / (x1 - x0) * w), 0), w - 1)
     j = min(max(int((y - y0) / (y1 - y0) * h), 0), h - 1)
-    return GS.decode(res["array"][j:j + 1, i:i + 1])[0, 0]
+    return GS.decode(res[key][j:j + 1, i:i + 1])[0, 0]
+
+
+def water_run(res: dict, y: float):
+    """x extent of the aux water >= 0.5 on the splat row nearest y (None without water)."""
+    X, Y = res["X"], res["Y"]
+    j = int(np.argmin(np.abs(Y[:, 0] - y)))
+    xs = X[j][GS.decode(res["aux"])[j, :, 0] >= 0.5]
+    return (float(xs.min()), float(xs.max())) if len(xs) else None
 
 
 class SplatGeometry(unittest.TestCase):
@@ -63,11 +76,25 @@ class SplatGeometry(unittest.TestCase):
         for key in GS.MAPS:
             again = GS.generate(key, PARAMS, layout(key))
             self.assertEqual(again["sha256"], generated(key)["sha256"], key)
+            self.assertEqual(again["auxSha256"], generated(key)["auxSha256"], key)
+            self.assertEqual(again["falls"], generated(key)["falls"], key)
 
     def test_alpha_never_zero(self):
         # UE's PNG import may infill the RGB of zero-alpha pixels (TextureImporter FillPNGZeroAlpha)
         for key in GS.MAPS:
             self.assertGreaterEqual(int(generated(key)["array"][..., 3].min()), 1, key)
+            self.assertGreaterEqual(int(generated(key)["aux"][..., 3].min()), 1, key)
+            self.assertEqual(generated(key)["aux"].shape, generated(key)["array"].shape, key)
+
+    def test_gauss_blur_keeps_constants_and_mass(self):
+        flat = np.full((40, 60), 0.37)
+        np.testing.assert_allclose(GS.gauss_blur(flat, (3.0, 2.0)), flat, atol=1e-12)
+        spot = np.zeros((41, 41))
+        spot[20, 20] = 1.0
+        b = GS.gauss_blur(spot, (2.0, 2.0))
+        self.assertAlmostEqual(float(b.sum()), 1.0, places=6)
+        self.assertAlmostEqual(float(b[20, 18]), float(b[18, 20]), places=12)  # isotropic for equal sigmas
+        np.testing.assert_array_equal(GS.gauss_blur(spot, (0.0, 0.0)), spot)
 
     def test_stacked_weights_sum_to_one(self):
         rng = np.random.default_rng(3)
@@ -87,6 +114,18 @@ class SplatGeometry(unittest.TestCase):
         self.assertGreater(sar["L1"], 0.1)  # sand
         self.assertGreater(sar["L2"], 0.05)  # pebbles in the river channels
         self.assertGreater(sar["L0"], 0.2)  # forest floor W
+        # P4: water only on Sarpedon, an edge band on both (Marmoreal curb, Sarpedon deck beam)
+        self.assertEqual(mar["water"], 0.0)
+        self.assertEqual(mar["foam"], 0.0)
+        self.assertGreater(sar["water"], 0.03)
+        self.assertGreater(sar["foam"], 0.0)
+        self.assertGreater(mar["edge"], 0.03)
+        self.assertGreater(sar["edge"], 0.002)
+        # P4 gap 10: the petals concentrate under the cherries - well below the P2 petal rules on the same layout
+        p2 = copy.deepcopy(PARAMS)
+        p2["maps"]["marmoreal"]["rules"].update(petalGlobal=1.0, petalTreeRadiusUU=125.0, petalDrift=0.55, petalBeds=0.3)
+        before = GS.coverage(GS.generate("marmoreal", p2, layout("marmoreal")), p2)["accentMean"]
+        self.assertLess(mar["accentMean"], 0.8 * before)
 
 
 class SplatRules(unittest.TestCase):
@@ -94,7 +133,7 @@ class SplatRules(unittest.TestCase):
         res = generated("marmoreal")
         lay = layout("marmoreal")
         self.assertGreater(sample(res, 0, -360)[2], 0.95)  # palace terrace: paving
-        self.assertGreater(sample(res, -505, 0)[2], 0.95)  # W walkway next to the frame
+        self.assertGreater(sample(res, -490, 0)[2], 0.95)  # W walkway next to the frame
         cherry = next(p for p in lay["props"] if p["id"] == "cherry-w")
         c = sample(res, *cherry["loc"][:2])
         self.assertLess(c[2], 0.05)  # no paving under the cherry
@@ -112,25 +151,137 @@ class SplatRules(unittest.TestCase):
                 self.assertGreater(sample(res, *p["loc"][:2])[2], 0.95, p["id"])  # on the deck
         fa, fb = PARAMS["maps"]["sarpedon"]["river"]["farEdgeX"]
         far = sample(res, (fa + fb) / 2 + 15, -420)
-        self.assertGreater(far[1], 0.9)  # pebbles in the far channel
+        self.assertGreater(far[1], 0.9)  # the pebble bed of the far channel (under the water)
         self.assertGreater(far[3], 0.8)  # wet (x 0.82 .. 1 noise)
         na, nb = PARAMS["maps"]["sarpedon"]["river"]["nearEdgeX"]
         near = sample(res, (na + nb) / 2 - 10, 400)
-        self.assertGreater(near[1], 0.9)  # pebbles at the river mouth near edge (waterfall)
+        self.assertGreater(near[1], 0.9)  # the pebble bed at the river mouth near edge (waterfall)
         self.assertGreater(sample(res, 0, -420)[0], 0.9)  # beach N-centre: sand
         forest = sample(res, -700, 150)
         self.assertLess(max(forest[:3]), 0.1)  # the forest floor base (W)
         fort = next(p for p in lay["props"] if LC.mesh_name(p) == "FortRuin")
         self.assertGreater(max(sample(res, *fort["loc"][:2])[:2]), 0.5)  # fort dust / rubble
 
+    def test_marmoreal_curb_and_petal_mask(self):
+        res = generated("marmoreal")
+        # walking out from the frame along y = 0: paving, then the curb band (aux B) on its last ~24 uu, then earth
+        xs = np.arange(-470.0, -650.0, -2.0)
+        pave = np.array([sample(res, x, 0.0)[2] for x in xs])
+        edge = np.array([sample(res, x, 0.0, "aux")[2] for x in xs])
+        out = int(np.argmax(pave < 0.5))  # first x outside the paving
+        self.assertGreater(out, 5)
+        self.assertGreater(float(edge[max(out - 5, 0):out].max()), 0.8)  # the curb just inside the paving border
+        self.assertLess(float(edge[:max(out - 20, 1)].max()), 0.1)  # no curb next to the frame
+        self.assertLess(float(edge[out + 10:].max()), 0.1)  # none on the earth
+        cherry = next(p for p in layout("marmoreal")["props"] if p["id"] == "cherry-w")
+        self.assertGreater(sample(res, *cherry["loc"][:2])[3], 0.8)  # dense under the tree
+        self.assertLess(sample(res, -600, 300)[3], 0.1)  # sparse confetti far from the trees
+
+    def test_sarpedon_water_follows_the_painted_river(self):
+        res = generated("sarpedon")
+        riv = PARAMS["maps"]["sarpedon"]["river"]
+        for y, (a, b) in ((-GS.FY - 6.0, riv["farEdgeX"]), (GS.FY + 6.0, riv["nearEdgeX"])):
+            run = water_run(res, y)
+            self.assertIsNotNone(run, y)
+            overlap = min(run[1], b) - max(run[0], a)
+            self.assertGreater(overlap / (b - a), 0.85, (y, run, (a, b)))  # the water continues the painted river
+            self.assertLess(abs((run[0] + run[1]) / 2 - (a + b) / 2), 20.0, (y, run))
+            self.assertGreater(sample(res, (a + b) / 2, y, "aux")[0], 0.9)
+        # the far mouth opens into the sea: surf lines (foam) inside the water near the far tray edge
+        Y = res["Y"]
+        aux = GS.decode(res["aux"])
+        sea = (Y < SHARED_TRAY[1] + 70) & (Y > SHARED_TRAY[1] + 20)
+        self.assertGreater(float((aux[..., 1] * aux[..., 0])[sea].max()), 0.5)
+        # depth: 0 at the shore, deep in the middle of the far mouth
+        fa, fb = riv["farEdgeX"]
+        self.assertGreater(sample(res, (fa + fb) / 2 + 20, -440, "aux")[3], 0.6)
+        # a thin pebble rim on the banks, sand beyond it, no water there
+        run = water_run(res, -400.0)
+        self.assertGreater(sample(res, run[1] + 5.0, -400.0)[1], 0.5)
+        beyond = [sample(res, run[1] + d, -400.0)[1] for d in range(30, 70, 2)]  # sand (a sparse pebble scatter)
+        self.assertLess(float(np.mean(beyond)), 0.5)
+        self.assertLess(sample(res, run[1] + 40.0, -400.0, "aux")[0], 0.05)
+
+    def test_sarpedon_deck_beam(self):
+        res = generated("sarpedon")
+        self.assertGreater(sample(res, 404.0, -400.0, "aux")[2], 0.8)  # the quay N-E: the planks end at x 400
+        self.assertGreater(sample(res, 124.0, 380.0, "aux")[2], 0.8)  # the quay S-E: the planks end at x 120
+        self.assertLess(sample(res, 600.0, -200.0, "aux")[2], 0.05)  # not inside the deck
+        self.assertLess(sample(res, -700.0, 150.0, "aux")[2], 0.05)  # not on the forest floor
+
+    def test_waterfall_entry(self):
+        res = generated("sarpedon")
+        falls = res["falls"]
+        self.assertEqual(len(falls), 1)
+        f = falls[0]
+        tx0, ty0, tx1, ty1 = SHARED_TRAY
+        spec = PARAMS["maps"]["sarpedon"]["water"]["falls"][0]
+        self.assertEqual(f["material"], "/Game/EnvKit/Ground/MI_EnvWaterfall_Sarpedon")
+        self.assertEqual(f["y"], ty1 + spec["offsetUU"])
+        na, nb = PARAMS["maps"]["sarpedon"]["river"]["nearEdgeX"]
+        self.assertLess(abs((f["x0"] + f["x1"]) / 2 - (na + nb) / 2), 30.0)  # under the river
+        self.assertGreater(f["x1"] - f["x0"], 0.8 * (nb - na))
+        run = water_run(res, ty1 - 3.0)
+        self.assertGreaterEqual(f["x0"], run[0] - 2.0)  # inside the water at the edge
+        self.assertLessEqual(f["x1"], run[1] + 2.0)
+        self.assertEqual(GS.validate_waterfalls("sarpedon", falls, SHARED_TRAY), [])
+        self.assertEqual(generated("marmoreal")["falls"], [])
+        bad = [dict(f, topZ=30.0), dict(f), dict(f, spillUU=0.0), dict(f, x1=f["x0"] - 1.0),
+               dict(f, material="/Game/X/MI_Y"), dict(f, y=ty1 - 10.0)]
+        for k, b in enumerate(bad):
+            got = GS.validate_waterfalls("sarpedon", [f, b] if k == 1 else [b], SHARED_TRAY)
+            self.assertTrue(got, (k, b))  # 1: duplicate id
+
+    def test_rules_are_parametric(self):
+        p = copy.deepcopy(PARAMS)
+        p["maps"]["marmoreal"]["rules"]["petalGlobal"] = 0.0
+        p["maps"]["marmoreal"]["rules"]["curbWidthUU"] = 0.0
+        res = GS.generate("marmoreal", p, layout("marmoreal"))
+        cov = GS.coverage(res, p)
+        self.assertLess(cov["accentMean"], GS.coverage(generated("marmoreal"), PARAMS)["accentMean"])
+        self.assertEqual(cov["edge"], 0.0)
+        p = copy.deepcopy(PARAMS)
+        p["maps"]["sarpedon"]["water"]["falls"] = []
+        p["maps"]["sarpedon"]["rules"]["waterInsetUU"] = 15.0
+        res = GS.generate("sarpedon", p, layout("sarpedon"))
+        self.assertEqual(res["falls"], [])
+        self.assertLess(GS.coverage(res, p)["water"], GS.coverage(generated("sarpedon"), PARAMS)["water"])
+        p["maps"]["sarpedon"]["rules"]["depthUU"] = "deep"
+        with self.assertRaises(SystemExit):
+            GS.generate("sarpedon", p, layout("sarpedon"))
+
+    def test_ground_section_carries_aux_and_waterfalls(self):
+        for key in GS.MAPS:
+            res = generated(key)
+            sec = GS.ground_section(key, PARAMS, res, GS.PARAMS_DEFAULT.parent / f"{key}.splat.png")
+            self.assertEqual(sec["aux"], GS.rel(GS.PARAMS_DEFAULT.parent / f"{key}.aux.png"))
+            self.assertEqual(sec["auxSha256"], res["auxSha256"])
+            self.assertEqual("waterfalls" in sec, key == "sarpedon")
+            lay = dict(layout(key), ground=sec)
+            self.assertEqual(GS.check_layout_ground(key, lay, res, PARAMS), [])
+            stale = dict(sec, auxSha256="00")
+            self.assertTrue(GS.check_layout_ground(key, dict(lay, ground=stale), res, PARAMS))
+            # layout_check accepts the section (its splat sha256 rule compares the committed file, skipped here)
+            err, _, _ = LC.validate_ground(lay, key, SHARED_TRAY)
+            self.assertEqual([e for e in err if "sha256" not in e], [], key)
+        res = generated("sarpedon")
+        sec = GS.ground_section("sarpedon", PARAMS, res, GS.PARAMS_DEFAULT.parent / "sarpedon.splat.png")
+        moved = dict(sec, waterfalls=[dict(sec["waterfalls"][0], x0=sec["waterfalls"][0]["x0"] - 50.0)])
+        errs = GS.check_layout_ground("sarpedon", dict(layout("sarpedon"), ground=moved), res, PARAMS)
+        self.assertTrue(any("waterfalls" in e for e in errs), errs)
+
     def test_layout_sections_match_the_splats(self):
         for key in GS.MAPS:
             lay = layout(key)
             png = GS.REPO / lay["ground"]["splat"]
             self.assertTrue(png.is_file(), key)
-            res = dict(generated(key), sha256=GS.sha256_bytes(png.read_bytes()))
+            aux = GS.REPO / lay["ground"].get("aux", "-")
+            self.assertTrue(aux.is_file(), f"{key}: no aux mask in the layout (ground_splat.py --write-layouts)")
+            res = dict(generated(key), sha256=GS.sha256_bytes(png.read_bytes()),
+                       auxSha256=GS.sha256_bytes(aux.read_bytes()))
             self.assertEqual(GS.check_layout_ground(key, lay, res, PARAMS), [], key)
             self.assertEqual(res["sha256"], generated(key)["sha256"], f"{key}: committed splat != the rules")
+            self.assertEqual(res["auxSha256"], generated(key)["auxSha256"], f"{key}: committed aux != the rules")
 
 
 class GroundCheck(unittest.TestCase):
@@ -169,6 +320,64 @@ class ImportStages(unittest.TestCase):
         expected = dx_normal(np.rot90(h, 1))
         diff = np.abs(rotated.astype(int) - expected.astype(int))[2:-2, 2:-2, :2]
         self.assertLessEqual(int(diff.max()), 2)
+
+    def test_water_ripple_normal(self):
+        n = IMP.water_ripple_normal()
+        self.assertEqual(n.shape, (IMP.RIPPLE["size"], IMP.RIPPLE["size"], 3))
+        np.testing.assert_array_equal(n, IMP.water_ripple_normal())  # deterministic
+        v = n.astype(float) / 255.0 * 2.0 - 1.0
+        self.assertGreater(float(v[..., 2].min()), 0.5)  # gentle ripples, always facing up
+        self.assertLess(abs(float(v[..., 0].mean())), 0.02)  # no net tilt
+        self.assertLess(abs(float(v[..., 1].mean())), 0.02)
+        # tileable: the wrap-around step is no larger than an ordinary neighbour step
+        inner_x = np.abs(np.diff(v[..., :2], axis=1)).mean()
+        inner_y = np.abs(np.diff(v[..., :2], axis=0)).mean()
+        self.assertLess(np.abs(v[:, 0, :2] - v[:, -1, :2]).mean(), 1.5 * inner_x)
+        self.assertLess(np.abs(v[0, :, :2] - v[-1, :, :2]).mean(), 1.5 * inner_y)
+
+    def test_material_instance_parameters(self):
+        textures = {(s, k): f"T_{s}_{k}" for s in list(PARAMS["sets"]) + [IMP.RIPPLE_SET] for k in IMP.KEYS}
+        rect = [-820.0, -560.0, 820.0, 470.0]
+        mar = IMP.mi_want("marmoreal", PARAMS, textures, "splat", rect, "aux", "ripple")
+        sar = IMP.mi_want("sarpedon", PARAMS, textures, "splat", rect, "aux", "ripple")
+        for want in (mar, sar):
+            self.assertEqual(want["tex"]["Aux"], "aux")
+            self.assertEqual(want["tex"]["WaterRippleN"], "ripple")
+            self.assertEqual(len(want["tex"]), 15)
+        # gap 13: rough, less specular marble paving (L3) on Marmoreal
+        self.assertGreaterEqual(mar["vector"]["LayerRoughMin"][3], 0.75)
+        self.assertLess(mar["vector"]["LayerSpecular"][3], 0.4)
+        self.assertAlmostEqual(mar["vector"]["LayerMacro"][3], 0.08)
+        # no water on Marmoreal: no foam, no lift
+        self.assertEqual(mar["vector"]["WaterFoam"][3], 0.0)
+        self.assertEqual(mar["vector"]["WaterSurface"][3], 0.0)
+        # Sarpedon water: the map's river colour in linear (P4 tune: sRGB 34, 63, 105 -> 40, 76, 128 with lift 4,
+        # so the off-map water reads like the lifted painted river), glossy, lifted
+        r, g, b, _ = sar["vector"]["WaterColor"]
+        self.assertAlmostEqual(r, 0.0212, places=3)
+        self.assertAlmostEqual(g, 0.0723, places=3)
+        self.assertAlmostEqual(b, 0.2159, places=3)
+        self.assertLess(sar["vector"]["WaterSurface"][0], 0.15)
+        self.assertGreater(sar["vector"]["WaterSurface"][3], 0.0)
+        self.assertGreater(sar["vector"]["LayerNormal"][3], 1.0)  # sharper deck planks
+        self.assertTrue(IMP.has_falls(PARAMS, "sarpedon"))
+        self.assertFalse(IMP.has_falls(PARAMS, "marmoreal"))
+        fall = IMP.fall_mi_want("sarpedon", PARAMS, "ripple")
+        self.assertEqual(fall["vector"]["WaterColor"], sar["vector"]["WaterColor"])
+        self.assertGreater(fall["vector"]["FallFlow"][0], 0.0)
+        self.assertEqual(IMP.fall_mi_asset("sarpedon"), "/Game/EnvKit/Ground/MI_EnvWaterfall_Sarpedon")
+        self.assertEqual(IMP.aux_asset("sarpedon"), "/Game/EnvKit/Ground/T_EnvGround_Sarpedon_Aux")
+        self.assertIn(IMP.ripple_asset(), IMP.planned_assets(PARAMS))
+
+    def test_hlsl_declares_what_it_reads(self):
+        # every Custom node of both graphs names its inputs in the code (ue_import_env_ground.build_* wire them)
+        self.assertIn("WaterRippleN", IMP.HLSL_FALL_RIPPLE_UV + "WaterRippleN")
+        for code, pins in ((IMP.HLSL_WATER, ("Aux", "P", "Time", "WaterPan", "WaterRipple", "WaterFoam")),
+                           (IMP.HLSL_FALL_OPACITY, IMP.FALL_CORE_INPUTS),
+                           (IMP.HLSL_EMISSIVE, ("Water", "WaterColor", "WaterSurface", "NightEV", "NightSaturation",
+                                                "NightTint"))):
+            for pin in pins:
+                self.assertIn(pin, code)
 
     def test_used_sets_and_asset_names(self):
         self.assertEqual(sorted(IMP.used_sets(PARAMS, ["marmoreal", "sarpedon"])),

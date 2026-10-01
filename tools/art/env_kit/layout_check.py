@@ -48,19 +48,23 @@ Checks (every one is an error unless marked warn):
  7. shadows: the key light of the art profiles (k1_mock.KEY_LIGHT_ROT = (-55, 30, 0), travelling
     towards +X / +Y) projects every castShadow prop's box onto Z = 0; the shadow must not touch any
     space circle (warn below SHADOW_WARN_UU);
- 8. warn: 10..18 props; tall props (> TALL_H_UU) in the near half (Y > 0); crowns overhanging the
-    tray edge by > 60 uu; lights inside the frame rectangle or off the tray.
+ 8. warn: 10..28 props; tall props (> TALL_H_UU) in the near half (Y > 0) whose footprint reaches the frame's X
+    columns (+ TALL_SIDE_UU; a tall prop wholly beside the frame leans outwards in the K1 perspective and check 6
+    measures it exactly); crowns overhanging the tray edge by > 60 uu; lights inside the frame rectangle or off the tray.
  9. ground (ENV-U10, optional section - warn when absent; validate_ground, = S08EnvGround.cpp): mode 'runtime',
     material /Game/EnvKit/Ground/MI_EnvGround_<Kit>, z in (-3, -0.5), frameOverlapUU in [0, 20], insetUU in
     [0, 200], splatRect [minX, minY, maxX, maxY] covering the tray top - inset, the tray top minus the frame hole =
     4 strips (S08EnvGround::Strips), and the splat PNG (tools/art/env_kit/ground_splat.py) present with the
     recorded splatSha256.
+10. K1 framing (P4, concept review gap 4): every prop of K1_FRAMED[<map>] has its whole oriented box inside the K1
+    overview frame (D0, 1920 x 1080, >= K1_FRAME_MARGIN_PX from the edge); every prop's in-frame share of its projected
+    box is reported (column 'K1 in frame', * = K1_FRAMED).
 
 Usage:
   python -B tools/art/env_kit/layout_check.py                       # both maps, text report
   python -B tools/art/env_kit/layout_check.py --maps sarpedon --images C:/tmp/envmaps-research/p1b/layout
   python -B tools/art/env_kit/layout_check.py --json report.json
-  python -B tools/art/env_kit/layout_check.py --selftest            # synthetic negative cases (14)
+  python -B tools/art/env_kit/layout_check.py --selftest            # synthetic cases (25)
 Prop sizes come from the env kit build reports (--build-reports, reports/assets/SM_Env_<Name>.build.json:
 UE X = depth, Y = width, Z = height) when present, else from the KIT table; the run prints whether they agree.
 Debug images (--images DIR, CPU / PIL only): <map>-top.png (orthographic top view, footprints, lights,
@@ -117,8 +121,17 @@ RIM_UU = 20.0                # rocky lip band of T2 inside the tray edge (rock t
 FRAME_GAP_UU = 2.0
 NEAR_MAX_H_UU = 25.0
 TALL_H_UU = 120.0
+TALL_SIDE_UU = 60.0          # 8.: a near-half tall prop warns only when its footprint reaches |X| < FRAME_HX + this
+# 10. props whose whole box must lie in the K1 overview frame (concept review gap 4: the Sarpedon hull read as a sliver
+# in the top-right corner of K1)
+K1_FRAMED = {"sarpedon": ("hull-e1", "hull-e2")}
+K1_FRAME_MARGIN_PX = 0.0
 MAX_POINT_LIGHTS = 6
-PROPS_RANGE = (10, 18)
+# P4 (2026-10-01): 18 -> 28. The P3 packaged bench (docs/game-design/evidence/ENV-MAPS/p3-packaged-2026-10-01/bench)
+# measured the whole environment at +0.4-0.46 ms GPU at K1, mostly the point lights and Lumen; the props are decor
+# meshes of <= 12k triangles without collision, so a few more instances stay far inside the budget (perf was NOT
+# re-measured in P4: re-measure with tools/art/render/render_bench.py at the next packaged run).
+PROPS_RANGE = (10, 28)
 CROWN_OVERHANG_WARN_UU = 60.0
 SHADOW_WARN_UU = 10.0
 MODULAR = {"ArcadeBay", "Portal", "Palisade", "Hull"}  # wall modules may interpenetrate at a joint
@@ -528,9 +541,11 @@ def validate(layout: dict, key: str, spaces: list[dict]) -> tuple[list[str], lis
         # 4. near band
         if rects_overlap(full, near) and h > NEAR_MAX_H_UU:
             err.append(f"prop {pid}: {h:.0f} uu tall in the near band (max {NEAR_MAX_H_UU})")
-        # 7. tall props in the near half
-        if h > TALL_H_UU and float(p["loc"][1]) > 0:
-            warn.append(f"prop {pid}: {h:.0f} uu tall in the near half (Y {p['loc'][1]:.0f} > 0)")
+        # 8. tall props in the near half, in front of or at the corners of the map (not wholly beside the frame)
+        x_gap = 0.0 if fx0 < 0.0 < fx1 else min(abs(fx0), abs(fx1))  # nearest |X| of the footprint
+        if h > TALL_H_UU and float(p["loc"][1]) > 0 and x_gap < FRAME_HX + TALL_SIDE_UU:
+            warn.append(f"prop {pid}: {h:.0f} uu tall in the near half (Y {p['loc'][1]:.0f} > 0) and within "
+                        f"{TALL_SIDE_UU:.0f} uu of the frame's X columns")
     n = len(props)
     info["parsed"] = len(ok_props) == n
     if not PROPS_RANGE[0] <= n <= PROPS_RANGE[1]:
@@ -683,6 +698,61 @@ def shadows(layout: dict, spaces: list[dict]) -> dict:
     return out
 
 
+def _clip_rect(poly: np.ndarray, x0: float, y0: float, x1: float, y1: float) -> np.ndarray:
+    """Sutherland-Hodgman clip of a convex polygon (n, 2) to an axis-aligned rectangle."""
+    out = [tuple(q) for q in poly]
+    for axis, bound, keep_ge in ((0, x0, True), (0, x1, False), (1, y0, True), (1, y1, False)):
+        src, out = out, []
+        for i in range(len(src)):
+            a, b = src[i], src[(i + 1) % len(src)]
+            ina = a[axis] >= bound if keep_ge else a[axis] <= bound
+            inb = b[axis] >= bound if keep_ge else b[axis] <= bound
+            if ina:
+                out.append(a)
+            if ina != inb:
+                t = (bound - a[axis]) / (b[axis] - a[axis])
+                out.append((a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1])))
+        if not out:
+            return np.zeros((0, 2))
+    return np.array(out, float)
+
+
+def _area(poly: np.ndarray) -> float:
+    if len(poly) < 3:
+        return 0.0
+    x, y = poly[:, 0], poly[:, 1]
+    return 0.5 * abs(float(np.dot(x, np.roll(y, -1)) - np.dot(y, np.roll(x, -1))))
+
+
+def k1_framing(layout: dict, key: str, framed: tuple | None = None) -> tuple[list[str], dict]:
+    """10. Per prop at the K1 overview (D0, looking at the centre): the share of its projected box hull inside the
+    1920 x 1080 frame and the smallest distance of a box corner to the frame edge (px, < 0 = outside); K1_FRAMED props
+    must be wholly inside (>= K1_FRAME_MARGIN_PX); `framed` overrides K1_FRAMED[key] (selftest)."""
+    _, d0, _ = k1_rig(layout_board_id(layout))
+    cam = make_camera(d0)
+    W, H = SCREEN
+    err, info = [], {}
+    for p in layout["props"]:
+        b = box_corners(p)
+        if (((b - cam.pos) @ cam.fwd) < NEAR_UU).any():
+            info[p["id"]] = {"inFrame": 0.0, "edgePx": -math.inf}
+            continue
+        scr = cam.project(b)
+        hull = convex_hull(scr)
+        full = _area(hull)
+        share = _area(_clip_rect(hull, 0.0, 0.0, float(W), float(H))) / full if full > 0 else 0.0
+        edge = float(min(scr[:, 0].min(), scr[:, 1].min(), W - scr[:, 0].max(), H - scr[:, 1].max()))
+        info[p["id"]] = {"inFrame": round(share, 3), "edgePx": round(edge, 1)}
+    for pid in (K1_FRAMED.get(key, ()) if framed is None else framed):
+        got = info.get(pid)
+        if got is None:
+            err.append(f"prop {pid}: listed in K1_FRAMED but not in the layout")
+        elif got["edgePx"] < K1_FRAME_MARGIN_PX:
+            err.append(f"prop {pid}: box leaves the K1 frame ({-got['edgePx']:.0f} px past the edge, "
+                       f"{got['inFrame']:.0%} in frame) - K1_FRAMED props must be wholly visible at the K1 overview")
+    return err, info
+
+
 def check(key: str, layout_path: Path, topo_path: Path) -> dict:
     layout = json.loads(layout_path.read_text(encoding="utf-8"))
     topo = json.loads(topo_path.read_text(encoding="utf-8"))
@@ -704,6 +774,11 @@ def check(key: str, layout_path: Path, topo_path: Path) -> dict:
                            f"move it out or set castShadow false")
             elif sh["uu"] < SHADOW_WARN_UU:
                 warn.append(f"prop {pid}: key-light shadow {sh['uu']:.1f} uu from space {sh['space']}")
+        k_err, k_info = k1_framing(layout, key)
+        err += k_err
+        for pid, k in k_info.items():
+            info["props"][pid]["k1_in_frame"] = k["inFrame"]
+            info["props"][pid]["k1_edge_px"] = k["edgePx"]
     return {"map": key, "layout": layout, "spaces": spaces, "errors": err, "warnings": warn, "info": info,
             "occlusion": occ,
             "cameras": len(camera_set(spaces, layout_board_id(layout))) if info.get("parsed") else 0}
@@ -1084,7 +1159,34 @@ def selftest() -> int:
         ok = all(m in text for m in must) and not any(m in text for m in must_not)
         fails += not ok
         print(f"   {'ok  ' if ok else 'FAIL'} {name}: {text or 'no errors'}")
-    total = len(cases) + len(g_cases)
+    # 8. / 10. (P4): near-half tall props warn only at the frame's X columns; K1_FRAMED boxes stay in the K1 frame
+    w_cases = [
+        ("tall tree beside the frame in the near half is quiet", [P("t", "Cherry", -680, 150, 0, 1.0)], "near half",
+         False),
+        ("tall cypress at the near corner warns", [P("t", "Cypress", -505, 200, 90, 1.3)], "near half", True),
+    ]
+    for name, props, needle, want in w_cases:
+        lay = {"schema": SCHEMA, "map": "marmoreal", "boardId": MAPS["marmoreal"]["boardId"], "tray": tray,
+               "apron": ap, "props": props, "lights": [], "notes": "selftest"}
+        _, warns, _ = validate(lay, "marmoreal", spaces)
+        text = " | ".join(warns)
+        ok = (needle in text) == want
+        fails += not ok
+        print(f"   {'ok  ' if ok else 'FAIL'} {name}: {text or 'no warnings'}")
+    hull = "/Game/EnvKit/Sarpedon/SM_Env_Hull"
+    f_cases = [
+        ("hull in the far-right corner leaves the K1 frame", [700.0, -370.0], 152.0, True),
+        ("hull along the E frame edge stays in the K1 frame", [590.0, -125.0], 178.0, False),
+    ]
+    for name, xy, yaw, want in f_cases:
+        lay = {"boardId": MAPS["sarpedon"]["boardId"], "map": "sarpedon",
+               "props": [{"id": "h", "mesh": hull, "loc": [*xy, TRAY_TOP_Z], "yawDeg": yaw, "scale": 0.85}]}
+        err, info = k1_framing(lay, "sarpedon", framed=("h",))
+        text = " | ".join(err)
+        ok = ("leaves the K1 frame" in text) == want and 0.0 <= info["h"]["inFrame"] <= 1.0
+        fails += not ok
+        print(f"   {'ok  ' if ok else 'FAIL'} {name}: {text or 'in frame'} (share {info['h']['inFrame']:.0%})")
+    total = len(cases) + len(g_cases) + len(w_cases) + len(f_cases)
     print(f"   -> selftest {'FAIL' if fails else 'OK'} ({total - fails}/{total})")
     return 1 if fails else 0
 
@@ -1131,12 +1233,15 @@ def main(argv=None) -> int:
             print(f"   ground: {gi.get('strips')} strips, {gi.get('areaUU2', 0):.0f} uu2, splatRect {gi.get('splatRect')}, "
                   f"splat sha256 {str(gi.get('splatSha256', '-'))[:12]}")
         print(f"   {'prop':<16} {'mesh':<14} {'w x d x h (uu)':<16} {'clear px':>8}  "
-              f"{'worst camera / space':<22} {'shadow uu':>9}")
+              f"{'worst camera / space':<22} {'shadow uu':>9} {'K1 in frame':>11}")
         for pid, inf in res["info"]["props"].items():
             s = "x".join(f"{v:.0f}" for v in inf["size_uu"])
             sh = inf.get("shadow_uu")
+            k1 = inf.get("k1_in_frame")
+            framed = "*" if pid in K1_FRAMED.get(key, ()) else " "
             print(f"   {pid:<16} {inf['mesh']:<14} {s:<16} {inf.get('clearance_px', float('nan')):>8.1f}  "
-                  f"{inf.get('worst', ''):<22} {'-' if sh is None else f'{sh:.1f}':>9}")
+                  f"{inf.get('worst', ''):<22} {'-' if sh is None else f'{sh:.1f}':>9} "
+                  f"{'-' if k1 is None else f'{k1:.0%}':>10}{framed}")
         for w in res["warnings"]:
             print(f"   WARN  {w}")
         for e in res["errors"]:

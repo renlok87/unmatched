@@ -555,6 +555,8 @@ def check_profiles(fixtures: list[dict], profiles: dict) -> list[str]:
             errs.append(f"light {lid}: point lights must not cast shadows")
         errs += check_render_blocks(lid, lp)
     errs += check_content_blocks(profiles)
+    for b in profiles.get("boards", []):
+        errs += check_readability_block(b.get("id", "?"), b)
     return errs
 
 
@@ -649,6 +651,62 @@ def check_night_blocks(lid: str, lp: dict) -> list[str]:
                 and ("nightTintLinear" not in grade or _nums(grade["nightTintLinear"], 3, 0.0, 4.0))):
             errs.append(f"light {lid}: mapGrade needs nightEV -4..2, nightSaturation 0..1.5, lift 0..20 and an optional "
                         "nightTintLinear [r,g,b] 0..4")
+        # ENV-MAPS P4 (M_MapBoard graph v2): optional mask-only zone-separation terms, identity when absent
+        elif not ((_num(grade.get("maskSaturation", 1.0)) and 0 <= grade.get("maskSaturation", 1.0) <= 3)
+                  and (_num(grade.get("liftSaturation", 1.0)) and 0 <= grade.get("liftSaturation", 1.0) <= 3)
+                  and ("maskInverseTintLinear" not in grade or _nums(grade["maskInverseTintLinear"], 3, 0.0, 4.0))):
+            errs.append(f"light {lid}: mapGrade optional maskSaturation 0..3, liftSaturation 0..3 and "
+                        "maskInverseTintLinear [r,g,b] 0..4")
+    return errs
+
+
+def _hex(v) -> bool:
+    return isinstance(v, str) and len(v) == 7 and v[0] == "#" and all(c in "0123456789abcdefABCDEF" for c in v[1:])
+
+
+READ_RING_RADIUS_UU = 36.0  # S08MapSurfaceSpec::RingRadiusUU
+
+
+def check_readability_block(bid: str, board: dict) -> list[str]:
+    """ENV-MAPS P4: the optional board "readability" block, the same rules as S08BoardArt.cpp ParseReadability:
+    map-image boards only (a grid with the block is rejected), every present sub-block complete and in range."""
+    if "readability" not in board:
+        return []
+    errs = []
+    r = board["readability"]
+    if board.get("surface") != "map-image":
+        return [f"board {bid}: readability is for map-image boards only"]
+    if not isinstance(r, dict):
+        return [f"board {bid}: readability must be an object"]
+    for flag in ("labelPlates", "leaderPip"):
+        if flag in r and not isinstance(r[flag], bool):
+            errs.append(f"board {bid}: readability.{flag} must be true|false")
+
+    def rng(o, key, lo, hi, default):
+        v = o.get(key, default)
+        return _num(v) and lo <= v <= hi
+
+    if "reach" in r:
+        reach = r["reach"]
+        ok = (isinstance(reach, dict) and all(_hex(reach[k]) for k in ("colorSrgb", "strokeSrgb") if k in reach)
+              and rng(reach, "segments", 12, 96, 48) and float(reach.get("segments", 48)).is_integer()
+              and rng(reach, "widthUU", 1, 6, 3.5) and rng(reach, "strokeUU", 0.25, 3, 1.0))
+        if not ok:
+            errs.append(f"board {bid}: readability.reach needs colorSrgb / strokeSrgb #RRGGBB, segments 12..96 (whole), "
+                        "widthUU 1..6, strokeUU 0.25..3")
+        else:
+            half = reach.get("widthUU", 3.5) / 2 + reach.get("strokeUU", 1.0)
+            if READ_RING_RADIUS_UU + half > 40 or READ_RING_RADIUS_UU - half < 30:
+                errs.append(f"board {bid}: readability.reach widthUU / 2 + strokeUU must keep the ring between r 30 and r 40")
+    if "contactShadow" in r:
+        cs = r["contactShadow"]
+        if not (isinstance(cs, dict) and rng(cs, "diameterUU", 20, 160, 64) and rng(cs, "strength", 0, 1, 0.5)
+                and rng(cs, "softness", 0.1, 1, 0.55)):
+            errs.append(f"board {bid}: readability.contactShadow needs diameterUU 20..160, strength 0..1, softness 0.1..1")
+    if "frameWood" in r:
+        fw = r["frameWood"]
+        if not (isinstance(fw, dict) and rng(fw, "valueScaleSrgb", 0.2, 1, 0.7) and rng(fw, "saturation", 0, 1, 0.75)):
+            errs.append(f"board {bid}: readability.frameWood needs valueScaleSrgb 0.2..1 and saturation 0..1")
     return errs
 
 

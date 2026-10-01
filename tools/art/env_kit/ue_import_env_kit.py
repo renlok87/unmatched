@@ -22,6 +22,14 @@ Targets (the fixed UE naming contract of S08EnvLayout.h; the layouts in Config/A
                                             TWO_SIDED (Cypress Rope Tree Cherry Urn: inward-wound faces), off otherwise
   Marmoreal: ArcadeBay Portal Cherry PlinthBall LanternPlinth Urn Cypress
   Sarpedon:  FortRuin Tree Hull Cannon Campfire Palisade Rope
+  /Game/EnvKit/Shared/M_EnvProp             (ENV-MAPS P4 track B) the kit's 'look' master: BC/N/ORM as M_UM_Figure at
+                                            its neutral defaults + an HSV-window recolour of the BC and an emissive
+                                            window (tools/art/env_kit/env_prop_look.py: HLSL, numpy mirror, --check).
+                                            The props of the look file (<run>/scripts/env-prop-look.json: Cherry,
+                                            Cypress, Tree, LanternPlinth, Campfire, Portal) get MI_Env_<Name> parented to
+                                            M_EnvProp with the look's parameters; every other prop keeps M_UM_Figure.
+                                            The committed textures are not changed. --no-look keeps every MI on
+                                            M_UM_Figure (the P1b-P3 state).
 DefaultGame.ini always cooks /Game/EnvKit (the board actor loads the meshes at runtime by the layout paths).
 
 Checks before any import: every source file exists and its sha256 equals the build report of track A
@@ -43,7 +51,7 @@ Run (the editor must be CLOSED - UnrealEditor-Cmd holds the project; never insid
 Pre-check without UE (plain Python: presence + sha256 against the build report, no import):
   python -B tools/art/env_kit/ue_import_env_kit.py --check
 Options: --maps marmoreal,sarpedon  --names Cherry,Hull  --run <run dir>  --report <json>  --force (re-import all)
-         --import-scale 1.0  --normal auto|directx|opengl  --require-verified
+         --import-scale 1.0  --normal auto|directx|opengl  --require-verified  --look <json> | --no-look
 """
 
 from __future__ import annotations
@@ -60,9 +68,15 @@ try:  # inside UnrealEditor(-Cmd) only; --check runs in plain Python
     import unreal as u  # type: ignore
 except ImportError:  # pragma: no cover - plain Python
     u = None
+if u is not None and not hasattr(u, "EditorAssetLibrary"):  # the repo's unreal/ folder as a namespace package
+    u = None
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[2]
+if str(HERE) not in sys.path:  # env_prop_look (no numpy needed for the UE side)
+    sys.path.insert(0, str(HERE))
+import env_prop_look as look_lib  # noqa: E402
+
 RUN_DEFAULT = REPO / "art" / "pipeline-candidates" / "ASSET-ENV-KIT-001" / "20260930-tripo-h31"
 ROOT = "/Game/EnvKit"
 MASTER = "/Game/UM/Materials/M_UM_Figure"
@@ -99,6 +113,13 @@ SIZE_OK, SIZE_WARN = 0.01, 0.10  # relative error of the target dimension
 # Urn 4.9 %). M_UM_Figure is one-sided, so their MI overrides TwoSided (P1b review quick fix; the clean fix is a
 # rebuild with static_prop_candidate.fix_winding, after which this set can be emptied).
 TWO_SIDED = {"Cypress", "Rope", "Tree", "Cherry", "Urn"}
+# M_EnvProp (P4 track B): the look master; graph rebuilt when ENV_GRAPH_VERSION changes (or --force)
+ENV_MASTER = look_lib.MASTER_PATH
+ENV_GRAPH_TAG = "EnvPropGraphVersion"
+ENV_GRAPH_VERSION = "1"
+ENV_DEFAULT_TEX = {"BC": "/Game/UM/Materials/Textures/T_UM_Default_BC",
+                   "N": "/Game/UM/Materials/Textures/T_UM_Default_N",
+                   "ORM": "/Game/UM/Materials/Textures/T_UM_Default_ORM"}
 
 
 def rel(path: Path) -> str:
@@ -331,7 +352,131 @@ def check_master(master) -> dict:
     return {"path": MASTER, "textureParams": sorted(tex), "vectorParams": sorted(vec), "missing": missing}
 
 
-def ensure_instance(name: str, master, textures: dict, mask) -> dict:
+def build_env_master(force: bool) -> dict:
+    """/Game/EnvKit/Shared/M_EnvProp (lit, opaque, one-sided; the MIs override TwoSided like the M_UM_Figure ones):
+
+      BC / N / ORM  TextureSampleParameter2D BaseColorTexture / NormalTexture / ORMTexture (UV0, their own samplers)
+      BaseColor     Custom 'EnvPropAlbedo'   (env_prop_look.HLSL_ALBEDO: C = BC.rgb, Win = RegionWindow,
+                                              Adj = RegionAdjust, Rest = RestAdjust, Soft = WindowSoft)
+      Emissive      Custom 'EnvPropEmissive' (env_prop_look.HLSL_EMISSIVE: C = BC.rgb, Win = EmissiveWindow,
+                                              Soft = WindowSoft, Col = EmissiveColor.rgb, Intensity = EmissiveIntensity)
+      Normal        lerp((0,0,1), N.rgb, NormalStrength)
+      Roughness     lerp(RoughnessMin, RoughnessMax, ORM.g);  Metallic ORM.b;  AO ORM.r
+    At the defaults (env_prop_look.VECTOR_DEFAULTS / SCALAR_DEFAULTS) the output equals M_UM_Figure at its neutral
+    defaults (BC, N, ORM.G, ORM.B, ORM.R, no emissive)."""
+    eal, mel = u.EditorAssetLibrary, u.MaterialEditingLibrary
+    material = u.load_asset(ENV_MASTER) if eal.does_asset_exist(ENV_MASTER) else None
+    if material is not None and not force and eal.get_metadata_tag(material, ENV_GRAPH_TAG) == ENV_GRAPH_VERSION:
+        return {"action": "unchanged", "path": ENV_MASTER, "graphVersion": ENV_GRAPH_VERSION}
+    action = "rebuilt" if material is not None else "created"
+    folder, leaf = split(ENV_MASTER)
+    if material is None:
+        material = u.AssetToolsHelpers.get_asset_tools().create_asset(leaf, folder, u.Material, u.MaterialFactoryNew())
+    if material is None:
+        raise RuntimeError(f"could not create {ENV_MASTER}")
+    material.set_editor_property("shading_model", u.MaterialShadingModel.MSM_DEFAULT_LIT)
+    material.set_editor_property("blend_mode", u.BlendMode.BLEND_OPAQUE)
+    material.set_editor_property("two_sided", False)
+    mel.delete_all_material_expressions(material)
+    ypos = [0]
+
+    def expr(cls, x, y=None):
+        node = mel.create_material_expression(material, cls, x, ypos[0] if y is None else y)
+        if node is None:
+            raise RuntimeError(f"could not create {cls}")
+        if y is None:
+            ypos[0] += 140
+        return node
+
+    def connect(src, out, dst, inp):
+        if not mel.connect_material_expressions(src, out, dst, inp):
+            raise RuntimeError(f"could not connect {src.get_name()}.{out or '<0>'} -> {dst.get_name()}.{inp}")
+
+    def vector(name):
+        node = expr(u.MaterialExpressionVectorParameter, -1500)
+        node.set_editor_property("parameter_name", name)
+        node.set_editor_property("default_value", u.LinearColor(*look_lib.VECTOR_DEFAULTS[name]))
+        return node
+
+    def scalar(name):
+        node = expr(u.MaterialExpressionScalarParameter, -1500)
+        node.set_editor_property("parameter_name", name)
+        node.set_editor_property("default_value", float(look_lib.SCALAR_DEFAULTS[name]))
+        return node
+
+    def custom(desc, out_type, kind, x, y):
+        node = expr(u.MaterialExpressionCustom, x, y)
+        node.set_editor_property("description", desc)
+        node.set_editor_property("output_type", out_type)
+        pins = []
+        for pin, _ in look_lib.HLSL_INPUTS[kind]:
+            ci = u.CustomInput()
+            ci.set_editor_property("input_name", pin)
+            pins.append(ci)
+        node.set_editor_property("inputs", pins)
+        node.set_editor_property("code", look_lib.HLSL_ALBEDO if kind == "albedo" else look_lib.HLSL_EMISSIVE)
+        return node
+
+    st = u.MaterialSamplerType
+    samples = {}
+    for i, (key, stype) in enumerate((("BC", st.SAMPLERTYPE_COLOR), ("N", st.SAMPLERTYPE_NORMAL),
+                                      ("ORM", st.SAMPLERTYPE_MASKS))):
+        node = expr(u.MaterialExpressionTextureSampleParameter2D, -1100, -200 + 320 * i)
+        node.set_editor_property("parameter_name", look_lib.TEX_PARAMS[key])
+        node.set_editor_property("sampler_type", stype)
+        default = u.load_asset(ENV_DEFAULT_TEX[key])
+        if default is None:
+            raise RuntimeError(f"default texture {ENV_DEFAULT_TEX[key]} missing (tools/tripo-pipeline/um_masters.py)")
+        node.set_editor_property("texture", default)  # after the sampler type (AutoSetSampleType keeps them consistent)
+        samples[key] = node
+    vec = {name: vector(name) for name in look_lib.VECTOR_DEFAULTS}
+    sca = {name: scalar(name) for name in look_lib.SCALAR_DEFAULTS}
+    cmot = u.CustomMaterialOutputType
+    albedo = custom("EnvPropAlbedo", cmot.CMOT_FLOAT3, "albedo", -600, -300)
+    connect(samples["BC"], "RGB", albedo, "C")
+    for pin, param in (("Win", "RegionWindow"), ("Adj", "RegionAdjust"), ("Rest", "RestAdjust"), ("Soft", "WindowSoft")):
+        connect(vec[param], "RGBA", albedo, pin)
+    mel.connect_material_property(albedo, "", u.MaterialProperty.MP_BASE_COLOR)
+    emissive = custom("EnvPropEmissive", cmot.CMOT_FLOAT3, "emissive", -600, 100)
+    connect(samples["BC"], "RGB", emissive, "C")
+    connect(vec["EmissiveWindow"], "RGBA", emissive, "Win")
+    connect(vec["WindowSoft"], "RGBA", emissive, "Soft")
+    connect(vec["EmissiveColor"], "RGB", emissive, "Col")
+    connect(sca["EmissiveIntensity"], "", emissive, "Intensity")
+    mel.connect_material_property(emissive, "", u.MaterialProperty.MP_EMISSIVE_COLOR)
+    flat = expr(u.MaterialExpressionConstant3Vector, -600, 420)
+    flat.set_editor_property("constant", u.LinearColor(0.0, 0.0, 1.0, 0.0))
+    normal = expr(u.MaterialExpressionLinearInterpolate, -350, 420)
+    connect(flat, "", normal, "A")
+    connect(samples["N"], "RGB", normal, "B")
+    connect(sca["NormalStrength"], "", normal, "Alpha")
+    mel.connect_material_property(normal, "", u.MaterialProperty.MP_NORMAL)
+    rough = expr(u.MaterialExpressionLinearInterpolate, -350, 620)
+    connect(sca["RoughnessMin"], "", rough, "A")
+    connect(sca["RoughnessMax"], "", rough, "B")
+    connect(samples["ORM"], "G", rough, "Alpha")
+    mel.connect_material_property(rough, "", u.MaterialProperty.MP_ROUGHNESS)
+    mel.connect_material_property(samples["ORM"], "B", u.MaterialProperty.MP_METALLIC)
+    mel.connect_material_property(samples["ORM"], "R", u.MaterialProperty.MP_AMBIENT_OCCLUSION)
+    mel.recompile_material(material)
+    eal.set_metadata_tag(material, ENV_GRAPH_TAG, ENV_GRAPH_VERSION)
+    if not eal.save_loaded_asset(material, False):
+        raise RuntimeError(f"could not save {ENV_MASTER}")
+    params = {"texture": sorted(str(n) for n in mel.get_texture_parameter_names(material)),
+              "vector": sorted(str(n) for n in mel.get_vector_parameter_names(material)),
+              "scalar": sorted(str(n) for n in mel.get_scalar_parameter_names(material))}
+    missing = ([p for p in look_lib.TEX_PARAMS.values() if p not in params["texture"]]
+               + [p for p in look_lib.VECTOR_DEFAULTS if p not in params["vector"]]
+               + [p for p in look_lib.SCALAR_DEFAULTS if p not in params["scalar"]])
+    if missing:
+        raise RuntimeError(f"{ENV_MASTER}: parameters missing after the build: {missing}")
+    return {"action": action, "path": ENV_MASTER, "graphVersion": ENV_GRAPH_VERSION,
+            "expressions": int(mel.get_num_material_expressions(material)), "params": params}
+
+
+def ensure_instance(name: str, master, textures: dict, mask, look: dict | None = None) -> dict:
+    """MI_Env_<name>: child of M_UM_Figure (look None) or of M_EnvProp with the look's parameters
+    (look = env_prop_look.mi_params(...); master is then M_EnvProp)."""
     eal, mel = u.EditorAssetLibrary, u.MaterialEditingLibrary
     path = asset_paths(name)["mi"]
     mi = u.load_asset(path) if eal.does_asset_exist(path) else None
@@ -353,29 +498,50 @@ def ensure_instance(name: str, master, textures: dict, mask) -> dict:
         parent = mi.get_editor_property("parent")
         ov = mi.get_editor_property("base_property_overrides")
         state = {"parent": parent.get_path_name() if parent else None,
-                 PARAM_TEAM: rgba(mel.get_material_instance_vector_parameter_value(mi, PARAM_TEAM)),
                  "twoSided": (bool(ov.get_editor_property("override_two_sided")),
                               bool(ov.get_editor_property("two_sided")))}
         for key, param in PARAMS.items():
             bound = mel.get_material_instance_texture_parameter_value(mi, param)
             state[param] = bound.get_path_name() if bound else None
-        if mask is not None:
-            bound = mel.get_material_instance_texture_parameter_value(mi, PARAM_MASK)
-            state[PARAM_MASK] = bound.get_path_name() if bound else None
+        if look is None:
+            state[PARAM_TEAM] = rgba(mel.get_material_instance_vector_parameter_value(mi, PARAM_TEAM))
+            if mask is not None:
+                bound = mel.get_material_instance_texture_parameter_value(mi, PARAM_MASK)
+                state[PARAM_MASK] = bound.get_path_name() if bound else None
+        else:
+            for pname in look["vector"]:
+                state["v:" + pname] = rgba(mel.get_material_instance_vector_parameter_value(mi, pname))
+            for pname in look["scalar"]:
+                state["s:" + pname] = round(float(mel.get_material_instance_scalar_parameter_value(mi, pname)), 5)
         return state
 
-    want = {"parent": master.get_path_name(), PARAM_TEAM: rgba(white), "twoSided": (two_sided, two_sided)}
+    want = {"parent": master.get_path_name(), "twoSided": (two_sided, two_sided)}
     want.update({param: textures[key].get_path_name() for key, param in PARAMS.items()})
-    if mask is not None:
-        want[PARAM_MASK] = mask.get_path_name()
+    if look is None:
+        want[PARAM_TEAM] = rgba(white)
+        if mask is not None:
+            want[PARAM_MASK] = mask.get_path_name()
+    else:
+        want.update({"v:" + k: tuple(round(float(x), 5) for x in v) for k, v in look["vector"].items()})
+        want.update({"s:" + k: round(float(v), 5) for k, v in look["scalar"].items()})
     if action == "updated" and current() == want:
         return {"action": "unchanged", "path": path, "params": {k: str(v) for k, v in want.items()}}
+    old_parent = mi.get_editor_property("parent")
+    if (old_parent is not None and old_parent.get_path_name() != master.get_path_name()
+            and hasattr(mel, "clear_all_material_instance_parameters")):
+        mel.clear_all_material_instance_parameters(mi)  # drop the other master's overrides (TeamColor, TeamMask)
     mel.set_material_instance_parent(mi, master)
     for key, param in PARAMS.items():
         mel.set_material_instance_texture_parameter_value(mi, param, textures[key])
-    if mask is not None:
-        mel.set_material_instance_texture_parameter_value(mi, PARAM_MASK, mask)
-    mel.set_material_instance_vector_parameter_value(mi, PARAM_TEAM, white)
+    if look is None:
+        if mask is not None:
+            mel.set_material_instance_texture_parameter_value(mi, PARAM_MASK, mask)
+        mel.set_material_instance_vector_parameter_value(mi, PARAM_TEAM, white)
+    else:
+        for pname, v in look["vector"].items():
+            mel.set_material_instance_vector_parameter_value(mi, pname, u.LinearColor(*[float(x) for x in v]))
+        for pname, v in look["scalar"].items():
+            mel.set_material_instance_scalar_parameter_value(mi, pname, float(v))
     ov = mi.get_editor_property("base_property_overrides")  # a copy: set the fields, then write it back
     ov.set_editor_property("override_two_sided", two_sided)
     ov.set_editor_property("two_sided", two_sided)
@@ -385,8 +551,10 @@ def ensure_instance(name: str, master, textures: dict, mask) -> dict:
         raise RuntimeError(f"could not save {path}")
     got = current()
     if got != want:
-        raise RuntimeError(f"{path}: parameters did not bind: {got}")
-    return {"action": action, "path": path, "params": {k: str(v) for k, v in want.items()}}
+        diff = {k: (got.get(k), v) for k, v in want.items() if got.get(k) != v}
+        raise RuntimeError(f"{path}: parameters did not bind (got, want): {diff}")
+    return {"action": action, "path": path, "parent": master.get_path_name(),
+            "params": {k: str(v) for k, v in want.items()}}
 
 
 def setp(obj, prop: str, value) -> bool:
@@ -549,6 +717,14 @@ def run_import(plans: dict, args, convention: str) -> tuple[dict, bool]:
         return result, False
     mask = u.load_asset(MASK_NONE) if eal.does_asset_exist(MASK_NONE) else None
     result["teamMask"] = MASK_NONE if mask is not None else "missing (TeamColor white keeps BC unchanged anyway)"
+    env_master = None
+    if any(plan.get("look") for plan in plans.values()):
+        try:
+            result["envMaster"] = build_env_master(args.force)
+            env_master = u.load_asset(ENV_MASTER)
+        except Exception as exc:  # noqa: BLE001 - the look props fail, the others go on
+            result["envMaster"] = {"action": "failed", "error": f"{type(exc).__name__}: {exc}"}
+            ok = False
     folders_before = {f: folder_listing(f) for f in sorted({folder_of(n) for n in plans}) if eal.does_directory_exist(f)}
     result["props"] = {}
     for name, plan in plans.items():
@@ -567,7 +743,12 @@ def run_import(plans: dict, args, convention: str) -> tuple[dict, bool]:
                 out["textures"][key] = import_texture(plan["sources"][key], paths[f"tex:{key}"], key, convention,
                                                       args.force)
                 textures[key] = u.load_asset(paths[f"tex:{key}"])
-            out["materialInstance"] = ensure_instance(name, master, textures, mask)
+            if plan.get("look"):
+                if env_master is None:
+                    raise RuntimeError(f"{ENV_MASTER} not available (see ue.envMaster)")
+                out["materialInstance"] = ensure_instance(name, env_master, textures, mask, plan["look"])
+            else:
+                out["materialInstance"] = ensure_instance(name, master, textures, mask)
             mi = u.load_asset(paths["mi"])
             fbx = plan["sources"]["fbx"]
             mesh = u.load_asset(paths["mesh"]) if eal.does_asset_exist(paths["mesh"]) else None
@@ -615,6 +796,31 @@ def run_import(plans: dict, args, convention: str) -> tuple[dict, bool]:
     return result, ok
 
 
+# ---------------------------------------------------------------------------------------------------------- look
+def attach_look(plans: dict, run: Path, args) -> tuple[dict, bool]:
+    """plans[name]['look'] = the M_EnvProp MI parameters of every prop in the look file (env_prop_look.mi_params);
+    a look file that does not validate fails the run (nothing half-applied). Returns (report info, ok)."""
+    if args.no_look:
+        return {"used": False, "note": "--no-look: every MI on M_UM_Figure"}, True
+    path = Path(args.look) if args.look else run / "scripts" / "env-prop-look.json"
+    if not path.is_file():
+        if args.look:
+            return {"used": False, "path": rel(path), "error": "look file missing"}, False
+        return {"used": False, "path": rel(path), "note": "no look file: every MI on M_UM_Figure"}, True
+    try:
+        data = look_lib.load_look(path)
+    except (OSError, ValueError) as exc:
+        return {"used": False, "path": rel(path), "error": str(exc)}, False
+    unknown = sorted(n for n in data["props"] if n not in KIT)
+    if unknown:
+        return {"used": False, "path": rel(path), "error": f"unknown kit names {unknown}"}, False
+    for name, plan in plans.items():
+        if name in data["props"]:
+            plan["look"] = look_lib.mi_params(data, name)
+    return {"used": True, "path": rel(path), "sha256": sha256_file(path), "master": ENV_MASTER,
+            "props": sorted(data["props"]), "selected": sorted(n for n in plans if n in data["props"])}, True
+
+
 # ---------------------------------------------------------------------------------------------------------- entry
 def select(args) -> list:
     names = list(KIT)
@@ -644,6 +850,9 @@ def main(argv: list | None = None) -> int:
     parser.add_argument("--import-scale", type=float, default=1.0, help="FBX import_uniform_scale (UM_FBX_v1: 1.0)")
     parser.add_argument("--normal", choices=("auto", "directx", "opengl"), default="auto")
     parser.add_argument("--require-verified", action="store_true", help="refuse sources the build report does not list")
+    parser.add_argument("--look", default=None,
+                        help="look file of M_EnvProp (default <run>/scripts/env-prop-look.json, when present)")
+    parser.add_argument("--no-look", action="store_true", help="every MI on M_UM_Figure (ignore the look file)")
     args = parser.parse_args(argv)
     started = time.time()
     run = Path(args.run).resolve()
@@ -651,12 +860,14 @@ def main(argv: list | None = None) -> int:
     report = load_build_report(run)
     convention, convention_source = normal_convention(report, args.normal)
     plans = {name: plan_prop(name, run, report) for name in names}
+    look_info, look_ok = attach_look(plans, run, args)
     out = {"schema": "unmatched.env-kit-ue-import/1", "tool": "tools/art/env_kit/ue_import_env_kit.py",
            "mode": "check" if (args.check or u is None) else "import", "run": rel(run), "contentRoot": ROOT,
-           "master": MASTER, "normalConvention": convention, "normalConventionSource": convention_source,
+           "master": MASTER, "envMaster": ENV_MASTER, "envGraphVersion": ENV_GRAPH_VERSION, "look": look_info,
+           "normalConvention": convention, "normalConventionSource": convention_source,
            "importScale": args.import_scale,
            "buildReport": {k: v for k, v in report.items() if k != "data"}, "props": plans}
-    ok = all(p["ok"] for p in plans.values())
+    ok = all(p["ok"] for p in plans.values()) and look_ok
     if args.require_verified:
         ok = ok and all(p["verified"] for p in plans.values())
     if out["mode"] == "import":

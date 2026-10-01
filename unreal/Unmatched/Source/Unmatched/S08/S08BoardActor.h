@@ -107,6 +107,19 @@ public:
   /** Automation only: board profile data without BeginPlay / -ArtPreview (art assets treated as ready; the
    *  map-image path loads its own assets and falls back when they are missing). */
   void SetArtDataForTest(const FS08BoardArtData& Data);
+  /** ENV-MAPS P4: the "readability" block of the ACTIVE map-image profile (nullptr on grids, without art, on a
+   *  refused map-image profile, or when the profile has no block). */
+  const FS08BoardReadabilitySpec* GetActiveReadability() const {
+    return bArtActive && bMapImageActive && ActiveProfile.Readability.bSet ? &ActiveProfile.Readability : nullptr;
+  }
+  /** ENV-MAPS P4: screen tags on the readability plate (dark rounded plate + team outline + hard padding). */
+  bool UsesLabelPlates() const {
+    const FS08BoardReadabilitySpec* R = GetActiveReadability();
+    return R && R->bLabelPlates;
+  }
+  /** Source of the last map frame material: "frame-wood" (M_MapFrameWood MID), "probe" (the ART-005 wood) or
+   *  "missing" (frameWood asked for, M_MapFrameWood not imported -> the probe wood). Empty before a map-image board. */
+  const FString& GetMapFrameWoodSource() const { return MapFrameWoodSource; }
 
   /** Syncs fighter actors with the latest decoded fighters (spawn/move/
    *  re-label by stable fighter id; dead fighters hide instantly). */
@@ -354,6 +367,27 @@ private:
   /** 'map-image' surface: the map plane, frame, corners and pick box (no lattice, no zone marks). */
   void BuildMapImageSurface(const FS08BoardModel& Board, const FS08BoardSummary& Summary);
   void HideTopologyComponents();
+
+  // ---- ENV-MAPS P4 readability (map-image boards with a profile "readability" block only) ----
+  /** The map frame material: a MID of M_MapFrameWood with the profile's frameWood values, else the ART-005 probe
+   *  wood (MapFrameWoodSource says which). */
+  UMaterialInterface* MapFrameMaterial();
+  /** Contact-shadow blob and (heroes) leader pip as components of the fighter actor; no-op without the block. */
+  void ApplyFighterReadability(AS08FighterActor* Actor, const FS08BoardFighter& Fighter, ES08TeamSlot Look);
+  UPROPERTY()
+  TObjectPtr<UMaterialInstanceDynamic> MapFrameWoodMid;
+  bool bMapFrameWoodTried = false;
+  FString MapFrameWoodSource;
+  UPROPERTY()
+  TObjectPtr<UMaterialInstanceDynamic> ContactShadowMid;
+  bool bContactShadowTried = false;
+  UPROPERTY()
+  TObjectPtr<UMaterialInstanceDynamic> LeaderPipMidP1;  // team look slot P1 (gold)
+  UPROPERTY()
+  TObjectPtr<UMaterialInstanceDynamic> LeaderPipMidP2;  // team look slot P2 (steel blue)
+  UPROPERTY()
+  TObjectPtr<UMaterialInstanceDynamic> LeaderPipKeylineMid;
+  FString ReadabilityFightersTraceKey;
 
   FS08BoardModel BoardModel;
   TArray<FS08BoardFighter> Fighters;

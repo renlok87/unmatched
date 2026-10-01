@@ -18,6 +18,12 @@ C:/tmp/envmaps-research/k1-mocks/ (out of git). Only numbers are written next to
 The manifest names outputs by canonical roots (ROOTS), not by the --derived / --mocks used.
 
 Usage:  python -B tools/art/map_surface/build_map_textures.py [--maps marmoreal sarpedon]
+        python -B tools/art/map_surface/build_map_textures.py --refresh-k1 [--maps ...] [--derived <dir>]
+The K1 night grade (mocks b / c, manifest k1.grade_b_c) is the ENGINE grade: the light profile's "mapGrade" of the
+map-image board in unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json (k1_mock.profile_map_grade, ENV-MAPS
+P4). --refresh-k1 re-renders only the K1 mocks with that grade from the already built BC / mask (sha256 checked against
+the manifest, read only) and updates k1.grade_b_c / k1.mocks / k1.measurement.grade_b_vs_a_ev; every other manifest
+field and every texture stays as it is.
 """
 from __future__ import annotations
 
@@ -87,7 +93,12 @@ BC = {"resample": "PIL LANCZOS (float32 per channel), 1337x866 -> 4096x4096 in o
       "unsharp_sigma_src_px": 0.7, "unsharp_amount": 0.35}
 SDF = {"codes_per_src_px": 512.0, "clamp_src_px": 64.0, "zero_code": 32768}
 MASK = {"dilate_src_px": 6.0, "soft_src_px": 1.0}
-GRADE = {"ev": -0.7, "saturation": 0.7, "tint_srgb_mul": [0.90, 0.97, 1.12], "lift": 0.35}
+# Pre-P4 mock grade (S-prep; the MI defaults of graph v1). Since ENV-MAPS P4 the mocks use the profile mapGrade
+# (k1_mock.profile_map_grade); this stays only as the documented origin of the M_MapBoard parameter defaults.
+GRADE_SPREP = {"ev": -0.7, "saturation": 0.7, "tint_srgb_mul": [0.90, 0.97, 1.12], "lift": 0.35}
+GRADE_FORMULA = ("lit = albedo * 2^ev * tint_lin; outside = desaturate(lit, saturation); inside = saturate(lit * "
+                 "mask_inverse_tint_lin, mask_saturation) + lift * saturate(albedo, lift_saturation) (unlit / emissive "
+                 "share); mix by GameMask (= M_MapBoard graph v2, tools/art/map_surface/ue_import_map_surface.py)")
 K1 = {"width": 1920, "height": 1080, "ss": 3, "tray_rim_uu": 60.0, "tray_height_uu": 150.0,
       "rock_srgb": [0.235, 0.225, 0.215], "bg_top_srgb": [0.055, 0.066, 0.105],
       "bg_bottom_srgb": [0.012, 0.015, 0.026],
@@ -299,10 +310,25 @@ def make_layers(vec: dict) -> dict:
 
 
 # ------------------------------------------------------------------ 5. K1
-def k1_layout(vec: dict, topo: dict) -> dict:
+def k1_grade(key: str) -> dict:
+    """The engine night grade of a map (the profile mapGrade, k1_mock.profile_map_grade) in the k1_mock format."""
+    return k1_mock.profile_map_grade(key)
+
+
+def grade_record(grade: dict) -> dict:
+    """manifest k1.grade_b_c: the profile grade the mocks b / c were rendered with (ue_import_map_surface.py writes
+    the same values into MI_<Name>_MapBoard). tint_lin_luma_normalised keeps the import contract's key: the profile
+    tint is used verbatim (it is linear and already ~luma 1)."""
+    return {"source": grade["source"], "ev": grade["ev"], "saturation": grade["saturation"], "lift": grade["lift"],
+            "tint_lin": grade["tint_lin"], "tint_lin_luma_normalised": grade["tint_lin"],
+            "mask_saturation": grade["mask_saturation"], "lift_saturation": grade["lift_saturation"],
+            "mask_inverse_tint_lin": grade["mask_inverse_tint_lin"], "formula": GRADE_FORMULA,
+            "note": "the mock lights the map with 2^ev * tint only (no key / moon-pool / sky lights, no tonemapper): "
+                    "same grade parameters as the engine, not the engine render"}
+
+
+def k1_layout(vec: dict, topo: dict, grade: dict) -> dict:
     mx, my = SRC_W * UU_PER_PX / 2, SRC_H * UU_PER_PX / 2
-    tint = np.asarray(GRADE["tint_srgb_mul"], np.float64)
-    tint = tint / float(tint @ np.array([0.2126, 0.7152, 0.0722]))
     starts = {s["start"]: s for s in topo["spaces"] if s.get("start")}
     painted = {s["id"]: s["painted_px"] for s in vec["spaces"]}
 
@@ -318,8 +344,8 @@ def k1_layout(vec: dict, topo: dict) -> dict:
         heroes.append({"x": x, "y": y, "albedo_lin": K1["hero"]["albedo_lin"], "space": starts[k]["id"]})
     return {"map_half_uu": (mx, my), "tray_rim_uu": K1["tray_rim_uu"], "tray_height_uu": K1["tray_height_uu"],
             "rock_srgb": K1["rock_srgb"], "bg_top_srgb": K1["bg_top_srgb"], "bg_bottom_srgb": K1["bg_bottom_srgb"],
-            "grade": {"ev": GRADE["ev"], "saturation": GRADE["saturation"], "tint_lin": tint.tolist(),
-                      "lift": GRADE["lift"]},
+            "grade": {k: grade[k] for k in ("ev", "saturation", "tint_lin", "lift", "mask_saturation",
+                                            "lift_saturation", "mask_inverse_tint_lin")},
             "heroes": heroes, "rings": rings}
 
 
@@ -440,6 +466,75 @@ def logo_before_after(key: str, before: np.ndarray, after: np.ndarray, rect, out
 
 
 # ------------------------------------------------------------------ main
+def k1_mocks(key: str, cam: "k1_mock.Camera", layout: dict, bc: np.ndarray, mask8: np.ndarray, mocks: Path):
+    """K1 mocks a / b / c, the a|b split and the b/a EV map of one map (written to <mocks>); returns the manifest
+    k1.mocks block and k1.measurement.grade_b_vs_a_ev."""
+    mocks.mkdir(parents=True, exist_ok=True)
+    lin = k1_mock.srgb_to_lin(bc.astype(np.float32) / 255.0)
+    maps = {"mips": k1_mock.build_mips(lin), "mask_mips": k1_mock.build_mips(mask8.astype(np.float32) / 255.0)}
+    del lin
+    mock_info = {}
+    frames = {}
+    for variant in ("a", "b", "c"):
+        fr = k1_mock.render(cam, maps, layout, variant, ss=K1["ss"])
+        frames[variant] = fr
+        p = mocks / f"{key}-{variant}.png"
+        info = write_bytes(p, pil_png(Image.fromarray(fr, "RGB")))
+        mock_info[variant] = {"path": f"{MOCKS}/{p.name}", **info, "width": K1["width"], "height": K1["height"]}
+    # a | b split for the difference (left half a, right half b) + luminance ratio b/a map
+    split = frames["a"].copy()
+    split[:, K1["width"] // 2:] = frames["b"][:, K1["width"] // 2:]
+    split[:, K1["width"] // 2 - 1:K1["width"] // 2 + 1] = (255, 255, 255)
+    p = mocks / f"{key}-ab-split.png"
+    mock_info["ab_split"] = {"path": f"{MOCKS}/{p.name}", **write_bytes(p, pil_png(Image.fromarray(split, "RGB")))}
+    la = k1_mock.srgb_to_lin(frames["a"] / 255.0) @ k1_mock.LUMA
+    lb = k1_mock.srgb_to_lin(frames["b"] / 255.0) @ k1_mock.LUMA
+    ev = np.log2(np.maximum(lb, 1e-4) / np.maximum(la, 1e-4))
+    evn = np.clip((ev + 1.0) / 1.2, 0, 1)
+    heat = np.stack([evn, evn ** 0.5 * 0.2 + 0.1, 1 - evn], axis=-1)
+    p = mocks / f"{key}-ab-ev.png"
+    mock_info["ab_ev"] = {"path": f"{MOCKS}/{p.name}", "legend": "log2(b/a) luminance: blue = -1 EV, red = +0.2 EV",
+                          **write_bytes(p, pil_png(Image.fromarray((heat * 255).astype(np.uint8), "RGB")))}
+    # EV of b vs a inside / outside the game layer, measured on the map pixels of the mocks
+    on, us, vs_ = k1_mock.screen_uv(cam, layout, TEX)
+    msc = np.where(on, mask8[vs_, us], 0)
+    ins, outs = on & (msc >= 250), on & (msc <= 5)
+    grade_ev = {"inside_mask_median": round(float(np.median(ev[ins])), 3),
+                "outside_mask_median": round(float(np.median(ev[outs])), 3),
+                "inside_minus_outside": round(float(np.median(ev[ins]) - np.median(ev[outs])), 3),
+                "screen_px_inside": int(ins.sum()), "screen_px_outside": int(outs.sum())}
+    return mock_info, grade_ev
+
+
+def refresh_k1(key: str, a) -> dict:
+    """ENV-MAPS P4: re-render the K1 mocks with the profile grade from the built BC / mask (sha256 = manifest) and
+    update only k1.grade_b_c, k1.mocks and k1.measurement.grade_b_vs_a_ev of manifest.<key>.json."""
+    name = MAPS[key]["name"]
+    path = HERE / f"manifest.{key}.json"
+    manifest = json.loads(path.read_text(encoding="utf-8"))
+    src = {}
+    for layer in ("bc", "mask"):
+        p = Path(a.derived) / key / Path(manifest["outputs"][layer]["path"]).name
+        if not p.is_file() or sha256_file(p) != manifest["outputs"][layer]["sha256"]:
+            raise SystemExit(f"{key}: {p} missing or its sha256 differs from {path.name} (rebuild without --refresh-k1)")
+        src[layer] = p
+    bc = np.asarray(Image.open(src["bc"]).convert("RGB"))
+    mask8 = np.asarray(Image.open(src["mask"]).convert("L"))
+    vec = json.loads((HERE / f"{key}.vector-layer.json").read_text(encoding="utf-8"))
+    topo = json.loads((REPO / manifest["inputs"]["topology"]["path"]).read_text(encoding="utf-8"))
+    grade = k1_grade(key)
+    mx, my = SRC_W * UU_PER_PX / 2, SRC_H * UU_PER_PX / 2
+    cam = k1_mock.Camera(k1_mock.s08_fit_distance(mx, my), K1["width"], K1["height"])
+    layout = k1_layout(vec, topo, grade)
+    print(f"[{key}] K1 mocks (refresh, {name}, grade: {grade['source']})", flush=True)
+    mock_info, grade_ev = k1_mocks(key, cam, layout, bc, mask8, Path(a.mocks))
+    manifest["k1"]["grade_b_c"] = grade_record(grade)
+    manifest["k1"]["mocks"] = mock_info
+    manifest["k1"]["measurement"]["grade_b_vs_a_ev"] = grade_ev
+    dump_json(path, manifest)
+    return manifest
+
+
 def build(key: str, a) -> dict:
     cfg = MAPS[key]
     name = cfg["name"]
@@ -498,42 +593,10 @@ def build(key: str, a) -> dict:
     mx, my = SRC_W * UU_PER_PX / 2, SRC_H * UU_PER_PX / 2
     dist = k1_mock.s08_fit_distance(mx, my)
     cam = k1_mock.Camera(dist, K1["width"], K1["height"])
-    layout = k1_layout(vec, topo)
-    lin = k1_mock.srgb_to_lin(bc.astype(np.float32) / 255.0)
-    maps = {"mips": k1_mock.build_mips(lin),
-            "mask_mips": k1_mock.build_mips(layers["mask8"].astype(np.float32) / 255.0)}
-    del lin
-    mock_info = {}
-    frames = {}
-    for variant in ("a", "b", "c"):
-        fr = k1_mock.render(cam, maps, layout, variant, ss=K1["ss"])
-        frames[variant] = fr
-        p = mocks / f"{key}-{variant}.png"
-        info = write_bytes(p, pil_png(Image.fromarray(fr, "RGB")))
-        mock_info[variant] = {"path": f"{MOCKS}/{p.name}", **info, "width": K1["width"], "height": K1["height"]}
-    # a | b split for the difference (left half a, right half b) + luminance ratio b/a map
-    split = frames["a"].copy()
-    split[:, K1["width"] // 2:] = frames["b"][:, K1["width"] // 2:]
-    split[:, K1["width"] // 2 - 1:K1["width"] // 2 + 1] = (255, 255, 255)
-    p = mocks / f"{key}-ab-split.png"
-    mock_info["ab_split"] = {"path": f"{MOCKS}/{p.name}", **write_bytes(p, pil_png(Image.fromarray(split, "RGB")))}
-    la = k1_mock.srgb_to_lin(frames["a"] / 255.0) @ k1_mock.LUMA
-    lb = k1_mock.srgb_to_lin(frames["b"] / 255.0) @ k1_mock.LUMA
-    ev = np.log2(np.maximum(lb, 1e-4) / np.maximum(la, 1e-4))
-    evn = np.clip((ev + 1.0) / 1.2, 0, 1)
-    heat = np.stack([evn, evn ** 0.5 * 0.2 + 0.1, 1 - evn], axis=-1)
-    p = mocks / f"{key}-ab-ev.png"
-    mock_info["ab_ev"] = {"path": f"{MOCKS}/{p.name}", "legend": "log2(b/a) luminance: blue = -1 EV, red = +0.2 EV",
-                          **write_bytes(p, pil_png(Image.fromarray((heat * 255).astype(np.uint8), "RGB")))}
+    layout = k1_layout(vec, topo, k1_grade(key))
+    mock_info, grade_ev = k1_mocks(key, cam, layout, bc, layers["mask8"], mocks)
     meas = k1_measure(cam, layers["ids"], vec, layout)
-    # EV of b vs a inside / outside the game layer, measured on the map pixels of the mocks
-    on, us, vs_ = k1_mock.screen_uv(cam, layout, TEX)
-    msc = np.where(on, layers["mask8"][vs_, us], 0)
-    ins, outs = on & (msc >= 250), on & (msc <= 5)
-    meas["grade_b_vs_a_ev"] = {"inside_mask_median": round(float(np.median(ev[ins])), 3),
-                               "outside_mask_median": round(float(np.median(ev[outs])), 3),
-                               "inside_minus_outside": round(float(np.median(ev[ins]) - np.median(ev[outs])), 3),
-                               "screen_px_inside": int(ins.sum()), "screen_px_outside": int(outs.sum())}
+    meas["grade_b_vs_a_ev"] = grade_ev
     vec_path = HERE / f"{key}.vector-layer.json"
     vec_sha = dump_json(vec_path, vec)
     manifest = {
@@ -584,9 +647,7 @@ def build(key: str, a) -> dict:
                       "rock_srgb": K1["rock_srgb"], "key_light_rot": list(k1_mock.KEY_LIGHT_ROT),
                       "ring": K1["ring"], "hero": K1["hero"],
                       "rings_on": [{"space": r["space"], "start": r["start"]} for r in layout["rings"]]},
-            "grade_b_c": {**GRADE, "tint_lin_luma_normalised": [round(x, 4) for x in layout["grade"]["tint_lin"]],
-                          "formula": "lit = albedo * 2^ev * tint; outside = desaturate(lit, saturation); "
-                                     "inside = lit + lift * albedo (unlit / emissive share); mix by GameMask"},
+            "grade_b_c": grade_record(k1_grade(key)),
             "render": {"supersampling": K1["ss"], "texture_filter": "trilinear, lod = log2(sqrt(|dUV/dx| |dUV/dy|))"},
             "mocks": mock_info,
             "measurement": meas,
@@ -605,7 +666,15 @@ def main(argv=None) -> int:
     ap.add_argument("--topology", default=str(REPO / "docs/game-design/evidence/ENV-MAPS/2026-09-30-research"))
     ap.add_argument("--derived", default=str(MAIN / "scraped-data/derived/maps"))
     ap.add_argument("--mocks", default="C:/tmp/envmaps-research/k1-mocks")
+    ap.add_argument("--refresh-k1", action="store_true",
+                    help="only re-render the K1 mocks with the profile mapGrade (BC / mask read from --derived)")
     a = ap.parse_args(argv)
+    if a.refresh_k1:
+        for key in a.maps:
+            m = refresh_k1(key, a)
+            print(json.dumps({"map": key, "grade_b_c": m["k1"]["grade_b_c"],
+                              "grade_b_vs_a_ev": m["k1"]["measurement"]["grade_b_vs_a_ev"]}, indent=1))
+        return 0
     for key in a.maps:
         m = build(key, a)
         print(json.dumps({"map": key, "outputs": {k: (v["path"], v["bytes"], v["sha256"][:16])

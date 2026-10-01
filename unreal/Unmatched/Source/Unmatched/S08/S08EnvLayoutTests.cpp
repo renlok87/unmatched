@@ -965,8 +965,19 @@ bool FS08EnvLayoutKitAssetsTest::RunTest(const FString&) {
         bSlots = bSlots && Slot.MaterialInterface.Get() == static_cast<UMaterialInterface*>(Mi);
       }
       TestTrue(Name + TEXT(": every slot = MI_Env_") + Name, bSlots);
-      TestTrue(Name + TEXT(": MI parent M_UM_Figure"),
-               Mi->Parent && Mi->Parent->GetPathName() == TEXT("/Game/UM/Materials/M_UM_Figure.M_UM_Figure"));
+      // P4 look (env-prop-look.json): these MIs are children of the kit master M_EnvProp (HSV window recolour +
+      // emissive window); the rest stay on M_UM_Figure.
+      const bool bLook = Name == TEXT("Cherry") || Name == TEXT("Cypress") || Name == TEXT("Tree") ||
+                         Name == TEXT("LanternPlinth") || Name == TEXT("Campfire") || Name == TEXT("Portal");
+      const FString WantParent = bLook ? TEXT("/Game/EnvKit/Shared/M_EnvProp.M_EnvProp")
+                                       : TEXT("/Game/UM/Materials/M_UM_Figure.M_UM_Figure");
+      TestTrue(Name + TEXT(": MI parent ") + WantParent, Mi->Parent && Mi->Parent->GetPathName() == WantParent);
+      if (Name == TEXT("LanternPlinth") || Name == TEXT("Campfire") || Name == TEXT("Portal")) {
+        float Emissive = 0.f;
+        TestTrue(Name + TEXT(": EmissiveIntensity > 0 (env-prop-look.json)"),
+                 Mi->GetScalarParameterValue(FHashedMaterialParameterInfo(TEXT("EmissiveIntensity")), Emissive) &&
+                     Emissive > 0.f);
+      }
       UTexture* Bound = nullptr;
       TestTrue(Name + TEXT(": BaseColorTexture bound"),
                Mi->GetTextureParameterValue(FHashedMaterialParameterInfo(TEXT("BaseColorTexture")), Bound) && Bound == Bc);

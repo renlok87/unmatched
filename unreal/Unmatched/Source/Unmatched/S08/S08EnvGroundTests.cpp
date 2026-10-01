@@ -5,13 +5,19 @@
 //   GroundSpawn    a fake map-image board through S08EnvLayout::Update: 4 plane strips (NoCollision, no shadow, MID
 //                  parameters), keep / respawn / clear, a layout without ground, a missing material
 //   GroundShipped  Config/ArtBoards/EnvLayouts ground sections against the map-image profiles, and the imported
-//                  M_EnvGround / MI_EnvGround_<Map> (tools/art/env_kit/ue_import_env_ground.py; AddWarning if absent)
+//                  M_EnvGround / MI_EnvGround_<Map> (tools/art/env_kit/ue_import_env_ground.py; AddWarning if absent);
+//                  P4: the shipped waterfalls at the near tray edge and the imported M_EnvWaterfall / MI_EnvWaterfall_<Map>
+//   GroundWaterfallParse     P4 "waterfalls": every field, defaults, 17 rejections (the whole layout is invalid)
+//   GroundWaterfallGeometry  P4 world-free card / spill transforms (corners, normal, v down the card), FallCard, trace
+//   GroundWaterfallSpawn     P4 fake map-image board: strips + card + spill (MID FallCard, NoCollision, no shadow), a
+//                            fall without spill, a missing waterfall material (skipped, strips stay)
 //   UnrealEditor-Cmd.exe Unmatched.uproject
 //     -ExecCmds="Automation RunTests Unmatched.S08.EnvLayout; Quit" -unattended -nosplash -nullrhi
 #if WITH_AUTOMATION_TESTS
 
 #include "S08BoardActor.h"
 #include "S08BoardArt.h"
+#include "S08Diorama.h"
 #include "S08EnvGround.h"
 #include "S08EnvLayout.h"
 #include "Components/PointLightComponent.h"
@@ -119,6 +125,17 @@ struct FTestWorld {
 };
 
 bool Destroyed(const UActorComponent* C) { return !IsValid(C) || C->IsBeingDestroyed() || !C->IsRegistered(); }
+
+/** P4: one "waterfalls" entry (the shipped Sarpedon numbers by default). */
+FString FallJson(const FString& Id, const FString& Material, const FString& Extra = FString()) {
+  return FString::Printf(TEXT("{\"id\":\"%s\",\"material\":\"%s\",\"x0\":-241,\"x1\":-47,\"y\":457,"
+                              "\"topZ\":2.5,\"dropUU\":230,\"spillUU\":60%s}"),
+                         *Id, *Material, *Extra);
+}
+
+FString GroundWithFalls(const FString& Material, const FString& Falls) {
+  return GroundJson(FullGroundBody(Material) + TEXT(",\"waterfalls\":[") + Falls + TEXT("]"));
+}
 }  // namespace S08EnvGroundTest
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08EnvGroundParseTest,
@@ -274,7 +291,240 @@ bool FS08EnvGroundStripsTest::RunTest(const FString&) {
   const FString Line = S08EnvGround::TraceLine(TEXT("marmoreal"), G, St);
   AddInfo(Line);
   TestTrue("trace line", Line.StartsWith(TEXT("ARTPREVIEW envlayout ground map=marmoreal mode=runtime strips=0 material=/Game/EnvKit/Ground/MI_EnvGround_Marmoreal")) &&
-                             Line.EndsWith(TEXT("status=missing-material")));
+                             Line.EndsWith(TEXT("falls=0/0 fallCards=0 status=missing-material")));
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08EnvGroundWaterfallParseTest,
+    "Unmatched.S08.EnvLayout.GroundWaterfallParse the waterfalls of the ground section keep every field, default topZ / spillUU and reject bad entries",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08EnvGroundWaterfallParseTest::RunTest(const FString&) {
+  using namespace S08EnvGroundTest;
+  const FString Mat = TEXT("/Game/EnvKit/Ground/MI_EnvWaterfall_Sarpedon");
+  FS08EnvLayout L;
+  TArray<FString> Errors;
+  const FString Two = FallJson(TEXT("fall-s"), Mat, TEXT(",\"futureField\":[1]")) + TEXT(",") +
+                      TEXT("{\"id\":\"fall-2\",\"material\":\"/Engine/BasicShapes/BasicShapeMaterial\",\"x0\":10,"
+                           "\"x1\":30.5,\"y\":440,\"dropUU\":120}");
+  if (!TestTrue(TEXT("two waterfalls parse: ") + FString::Join(Errors, TEXT(" | ")),
+                L.ParseJson(LayoutJson(TEXT("sarpedon"), GroundWithFalls(EngineMaterial, Two)), Errors))) {
+    return false;
+  }
+  if (!TestEqual("two entries", L.Ground.Waterfalls.Num(), 2)) return false;
+  const FS08EnvWaterfall& A = L.Ground.Waterfalls[0];
+  TestTrue("entry 0: id / material", A.Id == TEXT("fall-s") && A.Material == Mat);
+  TestTrue("entry 0: numbers", A.X0 == -241.0f && A.X1 == -47.0f && A.Y == 457.0f && A.TopZ == 2.5f &&
+                                   A.DropUU == 230.0f && A.SpillUU == 60.0f);
+  const FS08EnvWaterfall& B = L.Ground.Waterfalls[1];
+  TestTrue("entry 1: defaults topZ 2.5, spill 0", B.TopZ == S08EnvGroundSpec::DefaultFallTopZ && B.SpillUU == 0.0f &&
+                                                      B.X1 == 30.5f && B.DropUU == 120.0f);
+  TestTrue("the strips' fields still parse", L.Ground.bSet && L.Ground.bSplatRect);
+  Errors.Reset();
+  TestTrue("null waterfalls = none",
+           L.ParseJson(LayoutJson(TEXT("sarpedon"), GroundJson(FullGroundBody(EngineMaterial) + TEXT(",\"waterfalls\":null"))),
+                       Errors) &&
+               L.Ground.Waterfalls.Num() == 0);
+  Errors.Reset();
+  TestTrue("empty waterfalls = none",
+           L.ParseJson(LayoutJson(TEXT("sarpedon"), GroundWithFalls(EngineMaterial, FString())), Errors) &&
+               L.Ground.Waterfalls.Num() == 0);
+  Errors.Reset();
+  TestTrue("a re-parse without waterfalls forgets them",
+           L.ParseJson(LayoutJson(TEXT("sarpedon"), GroundJson(FullGroundBody(EngineMaterial))), Errors) &&
+               L.Ground.Waterfalls.Num() == 0);
+
+  struct FCase {
+    const TCHAR* Name;
+    FString Falls;        // the array body, or the whole value when bRaw
+    bool bRaw;
+    const TCHAR* Expect;  // substring of one error
+  };
+  const FString F = FallJson(TEXT("f"), Mat);
+  const FCase Cases[] = {
+      {TEXT("not an array"), TEXT("{\"id\":\"f\"}"), true, TEXT("ground: waterfalls is not an array")},
+      {TEXT("five entries"), FString::Join(TArray<FString>{FallJson(TEXT("a"), Mat), FallJson(TEXT("b"), Mat),
+                                                             FallJson(TEXT("c"), Mat), FallJson(TEXT("d"), Mat),
+                                                             FallJson(TEXT("e"), Mat)},
+                                           TEXT(",")),
+       false, TEXT("entries (max 4)")},
+      {TEXT("entry a number"), TEXT("3"), false, TEXT("waterfalls[0] is not an object")},
+      {TEXT("id missing"), TEXT("{\"material\":\"/Game/X\",\"x0\":0,\"x1\":1,\"y\":0,\"dropUU\":5}"), false,
+       TEXT(": id")},
+      {TEXT("duplicate id"), F + TEXT(",") + F, false, TEXT("waterfalls[1]: id")},
+      {TEXT("material without a root"), FallJson(TEXT("f"), TEXT("Game/X")), false, TEXT(": material")},
+      {TEXT("x0 a string"), TEXT("{\"id\":\"f\",\"material\":\"/Game/X\",\"x0\":\"0\",\"x1\":1,\"y\":0,\"dropUU\":5}"),
+       false, TEXT("x0 / x1 / y must be numbers")},
+      {TEXT("y missing"), TEXT("{\"id\":\"f\",\"material\":\"/Game/X\",\"x0\":0,\"x1\":1,\"dropUU\":5}"), false,
+       TEXT("x0 / x1 / y must be numbers")},
+      {TEXT("x1 <= x0"), TEXT("{\"id\":\"f\",\"material\":\"/Game/X\",\"x0\":5,\"x1\":5,\"y\":0,\"dropUU\":5}"),
+       false, TEXT("x1 - x0")},
+      {TEXT("width 2500"), TEXT("{\"id\":\"f\",\"material\":\"/Game/X\",\"x0\":-1250,\"x1\":1250,\"y\":0,\"dropUU\":5}"),
+       false, TEXT("x1 - x0")},
+      {TEXT("y 6000"), TEXT("{\"id\":\"f\",\"material\":\"/Game/X\",\"x0\":0,\"x1\":1,\"y\":6000,\"dropUU\":5}"),
+       false, TEXT("x1 - x0")},
+      {TEXT("dropUU missing"), TEXT("{\"id\":\"f\",\"material\":\"/Game/X\",\"x0\":0,\"x1\":1,\"y\":0}"), false,
+       TEXT("dropUU")},
+      {TEXT("dropUU 0"), TEXT("{\"id\":\"f\",\"material\":\"/Game/X\",\"x0\":0,\"x1\":1,\"y\":0,\"dropUU\":0}"),
+       false, TEXT("dropUU")},
+      {TEXT("dropUU 1500"), TEXT("{\"id\":\"f\",\"material\":\"/Game/X\",\"x0\":0,\"x1\":1,\"y\":0,\"dropUU\":1500}"),
+       false, TEXT("dropUU")},
+      {TEXT("topZ 25"), FallJson(TEXT("f"), Mat, TEXT(",\"topZ\":25")), false, TEXT("topZ")},
+      {TEXT("spillUU negative"), FallJson(TEXT("f"), Mat, TEXT(",\"spillUU\":-1")), false, TEXT("spillUU")},
+      {TEXT("spillUU 250"), FallJson(TEXT("f"), Mat, TEXT(",\"spillUU\":250")), false, TEXT("spillUU")},
+  };
+  for (const FCase& C : Cases) {
+    const FString Ground = C.bRaw ? GroundJson(FullGroundBody(EngineMaterial) + TEXT(",\"waterfalls\":") + C.Falls)
+                                  : GroundWithFalls(EngineMaterial, C.Falls);
+    FS08EnvLayout Bad;
+    TArray<FString> CaseErrors;
+    const bool bOk = Bad.ParseJson(LayoutJson(TEXT("sarpedon"), Ground), CaseErrors);
+    TestFalse(FString::Printf(TEXT("%s: the whole layout is rejected"), C.Name), bOk);
+    const FString All = FString::Join(CaseErrors, TEXT(" | "));
+    TestTrue(FString::Printf(TEXT("%s: error mentions '%s' (%s)"), C.Name, C.Expect, *All), All.Contains(C.Expect));
+    TestFalse(FString::Printf(TEXT("%s: ground not set"), C.Name), Bad.Ground.bSet);
+  }
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08EnvGroundWaterfallGeometryTest,
+    "Unmatched.S08.EnvLayout.GroundWaterfallGeometry the waterfall card hangs from topZ facing the K1 camera, the spill lies on the lip; FallCard values",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08EnvGroundWaterfallGeometryTest::RunTest(const FString&) {
+  FS08EnvWaterfall Fall;
+  Fall.Id = TEXT("fall-s");
+  Fall.X0 = -241.0f;
+  Fall.X1 = -47.0f;
+  Fall.Y = 457.0f;
+  Fall.TopZ = 2.5f;
+  Fall.DropUU = 230.0f;
+  Fall.SpillUU = 60.0f;
+  // the engine plane: 100 x 100 at scale 1, normal +Z, UV (0,0) at local (-50,-50), u along +X, v along +Y
+  const FTransform Card = S08EnvGround::FallCardTransform(Fall);
+  const FVector TopLeft = Card.TransformPosition(FVector(-50.0, -50.0, 0.0));
+  const FVector BottomRight = Card.TransformPosition(FVector(50.0, 50.0, 0.0));
+  TestTrue(TEXT("card UV (0,0) = (x0, y, topZ) ") + TopLeft.ToString(), TopLeft.Equals(FVector(-241.0, 457.0, 2.5), 1e-3));
+  TestTrue(TEXT("card UV (1,1) = (x1, y, topZ - drop) ") + BottomRight.ToString(),
+           BottomRight.Equals(FVector(-47.0, 457.0, 2.5 - 230.0), 1e-3));
+  const FVector Normal = Card.TransformVectorNoScale(FVector::UpVector);
+  TestTrue(TEXT("card faces +Y (the K1 camera) ") + Normal.ToString(), Normal.Equals(FVector(0.0, 1.0, 0.0), 1e-6));
+  TestTrue("card: v runs down (local +Y -> -Z)",
+           Card.TransformVectorNoScale(FVector(0.0, 1.0, 0.0)).Equals(FVector(0.0, 0.0, -1.0), 1e-6));
+  TestTrue("card: u runs +X", Card.TransformVectorNoScale(FVector(1.0, 0.0, 0.0)).Equals(FVector(1.0, 0.0, 0.0), 1e-6));
+  TestTrue("card: a proper rotation (u x v = the normal)",
+           (Card.TransformVectorNoScale(FVector(1.0, 0.0, 0.0)) ^ Card.TransformVectorNoScale(FVector(0.0, 1.0, 0.0)))
+               .Equals(Normal, 1e-6));
+  const FTransform Spill = S08EnvGround::FallSpillTransform(Fall);
+  TestTrue("spill UV (0,0) = (x0, y - spill, topZ)",
+           Spill.TransformPosition(FVector(-50.0, -50.0, 0.0)).Equals(FVector(-241.0, 397.0, 2.5), 1e-3));
+  TestTrue("spill UV (1,1) = (x1, y, topZ): it meets the card's top edge",
+           Spill.TransformPosition(FVector(50.0, 50.0, 0.0)).Equals(FVector(-47.0, 457.0, 2.5), 1e-3));
+  TestTrue("spill: flat, facing up", Spill.TransformVectorNoScale(FVector::UpVector).Equals(FVector::UpVector, 1e-6));
+  const FLinearColor CardParam = S08EnvGround::FallCardParam(Fall, false);
+  const FLinearColor SpillParam = S08EnvGround::FallCardParam(Fall, true);
+  TestTrue(TEXT("FallCard (card) = (194, 230, 0, 0) ") + CardParam.ToString(),
+           CardParam.Equals(FLinearColor(194.0f, 230.0f, S08EnvGroundSpec::FallKindCard, 0.0f), 1e-3f));
+  TestTrue(TEXT("FallCard (spill) = (194, 60, 1, 0) ") + SpillParam.ToString(),
+           SpillParam.Equals(FLinearColor(194.0f, 60.0f, S08EnvGroundSpec::FallKindSpill, 0.0f), 1e-3f));
+  TestTrue("the T2 lip stays under the spill", Fall.TopZ > S08Diorama::T2LipTopZMax);
+  // trace: falls spawned / declared, cards
+  FS08EnvGround G;
+  G.bSet = true;
+  G.Mode = S08EnvGroundSpec::RuntimeMode;
+  G.Material = TEXT("/Game/EnvKit/Ground/MI_EnvGround_Sarpedon");
+  G.Waterfalls.Add(Fall);
+  FS08EnvGroundStats St;
+  St.Status = TEXT("ok");
+  St.Strips = 4;
+  St.Falls = 1;
+  St.FallCards = 2;
+  const FString Line = S08EnvGround::TraceLine(TEXT("sarpedon"), G, St);
+  AddInfo(Line);
+  TestTrue("trace line carries falls=1/1 fallCards=2", Line.Contains(TEXT(" falls=1/1 fallCards=2 status=ok")));
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08EnvGroundWaterfallSpawnTest,
+    "Unmatched.S08.EnvLayout.GroundWaterfallSpawn fake map-image board: strips plus waterfall card and spill planes, a fall without spill, a missing waterfall material",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08EnvGroundWaterfallSpawnTest::RunTest(const FString&) {
+  using namespace S08EnvGroundTest;
+  FTestWorld W(TEXT("S08EnvGroundWaterfallSpawn"));
+  if (!TestNotNull("test world", W.World)) return false;
+  AS08BoardActor* Actor = W.SpawnBoard();
+  if (!TestNotNull("board actor", Actor)) return false;
+  USceneComponent* Root = Actor->GetRootComponent();
+  UStaticMesh* Plane = LoadObject<UStaticMesh>(nullptr, S08EnvGroundSpec::PlaneMeshPath);
+  UMaterialInterface* Parent = LoadObject<UMaterialInterface>(nullptr, EngineMaterial);
+  if (!TestNotNull("engine plane", Plane) || !TestNotNull("engine material", Parent)) return false;
+  const FString Dir = TempDir(TEXT("Waterfall"));
+  const FString File = S08EnvLayout::FileFor(Dir, TEXT("envwater"));
+  TestTrue("write layout", WriteText(File, LayoutJson(TEXT("envwater"),
+                                                       GroundWithFalls(EngineMaterial, FallJson(TEXT("fall-s"), EngineMaterial)))));
+  FS08EnvLayoutRequest Req;
+  Req.bEnabled = true;
+  Req.bMapImageActive = true;
+  Req.ProfileId = TEXT("envmap");
+  Req.MapKey = TEXT("envwater");
+  Req.RoomBoardId = BoardId;
+  Req.ProfileBoardIds = {FString(BoardId)};
+  Req.MapHalf = MapHalf;
+  Req.FrameHalf = FrameHalf;
+  Req.Dir = Dir;
+  FS08EnvLayoutRuntime Rt;
+  TArray<TObjectPtr<UStaticMeshComponent>> Props;
+  TArray<TObjectPtr<UPointLightComponent>> Lights;
+  S08EnvLayout::Update(Req, *Actor, Root, Rt, Props, Lights);
+  if (!TestTrue("layout applied and valid", Rt.bApplied && Rt.bLayoutValid && Rt.Status == TEXT("ok"))) return false;
+  AddInfo(S08EnvGround::TraceLine(Req.MapKey, Rt.Layout.Ground, Rt.GroundStats));
+  TestEqual("ground status ok", Rt.GroundStats.Status, FString(TEXT("ok")));
+  TestTrue("4 strips, 1 fall, 2 cards, none missing", Rt.GroundStats.Strips == 4 && Rt.GroundStats.Falls == 1 &&
+                                                          Rt.GroundStats.FallCards == 2 && Rt.GroundStats.FallsMissing == 0);
+  if (!TestEqual("6 ground components (4 strips + card + spill)", Rt.Ground.Num(), 6)) return false;
+  const FS08EnvWaterfall& Fall = Rt.Layout.Ground.Waterfalls[0];
+  for (int32 I = 4; I < 6; ++I) {
+    const bool bSpill = I == 5;
+    UStaticMeshComponent* C = Rt.Ground[I].Get();
+    if (!TestNotNull(FString::Printf(TEXT("fall part %d alive"), I), C)) continue;
+    const FString N = C->GetName();
+    TestTrue(N + TEXT(": named after the fall"), N.StartsWith(bSpill ? TEXT("EnvWaterfall_fall_s_Spill")
+                                                                      : TEXT("EnvWaterfall_fall_s_Card")));
+    TestTrue(N + TEXT(": registered under the board root"), C->IsRegistered() && C->GetAttachParent() == Root);
+    TestTrue(N + TEXT(": the engine plane"), C->GetStaticMesh() == Plane);
+    TestTrue(N + TEXT(": NoCollision, no shadow, no navigation"),
+             C->GetCollisionEnabled() == ECollisionEnabled::NoCollision && !C->CastShadow &&
+                 !C->CanEverAffectNavigation());
+    const FTransform Want = bSpill ? S08EnvGround::FallSpillTransform(Fall) : S08EnvGround::FallCardTransform(Fall);
+    TestTrue(N + TEXT(": relative transform ") + C->GetRelativeTransform().ToString(),
+             C->GetRelativeTransform().Equals(Want, 1e-3));
+    UMaterialInstanceDynamic* Mid = Cast<UMaterialInstanceDynamic>(C->GetMaterial(0));
+    if (TestNotNull(N + TEXT(": MID"), Mid)) {
+      TestTrue(N + TEXT(": MID parent = the fall material"), Mid->Parent == Parent);
+      const FVectorParameterValue* Card = FindVector(Mid, S08EnvGroundSpec::ParamFallCard);
+      TestTrue(N + TEXT(": FallCard"), Card && Card->ParameterValue.Equals(S08EnvGround::FallCardParam(Fall, bSpill), 1e-3f));
+    }
+  }
+  // a fall without spill: one card
+  TestTrue("rewrite: no spill",
+           WriteText(File, LayoutJson(TEXT("envwater"),
+                                      GroundWithFalls(EngineMaterial, FallJson(TEXT("fall-s"), EngineMaterial,
+                                                                               TEXT(",\"spillUU\":0"))))));
+  S08EnvLayout::Update(Req, *Actor, Root, Rt, Props, Lights);
+  TestTrue("no spill: 4 strips + 1 card", Rt.Ground.Num() == 5 && Rt.GroundStats.FallCards == 1 && Rt.GroundStats.Falls == 1);
+  // a waterfall material that was never imported: the fall is skipped, the strips stay
+  TestTrue("rewrite: missing waterfall material",
+           WriteText(File, LayoutJson(TEXT("envwater"),
+                                      GroundWithFalls(EngineMaterial,
+                                                      FallJson(TEXT("fall-s"), TEXT("/Game/EnvKit/Ground/MI_EnvWaterfall_NoSuchTest"))))));
+  S08EnvLayout::Update(Req, *Actor, Root, Rt, Props, Lights);
+  TestTrue("missing fall material: strips only, counted", Rt.Ground.Num() == 4 && Rt.GroundStats.Falls == 0 &&
+                                                               Rt.GroundStats.FallsMissing == 1 &&
+                                                               Rt.GroundStats.Status == TEXT("ok"));
+  // a grid / grey board clears everything
+  Req.bMapImageActive = false;
+  S08EnvLayout::Update(Req, *Actor, Root, Rt, Props, Lights);
+  TestEqual("grid / grey board: no ground, no fall", Rt.Ground.Num(), 0);
+  Actor->Destroy();
+  IFileManager::Get().DeleteDirectory(*FPaths::Combine(FPaths::AutomationTransientDir(), TEXT("S08EnvGround")), false, true);
   return true;
 }
 
@@ -421,6 +671,32 @@ bool FS08EnvGroundShippedTest::RunTest(const FString&) {
                             *G.SplatRect.ToString()));
     TestEqual(Key + TEXT(": 4 strips round the frame"), S.Num(), 4);
     TestTrue(Key + TEXT(": splatRect set and covering the tray top"), G.bSplatRect && Covers(G.SplatRect, Outer));
+    // P4 waterfalls: in front of the near tray edge (within the T2 overhang + 40 uu), over the tray width, the spill
+    // starting on the tray top, above the T2 lip; their MI imported -> parent M_EnvWaterfall with the ripple bound
+    for (const FS08EnvWaterfall& Fall : G.Waterfalls) {
+      const FString Id = Key + TEXT(" waterfall ") + Fall.Id;
+      AddInfo(FString::Printf(TEXT("%s: x %.1f..%.1f y %.1f topZ %.1f drop %.0f spill %.0f"), *Id, Fall.X0, Fall.X1,
+                              Fall.Y, Fall.TopZ, Fall.DropUU, Fall.SpillUU));
+      TestEqual(Id + TEXT(": material MI_EnvWaterfall_<Map>"), PackageOf(Fall.Material),
+                FString(S08EnvGroundSpec::MaterialRoot) + TEXT("MI_EnvWaterfall_") + B.Map.Name);
+      TestTrue(Id + TEXT(": at the near tray edge"), Fall.Y >= Top.Max.Y && Fall.Y <= Top.Max.Y + 40.0);
+      TestTrue(Id + TEXT(": within the tray width"), Fall.X0 >= Top.Min.X && Fall.X1 <= Top.Max.X);
+      TestTrue(Id + TEXT(": the spill starts on the tray top"),
+               Fall.SpillUU > 0.0f && Fall.Y - Fall.SpillUU < Top.Max.Y && Fall.Y - Fall.SpillUU > Top.Max.Y - 120.0);
+      TestTrue(Id + TEXT(": above the T2 lip"), Fall.TopZ > S08Diorama::T2LipTopZMax);
+      if (!FPackageName::DoesPackageExist(PackageOf(Fall.Material))) {
+        AddWarning(FString::Printf(TEXT("%s not imported (tools/art/env_kit/ue_import_env_ground.py): the fall stays off"),
+                                   *PackageOf(Fall.Material)));
+        continue;
+      }
+      UMaterialInstance* FallMi = LoadObject<UMaterialInstance>(nullptr, *Fall.Material);
+      if (!TestNotNull(Id + TEXT(": MI loads"), FallMi)) continue;
+      TestTrue(Id + TEXT(": MI parent M_EnvWaterfall"),
+               FallMi->Parent && FallMi->Parent->GetPathName() == TEXT("/Game/EnvKit/Ground/M_EnvWaterfall.M_EnvWaterfall"));
+      UTexture* Ripple = nullptr;
+      TestTrue(Id + TEXT(": WaterRippleN bound"),
+               FallMi->GetTextureParameterValue(FHashedMaterialParameterInfo(TEXT("WaterRippleN")), Ripple) && Ripple);
+    }
     const FString Pkg = PackageOf(G.Material);
     if (!FPackageName::DoesPackageExist(Pkg)) {
       AddWarning(FString::Printf(TEXT("%s not imported (tools/art/env_kit/ue_import_env_ground.py): the map's ground stays off"), *Pkg));
@@ -431,7 +707,7 @@ bool FS08EnvGroundShippedTest::RunTest(const FString&) {
     if (!TestNotNull(Key + TEXT(": MI loads"), Mi)) continue;
     TestTrue(Key + TEXT(": MI parent M_EnvGround"),
              Mi->Parent && Mi->Parent->GetPathName() == TEXT("/Game/EnvKit/Ground/M_EnvGround.M_EnvGround"));
-    TArray<FString> TextureParams = {TEXT("Splat")};
+    TArray<FString> TextureParams = {TEXT("Splat"), TEXT("Aux"), TEXT("WaterRippleN")};
     for (int32 I = 0; I < 4; ++I) {
       for (const TCHAR* K : {TEXT("BC"), TEXT("N"), TEXT("ORMH")}) TextureParams.Add(FString::Printf(TEXT("L%d_%s"), I, K));
     }
@@ -439,8 +715,8 @@ bool FS08EnvGroundShippedTest::RunTest(const FString&) {
       UTexture* Bound = nullptr;
       TestTrue(FString::Printf(TEXT("%s: %s bound"), *Key, *Name),
                Mi->GetTextureParameterValue(FHashedMaterialParameterInfo(*Name), Bound) && Bound != nullptr);
-      if (Name == TEXT("Splat") && Bound) {
-        TestTrue(Key + TEXT(": splat linear RGBA8 (TC_VectorDisplacementmap)"),
+      if ((Name == TEXT("Splat") || Name == TEXT("Aux")) && Bound) {
+        TestTrue(Key + TEXT(": ") + Name + TEXT(" linear RGBA8 (TC_VectorDisplacementmap)"),
                  !Bound->SRGB && Bound->CompressionSettings == TC_VectorDisplacementmap);
       }
     }
