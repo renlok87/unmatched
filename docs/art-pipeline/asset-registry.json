@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "registryId": "unmatched-mvp-3d-asset-registry",
-  "snapshotDate": "2026-09-30",
+  "snapshotDate": "2026-10-01",
   "language": "ru",
   "purpose": "Машиночитаемый реестр обязательных 3D-ассетов MVP: источники, стадия, владение файлами, следующий шаг, блокер, критерий готовности. Реестр пайплайна; не заменяет нормативный 06-asset-manifest.csv и не меняет статусы бэклога.",
   "validator": "tools/tripo-pipeline/validate_registry.py",
@@ -186,7 +186,7 @@
       "paths": [
         {"path": "docs/art-pipeline/material-library/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "архитектура библиотеки материалов UM v1: классы, LUT, детали, износ"},
         {"path": "docs/art-pipeline/material-library/um-material-presets-v1.json", "root": "repo", "kind": "file", "expect": "exists", "role": "пресеты классов (числа + источники)", "sha256": "863a3c2f5457e0f6352a4ce600e9ee17b79a92badcdc1a5f654a79784cd197e7"},
-        {"path": "docs/art-pipeline/material-library/sources.json", "root": "repo", "kind": "file", "expect": "exists", "role": "сопоставление CC0-наборов с классами, измерения (22 ambientCG v1; с b9240524 — 32, +10 для ENV-MAPS, ENV-U5)", "sha256": "3cd88e8d292698858c9fa826b130d6fc94be9e865067ee7d586e05c4b8f45871"},
+        {"path": "docs/art-pipeline/material-library/sources.json", "root": "repo", "kind": "file", "expect": "exists", "role": "сопоставление CC0-наборов с классами, измерения (22 ambientCG v1; с b9240524 — 32, +10 для ENV-MAPS, ENV-U5; перепин после 2fa377f8 — процедурный класс water_ripple, ENV-MAPS P4)", "sha256": "7f17683c945adfeb7cf769c57b0c07cf44da5a745f19e2c10af860707e6edf8b"},
         {"path": "art/material-library/cc0-raw/manifest.json", "root": "repo", "kind": "file", "expect": "exists", "role": "манифест сырья CC0 (само сырьё не коммитится); перепин после b9240524 (+10 наборов ENV-MAPS)", "sha256": "b548a6b7c1a88031622b3b0d26bc7708fb349d2129ab5b85965dcee619130a79"},
         {"path": "art/material-library/v1/textures-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт тайлов: sha256, конвенция, швы, измерения", "sha256": "fddc9c5d3b2b6ec2b4fe57cb08b2ad1c1f6ed67ecdbac346457be5f2a1a54b65"},
         {"path": "art/material-library/v1/preview/tiles-sheet.png", "root": "repo", "kind": "file", "expect": "exists", "role": "контактный лист тайлов", "sha256": "ce5df3c8b605e487d92fdf8341f28d8b1c9db33985240b7f3a772bde1206897c"},
@@ -2249,10 +2249,52 @@
             {"path": "docs/game-design/evidence/GD-058/interim-2026-09-30/package-2026-09-30.md", "root": "repo", "kind": "file", "expect": "exists", "role": "6B: состав пака (TableBase в паке)"}
           ],
           "note": "Флаг -ArtPreviewDiorama (только вместе с -ArtPreview): компонент ArtDioramaTray на акторе доски, NoCollision, подгонка S08Diorama::FitTray (кайма 50 uu, Z не масштабируется, верх −3). Кук: DirectoriesToAlwaysCook /Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31. Packaged Development: 5c-B2 (bd60e1e4) — три доски с героями v2, поднос виден на всех кадрах; 6B (c52b96c6) — набор B приёмки GD-058 interim, на всех клиентах tray=SM_TableBase, missing/hidden нет; Cobble 656×756×150, Sherwood 948×648×150, T. Rex 848×648×150. Герои v2 + поднос: +4 % GPU на K1, +7,5 % на K2 5×. Художественной приёмки нет."
+        },
+        {
+          "layer": "blender-candidate + ue-editor-import T2 (ENV-MAPS P2, 20261001-tray-t2)",
+          "stage": "ue-editor-frames",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20261001-tray-t2/reports/build-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "сборка T2 в Blender (build report)"},
+            {"path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20261001-tray-t2/reports/tray-t2-params.json", "root": "repo", "kind": "file", "expect": "exists", "role": "параметры T2"},
+            {"path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20261001-tray-t2/reports/fbx-readback.json", "root": "repo", "kind": "file", "expect": "exists", "role": "read-back FBX"},
+            {"path": "tools/art/env_kit/ue_import_tray_t2.py", "root": "repo", "kind": "file", "expect": "exists", "role": "импорт T2 / T2b (--variant)"},
+            {"path": "/Game/PipelineCandidates/TableBase/T2/SM_TableBase_T2", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "UE меш T2"},
+            {"path": "docs/game-design/evidence/ENV-MAPS/p2-frames-2026-10-01/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P2: общий скалистый поднос на досках-картах"}
+          ],
+          "note": "Общий скалистый поднос досок-карт (ENV-U10): halfX 780, halfY 470, offsetY −45, одна модель на обе карты. С P5b — резерв: S08Diorama::LoadTrayT2 берёт T2b, затем T2, затем заглушку T1. Сеточные доски (Cobble) остаются на SM_TableBase с FitTray."
+        },
+        {
+          "layer": "blender-candidate T2b (ENV-MAPS P5, линия K, 20261001-tray-t2b)",
+          "stage": "blender-candidate",
+          "status": "измерено",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20261001-tray-t2b/reports/build-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "сборка T2b в Blender (build report)"},
+            {"path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20261001-tray-t2b/reports/tray-t2b-params.json", "root": "repo", "kind": "file", "expect": "exists", "role": "параметры T2b"},
+            {"path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20261001-tray-t2b/reports/south-profile.json", "root": "repo", "kind": "file", "expect": "exists", "role": "профиль южной губы (вход водопада)"},
+            {"path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20261001-tray-t2b/reports/textures-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "текстуры мха (report)"}
+          ],
+          "note": "Верх как у T2 (1560 × 940 uu на Z −3), глубина скалы 212,7 uu, рваный низ, свес губы 23 uu по сторонам, мох по vertex colour (R), 19 278 tris."
+        },
+        {
+          "layer": "ue-editor-import + live-packaged T2b /Game/PipelineCandidates/TableBase/T2b (MI по карте)",
+          "stage": "live-packaged-probe",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "/Game/PipelineCandidates/TableBase/T2b/SM_TableBase_T2b", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "UE меш T2b"},
+            {"path": "unreal/Unmatched/Source/Unmatched/S08/S08Diorama.h", "root": "repo", "kind": "file", "expect": "exists", "role": "LoadTrayT2: T2b → T2 → T1, MI по карте"},
+            {"path": "docs/game-design/evidence/ENV-MAPS/p5b-tray-water-2026-10-01/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P5 трек B: импорт T2b, M_TableBase_T2b"},
+            {"path": "docs/game-design/evidence/ENV-MAPS/p6-live-2026-10-01/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P6: packaged-сборка и живые партии"},
+            {"path": "docs/game-design/evidence/ENV-MAPS/p6-live-2026-10-01/marmoreal/k3/combat-20261001-174551/combat-client-host.trace.log", "root": "repo", "kind": "file", "expect": "exists", "role": "P6: трасса `tray-t2 loaded mesh=…/SM_TableBase_T2b`, kind=T2b"}
+          ],
+          "note": "MI_TableBase_T2b_Marmoreal — мох и лепестки; MI_TableBase_T2b_Sarpedon — тёмный влажный камень, мох 0,9 → 0,38 в P5c. Кук: DirectoriesToAlwaysCook /Game/PipelineCandidates/TableBase/T2b. На 0,65× юбка занимает 5,3 % высоты кадра против 8–12 % концепта; глубина подноса отложена до приёмки (ENV-U14)."
         }
       ],
       "manifest06": {"verificationStatusIn06": "planned", "drift": "Нет расхождения.", "proposedChange": "Нет."},
-      "nextStep": "Художественная приёмка подноса человеком (кромка, тон камня, почти чёрная юбка скалы в свете Cobble — нужен свет/заливка диорамы или решение «так и надо»); масштаб и неравномерность подноса под оригинальные карты сессии ENV-MAPS; build-профиль table-base-static-um-fbx-v1 и CLI ue-import (pivot_base_centre) — привести к реальному контуру.",
+      "nextStep": "Художественная приёмка подноса человеком (кромка, тон камня, почти чёрная юбка скалы в свете Cobble — нужен свет/заливка диорамы или решение «так и надо»); на оригинальных картах — общий поднос T2b (ENV-MAPS P5b), его глубина отложена до художественной приёмки (ENV-U14); build-профиль table-base-static-um-fbx-v1 и CLI ue-import (pivot_base_centre) — привести к реальному контуру.",
       "blocker": "Художественной приёмки нет (GD-058 принят только промежуточно, без окружения и оригинальных карт); габарит финальной доски (AD-OPEN-36); слоты 04 §3.6 (AD-CNF-18): у M_DioramaMaster нет текстурных параметров, поэтому MI на M_UM_Figure.",
       "doneCriteria": "На K1 за краем нет читаемых объектов; нет z-fighting с доской; кайма 40–60 uu (предложено).",
       "acceptanceEvidence": [],
@@ -2601,6 +2643,446 @@
       "plannedPaths": [
         {"path": "blender/ASSET-PLACEHOLDER-MANNEQUIN", "root": "repo", "kind": "file", "expect": "planned", "role": "каталог по 04 §3.10"}
       ]
+    },
+    {
+      "id": "ASSET-ENV-KIT-001",
+      "name": "Кит окружения ENV-MAPS: пропсы Tripo (P1 — 14, P5 — 8), земля и раскладки по периметру карт Marmoreal и Sarpedon",
+      "category": "modular-environment",
+      "contentKey": null,
+      "manifest06Row": null,
+      "backlog": ["ART-009"],
+      "parent": null,
+      "instances": 1,
+      "status": "технически импортировано",
+      "stage": "live-packaged-probe",
+      "ownership": {"existingFiles": "pipeline", "nextCandidates": "pipeline", "acceptance": "art-chat"},
+      "sourceImages": {
+        "selectionManifest": {"path": "art/imagegen/env-v1/concepts/manifest.json", "root": "repo", "kind": "file", "expect": "exists", "role": "концепты окружения ENV-U8: Marmoreal v1, Sarpedon v2"},
+        "recommended": [],
+        "excludedCandidates": [],
+        "note": "Сами концепты вне git (scraped-data/derived/concepts/env-v1/): в них оригинальные карты (ENV-U3/U7). Мультивидовые референсы P5 — промпт и скрипт в art/imagegen/env-v1/p5-assets/."
+      },
+      "source3d": [],
+      "layers": [
+        {
+          "layer": "tripo-source + blender-candidate P1 20260930-tripo-h31 (14 пропсов: Marmoreal v1, Sarpedon v2)",
+          "stage": "blender-candidate",
+          "status": "измерено",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20260930-tripo-h31/reports/tripo-run.json", "root": "repo", "kind": "file", "expect": "exists", "role": "Tripo H3.1: задачи, sha256, кредиты (1470)"},
+            {"path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20260930-tripo-h31/reports/build-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "Blender headless UM_FBX_v1: габариты, pivot, 2K BC/N/ORM (build report)"},
+            {"path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20260930-tripo-h31/reports/orientation-check.json", "root": "repo", "kind": "file", "expect": "exists", "role": "проверка ориентации"},
+            {"path": "docs/art-pipeline/evidence/ENV-MAPS/credits-ledger-env.json", "root": "repo", "kind": "file", "expect": "exists", "role": "журнал кредитов трека ENV-MAPS"}
+          ],
+          "note": "Tripo H3.1 multi-view → Quad-ретопология → Smart UV → текстура 2K → PBR, по 105 кредитов, 1470 всего (ENV-U4). Исходные GLB вне git. После P5c в основной раскладке нет ENV-M-CHERRY и ENV-S-TREE: их заменили деревья паков Fab (ENV-U13)."
+        },
+        {
+          "layer": "tripo-source + blender-candidate P5 20261001-tripo-h31-p5 (8 ассетов)",
+          "stage": "blender-candidate",
+          "status": "измерено",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/reports/tripo-run.json", "root": "repo", "kind": "file", "expect": "exists", "role": "Tripo H3.1: задачи, sha256, кредиты (840)"},
+            {"path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/reports/build-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "Blender headless UM_FBX_v1 (build report)"},
+            {"path": "art/imagegen/env-v1/p5-assets/prompt-p5.txt", "root": "repo", "kind": "file", "expect": "exists", "role": "промпт мультивидовых референсов P5"}
+          ],
+          "note": "Codex imagegen, 4 вида → Tripo H3.1, 840 кредитов (баланс 22380 → 21540). В раскладку вошли 7: бочка, штабель ящиков, фонарный столб, знамя, скала (Sarpedon), балюстрада, клумба с изгородью (Marmoreal). ENV-M-CHERRY-V2 не ставился (ENV-U13)."
+        },
+        {
+          "layer": "ue-editor-import /Game/EnvKit/{Marmoreal,Sarpedon} на M_EnvProp",
+          "stage": "ue-editor-frames",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "tools/art/env_kit/ue_import_env_kit.py", "root": "repo", "kind": "file", "expect": "exists", "role": "импорт кита коммандлетом"},
+            {"path": "/Game/EnvKit/Shared/M_EnvProp", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "мастер пропсов окружения"},
+            {"path": "/Game/EnvKit/Marmoreal", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "меши, текстуры и MI Marmoreal"},
+            {"path": "/Game/EnvKit/Sarpedon", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "меши, текстуры и MI Sarpedon"},
+            {"path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/scripts/env-prop-look.json", "root": "repo", "kind": "file", "expect": "exists", "role": "вид пропсов: MI на M_EnvProp (env_prop_look.py)"},
+            {"path": "docs/game-design/evidence/ENV-MAPS/p4-polish-2026-10-01/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P4: вид кита, кадры editor -Bench на эталоне RENDER"}
+          ],
+          "note": "Content вне git: импорт скриптом в каждой копии. Кадры editor -game -Bench на эталоне RENDER — P2, P4, P5b, P5c."
+        },
+        {
+          "layer": "ground: CC0-сплат M_EnvGround, вода устьев реки Sarpedon (ENV-U10)",
+          "stage": "ue-editor-frames",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-ENV-KIT-001/ground/ground-params.json", "root": "repo", "kind": "file", "expect": "exists", "role": "параметры земли, воды и вида подноса T2b по картам"},
+            {"path": "tools/art/env_kit/ue_import_env_ground.py", "root": "repo", "kind": "file", "expect": "exists", "role": "импорт M_EnvGround / M_EnvWaterfall / M_EnvSea и MI"},
+            {"path": "/Game/EnvKit/Ground/M_EnvGround", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "мастер земли (сплат)"},
+            {"path": "docs/game-design/evidence/ENV-MAPS/p2-frames-2026-10-01/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P2: тематическая земля и ночной свет"}
+          ],
+          "note": "Runtime-полосы S08EnvGround между рамкой и краем подноса: Marmoreal — мостовая, тёмная земля, лепестки; Sarpedon — подстилка, песок, галька, палуба, вода в устьях. Наборы — библиотека CC0 (ENV-U5)."
+        },
+        {
+          "layer": "live-packaged: раскладки EnvLayouts в packaged P3 / P5a / P6",
+          "stage": "live-packaged-probe",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "unreal/Unmatched/Config/ArtBoards/EnvLayouts/marmoreal.layout.json", "root": "repo", "kind": "file", "expect": "exists", "role": "раскладка Marmoreal: 64 пропа, 5 огней, 10 fx"},
+            {"path": "unreal/Unmatched/Config/ArtBoards/EnvLayouts/sarpedon.layout.json", "root": "repo", "kind": "file", "expect": "exists", "role": "раскладка Sarpedon: 54 пропа, 5 огней, 8 fx"},
+            {"path": "tools/art/env_kit/layout_check.py", "root": "repo", "kind": "file", "expect": "exists", "role": "проверка: пропсы не закрывают круги, бюджет света"},
+            {"path": "docs/game-design/evidence/ENV-MAPS/p3-packaged-2026-10-01/bench/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P3: packaged -Bench, стоимость окружения"},
+            {"path": "docs/game-design/evidence/ENV-MAPS/p6-live-2026-10-01/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P6: packaged-сборка и живые партии на обеих картах"},
+            {"path": "docs/game-design/evidence/ENV-MAPS/p6-live-2026-10-01/marmoreal/k3/combat-20261001-174551/combat-client-host.trace.log", "root": "repo", "kind": "file", "expect": "exists", "role": "P6: трасса клиента Marmoreal (envlayout missingMeshes=0)"}
+          ],
+          "note": "P6 packaged (кук 1112 / 1112, 0 ошибок): у клиентов живых партий `envlayout map=… missingMeshes=0`. layout_check 0 ERROR / 0 WARN. GPU окружения на K1: P3 +0,41…+0,46 мс, P5a +0,54…+0,58 мс к Cobble; после P5b/P5c render_bench.py не запускался."
+        }
+      ],
+      "manifest06": {"verificationStatusIn06": "нет строки", "drift": "В 06 нет строки: ассеты окружения оригинальных карт появились в треке ENV-MAPS (поправка D-03, 2026-09-30); ASSET-DECOR-KIT-001 в 06 описывает декор Cobble.", "proposedChange": "Предложено: строки 06 для окружения оригинальных карт — после художественной приёмки GD-058."},
+      "nextStep": "Художественная приёмка досок-карт — GD-058, решение пользователя. Замер render_bench.py (packaged -Bench) после P5b/P5c. Открытые пункты — бэклог ART-009 и раздел «Итог» ENV-MAPS-PLAN.md.",
+      "blocker": "Художественной приёмки нет (GD-058 — решение пользователя).",
+      "doneCriteria": "Пропсы не закрывают круги карты на всех зумах (layout_check 0 ERROR / 0 WARN); свет в бюджете 1 ключ + 6 точек; решение пользователя по GD-058.",
+      "acceptanceEvidence": [],
+      "evidence": [
+        {"path": "docs/art-pipeline/ENV-MAPS-PLAN.md", "root": "repo", "kind": "file", "expect": "exists", "role": "план и итог трека ENV-MAPS"},
+        {"path": "docs/game-design/decisions/2026-09-30-env-original-maps-decisions.md", "root": "repo", "kind": "file", "expect": "exists", "role": "решения пользователя ENV-U0…U14"},
+        {"path": "docs/game-design/evidence/ENV-MAPS/p5b-assets-2026-10-01/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P5b: новые ассеты на диорамах, замеры"},
+        {"path": "docs/game-design/evidence/ENV-MAPS/p5c-fab-2026-10-01/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P5c: паки Fab, финальные кадры, замеры"}
+      ],
+      "plannedPaths": []
+    },
+    {
+      "id": "ASSET-ENV-KIT-001.FAB",
+      "name": "Производные паков Fab в основной раскладке: /Game/EnvKit/Fab (меши, ночные MI) и /Game/EnvKit/FX (Niagara)",
+      "category": "modular-environment",
+      "contentKey": null,
+      "manifest06Row": null,
+      "backlog": ["ART-009"],
+      "parent": "ASSET-ENV-KIT-001",
+      "instances": 1,
+      "status": "технически импортировано",
+      "stage": "live-packaged-probe",
+      "ownership": {"existingFiles": "pipeline", "nextCandidates": "pipeline", "acceptance": "art-chat"},
+      "sourceImages": {
+        "selectionManifest": null,
+        "recommended": [],
+        "excludedCandidates": [],
+        "note": "Только паки с разрешённым ИИ (ENV-U13/U14). Лицензии и атрибуция CC BY 4.0 — docs/art-pipeline/CREDITS-fab.md. Паки лежат в gitignored Content/<Pack>/ и не изменялись; производные — только в /Game/EnvKit/Fab и /Game/EnvKit/FX."
+      },
+      "source3d": [],
+      "layers": [
+        {
+          "layer": "ue-editor-import /Game/EnvKit/Fab (20 мешей, ночные MI envfab-2)",
+          "stage": "ue-editor-frames",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "tools/art/env_kit/ue_import_fab_picks.py", "root": "repo", "kind": "file", "expect": "exists", "role": "импорт дубликатов мешей и обёрток ночного вида (NightTint)"},
+            {"path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-fab-p5c/scripts/fab-picks.json", "root": "repo", "kind": "file", "expect": "exists", "role": "выбор мешей паков и ночные MI"},
+            {"path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-fab-p5c/README-track-F.md", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт трека F (пропсы Fab)"},
+            {"path": "/Game/EnvKit/Fab", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "производные ассеты паков Fab"},
+            {"path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-fab-p5c/reports/p5c-layout-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "раскладка пропсов P5c (report)"}
+          ],
+          "note": "Stylized Environment - Forest: розовые деревья вместо сакуры Marmoreal, тёмные дубы и кусты Sarpedon. Fantasy_Forest: лес и мокрые камни Sarpedon. Vine_Plants: плющ на задней стене, аркаде, частоколе и руине. Stylized Flowers Pots: вазоны, клумбы, лаванда."
+        },
+        {
+          "layer": "ue-editor-import /Game/EnvKit/FX (4 системы Niagara)",
+          "stage": "ue-editor-frames",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "tools/art/env_kit/ue_import_fab_fx.py", "root": "repo", "kind": "file", "expect": "exists", "role": "импорт систем Niagara под /Game/EnvKit/FX"},
+            {"path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-fab-p5c/README-fx.md", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт трека V (VFX)"},
+            {"path": "/Game/EnvKit/FX/NS_Env_Campfire", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "огонь костров"},
+            {"path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-fab-p5c/reports/p5c-fx-layout-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "раскладка fx (report)"}
+          ],
+          "note": "Stylish Fire VFX: огонь костров и пламя фонарей. Free Niagara Particles (CC BY 4.0): лепестки, светлячки. CPU-симуляция, без световых рендереров, детерминированный seed, в -Bench заморожены. Water Materials (CC BY 4.0) — текстуры M_EnvSea и M_EnvWaterfall (запись ASSET-ENV-S-WATERFALL-001). Particles and Wind Control System скачан, но не используется (Cascade и точечный свет)."
+        },
+        {
+          "layer": "live-packaged P6",
+          "stage": "live-packaged-probe",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "docs/game-design/evidence/ENV-MAPS/p6-live-2026-10-01/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P6: кук подтягивает паки по жёстким ссылкам из /Game/EnvKit"},
+            {"path": "docs/game-design/evidence/ENV-MAPS/p6-live-2026-10-01/sarpedon/k3/combat-20261001-175646/combat-client-host.trace.log", "root": "repo", "kind": "file", "expect": "exists", "role": "P6: трасса клиента Sarpedon (envlayout fx missingSystems=0)"}
+          ],
+          "note": "Packaged-сборка P6: кук 1112 / 1112, 0 ошибок; у клиентов живых партий строки `envlayout fx … missingSystems=0`."
+        }
+      ],
+      "manifest06": {"verificationStatusIn06": "нет строки", "drift": "Сторонние паки в 06 не учитываются.", "proposedChange": "Нет: учёт паков и лицензий — docs/art-pipeline/CREDITS-fab.md."},
+      "nextStep": "Художественная приёмка (GD-058, решение пользователя). Кроны розовых деревьев Forest крупные и гранёные — это геометрия меша пака, вопрос приёмки.",
+      "blocker": "Художественной приёмки нет (GD-058 — решение пользователя).",
+      "doneCriteria": "В основной раскладке только паки с разрешённым ИИ (NoAI нет: ue_import_user_fab.py --check, layout_check); атрибуция CC BY записана; паки в Content/<Pack>/ не изменены.",
+      "acceptanceEvidence": [],
+      "evidence": [
+        {"path": "docs/art-pipeline/CREDITS-fab.md", "root": "repo", "kind": "file", "expect": "exists", "role": "реестр паков Fab, лицензии, атрибуция CC BY 4.0"},
+        {"path": "docs/art-pipeline/fab-free-assets-research-2026-10-01.md", "root": "repo", "kind": "file", "expect": "exists", "role": "ресёрч бесплатных паков Fab"},
+        {"path": "docs/game-design/evidence/ENV-MAPS/p5c-fab-2026-10-01/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P5c: что из какого пака, замеры"}
+      ],
+      "plannedPaths": []
+    },
+    {
+      "id": "ASSET-ENV-KIT-001.USERFAB",
+      "name": "NoAI-вариант раскладки для пользователя: /Game/EnvKit/UserFab (Megaplants: Yoshino Cherry, камни StyleHex)",
+      "category": "modular-environment",
+      "contentKey": null,
+      "manifest06Row": null,
+      "backlog": ["ART-009"],
+      "parent": "ASSET-ENV-KIT-001",
+      "instances": 1,
+      "status": "технически импортировано",
+      "stage": "live-packaged-probe",
+      "ownership": {"existingFiles": "pipeline", "nextCandidates": "pipeline", "acceptance": "art-chat"},
+      "sourceImages": {
+        "selectionManifest": null,
+        "recommended": [],
+        "excludedCandidates": [],
+        "note": "Паки NoAI (Megaplant_Library, StyleHex_Studio): их текстуры, превью и кадры ИИ не открывает; агенты работают с ними только как с путями и техническими данными UE (ENV-U14). Лицензии — docs/art-pipeline/CREDITS-fab.md."
+      },
+      "source3d": [],
+      "layers": [
+        {
+          "layer": "ue-editor-import /Game/EnvKit/UserFab (ue_import_user_fab.py)",
+          "stage": "ue-editor-import",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "tools/art/env_kit/ue_import_user_fab.py", "root": "repo", "kind": "file", "expect": "exists", "role": "импорт производных NoAI-паков (коммандлет), --check"},
+            {"path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-fab-p5c/scripts/user-fab.json", "root": "repo", "kind": "file", "expect": "exists", "role": "спецификация /Game/EnvKit/UserFab"},
+            {"path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-fab-p5c/reports/p5c-user-fab-import-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "отчёт импорта: габариты, треугольники, зависимости (report)"},
+            {"path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-fab-p5c/README-user-variant.md", "root": "repo", "kind": "file", "expect": "exists", "role": "вариант «для пользователя»: правило NoAI, состав, проверки"},
+            {"path": "/Game/EnvKit/UserFab", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "производные NoAI-паков"}
+          ],
+          "note": "Yoshino Cherry — статические меши Nanite без экспериментальных плагинов; камни StyleHex. Стоят только в оверлеях <map>.user.layout.json; основная раскладка их не содержит."
+        },
+        {
+          "layer": "live-packaged P6 (проверка только по трассе)",
+          "stage": "live-packaged-probe",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "unreal/Unmatched/Config/ArtBoards/EnvLayouts/marmoreal.user.layout.json", "root": "repo", "kind": "file", "expect": "exists", "role": "оверлей Marmoreal (Yoshino)"},
+            {"path": "unreal/Unmatched/Config/ArtBoards/EnvLayouts/sarpedon.user.layout.json", "root": "repo", "kind": "file", "expect": "exists", "role": "оверлей Sarpedon (камни StyleHex)"},
+            {"path": "tools/s08/Unmatched-Yoshino.cmd", "root": "repo", "kind": "file", "expect": "exists", "role": "запуск packaged-клиента с -EnvLayoutVariant=user двойным щелчком"},
+            {"path": "docs/game-design/evidence/ENV-MAPS/p6-live-2026-10-01/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P6: NoAI-вариант в packaged"}
+          ],
+          "note": "Unmatched.exe -Bench … -EnvLayoutVariant=user на обеих картах: `envlayout variant=user`, missingMeshes=0 (Marmoreal 64 пропа, Sarpedon 54), строка RENDER на эталоне. Кадры вне git (C:/tmp/envmaps-research/p6/user-variant-for-user/), ИИ их не открывал."
+        }
+      ],
+      "manifest06": {"verificationStatusIn06": "нет строки", "drift": "Сторонние паки в 06 не учитываются.", "proposedChange": "Нет."},
+      "nextStep": "Просмотр варианта пользователем (кадры вне git или запуск tools/s08/Unmatched-Yoshino.cmd). ИИ внешний вид не оценивает.",
+      "blocker": "Внешний вид варианта не оценивал никто, кроме пользователя (правило NoAI).",
+      "doneCriteria": "Основная раскладка не содержит NoAI-ассетов; вариант включается только флагом -EnvLayoutVariant=user; missingMeshes=0 на обеих картах.",
+      "acceptanceEvidence": [],
+      "evidence": [
+        {"path": "docs/art-pipeline/CREDITS-fab.md", "root": "repo", "kind": "file", "expect": "exists", "role": "реестр паков Fab, отметка NoAI"},
+        {"path": "docs/game-design/decisions/2026-09-30-env-original-maps-decisions.md", "root": "repo", "kind": "file", "expect": "exists", "role": "ENV-U13/U14: правило NoAI, флаг варианта"}
+      ],
+      "plannedPaths": []
+    },
+    {
+      "id": "ASSET-MAP-FRAME-002",
+      "name": "Тяжёлая модульная рамка карты frame-002 (доски-карты Marmoreal и Sarpedon)",
+      "category": "board",
+      "contentKey": null,
+      "manifest06Row": null,
+      "backlog": ["ART-009"],
+      "parent": null,
+      "instances": 1,
+      "status": "технически импортировано",
+      "stage": "live-packaged-probe",
+      "ownership": {"existingFiles": "pipeline", "nextCandidates": "pipeline", "acceptance": "art-chat"},
+      "sourceImages": {
+        "selectionManifest": null,
+        "recommended": [],
+        "excludedCandidates": [],
+        "note": "Параметрический ассет Blender (линия K, пробел 9 концепт-ревью P2); Tripo не нужен."
+      },
+      "source3d": [],
+      "layers": [
+        {
+          "layer": "blender-candidate 20261001-frame-v1 (4 модуля, 20 инстансов на доску)",
+          "stage": "blender-candidate",
+          "status": "измерено",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-MAP-FRAME-002/20261001-frame-v1/reports/build-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "сборка и read-back FBX (build report)"},
+            {"path": "art/pipeline-candidates/ASSET-MAP-FRAME-002/20261001-frame-v1/reports/frame-layout.json", "root": "repo", "kind": "file", "expect": "exists", "role": "раскладка 20 модулей"},
+            {"path": "art/pipeline-candidates/ASSET-MAP-FRAME-002/20261001-frame-v1/reports/frame-params.json", "root": "repo", "kind": "file", "expect": "exists", "role": "параметры профиля"},
+            {"path": "art/pipeline-candidates/ASSET-MAP-FRAME-002/20261001-frame-v1/reports/textures-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "текстуры железа (report)"},
+            {"path": "art/pipeline-candidates/ASSET-MAP-FRAME-002/scripts/frame_build.py", "root": "repo", "kind": "file", "expect": "exists", "role": "сборка в Blender"}
+          ],
+          "note": "Проём = карта 891,333 × 577,333 uu, дерево ровно до FrameHalf 469,667 × 312,667; профиль от −10 до +12,4 uu; L-скобы и полосы с заклёпками. Модули 584–1030 tris, около 14,4k на доску."
+        },
+        {
+          "layer": "ue-editor-import /Game/EnvMaps/Frame",
+          "stage": "ue-editor-frames",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "tools/art/env_kit/ue_import_map_frame.py", "root": "repo", "kind": "file", "expect": "exists", "role": "импорт модулей и MI железа"},
+            {"path": "/Game/EnvMaps/Frame/SM_MapFrame002_Corner", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "угловой модуль"},
+            {"path": "/Game/EnvMaps/Frame/MI_MapFrame002_Iron", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "MI железа на M_EnvProp"},
+            {"path": "art/pipeline-candidates/ASSET-MAP-FRAME-002/20261001-frame-v1/reports/frame-iron-look.json", "root": "repo", "kind": "file", "expect": "exists", "role": "вид железа"},
+            {"path": "docs/game-design/evidence/ENV-MAPS/p5b-assets-2026-10-01/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P5b: рамка в кадре, замер «стальных» пикселей"}
+          ],
+          "note": "Слот 0 — MID M_MapFrameWood (профиль frameWood), слот 1 — MI_MapFrame002_Iron (V ×2,0 после Tune P5b). Сеточные доски рамку не получают."
+        },
+        {
+          "layer": "live-packaged P6",
+          "stage": "live-packaged-probe",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "docs/game-design/evidence/ENV-MAPS/p6-live-2026-10-01/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P6: packaged-сборка и живые партии"},
+            {"path": "docs/game-design/evidence/ENV-MAPS/p6-live-2026-10-01/marmoreal/k3/combat-20261001-174551/combat-client-host.trace.log", "root": "repo", "kind": "file", "expect": "exists", "role": "P6: трасса `ARTPREVIEW map frame kit=frame-002 parts=20 … exactFit=1`"}
+          ],
+          "note": "У клиентов живых партий обеих карт: 20 модулей, stretch 1,0, exactFit=1."
+        }
+      ],
+      "manifest06": {"verificationStatusIn06": "нет строки", "drift": "В 06 нет строки для рамки досок-карт (трек ENV-MAPS).", "proposedChange": "Предложено: строка 06 после художественной приёмки GD-058."},
+      "nextStep": "Художественная приёмка. Ширина бруса 24 uu закреплена FrameHalf (иначе сдвинутся камера и раскладки); её изменение отложено до приёмки (ENV-U14).",
+      "blocker": "Художественной приёмки нет (GD-058 — решение пользователя).",
+      "doneCriteria": "Проём совпадает с картой, модули без растяжения (exactFit=1), рамка не закрывает круги.",
+      "acceptanceEvidence": [],
+      "evidence": [
+        {"path": "docs/game-design/evidence/ENV-MAPS/p5k-blender-assets-2026-10-01/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P5 линия K: ассеты из Blender"}
+      ],
+      "plannedPaths": []
+    },
+    {
+      "id": "ASSET-ENV-M-BACKWALL-001",
+      "name": "Задняя мраморная стена дворца Marmoreal (модули BayDoor, BayWindows, Centre)",
+      "category": "modular-environment",
+      "contentKey": null,
+      "manifest06Row": null,
+      "backlog": ["ART-009"],
+      "parent": "ASSET-ENV-KIT-001",
+      "instances": 5,
+      "status": "технически импортировано",
+      "stage": "live-packaged-probe",
+      "ownership": {"existingFiles": "pipeline", "nextCandidates": "pipeline", "acceptance": "art-chat"},
+      "sourceImages": {
+        "selectionManifest": null,
+        "recommended": [],
+        "excludedCandidates": [],
+        "note": "Параметрический ассет Blender (линия K, пробелы 12 и 14 концепт-ревью P2); Tripo не нужен."
+      },
+      "source3d": [],
+      "layers": [
+        {
+          "layer": "blender-candidate 20261001-backwall-v1",
+          "stage": "blender-candidate",
+          "status": "измерено",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-ENV-M-BACKWALL-001/20261001-backwall-v1/reports/build-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "сборка и read-back FBX (build report)"},
+            {"path": "art/pipeline-candidates/ASSET-ENV-M-BACKWALL-001/20261001-backwall-v1/reports/backwall-layout.json", "root": "repo", "kind": "file", "expect": "exists", "role": "5 позиций в раскладке Marmoreal"},
+            {"path": "art/pipeline-candidates/ASSET-ENV-M-BACKWALL-001/20261001-backwall-v1/reports/backwall-params.json", "root": "repo", "kind": "file", "expect": "exists", "role": "параметры модулей"},
+            {"path": "art/pipeline-candidates/ASSET-ENV-M-BACKWALL-001/scripts/backwall_build.py", "root": "repo", "kind": "file", "expect": "exists", "role": "сборка в Blender"}
+          ],
+          "note": "Модули по ширине ArcadeBay (152,3 uu) и портала (186,0 uu), высота 235 и 255 uu, 9408–9696 tris; ниши окон и двери светятся эмиссив-маской, источников света нет."
+        },
+        {
+          "layer": "ue-editor-import /Game/EnvKit/Marmoreal (SM_Env_BackWall_*, MI_Env_BackWall)",
+          "stage": "ue-editor-frames",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "tools/art/env_kit/ue_import_env_kit.py", "root": "repo", "kind": "file", "expect": "exists", "role": "импорт кита (--names BackWall_*)"},
+            {"path": "/Game/EnvKit/Marmoreal/SM_Env_BackWall_Centre", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "центральный модуль"},
+            {"path": "/Game/EnvKit/Marmoreal/MI_Env_BackWall", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "MI на M_EnvProp, свечение окон"},
+            {"path": "docs/game-design/evidence/ENV-MAPS/p5c-fab-2026-10-01/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P5c: яркость стены и пробел «окна без градиента»"}
+          ],
+          "note": "Tune P5c: камень ×0,52, свечение ×1,2; средняя яркость стены на K1 121,1 → 88,7, окна не перегорают."
+        },
+        {
+          "layer": "live-packaged P6",
+          "stage": "live-packaged-probe",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "docs/game-design/evidence/ENV-MAPS/p6-live-2026-10-01/marmoreal/k3/combat-20261001-174551/combat-client-host.trace.log", "root": "repo", "kind": "file", "expect": "exists", "role": "P6: трасса клиента Marmoreal (5 пропсов BackWall в раскладке)"}
+          ],
+          "note": "Пять модулей стоят в раскладке Marmoreal у клиентов живой партии P6, missingMeshes=0."
+        }
+      ],
+      "manifest06": {"verificationStatusIn06": "нет строки", "drift": "В 06 нет строки: ассеты окружения оригинальных карт появились в треке ENV-MAPS (поправка D-03, 2026-09-30); ASSET-DECOR-KIT-001 в 06 описывает декор Cobble.", "proposedChange": "Предложено: строки 06 для окружения оригинальных карт — после художественной приёмки GD-058."},
+      "nextStep": "Градиент окон: у M_EnvProp нет UV-члена, окна в BC залиты одним цветом — нужна новая функция мастер-материала (градиент по локальной высоте или UV окна) или градиент в T_Env_BackWall_BC/_E. Художественная приёмка.",
+      "blocker": "Нет функции мастер-материала для градиента окон; художественной приёмки нет.",
+      "doneCriteria": "Стена не ярче карты на K1; окна не перегорают; тень стены на поле не попадает.",
+      "acceptanceEvidence": [],
+      "evidence": [
+        {"path": "docs/game-design/evidence/ENV-MAPS/p5k-blender-assets-2026-10-01/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P5 линия K: ассеты из Blender"},
+        {"path": "docs/game-design/evidence/ENV-MAPS/p5b-assets-2026-10-01/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P5b: стена в кадре, перегорание окон"}
+      ],
+      "plannedPaths": []
+    },
+    {
+      "id": "ASSET-ENV-S-WATERFALL-001",
+      "name": "Водопад и море Sarpedon (лист, пена и туман, выступ, кольцо моря)",
+      "category": "modular-environment",
+      "contentKey": null,
+      "manifest06Row": null,
+      "backlog": ["ART-009"],
+      "parent": "ASSET-ENV-KIT-001",
+      "instances": 1,
+      "status": "технически импортировано",
+      "stage": "live-packaged-probe",
+      "ownership": {"existingFiles": "pipeline", "nextCandidates": "pipeline", "acceptance": "art-chat"},
+      "sourceImages": {
+        "selectionManifest": null,
+        "recommended": [],
+        "excludedCandidates": [],
+        "note": "Параметрический ассет Blender (линия K, пробелы 1, 3, 8 концепт-ревью P2); текстуры воды M_EnvSea / M_EnvWaterfall — пак Water Materials (CC BY 4.0, CREDITS-fab.md)."
+      },
+      "source3d": [],
+      "layers": [
+        {
+          "layer": "blender-candidate 20261001-waterfall-v1",
+          "stage": "blender-candidate",
+          "status": "измерено",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-ENV-S-WATERFALL-001/20261001-waterfall-v1/reports/build-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "сборка и read-back FBX (build report)"},
+            {"path": "art/pipeline-candidates/ASSET-ENV-S-WATERFALL-001/20261001-waterfall-v1/reports/waterfall-layout.json", "root": "repo", "kind": "file", "expect": "exists", "role": "позиции листа, пены, выступа и моря"},
+            {"path": "art/pipeline-candidates/ASSET-ENV-S-WATERFALL-001/20261001-waterfall-v1/reports/waterfall-params.json", "root": "repo", "kind": "file", "expect": "exists", "role": "параметры"},
+            {"path": "art/pipeline-candidates/ASSET-ENV-S-WATERFALL-001/scripts/waterfall_build.py", "root": "repo", "kind": "file", "expect": "exists", "role": "сборка в Blender (читает south-profile.json T2b)"}
+          ],
+          "note": "Лист сходит с южной губы T2b: ширина 193,8 → 217 uu, падение 174 uu; пена и туман в точке падения; необязательный выступ; плоское кольцо моря до R 4500 (Col.R — пена у скал, Col.G — затухание). Около 6,8k tris."
+        },
+        {
+          "layer": "ue-editor-import /Game/EnvKit/Ground (меши Sarpedon, M_EnvWaterfall, M_EnvSea)",
+          "stage": "ue-editor-frames",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "tools/art/env_kit/ue_import_env_ground.py", "root": "repo", "kind": "file", "expect": "exists", "role": "импорт мешей и материалов воды"},
+            {"path": "/Game/EnvKit/Ground/Sarpedon/SM_Env_S_Waterfall", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "лист водопада"},
+            {"path": "/Game/EnvKit/Ground/Sarpedon/SM_Env_S_SeaRing", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "кольцо моря"},
+            {"path": "/Game/EnvKit/Ground/M_EnvSea", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "материал моря (graph 2, текстуры Water Materials)"},
+            {"path": "docs/game-design/evidence/ENV-MAPS/p5b-tray-water-2026-10-01/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P5 трек B: поднос T2b, водопад и море"},
+            {"path": "docs/game-design/evidence/ENV-MAPS/p5b-assets-2026-10-01/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P5b: v-переворот листа, доля воды 0,39 → 0,94"}
+          ],
+          "note": "P5b: флаг FallCard.w переворачивает v на мешах линии K (M_EnvWaterfall graph 2). P5c: M_EnvSea graph 2 — прибой, пена, волны на текстурах Water Materials; водопад мягче."
+        },
+        {
+          "layer": "live-packaged P6",
+          "stage": "live-packaged-probe",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "docs/game-design/evidence/ENV-MAPS/p6-live-2026-10-01/sarpedon/k3/combat-20261001-175646/combat-client-host.trace.log", "root": "repo", "kind": "file", "expect": "exists", "role": "P6: трасса клиента Sarpedon (fallMeshes=1 fallMeshParts=3 sea=ok)"}
+          ],
+          "note": "У клиентов живых партий Sarpedon в P6: водопад-меш и море на месте (`sea=ok`)."
+        }
+      ],
+      "manifest06": {"verificationStatusIn06": "нет строки", "drift": "В 06 нет строки: ассеты окружения оригинальных карт появились в треке ENV-MAPS (поправка D-03, 2026-09-30); ASSET-DECOR-KIT-001 в 06 описывает декор Cobble.", "proposedChange": "Предложено: строки 06 для окружения оригинальных карт — после художественной приёмки GD-058."},
+      "nextStep": "Художественная приёмка. Вода, водопад и прибой анимируются нодой Time: для попиксельного совпадения кадров бенча нужны MI с нулевой скоростью (P5c, «Пробелы»).",
+      "blocker": "Художественной приёмки нет (GD-058 — решение пользователя).",
+      "doneCriteria": "Лист не задевает скалу T2b; трасса `sea=ok`; вода за рамкой без «дыр».",
+      "acceptanceEvidence": [],
+      "evidence": [
+        {"path": "docs/game-design/evidence/ENV-MAPS/p5k-blender-assets-2026-10-01/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P5 линия K: ассеты из Blender"},
+        {"path": "docs/game-design/evidence/ENV-MAPS/p5c-fab-2026-10-01/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P5c: море и водопад на Water Materials"}
+      ],
+      "plannedPaths": []
     }
   ]
 }

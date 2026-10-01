@@ -1,7 +1,7 @@
 {
   "schema": "unmatched-plan-status/v1",
-  "generated": "2026-09-30T23:30:00Z",
-  "head": "c52b96c66929f16a44444daf07573424a3b2c18a",
+  "generated": "2026-10-01T13:30:00Z",
+  "head": "59a5e59327b6a01093b92fa0df89a325da1653e1",
   "sources": [
     {
       "id": "handover",
@@ -47,6 +47,11 @@
       "id": "session",
       "path": "git log 2026-09-28..c52b96c6",
       "title": "Коммиты с 2026-09-28 и цель сессии 2026-09-30 (/goal: реестр слоёв, акцент Arthur, 5c-B, волны 6–7); итог — SESSION-CLOSEOUT-2026-09-30.md"
+    },
+    {
+      "id": "env-maps",
+      "path": "docs/art-pipeline/ENV-MAPS-PLAN.md",
+      "title": "План и итог трека ENV-MAPS: доски-диорамы на оригинальных картах Marmoreal и Sarpedon, фазы P0–P6 (2026-09-30…10-01, ветка feat/env-original-maps); решения — docs/game-design/decisions/2026-09-30-env-original-maps-decisions.md"
     }
   ],
   "tasks": [
@@ -1263,16 +1268,17 @@
         "docs/art-pipeline/crate-report.md",
         "docs/art-pipeline/table-base-report.md",
         "docs/game-design/evidence/ART-005/corner-bracket-review-2026-09-28.md",
-        "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30.md"
+        "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30.md",
+        "docs/game-design/evidence/ENV-MAPS/p5c-fab-2026-10-01/README.md"
       ],
-      "next": "Поднос SM_TableBase — «технически импортировано», в игре за -ArtPreviewDiorama (5c-B2, 6B); художественная приёмка подноса (кромка, тон, чёрная юбка в свете Cobble) и масштаб под оригинальные карты — сессия ENV. Фонарь/фасады/ящик — UE-импорт (CLI static-candidate) и размещение по решению окружения ENV.",
+      "next": "Поднос SM_TableBase — «технически импортировано», в игре за -ArtPreviewDiorama (5c-B2, 6B); художественная приёмка подноса (кромка, тон, чёрная юбка в свете Cobble). На оригинальных картах (ENV-MAPS, 2026-10-01) — общий поднос T2b, рамка frame-002 и кит окружения технически импортированы (реестр ASSET-ENV-KIT-001…); их остатки — строка ART-009 бэклога. Фонарь/фасады/ящик декора Cobble — UE-импорт (CLI static-candidate).",
       "blocker": null,
       "assets": [
         "ASSET-DECOR-KIT-001",
         "ASSET-TABLE-BASE-001",
         "ASSET-BOARD-COBBLE-001"
       ],
-      "updated": "2026-09-30T23:30:00Z"
+      "updated": "2026-10-01T13:30:00Z"
     },
     {
       "id": "ART-010",
@@ -1495,10 +1501,11 @@
         "docs/game-design/evidence/GD-058/interim-2026-09-30/qa009-report-2026-09-30.md",
         "docs/game-design/evidence/GD-058/interim-2026-09-30/qa010-report-2026-09-30.md",
         "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/runs-2026-09-30.md",
-        "docs/game-design/evidence/GD-058/interim-2026-09-30/fix-w7/fix-w7-2026-09-30.md"
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/fix-w7/fix-w7-2026-09-30.md",
+        "docs/game-design/evidence/ENV-MAPS/p6-live-2026-10-01/README.md"
       ],
-      "next": "Промежуточно принято по делегированию пользователя (без личного просмотра пользователя; без окружения и оригинальных карт), 2026-09-30 — вердикт панели 4/4, §9 акта GD-058. «Художественно принято» не ставится. Финальный GD-058 — в сессии карт после волны ENV, на диораме оригинальной карты (передано: SESSION-CLOSEOUT-2026-09-30.md). Волна 7 закрыла §8 п. 9 и п. 13 (измерено) и п. 12 (реестр); открыты п. 14–16 (теги на шве/void, разметка зон, отладочный текст HUD), п. 17 (postgres-сьюты), гейт attackType в K3.",
-      "blocker": "ACC-022 на D-07 не измерен (целевого ПК нет); T4.3 не выполнен (пользователь активен); окружение и оригинальные карты — сессия ENV.",
+      "next": "Промежуточно принято по делегированию пользователя (без личного просмотра пользователя; без окружения и оригинальных карт), 2026-09-30 — вердикт панели 4/4, §9 акта GD-058. «Художественно принято» не ставится. Финальный GD-058 — в сессии карт после волны ENV, на диораме оригинальной карты (передано: SESSION-CLOSEOUT-2026-09-30.md). Волна ENV-MAPS P0–P6 закрыта 2026-10-01 (packaged-сборка и живые партии на Marmoreal и Sarpedon); финальная художественная приёмка на досках-картах ждёт решения пользователя. Волна 7 закрыла §8 п. 9 и п. 13 (измерено) и п. 12 (реестр); открыты п. 14–16 (теги на шве/void, разметка зон, отладочный текст HUD), п. 17 (postgres-сьюты), гейт attackType в K3.",
+      "blocker": "ACC-022 на D-07 не измерен (целевого ПК нет); T4.3 не выполнен (пользователь активен); художественная приёмка досок-карт — решение пользователя (ENV-MAPS P0–P6 закрыта 2026-10-01).",
       "assets": [
         "ASSET-MEDUSA-001",
         "ASSET-KING-ARTHUR-001",
@@ -1511,7 +1518,7 @@
         "ASSET-PROPS-CARDS-001",
         "ASSET-PLACEHOLDER-MANNEQUIN"
       ],
-      "updated": "2026-09-30T23:30:00Z",
+      "updated": "2026-10-01T13:30:00Z",
       "note": "2026-09-30: одна сборка f8accb3d…/84e68fbe…, 15/15 прогонов, 66/66 кадров packaged-live strict; три неудачи 5b-R/5c-B закрыты (форма колец 54/54); открыто: номера гарпий H1–H3 в кадре, лицо на K2 1,6×, поворот к сопернику, perf на D-07, реальный ввод. «Художественно принято» не ставится. Волна 6B: MELEE у Medusa подтверждён по трассам (сервер отдавал melee; бои K3 законны и по правилам ranged); плашка на Cobble ближе к чужой фигуре (Merlin 3 px / Medusa 126 px) — HUD-долг. Волна 7 (трек FIX): attackType Medusa = range на стенде S09, плашка «HERO | RANGED»; плашка стоит на своей фигуре (packaged K1/K2 1,6× Cobble, зазор 0)."
     },
     {
@@ -1582,7 +1589,179 @@
       "next": "Обновлять при каждой интеграции волны.",
       "blocker": null,
       "assets": [],
-      "updated": "2026-09-30T07:15:00Z"
+      "updated": "2026-10-01T13:30:00Z"
+    },
+    {
+      "id": "ENV-P0",
+      "title": "ENV-MAPS P0: граф оригинальных карт, правила на графе в бэкенде, подготовка поверхности карты, концепты окружения",
+      "track": "tech",
+      "source": "env-maps",
+      "status": "done",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/game-design/evidence/ENV-MAPS/2026-09-30-research/README.md",
+        "backend/prisma/fixtures/boards/marmoreal.topology.json",
+        "backend/prisma/fixtures/boards/sarpedon.topology.json",
+        "backend/src/game-engine/engine/board-topology.ts",
+        "art/imagegen/env-v1/concepts/manifest.json",
+        "docs/game-design/decisions/2026-09-30-env-original-maps-decisions.md",
+        "docs/art-pipeline/ENV-MAPS-PLAN.md"
+      ],
+      "next": "—",
+      "blocker": null,
+      "assets": [
+        "ASSET-ENV-KIT-001",
+        "ASSET-TABLE-BASE-001",
+        "ASSET-MAP-FRAME-002",
+        "ASSET-ENV-M-BACKWALL-001",
+        "ASSET-ENV-S-WATERFALL-001"
+      ],
+      "updated": "2026-10-01T13:30:00Z",
+      "note": "Коммиты 883b2b15 (ресёрч, ENV-U0…U3, план), d1030895 (ENV-U4…U7), b9240524 (+10 наборов CC0), 989b3a76 (концепты, ENV-U8), 8dbc823f (P0: топология unmatched.board-topology/1 — Marmoreal 7×6, 31 пространство / 42 связи; Sarpedon 9×6, 38 / 61; board-topology.ts — единственная смежность; старты и сайдкики; 4K BC, маска, SDF/ID вне git; backend jest 1463, 0 упавших)."
+    },
+    {
+      "id": "ENV-P1",
+      "title": "ENV-MAPS P1: клиент UE на графе, ranged через общую зону, поверхность map-image, кит окружения (Tripo) и первые кадры",
+      "track": "tech",
+      "source": "env-maps",
+      "status": "done",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/game-design/evidence/ENV-MAPS/first-frames-2026-09-30/README.md",
+        "unreal/Unmatched/Source/Unmatched/S08/S08BoardModel.h",
+        "unreal/Unmatched/Source/Unmatched/S09/S09ManeuverUi.h",
+        "art/pipeline-candidates/ASSET-ENV-KIT-001/20260930-tripo-h31/reports/tripo-run.json"
+      ],
+      "next": "—",
+      "blocker": null,
+      "assets": [
+        "ASSET-ENV-KIT-001",
+        "ASSET-TABLE-BASE-001",
+        "ASSET-MAP-FRAME-002",
+        "ASSET-ENV-M-BACKWALL-001",
+        "ASSET-ENV-S-WATERFALL-001"
+      ],
+      "updated": "2026-10-01T13:30:00Z",
+      "note": "Коммиты b9be5bdd (14 пропсов Tripo, 1470 кредитов), fb276c59 и 39c632f4 (клиент на графе, map-image, раскладки, S08EnvLayout), ae02966b (сборка зелёная, карты и кит импортированы, UE-тесты 203/203, первые кадры), db86ab5e (решения ENV-U9/U10)."
+    },
+    {
+      "id": "ENV-P2",
+      "title": "ENV-MAPS P2: тематическая земля CC0, общий скалистый поднос T2, K1 ×1,25, ночной свет, итоговые кадры и концепт-ревью",
+      "track": "art",
+      "source": "env-maps",
+      "status": "done",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/game-design/evidence/ENV-MAPS/p2-frames-2026-10-01/README.md",
+        "docs/game-design/evidence/ENV-MAPS/p2-frames-2026-10-01/concept-review.json"
+      ],
+      "next": "—",
+      "blocker": null,
+      "assets": [
+        "ASSET-ENV-KIT-001",
+        "ASSET-TABLE-BASE-001",
+        "ASSET-MAP-FRAME-002",
+        "ASSET-ENV-M-BACKWALL-001",
+        "ASSET-ENV-S-WATERFALL-001"
+      ],
+      "updated": "2026-10-01T13:30:00Z",
+      "note": "Коммит 8e5a3dc9; UE-тесты 213/213; концепт-ревью — 16 расхождений, статус «предложено». Решения ENV-U11/U12 — 9f1c66c4."
+    },
+    {
+      "id": "ENV-P3",
+      "title": "ENV-MAPS P3: packaged-сборка с картами и окружением, -Bench perf, живые дуэли двух клиентов на обеих картах",
+      "track": "closing",
+      "source": "env-maps",
+      "status": "done",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/game-design/evidence/ENV-MAPS/p3-packaged-2026-10-01/bench/README.md",
+        "docs/game-design/evidence/ENV-MAPS/p3-packaged-2026-10-01/live/marmoreal/README.md",
+        "docs/game-design/evidence/ENV-MAPS/p3-packaged-2026-10-01/live/sarpedon/README.md"
+      ],
+      "next": "—",
+      "blocker": null,
+      "assets": [
+        "ASSET-ENV-KIT-001",
+        "ASSET-TABLE-BASE-001",
+        "ASSET-MAP-FRAME-002",
+        "ASSET-ENV-M-BACKWALL-001",
+        "ASSET-ENV-S-WATERFALL-001"
+      ],
+      "updated": "2026-10-01T13:30:00Z",
+      "note": "Коммит d1bfb659: кук 0 ошибок; K1 GPU Cobble 1,82 мс против 2,28 / 2,24 мс на картах (dev-PC, фон частично загрязнён, не ACC-022); дуэли до GAME_OVER, ходы по связям, дальние атаки Medusa через общую зону."
+    },
+    {
+      "id": "ENV-P4",
+      "title": "ENV-MAPS P4: полировка без новых ассетов — вода, земля, вид кита, читаемость досок-карт",
+      "track": "art",
+      "source": "env-maps",
+      "status": "done",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/game-design/evidence/ENV-MAPS/p4-polish-2026-10-01/README.md"
+      ],
+      "next": "—",
+      "blocker": null,
+      "assets": [
+        "ASSET-ENV-KIT-001",
+        "ASSET-TABLE-BASE-001",
+        "ASSET-MAP-FRAME-002",
+        "ASSET-ENV-M-BACKWALL-001",
+        "ASSET-ENV-S-WATERFALL-001"
+      ],
+      "updated": "2026-10-01T13:30:00Z",
+      "note": "Коммит 2fa377f8: UE-тесты 222/222, pytest 268; мин. смежная ΔE76 зон 23,3 / 23,2; Cobble K1 без изменений."
+    },
+    {
+      "id": "ENV-P5",
+      "title": "ENV-MAPS P5: новые ассеты окружения — Tripo P5, Blender (T2b, frame-002, задняя стена, водопад и море), паки Fab, VFX, NoAI-вариант для пользователя",
+      "track": "art",
+      "source": "env-maps",
+      "status": "done",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/game-design/evidence/ENV-MAPS/p5a-verify-2026-10-01/README.md",
+        "docs/game-design/evidence/ENV-MAPS/p5k-blender-assets-2026-10-01/README.md",
+        "docs/game-design/evidence/ENV-MAPS/p5b-tray-water-2026-10-01/README.md",
+        "docs/game-design/evidence/ENV-MAPS/p5b-assets-2026-10-01/README.md",
+        "docs/game-design/evidence/ENV-MAPS/p5c-fab-2026-10-01/README.md",
+        "docs/art-pipeline/CREDITS-fab.md",
+        "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-fab-p5c/README-user-variant.md"
+      ],
+      "next": "Открытые пункты — бэклог ART-009 и «Итог» ENV-MAPS-PLAN.md: градиент окон задней стены (функция мастер-материала), крупные кроны деревьев Forest, насыщенно-синяя река на карте, render_bench после P5b/P5c, у Sarpedon нет луны и неба, вид NoAI-варианта ИИ не оценивал.",
+      "blocker": null,
+      "assets": [
+        "ASSET-ENV-KIT-001",
+        "ASSET-TABLE-BASE-001",
+        "ASSET-MAP-FRAME-002",
+        "ASSET-ENV-M-BACKWALL-001",
+        "ASSET-ENV-S-WATERFALL-001"
+      ],
+      "updated": "2026-10-01T13:30:00Z",
+      "note": "Коммиты bd6531fb (8 ассетов Tripo, 840 кредитов), 4c05e25a (P5a: packaged-проверка P4, Merlin ranged вживую, UE-тесты 224/224), 4870ad04 (линия K: T2b, frame-002, задняя стена, водопад), 80815db7 / 6eb6ddde / 9484385c / 64755187 / a306260c / 5c4c14b2 (паки Fab: ENV-U13/U14, реестр, ресёрч), 8938a03f (P5b: UE-тесты 233/233, pytest 345), 8c60a4a9 (P5c: паки Fab, VFX, вода, NoAI-вариант; UE-тесты 237/237, pytest 416)."
+    },
+    {
+      "id": "ENV-P6",
+      "title": "ENV-MAPS P6: packaged-сборка и живые партии на Marmoreal и Sarpedon (Medusa и Merlin ranged), NoAI-вариант в packaged",
+      "track": "closing",
+      "source": "env-maps",
+      "status": "done",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/game-design/evidence/ENV-MAPS/p6-live-2026-10-01/README.md"
+      ],
+      "next": "Художественная приёмка досок-карт — GD-058, решение пользователя.",
+      "blocker": null,
+      "assets": [
+        "ASSET-ENV-KIT-001",
+        "ASSET-TABLE-BASE-001",
+        "ASSET-MAP-FRAME-002",
+        "ASSET-ENV-M-BACKWALL-001",
+        "ASSET-ENV-S-WATERFALL-001"
+      ],
+      "updated": "2026-10-01T13:30:00Z",
+      "note": "Коммит 59a5e593: кук 1112 / 1112, 0 ошибок; партии до FINISHED, ходы только по связям; дальние через зону — Marmoreal: Медуза 1, Мерлин 3; Sarpedon (второй прогон): Медуза 3, Мерлин 5; первый прогон Sarpedon оставлен как неудачный гейт (Медуза била только соседа). -EnvLayoutVariant=user: missingMeshes=0, кадры только для пользователя. Без render_bench и без итоговых кадров K1–K3 (по просьбе пользователя)."
     }
   ],
   "waves": [
@@ -1777,6 +1956,20 @@
         "W7-FIX",
         "ART-017",
         "ART-HUB"
+      ]
+    },
+    {
+      "id": "ENV-MAPS",
+      "title": "Доски-диорамы на оригинальных картах Marmoreal и Sarpedon (поправка D-03): P0–P6 закрыты 2026-10-01; художественная приёмка GD-058 — решение пользователя",
+      "status": "done",
+      "tasks": [
+        "ENV-P0",
+        "ENV-P1",
+        "ENV-P2",
+        "ENV-P3",
+        "ENV-P4",
+        "ENV-P5",
+        "ENV-P6"
       ]
     }
   ],

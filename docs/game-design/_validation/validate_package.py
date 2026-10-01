@@ -27,7 +27,7 @@ content = read_csv('05-content-matrix.csv', 'contentKey')
 assets = read_csv('06-asset-manifest.csv', 'assetKey')
 cues = read_csv('07-animation-vfx-audio.csv', 'cueId')
 backlog = read_csv('14-sprint-backlog.csv', 'id')
-assert (len(content), len(assets), len(cues)) == (34, 50, 18)
+assert (len(content), len(assets), len(cues)) == (36, 50, 18)  # 05: +2 board rows ENV-MAPS (2026-10-01)
 asset_keys = {row['assetKey'] for row in assets}
 assert sum(row['assetKey'].startswith('ASSET-CARDART-') for row in assets) == 27
 assert all(not row['fallbackAssetKey'] or row['fallbackAssetKey'] in asset_keys for row in assets)
@@ -146,7 +146,7 @@ for name in ['README.md', '12-validation-report.md', '13-sprint-plan.md', '15-ru
     for key in re.findall(r'\b(?:GD-\d{3}|ART-\d{3}|ACC-\d{3})\b', body):
         assert key in all_ids | acc, f'{name}: unknown ID {key}'
 
-print('PASS: original CSV 34/50/18; 27 deck-card entries / 60 copies; 25 distinct titles')
+print('PASS: original CSV 34/50/18 (+2 board rows 05, ENV-MAPS); 27 deck-card entries / 60 copies; 25 distinct titles')
 print('PASS: 34/34 legacy tasks mapped; 69 new tasks; 22/22 acceptance checks linked')
 print('PASS: dependency DAG; no future DEV dependency; 14 sprints <=8 DEV days')
 print('DEV loads:', ', '.join(f'{key}={loads[key]:g}' for key in sorted(loads)))
