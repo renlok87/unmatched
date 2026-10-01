@@ -32,6 +32,7 @@
 
 #include "CoreMinimal.h"
 #include "S08BoardModel.h"
+#include "S08ConceptPaste.h"
 
 /** Zone mark geometry (uu, z above the tile top z = 0). W5b-R D-4: strokes moved inside the slab (nominal centre
  *  line 42, clamped so that fill + keyline <= 45), dark keylines under every stroke and glyph, glyphs above strokes:
@@ -470,6 +471,9 @@ struct UNMATCHED_API FS08BoardArtProfile {
   /** ENV-MAPS P5 track C: optional "mapFrame" / "backdrop" blocks (map-image boards only). */
   FS08MapFrameSpec MapFrame;
   FS08BackdropSpec Backdrop;
+  /** ENV-MAPS P7 (ENV-U15): optional "conceptPaste" block (map-image boards only; S08ConceptPaste.h). Its lights count
+   *  against the light profile's points (profile points + block lights <= 6, the block hides the layout lights). */
+  FS08ConceptPasteSpec ConceptPaste;
 };
 
 /** Counts of one decoded board (what the art and the trace describe). */

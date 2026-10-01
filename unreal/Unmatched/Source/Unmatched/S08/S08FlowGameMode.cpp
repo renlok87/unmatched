@@ -6797,7 +6797,15 @@ void AS08FlowGameMode::RunRenderBench() {
       const float Zoom = S08BenchViewZoom(View);
       // ENV-U9: a "K1..." view never selects the hero (centred on the board); "K2..." focuses it.
       const bool bCentredView = View.StartsWith(TEXT("K1"));
-      if (Zoom > 1.0f && !bCentredView && !B.HeroId.IsEmpty()) {
+      if (View.StartsWith(TEXT("Fitx")) && Zoom > 0.0f && CameraZoom.Fit > 0.0f) {
+        // ENV-MAPS P7: "Fitx<m>" = centred at the board fit x m (the concept camera C0 of the map dioramas:
+        // Fitx1.45 = 2714.6 uu on Marmoreal / Sarpedon), clamped to the wheel limits. Note: <m> multiplies the
+        // distance here, unlike the K-views' zoom ratio.
+        SelectFighter(FString());
+        const FS08ZoomStep ZoomStep = CameraZoom.BenchDistance(CameraZoom.Fit * Zoom);
+        FS08Trace::Write(FString::Printf(TEXT("BENCH view=%s centred fit-mul=%.3f target=%.1f fit=%.1f clamp=%d"), *View,
+                                         Zoom, ZoomStep.To, CameraZoom.Fit, ZoomStep.bClamped ? 1 : 0));
+      } else if (Zoom > 1.0f && !bCentredView && !B.HeroId.IsEmpty()) {
         SelectFighter(B.HeroId);
         const FS08ZoomStep ZoomStep = CameraZoom.FocusZoom(Zoom);
         FS08Trace::Write(FString::Printf(TEXT("BENCH view=%s focus hero=%s zoom=%.2f target=%.1f clamp=%d"), *View,

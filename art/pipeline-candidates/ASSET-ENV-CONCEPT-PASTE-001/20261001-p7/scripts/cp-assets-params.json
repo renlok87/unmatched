@@ -1,0 +1,47 @@
+{
+ "schema": "unmatched.concept-paste.assets-params/1",
+ "asset": "ASSET-ENV-CONCEPT-PASTE-001",
+ "status": "предложено (ENV-MAPS P7 track A, CREATE stage: headless Blender only, nothing imported into UE)",
+ "run_dir": "art/pipeline-candidates/ASSET-ENV-CONCEPT-PASTE-001/20261001-p7",
+ "scratch_dir": "C:/tmp/envmaps-research/p7/trackA/scratch",
+ "tools": {"numpy": "tools/art/concept_paste/cp_proxies.py", "blender": "tools/art/concept_paste/blender_cp_assets.py"},
+ "proxies": {
+  "sheetStepPx": 8,
+  "seaMesh": false,
+  "seaStepPx": 32,
+  "dissolveAngleDeg": 0.5,
+  "maxSheetTriangles": 45000,
+  "maxSeaTriangles": 9000,
+  "note": "depth sheet = design.json 3_projection relief proxy on a C0 grid (8 px like the prototype); planar regions dissolved (the paste material projects through C0, the vertex UVs are exact only at the vertices); optional sea mesh (seaMesh, off: the profile block conceptPaste.sea builds the sea plane / sky cylinder from engine planes) = a 32 px grid"
+ },
+ "lanternHead": {
+  "asset": "SM_EnvCP_LanternHead",
+  "source": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/SM_Env_LanternPost.fbx",
+  "sourceSha256": "0bb5163a8a2d7ab4c054024a49d485ca87edd4b6a60c335fdada636772ead212",
+  "keep": {"ueYMax": -6.0, "ueZMax": 76.0,
+           "note": "UE mesh frame of SM_Env_LanternPost (X front, Y width, Z up, uu): the lantern hangs from the arm on the -Y side (glass Y -24.6..-14.2, Z 45.4..52.4, p5c-fx-anchors.json); the hook is narrow (Y -19.9..-14.4) up to Z 76, the arm (Y -28..-6) starts at Z ~76 (face-centroid histogram 2026-10-01); the post and the brace stay at Y > -6"},
+  "glowCentroidUU": [-2.76, -17.49, 48.47],
+  "glowSource": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-fab-p5c/reports/p5c-fx-anchors.json (SM_Env_LanternPost glowCentroidUU)",
+  "maxTriangles": 4000,
+  "material": "MI_Env_LanternPost (same UVs as the post)"
+ },
+ "kitMeasure": {
+  "SM_Env_Cannon": {"source": "art/pipeline-candidates/ASSET-ENV-KIT-001/20260930-tripo-h31/export/SM_Env_Cannon.fbx",
+                    "sourceSha256": "0bf068060b921c8db60251ba2980757b60af12eb48a9a55bf77c2424b3fc0a8b",
+                    "muzzleShare": 0.12,
+                    "note": "read only (the kit mesh is reused as is): barrel axis height at the muzzle = Z centre of the vertices in the front muzzleShare of the length (+X = muzzle)"}
+ },
+ "bannerCloth": {
+  "asset": "SM_EnvCP_BannerCloth",
+  "source": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/SM_Env_Banner.fbx",
+  "sourceSha256": "ecdbb7b845b0ee1d3d6f78941a166a0d6267a7f44fe54deee1e3cdbfa4b74164",
+  "clothMinAbsY": 6.0,
+  "clothMinZ": 25.0,
+  "crossbarMinAbsY": 23.0,
+  "clothNote": "cloth faces: |Y| > clothMinAbsY and Z > clothMinZ (the pole foot rings at Z 7..20 stay out); everything below the lowest cloth face (pole foot, base plate) and above the cross-bar (spear tip) is deleted; the pole segment behind the cloth stays (inside the cloth folds)",
+  "clothAspect": 2.46,
+  "aspectSource": "design.json 5_elements.reuse.banner: painted cloth ~81 uu wide, shorten the painted ~325 uu to ~200 uu -> length / width 200 / 81.3",
+  "maxTriangles": 6000,
+  "material": "MI_Env_Banner (same UVs)"
+ }
+}

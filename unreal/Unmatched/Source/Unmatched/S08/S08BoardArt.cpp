@@ -1010,6 +1010,27 @@ bool FS08BoardArtData::ParseJson(const FString& Text, TArray<FString>& OutErrors
         }
       }
       if (!bBlocksOk) continue;
+      // ENV-MAPS P7 (ENV-U15): optional concept paste, map-image boards only (grids bit for bit); its point lights share
+      // the budget with the light profile's points (1 key + <= 6 points; the block hides the env-layout lights).
+      if ((*Obj)->HasField(TEXT("conceptPaste"))) {
+        const TSharedPtr<FJsonObject>* Block = nullptr;
+        if (B.Surface != ES08BoardSurface::MapImage) {
+          OutErrors.Add(FString::Printf(TEXT("board %s: conceptPaste is for map-image boards only"), *B.Id));
+          continue;
+        }
+        if (!(*Obj)->TryGetObjectField(TEXT("conceptPaste"), Block) || !Block || !Block->IsValid()) {
+          OutErrors.Add(FString::Printf(TEXT("board %s: conceptPaste must be an object"), *B.Id));
+          continue;
+        }
+        if (!S08ConceptPaste::ParseJson(B.Id, *Block, B.ConceptPaste, OutErrors)) continue;
+        const FS08LightProfile& Light = Lights.FindChecked(B.LightId);
+        if (Light.Points.Num() + B.ConceptPaste.Lights.Num() > S08ConceptPasteSpec::CombinedPointBudget) {
+          OutErrors.Add(FString::Printf(TEXT("board %s: conceptPaste lights %d + light profile %s points %d > %d"), *B.Id,
+                                        B.ConceptPaste.Lights.Num(), *B.LightId, Light.Points.Num(),
+                                        S08ConceptPasteSpec::CombinedPointBudget));
+          continue;
+        }
+      }
       const TSharedPtr<FJsonObject>* Expect = nullptr;
       if ((*Obj)->TryGetObjectField(TEXT("expect"), Expect) && Expect) {
         auto ReadInt = [&](const TCHAR* Field, int32& Out) {

@@ -95,6 +95,20 @@ FX_SPECS: list[dict] = [
         "estimate": {"kind": "emitters", "emitters": _FIRE_EMITTERS, "spawnMul": 0.8},
     },
     {
+        "name": "NS_Env_ConceptFire",
+        "source": "/Game/Stylish_Fire_VFX/Niagara/NS_Stylish_Fire_2",
+        "pack": "Stylish_Fire_VFX",
+        "licence": "Fab Standard (personal)",
+        "role": "ENV-MAPS P7 concept paste (sarpedon.concept.layout.json fire-fort / fire-brazier): the painted fires of the "
+                "concept are tall yellow-cored flames; NS_Env_Campfire (colour x3) read as a red blob over the clean "
+                "plate's embers at C0 / K1 (P7 tune) - a larger, less saturated copy; NS_Env_Campfire (P5c) unchanged",
+        "system": {"determinism": True, "random_seed": 52014, "warmup_time": 0.0},
+        "tune": {"simTarget": "cpu", "emitterDeterminism": True, "emitterSeedBase": 52400,
+                 "disableLightRenderers": True, "disableComponentRenderers": True,
+                 "constants": _fire_rules(0.5, 0.8, 5.0), "user": {}},
+        "estimate": {"kind": "emitters", "emitters": _FIRE_EMITTERS, "spawnMul": 0.8},
+    },
+    {
         "name": "NS_Env_LanternFlame",
         "source": "/Game/Stylish_Fire_VFX/Niagara/NS_Stylish_Fire_3",
         "pack": "Stylish_Fire_VFX",

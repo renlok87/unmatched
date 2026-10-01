@@ -318,7 +318,8 @@ int32 EnvFindById(const TArray<TSharedPtr<FJsonValue>>& Items, const FString& Id
  *  Tolerated: removing an id listed in AlreadyDropped (an fx that went with its anchor prop). */
 void EnvOverlaySection(const TSharedPtr<FJsonObject>& Base, const TSharedPtr<FJsonObject>& Overlay, const TCHAR* Section,
                        const TArray<FString>& ReplaceFields, const TArray<FString>& AlreadyDropped, int32& Removed,
-                       int32& Replaced, int32& Added, TArray<FString>& RemovedIds, TArray<FString>& Errors) {
+                       int32& Replaced, int32& Added, TArray<FString>& RemovedIds, TArray<FString>& TouchedIds,
+                       TArray<FString>& Errors) {
   if (!Overlay->HasField(Section)) return;
   const TSharedPtr<FJsonObject>* Ops = nullptr;
   if (!Overlay->TryGetObjectField(Section, Ops) || !Ops || !Ops->IsValid()) {
@@ -394,6 +395,7 @@ void EnvOverlaySection(const TSharedPtr<FJsonObject>& Base, const TSharedPtr<FJs
         if (bEntryOk) {
           Items[At] = MakeShared<FJsonValueObject>(Merged);
           ++Replaced;
+          TouchedIds.AddUnique(Id);
         }
       }
     }
@@ -418,6 +420,7 @@ void EnvOverlaySection(const TSharedPtr<FJsonObject>& Base, const TSharedPtr<FJs
         }
         Items.Add(V);
         ++Added;
+        TouchedIds.AddUnique(Id);
       }
     }
   }
@@ -763,10 +766,10 @@ bool MergeOverlay(const FString& BaseText, const FString& OverlayText, const FSt
   }
   if (R.Errors.Num() != Before) return false;
   // props: remove -> replace -> add; the fx anchored on a removed prop go with it
-  TArray<FString> RemovedProps, RemovedFx, NoneDropped;
+  TArray<FString> RemovedProps, RemovedFx, NoneDropped, TouchedProps, TouchedFx;
   EnvOverlaySection(Base, Overlay, TEXT("props"),
                     {TEXT("mesh"), TEXT("loc"), TEXT("yawDeg"), TEXT("scale"), TEXT("castShadow")}, NoneDropped,
-                    R.PropsRemoved, R.PropsReplaced, R.PropsAdded, RemovedProps, R.Errors);
+                    R.PropsRemoved, R.PropsReplaced, R.PropsAdded, RemovedProps, TouchedProps, R.Errors);
   TArray<FString> DroppedWithAnchor;
   const TArray<TSharedPtr<FJsonValue>>* BaseFx = nullptr;
   if (RemovedProps.Num() > 0 && Base->TryGetArrayField(TEXT("fx"), BaseFx) && BaseFx) {
@@ -788,7 +791,7 @@ bool MergeOverlay(const FString& BaseText, const FString& OverlayText, const FSt
   EnvOverlaySection(Base, Overlay, TEXT("fx"),
                     {TEXT("system"), TEXT("anchor"), TEXT("loc"), TEXT("yawDeg"), TEXT("scale"), TEXT("seed"),
                      TEXT("warmupS"), TEXT("enabled"), TEXT("user")},
-                    DroppedWithAnchor, R.FxRemoved, R.FxReplaced, R.FxAdded, RemovedFx, R.Errors);
+                    DroppedWithAnchor, R.FxRemoved, R.FxReplaced, R.FxAdded, RemovedFx, TouchedFx, R.Errors);
   if (R.Errors.Num() != Before) return false;
   FString MergedText;
   const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&MergedText);
@@ -803,6 +806,8 @@ bool MergeOverlay(const FString& BaseText, const FString& OverlayText, const FSt
     return false;
   }
   Out = MoveTemp(Merged);
+  for (const FString& Id : TouchedProps) Out.OverlayPropIds.Add(Id);
+  for (const FString& Id : TouchedFx) Out.OverlayFxIds.Add(Id);
   return true;
 }
 
@@ -1016,6 +1021,7 @@ FS08EnvSpawnStats Spawn(const FS08EnvLayout& Layout, AActor& Owner, USceneCompon
     C->SetRelativeTransform(P.Transform());
     C->RegisterComponent();
     OutProps.Add(C);
+    S.PropComponentIds.Add(P.Id);
     ++S.Props;
     S.SpawnedPropIds.Add(P.Id);
     S.ShadowCasters += P.bCastShadow ? 1 : 0;
@@ -1056,6 +1062,7 @@ FS08EnvSpawnStats Spawn(const FS08EnvLayout& Layout, AActor& Owner, USceneCompon
     C->SetRelativeLocation(L.Loc);
     C->RegisterComponent();
     OutLights.Add(C);
+    S.LightComponentIds.Add(L.Id);
     ++S.Lights;
     FS08Trace::Write(FString::Printf(
         TEXT("ARTPREVIEW envlayout light id=%s kind=point at=%s intensity=%g units=%s radius=%g color=%s shadow=0"),
@@ -1269,6 +1276,7 @@ FS08EnvFxStats SpawnFx(const FS08EnvLayout& Layout, AActor& Owner, USceneCompone
       Particles = EnvLiveParticles(*C);
     }
     OutFx.Add(C);
+    S.FxComponentIds.Add(F.Id);
     ++S.Fx;
     S.Particles += Particles;
     S.UserSet += UserSet;

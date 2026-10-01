@@ -1,0 +1,1142 @@
+{
+  "schema": "unmatched.concept-paste.assets-build/1",
+  "status": "measured",
+  "asset": "ASSET-ENV-CONCEPT-PASTE-001",
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "technically_imported": false
+  },
+  "blender_version": "5.2.2 LTS",
+  "script_sha256_lf": {
+    "tools/art/concept_paste/blender_cp_assets.py": "23d90ec819bfdde6619a2d28c681dbc7f7785f74aa9aaac5c53dc1ad2c689c74",
+    "tools/art/concept_paste/cp_proxies.py": "e2b80a35e378513f77115c0354adb7837d822d499c6a8ff4a49ca3da075845c5",
+    "tools/art/env_kit/k_blender.py": "b291e157bf8d206bdad92632a3021596d3deeff579549ab34d3a56d62ac3955b"
+  },
+  "params": {
+    "path": "art/pipeline-candidates/ASSET-ENV-CONCEPT-PASTE-001/20261001-p7/scripts/cp-assets-params.json",
+    "sha256": "593f6e1d0c2aeff580f43569807a08a8cad0050a7c2fc12813a541705469dd3d"
+  },
+  "numpy": {
+    "_camPosUE": [
+      0.0,
+      1557.0457379954673,
+      2223.6917671245315
+    ],
+    "sarpedon": {
+      "name": "Sarpedon",
+      "sheet": {
+        "npz": "C:/tmp/envmaps-research/p7/trackA/scratch/work/sarpedon-sheet.npz",
+        "stepPx": 8.0,
+        "grid": [
+          190,
+          337
+        ],
+        "cellsKept": 42023,
+        "cellsTotal": 63504,
+        "zRange": [
+          -300.0,
+          820.28
+        ]
+      },
+      "uvRects": {
+        "uv0PlateB": [
+          -384,
+          -216,
+          2304,
+          1296
+        ],
+        "uv1PlateA": [
+          0,
+          0,
+          1920,
+          1080
+        ]
+      }
+    },
+    "marmoreal": {
+      "name": "Marmoreal",
+      "sheet": {
+        "npz": "C:/tmp/envmaps-research/p7/trackA/scratch/work/marmoreal-sheet.npz",
+        "stepPx": 8.0,
+        "grid": [
+          190,
+          337
+        ],
+        "cellsKept": 54374,
+        "cellsTotal": 63504,
+        "zRange": [
+          -175.12,
+          509.96
+        ]
+      },
+      "uvRects": {
+        "uv0PlateB": [
+          -384,
+          -216,
+          2304,
+          1296
+        ],
+        "uv1PlateA": [
+          0,
+          0,
+          1920,
+          1080
+        ]
+      }
+    }
+  },
+  "contract": {
+    "ue": {
+      "proxies": "/Game/EnvMaps/<Name>/ConceptPaste/SM_<Name>_ConceptSheet (no collision, Nanite off, no shadows, Lumen GI off on the component: design.json 4)",
+      "details": "/Game/EnvKit/ConceptPaste/SM_EnvCP_{LanternHead,BannerCloth} (slots -> MI_Env_LanternPost / MI_Env_Banner of the env kit)",
+      "import": "tools/art/concept_paste/ue_import_concept_paste.py"
+    }
+  },
+  "exports": [
+    {
+      "fbx": "art/pipeline-candidates/ASSET-ENV-CONCEPT-PASTE-001/20261001-p7/export/SM_Marmoreal_ConceptSheet.fbx",
+      "sha256": "d0030a3ce71ed4ba99bcd65c7abebed04cf261789d5e3c6746cc207d949ef020",
+      "bytes": 358172,
+      "preset": "UM_FBX_v1.json",
+      "exporter_kwargs": {
+        "add_leaf_bones": false,
+        "apply_scale_options": "FBX_SCALE_UNITS",
+        "apply_unit_scale": true,
+        "axis_forward": "-Y",
+        "axis_up": "Z",
+        "bake_anim": false,
+        "bake_space_transform": false,
+        "embed_textures": false,
+        "mesh_smooth_type": "FACE",
+        "object_types": [
+          "ARMATURE",
+          "MESH"
+        ],
+        "path_mode": "AUTO",
+        "primary_bone_axis": "Y",
+        "secondary_bone_axis": "X",
+        "use_custom_props": false,
+        "use_mesh_edges": false,
+        "use_selection": true,
+        "use_triangles": true
+      },
+      "colors_type": "SRGB (exporter default; mask values pre-linearised, see k_blender.py)",
+      "um_fbx_v1_conformance": [
+        {
+          "setting": "Forward / Up (04 1.1)",
+          "standard": [
+            "-Y",
+            "Z"
+          ],
+          "used": [
+            "-Y",
+            "Z"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Apply Scalings (04 1.1)",
+          "standard": "FBX_SCALE_UNITS",
+          "used": "FBX_SCALE_UNITS",
+          "conforms": true
+        },
+        {
+          "setting": "Apply Unit (04 1.1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Apply Transform (04 1.1)",
+          "standard": false,
+          "used": false,
+          "conforms": true
+        },
+        {
+          "setting": "Triangulate Faces (04 1.1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Smoothing (04 1.1)",
+          "standard": "FACE",
+          "used": "FACE",
+          "conforms": true
+        },
+        {
+          "setting": "Object Types (04 1.1)",
+          "standard": [
+            "ARMATURE",
+            "MESH"
+          ],
+          "used": [
+            "ARMATURE",
+            "MESH"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Loose Edges / Custom Properties (04 1.1)",
+          "standard": [
+            false,
+            false
+          ],
+          "used": [
+            false,
+            false
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Leaf bones / bone axes (04 1.1, preset)",
+          "standard": [
+            false,
+            "Y",
+            "X"
+          ],
+          "used": [
+            false,
+            "Y",
+            "X"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Bake Animation (04 1.1: skeletal clips only)",
+          "standard": false,
+          "used": false,
+          "conforms": true
+        },
+        {
+          "setting": "Path Mode, textures not embedded (04 1.1)",
+          "standard": [
+            "AUTO",
+            false
+          ],
+          "used": [
+            "AUTO",
+            false
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Export space: +Z rotation deg / data scale / UnitScaleFactor patch (preset)",
+          "standard": [
+            90.0,
+            100.0,
+            1.0
+          ],
+          "used": [
+            90.0,
+            100.0,
+            1.0
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Scene units: metric, unit scale 1.0 (04 1)",
+          "standard": [
+            "METRIC",
+            1.0
+          ],
+          "used": [
+            "METRIC",
+            1.0
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Transforms applied: object matrix identity (04 1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Pivot: board-actor origin (map centre, Z 0 = map plane): identity under the board actor",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        }
+      ],
+      "name": "SM_Marmoreal_ConceptSheet",
+      "triangles": 7486,
+      "boundsUeLocalUU": {
+        "min": [
+          -1452.42,
+          -999.457,
+          -175.117
+        ],
+        "max": [
+          1452.42,
+          699.819,
+          509.962
+        ],
+        "size": [
+          2904.84,
+          1699.276,
+          685.079
+        ]
+      },
+      "roundtrip": {
+        "mesh_objects": 1,
+        "triangles": 7486,
+        "expected_triangles": 7486,
+        "material_slots": [
+          "M_ConceptPaste"
+        ],
+        "expected_slots": [
+          "M_ConceptPaste"
+        ],
+        "uv_layers": [
+          "UVMap",
+          "UV1"
+        ],
+        "color_attributes": [],
+        "bounds_as_ue_uu": {
+          "min": [
+            -1452.42,
+            -999.457,
+            -175.117
+          ],
+          "max": [
+            1452.42,
+            699.819,
+            509.962
+          ]
+        },
+        "note": "read-back frame: UE = (x, -y, z)",
+        "ue_frame_matches_build": true
+      },
+      "map": "marmoreal",
+      "part": "sheet",
+      "grid": {
+        "npz": "C:/tmp/envmaps-research/p7/trackA/scratch/work/marmoreal-sheet.npz",
+        "stepPx": 8.0,
+        "grid": [
+          190,
+          337
+        ],
+        "cellsKept": 54374,
+        "cellsTotal": 63504,
+        "zRange": [
+          -175.12,
+          509.96
+        ]
+      },
+      "facingC0Share": 1.0,
+      "dissolveAngleDeg": 0.5,
+      "quadsBeforeDissolve": 54374,
+      "trianglesBeforeDissolve": 108748,
+      "verticesIn": 55107,
+      "sliversFlippedToCamera": 0,
+      "surfaceErrorUU": {
+        "p50": 0.0005,
+        "p99": 0.0664,
+        "max": 0.2153,
+        "misses": 0,
+        "method": "distance of every interior input grid vertex (4 kept cells) to the dissolved surface (BVH nearest)"
+      },
+      "uv": {
+        "UVMap": "plate B UV (u, v down in UE) of the vertex's C0 pixel",
+        "UV1": "plate A UV (outside 0..1 beyond the concept frame)",
+        "contract": "exact at the vertices only: the paste material projects through C0"
+      },
+      "checks": {
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "material_slots": true,
+        "uv0_present": true,
+        "roundtrip_bounds_match_ue_frame": true,
+        "um_fbx_v1_conforms": true,
+        "triangles_within_budget": true,
+        "faces_c0_camera": true,
+        "surface_error_p99_le_1uu": true,
+        "surface_error_max_le_8uu": true,
+        "no_misses": true,
+        "uv1_present": true
+      }
+    },
+    {
+      "fbx": "art/pipeline-candidates/ASSET-ENV-CONCEPT-PASTE-001/20261001-p7/export/SM_Sarpedon_ConceptSheet.fbx",
+      "sha256": "901eaf15fe11c347676e9be27c8f7de634db23201a2d9ae5fda5df2cc9fa2239",
+      "bytes": 493564,
+      "preset": "UM_FBX_v1.json",
+      "exporter_kwargs": {
+        "add_leaf_bones": false,
+        "apply_scale_options": "FBX_SCALE_UNITS",
+        "apply_unit_scale": true,
+        "axis_forward": "-Y",
+        "axis_up": "Z",
+        "bake_anim": false,
+        "bake_space_transform": false,
+        "embed_textures": false,
+        "mesh_smooth_type": "FACE",
+        "object_types": [
+          "ARMATURE",
+          "MESH"
+        ],
+        "path_mode": "AUTO",
+        "primary_bone_axis": "Y",
+        "secondary_bone_axis": "X",
+        "use_custom_props": false,
+        "use_mesh_edges": false,
+        "use_selection": true,
+        "use_triangles": true
+      },
+      "colors_type": "SRGB (exporter default; mask values pre-linearised, see k_blender.py)",
+      "um_fbx_v1_conformance": [
+        {
+          "setting": "Forward / Up (04 1.1)",
+          "standard": [
+            "-Y",
+            "Z"
+          ],
+          "used": [
+            "-Y",
+            "Z"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Apply Scalings (04 1.1)",
+          "standard": "FBX_SCALE_UNITS",
+          "used": "FBX_SCALE_UNITS",
+          "conforms": true
+        },
+        {
+          "setting": "Apply Unit (04 1.1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Apply Transform (04 1.1)",
+          "standard": false,
+          "used": false,
+          "conforms": true
+        },
+        {
+          "setting": "Triangulate Faces (04 1.1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Smoothing (04 1.1)",
+          "standard": "FACE",
+          "used": "FACE",
+          "conforms": true
+        },
+        {
+          "setting": "Object Types (04 1.1)",
+          "standard": [
+            "ARMATURE",
+            "MESH"
+          ],
+          "used": [
+            "ARMATURE",
+            "MESH"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Loose Edges / Custom Properties (04 1.1)",
+          "standard": [
+            false,
+            false
+          ],
+          "used": [
+            false,
+            false
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Leaf bones / bone axes (04 1.1, preset)",
+          "standard": [
+            false,
+            "Y",
+            "X"
+          ],
+          "used": [
+            false,
+            "Y",
+            "X"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Bake Animation (04 1.1: skeletal clips only)",
+          "standard": false,
+          "used": false,
+          "conforms": true
+        },
+        {
+          "setting": "Path Mode, textures not embedded (04 1.1)",
+          "standard": [
+            "AUTO",
+            false
+          ],
+          "used": [
+            "AUTO",
+            false
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Export space: +Z rotation deg / data scale / UnitScaleFactor patch (preset)",
+          "standard": [
+            90.0,
+            100.0,
+            1.0
+          ],
+          "used": [
+            90.0,
+            100.0,
+            1.0
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Scene units: metric, unit scale 1.0 (04 1)",
+          "standard": [
+            "METRIC",
+            1.0
+          ],
+          "used": [
+            "METRIC",
+            1.0
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Transforms applied: object matrix identity (04 1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Pivot: board-actor origin (map centre, Z 0 = map plane): identity under the board actor",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        }
+      ],
+      "name": "SM_Sarpedon_ConceptSheet",
+      "triangles": 10564,
+      "boundsUeLocalUU": {
+        "min": [
+          -1278.481,
+          -1021.53,
+          -300.0
+        ],
+        "max": [
+          1242.246,
+          585.481,
+          820.285
+        ],
+        "size": [
+          2520.727,
+          1607.011,
+          1120.285
+        ]
+      },
+      "roundtrip": {
+        "mesh_objects": 1,
+        "triangles": 10564,
+        "expected_triangles": 10564,
+        "material_slots": [
+          "M_ConceptPaste"
+        ],
+        "expected_slots": [
+          "M_ConceptPaste"
+        ],
+        "uv_layers": [
+          "UVMap",
+          "UV1"
+        ],
+        "color_attributes": [],
+        "bounds_as_ue_uu": {
+          "min": [
+            -1278.481,
+            -1021.53,
+            -300.0
+          ],
+          "max": [
+            1242.246,
+            585.481,
+            820.285
+          ]
+        },
+        "note": "read-back frame: UE = (x, -y, z)",
+        "ue_frame_matches_build": true
+      },
+      "map": "sarpedon",
+      "part": "sheet",
+      "grid": {
+        "npz": "C:/tmp/envmaps-research/p7/trackA/scratch/work/sarpedon-sheet.npz",
+        "stepPx": 8.0,
+        "grid": [
+          190,
+          337
+        ],
+        "cellsKept": 42023,
+        "cellsTotal": 63504,
+        "zRange": [
+          -300.0,
+          820.28
+        ]
+      },
+      "facingC0Share": 1.0,
+      "dissolveAngleDeg": 0.5,
+      "quadsBeforeDissolve": 42023,
+      "trianglesBeforeDissolve": 84046,
+      "verticesIn": 42799,
+      "sliversFlippedToCamera": 4,
+      "surfaceErrorUU": {
+        "p50": 0.0,
+        "p99": 0.0498,
+        "max": 0.2454,
+        "misses": 0,
+        "method": "distance of every interior input grid vertex (4 kept cells) to the dissolved surface (BVH nearest)"
+      },
+      "uv": {
+        "UVMap": "plate B UV (u, v down in UE) of the vertex's C0 pixel",
+        "UV1": "plate A UV (outside 0..1 beyond the concept frame)",
+        "contract": "exact at the vertices only: the paste material projects through C0"
+      },
+      "checks": {
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "material_slots": true,
+        "uv0_present": true,
+        "roundtrip_bounds_match_ue_frame": true,
+        "um_fbx_v1_conforms": true,
+        "triangles_within_budget": true,
+        "faces_c0_camera": true,
+        "surface_error_p99_le_1uu": true,
+        "surface_error_max_le_8uu": true,
+        "no_misses": true,
+        "uv1_present": true
+      }
+    },
+    {
+      "fbx": "art/pipeline-candidates/ASSET-ENV-CONCEPT-PASTE-001/20261001-p7/export/SM_EnvCP_LanternHead.fbx",
+      "sha256": "e79ac13748fa2e5114ce77c1ece73a67bd77d3c376e732330427ac8dd5d9f361",
+      "bytes": 122396,
+      "preset": "UM_FBX_v1.json",
+      "exporter_kwargs": {
+        "add_leaf_bones": false,
+        "apply_scale_options": "FBX_SCALE_UNITS",
+        "apply_unit_scale": true,
+        "axis_forward": "-Y",
+        "axis_up": "Z",
+        "bake_anim": false,
+        "bake_space_transform": false,
+        "embed_textures": false,
+        "mesh_smooth_type": "FACE",
+        "object_types": [
+          "ARMATURE",
+          "MESH"
+        ],
+        "path_mode": "AUTO",
+        "primary_bone_axis": "Y",
+        "secondary_bone_axis": "X",
+        "use_custom_props": false,
+        "use_mesh_edges": false,
+        "use_selection": true,
+        "use_triangles": true
+      },
+      "colors_type": "SRGB (exporter default; mask values pre-linearised, see k_blender.py)",
+      "um_fbx_v1_conformance": [
+        {
+          "setting": "Forward / Up (04 1.1)",
+          "standard": [
+            "-Y",
+            "Z"
+          ],
+          "used": [
+            "-Y",
+            "Z"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Apply Scalings (04 1.1)",
+          "standard": "FBX_SCALE_UNITS",
+          "used": "FBX_SCALE_UNITS",
+          "conforms": true
+        },
+        {
+          "setting": "Apply Unit (04 1.1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Apply Transform (04 1.1)",
+          "standard": false,
+          "used": false,
+          "conforms": true
+        },
+        {
+          "setting": "Triangulate Faces (04 1.1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Smoothing (04 1.1)",
+          "standard": "FACE",
+          "used": "FACE",
+          "conforms": true
+        },
+        {
+          "setting": "Object Types (04 1.1)",
+          "standard": [
+            "ARMATURE",
+            "MESH"
+          ],
+          "used": [
+            "ARMATURE",
+            "MESH"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Loose Edges / Custom Properties (04 1.1)",
+          "standard": [
+            false,
+            false
+          ],
+          "used": [
+            false,
+            false
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Leaf bones / bone axes (04 1.1, preset)",
+          "standard": [
+            false,
+            "Y",
+            "X"
+          ],
+          "used": [
+            false,
+            "Y",
+            "X"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Bake Animation (04 1.1: skeletal clips only)",
+          "standard": false,
+          "used": false,
+          "conforms": true
+        },
+        {
+          "setting": "Path Mode, textures not embedded (04 1.1)",
+          "standard": [
+            "AUTO",
+            false
+          ],
+          "used": [
+            "AUTO",
+            false
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Export space: +Z rotation deg / data scale / UnitScaleFactor patch (preset)",
+          "standard": [
+            90.0,
+            100.0,
+            1.0
+          ],
+          "used": [
+            90.0,
+            100.0,
+            1.0
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Scene units: metric, unit scale 1.0 (04 1)",
+          "standard": [
+            "METRIC",
+            1.0
+          ],
+          "used": [
+            "METRIC",
+            1.0
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Transforms applied: object matrix identity (04 1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Pivot: base centre of the kept lantern (XY bounds centre, min Z)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        }
+      ],
+      "name": "SM_EnvCP_LanternHead",
+      "triangles": 1813,
+      "boundsUeLocalUU": {
+        "min": [
+          -7.715,
+          -9.296,
+          0.0
+        ],
+        "max": [
+          7.715,
+          9.296,
+          38.112
+        ],
+        "size": [
+          15.431,
+          18.591,
+          38.112
+        ]
+      },
+      "roundtrip": {
+        "mesh_objects": 1,
+        "triangles": 1813,
+        "expected_triangles": 1813,
+        "material_slots": [
+          "M_Env_LanternPost"
+        ],
+        "expected_slots": [
+          "M_Env_LanternPost"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "color_attributes": [],
+        "bounds_as_ue_uu": {
+          "min": [
+            -7.715,
+            -9.296,
+            0.0
+          ],
+          "max": [
+            7.715,
+            9.296,
+            38.112
+          ]
+        },
+        "note": "read-back frame: UE = (x, -y, z)",
+        "ue_frame_matches_build": true
+      },
+      "source": {
+        "fbx": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/SM_Env_LanternPost.fbx",
+        "sha256": "0bb5163a8a2d7ab4c054024a49d485ca87edd4b6a60c335fdada636772ead212",
+        "triangles": 6736
+      },
+      "facesDeleted": 4923,
+      "pivotInSourceUU": [
+        -1.859,
+        -17.197,
+        37.926
+      ],
+      "glowOffsetUU": [
+        -0.901,
+        -0.293,
+        10.544
+      ],
+      "glowNote": "flame / light point relative to the pivot (scale with the prop)",
+      "checks": {
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "material_slots": true,
+        "uv0_present": true,
+        "roundtrip_bounds_match_ue_frame": true,
+        "um_fbx_v1_conforms": true,
+        "triangles_within_budget": true,
+        "glow_inside_bounds": true,
+        "post_removed": true
+      }
+    },
+    {
+      "fbx": "art/pipeline-candidates/ASSET-ENV-CONCEPT-PASTE-001/20261001-p7/export/SM_EnvCP_BannerCloth.fbx",
+      "sha256": "6b4dea4c53a60e72d6e72bb06af1609fbdea1909b53a30311ff7de7dba104be0",
+      "bytes": 214460,
+      "preset": "UM_FBX_v1.json",
+      "exporter_kwargs": {
+        "add_leaf_bones": false,
+        "apply_scale_options": "FBX_SCALE_UNITS",
+        "apply_unit_scale": true,
+        "axis_forward": "-Y",
+        "axis_up": "Z",
+        "bake_anim": false,
+        "bake_space_transform": false,
+        "embed_textures": false,
+        "mesh_smooth_type": "FACE",
+        "object_types": [
+          "ARMATURE",
+          "MESH"
+        ],
+        "path_mode": "AUTO",
+        "primary_bone_axis": "Y",
+        "secondary_bone_axis": "X",
+        "use_custom_props": false,
+        "use_mesh_edges": false,
+        "use_selection": true,
+        "use_triangles": true
+      },
+      "colors_type": "SRGB (exporter default; mask values pre-linearised, see k_blender.py)",
+      "um_fbx_v1_conformance": [
+        {
+          "setting": "Forward / Up (04 1.1)",
+          "standard": [
+            "-Y",
+            "Z"
+          ],
+          "used": [
+            "-Y",
+            "Z"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Apply Scalings (04 1.1)",
+          "standard": "FBX_SCALE_UNITS",
+          "used": "FBX_SCALE_UNITS",
+          "conforms": true
+        },
+        {
+          "setting": "Apply Unit (04 1.1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Apply Transform (04 1.1)",
+          "standard": false,
+          "used": false,
+          "conforms": true
+        },
+        {
+          "setting": "Triangulate Faces (04 1.1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Smoothing (04 1.1)",
+          "standard": "FACE",
+          "used": "FACE",
+          "conforms": true
+        },
+        {
+          "setting": "Object Types (04 1.1)",
+          "standard": [
+            "ARMATURE",
+            "MESH"
+          ],
+          "used": [
+            "ARMATURE",
+            "MESH"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Loose Edges / Custom Properties (04 1.1)",
+          "standard": [
+            false,
+            false
+          ],
+          "used": [
+            false,
+            false
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Leaf bones / bone axes (04 1.1, preset)",
+          "standard": [
+            false,
+            "Y",
+            "X"
+          ],
+          "used": [
+            false,
+            "Y",
+            "X"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Bake Animation (04 1.1: skeletal clips only)",
+          "standard": false,
+          "used": false,
+          "conforms": true
+        },
+        {
+          "setting": "Path Mode, textures not embedded (04 1.1)",
+          "standard": [
+            "AUTO",
+            false
+          ],
+          "used": [
+            "AUTO",
+            false
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Export space: +Z rotation deg / data scale / UnitScaleFactor patch (preset)",
+          "standard": [
+            90.0,
+            100.0,
+            1.0
+          ],
+          "used": [
+            90.0,
+            100.0,
+            1.0
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Scene units: metric, unit scale 1.0 (04 1)",
+          "standard": [
+            "METRIC",
+            1.0
+          ],
+          "used": [
+            "METRIC",
+            1.0
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Transforms applied: object matrix identity (04 1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Pivot: base centre after the stretch (XY bounds centre, min Z = lowest cloth tatter)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        }
+      ],
+      "name": "SM_EnvCP_BannerCloth",
+      "triangles": 3714,
+      "boundsUeLocalUU": {
+        "min": [
+          -6.223,
+          -28.532,
+          0.0
+        ],
+        "max": [
+          6.223,
+          28.532,
+          109.766
+        ],
+        "size": [
+          12.446,
+          57.065,
+          109.766
+        ]
+      },
+      "roundtrip": {
+        "mesh_objects": 1,
+        "triangles": 3714,
+        "expected_triangles": 3714,
+        "material_slots": [
+          "M_Env_Banner"
+        ],
+        "expected_slots": [
+          "M_Env_Banner"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "color_attributes": [],
+        "bounds_as_ue_uu": {
+          "min": [
+            -6.223,
+            -28.532,
+            0.0
+          ],
+          "max": [
+            6.223,
+            28.532,
+            109.766
+          ]
+        },
+        "note": "read-back frame: UE = (x, -y, z)",
+        "ue_frame_matches_build": true
+      },
+      "source": {
+        "fbx": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/SM_Env_Banner.fbx",
+        "sha256": "ecdbb7b845b0ee1d3d6f78941a166a0d6267a7f44fe54deee1e3cdbfa4b74164",
+        "triangles": 4637
+      },
+      "facesDeleted": 923,
+      "stretchZ": 1.6747,
+      "clothWidthUU": 41.566,
+      "clothLengthUU": 102.251,
+      "crossbarTopUU": 109.296,
+      "crossbarBottomUU": 102.251,
+      "pivotInSourceUU": [
+        -2.348,
+        0.0,
+        -6.439
+      ],
+      "hangNote": "attach point = (0, 0, crossbarTopUU) x scale above the pivot",
+      "checks": {
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "material_slots": true,
+        "uv0_present": true,
+        "roundtrip_bounds_match_ue_frame": true,
+        "um_fbx_v1_conforms": true,
+        "triangles_within_budget": true,
+        "aspect_reached": true
+      }
+    }
+  ],
+  "kitMeasurements": {
+    "SM_Env_Cannon": {
+      "source": "art/pipeline-candidates/ASSET-ENV-KIT-001/20260930-tripo-h31/export/SM_Env_Cannon.fbx",
+      "sha256": "0bf068060b921c8db60251ba2980757b60af12eb48a9a55bf77c2424b3fc0a8b",
+      "sha256Ok": true,
+      "boundsUU": {
+        "min": [
+          -22.5,
+          -15.812,
+          0.0
+        ],
+        "max": [
+          22.5,
+          15.812,
+          26.841
+        ]
+      },
+      "muzzleXUU": 22.5,
+      "barrelAxisZUU": 21.304,
+      "barrelRadiusUU": 5.536,
+      "barrelAxisYUU": -0.0
+    }
+  },
+  "checks": {
+    "SM_Marmoreal_ConceptSheet": true,
+    "SM_Sarpedon_ConceptSheet": true,
+    "SM_EnvCP_LanternHead": true,
+    "SM_EnvCP_BannerCloth": true,
+    "measure:SM_Env_Cannon": true
+  },
+  "checks_passed": true
+}

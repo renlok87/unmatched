@@ -8,6 +8,19 @@
   "colour": {"file": "marmoreal-v1.png", "size": [1672, 941], "conceptRectPx": [0, 0, 1672, 941]},
   "seaSky": null
  },
+ "bake": {
+  "note": "P7 track A (cp_bake.py), flag / variant only (Marmoreal default unchanged): the raw concept (no clean plate, no outpaint) -> outside the concept frame a blurred edge clamp faded to a dark border tone fills (outsideFrame; K1x0.65: ~11 % of the frame)",
+  "colourTag": "concept",
+  "lanczosA": 3,
+  "chunkRows": 64,
+  "outsideFrame": {"fadePx": 160, "darkGain": 0.6, "blurTexels": 6,
+                   "note": "outside the concept frame (no outpaint): edge clamp blurred and faded to 0.6 x the median border colour over 160 C0 px - no streaks, no mirrored architecture"},
+  "textures": {
+   "PlateA": {"kind": "paste", "size": [4096, 2048], "rectC0": [0, 0, 1920, 1080]},
+   "PlateB": {"kind": "paste", "size": [2048, 1024], "rectC0": [-384, -216, 2304, 1296]},
+   "Sea": {"kind": "sea", "size": [1024, 512], "rectC0": [-384, -216, 2304, 1296]}
+  }
+ },
  "registration": {"file": "registration.json (proto out dir)", "model": "homography, identity within 1.3 px"},
  "geometry": {
   "groundZ": -3.0,
@@ -34,5 +47,11 @@
   "paintedCornerUU": 70.0
  },
  "details": [],
- "overlays": []
+ "overlays": [],
+ "layout": {
+  "note": "P7 track A (cp_layout.py), comparison variant only (-EnvLayoutVariant=concept; the default Marmoreal look stays the P5c layout): the raw concept paints every prop (lamps, sakuras, balustrades, colonnade) -> all base props removed, the fx anchored on them go with them, the free fireflies stay; the base lights stay (no conceptPaste.lights)",
+  "variant": "concept",
+  "idPrefix": "",
+  "castShadow": false
+ }
 }

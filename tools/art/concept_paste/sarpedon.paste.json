@@ -11,7 +11,23 @@
   "colourFallback": {"file": "sarpedon-clean.png", "size": [1672, 941], "conceptRectPx": [0, 0, 1672, 941]},
   "concept": {"file": "C:/Users/ren/WebstormProjects/unmached/unmached/scraped-data/derived/concepts/env-v1/sarpedon-v2.png", "size": [1672, 941], "conceptRectPx": [0, 0, 1672, 941]},
   "seaSky": {"file": "sarpedon-sea-sky.png", "size": [1920, 1080], "conceptRectPx": [0, 0, 1920, 1080],
+             "sha256": "f887508320f13d5da93c325b895331518667ece7800d7a704511a16efe90570a",
              "note": "night sea + cloud glow without the island; only used behind the island silhouette (disocclusion) after a luma / chroma match to the extended plate's sea"}
+ },
+ "bake": {
+  "note": "P7 track A (cp_bake.py): UE textures laid out linearly in C0 px (rectC0 = x0, y0, x1, y1), Lanczos-3 from the colour plate through the registration homography; out of git, sha256 in manifest.sarpedon.json",
+  "colourTag": "extended2x",
+  "lanczosA": 3,
+  "chunkRows": 64,
+  "textures": {
+   "PlateA": {"kind": "paste", "size": [4096, 2048], "rectC0": [0, 0, 1920, 1080]},
+   "PlateB": {"kind": "paste", "size": [4096, 2048], "rectC0": [-384, -216, 2304, 1296]},
+   "Sea": {"kind": "sea", "size": [2048, 1024], "rectC0": [-384, -216, 2304, 1296]},
+   "Water": {"kind": "water", "size": [2048, 1024], "rectC0": [-384, -216, 2304, 1296]}
+  },
+  "water": {"blueMinusRed": [0.05, 0.15], "lumaWater": [0.10, 0.25], "lumaFoam": [0.45, 0.65], "satFoam": [0.12, 0.25],
+            "rectFeatherPx": 24, "blurTexels": 1.0,
+            "note": "painted-water key (blue minus red x luma, or bright unsaturated foam) inside the waterfall / surf-bay pxRects of the overlays; B = open sea (1 - island). A helper mask for the flow animation, approximate by design"}
  },
  "registration": {"file": "registration.json (proto out dir)", "model": "homography C0 px -> concept px, identity within 1 px; TPS not needed"},
  "geometry": {
@@ -51,7 +67,7 @@
   "skyPoly": [[-383, -216], [330, -216], [200, -170], [60, -100], [0, 60], [-150, 200], [-383, 250]]
  },
  "cut": {
-  "note": "what stays real: the original map + the 3D frame-002 (4b keep). The painted surround starts 2 uu UNDER the 3D frame's outer foot, so the seam is covered by the frame; the painted frame of the concept is about 2x wider than frame-002 (outer edge ~49-50 uu from the map vs 24 uu), so the band between our frame's outer edge and the painted frame's outer edge is replaced by a mirror fill of the ground just outside it.",
+  "note": "what stays real: the original map + the 3D frame-002 (4b keep). The painted surround starts 2 uu UNDER the 3D frame's outer foot, so the seam is covered by the frame; the painted frame of the concept is about 2x wider than frame-002 (outer edge ~49-50 uu from the map vs 24 uu), so the band between our frame's outer edge and the painted frame's outer edge is filled by a 1D rubber stretch of the ground just outside it (paste_proto.frame_band; the mirror fill of the first prototype made kaleidoscope patterns and was dropped, mirrorFeatherUU is unused).",
   "underFrameUU": 2.0,
   "paintedFrameOuterUU": {"far": 51.0, "east": 63.0, "west": 61.0, "near": 87.0},
   "paintedFrameMeasured": "luma profiles across the registered concept frame on the ground plane (proto measure): wood ends at ~48-50 uu (far, sand starts), ~61 (east), ~59 (west), ~85 (near: top + front face down to the rocks) from the map edge; frame-002 = 24 uu",
@@ -78,5 +94,33 @@
   {"id": "surf-sea", "kind": "surf overlay", "on": "sea", "anim": "UV flow distortion of the sea layer + foam panner (the sea plate already holds the painted foam)"},
   {"id": "fireflies-forest", "kind": "particles", "on": "forest-canopy", "px": [150, 330], "anim": "NS_Env_Fireflies (existing, CPU, frozen in bench)"},
   {"id": "cloud-drift", "kind": "optional", "on": "sky", "anim": "slow UV pan of a cloud layer (optional)"}
- ]
+ ],
+ "layout": {
+  "note": "P7 track A (cp_layout.py): the env-layout overlay EnvLayouts/sarpedon.concept.layout.json (variant 'concept'): every painted prop of the base layout removed (the plate paints them), the 12 details of design.json 5_elements at their C0-ray positions (paste_proto.detail_positions, relief proxy), fires / flames as fx, fireflies over the canopy; the concept-mode lights are the profile block's (S08ArtBoardProfiles.json conceptPaste.lights, track B: true positions + flicker); the prop ids are the design ids (the block's anims / shadow blobs name them)",
+  "variant": "concept",
+  "idPrefix": "",
+  "castShadow": false,
+  "lantern": {"mesh": "/Game/EnvKit/ConceptPaste/SM_EnvCP_LanternHead", "yawDeg": 90.0, "scaleRange": [0.8, 2.6], "sizeMul": 1.6,
+              "sizeMulNote": "P7 tune (UE frames at C0): the painted lanterns read ~1.6-1.9x the 3D heads at the eye-read sizeUU; the glass centre stays on the painted glass",
+              "flame": {"system": "/Game/EnvKit/FX/NS_Env_LanternFlame", "warmupS": 1.5},
+              "note": "scale = painted height (sizeUU[1]) / the head's height incl. the hook; the glow centre of the head lands on the painted lantern (the detail's world point)"},
+  "cannon": {"mesh": "/Game/EnvKit/Sarpedon/SM_Env_Cannon", "yawDeg": 158.0, "scaleRange": [1.2, 3.0], "sizeMul": 1.35,
+             "sizeMulNote": "P7 tune (UE frames at C0): the painted barrels read ~1.35-1.4x longer / thicker than the kit cannon at the eye-read sizeUU",
+             "note": "scale = painted length (sizeUU[0]) / the kit cannon's length; yaw 158 = the painted barrels (muzzle to the left and slightly to the camera, measured on the concept crop: screen (-45, +15) px -> world direction (cos 158, sin 158)); the barrel axis at the muzzle half (measured) sits on the detail's world point (ground + 22)"},
+  "banner": {"mesh": "/Game/EnvKit/ConceptPaste/SM_EnvCP_BannerCloth", "scaleRange": [1.0, 2.6], "hostZone": "ship",
+             "note": "scale = painted cloth width (sizeUU[0]) / the mesh cloth width; the cross-bar top on the detail's world point (top attachment); yaw: local +X = the outward normal of the ship flat towards C0, local Y along the hull line"},
+  "fire": {"system": "/Game/EnvKit/FX/NS_Env_ConceptFire", "warmupS": 1.5,
+           "campfire": {"scale": 1.4, "dz": 2.0}, "brazier": {"scale": 0.85, "dz": -6.0},
+           "note": "the clean plate keeps the painted pit / bowl: VFX only; scale from the painted fire size vs the kit campfire (40 uu x 1.2 in P5c)"},
+  "fireflies": {"replace": {"fireflies-forest-n": [-707.6, -118.9, 150.0], "fireflies-forest-s": [-695.2, 125.2, 150.0]},
+                "remove": ["fireflies-beach"], "note": "design.json 5_elements.reuse.fireflies; no beach light in the concept"},
+  "lights": [
+   {"id": "fire-fort", "on": "fire-fort", "dz": 55.0, "colorSrgb": "#FF8A3D", "intensityCd": 65, "radius": 460},
+   {"id": "fire-brazier", "on": "fire-brazier", "dz": 35.0, "colorSrgb": "#FF9A4A", "intensityCd": 55, "radius": 420},
+   {"id": "lantern-left", "on": "lantern-left", "dz": 0.0, "colorSrgb": "#FFA552", "intensityCd": 75, "radius": 380},
+   {"id": "lantern-deck-n", "on": "lantern-deck-n", "dz": 0.0, "colorSrgb": "#FFA552", "intensityCd": 95, "radius": 420},
+   {"id": "lantern-deck-se", "on": "lantern-deck-se", "dz": 0.0, "colorSrgb": "#FFA552", "intensityCd": 90, "radius": 400}
+  ],
+  "lightsNote": "design.json 4_lighting_grade.pointLights: 5 points at the TRUE positions of the fires / main lanterns (+ the profile moon-pool = 6); colours / intensities of the P5c base lights they replace (campfire-nw / -w, ship lanterns); to be re-measured in UE (warm fraction >= 0.12)"
+ }
 }

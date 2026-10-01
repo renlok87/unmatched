@@ -112,6 +112,8 @@ public:
   /** Flag path (-ArtPreviewFocusZoom): overview / Zoom, clamped to
    *  [MinDistance, Overview] exactly like the historical probe. */
   FS08ZoomStep FocusZoom(float Zoom);
+  /** Bench only (ENV-MAPS P7 "Fitx<m>" views): an exact centred distance, clamped to [MinDistance, MaxDistance]. */
+  FS08ZoomStep BenchDistance(float Distance);
   /** Starts a focus tween (length of the latest distance command) when the
    *  follow target changed. */
   void SetFocusTarget(const FVector& Focus);

@@ -188,6 +188,10 @@ struct UNMATCHED_API FS08EnvLayout {
   FString Variant;
   FString OverlayPath;
   FString OverlaySha256;
+  /** ENV-MAPS P7 (concept paste): ids of the props / fx the applied overlay added or replaced (MergeOverlay); every other
+   *  entry is a 'base' one (FS08ConceptHide::bBaseProps / bBaseFx hide those). Empty without an overlay. */
+  TSet<FString> OverlayPropIds;
+  TSet<FString> OverlayFxIds;
 
   /** Parses and validates the whole document; any structural error makes it invalid (false, nothing spawns). */
   bool ParseJson(const FString& Text, TArray<FString>& OutErrors);
@@ -233,6 +237,9 @@ struct UNMATCHED_API FS08EnvSpawnStats {
   TArray<FString> MissingPaths;
   /** Ids of the props that got a component (fx anchors need a spawned prop). */
   TSet<FString> SpawnedPropIds;
+  /** ENV-MAPS P7: the id of every component Spawn appended, in the order of OutProps / OutLights. */
+  TArray<FString> PropComponentIds;
+  TArray<FString> LightComponentIds;
 };
 
 /** How fx spawn (FromCommandLine for the board actor; tests build their own). */
@@ -266,6 +273,8 @@ struct UNMATCHED_API FS08EnvFxStats {
   int32 UserMissing = 0;           // user parameters the system does not expose (or with the wrong arity)
   FString Mode;
   TArray<FString> MissingPaths;
+  /** ENV-MAPS P7: the id of every component SpawnFx appended, in the order of OutFx. */
+  TArray<FString> FxComponentIds;
 };
 
 /** Inputs of one board-actor update (the actor fills it from its active art profile). */

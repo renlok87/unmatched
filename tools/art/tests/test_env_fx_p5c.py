@@ -47,7 +47,8 @@ class FxSpecs(unittest.TestCase):
         err, _warn = FX.validate(FX.FX_SPECS, content=None)
         self.assertEqual(err, [])
         self.assertEqual({s["name"] for s in FX.FX_SPECS},
-                         {"NS_Env_Campfire", "NS_Env_LanternFlame", "NS_Env_CherryPetals", "NS_Env_Fireflies"})
+                         {"NS_Env_Campfire", "NS_Env_LanternFlame", "NS_Env_CherryPetals", "NS_Env_Fireflies",
+                          "NS_Env_ConceptFire"})  # P7 concept paste fires (sarpedon.concept.layout.json)
 
     def test_targets_and_rules(self):
         for s in FX.FX_SPECS:

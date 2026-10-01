@@ -1,0 +1,229 @@
+{
+ "schema": "unmatched.concept-paste.derived/1",
+ "map": "marmoreal",
+ "status": "измерено (bake); textures OUT of git (ENV-U3 / ENV-U7): only parameters and sha256 here",
+ "outDir": "scraped-data/derived/concept-paste/marmoreal",
+ "spec": "tools/art/concept_paste/marmoreal.paste.json",
+ "registration": {
+  "file": "tools/art/concept_paste/registration.json",
+  "tag": "concept",
+  "H": [
+   [
+    0.998885668,
+    -0.000734888,
+    1.329103233
+   ],
+   [
+    -9.3381e-05,
+    0.998322712,
+    0.524401639
+   ],
+   [
+    -2.19e-07,
+    -1.293e-06,
+    1.0
+   ]
+  ],
+  "homographyResidualPx": {
+   "n": 157,
+   "rms": 0.219,
+   "p50": 0.18,
+   "p95": 0.383,
+   "max": 0.651
+  }
+ },
+ "camera": {
+  "pos": [
+   0.0,
+   1557.046,
+   2223.692
+  ],
+  "focus": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "dist": 2714.626,
+  "pitch": -55,
+  "yaw": -90,
+  "hfov": 35,
+  "size": [
+   1920,
+   1080
+  ]
+ },
+ "uvContract": "u = (c0x - rectC0[0]) / (rectC0[2] - rectC0[0]), v = (c0y - rectC0[1]) / (rectC0[3] - rectC0[1]); c0 = C0 pixel (continuous, 1920 x 1080, y down) of the board-space position",
+ "resample": "Lanczos-3 (classic, ENV-U6), widened by the minification, edge clamp, weights normalised",
+ "materialContract": {
+  "homography": [
+   [
+    1.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "homographyNote": "the registration H (registration.json) is baked into the texels: C0 px -> plate UV is linear",
+  "rects": {
+   "plateA": [
+    0,
+    0,
+    1920,
+    1080
+   ],
+   "plateB": [
+    -384,
+    -216,
+    2688,
+    1512
+   ],
+   "seaPlate": [
+    -384,
+    -216,
+    2688,
+    1512
+   ]
+  },
+  "assets": {
+   "plateA": "/Game/EnvMaps/Marmoreal/ConceptPaste/T_Marmoreal_ConceptPlateA",
+   "plateB": "/Game/EnvMaps/Marmoreal/ConceptPaste/T_Marmoreal_ConceptPlateB",
+   "seaPlate": "/Game/EnvMaps/Marmoreal/ConceptPaste/T_Marmoreal_ConceptSea"
+  },
+  "alpha": "plateA / plateB A = island matte (featherPx) x NOT under frame-002 (cut underFrameUU); opacity mask 0.5",
+  "outside": "clamp",
+  "outsideNote": "plate B carries its own blurred / faded edge fill outside the concept frame (outsideFrame); beyond its rect the edge clamp continues that dark tone"
+ },
+ "generator": {
+  "tools/art/concept_paste/cp_bake.py": "afce54fe0a387510172eb4455bd4ce8ae3f0a3ed69924f666876379dc63a60d3",
+  "tools/art/concept_paste/cp_common.py": "db342dc941f417a592a74b27e88c87d43ecf618902d5b6b39f58d30925609c72",
+  "tools/art/concept_paste/paste_proto.py": "1fa552b83c8b578a8c5a1086f72086abc89aecfb2558fc829955975c8b01a748"
+ },
+ "paramsSha256": "5a29489b3fc6a230aad45861d2ba3a16e732d0af06354e5d22f00439cc0f492d",
+ "inputs": {
+  "colour": {
+   "file": "C:/Users/ren/WebstormProjects/unmached/unmached/scraped-data/derived/concepts/env-v1/marmoreal-v1.png",
+   "sha256": "8f098ef2980162a9fa48fdec6865618388e5e0486c73b71247dff5fccc72e662",
+   "size": [
+    1672,
+    941
+   ],
+   "registrationTag": "concept"
+  }
+ },
+ "outputs": {
+  "PlateA": {
+   "file": "T_Marmoreal_ConceptPlateA.png",
+   "kind": "paste",
+   "size": [
+    4096,
+    2048
+   ],
+   "channels": "RGBA",
+   "rectC0": [
+    0,
+    0,
+    1920,
+    1080
+   ],
+   "sha256": "dfaa19fb69b0428e6fc6554ac7f705fc3ed7cc0baa120d1131e7357e79405969",
+   "bytes": 12450723,
+   "meanSrgb": [
+    0.3227,
+    0.2701,
+    0.2977
+   ]
+  },
+  "PlateB": {
+   "file": "T_Marmoreal_ConceptPlateB.png",
+   "kind": "paste",
+   "size": [
+    2048,
+    1024
+   ],
+   "channels": "RGBA",
+   "rectC0": [
+    -384,
+    -216,
+    2304,
+    1296
+   ],
+   "sha256": "cbfc4a8be1cd7155c0ccd118b1238e5cc9fb6a2cde822cc22ad3cef2bad1789b",
+   "bytes": 2631363,
+   "meanSrgb": [
+    0.1959,
+    0.176,
+    0.21
+   ]
+  },
+  "Sea": {
+   "file": "T_Marmoreal_ConceptSea.png",
+   "kind": "sea",
+   "size": [
+    1024,
+    512
+   ],
+   "channels": "RGB",
+   "rectC0": [
+    -384,
+    -216,
+    2304,
+    1296
+   ],
+   "sha256": "edf69aea6390776248719d891be14f6e0a6590ee0109e5cb9272e97f22d39938",
+   "bytes": 651549,
+   "meanSrgb": [
+    0.1959,
+    0.176,
+    0.2101
+   ]
+  }
+ },
+ "stats": {
+  "PlateA": {
+   "sourcePxPerTexel": [
+    0.4082,
+    0.4595
+   ],
+   "texelsPerC0Px": [
+    2.1333,
+    1.8963
+   ],
+   "bandResampledTexels": 2071018,
+   "alphaCoverage": 0.709,
+   "underFrameTexels": 2441086
+  },
+  "PlateB": {
+   "sourcePxPerTexel": [
+    1.143,
+    1.2865
+   ],
+   "texelsPerC0Px": [
+    0.7619,
+    0.6772
+   ],
+   "bandResampledTexels": 264833,
+   "alphaCoverage": 0.8516,
+   "underFrameTexels": 311180
+  },
+  "Sea": {
+   "sourcePxPerTexel": [
+    2.2859,
+    2.573
+   ],
+   "texelsPerC0Px": [
+    0.381,
+    0.3386
+   ],
+   "bandResampledTexels": 66214
+  }
+ }
+}

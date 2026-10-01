@@ -9,6 +9,7 @@
 #include "GameFramework/Actor.h"
 #include "S08BoardModel.h"
 #include "S08BoardArt.h"
+#include "S08ConceptPaste.h"
 #include "S08EnvLayout.h"
 #include "S08MapBackdrop.h"
 #include "S08ArtHud.h"
@@ -131,6 +132,15 @@ public:
    *  S08MapBackdrop::Update applied (empty / 'off' on grids, the grey view, a refused profile, without the env gate). */
   const TArray<TObjectPtr<UStaticMeshComponent>>& GetBackdropParts() const { return BackdropParts; }
   const FS08BackdropRuntime& GetBackdropRuntime() const { return BackdropRuntime; }
+  /** ENV-MAPS P7 (ENV-U15): the concept paste of the active map-image board (S08ConceptPaste.h) - the decision of the
+   *  last board (mode, reason), the parts (sheet, sea plane, sky segments, blobs), its point lights, and what it hid. */
+  const FS08ConceptPasteRuntime& GetConceptPasteRuntime() const { return ConceptRuntime; }
+  const FS08ConceptPasteMode& GetConceptPasteMode() const { return ConceptMode; }
+  const TArray<TObjectPtr<UStaticMeshComponent>>& GetConceptPasteParts() const { return ConceptParts; }
+  const TArray<TObjectPtr<UPointLightComponent>>& GetConceptPasteLights() const { return ConceptLights; }
+  const US08ConceptPasteAnimComponent* GetConceptPasteAnim() const { return ConceptAnim; }
+  /** True while the paste is on and its parts exist (the painted surround replaces tray / ground / props). */
+  bool IsConceptPasteOn() const { return ConceptMode.bOn && ConceptRuntime.Status == TEXT("ok"); }
 
   /** Syncs fighter actors with the latest decoded fighters (spawn/move/
    *  re-label by stable fighter id; dead fighters hide instantly). */
@@ -407,6 +417,29 @@ private:
   UPROPERTY()
   TArray<TObjectPtr<UStaticMeshComponent>> BackdropParts;
   FS08BackdropRuntime BackdropRuntime;
+  // ---- ENV-MAPS P7 (ENV-U15): concept paste (profile "conceptPaste", S08ConceptPaste.h) ----
+  /** Decides the mode for the active board (gate, command line, block default) and loads its assets; a missing required
+   *  asset falls back to off (P5c look). Called by UpdateEnvLayout before the layout (the mode picks the overlay). */
+  void ResolveConceptPasteMode();
+  /** After the env layout: off if the concept overlay did not apply; spawns / keeps / clears the parts, hides what the
+   *  block lists (env components, fog), drives the anim component; traced. */
+  void UpdateConceptPaste();
+  /** The tray part of the hide list (after the tray placement of UpdateDioramaTray). */
+  void HideTrayForConceptPaste();
+  UPROPERTY()
+  TArray<TObjectPtr<UStaticMeshComponent>> ConceptParts;
+  UPROPERTY()
+  TArray<TObjectPtr<UPointLightComponent>> ConceptLights;
+  UPROPERTY()
+  TObjectPtr<US08ConceptPasteAnimComponent> ConceptAnim;
+  /** Keeps the loaded concept assets alive between ResolveConceptPasteMode and the parts (MIDs / components then own them). */
+  UPROPERTY()
+  TArray<TObjectPtr<UObject>> ConceptAssetRefs;
+  FS08ConceptPasteAssets ConceptAssets;
+  FString ConceptAssetsProfileId;
+  FS08ConceptPasteInputs ConceptInputs;
+  FS08ConceptPasteMode ConceptMode;
+  FS08ConceptPasteRuntime ConceptRuntime;
   UPROPERTY()
   TObjectPtr<UMaterialInstanceDynamic> ContactShadowMid;
   bool bContactShadowTried = false;

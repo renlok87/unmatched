@@ -1,0 +1,305 @@
+{
+ "schema": "unmatched.concept-paste.derived/1",
+ "map": "sarpedon",
+ "status": "измерено (bake); textures OUT of git (ENV-U3 / ENV-U7): only parameters and sha256 here",
+ "outDir": "scraped-data/derived/concept-paste/sarpedon",
+ "spec": "tools/art/concept_paste/sarpedon.paste.json",
+ "registration": {
+  "file": "tools/art/concept_paste/registration.json",
+  "tag": "extended2x",
+  "H": [
+   [
+    1.001798814,
+    0.001837713,
+    -1.055357269
+   ],
+   [
+    -0.000180789,
+    1.003633,
+    -1.328865506
+   ],
+   [
+    -2.02e-07,
+    2.11e-06,
+    1.0
+   ]
+  ],
+  "homographyResidualPx": {
+   "n": 163,
+   "rms": 0.294,
+   "p50": 0.234,
+   "p95": 0.484,
+   "max": 0.979
+  }
+ },
+ "camera": {
+  "pos": [
+   0.0,
+   1557.046,
+   2223.692
+  ],
+  "focus": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "dist": 2714.626,
+  "pitch": -55,
+  "yaw": -90,
+  "hfov": 35,
+  "size": [
+   1920,
+   1080
+  ]
+ },
+ "uvContract": "u = (c0x - rectC0[0]) / (rectC0[2] - rectC0[0]), v = (c0y - rectC0[1]) / (rectC0[3] - rectC0[1]); c0 = C0 pixel (continuous, 1920 x 1080, y down) of the board-space position",
+ "resample": "Lanczos-3 (classic, ENV-U6), widened by the minification, edge clamp, weights normalised",
+ "materialContract": {
+  "homography": [
+   [
+    1.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.0,
+    1.0,
+    0.0
+   ],
+   [
+    0.0,
+    0.0,
+    1.0
+   ]
+  ],
+  "homographyNote": "the registration H (registration.json) is baked into the texels: C0 px -> plate UV is linear",
+  "rects": {
+   "plateA": [
+    0,
+    0,
+    1920,
+    1080
+   ],
+   "plateB": [
+    -384,
+    -216,
+    2688,
+    1512
+   ],
+   "seaPlate": [
+    -384,
+    -216,
+    2688,
+    1512
+   ],
+   "waterMask": [
+    -384,
+    -216,
+    2688,
+    1512
+   ]
+  },
+  "assets": {
+   "plateA": "/Game/EnvMaps/Sarpedon/ConceptPaste/T_Sarpedon_ConceptPlateA",
+   "plateB": "/Game/EnvMaps/Sarpedon/ConceptPaste/T_Sarpedon_ConceptPlateB",
+   "seaPlate": "/Game/EnvMaps/Sarpedon/ConceptPaste/T_Sarpedon_ConceptSea",
+   "waterMask": "/Game/EnvMaps/Sarpedon/ConceptPaste/T_Sarpedon_ConceptWater"
+  },
+  "alpha": "plateA / plateB A = island matte (featherPx) x NOT under frame-002 (cut underFrameUU); opacity mask 0.5",
+  "outside": "clip",
+  "outsideNote": "the outpainted plate B covers every game view (K1x0.65: 0 % beyond it)"
+ },
+ "generator": {
+  "tools/art/concept_paste/cp_bake.py": "afce54fe0a387510172eb4455bd4ce8ae3f0a3ed69924f666876379dc63a60d3",
+  "tools/art/concept_paste/cp_common.py": "db342dc941f417a592a74b27e88c87d43ecf618902d5b6b39f58d30925609c72",
+  "tools/art/concept_paste/paste_proto.py": "1fa552b83c8b578a8c5a1086f72086abc89aecfb2558fc829955975c8b01a748"
+ },
+ "paramsSha256": "4a350bada09abf829116d7791229c950e88dd10ef3b6da6693a4f884576de771",
+ "inputs": {
+  "colour": {
+   "file": "C:/tmp/envmaps-research/p7/plates/sarpedon-extended-2x.png",
+   "sha256": "a89a7e8cc25561450f4e6515c51ba4e23041a27f18ebab44f08950f2a48bd7e7",
+   "size": [
+    4680,
+    2634
+   ],
+   "registrationTag": "extended2x"
+  },
+  "seaSky": {
+   "file": "C:/tmp/envmaps-research/p7/plates/sarpedon-sea-sky.png",
+   "sha256": "f887508320f13d5da93c325b895331518667ece7800d7a704511a16efe90570a",
+   "size": [
+    1920,
+    1080
+   ]
+  }
+ },
+ "outputs": {
+  "PlateA": {
+   "file": "T_Sarpedon_ConceptPlateA.png",
+   "kind": "paste",
+   "size": [
+    4096,
+    2048
+   ],
+   "channels": "RGBA",
+   "rectC0": [
+    0,
+    0,
+    1920,
+    1080
+   ],
+   "sha256": "7588af20776953e4dd8bbb0c4919e35bd4ad9a08d6c78b376a208d570ccfaa5e",
+   "bytes": 16070868,
+   "meanSrgb": [
+    0.2257,
+    0.2,
+    0.1951
+   ]
+  },
+  "PlateB": {
+   "file": "T_Sarpedon_ConceptPlateB.png",
+   "kind": "paste",
+   "size": [
+    4096,
+    2048
+   ],
+   "channels": "RGBA",
+   "rectC0": [
+    -384,
+    -216,
+    2304,
+    1296
+   ],
+   "sha256": "447ca6754b01bc0100e95d09364ba52a0b889af53e3e9097d47b906fe68651dd",
+   "bytes": 14987882,
+   "meanSrgb": [
+    0.1503,
+    0.1575,
+    0.1859
+   ]
+  },
+  "Sea": {
+   "file": "T_Sarpedon_ConceptSea.png",
+   "kind": "sea",
+   "size": [
+    2048,
+    1024
+   ],
+   "channels": "RGB",
+   "rectC0": [
+    -384,
+    -216,
+    2304,
+    1296
+   ],
+   "sha256": "b9d04a487998bd7c4dc637413fa43263516cc4468f85d5a1a4409b63bf56bd6e",
+   "bytes": 3239838,
+   "meanSrgb": [
+    0.0541,
+    0.108,
+    0.1806
+   ]
+  },
+  "Water": {
+   "file": "T_Sarpedon_ConceptWater.png",
+   "kind": "water",
+   "size": [
+    2048,
+    1024
+   ],
+   "channels": "RGB",
+   "rectC0": [
+    -384,
+    -216,
+    2304,
+    1296
+   ],
+   "sha256": "f0d0f364317232316de211759e23a61c0fd30b189241a28409a7340abb29154b",
+   "bytes": 141611,
+   "meanSrgb": [
+    0.0182,
+    0.0037,
+    0.2101
+   ]
+  }
+ },
+ "stats": {
+  "PlateA": {
+   "sourcePxPerTexel": [
+    0.8164,
+    0.9189
+   ],
+   "texelsPerC0Px": [
+    2.1333,
+    1.8963
+   ],
+   "bandResampledTexels": 2345281,
+   "alphaCoverage": 0.6723,
+   "underFrameTexels": 2441086
+  },
+  "PlateB": {
+   "sourcePxPerTexel": [
+    1.143,
+    1.2865
+   ],
+   "texelsPerC0Px": [
+    1.5238,
+    1.3545
+   ],
+   "bandResampledTexels": 1196181,
+   "alphaCoverage": 0.6413,
+   "underFrameTexels": 1244720
+  },
+  "Sea": {
+   "sourcePxPerTexel": [
+    2.2859,
+    2.573
+   ],
+   "texelsPerC0Px": [
+    0.7619,
+    0.6772
+   ],
+   "bandResampledTexels": 300064,
+   "seaMatch": {
+    "refMean": [
+     0.05620000138878822,
+     0.10809999704360962,
+     0.1776999980211258
+    ],
+    "refStd": [
+     0.05609999969601631,
+     0.08489999920129776,
+     0.12409999966621399
+    ],
+    "seaSkyMean": [
+     0.05719999969005585,
+     0.12999999523162842,
+     0.22290000319480896
+    ],
+    "seaSkyStd": [
+     0.0892999991774559,
+     0.12129999697208405,
+     0.16750000417232513
+    ],
+    "mirroredTexels": 625947
+   }
+  },
+  "Water": {
+   "sourcePxPerTexel": [
+    2.2859,
+    2.573
+   ],
+   "texelsPerC0Px": [
+    0.7619,
+    0.6772
+   ],
+   "bandResampledTexels": 300064,
+   "coverage": {
+    "waterfall": 0.0178,
+    "surfBay": 0.003,
+    "sea": 0.2099
+   }
+  }
+ }
+}

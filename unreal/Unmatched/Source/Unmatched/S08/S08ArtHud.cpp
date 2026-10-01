@@ -116,6 +116,10 @@ FS08ZoomStep FS08CameraZoom::FocusZoom(float Zoom) {
   return StartDistanceTween(Requested, MinDistance(), Overview, Config.ZoomAnimSeconds);
 }
 
+FS08ZoomStep FS08CameraZoom::BenchDistance(float Distance) {
+  return StartDistanceTween(Distance, MinDistance(), MaxDistance(), Config.ZoomAnimSeconds);
+}
+
 void FS08CameraZoom::SetFocusTarget(const FVector& Focus) {
   if (Focus.Equals(TargetFocus, 0.01f)) return;
   TargetFocus = Focus;
