@@ -1,0 +1,193 @@
+{
+ "schema": "unmatched.env-maps.graph-duel-check/1",
+ "gameId": "cmupj2dh7000dwi7kkjl9my8s",
+ "boardId": "c121b47f8d6eb28daccb76d05",
+ "map": "marmoreal",
+ "actions": 42,
+ "moves": {
+  "maneuverMoves": 5,
+  "linkedOk": 5,
+  "stepsChecked": 9,
+  "allLinked": true,
+  "moves": [
+   {
+    "seq": 3,
+    "fighter": "f-0-hero",
+    "path": [
+     "M20",
+     "M21",
+     "M25"
+    ],
+    "from": "M13",
+    "to": "M25",
+    "steps": 3,
+    "endMatchesCue": true,
+    "unlinkedSteps": [],
+    "status": "ok"
+   },
+   {
+    "seq": 10,
+    "fighter": "f-1-hero",
+    "path": [
+     "M23",
+     "M26"
+    ],
+    "from": "M31",
+    "to": "M26",
+    "steps": 2,
+    "endMatchesCue": true,
+    "unlinkedSteps": [],
+    "status": "ok"
+   },
+   {
+    "seq": 10,
+    "fighter": "f-1-sk0",
+    "path": [
+     "M24",
+     "M16"
+    ],
+    "from": "M23",
+    "to": "M16",
+    "steps": 2,
+    "endMatchesCue": true,
+    "unlinkedSteps": [],
+    "status": "ok"
+   },
+   {
+    "seq": 27,
+    "fighter": "f-0-sk0",
+    "path": [
+     "M08"
+    ],
+    "from": "M07",
+    "to": "M08",
+    "steps": 1,
+    "endMatchesCue": true,
+    "unlinkedSteps": [],
+    "status": "ok"
+   },
+   {
+    "seq": 31,
+    "fighter": "f-1-sk0",
+    "path": [
+     "M12"
+    ],
+    "from": "M16",
+    "to": "M12",
+    "steps": 1,
+    "endMatchesCue": true,
+    "unlinkedSteps": [],
+    "status": "ok"
+   }
+  ],
+  "nonManeuverCueMoves": [],
+  "problems": []
+ },
+ "ranged": {
+  "rangedNonAdjacent": 4,
+  "byAttacker": {
+   "f-0-hero": 1,
+   "f-1-sk0": 3
+  },
+  "candidates": [
+   {
+    "seat": "host",
+    "attacker": "f-0-hero",
+    "attackerAt": "M25",
+    "target": "f-1-hero",
+    "targetAt": "M31",
+    "linked": false,
+    "sharedZones": [
+     "brown"
+    ],
+    "attackDoneSeq": 4,
+    "serverRow": true,
+    "ok": true
+   },
+   {
+    "seat": "joiner",
+    "attacker": "f-1-sk0",
+    "attackerAt": "M16",
+    "target": "f-0-hero",
+    "targetAt": "M25",
+    "linked": false,
+    "sharedZones": [
+     "blue"
+    ],
+    "attackDoneSeq": 11,
+    "serverRow": true,
+    "ok": true
+   },
+   {
+    "seat": "joiner",
+    "attacker": "f-1-sk0",
+    "attackerAt": "M16",
+    "target": "f-0-hero",
+    "targetAt": "M25",
+    "linked": false,
+    "sharedZones": [
+     "blue"
+    ],
+    "attackDoneSeq": 21,
+    "serverRow": true,
+    "ok": true
+   },
+   {
+    "seat": "joiner",
+    "attacker": "f-1-sk0",
+    "attackerAt": "M16",
+    "target": "f-0-hero",
+    "targetAt": "M25",
+    "linked": false,
+    "sharedZones": [
+     "blue"
+    ],
+    "attackDoneSeq": 23,
+    "serverRow": true,
+    "ok": true
+   },
+   {
+    "seat": "joiner",
+    "attacker": "f-1-sk0",
+    "attackerAt": "M16",
+    "target": "f-0-hero",
+    "targetAt": "M25",
+    "linked": false,
+    "sharedZones": [
+     "blue"
+    ],
+    "attackDoneSeq": null,
+    "serverRow": true,
+    "ok": false
+   },
+   {
+    "seat": "joiner",
+    "attacker": "f-1-sk0",
+    "attackerAt": "M12",
+    "target": "f-0-hero",
+    "targetAt": "M25",
+    "linked": false,
+    "sharedZones": [
+     "blue"
+    ],
+    "attackDoneSeq": null,
+    "serverRow": true,
+    "ok": false
+   }
+  ],
+  "attacksTotal": 8
+ },
+ "result": {
+  "hostOutcome": "VICTORY",
+  "joinerOutcome": "DEFEAT",
+  "gameEndedRow": true,
+  "ok": true
+ },
+ "gates": {
+  "moves": true,
+  "ranged": true,
+  "result": true,
+  "ranged:f-0-hero": true,
+  "ranged:f-1-sk0": true
+ }
+}

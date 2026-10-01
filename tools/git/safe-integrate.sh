@@ -68,5 +68,5 @@ AFTER_DIRTY=$(git status --porcelain)
 [ "$BEFORE_DIRTY" = "$AFTER_DIRTY" ] || echo "WARNING: working-tree status changed beyond the merge - inspect 'git status'" >&2
 echo "SAFE-INTEGRATE MERGED $TARGET -> $(git rev-parse --short HEAD)"
 if [ -n "$UE_CHANGED" ]; then
-  echo "NOTE: UE sources changed ($(printf '%s\n' "$UE_CHANGED" | wc -l) files): rebuild UnmatchedEditor in the main checkout before opening the editor (node tools/s08/build-editor.cjs)."
+  echo "NOTE: UE sources changed ($(printf '%s\n' "$UE_CHANGED" | wc -l) files): rebuild UnmatchedEditor in the main checkout before opening the editor (node tools/s08/build-editor.cjs UnmatchedEditor Win64 Development -Project=$MAIN/unreal/Unmatched/Unmatched.uproject -WaitMutex -NoXGE -MaxParallelActions=6)."
 fi

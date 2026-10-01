@@ -55,6 +55,30 @@ def rows(game_id: str) -> list[dict]:
     return json.loads(r.stdout.strip() or "[]")
 
 
+def final_positions(game_id: str) -> dict:
+    """Fighter positions in the game's final GameState (only used for fighters that never moved)."""
+    if not re.fullmatch(r"c[a-z0-9]{24}", game_id):
+        raise SystemExit(f"refusing game id {game_id!r}")
+    sql = "select state::text from \"GameState\" where \"gameId\" = '" + game_id + "' limit 1"
+    r = subprocess.run(["docker", "exec", CONTAINER, "psql", "-U", "unmatched", "-d", "unmatched", "-At", "-c", sql],
+                       capture_output=True, text=True, encoding="utf-8")
+    if r.returncode != 0:
+        raise SystemExit("psql failed")
+    out: dict = {}
+
+    def walk(o):
+        if isinstance(o, dict):
+            if isinstance(o.get("id"), str) and re.fullmatch(r"f-\d-(hero|sk\d+)", o["id"]) and isinstance(o.get("pos"), dict):
+                out.setdefault(o["id"], (o["pos"].get("x"), o["pos"].get("y")))
+            for v in o.values():
+                walk(v)
+        elif isinstance(o, list):
+            for v in o:
+                walk(v)
+    walk(json.loads(r.stdout.strip() or "{}"))
+    return out
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--host-trace", required=True)
@@ -90,6 +114,15 @@ def main() -> int:
     first = {}
     for (f, _seq), c in order:
         first.setdefault(f, c["move"][0])
+    # A fighter that never moved has no CUE move line, so its position is unknown to the traces. If the
+    # server log has no maneuver path for it either, its final server position is also its start.
+    moved_on_server = {mv["fighterId"] for r in acts if r["type"] == "MANEUVER"
+                       for mv in ((r["payload"] or {}).get("input") or {}).get("moves") or [] if mv.get("path")}
+    unmoved_from_state = []
+    for f, xy in sorted(final_positions(gid).items()):
+        if f not in first and f not in moved_on_server and sid.get(xy):
+            first[f] = sid[xy]
+            unmoved_from_state.append({"fighter": f, "space": sid[xy]})
 
     def pos_before(f: str, seq: int):
         p = first.get(f)
@@ -150,6 +183,7 @@ def main() -> int:
            "cueDisagreements": disagree,
            "maneuver": {"moves": len(moves), "steps": steps, "violations": bad, "detail": moves},
            "nonManeuverMoves": other,
+           "unmovedFromFinalState": unmoved_from_state,
            "attacks": {"total": len(attacks), "rangedNonAdjacent": len(ranged), "rangedByAttacker": by_attacker,
                        "requiredRangedAttackers": a.require_ranged_attacker,
                        "missingRangedAttackers": missing_attackers, "illegalLooking": illegal,
