@@ -20,8 +20,19 @@ Targets (the fixed UE naming contract of S08EnvLayout.h; the layouts in Config/A
                                             ORMTexture bound, TeamColor white, TeamMaskTexture = T_UM_Mask_Black (no team
                                             colour on the environment); base property override TwoSided on for
                                             TWO_SIDED (Cypress Rope Tree Cherry Urn: inward-wound faces), off otherwise
-  Marmoreal: ArcadeBay Portal Cherry PlinthBall LanternPlinth Urn Cypress
-  Sarpedon:  FortRuin Tree Hull Cannon Campfire Palisade Rope
+  Marmoreal: ArcadeBay Portal Cherry PlinthBall LanternPlinth Urn Cypress            (run 20260930-tripo-h31)
+             Balustrade HedgeBed                                                   (run 20261001-tripo-h31-p5)
+             BackWall_BayDoor BackWall_BayWindows BackWall_Centre                  (ASSET-ENV-M-BACKWALL-001)
+  Sarpedon:  FortRuin Tree Hull Cannon Campfire Palisade Rope                      (run 20260930-tripo-h31)
+             Barrel CrateStack LanternPost Banner RockOutcrop                       (run 20261001-tripo-h31-p5)
+  Every prop is read from its own run (RUN_OF: export/ + reports/build-report.json); --run forces one run for all.
+  Shared material sets (MATERIAL_OF): the three back-wall modules share one 2K atlas and one MI -
+  T_Env_BackWall_{BC,N,ORM,E} + MI_Env_BackWall (child of M_EnvProp: its EmissiveWindow lights only the window /
+  door glow texels; look entry 'BackWall' of the P5 run's env-prop-look.json). T_Env_BackWall_E (linear, TC_Masks)
+  is the same glow mask as a texture, imported for a future dedicated master and not bound by M_EnvProp. The back-wall
+  build report (schema unmatched.env-m-backwall.build-report/1, Blender lane K) is adapted to env-kit entries
+  (exports[] -> fbx sha256, the shared textures, height target = the module height, readback = boundsUeLocalUU); its
+  pivot is the back face, not the base centre (bounds x -16 .. +14.8 / +9.3: reported, not a problem).
   /Game/EnvKit/Shared/M_EnvProp             (ENV-MAPS P4 track B) the kit's 'look' master: BC/N/ORM as M_UM_Figure at
                                             its neutral defaults + an HSV-window recolour of the BC and an emissive
                                             window (tools/art/env_kit/env_prop_look.py: HLSL, numpy mirror, --check).
@@ -78,6 +89,9 @@ if str(HERE) not in sys.path:  # env_prop_look (no numpy needed for the UE side)
 import env_prop_look as look_lib  # noqa: E402
 
 RUN_DEFAULT = REPO / "art" / "pipeline-candidates" / "ASSET-ENV-KIT-001" / "20260930-tripo-h31"
+RUN_P5 = REPO / "art" / "pipeline-candidates" / "ASSET-ENV-KIT-001" / "20261001-tripo-h31-p5"
+RUN_BACKWALL = REPO / "art" / "pipeline-candidates" / "ASSET-ENV-M-BACKWALL-001" / "20261001-backwall-v1"
+BACKWALL_SCHEMA = "unmatched.env-m-backwall.build-report/1"
 ROOT = "/Game/EnvKit"
 MASTER = "/Game/UM/Materials/M_UM_Figure"
 MASK_NONE = "/Game/UM/Materials/Textures/T_UM_Mask_Black"
@@ -106,13 +120,36 @@ KIT = {
     "Campfire": ("Sarpedon", "ENV-S-CAMPFIRE", ("diameter", 40.0)),
     "Palisade": ("Sarpedon", "ENV-S-PALISADE", ("height", 70.0)),
     "Rope": ("Sarpedon", "ENV-S-ROPE", ("diameter", 22.0)),
+    # P5 (20261001-tripo-h31-p5; ENV-M-CHERRY-V2 is not processed: ENV-U13)
+    "Barrel": ("Sarpedon", "ENV-S-BARREL", ("height", 28.0)),
+    "CrateStack": ("Sarpedon", "ENV-S-CRATE-STACK", ("height", 45.0)),
+    "LanternPost": ("Sarpedon", "ENV-S-LANTERN-POST", ("height", 95.0)),
+    "Banner": ("Sarpedon", "ENV-S-BANNER", ("height", 120.0)),
+    "RockOutcrop": ("Sarpedon", "ENV-S-ROCK-OUTCROP", ("height", 70.0)),
+    "Balustrade": ("Marmoreal", "ENV-M-BALUSTRADE", ("length", 150.0)),
+    "HedgeBed": ("Marmoreal", "ENV-M-HEDGE-BED", ("length", 150.0)),
+    # Blender lane K (ASSET-ENV-M-BACKWALL-001): three modules on one atlas / one MI (MATERIAL_OF)
+    "BackWall_BayDoor": ("Marmoreal", "ENV-M-BACKWALL/Bay_Door", ("height", 235.0)),
+    "BackWall_BayWindows": ("Marmoreal", "ENV-M-BACKWALL/Bay_Windows", ("height", 235.0)),
+    "BackWall_Centre": ("Marmoreal", "ENV-M-BACKWALL/Centre", ("height", 255.0)),
 }
+P5_NAMES = ("Barrel", "CrateStack", "LanternPost", "Banner", "RockOutcrop", "Balustrade", "HedgeBed")
+BACKWALL_NAMES = ("BackWall_BayDoor", "BackWall_BayWindows", "BackWall_Centre")
+# the run (export/ + reports/build-report.json) every prop comes from; the others come from RUN_DEFAULT
+RUN_OF = {**{n: RUN_P5 for n in P5_NAMES}, **{n: RUN_BACKWALL for n in BACKWALL_NAMES}}
+# props sharing one texture set + MI (T_Env_<set>_*, MI_Env_<set>); the others use their own name
+MATERIAL_OF = {n: "BackWall" for n in BACKWALL_NAMES}
+TEXTURE_KEYS_OF = {"BackWall": ("BC", "N", "ORM", "E")}
 MAPS = {"marmoreal": "Marmoreal", "sarpedon": "Sarpedon"}
 SIZE_OK, SIZE_WARN = 0.01, 0.10  # relative error of the target dimension
 # Meshes with inward-wound faces (track A build report: Cypress 42.9 %, Rope 13.9 %, Tree 12.8 %, Cherry 10.2 %,
 # Urn 4.9 %). M_UM_Figure is one-sided, so their MI overrides TwoSided (P1b review quick fix; the clean fix is a
 # rebuild with static_prop_candidate.fix_winding, after which this set can be emptied).
-TWO_SIDED = {"Cypress", "Rope", "Tree", "Cherry", "Urn"}
+# Keyed by the material set (= the prop name unless MATERIAL_OF says otherwise). P5 (20261001-tripo-h31-p5 build
+# report, ray escape: no prop above 0.1 % inward area): Banner - a cloth card, two-sided by design, plus 2 open slits
+# (12.2 uu2, rim 79.6 uu along the cloth edge); Balustrade - 5 open holes totalling 91.5 uu2 (largest 58.2 uu2,
+# 3.8 uu wide, z 29) that a one-sided material would show as see-through gaps.
+TWO_SIDED = {"Cypress", "Rope", "Tree", "Cherry", "Urn", "Banner", "Balustrade"}
 # M_EnvProp (P4 track B): the look master; graph rebuilt when ENV_GRAPH_VERSION changes (or --force)
 ENV_MASTER = look_lib.MASTER_PATH
 ENV_GRAPH_TAG = "EnvPropGraphVersion"
@@ -141,11 +178,49 @@ def folder_of(name: str) -> str:
     return f"{ROOT}/{KIT[name][0]}"
 
 
+def material_of(name: str) -> str:
+    """The texture / MI set of a prop: T_Env_<set>_*, MI_Env_<set> (the prop name unless it shares an atlas)."""
+    return MATERIAL_OF.get(name, name)
+
+
+def texture_keys(name: str) -> tuple:
+    return TEXTURE_KEYS_OF.get(material_of(name), TEXTURE_KEYS)
+
+
+def run_of(name: str) -> Path:
+    return RUN_OF.get(name, RUN_DEFAULT)
+
+
 def asset_paths(name: str) -> dict:
     f = folder_of(name)
-    out = {"mesh": f"{f}/SM_Env_{name}", "mi": f"{f}/MI_Env_{name}"}
-    out.update({f"tex:{k}": f"{f}/T_Env_{name}_{k}" for k in TEXTURE_KEYS})
+    mat = material_of(name)
+    out = {"mesh": f"{f}/SM_Env_{name}", "mi": f"{f}/MI_Env_{mat}"}
+    out.update({f"tex:{k}": f"{f}/T_Env_{mat}_{k}" for k in texture_keys(name)})
     return out
+
+
+def adapt_backwall_report(data: dict) -> dict:
+    """The Blender lane-K back-wall report (BACKWALL_SCHEMA: exports[] + one shared texture set) as env-kit build-report
+    entries keyed by the UE mesh name, so plan_prop / expected_hashes / target_of read it like track A's report."""
+    tex = {k: dict(v) for k, v in (data.get("textures") or {}).items() if isinstance(v, dict)}
+    for k, v in tex.items():
+        v.setdefault("colorspace", "sRGB" if k == "BC" else "linear")
+    assets = {}
+    for ex in data.get("exports") or []:
+        size = ((ex.get("boundsUeLocalUU") or {}).get("size")) or [None, None, None]
+        checks = ex.get("checks") or {}
+        assets[ex.get("name")] = {
+            "ue": {"mesh": ex.get("name"), "material_instance": "MI_Env_BackWall", "folder": "/Game/EnvKit/Marmoreal/"},
+            "fbx": {"path": ex.get("fbx"), "sha256": ex.get("sha256"), "bytes": ex.get("bytes")},
+            "textures": tex,
+            "target": {"dimension": "height", "uu": size[2]} if isinstance(size[2], (int, float)) else None,
+            "readback": {"dimensions_uu_ue": {"X_depth_front_back": size[0], "Y_width": size[1], "Z_height": size[2]},
+                         "triangles": (ex.get("roundtrip") or {}).get("triangles")},
+            "checks_passed": (bool(checks) and all(checks.values())
+                              and bool((data.get("checks") or {}).get(ex.get("name")))),
+        }
+    return {"schema": REPORT_SCHEMA, "adaptedFrom": BACKWALL_SCHEMA, "assets": assets,
+            "conventions": {"normal": "DirectX (k_blender.py / static_prop_candidate: green flipped, UM_FBX_v1)"}}
 
 
 # ------------------------------------------------------------------------------------------------ build report (A)
@@ -162,7 +237,9 @@ def load_build_report(run: Path) -> dict:
         info.update(present=False, error=f"unreadable: {exc}")
         return info
     info.update(sha256=hashlib.sha256(raw).hexdigest(), schema=data.get("schema"), data=data)
-    if data.get("schema") != REPORT_SCHEMA:
+    if data.get("schema") == BACKWALL_SCHEMA:
+        info.update(data=adapt_backwall_report(data), note=f"{BACKWALL_SCHEMA} adapted to env-kit entries")
+    elif data.get("schema") != REPORT_SCHEMA:
         info["note"] = f"schema {data.get('schema')!r} != {REPORT_SCHEMA}: generic sha256 scan"
     return info
 
@@ -240,19 +317,21 @@ def target_of(report: dict, name: str) -> dict:
 
 def plan_prop(name: str, run: Path, report: dict) -> dict:
     export = run / "export"
+    mat = material_of(name)
     files = {"fbx": export / f"SM_Env_{name}.fbx"}
-    files.update({k: export / f"T_Env_{name}_{k}.png" for k in TEXTURE_KEYS})
+    files.update({k: export / f"T_Env_{mat}_{k}.png" for k in texture_keys(name)})
     expected, source = expected_hashes(report, name)
     entry = report_entry(report, name) or {}
     plan = {"name": name, "map": KIT[name][0], "id": KIT[name][1], "assets": asset_paths(name), "sources": {},
-            "hashSource": source, "target": target_of(report, name), "ok": True, "verified": True}
+            "material": mat, "run": rel(run), "hashSource": source, "target": target_of(report, name),
+            "ok": True, "verified": True}
     ue = entry.get("ue") or {}
     if ue:
         want_folder = folder_of(name) + "/"
         plan["reportUe"] = {"folder": ue.get("folder"), "mesh": ue.get("mesh"), "mi": ue.get("material_instance"),
                             "matchesContract": ue.get("folder") in (want_folder, folder_of(name)) and
                                                ue.get("mesh") == f"SM_Env_{name}" and
-                                               ue.get("material_instance") in (None, f"MI_Env_{name}")}
+                                               ue.get("material_instance") in (None, f"MI_Env_{mat}")}
     if entry.get("checks_passed") is not None:
         plan["reportChecksPassed"] = bool(entry.get("checks_passed"))
     readback = (entry.get("readback") or {}).get("dimensions_uu_ue")
@@ -289,7 +368,7 @@ def texture_settings(key: str, convention: str) -> dict:
     elif key == "N":
         wanted = {"compression_settings": tcs.TC_NORMALMAP, "srgb": False, "lod_group": grp.TEXTUREGROUP_WORLD_NORMAL_MAP,
                   "flip_green_channel": convention == "opengl"}
-    elif key == "ORM":
+    elif key in ("ORM", "E"):  # E: the back wall's glow mask (linear, TC_Masks; not bound by M_EnvProp)
         wanted = {"compression_settings": tcs.TC_MASKS, "srgb": False, "lod_group": grp.TEXTUREGROUP_WORLD}
     else:
         raise KeyError(key)
@@ -489,7 +568,7 @@ def ensure_instance(name: str, master, textures: dict, mask, look: dict | None =
     if mi is None:
         raise RuntimeError(f"could not create {path}")
     white = u.LinearColor(1.0, 1.0, 1.0, 1.0)
-    two_sided = name in TWO_SIDED
+    two_sided = material_of(name) in TWO_SIDED
 
     def rgba(c) -> tuple:  # compared as numbers (struct == is not relied upon)
         return tuple(round(float(getattr(c, k)), 5) for k in ("r", "g", "b", "a"))
@@ -727,6 +806,7 @@ def run_import(plans: dict, args, convention: str) -> tuple[dict, bool]:
             ok = False
     folders_before = {f: folder_listing(f) for f in sorted({folder_of(n) for n in plans}) if eal.does_directory_exist(f)}
     result["props"] = {}
+    shared: dict = {}  # material set -> the prop that imported its textures / MI in this run
     for name, plan in plans.items():
         out: dict = {}
         result["props"][name] = out
@@ -738,17 +818,24 @@ def run_import(plans: dict, args, convention: str) -> tuple[dict, bool]:
         try:
             paths = plan["assets"]
             textures = {}
-            out["textures"] = {}
-            for key in TEXTURE_KEYS:
-                out["textures"][key] = import_texture(plan["sources"][key], paths[f"tex:{key}"], key, convention,
-                                                      args.force)
-                textures[key] = u.load_asset(paths[f"tex:{key}"])
-            if plan.get("look"):
-                if env_master is None:
-                    raise RuntimeError(f"{ENV_MASTER} not available (see ue.envMaster)")
-                out["materialInstance"] = ensure_instance(name, env_master, textures, mask, plan["look"])
+            mat = plan.get("material", name)
+            if mat in shared:  # the shared atlas + MI were already imported / checked for an earlier module
+                textures = {key: u.load_asset(paths[f"tex:{key}"]) for key in texture_keys(name)}
+                out["textures"] = {"sharedWith": shared[mat]}
+                out["materialInstance"] = {"sharedWith": shared[mat], "path": paths["mi"]}
             else:
-                out["materialInstance"] = ensure_instance(name, master, textures, mask)
+                out["textures"] = {}
+                for key in texture_keys(name):
+                    out["textures"][key] = import_texture(plan["sources"][key], paths[f"tex:{key}"], key,
+                                                          plan.get("normalConvention", convention), args.force)
+                    textures[key] = u.load_asset(paths[f"tex:{key}"])
+                if plan.get("look"):
+                    if env_master is None:
+                        raise RuntimeError(f"{ENV_MASTER} not available (see ue.envMaster)")
+                    out["materialInstance"] = ensure_instance(name, env_master, textures, mask, plan["look"])
+                else:
+                    out["materialInstance"] = ensure_instance(name, master, textures, mask)
+                shared[mat] = name
             mi = u.load_asset(paths["mi"])
             fbx = plan["sources"]["fbx"]
             mesh = u.load_asset(paths["mesh"]) if eal.does_asset_exist(paths["mesh"]) else None
@@ -797,28 +884,61 @@ def run_import(plans: dict, args, convention: str) -> tuple[dict, bool]:
 
 
 # ---------------------------------------------------------------------------------------------------------- look
-def attach_look(plans: dict, run: Path, args) -> tuple[dict, bool]:
-    """plans[name]['look'] = the M_EnvProp MI parameters of every prop in the look file (env_prop_look.mi_params);
-    a look file that does not validate fails the run (nothing half-applied). Returns (report info, ok)."""
+def look_names() -> set:
+    """Names a look file may use: the material sets (a prop's own name, or the shared set such as BackWall)."""
+    return {material_of(n) for n in KIT}
+
+
+def attach_look(plans: dict, run: Path | None, args) -> tuple[dict, bool]:
+    """plans[name]['look'] = the M_EnvProp MI parameters of the prop's material set (env_prop_look.mi_params). The look
+    files: --look, else <run>/scripts/env-prop-look.json of `run`, of every planned prop's run (plan['run']) and (without
+    --run) of every kit prop's run (RUN_OF) that has one - one entry per material set across the files (a set listed twice fails). A look file that does not
+    validate fails the run (nothing half-applied). Returns (report info, ok)."""
     if args.no_look:
         return {"used": False, "note": "--no-look: every MI on M_UM_Figure"}, True
-    path = Path(args.look) if args.look else run / "scripts" / "env-prop-look.json"
-    if not path.is_file():
-        if args.look:
-            return {"used": False, "path": rel(path), "error": "look file missing"}, False
-        return {"used": False, "path": rel(path), "note": "no look file: every MI on M_UM_Figure"}, True
-    try:
-        data = look_lib.load_look(path)
-    except (OSError, ValueError) as exc:
-        return {"used": False, "path": rel(path), "error": str(exc)}, False
-    unknown = sorted(n for n in data["props"] if n not in KIT)
-    if unknown:
-        return {"used": False, "path": rel(path), "error": f"unknown kit names {unknown}"}, False
+    if args.look:
+        paths = [Path(args.look)]
+        if not paths[0].is_file():
+            return {"used": False, "path": rel(paths[0]), "error": "look file missing"}, False
+    else:
+        # P5b tune: without --run also every kit prop's own run (RUN_OF), so a partial import (--names BackWall_*) finds
+        # the same look files as a full one - the back-wall run has no look file of its own, its 'BackWall' entry is in
+        # the P5 run's file (before, such an import put MI_Env_BackWall back on M_UM_Figure)
+        runs = ([Path(run)] if run is not None else []) + [REPO / p["run"] for p in plans.values() if p.get("run")]
+        if run is None:
+            runs += [run_of(n) for n in KIT]
+        paths = []
+        for r in runs:
+            cand = (r / "scripts" / "env-prop-look.json").resolve()
+            if cand.is_file() and cand not in paths:
+                paths.append(cand)
+        if not paths:
+            return {"used": False, "paths": [], "note": "no look file: every MI on M_UM_Figure"}, True
+    merged, files = {}, []
+    for path in paths:
+        try:
+            data = look_lib.load_look(path)
+        except (OSError, ValueError) as exc:
+            return {"used": False, "path": rel(path), "error": str(exc)}, False
+        unknown = sorted(n for n in data["props"] if n not in look_names())
+        if unknown:
+            return {"used": False, "path": rel(path), "error": f"unknown kit names {unknown}"}, False
+        twice = sorted(n for n in data["props"] if n in merged)
+        if twice:
+            return {"used": False, "path": rel(path), "error": f"look entries {twice} in two look files"}, False
+        for n in data["props"]:
+            merged[n] = (data, path)
+        files.append({"path": rel(path), "sha256": sha256_file(path), "props": sorted(data["props"])})
     for name, plan in plans.items():
-        if name in data["props"]:
-            plan["look"] = look_lib.mi_params(data, name)
-    return {"used": True, "path": rel(path), "sha256": sha256_file(path), "master": ENV_MASTER,
-            "props": sorted(data["props"]), "selected": sorted(n for n in plans if n in data["props"])}, True
+        hit = merged.get(material_of(name))
+        if hit is not None:
+            plan["look"] = look_lib.mi_params(hit[0], material_of(name))
+            plan["lookFile"] = rel(hit[1])
+    info = {"used": True, "master": ENV_MASTER, "files": files, "props": sorted(merged),
+            "selected": sorted(n for n in plans if material_of(n) in merged)}
+    if len(files) == 1:  # the single-file keys of the P4 report
+        info.update(path=files[0]["path"], sha256=files[0]["sha256"])
+    return info, True
 
 
 # ---------------------------------------------------------------------------------------------------------- entry
@@ -841,9 +961,10 @@ def select(args) -> list:
 
 def main(argv: list | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n", 1)[0])
-    parser.add_argument("--run", default=str(RUN_DEFAULT), help="run directory with export/ and reports/")
+    parser.add_argument("--run", default=None,
+                        help="force one run directory (export/ + reports/) for every prop; default: RUN_OF per prop")
     parser.add_argument("--maps", default="", help="comma list: marmoreal,sarpedon (default both)")
-    parser.add_argument("--names", default="", help="comma list of kit names (ArcadeBay, ..., Rope)")
+    parser.add_argument("--names", default="", help="comma list of kit names (ArcadeBay, ..., Rope, Barrel, ...)")
     parser.add_argument("--report", default=None, help="report JSON path")
     parser.add_argument("--check", action="store_true", help="verify sources only (no UE import)")
     parser.add_argument("--force", action="store_true", help="re-import textures and meshes")
@@ -855,23 +976,32 @@ def main(argv: list | None = None) -> int:
     parser.add_argument("--no-look", action="store_true", help="every MI on M_UM_Figure (ignore the look file)")
     args = parser.parse_args(argv)
     started = time.time()
-    run = Path(args.run).resolve()
+    forced = Path(args.run).resolve() if args.run else None
     names = select(args)
-    report = load_build_report(run)
-    convention, convention_source = normal_convention(report, args.normal)
-    plans = {name: plan_prop(name, run, report) for name in names}
-    look_info, look_ok = attach_look(plans, run, args)
+    runs = {name: forced or run_of(name).resolve() for name in names}
+    reports = {r: load_build_report(r) for r in dict.fromkeys(runs.values())}
+    conventions = {r: normal_convention(rep, args.normal) for r, rep in reports.items()}
+    plans = {}
+    for name in names:
+        plans[name] = plan_prop(name, runs[name], reports[runs[name]])
+        plans[name]["normalConvention"] = conventions[runs[name]][0]
+    look_info, look_ok = attach_look(plans, forced, args)
+    used = sorted({c for c, _ in conventions.values()})
+    convention = used[0] if len(used) == 1 else "per-run"
+    convention_source = "; ".join(f"{rel(r)}: {c} ({src})" for r, (c, src) in conventions.items())
     out = {"schema": "unmatched.env-kit-ue-import/1", "tool": "tools/art/env_kit/ue_import_env_kit.py",
-           "mode": "check" if (args.check or u is None) else "import", "run": rel(run), "contentRoot": ROOT,
-           "master": MASTER, "envMaster": ENV_MASTER, "envGraphVersion": ENV_GRAPH_VERSION, "look": look_info,
-           "normalConvention": convention, "normalConventionSource": convention_source,
+           "mode": "check" if (args.check or u is None) else "import",
+           "run": rel(forced) if forced else "per prop (RUN_OF)", "runs": sorted(rel(r) for r in reports),
+           "contentRoot": ROOT, "master": MASTER, "envMaster": ENV_MASTER, "envGraphVersion": ENV_GRAPH_VERSION,
+           "look": look_info, "normalConvention": convention, "normalConventionSource": convention_source,
            "importScale": args.import_scale,
-           "buildReport": {k: v for k, v in report.items() if k != "data"}, "props": plans}
+           "buildReport": {rel(r): {k: v for k, v in rep.items() if k != "data"} for r, rep in reports.items()},
+           "props": plans}
     ok = all(p["ok"] for p in plans.values()) and look_ok
     if args.require_verified:
         ok = ok and all(p["verified"] for p in plans.values())
     if out["mode"] == "import":
-        imported, import_ok = run_import(plans, args, convention)
+        imported, import_ok = run_import(plans, args, used[0] if len(used) == 1 else "directx")
         out["ue"] = imported
         out["engine"] = str(u.SystemLibrary.get_engine_version())
         ok = ok and import_ok

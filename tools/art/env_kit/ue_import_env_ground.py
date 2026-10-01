@@ -30,6 +30,18 @@ Three stages, one file:
                                                                   water, accent, grade, SplatRect
            /Game/EnvKit/Ground/M_EnvWaterfall                      P4: the waterfall card material (masked, lit)
            /Game/EnvKit/Ground/MI_EnvWaterfall_<Map>               only maps with ground-params 'water.falls'
+           /Game/EnvKit/Ground/M_EnvSea                            P5 track B: the sea ring material (opaque, lit)
+           /Game/EnvKit/Ground/MI_EnvSea_<Map>                     only maps with ground-params 'sea' (Sarpedon)
+           /Game/EnvKit/Ground/<Map>/SM_Env_S_{Waterfall,WaterfallFoam,WaterfallLip,SeaRing}
+                                                                  P5 track B: the lane K meshes (art/pipeline-candidates/
+                                                                  ASSET-ENV-S-WATERFALL-001/<run>/export, sha256 = the
+                                                                  run's build-report exports): legacy FbxFactory, scale 1,
+                                                                  normals imported, no collision, Nanite off; vertex
+                                                                  colours REPLACE for the lip and the sea ring (Col
+                                                                  masks), IGNORE for the sheet / foam; slots: sheet and
+                                                                  foam -> MI_EnvWaterfall_<Map> (the runtime puts MIDs on
+                                                                  top), lip -> MI_TableBase_T2b_<Map> (ue_import_tray_t2.py
+                                                                  runs first; else a warning), sea -> MI_EnvSea_<Map>
            (DefaultGame.ini cooks /Game/EnvKit already; S08EnvGround.cpp loads the MIs by the layout paths.)
 
 M_EnvGround (graph 2; lit, opaque, one-sided; every texture on a SHARED sampler - 16 samples use no sampler slot):
@@ -56,12 +68,19 @@ M_EnvGround (graph 2; lit, opaque, one-sided; every texture on a SHARED sampler 
              WaterSurface.x, foam -> 0.7
   specular = sum w_i LayerSpecular_i, water -> WaterSurface.y;  AO / metallic = sum w_i ORMH_i.rb
   emissive = graded WaterColor * WaterSurface.w * water * (1 - foam)  (the map's river is lifted; 0 without water)
-M_EnvWaterfall (masked, clip 0.5, lit, two-sided): FallCard = (width, height, kind 0 card / 1 spill, 0) per
-  component (S08EnvGround sets it on the MID); streaks scroll along +v at FallFlow.x uu/s (v runs down the card and
+M_EnvWaterfall (masked, clip 0.5, lit, two-sided): FallCard = (width, height, kind 0 card / 1 spill, flip) per
+  component (S08EnvGround sets it on the MID; flip 1 = v := 1 - v for the lane K sheet / foam meshes, whose v was authored
+  top -> bottom in Blender and is flipped by the FBX import; 0 for the engine-plane card / spill); streaks scroll along +v at FallFlow.x uu/s (v runs down the card and
   towards the lip on the spill), foam at the lip and in the streaks, side fade FallFlow.z uu, bottom fade FallFlow.w,
   spill far-edge fade FallSpill.x uu, the soft fades dithered in screen space (interleaved gradient noise on
   SvPosition, amount FallSpill.y; no DitherTemporalAA node - it is not in the UE 5.8 headers); ripple normal along the
   flow; emissive = graded colour * FallShade.w.
+M_EnvSea (P5 track B; opaque, lit, one-sided): UV0 = board XY / SeaTile.x uu (the lane K ring), VertexColor R = the foam
+  band at the cliffs (broken by two drifting value noises, SeaFlow.zw = foam scale uu / speed), G = the far fade (0 at the
+  cliffs, 1 from 3500 uu out) -> SeaFar.rgb (strength SeaFar.a); base = lerp(SeaColor, SeaFoam.rgb, foam * SeaFoam.a),
+  night grade as M_EnvWaterfall; ripple normal (WaterRippleN, panned SeaFlow.xy uu/s at SeaTile.y uu) of strength
+  SeaShade.z fading out far; roughness SeaShade.x (foam 0.7, far 0.95), specular SeaShade.y (0 far), emissive = graded *
+  SeaShade.w * (1 - far) (the sea stays readable under the night grade without a light).
 Idempotent: textures carry EnvGroundSourceSha256 (re-imported only when the source changes or --force), the materials
 carry EnvGroundGraphVersion (rebuilt only when their graph version changes or --force), the MIs are compared parameter by
 parameter and only written when they differ. Report: 'ENVGROUND-IMPORT-REPORT {...}' / 'ENVGROUND-IMPORT-RESULT ok|failed'
@@ -102,10 +121,21 @@ MATERIAL_NAME = "M_EnvGround"
 MATERIAL_PATH = f"{ROOT}/{MATERIAL_NAME}"
 FALL_MATERIAL_NAME = "M_EnvWaterfall"
 FALL_MATERIAL_PATH = f"{ROOT}/{FALL_MATERIAL_NAME}"
+SEA_MATERIAL_NAME = "M_EnvSea"
+SEA_MATERIAL_PATH = f"{ROOT}/{SEA_MATERIAL_NAME}"
+SEA_GRAPH_VERSION = "1"
+# P5 track B: the lane K meshes of a map (part -> (asset name, vertex colours)); folder /Game/EnvKit/Ground/<Map>
+ENV_MESHES = {"sheet": ("SM_Env_S_Waterfall", "ignore"), "foam": ("SM_Env_S_WaterfallFoam", "ignore"),
+              "lip": ("SM_Env_S_WaterfallLip", "replace"), "sea": ("SM_Env_S_SeaRing", "replace")}
+MESH_SHA_TAG = "EnvGroundMeshSha256"
+MESH_VC_TAG = "EnvGroundVertexColors"
+MESH_BOUNDS_TOL_UU = 0.5
+MESH_TRIS_TOL = 0.01
+T2B_MI_PREFIX = "/Game/PipelineCandidates/TableBase/T2b/MI_TableBase_T2b_"
 SHA_TAG = "EnvGroundSourceSha256"
 GRAPH_TAG = "EnvGroundGraphVersion"
 GRAPH_VERSION = "2"
-FALL_GRAPH_VERSION = "1"
+FALL_GRAPH_VERSION = "2"  # P5b tune: FallCard.w = 1 flips v (lane K meshes)
 PREP_VERSION = "1"
 KEYS = ("BC", "N", "ORMH")
 LAYERS = 4
@@ -169,6 +199,64 @@ def mi_asset(key: str) -> str:
 
 def fall_mi_asset(key: str) -> str:
     return f"{ROOT}/MI_EnvWaterfall_{MAPS[key]}"
+
+
+def sea_mi_asset(key: str) -> str:
+    return f"{ROOT}/MI_EnvSea_{MAPS[key]}"
+
+
+def has_sea(params: dict, key: str) -> bool:
+    return bool(params["maps"][key].get("sea"))
+
+
+def mesh_asset(key: str, part: str) -> str:
+    return f"{ROOT}/{MAPS[key]}/{ENV_MESHES[part][0]}"
+
+
+def mesh_parts(params: dict, key: str) -> dict:
+    """{part: lane K run (repo-relative)} of the meshes a map needs: sheet + foam (+ lip) for a fall with 'mesh', the
+    sea ring for 'sea'."""
+    parts = {}
+    for f in (params["maps"][key].get("water") or {}).get("falls") or []:
+        m = f.get("mesh")
+        if m:
+            parts.update(sheet=m["run"], foam=m["run"])
+            if m.get("lip", True):
+                parts["lip"] = m["run"]
+    sea = params["maps"][key].get("sea")
+    if sea:
+        parts["sea"] = sea["run"]
+    return parts
+
+
+def plan_meshes(params: dict, key: str) -> dict:
+    """The FBX of every mesh part verified against its run's build report (sha256, triangles, bounds)."""
+    out, reports = {}, {}
+    for part, run in mesh_parts(params, key).items():
+        name, vc = ENV_MESHES[part]
+        item = {"asset": mesh_asset(key, part), "vertexColors": vc, "run": run}
+        try:
+            if run not in reports:
+                reports[run] = json.loads((REPO / run / "reports" / "build-report.json").read_text(encoding="utf-8"))
+            rep_ = reports[run]
+            exp = next((e for e in rep_.get("exports") or [] if e.get("name") == name), None)
+            if rep_.get("checks_passed") is not True or exp is None:
+                raise ValueError(f"{name} not in a passing build report of {run}")
+            fbx = REPO / run / "export" / f"{name}.fbx"
+            item.update(source=fbx.as_posix(), path=rel(fbx), expectedSha256=exp["sha256"],
+                        triangles=exp.get("triangles"), boundsUeUU=exp.get("boundsUeLocalUU"),
+                        slots=len((exp.get("roundtrip") or {}).get("material_slots") or [None]))
+            if not fbx.is_file():
+                item.update(ok=False, error="FBX missing")
+            else:
+                item["sha256"] = sha256_file(fbx)
+                item["ok"] = item["sha256"] == exp["sha256"]
+                if not item["ok"]:
+                    item["error"] = "sha256 differs from the run's build report"
+        except (OSError, ValueError, KeyError) as exc:
+            item.update(ok=False, error=f"{type(exc).__name__}: {exc}")
+        out[part] = item
+    return out
 
 
 def has_falls(params: dict, key: str) -> bool:
@@ -397,6 +485,9 @@ def plan(params: dict, keys: list[str], staging: Path, params_path: Path) -> dic
         m = {"ok": True, "splatAsset": splat_asset(key), "auxAsset": aux_asset(key), "mi": mi_asset(key)}
         if has_falls(params, key):
             m["fallMi"] = fall_mi_asset(key)
+        if has_sea(params, key):
+            m["seaMi"] = sea_mi_asset(key)
+        m["meshes"] = plan_meshes(params, key)
         meta_path = params_path.parent / f"{key}.splat.json"
         png_path = params_path.parent / f"{key}.splat.png"
         aux_path = params_path.parent / f"{key}.aux.png"
@@ -433,7 +524,27 @@ def plan(params: dict, keys: list[str], staging: Path, params_path: Path) -> dic
                 for f in falls:
                     if f.get("material") != fall_mi_asset(key):
                         probs.append(f"waterfall {f.get('id')} material {f.get('material')!r} != {fall_mi_asset(key)!r}")
+                    fm = f.get("mesh")
+                    if isinstance(fm, dict):
+                        for part in ("sheet", "foam", "lip"):
+                            if fm.get(part) is not None and fm.get(part) != mesh_asset(key, part):
+                                probs.append(f"waterfall {f.get('id')} mesh.{part} {fm.get(part)!r} != {mesh_asset(key, part)!r}")
+                        if fm.get("lip") is not None and fm.get("lipMaterial") != f"{T2B_MI_PREFIX}{MAPS[key]}":
+                            probs.append(f"waterfall {f.get('id')} mesh.lipMaterial {fm.get('lipMaterial')!r}")
                 m["waterfalls"] = len(falls)
+                sea = g.get("sea")
+                if sea != meta.get("sea"):
+                    probs.append("ground.sea != the splat meta sea")
+                if bool(sea) != has_sea(params, key):
+                    probs.append("ground.sea present / absent unlike ground-params sea")
+                if isinstance(sea, dict):
+                    if sea.get("material") != sea_mi_asset(key):
+                        probs.append(f"ground.sea.material {sea.get('material')!r} != {sea_mi_asset(key)!r}")
+                    if sea.get("mesh") != mesh_asset(key, "sea"):
+                        probs.append(f"ground.sea.mesh {sea.get('mesh')!r} != {mesh_asset(key, 'sea')!r}")
+            bad = [f"{part}: {it.get('error')}" for part, it in m["meshes"].items() if not it.get("ok")]
+            if bad:
+                probs.append("meshes " + "; ".join(bad))
             if probs:
                 m.update(ok=False, error="; ".join(probs) + " (ground_splat.py --write-layouts)")
         except (OSError, ValueError, KeyError) as exc:
@@ -897,17 +1008,19 @@ struct FEnvFallFns {
 FEnvFallFns F;
 float2 size = max(FallCard.xy, float2(1.0, 1.0));
 bool spill = FallCard.z > 0.5;
-float2 p = UV * size;  // uu: x across the fall, y along the flow (down the card / towards the lip on the spill)
+// FallCard.w = 1: a lane K mesh (P5 tune) - its v was authored top->bottom in Blender and the FBX import flips V
+float2 uvf = FallCard.w > 0.5 ? float2(UV.x, 1.0 - UV.y) : UV;
+float2 p = uvf * size;  // uu: x across the fall, y along the flow (down the card / towards the lip on the spill)
 float sc = max(FallFlow.y, 1.0);
 float2 q = float2(p.x / sc, (p.y - Time * FallFlow.x) / (sc * 5.0));
 float streak = 0.6 * F.ValueNoise(q) + 0.4 * F.ValueNoise(q * float2(2.1, 1.7) + 7.3);
-float foam = spill ? saturate(UV.y * 1.4 - 0.5) * (0.5 + streak)
-                   : saturate(streak * 1.5 - 0.35) * (0.55 + 0.45 * saturate(1.0 - UV.y * 1.5)) + 0.6 * saturate(1.0 - p.y / 14.0);
+float foam = spill ? saturate(uvf.y * 1.4 - 0.5) * (0.5 + streak)
+                   : saturate(streak * 1.5 - 0.35) * (0.55 + 0.45 * saturate(1.0 - uvf.y * 1.5)) + 0.6 * saturate(1.0 - p.y / 14.0);
 foam = saturate(foam) * WaterFoam.a;
 float side = smoothstep(0.0, max(FallFlow.z, 0.5), p.x) * smoothstep(0.0, max(FallFlow.z, 0.5), size.x - p.x);
 float alpha = side * (0.75 + 0.5 * streak);
 alpha *= spill ? smoothstep(0.0, max(FallSpill.x, 0.5), p.y)
-               : 1.0 - smoothstep(1.0 - FallFlow.w, 1.0, UV.y + 0.25 * (streak - 0.5));
+               : 1.0 - smoothstep(1.0 - FallFlow.w, 1.0, uvf.y + 0.25 * (streak - 0.5));
 float3 base = lerp(WaterColor.rgb, WaterFoam.rgb, foam);
 float3 lit = base * exp2(NightEV) * NightTint;
 float luma = dot(lit, float3(0.2126, 0.7152, 0.0722));
@@ -923,7 +1036,7 @@ float ign = frac(52.9829189 * frac(dot(px, float2(0.06711056, 0.00583715))));
 return saturate(alpha + (ign - 0.5) * FallSpill.y);
 """
 HLSL_FALL_ROUGH = HLSL_FALL_CORE + "return saturate(lerp(FallShade.x, 0.6, foam));\n"
-HLSL_FALL_RIPPLE_UV = """float2 p = UV * max(FallCard.xy, float2(1.0, 1.0));
+HLSL_FALL_RIPPLE_UV = """float2 p = (FallCard.w > 0.5 ? float2(UV.x, 1.0 - UV.y) : UV) * max(FallCard.xy, float2(1.0, 1.0));
 return float2(p.x, p.y - Time * FallFlow.x) / max(RippleTileUU, 1.0);
 """
 HLSL_FALL_NORMAL = "return normalize(float3(R.xy * FallShade.z, 1.0));"
@@ -984,6 +1097,306 @@ def build_waterfall_material(ripple_default, force: bool) -> dict:
     _finish_material(material, FALL_MATERIAL_PATH, FALL_GRAPH_VERSION)
     return {"action": action, "path": FALL_MATERIAL_PATH, "graphVersion": FALL_GRAPH_VERSION,
             "expressions": int(mel.get_num_material_expressions(material))}
+
+
+# --- M_EnvSea (P5 track B, review gap 8): the dark sea ring under the Sarpedon island -----------------------------------
+HLSL_SEA_CORE = """// P5 M_EnvSea: VC.r = the foam band at the cliffs, VC.g = the far fade (lane K SM_Env_S_SeaRing); UV0 = XY / SeaTile.x
+struct FEnvSeaFns {
+  float Hash12(float2 p) {
+    float3 p3 = frac(float3(p.xyx) * 0.1031);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return frac((p3.x + p3.y) * p3.z);
+  }
+  float ValueNoise(float2 q) {
+    float2 i0 = floor(q);
+    float2 f = frac(q);
+    float2 s = f * f * (3.0 - 2.0 * f);
+    float a = Hash12(i0);
+    float b = Hash12(i0 + float2(1.0, 0.0));
+    float c = Hash12(i0 + float2(0.0, 1.0));
+    float d = Hash12(i0 + float2(1.0, 1.0));
+    return lerp(lerp(a, b, s.x), lerp(c, d, s.x), s.y);
+  }
+};
+FEnvSeaFns F;
+float2 p = UV * max(SeaTile.x, 1.0);  // board uu
+float sc = max(SeaFlow.z, 1.0);
+float n = 0.6 * F.ValueNoise(p / sc + Time * SeaFlow.w * float2(0.7, 0.3))
+        + 0.4 * F.ValueNoise(p / (sc * 0.43) - Time * SeaFlow.w * float2(0.2, 0.6) + 5.1);
+float foam = saturate((saturate(VC.r) * (0.55 + 0.9 * n) - 0.3) * 2.0) * SeaFoam.a;
+float far = saturate(VC.g) * SeaFar.a;
+float3 base = lerp(lerp(SeaColor.rgb, SeaFoam.rgb, foam), SeaFar.rgb, far);
+float3 lit = base * exp2(NightEV) * NightTint;
+float luma = dot(lit, float3(0.2126, 0.7152, 0.0722));
+float3 graded = max(lerp(luma.xxx, lit, NightSaturation), 0.0);
+"""
+SEA_CORE_INPUTS = ("UV", "Time", "VC", "SeaColor", "SeaFar", "SeaFoam", "SeaFlow", "SeaTile", "NightEV",
+                   "NightSaturation", "NightTint")
+HLSL_SEA_ALBEDO = HLSL_SEA_CORE + "return graded;\n"
+HLSL_SEA_EMISSIVE = HLSL_SEA_CORE + "return graded * SeaShade.w * (1.0 - far);\n"
+HLSL_SEA_ROUGH = HLSL_SEA_CORE + "return saturate(lerp(lerp(SeaShade.x, 0.7, foam), 0.95, far));\n"
+HLSL_SEA_SPECULAR = HLSL_SEA_CORE + "return saturate(SeaShade.y * (1.0 - far));\n"
+HLSL_SEA_RIPPLE_UV = """float2 p = UV * max(SeaTile.x, 1.0);
+return (p + Time * SeaFlow.xy) / max(SeaTile.y, 1.0);
+"""
+HLSL_SEA_NORMAL = "return normalize(float3(R.xy * SeaShade.z * (1.0 - saturate(VC.g)), 1.0));"
+SEA_SCALAR_DEFAULTS = {"NightEV": -1.0, "NightSaturation": 0.85}
+SEA_VECTOR_DEFAULTS = {"SeaColor": (0.0052, 0.0160, 0.0423, 1.0), "SeaFar": (0.0018, 0.0033, 0.0070, 1.0),
+                       "SeaFoam": (0.62, 0.66, 0.7, 0.7), "SeaFlow": (3.0, 1.5, 14.0, 0.3),
+                       "SeaTile": (600.0, 160.0, 0.0, 0.0), "SeaShade": (0.08, 0.3, 0.5, 1.5),
+                       "NightTint": (0.97, 1.0, 1.08, 1.0)}
+
+
+def build_sea_material(ripple_default, force: bool) -> dict:
+    material, action = _begin_material(SEA_MATERIAL_PATH, SEA_MATERIAL_NAME, SEA_GRAPH_VERSION, force)
+    if action == "unchanged":
+        return {"action": "unchanged", "path": SEA_MATERIAL_PATH, "graphVersion": SEA_GRAPH_VERSION}
+    mel = u.MaterialEditingLibrary
+    material.set_editor_property("shading_model", u.MaterialShadingModel.MSM_DEFAULT_LIT)
+    material.set_editor_property("blend_mode", u.BlendMode.BLEND_OPAQUE)
+    material.set_editor_property("two_sided", False)
+    g = _Graph(material)
+    cmot, st, ssm = u.CustomMaterialOutputType, u.MaterialSamplerType, u.SamplerSourceMode
+    uv = g.expr(u.MaterialExpressionTextureCoordinate, -2000)
+    uv.set_editor_property("coordinate_index", 0)
+    t = g.expr(u.MaterialExpressionTime, -2000)
+    vc = g.expr(u.MaterialExpressionVertexColor, -2000)
+    s = {name: g.scalar(name, val) for name, val in SEA_SCALAR_DEFAULTS.items()}
+    v = {name: g.vector(name, val) for name, val in SEA_VECTOR_DEFAULTS.items()}
+    src = {"UV": (uv, ""), "Time": (t, ""), "VC": (vc, ""), "NightEV": (s["NightEV"], ""),
+           "NightSaturation": (s["NightSaturation"], ""), "NightTint": (v["NightTint"], "RGB")}
+    for name in ("SeaColor", "SeaFar", "SeaFoam", "SeaFlow", "SeaTile", "SeaShade"):
+        src[name] = (v[name], "RGBA")
+    nodes = {}
+    for desc, code, out_type, extra, y in (
+            ("SeaAlbedo", HLSL_SEA_ALBEDO, cmot.CMOT_FLOAT3, (), -300),
+            ("SeaEmissive", HLSL_SEA_EMISSIVE, cmot.CMOT_FLOAT3, ("SeaShade",), 0),
+            ("SeaRoughness", HLSL_SEA_ROUGH, cmot.CMOT_FLOAT1, ("SeaShade",), 300),
+            ("SeaSpecular", HLSL_SEA_SPECULAR, cmot.CMOT_FLOAT1, ("SeaShade",), 600)):
+        pins = SEA_CORE_INPUTS + extra
+        node = g.custom(desc, out_type, pins, code, -800, y)
+        g.wire(node, {p_: src[p_] for p_ in pins})
+        nodes[desc] = node
+    ruv = g.custom("SeaRippleUV", cmot.CMOT_FLOAT2, ("UV", "Time", "SeaFlow", "SeaTile"), HLSL_SEA_RIPPLE_UV, -1500, 900)
+    g.wire(ruv, {k: src[k] for k in ("UV", "Time", "SeaFlow", "SeaTile")})
+    rs = g.sample("WaterRippleN", st.SAMPLERTYPE_NORMAL, ripple_default, ssm.SSM_WRAP_WORLD_GROUP_SETTINGS, -1200, 900)
+    g.connect(ruv, "", rs, "UVs")
+    normal = g.custom("SeaNormal", cmot.CMOT_FLOAT3, ("R", "SeaShade", "VC"), HLSL_SEA_NORMAL, -800, 900)
+    g.wire(normal, {"R": (rs, "RGB"), "SeaShade": src["SeaShade"], "VC": src["VC"]})
+    mel.connect_material_property(nodes["SeaAlbedo"], "", u.MaterialProperty.MP_BASE_COLOR)
+    mel.connect_material_property(nodes["SeaEmissive"], "", u.MaterialProperty.MP_EMISSIVE_COLOR)
+    mel.connect_material_property(nodes["SeaRoughness"], "", u.MaterialProperty.MP_ROUGHNESS)
+    mel.connect_material_property(nodes["SeaSpecular"], "", u.MaterialProperty.MP_SPECULAR)
+    mel.connect_material_property(normal, "", u.MaterialProperty.MP_NORMAL)
+    _finish_material(material, SEA_MATERIAL_PATH, SEA_GRAPH_VERSION)
+    return {"action": action, "path": SEA_MATERIAL_PATH, "graphVersion": SEA_GRAPH_VERSION,
+            "expressions": int(mel.get_num_material_expressions(material))}
+
+
+def sea_mi_want(key: str, params: dict, ripple=None) -> dict:
+    """MI_EnvSea_<Map>: ground-params maps.<key>.sea + the map's night grade."""
+    mp = params["maps"][key]
+    sp = mp.get("sea") or {}
+    gr = mp["grade"]
+    color = srgb8_to_linear(sp["colorSrgb"]) if "colorSrgb" in sp else SEA_VECTOR_DEFAULTS["SeaColor"][:3]
+    far = srgb8_to_linear(sp["farSrgb"]) if "farSrgb" in sp else SEA_VECTOR_DEFAULTS["SeaFar"][:3]
+    pan = sp.get("panUUps", SEA_VECTOR_DEFAULTS["SeaFlow"][:2])
+    tex = {"WaterRippleN": ripple} if ripple is not None else {}
+    scal = {"NightEV": float(gr["ev"]), "NightSaturation": float(gr["saturation"])}
+    vec = {"SeaColor": tuple(round(c, 5) for c in color) + (1.0,),
+           "SeaFar": tuple(round(c, 5) for c in far) + (float(sp.get("farStrength", 1.0)),),
+           "SeaFoam": tuple(float(c) for c in sp.get("foamColor", SEA_VECTOR_DEFAULTS["SeaFoam"][:3]))
+           + (float(sp.get("foamOpacity", 0.7)),),
+           "SeaFlow": (float(pan[0]), float(pan[1]), float(sp.get("foamScaleUU", 14.0)), float(sp.get("foamSpeed", 0.3))),
+           "SeaTile": (float(sp.get("uvTileUU", 600.0)), float(sp.get("rippleTileUU", 160.0)), 0.0, 0.0),
+           "SeaShade": (float(sp.get("roughness", 0.08)), float(sp.get("specular", 0.3)),
+                        float(sp.get("normalStrength", 0.5)), float(sp.get("lift", 1.5))),
+           "NightTint": tuple(float(v) for v in gr["tint"]) + (1.0,)}
+    return {"tex": tex, "scalar": scal, "vector": vec}
+
+
+# --- P5 track B: the lane K meshes (legacy FbxFactory; the env kit's import with a vertex-colour option) --------------
+def sm_api():
+    """StaticMeshEditorSubsystem (the module is not loaded by -run=pythonscript until asked; UE 5.8)."""
+    sms = None
+    try:
+        u.load_module("StaticMeshEditor")
+        sms = u.get_editor_subsystem(u.StaticMeshEditorSubsystem)
+    except Exception:  # noqa: BLE001 - engine / commandlet dependent
+        sms = None
+    if sms is None and hasattr(u, "EditorStaticMeshLibrary"):
+        sms = u.EditorStaticMeshLibrary
+    if sms is None:
+        raise RuntimeError("StaticMeshEditorSubsystem unavailable (run inside UnrealEditor-Cmd -run=pythonscript)")
+    return sms
+
+
+def _setp(obj, prop: str, value) -> bool:
+    try:
+        obj.set_editor_property(prop, value)
+        return True
+    except Exception:  # noqa: BLE001 - optional property (engine version)
+        return False
+
+
+def import_static_mesh(source: str, asset: str, vertex_colors: str = "ignore", scale: float = 1.0) -> dict:
+    """One FBX -> one static mesh (combine meshes, normals imported, no materials / textures / collision / Nanite);
+    vertex_colors 'replace' keeps the FBX Col layer (lane K masks), 'ignore' drops it."""
+    folder, leaf = split(asset)
+    o = u.FbxImportUI()
+    o.set_editor_property("automated_import_should_detect_type", False)
+    o.set_editor_property("import_mesh", True)
+    o.set_editor_property("import_as_skeletal", False)
+    o.set_editor_property("mesh_type_to_import", u.FBXImportType.FBXIT_STATIC_MESH)
+    o.set_editor_property("original_import_type", u.FBXImportType.FBXIT_STATIC_MESH)
+    o.set_editor_property("import_materials", False)
+    o.set_editor_property("import_textures", False)
+    o.set_editor_property("import_animations", False)
+    d = o.get_editor_property("static_mesh_import_data")
+    d.set_editor_property("combine_meshes", True)
+    vco = u.VertexColorImportOption
+    d.set_editor_property("vertex_color_import_option", vco.REPLACE if vertex_colors == "replace" else vco.IGNORE)
+    d.set_editor_property("normal_import_method", u.FBXNormalImportMethod.FBXNIM_IMPORT_NORMALS)
+    d.set_editor_property("import_uniform_scale", float(scale))
+    res = {"factory": "FbxFactory", "vertexColors": vertex_colors, "importUniformScale": float(scale),
+           "autoGenerateCollisionOff": _setp(d, "auto_generate_collision", False),
+           "buildNaniteOff": _setp(d, "build_nanite", False)}
+    t = u.AssetImportTask()
+    t.set_editor_property("filename", source)
+    t.set_editor_property("destination_path", folder)
+    t.set_editor_property("destination_name", leaf)
+    t.set_editor_property("replace_existing", True)
+    t.set_editor_property("automated", True)
+    t.set_editor_property("save", False)
+    t.set_editor_property("factory", u.FbxFactory())
+    t.set_editor_property("options", o)
+    u.AssetToolsHelpers.get_asset_tools().import_asset_tasks([t])
+    res["imported"] = [str(x) for x in t.get_editor_property("imported_object_paths")]
+    if not res["imported"]:
+        raise RuntimeError(f"the import of {source} produced no assets")
+    return res
+
+
+def ensure_decor_mesh(mesh, slot_material) -> list:
+    """Nanite off, no simple collision + simple-as-complex (no collision data), every slot -> slot_material (None =
+    leave the slots). Returns the changes."""
+    sms = sm_api()
+    changes = []
+    nanite = mesh.get_editor_property("nanite_settings")
+    if nanite.get_editor_property("enabled"):
+        nanite.set_editor_property("enabled", False)
+        mesh.set_editor_property("nanite_settings", nanite)
+        changes.append("nanite off")
+    if sms.get_simple_collision_count(mesh) > 0:
+        sms.remove_collisions(mesh)
+        changes.append("simple collision removed")
+    try:
+        body = mesh.get_editor_property("body_setup")
+        flag = u.CollisionTraceFlag.CTF_USE_SIMPLE_AS_COMPLEX
+        if body is not None and body.get_editor_property("collision_trace_flag") != flag:
+            body.set_editor_property("collision_trace_flag", flag)
+            changes.append("collision trace simple-as-complex")
+    except Exception as exc:  # noqa: BLE001 - optional hardening
+        changes.append(f"collision trace flag not set ({type(exc).__name__}: {exc})")
+    if slot_material is not None:
+        for index in range(len(mesh.get_editor_property("static_materials"))):
+            current = mesh.get_material(index)
+            if current is None or current.get_path_name() != slot_material.get_path_name():
+                mesh.set_material(index, slot_material)
+                changes.append(f"slot {index} -> {slot_material.get_name()}")
+    return changes
+
+
+def compare_mesh(measured: dict, item: dict) -> dict:
+    """World-free (also exercised by the tests): measured bounds / triangles against the lane K build."""
+    out = {}
+    b = item.get("boundsUeUU") or {}
+    if b.get("min") and b.get("max"):
+        delta = [round(measured["boundsMin"][i] - b["min"][i], 3) for i in range(3)] + \
+                [round(measured["boundsMax"][i] - b["max"][i], 3) for i in range(3)]
+        out["bounds"] = {"build": b, "deltaUU": delta, "ok": all(abs(d) <= MESH_BOUNDS_TOL_UU for d in delta)}
+    tris = item.get("triangles")
+    if tris and isinstance(measured.get("trianglesLod0"), int):
+        drift = abs(measured["trianglesLod0"] - tris) / tris
+        out["triangles"] = {"build": tris, "ue": measured["trianglesLod0"], "drift": round(drift, 5),
+                            "ok": drift <= MESH_TRIS_TOL}
+    return out
+
+
+def measure_mesh(mesh, item: dict) -> dict:
+    sms = sm_api()
+    box = mesh.get_bounding_box()
+    mn, mx = box.min, box.max
+    out = {"boundsMin": [round(mn.x, 3), round(mn.y, 3), round(mn.z, 3)],
+           "boundsMax": [round(mx.x, 3), round(mx.y, 3), round(mx.z, 3)],
+           "nanite": bool(mesh.get_editor_property("nanite_settings").get_editor_property("enabled")),
+           "simpleCollision": int(sms.get_simple_collision_count(mesh)),
+           "slots": [mesh.get_material(i).get_path_name() if mesh.get_material(i) else None
+                     for i in range(len(mesh.get_editor_property("static_materials")))]}
+    try:
+        out["trianglesLod0"] = int(mesh.get_num_triangles(0))
+    except Exception:  # noqa: BLE001 - not exposed in every engine version
+        out["trianglesLod0"] = None
+    try:
+        out["hasVertexColors"] = bool(sms.has_vertex_colors(mesh))
+    except Exception as exc:  # noqa: BLE001 - measurement only
+        out["hasVertexColors"] = f"n/a ({type(exc).__name__})"
+    out.update(compare_mesh(out, item))
+    return out
+
+
+def import_env_meshes(key: str, items: dict, materials: dict, force: bool) -> tuple[dict, bool]:
+    """Imports / updates the lane K meshes of one map (plan_meshes items) and binds their slots (materials = {part:
+    material or None}). Idempotent: MESH_SHA_TAG / MESH_VC_TAG per mesh."""
+    eal = u.EditorAssetLibrary
+    out, ok = {}, True
+    for part, it in items.items():
+        r = {"asset": it["asset"]}
+        out[part] = r
+        if not it.get("ok"):
+            r.update(action="skipped", error=it.get("error"))
+            ok = False
+            continue
+        try:
+            mesh = u.load_asset(it["asset"]) if eal.does_asset_exist(it["asset"]) else None
+            if (mesh is not None and not force and eal.get_metadata_tag(mesh, MESH_SHA_TAG) == it["sha256"]
+                    and eal.get_metadata_tag(mesh, MESH_VC_TAG) == it["vertexColors"]):
+                r["action"] = "unchanged"
+            else:
+                r.update(import_static_mesh(it["source"], it["asset"], it["vertexColors"]),
+                         action="reimported" if mesh is not None else "imported")
+                mesh = u.load_asset(it["asset"])
+                if mesh is None or not isinstance(mesh, u.StaticMesh):
+                    raise RuntimeError(f"{it['asset']} is not a static mesh after the import")
+                eal.set_metadata_tag(mesh, MESH_SHA_TAG, it["sha256"])
+                eal.set_metadata_tag(mesh, MESH_VC_TAG, it["vertexColors"])
+            material = materials.get(part)
+            if material is None:
+                r["warning"] = f"no material for the {part} slots (left as imported)"
+            r["changes"] = ensure_decor_mesh(mesh, material)
+            if r["changes"] or r["action"] != "unchanged":
+                if not eal.save_loaded_asset(mesh, False):
+                    raise RuntimeError(f"could not save {it['asset']}")
+            m = r["measure"] = measure_mesh(mesh, it)
+            problems = []
+            if m["nanite"]:
+                problems.append("nanite still on")
+            if m["simpleCollision"]:
+                problems.append("simple collision left")
+            if not (m.get("bounds") or {}).get("ok", True):
+                problems.append(f"bounds differ from the build: {m.get('bounds')}")
+            if (m.get("triangles") or {}).get("ok") is False:
+                problems.append(f"triangles differ from the build: {m.get('triangles')}")
+            if it["vertexColors"] == "replace" and m.get("hasVertexColors") is False:
+                problems.append("vertex colours missing (REPLACE)")
+            if len(m["slots"]) != it.get("slots", len(m["slots"])):
+                problems.append(f"{len(m['slots'])} slots, the build has {it.get('slots')}")
+            r["problems"] = problems
+            ok = ok and not problems
+        except Exception as exc:  # noqa: BLE001 - report and continue
+            r["error"] = f"{type(exc).__name__}: {exc}"
+            ok = False
+    return out, ok
 
 
 def _water(params: dict, key: str) -> dict:
@@ -1166,6 +1579,14 @@ def run_import(pl: dict, params: dict, keys: list[str], force: bool) -> tuple[di
     except Exception as exc:  # noqa: BLE001
         result["material"] = {"action": "failed", "error": f"{type(exc).__name__}: {exc}"}
         return result, False
+    sea_material = None
+    if any(has_sea(params, k) for k in ready):
+        try:
+            result["seaMaterial"] = build_sea_material(ripple, force)
+            sea_material = u.load_asset(SEA_MATERIAL_PATH)
+        except Exception as exc:  # noqa: BLE001
+            result["seaMaterial"] = {"action": "failed", "error": f"{type(exc).__name__}: {exc}"}
+            ok = False
     fall_material = None
     if any(has_falls(params, k) for k in ready):
         try:
@@ -1197,6 +1618,28 @@ def run_import(pl: dict, params: dict, keys: list[str], force: bool) -> tuple[di
                 result["maps"][key]["waterfallInstance"] = {"action": "failed",
                                                             "error": f"{type(exc).__name__}: {exc}"}
                 ok = False
+        if has_sea(params, key):
+            if sea_material is None:
+                result["maps"][key]["seaInstance"] = {"action": "skipped", "error": "no M_EnvSea"}
+                ok = False
+            else:
+                try:
+                    result["maps"][key]["seaInstance"] = ensure_instance(
+                        sea_mi_asset(key), sea_material, sea_mi_want(key, params, ripple))
+                except Exception as exc:  # noqa: BLE001
+                    result["maps"][key]["seaInstance"] = {"action": "failed", "error": f"{type(exc).__name__}: {exc}"}
+                    ok = False
+        items = pl["maps"][key].get("meshes") or {}
+        if items:
+            eal = u.EditorAssetLibrary
+
+            def load(path):
+                return u.load_asset(path) if eal.does_asset_exist(path) else None
+            fall_mi = load(fall_mi_asset(key)) if has_falls(params, key) else None
+            mats = {"sheet": fall_mi, "foam": fall_mi, "lip": load(f"{T2B_MI_PREFIX}{MAPS[key]}"),
+                    "sea": load(sea_mi_asset(key)) if has_sea(params, key) else None}
+            result["maps"][key]["meshes"], meshes_ok = import_env_meshes(key, items, mats, force)
+            ok = ok and meshes_ok
     listing = sorted(str(p).split(".")[0] for p in u.EditorAssetLibrary.list_assets(ROOT, recursive=True,
                                                                                       include_folder=False))
     result["folder"] = {"assets": len(listing), "foreign": [a for a in listing if a not in planned_assets(params)]}
@@ -1208,6 +1651,8 @@ def planned_assets(params: dict) -> set:
     planned = {MATERIAL_PATH, FALL_MATERIAL_PATH, ripple_asset()}
     planned |= {mi_asset(k) for k in MAPS} | {splat_asset(k) for k in MAPS} | {aux_asset(k) for k in MAPS}
     planned |= {fall_mi_asset(k) for k in MAPS}
+    planned |= {SEA_MATERIAL_PATH} | {sea_mi_asset(k) for k in MAPS}
+    planned |= {mesh_asset(k, part) for k in MAPS for part in ENV_MESHES}
     planned |= {texture_asset(s, k) for s in params["sets"] for k in KEYS}
     return planned
 
@@ -1236,7 +1681,8 @@ def main(argv: list | None = None) -> int:
     report = {"schema": "unmatched.env-ground-ue-import/1", "tool": "tools/art/env_kit/ue_import_env_ground.py",
               "mode": mode, "params": rel(params_path), "staging": staging.as_posix(), "contentRoot": ROOT,
               "material": MATERIAL_PATH, "graphVersion": GRAPH_VERSION, "waterfallMaterial": FALL_MATERIAL_PATH,
-              "waterfallGraphVersion": FALL_GRAPH_VERSION, "maps": keys}
+              "waterfallGraphVersion": FALL_GRAPH_VERSION, "seaMaterial": SEA_MATERIAL_PATH,
+              "seaGraphVersion": SEA_GRAPH_VERSION, "maps": keys}
     ok = True
     if mode == "prep":
         if u is not None:

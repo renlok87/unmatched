@@ -48,7 +48,7 @@ Checks (every one is an error unless marked warn):
  7. shadows: the key light of the art profiles (k1_mock.KEY_LIGHT_ROT = (-55, 30, 0), travelling
     towards +X / +Y) projects every castShadow prop's box onto Z = 0; the shadow must not touch any
     space circle (warn below SHADOW_WARN_UU);
- 8. warn: 10..28 props; tall props (> TALL_H_UU) in the near half (Y > 0) whose footprint reaches the frame's X
+ 8. warn: 10..48 props (PROPS_RANGE); tall props (> TALL_H_UU) in the near half (Y > 0) whose footprint reaches the frame's X
     columns (+ TALL_SIDE_UU; a tall prop wholly beside the frame leans outwards in the K1 perspective and check 6
     measures it exactly); crowns overhanging the tray edge by > 60 uu; lights inside the frame rectangle or off the tray.
  9. ground (ENV-U10, optional section - warn when absent; validate_ground, = S08EnvGround.cpp): mode 'runtime',
@@ -64,9 +64,10 @@ Usage:
   python -B tools/art/env_kit/layout_check.py                       # both maps, text report
   python -B tools/art/env_kit/layout_check.py --maps sarpedon --images C:/tmp/envmaps-research/p1b/layout
   python -B tools/art/env_kit/layout_check.py --json report.json
-  python -B tools/art/env_kit/layout_check.py --selftest            # synthetic cases (25)
+  python -B tools/art/env_kit/layout_check.py --selftest            # synthetic cases (27)
 Prop sizes come from the env kit build reports (--build-reports, reports/assets/SM_Env_<Name>.build.json:
-UE X = depth, Y = width, Z = height) when present, else from the KIT table; the run prints whether they agree.
+UE X = depth, Y = width, Z = height; the P5 props from EXTRA_BUILD_REPORTS, the Blender back-wall modules from the
+lane-K build report BACKWALL_REPORT) when present, else from the KIT table; the run prints whether they agree.
 Debug images (--images DIR, CPU / PIL only): <map>-top.png (orthographic top view, footprints, lights,
 K1 / zoom-out ground frusta) and <map>-k1.png (K1 overview, D0), plus <map>-out.png (the zoom-out limit
 fit / 0.65) and <map>-wide.png (the concept camera, fit x 1.45). They draw the flat map illustration (out of git, ENV-U3:
@@ -127,14 +128,20 @@ TALL_SIDE_UU = 60.0          # 8.: a near-half tall prop warns only when its foo
 K1_FRAMED = {"sarpedon": ("hull-e1", "hull-e2")}
 K1_FRAME_MARGIN_PX = 0.0
 MAX_POINT_LIGHTS = 6
+# P5 track A (2026-10-01): 28 -> 48 (WARN guide only; every error rule is unchanged). P5 dresses both maps with the new
+# small props of concept-review gaps 4 / 6 / 7 / 12: Marmoreal 21 -> 41 (5 back-wall modules, 12 balustrade segments,
+# 3 hedge beds), Sarpedon 24 -> 42 (8 barrels / crates, 3 lantern posts, 2 banners, 5 rock outcrops). The new meshes
+# are 4.3k-7.8k triangles (back wall 9.4k-9.7k), no collision, no new light; the environment cost has to be re-measured
+# with tools/art/render/render_bench.py at the next packaged run (not done in this CREATE stage).
 # P4 (2026-10-01): 18 -> 28. The P3 packaged bench (docs/game-design/evidence/ENV-MAPS/p3-packaged-2026-10-01/bench)
 # measured the whole environment at +0.4-0.46 ms GPU at K1, mostly the point lights and Lumen; the props are decor
 # meshes of <= 12k triangles without collision, so a few more instances stay far inside the budget (perf was NOT
 # re-measured in P4: re-measure with tools/art/render/render_bench.py at the next packaged run).
-PROPS_RANGE = (10, 28)
+PROPS_RANGE = (10, 48)
 CROWN_OVERHANG_WARN_UU = 60.0
 SHADOW_WARN_UU = 10.0
-MODULAR = {"ArcadeBay", "Portal", "Palisade", "Hull"}  # wall modules may interpenetrate at a joint
+MODULAR = {"ArcadeBay", "Portal", "Palisade", "Hull", "Balustrade",  # wall modules may interpenetrate at a joint
+           "BackWall_BayDoor", "BackWall_BayWindows", "BackWall_Centre"}
 JOINT_TOL_UU = 8.0
 
 # name -> (kit folder, Tripo asset, GLB extent (x width, y up, z depth=front), target (kind, uu),
@@ -156,11 +163,32 @@ KIT = {
     "Campfire": ("Sarpedon", "ENV-S-CAMPFIRE", (0.9741, 0.4114, 0.9779), ("diameter", 40.0), None),
     "Palisade": ("Sarpedon", "ENV-S-PALISADE", (0.9770, 0.9426, 0.1969), ("height", 70.0), None),
     "Rope": ("Sarpedon", "ENV-S-ROPE", (0.9789, 0.4655, 0.9483), ("diameter", 22.0), None),
+    # P5 (art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/source/*.glb; ENV-M-CHERRY-V2 not used: ENV-U13)
+    "Barrel": ("Sarpedon", "ENV-S-BARREL", (0.7480, 0.9776, 0.7480), ("height", 28.0), None),
+    "CrateStack": ("Sarpedon", "ENV-S-CRATE-STACK", (0.9779, 0.8937, 0.4382), ("height", 45.0), None),
+    "LanternPost": ("Sarpedon", "ENV-S-LANTERN-POST", (0.5832, 0.9771, 0.2581), ("height", 95.0), None),
+    "Banner": ("Sarpedon", "ENV-S-BANNER", (0.4643, 0.9764, 0.1586), ("height", 120.0), None),
+    "RockOutcrop": ("Sarpedon", "ENV-S-ROCK-OUTCROP", (0.9783, 0.8501, 0.7448), ("height", 70.0), None),
+    "Balustrade": ("Marmoreal", "ENV-M-BALUSTRADE", (0.9795, 0.3009, 0.0939), ("length", 150.0), None),
+    "HedgeBed": ("Marmoreal", "ENV-M-HEDGE-BED", (0.9782, 0.2967, 0.1742), ("length", 150.0), None),
+    # Blender lane K (ASSET-ENV-M-BACKWALL-001, no GLB): extents = the module bounds in uu (width, height, depth), so the
+    # target height gives scale 1; the pivot is the back face, see LOCAL_CENTRE_X
+    "BackWall_BayDoor": ("Marmoreal", "ENV-M-BACKWALL", (152.3, 235.0, 30.792), ("height", 235.0), None),
+    "BackWall_BayWindows": ("Marmoreal", "ENV-M-BACKWALL", (152.3, 235.0, 30.792), ("height", 235.0), None),
+    "BackWall_Centre": ("Marmoreal", "ENV-M-BACKWALL", (186.0, 255.0, 25.345), ("height", 255.0), None),
 }
+# local X (depth, front = +X) of the bounds centre at scale 1 when the pivot is not the base centre: the back-wall
+# modules span x -16 .. +14.792 (bays) / +9.345 (centre) (lane-K build report boundsUeLocalUU)
+LOCAL_CENTRE_X = {"BackWall_BayDoor": -0.604, "BackWall_BayWindows": -0.604, "BackWall_Centre": -3.3275}
 BUILD_REPORTS = ROOT / "art/pipeline-candidates/ASSET-ENV-KIT-001/20260930-tripo-h31/reports/assets"
+P5_RUN = ROOT / "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5"
+EXTRA_BUILD_REPORTS = (P5_RUN / "reports/assets",)  # searched after --build-reports for SM_Env_<Name>.build.json
+BACKWALL_REPORT = ROOT / "art/pipeline-candidates/ASSET-ENV-M-BACKWALL-001/20261001-backwall-v1/reports/build-report.json"
+GLB_DIR_OF = {n: P5_RUN / "source" for n in ("Barrel", "CrateStack", "LanternPost", "Banner", "RockOutcrop",
+                                             "Balustrade", "HedgeBed")}  # debug-image meshes (out of git)
 PROCESSED: dict[str, tuple[float, float, float]] = {}  # name -> (w, d, h) at scale 1 from the build reports
 TURNS: dict[str, float] = {}  # name -> yaw the processing track applied to the raw mesh (.blend +Z, deg)
-MESH_RE = re.compile(r"^/Game/EnvKit/(Marmoreal|Sarpedon)/SM_Env_([A-Za-z]+)$")
+MESH_RE = re.compile(r"^/Game/EnvKit/(Marmoreal|Sarpedon)/SM_Env_([A-Za-z]+(?:_[A-Za-z]+)?)$")
 HEX_RE = re.compile(r"^#[0-9A-Fa-f]{6}$")
 
 
@@ -190,6 +218,7 @@ def footprint(p: dict, base: bool = False) -> np.ndarray:
         w, d = w * frac[0], d * frac[1]
     loc = np.array(p["loc"][:2], float)
     c = np.array([[-d / 2, -w / 2], [d / 2, -w / 2], [d / 2, w / 2], [-d / 2, w / 2]])  # local X = depth
+    c[:, 0] += LOCAL_CENTRE_X.get(name, 0.0) * p["scale"]  # pivot off the bounds centre (back-wall modules)
     return c @ _rot(p["yawDeg"]).T + loc
 
 
@@ -266,12 +295,20 @@ def kit_crosscheck(reports_dir: Path | None) -> list[str]:
     if not reports_dir or not Path(reports_dir).exists():
         return [f"kit: no build reports at {reports_dir} - sizes from the KIT table (GLB bounds x target)"]
     msgs, ok = [], 0
+    backwall = {}
+    if BACKWALL_REPORT.is_file():  # the lane-K report: exports[].boundsUeLocalUU.size = (X depth, Y width, Z height)
+        bw = json.loads(BACKWALL_REPORT.read_text(encoding="utf-8"))
+        backwall = {ex["name"][len("SM_Env_"):]: ex["boundsUeLocalUU"]["size"] for ex in bw.get("exports", [])}
     for name in KIT:
-        f = Path(reports_dir) / f"SM_Env_{name}.build.json"
-        if not f.exists():
+        f = next((d / f"SM_Env_{name}.build.json" for d in (Path(reports_dir), *EXTRA_BUILD_REPORTS)
+                  if (d / f"SM_Env_{name}.build.json").exists()), Path(reports_dir) / f"SM_Env_{name}.build.json")
+        if name in backwall:
+            b = {"scale_pivot": {"dimensions_uu_ue_xyz": backwall[name]}}
+        elif not f.exists():
             msgs.append(f"kit: {f.name} missing - KIT table size used")
             continue
-        b = json.loads(f.read_text(encoding="utf-8"))
+        else:
+            b = json.loads(f.read_text(encoding="utf-8"))
         X, Y, Z = (float(v) for v in b["scale_pivot"]["dimensions_uu_ue_xyz"])
         want = dims(name, 1.0)
         PROCESSED[name] = (Y, X, Z)
@@ -834,7 +871,7 @@ def _prop_tris(p: dict, glb_dir: Path | None, cache_dir: Path | None):
     k = val / ref * p["scale"]
     R = _rot(p["yawDeg"])
     loc = np.asarray(p["loc"], float)
-    glb = glb_dir / f"{src}.glb" if glb_dir else None
+    glb = (GLB_DIR_OF.get(name, glb_dir) / f"{src}.glb") if glb_dir else None
     if glb and glb.exists():
         v, f, c = _glb_preview(glb, cache_dir)
         # glTF -> .blend (x, -z, y), the processing turn about .blend +Z, then .blend -> UM_FBX_v1 local
@@ -862,7 +899,11 @@ _KIND_COL = {"ArcadeBay": (0.85, 0.83, 0.80), "Portal": (0.9, 0.85, 0.75), "Cher
              "PlinthBall": (0.8, 0.8, 0.82), "LanternPlinth": (1.0, 0.8, 0.5), "Urn": (0.85, 0.7, 0.75),
              "Cypress": (0.25, 0.5, 0.3), "FortRuin": (0.6, 0.6, 0.55), "Tree": (0.3, 0.55, 0.3),
              "Hull": (0.55, 0.25, 0.2), "Cannon": (0.3, 0.3, 0.3), "Campfire": (1.0, 0.5, 0.2),
-             "Palisade": (0.5, 0.35, 0.2), "Rope": (0.8, 0.7, 0.45)}
+             "Palisade": (0.5, 0.35, 0.2), "Rope": (0.8, 0.7, 0.45), "Barrel": (0.6, 0.4, 0.22),
+             "CrateStack": (0.55, 0.42, 0.28), "LanternPost": (1.0, 0.75, 0.4), "Banner": (0.75, 0.12, 0.15),
+             "RockOutcrop": (0.5, 0.5, 0.47), "Balustrade": (0.88, 0.86, 0.82), "HedgeBed": (0.25, 0.45, 0.25),
+             "BackWall_BayDoor": (0.9, 0.87, 0.8), "BackWall_BayWindows": (0.9, 0.87, 0.8),
+             "BackWall_Centre": (0.9, 0.87, 0.8)}
 
 
 def _shade(tri: np.ndarray, col: np.ndarray, view_from=None):
@@ -1115,6 +1156,14 @@ def selftest() -> int:
          ["base footprints overlap"], []),
         ("abutting wall modules are fine",
          [P("a", "ArcadeBay", -76.1, -425, 90, 1.45), P("b", "ArcadeBay", 76.1, -425, 90, 1.45)], [], [], ["overlap"]),
+        # P5: modules with an underscore name (lane-K back wall) parse; abutting balustrade segments are a joint, two
+        # segments on top of each other are not; the back-wall module box sits on its back-face pivot (LOCAL_CENTRE_X)
+        ("back-wall modules abut behind the arcade",
+         [P("a", "BackWall_BayWindows", -169.2, -465.866), P("b", "BackWall_Centre", 0.0, -465.866)], [], [],
+         ["overlap", "is not /Game/EnvKit"]),
+        ("balustrade segments abut, stacked ones overlap",
+         [P("a", "Balustrade", -752, -121, 0), P("b", "Balustrade", -752, 29, 0), P("c", "Balustrade", -752, 60, 0)], [],
+         ["props b / c: base footprints overlap"], ["props a / b"]),
         ("point light with shadows", [], [Lt("a", shadow=True)], ["cast no shadows"], []),
         ("seven point lights", [], [Lt(f"l{i}", x=-520.0 + 40 * i) for i in range(7)], ["point lights >"], []),
         ("near-corner post behind the close wheel cameras is clipped, not projected",

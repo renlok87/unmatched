@@ -70,6 +70,131 @@ FString GroundSafeName(const FString& Id) {
   return S;
 }
 
+/** N JSON numbers in an array (never numeric strings). */
+bool GroundNumbers(const TSharedPtr<FJsonValue>& Value, int32 N, double* Out) {
+  const TArray<TSharedPtr<FJsonValue>>* Values = nullptr;
+  if (!Value.IsValid() || !Value->TryGetArray(Values) || !Values || Values->Num() != N) return false;
+  for (int32 I = 0; I < N; ++I) {
+    if (!GroundNumber((*Values)[I], Out[I])) return false;
+  }
+  return true;
+}
+
+/** Optional package-path string: absent / null -> true (Out empty); present -> a valid package path. */
+bool GroundOptionalPackage(const TSharedPtr<FJsonObject>& Obj, const TCHAR* Field, FString& Out) {
+  Out.Reset();
+  const TSharedPtr<FJsonValue> Value = Obj->TryGetField(Field);
+  if (!Value.IsValid() || Value->Type == EJson::Null) return true;
+  return Value->TryGetString(Out) && GroundIsPackagePath(Out);
+}
+
+/** "loc" [x, y, z] with |x|, |y| <= MeshMaxAbsXYUU and MinZ <= z <= MaxZ (bMaxExclusive: z < MaxZ) + "yawDeg". */
+bool GroundParsePlacement(const TSharedPtr<FJsonObject>& Obj, const FString& Where, double MinZ, double MaxZ,
+                          bool bMaxExclusive, FVector& OutLoc, float& OutYaw, TArray<FString>& OutErrors) {
+  const int32 Before = OutErrors.Num();
+  double L[3] = {0.0, 0.0, 0.0};
+  const double MaxXY = S08EnvGroundSpec::MeshMaxAbsXYUU;
+  if (!GroundNumbers(Obj->TryGetField(TEXT("loc")), 3, L) || FMath::Abs(L[0]) > MaxXY || FMath::Abs(L[1]) > MaxXY ||
+      L[2] < MinZ || (bMaxExclusive ? L[2] >= MaxZ : L[2] > MaxZ)) {
+    OutErrors.Add(FString::Printf(TEXT("%s.loc must be [x, y, z] numbers with |x|, |y| <= %.0f and z in [%.0f, %.0f%s"),
+                                  *Where, MaxXY, MinZ, MaxZ, bMaxExclusive ? TEXT(")") : TEXT("]")));
+  }
+  double Yaw = 0.0;
+  if (!GroundOptionalNumber(Obj, TEXT("yawDeg"), Yaw) || FMath::Abs(Yaw) > S08EnvGroundSpec::MaxMeshYawDeg) {
+    OutErrors.Add(FString::Printf(TEXT("%s.yawDeg must be a number in [-%.0f, %.0f]"), *Where,
+                                  S08EnvGroundSpec::MaxMeshYawDeg, S08EnvGroundSpec::MaxMeshYawDeg));
+  }
+  OutLoc = FVector(L[0], L[1], L[2]);
+  OutYaw = static_cast<float>(Yaw);
+  return OutErrors.Num() == Before;
+}
+
+/** A card size [w, h] in (0, MaxMeshCardUU]. */
+bool GroundCard(const TSharedPtr<FJsonValue>& Value, FVector2D& Out) {
+  double C[2] = {0.0, 0.0};
+  if (!GroundNumbers(Value, 2, C)) return false;
+  const double Max = S08EnvGroundSpec::MaxMeshCardUU;
+  if (C[0] <= 0.0 || C[0] > Max || C[1] <= 0.0 || C[1] > Max) return false;
+  Out = FVector2D(C[0], C[1]);
+  return true;
+}
+
+/** P5 track B: the optional "mesh" object of a waterfall entry (absent / null -> bSet false). */
+void GroundParseFallMesh(const TSharedPtr<FJsonValue>& Value, const FString& Where, FS08EnvWaterfallMesh& Out,
+                         TArray<FString>& OutErrors) {
+  Out = FS08EnvWaterfallMesh();
+  if (!Value.IsValid() || Value->Type == EJson::Null) return;
+  const FString W = Where + TEXT(": mesh");
+  const TSharedPtr<FJsonObject>* ObjPtr = nullptr;
+  if (!Value->TryGetObject(ObjPtr) || !ObjPtr || !ObjPtr->IsValid()) {
+    OutErrors.Add(W + TEXT(" is not an object"));
+    return;
+  }
+  const TSharedPtr<FJsonObject>& Obj = *ObjPtr;
+  const int32 Before = OutErrors.Num();
+  FS08EnvWaterfallMesh M;
+  if (!Obj->TryGetStringField(TEXT("sheet"), M.Sheet) || !GroundIsPackagePath(M.Sheet)) {
+    OutErrors.Add(FString::Printf(TEXT("%s.sheet '%s' is not a /Game/ or /Engine/ package path"), *W, *M.Sheet));
+  }
+  for (const TPair<const TCHAR*, FString*>& Field :
+       {TPair<const TCHAR*, FString*>(TEXT("foam"), &M.Foam), TPair<const TCHAR*, FString*>(TEXT("lip"), &M.Lip),
+        TPair<const TCHAR*, FString*>(TEXT("lipMaterial"), &M.LipMaterial)}) {
+    if (!GroundOptionalPackage(Obj, Field.Key, *Field.Value)) {
+      OutErrors.Add(FString::Printf(TEXT("%s.%s is not a /Game/ or /Engine/ package path"), *W, Field.Key));
+    }
+  }
+  if (!M.Lip.IsEmpty() && M.LipMaterial.IsEmpty()) OutErrors.Add(W + TEXT(": a lip needs its lipMaterial"));
+  GroundParsePlacement(Obj, W, S08EnvGroundSpec::FallMeshMinZ, S08EnvGroundSpec::FallMeshMaxZ, false, M.Loc, M.YawDeg,
+                       OutErrors);
+  if (!GroundCard(Obj->TryGetField(TEXT("sheetCard")), M.SheetCard)) {
+    OutErrors.Add(FString::Printf(TEXT("%s.sheetCard must be [w, h] numbers in (0, %.0f]"), *W,
+                                  S08EnvGroundSpec::MaxMeshCardUU));
+  }
+  const TSharedPtr<FJsonValue> Foam = Obj->TryGetField(TEXT("foamCards"));
+  if (Foam.IsValid() && Foam->Type != EJson::Null) {
+    const TArray<TSharedPtr<FJsonValue>>* Cards = nullptr;
+    bool bOk = Foam->TryGetArray(Cards) && Cards && Cards->Num() <= S08EnvGroundSpec::MaxFoamCards;
+    for (int32 I = 0; bOk && I < Cards->Num(); ++I) {
+      FVector2D Card;
+      bOk = GroundCard((*Cards)[I], Card);
+      if (bOk) M.FoamCards.Add(Card);
+    }
+    if (!bOk) {
+      OutErrors.Add(FString::Printf(TEXT("%s.foamCards must be <= %d pairs [w, h] in (0, %.0f]"), *W,
+                                    S08EnvGroundSpec::MaxFoamCards, S08EnvGroundSpec::MaxMeshCardUU));
+    }
+  }
+  if (OutErrors.Num() != Before) return;
+  M.bSet = true;
+  Out = M;
+}
+
+/** P5 track B: the optional "sea" object of the ground section (absent / null -> bSet false). */
+void GroundParseSea(const TSharedPtr<FJsonValue>& Value, FS08EnvSea& Out, TArray<FString>& OutErrors) {
+  Out = FS08EnvSea();
+  if (!Value.IsValid() || Value->Type == EJson::Null) return;
+  const TSharedPtr<FJsonObject>* ObjPtr = nullptr;
+  if (!Value->TryGetObject(ObjPtr) || !ObjPtr || !ObjPtr->IsValid()) {
+    OutErrors.Add(TEXT("ground: sea is not an object"));
+    return;
+  }
+  const TSharedPtr<FJsonObject>& Obj = *ObjPtr;
+  const int32 Before = OutErrors.Num();
+  FS08EnvSea Sea;
+  if (!Obj->TryGetStringField(TEXT("mesh"), Sea.Mesh) || !GroundIsPackagePath(Sea.Mesh)) {
+    OutErrors.Add(FString::Printf(TEXT("ground: sea.mesh '%s' is not a /Game/ or /Engine/ package path"), *Sea.Mesh));
+  }
+  if (!Obj->TryGetStringField(TEXT("material"), Sea.Material) || !GroundIsPackagePath(Sea.Material)) {
+    OutErrors.Add(FString::Printf(TEXT("ground: sea.material '%s' is not a /Game/ or /Engine/ package path"),
+                                  *Sea.Material));
+  }
+  GroundParsePlacement(Obj, TEXT("ground: sea"), S08EnvGroundSpec::SeaMinZ, S08EnvGroundSpec::SeaMaxZ, true, Sea.Loc,
+                       Sea.YawDeg, OutErrors);
+  if (OutErrors.Num() != Before) return;
+  Sea.bSet = true;
+  Out = Sea;
+}
+
 /** The optional "waterfalls" array (P4): absent / null -> none; anything invalid adds 'ground: waterfalls...' errors. */
 void GroundParseWaterfalls(const TSharedPtr<FJsonValue>& Value, TArray<FS08EnvWaterfall>& Out,
                            TArray<FString>& OutErrors) {
@@ -127,6 +252,7 @@ void GroundParseWaterfalls(const TSharedPtr<FJsonValue>& Value, TArray<FS08EnvWa
       OutErrors.Add(FString::Printf(TEXT("%s: spillUU must be a number in [0, %.0f]"), *Where,
                                     S08EnvGroundSpec::MaxFallSpillUU));
     }
+    GroundParseFallMesh(Obj->TryGetField(TEXT("mesh")), Where, F.Mesh, OutErrors);
     if (OutErrors.Num() != Before) continue;
     F.X0 = static_cast<float>(X0);
     F.X1 = static_cast<float>(X1);
@@ -138,6 +264,44 @@ void GroundParseWaterfalls(const TSharedPtr<FJsonValue>& Value, TArray<FS08EnvWa
   }
 }
 
+/** One decor component under the board actor (not registered yet): Mesh, NoCollision, no navigation, CastShadow as
+ *  asked, the relative transform. */
+UStaticMeshComponent* GroundNewComponent(AActor& Owner, USceneComponent* Attach, UStaticMesh* Mesh,
+                                         const FString& BaseName, const FTransform& Relative, bool bCastShadow) {
+  const FName Name = MakeUniqueObjectName(&Owner, UStaticMeshComponent::StaticClass(), FName(*BaseName));
+  UStaticMeshComponent* C = NewObject<UStaticMeshComponent>(&Owner, Name);
+  C->SetupAttachment(Attach);
+  C->SetStaticMesh(Mesh);
+  // Decor: never a click / cursor surface (the map pick box is), never navigation.
+  C->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+  C->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+  C->SetGenerateOverlapEvents(false);
+  C->SetCanEverAffectNavigation(false);
+  C->SetCastShadow(bCastShadow);
+  C->SetRelativeTransform(Relative);
+  return C;
+}
+
+/** Slot Slot of C <- a MID of Material filled by Params (the material itself when no MID can be made). */
+template <typename FParams>
+void GroundSetMid(UStaticMeshComponent* C, int32 Slot, UMaterialInterface* Material, const FParams& Params) {
+  UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(Material, C);
+  if (Mid) {
+    Params(*Mid);
+    C->SetMaterial(Slot, Mid);
+  } else {
+    C->SetMaterial(Slot, Material);
+  }
+}
+
+void GroundRegister(UStaticMeshComponent* C, TArray<TWeakObjectPtr<UStaticMeshComponent>>& Out) {
+  C->RegisterComponent();
+  Out.Emplace(C);
+}
+
+/** Material slots of a mesh (at least 1). */
+int32 GroundSlots(const UStaticMesh* Mesh) { return FMath::Max(Mesh ? Mesh->GetStaticMaterials().Num() : 0, 1); }
+
 /** One decor plane under the board actor: the engine plane, NoCollision, no navigation, no shadow, a MID of Material
  *  (Params fills it). Registered and appended to Out. */
 template <typename FParams>
@@ -145,26 +309,10 @@ UStaticMeshComponent* GroundAddPlane(AActor& Owner, USceneComponent* Attach, USt
                                      const FString& BaseName, const FTransform& Relative,
                                      UMaterialInterface* Material, const FParams& Params,
                                      TArray<TWeakObjectPtr<UStaticMeshComponent>>& Out) {
-  const FName Name = MakeUniqueObjectName(&Owner, UStaticMeshComponent::StaticClass(), FName(*BaseName));
-  UStaticMeshComponent* C = NewObject<UStaticMeshComponent>(&Owner, Name);
-  C->SetupAttachment(Attach);
-  C->SetStaticMesh(Plane);
-  // A flat decor layer: never a click / cursor surface (the map pick box is), never navigation, no shadow of its own.
-  C->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-  C->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
-  C->SetGenerateOverlapEvents(false);
-  C->SetCanEverAffectNavigation(false);
-  C->SetCastShadow(false);
-  C->SetRelativeTransform(Relative);
-  UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(Material, C);
-  if (Mid) {
-    Params(*Mid);
-    C->SetMaterial(0, Mid);
-  } else {
-    C->SetMaterial(0, Material);
-  }
-  C->RegisterComponent();
-  Out.Emplace(C);
+  // A flat decor layer: no shadow of its own.
+  UStaticMeshComponent* C = GroundNewComponent(Owner, Attach, Plane, BaseName, Relative, false);
+  GroundSetMid(C, 0, Material, Params);
+  GroundRegister(C, Out);
   return C;
 }
 
@@ -174,6 +322,14 @@ UMaterialInterface* GroundLoadMaterial(const FString& Path) {
   const bool bMayExist =
       FPlatformProperties::RequiresCookedData() || FPackageName::DoesPackageExist(GroundPackageOf(Path));
   return bMayExist ? LoadObject<UMaterialInterface>(nullptr, *Path, nullptr, LOAD_NoWarn) : nullptr;
+}
+
+/** The same for the P5 lane K meshes (an empty path -> nullptr). */
+UStaticMesh* GroundLoadMesh(const FString& Path) {
+  if (Path.IsEmpty()) return nullptr;
+  const bool bMayExist =
+      FPlatformProperties::RequiresCookedData() || FPackageName::DoesPackageExist(GroundPackageOf(Path));
+  return bMayExist ? LoadObject<UStaticMesh>(nullptr, *Path, nullptr, LOAD_NoWarn) : nullptr;
 }
 }  // namespace S08EnvGroundPrivate
 
@@ -226,6 +382,7 @@ bool ParseJson(const TSharedPtr<FJsonObject>& Obj, FS08EnvGround& Out, TArray<FS
     }
   }
   GroundParseWaterfalls(Obj->TryGetField(TEXT("waterfalls")), G.Waterfalls, OutErrors);
+  GroundParseSea(Obj->TryGetField(TEXT("sea")), G.Sea, OutErrors);
   if (OutErrors.Num() != Before) return false;
   G.bSet = true;
   Out = G;
@@ -299,6 +456,22 @@ FLinearColor FallCardParam(const FS08EnvWaterfall& Fall, bool bSpill) {
                       bSpill ? S08EnvGroundSpec::FallKindSpill : S08EnvGroundSpec::FallKindCard, 0.0f);
 }
 
+FTransform MeshPieceTransform(const FVector& Loc, float YawDeg) {
+  return FTransform(FRotator(0.0f, YawDeg, 0.0f), Loc, FVector::OneVector);
+}
+
+FLinearColor SheetCardParam(const FS08EnvWaterfallMesh& Mesh) {
+  return FLinearColor(static_cast<float>(Mesh.SheetCard.X), static_cast<float>(Mesh.SheetCard.Y),
+                      S08EnvGroundSpec::FallKindCard, S08EnvGroundSpec::FallFlipMesh);
+}
+
+FLinearColor FoamCardParam(const FS08EnvWaterfallMesh& Mesh, int32 Slot) {
+  const FVector2D Card = Mesh.FoamCards.Num() > 0 ? Mesh.FoamCards[FMath::Clamp(Slot, 0, Mesh.FoamCards.Num() - 1)]
+                                                  : FVector2D(Mesh.SheetCard.X, 70.0);
+  return FLinearColor(static_cast<float>(Card.X), static_cast<float>(Card.Y), S08EnvGroundSpec::FallKindSpill,
+                      S08EnvGroundSpec::FallFlipMesh);
+}
+
 FS08EnvGroundStats Spawn(const FS08EnvGround& Ground, AActor& Owner, USceneComponent* Parent, const FBox2D& TrayTop,
                          const FVector2D& FrameHalf, TArray<TWeakObjectPtr<UStaticMeshComponent>>& Out) {
   using namespace S08EnvGroundPrivate;
@@ -344,27 +517,80 @@ FS08EnvGroundStats Spawn(const FS08EnvGround& Ground, AActor& Owner, USceneCompo
     ++S.Strips;
     S.AreaUU2 += R.GetArea();
   }
-  // P4 waterfalls: the vertical card and the optional flat spill of every entry (the same engine plane, own material)
+  // P4 waterfalls: the vertical card and the optional flat spill of every entry (the same engine plane, own material);
+  // P5 track B: the lane K sheet / foam / lip meshes instead of the card when the sheet mesh is in the build
+  const FName FallCardName(S08EnvGroundSpec::ParamFallCard);
   for (const FS08EnvWaterfall& Fall : Ground.Waterfalls) {
     UMaterialInterface* FallMaterial = GroundLoadMaterial(Fall.Material);
     if (!FallMaterial) {
       ++S.FallsMissing;
       continue;
     }
-    for (int32 Part = 0; Part < 2; ++Part) {
-      const bool bSpill = Part == 1;
-      if (bSpill && Fall.SpillUU <= 0.0f) continue;
-      GroundAddPlane(Owner, Attach, Plane,
-                     FString::Printf(TEXT("EnvWaterfall_%s_%s"), *GroundSafeName(Fall.Id),
-                                     bSpill ? TEXT("Spill") : TEXT("Card")),
-                     bSpill ? FallSpillTransform(Fall) : FallCardTransform(Fall), FallMaterial,
-                     [&Fall, bSpill](UMaterialInstanceDynamic& Mid) {
-                       Mid.SetVectorParameterValue(FName(S08EnvGroundSpec::ParamFallCard), FallCardParam(Fall, bSpill));
+    const FString Base = FString::Printf(TEXT("EnvWaterfall_%s"), *GroundSafeName(Fall.Id));
+    UStaticMesh* Sheet = Fall.Mesh.bSet ? GroundLoadMesh(Fall.Mesh.Sheet) : nullptr;
+    if (Sheet) {
+      const FTransform Piece = MeshPieceTransform(Fall.Mesh.Loc, Fall.Mesh.YawDeg);
+      UStaticMeshComponent* C = GroundNewComponent(Owner, Attach, Sheet, Base + TEXT("_Sheet"), Piece, false);
+      for (int32 Slot = 0; Slot < GroundSlots(Sheet); ++Slot) {
+        GroundSetMid(C, Slot, FallMaterial, [&Fall, &FallCardName](UMaterialInstanceDynamic& Mid) {
+          Mid.SetVectorParameterValue(FallCardName, SheetCardParam(Fall.Mesh));
+        });
+      }
+      GroundRegister(C, Out);
+      ++S.FallMeshParts;
+      if (UStaticMesh* Foam = GroundLoadMesh(Fall.Mesh.Foam)) {
+        C = GroundNewComponent(Owner, Attach, Foam, Base + TEXT("_Foam"), Piece, false);
+        for (int32 Slot = 0; Slot < GroundSlots(Foam); ++Slot) {  // slot 0 foam, slot 1 mist (kind 1 = spill fades)
+          GroundSetMid(C, Slot, FallMaterial, [&Fall, &FallCardName, Slot](UMaterialInstanceDynamic& Mid) {
+            Mid.SetVectorParameterValue(FallCardName, FoamCardParam(Fall.Mesh, Slot));
+          });
+        }
+        GroundRegister(C, Out);
+        ++S.FallMeshParts;
+      }
+      // the rock lip: only with its tray material (a lip in the importer's default material would read as a hole)
+      UStaticMesh* Lip = GroundLoadMesh(Fall.Mesh.Lip);
+      UMaterialInterface* LipMaterial = Lip ? GroundLoadMaterial(Fall.Mesh.LipMaterial) : nullptr;
+      if (Lip && LipMaterial) {
+        C = GroundNewComponent(Owner, Attach, Lip, Base + TEXT("_Lip"), Piece, true);  // rock: casts like the tray
+        for (int32 Slot = 0; Slot < GroundSlots(Lip); ++Slot) C->SetMaterial(Slot, LipMaterial);
+        GroundRegister(C, Out);
+        ++S.FallMeshParts;
+      }
+      ++S.FallMeshes;
+    } else {
+      GroundAddPlane(Owner, Attach, Plane, Base + TEXT("_Card"), FallCardTransform(Fall), FallMaterial,
+                     [&Fall, &FallCardName](UMaterialInstanceDynamic& Mid) {
+                       Mid.SetVectorParameterValue(FallCardName, FallCardParam(Fall, false));
+                     },
+                     Out);
+      ++S.FallCards;
+    }
+    if (Fall.SpillUU > 0.0f) {
+      GroundAddPlane(Owner, Attach, Plane, Base + TEXT("_Spill"), FallSpillTransform(Fall), FallMaterial,
+                     [&Fall, &FallCardName](UMaterialInstanceDynamic& Mid) {
+                       Mid.SetVectorParameterValue(FallCardName, FallCardParam(Fall, true));
                      },
                      Out);
       ++S.FallCards;
     }
     ++S.Falls;
+  }
+  // P5 track B: the sea ring under the tray (the MI as is: one look per map, nothing per component)
+  if (Ground.Sea.bSet) {
+    UStaticMesh* SeaMesh = GroundLoadMesh(Ground.Sea.Mesh);
+    UMaterialInterface* SeaMaterial = SeaMesh ? GroundLoadMaterial(Ground.Sea.Material) : nullptr;
+    if (!SeaMesh) {
+      S.SeaStatus = TEXT("missing-mesh");
+    } else if (!SeaMaterial) {
+      S.SeaStatus = TEXT("missing-material");
+    } else {
+      UStaticMeshComponent* C = GroundNewComponent(Owner, Attach, SeaMesh, TEXT("EnvSea"),
+                                                   MeshPieceTransform(Ground.Sea.Loc, Ground.Sea.YawDeg), false);
+      for (int32 Slot = 0; Slot < GroundSlots(SeaMesh); ++Slot) C->SetMaterial(Slot, SeaMaterial);
+      GroundRegister(C, Out);
+      S.SeaStatus = TEXT("ok");
+    }
   }
   S.Status = TEXT("ok");
   return S;
@@ -390,7 +616,18 @@ FString TraceLine(const FString& MapKey, const FS08EnvGround& Ground, const FS08
       Stats.MaterialName.IsEmpty() ? *Ground.Material : *Stats.MaterialName, Ground.Z, *GroundBox(Stats.Outer),
       *GroundBox(Stats.Hole), Ground.bSplatRect ? *GroundBox(Ground.SplatRect) : TEXT("-"),
       Stats.bSplatCoversOuter ? 1 : 0, Stats.AreaUU2, Stats.Falls, Ground.Waterfalls.Num(), Stats.FallCards,
-      *Stats.Status);
+      *Stats.Status) +
+         (Ground.HasMeshPieces() ? FString::Printf(TEXT(" fallMeshes=%d fallMeshParts=%d sea=%s"), Stats.FallMeshes,
+                                                   Stats.FallMeshParts, *Stats.SeaStatus)
+                                 : FString());
 }
 
 }  // namespace S08EnvGround
+
+bool FS08EnvGround::HasMeshPieces() const {
+  if (Sea.bSet) return true;
+  for (const FS08EnvWaterfall& Fall : Waterfalls) {
+    if (Fall.Mesh.bSet) return true;
+  }
+  return false;
+}

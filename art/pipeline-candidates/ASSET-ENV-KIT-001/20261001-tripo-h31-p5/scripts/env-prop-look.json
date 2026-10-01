@@ -1,0 +1,58 @@
+{
+  "schema": "unmatched.env-prop-look/1",
+  "status": "предложено (ENV-MAPS P5 track A, 2026-10-01): measured on the committed BC textures by tools/art/env_kit/env_prop_look.py --check; UE frames are the integrate stage's; художественная приёмка - решение пользователя",
+  "master": "/Game/EnvKit/Shared/M_EnvProp",
+  "notes": "Looks of the P5 props (run 20261001-tripo-h31-p5) and of the Blender back wall (ASSET-ENV-M-BACKWALL-001, material set 'BackWall' = MI_Env_BackWall shared by SM_Env_BackWall_{BayDoor,BayWindows,Centre}; its BC is the 'bc' path). Every entry gets MI_Env_<Name> parented to M_EnvProp (tools/art/env_kit/ue_import_env_kit.py merges this file with the P4 file of 20260930-tripo-h31). Night-friendly: the Tripo albedos of the new wood / cloth / stone / hedge props are brighter or more saturated than the kit they join (Sarpedon hull V 0.24 S 0.28, cannon V 0.28; barrel V 0.37 S 0.62, banner S 0.68), so the rest of each texture is pulled down 8-20 % in V and 10-25 % in S - no region recolour, the texture stays as committed. The balustrade marble is kept a step below the colonnade (ArcadeBay V 0.63 on M_UM_Figure) so the long edge runs do not outshine the palace. Emissive-only warm accents (no point light added; 1 key + <= 6 points per map unchanged): the lantern-post glass panes (pale amber, hue ~42, V >= 0.68: 1.1 % of the texels) at x6 like the LanternPlinth glass (mean emissive luminance 1.60 vs 1.75), and the back-wall window / door glow (the narrow HSV window of the lane-K report: hue 31 +- 12, S >= 0.5, V >= 0.8; with the default soft edges it lights 98.4 % of the T_Env_BackWall_E glow texels and 0.004 % of the rest) at x4.5 (mean 1.79, the lantern-glass order, ENV-M-BACKWALL contract). P5b tune (2026-10-01, UE frames): x4.5 (1.0, 0.62, 0.3) clipped 12.6 % of the back-wall pixels at K1 in saturated orange; now x2.8 with a paler warm (1.0, 0.7, 0.42): mean 1.19, the target floor lowered to 0.9.",
+  "soft": {"hueDeg": 8.0, "sv": 0.06},
+  "props": {
+    "Barrel": {
+      "gap": "concept-review rank 4: deck dressing; the orange Tripo wood (S 0.62) quieted towards the dark hull planks",
+      "rest": {"satMul": 0.75, "valMul": 0.85},
+      "target": {"restValRatio": [0.83, 0.87], "restSatRatio": [0.73, 0.77]}
+    },
+    "CrateStack": {
+      "gap": "concept-review rank 4: deck dressing, slightly darker / quieter",
+      "rest": {"satMul": 0.85, "valMul": 0.9},
+      "target": {"restValRatio": [0.88, 0.92], "restSatRatio": [0.83, 0.87]}
+    },
+    "LanternPost": {
+      "gap": "concept-review ranks 4 + 7 + 14: standing lantern posts on the deck and the palisade, emissive glass only (no new point light)",
+      "emissive": {
+        "window": {"hueDeg": 42.0, "halfWidthDeg": 12.0, "satMin": 0.28, "valMin": 0.68},
+        "colorLinear": [1.0, 0.62, 0.3],
+        "intensity": 6.0
+      },
+      "target": {"emissiveFraction": [0.005, 0.03], "emissiveMeanLuminance": [1.2, 2.5], "restValRatio": [0.995, 1.005]}
+    },
+    "Banner": {
+      "gap": "concept-review rank 4: the red banner, kept red, a step darker for the night profile",
+      "rest": {"satMul": 0.9, "valMul": 0.9},
+      "target": {"restValRatio": [0.88, 0.92], "restSatRatio": [0.88, 0.92]}
+    },
+    "RockOutcrop": {
+      "gap": "concept-review rank 7: rock outcrops in the dark west forest (concept Y 26 vs the render's 54)",
+      "rest": {"satMul": 0.85, "valMul": 0.8},
+      "target": {"restValRatio": [0.78, 0.82], "restSatRatio": [0.83, 0.87]}
+    },
+    "Balustrade": {
+      "gap": "concept-review rank 6: marble balustrade runs along the W / E / front tray edges, a step below the colonnade marble",
+      "rest": {"satMul": 0.9, "valMul": 0.92},
+      "target": {"restValRatio": [0.9, 0.94], "restSatRatio": [0.88, 0.92]}
+    },
+    "HedgeBed": {
+      "gap": "concept-review rank 6: hedge / flower beds on the dark-earth areas, darker foliage (the pink flowers keep their hue)",
+      "rest": {"satMul": 0.85, "valMul": 0.85},
+      "target": {"restValRatio": [0.83, 0.87], "restSatRatio": [0.83, 0.87]}
+    },
+    "BackWall": {
+      "gap": "concept-review rank 12 (+14): warm-lit windows / doors behind the colonnade arches, emissive only",
+      "bc": "art/pipeline-candidates/ASSET-ENV-M-BACKWALL-001/20261001-backwall-v1/export/T_Env_BackWall_BC.png",
+      "emissive": {
+        "window": {"hueDeg": 31.0, "halfWidthDeg": 12.0, "satMin": 0.5, "valMin": 0.8},
+        "colorLinear": [1.0, 0.7, 0.42],
+        "intensity": 2.8
+      },
+      "target": {"emissiveFraction": [0.012, 0.03], "emissiveMeanLuminance": [0.9, 2.5], "restValRatio": [0.995, 1.005]}
+    }
+  }
+}

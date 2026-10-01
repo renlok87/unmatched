@@ -1,0 +1,36 @@
+{
+  "schema": "unmatched.env-kit.params/1",
+  "_purpose": "Params of tools/art/env_kit (run_env_kit.py -> env_kit_build.py / orientation_check.py) for the 7 usable Tripo ENV props of run 20261001-tripo-h31-p5 (ENV-MAPS P5, concept-review gaps 2, 4, 6, 7, 14). ENV-M-CHERRY-V2 is NOT processed (ENV-U13: cherries / Sarpedon trees go to free Fab packs later). Target sizes are the P5 task proposal (uu = cm), measured against, not accepted values; scale of the existing kit: cells ~84 uu circles, figures ~40-60 uu tall.",
+  "_sizes": "Tripo proportions (GLB POSITION extents, x width / y up / z depth): Balustrade 0.980 x 0.301 x 0.094 -> length 150 gives 46 uu tall (task ~150 x 45); HedgeBed 0.978 x 0.297 x 0.174 -> length 150 gives 45.5 uu tall (task ~150 x 40: a uniform scale cannot meet both, the length is kept so a bed matches a balustrade segment); RockOutcrop 0.978 x 0.850 x 0.745 -> height 70 gives 80.5 uu long (task 60-90 for both); Banner 0.464 x 0.976 -> height 120 gives 57 uu wide; LanternPost 0.583 x 0.977 -> height 95 gives 57 uu (bracket arm); Barrel height 28 -> 21.4 diameter; CrateStack height 45 -> 49 wide.",
+  "run_dir": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5",
+  "scratch_dir": "C:/tmp/envmaps-research/p5a-kit/envkit",
+  "refs_dir": "C:/tmp/envmaps-research/tripo-inputs5",
+  "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+  "texture_size": 2048,
+  "uv_raster_size": 1024,
+  "normal_padding_px_source": 32,
+  "bake_ao": false,
+  "max_triangles": 12000,
+  "isolated_gap_uu": 0.5,
+  "orientation": {
+    "raster_px": 192,
+    "apply_min_iou_gain": 0.05,
+    "note": "A yaw other than 0 is applied only when a 90/180/270 deg turn beats the Tripo front by >= apply_min_iou_gain mean silhouette IoU over the four reference views; smaller differences keep the Tripo front (the Tripo H3.1 multiview contract) and are reported"
+  },
+  "ue": {
+    "folders": "/Game/EnvKit/<board>/ (flat, the fixed env-kit contract)",
+    "mesh": "SM_Env_<Name>", "textures": "T_Env_<Name>_{BC,N,ORM}", "material_instance": "MI_Env_<Name>",
+    "fbx_material_slot": "M_Env_<Name> (slot 0; the MI is assigned to it in UE)",
+    "import": "legacy FBX, import_uniform_scale 1.0, import_materials false, import_textures false, collision none (decor, not interactive), build_nanite false",
+    "textures": {"BC": "sRGB, TC_Default", "N": "sRGB off, TC_Normalmap, flip_green false (PNG is DirectX already)", "ORM": "sRGB off, TC_Masks"}
+  },
+  "assets": {
+    "ENV-S-BARREL":       {"name": "Barrel",      "board": "Sarpedon",  "target": {"dimension": "height", "uu": 28}},
+    "ENV-S-CRATE-STACK":  {"name": "CrateStack",  "board": "Sarpedon",  "target": {"dimension": "height", "uu": 45}},
+    "ENV-S-LANTERN-POST": {"name": "LanternPost", "board": "Sarpedon",  "target": {"dimension": "height", "uu": 95}},
+    "ENV-S-BANNER":       {"name": "Banner",      "board": "Sarpedon",  "target": {"dimension": "height", "uu": 120}},
+    "ENV-S-ROCK-OUTCROP": {"name": "RockOutcrop", "board": "Sarpedon",  "target": {"dimension": "height", "uu": 70}},
+    "ENV-M-BALUSTRADE":   {"name": "Balustrade",  "board": "Marmoreal", "target": {"dimension": "length", "uu": 150}},
+    "ENV-M-HEDGE-BED":    {"name": "HedgeBed",    "board": "Marmoreal", "target": {"dimension": "length", "uu": 150}}
+  }
+}

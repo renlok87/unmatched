@@ -22,6 +22,7 @@
 // (the engine plane maps local (-50,-50) -> UV (0,0), u along +X, v along +Y), so the strips sample ONE continuous
 // board-space texture: tools/art/env_kit/ue_import_env_ground.py builds M_EnvGround and MI_EnvGround_<Map>.
 // A missing material spawns no strip (traced; the props and lights of the layout still spawn).
+// (The ground parser accepts only mode "runtime"; the P5 lane K meshes below are extra pieces of the same section.)
 //
 // Waterfalls (ENV-MAPS P4, review gap 1; optional "waterfalls" array of the same section, written by ground_splat.py from
 // ground-params.json 'water.falls'; Sarpedon only):
@@ -34,9 +35,24 @@
 // MID of the entry's material with FallCard = (width, height, kind 0 card / 1 spill, 0) (M_EnvWaterfall scrolls its
 // streaks along +v). The ground water itself is not a component: M_EnvGround draws it from the aux mask of the MI. A
 // missing waterfall material skips that entry (counted in the trace). Grid boards never reach this code (no layout).
+//
+// P5 track B (lane K meshes, art/pipeline-candidates/ASSET-ENV-S-WATERFALL-001; Sarpedon only, written by ground_splat.py):
+//   waterfalls[i].mesh = {"sheet":"/Game/EnvKit/Ground/Sarpedon/SM_Env_S_Waterfall", "foam":".../SM_Env_S_WaterfallFoam",
+//                         "lip":".../SM_Env_S_WaterfallLip", "lipMaterial":"/Game/PipelineCandidates/TableBase/T2b/
+//                         MI_TableBase_T2b_Sarpedon", "loc":[-144.1,425,0], "yawDeg":90, "sheetCard":[193.8,185.231],
+//                         "foamCards":[[261.34,70],[243.97,76]]}
+//     When the sheet mesh loads, the entry spawns the sheet (MID of the entry's material, FallCard = (sheetCard, kind 0, flip 1)),
+//     the foam / mist (one MID per slot, FallCard = (foamCards[slot] or the last one, kind 1, flip 1)) and the optional rock lip
+//     (lipMaterial, else the mesh's own slot material; it casts a shadow like the tray) at loc / yawDeg, scale 1, INSTEAD
+//     of the vertical plane card; the flat spill plane stays. A sheet mesh that is not in the build falls back to the
+//     plane card (traced as fallMeshes=0); a missing foam / lip mesh is skipped.
+//   sea = {"mesh":"/Game/EnvKit/Ground/Sarpedon/SM_Env_S_SeaRing", "material":"/Game/EnvKit/Ground/MI_EnvSea_Sarpedon",
+//          "loc":[0,-45,-172], "yawDeg":0}: the dark sea ring under the tray (z strictly below the tray top), NoCollision,
+//          no shadow, the MI as is; spawned with the strips (status ok), sea=ok|missing-mesh|missing-material.
 // Trace: 'ARTPREVIEW envlayout ground map=<m> mode=runtime strips=N material=<name> z=.. outer=(..)..(..) hole=(..)..(..)
 //         splatRect=(..)..(..)|- splatCovers=0|1 areaUU2=.. falls=<spawned>/<declared> fallCards=K
-//         status=ok|off|no-tray|no-strips|missing-plane|missing-material'
+//         status=ok|off|no-tray|no-strips|missing-plane|missing-material[ fallMeshes=M fallMeshParts=P sea=<s>]' (the
+//         bracketed P5 tail only for a ground with a waterfall mesh or a sea: every other line is unchanged)
 #pragma once
 
 #include "CoreMinimal.h"
@@ -80,7 +96,34 @@ constexpr float MaxFallAbsXYUU = 5000.0f;
 /** FallCard.z of the two parts. */
 constexpr float FallKindCard = 0.0f;
 constexpr float FallKindSpill = 1.0f;
+/** FallCard.w: 0 = the engine-plane card / spill (v runs down the card), 1 = a lane K mesh (sheet / foam / mist): their v
+ *  was authored top -> bottom in Blender and the FBX import flips V, so M_EnvWaterfall (graph 2) uses 1 - v (P5b tune). */
+constexpr float FallFlipPlane = 0.0f;
+constexpr float FallFlipMesh = 1.0f;
+/** P5 track B mesh pieces (waterfalls[].mesh, sea; tools/art/env_kit/ground_splat.py mirrors the limits). */
+constexpr float MeshMaxAbsXYUU = 5000.0f;
+constexpr float FallMeshMinZ = -50.0f;
+constexpr float FallMeshMaxZ = 50.0f;
+constexpr float MaxMeshYawDeg = 360.0f;
+constexpr float MaxMeshCardUU = 2000.0f;
+constexpr int32 MaxFoamCards = 2;
+/** The sea ring lies in [SeaMinZ, SeaMaxZ): strictly below the tray top (S08Diorama::TopZ). */
+constexpr float SeaMinZ = -1000.0f;
+constexpr float SeaMaxZ = -3.0f;
 }  // namespace S08EnvGroundSpec
+
+/** P5 track B: the optional lane K meshes of a waterfall (they replace its vertical plane card). */
+struct UNMATCHED_API FS08EnvWaterfallMesh {
+  bool bSet = false;
+  FString Sheet;        // required (package path)
+  FString Foam;         // optional
+  FString Lip;          // optional
+  FString LipMaterial;  // required with a lip
+  FVector Loc = FVector::ZeroVector;
+  float YawDeg = 0.0f;
+  FVector2D SheetCard = FVector2D::ZeroVector;  // FallCard.xy of the sheet
+  TArray<FVector2D> FoamCards;                  // FallCard.xy per foam slot (the last one repeats)
+};
 
 /** One "waterfalls" entry: a vertical card (and an optional flat spill) at the near tray edge (board space). */
 struct UNMATCHED_API FS08EnvWaterfall {
@@ -92,6 +135,17 @@ struct UNMATCHED_API FS08EnvWaterfall {
   float TopZ = S08EnvGroundSpec::DefaultFallTopZ;
   float DropUU = 0.0f;
   float SpillUU = 0.0f;
+  /** P5 track B: the optional "mesh" object (bSet false = the plane card only). */
+  FS08EnvWaterfallMesh Mesh;
+};
+
+/** P5 track B: the optional "sea" object of the ground section (the sea ring under the tray). */
+struct UNMATCHED_API FS08EnvSea {
+  bool bSet = false;
+  FString Mesh;
+  FString Material;
+  FVector Loc = FVector::ZeroVector;
+  float YawDeg = 0.0f;
 };
 
 /** The parsed "ground" section of a layout (bSet false = the layout has none: no ground). */
@@ -106,6 +160,10 @@ struct UNMATCHED_API FS08EnvGround {
   FBox2D SplatRect = FBox2D(ForceInit);  // board XY covered by the splat texture
   /** P4: the optional "waterfalls" (empty = none). */
   TArray<FS08EnvWaterfall> Waterfalls;
+  /** P5 track B: the optional "sea". */
+  FS08EnvSea Sea;
+  /** True when the trace line carries the P5 tail (a waterfall with a mesh, or a sea). */
+  bool HasMeshPieces() const;
 };
 
 /** What one ground spawn did (also the trace numbers). */
@@ -122,6 +180,11 @@ struct UNMATCHED_API FS08EnvGroundStats {
   int32 Falls = 0;
   int32 FallsMissing = 0;
   int32 FallCards = 0;
+  /** P5 track B: falls shown with their sheet mesh (not the plane card) / mesh components (sheet + foam + lip) / the sea
+   *  ring ('off' without a "sea", else ok | missing-mesh | missing-material). */
+  int32 FallMeshes = 0;
+  int32 FallMeshParts = 0;
+  FString SeaStatus = TEXT("off");
 };
 
 namespace S08EnvGround {
@@ -147,10 +210,17 @@ UNMATCHED_API FTransform FallCardTransform(const FS08EnvWaterfall& Fall);
 UNMATCHED_API FTransform FallSpillTransform(const FS08EnvWaterfall& Fall);
 /** FallCard = (width, height, kind, 0): height = dropUU (card) or spillUU (spill), kind = FallKindCard | FallKindSpill. */
 UNMATCHED_API FLinearColor FallCardParam(const FS08EnvWaterfall& Fall, bool bSpill);
+/** P5 track B: relative transform of a lane K piece: Loc, yaw YawDeg about +Z (90: local +X -> board +Y), scale 1. */
+UNMATCHED_API FTransform MeshPieceTransform(const FVector& Loc, float YawDeg);
+/** FallCard of the sheet mesh: (sheetCard.x, sheetCard.y, FallKindCard, FallFlipMesh). */
+UNMATCHED_API FLinearColor SheetCardParam(const FS08EnvWaterfallMesh& Mesh);
+/** FallCard of foam slot Slot: (foamCards[Slot] or the last one, FallKindSpill, FallFlipMesh); no foamCards -> (sheet width, 70). */
+UNMATCHED_API FLinearColor FoamCardParam(const FS08EnvWaterfallMesh& Mesh, int32 Slot);
 /** Creates one plane component per strip of (OuterRect(TrayTop), HoleRect(FrameHalf)) under Parent (owned by Owner),
  *  each with a MID of Ground.Material carrying GroundStrip / SplatRect, then the waterfall cards / spills of
- *  Ground.Waterfalls (MID of their material with FallCard); appends them to Out (weak: the actor owns them). Nothing is
- *  created unless the status is 'ok'. */
+ *  Ground.Waterfalls (MID of their material with FallCard; P5: the sheet / foam / lip meshes instead of the card when the
+ *  sheet mesh loads) and the P5 sea ring; appends them to Out (weak: the actor owns them). Nothing is created unless the
+ *  status is 'ok'. */
 UNMATCHED_API FS08EnvGroundStats Spawn(const FS08EnvGround& Ground, AActor& Owner, USceneComponent* Parent,
                                        const FBox2D& TrayTop, const FVector2D& FrameHalf,
                                        TArray<TWeakObjectPtr<UStaticMeshComponent>>& Out);

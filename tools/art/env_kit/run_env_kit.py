@@ -31,7 +31,9 @@ ORIENT = HERE.parent / "orientation_check.py"
 READBACK = REPO / "tools" / "tripo-pipeline" / "blender" / "check_static_prop_fbx.py"
 SPC = REPO / "tools" / "tripo-pipeline" / "blender" / "static_prop_candidate.py"
 DEFAULT_BLENDER = os.environ.get("BLENDER", "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe")
-NO_WINDOW = 0x08000000 if os.name == "nt" else 0
+# Windows: no console window, BELOW_NORMAL priority (the GPU / UE runs of the other tracks keep the machine)
+NO_WINDOW = (0x08000000 | 0x00004000) if os.name == "nt" else 0
+BLENDER_THREADS = os.environ.get("ENVKIT_BLENDER_THREADS", "4")
 ZFRACS = (0.5, 0.45, 0.55, 0.4, 0.6, 0.35, 0.65, 0.3, 0.7)
 
 
@@ -63,7 +65,8 @@ def run(cmd, log):
 
 
 def blender(bl, script, args, log):
-    return run([bl, "-b", "--factory-startup", "--python-exit-code", "1", "--python", rel(script), "--"] + args, log)
+    return run([bl, "-b", "--factory-startup", "-t", BLENDER_THREADS, "--python-exit-code", "1", "--python", rel(script),
+                "--"] + args, log)
 
 
 def aggregate(P, params_path, ids):

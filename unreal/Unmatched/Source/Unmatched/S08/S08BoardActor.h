@@ -10,6 +10,7 @@
 #include "S08BoardModel.h"
 #include "S08BoardArt.h"
 #include "S08EnvLayout.h"
+#include "S08MapBackdrop.h"
 #include "S08ArtHud.h"
 #include "S08HeroesV2.h"
 #include "S08Render.h"
@@ -120,6 +121,16 @@ public:
   /** Source of the last map frame material: "frame-wood" (M_MapFrameWood MID), "probe" (the ART-005 wood) or
    *  "missing" (frameWood asked for, M_MapFrameWood not imported -> the probe wood). Empty before a map-image board. */
   const FString& GetMapFrameWoodSource() const { return MapFrameWoodSource; }
+  /** ENV-MAPS P5 track C (gap 9 full): the frame of the last map-image board - "frame-002" (the 20 modules of
+   *  ASSET-MAP-FRAME-002 replaced the cube bars and the ART-005 corners), "bars" (no "mapFrame" block) or "missing" (the
+   *  block asks for the kit, a module mesh is not imported -> bars + corners). Empty before a map-image board. */
+  const FString& GetMapFrameKitSource() const { return MapFrameKitSource; }
+  /** The frame module components of the active map-image board (empty on grids and with the bars). */
+  const TArray<TObjectPtr<UStaticMeshComponent>>& GetMapFrameParts() const { return MapFrameParts; }
+  /** ENV-MAPS P5 track C (gap 8): the night backdrop parts (mist planes, moon card) of the active map-image board and what
+   *  S08MapBackdrop::Update applied (empty / 'off' on grids, the grey view, a refused profile, without the env gate). */
+  const TArray<TObjectPtr<UStaticMeshComponent>>& GetBackdropParts() const { return BackdropParts; }
+  const FS08BackdropRuntime& GetBackdropRuntime() const { return BackdropRuntime; }
 
   /** Syncs fighter actors with the latest decoded fighters (spawn/move/
    *  re-label by stable fighter id; dead fighters hide instantly). */
@@ -378,6 +389,24 @@ private:
   TObjectPtr<UMaterialInstanceDynamic> MapFrameWoodMid;
   bool bMapFrameWoodTried = false;
   FString MapFrameWoodSource;
+  // ---- ENV-MAPS P5 track C: heavy modular frame (profile "mapFrame") and night backdrop (profile "backdrop") ----
+  /** Places the 20 ASSET-MAP-FRAME-002 modules (S08MapFrame002Layout) with Wood on their wood slot; false (nothing
+   *  placed, traced) when a module mesh is not imported - the caller then keeps the cube bars + ART-005 corners. */
+  bool BuildMapFrame002(UMaterialInterface* Wood);
+  void ClearMapFrameParts();
+  /** S08MapBackdrop::Update for the active board (env gate AND map-image AND the profile block). */
+  void UpdateBackdrop();
+  UPROPERTY()
+  TArray<TObjectPtr<UStaticMeshComponent>> MapFrameParts;
+  UPROPERTY()
+  TArray<TObjectPtr<UStaticMesh>> Frame002Meshes;  // Corner, SegA, SegB, SegMid (ES08FrameModule order)
+  UPROPERTY()
+  TObjectPtr<UMaterialInterface> Frame002Iron;
+  bool bFrame002Tried = false;
+  FString MapFrameKitSource;
+  UPROPERTY()
+  TArray<TObjectPtr<UStaticMeshComponent>> BackdropParts;
+  FS08BackdropRuntime BackdropRuntime;
   UPROPERTY()
   TObjectPtr<UMaterialInstanceDynamic> ContactShadowMid;
   bool bContactShadowTried = false;

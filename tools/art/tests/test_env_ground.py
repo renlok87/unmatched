@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import copy
 import json
+import re
 import sys
 import unittest
 from pathlib import Path
@@ -379,6 +380,21 @@ class ImportStages(unittest.TestCase):
             for pin in pins:
                 self.assertIn(pin, code)
 
+    def test_fall_mesh_v_flip(self):
+        # P5b tune: the lane K meshes carry v top -> bottom in Blender, the FBX import flips V; FallCard.w = 1 (C++
+        # FallFlipMesh on the sheet / foam MIDs) makes M_EnvWaterfall use 1 - v, the plane card / spill keep w = 0
+        header = (GS.REPO / "unreal/Unmatched/Source/Unmatched/S08/S08EnvGround.h").read_text(encoding="utf-8")
+        self.assertRegex(header, r"constexpr float FallFlipPlane = 0\.0f;")
+        self.assertRegex(header, r"constexpr float FallFlipMesh = 1\.0f;")
+        src = (GS.REPO / "unreal/Unmatched/Source/Unmatched/S08/S08EnvGround.cpp").read_text(encoding="utf-8")
+        self.assertEqual(src.count("S08EnvGroundSpec::FallFlipMesh"), 2)  # SheetCardParam + FoamCardParam
+        core = IMP.HLSL_FALL_CORE
+        self.assertIn("float2 uvf = FallCard.w > 0.5 ? float2(UV.x, 1.0 - UV.y) : UV;", core)
+        after = core.split("float2 uvf =", 1)[1].split(chr(10), 1)[1]
+        self.assertNotIn("UV.y", after)  # every later v read is flipped
+        self.assertIn("FallCard.w > 0.5", IMP.HLSL_FALL_RIPPLE_UV)
+        self.assertNotEqual(IMP.FALL_GRAPH_VERSION, "1")  # rebuilds M_EnvWaterfall over the P4 graph
+
     def test_used_sets_and_asset_names(self):
         self.assertEqual(sorted(IMP.used_sets(PARAMS, ["marmoreal", "sarpedon"])),
                          sorted(["Ground076", "Moss002", "Grass005", "Tiles143", "Ground055S", "Gravel021",
@@ -395,6 +411,167 @@ class ImportStages(unittest.TestCase):
         pl = IMP.plan(PARAMS, ["marmoreal", "sarpedon"], staging, GS.PARAMS_DEFAULT)
         bad = {s: {k: t.get("error") for k, t in it["textures"].items() if not t["ok"]} for s, it in pl["sets"].items()}
         self.assertTrue(pl["ok"], json.dumps({"sets": bad, "maps": {k: m.get("error") for k, m in pl["maps"].items()}}))
+
+
+ENVGROUND_H = GS.REPO / "unreal/Unmatched/Source/Unmatched/S08/S08EnvGround.h"
+WATERFALL_RUN = "art/pipeline-candidates/ASSET-ENV-S-WATERFALL-001/20261001-waterfall-v1"
+
+
+def ground_consts() -> dict:
+    text = ENVGROUND_H.read_text(encoding="utf-8")
+    out = {m.group(1): float(m.group(2)) for m in re.finditer(r"constexpr float (\w+) = ([-\d.]+)f;", text)}
+    out.update({m.group(1): int(m.group(2)) for m in re.finditer(r"constexpr int32 (\w+) = (\d+);", text)})
+    return out
+
+
+class MeshPieces(unittest.TestCase):
+    """P5 track B: the lane K waterfall meshes and the sea ring in the layout ground section (ground_splat.py) and their
+    import (ue_import_env_ground.py), plain Python."""
+
+    def test_sarpedon_fall_mesh_and_sea(self):
+        res = generated("sarpedon")
+        f = res["falls"][0]
+        m = f["mesh"]
+        tx0, ty0, tx1, ty1 = SHARED_TRAY
+        self.assertEqual(m["sheet"], "/Game/EnvKit/Ground/Sarpedon/SM_Env_S_Waterfall")
+        self.assertEqual(m["foam"], "/Game/EnvKit/Ground/Sarpedon/SM_Env_S_WaterfallFoam")
+        self.assertEqual(m["lip"], "/Game/EnvKit/Ground/Sarpedon/SM_Env_S_WaterfallLip")
+        self.assertEqual(m["lipMaterial"], "/Game/PipelineCandidates/TableBase/T2b/MI_TableBase_T2b_Sarpedon")
+        self.assertEqual(m["loc"], [round((f["x0"] + f["x1"]) / 2, 3), ty1, 0.0])
+        self.assertEqual(m["yawDeg"], 90.0)
+        self.assertEqual(m["sheetCard"], [193.8, 185.231])
+        self.assertAlmostEqual(m["sheetCard"][0], f["x1"] - f["x0"], places=6)  # built for this fall
+        self.assertEqual(m["foamCards"], [[261.34, 70.0], [243.97, 76.0]])     # slot 0 foam, slot 1 mist
+        self.assertEqual(res["sea"], {"mesh": "/Game/EnvKit/Ground/Sarpedon/SM_Env_S_SeaRing",
+                                      "material": "/Game/EnvKit/Ground/MI_EnvSea_Sarpedon",
+                                      "loc": [0.0, (ty0 + ty1) / 2, -172.0], "yawDeg": 0.0})
+        self.assertEqual(GS.validate_waterfalls("sarpedon", res["falls"], SHARED_TRAY), [])
+        self.assertEqual(GS.validate_sea("sarpedon", res["sea"], SHARED_TRAY), [])
+        # Marmoreal has neither (gated to the Sarpedon ground section)
+        mres = generated("marmoreal")
+        self.assertIsNone(mres["sea"])
+        sec = GS.ground_section("marmoreal", PARAMS, mres, GS.PARAMS_DEFAULT.parent / "marmoreal.splat.png")
+        self.assertNotIn("sea", sec)
+        self.assertNotIn("notesP5", sec)
+        ssec = GS.ground_section("sarpedon", PARAMS, res, GS.PARAMS_DEFAULT.parent / "sarpedon.splat.png")
+        self.assertIn("sea", ssec)
+        self.assertIn("notesP5", ssec)
+
+    def test_mesh_and_sea_rejections(self):
+        res = generated("sarpedon")
+        f = res["falls"][0]
+        m = f["mesh"]
+        bad_meshes = [dict(m, sheet="Game/X"), dict(m, foam="C:/x"), dict(m, lipMaterial=None),
+                      dict(m, loc=[0.0, 0.0]), dict(m, loc=[m["loc"][0], m["loc"][1], 60.0]),
+                      dict(m, loc=[m["loc"][0] + 5.0, m["loc"][1], 0.0]), dict(m, loc=[m["loc"][0], 400.0, 0.0]),
+                      dict(m, yawDeg=400.0), dict(m, sheetCard=[0.0, 10.0]), dict(m, sheetCard=[10.0]),
+                      dict(m, foamCards=[[1.0, 1.0]] * 3), dict(m, foamCards=[["1", 1.0]]), "mesh"]
+        for b in bad_meshes:
+            self.assertTrue(GS.validate_waterfalls("sarpedon", [dict(f, mesh=b)], SHARED_TRAY), b)
+        sea = res["sea"]
+        for b in (dict(sea, loc=[0.0, -45.0, -3.0]), dict(sea, loc=[0.0, -45.0, 5.0]), dict(sea, loc=[0.0, 0.0, -172.0]),
+                  dict(sea, loc=[0.0, -45.0, -2000.0]), dict(sea, mesh="SM_X"), dict(sea, material=None),
+                  dict(sea, yawDeg="0"), [1, 2]):
+            self.assertTrue(GS.validate_sea("sarpedon", b, SHARED_TRAY), b)
+
+    def test_check_mesh_run_catches_a_stale_build(self):
+        res = generated("sarpedon")
+        sec = GS.ground_section("sarpedon", PARAMS, res, GS.PARAMS_DEFAULT.parent / "sarpedon.splat.png")
+        self.assertEqual(GS.check_mesh_run("sarpedon", sec, PARAMS), [])
+        # the fall moved / widened by the rules: the sheet was built for the old width -> rebuild
+        f = dict(sec["waterfalls"][0], x0=sec["waterfalls"][0]["x0"] - 20.0)
+        errs = GS.check_mesh_run("sarpedon", dict(sec, waterfalls=[f]), PARAMS)
+        self.assertTrue(any("rebuild" in e for e in errs), errs)
+        moved = dict(sec["waterfalls"][0], mesh=dict(sec["waterfalls"][0]["mesh"], loc=[0.0, 425.0, 0.0]))
+        self.assertTrue(GS.check_mesh_run("sarpedon", dict(sec, waterfalls=[moved]), PARAMS))
+        # another shared tray than the run was built for
+        p = copy.deepcopy(PARAMS)
+        p["tray"]["offsetY"] = -40.0
+        errs = GS.check_mesh_run("sarpedon", sec, p)
+        self.assertTrue(any("built for the tray" in e for e in errs), errs)
+        self.assertTrue(GS.check_mesh_run("sarpedon", dict(sec, sea=dict(sec["sea"], loc=[0.0, -45.0, -150.0])), PARAMS))
+        # the layout check compares the sea / mesh blocks with the generator
+        lay = dict(layout("sarpedon"), ground=dict(sec, sea=None))
+        self.assertTrue(any("ground.sea" in e for e in GS.check_layout_ground("sarpedon", lay, res, PARAMS)))
+
+    def test_limits_mirror_s08envground(self):
+        h = ground_consts()
+        self.assertEqual(GS.MESH_MAX_ABS_XY_UU, h["MeshMaxAbsXYUU"])
+        self.assertEqual(GS.MESH_Z, (h["FallMeshMinZ"], h["FallMeshMaxZ"]))
+        self.assertEqual(GS.SEA_Z, (h["SeaMinZ"], h["SeaMaxZ"]))
+        self.assertEqual(GS.MESH_MAX_CARD_UU, h["MaxMeshCardUU"])
+        self.assertEqual(GS.MESH_MAX_FOAM_CARDS, h["MaxFoamCards"])
+        self.assertEqual(GS.FALL_TOP_Z, (h["FallMinTopZ"], h["FallMaxTopZ"]))
+        self.assertEqual(GS.SEA_Z[1], -3.0)  # = S08Diorama::TopZ: the sea stays under the tray top
+
+    def test_shipped_sarpedon_layout_carries_the_pieces(self):
+        g = layout("sarpedon")["ground"]
+        self.assertIn("mesh", g["waterfalls"][0])
+        self.assertIn("sea", g)
+        self.assertNotIn("sea", layout("marmoreal")["ground"])
+        self.assertTrue(all("mesh" not in f for f in layout("marmoreal")["ground"].get("waterfalls", [])))
+
+    def test_mesh_import_plan(self):
+        items = IMP.plan_meshes(PARAMS, "sarpedon")
+        self.assertEqual(set(items), {"sheet", "foam", "lip", "sea"})
+        for part, it in items.items():
+            self.assertTrue(it["ok"], (part, it.get("error")))
+            self.assertEqual(it["asset"], f"/Game/EnvKit/Ground/Sarpedon/{IMP.ENV_MESHES[part][0]}")
+            self.assertEqual(it["run"], WATERFALL_RUN)
+        # vertex colours REPLACE for the lip (the tray moss mask) and the sea ring (foam / far fade)
+        self.assertEqual({p: it["vertexColors"] for p, it in items.items()},
+                         {"sheet": "ignore", "foam": "ignore", "lip": "replace", "sea": "replace"})
+        self.assertEqual(items["foam"]["slots"], 2)
+        self.assertEqual(IMP.plan_meshes(PARAMS, "marmoreal"), {})
+        p = copy.deepcopy(PARAMS)
+        p["maps"]["sarpedon"]["sea"]["run"] = "art/pipeline-candidates/ASSET-ENV-S-WATERFALL-001/no-such-run"
+        self.assertFalse(IMP.plan_meshes(p, "sarpedon")["sea"]["ok"])
+        p = copy.deepcopy(PARAMS)
+        p["maps"]["sarpedon"]["water"]["falls"][0]["mesh"]["lip"] = False
+        self.assertNotIn("lip", IMP.plan_meshes(p, "sarpedon"))
+        planned = IMP.planned_assets(PARAMS)
+        for it in items.values():
+            self.assertIn(it["asset"], planned)
+        self.assertIn(IMP.SEA_MATERIAL_PATH, planned)
+        self.assertIn(IMP.sea_mi_asset("sarpedon"), planned)
+
+    def test_compare_mesh(self):
+        item = {"boundsUeUU": {"min": [26.041, -108.528, -172.0], "max": [81.274, 108.528, 2.0]}, "triangles": 1632}
+        ok = IMP.compare_mesh({"boundsMin": [26.2, -108.528, -172.0], "boundsMax": [81.274, 108.6, 2.0],
+                               "trianglesLod0": 1630}, item)
+        self.assertTrue(ok["bounds"]["ok"] and ok["triangles"]["ok"], ok)
+        x100 = IMP.compare_mesh({"boundsMin": [2604.1, -10852.8, -17200.0], "boundsMax": [8127.4, 10852.8, 200.0],
+                                 "trianglesLod0": 1500}, item)
+        self.assertFalse(x100["bounds"]["ok"])
+        self.assertFalse(x100["triangles"]["ok"])
+
+    def test_sea_material_instance(self):
+        want = IMP.sea_mi_want("sarpedon", PARAMS, "ripple")
+        sp = PARAMS["maps"]["sarpedon"]["sea"]
+        self.assertEqual(want["tex"], {"WaterRippleN": "ripple"})
+        col = want["vector"]["SeaColor"]
+        far = want["vector"]["SeaFar"]
+        water = IMP.mi_want("sarpedon", PARAMS, {(s, k): "t" for s in list(PARAMS["sets"]) + [IMP.RIPPLE_SET]
+                                                   for k in IMP.KEYS}, "s", [0, 0, 1, 1])["vector"]["WaterColor"]
+        self.assertLess(sum(col[:3]), sum(water[:3]))   # the sea is darker than the river water
+        self.assertLess(sum(far[:3]), sum(col[:3]))     # and fades darker far out
+        self.assertEqual(far[3], float(sp["farStrength"]))
+        self.assertEqual(want["vector"]["SeaTile"][:2], (600.0, float(sp["rippleTileUU"])))  # UV0 = XY / 600 (lane K)
+        self.assertEqual(want["scalar"]["NightEV"], PARAMS["maps"]["sarpedon"]["grade"]["ev"])
+        self.assertEqual(set(want["vector"]), set(IMP.SEA_VECTOR_DEFAULTS))
+        self.assertEqual(set(want["scalar"]), set(IMP.SEA_SCALAR_DEFAULTS))
+        self.assertTrue(IMP.has_sea(PARAMS, "sarpedon"))
+        self.assertFalse(IMP.has_sea(PARAMS, "marmoreal"))
+
+    def test_sea_hlsl_declares_what_it_reads(self):
+        for code, pins in ((IMP.HLSL_SEA_ALBEDO, IMP.SEA_CORE_INPUTS),
+                           (IMP.HLSL_SEA_EMISSIVE, IMP.SEA_CORE_INPUTS + ("SeaShade",)),
+                           (IMP.HLSL_SEA_RIPPLE_UV, ("UV", "Time", "SeaFlow", "SeaTile")),
+                           (IMP.HLSL_SEA_NORMAL, ("R", "SeaShade", "VC"))):
+            for pin in pins:
+                self.assertIn(pin, code)
+        self.assertIn("VC.r", IMP.HLSL_SEA_CORE)  # foam band
+        self.assertIn("VC.g", IMP.HLSL_SEA_CORE)  # far fade
 
 
 if __name__ == "__main__":

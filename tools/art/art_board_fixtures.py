@@ -557,6 +557,7 @@ def check_profiles(fixtures: list[dict], profiles: dict) -> list[str]:
     errs += check_content_blocks(profiles)
     for b in profiles.get("boards", []):
         errs += check_readability_block(b.get("id", "?"), b)
+        errs += check_frame_backdrop_blocks(b.get("id", "?"), b)
     return errs
 
 
@@ -707,6 +708,31 @@ def check_readability_block(bid: str, board: dict) -> list[str]:
         fw = r["frameWood"]
         if not (isinstance(fw, dict) and rng(fw, "valueScaleSrgb", 0.2, 1, 0.7) and rng(fw, "saturation", 0, 1, 0.75)):
             errs.append(f"board {bid}: readability.frameWood needs valueScaleSrgb 0.2..1 and saturation 0..1")
+    return errs
+
+
+def check_frame_backdrop_blocks(bid: str, board: dict) -> list[str]:
+    """ENV-MAPS P5 track C: the optional "mapFrame" ({"kit": "frame-002"}, mapImage.frameUU 24) and "backdrop" blocks,
+    the same rules as S08BoardArt.cpp ParseMapFrame / ParseBackdrop (map-image boards only; the backdrop rules and the
+    camera model are mirrored in tools/art/map_surface/backdrop.py)."""
+    errs = []
+    for key in ("mapFrame", "backdrop"):
+        if key in board and board.get("surface") != "map-image":
+            errs.append(f"board {bid}: {key} is for map-image boards only")
+    if errs:
+        return errs
+    if "mapFrame" in board:
+        mf = board["mapFrame"]
+        if not isinstance(mf, dict) or mf.get("kit") != "frame-002":
+            errs.append(f"board {bid}: mapFrame.kit must be 'frame-002'")
+        elif set(mf) - {"kit", "note"}:
+            errs.append(f"board {bid}: mapFrame.{sorted(set(mf) - {'kit', 'note'})[0]} is not a field (kit, note)")
+        elif (board.get("mapImage") or {}).get("frameUU", 24) != 24:
+            errs.append(f"board {bid}: mapFrame kit frame-002 needs mapImage.frameUU 24")
+    if "backdrop" in board:
+        sys.path.insert(0, str(REPO / "tools" / "art" / "map_surface"))
+        import backdrop as backdrop_lib  # noqa: E402  (plain Python mirror of the C++ parser + camera model)
+        errs += backdrop_lib.validate_block(board["backdrop"], backdrop_lib.map_half(board), bid)
     return errs
 
 

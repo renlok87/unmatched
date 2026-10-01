@@ -459,6 +459,129 @@ bool ParseReadability(const FString& BoardId, const TSharedPtr<FJsonObject>& Obj
   Out.bSet = bOk;
   return bOk;
 }
+
+// Optional finite number in [Min, Max] (absent = keep InOut).
+bool OptionalNumber(const TSharedPtr<FJsonObject>& O, const TCHAR* Field, double Min, double Max, float& InOut) {
+  if (!O->HasField(Field)) return true;
+  double V = 0.0;
+  if (!O->TryGetNumberField(Field, V) || !FMath::IsFinite(V) || V < Min || V > Max) return false;
+  InOut = static_cast<float>(V);
+  return true;
+}
+
+// Optional [a, b] / [r, g, b] of finite numbers in [Min, Max].
+bool OptionalVec2(const TSharedPtr<FJsonObject>& O, const TCHAR* Field, double Min, double Max, FVector2D& InOut) {
+  if (!O->HasField(Field)) return true;
+  TArray<double> N;
+  if (!ReadNumberArray(O, Field, 2, N)) return false;
+  for (const double V : N) {
+    if (!FMath::IsFinite(V) || V < Min || V > Max) return false;
+  }
+  InOut = FVector2D(N[0], N[1]);
+  return true;
+}
+
+bool OptionalColor(const TSharedPtr<FJsonObject>& O, const TCHAR* Field, FLinearColor& InOut) {
+  if (!O->HasField(Field)) return true;
+  TArray<double> N;
+  if (!ReadNumberArray(O, Field, 3, N)) return false;
+  for (const double V : N) {
+    if (!FMath::IsFinite(V) || V < 0.0 || V > 4.0) return false;
+  }
+  InOut = FLinearColor(static_cast<float>(N[0]), static_cast<float>(N[1]), static_cast<float>(N[2]));
+  return true;
+}
+
+// ENV-MAPS P5 track C: the "mapFrame" block of a map-image board ({"kit": "frame-002"}).
+bool ParseMapFrame(const FString& BoardId, const TSharedPtr<FJsonObject>& Object, const FS08MapImageSpec& Map,
+                   FS08MapFrameSpec& Out, TArray<FString>& Errors) {
+  Out = FS08MapFrameSpec();
+  FString Kit;
+  if (!Object->TryGetStringField(TEXT("kit"), Kit) || Kit != S08MapSurfaceSpec::Frame002Kit) {
+    Errors.Add(FString::Printf(TEXT("board %s: mapFrame.kit must be '%s'"), *BoardId, S08MapSurfaceSpec::Frame002Kit));
+    return false;
+  }
+  for (const TPair<FString, TSharedPtr<FJsonValue>>& Field : Object->Values) {
+    if (Field.Key != TEXT("kit") && Field.Key != TEXT("note")) {
+      Errors.Add(FString::Printf(TEXT("board %s: mapFrame.%s is not a field (kit, note)"), *BoardId, *Field.Key));
+      return false;
+    }
+  }
+  // The modules are 24 uu wide (wood out to FrameHalf exactly): another frame width would move the camera fit, the
+  // tray apron and the env layouts' frame clearance against the bars it replaces.
+  if (!FMath::IsNearlyEqual(Map.FrameUU, S08MapSurfaceSpec::Frame002FrameUU, 1e-3f)) {
+    Errors.Add(FString::Printf(TEXT("board %s: mapFrame kit %s needs mapImage.frameUU %.0f (got %g)"), *BoardId, *Kit,
+                               S08MapSurfaceSpec::Frame002FrameUU, Map.FrameUU));
+    return false;
+  }
+  Out.Kit = Kit;
+  Out.bSet = true;
+  return true;
+}
+
+// ENV-MAPS P5 track C: the "backdrop" block of a map-image board (mist planes + moon card; every number validated).
+bool ParseBackdrop(const FString& BoardId, const TSharedPtr<FJsonObject>& Object, const FS08MapImageSpec& Map,
+                   FS08BackdropSpec& Out, TArray<FString>& Errors) {
+  using namespace S08MapSurfaceSpec;
+  Out = FS08BackdropSpec();
+  bool bOk = true;
+  auto Fail = [&](const FString& What) {
+    Errors.Add(FString::Printf(TEXT("board %s: backdrop.%s"), *BoardId, *What));
+    bOk = false;
+  };
+  const TArray<TSharedPtr<FJsonValue>>* MistValues = nullptr;
+  if (Object->HasField(TEXT("mist"))) {
+    if (!Object->TryGetArrayField(TEXT("mist"), MistValues) || !MistValues || MistValues->Num() > BackdropMaxMist) {
+      Fail(FString::Printf(TEXT("mist must be an array of at most %d planes"), BackdropMaxMist));
+    } else {
+      for (int32 I = 0; I < MistValues->Num(); ++I) {
+        const TSharedPtr<FJsonObject>* M = nullptr;
+        FS08BackdropMistSpec Mist;
+        if (!(*MistValues)[I].IsValid() || !(*MistValues)[I]->TryGetObject(M) || !M || !M->IsValid() ||
+            !(*M)->HasField(TEXT("zUU")) || !OptionalNumber(*M, TEXT("zUU"), BackdropMinZ, BackdropMaxZ, Mist.ZUU) ||
+            !OptionalVec2(*M, TEXT("centerUU"), -4000.0, 4000.0, Mist.CenterUU) ||
+            !OptionalVec2(*M, TEXT("halfUU"), 500.0, 8000.0, Mist.HalfUU) ||
+            !OptionalColor(*M, TEXT("colorLinear"), Mist.Color) ||
+            !OptionalNumber(*M, TEXT("opacity"), 0.0, 0.8, Mist.Opacity) || Mist.Opacity <= 0.0f ||
+            !OptionalNumber(*M, TEXT("noiseScaleUU"), 50.0, 5000.0, Mist.NoiseScaleUU) ||
+            !OptionalVec2(*M, TEXT("panUUPerSec"), -100.0, 100.0, Mist.PanUUPerSec) ||
+            !OptionalNumber(*M, TEXT("edgeFade"), 0.05, 0.5, Mist.EdgeFade) ||
+            !OptionalNumber(*M, TEXT("coverage"), 0.0, 1.0, Mist.Coverage) ||
+            !OptionalNumber(*M, TEXT("seed"), 0.0, 1000.0, Mist.Seed)) {
+          Fail(FString::Printf(
+              TEXT("mist[%d] needs zUU %.0f..%.0f and optional centerUU |..| <= 4000, halfUU 500..8000, colorLinear 0..4, opacity (0, 0.8], noiseScaleUU 50..5000, panUUPerSec |..| <= 100, edgeFade 0.05..0.5, coverage 0..1, seed 0..1000"),
+              I, BackdropMinZ, BackdropMaxZ));
+          continue;
+        }
+        Out.Mist.Add(Mist);
+      }
+    }
+  }
+  const TSharedPtr<FJsonObject>* Moon = nullptr;
+  if (Object->HasField(TEXT("moon"))) {
+    FS08BackdropMoonSpec& M = Out.Moon;
+    if (!Object->TryGetObjectField(TEXT("moon"), Moon) || !Moon || !Moon->IsValid() ||
+        !OptionalVec2(*Moon, TEXT("screenAnchor"), -1.0, 1.0, M.ScreenAnchor) ||
+        !OptionalNumber(*Moon, TEXT("depthUU"), 500.0, 20000.0, M.DepthUU) ||
+        !OptionalNumber(*Moon, TEXT("diameterUU"), 50.0, 5000.0, M.DiameterUU) ||
+        !OptionalColor(*Moon, TEXT("colorLinear"), M.Color) ||
+        !OptionalNumber(*Moon, TEXT("intensity"), 0.0, 50.0, M.Intensity) || M.Intensity <= 0.0f ||
+        !OptionalNumber(*Moon, TEXT("softness"), 0.05, 1.0, M.Softness) ||
+        !OptionalNumber(*Moon, TEXT("discRadius"), 0.0, 0.5, M.DiscRadius) ||
+        !OptionalNumber(*Moon, TEXT("discIntensity"), 0.0, 50.0, M.DiscIntensity)) {
+      Fail(TEXT("moon needs optional screenAnchor [-1..1, -1..1], depthUU 500..20000, diameterUU 50..5000, colorLinear 0..4, intensity (0, 50], softness 0.05..1, discRadius 0..0.5, discIntensity 0..50"));
+    } else {
+      M.bSet = true;
+    }
+  }
+  if (bOk && Out.Mist.IsEmpty() && !Out.Moon.bSet) Fail(TEXT("needs at least one mist plane or the moon"));
+  if (bOk) {
+    const FString Problem = S08BackdropPlacementProblem(Out, Map.HalfUU());
+    if (!Problem.IsEmpty()) Fail(Problem);
+  }
+  Out.bSet = bOk;
+  return bOk;
+}
 }  // namespace
 
 FVector FS08MapImageSpec::PxToWorld(const FVector2D& Px) const {
@@ -861,6 +984,30 @@ bool FS08BoardArtData::ParseJson(const FString& Text, TArray<FString>& OutErrors
           continue;
         }
       }
+      // ENV-MAPS P5 track C: optional heavy frame kit and night backdrop, map-image boards only (grids bit for bit).
+      bool bBlocksOk = true;
+      for (const TCHAR* Field : {TEXT("mapFrame"), TEXT("backdrop")}) {
+        if (!(*Obj)->HasField(Field)) continue;
+        const TSharedPtr<FJsonObject>* Block = nullptr;
+        if (B.Surface != ES08BoardSurface::MapImage) {
+          OutErrors.Add(FString::Printf(TEXT("board %s: %s is for map-image boards only"), *B.Id, Field));
+          bBlocksOk = false;
+          break;
+        }
+        if (!(*Obj)->TryGetObjectField(Field, Block) || !Block || !Block->IsValid()) {
+          OutErrors.Add(FString::Printf(TEXT("board %s: %s must be an object"), *B.Id, Field));
+          bBlocksOk = false;
+          break;
+        }
+        const bool bParsed = FCString::Strcmp(Field, TEXT("mapFrame")) == 0
+                                 ? ParseMapFrame(B.Id, *Block, B.Map, B.MapFrame, OutErrors)
+                                 : ParseBackdrop(B.Id, *Block, B.Map, B.Backdrop, OutErrors);
+        if (!bParsed) {
+          bBlocksOk = false;
+          break;
+        }
+      }
+      if (!bBlocksOk) continue;
       const TSharedPtr<FJsonObject>* Expect = nullptr;
       if ((*Obj)->TryGetObjectField(TEXT("expect"), Expect) && Expect) {
         auto ReadInt = [&](const TCHAR* Field, int32& Out) {
@@ -1288,4 +1435,159 @@ FTransform S08ContactShadowTransform(const FS08BoardReadabilitySpec& Spec, float
 
 FString S08ColorHex(const FColor& Color) {
   return FString::Printf(TEXT("#%02X%02X%02X"), Color.R, Color.G, Color.B);
+}
+
+// ---- ENV-MAPS P5 track C: heavy modular map frame + night backdrop ----------------------------------------------
+
+const TCHAR* S08FrameModuleName(ES08FrameModule Module) {
+  switch (Module) {
+    case ES08FrameModule::Corner: return TEXT("Corner");
+    case ES08FrameModule::SegA: return TEXT("A");
+    case ES08FrameModule::SegB: return TEXT("B");
+    default: return TEXT("Mid");
+  }
+}
+
+const TCHAR* S08FrameModulePath(ES08FrameModule Module) {
+  switch (Module) {
+    case ES08FrameModule::Corner: return S08MapSurfaceSpec::Frame002CornerPath;
+    case ES08FrameModule::SegA: return S08MapSurfaceSpec::Frame002SegAPath;
+    case ES08FrameModule::SegB: return S08MapSurfaceSpec::Frame002SegBPath;
+    default: return S08MapSurfaceSpec::Frame002SegMidPath;
+  }
+}
+
+FS08FrameLayout S08MapFrame002Layout(const FVector2D& MapHalf, double SegmentUU, double CornerLegUU) {
+  FS08FrameLayout Out;
+  const double Hx = MapHalf.X, Hy = MapHalf.Y, Lc = CornerLegUU;
+  struct FCorner {
+    const TCHAR* Name;
+    double X, Y;
+    float Yaw;
+  };
+  for (const FCorner& C : {FCorner{TEXT("near-east"), Hx, Hy, 0.0f}, FCorner{TEXT("near-west"), -Hx, Hy, 90.0f},
+                           FCorner{TEXT("far-west"), -Hx, -Hy, 180.0f}, FCorner{TEXT("far-east"), Hx, -Hy, -90.0f}}) {
+    FS08FramePiece P;
+    P.Id = FString(TEXT("corner-")) + C.Name;
+    P.Module = ES08FrameModule::Corner;
+    P.Location = FVector(C.X, C.Y, 0.0);
+    P.YawDeg = C.Yaw;
+    Out.Pieces.Add(P);
+  }
+  // (side, start of the fill on the inner edge, local +X direction, yaw, side length) - frame_layout.py order.
+  struct FSide {
+    const TCHAR* Name;
+    FVector2D Start, Dir;
+    float Yaw;
+    double Length;
+    bool bLong;
+  };
+  bool bExact = true;
+  for (const FSide& S : {FSide{TEXT("near"), FVector2D(-Hx + Lc, Hy), FVector2D(1.0, 0.0), 0.0f, 2.0 * Hx, true},
+                         FSide{TEXT("far"), FVector2D(Hx - Lc, -Hy), FVector2D(-1.0, 0.0), 180.0f, 2.0 * Hx, true},
+                         FSide{TEXT("east"), FVector2D(Hx, Hy - Lc), FVector2D(0.0, -1.0), -90.0f, 2.0 * Hy, false},
+                         FSide{TEXT("west"), FVector2D(-Hx, -Hy + Lc), FVector2D(0.0, 1.0), 90.0f, 2.0 * Hy, false}}) {
+    const double Fill = S.Length - 2.0 * Lc;
+    const int32 N = FMath::Max(1, static_cast<int32>(FMath::RoundHalfFromZero(Fill / SegmentUU)));
+    const double Stretch = Fill / (N * SegmentUU);
+    bExact = bExact && FMath::Abs(Stretch - 1.0) < 1e-5;
+    if (S.bLong) {
+      Out.SegmentsX = N;
+      Out.StretchX = Stretch;
+    } else {
+      Out.SegmentsY = N;
+      Out.StretchY = Stretch;
+    }
+    const double L = SegmentUU * Stretch;
+    const int32 Mid = (N % 2 == 1) ? N / 2 : -1;
+    for (int32 I = 0; I < N; ++I) {
+      FS08FramePiece P;
+      P.Id = FString::Printf(TEXT("%s-%d"), S.Name, I);
+      P.Module = I == Mid ? ES08FrameModule::SegMid
+                          : (((I + (S.bLong ? 0 : 1)) % 2 == 0) ? ES08FrameModule::SegA : ES08FrameModule::SegB);
+      const FVector2D At = S.Start + S.Dir * (L * I);
+      P.Location = FVector(At.X, At.Y, 0.0);
+      P.YawDeg = S.Yaw;
+      P.ScaleX = static_cast<float>(Stretch);
+      Out.Pieces.Add(P);
+    }
+  }
+  Out.bExactFit = bExact;
+  return Out;
+}
+
+FS08BoardView FS08BoardView::AtDistance(double DistanceUU) {
+  // SetupCameraForBoard: FRotator(-55, -90, 0) at (0, D cos 55, D sin 55); the axes of that rotator.
+  FS08BoardView V;
+  const double Pitch = FMath::DegreesToRadians(55.0);
+  V.Location = FVector(0.0, DistanceUU * FMath::Cos(Pitch), DistanceUU * FMath::Sin(Pitch));
+  const FRotationMatrix M(FRotator(-55.0f, -90.0f, 0.0f));
+  V.Forward = M.GetUnitAxis(EAxis::X);
+  V.Right = M.GetUnitAxis(EAxis::Y);
+  V.Up = M.GetUnitAxis(EAxis::Z);
+  V.HalfTanH = FMath::Tan(FMath::DegreesToRadians(35.0 * 0.5));
+  V.HalfTanV = V.HalfTanH / (16.0 / 9.0);
+  return V;
+}
+
+bool FS08BoardView::Project(const FVector& World, FVector2D& OutNdc) const {
+  const FVector D = World - Location;
+  const double Depth = FVector::DotProduct(D, Forward);
+  if (Depth <= KINDA_SMALL_NUMBER) return false;
+  OutNdc = FVector2D(FVector::DotProduct(D, Right) / (Depth * HalfTanH), FVector::DotProduct(D, Up) / (Depth * HalfTanV));
+  return true;
+}
+
+FVector FS08BoardView::Ray(const FVector2D& Ndc) const {
+  return (Forward + Right * (Ndc.X * HalfTanH) + Up * (Ndc.Y * HalfTanV)).GetSafeNormal();
+}
+
+double S08BackdropFarViewDistanceUU(const FVector2D& MapHalf) {
+  return S08K1FitDistanceUU(MapHalf) / S08MapSurfaceSpec::BackdropFarViewRatio;
+}
+
+FTransform S08BackdropMistTransform(const FS08BackdropMistSpec& Mist) {
+  return FTransform(FRotator::ZeroRotator, FVector(Mist.CenterUU.X, Mist.CenterUU.Y, Mist.ZUU),
+                    FVector(Mist.HalfUU.X / 50.0, Mist.HalfUU.Y / 50.0, 1.0));
+}
+
+FTransform S08BackdropMoonTransform(const FS08BackdropMoonSpec& Moon, const FVector2D& MapHalf, double* OutTopZ) {
+  const FS08BoardView View = FS08BoardView::AtDistance(S08BackdropFarViewDistanceUU(MapHalf));
+  const FVector Centre = View.Location + View.Ray(Moon.ScreenAnchor) * Moon.DepthUU;
+  // Engine plane normal +Z -> towards the camera (-Forward); local X along the screen right: a round disc on screen.
+  const FRotator Rotation = FRotationMatrix::MakeFromZX(-View.Forward, View.Right).Rotator();
+  const double Scale = Moon.DiameterUU / 100.0;
+  const FTransform T(Rotation, Centre, FVector(Scale, Scale, 1.0));
+  if (OutTopZ) {
+    double Top = -UE_BIG_NUMBER;
+    for (const FVector2D Corner : {FVector2D(-50.0, -50.0), FVector2D(50.0, -50.0), FVector2D(-50.0, 50.0), FVector2D(50.0, 50.0)}) {
+      Top = FMath::Max(Top, T.TransformPosition(FVector(Corner.X, Corner.Y, 0.0)).Z);
+    }
+    *OutTopZ = Top;
+  }
+  return T;
+}
+
+FString S08BackdropPlacementProblem(const FS08BackdropSpec& Spec, const FVector2D& MapHalf) {
+  using namespace S08MapSurfaceSpec;
+  for (int32 I = 0; I < Spec.Mist.Num(); ++I) {
+    if (Spec.Mist[I].ZUU > BackdropMaxZ) {
+      return FString::Printf(TEXT("mist[%d] zUU %.0f above %.0f (the board must stay in front of the backdrop)"), I,
+                             Spec.Mist[I].ZUU, BackdropMaxZ);
+    }
+    for (int32 J = 0; J < I; ++J) {
+      if (FMath::Abs(Spec.Mist[I].ZUU - Spec.Mist[J].ZUU) < BackdropMinLayerGapUU) {
+        return FString::Printf(TEXT("mist[%d] and mist[%d] closer than %.0f uu in Z"), J, I, BackdropMinLayerGapUU);
+      }
+    }
+  }
+  if (Spec.Moon.bSet) {
+    double Top = 0.0;
+    S08BackdropMoonTransform(Spec.Moon, MapHalf, &Top);
+    if (Top > BackdropMaxZ) {
+      return FString::Printf(TEXT("moon card reaches Z %.0f above %.0f (move it deeper: depthUU / screenAnchor)"), Top,
+                             BackdropMaxZ);
+    }
+  }
+  return FString();
 }

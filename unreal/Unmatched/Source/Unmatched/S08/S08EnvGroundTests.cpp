@@ -11,6 +11,15 @@
 //   GroundWaterfallGeometry  P4 world-free card / spill transforms (corners, normal, v down the card), FallCard, trace
 //   GroundWaterfallSpawn     P4 fake map-image board: strips + card + spill (MID FallCard, NoCollision, no shadow), a
 //                            fall without spill, a missing waterfall material (skipped, strips stay)
+// P5 track B (lane K meshes, Sarpedon):
+//   GroundMeshParse     waterfalls[].mesh and the ground "sea": every field, defaults, rejections (the whole layout is
+//                       invalid), null = none
+//   GroundMeshGeometry  world-free: the piece transform (yaw 90: local +X -> board +Y), sheet / foam FallCard values, the
+//                       trace tail only for a ground with mesh pieces (every older line unchanged)
+//   GroundMeshSpawn     fake map-image board with engine meshes: sheet + foam + lip instead of the card, spill kept, sea
+//                       ring; the card fallback without the sheet mesh, a lip without its material skipped, sea statuses
+//   GroundShipped       (extended) the shipped Sarpedon mesh pieces / sea at the near tray edge / under the tray and the
+//                       imported M_EnvSea / MI_EnvSea_<Map> / SM_Env_S_* (warnings while not imported)
 //   UnrealEditor-Cmd.exe Unmatched.uproject
 //     -ExecCmds="Automation RunTests Unmatched.S08.EnvLayout; Quit" -unattended -nosplash -nullrhi
 #if WITH_AUTOMATION_TESTS
@@ -135,6 +144,22 @@ FString FallJson(const FString& Id, const FString& Material, const FString& Extr
 
 FString GroundWithFalls(const FString& Material, const FString& Falls) {
   return GroundJson(FullGroundBody(Material) + TEXT(",\"waterfalls\":[") + Falls + TEXT("]"));
+}
+
+/** P5 track B: a waterfall "mesh" object (engine shapes as the lane K pieces by default). */
+FString FallMeshJson(const FString& Sheet = TEXT("/Engine/BasicShapes/Cube"),
+                     const FString& LipMaterial = FString(EngineMaterial), const FString& Extra = FString()) {
+  return FString::Printf(TEXT(",\"mesh\":{\"sheet\":\"%s\",\"foam\":\"/Engine/BasicShapes/Cylinder\","
+                              "\"lip\":\"/Engine/BasicShapes/Cone\",\"lipMaterial\":\"%s\",\"loc\":[-144.1,425,0],"
+                              "\"yawDeg\":90,\"sheetCard\":[193.8,185.231],\"foamCards\":[[261.34,70],[243.97,76]]%s}"),
+                         *Sheet, *LipMaterial, *Extra);
+}
+
+/** P5 track B: a ground "sea" object. */
+FString SeaJson(const FString& Mesh = TEXT("/Engine/BasicShapes/Plane"), const FString& Material = FString(EngineMaterial),
+                const FString& Loc = TEXT("[0,-45,-172]")) {
+  return FString::Printf(TEXT(",\"sea\":{\"mesh\":\"%s\",\"material\":\"%s\",\"loc\":%s,\"yawDeg\":0}"), *Mesh,
+                         *Material, *Loc);
 }
 }  // namespace S08EnvGroundTest
 
@@ -684,6 +709,29 @@ bool FS08EnvGroundShippedTest::RunTest(const FString&) {
       TestTrue(Id + TEXT(": the spill starts on the tray top"),
                Fall.SpillUU > 0.0f && Fall.Y - Fall.SpillUU < Top.Max.Y && Fall.Y - Fall.SpillUU > Top.Max.Y - 120.0);
       TestTrue(Id + TEXT(": above the T2 lip"), Fall.TopZ > S08Diorama::T2LipTopZMax);
+      if (Fall.Mesh.bSet) {
+        // P5 track B: the lane K pieces at (fall centre, near tray edge, 0), out of the tray (yaw 90), the lip in the
+        // map's T2b MI; the sheet as wide as the fall
+        const FS08EnvWaterfallMesh& M = Fall.Mesh;
+        const FString Folder = FString(S08EnvGroundSpec::MaterialRoot) + B.Map.Name + TEXT("/");
+        TestTrue(Id + TEXT(": mesh paths under /Game/EnvKit/Ground/<Map>/"),
+                 M.Sheet == Folder + TEXT("SM_Env_S_Waterfall") && M.Foam == Folder + TEXT("SM_Env_S_WaterfallFoam") &&
+                     (M.Lip.IsEmpty() || M.Lip == Folder + TEXT("SM_Env_S_WaterfallLip")));
+        TestTrue(Id + TEXT(": lip material = MI_TableBase_T2b_<Map>"),
+                 M.Lip.IsEmpty() || M.LipMaterial == S08Diorama::T2bMapMaterialPath(B.Map.Name));
+        TestTrue(Id + TEXT(": pieces at the near tray edge, under the fall centre ") + M.Loc.ToString(),
+                 FMath::IsNearlyEqual(M.Loc.Y, Top.Max.Y, 0.05) &&
+                     FMath::IsNearlyEqual(M.Loc.X, (Fall.X0 + Fall.X1) * 0.5, 0.05) && M.Loc.Z == 0.0);
+        TestTrue(Id + TEXT(": yaw 90 (local +X out of the tray)"), FMath::IsNearlyEqual(M.YawDeg, 90.0f));
+        TestTrue(Id + TEXT(": the sheet is as wide as the fall"),
+                 FMath::IsNearlyEqual(M.SheetCard.X, static_cast<double>(Fall.X1 - Fall.X0), 0.05));
+        for (const FString& Mesh : {M.Sheet, M.Foam, M.Lip}) {
+          if (!Mesh.IsEmpty() && !FPackageName::DoesPackageExist(PackageOf(Mesh))) {
+            AddWarning(FString::Printf(TEXT("%s not imported (tools/art/env_kit/ue_import_env_ground.py): %s"), *Mesh,
+                                       Mesh == M.Sheet ? TEXT("the plane card stays") : TEXT("the piece is skipped")));
+          }
+        }
+      }
       if (!FPackageName::DoesPackageExist(PackageOf(Fall.Material))) {
         AddWarning(FString::Printf(TEXT("%s not imported (tools/art/env_kit/ue_import_env_ground.py): the fall stays off"),
                                    *PackageOf(Fall.Material)));
@@ -696,6 +744,27 @@ bool FS08EnvGroundShippedTest::RunTest(const FString&) {
       UTexture* Ripple = nullptr;
       TestTrue(Id + TEXT(": WaterRippleN bound"),
                FallMi->GetTextureParameterValue(FHashedMaterialParameterInfo(TEXT("WaterRippleN")), Ripple) && Ripple);
+    }
+    if (G.Sea.bSet) {
+      // P5 track B: the sea ring under the tray centre, below the tray top and above the bottom of either shared tray
+      // (T2 / T2b), so its inner edge (40 uu inside the tray outline) hides under the cliff
+      const FS08EnvSea& Sea = G.Sea;
+      AddInfo(FString::Printf(TEXT("%s sea: %s at %s"), *Key, *Sea.Mesh, *Sea.Loc.ToString()));
+      TestEqual(Key + TEXT(": sea material MI_EnvSea_<Map>"), PackageOf(Sea.Material),
+                FString(S08EnvGroundSpec::MaterialRoot) + TEXT("MI_EnvSea_") + B.Map.Name);
+      TestTrue(Key + TEXT(": sea under the tray centre"),
+               FMath::IsNearlyEqual(Sea.Loc.X, Top.GetCenter().X, 0.05) &&
+                   FMath::IsNearlyEqual(Sea.Loc.Y, Top.GetCenter().Y, 0.05));
+      TestTrue(Key + TEXT(": sea below the tray top, above the T2 cliff bottom"),
+               Sea.Loc.Z < S08Diorama::TopZ && Sea.Loc.Z > S08Diorama::TopZ - S08Diorama::T2MaxDepthUU);
+      if (!FPackageName::DoesPackageExist(PackageOf(Sea.Material)) || !FPackageName::DoesPackageExist(PackageOf(Sea.Mesh))) {
+        AddWarning(FString::Printf(TEXT("%s / %s not imported (tools/art/env_kit/ue_import_env_ground.py): no sea ring"),
+                                   *Sea.Mesh, *Sea.Material));
+      } else {
+        UMaterialInstance* SeaMi = LoadObject<UMaterialInstance>(nullptr, *Sea.Material);
+        TestTrue(Key + TEXT(": MI_EnvSea parent M_EnvSea"),
+                 SeaMi && SeaMi->Parent && SeaMi->Parent->GetPathName() == TEXT("/Game/EnvKit/Ground/M_EnvSea.M_EnvSea"));
+      }
     }
     const FString Pkg = PackageOf(G.Material);
     if (!FPackageName::DoesPackageExist(Pkg)) {
@@ -726,6 +795,304 @@ bool FS08EnvGroundShippedTest::RunTest(const FString&) {
                  Rect.Equals(S08EnvGround::RectParam(G.SplatRect), 0.01f));
   }
   AddInfo(FString::Printf(TEXT("shipped ground sections checked: %d, imported materials: %d"), Checked, Imported));
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08EnvGroundMeshParseTest,
+    "Unmatched.S08.EnvLayout.GroundMeshParse P5 waterfall meshes and the sea of the ground section keep every field and reject bad entries",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08EnvGroundMeshParseTest::RunTest(const FString&) {
+  using namespace S08EnvGroundTest;
+  const FString Mat = TEXT("/Game/EnvKit/Ground/MI_EnvWaterfall_Sarpedon");
+  FS08EnvLayout L;
+  TArray<FString> Errors;
+  const FString Full = GroundJson(FullGroundBody(EngineMaterial) + TEXT(",\"waterfalls\":[") +
+                                  FallJson(TEXT("fall-s"), Mat, FallMeshJson()) + TEXT("]") + SeaJson());
+  if (!TestTrue(TEXT("mesh + sea parse: ") + FString::Join(Errors, TEXT(" | ")),
+                L.ParseJson(LayoutJson(TEXT("sarpedon"), Full), Errors))) {
+    return false;
+  }
+  if (!TestEqual("one waterfall", L.Ground.Waterfalls.Num(), 1)) return false;
+  const FS08EnvWaterfallMesh& M = L.Ground.Waterfalls[0].Mesh;
+  TestTrue("mesh set", M.bSet);
+  TestTrue("mesh paths", M.Sheet == TEXT("/Engine/BasicShapes/Cube") && M.Foam == TEXT("/Engine/BasicShapes/Cylinder") &&
+                             M.Lip == TEXT("/Engine/BasicShapes/Cone") && M.LipMaterial == EngineMaterial);
+  TestTrue(TEXT("mesh loc / yaw ") + M.Loc.ToString(),
+           M.Loc.Equals(FVector(-144.1, 425.0, 0.0), 1e-4) && FMath::IsNearlyEqual(M.YawDeg, 90.0f));
+  TestTrue("sheetCard", M.SheetCard.Equals(FVector2D(193.8, 185.231), 1e-4));
+  TestTrue("foamCards", M.FoamCards.Num() == 2 && M.FoamCards[0].Equals(FVector2D(261.34, 70.0), 1e-4) &&
+                            M.FoamCards[1].Equals(FVector2D(243.97, 76.0), 1e-4));
+  TestTrue("the P4 fields still parse", L.Ground.Waterfalls[0].X0 == -241.0f && L.Ground.Waterfalls[0].SpillUU == 60.0f);
+  const FS08EnvSea& Sea = L.Ground.Sea;
+  TestTrue("sea set", Sea.bSet && Sea.Mesh == TEXT("/Engine/BasicShapes/Plane") && Sea.Material == EngineMaterial);
+  TestTrue(TEXT("sea loc ") + Sea.Loc.ToString(), Sea.Loc.Equals(FVector(0.0, -45.0, -172.0), 1e-4) && Sea.YawDeg == 0.0f);
+  TestTrue("HasMeshPieces", L.Ground.HasMeshPieces());
+  // optional parts: no foam / lip / foamCards / yaw
+  Errors.Reset();
+  const FString Minimal = TEXT(",\"mesh\":{\"sheet\":\"/Game/EnvKit/Ground/Sarpedon/SM_Env_S_Waterfall\","
+                               "\"loc\":[0,0,0],\"sheetCard\":[10,20]}");
+  TestTrue(TEXT("minimal mesh parses: ") + FString::Join(Errors, TEXT(" | ")),
+           L.ParseJson(LayoutJson(TEXT("sarpedon"), GroundWithFalls(EngineMaterial, FallJson(TEXT("f"), Mat, Minimal))),
+                       Errors) &&
+               L.Ground.Waterfalls[0].Mesh.bSet && L.Ground.Waterfalls[0].Mesh.Foam.IsEmpty() &&
+               L.Ground.Waterfalls[0].Mesh.Lip.IsEmpty() && L.Ground.Waterfalls[0].Mesh.FoamCards.Num() == 0 &&
+               L.Ground.Waterfalls[0].Mesh.YawDeg == 0.0f && !L.Ground.Sea.bSet);
+  Errors.Reset();
+  TestTrue("null mesh / null sea = none",
+           L.ParseJson(LayoutJson(TEXT("sarpedon"),
+                                  GroundJson(FullGroundBody(EngineMaterial) + TEXT(",\"waterfalls\":[") +
+                                             FallJson(TEXT("f"), Mat, TEXT(",\"mesh\":null")) + TEXT("],\"sea\":null"))),
+                       Errors) &&
+               !L.Ground.Waterfalls[0].Mesh.bSet && !L.Ground.Sea.bSet && !L.Ground.HasMeshPieces());
+
+  struct FCase {
+    const TCHAR* Name;
+    FString Extra;        // appended to the ground body after a valid waterfalls array (bFall: inside the fall entry)
+    bool bFall;
+    const TCHAR* Expect;  // substring of one error
+  };
+  const TCHAR* const Cube = TEXT("/Engine/BasicShapes/Cube");
+  const FString Loc = TEXT("\"loc\":[0,0,0]");
+  const FString Card = TEXT("\"sheetCard\":[10,20]");
+  auto MeshObj = [](const FString& Body) { return FString::Printf(TEXT(",\"mesh\":{%s}"), *Body); };
+  const FString S = FString::Printf(TEXT("\"sheet\":\"%s\""), Cube);
+  const FCase Cases[] = {
+      {TEXT("mesh a string"), TEXT(",\"mesh\":\"x\""), true, TEXT("mesh is not an object")},
+      {TEXT("sheet missing"), MeshObj(Loc + TEXT(",") + Card), true, TEXT("mesh.sheet")},
+      {TEXT("sheet not a package"), MeshObj(TEXT("\"sheet\":\"Engine/X\",") + Loc + TEXT(",") + Card), true,
+       TEXT("mesh.sheet")},
+      {TEXT("foam not a package"), MeshObj(S + TEXT(",\"foam\":\"C:/x\",") + Loc + TEXT(",") + Card), true,
+       TEXT("mesh.foam")},
+      {TEXT("lip without material"), MeshObj(S + TEXT(",\"lip\":\"/Engine/BasicShapes/Cone\",") + Loc + TEXT(",") + Card),
+       true, TEXT("lipMaterial")},
+      {TEXT("loc missing"), MeshObj(S + TEXT(",") + Card), true, TEXT("mesh.loc")},
+      {TEXT("loc two numbers"), MeshObj(S + TEXT(",\"loc\":[0,0],") + Card), true, TEXT("mesh.loc")},
+      {TEXT("loc z 60"), MeshObj(S + TEXT(",\"loc\":[0,0,60],") + Card), true, TEXT("mesh.loc")},
+      {TEXT("loc x 6000"), MeshObj(S + TEXT(",\"loc\":[6000,0,0],") + Card), true, TEXT("mesh.loc")},
+      {TEXT("yaw 400"), MeshObj(S + TEXT(",") + Loc + TEXT(",\"yawDeg\":400,") + Card), true, TEXT("mesh.yawDeg")},
+      {TEXT("sheetCard missing"), MeshObj(S + TEXT(",") + Loc), true, TEXT("mesh.sheetCard")},
+      {TEXT("sheetCard zero"), MeshObj(S + TEXT(",") + Loc + TEXT(",\"sheetCard\":[0,20]")), true, TEXT("mesh.sheetCard")},
+      {TEXT("three foamCards"),
+       MeshObj(S + TEXT(",") + Loc + TEXT(",") + Card + TEXT(",\"foamCards\":[[1,1],[1,1],[1,1]]")), true,
+       TEXT("mesh.foamCards")},
+      {TEXT("foamCard of strings"), MeshObj(S + TEXT(",") + Loc + TEXT(",") + Card + TEXT(",\"foamCards\":[[\"1\",1]]")),
+       true, TEXT("mesh.foamCards")},
+      {TEXT("sea a number"), TEXT(",\"sea\":3"), false, TEXT("ground: sea is not an object")},
+      {TEXT("sea mesh missing"), FString::Printf(TEXT(",\"sea\":{\"material\":\"%s\",\"loc\":[0,-45,-172]}"), EngineMaterial),
+       false, TEXT("sea.mesh")},
+      {TEXT("sea material bad"), SeaJson(TEXT("/Engine/BasicShapes/Plane"), TEXT("MI_X")), false, TEXT("sea.material")},
+      {TEXT("sea at the tray top"), SeaJson(TEXT("/Engine/BasicShapes/Plane"), EngineMaterial, TEXT("[0,-45,-3]")), false,
+       TEXT("sea.loc")},
+      {TEXT("sea above the board"), SeaJson(TEXT("/Engine/BasicShapes/Plane"), EngineMaterial, TEXT("[0,-45,10]")), false,
+       TEXT("sea.loc")},
+      {TEXT("sea too deep"), SeaJson(TEXT("/Engine/BasicShapes/Plane"), EngineMaterial, TEXT("[0,-45,-2000]")), false,
+       TEXT("sea.loc")},
+      {TEXT("sea far off"), SeaJson(TEXT("/Engine/BasicShapes/Plane"), EngineMaterial, TEXT("[0,9000,-172]")), false,
+       TEXT("sea.loc")},
+  };
+  for (const FCase& C : Cases) {
+    const FString Falls = FallJson(TEXT("f"), Mat, C.bFall ? C.Extra : FString());
+    const FString Ground = GroundJson(FullGroundBody(EngineMaterial) + TEXT(",\"waterfalls\":[") + Falls + TEXT("]") +
+                                      (C.bFall ? FString() : C.Extra));
+    FS08EnvLayout Bad;
+    TArray<FString> CaseErrors;
+    const bool bOk = Bad.ParseJson(LayoutJson(TEXT("sarpedon"), Ground), CaseErrors);
+    TestFalse(FString::Printf(TEXT("%s: the whole layout is rejected"), C.Name), bOk);
+    const FString All = FString::Join(CaseErrors, TEXT(" | "));
+    TestTrue(FString::Printf(TEXT("%s: error mentions '%s' (%s)"), C.Name, C.Expect, *All), All.Contains(C.Expect));
+    TestFalse(FString::Printf(TEXT("%s: ground not set"), C.Name), Bad.Ground.bSet);
+  }
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08EnvGroundMeshGeometryTest,
+    "Unmatched.S08.EnvLayout.GroundMeshGeometry P5 lane K pieces sit at loc with yaw 90 out of the tray; sheet / foam FallCard; trace tail",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08EnvGroundMeshGeometryTest::RunTest(const FString&) {
+  FS08EnvWaterfallMesh M;
+  M.bSet = true;
+  M.Loc = FVector(-144.1, 425.0, 0.0);
+  M.YawDeg = 90.0f;
+  M.SheetCard = FVector2D(193.8, 185.231);
+  M.FoamCards = {FVector2D(261.34, 70.0), FVector2D(243.97, 76.0)};
+  const FTransform T = S08EnvGround::MeshPieceTransform(M.Loc, M.YawDeg);
+  // lane K local frame: +X out of the tray (board +Y at yaw 90), Y across the fall (board -X), z 0 = the play plane
+  TestTrue("local +X -> board +Y", T.TransformVectorNoScale(FVector(1.0, 0.0, 0.0)).Equals(FVector(0.0, 1.0, 0.0), 1e-6));
+  TestTrue("local +Y -> board -X", T.TransformVectorNoScale(FVector(0.0, 1.0, 0.0)).Equals(FVector(-1.0, 0.0, 0.0), 1e-6));
+  TestTrue("scale 1", T.GetScale3D().Equals(FVector::OneVector, 0.0));
+  // the sheet starts at local (26.04, 0, 2): just in front of the T2b lip (23 uu) of the near tray edge (y 425)
+  const FVector Top = T.TransformPosition(FVector(26.04, 0.0, 2.0));
+  TestTrue(TEXT("sheet top at the near tray edge ") + Top.ToString(), Top.Equals(FVector(-144.1, 451.04, 2.0), 1e-3));
+  TestTrue("the sheet starts beyond the T2b side overhang (23 uu)", Top.Y - 425.0 > 23.0);
+  TestTrue("SheetCard = (193.8, 185.231, card)",
+           S08EnvGround::SheetCardParam(M).Equals(FLinearColor(193.8f, 185.231f, S08EnvGroundSpec::FallKindCard, S08EnvGroundSpec::FallFlipMesh), 1e-3f));
+  TestTrue("foam slot 0 (kind 1)",
+           S08EnvGround::FoamCardParam(M, 0).Equals(FLinearColor(261.34f, 70.0f, S08EnvGroundSpec::FallKindSpill, S08EnvGroundSpec::FallFlipMesh), 1e-3f));
+  TestTrue("mist slot 1", S08EnvGround::FoamCardParam(M, 1).Equals(FLinearColor(243.97f, 76.0f, 1.0f, 1.0f), 1e-3f));
+  TestTrue("a third slot repeats the last card", S08EnvGround::FoamCardParam(M, 5) == S08EnvGround::FoamCardParam(M, 1));
+  FS08EnvWaterfallMesh NoCards = M;
+  NoCards.FoamCards.Reset();
+  TestTrue("no foamCards: the sheet width x 70", S08EnvGround::FoamCardParam(NoCards, 0).Equals(FLinearColor(193.8f, 70.0f, 1.0f, 1.0f), 1e-3f));
+  // trace: the P5 tail only for a ground with mesh pieces
+  FS08EnvWaterfall Fall;
+  Fall.Id = TEXT("fall-s");
+  Fall.X0 = -241.0f;
+  Fall.X1 = -47.2f;
+  Fall.Y = 457.0f;
+  Fall.DropUU = 120.0f;
+  Fall.SpillUU = 60.0f;
+  FS08EnvGround G;
+  G.bSet = true;
+  G.Mode = S08EnvGroundSpec::RuntimeMode;
+  G.Material = TEXT("/Game/EnvKit/Ground/MI_EnvGround_Sarpedon");
+  G.Waterfalls.Add(Fall);
+  FS08EnvGroundStats St;
+  St.Status = TEXT("ok");
+  St.Strips = 4;
+  St.Falls = 1;
+  St.FallCards = 2;
+  const FString Old = S08EnvGround::TraceLine(TEXT("sarpedon"), G, St);
+  TestTrue("no mesh pieces: the P4 line ends with status", Old.EndsWith(TEXT(" falls=1/1 fallCards=2 status=ok")));
+  G.Waterfalls[0].Mesh = M;
+  G.Sea.bSet = true;
+  St.FallCards = 1;
+  St.FallMeshes = 1;
+  St.FallMeshParts = 3;
+  St.SeaStatus = TEXT("ok");
+  const FString New = S08EnvGround::TraceLine(TEXT("sarpedon"), G, St);
+  AddInfo(New);
+  TestTrue("mesh pieces: the P5 tail after status",
+           New.EndsWith(TEXT(" falls=1/1 fallCards=1 status=ok fallMeshes=1 fallMeshParts=3 sea=ok")));
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08EnvGroundMeshSpawnTest,
+    "Unmatched.S08.EnvLayout.GroundMeshSpawn fake map-image board: sheet, foam and lip meshes instead of the card, the spill kept, the sea ring; fallbacks",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08EnvGroundMeshSpawnTest::RunTest(const FString&) {
+  using namespace S08EnvGroundTest;
+  FTestWorld W(TEXT("S08EnvGroundMeshSpawn"));
+  if (!TestNotNull("test world", W.World)) return false;
+  AS08BoardActor* Actor = W.SpawnBoard();
+  if (!TestNotNull("board actor", Actor)) return false;
+  USceneComponent* Root = Actor->GetRootComponent();
+  UStaticMesh* Plane = LoadObject<UStaticMesh>(nullptr, S08EnvGroundSpec::PlaneMeshPath);
+  UStaticMesh* Cube = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Cube.Cube"));
+  UStaticMesh* Cylinder = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Cylinder.Cylinder"));
+  UStaticMesh* Cone = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Cone.Cone"));
+  UMaterialInterface* Parent = LoadObject<UMaterialInterface>(nullptr, EngineMaterial);
+  if (!TestTrue("engine shapes and material", Plane && Cube && Cylinder && Cone && Parent)) return false;
+  const FString Dir = TempDir(TEXT("Mesh"));
+  const FString File = S08EnvLayout::FileFor(Dir, TEXT("envmesh"));
+  auto Write = [&](const FString& FallExtra, const FString& Sea) {
+    return WriteText(File, LayoutJson(TEXT("envmesh"),
+                                      GroundJson(FullGroundBody(EngineMaterial) + TEXT(",\"waterfalls\":[") +
+                                                 FallJson(TEXT("fall-s"), EngineMaterial, FallExtra) + TEXT("]") + Sea)));
+  };
+  TestTrue("write layout", Write(FallMeshJson(), SeaJson()));
+  FS08EnvLayoutRequest Req;
+  Req.bEnabled = true;
+  Req.bMapImageActive = true;
+  Req.ProfileId = TEXT("envmap");
+  Req.MapKey = TEXT("envmesh");
+  Req.RoomBoardId = BoardId;
+  Req.ProfileBoardIds = {FString(BoardId)};
+  Req.MapHalf = MapHalf;
+  Req.FrameHalf = FrameHalf;
+  Req.Dir = Dir;
+  FS08EnvLayoutRuntime Rt;
+  TArray<TObjectPtr<UStaticMeshComponent>> Props;
+  TArray<TObjectPtr<UPointLightComponent>> Lights;
+  S08EnvLayout::Update(Req, *Actor, Root, Rt, Props, Lights);
+  if (!TestTrue("layout applied and valid", Rt.bApplied && Rt.bLayoutValid && Rt.Status == TEXT("ok"))) return false;
+  const FString Line = S08EnvGround::TraceLine(Req.MapKey, Rt.Layout.Ground, Rt.GroundStats);
+  AddInfo(Line);
+  const FS08EnvGroundStats& St = Rt.GroundStats;
+  TestTrue("4 strips, 1 fall as meshes (sheet + foam + lip), the spill plane, the sea",
+           St.Status == TEXT("ok") && St.Strips == 4 && St.Falls == 1 && St.FallMeshes == 1 && St.FallMeshParts == 3 &&
+               St.FallCards == 1 && St.SeaStatus == TEXT("ok"));
+  TestTrue("trace tail", Line.EndsWith(TEXT("fallMeshes=1 fallMeshParts=3 sea=ok")));
+  if (!TestEqual("9 ground components (4 strips + sheet + foam + lip + spill + sea)", Rt.Ground.Num(), 9)) return false;
+  const FS08EnvWaterfall& Fall = Rt.Layout.Ground.Waterfalls[0];
+  const FTransform Piece = S08EnvGround::MeshPieceTransform(Fall.Mesh.Loc, Fall.Mesh.YawDeg);
+  struct FWant {
+    const TCHAR* Name;
+    UStaticMesh* Mesh;
+    bool bShadow;
+  };
+  const FWant Want[] = {{TEXT("EnvWaterfall_fall_s_Sheet"), Cube, false},
+                        {TEXT("EnvWaterfall_fall_s_Foam"), Cylinder, false},
+                        {TEXT("EnvWaterfall_fall_s_Lip"), Cone, true},
+                        {TEXT("EnvWaterfall_fall_s_Spill"), Plane, false},
+                        {TEXT("EnvSea"), Plane, false}};
+  for (int32 I = 0; I < 5; ++I) {
+    UStaticMeshComponent* C = Rt.Ground[4 + I].Get();
+    if (!TestNotNull(FString::Printf(TEXT("piece %d alive"), I), C)) continue;
+    const FString N = C->GetName();
+    TestTrue(N + TEXT(": named ") + Want[I].Name, N.StartsWith(Want[I].Name));
+    TestTrue(N + TEXT(": mesh"), C->GetStaticMesh() == Want[I].Mesh);
+    TestTrue(N + TEXT(": registered under the board root"), C->IsRegistered() && C->GetAttachParent() == Root);
+    TestTrue(N + TEXT(": NoCollision, no navigation"),
+             C->GetCollisionEnabled() == ECollisionEnabled::NoCollision && !C->CanEverAffectNavigation());
+    TestTrue(N + TEXT(": casts a shadow only for the rock lip"), static_cast<bool>(C->CastShadow) == Want[I].bShadow);
+    const FTransform Rel = C->GetRelativeTransform();
+    if (I < 3) {
+      TestTrue(N + TEXT(": at the lane K piece transform ") + Rel.ToString(), Rel.Equals(Piece, 1e-3));
+    } else if (I == 3) {
+      TestTrue(N + TEXT(": the P4 spill transform"), Rel.Equals(S08EnvGround::FallSpillTransform(Fall), 1e-3));
+    } else {
+      TestTrue(N + TEXT(": at the sea loc ") + Rel.ToString(),
+               Rel.Equals(S08EnvGround::MeshPieceTransform(FVector(0.0, -45.0, -172.0), 0.0f), 1e-3));
+    }
+  }
+  // materials: sheet / foam = MIDs of the fall material with their FallCard, spill as in P4, lip / sea = the MI as is
+  auto MidCard = [&](int32 Index, int32 Slot) -> const FVectorParameterValue* {
+    UStaticMeshComponent* C = Rt.Ground[Index].Get();
+    UMaterialInstanceDynamic* Mid = C ? Cast<UMaterialInstanceDynamic>(C->GetMaterial(Slot)) : nullptr;
+    return Mid && Mid->Parent == Parent ? FindVector(Mid, S08EnvGroundSpec::ParamFallCard) : nullptr;
+  };
+  const FVectorParameterValue* SheetCard = MidCard(4, 0);
+  TestTrue("sheet MID FallCard = sheetCard (kind 0)",
+           SheetCard && SheetCard->ParameterValue.Equals(S08EnvGround::SheetCardParam(Fall.Mesh), 1e-3f));
+  const FVectorParameterValue* FoamCard = MidCard(5, 0);
+  TestTrue("foam MID FallCard = foamCards[0] (kind 1)",
+           FoamCard && FoamCard->ParameterValue.Equals(S08EnvGround::FoamCardParam(Fall.Mesh, 0), 1e-3f));
+  const FVectorParameterValue* SpillCard = MidCard(7, 0);
+  TestTrue("spill MID FallCard as in P4",
+           SpillCard && SpillCard->ParameterValue.Equals(S08EnvGround::FallCardParam(Fall, true), 1e-3f));
+  TestTrue("lip: the lipMaterial itself", Rt.Ground[6].Get() && Rt.Ground[6]->GetMaterial(0) == Parent);
+  TestTrue("sea: the sea material itself", Rt.Ground[8].Get() && Rt.Ground[8]->GetMaterial(0) == Parent);
+  // the sheet mesh is not in the build: the P4 plane card comes back (foam / lip are not shown without the sheet)
+  TestTrue("rewrite: missing sheet", Write(FallMeshJson(TEXT("/Game/EnvKit/Ground/Sarpedon/SM_NoSuchSheetTest")), SeaJson()));
+  S08EnvLayout::Update(Req, *Actor, Root, Rt, Props, Lights);
+  TestTrue("missing sheet: card + spill + sea", Rt.Ground.Num() == 7 && Rt.GroundStats.FallMeshes == 0 &&
+                                                   Rt.GroundStats.FallMeshParts == 0 && Rt.GroundStats.FallCards == 2 &&
+                                                   Rt.GroundStats.SeaStatus == TEXT("ok"));
+  TestTrue("missing sheet: the card is the P4 plane",
+           Rt.Ground.Num() > 4 && Rt.Ground[4].Get() && Rt.Ground[4]->GetName().StartsWith(TEXT("EnvWaterfall_fall_s_Card")) &&
+               Rt.Ground[4]->GetStaticMesh() == Plane);
+  // a lip whose tray material is not in the build is skipped (sheet + foam stay)
+  TestTrue("rewrite: missing lip material",
+           Write(FallMeshJson(TEXT("/Engine/BasicShapes/Cube"), TEXT("/Game/PipelineCandidates/TableBase/T2b/MI_NoSuchTest")),
+                 SeaJson()));
+  S08EnvLayout::Update(Req, *Actor, Root, Rt, Props, Lights);
+  TestTrue("missing lip material: sheet + foam + spill + sea",
+           Rt.Ground.Num() == 8 && Rt.GroundStats.FallMeshes == 1 && Rt.GroundStats.FallMeshParts == 2);
+  // sea statuses
+  TestTrue("rewrite: missing sea mesh", Write(FallMeshJson(), SeaJson(TEXT("/Game/EnvKit/Ground/Sarpedon/SM_NoSuchSeaTest"))));
+  S08EnvLayout::Update(Req, *Actor, Root, Rt, Props, Lights);
+  TestTrue("missing sea mesh: no ring, traced", Rt.Ground.Num() == 8 && Rt.GroundStats.SeaStatus == TEXT("missing-mesh"));
+  TestTrue("rewrite: missing sea material",
+           Write(FallMeshJson(), SeaJson(TEXT("/Engine/BasicShapes/Plane"), TEXT("/Game/EnvKit/Ground/MI_EnvSea_NoSuchTest"))));
+  S08EnvLayout::Update(Req, *Actor, Root, Rt, Props, Lights);
+  TestTrue("missing sea material: no ring, traced",
+           Rt.Ground.Num() == 8 && Rt.GroundStats.SeaStatus == TEXT("missing-material"));
+  // a grid / grey board clears everything
+  Req.bMapImageActive = false;
+  S08EnvLayout::Update(Req, *Actor, Root, Rt, Props, Lights);
+  TestEqual("grid / grey board: no ground, no fall, no sea", Rt.Ground.Num(), 0);
+  Actor->Destroy();
+  IFileManager::Get().DeleteDirectory(*FPaths::Combine(FPaths::AutomationTransientDir(), TEXT("S08EnvGround")), false, true);
   return true;
 }
 

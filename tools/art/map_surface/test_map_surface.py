@@ -7,6 +7,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import re
 import sys
 import unittest
 from pathlib import Path
@@ -320,6 +321,125 @@ class ZoneSeparation(unittest.TestCase):
         self.assertAlmostEqual(xy[1], 540.0, delta=1.0)
         right = cam.project([[100.0, 0.0, 0.0]])[0]
         self.assertGreater(right[0], xy[0])  # +X (east) is screen right
+
+
+
+class Backdrop(unittest.TestCase):
+    """ENV-MAPS P5 track C (gap 8): backdrop.py mirrors S08BoardArt.cpp / S08MapBackdrop.cpp / the material HLSL."""
+
+    HALF = (1337 * 0.6666667 / 2, 866 * 0.6666667 / 2)
+
+    @staticmethod
+    def header() -> str:
+        return (HERE.parents[2] / "unreal/Unmatched/Source/Unmatched/S08/S08BoardArt.h").read_text(encoding="utf-8")
+
+    def test_constants_match_the_cpp_header(self):
+        import backdrop as bd
+        import ue_import_map_surface as ms
+        h = self.header()
+        for name, value in (("BackdropMaxZ", bd.MAX_Z), ("BackdropMinZ", bd.MIN_Z),
+                            ("BackdropMinLayerGapUU", bd.MIN_LAYER_GAP), ("BackdropFarViewRatio", bd.FAR_VIEW_RATIO)):
+            m = re.search(r"constexpr float %s = (-?[0-9.]+)f;" % name, h)
+            self.assertIsNotNone(m, name)
+            self.assertAlmostEqual(float(m.group(1)), value, msg=name)
+        self.assertIn("constexpr int32 BackdropMaxMist = %d;" % bd.MAX_MIST, h)
+        for path in (ms.BACKDROP_MIST_PATH, ms.BACKDROP_MOON_PATH):
+            leaf = path.rsplit("/", 1)[1]
+            self.assertIn('TEXT("%s.%s")' % (path, leaf), h)
+        params = set(re.findall(r'ParamBackdrop\w+ = TEXT\("(\w+)"\)', h))
+        used = (set(bd.MIST_PARAMS["vector"]) | set(bd.MIST_PARAMS["scalar"]) | set(bd.MOON_PARAMS["vector"])
+                | set(bd.MOON_PARAMS["scalar"]))
+        self.assertEqual(used, params)
+        for pin in bd.MIST_INPUTS:
+            self.assertIn(pin, bd.MIST_HLSL)
+        for pin in bd.MOON_INPUTS:
+            self.assertIn(pin, bd.MOON_HLSL)
+
+    def test_camera_matches_zone_separation_cam(self):
+        import backdrop as bd
+        import zone_separation as zs
+        d = bd.k1_fit_distance(self.HALF) * 1.25
+        self.assertAlmostEqual(d, 2340.195, delta=0.5)
+        self.assertAlmostEqual(bd.far_view_distance(self.HALF), 2880.24, delta=0.5)
+        view = bd.BoardView(d)
+        cam = zs.Cam(list(view.loc), -55.0, -90.0)
+        for p in ((0.0, 0.0, 0.0), (300.0, -200.0, -50.0), (-700.0, 300.0, -3.0)):
+            ndc = view.project(p)
+            px = cam.project([list(p)])[0]
+            self.assertAlmostEqual((ndc[0] + 1) * 960.0, px[0], delta=0.5)
+            self.assertAlmostEqual((1 - ndc[1]) * 540.0, px[1], delta=0.5)
+        for anchor in ((-0.9, 0.82), (0.3, -0.4)):
+            ray = view.ray(anchor)
+            back = view.project(tuple(view.loc[i] + ray[i] * 3000.0 for i in range(3)))
+            self.assertAlmostEqual(back[0], anchor[0], places=9)
+            self.assertAlmostEqual(back[1], anchor[1], places=9)
+
+    def test_shipped_blocks_valid_and_below_the_board(self):
+        import backdrop as bd
+        blocks = bd.shipped_blocks()
+        # P5b tune: Sarpedon has no backdrop (Track B's opaque sea ring under the island hid the moon card)
+        self.assertEqual(sorted(blocks), ["marmoreal-original"])
+        for bid, board in blocks.items():
+            half = bd.map_half(board)
+            self.assertEqual(bd.validate_block(board["backdrop"], half, bid), [])
+            rep = bd.report(board["backdrop"], half)
+            moon = rep["moon"]
+            self.assertLessEqual(moon["topZ"], bd.MAX_Z)
+            self.assertEqual(moon["ndcFar"], [-0.9, 0.82])  # upper-left of the far zoom (K1 x 0.65) view
+            for m in board["backdrop"].get("mist", []):
+                self.assertLessEqual(m["zUU"], bd.MAX_Z)
+        self.assertEqual(len(blocks["marmoreal-original"]["backdrop"]["mist"]), 2)
+
+    def test_validate_block_rules(self):
+        import backdrop as bd
+        ok = {"mist": [{"zUU": -400}, {"zUU": -900}], "moon": {}}
+        self.assertEqual(bd.validate_block(ok, self.HALF), [])
+        for bad, part in (({"mist": [{"zUU": -100}]}, "mist[0]"), ({"mist": [{"zUU": -400}, {"zUU": -450}]}, "closer"),
+                          ({"mist": [{"zUU": -400}] * 3}, "at most"), ({"mist": [{"halfUU": [1, 1]}]}, "mist[0]"),
+                          ({"moon": {"depthUU": 1500}}, "moon card"), ({}, "at least one"),
+                          ({"moon": {"intensity": 0}}, "moon")):
+            errs = bd.validate_block(bad, self.HALF)
+            self.assertTrue(any(part in e for e in errs), (bad, errs))
+
+    def test_mist_density_mirror(self):
+        import backdrop as bd
+        p = bd.mist_params({"zUU": -400})
+        n = 129
+        g = np.linspace(0.0, 1.0, n)
+        uv = np.stack(np.meshgrid(g, g), -1)
+        d = bd.mist_density(uv, 0.0, p)
+        self.assertTrue(np.all((d >= 0) & (d <= 1)))
+        self.assertEqual(float(d[0, 0]), 0.0)          # corners outside the ellipse
+        self.assertEqual(float(np.abs(d[0, :]).max()), 0.0)  # the plane edge fully faded (no hard rectangle)
+        centre = d[n // 4: 3 * n // 4, n // 4: 3 * n // 4]
+        self.assertGreater(float(centre.std()), 0.1)    # visible cloud structure inside
+        lo = bd.mist_density(uv, 0.0, dict(p, Coverage=0.2)).mean()
+        hi = bd.mist_density(uv, 0.0, dict(p, Coverage=0.8)).mean()
+        self.assertLess(lo, hi)                          # coverage is monotonic
+        moved = bd.mist_density(uv, 60.0, p)             # a minute of pan moves the clouds
+        self.assertGreater(float(np.abs(moved - d)[n // 4: 3 * n // 4, n // 4: 3 * n // 4].mean()), 0.01)
+
+    def test_moon_glow_mirror(self):
+        import backdrop as bd
+        p = bd.moon_params({})
+        n = 101
+        g = np.linspace(0.0, 1.0, n)
+        uv = np.stack(np.meshgrid(g, g), -1)
+        e = bd.moon_glow(uv, p)
+        lum = e @ np.array([0.2126, 0.7152, 0.0722])
+        self.assertEqual(int(np.argmax(lum)), (n // 2) * n + n // 2)  # peak at the centre
+        self.assertEqual(float(lum[0, 0]), 0.0)                      # nothing at the card corners
+        self.assertEqual(float(lum[n // 2, 0]), 0.0)                 # nor on the card edge (r = 1)
+        self.assertTrue(np.all(np.diff(lum[n // 2, n // 2:]) <= 1e-12))  # monotonic falloff
+        no_disc = bd.moon_glow(uv, dict(p, DiscRadius=0.0))
+        self.assertLess(float(no_disc.max()), float(e.max()))
+
+    def test_mock_view_runs(self):
+        import backdrop as bd
+        board = bd.shipped_blocks()["marmoreal-original"]
+        img = bd.mock_far_view(board["backdrop"], bd.map_half(board), size=(96, 54))
+        self.assertEqual(img.shape, (54, 96, 3))
+        self.assertTrue(np.isfinite(img).all())
 
 
 if __name__ == "__main__":

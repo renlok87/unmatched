@@ -1,0 +1,1339 @@
+{
+  "schema": "unmatched.env-kit.build-report/1",
+  "asset": "ASSET-ENV-KIT-001",
+  "runId": "20261001-tripo-h31-p5",
+  "status": "measured",
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "budgets_declared": false,
+    "note": "technical pipeline output; nothing here is an art decision"
+  },
+  "generated": "2026-10-01",
+  "params": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/scripts/env-kit-params.json",
+  "scripts_sha256_lf": {
+    "tools/art/env_kit/env_kit_build.py": "cf9b65c6706f2313674a6a29855ee13a8c4bbeb2e0e025cd57407dead242173f",
+    "tools/art/env_kit/orientation_check.py": "23df62cd21c6202e5dd906e315d6a36b2122060f2887d05ecf0ed92c531553fd",
+    "tools/art/env_kit/run_env_kit.py": "ce4d4ab0fd90537e642fd92cea6d99789adb250f5b0a5123c8e2464b2c5c4197",
+    "tools/tripo-pipeline/blender/check_static_prop_fbx.py": "dddb6341076e297c9cf11f9526e25d8523b5924f44f3c6892de8baefc9c6c28c",
+    "tools/tripo-pipeline/blender/static_prop_candidate.py": "b1e67b69c41abf19aa053f3d7126fa507f7d96ebfb1d144ca28b334623a28af6"
+  },
+  "blender_version": "5.2.2 LTS",
+  "no_render_policy": "CPU only: headless Blender -b --factory-startup, no Eevee/Cycles/Workbench render, no AO bake, no viewport; orientation verified with silhouette masks (PIL) and face colour statistics against the Tripo reference views",
+  "conventions": {
+    "units": "FBX numbers are centimetres = UE uu, UnitScaleFactor patched to 1.0 (UM_FBX_v1)",
+    "forward_axis": "front (Tripo 'front' reference view) = glTF +Z = .blend -Y = UE +X (UM_FBX_v1 +90 deg Z turn; the FBX readback frame maps .blend -Y -> +X, as for SM_Decor_Barrel/Lantern)",
+    "placement_yaw": "K1 camera yaw -90 looks along -Y: actor yaw +90 turns the front (+X) to the camera",
+    "pivot": "base centre: centre of the XY bounds, min Z = 0",
+    "ue_import": "legacy FBX, import_uniform_scale 1.0, import_materials false, import_textures false, collision none (decor, not interactive), build_nanite false",
+    "textures": {
+      "BC": "sRGB, TC_Default",
+      "N": "sRGB off, TC_Normalmap, flip_green false (PNG is DirectX already)",
+      "ORM": "sRGB off, TC_Masks"
+    },
+    "orm": "R = 1.0 (no AO; Tripo gives no occlusion map and the Cycles bake is not run), G = roughness, B = metallic",
+    "normal": "DirectX (green flipped from the glTF OpenGL map), same as SM_Decor_Barrel/Lantern",
+    "base_colour": "glTF baseColorFactor 0.8 multiplied in linear light (as the lantern candidate)",
+    "memory_rule_note": "'FBX_SCALE_UNITS + import 100' (S05 memory) belongs to a profile without the UnitScaleFactor patch; with UM_FBX_v1 (lantern/barrel, RIG-CONTRACT.md) UE imports at import_uniform_scale 1.0"
+  },
+  "totals": {
+    "assets_built": 7,
+    "triangles": 42571,
+    "triangles_max": 7805,
+    "export_bytes": 112165125,
+    "checks_passed": true
+  },
+  "findings": [
+    "ENV-S-BARREL: open edges 2 in 1 loop(s): 0 zero-width crack(s), 1 hole(s) totalling 0.1 uu2 (largest 0.1 uu2, rim 1.1 uu, mean width 0.14 uu, at z 2 uu)",
+    "ENV-S-BARREL: non-manifold edges 1",
+    "ENV-S-BARREL: degenerate faces 1 (UE drops them at build)",
+    "ENV-S-CRATE-STACK: open edges 44 in 18 loop(s): 6 zero-width crack(s), 12 hole(s) totalling 2.2 uu2 (largest 0.3 uu2, rim 2.3 uu, mean width 0.25 uu, at z 42 uu)",
+    "ENV-S-CRATE-STACK: non-manifold edges 13",
+    "ENV-S-CRATE-STACK: faces facing inward by ray escape 12 (0.0 % of area; one-sided material culls them from outside)",
+    "ENV-S-CRATE-STACK: recalc winding disagreements 4 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+    "ENV-S-CRATE-STACK: degenerate faces 13 (UE drops them at build)",
+    "ENV-S-LANTERN-POST: open edges 39 in 21 loop(s): 18 zero-width crack(s), 3 hole(s) totalling 1.4 uu2 (largest 0.5 uu2, rim 4.7 uu, mean width 0.21 uu, at z 59 uu)",
+    "ENV-S-LANTERN-POST: non-manifold edges 26",
+    "ENV-S-LANTERN-POST: faces facing inward by ray escape 10 (0.0 % of area; one-sided material culls them from outside)",
+    "ENV-S-LANTERN-POST: recalc winding disagreements 4 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+    "ENV-S-LANTERN-POST: degenerate faces 7 (UE drops them at build)",
+    "ENV-S-BANNER: open edges 79 in 8 loop(s): 6 zero-width crack(s), 2 hole(s) totalling 12.2 uu2 (largest 6.1 uu2, rim 79.6 uu, mean width 0.15 uu, at z 112 uu)",
+    "ENV-S-BANNER: non-manifold edges 3",
+    "ENV-S-BANNER: faces facing inward by ray escape 2 (0.0 % of area; one-sided material culls them from outside)",
+    "ENV-S-ROCK-OUTCROP: open edges 5 in 3 loop(s): 1 zero-width crack(s), 2 hole(s) totalling 0.3 uu2 (largest 0.2 uu2, rim 1.9 uu, mean width 0.19 uu, at z 17 uu)",
+    "ENV-S-ROCK-OUTCROP: non-manifold edges 4",
+    "ENV-S-ROCK-OUTCROP: faces facing inward by ray escape 3 (0.0 % of area; one-sided material culls them from outside)",
+    "ENV-S-ROCK-OUTCROP: recalc winding disagreements 2 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+    "ENV-M-BALUSTRADE: open edges 141 in 32 loop(s): 27 zero-width crack(s), 5 hole(s) totalling 91.5 uu2 (largest 58.2 uu2, rim 30.5 uu, mean width 3.81 uu, at z 29 uu)",
+    "ENV-M-BALUSTRADE: non-manifold edges 28",
+    "ENV-M-BALUSTRADE: faces facing inward by ray escape 2 (0.0 % of area; one-sided material culls them from outside)",
+    "ENV-M-BALUSTRADE: recalc winding disagreements 31 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+    "ENV-M-BALUSTRADE: degenerate faces 7 (UE drops them at build)",
+    "ENV-M-HEDGE-BED: open edges 58 in 20 loop(s): 12 zero-width crack(s), 8 hole(s) totalling 15.6 uu2 (largest 7.2 uu2, rim 14.7 uu, mean width 0.98 uu, at z 31 uu)",
+    "ENV-M-HEDGE-BED: non-manifold edges 43",
+    "ENV-M-HEDGE-BED: faces facing inward by ray escape 11 (0.1 % of area; one-sided material culls them from outside)",
+    "ENV-M-HEDGE-BED: recalc winding disagreements 8 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+    "ENV-M-HEDGE-BED: degenerate faces 3 (UE drops them at build)",
+    "ENV-M-HEDGE-BED: UV overlap between islands 135 px at 1024"
+  ],
+  "assets": {
+    "ENV-M-BALUSTRADE": {
+      "ue": {
+        "mesh": "SM_Env_Balustrade",
+        "textures": [
+          "T_Env_Balustrade_BC",
+          "T_Env_Balustrade_N",
+          "T_Env_Balustrade_ORM"
+        ],
+        "material_instance": "MI_Env_Balustrade",
+        "fbx_material_slot": [
+          "M_Env_Balustrade"
+        ],
+        "folder": "/Game/EnvKit/Marmoreal/"
+      },
+      "board": "Marmoreal",
+      "target": {
+        "dimension": "length",
+        "uu": 150
+      },
+      "scale_factor_source_to_final": 1.531444,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": {
+            "yaw_deg": 0,
+            "consistent": true,
+            "reasons": [
+              "Tripo front (0 deg) has the best mean silhouette IoU"
+            ]
+          },
+          "mean_iou_0deg": 0.7205,
+          "best_silhouette_turn_deg": 0,
+          "silhouette_margin_0_vs_180": 0.026,
+          "colour_margin_0_vs_180": 0.0003
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/SM_Env_Balustrade.fbx",
+        "sha256": "286c58d59665c3467e27e06060b393e1e6a1cb3ec323ed311db40c0013f13943",
+        "bytes": 399148
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/T_Env_Balustrade_BC.png",
+          "sha256": "4fb35a62a03bd69e4f26aada765f0c578ece8b190ac86669a7b5b906e61d3d29",
+          "bytes": 4308818,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/T_Env_Balustrade_N.png",
+          "sha256": "3c238bb6ea9d39ccc499c03ee7c663a042949ad3fdfe95dce922497d3a271e84",
+          "bytes": 5353555,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/T_Env_Balustrade_ORM.png",
+          "sha256": "d3b9f9caf07e19ad6ca908220bdfbd9d0d59c2dad53ff753665b997319ebba04",
+          "bytes": 3136997,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/reports/fbx-readback/SM_Env_Balustrade.json",
+        "mesh_objects": [
+          "SM_Env_Balustrade"
+        ],
+        "triangles": 7805,
+        "materials": [
+          "M_Env_Balustrade"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -7.192,
+          -75.0,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          7.192,
+          75.0,
+          46.086
+        ],
+        "dimensions_uu_readback_xyz": [
+          14.384,
+          150.0,
+          46.086
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 14.384,
+          "Y_width": 150.0,
+          "Z_height": 46.086
+        },
+        "topology_welded_1um": {
+          "open_edges": 141,
+          "non_manifold_edges": 28,
+          "faces_with_inconsistent_winding": 30
+        },
+        "protrusion_axis_readback": "+Y",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 979,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.001703,
+          0.001703,
+          0.996585,
+          0.998297
+        ],
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 17,
+        "flipped_uv_triangles_vs_island_majority": 2,
+        "zero_area_uv_triangles": 7,
+        "uv_area_used_fraction": 0.5543,
+        "texel_density_px_per_m_at_raster": 614.6,
+        "min_gutter_px_estimate": 0,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 141,
+        "open_edge_loops": 32,
+        "non_manifold_edges": 28,
+        "faces_with_inconsistent_winding": 31,
+        "degenerate_faces": 7,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 27,
+          "hole": 5
+        },
+        "hole_area_uu2_total": 91.497,
+        "shells": 1,
+        "shells_isolated": 0,
+        "shells_isolated_off_ground": 0,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": 0.008669246,
+        "corners_pointing_into_surface": 111,
+        "ray_escape_faces": {
+          "outward": 7692,
+          "inward": 2,
+          "sheet": 1,
+          "enclosed": 110
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.9945,
+          "inward": 0.0,
+          "sheet": 0.0,
+          "enclosed": 0.0055
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/reports/assets/SM_Env_Balustrade.build.json",
+      "findings": [
+        "open edges 141 in 32 loop(s): 27 zero-width crack(s), 5 hole(s) totalling 91.5 uu2 (largest 58.2 uu2, rim 30.5 uu, mean width 3.81 uu, at z 29 uu)",
+        "non-manifold edges 28",
+        "faces facing inward by ray escape 2 (0.0 % of area; one-sided material culls them from outside)",
+        "recalc winding disagreements 31 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+        "degenerate faces 7 (UE drops them at build)"
+      ]
+    },
+    "ENV-M-HEDGE-BED": {
+      "ue": {
+        "mesh": "SM_Env_HedgeBed",
+        "textures": [
+          "T_Env_HedgeBed_BC",
+          "T_Env_HedgeBed_N",
+          "T_Env_HedgeBed_ORM"
+        ],
+        "material_instance": "MI_Env_HedgeBed",
+        "fbx_material_slot": [
+          "M_Env_HedgeBed"
+        ],
+        "folder": "/Game/EnvKit/Marmoreal/"
+      },
+      "board": "Marmoreal",
+      "target": {
+        "dimension": "length",
+        "uu": 150
+      },
+      "scale_factor_source_to_final": 1.533399,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": {
+            "yaw_deg": 0,
+            "consistent": true,
+            "reasons": [
+              "Tripo front (0 deg) has the best mean silhouette IoU",
+              "front/back silhouettes nearly mirror-equal (IoU margin 0.008): colour cue prefers 0 deg"
+            ]
+          },
+          "mean_iou_0deg": 0.8793,
+          "best_silhouette_turn_deg": 0,
+          "silhouette_margin_0_vs_180": 0.0076,
+          "colour_margin_0_vs_180": 0.0
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/SM_Env_HedgeBed.fbx",
+        "sha256": "d7b4e55811aa513c81f65bc9952380c3abc36bb8a717bb6f086a58c2cc24b2c6",
+        "bytes": 481404
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/T_Env_HedgeBed_BC.png",
+          "sha256": "eebc201e75b6eb36e8f5e23322734fd896145ad3395a4ccbda0a7427ac90c48a",
+          "bytes": 6333519,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/T_Env_HedgeBed_N.png",
+          "sha256": "5ae7353846f1ef60b49a500f21a7aa5ebc4dfa44d8b547f22b9a7e630b3a1547",
+          "bytes": 7711877,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/T_Env_HedgeBed_ORM.png",
+          "sha256": "530c3e0fa36a32183f59a572f633c210d560a3df781f358257ae17a871dbf558",
+          "bytes": 3037186,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/reports/fbx-readback/SM_Env_HedgeBed.json",
+        "mesh_objects": [
+          "SM_Env_HedgeBed"
+        ],
+        "triangles": 6994,
+        "materials": [
+          "M_Env_HedgeBed"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -13.356,
+          -75.0,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          13.356,
+          75.0,
+          45.499
+        ],
+        "dimensions_uu_readback_xyz": [
+          26.712,
+          150.0,
+          45.499
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 26.712,
+          "Y_width": 150.0,
+          "Z_height": 45.499
+        },
+        "topology_welded_1um": {
+          "open_edges": 58,
+          "non_manifold_edges": 43,
+          "faces_with_inconsistent_winding": 9
+        },
+        "protrusion_axis_readback": "-Y",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 2675,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.002647,
+          0.002647,
+          0.997353,
+          0.987032
+        ],
+        "overlap_pixels_between_islands": 135,
+        "overlap_pixels_inside_islands_strict": 22,
+        "flipped_uv_triangles_vs_island_majority": 2,
+        "zero_area_uv_triangles": 3,
+        "uv_area_used_fraction": 0.2854,
+        "texel_density_px_per_m_at_raster": 329.6,
+        "min_gutter_px_estimate": 1,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 58,
+        "open_edge_loops": 20,
+        "non_manifold_edges": 43,
+        "faces_with_inconsistent_winding": 8,
+        "degenerate_faces": 3,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 12,
+          "hole": 8
+        },
+        "hole_area_uu2_total": 15.625,
+        "shells": 1,
+        "shells_isolated": 0,
+        "shells_isolated_off_ground": 0,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": 0.023202246,
+        "corners_pointing_into_surface": 777,
+        "ray_escape_faces": {
+          "outward": 6027,
+          "inward": 11,
+          "sheet": 0,
+          "enclosed": 956
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.8854,
+          "inward": 0.0008,
+          "sheet": 0.0,
+          "enclosed": 0.1138
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/reports/assets/SM_Env_HedgeBed.build.json",
+      "findings": [
+        "open edges 58 in 20 loop(s): 12 zero-width crack(s), 8 hole(s) totalling 15.6 uu2 (largest 7.2 uu2, rim 14.7 uu, mean width 0.98 uu, at z 31 uu)",
+        "non-manifold edges 43",
+        "faces facing inward by ray escape 11 (0.1 % of area; one-sided material culls them from outside)",
+        "recalc winding disagreements 8 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+        "degenerate faces 3 (UE drops them at build)",
+        "UV overlap between islands 135 px at 1024"
+      ]
+    },
+    "ENV-S-BANNER": {
+      "ue": {
+        "mesh": "SM_Env_Banner",
+        "textures": [
+          "T_Env_Banner_BC",
+          "T_Env_Banner_N",
+          "T_Env_Banner_ORM"
+        ],
+        "material_instance": "MI_Env_Banner",
+        "fbx_material_slot": [
+          "M_Env_Banner"
+        ],
+        "folder": "/Game/EnvKit/Sarpedon/"
+      },
+      "board": "Sarpedon",
+      "target": {
+        "dimension": "height",
+        "uu": 120
+      },
+      "scale_factor_source_to_final": 1.229054,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": {
+            "yaw_deg": 0,
+            "consistent": true,
+            "reasons": [
+              "Tripo front (0 deg) has the best mean silhouette IoU"
+            ]
+          },
+          "mean_iou_0deg": 0.9013,
+          "best_silhouette_turn_deg": 0,
+          "silhouette_margin_0_vs_180": 0.1618,
+          "colour_margin_0_vs_180": 0.0168
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/SM_Env_Banner.fbx",
+        "sha256": "ecdbb7b845b0ee1d3d6f78941a166a0d6267a7f44fe54deee1e3cdbfa4b74164",
+        "bytes": 263580
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/T_Env_Banner_BC.png",
+          "sha256": "ebe36e066d0ab07a0291f429ff24c483fccae4f40f20296cec7cc759825f70ed",
+          "bytes": 5195465,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/T_Env_Banner_N.png",
+          "sha256": "dedaf4899382bdc10dae9d16f3e98416465682aa97b7a3efbcec4382d6f45652",
+          "bytes": 5779452,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/T_Env_Banner_ORM.png",
+          "sha256": "fdc5d3974459f1b067ec837d0d6aa86e249c348461a57bcdebebdf5832724ca0",
+          "bytes": 3567680,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/reports/fbx-readback/SM_Env_Banner.json",
+        "mesh_objects": [
+          "SM_Env_Banner"
+        ],
+        "triangles": 4637,
+        "materials": [
+          "M_Env_Banner"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -9.746,
+          -28.532,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          9.746,
+          28.532,
+          120.0
+        ],
+        "dimensions_uu_readback_xyz": [
+          19.491,
+          57.065,
+          120.0
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 19.491,
+          "Y_width": 57.065,
+          "Z_height": 120.0
+        },
+        "topology_welded_1um": {
+          "open_edges": 79,
+          "non_manifold_edges": 3,
+          "faces_with_inconsistent_winding": 0
+        },
+        "protrusion_axis_readback": "-Y",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 691,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.001674,
+          0.001671,
+          0.993764,
+          0.998329
+        ],
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 98,
+        "flipped_uv_triangles_vs_island_majority": 2,
+        "zero_area_uv_triangles": 0,
+        "uv_area_used_fraction": 0.588,
+        "texel_density_px_per_m_at_raster": 837.1,
+        "min_gutter_px_estimate": 3,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 79,
+        "open_edge_loops": 8,
+        "non_manifold_edges": 3,
+        "faces_with_inconsistent_winding": 0,
+        "degenerate_faces": 0,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 6,
+          "hole": 2
+        },
+        "hole_area_uu2_total": 12.244,
+        "shells": 1,
+        "shells_isolated": 0,
+        "shells_isolated_off_ground": 0,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": 0.006542789,
+        "corners_pointing_into_surface": 100,
+        "ray_escape_faces": {
+          "outward": 4393,
+          "inward": 2,
+          "sheet": 0,
+          "enclosed": 242
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.966,
+          "inward": 0.0,
+          "sheet": 0.0,
+          "enclosed": 0.034
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/reports/assets/SM_Env_Banner.build.json",
+      "findings": [
+        "open edges 79 in 8 loop(s): 6 zero-width crack(s), 2 hole(s) totalling 12.2 uu2 (largest 6.1 uu2, rim 79.6 uu, mean width 0.15 uu, at z 112 uu)",
+        "non-manifold edges 3",
+        "faces facing inward by ray escape 2 (0.0 % of area; one-sided material culls them from outside)"
+      ]
+    },
+    "ENV-S-BARREL": {
+      "ue": {
+        "mesh": "SM_Env_Barrel",
+        "textures": [
+          "T_Env_Barrel_BC",
+          "T_Env_Barrel_N",
+          "T_Env_Barrel_ORM"
+        ],
+        "material_instance": "MI_Env_Barrel",
+        "fbx_material_slot": [
+          "M_Env_Barrel"
+        ],
+        "folder": "/Game/EnvKit/Sarpedon/"
+      },
+      "board": "Sarpedon",
+      "target": {
+        "dimension": "height",
+        "uu": 28
+      },
+      "scale_factor_source_to_final": 0.286413,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": {
+            "yaw_deg": 0,
+            "consistent": true,
+            "reasons": [
+              "Tripo front (0 deg) has the best mean silhouette IoU",
+              "front/back silhouettes nearly mirror-equal (IoU margin 0.000): colour cue prefers 0 deg"
+            ]
+          },
+          "mean_iou_0deg": 0.9835,
+          "best_silhouette_turn_deg": 0,
+          "silhouette_margin_0_vs_180": 0.0003,
+          "colour_margin_0_vs_180": -0.0405
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/SM_Env_Barrel.fbx",
+        "sha256": "1dcaca7ec9204b283aa10878e097d6608870cebb58dcbed2e27b2ee944ca0943",
+        "bytes": 256668
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/T_Env_Barrel_BC.png",
+          "sha256": "c3703611378036efdcb78d2fd40ff5a04d06a59813cdf56e7cdded8626abf110",
+          "bytes": 6295343,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/T_Env_Barrel_N.png",
+          "sha256": "94fe0229b01801b5ef0563c33c8379a3063a3cf1d7f933124e4737201bd26302",
+          "bytes": 6101857,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/T_Env_Barrel_ORM.png",
+          "sha256": "468bbf1e2fca92115f60ae0e44b4727a1be8a4958c146a4714cf32c8c97068d9",
+          "bytes": 3404244,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/reports/fbx-readback/SM_Env_Barrel.json",
+        "mesh_objects": [
+          "SM_Env_Barrel"
+        ],
+        "triangles": 4268,
+        "materials": [
+          "M_Env_Barrel"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -10.712,
+          -10.712,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          10.712,
+          10.712,
+          28.0
+        ],
+        "dimensions_uu_readback_xyz": [
+          21.425,
+          21.425,
+          28.0
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 21.425,
+          "Y_width": 21.425,
+          "Z_height": 28.0
+        },
+        "topology_welded_1um": {
+          "open_edges": 2,
+          "non_manifold_edges": 1,
+          "faces_with_inconsistent_winding": 1
+        },
+        "protrusion_axis_readback": "+X",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 693,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.001861,
+          0.001861,
+          0.998139,
+          0.995015
+        ],
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 99,
+        "flipped_uv_triangles_vs_island_majority": 2,
+        "zero_area_uv_triangles": 0,
+        "uv_area_used_fraction": 0.5256,
+        "texel_density_px_per_m_at_raster": 1457.2,
+        "min_gutter_px_estimate": 3,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 2,
+        "open_edge_loops": 1,
+        "non_manifold_edges": 1,
+        "faces_with_inconsistent_winding": 0,
+        "degenerate_faces": 1,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 0,
+          "hole": 1
+        },
+        "hole_area_uu2_total": 0.078,
+        "shells": 1,
+        "shells_isolated": 0,
+        "shells_isolated_off_ground": 0,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": 0.364067327,
+        "corners_pointing_into_surface": 39,
+        "ray_escape_faces": {
+          "outward": 4144,
+          "inward": 0,
+          "sheet": 0,
+          "enclosed": 124
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.9677,
+          "inward": 0.0,
+          "sheet": 0.0,
+          "enclosed": 0.0323
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/reports/assets/SM_Env_Barrel.build.json",
+      "findings": [
+        "open edges 2 in 1 loop(s): 0 zero-width crack(s), 1 hole(s) totalling 0.1 uu2 (largest 0.1 uu2, rim 1.1 uu, mean width 0.14 uu, at z 2 uu)",
+        "non-manifold edges 1",
+        "degenerate faces 1 (UE drops them at build)"
+      ]
+    },
+    "ENV-S-CRATE-STACK": {
+      "ue": {
+        "mesh": "SM_Env_CrateStack",
+        "textures": [
+          "T_Env_CrateStack_BC",
+          "T_Env_CrateStack_N",
+          "T_Env_CrateStack_ORM"
+        ],
+        "material_instance": "MI_Env_CrateStack",
+        "fbx_material_slot": [
+          "M_Env_CrateStack"
+        ],
+        "folder": "/Game/EnvKit/Sarpedon/"
+      },
+      "board": "Sarpedon",
+      "target": {
+        "dimension": "height",
+        "uu": 45
+      },
+      "scale_factor_source_to_final": 0.503519,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": {
+            "yaw_deg": 0,
+            "consistent": true,
+            "reasons": [
+              "Tripo front (0 deg) has the best mean silhouette IoU"
+            ]
+          },
+          "mean_iou_0deg": 0.894,
+          "best_silhouette_turn_deg": 0,
+          "silhouette_margin_0_vs_180": 0.1351,
+          "colour_margin_0_vs_180": 0.0026
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/SM_Env_CrateStack.fbx",
+        "sha256": "1affe5c56ed54f82499ff0f374f2fdbba2fea9f705c9db396b125fb06549d4b0",
+        "bytes": 336636
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/T_Env_CrateStack_BC.png",
+          "sha256": "fe7a3219754ab1c83e8195de761cb6f951ba6094c067fccdbb6c7043a1dd1763",
+          "bytes": 6327832,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/T_Env_CrateStack_N.png",
+          "sha256": "40f33ec24c8cbb4b4f7d95fa70b8e5c7b9e5a54bb7e60c8952c022ac7724e184",
+          "bytes": 6606858,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/T_Env_CrateStack_ORM.png",
+          "sha256": "28f9c0ed538c9c2363305aaf30b0abcac8648faf92fd03cb832aa1ecfb96fb03",
+          "bytes": 3482239,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/reports/fbx-readback/SM_Env_CrateStack.json",
+        "mesh_objects": [
+          "SM_Env_CrateStack"
+        ],
+        "triangles": 6222,
+        "materials": [
+          "M_Env_CrateStack"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -11.033,
+          -24.62,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          11.033,
+          24.62,
+          45.0
+        ],
+        "dimensions_uu_readback_xyz": [
+          22.066,
+          49.24,
+          45.0
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 22.066,
+          "Y_width": 49.24,
+          "Z_height": 45.0
+        },
+        "topology_welded_1um": {
+          "open_edges": 44,
+          "non_manifold_edges": 13,
+          "faces_with_inconsistent_winding": 2
+        },
+        "protrusion_axis_readback": "-Y",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 751,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.001883,
+          0.001872,
+          0.993566,
+          0.998159
+        ],
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 11,
+        "flipped_uv_triangles_vs_island_majority": 14,
+        "zero_area_uv_triangles": 6,
+        "uv_area_used_fraction": 0.5416,
+        "texel_density_px_per_m_at_raster": 867.2,
+        "min_gutter_px_estimate": 3,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 44,
+        "open_edge_loops": 18,
+        "non_manifold_edges": 13,
+        "faces_with_inconsistent_winding": 4,
+        "degenerate_faces": 13,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 6,
+          "hole": 12
+        },
+        "hole_area_uu2_total": 2.207,
+        "shells": 1,
+        "shells_isolated": 0,
+        "shells_isolated_off_ground": 0,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": 0.182067476,
+        "corners_pointing_into_surface": 148,
+        "ray_escape_faces": {
+          "outward": 5759,
+          "inward": 12,
+          "sheet": 3,
+          "enclosed": 448
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.9373,
+          "inward": 0.0004,
+          "sheet": 0.0,
+          "enclosed": 0.0622
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/reports/assets/SM_Env_CrateStack.build.json",
+      "findings": [
+        "open edges 44 in 18 loop(s): 6 zero-width crack(s), 12 hole(s) totalling 2.2 uu2 (largest 0.3 uu2, rim 2.3 uu, mean width 0.25 uu, at z 42 uu)",
+        "non-manifold edges 13",
+        "faces facing inward by ray escape 12 (0.0 % of area; one-sided material culls them from outside)",
+        "recalc winding disagreements 4 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+        "degenerate faces 13 (UE drops them at build)"
+      ]
+    },
+    "ENV-S-LANTERN-POST": {
+      "ue": {
+        "mesh": "SM_Env_LanternPost",
+        "textures": [
+          "T_Env_LanternPost_BC",
+          "T_Env_LanternPost_N",
+          "T_Env_LanternPost_ORM"
+        ],
+        "material_instance": "MI_Env_LanternPost",
+        "fbx_material_slot": [
+          "M_Env_LanternPost"
+        ],
+        "folder": "/Game/EnvKit/Sarpedon/"
+      },
+      "board": "Sarpedon",
+      "target": {
+        "dimension": "height",
+        "uu": 95
+      },
+      "scale_factor_source_to_final": 0.972243,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": {
+            "yaw_deg": 0,
+            "consistent": true,
+            "reasons": [
+              "Tripo front (0 deg) has the best mean silhouette IoU"
+            ]
+          },
+          "mean_iou_0deg": 0.8868,
+          "best_silhouette_turn_deg": 0,
+          "silhouette_margin_0_vs_180": 0.3744,
+          "colour_margin_0_vs_180": -0.0062
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/SM_Env_LanternPost.fbx",
+        "sha256": "0bb5163a8a2d7ab4c054024a49d485ca87edd4b6a60c335fdada636772ead212",
+        "bytes": 393484
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/T_Env_LanternPost_BC.png",
+          "sha256": "acedde46f89a1fd9e9ef90e01c8c564effb0eba5244fdc3e603a6518d1c728fe",
+          "bytes": 5868215,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/T_Env_LanternPost_N.png",
+          "sha256": "616c38aa66be6c0dd509a9eb09d0aed54d9073cfbc19c03e983aae1feaf9733f",
+          "bytes": 6735108,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/T_Env_LanternPost_ORM.png",
+          "sha256": "3d6d68a6ab6ccc1d52ad990dccb5cac3ca7c2d8e8a1b9419bd8f72d4770ef6e3",
+          "bytes": 4099307,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/reports/fbx-readback/SM_Env_LanternPost.json",
+        "mesh_objects": [
+          "SM_Env_LanternPost"
+        ],
+        "triangles": 6736,
+        "materials": [
+          "M_Env_LanternPost"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -12.549,
+          -28.351,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          12.549,
+          28.351,
+          95.0
+        ],
+        "dimensions_uu_readback_xyz": [
+          25.098,
+          56.703,
+          95.0
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 25.098,
+          "Y_width": 56.703,
+          "Z_height": 95.0
+        },
+        "topology_welded_1um": {
+          "open_edges": 39,
+          "non_manifold_edges": 26,
+          "faces_with_inconsistent_winding": 5
+        },
+        "protrusion_axis_readback": "+Y",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 1250,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.002133,
+          0.002133,
+          0.995924,
+          0.997867
+        ],
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 6,
+        "flipped_uv_triangles_vs_island_majority": 7,
+        "zero_area_uv_triangles": 7,
+        "uv_area_used_fraction": 0.4188,
+        "texel_density_px_per_m_at_raster": 691.1,
+        "min_gutter_px_estimate": 1,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 39,
+        "open_edge_loops": 21,
+        "non_manifold_edges": 26,
+        "faces_with_inconsistent_winding": 4,
+        "degenerate_faces": 7,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 18,
+          "hole": 3
+        },
+        "hole_area_uu2_total": 1.422,
+        "shells": 1,
+        "shells_isolated": 0,
+        "shells_isolated_off_ground": 0,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": 0.019725008,
+        "corners_pointing_into_surface": 165,
+        "ray_escape_faces": {
+          "outward": 6359,
+          "inward": 10,
+          "sheet": 0,
+          "enclosed": 367
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.9678,
+          "inward": 0.0003,
+          "sheet": 0.0,
+          "enclosed": 0.032
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/reports/assets/SM_Env_LanternPost.build.json",
+      "findings": [
+        "open edges 39 in 21 loop(s): 18 zero-width crack(s), 3 hole(s) totalling 1.4 uu2 (largest 0.5 uu2, rim 4.7 uu, mean width 0.21 uu, at z 59 uu)",
+        "non-manifold edges 26",
+        "faces facing inward by ray escape 10 (0.0 % of area; one-sided material culls them from outside)",
+        "recalc winding disagreements 4 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)",
+        "degenerate faces 7 (UE drops them at build)"
+      ]
+    },
+    "ENV-S-ROCK-OUTCROP": {
+      "ue": {
+        "mesh": "SM_Env_RockOutcrop",
+        "textures": [
+          "T_Env_RockOutcrop_BC",
+          "T_Env_RockOutcrop_N",
+          "T_Env_RockOutcrop_ORM"
+        ],
+        "material_instance": "MI_Env_RockOutcrop",
+        "fbx_material_slot": [
+          "M_Env_RockOutcrop"
+        ],
+        "folder": "/Game/EnvKit/Sarpedon/"
+      },
+      "board": "Sarpedon",
+      "target": {
+        "dimension": "height",
+        "uu": 70
+      },
+      "scale_factor_source_to_final": 0.823466,
+      "yaw_applied_deg": 0.0,
+      "forward_axis": {
+        "blend": "-Y",
+        "ue": "+X",
+        "placement": "actor yaw +90 faces the K1 camera (camera yaw -90)",
+        "orientation_check": {
+          "decision": {
+            "yaw_deg": 0,
+            "consistent": true,
+            "reasons": [
+              "Tripo front (0 deg) has the best mean silhouette IoU"
+            ]
+          },
+          "mean_iou_0deg": 0.9028,
+          "best_silhouette_turn_deg": 0,
+          "silhouette_margin_0_vs_180": 0.29,
+          "colour_margin_0_vs_180": 0.0105
+        }
+      },
+      "fbx": {
+        "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/SM_Env_RockOutcrop.fbx",
+        "sha256": "adef055b9370c753c5b3e4c36748cf4594d22b59edbce169488c7de3ad81b006",
+        "bytes": 343292
+      },
+      "textures": {
+        "BC": {
+          "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/T_Env_RockOutcrop_BC.png",
+          "sha256": "f769cc73ff65ec3b8088252a129757579e6478f1addd68f6d85dbfae96d64fb6",
+          "bytes": 6270958,
+          "colorspace": "sRGB"
+        },
+        "N": {
+          "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/T_Env_RockOutcrop_N.png",
+          "sha256": "9b881779b971bc38fea830a2842f10be2fd22dc71d553622a4407127b4ac058e",
+          "bytes": 6062115,
+          "colorspace": "Linear (Non-Color)"
+        },
+        "ORM": {
+          "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/export/T_Env_RockOutcrop_ORM.png",
+          "sha256": "5600b709667f247c59df7cd931d0ca334a4051064c745d3923f72d85f475c317",
+          "bytes": 4012288,
+          "colorspace": "Linear (Non-Color)"
+        }
+      },
+      "readback": {
+        "path": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/reports/fbx-readback/SM_Env_RockOutcrop.json",
+        "mesh_objects": [
+          "SM_Env_RockOutcrop"
+        ],
+        "triangles": 5909,
+        "materials": [
+          "M_Env_RockOutcrop"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "has_custom_split_normals": true,
+        "bounds_min_uu_readback": [
+          -30.664,
+          -40.282,
+          0.0
+        ],
+        "bounds_max_uu_readback": [
+          30.664,
+          40.282,
+          70.0
+        ],
+        "dimensions_uu_readback_xyz": [
+          61.329,
+          80.563,
+          70.0
+        ],
+        "dimensions_uu_ue": {
+          "X_depth_front_back": 61.329,
+          "Y_width": 80.563,
+          "Z_height": 70.0
+        },
+        "topology_welded_1um": {
+          "open_edges": 5,
+          "non_manifold_edges": 4,
+          "faces_with_inconsistent_winding": 2
+        },
+        "protrusion_axis_readback": "-Y",
+        "protrusion_z_frac_used": 0.5
+      },
+      "uv0": {
+        "islands": 946,
+        "triangles_out_of_0_1": 0,
+        "uv_bounds": [
+          0.001928,
+          0.001922,
+          0.995083,
+          0.998089
+        ],
+        "overlap_pixels_between_islands": 0,
+        "overlap_pixels_inside_islands_strict": 77,
+        "flipped_uv_triangles_vs_island_majority": 2,
+        "zero_area_uv_triangles": 0,
+        "uv_area_used_fraction": 0.6008,
+        "texel_density_px_per_m_at_raster": 599.0,
+        "min_gutter_px_estimate": 3,
+        "raster_size_px": 1024
+      },
+      "geometry": {
+        "closed_manifold_consistent": false,
+        "open_edges": 5,
+        "open_edge_loops": 3,
+        "non_manifold_edges": 4,
+        "faces_with_inconsistent_winding": 2,
+        "degenerate_faces": 0,
+        "loose_vertices": 0,
+        "open_edge_loops_by_kind": {
+          "crack (zero-width T-junction/sliver)": 1,
+          "hole": 2
+        },
+        "hole_area_uu2_total": 0.29,
+        "shells": 1,
+        "shells_isolated": 0,
+        "shells_isolated_off_ground": 0,
+        "shells_inverted_closed": 0,
+        "signed_volume_m3_prescale": 0.190024874,
+        "corners_pointing_into_surface": 205,
+        "ray_escape_faces": {
+          "outward": 5649,
+          "inward": 3,
+          "sheet": 0,
+          "enclosed": 257
+        },
+        "ray_escape_area_fraction": {
+          "outward": 0.9753,
+          "inward": 0.0001,
+          "sheet": 0.0,
+          "enclosed": 0.0246
+        }
+      },
+      "checks_passed": true,
+      "checks": {
+        "source_sha256_matches_tripo_run": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "triangles_le_budget": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "uv0_inside_0_1": true,
+        "no_armature": true,
+        "target_dimension_1pct": true,
+        "base_at_zero": true,
+        "centred_xy": true,
+        "source_unchanged": true,
+        "um_fbx_v1_conforms": true
+      },
+      "build_report": "art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/reports/assets/SM_Env_RockOutcrop.build.json",
+      "findings": [
+        "open edges 5 in 3 loop(s): 1 zero-width crack(s), 2 hole(s) totalling 0.3 uu2 (largest 0.2 uu2, rim 1.9 uu, mean width 0.19 uu, at z 17 uu)",
+        "non-manifold edges 4",
+        "faces facing inward by ray escape 3 (0.0 % of area; one-sided material culls them from outside)",
+        "recalc winding disagreements 2 (bmesh on welded mesh; unreliable on open/non-manifold meshes, ray escape is the measure)"
+      ]
+    }
+  }
+}

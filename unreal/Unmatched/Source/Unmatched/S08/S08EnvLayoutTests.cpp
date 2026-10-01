@@ -152,11 +152,21 @@ const TCHAR* const MapDocJson = TEXT(
 /** The fixed kit contract (S08EnvLayout.h / ue_import_env_kit.py): map folder -> SM_Env_<Name> names. */
 const TMap<FString, TArray<FString>>& KitNames() {
   static const TMap<FString, TArray<FString>> Names = {
+      // P5 (ENV-MAPS track A): + Balustrade, HedgeBed and the three lane K back-wall modules (Marmoreal); + Barrel,
+      // CrateStack, LanternPost, Banner, RockOutcrop (Sarpedon) - tools/art/env_kit/ue_import_env_kit.py / layout_check.py KIT
       {TEXT("Marmoreal"), {TEXT("ArcadeBay"), TEXT("Portal"), TEXT("Cherry"), TEXT("PlinthBall"), TEXT("LanternPlinth"),
-                           TEXT("Urn"), TEXT("Cypress")}},
+                           TEXT("Urn"), TEXT("Cypress"), TEXT("Balustrade"), TEXT("HedgeBed"), TEXT("BackWall_BayDoor"),
+                           TEXT("BackWall_BayWindows"), TEXT("BackWall_Centre")}},
       {TEXT("Sarpedon"), {TEXT("FortRuin"), TEXT("Tree"), TEXT("Hull"), TEXT("Cannon"), TEXT("Campfire"), TEXT("Palisade"),
-                          TEXT("Rope")}}};
+                          TEXT("Rope"), TEXT("Barrel"), TEXT("CrateStack"), TEXT("LanternPost"), TEXT("Banner"),
+                          TEXT("RockOutcrop")}}};
   return Names;
+}
+
+/** The material set of a kit mesh (ue_import_env_kit.py MATERIAL_OF): the back-wall modules share MI_Env_BackWall and
+ *  T_Env_BackWall_*; every other mesh has its own. */
+FString KitMaterialSetOf(const FString& Name) {
+  return Name.StartsWith(TEXT("BackWall_")) ? FString(TEXT("BackWall")) : Name;
 }
 
 struct FTestWorld {
@@ -949,10 +959,11 @@ bool FS08EnvLayoutKitAssetsTest::RunTest(const FString&) {
       }
       ++Checked;
       UStaticMesh* Mesh = LoadObject<UStaticMesh>(nullptr, *MeshPath);
-      UMaterialInstance* Mi = LoadObject<UMaterialInstance>(nullptr, *(Folder + TEXT("MI_Env_") + Name));
-      UTexture* Bc = LoadObject<UTexture>(nullptr, *(Folder + TEXT("T_Env_") + Name + TEXT("_BC")));
-      UTexture* N = LoadObject<UTexture>(nullptr, *(Folder + TEXT("T_Env_") + Name + TEXT("_N")));
-      UTexture* Orm = LoadObject<UTexture>(nullptr, *(Folder + TEXT("T_Env_") + Name + TEXT("_ORM")));
+      const FString Set = KitMaterialSetOf(Name);
+      UMaterialInstance* Mi = LoadObject<UMaterialInstance>(nullptr, *(Folder + TEXT("MI_Env_") + Set));
+      UTexture* Bc = LoadObject<UTexture>(nullptr, *(Folder + TEXT("T_Env_") + Set + TEXT("_BC")));
+      UTexture* N = LoadObject<UTexture>(nullptr, *(Folder + TEXT("T_Env_") + Set + TEXT("_N")));
+      UTexture* Orm = LoadObject<UTexture>(nullptr, *(Folder + TEXT("T_Env_") + Set + TEXT("_ORM")));
       if (!TestTrue(Name + TEXT(": mesh, MI and three textures load"), Mesh && Mi && Bc && N && Orm)) continue;
 #if WITH_EDITORONLY_DATA
       TestFalse(Name + TEXT(": Nanite off"), Mesh->IsNaniteEnabled());
@@ -964,15 +975,19 @@ bool FS08EnvLayoutKitAssetsTest::RunTest(const FString&) {
       for (const FStaticMaterial& Slot : Slots) {
         bSlots = bSlots && Slot.MaterialInterface.Get() == static_cast<UMaterialInterface*>(Mi);
       }
-      TestTrue(Name + TEXT(": every slot = MI_Env_") + Name, bSlots);
+      TestTrue(Name + TEXT(": every slot = MI_Env_") + Set, bSlots);
       // P4 look (env-prop-look.json): these MIs are children of the kit master M_EnvProp (HSV window recolour +
-      // emissive window); the rest stay on M_UM_Figure.
-      const bool bLook = Name == TEXT("Cherry") || Name == TEXT("Cypress") || Name == TEXT("Tree") ||
+      // emissive window); the rest stay on M_UM_Figure. P5: every new prop and the back wall have a look too.
+      const bool bP5 = Name == TEXT("Balustrade") || Name == TEXT("HedgeBed") || Set == TEXT("BackWall") ||
+                       Name == TEXT("Barrel") || Name == TEXT("CrateStack") || Name == TEXT("LanternPost") ||
+                       Name == TEXT("Banner") || Name == TEXT("RockOutcrop");
+      const bool bLook = bP5 || Name == TEXT("Cherry") || Name == TEXT("Cypress") || Name == TEXT("Tree") ||
                          Name == TEXT("LanternPlinth") || Name == TEXT("Campfire") || Name == TEXT("Portal");
       const FString WantParent = bLook ? TEXT("/Game/EnvKit/Shared/M_EnvProp.M_EnvProp")
                                        : TEXT("/Game/UM/Materials/M_UM_Figure.M_UM_Figure");
       TestTrue(Name + TEXT(": MI parent ") + WantParent, Mi->Parent && Mi->Parent->GetPathName() == WantParent);
-      if (Name == TEXT("LanternPlinth") || Name == TEXT("Campfire") || Name == TEXT("Portal")) {
+      if (Name == TEXT("LanternPlinth") || Name == TEXT("Campfire") || Name == TEXT("Portal") ||
+          Name == TEXT("LanternPost") || Set == TEXT("BackWall")) {
         float Emissive = 0.f;
         TestTrue(Name + TEXT(": EmissiveIntensity > 0 (env-prop-look.json)"),
                  Mi->GetScalarParameterValue(FHashedMaterialParameterInfo(TEXT("EmissiveIntensity")), Emissive) &&
@@ -987,7 +1002,8 @@ bool FS08EnvLayoutKitAssetsTest::RunTest(const FString&) {
                Mi->GetTextureParameterValue(FHashedMaterialParameterInfo(TEXT("ORMTexture")), Bound) && Bound == Orm);
       // P1b review: meshes with inward-wound faces get a TwoSided MI override (ue_import_env_kit.py TWO_SIDED).
       const bool bWantTwoSided = Name == TEXT("Cypress") || Name == TEXT("Rope") || Name == TEXT("Tree") ||
-                                 Name == TEXT("Cherry") || Name == TEXT("Urn");
+                                 Name == TEXT("Cherry") || Name == TEXT("Urn") || Name == TEXT("Banner") ||
+                                 Name == TEXT("Balustrade");
       const bool bTwoSided = Mi->BasePropertyOverrides.bOverride_TwoSided && Mi->BasePropertyOverrides.TwoSided;
       TestTrue(FString::Printf(TEXT("%s: MI TwoSided override %d, expected %d (ue_import_env_kit.py TWO_SIDED)"), *Name,
                                bTwoSided ? 1 : 0, bWantTwoSided ? 1 : 0),
@@ -1000,7 +1016,9 @@ bool FS08EnvLayoutKitAssetsTest::RunTest(const FString&) {
       TestTrue(Name + TEXT(": pivot at the base (min Z ~ 0)"), FMath::Abs(Box.Min.Z) < 1.0);
     }
   }
-  AddInfo(FString::Printf(TEXT("env kit meshes checked: %d / 14"), Checked));
+  int32 Total = 0;
+  for (const TPair<FString, TArray<FString>>& Map : KitNames()) Total += Map.Value.Num();
+  AddInfo(FString::Printf(TEXT("env kit meshes checked: %d / %d"), Checked, Total));
   return true;
 }
 

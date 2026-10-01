@@ -39,6 +39,44 @@
   "layerMacroScaleUU": 33.0,
   "note": "heightBlend per layer L1..L3 (0..1) scales how much the layer's height shapes its border; accent.carpet = the pink carpet strength under dense petals (petals mode only). P4 (graph 2), optional per layer: roughMin / roughScale (roughness = max(tex * roughScale, roughMin)), specular (default material.specular), normalStrength (x material.normalStrength), macro (extra +-value noise at layerMacroScaleUU on that layer only, ~ one paving tile). Per map: edge = the aux.B band (albedo x color, roughness -> roughness, strength), water = the aux.R/G/A water layer (Sarpedon river mouths), rules = splat-rule numbers (ground_splat.py; every number has a code default)."
  },
+ "trayLook": {
+  "role": "P5 track B (ENV-U10 'скалистый край', ONE shared tray): the look of SM_TableBase_T2b (lane K) = M_TableBase_T2b (the T2 rock graph of M_UM_Figure + a moss lerp by VertexColor.R, B = depth darkening, G = per-chunk variation) - tools/art/env_kit/ue_import_tray_t2.py builds MI_TableBase_T2b (these defaults) and MI_TableBase_T2b_<Map> (defaults + maps.<key>.trayLook); the board actor takes the map's MI (S08Diorama::LoadTrayT2Material). Status: proposed (no art acceptance). At MossAmount 0 / white tints / variation 0 / depth and petal alpha 0 the material equals the T2 look.",
+  "defaults": {
+   "MossTint": [
+    0.55,
+    0.62,
+    0.42
+   ],
+   "MossAmount": 1.0,
+   "MossContrast": 3.0,
+   "MossBreakup": 0.6,
+   "MossTileScale": 1.5,
+   "MossRoughness": 0.85,
+   "RockTint": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "RockRoughScale": 1.0,
+   "RockRoughMin": 0.0,
+   "ChunkVariation": 0.25,
+   "DepthTint": [
+    0.55,
+    0.55,
+    0.6,
+    0.6
+   ],
+   "PetalColor": [
+    0.87,
+    0.4,
+    0.51,
+    0.0
+   ],
+   "PetalSizeUU": 6.0,
+   "UVTileUU": 180.0,
+   "NormalStrength": 1.0
+  }
+ },
  "sets": {
   "Tiles143": {
    "rotate90": false,
@@ -182,6 +220,27 @@
      "A": 3.0,
      "E": 1.5
     }
+   },
+   "trayLook": {
+    "note": "moss on the upper lip with cherry petals in it (the ground accent colour), the palace-garden green",
+    "MossTint": [
+     0.62,
+     0.72,
+     0.45
+    ],
+    "MossAmount": 1.1,
+    "DepthTint": [
+     0.5,
+     0.5,
+     0.56,
+     0.6
+    ],
+    "PetalColor": [
+     0.87,
+     0.4,
+     0.51,
+     0.35
+    ]
    }
   },
   "sarpedon": {
@@ -325,13 +384,51 @@
       "dropUU": 120.0,
       "spillUU": 60.0,
       "flowUUps": 40.0,
-      "streakScaleUU": 4.0,
+      "streakScaleUU": 5.0,
       "edgeFadeUU": 12.0,
-      "bottomFade": 0.9,
+      "bottomFade": 0.15,
       "spillFadeUU": 18.0,
-      "dither": 0.15
+      "dither": 0.15,
+      "mesh": {
+       "note": "P5 track B: the lane K meshes replace the vertical plane card (the spill plane stays): sheet (FallCard from the build), foam + mist (slot MIDs, kind 1), the optional rock lip (MI_TableBase_T2b_<Map>); the plane card is the fallback while the sheet mesh is not imported",
+       "run": "art/pipeline-candidates/ASSET-ENV-S-WATERFALL-001/20261001-waterfall-v1",
+       "lip": true
+      }
      }
     ]
+   },
+   "sea": {
+    "role": "P5 track B (review gap 8, Sarpedon only): the dark sea ring under the island (lane K SM_Env_S_SeaRing: Col.R foam band at the cliffs, Col.G far fade, UV0 = board XY / 600 uu) with M_EnvSea / MI_EnvSea_<Map> (tools/art/env_kit/ue_import_env_ground.py); placed by S08EnvGround from the layout ground.sea at (0, tray offsetY, the fall bottom z)",
+    "run": "art/pipeline-candidates/ASSET-ENV-S-WATERFALL-001/20261001-waterfall-v1",
+    "colorSrgb": [
+     20,
+     44,
+     74
+    ],
+    "farSrgb": [
+     6,
+     11,
+     20
+    ],
+    "farStrength": 1.0,
+    "foamColor": [
+     0.62,
+     0.66,
+     0.7
+    ],
+    "foamOpacity": 0.7,
+    "roughness": 0.08,
+    "specular": 0.3,
+    "normalStrength": 0.5,
+    "lift": 3.0,
+    "rippleTileUU": 160.0,
+    "panUUps": [
+     3.0,
+     1.5
+    ],
+    "foamScaleUU": 14.0,
+    "foamSpeed": 0.3,
+    "uvTileUU": 600.0
    },
    "rules": {
     "note": "review gaps 1 / 5 / 7 (P4): noise-broken, blurred edges; feathered fire sand; deck beam; water + pebble rim + foam / surf",
@@ -370,6 +467,28 @@
     },
     "foamShore": 0.8,
     "beachScatter": 0.35
+   },
+   "trayLook": {
+    "note": "damp dark sea-cliff rock: darker, cooler, less rough; thin dark moss; the cliff darkens towards the sea",
+    "RockTint": [
+     0.72,
+     0.76,
+     0.8
+    ],
+    "RockRoughScale": 0.7,
+    "RockRoughMin": 0.25,
+    "MossTint": [
+     0.35,
+     0.45,
+     0.3
+    ],
+    "MossAmount": 0.9,
+    "DepthTint": [
+     0.35,
+     0.4,
+     0.48,
+     0.8
+    ]
    }
   }
  }

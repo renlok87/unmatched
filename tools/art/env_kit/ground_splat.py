@@ -41,7 +41,18 @@ With --write-layouts the 'ground' section of Config/ArtBoards/EnvLayouts/<map>.l
   {"mode":"runtime", "material":"/Game/EnvKit/Ground/MI_EnvGround_<Map>", "z", "frameOverlapUU", "insetUU",
    "splatRect":[minX, minY, maxX, maxY], "splat":"<repo-relative png>", "splatSha256", "aux", "auxSha256",
    "waterfalls":[{"id", "material":"/Game/EnvKit/Ground/MI_EnvWaterfall_<Map>", "x0", "x1", "y", "topZ", "dropUU",
-                  "spillUU"}]  (only maps with ground-params 'water.falls'; S08EnvGround spawns them), "notes"}
+                  "spillUU", "mesh"?}]  (only maps with ground-params 'water.falls'; S08EnvGround spawns them),
+   "sea"?, "notes", "notesP5"?}
+P5 track B (lane K meshes, art/pipeline-candidates/ASSET-ENV-S-WATERFALL-001): a fall with ground-params 'mesh' gets
+  "mesh": {"sheet", "foam", "lip"?, "lipMaterial"?: package paths (/Game/EnvKit/Ground/<Map>/SM_Env_S_*,
+           /Game/PipelineCandidates/TableBase/T2b/MI_TableBase_T2b_<Map>), "loc": [fall centre x, near tray edge y, 0],
+           "yawDeg": 90, "sheetCard": [w, h] (FallCard of the sheet, from the build), "foamCards": [[w, h], ...] (slot 0
+           foam, slot 1 mist; kind 1)}  - S08EnvGround puts the meshes there instead of the vertical plane card (the
+           spill plane stays; the card is the fallback while the sheet mesh is not imported);
+  a map with ground-params 'sea' gets "sea": {"mesh": "/Game/EnvKit/Ground/<Map>/SM_Env_S_SeaRing",
+           "material": "/Game/EnvKit/Ground/MI_EnvSea_<Map>", "loc": [0, tray offsetY, the fall bottom z], "yawDeg": 0}.
+  Both are taken from the run's reports (build-report.json, waterfall-layout.json); --check also verifies that the run
+  was built for this fall (top width = x1 - x0, centre, tray edge) and this tray (else: rebuild the waterfall run).
 
 Usage (repository root; plain Python: numpy, PIL):
   python -B tools/art/env_kit/ground_splat.py                        # both maps: splat + meta + preview
@@ -431,6 +442,196 @@ def _png(arr: np.ndarray) -> bytes:
     return buf.getvalue()
 
 
+# P5 track B: the lane K meshes of the Sarpedon waterfall and the sea ring (ASSET-ENV-S-WATERFALL-001)
+FALL_MESHES = {"sheet": "SM_Env_S_Waterfall", "foam": "SM_Env_S_WaterfallFoam", "lip": "SM_Env_S_WaterfallLip"}
+SEA_MESH = "SM_Env_S_SeaRing"
+T2B_MI_PREFIX = "/Game/PipelineCandidates/TableBase/T2b/MI_TableBase_T2b_"
+MESH_TOL_UU = 0.05
+# S08EnvGroundSpec mesh / sea limits (S08EnvGround.h): the C++ parser rejects the whole layout outside them
+MESH_MAX_ABS_XY_UU = 5000.0
+MESH_Z = (-50.0, 50.0)          # waterfall pieces, inclusive
+SEA_Z = (-1000.0, -3.0)         # [min, max): strictly below the tray top
+MESH_MAX_CARD_UU = 2000.0
+MESH_MAX_FOAM_CARDS = 2
+
+
+def mesh_folder(params: dict, key: str) -> str:
+    return f"{params['ground']['materialRoot']}/{MAPS[key]}"
+
+
+def load_mesh_run(run: str) -> dict:
+    """build-report.json + waterfall-layout.json (+ waterfall-params.json) of a lane K waterfall run (repo-relative)."""
+    base = REPO / run
+    try:
+        build = json.loads((base / "reports" / "build-report.json").read_text(encoding="utf-8"))
+        lay = json.loads((base / "reports" / "waterfall-layout.json").read_text(encoding="utf-8"))
+        wp = json.loads((base / "reports" / "waterfall-params.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise SystemExit(f"waterfall run {run}: reports unreadable ({exc})")
+    if build.get("checks_passed") is not True:
+        raise SystemExit(f"waterfall run {run}: build report checks did not pass")
+    return {"run": run, "build": build, "layout": lay, "params": wp}
+
+
+def _slot_of(label: str) -> int:
+    digits = "".join(c for c in label.split("slot", 1)[-1] if c.isdigit())
+    return int(digits) if digits else 0
+
+
+def fall_mesh(key: str, params: dict, spec: dict, entry: dict, tray) -> dict:
+    """The 'mesh' block of a fall entry from its ground-params 'mesh' {run, lip} and the run's reports: the pieces sit
+    at (fall centre x, near tray edge y, 0), yaw of the build layout (90: local +X = board +Y, out of the tray)."""
+    m = spec["mesh"]
+    run = load_mesh_run(m["run"])
+    b, wl = run["build"], run["layout"]["fallPieces"]
+    folder = mesh_folder(params, key)
+    cards = sorted(b["foam"]["fallCards"].items(), key=lambda kv: _slot_of(kv[0]))
+    out = {"sheet": f"{folder}/{FALL_MESHES['sheet']}", "foam": f"{folder}/{FALL_MESHES['foam']}"}
+    if m.get("lip", True):
+        out["lip"] = f"{folder}/{FALL_MESHES['lip']}"
+        out["lipMaterial"] = f"{T2B_MI_PREFIX}{MAPS[key]}"
+    out.update({"loc": [round((entry["x0"] + entry["x1"]) / 2.0, 3), float(tray[3]), 0.0],
+                "yawDeg": float(wl["yawDeg"]),
+                "sheetCard": [float(v) for v in b["sheet"]["fallCard"][:2]],
+                "foamCards": [[float(v) for v in c[:2]] for _, c in cards]})
+    return out
+
+
+def sea_section(key: str, params: dict, tray) -> dict | None:
+    """The layout 'ground.sea' of a map with ground-params 'sea': the ring under the tray centre at the z of the run's
+    layout (the fall bottom: the fall meets the sea)."""
+    sp = params["maps"][key].get("sea")
+    if not sp:
+        return None
+    run = load_mesh_run(sp["run"])
+    z = float(run["layout"]["sea"]["loc"][2])
+    return {"mesh": f"{mesh_folder(params, key)}/{SEA_MESH}",
+            "material": f"{params['ground']['materialRoot']}/MI_EnvSea_{MAPS[key]}",
+            "loc": [round((tray[0] + tray[2]) / 2.0, 3), round((tray[1] + tray[3]) / 2.0, 3), z],
+            "yawDeg": float(run["layout"]["sea"]["yawDeg"])}
+
+
+def _num(v) -> bool:
+    return isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v)
+
+
+def _vec(v, n: int) -> bool:
+    return isinstance(v, list) and len(v) == n and all(_num(x) for x in v)
+
+
+def _package(path) -> bool:
+    """S08EnvGround's package path rule: /Game/ or /Engine/, [A-Za-z0-9_/-], at most one '.Object'."""
+    if not isinstance(path, str) or not (path.startswith("/Game/") or path.startswith("/Engine/")):
+        return False
+    if "//" in path or path.endswith("/") or path.endswith(".") or path.count(".") > 1:
+        return False
+    return all(c.isalnum() or c in "_/-." for c in path)
+
+
+def validate_fall_mesh(key: str, fid, mesh, entry: dict, tray) -> list[str]:
+    """A fall's 'mesh' block against the S08EnvGround parse rules and its entry / the tray (structure only; the run
+    consistency is check_mesh_run)."""
+    if mesh is None:
+        return []
+    w = f"{key}: waterfall {fid}: mesh"
+    if not isinstance(mesh, dict):
+        return [f"{w} is not an object"]
+    errs = []
+    for k in ("sheet", "foam", "lip", "lipMaterial"):
+        if k == "sheet" or mesh.get(k) is not None:
+            if not _package(mesh.get(k)):
+                errs.append(f"{w}.{k} {mesh.get(k)!r} is not a /Game/ or /Engine/ package path")
+    loc, yaw = mesh.get("loc"), mesh.get("yawDeg", 0.0)
+    if not _vec(loc, 3) or max(abs(loc[0]), abs(loc[1])) > MESH_MAX_ABS_XY_UU or not MESH_Z[0] <= loc[2] <= MESH_Z[1]:
+        errs.append(f"{w}.loc {loc!r} must be [x, y, z] with |x|, |y| <= {MESH_MAX_ABS_XY_UU:g}, z in {list(MESH_Z)}")
+        loc = None
+    if not _num(yaw) or abs(yaw) > 360.0:
+        errs.append(f"{w}.yawDeg {yaw!r} must be a number in [-360, 360]")
+    card = mesh.get("sheetCard")
+    if not _vec(card, 2) or not all(0.0 < v <= MESH_MAX_CARD_UU for v in card):
+        errs.append(f"{w}.sheetCard {card!r} must be [w, h] in (0, {MESH_MAX_CARD_UU:g}]")
+    foam = mesh.get("foamCards", [])
+    if (not isinstance(foam, list) or len(foam) > MESH_MAX_FOAM_CARDS
+            or not all(_vec(c, 2) and all(0.0 < v <= MESH_MAX_CARD_UU for v in c) for c in foam)):
+        errs.append(f"{w}.foamCards {foam!r} must be <= {MESH_MAX_FOAM_CARDS} pairs [w, h] in (0, {MESH_MAX_CARD_UU:g}]")
+    if mesh.get("lip") is not None and mesh.get("lipMaterial") is None:
+        errs.append(f"{w}: a lip needs its lipMaterial (MI_TableBase_T2b_<Map>)")
+    if loc is not None and all(_num(entry.get(k)) for k in ("x0", "x1")):
+        if abs(loc[0] - (entry["x0"] + entry["x1"]) / 2.0) > MESH_TOL_UU or abs(loc[1] - tray[3]) > MESH_TOL_UU:
+            errs.append(f"{w}.loc {loc} is not (fall centre {(entry['x0'] + entry['x1']) / 2.0:g}, near tray edge "
+                        f"{tray[3]:g}, z)")
+    return errs
+
+
+def validate_sea(key: str, sea, tray) -> list[str]:
+    """The layout 'ground.sea' against the S08EnvGround parse rules and the tray (under its centre, below its top)."""
+    if sea is None:
+        return []
+    if not isinstance(sea, dict):
+        return [f"{key}: ground.sea is not an object"]
+    errs = []
+    if not _package(sea.get("mesh")):
+        errs.append(f"{key}: ground.sea.mesh {sea.get('mesh')!r} is not a package path")
+    if not _package(sea.get("material")):
+        errs.append(f"{key}: ground.sea.material {sea.get('material')!r} is not a package path")
+    loc, yaw = sea.get("loc"), sea.get("yawDeg", 0.0)
+    if not _vec(loc, 3) or max(abs(loc[0]), abs(loc[1])) > MESH_MAX_ABS_XY_UU or not SEA_Z[0] <= loc[2] < SEA_Z[1]:
+        errs.append(f"{key}: ground.sea.loc {loc!r} must be [x, y, z], |x|, |y| <= {MESH_MAX_ABS_XY_UU:g}, "
+                    f"z in [{SEA_Z[0]:g}, {SEA_Z[1]:g}) (below the tray top)")
+    elif abs(loc[0] - (tray[0] + tray[2]) / 2.0) > MESH_TOL_UU or abs(loc[1] - (tray[1] + tray[3]) / 2.0) > MESH_TOL_UU:
+        errs.append(f"{key}: ground.sea.loc {loc} is not under the tray centre")
+    if not _num(yaw) or abs(yaw) > 360.0:
+        errs.append(f"{key}: ground.sea.yawDeg {yaw!r} must be a number in [-360, 360]")
+    return errs
+
+
+def check_mesh_run(key: str, g: dict, params: dict) -> list[str]:
+    """--check: the lane K run each mesh block / the sea comes from was built for this fall and this tray."""
+    errs = []
+    tray = params["tray"]
+    specs = {f["id"]: f for f in ((params["maps"][key].get("water") or {}).get("falls") or [])}
+
+    def tray_errs(run: dict, what: str) -> list[str]:
+        t = run["params"].get("tray") or {}
+        if (abs(float(t.get("half_x_ue", -1)) - tray["halfX"]) > MESH_TOL_UU
+                or abs(float(t.get("half_y_ue", -1)) - tray["halfY"]) > MESH_TOL_UU
+                or abs(float(t.get("offset_y_ue", 1e9)) - tray["offsetY"]) > MESH_TOL_UU):
+            return [f"{key}: {what}: the run {run['run']} was built for the tray {t}, not {tray}"]
+        return []
+
+    for f in g.get("waterfalls") or []:
+        spec = specs.get(f.get("id")) or {}
+        if not isinstance(f.get("mesh"), dict) or not spec.get("mesh"):
+            continue
+        what = f"waterfall {f['id']}"
+        try:
+            run = load_mesh_run(spec["mesh"]["run"])
+        except SystemExit as exc:
+            errs.append(f"{key}: {what}: {exc}")
+            continue
+        width = f["x1"] - f["x0"]
+        if abs(float(run["build"]["sheet"]["topWidthUU"]) - width) > MESH_TOL_UU:
+            errs.append(f"{key}: {what}: the sheet was built {run['build']['sheet']['topWidthUU']} uu wide, the fall is "
+                        f"{width:g} - rebuild (tools/art/env_kit/run_k_assets.py --assets waterfall)")
+        built = run["layout"]["fallPieces"]["loc"]
+        if not _vec(f["mesh"].get("loc"), 3) or any(abs(float(built[i]) - f["mesh"]["loc"][i]) > MESH_TOL_UU
+                                                      for i in range(3)):
+            errs.append(f"{key}: {what}: mesh.loc {f['mesh'].get('loc')} != the build layout {built}")
+        errs += tray_errs(run, what)
+    sea = g.get("sea")
+    sp = params["maps"][key].get("sea")
+    if isinstance(sea, dict) and sp:
+        try:
+            run = load_mesh_run(sp["run"])
+        except SystemExit as exc:
+            return errs + [f"{key}: ground.sea: {exc}"]
+        built = run["layout"]["sea"]["loc"]
+        if not _vec(sea.get("loc"), 3) or any(abs(float(built[i]) - sea["loc"][i]) > MESH_TOL_UU for i in range(3)):
+            errs.append(f"{key}: ground.sea.loc {sea.get('loc')} != the build layout {built}")
+        errs += tray_errs(run, "ground.sea")
+    return errs
+
+
 def waterfalls(key: str, params: dict, res: dict) -> list[dict]:
     """The layout 'ground.waterfalls' of a map (ground-params 'water.falls'): x-run = the water of the aux mask on the
     row just inside the near tray edge (the longest run >= 0.5, so the fall lines up with the painted river through the
@@ -459,11 +660,14 @@ def waterfalls(key: str, params: dict, res: dict) -> list[dict]:
         half_px = (X[0, 1] - X[0, 0]) / 2.0
         inset = float(f.get("insetUU", 0.0))
         x0, x1 = X[j, best[1]] - half_px + inset, X[j, best[2]] + half_px - inset
-        out.append({"id": str(f["id"]), "material": f"{root}/MI_EnvWaterfall_{MAPS[key]}",
-                    "x0": round(float(x0), 1), "x1": round(float(x1), 1),
-                    "y": round(float(ty1 + float(f.get("offsetUU", 30.0))), 1),
-                    "topZ": float(f.get("topZ", 2.5)), "dropUU": float(f.get("dropUU", 200.0)),
-                    "spillUU": float(f.get("spillUU", 0.0))})
+        entry = {"id": str(f["id"]), "material": f"{root}/MI_EnvWaterfall_{MAPS[key]}",
+                 "x0": round(float(x0), 1), "x1": round(float(x1), 1),
+                 "y": round(float(ty1 + float(f.get("offsetUU", 30.0))), 1),
+                 "topZ": float(f.get("topZ", 2.5)), "dropUU": float(f.get("dropUU", 200.0)),
+                 "spillUU": float(f.get("spillUU", 0.0))}
+        if f.get("mesh"):  # P5 track B: the lane K meshes instead of the plane card
+            entry["mesh"] = fall_mesh(key, params, f, entry, res["tray"])
+        out.append(entry)
     return out
 
 
@@ -498,6 +702,7 @@ def generate(key: str, params: dict, layout: dict) -> dict:
     res = {"key": key, "rect": rect, "size": size, "X": X, "Y": Y, "channels": ch, "array": arr, "png": png,
            "sha256": sha256_bytes(png), "tray": tray, "aux": aux, "auxPng": aux_png, "auxSha256": sha256_bytes(aux_png)}
     res["falls"] = waterfalls(key, params, res)
+    res["sea"] = sea_section(key, params, tray)
     return res
 
 
@@ -750,6 +955,8 @@ def ground_section(key: str, params: dict, res: dict, png_path: Path) -> dict:
     }
     if res.get("falls"):
         sec["waterfalls"] = [dict(f) for f in res["falls"]]
+    if res.get("sea"):
+        sec["sea"] = dict(res["sea"])
     sec["notes"] = ("ENV-U10 themed ground (tools/art/env_kit/ground_splat.py, ground-params.json): runtime = four "
                     "/Engine/BasicShapes/Plane strips = tray top minus the frame (hole = frame outer - frameOverlapUU, "
                     "outer = tray top - insetUU) at z, NoCollision, no shadow casting; material MI_EnvGround_<Map> "
@@ -757,6 +964,12 @@ def ground_section(key: str, params: dict, res: dict, png_path: Path) -> dict:
                     "mask (water / foam / edge band / depth) is bound in the MI. P4 waterfalls (S08EnvGround): per "
                     "entry a vertical engine-plane card x0..x1 at y from topZ down dropUU plus a flat spill (y - "
                     "spillUU .. y at topZ) over the T2 lip, MI_EnvWaterfall_<Map>, no collision, no shadow.")
+    if any(f.get("mesh") for f in res.get("falls") or []) or res.get("sea"):
+        sec["notesP5"] = ("P5 track B (S08EnvGround): waterfalls[].mesh = the lane K sheet / foam + mist / rock lip at "
+                          "loc + yawDeg instead of the plane card (the card is the fallback while the sheet mesh is not "
+                          "imported; the spill plane stays), sheet MID FallCard = sheetCard, foam slot MIDs = foamCards "
+                          "(kind 1), lip = lipMaterial; sea = SM_Env_S_SeaRing under the tray centre with "
+                          "MI_EnvSea_<Map> (tools/art/env_kit/ue_import_env_ground.py imports both).")
     return sec
 
 
@@ -805,6 +1018,7 @@ def validate_waterfalls(key: str, falls, tray) -> list[str]:
             errs.append(f"{key}: waterfall {fid}: the spill {num['y'] - num['spillUU']}..{num['y']} does not start on the tray top near its edge")
         if not isinstance(f.get("material"), str) or not f["material"].startswith("/Game/EnvKit/Ground/MI_EnvWaterfall_"):
             errs.append(f"{key}: waterfall {fid}: material {f.get('material')!r} is not /Game/EnvKit/Ground/MI_EnvWaterfall_<Map>")
+        errs += validate_fall_mesh(key, fid, f.get("mesh"), num, tray)
     return errs
 
 
@@ -841,7 +1055,11 @@ def check_layout_ground(key: str, layout: dict, res: dict, params: dict) -> list
             errs.append(f"{key}: layout ground.{k} = {g.get(k)!r}, generator gives {want[k]!r}")
     if g.get("waterfalls") != want.get("waterfalls"):
         errs.append(f"{key}: layout ground.waterfalls = {g.get('waterfalls')!r}, generator gives {want.get('waterfalls')!r}")
+    if g.get("sea") != want.get("sea"):
+        errs.append(f"{key}: layout ground.sea = {g.get('sea')!r}, generator gives {want.get('sea')!r}")
     errs += validate_waterfalls(key, g.get("waterfalls"), res["tray"])
+    errs += validate_sea(key, g.get("sea"), res["tray"])
+    errs += check_mesh_run(key, g, params)
     return errs
 
 
@@ -902,6 +1120,7 @@ def run(args) -> int:
                     "format": "PNG RGBA8", "channels": AUX_CHANNELS},
             "rules": params["maps"][key].get("rules") or {},
             "waterfalls": res["falls"],
+            **({"sea": res["sea"]} if res.get("sea") else {}),
             "kit": kit_msgs[:3], "notes": notes,
         }
         if args.check:
@@ -914,6 +1133,8 @@ def run(args) -> int:
                         errs.append(f"{key}: {rel(meta_path)} {field}.sha256 does not match {rel(path)}")
                 if m_old.get("waterfalls", []) != res["falls"]:
                     errs.append(f"{key}: {rel(meta_path)} waterfalls differ from the rules; re-run")
+                if m_old.get("sea") != res.get("sea"):
+                    errs.append(f"{key}: {rel(meta_path)} sea differs from the params; re-run")
             else:
                 errs.append(f"{key}: {rel(meta_path)} missing")
             if png_path.is_file() and aux_path.is_file():

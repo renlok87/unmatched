@@ -6,7 +6,14 @@
 //   T2Assets   the imported SM_TableBase_T2 / MI_TableBase_T2 / T_TableBase_T2_* against the Blender build
 //              (art/pipeline-candidates/ASSET-TABLE-BASE-001/20261001-tray-t2); a warning when not imported yet
 //              (tools/art/env_kit/ue_import_tray_t2.py);
-//   T2Actor    the board actor shows T2 at scale 1 at the layout centre and swaps back to T1 for a grid board.
+//   T2Actor    the board actor shows the shared tray (T2b, else T2 - S08Diorama::LoadTrayT2) at scale 1 at the layout
+//              centre and swaps back to T1 for a grid board.
+// P5 track B (T2b, art/pipeline-candidates/ASSET-TABLE-BASE-001/20261001-tray-t2b):
+//   T2bPick    world-free: T2b before T2 before T1, the per-map MI paths, the kind of a mesh, LoadTrayT2 against the
+//              packages in the build, the trace line;
+//   T2bAssets  the imported SM_TableBase_T2b / M_TableBase_T2b / MI_TableBase_T2b(_<Map>) against the lane K build (the
+//              T2b envelope, vertex colours = the moss mask, the per-map looks); a warning when not imported yet
+//              (tools/art/env_kit/ue_import_tray_t2.py --variant t2b).
 //   UnrealEditor-Cmd.exe Unmatched.uproject
 //     -ExecCmds="Automation RunTests Unmatched.S08.Diorama; Quit" -unattended -nosplash -nullrhi
 #if WITH_AUTOMATION_TESTS
@@ -21,12 +28,14 @@
 #include "Engine/StaticMesh.h"
 #include "Engine/Texture2D.h"
 #include "Engine/World.h"
+#include "Materials/Material.h"
 #include "Materials/MaterialInstance.h"
 #include "Materials/MaterialInterface.h"
 #include "Misc/AutomationTest.h"
 #include "Misc/PackageName.h"
 #include "Misc/Paths.h"
 #include "PhysicsEngine/BodySetup.h"
+#include "StaticMeshResources.h"
 
 namespace S08DioramaT2Test {
 // The map plane (1337 x 866 px at 2/3 uu per px) + the 24 uu wooden frame, halved.
@@ -70,6 +79,20 @@ struct FFlagScope {
   explicit FFlagScope(bool bOn) { S08Diorama::SetFlagOverrideForTest(bOn); }
   ~FFlagScope() { S08Diorama::ResetFlagOverrideForTest(); }
 };
+
+/** The kind LoadTrayT2 must pick in this build (uncooked: by the packages that exist). */
+S08Diorama::ETrayT2Kind ExpectedTrayKind() {
+  return S08Diorama::PickTrayT2(FPackageName::DoesPackageExist(FString(S08Diorama::T2bMeshPath)),
+                                FPackageName::DoesPackageExist(FString(S08Diorama::T2MeshPath)));
+}
+
+bool MiScalar(const UMaterialInterface* Mi, const TCHAR* Name, float& Out) {
+  return Mi && Mi->GetScalarParameterValue(FHashedMaterialParameterInfo(Name), Out);
+}
+
+bool MiVector(const UMaterialInterface* Mi, const TCHAR* Name, FLinearColor& Out) {
+  return Mi && Mi->GetVectorParameterValue(FHashedMaterialParameterInfo(Name), Out);
+}
 }  // namespace S08DioramaT2Test
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08DioramaT2FitTest,
@@ -254,6 +277,147 @@ bool FS08DioramaT2AssetsTest::RunTest(const FString&) {
   return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08DioramaT2bPickTest,
+    "Unmatched.S08.Diorama.T2bPick the map-image tray prefers T2b, falls back to T2 then T1, and takes the map's MI",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08DioramaT2bPickTest::RunTest(const FString&) {
+  using namespace S08Diorama;
+  using namespace S08DioramaT2Test;
+  TestEqual("both in the build -> T2b", static_cast<int32>(PickTrayT2(true, true)), static_cast<int32>(ETrayT2Kind::T2b));
+  TestEqual("only T2b -> T2b", static_cast<int32>(PickTrayT2(true, false)), static_cast<int32>(ETrayT2Kind::T2b));
+  TestEqual("only T2 -> T2 (fallback)", static_cast<int32>(PickTrayT2(false, true)), static_cast<int32>(ETrayT2Kind::T2));
+  TestEqual("neither -> none (the T1 placeholder)", static_cast<int32>(PickTrayT2(false, false)),
+            static_cast<int32>(ETrayT2Kind::None));
+  TestEqual("kind names", FString::Printf(TEXT("%s/%s/%s"), TrayT2KindName(ETrayT2Kind::None),
+                                          TrayT2KindName(ETrayT2Kind::T2), TrayT2KindName(ETrayT2Kind::T2b)),
+            FString(TEXT("none/T2/T2b")));
+  TestTrue("T2 paths unchanged", FCString::Strcmp(TrayT2MeshPath(ETrayT2Kind::T2), T2MeshPath) == 0 &&
+                                     FCString::Strcmp(TrayT2MaterialPath(ETrayT2Kind::T2), T2MaterialPath) == 0);
+  TestTrue("T2b paths", FCString::Strcmp(TrayT2MeshPath(ETrayT2Kind::T2b), T2bMeshPath) == 0 &&
+                            FCString::Strcmp(TrayT2MaterialPath(ETrayT2Kind::T2b), T2bMaterialPath) == 0);
+  TestTrue("none has no paths", !TrayT2MeshPath(ETrayT2Kind::None) && !TrayT2MaterialPath(ETrayT2Kind::None));
+  const FString Sarpedon = TEXT("/Game/PipelineCandidates/TableBase/T2b/MI_TableBase_T2b_Sarpedon");
+  TestEqual("per-map MI from the map key", T2bMapMaterialPath(TEXT("sarpedon")), Sarpedon);
+  TestEqual("per-map MI from the map name", T2bMapMaterialPath(TEXT("Sarpedon")), Sarpedon);
+  TestEqual("per-map MI Marmoreal", T2bMapMaterialPath(TEXT("MARMOREAL")),
+            FString(TEXT("/Game/PipelineCandidates/TableBase/T2b/MI_TableBase_T2b_Marmoreal")));
+  TestTrue("no per-map MI for an empty / unsafe name",
+           T2bMapMaterialPath(FString()).IsEmpty() && T2bMapMaterialPath(TEXT("../x")).IsEmpty() &&
+               T2bMapMaterialPath(TEXT("a b")).IsEmpty());
+  TestEqual("TrayT2KindOf(nullptr)", static_cast<int32>(TrayT2KindOf(nullptr)), static_cast<int32>(ETrayT2Kind::None));
+  // The same flat top and lip as T2 (placement, aprons and the layouts stay as they are); only the skirt is heavier.
+  TestTrue("T2b envelope contains the T2 one", T2bMaxOverhangUU >= T2MaxOverhangUU && T2bMaxDepthUU >= T2MaxDepthUU &&
+                                                   T2bMinDepthUU >= T2MinDepthUU && T2bMinDepthUU < T2bMaxDepthUU);
+  // LoadTrayT2 against what is in this build
+  const ETrayT2Kind Want = ExpectedTrayKind();
+  const FTrayT2Assets A = LoadTrayT2(TEXT("sarpedon"));
+  const FString Line = TrayT2LoadTraceLine(A);
+  AddInfo(Line);
+  TestEqual("LoadTrayT2 kind = what the build has", static_cast<int32>(A.Kind), static_cast<int32>(Want));
+  TestTrue("trace prefix kept (tray-t2 loaded|absent mesh=)",
+           Line.StartsWith(Want == ETrayT2Kind::None ? TEXT("ARTPREVIEW diorama tray-t2 absent mesh=")
+                                                     : TEXT("ARTPREVIEW diorama tray-t2 loaded mesh=")));
+  TestTrue("trace carries the kind", Line.Contains(FString(TEXT(" kind=")) + TrayT2KindName(Want)));
+  if (Want == ETrayT2Kind::None) {
+    AddWarning(TEXT("no shared tray imported (tools/art/env_kit/ue_import_tray_t2.py): map-image boards use T1"));
+    TestTrue("none: nothing loaded", !A.Mesh && !A.Material);
+    return true;
+  }
+  TestEqual("the loaded mesh's kind", static_cast<int32>(TrayT2KindOf(A.Mesh)), static_cast<int32>(Want));
+  if (Want == ETrayT2Kind::T2b) {
+    const bool bMapMi = FPackageName::DoesPackageExist(Sarpedon);
+    TestEqual("T2b material: the map's MI when imported, else the shared one", A.MaterialPath,
+              bMapMi ? Sarpedon : FString(T2bMaterialPath));
+    FString Shared;
+    LoadTrayT2Material(ETrayT2Kind::T2b, TEXT("NoSuchMapTest"), &Shared);
+    TestEqual("an unknown map gets the shared T2b MI", Shared, FString(T2bMaterialPath));
+  } else {
+    AddWarning(FString::Printf(TEXT("%s not imported (ue_import_tray_t2.py --variant t2b): the T2 fallback is used"),
+                               T2bMeshPath));
+    TestEqual("T2 material", A.MaterialPath, FString(T2MaterialPath));
+  }
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08DioramaT2bAssetsTest,
+    "Unmatched.S08.Diorama.T2bAssets imported SM_TableBase_T2b matches the lane K build (envelope, moss vertex colours, per-map MIs)",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08DioramaT2bAssetsTest::RunTest(const FString&) {
+  using namespace S08Diorama;
+  using namespace S08DioramaT2Test;
+  if (!FPackageName::DoesPackageExist(FString(T2bMeshPath))) {
+    AddWarning(FString::Printf(TEXT("%s not imported (tools/art/env_kit/ue_import_tray_t2.py --variant t2b): the map-image "
+                                    "boards keep T2"),
+                               T2bMeshPath));
+    return true;
+  }
+  UStaticMesh* Mesh = LoadObject<UStaticMesh>(nullptr, T2bMeshPath);
+  UMaterialInstance* Mi = LoadObject<UMaterialInstance>(nullptr, T2bMaterialPath);
+  if (!TestTrue("SM_TableBase_T2b and MI_TableBase_T2b load", Mesh && Mi)) return true;
+  const FBox Box = Mesh->GetBoundingBox();
+  const int32 Tris = Mesh->GetNumTriangles(0);
+  AddInfo(FString::Printf(TEXT("SM_TableBase_T2b bounds %s size %s triangles %d"), *Box.ToString(),
+                          *Box.GetSize().ToString(), Tris));
+  // the same flat top as T2 (FitTrayT2 places it the same way), a heavier skirt within the T2b envelope
+  TestTrue(FString::Printf(TEXT("covers the flat top +-%.0f x +-%.0f"), T2TopHalfX, T2TopHalfY),
+           Box.Min.X <= -T2TopHalfX && Box.Max.X >= T2TopHalfX && Box.Min.Y <= -T2TopHalfY && Box.Max.Y >= T2TopHalfY);
+  TestTrue(FString::Printf(TEXT("overhang <= %.0f uu"), T2bMaxOverhangUU),
+           Box.Max.X <= T2TopHalfX + T2bMaxOverhangUU && Box.Max.Y <= T2TopHalfY + T2bMaxOverhangUU &&
+               Box.Min.X >= -T2TopHalfX - T2bMaxOverhangUU && Box.Min.Y >= -T2TopHalfY - T2bMaxOverhangUU);
+  TestTrue("XY centred on the pivot (+-1 uu)",
+           FMath::Abs(Box.Min.X + Box.Max.X) <= 1.0 && FMath::Abs(Box.Min.Y + Box.Max.Y) <= 1.0);
+  TestTrue(FString::Printf(TEXT("lip top %.2f in [%.0f, %.1f]"), Box.Max.Z, TopZ, T2LipTopZMax + 0.5),
+           Box.Max.Z >= TopZ && Box.Max.Z <= T2LipTopZMax + 0.5);
+  const double Depth = TopZ - Box.Min.Z;
+  TestTrue(FString::Printf(TEXT("depth below the top %.1f in [%.0f, %.0f]"), Depth, T2bMinDepthUU, T2bMaxDepthUU),
+           Depth >= T2bMinDepthUU - 0.5 && Depth <= T2bMaxDepthUU + 0.5);
+  TestTrue(FString::Printf(TEXT("triangles %d in (0, 40000] (lane K budget)"), Tris), Tris > 0 && Tris <= 40000);
+#if WITH_EDITORONLY_DATA
+  TestFalse("Nanite off", Mesh->IsNaniteEnabled());
+#endif
+  const UBodySetup* Body = Mesh->GetBodySetup();
+  TestTrue("no simple collision (decor)", !Body || Body->AggGeom.GetElementCount() == 0);
+  // the moss mask lives in the vertex colours (imported with REPLACE)
+  const FStaticMeshRenderData* Render = Mesh->GetRenderData();
+  const int32 Colours = Render && Render->LODResources.Num() > 0
+                            ? static_cast<int32>(Render->LODResources[0].VertexBuffers.ColorVertexBuffer.GetNumVertices())
+                            : 0;
+  TestTrue(FString::Printf(TEXT("vertex colours present (%d): the moss / depth masks"), Colours), Colours > 0);
+  const TArray<FStaticMaterial>& Slots = Mesh->GetStaticMaterials();
+  TestEqual("one material slot", Slots.Num(), 1);
+  TestTrue("slot = MI_TableBase_T2b",
+           Slots.Num() == 1 && Slots[0].MaterialInterface.Get() == static_cast<UMaterialInterface*>(Mi));
+  const FString Master = FString(T2bMasterPath) + TEXT(".M_TableBase_T2b");
+  TestTrue("MI parent M_TableBase_T2b", Mi->Parent && Mi->Parent->GetPathName() == Master);
+  const TCHAR* const TexParams[] = {TEXT("BaseColorTexture"), TEXT("NormalTexture"), TEXT("ORMTexture"),
+                                    TEXT("MossBaseColorTexture"), TEXT("MossNormalTexture")};
+  for (const TCHAR* Param : TexParams) {
+    UTexture* Bound = nullptr;
+    const bool bBound = Mi->GetTextureParameterValue(FHashedMaterialParameterInfo(Param), Bound) && Bound;
+    TestTrue(FString::Printf(TEXT("%s bound"), Param), bBound);
+    const UTexture2D* Tex2D = Cast<UTexture2D>(Bound);
+    TestTrue(FString::Printf(TEXT("%s wraps (tiling UVs)"), Param),
+             Tex2D && Tex2D->AddressX == TA_Wrap && Tex2D->AddressY == TA_Wrap);
+  }
+  // per-map looks: Marmoreal moss + petals, Sarpedon damp dark rock without petals
+  UMaterialInstance* Marm = LoadObject<UMaterialInstance>(nullptr, *T2bMapMaterialPath(TEXT("marmoreal")));
+  UMaterialInstance* Sarp = LoadObject<UMaterialInstance>(nullptr, *T2bMapMaterialPath(TEXT("sarpedon")));
+  if (!TestTrue("MI_TableBase_T2b_Marmoreal and _Sarpedon load", Marm && Sarp)) return true;
+  TestTrue("per-map MIs: parent M_TableBase_T2b", Marm->Parent && Sarp->Parent &&
+                                                      Marm->Parent->GetPathName() == Master &&
+                                                      Sarp->Parent->GetPathName() == Master);
+  float MossM = 0.0f, MossS = 0.0f, RoughS = 1.0f;
+  FLinearColor PetalM, PetalS, RockS;
+  TestTrue("Marmoreal: moss on", MiScalar(Marm, TEXT("MossAmount"), MossM) && MossM > 0.0f);
+  TestTrue("Marmoreal: petals in the moss", MiVector(Marm, TEXT("PetalColor"), PetalM) && PetalM.A > 0.0f);
+  TestTrue("Sarpedon: thin moss, no petals", MiScalar(Sarp, TEXT("MossAmount"), MossS) && MossS > 0.0f &&
+                                                MiVector(Sarp, TEXT("PetalColor"), PetalS) && PetalS.A == 0.0f);
+  TestTrue("Sarpedon: darker (damp) rock, less rough",
+           MiVector(Sarp, TEXT("RockTint"), RockS) && RockS.R < 1.0f && RockS.G < 1.0f && RockS.B < 1.0f &&
+               MiScalar(Sarp, TEXT("RockRoughScale"), RoughS) && RoughS < 1.0f);
+  return true;
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08DioramaT2ActorTest,
     "Unmatched.S08.Diorama.T2Actor the board actor shows T2 at scale 1 on a map tray and T1 again on a grid board",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
@@ -273,18 +437,29 @@ bool FS08DioramaT2ActorTest::RunTest(const FString&) {
                                                               FRotator::ZeroRotator);
     if (TestNotNull("board actor spawned", Actor) && TestTrue("tray created", Actor->EnsureDioramaTray(true))) {
       const UStaticMeshComponent* Tray = Actor->GetDioramaTray();
-      const bool bImported = FPackageName::DoesPackageExist(FString(T2MeshPath));
+      // P5 track B: T2b first, T2 as the fallback (S08Diorama::LoadTrayT2); the test world has no map profile, so the
+      // tray carries the kind's shared MI.
+      const ETrayT2Kind Kind = ExpectedTrayKind();
+      const bool bImported = Kind != ETrayT2Kind::None;
+      const FString KindMesh = bImported ? FString(TrayT2MeshPath(Kind)) : FString();
       const bool bPlaced = Actor->PlaceDioramaTrayT2(MapFrameHalf, T2Top, T2DefaultOffsetY, TEXT("layout"));
       if (!bImported) {
-        AddWarning(FString::Printf(TEXT("%s not imported: PlaceDioramaTrayT2 must refuse and leave T1"), T2MeshPath));
+        AddWarning(FString::Printf(TEXT("neither %s nor %s imported: PlaceDioramaTrayT2 must refuse and leave T1"),
+                                   T2bMeshPath, T2MeshPath));
         TestFalse("T2 absent: refused", bPlaced);
         TestTrue("T2 absent: still the T1 mesh",
                  Tray && Tray->GetStaticMesh() && Tray->GetStaticMesh()->GetPathName().StartsWith(MeshPath));
       } else if (TestTrue("T2 placed", bPlaced) && TestNotNull("tray component", Tray)) {
-        TestTrue("tray mesh SM_TableBase_T2",
-                 Tray->GetStaticMesh() && Tray->GetStaticMesh()->GetPathName().StartsWith(T2MeshPath));
+        AddInfo(FString::Printf(TEXT("shared tray kind %s (%s)"), TrayT2KindName(Kind), *KindMesh));
+        TestTrue(FString::Printf(TEXT("tray mesh = %s"), *KindMesh),
+                 Tray->GetStaticMesh() && Tray->GetStaticMesh()->GetPathName().StartsWith(KindMesh + TEXT(".")));
+        TestEqual("TrayT2KindOf(the tray mesh)", static_cast<int32>(TrayT2KindOf(Tray->GetStaticMesh())),
+                  static_cast<int32>(Kind));
         const UMaterialInterface* Mi = Tray->GetMaterial(0);
-        TestTrue("tray MI_TableBase_T2", Mi && Mi->GetPathName().StartsWith(T2MaterialPath));
+        FString WantMi;
+        LoadTrayT2Material(Kind, FString(), &WantMi);
+        TestTrue(FString::Printf(TEXT("tray MI = %s"), *WantMi),
+                 Mi && (WantMi.IsEmpty() || Mi->GetPathName().StartsWith(WantMi)));
         TestTrue("visible", Tray->IsVisible());
         TestTrue(FString::Printf(TEXT("location %s == (0,-45,0)"), *Tray->GetComponentLocation().ToString()),
                  Tray->GetComponentLocation().Equals(FVector(0.0, -45.0, 0.0), 1e-3));
@@ -306,10 +481,11 @@ bool FS08DioramaT2ActorTest::RunTest(const FString&) {
         const UMaterialInterface* T1Mi = Tray->GetMaterial(0);
         TestTrue("grid board: MI_TableBase_Candidate", T1Mi && T1Mi->GetPathName().StartsWith(MaterialPath));
         TestTrue("grid board: at the board centre", Tray->GetComponentLocation().Equals(FVector::ZeroVector, 1e-3));
-        // And the map board again: T2 is reused (no second load) at the layout's centre.
-        TestTrue("map board again: T2", Actor->PlaceDioramaTrayT2(MapFrameHalf, T2Top, -40.0f, TEXT("layout")) &&
-                                            Tray->GetStaticMesh()->GetPathName().StartsWith(T2MeshPath) &&
-                                            Tray->GetComponentLocation().Equals(FVector(0.0, -40.0, 0.0), 1e-3));
+        // And the map board again: the shared tray is reused (no second load) at the layout's centre.
+        TestTrue("map board again: the shared tray",
+                 Actor->PlaceDioramaTrayT2(MapFrameHalf, T2Top, -40.0f, TEXT("layout")) &&
+                     Tray->GetStaticMesh()->GetPathName().StartsWith(KindMesh + TEXT(".")) &&
+                     Tray->GetComponentLocation().Equals(FVector(0.0, -40.0, 0.0), 1e-3));
         Actor->PlaceDioramaTray(false, FVector2D::ZeroVector, TEXT("grey"));
         TestFalse("hidden on a grey board", Tray->IsVisible());
       }

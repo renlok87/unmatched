@@ -304,6 +304,40 @@ class CommittedFixtures(unittest.TestCase):
         b["readability"]["reach"].update(widthUU=6, strokeUU=3)
         self.assertTrue(any("between r 30 and r 40" in e for e in F.check_readability_block(b["id"], b)))
 
+    def test_frame_backdrop_blocks(self):
+        # ENV-MAPS P5 track C: mapFrame / backdrop on the two map-image boards only, the C++ parser rules mirrored.
+        profiles = json.loads(F.DEFAULT_PROFILES.read_text(encoding="utf-8"))
+        self.assertEqual(sorted(b["id"] for b in profiles["boards"] if "mapFrame" in b),
+                         ["marmoreal-original", "sarpedon-original"])
+        # P5b tune: Sarpedon has no backdrop (Track B's opaque sea ring under the island hid the moon card)
+        self.assertEqual(sorted(b["id"] for b in profiles["boards"] if "backdrop" in b), ["marmoreal-original"])
+        for b in profiles["boards"]:
+            self.assertEqual(F.check_frame_backdrop_blocks(b["id"], b), [], b["id"])
+        by_id = {b["id"]: b for b in profiles["boards"]}
+        self.assertEqual(len(by_id["marmoreal-original"]["backdrop"]["mist"]), 2)
+        grid = json.loads(json.dumps(by_id["cobble-city"]))
+        grid["mapFrame"] = {"kit": "frame-002"}
+        self.assertEqual(F.check_frame_backdrop_blocks("cobble-city", grid),
+                         ["board cobble-city: mapFrame is for map-image boards only"])
+        mp = by_id["marmoreal-original"]
+        cases = (
+            (lambda b: b["mapFrame"].update(kit="frame-003"), "mapFrame.kit"),
+            (lambda b: b["mapFrame"].update(scale=2), "mapFrame.scale is not a field"),
+            (lambda b: b["mapImage"].update(frameUU=30), "needs mapImage.frameUU 24"),
+            (lambda b: b["backdrop"]["mist"][0].update(zUU=-100), "backdrop.mist[0]"),
+            (lambda b: b["backdrop"]["mist"][1].update(zUU=-450), "closer than 100"),
+            (lambda b: b["backdrop"]["mist"][0].update(opacity=0), "backdrop.mist[0]"),
+            (lambda b: b["backdrop"]["mist"].append({"zUU": -1500}), "at most 2"),
+            (lambda b: b["backdrop"]["moon"].update(depthUU=1500), "moon card reaches above"),
+            (lambda b: b["backdrop"]["moon"].update(screenAnchor=[-1.5, 0.8]), "backdrop.moon"),
+            (lambda b: b.update(backdrop={}), "at least one mist plane or the moon"),
+        )
+        for patch, part in cases:
+            b = json.loads(json.dumps(mp))
+            patch(b)
+            errs = F.check_frame_backdrop_blocks(b["id"], b)
+            self.assertTrue(any(part in e for e in errs), (part, errs))
+
     def test_profile_content_rules_detect_violations(self):
         # T4.2: zone MI per style (and fallback), one /Game/ glyph mesh per known glyph, every used glyph covered.
         profiles = json.loads(F.DEFAULT_PROFILES.read_text(encoding="utf-8"))

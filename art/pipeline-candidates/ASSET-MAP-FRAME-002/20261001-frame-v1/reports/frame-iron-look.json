@@ -1,0 +1,15 @@
+{
+ "schema": "unmatched.env-prop-look/1",
+ "master": "/Game/EnvKit/Shared/M_EnvProp",
+ "status": "proposed",
+ "note": "ENV-MAPS P5 track C: the iron of ASSET-MAP-FRAME-002 (MI_MapFrame002_Iron, tools/art/env_kit/ue_import_map_frame.py). p5k open issue: the iron BC (~0.24 sRGB V, metallic 0.77, roughness 0.88) reads as a second dark material on the darker P4 frame wood; only the rivets showed. Proposal: brighter and cooler steel (rest V x1.6, S x0.7), the rust patches kept at their value (so they read darker than the steel), smoother (roughness 0.88 -> about 0.65 after the remap) so the key light and the sky cubemap give the straps a sheen. Measured in texture space by ue_import_map_frame.py --check (iron_separation: linear luma ratio to the graded wood, CIE dL*, saturation, roughness); the UE frame decides. P5b tune (2026-10-01, UE frames K1 / K2x1.6): at V x1.6 the straps still read as a thin dark bar at K1 -> rest V x2.0, S x0.6, roughness remap 0.25..0.6 (texture space: luma ratio 6.07 to the graded wood, dL* 28.9). Status: предложено.",
+ "soft": {"hueDeg": 8, "sv": 0.06},
+ "props": {
+  "MapFrame002Iron": {
+   "region": {"window": {"hueDeg": 25, "halfWidthDeg": 20, "satMin": 0.3, "valMin": 0.1},
+              "adjust": {"hueShiftDeg": 0, "satMul": 1.1, "valMul": 1.0}},
+   "rest": {"satMul": 0.6, "valMul": 2.0},
+   "surface": {"RoughnessMin": 0.25, "RoughnessMax": 0.6, "NormalStrength": 1.0}
+  }
+ }
+}

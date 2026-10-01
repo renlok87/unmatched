@@ -9,11 +9,15 @@
 // ENV-MAPS track S: the 'map-image' surface (MapImageParser, MapProfiles on the committed topology fixtures
 // backend/prisma/fixtures/boards, MapCamera K1 distance, MapGeometry, MapPlaneUV on the engine plane,
 // MapActor grey topology view + missing-asset fallback, MapAssets once the out-of-git import ran).
+// ENV-MAPS P5 track C: MapFrameLayout (frame-002 modules vs the committed frame-layout.json), FrameBackdropParser,
+// BackdropGeometry (K1 camera model, moon / mist placement below the board), FrameBackdropActor (map-image only).
 //   UnrealEditor-Cmd.exe Unmatched.uproject
 //     -ExecCmds="Automation RunTests Unmatched.S08.BoardArt; Quit" -unattended -nosplash -nullrhi
 #if WITH_AUTOMATION_TESTS
 
 #include "S08BoardActor.h"
+#include "S08ArtHud.h"
+#include "S08MapBackdrop.h"
 #include "S08BoardArt.h"
 #include "S08BoardModel.h"
 #include "S08Diorama.h"
@@ -1819,8 +1823,16 @@ bool FS08BoardArtMapActorTest::RunTest(const FString&) {
         }
         TestTrue("night fog spawned with the lights", Map->GetAppliedRender().bFog);
         TestEqual("no lattice", Map->GetLatticeInstanceCount(), 0);
-        TestEqual("4 frame bars", Map->GetArtSurfacePartCount(), 4);
-        TestEqual("4 iron corners", Map->GetArtCornerCount(), 4);
+        // ENV-MAPS P5 track C: the shipped profile asks for the frame-002 kit; without its import the bars + corners stay.
+        if (Map->GetMapFrameKitSource() == TEXT("frame-002")) {
+          TestEqual("frame-002: no cube bars", Map->GetArtSurfacePartCount(), 0);
+          TestEqual("frame-002: no ART-005 corners", Map->GetArtCornerCount(), 0);
+          TestEqual("frame-002: 20 modules", Map->GetMapFrameParts().Num(), 20);
+        } else {
+          TestEqual("frame kit not imported -> 'missing'", Map->GetMapFrameKitSource(), FString(TEXT("missing")));
+          TestEqual("4 frame bars", Map->GetArtSurfacePartCount(), 4);
+          TestEqual("4 iron corners", Map->GetArtCornerCount(), 4);
+        }
         TestTrue("no grey discs", !Map->GetTopologyDiscs() || Map->GetTopologyDiscs()->GetInstanceCount() == 0);
         TestTrue("half extent = the map", Map->GetBoardHalfExtentUU().Equals(MapHalf, 0.01));
         // ENV-U9: what SetupCameraForBoard reads - the active profile's 1.25 -> K1 2340 uu.
@@ -2322,6 +2334,456 @@ bool FS08BoardArtReadabilityActorTest::RunTest(const FString&) {
         // reachable readability rings around the sidekick's space: no crash, traced
         if (Side) Map->SetSelectedFighter(TEXT("f-0-hero"), {FS08BoardModel::CellKey(Side->GetFighter().X, Side->GetFighter().Y)});
         Map->Destroy();
+      }
+    }
+  }
+  GEngine->DestroyWorldContext(World);
+  World->DestroyWorld(false);
+  return true;
+}
+
+// ---- ENV-MAPS P5 track C: heavy modular frame ASSET-MAP-FRAME-002 (gap 9 full) and the night backdrop (gap 8) ----
+namespace S08FrameBackdropTest {
+/** -ArtPreviewDiorama on / -ArtPreviewNoEnv off for the scope (the backdrop uses the env gate). */
+struct FGate {
+  FGate(bool bDiorama, bool bOptOut) {
+    S08Diorama::SetFlagOverrideForTest(bDiorama);
+    S08EnvLayout::SetOptOutOverrideForTest(bOptOut);
+  }
+  ~FGate() {
+    S08Diorama::ResetFlagOverrideForTest();
+    S08EnvLayout::ResetOptOutOverrideForTest();
+  }
+};
+
+/** The map board's frame + backdrop blocks of the tests (the shipped Marmoreal values, the 2nd mist with defaults). */
+const TCHAR* const Blocks = TEXT(
+    "\"mapFrame\":{\"kit\":\"frame-002\",\"note\":\"test\"},"
+    "\"backdrop\":{\"mist\":[{\"zUU\":-400,\"centerUU\":[0,-400],\"halfUU\":[2400,1600],\"colorLinear\":[0.7,0.8,1.15],"
+    "\"opacity\":0.3,\"noiseScaleUU\":650,\"panUUPerSec\":[7,-2.5],\"edgeFade\":0.3,\"coverage\":0.42,\"seed\":3},"
+    "{\"zUU\":-900,\"halfUU\":[2900,2100],\"opacity\":0.5}],"
+    "\"moon\":{\"screenAnchor\":[-0.9,0.82],\"depthUU\":5200,\"diameterUU\":1800,\"colorLinear\":[0.72,0.8,1.0],"
+    "\"intensity\":1.2,\"softness\":0.4,\"discRadius\":0.06,\"discIntensity\":2.5}},");
+
+FString MapDocWith(const FString& Extra) {
+  FString Doc = S08MapTest::MapDoc();
+  Doc.ReplaceInline(S08MapTest::MapLightAnchor, *(FString(S08MapTest::MapLightAnchor) + Extra));
+  return Doc;
+}
+
+FString FrameLayoutFile() {
+  return FPaths::ConvertRelativePathToFull(FPaths::Combine(
+      FPaths::ProjectDir(),
+      TEXT("../../art/pipeline-candidates/ASSET-MAP-FRAME-002/20261001-frame-v1/reports/frame-layout.json")));
+}
+
+FString FramePackageOf(const TCHAR* ObjectPath) {
+  FString Path(ObjectPath);
+  int32 Dot = INDEX_NONE;
+  return Path.FindLastChar(TEXT('.'), Dot) ? Path.Left(Dot) : Path;
+}
+
+bool FrameKitImported() {
+  for (const ES08FrameModule M : {ES08FrameModule::Corner, ES08FrameModule::SegA, ES08FrameModule::SegB,
+                                  ES08FrameModule::SegMid}) {
+    if (!FPackageName::DoesPackageExist(FramePackageOf(S08FrameModulePath(M)))) return false;
+  }
+  return true;
+}
+}  // namespace S08FrameBackdropTest
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08BoardArtMapFrameLayoutTest,
+    "Unmatched.S08.BoardArt.MapFrameLayout frame-002: 20 modules, exact fit on the map, equal to the committed frame-layout.json",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08BoardArtMapFrameLayoutTest::RunTest(const FString&) {
+  using namespace S08MapTest;
+  const FS08FrameLayout L = S08MapFrame002Layout(MapHalf);
+  TestEqual("20 modules", L.Pieces.Num(), 20);
+  TestTrue(FString::Printf(TEXT("5 x 157 along X, 3 x 157 along Y (got %d x %d)"), L.SegmentsX, L.SegmentsY),
+           L.SegmentsX == 5 && L.SegmentsY == 3);
+  TestTrue(FString::Printf(TEXT("exact fit (stretch %.8f x %.8f)"), L.StretchX, L.StretchY),
+           L.bExactFit && FMath::Abs(L.StretchX - 1.0) < 1e-5 && FMath::Abs(L.StretchY - 1.0) < 1e-5);
+  TMap<FString, int32> Counts;
+  for (const FS08FramePiece& P : L.Pieces) Counts.FindOrAdd(S08FrameModuleName(P.Module)) += 1;
+  TestTrue("4 corners, 4 A, 8 B, 4 Mid", Counts.FindRef(TEXT("Corner")) == 4 && Counts.FindRef(TEXT("A")) == 4 &&
+                                             Counts.FindRef(TEXT("B")) == 8 && Counts.FindRef(TEXT("Mid")) == 4);
+  // the corners sit on the inner map corners (pivot = the inner corner), yaw 0 / 90 / 180 / -90
+  TestTrue("corner-near-east on (+X, +Y), yaw 0",
+           L.Pieces[0].Id == TEXT("corner-near-east") && L.Pieces[0].Location.Equals(FVector(MapHalf.X, MapHalf.Y, 0.0), 1e-3) &&
+               L.Pieces[0].YawDeg == 0.0f);
+  TestTrue("corner-far-west on (-X, -Y), yaw 180",
+           L.Pieces[2].Location.Equals(FVector(-MapHalf.X, -MapHalf.Y, 0.0), 1e-3) && L.Pieces[2].YawDeg == 180.0f);
+  // each side: the segments run from the corner leg to the opposite leg without a gap, Mid in the middle
+  const FS08FramePiece* Near0 = L.Pieces.FindByPredicate([](const FS08FramePiece& P) { return P.Id == TEXT("near-0"); });
+  const FS08FramePiece* Near2 = L.Pieces.FindByPredicate([](const FS08FramePiece& P) { return P.Id == TEXT("near-2"); });
+  const FS08FramePiece* East1 = L.Pieces.FindByPredicate([](const FS08FramePiece& P) { return P.Id == TEXT("east-1"); });
+  TestTrue("near-0 = A at x -392.5 (the corner leg 53.1667 from -445.667)",
+           Near0 && Near0->Module == ES08FrameModule::SegA && FMath::IsNearlyEqual(Near0->Location.X, -392.5, 1e-3));
+  TestTrue("near-2 = Mid", Near2 && Near2->Module == ES08FrameModule::SegMid);
+  TestTrue("east-1 = Mid at yaw -90", East1 && East1->Module == ES08FrameModule::SegMid && East1->YawDeg == -90.0f);
+  // another map size: the nearest count and a stretch (the caller decides; the shipped maps never need it)
+  const FS08FrameLayout Other = S08MapFrame002Layout(FVector2D(500.0, 300.0));
+  TestTrue(FString::Printf(TEXT("another size: not exact, stretch %.4f x %.4f"), Other.StretchX, Other.StretchY),
+           !Other.bExactFit && Other.StretchX > 0.8 && Other.StretchX < 1.2 && Other.StretchY > 0.8 && Other.StretchY < 1.2);
+  // the C++ mirror == the committed layout of lane K (frame_layout.py placements())
+  FString Text;
+  const FString File = S08FrameBackdropTest::FrameLayoutFile();
+  if (!FFileHelper::LoadFileToString(Text, *File)) {
+    AddWarning(TEXT("frame-layout.json not found (") + File + TEXT("): the cross-check was NOT run"));
+    return true;
+  }
+  TSharedPtr<FJsonObject> Root;
+  FString Problem;
+  if (!TestTrue(TEXT("frame-layout.json parses"), FS08Contracts::TryParseJsonObject(Text, Root, Problem) && Root.IsValid())) {
+    return false;
+  }
+  const TArray<TSharedPtr<FJsonValue>>& Instances = Root->GetArrayField(TEXT("instances"));
+  TestEqual("json: 20 instances", Instances.Num(), L.Pieces.Num());
+  int32 Matched = 0;
+  for (const TSharedPtr<FJsonValue>& V : Instances) {
+    const TSharedPtr<FJsonObject> I = V->AsObject();
+    const FString Id = I->GetStringField(TEXT("id"));
+    const FS08FramePiece* P = L.Pieces.FindByPredicate([&Id](const FS08FramePiece& X) { return X.Id == Id; });
+    const TArray<TSharedPtr<FJsonValue>>& Loc = I->GetArrayField(TEXT("loc"));
+    const FVector JsonLoc(Loc[0]->AsNumber(), Loc[1]->AsNumber(), Loc[2]->AsNumber());
+    const bool bOk = P && I->GetStringField(TEXT("module")) == S08FrameModuleName(P->Module) &&
+                     P->Location.Equals(JsonLoc, 1e-3) &&
+                     FMath::IsNearlyEqual(P->YawDeg, static_cast<float>(I->GetNumberField(TEXT("yawDeg"))), 1e-4f) &&
+                     FMath::IsNearlyEqual(P->ScaleX, static_cast<float>(I->GetNumberField(TEXT("scaleX"))), 1e-6f);
+    if (!bOk) {
+      AddError(FString::Printf(TEXT("%s: C++ %s %s yaw %.1f != json %s %s yaw %.1f"), *Id,
+                               P ? S08FrameModuleName(P->Module) : TEXT("-"), P ? *P->Location.ToString() : TEXT("-"),
+                               P ? P->YawDeg : 0.0f, *I->GetStringField(TEXT("module")), *JsonLoc.ToString(),
+                               I->GetNumberField(TEXT("yawDeg"))));
+    }
+    Matched += bOk ? 1 : 0;
+  }
+  TestEqual("every instance equal to the json", Matched, 20);
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08BoardArtFrameBackdropParserTest,
+    "Unmatched.S08.BoardArt.FrameBackdropParser mapFrame / backdrop blocks: parsed, optional, map-image only, ranges, below the board",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08BoardArtFrameBackdropParserTest::RunTest(const FString&) {
+  using namespace S08FrameBackdropTest;
+  using namespace S08MapSurfaceSpec;
+  {
+    FS08BoardArtData Data;
+    TArray<FString> Errors;
+    if (!TestTrue(TEXT("map doc with frame + backdrop parses: ") + FString::Join(Errors, TEXT(" | ")),
+                  Data.ParseJson(MapDocWith(Blocks), Errors))) {
+      return false;
+    }
+    const FS08BoardArtProfile* Map = Data.Boards.FindByPredicate([](const FS08BoardArtProfile& B) { return B.Id == TEXT("map"); });
+    const FS08BoardArtProfile* Grid = Data.Boards.FindByPredicate([](const FS08BoardArtProfile& B) { return B.Id == TEXT("one"); });
+    if (TestNotNull("map profile", Map)) {
+      TestTrue("mapFrame kit frame-002", Map->MapFrame.bSet && Map->MapFrame.Kit == Frame002Kit);
+      const FS08BackdropSpec& B = Map->Backdrop;
+      TestTrue("backdrop: 2 mist planes + moon", B.bSet && B.Mist.Num() == 2 && B.Moon.bSet);
+      if (B.Mist.Num() == 2) {
+        TestTrue("mist[0] values", B.Mist[0].ZUU == -400.0f && B.Mist[0].CenterUU.Equals(FVector2D(0.0, -400.0)) &&
+                                       B.Mist[0].HalfUU.Equals(FVector2D(2400.0, 1600.0)) &&
+                                       FMath::IsNearlyEqual(B.Mist[0].Opacity, 0.3f) &&
+                                       B.Mist[0].PanUUPerSec.Equals(FVector2D(7.0, -2.5)) &&
+                                       FMath::IsNearlyEqual(B.Mist[0].Coverage, 0.42f) && B.Mist[0].Seed == 3.0f);
+        const FS08BackdropMistSpec Defaults;
+        TestTrue("mist[1]: absent fields keep the defaults", B.Mist[1].ZUU == -900.0f &&
+                                                                B.Mist[1].NoiseScaleUU == Defaults.NoiseScaleUU &&
+                                                                B.Mist[1].CenterUU.Equals(Defaults.CenterUU) &&
+                                                                FMath::IsNearlyEqual(B.Mist[1].Opacity, 0.5f));
+      }
+      TestTrue("moon values", B.Moon.ScreenAnchor.Equals(FVector2D(-0.9, 0.82), 1e-6) && B.Moon.DepthUU == 5200.0f &&
+                                  B.Moon.DiameterUU == 1800.0f && FMath::IsNearlyEqual(B.Moon.Intensity, 1.2f) &&
+                                  FMath::IsNearlyEqual(B.Moon.DiscIntensity, 2.5f));
+    }
+    TestTrue("the grid profile has neither block", Grid && !Grid->MapFrame.bSet && !Grid->Backdrop.bSet);
+  }
+  {
+    FS08BoardArtData Data;
+    TArray<FString> Errors;
+    TestTrue("map doc without the blocks parses", Data.ParseJson(S08MapTest::MapDoc(), Errors));
+    const FS08BoardArtProfile* Map = Data.Boards.FindByPredicate([](const FS08BoardArtProfile& B) { return B.Id == TEXT("map"); });
+    TestTrue("absent blocks: off (bars + corners, no backdrop)", Map && !Map->MapFrame.bSet && !Map->Backdrop.bSet);
+    FS08BoardArtData MoonOnly;
+    TestTrue("moon-only backdrop parses",
+             MoonOnly.ParseJson(MapDocWith(TEXT("\"backdrop\":{\"moon\":{}},")), Errors));
+    const FS08BoardArtProfile* M = MoonOnly.Boards.FindByPredicate([](const FS08BoardArtProfile& B) { return B.Id == TEXT("map"); });
+    TestTrue("moon only: no mist, default moon", M && M->Backdrop.bSet && M->Backdrop.Mist.IsEmpty() && M->Backdrop.Moon.bSet &&
+                                                     M->Backdrop.Moon.DepthUU == FS08BackdropMoonSpec().DepthUU);
+  }
+  auto Expect = [this](const FString& Name, const FString& Doc, const FString& ErrorPart) {
+    FS08BoardArtData Broken;
+    TArray<FString> Errs;
+    TestFalse(Name + TEXT(": rejected"), Broken.ParseJson(Doc, Errs));
+    TestTrue(Name + TEXT(": reason '") + ErrorPart + TEXT("' in ") + FString::Join(Errs, TEXT(" | ")),
+             FString::Join(Errs, TEXT(" | ")).Contains(ErrorPart));
+  };
+  {
+    // grids never carry them (Cobble and the art fixtures stay bit for bit)
+    for (const TCHAR* Block : {TEXT("\"mapFrame\":{\"kit\":\"frame-002\"},"), TEXT("\"backdrop\":{\"moon\":{}},")}) {
+      FString OnGrid = S08MapTest::MapDoc();
+      OnGrid.ReplaceInline(TEXT("\"surface\":\"tiles\","), *(FString(TEXT("\"surface\":\"tiles\",")) + Block));
+      Expect(FString(TEXT("on a grid: ")) + Block, OnGrid, TEXT("is for map-image boards only"));
+    }
+  }
+  auto Bad = [&](const FString& Name, const TCHAR* From, const TCHAR* To, const TCHAR* ErrorPart) {
+    FString B = Blocks;
+    TestTrue(Name + TEXT(": patch applies"), B.Contains(From));
+    B.ReplaceInline(From, To);
+    Expect(Name, MapDocWith(B), ErrorPart);
+  };
+  Bad(TEXT("unknown kit"), TEXT("\"kit\":\"frame-002\""), TEXT("\"kit\":\"frame-003\""), TEXT("mapFrame.kit"));
+  Bad(TEXT("unknown mapFrame field"), TEXT("\"note\":\"test\""), TEXT("\"scale\":2"), TEXT("mapFrame.scale is not a field"));
+  Bad(TEXT("mist above the tray"), TEXT("\"zUU\":-400"), TEXT("\"zUU\":-100"), TEXT("backdrop.mist[0]"));
+  Bad(TEXT("mist zUU missing"), TEXT("\"zUU\":-900,"), TEXT(""), TEXT("backdrop.mist[1]"));
+  Bad(TEXT("mist layers 50 uu apart"), TEXT("\"zUU\":-900"), TEXT("\"zUU\":-450"), TEXT("closer than 100"));
+  Bad(TEXT("mist opacity 0"), TEXT("\"opacity\":0.3"), TEXT("\"opacity\":0"), TEXT("backdrop.mist[0]"));
+  Bad(TEXT("mist opacity 0.9"), TEXT("\"opacity\":0.3"), TEXT("\"opacity\":0.9"), TEXT("backdrop.mist[0]"));
+  Bad(TEXT("fast pan"), TEXT("\"panUUPerSec\":[7,-2.5]"), TEXT("\"panUUPerSec\":[700,-2.5]"), TEXT("backdrop.mist[0]"));
+  Bad(TEXT("three mist planes"), TEXT("{\"zUU\":-900,"), TEXT("{\"zUU\":-1500},{\"zUU\":-900,"), TEXT("at most 2"));
+  Bad(TEXT("moon too shallow (would reach over the board)"), TEXT("\"depthUU\":5200"), TEXT("\"depthUU\":1500"),
+      TEXT("moon card reaches Z"));
+  Bad(TEXT("moon anchor off screen"), TEXT("\"screenAnchor\":[-0.9,0.82]"), TEXT("\"screenAnchor\":[-1.5,0.82]"),
+      TEXT("backdrop.moon"));
+  Bad(TEXT("moon colour negative"), TEXT("\"colorLinear\":[0.72,0.8,1.0]"), TEXT("\"colorLinear\":[-1,0.8,1.0]"),
+      TEXT("backdrop.moon"));
+  Expect(TEXT("empty backdrop"), MapDocWith(TEXT("\"backdrop\":{},")), TEXT("at least one mist plane or the moon"));
+  {
+    // the modules are 24 uu wide: another frameUU is refused with the kit
+    FString Doc = MapDocWith(TEXT("\"mapFrame\":{\"kit\":\"frame-002\"},"));
+    TestTrue("frameUU anchor", Doc.Contains(TEXT("\"frameUU\":24")));
+    Doc.ReplaceInline(TEXT("\"frameUU\":24"), TEXT("\"frameUU\":30"));
+    Expect(TEXT("kit with frameUU 30"), Doc, TEXT("needs mapImage.frameUU 24"));
+  }
+  // the shipped data: both map-image boards ask for the kit; Marmoreal mist + moon; Sarpedon no backdrop (P5b tune: Track
+  // B's opaque sea ring at z -172 hides everything below the island, the moon card was invisible)
+  FS08BoardArtData Shipped;
+  TArray<FString> Errors;
+  if (TestTrue("shipped data", LoadShipped(Shipped, Errors))) {
+    int32 Maps = 0;
+    for (const FS08BoardArtProfile& B : Shipped.Boards) {
+      if (B.Surface != ES08BoardSurface::MapImage) {
+        TestFalse(B.Id + TEXT(": grids carry no mapFrame / backdrop"), B.MapFrame.bSet || B.Backdrop.bSet);
+        continue;
+      }
+      ++Maps;
+      TestTrue(B.Id + TEXT(": mapFrame frame-002"), B.MapFrame.bSet && B.MapFrame.Kit == Frame002Kit);
+      if (B.Id == TEXT("sarpedon-original")) {
+        TestFalse("sarpedon: no backdrop (the sea ring is under the island)", B.Backdrop.bSet);
+        continue;
+      }
+      TestTrue(B.Id + TEXT(": backdrop with the moon"), B.Backdrop.bSet && B.Backdrop.Moon.bSet);
+      TestTrue(B.Id + TEXT(": placement ok (everything below the board)"),
+               S08BackdropPlacementProblem(B.Backdrop, B.Map.HalfUU()).IsEmpty());
+      if (B.Id == TEXT("marmoreal-original")) TestEqual("marmoreal: 2 mist planes", B.Backdrop.Mist.Num(), 2);
+    }
+    TestEqual("two map-image profiles", Maps, 2);
+  }
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08BoardArtBackdropGeometryTest,
+    "Unmatched.S08.BoardArt.BackdropGeometry K1 camera model, moon card in the upper-left of the far view and below the board, mist planes",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08BoardArtBackdropGeometryTest::RunTest(const FString&) {
+  using namespace S08MapTest;
+  using namespace S08MapSurfaceSpec;
+  // the camera model = SetupCameraForBoard: looks at the origin, screen right = +X, screen up = the far side (-Y)
+  const double K1 = S08K1OverviewDistanceUU(S08K1FitDistanceUU(MapHalf), 1.25f);
+  const FS08BoardView View = FS08BoardView::AtDistance(K1);
+  FVector2D Ndc;
+  TestTrue("origin at the screen centre", View.Project(FVector::ZeroVector, Ndc) && Ndc.Equals(FVector2D::ZeroVector, 1e-6));
+  TestTrue("+X is screen right", View.Project(FVector(300.0, 0.0, 0.0), Ndc) && Ndc.X > 0.1 && FMath::Abs(Ndc.Y) < 1e-6);
+  TestTrue("-Y (far) is screen up", View.Project(FVector(0.0, -300.0, 0.0), Ndc) && Ndc.Y > 0.1);
+  TestTrue("camera location (0, D cos 55, D sin 55)",
+           View.Location.Equals(FVector(0.0, K1 * FMath::Cos(FMath::DegreesToRadians(55.0)), K1 * FMath::Sin(FMath::DegreesToRadians(55.0))), 0.01));
+  // the map frame's far corners at K1 fit inside the screen (the K1 fit of S08K1FitDistanceUU)
+  TestTrue("far-left frame corner on screen at K1", View.Project(FVector(-469.67, -312.67, 0.0), Ndc) &&
+                                                         FMath::Abs(Ndc.X) < 1.0 && FMath::Abs(Ndc.Y) < 1.0);
+  for (const FVector2D Anchor : {FVector2D(-0.9, 0.82), FVector2D(0.3, -0.4)}) {
+    TestTrue(TEXT("ray / project round trip ") + Anchor.ToString(),
+             View.Project(View.Location + View.Ray(Anchor) * 3000.0, Ndc) && Ndc.Equals(Anchor, 1e-6));
+  }
+  // the far zoom = fit / 0.65 = FS08CameraZoomConfig::OverviewOutRatio (2880.2 uu on the maps)
+  const double Far = S08BackdropFarViewDistanceUU(MapHalf);
+  TestTrue(FString::Printf(TEXT("far view %.2f = 2880.2 +- 0.5"), Far), FMath::Abs(Far - 2880.24) <= 0.5);
+  TestEqual("BackdropFarViewRatio == the zoom's OverviewOutRatio", BackdropFarViewRatio, FS08CameraZoomConfig().OverviewOutRatio);
+  // the shipped moon: on its anchor in the far view, facing the camera, round, below the board
+  FS08BackdropMoonSpec Moon;
+  Moon.bSet = true;
+  double TopZ = 0.0;
+  const FTransform Card = S08BackdropMoonTransform(Moon, MapHalf, &TopZ);
+  const FS08BoardView FarView = FS08BoardView::AtDistance(Far);
+  TestTrue(TEXT("moon centre on its anchor in the far view ") + Moon.ScreenAnchor.ToString(),
+           FarView.Project(Card.GetTranslation(), Ndc) && Ndc.Equals(Moon.ScreenAnchor, 1e-4));
+  TestTrue("moon anchor in the upper-left quadrant", Moon.ScreenAnchor.X < 0.0 && Moon.ScreenAnchor.Y > 0.0);
+  TestTrue("card normal towards the camera (parallel to the screen)",
+           Card.GetRotation().RotateVector(FVector::UpVector).Equals(-FarView.Forward, 1e-4));
+  TestTrue("card local X = screen right (a round disc on screen)",
+           Card.GetRotation().RotateVector(FVector::ForwardVector).Equals(FarView.Right, 1e-4));
+  TestTrue("card scale = diameter / 100", Card.GetScale3D().Equals(FVector(Moon.DiameterUU / 100.0, Moon.DiameterUU / 100.0, 1.0), 1e-4));
+  TestTrue(FString::Printf(TEXT("moon card top Z %.0f below %.0f (the board is always in front of it)"), TopZ, BackdropMaxZ),
+           TopZ <= BackdropMaxZ);
+  // the same card seen from K1 is behind the tray plane's far-left corner region: never in front of the frame
+  TestTrue("moon centre farther from the K1 camera than the far frame corner",
+           FVector::Dist(View.Location, Card.GetTranslation()) > FVector::Dist(View.Location, FVector(-469.67, -312.67, 0.0)));
+  FS08BackdropSpec Spec;
+  Spec.bSet = true;
+  Spec.Moon = Moon;
+  TestTrue("shipped-like moon: no placement problem", S08BackdropPlacementProblem(Spec, MapHalf).IsEmpty());
+  Spec.Moon.DepthUU = 1500.0f;
+  TestTrue("a shallow moon is refused", S08BackdropPlacementProblem(Spec, MapHalf).Contains(TEXT("moon card reaches Z")));
+  // mist plane: the engine plane (100 uu) scaled to the size, flat, at its height
+  FS08BackdropMistSpec Mist;
+  Mist.ZUU = -400.0f;
+  Mist.CenterUU = FVector2D(10.0, -400.0);
+  Mist.HalfUU = FVector2D(2400.0, 1600.0);
+  const FTransform Plane = S08BackdropMistTransform(Mist);
+  TestTrue("mist plane at (cx, cy, z), flat", Plane.GetTranslation().Equals(FVector(10.0, -400.0, -400.0), 1e-6) &&
+                                                Plane.GetRotation().Equals(FQuat::Identity, 1e-6));
+  TestTrue("mist plane scale = half / 50", Plane.GetScale3D().Equals(FVector(48.0, 32.0, 1.0), 1e-6));
+  Spec = FS08BackdropSpec();
+  Spec.Mist = {Mist, Mist};
+  Spec.Mist[1].ZUU = -470.0f;
+  TestTrue("two mist planes 70 uu apart are refused", S08BackdropPlacementProblem(Spec, MapHalf).Contains(TEXT("closer than")));
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08BoardArtFrameBackdropActorTest,
+    "Unmatched.S08.BoardArt.FrameBackdropActor frame-002 modules + backdrop parts on the map-image board only; grids / grey / refused none",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08BoardArtFrameBackdropActorTest::RunTest(const FString&) {
+  using namespace S08MapTest;
+  using namespace S08FrameBackdropTest;
+  FGate Gate(true, false);
+  UWorld* World = UWorld::CreateWorld(EWorldType::Game, false, FName(TEXT("S08BoardArtFrameBackdropActor")));
+  if (!TestNotNull("test world", World)) return false;
+  FWorldContext& Context = GEngine->CreateNewWorldContext(EWorldType::Game);
+  Context.SetCurrentWorld(World);
+  auto NoParts = [this](const AS08BoardActor* A, const TCHAR* What) {
+    TestTrue(FString(What) + TEXT(": no frame modules, no backdrop parts"),
+             A->GetMapFrameParts().IsEmpty() && A->GetBackdropParts().IsEmpty() && A->GetBackdropRuntime().MistPlanes == 0 &&
+                 !A->GetBackdropRuntime().bMoon);
+  };
+  // 1) grids (Cobble-size, no art data) and the refused map-image profile: nothing, and a grid-only run traces nothing
+  FS08BoardModel Topo;
+  if (TestTrue("synthetic topology board", SyntheticTopology(Topo))) {
+    AS08BoardActor* A = World->SpawnActor<AS08BoardActor>(AS08BoardActor::StaticClass(), FVector::ZeroVector,
+                                                          FRotator::ZeroRotator);
+    if (TestNotNull("board actor", A)) {
+      TestTrue("env gate armed", A->EnsureEnvLayout(true));
+      TestTrue("rebuild grid 5x6", A->Rebuild(MakeBoard(5, 6)));
+      NoParts(A, TEXT("grid 5x6"));
+      TestFalse("grid-only run: no backdrop line", A->GetBackdropRuntime().bTraced);
+      TestTrue("grid: the frame kit source untouched (empty)", A->GetMapFrameKitSource().IsEmpty());
+      FS08BoardArtData Data;
+      TArray<FString> Errors;
+      if (TestTrue(TEXT("doc with the blocks: ") + FString::Join(Errors, TEXT(" | ")), Data.ParseJson(MapDocWith(Blocks), Errors))) {
+        A->SetArtDataForTest(Data);
+        FS08BoardModel Grid = MakeBoard(3, 2);
+        for (FS08Cell& Cell : Grid.Cells) Cell.Zones = {Cell.X == 0 ? TEXT("a") : TEXT("b")};
+        TestTrue("rebuild the 3x2 grid profile", A->Rebuild(Grid));
+        TestFalse("3x2 grid: not map-image", A->IsMapImageActive());
+        NoParts(A, TEXT("grid 3x2 with the data"));
+        A->SetRoomBoardId(TEXT("cidMap"));
+        TestTrue("rebuild topology (map assets missing)", A->Rebuild(Topo));
+        TestFalse("refused map-image", A->IsMapImageActive());
+        NoParts(A, TEXT("refused map-image"));
+      }
+      A->Destroy();
+    }
+  }
+  // 2) the shipped Marmoreal profile once the map import ran (out of git): kit + backdrop, then back to a grid
+  FS08BoardArtData Shipped;
+  TArray<FString> Errors;
+  if (TestTrue("shipped data", LoadShipped(Shipped, Errors))) {
+    const FS08BoardArtProfile* Marmoreal =
+        Shipped.Boards.FindByPredicate([](const FS08BoardArtProfile& B) { return B.Id == TEXT("marmoreal-original"); });
+    TSharedPtr<FJsonValue> State;
+    TSharedPtr<FJsonObject> Root;
+    FString BoardId;
+    FS08BoardModel Board;
+    const bool bBoard = TopologyBoardState(FPaths::Combine(TopologyFixtureDir(), TEXT("marmoreal.topology.json")), State,
+                                           BoardId, Root) &&
+                        Board.Decode(State);
+    if (!Marmoreal || !bBoard) {
+      AddError(TEXT("marmoreal-original profile or fixture missing"));
+    } else if (!FPackageName::DoesPackageExist(Marmoreal->Map.MaterialInstancePath)) {
+      AddWarning(TEXT("map assets not imported: run tools/art/map_surface/ue_import_map_surface.py (ENV-U3: out of git); ")
+                 TEXT("the frame-002 / backdrop actor path was NOT exercised"));
+    } else {
+      AS08BoardActor* A = World->SpawnActor<AS08BoardActor>(AS08BoardActor::StaticClass(), FVector::ZeroVector,
+                                                            FRotator::ZeroRotator);
+      if (TestNotNull("board actor (map-image)", A)) {
+        TestTrue("env gate armed", A->EnsureEnvLayout(true));
+        A->SetArtDataForTest(Shipped);
+        A->SetRoomBoardId(BoardId);
+        TestTrue("rebuild Marmoreal", A->Rebuild(Board));
+        TestTrue("map-image active", A->IsMapImageActive());
+        if (FrameKitImported()) {
+          TestEqual("frame kit source", A->GetMapFrameKitSource(), FString(TEXT("frame-002")));
+          TestEqual("20 modules", A->GetMapFrameParts().Num(), 20);
+          TestEqual("no cube bars", A->GetArtSurfacePartCount(), 0);
+          TestEqual("no ART-005 corners", A->GetArtCornerCount(), 0);
+          const FS08FrameLayout Layout = S08MapFrame002Layout(Marmoreal->Map.HalfUU());
+          int32 Placed = 0, WoodOnFrameWood = 0;
+          for (int32 I = 0; I < A->GetMapFrameParts().Num() && I < Layout.Pieces.Num(); ++I) {
+            const UStaticMeshComponent* Part = A->GetMapFrameParts()[I];
+            if (!Part) continue;
+            Placed += Part->GetRelativeLocation().Equals(Layout.Pieces[I].Location, 1e-3) &&
+                              FMath::IsNearlyZero(FRotator::NormalizeAxis(Part->GetRelativeRotation().Yaw - Layout.Pieces[I].YawDeg), 1e-3) &&
+                              Part->GetCollisionEnabled() == ECollisionEnabled::NoCollision
+                          ? 1 : 0;
+            const int32 WoodIndex = Part->GetMaterialIndex(FName(S08MapSurfaceSpec::Frame002WoodSlot));
+            const UMaterialInterface* Wood = Part->GetMaterial(WoodIndex != INDEX_NONE ? WoodIndex : 0);
+            WoodOnFrameWood += Wood && A->GetMapFrameWoodSource() == TEXT("frame-wood") &&
+                                       Wood->GetMaterial() && Wood->GetMaterial()->GetName() == TEXT("M_MapFrameWood")
+                                   ? 1 : 0;
+          }
+          TestEqual("every module at its layout transform, no collision", Placed, 20);
+          if (A->GetMapFrameWoodSource() == TEXT("frame-wood")) {
+            TestEqual("the wood slot of every module on the frameWood MID", WoodOnFrameWood, 20);
+          }
+        } else {
+          AddWarning(TEXT("frame-002 not imported (tools/art/env_kit/ue_import_map_frame.py): the bars fallback was checked"));
+          TestEqual("frame kit source 'missing'", A->GetMapFrameKitSource(), FString(TEXT("missing")));
+          TestTrue("bars + corners kept", A->GetArtSurfacePartCount() == 4 && A->GetArtCornerCount() == 4 &&
+                                              A->GetMapFrameParts().IsEmpty());
+        }
+        const bool bMaterials = FPackageName::DoesPackageExist(FramePackageOf(S08MapSurfaceSpec::BackdropMistMaterialPath)) &&
+                                FPackageName::DoesPackageExist(FramePackageOf(S08MapSurfaceSpec::BackdropMoonMaterialPath));
+        const FS08BackdropRuntime& Rt = A->GetBackdropRuntime();
+        if (bMaterials) {
+          TestEqual("backdrop status ok", Rt.Status, FString(TEXT("ok")));
+          TestTrue("2 mist planes + the moon", A->GetBackdropParts().Num() == 3 && Rt.MistPlanes == 2 && Rt.bMoon);
+          for (const UStaticMeshComponent* Part : A->GetBackdropParts()) {
+            if (!Part) continue;
+            const FBox Box = Part->Bounds.GetBox();
+            TestTrue(FString::Printf(TEXT("%s below the board (max Z %.0f)"), *Part->GetName(), Box.Max.Z),
+                     Box.Max.Z <= S08MapSurfaceSpec::BackdropMaxZ + 0.5);
+            TestTrue(Part->GetName() + TEXT(": lights nothing (no shadow, no GI / DF), no collision"),
+                     !Part->CastShadow && !Part->bAffectDynamicIndirectLighting && !Part->bAffectDistanceFieldLighting &&
+                         Part->GetCollisionEnabled() == ECollisionEnabled::NoCollision);
+            const UMaterialInterface* Mi = Part->GetMaterial(0);
+            const UMaterial* Base = Mi ? Mi->GetMaterial() : nullptr;
+            TestTrue(Part->GetName() + TEXT(": unlit, translucent / additive, Apply Fogging off"),
+                     Base && Base->GetShadingModels().HasOnlyShadingModel(MSM_Unlit) &&
+                         (Base->GetBlendMode() == BLEND_Translucent || Base->GetBlendMode() == BLEND_Additive) &&
+                         !Base->bUseTranslucencyVertexFog);
+          }
+        } else {
+          AddWarning(TEXT("backdrop materials not imported (ue_import_map_surface.py): the 'missing-material' path was checked"));
+          TestEqual("backdrop status missing-material", Rt.Status, FString(TEXT("missing-material")));
+          TestTrue("no backdrop part", A->GetBackdropParts().IsEmpty());
+        }
+        // the same board again keeps the parts; a grid afterwards clears everything
+        const int32 Parts = A->GetBackdropParts().Num();
+        TestTrue("rebuild a 5x6 grid", A->Rebuild(MakeBoard(5, 6)));
+        NoParts(A, TEXT("grid after the map"));
+        TestEqual("bars gone with the map", A->GetArtCornerCount(), 0);
+        AddInfo(FString::Printf(TEXT("Marmoreal: frame %s, backdrop %s (%d parts)"), *A->GetMapFrameKitSource(), *Rt.Status, Parts));
+        A->Destroy();
       }
     }
   }

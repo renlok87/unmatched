@@ -28,6 +28,12 @@ ENV-MAPS P4 readability materials (map-image boards whose profile has a "readabi
                                     multiplier) and FrameSaturation - the darker map frame (review gap 9)
   /Game/EnvMaps/M_MapContactShadow  unlit, BLEND_MODULATE: a soft radial blob (Strength, Softness) on the engine plane
                                     under every fighter base
+ENV-MAPS P5 track C night backdrop (map-image boards whose profile has a "backdrop" block; shared by both maps, HLSL and
+numpy mirror in backdrop.py; Apply Fogging off on both - the night fog would wash them out):
+  /Game/EnvMaps/M_MapBackdropMist   unlit, BLEND_TRANSLUCENT: 3-octave value-noise mist in uu (SizeUU, PanUU x Time,
+                                    NoiseScaleUU, Coverage, Seed), elliptic EdgeFade; Emissive = Tint, Opacity x density
+  /Game/EnvMaps/M_MapBackdropMoon   unlit, BLEND_ADDITIVE: soft gaussian glow + small disc (Tint, Intensity, Softness,
+                                    DiscRadius, DiscIntensity) on the engine plane (UV 0..1)
 The SDF and the space-ID map are imported for the next steps (highlight by ID, crisp game layer) and are not
 sampled by M_MapBoard yet; they sit under /Game/EnvMaps/Data (never cooked, ~0.4 GB kept out of the pak). Once
 M_MapBoard samples them, move them out of Data and drop the DirectoriesToNeverCook line (the cooker drops a
@@ -64,6 +70,9 @@ try:  # inside UnrealEditor(-Cmd) only; --check runs in plain Python
     import unreal as u  # type: ignore
 except ImportError:  # pragma: no cover - plain Python
     u = None
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import backdrop as backdrop_lib  # noqa: E402  (HLSL + parameter defaults of the backdrop materials; plain Python)
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[2]
@@ -126,6 +135,14 @@ float r = length(d);
 float a = Strength * exp(-(r * r) / max(Softness * Softness, 1e-4)) * saturate((1.0 - r) * 6.0);
 return (1.0 - saturate(a)).xxx;
 """
+
+
+# ---- ENV-MAPS P5 track C night backdrop (S08BoardArt.h S08MapSurfaceSpec::BackdropMistMaterialPath / ...MoonMaterialPath)
+BACKDROP_MIST_NAME = "M_MapBackdropMist"
+BACKDROP_MIST_PATH = f"{ROOT}/{BACKDROP_MIST_NAME}"
+BACKDROP_MOON_NAME = "M_MapBackdropMoon"
+BACKDROP_MOON_PATH = f"{ROOT}/{BACKDROP_MOON_NAME}"
+BACKDROP_VERSION = "1"
 
 
 def mi_params(grade: dict) -> dict:
@@ -515,11 +532,98 @@ def build_contact_shadow(force: bool) -> dict:
     return _finish(material, CONTACT_SHADOW_PATH, GRAPH_TAG, CONTACT_SHADOW_VERSION, action)
 
 
+def _vector(material, name, value, x, y):
+    node = u.MaterialEditingLibrary.create_material_expression(material, u.MaterialExpressionVectorParameter, x, y)
+    node.set_editor_property("parameter_name", name)
+    node.set_editor_property("default_value", u.LinearColor(*[float(v) for v in value]))
+    return node
+
+
+def _translucent_unlit(material, blend) -> dict:
+    """Unlit translucent with Apply Fogging off (UMaterial::bUseTranslucencyVertexFog, display name 'Apply Fogging')."""
+    material.set_editor_property("shading_model", u.MaterialShadingModel.MSM_UNLIT)
+    material.set_editor_property("blend_mode", blend)
+    material.set_editor_property("two_sided", False)
+    flags = {}
+    for prop, value in (("use_translucency_vertex_fog", False), ("output_translucent_velocity", False)):
+        try:
+            material.set_editor_property(prop, value)
+            flags[prop] = bool(material.get_editor_property(prop))
+        except Exception as exc:  # noqa: BLE001 - engine-version dependent; reported, never silently assumed
+            flags[prop] = f"n/a ({exc})"
+    if flags.get("use_translucency_vertex_fog") is not False:
+        raise RuntimeError(f"{material.get_name()}: could not switch Apply Fogging off: {flags}")
+    return flags
+
+
+def _check_params(material, path: str, want: dict) -> dict:
+    mel = u.MaterialEditingLibrary
+    got = {"vector": sorted(str(n) for n in mel.get_vector_parameter_names(material)),
+           "scalar": sorted(str(n) for n in mel.get_scalar_parameter_names(material))}
+    missing = [p for k in ("vector", "scalar") for p in want[k] if p not in got[k]]
+    if missing:
+        raise RuntimeError(f"{path}: parameters missing after the build: {missing}")
+    return got
+
+
+def build_backdrop_mist(force: bool) -> dict:
+    """M_MapBackdropMist (ENV-MAPS P5 gap 8): unlit translucent value-noise mist (backdrop.MIST_HLSL), no fog."""
+    mel = u.MaterialEditingLibrary
+    material, action = _new_material(BACKDROP_MIST_PATH, BACKDROP_MIST_NAME, GRAPH_TAG, BACKDROP_VERSION, force)
+    if action is None:
+        return {"action": "unchanged", "path": BACKDROP_MIST_PATH, "graphVersion": BACKDROP_VERSION}
+    flags = _translucent_unlit(material, u.BlendMode.BLEND_TRANSLUCENT)
+    P = backdrop_lib.MIST_PARAMS
+    uv = mel.create_material_expression(material, u.MaterialExpressionTextureCoordinate, -1300, -300)
+    time = mel.create_material_expression(material, u.MaterialExpressionTime, -1300, -200)
+    vec = {n: _vector(material, n, v, -1300, -100 + 120 * i) for i, (n, v) in enumerate(P["vector"].items())}
+    sca = {n: _scalar(material, n, v, -1300, 300 + 100 * i) for i, (n, v) in enumerate(P["scalar"].items())}
+    density = _custom_node(material, "MapBackdropMist", -700, 0, backdrop_lib.MIST_INPUTS, backdrop_lib.MIST_HLSL)
+    density.set_editor_property("output_type", u.CustomMaterialOutputType.CMOT_FLOAT1)
+    _connect(uv, "", density, "UV")
+    _connect(time, "", density, "Time")
+    _connect(vec["SizeUU"], "RGB", density, "Size")
+    _connect(vec["PanUU"], "RGB", density, "Pan")
+    for pin, param in (("NoiseScale", "NoiseScaleUU"), ("EdgeFade", "EdgeFade"), ("Coverage", "Coverage"), ("Seed", "Seed")):
+        _connect(sca[param], "", density, pin)
+    alpha = mel.create_material_expression(material, u.MaterialExpressionMultiply, -350, 100)
+    _connect(density, "", alpha, "A")
+    _connect(sca["Opacity"], "", alpha, "B")
+    mel.connect_material_property(alpha, "", u.MaterialProperty.MP_OPACITY)
+    mel.connect_material_property(vec["Tint"], "RGB", u.MaterialProperty.MP_EMISSIVE_COLOR)
+    out = _finish(material, BACKDROP_MIST_PATH, GRAPH_TAG, BACKDROP_VERSION, action)
+    out.update(flags=flags, params=_check_params(material, BACKDROP_MIST_PATH, P), blend="translucent")
+    return out
+
+
+def build_backdrop_moon(force: bool) -> dict:
+    """M_MapBackdropMoon (ENV-MAPS P5 gap 8): unlit additive moon glow (backdrop.MOON_HLSL), no fog."""
+    mel = u.MaterialEditingLibrary
+    material, action = _new_material(BACKDROP_MOON_PATH, BACKDROP_MOON_NAME, GRAPH_TAG, BACKDROP_VERSION, force)
+    if action is None:
+        return {"action": "unchanged", "path": BACKDROP_MOON_PATH, "graphVersion": BACKDROP_VERSION}
+    flags = _translucent_unlit(material, u.BlendMode.BLEND_ADDITIVE)
+    P = backdrop_lib.MOON_PARAMS
+    uv = mel.create_material_expression(material, u.MaterialExpressionTextureCoordinate, -1100, -200)
+    tint = _vector(material, "Tint", P["vector"]["Tint"], -1100, -100)
+    sca = {n: _scalar(material, n, v, -1100, 50 + 100 * i) for i, (n, v) in enumerate(P["scalar"].items())}
+    glow = _custom_node(material, "MapBackdropMoon", -500, 0, backdrop_lib.MOON_INPUTS, backdrop_lib.MOON_HLSL)
+    _connect(uv, "", glow, "UV")
+    _connect(tint, "RGB", glow, "Tint")
+    for pin in ("Intensity", "Softness", "DiscRadius", "DiscIntensity"):
+        _connect(sca[pin], "", glow, pin)
+    mel.connect_material_property(glow, "", u.MaterialProperty.MP_EMISSIVE_COLOR)
+    out = _finish(material, BACKDROP_MOON_PATH, GRAPH_TAG, BACKDROP_VERSION, action)
+    out.update(flags=flags, params=_check_params(material, BACKDROP_MOON_PATH, P), blend="additive")
+    return out
+
+
 def run_import(plan: dict, force: bool) -> tuple[dict, bool]:
     result, ok, material = {}, True, None
     # ENV-MAPS P4 readability materials (map independent; a failure is reported, the maps still import)
     readability = {}
-    for key, builder in (("frameWood", build_frame_wood), ("contactShadow", build_contact_shadow)):
+    for key, builder in (("frameWood", build_frame_wood), ("contactShadow", build_contact_shadow),
+                         ("backdropMist", build_backdrop_mist), ("backdropMoon", build_backdrop_moon)):
         try:
             readability[key] = builder(force)
         except Exception as exc:  # report and continue
@@ -576,7 +680,8 @@ def main(argv: list[str] | None = None) -> int:
     report = {"schema": "unmatched.env-maps-ue-import/1", "tool": "tools/art/map_surface/ue_import_map_surface.py",
               "mode": "check" if (args.check or u is None) else "import", "derivedRoot": str(root),
               "contentRoot": ROOT, "dataRoot": DATA_ROOT, "material": MATERIAL_PATH, "graphVersion": GRAPH_VERSION,
-              "readability": {"frameWood": FRAME_WOOD_PATH, "contactShadow": CONTACT_SHADOW_PATH}, "maps": {}}
+              "readability": {"frameWood": FRAME_WOOD_PATH, "contactShadow": CONTACT_SHADOW_PATH,
+                              "backdropMist": BACKDROP_MIST_PATH, "backdropMoon": BACKDROP_MOON_PATH}, "maps": {}}
     plan = verify_sources(keys, root)
     ok = all(entry["ok"] for entry in plan.values())
     report["maps"] = plan

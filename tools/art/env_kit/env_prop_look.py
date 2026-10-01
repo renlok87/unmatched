@@ -20,10 +20,15 @@ The same HLSL strings (HLSL_ALBEDO / HLSL_EMISSIVE) are built into the UE materi
 here in numpy (apply_look), so the look is checked on the committed textures without UE: --check prints the measured
 region statistics before / after against the targets in the look file and exits 1 when a target is missed.
 
-Look file: art/pipeline-candidates/ASSET-ENV-KIT-001/20260930-tripo-h31/scripts/env-prop-look.json
-(schema unmatched.env-prop-look/1). Only props listed there move to M_EnvProp; the others keep M_UM_Figure unchanged.
+Look files (schema unmatched.env-prop-look/1), one per env-kit run (LOOK_FILES):
+  art/pipeline-candidates/ASSET-ENV-KIT-001/20260930-tripo-h31/scripts/env-prop-look.json     (P4: the P1 kit props)
+  art/pipeline-candidates/ASSET-ENV-KIT-001/20261001-tripo-h31-p5/scripts/env-prop-look.json  (P5 props + BackWall)
+Only props listed there move to M_EnvProp; the others keep M_UM_Figure unchanged. The BC of an entry is
+<run>/export/T_Env_<Name>_BC.png (run = the look file's run folder), or the repo-relative path in the entry's optional
+"bc" (the shared back-wall atlas of ASSET-ENV-M-BACKWALL-001, entry name = its material set 'BackWall').
 
-  python -B tools/art/env_kit/env_prop_look.py --check                 # targets on the committed BC textures
+  python -B tools/art/env_kit/env_prop_look.py --check                 # every look file: targets on the committed BCs
+  python -B tools/art/env_kit/env_prop_look.py --look <file> --check   # one look file (its run = <file>/../..)
   python -B tools/art/env_kit/env_prop_look.py --previews <dir>        # before / after BC + emissive PNGs (scratch)
 
 Status: the values are 'предложено' (proposed) - measured on textures here, in UE frames by the integrate stage.
@@ -41,6 +46,9 @@ HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[2]
 RUN_DEFAULT = REPO / "art" / "pipeline-candidates" / "ASSET-ENV-KIT-001" / "20260930-tripo-h31"
 LOOK_DEFAULT = RUN_DEFAULT / "scripts" / "env-prop-look.json"
+RUN_P5 = REPO / "art" / "pipeline-candidates" / "ASSET-ENV-KIT-001" / "20261001-tripo-h31-p5"
+LOOK_P5 = RUN_P5 / "scripts" / "env-prop-look.json"
+LOOK_FILES = (LOOK_DEFAULT, LOOK_P5)  # --check without --look measures all of them
 SCHEMA = "unmatched.env-prop-look/1"
 MASTER_PATH = "/Game/EnvKit/Shared/M_EnvProp"
 # MI parameter names of M_EnvProp (the texture names are those of M_UM_Figure, so the kit binds the same way)
@@ -147,6 +155,9 @@ def validate_look(data: dict) -> list[str]:
                 err.append(f"{name}.emissive.colorLinear must be 3 numbers >= 0")
             if not (isinstance(em.get("intensity"), (int, float)) and 0 < em["intensity"] <= 50):
                 err.append(f"{name}.emissive.intensity must be in (0, 50]")
+        bc = e.get("bc")
+        if bc is not None and (not isinstance(bc, str) or not bc.endswith("_BC.png") or Path(bc).is_absolute()):
+            err.append(f"{name}.bc must be a repo-relative path to a *_BC.png")
         if reg is None and em is None and not e.get("rest"):
             err.append(f"{name}: no region, rest or emissive - leave it on M_UM_Figure instead")
         soft = e.get("soft", data.get("soft", {}))
@@ -270,11 +281,23 @@ def circular_mean_deg(h01, weights) -> float:
     return float(np.degrees(np.arctan2((np.sin(a) * weights).sum() / sw, (np.cos(a) * weights).sum() / sw)) % 360)
 
 
-def load_bc(name: str, run: Path = RUN_DEFAULT, size: int = 512):
-    """The committed BC of SM_Env_<name> as sRGB float (size x size, box-filtered: statistics only)."""
+def bc_path(name: str, run: Path = RUN_DEFAULT, data: dict | None = None) -> Path:
+    """The BC a look entry is measured on: its 'bc' (repo-relative) or <run>/export/T_Env_<name>_BC.png."""
+    bc = ((data or {}).get("props", {}).get(name) or {}).get("bc")
+    return REPO / bc if bc else Path(run) / "export" / f"T_Env_{name}_BC.png"
+
+
+def run_of_look(path: Path) -> Path:
+    """A look file lives in <run>/scripts/: its run folder."""
+    return Path(path).resolve().parents[1]
+
+
+def load_bc(name: str, run: Path = RUN_DEFAULT, size: int = 512, data: dict | None = None):
+    """The committed BC of SM_Env_<name> (or the entry's 'bc') as sRGB float (size x size, box-filtered: statistics
+    only)."""
     np = _np()
     from PIL import Image
-    img = Image.open(run / "export" / f"T_Env_{name}_BC.png").convert("RGB")
+    img = Image.open(bc_path(name, run, data)).convert("RGB")
     if size and img.size[0] != size:
         img = img.resize((size, size), Image.BOX)
     return np.asarray(img, np.float32) / 255.0
@@ -283,7 +306,7 @@ def load_bc(name: str, run: Path = RUN_DEFAULT, size: int = 512):
 def measure(name: str, data: dict, run: Path = RUN_DEFAULT, size: int = 512) -> dict:
     """Region / rest / emissive statistics of one prop's look on its committed BC (texture space, not a render)."""
     np = _np()
-    bc = load_bc(name, run, size)
+    bc = load_bc(name, run, size, data)
     params = mi_params(data, name)
     out = apply_look(bc, params)
     hsv0 = out["hsv"]
@@ -351,7 +374,7 @@ def write_previews(name: str, data: dict, out_dir: Path, run: Path = RUN_DEFAULT
     np = _np()
     from PIL import Image
     out_dir.mkdir(parents=True, exist_ok=True)
-    bc = load_bc(name, run, size)
+    bc = load_bc(name, run, size, data)
     out = apply_look(bc, mi_params(data, name))
     em = out["emissive"] * 0.2  # ~ the night profiles' fixed exposure (EV100 2.05)
     em = em / (1.0 + em)
@@ -366,42 +389,53 @@ def write_previews(name: str, data: dict, out_dir: Path, run: Path = RUN_DEFAULT
 
 def main(argv: list | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n", 1)[0])
-    ap.add_argument("--look", default=str(LOOK_DEFAULT))
-    ap.add_argument("--run", default=str(RUN_DEFAULT))
+    ap.add_argument("--look", action="append", default=None,
+                    help="look file (repeatable); default: every file of LOOK_FILES that exists")
+    ap.add_argument("--run", default=None, help="the run of the BC textures (default: the look file's run folder)")
     ap.add_argument("--check", action="store_true", help="measure every prop's look on its BC against its targets")
     ap.add_argument("--previews", default=None, help="write before / after / emissive / mask PNGs here (scratch)")
     ap.add_argument("--json", default=None, help="write the measurements here")
     args = ap.parse_args(argv)
-    data = load_look(Path(args.look))
-    run = Path(args.run)
-    report, bad = {"schema": "unmatched.env-prop-look-check/1", "look": str(args.look), "props": {}}, []
-    for name in data["props"]:
-        res = measure(name, data, run)
-        report["props"][name] = res
-        miss = check_targets(name, data, res)
-        bad += miss
-        reg = res.get("region")
-        line = f"{name:<14} region {res['regionFraction']:.3f}"
-        if reg:
-            b, a = reg["before"], reg["after"]
-            line += (f" H {b['hueDeg']:.0f}->{a['hueDeg']:.0f} S {b['sat']:.2f}->{a['sat']:.2f} "
-                     f"V {b['val']:.2f}->{a['val']:.2f} (x{reg['valRatio']:.2f})")
-        rs = res.get("rest") or {}
-        if rs.get("valRatio") is not None and (abs(rs["valRatio"] - 1) > 0.005 or abs(rs["satRatio"] - 1) > 0.005):
-            line += f" | rest S x{rs['satRatio']:.2f} V x{rs['valRatio']:.2f}"
-        if res.get("emissive"):
-            line += (f" | emissive {res['emissiveFraction']:.3f} of texels, mean lum {res['emissive']['meanLuminance']:.2f}"
-                     f" (x{res['emissive']['intensity']:g})")
-        print(("MISS " if miss else "ok   ") + line)
-        if args.previews:
-            write_previews(name, data, Path(args.previews), run)
+    looks = [Path(x) for x in args.look] if args.look else [f for f in LOOK_FILES if f.is_file()]
+    report, bad = {"schema": "unmatched.env-prop-look-check/1", "look": [str(f) for f in looks], "props": {}}, []
+    count = 0
+    for look in looks:
+        data = load_look(look)
+        run = Path(args.run) if args.run else run_of_look(look)
+        print(f"look {look.as_posix()}")
+        for name in data["props"]:
+            count += 1
+            bad += _check_one(name, data, run, report, args)
     for b in bad:
         print("  TARGET " + b)
     report["ok"] = not bad
     if args.json:
         Path(args.json).write_text(json.dumps(report, indent=1, ensure_ascii=False), encoding="utf-8")
-    print(f"ENVPROP-LOOK {'ok' if not bad else 'failed'} props={len(data['props'])}")
+    print(f"ENVPROP-LOOK {'ok' if not bad else 'failed'} props={count}")
     return 0 if not bad else 1
+
+
+def _check_one(name: str, data: dict, run: Path, report: dict, args) -> list[str]:
+    """Measure one look entry, print its line, write its previews; returns the missed targets."""
+    res = measure(name, data, run)
+    report["props"][name] = res
+    miss = check_targets(name, data, res)
+    reg = res.get("region")
+    line = f"{name:<14} region {res['regionFraction']:.3f}"
+    if reg:
+        b, a = reg["before"], reg["after"]
+        line += (f" H {b['hueDeg']:.0f}->{a['hueDeg']:.0f} S {b['sat']:.2f}->{a['sat']:.2f} "
+                 f"V {b['val']:.2f}->{a['val']:.2f} (x{reg['valRatio']:.2f})")
+    rs = res.get("rest") or {}
+    if rs.get("valRatio") is not None and (abs(rs["valRatio"] - 1) > 0.005 or abs(rs["satRatio"] - 1) > 0.005):
+        line += f" | rest S x{rs['satRatio']:.2f} V x{rs['valRatio']:.2f}"
+    if res.get("emissive"):
+        line += (f" | emissive {res['emissiveFraction']:.3f} of texels, mean lum {res['emissive']['meanLuminance']:.2f}"
+                 f" (x{res['emissive']['intensity']:g})")
+    print(("MISS " if miss else "ok   ") + line)
+    if args.previews:
+        write_previews(name, data, Path(args.previews), run)
+    return miss
 
 
 if __name__ == "__main__":

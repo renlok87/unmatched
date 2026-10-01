@@ -126,6 +126,55 @@ constexpr float ReachStrokeZ = 1.6f;
 constexpr float ReachStrokeDepth = 0.004f;
 /** ENV-O8 T1: the placeholder tray is stretched non-uniformly under a map (see S08Diorama.h). */
 inline const TCHAR* const TrayWaiver = TEXT("T1-placeholder");
+/** ENV-MAPS P5 track C (concept review gap 9, full): the heavy modular frame ASSET-MAP-FRAME-002 (Blender lane K,
+ *  art/pipeline-candidates/ASSET-MAP-FRAME-002/20261001-frame-v1), imported out of git by
+ *  tools/art/env_kit/ue_import_map_frame.py into /Game/EnvMaps/Frame (cooked with /Game/EnvMaps). A profile "mapFrame"
+ *  block {"kit": "frame-002"} replaces the 4 cube bars AND the ART-005 corner brackets of a map-image board with the
+ *  20 module instances of S08MapFrame002Layout; a missing mesh keeps the bars + brackets (traced). Slot
+ *  M_MapFrame002_Wood takes the frame-wood material of the profile (MapFrameMaterial), slot M_MapFrame002_Iron keeps
+ *  its MI (child of M_EnvProp). */
+inline const TCHAR* const Frame002Kit = TEXT("frame-002");
+inline const TCHAR* const Frame002CornerPath = TEXT("/Game/EnvMaps/Frame/SM_MapFrame002_Corner.SM_MapFrame002_Corner");
+inline const TCHAR* const Frame002SegAPath = TEXT("/Game/EnvMaps/Frame/SM_MapFrame002_SegA.SM_MapFrame002_SegA");
+inline const TCHAR* const Frame002SegBPath = TEXT("/Game/EnvMaps/Frame/SM_MapFrame002_SegB.SM_MapFrame002_SegB");
+inline const TCHAR* const Frame002SegMidPath = TEXT("/Game/EnvMaps/Frame/SM_MapFrame002_SegMid.SM_MapFrame002_SegMid");
+inline const TCHAR* const Frame002IronMaterialPath = TEXT("/Game/EnvMaps/Frame/MI_MapFrame002_Iron.MI_MapFrame002_Iron");
+inline const TCHAR* const Frame002WoodSlot = TEXT("M_MapFrame002_Wood");
+inline const TCHAR* const Frame002IronSlot = TEXT("M_MapFrame002_Iron");
+constexpr double Frame002SegmentUU = 157.0;         // straight module length (frame-params.json modules.segment_uu)
+constexpr double Frame002CornerLegUU = 53.1666667;  // corner leg along each side from the inner map corner
+constexpr float Frame002FrameUU = 24.0f;            // the modules' wood width = the profile frameUU they need
+constexpr float Frame002IronProudUU = 2.0f;         // iron straps / rivets beyond FrameHalf (onto the ground strips)
+/** ENV-MAPS P5 track C (concept review gap 8): the procedural night backdrop of a map-image board (profile "backdrop"
+ *  block): <= 2 large unlit translucent mist planes far under the tray and one soft moon-glow card in the upper-left of
+ *  the far zoom view (K1 x 0.65). Materials built out of git by tools/art/map_surface/ue_import_map_surface.py; both
+ *  have Apply Fogging off (the night fog starts at 2900 uu and would wash them out) and light nothing (unlit, no
+ *  shadow, no GI / distance field / reflection-capture contribution). */
+inline const TCHAR* const BackdropMistMaterialPath = TEXT("/Game/EnvMaps/M_MapBackdropMist.M_MapBackdropMist");
+inline const TCHAR* const BackdropMoonMaterialPath = TEXT("/Game/EnvMaps/M_MapBackdropMoon.M_MapBackdropMoon");
+inline const TCHAR* const ParamBackdropTint = TEXT("Tint");            // vector (linear)
+inline const TCHAR* const ParamBackdropOpacity = TEXT("Opacity");      // mist: peak opacity
+inline const TCHAR* const ParamBackdropSize = TEXT("SizeUU");          // mist: plane size (x, y) uu
+inline const TCHAR* const ParamBackdropPan = TEXT("PanUU");            // mist: pan (x, y) uu per second
+inline const TCHAR* const ParamBackdropNoiseScale = TEXT("NoiseScaleUU");
+inline const TCHAR* const ParamBackdropEdgeFade = TEXT("EdgeFade");    // mist: elliptic edge fade (fraction of the radius)
+inline const TCHAR* const ParamBackdropCoverage = TEXT("Coverage");    // mist: 0 = clear .. 1 = solid
+inline const TCHAR* const ParamBackdropSeed = TEXT("Seed");
+inline const TCHAR* const ParamBackdropIntensity = TEXT("Intensity");  // moon: glow intensity
+inline const TCHAR* const ParamBackdropSoftness = TEXT("Softness");    // moon: gaussian width (fraction of the radius)
+inline const TCHAR* const ParamBackdropDiscRadius = TEXT("DiscRadius");
+inline const TCHAR* const ParamBackdropDiscIntensity = TEXT("DiscIntensity");
+constexpr int32 BackdropMaxMist = 2;
+/** Every backdrop part stays below this Z (the T2b rocky tray bottom is at about -216): the opaque tray, frame and props
+ *  are always in front of it, so the backdrop can never draw over the board. */
+constexpr float BackdropMaxZ = -250.0f;
+constexpr float BackdropMinZ = -4000.0f;
+/** Two mist layers at least this far apart in Z (no translucency sort flicker between them). */
+constexpr float BackdropMinLayerGapUU = 100.0f;
+/** The far zoom view the moon is anchored in: K1 fit / FarViewRatio (= FS08CameraZoom::OverviewOutRatio, S08ArtHud.h;
+ *  2880.2 uu on the maps), the camera of AS08FlowGameMode::SetupCameraForBoard (pitch -55, yaw -90, hfov 35, 16:9). */
+constexpr float BackdropFarViewRatio = 0.65f;
+constexpr int32 BackdropTranslucencySortPriority = -10;  // drawn before the game-layer translucents
 }  // namespace S08MapSurfaceSpec
 
 enum class ES08ZoneStroke : uint8 { Solid, Dash2, Dash3, Dash4, Dots5, Double, DashDot };
@@ -342,6 +391,50 @@ struct UNMATCHED_API FS08BoardReadabilitySpec {
   float FrameValueScaleLinear() const { return FMath::Pow(FMath::Clamp(FrameValueScaleSrgb, 0.0f, 1.0f), 2.2f); }
 };
 
+/** ENV-MAPS P5 track C (gap 9 full): the optional "mapFrame" block of a map-image board ({"kit": "frame-002"}, the
+ *  only kit; the profile's mapImage.frameUU must be the modules' 24 uu). Absent = the cube bars + ART-005 brackets. */
+struct UNMATCHED_API FS08MapFrameSpec {
+  bool bSet = false;
+  FString Kit;
+};
+
+/** One mist plane of the backdrop: the engine plane (100 uu, normal +Z) scaled to 2 x HalfUU at (CenterUU, ZUU). */
+struct UNMATCHED_API FS08BackdropMistSpec {
+  float ZUU = -400.0f;                                      // BackdropMinZ .. BackdropMaxZ
+  FVector2D CenterUU = FVector2D::ZeroVector;               // |x|, |y| <= 4000
+  FVector2D HalfUU = FVector2D(1900.0, 1350.0);             // 500 .. 8000 each
+  FLinearColor Color = FLinearColor(0.3f, 0.38f, 0.62f);    // linear, 0..4 ("colorLinear")
+  float Opacity = 0.3f;                                     // peak opacity (0, 0.8]
+  float NoiseScaleUU = 700.0f;                              // 50 .. 5000 (the largest noise octave)
+  FVector2D PanUUPerSec = FVector2D(6.0, -3.0);             // |x|, |y| <= 100 (a slow drift)
+  float EdgeFade = 0.3f;                                    // 0.05 .. 0.5 of the elliptic radius
+  float Coverage = 0.5f;                                    // 0 .. 1
+  float Seed = 0.0f;                                        // 0 .. 1000
+};
+
+/** The moon-glow card: the engine plane facing the camera (parallel to the screen) at DepthUU along the ray of
+ *  ScreenAnchor (NDC of the far zoom view: x right, y up, -1..1). */
+struct UNMATCHED_API FS08BackdropMoonSpec {
+  bool bSet = false;
+  FVector2D ScreenAnchor = FVector2D(-0.9, 0.82);
+  float DepthUU = 5200.0f;                                  // 500 .. 20000 from the far camera
+  float DiameterUU = 1800.0f;                               // 50 .. 5000
+  FLinearColor Color = FLinearColor(0.72f, 0.8f, 1.0f);     // linear, 0..4
+  float Intensity = 1.0f;                                   // (0, 50]
+  float Softness = 0.4f;                                    // 0.05 .. 1
+  float DiscRadius = 0.06f;                                 // 0 .. 0.5 of the card radius (0 = glow only)
+  float DiscIntensity = 2.0f;                               // 0 .. 50
+};
+
+/** ENV-MAPS P5 track C (gap 8): the optional "backdrop" block of a map-image board (grids reject it). Status:
+ *  предложено. Mist: 0..BackdropMaxMist layers, each below BackdropMaxZ, layers >= BackdropMinLayerGapUU apart in Z;
+ *  the moon card is optional and must also stay below BackdropMaxZ; at least one part. */
+struct UNMATCHED_API FS08BackdropSpec {
+  bool bSet = false;
+  TArray<FS08BackdropMistSpec> Mist;
+  FS08BackdropMoonSpec Moon;
+};
+
 struct UNMATCHED_API FS08BoardArtProfile {
   FString Id;
   TArray<FString> MatchBoardIds;
@@ -368,6 +461,9 @@ struct UNMATCHED_API FS08BoardArtProfile {
   static constexpr float MaxK1DistanceMul = 2.0f;
   /** ENV-MAPS P4: optional "readability" block (map-image boards only, see FS08BoardReadabilitySpec). */
   FS08BoardReadabilitySpec Readability;
+  /** ENV-MAPS P5 track C: optional "mapFrame" / "backdrop" blocks (map-image boards only). */
+  FS08MapFrameSpec MapFrame;
+  FS08BackdropSpec Backdrop;
 };
 
 /** Counts of one decoded board (what the art and the trace describe). */
@@ -542,3 +638,66 @@ UNMATCHED_API void S08LeaderPipTransforms(float RingOuterUU, float RingScale, FT
 UNMATCHED_API FTransform S08ContactShadowTransform(const FS08BoardReadabilitySpec& Spec, float RingScale);
 /** "#RRGGBB" of a colour (trace lines). */
 UNMATCHED_API FString S08ColorHex(const FColor& Color);
+
+// ---- ENV-MAPS P5 track C: heavy modular map frame + night backdrop (world-free, automation-tested) -------------
+
+enum class ES08FrameModule : uint8 { Corner, SegA, SegB, SegMid };
+UNMATCHED_API const TCHAR* S08FrameModuleName(ES08FrameModule Module);  // Corner | A | B | Mid (frame-layout.json)
+/** Asset path of a module (S08MapSurfaceSpec::Frame002*Path). */
+UNMATCHED_API const TCHAR* S08FrameModulePath(ES08FrameModule Module);
+
+struct UNMATCHED_API FS08FramePiece {
+  FString Id;            // corner-near-east, near-0 .. (frame-layout.json ids)
+  ES08FrameModule Module = ES08FrameModule::SegA;
+  FVector Location = FVector::ZeroVector;  // board-actor space, z 0 (the module meshes carry their own heights)
+  float YawDeg = 0.0f;
+  float ScaleX = 1.0f;   // segment stretch along the side (1 on both shipped maps)
+};
+
+struct UNMATCHED_API FS08FrameLayout {
+  TArray<FS08FramePiece> Pieces;
+  int32 SegmentsX = 0;   // per long side (near / far)
+  int32 SegmentsY = 0;   // per short side (east / west)
+  double StretchX = 1.0;
+  double StretchY = 1.0;
+  /** Every side fits whole modules (|stretch - 1| < 1e-5). */
+  bool bExactFit = false;
+};
+
+/** The 20 (on the shipped maps) module instances of ASSET-MAP-FRAME-002 around a map of half extent MapHalf - the C++
+ *  mirror of art/pipeline-candidates/ASSET-MAP-FRAME-002/scripts/frame_layout.py placements(): 4 corners (pivot = the
+ *  inner map corner; yaw 0 near-east, 90 near-west, 180 far-west, -90 far-east), then per side (near yaw 0 from -X,
+ *  far yaw 180 from +X, east yaw -90 from +Y, west yaw 90 from -Y) round(fill / SegmentUU) segments from the corner leg
+ *  on (fill = side - 2 x CornerLegUU), the middle one of an odd count 'Mid', the others alternating A / B (A first on
+ *  near / far, B first on east / west). Another map size gets the nearest count and ScaleX = the stretch. */
+UNMATCHED_API FS08FrameLayout S08MapFrame002Layout(const FVector2D& MapHalf,
+                                                   double SegmentUU = S08MapSurfaceSpec::Frame002SegmentUU,
+                                                   double CornerLegUU = S08MapSurfaceSpec::Frame002CornerLegUU);
+
+/** The K1 camera of AS08FlowGameMode::SetupCameraForBoard at a distance: location (0, D cos 55, D sin 55), pitch -55,
+ *  yaw -90 (looks along -Y; screen right = +X, screen up = far = -Y), horizontal fov 35, 16:9. */
+struct UNMATCHED_API FS08BoardView {
+  FVector Location = FVector::ZeroVector;
+  FVector Forward = FVector::ForwardVector;
+  FVector Right = FVector::RightVector;
+  FVector Up = FVector::UpVector;
+  double HalfTanH = 0.0;
+  double HalfTanV = 0.0;
+  static FS08BoardView AtDistance(double DistanceUU);
+  /** World point -> NDC (x right, y up); false behind the camera. */
+  bool Project(const FVector& World, FVector2D& OutNdc) const;
+  /** Unit ray through an NDC point. */
+  FVector Ray(const FVector2D& Ndc) const;
+};
+
+/** Far zoom distance of a map: S08K1FitDistanceUU(MapHalf) / BackdropFarViewRatio (2880.2 uu on the shipped maps). */
+UNMATCHED_API double S08BackdropFarViewDistanceUU(const FVector2D& MapHalf);
+/** Mist plane transform (engine plane, 100 uu, normal +Z, UV 0..1 over the plane). */
+UNMATCHED_API FTransform S08BackdropMistTransform(const FS08BackdropMistSpec& Mist);
+/** Moon card transform: centre on the far view's ray through ScreenAnchor at DepthUU, normal towards the camera
+ *  (-Forward: parallel to the screen), scale DiameterUU / 100. OutTopZ = the highest Z of the card (its corners). */
+UNMATCHED_API FTransform S08BackdropMoonTransform(const FS08BackdropMoonSpec& Moon, const FVector2D& MapHalf,
+                                                  double* OutTopZ = nullptr);
+/** Empty when every part of the backdrop stays below S08MapSurfaceSpec::BackdropMaxZ (the board is always in front of
+ *  it) and the mist layers are BackdropMinLayerGapUU apart; else the reason (the parser rejects the board). */
+UNMATCHED_API FString S08BackdropPlacementProblem(const FS08BackdropSpec& Spec, const FVector2D& MapHalf);

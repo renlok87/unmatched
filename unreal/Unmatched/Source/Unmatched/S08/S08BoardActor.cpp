@@ -3,6 +3,7 @@
 #include "S08ArtPreviewMedusa.h"
 #include "S08Diorama.h"
 #include "S08FighterActor.h"
+#include "S08MapBackdrop.h"
 #include "S08Render.h"
 #include "S08TraceLog.h"
 #include "Components/BoxComponent.h"
@@ -558,6 +559,7 @@ void AS08BoardActor::ClearArtSurface() {
     if (Part) Part->DestroyComponent();
   }
   ArtSurfaceParts.Reset();
+  ClearMapFrameParts();  // ENV-MAPS P5: the frame modules of a map-image board (always empty on grids)
 }
 
 void AS08BoardActor::AddArtSurfacePart(UMaterialInterface* Material, const FTransform& Transform) {
@@ -892,21 +894,24 @@ void AS08BoardActor::PlaceDioramaTray(bool bVisible, const FVector2D& BoardHalf,
 bool AS08BoardActor::PlaceDioramaTrayT2(const FVector2D& FrameHalf, const FVector2D& LayoutHalf, float OffsetY,
                                         const TCHAR* Source) {
   if (!DioramaTray) return false;
+  const FString MapName = ActiveProfile.Map.Name;  // "" in a profile-less test world -> the shared MI
   if (!bTrayT2Tried) {
-    // Loaded on the first map-image board only: a run that never shows a map loads nothing new.
+    // Loaded on the first map-image board only: a run that never shows a map loads nothing new. P5 track B: the
+    // chunky T2b when it is in the build, else T2 (S08Diorama::LoadTrayT2), else the T1 placeholder below.
     bTrayT2Tried = true;
-    TrayT2Mesh = LoadObject<UStaticMesh>(nullptr, S08Diorama::T2MeshPath);
-    TrayT2Mi = LoadObject<UMaterialInterface>(nullptr, S08Diorama::T2MaterialPath);
-    FS08Trace::Write(FString::Printf(
-        TEXT("ARTPREVIEW diorama tray-t2 %s mesh=%s mi=%s%s"), TrayT2Mesh ? TEXT("loaded") : TEXT("absent"),
-        S08Diorama::T2MeshPath, TrayT2Mi ? *TrayT2Mi->GetName() : TEXT("missing(mesh default)"),
-        TrayT2Mesh ? TEXT("") : TEXT(" (import: tools/art/env_kit/ue_import_tray_t2.py) -> T1 placeholder")));
+    const S08Diorama::FTrayT2Assets Assets = S08Diorama::LoadTrayT2(MapName);
+    TrayT2Mesh = Assets.Mesh;
+    TrayT2Mi = Assets.Material;
+    FS08Trace::Write(S08Diorama::TrayT2LoadTraceLine(Assets));
   }
   if (!TrayT2Mesh) return false;
-  if (DioramaTray->GetStaticMesh() != TrayT2Mesh) {
-    DioramaTray->SetStaticMesh(TrayT2Mesh);
-    DioramaTray->SetMaterial(0, TrayT2Mi);  // nullptr = the mesh's own material
-  }
+  // T2b: the map's MI (MI_TableBase_T2b_<Map>: Marmoreal moss + petals / Sarpedon damp rock) when imported, else the
+  // shared one; T2: MI_TableBase_T2 (nullptr = the mesh's own material)
+  UMaterialInterface* MapMi =
+      S08Diorama::LoadTrayT2Material(S08Diorama::TrayT2KindOf(TrayT2Mesh), MapName);
+  if (!MapMi) MapMi = TrayT2Mi;
+  if (DioramaTray->GetStaticMesh() != TrayT2Mesh) DioramaTray->SetStaticMesh(TrayT2Mesh);
+  if (DioramaTray->GetMaterial(0) != MapMi) DioramaTray->SetMaterial(0, MapMi);
   float MismatchUU = 0.0f;
   const S08Diorama::FTrayFit Fit = S08Diorama::FitTrayT2(LayoutHalf, OffsetY, MismatchUU);
   DioramaTray->SetRelativeLocationAndRotation(FVector(Fit.Location.X, Fit.Location.Y, 0.0),
@@ -920,11 +925,12 @@ bool AS08BoardActor::PlaceDioramaTrayT2(const FVector2D& FrameHalf, const FVecto
   // Same leading fields as the T1 line (topZ = the flat top, boardHalf = the map frame, rimUU = the narrowest apron
   // from the frame to the tray edge), then the T2 fields; no waiver: the mesh is placed at scale 1.
   FS08Trace::Write(FString::Printf(
-      TEXT("ARTPREVIEW diorama tray=%s mi=%s surface=%s yaw=%.1f scale=%.3fx%.3fx%.3f bounds=(%.1f,%.1f,%.1f)..(%.1f,%.1f,%.1f) size=%.1fx%.1fx%.1f topZ=%.1f boardHalf=%.1fx%.1f rimUU=%.1f collision=none kind=T2 topHalf=%.1fx%.1f layoutHalf=%.1fx%.1f offset=(%.1f,%.1f) source=%s mismatchUU=%.1f match=%d anisotropy=%.3f lipTopZ=%.1f lipBandUU=%.1f"),
+      TEXT("ARTPREVIEW diorama tray=%s mi=%s surface=%s yaw=%.1f scale=%.3fx%.3fx%.3f bounds=(%.1f,%.1f,%.1f)..(%.1f,%.1f,%.1f) size=%.1fx%.1fx%.1f topZ=%.1f boardHalf=%.1fx%.1f rimUU=%.1f collision=none kind=%s topHalf=%.1fx%.1f layoutHalf=%.1fx%.1f offset=(%.1f,%.1f) source=%s mismatchUU=%.1f match=%d anisotropy=%.3f lipTopZ=%.1f lipBandUU=%.1f"),
       *TrayT2Mesh->GetPathName(), Mi ? *Mi->GetName() : TEXT("-"), S08BoardSurfaceName(ES08BoardSurface::MapImage),
       Fit.YawDeg, Fit.Scale.X, Fit.Scale.Y, Fit.Scale.Z, Box.Min.X, Box.Min.Y, Box.Min.Z, Box.Max.X, Box.Max.Y,
       Box.Max.Z, Size.X, Size.Y, Size.Z, S08Diorama::TopZ, FrameHalf.X, FrameHalf.Y,
-      S08Diorama::T2MinApronUU(FrameHalf, OffsetY), Fit.WorldHalf.X, Fit.WorldHalf.Y, LayoutHalf.X, LayoutHalf.Y,
+      S08Diorama::T2MinApronUU(FrameHalf, OffsetY),
+      S08Diorama::TrayT2KindName(S08Diorama::TrayT2KindOf(TrayT2Mesh)), Fit.WorldHalf.X, Fit.WorldHalf.Y, LayoutHalf.X, LayoutHalf.Y,
       Fit.Location.X, Fit.Location.Y, Source, MismatchUU, bMatch, Fit.Anisotropy(), Box.Max.Z, S08Diorama::T2RimUU));
   if (!bMatch) {
     FS08Trace::Write(FString::Printf(
@@ -937,6 +943,8 @@ bool AS08BoardActor::PlaceDioramaTrayT2(const FVector2D& FrameHalf, const FVecto
 void AS08BoardActor::UpdateDioramaTray(const FS08BoardModel& Board) {
   // ENV-MAPS track C: the environment first (it does not need the tray mesh; its layout may carry the tray extents).
   UpdateEnvLayout();
+  // ENV-MAPS P5 track C: the night backdrop under the tray (same env gate; a no-op on grid-only runs).
+  UpdateBackdrop();
   if (!DioramaTray) return;
   if (!bArtActive) {
     PlaceDioramaTray(false, FVector2D::ZeroVector, TEXT("grey"));
@@ -1816,6 +1824,10 @@ void AS08BoardActor::BuildMapImageSurface(const FS08BoardModel& Board, const FS0
   TopologyLinkBars->SetVisibility(false);
   // The wooden frame of the 'tiles' surface (ArtFrameUU look: bars centred on z -3, 14 uu deep) around the map
   // and the ART-005 iron corner brackets on the map corners.
+  // ENV-MAPS P5 track C (gap 9 full): a profile "mapFrame" block replaces both with the heavy modular frame
+  // ASSET-MAP-FRAME-002 (same footprint: wood exactly to FrameHalf); not imported -> the bars + brackets below.
+  bool bFrameKit = false;
+  if (!ActiveProfile.MapFrame.bSet) MapFrameKitSource = TEXT("bars");
   if (Map.FrameUU > 0.0f) {
     const double F = Map.FrameUU;
     const double SpanX = (Size.X + 2.0 * F) / 100.0;
@@ -1823,20 +1835,25 @@ void AS08BoardActor::BuildMapImageSurface(const FS08BoardModel& Board, const FS0
     const double T = F / 100.0;
     // ENV-MAPS P4 (review gap 9, quick): a profile "frameWood" block puts the frame on the darker M_MapFrameWood.
     UMaterialInterface* FrameWood = MapFrameMaterial();
-    for (const FTransform& Bar : {
-             FTransform(FRotator::ZeroRotator, FVector(0, Half.Y + F * 0.5, FrameCentreZ), FVector(SpanX, T, 0.14)),
-             FTransform(FRotator::ZeroRotator, FVector(0, -Half.Y - F * 0.5, FrameCentreZ), FVector(SpanX, T, 0.14)),
-             FTransform(FRotator::ZeroRotator, FVector(-Half.X - F * 0.5, 0, FrameCentreZ), FVector(T, SpanY, 0.14)),
-             FTransform(FRotator::ZeroRotator, FVector(Half.X + F * 0.5, 0, FrameCentreZ), FVector(T, SpanY, 0.14))}) {
-      AddArtSurfacePart(FrameWood, Bar);
+    bFrameKit = ActiveProfile.MapFrame.bSet && BuildMapFrame002(FrameWood);
+    if (!bFrameKit) {
+      for (const FTransform& Bar : {
+               FTransform(FRotator::ZeroRotator, FVector(0, Half.Y + F * 0.5, FrameCentreZ), FVector(SpanX, T, 0.14)),
+               FTransform(FRotator::ZeroRotator, FVector(0, -Half.Y - F * 0.5, FrameCentreZ), FVector(SpanX, T, 0.14)),
+               FTransform(FRotator::ZeroRotator, FVector(-Half.X - F * 0.5, 0, FrameCentreZ), FVector(T, SpanY, 0.14)),
+               FTransform(FRotator::ZeroRotator, FVector(Half.X + F * 0.5, 0, FrameCentreZ), FVector(T, SpanY, 0.14))}) {
+        AddArtSurfacePart(FrameWood, Bar);
+      }
     }
   }
-  for (const TPair<FVector, float>& Corner : {
-           TPair<FVector, float>(FVector(Half.X, Half.Y, 0), 180),
-           TPair<FVector, float>(FVector(-Half.X, Half.Y, 0), -90),
-           TPair<FVector, float>(FVector(-Half.X, -Half.Y, 0), 0),
-           TPair<FVector, float>(FVector(Half.X, -Half.Y, 0), 90)}) {
-    ArtCorners->AddInstance(FTransform(FRotator(0, Corner.Value, 0), Corner.Key, FVector::OneVector), true);
+  if (!bFrameKit) {
+    for (const TPair<FVector, float>& Corner : {
+             TPair<FVector, float>(FVector(Half.X, Half.Y, 0), 180),
+             TPair<FVector, float>(FVector(-Half.X, Half.Y, 0), -90),
+             TPair<FVector, float>(FVector(-Half.X, -Half.Y, 0), 0),
+             TPair<FVector, float>(FVector(Half.X, -Half.Y, 0), 90)}) {
+      ArtCorners->AddInstance(FTransform(FRotator(0, Corner.Value, 0), Corner.Key, FVector::OneVector), true);
+    }
   }
   PlaceMapPickBox(MapPickBox, Half);
   const FString Mismatch = S08ExpectMismatch(ActiveProfile, Summary);
@@ -1883,6 +1900,83 @@ UMaterialInterface* AS08BoardActor::MapFrameMaterial() {
       TEXT("ARTPREVIEW map frame wood=frame-wood material=M_MapFrameWood valueScaleSrgb=%.2f valueScaleLinear=%.4f saturation=%.2f"),
       R->FrameValueScaleSrgb, R->FrameValueScaleLinear(), R->FrameSaturation));
   return MapFrameWoodMid.Get();
+}
+
+// ---- ENV-MAPS P5 track C: heavy modular map frame (gap 9 full) and night backdrop (gap 8) ------------------------
+
+void AS08BoardActor::ClearMapFrameParts() {
+  for (UStaticMeshComponent* Part : MapFrameParts) {
+    if (Part) Part->DestroyComponent();
+  }
+  MapFrameParts.Reset();
+}
+
+bool AS08BoardActor::BuildMapFrame002(UMaterialInterface* Wood) {
+  using namespace S08MapSurfaceSpec;
+  const ES08FrameModule Modules[] = {ES08FrameModule::Corner, ES08FrameModule::SegA, ES08FrameModule::SegB,
+                                     ES08FrameModule::SegMid};
+  if (!bFrame002Tried) {
+    // Loaded on the first map-image board with the block; a run that never shows one loads nothing new.
+    bFrame002Tried = true;
+    Frame002Meshes.Reset();
+    for (const ES08FrameModule Module : Modules) {
+      Frame002Meshes.Add(LoadObject<UStaticMesh>(nullptr, S08FrameModulePath(Module), nullptr, LOAD_NoWarn));
+    }
+    Frame002Iron = LoadObject<UMaterialInterface>(nullptr, Frame002IronMaterialPath, nullptr, LOAD_NoWarn);
+  }
+  TArray<FString> Missing;
+  for (int32 I = 0; I < static_cast<int32>(UE_ARRAY_COUNT(Modules)); ++I) {
+    if (!Frame002Meshes.IsValidIndex(I) || !Frame002Meshes[I]) Missing.Add(S08FrameModulePath(Modules[I]));
+  }
+  if (!Missing.IsEmpty()) {
+    MapFrameKitSource = TEXT("missing");
+    FS08Trace::Write(FString::Printf(
+        TEXT("ARTPREVIEW map frame kit=%s missing=%s (run tools/art/env_kit/ue_import_map_frame.py) -> cube bars + ART-005 corners"),
+        Frame002Kit, *FString::Join(Missing, TEXT(","))));
+    return false;
+  }
+  const FS08FrameLayout Layout = S08MapFrame002Layout(ActiveProfile.Map.HalfUU());
+  int32 Counts[4] = {0, 0, 0, 0};
+  int32 WoodByName = 0, IronSlots = 0;
+  for (const FS08FramePiece& P : Layout.Pieces) {
+    UStaticMesh* Mesh = Frame002Meshes[static_cast<int32>(P.Module)];
+    // Unique names: a map-image board shown again after a grid must not reuse a destroyed component's name.
+    UStaticMeshComponent* Part = NewObject<UStaticMeshComponent>(
+        this, MakeUniqueObjectName(this, UStaticMeshComponent::StaticClass(), FName(*(TEXT("MapFrame_") + P.Id))));
+    Part->SetupAttachment(RootComponent);
+    Part->SetStaticMesh(Mesh);
+    Part->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    Part->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+    Part->SetGenerateOverlapEvents(false);
+    Part->SetCanEverAffectNavigation(false);
+    Part->SetRelativeTransform(FTransform(FRotator(0.0f, P.YawDeg, 0.0f), P.Location, FVector(P.ScaleX, 1.0, 1.0)));
+    // Slots by name (SegA / SegB carry no iron faces; the FBX may still list the slot): the wood takes the profile's
+    // frame wood (the M_MapFrameWood MID of "frameWood", else the probe wood), the iron keeps / gets its MI.
+    const int32 WoodIndex = Part->GetMaterialIndex(FName(Frame002WoodSlot));
+    WoodByName += WoodIndex != INDEX_NONE ? 1 : 0;
+    if (Wood) Part->SetMaterial(WoodIndex != INDEX_NONE ? WoodIndex : 0, Wood);
+    const int32 IronIndex = Part->GetMaterialIndex(FName(Frame002IronSlot));
+    if (IronIndex != INDEX_NONE) {
+      ++IronSlots;
+      if (Frame002Iron) Part->SetMaterial(IronIndex, Frame002Iron);
+    }
+    Part->RegisterComponent();
+    MapFrameParts.Add(Part);
+    ++Counts[static_cast<int32>(P.Module)];
+  }
+  MapFrameKitSource = Frame002Kit;
+  FS08Trace::Write(FString::Printf(
+      TEXT("ARTPREVIEW map frame kit=%s parts=%d corner=%d a=%d b=%d mid=%d segments=%dx%d stretch=%.6fx%.6f exactFit=%d woodSlots=%d/%d ironSlots=%d wood=%s iron=%s ironProudUU=%.1f replaces=bars+corners"),
+      Frame002Kit, MapFrameParts.Num(), Counts[0], Counts[1], Counts[2], Counts[3], Layout.SegmentsX, Layout.SegmentsY,
+      Layout.StretchX, Layout.StretchY, Layout.bExactFit ? 1 : 0, WoodByName, MapFrameParts.Num(), IronSlots,
+      Wood ? *Wood->GetName() : TEXT("-"), Frame002Iron ? *Frame002Iron->GetName() : TEXT("mesh-default"),
+      Frame002IronProudUU));
+  return true;
+}
+
+void AS08BoardActor::UpdateBackdrop() {
+  S08MapBackdrop::Update(bEnvLayoutEnabled && bArtActive && bMapImageActive, ActiveProfile.Id, ActiveProfile.Backdrop,
+                         ActiveProfile.Map.HalfUU(), *this, RootComponent, PlaneMesh, BackdropParts, BackdropRuntime);
 }
 
 void AS08BoardActor::ApplyFighterReadability(AS08FighterActor* Actor, const FS08BoardFighter& Fighter,
