@@ -141,6 +141,18 @@ compare them and keep verified local backups before integrating; never reset, cl
 blindly stash the entire project, or overwrite unrelated user work.
 Local integration is authorized; remote pushes are not implied by this instruction.
 
+Parallel sessions (user request 2026-10-01: «мне нужно чтобы два окна не сломались при мержде в
+ветку fix/admin-panel»): one session works in the main checkout on `fix/admin-panel`, others in
+worktrees on feature branches. A worktree session integrates ONLY through
+`tools/git/safe-integrate.sh <branch> --apply` (run the dry run first): it requires that the
+branch already contains the latest `fix/admin-panel` (merge it in, rebuild and test first), that
+the main checkout has no git operation in progress and nothing staged, that no incoming file has
+uncommitted or untracked work in the main checkout, and that no UnrealEditor/UBT/packaged client
+of the main checkout is running when `unreal/` changes; then it fast-forwards. The main-checkout
+session commits its own work promptly (never leaves changes staged) and, after an integration
+that touched `unreal/`, rebuilds UnmatchedEditor before opening the editor. Neither session
+merges the other's branch by hand, stashes, resets or edits the other's uncommitted files.
+
 ## Agent and process lifecycle
 
 Keep only the sessions needed for the current task. Do not launch a large pool of
