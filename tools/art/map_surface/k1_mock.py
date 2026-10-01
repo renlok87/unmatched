@@ -6,10 +6,15 @@ Camera = AS08FlowGameMode::SetupCameraForBoard: horizontal FOV 35 deg at 16:9, p
 yaw -90 (looks along -Y), located at (0, D cos55, D sin55), optical axis through the origin.
 The illustration is laid flat and upright: source pixel (x, y) -> X = (x/1337 - 0.5) * 891.33,
 Y = (y/866 - 0.5) * 577.33 (2/3 uu per source px), i.e. image top = far edge.
+D: s08_fit_distance is the board FIT (1872.156 uu for the map canvas; the mocks of build_map_textures.py and
+manifest.<key>.json k1.camera stay at this fit). Since ENV-U9 the game's K1 overview is the fit x the board
+profile's "k1DistanceMul" (s08_overview_distance, k1_distance_mul: 1.25 on both map-image boards -> 2340.195 uu).
 """
 from __future__ import annotations
 
+import json
 import math
+from pathlib import Path
 
 import numpy as np
 from scipy import ndimage
@@ -17,16 +22,42 @@ from scipy import ndimage
 CAM = {"hfov_deg": 35.0, "aspect": 16.0 / 9.0, "pitch_deg": 55.0, "yaw_deg": -90.0,
        "fit_margin_uu": 60.0, "fit_mul": 1.12}
 KEY_LIGHT_ROT = (-55.0, 30.0, 0.0)  # S08 key (pitch, yaw, roll), pinned by S08BoardArtTests
+# The board profiles the game reads (FS08BoardArtProfile::K1DistanceMul): the single source of k1DistanceMul.
+PROFILES = Path(__file__).resolve().parents[3] / "unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json"
+K1_MUL_RANGE = (1.0, 2.0)  # FS08BoardArtProfile::MinK1DistanceMul / MaxK1DistanceMul (the parser rejects the rest)
 
 
 def s08_fit_distance(extent_x: float, extent_y: float) -> float:
-    """SetupCameraForBoard formula with board half extents (uu)."""
+    """SetupCameraForBoard fit formula (S08K1FitDistanceUU) with board half extents (uu)."""
     half_h = math.tan(math.radians(CAM["hfov_deg"] / 2))
     half_v = half_h / CAM["aspect"]
     sp, m = math.sin(math.radians(CAM["pitch_deg"])), CAM["fit_margin_uu"]
     need_v = (extent_y * sp + m) / half_v
     need_h = (extent_x + m) / half_h
     return max(need_v, need_h) * CAM["fit_mul"]
+
+
+def k1_distance_mul(board_id: str, profiles: Path | None = None) -> float:
+    """ENV-U9: "k1DistanceMul" of the board profile whose match.boardIds holds board_id (1.0 when the profile has
+    none, as FS08BoardArtProfile). AS08FlowGameMode::SetupCameraForBoard applies it while that profile is active.
+    ValueError when no profile matches or the value is outside K1_MUL_RANGE (the UE parser rejects the document)."""
+    doc = json.loads((profiles or PROFILES).read_text(encoding="utf-8"))
+    for board in doc.get("boards", []):
+        if board_id in ((board.get("match") or {}).get("boardIds") or []):
+            mul = board.get("k1DistanceMul", 1.0)
+            if isinstance(mul, bool) or not isinstance(mul, (int, float)) or \
+                    not K1_MUL_RANGE[0] <= float(mul) <= K1_MUL_RANGE[1]:
+                raise ValueError(f"board {board.get('id')}: k1DistanceMul {mul!r} is not a number in {K1_MUL_RANGE}")
+            return float(mul)
+    raise ValueError(f"no board profile matches board id {board_id!r} in {profiles or PROFILES}")
+
+
+def s08_overview_distance(extent_x: float, extent_y: float, k1_mul: float = 1.0) -> float:
+    """ENV-U9: the K1 overview (S08K1OverviewDistanceUU) = s08_fit_distance x k1DistanceMul; 1.0 = the fit itself.
+    The camera rig keeps its zoom ratios relative to this overview, its near limit at 300 uu and its far limit at
+    fit / 0.65 (FS08CameraZoom; tools/art/env_kit/layout_check.py camera_set mirrors it)."""
+    fit = s08_fit_distance(extent_x, extent_y)
+    return fit if k1_mul == 1.0 else fit * k1_mul
 
 
 class Camera:

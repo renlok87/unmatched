@@ -1,0 +1,243 @@
+{
+ "schema": "unmatched.env-ground-params/1",
+ "decision": "ENV-U10 (user, 2026-09-30): themed CC0 ground between the map frame and the tray edge - Marmoreal: marble paving by the palace + dark earth with petals; Sarpedon: forest floor, sand, ship deck planks under the ship, pebbles at the river mouth. ENV-U5: only the downloaded CC0 sets (no new downloads).",
+ "tools": {
+  "splat": "tools/art/env_kit/ground_splat.py (splat masks + previews + layout 'ground' sections)",
+  "import": "tools/art/env_kit/ue_import_env_ground.py (--prep: CC0 -> 2K BC/N/ORMH staging PNGs; UE: textures, M_EnvGround, MI_EnvGround_<Map>)"
+ },
+ "cc0Raw": "C:/Users/ren/WebstormProjects/unmached/unmached/art/material-library/cc0-raw",
+ "tray": {
+  "halfX": 780.0,
+  "halfY": 470.0,
+  "offsetY": -45.0,
+  "source": "P2 shared tray of both maps (track TRAY default; C:/tmp/envmaps-research/p2/tray-extents.json). ground_splat.py warns when that file or a layout tray disagrees."
+ },
+ "splat": {
+  "size": [
+   1024,
+   512
+  ],
+  "marginUU": 40.0,
+  "roundUU": 10.0,
+  "note": "RGBA8, linear. R/G/B = coverage of layers L1/L2/L3 stacked over the base L0 (L3 on top), A = accent density (Marmoreal petals, Sarpedon wetness). The texture covers splatRect = tray rect (union of this tray and the layout tray) + marginUU, rounded outward; row 0 = the far side (-Y), column 0 = -X."
+ },
+ "ground": {
+  "mode": "runtime",
+  "materialRoot": "/Game/EnvKit/Ground",
+  "z": -1.0,
+  "frameOverlapUU": 2.0,
+  "insetUU": 0.0
+ },
+ "material": {
+  "graphVersion": "1",
+  "heightContrast": 0.25,
+  "normalStrength": 1.0,
+  "macroStrength": 0.14,
+  "macroScaleUU": 240.0,
+  "specular": 0.4,
+  "note": "heightBlend per layer L1..L3 (0..1) scales how much the layer's height shapes its border; accent.carpet = the pink carpet strength under dense petals (petals mode only)"
+ },
+ "sets": {
+  "Tiles143": {
+   "rotate90": false,
+   "note": "square travertine tiles (beige) - desaturated to pale marble paving"
+  },
+  "Ground076": {
+   "rotate90": false,
+   "note": "earth with needles - darkened / desaturated"
+  },
+  "Moss002": {
+   "rotate90": false,
+   "note": "moss / forest floor"
+  },
+  "Grass005": {
+   "rotate90": false,
+   "note": "short grass"
+  },
+  "Ground055S": {
+   "rotate90": false,
+   "note": "fine sand"
+  },
+  "Planks023A": {
+   "rotate90": true,
+   "note": "deck planks; rotated 90 deg in the staging (image + DirectX normal XY) so the planks run along board +Y, parallel to the hull line"
+  },
+  "Gravel021": {
+   "rotate90": false,
+   "note": "pebbles"
+  }
+ },
+ "maps": {
+  "marmoreal": {
+   "layers": [
+    {
+     "slot": "L0",
+     "set": "Ground076",
+     "role": "dark earth (base; the cherry beds under a carpet of petals)",
+     "tileUU": 160.0,
+     "tint": [
+      0.4,
+      0.36,
+      0.34
+     ],
+     "saturation": 0.45
+    },
+    {
+     "slot": "L1",
+     "channel": "R",
+     "set": "Moss002",
+     "role": "moss under the cherries, round the cypresses, along the tray rim and the paving edge",
+     "tileUU": 220.0,
+     "tint": [
+      0.5,
+      0.58,
+      0.45
+     ],
+     "saturation": 0.6,
+     "heightBlend": 1.0
+    },
+    {
+     "slot": "L2",
+     "channel": "G",
+     "set": "Grass005",
+     "role": "grass tufts in the outer W / E beds",
+     "tileUU": 140.0,
+     "tint": [
+      0.42,
+      0.5,
+      0.4
+     ],
+     "saturation": 0.6,
+     "heightBlend": 1.0
+    },
+    {
+     "slot": "L3",
+     "channel": "B",
+     "set": "Tiles143",
+     "role": "marble paving: palace terrace N, walkway round the frame, lamp / plinth pads",
+     "tileUU": 200.0,
+     "tint": [
+      0.48,
+      0.5,
+      0.56
+     ],
+     "saturation": 0.25,
+     "heightBlend": 1.0
+    }
+   ],
+   "accent": {
+    "mode": "petals",
+    "channel": "A",
+    "color": [
+     0.87,
+     0.4,
+     0.51
+    ],
+    "opacity": 0.95,
+    "petalSizeUU": 7.0,
+    "roughness": 0.6,
+    "carpet": 0.55
+   },
+   "grade": {
+    "ev": -1.0,
+    "saturation": 0.7,
+    "tint": [
+     0.9317,
+     1.0042,
+     1.1595
+    ]
+   }
+  },
+  "sarpedon": {
+   "layers": [
+    {
+     "slot": "L0",
+     "set": "Moss002",
+     "role": "forest floor (base; W / NW)",
+     "tileUU": 200.0,
+     "tint": [
+      0.42,
+      0.45,
+      0.33
+     ],
+     "saturation": 0.5
+    },
+    {
+     "slot": "L1",
+     "channel": "R",
+     "set": "Ground055S",
+     "role": "sand: beach N-centre, river banks, fire clearings",
+     "tileUU": 250.0,
+     "tint": [
+      0.62,
+      0.51,
+      0.37
+     ],
+     "saturation": 1.0,
+     "heightBlend": 0.3
+    },
+    {
+     "slot": "L2",
+     "channel": "G",
+     "set": "Gravel021",
+     "role": "pebbles: both river channels (mouth N, waterfall exit S), fort rubble",
+     "tileUU": 160.0,
+     "tint": [
+      1.25,
+      1.25,
+      1.3
+     ],
+     "saturation": 0.7,
+     "heightBlend": 1.0
+    },
+    {
+     "slot": "L3",
+     "channel": "B",
+     "set": "Planks023A",
+     "role": "ship deck planks: E band under the hull and cannons, quay N-E and S-E",
+     "tileUU": 105.0,
+     "tint": [
+      1.1,
+      0.95,
+      0.8
+     ],
+     "saturation": 1.0,
+     "heightBlend": 0.4
+    }
+   ],
+   "accent": {
+    "mode": "wet",
+    "channel": "A",
+    "color": [
+     0.55,
+     0.55,
+     0.6
+    ],
+    "opacity": 0.85,
+    "petalSizeUU": 0.0,
+    "roughness": 0.2,
+    "carpet": 0.0
+   },
+   "grade": {
+    "ev": -1.0,
+    "saturation": 0.7,
+    "tint": [
+     0.9317,
+     1.0042,
+     1.1595
+    ]
+   },
+   "river": {
+    "source": "measured on the map illustration (scraped-data/images/maps/sarpedon.webp, out of git): water runs x at the map edges, board uu",
+    "farEdgeX": [
+     110.0,
+     240.0
+    ],
+    "nearEdgeX": [
+     -227.0,
+     -44.0
+    ]
+   }
+  }
+ }
+}

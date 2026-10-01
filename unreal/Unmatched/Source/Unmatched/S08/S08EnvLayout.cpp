@@ -293,6 +293,15 @@ bool FS08EnvLayout::ParseJson(const FString& Text, TArray<FString>& OutErrors) {
       }
     }
   }
+  if (Root->HasField(TEXT("ground"))) {
+    // ENV-U10 themed ground (S08EnvGround.h): optional; when present it must be valid like every other section.
+    const TSharedPtr<FJsonObject>* GroundObj = nullptr;
+    if (!Root->TryGetObjectField(TEXT("ground"), GroundObj) || !GroundObj || !GroundObj->IsValid()) {
+      OutErrors.Add(TEXT("ground is not an object"));
+    } else {
+      S08EnvGround::ParseJson(*GroundObj, Ground, OutErrors);
+    }
+  }
   Root->TryGetStringField(TEXT("notes"), Notes);
   return OutErrors.Num() == Before;
 }
@@ -599,12 +608,13 @@ void Update(const FS08EnvLayoutRequest& Request, AActor& Owner, USceneComponent*
   if (!Request.bEnabled || !Request.bMapImageActive) {
     // A board change away from a map-image board (or the gate went off): nothing of the environment stays. A grid
     // board that never had one writes nothing at all.
-    if (Runtime.bApplied || Props.Num() > 0 || Lights.Num() > 0) {
+    if (Runtime.bApplied || Props.Num() > 0 || Lights.Num() > 0 || Runtime.Ground.Num() > 0) {
       const int32 P = Props.Num(), L = Lights.Num();
       Clear(Props, Lights);
-      FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW envlayout off map=%s reason=%s clearedProps=%d clearedLights=%d"),
+      const int32 G = S08EnvGround::Clear(Runtime.Ground);
+      FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW envlayout off map=%s reason=%s clearedProps=%d clearedLights=%d clearedGround=%d"),
                                        Runtime.MapKey.IsEmpty() ? TEXT("-") : *Runtime.MapKey,
-                                       !Request.bEnabled ? TEXT("gate-off") : TEXT("no-map-image-board"), P, L));
+                                       !Request.bEnabled ? TEXT("gate-off") : TEXT("no-map-image-board"), P, L, G));
     }
     Runtime = FS08EnvLayoutRuntime();
     return;
@@ -624,6 +634,7 @@ void Update(const FS08EnvLayoutRequest& Request, AActor& Owner, USceneComponent*
     return;  // the same layout bytes on the same board again: the components (or the traced failure) stay as they are
   }
   Clear(Props, Lights);
+  S08EnvGround::Clear(Runtime.Ground);  // before the reset below forgets them
   Runtime = FS08EnvLayoutRuntime();
   Runtime.bApplied = true;
   Runtime.Key = Key;
@@ -666,6 +677,16 @@ void Update(const FS08EnvLayoutRequest& Request, AActor& Owner, USceneComponent*
     }
   }
   Runtime.Stats = Spawn(Layout, Owner, Parent, Request.MapHalf, TrayTop, Props, Lights);
+  if (Layout.Ground.bSet) {
+    // ENV-U10: the themed ground on the same tray top rectangle the diorama tray is placed with (ApplyTray / TrayFit).
+    Runtime.GroundStats =
+        S08EnvGround::Spawn(Layout.Ground, Owner, Parent, TrayTop, Request.FrameHalf, Runtime.Ground);
+    const FString GroundLine = S08EnvGround::TraceLine(Request.MapKey, Layout.Ground, Runtime.GroundStats);
+    if (Runtime.GroundStats.Status != TEXT("ok")) {
+      UE_LOG(LogTemp, Display, TEXT("%s (import: tools/art/env_kit/ue_import_env_ground.py)"), *GroundLine);
+    }
+    FS08Trace::Write(GroundLine);
+  }
   const FS08EnvSpawnStats& S = Runtime.Stats;
   const int32 Combined = Request.ProfilePointLights + S.Lights;
   const FString Tail = FString::Printf(
@@ -698,6 +719,32 @@ bool ApplyTray(const FS08EnvLayoutRuntime& Runtime, const FVector2D& FrameHalf, 
                                      *Runtime.MapKey, *Reason));
   }
   return bOk;
+}
+
+bool ApplyTrayT2(const FS08EnvLayoutRuntime& Runtime, const FVector2D& FrameHalf, FVector2D& InOutHalf,
+                 float& InOutOffsetY, FString& OutSource) {
+  if (!Runtime.bApplied || !Runtime.bLayoutValid) return false;
+  FVector2D Half, Offset;
+  FString Source, Reason;
+  if (!TrayFit(Runtime.Layout, FrameHalf, Half, Offset, Source, Reason)) {
+    if (Runtime.Layout.Tray.bSet || Runtime.Layout.Apron.bSet) {
+      FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW envlayout tray map=%s mesh=T2 source=default refused=%s"),
+                                       *Runtime.MapKey, *Reason));
+    }
+    return false;
+  }
+  // TrayFit inverted S08Diorama::FitTray; the forward fit is the layout's outer tray (halfX x halfY at (0, offsetY)).
+  const S08Diorama::FTrayFit Outer = S08Diorama::FitTray(Half, Offset);
+  float MismatchUU = 0.0f;
+  S08Diorama::FitTrayT2(Outer.WorldHalf, static_cast<float>(Offset.Y), MismatchUU);
+  InOutHalf = Outer.WorldHalf;
+  InOutOffsetY = static_cast<float>(Offset.Y);
+  OutSource = Source;
+  FS08Trace::Write(FString::Printf(
+      TEXT("ARTPREVIEW envlayout tray map=%s source=%s outerHalf=%.1fx%.1f offsetY=%.1f frameHalf=%.1fx%.1f mesh=T2 t2Top=%.1fx%.1f mismatchUU=%.1f"),
+      *Runtime.MapKey, *Source, Outer.WorldHalf.X, Outer.WorldHalf.Y, Offset.Y, FrameHalf.X, FrameHalf.Y,
+      S08Diorama::T2TopHalfX, S08Diorama::T2TopHalfY, MismatchUU));
+  return true;
 }
 
 }  // namespace S08EnvLayout

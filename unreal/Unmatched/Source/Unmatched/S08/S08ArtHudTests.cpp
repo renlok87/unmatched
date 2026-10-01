@@ -7,6 +7,7 @@
 #if WITH_AUTOMATION_TESTS
 
 #include "S08ArtHud.h"
+#include "S08BoardArt.h"
 #include "S08BoardModel.h"
 #include "S08FighterActor.h"
 #include "Components/CapsuleComponent.h"
@@ -91,6 +92,75 @@ bool FS08ArtHudZoomWheelTest::RunTest(const FString&) {
   Step = Zoom.Wheel(-1);
   TestTrue("second notch out clamps at overview/0.65", Step.bClamped && Step.Limit == ES08ZoomLimit::Far &&
                                                            FMath::IsNearlyEqual(Step.To, OverviewCobble / 0.65f, 0.01f));
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08ArtHudZoomMapOverviewTest,
+    "Unmatched.S08.ArtHud.Zoom ENV-U9 map overview: fit x 1.25 = 2340, near 300 uu, far fit/0.65 = 0.8125x, follow one notch in",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08ArtHudZoomMapOverviewTest::RunTest(const FString&) {
+  // The map canvas of Marmoreal / Sarpedon (1337 x 866 px at 2/3 uu per px, halved) and its profile's k1DistanceMul.
+  const FVector2D MapHalf(445.66667, 288.66667);
+  const float Fit = S08K1FitDistanceUU(MapHalf);
+  const float Overview = S08K1OverviewDistanceUU(Fit, 1.25f);
+  TestTrue(FString::Printf(TEXT("map fit %.3f = 1872.156 +- 0.5"), Fit), FMath::Abs(Fit - 1872.156f) <= 0.5f);
+  TestTrue(FString::Printf(TEXT("map overview %.3f = fit x 1.25 = 2340.195 +- 0.5"), Overview),
+           FMath::IsNearlyEqual(Overview, Fit * 1.25f) && FMath::Abs(Overview - 2340.195f) <= 0.5f);
+  FS08CameraZoom Zoom;
+  Zoom.Reset(Overview, Fit);
+  TestTrue("starts at the overview", Zoom.Current == Overview && Zoom.Target == Overview && Zoom.Fit == Fit);
+  TestEqual("nearest = the absolute MinDistanceUU", Zoom.MinDistance(), 300.0f);
+  TestTrue(FString::Printf(TEXT("farthest %.2f = fit / 0.65 = 2880.2 (as before ENV-U9)"), Zoom.MaxDistance()),
+           FMath::IsNearlyEqual(Zoom.MaxDistance(), Fit / 0.65f, 0.01f) && FMath::Abs(Zoom.MaxDistance() - 2880.24f) <= 0.5f);
+  TestTrue(FString::Printf(TEXT("far zoom %.4f = 0.65 x 1.25 = 0.8125 of the new overview"), Zoom.ZoomOf(Zoom.MaxDistance())),
+           FMath::IsNearlyEqual(Zoom.ZoomOf(Zoom.MaxDistance()), 0.8125f, 1e-4f));
+  TestTrue(FString::Printf(TEXT("near zoom %.3f = 2340.2 / 300 = 7.80"), Zoom.ZoomOf(Zoom.MinDistance())),
+           FMath::IsNearlyEqual(Zoom.ZoomOf(Zoom.MinDistance()), Overview / 300.0f, 1e-4f));
+  TestFalse("the overview does not follow", Zoom.WantsFollow());
+  // Out: one notch (2925.2 requested) reaches the far limit, the next one is a clamp at it.
+  FS08ZoomStep Step = Zoom.Wheel(-1);
+  TestTrue(FString::Printf(TEXT("one notch out: requested %.1f -> %.1f clamped at the far limit"), Step.Requested, Step.To),
+           Step.bClamped && Step.Limit == ES08ZoomLimit::Far && FMath::IsNearlyEqual(Step.To, Fit / 0.65f, 0.01f) &&
+               FMath::IsNearlyEqual(Step.Requested, Overview * 1.25f, 0.01f));
+  Step = Zoom.Wheel(-1);
+  TestTrue("a second notch out stays at the far limit", Step.bClamped && Step.Limit == ES08ZoomLimit::Far &&
+                                                            FMath::IsNearlyEqual(Step.To, Fit / 0.65f, 0.01f));
+  // Space, then in: the first notch is the fit (the pre-ENV-U9 K1 framing) and already follows (1.25 >= 1.2).
+  Step = Zoom.ReturnToOverview();
+  TestTrue("Space -> the new overview", Step.To == Overview && !Step.bClamped);
+  Step = Zoom.Wheel(+1);
+  TestTrue(FString::Printf(TEXT("one notch in = the fit %.2f"), Step.To), FMath::IsNearlyEqual(Step.To, Fit, 0.01f) && !Step.bClamped);
+  TestTrue("zoom 1.25 of the overview follows the selection", Zoom.WantsFollow());
+  int32 Unclamped = 1;
+  for (int32 I = 0; I < 20; ++I) {
+    Step = Zoom.Wheel(+1);
+    if (Step.bClamped) break;
+    ++Unclamped;
+  }
+  TestEqual("9 notches fit before the 300 uu limit (2340.2/1.25^9 = 314.1)", Unclamped, 9);
+  TestTrue("then the absolute near limit", Step.bClamped && Step.Limit == ES08ZoomLimit::Near && Step.To == 300.0f);
+  // Flag / bench focus zoom: relative to the new overview (K2 1.6x = 1462.6 uu; the pre-ENV-U9 1170 uu is 2x).
+  Zoom.Reset(Overview, Fit);
+  FS08ZoomStep K2 = Zoom.FocusZoom(1.6f);
+  TestTrue(FString::Printf(TEXT("K2 1.6x = %.1f = overview / 1.6"), K2.To),
+           FMath::IsNearlyEqual(K2.To, Overview / 1.6f, 0.01f) && !K2.bClamped);
+  K2 = Zoom.FocusZoom(2.0f);
+  TestTrue(FString::Printf(TEXT("2x = %.1f = the pre-ENV-U9 K2 1.6x (fit / 1.6)"), K2.To),
+           FMath::IsNearlyEqual(K2.To, Fit / 1.6f, 0.01f));
+  K2 = Zoom.FocusZoom(0.5f);
+  TestTrue("a focus zoom below 1 stays at the overview", FMath::IsNearlyEqual(K2.To, Overview, 0.01f));
+  // Grids: the single-argument Reset (and Fit == Overview) is the historical rig, far limit bit for bit.
+  FS08CameraZoom Grid;
+  Grid.Reset(OverviewCobble);
+  TestTrue("grid: fit = overview", Grid.Fit == OverviewCobble);
+  TestTrue("grid: far limit = overview / 0.65", FMath::IsNearlyEqual(Grid.MaxDistance(), OverviewCobble / 0.65f, 0.01f));
+  FS08CameraZoom GridExplicit;
+  GridExplicit.Reset(OverviewCobble, OverviewCobble);
+  TestTrue("grid: an explicit fit == overview gives the same far limit", GridExplicit.MaxDistance() == Grid.MaxDistance());
+  FS08CameraZoom NoOut;
+  NoOut.Config.OverviewOutRatio = 1.0f;
+  NoOut.Reset(Overview, Fit);
+  TestTrue("out ratio 1 on a map: the far limit never comes nearer than the overview", NoOut.MaxDistance() == Overview);
   return true;
 }
 

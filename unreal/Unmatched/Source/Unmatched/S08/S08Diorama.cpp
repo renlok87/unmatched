@@ -41,4 +41,23 @@ FTrayFit FitTray(const FVector2D& BoardHalf, const FVector2D& Offset) {
   return Fit;
 }
 
+FTrayFit FitTrayT2(const FVector2D& LayoutHalf, float OffsetY, float& OutMismatchUU) {
+  // ENV-U10 T2: the mesh already IS the tray (built to the shared extents in Blender): it only moves, never scales.
+  FTrayFit Fit;
+  Fit.YawDeg = 0.0f;
+  Fit.Scale = FVector::OneVector;
+  Fit.WorldHalf = FVector2D(T2TopHalfX, T2TopHalfY);
+  Fit.Location = FVector2D(0.0, OffsetY);
+  OutMismatchUU = static_cast<float>(
+      FMath::Max(FMath::Abs(LayoutHalf.X - T2TopHalfX), FMath::Abs(LayoutHalf.Y - T2TopHalfY)));
+  return Fit;
+}
+
+float T2MinApronUU(const FVector2D& FrameHalf, float OffsetY) {
+  const double Side = T2TopHalfX - FrameHalf.X;
+  const double Far = (T2TopHalfY - OffsetY) - FrameHalf.Y;   // far edge at OffsetY - halfY (-Y)
+  const double Near = (T2TopHalfY + OffsetY) - FrameHalf.Y;  // near edge at OffsetY + halfY (+Y)
+  return static_cast<float>(FMath::Min(Side, FMath::Min(Far, Near)));
+}
+
 }  // namespace S08Diorama

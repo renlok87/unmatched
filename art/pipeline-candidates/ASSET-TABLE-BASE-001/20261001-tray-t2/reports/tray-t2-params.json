@@ -1,0 +1,64 @@
+{
+  "schema": "unmatched.table-base-t2.params/1",
+  "note": "SM_TableBase_T2 = the ONE shared rocky tray of the map boards (ENV-U10). Every number is PROPOSED (track TRAY), not an art decision. Axes of 'tray' = UE board-actor space (X right on the K1 screen, Y towards the K1 camera); the Blender build works in .blend axes (UM_FBX_v1: UE X = -blend y, UE Y = -blend x).",
+  "run_dir": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20261001-tray-t2",
+  "scratch_dir": "C:/tmp/envmaps-research/p2/tray",
+  "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+  "asset_name": "SM_TableBase_T2",
+  "material_name": "M_TableBase_T2",
+  "texture_prefix": "T_TableBase_T2",
+  "tray": {
+    "half_x_ue": 780.0,
+    "half_y_ue": 470.0,
+    "offset_y_ue": -45.0,
+    "top_z": -3.0,
+    "rim_uu": 20.0,
+    "lip_top_z_max": 2.0,
+    "overhang_max_uu": 18.0,
+    "overhang_corner_max_uu": 30.0,
+    "depth_min_uu": 120.0,
+    "depth_max_uu": 180.0,
+    "max_triangles": 30000
+  },
+  "kit": {
+    "seed": 20261001,
+    "tile_uu": 180.0,
+    "library": {"cap": 7, "block": 7, "spike": 7},
+    "side_module_lengths_uu": [150.0, 165.0, 180.0, 195.0, 210.0, 225.0],
+    "corner_variants": 2,
+    "corner_leg_uu": 120.0,
+    "core_inset_uu": 16.0,
+    "core_bottom_z": -95.0,
+    "instance_scale": [0.86, 1.16],
+    "rows": {
+      "cap":   {"out_uu": [4.0, 15.0],  "top_z": [-1.8, 1.4], "overlap_uu": [4.0, 10.0], "yaw_jitter_deg": 7.0, "gap_uu": null},
+      "block": {"out_uu": [-4.0, 8.0],  "top_z": [-34.0, -18.0], "overlap_uu": [2.0, 8.0], "yaw_jitter_deg": 9.0, "gap_uu": null},
+      "spike": {"out_uu": [-20.0, 1.0], "top_z": [-88.0, -62.0], "overlap_uu": null, "yaw_jitter_deg": 14.0, "gap_uu": [-12.0, 18.0]}
+    }
+  },
+  "textures": {
+    "rock_id": "Rock058",
+    "rock_dir": "C:/Users/ren/WebstormProjects/unmached/unmached/art/material-library/cc0-raw/Rock058",
+    "cc0_manifest": "C:/Users/ren/WebstormProjects/unmached/unmached/art/material-library/cc0-raw/manifest.json",
+    "t1_bc": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/export/T_TableBase_BC.png",
+    "t1_lip_rect_px": [0, 940, 1040, 2048],
+    "highlight_knee_percentile": 88.0,
+    "highlight_slope": 0.35,
+    "chroma_variation_keep": 0.35,
+    "luminance_vs_t1_skirt": 0.9,
+    "contrast_gamma": 0.9,
+    "ao_strength": 0.85,
+    "roughness_mean": 0.86,
+    "roughness_variation": 0.6,
+    "roughness_clamp": [0.6, 1.0]
+  },
+  "preview": {
+    "resolution": [1280, 720],
+    "samples": 24,
+    "hfov_deg": 35.0,
+    "pitch_deg": -55.0,
+    "k1_distance_uu": 2340.195,
+    "zoom_out_distance_uu": 2880.24,
+    "follow_distance_uu": 1170.1
+  }
+}

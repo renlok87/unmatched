@@ -56,8 +56,9 @@ FString FS08CameraZoomConfig::Describe() const {
       Issues.Num() > 0 ? TEXT(" ") : TEXT(""), *FString::Join(Issues, TEXT("; ")));
 }
 
-void FS08CameraZoom::Reset(float OverviewDistance) {
+void FS08CameraZoom::Reset(float OverviewDistance, float FitDistance) {
   Overview = FMath::Max(0.0f, OverviewDistance);
+  Fit = FitDistance > 0.0f ? FitDistance : Overview;
   Current = Target = DistStart = Overview;
   DistElapsed = DistDuration = 0.0f;
   CurrentFocus = TargetFocus = FocusStart = FVector::ZeroVector;
@@ -71,7 +72,10 @@ float FS08CameraZoom::MinDistance() const {
 }
 
 float FS08CameraZoom::MaxDistance() const {
-  return Config.OverviewOutRatio > 0.0f ? Overview / Config.OverviewOutRatio : Overview;
+  // ENV-U9: the far limit belongs to the board fit (Fit == Overview on grids: overview / ratio, bit for bit as
+  // before); on the map-image boards it stays at fit / 0.65 = 2880.2 uu = 0.8125x of their 2340.2 uu overview.
+  // Never nearer than the overview (a ratio of 1, or a large k1DistanceMul, leaves no zoom-out).
+  return Config.OverviewOutRatio > 0.0f ? FMath::Max(Overview, Fit / Config.OverviewOutRatio) : Overview;
 }
 
 FS08ZoomStep FS08CameraZoom::StartDistanceTween(float Requested, float Lo, float Hi, float Seconds) {

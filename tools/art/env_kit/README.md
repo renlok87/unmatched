@@ -149,3 +149,39 @@ The task allows fixing orientation, scale and pivot only. The build therefore sk
   needs a decision per asset; see the findings in `build-report.json`. The UE-side alternative for foliage is
   a two-sided MI (`BasePropertyOverrides.TwoSided`).
 - **UE import.** It needs the editor, which is not allowed while the GPU measurements run.
+
+## Themed ground (ENV-U10, P2 track GROUND)
+
+User decision ENV-U10 ("Тематическая земля + скалистый край"): between the wooden map frame and the tray edge lies
+a themed CC0 ground. Marmoreal: marble paving by the palace and round the frame, dark earth with a carpet of
+cherry petals, moss and grass beds. Sarpedon: forest floor, a sand beach, ship-deck planks under the hull and the
+cannons, pebbles in both river channels (the river mouth on the far side, the waterfall exit on the near side).
+
+| File | What |
+| --- | --- |
+| `art/pipeline-candidates/ASSET-ENV-KIT-001/ground/ground-params.json` | the shared tray, splat size, layer sets per map (CC0 set, tiling uu, tint, saturation), accent (petals / wetness), night grade, material constants |
+| `tools/art/env_kit/ground_splat.py` | region rules -> `<map>.splat.png` (RGBA8: R/G/B = coverage of L1/L2/L3 over the base L0, A = 1 + accent * 254), `<map>.splat.json` (meta, coverage), `<map>.preview.png` (false colour + albedo preview); `--write-layouts` writes the layouts' `ground` section, `--check` regenerates and compares |
+| `tools/art/env_kit/ue_import_env_ground.py` | `--prep` (plain Python): the 7 CC0 sets -> 2K staging PNGs `T_Ground_<Set>_{BC,N,ORMH}` in `unreal/Unmatched/Saved/EnvKit/GroundSources` (gitignored; Planks023A turned 90 deg so the planks run along +Y, DirectX normal XY turned with it); `--check`; in UE: textures, `M_EnvGround`, `MI_EnvGround_<Map>` under `/Game/EnvKit/Ground` (idempotent: sha256 metadata tags, graph version tag, MI parameters compared) |
+| `S08EnvGround.h/.cpp` | the layout `ground` section and its runtime mesh (see below); tests `S08EnvGroundTests.cpp` (`Unmatched.S08.EnvLayout.Ground*`) |
+| `layout_check.py` | check 9: the ground section (mode, material, z, overlap, inset, splat rect, 4 strips, splat sha256) |
+
+Order (repository root): `ground_splat.py --write-layouts`, `ue_import_env_ground.py --prep`, `ue_import_env_ground.py
+--check`, then the UE commandlet `-run=pythonscript -script="<repo>/tools/art/env_kit/ue_import_env_ground.py"`. The
+splat region rules read the layout props (lamp pads, deck under every Hull / Cannon, fire clearings, fort rubble,
+petals under every Cherry), so a moved prop needs `ground_splat.py --write-layouts` again; `--check` and the
+`splatSha256` of the layout catch a stale splat.
+
+Mesh: **runtime**, not an FBX. The ground is the tray top rectangle (the one the diorama tray is placed with,
+`S08EnvLayout::TrayTopRect`) minus the frame (`frameOverlapUU` 2 under the 14 uu deep frame bars), cut into 4
+strips, each one `/Engine/BasicShapes/Plane` at `z` -1 (between the tray top -3 and the map plane -0.5),
+NoCollision, no shadow casting. Each strip gets a MID with `GroundStrip` = (min, size) of the strip and `SplatRect`
+of the layout, and `M_EnvGround` computes the board position `P = GroundStrip.xy + UV0 * GroundStrip.zw`, so all
+strips sample one continuous board-space texture. Why: the ground follows whatever tray the layout sets (track TRAY)
+with no Blender export and no re-import, it needs no new mesh asset or plugin, and the frame / tray numbers live in
+one place (the layout).
+
+`M_EnvGround`: 4 layers (BC / N / ORMH at `P / L<i>_TileUU`, shared wrap sampler), the splat (shared clamp sampler),
+a height-lerp stack (`HeightContrast`), per-layer tint + saturation (`L<i>_Tint`), macro value noise
+(`MacroStrength`, `MacroScaleUU`), the accent (`PetalSizeUU` > 0: a pink carpet + one jittered petal per cell;
+0: wetness that darkens and lowers roughness), and the `M_MapBoard` night grade (`NightEV`, `NightSaturation`,
+`NightTint`). The Custom HLSL compiles with fxc ps_5_0 and dxc ps_6_0 (checked outside UE).

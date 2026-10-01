@@ -229,6 +229,25 @@ class CommittedFixtures(unittest.TestCase):
         self.assertTrue(any("exposure needs" in e for e in errs))
         self.assertEqual(F.check_render_blocks("cobble-probe", profiles["lightProfiles"]["cobble-probe"]), [])
 
+    def test_profile_night_blocks(self):
+        # ENV-MAPS P2 (rev 9): the shipped night profiles carry a valid fog and map grade; broken ones are reported.
+        profiles = json.loads(F.DEFAULT_PROFILES.read_text(encoding="utf-8"))
+        for lid in ("marmoreal-night", "sarpedon-night"):
+            lp = profiles["lightProfiles"][lid]
+            self.assertIn("fog", lp)
+            self.assertIn("mapGrade", lp)
+            self.assertEqual(F.check_night_blocks(lid, lp), [])
+        lp = json.loads(json.dumps(profiles["lightProfiles"]["marmoreal-night"]))
+        lp["fog"]["density"] = 0
+        lp["fog"]["endDistanceUU"] = lp["fog"]["startDistanceUU"] - 1
+        lp["mapGrade"]["lift"] = -1
+        lp["mapGrade"]["nightTintLinear"] = [1, 1]
+        errs = F.check_render_blocks("marmoreal-night", lp)
+        self.assertTrue(any("fog needs" in e for e in errs))
+        self.assertTrue(any("mapGrade needs" in e for e in errs))
+        del lp["fog"], lp["mapGrade"]
+        self.assertEqual(F.check_night_blocks("marmoreal-night", lp), [])
+
     def test_profile_content_rules_detect_violations(self):
         # T4.2: zone MI per style (and fallback), one /Game/ glyph mesh per known glyph, every used glyph covered.
         profiles = json.loads(F.DEFAULT_PROFILES.read_text(encoding="utf-8"))

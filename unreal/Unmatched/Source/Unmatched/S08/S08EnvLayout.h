@@ -10,6 +10,8 @@
 //                 "scale":1.0, "castShadow":true} ],
 //     "lights": [ {"id":"lamp-nw", "type":"point", "loc":[x,y,z], "colorSrgb":"#FFB870", "intensityCd":<cd>,
 //                  "radius":<uu>, "castShadow":false} ],
+//     "ground": {"mode":"runtime", "material":"/Game/EnvKit/Ground/MI_EnvGround_<Map>", "z":-1, ...},  // optional,
+//                                                              // ENV-U10 themed ground: S08EnvGround.h
 //     "notes": "..." }
 // Coordinates are board-actor space (uu): origin = map centre, +X right on screen, +Y towards the K1 camera (near
 // side), Z up (map plane ~ 0, tray top -3). A prop's pivot is its base centre; scale multiplies the processed mesh,
@@ -29,6 +31,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "S08EnvGround.h"
 #include "UObject/ObjectPtr.h"
 
 class AActor;
@@ -104,6 +107,8 @@ struct UNMATCHED_API FS08EnvLayout {
   FS08EnvApron Apron;
   TArray<FS08EnvProp> Props;
   TArray<FS08EnvLight> Lights;
+  /** ENV-U10: the optional themed ground (S08EnvGround.h); an invalid "ground" makes the whole layout invalid. */
+  FS08EnvGround Ground;
   FString Notes;
   /** LoadFile only: the file and the sha256 of its bytes (evidence). */
   FString SourcePath;
@@ -156,6 +161,10 @@ struct UNMATCHED_API FS08EnvLayoutRuntime {
   FString Status;             // ok | invalid | absent
   FS08EnvLayout Layout;
   FS08EnvSpawnStats Stats;
+  /** ENV-U10: the ground strips of Layout.Ground (S08EnvGround::Spawn). Weak: the board actor owns the components
+   *  (OwnedComponents); Update clears them together with the props and lights. */
+  TArray<TWeakObjectPtr<UStaticMeshComponent>> Ground;
+  FS08EnvGroundStats GroundStats;
 };
 
 namespace S08EnvLayout {
@@ -212,14 +221,24 @@ UNMATCHED_API FS08EnvSpawnStats Spawn(const FS08EnvLayout& Layout, AActor& Owner
 UNMATCHED_API int32 Clear(TArray<TObjectPtr<UStaticMeshComponent>>& Props,
                           TArray<TObjectPtr<UPointLightComponent>>& Lights);
 /** The board-actor hook: clears on a board change / gate off, (re)loads and spawns the layout of the active map-image
- *  profile, keeps the components when the same layout applies again; writes the summary trace. */
+ *  profile, keeps the components when the same layout applies again; writes the summary trace. ENV-U10: a layout with
+ *  a "ground" section also gets its ground strips (S08EnvGround::Spawn on the same tray top rectangle, kept in
+ *  Runtime.Ground, traced 'ARTPREVIEW envlayout ground ...') and loses them with the props. */
 UNMATCHED_API void Update(const FS08EnvLayoutRequest& Request, AActor& Owner, USceneComponent* Parent,
                           FS08EnvLayoutRuntime& Runtime, TArray<TObjectPtr<UStaticMeshComponent>>& Props,
                           TArray<TObjectPtr<UPointLightComponent>>& Lights);
 /** The board actor's tray hook (map-image branch of UpdateDioramaTray): when the applied layout has a tray (or an
  *  apron) that covers the frame, replaces the placeholder fit inputs by the layout's (TrayFit) and traces
  *  'ARTPREVIEW envlayout tray ... source=layout|apron'; a refused layout tray is traced and the inputs stay. The tray
- *  line itself (PlaceDioramaTray) keeps its 'waiver=T1-placeholder' field. */
+ *  line itself (PlaceDioramaTray) keeps its 'waiver=T1-placeholder' field. Since ENV-U10 only the T1 fallback of a
+ *  map-image board uses it (SM_TableBase_T2 not in the build); ApplyTrayT2 is the regular hook. */
 UNMATCHED_API bool ApplyTray(const FS08EnvLayoutRuntime& Runtime, const FVector2D& FrameHalf,
                              FVector2D& InOutBoardHalf, FVector2D& InOutOffset);
+/** ENV-U10 track TRAY: the map-image tray hook of the shared rocky tray T2 (S08Diorama::FitTrayT2: scale 1, never
+ *  stretched). When the applied valid layout has a tray (or an apron) that covers the frame (TrayFit), its OUTER half
+ *  extent (halfX, halfY) and offsetY replace InOutHalf / InOutOffsetY and OutSource = layout | apron, traced
+ *  'ARTPREVIEW envlayout tray map=.. source=.. outerHalf=.. offsetY=.. frameHalf=.. mesh=T2 t2Top=.. mismatchUU=..';
+ *  otherwise the inputs (the T2 default) stay, OutSource is untouched and a refused layout tray is traced. */
+UNMATCHED_API bool ApplyTrayT2(const FS08EnvLayoutRuntime& Runtime, const FVector2D& FrameHalf, FVector2D& InOutHalf,
+                               float& InOutOffsetY, FString& OutSource);
 }  // namespace S08EnvLayout

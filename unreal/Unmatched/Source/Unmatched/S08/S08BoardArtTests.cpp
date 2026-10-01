@@ -367,6 +367,54 @@ bool FS08BoardArtParserTest::RunTest(const FString&) {
   ExpectRender(TEXT("engine cubemap"), TEXT("/Game/S08/Render/TC_S08_AmbientDome"), TEXT("/Engine/X"), TEXT("sky needs"));
   ExpectRender(TEXT("exposure range"), TEXT("\"maxBrightness\":2.46229"), TEXT("\"maxBrightness\":8"), TEXT("exposure needs"));
   ExpectRender(TEXT("too many cascades"), TEXT("\"cascades\":2"), TEXT("\"cascades\":9"), TEXT("directional.shadow needs"));
+  // ENV-MAPS P2 night calibration: the optional fog and map night grade blocks parse; broken ones reject the profile.
+  {
+    FS08BoardArtData Data;
+    TArray<FString> Errors;
+    TestTrue("render blocks without fog / mapGrade", Data.ParseJson(Render, Errors));
+    const FS08LightProfile* L = Data.Lights.Find(TEXT("L"));
+    TestTrue("no fog and no map grade by default", L && !L->Fog.bSet && !L->MapGrade.bSet);
+  }
+  const FString NightBlocks = TEXT("\"fog\":{\"colorLinear\":[0.02,0.03,0.06],\"density\":0.05,\"heightFalloff\":0.5,")
+      TEXT("\"heightZ\":-300,\"startDistanceUU\":2600,\"endDistanceUU\":30000,\"maxOpacity\":0.9},")
+      TEXT("\"mapGrade\":{\"nightEV\":-0.4,\"nightSaturation\":0.8,\"lift\":1.5,\"nightTintLinear\":[0.9,1,1.1]},\"exposure\":{");
+  FString Night = Render;
+  Night.ReplaceInline(TEXT("\"exposure\":{"), *NightBlocks);
+  {
+    FS08BoardArtData Data;
+    TArray<FString> Errors;
+    TestTrue(TEXT("fog + mapGrade parse: ") + FString::Join(Errors, TEXT(" | ")), Data.ParseJson(Night, Errors));
+    const FS08LightProfile* L = Data.Lights.Find(TEXT("L"));
+    if (TestNotNull("light L with fog + mapGrade", L)) {
+      TestTrue("fog", L->Fog.bSet && FMath::IsNearlyEqual(L->Fog.Density, 0.05f) &&
+                          FMath::IsNearlyEqual(L->Fog.HeightFalloff, 0.5f) && FMath::IsNearlyEqual(L->Fog.HeightZ, -300.0f) &&
+                          FMath::IsNearlyEqual(L->Fog.StartDistanceUU, 2600.0f) &&
+                          FMath::IsNearlyEqual(L->Fog.EndDistanceUU, 30000.0f) &&
+                          FMath::IsNearlyEqual(L->Fog.MaxOpacity, 0.9f) && FMath::IsNearlyEqual(L->Fog.Color.B, 0.06f));
+      TestTrue("mapGrade", L->MapGrade.bSet && FMath::IsNearlyEqual(L->MapGrade.NightEV, -0.4f) &&
+                               FMath::IsNearlyEqual(L->MapGrade.NightSaturation, 0.8f) &&
+                               FMath::IsNearlyEqual(L->MapGrade.Lift, 1.5f) && L->MapGrade.bHasTint &&
+                               FMath::IsNearlyEqual(L->MapGrade.NightTint.B, 1.1f));
+    }
+  }
+  auto ExpectNight = [this, &Night](const FString& Name, const FString& From, const FString& To, const FString& ErrorPart) {
+    FString Doc = Night;
+    TestTrue(Name + TEXT(": patch applies"), Doc.Contains(From));
+    Doc.ReplaceInline(*From, *To);
+    FS08BoardArtData Data;
+    TArray<FString> Errors;
+    Data.ParseJson(Doc, Errors);
+    TestFalse(Name + TEXT(": profile rejected"), Data.Lights.Contains(TEXT("L")));
+    TestTrue(Name + TEXT(": reason '") + ErrorPart + TEXT("' in ") + FString::Join(Errors, TEXT(" | ")),
+             FString::Join(Errors, TEXT(" | ")).Contains(ErrorPart));
+  };
+  ExpectNight(TEXT("fog density 0"), TEXT("\"density\":0.05"), TEXT("\"density\":0"), TEXT("fog needs"));
+  ExpectNight(TEXT("fog without colour"), TEXT("\"colorLinear\":[0.02,0.03,0.06],"), TEXT(""), TEXT("fog needs"));
+  ExpectNight(TEXT("fog end before start"), TEXT("\"endDistanceUU\":30000"), TEXT("\"endDistanceUU\":100"), TEXT("fog needs"));
+  ExpectNight(TEXT("fog opacity > 1"), TEXT("\"maxOpacity\":0.9"), TEXT("\"maxOpacity\":1.5"), TEXT("fog needs"));
+  ExpectNight(TEXT("map grade lift < 0"), TEXT("\"lift\":1.5"), TEXT("\"lift\":-1"), TEXT("mapGrade needs"));
+  ExpectNight(TEXT("map grade without nightEV"), TEXT("\"nightEV\":-0.4,"), TEXT(""), TEXT("mapGrade needs"));
+  ExpectNight(TEXT("map grade bad tint"), TEXT("[0.9,1,1.1]"), TEXT("[0.9,1]"), TEXT("mapGrade needs"));
   return true;
 }
 
@@ -1200,6 +1248,16 @@ FString MapDoc() {
   return Doc + MapBoardJson + TEXT("]}");
 }
 
+/** The "map" board's light field: the anchor where the tests insert "k1DistanceMul" (the grid board has "tiles"). */
+const TCHAR* const MapLightAnchor = TEXT("\"surface\":\"map-image\",\"light\":\"L\",");
+
+/** MapDoc() with "k1DistanceMul": Mul on the map board (ENV-U9; the shipped map profiles carry 1.25). */
+FString MapDocWithK1Mul(const TCHAR* Mul) {
+  FString Doc = MapDoc();
+  Doc.ReplaceInline(MapLightAnchor, *FString::Printf(TEXT("%s\"k1DistanceMul\":%s,"), MapLightAnchor, Mul));
+  return Doc;
+}
+
 const FVector2D MapHalf(445.66667, 288.66667);  // 1337 x 866 px at 2/3 uu per px, halved
 }  // namespace S08MapTest
 
@@ -1228,6 +1286,20 @@ bool FS08BoardArtMapImageParserTest::RunTest(const FString&) {
            M.SizeUU().Equals(FVector2D(891.3333, 577.3333), 0.01));
   TestTrue("frame half = map half + 24", M.FrameHalfUU().Equals(MapHalf + FVector2D(24.0, 24.0), 0.01));
   TestTrue("tray offset", M.TrayOffsetUU.Equals(FVector2D(10.0, -20.0), 1e-6));
+  // ENV-U9 "k1DistanceMul": optional (default 1 = the plain fit), [1, 2].
+  TestTrue(FString::Printf(TEXT("k1DistanceMul absent -> 1 (%.3f)"), P->K1DistanceMul), P->K1DistanceMul == 1.0f);
+  {
+    FS08BoardArtData WithMul;
+    TArray<FString> MulErrors;
+    const bool bParsed = WithMul.ParseJson(MapDocWithK1Mul(TEXT("1.25")), MulErrors);
+    TestTrue(TEXT("k1DistanceMul 1.25 parses: ") + FString::Join(MulErrors, TEXT(" | ")), bParsed);
+    const FS08BoardArtProfile* MapMul =
+        WithMul.Boards.FindByPredicate([](const FS08BoardArtProfile& B) { return B.Id == TEXT("map"); });
+    const FS08BoardArtProfile* GridMul =
+        WithMul.Boards.FindByPredicate([](const FS08BoardArtProfile& B) { return B.Id == TEXT("one"); });
+    TestTrue("k1DistanceMul 1.25 kept", MapMul && MapMul->K1DistanceMul == 1.25f);
+    TestTrue("the grid profile without the field keeps 1", GridMul && GridMul->K1DistanceMul == 1.0f);
+  }
   TestTrue("expect spaces/links", P->Expect.Spaces == 3 && P->Expect.Links == 2);
   TestTrue("expect zones sorted", P->Expect.Zones == TArray<FString>({TEXT("a"), TEXT("b")}));
   TestTrue("no W x H expect", P->Expect.Cells < 0);
@@ -1285,6 +1357,11 @@ bool FS08BoardArtMapImageParserTest::RunTest(const FString&) {
   Expect(TEXT("tray offset not a pair"), TEXT("\"trayOffsetUU\":[10,-20]"), TEXT("\"trayOffsetUU\":[10]"),
          TEXT("mapImage.trayOffsetUU"));
   Expect(TEXT("unknown surface"), TEXT("\"surface\":\"map-image\""), TEXT("\"surface\":\"map-photo\""), TEXT("unknown surface"));
+  const FString MulError = TEXT("k1DistanceMul must be a number in [1, 2]");
+  for (const TCHAR* Bad : {TEXT("0.9"), TEXT("2.5"), TEXT("0"), TEXT("\"far\"")}) {
+    Expect(FString::Printf(TEXT("k1DistanceMul %s"), Bad), MapLightAnchor,
+           FString::Printf(TEXT("%s\"k1DistanceMul\":%s,"), MapLightAnchor, Bad), MulError);
+  }
   return true;
 }
 
@@ -1348,7 +1425,12 @@ bool FS08BoardArtMapProfilesTest::RunTest(const FString&) {
     const FVector2D Half = S08BoardHalfExtentUU(Board);
     TestTrue(FString::Printf(TEXT("%s: board half extent %s = the map half"), *Name, *Half.ToString()), Half.Equals(M.HalfUU(), 0.01));
     const float K1 = S08K1FitDistanceUU(Half);
-    TestTrue(FString::Printf(TEXT("%s: K1 distance %.2f = 1872 +- 1"), *Name, K1), FMath::Abs(K1 - 1872.0f) <= 1.0f);
+    TestTrue(FString::Printf(TEXT("%s: K1 fit %.2f = 1872 +- 1"), *Name, K1), FMath::Abs(K1 - 1872.0f) <= 1.0f);
+    // ENV-U9: the profile moves the overview back to the fit x 1.25 (the env layout around the frame in K1).
+    TestTrue(FString::Printf(TEXT("%s: k1DistanceMul %.3f = 1.25"), *Name, P->K1DistanceMul), P->K1DistanceMul == 1.25f);
+    const float Overview = S08K1OverviewDistanceUU(K1, P->K1DistanceMul);
+    TestTrue(FString::Printf(TEXT("%s: K1 overview %.2f = fit x 1.25 = 2340 +- 1"), *Name, Overview),
+             FMath::Abs(Overview - 2340.0f) <= 1.0f && FMath::IsNearlyEqual(Overview, K1 * 1.25f));
     // Night light placeholder: spots scale by the MAP size and sit on / around the map, warm and cool present.
     const FS08LightProfile* Light = Data.LightFor(*P);
     if (TestNotNull(Name + TEXT(": light profile"), Light)) {
@@ -1380,13 +1462,19 @@ bool FS08BoardArtMapProfilesTest::RunTest(const FString&) {
       TestTrue(Name + TEXT(": budget"), Placed.Num() <= 7);
       TestTrue(FString::Printf(TEXT("%s: combined points %d + %d <= 6"), *Name, Points, Env.Lights.Num()),
                Points + Env.Lights.Num() <= 6);
+      // Profile rev 9 (ENV-MAPS P2 night calibration): the night haze fog keeps the K1 board out of it (start beyond
+      // the farthest K1 tray point, ~2800 uu) and the map grade keeps the readability lift inside the game mask.
+      TestTrue(FString::Printf(TEXT("%s: night fog set, start %.0f >= 2800, no volumetric"), *Name, Light->Fog.StartDistanceUU),
+               Light->Fog.bSet && Light->Fog.StartDistanceUU >= 2800.0f && Light->Fog.Density > 0.0f);
+      TestTrue(FString::Printf(TEXT("%s: map grade set, lift %.2f > the MI 0.35"), *Name, Light->MapGrade.Lift),
+               Light->MapGrade.bSet && Light->MapGrade.Lift > 0.35f);
     }
   }
   return true;
 }
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08BoardArtMapCameraTest,
-    "Unmatched.S08.BoardArt.MapCamera K1 distance: grids unchanged (Cobble 1931), map canvas 1872",
+    "Unmatched.S08.BoardArt.MapCamera K1 distance: grids unchanged (Cobble 1931), map canvas fit 1872 x k1DistanceMul 1.25 = 2340",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FS08BoardArtMapCameraTest::RunTest(const FString&) {
   using namespace S08MapTest;
@@ -1410,9 +1498,37 @@ bool FS08BoardArtMapCameraTest::RunTest(const FString&) {
              Half.Equals(FVector2D(Size.X * 50.0, Size.Y * 50.0), 1e-6));
     TestEqual(FString::Printf(TEXT("%dx%d grid K1 = the pre-ENV-MAPS formula"), Size.X, Size.Y), S08K1FitDistanceUU(Half),
               Legacy(Size.X, Size.Y));
+    // ENV-U9: a multiplier of 1 (every grid profile) is the fit, bit for bit.
+    const float GridFit = S08K1FitDistanceUU(Half);
+    TestTrue(FString::Printf(TEXT("%dx%d grid overview (k1DistanceMul 1) == the fit exactly"), Size.X, Size.Y),
+             S08K1OverviewDistanceUU(GridFit, 1.0f) == GridFit);
   }
   TestTrue(FString::Printf(TEXT("Cobble 5x6 K1 %.1f = 1931 +- 1"), S08K1FitDistanceUU(S08BoardHalfExtentUU(MakeBoard(5, 6)))),
            FMath::Abs(S08K1FitDistanceUU(S08BoardHalfExtentUU(MakeBoard(5, 6))) - 1931.0f) <= 1.0f);
+  // ENV-U9 in the shipped data: the two map-image profiles carry 1.25, every grid profile (Cobble first) keeps 1.
+  {
+    FS08BoardArtData Shipped;
+    TArray<FString> Errors;
+    if (TestTrue("shipped data", LoadShipped(Shipped, Errors))) {
+      int32 Maps = 0;
+      for (const FS08BoardArtProfile& B : Shipped.Boards) {
+        const bool bMap = B.Surface == ES08BoardSurface::MapImage;
+        Maps += bMap ? 1 : 0;
+        TestTrue(FString::Printf(TEXT("%s: k1DistanceMul %.3f = %s"), *B.Id, B.K1DistanceMul, bMap ? TEXT("1.25") : TEXT("1")),
+                 B.K1DistanceMul == (bMap ? 1.25f : 1.0f));
+      }
+      TestEqual("two map-image profiles", Maps, 2);
+      const FS08BoardArtProfile* Cobble =
+          Shipped.Boards.FindByPredicate([](const FS08BoardArtProfile& B) { return B.Id == TEXT("cobble-city"); });
+      if (TestNotNull("cobble-city profile", Cobble)) {
+        const float CobbleFit = S08K1FitDistanceUU(S08BoardHalfExtentUU(MakeBoard(5, 6)));
+        const float CobbleOverview = S08K1OverviewDistanceUU(CobbleFit, Cobble->K1DistanceMul);
+        TestTrue(FString::Printf(TEXT("Cobble overview %.3f == its fit (1931 unchanged)"), CobbleOverview),
+                 CobbleOverview == CobbleFit);
+        TestEqual("Cobble overview = the pre-ENV-MAPS formula", CobbleOverview, Legacy(5, 6));
+      }
+    }
+  }
   FS08BoardModel Topo;
   if (TestTrue("synthetic topology board", SyntheticTopology(Topo))) {
     const FVector2D Half = S08BoardHalfExtentUU(Topo);
@@ -1420,8 +1536,15 @@ bool FS08BoardArtMapCameraTest::RunTest(const FString&) {
              Half.Equals(MapHalf, 0.01));
     const float K1 = S08K1FitDistanceUU(Half);
     // tools/art/map_surface/manifest.<key>.json k1.camera.distance_uu = 1872.156 (the same formula in Python)
-    TestTrue(FString::Printf(TEXT("map K1 %.3f = 1872.156 +- 0.5 (manifest) and 1872 +- 1"), K1),
+    TestTrue(FString::Printf(TEXT("map K1 fit %.3f = 1872.156 +- 0.5 (manifest) and 1872 +- 1"), K1),
              FMath::Abs(K1 - 1872.156f) <= 0.5f && FMath::Abs(K1 - 1872.0f) <= 1.0f);
+    // ENV-U9: the overview of a map-image board = the fit x 1.25 (tools/art/map_surface/k1_mock.s08_overview_distance
+    // and tools/art/env_kit/layout_check.py use the same 2340.195 uu).
+    const float Overview = S08K1OverviewDistanceUU(K1, 1.25f);
+    TestTrue(FString::Printf(TEXT("map K1 overview %.3f = 2340.195 +- 0.5 and 2340 +- 1"), Overview),
+             FMath::Abs(Overview - 2340.195f) <= 0.5f && FMath::Abs(Overview - 2340.0f) <= 1.0f);
+    TestTrue(FString::Printf(TEXT("the far limit fit / 0.65 = %.1f = 0.8125x of the overview"), K1 / 0.65f),
+             FMath::IsNearlyEqual(Overview / (K1 / 0.65f), 0.8125f, 1e-4f));
   }
   return true;
 }
@@ -1576,6 +1699,7 @@ bool FS08BoardArtMapActorTest::RunTest(const FString&) {
     TestTrue("rebuild topology", Grey->Rebuild(Topo));
     TestTrue("topology board", Grey->IsTopologyBoard());
     TestFalse("no art (grey)", Grey->IsArtActive() || Grey->IsMapImageActive());
+    TestTrue("grey: k1DistanceMul 1 (K1 = the plain fit)", Grey->GetK1DistanceMul() == 1.0f);
     TestEqual("no lattice instances", Grey->GetLatticeInstanceCount(), 0);
     const UInstancedStaticMeshComponent* Discs = Grey->GetTopologyDiscs();
     const UInstancedStaticMeshComponent* Bars = Grey->GetTopologyLinkBars();
@@ -1622,7 +1746,9 @@ bool FS08BoardArtMapActorTest::RunTest(const FString&) {
   //    grey topology view and every missing package is reported ('ARTPREVIEW map-image missing <path>').
   FS08BoardArtData Data;
   TArray<FString> Errors;
-  if (TestTrue(TEXT("map doc parses: ") + FString::Join(Errors, TEXT(" | ")), Data.ParseJson(MapDoc(), Errors))) {
+  // ENV-U9: the profile asks for k1DistanceMul 1.25, but a refused profile never moves the camera.
+  if (TestTrue(TEXT("map doc parses: ") + FString::Join(Errors, TEXT(" | ")),
+               Data.ParseJson(MapDocWithK1Mul(TEXT("1.25")), Errors))) {
     AS08BoardActor* Missing = World->SpawnActor<AS08BoardActor>(AS08BoardActor::StaticClass(), FVector::ZeroVector,
                                                                 FRotator::ZeroRotator);
     if (TestNotNull("board actor (missing assets)", Missing)) {
@@ -1630,6 +1756,7 @@ bool FS08BoardArtMapActorTest::RunTest(const FString&) {
       Missing->SetRoomBoardId(TEXT("cidMap"));
       TestTrue("rebuild", Missing->Rebuild(Topo));
       TestFalse("map-image refused", Missing->IsArtActive() || Missing->IsMapImageActive());
+      TestTrue("refused profile: k1DistanceMul 1 (K1 = the plain fit)", Missing->GetK1DistanceMul() == 1.0f);
       TestTrue("grey topology view instead", Missing->GetTopologyDiscs() && Missing->GetTopologyDiscs()->GetInstanceCount() == 3);
       TestEqual("no lattice", Missing->GetLatticeInstanceCount(), 0);
       const FS08BoardArtProfile* P = Data.Boards.FindByPredicate([](const FS08BoardArtProfile& B) { return B.Id == TEXT("map"); });
@@ -1679,12 +1806,28 @@ bool FS08BoardArtMapActorTest::RunTest(const FString&) {
           TestTrue("plane material = MID of MI_Marmoreal_MapBoard",
                    Mid && Mid->Parent && Mid->Parent->GetName() == TEXT("MI_Marmoreal_MapBoard"));
           TestTrue("plane sized to the map", PlaneComp->GetRelativeScale3D().Equals(FVector(MapHalf.X / 50.0, MapHalf.Y / 50.0, 1.0), 0.01));
+          // Profile rev 9 (ENV-MAPS P2): the light profile's mapGrade is what the MID renders with.
+          const FS08LightProfile* Night = Shipped.LightFor(*Marmoreal);
+          float Lift = -1.0f, Ev = 0.0f;
+          if (Mid && Night && Night->MapGrade.bSet) {
+            Mid->GetScalarParameterValue(FHashedMaterialParameterInfo(S08MapSurfaceSpec::ParamLift), Lift);
+            Mid->GetScalarParameterValue(FHashedMaterialParameterInfo(S08MapSurfaceSpec::ParamNightEV), Ev);
+          }
+          TestTrue(FString::Printf(TEXT("MID map grade = the profile (Lift %.2f, NightEV %.2f)"), Lift, Ev),
+                   Night && Night->MapGrade.bSet && FMath::IsNearlyEqual(Lift, Night->MapGrade.Lift) &&
+                       FMath::IsNearlyEqual(Ev, Night->MapGrade.NightEV));
         }
+        TestTrue("night fog spawned with the lights", Map->GetAppliedRender().bFog);
         TestEqual("no lattice", Map->GetLatticeInstanceCount(), 0);
         TestEqual("4 frame bars", Map->GetArtSurfacePartCount(), 4);
         TestEqual("4 iron corners", Map->GetArtCornerCount(), 4);
         TestTrue("no grey discs", !Map->GetTopologyDiscs() || Map->GetTopologyDiscs()->GetInstanceCount() == 0);
         TestTrue("half extent = the map", Map->GetBoardHalfExtentUU().Equals(MapHalf, 0.01));
+        // ENV-U9: what SetupCameraForBoard reads - the active profile's 1.25 -> K1 2340 uu.
+        const float MapK1 = S08K1OverviewDistanceUU(S08K1FitDistanceUU(Map->GetBoardHalfExtentUU()), Map->GetK1DistanceMul());
+        TestTrue(FString::Printf(TEXT("active map profile: k1DistanceMul %.3f = 1.25, K1 %.1f = 2340 +- 1"),
+                                 Map->GetK1DistanceMul(), MapK1),
+                 Map->GetK1DistanceMul() == 1.25f && FMath::Abs(MapK1 - 2340.0f) <= 1.0f);
         TestTrue("pick box on the map", Map->GetMapPickBox() &&
                                             Map->GetMapPickBox()->GetCollisionEnabled() == ECollisionEnabled::QueryOnly);
         // reachable rings (art): no crash, rings only on spaces

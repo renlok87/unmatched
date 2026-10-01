@@ -1,0 +1,107 @@
+// ENV-MAPS P2 track GROUND (user decision ENV-U10, "Тематическая земля + скалистый край"): the themed ground between
+// the wooden map frame and the tray edge of the original-map boards, spawned with the environment layout
+// (S08EnvLayout.h) of the active 'map-image' board.
+//
+// Data: the optional "ground" object of Config/ArtBoards/EnvLayouts/<map>.layout.json (tools/art/env_kit/
+// ground_splat.py --write-layouts writes it; other fields such as "splat" / "splatSha256" / "notes" are ignored):
+//   "ground": {"mode":"runtime", "material":"/Game/EnvKit/Ground/MI_EnvGround_Marmoreal", "z":-1.0,
+//              "frameOverlapUU":2.0, "insetUU":0.0, "splatRect":[minX, minY, maxX, maxY]}
+//
+// Mesh = "runtime" (the only mode; chosen over a Blender plane-with-hole FBX): the ground is the tray top rectangle the
+// diorama tray is placed with (S08EnvLayout::TrayTopRect) shrunk by insetUU, minus the frame outer rectangle shrunk by
+// frameOverlapUU (the strips reach under the 14 uu deep frame bars: no seam, the T-junction corners stay hidden),
+// cut into <= 4 axis-aligned strips (N and S full width, W and E between them). Each strip is one
+// /Engine/BasicShapes/Plane (100 x 100 uu, always cooked by DefaultGame.ini) scaled to the strip at Z = z, strictly
+// between the tray top (-3) and the map plane (-0.5): no z-fight with either. NoCollision, no navigation, no shadow
+// casting (a flat layer; it receives shadows and decals). Why runtime rather than an FBX: the ground follows whatever
+// tray the layout sets (track TRAY) with no Blender re-export and no re-import, it needs no new mesh asset and no
+// plugin, and the board-space UVs come from the material instead of the mesh. Each strip gets a MID of the layout's
+// material with
+//   GroundStrip = (min.x, min.y, size.x, size.y) of the strip  -> M_EnvGround: P = GroundStrip.xy + UV0 * GroundStrip.zw
+//   SplatRect   = (minX, minY, maxX - minX, maxY - minY)         (only when "splatRect" is set; else the MI's value)
+// (the engine plane maps local (-50,-50) -> UV (0,0), u along +X, v along +Y), so the strips sample ONE continuous
+// board-space texture: tools/art/env_kit/ue_import_env_ground.py builds M_EnvGround and MI_EnvGround_<Map>.
+// A missing material spawns no strip (traced; the props and lights of the layout still spawn).
+// Trace: 'ARTPREVIEW envlayout ground map=<m> mode=runtime strips=N material=<name> z=.. outer=(..)..(..) hole=(..)..(..)
+//         splatRect=(..)..(..)|- splatCovers=0|1 areaUU2=.. status=ok|off|no-tray|no-strips|missing-plane|missing-material'
+#pragma once
+
+#include "CoreMinimal.h"
+#include "UObject/WeakObjectPtrTemplates.h"
+
+class AActor;
+class FJsonObject;
+class USceneComponent;
+class UStaticMeshComponent;
+
+namespace S08EnvGroundSpec {
+inline const TCHAR* const RuntimeMode = TEXT("runtime");
+inline const TCHAR* const PlaneMeshPath = TEXT("/Engine/BasicShapes/Plane.Plane");
+/** Where ue_import_env_ground.py puts M_EnvGround / MI_EnvGround_<Map> (under the always-cooked /Game/EnvKit). */
+inline const TCHAR* const MaterialRoot = TEXT("/Game/EnvKit/Ground/");
+inline const TCHAR* const ParamGroundStrip = TEXT("GroundStrip");
+inline const TCHAR* const ParamSplatRect = TEXT("SplatRect");
+/** Exclusive Z range: above the tray top (S08Diorama::TopZ), below the map plane (S08MapSurfaceSpec::PlaneZ). */
+constexpr float MinZ = -3.0f;
+constexpr float MaxZ = -0.5f;
+constexpr float DefaultZ = -1.0f;
+constexpr float DefaultFrameOverlapUU = 2.0f;
+/** The frame is 24 uu wide: the hole never shrinks past the painted map. */
+constexpr float MaxFrameOverlapUU = 20.0f;
+constexpr float MaxInsetUU = 200.0f;
+/** /Engine/BasicShapes/Plane spans 100 x 100 uu at scale 1. */
+constexpr float PlaneSizeUU = 100.0f;
+/** Strips thinner than this are dropped. */
+constexpr float MinStripUU = 0.5f;
+}  // namespace S08EnvGroundSpec
+
+/** The parsed "ground" section of a layout (bSet false = the layout has none: no ground). */
+struct UNMATCHED_API FS08EnvGround {
+  bool bSet = false;
+  FString Mode;
+  FString Material;  // MI package path (/Game/... or /Engine/...), optionally "Pkg.Obj"
+  float Z = S08EnvGroundSpec::DefaultZ;
+  float FrameOverlapUU = S08EnvGroundSpec::DefaultFrameOverlapUU;
+  float InsetUU = 0.0f;
+  bool bSplatRect = false;
+  FBox2D SplatRect = FBox2D(ForceInit);  // board XY covered by the splat texture
+};
+
+/** What one ground spawn did (also the trace numbers). */
+struct UNMATCHED_API FS08EnvGroundStats {
+  FString Status = TEXT("off");
+  int32 Strips = 0;
+  FBox2D Outer = FBox2D(ForceInit);  // tray top - inset
+  FBox2D Hole = FBox2D(ForceInit);   // frame outer - overlap
+  double AreaUU2 = 0.0;
+  /** The splat rectangle contains the outer rectangle (true without a "splatRect": the MI's value is used). */
+  bool bSplatCoversOuter = false;
+  FString MaterialName;
+};
+
+namespace S08EnvGround {
+/** Parses a "ground" object into Out (Out.bSet = true only when it is valid); appends 'ground: ...' errors. */
+UNMATCHED_API bool ParseJson(const TSharedPtr<FJsonObject>& Obj, FS08EnvGround& Out, TArray<FString>& OutErrors);
+/** Tray top shrunk by InsetUU on every side. */
+UNMATCHED_API FBox2D OuterRect(const FBox2D& TrayTop, float InsetUU);
+/** Frame outer rectangle (+-FrameHalf) shrunk by FrameOverlapUU on every side. */
+UNMATCHED_API FBox2D HoleRect(const FVector2D& FrameHalf, float FrameOverlapUU);
+/** Outer minus Hole as <= 4 disjoint axis-aligned strips, in the order N (far, full width), S (near, full width), W,
+ *  E (between N and S); the hole is clipped to Outer first, strips thinner than MinStripUU are dropped. No hole inside
+ *  Outer -> Outer itself; an invalid or degenerate Outer -> none. */
+UNMATCHED_API TArray<FBox2D> Strips(const FBox2D& Outer, const FBox2D& Hole);
+/** Relative transform of the engine plane that covers Strip at height Z (no rotation, scale size / 100, Z scale 1). */
+UNMATCHED_API FTransform StripTransform(const FBox2D& Strip, float Z);
+/** (min.x, min.y, size.x, size.y): the GroundStrip / SplatRect parameter value of a rectangle. */
+UNMATCHED_API FLinearColor RectParam(const FBox2D& Rect);
+/** Creates one plane component per strip of (OuterRect(TrayTop), HoleRect(FrameHalf)) under Parent (owned by Owner),
+ *  each with a MID of Ground.Material carrying GroundStrip / SplatRect; appends them to Out (weak: the actor owns
+ *  them). Nothing is created unless the status is 'ok'. */
+UNMATCHED_API FS08EnvGroundStats Spawn(const FS08EnvGround& Ground, AActor& Owner, USceneComponent* Parent,
+                                       const FBox2D& TrayTop, const FVector2D& FrameHalf,
+                                       TArray<TWeakObjectPtr<UStaticMeshComponent>>& Out);
+/** Destroys every live ground component; returns how many there were. */
+UNMATCHED_API int32 Clear(TArray<TWeakObjectPtr<UStaticMeshComponent>>& Components);
+/** 'ARTPREVIEW envlayout ground map=<m> mode=.. strips=N ... status=<s>'. */
+UNMATCHED_API FString TraceLine(const FString& MapKey, const FS08EnvGround& Ground, const FS08EnvGroundStats& Stats);
+}  // namespace S08EnvGround

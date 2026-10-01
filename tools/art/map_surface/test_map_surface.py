@@ -69,6 +69,16 @@ class Camera(unittest.TestCase):
         self.assertAlmostEqual(k1_mock.s08_fit_distance(250.0, 300.0), 1931.0, delta=1.0)
         self.assertAlmostEqual(k1_mock.s08_fit_distance(891.333 / 2, 577.333 / 2), 1872.0, delta=1.0)
 
+    def test_overview_distance_env_u9(self):
+        # ENV-U9: the two map-image profiles carry k1DistanceMul 1.25 -> K1 2340 uu; Cobble keeps its fit (1931)
+        self.assertEqual(k1_mock.k1_distance_mul("c121b47f8d6eb28daccb76d05"), 1.25)  # Marmoreal
+        self.assertEqual(k1_mock.k1_distance_mul("c7fa64a26c29a0835f2383e63"), 1.25)  # Sarpedon
+        self.assertEqual(k1_mock.k1_distance_mul("cmuhgs4b2001mwik4f2b2xtf8"), 1.0)   # Cobble City 5x6
+        with self.assertRaises(ValueError):
+            k1_mock.k1_distance_mul("no-such-board")
+        self.assertAlmostEqual(k1_mock.s08_overview_distance(891.333 / 2, 577.333 / 2, 1.25), 2340.2, delta=0.5)
+        self.assertEqual(k1_mock.s08_overview_distance(250.0, 300.0), k1_mock.s08_fit_distance(250.0, 300.0))
+
     def test_projection_centre_and_orientation(self):
         cam = k1_mock.Camera(1872.0, 1920, 1080)
         c = cam.project([[0.0, 0.0, 0.0]])[0]

@@ -828,6 +828,22 @@ bool FS08EnvLayoutActorTest::RunTest(const FString&) {
                                 Rt.Stats.Intrusions, Rt.Stats.OutsideTray));
         TestTrue("layout applied and valid", Rt.bApplied && Rt.bLayoutValid);
         TestEqual("lights = the layout's", A->GetEnvLights().Num(), ShippedLayout.Lights.Num());
+        if (ShippedLayout.Ground.bSet) {
+          // ENV-U10 themed ground (S08EnvGround.h): 4 strips once tools/art/env_kit/ue_import_env_ground.py ran.
+          int32 GroundLive = 0;
+          for (const TWeakObjectPtr<UStaticMeshComponent>& G : Rt.Ground) GroundLive += G.IsValid() ? 1 : 0;
+          AddInfo(FString::Printf(TEXT("shipped Marmoreal ground: status %s strips %d area %.0f uu2"),
+                                  *Rt.GroundStats.Status, GroundLive, Rt.GroundStats.AreaUU2));
+          int32 GroundDot = INDEX_NONE;
+          const FString& GroundMat = ShippedLayout.Ground.Material;
+          const FString GroundPkg = GroundMat.FindChar(TEXT('.'), GroundDot) ? GroundMat.Left(GroundDot) : GroundMat;
+          if (FPackageName::DoesPackageExist(GroundPkg)) {
+            TestTrue("ground: 4 strips", Rt.GroundStats.Status == TEXT("ok") && GroundLive == 4);
+          } else {
+            AddWarning(FString::Printf(TEXT("%s not imported (tools/art/env_kit/ue_import_env_ground.py): no ground strips"),
+                                       *GroundPkg));
+          }
+        }
         if (KitMeshes == 0) {
           AddWarning(TEXT("env kit not imported (tools/art/env_kit/ue_import_env_kit.py): every prop skipped as missing"));
         } else {
@@ -841,7 +857,8 @@ bool FS08EnvLayoutActorTest::RunTest(const FString&) {
           }
         }
         TestTrue("rebuild grid 5x6", A->Rebuild(EnvGridBoard(5, 6)));
-        TestTrue("board change clears the environment", A->GetEnvProps().Num() == 0 && A->GetEnvLights().Num() == 0);
+        TestTrue("board change clears the environment", A->GetEnvProps().Num() == 0 && A->GetEnvLights().Num() == 0 &&
+                                                            A->GetEnvLayoutRuntime().Ground.Num() == 0);
         A->Destroy();
       }
     }

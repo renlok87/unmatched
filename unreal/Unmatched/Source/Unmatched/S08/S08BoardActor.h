@@ -58,6 +58,12 @@ public:
    *  placeholder stretch runs under ('T1-placeholder' on the map-image surface; nullptr = the old line). */
   void PlaceDioramaTray(bool bVisible, const FVector2D& BoardHalf, const TCHAR* Surface,
                         const FVector2D& Offset = FVector2D::ZeroVector, const TCHAR* Waiver = nullptr);
+  /** ENV-U10 track TRAY: shows the shared rocky tray T2 (S08Diorama::T2MeshPath, loaded on first use) at
+   *  (0, OffsetY, 0), yaw 0, scale 1 (S08Diorama::FitTrayT2) for a layout tray of outer half LayoutHalf around a board
+   *  frame of half FrameHalf; Source names where the tray came from (layout | apron | default). Writes the
+   *  'ARTPREVIEW diorama tray=... kind=T2 ...' line (no waiver). False (nothing changed) when T2 is not in the build -
+   *  the caller then keeps the T1 placeholder. Public for the automation test. */
+  bool PlaceDioramaTrayT2(const FVector2D& FrameHalf, const FVector2D& LayoutHalf, float OffsetY, const TCHAR* Source);
   /** ENV-MAPS track C (S08EnvLayout.h): arms the environment around map-image boards when
    *  S08EnvLayout::Enabled(bArtPreview) (-ArtPreview -ArtPreviewDiorama, no -ArtPreviewNoEnv); creates nothing by
    *  itself (called from BeginPlay; a grid board never gets a component). Returns the gate. */
@@ -76,6 +82,9 @@ public:
   /** Half extent the K1 camera / lights / tray fit: the active map-image profile's map, else the board's
    *  S08BoardHalfExtentUU (map canvas of a topology board, W x H x 50 of a grid). */
   FVector2D GetBoardHalfExtentUU() const;
+  /** ENV-U9: "k1DistanceMul" of the active art profile (1.25 on the two map-image boards), 1 without one (no art,
+   *  no match, a refused map-image profile -> the grey topology view keeps the plain fit). */
+  float GetK1DistanceMul() const { return bArtActive ? ActiveProfile.K1DistanceMul : 1.0f; }
   /** Map plane (map-image surface, or the dark canvas of the grey topology view); nullptr until a topology board. */
   const UStaticMeshComponent* GetMapPlane() const { return MapPlane; }
   /** Invisible QueryOnly (Visibility) cursor-trace box over the map of a topology board (nullptr on grids). */
@@ -272,11 +281,14 @@ private:
   void AddArtSurfacePart(UMaterialInterface* Material, const FTransform& Transform);
   void ClearArtLights();
   void ApplyArtLights(const FS08LightProfile& Light, bool bLegacyCobbleTrace);
+  /** ENV-MAPS P2: the profile's "mapGrade" on the map MID of a map-image board (traced; no block = the MI values). */
+  void ApplyMapGrade(const FS08LightProfile& Light);
   void ApplySurfaceMaterials();
   /** Wave 5c-B -ArtPreviewDiorama: shows / hides and fits the tray under the active art board (traced). */
   void UpdateDioramaTray(const FS08BoardModel& Board);
   /** ENV-MAPS track C: spawns / keeps / clears the environment of the active map-image board (S08EnvLayout::Update);
-   *  called first thing in UpdateDioramaTray, whose map-image fit then takes the layout's tray (S08EnvLayout::ApplyTray). */
+   *  called first thing in UpdateDioramaTray, whose map-image tray then takes the layout's tray (S08EnvLayout::ApplyTrayT2 -> the shared
+   *  T2 at scale 1; S08EnvLayout::ApplyTray only for the T1 placeholder fallback). */
   void UpdateEnvLayout();
 
   UPROPERTY()
@@ -298,6 +310,17 @@ private:
   // Wave 5c-B -ArtPreviewDiorama (S08Diorama.h): created at runtime only with the flag, nullptr otherwise.
   UPROPERTY()
   TObjectPtr<UStaticMeshComponent> DioramaTray;
+  // ENV-U10 track TRAY: the tray component swaps between T1 (SM_TableBase, grid boards and the map-image fallback)
+  // and T2 (SM_TableBase_T2, map-image boards, loaded on first use; bTrayT2Tried = the load was attempted).
+  UPROPERTY()
+  TObjectPtr<UStaticMesh> TrayT1Mesh;
+  UPROPERTY()
+  TObjectPtr<UMaterialInterface> TrayT1Mi;
+  UPROPERTY()
+  TObjectPtr<UStaticMesh> TrayT2Mesh;
+  UPROPERTY()
+  TObjectPtr<UMaterialInterface> TrayT2Mi;
+  bool bTrayT2Tried = false;
   // ENV-MAPS track C (S08EnvLayout.h): environment props / point lights of the active map-image board, created at
   // runtime only with -ArtPreview -ArtPreviewDiorama; destroyed on a board change.
   UPROPERTY()

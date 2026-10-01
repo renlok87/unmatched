@@ -37,7 +37,13 @@ struct FS08CameraZoomConfig {
    *  the Cobble 5x6 overview (live-k2-zoom-comparison-2026-09-28); 03 §2 asks
    *  1.6x. Q-302 decides - this is a proposal kept at the measured value. */
   float MinDistanceUU = 300.0f;
-  /** Farthest wheel distance = overview / ratio (03 §2: 0.65x). */
+  /** Farthest wheel distance = the board FIT distance / ratio (03 §2: 0.65x), never nearer than the overview
+   *  (FS08CameraZoom::MaxDistance). On every board whose overview is its fit (all grids) that is overview / ratio
+   *  as before. ENV-U9 decision for the map-image boards (overview = fit x k1DistanceMul 1.25 = 2340.2 uu): the far
+   *  limit stays at the fit 1872.2 / 0.65 = 2880.2 uu, i.e. 0.65 x 1.25 = 0.8125x of the NEW overview (one wheel
+   *  notch out of K1 reaches it). Reasons: the env layouts (tools/art/env_kit/layout_check.py camera set) and the
+   *  night key-light CSM distance (3600 uu, S08ArtBoardProfiles rev 7) were sized for 2880 uu; 0.65x of the new
+   *  overview (3600 uu) would add only void around the tray and push the far tray edge out of the shadow range. */
   float OverviewOutRatio = 0.65f;
   /** Distance multiplier per wheel notch (one notch = x1.25 / /1.25). */
   float WheelStepFactor = 1.25f;
@@ -45,7 +51,8 @@ struct FS08CameraZoomConfig {
   float ZoomAnimSeconds = 0.20f;
   /** Space: back to the overview (03 §2 "~300 ms"). */
   float OverviewReturnSeconds = 0.30f;
-  /** Follow-selection from this zoom (03 §2: >= 1.2x). */
+  /** Follow-selection from this zoom of the OVERVIEW (03 §2: >= 1.2x; ENV-U9 map boards: 2340.2 / 1.2 = 1950.2 uu,
+   *  so one wheel notch in from K1 follows, as on every grid). */
   float FollowFromZoom = 1.2f;
   FString Source = TEXT("defaults");
   TArray<FString> Issues;
@@ -83,12 +90,19 @@ struct FS08ZoomStep {
 
 /** Distance + focus rig of the fixed-angle board camera (pitch/yaw/FOV never
  *  change, D-10). Time-based smoothstep tweens of exactly the configured
- *  length replace the old open-ended FInterpTo, so "settled" is exact. */
+ *  length replace the old open-ended FInterpTo, so "settled" is exact.
+ *  ENV-U9: Overview (K1, the Space target) = Fit x the board profile's
+ *  k1DistanceMul. Every zoom RATIO is relative to the Overview (ZoomOf,
+ *  FollowFromZoom, FocusZoom / the bench K2xN views, the fighter label ratio),
+ *  so the K1-K3 frame spec of a map follows its new K1; the two limits are
+ *  board-absolute: near = MinDistanceUU (300 uu), far = Fit / OverviewOutRatio
+ *  (see FS08CameraZoomConfig::OverviewOutRatio). Fit == Overview on grids. */
 class FS08CameraZoom {
 public:
   FS08CameraZoomConfig Config;
 
-  void Reset(float OverviewDistance);
+  /** FitDistance <= 0 -> the overview is the fit (every grid, the historical single-argument call). */
+  void Reset(float OverviewDistance, float FitDistance = 0.0f);
   bool IsReady() const { return Overview > 0.0f; }
   float MinDistance() const;
   float MaxDistance() const;
@@ -108,6 +122,8 @@ public:
   float ZoomOf(float Distance) const { return Distance > 0.0f ? Overview / Distance : 0.0f; }
 
   float Overview = 0.0f;
+  /** ENV-U9: the board fit the overview was derived from (S08K1FitDistanceUU); anchors the far limit. */
+  float Fit = 0.0f;
   float Current = 0.0f;
   float Target = 0.0f;
   FVector CurrentFocus = FVector::ZeroVector;

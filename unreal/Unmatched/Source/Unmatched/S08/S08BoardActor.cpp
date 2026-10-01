@@ -11,6 +11,8 @@
 #include "Components/DirectionalLightComponent.h"
 #include "Components/PointLightComponent.h"
 #include "Components/SkyLightComponent.h"
+#include "Components/ExponentialHeightFogComponent.h"
+#include "Engine/ExponentialHeightFog.h"
 #include "Engine/PostProcessVolume.h"
 #include "Engine/SkyLight.h"
 #include "Engine/TextureCube.h"
@@ -685,6 +687,30 @@ void AS08BoardActor::ApplyArtLights(const FS08LightProfile& Light, bool bLegacyC
         *Light.Id, *Light.Sky.CubemapPath, Cube ? 1 : 0, Sky ? 1 : 0, Light.Sky.Intensity, Light.Sky.Color.R,
         Light.Sky.Color.G, Light.Sky.Color.B, Light.Sky.bLowerHemisphereIsBlack ? 1 : 0));
   }
+  // ENV-MAPS P2 night calibration: an optional ExponentialHeightFog (no volumetric fog) turns the black void
+  // around the diorama into the night haze of the concepts; StartDistance keeps the board out of it. A scene
+  // actor of the profile like the lights (destroyed with them), never a renderer / scalability setting.
+  if (bOk && Light.Fog.bSet && !bLegacy) {
+    const FS08FogSpec& F = Light.Fog;
+    AExponentialHeightFog* Fog =
+        GetWorld()->SpawnActor<AExponentialHeightFog>(FVector(0.0, 0.0, F.HeightZ), FRotator::ZeroRotator);
+    UExponentialHeightFogComponent* FogComponent = Fog ? Fog->GetComponent() : nullptr;
+    if (FogComponent) {
+      FogComponent->SetFogDensity(F.Density);
+      FogComponent->SetFogHeightFalloff(F.HeightFalloff);
+      FogComponent->SetFogInscatteringColor(F.Color);
+      FogComponent->SetStartDistance(F.StartDistanceUU);
+      FogComponent->SetEndDistance(F.EndDistanceUU);
+      FogComponent->SetFogMaxOpacity(F.MaxOpacity);
+      FogComponent->SetVolumetricFog(false);
+      ArtLights.Add(Fog);
+      AppliedRender.bFog = true;
+    }
+    FS08Trace::Write(FString::Printf(
+        TEXT("ARTPREVIEW fog profile=%s spawned=%d color=(%.4f,%.4f,%.4f) density=%g falloff=%g heightZ=%.0f start=%.0f end=%.0f maxOpacity=%.2f volumetric=0"),
+        *Light.Id, FogComponent ? 1 : 0, F.Color.R, F.Color.G, F.Color.B, F.Density, F.HeightFalloff, F.HeightZ,
+        F.StartDistanceUU, F.EndDistanceUU, F.MaxOpacity));
+  }
   // W4-A (memo §1 item 1): the exposure of the profile, identical in packaged
   // runs and the editor control scene: an unbound volume, histogram with
   // min == max brightness (a fixed exposure) + bias. Without it the engine
@@ -743,6 +769,28 @@ void AS08BoardActor::ApplyArtLights(const FS08LightProfile& Light, bool bLegacyC
   }
 }
 
+void AS08BoardActor::ApplyMapGrade(const FS08LightProfile& Light) {
+  UMaterialInstanceDynamic* Mid = MapPlaneMaterial.Get();
+  if (!Mid) return;
+  const FS08MapGradeSpec& G = Light.MapGrade;
+  if (G.bSet) {
+    Mid->SetScalarParameterValue(FName(S08MapSurfaceSpec::ParamNightEV), G.NightEV);
+    Mid->SetScalarParameterValue(FName(S08MapSurfaceSpec::ParamNightSaturation), G.NightSaturation);
+    Mid->SetScalarParameterValue(FName(S08MapSurfaceSpec::ParamLift), G.Lift);
+    if (G.bHasTint) Mid->SetVectorParameterValue(FName(S08MapSurfaceSpec::ParamNightTint), G.NightTint);
+  }
+  // Read back what the MID renders with (the profile values, or the MI values of the import script).
+  float Ev = 0.0f, Saturation = 0.0f, Lift = 0.0f;
+  FLinearColor Tint = FLinearColor::White;
+  Mid->GetScalarParameterValue(FHashedMaterialParameterInfo(S08MapSurfaceSpec::ParamNightEV), Ev);
+  Mid->GetScalarParameterValue(FHashedMaterialParameterInfo(S08MapSurfaceSpec::ParamNightSaturation), Saturation);
+  Mid->GetScalarParameterValue(FHashedMaterialParameterInfo(S08MapSurfaceSpec::ParamLift), Lift);
+  Mid->GetVectorParameterValue(FHashedMaterialParameterInfo(S08MapSurfaceSpec::ParamNightTint), Tint);
+  FS08Trace::Write(FString::Printf(
+      TEXT("ARTPREVIEW map grade profile=%s source=%s nightEV=%.2f nightSaturation=%.2f lift=%.2f nightTint=(%.4f,%.4f,%.4f)"),
+      *Light.Id, G.bSet ? TEXT("profile") : TEXT("mi"), Ev, Saturation, Lift, Tint.R, Tint.G, Tint.B));
+}
+
 void AS08BoardActor::ApplySurfaceMaterials() {
   // The instanced tiles keep their grey materials in every mode; on an art
   // board they are hidden click surfaces (the art surface draws instead) and
@@ -774,6 +822,8 @@ bool AS08BoardActor::EnsureDioramaTray(bool bArtPreview) {
   DioramaTray->SetRelativeLocation(FVector::ZeroVector);
   DioramaTray->SetVisibility(false);
   DioramaTray->RegisterComponent();
+  TrayT1Mesh = TrayMesh;  // ENV-U10: PlaceDioramaTray shows T1 again after a map-image board had T2
+  TrayT1Mi = TrayMi;
   FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW diorama requested mesh=%s mi=%s"), *TrayMesh->GetPathName(),
                                    TrayMi ? *TrayMi->GetName() : TEXT("missing(mesh default)")));
   return true;
@@ -786,6 +836,11 @@ void AS08BoardActor::PlaceDioramaTray(bool bVisible, const FVector2D& BoardHalf,
     DioramaTray->SetVisibility(false);
     FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW diorama tray hidden surface=%s (no art board)"), Surface));
     return;
+  }
+  // ENV-U10: the component may still carry T2 from a map-image board - every FitTray placement is the T1 mesh.
+  if (TrayT1Mesh && DioramaTray->GetStaticMesh() != TrayT1Mesh) {
+    DioramaTray->SetStaticMesh(TrayT1Mesh);
+    DioramaTray->SetMaterial(0, TrayT1Mi);  // nullptr = the mesh's own material, as EnsureDioramaTray without the MI
   }
   const S08Diorama::FTrayFit Fit = S08Diorama::FitTray(BoardHalf, Offset);
   DioramaTray->SetRelativeLocationAndRotation(FVector(Fit.Location.X, Fit.Location.Y, 0.0),
@@ -808,6 +863,51 @@ void AS08BoardActor::PlaceDioramaTray(bool bVisible, const FVector2D& BoardHalf,
       Size.Z, Box.Max.Z, BoardHalf.X, BoardHalf.Y, S08Diorama::RimUU, *Extra));
 }
 
+bool AS08BoardActor::PlaceDioramaTrayT2(const FVector2D& FrameHalf, const FVector2D& LayoutHalf, float OffsetY,
+                                        const TCHAR* Source) {
+  if (!DioramaTray) return false;
+  if (!bTrayT2Tried) {
+    // Loaded on the first map-image board only: a run that never shows a map loads nothing new.
+    bTrayT2Tried = true;
+    TrayT2Mesh = LoadObject<UStaticMesh>(nullptr, S08Diorama::T2MeshPath);
+    TrayT2Mi = LoadObject<UMaterialInterface>(nullptr, S08Diorama::T2MaterialPath);
+    FS08Trace::Write(FString::Printf(
+        TEXT("ARTPREVIEW diorama tray-t2 %s mesh=%s mi=%s%s"), TrayT2Mesh ? TEXT("loaded") : TEXT("absent"),
+        S08Diorama::T2MeshPath, TrayT2Mi ? *TrayT2Mi->GetName() : TEXT("missing(mesh default)"),
+        TrayT2Mesh ? TEXT("") : TEXT(" (import: tools/art/env_kit/ue_import_tray_t2.py) -> T1 placeholder")));
+  }
+  if (!TrayT2Mesh) return false;
+  if (DioramaTray->GetStaticMesh() != TrayT2Mesh) {
+    DioramaTray->SetStaticMesh(TrayT2Mesh);
+    DioramaTray->SetMaterial(0, TrayT2Mi);  // nullptr = the mesh's own material
+  }
+  float MismatchUU = 0.0f;
+  const S08Diorama::FTrayFit Fit = S08Diorama::FitTrayT2(LayoutHalf, OffsetY, MismatchUU);
+  DioramaTray->SetRelativeLocationAndRotation(FVector(Fit.Location.X, Fit.Location.Y, 0.0),
+                                              FRotator(0.0f, Fit.YawDeg, 0.0f));
+  DioramaTray->SetRelativeScale3D(Fit.Scale);
+  DioramaTray->SetVisibility(true);
+  const FBox Box = TrayT2Mesh->GetBoundingBox().TransformBy(DioramaTray->GetComponentTransform());
+  const UMaterialInterface* Mi = DioramaTray->GetMaterial(0);
+  const FVector Size = Box.GetSize();
+  const int32 bMatch = MismatchUU <= S08Diorama::T2MatchToleranceUU ? 1 : 0;
+  // Same leading fields as the T1 line (topZ = the flat top, boardHalf = the map frame, rimUU = the narrowest apron
+  // from the frame to the tray edge), then the T2 fields; no waiver: the mesh is placed at scale 1.
+  FS08Trace::Write(FString::Printf(
+      TEXT("ARTPREVIEW diorama tray=%s mi=%s surface=%s yaw=%.1f scale=%.3fx%.3fx%.3f bounds=(%.1f,%.1f,%.1f)..(%.1f,%.1f,%.1f) size=%.1fx%.1fx%.1f topZ=%.1f boardHalf=%.1fx%.1f rimUU=%.1f collision=none kind=T2 topHalf=%.1fx%.1f layoutHalf=%.1fx%.1f offset=(%.1f,%.1f) source=%s mismatchUU=%.1f match=%d anisotropy=%.3f lipTopZ=%.1f lipBandUU=%.1f"),
+      *TrayT2Mesh->GetPathName(), Mi ? *Mi->GetName() : TEXT("-"), S08BoardSurfaceName(ES08BoardSurface::MapImage),
+      Fit.YawDeg, Fit.Scale.X, Fit.Scale.Y, Fit.Scale.Z, Box.Min.X, Box.Min.Y, Box.Min.Z, Box.Max.X, Box.Max.Y,
+      Box.Max.Z, Size.X, Size.Y, Size.Z, S08Diorama::TopZ, FrameHalf.X, FrameHalf.Y,
+      S08Diorama::T2MinApronUU(FrameHalf, OffsetY), Fit.WorldHalf.X, Fit.WorldHalf.Y, LayoutHalf.X, LayoutHalf.Y,
+      Fit.Location.X, Fit.Location.Y, Source, MismatchUU, bMatch, Fit.Anisotropy(), Box.Max.Z, S08Diorama::T2RimUU));
+  if (!bMatch) {
+    FS08Trace::Write(FString::Printf(
+        TEXT("ARTPREVIEW diorama tray-t2 mismatch layoutHalf=%.1fx%.1f t2Top=%.1fx%.1f mismatchUU=%.1f (T2 is never stretched: rebuild T2 or fix the layout tray)"),
+        LayoutHalf.X, LayoutHalf.Y, S08Diorama::T2TopHalfX, S08Diorama::T2TopHalfY, MismatchUU));
+  }
+  return true;
+}
+
 void AS08BoardActor::UpdateDioramaTray(const FS08BoardModel& Board) {
   // ENV-MAPS track C: the environment first (it does not need the tray mesh; its layout may carry the tray extents).
   UpdateEnvLayout();
@@ -817,14 +917,21 @@ void AS08BoardActor::UpdateDioramaTray(const FS08BoardModel& Board) {
     return;
   }
   if (bMapImageActive) {
-    // ENV-O8 T1 placeholder (explicit waiver, S08Diorama.h): the Cobble-sized SM_TableBase is stretched
-    // non-uniformly (~1.37 x 1.11) around the map + wooden frame until the T2 modular skirt replaces it. The
-    // <= 5 % non-uniformity rule of the tray is waived for this placeholder only, and the trace line says so.
-    // ENV-MAPS track C: an applied env layout with a tray / apron that covers the frame sets the outer tray instead
-    // (S08EnvLayout::ApplyTray, traced 'ARTPREVIEW envlayout tray'); still the same placeholder mesh and waiver.
-    FVector2D TrayHalf = ActiveProfile.Map.FrameHalfUU();
+    // ENV-U10 track TRAY: the shared rocky tray T2 (S08Diorama.h) at scale 1 - no stretch, no waiver - centred on the
+    // applied env layout's tray (S08EnvLayout::ApplyTrayT2: its "tray" / apron, traced 'ARTPREVIEW envlayout tray
+    // ... mesh=T2'), else on the shared default (-ArtPreviewNoEnv, no / invalid layout).
+    const FVector2D Frame = ActiveProfile.Map.FrameHalfUU();
+    FVector2D LayoutHalf(S08Diorama::T2TopHalfX, S08Diorama::T2TopHalfY);
+    float OffsetY = S08Diorama::T2DefaultOffsetY;
+    FString Source = TEXT("default");
+    S08EnvLayout::ApplyTrayT2(EnvRuntime, Frame, LayoutHalf, OffsetY, Source);
+    if (PlaceDioramaTrayT2(Frame, LayoutHalf, OffsetY, *Source)) return;
+    // T2 not in the build: the ENV-O8 T1 placeholder (explicit waiver, S08Diorama.h) - the Cobble-sized SM_TableBase
+    // stretched non-uniformly around the map + wooden frame (or the layout's outer tray, S08EnvLayout::ApplyTray);
+    // the <= 5 % non-uniformity rule of the tray is waived for this fallback only, and the trace line says so.
+    FVector2D TrayHalf = Frame;
     FVector2D TrayOffset = ActiveProfile.Map.TrayOffsetUU;
-    S08EnvLayout::ApplyTray(EnvRuntime, ActiveProfile.Map.FrameHalfUU(), TrayHalf, TrayOffset);
+    S08EnvLayout::ApplyTray(EnvRuntime, Frame, TrayHalf, TrayOffset);
     PlaceDioramaTray(true, TrayHalf, S08BoardSurfaceName(ES08BoardSurface::MapImage), TrayOffset,
                      S08MapSurfaceSpec::TrayWaiver);
     return;
@@ -968,6 +1075,7 @@ bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
     ClearArtLights();
   } else if (const FS08LightProfile* Light = ArtData.LightFor(ActiveProfile)) {
     ApplyArtLights(*Light, ActiveProfile.bLegacyCobbleTrace);
+    if (bMapImageActive) ApplyMapGrade(*Light);
   }
   const bool bCobbleMesh = bArtActive && !bArtTiles && !bMapImageActive;
   // ENV-MAPS: the map-image surface draws no zone marks (the zones are the painted ones); on grids this is

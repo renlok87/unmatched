@@ -3,15 +3,15 @@
   "map": "sarpedon",
   "boardId": "c7fa64a26c29a0835f2383e63",
   "tray": {
-    "halfX": 769.67,
-    "halfY": 462.67,
-    "offsetY": -50.0
+    "halfX": 780.0,
+    "halfY": 470.0,
+    "offsetY": -45.0
   },
   "apron": {
-    "n": 200.0,
-    "s": 100.0,
-    "w": 300.0,
-    "e": 300.0
+    "n": 202.33,
+    "s": 112.33,
+    "w": 310.33,
+    "e": 310.33
   },
   "props": [
     {
@@ -238,11 +238,11 @@
       "loc": [
         -548.0,
         -352.0,
-        28.0
+        60.0
       ],
       "colorSrgb": "#FF8A3D",
-      "intensityCd": 80,
-      "radius": 380,
+      "intensityCd": 55,
+      "radius": 460,
       "castShadow": false
     },
     {
@@ -251,11 +251,11 @@
       "loc": [
         -560.0,
         85.0,
-        25.0
+        60.0
       ],
       "colorSrgb": "#FF9A4A",
-      "intensityCd": 60,
-      "radius": 330,
+      "intensityCd": 45,
+      "radius": 420,
       "castShadow": false
     },
     {
@@ -266,9 +266,9 @@
         -355.0,
         150.0
       ],
-      "colorSrgb": "#FFB870",
-      "intensityCd": 45,
-      "radius": 340,
+      "colorSrgb": "#FFA552",
+      "intensityCd": 70,
+      "radius": 480,
       "castShadow": false
     },
     {
@@ -279,11 +279,40 @@
         -126.0,
         140.0
       ],
-      "colorSrgb": "#FFB870",
-      "intensityCd": 40,
-      "radius": 320,
+      "colorSrgb": "#FFA552",
+      "intensityCd": 65,
+      "radius": 460,
       "castShadow": false
+    },
+    {
+      "id": "ship-lantern-stern",
+      "type": "point",
+      "castShadow": false,
+      "loc": [
+        690.0,
+        -30.0,
+        140.0
+      ],
+      "colorSrgb": "#FFA552",
+      "intensityCd": 50,
+      "radius": 440
     }
   ],
-  "notes": "Sarpedon - concept v2 (ENV-U8): NW fort ruin with a campfire in front, palisade = 2 segments along the far edge right of the fort (facing the camera) + 3 along the W side turned 15-20 deg towards the camera (edge-on they read as a thin line), trees W/NW behind the palisade, a fire basket (Campfire) in the W palisade gap. E: ship hull as 2 sections at scale 0.85 (255 long x 218 h; the processed hull is 300 long x 256 h - its proportions incl. the rigging, not the ~130 h of the proposal), on a slight curve (UE yaw 152 -> 165, bow towards the far-right corner) with the outboard red side and gunports facing the map and the camera; 4 cannons (1.4 -> 63 long; 45 is a speck next to 50-uu heroes) in front of the hull pointing at the map; rope coils (1.8 -> 40 dia) NE and SE. Far centre (river mouth / beach, X ~ -300..+400) and the near edge where the river leaves the map (X ~ -45..+90, waterfall over the tray edge) are kept free for a later water VFX - no prop. 18 props, 4 warm lights (2 campfires + 2 ship lanterns on the hull rail; the lantern mesh is pending, SM_Decor_Lantern is not in this worktree); leaves 2 points for a cool moon/water fill. Conventions: board-actor space (origin = map centre, +X right on the K1 screen, +Y towards the K1 camera = near side, Z up, map plane ~0); props stand on the tray top z -3, pivot = base centre; yawDeg = UE actor yaw of the processed UM_FBX_v1 mesh (tools/art/env_kit/env_kit_build.py: local +X = FRONT = the Tripo 'front' reference view, Y = width, Z = up), so 90 turns the front to the K1 camera (+Y) with the width along X, 180 faces -X/west, 0 faces +X/east, -90 faces -Y/far; scale multiplies the processed mesh, whose size already equals its target (height; Hull/Cannon = length, Campfire/Rope = diameter = longest horizontal extent; e.g. Hull 300 x 64 x 256, Cannon 45 x 32 x 27). Tray (T1 placeholder: SM_TableBase scaled to halfX x halfY and moved to (0, offsetY) = tray centre, negative = towards the far side; top z -3) = frame outer rectangle (|X| <= 469.667, |Y| <= 312.667) + apron n/s/w/e. The near band (Y > 312.667, |X| < 469.667, between the map and the camera) is kept empty; tall props only on the far side and in the far halves of W/E. Checked by tools/art/env_kit/layout_check.py: no prop box covers or comes within 4 px (1080p) of any space circle at K1 (D0 = 1872 uu) and every wheel zoom (0.65x .. 6.24x, notches of x1.25 clamped to 300 uu .. D0/0.65) plus 1.2x/1.6x, looking at the centre and, from 1.2x on, following every space; no castShadow prop's key-light (-55, 30, 0) shadow touches a circle. Lights: warm points without shadows at lantern/fire positions. S08EnvLayout adds them to the art light profile's points and checks 1 key + <= 6 points in total (combinedBudgetOk); S08ArtBoardProfiles rev 7 cut the profile placeholders to the cool point (marmoreal-night moon-pool / sarpedon-night water-rim), so profile + layout = 1 + 4 = 5 points. SM_Decor_Lantern/Barrel/Crate are not in this worktree and are not referenced. Status: proposed (P1b layout), not art-accepted; iterate on UE K1 / zoom-out frames."
+  "ground": {
+    "mode": "runtime",
+    "material": "/Game/EnvKit/Ground/MI_EnvGround_Sarpedon",
+    "z": -1.0,
+    "frameOverlapUU": 2.0,
+    "insetUU": 0.0,
+    "splatRect": [
+      -820.0,
+      -560.0,
+      820.0,
+      470.0
+    ],
+    "splat": "art/pipeline-candidates/ASSET-ENV-KIT-001/ground/sarpedon.splat.png",
+    "splatSha256": "0f59eadc54e432a36c4520dd109f4720650278c22095bf525e9cf34d880b539b",
+    "notes": "ENV-U10 themed ground (tools/art/env_kit/ground_splat.py, ground-params.json): runtime = four /Engine/BasicShapes/Plane strips = tray top minus the frame (hole = frame outer - frameOverlapUU, outer = tray top - insetUU) at z, NoCollision, no shadow casting; material MI_EnvGround_<Map> (tools/art/env_kit/ue_import_env_ground.py) gets GroundStrip / SplatRect per strip (MID)."
+  },
+  "notes": "Sarpedon - concept v2 (ENV-U8): NW fort ruin with a campfire in front, palisade = 2 segments along the far edge right of the fort (facing the camera) + 3 along the W side turned 15-20 deg towards the camera (edge-on they read as a thin line), trees W/NW behind the palisade, a fire basket (Campfire) in the W palisade gap. E: ship hull as 2 sections at scale 0.85 (255 long x 218 h; the processed hull is 300 long x 256 h - its proportions incl. the rigging, not the ~130 h of the proposal), on a slight curve (UE yaw 152 -> 165, bow towards the far-right corner) with the outboard red side and gunports facing the map and the camera; 4 cannons (1.4 -> 63 long; 45 is a speck next to 50-uu heroes) in front of the hull pointing at the map; rope coils (1.8 -> 40 dia) NE and SE. Far centre (river mouth / beach, X ~ -300..+400) and the near edge where the river leaves the map (X ~ -45..+90, waterfall over the tray edge) are kept free for a later water VFX - no prop. 18 props, 4 warm lights (2 campfires + 2 ship lanterns on the hull rail; the lantern mesh is pending, SM_Decor_Lantern is not in this worktree); leaves 2 points for a cool moon/water fill. Conventions: board-actor space (origin = map centre, +X right on the K1 screen, +Y towards the K1 camera = near side, Z up, map plane ~0); props stand on the tray top z -3, pivot = base centre; yawDeg = UE actor yaw of the processed UM_FBX_v1 mesh (tools/art/env_kit/env_kit_build.py: local +X = FRONT = the Tripo 'front' reference view, Y = width, Z = up), so 90 turns the front to the K1 camera (+Y) with the width along X, 180 faces -X/west, 0 faces +X/east, -90 faces -Y/far; scale multiplies the processed mesh, whose size already equals its target (height; Hull/Cannon = length, Campfire/Rope = diameter = longest horizontal extent; e.g. Hull 300 x 64 x 256, Cannon 45 x 32 x 27). Tray (ENV-U10 / 'одна каменная подложка', T2): the ONE shared stone tray SM_TableBase_T2 of both map boards - halfX 780 x halfY 470 centred at (0, offsetY -45) (negative = towards the far side), flat top z -3, placed at scale 1 (no stretch; T1 SM_TableBase stays for the grid fixtures) = frame outer rectangle (|X| <= 469.667, |Y| <= 312.667) + apron n 202.33 / s 112.33 / w = e 310.33 (the apron follows the shared tray, art/pipeline-candidates/ASSET-TABLE-BASE-001/20261001-tray-t2/reports/tray-t2-params.json); its rocky lip may rise to z +2 only within rimUU 20 of the tray edge (keep prop bases out of that band). The near band (Y > 312.667, |X| < 469.667, between the map and the camera) is kept empty; tall props only on the far side and in the far halves of W/E. Checked by tools/art/env_kit/layout_check.py: no prop box covers or comes within 4 px (1080p) of any space circle at K1 (D0 = 2340 uu = the fit 1872 uu x k1DistanceMul 1.25 of the board profile, ENV-U9) and every wheel zoom (0.8125x .. 7.80x of D0: notches of x1.25 clamped to 300 uu .. fit/0.65 = 2880 uu) plus 1.2x/1.6x of D0, looking at the centre and, from 1.2x of D0 on, following every space; no castShadow prop's key-light (-55, 30, 0) shadow touches a circle. Lights: warm points without shadows at lantern/fire positions. S08EnvLayout adds them to the art light profile's points and checks 1 key + <= 6 points in total (combinedBudgetOk); S08ArtBoardProfiles rev 7 cut the profile placeholders to the cool point (marmoreal-night moon-pool / sarpedon-night water-rim), so profile + layout = 1 + 4 = 5 points. SM_Decor_Lantern/Barrel/Crate are not in this worktree and are not referenced. Status: proposed (P1b layout), not art-accepted; iterate on UE K1 / zoom-out frames. P2 night calibration (2026-10-01, S08ArtBoardProfiles rev 9, docs/game-design/evidence/ENV-MAPS/p2-frames-2026-10-01/README.md): campfire lights raised to z 60 (no blown hot spot) at 55/45 cd r460/420, hull lanterns #FFA552 70/65 cd r480/460, and a 5th warm light ship-lantern-stern at the S end of hull-e2 (690,-30,140) 50 cd r440 for the SE deck; the profile's water-rim point became the shared cool moon pool over the map, so profile + layout = 1 key + 6 points."
 }

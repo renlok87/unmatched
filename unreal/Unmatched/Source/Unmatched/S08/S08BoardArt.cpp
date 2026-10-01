@@ -232,6 +232,66 @@ bool ParseRenderBlocks(const FString& ProfileId, const TSharedPtr<FJsonObject>& 
       K.ContactShadowLength = static_cast<float>(Contact);
     }
   }
+  // ENV-MAPS P2 night calibration: optional height fog (the void around the diorama) and map night grade.
+  auto Finite3 = [](const TArray<double>& N, double Max) {
+    for (const double V : N) {
+      if (!FMath::IsFinite(V) || V < 0.0 || V > Max) return false;
+    }
+    return true;
+  };
+  const TSharedPtr<FJsonObject>* Fog = nullptr;
+  if (Obj->TryGetObjectField(TEXT("fog"), Fog) && Fog) {
+    FS08FogSpec& F = Profile.Fog;
+    TArray<double> Color;
+    double Density = -1.0, Falloff = -1.0, HeightZ = 0.0, Start = 0.0, End = 0.0, MaxOpacity = 1.0;
+    const bool bColor = ReadNumberArray(*Fog, TEXT("colorLinear"), 3, Color) && Finite3(Color, 10.0);
+    const bool bNumbers = (*Fog)->TryGetNumberField(TEXT("density"), Density) &&
+                          (*Fog)->TryGetNumberField(TEXT("heightFalloff"), Falloff) &&
+                          (*Fog)->TryGetNumberField(TEXT("heightZ"), HeightZ) &&
+                          (*Fog)->TryGetNumberField(TEXT("startDistanceUU"), Start);
+    (*Fog)->TryGetNumberField(TEXT("endDistanceUU"), End);
+    (*Fog)->TryGetNumberField(TEXT("maxOpacity"), MaxOpacity);
+    if (!bColor || !bNumbers || !(Density > 0.0 && Density <= 1.0) || !(Falloff > 0.0 && Falloff <= 2.0) ||
+        !FMath::IsFinite(HeightZ) || FMath::Abs(HeightZ) > 100000.0 || !(Start >= 0.0 && Start <= 100000.0) ||
+        !(End == 0.0 || (End > Start && End <= 1000000.0)) || !(MaxOpacity >= 0.0 && MaxOpacity <= 1.0)) {
+      Errors.Add(FString::Printf(TEXT("light profile %s: fog needs colorLinear [r,g,b] 0..10, density 0..1, heightFalloff 0..2, heightZ, startDistanceUU >= 0, endDistanceUU 0 or > start, maxOpacity 0..1"),
+                                 *ProfileId));
+      bOk = false;
+    } else {
+      F.bSet = true;
+      F.Color = FLinearColor(Color[0], Color[1], Color[2]);
+      F.Density = static_cast<float>(Density);
+      F.HeightFalloff = static_cast<float>(Falloff);
+      F.HeightZ = static_cast<float>(HeightZ);
+      F.StartDistanceUU = static_cast<float>(Start);
+      F.EndDistanceUU = static_cast<float>(End);
+      F.MaxOpacity = static_cast<float>(MaxOpacity);
+    }
+  }
+  const TSharedPtr<FJsonObject>* Grade = nullptr;
+  if (Obj->TryGetObjectField(TEXT("mapGrade"), Grade) && Grade) {
+    FS08MapGradeSpec& G = Profile.MapGrade;
+    double Ev = 0.0, Saturation = -1.0, Lift = -1.0;
+    TArray<double> Tint;
+    const bool bNumbers = (*Grade)->TryGetNumberField(TEXT("nightEV"), Ev) &&
+                          (*Grade)->TryGetNumberField(TEXT("nightSaturation"), Saturation) &&
+                          (*Grade)->TryGetNumberField(TEXT("lift"), Lift);
+    const bool bHasTint = (*Grade)->HasField(TEXT("nightTintLinear"));
+    const bool bTint = !bHasTint || (ReadNumberArray(*Grade, TEXT("nightTintLinear"), 3, Tint) && Finite3(Tint, 4.0));
+    if (!bNumbers || !bTint || !(Ev >= -4.0 && Ev <= 2.0) || !(Saturation >= 0.0 && Saturation <= 1.5) ||
+        !(Lift >= 0.0 && Lift <= 20.0)) {
+      Errors.Add(FString::Printf(TEXT("light profile %s: mapGrade needs nightEV -4..2, nightSaturation 0..1.5, lift 0..20 and an optional nightTintLinear [r,g,b] 0..4"),
+                                 *ProfileId));
+      bOk = false;
+    } else {
+      G.bSet = true;
+      G.NightEV = static_cast<float>(Ev);
+      G.NightSaturation = static_cast<float>(Saturation);
+      G.Lift = static_cast<float>(Lift);
+      G.bHasTint = bHasTint;
+      if (bHasTint) G.NightTint = FLinearColor(Tint[0], Tint[1], Tint[2]);
+    }
+  }
   return bOk;
 }
 
@@ -679,6 +739,17 @@ bool FS08BoardArtData::ParseJson(const FString& Text, TArray<FString>& OutErrors
           continue;
         }
       }
+      // ENV-U9: optional K1 overview multiplier (overview = the board fit x k1DistanceMul), any surface, default 1.
+      if ((*Obj)->HasField(TEXT("k1DistanceMul"))) {
+        double Mul = 0.0;
+        if (!(*Obj)->TryGetNumberField(TEXT("k1DistanceMul"), Mul) || !FMath::IsFinite(Mul) ||
+            Mul < FS08BoardArtProfile::MinK1DistanceMul || Mul > FS08BoardArtProfile::MaxK1DistanceMul) {
+          OutErrors.Add(FString::Printf(TEXT("board %s: k1DistanceMul must be a number in [%.0f, %.0f]"), *B.Id,
+                                        FS08BoardArtProfile::MinK1DistanceMul, FS08BoardArtProfile::MaxK1DistanceMul));
+          continue;
+        }
+        B.K1DistanceMul = static_cast<float>(Mul);
+      }
       const TSharedPtr<FJsonObject>* Expect = nullptr;
       if ((*Obj)->TryGetObjectField(TEXT("expect"), Expect) && Expect) {
         auto ReadInt = [&](const TCHAR* Field, int32& Out) {
@@ -1001,6 +1072,11 @@ float S08K1FitDistanceUU(const FVector2D& HalfExtentUU) {
   const float NeedV = (ExtentY * SinPitch + 60.0f) / HalfV;
   const float NeedH = (ExtentX + 60.0f) / HalfH;
   return FMath::Max(NeedV, NeedH) * 1.12f;
+}
+
+float S08K1OverviewDistanceUU(float FitDistanceUU, float K1DistanceMul) {
+  // Mul 1 (every grid, a refused / missing profile) returns the fit untouched.
+  return K1DistanceMul == 1.0f ? FitDistanceUU : FitDistanceUU * K1DistanceMul;
 }
 
 TArray<TPair<FIntPoint, FIntPoint>> S08BoardLinkPairs(const FS08BoardModel& Board) {

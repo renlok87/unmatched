@@ -55,6 +55,7 @@ struct UNMATCHED_API FS08AppliedRender {
   FString ProfilesSource;     // pak | override
   int32 ShadowCasters = 0;    // lights with CastShadows (C-8: 1 = the key)
   FString KeyShadow;          // csm distance/cascades as applied
+  bool bFog = false;          // ENV-MAPS P2: the profile's ExponentialHeightFog was spawned (not in the RENDER line)
 };
 
 /** One "RENDER ..." trace line (no trailing newline). Tag = SHOT/BENCH/... */

@@ -24,7 +24,9 @@ Checks (every one is an error unless marked warn):
     the fixed set and the kit folder that owns it, unique ids, <= 6 point lights without shadows;
  2. tray / apron: tray.halfX = frameHalfX + max(apron.w, apron.e), tray.halfY = frameHalfY +
     (apron.n + apron.s) / 2, tray.offsetY = (apron.s - apron.n) / 2 (tray centre Y; negative = shifted
-    to the far side); every prop's base footprint lies on the tray (LIP_UU inside its edge);
+    to the far side); the tray IS the one shared stone tray T2 of both maps (TRAY_T2: SM_TableBase_T2 at scale 1,
+    ENV-U10 'единая каменная подложка'); every prop's base footprint lies on the tray (LIP_UU inside its edge),
+    warn when it reaches into the rocky lip band (RIM_UU inside the edge, where T2 rocks rise up to Z +2);
  3. frame: no prop's full oriented footprint enters the frame rectangle (+ FRAME_GAP_UU), and the axis-aligned
     box of the rotated prop box stays off the map rectangle (= S08EnvLayout.cpp BoxOverlapsMap, the UE
     'intrusions' counter);
@@ -34,10 +36,11 @@ Checks (every one is an error unless marked warn):
     interpenetrate by <= JOINT_TOL_UU at a joint);
  6. occlusion: every prop's oriented bounding box (processed size x scale; tall tops included) is
     projected with the K1 camera model (tools/art/map_surface/k1_mock.py: HFOV 35, pitch -55,
-    yaw -90, 1920 x 1080) at the overview distance D0 = s08_fit_distance(map half extents)
-    (~1872 uu) and every distance the mouse wheel can settle on (wheel_zooms: notches of x1.25 clamped to
-    [300 uu, D0 / 0.65], i.e. zoom 0.65x .. 6.24x, FS08CameraZoomConfig defaults) plus 1.2x / 1.6x, looking at
-    the board centre and - from 1.2x on (follow mode, focus = space centre + 28 uu Z, as
+    yaw -90, 1920 x 1080) at the K1 overview D0 = the fit s08_fit_distance(map half extents) (~1872 uu) x the
+    board profile's k1DistanceMul (ENV-U9, S08ArtBoardProfiles.json: 1.25 -> ~2340 uu) and every distance the
+    mouse wheel can settle on (wheel_zooms: notches of x1.25 clamped to [300 uu, fit / 0.65 = ~2880 uu], i.e. zoom
+    0.8125x .. 7.80x of D0, FS08CameraZoomConfig defaults + FS08CameraZoom::MaxDistance) plus 1.2x / 1.6x of D0,
+    looking at the board centre and - from 1.2x of D0 on (follow mode, focus = space centre + 28 uu Z, as
     AS08FlowGameMode::UpdateBoardCamera) - at every space. The convex hull of the projected box must
     stay MARGIN_PX (4 px at 1080p) away from every space circle's projected disk (radius =
     spaceRadiusPx + 0.5 px painted ring). A prop point above the ground whose projection falls inside a
@@ -47,6 +50,11 @@ Checks (every one is an error unless marked warn):
     space circle (warn below SHADOW_WARN_UU);
  8. warn: 10..18 props; tall props (> TALL_H_UU) in the near half (Y > 0); crowns overhanging the
     tray edge by > 60 uu; lights inside the frame rectangle or off the tray.
+ 9. ground (ENV-U10, optional section - warn when absent; validate_ground, = S08EnvGround.cpp): mode 'runtime',
+    material /Game/EnvKit/Ground/MI_EnvGround_<Kit>, z in (-3, -0.5), frameOverlapUU in [0, 20], insetUU in
+    [0, 200], splatRect [minX, minY, maxX, maxY] covering the tray top - inset, the tray top minus the frame hole =
+    4 strips (S08EnvGround::Strips), and the splat PNG (tools/art/env_kit/ground_splat.py) present with the
+    recorded splatSha256.
 
 Usage:
   python -B tools/art/env_kit/layout_check.py                       # both maps, text report
@@ -56,8 +64,8 @@ Usage:
 Prop sizes come from the env kit build reports (--build-reports, reports/assets/SM_Env_<Name>.build.json:
 UE X = depth, Y = width, Z = height) when present, else from the KIT table; the run prints whether they agree.
 Debug images (--images DIR, CPU / PIL only): <map>-top.png (orthographic top view, footprints, lights,
-K1 / zoom-out ground frusta) and <map>-k1.png (K1 overview), plus <map>-out.png (zoom-out 0.65x) and
-<map>-wide.png (the 1.45x concept camera). They draw the flat map illustration (out of git, ENV-U3:
+K1 / zoom-out ground frusta) and <map>-k1.png (K1 overview, D0), plus <map>-out.png (the zoom-out limit
+fit / 0.65) and <map>-wide.png (the concept camera, fit x 1.45). They draw the flat map illustration (out of git, ENV-U3:
 --map-images) and, when the Tripo source GLBs are present (--glb-dir, out of git), flat-shaded
 previews of the real meshes; otherwise shaded boxes. Exit code 1 on any error.
 """
@@ -89,9 +97,11 @@ TRAY_TOP_Z = -3.0
 RING_EXTRA_PX = 0.5          # painted ring outer edge 63.43 px vs spaceRadiusPx 63
 MARGIN_PX = 4.0              # clearance around every circle at 1080p
 SCREEN = (1920, 1080)
-# FS08CameraZoomConfig defaults (S08ArtHud.h): farthest = D0 / OverviewOutRatio, nearest = MinDistanceUU, one wheel
-# notch = x / WheelStepFactor, follow-selection from FollowFromZoom. The wheel steps are computed in camera_set().
-ZOOM_OUT = 0.65              # OverviewOutRatio
+# FS08CameraZoomConfig defaults (S08ArtHud.h): D0 = the K1 overview = fit x k1DistanceMul (ENV-U9, read from the board
+# profile), farthest = max(D0, fit / OverviewOutRatio) (the far limit stays with the fit: 2880 uu = 0.8125x of the map
+# boards' 2340 uu D0), nearest = MinDistanceUU (absolute), one wheel notch = x / WheelStepFactor, follow-selection
+# from FollowFromZoom of D0. The wheel steps are computed in camera_set().
+ZOOM_OUT = 0.65              # OverviewOutRatio (of the fit)
 WHEEL_STEP = 1.25            # WheelStepFactor
 MIN_DIST_UU = 300.0          # MinDistanceUU
 FOLLOW_FROM = 1.2            # FollowFromZoom
@@ -99,6 +109,11 @@ ZOOMS_FIXED = (1.2, 1.6)     # the follow threshold and the 03 §2 K2 zoom (Focu
 FOLLOW_Z = 28.0              # UpdateBoardCamera: focus = CellToWorld + (0, 0, 28)
 NEAR_UU = 10.0               # UE near clip plane (GNearClippingPlane): nothing nearer to the camera is drawn
 LIP_UU = 8.0                 # base footprint stays this far inside the tray edge
+# ENV-U10 (track TRAY, 2026-10-01): the ONE shared stone tray of both map boards = the flat top of SM_TableBase_T2
+# (art/pipeline-candidates/ASSET-TABLE-BASE-001/20261001-tray-t2, placed at scale 1 at (0, offsetY); the ground
+# track reads the same numbers from C:/tmp/envmaps-research/p2/tray-extents.json). Both layouts carry exactly this.
+TRAY_T2 = {"halfX": 780.0, "halfY": 470.0, "offsetY": -45.0}
+RIM_UU = 20.0                # rocky lip band of T2 inside the tray edge (rock tops up to Z +2 there): warn for props
 FRAME_GAP_UU = 2.0
 NEAR_MAX_H_UU = 25.0
 TALL_H_UU = 120.0
@@ -294,13 +309,29 @@ def clip_front(cam: k1_mock.Camera, pts: np.ndarray, closed: bool = False) -> np
     return np.vstack([front, *cross]) if cross else front.reshape(-1, 3)
 
 
-def wheel_zooms(d0: float) -> list[float]:
+def k1_rig(board_id: str) -> tuple[float, float, float]:
+    """(fit, D0, far) of a map board's camera rig (AS08FlowGameMode::SetupCameraForBoard + FS08CameraZoom): the fit
+    s08_fit_distance of the map canvas (~1872.2 uu), the K1 overview D0 = fit x the board profile's k1DistanceMul
+    (ENV-U9, S08ArtBoardProfiles.json via k1_mock.k1_distance_mul: 1.25 -> ~2340.2 uu) and the far wheel limit
+    max(D0, fit / ZOOM_OUT) (~2880.2 uu = 0.8125x of D0: the far limit stays with the fit)."""
+    fit = k1_mock.s08_fit_distance(MAP_HX, MAP_HY)
+    d0 = k1_mock.s08_overview_distance(MAP_HX, MAP_HY, k1_mock.k1_distance_mul(board_id))
+    return fit, d0, max(d0, fit / ZOOM_OUT)
+
+
+def layout_board_id(layout: dict) -> str:
+    """The board id the game plays this layout on (MAPS; the layout's own boardId is checked by validate())."""
+    return MAPS.get(layout.get("map"), {}).get("boardId") or layout.get("boardId", "")
+
+
+def wheel_zooms(d0: float, far: float | None = None) -> list[float]:
     """Every zoom (D0 / D) the wheel can settle on. FS08CameraZoom::Wheel divides / multiplies the TARGET distance
-    by WHEEL_STEP and clamps it to [min(MIN_DIST_UU, D0), D0 / ZOOM_OUT], so the settled distances are the closure
-    of D0 under those two moves: D0 * 1.25^k and, after hitting a limit, MinDistance * 1.25^m / MaxDistance / 1.25^n
-    (Marmoreal / Sarpedon: 1.25 .. 5.96 and 6.24 = D0 / 300 from the overview, 0.8 / 0.65 out, plus both clamp
-    lattices)."""
-    lo, hi = min(MIN_DIST_UU, d0), d0 / ZOOM_OUT
+    by WHEEL_STEP and clamps it to [min(MIN_DIST_UU, D0), far] (far = FS08CameraZoom::MaxDistance, default
+    D0 / ZOOM_OUT = the rig with D0 = the fit), so the settled distances are the closure of D0 under those two moves:
+    D0 * 1.25^k and, after hitting a limit, MinDistance * 1.25^m / far / 1.25^n (Marmoreal / Sarpedon, ENV-U9
+    D0 = 2340.2, far = 2880.2: 1.25 (= the fit) .. 7.45 and 7.80 = D0 / 300 from the overview, 0.8125 out, plus both
+    clamp lattices; the settle distances are the same set as before ENV-U9, only D0 moved one notch out)."""
+    lo, hi = min(MIN_DIST_UU, d0), (d0 / ZOOM_OUT if far is None else far)
     seen: dict[float, float] = {}
     todo = [d0]
     while todo:
@@ -312,11 +343,12 @@ def wheel_zooms(d0: float) -> list[float]:
     return sorted({round(d0 / d, 4) for d in seen.values()})
 
 
-def camera_set(spaces: list[dict]) -> list[tuple[str, float, tuple]]:
-    """K1, every wheel zoom (centred) and ZOOMS_FIXED; from FOLLOW_FROM on also following every space."""
-    d0 = k1_mock.s08_fit_distance(MAP_HX, MAP_HY)
+def camera_set(spaces: list[dict], board_id: str) -> list[tuple[str, float, tuple]]:
+    """K1 (D0 of k1_rig), every wheel zoom (centred) and ZOOMS_FIXED, all as zooms of D0; from FOLLOW_FROM x D0 on
+    also following every space."""
+    _, d0, far = k1_rig(board_id)
     out = []
-    for z in sorted(set(wheel_zooms(d0)) | set(ZOOMS_FIXED)):
+    for z in sorted(set(wheel_zooms(d0, far)) | set(ZOOMS_FIXED)):
         if z == 1.0:
             out.append(("K1", d0, (0.0, 0.0, 0.0)))
             continue
@@ -355,7 +387,7 @@ def occlusion(layout: dict, spaces: list[dict]) -> dict:
     boxes = [box_corners(p) for p in props]
     circ = [circle_pts(s) for s in spaces]
     worst = {p["id"]: {"px": math.inf, "camera": "", "space": ""} for p in props}
-    for label, dist, focus in camera_set(spaces):
+    for label, dist, focus in camera_set(spaces, layout_board_id(layout)):
         cam = make_camera(dist, focus)
         vis, cpolys = [], []  # circles (partly) in front of the camera; the rest cannot be covered
         for i, c in enumerate(circ):
@@ -395,7 +427,7 @@ def validate(layout: dict, key: str, spaces: list[dict]) -> tuple[list[str], lis
     for k, t in need.items():
         if not isinstance(layout.get(k), t):
             err.append(f"key '{k}' missing or not {t.__name__}")
-    extra = set(layout) - set(need)
+    extra = set(layout) - set(need) - {"ground"}  # 'ground' is optional (check 9, validate_ground)
     if extra:
         warn.append(f"unknown top-level keys {sorted(extra)}")
     if err:
@@ -425,6 +457,10 @@ def validate(layout: dict, key: str, spaces: list[dict]) -> tuple[list[str], lis
             err.append(f"tray.{k} = {tray[k]} but the apron gives {v:.2f}")
     if apron["w"] != apron["e"]:
         warn.append("apron w != e: the tray has no X offset, the narrower side gets the extra stone")
+    off_t2 = {k: tray[k] for k, v in TRAY_T2.items() if abs(tray[k] - v) > 0.5}
+    if off_t2:
+        err.append(f"tray {off_t2} is not the shared T2 tray {TRAY_T2} (ENV-U10: one stone tray SM_TableBase_T2 "
+                   f"for both maps, placed at scale 1 - a different tray would need a stretch)")
     t_x0, t_x1 = -tray["halfX"], tray["halfX"]
     t_y0, t_y1 = tray["offsetY"] - tray["halfY"], tray["offsetY"] + tray["halfY"]
     info["tray"] = {"x": [round(t_x0, 2), round(t_x1, 2)], "y": [round(t_y0, 2), round(t_y1, 2)]}
@@ -470,9 +506,14 @@ def validate(layout: dict, key: str, spaces: list[dict]) -> tuple[list[str], lis
         # 2. on the tray
         bx0, by0 = base.min(0)
         bx1, by1 = base.max(0)
-        if bx0 < t_x0 + LIP_UU or bx1 > t_x1 - LIP_UU or by0 < t_y0 + LIP_UU or by1 > t_y1 - LIP_UU:
+        edge_gap = min(bx0 - t_x0, t_x1 - bx1, by0 - t_y0, t_y1 - by1)
+        info["props"][pid]["edge_gap_uu"] = round(edge_gap, 1)
+        if edge_gap < LIP_UU:
             err.append(f"prop {pid}: base footprint x[{bx0:.0f},{bx1:.0f}] y[{by0:.0f},{by1:.0f}] leaves the tray "
                        f"x[{t_x0:.0f},{t_x1:.0f}] y[{t_y0:.0f},{t_y1:.0f}] (lip {LIP_UU})")
+        elif edge_gap < RIM_UU:
+            warn.append(f"prop {pid}: base footprint {edge_gap:.0f} uu from the tray edge, inside the T2 rocky lip "
+                        f"band ({RIM_UU:.0f} uu: rock tops up to Z +2 there)")
         fx0, fy0 = full.min(0)
         fx1, fy1 = full.max(0)
         over = max(t_x0 - fx0, fx1 - t_x1, t_y0 - fy0, fy1 - t_y1)
@@ -534,6 +575,89 @@ def validate(layout: dict, key: str, spaces: list[dict]) -> tuple[list[str], lis
             warn.append(f"light {tag}: above the map/frame - keep warm pools off the spaces")
         if not (t_x0 <= x <= t_x1 and t_y0 <= y <= t_y1) or not (0 < z <= 400):
             warn.append(f"light {tag}: off the tray or z outside (0, 400]")
+    # 9. the themed ground (ENV-U10)
+    g_err, g_warn, info["ground"] = validate_ground(layout, key, (t_x0, t_y0, t_x1, t_y1))
+    err += g_err
+    warn += g_warn
+    return err, warn, info
+
+
+# ------------------------------------------------------------------ 9. ground (ENV-U10, S08EnvGround.h)
+GROUND_Z = (-3.0, -0.5)          # exclusive: above the tray top, below the map plane (S08EnvGroundSpec)
+GROUND_MAX_OVERLAP_UU = 20.0     # S08EnvGroundSpec::MaxFrameOverlapUU
+GROUND_MAX_INSET_UU = 200.0      # S08EnvGroundSpec::MaxInsetUU
+GROUND_MIN_STRIP_UU = 0.5        # S08EnvGroundSpec::MinStripUU
+
+
+def ground_strips(outer: tuple, hole: tuple) -> list[tuple]:
+    """S08EnvGround::Strips: outer minus the hole as <= 4 disjoint rectangles (x0, y0, x1, y1): N, S, W, E."""
+    ox0, oy0, ox1, oy1 = outer
+    if ox1 - ox0 <= GROUND_MIN_STRIP_UU or oy1 - oy0 <= GROUND_MIN_STRIP_UU:
+        return []
+    hx0, hy0, hx1, hy1 = hole
+    if hx1 <= ox0 or hx0 >= ox1 or hy1 <= oy0 or hy0 >= oy1:
+        return [outer]
+    hx0, hx1, hy0, hy1 = max(hx0, ox0), min(hx1, ox1), max(hy0, oy0), min(hy1, oy1)
+    cand = [(ox0, oy0, ox1, hy0), (ox0, hy1, ox1, oy1), (ox0, hy0, hx0, hy1), (hx1, hy0, ox1, hy1)]
+    return [r for r in cand if r[2] - r[0] > GROUND_MIN_STRIP_UU and r[3] - r[1] > GROUND_MIN_STRIP_UU]
+
+
+def validate_ground(layout: dict, key: str, tray_rect: tuple) -> tuple[list[str], list[str], dict]:
+    err, warn, info = [], [], {}
+    g = layout.get("ground")
+    if g is None:
+        return [], ["no 'ground' section (ENV-U10 themed ground: tools/art/env_kit/ground_splat.py --write-layouts)"], info
+    if not isinstance(g, dict):
+        return ["ground is not an object"], [], info
+
+    def num(v):
+        return isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v)
+    if g.get("mode") != "runtime":
+        err.append(f"ground: mode {g.get('mode')!r} is not 'runtime' (S08EnvGround: four engine-plane strips)")
+    want_mat = f"/Game/EnvKit/Ground/MI_EnvGround_{MAPS[key]['kit']}"
+    if g.get("material") not in (want_mat, f"{want_mat}.MI_EnvGround_{MAPS[key]['kit']}"):
+        err.append(f"ground: material {g.get('material')!r} is not {want_mat} (tools/art/env_kit/ue_import_env_ground.py)")
+    z = g.get("z", -1.0)
+    if not num(z) or not GROUND_Z[0] < z < GROUND_Z[1]:
+        err.append(f"ground: z {z!r} not in ({GROUND_Z[0]}, {GROUND_Z[1]}) - above the tray top, below the map plane")
+    ov = g.get("frameOverlapUU", 2.0)
+    if not num(ov) or not 0.0 <= ov <= GROUND_MAX_OVERLAP_UU:
+        err.append(f"ground: frameOverlapUU {ov!r} not in [0, {GROUND_MAX_OVERLAP_UU:g}]")
+        ov = 2.0
+    inset = g.get("insetUU", 0.0)
+    if not num(inset) or not 0.0 <= inset <= GROUND_MAX_INSET_UU:
+        err.append(f"ground: insetUU {inset!r} not in [0, {GROUND_MAX_INSET_UU:g}]")
+        inset = 0.0
+    tx0, ty0, tx1, ty1 = tray_rect
+    outer = (tx0 + inset, ty0 + inset, tx1 - inset, ty1 - inset)
+    strips = ground_strips(outer, (-FRAME_HX + ov, -FRAME_HY + ov, FRAME_HX - ov, FRAME_HY - ov))
+    info["strips"] = len(strips)
+    info["areaUU2"] = round(sum((r[2] - r[0]) * (r[3] - r[1]) for r in strips), 1)
+    if len(strips) != 4:
+        err.append(f"ground: the tray top {outer} minus the frame gives {len(strips)} strips, not 4")
+    rect = g.get("splatRect")
+    if rect is not None:
+        if not (isinstance(rect, list) and len(rect) == 4 and all(num(v) for v in rect) and rect[2] > rect[0]
+                and rect[3] > rect[1]):
+            err.append("ground: splatRect must be [minX, minY, maxX, maxY] numbers with max > min")
+        else:
+            info["splatRect"] = rect
+            if not (rect[0] <= outer[0] and rect[1] <= outer[1] and rect[2] >= outer[2] and rect[3] >= outer[3]):
+                err.append(f"ground: splatRect {rect} does not cover the ground {outer} (re-run ground_splat.py)")
+    else:
+        warn.append("ground: no splatRect - the MI's SplatRect is used as is")
+    png = g.get("splat")
+    if isinstance(png, str):
+        path = ROOT / png
+        if not path.is_file():
+            warn.append(f"ground: splat {png} missing (tools/art/env_kit/ground_splat.py)")
+        else:
+            import hashlib
+            got = hashlib.sha256(path.read_bytes()).hexdigest()
+            info["splatSha256"] = got
+            if g.get("splatSha256") not in (None, got):
+                err.append(f"ground: {png} sha256 {got[:12]} != splatSha256 {str(g.get('splatSha256'))[:12]} "
+                           f"(ground_splat.py --write-layouts)")
     return err, warn, info
 
 
@@ -581,7 +705,8 @@ def check(key: str, layout_path: Path, topo_path: Path) -> dict:
             elif sh["uu"] < SHADOW_WARN_UU:
                 warn.append(f"prop {pid}: key-light shadow {sh['uu']:.1f} uu from space {sh['space']}")
     return {"map": key, "layout": layout, "spaces": spaces, "errors": err, "warnings": warn, "info": info,
-            "occlusion": occ, "cameras": len(camera_set(spaces))}
+            "occlusion": occ,
+            "cameras": len(camera_set(spaces, layout_board_id(layout))) if info.get("parsed") else 0}
 
 
 # ------------------------------------------------------------------ debug images (CPU / PIL)
@@ -816,9 +941,9 @@ def render_top(res: dict, out: Path, glb_dir, cache_dir, map_img, px_per_uu: flo
         dr.ellipse(c, outline=(0, 230, 255), width=2)
         cx, cy = Q([[s["X"], s["Y"]]])[0]
         dr.text((cx - 11, cy - 7), s["id"], fill=(255, 255, 255), font=f)
-    # ground footprints of the K1 and zoom-out frusta
-    d0 = k1_mock.s08_fit_distance(MAP_HX, MAP_HY)
-    for dist, colr in ((d0, (255, 255, 255)), (d0 / ZOOM_OUT, (140, 140, 255))):
+    # ground footprints of the K1 (D0) and zoom-out limit frusta
+    _, d0, far = k1_rig(layout_board_id(lay))
+    for dist, colr in ((d0, (255, 255, 255)), (far, (140, 140, 255))):
         cam = make_camera(dist)
         r = cam.rays(0, cam.h)
         cr = np.array([r[0, 0], r[0, -1], r[-1, -1], r[-1, 0]])
@@ -859,7 +984,8 @@ def render_top(res: dict, out: Path, glb_dir, cache_dir, map_img, px_per_uu: flo
         dr.text((cx + 6, cy - 14), f"{lt['id']} {lt['intensityCd']}cd", fill=(255, 210, 120), font=f)
     dr.text((8, 6), f"{res['map']} top view - tray x[{-tx:.0f},{tx:.0f}] y[{ty0:.0f},{ty1:.0f}]  "
                     f"apron n{ap['n']} s{ap['s']} w{ap['w']} e{ap['e']}  "
-                    f"(white = K1 ground frustum, blue = zoom-out 0.65x; yellow = base footprint)",
+                    f"(white = K1 ground frustum D0 {d0:.0f}, blue = zoom-out limit {far:.0f} = {d0 / far:.4g}x; "
+                    f"yellow = base footprint)",
             fill=(255, 255, 255), font=_font(15))
     out.parent.mkdir(parents=True, exist_ok=True)
     img.save(out)
@@ -870,9 +996,10 @@ def write_images(res: dict, out_dir: Path, glb_dir, map_dir):
     cache = out_dir / "_mesh_cache"
     map_img = _find_map_image(key, map_dir)
     render_top(res, out_dir / f"{key}-top.png", glb_dir, cache, map_img)
-    d0 = k1_mock.s08_fit_distance(MAP_HX, MAP_HY)
-    for tag, dist, title in (("k1", d0, "K1 overview"), ("out", d0 / ZOOM_OUT, "zoom-out 0.65x"),
-                             ("wide", d0 * 1.45, "concept camera (K1 distance x1.45)")):
+    fit, d0, far = k1_rig(layout_board_id(res["layout"]))
+    for tag, dist, title in (("k1", d0, f"K1 overview (fit x{d0 / fit:.3g})"),
+                             ("out", far, f"zoom-out limit {d0 / far:.4g}x (fit / {ZOOM_OUT:g})"),
+                             ("wide", fit * 1.45, "concept camera (fit x1.45)")):
         render_view(res, dist, (0.0, 0.0, 0.0), out_dir / f"{key}-{tag}.png", f"{key} {title}  D={dist:.0f}",
                     glb_dir, cache, map_img)
     return map_img
@@ -884,8 +1011,9 @@ def selftest() -> int:
     the geometry says it cannot matter (far / side giants never occlude a circle)."""
     topo = json.loads((ROOT / "backend/prisma/fixtures/boards/marmoreal.topology.json").read_text(encoding="utf-8"))
     spaces = load_spaces(topo)
-    ap = {"n": 170.0, "s": 90.0, "w": 260.0, "e": 260.0}
-    tray = {"halfX": FRAME_HX + 260.0, "halfY": FRAME_HY + 130.0, "offsetY": -40.0}
+    tray = dict(TRAY_T2)  # the shared T2 tray and the apron it implies
+    ap = {"n": -(tray["offsetY"] - tray["halfY"]) - FRAME_HY, "s": tray["offsetY"] + tray["halfY"] - FRAME_HY,
+          "w": tray["halfX"] - FRAME_HX, "e": tray["halfX"] - FRAME_HX}
 
     def P(pid, name, x, y, yaw=90.0, scale=1.0, shadow=False):
         return {"id": pid, "mesh": f"/Game/EnvKit/{KIT[name][0]}/SM_Env_{name}", "loc": [x, y, TRAY_TOP_Z],
@@ -916,11 +1044,15 @@ def selftest() -> int:
         ("seven point lights", [], [Lt(f"l{i}", x=-520.0 + 40 * i) for i in range(7)], ["point lights >"], []),
         ("near-corner post behind the close wheel cameras is clipped, not projected",
          [P("t", "PlinthBall", -525, 368)], [], [], ["covers"]),
+        ("a tray other than the shared T2 tray", [P("t", "PlinthBall", -525, 368)], [], ["not the shared T2 tray"],
+         [], {"halfX": FRAME_HX + 260.0, "halfY": FRAME_HY + 130.0, "offsetY": -40.0},
+         {"n": 170.0, "s": 90.0, "w": 260.0, "e": 260.0}),
     ]
     fails = 0
-    for name, props, lights, must, must_not in cases:
-        lay = {"schema": SCHEMA, "map": "marmoreal", "boardId": MAPS["marmoreal"]["boardId"], "tray": tray,
-               "apron": ap, "props": props, "lights": lights, "notes": "selftest"}
+    for name, props, lights, must, must_not, *own in cases:
+        lay = {"schema": SCHEMA, "map": "marmoreal", "boardId": MAPS["marmoreal"]["boardId"],
+               "tray": own[0] if own else tray, "apron": own[1] if own else ap, "props": props, "lights": lights,
+               "notes": "selftest"}
         err, _, info = validate(lay, "marmoreal", spaces)
         if info.get("parsed") and props:
             for pid, w in occlusion(lay, spaces).items():
@@ -933,7 +1065,27 @@ def selftest() -> int:
         ok = all(m in text for m in must) and not any(m in text for m in must_not)
         fails += not ok
         print(f"   {'ok  ' if ok else 'FAIL'} {name}: {text or 'no errors'}")
-    print(f"   -> selftest {'FAIL' if fails else 'OK'} ({len(cases) - fails}/{len(cases)})")
+    # 9. the ground section (validate_ground on the shared tray top)
+    t_rect = (-tray["halfX"], tray["offsetY"] - tray["halfY"], tray["halfX"], tray["offsetY"] + tray["halfY"])
+    good = {"mode": "runtime", "material": "/Game/EnvKit/Ground/MI_EnvGround_Marmoreal", "z": -1.0,
+            "frameOverlapUU": 2.0, "insetUU": 0.0, "splatRect": [-820.0, -560.0, 820.0, 470.0]}
+    g_cases = [
+        ("valid ground: 4 strips round the frame", good, [], ["ground"]),
+        ("ground with a mesh mode", dict(good, mode="mesh"), ["ground: mode"], []),
+        ("ground material of the other map", dict(good, material="/Game/EnvKit/Ground/MI_EnvGround_Sarpedon"),
+         ["ground: material"], []),
+        ("ground under the tray top", dict(good, z=-3.5), ["ground: z"], []),
+        ("splat rect short of the tray", dict(good, splatRect=[-700.0, -560.0, 820.0, 470.0]), ["does not cover"], []),
+        ("inset swallowing the near band", dict(good, insetUU=150.0), ["strips, not 4"], []),
+    ]
+    for name, ground, must, must_not in g_cases:
+        err, _, _ = validate_ground({"ground": ground}, "marmoreal", t_rect)
+        text = " | ".join(err)
+        ok = all(m in text for m in must) and not any(m in text for m in must_not)
+        fails += not ok
+        print(f"   {'ok  ' if ok else 'FAIL'} {name}: {text or 'no errors'}")
+    total = len(cases) + len(g_cases)
+    print(f"   -> selftest {'FAIL' if fails else 'OK'} ({total - fails}/{total})")
     return 1 if fails else 0
 
 
@@ -965,8 +1117,19 @@ def main(argv=None) -> int:
         print(f"== {key}: {len(lay.get('props', []))} props, {len(lay.get('lights', []))} lights, "
               f"{len(res['spaces'])} spaces, {res['cameras']} camera poses, "
               f"margin {MARGIN_PX} px @ {SCREEN[0]}x{SCREEN[1]}")
+        fit, d0, far = k1_rig(layout_board_id(lay) or MAPS[key]["boardId"])
+        rig = {"fitUU": round(fit, 3), "k1DistanceMul": round(d0 / fit, 4), "k1UU": round(d0, 3),
+               "farUU": round(far, 3), "nearUU": min(MIN_DIST_UU, d0), "zoomRange": [round(d0 / far, 4),
+                                                                                    round(d0 / min(MIN_DIST_UU, d0), 4)]}
+        print(f"   camera: K1 D0 {d0:.1f} uu = fit {fit:.1f} x k1DistanceMul {d0 / fit:g} (ENV-U9); wheel "
+              f"{rig['nearUU']:.0f} .. {far:.1f} uu = zoom {rig['zoomRange'][0]:g}x .. {rig['zoomRange'][1]:g}x of D0; "
+              f"follow from {FOLLOW_FROM:g}x = {d0 / FOLLOW_FROM:.1f} uu")
         if "tray" in res["info"]:
             print(f"   tray x{res['info']['tray']['x']} y{res['info']['tray']['y']}  apron {lay['apron']}")
+        if res["info"].get("ground"):
+            gi = res["info"]["ground"]
+            print(f"   ground: {gi.get('strips')} strips, {gi.get('areaUU2', 0):.0f} uu2, splatRect {gi.get('splatRect')}, "
+                  f"splat sha256 {str(gi.get('splatSha256', '-'))[:12]}")
         print(f"   {'prop':<16} {'mesh':<14} {'w x d x h (uu)':<16} {'clear px':>8}  "
               f"{'worst camera / space':<22} {'shadow uu':>9}")
         for pid, inf in res["info"]["props"].items():
@@ -985,7 +1148,7 @@ def main(argv=None) -> int:
             mi = write_images(res, Path(a.images), glb, Path(a.map_images) if a.map_images else None)
             print(f"   images -> {a.images} ({'meshes' if glb else 'boxes'}, map {'yes' if mi else 'missing'})")
         report[key] = {"errors": res["errors"], "warnings": res["warnings"], "info": res["info"],
-                       "cameras": res["cameras"], "marginPx": MARGIN_PX}
+                       "cameras": res["cameras"], "camera": rig, "marginPx": MARGIN_PX}
     if a.json:
         Path(a.json).write_text(json.dumps(report, indent=1, ensure_ascii=False), encoding="utf-8")
     return 1 if failed else 0

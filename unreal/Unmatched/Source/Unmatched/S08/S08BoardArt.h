@@ -86,6 +86,11 @@ inline const TCHAR* const CylinderMeshPath = TEXT("/Engine/BasicShapes/Cylinder.
 /** M_MapBoard texture parameters (tools/art/map_surface/ue_import_map_surface.py builds the material). */
 inline const TCHAR* const ParamBaseColor = TEXT("BaseColor");
 inline const TCHAR* const ParamGameMask = TEXT("GameMask");
+/** M_MapBoard night-grade parameters (ENV-MAPS P2: a light profile's "mapGrade" sets them on the map MID). */
+inline const TCHAR* const ParamNightEV = TEXT("NightEV");
+inline const TCHAR* const ParamNightSaturation = TEXT("NightSaturation");
+inline const TCHAR* const ParamLift = TEXT("Lift");
+inline const TCHAR* const ParamNightTint = TEXT("NightTint");
 /** ENV-O8 T1: the placeholder tray is stretched non-uniformly under a map (see S08Diorama.h). */
 inline const TCHAR* const TrayWaiver = TEXT("T1-placeholder");
 }  // namespace S08MapSurfaceSpec
@@ -169,6 +174,32 @@ struct UNMATCHED_API FS08KeyShadowSpec {
   float ContactShadowLength = 0.0f;
 };
 
+/** ENV-MAPS P2 night calibration (optional "fog" block): one ExponentialHeightFog actor, so the void around the
+ *  diorama reads as a dark night haze instead of the black clear colour. A scene actor, not a renderer setting:
+ *  no volumetric fog, Lumen and the scalability untouched. StartDistanceUU keeps the board itself out of it. */
+struct UNMATCHED_API FS08FogSpec {
+  bool bSet = false;
+  FLinearColor Color = FLinearColor::Black;  // FogInscatteringLuminance (linear)
+  float Density = 0.02f;                     // FogDensity
+  float HeightFalloff = 0.2f;                // FogHeightFalloff
+  float HeightZ = 0.0f;                      // actor Z = the fog height
+  float StartDistanceUU = 0.0f;              // StartDistance
+  float EndDistanceUU = 0.0f;                // EndDistance (0 = none)
+  float MaxOpacity = 1.0f;                   // FogMaxOpacity
+};
+
+/** ENV-MAPS P2 (optional "mapGrade" block): the night grade of the M_MapBoard MID on a map-image board
+ *  (NightEV, NightSaturation, Lift, NightTint); overrides the MI values of ue_import_map_surface.py at runtime,
+ *  because the grade belongs to the night light it is calibrated with. Ignored on grid boards. */
+struct UNMATCHED_API FS08MapGradeSpec {
+  bool bSet = false;
+  float NightEV = -0.7f;
+  float NightSaturation = 0.7f;
+  float Lift = 0.35f;
+  bool bHasTint = false;
+  FLinearColor NightTint = FLinearColor::White;  // linear
+};
+
 struct UNMATCHED_API FS08LightProfile {
   FString Id;
   bool bHasDirectional = false;
@@ -183,6 +214,8 @@ struct UNMATCHED_API FS08LightProfile {
   FS08SkySpec Sky;
   FS08ExposureSpec Exposure;
   FS08KeyShadowSpec KeyShadow;
+  FS08FogSpec Fog;
+  FS08MapGradeSpec MapGrade;
   /** 1 directional with shadow + <= 6 points without shadows. */
   bool BudgetOk(FString& OutReason) const;
 };
@@ -251,6 +284,14 @@ struct UNMATCHED_API FS08BoardArtProfile {
   FS08BoardExpect Expect;
   /** ENV-MAPS: the "mapImage" block (bSet only on surface 'map-image'). */
   FS08MapImageSpec Map;
+  /** ENV-U9 (user decision 2026-09-30, "Отъехать до ≈×1,25"): optional "k1DistanceMul" in [MinK1DistanceMul,
+   *  MaxK1DistanceMul], default 1. The K1 overview = the board fit (S08K1FitDistanceUU) x this, see
+   *  S08K1OverviewDistanceUU. The two map-image profiles set 1.25 (1872.156 -> 2340.195 uu: the env layout around
+   *  the frame is in the overview); every grid profile keeps 1, so Cobble stays at 1931 uu bit for bit.
+   *  AS08BoardActor::GetK1DistanceMul returns it only while the profile is active (1 on a refused profile). */
+  float K1DistanceMul = 1.0f;
+  static constexpr float MinK1DistanceMul = 1.0f;  // never nearer than the fit (the whole board stays in K1)
+  static constexpr float MaxK1DistanceMul = 2.0f;
 };
 
 /** Counts of one decoded board (what the art and the trace describe). */
@@ -385,6 +426,11 @@ UNMATCHED_API FVector2D S08BoardHalfExtentUU(const FS08BoardModel& Board);
 /** K1 overview distance of AS08FlowGameMode::SetupCameraForBoard for a board half extent: horizontal FOV 35,
  *  16:9, pitch -55, 60 uu margin, x1.12 (Cobble 5x6 -> 1931 uu, the map canvas 891.333 x 577.333 -> 1872 uu). */
 UNMATCHED_API float S08K1FitDistanceUU(const FVector2D& HalfExtentUU);
+/** ENV-U9: the K1 overview distance (the camera's home view: the first frame, Space, and the reference of every zoom
+ *  ratio of FS08CameraZoom) = the fit (S08K1FitDistanceUU) x K1DistanceMul (the active board profile's
+ *  "k1DistanceMul"). K1DistanceMul == 1 returns FitDistanceUU itself, bit for bit (every grid: Cobble 5x6 -> 1931
+ *  uu); the map-image boards (1.25) -> 1872.156 x 1.25 = 2340.195 uu. */
+UNMATCHED_API float S08K1OverviewDistanceUU(float FitDistanceUU, float K1DistanceMul);
 /** Undirected links of a topology board (FS08BoardModel::Neighbours, symmetrised), each pair once with the
  *  row-major smaller cell first, sorted; empty on a grid. */
 UNMATCHED_API TArray<TPair<FIntPoint, FIntPoint>> S08BoardLinkPairs(const FS08BoardModel& Board);

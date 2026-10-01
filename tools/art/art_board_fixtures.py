@@ -612,6 +612,43 @@ def check_render_blocks(lid: str, lp: dict) -> list[str]:
                 and isinstance(sh.get("cascades"), int) and 1 <= sh["cascades"] <= 4
                 and 0 <= float(sh.get("contactShadowLength", 0.0)) <= 0.1):
             errs.append(f"light {lid}: directional.shadow needs distanceUU > 0, cascades 1..4, contactShadowLength 0..0.1")
+    errs += check_night_blocks(lid, lp)
+    return errs
+
+
+def _nums(v, n, lo, hi) -> bool:
+    return (isinstance(v, list) and len(v) == n and all(isinstance(x, (int, float)) and not isinstance(x, bool)
+                                                         and lo <= x <= hi for x in v))
+
+
+def _num(v) -> bool:
+    return isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v)
+
+
+def check_night_blocks(lid: str, lp: dict) -> list[str]:
+    """ENV-MAPS P2 (profile rev 9): the optional "fog" (ExponentialHeightFog) and "mapGrade" (M_MapBoard MID night
+    grade) blocks, the same ranges as S08BoardArt.cpp ParseRenderBlocks (a broken block rejects the profile)."""
+    errs = []
+    fog = lp.get("fog")
+    if fog is not None:
+        start, end = fog.get("startDistanceUU"), fog.get("endDistanceUU", 0)
+        if not (isinstance(fog, dict) and _nums(fog.get("colorLinear"), 3, 0.0, 10.0)
+                and _num(fog.get("density")) and 0 < fog["density"] <= 1
+                and _num(fog.get("heightFalloff")) and 0 < fog["heightFalloff"] <= 2
+                and _num(fog.get("heightZ")) and abs(fog["heightZ"]) <= 100000
+                and _num(start) and 0 <= start <= 100000
+                and _num(end) and (end == 0 or start < end <= 1000000)
+                and _num(fog.get("maxOpacity", 1.0)) and 0 <= fog.get("maxOpacity", 1.0) <= 1):
+            errs.append(f"light {lid}: fog needs colorLinear [r,g,b] 0..10, density 0..1, heightFalloff 0..2, heightZ, "
+                        "startDistanceUU >= 0, endDistanceUU 0 or > start, maxOpacity 0..1")
+    grade = lp.get("mapGrade")
+    if grade is not None:
+        if not (isinstance(grade, dict) and _num(grade.get("nightEV")) and -4 <= grade["nightEV"] <= 2
+                and _num(grade.get("nightSaturation")) and 0 <= grade["nightSaturation"] <= 1.5
+                and _num(grade.get("lift")) and 0 <= grade["lift"] <= 20
+                and ("nightTintLinear" not in grade or _nums(grade["nightTintLinear"], 3, 0.0, 4.0))):
+            errs.append(f"light {lid}: mapGrade needs nightEV -4..2, nightSaturation 0..1.5, lift 0..20 and an optional "
+                        "nightTintLinear [r,g,b] 0..4")
     return errs
 
 

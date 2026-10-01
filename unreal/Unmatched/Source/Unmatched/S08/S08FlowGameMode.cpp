@@ -756,12 +756,19 @@ void AS08FlowGameMode::SetupCameraForBoard() {
   const FVector2D BoardHalf = BoardActor ? BoardActor->GetBoardHalfExtentUU() : S08BoardHalfExtentUU(BoardModel);
   const float SinPitch = FMath::Sin(FMath::DegreesToRadians(55.0f));
   const float CosPitch = FMath::Cos(FMath::DegreesToRadians(55.0f));
-  const float Distance = S08K1FitDistanceUU(BoardHalf);
+  // ENV-U9 (user decision 2026-09-30, "move back to ~x1.25"): the overview = the fit x the active board profile's
+  // k1DistanceMul - 1.25 on the two map-image boards (1872.2 -> 2340.2 uu: the colonnade / ship and the sides of the
+  // diorama are in K1), 1 everywhere else (grids bit for bit, the grey topology view of a refused map profile).
+  // The zoom rig takes both: its ratios (follow-from, focus zoom, label ratio) are relative to the overview, its far
+  // limit stays fit / OverviewOutRatio (2880.2 uu on the maps, one wheel notch out), its near limit 300 uu.
+  const float Fit = S08K1FitDistanceUU(BoardHalf);
+  const float K1Mul = BoardActor ? BoardActor->GetK1DistanceMul() : 1.0f;
+  const float Distance = S08K1OverviewDistanceUU(Fit, K1Mul);
   const FVector Location(0.0f, Distance * CosPitch, Distance * SinPitch);
   if (BoardModel.bHasTopology) {
-    FS08Trace::Write(FString::Printf(TEXT("CAMERA extents source=%s half=%.1fx%.1f dist=%.1f"),
+    FS08Trace::Write(FString::Printf(TEXT("CAMERA extents source=%s half=%.1fx%.1f dist=%.1f fit=%.1f k1Mul=%.3f"),
                                      BoardActor && BoardActor->IsMapImageActive() ? TEXT("map-image") : TEXT("map-canvas"),
-                                     BoardHalf.X, BoardHalf.Y, Distance));
+                                     BoardHalf.X, BoardHalf.Y, Distance, Fit, K1Mul));
   }
   // ART-004 T2.2: zoom parameters from one config (defaults <- game ini
   // [Unmatched.Camera] <- -S08Camera*= overrides), traced once per board.
@@ -769,7 +776,7 @@ void AS08FlowGameMode::SetupCameraForBoard() {
   CameraZoom.Config.ApplyIni(GGameIni);
   CameraZoom.Config.ApplyCommandLine(FCommandLine::Get());
   CameraZoom.Config.Sanitize();
-  CameraZoom.Reset(Distance);
+  CameraZoom.Reset(Distance, Fit);
 
   if (!BoardCamera) {
     FActorSpawnParameters Params;
@@ -789,10 +796,10 @@ void AS08FlowGameMode::SetupCameraForBoard() {
   TraceLines.Add(Line);
   FS08Trace::Write(Line);
   FS08Trace::Write(FString::Printf(
-      TEXT("CAMERA config overview=%.1f nearest=%.1f farthest=%.1f zoomRange=%.2f-%.2f %s"),
+      TEXT("CAMERA config overview=%.1f nearest=%.1f farthest=%.1f zoomRange=%.2f-%.2f fit=%.1f k1Mul=%.3f %s"),
       CameraZoom.Overview, CameraZoom.MinDistance(), CameraZoom.MaxDistance(),
-      CameraZoom.ZoomOf(CameraZoom.MaxDistance()), CameraZoom.ZoomOf(CameraZoom.MinDistance()),
-      *CameraZoom.Config.Describe()));
+      CameraZoom.ZoomOf(CameraZoom.MaxDistance()), CameraZoom.ZoomOf(CameraZoom.MinDistance()), CameraZoom.Fit,
+      K1Mul, *CameraZoom.Config.Describe()));
 }
 
 void AS08FlowGameMode::UpdateBoardCamera(float DeltaSeconds) {
@@ -807,7 +814,8 @@ void AS08FlowGameMode::UpdateBoardCamera(float DeltaSeconds) {
     if (PC->WasInputKeyJustPressed(EKeys::MouseScrollDown)) ApplyWheel(-1, ES08InputSource::Os);
     if (PC->WasInputKeyJustPressed(EKeys::SpaceBar)) ApplySpace(ES08InputSource::Os);
   }
-  // Follow-selection from FollowFromZoom (03 §2: >= 1.2x of the overview).
+  // Follow-selection from FollowFromZoom (03 §2: >= 1.2x of the overview; ENV-U9: of the map boards' 2340 uu
+  // overview, so their first wheel notch in - the fit, 1872 uu - already follows, as the first notch does on grids).
   FVector FocusTarget = FVector::ZeroVector;
   if (CameraZoom.WantsFollow()) {
     const FString& FocusId = !CommandUi.SelectedFighterId.IsEmpty()
@@ -836,6 +844,7 @@ void AS08FlowGameMode::UpdateBoardCamera(float DeltaSeconds) {
                                         CameraZoom.Current * FMath::Sin(Pitch)),
       FRotator(-55.0f, -90.0f, 0.0f));
   if (BoardActor) {
+    // Relative to the overview (ENV-U9 included): the world labels keep their K1 size at K1.
     const float Ratio = CameraZoom.Current / CameraZoom.Overview;
     BoardActor->SetFighterLabelZoomRatio(
         Ratio, Ratio < 0.4f &&
@@ -6655,6 +6664,12 @@ void S08BenchSetCvar(const TCHAR* Name, const FString& Value) {
 float S08BenchViewZoom(const FString& View) {
   // "K1" = overview, "K2x5" = zoom 5 on the hero, "K2x1.6" = 1.6,
   // "K1x0.65" = wheel zoom-out of the overview (ENV-MAPS first frames).
+  // ENV-U9: every zoom is relative to the overview, which on the map-image
+  // boards is the fit x 1.25 = 2340.2 uu ("K1"); "K2x1.6" = 1462.6 uu there
+  // (the pre-ENV-U9 K2x1.6 framing, 1170.1 uu, is "K2x2"); "K1x0.65" stops
+  // at the far limit fit / 0.65 = 2880.2 uu (zoom 0.81, the same frame as
+  // the first frames' K1x0.65); "K1x1.25" = a centred zoom-in with nothing
+  // selected = the fit, 1872.2 uu (the pre-ENV-U9 K1 framing).
   int32 X = INDEX_NONE;
   if (View.FindChar(TCHAR('x'), X)) return FCString::Atof(*View.Mid(X + 1));
   return 1.0f;
@@ -6729,15 +6744,24 @@ void AS08FlowGameMode::RunRenderBench() {
       return;
     case 2: {  // view setup
       const float Zoom = S08BenchViewZoom(View);
-      if (Zoom > 1.0f && !B.HeroId.IsEmpty()) {
+      // ENV-U9: a "K1..." view never selects the hero (centred on the board); "K2..." focuses it.
+      const bool bCentredView = View.StartsWith(TEXT("K1"));
+      if (Zoom > 1.0f && !bCentredView && !B.HeroId.IsEmpty()) {
         SelectFighter(B.HeroId);
         const FS08ZoomStep ZoomStep = CameraZoom.FocusZoom(Zoom);
         FS08Trace::Write(FString::Printf(TEXT("BENCH view=%s focus hero=%s zoom=%.2f target=%.1f clamp=%d"), *View,
                                          *B.HeroId, Zoom, ZoomStep.To, ZoomStep.bClamped ? 1 : 0));
+      } else if (Zoom > 1.0f && bCentredView) {
+        // "K1x1.25": nothing selected, so the follow rig (>= 1.2x) has no target and the focus stays at the centre.
+        SelectFighter(FString());
+        const FS08ZoomStep ZoomStep = CameraZoom.FocusZoom(Zoom);
+        FS08Trace::Write(FString::Printf(TEXT("BENCH view=%s centred zoom=%.2f target=%.1f fit=%.1f clamp=%d"), *View,
+                                         Zoom, ZoomStep.To, CameraZoom.Fit, ZoomStep.bClamped ? 1 : 0));
       } else if (Zoom > 0.0f && Zoom < 1.0f) {
         // ENV-MAPS "K1x0.65": zoom-out from the overview by wheel notches (the
         // player's own path), stopping at the requested zoom or the far limit
-        // (overview / OverviewOutRatio = 0.65x by default).
+        // (fit / OverviewOutRatio: 0.65x of the overview on grids, 0.8125x =
+        // 2880.2 uu = one notch on the ENV-U9 map boards).
         SelectFighter(FString());
         FS08ZoomStep ZoomStep = CameraZoom.ReturnToOverview();
         const float Wanted = CameraZoom.Overview / Zoom;
@@ -6751,7 +6775,8 @@ void AS08FlowGameMode::RunRenderBench() {
       } else {
         SelectFighter(FString());
         CameraZoom.ReturnToOverview();
-        FS08Trace::Write(FString::Printf(TEXT("BENCH view=%s overview target=%.1f"), *View, CameraZoom.Target));
+        FS08Trace::Write(FString::Printf(TEXT("BENCH view=%s overview target=%.1f fit=%.1f"), *View, CameraZoom.Target,
+                                         CameraZoom.Fit));
       }
       B.StepStart = Elapsed;
       B.bSettleLogged = false;

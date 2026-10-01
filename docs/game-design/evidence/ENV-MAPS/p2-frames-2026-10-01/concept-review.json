@@ -1,0 +1,158 @@
+{
+  "schema": "unmatched.env-concept-review/1",
+  "date": "2026-10-01",
+  "status": "предложено (ревью агента; художественная приёмка — решение пользователя)",
+  "frames": "docs/game-design/evidence/ENV-MAPS/p2-frames-2026-10-01/",
+  "concepts": "art/imagegen/env-v1/concepts/manifest.json (Marmoreal v1, Sarpedon v2)",
+  "matches": [
+    "Night grade matches the concepts numerically and by eye. Map brightness in K1 is 115.3 against 115.0 (Marmoreal) and 104.8 against 104.9 (Sarpedon). The surroundings are darker than the map (0.59/0.65 and 0.39/0.38). The black void is now a navy haze (Y 32, b* -15, concepts 29-30 / -15..-17). Both frames read as a dim dioramа with the map as the bright focal plane, which is the concepts' value structure.",
+    "Both maps sit on one shared rocky tray (T2, the same mesh, offset (0,-45), mismatch 0) as the user asked («единая каменная подложка»). At K1x0.65 it reads as a floating island against the haze, like the concepts.",
+    "Marmoreal follows the concept layout. Along the far edge there is the palace colonnade with a central portal and steps; its warm-lit doors (Y 140, orange) are the focal accent, as in marmoreal-v1. Four lantern plinths cast warm pools on the marble paving. There are cherry trees on the left and right, urns with red flowers, dark cypresses at the ends of the colonnade, ball-finial plinths at the front corners, marble paving around the frame plus dark earth with petals (ENV-U10), and petals scattered over the ground.",
+    "Sarpedon follows the concept layout. In the north-west there is the fort ruin with a campfire, a second campfire in the west, palisade fences and trees on the west side. On the east side are a ship hull with lantern glow, cannons on deck planks and rope coils. Sand and pebbles mark the river mouths north and south (ENV-U10). Warm and cool are split as in sarpedon-v2: warm campfires in the west and ship lanterns in the east frame a cooler, moonlit map in the middle.",
+    "The map frame is a dark wooden border with corner plates. The map art, circles and connection lines are crisp at K1 and K2. Circle outlines are stronger than before (ΔL* 36.1 and 33.7), fills stand out more from the surrounding art (15.2 and 19.2), and zone chroma went up (C* 19.9 and 25.5). Zone colours stay saturated like the concepts.",
+    "Hero figures use team-coloured bases that fit the user's style concept: a gold double ring for the Medusa team and a steel-blue hexagon for Arthur and Merlin. Arthur's red and Merlin's blue stand out against the map at K1.",
+    "The K1 distance is the map fit × 1.25 (ENV-U9, trace k1Mul=1.250). At K1 the whole tray and its props are framed around a centred map, like the concepts' composition. Cobble is unchanged.",
+    "The palette mood matches the user's style concept («мрачноватая атмосферная диорама», night, warm lanterns): a cool blue-grey key with warm orange pools (#FFA552) and no daylight look anywhere. All 6 frames pass the render reference."
+  ],
+  "gaps": [
+    {
+      "rank": 1,
+      "map": "sarpedon",
+      "issue": "There is no water. In the concept the river continues past the frame into sea waves at the north beach and a waterfall over the south cliff. In the render the river stops at the frame and both river mouths are near-black gravel patches (Y 22-24 against sand 57-68, ragged rectangles touching the frame), which read as holes in the tray. This is the biggest difference from sarpedon-v2.",
+      "fix": "Add a water layer at both river mouths. Option one: a separate translucent or lit water plane per mouth (CC0 water normal with a slow panner, tinted to the map's river colour, about sRGB (34,63,105), plus a foam strip on the sand edge). Option two: a 'shallow water' layer in ground-params.json/splat with a blue tint and low roughness. Line the water up with where the river leaves the map. Add a simple waterfall card or mesh with a scrolling texture over the south tray edge, below the river. Keep the gravel as a thin pebble rim, raise its albedo and blend it into the sand. Re-run layout_check.py and ground_splat.py --check.",
+      "hours": 7,
+      "needsNewAssets": true
+    },
+    {
+      "rank": 2,
+      "map": "marmoreal",
+      "issue": "The cherry trees are hot magenta, low-poly faceted cards: HSV saturation 0.72, hue 339, against 0.34 for the concept's trees and 0.26 for the cherry trees printed on the map. They are the most saturated thing in the frame and clash with the soft pink of the printed art. There are only 2 trees and both are cut off by the frame edge at K1. The concept has bulky, soft, overhanging trees and several of them.",
+      "fix": "Quick win (no new asset): shift the cherry albedo in T_Env_Cherry_BC to hue about 335-345, S about 0.35, V +20 % (the env_kit_build/ue_import_env_kit pipeline), re-import and re-measure. Full fix: regenerate the cherry as a dense clustered-blossom canopy (Tripo h3.1 or Blender alpha blossom cards on the existing trunk), then place 3-4 instances (back corners plus front corners) at varied yaw and scale within the prop budget.",
+      "hours": 5,
+      "needsNewAssets": true
+    },
+    {
+      "rank": 3,
+      "map": "both",
+      "issue": "The rocky tray skirt is a thin, uniform, dark band: about 3 % of frame height at 0.65x, and at K1 it is almost cut off by the bottom of the frame. In the user's style concept and both chosen concepts the rocky cliff is chunky and big, about 8-12 % of frame height, with readable boulders. Marmoreal's has moss and petals, Sarpedon's has a waterfall and surf. Without it the boards do not read as «диорама на скалистой подложке».",
+      "fix": "Build the ENV-U10 modular rocky skirt. In Blender, cut 3-4 straight cliff modules plus 2 corner modules from the SM_TableBase rock, about 150-250 uu deep, with jagged bottoms and a vertex-colour moss band on the upper lip. Instance them around the T2 outline from the layout (no stretching). Give the rock a slight cool rim from the key so it separates from the haze. For Sarpedon, leave a notch for the waterfall (gap 1). Check the tray bounds in layout_check.py and the render budget.",
+      "hours": 9,
+      "needsNewAssets": true
+    },
+    {
+      "rank": 4,
+      "map": "sarpedon",
+      "issue": "The east (ship) side is sparse. A large, empty, flat plank deck holds only 4 cannons and 2 rope coils. The hull sits at the far back edge, and at K1 it is mostly outside the frame (only the top-right corner shows). The concept has the hull along the whole east side, close to the frame, with crates, barrels, rope coils, cannons through the gun ports, rigging, a red banner and several hanging lanterns.",
+      "fix": "Layout first: move hull-e1/e2 south and west, closer to the frame's east edge and centred on Y, so both sections are inside the K1 frame (check intrusions, outsideTray and the old hull-e1 20 uu WARN). Narrow the exposed deck. Then make 4 small Tripo props: barrel, crate stack, standing lantern post (also reused in the west), and a red banner/sail card. Dress the deck with 6-10 instances (only the 6-point light budget applies; these are mesh-only, no new lights) and add emissive lantern glass for warmth.",
+      "hours": 7,
+      "needsNewAssets": true
+    },
+    {
+      "rank": 5,
+      "map": "sarpedon",
+      "issue": "The ground reads as a patchwork of hard-edged rectangles: grass/dirt, cold grey ripple sand, black gravel and plank deck, with straight or torn-paper seams. The sand is neutral grey (sRGB about 55-66, b* ~0) where the concept's beach is warm (sRGB 119,83,59, Y 89). The sand discs under the campfires look like cut-out stickers.",
+      "fix": "Material and splat only. Break the splat edges with noise and blur them (ground_splat.py), and warm the sand tint (L1 back toward 0.70,0.56,0.40 at the river mouths). Let the dirt bleed into the campfire sand with a feathered edge. End the deck planks under the hull with a beam edge instead of a straight seam. Scatter the existing rocks/rope along the seams. Re-import with ue_import_env_ground.py and re-run measure.py (keep surround/map near 0.39).",
+      "hours": 3,
+      "needsNewAssets": false
+    },
+    {
+      "rank": 6,
+      "map": "marmoreal",
+      "issue": "The sides and the front strip are empty: large flat 'dark earth with petals' carpets with no vegetation volume. The concept has marble balustrades along the cliff edges, ball-finial posts at all 4 corners (the render has only the 2 front ones), hedges and flower beds with pink and white flowers, and rose garlands on the colonnade.",
+      "fix": "Tripo: a marble balustrade module (straight segment plus end post), plus a low hedge/flower-bed module. Run the balustrade along the W/E and front tray edges, add 2 PlinthBall posts at the back corners, and put 2-3 flower beds on the dark-earth areas (mesh only, no lights). Check the prop count and K1 framing with layout_check.py.",
+      "hours": 6,
+      "needsNewAssets": true
+    },
+    {
+      "rank": 7,
+      "map": "sarpedon",
+      "issue": "The west forest is thin and its style is off: 2 chunky, saturated-green, toy-like trees and short fence runs. The dirt there is brighter than the concept's dark forest (Y 54 against 26). The concept has dense dark foliage, rock outcrops, lanterns on palisade posts and ruined walls.",
+      "fix": "Duplicate SM_Env_Tree 4-6 times at varied scale and yaw behind the palisade, darken and desaturate MI_Env_Tree (V -25 %, S -20 %), and add 3-5 rock outcrops (Tripo, or Blender from the CC0 Rock058 set already downloaded). Add 2 of the lantern posts from gap 4 on the palisade (emissive-only, or swap them with existing campfire lights to stay within the 6-point budget).",
+      "hours": 4,
+      "needsNewAssets": true
+    },
+    {
+      "rank": 8,
+      "map": "both",
+      "issue": "The background is a flat navy fog gradient. The concepts have clouds and mist under the island, a moon glow (top-left), dark tree silhouettes (Marmoreal) and a dark sea with surf around the base (Sarpedon). It covers about 8-10 % of K1 and about 35 % at 0.65x.",
+      "fix": "Add an imagegen tileable night-cloud/mist texture on 2 large unlit translucent planes under the tray (z about -400 and -900, slow pan, fading at the edges), plus a soft moon-glow gradient card in the upper-left quadrant of the 0.65x view. For Sarpedon, add a dark sea plane under the island with a foam ring at the skirt. The fog start of 2900 uu stays, so the board is unaffected.",
+      "hours": 4,
+      "needsNewAssets": true
+    },
+    {
+      "rank": 9,
+      "map": "both",
+      "issue": "The map frame is a thin, fairly light brown plank (about 25 px at K1) with small flat corner plates. The concepts and the user's style concept use a heavy, dark, weathered wood frame with iron corner brackets and rivets that reads as a separate object.",
+      "fix": "Quick: darken and desaturate the frame wood MI (about -30 % V). Full: model a new frame in Blender with a thicker profile (about 1.6x), a bevel and iron L-brackets with rivets on the corners and mid-edges, keeping the same frameHalf so the camera and layout stay valid.",
+      "hours": 4,
+      "needsNewAssets": true
+    },
+    {
+      "rank": 10,
+      "map": "marmoreal",
+      "issue": "The ground transitions have torn-paper hard edges between the paving and the grass/earth, with no curb and no grass tufts. The paving reads as clean uniform grey tiles. Petals are an even confetti scatter, including on grass far from the trees. In the concept petals drift under the trees and along the paving joints.",
+      "fix": "Splat only: noise-broken, blurred paving edges plus a 1-tile curb strip (darker, rougher L3 band). Use a petal density mask centred on the cherry trees and the colonnade flower beds, and lower the global density by about 50 %. Add a macro variation of about ±8 % on the paving. Re-import and re-measure.",
+      "hours": 2.5,
+      "needsNewAssets": false
+    },
+    {
+      "rank": 11,
+      "map": "both",
+      "issue": "The light still reads closer to dusk than to the concepts' moonlit night on the props. The key is pinned at (-55,30,0) and comes from W–NW, so the props get side light but no cool back or rim highlights (the concepts have blue edge light on the colonnade, ship and rocks). No moon disc or glow is visible.",
+      "fix": "Needs a user decision. Unpin the key rotation and move it to a lower back-left moon (pitch about -35, from about NW-N), then update the BoardArt.Shipped test, the layout_check.py shadow rule and k1_mock.KEY_LIGHT_ROT together. Re-check figure shadows on the map and the circle readability (ΔL*). Pair this with the moon-glow card from gap 8.",
+      "hours": 3,
+      "needsNewAssets": false
+    },
+    {
+      "rank": 12,
+      "map": "marmoreal",
+      "issue": "The colonnade arches open onto the navy void. The concept shows a warm-lit corridor or back wall behind the arches, with windows, climbing roses and flower urns at the entrance, so the palace reads as a building rather than a stage flat.",
+      "fix": "Put a simple Blender back-wall slab (marble, with emissive warm window or door insets and no lights) behind the ArcadeBay row, plus a dark hedge strip at its foot. Add rose garlands by duplicating the existing urn flowers or with a small Tripo garland.",
+      "hours": 2.5,
+      "needsNewAssets": true
+    },
+    {
+      "rank": 13,
+      "map": "marmoreal",
+      "issue": "The lantern lights leave bright specular ghost spots on the glossy marble paving, south of each lantern and offset toward the camera; they look like floating glowing squares in K1 and K2. The lantern heads themselves have no glow halo, while in the concept the lanterns bloom.",
+      "fix": "Raise the paving (L3) roughness to 0.75-0.85 and/or lower the ground material's specular in ground-params.json, then re-import. Raise the flame/glass emissive on MI_Env_LanternPlinth (about 3-5x) so bloom gives a halo. No light-budget change.",
+      "hours": 1,
+      "needsNewAssets": false
+    },
+    {
+      "rank": 14,
+      "map": "both",
+      "issue": "The warm share of the surroundings is still below the concepts (Marmoreal 0.15 against 0.19, Sarpedon 0.08 against 0.14). The concepts have many more small warm sources (lantern posts, hanging ship lanterns, window glow). The light budget is used up at 1 key + 6 points.",
+      "fix": "Add emissive-only warm accents with no lights: lantern-post glass and window insets from gaps 4, 7 and 12, plus small additive glow cards at each lantern. Then re-measure the warm share with measure.py; the target is ≥0.18 and ≥0.12.",
+      "hours": 1.5,
+      "needsNewAssets": false
+    },
+    {
+      "rank": 15,
+      "map": "marmoreal",
+      "issue": "The cypress topiaries are covered in red bauble-like fruit and read as Christmas trees, which pulls them away from the concept's dark, quiet cypresses.",
+      "fix": "Darken and desaturate the red in T_Env_Cypress_BC (or remove the fruit with an albedo mask) and darken the foliage; re-import.",
+      "hours": 0.5,
+      "needsNewAssets": false
+    },
+    {
+      "rank": 16,
+      "map": "both",
+      "issue": "The concepts let warm lantern and ship light spill onto the outer ring of the map (warm corners). The render map is lit evenly cool-neutral because Lift 1.5 is mostly emissive, so it looks a bit like a backlit print rather than part of the scene.",
+      "fix": "Optional and low priority because it trades against readability. Lower Lift outside the circles (mask=0 areas) or let the lantern radii reach the frame, then verify that the zone ΔE and outline ΔL* do not drop. Do this only after the readability items are fixed.",
+      "hours": 1.5,
+      "needsNewAssets": false
+    }
+  ],
+  "readability": [
+    "HIGH: the HUD name/HP labels are thin white text with no outline or backing plate. On light circles they almost disappear: Merlin is nearly invisible on Marmoreal lavender, and King Arthur, Medusa 16/16 and the Harpies labels are low-contrast on pale pink/yellow and on Sarpedon's light-blue circles. In dense columns (Harpies 1 / Medusa / Harpies 2 on Marmoreal's left edge) the labels overlap the neighbouring figure. Fix in UMG (about 2-3 h): a dark semi-opaque rounded plate with a 1 px outline and a team-colour accent, plus collision offsets so stacked labels do not overlap.",
+    "HIGH: the cool night light squeezes warm/cool zone pairs together. Marmoreal pink vs lavender is ΔE 15.3 in K1 against 24.2 on the original map (-37 %), and Sarpedon light-blue vs pink is 17.7 against 24.5 (-28 %). The other pairs are fine (Sarpedon tan vs red 29.4 against 31.5; Marmoreal white vs yellow about 32). Players can mix up those adjacent zones. Fix (1-2 h): inside the GameMask, raise the share of the untinted emissive Lift relative to the cool-lit term, or add a mask-only inverse-tint/saturation term to M_MapBoard (or make the moon pool neutral white). Re-measure the zone ΔE with a target ≥20.",
+    "MEDIUM: the movement highlight is a mint-green stroke. On green zones (Sarpedon forest circles, the green halves of Marmoreal garden circles) its contrast drops, and at K2 the stroke is visibly a 12-sided polygon. Fix (1-2 h): pick a highlight colour outside the zone palette (warm white or gold with a thin dark outer stroke) and use 48 or more segments.",
+    "MEDIUM: the figures look pasted on. No contact or cast shadow shows on the map, because Lift 1.5 emissive washes out shadows inside the circles. Medusa also shares the bronze material and the same gold double ring with the harpies, so at K1 (about 40-50 px figures) the leader is not distinct; the user's style concept has a pale Medusa against dark-red harpies. Fix: a soft contact-shadow blob under each base (about 1 h), a leader ring variant such as a thicker ring or a pip (about 1 h), and later a lighter Medusa material (hero asset, separate task).",
+    "MEDIUM (Sarpedon): the near-black gravel patches at both river mouths touch the frame right next to the edge circles. They are a high-contrast dark noise field that pulls the eye and reads as holes; gap 1 (water) removes them.",
+    "LOW: the Marmoreal lantern specular ghosts and the Sarpedon hull-lantern glare sit outside the map frame, so they do not tint any circle. The moon pool is centred and creates no hotspot on circles. Keep any future lantern radii from reaching the circles; at most let them reach the frame edge.",
+    "LOW: every frame has two small dark-navy UI rectangles, one at the bottom centre (about 20x20 px around 960,1070) and one in the top-right corner (about 36x28 px). They are probably collapsed HUD tabs. Confirm they are intended; otherwise hide them in -Bench screenshots and give them a proper style in play.",
+    "LOW: at K1 the Sarpedon ship hull is mostly outside the frame and the Marmoreal colonnade is cut off at the top. That does not affect play, but the east and north themes read weakly in the main gameplay view; gap 4 (layout move) fixes Sarpedon.",
+    "Review crops (scratch only, they contain the original map, ENV-U3/U7, do not git-add) are in C:/tmp/envmaps-research/p2/review/: m-K1-left-figs.jpg, m-K1-arthur.jpg (labels), m-K2-figs.jpg (highlight), s-K1-bottom.jpg (gravel and sand), s-K065-ship.jpg, m-K065-skirt.jpg, hud-artifacts.jpg. No UE, build or other processes were started; this was a read-only review."
+  ]
+}
