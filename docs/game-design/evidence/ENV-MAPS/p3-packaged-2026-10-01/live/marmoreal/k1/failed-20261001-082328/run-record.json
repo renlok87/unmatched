@@ -1,0 +1,110 @@
+{
+  "schema": "unmatched.envmaps-p3-live-run/1",
+  "label": "k1-marmoreal",
+  "kind": "phase2",
+  "startedLocal": "2026-10-01T08:22:23+05:00",
+  "argv": [
+    "node",
+    "tools/s09/run-with-env.cjs",
+    "powershell",
+    "-NoProfile",
+    "-ExecutionPolicy",
+    "Bypass",
+    "-File",
+    "tools/s08/run-phase2-demo.ps1",
+    "-EvidenceDir",
+    "docs/game-design/evidence/ENV-MAPS/p3-packaged-2026-10-01/live/marmoreal/k1",
+    "-Api",
+    "http://localhost:3120/graphql",
+    "-ArtPreviewBoardId",
+    "c121b47f8d6eb28daccb76d05",
+    "-ArtPreviewHeroesV2",
+    "-ArtPreviewDiorama",
+    "-ArtPreviewShotAfter",
+    "36",
+    "-RunSeconds",
+    "50",
+    "-ClientFps",
+    "30",
+    "-ClientRenderPreset",
+    "High",
+    "-RequireRenderReference",
+    "-RequireShotCaptured",
+    "-ClientPerf"
+  ],
+  "credentials": "backend/.env exported by tools/s09/run-with-env.cjs into the child environment only",
+  "gpuLock": "owner=ENV-MAPS-P3 wt-envmaps pid=272 2026-10-01T08:21:58+05:00 purpose=live K1/K3 marmoreal (packaged pair 2x30fps)",
+  "backend": {
+    "port": 3120,
+    "pid": 56068,
+    "process": {
+      "pid": 56068,
+      "parent": 58008,
+      "name": "node.exe",
+      "exe": "C:\\nvm4w\\nodejs\\node.exe",
+      "cmd": "\"C:\\nvm4w\\nodejs\\node.exe\" -r dotenv/config dist/src/main.js ",
+      "created": "2026-10-01T07:17:17.2737070+05:00"
+    }
+  },
+  "staged": {
+    "global.ucas": "da0334ab680ac0ced936cad7cde332695ee0c44d9b30b9aa13b69a0c84e27866",
+    "global.utoc": "3c89e9d0176cb1f68e9462b27440ae4ac509c57fdbfef843621b6fb1eca0c7df",
+    "Unmatched-Windows.pak": "17cb484f60c165981445b4b20bddf4775fa99d4ff0611d0b9ccb20c6ca3da0d6",
+    "Unmatched-Windows.ucas": "5c3dfb82b3bc633f370e5bb227c5a744bfe4107075d715d7bc338f66cc249916",
+    "Unmatched-Windows.utoc": "2b91b8eb86bd8e6e3e2efde13c30a786156d9162190c82ccdcdcc103d3f180ea",
+    "Unmatched.exe(inner)": "d0b49f8c3bbee39b59685756a8e5954e56c71b5458e386edcd38ae459c99057a"
+  },
+  "demoPid": 57904,
+  "demoExit": 1,
+  "finishedLocal": "2026-10-01T08:23:28+05:00",
+  "durationS": 64.3,
+  "staging": "C:\\Users\\ren\\AppData\\Local\\Temp\\s08-phase2-20261001-082226-56640",
+  "cleanupLine": "cleanup: aborted THIS run's game id=cmuoyxs4t001xwi9gnbp86ngl status=ABORTED (verified)",
+  "roomStatus": "ABORTED",
+  "runDir": "docs/game-design/evidence/ENV-MAPS/p3-packaged-2026-10-01/live/marmoreal/k1/failed-20261001-082328",
+  "clientLogs": [
+    {
+      "name": "Unmatched.log",
+      "bytes": 110732,
+      "sha256": "ef7c6053d576ba9f4ef0138f0ea8d0a3988ccc77aded630f2a0a3728fc4b2839",
+      "roomCodeRedacted": true
+    },
+    {
+      "name": "Unmatched_2.log",
+      "bytes": 110429,
+      "sha256": "f64f1afb88095e6027e9b6218626c936e313727cdbdfe2b96947beb85101060e",
+      "roomCodeRedacted": true
+    }
+  ],
+  "crashLines": [],
+  "clientProcesses": [
+    {
+      "pid": 40884,
+      "parent": 56640,
+      "exe": "C:\\tmp\\wt-envmaps\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched.exe",
+      "created": "2026-10-01T08:22:26.8350520+05:00"
+    },
+    {
+      "pid": 37772,
+      "parent": 40884,
+      "exe": "C:\\tmp\\wt-envmaps\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched\\Binaries\\Win64\\Unmatched.exe",
+      "created": "2026-10-01T08:22:26.8448010+05:00"
+    },
+    {
+      "pid": 48836,
+      "parent": 56640,
+      "exe": "C:\\tmp\\wt-envmaps\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched.exe",
+      "created": "2026-10-01T08:22:31.8619540+05:00"
+    },
+    {
+      "pid": 33356,
+      "parent": 48836,
+      "exe": "C:\\tmp\\wt-envmaps\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched\\Binaries\\Win64\\Unmatched.exe",
+      "created": "2026-10-01T08:22:31.8724950+05:00"
+    }
+  ],
+  "failure": [
+    "+             throw \"$($pair[0]) zone '$key' expected $want cells: $(if ...",
+    "    + CategoryInfo          : OperationStopped: (host zone '' ex...s: no zone line:String) [], RuntimeException"
+  ]
+}

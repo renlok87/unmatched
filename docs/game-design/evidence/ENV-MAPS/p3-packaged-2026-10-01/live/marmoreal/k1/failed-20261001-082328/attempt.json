@@ -1,0 +1,49 @@
+{
+  "schema": "unmatched.envmaps-p3-attempt/1",
+  "status": "измерено (прогон не прошёл гейт скрипта; не доказательство)",
+  "label": "k1-marmoreal",
+  "kind": "phase2",
+  "argv": [
+    "node",
+    "tools/s09/run-with-env.cjs",
+    "powershell",
+    "-NoProfile",
+    "-ExecutionPolicy",
+    "Bypass",
+    "-File",
+    "tools/s08/run-phase2-demo.ps1",
+    "-EvidenceDir",
+    "docs/game-design/evidence/ENV-MAPS/p3-packaged-2026-10-01/live/marmoreal/k1",
+    "-Api",
+    "http://localhost:3120/graphql",
+    "-ArtPreviewBoardId",
+    "c121b47f8d6eb28daccb76d05",
+    "-ArtPreviewHeroesV2",
+    "-ArtPreviewDiorama",
+    "-ArtPreviewShotAfter",
+    "36",
+    "-RunSeconds",
+    "50",
+    "-ClientFps",
+    "30",
+    "-ClientRenderPreset",
+    "High",
+    "-RequireRenderReference",
+    "-RequireShotCaptured",
+    "-ClientPerf"
+  ],
+  "demoExit": 1,
+  "failure": [
+    "+             throw \"$($pair[0]) zone '$key' expected $want cells: $(if ...",
+    "    + CategoryInfo          : OperationStopped: (host zone '' ex...s: no zone line:String) [], RuntimeException"
+  ],
+  "cleanupLine": "cleanup: aborted THIS run's game id=cmuoyxs4t001xwi9gnbp86ngl status=ABORTED (verified)",
+  "staged": {
+    "global.ucas": "da0334ab680ac0ced936cad7cde332695ee0c44d9b30b9aa13b69a0c84e27866",
+    "global.utoc": "3c89e9d0176cb1f68e9462b27440ae4ac509c57fdbfef843621b6fb1eca0c7df",
+    "Unmatched-Windows.pak": "17cb484f60c165981445b4b20bddf4775fa99d4ff0611d0b9ccb20c6ca3da0d6",
+    "Unmatched-Windows.ucas": "5c3dfb82b3bc633f370e5bb227c5a744bfe4107075d715d7bc338f66cc249916",
+    "Unmatched-Windows.utoc": "2b91b8eb86bd8e6e3e2efde13c30a786156d9162190c82ccdcdcc103d3f180ea",
+    "Unmatched.exe(inner)": "d0b49f8c3bbee39b59685756a8e5954e56c71b5458e386edcd38ae459c99057a"
+  }
+}

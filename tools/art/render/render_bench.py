@@ -9,6 +9,8 @@ CSV profiler window (-csvGpuStats: per-pass GPU ms), dumps one ProfileGPU
 frame and takes one 1920x1080 SHOT with the RENDER fingerprint.
 
   python tools/art/render/render_bench.py run --variant dx12-lumen-high --repeats 3 --out <dir>
+  python tools/art/render/render_bench.py run --variant dx12-lumen-high-v2 --name marmoreal --out <dir>
+      --views K1+K1x0.65+K2x1.6 --bench-fixture ../../../Unmatched/Config/Bench/S08BenchMarmoreal.json  (ENV-MAPS)
   python tools/art/render/render_bench.py summarize --out <dir> <variant dirs...>
   python tools/art/render/render_bench.py variants
 
@@ -376,6 +378,11 @@ def run_one(variant: str, rdir: Path, a) -> dict:
            "-ArtPreview", "-Bench", f"-BenchOut={rdir}", f"-S08Trace={trace}", f"-BenchViews={a.views}",
            f"-BenchWarmup={a.warmup}", f"-BenchSettle={a.settle}", f"-BenchMeasure={a.measure}",
            "-BenchCsv", "-csvGpuStats", f"-abslog={log}"] + args
+    if a.bench_fixture:
+        # ENV-MAPS: the same scene on another board (S08BenchMarmoreal/Sarpedon.json); a relative path is read
+        # by the packaged client from its pak (cwd Binaries/Win64, e.g. ../../../Unmatched/Config/Bench/<file>)
+        cmd.append(f"-BenchFixture={a.bench_fixture}")
+        notes = {**notes, "benchFixture": a.bench_fixture}
     cmd.append("-ExecCmds=" + ", ".join(["DisableAllScreenMessages"] + execs))
     before = set(STAGED_CSV.glob("*.csv")) if STAGED_CSV.is_dir() else set()
     started = time.time()
@@ -386,7 +393,7 @@ def run_one(variant: str, rdir: Path, a) -> dict:
     sampler = gpu_sampler(rdir / "nvidia-smi.csv")
     p = subprocess.Popen(cmd, creationflags=NO_WINDOW)
     rec["pid"] = p.pid
-    timeout = a.warmup + 2 * (a.settle + a.measure + 25) + 120
+    timeout = a.warmup + max(2, len(a.views.split("+"))) * (a.settle + a.measure + 25) + 120
     try:
         p.wait(timeout=timeout)
     except subprocess.TimeoutExpired:
@@ -424,7 +431,7 @@ def run_one(variant: str, rdir: Path, a) -> dict:
 
 def cmd_run(a) -> int:
     # absolute: the client resolves -BenchOut / -S08Trace / -abslog against its own Binaries/Win64 directory
-    out = Path(a.out).resolve() / a.variant
+    out = Path(a.out).resolve() / (a.name or a.variant)
     lock = Path(r"C:\tmp\unmatched-gpu.lock")
     if not lock.is_file():
         print("REFUSED: take the GPU token first (C:/tmp/unmatched-gpu.lock)")
@@ -468,7 +475,8 @@ def summarize_variant(vdir: Path) -> dict:
         passes = sorted({k for c in csvs for k in (c.get("gpu") or {})})
         pg = [(r.get("profileGpu") or [])[vi] if len(r.get("profileGpu") or []) > vi else {} for r in runs]
         queues = sorted({q for d in pg for q in (d.get("summary") or {})})
-        shots = [(r.get("shots") or {}).get(v, {}) for r in runs]
+        # shot keys are PNG stems ("K1x0p65"), trace views keep the dot ("K1x0.65")
+        shots = [(r.get("shots") or {}).get(v) or (r.get("shots") or {}).get(v.replace(".", "p"), {}) for r in runs]
         out["views"][v] = {
             "fps": _stats([d.get("fps") for d in per]),
             "frameMsAvg": _stats([(d.get("frameMs") or {}).get("avg") for d in per]),
@@ -632,6 +640,8 @@ def main(argv=None) -> int:
     r.add_argument("--warmup", type=int, default=30)
     r.add_argument("--settle", type=int, default=8)
     r.add_argument("--measure", type=int, default=20)
+    r.add_argument("--bench-fixture", default="", help="-BenchFixture=<json> (default: the client's S08BenchCobble.json)")
+    r.add_argument("--name", default="", help="output directory name under --out (default: the variant)")
     s = sub.add_parser("summarize")
     s.add_argument("--out", required=True)
     s.add_argument("variant_dirs", nargs="+")

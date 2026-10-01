@@ -1,0 +1,25 @@
+{
+ "tool": "nvidia-smi pmon -d 5 -s u, цепочка 07:46–08:07 (+05), прогоны 2–9 из 9 (r1 marmoreal — до запуска этого лога)",
+ "samples": 192,
+ "samplesForeignOver20pct": 30,
+ "foreignMaxSmPct": {
+  "claude.exe": 37,
+  "dwm.exe": 32,
+  "chrome.exe": 7,
+  "ChatGPT.exe": 3,
+  "steamwebhelper.": 3,
+  "explorer.exe": 2
+ },
+ "unmatchedPids": [
+  2592,
+  29900,
+  41308,
+  41904,
+  42396,
+  53428,
+  57516,
+  57904
+ ],
+ "unmatchedSmP50": 70,
+ "note": "SM % процесса из pmon (выборка 5 с); посторонних игр/рендеров нет, только dwm.exe (композитор) и claude.exe (UI)"
+}

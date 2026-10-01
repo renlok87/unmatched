@@ -46,7 +46,12 @@
   # and no 'diorama tray missing'. The combat clip lines (LungeAttack / HitReact / DeathSettle) are
   # counted into the manifest (heroesV2Anim), not gated: which of them fire depends on the duel.
   [switch]$ArtPreviewHeroesV2,
-  [switch]$ArtPreviewDiorama
+  [switch]$ArtPreviewDiorama,
+  # ENV-MAPS (opt-in): the run must end in a decided duel - both traces carry
+  # 'RESULT seq=N outcome=VICTORY|DEFEAT winner=' (exactly one VICTORY and one
+  # DEFEAT) and the authoritative game row reads FINISHED with a winnerId that
+  # is one of this run's two seats. Without the switch the K3 gates are unchanged.
+  [switch]$RequireGameOver
 )
 
 # W5b-R (t53-thresholds.json shotCaptured): every published frame must carry its pixel provenance line
@@ -115,7 +120,17 @@ if ($ArtPreviewBoardId) {
     throw "ArtPreviewBoardId '$ArtPreviewBoardId' is not a registered art board ($known)"
   }
   $ArtBoardSize = "$($ArtBoard.match.width)x$($ArtBoard.match.height)"
-  Write-Output "art board: profile=$($ArtBoard.id) size=$ArtBoardSize light=$($ArtBoard.light)"
+  # ENV-MAPS: an original-map profile (surface map-image) registers no grid W x H; the backend derives
+  # W x H from the lattice of the committed topology fixture the profile names (as run-phase2-demo).
+  $ArtBoardMap = ($ArtBoard.surface -eq 'map-image')
+  if ($ArtBoardMap) {
+    $topologyPath = Join-Path $RepoRoot $ArtBoard.fixture
+    if (-not $ArtBoard.fixture -or -not (Test-Path -LiteralPath $topologyPath)) { throw "map-image board '$($ArtBoard.id)' names no readable topology fixture: '$($ArtBoard.fixture)'" }
+    $ArtTopology = [System.IO.File]::ReadAllText($topologyPath, [System.Text.Encoding]::UTF8) | ConvertFrom-Json
+    if ($ArtTopology.boardId -cne $ArtPreviewBoardId) { throw "topology fixture $($ArtBoard.fixture) is board $($ArtTopology.boardId), not $ArtPreviewBoardId" }
+    $ArtBoardSize = "$($ArtTopology.lattice.width)x$($ArtTopology.lattice.height)"
+  }
+  Write-Output "art board: profile=$($ArtBoard.id) size=$ArtBoardSize light=$($ArtBoard.light) map=$ArtBoardMap"
 }
 if (-not $Exe) { $Exe = Join-Path $RepoRoot 'unreal\Unmatched\Saved\StagedBuilds\Windows\Unmatched.exe' }
 if (-not $EvidenceDir) { $EvidenceDir = Join-Path $RepoRoot 'docs\game-design\evidence\S09\run' }
@@ -538,6 +553,11 @@ function Invoke-CombatDemo {
         }
         Assert-Trace $pair[1] @("ARTPREVIEW board profile=$($ArtBoard.id) match=boardId board=$ArtBoardSize boardId=$ArtPreviewBoardId",
           "ARTPREVIEW lights applied profile=$($ArtBoard.light) directional=1 shadow=1 ") "$($pair[0]) art board"
+        if ($ArtBoardMap) {
+          # ENV-MAPS: the client plays the map on its space graph (spaces/links of the registration).
+          Assert-Trace $pair[1] @("BOARD topology spaces=$($ArtBoard.expect.spaces) links=$($ArtBoard.expect.links) starts=",
+            "ARTPREVIEW board active profile=$($ArtBoard.id) $ArtBoardSize surface=map-image map=$($ArtBoard.mapImage.name) spaces=$($ArtBoard.expect.spaces) links=$($ArtBoard.expect.links) ") "$($pair[0]) map board"
+        }
       }
     }
     if ($MedusaVariantExplicit) {
@@ -574,6 +594,14 @@ function Invoke-CombatDemo {
         Assert-Trace $pair[1] @('ARTPREVIEW diorama requested mesh=/Game/PipelineCandidates/TableBase/', 'ARTPREVIEW diorama tray=/Game/PipelineCandidates/TableBase/') "$($pair[0]) diorama"
         $trayMissing = Select-String -LiteralPath $pair[1] -Pattern 'ARTPREVIEW diorama tray missing' | Select-Object -First 1
         if ($trayMissing) { throw "$($pair[0]) diorama tray not shown: $($trayMissing.Line)" }
+        if ($ArtBoardMap) {
+          # ENV-MAPS (as run-phase2-demo): the map's 3D perimeter and themed ground spawn with the tray.
+          $mapKey = $ArtTopology.map
+          $envLine = Select-String -LiteralPath $pair[1] -Pattern ('ARTPREVIEW envlayout map=' + [regex]::Escape($mapKey) + ' props=\d+ .* missingMeshes=0 .*combinedBudgetOk=1 .*boardId=' + [regex]::Escape($ArtPreviewBoardId) + ' .* status=ok') | Select-Object -Last 1
+          if (-not $envLine) { throw "$($pair[0]) env layout of $mapKey not spawned ok (no 'ARTPREVIEW envlayout map=$mapKey ... status=ok')" }
+          $ground = Select-String -LiteralPath $pair[1] -Pattern ('ARTPREVIEW envlayout ground map=' + [regex]::Escape($mapKey) + ' .* status=ok') | Select-Object -Last 1
+          if (-not $ground) { throw "$($pair[0]) env ground of $mapKey not spawned ok" }
+        }
       }
     }
     # T5.2: W4-A render reference on every evidence SHOT of both clients that
@@ -700,6 +728,37 @@ function Invoke-CombatDemo {
     if ($hostSeq -lt 12 -or $joinSeq -lt 12) { throw "match did not run long enough: host=$hostSeq joiner=$joinSeq" }
     if ([Math]::Abs($hostSeq - $joinSeq) -gt 4) { throw "clients diverged: host seq=$hostSeq joiner seq=$joinSeq" }
 
+    $GameOver = $null
+    if ($RequireGameOver) {
+      $mH = [regex]::Match($hostText, 'RESULT seq=(\d+) outcome=([A-Z]+) winner=')
+      $mJ = [regex]::Match($joinText, 'RESULT seq=(\d+) outcome=([A-Z]+) winner=')
+      if (-not $mH.Success -or -not $mJ.Success) { throw "GAME_OVER gate: 'RESULT seq=' missing (host=$($mH.Success) joiner=$($mJ.Success)) - the duel did not reach GAME_OVER within RunSeconds=$RunSeconds" }
+      $hostOutcome = $mH.Groups[2].Value; $joinOutcome = $mJ.Groups[2].Value
+      if (-not (($hostOutcome -eq 'VICTORY' -and $joinOutcome -eq 'DEFEAT') -or ($hostOutcome -eq 'DEFEAT' -and $joinOutcome -eq 'VICTORY'))) {
+        throw "GAME_OVER gate: outcomes are not one VICTORY + one DEFEAT (host=$hostOutcome joiner=$joinOutcome)"
+      }
+      $goLoginBody = @{ query = 'mutation L($input: LoginDto!) { login(input: $input) { accessToken user { id } } }'; variables = @{ input = @{ email = $AccountA.email; password = $AccountA.password } } } | ConvertTo-Json -Depth 5
+      $goLoginA = Invoke-RestMethod -Uri $Api -Method Post -ContentType 'application/json' -Body $goLoginBody
+      Assert-GqlOk $goLoginA 'GAME_OVER gate host login'
+      $goLoginBody = @{ query = 'mutation L($input: LoginDto!) { login(input: $input) { accessToken user { id } } }'; variables = @{ input = @{ email = $AccountB.email; password = $AccountB.password } } } | ConvertTo-Json -Depth 5
+      $goLoginB = Invoke-RestMethod -Uri $Api -Method Post -ContentType 'application/json' -Body $goLoginBody
+      Assert-GqlOk $goLoginB 'GAME_OVER gate joiner login'
+      $goQuery = @{ query = 'query G($id: String!) { game(id: $id) { id status winnerId boardId } }'; variables = @{ id = $Script:ThisRunGameId } } | ConvertTo-Json -Depth 5
+      $goRow = Invoke-RestMethod -Uri $Api -Method Post -ContentType 'application/json' -Headers @{ authorization = "Bearer $($goLoginA.data.login.accessToken)" } -Body $goQuery
+      Assert-GqlOk $goRow 'GAME_OVER gate game lookup'
+      $row = $goRow.data.game
+      if (-not $row -or $row.id -cne $Script:ThisRunGameId) { throw "GAME_OVER gate: game $($Script:ThisRunGameId) does not resolve" }
+      if ($row.status -cne 'FINISHED') { throw "GAME_OVER gate: game row status=$($row.status), expected FINISHED" }
+      $seatA = $goLoginA.data.login.user.id; $seatB = $goLoginB.data.login.user.id
+      if (-not $row.winnerId -or @($seatA, $seatB) -notcontains $row.winnerId) { throw 'GAME_OVER gate: FINISHED row has no winnerId of this run''s two seats' }
+      $rowWinnerSeat = if ($row.winnerId -eq $seatA) { 'host' } else { 'joiner' }
+      $traceWinnerSeat = if ($hostOutcome -eq 'VICTORY') { 'host' } else { 'joiner' }
+      if ($rowWinnerSeat -ne $traceWinnerSeat) { throw "GAME_OVER gate: server winner ($rowWinnerSeat) contradicts the presented VICTORY ($traceWinnerSeat)" }
+      if ($ArtPreviewBoardId -and $row.boardId -cne $ArtPreviewBoardId) { throw "GAME_OVER gate: row boardId=$($row.boardId), expected $ArtPreviewBoardId" }
+      $GameOver = [ordered]@{ status = $row.status; winnerSeat = $rowWinnerSeat; hostOutcome = $hostOutcome; joinerOutcome = $joinOutcome; hostResultSeq = [int]$mH.Groups[1].Value; joinerResultSeq = [int]$mJ.Groups[1].Value; boardId = $row.boardId }
+      Write-Output ("GAME_OVER gate ok: row FINISHED, winner seat={0} (host {1}, joiner {2}), result seq host={3} joiner={4}" -f $rowWinnerSeat, $hostOutcome, $joinOutcome, $GameOver.hostResultSeq, $GameOver.joinerResultSeq)
+    }
+
     $publishNames = @(
       'combat-client-host.trace.log', 'combat-client-joiner.trace.log',
       'host\s09-combat-result.png',
@@ -751,6 +810,7 @@ function Invoke-CombatDemo {
       heroesV2Anim = $HeroesV2Anim
       render = [ordered]@{ clientRenderPreset = $ClientRenderPreset; requireRenderReference = [bool]$RequireRenderReference; clientPerf = [bool]$ClientPerf }
       revealProof = $RevealProof
+      gameOver = $GameOver
       files   = @()
     }
     function Get-Sha256Hex([string]$Path) {
