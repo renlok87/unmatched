@@ -1,0 +1,1072 @@
+{
+  "schema": "unmatched.table-base-t2b.build-report/1",
+  "status": "measured",
+  "asset": "ASSET-TABLE-BASE-001 / SM_TableBase_T2b",
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "technically_imported": false
+  },
+  "blender_version": "5.2.2 LTS",
+  "script_sha256_lf": "f3b0a74a8d06abcc68b22e4cb2d34be304566784614cee512af39f6554e2b70b",
+  "layout_sha256_lf": "3b12f5204f6bbe66c266eb046281cce9fbd0233c7ded6f014a44f6aa3c905393",
+  "helpers": {
+    "k_blender": "b291e157bf8d206bdad92632a3021596d3deeff579549ab34d3a56d62ac3955b",
+    "static_prop_candidate": "b1e67b69c41abf19aa053f3d7126fa507f7d96ebfb1d144ca28b334623a28af6"
+  },
+  "params": {
+    "path": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20261001-tray-t2b/reports/tray-t2b-params.json",
+    "sha256": "573ce0851d30d43c6d301a4aef9b812fe6992ca8e9226f88cd1cf57547cb19a5"
+  },
+  "contract": {
+    "ue": {
+      "folder": "/Game/PipelineCandidates/TableBase/T2b",
+      "mesh": "SM_TableBase_T2b",
+      "material_instance": "MI_TableBase_T2b (parent: a new M_TableBase_T2b = the T2 rock graph + a moss lerp by VertexColor.R; MI params MossTint/MossAmount per map)",
+      "textures": [
+        "T_TableBase_T2_BC",
+        "T_TableBase_T2_N",
+        "T_TableBase_T2_ORM (reused, already in UE)",
+        "T_TableBase_T2b_Moss_BC",
+        "T_TableBase_T2b_Moss_N"
+      ],
+      "import": "extend tools/art/env_kit/ue_import_tray_t2.py (legacy FbxFactory, import_uniform_scale 1.0, vertex_color_import_option REPLACE, normals imported, no collision, Nanite off)"
+    },
+    "placement": "the same as SM_TableBase_T2: board actor component at (0, tray.offsetY, 0), yaw 0, scale 1",
+    "axes": "UE X = -blend y (long side), UE Y = -blend x; read-back frame = UE with Y negated",
+    "uv": "UV0 world box projection, 180 uu per repeat (Wrap)",
+    "vertexColor": "Col (FBX values = the masks): R = moss mask on the upper lip (Marmoreal moss + petals tint / Sarpedon damp via MI params), G = per-chunk random 0..1 (tint variation), B = depth below the top 0..1 (0 at the top, 1 at depth_ref_uu), A = 1"
+  },
+  "kit": {
+    "library": {
+      "cap": [
+        {
+          "variant": 0,
+          "w": 90.25,
+          "t": 58.6,
+          "h": 73.01,
+          "points": 33,
+          "extra": {
+            "topSlope": 0.352,
+            "flatBand": 8.312,
+            "batter": 12.456
+          }
+        },
+        {
+          "variant": 1,
+          "w": 89.32,
+          "t": 47.15,
+          "h": 69.28,
+          "points": 33,
+          "extra": {
+            "topSlope": 0.317,
+            "flatBand": 9.579,
+            "batter": 9.505
+          }
+        },
+        {
+          "variant": 2,
+          "w": 71.76,
+          "t": 50.68,
+          "h": 71.21,
+          "points": 33,
+          "extra": {
+            "topSlope": 0.293,
+            "flatBand": 9.013,
+            "batter": 8.377
+          }
+        },
+        {
+          "variant": 3,
+          "w": 106.26,
+          "t": 48.77,
+          "h": 65.53,
+          "points": 33,
+          "extra": {
+            "topSlope": 0.388,
+            "flatBand": 10.059,
+            "batter": 8.419
+          }
+        },
+        {
+          "variant": 4,
+          "w": 102.17,
+          "t": 54.96,
+          "h": 69.44,
+          "points": 33,
+          "extra": {
+            "topSlope": 0.33,
+            "flatBand": 7.155,
+            "batter": 13.85
+          }
+        },
+        {
+          "variant": 5,
+          "w": 75.36,
+          "t": 42.77,
+          "h": 56.22,
+          "points": 33,
+          "extra": {
+            "topSlope": 0.356,
+            "flatBand": 11.794,
+            "batter": 12.026
+          }
+        },
+        {
+          "variant": 6,
+          "w": 107.33,
+          "t": 61.03,
+          "h": 70.05,
+          "points": 33,
+          "extra": {
+            "topSlope": 0.402,
+            "flatBand": 6.391,
+            "batter": 11.091
+          }
+        },
+        {
+          "variant": 7,
+          "w": 96.34,
+          "t": 51.83,
+          "h": 51.23,
+          "points": 33,
+          "extra": {
+            "topSlope": 0.286,
+            "flatBand": 8.127,
+            "batter": 12.807
+          }
+        }
+      ],
+      "boulder": [
+        {
+          "variant": 0,
+          "w": 74.32,
+          "t": 48.01,
+          "h": 77.05,
+          "points": 47,
+          "extra": {
+            "lean": 0.1
+          }
+        },
+        {
+          "variant": 1,
+          "w": 115.21,
+          "t": 70.22,
+          "h": 59.97,
+          "points": 47,
+          "extra": {
+            "lean": -0.082
+          }
+        },
+        {
+          "variant": 2,
+          "w": 78.47,
+          "t": 77.75,
+          "h": 79.24,
+          "points": 47,
+          "extra": {
+            "lean": 0.077
+          }
+        },
+        {
+          "variant": 3,
+          "w": 128.93,
+          "t": 57.02,
+          "h": 86.16,
+          "points": 47,
+          "extra": {
+            "lean": -0.011
+          }
+        },
+        {
+          "variant": 4,
+          "w": 127.78,
+          "t": 63.44,
+          "h": 65.35,
+          "points": 47,
+          "extra": {
+            "lean": -0.02
+          }
+        },
+        {
+          "variant": 5,
+          "w": 74.71,
+          "t": 61.32,
+          "h": 69.96,
+          "points": 47,
+          "extra": {
+            "lean": -0.055
+          }
+        },
+        {
+          "variant": 6,
+          "w": 70.51,
+          "t": 66.83,
+          "h": 58.84,
+          "points": 47,
+          "extra": {
+            "lean": 0.082
+          }
+        },
+        {
+          "variant": 7,
+          "w": 129.94,
+          "t": 70.85,
+          "h": 82.5,
+          "points": 47,
+          "extra": {
+            "lean": 0.086
+          }
+        }
+      ],
+      "block": [
+        {
+          "variant": 0,
+          "w": 64.74,
+          "t": 44.45,
+          "h": 120.11,
+          "points": 31,
+          "extra": {
+            "lean": [
+              2.304,
+              -0.539
+            ]
+          }
+        },
+        {
+          "variant": 1,
+          "w": 61.3,
+          "t": 56.2,
+          "h": 114.63,
+          "points": 31,
+          "extra": {
+            "lean": [
+              4.645,
+              -2.159
+            ]
+          }
+        },
+        {
+          "variant": 2,
+          "w": 75.92,
+          "t": 42.36,
+          "h": 99.45,
+          "points": 31,
+          "extra": {
+            "lean": [
+              -3.76,
+              1.121
+            ]
+          }
+        },
+        {
+          "variant": 3,
+          "w": 87.63,
+          "t": 46.63,
+          "h": 106.26,
+          "points": 31,
+          "extra": {
+            "lean": [
+              2.33,
+              -2.633
+            ]
+          }
+        },
+        {
+          "variant": 4,
+          "w": 88.36,
+          "t": 45.94,
+          "h": 94.24,
+          "points": 31,
+          "extra": {
+            "lean": [
+              1.101,
+              -2.79
+            ]
+          }
+        },
+        {
+          "variant": 5,
+          "w": 77.79,
+          "t": 43.25,
+          "h": 114.21,
+          "points": 31,
+          "extra": {
+            "lean": [
+              -1.437,
+              -0.851
+            ]
+          }
+        },
+        {
+          "variant": 6,
+          "w": 69.16,
+          "t": 52.78,
+          "h": 96.29,
+          "points": 31,
+          "extra": {
+            "lean": [
+              -3.426,
+              -0.773
+            ]
+          }
+        }
+      ],
+      "spike": [
+        {
+          "variant": 0,
+          "w": 50.11,
+          "t": 40.93,
+          "h": 65.74,
+          "points": 24,
+          "extra": {
+            "tip": [
+              9.549,
+              1.412
+            ],
+            "blunt": 0.0
+          }
+        },
+        {
+          "variant": 1,
+          "w": 56.4,
+          "t": 36.79,
+          "h": 57.27,
+          "points": 25,
+          "extra": {
+            "tip": [
+              -8.353,
+              -1.175
+            ],
+            "blunt": 0.0
+          }
+        },
+        {
+          "variant": 2,
+          "w": 50.42,
+          "t": 52.44,
+          "h": 60.89,
+          "points": 29,
+          "extra": {
+            "tip": [
+              -6.003,
+              7.728
+            ],
+            "blunt": 1.0
+          }
+        },
+        {
+          "variant": 3,
+          "w": 59.65,
+          "t": 52.38,
+          "h": 63.93,
+          "points": 25,
+          "extra": {
+            "tip": [
+              -10.73,
+              -9.782
+            ],
+            "blunt": 0.0
+          }
+        },
+        {
+          "variant": 4,
+          "w": 67.46,
+          "t": 39.85,
+          "h": 40.13,
+          "points": 24,
+          "extra": {
+            "tip": [
+              15.394,
+              6.033
+            ],
+            "blunt": 0.0
+          }
+        },
+        {
+          "variant": 5,
+          "w": 42.97,
+          "t": 33.99,
+          "h": 67.5,
+          "points": 24,
+          "extra": {
+            "tip": [
+              8.074,
+              -3.022
+            ],
+            "blunt": 0.0
+          }
+        },
+        {
+          "variant": 6,
+          "w": 63.91,
+          "t": 53.69,
+          "h": 40.42,
+          "points": 29,
+          "extra": {
+            "tip": [
+              -13.689,
+              -10.166
+            ],
+            "blunt": 1.0
+          }
+        },
+        {
+          "variant": 7,
+          "w": 47.75,
+          "t": 52.27,
+          "h": 75.51,
+          "points": 25,
+          "extra": {
+            "tip": [
+              8.102,
+              -8.095
+            ],
+            "blunt": 0.0
+          }
+        },
+        {
+          "variant": 8,
+          "w": 61.76,
+          "t": 46.39,
+          "h": 48.24,
+          "points": 25,
+          "extra": {
+            "tip": [
+              -0.431,
+              -8.331
+            ],
+            "blunt": 0.0
+          }
+        }
+      ]
+    },
+    "modules": [
+      {
+        "type": "side",
+        "variant": 0,
+        "chunks": 12,
+        "triangles": 704,
+        "lengthUU": 170.0,
+        "legUU": null,
+        "zRange": [
+          -188.89,
+          0.61
+        ]
+      },
+      {
+        "type": "side",
+        "variant": 1,
+        "chunks": 12,
+        "triangles": 672,
+        "lengthUU": 190.0,
+        "legUU": null,
+        "zRange": [
+          -203.93,
+          1.17
+        ]
+      },
+      {
+        "type": "side",
+        "variant": 2,
+        "chunks": 14,
+        "triangles": 786,
+        "lengthUU": 210.0,
+        "legUU": null,
+        "zRange": [
+          -187.81,
+          1.62
+        ]
+      },
+      {
+        "type": "side",
+        "variant": 3,
+        "chunks": 14,
+        "triangles": 800,
+        "lengthUU": 230.0,
+        "legUU": null,
+        "zRange": [
+          -215.75,
+          1.71
+        ]
+      },
+      {
+        "type": "side",
+        "variant": 4,
+        "chunks": 16,
+        "triangles": 908,
+        "lengthUU": 250.0,
+        "legUU": null,
+        "zRange": [
+          -196.99,
+          1.43
+        ]
+      },
+      {
+        "type": "side",
+        "variant": 5,
+        "chunks": 15,
+        "triangles": 832,
+        "lengthUU": 270.0,
+        "legUU": null,
+        "zRange": [
+          -206.98,
+          1.46
+        ]
+      },
+      {
+        "type": "corner",
+        "variant": 0,
+        "chunks": 23,
+        "triangles": 1340,
+        "lengthUU": null,
+        "legUU": 140.0,
+        "zRange": [
+          -194.15,
+          0.66
+        ]
+      },
+      {
+        "type": "corner",
+        "variant": 1,
+        "chunks": 22,
+        "triangles": 1274,
+        "lengthUU": null,
+        "legUU": 140.0,
+        "zRange": [
+          -196.85,
+          0.94
+        ]
+      }
+    ],
+    "perimeter": [
+      {
+        "name": "top",
+        "ue": "west (UE -X)",
+        "start": [
+          -470.0,
+          780.0
+        ],
+        "rotDeg": 0.0,
+        "lengthUU": 940.0,
+        "outward": [
+          0.0,
+          1.0
+        ],
+        "sequence": [
+          1,
+          3,
+          5
+        ],
+        "overlapUU": 7.5,
+        "fillUU": 660.0,
+        "sumUU": 690.0
+      },
+      {
+        "name": "right",
+        "ue": "far/north (UE -Y)",
+        "start": [
+          470.0,
+          780.0
+        ],
+        "rotDeg": -90.0,
+        "lengthUU": 1560.0,
+        "outward": [
+          1.0,
+          0.0
+        ],
+        "sequence": [
+          4,
+          0,
+          5,
+          1,
+          5,
+          1
+        ],
+        "overlapUU": 8.571428571428571,
+        "fillUU": 1280.0,
+        "sumUU": 1340.0
+      },
+      {
+        "name": "bottom",
+        "ue": "east (UE +X)",
+        "start": [
+          470.0,
+          -780.0
+        ],
+        "rotDeg": 180.0,
+        "lengthUU": 940.0,
+        "outward": [
+          -0.0,
+          -1.0
+        ],
+        "sequence": [
+          4,
+          5,
+          0
+        ],
+        "overlapUU": 7.5,
+        "fillUU": 660.0,
+        "sumUU": 690.0
+      },
+      {
+        "name": "left",
+        "ue": "near/south (UE +Y)",
+        "start": [
+          -470.0,
+          -780.0
+        ],
+        "rotDeg": 90.0,
+        "lengthUU": 1560.0,
+        "outward": [
+          -1.0,
+          0.0
+        ],
+        "sequence": [
+          1,
+          5,
+          4,
+          3,
+          2,
+          1
+        ],
+        "overlapUU": 8.571428571428571,
+        "fillUU": 1280.0,
+        "sumUU": 1340.0
+      }
+    ],
+    "modulePlacements": 22,
+    "chunkInstances": 339,
+    "instancesByRow": {
+      "cap": 75,
+      "boulder": 69,
+      "block": 86,
+      "spike": 109
+    },
+    "instanceScaleRange": [
+      0.855,
+      1.1761
+    ],
+    "instanceAnisotropyMax": 1.0000000000000002,
+    "capsMovedDownForRim": 0,
+    "hullsNotOutward": 0,
+    "instancesFile": "reports/kit-instances.json"
+  },
+  "geometry": {
+    "triangles": 19278,
+    "trianglesByPart": {
+      "cap": 4090,
+      "boulder": 5864,
+      "block": 4480,
+      "spike": 4832,
+      "core": 10,
+      "top": 2
+    },
+    "vertices": 10323,
+    "boundsUeUU": {
+      "min": [
+        -815.719,
+        -501.323,
+        -215.746
+      ],
+      "max": [
+        815.719,
+        501.323,
+        1.71
+      ],
+      "size": [
+        1631.437,
+        1002.646,
+        217.456
+      ]
+    },
+    "flatTop": {
+      "zUU": [
+        -3.0
+      ],
+      "rectUeUU": {
+        "halfX": 780.0,
+        "halfY": 470.0
+      },
+      "rectBlendMin": [
+        -470.0,
+        -780.0
+      ]
+    },
+    "lip": {
+      "topZMaxUU": 1.71,
+      "rimUU": 20.0,
+      "maxZInsideRimBandInnerRectUU": -3.0
+    },
+    "overhangUU": {
+      "sidesMax": 23.041,
+      "cornersMax": 35.719
+    },
+    "depthBelowTopUU": 212.746,
+    "lowestZUU": -215.746,
+    "rows": {
+      "cap": {
+        "triangles": 4090,
+        "zRange": [
+          -85.63,
+          1.71
+        ]
+      },
+      "boulder": {
+        "triangles": 5864,
+        "zRange": [
+          -138.9,
+          -26.25
+        ]
+      },
+      "block": {
+        "triangles": 4480,
+        "zRange": [
+          -193.12,
+          -31.65
+        ]
+      },
+      "spike": {
+        "triangles": 4832,
+        "zRange": [
+          -215.75,
+          -99.45
+        ]
+      }
+    }
+  },
+  "seeThrough": {
+    "requiredDepthsZ": [
+      -3.5,
+      -6.0,
+      -15.0,
+      -30.0,
+      -45.0,
+      -55.0
+    ],
+    "deepDepthsZ": [
+      -100.0,
+      -160.0,
+      -200.0
+    ],
+    "cameras": {
+      "K1": {
+        "origin": [
+          -1387.28,
+          -0.0,
+          1916.98
+        ],
+        "requiredRays": 7524,
+        "holes": 0,
+        "holesAt": [],
+        "silhouetteMisses": 0,
+        "deepRays": 3762,
+        "deepOpenFraction": 0.2148
+      },
+      "zoom-out-0.65": {
+        "origin": [
+          -1697.04,
+          -0.0,
+          2359.35
+        ],
+        "requiredRays": 7524,
+        "holes": 0,
+        "holesAt": [],
+        "silhouetteMisses": 0,
+        "deepRays": 3762,
+        "deepOpenFraction": 0.2135
+      },
+      "follow-1.2-near-W": {
+        "origin": [
+          -1413.57,
+          300.0,
+          1625.48
+        ],
+        "requiredRays": 7524,
+        "holes": 0,
+        "holesAt": [],
+        "silhouetteMisses": 0,
+        "deepRays": 3762,
+        "deepOpenFraction": 0.2119
+      },
+      "follow-1.6-near-E": {
+        "origin": [
+          -966.14,
+          -300.0,
+          986.49
+        ],
+        "requiredRays": 7524,
+        "holes": 0,
+        "holesAt": [],
+        "silhouetteMisses": 0,
+        "deepRays": 3762,
+        "deepOpenFraction": 0.2124
+      }
+    },
+    "missedTotal": 0
+  },
+  "vertexColorStats": {
+    "R_moss": {
+      "mean": 0.0783,
+      "fractionAbove0.5": 0.0459,
+      "meanAboveZ-20": 0.499,
+      "meanBelowZ-80": 0.0
+    },
+    "G_chunkRandom": {
+      "min": 0.0026,
+      "max": 0.9942
+    },
+    "B_depth": {
+      "min": 0.0,
+      "max": 0.851
+    }
+  },
+  "southProfile": {
+    "file": "reports/south-profile.json",
+    "maxOutwardTopBandUU": 23.041
+  },
+  "exports": [
+    {
+      "fbx": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20261001-tray-t2b/export/SM_TableBase_T2b.fbx",
+      "sha256": "bca13949980db6ea00d39ebab0de5acee2a93c7fab4ce15613e68ba2ae8d446c",
+      "bytes": 997084,
+      "preset": "UM_FBX_v1.json",
+      "exporter_kwargs": {
+        "add_leaf_bones": false,
+        "apply_scale_options": "FBX_SCALE_UNITS",
+        "apply_unit_scale": true,
+        "axis_forward": "-Y",
+        "axis_up": "Z",
+        "bake_anim": false,
+        "bake_space_transform": false,
+        "embed_textures": false,
+        "mesh_smooth_type": "FACE",
+        "object_types": [
+          "ARMATURE",
+          "MESH"
+        ],
+        "path_mode": "AUTO",
+        "primary_bone_axis": "Y",
+        "secondary_bone_axis": "X",
+        "use_custom_props": false,
+        "use_mesh_edges": false,
+        "use_selection": true,
+        "use_triangles": true
+      },
+      "colors_type": "SRGB (exporter default; mask values pre-linearised, see k_blender.py)",
+      "um_fbx_v1_conformance": [
+        {
+          "setting": "Forward / Up (04 1.1)",
+          "standard": [
+            "-Y",
+            "Z"
+          ],
+          "used": [
+            "-Y",
+            "Z"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Apply Scalings (04 1.1)",
+          "standard": "FBX_SCALE_UNITS",
+          "used": "FBX_SCALE_UNITS",
+          "conforms": true
+        },
+        {
+          "setting": "Apply Unit (04 1.1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Apply Transform (04 1.1)",
+          "standard": false,
+          "used": false,
+          "conforms": true
+        },
+        {
+          "setting": "Triangulate Faces (04 1.1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Smoothing (04 1.1)",
+          "standard": "FACE",
+          "used": "FACE",
+          "conforms": true
+        },
+        {
+          "setting": "Object Types (04 1.1)",
+          "standard": [
+            "ARMATURE",
+            "MESH"
+          ],
+          "used": [
+            "ARMATURE",
+            "MESH"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Loose Edges / Custom Properties (04 1.1)",
+          "standard": [
+            false,
+            false
+          ],
+          "used": [
+            false,
+            false
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Leaf bones / bone axes (04 1.1, preset)",
+          "standard": [
+            false,
+            "Y",
+            "X"
+          ],
+          "used": [
+            false,
+            "Y",
+            "X"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Bake Animation (04 1.1: skeletal clips only)",
+          "standard": false,
+          "used": false,
+          "conforms": true
+        },
+        {
+          "setting": "Path Mode, textures not embedded (04 1.1)",
+          "standard": [
+            "AUTO",
+            false
+          ],
+          "used": [
+            "AUTO",
+            false
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Export space: +Z rotation deg / data scale / UnitScaleFactor patch (preset)",
+          "standard": [
+            90.0,
+            100.0,
+            1.0
+          ],
+          "used": [
+            90.0,
+            100.0,
+            1.0
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Scene units: metric, unit scale 1.0 (04 1)",
+          "standard": [
+            "METRIC",
+            1.0
+          ],
+          "used": [
+            "METRIC",
+            1.0
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Transforms applied: object matrix identity (04 1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Pivot: tray centre (0,0) = centre of the flat top at top_z (T2 rule)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        }
+      ],
+      "name": "SM_TableBase_T2b",
+      "triangles": 19278
+    }
+  ],
+  "roundtrip": {
+    "mesh_objects": 1,
+    "triangles": 19278,
+    "expected_triangles": 19278,
+    "material_slots": [
+      "M_TableBase_T2b"
+    ],
+    "expected_slots": [
+      "M_TableBase_T2b"
+    ],
+    "uv_layers": [
+      "UVMap"
+    ],
+    "color_attributes": [
+      "Col"
+    ],
+    "bounds_as_ue_uu": {
+      "min": [
+        -815.719,
+        -501.323,
+        -215.746
+      ],
+      "max": [
+        815.719,
+        501.323,
+        1.71
+      ]
+    },
+    "note": "read-back frame: UE = (x, -y, z)",
+    "color_file_values": {
+      "domain": "CORNER",
+      "type": "BYTE_COLOR",
+      "min": [
+        0.0,
+        0.0003,
+        0.0
+      ],
+      "max": [
+        1.0,
+        0.9911,
+        0.6939
+      ],
+      "mean": [
+        0.0429,
+        0.3085,
+        0.1355
+      ]
+    },
+    "ue_frame_matches_build": true
+  },
+  "blend_scratch": "C:\\tmp\\envmaps-research\\p5k\\tray-t2b\\work\\SM_TableBase_T2b.blend",
+  "checks": {
+    "triangles_within_budget": true,
+    "module_triangles_within_budget": true,
+    "instances_uniform_scale_only": true,
+    "chunk_hulls_outward": true,
+    "flat_top_is_the_tray_rectangle": true,
+    "nothing_above_top_inward_of_rim": true,
+    "lip_top_within_max": true,
+    "overhang_sides_within_max": true,
+    "overhang_corners_within_max": true,
+    "depth_in_range": true,
+    "no_see_through_to_void": true,
+    "moss_on_upper_lip": true,
+    "single_mesh": true,
+    "triangles_preserved": true,
+    "one_material_slot": true,
+    "uv0_present": true,
+    "vertex_colors_present": true,
+    "roundtrip_bounds_match_ue_frame": true,
+    "um_fbx_v1_conforms": true
+  },
+  "checks_passed": true
+}

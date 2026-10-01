@@ -1,0 +1,51 @@
+{
+  "schema": "unmatched.table-base-t2b.params/1",
+  "note": "SM_TableBase_T2b = the chunky version of the ONE shared rocky tray (ENV-U10, review gap 3). Same top outline as T2 (half 780 x 470, offsetY -45 applied by the board actor). Every number is PROPOSED (lane K), not an art decision. Axes of 'tray' = UE board-actor space; the Blender build works in .blend axes (UM_FBX_v1: UE X = -blend y, UE Y = -blend x).",
+  "run_dir": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20261001-tray-t2b",
+  "scratch_dir": "C:/tmp/envmaps-research/p5k/tray-t2b",
+  "fbx_preset": "blender/_tools/presets/UM_FBX_v1.json",
+  "asset_name": "SM_TableBase_T2b",
+  "material_name": "M_TableBase_T2b",
+  "rock_textures": {"dir": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20261001-tray-t2/export", "prefix": "T_TableBase_T2",
+                    "note": "T2b reuses the T2 rock set (Rock058-derived, tiling) - no new rock texture; only the moss detail BC/N below is new"},
+  "moss_textures": {"source_id": "Moss002", "source_dir": "C:/Users/ren/WebstormProjects/unmached/unmached/art/material-library/cc0-raw/Moss002",
+                    "size": 1024, "prefix": "T_TableBase_T2b_Moss", "saturation_keep": 0.55, "target_mean_luma_srgb": 0.36},
+  "tray": {
+    "half_x_ue": 780.0, "half_y_ue": 470.0, "offset_y_ue": -45.0, "top_z": -3.0,
+    "rim_uu": 20.0, "lip_top_z_max": 2.5,
+    "overhang_max_uu": 34.0, "overhang_corner_max_uu": 50.0,
+    "depth_min_uu": 150.0, "depth_max_uu": 250.0,
+    "max_triangles": 40000
+  },
+  "kit": {
+    "seed": 20261002,
+    "tile_uu": 180.0,
+    "library": {"cap": 8, "boulder": 8, "block": 7, "spike": 9},
+    "side_module_lengths_uu": [170.0, 190.0, 210.0, 230.0, 250.0, 270.0],
+    "corner_variants": 2,
+    "corner_leg_uu": 140.0,
+    "core_inset_uu": 30.0,
+    "core_bottom_z": -150.0,
+    "instance_scale": [0.9, 1.12],
+    "rows": [
+      {"name": "cap", "kind": "cap", "out_uu": [10.0, 22.0], "top_z": [-1.5, 1.4], "overlap_uu": [6.0, 14.0], "gap_uu": null, "yaw_jitter_deg": 6.0, "corner_width_uu": 70.0},
+      {"name": "boulder", "kind": "boulder", "out_uu": [4.0, 16.0], "top_z": [-48.0, -26.0], "overlap_uu": null, "gap_uu": [-30.0, 10.0], "yaw_jitter_deg": 12.0, "corner_width_uu": 80.0, "corner_push_out": true},
+      {"name": "block", "kind": "block", "out_uu": [-14.0, 0.0], "top_z": [-62.0, -40.0], "overlap_uu": [4.0, 10.0], "gap_uu": null, "yaw_jitter_deg": 9.0, "corner_width_uu": 70.0, "corner_push_out": true},
+      {"name": "spike", "kind": "spike", "out_uu": [-30.0, -8.0], "top_z": [-145.0, -100.0], "scale": [0.85, 1.2], "overlap_uu": null, "gap_uu": [-16.0, 22.0], "yaw_jitter_deg": 14.0, "corner_width_uu": 55.0}
+    ]
+  },
+  "shapes": {
+    "cap": {"w": [70.0, 115.0], "t": [42.0, 62.0], "h": [48.0, 78.0], "top_slope": [0.28, 0.42], "flat_band": [6.0, 12.0], "batter": [0.15, 0.3]},
+    "boulder": {"w": [70.0, 130.0], "t": [48.0, 78.0], "h": [55.0, 95.0], "rings": 6, "ring_points": 9},
+    "block": {"w": [55.0, 95.0], "t": [40.0, 60.0], "h": [85.0, 135.0]},
+    "spike": {"w": [42.0, 80.0], "t": [32.0, 55.0], "h": [38.0, 80.0], "blunt_fraction": 0.5}
+  },
+  "vertex_color": {
+    "note": "Col (FBX values = the masks): R = moss mask on the upper lip (Marmoreal moss + petals tint / Sarpedon damp via MI params), G = per-chunk random 0..1 (tint variation), B = depth below the top 0..1 (0 at the top, 1 at depth_ref_uu), A = 1",
+    "moss_top_z": -8.0, "moss_bottom_z": -54.0, "moss_up_min": 0.12, "moss_up_full": 0.7, "moss_side_floor": 0.3,
+    "noise_uu": 38.0, "noise_amount": 0.35, "depth_ref_uu": 250.0
+  },
+  "south_profile": {"x_ue": [-262.0, -26.0], "z_step_uu": 5.0, "note": "outward rock extent beyond the near/south edge (UE +Y, y = offsetY + halfY = 425) in the waterfall x range, per z bin - read by the waterfall build"},
+  "preview": {"resolution": [1280, 720], "samples": 20, "hfov_deg": 35.0, "pitch_deg": -55.0,
+              "k1_distance_uu": 2340.195, "zoom_out_distance_uu": 2880.24, "follow_distance_uu": 1170.1}
+}

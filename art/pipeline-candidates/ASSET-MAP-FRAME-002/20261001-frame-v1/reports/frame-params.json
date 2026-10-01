@@ -1,0 +1,39 @@
+{
+  "schema": "unmatched.map-frame-002.params/1",
+  "note": "ASSET-MAP-FRAME-002 = the heavy map frame of the map-image boards (review gap 9, full fix). Every number is PROPOSED (lane K), not an art decision. Frame footprint = the current one: inner opening = the map (S08MapImageSpec HalfUU, 1337 x 866 px x 0.6666667 uu/px), wood out to FrameHalfUU = map half + frameUU 24 (S08BoardArt.h DefaultFrameUU); the camera, the tray fit (S08Diorama::T2MinApronUU) and the env layouts keep their numbers. Heavier = a 1.6x taller profile (14 -> 22.4 uu: z -10 .. +12.4; the bars today are cubes 24 x 14 uu centred on z -3, i.e. -10 .. +4) with a raised, bevelled outer rail, a stepped inner lip and iron hardware.",
+  "run_dir": "art/pipeline-candidates/ASSET-MAP-FRAME-002/20261001-frame-v1",
+  "scratch_dir": "C:/tmp/envmaps-research/p5k/frame",
+  "map": {"src_px": [1337, 866], "uu_per_px": 0.6666667, "frame_uu": 24.0,
+          "source": "unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json boards marmoreal-original / sarpedon-original mapImage (both 1337 x 866, 0.6666667, frameUU 24)"},
+  "current_frame": {"bar_section_uu": [24.0, 14.0], "centre_z": -3.0, "z_range": [-10.0, 4.0], "source": "S08BoardActor.cpp BuildMapImageSurface (cube bars FVector(SpanX, T, 0.14) at FrameCentreZ -3)"},
+  "profile": {
+    "note": "(w, z): w = distance outward from the inner edge (the map edge), z relative to the play plane (figures stand on z 0; map plane -0.5, tray top -3, ground -1). Closed polygon, listed inner-bottom -> outer-bottom -> up the outer face -> rail -> cove -> inner step -> inner face. 'jitter' marks the points that get the weathering jitter.",
+    "points": [[0.0, -10.0], [24.0, -10.0], [24.0, 7.6], [23.0, 9.6], [21.6, 11.6], [20.4, 12.4], [12.6, 12.4], [11.2, 11.6], [10.0, 9.6], [8.6, 6.0], [7.6, 4.8], [3.2, 4.8], [1.2, 3.8], [0.0, 2.0]],
+    "jitter": [3, 4, 5, 6, 7, 8, 9, 11, 12],
+    "jitter_uu": 0.35, "jitter_fade_uu": 8.0, "station_step_uu": 8.0
+  },
+  "modules": {
+    "segment_uu": 157.0,
+    "corner_leg_uu": 53.1666667,
+    "note": "map 891.333 x 577.333: X fill 891.333 - 2 x 53.1667 = 785 = 5 x 157, Y fill 577.333 - 2 x 53.1667 = 471 = 3 x 157 -> every segment at scale 1.0, the middle segment of each side (X: 3rd of 5, Y: 2nd of 3) is the bracket variant centred on the side's midpoint"
+  },
+  "iron": {
+    "thickness_uu": 0.9,
+    "corner_strap_uu": 52.0,
+    "corner_polyline": [[12.0, 12.4], [20.4, 12.4], [21.6, 11.6], [23.0, 9.6], [24.0, 7.6], [24.0, -1.0]],
+    "mid_strap_width_uu": 20.0,
+    "mid_polyline": [[1.2, 3.8], [3.2, 4.8], [7.6, 4.8], [8.6, 6.0], [10.0, 9.6], [11.2, 11.6], [12.6, 12.4], [20.4, 12.4], [21.6, 11.6], [23.0, 9.6], [24.0, 7.6], [24.0, -1.0]],
+    "rivet_radius_uu": 1.7, "rivet_height_uu": 1.1, "rivet_segments": 8
+  },
+  "uv": {"wood_tile_uu": 72.0, "iron_tile_uu": 48.0, "grain": "wood grain along V (T_old_wood_D: vertical grain) = along the bar"},
+  "materials": {"wood": "M_MapFrame002_Wood", "iron": "M_MapFrame002_Iron"},
+  "iron_textures": {"size": 1024, "prefix": "T_MapFrame002_Iron",
+                    "base": "Metal038", "rust": "Metal017",
+                    "lib": "C:/Users/ren/WebstormProjects/unmached/unmached/art/material-library/cc0-raw",
+                    "base_value_scale": 0.55, "rust_amount": 0.28, "rust_noise_px": 96, "rust_value_scale": 0.55,
+                    "roughness_range": [0.55, 0.92]},
+  "variants": {"A": {"seed": 1, "v_offset": 0.0}, "B": {"seed": 2, "v_offset": 0.43}, "Mid": {"seed": 3, "v_offset": 0.71}, "Corner": {"seed": 4, "v_offset": 0.2}},
+  "max_triangles_per_module": 12000,
+  "preview": {"resolution": [1280, 720], "samples": 20, "hfov_deg": 35.0, "pitch_deg": -55.0,
+              "k1_distance_uu": 2340.195, "zoom_out_distance_uu": 2880.24, "follow_distance_uu": 1170.1, "closeup_distance_uu": 750.0}
+}

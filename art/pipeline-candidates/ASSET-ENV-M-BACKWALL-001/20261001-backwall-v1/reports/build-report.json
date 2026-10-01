@@ -1,0 +1,868 @@
+{
+  "schema": "unmatched.env-m-backwall.build-report/1",
+  "status": "measured",
+  "asset": "ASSET-ENV-M-BACKWALL-001",
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "technically_imported": false
+  },
+  "blender_version": "5.2.2 LTS",
+  "script_sha256_lf": "379013b05794df41c19679c770fd8d8e44973ab7094dcd4409054bd256c65aeb",
+  "helpers": {
+    "k_blender": "b291e157bf8d206bdad92632a3021596d3deeff579549ab34d3a56d62ac3955b",
+    "static_prop_candidate": "b1e67b69c41abf19aa053f3d7126fa507f7d96ebfb1d144ca28b334623a28af6"
+  },
+  "params": {
+    "path": "art/pipeline-candidates/ASSET-ENV-M-BACKWALL-001/20261001-backwall-v1/reports/backwall-params.json",
+    "sha256": "7fcc93923ea943c129887f6eca39d15120b4c3e06a491960495edaab5ffe1e6e"
+  },
+  "textures": {
+    "BC": {
+      "path": "art/pipeline-candidates/ASSET-ENV-M-BACKWALL-001/20261001-backwall-v1/export/T_Env_BackWall_BC.png",
+      "sha256": "6b4e20daab7466938051747cd11fb7f2f270da20bf6b823d40406a7e2008c7bb",
+      "bytes": 3455288
+    },
+    "N": {
+      "path": "art/pipeline-candidates/ASSET-ENV-M-BACKWALL-001/20261001-backwall-v1/export/T_Env_BackWall_N.png",
+      "sha256": "0d3de5634d985165ee2fbd3772e4aa4a2a445cfe3065e4e996cac6f1d2cf17f0",
+      "bytes": 2705031
+    },
+    "ORM": {
+      "path": "art/pipeline-candidates/ASSET-ENV-M-BACKWALL-001/20261001-backwall-v1/export/T_Env_BackWall_ORM.png",
+      "sha256": "cab7c14b572af1a6849ca4c409e008585cd5181e74bb3b3b4df0e4d4b1dbce24",
+      "bytes": 1648952
+    },
+    "E": {
+      "path": "art/pipeline-candidates/ASSET-ENV-M-BACKWALL-001/20261001-backwall-v1/export/T_Env_BackWall_E.png",
+      "sha256": "6dbcda8dc641c0eaad4c654c5d2fd0383edb94c66ccaa9abb956443973e3c69d",
+      "bytes": 17121
+    }
+  },
+  "texel": {
+    "atlasCoveredFraction": 0.5402,
+    "texelsPerUU": 2.428,
+    "surfaceAreaUU2": {
+      "SM_Env_BackWall_BayDoor": 121952.1,
+      "SM_Env_BackWall_BayWindows": 118890.4,
+      "SM_Env_BackWall_Centre": 143347.4
+    },
+    "slotTexelFractions": {
+      "marble": 0.1607,
+      "trim": 0.1296,
+      "glow": 0.0194,
+      "frame": 0.0369,
+      "hedge": 0.0193,
+      "leaf": 0.1411,
+      "rose": 0.0331
+    },
+    "normalDeviationMeanMarble": 0.0359,
+    "normalDeviationMeanHedge": 0.084,
+    "aoMean": 0.5446,
+    "aoMinP5": 0.0
+  },
+  "emissiveWindow": {
+    "window": {
+      "hue_deg": 31.0,
+      "hue_half_deg": 12.0,
+      "sat_min": 0.5,
+      "val_min": 0.8,
+      "note": "M_EnvProp EmissiveWindow (hue centre, hue half width, S min, V min) that isolates the glow texels of the BC"
+    },
+    "glowTexels": 81313,
+    "glowInsideFraction": 1.0,
+    "otherTexels": 2184435,
+    "otherInsideFraction": 0.0
+  },
+  "cc0": {
+    "marble": "Marble012",
+    "hedge": "Moss002",
+    "license": "CC0 1.0 (ambientCG), local library"
+  },
+  "layout": {
+    "file": "reports/backwall-layout.json",
+    "yFrontFace": -465.866,
+    "gapUU": 1.0,
+    "arcadeBackY": -447.318,
+    "portalBackY": -455.967,
+    "portalTopZ": 214.5,
+    "bayHedgeFrontY": -451.074,
+    "rowXExtent": [
+      -397.65,
+      397.65
+    ],
+    "cypressNwEastEdgeX": -404.893,
+    "keyShadowTipY": -371.59,
+    "mapFrameFarEdgeY": -312.667,
+    "bayPitchUU": [
+      152.3,
+      169.2,
+      169.2,
+      152.3
+    ],
+    "checks": {
+      "layout_hedge_behind_arcade": true,
+      "layout_centre_clear_of_portal": true,
+      "layout_clear_of_cypress": true,
+      "layout_shadow_short_of_map_frame": true
+    }
+  },
+  "contract": {
+    "ue": {
+      "folder": "/Game/EnvKit/Marmoreal (flat, env-kit contract)",
+      "meshes": [
+        "SM_Env_BackWall_BayDoor",
+        "SM_Env_BackWall_BayWindows",
+        "SM_Env_BackWall_Centre"
+      ],
+      "material": "MI_Env_BackWall: child of /Game/EnvKit/Shared/M_EnvProp, BaseColor/Normal/ORM = T_Env_BackWall_{BC,N,ORM}, EmissiveWindow = (hue 31, half 12, S 0.50, V 0.80), EmissiveColor warm, EmissiveIntensity ~ the lantern glass (P4: x6); T_Env_BackWall_E is the same mask as a texture for a future dedicated master",
+      "import": "extend tools/art/env_kit/ue_import_env_kit.py (legacy FbxFactory, uniform scale 1.0, normals imported, no collision, Nanite off; BC sRGB, N TC_Normalmap DirectX, ORM / E TC_Masks)"
+    }
+  },
+  "exports": [
+    {
+      "fbx": "art/pipeline-candidates/ASSET-ENV-M-BACKWALL-001/20261001-backwall-v1/export/SM_Env_BackWall_BayDoor.fbx",
+      "sha256": "984dfcc90a31d2f6c914e12947777d8128021c6a56f81a087520ef398839b87e",
+      "bytes": 395788,
+      "preset": "UM_FBX_v1.json",
+      "exporter_kwargs": {
+        "add_leaf_bones": false,
+        "apply_scale_options": "FBX_SCALE_UNITS",
+        "apply_unit_scale": true,
+        "axis_forward": "-Y",
+        "axis_up": "Z",
+        "bake_anim": false,
+        "bake_space_transform": false,
+        "embed_textures": false,
+        "mesh_smooth_type": "FACE",
+        "object_types": [
+          "ARMATURE",
+          "MESH"
+        ],
+        "path_mode": "AUTO",
+        "primary_bone_axis": "Y",
+        "secondary_bone_axis": "X",
+        "use_custom_props": false,
+        "use_mesh_edges": false,
+        "use_selection": true,
+        "use_triangles": true
+      },
+      "colors_type": "SRGB (exporter default; mask values pre-linearised, see k_blender.py)",
+      "um_fbx_v1_conformance": [
+        {
+          "setting": "Forward / Up (04 1.1)",
+          "standard": [
+            "-Y",
+            "Z"
+          ],
+          "used": [
+            "-Y",
+            "Z"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Apply Scalings (04 1.1)",
+          "standard": "FBX_SCALE_UNITS",
+          "used": "FBX_SCALE_UNITS",
+          "conforms": true
+        },
+        {
+          "setting": "Apply Unit (04 1.1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Apply Transform (04 1.1)",
+          "standard": false,
+          "used": false,
+          "conforms": true
+        },
+        {
+          "setting": "Triangulate Faces (04 1.1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Smoothing (04 1.1)",
+          "standard": "FACE",
+          "used": "FACE",
+          "conforms": true
+        },
+        {
+          "setting": "Object Types (04 1.1)",
+          "standard": [
+            "ARMATURE",
+            "MESH"
+          ],
+          "used": [
+            "ARMATURE",
+            "MESH"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Loose Edges / Custom Properties (04 1.1)",
+          "standard": [
+            false,
+            false
+          ],
+          "used": [
+            false,
+            false
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Leaf bones / bone axes (04 1.1, preset)",
+          "standard": [
+            false,
+            "Y",
+            "X"
+          ],
+          "used": [
+            false,
+            "Y",
+            "X"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Bake Animation (04 1.1: skeletal clips only)",
+          "standard": false,
+          "used": false,
+          "conforms": true
+        },
+        {
+          "setting": "Path Mode, textures not embedded (04 1.1)",
+          "standard": [
+            "AUTO",
+            false
+          ],
+          "used": [
+            "AUTO",
+            false
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Export space: +Z rotation deg / data scale / UnitScaleFactor patch (preset)",
+          "standard": [
+            90.0,
+            100.0,
+            1.0
+          ],
+          "used": [
+            90.0,
+            100.0,
+            1.0
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Scene units: metric, unit scale 1.0 (04 1)",
+          "standard": [
+            "METRIC",
+            1.0
+          ],
+          "used": [
+            "METRIC",
+            1.0
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Transforms applied: object matrix identity (04 1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Pivot: wall front face (x 0) at the module centre, base z 0; width = the module width",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        }
+      ],
+      "name": "SM_Env_BackWall_BayDoor",
+      "module": "Bay_Door",
+      "triangles": 9674,
+      "trianglesBySlot": {
+        "marble": 198,
+        "trim": 811,
+        "glow": 45,
+        "frame": 84,
+        "hedge": 936,
+        "leaf": 5760,
+        "rose": 1840
+      },
+      "boundsUeLocalUU": {
+        "min": [
+          -16.0,
+          -76.15,
+          0.0
+        ],
+        "max": [
+          14.792,
+          76.15,
+          235.0
+        ],
+        "size": [
+          30.792,
+          152.3,
+          235.0
+        ]
+      },
+      "uvRange": [
+        0.0051,
+        0.9949
+      ],
+      "glowFaces": 3,
+      "roundtrip": {
+        "mesh_objects": 1,
+        "triangles": 9674,
+        "expected_triangles": 9674,
+        "material_slots": [
+          "M_Env_BackWall"
+        ],
+        "expected_slots": [
+          "M_Env_BackWall"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "color_attributes": [],
+        "bounds_as_ue_uu": {
+          "min": [
+            -16.0,
+            -76.15,
+            0.0
+          ],
+          "max": [
+            14.792,
+            76.15,
+            235.0
+          ]
+        },
+        "note": "read-back frame: UE = (x, -y, z)",
+        "ue_frame_matches_build": true
+      },
+      "checks": {
+        "triangles_within_budget": true,
+        "width_equals_module": true,
+        "height_equals_module": true,
+        "back_at_minus_thickness": true,
+        "has_glow_faces": true,
+        "uv0_in_unit_square": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "roundtrip_bounds_match_ue_frame": true,
+        "um_fbx_v1_conforms": true
+      }
+    },
+    {
+      "fbx": "art/pipeline-candidates/ASSET-ENV-M-BACKWALL-001/20261001-backwall-v1/export/SM_Env_BackWall_BayWindows.fbx",
+      "sha256": "80134a40675fba95bdf172fcd89a724ef37f3e027e32ecce1ffe12da3af92d7a",
+      "bytes": 395868,
+      "preset": "UM_FBX_v1.json",
+      "exporter_kwargs": {
+        "add_leaf_bones": false,
+        "apply_scale_options": "FBX_SCALE_UNITS",
+        "apply_unit_scale": true,
+        "axis_forward": "-Y",
+        "axis_up": "Z",
+        "bake_anim": false,
+        "bake_space_transform": false,
+        "embed_textures": false,
+        "mesh_smooth_type": "FACE",
+        "object_types": [
+          "ARMATURE",
+          "MESH"
+        ],
+        "path_mode": "AUTO",
+        "primary_bone_axis": "Y",
+        "secondary_bone_axis": "X",
+        "use_custom_props": false,
+        "use_mesh_edges": false,
+        "use_selection": true,
+        "use_triangles": true
+      },
+      "colors_type": "SRGB (exporter default; mask values pre-linearised, see k_blender.py)",
+      "um_fbx_v1_conformance": [
+        {
+          "setting": "Forward / Up (04 1.1)",
+          "standard": [
+            "-Y",
+            "Z"
+          ],
+          "used": [
+            "-Y",
+            "Z"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Apply Scalings (04 1.1)",
+          "standard": "FBX_SCALE_UNITS",
+          "used": "FBX_SCALE_UNITS",
+          "conforms": true
+        },
+        {
+          "setting": "Apply Unit (04 1.1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Apply Transform (04 1.1)",
+          "standard": false,
+          "used": false,
+          "conforms": true
+        },
+        {
+          "setting": "Triangulate Faces (04 1.1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Smoothing (04 1.1)",
+          "standard": "FACE",
+          "used": "FACE",
+          "conforms": true
+        },
+        {
+          "setting": "Object Types (04 1.1)",
+          "standard": [
+            "ARMATURE",
+            "MESH"
+          ],
+          "used": [
+            "ARMATURE",
+            "MESH"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Loose Edges / Custom Properties (04 1.1)",
+          "standard": [
+            false,
+            false
+          ],
+          "used": [
+            false,
+            false
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Leaf bones / bone axes (04 1.1, preset)",
+          "standard": [
+            false,
+            "Y",
+            "X"
+          ],
+          "used": [
+            false,
+            "Y",
+            "X"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Bake Animation (04 1.1: skeletal clips only)",
+          "standard": false,
+          "used": false,
+          "conforms": true
+        },
+        {
+          "setting": "Path Mode, textures not embedded (04 1.1)",
+          "standard": [
+            "AUTO",
+            false
+          ],
+          "used": [
+            "AUTO",
+            false
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Export space: +Z rotation deg / data scale / UnitScaleFactor patch (preset)",
+          "standard": [
+            90.0,
+            100.0,
+            1.0
+          ],
+          "used": [
+            90.0,
+            100.0,
+            1.0
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Scene units: metric, unit scale 1.0 (04 1)",
+          "standard": [
+            "METRIC",
+            1.0
+          ],
+          "used": [
+            "METRIC",
+            1.0
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Transforms applied: object matrix identity (04 1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Pivot: wall front face (x 0) at the module centre, base z 0; width = the module width",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        }
+      ],
+      "name": "SM_Env_BackWall_BayWindows",
+      "module": "Bay_Windows",
+      "triangles": 9696,
+      "trianglesBySlot": {
+        "marble": 204,
+        "trim": 836,
+        "glow": 48,
+        "frame": 72,
+        "hedge": 936,
+        "leaf": 5760,
+        "rose": 1840
+      },
+      "boundsUeLocalUU": {
+        "min": [
+          -16.0,
+          -76.15,
+          0.0
+        ],
+        "max": [
+          14.792,
+          76.15,
+          235.0
+        ],
+        "size": [
+          30.792,
+          152.3,
+          235.0
+        ]
+      },
+      "uvRange": [
+        0.0051,
+        0.9948
+      ],
+      "glowFaces": 3,
+      "roundtrip": {
+        "mesh_objects": 1,
+        "triangles": 9696,
+        "expected_triangles": 9696,
+        "material_slots": [
+          "M_Env_BackWall"
+        ],
+        "expected_slots": [
+          "M_Env_BackWall"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "color_attributes": [],
+        "bounds_as_ue_uu": {
+          "min": [
+            -16.0,
+            -76.15,
+            0.0
+          ],
+          "max": [
+            14.792,
+            76.15,
+            235.0
+          ]
+        },
+        "note": "read-back frame: UE = (x, -y, z)",
+        "ue_frame_matches_build": true
+      },
+      "checks": {
+        "triangles_within_budget": true,
+        "width_equals_module": true,
+        "height_equals_module": true,
+        "back_at_minus_thickness": true,
+        "has_glow_faces": true,
+        "uv0_in_unit_square": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "roundtrip_bounds_match_ue_frame": true,
+        "um_fbx_v1_conforms": true
+      }
+    },
+    {
+      "fbx": "art/pipeline-candidates/ASSET-ENV-M-BACKWALL-001/20261001-backwall-v1/export/SM_Env_BackWall_Centre.fbx",
+      "sha256": "53681ea6053a3e490bd0da3f18023f81f938d7ec6a22e53fe4a4f4e1a6ec889a",
+      "bytes": 380316,
+      "preset": "UM_FBX_v1.json",
+      "exporter_kwargs": {
+        "add_leaf_bones": false,
+        "apply_scale_options": "FBX_SCALE_UNITS",
+        "apply_unit_scale": true,
+        "axis_forward": "-Y",
+        "axis_up": "Z",
+        "bake_anim": false,
+        "bake_space_transform": false,
+        "embed_textures": false,
+        "mesh_smooth_type": "FACE",
+        "object_types": [
+          "ARMATURE",
+          "MESH"
+        ],
+        "path_mode": "AUTO",
+        "primary_bone_axis": "Y",
+        "secondary_bone_axis": "X",
+        "use_custom_props": false,
+        "use_mesh_edges": false,
+        "use_selection": true,
+        "use_triangles": true
+      },
+      "colors_type": "SRGB (exporter default; mask values pre-linearised, see k_blender.py)",
+      "um_fbx_v1_conformance": [
+        {
+          "setting": "Forward / Up (04 1.1)",
+          "standard": [
+            "-Y",
+            "Z"
+          ],
+          "used": [
+            "-Y",
+            "Z"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Apply Scalings (04 1.1)",
+          "standard": "FBX_SCALE_UNITS",
+          "used": "FBX_SCALE_UNITS",
+          "conforms": true
+        },
+        {
+          "setting": "Apply Unit (04 1.1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Apply Transform (04 1.1)",
+          "standard": false,
+          "used": false,
+          "conforms": true
+        },
+        {
+          "setting": "Triangulate Faces (04 1.1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Smoothing (04 1.1)",
+          "standard": "FACE",
+          "used": "FACE",
+          "conforms": true
+        },
+        {
+          "setting": "Object Types (04 1.1)",
+          "standard": [
+            "ARMATURE",
+            "MESH"
+          ],
+          "used": [
+            "ARMATURE",
+            "MESH"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Loose Edges / Custom Properties (04 1.1)",
+          "standard": [
+            false,
+            false
+          ],
+          "used": [
+            false,
+            false
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Leaf bones / bone axes (04 1.1, preset)",
+          "standard": [
+            false,
+            "Y",
+            "X"
+          ],
+          "used": [
+            false,
+            "Y",
+            "X"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Bake Animation (04 1.1: skeletal clips only)",
+          "standard": false,
+          "used": false,
+          "conforms": true
+        },
+        {
+          "setting": "Path Mode, textures not embedded (04 1.1)",
+          "standard": [
+            "AUTO",
+            false
+          ],
+          "used": [
+            "AUTO",
+            false
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Export space: +Z rotation deg / data scale / UnitScaleFactor patch (preset)",
+          "standard": [
+            90.0,
+            100.0,
+            1.0
+          ],
+          "used": [
+            90.0,
+            100.0,
+            1.0
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Scene units: metric, unit scale 1.0 (04 1)",
+          "standard": [
+            "METRIC",
+            1.0
+          ],
+          "used": [
+            "METRIC",
+            1.0
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Transforms applied: object matrix identity (04 1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Pivot: wall front face (x 0) at the module centre, base z 0; width = the module width",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        }
+      ],
+      "name": "SM_Env_BackWall_Centre",
+      "module": "Centre",
+      "triangles": 9408,
+      "trianglesBySlot": {
+        "marble": 203,
+        "trim": 832,
+        "glow": 49,
+        "frame": 84,
+        "leaf": 6720,
+        "rose": 1520
+      },
+      "boundsUeLocalUU": {
+        "min": [
+          -16.0,
+          -93.0,
+          0.0
+        ],
+        "max": [
+          9.345,
+          93.0,
+          255.0
+        ],
+        "size": [
+          25.345,
+          186.0,
+          255.0
+        ]
+      },
+      "uvRange": [
+        0.0051,
+        0.9948
+      ],
+      "glowFaces": 5,
+      "roundtrip": {
+        "mesh_objects": 1,
+        "triangles": 9408,
+        "expected_triangles": 9408,
+        "material_slots": [
+          "M_Env_BackWall"
+        ],
+        "expected_slots": [
+          "M_Env_BackWall"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "color_attributes": [],
+        "bounds_as_ue_uu": {
+          "min": [
+            -16.0,
+            -93.0,
+            0.0
+          ],
+          "max": [
+            9.345,
+            93.0,
+            255.0
+          ]
+        },
+        "note": "read-back frame: UE = (x, -y, z)",
+        "ue_frame_matches_build": true
+      },
+      "checks": {
+        "triangles_within_budget": true,
+        "width_equals_module": true,
+        "height_equals_module": true,
+        "back_at_minus_thickness": true,
+        "has_glow_faces": true,
+        "uv0_in_unit_square": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "one_material_slot": true,
+        "uv0_present": true,
+        "roundtrip_bounds_match_ue_frame": true,
+        "um_fbx_v1_conforms": true
+      }
+    }
+  ],
+  "blend_scratch": "C:\\tmp\\envmaps-research\\p5k\\backwall\\work\\SM_Env_BackWall_all.blend",
+  "checks": {
+    "SM_Env_BackWall_BayDoor": true,
+    "SM_Env_BackWall_BayWindows": true,
+    "SM_Env_BackWall_Centre": true,
+    "emissive_window_isolates_glow": true,
+    "normal_map_has_relief": true,
+    "layout_hedge_behind_arcade": true,
+    "layout_centre_clear_of_portal": true,
+    "layout_clear_of_cypress": true,
+    "layout_shadow_short_of_map_frame": true
+  },
+  "checks_passed": true
+}

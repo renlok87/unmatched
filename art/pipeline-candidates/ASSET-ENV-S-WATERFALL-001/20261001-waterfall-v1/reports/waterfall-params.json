@@ -1,0 +1,41 @@
+{
+  "schema": "unmatched.env-s-waterfall.params/1",
+  "note": "ASSET-ENV-S-WATERFALL-001 = Sarpedon's south river-mouth waterfall as real meshes (review gap 1 rest) + the optional rock 'waterfall lip' add-on (gap 3, separate from the shared tray) + a dark sea ring under the island (gap 8, Sarpedon part). Every number is PROPOSED (lane K), not an art decision. Local frame of the fall pieces (UE numbers): origin on the near/south tray edge line at the fall centre, z 0 = the play plane; local +X = outward (board +Y at yaw 90, the env-kit 'front' convention), local Y across the fall (board -X at yaw 90). Placement: loc (board) = (fall centre x, tray near edge y = offsetY + halfY, 0), yaw 90, scale 1.",
+  "run_dir": "art/pipeline-candidates/ASSET-ENV-S-WATERFALL-001/20261001-waterfall-v1",
+  "scratch_dir": "C:/tmp/envmaps-research/p5k/waterfall",
+  "source_entry": {"layout": "unreal/Unmatched/Config/ArtBoards/EnvLayouts/sarpedon.layout.json", "id": "fall-s",
+                   "x0": -241.0, "x1": -47.2, "y": 457.0, "topZ": 2.5, "dropUU": 120.0, "spillUU": 60.0},
+  "tray": {"half_x_ue": 780.0, "half_y_ue": 470.0, "offset_y_ue": -45.0, "top_z": -3.0, "ground_z": -1.0},
+  "south_profile": "art/pipeline-candidates/ASSET-TABLE-BASE-001/20261001-tray-t2b/reports/south-profile.json",
+  "lip": {
+    "asset": "SM_Env_S_WaterfallLip", "material": "M_TableBase_T2b",
+    "seed": 3101, "half_width_uu": 112.0, "back_x": -26.0, "front_x_min": 30.0, "front_margin_uu": 7.0,
+    "top_z": 0.8, "slab_bottom_z": -46.0, "slabs": 5,
+    "cheek_top_z": [7.0, 12.0], "cheek_half_width": [16.0, 22.0], "cheek_bottom_z": -52.0,
+    "hanging": 4, "hanging_top_z": -40.0, "hanging_bottom_z": [-105.0, -80.0], "hanging_front_recess_uu": 10.0,
+    "tile_uu": 180.0, "max_triangles": 12000
+  },
+  "sheet": {
+    "asset": "SM_Env_S_Waterfall", "material": "M_EnvWaterfall_Sheet",
+    "start_z": 2.0, "start_back_uu": 4.0, "bottom_z": -172.0, "reach_candidates_uu": [34, 38, 42, 46, 50, 56, 62, 70],
+    "clearance_lip_uu": 1.5, "clearance_uu": 4.0, "widen_bottom": 1.12, "plan_bulge_uu": 4.0,
+    "ripple_uu": 1.6, "ripple_period_y_uu": 37.0, "ripple_period_d_uu": 60.0,
+    "columns": 24, "rows": 34, "max_triangles": 12000
+  },
+  "foam": {
+    "asset": "SM_Env_S_WaterfallFoam", "materials": ["M_EnvWaterfall_Foam", "M_EnvWaterfall_Mist"],
+    "disc_half_x_uu": 70.0, "disc_half_y_factor": 0.68, "disc_dome_uu": 5.0, "disc_rings": 6, "disc_segments": 32,
+    "mist_radius_x_uu": 62.0, "mist_half_y_factor": 0.62, "mist_height_uu": 70.0, "mist_sink_uu": 6.0,
+    "mist_arc_deg": [-100.0, 100.0], "mist_segments": 24, "mist_rows": 4, "max_triangles": 12000
+  },
+  "sea": {
+    "asset": "SM_Env_S_SeaRing", "material": "M_EnvSea",
+    "note": "flat annulus, pivot = tray centre (board (0, offsetY)), placed at z = sheet bottom_z (the fall meets the sea); inner edge = a rounded rectangle inset_uu inside the tray outline (tucked under the cliff), outer edge a circle (fog starts at 2900 uu)",
+    "inset_uu": 40.0, "corner_radius_uu": 80.0, "outer_radius_uu": 4500.0, "boundary_points": 160,
+    "ring_fractions": [0.0, 0.004, 0.01, 0.02, 0.035, 0.06, 0.1, 0.16, 0.25, 0.38, 0.55, 0.76, 1.0],
+    "uv0_tile_uu": 600.0, "uv1_dist_uu": 1000.0, "foam_band_uu": 120.0, "far_fade_uu": [200.0, 3500.0],
+    "max_triangles": 12000
+  },
+  "preview": {"resolution": [1280, 720], "samples": 20, "hfov_deg": 35.0, "pitch_deg": -55.0,
+              "k1_distance_uu": 2340.195, "zoom_out_distance_uu": 2880.24, "follow_distance_uu": 1170.1}
+}

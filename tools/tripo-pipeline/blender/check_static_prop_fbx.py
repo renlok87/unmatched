@@ -64,8 +64,9 @@ res["topology_welded_1um"] = {
 bm.free()
 cx, cy = (lo.x + hi.x) / 2, (lo.y + hi.y) / 2
 z0 = lo.z + (hi.z - lo.z) * zfrac
-band = [p for p in pts if abs(p.z - z0) < (hi.z - lo.z) * 0.08]
-far = max(band, key=lambda p: math.hypot(p.x - cx, p.y - cy))
+tol = (hi.z - lo.z) * 0.08
+band = [p for p in pts if abs(p.z - z0) < tol] if tol > 0 else list(pts)  # a flat mesh (sea ring): every vertex
+far =max(band, key=lambda p: math.hypot(p.x - cx, p.y - cy))
 ang = math.degrees(math.atan2(far.y - cy, far.x - cx))
 res["protrusion_direction_deg_from_plus_x_ccw"] = round(ang, 1)
 res["protrusion_axis_blender"] = min((("+X", 0), ("+Y", 90), ("-X", 180), ("-X", -180), ("-Y", -90)),

@@ -1,0 +1,1191 @@
+{
+  "schema": "unmatched.map-frame-002.build-report/1",
+  "status": "measured",
+  "asset": "ASSET-MAP-FRAME-002 / SM_MapFrame002_*",
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false,
+    "technically_imported": false
+  },
+  "blender_version": "5.2.2 LTS",
+  "script_sha256_lf": "b9f6b3befe7a11a0bb04d7b2d291e8bd2c68f13c86e783f4014b8ac821607e89",
+  "layout_sha256_lf": "54ca032b52d9c3a6eb5d34587fb226dfd7c0e113c84315c182afe5bc0a82be06",
+  "helpers": {
+    "k_blender": "b291e157bf8d206bdad92632a3021596d3deeff579549ab34d3a56d62ac3955b",
+    "static_prop_candidate": "b1e67b69c41abf19aa053f3d7126fa507f7d96ebfb1d144ca28b334623a28af6"
+  },
+  "params": {
+    "path": "art/pipeline-candidates/ASSET-MAP-FRAME-002/20261001-frame-v1/reports/frame-params.json",
+    "sha256": "a9aac98b66598ee1667389185da344563d69dc4413fa340bffc55e711adb35f3"
+  },
+  "profile": {
+    "woodW": [
+      0.0,
+      24.0
+    ],
+    "woodZ": [
+      -10.0,
+      12.4
+    ],
+    "ironW": [
+      0.7975,
+      24.9
+    ],
+    "ironZ": [
+      -1.0,
+      13.3
+    ],
+    "areaUU2": 453.6,
+    "currentBarAreaUU2": 336.0,
+    "heightRatioToCurrent": 1.6,
+    "visibleHeightAboveGroundUU": {
+      "new": 13.4,
+      "current": 5.0
+    }
+  },
+  "layout": {
+    "file": "reports/frame-layout.json",
+    "exactFit": true,
+    "sides": {
+      "near": {
+        "fillUU": 785.0000445,
+        "segments": 5,
+        "stretch": 1.000000056687898
+      },
+      "far": {
+        "fillUU": 785.0000445,
+        "segments": 5,
+        "stretch": 1.000000056687898
+      },
+      "east": {
+        "fillUU": 471.0000287999999,
+        "segments": 3,
+        "stretch": 1.0000000611464965
+      },
+      "west": {
+        "fillUU": 471.0000287999999,
+        "segments": 3,
+        "stretch": 1.0000000611464965
+      }
+    },
+    "frameHalfUU": [
+      469.6667,
+      312.6667
+    ],
+    "mapHalfUU": [
+      445.6667,
+      288.6667
+    ]
+  },
+  "assembled": {
+    "boundsUU": {
+      "min": [
+        -471.667,
+        -314.667,
+        -10.0
+      ],
+      "max": [
+        471.667,
+        314.667,
+        14.4
+      ]
+    },
+    "woodBoundsUU": {
+      "min": [
+        -469.6667,
+        -312.6667,
+        -10.0
+      ],
+      "max": [
+        469.6667,
+        312.6667,
+        12.7426
+      ]
+    },
+    "verticesInsideMapOpening": 0,
+    "sideCoverage": {
+      "near": {
+        "intervals": 7,
+        "maxGapUU": 2.2e-05,
+        "minGapUU": -9e-06,
+        "span": [
+          -445.6667,
+          445.6667
+        ]
+      },
+      "far": {
+        "intervals": 7,
+        "maxGapUU": 2.2e-05,
+        "minGapUU": -9e-06,
+        "span": [
+          -445.6667,
+          445.6667
+        ]
+      },
+      "east": {
+        "intervals": 5,
+        "maxGapUU": 1.4e-05,
+        "minGapUU": -1e-05,
+        "span": [
+          -288.6667,
+          288.6667
+        ]
+      },
+      "west": {
+        "intervals": 5,
+        "maxGapUU": 1.4e-05,
+        "minGapUU": -1e-05,
+        "span": [
+          -288.6667,
+          288.6667
+        ]
+      }
+    },
+    "ironBeyondFrameHalfUU": 2.0003,
+    "note": "the wood ends exactly at FrameHalfUU; only the iron straps / rivets on the outer face stand 2.00 uu proud of it (onto the ground strip, which overlaps the frame by 2 uu)"
+  },
+  "mapOcclusionUU": {
+    "K1": {
+      "newFrameUU": 2.013,
+      "currentFrameUU": 2.478
+    },
+    "zoomout065": {
+      "newFrameUU": 2.156,
+      "currentFrameUU": 2.605
+    },
+    "follow16-nearE": {
+      "newFrameUU": 2.487,
+      "currentFrameUU": 2.897
+    },
+    "follow16-farW": {
+      "newFrameUU": 0.463,
+      "currentFrameUU": 0.836
+    }
+  },
+  "contract": {
+    "ue": {
+      "folder": "/Game/EnvMaps/Frame",
+      "meshes": [
+        "SM_MapFrame002_SegA",
+        "SM_MapFrame002_SegB",
+        "SM_MapFrame002_SegMid",
+        "SM_MapFrame002_Corner"
+      ],
+      "slots": {
+        "0 M_MapFrame002_Wood": "MID of /Game/EnvMaps/M_MapFrameWood (the P4 frameWood profile values keep working; UV0 tiles T_old_wood, Wrap)",
+        "1 M_MapFrame002_Iron": "MI of /Game/EnvKit/Shared/M_EnvProp (or M_UM_Figure) with T_MapFrame002_Iron_{BC,N,ORM} (Wrap)"
+      },
+      "import": "new tools/art/env_kit/ue_import_map_frame.py modelled on ue_import_tray_t2.py (legacy FbxFactory, import_uniform_scale 1.0, normals imported, no collision, Nanite off)"
+    },
+    "placement": "reports/frame-layout.json: per instance module, loc (board-actor space, z 0), yawDeg, scaleX (1.0 for both maps); replaces the 4 cube bars AND the ART-005 ArtCorners instances on map-image boards (the corner module carries its own bracket)",
+    "axes": "UE numbers authored directly (k_blender.py); read-back frame = UE with Y negated"
+  },
+  "exports": [
+    {
+      "fbx": "art/pipeline-candidates/ASSET-MAP-FRAME-002/20261001-frame-v1/export/SM_MapFrame002_SegA.fbx",
+      "sha256": "5bd1010c8ef81192c6e84e4cba4a2ea8db10a8fa7df9fc7ebd99071d2ec21b47",
+      "bytes": 34236,
+      "preset": "UM_FBX_v1.json",
+      "exporter_kwargs": {
+        "add_leaf_bones": false,
+        "apply_scale_options": "FBX_SCALE_UNITS",
+        "apply_unit_scale": true,
+        "axis_forward": "-Y",
+        "axis_up": "Z",
+        "bake_anim": false,
+        "bake_space_transform": false,
+        "embed_textures": false,
+        "mesh_smooth_type": "FACE",
+        "object_types": [
+          "ARMATURE",
+          "MESH"
+        ],
+        "path_mode": "AUTO",
+        "primary_bone_axis": "Y",
+        "secondary_bone_axis": "X",
+        "use_custom_props": false,
+        "use_mesh_edges": false,
+        "use_selection": true,
+        "use_triangles": true
+      },
+      "colors_type": "SRGB (exporter default; mask values pre-linearised, see k_blender.py)",
+      "um_fbx_v1_conformance": [
+        {
+          "setting": "Forward / Up (04 1.1)",
+          "standard": [
+            "-Y",
+            "Z"
+          ],
+          "used": [
+            "-Y",
+            "Z"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Apply Scalings (04 1.1)",
+          "standard": "FBX_SCALE_UNITS",
+          "used": "FBX_SCALE_UNITS",
+          "conforms": true
+        },
+        {
+          "setting": "Apply Unit (04 1.1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Apply Transform (04 1.1)",
+          "standard": false,
+          "used": false,
+          "conforms": true
+        },
+        {
+          "setting": "Triangulate Faces (04 1.1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Smoothing (04 1.1)",
+          "standard": "FACE",
+          "used": "FACE",
+          "conforms": true
+        },
+        {
+          "setting": "Object Types (04 1.1)",
+          "standard": [
+            "ARMATURE",
+            "MESH"
+          ],
+          "used": [
+            "ARMATURE",
+            "MESH"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Loose Edges / Custom Properties (04 1.1)",
+          "standard": [
+            false,
+            false
+          ],
+          "used": [
+            false,
+            false
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Leaf bones / bone axes (04 1.1, preset)",
+          "standard": [
+            false,
+            "Y",
+            "X"
+          ],
+          "used": [
+            false,
+            "Y",
+            "X"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Bake Animation (04 1.1: skeletal clips only)",
+          "standard": false,
+          "used": false,
+          "conforms": true
+        },
+        {
+          "setting": "Path Mode, textures not embedded (04 1.1)",
+          "standard": [
+            "AUTO",
+            false
+          ],
+          "used": [
+            "AUTO",
+            false
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Export space: +Z rotation deg / data scale / UnitScaleFactor patch (preset)",
+          "standard": [
+            90.0,
+            100.0,
+            1.0
+          ],
+          "used": [
+            90.0,
+            100.0,
+            1.0
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Scene units: metric, unit scale 1.0 (04 1)",
+          "standard": [
+            "METRIC",
+            1.0
+          ],
+          "used": [
+            "METRIC",
+            1.0
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Transforms applied: object matrix identity (04 1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Pivot: start of the inner edge (frame_layout.py frames; z 0 = the play plane, wood bottom at -10)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        }
+      ],
+      "name": "SM_MapFrame002_SegA",
+      "module": "A",
+      "triangles": 584,
+      "trianglesByPart": {
+        "wood": 584
+      },
+      "boundsUeLocalUU": {
+        "min": [
+          0.0,
+          0.0,
+          -10.0
+        ],
+        "max": [
+          157.0,
+          24.0,
+          12.742
+        ],
+        "size": [
+          157.0,
+          24.0,
+          22.742
+        ]
+      },
+      "woodOuterWUU": 24.0,
+      "openingPenetrationUU": 0.0,
+      "uv": {
+        "UVMap": {
+          "min": [
+            0.0,
+            -0.1389
+          ],
+          "max": [
+            1.1901,
+            2.1806
+          ]
+        },
+        "degenerateUv0Triangles": 0
+      },
+      "roundtrip": {
+        "mesh_objects": 1,
+        "triangles": 584,
+        "expected_triangles": 584,
+        "material_slots": [
+          "M_MapFrame002_Wood",
+          "M_MapFrame002_Iron"
+        ],
+        "expected_slots": [
+          "M_MapFrame002_Wood",
+          "M_MapFrame002_Iron"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "color_attributes": [],
+        "bounds_as_ue_uu": {
+          "min": [
+            0.0,
+            -0.0,
+            -10.0
+          ],
+          "max": [
+            157.0,
+            24.0,
+            12.742
+          ]
+        },
+        "note": "read-back frame: UE = (x, -y, z)",
+        "ue_frame_matches_build": true
+      },
+      "blend_scratch": "C:\\tmp\\envmaps-research\\p5k\\frame\\work\\SM_MapFrame002_SegA.blend",
+      "checks": {
+        "triangles_within_budget": true,
+        "nothing_over_the_map_opening": true,
+        "wood_inside_frame_half": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "two_material_slots": true,
+        "uv0_present": true,
+        "roundtrip_bounds_match_ue_frame": true,
+        "um_fbx_v1_conforms": true
+      }
+    },
+    {
+      "fbx": "art/pipeline-candidates/ASSET-MAP-FRAME-002/20261001-frame-v1/export/SM_MapFrame002_SegB.fbx",
+      "sha256": "74324f7acb011210ad82127e791bbf5faca820c579d7ad9fa3eb6ac4e43b0bca",
+      "bytes": 34268,
+      "preset": "UM_FBX_v1.json",
+      "exporter_kwargs": {
+        "add_leaf_bones": false,
+        "apply_scale_options": "FBX_SCALE_UNITS",
+        "apply_unit_scale": true,
+        "axis_forward": "-Y",
+        "axis_up": "Z",
+        "bake_anim": false,
+        "bake_space_transform": false,
+        "embed_textures": false,
+        "mesh_smooth_type": "FACE",
+        "object_types": [
+          "ARMATURE",
+          "MESH"
+        ],
+        "path_mode": "AUTO",
+        "primary_bone_axis": "Y",
+        "secondary_bone_axis": "X",
+        "use_custom_props": false,
+        "use_mesh_edges": false,
+        "use_selection": true,
+        "use_triangles": true
+      },
+      "colors_type": "SRGB (exporter default; mask values pre-linearised, see k_blender.py)",
+      "um_fbx_v1_conformance": [
+        {
+          "setting": "Forward / Up (04 1.1)",
+          "standard": [
+            "-Y",
+            "Z"
+          ],
+          "used": [
+            "-Y",
+            "Z"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Apply Scalings (04 1.1)",
+          "standard": "FBX_SCALE_UNITS",
+          "used": "FBX_SCALE_UNITS",
+          "conforms": true
+        },
+        {
+          "setting": "Apply Unit (04 1.1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Apply Transform (04 1.1)",
+          "standard": false,
+          "used": false,
+          "conforms": true
+        },
+        {
+          "setting": "Triangulate Faces (04 1.1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Smoothing (04 1.1)",
+          "standard": "FACE",
+          "used": "FACE",
+          "conforms": true
+        },
+        {
+          "setting": "Object Types (04 1.1)",
+          "standard": [
+            "ARMATURE",
+            "MESH"
+          ],
+          "used": [
+            "ARMATURE",
+            "MESH"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Loose Edges / Custom Properties (04 1.1)",
+          "standard": [
+            false,
+            false
+          ],
+          "used": [
+            false,
+            false
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Leaf bones / bone axes (04 1.1, preset)",
+          "standard": [
+            false,
+            "Y",
+            "X"
+          ],
+          "used": [
+            false,
+            "Y",
+            "X"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Bake Animation (04 1.1: skeletal clips only)",
+          "standard": false,
+          "used": false,
+          "conforms": true
+        },
+        {
+          "setting": "Path Mode, textures not embedded (04 1.1)",
+          "standard": [
+            "AUTO",
+            false
+          ],
+          "used": [
+            "AUTO",
+            false
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Export space: +Z rotation deg / data scale / UnitScaleFactor patch (preset)",
+          "standard": [
+            90.0,
+            100.0,
+            1.0
+          ],
+          "used": [
+            90.0,
+            100.0,
+            1.0
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Scene units: metric, unit scale 1.0 (04 1)",
+          "standard": [
+            "METRIC",
+            1.0
+          ],
+          "used": [
+            "METRIC",
+            1.0
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Transforms applied: object matrix identity (04 1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Pivot: start of the inner edge (frame_layout.py frames; z 0 = the play plane, wood bottom at -10)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        }
+      ],
+      "name": "SM_MapFrame002_SegB",
+      "module": "B",
+      "triangles": 584,
+      "trianglesByPart": {
+        "wood": 584
+      },
+      "boundsUeLocalUU": {
+        "min": [
+          0.0,
+          0.0,
+          -10.0
+        ],
+        "max": [
+          157.0,
+          24.0,
+          12.738
+        ],
+        "size": [
+          157.0,
+          24.0,
+          22.738
+        ]
+      },
+      "woodOuterWUU": 24.0,
+      "openingPenetrationUU": 0.0,
+      "uv": {
+        "UVMap": {
+          "min": [
+            0.0,
+            -0.1389
+          ],
+          "max": [
+            1.1901,
+            2.6106
+          ]
+        },
+        "degenerateUv0Triangles": 0
+      },
+      "roundtrip": {
+        "mesh_objects": 1,
+        "triangles": 584,
+        "expected_triangles": 584,
+        "material_slots": [
+          "M_MapFrame002_Wood",
+          "M_MapFrame002_Iron"
+        ],
+        "expected_slots": [
+          "M_MapFrame002_Wood",
+          "M_MapFrame002_Iron"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "color_attributes": [],
+        "bounds_as_ue_uu": {
+          "min": [
+            0.0,
+            -0.0,
+            -10.0
+          ],
+          "max": [
+            157.0,
+            24.0,
+            12.738
+          ]
+        },
+        "note": "read-back frame: UE = (x, -y, z)",
+        "ue_frame_matches_build": true
+      },
+      "blend_scratch": "C:\\tmp\\envmaps-research\\p5k\\frame\\work\\SM_MapFrame002_SegB.blend",
+      "checks": {
+        "triangles_within_budget": true,
+        "nothing_over_the_map_opening": true,
+        "wood_inside_frame_half": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "two_material_slots": true,
+        "uv0_present": true,
+        "roundtrip_bounds_match_ue_frame": true,
+        "um_fbx_v1_conforms": true
+      }
+    },
+    {
+      "fbx": "art/pipeline-candidates/ASSET-MAP-FRAME-002/20261001-frame-v1/export/SM_MapFrame002_SegMid.fbx",
+      "sha256": "daa6adf773b1e412fbca4178b98e11de14ca7b0f24c685ae63f7ed4a977254dc",
+      "bytes": 41260,
+      "preset": "UM_FBX_v1.json",
+      "exporter_kwargs": {
+        "add_leaf_bones": false,
+        "apply_scale_options": "FBX_SCALE_UNITS",
+        "apply_unit_scale": true,
+        "axis_forward": "-Y",
+        "axis_up": "Z",
+        "bake_anim": false,
+        "bake_space_transform": false,
+        "embed_textures": false,
+        "mesh_smooth_type": "FACE",
+        "object_types": [
+          "ARMATURE",
+          "MESH"
+        ],
+        "path_mode": "AUTO",
+        "primary_bone_axis": "Y",
+        "secondary_bone_axis": "X",
+        "use_custom_props": false,
+        "use_mesh_edges": false,
+        "use_selection": true,
+        "use_triangles": true
+      },
+      "colors_type": "SRGB (exporter default; mask values pre-linearised, see k_blender.py)",
+      "um_fbx_v1_conformance": [
+        {
+          "setting": "Forward / Up (04 1.1)",
+          "standard": [
+            "-Y",
+            "Z"
+          ],
+          "used": [
+            "-Y",
+            "Z"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Apply Scalings (04 1.1)",
+          "standard": "FBX_SCALE_UNITS",
+          "used": "FBX_SCALE_UNITS",
+          "conforms": true
+        },
+        {
+          "setting": "Apply Unit (04 1.1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Apply Transform (04 1.1)",
+          "standard": false,
+          "used": false,
+          "conforms": true
+        },
+        {
+          "setting": "Triangulate Faces (04 1.1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Smoothing (04 1.1)",
+          "standard": "FACE",
+          "used": "FACE",
+          "conforms": true
+        },
+        {
+          "setting": "Object Types (04 1.1)",
+          "standard": [
+            "ARMATURE",
+            "MESH"
+          ],
+          "used": [
+            "ARMATURE",
+            "MESH"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Loose Edges / Custom Properties (04 1.1)",
+          "standard": [
+            false,
+            false
+          ],
+          "used": [
+            false,
+            false
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Leaf bones / bone axes (04 1.1, preset)",
+          "standard": [
+            false,
+            "Y",
+            "X"
+          ],
+          "used": [
+            false,
+            "Y",
+            "X"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Bake Animation (04 1.1: skeletal clips only)",
+          "standard": false,
+          "used": false,
+          "conforms": true
+        },
+        {
+          "setting": "Path Mode, textures not embedded (04 1.1)",
+          "standard": [
+            "AUTO",
+            false
+          ],
+          "used": [
+            "AUTO",
+            false
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Export space: +Z rotation deg / data scale / UnitScaleFactor patch (preset)",
+          "standard": [
+            90.0,
+            100.0,
+            1.0
+          ],
+          "used": [
+            90.0,
+            100.0,
+            1.0
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Scene units: metric, unit scale 1.0 (04 1)",
+          "standard": [
+            "METRIC",
+            1.0
+          ],
+          "used": [
+            "METRIC",
+            1.0
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Transforms applied: object matrix identity (04 1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Pivot: start of the inner edge (frame_layout.py frames; z 0 = the play plane, wood bottom at -10)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        }
+      ],
+      "name": "SM_MapFrame002_SegMid",
+      "module": "Mid",
+      "triangles": 826,
+      "trianglesByPart": {
+        "strap": 92,
+        "wood": 584,
+        "rivet": 150
+      },
+      "boundsUeLocalUU": {
+        "min": [
+          0.0,
+          0.0,
+          -10.0
+        ],
+        "max": [
+          157.0,
+          26.0,
+          14.4
+        ],
+        "size": [
+          157.0,
+          26.0,
+          24.4
+        ]
+      },
+      "woodOuterWUU": 24.0,
+      "openingPenetrationUU": 0.0,
+      "uv": {
+        "UVMap": {
+          "min": [
+            -0.0979,
+            -1.7854
+          ],
+          "max": [
+            1.6809,
+            2.8906
+          ]
+        },
+        "degenerateUv0Triangles": 0
+      },
+      "roundtrip": {
+        "mesh_objects": 1,
+        "triangles": 826,
+        "expected_triangles": 826,
+        "material_slots": [
+          "M_MapFrame002_Wood",
+          "M_MapFrame002_Iron"
+        ],
+        "expected_slots": [
+          "M_MapFrame002_Wood",
+          "M_MapFrame002_Iron"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "color_attributes": [],
+        "bounds_as_ue_uu": {
+          "min": [
+            0.0,
+            -0.0,
+            -10.0
+          ],
+          "max": [
+            157.0,
+            26.0,
+            14.4
+          ]
+        },
+        "note": "read-back frame: UE = (x, -y, z)",
+        "ue_frame_matches_build": true
+      },
+      "blend_scratch": "C:\\tmp\\envmaps-research\\p5k\\frame\\work\\SM_MapFrame002_SegMid.blend",
+      "checks": {
+        "triangles_within_budget": true,
+        "nothing_over_the_map_opening": true,
+        "wood_inside_frame_half": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "two_material_slots": true,
+        "uv0_present": true,
+        "roundtrip_bounds_match_ue_frame": true,
+        "um_fbx_v1_conforms": true
+      }
+    },
+    {
+      "fbx": "art/pipeline-candidates/ASSET-MAP-FRAME-002/20261001-frame-v1/export/SM_MapFrame002_Corner.fbx",
+      "sha256": "d97ba46614502853a5b3ad6744d4fefc3ee70ddc3e11534130ac167e9832a3be",
+      "bytes": 46812,
+      "preset": "UM_FBX_v1.json",
+      "exporter_kwargs": {
+        "add_leaf_bones": false,
+        "apply_scale_options": "FBX_SCALE_UNITS",
+        "apply_unit_scale": true,
+        "axis_forward": "-Y",
+        "axis_up": "Z",
+        "bake_anim": false,
+        "bake_space_transform": false,
+        "embed_textures": false,
+        "mesh_smooth_type": "FACE",
+        "object_types": [
+          "ARMATURE",
+          "MESH"
+        ],
+        "path_mode": "AUTO",
+        "primary_bone_axis": "Y",
+        "secondary_bone_axis": "X",
+        "use_custom_props": false,
+        "use_mesh_edges": false,
+        "use_selection": true,
+        "use_triangles": true
+      },
+      "colors_type": "SRGB (exporter default; mask values pre-linearised, see k_blender.py)",
+      "um_fbx_v1_conformance": [
+        {
+          "setting": "Forward / Up (04 1.1)",
+          "standard": [
+            "-Y",
+            "Z"
+          ],
+          "used": [
+            "-Y",
+            "Z"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Apply Scalings (04 1.1)",
+          "standard": "FBX_SCALE_UNITS",
+          "used": "FBX_SCALE_UNITS",
+          "conforms": true
+        },
+        {
+          "setting": "Apply Unit (04 1.1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Apply Transform (04 1.1)",
+          "standard": false,
+          "used": false,
+          "conforms": true
+        },
+        {
+          "setting": "Triangulate Faces (04 1.1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Smoothing (04 1.1)",
+          "standard": "FACE",
+          "used": "FACE",
+          "conforms": true
+        },
+        {
+          "setting": "Object Types (04 1.1)",
+          "standard": [
+            "ARMATURE",
+            "MESH"
+          ],
+          "used": [
+            "ARMATURE",
+            "MESH"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Loose Edges / Custom Properties (04 1.1)",
+          "standard": [
+            false,
+            false
+          ],
+          "used": [
+            false,
+            false
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Leaf bones / bone axes (04 1.1, preset)",
+          "standard": [
+            false,
+            "Y",
+            "X"
+          ],
+          "used": [
+            false,
+            "Y",
+            "X"
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Bake Animation (04 1.1: skeletal clips only)",
+          "standard": false,
+          "used": false,
+          "conforms": true
+        },
+        {
+          "setting": "Path Mode, textures not embedded (04 1.1)",
+          "standard": [
+            "AUTO",
+            false
+          ],
+          "used": [
+            "AUTO",
+            false
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Export space: +Z rotation deg / data scale / UnitScaleFactor patch (preset)",
+          "standard": [
+            90.0,
+            100.0,
+            1.0
+          ],
+          "used": [
+            90.0,
+            100.0,
+            1.0
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Scene units: metric, unit scale 1.0 (04 1)",
+          "standard": [
+            "METRIC",
+            1.0
+          ],
+          "used": [
+            "METRIC",
+            1.0
+          ],
+          "conforms": true
+        },
+        {
+          "setting": "Transforms applied: object matrix identity (04 1)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        },
+        {
+          "setting": "Pivot: the inner map corner (frame_layout.py frames; z 0 = the play plane, wood bottom at -10)",
+          "standard": true,
+          "used": true,
+          "conforms": true
+        }
+      ],
+      "name": "SM_MapFrame002_Corner",
+      "module": "Corner",
+      "triangles": 1030,
+      "trianglesByPart": {
+        "strap": 88,
+        "wood": 552,
+        "rivet": 390
+      },
+      "boundsUeLocalUU": {
+        "min": [
+          -53.167,
+          -53.167,
+          -10.0
+        ],
+        "max": [
+          26.0,
+          26.0,
+          14.4
+        ],
+        "size": [
+          79.167,
+          79.167,
+          24.4
+        ]
+      },
+      "woodOuterWUU": 24.0,
+      "openingPenetrationUU": 0.0,
+      "uv": {
+        "UVMap": {
+          "min": [
+            -0.4937,
+            -0.3792
+          ],
+          "max": [
+            1.1901,
+            1.4751
+          ]
+        },
+        "degenerateUv0Triangles": 0
+      },
+      "roundtrip": {
+        "mesh_objects": 1,
+        "triangles": 1030,
+        "expected_triangles": 1030,
+        "material_slots": [
+          "M_MapFrame002_Wood",
+          "M_MapFrame002_Iron"
+        ],
+        "expected_slots": [
+          "M_MapFrame002_Wood",
+          "M_MapFrame002_Iron"
+        ],
+        "uv_layers": [
+          "UVMap"
+        ],
+        "color_attributes": [],
+        "bounds_as_ue_uu": {
+          "min": [
+            -53.167,
+            -53.167,
+            -10.0
+          ],
+          "max": [
+            26.0,
+            26.0,
+            14.4
+          ]
+        },
+        "note": "read-back frame: UE = (x, -y, z)",
+        "ue_frame_matches_build": true
+      },
+      "blend_scratch": "C:\\tmp\\envmaps-research\\p5k\\frame\\work\\SM_MapFrame002_Corner.blend",
+      "checks": {
+        "triangles_within_budget": true,
+        "nothing_over_the_map_opening": true,
+        "wood_inside_frame_half": true,
+        "single_mesh": true,
+        "triangles_preserved": true,
+        "two_material_slots": true,
+        "uv0_present": true,
+        "roundtrip_bounds_match_ue_frame": true,
+        "um_fbx_v1_conforms": true
+      }
+    }
+  ],
+  "checks": {
+    "modules_pass": true,
+    "exact_fit_both_maps": true,
+    "assembled_nothing_inside_opening": true,
+    "assembled_sides_watertight": true,
+    "assembled_wood_bounds_equal_frame_half": true,
+    "profile_height_about_1p6x": true,
+    "map_occlusion_not_worse_than_current": true
+  },
+  "checks_passed": true
+}
