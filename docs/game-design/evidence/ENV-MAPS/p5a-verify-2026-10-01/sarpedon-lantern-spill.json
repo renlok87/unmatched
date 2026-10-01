@@ -1,0 +1,4490 @@
+{
+ "schema": "unmatched.env-maps.sarpedon-lantern-spill/1",
+ "method": "Per circle the fill samples (fractions 0.35-0.75 of the ring radius, all angles) are projected into the frame with the camera of its 'SHOT ctx' line (tools/art/map_surface/zone_separation.py Cam / MapData); residual = median CIELAB of the frame samples - median CIELAB of the same samples on the original map (BC). The reference residual is the median over the UNLIT circles (every warm point light of ALL given layouts - hull lanterns, campfires - farther than 450 uu, so P3 and P5a share one reference set); the local tint of a circle = its residual - the reference (dL*, da*, db*, dab = hypot(da, db)). Warm spill = + da / + db on the east circles S07 / S15 / S27 (the same zones exist only on the ship side, so no same-zone control is possible).",
+ "runs": [
+  {
+   "frame": "bench-K1-1920x1080.png",
+   "camera": {
+    "pos": [
+     0.0,
+     1342.0,
+     1917.0
+    ],
+    "pitch": -55.0,
+    "yaw": -90.0
+   },
+   "circlesMeasured": 38,
+   "unlitReference": {
+    "circles": [
+     "S04",
+     "S05",
+     "S11",
+     "S12",
+     "S13",
+     "S16",
+     "S21",
+     "S25",
+     "S31",
+     "S32",
+     "S35",
+     "S36"
+    ],
+    "residualLab": [
+     0.02,
+     -3.34,
+     -10.24
+    ]
+   },
+   "east": {
+    "S07": {
+     "nearestLanternUU": 261.3,
+     "nearestWarmUU": 261.3,
+     "zones": [
+      "brown"
+     ],
+     "dL": 0.07,
+     "da": 10.3,
+     "db": 14.49,
+     "dab": 17.78
+    },
+    "S15": {
+     "nearestLanternUU": 297.9,
+     "nearestWarmUU": 297.9,
+     "zones": [
+      "red"
+     ],
+     "dL": -0.76,
+     "da": 7.03,
+     "db": 12.41,
+     "dab": 14.26
+    },
+    "S27": {
+     "nearestLanternUU": 335.7,
+     "nearestWarmUU": 335.7,
+     "zones": [
+      "red"
+     ],
+     "dL": -5.85,
+     "da": 3.87,
+     "db": 7.72,
+     "dab": 8.63
+    }
+   },
+   "allCircles": {
+    "S01": {
+     "nearestLanternUU": 985.2,
+     "nearestWarmUU": 212.9,
+     "zones": [
+      "green"
+     ],
+     "dL": -2.94,
+     "da": 3.03,
+     "db": 6.73,
+     "dab": 7.38
+    },
+    "S02": {
+     "nearestLanternUU": 881.7,
+     "nearestWarmUU": 287.0,
+     "zones": [
+      "green"
+     ],
+     "dL": -1.96,
+     "da": 1.57,
+     "db": 4.92,
+     "dab": 5.16
+    },
+    "S03": {
+     "nearestLanternUU": 799.3,
+     "nearestWarmUU": 382.3,
+     "zones": [
+      "green"
+     ],
+     "dL": -0.4,
+     "da": 0.74,
+     "db": 4.07,
+     "dab": 4.14
+    },
+    "S04": {
+     "nearestLanternUU": 704.6,
+     "nearestWarmUU": 458.9,
+     "zones": [
+      "green"
+     ],
+     "dL": 0.36,
+     "da": 0.74,
+     "db": 4.1,
+     "dab": 4.17
+    },
+    "S05": {
+     "nearestLanternUU": 596.0,
+     "nearestWarmUU": 572.0,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -1.16,
+     "da": -4.04,
+     "db": -6.62,
+     "dab": 7.75
+    },
+    "S06": {
+     "nearestLanternUU": 344.5,
+     "nearestWarmUU": 344.5,
+     "zones": [
+      "brown"
+     ],
+     "dL": -2.04,
+     "da": 4.88,
+     "db": 9.85,
+     "dab": 10.99
+    },
+    "S07": {
+     "nearestLanternUU": 261.3,
+     "nearestWarmUU": 261.3,
+     "zones": [
+      "brown"
+     ],
+     "dL": 0.07,
+     "da": 10.3,
+     "db": 14.49,
+     "dab": 17.78
+    },
+    "S08": {
+     "nearestLanternUU": 1008.7,
+     "nearestWarmUU": 265.9,
+     "zones": [
+      "green"
+     ],
+     "dL": -2.77,
+     "da": 2.16,
+     "db": 5.96,
+     "dab": 6.34
+    },
+    "S09": {
+     "nearestLanternUU": 912.3,
+     "nearestWarmUU": 324.3,
+     "zones": [
+      "green"
+     ],
+     "dL": -1.56,
+     "da": 1.44,
+     "db": 4.48,
+     "dab": 4.7
+    },
+    "S10": {
+     "nearestLanternUU": 842.3,
+     "nearestWarmUU": 396.0,
+     "zones": [
+      "green"
+     ],
+     "dL": 0.27,
+     "da": 0.88,
+     "db": 3.88,
+     "dab": 3.98
+    },
+    "S11": {
+     "nearestLanternUU": 749.0,
+     "nearestWarmUU": 479.7,
+     "zones": [
+      "green"
+     ],
+     "dL": 1.69,
+     "da": 0.67,
+     "db": 3.99,
+     "dab": 4.04
+    },
+    "S12": {
+     "nearestLanternUU": 659.3,
+     "nearestWarmUU": 575.5,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -0.93,
+     "da": -2.87,
+     "db": -8.9,
+     "dab": 9.35
+    },
+    "S13": {
+     "nearestLanternUU": 565.4,
+     "nearestWarmUU": 565.4,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -0.36,
+     "da": -4.42,
+     "db": -6.64,
+     "dab": 7.98
+    },
+    "S14": {
+     "nearestLanternUU": 426.5,
+     "nearestWarmUU": 426.5,
+     "zones": [
+      "brown"
+     ],
+     "dL": -1.95,
+     "da": 2.72,
+     "db": 8.02,
+     "dab": 8.46
+    },
+    "S15": {
+     "nearestLanternUU": 297.9,
+     "nearestWarmUU": 297.9,
+     "zones": [
+      "red"
+     ],
+     "dL": -0.76,
+     "da": 7.03,
+     "db": 12.41,
+     "dab": 14.26
+    },
+    "S16": {
+     "nearestLanternUU": 512.6,
+     "nearestWarmUU": 512.6,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -0.8,
+     "da": -3.97,
+     "db": -6.56,
+     "dab": 7.67
+    },
+    "S17": {
+     "nearestLanternUU": 316.1,
+     "nearestWarmUU": 316.1,
+     "zones": [
+      "red"
+     ],
+     "dL": -2.85,
+     "da": 5.04,
+     "db": 10.03,
+     "dab": 11.22
+    },
+    "S18": {
+     "nearestLanternUU": 1042.8,
+     "nearestWarmUU": 193.5,
+     "zones": [
+      "blue"
+     ],
+     "dL": -2.09,
+     "da": 7.77,
+     "db": 12.27,
+     "dab": 14.52
+    },
+    "S19": {
+     "nearestLanternUU": 974.1,
+     "nearestWarmUU": 263.2,
+     "zones": [
+      "blue"
+     ],
+     "dL": -4.91,
+     "da": 5.96,
+     "db": 9.89,
+     "dab": 11.55
+    },
+    "S20": {
+     "nearestLanternUU": 873.2,
+     "nearestWarmUU": 361.3,
+     "zones": [
+      "blue"
+     ],
+     "dL": -1.64,
+     "da": 6.6,
+     "db": 16.58,
+     "dab": 17.84
+    },
+    "S21": {
+     "nearestLanternUU": 754.7,
+     "nearestWarmUU": 487.2,
+     "zones": [
+      "yellow",
+      "purple"
+     ],
+     "dL": 3.98,
+     "da": -2.94,
+     "db": -0.79,
+     "dab": 3.05
+    },
+    "S22": {
+     "nearestLanternUU": 477.8,
+     "nearestWarmUU": 477.8,
+     "zones": [
+      "yellow",
+      "brown",
+      "purple"
+     ],
+     "dL": 2.22,
+     "da": 2.51,
+     "db": 7.27,
+     "dab": 7.69
+    },
+    "S23": {
+     "nearestLanternUU": 1075.0,
+     "nearestWarmUU": 176.3,
+     "zones": [
+      "blue"
+     ],
+     "dL": -2.52,
+     "da": 8.16,
+     "db": 14.48,
+     "dab": 16.62
+    },
+    "S24": {
+     "nearestLanternUU": 848.8,
+     "nearestWarmUU": 412.2,
+     "zones": [
+      "yellow",
+      "purple"
+     ],
+     "dL": 4.31,
+     "da": -1.55,
+     "db": 0.56,
+     "dab": 1.65
+    },
+    "S25": {
+     "nearestLanternUU": 552.0,
+     "nearestWarmUU": 552.0,
+     "zones": [
+      "yellow",
+      "brown",
+      "purple"
+     ],
+     "dL": -4.54,
+     "da": -0.67,
+     "db": -23.03,
+     "dab": 23.04
+    },
+    "S26": {
+     "nearestLanternUU": 455.6,
+     "nearestWarmUU": 455.6,
+     "zones": [
+      "purple"
+     ],
+     "dL": 0.97,
+     "da": 3.64,
+     "db": 1.05,
+     "dab": 3.79
+    },
+    "S27": {
+     "nearestLanternUU": 335.7,
+     "nearestWarmUU": 335.7,
+     "zones": [
+      "red"
+     ],
+     "dL": -5.85,
+     "da": 3.87,
+     "db": 7.72,
+     "dab": 8.63
+    },
+    "S28": {
+     "nearestLanternUU": 1102.4,
+     "nearestWarmUU": 211.2,
+     "zones": [
+      "blue"
+     ],
+     "dL": -0.29,
+     "da": 5.86,
+     "db": 7.84,
+     "dab": 9.79
+    },
+    "S29": {
+     "nearestLanternUU": 1008.2,
+     "nearestWarmUU": 272.6,
+     "zones": [
+      "blue"
+     ],
+     "dL": 1.37,
+     "da": 4.67,
+     "db": 7.08,
+     "dab": 8.48
+    },
+    "S30": {
+     "nearestLanternUU": 916.4,
+     "nearestWarmUU": 375.2,
+     "zones": [
+      "purple"
+     ],
+     "dL": 2.58,
+     "da": -0.06,
+     "db": 2.72,
+     "dab": 2.72
+    },
+    "S31": {
+     "nearestLanternUU": 781.6,
+     "nearestWarmUU": 503.7,
+     "zones": [
+      "purple"
+     ],
+     "dL": 4.04,
+     "da": 2.45,
+     "db": 1.78,
+     "dab": 3.03
+    },
+    "S32": {
+     "nearestLanternUU": 611.3,
+     "nearestWarmUU": 611.3,
+     "zones": [
+      "purple"
+     ],
+     "dL": -7.23,
+     "da": 0.89,
+     "db": 2.69,
+     "dab": 2.83
+    },
+    "S33": {
+     "nearestLanternUU": 415.4,
+     "nearestWarmUU": 415.4,
+     "zones": [
+      "red"
+     ],
+     "dL": -6.15,
+     "da": 1.76,
+     "db": 4.99,
+     "dab": 5.29
+    },
+    "S34": {
+     "nearestLanternUU": 1012.8,
+     "nearestWarmUU": 326.0,
+     "zones": [
+      "purple"
+     ],
+     "dL": -0.07,
+     "da": 0.23,
+     "db": 2.69,
+     "dab": 2.7
+    },
+    "S35": {
+     "nearestLanternUU": 721.7,
+     "nearestWarmUU": 589.6,
+     "zones": [
+      "purple"
+     ],
+     "dL": 2.85,
+     "da": 3.82,
+     "db": 0.79,
+     "dab": 3.9
+    },
+    "S36": {
+     "nearestLanternUU": 659.0,
+     "nearestWarmUU": 659.0,
+     "zones": [
+      "purple"
+     ],
+     "dL": 1.6,
+     "da": 2.94,
+     "db": 0.95,
+     "dab": 3.09
+    },
+    "S37": {
+     "nearestLanternUU": 556.5,
+     "nearestWarmUU": 556.5,
+     "zones": [
+      "red"
+     ],
+     "dL": -5.21,
+     "da": 1.11,
+     "db": 4.38,
+     "dab": 4.52
+    },
+    "S38": {
+     "nearestLanternUU": 470.7,
+     "nearestWarmUU": 470.7,
+     "zones": [
+      "red"
+     ],
+     "dL": -7.16,
+     "da": 1.28,
+     "db": 4.42,
+     "dab": 4.6
+    }
+   },
+   "lanternBand": {
+    "circlesWithin350uu": [
+     "S06",
+     "S07",
+     "S15",
+     "S17",
+     "S27"
+    ],
+    "medianDa": 5.04,
+    "medianDb": 10.03
+   },
+   "label": "p3-packaged-bench-K1-r1",
+   "lights": [
+    {
+     "id": "campfire-nw",
+     "loc": [
+      -548.0,
+      -352.0,
+      60.0
+     ],
+     "intensityCd": 55,
+     "radius": 460
+    },
+    {
+     "id": "campfire-w",
+     "loc": [
+      -560.0,
+      85.0,
+      60.0
+     ],
+     "intensityCd": 45,
+     "radius": 420
+    },
+    {
+     "id": "ship-lantern-n",
+     "loc": [
+      571.7,
+      -355.0,
+      150.0
+     ],
+     "intensityCd": 70,
+     "radius": 480
+    },
+    {
+     "id": "ship-lantern-s",
+     "loc": [
+      661.9,
+      -126.0,
+      140.0
+     ],
+     "intensityCd": 65,
+     "radius": 460
+    },
+    {
+     "id": "ship-lantern-stern",
+     "loc": [
+      690.0,
+      -30.0,
+      140.0
+     ],
+     "intensityCd": 50,
+     "radius": 440
+    }
+   ]
+  },
+  {
+   "frame": "phase2-board-host-1920x1080.png",
+   "camera": {
+    "pos": [
+     0.0,
+     1342.0,
+     1917.0
+    ],
+    "pitch": -55.0,
+    "yaw": -90.0
+   },
+   "circlesMeasured": 38,
+   "unlitReference": {
+    "circles": [
+     "S04",
+     "S05",
+     "S11",
+     "S12",
+     "S13",
+     "S16",
+     "S21",
+     "S25",
+     "S31",
+     "S32",
+     "S35",
+     "S36"
+    ],
+    "residualLab": [
+     0.15,
+     -3.54,
+     -10.08
+    ]
+   },
+   "east": {
+    "S07": {
+     "nearestLanternUU": 261.3,
+     "nearestWarmUU": 261.3,
+     "zones": [
+      "brown"
+     ],
+     "dL": -0.11,
+     "da": 10.56,
+     "db": 14.3,
+     "dab": 17.78
+    },
+    "S15": {
+     "nearestLanternUU": 297.9,
+     "nearestWarmUU": 297.9,
+     "zones": [
+      "red"
+     ],
+     "dL": -0.89,
+     "da": 7.21,
+     "db": 12.16,
+     "dab": 14.14
+    },
+    "S27": {
+     "nearestLanternUU": 335.7,
+     "nearestWarmUU": 335.7,
+     "zones": [
+      "red"
+     ],
+     "dL": -6.08,
+     "da": 4.03,
+     "db": 7.59,
+     "dab": 8.59
+    }
+   },
+   "allCircles": {
+    "S01": {
+     "nearestLanternUU": 985.2,
+     "nearestWarmUU": 212.9,
+     "zones": [
+      "green"
+     ],
+     "dL": -2.82,
+     "da": 2.55,
+     "db": 7.19,
+     "dab": 7.63
+    },
+    "S02": {
+     "nearestLanternUU": 881.7,
+     "nearestWarmUU": 287.0,
+     "zones": [
+      "green"
+     ],
+     "dL": -1.84,
+     "da": 1.25,
+     "db": 5.21,
+     "dab": 5.36
+    },
+    "S03": {
+     "nearestLanternUU": 799.3,
+     "nearestWarmUU": 382.3,
+     "zones": [
+      "green"
+     ],
+     "dL": -0.24,
+     "da": 0.35,
+     "db": 4.67,
+     "dab": 4.68
+    },
+    "S04": {
+     "nearestLanternUU": 704.6,
+     "nearestWarmUU": 458.9,
+     "zones": [
+      "green"
+     ],
+     "dL": 0.44,
+     "da": 0.46,
+     "db": 4.39,
+     "dab": 4.41
+    },
+    "S05": {
+     "nearestLanternUU": 596.0,
+     "nearestWarmUU": 572.0,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -1.14,
+     "da": -4.63,
+     "db": -6.06,
+     "dab": 7.63
+    },
+    "S06": {
+     "nearestLanternUU": 344.5,
+     "nearestWarmUU": 344.5,
+     "zones": [
+      "brown"
+     ],
+     "dL": -2.2,
+     "da": 5.04,
+     "db": 9.67,
+     "dab": 10.9
+    },
+    "S07": {
+     "nearestLanternUU": 261.3,
+     "nearestWarmUU": 261.3,
+     "zones": [
+      "brown"
+     ],
+     "dL": -0.11,
+     "da": 10.56,
+     "db": 14.3,
+     "dab": 17.78
+    },
+    "S08": {
+     "nearestLanternUU": 1008.7,
+     "nearestWarmUU": 265.9,
+     "zones": [
+      "green"
+     ],
+     "dL": -2.52,
+     "da": 1.69,
+     "db": 6.2,
+     "dab": 6.42
+    },
+    "S09": {
+     "nearestLanternUU": 912.3,
+     "nearestWarmUU": 324.3,
+     "zones": [
+      "green"
+     ],
+     "dL": -1.41,
+     "da": 1.0,
+     "db": 4.91,
+     "dab": 5.01
+    },
+    "S10": {
+     "nearestLanternUU": 842.3,
+     "nearestWarmUU": 396.0,
+     "zones": [
+      "green"
+     ],
+     "dL": 0.5,
+     "da": 0.28,
+     "db": 4.46,
+     "dab": 4.47
+    },
+    "S11": {
+     "nearestLanternUU": 749.0,
+     "nearestWarmUU": 479.7,
+     "zones": [
+      "green"
+     ],
+     "dL": 1.85,
+     "da": 0.26,
+     "db": 4.36,
+     "dab": 4.37
+    },
+    "S12": {
+     "nearestLanternUU": 659.3,
+     "nearestWarmUU": 575.5,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -0.96,
+     "da": -3.15,
+     "db": -8.53,
+     "dab": 9.09
+    },
+    "S13": {
+     "nearestLanternUU": 565.4,
+     "nearestWarmUU": 565.4,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -0.44,
+     "da": -4.81,
+     "db": -6.27,
+     "dab": 7.9
+    },
+    "S14": {
+     "nearestLanternUU": 426.5,
+     "nearestWarmUU": 426.5,
+     "zones": [
+      "brown"
+     ],
+     "dL": -2.08,
+     "da": 2.95,
+     "db": 7.87,
+     "dab": 8.4
+    },
+    "S15": {
+     "nearestLanternUU": 297.9,
+     "nearestWarmUU": 297.9,
+     "zones": [
+      "red"
+     ],
+     "dL": -0.89,
+     "da": 7.21,
+     "db": 12.16,
+     "dab": 14.14
+    },
+    "S16": {
+     "nearestLanternUU": 512.6,
+     "nearestWarmUU": 512.6,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -0.9,
+     "da": -3.76,
+     "db": -6.77,
+     "dab": 7.74
+    },
+    "S17": {
+     "nearestLanternUU": 316.1,
+     "nearestWarmUU": 316.1,
+     "zones": [
+      "red"
+     ],
+     "dL": -2.93,
+     "da": 5.23,
+     "db": 9.84,
+     "dab": 11.14
+    },
+    "S18": {
+     "nearestLanternUU": 1042.8,
+     "nearestWarmUU": 193.5,
+     "zones": [
+      "blue"
+     ],
+     "dL": -1.59,
+     "da": 7.73,
+     "db": 11.43,
+     "dab": 13.8
+    },
+    "S19": {
+     "nearestLanternUU": 974.1,
+     "nearestWarmUU": 263.2,
+     "zones": [
+      "blue"
+     ],
+     "dL": -3.72,
+     "da": 5.95,
+     "db": 9.49,
+     "dab": 11.2
+    },
+    "S20": {
+     "nearestLanternUU": 873.2,
+     "nearestWarmUU": 361.3,
+     "zones": [
+      "blue"
+     ],
+     "dL": 0.5,
+     "da": 6.4,
+     "db": 18.93,
+     "dab": 19.98
+    },
+    "S21": {
+     "nearestLanternUU": 754.7,
+     "nearestWarmUU": 487.2,
+     "zones": [
+      "yellow",
+      "purple"
+     ],
+     "dL": 3.99,
+     "da": -3.01,
+     "db": -0.82,
+     "dab": 3.12
+    },
+    "S22": {
+     "nearestLanternUU": 477.8,
+     "nearestWarmUU": 477.8,
+     "zones": [
+      "yellow",
+      "brown",
+      "purple"
+     ],
+     "dL": 0.75,
+     "da": 2.72,
+     "db": 5.56,
+     "dab": 6.19
+    },
+    "S23": {
+     "nearestLanternUU": 1075.0,
+     "nearestWarmUU": 176.3,
+     "zones": [
+      "blue"
+     ],
+     "dL": -2.34,
+     "da": 8.18,
+     "db": 14.05,
+     "dab": 16.26
+    },
+    "S24": {
+     "nearestLanternUU": 848.8,
+     "nearestWarmUU": 412.2,
+     "zones": [
+      "yellow",
+      "purple"
+     ],
+     "dL": 4.39,
+     "da": -1.77,
+     "db": 0.93,
+     "dab": 2.0
+    },
+    "S25": {
+     "nearestLanternUU": 552.0,
+     "nearestWarmUU": 552.0,
+     "zones": [
+      "yellow",
+      "brown",
+      "purple"
+     ],
+     "dL": -3.53,
+     "da": -0.26,
+     "db": -23.13,
+     "dab": 23.13
+    },
+    "S26": {
+     "nearestLanternUU": 455.6,
+     "nearestWarmUU": 455.6,
+     "zones": [
+      "purple"
+     ],
+     "dL": 0.84,
+     "da": 3.77,
+     "db": 0.91,
+     "dab": 3.87
+    },
+    "S27": {
+     "nearestLanternUU": 335.7,
+     "nearestWarmUU": 335.7,
+     "zones": [
+      "red"
+     ],
+     "dL": -6.08,
+     "da": 4.03,
+     "db": 7.59,
+     "dab": 8.59
+    },
+    "S28": {
+     "nearestLanternUU": 1102.4,
+     "nearestWarmUU": 211.2,
+     "zones": [
+      "blue"
+     ],
+     "dL": -0.22,
+     "da": 5.43,
+     "db": 8.25,
+     "dab": 9.88
+    },
+    "S29": {
+     "nearestLanternUU": 1008.2,
+     "nearestWarmUU": 272.6,
+     "zones": [
+      "blue"
+     ],
+     "dL": 1.49,
+     "da": 4.21,
+     "db": 7.42,
+     "dab": 8.53
+    },
+    "S30": {
+     "nearestLanternUU": 916.4,
+     "nearestWarmUU": 375.2,
+     "zones": [
+      "purple"
+     ],
+     "dL": 2.57,
+     "da": -0.48,
+     "db": 2.87,
+     "dab": 2.91
+    },
+    "S31": {
+     "nearestLanternUU": 781.6,
+     "nearestWarmUU": 503.7,
+     "zones": [
+      "purple"
+     ],
+     "dL": 4.13,
+     "da": 1.9,
+     "db": 2.02,
+     "dab": 2.77
+    },
+    "S32": {
+     "nearestLanternUU": 611.3,
+     "nearestWarmUU": 611.3,
+     "zones": [
+      "purple"
+     ],
+     "dL": -7.04,
+     "da": 0.86,
+     "db": 2.35,
+     "dab": 2.5
+    },
+    "S33": {
+     "nearestLanternUU": 415.4,
+     "nearestWarmUU": 415.4,
+     "zones": [
+      "red"
+     ],
+     "dL": -6.29,
+     "da": 1.97,
+     "db": 4.82,
+     "dab": 5.21
+    },
+    "S34": {
+     "nearestLanternUU": 1012.8,
+     "nearestWarmUU": 326.0,
+     "zones": [
+      "purple"
+     ],
+     "dL": -0.04,
+     "da": -0.15,
+     "db": 2.94,
+     "dab": 2.94
+    },
+    "S35": {
+     "nearestLanternUU": 721.7,
+     "nearestWarmUU": 589.6,
+     "zones": [
+      "purple"
+     ],
+     "dL": 2.98,
+     "da": 3.22,
+     "db": 1.02,
+     "dab": 3.37
+    },
+    "S36": {
+     "nearestLanternUU": 659.0,
+     "nearestWarmUU": 659.0,
+     "zones": [
+      "purple"
+     ],
+     "dL": 1.54,
+     "da": 3.17,
+     "db": 0.82,
+     "dab": 3.27
+    },
+    "S37": {
+     "nearestLanternUU": 556.5,
+     "nearestWarmUU": 556.5,
+     "zones": [
+      "red"
+     ],
+     "dL": -5.35,
+     "da": 1.29,
+     "db": 4.19,
+     "dab": 4.39
+    },
+    "S38": {
+     "nearestLanternUU": 470.7,
+     "nearestWarmUU": 470.7,
+     "zones": [
+      "red"
+     ],
+     "dL": -7.21,
+     "da": 1.46,
+     "db": 4.3,
+     "dab": 4.55
+    }
+   },
+   "lanternBand": {
+    "circlesWithin350uu": [
+     "S06",
+     "S07",
+     "S15",
+     "S17",
+     "S27"
+    ],
+    "medianDa": 5.23,
+    "medianDb": 9.84
+   },
+   "label": "p3-packaged-live-K1-host",
+   "lights": [
+    {
+     "id": "campfire-nw",
+     "loc": [
+      -548.0,
+      -352.0,
+      60.0
+     ],
+     "intensityCd": 55,
+     "radius": 460
+    },
+    {
+     "id": "campfire-w",
+     "loc": [
+      -560.0,
+      85.0,
+      60.0
+     ],
+     "intensityCd": 45,
+     "radius": 420
+    },
+    {
+     "id": "ship-lantern-n",
+     "loc": [
+      571.7,
+      -355.0,
+      150.0
+     ],
+     "intensityCd": 70,
+     "radius": 480
+    },
+    {
+     "id": "ship-lantern-s",
+     "loc": [
+      661.9,
+      -126.0,
+      140.0
+     ],
+     "intensityCd": 65,
+     "radius": 460
+    },
+    {
+     "id": "ship-lantern-stern",
+     "loc": [
+      690.0,
+      -30.0,
+      140.0
+     ],
+     "intensityCd": 50,
+     "radius": 440
+    }
+   ]
+  },
+  {
+   "frame": "bench-K1-1920x1080.png",
+   "camera": {
+    "pos": [
+     0.0,
+     1342.0,
+     1917.0
+    ],
+    "pitch": -55.0,
+    "yaw": -90.0
+   },
+   "circlesMeasured": 38,
+   "unlitReference": {
+    "circles": [
+     "S04",
+     "S05",
+     "S11",
+     "S12",
+     "S13",
+     "S16",
+     "S21",
+     "S25",
+     "S31",
+     "S32",
+     "S35",
+     "S36"
+    ],
+    "residualLab": [
+     1.02,
+     -6.52,
+     -7.4
+    ]
+   },
+   "east": {
+    "S07": {
+     "nearestLanternUU": 253.9,
+     "nearestWarmUU": 253.9,
+     "zones": [
+      "brown"
+     ],
+     "dL": -0.25,
+     "da": 14.38,
+     "db": 15.83,
+     "dab": 21.39
+    },
+    "S15": {
+     "nearestLanternUU": 266.3,
+     "nearestWarmUU": 266.3,
+     "zones": [
+      "red"
+     ],
+     "dL": 1.44,
+     "da": 14.85,
+     "db": 16.5,
+     "dab": 22.2
+    },
+    "S27": {
+     "nearestLanternUU": 249.2,
+     "nearestWarmUU": 249.2,
+     "zones": [
+      "red"
+     ],
+     "dL": -0.09,
+     "da": 15.48,
+     "db": 16.45,
+     "dab": 22.59
+    }
+   },
+   "allCircles": {
+    "S01": {
+     "nearestLanternUU": 1001.8,
+     "nearestWarmUU": 212.9,
+     "zones": [
+      "green"
+     ],
+     "dL": -2.53,
+     "da": 2.75,
+     "db": 7.94,
+     "dab": 8.4
+    },
+    "S02": {
+     "nearestLanternUU": 900.5,
+     "nearestWarmUU": 287.0,
+     "zones": [
+      "green"
+     ],
+     "dL": -1.64,
+     "da": 0.97,
+     "db": 6.02,
+     "dab": 6.1
+    },
+    "S03": {
+     "nearestLanternUU": 811.5,
+     "nearestWarmUU": 382.3,
+     "zones": [
+      "green"
+     ],
+     "dL": -0.1,
+     "da": 0.08,
+     "db": 5.3,
+     "dab": 5.3
+    },
+    "S04": {
+     "nearestLanternUU": 721.0,
+     "nearestWarmUU": 458.9,
+     "zones": [
+      "green"
+     ],
+     "dL": 0.5,
+     "da": -0.09,
+     "db": 5.28,
+     "dab": 5.28
+    },
+    "S05": {
+     "nearestLanternUU": 608.7,
+     "nearestWarmUU": 572.0,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -1.25,
+     "da": -1.55,
+     "db": -2.33,
+     "dab": 2.8
+    },
+    "S06": {
+     "nearestLanternUU": 330.5,
+     "nearestWarmUU": 330.5,
+     "zones": [
+      "brown"
+     ],
+     "dL": -2.19,
+     "da": 9.26,
+     "db": 12.0,
+     "dab": 15.16
+    },
+    "S07": {
+     "nearestLanternUU": 253.9,
+     "nearestWarmUU": 253.9,
+     "zones": [
+      "brown"
+     ],
+     "dL": -0.25,
+     "da": 14.38,
+     "db": 15.83,
+     "dab": 21.39
+    },
+    "S08": {
+     "nearestLanternUU": 1006.0,
+     "nearestWarmUU": 265.9,
+     "zones": [
+      "green"
+     ],
+     "dL": -2.38,
+     "da": 1.6,
+     "db": 7.2,
+     "dab": 7.37
+    },
+    "S09": {
+     "nearestLanternUU": 917.6,
+     "nearestWarmUU": 324.3,
+     "zones": [
+      "green"
+     ],
+     "dL": -1.3,
+     "da": 0.72,
+     "db": 5.63,
+     "dab": 5.67
+    },
+    "S10": {
+     "nearestLanternUU": 831.2,
+     "nearestWarmUU": 396.0,
+     "zones": [
+      "green"
+     ],
+     "dL": 0.52,
+     "da": 0.21,
+     "db": 5.01,
+     "dab": 5.01
+    },
+    "S11": {
+     "nearestLanternUU": 744.8,
+     "nearestWarmUU": 479.7,
+     "zones": [
+      "green"
+     ],
+     "dL": 1.77,
+     "da": -0.05,
+     "db": 5.04,
+     "dab": 5.04
+    },
+    "S12": {
+     "nearestLanternUU": 642.0,
+     "nearestWarmUU": 575.5,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -1.07,
+     "da": -0.51,
+     "db": -5.16,
+     "dab": 5.19
+    },
+    "S13": {
+     "nearestLanternUU": 558.0,
+     "nearestWarmUU": 558.0,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -0.5,
+     "da": -1.91,
+     "db": -2.34,
+     "dab": 3.02
+    },
+    "S14": {
+     "nearestLanternUU": 386.0,
+     "nearestWarmUU": 386.0,
+     "zones": [
+      "brown"
+     ],
+     "dL": -1.85,
+     "da": 7.39,
+     "db": 10.87,
+     "dab": 13.15
+    },
+    "S15": {
+     "nearestLanternUU": 266.3,
+     "nearestWarmUU": 266.3,
+     "zones": [
+      "red"
+     ],
+     "dL": 1.44,
+     "da": 14.85,
+     "db": 16.5,
+     "dab": 22.2
+    },
+    "S16": {
+     "nearestLanternUU": 475.2,
+     "nearestWarmUU": 475.2,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -0.96,
+     "da": -1.55,
+     "db": -2.32,
+     "dab": 2.79
+    },
+    "S17": {
+     "nearestLanternUU": 249.3,
+     "nearestWarmUU": 249.3,
+     "zones": [
+      "red"
+     ],
+     "dL": 0.74,
+     "da": 14.46,
+     "db": 16.26,
+     "dab": 21.76
+    },
+    "S18": {
+     "nearestLanternUU": 1000.9,
+     "nearestWarmUU": 193.5,
+     "zones": [
+      "blue"
+     ],
+     "dL": -1.59,
+     "da": 10.8,
+     "db": 12.55,
+     "dab": 16.56
+    },
+    "S19": {
+     "nearestLanternUU": 913.2,
+     "nearestWarmUU": 263.2,
+     "zones": [
+      "blue"
+     ],
+     "dL": -4.88,
+     "da": 8.74,
+     "db": 9.4,
+     "dab": 12.84
+    },
+    "S20": {
+     "nearestLanternUU": 822.2,
+     "nearestWarmUU": 361.3,
+     "zones": [
+      "blue"
+     ],
+     "dL": -3.51,
+     "da": 9.42,
+     "db": 14.46,
+     "dab": 17.26
+    },
+    "S21": {
+     "nearestLanternUU": 695.9,
+     "nearestWarmUU": 487.2,
+     "zones": [
+      "yellow",
+      "purple"
+     ],
+     "dL": 3.91,
+     "da": 0.05,
+     "db": -0.88,
+     "dab": 0.89
+    },
+    "S22": {
+     "nearestLanternUU": 403.6,
+     "nearestWarmUU": 403.6,
+     "zones": [
+      "yellow",
+      "brown",
+      "purple"
+     ],
+     "dL": 2.17,
+     "da": 7.33,
+     "db": 10.15,
+     "dab": 12.52
+    },
+    "S23": {
+     "nearestLanternUU": 998.3,
+     "nearestWarmUU": 176.3,
+     "zones": [
+      "blue"
+     ],
+     "dL": -1.72,
+     "da": 11.25,
+     "db": 14.68,
+     "dab": 18.5
+    },
+    "S24": {
+     "nearestLanternUU": 761.6,
+     "nearestWarmUU": 412.2,
+     "zones": [
+      "yellow",
+      "purple"
+     ],
+     "dL": 4.29,
+     "da": 1.38,
+     "db": 0.99,
+     "dab": 1.69
+    },
+    "S25": {
+     "nearestLanternUU": 459.9,
+     "nearestWarmUU": 459.9,
+     "zones": [
+      "yellow",
+      "brown",
+      "purple"
+     ],
+     "dL": -4.91,
+     "da": 2.8,
+     "db": -25.23,
+     "dab": 25.38
+    },
+    "S26": {
+     "nearestLanternUU": 362.0,
+     "nearestWarmUU": 362.0,
+     "zones": [
+      "purple"
+     ],
+     "dL": 1.09,
+     "da": 7.84,
+     "db": 1.66,
+     "dab": 8.01
+    },
+    "S27": {
+     "nearestLanternUU": 249.2,
+     "nearestWarmUU": 249.2,
+     "zones": [
+      "red"
+     ],
+     "dL": -0.09,
+     "da": 15.48,
+     "db": 16.45,
+     "dab": 22.59
+    },
+    "S28": {
+     "nearestLanternUU": 981.3,
+     "nearestWarmUU": 211.2,
+     "zones": [
+      "blue"
+     ],
+     "dL": 0.07,
+     "da": 8.8,
+     "db": 7.93,
+     "dab": 11.84
+    },
+    "S29": {
+     "nearestLanternUU": 900.0,
+     "nearestWarmUU": 272.6,
+     "zones": [
+      "blue"
+     ],
+     "dL": 1.51,
+     "da": 7.44,
+     "db": 6.83,
+     "dab": 10.1
+    },
+    "S30": {
+     "nearestLanternUU": 797.4,
+     "nearestWarmUU": 375.2,
+     "zones": [
+      "purple"
+     ],
+     "dL": 2.64,
+     "da": 3.68,
+     "db": 2.7,
+     "dab": 4.56
+    },
+    "S31": {
+     "nearestLanternUU": 668.5,
+     "nearestWarmUU": 503.7,
+     "zones": [
+      "purple"
+     ],
+     "dL": 4.18,
+     "da": 6.22,
+     "db": 1.89,
+     "dab": 6.5
+    },
+    "S32": {
+     "nearestLanternUU": 492.7,
+     "nearestWarmUU": 492.7,
+     "zones": [
+      "purple"
+     ],
+     "dL": -8.5,
+     "da": 4.44,
+     "db": 2.7,
+     "dab": 5.2
+    },
+    "S33": {
+     "nearestLanternUU": 304.0,
+     "nearestWarmUU": 304.0,
+     "zones": [
+      "red"
+     ],
+     "dL": -3.38,
+     "da": 10.62,
+     "db": 10.44,
+     "dab": 14.89
+    },
+    "S34": {
+     "nearestLanternUU": 873.6,
+     "nearestWarmUU": 326.0,
+     "zones": [
+      "purple"
+     ],
+     "dL": 0.04,
+     "da": 4.05,
+     "db": 2.69,
+     "dab": 4.86
+    },
+    "S35": {
+     "nearestLanternUU": 586.0,
+     "nearestWarmUU": 586.0,
+     "zones": [
+      "purple"
+     ],
+     "dL": 3.03,
+     "da": 7.79,
+     "db": 0.88,
+     "dab": 7.84
+    },
+    "S36": {
+     "nearestLanternUU": 500.9,
+     "nearestWarmUU": 500.9,
+     "zones": [
+      "purple"
+     ],
+     "dL": 1.77,
+     "da": 6.76,
+     "db": 1.0,
+     "dab": 6.83
+    },
+    "S37": {
+     "nearestLanternUU": 386.1,
+     "nearestWarmUU": 386.1,
+     "zones": [
+      "red"
+     ],
+     "dL": -4.92,
+     "da": 7.75,
+     "db": 6.99,
+     "dab": 10.44
+    },
+    "S38": {
+     "nearestLanternUU": 301.1,
+     "nearestWarmUU": 301.1,
+     "zones": [
+      "red"
+     ],
+     "dL": -5.75,
+     "da": 9.9,
+     "db": 8.03,
+     "dab": 12.75
+    }
+   },
+   "lanternBand": {
+    "circlesWithin350uu": [
+     "S06",
+     "S07",
+     "S15",
+     "S17",
+     "S27",
+     "S33",
+     "S38"
+    ],
+    "medianDa": 14.38,
+    "medianDb": 15.83
+   },
+   "label": "p4-editor-bench-K1",
+   "lights": [
+    {
+     "id": "campfire-nw",
+     "loc": [
+      -548.0,
+      -352.0,
+      60.0
+     ],
+     "intensityCd": 65,
+     "radius": 460
+    },
+    {
+     "id": "campfire-w",
+     "loc": [
+      -560.0,
+      85.0,
+      60.0
+     ],
+     "intensityCd": 55,
+     "radius": 420
+    },
+    {
+     "id": "ship-lantern-n",
+     "loc": [
+      598.0,
+      -225.0,
+      150.0
+     ],
+     "intensityCd": 85,
+     "radius": 420
+    },
+    {
+     "id": "ship-lantern-s",
+     "loc": [
+      592.0,
+      0.0,
+      145.0
+     ],
+     "intensityCd": 80,
+     "radius": 400
+    },
+    {
+     "id": "ship-lantern-stern",
+     "loc": [
+      585.0,
+      225.0,
+      140.0
+     ],
+     "intensityCd": 65,
+     "radius": 380
+    }
+   ]
+  },
+  {
+   "frame": "bench-K1-1920x1080.png",
+   "camera": {
+    "pos": [
+     0.0,
+     1342.0,
+     1917.0
+    ],
+    "pitch": -55.0,
+    "yaw": -90.0
+   },
+   "circlesMeasured": 38,
+   "unlitReference": {
+    "circles": [
+     "S04",
+     "S05",
+     "S11",
+     "S12",
+     "S13",
+     "S16",
+     "S21",
+     "S25",
+     "S31",
+     "S32",
+     "S35",
+     "S36"
+    ],
+    "residualLab": [
+     1.02,
+     -6.47,
+     -7.31
+    ]
+   },
+   "east": {
+    "S07": {
+     "nearestLanternUU": 253.9,
+     "nearestWarmUU": 253.9,
+     "zones": [
+      "brown"
+     ],
+     "dL": -0.24,
+     "da": 14.31,
+     "db": 15.82,
+     "dab": 21.33
+    },
+    "S15": {
+     "nearestLanternUU": 266.3,
+     "nearestWarmUU": 266.3,
+     "zones": [
+      "red"
+     ],
+     "dL": 1.46,
+     "da": 14.78,
+     "db": 16.49,
+     "dab": 22.14
+    },
+    "S27": {
+     "nearestLanternUU": 249.2,
+     "nearestWarmUU": 249.2,
+     "zones": [
+      "red"
+     ],
+     "dL": -0.11,
+     "da": 15.48,
+     "db": 16.32,
+     "dab": 22.49
+    }
+   },
+   "allCircles": {
+    "S01": {
+     "nearestLanternUU": 1001.8,
+     "nearestWarmUU": 212.9,
+     "zones": [
+      "green"
+     ],
+     "dL": -2.48,
+     "da": 2.65,
+     "db": 7.87,
+     "dab": 8.3
+    },
+    "S02": {
+     "nearestLanternUU": 900.5,
+     "nearestWarmUU": 287.0,
+     "zones": [
+      "green"
+     ],
+     "dL": -1.59,
+     "da": 0.87,
+     "db": 5.97,
+     "dab": 6.04
+    },
+    "S03": {
+     "nearestLanternUU": 811.5,
+     "nearestWarmUU": 382.3,
+     "zones": [
+      "green"
+     ],
+     "dL": -0.12,
+     "da": -0.02,
+     "db": 5.15,
+     "dab": 5.15
+    },
+    "S04": {
+     "nearestLanternUU": 721.0,
+     "nearestWarmUU": 458.9,
+     "zones": [
+      "green"
+     ],
+     "dL": 0.52,
+     "da": -0.09,
+     "db": 5.19,
+     "dab": 5.19
+    },
+    "S05": {
+     "nearestLanternUU": 608.7,
+     "nearestWarmUU": 572.0,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -1.2,
+     "da": -1.57,
+     "db": -2.44,
+     "dab": 2.9
+    },
+    "S06": {
+     "nearestLanternUU": 330.5,
+     "nearestWarmUU": 330.5,
+     "zones": [
+      "brown"
+     ],
+     "dL": -2.17,
+     "da": 9.16,
+     "db": 11.9,
+     "dab": 15.02
+    },
+    "S07": {
+     "nearestLanternUU": 253.9,
+     "nearestWarmUU": 253.9,
+     "zones": [
+      "brown"
+     ],
+     "dL": -0.24,
+     "da": 14.31,
+     "db": 15.82,
+     "dab": 21.33
+    },
+    "S08": {
+     "nearestLanternUU": 1006.0,
+     "nearestWarmUU": 265.9,
+     "zones": [
+      "green"
+     ],
+     "dL": -2.37,
+     "da": 1.5,
+     "db": 7.15,
+     "dab": 7.3
+    },
+    "S09": {
+     "nearestLanternUU": 917.6,
+     "nearestWarmUU": 324.3,
+     "zones": [
+      "green"
+     ],
+     "dL": -1.24,
+     "da": 0.64,
+     "db": 5.56,
+     "dab": 5.6
+    },
+    "S10": {
+     "nearestLanternUU": 831.2,
+     "nearestWarmUU": 396.0,
+     "zones": [
+      "green"
+     ],
+     "dL": 0.48,
+     "da": 0.11,
+     "db": 4.97,
+     "dab": 4.97
+    },
+    "S11": {
+     "nearestLanternUU": 744.8,
+     "nearestWarmUU": 479.7,
+     "zones": [
+      "green"
+     ],
+     "dL": 1.88,
+     "da": -0.13,
+     "db": 4.99,
+     "dab": 4.99
+    },
+    "S12": {
+     "nearestLanternUU": 642.0,
+     "nearestWarmUU": 575.5,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -1.08,
+     "da": -0.57,
+     "db": -5.3,
+     "dab": 5.33
+    },
+    "S13": {
+     "nearestLanternUU": 558.0,
+     "nearestWarmUU": 558.0,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -0.52,
+     "da": -1.94,
+     "db": -2.39,
+     "dab": 3.08
+    },
+    "S14": {
+     "nearestLanternUU": 386.0,
+     "nearestWarmUU": 386.0,
+     "zones": [
+      "brown"
+     ],
+     "dL": -1.86,
+     "da": 7.33,
+     "db": 10.81,
+     "dab": 13.06
+    },
+    "S15": {
+     "nearestLanternUU": 266.3,
+     "nearestWarmUU": 266.3,
+     "zones": [
+      "red"
+     ],
+     "dL": 1.46,
+     "da": 14.78,
+     "db": 16.49,
+     "dab": 22.14
+    },
+    "S16": {
+     "nearestLanternUU": 475.2,
+     "nearestWarmUU": 475.2,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -0.94,
+     "da": -1.62,
+     "db": -2.38,
+     "dab": 2.88
+    },
+    "S17": {
+     "nearestLanternUU": 249.3,
+     "nearestWarmUU": 249.3,
+     "zones": [
+      "red"
+     ],
+     "dL": 0.74,
+     "da": 14.32,
+     "db": 16.09,
+     "dab": 21.54
+    },
+    "S18": {
+     "nearestLanternUU": 1000.9,
+     "nearestWarmUU": 193.5,
+     "zones": [
+      "blue"
+     ],
+     "dL": -1.63,
+     "da": 10.74,
+     "db": 12.39,
+     "dab": 16.4
+    },
+    "S19": {
+     "nearestLanternUU": 913.2,
+     "nearestWarmUU": 263.2,
+     "zones": [
+      "blue"
+     ],
+     "dL": -5.41,
+     "da": 8.66,
+     "db": 9.47,
+     "dab": 12.83
+    },
+    "S20": {
+     "nearestLanternUU": 822.2,
+     "nearestWarmUU": 361.3,
+     "zones": [
+      "blue"
+     ],
+     "dL": -3.64,
+     "da": 9.33,
+     "db": 14.37,
+     "dab": 17.14
+    },
+    "S21": {
+     "nearestLanternUU": 695.9,
+     "nearestWarmUU": 487.2,
+     "zones": [
+      "yellow",
+      "purple"
+     ],
+     "dL": 3.88,
+     "da": 0.09,
+     "db": -0.79,
+     "dab": 0.8
+    },
+    "S22": {
+     "nearestLanternUU": 403.6,
+     "nearestWarmUU": 403.6,
+     "zones": [
+      "yellow",
+      "brown",
+      "purple"
+     ],
+     "dL": 2.21,
+     "da": 7.33,
+     "db": 10.1,
+     "dab": 12.48
+    },
+    "S23": {
+     "nearestLanternUU": 998.3,
+     "nearestWarmUU": 176.3,
+     "zones": [
+      "blue"
+     ],
+     "dL": -1.69,
+     "da": 11.22,
+     "db": 14.62,
+     "dab": 18.43
+    },
+    "S24": {
+     "nearestLanternUU": 761.6,
+     "nearestWarmUU": 412.2,
+     "zones": [
+      "yellow",
+      "purple"
+     ],
+     "dL": 4.32,
+     "da": 1.37,
+     "db": 0.71,
+     "dab": 1.54
+    },
+    "S25": {
+     "nearestLanternUU": 459.9,
+     "nearestWarmUU": 459.9,
+     "zones": [
+      "yellow",
+      "brown",
+      "purple"
+     ],
+     "dL": -4.67,
+     "da": 2.9,
+     "db": -25.18,
+     "dab": 25.35
+    },
+    "S26": {
+     "nearestLanternUU": 362.0,
+     "nearestWarmUU": 362.0,
+     "zones": [
+      "purple"
+     ],
+     "dL": 1.13,
+     "da": 7.81,
+     "db": 1.54,
+     "dab": 7.96
+    },
+    "S27": {
+     "nearestLanternUU": 249.2,
+     "nearestWarmUU": 249.2,
+     "zones": [
+      "red"
+     ],
+     "dL": -0.11,
+     "da": 15.48,
+     "db": 16.32,
+     "dab": 22.49
+    },
+    "S28": {
+     "nearestLanternUU": 981.3,
+     "nearestWarmUU": 211.2,
+     "zones": [
+      "blue"
+     ],
+     "dL": 0.06,
+     "da": 8.8,
+     "db": 7.83,
+     "dab": 11.78
+    },
+    "S29": {
+     "nearestLanternUU": 900.0,
+     "nearestWarmUU": 272.6,
+     "zones": [
+      "blue"
+     ],
+     "dL": 1.56,
+     "da": 7.41,
+     "db": 6.75,
+     "dab": 10.02
+    },
+    "S30": {
+     "nearestLanternUU": 797.4,
+     "nearestWarmUU": 375.2,
+     "zones": [
+      "purple"
+     ],
+     "dL": 2.64,
+     "da": 3.58,
+     "db": 2.57,
+     "dab": 4.41
+    },
+    "S31": {
+     "nearestLanternUU": 668.5,
+     "nearestWarmUU": 503.7,
+     "zones": [
+      "purple"
+     ],
+     "dL": 4.19,
+     "da": 6.21,
+     "db": 1.71,
+     "dab": 6.45
+    },
+    "S32": {
+     "nearestLanternUU": 492.7,
+     "nearestWarmUU": 492.7,
+     "zones": [
+      "purple"
+     ],
+     "dL": -8.62,
+     "da": 4.41,
+     "db": 2.6,
+     "dab": 5.12
+    },
+    "S33": {
+     "nearestLanternUU": 304.0,
+     "nearestWarmUU": 304.0,
+     "zones": [
+      "red"
+     ],
+     "dL": -3.38,
+     "da": 10.59,
+     "db": 10.27,
+     "dab": 14.75
+    },
+    "S34": {
+     "nearestLanternUU": 873.6,
+     "nearestWarmUU": 326.0,
+     "zones": [
+      "purple"
+     ],
+     "dL": 0.08,
+     "da": 3.97,
+     "db": 2.68,
+     "dab": 4.79
+    },
+    "S35": {
+     "nearestLanternUU": 586.0,
+     "nearestWarmUU": 586.0,
+     "zones": [
+      "purple"
+     ],
+     "dL": 3.02,
+     "da": 7.75,
+     "db": 0.79,
+     "dab": 7.79
+    },
+    "S36": {
+     "nearestLanternUU": 500.9,
+     "nearestWarmUU": 500.9,
+     "zones": [
+      "purple"
+     ],
+     "dL": 1.79,
+     "da": 6.65,
+     "db": 0.91,
+     "dab": 6.71
+    },
+    "S37": {
+     "nearestLanternUU": 386.1,
+     "nearestWarmUU": 386.1,
+     "zones": [
+      "red"
+     ],
+     "dL": -4.9,
+     "da": 7.68,
+     "db": 6.93,
+     "dab": 10.35
+    },
+    "S38": {
+     "nearestLanternUU": 301.1,
+     "nearestWarmUU": 301.1,
+     "zones": [
+      "red"
+     ],
+     "dL": -5.83,
+     "da": 9.79,
+     "db": 7.96,
+     "dab": 12.62
+    }
+   },
+   "lanternBand": {
+    "circlesWithin350uu": [
+     "S06",
+     "S07",
+     "S15",
+     "S17",
+     "S27",
+     "S33",
+     "S38"
+    ],
+    "medianDa": 14.31,
+    "medianDb": 15.82
+   },
+   "label": "p5a-packaged-bench-K1-r1",
+   "lights": [
+    {
+     "id": "campfire-nw",
+     "loc": [
+      -548.0,
+      -352.0,
+      60.0
+     ],
+     "intensityCd": 65,
+     "radius": 460
+    },
+    {
+     "id": "campfire-w",
+     "loc": [
+      -560.0,
+      85.0,
+      60.0
+     ],
+     "intensityCd": 55,
+     "radius": 420
+    },
+    {
+     "id": "ship-lantern-n",
+     "loc": [
+      598.0,
+      -225.0,
+      150.0
+     ],
+     "intensityCd": 85,
+     "radius": 420
+    },
+    {
+     "id": "ship-lantern-s",
+     "loc": [
+      592.0,
+      0.0,
+      145.0
+     ],
+     "intensityCd": 80,
+     "radius": 400
+    },
+    {
+     "id": "ship-lantern-stern",
+     "loc": [
+      585.0,
+      225.0,
+      140.0
+     ],
+     "intensityCd": 65,
+     "radius": 380
+    }
+   ]
+  },
+  {
+   "frame": "bench-K1-1920x1080.png",
+   "camera": {
+    "pos": [
+     0.0,
+     1342.0,
+     1917.0
+    ],
+    "pitch": -55.0,
+    "yaw": -90.0
+   },
+   "circlesMeasured": 38,
+   "unlitReference": {
+    "circles": [
+     "S04",
+     "S05",
+     "S11",
+     "S12",
+     "S13",
+     "S16",
+     "S21",
+     "S25",
+     "S31",
+     "S32",
+     "S35",
+     "S36"
+    ],
+    "residualLab": [
+     1.02,
+     -6.36,
+     -7.44
+    ]
+   },
+   "east": {
+    "S07": {
+     "nearestLanternUU": 253.9,
+     "nearestWarmUU": 253.9,
+     "zones": [
+      "brown"
+     ],
+     "dL": -0.31,
+     "da": 14.24,
+     "db": 15.93,
+     "dab": 21.37
+    },
+    "S15": {
+     "nearestLanternUU": 266.3,
+     "nearestWarmUU": 266.3,
+     "zones": [
+      "red"
+     ],
+     "dL": 1.42,
+     "da": 14.6,
+     "db": 16.59,
+     "dab": 22.1
+    },
+    "S27": {
+     "nearestLanternUU": 249.2,
+     "nearestWarmUU": 249.2,
+     "zones": [
+      "red"
+     ],
+     "dL": -0.07,
+     "da": 15.39,
+     "db": 16.38,
+     "dab": 22.48
+    }
+   },
+   "allCircles": {
+    "S01": {
+     "nearestLanternUU": 1001.8,
+     "nearestWarmUU": 212.9,
+     "zones": [
+      "green"
+     ],
+     "dL": -2.45,
+     "da": 2.55,
+     "db": 8.03,
+     "dab": 8.43
+    },
+    "S02": {
+     "nearestLanternUU": 900.5,
+     "nearestWarmUU": 287.0,
+     "zones": [
+      "green"
+     ],
+     "dL": -1.61,
+     "da": 0.74,
+     "db": 6.16,
+     "dab": 6.2
+    },
+    "S03": {
+     "nearestLanternUU": 811.5,
+     "nearestWarmUU": 382.3,
+     "zones": [
+      "green"
+     ],
+     "dL": -0.28,
+     "da": -0.18,
+     "db": 5.37,
+     "dab": 5.38
+    },
+    "S04": {
+     "nearestLanternUU": 721.0,
+     "nearestWarmUU": 458.9,
+     "zones": [
+      "green"
+     ],
+     "dL": 0.52,
+     "da": -0.21,
+     "db": 5.33,
+     "dab": 5.33
+    },
+    "S05": {
+     "nearestLanternUU": 608.7,
+     "nearestWarmUU": 572.0,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -1.24,
+     "da": -1.65,
+     "db": -2.28,
+     "dab": 2.81
+    },
+    "S06": {
+     "nearestLanternUU": 330.5,
+     "nearestWarmUU": 330.5,
+     "zones": [
+      "brown"
+     ],
+     "dL": -2.22,
+     "da": 9.09,
+     "db": 12.04,
+     "dab": 15.08
+    },
+    "S07": {
+     "nearestLanternUU": 253.9,
+     "nearestWarmUU": 253.9,
+     "zones": [
+      "brown"
+     ],
+     "dL": -0.31,
+     "da": 14.24,
+     "db": 15.93,
+     "dab": 21.37
+    },
+    "S08": {
+     "nearestLanternUU": 1006.0,
+     "nearestWarmUU": 265.9,
+     "zones": [
+      "green"
+     ],
+     "dL": -2.33,
+     "da": 1.43,
+     "db": 7.32,
+     "dab": 7.45
+    },
+    "S09": {
+     "nearestLanternUU": 917.6,
+     "nearestWarmUU": 324.3,
+     "zones": [
+      "green"
+     ],
+     "dL": -1.25,
+     "da": 0.51,
+     "db": 5.72,
+     "dab": 5.74
+    },
+    "S10": {
+     "nearestLanternUU": 831.2,
+     "nearestWarmUU": 396.0,
+     "zones": [
+      "green"
+     ],
+     "dL": 0.5,
+     "da": 0.03,
+     "db": 5.03,
+     "dab": 5.03
+    },
+    "S11": {
+     "nearestLanternUU": 744.8,
+     "nearestWarmUU": 479.7,
+     "zones": [
+      "green"
+     ],
+     "dL": 1.88,
+     "da": -0.22,
+     "db": 5.17,
+     "dab": 5.17
+    },
+    "S12": {
+     "nearestLanternUU": 642.0,
+     "nearestWarmUU": 575.5,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -1.05,
+     "da": -0.66,
+     "db": -5.25,
+     "dab": 5.29
+    },
+    "S13": {
+     "nearestLanternUU": 558.0,
+     "nearestWarmUU": 558.0,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -0.52,
+     "da": -2.06,
+     "db": -2.24,
+     "dab": 3.04
+    },
+    "S14": {
+     "nearestLanternUU": 386.0,
+     "nearestWarmUU": 386.0,
+     "zones": [
+      "brown"
+     ],
+     "dL": -1.8,
+     "da": 7.28,
+     "db": 10.95,
+     "dab": 13.15
+    },
+    "S15": {
+     "nearestLanternUU": 266.3,
+     "nearestWarmUU": 266.3,
+     "zones": [
+      "red"
+     ],
+     "dL": 1.42,
+     "da": 14.6,
+     "db": 16.59,
+     "dab": 22.1
+    },
+    "S16": {
+     "nearestLanternUU": 475.2,
+     "nearestWarmUU": 475.2,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -0.94,
+     "da": -1.73,
+     "db": -2.28,
+     "dab": 2.86
+    },
+    "S17": {
+     "nearestLanternUU": 249.3,
+     "nearestWarmUU": 249.3,
+     "zones": [
+      "red"
+     ],
+     "dL": 0.74,
+     "da": 14.24,
+     "db": 16.26,
+     "dab": 21.62
+    },
+    "S18": {
+     "nearestLanternUU": 1000.9,
+     "nearestWarmUU": 193.5,
+     "zones": [
+      "blue"
+     ],
+     "dL": -1.62,
+     "da": 10.63,
+     "db": 12.51,
+     "dab": 16.42
+    },
+    "S19": {
+     "nearestLanternUU": 913.2,
+     "nearestWarmUU": 263.2,
+     "zones": [
+      "blue"
+     ],
+     "dL": -5.5,
+     "da": 8.58,
+     "db": 9.62,
+     "dab": 12.89
+    },
+    "S20": {
+     "nearestLanternUU": 822.2,
+     "nearestWarmUU": 361.3,
+     "zones": [
+      "blue"
+     ],
+     "dL": -3.63,
+     "da": 9.26,
+     "db": 14.37,
+     "dab": 17.1
+    },
+    "S21": {
+     "nearestLanternUU": 695.9,
+     "nearestWarmUU": 487.2,
+     "zones": [
+      "yellow",
+      "purple"
+     ],
+     "dL": 3.84,
+     "da": 0.21,
+     "db": -0.95,
+     "dab": 0.98
+    },
+    "S22": {
+     "nearestLanternUU": 403.6,
+     "nearestWarmUU": 403.6,
+     "zones": [
+      "yellow",
+      "brown",
+      "purple"
+     ],
+     "dL": 2.24,
+     "da": 7.16,
+     "db": 10.17,
+     "dab": 12.44
+    },
+    "S23": {
+     "nearestLanternUU": 998.3,
+     "nearestWarmUU": 176.3,
+     "zones": [
+      "blue"
+     ],
+     "dL": -1.76,
+     "da": 11.16,
+     "db": 14.58,
+     "dab": 18.36
+    },
+    "S24": {
+     "nearestLanternUU": 761.6,
+     "nearestWarmUU": 412.2,
+     "zones": [
+      "yellow",
+      "purple"
+     ],
+     "dL": 4.27,
+     "da": 1.27,
+     "db": 0.94,
+     "dab": 1.58
+    },
+    "S25": {
+     "nearestLanternUU": 459.9,
+     "nearestWarmUU": 459.9,
+     "zones": [
+      "yellow",
+      "brown",
+      "purple"
+     ],
+     "dL": -4.88,
+     "da": 2.66,
+     "db": -25.15,
+     "dab": 25.29
+    },
+    "S26": {
+     "nearestLanternUU": 362.0,
+     "nearestWarmUU": 362.0,
+     "zones": [
+      "purple"
+     ],
+     "dL": 1.15,
+     "da": 7.76,
+     "db": 1.62,
+     "dab": 7.93
+    },
+    "S27": {
+     "nearestLanternUU": 249.2,
+     "nearestWarmUU": 249.2,
+     "zones": [
+      "red"
+     ],
+     "dL": -0.07,
+     "da": 15.39,
+     "db": 16.38,
+     "dab": 22.48
+    },
+    "S28": {
+     "nearestLanternUU": 981.3,
+     "nearestWarmUU": 211.2,
+     "zones": [
+      "blue"
+     ],
+     "dL": 0.09,
+     "da": 8.67,
+     "db": 7.92,
+     "dab": 11.75
+    },
+    "S29": {
+     "nearestLanternUU": 900.0,
+     "nearestWarmUU": 272.6,
+     "zones": [
+      "blue"
+     ],
+     "dL": 1.56,
+     "da": 7.33,
+     "db": 6.84,
+     "dab": 10.03
+    },
+    "S30": {
+     "nearestLanternUU": 797.4,
+     "nearestWarmUU": 375.2,
+     "zones": [
+      "purple"
+     ],
+     "dL": 2.62,
+     "da": 3.48,
+     "db": 2.69,
+     "dab": 4.4
+    },
+    "S31": {
+     "nearestLanternUU": 668.5,
+     "nearestWarmUU": 503.7,
+     "zones": [
+      "purple"
+     ],
+     "dL": 4.21,
+     "da": 6.07,
+     "db": 1.79,
+     "dab": 6.32
+    },
+    "S32": {
+     "nearestLanternUU": 492.7,
+     "nearestWarmUU": 492.7,
+     "zones": [
+      "purple"
+     ],
+     "dL": -8.47,
+     "da": 4.35,
+     "db": 2.75,
+     "dab": 5.15
+    },
+    "S33": {
+     "nearestLanternUU": 304.0,
+     "nearestWarmUU": 304.0,
+     "zones": [
+      "red"
+     ],
+     "dL": -3.44,
+     "da": 10.49,
+     "db": 10.53,
+     "dab": 14.86
+    },
+    "S34": {
+     "nearestLanternUU": 873.6,
+     "nearestWarmUU": 326.0,
+     "zones": [
+      "purple"
+     ],
+     "dL": 0.04,
+     "da": 3.83,
+     "db": 2.76,
+     "dab": 4.72
+    },
+    "S35": {
+     "nearestLanternUU": 586.0,
+     "nearestWarmUU": 586.0,
+     "zones": [
+      "purple"
+     ],
+     "dL": 3.04,
+     "da": 7.58,
+     "db": 0.95,
+     "dab": 7.64
+    },
+    "S36": {
+     "nearestLanternUU": 500.9,
+     "nearestWarmUU": 500.9,
+     "zones": [
+      "purple"
+     ],
+     "dL": 1.72,
+     "da": 6.55,
+     "db": 1.04,
+     "dab": 6.63
+    },
+    "S37": {
+     "nearestLanternUU": 386.1,
+     "nearestWarmUU": 386.1,
+     "zones": [
+      "red"
+     ],
+     "dL": -4.95,
+     "da": 7.61,
+     "db": 7.1,
+     "dab": 10.4
+    },
+    "S38": {
+     "nearestLanternUU": 301.1,
+     "nearestWarmUU": 301.1,
+     "zones": [
+      "red"
+     ],
+     "dL": -5.72,
+     "da": 9.61,
+     "db": 8.11,
+     "dab": 12.58
+    }
+   },
+   "lanternBand": {
+    "circlesWithin350uu": [
+     "S06",
+     "S07",
+     "S15",
+     "S17",
+     "S27",
+     "S33",
+     "S38"
+    ],
+    "medianDa": 14.24,
+    "medianDb": 15.93
+   },
+   "label": "p5a-packaged-bench-K1-r2",
+   "lights": [
+    {
+     "id": "campfire-nw",
+     "loc": [
+      -548.0,
+      -352.0,
+      60.0
+     ],
+     "intensityCd": 65,
+     "radius": 460
+    },
+    {
+     "id": "campfire-w",
+     "loc": [
+      -560.0,
+      85.0,
+      60.0
+     ],
+     "intensityCd": 55,
+     "radius": 420
+    },
+    {
+     "id": "ship-lantern-n",
+     "loc": [
+      598.0,
+      -225.0,
+      150.0
+     ],
+     "intensityCd": 85,
+     "radius": 420
+    },
+    {
+     "id": "ship-lantern-s",
+     "loc": [
+      592.0,
+      0.0,
+      145.0
+     ],
+     "intensityCd": 80,
+     "radius": 400
+    },
+    {
+     "id": "ship-lantern-stern",
+     "loc": [
+      585.0,
+      225.0,
+      140.0
+     ],
+     "intensityCd": 65,
+     "radius": 380
+    }
+   ]
+  },
+  {
+   "frame": "bench-K1-1920x1080.png",
+   "camera": {
+    "pos": [
+     0.0,
+     1342.0,
+     1917.0
+    ],
+    "pitch": -55.0,
+    "yaw": -90.0
+   },
+   "circlesMeasured": 38,
+   "unlitReference": {
+    "circles": [
+     "S04",
+     "S05",
+     "S11",
+     "S12",
+     "S13",
+     "S16",
+     "S21",
+     "S25",
+     "S31",
+     "S32",
+     "S35",
+     "S36"
+    ],
+    "residualLab": [
+     1.05,
+     -6.46,
+     -7.38
+    ]
+   },
+   "east": {
+    "S07": {
+     "nearestLanternUU": 253.9,
+     "nearestWarmUU": 253.9,
+     "zones": [
+      "brown"
+     ],
+     "dL": -0.27,
+     "da": 14.28,
+     "db": 15.83,
+     "dab": 21.32
+    },
+    "S15": {
+     "nearestLanternUU": 266.3,
+     "nearestWarmUU": 266.3,
+     "zones": [
+      "red"
+     ],
+     "dL": 1.43,
+     "da": 14.8,
+     "db": 16.56,
+     "dab": 22.21
+    },
+    "S27": {
+     "nearestLanternUU": 249.2,
+     "nearestWarmUU": 249.2,
+     "zones": [
+      "red"
+     ],
+     "dL": -0.13,
+     "da": 15.47,
+     "db": 16.41,
+     "dab": 22.55
+    }
+   },
+   "allCircles": {
+    "S01": {
+     "nearestLanternUU": 1001.8,
+     "nearestWarmUU": 212.9,
+     "zones": [
+      "green"
+     ],
+     "dL": -2.51,
+     "da": 2.61,
+     "db": 7.95,
+     "dab": 8.37
+    },
+    "S02": {
+     "nearestLanternUU": 900.5,
+     "nearestWarmUU": 287.0,
+     "zones": [
+      "green"
+     ],
+     "dL": -1.61,
+     "da": 0.85,
+     "db": 6.06,
+     "dab": 6.12
+    },
+    "S03": {
+     "nearestLanternUU": 811.5,
+     "nearestWarmUU": 382.3,
+     "zones": [
+      "green"
+     ],
+     "dL": -0.08,
+     "da": -0.07,
+     "db": 5.26,
+     "dab": 5.26
+    },
+    "S04": {
+     "nearestLanternUU": 721.0,
+     "nearestWarmUU": 458.9,
+     "zones": [
+      "green"
+     ],
+     "dL": 0.52,
+     "da": -0.13,
+     "db": 5.27,
+     "dab": 5.27
+    },
+    "S05": {
+     "nearestLanternUU": 608.7,
+     "nearestWarmUU": 572.0,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -1.24,
+     "da": -1.58,
+     "db": -2.36,
+     "dab": 2.84
+    },
+    "S06": {
+     "nearestLanternUU": 330.5,
+     "nearestWarmUU": 330.5,
+     "zones": [
+      "brown"
+     ],
+     "dL": -2.18,
+     "da": 9.21,
+     "db": 11.98,
+     "dab": 15.11
+    },
+    "S07": {
+     "nearestLanternUU": 253.9,
+     "nearestWarmUU": 253.9,
+     "zones": [
+      "brown"
+     ],
+     "dL": -0.27,
+     "da": 14.28,
+     "db": 15.83,
+     "dab": 21.32
+    },
+    "S08": {
+     "nearestLanternUU": 1006.0,
+     "nearestWarmUU": 265.9,
+     "zones": [
+      "green"
+     ],
+     "dL": -2.42,
+     "da": 1.46,
+     "db": 7.21,
+     "dab": 7.35
+    },
+    "S09": {
+     "nearestLanternUU": 917.6,
+     "nearestWarmUU": 324.3,
+     "zones": [
+      "green"
+     ],
+     "dL": -1.27,
+     "da": 0.62,
+     "db": 5.63,
+     "dab": 5.67
+    },
+    "S10": {
+     "nearestLanternUU": 831.2,
+     "nearestWarmUU": 396.0,
+     "zones": [
+      "green"
+     ],
+     "dL": 0.48,
+     "da": 0.08,
+     "db": 4.98,
+     "dab": 4.98
+    },
+    "S11": {
+     "nearestLanternUU": 744.8,
+     "nearestWarmUU": 479.7,
+     "zones": [
+      "green"
+     ],
+     "dL": 1.86,
+     "da": -0.14,
+     "db": 5.06,
+     "dab": 5.06
+    },
+    "S12": {
+     "nearestLanternUU": 642.0,
+     "nearestWarmUU": 575.5,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -1.09,
+     "da": -0.58,
+     "db": -5.28,
+     "dab": 5.31
+    },
+    "S13": {
+     "nearestLanternUU": 558.0,
+     "nearestWarmUU": 558.0,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -0.52,
+     "da": -1.96,
+     "db": -2.33,
+     "dab": 3.05
+    },
+    "S14": {
+     "nearestLanternUU": 386.0,
+     "nearestWarmUU": 386.0,
+     "zones": [
+      "brown"
+     ],
+     "dL": -1.88,
+     "da": 7.36,
+     "db": 10.92,
+     "dab": 13.17
+    },
+    "S15": {
+     "nearestLanternUU": 266.3,
+     "nearestWarmUU": 266.3,
+     "zones": [
+      "red"
+     ],
+     "dL": 1.43,
+     "da": 14.8,
+     "db": 16.56,
+     "dab": 22.21
+    },
+    "S16": {
+     "nearestLanternUU": 475.2,
+     "nearestWarmUU": 475.2,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -0.97,
+     "da": -1.59,
+     "db": -2.32,
+     "dab": 2.81
+    },
+    "S17": {
+     "nearestLanternUU": 249.3,
+     "nearestWarmUU": 249.3,
+     "zones": [
+      "red"
+     ],
+     "dL": 0.69,
+     "da": 14.34,
+     "db": 16.22,
+     "dab": 21.65
+    },
+    "S18": {
+     "nearestLanternUU": 1000.9,
+     "nearestWarmUU": 193.5,
+     "zones": [
+      "blue"
+     ],
+     "dL": -1.73,
+     "da": 10.73,
+     "db": 12.45,
+     "dab": 16.43
+    },
+    "S19": {
+     "nearestLanternUU": 913.2,
+     "nearestWarmUU": 263.2,
+     "zones": [
+      "blue"
+     ],
+     "dL": -5.52,
+     "da": 8.59,
+     "db": 9.53,
+     "dab": 12.83
+    },
+    "S20": {
+     "nearestLanternUU": 822.2,
+     "nearestWarmUU": 361.3,
+     "zones": [
+      "blue"
+     ],
+     "dL": -3.59,
+     "da": 9.35,
+     "db": 14.67,
+     "dab": 17.39
+    },
+    "S21": {
+     "nearestLanternUU": 695.9,
+     "nearestWarmUU": 487.2,
+     "zones": [
+      "yellow",
+      "purple"
+     ],
+     "dL": 3.86,
+     "da": 0.13,
+     "db": -0.85,
+     "dab": 0.86
+    },
+    "S22": {
+     "nearestLanternUU": 403.6,
+     "nearestWarmUU": 403.6,
+     "zones": [
+      "yellow",
+      "brown",
+      "purple"
+     ],
+     "dL": 2.17,
+     "da": 7.31,
+     "db": 10.05,
+     "dab": 12.43
+    },
+    "S23": {
+     "nearestLanternUU": 998.3,
+     "nearestWarmUU": 176.3,
+     "zones": [
+      "blue"
+     ],
+     "dL": -1.72,
+     "da": 11.16,
+     "db": 14.62,
+     "dab": 18.39
+    },
+    "S24": {
+     "nearestLanternUU": 761.6,
+     "nearestWarmUU": 412.2,
+     "zones": [
+      "yellow",
+      "purple"
+     ],
+     "dL": 4.29,
+     "da": 1.42,
+     "db": 0.9,
+     "dab": 1.68
+    },
+    "S25": {
+     "nearestLanternUU": 459.9,
+     "nearestWarmUU": 459.9,
+     "zones": [
+      "yellow",
+      "brown",
+      "purple"
+     ],
+     "dL": -4.77,
+     "da": 2.81,
+     "db": -24.43,
+     "dab": 24.59
+    },
+    "S26": {
+     "nearestLanternUU": 362.0,
+     "nearestWarmUU": 362.0,
+     "zones": [
+      "purple"
+     ],
+     "dL": 1.15,
+     "da": 7.78,
+     "db": 1.62,
+     "dab": 7.94
+    },
+    "S27": {
+     "nearestLanternUU": 249.2,
+     "nearestWarmUU": 249.2,
+     "zones": [
+      "red"
+     ],
+     "dL": -0.13,
+     "da": 15.47,
+     "db": 16.41,
+     "dab": 22.55
+    },
+    "S28": {
+     "nearestLanternUU": 981.3,
+     "nearestWarmUU": 211.2,
+     "zones": [
+      "blue"
+     ],
+     "dL": 0.04,
+     "da": 8.81,
+     "db": 7.89,
+     "dab": 11.82
+    },
+    "S29": {
+     "nearestLanternUU": 900.0,
+     "nearestWarmUU": 272.6,
+     "zones": [
+      "blue"
+     ],
+     "dL": 1.49,
+     "da": 7.43,
+     "db": 6.8,
+     "dab": 10.07
+    },
+    "S30": {
+     "nearestLanternUU": 797.4,
+     "nearestWarmUU": 375.2,
+     "zones": [
+      "purple"
+     ],
+     "dL": 2.56,
+     "da": 3.62,
+     "db": 2.62,
+     "dab": 4.47
+    },
+    "S31": {
+     "nearestLanternUU": 668.5,
+     "nearestWarmUU": 503.7,
+     "zones": [
+      "purple"
+     ],
+     "dL": 4.19,
+     "da": 6.18,
+     "db": 1.74,
+     "dab": 6.42
+    },
+    "S32": {
+     "nearestLanternUU": 492.7,
+     "nearestWarmUU": 492.7,
+     "zones": [
+      "purple"
+     ],
+     "dL": -8.56,
+     "da": 4.4,
+     "db": 2.64,
+     "dab": 5.13
+    },
+    "S33": {
+     "nearestLanternUU": 304.0,
+     "nearestWarmUU": 304.0,
+     "zones": [
+      "red"
+     ],
+     "dL": -3.44,
+     "da": 10.59,
+     "db": 10.42,
+     "dab": 14.85
+    },
+    "S34": {
+     "nearestLanternUU": 873.6,
+     "nearestWarmUU": 326.0,
+     "zones": [
+      "purple"
+     ],
+     "dL": 0.05,
+     "da": 3.96,
+     "db": 2.75,
+     "dab": 4.82
+    },
+    "S35": {
+     "nearestLanternUU": 586.0,
+     "nearestWarmUU": 586.0,
+     "zones": [
+      "purple"
+     ],
+     "dL": 2.95,
+     "da": 7.78,
+     "db": 0.85,
+     "dab": 7.82
+    },
+    "S36": {
+     "nearestLanternUU": 500.9,
+     "nearestWarmUU": 500.9,
+     "zones": [
+      "purple"
+     ],
+     "dL": 1.82,
+     "da": 6.66,
+     "db": 0.98,
+     "dab": 6.73
+    },
+    "S37": {
+     "nearestLanternUU": 386.1,
+     "nearestWarmUU": 386.1,
+     "zones": [
+      "red"
+     ],
+     "dL": -4.92,
+     "da": 7.67,
+     "db": 6.96,
+     "dab": 10.36
+    },
+    "S38": {
+     "nearestLanternUU": 301.1,
+     "nearestWarmUU": 301.1,
+     "zones": [
+      "red"
+     ],
+     "dL": -5.85,
+     "da": 9.75,
+     "db": 8.04,
+     "dab": 12.64
+    }
+   },
+   "lanternBand": {
+    "circlesWithin350uu": [
+     "S06",
+     "S07",
+     "S15",
+     "S17",
+     "S27",
+     "S33",
+     "S38"
+    ],
+    "medianDa": 14.28,
+    "medianDb": 15.83
+   },
+   "label": "p5a-packaged-bench-K1-r3",
+   "lights": [
+    {
+     "id": "campfire-nw",
+     "loc": [
+      -548.0,
+      -352.0,
+      60.0
+     ],
+     "intensityCd": 65,
+     "radius": 460
+    },
+    {
+     "id": "campfire-w",
+     "loc": [
+      -560.0,
+      85.0,
+      60.0
+     ],
+     "intensityCd": 55,
+     "radius": 420
+    },
+    {
+     "id": "ship-lantern-n",
+     "loc": [
+      598.0,
+      -225.0,
+      150.0
+     ],
+     "intensityCd": 85,
+     "radius": 420
+    },
+    {
+     "id": "ship-lantern-s",
+     "loc": [
+      592.0,
+      0.0,
+      145.0
+     ],
+     "intensityCd": 80,
+     "radius": 400
+    },
+    {
+     "id": "ship-lantern-stern",
+     "loc": [
+      585.0,
+      225.0,
+      140.0
+     ],
+     "intensityCd": 65,
+     "radius": 380
+    }
+   ]
+  },
+  {
+   "frame": "phase2-board-host-1920x1080.png",
+   "camera": {
+    "pos": [
+     0.0,
+     1342.0,
+     1917.0
+    ],
+    "pitch": -55.0,
+    "yaw": -90.0
+   },
+   "circlesMeasured": 38,
+   "unlitReference": {
+    "circles": [
+     "S04",
+     "S05",
+     "S11",
+     "S12",
+     "S13",
+     "S16",
+     "S21",
+     "S25",
+     "S31",
+     "S32",
+     "S35",
+     "S36"
+    ],
+    "residualLab": [
+     0.71,
+     -6.13,
+     -6.33
+    ]
+   },
+   "east": {
+    "S07": {
+     "nearestLanternUU": 253.9,
+     "nearestWarmUU": 253.9,
+     "zones": [
+      "brown"
+     ],
+     "dL": 0.07,
+     "da": 13.94,
+     "db": 14.8,
+     "dab": 20.33
+    },
+    "S15": {
+     "nearestLanternUU": 266.3,
+     "nearestWarmUU": 266.3,
+     "zones": [
+      "red"
+     ],
+     "dL": 1.72,
+     "da": 14.43,
+     "db": 15.42,
+     "dab": 21.12
+    },
+    "S27": {
+     "nearestLanternUU": 249.2,
+     "nearestWarmUU": 249.2,
+     "zones": [
+      "red"
+     ],
+     "dL": 0.2,
+     "da": 15.05,
+     "db": 15.25,
+     "dab": 21.43
+    }
+   },
+   "allCircles": {
+    "S01": {
+     "nearestLanternUU": 1001.8,
+     "nearestWarmUU": 212.9,
+     "zones": [
+      "green"
+     ],
+     "dL": -2.52,
+     "da": 2.76,
+     "db": 7.11,
+     "dab": 7.63
+    },
+    "S02": {
+     "nearestLanternUU": 900.5,
+     "nearestWarmUU": 287.0,
+     "zones": [
+      "green"
+     ],
+     "dL": -1.7,
+     "da": 0.96,
+     "db": 5.4,
+     "dab": 5.49
+    },
+    "S03": {
+     "nearestLanternUU": 811.5,
+     "nearestWarmUU": 382.3,
+     "zones": [
+      "green"
+     ],
+     "dL": -0.51,
+     "da": 0.06,
+     "db": 4.65,
+     "dab": 4.65
+    },
+    "S04": {
+     "nearestLanternUU": 721.0,
+     "nearestWarmUU": 458.9,
+     "zones": [
+      "green"
+     ],
+     "dL": 0.6,
+     "da": 0.01,
+     "db": 4.49,
+     "dab": 4.49
+    },
+    "S05": {
+     "nearestLanternUU": 608.7,
+     "nearestWarmUU": 572.0,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -1.3,
+     "da": -1.85,
+     "db": -3.14,
+     "dab": 3.65
+    },
+    "S06": {
+     "nearestLanternUU": 330.5,
+     "nearestWarmUU": 330.5,
+     "zones": [
+      "brown"
+     ],
+     "dL": -1.87,
+     "da": 8.86,
+     "db": 10.92,
+     "dab": 14.06
+    },
+    "S07": {
+     "nearestLanternUU": 253.9,
+     "nearestWarmUU": 253.9,
+     "zones": [
+      "brown"
+     ],
+     "dL": 0.07,
+     "da": 13.94,
+     "db": 14.8,
+     "dab": 20.33
+    },
+    "S08": {
+     "nearestLanternUU": 1006.0,
+     "nearestWarmUU": 265.9,
+     "zones": [
+      "green"
+     ],
+     "dL": -2.31,
+     "da": 1.61,
+     "db": 6.24,
+     "dab": 6.45
+    },
+    "S09": {
+     "nearestLanternUU": 917.6,
+     "nearestWarmUU": 324.3,
+     "zones": [
+      "green"
+     ],
+     "dL": -1.47,
+     "da": 0.77,
+     "db": 4.94,
+     "dab": 5.0
+    },
+    "S10": {
+     "nearestLanternUU": 831.2,
+     "nearestWarmUU": 396.0,
+     "zones": [
+      "green"
+     ],
+     "dL": 0.44,
+     "da": 0.14,
+     "db": 4.35,
+     "dab": 4.36
+    },
+    "S11": {
+     "nearestLanternUU": 744.8,
+     "nearestWarmUU": 479.7,
+     "zones": [
+      "green"
+     ],
+     "dL": 1.65,
+     "da": -0.01,
+     "db": 4.34,
+     "dab": 4.34
+    },
+    "S12": {
+     "nearestLanternUU": 642.0,
+     "nearestWarmUU": 575.5,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -1.07,
+     "da": -0.87,
+     "db": -5.78,
+     "dab": 5.85
+    },
+    "S13": {
+     "nearestLanternUU": 558.0,
+     "nearestWarmUU": 558.0,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -0.6,
+     "da": -2.26,
+     "db": -3.01,
+     "dab": 3.77
+    },
+    "S14": {
+     "nearestLanternUU": 386.0,
+     "nearestWarmUU": 386.0,
+     "zones": [
+      "brown"
+     ],
+     "dL": -1.49,
+     "da": 7.07,
+     "db": 9.8,
+     "dab": 12.08
+    },
+    "S15": {
+     "nearestLanternUU": 266.3,
+     "nearestWarmUU": 266.3,
+     "zones": [
+      "red"
+     ],
+     "dL": 1.72,
+     "da": 14.43,
+     "db": 15.42,
+     "dab": 21.12
+    },
+    "S16": {
+     "nearestLanternUU": 475.2,
+     "nearestWarmUU": 475.2,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -0.63,
+     "da": -1.93,
+     "db": -3.36,
+     "dab": 3.87
+    },
+    "S17": {
+     "nearestLanternUU": 249.3,
+     "nearestWarmUU": 249.3,
+     "zones": [
+      "red"
+     ],
+     "dL": 1.08,
+     "da": 14.02,
+     "db": 15.09,
+     "dab": 20.59
+    },
+    "S18": {
+     "nearestLanternUU": 1000.9,
+     "nearestWarmUU": 193.5,
+     "zones": [
+      "blue"
+     ],
+     "dL": -0.79,
+     "da": 10.21,
+     "db": 10.86,
+     "dab": 14.91
+    },
+    "S19": {
+     "nearestLanternUU": 913.2,
+     "nearestWarmUU": 263.2,
+     "zones": [
+      "blue"
+     ],
+     "dL": -3.63,
+     "da": 8.21,
+     "db": 8.02,
+     "dab": 11.47
+    },
+    "S20": {
+     "nearestLanternUU": 822.2,
+     "nearestWarmUU": 361.3,
+     "zones": [
+      "blue"
+     ],
+     "dL": -1.1,
+     "da": 9.04,
+     "db": 15.83,
+     "dab": 18.23
+    },
+    "S21": {
+     "nearestLanternUU": 695.9,
+     "nearestWarmUU": 487.2,
+     "zones": [
+      "yellow",
+      "purple"
+     ],
+     "dL": 2.76,
+     "da": -0.26,
+     "db": 3.83,
+     "dab": 3.84
+    },
+    "S22": {
+     "nearestLanternUU": 403.6,
+     "nearestWarmUU": 403.6,
+     "zones": [
+      "yellow",
+      "brown",
+      "purple"
+     ],
+     "dL": 1.36,
+     "da": 7.07,
+     "db": 7.34,
+     "dab": 10.19
+    },
+    "S23": {
+     "nearestLanternUU": 998.3,
+     "nearestWarmUU": 176.3,
+     "zones": [
+      "blue"
+     ],
+     "dL": -1.4,
+     "da": 10.91,
+     "db": 13.24,
+     "dab": 17.16
+    },
+    "S24": {
+     "nearestLanternUU": 761.6,
+     "nearestWarmUU": 412.2,
+     "zones": [
+      "yellow",
+      "purple"
+     ],
+     "dL": 3.37,
+     "da": 0.97,
+     "db": 2.28,
+     "dab": 2.48
+    },
+    "S25": {
+     "nearestLanternUU": 459.9,
+     "nearestWarmUU": 459.9,
+     "zones": [
+      "yellow",
+      "brown",
+      "purple"
+     ],
+     "dL": -3.8,
+     "da": 2.58,
+     "db": -26.33,
+     "dab": 26.46
+    },
+    "S26": {
+     "nearestLanternUU": 362.0,
+     "nearestWarmUU": 362.0,
+     "zones": [
+      "purple"
+     ],
+     "dL": 1.47,
+     "da": 7.46,
+     "db": 0.55,
+     "dab": 7.48
+    },
+    "S27": {
+     "nearestLanternUU": 249.2,
+     "nearestWarmUU": 249.2,
+     "zones": [
+      "red"
+     ],
+     "dL": 0.2,
+     "da": 15.05,
+     "db": 15.25,
+     "dab": 21.43
+    },
+    "S28": {
+     "nearestLanternUU": 981.3,
+     "nearestWarmUU": 211.2,
+     "zones": [
+      "blue"
+     ],
+     "dL": -0.17,
+     "da": 8.61,
+     "db": 6.83,
+     "dab": 10.99
+    },
+    "S29": {
+     "nearestLanternUU": 900.0,
+     "nearestWarmUU": 272.6,
+     "zones": [
+      "blue"
+     ],
+     "dL": 1.35,
+     "da": 7.18,
+     "db": 5.78,
+     "dab": 9.21
+    },
+    "S30": {
+     "nearestLanternUU": 797.4,
+     "nearestWarmUU": 375.2,
+     "zones": [
+      "purple"
+     ],
+     "dL": 2.4,
+     "da": 3.27,
+     "db": 1.76,
+     "dab": 3.71
+    },
+    "S31": {
+     "nearestLanternUU": 668.5,
+     "nearestWarmUU": 503.7,
+     "zones": [
+      "purple"
+     ],
+     "dL": 3.96,
+     "da": 5.85,
+     "db": 0.92,
+     "dab": 5.92
+    },
+    "S32": {
+     "nearestLanternUU": 492.7,
+     "nearestWarmUU": 492.7,
+     "zones": [
+      "purple"
+     ],
+     "dL": -8.06,
+     "da": 3.97,
+     "db": 1.53,
+     "dab": 4.25
+    },
+    "S33": {
+     "nearestLanternUU": 304.0,
+     "nearestWarmUU": 304.0,
+     "zones": [
+      "red"
+     ],
+     "dL": -3.11,
+     "da": 10.28,
+     "db": 9.31,
+     "dab": 13.87
+    },
+    "S34": {
+     "nearestLanternUU": 873.6,
+     "nearestWarmUU": 326.0,
+     "zones": [
+      "purple"
+     ],
+     "dL": -0.04,
+     "da": 3.67,
+     "db": 1.82,
+     "dab": 4.1
+    },
+    "S35": {
+     "nearestLanternUU": 586.0,
+     "nearestWarmUU": 586.0,
+     "zones": [
+      "purple"
+     ],
+     "dL": 3.0,
+     "da": 7.12,
+     "db": 0.07,
+     "dab": 7.12
+    },
+    "S36": {
+     "nearestLanternUU": 500.9,
+     "nearestWarmUU": 500.9,
+     "zones": [
+      "purple"
+     ],
+     "dL": 2.15,
+     "da": 6.24,
+     "db": -0.07,
+     "dab": 6.24
+    },
+    "S37": {
+     "nearestLanternUU": 386.1,
+     "nearestWarmUU": 386.1,
+     "zones": [
+      "red"
+     ],
+     "dL": -4.64,
+     "da": 7.34,
+     "db": 5.86,
+     "dab": 9.39
+    },
+    "S38": {
+     "nearestLanternUU": 301.1,
+     "nearestWarmUU": 301.1,
+     "zones": [
+      "red"
+     ],
+     "dL": -5.5,
+     "da": 9.37,
+     "db": 6.97,
+     "dab": 11.68
+    }
+   },
+   "lanternBand": {
+    "circlesWithin350uu": [
+     "S06",
+     "S07",
+     "S15",
+     "S17",
+     "S27",
+     "S33",
+     "S38"
+    ],
+    "medianDa": 13.94,
+    "medianDb": 14.8
+   },
+   "label": "p5a-packaged-live-K1-host",
+   "lights": [
+    {
+     "id": "campfire-nw",
+     "loc": [
+      -548.0,
+      -352.0,
+      60.0
+     ],
+     "intensityCd": 65,
+     "radius": 460
+    },
+    {
+     "id": "campfire-w",
+     "loc": [
+      -560.0,
+      85.0,
+      60.0
+     ],
+     "intensityCd": 55,
+     "radius": 420
+    },
+    {
+     "id": "ship-lantern-n",
+     "loc": [
+      598.0,
+      -225.0,
+      150.0
+     ],
+     "intensityCd": 85,
+     "radius": 420
+    },
+    {
+     "id": "ship-lantern-s",
+     "loc": [
+      592.0,
+      0.0,
+      145.0
+     ],
+     "intensityCd": 80,
+     "radius": 400
+    },
+    {
+     "id": "ship-lantern-stern",
+     "loc": [
+      585.0,
+      225.0,
+      140.0
+     ],
+     "intensityCd": 65,
+     "radius": 380
+    }
+   ]
+  },
+  {
+   "frame": "phase2-board-joiner-1920x1080.png",
+   "camera": {
+    "pos": [
+     0.0,
+     1342.0,
+     1917.0
+    ],
+    "pitch": -55.0,
+    "yaw": -90.0
+   },
+   "circlesMeasured": 38,
+   "unlitReference": {
+    "circles": [
+     "S04",
+     "S05",
+     "S11",
+     "S12",
+     "S13",
+     "S16",
+     "S21",
+     "S25",
+     "S31",
+     "S32",
+     "S35",
+     "S36"
+    ],
+    "residualLab": [
+     1.06,
+     -6.48,
+     -7.41
+    ]
+   },
+   "east": {
+    "S07": {
+     "nearestLanternUU": 253.9,
+     "nearestWarmUU": 253.9,
+     "zones": [
+      "brown"
+     ],
+     "dL": -0.28,
+     "da": 14.31,
+     "db": 15.86,
+     "dab": 21.36
+    },
+    "S15": {
+     "nearestLanternUU": 266.3,
+     "nearestWarmUU": 266.3,
+     "zones": [
+      "red"
+     ],
+     "dL": 1.42,
+     "da": 14.72,
+     "db": 16.53,
+     "dab": 22.13
+    },
+    "S27": {
+     "nearestLanternUU": 249.2,
+     "nearestWarmUU": 249.2,
+     "zones": [
+      "red"
+     ],
+     "dL": -0.07,
+     "da": 15.45,
+     "db": 16.4,
+     "dab": 22.54
+    }
+   },
+   "allCircles": {
+    "S01": {
+     "nearestLanternUU": 1001.8,
+     "nearestWarmUU": 212.9,
+     "zones": [
+      "green"
+     ],
+     "dL": -2.51,
+     "da": 2.64,
+     "db": 7.93,
+     "dab": 8.36
+    },
+    "S02": {
+     "nearestLanternUU": 900.5,
+     "nearestWarmUU": 287.0,
+     "zones": [
+      "green"
+     ],
+     "dL": -1.62,
+     "da": 0.82,
+     "db": 6.13,
+     "dab": 6.19
+    },
+    "S03": {
+     "nearestLanternUU": 811.5,
+     "nearestWarmUU": 382.3,
+     "zones": [
+      "green"
+     ],
+     "dL": -0.13,
+     "da": -0.04,
+     "db": 5.37,
+     "dab": 5.37
+    },
+    "S04": {
+     "nearestLanternUU": 721.0,
+     "nearestWarmUU": 458.9,
+     "zones": [
+      "green"
+     ],
+     "dL": 0.55,
+     "da": -0.13,
+     "db": 5.36,
+     "dab": 5.36
+    },
+    "S05": {
+     "nearestLanternUU": 608.7,
+     "nearestWarmUU": 572.0,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -1.26,
+     "da": -1.58,
+     "db": -2.43,
+     "dab": 2.9
+    },
+    "S06": {
+     "nearestLanternUU": 330.5,
+     "nearestWarmUU": 330.5,
+     "zones": [
+      "brown"
+     ],
+     "dL": -2.24,
+     "da": 9.25,
+     "db": 12.0,
+     "dab": 15.15
+    },
+    "S07": {
+     "nearestLanternUU": 253.9,
+     "nearestWarmUU": 253.9,
+     "zones": [
+      "brown"
+     ],
+     "dL": -0.28,
+     "da": 14.31,
+     "db": 15.86,
+     "dab": 21.36
+    },
+    "S08": {
+     "nearestLanternUU": 1006.0,
+     "nearestWarmUU": 265.9,
+     "zones": [
+      "green"
+     ],
+     "dL": -2.33,
+     "da": 1.52,
+     "db": 7.1,
+     "dab": 7.26
+    },
+    "S09": {
+     "nearestLanternUU": 917.6,
+     "nearestWarmUU": 324.3,
+     "zones": [
+      "green"
+     ],
+     "dL": -1.28,
+     "da": 0.67,
+     "db": 5.64,
+     "dab": 5.68
+    },
+    "S10": {
+     "nearestLanternUU": 831.2,
+     "nearestWarmUU": 396.0,
+     "zones": [
+      "green"
+     ],
+     "dL": -0.2,
+     "da": 0.74,
+     "db": 4.6,
+     "dab": 4.66
+    },
+    "S11": {
+     "nearestLanternUU": 744.8,
+     "nearestWarmUU": 479.7,
+     "zones": [
+      "green"
+     ],
+     "dL": 1.88,
+     "da": -0.11,
+     "db": 5.09,
+     "dab": 5.1
+    },
+    "S12": {
+     "nearestLanternUU": 642.0,
+     "nearestWarmUU": 575.5,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -1.1,
+     "da": -0.57,
+     "db": -5.31,
+     "dab": 5.34
+    },
+    "S13": {
+     "nearestLanternUU": 558.0,
+     "nearestWarmUU": 558.0,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -0.55,
+     "da": -1.97,
+     "db": -2.32,
+     "dab": 3.04
+    },
+    "S14": {
+     "nearestLanternUU": 386.0,
+     "nearestWarmUU": 386.0,
+     "zones": [
+      "brown"
+     ],
+     "dL": -1.84,
+     "da": 7.4,
+     "db": 10.91,
+     "dab": 13.19
+    },
+    "S15": {
+     "nearestLanternUU": 266.3,
+     "nearestWarmUU": 266.3,
+     "zones": [
+      "red"
+     ],
+     "dL": 1.42,
+     "da": 14.72,
+     "db": 16.53,
+     "dab": 22.13
+    },
+    "S16": {
+     "nearestLanternUU": 475.2,
+     "nearestWarmUU": 475.2,
+     "zones": [
+      "yellow"
+     ],
+     "dL": -0.98,
+     "da": -1.62,
+     "db": -2.28,
+     "dab": 2.8
+    },
+    "S17": {
+     "nearestLanternUU": 249.3,
+     "nearestWarmUU": 249.3,
+     "zones": [
+      "red"
+     ],
+     "dL": 0.76,
+     "da": 14.37,
+     "db": 16.19,
+     "dab": 21.65
+    },
+    "S18": {
+     "nearestLanternUU": 1000.9,
+     "nearestWarmUU": 193.5,
+     "zones": [
+      "blue"
+     ],
+     "dL": -1.11,
+     "da": 10.54,
+     "db": 12.0,
+     "dab": 15.97
+    },
+    "S19": {
+     "nearestLanternUU": 913.2,
+     "nearestWarmUU": 263.2,
+     "zones": [
+      "blue"
+     ],
+     "dL": -4.89,
+     "da": 8.63,
+     "db": 9.3,
+     "dab": 12.69
+    },
+    "S20": {
+     "nearestLanternUU": 822.2,
+     "nearestWarmUU": 361.3,
+     "zones": [
+      "blue"
+     ],
+     "dL": -3.17,
+     "da": 9.4,
+     "db": 14.26,
+     "dab": 17.07
+    },
+    "S21": {
+     "nearestLanternUU": 695.9,
+     "nearestWarmUU": 487.2,
+     "zones": [
+      "yellow",
+      "purple"
+     ],
+     "dL": 3.84,
+     "da": 0.11,
+     "db": -0.92,
+     "dab": 0.92
+    },
+    "S22": {
+     "nearestLanternUU": 403.6,
+     "nearestWarmUU": 403.6,
+     "zones": [
+      "yellow",
+      "brown",
+      "purple"
+     ],
+     "dL": 1.01,
+     "da": 7.4,
+     "db": 8.43,
+     "dab": 11.22
+    },
+    "S23": {
+     "nearestLanternUU": 998.3,
+     "nearestWarmUU": 176.3,
+     "zones": [
+      "blue"
+     ],
+     "dL": -1.5,
+     "da": 11.19,
+     "db": 14.36,
+     "dab": 18.21
+    },
+    "S24": {
+     "nearestLanternUU": 761.6,
+     "nearestWarmUU": 412.2,
+     "zones": [
+      "yellow",
+      "purple"
+     ],
+     "dL": 4.29,
+     "da": 1.31,
+     "db": 0.92,
+     "dab": 1.6
+    },
+    "S25": {
+     "nearestLanternUU": 459.9,
+     "nearestWarmUU": 459.9,
+     "zones": [
+      "yellow",
+      "brown",
+      "purple"
+     ],
+     "dL": -4.23,
+     "da": 2.82,
+     "db": -24.78,
+     "dab": 24.94
+    },
+    "S26": {
+     "nearestLanternUU": 362.0,
+     "nearestWarmUU": 362.0,
+     "zones": [
+      "purple"
+     ],
+     "dL": 1.11,
+     "da": 7.84,
+     "db": 1.66,
+     "dab": 8.01
+    },
+    "S27": {
+     "nearestLanternUU": 249.2,
+     "nearestWarmUU": 249.2,
+     "zones": [
+      "red"
+     ],
+     "dL": -0.07,
+     "da": 15.45,
+     "db": 16.4,
+     "dab": 22.54
+    },
+    "S28": {
+     "nearestLanternUU": 981.3,
+     "nearestWarmUU": 211.2,
+     "zones": [
+      "blue"
+     ],
+     "dL": 0.12,
+     "da": 8.78,
+     "db": 7.81,
+     "dab": 11.75
+    },
+    "S29": {
+     "nearestLanternUU": 900.0,
+     "nearestWarmUU": 272.6,
+     "zones": [
+      "blue"
+     ],
+     "dL": 1.64,
+     "da": 7.42,
+     "db": 6.81,
+     "dab": 10.08
+    },
+    "S30": {
+     "nearestLanternUU": 797.4,
+     "nearestWarmUU": 375.2,
+     "zones": [
+      "purple"
+     ],
+     "dL": 2.61,
+     "da": 3.56,
+     "db": 2.6,
+     "dab": 4.41
+    },
+    "S31": {
+     "nearestLanternUU": 668.5,
+     "nearestWarmUU": 503.7,
+     "zones": [
+      "purple"
+     ],
+     "dL": 4.19,
+     "da": 6.25,
+     "db": 1.78,
+     "dab": 6.5
+    },
+    "S32": {
+     "nearestLanternUU": 492.7,
+     "nearestWarmUU": 492.7,
+     "zones": [
+      "purple"
+     ],
+     "dL": -8.43,
+     "da": 4.38,
+     "db": 2.52,
+     "dab": 5.05
+    },
+    "S33": {
+     "nearestLanternUU": 304.0,
+     "nearestWarmUU": 304.0,
+     "zones": [
+      "red"
+     ],
+     "dL": -3.45,
+     "da": 10.57,
+     "db": 10.47,
+     "dab": 14.88
+    },
+    "S34": {
+     "nearestLanternUU": 873.6,
+     "nearestWarmUU": 326.0,
+     "zones": [
+      "purple"
+     ],
+     "dL": 0.05,
+     "da": 4.04,
+     "db": 2.7,
+     "dab": 4.86
+    },
+    "S35": {
+     "nearestLanternUU": 586.0,
+     "nearestWarmUU": 586.0,
+     "zones": [
+      "purple"
+     ],
+     "dL": 3.11,
+     "da": 7.74,
+     "db": 0.92,
+     "dab": 7.8
+    },
+    "S36": {
+     "nearestLanternUU": 500.9,
+     "nearestWarmUU": 500.9,
+     "zones": [
+      "purple"
+     ],
+     "dL": 1.77,
+     "da": 6.61,
+     "db": 1.0,
+     "dab": 6.68
+    },
+    "S37": {
+     "nearestLanternUU": 386.1,
+     "nearestWarmUU": 386.1,
+     "zones": [
+      "red"
+     ],
+     "dL": -4.97,
+     "da": 7.66,
+     "db": 6.99,
+     "dab": 10.37
+    },
+    "S38": {
+     "nearestLanternUU": 301.1,
+     "nearestWarmUU": 301.1,
+     "zones": [
+      "red"
+     ],
+     "dL": -5.85,
+     "da": 9.73,
+     "db": 8.06,
+     "dab": 12.64
+    }
+   },
+   "lanternBand": {
+    "circlesWithin350uu": [
+     "S06",
+     "S07",
+     "S15",
+     "S17",
+     "S27",
+     "S33",
+     "S38"
+    ],
+    "medianDa": 14.31,
+    "medianDb": 15.86
+   },
+   "label": "p5a-packaged-live-K1-joiner",
+   "lights": [
+    {
+     "id": "campfire-nw",
+     "loc": [
+      -548.0,
+      -352.0,
+      60.0
+     ],
+     "intensityCd": 65,
+     "radius": 460
+    },
+    {
+     "id": "campfire-w",
+     "loc": [
+      -560.0,
+      85.0,
+      60.0
+     ],
+     "intensityCd": 55,
+     "radius": 420
+    },
+    {
+     "id": "ship-lantern-n",
+     "loc": [
+      598.0,
+      -225.0,
+      150.0
+     ],
+     "intensityCd": 85,
+     "radius": 420
+    },
+    {
+     "id": "ship-lantern-s",
+     "loc": [
+      592.0,
+      0.0,
+      145.0
+     ],
+     "intensityCd": 80,
+     "radius": 400
+    },
+    {
+     "id": "ship-lantern-stern",
+     "loc": [
+      585.0,
+      225.0,
+      140.0
+     ],
+     "intensityCd": 65,
+     "radius": 380
+    }
+   ]
+  }
+ ]
+}

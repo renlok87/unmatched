@@ -21,7 +21,9 @@ its start. A position before seq N is the 'to' of its last CUE with seq < N.
   result  one VICTORY + one DEFEAT 'RESULT seq=' line and a GAME_ENDED row.
 
 Usage: python tools/s09/xcheck_graph_duel.py --host-trace H --joiner-trace J [--json OUT]
-Exit 0 only if every maneuver step is linked, traces agree, >= 1 ranged non-adjacent attack and the result holds.
+                                             [--require-ranged-attacker ID ...]
+Exit 0 only if every maneuver step is linked, traces agree, >= 1 ranged non-adjacent attack (and >= 1 by every
+--require-ranged-attacker fighter, ENV-MAPS P5a joiner attack plan) and the result holds.
 """
 from __future__ import annotations
 
@@ -58,6 +60,8 @@ def main() -> int:
     ap.add_argument("--host-trace", required=True)
     ap.add_argument("--joiner-trace", required=True)
     ap.add_argument("--json")
+    ap.add_argument("--require-ranged-attacker", action="append", metavar="FIGHTER_ID", default=[],
+                    help="also require >= 1 ranged non-adjacent server attack BY this fighter (P5a: f-1-sk0 = Merlin)")
     a = ap.parse_args()
     ht = Path(a.host_trace).read_text(encoding="utf-8-sig", errors="replace")
     jt = Path(a.joiner_trace).read_text(encoding="utf-8-sig", errors="replace")
@@ -130,6 +134,10 @@ def main() -> int:
                         "rangedNonAdjacent": (not linked) and bool(shared),
                         "attackerKind": RANGED_HEROES.get(inp["attackerId"], "melee")})
     ranged = [x for x in attacks if x["rangedNonAdjacent"]]
+    by_attacker: dict = {}
+    for x in ranged:
+        by_attacker[x["attacker"]] = by_attacker.get(x["attacker"], 0) + 1
+    missing_attackers = [f for f in a.require_ranged_attacker if not by_attacker.get(f)]
     illegal = [x for x in attacks if not x["linked"] and (not x["sharedZones"] or x["attackerKind"] == "melee")]
 
     rh, rj = RESULT.findall(ht), RESULT.findall(jt)
@@ -142,17 +150,21 @@ def main() -> int:
            "cueDisagreements": disagree,
            "maneuver": {"moves": len(moves), "steps": steps, "violations": bad, "detail": moves},
            "nonManeuverMoves": other,
-           "attacks": {"total": len(attacks), "rangedNonAdjacent": len(ranged), "illegalLooking": illegal,
+           "attacks": {"total": len(attacks), "rangedNonAdjacent": len(ranged), "rangedByAttacker": by_attacker,
+                       "requiredRangedAttackers": a.require_ranged_attacker,
+                       "missingRangedAttackers": missing_attackers, "illegalLooking": illegal,
                        "detail": attacks},
            "result": {"host": rh[-1] if rh else None, "joiner": rj[-1] if rj else None,
                       "gameEndedRows": len(ended), "ok": result_ok}}
-    ok = not problems and not disagree and bad == 0 and moves and ranged and not illegal and result_ok
+    ok = (not problems and not disagree and bad == 0 and moves and ranged and not illegal and result_ok
+          and not missing_attackers)
     out["ok"] = bool(ok)
     if a.json:
         Path(a.json).write_text(json.dumps(out, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
     print(json.dumps({k: out[k] for k in ("gameId", "map", "cueMoves", "cueSeenByBoth", "ok")} |
                      {"maneuverMoves": len(moves), "steps": steps, "violations": bad, "nonManeuverMoves": len(other),
-                      "attacks": len(attacks), "rangedNonAdjacent": len(ranged), "illegalLooking": len(illegal),
+                      "attacks": len(attacks), "rangedNonAdjacent": len(ranged), "rangedByAttacker": by_attacker,
+                      "missingRangedAttackers": missing_attackers, "illegalLooking": len(illegal),
                       "result": out["result"]}, ensure_ascii=False))
     return 0 if ok else 1
 

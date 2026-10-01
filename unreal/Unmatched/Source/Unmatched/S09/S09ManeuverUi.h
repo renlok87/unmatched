@@ -142,6 +142,40 @@ public:
   static TArray<FString> LegalAttackTargets(const FS08BoardModel& Board,
                                             const TArray<FS08BoardFighter>& Fighters,
                                             const FString& AttackerId);
+  /** One S09AUTO auto-attack candidate: an own attacker and the ONE target
+   *  the driver offers it (positions only - the draft gates re-check). */
+  struct FAutoAttackPick {
+    FString AttackerId;
+    FString TargetId;
+    bool bZoneOnly = false; // legal only through a shared zone (ranged, not linked)
+  };
+  /** S09AUTO auto-attack order (pure; the driver tries the picks in order
+   *  with SelectAttacker/SelectTarget and takes the first that passes).
+   *  For every living fighter of ViewerId in Fighters order: the first
+   *  living enemy on an ADJACENT cell (a link on an original-map board,
+   *  manhattan 1 on a grid); when it has none and the board carries a space
+   *  topology, the first living enemy it may hit only through a shared zone
+   *  (ranged attackers, ENV-O6). Grids keep the melee-only auto pick.
+   *  bPreferRanged (opt-in '-S09Combat=...+ranged' plan token, ENV-MAPS
+   *  P5a: the joiner's Merlin proof) moves the zone-only picks ahead of the
+   *  adjacent ones, keeping the relative order inside both groups; without
+   *  it the order is exactly the pre-P5a driver loop. */
+  static TArray<FAutoAttackPick> AutoAttackPicks(const FS08BoardModel& Board,
+                                                 const TArray<FS08BoardFighter>& Fighters,
+                                                 const FString& ViewerId, bool bPreferRanged);
+  /** S09AUTO 'ranged' plan maneuver (ENV-MAPS P5a, original-map boards
+   *  only): a destination from where the RANGED mover has a zone-only
+   *  target - no living enemy on a linked space, at least one living enemy
+   *  sharing a zone. False (stay) when the mover is not ranged / dead, the
+   *  board has no topology, its own cell already is such a position, or no
+   *  legal destination qualifies. Candidates are ComputeReachableCells
+   *  (Allowance; the same traversal/endpoint rules as every draft move)
+   *  minus Reserved (endpoints of the other moves of the same draft); the
+   *  pick is the fewest steps (BuildManeuverPath), then lower Y, lower X.
+   *  OutTargetId = the first such enemy in Fighters order. */
+  static bool PickRangedPosition(const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters,
+                                 const FString& MoverId, int32 Allowance, const TSet<uint64>& Reserved,
+                                 FIntPoint& OutCell, int32& OutSteps, FString& OutTargetId);
 
   ES09CommandMode Mode = ES09CommandMode::None;
 

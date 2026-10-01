@@ -1,0 +1,86 @@
+art board: profile=sarpedon-original size=9x6 light=sarpedon-night map=True
+staged GameUserSettings -> 1920x1080 (windowed): C:\tmp\wt-envmaps\unreal\Unmatched\Saved\StagedBuilds\Windows\Unmatched\Saved\Config\Windows\GameUserSettings.ini
+heroA=cmuhgvgke00skwi9glfew6898 heroB=cmuhgvghu00oawi9gv9ehihmg
+staging: C:\Users\ren\AppData\Local\Temp\s09-combat-20261001-115008-24636
+combat plans: host=attack+defend+ownresult joiner=attack+ranged+defend+resolve
+host pid=56480
+room created by this run (code redacted from output; id=cmup6cvy300ozwi9o9iiyl6ot)
+art board id verified against the authoritative game row
+joiner pid=56072
+both clients exited
+markers joiner: defense(def=1729 atk=0 res=0 rst=0) resolve(res=2590 def=0 rst=0) result(rst=2387 res=0 def=0) host: result(rst=2366 res=0 def=0)
+heroes v2 host: figures=6 idle=6 clips Idle=20 LungeAttack=7 HitReact=7 DeathSettle=1
+heroes v2 joiner: figures=6 idle=6 clips Idle=20 LungeAttack=7 HitReact=7 DeathSettle=1
+render fingerprint host: shots=13 gated=12 offReference=0 lobbyShots=1 preset=High
+render fingerprint joiner: shots=14 gated=13 offReference=0 lobbyShots=1 preset=High
+joiner attack plan: joiner attacks done=2 ranged picks=6; host attacks done=5 defenses=2
+reveal markers joiner: resolve(res=2373) reveal(rvl=3032 def=0 rst=0)
+WARN: scheme not played this run (no legal card/action left) - not a gate
+convergence: host maxSeq=40 joiner maxSeq=40
+GAME_OVER gate ok: row FINISHED, winner seat=host (host VICTORY, joiner DEFEAT), result seq host=40 joiner=40
+damage-combat frame: host has none (no damage CUE on the combat target while its number was painted)
+shot captured host s09-combat-result.png: frame=772 lateFrame=772 px=1920x1080 sha256=51f28a4c720e
+shot captured joiner s09-combat-defense-open.png: frame=472 lateFrame=472 px=1920x1080 sha256=68d5f185fc89
+shot captured joiner s09-combat-resolve-window.png: frame=477 lateFrame=477 px=1920x1080 sha256=8474e7d2ec36
+shot captured joiner s09-combat-result.png: frame=598 lateFrame=598 px=1920x1080 sha256=0f7243e3eea4
+shot captured joiner s09-combat-resolve-revealed.png: frame=482 lateFrame=482 px=1920x1080 sha256=15658560e82d
+shot captured joiner s09-damage-number.png: frame=601 lateFrame=601 px=1920x1080 sha256=bd897d8d7098
+shot captured joiner s09-damage-combat.png: frame=602 lateFrame=602 px=1920x1080 sha256=a5a51795d83c
+published evidence run dir: C:\tmp\wt-envmaps\docs\game-design\evidence\ENV-MAPS\p5a-verify-2026-10-01\live\sarpedon\k3\combat-20261001-115008 (pointer: latest-combat.json)
+--- host trace (combat tail) ---
+
+2026.10.01-06.50.49 MODE seq=39 mode=6 combat=1 pending=1
+2026.10.01-06.50.49 HUD seq=39 phase=COMBAT_RESOLVE turn=you hand=3 oppHand=4(hidden) oppDeck=20~ deck=20~ discard=7
+2026.10.01-06.50.49 WS seq=39 phase=COMBAT_RESOLVE (apply)
+2026.10.01-06.50.49 S09AUTO drive mode=6 plan=[attack+defend+ownresult] phase=COMBAT_RESOLVE turn=cmuhntivg0000wib0anhq
+yswc
+2026.10.01-06.50.49 S09AUTO boost choice - holding 4s for the other seat's reveal capture
+2026.10.01-06.50.49 ICON fighter=f-1-hero bbox=(1151,754,1183,786) size=32 src=combat anchor=right fallback=0 overlapPx
+2=0 texture=/Game/ArtTests/ARTMarkers/Textures/T_UI_Action_AttackToken_32
+2026.10.01-06.50.53 PEND-RESOLVE sent type=BOOST_CHOICE stage=0 id=cmuhgvgkf00smwi9gaeymh3ur-during-0-boost-38
+2026.10.01-06.50.53 S09AUTO pending picked (type=BOOST_CHOICE stage=0)
+2026.10.01-06.50.53 ICON fighter=f-1-hero bbox=(1151,754,1183,786) size=32 src=combat anchor=right fallback=0 overlapPx
+2=0 texture=/Game/ArtTests/ARTMarkers/Textures/T_UI_Action_AttackToken_32
+2026.10.01-06.50.53 COMBAT-RESULT seq=40 damage=5 role=attacked
+2026.10.01-06.50.53 ARTPREVIEW combat marker fighter=Medusa attacker=0 target=0 icon=0 targetMesh=SM_Marker_TargetRing 
+iconMode=screen targetArcScaleXY=0.920
+2026.10.01-06.50.53 ARTPREVIEW combat marker fighter=King Arthur attacker=0 target=0 icon=0 targetMesh=SM_Marker_Target
+Ring iconMode=screen targetArcScaleXY=0.920
+2026.10.01-06.50.53 MODE seq=40 mode=0 combat=1 pending=1
+2026.10.01-06.50.53 PEND resolve done seq=40 (apply) phase=GAME_OVER
+2026.10.01-06.50.53 MODE seq=40 mode=0 combat=1 pending=1
+2026.10.01-06.50.55 S09AUTO result-screen shot
+2026.10.01-06.50.55 SHOT requested: FScreenshotRequest(bShowUI) -> C:\Users\ren\AppData\Local\Temp\s09-combat-20261001-
+115008-24636\host/s09-result-screen.png
+2026.10.01-06.50.59 S09AUTO lobby-return shot
+2026.10.01-06.50.59 SHOT requested: FScreenshotRequest(bShowUI) -> C:\Users\ren\AppData\Local\Temp\s09-combat-20261001-
+115008-24636\host/s09-lobby-return.png
+2026.10.01-06.50.59 S09AUTO duel flow complete (GAME_OVER -> result shown -> lobby return) - exiting
+--- joiner trace (combat tail) ---
+2026.10.01-06.50.52 S09AUTO resolve
+2026.10.01-06.50.52 S09AUTO resolve
+2026.10.01-06.50.52 S09AUTO resolve
+2026.10.01-06.50.52 S09AUTO resolve
+2026.10.01-06.50.52 S09AUTO resolve
+2026.10.01-06.50.53 S09AUTO resolve
+2026.10.01-06.50.53 S09AUTO resolve
+2026.10.01-06.50.53 S09AUTO resolve
+2026.10.01-06.50.53 S09AUTO resolve
+2026.10.01-06.50.53 S09AUTO resolve
+2026.10.01-06.50.53 S09AUTO resolve
+2026.10.01-06.50.53 COMBAT-RESULT seq=40 damage=5 role=defended
+2026.10.01-06.50.53 ARTPREVIEW combat marker fighter=Medusa attacker=0 target=0 icon=0 targetMesh=SM_Marker_TargetRing 
+iconMode=screen targetArcScaleXY=0.920
+2026.10.01-06.50.53 ARTPREVIEW combat marker fighter=King Arthur attacker=0 target=0 icon=0 targetMesh=SM_Marker_Target
+Ring iconMode=screen targetArcScaleXY=0.920
+2026.10.01-06.50.53 MODE seq=40 mode=0 combat=1 pending=1
+2026.10.01-06.50.55 S09AUTO result-screen shot
+2026.10.01-06.50.55 SHOT requested: FScreenshotRequest(bShowUI) -> C:\Users\ren\AppData\Local\Temp\s09-combat-20261001-
+115008-24636\joiner/s09-result-screen.png
+2026.10.01-06.50.59 S09AUTO lobby-return shot
+2026.10.01-06.50.59 SHOT requested: FScreenshotRequest(bShowUI) -> C:\Users\ren\AppData\Local\Temp\s09-combat-20261001-
+115008-24636\joiner/s09-lobby-return.png
+2026.10.01-06.50.59 S09AUTO duel flow complete (GAME_OVER -> result shown -> lobby return) - exiting
+cleanup: game cmup6cvy300ozwi9o9iiyl6ot already terminal (FINISHED)
+
+

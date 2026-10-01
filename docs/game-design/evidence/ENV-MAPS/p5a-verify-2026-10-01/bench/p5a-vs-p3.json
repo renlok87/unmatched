@@ -1,0 +1,2140 @@
+{
+ "schema": "unmatched.envmaps-p5a-vs-p3-bench/1",
+ "rule": "|delta| > 2 x max(noise of 3 repeats) = significant",
+ "boards": {
+  "cobble": {
+   "K1": {
+    "gpuMsAvg": {
+     "p3": 1.823,
+     "p5a": 1.857,
+     "delta": 0.034,
+     "pct": 1.9,
+     "threshold2xNoise": 0.02,
+     "significant": true
+    },
+    "gpuMsP95": {
+     "p3": 1.89,
+     "p5a": 1.923,
+     "delta": 0.033,
+     "pct": 1.7,
+     "threshold2xNoise": 0.04,
+     "significant": false
+    },
+    "fps": {
+     "p3": 241.153,
+     "p5a": 158.677,
+     "delta": -82.476,
+     "pct": -34.2,
+     "threshold2xNoise": 10.94,
+     "significant": true
+    },
+    "frameMsAvg": {
+     "p3": 4.147,
+     "p5a": 6.3,
+     "delta": 2.153,
+     "pct": 51.9,
+     "threshold2xNoise": 0.18,
+     "significant": true
+    },
+    "renderMsAvg": {
+     "p3": 4.143,
+     "p5a": 6.3,
+     "delta": 2.157,
+     "pct": 52.1,
+     "threshold2xNoise": 0.18,
+     "significant": true
+    },
+    "gameMsAvg": {
+     "p3": 1.123,
+     "p5a": 1.29,
+     "delta": 0.167,
+     "pct": 14.9,
+     "threshold2xNoise": 0.14,
+     "significant": true
+    },
+    "counters": {
+     "RHI/DrawCalls": {
+      "p3": 213.0,
+      "p5a": 213.0,
+      "delta": 0.0,
+      "pct": 0.0,
+      "threshold2xNoise": 0.0,
+      "significant": false
+     },
+     "RHI/PrimitivesDrawn": {
+      "p3": 848195.0,
+      "p5a": 848195.0,
+      "delta": 0.0,
+      "pct": 0.0,
+      "threshold2xNoise": 0.0,
+      "significant": false
+     },
+     "LightCount/All": {
+      "p3": 2.0,
+      "p5a": 2.0,
+      "delta": 0.0,
+      "pct": 0.0,
+      "threshold2xNoise": 0.0,
+      "significant": false
+     }
+    },
+    "csvGpuMeanMs": {
+     "GPU/Basepass": {
+      "p3": 0.078,
+      "p5a": 0.08,
+      "delta": 0.002,
+      "pct": 2.6,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/Lights": {
+      "p3": 0.051,
+      "p5a": 0.051,
+      "delta": 0.0,
+      "pct": 0.0,
+      "threshold2xNoise": 0.002,
+      "significant": false
+     },
+     "GPU/RenderDeferredLighting": {
+      "p3": 0.209,
+      "p5a": 0.212,
+      "delta": 0.003,
+      "pct": 1.4,
+      "threshold2xNoise": 0.016,
+      "significant": false
+     },
+     "GPU/LumenReflections": {
+      "p3": 0.122,
+      "p5a": 0.121,
+      "delta": -0.001,
+      "pct": -0.8,
+      "threshold2xNoise": 0.002,
+      "significant": false
+     },
+     "GPU/ShadowDepths": {
+      "p3": 0.048,
+      "p5a": 0.049,
+      "delta": 0.001,
+      "pct": 2.1,
+      "threshold2xNoise": 0.002,
+      "significant": false
+     },
+     "GPU/LumenSceneUpdate": {
+      "p3": 0.063,
+      "p5a": 0.065,
+      "delta": 0.002,
+      "pct": 3.2,
+      "threshold2xNoise": 0.004,
+      "significant": false
+     },
+     "GPU/Translucency": {
+      "p3": 0.003,
+      "p5a": 0.003,
+      "delta": 0.0,
+      "pct": 0.0,
+      "threshold2xNoise": 0.0,
+      "significant": false
+     },
+     "GPU/Prepass": {
+      "p3": 0.028,
+      "p5a": 0.029,
+      "delta": 0.001,
+      "pct": 3.6,
+      "threshold2xNoise": 0.0,
+      "significant": true
+     },
+     "GPU/Postprocessing": {
+      "p3": 0.116,
+      "p5a": 0.117,
+      "delta": 0.001,
+      "pct": 0.9,
+      "threshold2xNoise": 0.002,
+      "significant": false
+     },
+     "GPU/Unaccounted": {
+      "p3": 0.347,
+      "p5a": 0.353,
+      "delta": 0.006,
+      "pct": 1.7,
+      "threshold2xNoise": 0.008,
+      "significant": false
+     }
+    },
+    "nvidiaSmiUtilP50": {
+     "p3": 89.333,
+     "p5a": 95.667,
+     "delta": 6.334,
+     "pct": 7.1,
+     "threshold2xNoise": 4.0,
+     "significant": true
+    },
+    "vramMiBMax": {
+     "p3": 4147.333,
+     "p5a": 4068.333,
+     "delta": -79.0,
+     "pct": -1.9,
+     "threshold2xNoise": 390.0,
+     "significant": false
+    }
+   },
+   "K1x0.65": {
+    "gpuMsAvg": {
+     "p3": 1.737,
+     "p5a": 1.773,
+     "delta": 0.036,
+     "pct": 2.1,
+     "threshold2xNoise": 0.02,
+     "significant": true
+    },
+    "gpuMsP95": {
+     "p3": 1.79,
+     "p5a": 1.84,
+     "delta": 0.05,
+     "pct": 2.8,
+     "threshold2xNoise": 0.06,
+     "significant": false
+    },
+    "fps": {
+     "p3": 248.23,
+     "p5a": 161.023,
+     "delta": -87.207,
+     "pct": -35.1,
+     "threshold2xNoise": 17.9,
+     "significant": true
+    },
+    "frameMsAvg": {
+     "p3": 4.03,
+     "p5a": 6.21,
+     "delta": 2.18,
+     "pct": 54.1,
+     "threshold2xNoise": 0.28,
+     "significant": true
+    },
+    "renderMsAvg": {
+     "p3": 4.03,
+     "p5a": 6.21,
+     "delta": 2.18,
+     "pct": 54.1,
+     "threshold2xNoise": 0.28,
+     "significant": true
+    },
+    "gameMsAvg": {
+     "p3": 1.12,
+     "p5a": 1.31,
+     "delta": 0.19,
+     "pct": 17.0,
+     "threshold2xNoise": 0.3,
+     "significant": false
+    },
+    "counters": {
+     "RHI/DrawCalls": {
+      "p3": 204.0,
+      "p5a": 204.0,
+      "delta": 0.0,
+      "pct": 0.0,
+      "threshold2xNoise": 0.0,
+      "significant": false
+     },
+     "RHI/PrimitivesDrawn": {
+      "p3": 683452.0,
+      "p5a": 683452.0,
+      "delta": 0.0,
+      "pct": 0.0,
+      "threshold2xNoise": 0.0,
+      "significant": false
+     },
+     "LightCount/All": {
+      "p3": 2.0,
+      "p5a": 2.0,
+      "delta": 0.0,
+      "pct": 0.0,
+      "threshold2xNoise": 0.0,
+      "significant": false
+     }
+    },
+    "csvGpuMeanMs": {
+     "GPU/Basepass": {
+      "p3": 0.066,
+      "p5a": 0.069,
+      "delta": 0.003,
+      "pct": 4.5,
+      "threshold2xNoise": 0.0,
+      "significant": true
+     },
+     "GPU/Lights": {
+      "p3": 0.043,
+      "p5a": 0.043,
+      "delta": 0.0,
+      "pct": 0.0,
+      "threshold2xNoise": 0.002,
+      "significant": false
+     },
+     "GPU/RenderDeferredLighting": {
+      "p3": 0.219,
+      "p5a": 0.235,
+      "delta": 0.016,
+      "pct": 7.3,
+      "threshold2xNoise": 0.012,
+      "significant": true
+     },
+     "GPU/LumenReflections": {
+      "p3": 0.121,
+      "p5a": 0.124,
+      "delta": 0.003,
+      "pct": 2.5,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/ShadowDepths": {
+      "p3": 0.019,
+      "p5a": 0.018,
+      "delta": -0.001,
+      "pct": -5.3,
+      "threshold2xNoise": 0.002,
+      "significant": false
+     },
+     "GPU/LumenSceneUpdate": {
+      "p3": 0.063,
+      "p5a": 0.065,
+      "delta": 0.002,
+      "pct": 3.2,
+      "threshold2xNoise": 0.004,
+      "significant": false
+     },
+     "GPU/Translucency": {
+      "p3": 0.004,
+      "p5a": 0.003,
+      "delta": -0.001,
+      "pct": -25.0,
+      "threshold2xNoise": 0.002,
+      "significant": false
+     },
+     "GPU/Prepass": {
+      "p3": 0.026,
+      "p5a": 0.027,
+      "delta": 0.001,
+      "pct": 3.8,
+      "threshold2xNoise": 0.0,
+      "significant": true
+     },
+     "GPU/Postprocessing": {
+      "p3": 0.115,
+      "p5a": 0.116,
+      "delta": 0.001,
+      "pct": 0.9,
+      "threshold2xNoise": 0.002,
+      "significant": false
+     },
+     "GPU/Unaccounted": {
+      "p3": 0.349,
+      "p5a": 0.351,
+      "delta": 0.002,
+      "pct": 0.6,
+      "threshold2xNoise": 0.02,
+      "significant": false
+     }
+    },
+    "nvidiaSmiUtilP50": {
+     "p3": 87.667,
+     "p5a": 95.0,
+     "delta": 7.333,
+     "pct": 8.4,
+     "threshold2xNoise": 2.0,
+     "significant": true
+    },
+    "vramMiBMax": {
+     "p3": 4147.333,
+     "p5a": 4116.667,
+     "delta": -30.666,
+     "pct": -0.7,
+     "threshold2xNoise": 408.0,
+     "significant": false
+    }
+   },
+   "K2x1.6": {
+    "gpuMsAvg": {
+     "p3": 1.927,
+     "p5a": 1.943,
+     "delta": 0.016,
+     "pct": 0.8,
+     "threshold2xNoise": 0.02,
+     "significant": false
+    },
+    "gpuMsP95": {
+     "p3": 2.15,
+     "p5a": 2.027,
+     "delta": -0.123,
+     "pct": -5.7,
+     "threshold2xNoise": 0.1,
+     "significant": true
+    },
+    "fps": {
+     "p3": 235.097,
+     "p5a": 150.43,
+     "delta": -84.667,
+     "pct": -36.0,
+     "threshold2xNoise": 9.08,
+     "significant": true
+    },
+    "frameMsAvg": {
+     "p3": 4.253,
+     "p5a": 6.647,
+     "delta": 2.394,
+     "pct": 56.3,
+     "threshold2xNoise": 0.22,
+     "significant": true
+    },
+    "renderMsAvg": {
+     "p3": 4.253,
+     "p5a": 6.647,
+     "delta": 2.394,
+     "pct": 56.3,
+     "threshold2xNoise": 0.22,
+     "significant": true
+    },
+    "gameMsAvg": {
+     "p3": 1.127,
+     "p5a": 1.37,
+     "delta": 0.243,
+     "pct": 21.6,
+     "threshold2xNoise": 0.24,
+     "significant": true
+    },
+    "counters": {
+     "RHI/DrawCalls": {
+      "p3": 283.863,
+      "p5a": 283.394,
+      "delta": -0.469,
+      "pct": -0.2,
+      "threshold2xNoise": 4.0,
+      "significant": false
+     },
+     "RHI/PrimitivesDrawn": {
+      "p3": 930356.46,
+      "p5a": 930582.027,
+      "delta": 225.567,
+      "pct": 0.0,
+      "threshold2xNoise": 1282.138,
+      "significant": false
+     },
+     "LightCount/All": {
+      "p3": 2.0,
+      "p5a": 2.0,
+      "delta": 0.0,
+      "pct": 0.0,
+      "threshold2xNoise": 0.0,
+      "significant": false
+     }
+    },
+    "csvGpuMeanMs": {
+     "GPU/Basepass": {
+      "p3": 0.115,
+      "p5a": 0.118,
+      "delta": 0.003,
+      "pct": 2.6,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/Lights": {
+      "p3": 0.062,
+      "p5a": 0.061,
+      "delta": -0.001,
+      "pct": -1.6,
+      "threshold2xNoise": 0.002,
+      "significant": false
+     },
+     "GPU/RenderDeferredLighting": {
+      "p3": 0.223,
+      "p5a": 0.212,
+      "delta": -0.011,
+      "pct": -4.9,
+      "threshold2xNoise": 0.014,
+      "significant": false
+     },
+     "GPU/LumenReflections": {
+      "p3": 0.127,
+      "p5a": 0.126,
+      "delta": -0.001,
+      "pct": -0.8,
+      "threshold2xNoise": 0.002,
+      "significant": false
+     },
+     "GPU/ShadowDepths": {
+      "p3": 0.053,
+      "p5a": 0.053,
+      "delta": 0.0,
+      "pct": 0.0,
+      "threshold2xNoise": 0.004,
+      "significant": false
+     },
+     "GPU/LumenSceneUpdate": {
+      "p3": 0.064,
+      "p5a": 0.066,
+      "delta": 0.002,
+      "pct": 3.1,
+      "threshold2xNoise": 0.004,
+      "significant": false
+     },
+     "GPU/Translucency": {
+      "p3": 0.004,
+      "p5a": 0.003,
+      "delta": -0.001,
+      "pct": -25.0,
+      "threshold2xNoise": 0.0,
+      "significant": true
+     },
+     "GPU/Prepass": {
+      "p3": 0.029,
+      "p5a": 0.031,
+      "delta": 0.002,
+      "pct": 6.9,
+      "threshold2xNoise": 0.002,
+      "significant": false
+     },
+     "GPU/Postprocessing": {
+      "p3": 0.118,
+      "p5a": 0.118,
+      "delta": 0.0,
+      "pct": 0.0,
+      "threshold2xNoise": 0.0,
+      "significant": false
+     },
+     "GPU/Unaccounted": {
+      "p3": 0.343,
+      "p5a": 0.353,
+      "delta": 0.01,
+      "pct": 2.9,
+      "threshold2xNoise": 0.012,
+      "significant": false
+     }
+    },
+    "nvidiaSmiUtilP50": {
+     "p3": 89.667,
+     "p5a": 95.667,
+     "delta": 6.0,
+     "pct": 6.7,
+     "threshold2xNoise": 2.0,
+     "significant": true
+    },
+    "vramMiBMax": {
+     "p3": 4211.667,
+     "p5a": 4182.0,
+     "delta": -29.667,
+     "pct": -0.7,
+     "threshold2xNoise": 306.0,
+     "significant": false
+    }
+   },
+   "K2x2.5": {
+    "gpuMsAvg": {
+     "p3": 2.07,
+     "p5a": 2.127,
+     "delta": 0.057,
+     "pct": 2.8,
+     "threshold2xNoise": 0.04,
+     "significant": true
+    },
+    "gpuMsP95": {
+     "p3": 2.233,
+     "p5a": 2.333,
+     "delta": 0.1,
+     "pct": 4.5,
+     "threshold2xNoise": 0.02,
+     "significant": true
+    },
+    "fps": {
+     "p3": 234.963,
+     "p5a": 149.923,
+     "delta": -85.04,
+     "pct": -36.2,
+     "threshold2xNoise": 4.92,
+     "significant": true
+    },
+    "frameMsAvg": {
+     "p3": 4.253,
+     "p5a": 6.67,
+     "delta": 2.417,
+     "pct": 56.8,
+     "threshold2xNoise": 0.22,
+     "significant": true
+    },
+    "renderMsAvg": {
+     "p3": 4.253,
+     "p5a": 6.67,
+     "delta": 2.417,
+     "pct": 56.8,
+     "threshold2xNoise": 0.22,
+     "significant": true
+    },
+    "gameMsAvg": {
+     "p3": 1.11,
+     "p5a": 1.363,
+     "delta": 0.253,
+     "pct": 22.8,
+     "threshold2xNoise": 0.12,
+     "significant": true
+    },
+    "counters": {
+     "RHI/DrawCalls": {
+      "p3": 250.066,
+      "p5a": 250.0,
+      "delta": -0.066,
+      "pct": -0.0,
+      "threshold2xNoise": 0.394,
+      "significant": false
+     },
+     "RHI/PrimitivesDrawn": {
+      "p3": 1021534.971,
+      "p5a": 1021616.624,
+      "delta": 81.653,
+      "pct": 0.0,
+      "threshold2xNoise": 400.798,
+      "significant": false
+     },
+     "LightCount/All": {
+      "p3": 2.0,
+      "p5a": 2.0,
+      "delta": 0.0,
+      "pct": 0.0,
+      "threshold2xNoise": 0.0,
+      "significant": false
+     }
+    },
+    "csvGpuMeanMs": {
+     "GPU/Basepass": {
+      "p3": 0.1,
+      "p5a": 0.102,
+      "delta": 0.002,
+      "pct": 2.0,
+      "threshold2xNoise": 0.0,
+      "significant": true
+     },
+     "GPU/Lights": {
+      "p3": 0.068,
+      "p5a": 0.068,
+      "delta": 0.0,
+      "pct": 0.0,
+      "threshold2xNoise": 0.002,
+      "significant": false
+     },
+     "GPU/RenderDeferredLighting": {
+      "p3": 0.249,
+      "p5a": 0.25,
+      "delta": 0.001,
+      "pct": 0.4,
+      "threshold2xNoise": 0.008,
+      "significant": false
+     },
+     "GPU/LumenReflections": {
+      "p3": 0.131,
+      "p5a": 0.13,
+      "delta": -0.001,
+      "pct": -0.8,
+      "threshold2xNoise": 0.002,
+      "significant": false
+     },
+     "GPU/ShadowDepths": {
+      "p3": 0.095,
+      "p5a": 0.096,
+      "delta": 0.001,
+      "pct": 1.1,
+      "threshold2xNoise": 0.006,
+      "significant": false
+     },
+     "GPU/LumenSceneUpdate": {
+      "p3": 0.064,
+      "p5a": 0.067,
+      "delta": 0.003,
+      "pct": 4.7,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/Translucency": {
+      "p3": 0.008,
+      "p5a": 0.011,
+      "delta": 0.003,
+      "pct": 37.5,
+      "threshold2xNoise": 0.006,
+      "significant": false
+     },
+     "GPU/Prepass": {
+      "p3": 0.031,
+      "p5a": 0.032,
+      "delta": 0.001,
+      "pct": 3.2,
+      "threshold2xNoise": 0.0,
+      "significant": true
+     },
+     "GPU/Postprocessing": {
+      "p3": 0.119,
+      "p5a": 0.119,
+      "delta": 0.0,
+      "pct": 0.0,
+      "threshold2xNoise": 0.002,
+      "significant": false
+     },
+     "GPU/Unaccounted": {
+      "p3": 0.368,
+      "p5a": 0.412,
+      "delta": 0.044,
+      "pct": 12.0,
+      "threshold2xNoise": 0.024,
+      "significant": true
+     }
+    },
+    "nvidiaSmiUtilP50": {
+     "p3": 89.333,
+     "p5a": 96.0,
+     "delta": 6.667,
+     "pct": 7.5,
+     "threshold2xNoise": 2.0,
+     "significant": true
+    },
+    "vramMiBMax": {
+     "p3": 4210.0,
+     "p5a": 4179.667,
+     "delta": -30.333,
+     "pct": -0.7,
+     "threshold2xNoise": 442.0,
+     "significant": false
+    }
+   }
+  },
+  "marmoreal": {
+   "K1": {
+    "gpuMsAvg": {
+     "p3": 2.28,
+     "p5a": 2.44,
+     "delta": 0.16,
+     "pct": 7.0,
+     "threshold2xNoise": 0.06,
+     "significant": true
+    },
+    "gpuMsP95": {
+     "p3": 2.463,
+     "p5a": 2.64,
+     "delta": 0.177,
+     "pct": 7.2,
+     "threshold2xNoise": 0.02,
+     "significant": true
+    },
+    "fps": {
+     "p3": 228.85,
+     "p5a": 147.047,
+     "delta": -81.803,
+     "pct": -35.7,
+     "threshold2xNoise": 13.96,
+     "significant": true
+    },
+    "frameMsAvg": {
+     "p3": 4.37,
+     "p5a": 6.8,
+     "delta": 2.43,
+     "pct": 55.6,
+     "threshold2xNoise": 0.26,
+     "significant": true
+    },
+    "renderMsAvg": {
+     "p3": 4.37,
+     "p5a": 6.8,
+     "delta": 2.43,
+     "pct": 55.6,
+     "threshold2xNoise": 0.26,
+     "significant": true
+    },
+    "gameMsAvg": {
+     "p3": 1.117,
+     "p5a": 1.27,
+     "delta": 0.153,
+     "pct": 13.7,
+     "threshold2xNoise": 0.06,
+     "significant": true
+    },
+    "counters": {
+     "RHI/DrawCalls": {
+      "p3": 239.0,
+      "p5a": 263.0,
+      "delta": 24.0,
+      "pct": 10.0,
+      "threshold2xNoise": 0.0,
+      "significant": true
+     },
+     "RHI/PrimitivesDrawn": {
+      "p3": 1174466.76,
+      "p5a": 1252276.477,
+      "delta": 77809.717,
+      "pct": 6.6,
+      "threshold2xNoise": 13208.808,
+      "significant": true
+     },
+     "LightCount/All": {
+      "p3": 7.0,
+      "p5a": 7.0,
+      "delta": 0.0,
+      "pct": 0.0,
+      "threshold2xNoise": 0.0,
+      "significant": false
+     }
+    },
+    "csvGpuMeanMs": {
+     "GPU/Basepass": {
+      "p3": 0.134,
+      "p5a": 0.171,
+      "delta": 0.037,
+      "pct": 27.6,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/Lights": {
+      "p3": 0.107,
+      "p5a": 0.108,
+      "delta": 0.001,
+      "pct": 0.9,
+      "threshold2xNoise": 0.0,
+      "significant": true
+     },
+     "GPU/RenderDeferredLighting": {
+      "p3": 0.39,
+      "p5a": 0.301,
+      "delta": -0.089,
+      "pct": -22.8,
+      "threshold2xNoise": 0.034,
+      "significant": true
+     },
+     "GPU/LumenReflections": {
+      "p3": 0.194,
+      "p5a": 0.135,
+      "delta": -0.059,
+      "pct": -30.4,
+      "threshold2xNoise": 0.008,
+      "significant": true
+     },
+     "GPU/ShadowDepths": {
+      "p3": 0.054,
+      "p5a": 0.055,
+      "delta": 0.001,
+      "pct": 1.9,
+      "threshold2xNoise": 0.004,
+      "significant": false
+     },
+     "GPU/LumenSceneUpdate": {
+      "p3": 0.084,
+      "p5a": 0.087,
+      "delta": 0.003,
+      "pct": 3.6,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/Translucency": {
+      "p3": 0.003,
+      "p5a": 0.124,
+      "delta": 0.121,
+      "pct": 4033.3,
+      "threshold2xNoise": 0.02,
+      "significant": true
+     },
+     "GPU/Prepass": {
+      "p3": 0.044,
+      "p5a": 0.046,
+      "delta": 0.002,
+      "pct": 4.5,
+      "threshold2xNoise": 0.004,
+      "significant": false
+     },
+     "GPU/Postprocessing": {
+      "p3": 0.119,
+      "p5a": 0.12,
+      "delta": 0.001,
+      "pct": 0.8,
+      "threshold2xNoise": 0.0,
+      "significant": true
+     },
+     "GPU/Unaccounted": {
+      "p3": 0.354,
+      "p5a": 0.379,
+      "delta": 0.025,
+      "pct": 7.1,
+      "threshold2xNoise": 0.03,
+      "significant": false
+     }
+    },
+    "nvidiaSmiUtilP50": {
+     "p3": 89.0,
+     "p5a": 96.0,
+     "delta": 7.0,
+     "pct": 7.9,
+     "threshold2xNoise": 0.0,
+     "significant": true
+    },
+    "vramMiBMax": {
+     "p3": 4295.667,
+     "p5a": 4118.333,
+     "delta": -177.334,
+     "pct": -4.1,
+     "threshold2xNoise": 468.0,
+     "significant": false
+    },
+    "envCostVsCobbleGpuMs": {
+     "p3": 0.457,
+     "p5a": 0.583,
+     "change": 0.126
+    }
+   },
+   "K1x0.65": {
+    "gpuMsAvg": {
+     "p3": 2.187,
+     "p5a": 2.347,
+     "delta": 0.16,
+     "pct": 7.3,
+     "threshold2xNoise": 0.12,
+     "significant": true
+    },
+    "gpuMsP95": {
+     "p3": 2.333,
+     "p5a": 2.563,
+     "delta": 0.23,
+     "pct": 9.9,
+     "threshold2xNoise": 0.12,
+     "significant": true
+    },
+    "fps": {
+     "p3": 234.357,
+     "p5a": 148.153,
+     "delta": -86.204,
+     "pct": -36.8,
+     "threshold2xNoise": 14.54,
+     "significant": true
+    },
+    "frameMsAvg": {
+     "p3": 4.267,
+     "p5a": 6.753,
+     "delta": 2.486,
+     "pct": 58.3,
+     "threshold2xNoise": 0.66,
+     "significant": true
+    },
+    "renderMsAvg": {
+     "p3": 4.267,
+     "p5a": 6.753,
+     "delta": 2.486,
+     "pct": 58.3,
+     "threshold2xNoise": 0.66,
+     "significant": true
+    },
+    "gameMsAvg": {
+     "p3": 1.15,
+     "p5a": 1.263,
+     "delta": 0.113,
+     "pct": 9.8,
+     "threshold2xNoise": 0.28,
+     "significant": false
+    },
+    "counters": {
+     "RHI/DrawCalls": {
+      "p3": 235.0,
+      "p5a": 259.0,
+      "delta": 24.0,
+      "pct": 10.2,
+      "threshold2xNoise": 0.0,
+      "significant": true
+     },
+     "RHI/PrimitivesDrawn": {
+      "p3": 1039466.363,
+      "p5a": 1118211.281,
+      "delta": 78744.918,
+      "pct": 7.6,
+      "threshold2xNoise": 19660.96,
+      "significant": true
+     },
+     "LightCount/All": {
+      "p3": 7.0,
+      "p5a": 7.0,
+      "delta": 0.0,
+      "pct": 0.0,
+      "threshold2xNoise": 0.0,
+      "significant": false
+     }
+    },
+    "csvGpuMeanMs": {
+     "GPU/Basepass": {
+      "p3": 0.111,
+      "p5a": 0.149,
+      "delta": 0.038,
+      "pct": 34.2,
+      "threshold2xNoise": 0.004,
+      "significant": true
+     },
+     "GPU/Lights": {
+      "p3": 0.085,
+      "p5a": 0.082,
+      "delta": -0.003,
+      "pct": -3.5,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/RenderDeferredLighting": {
+      "p3": 0.258,
+      "p5a": 0.244,
+      "delta": -0.014,
+      "pct": -5.4,
+      "threshold2xNoise": 0.028,
+      "significant": false
+     },
+     "GPU/LumenReflections": {
+      "p3": 0.165,
+      "p5a": 0.132,
+      "delta": -0.033,
+      "pct": -20.0,
+      "threshold2xNoise": 0.01,
+      "significant": true
+     },
+     "GPU/ShadowDepths": {
+      "p3": 0.042,
+      "p5a": 0.047,
+      "delta": 0.005,
+      "pct": 11.9,
+      "threshold2xNoise": 0.004,
+      "significant": true
+     },
+     "GPU/LumenSceneUpdate": {
+      "p3": 0.084,
+      "p5a": 0.087,
+      "delta": 0.003,
+      "pct": 3.6,
+      "threshold2xNoise": 0.006,
+      "significant": false
+     },
+     "GPU/Translucency": {
+      "p3": 0.003,
+      "p5a": 0.085,
+      "delta": 0.082,
+      "pct": 2733.3,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/Prepass": {
+      "p3": 0.04,
+      "p5a": 0.042,
+      "delta": 0.002,
+      "pct": 5.0,
+      "threshold2xNoise": 0.004,
+      "significant": false
+     },
+     "GPU/Postprocessing": {
+      "p3": 0.119,
+      "p5a": 0.122,
+      "delta": 0.003,
+      "pct": 2.5,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/Unaccounted": {
+      "p3": 0.346,
+      "p5a": 0.36,
+      "delta": 0.014,
+      "pct": 4.0,
+      "threshold2xNoise": 0.018,
+      "significant": false
+     }
+    },
+    "nvidiaSmiUtilP50": {
+     "p3": 82.333,
+     "p5a": 96.0,
+     "delta": 13.667,
+     "pct": 16.6,
+     "threshold2xNoise": 34.0,
+     "significant": false
+    },
+    "vramMiBMax": {
+     "p3": 4304.667,
+     "p5a": 4100.333,
+     "delta": -204.334,
+     "pct": -4.7,
+     "threshold2xNoise": 574.0,
+     "significant": false
+    },
+    "envCostVsCobbleGpuMs": {
+     "p3": 0.45,
+     "p5a": 0.574,
+     "change": 0.124
+    }
+   },
+   "K2x1.6": {
+    "gpuMsAvg": {
+     "p3": 2.213,
+     "p5a": 2.483,
+     "delta": 0.27,
+     "pct": 12.2,
+     "threshold2xNoise": 0.02,
+     "significant": true
+    },
+    "gpuMsP95": {
+     "p3": 2.407,
+     "p5a": 2.67,
+     "delta": 0.263,
+     "pct": 10.9,
+     "threshold2xNoise": 0.16,
+     "significant": true
+    },
+    "fps": {
+     "p3": 233.25,
+     "p5a": 147.723,
+     "delta": -85.527,
+     "pct": -36.7,
+     "threshold2xNoise": 16.76,
+     "significant": true
+    },
+    "frameMsAvg": {
+     "p3": 4.287,
+     "p5a": 6.773,
+     "delta": 2.486,
+     "pct": 58.0,
+     "threshold2xNoise": 0.78,
+     "significant": true
+    },
+    "renderMsAvg": {
+     "p3": 4.283,
+     "p5a": 6.773,
+     "delta": 2.49,
+     "pct": 58.1,
+     "threshold2xNoise": 0.78,
+     "significant": true
+    },
+    "gameMsAvg": {
+     "p3": 1.1,
+     "p5a": 1.29,
+     "delta": 0.19,
+     "pct": 17.3,
+     "threshold2xNoise": 0.04,
+     "significant": true
+    },
+    "counters": {
+     "RHI/DrawCalls": {
+      "p3": 293.0,
+      "p5a": 243.701,
+      "delta": -49.299,
+      "pct": -16.8,
+      "threshold2xNoise": 2.372,
+      "significant": true
+     },
+     "RHI/PrimitivesDrawn": {
+      "p3": 1021548.162,
+      "p5a": 1062045.29,
+      "delta": 40497.128,
+      "pct": 4.0,
+      "threshold2xNoise": 4624.352,
+      "significant": true
+     },
+     "LightCount/All": {
+      "p3": 7.0,
+      "p5a": 7.0,
+      "delta": 0.0,
+      "pct": 0.0,
+      "threshold2xNoise": 0.0,
+      "significant": false
+     }
+    },
+    "csvGpuMeanMs": {
+     "GPU/Basepass": {
+      "p3": 0.115,
+      "p5a": 0.129,
+      "delta": 0.014,
+      "pct": 12.2,
+      "threshold2xNoise": 0.004,
+      "significant": true
+     },
+     "GPU/Lights": {
+      "p3": 0.107,
+      "p5a": 0.109,
+      "delta": 0.002,
+      "pct": 1.9,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/RenderDeferredLighting": {
+      "p3": 0.378,
+      "p5a": 0.478,
+      "delta": 0.1,
+      "pct": 26.5,
+      "threshold2xNoise": 0.02,
+      "significant": true
+     },
+     "GPU/LumenReflections": {
+      "p3": 0.175,
+      "p5a": 0.143,
+      "delta": -0.032,
+      "pct": -18.3,
+      "threshold2xNoise": 0.004,
+      "significant": true
+     },
+     "GPU/ShadowDepths": {
+      "p3": 0.057,
+      "p5a": 0.059,
+      "delta": 0.002,
+      "pct": 3.5,
+      "threshold2xNoise": 0.004,
+      "significant": false
+     },
+     "GPU/LumenSceneUpdate": {
+      "p3": 0.082,
+      "p5a": 0.085,
+      "delta": 0.003,
+      "pct": 3.7,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/Translucency": {
+      "p3": 0.003,
+      "p5a": 0.107,
+      "delta": 0.104,
+      "pct": 3466.7,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/Prepass": {
+      "p3": 0.033,
+      "p5a": 0.039,
+      "delta": 0.006,
+      "pct": 18.2,
+      "threshold2xNoise": 0.004,
+      "significant": true
+     },
+     "GPU/Postprocessing": {
+      "p3": 0.119,
+      "p5a": 0.121,
+      "delta": 0.002,
+      "pct": 1.7,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/Unaccounted": {
+      "p3": 0.35,
+      "p5a": 0.372,
+      "delta": 0.022,
+      "pct": 6.3,
+      "threshold2xNoise": 0.016,
+      "significant": true
+     }
+    },
+    "nvidiaSmiUtilP50": {
+     "p3": 88.0,
+     "p5a": 96.0,
+     "delta": 8.0,
+     "pct": 9.1,
+     "threshold2xNoise": 0.0,
+     "significant": true
+    },
+    "vramMiBMax": {
+     "p3": 4273.333,
+     "p5a": 4166.0,
+     "delta": -107.333,
+     "pct": -2.5,
+     "threshold2xNoise": 300.0,
+     "significant": false
+    },
+    "envCostVsCobbleGpuMs": {
+     "p3": 0.286,
+     "p5a": 0.54,
+     "change": 0.254
+    }
+   },
+   "K2x2.5": {
+    "gpuMsAvg": {
+     "p3": 2.227,
+     "p5a": 2.46,
+     "delta": 0.233,
+     "pct": 10.5,
+     "threshold2xNoise": 0.06,
+     "significant": true
+    },
+    "gpuMsP95": {
+     "p3": 2.407,
+     "p5a": 2.627,
+     "delta": 0.22,
+     "pct": 9.1,
+     "threshold2xNoise": 0.04,
+     "significant": true
+    },
+    "fps": {
+     "p3": 235.65,
+     "p5a": 149.443,
+     "delta": -86.207,
+     "pct": -36.6,
+     "threshold2xNoise": 5.72,
+     "significant": true
+    },
+    "frameMsAvg": {
+     "p3": 4.243,
+     "p5a": 6.69,
+     "delta": 2.447,
+     "pct": 57.7,
+     "threshold2xNoise": 0.26,
+     "significant": true
+    },
+    "renderMsAvg": {
+     "p3": 4.243,
+     "p5a": 6.69,
+     "delta": 2.447,
+     "pct": 57.7,
+     "threshold2xNoise": 0.26,
+     "significant": true
+    },
+    "gameMsAvg": {
+     "p3": 1.11,
+     "p5a": 1.307,
+     "delta": 0.197,
+     "pct": 17.7,
+     "threshold2xNoise": 0.14,
+     "significant": true
+    },
+    "counters": {
+     "RHI/DrawCalls": {
+      "p3": 235.96,
+      "p5a": 202.97,
+      "delta": -32.99,
+      "pct": -14.0,
+      "threshold2xNoise": 2.91,
+      "significant": true
+     },
+     "RHI/PrimitivesDrawn": {
+      "p3": 931856.012,
+      "p5a": 964988.773,
+      "delta": 33132.761,
+      "pct": 3.6,
+      "threshold2xNoise": 4028.436,
+      "significant": true
+     },
+     "LightCount/All": {
+      "p3": 5.0,
+      "p5a": 5.0,
+      "delta": 0.0,
+      "pct": 0.0,
+      "threshold2xNoise": 0.0,
+      "significant": false
+     }
+    },
+    "csvGpuMeanMs": {
+     "GPU/Basepass": {
+      "p3": 0.112,
+      "p5a": 0.121,
+      "delta": 0.009,
+      "pct": 8.0,
+      "threshold2xNoise": 0.004,
+      "significant": true
+     },
+     "GPU/Lights": {
+      "p3": 0.115,
+      "p5a": 0.113,
+      "delta": -0.002,
+      "pct": -1.7,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/RenderDeferredLighting": {
+      "p3": 0.342,
+      "p5a": 0.462,
+      "delta": 0.12,
+      "pct": 35.1,
+      "threshold2xNoise": 0.032,
+      "significant": true
+     },
+     "GPU/LumenReflections": {
+      "p3": 0.164,
+      "p5a": 0.138,
+      "delta": -0.026,
+      "pct": -15.9,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/ShadowDepths": {
+      "p3": 0.094,
+      "p5a": 0.096,
+      "delta": 0.002,
+      "pct": 2.1,
+      "threshold2xNoise": 0.0,
+      "significant": true
+     },
+     "GPU/LumenSceneUpdate": {
+      "p3": 0.083,
+      "p5a": 0.085,
+      "delta": 0.002,
+      "pct": 2.4,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/Translucency": {
+      "p3": 0.003,
+      "p5a": 0.102,
+      "delta": 0.099,
+      "pct": 3300.0,
+      "threshold2xNoise": 0.0,
+      "significant": true
+     },
+     "GPU/Prepass": {
+      "p3": 0.026,
+      "p5a": 0.03,
+      "delta": 0.004,
+      "pct": 15.4,
+      "threshold2xNoise": 0.004,
+      "significant": false
+     },
+     "GPU/Postprocessing": {
+      "p3": 0.119,
+      "p5a": 0.12,
+      "delta": 0.001,
+      "pct": 0.8,
+      "threshold2xNoise": 0.002,
+      "significant": false
+     },
+     "GPU/Unaccounted": {
+      "p3": 0.346,
+      "p5a": 0.369,
+      "delta": 0.023,
+      "pct": 6.6,
+      "threshold2xNoise": 0.016,
+      "significant": true
+     }
+    },
+    "nvidiaSmiUtilP50": {
+     "p3": 88.0,
+     "p5a": 96.0,
+     "delta": 8.0,
+     "pct": 9.1,
+     "threshold2xNoise": 0.0,
+     "significant": true
+    },
+    "vramMiBMax": {
+     "p3": 4273.333,
+     "p5a": 4198.0,
+     "delta": -75.333,
+     "pct": -1.8,
+     "threshold2xNoise": 500.0,
+     "significant": false
+    },
+    "envCostVsCobbleGpuMs": {
+     "p3": 0.157,
+     "p5a": 0.333,
+     "change": 0.176
+    }
+   }
+  },
+  "sarpedon": {
+   "K1": {
+    "gpuMsAvg": {
+     "p3": 2.237,
+     "p5a": 2.393,
+     "delta": 0.156,
+     "pct": 7.0,
+     "threshold2xNoise": 0.08,
+     "significant": true
+    },
+    "gpuMsP95": {
+     "p3": 2.393,
+     "p5a": 2.6,
+     "delta": 0.207,
+     "pct": 8.7,
+     "threshold2xNoise": 0.06,
+     "significant": true
+    },
+    "fps": {
+     "p3": 232.32,
+     "p5a": 146.523,
+     "delta": -85.797,
+     "pct": -36.9,
+     "threshold2xNoise": 8.7,
+     "significant": true
+    },
+    "frameMsAvg": {
+     "p3": 4.303,
+     "p5a": 6.827,
+     "delta": 2.524,
+     "pct": 58.7,
+     "threshold2xNoise": 0.32,
+     "significant": true
+    },
+    "renderMsAvg": {
+     "p3": 4.303,
+     "p5a": 6.827,
+     "delta": 2.524,
+     "pct": 58.7,
+     "threshold2xNoise": 0.32,
+     "significant": true
+    },
+    "gameMsAvg": {
+     "p3": 1.12,
+     "p5a": 1.377,
+     "delta": 0.257,
+     "pct": 22.9,
+     "threshold2xNoise": 0.24,
+     "significant": true
+    },
+    "counters": {
+     "RHI/DrawCalls": {
+      "p3": 239.0,
+      "p5a": 268.0,
+      "delta": 29.0,
+      "pct": 12.1,
+      "threshold2xNoise": 0.0,
+      "significant": true
+     },
+     "RHI/PrimitivesDrawn": {
+      "p3": 1183686.994,
+      "p5a": 1332251.849,
+      "delta": 148564.855,
+      "pct": 12.6,
+      "threshold2xNoise": 282.528,
+      "significant": true
+     },
+     "LightCount/All": {
+      "p3": 7.0,
+      "p5a": 7.0,
+      "delta": 0.0,
+      "pct": 0.0,
+      "threshold2xNoise": 0.0,
+      "significant": false
+     }
+    },
+    "csvGpuMeanMs": {
+     "GPU/Basepass": {
+      "p3": 0.12,
+      "p5a": 0.153,
+      "delta": 0.033,
+      "pct": 27.5,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/Lights": {
+      "p3": 0.101,
+      "p5a": 0.103,
+      "delta": 0.002,
+      "pct": 2.0,
+      "threshold2xNoise": 0.002,
+      "significant": false
+     },
+     "GPU/RenderDeferredLighting": {
+      "p3": 0.335,
+      "p5a": 0.298,
+      "delta": -0.037,
+      "pct": -11.0,
+      "threshold2xNoise": 0.008,
+      "significant": true
+     },
+     "GPU/LumenReflections": {
+      "p3": 0.145,
+      "p5a": 0.132,
+      "delta": -0.013,
+      "pct": -9.0,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/ShadowDepths": {
+      "p3": 0.052,
+      "p5a": 0.058,
+      "delta": 0.006,
+      "pct": 11.5,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/LumenSceneUpdate": {
+      "p3": 0.083,
+      "p5a": 0.086,
+      "delta": 0.003,
+      "pct": 3.6,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/Translucency": {
+      "p3": 0.003,
+      "p5a": 0.103,
+      "delta": 0.1,
+      "pct": 3333.3,
+      "threshold2xNoise": 0.026,
+      "significant": true
+     },
+     "GPU/Prepass": {
+      "p3": 0.044,
+      "p5a": 0.05,
+      "delta": 0.006,
+      "pct": 13.6,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/Postprocessing": {
+      "p3": 0.119,
+      "p5a": 0.121,
+      "delta": 0.002,
+      "pct": 1.7,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/Unaccounted": {
+      "p3": 0.345,
+      "p5a": 0.374,
+      "delta": 0.029,
+      "pct": 8.4,
+      "threshold2xNoise": 0.024,
+      "significant": true
+     }
+    },
+    "nvidiaSmiUtilP50": {
+     "p3": 88.333,
+     "p5a": 96.0,
+     "delta": 7.667,
+     "pct": 8.7,
+     "threshold2xNoise": 2.0,
+     "significant": true
+    },
+    "vramMiBMax": {
+     "p3": 4214.667,
+     "p5a": 4194.667,
+     "delta": -20.0,
+     "pct": -0.5,
+     "threshold2xNoise": 578.0,
+     "significant": false
+    },
+    "envCostVsCobbleGpuMs": {
+     "p3": 0.414,
+     "p5a": 0.536,
+     "change": 0.122
+    }
+   },
+   "K1x0.65": {
+    "gpuMsAvg": {
+     "p3": 2.17,
+     "p5a": 2.32,
+     "delta": 0.15,
+     "pct": 6.9,
+     "threshold2xNoise": 0.04,
+     "significant": true
+    },
+    "gpuMsP95": {
+     "p3": 2.307,
+     "p5a": 2.53,
+     "delta": 0.223,
+     "pct": 9.7,
+     "threshold2xNoise": 0.04,
+     "significant": true
+    },
+    "fps": {
+     "p3": 233.003,
+     "p5a": 149.773,
+     "delta": -83.23,
+     "pct": -35.7,
+     "threshold2xNoise": 4.48,
+     "significant": true
+    },
+    "frameMsAvg": {
+     "p3": 4.293,
+     "p5a": 6.677,
+     "delta": 2.384,
+     "pct": 55.5,
+     "threshold2xNoise": 0.1,
+     "significant": true
+    },
+    "renderMsAvg": {
+     "p3": 4.287,
+     "p5a": 6.673,
+     "delta": 2.386,
+     "pct": 55.7,
+     "threshold2xNoise": 0.08,
+     "significant": true
+    },
+    "gameMsAvg": {
+     "p3": 1.127,
+     "p5a": 1.297,
+     "delta": 0.17,
+     "pct": 15.1,
+     "threshold2xNoise": 0.2,
+     "significant": false
+    },
+    "counters": {
+     "RHI/DrawCalls": {
+      "p3": 235.0,
+      "p5a": 267.0,
+      "delta": 32.0,
+      "pct": 13.6,
+      "threshold2xNoise": 0.0,
+      "significant": true
+     },
+     "RHI/PrimitivesDrawn": {
+      "p3": 1069106.313,
+      "p5a": 1209603.065,
+      "delta": 140496.752,
+      "pct": 13.1,
+      "threshold2xNoise": 12171.894,
+      "significant": true
+     },
+     "LightCount/All": {
+      "p3": 7.0,
+      "p5a": 7.0,
+      "delta": 0.0,
+      "pct": 0.0,
+      "threshold2xNoise": 0.0,
+      "significant": false
+     }
+    },
+    "csvGpuMeanMs": {
+     "GPU/Basepass": {
+      "p3": 0.104,
+      "p5a": 0.137,
+      "delta": 0.033,
+      "pct": 31.7,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/Lights": {
+      "p3": 0.081,
+      "p5a": 0.079,
+      "delta": -0.002,
+      "pct": -2.5,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/RenderDeferredLighting": {
+      "p3": 0.255,
+      "p5a": 0.231,
+      "delta": -0.024,
+      "pct": -9.4,
+      "threshold2xNoise": 0.008,
+      "significant": true
+     },
+     "GPU/LumenReflections": {
+      "p3": 0.138,
+      "p5a": 0.127,
+      "delta": -0.011,
+      "pct": -8.0,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/ShadowDepths": {
+      "p3": 0.043,
+      "p5a": 0.048,
+      "delta": 0.005,
+      "pct": 11.6,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/LumenSceneUpdate": {
+      "p3": 0.084,
+      "p5a": 0.086,
+      "delta": 0.002,
+      "pct": 2.4,
+      "threshold2xNoise": 0.002,
+      "significant": false
+     },
+     "GPU/Translucency": {
+      "p3": 0.003,
+      "p5a": 0.085,
+      "delta": 0.082,
+      "pct": 2733.3,
+      "threshold2xNoise": 0.006,
+      "significant": true
+     },
+     "GPU/Prepass": {
+      "p3": 0.04,
+      "p5a": 0.046,
+      "delta": 0.006,
+      "pct": 15.0,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/Postprocessing": {
+      "p3": 0.119,
+      "p5a": 0.122,
+      "delta": 0.003,
+      "pct": 2.5,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/Unaccounted": {
+      "p3": 0.399,
+      "p5a": 0.364,
+      "delta": -0.035,
+      "pct": -8.8,
+      "threshold2xNoise": 0.028,
+      "significant": true
+     }
+    },
+    "nvidiaSmiUtilP50": {
+     "p3": 87.667,
+     "p5a": 96.0,
+     "delta": 8.333,
+     "pct": 9.5,
+     "threshold2xNoise": 2.0,
+     "significant": true
+    },
+    "vramMiBMax": {
+     "p3": 4217.667,
+     "p5a": 4223.667,
+     "delta": 6.0,
+     "pct": 0.1,
+     "threshold2xNoise": 604.0,
+     "significant": false
+    },
+    "envCostVsCobbleGpuMs": {
+     "p3": 0.433,
+     "p5a": 0.547,
+     "change": 0.114
+    }
+   },
+   "K2x1.6": {
+    "gpuMsAvg": {
+     "p3": 2.14,
+     "p5a": 2.36,
+     "delta": 0.22,
+     "pct": 10.3,
+     "threshold2xNoise": 0.04,
+     "significant": true
+    },
+    "gpuMsP95": {
+     "p3": 2.35,
+     "p5a": 2.587,
+     "delta": 0.237,
+     "pct": 10.1,
+     "threshold2xNoise": 0.04,
+     "significant": true
+    },
+    "fps": {
+     "p3": 228.69,
+     "p5a": 146.133,
+     "delta": -82.557,
+     "pct": -36.1,
+     "threshold2xNoise": 12.08,
+     "significant": true
+    },
+    "frameMsAvg": {
+     "p3": 4.373,
+     "p5a": 6.843,
+     "delta": 2.47,
+     "pct": 56.5,
+     "threshold2xNoise": 0.24,
+     "significant": true
+    },
+    "renderMsAvg": {
+     "p3": 4.373,
+     "p5a": 6.843,
+     "delta": 2.47,
+     "pct": 56.5,
+     "threshold2xNoise": 0.24,
+     "significant": true
+    },
+    "gameMsAvg": {
+     "p3": 1.113,
+     "p5a": 1.32,
+     "delta": 0.207,
+     "pct": 18.6,
+     "threshold2xNoise": 0.04,
+     "significant": true
+    },
+    "counters": {
+     "RHI/DrawCalls": {
+      "p3": 469.0,
+      "p5a": 328.795,
+      "delta": -140.205,
+      "pct": -29.9,
+      "threshold2xNoise": 2.292,
+      "significant": true
+     },
+     "RHI/PrimitivesDrawn": {
+      "p3": 1258493.896,
+      "p5a": 1379833.926,
+      "delta": 121340.03,
+      "pct": 9.6,
+      "threshold2xNoise": 7741.496,
+      "significant": true
+     },
+     "LightCount/All": {
+      "p3": 6.0,
+      "p5a": 6.0,
+      "delta": 0.0,
+      "pct": 0.0,
+      "threshold2xNoise": 0.0,
+      "significant": false
+     }
+    },
+    "csvGpuMeanMs": {
+     "GPU/Basepass": {
+      "p3": 0.132,
+      "p5a": 0.149,
+      "delta": 0.017,
+      "pct": 12.9,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/Lights": {
+      "p3": 0.096,
+      "p5a": 0.094,
+      "delta": -0.002,
+      "pct": -2.1,
+      "threshold2xNoise": 0.0,
+      "significant": true
+     },
+     "GPU/RenderDeferredLighting": {
+      "p3": 0.288,
+      "p5a": 0.314,
+      "delta": 0.026,
+      "pct": 9.0,
+      "threshold2xNoise": 0.016,
+      "significant": true
+     },
+     "GPU/LumenReflections": {
+      "p3": 0.137,
+      "p5a": 0.131,
+      "delta": -0.006,
+      "pct": -4.4,
+      "threshold2xNoise": 0.004,
+      "significant": true
+     },
+     "GPU/ShadowDepths": {
+      "p3": 0.06,
+      "p5a": 0.065,
+      "delta": 0.005,
+      "pct": 8.3,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/LumenSceneUpdate": {
+      "p3": 0.085,
+      "p5a": 0.087,
+      "delta": 0.002,
+      "pct": 2.4,
+      "threshold2xNoise": 0.002,
+      "significant": false
+     },
+     "GPU/Translucency": {
+      "p3": 0.003,
+      "p5a": 0.102,
+      "delta": 0.099,
+      "pct": 3300.0,
+      "threshold2xNoise": 0.006,
+      "significant": true
+     },
+     "GPU/Prepass": {
+      "p3": 0.031,
+      "p5a": 0.049,
+      "delta": 0.018,
+      "pct": 58.1,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/Postprocessing": {
+      "p3": 0.119,
+      "p5a": 0.121,
+      "delta": 0.002,
+      "pct": 1.7,
+      "threshold2xNoise": 0.0,
+      "significant": true
+     },
+     "GPU/Unaccounted": {
+      "p3": 0.35,
+      "p5a": 0.369,
+      "delta": 0.019,
+      "pct": 5.4,
+      "threshold2xNoise": 0.026,
+      "significant": false
+     }
+    },
+    "nvidiaSmiUtilP50": {
+     "p3": 87.667,
+     "p5a": 96.0,
+     "delta": 8.333,
+     "pct": 9.5,
+     "threshold2xNoise": 2.0,
+     "significant": true
+    },
+    "vramMiBMax": {
+     "p3": 4279.333,
+     "p5a": 4264.333,
+     "delta": -15.0,
+     "pct": -0.4,
+     "threshold2xNoise": 440.0,
+     "significant": false
+    },
+    "envCostVsCobbleGpuMs": {
+     "p3": 0.213,
+     "p5a": 0.417,
+     "change": 0.204
+    }
+   },
+   "K2x2.5": {
+    "gpuMsAvg": {
+     "p3": 2.167,
+     "p5a": 2.363,
+     "delta": 0.196,
+     "pct": 9.0,
+     "threshold2xNoise": 0.06,
+     "significant": true
+    },
+    "gpuMsP95": {
+     "p3": 2.343,
+     "p5a": 2.567,
+     "delta": 0.224,
+     "pct": 9.6,
+     "threshold2xNoise": 0.02,
+     "significant": true
+    },
+    "fps": {
+     "p3": 229.577,
+     "p5a": 152.52,
+     "delta": -77.057,
+     "pct": -33.6,
+     "threshold2xNoise": 9.98,
+     "significant": true
+    },
+    "frameMsAvg": {
+     "p3": 4.357,
+     "p5a": 6.553,
+     "delta": 2.196,
+     "pct": 50.4,
+     "threshold2xNoise": 0.2,
+     "significant": true
+    },
+    "renderMsAvg": {
+     "p3": 4.357,
+     "p5a": 6.553,
+     "delta": 2.196,
+     "pct": 50.4,
+     "threshold2xNoise": 0.2,
+     "significant": true
+    },
+    "gameMsAvg": {
+     "p3": 1.143,
+     "p5a": 1.36,
+     "delta": 0.217,
+     "pct": 19.0,
+     "threshold2xNoise": 0.18,
+     "significant": true
+    },
+    "counters": {
+     "RHI/DrawCalls": {
+      "p3": 364.984,
+      "p5a": 251.044,
+      "delta": -113.94,
+      "pct": -31.2,
+      "threshold2xNoise": 0.264,
+      "significant": true
+     },
+     "RHI/PrimitivesDrawn": {
+      "p3": 1008408.705,
+      "p5a": 1024753.102,
+      "delta": 16344.397,
+      "pct": 1.6,
+      "threshold2xNoise": 4739.218,
+      "significant": true
+     },
+     "LightCount/All": {
+      "p3": 5.0,
+      "p5a": 4.0,
+      "delta": -1.0,
+      "pct": -20.0,
+      "threshold2xNoise": 0.0,
+      "significant": true
+     }
+    },
+    "csvGpuMeanMs": {
+     "GPU/Basepass": {
+      "p3": 0.098,
+      "p5a": 0.112,
+      "delta": 0.014,
+      "pct": 14.3,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/Lights": {
+      "p3": 0.095,
+      "p5a": 0.091,
+      "delta": -0.004,
+      "pct": -4.2,
+      "threshold2xNoise": 0.0,
+      "significant": true
+     },
+     "GPU/RenderDeferredLighting": {
+      "p3": 0.311,
+      "p5a": 0.337,
+      "delta": 0.026,
+      "pct": 8.4,
+      "threshold2xNoise": 0.03,
+      "significant": false
+     },
+     "GPU/LumenReflections": {
+      "p3": 0.134,
+      "p5a": 0.132,
+      "delta": -0.002,
+      "pct": -1.5,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/ShadowDepths": {
+      "p3": 0.096,
+      "p5a": 0.098,
+      "delta": 0.002,
+      "pct": 2.1,
+      "threshold2xNoise": 0.004,
+      "significant": false
+     },
+     "GPU/LumenSceneUpdate": {
+      "p3": 0.086,
+      "p5a": 0.086,
+      "delta": 0.0,
+      "pct": 0.0,
+      "threshold2xNoise": 0.002,
+      "significant": false
+     },
+     "GPU/Translucency": {
+      "p3": 0.003,
+      "p5a": 0.096,
+      "delta": 0.093,
+      "pct": 3100.0,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/Prepass": {
+      "p3": 0.025,
+      "p5a": 0.037,
+      "delta": 0.012,
+      "pct": 48.0,
+      "threshold2xNoise": 0.002,
+      "significant": true
+     },
+     "GPU/Postprocessing": {
+      "p3": 0.119,
+      "p5a": 0.121,
+      "delta": 0.002,
+      "pct": 1.7,
+      "threshold2xNoise": 0.0,
+      "significant": true
+     },
+     "GPU/Unaccounted": {
+      "p3": 0.345,
+      "p5a": 0.365,
+      "delta": 0.02,
+      "pct": 5.8,
+      "threshold2xNoise": 0.03,
+      "significant": false
+     }
+    },
+    "nvidiaSmiUtilP50": {
+     "p3": 87.0,
+     "p5a": 95.667,
+     "delta": 8.667,
+     "pct": 10.0,
+     "threshold2xNoise": 2.0,
+     "significant": true
+    },
+    "vramMiBMax": {
+     "p3": 4281.0,
+     "p5a": 4293.0,
+     "delta": 12.0,
+     "pct": 0.3,
+     "threshold2xNoise": 458.0,
+     "significant": false
+    },
+    "envCostVsCobbleGpuMs": {
+     "p3": 0.097,
+     "p5a": 0.236,
+     "change": 0.139
+    }
+   }
+  }
+ }
+}

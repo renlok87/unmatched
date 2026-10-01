@@ -175,6 +175,98 @@ TArray<FString> FS09CommandUi::LegalAttackTargets(const FS08BoardModel& Board,
   return Out;
 }
 
+TArray<FS09CommandUi::FAutoAttackPick> FS09CommandUi::AutoAttackPicks(
+    const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters, const FString& ViewerId,
+    bool bPreferRanged) {
+  TArray<FAutoAttackPick> Adjacent;
+  TArray<FAutoAttackPick> ZoneOnly;
+  TArray<FAutoAttackPick> Ordered; // default: per attacker, Fighters order
+  for (const FS08BoardFighter& Attacker : Fighters) {
+    if (Attacker.OwnerId != ViewerId || !Attacker.IsAlive()) continue;
+    const FS08BoardFighter* Target = nullptr;
+    bool bZone = false;
+    for (const FS08BoardFighter& Enemy : Fighters) {
+      if (Enemy.OwnerId == ViewerId || !Enemy.IsAlive()) continue;
+      if (Board.IsAdjacent(FIntPoint(Attacker.X, Attacker.Y), FIntPoint(Enemy.X, Enemy.Y))) {
+        Target = &Enemy;
+        break;
+      }
+    }
+    if (!Target && Board.bHasTopology) {
+      for (const FS08BoardFighter& Enemy : Fighters) {
+        if (Enemy.OwnerId == ViewerId || !Enemy.IsAlive()) continue;
+        if (IsZoneOnlyTarget(Board, Attacker, Enemy)) {
+          Target = &Enemy;
+          bZone = true;
+          break;
+        }
+      }
+    }
+    if (!Target) continue;
+    FAutoAttackPick Pick;
+    Pick.AttackerId = Attacker.Id;
+    Pick.TargetId = Target->Id;
+    Pick.bZoneOnly = bZone;
+    Ordered.Add(Pick);
+    (bZone ? ZoneOnly : Adjacent).Add(Pick);
+  }
+  if (!bPreferRanged) return Ordered;
+  ZoneOnly.Append(Adjacent);
+  return ZoneOnly;
+}
+
+bool FS09CommandUi::PickRangedPosition(const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters,
+                                       const FString& MoverId, int32 Allowance, const TSet<uint64>& Reserved,
+                                       FIntPoint& OutCell, int32& OutSteps, FString& OutTargetId) {
+  OutSteps = 0;
+  OutTargetId.Reset();
+  const FS08BoardFighter* Mover =
+      Fighters.FindByPredicate([&MoverId](const FS08BoardFighter& F) { return F.Id == MoverId; });
+  if (!Mover || !Mover->IsAlive() || !IsRangedAttacker(*Mover) || !Board.bHasTopology) return false;
+  // From (X,Y): no linked living enemy, and the first living enemy sharing a zone.
+  auto ZoneOnlyFrom = [&](int32 X, int32 Y, FString& OutTarget) {
+    FS08BoardFighter Probe = *Mover;
+    Probe.X = X;
+    Probe.Y = Y;
+    for (const FS08BoardFighter& Enemy : Fighters) {
+      if (Enemy.OwnerId == Mover->OwnerId || !Enemy.IsAlive()) continue;
+      if (Board.IsAdjacent(FIntPoint(X, Y), FIntPoint(Enemy.X, Enemy.Y))) return false;
+    }
+    for (const FS08BoardFighter& Enemy : Fighters) {
+      if (Enemy.OwnerId == Mover->OwnerId || !Enemy.IsAlive()) continue;
+      if (IsZoneOnlyTarget(Board, Probe, Enemy)) {
+        OutTarget = Enemy.Id;
+        return true;
+      }
+    }
+    return false;
+  };
+  FString Here;
+  if (ZoneOnlyFrom(Mover->X, Mover->Y, Here)) return false; // already in a ranged position: stay
+  const TSet<uint64> Reach = FS08BoardModel::ComputeReachableCells(Board, Fighters, MoverId, Allowance);
+  bool bFound = false;
+  for (const uint64 Key : Reach) {
+    const int32 X = static_cast<int32>(Key >> 32);
+    const int32 Y = static_cast<int32>(Key & 0xFFFFFFFF);
+    if ((X == Mover->X && Y == Mover->Y) || Reserved.Contains(Key)) continue;
+    FString Target;
+    if (!ZoneOnlyFrom(X, Y, Target)) continue;
+    TArray<FIntPoint> Path;
+    if (!FS08BoardModel::BuildManeuverPath(Board, Fighters, MoverId, Allowance, X, Y, Path) || Path.Num() == 0) {
+      continue;
+    }
+    const int32 Steps = Path.Num();
+    const bool bBetter = !bFound || Steps < OutSteps ||
+                         (Steps == OutSteps && (Y < OutCell.Y || (Y == OutCell.Y && X < OutCell.X)));
+    if (!bBetter) continue;
+    bFound = true;
+    OutCell = FIntPoint(X, Y);
+    OutSteps = Steps;
+    OutTargetId = Target;
+  }
+  return bFound;
+}
+
 bool FS09CommandUi::OnSnapshot(const FS08Snapshot& Snapshot, const FS08BoardModel& Board,
                                const TArray<FS08BoardFighter>& Fighters) {
   const ES09CommandMode OldMode = Mode;

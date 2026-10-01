@@ -15,11 +15,13 @@ Checks (each reported; --require-* turn them into exit-code gates):
           'S09AUTO ranged target attacker=A at=S1 target=T at=S2 via=shared-zone (not linked)' followed by
           'ATTACK done seq=N', re-checked against the fixture (no link, common zone) and matched to an
           ATTACK_INITIATED row with the same attacker/target at seq N.
+          Both traces are scanned (each seat's driver logs its own picks; with run-combat-demo -JoinerAttack
+          the joiner's Merlin too); --require-ranged-attacker ID gates on a proven attack by that fighter.
   result  'RESULT seq=N outcome=VICTORY|DEFEAT' on both seats (one each) and a GAME_ENDED row.
 
 Usage:
   python tools/s09/verify_graph_duel.py --host-trace H --joiner-trace J [--game-id ID] [--fixture F]
-         [--require-moves] [--require-ranged] [--require-result] [--json OUT]
+         [--require-moves] [--require-ranged] [--require-ranged-attacker ID ...] [--require-result] [--json OUT]
   python tools/s09/verify_graph_duel.py --self-test
 The game id defaults to the 'createGame -> room=<id>' line of the host trace; the fixture defaults to
 the topology fixture whose boardId equals the GAME_CREATED payload boardId.
@@ -168,9 +170,25 @@ def check_moves(g: Graph, actions: list[dict], cues: list[dict]) -> dict:
             "nonManeuverCueMoves": effects, "problems": problems}
 
 
-def check_ranged(g: Graph, host_text: str, actions: list[dict]) -> dict:
-    lines = host_text.splitlines()
+def check_ranged(g: Graph, traces: "str | dict[str, str]", actions: list[dict]) -> dict:
+    """traces: {seat: trace text}; a bare string is the host trace (pre-P5a call shape). The S09AUTO driver
+    of EACH seat logs its own ranged picks, so the host (Medusa) and - with run-combat-demo -JoinerAttack -
+    the joiner (Merlin) are both scanned; 'byAttacker' counts the proven attacks per fighter id."""
+    if isinstance(traces, str):
+        traces = {"host": traces}
     attacks = [a for a in actions if a.get("type") == "ATTACK_INITIATED"]
+    found = []
+    for seat, text in traces.items():
+        found.extend(_ranged_in_trace(g, seat, text.splitlines(), attacks))
+    by_attacker: dict[str, int] = {}
+    for r in found:
+        if r["ok"]:
+            by_attacker[r["attacker"]] = by_attacker.get(r["attacker"], 0) + 1
+    return {"rangedNonAdjacent": sum(1 for r in found if r["ok"]), "byAttacker": by_attacker,
+            "candidates": found, "attacksTotal": len(attacks)}
+
+
+def _ranged_in_trace(g: Graph, seat: str, lines: list[str], attacks: list[dict]) -> list[dict]:
     found = []
     for i, line in enumerate(lines):
         m = RANGED_RE.search(line)
@@ -189,13 +207,12 @@ def check_ranged(g: Graph, host_text: str, actions: list[dict]) -> dict:
         row = next((a for a in attacks if (a["payload"].get("input") or {}).get("attackerId") == attacker
                     and (a["payload"].get("input") or {}).get("targetId") == target
                     and (done is None or abs(a["seq"] - done) <= 2)), None)  # done seq = the returned snapshot
-        rec = {"attacker": attacker, "attackerAt": a_at, "target": target, "targetAt": t_at,
+        rec = {"seat": seat, "attacker": attacker, "attackerAt": a_at, "target": target, "targetAt": t_at,
                "linked": g.linked_labels(a_at, t_at), "sharedZones": shared, "attackDoneSeq": done,
                "serverRow": bool(row)}
         rec["ok"] = (not rec["linked"]) and bool(shared) and done is not None and rec["serverRow"]
         found.append(rec)
-    return {"rangedNonAdjacent": sum(1 for r in found if r["ok"]), "candidates": found,
-            "attacksTotal": len(attacks)}
+    return found
 
 
 def check_result(host_text: str, join_text: str, actions: list[dict]) -> dict:
@@ -225,11 +242,13 @@ def run(args) -> int:
     report = {"schema": "unmatched.env-maps.graph-duel-check/1", "gameId": game_id, "boardId": board_id,
               "map": fx["map"], "actions": len(actions),
               "moves": check_moves(g, actions, parse_cues([host_text, join_text])),
-              "ranged": check_ranged(g, host_text, actions),
+              "ranged": check_ranged(g, {"host": host_text, "joiner": join_text}, actions),
               "result": check_result(host_text, join_text, actions)}
     report["gates"] = {"moves": report["moves"]["allLinked"] and not report["moves"]["problems"],
                        "ranged": report["ranged"]["rangedNonAdjacent"] > 0,
                        "result": report["result"]["ok"]}
+    for fid in args.require_ranged_attacker or []:
+        report["gates"][f"ranged:{fid}"] = report["ranged"]["byAttacker"].get(fid, 0) > 0
     out = json.dumps(report, indent=1, ensure_ascii=False)
     if args.json:
         Path(args.json).write_text(out + "\n", encoding="utf-8")
@@ -237,9 +256,11 @@ def run(args) -> int:
                       "maneuverMoves": report["moves"]["maneuverMoves"], "stepsChecked": report["moves"]["stepsChecked"],
                       "nonManeuverCueMoves": len(report["moves"]["nonManeuverCueMoves"]),
                       "rangedNonAdjacent": report["ranged"]["rangedNonAdjacent"],
+                      "rangedByAttacker": report["ranged"]["byAttacker"],
                       "result": report["result"]}, ensure_ascii=False))
     failed = [k for k, req in (("moves", args.require_moves), ("ranged", args.require_ranged),
                                ("result", args.require_result)) if req and not report["gates"][k]]
+    failed += [f"ranged:{fid}" for fid in args.require_ranged_attacker or [] if not report["gates"][f"ranged:{fid}"]]
     if failed:
         print("GATES FAILED: " + ", ".join(failed), file=sys.stderr)
         return 1
@@ -286,6 +307,15 @@ def self_test() -> int:
     expect("ranged without a server row not counted", check_ranged(g, host, [])["rangedNonAdjacent"] == 0)
     host_adj = host.replace(f"at={far['id']} via", f"at={b['id']} via")
     expect("linked pair is not a ranged proof", check_ranged(g, host_adj, acts)["rangedNonAdjacent"] == 0)
+    # P5a: the joiner's own driver line (Merlin, f-1-sk0) is scanned too and counted per attacker.
+    join = (f"S09AUTO ranged target attacker=f-1-sk0 at={far['id']} target=f-0-hero at={a['id']} "
+            "via=shared-zone (not linked) prefer=ranged" + chr(10) + "ATTACK sent" + chr(10) + "ATTACK done seq=20" + chr(10))
+    acts2 = acts + [{"type": "ATTACK_INITIATED", "seq": 20, "payload": {"input": {"attackerId": "f-1-sk0", "targetId": "f-0-hero"}}}]
+    both = check_ranged(g, {"host": host, "joiner": join}, acts2)
+    expect("joiner Merlin ranged attack counted per attacker",
+           both["rangedNonAdjacent"] == 2 and both["byAttacker"] == {"f-0-hero": 1, "f-1-sk0": 1}
+           and [c["seat"] for c in both["candidates"]] == ["host", "joiner"])
+    expect("host-only scan does not see the joiner's attack", check_ranged(g, host, acts2)["byAttacker"] == {"f-0-hero": 1})
     res = check_result("RESULT seq=80 outcome=VICTORY winner=u1", "RESULT seq=80 outcome=DEFEAT winner=u1",
                        [{"type": "GAME_ENDED", "seq": 80, "payload": {}}])
     expect("one VICTORY + one DEFEAT + GAME_ENDED", res["ok"])
@@ -306,6 +336,8 @@ def main(argv=None) -> int:
     ap.add_argument("--require-moves", action="store_true")
     ap.add_argument("--require-ranged", action="store_true")
     ap.add_argument("--require-result", action="store_true")
+    ap.add_argument("--require-ranged-attacker", action="append", metavar="FIGHTER_ID",
+                    help="gate: >= 1 proven ranged shared-zone attack BY this fighter (e.g. f-1-sk0 = Merlin); repeatable")
     ap.add_argument("--self-test", action="store_true")
     a = ap.parse_args(argv)
     if a.self_test:

@@ -271,6 +271,11 @@ void AS08FlowGameMode::BeginPlay() {
   //   nodefense defender closes the window with no card
   //   resolve   press resolve in COMBAT_RESOLVE
   //   scheme    play one scheme card in the next own action phase
+  //   ranged    (opt-in, ENV-MAPS P5a) with 'attack': zone-only ranged picks
+  //             first and never deferred for a may-boost card; ranged
+  //             sidekicks maneuver to a zone-only (shared zone, no link) spot
+  //   ownresult (opt-in, ENV-MAPS P5a) the combat-result shot only for a combat
+  //             this seat attacked
   {
     FString Plan;
     FParse::Value(FCommandLine::Get(), TEXT("S09Combat="), Plan);
@@ -607,7 +612,11 @@ void AS08FlowGameMode::TrackCombatResult(const FS08Snapshot& Snapshot,
           *LastCombatResult.TargetFighterId, NumberSeq, Snapshot.SequenceNumber));
     }
   }
-  if (!S09ShotDir.IsEmpty() && !bS09ShotResult) {
+  // ENV-MAPS P5a opt-in plan token 'ownresult' (run-combat-demo -JoinerAttack host plan): the combat-result evidence
+  // shot waits for a combat THIS seat attacked. As a defender the host's result panel can be replaced in the very
+  // next frame by its own post-combat pending choice (Medusa TARGET_FIGHTER), which the result gate rejects.
+  const bool bResultShotRoleOk = !S09CombatPlan.Contains(TEXT("ownresult")) || LastCombatResult.bViewerWasAttacker;
+  if (!S09ShotDir.IsEmpty() && !bS09ShotResult && bResultShotRoleOk) {
     bS09ShotResult = true;
     S09ShotResultPath = S09ShotDir / TEXT("s09-combat-result.png");
     ShotResultAtElapsed = Elapsed;
@@ -2535,43 +2544,34 @@ void AS08FlowGameMode::RunS09Auto() {
       CommandUi.Mode = ES09CommandMode::AttackDraft;
       const FS09PlayerPanel* Own = Hud.ViewerPanel();
       const FS09CardView* Chosen = nullptr;
-      for (const FS08BoardFighter& Candidate : Fighters) {
-        if (Candidate.OwnerId != CommandUi.ViewerId || !Candidate.IsAlive()) continue;
+      bool bChosenZoneTarget = false;
+      // Melee pick first: a board-adjacent enemy (linked space; on a grid
+      // manhattan 1 in the old order). ENV-O6: on an original-map board a
+      // ranged attacker without an adjacent enemy takes the first enemy it
+      // shares a zone with (server ranged rule). Grids keep the old
+      // melee-only auto pick so the recorded Cobble / art-fixture S09AUTO
+      // sequence stays unchanged; manual drafts offer ranged everywhere.
+      // ENV-MAPS P5a opt-in 'ranged' token: zone-only picks go first (the
+      // joiner's Merlin proof); without it the order is the old loop's.
+      const bool bPreferRanged = HasPlan(TEXT("ranged"));
+      const TArray<FS09CommandUi::FAutoAttackPick> Picks =
+          FS09CommandUi::AutoAttackPicks(BoardModel, Fighters, CommandUi.ViewerId, bPreferRanged);
+      for (const FS09CommandUi::FAutoAttackPick& Pick : Picks) {
+        const FS08BoardFighter* Candidate = Fighters.FindByPredicate(
+            [&Pick](const FS08BoardFighter& F) { return F.Id == Pick.AttackerId; });
+        const FS08BoardFighter* Target = Fighters.FindByPredicate(
+            [&Pick](const FS08BoardFighter& F) { return F.Id == Pick.TargetId; });
+        if (!Candidate || !Target) continue;
         FString Why;
-        if (!CommandUi.SelectAttacker(Candidate.Id, BoardModel, Fighters, Why)) continue;
-        // Melee pick first: a board-adjacent enemy (linked space; on a grid
-        // manhattan 1 in the old order). ENV-O6: on an original-map board a
-        // ranged attacker without an adjacent enemy takes the first enemy it
-        // shares a zone with (server ranged rule). Grids keep the old
-        // melee-only auto pick so the recorded Cobble / art-fixture S09AUTO
-        // sequence stays unchanged; manual drafts offer ranged everywhere.
-        const FS08BoardFighter* Target = nullptr;
-        bool bZoneTarget = false;
-        for (const FS08BoardFighter& Enemy : Fighters) {
-          if (Enemy.OwnerId == CommandUi.ViewerId || !Enemy.IsAlive()) continue;
-          if (BoardModel.IsAdjacent(FIntPoint(Candidate.X, Candidate.Y),
-                                    FIntPoint(Enemy.X, Enemy.Y))) {
-            Target = &Enemy;
-            break;
-          }
-        }
-        if (!Target && BoardModel.bHasTopology) {
-          for (const FS08BoardFighter& Enemy : Fighters) {
-            if (Enemy.OwnerId == CommandUi.ViewerId || !Enemy.IsAlive()) continue;
-            if (FS09CommandUi::IsZoneOnlyTarget(BoardModel, Candidate, Enemy)) {
-              Target = &Enemy;
-              bZoneTarget = true;
-              break;
-            }
-          }
-        }
-        if (!Target) continue;
+        if (!CommandUi.SelectAttacker(Candidate->Id, BoardModel, Fighters, Why)) continue;
         if (!CommandUi.SelectTarget(Target->Id, BoardModel, Fighters, Why)) continue;
-        if (bZoneTarget) {
+        bChosenZoneTarget = Pick.bZoneOnly;
+        if (Pick.bZoneOnly) {
           FS08Trace::Write(FString::Printf(
-              TEXT("S09AUTO ranged target attacker=%s at=%s target=%s at=%s via=shared-zone (not linked)"),
-              *Candidate.Id, *BoardModel.CellLabel(Candidate.X, Candidate.Y), *Target->Id,
-              *BoardModel.CellLabel(Target->X, Target->Y)));
+              TEXT("S09AUTO ranged target attacker=%s at=%s target=%s at=%s via=shared-zone (not linked)%s"),
+              *Candidate->Id, *BoardModel.CellLabel(Candidate->X, Candidate->Y), *Target->Id,
+              *BoardModel.CellLabel(Target->X, Target->Y),
+              bPreferRanged ? TEXT(" prefer=ranged") : TEXT("")));
         }
         if (!Own) break;
         // Prefer a "You may BOOST this attack" card (Second Shot / Noble
@@ -2597,7 +2597,10 @@ void AS08FlowGameMode::RunS09Auto() {
       const bool bChoseMayBoost =
           Chosen && (Chosen->Name == TEXT("Second Shot") ||
                      Chosen->Name == TEXT("Noble Sacrifice"));
-      if (!bChoseMayBoost && !bS09ShotResolveRevealed && OwnTurnIndex < 8 &&
+      // 'ranged' plan token: a zone-only (ranged) attack is the proof itself
+      // and is never parked for a may-boost card.
+      const bool bRangedProofPick = bPreferRanged && bChosenZoneTarget && Chosen;
+      if (!bChoseMayBoost && !bRangedProofPick && !bS09ShotResolveRevealed && OwnTurnIndex < 8 &&
           Elapsed < 150.0f) {
         // The GD-033 reveal proof needs a may-boost attack (the server pauses
         // after THAT reveal). While no such card is in hand, close the draft
@@ -2798,7 +2801,44 @@ void AS08FlowGameMode::RunS09Auto() {
       } else {
         StepOneCell(CommandUi, Snap, BoardModel, Fighters, Hero->Id);
       }
-      const bool bMultiFighter = !bAutoS09Boost && OwnTurnIndex == 2 && ActionsDone == 1 && Sidekick;
+      // ENV-MAPS P5a opt-in 'ranged' token: every own living RANGED sidekick
+      // (Merlin) also moves - by the same graph rules (legal reach, links) -
+      // to the nearest space from where it has a zone-only target (no linked
+      // enemy, a shared zone), clear of the other draft endpoints. Stays put
+      // when it already stands in such a position or none is reachable.
+      FString RangedMovedId;
+      if (HasPlan(TEXT("ranged"))) {
+        TSet<uint64> Reserved;
+        for (const FS09DraftMove& Move : CommandUi.Moves) {
+          Reserved.Add(FS08BoardModel::CellKey(Move.DestX, Move.DestY));
+        }
+        for (const FS08BoardFighter& Entry : Fighters) {
+          if (Entry.OwnerId != CommandUi.ViewerId || !Entry.IsAlive() || Entry.bIsHero) continue;
+          if (!FS09CommandUi::IsRangedAttacker(Entry)) continue;
+          FIntPoint Dest(-1, -1);
+          int32 Steps = 0;
+          FString ZoneTarget;
+          if (!FS09CommandUi::PickRangedPosition(BoardModel, Fighters, Entry.Id, Entry.Movement, Reserved, Dest,
+                                                 Steps, ZoneTarget)) {
+            continue;
+          }
+          FString Reason;
+          CommandUi.SelectFighter(Entry.Id, Snap, BoardModel, Fighters);
+          if (CommandUi.SetDestination(Entry.Id, Dest.X, Dest.Y, Snap, BoardModel, Fighters, Reason)) {
+            Reserved.Add(FS08BoardModel::CellKey(Dest.X, Dest.Y));
+            if (RangedMovedId.IsEmpty()) RangedMovedId = Entry.Id;
+            FS08Trace::Write(FString::Printf(
+                TEXT("S09AUTO ranged position fighter=%s from=%s to=%s steps=%d zoneTarget=%s"), *Entry.Id,
+                *BoardModel.CellLabel(Entry.X, Entry.Y), *BoardModel.CellLabel(Dest.X, Dest.Y), Steps,
+                *ZoneTarget));
+          } else {
+            FS08Trace::Write(FString::Printf(TEXT("S09AUTO ranged position: destination %s refused by the draft (%s)"),
+                                             *BoardModel.CellLabel(Dest.X, Dest.Y), *Reason));
+          }
+        }
+      }
+      const bool bMultiFighter = !bAutoS09Boost && OwnTurnIndex == 2 && ActionsDone == 1 && Sidekick &&
+                                 Sidekick->Id != RangedMovedId;
       if (bMultiFighter) {
         StepOneCell(CommandUi, Snap, BoardModel, Fighters, Sidekick->Id);
         FS08Trace::Write(FString::Printf(TEXT("S09AUTO multi-fighter moves=%d"),

@@ -51,7 +51,15 @@
   # 'RESULT seq=N outcome=VICTORY|DEFEAT winner=' (exactly one VICTORY and one
   # DEFEAT) and the authoritative game row reads FINISHED with a winnerId that
   # is one of this run's two seats. Without the switch the K3 gates are unchanged.
-  [switch]$RequireGameOver
+  [switch]$RequireGameOver,
+  # ENV-MAPS P5a (opt-in): the joiner side (King Arthur + Merlin) maneuvers and attacks too, on the
+  # same graph rules: joiner plan attack+ranged+defend+resolve (approach + attack; the 'ranged' token
+  # puts a zone-only ranged pick - Merlin through a shared zone when no linked enemy exists - first),
+  # host plan attack+defend+ownresult (it must answer the joiner's attacks; its result shot waits for a combat it
+  # attacked - as a defender Medusa's post-combat pending choice can replace the result panel). Gated: the joiner trace must show
+  # its own 'S09AUTO attack (' + 'ATTACK done seq=' and the host trace its 'DEFENSE done seq='.
+  # Without the switch both plans and all gates are unchanged.
+  [switch]$JoinerAttack
 )
 
 # W5b-R (t53-thresholds.json shotCaptured): every published frame must carry its pixel provenance line
@@ -322,9 +330,12 @@ function Invoke-CombatDemo {
   if ($ClientPerf) { $common += '-S08Perf' }
   if ($ArtPreviewHeroesV2) { $common += '-ArtPreviewHeroesV2' }
   if ($ArtPreviewDiorama) { $common += '-ArtPreviewDiorama' }
+  $HostPlan = if ($JoinerAttack) { 'attack+defend+ownresult' } else { 'attack' }
+  $JoinPlan = if ($JoinerAttack) { 'attack+ranged+defend+resolve' } else { 'defend+resolve' }
+  Write-Output "combat plans: host=$HostPlan joiner=$JoinPlan"
   $hostArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
     "-S08Auto", "-S08Create", "-S08HeroId=$heroA", "-S08Trace=$hostTrace",
-    "-S09Flow", "-S09Combat=attack", "-S09ShotDir=$hostShots", "-S08ExitAfter=$RunSeconds")
+    "-S09Flow", "-S09Combat=$HostPlan", "-S09ShotDir=$hostShots", "-S08ExitAfter=$RunSeconds")
   if ($ArtPreviewBoardId) { $hostArgs += "-ArtPreviewBoardId=$ArtPreviewBoardId" }
   if ($ArtPreviewShotAfter -gt 0) { $hostArgs += "-ArtPreviewShotAfter=$ArtPreviewShotAfter" }
   if ($ArtPreviewSelectOwnHero) { $hostArgs += '-ArtPreviewSelectOwnHero' }
@@ -333,7 +344,7 @@ function Invoke-CombatDemo {
   }
   $joinArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
     "-S08Auto", "-S08HeroId=$heroB", "-S08Trace=$joinTrace",
-    "-S09Flow", "-S09Combat=defend+resolve", "-S09ShotDir=$joinShots", "-S08ExitAfter=$RunSeconds")
+    "-S09Flow", "-S09Combat=$JoinPlan", "-S09ShotDir=$joinShots", "-S08ExitAfter=$RunSeconds")
 
   $hostProc = $null
   $joinProc = $null
@@ -645,6 +656,23 @@ function Invoke-CombatDemo {
       'S09AUTO resolve-window shot', 'S09AUTO resolve',
       'RESOLVE sent', 'RESOLVE done seq=',
       'COMBAT-RESULT seq=', 'S09AUTO combat-result shot') 'joiner'
+    $JoinerAttackStats = $null
+    if ($JoinerAttack) {
+      # ENV-MAPS P5a opt-in: the joiner attacked on its own turns and the host answered the defense window.
+      Assert-Trace $joinTrace @('S09AUTO attack (', 'ATTACK sent', 'ATTACK done seq=') 'joiner attack plan'
+      if (-not (Select-String -LiteralPath $hostTrace -Pattern 'S09AUTO (defense card picked|no legal defense card)' -Quiet)) {
+        throw 'host trace never answered a joiner attack (no S09AUTO defense card picked / no legal defense card)'
+      }
+      $JoinerAttackStats = [ordered]@{
+        hostPlan = $HostPlan; joinerPlan = $JoinPlan
+        joinerAttacksDone = @(Select-String -LiteralPath $joinTrace -Pattern 'ATTACK done seq=').Count
+        joinerRangedPicks = @(Select-String -LiteralPath $joinTrace -Pattern 'S09AUTO ranged target attacker=').Count
+        hostAttacksDone = @(Select-String -LiteralPath $hostTrace -Pattern 'ATTACK done seq=').Count
+        hostDefenses = @(Select-String -LiteralPath $hostTrace -Pattern 'S09AUTO (defense card picked|no legal defense card)').Count
+      }
+      Write-Output ("joiner attack plan: joiner attacks done={0} ranged picks={1}; host attacks done={2} defenses={3}" -f `
+        $JoinerAttackStats.joinerAttacksDone, $JoinerAttackStats.joinerRangedPicks, $JoinerAttackStats.hostAttacksDone, $JoinerAttackStats.hostDefenses)
+    }
     if ($ArtPreview) {
       Assert-Trace $joinTrace @(
         'ARTPREVIEW damage-number fighter=',
@@ -710,9 +738,18 @@ function Invoke-CombatDemo {
     if (-not ($hostText -match 'phase=COMBAT')) { throw "host trace never observed phase=COMBAT" }
 
     # Privacy: published traces must not carry card ids for combat actions.
+    # ENV-MAPS P5a: 'PEND-RESOLVE sent type=<T> stage=N id=<effect id>' (pending-choice answer, GD-035) is not a
+    # combat command; the case-insensitive 'card' used to hit its type DISCARD_CARDS / id 'discard-choice-...' (an
+    # after-combat effect of an already revealed card - the same id class as the accepted BOOST_CHOICE / MOVE ids).
+    # Only that exact pending-answer line shape is exempt; any other PEND-RESOLVE line (e.g. one logging a card
+    # field) is still checked like every combat command.
+    $pendAnswer = '^\S+ PEND-RESOLVE sent type=[A-Z_]+ stage=\d+ id=\S+$'
     foreach ($t in @(@('host', $hostText), @('joiner', $joinText))) {
-      if ($t[1] -match '(ATTACK|DEFENSE|RESOLVE|SCHEME) sent .*card') {
-        throw "$($t[0]) trace appears to log card identities with a combat command"
+      foreach ($line in ($t[1] -split "`r?`n")) {
+        if ($line -match $pendAnswer) { continue }
+        if ($line -match '(ATTACK|DEFENSE|RESOLVE|SCHEME) sent .*card') {
+          throw "$($t[0]) trace appears to log card identities with a combat command"
+        }
       }
     }
 
@@ -811,6 +848,7 @@ function Invoke-CombatDemo {
       render = [ordered]@{ clientRenderPreset = $ClientRenderPreset; requireRenderReference = [bool]$RequireRenderReference; clientPerf = [bool]$ClientPerf }
       revealProof = $RevealProof
       gameOver = $GameOver
+      joinerAttack = $JoinerAttackStats
       files   = @()
     }
     function Get-Sha256Hex([string]$Path) {

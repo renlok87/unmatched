@@ -1089,6 +1089,153 @@ bool FS09RangedTargetsDraftTest::RunTest(const FString&) {
   return true;
 }
 
+// ---- ENV-MAPS P5a: S09AUTO auto-attack order (joiner attack plan) --------
+
+namespace S08BoardGraphTest {
+FString BgPicksText(const TArray<FS09CommandUi::FAutoAttackPick>& Picks) {
+  TArray<FString> Parts;
+  for (const FS09CommandUi::FAutoAttackPick& P : Picks) {
+    Parts.Add(FString::Printf(TEXT("%s>%s%s"), *P.AttackerId, *P.TargetId, P.bZoneOnly ? TEXT("(zone)") : TEXT("")));
+  }
+  return FString::Join(Parts, TEXT(","));
+}
+} // namespace S08BoardGraphTest
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09AutoAttackPicksTest,
+    "Unmatched.S09.RangedTargets.AutoPicks driver order: adjacent first per fighter, zone-only when no link, opt-in ranged preference",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS09AutoAttackPicksTest::RunTest(const FString&) {
+  FS08BoardModel Board;
+  if (!TestTrue(TEXT("board"), BgSyntheticBoard(Board))) return false;
+  const TArray<FS08BoardFighter> Fighters = BgRangedRoster();
+
+  // Host side 'A' (default order = the pre-P5a driver loop): Medusa has no
+  // linked enemy -> first zone-only enemy (Arthur, shared yellow); Harpy A ->
+  // Arthur by link; melee Harpy B has none (Merlin only shares red).
+  const FString HostDefault = BgPicksText(FS09CommandUi::AutoAttackPicks(Board, Fighters, TEXT("A"), false));
+  TestEqual(TEXT("host default order"), HostDefault, FString(TEXT("medusa>arthur(zone),harpy-a>arthur")));
+
+  // Joiner side 'B' = King Arthur + Merlin. Arthur (melee) hits Harpy A by
+  // the G09-G10 link; Merlin (ranged, G02) has NO linked enemy and takes the
+  // first enemy of a shared zone: Medusa (red).
+  const FString JoinDefault = BgPicksText(FS09CommandUi::AutoAttackPicks(Board, Fighters, TEXT("B"), false));
+  TestEqual(TEXT("joiner default order (Fighters order)"), JoinDefault,
+            FString(TEXT("arthur>harpy-a,merlin>medusa(zone)")));
+  const FString JoinRanged = BgPicksText(FS09CommandUi::AutoAttackPicks(Board, Fighters, TEXT("B"), true));
+  TestEqual(TEXT("joiner with the 'ranged' token: Merlin's zone pick first"), JoinRanged,
+            FString(TEXT("merlin>medusa(zone),arthur>harpy-a")));
+
+  // The zone pick is a real legal draft pair for the joiner seat.
+  FS09CommandUi Ui;
+  Ui.ViewerId = TEXT("B");
+  Ui.Mode = ES09CommandMode::AttackDraft;
+  FString Reason;
+  TestTrue(TEXT("Merlin selectable as attacker"), Ui.SelectAttacker(TEXT("merlin"), Board, Fighters, Reason));
+  TestTrue(TEXT("Merlin -> Medusa accepted (shared red, not linked)"),
+           Ui.SelectTarget(TEXT("medusa"), Board, Fighters, Reason));
+  TestTrue(TEXT("... and it is zone-only"),
+           FS09CommandUi::IsZoneOnlyTarget(Board, BgRosterFighter(Fighters, TEXT("merlin")),
+                                           BgRosterFighter(Fighters, TEXT("medusa"))));
+
+  // A linked enemy wins over the zone for the same fighter: Harpy B moves to
+  // G01 (linked to Merlin's G02) -> Merlin attacks it by link, no zone pick.
+  TArray<FS08BoardFighter> Linked = Fighters;
+  for (FS08BoardFighter& F : Linked) {
+    if (F.Id == TEXT("harpy-b")) {
+      F.X = 0;
+      F.Y = 0;
+    }
+  }
+  TestEqual(TEXT("Merlin with a linked enemy takes the link, even with the ranged token"),
+            BgPicksText(FS09CommandUi::AutoAttackPicks(Board, Linked, TEXT("B"), true)),
+            FString(TEXT("arthur>harpy-a,merlin>harpy-b")));
+
+  // Dead fighters are neither attackers nor targets.
+  TArray<FS08BoardFighter> Dead = Fighters;
+  for (FS08BoardFighter& F : Dead) {
+    if (F.Id == TEXT("medusa") || F.Id == TEXT("arthur")) F.Health = 0;
+  }
+  TestEqual(TEXT("defeated Medusa/Arthur: Merlin's only pick is Harpy B by the shared red zone (not linked)"),
+            BgPicksText(FS09CommandUi::AutoAttackPicks(Board, Dead, TEXT("B"), true)),
+            FString(TEXT("merlin>harpy-b(zone)")));
+  TestEqual(TEXT("defeated Medusa: host has only Harpy A (no living linked target) -> none"),
+            BgPicksText(FS09CommandUi::AutoAttackPicks(Board, Dead, TEXT("A"), false)), FString());
+
+  // Grids keep the melee-only auto pick (no zone picks without a topology),
+  // with or without the token - the recorded Cobble sequence is unchanged.
+  FS08BoardModel Grid;
+  TestTrue(TEXT("grid"), Grid.Decode(BgGridBoardState()));
+  const TArray<FS08BoardFighter> GridRoster = {BgFighter(TEXT("archer"), TEXT("A"), 0, 0, TEXT("ranged")),
+                                               BgFighter(TEXT("far"), TEXT("B"), 4, 2),
+                                               BgFighter(TEXT("near"), TEXT("B"), 1, 0)};
+  TestFalse(TEXT("grid has no topology"), Grid.bHasTopology);
+  TestEqual(TEXT("grid: adjacent only"), BgPicksText(FS09CommandUi::AutoAttackPicks(Grid, GridRoster, TEXT("A"), true)),
+            FString(TEXT("archer>near")));
+  TArray<FS08BoardFighter> GridFar = GridRoster;
+  GridFar.RemoveAt(2);
+  TestEqual(TEXT("grid: a same-zone far enemy is no auto pick"),
+            BgPicksText(FS09CommandUi::AutoAttackPicks(Grid, GridFar, TEXT("A"), true)), FString());
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09RangedPositionTest,
+    "Unmatched.S09.RangedTargets.RangedPosition 'ranged' plan moves a ranged sidekick by links to a zone-only spot",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS09RangedPositionTest::RunTest(const FString&) {
+  FS08BoardModel Board;
+  if (!TestTrue(TEXT("board"), BgSyntheticBoard(Board))) return false;
+  TArray<FS08BoardFighter> Fighters = BgRangedRoster();
+  FIntPoint Cell(-1, -1);
+  int32 Steps = -1;
+  FString Target;
+  const TSet<uint64> NoReserved;
+
+  // Merlin on G02 (red, blue): no linked enemy, Medusa shares red -> already in position, stays.
+  TestFalse(TEXT("Merlin on G02 already has a zone-only target: stay"),
+            FS09CommandUi::PickRangedPosition(Board, Fighters, TEXT("merlin"), 2, NoReserved, Cell, Steps, Target));
+
+  // Merlin on G05 (blue only, linked to G02 only): no enemy in blue -> walk the G05-G02 link back to G02
+  // (G01 is 2 steps and linked to Harpy B on G06 - a melee spot, never a ranged pick).
+  for (FS08BoardFighter& F : Fighters) {
+    if (F.Id == TEXT("merlin")) {
+      F.X = 4;
+      F.Y = 0;
+    }
+  }
+  TestTrue(TEXT("Merlin on G05 finds a ranged spot"),
+           FS09CommandUi::PickRangedPosition(Board, Fighters, TEXT("merlin"), 2, NoReserved, Cell, Steps, Target));
+  TestTrue(FString::Printf(TEXT("... G02 (1,0), got (%d,%d)"), Cell.X, Cell.Y), Cell == FIntPoint(1, 0));
+  TestEqual(TEXT("... one linked step"), Steps, 1);
+  TestEqual(TEXT("... zone target Medusa (shared red)"), Target, FString(TEXT("medusa")));
+  TArray<FIntPoint> Path;
+  TestTrue(TEXT("the pick is a legal maneuver path over links"),
+           FS08BoardModel::BuildManeuverPath(Board, Fighters, TEXT("merlin"), 2, 1, 0, Path) &&
+               Path == TArray<FIntPoint>{FIntPoint(1, 0)});
+
+  // G02 reserved by another move of the same draft -> G01 is linked to Harpy B -> no ranged spot.
+  TSet<uint64> Reserved;
+  Reserved.Add(FS08BoardModel::CellKey(1, 0));
+  TestFalse(TEXT("reserved G02 and melee-only G01: no ranged spot"),
+            FS09CommandUi::PickRangedPosition(Board, Fighters, TEXT("merlin"), 2, Reserved, Cell, Steps, Target));
+
+  // Melee fighters, dead movers and grids never get a ranged position.
+  TestFalse(TEXT("melee Arthur: none"),
+            FS09CommandUi::PickRangedPosition(Board, Fighters, TEXT("arthur"), 2, NoReserved, Cell, Steps, Target));
+  TArray<FS08BoardFighter> Dead = Fighters;
+  for (FS08BoardFighter& F : Dead) {
+    if (F.Id == TEXT("merlin")) F.Health = 0;
+  }
+  TestFalse(TEXT("dead Merlin: none"),
+            FS09CommandUi::PickRangedPosition(Board, Dead, TEXT("merlin"), 2, NoReserved, Cell, Steps, Target));
+  FS08BoardModel Grid;
+  TestTrue(TEXT("grid"), Grid.Decode(BgGridBoardState()));
+  const TArray<FS08BoardFighter> GridRoster = {BgFighter(TEXT("archer"), TEXT("B"), 0, 0, TEXT("ranged")),
+                                               BgFighter(TEXT("far"), TEXT("A"), 4, 5)};
+  TestFalse(TEXT("grid: no ranged positioning (melee-only auto driver on grids)"),
+            FS09CommandUi::PickRangedPosition(Grid, GridRoster, TEXT("archer"), 3, NoReserved, Cell, Steps, Target));
+  return true;
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09RangedTargetsOriginalMapsTest,
     "Unmatched.S09.RangedTargets.OriginalMaps every space pair: melee = link, ranged = link or shared zone",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)

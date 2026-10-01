@@ -1,0 +1,106 @@
+{
+  "schema": "unmatched.envmaps-p5a-live-run/1",
+  "label": "k1-sarpedon",
+  "kind": "phase2",
+  "startedLocal": "2026-10-01T11:48:54+05:00",
+  "argv": [
+    "node",
+    "tools/s09/run-with-env.cjs",
+    "powershell",
+    "-NoProfile",
+    "-ExecutionPolicy",
+    "Bypass",
+    "-File",
+    "tools/s08/run-phase2-demo.ps1",
+    "-EvidenceDir",
+    "docs/game-design/evidence/ENV-MAPS/p5a-verify-2026-10-01/live/sarpedon/k1",
+    "-Api",
+    "http://localhost:3120/graphql",
+    "-ArtPreviewBoardId",
+    "c7fa64a26c29a0835f2383e63",
+    "-ArtPreviewHeroesV2",
+    "-ArtPreviewDiorama",
+    "-ArtPreviewShotAfter",
+    "36",
+    "-RunSeconds",
+    "50",
+    "-ClientFps",
+    "30",
+    "-ClientRenderPreset",
+    "High",
+    "-RequireRenderReference",
+    "-RequireShotCaptured",
+    "-ClientPerf"
+  ],
+  "credentials": "backend/.env exported by tools/s09/run-with-env.cjs into the child environment only",
+  "gpuLock": "owner=ENV-MAPS-P5a live pid 3333 2026-10-01T11:45:43+05:00",
+  "backend": {
+    "port": 3120,
+    "pid": 53484,
+    "process": {
+      "pid": 53484,
+      "parent": 31896,
+      "name": "node.exe",
+      "exe": "C:\\nvm4w\\nodejs\\node.exe",
+      "cmd": "C:\\nvm4w\\nodejs\\node.exe -r dotenv/config dist/src/main.js",
+      "created": "2026-10-01T10:56:36.3478300+05:00"
+    }
+  },
+  "staged": {
+    "global.ucas": "da0334ab680ac0ced936cad7cde332695ee0c44d9b30b9aa13b69a0c84e27866",
+    "global.utoc": "3c89e9d0176cb1f68e9462b27440ae4ac509c57fdbfef843621b6fb1eca0c7df",
+    "Unmatched-Windows.pak": "e227ca5c1fa540062047a5195d716907d8a21806f8ff2cabf2b732fa3838c720",
+    "Unmatched-Windows.ucas": "6d50fcdc1465b8204ea6176f4a9516393e1b6d802bfbb0fb1d341f664616d421",
+    "Unmatched-Windows.utoc": "1f7a6aae01500e3429c9db6ee0fb3b5b77e9e5b5c3add7227e5f10e58ad9f97e",
+    "Unmatched.exe(inner)": "52e76f392be1aabb5407f1d5091b80af18a756a8ed6f588ff3dc8f2f4284fd87"
+  },
+  "demoPid": 15864,
+  "demoExit": 0,
+  "finishedLocal": "2026-10-01T11:50:03+05:00",
+  "durationS": 67.1,
+  "staging": "C:\\Users\\ren\\AppData\\Local\\Temp\\s08-phase2-20261001-114858-19632",
+  "cleanupLine": "cleanup: aborted THIS run's game id=cmup6be2u00o3wi9o7eg5h1tn status=ABORTED (verified)",
+  "roomStatus": "ABORTED",
+  "runDir": "docs/game-design/evidence/ENV-MAPS/p5a-verify-2026-10-01/live/sarpedon/k1/run-20261001-114858",
+  "clientLogs": [
+    {
+      "name": "Unmatched.log",
+      "bytes": 110846,
+      "sha256": "8571f490f3ea8c8127c5cde8ee9a03569f12aafd6686bb3a9eb2ae16d2fe4c30",
+      "roomCodeRedacted": false
+    },
+    {
+      "name": "Unmatched_2.log",
+      "bytes": 110543,
+      "sha256": "a779d7e42cfd06ca14db837e0d1bc8a70c3b0764d6abc8940248f54bb19eea95",
+      "roomCodeRedacted": false
+    }
+  ],
+  "crashLines": [],
+  "clientProcesses": [
+    {
+      "pid": 6844,
+      "parent": 19632,
+      "exe": "C:\\tmp\\wt-envmaps\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched.exe",
+      "created": "2026-10-01T11:48:58.8149380+05:00"
+    },
+    {
+      "pid": 33916,
+      "parent": 6844,
+      "exe": "C:\\tmp\\wt-envmaps\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched\\Binaries\\Win64\\Unmatched.exe",
+      "created": "2026-10-01T11:48:58.8238270+05:00"
+    },
+    {
+      "pid": 53384,
+      "parent": 19632,
+      "exe": "C:\\tmp\\wt-envmaps\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched.exe",
+      "created": "2026-10-01T11:49:04.4101500+05:00"
+    },
+    {
+      "pid": 50060,
+      "parent": 53384,
+      "exe": "C:\\tmp\\wt-envmaps\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched\\Binaries\\Win64\\Unmatched.exe",
+      "created": "2026-10-01T11:49:04.4208210+05:00"
+    }
+  ]
+}
