@@ -114,7 +114,9 @@ Tripo и любых генераторов 3D**. Генератор изобра
 - суставы внутри силуэта по ширинам (|x| ≤ ширина/2 на своей высоте), `.L` при x > 0, кость оружия у своей стороны
   (handbook §2.6), иерархия и 17 имён (16 у Harpy) — по `docs/art-pipeline/rig/rig-contract.json`;
 - палитра: класс — одно из имён таблицы `material-library/README.md` (`steel_blued` … `wood`, индексы 1–15;
-  `horn_claw` — класс расширения без глобального индекса, см. там §3a); `team_accent: true` только у классов с
+  `horn_claw` — класс расширения без глобального индекса, см. там §3a) или `legacy_bake` (MatID 0) для того, чему нет
+  класса: волосы, борода, глаза, самоцветы (так размечены борода и кристалл Merlin, `merlin-lookdev-v2.md` §3); у
+  `legacy_bake` в зоне задаются `roughness` и `metallic` явно; `team_accent: true` только у классов с
   TeamColor «да» (кожа-материал `leather_*`, ткани `wool_coarse`/`linen`/`silk`, `feathers`), никогда у металлов,
   `skin`, `stone_base`, `wood`, `horn_claw` (handbook §2.9); ни один hex не ближе ΔE 20 к цветам фона и сетки шаблона
   (§3).
