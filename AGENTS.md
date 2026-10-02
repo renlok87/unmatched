@@ -192,3 +192,25 @@ frame), not a hard cap on the combined GPU percentage of the two clients;
 the 60/30 FPS caps above remain the only GPU-load limits. Compare render cost
 with `tools/art/render/render_bench.py` (packaged `-Bench`, no FPS cap,
 ProfileGPU / CSV per pass), never with capped `gpuMs`.
+
+## Iteration speed (user decision 2026-10-02)
+
+User request: «Конечно, делай и закрепи это в основном пайплайне.» The user asked for this after asking why tasks take so long. Most of the time goes to three things: relaunching the engine for every bench frame (1.5–2 min each), double packaging, and full gates on small edits.
+- **Live tune.** Iterate on parameter-only changes in ONE running client, using
+  `python tools/art/render/live_tune.py start|reload|shot|cycle|stop`. See
+  `tools/art/render/LIVE-TUNE.md`.
+  - Parameter-only means the light/board profiles in `S08ArtBoardProfiles.json` and the `EnvLayouts/*.layout.json` files.
+  - Relaunch only after C++, mesh, texture or material-instance changes.
+  - Use live-tune frames as gate evidence only on the fidelity-proven path documented there.
+- **Light mode** applies to small visual fixes and parameter tuning that add no new system:
+  - at most 3 tuning iterations;
+  - before/after frames of the affected views plus only the affected gates;
+  - no separate review agent;
+  - no `render_bench.py` cost run, unless the change adds lights, meshes, materials or FX;
+  - UE tests only when C++ changed, otherwise pytest and the `--check` validators.
+- **Full mode** is everything above (review pass, all gates, cost bench). Use it for new systems or architecture changes, or when the user asks for an acceptance round.
+- **One package per change.** Package once in the worktree; `package-client.ps1` stamps the staged build with the commit.
+  After `safe-integrate.sh --apply`, do two things in the main checkout:
+  - rebuild UnmatchedEditor;
+  - copy the staged build with `tools/s08/sync-staged-build.ps1 -From <worktree>`. It refuses when the stamp commit differs from the main HEAD; do not repackage.
+- **Packaging trap.** A new or renamed `Config/**.json` reaches the pak only after the game makefile is regenerated: touch `unreal/Unmatched/Source/Unmatched/Unmatched.Build.cs`, then build the game target with `-MaxParallelActions=4`.

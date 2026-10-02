@@ -64,3 +64,21 @@ $argList = @(
 $p = Start-Process -FilePath $Uat -ArgumentList $argList -WindowStyle Hidden -PassThru -Wait -RedirectStandardOutput $Log -RedirectStandardError "$Log.err"
 Write-Output "UAT_EXIT=$($p.ExitCode)"
 if ($p.ExitCode -ne 0) { throw "RunUAT failed with exit code $($p.ExitCode); see $Log" }
+
+# Stamp the staged build with the source hash it was packaged from: tools/s08/sync-staged-build.ps1 copies it into
+# another checkout only when that checkout's sources hash the same (AGENTS.md "Iteration speed": one package per change).
+$staged = Join-Path $ProjectDir 'Saved\StagedBuilds\Windows'
+if (Test-Path -LiteralPath $staged) {
+  . (Join-Path $PSScriptRoot 'staged-build-stamp.ps1')
+  $src = Get-UnmatchedSourceHash $RepoRoot
+  $stamp = [ordered]@{
+    schema = 'unmatched.staged-build-stamp/1'
+    commit = (git -C $RepoRoot rev-parse HEAD).Trim()
+    sourceHash = $src.hash
+    sourceFiles = $src.files
+    builtAt = (Get-Date).ToString('o')
+    skipBuild = [bool]$SkipBuild
+  }
+  $stamp | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $staged 'BuildStamp.json') -Encoding UTF8
+  Write-Output "STAMP sourceHash=$($src.hash) files=$($src.files)"
+}
