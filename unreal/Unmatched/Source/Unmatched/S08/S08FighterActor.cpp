@@ -786,7 +786,7 @@ void AS08FighterActor::ApplyHeroLight(const FS08HeroLightSpec* Spec, int32 Layer
     }
     HeroLightLayers = 0;
     HeroLightRigKey.Reset();
-    SetHeroLitChannels(false);
+    SetHeroLitChannels(false, false);
     RefreshHeroLightState();
     return;
   }
@@ -809,13 +809,16 @@ void AS08FighterActor::ApplyHeroLight(const FS08HeroLightSpec* Spec, int32 Layer
       }
       USpotLightComponent* Light = HeroLights[I];
       if (!Light) {
-        // A child of the fighter: it follows every move and hides with the actor. Channel 1 only, no shadow, no GI /
+        // A child of the fighter: it follows every move and hides with the actor. Channel 1 only, never a shadow map
+        // (ShadowResolutionScale 0: a layer with contact shadows only traces the screen-space contact ray), no GI /
         // volumetric / translucency share (the translucency volume and the Lumen surface cache ignore the channels).
         Light = NewObject<USpotLightComponent>(this, I == 0 ? TEXT("HeroLightKey") : TEXT("HeroLightRim"));
         Light->SetupAttachment(RootComponent);
         Light->SetMobility(EComponentMobility::Movable);
         Light->SetIntensityUnits(ELightUnits::Candelas);
         Light->SetCastShadows(false);
+        Light->ShadowResolutionScale = 0.0f;
+        Light->ContactShadowLengthInWS = false;
         Light->SetLightingChannels(false, true, false);
         Light->SetIndirectLightingIntensity(0.0f);
         Light->SetVolumetricScatteringIntensity(0.0f);
@@ -831,33 +834,54 @@ void AS08FighterActor::ApplyHeroLight(const FS08HeroLightSpec* Spec, int32 Layer
       Light->SetInnerConeAngle(Layer.InnerConeDeg);
       Light->SetOuterConeAngle(Layer.OuterConeDeg);
       Light->SetAttenuationRadius(P.AttenuationRadiusUU);
+      // P9b: less sheen on the PBR figures, and the layer's own screen-space contact shadows (wings / arms / folds occlude
+      // it). Contact shadows need a shadow-casting light (DeferredLightingCommon.ush: ShadowedBits > 1); with
+      // ShadowResolutionScale 0 the renderer never allocates a shadow map for it (ShadowSetup.cpp early-out).
+      Light->SetSpecularScale(Layer.SpecularScale);
+      const bool bContact = Layer.HasContactShadow();
+      if (Light->ContactShadowLength != Layer.ContactShadowLength || Light->ShadowResolutionScale != 0.0f) {
+        Light->ContactShadowLength = Layer.ContactShadowLength;
+        Light->ShadowResolutionScale = 0.0f;
+        Light->MarkRenderStateDirty();
+      }
+      Light->SetCastShadows(bContact);
       HeroLightBaseCd[I] = P.Candelas;
-      Placed += FString::Printf(TEXT(" %s=(%.0f,%.0f,%.0f)d%.0f/%.3fcd/r%.0f/cone%.0f-%.0f/#%s"), I == 0 ? TEXT("key") : TEXT("rim"),
-                                P.Location.X, P.Location.Y, P.Location.Z, P.DistanceUU, P.Candelas, P.AttenuationRadiusUU,
-                                Layer.InnerConeDeg, Layer.OuterConeDeg, *Layer.ColorSrgb.ToHex().Left(6));
+      Placed += FString::Printf(TEXT(" %s=(%.0f,%.0f,%.0f)d%.0f/%.3fcd/r%.0f/cone%.0f-%.0f/#%s/spec%.2f/contact%.3f"),
+                                I == 0 ? TEXT("key") : TEXT("rim"), P.Location.X, P.Location.Y, P.Location.Z, P.DistanceUU,
+                                P.Candelas, P.AttenuationRadiusUU, Layer.InnerConeDeg, Layer.OuterConeDeg,
+                                *Layer.ColorSrgb.ToHex().Left(6), Layer.SpecularScale, Layer.ContactShadowLength);
     }
     FS08Trace::Write(FString::Printf(
-        TEXT("ARTPREVIEW hero-light rig fighter=%s layers=%d height=%.1f channel=%d shadows=0 indirect=0 translucency=0%s"),
-        *Fighter.Id, Want, Height, Channel, *Placed));
+        TEXT("ARTPREVIEW hero-light rig fighter=%s layers=%d height=%.1f channel=%d shadowMaps=0 indirect=0 translucency=0 pedestal=%d key=%.2flux rim=%.2flux%s"),
+        *Fighter.Id, Want, Height, Channel, Spec->bLitPedestal ? 1 : 0, Spec->Key.bSet ? Spec->Key.Lux : 0.0f,
+        Spec->Rim.bSet && Want > 1 ? Spec->Rim.Lux : 0.0f, *Placed));
   }
-  SetHeroLitChannels(true);
+  SetHeroLitChannels(true, Spec->bLitPedestal);
   RefreshHeroLightState();
 }
 
-void AS08FighterActor::SetHeroLitChannels(bool bLit) {
-  if (bHeroLitChannels == bLit) return;
+void AS08FighterActor::SetHeroLitChannels(bool bLit, bool bPedestal) {
+  const bool bPedestalLit = bLit && bPedestal;
+  if (bHeroLitChannels == bLit && bHeroLitPedestal == bPedestalLit) return;
   bHeroLitChannels = bLit;
-  // the figure takes the scene light (channel 0) and, while a rig is on, the hero light (channel 1); rings, labels, the
-  // readability blob / pip and every board / environment primitive stay on channel 0 only
-  for (UPrimitiveComponent* Figure : {static_cast<UPrimitiveComponent*>(ArtBody.Get()), static_cast<UPrimitiveComponent*>(ArtBase.Get()),
-                                      static_cast<UPrimitiveComponent*>(ArtPlaceholder.Get()), static_cast<UPrimitiveComponent*>(Body.Get())}) {
+  bHeroLitPedestal = bPedestalLit;
+  // the figure takes the scene light (channel 0) and, while a rig is on, the hero light (channel 1); the pedestal only
+  // with "litPedestal" (P9b: a lit pedestal turned into a cream disk, the brightest part of the figure); rings, labels,
+  // the readability blob / pip and every board / environment primitive stay on channel 0 only
+  for (UPrimitiveComponent* Figure : {static_cast<UPrimitiveComponent*>(ArtBody.Get()), static_cast<UPrimitiveComponent*>(ArtPlaceholder.Get()),
+                                      static_cast<UPrimitiveComponent*>(Body.Get())}) {
     if (Figure) Figure->SetLightingChannels(true, bLit, false);
   }
+  if (ArtBase) ArtBase->SetLightingChannels(true, bPedestalLit, false);
 }
 
 TArray<const UPrimitiveComponent*> AS08FighterActor::GetHeroLitPrimitives() const {
-  return {ArtBody.Get(), ArtBase.Get(), ArtPlaceholder.Get(), Body.Get()};
+  TArray<const UPrimitiveComponent*> Out = {ArtBody.Get(), ArtPlaceholder.Get(), Body.Get()};
+  if (bHeroLitPedestal) Out.Add(ArtBase.Get());
+  return Out;
 }
+
+const UPrimitiveComponent* AS08FighterActor::GetHeroPedestal() const { return ArtBase.Get(); }
 
 int32 AS08FighterActor::GetHeroLightCount() const {
   int32 N = 0;

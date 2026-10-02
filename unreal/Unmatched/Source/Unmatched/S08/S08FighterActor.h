@@ -110,8 +110,11 @@ public:
   ES08HeroLightState GetHeroLightState() const { return HeroLightState; }
   /** The state multiplier applied last (1 idle, ActiveMul (x pulse) active, DefeatedMul defeated, 0 off). */
   float GetHeroLightMultiplier() const { return HeroLightMul; }
-  /** The figure primitives that take the hero light (channels 0 + 1 while a rig is on). */
+  /** The figure primitives that take the hero light (channels 0 + 1 while a rig is on): the body / placeholder / grey box,
+   *  and the pedestal only when the block has "litPedestal": true (P9b). */
   TArray<const UPrimitiveComponent*> GetHeroLitPrimitives() const;
+  /** The figure pedestal (ArtBase): channel 0 only unless the rig's block has "litPedestal": true. */
+  const UPrimitiveComponent* GetHeroPedestal() const;
 
 protected:
   virtual void BeginPlay() override;
@@ -228,6 +231,7 @@ private:
   int32 HeroLightLayers = 0;
   bool bHeroLightFrozen = false;
   bool bHeroLitChannels = false;
+  bool bHeroLitPedestal = false;  // P9b: ArtBase on channel 1 only with "litPedestal": true
   float HeroLightMul = 0.0f;
   float HeroLightPhase = 0.0f;
   ES08HeroLightState HeroLightState = ES08HeroLightState::Off;
@@ -240,7 +244,8 @@ private:
   void RefreshHeroLightState();
   void ApplyHeroLightIntensity();
   void OnHeroLightPulse();
-  void SetHeroLitChannels(bool bLit);
+  /** The figure meshes on channels 0 + 1 while bLit (the pedestal too only when bPedestal), else channel 0 only. */
+  void SetHeroLitChannels(bool bLit, bool bPedestal);
 
   FS08BoardFighter Fighter;
 };

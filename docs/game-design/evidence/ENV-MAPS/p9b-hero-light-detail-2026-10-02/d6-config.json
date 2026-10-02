@@ -1,0 +1,541 @@
+{
+ "note": "ENV-MAPS P9b gate D6 (docs/art-pipeline/ENV-HERO-LIGHT.md): zone rectangles [x0, y0, x1, y1] in our own studio renders (Blender Cycles, neutral light, NOT game light) of the in-game bakes of the detailed Tripo models (H2/H3 ~1.9M tris, 8K PBR); figures = the body components at these K2x2.5 frame points of the bench (-BenchViews K2x2.5, the hero Medusa at the frame centre).",
+ "references": {
+  "medusa": {
+   "image": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-bake/preview/compare-k2-5x.jpg",
+   "figure": "right (H2 in-game bake)",
+   "zones": {
+    "skin": [
+     [
+      893,
+      250,
+      912,
+      275
+     ],
+     [
+      992,
+      255,
+      1008,
+      278
+     ],
+     [
+      925,
+      320,
+      940,
+      340
+     ],
+     [
+      945,
+      245,
+      965,
+      262
+     ]
+    ],
+    "gold": [
+     [
+      893,
+      285,
+      915,
+      305
+     ],
+     [
+      905,
+      368,
+      920,
+      392
+     ],
+     [
+      993,
+      368,
+      1008,
+      392
+     ],
+     [
+      1013,
+      293,
+      1033,
+      312
+     ]
+    ],
+    "cloth": [
+     [
+      935,
+      345,
+      955,
+      375
+     ],
+     [
+      885,
+      315,
+      905,
+      333
+     ]
+    ],
+    "snakes": [
+     [
+      915,
+      180,
+      990,
+      207
+     ]
+    ],
+    "pedestal": [
+     [
+      870,
+      450,
+      898,
+      475
+     ],
+     [
+      1048,
+      430,
+      1070,
+      455
+     ]
+    ]
+   }
+  },
+  "harpy": {
+   "image": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-bake/preview/k2/k2_front_prev_left_h2_right.jpg",
+   "figure": "right (H2/H3 in-game bake)",
+   "zones": {
+    "feathers-light": [
+     [
+      1088,
+      460,
+      1108,
+      478
+     ],
+     [
+      1222,
+      455,
+      1240,
+      470
+     ]
+    ],
+    "feathers-dark": [
+     [
+      1045,
+      440,
+      1070,
+      452
+     ],
+     [
+      1262,
+      440,
+      1285,
+      455
+     ]
+    ],
+    "body": [
+     [
+      1138,
+      522,
+      1158,
+      535
+     ],
+     [
+      1178,
+      522,
+      1196,
+      535
+     ]
+    ],
+    "pedestal": [
+     [
+      1118,
+      560,
+      1128,
+      580
+     ],
+     [
+      1190,
+      555,
+      1200,
+      575
+     ]
+    ]
+   }
+  },
+  "arthur": {
+   "image": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/preview/ld_k2_5x_cobble.jpg",
+   "figure": "look-dev v2 without the team dye, az 0 (top row, second panel)",
+   "zones": {
+    "cloak": [
+     [
+      426,
+      330,
+      446,
+      370
+     ],
+     [
+      540,
+      340,
+      560,
+      380
+     ],
+     [
+      542,
+      420,
+      562,
+      460
+     ]
+    ],
+    "gold": [
+     [
+      498,
+      240,
+      516,
+      256
+     ],
+     [
+      585,
+      238,
+      602,
+      253
+     ],
+     [
+      455,
+      245,
+      475,
+      262
+     ]
+    ],
+    "steel": [
+     [
+      626,
+      332,
+      642,
+      352
+     ],
+     [
+      612,
+      436,
+      632,
+      456
+     ]
+    ],
+    "skin": [
+     [
+      535,
+      198,
+      556,
+      212
+     ]
+    ],
+    "pedestal": [
+     [
+      455,
+      468,
+      485,
+      492
+     ],
+     [
+      520,
+      488,
+      560,
+      500
+     ]
+    ]
+   }
+  },
+  "merlin": {
+   "image": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/preview/k2_5x_front_h2.png",
+   "figure": "H2 in-game bake, front",
+   "zones": {
+    "robe": [
+     [
+      948,
+      595,
+      968,
+      640
+     ],
+     [
+      1015,
+      510,
+      1028,
+      550
+     ]
+    ],
+    "trim": [
+     [
+      929,
+      550,
+      940,
+      615
+     ],
+     [
+      979,
+      560,
+      989,
+      620
+     ]
+    ],
+    "beard": [
+     [
+      947,
+      508,
+      965,
+      528
+     ]
+    ],
+    "staff": [
+     [
+      880,
+      524,
+      886,
+      534
+     ],
+     [
+      892,
+      600,
+      898,
+      612
+     ]
+    ],
+    "pedestal": [
+     [
+      875,
+      684,
+      905,
+      704
+     ],
+     [
+      995,
+      690,
+      1025,
+      700
+     ]
+    ]
+   }
+  },
+  "arthur-back": {
+   "image": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2-lookdev/preview/ld_k2_5x_cobble.jpg",
+   "figure": "look-dev v2 without the team dye, az 180 (back; bottom row, second panel): the Cobble bench shows Arthur from behind",
+   "zones": {
+    "cloak": [
+     [
+      470,
+      1470,
+      520,
+      1540
+     ],
+     [
+      405,
+      1520,
+      435,
+      1560
+     ]
+    ],
+    "gold": [
+     [
+      405,
+      1430,
+      425,
+      1460
+     ],
+     [
+      562,
+      1428,
+      585,
+      1455
+     ]
+    ],
+    "steel": [
+     [
+      430,
+      1610,
+      448,
+      1640
+     ]
+    ],
+    "hair": [
+     [
+      478,
+      1372,
+      508,
+      1400
+     ]
+    ],
+    "pedestal": [
+     [
+      425,
+      1680,
+      470,
+      1700
+     ],
+     [
+      500,
+      1690,
+      560,
+      1705
+     ]
+    ]
+   }
+  },
+  "merlin-back": {
+   "image": "art/pipeline-candidates/ASSET-MERLIN-001/20260929-h2-bake/preview/sbs_back.png",
+   "figure": "right half: Blender EEVEE studio render of the H2 game mesh, back (the Cobble bench shows Merlin from behind)",
+   "zones": {
+    "robe": [
+     [
+      1410,
+      600,
+      1500,
+      740
+     ]
+    ],
+    "trim": [
+     [
+      1420,
+      474,
+      1520,
+      488
+     ]
+    ],
+    "staff": [
+     [
+      1638,
+      385,
+      1652,
+      415
+     ]
+    ],
+    "pedestal": [
+     [
+      1320,
+      990,
+      1460,
+      1050
+     ]
+    ]
+   }
+  }
+ },
+ "figures": {
+  "sarpedon": {
+   "K2x2p5": [
+    {
+     "name": "medusa",
+     "hero": "medusa",
+     "at": [
+      961,
+      540
+     ]
+    },
+    {
+     "name": "harpy-a",
+     "hero": "harpy",
+     "at": [
+      398,
+      560
+     ]
+    },
+    {
+     "name": "harpy-b",
+     "hero": "harpy",
+     "at": [
+      654,
+      680
+     ]
+    },
+    {
+     "name": "harpy-c",
+     "hero": "harpy",
+     "at": [
+      340,
+      850
+     ]
+    }
+   ]
+  },
+  "marmoreal": {
+   "K2x2p5": [
+    {
+     "name": "medusa",
+     "hero": "medusa",
+     "at": [
+      961,
+      540
+     ]
+    },
+    {
+     "name": "harpy-a",
+     "hero": "harpy",
+     "at": [
+      960,
+      300
+     ]
+    },
+    {
+     "name": "harpy-b",
+     "hero": "harpy",
+     "at": [
+      1004,
+      830
+     ]
+    },
+    {
+     "name": "harpy-c",
+     "hero": "harpy",
+     "at": [
+      1020,
+      85
+     ]
+    }
+   ]
+  },
+  "cobble": {
+   "K2x2p5": [
+    {
+     "name": "medusa",
+     "hero": "medusa",
+     "at": [
+      961,
+      540
+     ]
+    },
+    {
+     "name": "harpy-a",
+     "hero": "harpy",
+     "at": [
+      580,
+      535
+     ]
+    },
+    {
+     "name": "harpy-b",
+     "hero": "harpy",
+     "at": [
+      1338,
+      535
+     ]
+    },
+    {
+     "name": "harpy-c",
+     "hero": "harpy",
+     "at": [
+      959,
+      240
+     ]
+    },
+    {
+     "name": "arthur",
+     "hero": "arthur-back",
+     "at": [
+      960,
+      900
+     ]
+    },
+    {
+     "name": "merlin",
+     "hero": "merlin-back",
+     "at": [
+      1380,
+      910
+     ]
+    }
+   ]
+  }
+ }
+}

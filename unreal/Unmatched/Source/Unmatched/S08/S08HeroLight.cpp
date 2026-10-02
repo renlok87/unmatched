@@ -38,7 +38,8 @@ bool HlHexColor(const FString& Hex, FColor& Out) {
 bool ParseLayer(const FString& Ctx, const TSharedPtr<FJsonObject>& Object, FS08HeroLightLayer& Out, TArray<FString>& Errors) {
   FString Unknown;
   if (!HlKnownFields(Object, {TEXT("lux"), TEXT("colorSrgb"), TEXT("innerConeDeg"), TEXT("outerConeDeg"), TEXT("heightMul"),
-                              TEXT("azimuthDeg"), TEXT("elevationDeg"), TEXT("radiusMul"), TEXT("note")},
+                              TEXT("azimuthDeg"), TEXT("elevationDeg"), TEXT("radiusMul"), TEXT("specularScale"),
+                              TEXT("contactShadowLength"), TEXT("note")},
                      Unknown)) {
     Errors.Add(FString::Printf(TEXT("%s: unknown field '%s'"), *Ctx, *Unknown));
     return false;
@@ -52,8 +53,11 @@ bool ParseLayer(const FString& Ctx, const TSharedPtr<FJsonObject>& Object, FS08H
       !HlOptNumber(Object, TEXT("heightMul"), 0.3, 6.0, Out.HeightMul) ||
       !HlOptNumber(Object, TEXT("azimuthDeg"), -360.0, 360.0, Out.AzimuthDeg) ||
       !HlOptNumber(Object, TEXT("elevationDeg"), 5.0, 89.0, Out.ElevationDeg) ||
-      !HlOptNumber(Object, TEXT("radiusMul"), 1.05, 4.0, Out.RadiusMul) || Out.InnerConeDeg > Out.OuterConeDeg) {
-    Errors.Add(FString::Printf(TEXT("%s needs lux 0..50, colorSrgb #RRGGBB and optional innerConeDeg 0..80 <= outerConeDeg 1..80, heightMul 0.3..6, azimuthDeg -360..360, elevationDeg 5..89, radiusMul 1.05..4"),
+      !HlOptNumber(Object, TEXT("radiusMul"), 1.05, 4.0, Out.RadiusMul) ||
+      !HlOptNumber(Object, TEXT("specularScale"), 0.0, 1.0, Out.SpecularScale) ||
+      !HlOptNumber(Object, TEXT("contactShadowLength"), 0.0, 0.5, Out.ContactShadowLength) ||
+      Out.InnerConeDeg > Out.OuterConeDeg) {
+    Errors.Add(FString::Printf(TEXT("%s needs lux 0..50, colorSrgb #RRGGBB and optional innerConeDeg 0..80 <= outerConeDeg 1..80, heightMul 0.3..6, azimuthDeg -360..360, elevationDeg 5..89, radiusMul 1.05..4, specularScale 0..1, contactShadowLength 0..0.5"),
                                *Ctx));
     return false;
   }
@@ -74,12 +78,13 @@ const TCHAR* S08HeroLightStateName(ES08HeroLightState State) {
 
 FString FS08HeroLightSpec::Signature() const {
   auto LayerText = [](const FS08HeroLightLayer& L) {
-    return L.bSet ? FString::Printf(TEXT("%g/%s/%g/%g/%g/%g/%g/%g"), L.Lux, *L.ColorSrgb.ToHex(), L.InnerConeDeg, L.OuterConeDeg,
-                                    L.HeightMul, L.AzimuthDeg, L.ElevationDeg, L.RadiusMul)
+    return L.bSet ? FString::Printf(TEXT("%g/%s/%g/%g/%g/%g/%g/%g/%g/%g"), L.Lux, *L.ColorSrgb.ToHex(), L.InnerConeDeg,
+                                    L.OuterConeDeg, L.HeightMul, L.AzimuthDeg, L.ElevationDeg, L.RadiusMul, L.SpecularScale,
+                                    L.ContactShadowLength)
                   : FString(TEXT("-"));
   };
-  return FString::Printf(TEXT("%d%d|%g|%g|%s|%s|%g|%g|%g|%g"), bSet ? 1 : 0, bEnabled ? 1 : 0, CameraAzimuthDeg, AimHeight,
-                         *LayerText(Key), *LayerText(Rim), ActiveMul, BreathHz, BreathAmp, DefeatedMul);
+  return FString::Printf(TEXT("%d%d|%g|%g|p%d|%s|%s|%g|%g|%g|%g"), bSet ? 1 : 0, bEnabled ? 1 : 0, CameraAzimuthDeg, AimHeight,
+                         bLitPedestal ? 1 : 0, *LayerText(Key), *LayerText(Rim), ActiveMul, BreathHz, BreathAmp, DefeatedMul);
 }
 
 namespace S08HeroLight {
@@ -96,8 +101,8 @@ bool Parse(const FString& ProfileId, const TSharedPtr<FJsonObject>& LightProfile
   }
   const TSharedPtr<FJsonObject>& B = *Block;
   FString Unknown;
-  if (!HlKnownFields(B, {TEXT("enabled"), TEXT("note"), TEXT("cameraAzimuthDeg"), TEXT("aimHeight"), TEXT("key"), TEXT("rim"),
-                         TEXT("states")},
+  if (!HlKnownFields(B, {TEXT("enabled"), TEXT("note"), TEXT("cameraAzimuthDeg"), TEXT("aimHeight"), TEXT("litPedestal"),
+                         TEXT("key"), TEXT("rim"), TEXT("states")},
                      Unknown)) {
     Errors.Add(FString::Printf(TEXT("%s: unknown field '%s'"), *Ctx, *Unknown));
     return false;
@@ -106,6 +111,16 @@ bool Parse(const FString& ProfileId, const TSharedPtr<FJsonObject>& LightProfile
   if (!B->TryGetBoolField(TEXT("enabled"), bEnabled)) {
     Errors.Add(Ctx + TEXT(" needs \"enabled\": true | false"));
     return false;
+  }
+  // P9b: the pedestal (ArtBase) is lit only on request (default false: the dark bronze base keeps the scene light)
+  // (a strict JSON boolean: FJsonValueString::TryGetBool would accept any string)
+  if (B->HasField(TEXT("litPedestal"))) {
+    const TSharedPtr<FJsonValue> Pedestal = B->TryGetField(TEXT("litPedestal"));
+    if (!Pedestal.IsValid() || Pedestal->Type != EJson::Boolean) {
+      Errors.Add(Ctx + TEXT(": \"litPedestal\" must be true | false"));
+      return false;
+    }
+    Out.bLitPedestal = Pedestal->AsBool();
   }
   if (!HlOptNumber(B, TEXT("cameraAzimuthDeg"), -360.0, 360.0, Out.CameraAzimuthDeg) ||
       !HlOptNumber(B, TEXT("aimHeight"), 0.0, 1.5, Out.AimHeight)) {
