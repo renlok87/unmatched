@@ -2404,7 +2404,7 @@ const FS08HeroLightSpec* AS08BoardActor::GetActiveHeroLight() const {
 
 void AS08BoardActor::UpdateHeroLights() {
   using namespace S08HeroLightSpec;
-  FString OffReason = TEXT("test-opt-out");
+  FString OffReason = HeroLightOptOutReason;
   const bool bOptOut = HeroLightOptOutOverride.IsSet() ? HeroLightOptOutOverride.GetValue() : HeroLightCommandLineOff(OffReason);
   const FS08HeroLightSpec* Spec = GetActiveHeroLight();
   const FS08LightProfile* Light = bArtActive ? ArtData.LightFor(ActiveProfile) : nullptr;

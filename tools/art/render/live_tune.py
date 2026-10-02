@@ -203,11 +203,13 @@ def bench_args(mode: str, map_key: str, out: Path, views: str, bench: dict, extr
 
 
 def client_args(mode: str, map_key: str, session_dir: Path, warmup: float, bench: dict, profiles: str | None,
-                env_dir: str | None, extra: list[str]) -> list[str]:
+                env_dir: str | None, extra: list[str], art_view: bool = False) -> list[str]:
     fixture = FIXTURES[map_key]
+    # art_view (Art Tuner, docs/art-pipeline/ART-TUNER-PLAN.md): -ArtView=<map> instead of -Bench - the same fixture scene
+    # without the -Bench freeze (Niagara, flicker, wind and the hero breath run live), the free camera keys work
     common = ["/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode", "-windowed", "-resx=1920", "-resy=1080", "-ForceRes",
               "-RenderOffScreen", "-nosplash", "-unattended", "-NoSound", "-ArtPreview", "-ArtPreviewDiorama",
-              "-ArtPreviewHeroesV2", "-Bench"]
+              "-ArtPreviewHeroesV2", f"-ArtView={map_key}" if art_view else "-Bench"]
     if mode == "packaged":
         args = [str(STAGED_EXE)] + common + [f"-BenchFixture=../../../Unmatched/Config/Bench/{fixture}"]
     else:
@@ -265,7 +267,8 @@ def cmd_start(a: argparse.Namespace) -> int:
     # the packaged client reads the pak at start; its reloads read the worktree files (profilesSource=override)
     reload_profiles = a.profiles or (str(PROFILES) if a.packaged else None)
     reload_env = a.env_dir or (str(ENV_DIR) if a.packaged else None)
-    args = client_args(mode, a.map, session_dir, warmup, bench, a.profiles, a.env_dir, a.extra or [])
+    args = client_args(mode, a.map, session_dir, warmup, bench, a.profiles, a.env_dir, a.extra or [],
+                       art_view=getattr(a, "art_view", False))
     lock = Path(a.lock) if a.lock else GPU_LOCK
     lock_acquire(lock, f"live-tune {a.map} starting", timeout=a.lock_timeout)
     t0 = time.time()
@@ -681,6 +684,7 @@ def main(argv: list[str] | None = None) -> int:
     st.add_argument("--lock", help="GPU lock path (default C:/tmp/unmatched-gpu.lock)")
     st.add_argument("--lock-timeout", type=float, default=3600.0)
     st.add_argument("--extra", action="append", help="extra client argument (repeat; use --extra=-Flag)")
+    st.add_argument("--art-view", action="store_true", help="-ArtView=<map> instead of -Bench: live fx, free camera (Art Tuner)")
     for name in ("reload", "cycle"):
         p = sub.add_parser(name)
         p.add_argument("--profiles")

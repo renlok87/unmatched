@@ -28,6 +28,7 @@
 #include "Serialization/JsonSerializer.h"
 #include "Serialization/JsonWriter.h"
 #include "S08TraceLog.h"
+#include "S08ArtView.h"
 #include "S08LiveTune.h"
 #include "Widgets/Input/SEditableTextBox.h"
 #include "Widgets/Input/SButton.h"
@@ -309,7 +310,9 @@ void AS08FlowGameMode::BeginPlay() {
     }
   }
   // W4-A -Bench: backend-less render bench (no login, no room, no HUD).
-  bBench = FParse::Param(FCommandLine::Get(), TEXT("Bench"));
+  // Art Tuner M1: -ArtView=<map> takes the same backend-less path (S08FlowGameModeArtView.cpp)
+  if (S08ArtView::Enabled()) ArtViewBegin();
+  bBench = FParse::Param(FCommandLine::Get(), TEXT("Bench")) || ArtView.IsValid();
   if (bBench) {
     FS08Trace::Write(TEXT("BENCH start (W4-A backend-less render bench)"));
     RefreshUi();
@@ -825,8 +828,7 @@ void AS08FlowGameMode::SetupCameraForBoard() {
 void AS08FlowGameMode::UpdateBoardCamera(float DeltaSeconds) {
   if (!BoardCamera || !CameraZoom.IsReady()) return;
   auto* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
-  if (PC && Flow.IsValid() && Flow->GetStage() == ES08Stage::Started &&
-      !Hud.bGameOver) {
+  if (PC && ((Flow.IsValid() && Flow->GetStage() == ES08Stage::Started && !Hud.bGameOver) || ArtView.IsValid())) {
     // D-10: wheel changes distance only; the perspective, pitch and yaw stay
     // fixed. Limits/step/animation come from FS08CameraZoomConfig (Q-302
     // proposals); every OS event is traced INPUT ... src=os + CAMERA ....
@@ -858,11 +860,19 @@ void AS08FlowGameMode::UpdateBoardCamera(float DeltaSeconds) {
   }
   CameraZoom.SetFocusTarget(FocusTarget);
   CameraZoom.Tick(DeltaSeconds);
-  const float Pitch = FMath::DegreesToRadians(55.0f);
-  BoardCamera->SetActorLocationAndRotation(
-      CameraZoom.CurrentFocus + FVector(0.0f, CameraZoom.Current * FMath::Cos(Pitch),
-                                        CameraZoom.Current * FMath::Sin(Pitch)),
-      FRotator(-55.0f, -90.0f, 0.0f));
+  if (ArtView.IsValid()) {
+    // Art Tuner M1: the orbit / pan of the free view on the rig's focus and distance (the default = the line below)
+    FVector Location;
+    FRotator Rotation;
+    ArtView->Cam.Pose(CameraZoom.CurrentFocus, CameraZoom.Current, Location, Rotation);
+    BoardCamera->SetActorLocationAndRotation(Location, Rotation);
+  } else {
+    const float Pitch = FMath::DegreesToRadians(55.0f);
+    BoardCamera->SetActorLocationAndRotation(
+        CameraZoom.CurrentFocus + FVector(0.0f, CameraZoom.Current * FMath::Cos(Pitch),
+                                          CameraZoom.Current * FMath::Sin(Pitch)),
+        FRotator(-55.0f, -90.0f, 0.0f));
+  }
   if (BoardActor) {
     // Relative to the overview (ENV-U9 included): the world labels keep their K1 size at K1.
     const float Ratio = CameraZoom.Current / CameraZoom.Overview;
@@ -945,6 +955,8 @@ void AS08FlowGameMode::SelectFighter(const FString& FighterId) {
 void AS08FlowGameMode::HandleClick() {
   auto* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
   if (!PC || !BoardActor) return;
+  // Art Tuner M1: the free view owns the mouse (ArtViewTick: select / orbit / pan, no gameplay command)
+  if (ArtView.IsValid()) return;
 
   // GD-036: no board input after the terminal state.
   if (Hud.bGameOver) return;
@@ -3705,6 +3717,7 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
       }
     }
   }
+  if (ArtView.IsValid()) ArtViewTick(DeltaSeconds);
   UpdateBoardCamera(DeltaSeconds);
   UpdateArtHud(DeltaSeconds);
   // ART-004 T1.1 K2 gate: log once when the requested focus zoom has arrived
@@ -6759,11 +6772,12 @@ void AS08FlowGameMode::RunRenderBench() {
     FParse::Value(Cmd, TEXT("BenchOut="), B.OutDir);
     B.bProfileGpu = !FParse::Param(Cmd, TEXT("BenchNoProfileGPU"));
     B.bCsv = FParse::Param(Cmd, TEXT("BenchCsv"));
-    FString Fixture = FPaths::Combine(FPaths::ProjectConfigDir(), TEXT("Bench"), TEXT("S08BenchCobble.json"));
+    FString Fixture = ArtView.IsValid() ? ArtView->Fixture
+                                        : FPaths::Combine(FPaths::ProjectConfigDir(), TEXT("Bench"), TEXT("S08BenchCobble.json"));
     FParse::Value(Cmd, TEXT("BenchFixture="), Fixture);
     // ENV-MAPS live tune: the fixture init below, then the session owns the views (S08FlowGameModeLiveTune.cpp)
     const bool bLiveTune = S08LiveTune::Enabled();
-    if (!bLiveTune && (B.OutDir.IsEmpty() || B.Views.Num() == 0)) {
+    if (!bLiveTune && !ArtView.IsValid() && (B.OutDir.IsEmpty() || B.Views.Num() == 0)) {
       Finish(TEXT("BENCH FAILED usage: -BenchOut=<dir> and -BenchViews=K1+K2x5 are required"));
       return;
     }
@@ -6783,10 +6797,13 @@ void AS08FlowGameMode::RunRenderBench() {
       if (F.OwnerId == BenchViewerId && F.bIsHero) B.HeroId = F.Id;
     }
     float Fps = 0.0f;
-    FParse::Value(Cmd, TEXT("BenchFps="), Fps);
-    S08BenchSetCvar(TEXT("t.MaxFPS"), FString::SanitizeFloat(Fps));
-    S08BenchSetCvar(TEXT("r.VSync"), TEXT("0"));
-    S08BenchSetCvar(TEXT("r.ProfileGPU.ShowUI"), TEXT("0"));
+    const bool bFps = FParse::Value(Cmd, TEXT("BenchFps="), Fps);
+    // Art View keeps the client's own frame cap (60 FPS, AGENTS.md "Unreal GPU load") unless -BenchFps= is given
+    if (!ArtView.IsValid() || bFps) {
+      S08BenchSetCvar(TEXT("t.MaxFPS"), FString::SanitizeFloat(Fps));
+      S08BenchSetCvar(TEXT("r.VSync"), TEXT("0"));
+      S08BenchSetCvar(TEXT("r.ProfileGPU.ShowUI"), TEXT("0"));
+    }
     if (bLiveTune) LiveTuneBeforeBuild();
     SyncBoardFromApplied();
     FS08Trace::Write(FString::Printf(
@@ -6798,6 +6815,10 @@ void AS08FlowGameMode::RunRenderBench() {
         *Views, B.Warmup, B.Settle, B.Measure, Fps, B.bProfileGpu ? 1 : 0, B.bCsv ? 1 : 0));
     B.Step = 1;
     B.NextAt = Elapsed + B.Warmup;
+    if (ArtView.IsValid()) {
+      ArtViewAfterBuild(B.HeroId);
+      B.Step = 97;  // Art Tuner M1: the free view from here on (ArtViewTick), no view walk, no exit
+    }
     if (bLiveTune) {
       LiveTuneAfterBuild(B.Warmup, B.Settle, B.Measure, Fps, Fixture, B.HeroId);
       B.Step = 98;  // the live-tune session from here on (RunLiveTune)
@@ -6808,6 +6829,7 @@ void AS08FlowGameMode::RunRenderBench() {
     RunLiveTune();
     return;
   }
+  if (B.Step == 97) return;
   const FString View = B.Views.IsValidIndex(B.View) ? B.Views[B.View] : FString();
   switch (B.Step) {
     case 1:  // warm-up (shader/PSO caches, Lumen surface cache and history)

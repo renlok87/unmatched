@@ -480,6 +480,16 @@ private:
   void LiveTuneSetClocks(float Target, const FString& View);
   void LiveTuneWriteDone(struct FS08LiveResult& Result);
   TSharedPtr<class FJsonObject> LiveTuneState() const;
+  // Art Tuner M1 (S08ArtView.h, S08FlowGameModeArtView.cpp, docs/art-pipeline/ART-TUNER-PLAN.md): -ArtView=<map> = the -Bench
+  // fixture init without a backend and without the view walk, a free camera and live fx. Null without the flag.
+  TSharedPtr<struct FS08ArtViewSession> ArtView;
+  void ArtViewBegin();
+  void ArtViewAfterBuild(const FString& HeroId);
+  void ArtViewTick(float DeltaSeconds);
+  void ArtViewSetView(const FString& View);
+  void ArtViewRefreshOverlay();
+  /** -ArtTuner on the command line (the panel; S08ArtTuner.h). */
+  bool ArtTunerEnabled() const;
   // -S09HudProbe=<dir>: backend-less packaged probe - renders the fixture-04
   // HUD states and captures UI-inclusive shots + a Slate key-input check.
   bool bS09Probe = false;

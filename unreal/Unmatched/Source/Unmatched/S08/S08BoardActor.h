@@ -155,7 +155,16 @@ public:
     bHeroLightOverride = Spec != nullptr;
     HeroLightOverride = Spec ? *Spec : FS08HeroLightSpec();
   }
-  void SetHeroLightOptOutForTest(TOptional<bool> bOptOut) { HeroLightOptOutOverride = bOptOut; }
+  void SetHeroLightOptOutForTest(TOptional<bool> bOptOut) {
+    HeroLightOptOutOverride = bOptOut;
+    HeroLightOptOutReason = TEXT("test-opt-out");
+  }
+  /** Art Tuner M1 (-ArtView key H): the hero light off for the view only (the profile is untouched); false = back to the
+   *  command line decision (-NoHeroLight). Call UpdateHeroLights after. */
+  void SetHeroLightViewOff(bool bOff) {
+    HeroLightOptOutOverride = bOff ? TOptional<bool>(true) : TOptional<bool>();
+    HeroLightOptOutReason = TEXT("art-view");
+  }
   /** Applies the active block to every fighter actor within the board budget (S08HeroLight::LayersForBoard); traced. */
   void UpdateHeroLights();
 
@@ -513,6 +522,7 @@ private:
   bool bHeroLightOverride = false;
   FS08HeroLightSpec HeroLightOverride;
   TOptional<bool> HeroLightOptOutOverride;
+  FString HeroLightOptOutReason = TEXT("test-opt-out");
   int32 HeroLightCount = 0;
   int32 HeroLightLayersPerFigure = 0;
   FString HeroLightTraceKey;
