@@ -153,6 +153,13 @@ session commits its own work promptly (never leaves changes staged) and, after a
 that touched `unreal/`, rebuilds UnmatchedEditor before opening the editor. Neither session
 merges the other's branch by hand, stashes, resets or edits the other's uncommitted files.
 
+Commits without hooks (user decision 2026-10-03: «разреши глобально в проекте no verify»):
+commit in this repository with `git commit --no-verify`, in every checkout and worktree. The
+husky/lint-staged pre-commit hook is broken (no `eslint`/`prettier` in the root `node_modules`),
+and when it fails, lint-staged's revert also fails: it resets tracked working-tree files, wiping
+other sessions' uncommitted changes (it already erased `.claude/settings.local.json` twice).
+Run formatters/linters explicitly when a change needs them instead.
+
 ## Agent and process lifecycle
 
 Keep only the sessions needed for the current task. Do not launch a large pool of
