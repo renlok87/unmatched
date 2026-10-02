@@ -23,6 +23,8 @@
 
 | Путь | Владелец | Что лежит | В git |
 | --- | --- | --- | --- |
+| `art/imagegen/scratch-v1/` | pipeline / Codex 2D | scratch specs, grids, raw generations, masks, check reports and handoffs only after all checks pass; Merlin pilot BLOCKED after four front attempts (`merlin/README.md`) | да; `-text` |
+| `tools/scratch-model/` | pipeline / Codex 2D | spec checks, grid drawing, scale/translation registration, view checks, synthetic registration tests; no 3D builder | да; `-text` |
 | `docs/art-pipeline/` | pipeline | реестр, карта, инструкции и отчёты пайплайна, `imagegen-inputs/` (T2), `evidence/` прогонов | да (10cd855, 264338b); `.gitattributes`: `-text` |
 | `docs/art-pipeline/rig/` | pipeline | контракт рига `RIG-CONTRACT.md` + `rig-contract.json`: v2 (2026-09-29, волна 4) — `UM_HUMANOID_17_v2` по умолчанию (кость 0 `SKEL_UM_Humanoid`, `weapon.L`/`weapon.R`, ref-поза UM_FBX_v1, границы клипа, `ik_chains`, `bForceRootLock`); `UM_HUMANOID_17_v1` P1.6 закрыт для новых клипов; предложение | да (264338b; v2 — волна 4) |
 | `docs/art-pipeline/animation-library/` | pipeline | библиотека клипов: `clip-manifest.json` (+ schema), `VALIDATION.md`, `VIDEO-TO-MOTION.md`, `validation/*.json` (вывод `validate_clip.py` P1.6), `validation-rig-v2/*.json` (11 кейсов контракта v2), `fixtures/rig-contract-v2/` (синтетическая фикстура v2); MVP-слоты `proposed/not_run`, черновые клипы `draft_test` | да (264338b; v2 — волна 4) |

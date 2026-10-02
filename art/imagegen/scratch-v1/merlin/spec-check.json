@@ -1,0 +1,324 @@
+{
+  "checks": {
+    "asset_budget": {
+      "expected": "Merlin pilot: 45 cm, Ø24 cm, base 5–6 cm, 5–5.5 heads",
+      "measured": 45.0,
+      "note": "",
+      "passed": true
+    },
+    "base_top": {
+      "expected": 5.5,
+      "measured": 5.5,
+      "note": "",
+      "passed": true
+    },
+    "head_proportion": {
+      "expected": "1 ± 0.05",
+      "measured": 1.0,
+      "note": "",
+      "passed": true
+    },
+    "height": {
+      "expected": 45.0,
+      "measured": 45.0,
+      "note": "",
+      "passed": true
+    },
+    "joint_coordinates": {
+      "expected": "finite xyz centimetres",
+      "measured": {
+        "arm_lower.L": [
+          7.5,
+          -1,
+          31.5
+        ],
+        "arm_lower.R": [
+          -7.4,
+          -1,
+          32.5
+        ],
+        "arm_upper.L": [
+          5.5,
+          0,
+          36.5
+        ],
+        "arm_upper.R": [
+          -5.5,
+          0,
+          36.5
+        ],
+        "foot.L": [
+          2.8,
+          -0.8,
+          7.5
+        ],
+        "foot.R": [
+          -2.8,
+          -0.8,
+          7.5
+        ],
+        "hand.L": [
+          5.5,
+          -2.5,
+          28
+        ],
+        "hand.R": [
+          -7.2,
+          -2.5,
+          30
+        ],
+        "head": [
+          0,
+          -0.7,
+          37.5
+        ],
+        "hips": [
+          0,
+          0,
+          24
+        ],
+        "leg_lower.L": [
+          2.6,
+          0,
+          16
+        ],
+        "leg_lower.R": [
+          -2.6,
+          0,
+          16
+        ],
+        "leg_upper.L": [
+          2.4,
+          0,
+          24
+        ],
+        "leg_upper.R": [
+          -2.4,
+          0,
+          24
+        ],
+        "root": [
+          0,
+          0,
+          0
+        ],
+        "spine": [
+          0,
+          0,
+          29
+        ],
+        "weapon.R": [
+          -7.2,
+          -2.5,
+          30
+        ]
+      },
+      "note": "",
+      "passed": true
+    },
+    "joint_sides": {
+      "expected": ".L > 0; .R < 0",
+      "measured": [],
+      "note": "",
+      "passed": true
+    },
+    "joints_inside_body": {
+      "expected": "each nonweapon joint inside both interpolated body widths",
+      "measured": [],
+      "note": "",
+      "passed": true
+    },
+    "landmarks_order": {
+      "expected": "base_top == sole; all subsequent mandatory landmarks strictly increase",
+      "measured": {
+        "ankle": 7.5,
+        "base_top": 5.5,
+        "chest": 33.0,
+        "chin": 39.0,
+        "crotch": 24.0,
+        "eye": 41.5,
+        "head_top": 45.0,
+        "knee": 16.0,
+        "shoulder": 36.5,
+        "sole": 5.5,
+        "waist": 28.0
+      },
+      "note": "Coincident sole/base_top follows §2 example; no other equal levels allowed.",
+      "passed": true
+    },
+    "leaf_tails": {
+      "expected": [
+        "foot.L",
+        "foot.R",
+        "hand.L",
+        "head",
+        "weapon.R"
+      ],
+      "measured": [
+        "foot.L",
+        "foot.R",
+        "hand.L",
+        "head",
+        "weapon.R"
+      ],
+      "note": "",
+      "passed": true
+    },
+    "palette_background_distance": {
+      "expected": "ΔE76 >=20 from background AND grid",
+      "measured": {
+        "base": [
+          51.997159579120556,
+          66.7904174553057
+        ],
+        "beard_eyebrows": [
+          21.235721874889908,
+          56.002147849232124
+        ],
+        "belt": [
+          48.7911554764386,
+          81.21481270244334
+        ],
+        "boots_beard_wrap": [
+          53.31640255916455,
+          80.43830713283565
+        ],
+        "buckle": [
+          41.79396525815685,
+          84.39910254279685
+        ],
+        "crystal": [
+          64.17817898268453,
+          54.66655944760335
+        ],
+        "cuff_hem_edge": [
+          42.04578372037912,
+          77.07149809410274
+        ],
+        "face_hands": [
+          27.176050030947444,
+          70.95356120651759
+        ],
+        "gold_embroidery": [
+          50.87851132918993,
+          93.31470913751498
+        ],
+        "hood_lining": [
+          54.560682767548144,
+          68.6028214271138
+        ],
+        "robe_hood_sleeves": [
+          60.29399247965205,
+          65.924875147661
+        ],
+        "staff_frame": [
+          57.40261851652917,
+          80.31319415795525
+        ]
+      },
+      "note": "",
+      "passed": true
+    },
+    "palette_classes_team": {
+      "expected": "library classes; team dye allowed; explicit legacy roughness/metallic",
+      "measured": [],
+      "note": "",
+      "passed": true
+    },
+    "rig_names_parents": {
+      "expected": {
+        "arm_lower.L": "arm_upper.L",
+        "arm_lower.R": "arm_upper.R",
+        "arm_upper.L": "spine",
+        "arm_upper.R": "spine",
+        "foot.L": "leg_lower.L",
+        "foot.R": "leg_lower.R",
+        "hand.L": "arm_lower.L",
+        "hand.R": "arm_lower.R",
+        "head": "spine",
+        "hips": "root",
+        "leg_lower.L": "leg_upper.L",
+        "leg_lower.R": "leg_upper.R",
+        "leg_upper.L": "hips",
+        "leg_upper.R": "hips",
+        "root": null,
+        "spine": "hips",
+        "weapon.R": "hand.R"
+      },
+      "measured": {
+        "arm_lower.L": "arm_upper.L",
+        "arm_lower.R": "arm_upper.R",
+        "arm_upper.L": "spine",
+        "arm_upper.R": "spine",
+        "foot.L": "leg_lower.L",
+        "foot.R": "leg_lower.R",
+        "hand.L": "arm_lower.L",
+        "hand.R": "arm_lower.R",
+        "head": "spine",
+        "hips": "root",
+        "leg_lower.L": "leg_upper.L",
+        "leg_lower.R": "leg_upper.R",
+        "leg_upper.L": "hips",
+        "leg_upper.R": "hips",
+        "root": null,
+        "spine": "hips",
+        "weapon.R": "hand.R"
+      },
+      "note": "",
+      "passed": true
+    },
+    "schema_fields": {
+      "expected": [
+        "schema",
+        "asset_id",
+        "key",
+        "ue_key",
+        "kind",
+        "status",
+        "height_cm",
+        "height_tolerance_rel",
+        "base",
+        "heads",
+        "landmarks_z_cm",
+        "widths_cm",
+        "joints_cm",
+        "joint_parents",
+        "joint_tails_cm",
+        "weapon",
+        "pose",
+        "silhouette_features",
+        "palette",
+        "triangle_target",
+        "texture_px"
+      ],
+      "measured": [],
+      "note": "",
+      "passed": true
+    },
+    "weapon_grip": {
+      "expected": {
+        "bone": "weapon.R",
+        "grip": [
+          -7.2,
+          -2.5,
+          30
+        ]
+      },
+      "measured": [
+        -7.2,
+        -2.5,
+        30
+      ],
+      "note": "",
+      "passed": true
+    },
+    "weapon_length": {
+      "expected": 44.61386356823979,
+      "measured": 44.61386356823979,
+      "note": "",
+      "passed": true
+    }
+  },
+  "checks_passed": true,
+  "schema": "unmatched.scratch-check/1"
+}
