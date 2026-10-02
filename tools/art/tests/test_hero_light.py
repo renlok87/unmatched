@@ -278,7 +278,10 @@ class DocAndCode(unittest.TestCase):
         board = (S08 / "S08BoardActor.cpp").read_text(encoding="utf-8")
         sync = board[board.index("void AS08BoardActor::SyncFighters"):board.index("void AS08BoardActor::NotifyFighterAnimEvent")]
         self.assertIn("UpdateHeroLights();", sync)
-        self.assertIn("FS08EnvFxOptions::FromCommandLine().bFreeze", board)  # the pulse is frozen in -Bench
+        # the pulse is frozen in -Bench: UpdateHeroLights reads GetFxOptions(), the command line unless live tune overrides it
+        self.assertIn("const bool bFrozen = GetFxOptions().bFreeze;", board)
+        self.assertRegex(board, r"FS08EnvFxOptions AS08BoardActor::GetFxOptions\(\) const \{\s*return FxOptionsOverride\.IsSet\(\) \? "
+                                r"FxOptionsOverride\.GetValue\(\) : FS08EnvFxOptions::FromCommandLine\(\);")
         art = (S08 / "S08BoardArt.cpp").read_text(encoding="utf-8")
         self.assertIn("S08HeroLight::Parse(", art)
         tests = (S08 / "S08HeroLightTests.cpp").read_text(encoding="utf-8")

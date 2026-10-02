@@ -1,0 +1,760 @@
+{
+ "schema": "unmatched.live-tune-fidelity/1",
+ "date": "2026-10-02",
+ "gate": {
+  "meanAbs": 0.5,
+  "pxOver24Pct": 0.05
+ },
+ "maps": {
+  "sarpedon": {
+   "change": "sarpedon-night heroLight.key.lux 7 -> 14",
+   "timing": {
+    "start": {
+     "wallSeconds": 40.0,
+     "rc": 0,
+     "readySeconds": 39.9
+    },
+    "shot-b0": {
+     "wallSeconds": 19.9,
+     "rc": 0,
+     "ms": 19572.8,
+     "clock": [
+      {
+       "view": "K1",
+       "clockTarget": 74.06666564941406,
+       "clockErr": 0.0082550048828125,
+       "heroPoseErr": 9.846687316894531e-05
+      },
+      {
+       "view": "K2x1.6",
+       "clockTarget": 88.66166687011719,
+       "clockErr": 0.00829315185546875,
+       "heroPoseErr": 0.00010144710540771484
+      },
+      {
+       "view": "K2x2.5",
+       "clockTarget": 103.09667205810547,
+       "clockErr": 0.0082550048828125,
+       "heroPoseErr": 9.679794311523438e-05
+      }
+     ],
+     "fingerprints": [
+      true,
+      true,
+      true
+     ]
+    },
+    "cycle-b1-changed": {
+     "wallSeconds": 19.8,
+     "rc": 1,
+     "ms": 19227.1,
+     "cycleSeconds": 19.8,
+     "reloadMs": 54.7,
+     "fingerprints": [
+      {
+       "reference": false,
+       "reasons": [
+        "profilesSource=override (reference pak)"
+       ]
+      },
+      {
+       "reference": false,
+       "reasons": [
+        "profilesSource=override (reference pak)"
+       ]
+      },
+      {
+       "reference": false,
+       "reasons": [
+        "profilesSource=override (reference pak)"
+       ]
+      }
+     ]
+    },
+    "cycle-b2-revert": {
+     "wallSeconds": 19.7,
+     "rc": 0,
+     "ms": 19206.2,
+     "cycleSeconds": 19.7,
+     "reloadMs": 60.3,
+     "clock": [
+      {
+       "view": "K1",
+       "clockTarget": 74.06666564941406,
+       "clockErr": -0.007049560546875,
+       "heroPoseErr": -0.0012679100036621094
+      },
+      {
+       "view": "K2x1.6",
+       "clockTarget": 88.66166687011719,
+       "clockErr": -0.007049560546875,
+       "heroPoseErr": -0.001268625259399414
+      },
+      {
+       "view": "K2x2.5",
+       "clockTarget": 103.09667205810547,
+       "clockErr": -0.00704193115234375,
+       "heroPoseErr": -0.0012642145156860352
+      }
+     ],
+     "fingerprints": [
+      true,
+      true,
+      true
+     ]
+    },
+    "shot-b3-free": {
+     "wallSeconds": 19.4,
+     "rc": 0,
+     "ms": 19200.2
+    },
+    "cycle-b4-revert2": {
+     "wallSeconds": 19.8,
+     "rc": 0,
+     "ms": 19217.6,
+     "cycleSeconds": 19.8,
+     "reloadMs": 57.3,
+     "clock": [
+      {
+       "view": "K1",
+       "clockTarget": 74.06666564941406,
+       "clockErr": -0.00704193115234375,
+       "heroPoseErr": -0.0012685060501098633
+      },
+      {
+       "view": "K2x1.6",
+       "clockTarget": 88.66166687011719,
+       "clockErr": -0.0026092529296875,
+       "heroPoseErr": -0.0012466907501220703
+      },
+      {
+       "view": "K2x2.5",
+       "clockTarget": 103.09667205810547,
+       "clockErr": -0.00731658935546875,
+       "heroPoseErr": -0.0008987188339233398
+      }
+     ],
+     "fingerprints": [
+      true,
+      true,
+      true
+     ]
+    },
+    "state": {
+     "wallSeconds": 0.2,
+     "rc": 0,
+     "ms": 0.3
+    },
+    "stop": {
+     "wallSeconds": 2.3,
+     "rc": 0
+    },
+    "bench-a1": "exit=0 seconds=114",
+    "bench-a2": "exit=0 seconds=115"
+   },
+   "compare": {
+    "bench-a1 bench-a2": {
+     "K1": {
+      "meanAbs": 0.3295,
+      "pxOver24Pct": 0.0629,
+      "pass": false
+     },
+     "K2x1p6": {
+      "meanAbs": 0.3606,
+      "pxOver24Pct": 0.1137,
+      "pass": false
+     },
+     "K2x2p5": {
+      "meanAbs": 0.3549,
+      "pxOver24Pct": 0.002,
+      "pass": true
+     }
+    },
+    "bench-a1 live-b0": {
+     "K1": {
+      "meanAbs": 0.4347,
+      "pxOver24Pct": 0.0655,
+      "pass": false,
+      "outsideBenchNoise": {
+       "maskedPct": 1.12,
+       "meanAbs": 0.3959,
+       "pxOver24Pct": 0.0004,
+       "pass": true
+      }
+     },
+     "K2x1p6": {
+      "meanAbs": 0.478,
+      "pxOver24Pct": 0.099,
+      "pass": false,
+      "outsideBenchNoise": {
+       "maskedPct": 0.924,
+       "meanAbs": 0.4373,
+       "pxOver24Pct": 0.0,
+       "pass": true
+      }
+     },
+     "K2x2p5": {
+      "meanAbs": 0.4466,
+      "pxOver24Pct": 0.0018,
+      "pass": true,
+      "outsideBenchNoise": {
+       "maskedPct": 0.709,
+       "meanAbs": 0.4374,
+       "pxOver24Pct": 0.0001,
+       "pass": true
+      }
+     }
+    },
+    "bench-a1 live-b2-revert": {
+     "K1": {
+      "meanAbs": 0.4499,
+      "pxOver24Pct": 0.0153,
+      "pass": true,
+      "outsideBenchNoise": {
+       "maskedPct": 1.12,
+       "meanAbs": 0.4327,
+       "pxOver24Pct": 0.0,
+       "pass": true
+      }
+     },
+     "K2x1p6": {
+      "meanAbs": 0.4929,
+      "pxOver24Pct": 0.1142,
+      "pass": false,
+      "outsideBenchNoise": {
+       "maskedPct": 0.924,
+       "meanAbs": 0.4467,
+       "pxOver24Pct": 0.0002,
+       "pass": true
+      }
+     },
+     "K2x2p5": {
+      "meanAbs": 0.4547,
+      "pxOver24Pct": 0.0058,
+      "pass": true,
+      "outsideBenchNoise": {
+       "maskedPct": 0.709,
+       "meanAbs": 0.4416,
+       "pxOver24Pct": 0.0001,
+       "pass": true
+      }
+     }
+    },
+    "bench-a1 live-b4-revert2": {
+     "K1": {
+      "meanAbs": 0.5089,
+      "pxOver24Pct": 0.0611,
+      "pass": false,
+      "outsideBenchNoise": {
+       "maskedPct": 1.12,
+       "meanAbs": 0.4724,
+       "pxOver24Pct": 0.0001,
+       "pass": true
+      }
+     },
+     "K2x1p6": {
+      "meanAbs": 0.4251,
+      "pxOver24Pct": 0.0956,
+      "pass": false,
+      "outsideBenchNoise": {
+       "maskedPct": 0.924,
+       "meanAbs": 0.3844,
+       "pxOver24Pct": 0.0,
+       "pass": true
+      }
+     },
+     "K2x2p5": {
+      "meanAbs": 0.4515,
+      "pxOver24Pct": 0.0056,
+      "pass": true,
+      "outsideBenchNoise": {
+       "maskedPct": 0.709,
+       "meanAbs": 0.4401,
+       "pxOver24Pct": 0.0002,
+       "pass": true
+      }
+     }
+    },
+    "bench-a1 live-b3-clockfree": {
+     "K1": {
+      "meanAbs": 0.8138,
+      "pxOver24Pct": 0.5874,
+      "pass": false,
+      "outsideBenchNoise": {
+       "maskedPct": 1.12,
+       "meanAbs": 0.6788,
+       "pxOver24Pct": 0.2848,
+       "pass": false
+      }
+     },
+     "K2x1p6": {
+      "meanAbs": 0.5,
+      "pxOver24Pct": 0.435,
+      "pass": false,
+      "outsideBenchNoise": {
+       "maskedPct": 0.924,
+       "meanAbs": 0.3789,
+       "pxOver24Pct": 0.1184,
+       "pass": false
+      }
+     },
+     "K2x2p5": {
+      "meanAbs": 0.7461,
+      "pxOver24Pct": 0.5508,
+      "pass": false,
+      "outsideBenchNoise": {
+       "maskedPct": 0.709,
+       "meanAbs": 0.6237,
+       "pxOver24Pct": 0.3242,
+       "pass": false
+      }
+     }
+    },
+    "bench-a1 live-b1-changed": {
+     "K1": {
+      "meanAbs": 0.5397,
+      "pxOver24Pct": 0.1334,
+      "pass": false,
+      "outsideBenchNoise": {
+       "maskedPct": 1.12,
+       "meanAbs": 0.4925,
+       "pxOver24Pct": 0.0523,
+       "pass": false
+      }
+     },
+     "K2x1p6": {
+      "meanAbs": 0.5795,
+      "pxOver24Pct": 0.306,
+      "pass": false,
+      "outsideBenchNoise": {
+       "maskedPct": 0.924,
+       "meanAbs": 0.5234,
+       "pxOver24Pct": 0.1604,
+       "pass": false
+      }
+     },
+     "K2x2p5": {
+      "meanAbs": 0.5778,
+      "pxOver24Pct": 0.3739,
+      "pass": false,
+      "outsideBenchNoise": {
+       "maskedPct": 0.709,
+       "meanAbs": 0.5416,
+       "pxOver24Pct": 0.2953,
+       "pass": false
+      }
+     }
+    },
+    "live-b2-revert live-b4-revert2": {
+     "K1": {
+      "meanAbs": 0.4483,
+      "pxOver24Pct": 0.0606,
+      "pass": false
+     },
+     "K2x1p6": {
+      "meanAbs": 0.4943,
+      "pxOver24Pct": 0.114,
+      "pass": false
+     },
+     "K2x2p5": {
+      "meanAbs": 0.4621,
+      "pxOver24Pct": 0.002,
+      "pass": true
+     }
+    },
+    "bench-a2 live-b2-revert": {
+     "K1": {
+      "meanAbs": 0.4939,
+      "pxOver24Pct": 0.0632,
+      "pass": false
+     },
+     "K2x1p6": {
+      "meanAbs": 0.4921,
+      "pxOver24Pct": 0.1149,
+      "pass": false
+     },
+     "K2x2p5": {
+      "meanAbs": 0.4198,
+      "pxOver24Pct": 0.0059,
+      "pass": true
+     }
+    }
+   }
+  },
+  "cobble": {
+   "change": "cobble-probe points[warm].intensity 85 -> 170",
+   "timing": {
+    "start": {
+     "wallSeconds": 39.5,
+     "rc": 0,
+     "readySeconds": 39.4
+    },
+    "shot-b0": {
+     "wallSeconds": 19.6,
+     "rc": 0,
+     "ms": 19459.5,
+     "clock": [
+      {
+       "view": "K1",
+       "clockTarget": 74.06666564941406,
+       "clockErr": 0.00832366943359375,
+       "heroPoseErr": 0.0001035928726196289
+      },
+      {
+       "view": "K2x1.6",
+       "clockTarget": 88.66166687011719,
+       "clockErr": 0.0082855224609375,
+       "heroPoseErr": 0.0001010894775390625
+      },
+      {
+       "view": "K2x2.5",
+       "clockTarget": 103.09667205810547,
+       "clockErr": 0.00826263427734375,
+       "heroPoseErr": 0.00010347366333007812
+      }
+     ],
+     "fingerprints": [
+      true,
+      true,
+      true
+     ]
+    },
+    "cycle-b1-changed": {
+     "wallSeconds": 19.6,
+     "rc": 1,
+     "ms": 19093.4,
+     "cycleSeconds": 19.6,
+     "reloadMs": 24.8,
+     "fingerprints": [
+      {
+       "reference": false,
+       "reasons": [
+        "profilesSource=override (reference pak)"
+       ]
+      },
+      {
+       "reference": false,
+       "reasons": [
+        "profilesSource=override (reference pak)"
+       ]
+      },
+      {
+       "reference": false,
+       "reasons": [
+        "profilesSource=override (reference pak)"
+       ]
+      }
+     ]
+    },
+    "cycle-b2-revert": {
+     "wallSeconds": 19.6,
+     "rc": 0,
+     "ms": 19070.3,
+     "cycleSeconds": 19.5,
+     "reloadMs": 24.1,
+     "clock": [
+      {
+       "view": "K1",
+       "clockTarget": 74.06666564941406,
+       "clockErr": -0.007049560546875,
+       "heroPoseErr": -0.0012720823287963867
+      },
+      {
+       "view": "K2x1.6",
+       "clockTarget": 88.66166687011719,
+       "clockErr": -0.007049560546875,
+       "heroPoseErr": -0.0012725591659545898
+      },
+      {
+       "view": "K2x2.5",
+       "clockTarget": 103.09667205810547,
+       "clockErr": -0.007049560546875,
+       "heroPoseErr": -0.0012711286544799805
+      }
+     ],
+     "fingerprints": [
+      true,
+      true,
+      true
+     ]
+    },
+    "shot-b3-free": {
+     "wallSeconds": 19.4,
+     "rc": 0,
+     "ms": 19082.7
+    },
+    "cycle-b4-revert2": {
+     "wallSeconds": 19.5,
+     "rc": 0,
+     "ms": 19082.5,
+     "cycleSeconds": 19.5,
+     "reloadMs": 26.9,
+     "clock": [
+      {
+       "view": "K1",
+       "clockTarget": 74.06666564941406,
+       "clockErr": -0.00701904296875,
+       "heroPoseErr": -0.0012618303298950195
+      },
+      {
+       "view": "K2x1.6",
+       "clockTarget": 88.66166687011719,
+       "clockErr": -0.00704193115234375,
+       "heroPoseErr": -0.0012685060501098633
+      },
+      {
+       "view": "K2x2.5",
+       "clockTarget": 103.09667205810547,
+       "clockErr": -0.0034637451171875,
+       "heroPoseErr": -0.0012545585632324219
+      }
+     ],
+     "fingerprints": [
+      true,
+      true,
+      true
+     ]
+    },
+    "state": {
+     "wallSeconds": 0.3,
+     "rc": 0,
+     "ms": 0.2
+    },
+    "stop": {
+     "wallSeconds": 1.8,
+     "rc": 0
+    },
+    "bench-a1": "exit=0 seconds=114",
+    "bench-a2": "exit=0 seconds=114"
+   },
+   "compare": {
+    "bench-a1 bench-a2": {
+     "K1": {
+      "meanAbs": 0.2356,
+      "pxOver24Pct": 0.0026,
+      "pass": true
+     },
+     "K2x1p6": {
+      "meanAbs": 0.3838,
+      "pxOver24Pct": 0.0024,
+      "pass": true
+     },
+     "K2x2p5": {
+      "meanAbs": 0.4807,
+      "pxOver24Pct": 0.0082,
+      "pass": true
+     }
+    },
+    "bench-a1 live-b0": {
+     "K1": {
+      "meanAbs": 0.3439,
+      "pxOver24Pct": 0.0043,
+      "pass": true,
+      "outsideBenchNoise": {
+       "maskedPct": 0.449,
+       "meanAbs": 0.333,
+       "pxOver24Pct": 0.0006,
+       "pass": true
+      }
+     },
+     "K2x1p6": {
+      "meanAbs": 0.5424,
+      "pxOver24Pct": 0.0016,
+      "pass": false,
+      "outsideBenchNoise": {
+       "maskedPct": 0.851,
+       "meanAbs": 0.5311,
+       "pxOver24Pct": 0.0,
+       "pass": false
+      }
+     },
+     "K2x2p5": {
+      "meanAbs": 0.6814,
+      "pxOver24Pct": 0.0278,
+      "pass": false,
+      "outsideBenchNoise": {
+       "maskedPct": 1.389,
+       "meanAbs": 0.6447,
+       "pxOver24Pct": 0.0057,
+       "pass": false
+      }
+     }
+    },
+    "bench-a1 live-b2-revert": {
+     "K1": {
+      "meanAbs": 0.3871,
+      "pxOver24Pct": 0.0028,
+      "pass": true,
+      "outsideBenchNoise": {
+       "maskedPct": 0.449,
+       "meanAbs": 0.3779,
+       "pxOver24Pct": 0.0003,
+       "pass": true
+      }
+     },
+     "K2x1p6": {
+      "meanAbs": 0.51,
+      "pxOver24Pct": 0.0027,
+      "pass": false,
+      "outsideBenchNoise": {
+       "maskedPct": 0.851,
+       "meanAbs": 0.4995,
+       "pxOver24Pct": 0.0001,
+       "pass": true
+      }
+     },
+     "K2x2p5": {
+      "meanAbs": 0.7162,
+      "pxOver24Pct": 0.0083,
+      "pass": false,
+      "outsideBenchNoise": {
+       "maskedPct": 1.389,
+       "meanAbs": 0.6866,
+       "pxOver24Pct": 0.0004,
+       "pass": false
+      }
+     }
+    },
+    "bench-a1 live-b4-revert2": {
+     "K1": {
+      "meanAbs": 0.3668,
+      "pxOver24Pct": 0.0022,
+      "pass": true,
+      "outsideBenchNoise": {
+       "maskedPct": 0.449,
+       "meanAbs": 0.3579,
+       "pxOver24Pct": 0.0001,
+       "pass": true
+      }
+     },
+     "K2x1p6": {
+      "meanAbs": 0.5721,
+      "pxOver24Pct": 0.0027,
+      "pass": false,
+      "outsideBenchNoise": {
+       "maskedPct": 0.851,
+       "meanAbs": 0.5588,
+       "pxOver24Pct": 0.0,
+       "pass": false
+      }
+     },
+     "K2x2p5": {
+      "meanAbs": 0.6648,
+      "pxOver24Pct": 0.0041,
+      "pass": false,
+      "outsideBenchNoise": {
+       "maskedPct": 1.389,
+       "meanAbs": 0.6406,
+       "pxOver24Pct": 0.0005,
+       "pass": false
+      }
+     }
+    },
+    "bench-a1 live-b3-clockfree": {
+     "K1": {
+      "meanAbs": 0.4591,
+      "pxOver24Pct": 0.1572,
+      "pass": false,
+      "outsideBenchNoise": {
+       "maskedPct": 0.449,
+       "meanAbs": 0.4144,
+       "pxOver24Pct": 0.0707,
+       "pass": false
+      }
+     },
+     "K2x1p6": {
+      "meanAbs": 0.7219,
+      "pxOver24Pct": 0.3803,
+      "pass": false,
+      "outsideBenchNoise": {
+       "maskedPct": 0.851,
+       "meanAbs": 0.6223,
+       "pxOver24Pct": 0.2084,
+       "pass": false
+      }
+     },
+     "K2x2p5": {
+      "meanAbs": 1.4013,
+      "pxOver24Pct": 1.2778,
+      "pass": false,
+      "outsideBenchNoise": {
+       "maskedPct": 1.389,
+       "meanAbs": 1.142,
+       "pxOver24Pct": 0.8119,
+       "pass": false
+      }
+     }
+    },
+    "bench-a1 live-b1-changed": {
+     "K1": {
+      "meanAbs": 1.1015,
+      "pxOver24Pct": 0.004,
+      "pass": false,
+      "outsideBenchNoise": {
+       "maskedPct": 0.449,
+       "meanAbs": 1.094,
+       "pxOver24Pct": 0.002,
+       "pass": false
+      }
+     },
+     "K2x1p6": {
+      "meanAbs": 2.2136,
+      "pxOver24Pct": 0.0301,
+      "pass": false,
+      "outsideBenchNoise": {
+       "maskedPct": 0.851,
+       "meanAbs": 2.2107,
+       "pxOver24Pct": 0.0226,
+       "pass": false
+      }
+     },
+     "K2x2p5": {
+      "meanAbs": 2.436,
+      "pxOver24Pct": 0.0973,
+      "pass": false,
+      "outsideBenchNoise": {
+       "maskedPct": 1.389,
+       "meanAbs": 2.4229,
+       "pxOver24Pct": 0.0873,
+       "pass": false
+      }
+     }
+    },
+    "live-b2-revert live-b4-revert2": {
+     "K1": {
+      "meanAbs": 0.3607,
+      "pxOver24Pct": 0.0032,
+      "pass": true
+     },
+     "K2x1p6": {
+      "meanAbs": 0.5825,
+      "pxOver24Pct": 0.0032,
+      "pass": false
+     },
+     "K2x2p5": {
+      "meanAbs": 0.698,
+      "pxOver24Pct": 0.0061,
+      "pass": false
+     }
+    },
+    "bench-a2 live-b2-revert": {
+     "K1": {
+      "meanAbs": 0.3839,
+      "pxOver24Pct": 0.0018,
+      "pass": true
+     },
+     "K2x1p6": {
+      "meanAbs": 0.5322,
+      "pxOver24Pct": 0.0038,
+      "pass": false
+     },
+     "K2x2p5": {
+      "meanAbs": 0.7028,
+      "pxOver24Pct": 0.0109,
+      "pass": false
+     }
+    }
+   }
+  }
+ }
+}

@@ -94,6 +94,11 @@ public:
   void NotifyHeroAnimEvent(S08HeroesV2::EEvent Event, int32 Seq);
   /** The death hold (DeathSettle final pose) is running: the defeated figure is still visible. */
   bool IsInDeathHold() const { return bDeathHold; }
+  /** Live tune (S08LiveTune.h): position / length of the looping v2 clip that plays (false: no v2 figure, no looping clip). */
+  bool GetHeroClipTime(float& OutPosition, float& OutLength) const;
+  /** Live tune: moves the looping v2 clip's clock by DeltaSeconds (wrapped into the clip), so a capture shows the pose a
+   *  fresh -Bench run shows at the same time since spawn; false when no looping clip plays (nothing changed). */
+  bool ShiftHeroClipClock(float DeltaSeconds);
   /** Screen-space combat icon mode: the world billboard stays hidden while
    *  the HUD draws the exact-size icon (the trace still reports icon=1). */
   void SetScreenIconMode(bool bScreen);

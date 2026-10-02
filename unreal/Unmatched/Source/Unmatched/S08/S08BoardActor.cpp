@@ -3,9 +3,16 @@
 #include "S08ArtPreviewMedusa.h"
 #include "S08Diorama.h"
 #include "S08FighterActor.h"
+#include "S08LiveTune.h"
 #include "S08MapBackdrop.h"
 #include "S08Render.h"
 #include "S08TraceLog.h"
+#include "S08Contracts.h"
+#include "Dom/JsonObject.h"
+#include "HAL/FileManager.h"
+#include "Misc/FileHelper.h"
+#include "Serialization/JsonSerializer.h"
+#include "Serialization/JsonWriter.h"
 #include "Components/BoxComponent.h"
 #include "Components/InstancedStaticMeshComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -53,6 +60,27 @@ FString ZoneComponentName(const FString& Key) {
   FString Safe;
   for (const TCHAR C : Key) Safe.AppendChar(FChar::IsAlnum(C) ? C : TEXT('_'));
   return TEXT("ArtZone_") + Safe;
+}
+
+// Live tune: the sections of the profile document only BeginPlay reads (zone materials / instances, glyph meshes,
+// keyline content are loaded there once), serialised compactly; a reload that changes them warns (relaunch needed).
+FString S08BootSectionsSignature(const FString& Text) {
+  TSharedPtr<FJsonObject> Root;
+  FString Problem;
+  if (!FS08Contracts::TryParseJsonObject(Text, Root, Problem) || !Root.IsValid()) return FString();
+  FString Out;
+  for (const TCHAR* Field : {TEXT("zoneStyles"), TEXT("fallbackZoneStyle"), TEXT("glyphMeshes"), TEXT("zoneKeyline")}) {
+    FString Part = TEXT("-");
+    const TSharedPtr<FJsonValue> Value = Root->TryGetField(Field);
+    if (Value.IsValid()) {
+      Part.Reset();
+      const TSharedRef<TJsonWriter<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>> Writer =
+          TJsonWriterFactory<TCHAR, TCondensedJsonPrintPolicy<TCHAR>>::Create(&Part);
+      FJsonSerializer::Serialize(Value, FString(), Writer);
+    }
+    Out += FString(Field) + TEXT("=") + Part + TEXT(";");
+  }
+  return Out;
 }
 } // namespace
 
@@ -145,17 +173,12 @@ void AS08BoardActor::BeginPlay() {
     // W4-A RENDER fingerprint: which bytes the light profiles came from.
     AppliedRender.ProfilesSha256 = ArtData.SourceSha256;
     AppliedRender.ProfilesSource = bOverride ? TEXT("override") : TEXT("pak");
-    FS08Trace::Write(FString::Printf(
-        TEXT("ARTPREVIEW board profiles loaded=%d revision=%d boards=%d zoneStyles=%d lightProfiles=%d errors=%d path=Config/ArtBoards/S08ArtBoardProfiles.json"),
-        bArtDataLoaded ? 1 : 0, ArtData.Revision, ArtData.Boards.Num(), ArtData.ZoneStyles.Num(),
-        ArtData.Lights.Num(), Errors.Num()));
-    FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW board profiles source=%s sha256=%s%s%s"),
-                                     *AppliedRender.ProfilesSource,
-                                     ArtData.SourceSha256.IsEmpty() ? TEXT("-") : *ArtData.SourceSha256,
-                                     bOverride ? TEXT(" overridePath=") : TEXT(""),
-                                     bOverride ? *ProfilesPath : TEXT("")));
-    for (int32 I = 0; I < Errors.Num() && I < 8; ++I) {
-      FS08Trace::Write(TEXT("ARTPREVIEW board profiles error: ") + Errors[I]);
+    TraceProfilesLoaded(bArtDataLoaded, bOverride, ProfilesPath, Errors);
+    // live tune: what only BeginPlay reads of the document (a reload warns when it changes)
+    if (S08LiveTune::Enabled()) {
+      FString Text;
+      FFileHelper::LoadFileToString(Text, *ProfilesPath);
+      BootSectionsSignature = S08BootSectionsSignature(Text);
     }
     if (!bArtDataLoaded) {
       UE_LOG(LogTemp, Warning, TEXT("ARTPREVIEW board profiles invalid; keeping grey board"));
@@ -1019,6 +1042,9 @@ void AS08BoardActor::ApplyEnvLayout() {
   Request.ProfileTrayOffset = ActiveProfile.Map.TrayOffsetUU;
   const FS08LightProfile* Light = bMapImageActive ? ArtData.LightFor(ActiveProfile) : nullptr;
   Request.ProfilePointLights = Light ? Light->Points.Num() : 0;
+  // live tune only (unset in every other run: the command line decides, as before)
+  Request.Dir = EnvDirOverride;
+  if (FxOptionsOverride.IsSet()) Request.FxOptions = FxOptionsOverride;
   // ENV-MAPS P7: a block on the active profile decides the variant (unset = the command line, as before: Marmoreal's
   // default and every board without the block stay byte for byte).
   if (ConceptMode.bOverrideVariant) Request.Variant = ConceptMode.Variant;
@@ -1164,7 +1190,7 @@ void AS08BoardActor::UpdateConceptPaste() {
   const float EmissiveScale = S08ConceptPaste::EffectiveEmissiveScale(
       Spec, Light && Light->Exposure.bSet, Light ? Light->Exposure.MaxBrightness : 0.0f, ConceptRuntime.EmissiveScaleSource);
   // frozen runs (-Bench without -EnvFxLive, -EnvFxFreeze): no light flicker / prop sway / water flow - reproducible frames
-  const FS08EnvFxOptions FxOptions = FS08EnvFxOptions::FromCommandLine();
+  const FS08EnvFxOptions FxOptions = GetFxOptions();
   if (bLit3d) {
     // ENV-MAPS P8: the lit 3D island is the env layout's scene overlay; the block adds the sky, the lights, the tweaks
     S08ConceptPaste::ApplyLit3d(Spec, ConceptAssets, ActiveProfile.Map.FrameHalfUU(), Grade, EmissiveScale, FxOptions.bFreeze,
@@ -1274,7 +1300,10 @@ void AS08BoardActor::HideTrayForConceptPaste() {
 
 bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
   if (Board.Width <= 0 || Board.Height <= 0) return false;
-  if (BoardModel.Width == Board.Width && BoardModel.Height == Board.Height &&
+  // live tune (ReloadArtData / RequestFullRebuild): the same geometry is rebuilt in full, exactly like the first build
+  const bool bForced = bForceRebuild;
+  bForceRebuild = false;
+  if (!bForced && BoardModel.Width == Board.Width && BoardModel.Height == Board.Height &&
       BoardModel.Cells.Num() == Board.Cells.Num() && BuiltForBoardId == RoomBoardId &&
       BoardModel.bHasTopology == Board.bHasTopology) {
     bool bSameTypes = true;
@@ -1292,6 +1321,7 @@ bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
     }
     if (bSameTypes) return true; // geometry unchanged: tiles stay as-is
   }
+  ++BuildCount;
   BoardModel = Board;
   BuiltForBoardId = RoomBoardId;
   const FS08BoardSummary Summary = S08SummarizeBoard(Board);
@@ -2385,7 +2415,7 @@ void AS08BoardActor::UpdateHeroLights() {
                         : !Light->HeroLight.bSet ? TEXT("no-block")
                                              : TEXT("disabled");
   // frozen runs (-Bench without -EnvFxLive, -EnvFxFreeze): the active figure holds exactly activeMul (reproducible frames)
-  const bool bFrozen = FS08EnvFxOptions::FromCommandLine().bFreeze;
+  const bool bFrozen = GetFxOptions().bFreeze;
   // lit figures: the living ones and a falling one in its death hold (DefeatedMul); a hidden dead fighter gets no rig
   int32 Figures = 0;
   for (const AS08FighterActor* Actor : FighterActors) {
@@ -2413,4 +2443,143 @@ void AS08BoardActor::UpdateHeroLights() {
       ActiveProfile.Id.IsEmpty() ? TEXT("-") : *ActiveProfile.Id, Light ? *Light->Id : TEXT("-"), Spec ? 1 : 0, Reason,
       FighterActors.Num(), Lit, LayerCount, HeroLightCount, Lit * LayerCount, MaxLightsPerBoard, MaxLightsPerFigure, Channel,
       bFrozen ? 1 : 0));
+}
+
+// ---- ENV-MAPS live tune (S08LiveTune.h, tools/art/render/LIVE-TUNE.md) -------------------------------------------
+
+void AS08BoardActor::TraceProfilesLoaded(bool bLoaded, bool bOverride, const FString& Path, const TArray<FString>& Errors) {
+  FS08Trace::Write(FString::Printf(
+      TEXT("ARTPREVIEW board profiles loaded=%d revision=%d boards=%d zoneStyles=%d lightProfiles=%d errors=%d path=Config/ArtBoards/S08ArtBoardProfiles.json"),
+      bLoaded ? 1 : 0, ArtData.Revision, ArtData.Boards.Num(), ArtData.ZoneStyles.Num(),
+      ArtData.Lights.Num(), Errors.Num()));
+  FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW board profiles source=%s sha256=%s%s%s"),
+                                   *AppliedRender.ProfilesSource,
+                                   ArtData.SourceSha256.IsEmpty() ? TEXT("-") : *ArtData.SourceSha256,
+                                   bOverride ? TEXT(" overridePath=") : TEXT(""),
+                                   bOverride ? *Path : TEXT("")));
+  for (int32 I = 0; I < Errors.Num() && I < 8; ++I) {
+    FS08Trace::Write(TEXT("ARTPREVIEW board profiles error: ") + Errors[I]);
+  }
+}
+
+FS08EnvFxOptions AS08BoardActor::GetFxOptions() const {
+  return FxOptionsOverride.IsSet() ? FxOptionsOverride.GetValue() : FS08EnvFxOptions::FromCommandLine();
+}
+
+void AS08BoardActor::ResetArtRuntimeForReload() {
+  // Back to the state right after BeginPlay, so the next (forced) Rebuild walks the first build's path: no runtime key of
+  // the previous build may keep a component (env layout key, concept-paste key, backdrop profile, light profile id).
+  if (ConceptAnim) {
+    ConceptAnim->RestoreBase();
+    ConceptAnim->DestroyComponent();
+    ConceptAnim = nullptr;
+  }
+  S08ConceptPaste::RestoreHides(ConceptRuntime);
+  S08ConceptPaste::Clear(ConceptParts, ConceptLights, ConceptRuntime);
+  ConceptRuntime = FS08ConceptPasteRuntime();
+  ConceptMode = FS08ConceptPasteMode();
+  ConceptAssets = FS08ConceptPasteAssets();
+  ConceptAssetRefs.Reset();
+  ConceptAssetsProfileId.Reset();      // the spec's asset paths may have changed: LoadAssets again
+  ConceptApplyFailedProfileId.Reset();
+  S08EnvLayout::Clear(EnvProps, EnvLights);
+  S08EnvGround::Clear(EnvRuntime.Ground);
+  S08EnvLayout::ClearFx(EnvRuntime.Fx);
+  EnvRuntime = FS08EnvLayoutRuntime();
+  S08MapBackdrop::Clear(BackdropParts, BackdropRuntime);
+  BackdropRuntime = FS08BackdropRuntime();
+  ClearArtLights();
+  // trace dedupe keys: the rebuild writes the lines of a first build again (the live-tune shot copies them)
+  HeroLightTraceKey.Reset();
+  ReadabilityFightersTraceKey.Reset();
+  HeroesV2SummaryKey.Reset();
+  bAllMedusaSummaryTraced = false;
+  bForceRebuild = true;
+}
+
+void AS08BoardActor::RequestFullRebuild() { ResetArtRuntimeForReload(); }
+
+bool AS08BoardActor::ReloadArtData(const FString& ProfilesPath, bool bOverride, const FString& EnvDir,
+                                   TArray<FString>& OutErrors, TArray<FString>& OutWarnings) {
+  const int32 ErrorsBefore = OutErrors.Num();
+  if (!bArtDataLoaded || !bArtAssetsReady) {
+    // BeginPlay stopped before the art assets (no -ArtPreview, invalid profiles at start, missing assets): a reload cannot
+    // load what only BeginPlay loads
+    OutErrors.Add(FString::Printf(TEXT("the board started without art (profiles loaded=%d, assets ready=%d): relaunch"),
+                                  bArtDataLoaded ? 1 : 0, bArtAssetsReady ? 1 : 0));
+    return false;
+  }
+  // 1) the board profiles, parsed and validated into a separate document (the applied one stays untouched)
+  FS08BoardArtData NewData;
+  TArray<FString> ProfileErrors;
+  const bool bLoaded = NewData.LoadFile(ProfilesPath, ProfileErrors);
+  for (const FString& E : ProfileErrors) OutErrors.Add(TEXT("profiles: ") + E);
+  if (!bLoaded && ProfileErrors.IsEmpty()) OutErrors.Add(TEXT("profiles: invalid document"));
+  // 2) every env layout and overlay of the folder the next build reads (an invalid one would leave the map without its
+  // environment: a half-applied board)
+  bool bEnvOverride = false;
+  const FString Dir = !EnvDir.IsEmpty() ? EnvDir : !EnvDirOverride.IsEmpty() ? EnvDirOverride : S08EnvLayout::ResolveDir(bEnvOverride);
+  TArray<FString> Names;
+  IFileManager::Get().FindFiles(Names, *FPaths::Combine(Dir, FString(TEXT("*")) + S08EnvLayoutSpec::FileSuffix), true, false);
+  Names.Sort();
+  int32 Layouts = 0, Overlays = 0;
+  for (const FString& Name : Names) {
+    if (!S08EnvLayout::IsOverlayFileName(Name)) {
+      FS08EnvLayout Layout;
+      TArray<FString> Errors;
+      ++Layouts;
+      if (!Layout.LoadFile(FPaths::Combine(Dir, Name), Errors)) {
+        if (Errors.IsEmpty()) Errors.Add(TEXT("invalid document"));
+        for (const FString& E : Errors) OutErrors.Add(FString::Printf(TEXT("envlayout %s: %s"), *Name, *E));
+      }
+      continue;
+    }
+    ++Overlays;
+    const FString Stem = Name.LeftChop(FCString::Strlen(S08EnvLayoutSpec::FileSuffix));
+    FString MapKey, Variant;
+    Stem.Split(TEXT("."), &MapKey, &Variant);
+    FS08EnvLayout Base;
+    TArray<FString> BaseErrors;
+    if (!Base.LoadFile(S08EnvLayout::FileFor(Dir, MapKey), BaseErrors)) {
+      OutErrors.Add(FString::Printf(TEXT("envlayout %s: the base layout %s%s is missing or invalid"), *Name, *MapKey,
+                                    S08EnvLayoutSpec::FileSuffix));
+      continue;
+    }
+    const FS08EnvVariantResult R = S08EnvLayout::ApplyVariant(Dir, MapKey, Variant, Base);
+    if (R.Status != TEXT("ok")) {
+      if (R.Errors.IsEmpty()) OutErrors.Add(FString::Printf(TEXT("envlayout %s: overlay status %s"), *Name, *R.Status));
+      for (const FString& E : R.Errors) OutErrors.Add(FString::Printf(TEXT("envlayout %s: %s"), *Name, *E));
+    }
+  }
+  if (!bLoaded || OutErrors.Num() != ErrorsBefore) {
+    FS08Trace::Write(FString::Printf(TEXT("LIVETUNE reload refused errors=%d profiles=%s envDir=%s (the board keeps revision %d sha256=%s)"),
+                                     OutErrors.Num() - ErrorsBefore, *ProfilesPath, *Dir, ArtData.Revision,
+                                     ArtData.SourceSha256.IsEmpty() ? TEXT("-") : *ArtData.SourceSha256));
+    for (int32 I = ErrorsBefore; I < OutErrors.Num() && I < ErrorsBefore + 8; ++I) {
+      FS08Trace::Write(TEXT("LIVETUNE reload error: ") + OutErrors[I]);
+    }
+    return false;
+  }
+  // only BeginPlay reads these sections: they need a relaunch (the rebuild keeps the BeginPlay materials / meshes)
+  {
+    FString Text;
+    FFileHelper::LoadFileToString(Text, *ProfilesPath);
+    const FString Signature = S08BootSectionsSignature(Text);
+    if (!BootSectionsSignature.IsEmpty() && Signature != BootSectionsSignature) {
+      OutWarnings.Add(TEXT("zoneStyles / fallbackZoneStyle / glyphMeshes / zoneKeyline changed: their materials and meshes are "
+                           "loaded at BeginPlay only - relaunch to see them"));
+    }
+  }
+  // 3) swap + tear down to the post-BeginPlay state; the caller rebuilds through the normal path
+  ResetArtRuntimeForReload();
+  ArtData = MoveTemp(NewData);
+  AppliedRender.ProfilesSha256 = ArtData.SourceSha256;
+  AppliedRender.ProfilesSource = bOverride ? TEXT("override") : TEXT("pak");
+  if (!EnvDir.IsEmpty()) EnvDirOverride = EnvDir;
+  TraceProfilesLoaded(true, bOverride, ProfilesPath, TArray<FString>());
+  FS08Trace::Write(FString::Printf(TEXT("LIVETUNE reload data revision=%d sha256=%s source=%s envDir=%s envSource=%s layouts=%d overlays=%d"),
+                                   ArtData.Revision, *ArtData.SourceSha256, *AppliedRender.ProfilesSource, *Dir,
+                                   !EnvDirOverride.IsEmpty() ? TEXT("explicit") : (bEnvOverride ? TEXT("override") : TEXT("pak")),
+                                   Layouts, Overlays));
+  return true;
 }

@@ -201,7 +201,9 @@ User request: «Конечно, делай и закрепи это в осно�
   `tools/art/render/LIVE-TUNE.md`.
   - Parameter-only means the light/board profiles in `S08ArtBoardProfiles.json` and the `EnvLayouts/*.layout.json` files.
   - Relaunch only after C++, mesh, texture or material-instance changes.
-  - Use live-tune frames as gate evidence only on the fidelity-proven path documented there.
+  - Measured on 2026-10-02 (`docs/game-design/evidence/ENV-MAPS/live-tune-2026-10-02/`): an edit plus three views takes about 20 s, against about 115 s when relaunching.
+  - Live-tune frames are valid for tuning, for before/after pairs taken in one session and for mask or region metrics.
+  - Final acceptance frames still come from a fresh `-Bench` run (`live_tune.py bench`). Reason: Cobble K2 live frames differ from it by 0.51–0.72 mean, as uniform noise.
 - **Light mode** applies to small visual fixes and parameter tuning that add no new system:
   - at most 3 tuning iterations;
   - before/after frames of the affected views plus only the affected gates;

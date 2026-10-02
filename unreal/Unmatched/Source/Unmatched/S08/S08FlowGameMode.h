@@ -459,6 +459,27 @@ private:
   FString BenchViewerId;   // fixture player whose fighters are "own" (blue)
   FString BenchBoardId;    // Board row id of the fixture (art profile match)
   void RunRenderBench();
+  /** One -Bench view's camera: selection + zoom per the view name, traced 'BENCH view=...' (RunRenderBench case 2;
+   *  also the live-tune shot). */
+  void BenchSetupView(const FString& View, const FString& HeroId);
+  /** RunRenderBench case 3: the camera within 1 % / 1 uu of its target. */
+  bool BenchCameraSettled() const;
+  // ENV-MAPS live tune (S08LiveTune.h, S08FlowGameModeLiveTune.cpp): -ArtLiveTune=<dir> with the -Bench flags turns the
+  // bench into a file-protocol server after its fixture init. Null without the flag.
+  TSharedPtr<struct FS08LiveTuneSession> LiveTune;
+  /** Bench init: the session (journal marks) before the board build; called by RunRenderBench. */
+  void LiveTuneBeforeBuild();
+  void LiveTuneAfterBuild(float BenchWarmup, float BenchSettle, float BenchMeasure, float BenchFps, const FString& Fixture,
+                          const FString& HeroId);
+  void RunLiveTune();
+  void LiveTuneHandleCommand(const FString& Path, int32 Seq);
+  void LiveTuneReload(const struct FS08LiveCommand& Cmd, struct FS08LiveResult& Result);
+  void LiveTuneStartShot();
+  void LiveTuneShotTick();
+  void LiveTuneFinishShot(bool bOk, const FString& Error);
+  void LiveTuneSetClocks(float Target, const FString& View);
+  void LiveTuneWriteDone(struct FS08LiveResult& Result);
+  TSharedPtr<class FJsonObject> LiveTuneState() const;
   // -S09HudProbe=<dir>: backend-less packaged probe - renders the fixture-04
   // HUD states and captures UI-inclusive shots + a Slate key-input check.
   bool bS09Probe = false;

@@ -610,6 +610,25 @@ void AS08FighterActor::PlayHeroClip(S08HeroesV2::EClip Clip, S08HeroesV2::EEvent
       *Fighter.Id, ClipName(Clip), Len, EventName(Event), bLoop ? 1 : 0, Phase, Seq, *Anim->GetName()));
 }
 
+bool AS08FighterActor::GetHeroClipTime(float& OutPosition, float& OutLength) const {
+  if (!bHeroV2Visual || !ArtBody || !S08HeroesV2::ClipLoops(HeroClip) || !ArtBody->IsPlaying()) return false;
+  const UAnimSequenceBase* Anim = HeroClips.IsValidIndex(static_cast<int32>(HeroClip))
+      ? HeroClips[static_cast<int32>(HeroClip)].Get() : nullptr;
+  if (!Anim) return false;
+  OutLength = Anim->GetPlayLength();
+  OutPosition = ArtBody->GetPosition();
+  return OutLength > 0.0f;
+}
+
+bool AS08FighterActor::ShiftHeroClipClock(float DeltaSeconds) {
+  float Position = 0.0f, Length = 0.0f;
+  if (!GetHeroClipTime(Position, Length)) return false;
+  float P = FMath::Fmod(Position + DeltaSeconds, Length);
+  if (P < 0.0f) P += Length;
+  ArtBody->SetPosition(P, /*bFireNotifies=*/false);
+  return true;
+}
+
 void AS08FighterActor::OnHeroClipFinished() {
   NotifyHeroAnimEvent(S08HeroesV2::EEvent::ClipFinished, -1);
 }

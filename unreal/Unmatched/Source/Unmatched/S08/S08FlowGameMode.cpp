@@ -28,6 +28,7 @@
 #include "Serialization/JsonSerializer.h"
 #include "Serialization/JsonWriter.h"
 #include "S08TraceLog.h"
+#include "S08LiveTune.h"
 #include "Widgets/Input/SEditableTextBox.h"
 #include "Widgets/Input/SButton.h"
 #include "Widgets/Input/SCheckBox.h"
@@ -129,6 +130,12 @@ void S08WritePerfConfig() {
       GDynamicRHI ? GDynamicRHI->GetName() : TEXT("none")));
 }
 } // namespace
+
+// ENV-MAPS live tune: the -Bench measure line format for S08FlowGameModeLiveTune.cpp (S08LiveTune.h).
+FString S08LiveTunePerfStats(const TArray<float>& FrameMs, const TArray<float>& GpuMs, const TArray<float>& GameMs,
+                             const TArray<float>& RenderMs) {
+  return S08PerfStats(FrameMs, GpuMs, GameMs, RenderMs);
+}
 
 AS08FlowGameMode::AS08FlowGameMode() {
   PrimaryActorTick.bCanEverTick = true;
@@ -288,6 +295,8 @@ void AS08FlowGameMode::BeginPlay() {
   bS09Probe = !S09ProbeDir.IsEmpty();
   FParse::Value(FCommandLine::Get(), TEXT("S09ShotMode="), S09ShotMode);
 
+  // ENV-MAPS live tune: the journal keeps the boot lines for the shots' bench.trace.log (off without the flag)
+  if (S08LiveTune::Enabled()) FS08Trace::SetJournal(true);
   FS08Trace::Open();
   for (const FString& Line : ArtHud.PendingTrace) FS08Trace::Write(Line);
   ArtHud.PendingTrace.Reset();
@@ -635,6 +644,8 @@ void AS08FlowGameMode::SyncBoardFromApplied() {
     Params.Owner = this;
     BoardActor = GetWorld()->SpawnActor<AS08BoardActor>(
         AS08BoardActor::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator, Params);
+    // ENV-MAPS live tune: the board actor's BeginPlay lines end here (the shots' bench.trace.log keeps them)
+    if (LiveTune.IsValid() && LiveTune->BoardBootEnd < 0) LiveTune->BoardBootEnd = FS08Trace::JournalNum();
     if (BoardActor) {
       // T3.2: the room's Board row id selects the -ArtPreview board profile.
       BoardActor->SetRoomBoardId(RoomBoardId);
@@ -6750,7 +6761,9 @@ void AS08FlowGameMode::RunRenderBench() {
     B.bCsv = FParse::Param(Cmd, TEXT("BenchCsv"));
     FString Fixture = FPaths::Combine(FPaths::ProjectConfigDir(), TEXT("Bench"), TEXT("S08BenchCobble.json"));
     FParse::Value(Cmd, TEXT("BenchFixture="), Fixture);
-    if (B.OutDir.IsEmpty() || B.Views.Num() == 0) {
+    // ENV-MAPS live tune: the fixture init below, then the session owns the views (S08FlowGameModeLiveTune.cpp)
+    const bool bLiveTune = S08LiveTune::Enabled();
+    if (!bLiveTune && (B.OutDir.IsEmpty() || B.Views.Num() == 0)) {
       Finish(TEXT("BENCH FAILED usage: -BenchOut=<dir> and -BenchViews=K1+K2x5 are required"));
       return;
     }
@@ -6774,6 +6787,7 @@ void AS08FlowGameMode::RunRenderBench() {
     S08BenchSetCvar(TEXT("t.MaxFPS"), FString::SanitizeFloat(Fps));
     S08BenchSetCvar(TEXT("r.VSync"), TEXT("0"));
     S08BenchSetCvar(TEXT("r.ProfileGPU.ShowUI"), TEXT("0"));
+    if (bLiveTune) LiveTuneBeforeBuild();
     SyncBoardFromApplied();
     FS08Trace::Write(FString::Printf(
         TEXT("BENCH scene fixture=%s board=%dx%d fighters=%d viewer=%s hero=%s art=%d profile=%s views=%s warmup=%.0f settle=%.0f measure=%.0f fps=%.0f profileGpu=%d csv=%d"),
@@ -6784,6 +6798,14 @@ void AS08FlowGameMode::RunRenderBench() {
         *Views, B.Warmup, B.Settle, B.Measure, Fps, B.bProfileGpu ? 1 : 0, B.bCsv ? 1 : 0));
     B.Step = 1;
     B.NextAt = Elapsed + B.Warmup;
+    if (bLiveTune) {
+      LiveTuneAfterBuild(B.Warmup, B.Settle, B.Measure, Fps, Fixture, B.HeroId);
+      B.Step = 98;  // the live-tune session from here on (RunLiveTune)
+    }
+    return;
+  }
+  if (B.Step == 98) {
+    RunLiveTune();
     return;
   }
   const FString View = B.Views.IsValidIndex(B.View) ? B.Views[B.View] : FString();
@@ -6794,59 +6816,14 @@ void AS08FlowGameMode::RunRenderBench() {
       B.Step = 2;
       return;
     case 2: {  // view setup
-      const float Zoom = S08BenchViewZoom(View);
-      // ENV-U9: a "K1..." view never selects the hero (centred on the board); "K2..." focuses it.
-      const bool bCentredView = View.StartsWith(TEXT("K1"));
-      if (View.StartsWith(TEXT("Fitx")) && Zoom > 0.0f && CameraZoom.Fit > 0.0f) {
-        // ENV-MAPS P7: "Fitx<m>" = centred at the board fit x m (the concept camera C0 of the map dioramas:
-        // Fitx1.45 = 2714.6 uu on Marmoreal / Sarpedon), clamped to the wheel limits. Note: <m> multiplies the
-        // distance here, unlike the K-views' zoom ratio.
-        SelectFighter(FString());
-        const FS08ZoomStep ZoomStep = CameraZoom.BenchDistance(CameraZoom.Fit * Zoom);
-        FS08Trace::Write(FString::Printf(TEXT("BENCH view=%s centred fit-mul=%.3f target=%.1f fit=%.1f clamp=%d"), *View,
-                                         Zoom, ZoomStep.To, CameraZoom.Fit, ZoomStep.bClamped ? 1 : 0));
-      } else if (Zoom > 1.0f && !bCentredView && !B.HeroId.IsEmpty()) {
-        SelectFighter(B.HeroId);
-        const FS08ZoomStep ZoomStep = CameraZoom.FocusZoom(Zoom);
-        FS08Trace::Write(FString::Printf(TEXT("BENCH view=%s focus hero=%s zoom=%.2f target=%.1f clamp=%d"), *View,
-                                         *B.HeroId, Zoom, ZoomStep.To, ZoomStep.bClamped ? 1 : 0));
-      } else if (Zoom > 1.0f && bCentredView) {
-        // "K1x1.25": nothing selected, so the follow rig (>= 1.2x) has no target and the focus stays at the centre.
-        SelectFighter(FString());
-        const FS08ZoomStep ZoomStep = CameraZoom.FocusZoom(Zoom);
-        FS08Trace::Write(FString::Printf(TEXT("BENCH view=%s centred zoom=%.2f target=%.1f fit=%.1f clamp=%d"), *View,
-                                         Zoom, ZoomStep.To, CameraZoom.Fit, ZoomStep.bClamped ? 1 : 0));
-      } else if (Zoom > 0.0f && Zoom < 1.0f) {
-        // ENV-MAPS "K1x0.65": zoom-out from the overview by wheel notches (the
-        // player's own path), stopping at the requested zoom or the far limit
-        // (fit / OverviewOutRatio: 0.65x of the overview on grids, 0.8125x =
-        // 2880.2 uu = one notch on the ENV-U9 map boards).
-        SelectFighter(FString());
-        FS08ZoomStep ZoomStep = CameraZoom.ReturnToOverview();
-        const float Wanted = CameraZoom.Overview / Zoom;
-        for (int32 Notch = 0; Notch < 16 && CameraZoom.Target < Wanted - 0.5f && ZoomStep.Limit != ES08ZoomLimit::Far;
-             ++Notch) {
-          ZoomStep = CameraZoom.Wheel(-1);
-        }
-        FS08Trace::Write(FString::Printf(TEXT("BENCH view=%s zoom-out wanted=%.2f target=%.1f zoom=%.2f limit=%s"),
-                                         *View, Zoom, CameraZoom.Target, CameraZoom.ZoomOf(CameraZoom.Target),
-                                         S08ZoomLimitName(ZoomStep.Limit)));
-      } else {
-        SelectFighter(FString());
-        CameraZoom.ReturnToOverview();
-        FS08Trace::Write(FString::Printf(TEXT("BENCH view=%s overview target=%.1f fit=%.1f"), *View, CameraZoom.Target,
-                                         CameraZoom.Fit));
-      }
+      BenchSetupView(View, B.HeroId);
       B.StepStart = Elapsed;
       B.bSettleLogged = false;
       B.Step = 3;
       return;
     }
     case 3: {  // camera settle, then a Lumen / TSR history settle
-      const float DistErrPct = CameraZoom.Target > 0.0f
-          ? 100.0f * FMath::Abs(CameraZoom.Current - CameraZoom.Target) / CameraZoom.Target : 100.0f;
-      const float FocusErr = FVector::Dist(CameraZoom.CurrentFocus, CameraZoom.TargetFocus);
-      const bool bSettled = DistErrPct < 1.0f && FocusErr < 1.0f;
+      const bool bSettled = BenchCameraSettled();
       if (!bSettled && Elapsed - B.StepStart < 20.0f) return;
       if (!B.bSettleLogged) {
         B.bSettleLogged = true;
@@ -6891,8 +6868,7 @@ void AS08FlowGameMode::RunRenderBench() {
                                        CameraZoom.Current, CameraZoom.Target,
                                        FMath::IsNearlyEqual(CameraZoom.Current, CameraZoom.Target, 0.05f) ? 1 : 0,
                                        *CameraZoom.CurrentFocus.ToCompactString()));
-      B.ShotPath = FPaths::Combine(B.OutDir, FString::Printf(TEXT("bench-%s-1920x1080.png"),
-                                                             *View.Replace(TEXT("."), TEXT("p"))));
+      B.ShotPath = FPaths::Combine(B.OutDir, S08LiveTune::ShotFileName(View));
       TakeEvidenceShot(B.ShotPath);
       B.NextAt = Elapsed + 15.0f;
       B.Step = 6;
@@ -6911,4 +6887,57 @@ void AS08FlowGameMode::RunRenderBench() {
     default:
       return;
   }
+}
+
+void AS08FlowGameMode::BenchSetupView(const FString& View, const FString& HeroId) {
+  const float Zoom = S08BenchViewZoom(View);
+  // ENV-U9: a "K1..." view never selects the hero (centred on the board); "K2..." focuses it.
+  const bool bCentredView = View.StartsWith(TEXT("K1"));
+  if (View.StartsWith(TEXT("Fitx")) && Zoom > 0.0f && CameraZoom.Fit > 0.0f) {
+    // ENV-MAPS P7: "Fitx<m>" = centred at the board fit x m (the concept camera C0 of the map dioramas:
+    // Fitx1.45 = 2714.6 uu on Marmoreal / Sarpedon), clamped to the wheel limits. Note: <m> multiplies the
+    // distance here, unlike the K-views' zoom ratio.
+    SelectFighter(FString());
+    const FS08ZoomStep ZoomStep = CameraZoom.BenchDistance(CameraZoom.Fit * Zoom);
+    FS08Trace::Write(FString::Printf(TEXT("BENCH view=%s centred fit-mul=%.3f target=%.1f fit=%.1f clamp=%d"), *View,
+                                     Zoom, ZoomStep.To, CameraZoom.Fit, ZoomStep.bClamped ? 1 : 0));
+  } else if (Zoom > 1.0f && !bCentredView && !HeroId.IsEmpty()) {
+    SelectFighter(HeroId);
+    const FS08ZoomStep ZoomStep = CameraZoom.FocusZoom(Zoom);
+    FS08Trace::Write(FString::Printf(TEXT("BENCH view=%s focus hero=%s zoom=%.2f target=%.1f clamp=%d"), *View,
+                                     *HeroId, Zoom, ZoomStep.To, ZoomStep.bClamped ? 1 : 0));
+  } else if (Zoom > 1.0f && bCentredView) {
+    // "K1x1.25": nothing selected, so the follow rig (>= 1.2x) has no target and the focus stays at the centre.
+    SelectFighter(FString());
+    const FS08ZoomStep ZoomStep = CameraZoom.FocusZoom(Zoom);
+    FS08Trace::Write(FString::Printf(TEXT("BENCH view=%s centred zoom=%.2f target=%.1f fit=%.1f clamp=%d"), *View,
+                                     Zoom, ZoomStep.To, CameraZoom.Fit, ZoomStep.bClamped ? 1 : 0));
+  } else if (Zoom > 0.0f && Zoom < 1.0f) {
+    // ENV-MAPS "K1x0.65": zoom-out from the overview by wheel notches (the
+    // player's own path), stopping at the requested zoom or the far limit
+    // (fit / OverviewOutRatio: 0.65x of the overview on grids, 0.8125x =
+    // 2880.2 uu = one notch on the ENV-U9 map boards).
+    SelectFighter(FString());
+    FS08ZoomStep ZoomStep = CameraZoom.ReturnToOverview();
+    const float Wanted = CameraZoom.Overview / Zoom;
+    for (int32 Notch = 0; Notch < 16 && CameraZoom.Target < Wanted - 0.5f && ZoomStep.Limit != ES08ZoomLimit::Far;
+         ++Notch) {
+      ZoomStep = CameraZoom.Wheel(-1);
+    }
+    FS08Trace::Write(FString::Printf(TEXT("BENCH view=%s zoom-out wanted=%.2f target=%.1f zoom=%.2f limit=%s"),
+                                     *View, Zoom, CameraZoom.Target, CameraZoom.ZoomOf(CameraZoom.Target),
+                                     S08ZoomLimitName(ZoomStep.Limit)));
+  } else {
+    SelectFighter(FString());
+    CameraZoom.ReturnToOverview();
+    FS08Trace::Write(FString::Printf(TEXT("BENCH view=%s overview target=%.1f fit=%.1f"), *View, CameraZoom.Target,
+                                     CameraZoom.Fit));
+  }
+}
+
+bool AS08FlowGameMode::BenchCameraSettled() const {
+  const float DistErrPct = CameraZoom.Target > 0.0f
+      ? 100.0f * FMath::Abs(CameraZoom.Current - CameraZoom.Target) / CameraZoom.Target : 100.0f;
+  const float FocusErr = FVector::Dist(CameraZoom.CurrentFocus, CameraZoom.TargetFocus);
+  return DistErrPct < 1.0f && FocusErr < 1.0f;
 }

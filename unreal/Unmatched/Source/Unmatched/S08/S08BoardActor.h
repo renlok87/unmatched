@@ -159,6 +159,28 @@ public:
   /** Applies the active block to every fighter actor within the board budget (S08HeroLight::LayersForBoard); traced. */
   void UpdateHeroLights();
 
+  // ---- ENV-MAPS live tune (S08LiveTune.h, tools/art/render/LIVE-TUNE.md); unused without -ArtLiveTune ----
+  /** Loads and validates the board profiles at ProfilesPath (bOverride: not the default path -> profilesSource=override in
+   *  the RENDER fingerprint) and every env layout / overlay of EnvDir (empty = S08EnvLayout::ResolveDir) WITHOUT touching
+   *  the board: an invalid document returns false with the errors and the board keeps its state. A valid one is swapped
+   *  in (traced like BeginPlay), the art runtime goes back to its post-BeginPlay state (lights / fog / exposure, env
+   *  layout, concept paste, backdrop) and the next Rebuild is a full one - the caller rebuilds through the normal path
+   *  (the game mode's SyncBoardFromApplied: Rebuild + SyncFighters). OutWarnings: changed sections only BeginPlay reads
+   *  (zone styles, glyph meshes, zone keyline) - they need a relaunch. */
+  bool ReloadArtData(const FString& ProfilesPath, bool bOverride, const FString& EnvDir, TArray<FString>& OutErrors,
+                     TArray<FString>& OutWarnings);
+  /** Tears the art runtime down like ReloadArtData (same data) and makes the next Rebuild a full one. */
+  void RequestFullRebuild();
+  /** Full Rebuilds since spawn (a Rebuild with unchanged geometry keeps the tiles and is not counted). */
+  int32 GetBuildCount() const { return BuildCount; }
+  const FS08BoardArtData& GetArtData() const { return ArtData; }
+  /** Spawned art light actors of the light profile (key, points, SkyLight, fog, exposure volume). */
+  int32 GetArtLightActorCount() const { return ArtLights.Num(); }
+  /** Live tune: the fx mode of this board (unset = the command line: -Bench freezes unless -EnvFxLive); applies on the
+   *  next full Rebuild. */
+  void SetFxOptionsOverride(const TOptional<FS08EnvFxOptions>& Options) { FxOptionsOverride = Options; }
+  FS08EnvFxOptions GetFxOptions() const;
+
   /** Syncs fighter actors with the latest decoded fighters (spawn/move/
    *  re-label by stable fighter id; dead fighters hide instantly). */
   void SyncFighters(const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters,
@@ -316,6 +338,15 @@ private:
 
   FS08BoardArtData ArtData;
   bool bArtDataLoaded = false;
+  // ---- live tune (S08LiveTune.h) ----
+  int32 BuildCount = 0;
+  bool bForceRebuild = false;          // ReloadArtData / RequestFullRebuild: the next Rebuild ignores the same geometry
+  FString EnvDirOverride;              // a reload's "envDir" (empty = S08EnvLayout::ResolveDir)
+  TOptional<FS08EnvFxOptions> FxOptionsOverride;
+  FString BootSectionsSignature;       // zone styles / glyph meshes / keyline of the BeginPlay document (-ArtLiveTune only)
+  void ResetArtRuntimeForReload();
+  /** The two 'ARTPREVIEW board profiles' lines of BeginPlay (also written by a reload). */
+  void TraceProfilesLoaded(bool bLoaded, bool bOverride, const FString& Path, const TArray<FString>& Errors);
   FS08BoardArtProfile ActiveProfile;
   FString RoomBoardId;
   FString BuiltForBoardId;
