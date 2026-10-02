@@ -27,6 +27,23 @@ Tripo и любых генераторов 3D**. Генератор изобра
 5. **Ничего чужого не трогать.** Если ассет уже есть (например Medusa из Tripo H2), эксперимент живёт в своих
    каталогах и в своей UE-папке (`<Key>SC`), канонический скелет и H2-ассеты героя не меняются.
 
+## 0a. Роли и передача
+
+| Кто | Что делает | Промпт |
+|---|---|---|
+| **Codex** (есть `image_gen`) | этапы A–C (§2–4): `spec.json`, шаблоны сетки, виды, регистрация, маски, проверки; инструменты `check_spec.py`, `make_template.py`, `register_views.py`, `check_views.py` + тесты; `HANDOFF.json`; коммит и интеграция в `fix/admin-panel` | [CODEX-2D-PACKAGE-PROMPT.md](CODEX-2D-PACKAGE-PROMPT.md) |
+| **ZCode** (GLM, без генерации изображений) | этапы D–F (§5–7) и метрики §8: модель, UV, текстуры, риг, экспорт, клипы, UE, отчёт; инструменты `setup_refs.py`, `fit_check.py`, `project_bake.py` и др. | [ZCODE-BLENDER-PROMPT.md](ZCODE-BLENDER-PROMPT.md) |
+
+**Контракт передачи** — `art/imagegen/scratch-v1/<key>/HANDOFF.json` (схема `unmatched.scratch-handoff/1`):
+`asset_id`, `key`, `ue_key`, `git_commit` (коммит пакета в `fix/admin-panel`), `files` (относительный путь → sha256 для
+`spec.json`, `template.json`, шаблонов, `views/*`, `masks/*`, `details/*`, `prompts.md`, `spec-check.json`,
+`views-check.json`), `checks_passed: true` у обоих отчётов, `tools` (пути инструментов и их sha256), `notes` (что
+отличается от идеала: виды, прошедшие с трудом, особенности позы).
+
+Правило: ZCode **не генерирует и не правит** картинки и спецификацию. Пакет не проходит перепроверку (sha256 или
+`check_views.py` даёт FAIL) или по ходу моделирования выясняется, что виды противоречат друг другу, — ZCode
+останавливается и пишет `art/imagegen/scratch-v1/<key>/REWORK.md` (что не так, числа, какие виды) для Codex.
+
 ## 1. Каталоги и имена
 
 | Что | Где |
