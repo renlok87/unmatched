@@ -524,3 +524,249 @@ Visual control: Strict front, one character and correct hand, no extra limbs/hea
 ## Stop
 
 Front failed after four counted attempts; all four retained registration marks. Stop under CODEX-2D-PACKAGE-PROMPT §5. Side/back/albedo/details were not generated. No usable handoff. No pixel repairs and no post-generation spec changes. SYNTX was not used because image_gen was available.
+
+# Run 2 — user requested regeneration
+
+Date2026-10-02. New cycle authorized by user: «сгенерируй то что не смог». New front cycle capped at4 attempts, cumulative filenames try5–8. Original spec, original template metadata and original templates unchanged. Separate deterministic 2D underpaintings in guides-v2/ strengthen silhouette guidance; they are not final views or 3D geometry. Head reference crops are explicitly permitted by pipeline §4.1; raw originals remain unchanged.
+
+## back-albedo-try1
+
+Date2026-10-02; tool image_gen.imagegen; transparent_background:false.
+
+referenced_image_paths in exact order:
+
+- `C:/tmp/wt-scratch2d-merlin/art/imagegen/scratch-v1/merlin/raw/merlin-back-shaded-try1.png`
+
+Exact prompt:
+
+```text
+Convert ONLY the painted Merlin miniature in Image1 into a FLAT UNLIT ALBEDO projection. Remove ALL lighting, shadows, ambient occlusion, specular highlights, rim lights and illumination gradients. Keep every exterior contour and pixel position, costume pattern and hand/staff position identical to Image1. Keep the technical gray background, cyan grid and four registration marks unchanged. Do not add text, labels, props or perspective. Canvas exactly1024x1536. Flat solid local colors, no 3D shading, no fabric/wood shading or painted shadow lines. Crisp clean color-zone illustration suitable for direct base-color projection. Palette: robe/hood/sleeves #182A49; gold embroidered motif #B68B39; belt #624029; boots/beard leather tie #4A3023; hood lining #4A3153; very thin cuff/hem outer edge #79513D; buckle #AD7C48; wooden staff/claw setting #35271C; sapphire crystal #2556AD; beard/eyebrows #EEE7D3; face/hands #BE9874; stone base #30343C. Crystal is the same flat blue on every facet, no bright facets; beard one flat ivory, face one flat tan. Patterns remain the same solid gold shapes. Background #B4B4B4 and grid #00C8FF. No gradients anywhere within each material color zone. Strict BACK view: NO face/beard on back, right-hand staff at viewerRIGHT and left hand at belt viewerLEFT; preserve all back hood, sleeve and robe contours and gold embroidery.
+```
+
+Result: FAIL; `raw/back-albedo-try1-check.json`, `checks_passed: false`. Registration itself passed.
+
+Visual control: Back and staff viewer RIGHT maintained; subtle cloth/base gradients remain. Automated checks FAIL.
+
+## back-shaded-try1
+
+Date2026-10-02; tool image_gen.imagegen; transparent_background:false.
+
+referenced_image_paths in exact order:
+
+- `C:/tmp/wt-scratch2d-merlin/art/imagegen/scratch-v1/merlin/guides-v2/merlin-back-template.png`
+
+- `C:/tmp/wt-scratch2d-merlin/art/imagegen/scratch-v1/merlin/raw/merlin-front-shaded-try7.png`
+
+- `C:/tmp/wt-scratch2d-merlin/art/imagegen/scratch-v1/merlin/raw/merlin-side-shaded-try1.png`
+
+Exact prompt:
+
+```text
+Image1 EDIT TARGET is the exact BACK dimensional stencil. Image2 FRONT and Image3 LEFT SIDE define the SAME Merlin character/costume. Paint ONE strict BACK orthographic horizontal-camera elevation, no perspective, no three-quarter, no face visible. Right hand holds crooked wooden staff viewerRIGHT (character anatomical RIGHT), left hand at belt viewerLEFT. Preserve Image1 silhouette/body/base/staff/crystal exterior bounds; do not change height or width. Hood apex243, staff/crystal top126, base x200..824 y1270..1413 rectangle seen horizontally with no top ellipse, body knee width364 at997, crotch338 at789,waist364 at685,chest416 at555,shoulder442 at464,eye-level hood208 at334. Same dark navy blue coarse wool hood and long robe, gold hood-border embroidery, cuffs and hem with small ancient nonverbal rune-like motifs and stars, restrained small stitched stars on back no enormous new emblem, worn brown belt and shoes. White beard only hidden front, no beard on back. Same staff and wooden claw sapphire crystal as other views, no magic. Soft premium painted miniature shading ONLY on figure. Keep background pure #B4B4B4 and cyan measurement grid #00C8FF and four registration marks exactly unchanged, crisp opaque original pixels, no gray/cyan blending or background shadow. Figure occludes grid. No added objects/limbs/heads, no new text/watermark/crop. Exact1024x1536 canvas.
+```
+
+Result: FAIL; `raw/back-shaded-try1-check.json`, `checks_passed: false`. Registration itself passed.
+
+Visual control: Strict back, no face, right-hand staff at viewer RIGHT, one figure. Hood folds and hand position vary from front; staff collar gold. Mask FAIL.
+
+## face-front-shaded-try1
+
+Date2026-10-02; tool image_gen.imagegen; transparent_background:false.
+
+referenced_image_paths in exact order:
+
+- `C:/tmp/wt-scratch2d-merlin/art/imagegen/scratch-v1/merlin/detail-inputs/merlin-face-front-crop.png`
+
+Exact prompt:
+
+```text
+Image1 is the cropped FRONT head of this exact Merlin miniature. Generate a 1024x1024 close-up reference, strict FRONT ORTHOGRAPHIC, not perspective, not three-quarter. Same wise elderly wrinkled face, nose/eyebrows/eye shapes, white long beard and dark navy wool hood with same antique gold rim embroidery and star. Brown LEATHER beard tie (not a metal ring). No shoulders or hands or staff. Hood/head/beard together occupy central80% of canvas height, from y102 to922, all contours visible and uncropped. Refine sculpted detail and painted miniature surface, soft studio light. Light gray #B4B4B4 background and crisp cyan #00C8FF measurement grid occluded by the head. Four black circles diameter24px/white crosses at (40,40),(983,40),(40,983),(983,983). No new text/watermark, no extra faces/heads/accessories. This is detail reference, keep character identity consistent.
+```
+
+Result: unapproved detail; see `detail-check.json`, `checks_passed: false`.
+
+Visual control: One face, strict front, brown leather beard tie, character recognizable. Actual1254x1254, requested1024x1024; head almost fills canvas rather than80%; unapproved detail.
+
+## face-side-shaded-try1
+
+Date2026-10-02; tool image_gen.imagegen; transparent_background:false.
+
+referenced_image_paths in exact order:
+
+- `C:/tmp/wt-scratch2d-merlin/art/imagegen/scratch-v1/merlin/detail-inputs/merlin-face-side-crop.png`
+
+- `C:/tmp/wt-scratch2d-merlin/art/imagegen/scratch-v1/merlin/raw/merlin-face-front-shaded-try1.png`
+
+Exact prompt:
+
+```text
+Image1 is LEFT SIDE head crop of the same Merlin; Image2 is its detailed FRONT identity reference. Generate1024x1024 strict LEFT SIDE PROFILE of ONLY hood/head/long beard, facing LEFT, no perspective, no three-quarter, no shoulders/hands/staff. Preserve the wise elderly wrinkled face, white eyebrows, blue eyes, nose/profile and beard family. Brown leather beard tie. Same navy blue wool hood, exact star and gold ornamental rim embroidery, no added accessories. Hood/head/beard occupy central80% canvas height from y102..922 with uncropped contours and generous margin. Premium painted miniature detail with studio shading on head only. Gray #B4B4B4 background, cyan #00C8FF grid occluded by head. Four black registration circles diameter24px/white crosses (40,40),(983,40),(40,983),(983,983). No text/watermark/crop, no extra heads.
+```
+
+Result: unapproved detail; see `detail-check.json`, `checks_passed: false`.
+
+Visual control: One face, strict left profile facing LEFT, same facial family and brown beard tie. Actual1254x1254; oversized framing; unapproved detail.
+
+## front-albedo-try1
+
+Date2026-10-02; tool image_gen.imagegen; transparent_background:false.
+
+referenced_image_paths in exact order:
+
+- `C:/tmp/wt-scratch2d-merlin/art/imagegen/scratch-v1/merlin/raw/merlin-front-shaded-try7.png`
+
+Exact prompt:
+
+```text
+Convert ONLY the painted Merlin miniature in Image1 into a FLAT UNLIT ALBEDO projection. Remove ALL lighting, shadows, ambient occlusion, specular highlights, rim lights and illumination gradients. Keep every exterior contour and pixel position, costume pattern and hand/staff position identical to Image1. Keep the technical gray background, cyan grid and four registration marks unchanged. Do not add text, labels, props or perspective. Canvas exactly1024x1536. Flat solid local colors, no 3D shading, no fabric/wood shading or painted shadow lines. Crisp clean color-zone illustration suitable for direct base-color projection. Palette: robe/hood/sleeves #182A49; gold embroidered motif #B68B39; belt #624029; boots/beard leather tie #4A3023; hood lining #4A3153; very thin cuff/hem outer edge #79513D; buckle #AD7C48; wooden staff/claw setting #35271C; sapphire crystal #2556AD; beard/eyebrows #EEE7D3; face/hands #BE9874; stone base #30343C. Crystal is the same flat blue on every facet, no bright facets; beard one flat ivory, face one flat tan. Patterns remain the same solid gold shapes. Background #B4B4B4 and grid #00C8FF. No gradients anywhere within each material color zone. Strict FRONT view, staff viewerLEFT in RIGHT hand, left hand at belt viewerRIGHT.
+```
+
+Result: FAIL; `raw/front-albedo-try1-check.json`, `checks_passed: false`. Registration itself passed.
+
+Visual control: Front contour approximately follows try7; solid-color approximation, but base/cloth gradients and some face shadow tones remain. Automated flatness and silhouette checks FAIL.
+
+## front-shaded-try5
+
+Date2026-10-02; tool image_gen.imagegen; transparent_background:false.
+
+referenced_image_paths in exact order:
+
+- `C:/tmp/wt-scratch2d-merlin/art/imagegen/scratch-v1/merlin/guides-v2/merlin-front-template.png`
+
+- `C:/tmp/wt-scratch2d-merlin/art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png`
+
+- `C:/tmp/wt-scratch2d-merlin/art/imagegen/hero-quality-v1/merlin/merlin-front.png`
+
+Exact prompt:
+
+```text
+Use case: style-transfer. Image 1 EDIT TARGET is a dimensionally exact 2D underpainting on the Merlin measurement grid. Image 2 is ONLY painted-miniature craftsmanship. Image 3 is ONLY Merlin facial appearance, robe colors and gold embroidery. REFINE SURFACE DETAIL INSIDE THE ALREADY FILLED SHAPES OF IMAGE 1. Keep exactly the external contour and pixel position of the navy character, dark rectangular base, crooked brown staff and blue crystal in Image 1. Do not expand or shrink any shape. The simple beard/face patches are placeholders to refine internally. This is strict FRONT orthographic elevation, horizontal camera, no perspective, no 3/4. Base is a circular cylinder seen horizontally: preserve the rectangular elevation, no visible top ellipse. Preserve every gray background #B4B4B4 and cyan #00C8FF grid pixel and all four black-white registration circles exactly unchanged. No anti-alias color changes on grid, no vignette, no background shadows or gradient. Figure fully hides grid. Canvas exactly1024x1536. Hood top row243, staff crystal top126, base bottom1413, base top1270, base width624px x200..824. Body must keep the underpainting contour: total width364 at knees row997,338 at crotch789,364 at waist685,416 at chest555,442 at shoulders464,208 at eyes334. Render this slender elderly slightly hunched Merlin as premium painted-miniature illustration: deep midnight-blue coarse wool hood and ground-length robe, wide sleeves within existing silhouette, two vertical stoles, ancient gold embroidered rune-like nonverbal patterns and stars along hood rim, cuff and hem; long white beard tied brown leather, wise wrinkled face, brown worn leather belt bronze buckle/dangling end, boots visible internally above base top. RIGHT hand holds staff at x325,y633 on viewer LEFT; LEFT hand at belt viewer RIGHT. Pose and all exterior shapes from Image1 only, not Image3. Carved crooked dark wooden staff and wooden claw crystal setting contained in the existing guide, faceted sapphire-blue crystal, no magic. Soft studio shading and sculptural surface detail only within painted figure. Team accent only belt/hood lining/thin cuff and hem outer edge, gold pattern separate. One head, two arms, no extra props, no text/watermark/crop. Keep measurement sheet literally intact.
+```
+
+Result: FAIL; `raw/front-shaded-try5-check.json`, `checks_passed: false`. Registration itself passed.
+
+Visual control: Strict front, one head/two arms, staff anatomical right viewer left. Brown leather belt, but beard tie changed to gold; contour closer to stencil. Mask FAIL due grid contamination.
+
+## front-shaded-try6
+
+Date2026-10-02; tool image_gen.imagegen; transparent_background:false.
+
+referenced_image_paths in exact order:
+
+- `C:/tmp/wt-scratch2d-merlin/art/imagegen/scratch-v1/merlin/guides-v2/merlin-front-template.png`
+
+- `C:/tmp/wt-scratch2d-merlin/art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png`
+
+Exact prompt:
+
+```text
+EDIT IMAGE 1 IN PLACE. Paint detailed Merlin ONLY INSIDE its colored underpainting, preserving its exact silhouette. Do not redraw, re-render, resize, recolor or soften ANY background/grid/registration-mark pixels. This is an engineering stencil: original gray #B4B4B4, original cyan #00C8FF, exact original canvas1024x1536. Image2 only shows miniature paint craftsmanship, not anatomy. Strict front orthographic no perspective. Exact existing hood apex row243, crystal126, base rectangle x200..824/y1270..1413. Keep all body widths and staff path from Image1 unchanged. Refine elderly wrinkled face, tied white beard, navy blue wool hood/robe, two gold embroidered stoles, wide sleeves within stencil, worn brown belt bronze buckle, boots at base top. Right hand on staff viewerLEFT at x325/y633, left hand at belt viewerRIGHT. Crooked dark wood staff with blue sapphire crystal. No magic, no extra objects, no text. Keep dark stone base dimensions and exact flat horizontal camera elevation. Studio shading only INSIDE figure; exterior grid/background pixel-for-pixel unchanged. Do NOT expand sleeves or hood. Preserve source colored shapes as hard masks.
+```
+
+Result: FAIL; `raw/front-shaded-try6-check.json`, `checks_passed: false`. Registration itself passed.
+
+Visual control: Strict front, correct staff hand. Hard triangular hood envelope followed; beard tie is gold contrary to spec. Mask FAIL.
+
+## front-shaded-try7
+
+Date2026-10-02; tool image_gen.imagegen; transparent_background:false.
+
+referenced_image_paths in exact order:
+
+- `C:/tmp/wt-scratch2d-merlin/art/imagegen/scratch-v1/merlin/guides-v2/merlin-front-template.png`
+
+- `C:/tmp/wt-scratch2d-merlin/art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png`
+
+Exact prompt:
+
+```text
+Image1 is a fixed engineering drawing to be painted internally. Image2 craftsmanship reference only. Keep ALL of Image1 background, grid, four registration marks and outside edges of colored silhouette EXACTLY. Render ONE elderly Merlin in strict front orthographic elevation inside the colored stencil, without altering dimensions. Navy wool hood/robe, white tied beard, wise wrinkled face, brown leather belt/boots, bronze buckle, two gold embroidered stoles, gold stars and nonverbal rune-like embroidery; right hand on crooked wooden sapphire-topped staff viewerLEFT, left hand at belt. Soft painted shadows only INSIDE figure. Base is a dark stone rectangle in horizontal cylinder elevation x200..824 y1270..1413. Body hood top243, staff top126; preserve all stencil widths. CRITICAL PRINT PRODUCTION: background flat RGB180,180,180 and every grid pixel pure RGB0,200,255. Grid is bright saturated opaque cyan, NOT grayish cyan, NOT partially transparent or blurred, NOT a textured surface. Absolutely no antialiasing or shadows on the technical grid. Crisp clean digital engineering raster. Keep the source grid in its original hard pixels. No perspective, no extra objects, no watermark, no crop, no new text. Paint the character, never regenerate the technical sheet.
+```
+
+Result: FAIL; `raw/front-shaded-try7-check.json`, `checks_passed: false`. Registration itself passed.
+
+Visual control: Strict front, correct staff hand. Gold beard/staff collars differ from leather/wood specification. Mask FAIL. This draft supplied appearance and contours to side/back and albedo, not an accepted view.
+
+## front-shaded-try8
+
+Date2026-10-02; tool image_gen.imagegen; transparent_background:false.
+
+referenced_image_paths in exact order:
+
+- `C:/tmp/wt-scratch2d-merlin/art/imagegen/scratch-v1/merlin/guides-v2/merlin-front-template.png`
+
+- `C:/tmp/wt-scratch2d-merlin/art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png`
+
+- `C:/tmp/wt-scratch2d-merlin/art/imagegen/scratch-v1/merlin/raw/merlin-face-front-shaded-try1.png`
+
+Exact prompt:
+
+```text
+EDIT Image1 in place, HARD contour preservation. Image2 is painted-miniature quality only; Image3 gives same Merlin face and BROWN LEATHER beard tie. Refine navy silhouette into elderly Merlin, only paint INSIDE original colored shapes. Preserve every grid/background/registration pixel and exact external silhouette. Original canvas1024x1536, pure gray RGB180,180,180, grid RGB0,200,255 with no transparency/blur/filter/shading/antialiasing; original four black-white corner circles. Strict FRONT orthographic horizontal camera, no perspective. Hood apex243, crystal top126, base rectangle x200..824 y1270..1413, no visible top. Body widths from original stencil unchanged, no expanded sleeves: knee364,crotch338,waist364,chest416,shoulder442,eye208. Darkblue wool hood/robe with two ancient gold-embroidered stoles, gold star/rune-like rim/cuffs/hem, wise face, long white beard with BROWN LEATHER WRAP (no gold band), worn brown belt bronze buckle and dangling end, brown boots. RIGHT hand on carved darkwood crooked staff viewerLEFT at x325/y633, LEFT hand at belt viewerRIGHT. Staff claw frame is WOOD ONLY, no gold collars, sapphire blue crystal and no magic. Studio shading ONLY within figure. No extra props/limbs/heads/new text/watermark/crop. Do not regenerate technical grid: keep source hard pixels literally unchanged.
+```
+
+Result: FAIL; `raw/front-shaded-try8-check.json`, `checks_passed: false`. Registration itself passed.
+
+Visual control: Strict front, correct staff hand; brown beard wrap and wooden staff setting corrected. Hood/body dimensions visibly closer to stencil, but mandatory mask checks FAIL. Embroidery differs from try7, so frontalbedo from try7 is not an exact surface match.
+
+## side-albedo-try1
+
+Date2026-10-02; tool image_gen.imagegen; transparent_background:false.
+
+referenced_image_paths in exact order:
+
+- `C:/tmp/wt-scratch2d-merlin/art/imagegen/scratch-v1/merlin/raw/merlin-side-shaded-try1.png`
+
+Exact prompt:
+
+```text
+Convert ONLY the painted Merlin miniature in Image1 into a FLAT UNLIT ALBEDO projection. Remove ALL lighting, shadows, ambient occlusion, specular highlights, rim lights and illumination gradients. Keep every exterior contour and pixel position, costume pattern and hand/staff position identical to Image1. Keep the technical gray background, cyan grid and four registration marks unchanged. Do not add text, labels, props or perspective. Canvas exactly1024x1536. Flat solid local colors, no 3D shading, no fabric/wood shading or painted shadow lines. Crisp clean color-zone illustration suitable for direct base-color projection. Palette: robe/hood/sleeves #182A49; gold embroidered motif #B68B39; belt #624029; boots/beard leather tie #4A3023; hood lining #4A3153; very thin cuff/hem outer edge #79513D; buckle #AD7C48; wooden staff/claw setting #35271C; sapphire crystal #2556AD; beard/eyebrows #EEE7D3; face/hands #BE9874; stone base #30343C. Crystal is the same flat blue on every facet, no bright facets; beard one flat ivory, face one flat tan. Patterns remain the same solid gold shapes. Background #B4B4B4 and grid #00C8FF. No gradients anywhere within each material color zone. Strict LEFT SIDE PROFILE facing LEFT; preserve the same anatomical RIGHT hand staff on the far side and LEFT hand at belt.
+```
+
+Result: FAIL; `raw/side-albedo-try1-check.json`, `checks_passed: false`. Registration itself passed.
+
+Visual control: LEFT profile maintained; beard/hand contours changed slightly and subtle cloth/base gradients remain. Automated checks FAIL.
+
+## side-shaded-try1
+
+Date2026-10-02; tool image_gen.imagegen; transparent_background:false.
+
+referenced_image_paths in exact order:
+
+- `C:/tmp/wt-scratch2d-merlin/art/imagegen/scratch-v1/merlin/guides-v2/merlin-side-template.png`
+
+- `C:/tmp/wt-scratch2d-merlin/art/imagegen/scratch-v1/merlin/raw/merlin-front-shaded-try7.png`
+
+Exact prompt:
+
+```text
+Image1 EDIT TARGET is the LEFT SIDE dimension stencil for Merlin. Image2 defines the same character, costume and paint quality from FRONT; it is not side-view geometry. Paint one elderly Merlin STRICT LEFT SIDE PROFILE facing LEFT, orthographic horizontal camera, no perspective, no three-quarter. Character's anatomical LEFT side visible, RIGHT hand staff on far side; do NOT swap staff to left hand. Keep source stencil exterior body/base/staff/crystal positions and all technical gray/cyan grid and four corner marks unchanged. Canvas1024x1536, scale26px/cm, center512, baseline1413. Base frontal cylinder elevation width624px x200..824 y1270..1413, horizontal camera no top ellipse. Hood top y243, staff top126. Side body widths: knee y997=234px, crotch789=247px, waist685=260px, chest555=286px, shoulder464=260px, eye334=208px. Full figure darkblue wool robe/pointed deep hood, old wise wrinkled face nose pointing LEFT, long white beard brown leather tie projecting at front LEFT, gold embroidered rim/cuffs/hem and front stoles consistent with Image2, brown belt bronze buckle and boots, left hand at belt, right hand one-handed staff grip z30cm. Crooked carved dark wooden staff with wooden claw sapphire crystal; no magic. Soft painted-miniature studio shading ONLY INSIDE figure; background pure #B4B4B4 and grid pure #00C8FF crisp opaque no antialias colors, no shadows/vignette. Figure occludes grid. No extra limbs/heads/props, no new text/watermark/crop.
+```
+
+Result: FAIL; `raw/side-shaded-try1-check.json`, `checks_passed: false`. Registration itself passed.
+
+Visual control: Strict left profile facing LEFT; one figure, staff retained in anatomical right hand on far side, foreground left hand at belt. Beard tie/staff collar gold instead of brown/wood. Mask FAIL.
+
+## weapon-front-shaded-try1
+
+Date2026-10-02; tool image_gen.imagegen; transparent_background:false.
+
+referenced_image_paths in exact order:
+
+- `C:/tmp/wt-scratch2d-merlin/art/imagegen/scratch-v1/merlin/detail-inputs/merlin-weapon-front-template.png`
+
+- `C:/tmp/wt-scratch2d-merlin/art/imagegen/scratch-v1/merlin/raw/merlin-front-shaded-try7.png`
+
+Exact prompt:
+
+```text
+Image1 EDIT TARGET is exact isolated Merlin STAFF front-orthographic dimensional guide, not a character. Image2 is surface/design reference for same staff and blue sapphire crystal. Refine ONLY within Image1 staff/crystal colored contours, preserve crooked centreline, shaft thickness and tip/bottom exactly. Single isolated wooden staff, strict FRONT orthographic no perspective, no person/hand/base/other prop. Crooked very dark brown carved wood with restrained ancient decorative incision, wooden claw setting, faceted sapphire-blue crystal. NO metallic gold rings, no magical effect. Full staff and tip uncropped. Canvas1024x1536, scale29px/cm, bottom1413, crystal tip137, total vertical44cm. Main shaft radius0.6cm; crystal width3cm/87px, height3.5cm/101.5px; crystal center x454,y187.75. Preserve Image1 cyan measurement grid #00C8FF, gray #B4B4B4 and four registration marks exactly unchanged and figure occludes grid, no antialias color shifts/background shadow. Premium painted-miniature surface detail with soft studio shading ONLY inside staff/crystal. No text/watermark/crop/additional objects.
+```
+
+Result: unapproved detail; see `detail-check.json`, `checks_passed: false`.
+
+Visual control: Single staff, front orthographic, wooden claw setting with sapphire crystal, no magic or metal collars. Actual1024x1536, correct direction and broadly preserved centreline. Detail not approved while package blocked.
+
+## Run2 stop
+
+Four new front attempts all FAIL. All requested image categories now have outputs, but none constitutes an accepted full package. Stop required by §5. No fifth run2 front attempt, no threshold reduction, no pixel repair, no spec adaptation, no HANDOFF. Front↔back and shaded↔albedo values in current views-check.json are mask-derived and contaminated by grid artifacts.

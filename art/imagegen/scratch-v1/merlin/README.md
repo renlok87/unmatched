@@ -1,44 +1,46 @@
-# Merlin scratch 2D: BLOCKED — four front attempts rejected
+# Merlin scratch 2D — images generated, package BLOCKED
 
-ASSET-MERLIN-001, MerlinSC. Stop required by CODEX-2D-PACKAGE-PROMPT.md §5: no passing front-shaded after four attempts. All four attempts have detectable registration marks and count toward the limit. This is failure evidence, not an approved 2D package.
+ASSET-MERLIN-001 / MerlinSC. Run2 resumed on2026-10-02 at user request. **All requested image categories now exist**, but they do not satisfy the fixed numeric/visual contract. Four new front-shaded attempts failed; stop under CODEX-2D-PACKAGE-PROMPT §5. No HANDOFF.json and ZCode must not use these as accepted modelling projections.
 
-## Completed
+## Images
 
-- Immutable pre-generation `spec.json`: hood 45 cm, staff top 49.5 cm, base Ø24 × 5.5 cm, 5.25 heads, weapon.R, all 17 joints/parents, leaf tails, body widths and material palette.
-- `spec-check.json`: `checks_passed: true`; head proportion ratio 1.0; all library/background-distance/joint checks passed. Equal base_top/sole follows the pipeline's own example; all later mandatory levels strictly increase.
-- Generator resolution probe produced 1024×1536. `template.json`: 26 px/cm, baseline 1413, centre 512, front/left-side/back matrices. `templates/` contains the three grids.
-- Registration synthetic regression tests: `registration-test-check.json`, `checks_passed: true`, maximum recovery error 0.400967 px (limit 0.5 px); missing marks and unmodelled rotation rejected.
-- Four originals in `raw/`, unchanged bytes; exact requests and prompts in `prompts.md`, four attempt check reports, registered last front and masks; separate diagnostic overlays per attempt.
+- Full-body registered shaded views: `views/merlin-front-shaded.png` (try8), `merlin-side-shaded.png`, `merlin-back-shaded.png`.
+- Flat-color generation attempts: `views/merlin-front-albedo.png`, `merlin-side-albedo.png`, `merlin-back-albedo.png`. They still contain gradients and changed contours; these are rejected albedo attempts.
+- Close-up generated details: `details/merlin-face-front-shaded.png`, `merlin-face-side-shaded.png`, `merlin-weapon-front-shaded.png`. Face outputs1254×1254 despite requested1024×1024, and oversized framing; see `detail-check.json`.
+- Every original in `raw/` without pixel edits, every exact prompt and visual check in `prompts.md`; masks and per-attempt diagnostic overlays retained. Historical run1 reports in `raw/round1-*`.
+- Separate `guides-v2/` underpaintings and `detail-inputs/` crops/staff grid: generation inputs only, never final accepted projections. No3D geometry.
 
-## Numeric failure evidence
+## Fixed inputs and results
 
-Registration succeeds, but image generation does not preserve dimensions and grid color sufficiently for the required segmentation. These are values from the mandated ΔE76 >12 mask algorithm, **not reliable measurements of the visible painted geometry**, because cyan/gray mixtures join grid fragments to the silhouette. No threshold was relaxed and no original pixel was repaired.
+`spec.json` and original templates/metadata are byte-identical to run1: hood45cm, staff49.5cm, baseØ24×5.5cm, weapon.R,26px/cm, baseline1413. `spec-check.json` has `checks_passed: true`. `registration-test-check.json` has `checks_passed: true`; synthetic maximum error0.400967px≤0.5px. Tools keep unchanged thresholds and ΔE76 mask extraction.
 
-| Front attempt | Maximum registration residual px | Scale | Mask bottom row | Mask-derived body height cm | Mask-derived base diameter cm | Median width deviation | Result |
-|---|---:|---:|---:|---:|---:|---:|---|
-| 1 | 0.1007 | 0.99996575 | 1535 | 53.9615 | 26.9615 | 50.55% | FAIL |
-| 2 | 0.0576 | 0.99998644 | 1535 | 49.9231 | 25.9615 | 22.25% | FAIL |
-| 3 | 0.0878 | 1.00000660 | 1438 | 49.9615 | 29.9615 | 25.46% | FAIL |
-| 4 | 0.0508 | 0.99997267 | 1535 | 47.6154 | 29.0385 | 15.44% | FAIL |
+Current `views-check.json`: **checks_passed:false**. Every generated full-body view retains all registration marks and registers successfully; maximum residual across retained attempts=0.322318px (limit1.5px). But gray/cyan mixtures in the generated grid become foreground under the mandated ΔE76>12-to-both test, connect to the figure and contaminate the masks. Mask-derived numbers below are not reliable visual geometry measurements; they cannot count as acceptance.
 
-Expected: each registration residual ≤1.5 px; scale correction ≤3%; bottom 1413 ±2 px; height 45 ±1%; base diameter 24 ±2%; each landmark width ±8%, median ≤4%. Final `views-check.json`: `checks_passed: false`. Last grid contamination fraction 0.002506982708405802 exceeds 0.002. Final mask touches the frame edge and contains foreign grid fragments. Overlay: `diagnostics/front-shaded-try4-mask-overlay.png`.
+| Check | Measured | Required |
+|---|---:|---:|
+| Final front mask baseline | 1535px |1413±2px|
+| Front median width deviation |21.565934%|≤4%|
+| Front↔back profile median / height |2.393162%|≤2%|
+| Front↔back profile p95 / height |11.111111%|≤5%|
+| Front shaded↔albedo IoU |0.585519|≥0.98|
+| Side shaded↔albedo IoU |0.415004|≥0.98|
+| Back shaded↔albedo IoU |0.421507|≥0.98|
+| Maximum albedo zone L* range /100 |0.596991|≤0.12|
 
-Front↔back profile and shaded↔albedo IoU: **not measured**; no side/back/albedo was generated after the front blocker. Attempt counts: front-shaded 4; all other requested views/details 0; calibration 1 (not a character attempt). SYNTX token spend 0 because built-in image_gen was available.
+Attempt counts: front-shaded8 total (run1=4, run2=4); side-shaded1; back-shaded1; each albedo1; face-front1; face-side1; weapon-front1. New generation calls12; calibration remains the earlier1. SYNTX spend0 because image_gen is available.
 
-## Required resolution before resuming
+## Visual findings and next decision
 
-The generator must preserve the original grid/background colors and obey the fixed dimensional guides. Resume requires an explicit new attempt budget or an authorized different generation/masking protocol; §5 prohibits a fifth front attempt in this run. Changing thresholds, painting over the grid, or fitting spec numbers to these outputs is not an allowed resolution. Keep the spec immutable; compare a future generation against these same numeric values.
+Front8 corrects the brown leather beard tie and wooden staff setting. Side/back and front-albedo came from front7 and retain different surface motifs or gold collars/ties; costume identity across them is not exact. Side facesLEFT, front staff viewerLEFT and back staff viewerRIGHT; no extra heads or limbs observed. Face detail is recognizable, but framing does not match its request.
 
-No `HANDOFF.json`: its required `checks_passed: true` statements would be false. ZCode must not model from the rejected views. No 3D geometry, Blender/Unreal changes or remote push. The blocked report, source evidence and tested partial tools can be integrated locally without declaring the package ready.
+A fresh copy of the same prompt cannot be assumed to preserve technical-grid pixels: raw PNGs already fail before registration. To obtain a usable modelling package, a future run needs a generation method that preserves the grid/contours, or explicit authorization for a different grid/mask/compositing protocol. This run does not change those rules or fit the spec to images. Existing images may be reviewed as visual drafts only.
 
 ## Reproduce
 
 ```powershell
 python tools/scratch-model/check_spec.py art/imagegen/scratch-v1/merlin/spec.json
-python tools/scratch-model/make_template.py art/imagegen/scratch-v1/merlin/spec.json
 python tools/scratch-model/tests/test_registration.py --report art/imagegen/scratch-v1/merlin/registration-test-check.json
-python tools/scratch-model/register_views.py art/imagegen/scratch-v1/merlin --view front --variant shaded --attempt 4
 python tools/scratch-model/check_views.py art/imagegen/scratch-v1/merlin
 ```
 
-Last command intentionally exits 1. Tools depend on Python, Pillow, numpy and scipy. Tooling was exercised on this pilot and synthetic registration; full side/back/albedo pipeline remains unverified because generation stopped.
+Last command intentionally exits1. Source hashes in `blocked-files.json`. No3D/UE changes, remote push, stash/reset/clean or original-image repairs.

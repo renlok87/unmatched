@@ -1,20 +1,630 @@
 {
   "checks": {
-    "back.albedo.registered": {
-      "expected": "selected registered raw attempt",
-      "measured": null,
+    "back.albedo.base_diameter": {
+      "expected": {
+        "diameter_cm": 24.0,
+        "tolerance_rel": 0.02
+      },
+      "measured": 35.34615384615385,
       "note": "",
       "passed": false
     },
+    "back.albedo.baseline": {
+      "expected": {
+        "baseline_px": 1413,
+        "tolerance_px": 2
+      },
+      "measured": 1535,
+      "note": "",
+      "passed": false
+    },
+    "back.albedo.figure_height": {
+      "expected": {
+        "height_cm": 45.0,
+        "tolerance_rel": 0.01
+      },
+      "measured": 54.34615384615385,
+      "note": "",
+      "passed": false
+    },
+    "back.albedo.flat.base": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.5969908982626797,
+      "note": "",
+      "passed": false
+    },
+    "back.albedo.flat.beard_eyebrows": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.3997909994346983,
+      "note": "",
+      "passed": false
+    },
+    "back.albedo.flat.belt": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.14200441941858996,
+      "note": "",
+      "passed": false
+    },
+    "back.albedo.flat.boots_beard_wrap": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.24569467815616725,
+      "note": "",
+      "passed": false
+    },
+    "back.albedo.flat.buckle": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.2659247626945911,
+      "note": "",
+      "passed": false
+    },
+    "back.albedo.flat.crystal": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.4247148212697923,
+      "note": "",
+      "passed": false
+    },
+    "back.albedo.flat.cuff_hem_edge": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.23271300812447338,
+      "note": "",
+      "passed": false
+    },
+    "back.albedo.flat.face_hands": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.2984918454499662,
+      "note": "",
+      "passed": false
+    },
+    "back.albedo.flat.gold_embroidery": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.32447397028744407,
+      "note": "",
+      "passed": false
+    },
+    "back.albedo.flat.hood_lining": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.503768119888302,
+      "note": "",
+      "passed": false
+    },
+    "back.albedo.flat.robe_hood_sleeves": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.404687503924281,
+      "note": "",
+      "passed": false
+    },
+    "back.albedo.flat.staff_frame": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.3206638335681371,
+      "note": "",
+      "passed": false
+    },
+    "back.albedo.frame_margin": {
+      "expected": "no edge contact",
+      "measured": true,
+      "note": "",
+      "passed": false
+    },
+    "back.albedo.grid_inside": {
+      "expected": "<=0.002",
+      "measured": 0.0073133147681510085,
+      "note": "",
+      "passed": false
+    },
+    "back.albedo.registered": {
+      "expected": "selected registered raw attempt",
+      "measured": "merlin-back-albedo-try1.png",
+      "note": "",
+      "passed": true
+    },
+    "back.albedo.registration": {
+      "expected": "scale <=3%; each residual <=1.5 px",
+      "measured": {
+        "canvas": {
+          "expected": [
+            1024,
+            1536
+          ],
+          "measured": [
+            1024,
+            1536
+          ],
+          "note": "",
+          "passed": true
+        },
+        "residual_px": {
+          "expected": "each <=1.5 px",
+          "measured": [
+            0.284184528613481,
+            0.32231828740118423,
+            0.25539299374950186,
+            0.2296645377534673
+          ],
+          "note": "",
+          "passed": true
+        },
+        "scale_correction": {
+          "expected": "1 ±0.03",
+          "measured": 1.0001736681603366,
+          "note": "",
+          "passed": true
+        }
+      },
+      "note": "",
+      "passed": true
+    },
+    "back.albedo.single_connected_figure": {
+      "expected": "one substantial component (>=0.1% largest, >=100 px)",
+      "measured": [
+        606163
+      ],
+      "note": "",
+      "passed": true
+    },
+    "back.albedo.width.chest": {
+      "expected": {
+        "tolerance_rel": 0.08,
+        "width_cm": 16.0
+      },
+      "measured": 34.92307692307692,
+      "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
+      "passed": false
+    },
+    "back.albedo.width.crotch": {
+      "expected": {
+        "tolerance_rel": 0.08,
+        "width_cm": 13.0
+      },
+      "measured": 35.34615384615385,
+      "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
+      "passed": false
+    },
+    "back.albedo.width.eye": {
+      "expected": {
+        "tolerance_rel": 0.08,
+        "width_cm": 8.0
+      },
+      "measured": 35.34615384615385,
+      "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
+      "passed": false
+    },
+    "back.albedo.width.knee": {
+      "expected": {
+        "tolerance_rel": 0.08,
+        "width_cm": 14.0
+      },
+      "measured": 35.34615384615385,
+      "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
+      "passed": false
+    },
+    "back.albedo.width.shoulder": {
+      "expected": {
+        "tolerance_rel": 0.08,
+        "width_cm": 17.0
+      },
+      "measured": 35.34615384615385,
+      "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
+      "passed": false
+    },
+    "back.albedo.width.waist": {
+      "expected": {
+        "tolerance_rel": 0.08,
+        "width_cm": 14.0
+      },
+      "measured": 35.34615384615385,
+      "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
+      "passed": false
+    },
+    "back.albedo.width_median": {
+      "expected": "relative median <=0.04",
+      "measured": 1.5247252747252746,
+      "note": "",
+      "passed": false
+    },
+    "back.shaded.base_diameter": {
+      "expected": {
+        "diameter_cm": 24.0,
+        "tolerance_rel": 0.02
+      },
+      "measured": 29.96153846153846,
+      "note": "",
+      "passed": false
+    },
+    "back.shaded.baseline": {
+      "expected": {
+        "baseline_px": 1413,
+        "tolerance_px": 2
+      },
+      "measured": 1535,
+      "note": "",
+      "passed": false
+    },
+    "back.shaded.figure_height": {
+      "expected": {
+        "height_cm": 45.0,
+        "tolerance_rel": 0.01
+      },
+      "measured": 49.96153846153846,
+      "note": "",
+      "passed": false
+    },
+    "back.shaded.frame_margin": {
+      "expected": "no edge contact",
+      "measured": true,
+      "note": "",
+      "passed": false
+    },
+    "back.shaded.grid_inside": {
+      "expected": "<=0.002",
+      "measured": 0.0017732195916802453,
+      "note": "",
+      "passed": true
+    },
     "back.shaded.registered": {
       "expected": "selected registered raw attempt",
-      "measured": null,
+      "measured": "merlin-back-shaded-try1.png",
+      "note": "",
+      "passed": true
+    },
+    "back.shaded.registration": {
+      "expected": "scale <=3%; each residual <=1.5 px",
+      "measured": {
+        "canvas": {
+          "expected": [
+            1024,
+            1536
+          ],
+          "measured": [
+            1024,
+            1536
+          ],
+          "note": "",
+          "passed": true
+        },
+        "residual_px": {
+          "expected": "each <=1.5 px",
+          "measured": [
+            0.043006272588121626,
+            0.07546066553229887,
+            0.07669566335192707,
+            0.04670608548193065
+          ],
+          "note": "",
+          "passed": true
+        },
+        "scale_correction": {
+          "expected": "1 ±0.03",
+          "measured": 1.0000105885462414,
+          "note": "",
+          "passed": true
+        }
+      },
+      "note": "",
+      "passed": true
+    },
+    "back.shaded.single_connected_figure": {
+      "expected": "one substantial component (>=0.1% largest, >=100 px)",
+      "measured": [
+        819,
+        1240,
+        688,
+        1208,
+        922,
+        940,
+        1031,
+        502202,
+        813,
+        1437,
+        1032,
+        769,
+        3635,
+        824,
+        1059,
+        934,
+        2386,
+        939,
+        909,
+        2161,
+        685,
+        593
+      ],
+      "note": "",
+      "passed": false
+    },
+    "back.shaded.width.chest": {
+      "expected": {
+        "tolerance_rel": 0.08,
+        "width_cm": 16.0
+      },
+      "measured": 17.23076923076923,
+      "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
+      "passed": true
+    },
+    "back.shaded.width.crotch": {
+      "expected": {
+        "tolerance_rel": 0.08,
+        "width_cm": 13.0
+      },
+      "measured": 15.384615384615385,
+      "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
+      "passed": false
+    },
+    "back.shaded.width.eye": {
+      "expected": {
+        "tolerance_rel": 0.08,
+        "width_cm": 8.0
+      },
+      "measured": 17.615384615384617,
+      "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
+      "passed": false
+    },
+    "back.shaded.width.knee": {
+      "expected": {
+        "tolerance_rel": 0.08,
+        "width_cm": 14.0
+      },
+      "measured": 16.846153846153847,
+      "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
+      "passed": false
+    },
+    "back.shaded.width.shoulder": {
+      "expected": {
+        "tolerance_rel": 0.08,
+        "width_cm": 17.0
+      },
+      "measured": 16.0,
+      "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
+      "passed": true
+    },
+    "back.shaded.width.waist": {
+      "expected": {
+        "tolerance_rel": 0.08,
+        "width_cm": 14.0
+      },
+      "measured": 18.076923076923077,
+      "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
+      "passed": false
+    },
+    "back.shaded.width_median": {
+      "expected": "relative median <=0.04",
+      "measured": 0.1933643279797126,
+      "note": "",
+      "passed": false
+    },
+    "back.shaded_albedo_iou": {
+      "expected": ">=0.98",
+      "measured": 0.42150667022871174,
+      "note": "",
+      "passed": false
+    },
+    "front.albedo.base_diameter": {
+      "expected": {
+        "diameter_cm": 24.0,
+        "tolerance_rel": 0.02
+      },
+      "measured": 30.615384615384617,
+      "note": "",
+      "passed": false
+    },
+    "front.albedo.baseline": {
+      "expected": {
+        "baseline_px": 1413,
+        "tolerance_px": 2
+      },
+      "measured": 1535,
+      "note": "",
+      "passed": false
+    },
+    "front.albedo.figure_height": {
+      "expected": {
+        "height_cm": 45.0,
+        "tolerance_rel": 0.01
+      },
+      "measured": 54.34615384615385,
+      "note": "",
+      "passed": false
+    },
+    "front.albedo.flat.base": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.5695070059523845,
+      "note": "",
+      "passed": false
+    },
+    "front.albedo.flat.beard_eyebrows": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.40570587975084604,
+      "note": "",
+      "passed": false
+    },
+    "front.albedo.flat.belt": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.16190928086188922,
+      "note": "",
+      "passed": false
+    },
+    "front.albedo.flat.boots_beard_wrap": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.24469670785245978,
+      "note": "",
+      "passed": false
+    },
+    "front.albedo.flat.buckle": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.2455841194368517,
+      "note": "",
+      "passed": false
+    },
+    "front.albedo.flat.crystal": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.4227387602654929,
+      "note": "",
+      "passed": false
+    },
+    "front.albedo.flat.cuff_hem_edge": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.2531619353428838,
+      "note": "",
+      "passed": false
+    },
+    "front.albedo.flat.face_hands": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.27082946125348994,
+      "note": "",
+      "passed": false
+    },
+    "front.albedo.flat.gold_embroidery": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.2848895165804343,
+      "note": "",
+      "passed": false
+    },
+    "front.albedo.flat.hood_lining": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.33805568091635885,
+      "note": "",
+      "passed": false
+    },
+    "front.albedo.flat.robe_hood_sleeves": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.44753443890719463,
+      "note": "",
+      "passed": false
+    },
+    "front.albedo.flat.staff_frame": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.23160001652525936,
+      "note": "",
+      "passed": false
+    },
+    "front.albedo.frame_margin": {
+      "expected": "no edge contact",
+      "measured": true,
+      "note": "",
+      "passed": false
+    },
+    "front.albedo.grid_inside": {
+      "expected": "<=0.002",
+      "measured": 0.004753284056613708,
       "note": "",
       "passed": false
     },
     "front.albedo.registered": {
       "expected": "selected registered raw attempt",
-      "measured": null,
+      "measured": "merlin-front-albedo-try1.png",
+      "note": "",
+      "passed": true
+    },
+    "front.albedo.registration": {
+      "expected": "scale <=3%; each residual <=1.5 px",
+      "measured": {
+        "canvas": {
+          "expected": [
+            1024,
+            1536
+          ],
+          "measured": [
+            1024,
+            1536
+          ],
+          "note": "",
+          "passed": true
+        },
+        "residual_px": {
+          "expected": "each <=1.5 px",
+          "measured": [
+            0.1811051638538258,
+            0.24342184392878322,
+            0.2311487574194087,
+            0.23393691766192098
+          ],
+          "note": "",
+          "passed": true
+        },
+        "scale_correction": {
+          "expected": "1 ±0.03",
+          "measured": 1.000083071916997,
+          "note": "",
+          "passed": true
+        }
+      },
+      "note": "",
+      "passed": true
+    },
+    "front.albedo.single_connected_figure": {
+      "expected": "one substantial component (>=0.1% largest, >=100 px)",
+      "measured": [
+        7632,
+        550625,
+        3397,
+        2009,
+        2243,
+        3747,
+        13058,
+        8524,
+        862,
+        672,
+        4804
+      ],
+      "note": "",
+      "passed": false
+    },
+    "front.albedo.width.chest": {
+      "expected": {
+        "tolerance_rel": 0.08,
+        "width_cm": 16.0
+      },
+      "measured": 20.23076923076923,
+      "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
+      "passed": false
+    },
+    "front.albedo.width.crotch": {
+      "expected": {
+        "tolerance_rel": 0.08,
+        "width_cm": 13.0
+      },
+      "measured": 24.53846153846154,
+      "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
+      "passed": false
+    },
+    "front.albedo.width.eye": {
+      "expected": {
+        "tolerance_rel": 0.08,
+        "width_cm": 8.0
+      },
+      "measured": 24.46153846153846,
+      "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
+      "passed": false
+    },
+    "front.albedo.width.knee": {
+      "expected": {
+        "tolerance_rel": 0.08,
+        "width_cm": 14.0
+      },
+      "measured": 24.615384615384617,
+      "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
+      "passed": false
+    },
+    "front.albedo.width.shoulder": {
+      "expected": {
+        "tolerance_rel": 0.08,
+        "width_cm": 17.0
+      },
+      "measured": 18.76923076923077,
+      "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
+      "passed": false
+    },
+    "front.albedo.width.waist": {
+      "expected": {
+        "tolerance_rel": 0.08,
+        "width_cm": 14.0
+      },
+      "measured": 24.653846153846153,
+      "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
+      "passed": false
+    },
+    "front.albedo.width_median": {
+      "expected": "relative median <=0.04",
+      "measured": 0.7596153846153847,
       "note": "",
       "passed": false
     },
@@ -23,7 +633,7 @@
         "diameter_cm": 24.0,
         "tolerance_rel": 0.02
       },
-      "measured": 29.03846153846154,
+      "measured": 28.076923076923077,
       "note": "",
       "passed": false
     },
@@ -41,7 +651,7 @@
         "height_cm": 45.0,
         "tolerance_rel": 0.01
       },
-      "measured": 47.61538461538461,
+      "measured": 49.11538461538461,
       "note": "",
       "passed": false
     },
@@ -53,13 +663,13 @@
     },
     "front.shaded.grid_inside": {
       "expected": "<=0.002",
-      "measured": 0.002506982708405802,
+      "measured": 0.0010538488268099142,
       "note": "",
-      "passed": false
+      "passed": true
     },
     "front.shaded.registered": {
       "expected": "selected registered raw attempt",
-      "measured": "merlin-front-shaded-try4.png",
+      "measured": "merlin-front-shaded-try8.png",
       "note": "",
       "passed": true
     },
@@ -81,17 +691,17 @@
         "residual_px": {
           "expected": "each <=1.5 px",
           "measured": [
-            0.0394452505088336,
-            0.050834334239266574,
-            0.02516932771617877,
-            0.028299086045877813
+            0.03768567678238056,
+            0.041101964604762536,
+            0.02690095461260511,
+            0.03554959416681833
           ],
           "note": "",
           "passed": true
         },
         "scale_correction": {
           "expected": "1 ±0.03",
-          "measured": 0.9999726667697779,
+          "measured": 1.0001037682155407,
           "note": "",
           "passed": true
         }
@@ -102,40 +712,16 @@
     "front.shaded.single_connected_figure": {
       "expected": "one substantial component (>=0.1% largest, >=100 px)",
       "measured": [
-        591,
-        747,
-        1081,
-        558,
-        949,
-        588,
-        923,
-        1120,
-        1238,
-        416800,
-        660,
-        1101,
-        466,
-        514,
-        732,
-        427,
-        567,
-        548,
-        942,
-        429,
-        506,
-        1662,
-        1236,
-        812,
-        816,
+        560,
+        927,
+        485444,
+        1267,
+        674,
         612,
-        1396,
-        630,
-        786,
-        1151,
-        692,
-        511,
-        1135,
-        620
+        1027,
+        694,
+        770,
+        1052
       ],
       "note": "",
       "passed": false
@@ -145,16 +731,16 @@
         "tolerance_rel": 0.08,
         "width_cm": 16.0
       },
-      "measured": 17.153846153846153,
+      "measured": 17.692307692307693,
       "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
-      "passed": true
+      "passed": false
     },
     "front.shaded.width.crotch": {
       "expected": {
         "tolerance_rel": 0.08,
         "width_cm": 13.0
       },
-      "measured": 16.076923076923077,
+      "measured": 15.5,
       "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
       "passed": false
     },
@@ -163,7 +749,7 @@
         "tolerance_rel": 0.08,
         "width_cm": 8.0
       },
-      "measured": 15.73076923076923,
+      "measured": 15.576923076923077,
       "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
       "passed": false
     },
@@ -172,16 +758,16 @@
         "tolerance_rel": 0.08,
         "width_cm": 14.0
       },
-      "measured": 14.692307692307692,
+      "measured": 17.346153846153847,
       "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
-      "passed": true
+      "passed": false
     },
     "front.shaded.width.shoulder": {
       "expected": {
         "tolerance_rel": 0.08,
         "width_cm": 17.0
       },
-      "measured": 17.653846153846153,
+      "measured": 18.23076923076923,
       "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
       "passed": true
     },
@@ -190,25 +776,464 @@
         "tolerance_rel": 0.08,
         "width_cm": 14.0
       },
-      "measured": 17.692307692307693,
+      "measured": 17.346153846153847,
       "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
       "passed": false
     },
     "front.shaded.width_median": {
       "expected": "relative median <=0.04",
-      "measured": 0.15440088757396442,
+      "measured": 0.21565934065934067,
+      "note": "",
+      "passed": false
+    },
+    "front.shaded_albedo_iou": {
+      "expected": ">=0.98",
+      "measured": 0.5855191720772692,
+      "note": "",
+      "passed": false
+    },
+    "front_back.profile_median": {
+      "expected": "<=0.02 of full figure height",
+      "measured": 0.023931623931623933,
+      "note": "",
+      "passed": false
+    },
+    "front_back.profile_p95": {
+      "expected": "<=0.05 of full figure height",
+      "measured": 0.1111111111111111,
+      "note": "",
+      "passed": false
+    },
+    "front_side.extents": {
+      "expected": "top and bottom <=0.01 of full height",
+      "measured": [
+        0.018803418803418803,
+        0.0
+      ],
+      "note": "",
+      "passed": false
+    },
+    "side.albedo.base_diameter": {
+      "expected": {
+        "diameter_cm": 24.0,
+        "tolerance_rel": 0.02
+      },
+      "measured": 35.34615384615385,
+      "note": "",
+      "passed": false
+    },
+    "side.albedo.baseline": {
+      "expected": {
+        "baseline_px": 1413,
+        "tolerance_px": 2
+      },
+      "measured": 1535,
+      "note": "",
+      "passed": false
+    },
+    "side.albedo.figure_height": {
+      "expected": {
+        "height_cm": 45.0,
+        "tolerance_rel": 0.01
+      },
+      "measured": 54.34615384615385,
+      "note": "",
+      "passed": false
+    },
+    "side.albedo.flat.base": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.564140481494518,
+      "note": "",
+      "passed": false
+    },
+    "side.albedo.flat.beard_eyebrows": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.35273216033169286,
+      "note": "",
+      "passed": false
+    },
+    "side.albedo.flat.belt": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.15165862159348154,
+      "note": "",
+      "passed": false
+    },
+    "side.albedo.flat.boots_beard_wrap": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.23261276346985488,
+      "note": "",
+      "passed": false
+    },
+    "side.albedo.flat.buckle": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.23885642601135254,
+      "note": "",
+      "passed": false
+    },
+    "side.albedo.flat.crystal": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.44837209127793987,
+      "note": "",
+      "passed": false
+    },
+    "side.albedo.flat.cuff_hem_edge": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.21409177707173155,
+      "note": "",
+      "passed": false
+    },
+    "side.albedo.flat.face_hands": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.2860733160409513,
+      "note": "",
+      "passed": false
+    },
+    "side.albedo.flat.gold_embroidery": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.25646407402950244,
+      "note": "",
+      "passed": false
+    },
+    "side.albedo.flat.hood_lining": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.4665488880211419,
+      "note": "",
+      "passed": false
+    },
+    "side.albedo.flat.robe_hood_sleeves": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.4354808752466223,
+      "note": "",
+      "passed": false
+    },
+    "side.albedo.flat.staff_frame": {
+      "expected": "L* range /100 <=0.12",
+      "measured": 0.21750252006520376,
+      "note": "",
+      "passed": false
+    },
+    "side.albedo.frame_margin": {
+      "expected": "no edge contact",
+      "measured": true,
+      "note": "",
+      "passed": false
+    },
+    "side.albedo.grid_inside": {
+      "expected": "<=0.002",
+      "measured": 0.00915895790761208,
       "note": "",
       "passed": false
     },
     "side.albedo.registered": {
       "expected": "selected registered raw attempt",
-      "measured": null,
+      "measured": "merlin-side-albedo-try1.png",
+      "note": "",
+      "passed": true
+    },
+    "side.albedo.registration": {
+      "expected": "scale <=3%; each residual <=1.5 px",
+      "measured": {
+        "canvas": {
+          "expected": [
+            1024,
+            1536
+          ],
+          "measured": [
+            1024,
+            1536
+          ],
+          "note": "",
+          "passed": true
+        },
+        "residual_px": {
+          "expected": "each <=1.5 px",
+          "measured": [
+            0.27558112533107715,
+            0.2620757515390122,
+            0.2209989236769215,
+            0.27658765261247975
+          ],
+          "note": "",
+          "passed": true
+        },
+        "scale_correction": {
+          "expected": "1 ±0.03",
+          "measured": 1.000110395205273,
+          "note": "",
+          "passed": true
+        }
+      },
+      "note": "",
+      "passed": true
+    },
+    "side.albedo.single_connected_figure": {
+      "expected": "one substantial component (>=0.1% largest, >=100 px)",
+      "measured": [
+        450658,
+        3573,
+        4025,
+        5054
+      ],
       "note": "",
       "passed": false
     },
+    "side.albedo.width.chest": {
+      "expected": {
+        "tolerance_rel": 0.08,
+        "width_cm": 11.0
+      },
+      "measured": 34.0,
+      "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
+      "passed": false
+    },
+    "side.albedo.width.crotch": {
+      "expected": {
+        "tolerance_rel": 0.08,
+        "width_cm": 9.5
+      },
+      "measured": 34.46153846153846,
+      "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
+      "passed": false
+    },
+    "side.albedo.width.eye": {
+      "expected": {
+        "tolerance_rel": 0.08,
+        "width_cm": 8.0
+      },
+      "measured": 29.692307692307693,
+      "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
+      "passed": false
+    },
+    "side.albedo.width.knee": {
+      "expected": {
+        "tolerance_rel": 0.08,
+        "width_cm": 9.0
+      },
+      "measured": 34.61538461538461,
+      "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
+      "passed": false
+    },
+    "side.albedo.width.shoulder": {
+      "expected": {
+        "tolerance_rel": 0.08,
+        "width_cm": 10.0
+      },
+      "measured": 27.923076923076923,
+      "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
+      "passed": false
+    },
+    "side.albedo.width.waist": {
+      "expected": {
+        "tolerance_rel": 0.08,
+        "width_cm": 10.0
+      },
+      "measured": 35.34615384615385,
+      "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
+      "passed": false
+    },
+    "side.albedo.width_median": {
+      "expected": "relative median <=0.04",
+      "measured": 2.581072874493927,
+      "note": "",
+      "passed": false
+    },
+    "side.shaded.base_diameter": {
+      "expected": {
+        "diameter_cm": 24.0,
+        "tolerance_rel": 0.02
+      },
+      "measured": 34.69230769230769,
+      "note": "",
+      "passed": false
+    },
+    "side.shaded.baseline": {
+      "expected": {
+        "baseline_px": 1413,
+        "tolerance_px": 2
+      },
+      "measured": 1535,
+      "note": "",
+      "passed": false
+    },
+    "side.shaded.figure_height": {
+      "expected": {
+        "height_cm": 45.0,
+        "tolerance_rel": 0.01
+      },
+      "measured": 49.96153846153846,
+      "note": "",
+      "passed": false
+    },
+    "side.shaded.frame_margin": {
+      "expected": "no edge contact",
+      "measured": true,
+      "note": "",
+      "passed": false
+    },
+    "side.shaded.grid_inside": {
+      "expected": "<=0.002",
+      "measured": 0.0018956723507650547,
+      "note": "",
+      "passed": true
+    },
     "side.shaded.registered": {
       "expected": "selected registered raw attempt",
-      "measured": null,
+      "measured": "merlin-side-shaded-try1.png",
+      "note": "",
+      "passed": true
+    },
+    "side.shaded.registration": {
+      "expected": "scale <=3%; each residual <=1.5 px",
+      "measured": {
+        "canvas": {
+          "expected": [
+            1024,
+            1536
+          ],
+          "measured": [
+            1024,
+            1536
+          ],
+          "note": "",
+          "passed": true
+        },
+        "residual_px": {
+          "expected": "each <=1.5 px",
+          "measured": [
+            0.04567361215191199,
+            0.09610401371795858,
+            0.07086476350805755,
+            0.06924378443577883
+          ],
+          "note": "",
+          "passed": true
+        },
+        "scale_correction": {
+          "expected": "1 ±0.03",
+          "measured": 1.000025200229588,
+          "note": "",
+          "passed": true
+        }
+      },
+      "note": "",
+      "passed": true
+    },
+    "side.shaded.single_connected_figure": {
+      "expected": "one substantial component (>=0.1% largest, >=100 px)",
+      "measured": [
+        722,
+        1221,
+        834,
+        808,
+        1019,
+        1195,
+        1366,
+        1411,
+        1127,
+        358266,
+        1386,
+        1176,
+        1765,
+        853,
+        696,
+        1061,
+        875,
+        995,
+        1305,
+        644,
+        797,
+        933,
+        1102,
+        616,
+        443,
+        408,
+        463,
+        487,
+        4045,
+        508,
+        681,
+        446,
+        4952,
+        4633,
+        1670,
+        1709,
+        2578,
+        607,
+        1367,
+        741,
+        931,
+        438,
+        1241,
+        568,
+        586,
+        545
+      ],
+      "note": "",
+      "passed": false
+    },
+    "side.shaded.width.chest": {
+      "expected": {
+        "tolerance_rel": 0.08,
+        "width_cm": 11.0
+      },
+      "measured": 9.423076923076923,
+      "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
+      "passed": false
+    },
+    "side.shaded.width.crotch": {
+      "expected": {
+        "tolerance_rel": 0.08,
+        "width_cm": 9.5
+      },
+      "measured": 13.346153846153847,
+      "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
+      "passed": false
+    },
+    "side.shaded.width.eye": {
+      "expected": {
+        "tolerance_rel": 0.08,
+        "width_cm": 8.0
+      },
+      "measured": 9.038461538461538,
+      "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
+      "passed": false
+    },
+    "side.shaded.width.knee": {
+      "expected": {
+        "tolerance_rel": 0.08,
+        "width_cm": 9.0
+      },
+      "measured": 11.884615384615385,
+      "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
+      "passed": false
+    },
+    "side.shaded.width.shoulder": {
+      "expected": {
+        "tolerance_rel": 0.08,
+        "width_cm": 10.0
+      },
+      "measured": 8.961538461538462,
+      "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
+      "passed": false
+    },
+    "side.shaded.width.waist": {
+      "expected": {
+        "tolerance_rel": 0.08,
+        "width_cm": 10.0
+      },
+      "measured": 9.653846153846153,
+      "note": "Staff excluded using pre-generation projection bounds from spec; all other silhouette retained.",
+      "passed": true
+    },
+    "side.shaded.width_median": {
+      "expected": "relative median <=0.04",
+      "measured": 0.1365821678321678,
+      "note": "",
+      "passed": false
+    },
+    "side.shaded_albedo_iou": {
+      "expected": ">=0.98",
+      "measured": 0.41500397802994804,
       "note": "",
       "passed": false
     }
