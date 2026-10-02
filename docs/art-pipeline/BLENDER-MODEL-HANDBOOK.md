@@ -90,6 +90,7 @@ python -c "import numpy, PIL, scipy; print('deps ok')"
 | **Статический пропс** (бочка, фонарь, ящик, декор) | `static_prop_candidate.py` → CLI `static-candidate` | `tools/tripo-pipeline/blender/static_prop_candidate.py` |
 | Подставка героя | часть героя (`SM_<Hero>_<Stage>_Base`), отдельный статичный FBX без скина | H2 bake |
 | Окружение/карты | **не этот документ** (отдельный трек ENV-MAPS, `tools/art/env_kit/`) | — |
+| **Путь B (эксперимент):** модель с нуля в Blender по чертежам Codex, без Tripo | спецификация → сетка → виды `image_gen` → `build_<key>.py` → проекция текстур → риг/клипы/UE по этому документу | [SCRATCH-MODEL-PIPELINE.md](SCRATCH-MODEL-PIPELINE.md), инструменты `tools/scratch-model/` |
 
 **Не использовать как образец для новых работ:**
 
@@ -772,7 +773,7 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
 |---|---|---|
 | Бюджет героя | 15–25k (04 §1, 17 §4.5) | предложение до GD-058; измерено 34–43k |
 | Текстуры героя | 2K (04) | 4K master локально + 2K runtime в git |
-| Источник модели | моделирование в Blender с нуля (04, 17) | Tripo → H2 bake |
+| Источник модели | моделирование в Blender с нуля (04, 17) | Tripo → H2 bake; с нуля — только экспериментальный путь B ([SCRATCH-MODEL-PIPELINE.md](SCRATCH-MODEL-PIPELINE.md)), его бюджеты — по 04 |
 | Коллизия | `UCX_` в FBX (04) | нет коллизии, капсула в коде |
 | Масштаб импорта | `FBX_SCALE_UNITS` + import 100 (память S05) | патч `UnitScaleFactor 1.0` + import 1,0 |
 | Фронт скелетного меша | +Y (ART004, Tier A Medusa) | +X (UM_FBX_v1) |
