@@ -20,6 +20,14 @@ an overlay may not change lights / ground / tray / apron). Built from
     crates / the ship rail), 2 fires (fort campfire pit + brazier, NS_Env_ConceptFire), 3 cannons on the dock,
     the banner hanging vertically from the ship rail (SM_Env_S_Banner, 320 uu).
 
+P9 (F1 / F2 / F4 / F5): the frame band, the cascade sheets and foam (scene meshes); the dock props re-picked on the
+painting and kept clear of the frame band and the ship's hull side (shifted towards the board when they would cut
+into it); barrels on the ship deck; the cannons in the ship's gun ports (barrel axis through the port, out of the
+hull); the rail lantern on its post arm; the banner flat against the hull side; the fx plan of track B
+(fx-plan.sarpedon.json: layered fires at the brazier / fort pit, mist / spray at the cascade tiers) merged when present
+- its fires replace the P8 NS_Env_ConceptFire entries; without it the P8 fx stay. The fx anchors (brazier, fort pit,
+cascade tiers) are written to the overlay's conceptScene.fxAnchors.
+
 Validation: the Python twin of MergeOverlay (tools/art/concept_paste/cp_layout.merge) + scene rules (unique ids, roots
 /Game/EnvKit/ or /Game/EnvMaps/Sarpedon/Scene/, no NoAI / user mesh, material paths, Fab scale ranges, pivots off the
 map, fx anchors) + tools/art/env_kit/layout_check.check_scene (cell occlusion rule 6 and key-light shadow rule 7 on
@@ -43,13 +51,17 @@ if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 import cs_common as CS  # noqa: E402
 import cs_geom as G  # noqa: E402
+import ship_build as SB  # noqa: E402
+import frame_band_build as FBB  # noqa: E402
 
 sys.path.insert(0, str(CS.REPO / "tools" / "art" / "env_kit"))
 import cp_layout as CPL  # noqa: E402  (tools/art/concept_paste on the path via cs_common)
 import layout_check as LC  # noqa: E402
 
 OVERLAY_SCHEMA = "unmatched.env-layout-overlay/1"
-SCENE_MESHES = ("Island", "Ship", "Fort", "Palisade", "Piles")
+SCENE_MESHES = ("Island", "Ship", "Fort", "Palisade", "Piles", "FrameBand", "Cascade", "CascadeFoam")
+FX_PLAN = HERE / "fx-plan.sarpedon.json"  # track B (F5 fires, F4 mist / spray); merged when present
+FX_PLAN_SCHEMA = "unmatched.concept-scene-fx/1"
 MATERIAL_RE = re.compile(r"^/Game/EnvMaps/Sarpedon/Scene/MI_EnvScene_(Proj_[A-Za-z]+|LanternHead)$")
 SCENE_MESH_RE = re.compile(r"^/Game/EnvMaps/Sarpedon/Scene/SM_Env_S_[A-Za-z]+$")
 
@@ -181,7 +193,6 @@ def build(base: dict, meshes: dict):
     rng = np.random.default_rng(L["seed"])
     island = meshes["Island"]
     ground = G.Ground([island])
-    ship_g = G.Ground([meshes["Ship"]])
     cam = CS.cam0()
     fab = LC.FAB
     add, add_fx = [], []
@@ -192,10 +203,15 @@ def build(base: dict, meshes: dict):
         m = meshes[n]
         add.append({"id": f"scene-{n.lower()}", "mesh": mesh_path(n), "loc": [r2(v) for v in m.pivot], "yawDeg": 0.0,
                     "scale": 1.0, "castShadow": bool(L["castShadow"][n])})
+    wall = SB.Wall(allp["ship"])
+    ship_rep = CS.load_json(CS.RUNS["ship"] / "reports" / "ship-build.json")
+    band = FBB.outer_extents(allp["frameBand"])
     # P8.3: rocks at the sea level filling the ground sea ring's inner hole where the island foot does not cover it
     # (the ring's hole = tray outline - 40 uu; lit3d moves the ring to seaZUU -300; W-front corner showed black void)
     for r in L.get("footRocks") or []:
-        add.append({"id": r["id"], "mesh": f"/Game/EnvKit/Sarpedon/SM_Env_{r['kit']}", "loc": [r2(v) for v in r["loc"]],
+        # P9 tune: an entry may name its mesh (the Fab wet rock for the cascade rocks breaking its outline)
+        mesh = r.get("mesh") or f"/Game/EnvKit/Sarpedon/SM_Env_{r['kit']}"
+        add.append({"id": r["id"], "mesh": mesh, "loc": [r2(v) for v in r["loc"]],
                     "yawDeg": float(r["yawDeg"]), "scale": float(r["scale"]), "castShadow": False,
                     "material": look(r["look"])})
 
@@ -239,7 +255,7 @@ def build(base: dict, meshes: dict):
     last = -1e9
     matte = np.asarray(CS.spec()["geometry"]["islandMatte"]["poly"], float)
     canopy = [np.asarray(CS.spec()["geometry"]["heightZones"][0]["poly"], float)] +         [np.asarray(z, float) for z in T.get("extraZonesPx", [])]
-    ship_px = np.asarray(CS.params()["ship"]["targetPx"], float)
+    ship_px = np.asarray(Rk["shipExcludePx"], float)  # the painted ship incl. its outpainted extension (P8 targetPx)
     for i in np.argsort(arc):
         if arc[i] - last < Rk["spacingUU"]:
             continue
@@ -302,7 +318,8 @@ def build(base: dict, meshes: dict):
     info["rocks"] = min(len(rocks), Rk["max"]) + len(Rk["extraPx"]) + n_painted
     info["paintedRocks"] = n_painted
 
-    # barrels / crates / rope coils at the painted ones
+    # barrels / crates / rope coils at the painted ones (P9: clear of the frame band and the ship's hull side)
+    shifts = {}
     for p in L["props"]:
         Q = ground.hit_px(*p["footPx"])
         name = p["kit"]
@@ -313,9 +330,21 @@ def build(base: dict, meshes: dict):
         _, _, h1 = LC.dims(name, 1.0)
         s = h_uu / h1 if p.get("byHeight", True) else p["scale"]
         s = min(max(s, p.get("scaleRange", [0.5, 3.0])[0]), p.get("scaleRange", [0.5, 3.0])[1])
-        add.append({"id": p["id"], "mesh": f"/Game/EnvKit/Sarpedon/SM_Env_{name}", "loc": [r2(Q[0]), r2(Q[1]), r2(Q[2] - 1.0)],
-                    "yawDeg": float(p.get("yawDeg", rng.uniform(0, 360))), "scale": round(float(s), 3),
-                    "castShadow": True, "material": look("Wood")})
+        prop = {"id": p["id"], "mesh": f"/Game/EnvKit/Sarpedon/SM_Env_{name}", "loc": [r2(Q[0]), r2(Q[1]), r2(Q[2] - 1.0)],
+                "yawDeg": float(p.get("yawDeg", rng.uniform(0, 360))), "scale": round(float(s), 3),
+                "castShadow": True, "material": look("Wood")}
+        moved = clear_of_band_and_hull(prop, band, wall, ship_rep, L["propClearance"], ground)
+        if moved:
+            shifts[p["id"]] = moved
+        add.append(prop)
+    info["propShifts"] = shifts
+    # P9 F1: barrels on the ship deck behind the rail (painted above the rail line)
+    deck = {}
+    for p in L.get("shipDeckProps", []):
+        prop, moved = deck_prop(p, wall, ship_rep, allp["ship"])
+        add.append(prop)
+        deck[prop["id"]] = {"movedOnDeckUU": moved}
+    info["shipDeckProps"] = deck
 
     # details: lanterns / cannons / banner / fires
     D = L["details"]
@@ -332,14 +361,9 @@ def build(base: dict, meshes: dict):
         ray = cam.rays(np.array(float(d["px"][0])), np.array(float(d["px"][1])))
         ray = ray / np.linalg.norm(ray)
         if cfg["host"] == "ship":
-            t = G.ray_mesh(cam.pos, ray, ship_g.P, ship_g.F)
-            if not math.isfinite(t):
-                # the painted pixel is off the fitted hull silhouette: the median C0 distance of the hull vertices that
-                # project within 40 px of it (the lantern hangs at the hull's depth there)
-                q, _ = cam.project(ship_g.P)
-                near = np.hypot(q[:, 0] - d["px"][0], q[:, 1] - d["px"][1]) < 40.0
-                t = float(np.median(np.linalg.norm(ship_g.P[near] - cam.pos, axis=1)))
-            W = cam.pos + (t - cfg.get("frontUU", 25.0)) * ray
+            # P9: hangs from the rail post's arm (ship_build.lantern_rail: the painted pixel's ray on the plane of
+            # the arm tip, outside the hull side; the post's arm sits over the lantern head's top)
+            W = np.array(ship_rep["info"]["lanternRail"]["glow"], float)
         else:
             hp = hosts[cfg["host"]]
             yplane = hp[1] + cfg.get("frontUU", 12.0)
@@ -360,34 +384,45 @@ def build(base: dict, meshes: dict):
                        "seed": seed_of("flame-" + lid), "warmupS": 1.5})
         placed[lid] = {"glowWorld": [r2(v) for v in W], "scale": round(s, 3), "host": cfg["host"]}
     can = p7["kitMeasurements"]["SM_Env_Cannon"]
-    can_len = float(can["boundsUU"]["max"][0]) - float(can["boundsUU"]["min"][0])
     axis = np.array([0.0, float(can["barrelAxisYUU"]), float(can["barrelAxisZUU"])])
-    both = G.Ground([island, meshes["Ship"]])
+    ports = {pt["cannon"]: pt for pt in ship_rep["info"]["ports"]}
     for cid in ("cannon-1", "cannon-2", "cannon-3"):
         d = det[cid]
-        # the painted barrels stick out of the hull's gun ports: the barrel axis point on the painted pixel's ray,
-        # cannonFrontUU in front of the first hit (hull / dock)
-        ray = cam.rays(np.array(float(d["px"][0])), np.array(float(d["px"][1])))
-        ray = ray / np.linalg.norm(ray)
-        t = G.ray_mesh(cam.pos, ray, both.P, both.F)
-        P = cam.pos + (t - D["cannonFrontUU"]) * ray
-        depth = float((P - cam.pos) @ cam.fwd)
-        s = min(max(d["sizePx"][0] * depth / cam.f_px * D["cannonSizeMul"] / can_len, 1.2), 3.0)
-        yaw = D["cannonYawDeg"]
+        # P9 F1: the cannons sit in the ship's gun ports (ship_build.ports_of: the painted muzzle on the plane just
+        # outside the hull side, only the bare barrel out, the carriage inside the port / hull)
+        pt = ports[cid]
+        P = np.array(pt["axisPoint"], float)
+        s = float(pt["scale"])
+        yaw = float(pt["yawDeg"])
         loc = P - rot_yaw(axis * s, yaw)
         add.append({"id": cid, "mesh": "/Game/EnvKit/ConceptPaste/SM_EnvCP_Cannon", "loc": [r2(v) for v in loc],
                     "yawDeg": yaw, "scale": round(s, 3), "castShadow": True})
-        placed[cid] = {"barrelWorld": [r2(v) for v in P], "scale": round(s, 3)}
+        placed[cid] = {"barrelWorld": [r2(v) for v in P], "scale": round(s, 3), "port": pt["centre"]}
     bd = det["banner-ship"]
     ray = cam.rays(np.array(float(bd["px"][0])), np.array(float(bd["px"][1])))
     ray = ray / np.linalg.norm(ray)
-    t = G.ray_mesh(cam.pos, ray, ship_g.P, ship_g.F)
-    top = cam.pos + (t - D["bannerFrontUU"]) * ray
+    # P9: flat against the hull side, bannerOutUU outside it, the painted top pixel on that plane
+    top = wall.on_plane(bd["px"][0], bd["px"][1], -D["bannerOutUU"])
     s_b = D["bannerLengthUU"] / CS.params()["banner"]["lengthUU"]
-    add.append({"id": "banner-ship", "mesh": mesh_path("Banner"), "loc": [r2(v) for v in top], "yawDeg": 90.0,
-                "scale": round(s_b, 3), "castShadow": True})
+    add.append({"id": "banner-ship", "mesh": mesh_path("Banner"), "loc": [r2(v) for v in top],
+                "yawDeg": round(wall.out_yaw_deg(), 3), "scale": round(s_b, 3), "castShadow": True})
+    # the cloth must not cut into the dock / island (vertices below the island top under them)
+    yb = math.radians(wall.out_yaw_deg())
+    Rb = np.array([[math.cos(yb), -math.sin(yb), 0.0], [math.sin(yb), math.cos(yb), 0.0], [0.0, 0.0, 1.0]])
+    Vb = meshes["Banner"].V * s_b @ Rb.T + top
+    cut = 0
+    for v in Vb[Vb[:, 2] < 0.0]:
+        try:
+            cut += int(ground.height_at(v[0], v[1]) > v[2] + 0.5)
+        except ValueError:
+            pass
+    if cut:
+        raise SystemExit(f"banner-ship: {cut} cloth vertices inside the island (cliff / dock under the hem)")
     placed["banner-ship"] = {"topWorld": [r2(v) for v in top], "lengthUU": round(s_b * float(np.ptp(meshes["Banner"].V[:, 2])), 1),
-                             "widthUU": round(s_b * CS.params()["banner"]["widthUU"], 1), "hang": "vertical"}
+                             "widthUU": round(s_b * CS.params()["banner"]["widthUU"], 1), "hang": "vertical",
+                             "clothVerticesInIsland": cut}
+    anchors = {}
+    p8_fires = []
     for fid in ("fire-fort", "fire-brazier"):
         cfg = D["fires"][fid]
         hit = ground.hit_px(*det[fid]["px"])
@@ -398,9 +433,20 @@ def build(base: dict, meshes: dict):
             add.append({"id": fid + "-pit", "mesh": f"/Game/EnvKit/Sarpedon/SM_Env_{cfg['pitKit']}",
                         "loc": [r2(hit[0]), r2(hit[1]), r2(hit[2] - 1.0)], "yawDeg": 0.0, "scale": cfg["pitScale"],
                         "castShadow": False, "material": look("Rock")})
-        add_fx.append({"id": fid, "system": "/Game/EnvKit/FX/NS_Env_ConceptFire", "loc": [r2(v) for v in Q],
-                       "yawDeg": 0.0, "scale": cfg["scale"], "seed": seed_of(fid), "warmupS": 1.5})
+        p8_fires.append({"id": fid, "system": "/Game/EnvKit/FX/NS_Env_ConceptFire", "loc": [r2(v) for v in Q],
+                         "yawDeg": 0.0, "scale": cfg["scale"], "seed": seed_of(fid), "warmupS": 1.5})
         placed[fid] = {"fxWorld": [r2(v) for v in Q]}
+        anchors["fort-pit" if fid == "fire-fort" else "brazier"] = {
+            "loc": [r2(v) for v in Q], "ground": [r2(v) for v in hit], "kind": "fire",
+            "note": "the P8 fire point (the painted fire pixel's ray at heightUU above the ground hit)"}
+    casc = CS.load_json(CS.RUNS["props"] / "reports" / "cascade-build.json")
+    for t_ in casc["info"]["tiers"]:
+        anchors[f"falls-tier-{t_['tier']}"] = {"loc": t_["landing"], "widthUU": t_["widthUU"], "sea": t_["sea"],
+                                               "kind": "falls", "tier": t_["tier"]}
+    plan, plan_info = fx_plan(anchors)
+    add_fx += p8_fires if plan is None else plan
+    info["fxPlan"] = plan_info
+    info["fxAnchors"] = anchors
     info["details"] = placed
 
     # overlay
@@ -418,6 +464,12 @@ def build(base: dict, meshes: dict):
                "props": {"remove": [p["id"] for p in base["props"]], "add": add}, "fx": fx_ops,
                "conceptScene": {
                    "manifest": "tools/art/concept_scene/manifest.sarpedon.json",
+                   "fxAnchors": anchors,
+                   "fxPlan": plan_info,
+                   "lit3dHide": {"waterfalls": True,
+                                 "note": "P9 F4: the cascade (scene-cascade / scene-cascadefoam) replaces the P5c ground "
+                                         "waterfall in lit3d (the island's waterfall tongue is gone): the profile's lit3d "
+                                         "'hide' must list 'waterfalls' (track B); P5c / paste unchanged"},
                    "params": "tools/art/concept_scene/scene-params.sarpedon.json",
                    "materialOverride": "optional prop field 'material' = a projected-albedo MI (MI_EnvScene_Proj_<Look>, "
                                        "manifest 'looks'); track B: applied to ALL mesh slots of that prop",
@@ -431,6 +483,110 @@ def build(base: dict, meshes: dict):
                "notes": ("ENV-MAPS P8 lit 3D scene (path 1), variant 'scene', written by tools/art/concept_scene/"
                          "scene_layout.py. Status: предложено (CREATE stage, nothing rendered in UE yet).")}
     return overlay, info
+
+
+def clear_of_band_and_hull(prop: dict, band: dict, wall, ship_rep: dict, C: dict, ground: G.Ground):
+    """P9: a dock prop's footprint must keep C['bandUU'] from the frame band's outer rectangle and C['hullUU'] off the
+    hull side (the outermost wale / clinker) along the hull's length; else it moves towards the board along the hull's
+    outward normal (then away from the band along X), its Z re-read on the island. Returns the shift (uu) or None."""
+    out = np.asarray(wall.out2, float)
+    s_n, s_s = ship_rep["info"]["sNorth"], ship_rep["info"]["sSouth"] + ship_rep["info"]["bowUU"]
+    rect = np.array([[band["westX"], band["farY"]], [band["eastX"], band["farY"]], [band["eastX"], band["nearY"]],
+                     [band["westX"], band["nearY"]]])
+    moved = np.zeros(2)
+    for _ in range(40):
+        fp = LC.footprint(prop)
+        s_c = (fp - wall.F0) @ wall.u2
+        d_c = (fp - wall.F0) @ wall.in2
+        along = (s_c > s_n - C["hullUU"]) & (s_c < s_s)
+        need_hull = float(np.max(d_c[along] + C["hullUU"])) if along.any() else -1.0
+        cl = LC.poly_clearance(fp, rect)
+        if need_hull <= 0 and cl >= C["bandUU"]:
+            break
+        if need_hull > 0:
+            step = out * (need_hull + 0.5)
+        else:
+            # away from the band across its nearest outer edge
+            c = fp.mean(0)
+            edges = {(1.0, 0.0): band["eastX"] - c[0], (-1.0, 0.0): c[0] - band["westX"],
+                     (0.0, -1.0): c[1] - band["farY"], (0.0, 1.0): band["nearY"] - c[1]}
+            dirn = np.array(min(edges, key=lambda k: abs(edges[k])))
+            step = dirn * (C["bandUU"] - cl + 0.5)
+        moved += step
+        prop["loc"][0] = r2(prop["loc"][0] + step[0])
+        prop["loc"][1] = r2(prop["loc"][1] + step[1])
+    else:
+        raise SystemExit(f"prop {prop['id']}: no place between the frame band and the hull")
+    if not moved.any():
+        return None
+    prop["loc"][2] = r2(ground.height_at(prop["loc"][0], prop["loc"][1]) - 1.0)
+    return [r2(moved[0]), r2(moved[1])]
+
+
+def deck_prop(p: dict, wall, ship_rep: dict, SP: dict) -> dict:
+    """A kit prop on the ship deck at its painted centre pixel: the pixel's ray on the plane deck + h / 2 (h = the
+    painted height at that depth), kept inside the bulwarks."""
+    cam = CS.cam0()
+    H = SP["hull"]
+    name = p["kit"]
+    _, _, h1 = LC.dims(name, 1.0)
+    w1, d1, _ = LC.dims(name, 1.0)
+    s_mid = 0.5 * (ship_rep["info"]["sNorth"] + ship_rep["info"]["sSouth"])
+    zd = float(wall.rail_z(s_mid)) - float(H["deckDropUU"])
+    s = 1.0
+    Q = None
+    for _ in range(20):
+        Q = CS.ray_z(p["centrePx"][0], p["centrePx"][1], zd + 0.5 * h1 * s)
+        depth = float((Q - cam.pos) @ cam.fwd)
+        s = p["heightPx"] * depth / cam.f_px / math.cos(math.radians(55.0)) / h1
+        s = min(max(s, p["scaleRange"][0]), p["scaleRange"][1])
+    s_q, d_q, _ = wall.sdz(Q)
+    r = 0.5 * max(w1, d1) * s
+    t, B = float(H["wallThickUU"]), float(H["beamUU"])
+    # on the deck: inside the bulwarks and between the stern transom and the bow
+    s_in = min(max(s_q, ship_rep["info"]["sNorth"] + r + 1.0), ship_rep["info"]["sSouth"] - r - 1.0)
+    d_in = min(max(d_q, t + r + 1.0), B - t - r - 1.0)
+    zd = float(wall.rail_z(s_in)) - float(H["deckDropUU"])
+    P = wall.P(s_in, d_in, zd)
+    moved = float(np.hypot(s_in - s_q, d_in - d_q))
+    return {"id": p["id"], "mesh": f"/Game/EnvKit/Sarpedon/SM_Env_{name}", "loc": [r2(P[0]), r2(P[1]), r2(zd - 0.5)],
+            "yawDeg": float(p.get("yawDeg", 0.0)), "scale": round(float(s), 3), "castShadow": True,
+            "material": look("Wood")}, round(moved, 1)
+
+
+def fx_plan(anchors: dict, path: Path | None = None):
+    """Track B's fx plan (fx-plan.sarpedon.json, schema unmatched.concept-scene-fx/1): fires [{id, system, anchor
+    brazier | fort-pit, offsetUU, scale, yawDeg}] and waterfall [{id, system, tier, scale, offsetUU?}] resolved on the
+    anchors to absolute fx entries. (None, info) when the file is absent."""
+    path = FX_PLAN if path is None else Path(path)
+    if not path.is_file():
+        return None, {"file": CS.rel(path), "present": False,
+                      "note": "absent: the P8 NS_Env_ConceptFire fires stay; no cascade mist"}
+    plan = CS.load_json(path)
+    if plan.get("schema") != FX_PLAN_SCHEMA:
+        raise SystemExit(f"{CS.rel(path)}: schema {plan.get('schema')!r} != {FX_PLAN_SCHEMA}")
+    out = []
+    for f in plan.get("fires", []):
+        a = anchors.get(f["anchor"])
+        if a is None or a["kind"] != "fire":
+            raise SystemExit(f"fx plan {f['id']}: anchor {f['anchor']!r} is not brazier | fort-pit")
+        loc = np.asarray(a["loc"], float) + np.asarray(f.get("offsetUU", [0.0, 0.0, 0.0]), float)
+        out.append({"id": f["id"], "system": f["system"], "loc": [r2(v) for v in loc],
+                    "yawDeg": float(f.get("yawDeg", 0.0)), "scale": float(f.get("scale", 1.0)),
+                    "seed": seed_of(f["id"]), "warmupS": float(f.get("warmupS", 1.5))})
+    dropped = []
+    for f in plan.get("waterfall", []):
+        a = anchors.get(f"falls-tier-{int(f['tier'])}")
+        if a is None:  # a tier the cascade does not have (the plan's contract: dropped, reported)
+            dropped.append(f["id"])
+            continue
+        loc = np.asarray(a["loc"], float) + np.asarray(f.get("offsetUU", [0.0, 0.0, 0.0]), float)
+        out.append({"id": f["id"], "system": f["system"], "loc": [r2(v) for v in loc],
+                    "yawDeg": float(f.get("yawDeg", 0.0)), "scale": float(f.get("scale", 1.0)),
+                    "seed": seed_of(f["id"]), "warmupS": float(f.get("warmupS", 1.5))})
+    return out, {"file": CS.rel(path), "present": True, "sha256": CS.text_sha256_lf(path),
+                 "fires": len(plan.get("fires", [])), "waterfall": len(plan.get("waterfall", [])) - len(dropped),
+                 "droppedTiers": dropped}
 
 
 def LC_rect_dist(x, y):

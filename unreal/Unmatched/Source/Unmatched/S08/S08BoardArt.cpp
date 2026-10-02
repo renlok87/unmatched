@@ -882,6 +882,8 @@ bool FS08BoardArtData::ParseJson(const FString& Text, TArray<FString>& OutErrors
         }
       }
       if (!ParseRenderBlocks(Pair.Key, *Obj, Profile, OutErrors)) continue;
+      // ENV-MAPS P9: a broken "heroLight" block drops the profile (a board pointing at it then fails the document)
+      if (!S08HeroLight::Parse(Pair.Key, *Obj, Profile.HeroLight, OutErrors)) continue;
       FString Reason;
       if (!Profile.BudgetOk(Reason)) {
         OutErrors.Add(FString::Printf(TEXT("light profile %s over budget: %s"), *Pair.Key, *Reason));

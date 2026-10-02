@@ -7,6 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "S08BoardModel.h"
 #include "S08HeroesV2.h"
+#include "S08HeroLight.h"
 #include "S08Team.h"
 #include "TimerManager.h"
 #include "S08FighterActor.generated.h"
@@ -18,6 +19,8 @@ class UBillboardComponent;
 class UCapsuleComponent;
 class UMaterialInstanceDynamic;
 class UAnimSequenceBase;
+class USpotLightComponent;
+class UPrimitiveComponent;
 
 /** ART-004 T2.2 world-label presentation: the plate owner hides its world
  *  labels (the screen plate replaces them); neighbours show one compact line. */
@@ -94,6 +97,21 @@ public:
   /** Screen-space combat icon mode: the world billboard stays hidden while
    *  the HUD draws the exact-size icon (the trace still reports icon=1). */
   void SetScreenIconMode(bool bScreen);
+
+  // ---- ENV-MAPS P9 hero light (S08HeroLight.h, docs/art-pipeline/ENV-HERO-LIGHT.md) ----
+  /** Builds / updates / removes the per-figure rig: Spec = the active light profile's block (nullptr = no rig), Layers =
+   *  lights for this figure within the board budget (0 = no rig), bFrozen = no breathing pulse (-Bench frames). Call
+   *  after ApplyFighter (the figure height). The figure meshes join lighting channel 1 only while a rig is on. */
+  void ApplyHeroLight(const FS08HeroLightSpec* Spec, int32 LayerCount, bool bFrozen);
+  /** Number of hero light components currently on (0..2). */
+  int32 GetHeroLightCount() const;
+  /** Layer 0 = key, 1 = rim (nullptr when that layer is not built). */
+  const USpotLightComponent* GetHeroLight(int32 Layer) const;
+  ES08HeroLightState GetHeroLightState() const { return HeroLightState; }
+  /** The state multiplier applied last (1 idle, ActiveMul (x pulse) active, DefeatedMul defeated, 0 off). */
+  float GetHeroLightMultiplier() const { return HeroLightMul; }
+  /** The figure primitives that take the hero light (channels 0 + 1 while a rig is on). */
+  TArray<const UPrimitiveComponent*> GetHeroLitPrimitives() const;
 
 protected:
   virtual void BeginPlay() override;
@@ -201,6 +219,28 @@ private:
   void OnHeroClipFinished();
   void OnDeathHoldFinished();
   void BeginHeroDeath();
+
+  // ENV-MAPS P9 hero light: key (0) + rim (1) spot lights on lighting channel 1, created on first use.
+  UPROPERTY()
+  TArray<TObjectPtr<USpotLightComponent>> HeroLights;
+  FS08HeroLightSpec HeroLightSpec;
+  TArray<float> HeroLightBaseCd;  // candelas per layer at multiplier 1
+  int32 HeroLightLayers = 0;
+  bool bHeroLightFrozen = false;
+  bool bHeroLitChannels = false;
+  float HeroLightMul = 0.0f;
+  float HeroLightPhase = 0.0f;
+  ES08HeroLightState HeroLightState = ES08HeroLightState::Off;
+  FString HeroLightRigKey;
+  FString HeroLightTraceKey;
+  FTimerHandle HeroLightPulseTimer;
+  /** Off / Idle / Active / Defeated from the rig, the fighter and the selection / combat markers. */
+  ES08HeroLightState ComputeHeroLightState() const;
+  /** Re-evaluates the state (selection, combat focus, death) and the pulse timer; traces a change. */
+  void RefreshHeroLightState();
+  void ApplyHeroLightIntensity();
+  void OnHeroLightPulse();
+  void SetHeroLitChannels(bool bLit);
 
   FS08BoardFighter Fighter;
 };

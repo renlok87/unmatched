@@ -8,15 +8,18 @@ Pure Python (numpy / scipy), deterministic; the FBX export (k_blender.MeshBuilde
   * rim: the plateau outline from the params' outline entries, each a board point "xy", a C0 pixel "px" cast to its
     ray at "z" (the painted rim / canopy silhouette of sarpedon.paste.json geometry.islandMatte) or a C0 pixel
     "footPx" cast to the sea plane (the painted cliff foot of the near / west cliffs) and moved inwards by its run;
-    the near rim follows the front-cliff top (Y ~345), the waterfall tongue reaches under SM_Env_S_WaterfallLip
-    (loc (-144.1, 425, 0), back x -26 -> Y ~399), the east rim follows the painted red-wall foot of the ship
-    (ship_build.py fit: the hull covers the rest); resampled every rimStepUU, smoothed, organic noise away from the frame;
+    the near rim follows the front-cliff top (Y ~345-352; P9: straight across, the P5c waterfall tongue is gone - the
+    cascade of cascade_build.py runs down this cliff), the east rim follows the painted dock edge (the procedural
+    hull side of ship_build.py stands a little further east over the sea gap); resampled every rimStepUU, smoothed,
+    organic noise away from the frame;
   * top: a Delaunay surface on the rim (the rim vertices are its boundary) with a coarse lattice under the map, the
     normal lattice and a fine lattice in the ring around the frame (K2 close-ups); height = plateau -3, flat and
     exactly -3 inside the map field + frameFlatUU (no face above the map, the frame-002 foot stands on a solid plate:
     no gap), low noise bumps away from the frame, a forest mound (heightZones forest-canopy), the bay ramp down to
     -60 (heightZones bay-water) and a rounded rim;
-  * cliffs: rings from the rim down to the sea plane - bottomExtraUU with three ledges (profile breakpoints),
+  * cliffs: rings from the rim down to the sea plane - bottomExtraUU with three ledges (profile breakpoints; P9 F3:
+    on the front rim under the frame band's near beam the first ring sits on the beam's face plane below its bottom
+    edge - params nearLip - so no grazing lip strip shows in front of the frame, deeper in the cascade outlet),
     per-vertex run (horizontal reach of the cliff foot), jitter of the ledge heights, rock displacement along the
     outward normal and a ragged bottom ring; flat shading (faceted rock), the top is smooth;
   * UV0: one non-overlapping atlas (atlasPx): the top as a planar XY projection (north up), the cliff strips (u =
@@ -174,6 +177,22 @@ def top_surface(P, R, hf):
     return np.c_[pts, Z], T
 
 
+def near_lip_weights(P, R, nrm):
+    """P9 (F3 / F4): per rim vertex, the weight of the near-lip override (1 on the front rim under the frame band's
+    near beam, ramped off past its ends) and the cascade outlet window (1 inside the cascade X range)."""
+    L = P.get("nearLip")
+    n = len(R)
+    if not L:
+        return np.zeros(n), np.zeros(n)
+    X, Y = R[:, 0], R[:, 1]
+    w = (1.0 - CS.smoothstep(L["xHalfUU"], L["xHalfUU"] + L["rampUU"], np.abs(X)))
+    w = w * (nrm[:, 1] > L["minNormalY"]) * (Y > CS.C.FRAME_HY)
+    x0, x1 = L["outletXUU"]
+    r = L["outletRampUU"]
+    win = CS.smoothstep(x0 - r, x0, X) * (1.0 - CS.smoothstep(x1, x1 + r, X))
+    return w, win
+
+
 def cliffs(P, R, runs, z_rim, sea_z):
     n = len(R)
     nrm = CS.vertex_normals_2d(R)
@@ -187,19 +206,42 @@ def cliffs(P, R, runs, z_rim, sea_z):
     seed = P["seed"]
     bottom = sea_z - P["bottomExtraUU"]
     rings = np.zeros((K, n, 3))
+    drop = z_rim - bottom
+    # profile (run fraction s, drop fraction t) per ring and rim vertex
+    S = np.zeros((K, n))
+    T = np.zeros((K, n))
     for k in range(K):
         s = np.full(n, s_br[k])
         t = np.full(n, t_br[k])
         if 0 < k < K - 1:
             s = s + P["ledgeJitterS"] * CS.fbm(arc[:-1], np.full(n, 11.0 * k), P["ledgeNoiseScaleUU"], seed + 31 * k, 3)
             t = t + P["ledgeJitterT"] * CS.fbm(arc[:-1], np.full(n, 7.0 * k), P["ledgeNoiseScaleUU"], seed + 53 * k, 3)
-        drop = z_rim - bottom
+        S[k], T[k] = s, t
+    # P9 F3 / F4: under the frame band's near beam the lip drops steeply (the cliff top tucks under the beam's front
+    # face: no grazing lip strip in front of the frame), deeper in the cascade outlet (the water leaves from under
+    # the beam); later rings stay monotonic
+    L = P.get("nearLip")
+    w = np.zeros(n)
+    if L:
+        w, win = near_lip_weights(P, R, nrm)
+        lip_drop = L["dropUU"] + (L["outletDropUU"] - L["dropUU"]) * win
+        # ring 1 lands on the plane Y = faceYUU (just in front of the beam's front face, below its bottom edge)
+        out = np.clip((L["faceYUU"] - R[:, 1]) / np.maximum(nrm[:, 1], 0.6), L["minOutUU"], None)
+        S[1] = S[1] * (1 - w) + (out / np.maximum(runs, 1.0)) * w
+        T[1] = T[1] * (1 - w) + (lip_drop / np.maximum(drop, 1.0)) * w
+        for k in range(2, K):
+            S[k] = np.maximum(S[k], S[k - 1] + 0.01 * w)
+            T[k] = np.maximum(T[k], T[k - 1] + 0.01 * w)
+    for k in range(K):
+        s, t = S[k], T[k]
         z = z_rim - drop * np.clip(t, 0, 1)
         if k == K - 1:
             z = bottom + P["raggedBottomUU"] * CS.fbm(arc[:-1], np.zeros(n), 70.0, seed + 99, 3)
         disp = np.zeros(n)
         if k > 0:
             disp = P["rockDispUU"] * CS.fbm(arc[:-1], z, P["rockScaleUU"], seed + 17, 4)
+            if k == 1:
+                disp = disp * (1 - w)  # the tucked lip stays on the face plane (no rock pushed out over the beam)
         xy = R + nrm * (runs * np.clip(s, 0, 1.2) + disp)[:, None]
         rings[k] = np.c_[xy, z]
     rings[0, :, 2] = z_rim

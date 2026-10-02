@@ -300,6 +300,9 @@ class ShippedProfile(unittest.TestCase):
         paste = {lt["id"]: lt["loc"] for lt in self.block["lights"]}
         # P8.3 tune: lantern-deck-n's point moved to lantern-bay - at its design.json detail XY (the paste has no light there)
         paste["lantern-bay"] = [-129.7, -397.7, 196.6]
+        # P9 tune: the brazier point stands over track A's brazier bowl (overlay conceptScene.lights.reference
+        # fire-brazier (-577.3, 139.9)), 23 uu further west so its 180 uu pool stays off the map cells
+        paste["fire-brazier"] = [-600.0, 139.9, 90.0]
         for lt in self.lit["lights"]:
             self.assertIn(lt["id"], paste)
             self.assertLess(math.dist(lt["loc"][:2], paste[lt["id"]][:2]), 0.01, lt["id"])
@@ -308,9 +311,10 @@ class ShippedProfile(unittest.TestCase):
         self.assertLessEqual(points + len(self.lit["lights"]), 6)
         self.assertIn("layoutLights", self.lit["hide"])
 
-    def test_hide_brings_sea_and_falls_back(self):
+    def test_hide_brings_sea_back_and_drops_the_p5c_falls(self):
         self.assertNotIn("sea", self.lit["hide"])
-        self.assertNotIn("waterfalls", self.lit["hide"])
+        # ENV-MAPS P9 F4: the P5c sheet / lip / foam go - the scene overlay's multi-tier cascade replaces them
+        self.assertIn("waterfalls", self.lit["hide"])
         self.assertEqual(self.lit["seaZUU"], -300)
         self.assertLessEqual(self.lit["seaZUU"], -3)
 

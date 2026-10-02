@@ -9,7 +9,11 @@
 * rule 12 still fires where it must (synthetic cases: a tall post in the near band, a tree beside the frame with a
   shadow, a scene mesh turned off its authored placement) - the cell rules are not weakened;
 * the contents asked by the task: island / ship / fort / palisade / piles, 12-18 trees, 20-60 rocks, 6 lanterns on
-  their hosts, 2 fires, 3 cannons, the banner hanging vertically 300-325 uu, pack props with a projected look.
+  their hosts, 2 fires, 3 cannons, the banner hanging vertically 300-325 uu, pack props with a projected look;
+* P9: the frame band and the cascade placed, the cannons in the ship's ports (muzzle out of the hull side), the dock
+  props clear of the frame band and the hull side, the banner flat against the hull, track B's fx plan merged
+  (fires on the brazier / fort-pit anchors, mist on the cascade tiers; an unknown tier dropped, an unknown anchor an
+  error), rule 12 still catches scene geometry over frame-002.
 """
 from __future__ import annotations
 
@@ -25,8 +29,12 @@ sys.path.insert(0, str(REPO / "tools/art/concept_scene"))
 sys.path.insert(0, str(REPO / "tools/art/env_kit"))
 
 import cs_common as CS  # noqa: E402
+import frame_band_build as FBB  # noqa: E402
 import layout_check as LC  # noqa: E402
 import scene_layout as SL  # noqa: E402
+import ship_build as SB  # noqa: E402
+
+import numpy as np  # noqa: E402
 
 LAY = CS.load_json(CS.SCENE_LAYOUT)
 BASE = CS.load_json(CS.LAYOUTS / "sarpedon.layout.json")
@@ -49,9 +57,11 @@ class SceneLayout(unittest.TestCase):
 
     def test_contents(self):
         add = {p["id"]: p for p in LAY["props"]["add"]}
-        for n in ("island", "ship", "fort", "palisade", "piles"):
+        for n in ("island", "ship", "fort", "palisade", "piles", "frameband", "cascade", "cascadefoam"):
             p = add[f"scene-{n}"]
             self.assertEqual((p["yawDeg"], p["scale"]), (0.0, 1.0))
+        self.assertTrue(add["scene-frameband"]["castShadow"])
+        self.assertFalse(add["scene-cascade"]["castShadow"] or add["scene-cascadefoam"]["castShadow"])
         trees = [p for p in add.values() if p["id"].startswith("tree-")]
         rocks = [p for p in add.values() if p["id"].startswith("rock-")]
         self.assertTrue(12 <= len(trees) <= 18, len(trees))
@@ -60,7 +70,14 @@ class SceneLayout(unittest.TestCase):
         self.assertEqual(len(lanterns), 6)
         self.assertEqual(len([p for p in add.values() if p["mesh"].endswith("SM_EnvCP_Cannon")]), 3)
         fires = [f for f in LAY["fx"]["add"] if f["system"].endswith("NS_Env_ConceptFire")]
-        self.assertEqual(sorted(f["id"] for f in fires), ["fire-brazier", "fire-fort"])
+        if SL.FX_PLAN.is_file():  # P9: track B's layered fires replace the P8 sprite fires
+            plan = CS.load_json(SL.FX_PLAN)
+            ids = {f["id"] for f in LAY["fx"]["add"]}
+            self.assertEqual(fires, [])
+            for f in plan["fires"] + plan.get("waterfall", []):
+                self.assertIn(f["id"], ids)
+        else:
+            self.assertEqual(sorted(f["id"] for f in fires), ["fire-brazier", "fire-fort"])
         ban = add["banner-ship"]
         self.assertTrue(ban["mesh"].endswith("SM_Env_S_Banner"))
         length = float(ban["scale"]) * CS.params()["banner"]["lengthUU"]
@@ -78,6 +95,76 @@ class SceneLayout(unittest.TestCase):
         merged = LC.merge_overlay(BASE, LAY)
         self.assertEqual(merged["lights"], BASE["lights"])
         self.assertEqual(merged["ground"], BASE["ground"])
+
+
+class P9Placements(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.allp = CS.params()
+        cls.add = {p["id"]: p for p in LAY["props"]["add"]}
+        cls.wall = SB.Wall(cls.allp["ship"])
+        cls.ship = CS.load_json(CS.RUNS["ship"] / "reports" / "ship-build.json")
+
+    def test_cannons_in_the_ports(self):
+        ports = {p["cannon"]: p for p in self.ship["info"]["ports"]}
+        km = SB.kit_metrics()
+        for cid, pt in ports.items():
+            p = self.add[cid]
+            self.assertAlmostEqual(p["yawDeg"], pt["yawDeg"], places=2)
+            self.assertAlmostEqual(p["scale"], pt["scale"], places=3)
+            a = np.radians(p["yawDeg"])
+            R = np.array([[np.cos(a), -np.sin(a), 0.0], [np.sin(a), np.cos(a), 0.0], [0.0, 0.0, 1.0]])
+            axis = R @ (np.array(km["axis"]) * p["scale"]) + np.array(p["loc"])
+            self.assertLess(float(np.linalg.norm(axis - np.array(pt["axisPoint"]))), 0.05, cid)
+            muzzle = axis + R @ np.array([km["muzzleX"] * p["scale"], 0.0, 0.0])
+            d = self.wall.sdz(muzzle)[1]
+            self.assertAlmostEqual(d, -pt["protrusionUU"], delta=0.05, msg=f"{cid}: only the bare barrel leaves the hull")
+            s, _, z = self.wall.sdz(muzzle)
+            self.assertLess(abs(s - pt["s"]) + abs(z - pt["z"]), 0.1, f"{cid}: through the port centre")
+
+    def test_dock_props_clear_of_band_and_hull(self):
+        ext = FBB.outer_extents(self.allp["frameBand"])
+        rect = np.array([[ext["westX"], ext["farY"]], [ext["eastX"], ext["farY"]], [ext["eastX"], ext["nearY"]],
+                         [ext["westX"], ext["nearY"]]])
+        C = self.allp["layout"]["propClearance"]
+        for p in self.allp["layout"]["props"]:
+            fp = LC.footprint(self.add[p["id"]])
+            self.assertGreaterEqual(LC.poly_clearance(fp, rect), C["bandUU"] - 1e-6, p["id"])
+            d = (fp - self.wall.F0) @ self.wall.in2
+            s = (fp - self.wall.F0) @ self.wall.u2
+            along = (s > self.ship["info"]["sNorth"] - C["hullUU"]) & (s < self.ship["info"]["sSouth"])
+            if along.any():
+                self.assertLessEqual(float(d[along].max()), -C["hullUU"] + 1e-6, p["id"])
+
+    def test_banner_flat_against_the_hull(self):
+        b = self.add["banner-ship"]
+        self.assertAlmostEqual(b["yawDeg"], self.wall.out_yaw_deg(), places=2)
+        d = self.wall.sdz(np.array(b["loc"], float))[1]
+        self.assertAlmostEqual(d, -self.allp["layout"]["details"]["bannerOutUU"], delta=0.05)
+
+    def test_fx_plan_merge(self):
+        import tempfile
+        anchors = LAY["conceptScene"]["fxAnchors"]
+        plan = {"schema": SL.FX_PLAN_SCHEMA, "fires": [{"id": "f1", "system": "/Game/EnvKit/FX/NS_X", "anchor": "brazier",
+                                                         "offsetUU": [0, 0, 10], "scale": 2.0}],
+                "waterfall": [{"id": "m1", "system": "/Game/EnvKit/FX/NS_Y", "tier": 2, "scale": 0.5},
+                              {"id": "m9", "system": "/Game/EnvKit/FX/NS_Y", "tier": 9}]}
+        with tempfile.TemporaryDirectory() as td:
+            f = Path(td) / "plan.json"
+            f.write_text(json.dumps(plan), encoding="utf-8")
+            out, info = SL.fx_plan(anchors, f)
+            self.assertEqual([e["id"] for e in out], ["f1", "m1"])
+            self.assertEqual(info["droppedTiers"], ["m9"])
+            b = anchors["brazier"]["loc"]
+            self.assertEqual(out[0]["loc"], [round(b[0], 2), round(b[1], 2), round(b[2] + 10, 2)])
+            self.assertEqual(out[1]["loc"], [round(v, 2) for v in anchors["falls-tier-2"]["loc"]])
+            plan["fires"][0]["anchor"] = "nowhere"
+            f.write_text(json.dumps(plan), encoding="utf-8")
+            with self.assertRaises(SystemExit):
+                SL.fx_plan(anchors, f)
+            out, info = SL.fx_plan(anchors, Path(td) / "absent.json")
+            self.assertIsNone(out)
+            self.assertFalse(info["present"])
 
 
 class Rule12StillFires(unittest.TestCase):
@@ -107,6 +194,15 @@ class Rule12StillFires(unittest.TestCase):
                 p["yawDeg"] = 15.0
         res = LC.check_scene("sarpedon", overlay=o, proxies=PROX)
         self.assertTrue(any("scene-fort" in e and "board space" in e for e in res["errors"]), res["errors"])
+
+    def test_scene_geometry_over_frame002_is_caught(self):
+        prox = copy.deepcopy(PROX)
+        piv = prox["FrameBand"]["pivot"]
+        # a synthetic cluster on frame-002's top (local to the band's pivot)
+        prox["FrameBand"]["clusters"].append([[460.0 - piv[0], 0.0 - piv[1], 5.0], [465.0 - piv[0], 0.0 - piv[1], 5.0],
+                                              [462.0 - piv[0], 5.0 - piv[1], 5.0], [462.0 - piv[0], 2.0 - piv[1], 9.0]])
+        res = LC.check_scene("sarpedon", overlay=LAY, proxies=prox)
+        self.assertTrue(any("scene-frameband" in e and "frame-002" in e for e in res["errors"]), res["errors"])
 
     def test_below_plane_geometry_cannot_cover(self):
         box = [[0.0, 300.0, -200.0], [10.0, 300.0, -200.0], [0.0, 310.0, -200.0], [0.0, 300.0, -150.0]]

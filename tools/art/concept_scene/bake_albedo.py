@@ -55,8 +55,8 @@ Image.MAX_IMAGE_PIXELS = None
 LUMA = np.array([0.2126, 0.7152, 0.0722], np.float32)
 # track A's generators (track B owns ue_import_concept_scene.py / ue_scene_material.py in the same folder)
 TRACK_A_SCRIPTS = ("cs_common.py", "cs_geom.py", "cs_blender.py", "ship_build.py", "island_build.py", "fort_build.py",
-                   "palisade_build.py", "piles_build.py", "banner_build.py", "scene_layout.py", "bake_albedo.py",
-                   "run_scene.py")
+                   "palisade_build.py", "piles_build.py", "banner_build.py", "frame_band_build.py", "cascade_build.py",
+                   "scene_layout.py", "bake_albedo.py", "run_scene.py")
 
 
 # ------------------------------------------------------------------ helpers
@@ -124,9 +124,18 @@ def uv_raster(mesh: CS.Mesh, W: int, H: int):
     return tid, ys, xs, t, np.clip(L, -0.05, 1.05)
 
 
-def frame_band(P: np.ndarray, spec: dict) -> np.ndarray:
+def frame_band(P: np.ndarray, spec: dict, beams: dict | None = None) -> np.ndarray:
     """1 where a ground point lies in the painted-frame band (outside frame-002 minus 2 uu, inside the painted frame's
-    outer edge + 6 uu per side; corners: the painted corner size)."""
+    outer edge + 6 uu per side; corners: the painted corner size). P9: with `beams` (frame_band_build.outer_extents)
+    the band is the frame band mesh's own footprint (+ beamPadUU): the island top there lies under the heavy frame;
+    the sliver between the beam and the painted outer edge on the ground (hidden at C0, seen from the K views) takes
+    the ground of its side like the rest of the top."""
+    if beams is not None:
+        X, Y = P[:, 0], P[:, 1]
+        pad = float(beams.get("padUU", 0.0))
+        inside_outer = (X >= beams["westX"] - pad) & (X <= beams["eastX"] + pad) & (Y >= beams["farY"] - pad) &             (Y <= beams["nearY"] + pad)
+        under_frame = (np.abs(X) <= C.FRAME_HX - 2.0) & (np.abs(Y) <= C.FRAME_HY - 2.0)
+        return inside_outer & ~under_frame
     cut = spec["cut"]
     pw = cut["paintedFrameOuterUU"]
     X, Y = P[:, 0], P[:, 1]
@@ -235,7 +244,9 @@ def bake_mesh(key: str, mesh: CS.Mesh, size: int, zb: dict, plate: np.ndarray, H
     wgt = vis * CS.smoothstep(P["facing"][0], P["facing"][1], facing) * inside
     band = np.zeros(n_tex, bool)
     if key == "Island":
-        band = smooth & frame_band(Pw, spec)
+        import frame_band_build as FBB  # P9 F2: the band is real geometry now
+        beams = dict(FBB.outer_extents(CS.params()["frameBand"]), padUU=float(P["frameBand"].get("beamPadUU", 0.0)))
+        band = smooth & frame_band(Pw, spec, beams)
         wgt = wgt * (~band)
         under = (np.abs(Pw[:, 0]) < C.FRAME_HX - 2) & (np.abs(Pw[:, 1]) < C.FRAME_HY - 2)
         wgt = wgt * (~under)
@@ -298,9 +309,9 @@ def bake_mesh(key: str, mesh: CS.Mesh, size: int, zb: dict, plate: np.ndarray, H
         img = cc0(mat["cc0"], max(64, min(2048, int(round(mat["tileUU"] * rho)))))
         mean = img.reshape(-1, 3).mean(0)
         tex = triplanar(img, Pw[sel], Nw[sel], mat["tileUU"])
+        lt = tex @ LUMA
         # brightness detail of the CC0 (luma ratio: no hue noise) on the local colour; a little of the CC0 hue mixed in
         # at the local brightness
-        lt = tex @ LUMA
         ll = local[sel] @ LUMA
         hue = tex / np.maximum(lt, 1e-4)[:, None] * ll[:, None]
         base = local[sel] * (1 - P["fallbackHueMix"]) + hue * P["fallbackHueMix"]
@@ -476,11 +487,53 @@ def mesh_entries(baked_stats: dict) -> tuple[list, list]:
             out.append(ent)
         else:
             ent["textures"] = {}
-            ent["slots"] = ["/Game/EnvKit/ConceptPaste/MI_EnvCP_Banner"]
-            ent["note"] = ("vertical banner cloth, the P7c M_EnvCP_Banner UV contract (u across, v rail..hem, rod at "
-                           "Blender V 1.04..1.06): slot -> MI_EnvCP_Banner (WPO wind, sigil), not baked")
+            ent.update(EXISTING_MATERIAL[key](ent))
             extra.append(ent)
     return out, extra
+
+
+def _banner_entry(ent: dict) -> dict:
+    return {"slots": ["/Game/EnvKit/ConceptPaste/MI_EnvCP_Banner"],
+            "note": ("vertical banner cloth, the P7c M_EnvCP_Banner UV contract (u across, v rail..hem, rod at "
+                     "Blender V 1.04..1.06): slot -> MI_EnvCP_Banner (WPO wind, sigil), not baked")}
+
+
+def _material_route_entry(names: list[str], note: str):
+    """P9: meshes whose slots take track B's material-route MIs (ue_scene_material.MATERIAL_LOOKS: MAP_ROOT/
+    MI_EnvScene_<Name>), one MI per slot in slot order; not baked."""
+    def f(ent: dict) -> dict:
+        slots = [f"{CS.UE_DIR}/MI_EnvScene_{n}" for n in names]
+        return {"slots": slots, "mi": slots[0], "note": note}
+    return f
+
+
+EXISTING_MATERIAL = {
+    "Banner": _banner_entry,
+    "FrameBand": _material_route_entry(["FrameWood", "FrameIron"], (
+        "P9 F2 the heavy dark frame band around frame-002: slot 0 the bevelled beams (FrameWood: Planks023A dark), slot 1 "
+        "the iron corner brackets / mid straps / rivets (FrameIron: the frame-002 iron); box-mapped tiling UV0 (1 UV = "
+        "frameBand.uvTileUU uu), castShadow true, Lumen GI on")),
+    "Cascade": _material_route_entry(["FallsSheet"], (
+        "P9 F4 the cascade sheets (4 streams x 4 tiers down the front cliff): UV0 u across the whole cascade 0..1, v "
+        "along the flow 0..1 per tier (a UV island per tier: lip foam + landing fade each), authored lane K style "
+        "(Blender v = s / L, flipped by the FBX import: FallCard.w = 1); castShadow false, translucent; not in the "
+        "bake's depth buffer")),
+    "CascadeFoam": _material_route_entry(["FallsFoam"], (
+        "P9 F4 the foam pads on the 3 ledges + the sea foot: UV0 u across the cascade 0..1, v from the landing edge 0 "
+        "to the outer edge 1 (Blender v; FallCard.w = 1: foam at the landing, fade outwards); castShadow false")),
+}
+
+
+def materials_block() -> dict:
+    """Top-level manifest 'materials': this build's values for track B's material-route MIs (FallCard = the
+    cascade's measured stream size; the pads' depth)."""
+    rep = CS.load_json(CS.RUNS["props"] / "reports" / "cascade-build.json")
+    card = rep["info"]["fallCard"]
+    depth = CS.params()["cascade"]["foamDepthUU"]
+    return {"FallsSheet": {"vectors": {"FallCard": [card[0], card[1], 0.0, 1.0]},
+                           "note": "FallCard.xy = the cascade width x the mean tier length (uu) of reports/cascade-build.json"},
+            "FallsFoam": {"vectors": {"FallCard": [card[0], round((depth["ledge"] + depth["sea"]) / 2, 1), 0.0, 1.0]},
+                          "note": "FallCard.xy = the cascade width x the mean pad depth (uu)"}}
 
 
 def look_entries(cfg: dict) -> list:
@@ -542,6 +595,9 @@ def write_manifest(baked_stats: dict, proj_stats: dict | None):
                                     "baked into the texels), outside the rect: clamp",
                       "stats": proj_stats},
         "looks": looks,
+        "materials": materials_block(),
+        "materialsNote": "P9: value overrides of track B's material-route MIs (ue_scene_material.MATERIAL_LOOKS) named by "
+                         "the meshesExistingMaterial slots (frame band, cascade)",
         "looksNote": "projected-albedo MIs MI_EnvScene_Proj_<name> of M_EnvScene (track B, ue_scene_material.mi_plan) "
                      "named by the layout's optional prop field 'material' (all slots of the prop); FallbackTint = the "
                      "measured mean of the albedo plate over the C0 projections of the props using the look (linear "
@@ -553,7 +609,6 @@ def write_manifest(baked_stats: dict, proj_stats: dict | None):
                                    "sha256": CS.load_json(CS.PLATES / "manifest.json")["files"][CS.ALBEDO_PLATE["file"]]["sha256"],
                                    "conceptRectPx": CS.ALBEDO_PLATE["conceptRectPx"],
                                    "registration": "tools/art/concept_paste/registration.json maps.sarpedon.extended2x"},
-                   "polyhaven": "C:/tmp/envmaps-research/p8/polyhaven/manifest.json (CC0)",
                    "cc0": CS.CC0_RAW.as_posix()},
         "params": {"file": CS.rel(CS.PARAMS_PATH), "sha256": CS.text_sha256_lf(CS.PARAMS_PATH)},
         "generator": {CS.rel(HERE / f): CS.text_sha256_lf(HERE / f) for f in TRACK_A_SCRIPTS},
@@ -609,7 +664,8 @@ def main(argv=None) -> int:
     R = np.array([[math.cos(a_), -math.sin(a_), 0], [math.sin(a_), math.cos(a_), 0], [0, 0, 1]])
     meshes["Banner"] = CS.Mesh("SM_Env_S_Banner", bm.V * bp["scale"] @ R.T, bm.F, bm.UV, bm.MAT, bm.SMOOTH, bm.slots,
                                bp["loc"])
-    zb = scene_zbuf(meshes, lay, P["zbufPxPerC0"])
+    # the translucent cascade water does not hide the cliff behind it from C0 (the painted water lands on the rock)
+    zb = scene_zbuf({k: m for k, m in meshes.items() if k not in RS.WATER}, lay, P["zbufPxPerC0"])
     print(f"BAKE zbuf {zb['w']}x{zb['h']} in {time.time() - t0:.1f} s")
     only = [s for s in a.only.split(",") if s]
     old = CS.load_json(CS.MANIFEST_PATH) if CS.MANIFEST_PATH.is_file() else {}

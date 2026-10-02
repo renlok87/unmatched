@@ -81,6 +81,9 @@ Checks (every one is an error unless marked warn):
     sizes for /Game/EnvKit/ConceptPaste/SM_EnvCP_*), the scene meshes by their cluster hulls; trees / bushes within
     SCENE_TREE_NO_SHADOW_UU of the frame must not cast shadows (task R5); Fab scale ranges and NoAI as rule 11.
     The tray / apron / near-band rules 2 / 4 do not apply (the tray is hidden in the scene mode, the island replaces it).
+    P9: the frame band, the procedural ship and the cascade (SM_Env_S_FrameBand / Ship / Cascade / CascadeFoam) are
+    scene meshes like the others (same proxies, rules 6 / 7); in addition no scene-mesh geometry above Z 0 may lie over
+    frame-002 or the map field (|X| < 469.667 and |Y| < 312.667): the frame band wraps frame-002, it never covers it.
 
 Usage:
   python -B tools/art/env_kit/layout_check.py                       # both maps, text report
@@ -1172,6 +1175,13 @@ def check_scene(key: str = "sarpedon", overlay_path: Path | None = None, overlay
         m = SCENE_MESH_RE.match(p.get("mesh", ""))
         if m and m.group(1) != "Banner" and (abs(float(p.get("yawDeg", 0))) > 1e-6 or abs(float(p.get("scale", 1)) - 1) > 1e-6):
             err.append(f"prop {p['id']}: scene meshes are authored in board space (yaw 0, scale 1)")
+        if m and sh:
+            # P9 (frame band, ship, cascade): no scene-mesh geometry above the map plane over frame-002 or the map field
+            pts = np.vstack(sh)
+            over = (pts[:, 2] > 0.0) & (np.abs(pts[:, 0]) < FRAME_HX) & (np.abs(pts[:, 1]) < FRAME_HY)
+            if over.any():
+                err.append(f"prop {p['id']}: scene mesh geometry above Z 0 over frame-002 / the map field "
+                           f"({int(over.sum())} proxy points)")
         if fe and fe["kind"] in ("tree", "bush") and p.get("castShadow") and \
                 frame_dist(*p["loc"][:2]) < SCENE_TREE_NO_SHADOW_UU:
             err.append(f"prop {p['id']}: tree within {SCENE_TREE_NO_SHADOW_UU:g} uu of the frame casts a shadow (R5)")

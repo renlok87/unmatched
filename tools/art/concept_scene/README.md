@@ -1,4 +1,4 @@
-# tools/art/concept_scene: the lit 3D island under the Sarpedon painting (ENV-MAPS P8, path 1, track A)
+# tools/art/concept_scene: the lit 3D island under the Sarpedon painting (ENV-MAPS P8 / P9, path 1, track A)
 
 Task contract: `docs/art-pipeline/ENV-P8-3D-UNDER-PAINT-TASK.md` (§4 P8.1). Status of everything here: *proposed /
 technically exported / measured* (headless Blender and Python only, no UE run yet); the art acceptance is the user's.
@@ -28,14 +28,15 @@ session).
 
 | Step | Script | Output |
 |---|---|---|
-| ship prep | `ship_build.py -- prep` (Blender) | Poly Haven CC0 `dutch_ship_large_01` hull decimated to `hullPrepTris`; spars by principal-axis thickness -> `<work>/ship_raw.npz` |
-| ship fit | `ship_build.py fit` | yaw / position / scale fitted to the painted hull by C0-silhouette IoU (waterline fixed at the sea plane -300), the far hull below the deck cut, masts rebuilt at the painted mast pixels, dock line; `reports/ship-fit.json`, overlay `<work>/overlays/ship-silhouette-c0.jpg` |
-| island | `island_build.py --overlay` | rim from the island matte (C0 rays), the near front-cliff rim, the waterfall tongue under `SM_Env_S_WaterfallLip`, the east rim on the painted red-wall foot; Delaunay top (flat -3 under the map and frame), cliffs to -315 with 3 ledges, authored UV atlas; `reports/island-build.json` |
+| frame band (P9 F2) | `frame_band_build.py` | the painted heavy dark frame around frame-002: bevelled plank beams (outer top edges on the C0 rays of the painted outer edges, the near beam's tall front face over the tucked lip), iron corner brackets / mid straps / rivets; two slots (track B's `MI_EnvScene_FrameWood` / `FrameIron`), box-mapped tiling UV0; `reports/frameband-build.json` (C0 coverage of the painted frame), overlay `<work>/overlays/frameband-c0.jpg` |
+| ship (P9 F1) | `ship_build.py` | procedural on the painted pixels (no Poly Haven hull): a vertical wall plane through the painted foot line of the red hull side, the rail cap on the painted rail (level ~290 uu), clinker strakes, three gun ports at the painted cannon muzzles, wales, deck 90 uu under the rail, far bulwark, hull to the keel, stern transom clear of the frame band, bow beyond the canvas, the main mast raked along the painted mast line with a yard, a furled sail and shrouds, the rail-lantern post; `reports/ship-build.json` (C0 fit, ports, lantern), overlay `<work>/overlays/ship-c0.jpg` |
+| island | `island_build.py --overlay` | rim from the island matte (C0 rays), the near front-cliff rim (straight: P9 dropped the P5c waterfall tongue), the east rim on the painted dock edge; Delaunay top (flat -3 under the map and frame), cliffs to -315 with 3 ledges, the front lip tucked under the frame band's near beam (`nearLip`, P9 F3), authored UV atlas; `reports/island-build.json` |
+| cascade (P9 F4) | `cascade_build.py` | the wide multi-tier waterfall on the island's front cliff in the `nearLip` outlet: 4 streams x 4 tiers (lip -> ledges 1-3 -> the sea), held off the rock, every drop bowed outward; UV0 u across the cascade, v per tier (lane K convention, `FallCard.w` 1); foam pads on the landings; tier landings = the mist / spray anchors; `reports/cascade-build.json` (C0 painted-width coverage), overlay `<work>/overlays/cascade-c0.jpg` |
 | fort | `fort_build.py` | chamfered stone blocks along the painted base line, ragged top = the painted silhouette, the arch left open, rubble |
 | palisade, piles | `palisade_build.py`, `piles_build.py` | logs / posts / rope bands / rope spans from C0 pixels (foot = ray hit on the island) |
 | banner | `banner_build.py` | vertical cloth (the P7c `M_EnvCP_Banner` UV contract), not baked |
 | export | `cs_blender.py export` (Blender) | `k_blender.MeshBuilder` -> UM_FBX_v1 FBX (deterministic), Smart UV atlas for the non-island meshes, read-back, final NPZ |
-| layout | `scene_layout.py` | `EnvLayouts/sarpedon.scene.layout.json` (overlay, variant `scene`) + `scene-proxies.sarpedon.json` (geometry hulls for `layout_check` rule 12) |
+| layout | `scene_layout.py` | `EnvLayouts/sarpedon.scene.layout.json` (overlay, variant `scene`) + `scene-proxies.sarpedon.json` (geometry hulls for `layout_check` rule 12); P9: the frame band / cascade meshes, the dock props kept clear of the band and the hull side, the cannons in the ports, the rail lantern on its post arm, the banner flat on the hull, track B's `fx-plan.sarpedon.json` merged (`conceptScene.fxAnchors` / `fxPlan`) |
 | ao | `cs_blender.py ao` (Cycles CPU) | `<work>/ao/*_AO.png` |
 | bake | `bake_albedo.py` | `scraped-data/derived/concept-scene/sarpedon/T_Env_S_<Name>_{BC,N,ORM}.png` + `T_Env_S_AlbedoC0.png` (gitignored), `manifest.sarpedon.json` |
 
@@ -53,9 +54,41 @@ session).
   banner is the exception: its loc, yaw and scale come from the layout.
 - Sea: the cliffs and the ship's waterline reach -300 (task R3). An overlay may not change `ground`, so the base sea
   ring stays at -172 until the profile lowers it. The cliffs continue under the opaque sea.
+- P9 `meshesExistingMaterial`: the banner (`MI_EnvCP_Banner`), the frame band (slots `MI_EnvScene_FrameWood`,
+  `MI_EnvScene_FrameIron`), the cascade (`MI_EnvScene_FallsSheet`) and its foam (`MI_EnvScene_FallsFoam`) - track B's
+  material-route MIs of `ue_scene_material.py`, one per slot; the top-level `materials` block carries this build's
+  values (the cascade's `FallCard`). The frame band is not baked but stays an occluder of the island bake; the
+  cascade is neither baked nor an occluder (translucent).
+- P9 fx: `fx-plan.sarpedon.json` (track B, schema `unmatched.concept-scene-fx/1`) is merged by `scene_layout.py` when
+  present (its fires replace the P8 `NS_Env_ConceptFire` entries; a waterfall entry of a tier the cascade does not
+  have is dropped and reported); anchors `brazier`, `fort-pit`, `falls-tier-1..4` are written to the overlay's
+  `conceptScene.fxAnchors`. In lit3d the cascade replaces the P5c ground waterfall: the profile's `lit3d.hide` must
+  list `waterfalls` (track B, overlay note `conceptScene.lit3dHide`).
 
 ## Out of git (ENV-U3 / ENV-U7)
 
 Every image derived from the concept stays out of git: the atlases, the projected plate and the overlays. They live
 in `scraped-data/derived/concept-scene/` (gitignored by `scraped-data/`) and in `<work>`. Git holds the scripts, the
 params, the FBX files (each <= 15 MB), the reports and the sha256 manifest.
+
+## P9 (2026-10-02): the six fixes, track A part (F1 ship, F2 frame band, F3 front lip, F4 cascade)
+
+Status: *proposed / technically exported / measured on the plate at C0* (no UE run in this stage). Self-check numbers
+(headless, out-of-git overlays in `<work>/overlays/` and `C:/tmp/envmaps-research/p9/scratch/`):
+
+| Fix | What | Self-check |
+|---|---|---|
+| F1 ship | procedural near side on the painted pixels (`ship_build.py`), cannons in the ports, dock props re-picked, 2 barrels on the deck, banner flat on the hull, `scene-tune` Ship `BakedTint` 0.75 (the rest stays 0.45) | visible C0 silhouette IoU vs the painted ship 0.73 (P8 Poly Haven fit 0.65), rail pixel RMS 1.5 px, muzzles on their pixels (< 1 px) |
+| F2 frame band | `frame_band_build.py`: dark beams + iron around frame-002, top <= 12.1 < frame-002 12.4 | 96.8 % of the painted frame band covered at C0, rule 12 clearance 21.8 px |
+| F3 front lip | `island.nearLip`: the lip tucked under the beam's face, the band's planks fill limited to the beams' footprint | lip / neighbour cliff Laplacian variance on the bake preview: K1 1.23 / 1.06, C0 1.16-1.27, K1x0.65 1.17-1.96 (>= 0.7) |
+| F4 cascade | `cascade_build.py`: 4 streams x 4 tiers + foam pads, mist anchors for track B's plan | painted width (C0 x 640-1000) covered 91 % in the C0 frame, 92.5 % on the extended canvas |
+
+## P9 integrate / tune (2026-10-02, measured in UE; evidence `docs/game-design/evidence/ENV-MAPS/p9-fixes-hero-light-2026-10-02/`)
+
+- `cascade.uvPerStream` (scene-params): every stream has its own u 0..1 and the streams overlap by 8 uu, so
+  `M_EnvWaterfall`'s wobbling side fades soften each stream (the UE frames read four rectangular panels with straight
+  rock gaps); `FallCard.x` = the mean stream width (82.5 uu).
+- `layout.footRocks` entries may name a `mesh`: `rock-falls-*` = 8 wet Fab rocks on the cascade outline (outlet top
+  corners, between streams on tiers 2 / 3, its lower sides, the sea foot).
+- `scene-tune.sarpedon.json`: Ship `BakedTint` 1.3; `materials` FrameWood `BakedTint` (0.63, 0.48, 0.42) (the band read
+  dL* -6.4 under the painted frame), FrameIron 1.3, FallsSheet `FallLook` (0.5, 0.96, 0.9, 1) / `FallFlow` side 30 uu.

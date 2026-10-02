@@ -1,24 +1,30 @@
-"""ENV-MAPS P8.1 ship (ASSET-ENV-S-SHIP-001): Poly Haven CC0 dutch_ship_large_01 fitted to the painted ship by C0 pixels.
+"""ENV-MAPS P9 F1 ship (ASSET-ENV-S-SHIP-001 / SM_Env_S_Ship): the painted red-walled gun deck next to the board,
+built at its C0 pixels.
 
-Two stages (one file, two interpreters):
+  python -B tools/art/concept_scene/ship_build.py      # -> <work>/SM_Env_S_Ship.pre.npz + reports/ship-build.json
 
-  1. prep (Blender headless):
-       blender -b --factory-startup --python-exit-code 1 --python tools/art/concept_scene/ship_build.py -- prep
-     imports C:/tmp/envmaps-research/p8/polyhaven/dutch_ship_large_01/*.gltf (CC0, sha256 in that folder's manifest),
-     keeps the hull and the thick spars of the rigging (masts / yards: loose parts whose 2nd principal std >=
-     sparMinStdM and length >= sparMinLenM; ropes, blocks and sails are dropped - the painting shows them, a decimated
-     rope reads as noise), decimates (collapse) to the params' budgets and writes the model-frame arrays (UE numbers,
-     uu) to <work>/ship_raw.npz.
-  2. fit (system Python):
-       python -B tools/art/concept_scene/ship_build.py fit
-     fits yaw / position / scale / waterline of the model to the painted hull region (params ship.targetPx, C0 px:
-     the hull + deck between the island dock line and the far rail, read on the de-lit plate) by maximising the C0
-     silhouette IoU (Nelder-Mead from two bow directions, coarse then fine raster), cuts the far hull below the deck
-     (invisible from every game camera: faces of the far side under deckCutZ), puts the pivot at the waterline below
-     the hull centre and writes <work>/SM_Env_S_Ship.pre.npz (UE numbers local to the pivot, yaw 0, scale 1) +
-     the silhouette overlay on the de-lit plate (out of git, C0 frame) and reports/ship-fit.json (git).
+P8 fitted the Poly Haven CC0 dutch_ship_large_01 hull to the painted ship by C0 silhouette IoU with the waterline pinned
+at the sea plane: its deck landed at the dock level (-4.7), its near bulwark ~70 uu high and far behind the painted
+one, the cannons / rail lantern ended below the dock (z -40 .. -108) - a dark, far mass. The painting has a tall red
+hull side right next to the dock: rail cap, gun ports with the three cannons, the deck behind the rail with the main
+mast, rigging and a furled sail, and the hull going down into the sea past the island's SE corner.
 
-The FBX export (UM_FBX_v1, Smart UV atlas for the bake) is cs_blender.py 'export' (run_scene.py drives everything).
+P9 builds that side procedurally on the painted pixels (no Poly Haven hull: P8's model is no longer exported):
+  * the wall plane: a vertical plane through the painted foot line of the red wall on the dock (params footPx, the C0
+    rays on Z footZ, least squares); the rail cap's top = the painted rail pixels (railPx) cast onto that plane (the
+    heights come out constant within a few uu, ~290 uu: the plane is consistent with the painting);
+  * the near hull side: clinker strakes (each strake's lower edge out by clinkUU) from the bilge up to the rail cap,
+    with three gun ports cut at the painted cannons (the cannon centre pixel on the plane portOutUU outside the wall
+    = the barrel axis point; port box portDepthUU deep, a frame around it), two wales split around the ports;
+  * the hull: a loft of one cross-section (near side, bilge quarter-ellipse to the keel, far side, far bulwark, the
+    deck deckDropUU under the rail, near bulwark inner face) from the stern transom (north, kept clear of the frame
+    band) to the bow (south, beyond the extended canvas; the last bowUU narrow to a stem); rail caps on both bulwarks,
+    stanchions on the near rail, a tall post for the rail lantern;
+  * the rig: the painted masts (foot = C0 ray on the deck, top on the painted top row, radius from the painted width)
+    with rope bands, a yard with a furled sail on the main mast and shrouds from the rails.
+Faces are CCW outward (cs_common.Mesh); UVs come from the Smart UV atlas of cs_blender.py 'export'; the albedo is
+baked from the plate like every scene mesh (bake_albedo.py). The ports (centre, axis) and the deck plane go to the
+build report: scene_layout.py puts the cannons into the ports and the deck props on the deck.
 """
 from __future__ import annotations
 
@@ -27,365 +33,506 @@ import math
 import sys
 from pathlib import Path
 
+import numpy as np
+
 HERE = Path(__file__).resolve().parent
-try:
-    import bpy  # noqa: F401
-    IN_BLENDER = True
-except ImportError:
-    IN_BLENDER = False
-
-if IN_BLENDER:
-    import numpy as np
+if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
-    import cs_blender as CBL  # noqa: E402
+import cs_common as CS  # noqa: E402
+import cs_geom as G  # noqa: E402
 
-    def prep():
-        P = json.loads((HERE / "scene-params.sarpedon.json").read_text(encoding="utf-8"))["ship"]
-        work = Path(P["work"])
-        bpy.ops.wm.read_factory_settings(use_empty=True)
-        bpy.ops.import_scene.gltf(filepath=P["source"])
-        objs = {o.name: o for o in bpy.context.scene.objects if o.type == "MESH"}
-        out = {}
-        hull = next(o for n, o in objs.items() if n.endswith("_hull"))
-        rig = next(o for n, o in objs.items() if n.endswith("_rigging"))
-        # spars: loose parts of the rigging by principal-axis thickness
-        import bmesh
-        bm = bmesh.new()
-        bm.from_mesh(rig.data)
-        bm.transform(rig.matrix_world)
-        bm.verts.ensure_lookup_table()
-        comp = [-1] * len(bm.verts)
-        parts = []
-        for v in bm.verts:
-            if comp[v.index] >= 0:
-                continue
-            stack, cur = [v], []
-            comp[v.index] = len(parts)
-            while stack:
-                u = stack.pop()
-                cur.append(u.index)
-                for e in u.link_edges:
-                    w = e.other_vert(u)
-                    if comp[w.index] < 0:
-                        comp[w.index] = len(parts)
-                        stack.append(w)
-            parts.append(cur)
-        keep = set()
-        for i, idx in enumerate(parts):
-            co = np.array([bm.verts[j].co[:] for j in idx])
-            if len(co) < 8:
-                continue
-            c = co - co.mean(0)
-            sv = np.linalg.svd(c, compute_uv=False) / math.sqrt(len(co))
-            length = float(np.ptp(c @ np.linalg.svd(c, full_matrices=False)[2][0]))
-            if sv[1] >= P["sparMinStdM"] and length >= P["sparMinLenM"]:
-                keep.add(i)
-        drop = [f for f in bm.faces if comp[f.verts[0].index] not in keep]
-        bmesh.ops.delete(bm, geom=drop, context="FACES")
-        loose = [v for v in bm.verts if not v.link_faces]
-        bmesh.ops.delete(bm, geom=loose, context="VERTS")
-        me = bpy.data.meshes.new("spars")
-        bm.to_mesh(me)
-        bm.free()
-        spars = bpy.data.objects.new("spars", me)
-        bpy.context.scene.collection.objects.link(spars)
-        stats = {"sparParts": len(keep), "rigParts": len(parts)}
-        for key, o, budget in (("hull", hull, P["hullPrepTris"]), ("spars", spars, P["sparTris"])):
-            tris = sum(len(p.vertices) - 2 for p in o.data.polygons)
-            if tris > budget:
-                mod = o.modifiers.new("dec", "DECIMATE")
-                mod.decimate_type = "COLLAPSE"
-                mod.ratio = budget / tris
-                mod.use_collapse_triangulate = True
-                bpy.context.view_layer.objects.active = o
-                o.select_set(True)
-                bpy.ops.object.modifier_apply(modifier=mod.name)
-            V, F, UV, MAT = CBL.object_arrays(o, world=True)
-            out[key + "_V"], out[key + "_F"] = V, F
-            stats[key + "Tris"] = int(len(F))
-            stats[key + "SourceTris"] = int(tris)
-        CBL.save_npz(work / "ship_raw.npz", out)
-        (work / "ship_raw.json").write_text(json.dumps(stats, indent=1), encoding="utf-8")
-        print("SHIP-PREP", stats)
+NAME = "SM_Env_S_Ship"
+SLOT = "MI_Env_S_Ship"
 
-    if __name__ == "__main__":
-        import k_blender as K  # noqa: E402  (path set by cs_blender)
-        a = K.script_args()
-        if a and a[0] == "prep":
-            prep()
-        else:
-            raise SystemExit("usage: ship_build.py -- prep")
 
-else:
-    import numpy as np
-    from PIL import Image, ImageDraw
-    from scipy.optimize import minimize
+# ------------------------------------------------------------------ the painted wall
+class Wall:
+    """Ship frame from the painted wall: P(s, d, z) = F0 + u s + n_in d + z; d = 0 the outer face of the near hull
+    side, d > 0 into the ship; u runs north -> south along the wall."""
 
-    sys.path.insert(0, str(HERE))
-    import cs_common as CS  # noqa: E402
+    def __init__(self, P: dict):
+        cam = CS.cam0()
+        F = np.array([CS.ray_z(x, y, P["footZ"]) for x, y in P["footPx"]])
+        A = np.c_[F[:, 1], np.ones(len(F))]
+        (k, b), *_ = np.linalg.lstsq(A, F[:, 0], rcond=None)
+        self.k, self.b = float(k), float(b)
+        self.foot_res = [round(float(v), 2) for v in (F[:, 0] - (k * F[:, 1] + b))]
+        u = np.array([k, 1.0])
+        self.u2 = u / np.linalg.norm(u)
+        n_out = np.array([-1.0, k])
+        self.out2 = n_out / np.linalg.norm(n_out)  # towards the board (west)
+        self.in2 = -self.out2
+        self.F0 = np.array([b, 0.0])
+        self.cam = cam
+        rail = np.array([self.on_plane(x, y, 0.0) for x, y in P["railPx"]])
+        s = np.array([self.sdz(p)[0] for p in rail])
+        z = rail[:, 2]
+        (ra, rb), *_ = np.linalg.lstsq(np.c_[np.ones(len(s)), s], z, rcond=None)
+        self.rail_a, self.rail_b = float(ra), float(rb)
+        self.rail_pts = rail
+        self.rail_res = [round(float(v), 2) for v in z - (ra + rb * s)]
 
-    def rot(yaw_deg):
-        a = math.radians(yaw_deg)
-        return np.array([[math.cos(a), -math.sin(a), 0.0], [math.sin(a), math.cos(a), 0.0], [0.0, 0.0, 1.0]])
+    def P(self, s, d, z):
+        s, d, z = np.broadcast_arrays(np.asarray(s, float), np.asarray(d, float), np.asarray(z, float))
+        xy = self.F0 + s[..., None] * self.u2 + d[..., None] * self.in2
+        return np.concatenate([xy, z[..., None]], -1)
 
-    def transform(V, x):
-        """model (UE numbers, uu, waterline Z 0) -> board: scale s, yaw, translate (tx, ty, zw)."""
-        tx, ty, yaw, s, zw = x
-        return (V * s) @ rot(yaw).T + np.array([tx, ty, zw])
+    def sdz(self, p):
+        q = np.asarray(p[:2], float) - self.F0
+        return float(q @ self.u2), float(q @ self.in2), float(p[2])
 
-    def load_raw(P):
-        d = np.load(Path(P["work"]) / "ship_raw.npz")
-        V = np.vstack([d["hull_V"], d["spars_V"]])
-        F = np.vstack([d["hull_F"], d["spars_F"] + len(d["hull_V"])])
-        part = np.r_[np.zeros(len(d["hull_F"]), int), np.ones(len(d["spars_F"]), int)]
-        return V, F, part
+    def on_plane(self, px, py, d=0.0):
+        """The C0 ray of pixel (px, py) on the plane parallel to the wall at inward distance d."""
+        r = self.cam.rays(np.array(float(px)), np.array(float(py)))
+        r = r / np.linalg.norm(r)
+        n3 = np.r_[self.in2, 0.0]
+        p0 = np.r_[self.F0 + self.in2 * d, 0.0]
+        t = ((p0 - self.cam.pos) @ n3) / (r @ n3)
+        return self.cam.pos + t * r
 
-    class Fitter:
-        def __init__(self, P, V, F, scale_px):
-            self.P, self.V, self.F = P, V, F
-            self.cam = CS.cam0()
-            self.rect = CS.RECT_B
-            self.w = int((self.rect[2] - self.rect[0]) * scale_px)
-            self.h = int((self.rect[3] - self.rect[1]) * scale_px)
-            self.target = CS.poly_mask(P["targetPx"], self.w, self.h, self.rect)
-            self.island = CS.poly_mask(CS.spec()["geometry"]["islandMatte"]["poly"], self.w, self.h, self.rect)
-            self.hullF = F
+    def on_z(self, px, py, z):
+        return CS.ray_z(px, py, z)
 
-        def mask(self, x):
-            Pw = transform(self.V, x)
-            depth, _ = CS.raster_tris(self.cam, Pw, self.F, self.w, self.h, rect=self.rect)
-            return np.isfinite(depth)
+    def rail_z(self, s):
+        return self.rail_a + self.rail_b * np.asarray(s, float)
 
-        def score(self, x):
-            m = self.mask(x)
-            inter = (m & self.target).sum()
-            union = (m | self.target).sum()
-            # the ship must not cover the island dock / frame side of the target line
-            spill = (m & ~self.target & self.island).sum() / max(self.target.sum(), 1)
-            return float(inter / max(union, 1)) - self.P["spillWeight"] * float(spill)
+    def yaw_deg(self) -> float:
+        return math.degrees(math.atan2(self.u2[1], self.u2[0]))
 
-    def fit(P):
-        V, F, part = load_raw(P)
-        hullF = F[part == 0]
-        best = None
-        log = []
-        zw = float(P["waterlineZ"])
-        for yaw0 in P["yawStartsDeg"]:
-            x0 = np.array([*P["start"]["xy"], yaw0, P["start"]["scale"]], float)
-            for stage, (spx, it) in enumerate(((0.25, P["iterCoarse"]), (0.5, P["iterFine"]))):
-                fz = Fitter(P, V, hullF, spx)
-                steps = np.array(P["simplexSteps"], float) / (1 + stage)
-                sim = [x0] + [x0 + np.eye(4)[k] * steps[k] for k in range(4)]
-                res = minimize(lambda x: -fz.score(np.r_[x, zw]), x0, method="Nelder-Mead",
-                               options={"initial_simplex": np.array(sim), "maxiter": it, "xatol": 0.5, "fatol": 1e-4})
-                x0 = res.x
-                log.append({"yawStart": yaw0, "stage": stage, "iou": round(-float(res.fun), 4),
-                            "x": [round(float(v), 3) for v in res.x], "evals": int(res.nfev)})
-            if best is None or -res.fun > best[0]:
-                best = (-float(res.fun), np.r_[x0, zw])
-        return best, log, (V, F, part)
+    def out_yaw_deg(self) -> float:
+        return math.degrees(math.atan2(self.out2[1], self.out2[0]))
 
-    def ray_mesh(o, d, Pw, F):
-        """Nearest hit distance of the ray o + t d with triangles (Moller-Trumbore, vectorised); inf if none."""
-        a, b, c = Pw[F[:, 0]], Pw[F[:, 1]], Pw[F[:, 2]]
-        e1, e2 = b - a, c - a
-        pv = np.cross(d, e2)
-        det = np.einsum("ij,ij->i", e1, pv)
-        ok = np.abs(det) > 1e-12
-        inv = np.where(ok, 1.0 / np.where(ok, det, 1.0), 0.0)
-        tv = o - a
-        u = np.einsum("ij,ij->i", tv, pv) * inv
-        qv = np.cross(tv, e1)
-        v = (qv @ d) * inv
-        t = np.einsum("ij,ij->i", e2, qv) * inv
-        hit = ok & (u >= 0) & (v >= 0) & (u + v <= 1) & (t > 1)
-        return float(t[hit].min()) if hit.any() else math.inf
 
-    def cylinder(foot, top, radius, seg=12):
-        """Closed tapered cylinder (top radius 0.7) from foot to top; UVs filled later by the Smart UV atlas."""
-        ax = top - foot
-        L = np.linalg.norm(ax)
-        ax = ax / L
-        ref = np.array([1.0, 0.0, 0.0]) if abs(ax[0]) < 0.9 else np.array([0.0, 1.0, 0.0])
-        u = np.cross(ax, ref)
-        u /= np.linalg.norm(u)
-        v = np.cross(ax, u)
-        ang = np.arange(seg) * 2 * math.pi / seg
-        ring0 = foot + radius * (np.cos(ang)[:, None] * u + np.sin(ang)[:, None] * v)
-        ring1 = top + 0.7 * radius * (np.cos(ang)[:, None] * u + np.sin(ang)[:, None] * v)
-        V = np.vstack([ring0, ring1, top[None]])
+# ------------------------------------------------------------------ mesh helpers
+def orient_out(V, F, centre_fn):
+    P = V[F]
+    n = np.cross(P[:, 1] - P[:, 0], P[:, 2] - P[:, 0])
+    c = P.mean(1)
+    bad = np.einsum("ij,ij->i", n, c - centre_fn(c)) < 0
+    F = F.copy()
+    F[bad] = F[bad][:, ::-1]
+    return F
+
+
+def oriented_box(parts, W: Wall, s0, s1, d0, d1, z0, z1, bevel, tag="hull"):
+    """A chamfered box aligned with the wall frame."""
+    c = W.P((s0 + s1) / 2, (d0 + d1) / 2, (z0 + z1) / 2)
+    V, F = G.chamfer_box(c, (abs(s1 - s0), abs(d1 - d0), abs(z1 - z0)), W.yaw_deg(), bevel)
+    parts.add(V, F, tag)
+
+
+def kit_metrics() -> dict:
+    """The P7c concept-paste kit measurements (cannon: length / muzzle / barrel axis; lantern head: height / glow)."""
+    import cp_layout as CPL  # tools/art/concept_paste (on the path through cs_common)
+    p7 = CPL.load(CPL.BUILD_REPORT)
+    can = p7["kitMeasurements"]["SM_Env_Cannon"]
+    lant = CPL.export_of(p7, "SM_EnvCP_LanternHead")
+    return {"canLen": float(can["boundsUU"]["max"][0]) - float(can["boundsUU"]["min"][0]),
+            "muzzleX": float(can["muzzleXUU"]),
+            "axis": [0.0, float(can["barrelAxisYUU"]), float(can["barrelAxisZUU"])],
+            "headH": float(lant["boundsUeLocalUU"]["size"][2]), "glow": [float(v) for v in lant["glowOffsetUU"]]}
+
+
+def ports_of(P: dict, W: Wall, D: dict) -> list[dict]:
+    """Gun ports at the painted cannons. The kit cannon sits on a carriage; only its last barrelOnlyUU (x scale) are
+    bare barrel, so only that part may leave the hull: the painted MUZZLE pixel on the plane `protrusion` outside the
+    hull side = the muzzle, the barrel horizontal along the outward normal, the port centre = the muzzle's (s, z) on
+    the hull side; the carriage stays inside (port box + hull interior). Scale from the painted size as P8."""
+    spec = CS.spec()
+    det = {d["id"]: d for d in spec["details"]}
+    km = kit_metrics()
+    cam = W.cam
+    Pp = P["ports"]
+    out = []
+    for cid in Pp["cannons"]:
+        mz = Pp["muzzlePx"][cid]
+        M0 = W.on_plane(mz[0], mz[1], 0.0)
+        depth = float((M0 - cam.pos) @ cam.fwd)
+        sc = min(max(det[cid]["sizePx"][0] * depth / cam.f_px * D["cannonSizeMul"] / km["canLen"], 1.2), 3.0)
+        protr = Pp["barrelOnlyUU"] * sc + Pp["muzzleClearUU"]
+        M = W.on_plane(mz[0], mz[1], -protr)
+        s, d, z = W.sdz(M)
+        A = W.P(s, -protr + km["muzzleX"] * sc, z)  # the kit's barrel axis point (x 0)
+        out.append({"cannon": cid, "muzzlePx": mz, "muzzle": [round(float(v), 2) for v in M],
+                    "axisPoint": [round(float(v), 2) for v in A], "scale": round(sc, 3), "protrusionUU": round(protr, 2),
+                    "s": round(s, 2), "z": round(z, 2), "w": Pp["widthUU"], "h": Pp["heightUU"],
+                    "centre": [round(float(v), 2) for v in W.P(s, 0.0, z)],
+                    "outward": [round(float(v), 4) for v in W.out2], "yawDeg": round(W.out_yaw_deg(), 3)})
+    return out
+
+
+def lantern_rail(P: dict, W: Wall, D: dict) -> dict:
+    """The rail lantern hangs from its post's arm: the painted lantern pixel on the plane armUU outside the hull side
+    = the glow point; the lantern head (P8 size rule) below the arm; the post stands on the rail cap at that s."""
+    spec = CS.spec()
+    d = next(x for x in spec["details"] if x["id"] == "lantern-rail")
+    km = kit_metrics()
+    lp = P["rig"]["lanternPost"]
+    G_ = W.on_plane(d["px"][0], d["px"][1], -lp["armUU"])
+    depth = float((G_ - W.cam.pos) @ W.cam.fwd)
+    sc = d["sizePx"][1] * depth / W.cam.f_px * D["lanternSizeMul"] / km["headH"]
+    bottom = G_[2] - km["glow"][2] * sc
+    top = bottom + km["headH"] * sc
+    s_g = W.sdz(G_)[0]
+    return {"glow": [round(float(v), 2) for v in G_], "scale": round(sc, 3), "s": round(s_g, 2),
+            "topZ": round(float(top), 1), "armZ": round(float(top) + lp["hookUU"], 1)}
+
+
+def near_wall(parts, P: dict, W: Wall, s0: float, s1: float, z0: float, z1: float, ports: list[dict]):
+    """The near hull side d = 0 (clinker strakes, lower edge clinkUU out) from z0 to z1 with the port openings, the
+    port boxes (reveal + back) and frames."""
+    H = P["hull"]
+    clink = float(H["clinkUU"])
+    strake = float(H["strakeUU"])
+    holes = [(p["s"] - p["w"] / 2, p["s"] + p["w"] / 2, p["z"] - p["h"] / 2, p["z"] + p["h"] / 2) for p in ports]
+    s_nodes = set(np.arange(s0, s1, H["wallStepUU"]).tolist() + [s1])
+    z_bands = list(np.arange(z0, z1, strake)) + [z1]
+    for a, b, c, d in holes:
+        s_nodes.update([a, b])
+    s_nodes = np.array(sorted(x for x in s_nodes if s0 <= x <= s1))
+    for bi in range(len(z_bands) - 1):
+        za, zb = z_bands[bi], z_bands[bi + 1]
+        z_nodes = {za, zb}
+        for a, b, c, d in holes:
+            for zz in (c, d):
+                if za < zz < zb:
+                    z_nodes.add(zz)
+        z_nodes = np.array(sorted(z_nodes))
+        off = clink * (zb - z_nodes) / max(zb - za, 1e-6)  # lower edge out
+        S, Z = np.meshgrid(s_nodes, z_nodes, indexing="ij")
+        D = np.broadcast_to(-off[None, :], S.shape)
+        V = W.P(S, D, Z).reshape(-1, 3)
+        nz = len(z_nodes)
         F = []
-        for i in range(seg):
-            j = (i + 1) % seg
-            F += [[i, j, seg + j], [i, seg + j, seg + i], [seg + i, seg + j, 2 * seg]]
-        F = np.array(F)
-        # outward check (right-handed math on the UE numbers): the side normal must point away from the axis
-        n = np.cross(V[F[0, 1]] - V[F[0, 0]], V[F[0, 2]] - V[F[0, 0]])
-        if n @ (V[F[0]].mean(0) - foot - ax * ((V[F[0]].mean(0) - foot) @ ax)) < 0:
-            F = F[:, ::-1]
-        return V, F
+        for i in range(len(s_nodes) - 1):
+            for j in range(nz - 1):
+                sm, zm = (s_nodes[i] + s_nodes[i + 1]) / 2, (z_nodes[j] + z_nodes[j + 1]) / 2
+                if any(a < sm < b and c < zm < d for a, b, c, d in holes):
+                    continue
+                q = [i * nz + j, (i + 1) * nz + j, (i + 1) * nz + j + 1, i * nz + j + 1]
+                F += [[q[0], q[1], q[2]], [q[0], q[2], q[3]]]
+        F = np.array(F, np.int64)
+        F = orient_out(V, F, lambda c: c - np.r_[W.out2, 0.0][None] * 10.0)
+        parts.add(V, F, "wall")
+    # port boxes: reveal (4 sides) and back, into the hull; frames around the opening
+    depth = float(P["ports"]["depthUU"])
+    fr = float(P["ports"]["frameUU"])
+    for a, b, c, d in holes:
+        cs_, cz = (a + b) / 2, (c + d) / 2
+        ring = [(a, c), (b, c), (b, d), (a, d)]
+        V, F = [], []
+        for i in range(4):
+            (sa, za), (sb, zb) = ring[i], ring[(i + 1) % 4]
+            base = len(V)
+            V += [W.P(sa, 0.0, za), W.P(sb, 0.0, zb), W.P(sb, depth, zb), W.P(sa, depth, za)]
+            F += [[base, base + 1, base + 2], [base, base + 2, base + 3]]
+        base = len(V)
+        V += [W.P(a, depth, c), W.P(b, depth, c), W.P(b, depth, d), W.P(a, depth, d)]
+        F += [[base, base + 1, base + 2], [base, base + 2, base + 3]]
+        V, F = np.array(V), np.array(F, np.int64)
+        centre = W.P(cs_, depth * 0.5, cz)
+        # inward-facing (towards the opening's axis and the outside)
+        F = orient_out(V, F, lambda q: q + (q - centre[None]) * 2.0)
+        parts.add(V, F, "port")
+        for (s_a, s_b, z_a, z_b) in ((a - fr, b + fr, d, d + fr), (a - fr, b + fr, c - fr, c), (a - fr, a, c, d),
+                                     (b, b + fr, c, d)):
+            oriented_box(parts, W, s_a, s_b, -fr * 0.8, 0.5, z_a, z_b, 0.6, "portframe")
 
-    def painted_masts(P, Pw, F):
-        """Masts at the painted mast pixels (the model's spars sit elsewhere): foot = C0 ray hit on the fitted hull,
-        top = the top pixel's ray on the plane Y = foot Y (the C0 yaw looks along -Y); radius from the painted width."""
-        cam = CS.cam0()
-        out, info = [], []
-        for m in P["masts"]:
-            d = cam.rays(np.array(float(m["footPx"][0])), np.array(float(m["footPx"][1])))
-            d = d / np.linalg.norm(d)
-            t = ray_mesh(cam.pos, d, Pw, F)
-            on = "hull"
-            if not math.isfinite(t):  # off the fitted hull (the painted stern lies on the island dock): the plateau
-                t = (P["dockZ"] - cam.pos[2]) / d[2]
-                on = "plateau"
-            foot = cam.pos + t * d - np.array([0.0, 0.0, m.get("sinkUU", 10.0)])
-            # vertical mast: the height whose top projects onto the painted top row (bisection)
-            lo_h, hi_h = 10.0, 3000.0
-            for _ in range(60):
-                mid = (lo_h + hi_h) / 2
-                if cam.project(foot + np.array([0.0, 0.0, mid]))[0][1] > m["topPx"][1]:
-                    lo_h = mid
-                else:
-                    hi_h = mid
-            top = foot + np.array([0.0, 0.0, lo_h])
-            depth = float((foot - cam.pos) @ cam.fwd)
-            radius = m["widthPx"] / 2 * depth / cam.f_px
-            V, Fm = cylinder(foot, top, radius)
-            out.append((V, Fm))
-            info.append({"id": m["id"], "on": on, "foot": [round(float(v), 1) for v in foot], "top": [round(float(v), 1) for v in top],
-                         "radiusUU": round(radius, 1)})
-        return out, info
 
-    def hull_section(Pw, F, z, nrm, centre):
-        """Near-side points of the hull section at height z (board XY): the triangle edges crossing z on the side
-        facing the board (nrm)."""
-        a = Pw[F]
-        pts = []
-        for i, j in ((0, 1), (1, 2), (2, 0)):
-            za, zb = a[:, i, 2], a[:, j, 2]
-            m = (za - z) * (zb - z) < 0
-            t = (z - za[m]) / (zb[m] - za[m])
-            pts.append(a[m, i, :2] + t[:, None] * (a[m, j, :2] - a[m, i, :2]))
-        pts = np.vstack(pts)
-        side = (pts - centre) @ nrm
-        return pts[side > 0]
+def section(P: dict, z_rail: float, f: float = 1.0):
+    """The hull cross-section (d, z), closed loop starting at the near outer face top under the rail cap and going
+    down the near side: [(d, z)], index of the near outer face's bottom (the straight part has its own wall there)."""
+    H = P["hull"]
+    B, t = float(H["beamUU"]), float(H["wallThickUU"])
+    zc = z_rail - float(H["capHUU"])
+    zd = z_rail - float(H["deckDropUU"])
+    zb, zk = float(H["bilgeZ"]), float(H["keelZ"])
+    n_b = int(H["bilgeSegments"])
+    loop = [(0.0, zc), (0.0, zb)]
+    for i in range(1, n_b + 1):
+        th = math.pi / 2 * i / n_b
+        loop.append((B / 2 - B / 2 * math.cos(th), zb - (zb - zk) * math.sin(th)))
+    for i in range(1, n_b + 1):
+        th = math.pi / 2 + math.pi / 2 * i / n_b
+        loop.append((B / 2 - B / 2 * math.cos(th), zb - (zb - zk) * math.sin(th)))
+    loop += [(B, zc), (B - t, zc), (B - t, zd), (t, zd), (t, zc)]
+    loop = [(B / 2 + (d - B / 2) * f, z) for d, z in loop]
+    return loop
 
-    def cut_and_pivot(P, V, F, part, x):
-        """Board-space mesh: the model spars dropped, the far hull below the deck removed, the painted masts added,
-        pivot at the waterline below the hull centre."""
-        Pw = transform(V, x)
-        tx, ty, yaw, s, zw = x
-        axis = rot(yaw) @ np.array([0.0, 1.0, 0.0])  # model length axis (UE Y) in board space
-        nrm = np.array([-axis[1], axis[0], 0.0])
-        if nrm @ (np.array([0.0, 0.0, 0.0]) - np.array([tx, ty, 0.0])) < 0:
-            nrm = -nrm  # towards the board
-        cen = Pw[F].mean(1)
-        side = (cen[:, :2] - np.array([tx, ty])) @ nrm[:2]
-        deck_z = zw + P["deckModelZ"] * 100.0 * s
-        drop = (part == 1) | ((side < -P["cutKeepUU"]) & (cen[:, 2] < deck_z - P["cutBelowDeckUU"]))
-        keepF = F[~drop]
-        masts, minfo = painted_masts(P, Pw, F[part == 0])
-        Vall, Fall = [Pw], [keepF]
-        base = len(Pw)
-        for Vm, Fm in masts:
-            Vall.append(Vm)
-            Fall.append(Fm + base)
-            base += len(Vm)
-        Pw2 = np.vstack(Vall)
-        F2 = np.vstack(Fall)
-        part2 = np.r_[np.zeros(len(keepF), int), np.full(len(F2) - len(keepF), 2)]
-        used = np.unique(F2)
-        remap = -np.ones(len(Pw2), np.int64)
-        remap[used] = np.arange(len(used))
-        Vb = Pw2[used]
-        F2 = remap[F2]
-        pivot = np.array([tx, ty, zw])
-        dock = hull_section(Vb, F2[part2 == 0], P["dockZ"], nrm[:2], np.array([tx, ty]))
-        info = {"droppedTris": int(drop.sum()), "deckZ": round(float(deck_z), 1),
-                "nearNormal": [round(float(v), 4) for v in nrm[:2]], "axis": [round(float(v), 4) for v in axis[:2]],
-                "masts": minfo}
-        return Vb - pivot, F2, part2, pivot, info, dock
 
-    def overlay(P, mesh_board, F, out_png, fz_scale=0.5):
-        cam = CS.cam0()
-        rect = CS.RECT_B
-        w, h = int((rect[2] - rect[0]) * fz_scale), int((rect[3] - rect[1]) * fz_scale)
+def hull(parts, P: dict, W: Wall, s_n: float, s_s: float):
+    """Loft of the cross-section from the stern transom to the bow stem; the near outer face of the straight part is
+    left out (near_wall builds it with the ports)."""
+    H = P["hull"]
+    nb = int(H["bowStations"])
+    bow = float(H["bowUU"])
+    stations = [(s_n, 1.0), (s_s, 1.0)] + [(s_s + bow * i / nb, max(math.cos(math.pi / 2 * i / nb) ** 0.7, H["stemFrac"]))
+                                           for i in range(1, nb + 1)]
+    secs = []
+    for s, f in stations:
+        zr = float(W.rail_z(s))
+        loop = section(P, zr, f)
+        secs.append(W.P(np.full(len(loop), s), np.array([d for d, _ in loop]), np.array([z for _, z in loop])))
+    m = len(secs[0])
+    V = np.vstack(secs)
+    F = []
+    for i in range(len(secs) - 1):
+        straight = i == 0
+        for j in range(m):
+            if straight and j == 0:
+                continue  # (0, zc) -> (0, zb): the near_wall with the ports
+            jn = (j + 1) % m
+            a, b, c, d = i * m + j, i * m + jn, (i + 1) * m + jn, (i + 1) * m + j
+            F += [[a, b, c], [a, c, d]]
+    F = np.array(F, np.int64)
+    # orientation: the cross-section loop encloses the hull's solid (below the deck + the bulwarks), so its outward
+    # 2D normal is the visible side everywhere (near / far faces, bilge, deck up, bulwark inner faces into the well)
+    loop = np.array(section(P, float(W.rail_z(s_n))))
+    area = 0.5 * float(np.sum(loop[:, 0] * np.roll(loop[:, 1], -1) - np.roll(loop[:, 0], -1) * loop[:, 1]))
+    tang = np.roll(loop, -1, 0) - loop
+    out2 = np.c_[tang[:, 1], -tang[:, 0]] * (1.0 if area > 0 else -1.0)  # (d, z) outward of a CCW loop
+    seg_j = np.array([j for i in range(len(secs) - 1) for j in range(m) if not (i == 0 and j == 0) for _ in (0, 1)])
+    want = np.c_[np.outer(out2[seg_j, 0], W.in2), out2[seg_j, 1]]
+    Pv = V[F]
+    n = np.cross(Pv[:, 1] - Pv[:, 0], Pv[:, 2] - Pv[:, 0])
+    flip = np.einsum("ij,ij->i", n, want) < 0
+    F[flip] = F[flip][:, ::-1]
+    parts.add(V, F, "hull")
+    # end caps: the stern transom (station 0) and the stem (last station)
+    for idx, sgn in ((0, -1.0), (len(secs) - 1, 1.0)):
+        s, f = stations[idx]
+        loop = section(P, float(W.rail_z(s)), f)
+        poly = np.array(loop)
+        Q, T = CS.triangulate_polygon(poly, 25.0, boundary=poly)
+        Vc = W.P(np.full(len(Q), s), Q[:, 0], Q[:, 1])
+        Tn = orient_out(Vc, T, lambda q: q - np.r_[W.u2, 0.0][None] * sgn * 10.0)
+        parts.add(Vc, Tn, "cap")
+    return stations
+
+
+def rail_and_rig(parts, P: dict, W: Wall, s_n: float, s_s: float, rng):
+    H = P["hull"]
+    B, t = float(H["beamUU"]), float(H["wallThickUU"])
+    capH, over = float(H["capHUU"]), float(H["capOverUU"])
+    info = {}
+    # rail caps (near / far) as wall-aligned boxes following the rail line (pieces: the rail may slope)
+    n_pc = 6
+    for d0, d1 in ((-over, t + over), (B - t - over, B + over)):
+        for i in range(n_pc):
+            a, b = s_n + (s_s - s_n) * i / n_pc, s_n + (s_s - s_n) * (i + 1) / n_pc
+            zr = float(W.rail_z((a + b) / 2))
+            oriented_box(parts, W, a, b + (0.4 if i < n_pc - 1 else 0.0), d0, d1, zr - capH, zr, 1.2, "rail")
+    # wales on the near side, split around the ports
+    ports = P["_ports"]
+    for wz in H["walesZ"]:
+        z0, z1 = (float(W.rail_z((s_n + s_s) / 2)) - capH - 9.0, float(W.rail_z((s_n + s_s) / 2)) - capH) \
+            if wz == "rail" else (float(wz) - 4.5, float(wz) + 4.5)
+        cuts = [(s_n, s_s)]
+        for p in ports:
+            if p["z"] - p["h"] / 2 - 2 < z1 and p["z"] + p["h"] / 2 + 2 > z0:
+                nc = []
+                for a, b in cuts:
+                    pa, pb = p["s"] - p["w"] / 2 - 4, p["s"] + p["w"] / 2 + 4
+                    if pb <= a or pa >= b:
+                        nc.append((a, b))
+                    else:
+                        if pa > a:
+                            nc.append((a, pa))
+                        if pb < b:
+                            nc.append((pb, b))
+                cuts = nc
+        for a, b in cuts:
+            if b - a > 8:
+                oriented_box(parts, W, a, b, -float(H["waleOutUU"]), 1.0, z0, z1, 1.2, "wale")
+    # stanchions on the near rail cap
+    R = P["rig"]
+    s_post = np.arange(s_n + R["postStartUU"], s_s, R["postStepUU"])
+    lp = R["lanternPost"]
+    lr = P["_lanternRail"]
+    s_l = float(lr["s"])
+    for s in s_post:
+        if abs(s - s_l) < R["postStepUU"] * 0.4:
+            continue
+        zr = float(W.rail_z(s))
+        oriented_box(parts, W, s - R["postUU"] / 2, s + R["postUU"] / 2, t / 2 - R["postUU"] / 2, t / 2 + R["postUU"] / 2,
+                     zr - 2.0, zr + R["postHUU"], 0.8, "post")
+    zr = float(W.rail_z(s_l))
+    za = float(lr["armZ"])
+    h_l = za + lp["aboveArmUU"] - zr
+    oriented_box(parts, W, s_l - lp["sizeUU"] / 2, s_l + lp["sizeUU"] / 2, t / 2 - lp["sizeUU"] / 2, t / 2 + lp["sizeUU"] / 2,
+                 zr - 2.0, zr + h_l, 1.0, "post")
+    # the lantern's arm: out of the post over the hull side; the lantern hangs under its tip
+    oriented_box(parts, W, s_l - 2.5, s_l + 2.5, -lp["armUU"] - 3.0, t / 2, za - 2.5, za + 2.5, 0.6, "post")
+    info["lanternPost"] = {"s": round(s_l, 2), "heightUU": round(h_l, 1),
+                           "top": [round(float(v), 1) for v in W.P(s_l, t / 2, zr + h_l)],
+                           "armTip": [round(float(v), 1) for v in W.P(s_l, -lp["armUU"], za)]}
+    # masts on the deck at their painted pixels
+    masts = []
+    for m in R["masts"]:
+        zd = float(W.rail_z(0.0)) - float(H["deckDropUU"])
+        foot = W.on_z(m["footPx"][0], m["footPx"][1], zd)
+        s_m, d_m, _ = W.sdz(foot)
+        zd = float(W.rail_z(s_m)) - float(H["deckDropUU"])
+        foot = W.on_z(m["footPx"][0], m["footPx"][1], zd)
+        s_m, d_m, _ = W.sdz(foot)
+        # the painted mast is a vertical line in the picture; under C0 (pitch -55) a 3D vertical would fan out from
+        # the nadir and leave the painted pixels (75 px at the canvas top): the mast axis runs from the foot to the
+        # point of the top pixel's ray nearest to the foot's vertical (it rakes towards the picture's up)
+        r_t = W.cam.rays(np.array(float(m["topPx"][0])), np.array(float(m["topPx"][1])))
+        r_t = r_t / np.linalg.norm(r_t)
+        o = W.cam.pos
+        tt = -float((o[:2] - foot[:2]) @ r_t[:2]) / float(r_t[:2] @ r_t[:2])
+        topp = o + tt * r_t
+        hgt = float(topp[2] - foot[2])
+        rake = math.degrees(math.atan2(float(np.linalg.norm(topp[:2] - foot[:2])), hgt))
+        r = G.px_radius(foot, m["widthPx"])
+        if not (t + r <= d_m <= B - t - r):
+            raise SystemExit(f"ship: mast {m['id']} at d {d_m:.1f} is off the deck (t {t} .. B - t {B - t}, r {r:.1f})")
+        ax = (topp - foot) / np.linalg.norm(topp - foot)
+        base = foot - ax * m.get("sinkUU", 6.0)
+        V, F = G.log(base, topp, r, 14, 5, 0.0, rng, taper=0.75, wobble=0.0)
+        parts.add(V, F, "mast")
+        for fr in m.get("bandsAt", []):
+            cb = foot + (topp - foot) * fr
+            V, F = G.band(cb[:2], r * (1 - 0.25 * fr) + 1.6, float(cb[2]), 2.2)
+            parts.add(V, F, "rope")
+        mi = {"id": m["id"], "foot": [round(float(v), 1) for v in foot], "top": [round(float(v), 1) for v in topp],
+              "heightUU": round(hgt, 1), "rakeDeg": round(rake, 2), "radiusUU": round(r, 1), "dInUU": round(d_m, 1)}
+        y = m.get("yard")
+        if y:
+            c = foot + (topp - foot) * y["atFrac"]
+            zy = float(c[2])
+            L = float(y["lengthUU"])
+            a, b = c[:2] - W.in2 * L * y["nearFrac"], c[:2] + W.in2 * L * (1 - y["nearFrac"])
+            V, F = G.log(np.r_[a, zy], np.r_[b, zy], y["radiusUU"], 10, 3, 0.0, rng, taper=0.7, wobble=0.0)
+            parts.add(V, F, "yard")
+            # the furled sail: a lumpy roll under the yard
+            sa = a + (b - a) * 0.1
+            sb = a + (b - a) * 0.9
+            V, F = G.log(np.r_[sa, zy - y["sailRadiusUU"] * 0.9], np.r_[sb, zy - y["sailRadiusUU"] * 0.9],
+                         y["sailRadiusUU"], 12, 6, 0.0, rng, taper=0.6, wobble=0.18)
+            parts.add(V, F, "sail")
+            mi["yard"] = {"z": round(zy, 1), "lengthUU": L}
+        # shrouds: from both rails (s +- shroudSpreadUU) to the mast at shroudAtFrac
+        tip = foot + (topp - foot) * R["shroudAtFrac"]
+        for d_r in (t / 2, B - t / 2):
+            for ds in (-R["shroudSpreadUU"], R["shroudSpreadUU"]):
+                s_r = s_m + ds
+                a = W.P(s_r, d_r, float(W.rail_z(s_r)))
+                V, F = G.rope(a, tip, 1.5, R["ropeUU"])
+                parts.add(V, F, "rope")
+        masts.append(mi)
+    info["masts"] = masts
+    return info
+
+
+def build(P: dict, frame_band_east: float):
+    W = Wall(P)
+    rng = np.random.default_rng(P["seed"])
+    H = P["hull"]
+    # ends: the stern at the painted rail start, kept clear of the frame band's east beam; the straight part to the
+    # rail pixel at the extended canvas edge, the bow beyond
+    s_rail0 = W.sdz(W.on_plane(*P["railStartPx"]))[0]
+    y_clear = (frame_band_east + H["bandClearUU"] - W.b) / W.k  # foot X = band east + clearance
+    s_clear = float((np.array([W.k * y_clear + W.b, y_clear]) - W.F0) @ W.u2)
+    s_n = max(s_rail0, s_clear)
+    s_s = W.sdz(W.on_plane(*P["railEndPx"]))[0]
+    D = CS.params()["layout"]["details"]
+    ports = ports_of(P, W, D)
+    lrail = lantern_rail(P, W, D)
+    P = dict(P, _ports=ports, _lanternRail=lrail)
+    parts = G.Parts()
+    # the near side up to under the rail cap (the higher end; the lower end tucks into the cap box)
+    z_top_wall = float(max(W.rail_z(s_n), W.rail_z(s_s))) - float(H["capHUU"])
+    if abs(float(W.rail_z(s_n) - W.rail_z(s_s))) > float(H["capHUU"]) * 0.8:
+        raise SystemExit("ship: the rail slopes more than the cap height - the wall top would show")
+    near_wall(parts, P, W, s_n, s_s, float(H["bilgeZ"]), z_top_wall, ports)
+    stations = hull(parts, P, W, s_n, s_s)
+    rig = rail_and_rig(parts, P, W, s_n, s_s, rng)
+    pivot = np.r_[W.P(0.5 * (s_n + s_s), float(H["beamUU"]) / 2, 0.0)[:2], 0.0]
+    pivot = np.round(pivot, 3)
+    mesh = parts.mesh(NAME, SLOT, pivot)
+    zr = float(W.rail_z((s_n + s_s) / 2))
+    info = {"wall": {"footLine": f"X = {W.k:.5f} Y + {W.b:.3f} (Z {P['footZ']})", "footResidualsUU": W.foot_res,
+                     "railZ": f"{W.rail_a:.2f} + {W.rail_b:.5f} s", "railResidualsUU": W.rail_res,
+                     "along": [round(float(v), 5) for v in W.u2], "outward": [round(float(v), 5) for v in W.out2],
+                     "yawDeg": round(W.yaw_deg(), 3), "F0": [round(float(v), 3) for v in W.F0]},
+            "sNorth": round(s_n, 2), "sSouth": round(s_s, 2), "bowUU": H["bowUU"],
+            "northEnd": [round(float(v), 1) for v in W.P(s_n, 0.0, 0.0)],
+            "southEnd": [round(float(v), 1) for v in W.P(s_s, 0.0, 0.0)],
+            "railZMid": round(zr, 1), "deckZMid": round(zr - float(H["deckDropUU"]), 1),
+            "beamUU": H["beamUU"], "ports": ports, "lanternRail": lrail, "rig": rig, "triangles": mesh.tris}
+    return mesh, info, W
+
+
+# ------------------------------------------------------------------ self-check at C0
+def c0_fit(mesh: CS.Mesh, W: Wall, P: dict, out_png: Path | None = None) -> dict:
+    """Visible silhouette (depth-tested against the island + frame band) vs the painted ship region inside the C0
+    frame (params targetC0Px), the rail / foot line pixel residuals (projected model line vs the painted pixels)."""
+    from PIL import Image, ImageDraw
+    cam = CS.cam0()
+    rect = (0.0, 0.0, 1920.0, 1080.0)
+    w, h = 1920, 1080
+    d, _ = CS.raster_tris(cam, mesh.board(), mesh.F, w, h, rect=rect, cull_back=True)
+    occ = np.full((h, w), np.inf)
+    for n in ("SM_Env_S_Island", "SM_Env_S_FrameBand"):
+        f = CS.WORK / f"{n}.pre.npz"
+        if f.is_file():
+            o = CS.Mesh.load(f)
+            do, _ = CS.raster_tris(cam, o.board(), o.F, w, h, rect=rect, cull_back=True)
+            occ = np.minimum(occ, do)
+    m = np.isfinite(d) & (d <= occ + 0.5)  # the visible ship (the hull below the dock is inside the island)
+    tgt = CS.poly_mask(P["targetC0Px"], w, h, rect)
+    res = {"iouC0": round(float((m & tgt).sum() / max((m | tgt).sum(), 1)), 4),
+           "targetCoveredC0": round(float((m & tgt).sum() / max(tgt.sum(), 1)), 4),
+           "outsideTargetC0": round(float((m & ~tgt).sum() / max(tgt.sum(), 1)), 4)}
+
+    def px_err(points_px, z_of):
+        errs = []
+        for x, y in points_px:
+            A = W.on_plane(x, y, 0.0)
+            s = W.sdz(A)[0]
+            q = cam.project(W.P(s, 0.0, z_of(s))[None])[0][0]
+            errs.append(float(np.hypot(q[0] - x, q[1] - y)))
+        return round(float(np.sqrt(np.mean(np.square(errs)))), 2)
+    res["railRmsPx"] = px_err(P["railPx"], lambda s: float(W.rail_z(s)))
+    res["footRmsPx"] = px_err(P["footPx"], lambda s: float(P["footZ"]))
+    if out_png:
         img = CS.plate_c0(rect, w, h, CS.DELIT_EXT)
-        depth, _ = CS.raster_tris(cam, mesh_board, F, w, h, rect=rect)
-        m = np.isfinite(depth)
-        out = img.copy()
-        out[m] = out[m] * 0.45 + np.array([0.1, 0.9, 1.0]) * 0.55
-        im = Image.fromarray(np.clip(out * 255, 0, 255).astype(np.uint8))
-        d = ImageDraw.Draw(im)
-        k = w / (rect[2] - rect[0])
-        tp = [((x - rect[0]) * k, (y - rect[1]) * k) for x, y in P["targetPx"]]
-        d.line(tp + tp[:1], fill=(255, 0, 255), width=2)
-        fr = [((x - rect[0]) * k, (y - rect[1]) * k) for x, y in ((0, 0), (1920, 0), (1920, 1080), (0, 1080), (0, 0))]
-        d.line(fr, fill=(255, 255, 0), width=1)
-        Path(out_png).parent.mkdir(parents=True, exist_ok=True)
-        im.save(out_png)
-        t = CS.poly_mask(P["targetPx"], w, h, rect)
-        return {"iou": round(float((m & t).sum() / max((m | t).sum(), 1)), 4),
-                "targetCovered": round(float((m & t).sum() / max(t.sum(), 1)), 4),
-                "outsideTarget": round(float((m & ~t).sum() / max(t.sum(), 1)), 4)}
+        o = img.copy()
+        o[m] = o[m] * 0.5 + np.array([1.0, 0.25, 0.2]) * 0.5
+        im = Image.fromarray(np.clip(o * 255, 0, 255).astype(np.uint8))
+        dr = ImageDraw.Draw(im)
+        t = [tuple(p) for p in P["targetC0Px"]]
+        dr.line(t + t[:1], fill=(0, 255, 255), width=2)
+        for x, y in P["railPx"] + P["footPx"]:
+            dr.ellipse((x - 5, y - 5, x + 5, y + 5), outline=(255, 255, 0), width=2)
+        im.crop((1250, 0, 1920, 1080)).save(out_png, quality=88)
+    return res
 
-    def run_fit():
-        allp = CS.params()
-        P = allp["ship"]
-        cache = Path(P["work"]) / "ship_fit_cache.json"
-        key = {"params": {k: P[k] for k in ("targetPx", "spillWeight", "yawStartsDeg", "start", "simplexSteps",
-                                            "iterCoarse", "iterFine", "waterlineZ")},
-               "raw": CS.sha256(Path(P["work"]) / "ship_raw.npz")}
-        V, F, part = load_raw(P)
-        old = json.loads(cache.read_text(encoding="utf-8")) if cache.is_file() else {}
-        if old.get("key") == key and "--refit" not in sys.argv:
-            best, log = (old["iou"], np.array(old["x"])), old["log"]
-            print("SHIP-FIT cached", old["x"])
-        else:
-            best, log, _ = fit(P)
-            cache.write_text(json.dumps({"key": key, "iou": best[0], "x": best[1].tolist(), "log": log}), encoding="utf-8")
-        x = best[1]
-        Vl, F2, part2, pivot, info, dock = cut_and_pivot(P, V, F, part, x)
-        # the dock line: the outermost near-side hull section points at the plateau per 60 uu bin along the hull axis
-        # (= the outer face of the near bulwark at dockZ), the island's east rim follows it tucked under the hull
-        ax, nr = np.array(info["axis"]), np.array(info["nearNormal"])
-        c2 = pivot[:2]
-        ta, tn = (dock - c2) @ ax, (dock - c2) @ nr
-        dock_line = []
-        for b in np.arange(np.floor(ta.min() / 60) * 60, ta.max() + 60, 60):
-            m = (ta >= b) & (ta < b + 60)
-            if m.sum() >= 2:
-                i = np.argmax(np.where(m, tn, -np.inf))
-                dock_line.append([round(float(v), 1) for v in dock[i]])
-        tris = len(F2)
-        if tris > P["maxTris"]:
-            raise SystemExit(f"ship: {tris} triangles > {P['maxTris']} after the cut (lower hullPrepTris)")
-        UV = np.zeros((len(F2), 3, 2))
-        mesh = CS.Mesh("SM_Env_S_Ship", Vl, F2, UV, np.zeros(len(F2), int), np.ones(len(F2), bool),
-                       ["MI_Env_S_Ship"], pivot)
-        mesh.save(Path(P["work"]) / "SM_Env_S_Ship.pre.npz")
-        ov = overlay(P, mesh.board(), F2, CS.WORK / "overlays" / "ship-silhouette-c0.png")
-        hullsel = part2 == 0
-        Pb = mesh.board()
-        hb = Pb[np.unique(F2[hullsel])]
-        rep = {"schema": "unmatched.env-s-ship.fit/1",
-               "status": "измерено (C0 silhouette fit on the de-lit plate; proposed geometry)",
-               "source": P["source"], "fit": {"tx": round(float(x[0]), 2), "ty": round(float(x[1]), 2),
-                                             "yawDeg": round(float(x[2]), 3), "scale": round(float(x[3]), 5),
-                                             "waterlineZ": round(float(x[4]), 2), "iou": round(best[0], 4)},
-               "log": log, "cut": info, "triangles": int(tris),
-               "hullTopZ": round(float(hb[:, 2].max()), 1),
-               "dockLine": dock_line, "dockZ": P["dockZ"],
-               "overlay": (CS.WORK / "overlays" / "ship-silhouette-c0.png").as_posix(), "overlayStats": ov,
-               "pivotBoard": [round(float(v), 3) for v in pivot],
-               "boundsBoard": {"min": [round(float(v), 1) for v in Pb.min(0)],
-                               "max": [round(float(v), 1) for v in Pb.max(0)]}}
-        CS.dump_json(CS.RUNS["ship"] / "reports" / "ship-fit.json", rep)
-        print("SHIP-FIT", json.dumps(rep["fit"]), "tris", tris, "overlay", ov)
-        return rep
 
-    if __name__ == "__main__":
-        if len(sys.argv) > 1 and sys.argv[1] == "fit":
-            run_fit()
-        else:
-            raise SystemExit("usage: ship_build.py fit   (prep runs under Blender: -- prep)")
+def main(argv=None) -> int:
+    allp = CS.params()
+    P = allp["ship"]
+    sys.path.insert(0, str(HERE))
+    import frame_band_build as FBB  # noqa: E402
+    east = FBB.outer_extents(allp["frameBand"])["eastX"]
+    mesh, info, W = build(P, east)
+    mesh.save(CS.WORK / f"{NAME}.pre.npz")
+    fit = c0_fit(mesh, W, P, CS.WORK / "overlays" / "ship-c0.jpg")
+    chk = {"maxTris": P["maxTris"], "trianglesOk": mesh.tris <= P["maxTris"]}
+    B = mesh.board()
+    rep = {"schema": "unmatched.env-s-ship.build/1",
+           "status": "предложено (procedural geometry on the painted C0 pixels, CREATE stage; measured at C0)",
+           "mesh": NAME, "pivotBoard": [round(float(v), 3) for v in mesh.pivot], "info": info, "checks": chk,
+           "c0Fit": fit, "overlay": (CS.WORK / "overlays" / "ship-c0.jpg").as_posix(),
+           "boundsBoard": {"min": [round(float(v), 1) for v in B.min(0)], "max": [round(float(v), 1) for v in B.max(0)]},
+           "meshDigest": mesh.digest()}
+    CS.dump_json(CS.RUNS["ship"] / "reports" / "ship-build.json", rep)
+    print("SHIP", mesh.tris, "tris", json.dumps(fit), "ports", [(p["cannon"], p["z"]) for p in info["ports"]],
+          "masts", [(m["id"], m["dInUU"], m["heightUU"]) for m in info["rig"]["masts"]])
+    return 0 if chk["trianglesOk"] else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

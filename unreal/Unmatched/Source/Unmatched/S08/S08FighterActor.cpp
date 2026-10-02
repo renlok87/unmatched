@@ -8,6 +8,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/BillboardComponent.h"
+#include "Components/SpotLightComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/SkeletalMesh.h"
 #include "Engine/StaticMesh.h"
@@ -628,6 +629,7 @@ void AS08FighterActor::BeginHeroDeath() {
   TargetRing->SetVisibility(false);
   TargetIcon->SetVisibility(false);
   NotifyHeroAnimEvent(EEvent::Defeated, -1);
+  RefreshHeroLightState();  // ENV-MAPS P9: a defeated fighter's hero light goes (DefeatedMul) as the figure falls
   const UAnimSequenceBase* Anim = HeroClips.IsValidIndex(static_cast<int32>(EClip::DeathSettle))
       ? HeroClips[static_cast<int32>(EClip::DeathSettle)].Get() : nullptr;
   const float Hold = (Anim ? Anim->GetPlayLength() : 0.0f) + DeathHoldSeconds;
@@ -644,6 +646,7 @@ void AS08FighterActor::OnDeathHoldFinished() {
     SetActorHiddenInGame(true);
     SetActorEnableCollision(false);
   }
+  RefreshHeroLightState();
   FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW anim fighter=%s death hidden=%d"), *Fighter.Id,
                                    Fighter.IsAlive() ? 0 : 1));
 }
@@ -663,6 +666,7 @@ void AS08FighterActor::SetSelected(bool bSelected) {
         TEXT("ARTPREVIEW selection ring shown fighter=%s mesh=%s"),
         *Fighter.Name, *Ring->GetStaticMesh()->GetName()));
   }
+  RefreshHeroLightState();
 }
 
 void AS08FighterActor::SetCombatMarkers(bool bAttacker, bool bTarget) {
@@ -673,6 +677,7 @@ void AS08FighterActor::SetCombatMarkers(bool bAttacker, bool bTarget) {
   bIsCombatTarget = bNewTarget;
   Ring->SetVisibility(bIsSelected || bIsCombatAttacker);
   TargetRing->SetVisibility(bIsCombatTarget);
+  RefreshHeroLightState();
   TargetIcon->SetVisibility(bIsCombatTarget && bArtTargetIconLoaded && !bScreenIconMode);
   // icon=1 means "the target icon is bound to this fighter"; iconMode says
   // whether the world billboard or the exact-size HUD icon (T2.2) draws it.
@@ -767,4 +772,157 @@ const UStaticMesh* AS08FighterActor::GetTeamRingMesh() const { return TeamRing ?
 
 FVector AS08FighterActor::GetTeamRingScale() const {
   return TeamRing ? TeamRing->GetRelativeScale3D() : FVector::ZeroVector;
+}
+
+// ---- ENV-MAPS P9 hero light (S08HeroLight.h, docs/art-pipeline/ENV-HERO-LIGHT.md) ----------------------------------
+
+void AS08FighterActor::ApplyHeroLight(const FS08HeroLightSpec* Spec, int32 LayerCount, bool bFrozen) {
+  using namespace S08HeroLightSpec;
+  bHeroLightFrozen = bFrozen;
+  const bool bOn = Spec && Spec->bSet && Spec->bEnabled && LayerCount > 0 && Spec->Layers() > 0;
+  if (!bOn) {
+    for (USpotLightComponent* Light : HeroLights) {
+      if (Light) Light->SetVisibility(false);
+    }
+    HeroLightLayers = 0;
+    HeroLightRigKey.Reset();
+    SetHeroLitChannels(false);
+    RefreshHeroLightState();
+    return;
+  }
+  HeroLightSpec = *Spec;
+  const int32 Want = FMath::Clamp(FMath::Min(LayerCount, Spec->Layers()), 0, MaxLightsPerFigure);
+  const float Height = GetFigureHeightUU();
+  const FString RigKey = FString::Printf(TEXT("%s|%d|%.2f"), *Spec->Signature(), Want, Height);
+  if (RigKey != HeroLightRigKey) {
+    HeroLightRigKey = RigKey;
+    HeroLightLayers = Want;
+    HeroLightPhase = static_cast<float>(GetTypeHash(Fighter.Id) % 997u) / 997.0f * 2.0f * UE_PI;
+    HeroLights.SetNum(MaxLightsPerFigure);
+    HeroLightBaseCd.Init(0.0f, MaxLightsPerFigure);
+    FString Placed;
+    for (int32 I = 0; I < MaxLightsPerFigure; ++I) {
+      const FS08HeroLightLayer& Layer = I == 0 ? Spec->Key : Spec->Rim;
+      if (I >= Want || !Layer.bSet) {
+        if (HeroLights[I]) HeroLights[I]->SetVisibility(false);
+        continue;
+      }
+      USpotLightComponent* Light = HeroLights[I];
+      if (!Light) {
+        // A child of the fighter: it follows every move and hides with the actor. Channel 1 only, no shadow, no GI /
+        // volumetric / translucency share (the translucency volume and the Lumen surface cache ignore the channels).
+        Light = NewObject<USpotLightComponent>(this, I == 0 ? TEXT("HeroLightKey") : TEXT("HeroLightRim"));
+        Light->SetupAttachment(RootComponent);
+        Light->SetMobility(EComponentMobility::Movable);
+        Light->SetIntensityUnits(ELightUnits::Candelas);
+        Light->SetCastShadows(false);
+        Light->SetLightingChannels(false, true, false);
+        Light->SetIndirectLightingIntensity(0.0f);
+        Light->SetVolumetricScatteringIntensity(0.0f);
+        Light->SetAffectTranslucentLighting(false);
+        Light->SetAffectGlobalIllumination(false);
+        Light->bUseInverseSquaredFalloff = true;
+        Light->RegisterComponent();
+        HeroLights[I] = Light;
+      }
+      const FS08HeroLightPlacement P = S08HeroLight::Place(*Spec, Layer, Height);
+      Light->SetRelativeLocationAndRotation(P.Location, P.Rotation);
+      Light->SetLightColor(Layer.Linear());
+      Light->SetInnerConeAngle(Layer.InnerConeDeg);
+      Light->SetOuterConeAngle(Layer.OuterConeDeg);
+      Light->SetAttenuationRadius(P.AttenuationRadiusUU);
+      HeroLightBaseCd[I] = P.Candelas;
+      Placed += FString::Printf(TEXT(" %s=(%.0f,%.0f,%.0f)d%.0f/%.3fcd/r%.0f/cone%.0f-%.0f/#%s"), I == 0 ? TEXT("key") : TEXT("rim"),
+                                P.Location.X, P.Location.Y, P.Location.Z, P.DistanceUU, P.Candelas, P.AttenuationRadiusUU,
+                                Layer.InnerConeDeg, Layer.OuterConeDeg, *Layer.ColorSrgb.ToHex().Left(6));
+    }
+    FS08Trace::Write(FString::Printf(
+        TEXT("ARTPREVIEW hero-light rig fighter=%s layers=%d height=%.1f channel=%d shadows=0 indirect=0 translucency=0%s"),
+        *Fighter.Id, Want, Height, Channel, *Placed));
+  }
+  SetHeroLitChannels(true);
+  RefreshHeroLightState();
+}
+
+void AS08FighterActor::SetHeroLitChannels(bool bLit) {
+  if (bHeroLitChannels == bLit) return;
+  bHeroLitChannels = bLit;
+  // the figure takes the scene light (channel 0) and, while a rig is on, the hero light (channel 1); rings, labels, the
+  // readability blob / pip and every board / environment primitive stay on channel 0 only
+  for (UPrimitiveComponent* Figure : {static_cast<UPrimitiveComponent*>(ArtBody.Get()), static_cast<UPrimitiveComponent*>(ArtBase.Get()),
+                                      static_cast<UPrimitiveComponent*>(ArtPlaceholder.Get()), static_cast<UPrimitiveComponent*>(Body.Get())}) {
+    if (Figure) Figure->SetLightingChannels(true, bLit, false);
+  }
+}
+
+TArray<const UPrimitiveComponent*> AS08FighterActor::GetHeroLitPrimitives() const {
+  return {ArtBody.Get(), ArtBase.Get(), ArtPlaceholder.Get(), Body.Get()};
+}
+
+int32 AS08FighterActor::GetHeroLightCount() const {
+  int32 N = 0;
+  for (const USpotLightComponent* Light : HeroLights) N += Light && Light->IsVisible() ? 1 : 0;
+  return N;
+}
+
+const USpotLightComponent* AS08FighterActor::GetHeroLight(int32 Layer) const {
+  return HeroLights.IsValidIndex(Layer) ? HeroLights[Layer].Get() : nullptr;
+}
+
+ES08HeroLightState AS08FighterActor::ComputeHeroLightState() const {
+  if (HeroLightLayers <= 0) return ES08HeroLightState::Off;
+  if (!Fighter.IsAlive() || bDeathHold) return ES08HeroLightState::Defeated;
+  // "whose turn / selected" (ENV-HERO-LIGHT.md): the selected fighter or the attacker of the combat focus
+  if (bIsSelected || bIsCombatAttacker) return ES08HeroLightState::Active;
+  return ES08HeroLightState::Idle;
+}
+
+void AS08FighterActor::RefreshHeroLightState() {
+  HeroLightState = ComputeHeroLightState();
+  ApplyHeroLightIntensity();
+  const bool bPulse = HeroLightState == ES08HeroLightState::Active && !bHeroLightFrozen && HeroLightSpec.BreathHz > 0.0f &&
+                      HeroLightSpec.BreathAmp > 0.0f;
+  if (UWorld* World = GetWorld()) {
+    FTimerManager& Timers = World->GetTimerManager();
+    if (bPulse && !Timers.IsTimerActive(HeroLightPulseTimer)) {
+      Timers.SetTimer(HeroLightPulseTimer, this, &AS08FighterActor::OnHeroLightPulse, S08HeroLightSpec::PulseTickS, true);
+    } else if (!bPulse) {
+      Timers.ClearTimer(HeroLightPulseTimer);
+    }
+  }
+  const FString TraceKey = FString::Printf(TEXT("%s|%d"), S08HeroLightStateName(HeroLightState), HeroLightLayers);
+  if (TraceKey == HeroLightTraceKey || (HeroLightTraceKey.IsEmpty() && HeroLightState == ES08HeroLightState::Off)) return;
+  HeroLightTraceKey = TraceKey;
+  const FString Pulse = bPulse ? FString::Printf(TEXT("%.2fHz+-%.0f%%"), HeroLightSpec.BreathHz, HeroLightSpec.BreathAmp * 100.0f)
+                               : FString(bHeroLightFrozen && HeroLightState == ES08HeroLightState::Active ? TEXT("frozen")
+                                                                                                         : TEXT("none"));
+  FS08Trace::Write(FString::Printf(
+      TEXT("ARTPREVIEW hero-light fighter=%s state=%s layers=%d lightsOn=%d keyCd=%.3f rimCd=%.3f mul=%.3f pulse=%s"),
+      *Fighter.Id, S08HeroLightStateName(HeroLightState), HeroLightLayers, GetHeroLightCount(),
+      HeroLightBaseCd.IsValidIndex(0) ? HeroLightBaseCd[0] * HeroLightMul : 0.0f,
+      HeroLightBaseCd.IsValidIndex(1) ? HeroLightBaseCd[1] * HeroLightMul : 0.0f, HeroLightMul, *Pulse));
+}
+
+void AS08FighterActor::ApplyHeroLightIntensity() {
+  const UWorld* World = GetWorld();
+  const double T = World ? World->GetTimeSeconds() : 0.0;
+  HeroLightMul = HeroLightLayers > 0
+      ? S08HeroLight::StateMultiplier(HeroLightSpec, HeroLightState, T, bHeroLightFrozen, HeroLightPhase)
+      : 0.0f;
+  for (int32 I = 0; I < HeroLights.Num(); ++I) {
+    USpotLightComponent* Light = HeroLights[I];
+    if (!Light) continue;
+    const float BaseCd = HeroLightBaseCd.IsValidIndex(I) ? HeroLightBaseCd[I] : 0.0f;
+    const bool bVisible = I < HeroLightLayers && BaseCd > 0.0f && HeroLightMul > 0.0f;
+    if (bVisible) Light->SetIntensity(BaseCd * HeroLightMul);
+    if (Light->IsVisible() != bVisible) Light->SetVisibility(bVisible);
+  }
+}
+
+void AS08FighterActor::OnHeroLightPulse() {
+  if (HeroLightState != ES08HeroLightState::Active || bHeroLightFrozen) {
+    if (UWorld* World = GetWorld()) World->GetTimerManager().ClearTimer(HeroLightPulseTimer);
+    return;
+  }
+  ApplyHeroLightIntensity();
 }

@@ -1,8 +1,8 @@
 """ENV-MAPS P8.1 (track A): run the whole concept-scene chain headless (no UE, no GPU).
 
-  python -B tools/art/concept_scene/run_scene.py [--steps geom,export,layout,ao,bake,manifest] [--refit]
+  python -B tools/art/concept_scene/run_scene.py [--steps geom,export,layout,ao,bake,manifest]
 
-  geom      ship prep (Blender, only when <work>/ship_raw.npz is missing), ship fit, island, fort, palisade, piles
+  geom      frame band, ship (procedural on the painted pixels), island, cascade, fort, palisade, piles, banner
             (system Python) -> <work>/<Mesh>.pre.npz
   export    cs_blender.py export (headless Blender 5.2, factory startup): MeshBuilder -> UM_FBX_v1 FBX in
             art/pipeline-candidates/ASSET-ENV-S-*/20261002-v1/export/, Smart UV atlas for the imported / procedural
@@ -29,7 +29,7 @@ if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 import cs_common as CS  # noqa: E402
 
-# name -> (run key, FBX stem, slot, unwrap, sharpDeg, smoothFaces, atlas px, AO px)
+# name -> (run key, FBX stem, slot (or a tuple of slots), unwrap, sharpDeg, smoothFaces, atlas px, AO px)
 MESHES = {
     "Island": ("island", "SM_Env_S_Island", "MI_Env_S_Island", False, 40.0, "npz", 4096, 2048),
     "Ship": ("ship", "SM_Env_S_Ship", "MI_Env_S_Ship", True, 35.0, "all", 4096, 2048),
@@ -37,7 +37,18 @@ MESHES = {
     "Palisade": ("props", "SM_Env_S_Palisade", "MI_Env_S_Palisade", True, 50.0, "all", 2048, 1024),
     "Piles": ("props", "SM_Env_S_Piles", "MI_Env_S_Piles", True, 50.0, "all", 2048, 1024),
     "Banner": ("props", "SM_Env_S_Banner", "MI_EnvCP_Banner", False, None, "all", 0, 0),  # not baked (P7c material)
+    # P9: the frame band (F2: track B's material-route MIs, wood + iron, box-mapped tiling UVs, not baked) and the
+    # cascade water / foam (F4: authored flow UVs, translucent water MIs of track B, not baked, no bake occluders)
+    "FrameBand": ("props", "SM_Env_S_FrameBand", ("MI_EnvScene_FrameWood", "MI_EnvScene_FrameIron"), False, 30.0,
+                  "all", 0, 0),
+    "Cascade": ("props", "SM_Env_S_Cascade", "MI_EnvScene_FallsSheet", False, None, "all", 0, 0),
+    "CascadeFoam": ("props", "SM_Env_S_CascadeFoam", "MI_EnvScene_FallsFoam", False, None, "all", 0, 0),
 }
+WATER = ("Cascade", "CascadeFoam")  # translucent: not in the bake's C0 depth buffer
+
+
+def slots_of(slot) -> list[str]:
+    return list(slot) if isinstance(slot, (tuple, list)) else [slot]
 
 
 def blender(args, log: Path):
@@ -57,18 +68,19 @@ def py(script, *args):
 
 
 def step_geom(a):
-    if not (CS.WORK / "ship_raw.npz").is_file():
-        blender([str(HERE / "ship_build.py"), "--", "prep"], CS.WORK / "logs" / "ship_prep.log")
-    py("ship_build.py", "fit", *(["--refit"] if a.refit else []))
+    py("frame_band_build.py")
+    py("ship_build.py")
     py("island_build.py", "--overlay")
+    py("cascade_build.py")
     py("fort_build.py")
     py("palisade_build.py")
     py("piles_build.py")
     py("banner_build.py")
-    ms = [CS.Mesh.load(CS.WORK / f"SM_Env_S_{n}.pre.npz") for n in ("Island", "Ship", "Fort", "Palisade", "Piles")]
+    names = ("Island", "Ship", "Fort", "Palisade", "Piles", "FrameBand", "Cascade")
+    ms = [CS.Mesh.load(CS.WORK / f"SM_Env_S_{n}.pre.npz") for n in names]
     px = CS.overlay_meshes(ms, CS.WORK / "overlays" / "scene-silhouette-c0.png", scale=1.0, alpha=0.45,
                            crop=(-384.0, -216.0, 2304.0, 1296.0))
-    print("OVERLAY scene-silhouette-c0.png C0 px per mesh (island, ship, fort, palisade, piles):", px)
+    print(f"OVERLAY scene-silhouette-c0.png C0 px per mesh ({', '.join(names)}):", px)
 
 
 def export_job():
@@ -78,7 +90,7 @@ def export_job():
         (rd / "export").mkdir(parents=True, exist_ok=True)
         (rd / "reports" / "fbx-readback").mkdir(parents=True, exist_ok=True)
         jobs.append({"npz": str(CS.WORK / f"{stem}.pre.npz"), "fbx": str(rd / "export" / f"{stem}.fbx"),
-                     "final": str(CS.WORK / f"{stem}.npz"), "slots": [slot], "unwrap": unwrap,
+                     "final": str(CS.WORK / f"{stem}.npz"), "slots": slots_of(slot), "unwrap": unwrap,
                      "unwrapAngleDeg": 60.0, "unwrapMargin": 4.0 / max(atlas, 1024),
                      "sharpDeg": sharp, "smoothFaces": smooth,
                      "readback": str(rd / "reports" / "fbx-readback" / f"{stem}.json")})
@@ -112,7 +124,8 @@ def step_export(a):
                       "generator": {CS.rel(p): CS.text_sha256_lf(p) for p in sorted(HERE.glob("*.py"))
                                     if p.name in ("cs_common.py", "cs_geom.py", "cs_blender.py", "island_build.py",
                                                   "ship_build.py", "fort_build.py", "palisade_build.py",
-                                                  "piles_build.py", "banner_build.py", "run_scene.py")},
+                                                  "piles_build.py", "banner_build.py", "frame_band_build.py",
+                                                  "cascade_build.py", "run_scene.py")},
                       "params": CS.rel(CS.PARAMS_PATH), "paramsSha256": CS.text_sha256_lf(CS.PARAMS_PATH),
                       "exports": ex})
     print(f"EXPORT {len(rep['exports'])} meshes in {sec} s")
@@ -136,7 +149,6 @@ def step_ao(a):
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n", 1)[0])
     ap.add_argument("--steps", default="geom,export,layout,ao,bake,manifest")
-    ap.add_argument("--refit", action="store_true")
     a = ap.parse_args(argv)
     (CS.WORK / "logs").mkdir(parents=True, exist_ok=True)
     for s in [x.strip() for x in a.steps.split(",") if x.strip()]:

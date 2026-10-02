@@ -142,6 +142,23 @@ public:
   /** True while the paste is on and its parts exist (the painted surround replaces tray / ground / props). */
   bool IsConceptPasteOn() const { return ConceptMode.bOn && ConceptRuntime.Status == TEXT("ok"); }
 
+  // ---- ENV-MAPS P9 hero light (S08HeroLight.h, docs/art-pipeline/ENV-HERO-LIGHT.md) ----
+  /** The "heroLight" block that lights the figures now: the active art profile's light profile block when enabled (grid and
+   *  map-image boards alike), nullptr without art, without the block, disabled, or under -NoHeroLight. */
+  const FS08HeroLightSpec* GetActiveHeroLight() const;
+  /** Hero lights on the board after the last update (sum over the fighters) and the layers per figure. */
+  int32 GetHeroLightCount() const { return HeroLightCount; }
+  int32 GetHeroLightLayers() const { return HeroLightLayersPerFigure; }
+  /** Automation only: a spec used instead of the art profile's (also on a grey board), and the -NoHeroLight decision
+   *  (unset = the command line). Call UpdateHeroLights (or SyncFighters) after. */
+  void SetHeroLightOverrideForTest(const FS08HeroLightSpec* Spec) {
+    bHeroLightOverride = Spec != nullptr;
+    HeroLightOverride = Spec ? *Spec : FS08HeroLightSpec();
+  }
+  void SetHeroLightOptOutForTest(TOptional<bool> bOptOut) { HeroLightOptOutOverride = bOptOut; }
+  /** Applies the active block to every fighter actor within the board budget (S08HeroLight::LayersForBoard); traced. */
+  void UpdateHeroLights();
+
   /** Syncs fighter actors with the latest decoded fighters (spawn/move/
    *  re-label by stable fighter id; dead fighters hide instantly). */
   void SyncFighters(const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters,
@@ -460,6 +477,14 @@ private:
   UPROPERTY()
   TObjectPtr<UMaterialInstanceDynamic> LeaderPipKeylineMid;
   FString ReadabilityFightersTraceKey;
+
+  // ---- ENV-MAPS P9 hero light ----
+  bool bHeroLightOverride = false;
+  FS08HeroLightSpec HeroLightOverride;
+  TOptional<bool> HeroLightOptOutOverride;
+  int32 HeroLightCount = 0;
+  int32 HeroLightLayersPerFigure = 0;
+  FString HeroLightTraceKey;
 
   FS08BoardModel BoardModel;
   TArray<FS08BoardFighter> Fighters;

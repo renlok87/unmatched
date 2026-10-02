@@ -48,7 +48,10 @@ class FxSpecs(unittest.TestCase):
         self.assertEqual(err, [])
         self.assertEqual({s["name"] for s in FX.FX_SPECS},
                          {"NS_Env_Campfire", "NS_Env_LanternFlame", "NS_Env_CherryPetals", "NS_Env_Fireflies",
-                          "NS_Env_ConceptFire"})  # P7 concept paste fires (sarpedon.concept.layout.json)
+                          "NS_Env_ConceptFire",  # P7 concept paste fires (sarpedon.concept.layout.json)
+                          # ENV-MAPS P9: the layered lit3d fire + the cascade mist (fx-plan.sarpedon.json)
+                          "NS_Env_FireCore", "NS_Env_FireTongues", "NS_Env_FireSmoke", "NS_Env_FireEmbers",
+                          "NS_Env_FallsSpray"})
 
     def test_targets_and_rules(self):
         for s in FX.FX_SPECS:

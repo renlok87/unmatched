@@ -1,18 +1,110 @@
 {
  "schema": "unmatched.concept-scene-tune/1",
  "map": "sarpedon",
- "status": "измерено (ENV-MAPS P8.3 tune; художественная приёмка - решение пользователя)",
+ "status": "измерено (ENV-MAPS P8.3 + P9 tune; художественная приёмка - решение пользователя)",
  "note": "Parameters only (task section 4 P8.3 item 3), read last by tools/art/concept_scene/ue_scene_material.mi_plan over the manifest / default MI values; journal C:/tmp/envmaps-research/p8/tune/log.md (out of git), evidence docs/game-design/evidence/ENV-MAPS/p8-3d-under-paint-2026-10-02/README.md. The point lights are in S08ArtBoardProfiles.json conceptPaste.lit3d.lights.",
- "iteration": "i6",
+ "iteration": "p9-i3",
  "baked": {
-  "*": {"vectors": {"BakedTint": [0.45, 0.45, 0.45, 1.0]}, "scalars": {"NormalStrength": 2.0, "AOStrength": 1.3}},
-  "Island": {"vectors": {"BakedTint": [0.52, 0.44, 0.35, 1.0]}}
+  "*": {
+   "vectors": {
+    "BakedTint": [
+     0.45,
+     0.45,
+     0.45,
+     1.0
+    ]
+   },
+   "scalars": {
+    "NormalStrength": 2.0,
+    "AOStrength": 1.3
+   }
+  },
+  "Island": {
+   "vectors": {
+    "BakedTint": [
+     0.52,
+     0.44,
+     0.35,
+     1.0
+    ]
+   }
+  },
+  "Ship": {
+   "vectors": {
+    "BakedTint": [
+     1.3,
+     1.3,
+     1.3,
+     1.0
+    ]
+   },
+   "noteP9": "P9 F1: the ship is the only place where more albedo is wanted (the user keeps the dark overall light): 0.45 -> 0.75 (track A) -> 1.0 (p9-i1: the painted ship polygon at C0 read 1.9x darker in linear light, sRGB (25, 17, 19) vs the concept (40, 25, 22)); the rest of the environment unchanged; p9-i2 1.3 (the polygon still read dL* -3.5 at i1)"
+  }
  },
  "looks": {
-  "*": {"vectors": {"AlbedoGain": [0.45, 0.45, 0.45, 1.0]}, "vectorsMul": {"FallbackTint": [0.45, 0.45, 0.45]}}
+  "*": {
+   "vectors": {
+    "AlbedoGain": [
+     0.45,
+     0.45,
+     0.45,
+     1.0
+    ]
+   },
+   "vectorsMul": {
+    "FallbackTint": [
+     0.45,
+     0.45,
+     0.45
+    ]
+   }
+  }
  },
  "lanternHead": {
   "parent": "/Game/EnvKit/ConceptPaste/MI_EnvCP_LanternHead",
-  "scalars": {"EmissiveIntensity": 60.0}
+  "scalars": {
+   "EmissiveIntensity": 60.0
+  }
+ },
+ "materials": {
+  "FrameWood": {
+   "vectors": {
+    "BakedTint": [
+     0.63,
+     0.48,
+     0.42,
+     1.0
+    ]
+   },
+   "note": "P9 F2 p9-i1: the band patch at C0 (gates.py BAND) read sRGB (27, 23, 26) vs the concept (43, 35, 38), dL* -6.4: BakedTint x1.9 (track B 0.33 / 0.25 / 0.22)"
+  },
+  "FrameIron": {
+   "vectors": {
+    "BakedTint": [
+     1.3,
+     1.3,
+     1.3,
+     1.0
+    ]
+   },
+   "note": "P9 F2 p9-i1: the iron read 0.53 x the wood around it (15 vs 28 luma) - lifted so the brackets / straps / rivets read against the brighter wood"
+  },
+  "FallsSheet": {
+   "vectors": {
+    "FallLook": [
+     0.5,
+     0.96,
+     0.9,
+     1.0
+    ],
+    "FallFlow": [
+     48.0,
+     6.0,
+     30.0,
+     0.12
+    ]
+   },
+   "note": "P9 F4 p9-i1: body opacity 0.62 -> 0.5 (the rocks show through; the cascade read brighter and bluer than the painted one: mean sRGB (83, 97, 125) vs (44, 61, 86)); p9-i3: side fade 18 -> 30 uu, wobble 0.9 (with uvPerStream every stream gets a soft wobbling side: separate curtains instead of one rectangular sheet)"
+  }
  }
 }

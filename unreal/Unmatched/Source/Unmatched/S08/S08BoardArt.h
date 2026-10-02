@@ -32,6 +32,7 @@
 
 #include "CoreMinimal.h"
 #include "S08BoardModel.h"
+#include "S08HeroLight.h"
 #include "S08ConceptPaste.h"
 
 /** Zone mark geometry (uu, z above the tile top z = 0). W5b-R D-4: strokes moved inside the slab (nominal centre
@@ -313,6 +314,9 @@ struct UNMATCHED_API FS08LightProfile {
   FS08KeyShadowSpec KeyShadow;
   FS08FogSpec Fog;
   FS08MapGradeSpec MapGrade;
+  /** ENV-MAPS P9 (docs/art-pipeline/ENV-HERO-LIGHT.md, S08HeroLight.h): the optional per-figure "heroLight" rig (lighting
+   *  channel 1, figures only); a separate category outside the 1 key + <= 6 points budget below. */
+  FS08HeroLightSpec HeroLight;
   /** 1 directional with shadow + <= 6 points without shadows. */
   bool BudgetOk(FString& OutReason) const;
 };

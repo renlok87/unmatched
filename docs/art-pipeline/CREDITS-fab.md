@@ -14,7 +14,7 @@ gitignored `unreal/Unmatched/Content/<Pack>/` и в git не попадают. �
 | [Fantasy_Forest](https://www.fab.com/listings/ece3a551-6c18-47db-8fc3-d3d12698265f) | Gairisa | Fab Standard, «Личное» | разрешён | `Fantasy_Forest` | 5.8 | тёмный лес по кромке Sarpedon |
 | [Vine_Plants](https://www.fab.com/listings/23286ced-250a-4720-bb61-9017fbdc2446) | Gairisa | Fab Standard, «Личное» | разрешён | `Vine_Plants` | 5.8 | плющ/лианы: колоннада, задняя стена, руины форта |
 | [Stylized Flowers Pots](https://www.fab.com/listings/4615cf5f-d95d-4e92-b815-65575488d4be) | Gairisa | Fab Standard, «Личное» | разрешён | `Flowers_Pots` | 5.5 → проект 5.8 | цветы в вазонах/клумбы Marmoreal |
-| [Stylish Fire VFX (Free asset)](https://www.fab.com/listings/01e8534c-5877-4ce2-8948-9a696100de11) | VfxSTOCK | Fab Standard, «Личное» | разрешён | `Stylish_Fire_VFX` | 5.6 → проект 5.8 | огонь костров, фонарей, факелов |
+| [Stylish Fire VFX (Free asset)](https://www.fab.com/listings/01e8534c-5877-4ce2-8948-9a696100de11) | VfxSTOCK | Fab Standard, «Личное» | разрешён | `Stylish_Fire_VFX` | 5.6 → проект 5.8 | огонь костров, фонарей, факелов; P9: слоистый огонь жаровни и форта (ядро `NS_Stylish_Fire_4`, языки `_1`, дым `_2`) |
 | [Particles and Wind Control System](https://www.fab.com/listings/f673ef70-1c66-4c7f-8751-9f84ddb8b083) | Dragon Motion | бесплатно (Permanent Collection) | разрешён | `Particles_Wind_Control_System` | 5.8 | скачан, в игре **не используется**: его светлячки и свеча добавляют PointLight (бюджет света); огоньки взяты из Free Niagara Particles (P5c) |
 | [Free Niagara Particles (CC BY 4.0)](https://www.fab.com/listings/183732bc-c2fb-465c-9453-f70a1ce7ba2c) | SoftTofuVFX | **CC BY 4.0** | разрешён | `FreeParticle_SoftTofu` | 5.8 | лепестки, перья, искры |
 | [Water Materials](https://www.fab.com/listings/063155ea-d9d2-4f29-b09f-33270b0bc861) | tharlevfx | **CC BY 4.0** | разрешён | `WaterMaterials` (по факту папки) | 5.8 | вода реки/прибоя/водопада Sarpedon |
@@ -36,7 +36,7 @@ Smuggler's Cove. Скачал оркестратор 2026-10-02 в `C:/tmp/envma
 
 ## Атрибуция CC BY 4.0
 
-- «Free Niagara Particles» © SoftTofuVFX, CC BY 4.0, https://www.fab.com/listings/183732bc-c2fb-465c-9453-f70a1ce7ba2c — используется с изменениями (цвет/масштаб под ночную сцену): листья-лепестки `NS_leaf` и огоньки `NS_Sparkling_Animate_2` (P5c).
+- «Free Niagara Particles» © SoftTofuVFX, CC BY 4.0, https://www.fab.com/listings/183732bc-c2fb-465c-9453-f70a1ce7ba2c — используется с изменениями (цвет/масштаб под ночную сцену): листья-лепестки `NS_leaf` и огоньки `NS_Sparkling_Animate_2` (P5c); `NS_Sparkling_Noise` (ENV-MAPS P9: угольки слоистого огня жаровни и форта `NS_Env_FireEmbers`, брызги каскада `NS_Env_FallsSpray`; цвет, размер, число частиц, CPU).
 - «Water Materials» © tharlevfx, CC BY 4.0, https://www.fab.com/listings/063155ea-d9d2-4f29-b09f-33270b0bc861 — используются текстуры пака (T_Ocean_Foam, T_Water_Normal, T_Water_Normal_Large) в собственных материалах моря и водопада Sarpedon (`M_EnvSea`, `M_EnvWaterfall`, P5c).
 
 ## Состояние загрузок

@@ -43,7 +43,6 @@ PARAMS_PATH = HERE / "scene-params.sarpedon.json"
 MANIFEST_PATH = HERE / "manifest.sarpedon.json"
 WORK = Path("C:/tmp/envmaps-research/p8/sceneA")
 PLATES = Path("C:/tmp/envmaps-research/p8/plates")
-POLYHAVEN = Path("C:/tmp/envmaps-research/p8/polyhaven")
 DERIVED = REPO / "scraped-data" / "derived" / "concept-scene" / MAP_KEY
 CC0_RAW = C.MAIN / "art" / "material-library" / "cc0-raw"
 LAYOUTS = REPO / "unreal" / "Unmatched" / "Config" / "ArtBoards" / "EnvLayouts"

@@ -9,17 +9,21 @@ Pure Python on the committed reports / manifest (+ the out-of-git textures when 
 * the manifest: schema / fields of the interface (meshes, projected, layout), UE names /Game/EnvMaps/Sarpedon/Scene/,
   textures in the gitignored scraped-data/derived/concept-scene/sarpedon/ with their sha256, the projected plate
   power-of-two over the P7 PlateB rect, the looks named by the layout, params / generator hashes current;
-* the ship fit: the C0 silhouette IoU and the waterline at the sea plane.
+* the ship (P9: procedural on the painted pixels, no Poly Haven hull): the C0 fit (visible silhouette IoU, rail /
+  foot pixel residuals) and its three gun ports;
+* P9 material route: the frame band / cascade meshes name track B's material-route MIs per slot, the manifest's
+  "materials" carries the cascade's FallCard.
 """
 from __future__ import annotations
 
 import hashlib
 import json
-import re
 import subprocess
 import sys
 import unittest
 from pathlib import Path
+
+import numpy as np
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[2]
@@ -48,7 +52,7 @@ class FbxContracts(unittest.TestCase):
             rb = e["readback"]
             self.assertEqual(rb["mesh_objects"], 1, stem)
             self.assertEqual(rb["triangles"], e["triangles"], stem)
-            self.assertEqual(rb["material_slots"], [slot], stem)
+            self.assertEqual(rb["material_slots"], RS.slots_of(slot), stem)
             self.assertEqual(rb["uv_layers"], ["UVMap"], stem)
             self.assertTrue(rb["ue_frame_matches_build"], stem)
             self.assertTrue(all(c["conforms"] for c in e["um_fbx_v1_conformance"]), stem)
@@ -136,13 +140,39 @@ class Manifest(unittest.TestCase):
             self.assertRegex(mi, r"^/Game/EnvMaps/Sarpedon/Scene/MI_EnvScene_Proj_[A-Za-z]+$")
 
 
-class ShipFit(unittest.TestCase):
-    def test_fit(self):
-        fit = CS.load_json(CS.RUNS["ship"] / "reports" / "ship-fit.json")
-        self.assertGreaterEqual(fit["fit"]["iou"], 0.7, "C0 silhouette IoU of the hull vs the painted ship")
-        self.assertEqual(fit["fit"]["waterlineZ"], CS.params()["seaZ"])
-        self.assertLessEqual(fit["triangles"], 40000)
-        self.assertTrue(re.match(r".*dutch_ship_large_01", CS.params()["ship"]["source"]))
+class ShipBuild(unittest.TestCase):
+    def test_c0_fit(self):
+        rep = CS.load_json(CS.RUNS["ship"] / "reports" / "ship-build.json")
+        fit = rep["c0Fit"]
+        self.assertGreaterEqual(fit["iouC0"], 0.7, "visible C0 silhouette IoU vs the painted ship (P8: 0.65)")
+        self.assertGreaterEqual(fit["targetCoveredC0"], 0.8)
+        self.assertLessEqual(fit["railRmsPx"], 3.0, "the rail cap on the painted rail pixels")
+        self.assertLessEqual(fit["footRmsPx"], 10.0)
+        self.assertLessEqual(rep["info"]["triangles"], 40000)
+        self.assertNotIn("source", CS.params()["ship"], "P9: no Poly Haven hull any more")
+
+    def test_ports(self):
+        rep = CS.load_json(CS.RUNS["ship"] / "reports" / "ship-build.json")
+        ports = rep["info"]["ports"]
+        self.assertEqual(sorted(p["cannon"] for p in ports), ["cannon-1", "cannon-2", "cannon-3"])
+        cam = CS.cam0()
+        for p in ports:
+            q = cam.project(np.array([p["muzzle"]], float))[0][0]
+            self.assertLess(float(np.hypot(*(q - np.array(p["muzzlePx"])))), 1.0, p["cannon"])
+            self.assertGreater(p["protrusionUU"], 0.0)
+
+
+class MaterialRoute(unittest.TestCase):
+    def test_slots_and_materials(self):
+        ex = {m["name"]: m for m in MAN["meshesExistingMaterial"]}
+        ue = "/Game/EnvMaps/Sarpedon/Scene/MI_EnvScene_"
+        self.assertEqual(ex["FrameBand"]["slots"], [ue + "FrameWood", ue + "FrameIron"])
+        self.assertEqual(ex["Cascade"]["slots"], [ue + "FallsSheet"])
+        self.assertEqual(ex["CascadeFoam"]["slots"], [ue + "FallsFoam"])
+        rep = CS.load_json(CS.RUNS["props"] / "reports" / "cascade-build.json")
+        card = MAN["materials"]["FallsSheet"]["vectors"]["FallCard"]
+        self.assertEqual(card[:2], rep["info"]["fallCard"])
+        self.assertEqual(card[3], 1.0, "lane K v convention: FallCard.w = 1")
 
 
 if __name__ == "__main__":

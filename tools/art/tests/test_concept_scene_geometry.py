@@ -6,8 +6,12 @@
   in their committed build reports (code + params == the exported geometry);
 * the island: no vertex above the plateau inside the map field (|X| <= 467.67, |Y| <= 310.67), the frame-002 foot
   ring stands on the top (no gap), <= 40k triangles, a non-overlapping UV atlas inside 0..1, the near cliffs face the
-  K1 camera, the waterfall tongue reaches under SM_Env_S_WaterfallLip, the cliffs reach the sea plane;
-* the props: triangle budgets (<= 12k), closed logs, posts standing on the island.
+  K1 camera, the cliffs reach the sea plane; P9: the front lip tucks under the frame band's near beam (ring 1 on the
+  beam face plane, below its bottom edge; deeper in the cascade outlet), the P5c waterfall tongue is gone;
+* the props: triangle budgets (<= 12k), closed logs, posts standing on the island;
+* P9: the frame band (wraps frame-002, never over it, below its top, covers the painted frame at C0, two slots), the
+  cascade (4 streams, 4 tiers, clear of the rock towards every game camera, flow UVs) and the procedural ship (rail on
+  the painted pixels, ports at the painted muzzles, the mast on the deck, clear of the frame band).
 """
 from __future__ import annotations
 
@@ -28,6 +32,9 @@ import island_build as IB  # noqa: E402
 import fort_build as FB  # noqa: E402
 import palisade_build as PB  # noqa: E402
 import banner_build as BB  # noqa: E402
+import frame_band_build as FBB  # noqa: E402
+import cascade_build as CB  # noqa: E402
+import ship_build as SB  # noqa: E402
 
 
 def report(run, name):
@@ -82,13 +89,137 @@ class IslandTests(unittest.TestCase):
         top = self.mesh.face_normals()[self.mesh.SMOOTH]
         self.assertGreater(float(top[:, 2].min()), 0.0, "top faces point up")
 
-    def test_waterfall_tongue_under_the_lip(self):
-        # SM_Env_S_WaterfallLip: loc (-144.1, 425, 0), yaw 90, slabs from local x -26 (back) -> board Y >= 399
+    def test_front_lip_tucks_under_the_beam(self):
+        # P9 F3: on the front rim under the near beam the first profile ring lies on the beam's face plane, below its
+        # bottom edge (no grazing lip strip in front of the frame); deeper in the cascade outlet
+        L = self.P["nearLip"]
+        fb = CS.params()["frameBand"]
+        R, rings = self.rimd["R"], self.rimd["rings"]
+        sel = (R[:, 1] > CS.C.FRAME_HY) & (np.abs(R[:, 0]) < L["xHalfUU"] - 5)
+        self.assertGreater(int(sel.sum()), 40)
+        r1 = rings[1, sel]
+        self.assertLess(float(np.abs(r1[:, 1] - L["faceYUU"]).max()), 1.5)
+        self.assertTrue((r1[:, 2] <= fb["faceBottomZ"]).all(), "ring 1 below the beam's bottom edge")
+        x0, x1 = L["outletXUU"]
+        out = sel & (R[:, 0] > x0) & (R[:, 0] < x1)
+        self.assertLess(float(rings[1, out, 2].max()), fb["faceBottomZ"] - 20.0, "the cascade outlet under the beam")
+        self.assertLess(float(R[sel, 1].max()), fb["faceYUU"], "the rim stays behind the beam face")
+
+    def test_waterfall_tongue_is_gone(self):
         R = self.rimd["R"]
-        sel = np.abs(R[:, 0] + 144.1) < 80
-        self.assertGreater(float(R[sel, 1].max()), 399.0 + 20.0, "the tongue must reach under the lip's back")
-        h = self.hf(np.array([[-144.1, 410.0]]))[0]
-        self.assertLess(h, 0.8, "the tongue stays below the lip top (Z 0.8)")
+        sel = np.abs(R[:, 0] + 144.1) < 120
+        self.assertLess(float(R[sel, 1].max()), 360.0)
+
+
+class FrameBandTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.P = CS.params()["frameBand"]
+        cls.mesh, cls.info = FBB.build(cls.P)
+
+    def test_deterministic_and_matches_the_report(self):
+        again, _ = FBB.build(self.P)
+        self.assertEqual(self.mesh.digest(), again.digest())
+        self.assertEqual(self.mesh.digest(), report("props", "frameband-build.json")["meshDigest"])
+
+    def test_wraps_frame002_never_over_it(self):
+        chk = FBB.checks(self.mesh, self.P)
+        self.assertEqual(chk["verticesOverFrame002OrMap"], 0)
+        self.assertTrue(chk["belowFrameTop"])
+        self.assertLessEqual(self.mesh.tris, 12000)
+        B = self.mesh.board()
+        self.assertLess(float(np.abs(B[:, 0]).min()), 1.0, "the far / near beams run across the whole width")
+        self.assertLess(float(np.min(np.abs(B[:, 0]) - CS.C.FRAME_HX, initial=1e9, where=np.abs(B[:, 1]) < CS.C.FRAME_HY)), 1.0)
+
+    def test_covers_the_painted_frame_at_c0(self):
+        rep = report("props", "frameband-build.json")
+        self.assertGreaterEqual(rep["c0Coverage"]["covered"], 0.9)
+        self.assertLessEqual(rep["c0Coverage"]["spillShareOfPainted"], 0.2)
+
+    def test_two_slots_and_tiling_uvs(self):
+        self.assertEqual(self.mesh.slots, ["MI_EnvScene_FrameWood", "MI_EnvScene_FrameIron"])
+        n_iron = int((self.mesh.MAT == 1).sum())
+        self.assertGreater(n_iron, 500, "iron brackets / straps / rivets")
+        self.assertGreater(int((self.mesh.MAT == 0).sum()), 500)
+        self.assertTrue(np.isfinite(self.mesh.UV).all())
+        # tiling: a beam spans several UV units along its grain
+        self.assertGreater(float(np.ptp(self.mesh.UV[self.mesh.MAT == 0][..., 0])), 5.0)
+
+
+class CascadeTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        allp = CS.params()
+        cls.allp = allp
+        island, rimd, _, _ = IB.build(allp["island"], float(allp["seaZ"]))
+        cls.island, cls.rimd = island, rimd
+        cls.sheet, cls.foam, cls.info = CB.build(allp["cascade"], rimd, float(allp["seaZ"]), CB.beam_of(allp))
+
+    def test_deterministic_and_matches_the_report(self):
+        s2, f2, _ = CB.build(self.allp["cascade"], self.rimd, float(self.allp["seaZ"]), CB.beam_of(self.allp))
+        self.assertEqual((self.sheet.digest(), self.foam.digest()), (s2.digest(), f2.digest()))
+        rep = report("props", "cascade-build.json")
+        self.assertEqual(rep["meshDigest"], {CB.NAME: self.sheet.digest(), CB.FOAM: self.foam.digest()})
+
+    def test_streams_tiers_and_uvs(self):
+        self.assertEqual(len(self.info["streams"]), 4)
+        self.assertEqual([t["tier"] for t in self.info["tiers"]], [1, 2, 3, 4])
+        self.assertTrue(self.info["tiers"][-1]["sea"])
+        zs = [t["landing"][2] for t in self.info["tiers"]]
+        self.assertEqual(zs, sorted(zs, reverse=True), "tiers step down")
+        B = self.sheet.board()
+        self.assertGreaterEqual(float(B[:, 2].min()), float(self.allp["seaZ"]) - 1e-6)
+        self.assertLessEqual(float(B[:, 2].max()), self.allp["frameBand"]["faceBottomZ"], "starts under the beam")
+        self.assertTrue((self.sheet.UV >= -1e-9).all() and (self.sheet.UV <= 1 + 1e-9).all())
+        rep = report("props", "cascade-build.json")
+        self.assertGreaterEqual(rep["c0Coverage"]["c0Frame"]["widthCoverage"], 0.8, "painted width coverage at C0")
+
+    def test_clear_of_the_rock_towards_the_cameras(self):
+        cam = CS.cam0()
+        ground = G.Ground([self.island])
+        c = ground.P[ground.F].mean(1)
+        sel = (c[:, 0] > -330) & (c[:, 0] < 100) & (c[:, 1] > 300)
+        F = ground.F[sel]
+        for name, pos in (("C0", cam.pos), ("K1", CS.C.Cam(CS.C.D_K1).pos)):
+            blocked = 0
+            for v in self.sheet.board()[::4]:
+                d = pos - v
+                d = d / np.linalg.norm(d)
+                blocked += int(np.isfinite(G.ray_mesh(v + d * 0.5, d, ground.P, F)))
+            self.assertEqual(blocked, 0, name)
+
+
+class ShipTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        allp = CS.params()
+        cls.P = allp["ship"]
+        cls.east = FBB.outer_extents(allp["frameBand"])["eastX"]
+        cls.mesh, cls.info, cls.W = SB.build(cls.P, cls.east)
+
+    def test_deterministic_and_matches_the_report(self):
+        again, _, _ = SB.build(self.P, self.east)
+        self.assertEqual(self.mesh.digest(), again.digest())
+        self.assertEqual(self.mesh.digest(), report("ship", "ship-build.json")["meshDigest"])
+        self.assertLessEqual(self.mesh.tris, 40000)
+
+    def test_rail_on_the_painted_pixels(self):
+        self.assertLess(max(abs(v) for v in self.W.rail_res), 5.0, "the painted rail is level on the wall plane")
+        cam = CS.cam0()
+        for x, y in self.P["railPx"]:
+            A = self.W.on_plane(x, y, 0.0)
+            s = self.W.sdz(A)[0]
+            q = cam.project(self.W.P(s, 0.0, float(self.W.rail_z(s)))[None])[0][0]
+            self.assertLess(float(np.hypot(q[0] - x, q[1] - y)), 4.0)
+
+    def test_mast_on_deck_and_clear_of_the_band(self):
+        H = self.P["hull"]
+        for m in self.info["rig"]["masts"]:
+            self.assertTrue(H["wallThickUU"] < m["dInUU"] < H["beamUU"] - H["wallThickUU"], m["id"])
+        B = self.mesh.board()
+        ext = FBB.outer_extents(CS.params()["frameBand"])
+        inside = (B[:, 0] > ext["westX"]) & (B[:, 0] < ext["eastX"]) & (B[:, 1] > ext["farY"]) & (B[:, 1] < ext["nearY"])
+        self.assertEqual(int((inside & (B[:, 2] < 60.0)).sum()), 0, "the hull side must not cut the frame band")
 
 
 class PropTests(unittest.TestCase):

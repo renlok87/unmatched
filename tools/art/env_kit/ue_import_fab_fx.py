@@ -25,6 +25,8 @@ Modes (one file):
            (deleted, duplicated again from the pristine pack system, tuned, saved) only when that sha changes or with
            --force, so the 'mul' rules always apply to the pack values. Report: 'ENVFX-IMPORT-REPORT {...}' /
            'ENVFX-IMPORT-RESULT ok|failed' and <project>/Saved/EnvKit/ue-fx-import-report.json (or --report).
+ENV-MAPS P9 (F5 / F4): NS_Env_FireCore / _FireTongues / _FireSmoke / _FireEmbers (the layered brazier + fort fire) and
+NS_Env_FallsSpray (the cascade mist) are placed by tools/art/concept_scene/fx-plan.sarpedon.json; FX_PLAN_SYSTEMS lists them.
 Needs the UnmatchedEditor build with S08EnvFxAuthoring.cpp (Unmatched.Build.cs: Niagara). Licences: Stylish Fire VFX =
 Fab Standard (personal); Free Niagara Particles (SoftTofuVFX) = CC BY 4.0, attribution in docs/art-pipeline/CREDITS-fab.md.
 Statuses: proposed / measured / technically imported; artistic acceptance is the user's decision only.
@@ -79,6 +81,38 @@ def _fire_rules(k: float, spawn_mul: float, color_mul: float = 1.0) -> list[dict
         {"match": "*.SolveForcesAndVelocity.Speed Limit", "mul": k},
         {"match": "*.SpawnRate.SpawnRate", "mul": spawn_mul},
     ]
+
+
+# NS_Stylish_Fire_4: the same three emitters, lifetime 1.0..1.5 s (taller flames: the P9 fire core)
+_FIRE4_EMITTERS = {"Fire_1": {"spawnRate": 50.0, "lifetime": (1.0, 1.5)},
+                   "Fire": {"spawnRate": 25.0, "lifetime": (1.0, 1.5)},
+                   "Fire001": {"spawnRate": 25.0, "lifetime": (1.0, 1.5)}}
+# NS_Stylish_Fire_1: four emitters - Fire_1 30 / s (curl noise 599: the licking tongues), Fire / Fire001 15 / s and the
+# Fire_Partic sparks 15 / s (0.6..1.0 s); sprites 150..255 uu
+_FIRE1_EMITTERS = {"Fire_1": {"spawnRate": 30.0, "lifetime": (0.8, 1.0)},
+                   "Fire": {"spawnRate": 15.0, "lifetime": (0.8, 1.0)},
+                   "Fire001": {"spawnRate": 15.0, "lifetime": (0.8, 1.0)},
+                   "Fire_Partic": {"spawnRate": 15.0, "lifetime": (0.6, 1.0)}}
+# NS_Stylish_Fire_2 with the lifetime doubled (the P9 smoke layer)
+_SMOKE_EMITTERS = {k: {"spawnRate": v["spawnRate"], "lifetime": (v["lifetime"][0] * 2.0, v["lifetime"][1] * 2.0)}
+                   for k, v in _FIRE_EMITTERS.items()}
+# ENV-MAPS P9 (F5, the user: the brazier fire reads as a sprite blob): the brazier / fort fires of the Sarpedon lit3d scene
+# become a LAYERED stylised fire instead of the single NS_Env_ConceptFire (masked toon sprites of M_Toon_Fire, k 0.5,
+# colour x5 = a red disc at C0 / K1): a small yellow core (Fire_4, taller), thin orange tongues (Fire_1, curl noise), embers
+# (the SoftTofu hanging particulates recoloured orange, swirling) and a light dark smoke (Fire_2, dark colour, low gravity,
+# double lifetime) - placed per anchor by tools/art/concept_scene/fx-plan.sarpedon.json (merged into the scene overlay by
+# scene_layout.py). Every layer: CPU, determinism, light / component renderers off (no Niagara lights: the profile's
+# fire-brazier / fire-fort points light the scene), frozen in -Bench by S08EnvLayout (time dilation 0) like every fx.
+P9_FIRE_ROLE = "ENV-MAPS P9 F5 layered fire (fx-plan.sarpedon.json: brazier + fort pit of the lit3d scene)"
+
+
+def _fire_layer_rules(k: float, spawn_mul: float, color: tuple | None = None, color_mul: float = 1.0,
+                      extra: list | None = None) -> list[dict]:
+    """_fire_rules plus an absolute colour ('set' on every emitter's Color.Scale Color) and extra rules applied last."""
+    rules = _fire_rules(k, spawn_mul, color_mul)
+    if color is not None:
+        rules = [{"match": "*.Color.Scale Color", "set": [float(c) for c in color]}] + rules
+    return rules + list(extra or [])
 
 
 FX_SPECS: list[dict] = [
@@ -154,9 +188,89 @@ FX_SPECS: list[dict] = [
                           "Color": [6.0, 5.0, 1.2]}},
         "estimate": {"kind": "user", "spawnRate": "SpawnRate", "lifetime": ("Lifetime Min", "Lifetime Max")},
     },
+    {
+        "name": "NS_Env_FireCore",
+        "source": "/Game/Stylish_Fire_VFX/Niagara/NS_Stylish_Fire_4",
+        "pack": "Stylish_Fire_VFX",
+        "licence": "Fab Standard (personal)",
+        "role": P9_FIRE_ROLE + ": the core - small tall yellow-white flames (16..33 uu sprites)",
+        "system": {"determinism": True, "random_seed": 52021, "warmup_time": 0.0},
+        "tune": {"simTarget": "cpu", "emitterDeterminism": True, "emitterSeedBase": 52500,
+                 "disableLightRenderers": True, "disableComponentRenderers": True,
+                 # P9 tune i1 (UE frames: the brazier read as a red blob - the core was hidden in the tongues):
+                 # k 0.22 -> 0.3, spawn 0.6 -> 0.8, colour (2.6, 1.9, 0.9) -> a hotter yellow-white (4.2, 3.2, 1.5)
+                 "constants": _fire_layer_rules(0.3, 0.8, color=(4.2, 3.2, 1.5)), "user": {}},
+        "estimate": {"kind": "emitters", "emitters": _FIRE4_EMITTERS, "spawnMul": 0.8},
+    },
+    {
+        "name": "NS_Env_FireTongues",
+        "source": "/Game/Stylish_Fire_VFX/Niagara/NS_Stylish_Fire_1",
+        "pack": "Stylish_Fire_VFX",
+        "licence": "Fab Standard (personal)",
+        "role": P9_FIRE_ROLE + ": the flame tongues - thin orange licks around the core (curl noise), the Fire_Partic sparks",
+        "system": {"determinism": True, "random_seed": 52022, "warmup_time": 0.0},
+        "tune": {"simTarget": "cpu", "emitterDeterminism": True, "emitterSeedBase": 52600,
+                 "disableLightRenderers": True, "disableComponentRenderers": True,
+                 # P9 tune i1: colour x2.0 -> x1.4 (the orange tongues dominated the core)
+                 "constants": _fire_layer_rules(0.15, 0.5, color_mul=1.4), "user": {}},
+        "estimate": {"kind": "emitters", "emitters": _FIRE1_EMITTERS, "spawnMul": 0.5},
+    },
+    {
+        "name": "NS_Env_FireSmoke",
+        "source": "/Game/Stylish_Fire_VFX/Niagara/NS_Stylish_Fire_2",
+        "pack": "Stylish_Fire_VFX",
+        "licence": "Fab Standard (personal)",
+        "role": P9_FIRE_ROLE + ": a light dark smoke - the masked lit toon sprites in a dark colour, low gravity, double "
+                "lifetime, sparse (placed above the flames)",
+        "system": {"determinism": True, "random_seed": 52023, "warmup_time": 0.0},
+        "tune": {"simTarget": "cpu", "emitterDeterminism": True, "emitterSeedBase": 52700,
+                 "disableLightRenderers": True, "disableComponentRenderers": True,
+                 "constants": _fire_layer_rules(0.3, 0.25, color=(0.05, 0.045, 0.042), extra=[
+                     {"match": "*.GravityForce.Gravity", "mul": 0.15},
+                     {"match": "*.InitializeParticle.Lifetime*", "mul": 2.0}]),
+                 "user": {}},
+        "estimate": {"kind": "emitters", "emitters": _SMOKE_EMITTERS, "spawnMul": 0.25},
+    },
+    {
+        "name": "NS_Env_FireEmbers",
+        "source": "/Game/FreeParticle_SoftTofu/Niagara/NS_Sparkling_Noise",
+        "pack": "FreeParticle_SoftTofu",
+        "licence": "CC BY 4.0 (SoftTofuVFX; attribution in CREDITS-fab.md)",
+        "role": P9_FIRE_ROLE + ": embers - tiny orange glints swirling over the fire (the pack hanging particulates, "
+                "GPU -> CPU, noise-driven)",
+        # pack: GPU sim, User.SpawnRate 273, Sphere Radius 1, " Size Min" 20 / "Size Max" 45, Noise Strength 1555,
+        # Drag 15, Color (283, 154, 25) HDR, Lifetime Min 3.19 / Max 1.78 (the pack names are swapped)
+        "system": {"determinism": True, "random_seed": 52024, "warmup_time": 0.0},
+        "tune": {"simTarget": "cpu", "emitterDeterminism": True, "emitterSeedBase": 52800,
+                 "disableLightRenderers": True, "disableComponentRenderers": True, "constants": [],
+                 "user": {"SpawnRate": 12.0, "Sphere Radius": 9.0, " Size Min": 1.5, "Size Max": 3.5,
+                          "Lifetime Min": 0.9, "Lifetime Max": 1.7, "Noise Strength": 320.0, "Noise Frequency": 18.0,
+                          "Drag": 8.0, "Color": [14.0, 4.5, 0.8]}},
+        "estimate": {"kind": "user", "spawnRate": "SpawnRate", "lifetime": ("Lifetime Min", "Lifetime Max")},
+    },
+    {
+        "name": "NS_Env_FallsSpray",
+        "source": "/Game/FreeParticle_SoftTofu/Niagara/NS_Sparkling_Noise",
+        "pack": "FreeParticle_SoftTofu",
+        "licence": "CC BY 4.0 (SoftTofuVFX; attribution in CREDITS-fab.md)",
+        "role": "ENV-MAPS P9 F4 cascade mist / spray (fx-plan.sarpedon.json waterfall[]: the tier landings and the sea "
+                "at the foot): pale droplets drifting over the foam, no light",
+        "system": {"determinism": True, "random_seed": 52025, "warmup_time": 0.0},
+        "tune": {"simTarget": "cpu", "emitterDeterminism": True, "emitterSeedBase": 52900,
+                 "disableLightRenderers": True, "disableComponentRenderers": True, "constants": [],
+                 "user": {"SpawnRate": 36.0, "Sphere Radius": 55.0, " Size Min": 3.0, "Size Max": 7.0,
+                          "Lifetime Min": 1.0, "Lifetime Max": 1.8, "Noise Strength": 120.0, "Noise Frequency": 10.0,
+                          "Drag": 6.0, "Color": [0.85, 0.95, 1.05]}},
+        "estimate": {"kind": "user", "spawnRate": "SpawnRate", "lifetime": ("Lifetime Min", "Lifetime Max")},
+    },
 ]
 # Not built (P5c scout): a waterfall mist - no fitting Niagara system in the AI-allowed packs (WaterMaterials foam /
 # splash are deprecated Cascade); Particles_Wind_Control_System fireflies / candle add PointLightComponents.
+
+
+# the systems tools/art/concept_scene/fx-plan.sarpedon.json may name (ENV-MAPS P9)
+FX_PLAN_SYSTEMS = {"fires": ("NS_Env_FireCore", "NS_Env_FireTongues", "NS_Env_FireSmoke", "NS_Env_FireEmbers"),
+                   "waterfall": ("NS_Env_FallsSpray",)}
 
 
 def spec_by_name(name: str) -> dict | None:
@@ -242,6 +356,10 @@ def validate(specs: list[dict], content: Path | None = CONTENT) -> tuple[list[st
             hi = 6.0 if ".Color." in str(r.get("match")) else 2.0  # a colour scale may brighten more than a size
             if "mul" in r and not (0.0 < float(r["mul"]) <= hi):
                 err.append(f"{ctx} constants[{i}] mul {r['mul']} outside (0, {hi:g}]")
+            if "set" in r:
+                sv = r["set"] if isinstance(r["set"], list) else [r["set"]]
+                if not (1 <= len(sv) <= 4) or not all(isinstance(x, (int, float)) and 0.0 <= float(x) <= 50.0 for x in sv):
+                    err.append(f"{ctx} constants[{i}] set {r['set']!r} must be 1..4 numbers 0..50")
         for k, v in (t.get("user") or {}).items():
             vals = v if isinstance(v, list) else [v]
             if k.startswith("User.") or not (1 <= len(vals) <= 4) or not all(isinstance(x, (int, float)) for x in vals):

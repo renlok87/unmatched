@@ -33,6 +33,25 @@ object only matters for the editor's default-texture validation, as in M_Concept
                  bushes in live runs only (Live = 0 in the frozen -Bench: reproducible frames)
   SceneOpacity   (masked master) lerp(1, BC.a, UseOpacity)
 
+ENV-MAPS P9 track B (the six fixes, docs/game-design/evidence/ENV-MAPS/p8-3d-under-paint-2026-10-02/README.md "open"):
+  F6 foliage wind  SceneWind gains a leaf flutter (WindFlutter uu x h, WindFlutterHz, per-vertex phase) on top of the
+                   trunk sway; FOLIAGE_WIND (WindAmp 8, WindHeight 120 - the P8 G7 suggestion - + flutter) is merged over
+                   the manifest's Foliage look (track A wrote WindAmp 2 there) and under scene-tune.sarpedon.json. Live
+                   runs only (MPC Live = 1); the frozen -Bench (Live = 0) stays still. GRAPH_VERSION 2 / MI_VERSION 2.
+  F2 frame band    MI_EnvScene_FrameWood (M_EnvScene, Planks023A BC / N / ORMH on the mesh's UV0, BakedTint = the dark
+                   concept frame colour: concept band median sRGB (38, 28, 22) at C0 -> albedo ~ (50, 39, 30) by the P8
+                   display / albedo ratio of the island, / the Planks023A mean) and MI_EnvScene_FrameIron (M_EnvScene, the
+                   frame-002 iron textures T_MapFrame002_Iron_*: the same iron as the inner frame).
+  F4 cascade       MI_EnvScene_FallsSheet / MI_EnvScene_FallsFoam: children of the P5c MI_EnvWaterfall_Sarpedon (M_EnvWaterfall
+                   graph 3 - lit translucent, the Water Materials streaks, the map's water colour and night grade) with the
+                   cascade's FallCard / FallFlow / FallLook (UV0: u across the sheet 0..1, v along the flow authored top ->
+                   bottom in Blender, so FallCard.w = 1 as the lane K meshes; FallCard.xy = the sheet size in uu).
+  Material-route MIs live at MAP_ROOT/MI_EnvScene_<Name> (MATERIAL_LOOKS). Track A names them in the manifest: a mesh
+  "mi" / "slots" entry (bare names resolve to MAP_ROOT; ue_import_concept_scene.py also takes per-slot MIs in
+  "meshesExistingMaterial"), optional value overrides in a top-level "materials": {"<Name>": {"scalars", "vectors"}} (or a
+  "looks" entry of the same name: merged into the material MI, no projected MI_EnvScene_Proj_<Name> is made), then the
+  tune file's "materials" block.
+
 MIs: the baked list = manifest.sarpedon.json "meshes" (optional per mesh: "mi" (an explicit MI path), "material":
 {"masked": bool, "scalars": {...}, "vectors": {...}}); the projected looks = manifest "looks" ([{"name", "masked", "bc"
 (a UE texture path or null), "scalars", "vectors"}]) or DEFAULT_LOOKS below; MI_EnvScene_LanternGlass always. Without a
@@ -100,9 +119,9 @@ MPC_LIVE = "Live"
 MPC_EMISSIVE = "Emissive"
 MPC_DEFAULTS = {MPC_LIVE: 0.0, MPC_EMISSIVE: 1.0}
 GRAPH_TAG = "EnvMapsGraphVersion"
-GRAPH_VERSION = "1"
+GRAPH_VERSION = "2"  # P9 F6: SceneWind leaf flutter (WindFlutter / WindFlutterHz)
 MI_TAG = "EnvMapsSceneMi"
-MI_VERSION = "1"
+MI_VERSION = "2"  # P9: rebuilt with the graph-2 wind / the material-route MIs
 LANTERN_GLASS = "MI_EnvScene_LanternGlass"
 ALBEDO_DEFAULT_RECT = (-384.0, -216.0, 2688.0, 1512.0)  # cp_bake.py contract sarpedon: rectB = the extended canvas
 
@@ -112,7 +131,8 @@ TEXTURE_DEFAULTS = {"BC": "/Engine/EngineResources/WhiteSquareTexture", "N": "/E
 SCALARS = {"Projected": 0.0, "ProjStrength": 1.0, "FacingPower": 1.0, "UseNormal": 1.0, "NormalStrength": 1.0,
            "UseORM": 1.0, "Roughness": 0.9, "RoughnessScale": 1.0, "Metallic": 0.0, "AOStrength": 1.0,
            "EmissiveStrength": 0.0, "UseEmissiveMask": 0.0, "FlickerAmp": 0.0, "FlickerHz": 4.0,
-           "WindAmp": 0.0, "WindHz": 0.3, "WindHeight": 300.0, "UseOpacity": 0.0}
+           "WindAmp": 0.0, "WindHz": 0.3, "WindHeight": 300.0, "WindFlutter": 0.0, "WindFlutterHz": 1.7,
+           "UseOpacity": 0.0}
 VECTORS = {"BakedTint": (1.0, 1.0, 1.0, 1.0), "FallbackTint": (1.0, 1.0, 1.0, 1.0), "AlbedoGain": (1.0, 1.0, 1.0, 1.0),
            "EmissiveColor": (1.0, 0.45, 0.12, 1.0), "WindDir": (1.0, 0.3, 0.0, 0.0),
            "CamPos": (0.0, 1557.046, 2223.692, 0.0), "CamRight": (1.0, 0.0, 0.0, 0.0),
@@ -127,9 +147,56 @@ DEFAULT_LOOKS = [
     {"name": "Wood", "masked": False, "bc": None, "scalars": {"Roughness": 0.9}, "vectors": {"FallbackTint": (0.20, 0.12, 0.07, 1.0)}},
     {"name": "Ground", "masked": False, "bc": None, "scalars": {"Roughness": 0.95}, "vectors": {"FallbackTint": (0.18, 0.15, 0.10, 1.0)}},
     {"name": "Foliage", "masked": True, "bc": None,
-     "scalars": {"Roughness": 0.9, "WindAmp": 2.0, "WindHz": 0.35, "WindHeight": 300.0, "UseOpacity": 1.0},
+     "scalars": {"Roughness": 0.9, "WindAmp": 8.0, "WindHz": 0.35, "WindHeight": 120.0, "WindFlutter": 1.5,
+                 "WindFlutterHz": 1.8, "UseOpacity": 1.0},
      "vectors": {"FallbackTint": (0.05, 0.08, 0.05, 1.0)}},
 ]
+# P9 F6 (G7 foliage motion 0.16 % live in P8: WindAmp 2 uu x (h / 300)^1.5 on trees of 50..300 uu = sub-pixel): merged
+# over the manifest's Foliage look (track A's measured tints stay), under the tune file. A 100 uu tree top: h = 0.83 ->
+# 8 x 0.76 = 6 uu sway (~6 px at C0 / K1) + the 1.5 uu leaf flutter.
+FOLIAGE_WIND = {"Foliage": {"scalars": {"WindAmp": 8.0, "WindHz": 0.35, "WindHeight": 120.0, "WindFlutter": 1.5,
+                                        "WindFlutterHz": 1.8}}}
+
+# P9 F2 / F4: the material-route MIs (fixed names, MAP_ROOT/MI_EnvScene_<Name>), see the module docstring.
+PLANKS = "/Game/EnvKit/Ground/Sets/T_Ground_Planks023A"
+FRAME_IRON = "/Game/EnvMaps/Frame/T_MapFrame002_Iron"
+FALLS_PARENT = "/Game/EnvKit/Ground/MI_EnvWaterfall_Sarpedon"  # P5c ue_import_env_ground.py: graph 3, the map's water
+FALL_PARAMS = {"scalars": ("NightEV", "NightSaturation", "RippleTileUU"),
+               "vectors": ("FallCard", "FallFlow", "FallSpill", "FallShade", "FallLook", "FallTex", "WaterColor",
+                           "WaterFoam", "NightTint")}
+MATERIAL_LOOKS = [
+    {"name": "FrameWood", "parent": MATERIAL_PATH, "kind": "scene",
+     "textures": {"BC": f"{PLANKS}_BC", "N": f"{PLANKS}_N", "ORM": f"{PLANKS}_ORMH"},
+     "scalars": {"Projected": 0.0, "UseORM": 1.0, "UseNormal": 1.0, "NormalStrength": 1.5, "AOStrength": 1.3,
+                 "RoughnessScale": 1.0},
+     # concept band median sRGB (38, 28, 22) (C0, 30..85 uu around frame-002) -> albedo lin ~ (0.033, 0.020, 0.014) by the
+     # P8 island ratio display / albedo 0.59; / Planks023A mean lin (0.102, 0.079, 0.062)
+     "vectors": {"BakedTint": (0.33, 0.25, 0.22, 1.0)},
+     "for": "F2 the heavy dark outer frame band around frame-002 (bevelled planks: UV0 1 = one Planks023A tile ~ 100 uu)"},
+    {"name": "FrameIron", "parent": MATERIAL_PATH, "kind": "scene",
+     "textures": {"BC": f"{FRAME_IRON}_BC", "N": f"{FRAME_IRON}_N", "ORM": f"{FRAME_IRON}_ORM"},
+     "scalars": {"Projected": 0.0, "UseORM": 1.0, "UseNormal": 1.0, "NormalStrength": 1.0},
+     "vectors": {"BakedTint": (0.85, 0.85, 0.85, 1.0)},
+     "for": "F2 the iron corner brackets / mid-edge straps / rivets (the frame-002 iron textures)"},
+    {"name": "FallsSheet", "parent": FALLS_PARENT, "kind": "falls", "textures": {},
+     "scalars": {},
+     "vectors": {"FallCard": (320.0, 70.0, 0.0, 1.0), "FallFlow": (48.0, 6.0, 18.0, 0.12),
+                 "FallLook": (0.62, 0.96, 0.6, 1.0), "FallTex": (40.0, 110.0, 1.6, 0.0)},
+     "for": "F4 the cascade sheets (2-3 tiers down the front cliff; translucent lit, streaks along v)"},
+    {"name": "FallsFoam", "parent": FALLS_PARENT, "kind": "falls", "textures": {},
+     "scalars": {},
+     "vectors": {"FallCard": (320.0, 30.0, 0.0, 1.0), "FallFlow": (22.0, 3.0, 22.0, 0.3),
+                 "FallLook": (0.85, 1.0, 0.8, 1.0), "FallTex": (24.0, 60.0, 1.3, 0.0),
+                 "WaterColor": (0.30, 0.36, 0.42, 0.6), "WaterFoam": (0.80, 0.85, 0.90, 1.0)},
+     "for": "F4 the white foam at each tier landing and at the sea"},
+]
+MATERIAL_NAMES = tuple(m["name"] for m in MATERIAL_LOOKS)
+
+
+def material_mi_path(name: str) -> str:
+    return f"{MAP_ROOT}/MI_EnvScene_{name}"
+
+
 LANTERN = {"scalars": {"Projected": 0.0, "UseORM": 0.0, "UseNormal": 0.0, "Roughness": 0.3, "EmissiveStrength": 8.0,
                        "FlickerAmp": 0.15, "FlickerHz": 4.5},
            "vectors": {"BakedTint": (0.9, 0.6, 0.3, 1.0), "EmissiveColor": (1.0, 0.45, 0.12, 1.0)}}
@@ -179,12 +246,18 @@ float n = 0.6 * sin(t + ph) + 0.4 * sin(t * 2.37 + ph * 1.7);
 float flick = 1.0 + FlickerAmp * saturate(Live) * n;
 return EmissiveColor.rgb * EmissiveStrength * mask * flick * saturate(Emissive);
 """
-HLSL_WIND = """float h = saturate((WP.z - OP.z) / max(WindHeight, 1.0));
+HLSL_WIND = """// P9 F6: trunk sway (WindAmp x h^1.5) + leaf flutter (WindFlutter x h, per-vertex phase); Live = 0 -> still.
+float h = saturate((WP.z - OP.z) / max(WindHeight, 1.0));
 float ph = frac(sin(dot(floor(OP.xy / 7.0), float2(12.9898, 78.233))) * 43758.5453) * 6.2831853;
 float t = 6.2831853 * WindHz * Time;
 float s = sin(t + ph) + 0.35 * sin(2.3 * t + ph + WP.z * 0.02);
 float2 dir = normalize(WindDir.xy + float2(1e-4, 0.0));
-return float3(dir * (WindAmp * saturate(Live) * pow(h, 1.5) * s), 0.0);
+float live = saturate(Live);
+float3 sway = float3(dir * (WindAmp * pow(h, 1.5) * s), 0.0);
+float vp = dot(WP, float3(0.071, 0.053, 0.097)) * 6.2831853;
+float tf = 6.2831853 * WindFlutterHz * Time;
+float3 flutter = float3(sin(tf + vp), cos(1.31 * tf + vp * 1.7), 0.5 * sin(1.73 * tf + vp * 0.6)) * (WindFlutter * h);
+return (sway + flutter) * live;
 """
 HLSL_OPACITY = """float4 bc = Texture2DSample(BC, BCSampler, UV);
 return lerp(1.0, bc.a, saturate(UseOpacity));
@@ -202,7 +275,8 @@ NODES = {  # name -> (output dims, pins, code)
                       + [(n, "float") for n in ("EmissiveStrength", "UseEmissiveMask", "FlickerAmp", "FlickerHz", "Live",
                                                 "Emissive")], HLSL_EMISSIVE),
     "SceneWind": (3, [("WP", "float3"), ("OP", "float3"), ("Time", "float"), ("WindDir", "float4")]
-                  + [(n, "float") for n in ("WindAmp", "WindHz", "WindHeight", "Live")], HLSL_WIND),
+                  + [(n, "float") for n in ("WindAmp", "WindHz", "WindHeight", "WindFlutter", "WindFlutterHz", "Live")],
+                  HLSL_WIND),
     "SceneOpacity": (1, [("UV", "float2"), ("BC", "Texture2D"), ("UseOpacity", "float")], HLSL_OPACITY),
 }
 
@@ -320,15 +394,18 @@ def mi_plan(manifest: dict | None, block: dict | None = None, tune: dict | None 
     """Every MI this tool builds: name, path, parent, textures (param -> UE path), scalars, vectors."""
     block = block or sarpedon_block()
     tune = load_tune() if tune is None else tune
-    tb, tl = tune.get("baked") or {}, tune.get("looks") or {}
+    tb, tl, tm = tune.get("baked") or {}, tune.get("looks") or {}, tune.get("materials") or {}
     cam = camera_vectors(block)
     projected = (manifest or {}).get("projected") or {}
     albedo = projected.get("ue") or f"{MAP_ROOT}/T_Env_S_AlbedoC0"
     rect = tuple(float(v) for v in projected.get("rectC0Px", ALBEDO_DEFAULT_RECT))
     plan = []
+    material_paths = {material_mi_path(n) for n in MATERIAL_NAMES}
     for m in (manifest or {}).get("meshes", []):
         if not isinstance(m, dict) or not isinstance(m.get("name"), str):
             continue  # ue_import_concept_scene.validate reports it
+        if m.get("mi") in material_paths:
+            continue  # P9: the mesh takes a material-route MI (built below), not a baked MI of its own
         mat = m.get("material") or {}
         tex = {k: _texture_ue(v) for k, v in (m.get("textures") or {}).items() if k in ("BC", "N", "ORM")}
         name = f"MI_Env_S_{m['name']}"
@@ -341,7 +418,11 @@ def mi_plan(manifest: dict | None, block: dict | None = None, tune: dict | None 
                             "parent": MASKED_PATH if mat.get("masked") else MATERIAL_PATH, "textures": tex,
                             "scalars": scalars, "vectors": vectors}, tb.get("*"), tb.get(m["name"])))
     looks = (manifest or {}).get("looks") or DEFAULT_LOOKS
+    look_over = {}
     for look in looks:
+        if look.get("name") in MATERIAL_NAMES:  # P9: a look named like a material-route MI only overrides its values
+            look_over[look["name"]] = look
+            continue
         tex = {"Albedo": albedo}
         if look.get("bc"):
             tex["BC"] = look["bc"]
@@ -353,7 +434,19 @@ def mi_plan(manifest: dict | None, block: dict | None = None, tune: dict | None 
         name = f"MI_EnvScene_Proj_{look['name']}"
         plan.append(_tuned({"name": name, "path": f"{MAP_ROOT}/{name}", "route": "projected", "look": look["name"],
                             "parent": MASKED_PATH if look.get("masked") else MATERIAL_PATH, "textures": tex,
-                            "scalars": scalars, "vectors": vectors}, tl.get("*"), tl.get(look["name"])))
+                            "scalars": scalars, "vectors": vectors},
+                           FOLIAGE_WIND.get(look["name"]), tl.get("*"), tl.get(look["name"])))
+    # P9 F2 / F4: the material-route MIs (always planned: track A's meshes name them; the defaults are documented above)
+    over = (manifest or {}).get("materials") or {}
+    for spec in MATERIAL_LOOKS:
+        name = f"MI_EnvScene_{spec['name']}"
+        vectors = dict(cam) if spec["kind"] == "scene" else {}
+        vectors.update({k: tuple(float(x) for x in v) for k, v in spec["vectors"].items()})
+        plan.append(_tuned({"name": name, "path": material_mi_path(spec["name"]),
+                            "route": "material" if spec["kind"] == "scene" else "falls", "look": spec["name"],
+                            "parent": spec["parent"], "textures": dict(spec["textures"]), "scalars": dict(spec["scalars"]),
+                            "vectors": vectors},
+                           look_over.get(spec["name"]), over.get(spec["name"]), tm.get(spec["name"])))
     plan.append(_tuned({"name": LANTERN_GLASS, "path": f"{MAP_ROOT}/{LANTERN_GLASS}", "route": "emissive",
                         "parent": MATERIAL_PATH, "textures": {}, "scalars": dict(LANTERN["scalars"]),
                         "vectors": dict(cam, **{k: tuple(v) for k, v in LANTERN["vectors"].items()})},
@@ -406,8 +499,10 @@ def check() -> tuple[dict, list[str]]:
         errors.append("sarpedon lit3d.required must list M_EnvScene and SM_Env_S_Island")
     if lit.get("manifest") != "tools/art/concept_scene/manifest.sarpedon.json":
         errors.append(f"sarpedon lit3d.manifest {lit.get('manifest')!r}")
-    if set(lit.get("hide", [])) != {"tray", "ground", "backdrop", "fog", "baseProps", "baseFx", "layoutLights"}:
-        errors.append(f"sarpedon lit3d.hide {lit.get('hide')} (task: tray, ground, backdrop, fog, baseProps, baseFx, layoutLights)")
+    # P9 F4: the P5c falls (sheet / lip / foam) are hidden - the scene overlay's cascade replaces them; the sea ring stays
+    want_hide = {"tray", "ground", "waterfalls", "backdrop", "fog", "baseProps", "baseFx", "layoutLights"}
+    if set(lit.get("hide", [])) != want_hide:
+        errors.append(f"sarpedon lit3d.hide {lit.get('hide')} (P9: {sorted(want_hide)})")
     points = len(profiles["lightProfiles"][board["light"]].get("points", []))
     if points + len(lit.get("lights", [])) > 6 or len(lit.get("lights", [])) != 5:
         errors.append(f"sarpedon lit3d lights {len(lit.get('lights', []))} + profile points {points}: 5 lights, <= 6 points")
@@ -457,18 +552,50 @@ def check() -> tuple[dict, list[str]]:
     for m in plan:
         if not m["path"].startswith("/Game/EnvMaps/") or m["path"].startswith("/Game/EnvMaps/Data/"):
             errors.append(f"{m['name']}: {m['path']} is not a cooked /Game/EnvMaps path")
-        if not re.fullmatch(r"MI_(Env_S_[A-Za-z0-9]+|EnvScene_Proj_[A-Za-z0-9]+|EnvScene_LanternGlass|EnvScene_LanternHead)",
-                            m["name"]):
-            errors.append(f"{m['name']}: not MI_Env_S_<Name> / MI_EnvScene_Proj_<Look>")
+        if not re.fullmatch(r"MI_(Env_S_[A-Za-z0-9]+|EnvScene_Proj_[A-Za-z0-9]+|EnvScene_LanternGlass|EnvScene_LanternHead|"
+                            r"EnvScene_(" + "|".join(MATERIAL_NAMES) + r"))", m["name"]):
+            errors.append(f"{m['name']}: not MI_Env_S_<Name> / MI_EnvScene_Proj_<Look> / MI_EnvScene_<Material>")
         if m["route"] == "child":
             if not m["parent"].startswith("/Game/EnvKit/ConceptPaste/MI_"):
                 errors.append(f"{m['name']}: parent {m['parent']} is not a P7c ConceptPaste MI")
+            continue
+        if m["route"] == "falls":  # a child of the P5c waterfall MI: M_EnvWaterfall parameters only
+            if m["parent"] != FALLS_PARENT:
+                errors.append(f"{m['name']}: parent {m['parent']} is not {FALLS_PARENT}")
+            for k in m["scalars"]:
+                if k not in FALL_PARAMS["scalars"]:
+                    errors.append(f"{m['name']}: {k} is not an M_EnvWaterfall scalar")
+            for k, v in m["vectors"].items():
+                if k not in FALL_PARAMS["vectors"]:
+                    errors.append(f"{m['name']}: {k} is not an M_EnvWaterfall vector")
+                elif len(v) != 4:
+                    errors.append(f"{m['name']}: {k} needs 4 components")
+            card = m["vectors"].get("FallCard")
+            if card and not (card[0] > 0 and card[1] > 0 and card[2] in (0.0, 1.0) and card[3] in (0.0, 1.0)):
+                errors.append(f"{m['name']}: FallCard {card} must be (width uu, height uu, kind 0 | 1, flip 0 | 1)")
             continue
         for k in list(m["scalars"]) + list(m["vectors"]) + list(m["textures"]):
             if k not in names:
                 errors.append(f"{m['name']}: {k} is not an M_EnvScene parameter")
     if len({m["path"] for m in plan}) != len(plan):
         errors.append("duplicate MI paths")
+    # P9 F6: the foliage wind is live-only and large enough to read (G7 foliage motion >= 3 %)
+    fol = next((m for m in plan if m.get("look") == "Foliage"), None)
+    if fol is None:
+        errors.append("no MI_EnvScene_Proj_Foliage in the plan (the projected foliage route)")
+    else:
+        fs = fol["scalars"]
+        report["foliageWind"] = {k: fs.get(k) for k in ("WindAmp", "WindHz", "WindHeight", "WindFlutter", "WindFlutterHz")}
+        if not (fs.get("WindAmp", 0.0) >= 6.0 and fs.get("WindHeight", 300.0) <= 150.0 and fs.get("WindFlutter", 0.0) > 0.0):
+            errors.append(f"Foliage wind {report['foliageWind']}: P9 F6 needs WindAmp >= 6, WindHeight <= 150, WindFlutter > 0")
+    if "saturate(Live)" not in HLSL_WIND or "* live" not in HLSL_WIND:
+        errors.append("SceneWind must scale every term by the MPC Live (frozen -Bench = still)")
+    report["materialMis"] = {m["name"]: {"route": m["route"], "parent": m["parent"].rsplit("/", 1)[1],
+                                         "textures": sorted(m["textures"].values())}
+                             for m in plan if m["route"] in ("material", "falls")}
+    for name in MATERIAL_NAMES:
+        if f"MI_EnvScene_{name}" not in report["materialMis"]:
+            errors.append(f"MI_EnvScene_{name} missing from the plan")
     report["hlsl"] = compile_check()
     if report["hlsl"]["status"] == "failed":
         errors.append("DXC: " + report["hlsl"]["log"][-800:])

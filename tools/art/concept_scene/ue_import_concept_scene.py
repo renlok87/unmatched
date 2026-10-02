@@ -32,6 +32,16 @@ Pre-check without UE (plain Python):
       present with its sha256, FBX <= 15 MB in git, every concept-derived image gitignored (git check-ignore), the scene
       layout overlay (schema, variant, the manifest meshes it places, castShadow / lumenGI vs the profile's lit3d casters /
       giOff, material overrides = planned MIs), the profile's lit3d.required meshes in the manifest
+ENV-MAPS P9 track B:
+  * "meshesExistingMaterial" entries (no baked textures: the F2 frame band, the F4 cascade, the banner) are validated like
+    the meshes (name, ue, fbx + sha256, tris, castShadow / lumenGI when given) and may give one MI per slot ("slots":
+    [MI path | bare MI name | null, ...]; one entry = every slot, as before); an MI under /Game/EnvMaps/Sarpedon/Scene must
+    be planned by ue_scene_material.mi_plan (the material-route MI_EnvScene_FrameWood / _FrameIron / _FallsSheet /
+    _FallsFoam among them);
+  * tools/art/concept_scene/fx-plan.sarpedon.json (track B: the layered brazier / fort fire and the cascade mist, merged by
+    track A's scene_layout.py): schema, ids, systems = ue_import_fab_fx.FX_PLAN_SYSTEMS, anchors brazier | fort-pit, tiers;
+    with the scene overlay present its merge state ('none' before track A merged it, 'all' after; 'partial' or the P8
+    NS_Env_ConceptFire still next to the plan = an error).
 Derived directory order: the manifest's paths under the worktree, else the main checkout's (the same repo-relative path).
 Report 'CONCEPT-SCENE-IMPORT-REPORT {...}' / 'CONCEPT-SCENE-IMPORT-RESULT ok|failed',
 <project>/Saved/EnvMaps/concept-scene-import-report.json (or --report). Status: предложено.
@@ -73,6 +83,10 @@ MAX_FBX_MB = 15.0
 MAX_MESH_TRIS = 40000
 MAX_SCENE_TRIS = 450000
 TEXTURE_KEYS = ("BC", "N", "ORM")
+FX_PLAN = HERE / f"fx-plan.{MAP_KEY}.json"
+FX_PLAN_SCHEMA = "unmatched.concept-scene-fx/1"
+FX_ANCHORS = ("brazier", "fort-pit")
+FX_ID_RE = re.compile(r"[a-z0-9][a-z0-9-]{0,63}")
 NAME_RE = re.compile(r"[A-Z][A-Za-z0-9]{0,47}")
 HEX_RE = re.compile(r"[0-9a-f]{64}")
 
@@ -187,6 +201,51 @@ def validate(manifest: dict, repo: Path = REPO, *, check_files: bool = True, che
             errors.append(f"{where}: slots must be a list of MI paths / null")
         report["meshes"][name] = {"ue": want_ue, "tris": tris, "castShadow": m.get("castShadow"), "lumenGI": m.get("lumenGI"),
                                   "textures": sorted(tex)}
+    # P9: meshes that keep an existing / material-route MI (no baked textures)
+    planned_mis = {m["path"] for m in SM.mi_plan(manifest)}
+    existing_ue: dict[str, dict] = {}
+    for i, m in enumerate(manifest.get("meshesExistingMaterial") or []):
+        if not isinstance(m, dict):
+            errors.append(f"meshesExistingMaterial[{i}] is not an object")
+            continue
+        name = m.get("name", "")
+        where = f"meshesExistingMaterial {name or i}"
+        if not isinstance(name, str) or not NAME_RE.fullmatch(name):
+            errors.append(f"{where}: name must be [A-Z][A-Za-z0-9]* (SM_Env_S_<Name>)")
+            continue
+        if name in names:
+            errors.append(f"{where}: duplicate name")
+        names.add(name)
+        want_ue = f"{UE_DIR}/SM_Env_S_{name}"
+        if m.get("ue") != want_ue:
+            errors.append(f"{where}: ue {m.get('ue')!r} is not {want_ue}")
+        existing_ue[want_ue] = m  # placed-count only: the P8 caster / GI rules stay with the baked meshes
+        fbx = m.get("fbx")
+        if not isinstance(fbx, str) or not fbx.lower().endswith(".fbx") or fbx.startswith("/") or ":" in fbx:
+            errors.append(f"{where}: fbx {fbx!r} must be a repo-relative .fbx path")
+        else:
+            files.append((fbx, m, "fbx"))
+        tris = m.get("tris")
+        if tris is not None and (not isinstance(tris, int) or isinstance(tris, bool) or not 0 < tris <= MAX_MESH_TRIS):
+            errors.append(f"{where}: tris {tris!r} must be an integer 1..{MAX_MESH_TRIS}")
+        for flag in ("castShadow", "lumenGI"):
+            if flag in m and not isinstance(m[flag], bool):
+                errors.append(f"{where}: {flag} must be a bool")
+        slots = m.get("slots")
+        if slots is not None and (not isinstance(slots, list) or not all(x is None or isinstance(x, str) for x in slots)):
+            errors.append(f"{where}: slots must be a list of MI paths / names / null")
+            slots = []
+        mis = [x for x in ([m.get("mi")] + list(slots or [])) if x]
+        if not mis:
+            errors.append(f"{where}: needs 'mi' or slots[0]")
+        for mi in mis:
+            full = _full_mi(mi)
+            if not full.startswith("/Game/"):
+                errors.append(f"{where}: MI {mi!r} is not a /Game/ path")
+            elif full.startswith(UE_DIR + "/") and full not in planned_mis:
+                errors.append(f"{where}: MI {full} is not planned by ue_scene_material.mi_plan")
+        report["meshes"][name] = {"ue": want_ue, "tris": tris, "castShadow": m.get("castShadow"), "lumenGI": m.get("lumenGI"),
+                                  "mis": [_full_mi(x) for x in mis], "route": "existing-material"}
     proj = manifest.get("projected")
     if not isinstance(proj, dict):
         errors.append("projected must be an object {albedo, ue, rectC0Px, sha256}")
@@ -278,12 +337,20 @@ def validate(manifest: dict, repo: Path = REPO, *, check_files: bool = True, che
                     lerr.append(f"prop {pid}: {mm['name']} casts (manifest) but castShadow false and no lit3d caster pattern")
                 if mm.get("lumenGI") is False and not match_patterns(gi_off, pid):
                     lerr.append(f"prop {pid}: {mm['name']} lumenGI false (manifest) needs a lit3d giOff pattern")
+            elif mesh_path in existing_ue:
+                em = existing_ue[mesh_path]
+                placed[em["name"]] = placed.get(em["name"], 0) + 1
+                instanced += int(em.get("tris") or 0)
             elif mesh_path:
                 unknown.add(mesh_path)
             mats = e.get("material")
             for mat in ([mats] if isinstance(mats, str) else (mats or [])):
                 if isinstance(mat, str) and mat.startswith(UE_DIR + "/MI_") and mat.split(".")[0] not in planned:
-                    lerr.append(f"prop {pid}: material {mat} is not an MI of ue_scene_material.mi_plan")
+                    hint = ""
+                    leaf = mat.split(".")[0].rsplit("/", 1)[1]
+                    if leaf.startswith("MI_EnvScene_Proj_") and leaf[len("MI_EnvScene_Proj_"):] in SM.MATERIAL_NAMES:
+                        hint = f" (a material-route MI: use {SM.material_mi_path(leaf[len('MI_EnvScene_Proj_'):])})"
+                    lerr.append(f"prop {pid}: material {mat} is not an MI of ue_scene_material.mi_plan{hint}")
         if instanced > MAX_SCENE_TRIS:
             lerr.append(f"instanced manifest triangles {instanced} > {MAX_SCENE_TRIS} (G8)")
         errors.extend(lerr)
@@ -296,6 +363,97 @@ def validate(manifest: dict, repo: Path = REPO, *, check_files: bool = True, che
         if path != SM.MATERIAL_PATH and path not in by_ue:
             errors.append(f"lit3d.required {path} is neither M_EnvScene nor a manifest mesh")
     report["meshCount"] = len(names)
+    return report, errors
+
+
+def fab_fx():
+    sys.path.insert(0, str(REPO / "tools" / "art" / "env_kit"))
+    import ue_import_fab_fx as FX  # noqa: E402  (FX_SPECS / FX_PLAN_SYSTEMS: plain Python)
+    return FX
+
+
+def validate_fx_plan(plan: dict, layout: dict | None = None) -> tuple[dict, list[str]]:
+    """ENV-MAPS P9 fx-plan.sarpedon.json (track B) and, with the scene overlay, its merge state."""
+    FX = fab_fx()
+    errors: list[str] = []
+    report: dict = {"fires": 0, "waterfall": 0}
+    if plan.get("schema") != FX_PLAN_SCHEMA or plan.get("map") != MAP_KEY:
+        errors.append(f"fx-plan: schema / map must be {FX_PLAN_SCHEMA} / {MAP_KEY}")
+    ids: list[str] = []
+
+    def num(v, lo, hi):
+        return isinstance(v, (int, float)) and not isinstance(v, bool) and lo <= float(v) <= hi
+
+    for section, allowed in (("fires", FX.FX_PLAN_SYSTEMS["fires"]), ("waterfall", FX.FX_PLAN_SYSTEMS["waterfall"])):
+        entries = plan.get(section)
+        if not isinstance(entries, list) or not entries:
+            errors.append(f"fx-plan.{section} must be a non-empty list")
+            continue
+        for i, e in enumerate(entries):
+            where = f"fx-plan.{section}[{i}]"
+            if not isinstance(e, dict):
+                errors.append(f"{where} is not an object")
+                continue
+            fid = e.get("id")
+            if not isinstance(fid, str) or not FX_ID_RE.fullmatch(fid):
+                errors.append(f"{where}: id {fid!r} must be lower-case [a-z0-9-]")
+            ids.append(fid)
+            system = e.get("system", "")
+            leaf = system.rsplit("/", 1)[-1] if isinstance(system, str) else ""
+            if system != f"{FX.FX_ROOT}/{leaf}" or leaf not in allowed or FX.spec_by_name(leaf) is None:
+                errors.append(f"{where}: system {system!r} must be one of {FX.FX_ROOT}/{allowed}")
+            if not num(e.get("scale"), 0.05, FX.MAX_FX_SCALE if hasattr(FX, "MAX_FX_SCALE") else 10.0):
+                errors.append(f"{where}: scale {e.get('scale')!r} must be 0.05..10")
+            if section == "fires":
+                if e.get("anchor") not in FX_ANCHORS:
+                    errors.append(f"{where}: anchor {e.get('anchor')!r} must be one of {FX_ANCHORS}")
+                off = e.get("offsetUU")
+                if not (isinstance(off, list) and len(off) == 3 and all(num(v, -200.0, 200.0) for v in off)):
+                    errors.append(f"{where}: offsetUU must be [x, y, z] within +-200 uu")
+                if not num(e.get("yawDeg", 0), -360.0, 360.0):
+                    errors.append(f"{where}: yawDeg -360..360")
+            else:
+                tier = e.get("tier")
+                if not isinstance(tier, int) or isinstance(tier, bool) or not 1 <= tier <= 4:
+                    errors.append(f"{where}: tier {tier!r} must be an integer 1..4")
+        report[section] = len(entries) if isinstance(entries, list) else 0
+    if len(ids) != len(set(ids)):
+        errors.append("fx-plan: duplicate ids")
+    anchors = {e.get("anchor") for e in plan.get("fires") or [] if isinstance(e, dict)}
+    if not set(FX_ANCHORS) <= anchors:
+        errors.append(f"fx-plan: every fire anchor {FX_ANCHORS} needs its layers (got {sorted(a for a in anchors if a)})")
+    for anchor in FX_ANCHORS:  # the layered fire: core + tongues + embers + smoke per anchor
+        got = {str(e.get("system", "")).rsplit("/", 1)[-1] for e in plan.get("fires") or []
+               if isinstance(e, dict) and e.get("anchor") == anchor}
+        if anchor in anchors and got != set(FX.FX_PLAN_SYSTEMS["fires"]):
+            errors.append(f"fx-plan: {anchor} layers {sorted(got)} != {sorted(FX.FX_PLAN_SYSTEMS['fires'])}")
+    # particles of the plan (steady state; the board budget of ue_import_fab_fx is BOARD_PARTICLE_BUDGET)
+    est = 0.0
+    for e in list(plan.get("fires") or []) + list(plan.get("waterfall") or []):
+        leaf = str((e or {}).get("system", "")).rsplit("/", 1)[-1] if isinstance(e, dict) else ""
+        if FX.spec_by_name(leaf) is not None:
+            est += FX.estimate_particles(leaf)
+    report["particlesEstimate"] = round(est, 1)
+    if est > FX.BOARD_PARTICLE_BUDGET / 2:
+        errors.append(f"fx-plan: ~{est:.0f} particles > half the board budget {FX.BOARD_PARTICLE_BUDGET}")
+    if layout is not None:
+        fx_add = ((layout.get("fx") or {}).get("add") or [])
+        laid = {f.get("id") for f in fx_add if isinstance(f, dict)}
+        merged = [i for i in ids if i in laid]
+        concept_fire = [f.get("id") for f in fx_add if isinstance(f, dict) and
+                        str(f.get("system", "")).endswith("/NS_Env_ConceptFire")]
+        state = "all" if ids and len(merged) == len(set(ids)) else ("none" if not merged else "partial")
+        report["merged"] = state
+        report["conceptFireLeft"] = concept_fire
+        if state == "partial":
+            missing = sorted(set(ids) - laid)
+            report["notMerged"] = missing
+            # a waterfall tier the cascade does not have is dropped by the merger (documented): only fires must be complete
+            fires_missing = [i for i in missing if i.startswith("fire-")]
+            if fires_missing:
+                errors.append(f"fx-plan merged partially into the scene overlay: missing fires {fires_missing}")
+        if merged and concept_fire:
+            errors.append(f"scene overlay keeps the P8 NS_Env_ConceptFire {concept_fire} next to the fx-plan fires")
     return report, errors
 
 
@@ -383,6 +541,13 @@ def import_mesh(m: dict, src: Path, sha: str, force: bool) -> dict:
     return {"action": action, **res, **settings, "mi": mi_path}
 
 
+def _full_mi(mi: str | None) -> str | None:
+    """A bare MI name (track A writes MI_Env_S_<Name> / MI_EnvScene_<Name>) -> its MAP_ROOT path."""
+    if mi and "/" not in mi:
+        return f"{UE_DIR}/{mi}"
+    return mi
+
+
 def run_import(manifest: dict, force: bool) -> dict:
     out: dict = {"textures": {}, "meshes": {}}
     out["materials"] = {"collection": SM.ensure_collection(force)}
@@ -400,12 +565,14 @@ def run_import(manifest: dict, force: bool) -> dict:
         out["meshes"][m["name"]] = import_mesh(m, resolve(m["fbx"]), sha_of(manifest, m, m["fbx"]), force)
     # meshes that keep an existing material (track A: the vertical banner -> MI_EnvCP_Banner): no baked textures,
     # every slot -> slots[0] (or "mi")
+    # P9: several slots -> one MI per slot (the F2 frame band: wood + iron)
     for m in manifest.get("meshesExistingMaterial") or []:
         item = dict(m)
-        item["mi"] = m.get("mi") or (m.get("slots") or [None])[0]
+        slots = list(m.get("slots") or [])
+        item["mi"] = _full_mi(m.get("mi") or (slots[0] if slots else None))
         if not item["mi"]:
             raise RuntimeError(f"meshesExistingMaterial {m.get('name')}: no 'mi' / slots[0]")
-        item["slots"] = []
+        item["slots"] = slots if len(slots) > 1 else []
         out["meshes"][m["name"]] = import_mesh(item, resolve(m["fbx"]), sha_of(manifest, m, m["fbx"]), force)
     return out
 
@@ -432,6 +599,11 @@ def main(argv: list[str] | None = None) -> int:
     else:
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         report["check"], errors = validate(manifest, check_files=not args.no_files, check_git=not args.no_git)
+        if FX_PLAN.is_file():  # P9: the fx plan (track B) and its merge into the scene overlay (track A)
+            layout_path = REPO / LAYOUT_REL
+            lay = json.loads(layout_path.read_text(encoding="utf-8")) if layout_path.is_file() else None
+            report["fxPlan"], fx_errors = validate_fx_plan(json.loads(FX_PLAN.read_text(encoding="utf-8")), lay)
+            errors = errors + fx_errors
         report["errors"] = errors
         ok = not errors
         if args.check or u is None:

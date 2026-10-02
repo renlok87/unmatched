@@ -1381,6 +1381,8 @@ bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
     ApplyArtLights(*Light, ActiveProfile.bLegacyCobbleTrace);
     if (bMapImageActive) ApplyMapGrade(*Light);
   }
+  // ENV-MAPS P9: a profile change re-rigs the fighters already on the board (SyncFighters does it for new ones)
+  if (FighterActors.Num() > 0) UpdateHeroLights();
   const bool bCobbleMesh = bArtActive && !bArtTiles && !bMapImageActive;
   // ENV-MAPS: the map-image surface draws no zone marks (the zones are the painted ones); on grids this is
   // bArtActive as before.
@@ -1674,6 +1676,8 @@ void AS08BoardActor::SyncFighters(const FS08BoardModel& Board,
       ApplyFighterReadability(Actor, Fighter, S08TeamLook(Team, bOwn, TeamColorMode));
     }
   }
+  // ENV-MAPS P9: the per-figure hero light of the active light profile (channel 1, figures only), within the board budget
+  UpdateHeroLights();
   // ART-004 T2.2 six-copies review: one summary once every fighter applied.
   if (bArtActive && S08ArtPreviewAllMedusa() && !bAllMedusaSummaryTraced && FighterActors.Num() > 0) {
     bAllMedusaSummaryTraced = true;
@@ -2332,4 +2336,81 @@ void AS08BoardActor::ApplyFighterReadability(AS08FighterActor* Actor, const FS08
         *Fighter.Id, Fighter.bIsHero ? 1 : 0, bShadow ? 1 : 0, R->ShadowDiameterUU * RingScale, R->ShadowStrength,
         bPip ? 1 : 0, S08TeamSlotName(Look), RingScale));
   }
+}
+
+// ---- ENV-MAPS P9 hero light (S08HeroLight.h, docs/art-pipeline/ENV-HERO-LIGHT.md) ----------------------------------
+
+namespace {
+/** -NoHeroLight; -ArtPreviewLightsOff (gate G1: no engine light at all) and -S08LegacyRender also switch the rig off. */
+bool HeroLightCommandLineOff(FString& OutReason) {
+  if (S08HeroLight::OptOut()) {
+    OutReason = TEXT("flag-NoHeroLight");
+    return true;
+  }
+  if (FParse::Param(FCommandLine::Get(), S08ConceptPasteSpec::LightsOffFlagName)) {
+    OutReason = TEXT("flag-ArtPreviewLightsOff");
+    return true;
+  }
+  if (S08LegacyRender()) {  // the pre-W4 emulation leg of render_bench.py stays exactly the old state
+    OutReason = TEXT("legacy-render");
+    return true;
+  }
+  return false;
+}
+}  // namespace
+
+const FS08HeroLightSpec* AS08BoardActor::GetActiveHeroLight() const {
+  FString Unused;
+  const bool bOptOut = HeroLightOptOutOverride.IsSet() ? HeroLightOptOutOverride.GetValue() : HeroLightCommandLineOff(Unused);
+  if (bOptOut) return nullptr;
+  const FS08HeroLightSpec* Spec = nullptr;
+  if (bHeroLightOverride) {
+    Spec = &HeroLightOverride;
+  } else if (bArtActive) {
+    if (const FS08LightProfile* Light = ArtData.LightFor(ActiveProfile)) Spec = &Light->HeroLight;
+  }
+  return Spec && Spec->bSet && Spec->bEnabled && Spec->Layers() > 0 ? Spec : nullptr;
+}
+
+void AS08BoardActor::UpdateHeroLights() {
+  using namespace S08HeroLightSpec;
+  FString OffReason = TEXT("test-opt-out");
+  const bool bOptOut = HeroLightOptOutOverride.IsSet() ? HeroLightOptOutOverride.GetValue() : HeroLightCommandLineOff(OffReason);
+  const FS08HeroLightSpec* Spec = GetActiveHeroLight();
+  const FS08LightProfile* Light = bArtActive ? ArtData.LightFor(ActiveProfile) : nullptr;
+  const TCHAR* Reason = bOptOut              ? *OffReason
+                        : Spec               ? (bHeroLightOverride ? TEXT("test-override") : TEXT("profile"))
+                        : !bArtActive        ? TEXT("no-art")
+                        : !Light             ? TEXT("no-light-profile")
+                        : !Light->HeroLight.bSet ? TEXT("no-block")
+                                             : TEXT("disabled");
+  // frozen runs (-Bench without -EnvFxLive, -EnvFxFreeze): the active figure holds exactly activeMul (reproducible frames)
+  const bool bFrozen = FS08EnvFxOptions::FromCommandLine().bFreeze;
+  // lit figures: the living ones and a falling one in its death hold (DefeatedMul); a hidden dead fighter gets no rig
+  int32 Figures = 0;
+  for (const AS08FighterActor* Actor : FighterActors) {
+    Figures += Actor && (Actor->GetFighter().IsAlive() || Actor->IsInDeathHold()) ? 1 : 0;
+  }
+  const int32 LayerCount = Spec ? S08HeroLight::LayersForBoard(*Spec, Figures) : 0;
+  const int32 MaxFigures = LayerCount > 0 ? MaxLightsPerBoard / LayerCount : 0;
+  int32 Lit = 0;
+  HeroLightCount = 0;
+  HeroLightLayersPerFigure = LayerCount;
+  for (AS08FighterActor* Actor : FighterActors) {
+    if (!Actor) continue;
+    const bool bFigure = Actor->GetFighter().IsAlive() || Actor->IsInDeathHold();
+    const bool bRig = Spec && bFigure && Lit < MaxFigures;
+    Lit += bRig ? 1 : 0;
+    Actor->ApplyHeroLight(bRig ? Spec : nullptr, bRig ? LayerCount : 0, bFrozen);
+    HeroLightCount += Actor->GetHeroLightCount();
+  }
+  const FString Key = FString::Printf(TEXT("%s|%s|%d|%d|%d|%d|%d|%s"), *ActiveProfile.Id, Reason, FighterActors.Num(), Lit,
+                                      LayerCount, HeroLightCount, bFrozen ? 1 : 0, Spec ? *Spec->Signature() : TEXT("-"));
+  if (Key == HeroLightTraceKey) return;
+  HeroLightTraceKey = Key;
+  FS08Trace::Write(FString::Printf(
+      TEXT("ARTPREVIEW hero-light board profile=%s light=%s on=%d reason=%s fighters=%d litFigures=%d layers=%d lightsOn=%d budget=%d/%d perFigure<=%d channel=%d frozen=%d"),
+      ActiveProfile.Id.IsEmpty() ? TEXT("-") : *ActiveProfile.Id, Light ? *Light->Id : TEXT("-"), Spec ? 1 : 0, Reason,
+      FighterActors.Num(), Lit, LayerCount, HeroLightCount, Lit * LayerCount, MaxLightsPerBoard, MaxLightsPerFigure, Channel,
+      bFrozen ? 1 : 0));
 }

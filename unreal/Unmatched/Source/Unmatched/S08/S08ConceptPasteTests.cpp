@@ -734,8 +734,10 @@ bool FS08ConceptPasteShippedTest::RunTest(const FString&) {
   TestTrue("sarpedon lit3d: M_EnvScene and the island are required",
            L3.Required.Contains(S08ConceptPasteSpec::SceneMaterialPath) &&
                L3.Required.Contains(TEXT("/Game/EnvMaps/Sarpedon/Scene/SM_Env_S_Island")));
-  TestEqual("sarpedon lit3d: hide (the sea ring and the waterfalls come back)", L3.Hide.Names(),
-            FString(TEXT("tray+ground+backdrop+fog+baseProps+baseFx+layoutLights")));
+  // ENV-MAPS P9 (F4): the P5c falls (sheet / lip / foam) go - the lit3d cascade of the scene overlay replaces them; the sea
+  // ring comes back
+  TestEqual("sarpedon lit3d: hide (the sea ring comes back, the P5c falls go: the scene cascade replaces them)", L3.Hide.Names(),
+            FString(TEXT("tray+ground+waterfalls+backdrop+fog+baseProps+baseFx+layoutLights")));
   TestTrue("sarpedon lit3d: the sky cylinder stays, the sea ring at -300 under the cliffs (R3)",
            L3.bSky && S.Sea.bSet && L3.bSeaZ && L3.SeaZUU == -300.0f && L3.WaterfallScaleZ >= 1.0f);
   TestTrue(FString::Printf(TEXT("sarpedon lit3d: profile points %d + 5 lights <= 6"), Night ? Night->Points.Num() : -1),
@@ -746,6 +748,13 @@ bool FS08ConceptPasteShippedTest::RunTest(const FString&) {
     for (const FS08ConceptLight& L : L3.Lights) {
       Want.Remove(L.Id);
       TestTrue(L.Id + TEXT(": flickers"), L.FlickerAmp > 0.0f && L.FlickerHz > 0.0f);
+      if (L.Id == TEXT("fire-brazier")) {
+        // ENV-MAPS P9 tune: the brazier point stands over track A's brazier bowl (scene overlay fire-brazier at
+        // (-577.3, 139.9)), 23 uu further west so its 180 uu pool stays off the map field
+        TestTrue(L.Id + TEXT(": over the P9 brazier bowl (XY)"),
+                 FVector2D(L.Loc.X, L.Loc.Y).Equals(FVector2D(-600.0, 139.9), 0.11));
+        continue;
+      }
       for (const FDetail& D : Details) {
         if (L.Id == D.Id) {
           TestTrue(L.Id + TEXT(": on its design detail (XY)"),
