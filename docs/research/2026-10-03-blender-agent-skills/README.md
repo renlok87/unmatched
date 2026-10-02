@@ -60,6 +60,14 @@
 
 **Вывод для проекта:** наш прод-путь — headless-CLI скрипты, они детерминированы, версионируются и повторяемы; MCP-серверы закрывают другой кейс — интерактивную отладку в открытой GUI-сессии Blender (например, ручной ретопо/риговый тюнинг). Если понадобится — брать официальный (Blender 5.x, поддерживается Blender Foundation), помня про отсутствие песочницы: разрешить только для доверенных задач, локально.
 
+### 3.1. Premium у mcp-for-blender: для нас не актуален [verified 2026-10-03]
+
+[Страница premium](https://www.mcp-for-blender.com/premium) ($10 Hobby / $20 Pro / $100 Max): один лицензионный ключ вместо ключей провайдеров, пул генераций (Hunyuan3D v3.1 Rapid/Pro, Tripo, Rodin, Tripo P2 на Pro+). Ключевой факт: **«Tripo is exclusive to paid plans (not available with your own keys)»** — то есть своя подписка/ключ Tripo в mcp-for-blender не подключается вообще, даже на Free-тире. Для владельца подписки Tripo premium означает вторую оплату тех же генераций.
+
+- Если нужен агентный доступ к генерации с существующей подпиской — правильный путь **официальный MCP самого Tripo** ([VAST-AI-Research/tripo-mcp](https://github.com/VAST-AI-Research/tripo-mcp)): работает со своим API-ключом tripo3d.ai, кредиты списываются с уже оплаченной подписки [search].
+- Free-тир mcp-for-blender всё ещё полезен без подписки: библиотеки Poly Haven/Sketchfab/Poly Pizza и генерация через свои ключи Rodin (Hyper3D/fal.ai) или Hunyuan3D (Tencent Cloud).
+- Для нашего headless-пайплайна ни premium, ни MCP не меняют ничего: генерация и так идёт через Tripo API/веб, дальше — headless-билд скриптами.
+
 ## 4. Python-библиотеки для headless-конвейера
 
 - **[bpy на PyPI](https://pypi.org/project/bpy/)** [verified] — «Blender as a Python module» от Blender Foundation. **bpy 5.2.2 (15.09.2026) ровно соответствует нашему Blender 5.2.2**, есть Windows x86-64 колесо (~338 MB), требует **ровно CPython 3.13**. GPL-3.0. LTS-линии 4.5/4.2 сопровождаются. Известная ловушка версий 4.x — жёсткая привязка к точной версии Python (см. [docs.blender.org: Blender as a Python Module](https://docs.blender.org/manual/en/latest/advanced/extensions/python/wheels.html)).
@@ -117,7 +125,8 @@
 - https://github.com/freshtechbro/claudedesignskills
 - https://github.com/RobLe3/cc-blender-skill
 - https://www.blender.org/lab/mcp-server/ и https://projects.blender.org/lab/blender_mcp
-- https://github.com/ahujasid/blender-mcp (PyPI: `mcp-for-blender`)
+- https://github.com/ahujasid/blender-mcp (PyPI: `mcp-for-blender`), https://www.mcp-for-blender.com/premium
+- https://github.com/VAST-AI-Research/tripo-mcp (официальный MCP Tripo)
 - https://github.com/sandraschi/blender-mcp
 - https://pypi.org/project/bpy/ и https://docs.blender.org/manual/en/latest/advanced/extensions/python/wheels.html
 - https://github.com/nutti/fake-bpy-module
