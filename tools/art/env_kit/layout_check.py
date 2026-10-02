@@ -70,8 +70,21 @@ Checks (every one is an error unless marked warn):
     rule: NoAI assets only in the user's layout variant overlay, never in <map>.layout.json. The report adds the
     instance triangles per map (ENVKIT_TRIS / the picks' LOD0 'tris').
 
+12. P8 scene variant (ENV-MAPS P8 path 1, check_scene / --scene): the overlay EnvLayouts/sarpedon.scene.layout.json
+    merged on sarpedon.layout.json (Python twin of S08EnvLayout MergeOverlay: no lights / ground / tray / apron in an
+    overlay). The new baked meshes /Game/EnvMaps/Sarpedon/Scene/SM_Env_S_<Name> (island, ship, fort, palisade, piles,
+    banner; vertices authored in board space -> yaw 0, scale 1 at their pivot) are measured by their geometry, not a
+    box: tools/art/concept_scene/scene-proxies.sarpedon.json holds, per mesh, the 3D convex hulls of its vertices ABOVE
+    the map plane clustered in cells (nothing below Z 0 outside the map can cover a circle or cast a shadow onto it).
+    Rule 6 (cell occlusion, MARGIN_PX at every camera pose of camera_set) and rule 7 (key-light shadow on Z 0 off
+    every circle) run on every prop of the merged layout: kit / Fab / ConceptPaste props by their oriented box (ENVCP
+    sizes for /Game/EnvKit/ConceptPaste/SM_EnvCP_*), the scene meshes by their cluster hulls; trees / bushes within
+    SCENE_TREE_NO_SHADOW_UU of the frame must not cast shadows (task R5); Fab scale ranges and NoAI as rule 11.
+    The tray / apron / near-band rules 2 / 4 do not apply (the tray is hidden in the scene mode, the island replaces it).
+
 Usage:
   python -B tools/art/env_kit/layout_check.py                       # both maps, text report
+  python -B tools/art/env_kit/layout_check.py --scene               # + the P8 scene overlay of Sarpedon (rule 12)
   python -B tools/art/env_kit/layout_check.py --maps sarpedon --images C:/tmp/envmaps-research/p1b/layout
   python -B tools/art/env_kit/layout_check.py --json report.json
   python -B tools/art/env_kit/layout_check.py --selftest            # synthetic cases (27)
@@ -212,6 +225,16 @@ FAB_MIN_THICK_UU = 1.0       # flat vine cards (0-uu bounds) get this footprint 
 PACK_ROOTS = ("StylizedForest", "Fantasy_Forest", "Vine_Plants", "Flowers_Pots", "Stylish_Fire_VFX",
               "FreeParticle_SoftTofu", "Particles_Wind_Control_System", "WaterMaterials")
 NOAI_ROOTS = ("Megaplant_Library", "StyleHex_Studio")  # ENV-U14: only the user's variant overlay, never here
+# 12. P8 scene variant (tools/art/concept_scene): baked meshes measured by cluster hulls of their geometry above Z 0
+SCENE_DIR = ROOT / "tools/art/concept_scene"
+SCENE_PROXIES = SCENE_DIR / "scene-proxies.sarpedon.json"
+SCENE_LAYOUT = ROOT / "unreal/Unmatched/Config/ArtBoards/EnvLayouts/sarpedon.scene.layout.json"
+SCENE_MESH_RE = re.compile(r"^/Game/EnvMaps/Sarpedon/Scene/SM_Env_S_([A-Za-z]+)$")
+SCENE_TREE_NO_SHADOW_UU = 60.0
+ENVCP_MESH_RE = re.compile(r"^/Game/EnvKit/ConceptPaste/SM_EnvCP_([A-Za-z]+)$")
+# P7 ConceptPaste details (art/pipeline-candidates/ASSET-ENV-CONCEPT-PASTE-001/20261001-p7/reports/build-report.json
+# boundsUeLocalUU (x depth, y width, z height) at scale 1, pivot = base centre); the cannon copy = the kit cannon
+ENVCP = {"LanternHead": (15.431, 18.591, 38.112), "Cannon": (45.0, 31.624, 26.841), "BannerCloth": (94.247, 129.198, 97.455)}
 
 
 def load_fab(path: Path = FAB_PICKS) -> dict:
@@ -955,6 +978,222 @@ def check(key: str, layout_path: Path, topo_path: Path) -> dict:
             "cameras": len(camera_set(spaces, layout_board_id(layout))) if info.get("parsed") else 0}
 
 
+# ------------------------------------------------------------------ 12. P8 scene variant
+def merge_overlay(base: dict, overlay: dict) -> dict:
+    """Python twin of S08EnvLayout MergeOverlay (props / fx: remove, replace, add; fx anchored on a removed prop go with
+    it); an overlay may not carry lights / ground / tray / apron."""
+    import copy
+    out = copy.deepcopy(base)
+    for fixed in ("lights", "ground", "tray", "apron"):
+        if fixed in overlay:
+            raise ValueError(f"overlay cannot change '{fixed}'")
+    removed: list[str] = []
+    for section in ("props", "fx"):
+        ops = overlay.get(section, {})
+        items = out.get(section, [])
+        dropped = []
+        if section == "fx" and removed:
+            dropped = [f["id"] for f in items if f.get("anchor") in removed]
+            items = [f for f in items if f.get("anchor") not in removed]
+        for rid in ops.get("remove", []):
+            idx = [i for i, x in enumerate(items) if x["id"] == rid]
+            if not idx:
+                if rid in dropped:
+                    continue
+                raise ValueError(f"{section}.remove: {rid} not in the base")
+            items.pop(idx[0])
+            if section == "props":
+                removed.append(rid)
+        for rep in ops.get("replace", []):
+            idx = [i for i, x in enumerate(items) if x["id"] == rep["id"]]
+            if not idx:
+                raise ValueError(f"{section}.replace: {rep['id']} not in the base")
+            items[idx[0]].update({k: v for k, v in rep.items() if k != "id"})
+        for add in ops.get("add", []):
+            if any(x["id"] == add["id"] for x in items):
+                raise ValueError(f"{section}.add: {add['id']} exists")
+            items.append(add)
+        out[section] = items
+    return out
+
+
+def load_scene_proxies(path: Path = SCENE_PROXIES) -> dict:
+    """Name -> {"pivot", "clusters": [[[x, y, z] local to the pivot, ...], ...]} ({} without the file)."""
+    if not Path(path).is_file():
+        return {}
+    return json.loads(Path(path).read_text(encoding="utf-8")).get("meshes", {})
+
+
+def envcp_box(p: dict) -> np.ndarray:
+    m = ENVCP_MESH_RE.match(p["mesh"])
+    d, w, h = (v * float(p.get("scale", 1.0)) for v in ENVCP[m.group(1)])
+    c = np.array([[-d / 2, -w / 2], [d / 2, -w / 2], [d / 2, w / 2], [-d / 2, w / 2]]) @ _rot(p.get("yawDeg", 0.0)).T
+    c = c + np.array(p["loc"][:2], float)
+    z0 = float(p["loc"][2])
+    return np.vstack([np.c_[c, np.full(4, z0)], np.c_[c, np.full(4, z0 + h)]])
+
+
+def prop_shapes(p: dict, proxies: dict) -> tuple[list[np.ndarray], str]:
+    """Convex 3D point sets of a prop for rules 6 / 7 of the scene check, and an error ('' if fine)."""
+    m = SCENE_MESH_RE.match(p.get("mesh", ""))
+    if m:
+        e = proxies.get(m.group(1))
+        if e is None:
+            return [], f"prop {p['id']}: scene mesh SM_Env_S_{m.group(1)} has no proxy (scene_layout.py)"
+        loc = np.array(p["loc"], float)
+        yaw, s = float(p.get("yawDeg", 0.0)), float(p.get("scale", 1.0))
+        R = np.eye(3)
+        R[:2, :2] = _rot(yaw)
+        return [np.asarray(c, float) * s @ R.T + loc for c in e["clusters"]], ""
+    m2 = ENVCP_MESH_RE.match(p.get("mesh", ""))
+    if m2:
+        if m2.group(1) not in ENVCP:
+            return [], f"prop {p['id']}: unknown ConceptPaste mesh {p['mesh']}"
+        return [envcp_box(p)], ""
+    name = mesh_name(p)
+    if not name or (name not in KIT and fab_entry(name) is None):
+        return [], f"prop {p['id']}: mesh {p.get('mesh')} is neither kit / Fab / ConceptPaste nor a scene mesh"
+    return [box_corners(p)], ""
+
+
+def clip_above_plane(pts: np.ndarray, z0: float = 0.0) -> np.ndarray:
+    """The part of a convex point set with Z >= z0 (vertices above + the crossings of every above / below pair)."""
+    up = pts[:, 2] >= z0
+    if up.all() or not up.any():
+        return pts if up.all() else pts[:0]
+    a, b = pts[up], pts[~up]
+    t = (z0 - b[None, :, 2] + 0.0) / (a[:, None, 2] - b[None, :, 2])
+    cross = b[None, :, :] + (a[:, None, :] - b[None, :, :]) * t[..., None]
+    return np.vstack([a, cross.reshape(-1, 3)])
+
+
+def occlusion_shapes(props: list[dict], shapes: dict, spaces: list[dict], board_id: str) -> dict:
+    """occlusion() over arbitrary convex point sets per prop (worst screen clearance in px). Only the part of a shape
+    above the map plane (Z >= 0) is projected: the cameras are above Z 0, so a point below the plane whose projection
+    falls inside a circle's disk lies BEHIND that disk (the camera ray meets the disk first) and cannot cover it."""
+    circ = [circle_pts(s) for s in spaces]
+    worst = {p["id"]: {"px": math.inf, "camera": "", "space": ""} for p in props}
+    flat = [(p["id"], c) for p in props for sh in shapes[p["id"]] for c in (clip_above_plane(sh),) if len(c) >= 1]
+    for label, dist, focus in camera_set(spaces, board_id):
+        cam = make_camera(dist, focus)
+        vis, cpolys = [], []
+        for i, c in enumerate(circ):
+            f = clip_front(cam, c, closed=True)
+            if len(f) >= 3:
+                vis.append(i)
+                cpolys.append(cam.project(f))
+        if not vis:
+            continue
+        cbb = np.array([[c[:, 0].min(), c[:, 1].min(), c[:, 0].max(), c[:, 1].max()] for c in cpolys])
+        for pid, b in flat:
+            f = clip_front(cam, b)
+            if len(f) < 3:
+                continue
+            pr = cam.project(f)
+            bb = np.array([pr[:, 0].min(), pr[:, 1].min(), pr[:, 0].max(), pr[:, 1].max()])
+            gx = np.maximum(0, np.maximum(cbb[:, 0] - bb[2], bb[0] - cbb[:, 2]))
+            gy = np.maximum(0, np.maximum(cbb[:, 1] - bb[3], bb[1] - cbb[:, 3]))
+            gap = np.hypot(gx, gy)
+            w = worst[pid]
+            if gap.min() >= w["px"]:
+                continue
+            hull = convex_hull(pr)
+            for k in np.argsort(gap):
+                if gap[k] >= w["px"]:
+                    break
+                c = poly_clearance(hull, cpolys[k])
+                if c < w["px"]:
+                    w.update(px=c, camera=label, space=spaces[vis[k]]["id"])
+    return worst
+
+
+def shadows_shapes(props: list[dict], shapes: dict, spaces: list[dict]) -> dict:
+    """shadows() over convex point sets: the key-light shadow of each castShadow prop on Z = 0 vs the circles (uu);
+    only the part above Z 0 casts onto the map plane."""
+    L = k1_mock._light_dir(k1_mock.KEY_LIGHT_ROT)
+    disks = [circle_pts(s)[:, :2] for s in spaces]
+    out = {}
+    for p in props:
+        if not p.get("castShadow"):
+            continue
+        best = (math.inf, "")
+        for b in shapes[p["id"]]:
+            b = b[b[:, 2] > 0.0]
+            if len(b) < 1:
+                continue
+            t = -b[:, 2] / L[2]
+            pts = b[:, :2] + t[:, None] * L[None, :2]
+            sh = convex_hull(np.vstack([pts, b[:, :2]]))
+            for s, d in zip(spaces, disks):
+                if np.hypot(*(sh.mean(0) - (s["X"], s["Y"]))) > best[0] + 1500:
+                    continue
+                c = poly_clearance(sh, d) if len(sh) >= 3 else float(
+                    np.min(np.hypot(sh[:, 0] - s["X"], sh[:, 1] - s["Y"])) - s["R"])
+                if c < best[0]:
+                    best = (c, s["id"])
+        out[p["id"]] = {"uu": best[0], "space": best[1]}
+    return out
+
+
+def frame_dist(x: float, y: float) -> float:
+    dx, dy = abs(x) - FRAME_HX, abs(y) - FRAME_HY
+    return math.hypot(max(dx, 0.0), max(dy, 0.0)) + min(max(dx, dy), 0.0)
+
+
+def check_scene(key: str = "sarpedon", overlay_path: Path | None = None, overlay: dict | None = None,
+                layouts: Path | None = None, topology: Path | None = None, proxies: dict | None = None) -> dict:
+    """12. The P8 scene overlay merged on the base layout: rule 6 (occlusion) and rule 7 (shadows) on every prop."""
+    layouts = Path(layouts) if layouts else ROOT / "unreal/Unmatched/Config/ArtBoards/EnvLayouts"
+    topology = Path(topology) if topology else ROOT / "backend/prisma/fixtures/boards"
+    base = json.loads((layouts / f"{key}.layout.json").read_text(encoding="utf-8"))
+    if overlay is None:
+        overlay = json.loads(Path(overlay_path or SCENE_LAYOUT).read_text(encoding="utf-8"))
+    spaces = load_spaces(json.loads((topology / f"{key}.topology.json").read_text(encoding="utf-8")))
+    proxies = load_scene_proxies() if proxies is None else proxies
+    err, warn, info = [], [], {}
+    if overlay.get("variant") != "scene":
+        err.append(f"variant {overlay.get('variant')!r} != 'scene'")
+    try:
+        merged = merge_overlay(base, overlay)
+    except ValueError as exc:
+        return {"errors": [f"merge: {exc}"], "warnings": [], "info": {}, "layout": None}
+    props = merged["props"]
+    shapes = {}
+    for p in props:
+        sh, e = prop_shapes(p, proxies)
+        if e:
+            err.append(e)
+        shapes[p["id"]] = sh
+        if any(n in p.get("mesh", "") for n in NOAI_ROOTS):
+            err.append(f"prop {p['id']}: NoAI pack mesh (ENV-U14: only the user's variant overlay)")
+        fe = fab_entry(mesh_name(p))
+        if fe and not (fe["scaleRange"][0] - 1e-6 <= float(p["scale"]) <= fe["scaleRange"][1] + 1e-6):
+            err.append(f"prop {p['id']}: scale {p['scale']} outside the Fab pick range {fe['scaleRange']}")
+        m = SCENE_MESH_RE.match(p.get("mesh", ""))
+        if m and m.group(1) != "Banner" and (abs(float(p.get("yawDeg", 0))) > 1e-6 or abs(float(p.get("scale", 1)) - 1) > 1e-6):
+            err.append(f"prop {p['id']}: scene meshes are authored in board space (yaw 0, scale 1)")
+        if fe and fe["kind"] in ("tree", "bush") and p.get("castShadow") and \
+                frame_dist(*p["loc"][:2]) < SCENE_TREE_NO_SHADOW_UU:
+            err.append(f"prop {p['id']}: tree within {SCENE_TREE_NO_SHADOW_UU:g} uu of the frame casts a shadow (R5)")
+        info[p["id"]] = {"mesh": p["mesh"].rsplit("/", 1)[-1], "shapes": len(sh)}
+    if err:
+        return {"errors": err, "warnings": warn, "info": info, "layout": merged}
+    occ = occlusion_shapes(props, shapes, spaces, layout_board_id(merged))
+    for pid, w in occ.items():
+        info[pid]["clearance_px"] = round(w["px"], 1) if math.isfinite(w["px"]) else None
+        if w["px"] < MARGIN_PX:
+            err.append(f"prop {pid}: covers / grazes space {w['space']} at camera {w['camera']} "
+                       f"(clearance {w['px']:.1f} px < {MARGIN_PX} px)")
+    for pid, sh in shadows_shapes(props, shapes, spaces).items():
+        info[pid]["shadow_uu"] = round(sh["uu"], 1) if math.isfinite(sh["uu"]) else None
+        if sh["uu"] < 0:
+            err.append(f"prop {pid}: key-light shadow falls on space {sh['space']} ({-sh['uu']:.1f} uu deep)")
+        elif sh["uu"] < SHADOW_WARN_UU:
+            warn.append(f"prop {pid}: key-light shadow {sh['uu']:.1f} uu from space {sh['space']}")
+    return {"errors": err, "warnings": warn, "info": info, "layout": merged,
+            "cameras": len(camera_set(spaces, layout_board_id(merged))), "props": len(props)}
+
+
 # ------------------------------------------------------------------ debug images (CPU / PIL)
 def _glb_preview(path: Path, cache_dir: Path | None, tex: int = 256):
     """Vertices (glTF axes), faces and per-face sRGB colour of a Tripo GLB (one primitive)."""
@@ -1421,6 +1660,7 @@ def main(argv=None) -> int:
                     help="reports/assets of the env kit build (processed sizes); '' = KIT table only")
     ap.add_argument("--json", default=None, help="write the machine-readable report here")
     ap.add_argument("--selftest", action="store_true", help="run the synthetic negative cases and exit")
+    ap.add_argument("--scene", action="store_true", help="also check the P8 scene overlay (rule 12)")
     a = ap.parse_args(argv)
     kit_msgs = kit_crosscheck(Path(a.build_reports) if a.build_reports else None)
     if a.selftest:
@@ -1472,6 +1712,16 @@ def main(argv=None) -> int:
             print(f"   images -> {a.images} ({'meshes' if glb else 'boxes'}, map {'yes' if mi else 'missing'})")
         report[key] = {"errors": res["errors"], "warnings": res["warnings"], "info": res["info"],
                        "cameras": res["cameras"], "camera": rig, "marginPx": MARGIN_PX, "tris": tr}
+    if a.scene:
+        res = check_scene("sarpedon")
+        print(f"== sarpedon scene overlay: {res.get('props', 0)} props, {res.get('cameras', 0)} camera poses")
+        for w in res["warnings"]:
+            print(f"   WARN  {w}")
+        for e in res["errors"]:
+            print(f"   ERROR {e}")
+        print(f"   -> {'FAIL' if res['errors'] else 'OK'}")
+        failed |= bool(res["errors"])
+        report["sarpedon-scene"] = {"errors": res["errors"], "warnings": res["warnings"], "info": res["info"]}
     if a.json:
         Path(a.json).write_text(json.dumps(report, indent=1, ensure_ascii=False), encoding="utf-8")
     return 1 if failed else 0

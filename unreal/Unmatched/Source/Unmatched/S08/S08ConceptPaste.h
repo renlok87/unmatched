@@ -31,6 +31,30 @@
 // concept-paste missing ...' / 'mode=off reason=overlay-...'): the P5c look stays. Status: предложено.
 // Everything except Apply / ApplyHides / RestoreHides / the anim component is world-free (S08ConceptPasteTests.cpp,
 // Unmatched.S08.ConceptPaste.*).
+//
+// ENV-MAPS P8 (docs/art-pipeline/ENV-P8-3D-UNDER-PAINT-TASK.md, "path 1"): a second kind of the on mode, "lit3d", next to
+// the P7 "paste". The block's optional "mode" ("paste" default | "lit3d") is the kind the default / -ConceptPaste use;
+// the optional object "lit3d" describes it:
+//   * nothing is projected: the environment is the env-layout overlay lit3d.variant ('scene': EnvLayouts/<map>.scene.
+//     layout.json - the lit 3D island, ship, fort, palisade, trees, rocks, details; meshes / MIs of tools/art/
+//     concept_scene, M_EnvScene lit Default Lit); only the P7 sky cylinder stays (lit3d.sky, the block's "sea" geometry and
+//     sea plate on M_ConceptPaste, unlit by design, no sea plane);
+//   * lit3d.hide (Sarpedon: tray, ground, backdrop, fog, baseProps, baseFx, layoutLights): the sea ring and the waterfalls
+//     come back from the base layout's ground section; lit3d.seaZUU moves the sea ring (R3: under the cliffs at -300) and
+//     lit3d.waterfallScaleZ stretches the falls (both undone by RestoreHides);
+//   * lit3d.lights (<= 6 with the light profile's points, flicker like the paste's), lit3d.anims, lit3d.winds (prop ids
+//     or "prefix*", live runs only: the WindLive MID of the banner cloth, the pack wind scalars of the P5c foliage MIs
+//     back to their pack values), lit3d.casters (ids / "prefix*": CastShadow + Lumen GI on, the manifest's castShadow /
+//     lumenGI flags) and lit3d.giOff (R4 lever);
+//   * MPC_EnvScene (SceneCollectionPath) "Live" = 1 in live runs (the M_EnvScene wind / lantern flicker; 0 = still, the
+//     frozen -Bench) and "Emissive" (0 with -ArtPreviewLightsOff);
+//   * lit3d.required: /Game/EnvMaps packages that must load, else off 'missing-assets' (the P5c look, as P7).
+// Mode per run: -ConceptPaste=paste | -ConceptPaste=lit3d pick the kind; -EnvLayoutVariant=<lit3d.variant> -> lit3d,
+// -EnvLayoutVariant=<variant> -> paste; everything else as above.
+// -ArtPreviewLightsOff (gate G1, a bench frame without engine light): key, profile / layout / block points and the sky
+// light at intensity 0, the fog hidden, env fx hidden, MPC Emissive 0 and the emissive scalars of the env props' slots
+// (EmissiveIntensity / EmissiveStrength / Fill) at 0, the lit3d sky cylinder hidden; the P7 paste sheet keeps its painted
+// light (the P7c reference of G1). Traced 'ARTPREVIEW lights-off ...'. Status: предложено.
 #pragma once
 
 #include "CoreMinimal.h"
@@ -41,8 +65,12 @@
 class AActor;
 class FJsonObject;
 class UExponentialHeightFogComponent;
+class UMaterialInstanceDynamic;
 class UMaterialInterface;
+class UMaterialParameterCollection;
 class UPointLightComponent;
+class UPrimitiveComponent;
+class UWorld;
 class USceneComponent;
 class UStaticMesh;
 class UStaticMeshComponent;
@@ -107,6 +135,9 @@ constexpr int32 MaxAnims = 32;
  *  (MI_EnvCP_Banner keeps 0 = a still cloth, so the frozen -Bench stays reproducible). */
 constexpr int32 MaxWinds = 8;
 inline const TCHAR* const WindLiveParamName = TEXT("WindLive");
+/** P8: the wind scalars of the pack foliage (Fantasy_Forest Mi_Foliage_01 -> MI_EnvFab_ForestNight holds them at 0 for
+ *  the frozen -Bench): a "winds" prop gets its pack parent's value back in live runs (RestoreBase: the MI's again). */
+inline const TCHAR* const PackWindParamNames[] = {TEXT("Wind Intensity"), TEXT("Branch Wind Intensity")};
 constexpr int32 MaxShadowBlobs = 16;
 constexpr int32 MinSkySegments = 8;
 constexpr int32 MaxSkySegments = 128;
@@ -115,7 +146,28 @@ constexpr float DefaultCalibMax = 16.0f;
 constexpr int32 CombinedPointBudget = 6;
 /** Contact-shadow blobs sit this far above the surface they darken (no z-fight with the sheet). */
 constexpr float BlobLiftUU = 0.4f;
+/** ENV-MAPS P8 "lit3d": the kinds of the on mode ("mode" of the block, -ConceptPaste=<kind>) and the scene overlay. */
+inline const TCHAR* const KindPaste = TEXT("paste");
+inline const TCHAR* const KindLit3d = TEXT("lit3d");
+inline const TCHAR* const DefaultSceneVariant = TEXT("scene");
+/** The master material of the lit island (tools/art/concept_scene/ue_scene_material.py) and its collection. */
+inline const TCHAR* const SceneMaterialPath = TEXT("/Game/EnvMaps/Scene/M_EnvScene");
+inline const TCHAR* const SceneCollectionPath = TEXT("/Game/EnvMaps/Scene/MPC_EnvScene");
+inline const TCHAR* const SceneLiveParamName = TEXT("Live");          // MPC scalar: 1 = wind / flicker run, 0 = still
+inline const TCHAR* const SceneEmissiveParamName = TEXT("Emissive");  // MPC scalar: emissive multiplier (lights-off: 0)
+constexpr int32 MaxSceneRequired = 64;
+constexpr int32 MaxScenePatterns = 32;
+constexpr float MinSceneSeaZUU = -1000.0f;  // = S08EnvGround SeaMinZ .. SeaMaxZ
+constexpr float MaxSceneSeaZUU = -3.0f;
+constexpr float MinWaterfallScaleZ = 0.25f;
+constexpr float MaxWaterfallScaleZ = 4.0f;
+/** -ArtPreviewLightsOff (gate G1): a bench frame without the engine's light. */
+inline const TCHAR* const LightsOffFlagName = TEXT("ArtPreviewLightsOff");
 }  // namespace S08ConceptPasteSpec
+
+/** ENV-MAPS P8: what the on mode shows - the P7 projected paste or the lit 3D island. */
+enum class ES08ConceptKind : uint8 { Paste, Lit3d };
+UNMATCHED_API const TCHAR* S08ConceptKindName(ES08ConceptKind Kind);
 
 /** The concept camera C0 (k1_mock / cp_common.Cam): looks at Focus from DistanceUU along FRotator(Pitch, Yaw, 0);
  *  pixels x right / y down, continuous (pixel centres at i + 0.5), the VFOV from the aspect of SizePx. */
@@ -218,6 +270,24 @@ struct UNMATCHED_API FS08ConceptSeaSpec {
   int32 SkySegments = 48;
 };
 
+/** ENV-MAPS P8 "lit3d" object of the block (see the file comment). Prop lists take ids or "prefix*" patterns. */
+struct UNMATCHED_API FS08ConceptLit3dSpec {
+  bool bSet = false;
+  FString Variant = S08ConceptPasteSpec::DefaultSceneVariant;  // the scene env-layout overlay
+  FString ManifestPath;                                         // informational (tools/art/concept_scene/manifest.<map>.json)
+  TArray<FString> Required;                                     // /Game/EnvMaps packages that must load (1..64)
+  bool bSky = true;                                             // the P7 sky cylinder stays (needs the block's "sea")
+  bool bSeaZ = false;                                           // "seaZUU" given: the ground's sea ring moves to SeaZUU
+  float SeaZUU = -300.0f;
+  float WaterfallScaleZ = 1.0f;                                 // the ground's falls (not the lips) stretched in Z
+  FS08ConceptHide Hide;
+  TArray<FS08ConceptLight> Lights;
+  TArray<FS08ConceptAnim> Anims;
+  TArray<FString> WindProps;
+  TArray<FString> Casters;
+  TArray<FString> GiOff;
+};
+
 struct UNMATCHED_API FS08ConceptPasteSpec {
   bool bSet = false;
   bool bDefaultOn = false;                                         // "default": "on" | "off"
@@ -260,10 +330,24 @@ struct UNMATCHED_API FS08ConceptPasteSpec {
   TArray<FS08ConceptShadowBlob> ShadowBlobs;
   TArray<FS08ConceptFlow> Flows;  // <= MaxFlows
   FS08ConceptSeaFlow SeaFlow;
+  /** ENV-MAPS P8: "mode" (the kind of the default / a bare -ConceptPaste) and the "lit3d" object. */
+  ES08ConceptKind DefaultKind = ES08ConceptKind::Paste;
+  FS08ConceptLit3dSpec Lit3d;
   /** Half extent of the cut: the frame's outer foot minus CutUnderFrameUU (467.67 x 310.67 on the shipped maps). */
   FVector2D CutHalf(const FVector2D& FrameHalf) const;
-  /** Asset packages in a stable order (material, sheet, plates, sea, mask, LUT, water; empty optional ones skipped). */
+  /** Asset packages in a stable order (material, sheet, plates, sea, mask, LUT, water; empty optional ones skipped),
+   *  then the lit3d required packages. */
   TArray<FString> AssetPaths() const;
+  /** The per-kind parts of the block (paste: the top-level fields, lit3d: the "lit3d" object). */
+  const FS08ConceptHide& HideFor(ES08ConceptKind Kind) const { return Kind == ES08ConceptKind::Lit3d ? Lit3d.Hide : Hide; }
+  const TArray<FS08ConceptLight>& LightsFor(ES08ConceptKind Kind) const {
+    return Kind == ES08ConceptKind::Lit3d ? Lit3d.Lights : Lights;
+  }
+  const TArray<FS08ConceptAnim>& AnimsFor(ES08ConceptKind Kind) const { return Kind == ES08ConceptKind::Lit3d ? Lit3d.Anims : Anims; }
+  const TArray<FString>& WindsFor(ES08ConceptKind Kind) const { return Kind == ES08ConceptKind::Lit3d ? Lit3d.WindProps : WindProps; }
+  const FString& VariantFor(ES08ConceptKind Kind) const { return Kind == ES08ConceptKind::Lit3d ? Lit3d.Variant : Variant; }
+  /** The larger light count of the two kinds (the board parser checks it against the light profile's points). */
+  int32 MaxModeLights() const { return FMath::Max(Lights.Num(), Lit3d.Lights.Num()); }
 };
 
 /** What the command line asks for (ResolveMode input; FromCommandLine or a test override). */
@@ -271,6 +355,11 @@ struct UNMATCHED_API FS08ConceptPasteInputs {
   bool bFlagOn = false;
   bool bFlagOff = false;
   bool bCalib = false;
+  /** P8: -ConceptPaste=paste | lit3d (on, this kind); bKindSet false = the block's "mode". */
+  bool bKindSet = false;
+  ES08ConceptKind Kind = ES08ConceptKind::Paste;
+  /** P8 gate G1: -ArtPreviewLightsOff. */
+  bool bLightsOff = false;
   FString Variant;  // -EnvLayoutVariant=
   FString FlagText; // the flag as given (trace), empty = none
   static FS08ConceptPasteInputs FromCommandLine();
@@ -284,6 +373,8 @@ struct UNMATCHED_API FS08ConceptPasteMode {
                                       // default | missing-assets | overlay-absent | overlay-invalid | apply-failed
   bool bOverrideVariant = false;
   FString Variant;
+  /** P8: the kind while on (paste | lit3d; Paste when off). */
+  ES08ConceptKind Kind = ES08ConceptKind::Paste;
 };
 
 /** Parameter values of one M_ConceptPaste MID (the C++ mirror of the shader is ShaderSample). */
@@ -339,7 +430,27 @@ struct UNMATCHED_API FS08ConceptPasteAssets {
   UTexture* Water = nullptr;
   UMaterialInterface* ShadowMaterial = nullptr;
   TArray<FString> Missing;    // every missing package (required or optional)
-  bool RequiredOk() const { return Material && Sheet && PlateB && Plane; }
+  /** P8: the kind these assets were loaded for; lit3d: the required packages (loaded), the MPC (optional) and whether
+   *  every required package loaded (the sky parts above are optional in lit3d). */
+  ES08ConceptKind Kind = ES08ConceptKind::Paste;
+  TArray<UObject*> Scene;
+  UMaterialParameterCollection* SceneCollection = nullptr;
+  bool bSceneOk = false;
+  bool RequiredOk() const {
+    return Kind == ES08ConceptKind::Lit3d ? bSceneOk : (Material && Sheet && PlateB && Plane);
+  }
+  /** Every loaded object (the board actor keeps them referenced). */
+  TArray<UObject*> AllLoaded() const;
+};
+
+/** P8: one component lit3d changed (ApplyScene) - its values before, for RestoreHides. */
+struct UNMATCHED_API FS08ConceptSceneTweak {
+  TWeakObjectPtr<UPrimitiveComponent> Component;
+  bool bCastShadow = false;
+  bool bAffectGI = true;
+  FVector Location = FVector::ZeroVector;  // relative
+  FVector Scale = FVector::OneVector;      // relative
+  double BoundsZ = 0.0;                    // world bounds centre Z (the falls' foam / spill move by it)
 };
 
 /** What the last Apply did (AS08BoardActor::GetConceptPasteRuntime; the components live in its UPROPERTY arrays). */
@@ -365,6 +476,33 @@ struct UNMATCHED_API FS08ConceptPasteRuntime {
   bool bHidTray = false, bHidFog = false, bHidBackdrop = false;
   /** Env / scene components this mode hid (made visible again by RestoreHides). */
   TArray<TWeakObjectPtr<USceneComponent>> Hidden;
+  /** P8 lit3d (ApplyScene): the kind of the last Apply, the overlay props that spawned, the env props that cast a shadow /
+   *  feed Lumen GI after it, the casters / giOff it applied, the sea ring / falls it moved, the MPC state. */
+  ES08ConceptKind Kind = ES08ConceptKind::Paste;
+  int32 SceneProps = 0;
+  int32 SceneShadows = 0;
+  int32 SceneGi = 0;
+  int32 SceneCasters = 0;
+  int32 SceneGiOff = 0;
+  int32 SceneSeaMoved = 0;
+  int32 SceneFallsScaled = 0;
+  FString SceneCollection = TEXT("-");  // - | missing | live | still (+ ",emissive-off")
+  /** Components ApplyScene changed (restored by RestoreHides). */
+  TArray<FS08ConceptSceneTweak> Tweaks;
+};
+
+/** P8 gate G1: what ApplyLightsOff zeroed / hid. */
+struct UNMATCHED_API FS08LightsOffStats {
+  int32 Directional = 0;
+  int32 SkyLights = 0;
+  int32 ProfilePoints = 0;
+  int32 EnvLights = 0;
+  int32 ConceptLights = 0;
+  int32 EmissiveSlots = 0;
+  int32 FxHidden = 0;
+  int32 SkyParts = 0;
+  bool bFogHidden = false;
+  bool bCollection = false;
 };
 
 namespace S08ConceptPaste {
@@ -412,8 +550,18 @@ UNMATCHED_API float EffectiveEmissiveScale(const FS08ConceptPasteSpec& Spec, boo
 /** 'ARTPREVIEW concept-paste missing <path>' */
 UNMATCHED_API FString MissingLine(const FString& Path);
 
-/** Loads the block's assets (uncooked runs ask the package registry first: no loader warning in automation). */
-UNMATCHED_API FS08ConceptPasteAssets LoadAssets(const FS08ConceptPasteSpec& Spec);
+/** "paste" | "lit3d" -> the kind (false for anything else). */
+UNMATCHED_API bool KindFromName(const FString& Name, ES08ConceptKind& Out);
+/** P8: indices into Ids of the entries Patterns name ("id" exactly, "prefix*" by prefix), ascending, each once;
+ *  OutUnmatched (optional) = the patterns that named nothing. */
+UNMATCHED_API TArray<int32> MatchProps(const TArray<FString>& Patterns, const TArray<FString>& Ids,
+                                       TArray<FString>* OutUnmatched = nullptr);
+
+/** Loads the block's assets for one kind (uncooked runs ask the package registry first: no loader warning in
+ *  automation). Paste: material, sheet, plates, sea, mask, LUT, water, plane, blob material. Lit3d: the required list,
+ *  MPC_EnvScene and - with lit3d.sky and the block's "sea" - the paste material, the sea plate (else plate B), the plane. */
+UNMATCHED_API FS08ConceptPasteAssets LoadAssets(const FS08ConceptPasteSpec& Spec,
+                                                ES08ConceptKind Kind = ES08ConceptKind::Paste);
 
 /** Spawns the sheet, the sea layer, the lights and the blobs under Root (owned by Owner), clears the previous ones;
  *  writes the trace. Status ok / missing (Assets.RequiredOk false: nothing spawned) / failed (test hook). */
@@ -422,6 +570,34 @@ UNMATCHED_API void Apply(const FS08ConceptPasteSpec& Spec, const FS08ConceptPast
                          USceneComponent* Root,
                          TArray<TObjectPtr<UStaticMeshComponent>>& Parts,
                          TArray<TObjectPtr<UPointLightComponent>>& Lights, FS08ConceptPasteRuntime& Runtime);
+/** P8 lit3d: spawns the sky cylinder (lit3d.sky with the block's "sea": the sky segments only, no sea plane, no sheet)
+ *  and the lit3d lights under Root, clears the previous parts; writes the 'ARTPREVIEW concept-scene ...' trace. Status
+ *  ok / missing (a required package did not load: nothing spawned) / failed (test hook). */
+UNMATCHED_API void ApplyLit3d(const FS08ConceptPasteSpec& Spec, const FS08ConceptPasteAssets& Assets,
+                              const FVector2D& FrameHalf, ES08ConceptGrade Grade, float EmissiveScale, bool bFreezeFlow,
+                              AActor& Owner, USceneComponent* Root, TArray<TObjectPtr<UStaticMeshComponent>>& Parts,
+                              TArray<TObjectPtr<UPointLightComponent>>& Lights, FS08ConceptPasteRuntime& Runtime);
+/** P8 lit3d, after ApplyHides: casters -> CastShadow + Lumen GI on, giOff -> GI off, the ground's sea ring to
+ *  lit3d.seaZUU, the falls (not the lips) x lit3d.waterfallScaleZ in Z; records the previous values in Runtime.Tweaks
+ *  (RestoreHides undoes them) and the counts; traced 'ARTPREVIEW concept-scene apply ...'. */
+UNMATCHED_API void ApplyScene(const FS08ConceptLit3dSpec& Lit3d, const FS08EnvLayoutRuntime& Env,
+                              const TArray<TObjectPtr<UStaticMeshComponent>>& EnvProps, FS08ConceptPasteRuntime& Runtime);
+/** P8: MPC_EnvScene Live (1 live / 0 still) and Emissive (1 / 0) in World; false without a world / collection. */
+UNMATCHED_API bool SetSceneCollection(UWorld* World, UMaterialParameterCollection* Collection, bool bLive, bool bEmissive);
+/** P8 gate G1 (-ArtPreviewLightsOff): the lights of SceneActors (key, profile points, sky light) and the env / block
+ *  points at intensity 0, the fog of SceneActors hidden, the env fx hidden, the emissive scalars of the env props'
+ *  slots at 0 (a MID per slot that has one), MPC Emissive 0, and - bHideConceptParts (lit3d: the unlit sky) - the block's
+ *  parts hidden. Idempotent; traced 'ARTPREVIEW lights-off ...'. */
+UNMATCHED_API FS08LightsOffStats ApplyLightsOff(const TArray<TObjectPtr<AActor>>& SceneActors,
+                                                const TArray<TObjectPtr<UPointLightComponent>>& EnvLights,
+                                                const TArray<TObjectPtr<UPointLightComponent>>& BlockLights,
+                                                const TArray<TObjectPtr<UStaticMeshComponent>>& EnvProps,
+                                                const FS08EnvLayoutRuntime& Env,
+                                                const TArray<TObjectPtr<UStaticMeshComponent>>& BlockParts,
+                                                bool bHideConceptParts, UWorld* World,
+                                                UMaterialParameterCollection* Collection, const FString& ProfileId);
+/** The scalar parameters ApplyLightsOff zeroes on the env props' slots. */
+UNMATCHED_API const TArray<FName>& LightsOffEmissiveParams();
 /** Destroys the parts and lights (Runtime counts back to 0; Hidden untouched). */
 UNMATCHED_API void Clear(TArray<TObjectPtr<UStaticMeshComponent>>& Parts, TArray<TObjectPtr<UPointLightComponent>>& Lights,
                          FS08ConceptPasteRuntime& Runtime);
@@ -431,7 +607,8 @@ UNMATCHED_API void ApplyHides(const FS08ConceptHide& Hide, const FS08EnvLayoutRu
                               const TArray<TObjectPtr<UStaticMeshComponent>>& EnvProps,
                               const TArray<TObjectPtr<UPointLightComponent>>& EnvLights,
                               UExponentialHeightFogComponent* Fog, FS08ConceptPasteRuntime& Runtime);
-/** Shows again whatever ApplyHides hid (the mode went off for the same components). */
+/** Shows again whatever ApplyHides hid (the mode went off for the same components) and undoes the ApplyScene tweaks;
+ *  returns how many hidden components became visible. */
 UNMATCHED_API int32 RestoreHides(FS08ConceptPasteRuntime& Runtime);
 /** Ground component kind by its S08EnvGround name: ground | sea | waterfalls | "" (not a ground part). */
 UNMATCHED_API FString GroundKindOf(const FString& ComponentName);
@@ -467,7 +644,13 @@ private:
     FS08ConceptAnim Spec;
     FRotator BaseRotation = FRotator::ZeroRotator;
   };
+  struct FWindParam {
+    TWeakObjectPtr<UMaterialInstanceDynamic> Mid;
+    FName Name;
+    float Base = 0.0f;
+  };
   TArray<FFlicker> Flickers;
   TArray<FSway> Sways;
   TArray<TWeakObjectPtr<UStaticMeshComponent>> Winds;
+  TArray<FWindParam> WindParams;  // P8: pack wind scalars set to their pack value (RestoreBase puts Base back)
 };

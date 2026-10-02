@@ -14,6 +14,7 @@
 #include "Engine/StaticMesh.h"
 #include "GameFramework/Actor.h"
 #include "HAL/FileManager.h"
+#include "Materials/MaterialInterface.h"
 #include "HAL/PlatformProperties.h"
 #include "Misc/CommandLine.h"
 #include "Misc/FileHelper.h"
@@ -150,6 +151,39 @@ bool EnvParseProp(const TSharedPtr<FJsonObject>& Obj, int32 Index, TSet<FString>
   Out.YawDeg = static_cast<float>(Yaw);
   Out.Scale = static_cast<float>(Scale);
   if (!EnvOptionalBool(Obj, TEXT("castShadow"), Out.bCastShadow)) Errors.Add(Ctx + TEXT(": castShadow is not a bool"));
+  // ENV-MAPS P8: optional material override - one path (every slot) or a per-slot array (null / "" = the mesh's own)
+  const TSharedPtr<FJsonValue> Material = Obj->TryGetField(TEXT("material"));
+  if (Material.IsValid() && Material->Type != EJson::Null) {
+    bool bOk = false;
+    FString One;
+    const TArray<TSharedPtr<FJsonValue>>* Slots = nullptr;
+    if (Material->Type == EJson::String && Material->TryGetString(One)) {
+      bOk = EnvIsPackagePath(One);
+      if (bOk) {
+        Out.Materials.Add(One);
+        Out.bMaterialAllSlots = true;
+      }
+    } else if (Material->Type == EJson::Array && Material->TryGetArray(Slots) && Slots && Slots->Num() >= 1 &&
+               Slots->Num() <= S08EnvLayoutSpec::MaxMaterialSlots) {
+      bOk = true;
+      for (const TSharedPtr<FJsonValue>& V : *Slots) {
+        FString Path;
+        if (!V.IsValid() || V->Type == EJson::Null) {
+          Out.Materials.Add(FString());
+        } else if (V->Type == EJson::String && V->TryGetString(Path) && (Path.IsEmpty() || EnvIsPackagePath(Path))) {
+          Out.Materials.Add(Path);
+        } else {
+          bOk = false;
+        }
+      }
+    }
+    if (!bOk) {
+      Out.Materials.Reset();
+      Out.bMaterialAllSlots = false;
+      Errors.Add(FString::Printf(TEXT("%s: material must be a /Game/ or /Engine/ package path (every slot) or an array of 1..%d of them per slot (null / \"\" = the mesh's own)"),
+                                 *Ctx, S08EnvLayoutSpec::MaxMaterialSlots));
+    }
+  }
   return Errors.Num() == Before;
 }
 
@@ -449,6 +483,12 @@ FS08EnvTray FS08EnvApron::ImpliedTray(const FVector2D& FrameHalf) const {
   T.HalfY = static_cast<float>(FrameHalf.Y) + 0.5f * (N + S);
   T.OffsetY = 0.5f * (S - N);
   return T;
+}
+
+FString FS08EnvProp::MaterialForSlot(int32 Slot) const {
+  if (Materials.IsEmpty() || Slot < 0) return FString();
+  if (bMaterialAllSlots) return Materials[0];
+  return Materials.IsValidIndex(Slot) ? Materials[Slot] : FString();
 }
 
 FTransform FS08EnvProp::Transform() const {
@@ -768,7 +808,7 @@ bool MergeOverlay(const FString& BaseText, const FString& OverlayText, const FSt
   // props: remove -> replace -> add; the fx anchored on a removed prop go with it
   TArray<FString> RemovedProps, RemovedFx, NoneDropped, TouchedProps, TouchedFx;
   EnvOverlaySection(Base, Overlay, TEXT("props"),
-                    {TEXT("mesh"), TEXT("loc"), TEXT("yawDeg"), TEXT("scale"), TEXT("castShadow")}, NoneDropped,
+                    {TEXT("mesh"), TEXT("loc"), TEXT("yawDeg"), TEXT("scale"), TEXT("castShadow"), TEXT("material")}, NoneDropped,
                     R.PropsRemoved, R.PropsReplaced, R.PropsAdded, RemovedProps, TouchedProps, R.Errors);
   TArray<FString> DroppedWithAnchor;
   const TArray<TSharedPtr<FJsonValue>>* BaseFx = nullptr;
@@ -980,6 +1020,8 @@ FS08EnvSpawnStats Spawn(const FS08EnvLayout& Layout, AActor& Owner, USceneCompon
   USceneComponent* Attach = Parent ? Parent : Owner.GetRootComponent();
   TMap<FString, UStaticMesh*> Loaded;  // nullptr = tried, missing (one load per unique path)
   TMap<FString, TArray<FString>> MissingIds;
+  TMap<FString, UMaterialInterface*> LoadedMaterials;  // P8 material overrides, the same way
+  TMap<FString, TArray<FString>> MissingMaterialIds;
   for (const FS08EnvProp& P : Layout.Props) {
     if (PivotInsideMap(P.Loc, MapHalf)) {
       // ENV-U1: the 3D environment stands only around the map; a pivot on the painted map would cover spaces.
@@ -1016,6 +1058,30 @@ FS08EnvSpawnStats Spawn(const FS08EnvLayout& Layout, AActor& Owner, USceneCompon
     C->SetGenerateOverlapEvents(false);
     C->SetCanEverAffectNavigation(false);
     C->SetCastShadow(P.bCastShadow);
+    // ENV-MAPS P8: the optional material override (every slot, or per slot); a missing material keeps the mesh's own
+    int32 MaterialSlotsSet = 0;
+    if (!P.Materials.IsEmpty()) {
+      for (int32 Slot = 0; Slot < C->GetNumMaterials(); ++Slot) {
+        const FString Path = P.MaterialForSlot(Slot);
+        if (Path.IsEmpty()) continue;
+        UMaterialInterface* Material = nullptr;
+        if (UMaterialInterface** Found = LoadedMaterials.Find(Path)) {
+          Material = *Found;
+        } else {
+          const bool bMayExist =
+              FPlatformProperties::RequiresCookedData() || FPackageName::DoesPackageExist(EnvPackageOf(Path));
+          Material = bMayExist ? LoadObject<UMaterialInterface>(nullptr, *Path, nullptr, LOAD_NoWarn) : nullptr;
+          LoadedMaterials.Add(Path, Material);
+        }
+        if (!Material) {
+          MissingMaterialIds.FindOrAdd(Path).AddUnique(P.Id);
+          continue;
+        }
+        C->SetMaterial(Slot, Material);
+        ++MaterialSlotsSet;
+      }
+      S.MaterialOverrides += MaterialSlotsSet;
+    }
     // Default mobility (Movable, as the tray and the frame bars): a registered Static component would refuse the
     // transform (USceneComponent::MoveComponentImpl), and nothing here is baked.
     C->SetRelativeTransform(P.Transform());
@@ -1031,11 +1097,24 @@ FS08EnvSpawnStats Spawn(const FS08EnvLayout& Layout, AActor& Owner, USceneCompon
     S.Intrusions += bOverMap ? 1 : 0;
     S.OutsideTray += bOnTray ? 0 : 1;
     const FVector Size = Box.GetSize();
+    const FString MaterialTail =
+        P.Materials.IsEmpty()
+            ? FString()
+            : FString::Printf(TEXT(" material=%sx%d"),
+                              P.bMaterialAllSlots ? *FPackageName::GetShortName(EnvPackageOf(P.Materials[0])) : TEXT("per-slot"),
+                              MaterialSlotsSet);
     FS08Trace::Write(FString::Printf(
-        TEXT("ARTPREVIEW envlayout prop id=%s mesh=%s loc=%s yaw=%.1f scale=%.3f shadow=%d size=%.1fx%.1fx%.1f bounds=%s..%s overMap=%d onTray=%d"),
+        TEXT("ARTPREVIEW envlayout prop id=%s mesh=%s loc=%s yaw=%.1f scale=%.3f shadow=%d size=%.1fx%.1fx%.1f bounds=%s..%s overMap=%d onTray=%d%s"),
         *P.Id, *FPackageName::GetShortName(EnvPackageOf(P.Mesh)), *EnvVec(P.Loc), P.YawDeg, P.Scale,
         P.bCastShadow ? 1 : 0, Size.X, Size.Y, Size.Z, *EnvVec(Box.Min), *EnvVec(Box.Max), bOverMap ? 1 : 0,
-        bOnTray ? 1 : 0));
+        bOnTray ? 1 : 0, *MaterialTail));
+  }
+  for (const TPair<FString, TArray<FString>>& Missing : MissingMaterialIds) {
+    ++S.MissingMaterials;
+    const FString Line = FString::Printf(TEXT("ARTPREVIEW envlayout missing material=%s props=%s (the mesh's own kept; run tools/art/concept_scene/ue_scene_material.py)"),
+                                         *Missing.Key, *FString::Join(Missing.Value, TEXT("+")));
+    UE_LOG(LogTemp, Display, TEXT("%s"), *Line);
+    FS08Trace::Write(Line);
   }
   for (const TPair<FString, TArray<FString>>& Missing : MissingIds) {
     ++S.MissingMeshes;

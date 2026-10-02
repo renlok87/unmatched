@@ -46,6 +46,13 @@
 //    layout; the merged document is validated like a base layout. No flag = no overlay (the base, byte for byte); a
 //    missing or invalid overlay falls back to the base (traced 'ARTPREVIEW envlayout variant=<name> ... status=absent|
 //    invalid fallback=base'). Removing a prop also removes the fx anchored on it.
+//
+// ENV-MAPS P8 (lit3d scene, docs/art-pipeline/ENV-P8-3D-UNDER-PAINT-TASK.md): a prop may carry an optional "material"
+// override (also replaceable / addable by an overlay): a package path string = EVERY slot of the mesh gets that material
+// interface; an array = per slot (index = material slot, null or "" = keep the mesh's own; at most 16 entries, extra
+// entries past the mesh's slots are ignored). A material that does not load keeps the mesh's own (traced 'ARTPREVIEW
+// envlayout missing material=..'); the prop line gets ' material=<name|per-slot>x<slots set>' only when the field is
+// present (every other line stays byte-identical).
 #pragma once
 
 #include "CoreMinimal.h"
@@ -72,6 +79,8 @@ inline const TCHAR* const NoEnvFlagName = TEXT("ArtPreviewNoEnv");
 inline const TCHAR* const DirOverrideParam = TEXT("ArtEnvLayouts=");
 constexpr int32 MaxPointLights = 6;
 constexpr int32 MaxProps = 256;
+/** P8: the per-slot form of a prop's "material" override has at most this many entries. */
+constexpr int32 MaxMaterialSlots = 16;
 constexpr float MaxPropScale = 20.0f;
 /** Shared budget of AGENTS/W4-A: 1 directional key + <= 6 point lights on screen (art profile + layout). */
 constexpr int32 CombinedPointBudget = 6;
@@ -125,6 +134,12 @@ struct UNMATCHED_API FS08EnvProp {
   float YawDeg = 0.0f;
   float Scale = 1.0f;
   bool bCastShadow = true;
+  /** P8: the optional "material" override (see the file comment): bMaterialAllSlots = one path for every slot,
+   *  else Materials[slot] ("" = the mesh's own). Empty = no override. */
+  TArray<FString> Materials;
+  bool bMaterialAllSlots = false;
+  /** The override for one slot ("" = none). */
+  FString MaterialForSlot(int32 Slot) const;
   /** Relative transform under the board actor root (pivot = base centre). */
   FTransform Transform() const;
 };
@@ -234,6 +249,8 @@ struct UNMATCHED_API FS08EnvSpawnStats {
   int32 OutsideTray = 0;       // spawned props whose pivot lies outside the tray top (floating over the void)
   int32 OutsideKit = 0;        // props whose mesh is not under /Game/EnvKit (cooked only by another rule)
   int32 ShadowCasters = 0;
+  int32 MaterialOverrides = 0;    // P8: slots that got a "material" override
+  int32 MissingMaterials = 0;     // P8: unique override paths that did not load (the mesh's own stays)
   TArray<FString> MissingPaths;
   /** Ids of the props that got a component (fx anchors need a spawned prop). */
   TSet<FString> SpawnedPropIds;

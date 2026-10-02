@@ -3,7 +3,9 @@
 #include "S08Render.h"
 #include "S08TraceLog.h"
 #include "Components/ExponentialHeightFogComponent.h"
+#include "Components/LightComponent.h"
 #include "Components/PointLightComponent.h"
+#include "Components/SkyLightComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Dom/JsonObject.h"
 #include "Dom/JsonValue.h"
@@ -12,8 +14,11 @@
 #include "Engine/Texture.h"
 #include "Engine/World.h"
 #include "GameFramework/Actor.h"
+#include "Materials/MaterialInstance.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInterface.h"
+#include "Materials/MaterialParameterCollection.h"
+#include "Materials/MaterialParameterCollectionInstance.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Crc.h"
 #include "Misc/PackageName.h"
@@ -128,6 +133,158 @@ bool CpKnownFields(const TSharedPtr<FJsonObject>& O, const TArray<const TCHAR*>&
 bool CpAssetPath(const FString& Path) {
   return Path.StartsWith(S08ConceptPasteSpec::AssetRoot) && !Path.StartsWith(S08ConceptPasteSpec::NeverCookRoot) &&
          !Path.Contains(TEXT(" ")) && !Path.Contains(TEXT(".")) && Path.Len() > FCString::Strlen(S08ConceptPasteSpec::AssetRoot);
+}
+
+/** A prop id, or (bPatterns) "prefix*" with an id prefix. */
+bool CpIsPattern(const FString& S, bool bPatterns) {
+  if (bPatterns && S.EndsWith(TEXT("*"))) return CpIsId(S.LeftChop(1));
+  return CpIsId(S);
+}
+
+using FCpFail = TFunctionRef<void(const FString&)>;
+
+/** "hide" of the block (Prefix "") or of the lit3d object (Prefix "lit3d."). */
+void CpParseHide(const TSharedPtr<FJsonObject>& O, const FString& Prefix, FS08ConceptHide& Out, FCpFail Fail) {
+  if (!O->HasField(TEXT("hide"))) return;
+  const TArray<TSharedPtr<FJsonValue>>* Hide = nullptr;
+  if (!O->TryGetArrayField(TEXT("hide"), Hide) || !Hide) {
+    Fail(Prefix + TEXT("hide must be an array of names"));
+    return;
+  }
+  for (const TSharedPtr<FJsonValue>& V : *Hide) {
+    FString N;
+    if (!V.IsValid() || !V->TryGetString(N)) N = TEXT("?");
+    FS08ConceptHide& H = Out;
+    bool* Flag = N == TEXT("tray")         ? &H.bTray
+                 : N == TEXT("ground")     ? &H.bGround
+                 : N == TEXT("sea")        ? &H.bSea
+                 : N == TEXT("waterfalls") ? &H.bWaterfalls
+                 : N == TEXT("backdrop")   ? &H.bBackdrop
+                 : N == TEXT("fog")        ? &H.bFog
+                 : N == TEXT("baseProps")  ? &H.bBaseProps
+                 : N == TEXT("baseFx")     ? &H.bBaseFx
+                 : N == TEXT("layoutLights") ? &H.bLayoutLights
+                                             : nullptr;
+    if (!Flag) {
+      Fail(FString::Printf(TEXT("%shide '%s' is not tray | ground | sea | waterfalls | backdrop | fog | baseProps | baseFx | layoutLights"),
+                           *Prefix, *N));
+      continue;
+    }
+    *Flag = true;
+  }
+}
+
+/** "lights" (<= 6 here; the board parser checks them against the light profile's points). */
+void CpParseLights(const TSharedPtr<FJsonObject>& O, const FString& Prefix, const FS08ConceptHide& Hide,
+                   TArray<FS08ConceptLight>& Out, FCpFail Fail) {
+  if (!O->HasField(TEXT("lights"))) return;
+  TSet<FString> Ids;
+  const TArray<TSharedPtr<FJsonValue>>* Lights = nullptr;
+  if (!O->TryGetArrayField(TEXT("lights"), Lights) || !Lights || Lights->Num() > S08ConceptPasteSpec::MaxLights) {
+    Fail(FString::Printf(TEXT("%slights must be an array of at most %d points"), *Prefix, S08ConceptPasteSpec::MaxLights));
+  } else {
+    for (int32 I = 0; I < Lights->Num(); ++I) {
+      const TSharedPtr<FJsonObject>* L = nullptr;
+      FS08ConceptLight Light;
+      FString Hex, LightUnknown;
+      const TSharedPtr<FJsonObject>* Flicker = nullptr;
+      bool bOk = (*Lights)[I].IsValid() && (*Lights)[I]->TryGetObject(L) && L && L->IsValid() &&
+                 CpKnownFields(*L, {TEXT("id"), TEXT("loc"), TEXT("colorSrgb"), TEXT("intensityCd"), TEXT("radius"),
+                                  TEXT("flicker")},
+                             LightUnknown) &&
+                 (*L)->TryGetStringField(TEXT("id"), Light.Id) && CpIsId(Light.Id) && !Ids.Contains(Light.Id) &&
+                 CpVec3(*L, TEXT("loc"), 5000.0, Light.Loc) && (*L)->TryGetStringField(TEXT("colorSrgb"), Hex) &&
+                 CpHexColor(Hex, Light.Color) && (*L)->HasField(TEXT("intensityCd")) &&
+                 CpOptNumber(*L, TEXT("intensityCd"), 0.0, 10000.0, Light.IntensityCd) && (*L)->HasField(TEXT("radius")) &&
+                 CpOptNumber(*L, TEXT("radius"), 1.0, 5000.0, Light.RadiusUU);
+      if (bOk && (*L)->HasField(TEXT("flicker"))) {
+        FString FlickerUnknown;
+        bOk = (*L)->TryGetObjectField(TEXT("flicker"), Flicker) && Flicker && Flicker->IsValid() &&
+              CpKnownFields(*Flicker, {TEXT("amp"), TEXT("hz")}, FlickerUnknown) &&
+              CpOptNumber(*Flicker, TEXT("amp"), 0.0, 0.5, Light.FlickerAmp) &&
+              CpOptNumber(*Flicker, TEXT("hz"), 0.0, 20.0, Light.FlickerHz);
+      }
+      if (!bOk) {
+        Fail(FString::Printf(TEXT("%slights[%d] needs a unique id, loc [x,y,z] |..| <= 5000, colorSrgb #RRGGBB, intensityCd 0..10000, radius 1..5000, optional flicker {amp 0..0.5, hz 0..20}"),
+                             *Prefix, I));
+        continue;
+      }
+      Ids.Add(Light.Id);
+      Out.Add(Light);
+    }
+  }
+  if (Out.Num() > 0 && !Hide.bLayoutLights) {
+    Fail(Prefix + TEXT("lights replace the env-layout lights: hide needs \"layoutLights\" (light budget)"));
+  }
+}
+
+void CpParseAnims(const TSharedPtr<FJsonObject>& O, const FString& Prefix, TArray<FS08ConceptAnim>& Out, FCpFail Fail) {
+  if (!O->HasField(TEXT("anims"))) return;
+  const TArray<TSharedPtr<FJsonValue>>* Anims = nullptr;
+  if (!O->TryGetArrayField(TEXT("anims"), Anims) || !Anims || Anims->Num() > S08ConceptPasteSpec::MaxAnims) {
+    Fail(FString::Printf(TEXT("%sanims must be an array of at most %d entries"), *Prefix, S08ConceptPasteSpec::MaxAnims));
+    return;
+  }
+  for (int32 I = 0; I < Anims->Num(); ++I) {
+    const TSharedPtr<FJsonObject>* A = nullptr;
+    FS08ConceptAnim Anim;
+    FString Axis = TEXT("x"), AnimUnknown;
+    const bool bOk = (*Anims)[I].IsValid() && (*Anims)[I]->TryGetObject(A) && A && A->IsValid() &&
+                     CpKnownFields(*A, {TEXT("prop"), TEXT("swayDeg"), TEXT("swayHz"), TEXT("axis")}, AnimUnknown) &&
+                     (*A)->TryGetStringField(TEXT("prop"), Anim.Prop) && CpIsId(Anim.Prop) &&
+                     (*A)->HasField(TEXT("swayDeg")) && CpOptNumber(*A, TEXT("swayDeg"), 0.0, 15.0, Anim.SwayDeg) &&
+                     (*A)->HasField(TEXT("swayHz")) && CpOptNumber(*A, TEXT("swayHz"), 0.0, 5.0, Anim.SwayHz) &&
+                     (!(*A)->HasField(TEXT("axis")) ||
+                      ((*A)->TryGetStringField(TEXT("axis"), Axis) && (Axis == TEXT("x") || Axis == TEXT("y"))));
+    if (!bOk) {
+      Fail(FString::Printf(TEXT("%sanims[%d] needs prop (an env-layout prop id), swayDeg 0..15, swayHz 0..5, optional axis x | y"),
+                           *Prefix, I));
+      continue;
+    }
+    Anim.bAxisY = Axis == TEXT("y");
+    Out.Add(Anim);
+  }
+}
+
+/** A list of unique prop ids (bPatterns: also "prefix*"), at most Max ("winds", lit3d "casters" / "giOff"). */
+void CpParseIdList(const TSharedPtr<FJsonObject>& O, const TCHAR* Field, const FString& Prefix, int32 Max, bool bPatterns,
+                   TArray<FString>& Out, FCpFail Fail) {
+  if (!O->HasField(Field)) return;
+  const TArray<TSharedPtr<FJsonValue>>* Items = nullptr;
+  if (!O->TryGetArrayField(Field, Items) || !Items || Items->Num() > Max) {
+    Fail(FString::Printf(TEXT("%s%s must be an array of at most %d prop ids"), *Prefix, Field, Max));
+    return;
+  }
+  for (int32 I = 0; I < Items->Num(); ++I) {
+    FString Prop;
+    if (!(*Items)[I].IsValid() || !(*Items)[I]->TryGetString(Prop) || !CpIsPattern(Prop, bPatterns) || Out.Contains(Prop)) {
+      Fail(FString::Printf(TEXT("%s%s[%d] must be a unique env-layout prop id%s"), *Prefix, Field, I,
+                           bPatterns ? TEXT(" or \"prefix*\"") : TEXT("")));
+      continue;
+    }
+    Out.Add(Prop);
+  }
+}
+
+/** One point light of the block (P7 paste / P8 lit3d): Movable, candelas (unless -S08LegacyRender), no shadow. */
+UPointLightComponent* CpSpawnLight(AActor& Owner, USceneComponent* Root, const FS08ConceptLight& L, const TCHAR* TracePrefix) {
+  const bool bCandelas = !S08LegacyRender();
+  UPointLightComponent* C = NewObject<UPointLightComponent>(
+      &Owner, MakeUniqueObjectName(&Owner, UPointLightComponent::StaticClass(), FName(*(TEXT("ConceptLight_") + L.Id))));
+  C->SetupAttachment(Root ? Root : Owner.GetRootComponent());
+  C->SetMobility(EComponentMobility::Movable);
+  if (bCandelas) C->SetIntensityUnits(ELightUnits::Candelas);
+  C->SetIntensity(L.IntensityCd);
+  C->SetAttenuationRadius(L.RadiusUU);
+  C->SetCastShadows(false);
+  C->SetLightFColor(L.Color);
+  C->SetRelativeLocation(L.Loc);
+  C->RegisterComponent();
+  FS08Trace::Write(FString::Printf(
+      TEXT("ARTPREVIEW %s light id=%s kind=point at=%s intensity=%g units=%s radius=%g color=%s shadow=0 flicker=%.2f@%.1fHz"),
+      TracePrefix, *L.Id, *CpVec(L.Loc), L.IntensityCd, bCandelas ? TEXT("candelas") : TEXT("unitless-legacy"), L.RadiusUU,
+      *CpColorHex(L.Color), L.FlickerAmp, L.FlickerHz));
+  return C;
 }
 
 UStaticMeshComponent* CpNewPart(AActor& Owner, USceneComponent* Root, const TCHAR* BaseName, UStaticMesh* Mesh,
@@ -254,6 +411,10 @@ const TCHAR* S08ConceptGradeName(ES08ConceptGrade Grade) {
   return TEXT("?");
 }
 
+const TCHAR* S08ConceptKindName(ES08ConceptKind Kind) {
+  return Kind == ES08ConceptKind::Lit3d ? S08ConceptPasteSpec::KindLit3d : S08ConceptPasteSpec::KindPaste;
+}
+
 FString FS08ConceptHide::Names() const {
   TArray<FString> N;
   if (bTray) N.Add(TEXT("tray"));
@@ -277,6 +438,19 @@ TArray<FString> FS08ConceptPasteSpec::AssetPaths() const {
   for (const FString* P : {&MaterialPath, &SheetMeshPath, &PlateAPath, &PlateBPath, &SeaPlatePath, &MaskPath, &LutPath,
                            &WaterMaskPath}) {
     if (!P->IsEmpty()) Out.Add(*P);
+  }
+  Out.Append(Lit3d.Required);
+  return Out;
+}
+
+TArray<UObject*> FS08ConceptPasteAssets::AllLoaded() const {
+  TArray<UObject*> Out;
+  for (UObject* Asset : TArray<UObject*>{Material, Sheet, Plane, PlateA, PlateB, Sea, Mask, Lut, Water, ShadowMaterial,
+                                         SceneCollection}) {
+    if (Asset) Out.Add(Asset);
+  }
+  for (UObject* Asset : Scene) {
+    if (Asset) Out.Add(Asset);
   }
   return Out;
 }
@@ -302,7 +476,8 @@ bool ParseJson(const FString& BoardId, const TSharedPtr<FJsonObject>& O, FS08Con
                        TEXT("material"), TEXT("sheetMesh"), TEXT("plateA"), TEXT("plateB"), TEXT("seaPlate"),
                        TEXT("mask"), TEXT("lut"), TEXT("waterMask"), TEXT("camera"), TEXT("homography"), TEXT("rectA"), TEXT("rectB"),
                        TEXT("featherPx"), TEXT("outside"), TEXT("cut"), TEXT("grade"), TEXT("sea"), TEXT("hide"),
-                       TEXT("lights"), TEXT("anims"), TEXT("winds"), TEXT("shadowBlobs"), TEXT("flow")},
+                       TEXT("lights"), TEXT("anims"), TEXT("winds"), TEXT("shadowBlobs"), TEXT("flow"), TEXT("mode"),
+                       TEXT("lit3d")},
                    Unknown)) {
     Fail(FString::Printf(TEXT("%s is not a field"), *Unknown));
   }
@@ -460,113 +635,10 @@ bool ParseJson(const FString& BoardId, const TSharedPtr<FJsonObject>& O, FS08Con
       S.bSet = true;
     }
   }
-  if (O->HasField(TEXT("hide"))) {
-    const TArray<TSharedPtr<FJsonValue>>* Hide = nullptr;
-    if (!O->TryGetArrayField(TEXT("hide"), Hide) || !Hide) {
-      Fail(TEXT("hide must be an array of names"));
-    } else {
-      for (const TSharedPtr<FJsonValue>& V : *Hide) {
-        FString N;
-        if (!V.IsValid() || !V->TryGetString(N)) N = TEXT("?");
-        FS08ConceptHide& H = Out.Hide;
-        bool* Flag = N == TEXT("tray")         ? &H.bTray
-                     : N == TEXT("ground")     ? &H.bGround
-                     : N == TEXT("sea")        ? &H.bSea
-                     : N == TEXT("waterfalls") ? &H.bWaterfalls
-                     : N == TEXT("backdrop")   ? &H.bBackdrop
-                     : N == TEXT("fog")        ? &H.bFog
-                     : N == TEXT("baseProps")  ? &H.bBaseProps
-                     : N == TEXT("baseFx")     ? &H.bBaseFx
-                     : N == TEXT("layoutLights") ? &H.bLayoutLights
-                                                 : nullptr;
-        if (!Flag) {
-          Fail(FString::Printf(TEXT("hide '%s' is not tray | ground | sea | waterfalls | backdrop | fog | baseProps | baseFx | layoutLights"), *N));
-          continue;
-        }
-        *Flag = true;
-      }
-    }
-  }
-  // lights (<= 6 here; the board parser checks them against the light profile's points)
-  TSet<FString> Ids;
-  if (O->HasField(TEXT("lights"))) {
-    const TArray<TSharedPtr<FJsonValue>>* Lights = nullptr;
-    if (!O->TryGetArrayField(TEXT("lights"), Lights) || !Lights || Lights->Num() > S08ConceptPasteSpec::MaxLights) {
-      Fail(FString::Printf(TEXT("lights must be an array of at most %d points"), S08ConceptPasteSpec::MaxLights));
-    } else {
-      for (int32 I = 0; I < Lights->Num(); ++I) {
-        const TSharedPtr<FJsonObject>* L = nullptr;
-        FS08ConceptLight Light;
-        FString Hex, LightUnknown;
-        const TSharedPtr<FJsonObject>* Flicker = nullptr;
-        bool bOk = (*Lights)[I].IsValid() && (*Lights)[I]->TryGetObject(L) && L && L->IsValid() &&
-                   CpKnownFields(*L, {TEXT("id"), TEXT("loc"), TEXT("colorSrgb"), TEXT("intensityCd"), TEXT("radius"),
-                                    TEXT("flicker")},
-                               LightUnknown) &&
-                   (*L)->TryGetStringField(TEXT("id"), Light.Id) && CpIsId(Light.Id) && !Ids.Contains(Light.Id) &&
-                   CpVec3(*L, TEXT("loc"), 5000.0, Light.Loc) && (*L)->TryGetStringField(TEXT("colorSrgb"), Hex) &&
-                   CpHexColor(Hex, Light.Color) && (*L)->HasField(TEXT("intensityCd")) &&
-                   CpOptNumber(*L, TEXT("intensityCd"), 0.0, 10000.0, Light.IntensityCd) && (*L)->HasField(TEXT("radius")) &&
-                   CpOptNumber(*L, TEXT("radius"), 1.0, 5000.0, Light.RadiusUU);
-        if (bOk && (*L)->HasField(TEXT("flicker"))) {
-          FString FlickerUnknown;
-          bOk = (*L)->TryGetObjectField(TEXT("flicker"), Flicker) && Flicker && Flicker->IsValid() &&
-                CpKnownFields(*Flicker, {TEXT("amp"), TEXT("hz")}, FlickerUnknown) &&
-                CpOptNumber(*Flicker, TEXT("amp"), 0.0, 0.5, Light.FlickerAmp) &&
-                CpOptNumber(*Flicker, TEXT("hz"), 0.0, 20.0, Light.FlickerHz);
-        }
-        if (!bOk) {
-          Fail(FString::Printf(TEXT("lights[%d] needs a unique id, loc [x,y,z] |..| <= 5000, colorSrgb #RRGGBB, intensityCd 0..10000, radius 1..5000, optional flicker {amp 0..0.5, hz 0..20}"), I));
-          continue;
-        }
-        Ids.Add(Light.Id);
-        Out.Lights.Add(Light);
-      }
-    }
-    if (Out.Lights.Num() > 0 && !Out.Hide.bLayoutLights) {
-      Fail(TEXT("lights replace the env-layout lights: hide needs \"layoutLights\" (light budget)"));
-    }
-  }
-  if (O->HasField(TEXT("anims"))) {
-    const TArray<TSharedPtr<FJsonValue>>* Anims = nullptr;
-    if (!O->TryGetArrayField(TEXT("anims"), Anims) || !Anims || Anims->Num() > S08ConceptPasteSpec::MaxAnims) {
-      Fail(FString::Printf(TEXT("anims must be an array of at most %d entries"), S08ConceptPasteSpec::MaxAnims));
-    } else {
-      for (int32 I = 0; I < Anims->Num(); ++I) {
-        const TSharedPtr<FJsonObject>* A = nullptr;
-        FS08ConceptAnim Anim;
-        FString Axis = TEXT("x"), AnimUnknown;
-        const bool bOk = (*Anims)[I].IsValid() && (*Anims)[I]->TryGetObject(A) && A && A->IsValid() &&
-                         CpKnownFields(*A, {TEXT("prop"), TEXT("swayDeg"), TEXT("swayHz"), TEXT("axis")}, AnimUnknown) &&
-                         (*A)->TryGetStringField(TEXT("prop"), Anim.Prop) && CpIsId(Anim.Prop) &&
-                         (*A)->HasField(TEXT("swayDeg")) && CpOptNumber(*A, TEXT("swayDeg"), 0.0, 15.0, Anim.SwayDeg) &&
-                         (*A)->HasField(TEXT("swayHz")) && CpOptNumber(*A, TEXT("swayHz"), 0.0, 5.0, Anim.SwayHz) &&
-                         (!(*A)->HasField(TEXT("axis")) ||
-                          ((*A)->TryGetStringField(TEXT("axis"), Axis) && (Axis == TEXT("x") || Axis == TEXT("y"))));
-        if (!bOk) {
-          Fail(FString::Printf(TEXT("anims[%d] needs prop (an env-layout prop id), swayDeg 0..15, swayHz 0..5, optional axis x | y"), I));
-          continue;
-        }
-        Anim.bAxisY = Axis == TEXT("y");
-        Out.Anims.Add(Anim);
-      }
-    }
-  }
-  if (O->HasField(TEXT("winds"))) {
-    const TArray<TSharedPtr<FJsonValue>>* Winds = nullptr;
-    if (!O->TryGetArrayField(TEXT("winds"), Winds) || !Winds || Winds->Num() > S08ConceptPasteSpec::MaxWinds) {
-      Fail(FString::Printf(TEXT("winds must be an array of at most %d prop ids"), S08ConceptPasteSpec::MaxWinds));
-    } else {
-      for (int32 I = 0; I < Winds->Num(); ++I) {
-        FString Prop;
-        if (!(*Winds)[I].IsValid() || !(*Winds)[I]->TryGetString(Prop) || !CpIsId(Prop) || Out.WindProps.Contains(Prop)) {
-          Fail(FString::Printf(TEXT("winds[%d] must be a unique env-layout prop id"), I));
-          continue;
-        }
-        Out.WindProps.Add(Prop);
-      }
-    }
-  }
+  CpParseHide(O, FString(), Out.Hide, Fail);
+  CpParseLights(O, FString(), Out.Hide, Out.Lights, Fail);
+  CpParseAnims(O, FString(), Out.Anims, Fail);
+  CpParseIdList(O, TEXT("winds"), FString(), S08ConceptPasteSpec::MaxWinds, false, Out.WindProps, Fail);
   if (O->HasField(TEXT("shadowBlobs"))) {
     const TArray<TSharedPtr<FJsonValue>>* Blobs = nullptr;
     TSet<FString> BlobIds;
@@ -652,6 +724,81 @@ bool ParseJson(const FString& BoardId, const TSharedPtr<FJsonObject>& O, FS08Con
       }
     }
   }
+  // ENV-MAPS P8: the lit 3D island ("lit3d" object) and the kind of the default / a bare -ConceptPaste ("mode")
+  if (O->HasField(TEXT("lit3d"))) {
+    const TSharedPtr<FJsonObject>* L = nullptr;
+    FS08ConceptLit3dSpec& S = Out.Lit3d;
+    const int32 Lit3dBefore = Errors.Num();
+    FString LitUnknown;
+    if (!O->TryGetObjectField(TEXT("lit3d"), L) || !L || !L->IsValid()) {
+      Fail(TEXT("lit3d must be an object"));
+    } else {
+      if (!CpKnownFields(*L, {TEXT("variant"), TEXT("manifest"), TEXT("required"), TEXT("sky"), TEXT("seaZUU"),
+                              TEXT("waterfallScaleZ"), TEXT("hide"), TEXT("lights"), TEXT("anims"), TEXT("winds"),
+                              TEXT("casters"), TEXT("giOff")},
+                         LitUnknown)) {
+        Fail(FString::Printf(TEXT("lit3d.%s is not a field"), *LitUnknown));
+      }
+      if ((*L)->HasField(TEXT("variant")) &&
+          (!(*L)->TryGetStringField(TEXT("variant"), S.Variant) || !S08EnvLayout::IsVariantName(S.Variant))) {
+        Fail(TEXT("lit3d.variant must be an env-layout variant name [a-z0-9-]{1,32}"));
+      } else if (S.Variant == Out.Variant || S.Variant == Out.OffVariant) {
+        Fail(TEXT("lit3d.variant must differ from variant and offVariant"));
+      }
+      (*L)->TryGetStringField(TEXT("manifest"), S.ManifestPath);
+      const TArray<TSharedPtr<FJsonValue>>* Required = nullptr;
+      if (!(*L)->TryGetArrayField(TEXT("required"), Required) || !Required || Required->Num() < 1 ||
+          Required->Num() > S08ConceptPasteSpec::MaxSceneRequired) {
+        Fail(FString::Printf(TEXT("lit3d.required must be an array of 1..%d %s package paths"),
+                             S08ConceptPasteSpec::MaxSceneRequired, S08ConceptPasteSpec::AssetRoot));
+      } else {
+        for (int32 I = 0; I < Required->Num(); ++I) {
+          FString Path;
+          if (!(*Required)[I].IsValid() || !(*Required)[I]->TryGetString(Path) || !CpAssetPath(Path) || S.Required.Contains(Path)) {
+            Fail(FString::Printf(TEXT("lit3d.required[%d] '%s' is not a unique %s package path (not under %s)"), I, *Path,
+                                 S08ConceptPasteSpec::AssetRoot, S08ConceptPasteSpec::NeverCookRoot));
+            continue;
+          }
+          S.Required.Add(Path);
+        }
+      }
+      if ((*L)->HasField(TEXT("sky"))) {  // TryGetBoolField also accepts numbers: require a JSON bool
+        const TSharedPtr<FJsonValue> Sky = (*L)->TryGetField(TEXT("sky"));
+        if (!Sky.IsValid() || Sky->Type != EJson::Boolean) Fail(TEXT("lit3d.sky must be a bool"));
+        else S.bSky = Sky->AsBool();
+      }
+      if ((*L)->HasField(TEXT("seaZUU"))) {
+        if (!CpOptNumber(*L, TEXT("seaZUU"), S08ConceptPasteSpec::MinSceneSeaZUU, S08ConceptPasteSpec::MaxSceneSeaZUU, S.SeaZUU)) {
+          Fail(FString::Printf(TEXT("lit3d.seaZUU must be %.0f..%.0f (under the tray top)"), S08ConceptPasteSpec::MinSceneSeaZUU,
+                               S08ConceptPasteSpec::MaxSceneSeaZUU));
+        } else {
+          S.bSeaZ = true;
+        }
+      }
+      if (!CpOptNumber(*L, TEXT("waterfallScaleZ"), S08ConceptPasteSpec::MinWaterfallScaleZ,
+                       S08ConceptPasteSpec::MaxWaterfallScaleZ, S.WaterfallScaleZ)) {
+        Fail(FString::Printf(TEXT("lit3d.waterfallScaleZ must be %.2f..%.0f"), S08ConceptPasteSpec::MinWaterfallScaleZ,
+                             S08ConceptPasteSpec::MaxWaterfallScaleZ));
+      }
+      const FString P = TEXT("lit3d.");
+      CpParseHide(*L, P, S.Hide, Fail);
+      CpParseLights(*L, P, S.Hide, S.Lights, Fail);
+      CpParseAnims(*L, P, S.Anims, Fail);
+      CpParseIdList(*L, TEXT("winds"), P, S08ConceptPasteSpec::MaxWinds, true, S.WindProps, Fail);
+      CpParseIdList(*L, TEXT("casters"), P, S08ConceptPasteSpec::MaxScenePatterns, true, S.Casters, Fail);
+      CpParseIdList(*L, TEXT("giOff"), P, S08ConceptPasteSpec::MaxScenePatterns, true, S.GiOff, Fail);
+      S.bSet = Errors.Num() == Lit3dBefore;
+    }
+  }
+  if (O->HasField(TEXT("mode"))) {
+    FString Mode;
+    if (!O->TryGetStringField(TEXT("mode"), Mode) || !KindFromName(Mode, Out.DefaultKind)) {
+      Fail(TEXT("mode must be \"paste\" | \"lit3d\""));
+      Out.DefaultKind = ES08ConceptKind::Paste;
+    } else if (Out.DefaultKind == ES08ConceptKind::Lit3d && !O->HasField(TEXT("lit3d"))) {
+      Fail(TEXT("mode \"lit3d\" needs the lit3d object"));
+    }
+  }
   Out.bSet = Errors.Num() == Before;
   return Out.bSet;
 }
@@ -667,12 +814,21 @@ FS08ConceptPasteInputs InputsFromCommandLine(const TCHAR* CommandLine) {
     if (Key.Equals(S08ConceptPasteSpec::FlagName, ESearchCase::IgnoreCase)) {
       const FString V = Value.ToLower();
       In.FlagText = bHasValue ? V : FString(TEXT("1"));
+      ES08ConceptKind Kind = ES08ConceptKind::Paste;
       if (!bHasValue || V == TEXT("1") || V == TEXT("on") || V == TEXT("true")) {
         In.bFlagOn = true;
         In.bFlagOff = false;
+        In.bKindSet = false;
       } else if (V == TEXT("0") || V == TEXT("off") || V == TEXT("false")) {
         In.bFlagOff = true;
         In.bFlagOn = false;
+        In.bKindSet = false;
+      } else if (KindFromName(V, Kind)) {
+        // P8: -ConceptPaste=paste | lit3d = on with this kind
+        In.bFlagOn = true;
+        In.bFlagOff = false;
+        In.bKindSet = true;
+        In.Kind = Kind;
       }
     } else if (Key.Equals(S08ConceptPasteSpec::NoFlagName, ESearchCase::IgnoreCase) && !bHasValue) {
       In.bFlagOff = true;
@@ -680,6 +836,8 @@ FS08ConceptPasteInputs InputsFromCommandLine(const TCHAR* CommandLine) {
       In.FlagText = TEXT("no");
     } else if (Key.Equals(S08ConceptPasteSpec::CalibFlagName, ESearchCase::IgnoreCase) && !bHasValue) {
       In.bCalib = true;
+    } else if (Key.Equals(S08ConceptPasteSpec::LightsOffFlagName, ESearchCase::IgnoreCase) && !bHasValue) {
+      In.bLightsOff = true;
     } else if (bHasValue && Key.Equals(TEXT("EnvLayoutVariant"), ESearchCase::IgnoreCase)) {
       In.Variant = Value;
     }
@@ -703,20 +861,33 @@ FS08ConceptPasteMode ResolveMode(const FS08ConceptPasteSpec& Spec, const FS08Con
     return M;
   }
   const bool bConceptVariant = In.Variant == Spec.Variant;
+  const bool bSceneVariant = Spec.Lit3d.bSet && In.Variant == Spec.Lit3d.Variant;  // P8
   const bool bOffVariant = !Spec.OffVariant.IsEmpty() && In.Variant == Spec.OffVariant;
   if (In.bFlagOff) {
     M.Reason = TEXT("flag-off");
-    if (bConceptVariant || bOffVariant) {
-      // the concept overlay without the paste would leave holes; the off variant means the base layout
+    if (bConceptVariant || bSceneVariant || bOffVariant) {
+      // the concept / scene overlay without its mode would leave holes; the off variant means the base layout
       M.bOverrideVariant = true;
       M.Variant.Reset();
     }
     return M;
   }
+  ES08ConceptKind Kind = Spec.DefaultKind;
   if (In.bFlagOn) {
     M.Reason = TEXT("flag-on");
+    if (In.bKindSet) {
+      Kind = In.Kind;
+    } else if (bSceneVariant) {
+      Kind = ES08ConceptKind::Lit3d;
+    } else if (bConceptVariant) {
+      Kind = ES08ConceptKind::Paste;
+    }
+  } else if (bSceneVariant) {
+    M.Reason = TEXT("variant");
+    Kind = ES08ConceptKind::Lit3d;
   } else if (bConceptVariant) {
     M.Reason = TEXT("variant");
+    Kind = ES08ConceptKind::Paste;
   } else if (bOffVariant) {
     M.Reason = TEXT("variant-off");
     M.bOverrideVariant = true;  // the base layout, byte for byte (no '<map>.<offVariant>.layout.json' is needed)
@@ -729,20 +900,52 @@ FS08ConceptPasteMode ResolveMode(const FS08ConceptPasteSpec& Spec, const FS08Con
     M.Reason = TEXT("default");
     if (!Spec.bDefaultOn) return M;
   }
+  if (Kind == ES08ConceptKind::Lit3d && !Spec.Lit3d.bSet) Kind = ES08ConceptKind::Paste;  // a paste-only block
   M.bOn = true;
+  M.Kind = Kind;
   M.bOverrideVariant = true;
-  M.Variant = Spec.Variant;
+  M.Variant = Spec.VariantFor(Kind);
   return M;
 }
 
 FS08ConceptPasteMode FallbackOff(const FS08ConceptPasteSpec& Spec, const FS08ConceptPasteInputs& In, const TCHAR* Reason) {
   FS08ConceptPasteMode M;
   M.Reason = Reason;
-  if (Spec.bSet && In.Variant == Spec.Variant) {
+  if (Spec.bSet && (In.Variant == Spec.Variant || (Spec.Lit3d.bSet && In.Variant == Spec.Lit3d.Variant))) {
     M.bOverrideVariant = true;
     M.Variant.Reset();
   }
   return M;
+}
+
+bool KindFromName(const FString& Name, ES08ConceptKind& Out) {
+  if (Name.Equals(S08ConceptPasteSpec::KindPaste, ESearchCase::IgnoreCase)) {
+    Out = ES08ConceptKind::Paste;
+    return true;
+  }
+  if (Name.Equals(S08ConceptPasteSpec::KindLit3d, ESearchCase::IgnoreCase)) {
+    Out = ES08ConceptKind::Lit3d;
+    return true;
+  }
+  return false;
+}
+
+TArray<int32> MatchProps(const TArray<FString>& Patterns, const TArray<FString>& Ids, TArray<FString>* OutUnmatched) {
+  TArray<int32> Out;
+  for (const FString& Pattern : Patterns) {
+    const bool bPrefix = Pattern.EndsWith(TEXT("*"));
+    const FString Stem = bPrefix ? Pattern.LeftChop(1) : Pattern;
+    bool bAny = false;
+    for (int32 I = 0; I < Ids.Num(); ++I) {
+      if (bPrefix ? Ids[I].StartsWith(Stem, ESearchCase::CaseSensitive) : Ids[I] == Stem) {
+        Out.AddUnique(I);
+        bAny = true;
+      }
+    }
+    if (!bAny && OutUnmatched) OutUnmatched->Add(Pattern);
+  }
+  Out.Sort();
+  return Out;
 }
 
 FTransform SeaPlaneTransform(const FS08ConceptSeaSpec& Sea) {
@@ -925,9 +1128,10 @@ FString GroundKindOf(const FString& Name) {
 
 // ---- world -------------------------------------------------------------------------------------------------------
 
-FS08ConceptPasteAssets LoadAssets(const FS08ConceptPasteSpec& Spec) {
+FS08ConceptPasteAssets LoadAssets(const FS08ConceptPasteSpec& Spec, ES08ConceptKind Kind) {
   using namespace S08ConceptPastePrivate;
   FS08ConceptPasteAssets A;
+  A.Kind = Kind;
   auto Load = [&A](const FString& Path, UClass* Class) -> UObject* {
     if (Path.IsEmpty()) return nullptr;
     // uncooked runs (editor, automation) ask the package first: a missing import never reaches the loader
@@ -936,6 +1140,27 @@ FS08ConceptPasteAssets LoadAssets(const FS08ConceptPasteSpec& Spec) {
     if (!Obj) A.Missing.Add(Path);
     return Obj;
   };
+  if (Kind == ES08ConceptKind::Lit3d) {
+    // P8: the required scene packages decide; the sky cylinder (paste material + sea plate) and the MPC are optional
+    const FS08ConceptLit3dSpec& L = Spec.Lit3d;
+    int32 Loaded = 0;
+    for (const FString& Path : L.Required) {
+      if (UObject* Obj = Load(Path, UObject::StaticClass())) {
+        A.Scene.Add(Obj);
+        ++Loaded;
+      }
+    }
+    A.bSceneOk = L.bSet && L.Required.Num() > 0 && Loaded == L.Required.Num();
+    A.SceneCollection = Cast<UMaterialParameterCollection>(
+        Load(S08ConceptPasteSpec::SceneCollectionPath, UMaterialParameterCollection::StaticClass()));
+    if (L.bSky && Spec.Sea.bSet) {
+      A.Material = Cast<UMaterialInterface>(Load(Spec.MaterialPath, UMaterialInterface::StaticClass()));
+      A.Sea = Cast<UTexture>(Load(Spec.SeaPlatePath, UTexture::StaticClass()));
+      if (!A.Sea) A.PlateB = Cast<UTexture>(Load(Spec.PlateBPath, UTexture::StaticClass()));
+      A.Plane = Cast<UStaticMesh>(Load(S08ConceptPasteSpec::PlaneMeshPath, UStaticMesh::StaticClass()));
+    }
+    return A;
+  }
   A.Material = Cast<UMaterialInterface>(Load(Spec.MaterialPath, UMaterialInterface::StaticClass()));
   A.Sheet = Cast<UStaticMesh>(Load(Spec.SheetMeshPath, UStaticMesh::StaticClass()));
   A.PlateA = Cast<UTexture>(Load(Spec.PlateAPath, UTexture::StaticClass()));
@@ -977,6 +1202,7 @@ void Apply(const FS08ConceptPasteSpec& Spec, const FS08ConceptPasteAssets& Asset
   using namespace S08ConceptPasteSpec;
   Clear(Parts, Lights, Runtime);
   Runtime.bTraced = true;
+  Runtime.Kind = ES08ConceptKind::Paste;
   Runtime.Grade = S08ConceptGradeName(Grade);
   Runtime.EmissiveScale = EmissiveScale;
   Runtime.bCalib = bCalib;
@@ -1039,25 +1265,9 @@ void Apply(const FS08ConceptPasteSpec& Spec, const FS08ConceptPasteAssets& Asset
         Spec.Sea.SkyTopZUU, Sky.Num()));
   }
   // the true lights of the main fires / lanterns (the painted pools are in the plates; these light the real layer)
-  const bool bCandelas = !S08LegacyRender();
   for (const FS08ConceptLight& L : Spec.Lights) {
-    UPointLightComponent* C = NewObject<UPointLightComponent>(
-        &Owner, MakeUniqueObjectName(&Owner, UPointLightComponent::StaticClass(), FName(*(TEXT("ConceptLight_") + L.Id))));
-    C->SetupAttachment(Root ? Root : Owner.GetRootComponent());
-    C->SetMobility(EComponentMobility::Movable);
-    if (bCandelas) C->SetIntensityUnits(ELightUnits::Candelas);
-    C->SetIntensity(L.IntensityCd);
-    C->SetAttenuationRadius(L.RadiusUU);
-    C->SetCastShadows(false);
-    C->SetLightFColor(L.Color);
-    C->SetRelativeLocation(L.Loc);
-    C->RegisterComponent();
-    Lights.Add(C);
+    Lights.Add(CpSpawnLight(Owner, Root, L, TEXT("concept-paste")));
     ++Runtime.Lights;
-    FS08Trace::Write(FString::Printf(
-        TEXT("ARTPREVIEW concept-paste light id=%s kind=point at=%s intensity=%g units=%s radius=%g color=%s shadow=0 flicker=%.2f@%.1fHz"),
-        *L.Id, *CpVec(L.Loc), L.IntensityCd, bCandelas ? TEXT("candelas") : TEXT("unitless-legacy"), L.RadiusUU,
-        *CpColorHex(L.Color), L.FlickerAmp, L.FlickerHz));
   }
   // contact-shadow blobs under the 3D details (the unlit sheet receives no shadow)
   if (Spec.ShadowBlobs.Num() > 0 && !Assets.ShadowMaterial) {
@@ -1088,6 +1298,240 @@ void Apply(const FS08ConceptPasteSpec& Spec, const FS08ConceptPasteAssets& Asset
       Spec.Camera.SizePx.X, Spec.Camera.SizePx.Y, Spec.Homography.IsIdentity() ? TEXT("identity") : TEXT("registered"),
       Spec.RectA.X, Spec.RectA.Y, Spec.RectA.Z, Spec.RectA.W, Spec.RectB.X, Spec.RectB.Y, Spec.RectB.Z, Spec.RectB.W, Cut.X,
       Cut.Y));
+}
+
+void ApplyLit3d(const FS08ConceptPasteSpec& Spec, const FS08ConceptPasteAssets& Assets, const FVector2D& FrameHalf,
+                ES08ConceptGrade Grade, float EmissiveScale, bool bFreezeFlow, AActor& Owner, USceneComponent* Root,
+                TArray<TObjectPtr<UStaticMeshComponent>>& Parts, TArray<TObjectPtr<UPointLightComponent>>& Lights,
+                FS08ConceptPasteRuntime& Runtime) {
+  using namespace S08ConceptPastePrivate;
+  using namespace S08ConceptPasteSpec;
+  Clear(Parts, Lights, Runtime);
+  Runtime.bTraced = true;
+  Runtime.Kind = ES08ConceptKind::Lit3d;
+  Runtime.Grade = S08ConceptGradeName(Grade);
+  Runtime.EmissiveScale = EmissiveScale;
+  Runtime.bCalib = false;
+  const FS08ConceptLit3dSpec& L = Spec.Lit3d;
+  if (!Assets.RequiredOk()) {
+    Runtime.Status = TEXT("missing");
+    FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW concept-scene status=missing profile=%s mode=lit3d required=%d (run tools/art/concept_scene/ue_scene_material.py and ue_import_concept_scene.py) -> no scene"),
+                                     *Runtime.ProfileId, L.Required.Num()));
+    return;
+  }
+  if (GForceApplyFailure) {
+    Runtime.Status = TEXT("failed");
+    FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW concept-scene status=failed profile=%s mode=lit3d (forced by the automation hook) -> no scene"),
+                                     *Runtime.ProfileId));
+    return;
+  }
+  // the sky cylinder of P7 (unlit painted sky by design: task section 2 C2), no sea plane and no sheet: the sea ring of
+  // the ground section is the lit sea now
+  UTexture* SkyTex = Assets.Sea ? Assets.Sea : Assets.PlateB;
+  if (L.bSky && Spec.Sea.bSet && Assets.Material && Assets.Plane && SkyTex) {
+    UMaterialInstanceDynamic* SkyMid = UMaterialInstanceDynamic::Create(Assets.Material, &Owner);
+    const FS08ConceptMaterialParams SkyParams =
+        MaterialParams(Spec, FrameHalf, true, false, Grade, EmissiveScale, false, bFreezeFlow);
+    CpSetParams(*SkyMid, SkyParams);
+    SkyMid->SetTextureParameterValue(FName(ParamPlateA), SkyTex);
+    SkyMid->SetTextureParameterValue(FName(ParamPlateB), SkyTex);
+    const TArray<FTransform> Sky = SkySegmentTransforms(Spec.Sea);
+    for (const FTransform& T : Sky) Parts.Add(CpNewPart(Owner, Root, TEXT("ConceptSceneSky"), Assets.Plane, SkyMid, T));
+    Runtime.SeaParts = Sky.Num();
+    FS08Trace::Write(FString::Printf(
+        TEXT("ARTPREVIEW concept-scene sky profile=%s plate=%s z=%.0f..%.0f centre=(%.0f,%.0f) radius=%.0f segments=%d unlit=1"),
+        *Runtime.ProfileId, *SkyTex->GetName(), Spec.Sea.ZUU, Spec.Sea.SkyTopZUU, Spec.Sea.CentreUU.X, Spec.Sea.CentreUU.Y,
+        Spec.Sea.RadiusUU, Sky.Num()));
+  } else if (L.bSky) {
+    FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW concept-scene sky skipped profile=%s sea=%d material=%d plane=%d plate=%d"),
+                                     *Runtime.ProfileId, Spec.Sea.bSet ? 1 : 0, Assets.Material ? 1 : 0,
+                                     Assets.Plane ? 1 : 0, SkyTex ? 1 : 0));
+  }
+  for (const FS08ConceptLight& Light : L.Lights) {
+    Lights.Add(CpSpawnLight(Owner, Root, Light, TEXT("concept-scene")));
+    ++Runtime.Lights;
+  }
+  Runtime.Status = TEXT("ok");
+  FS08Trace::Write(FString::Printf(
+      TEXT("ARTPREVIEW concept-scene status=ok profile=%s mode=lit3d variant=%s required=%d sky=%d lights=%d manifest=%s collection=%s lit=1"),
+      *Runtime.ProfileId, *L.Variant, L.Required.Num(), Runtime.SeaParts, Runtime.Lights,
+      L.ManifestPath.IsEmpty() ? TEXT("-") : *L.ManifestPath,
+      Assets.SceneCollection ? *Assets.SceneCollection->GetName() : TEXT("missing")));
+}
+
+void ApplyScene(const FS08ConceptLit3dSpec& Lit3d, const FS08EnvLayoutRuntime& Env,
+                const TArray<TObjectPtr<UStaticMeshComponent>>& EnvProps, FS08ConceptPasteRuntime& Runtime) {
+  // the values before the first ApplyScene (a second call computes from them again: idempotent)
+  auto Remember = [&Runtime](UPrimitiveComponent* C) -> FS08ConceptSceneTweak {
+    for (const FS08ConceptSceneTweak& T : Runtime.Tweaks) {
+      if (T.Component.Get() == C) return T;
+    }
+    FS08ConceptSceneTweak& T = Runtime.Tweaks.AddDefaulted_GetRef();
+    T.Component = C;
+    T.bCastShadow = C->CastShadow;
+    T.bAffectGI = C->bAffectDynamicIndirectLighting;
+    T.Location = C->GetRelativeLocation();
+    T.Scale = C->GetRelativeScale3D();
+    T.BoundsZ = C->Bounds.Origin.Z;
+    return T;
+  };
+  const TArray<FString>& Ids = Env.Stats.PropComponentIds;
+  TArray<FString> Unmatched;
+  Runtime.SceneCasters = 0;
+  for (const int32 I : MatchProps(Lit3d.Casters, Ids, &Unmatched)) {
+    UStaticMeshComponent* C = EnvProps.IsValidIndex(I) ? EnvProps[I].Get() : nullptr;
+    if (!C) continue;
+    Remember(C);
+    C->SetCastShadow(true);
+    C->SetAffectDynamicIndirectLighting(true);
+    ++Runtime.SceneCasters;
+  }
+  Runtime.SceneGiOff = 0;
+  for (const int32 I : MatchProps(Lit3d.GiOff, Ids, &Unmatched)) {
+    UStaticMeshComponent* C = EnvProps.IsValidIndex(I) ? EnvProps[I].Get() : nullptr;
+    if (!C) continue;
+    Remember(C);
+    C->SetAffectDynamicIndirectLighting(false);
+    ++Runtime.SceneGiOff;
+  }
+  // R3: the sea ring under the cliffs, the falls down to it (the base layout's ground section itself stays)
+  Runtime.SceneSeaMoved = Runtime.SceneFallsScaled = 0;
+  for (const TWeakObjectPtr<UStaticMeshComponent>& G : Env.Ground) {
+    UStaticMeshComponent* C = G.Get();
+    if (!C) continue;
+    const FString Kind = GroundKindOf(C->GetName());
+    if (Kind == TEXT("sea") && Lit3d.bSeaZ) {
+      const FVector Loc = Remember(C).Location;
+      C->SetRelativeLocation(FVector(Loc.X, Loc.Y, Lit3d.SeaZUU));
+      ++Runtime.SceneSeaMoved;
+    } else if (Kind == TEXT("waterfalls") && !FMath::IsNearlyEqual(Lit3d.WaterfallScaleZ, 1.0f) &&
+               !C->GetName().Contains(TEXT("_Lip"))) {
+      // the falls hang from about z 0 (the lip, S08EnvGround: sheet pivot at the lip, the card centred on the drop):
+      // the sheet / card stretch by the factor (the top stays), the foam / spill keep their size and move down to where
+      // the stretched drop now ends (their bounds centre z x the factor; the actor sits at the world origin)
+      const FS08ConceptSceneTweak Before = Remember(C);
+      const FVector Loc = Before.Location;
+      const double S = Lit3d.WaterfallScaleZ;
+      if (C->GetName().Contains(TEXT("_Sheet")) || C->GetName().Contains(TEXT("_Card"))) {
+        C->SetRelativeLocation(FVector(Loc.X, Loc.Y, Loc.Z * S));
+        C->SetRelativeScale3D(FVector(Before.Scale.X, Before.Scale.Y, Before.Scale.Z * S));
+      } else {
+        C->SetRelativeLocation(FVector(Loc.X, Loc.Y, Loc.Z + (S - 1.0) * Before.BoundsZ));
+      }
+      ++Runtime.SceneFallsScaled;
+    }
+  }
+  // what the island is now: the overlay props that spawned, the visible env props that cast / feed Lumen GI
+  Runtime.SceneProps = Runtime.SceneShadows = Runtime.SceneGi = 0;
+  for (int32 I = 0; I < EnvProps.Num(); ++I) {
+    const UStaticMeshComponent* C = EnvProps[I].Get();
+    if (!C) continue;
+    if (Ids.IsValidIndex(I) && Env.Layout.OverlayPropIds.Contains(Ids[I])) ++Runtime.SceneProps;
+    if (!C->IsVisible()) continue;
+    Runtime.SceneShadows += C->CastShadow ? 1 : 0;
+    Runtime.SceneGi += C->bAffectDynamicIndirectLighting ? 1 : 0;
+  }
+  const FString Sea = Lit3d.bSeaZ ? FString::Printf(TEXT("z%.0f(%d)"), Lit3d.SeaZUU, Runtime.SceneSeaMoved) : FString(TEXT("kept"));
+  FS08Trace::Write(FString::Printf(
+      TEXT("ARTPREVIEW concept-scene apply profile=%s overlayProps=%d shadowsOn=%d lumenGI=%d casters=%d/%d giOff=%d/%d unmatched=%s sea=%s falls=%d scaleZ=%.2f"),
+      *Runtime.ProfileId, Runtime.SceneProps, Runtime.SceneShadows, Runtime.SceneGi, Runtime.SceneCasters,
+      Lit3d.Casters.Num(), Runtime.SceneGiOff, Lit3d.GiOff.Num(),
+      Unmatched.Num() ? *FString::Join(Unmatched, TEXT("+")) : TEXT("-"), *Sea, Runtime.SceneFallsScaled,
+      Lit3d.WaterfallScaleZ));
+}
+
+bool SetSceneCollection(UWorld* World, UMaterialParameterCollection* Collection, bool bLive, bool bEmissive) {
+  if (!World || !Collection) return false;
+  UMaterialParameterCollectionInstance* Instance = World->GetParameterCollectionInstance(Collection);
+  if (!Instance) return false;
+  const bool bLiveOk =
+      Instance->SetScalarParameterValue(FName(S08ConceptPasteSpec::SceneLiveParamName), bLive ? 1.0f : 0.0f);
+  const bool bEmissiveOk =
+      Instance->SetScalarParameterValue(FName(S08ConceptPasteSpec::SceneEmissiveParamName), bEmissive ? 1.0f : 0.0f);
+  return bLiveOk && bEmissiveOk;
+}
+
+const TArray<FName>& LightsOffEmissiveParams() {
+  // M_EnvProp (kit lanterns, MI_EnvCP_LanternHead), M_EnvScene (per MI, next to the MPC), M_EnvCP_Banner (emissive fill)
+  static const TArray<FName> Names = {FName(TEXT("EmissiveIntensity")), FName(TEXT("EmissiveStrength")), FName(TEXT("Fill"))};
+  return Names;
+}
+
+FS08LightsOffStats ApplyLightsOff(const TArray<TObjectPtr<AActor>>& SceneActors,
+                                  const TArray<TObjectPtr<UPointLightComponent>>& EnvLights,
+                                  const TArray<TObjectPtr<UPointLightComponent>>& BlockLights,
+                                  const TArray<TObjectPtr<UStaticMeshComponent>>& EnvProps, const FS08EnvLayoutRuntime& Env,
+                                  const TArray<TObjectPtr<UStaticMeshComponent>>& BlockParts, bool bHideConceptParts,
+                                  UWorld* World, UMaterialParameterCollection* Collection, const FString& ProfileId) {
+  FS08LightsOffStats S;
+  for (AActor* Actor : SceneActors) {
+    if (!Actor) continue;
+    TInlineComponentArray<UActorComponent*> Components(Actor);
+    for (UActorComponent* Component : Components) {
+      if (USkyLightComponent* Sky = Cast<USkyLightComponent>(Component)) {
+        Sky->SetIntensity(0.0f);
+        ++S.SkyLights;
+      } else if (ULightComponent* Light = Cast<ULightComponent>(Component)) {
+        Light->SetIntensity(0.0f);
+        if (Light->IsA<UPointLightComponent>()) {
+          ++S.ProfilePoints;
+        } else {
+          ++S.Directional;
+        }
+      } else if (UExponentialHeightFogComponent* Fog = Cast<UExponentialHeightFogComponent>(Component)) {
+        if (Fog->IsVisible()) Fog->SetVisibility(false);
+        S.bFogHidden = true;
+      }
+    }
+  }
+  for (UPointLightComponent* L : EnvLights) {
+    if (!L) continue;
+    L->SetIntensity(0.0f);
+    ++S.EnvLights;
+  }
+  for (UPointLightComponent* L : BlockLights) {
+    if (!L) continue;
+    L->SetIntensity(0.0f);
+    ++S.ConceptLights;
+  }
+  for (const TWeakObjectPtr<UNiagaraComponent>& Fx : Env.Fx) {
+    if (UNiagaraComponent* C = Fx.Get()) {
+      if (C->IsVisible()) C->SetVisibility(false);
+      ++S.FxHidden;
+    }
+  }
+  for (UStaticMeshComponent* Prop : EnvProps) {
+    if (!Prop) continue;
+    for (int32 Slot = 0; Slot < Prop->GetNumMaterials(); ++Slot) {
+      UMaterialInterface* Mat = Prop->GetMaterial(Slot);
+      if (!Mat) continue;
+      bool bHas = false;
+      for (const FName& Name : LightsOffEmissiveParams()) {
+        float Value = 0.0f;
+        bHas |= Mat->GetScalarParameterValue(FHashedMaterialParameterInfo(Name), Value);
+      }
+      if (!bHas) continue;
+      UMaterialInstanceDynamic* Mid = Cast<UMaterialInstanceDynamic>(Mat);
+      if (!Mid) Mid = Prop->CreateDynamicMaterialInstance(Slot, Mat);
+      if (!Mid) continue;
+      for (const FName& Name : LightsOffEmissiveParams()) Mid->SetScalarParameterValue(Name, 0.0f);
+      ++S.EmissiveSlots;
+    }
+  }
+  if (bHideConceptParts) {
+    for (UStaticMeshComponent* Part : BlockParts) {
+      if (!Part) continue;
+      if (Part->IsVisible()) Part->SetVisibility(false);
+      ++S.SkyParts;
+    }
+  }
+  S.bCollection = Collection && World && SetSceneCollection(World, Collection, false, false);
+  FS08Trace::Write(FString::Printf(
+      TEXT("ARTPREVIEW lights-off (-%s, gate G1 bench frame) profile=%s directional=%d skyLights=%d profilePoints=%d envLights=%d conceptLights=%d emissiveSlots=%d fxHidden=%d fog=%s conceptPartsHidden=%d mpcEmissive=%s"),
+      S08ConceptPasteSpec::LightsOffFlagName, ProfileId.IsEmpty() ? TEXT("-") : *ProfileId, S.Directional, S.SkyLights,
+      S.ProfilePoints, S.EnvLights, S.ConceptLights, S.EmissiveSlots, S.FxHidden, S.bFogHidden ? TEXT("hidden") : TEXT("-"),
+      S.SkyParts, S.bCollection ? TEXT("0") : TEXT("-")));
+  return S;
 }
 
 void ApplyHides(const FS08ConceptHide& Hide, const FS08EnvLayoutRuntime& Env,
@@ -1149,6 +1593,17 @@ int32 RestoreHides(FS08ConceptPasteRuntime& Runtime) {
     }
   }
   Runtime.Hidden.Reset();
+  // P8 lit3d: the components ApplyScene changed get their values back (shadow, GI, the sea ring / falls transform)
+  for (const FS08ConceptSceneTweak& T : Runtime.Tweaks) {
+    if (UPrimitiveComponent* C = T.Component.Get()) {
+      C->SetCastShadow(T.bCastShadow);
+      C->SetAffectDynamicIndirectLighting(T.bAffectGI);
+      C->SetRelativeLocation(T.Location);
+      C->SetRelativeScale3D(T.Scale);
+    }
+  }
+  Runtime.Tweaks.Reset();
+  Runtime.SceneCasters = Runtime.SceneGiOff = Runtime.SceneSeaMoved = Runtime.SceneFallsScaled = 0;
   Runtime.HiddenProps = Runtime.HiddenFx = Runtime.HiddenLights = 0;
   Runtime.HiddenGround = Runtime.HiddenSea = Runtime.HiddenWaterfalls = 0;
   Runtime.bHidFog = Runtime.bHidTray = Runtime.bHidBackdrop = false;
@@ -1186,12 +1641,32 @@ void US08ConceptPasteAnimComponent::AddWind(UStaticMeshComponent* Prop) {
     if (!Mat) continue;
     UMaterialInstanceDynamic* Mid = Cast<UMaterialInstanceDynamic>(Mat);
     if (!Mid) Mid = Prop->CreateDynamicMaterialInstance(Slot, Mat);
-    if (Mid) Mid->SetScalarParameterValue(S08ConceptPasteSpec::WindLiveParamName, 1.0f);
+    if (!Mid) continue;
+    Mid->SetScalarParameterValue(S08ConceptPasteSpec::WindLiveParamName, 1.0f);
+    // P8: the pack foliage MIs of the P5c kit (MI_EnvFab_*) hold their wind at 0 for the frozen -Bench; live runs get
+    // the pack's own value back (the value of the MI's parent: the pack material instance)
+    const UMaterialInstance* Instance = Cast<UMaterialInstance>(Mid->Parent);
+    const UMaterialInterface* PackParent = Instance ? Instance->Parent.Get() : nullptr;
+    for (const TCHAR* Name : S08ConceptPasteSpec::PackWindParamNames) {
+      float Base = 0.0f, Pack = 0.0f;
+      if (!PackParent || !Mid->GetScalarParameterValue(FHashedMaterialParameterInfo(Name), Base) ||
+          !PackParent->GetScalarParameterValue(FHashedMaterialParameterInfo(Name), Pack) || Pack <= Base) {
+        continue;
+      }
+      FWindParam& W = WindParams.AddDefaulted_GetRef();
+      W.Mid = Mid;
+      W.Name = FName(Name);
+      W.Base = Base;
+      Mid->SetScalarParameterValue(W.Name, Pack);
+    }
   }
   Winds.Add(Prop);
 }
 
 void US08ConceptPasteAnimComponent::RestoreBase() {
+  for (const FWindParam& W : WindParams) {
+    if (UMaterialInstanceDynamic* Mid = W.Mid.Get()) Mid->SetScalarParameterValue(W.Name, W.Base);
+  }
   for (const TWeakObjectPtr<UStaticMeshComponent>& W : Winds) {
     UStaticMeshComponent* P = W.Get();
     if (!P) continue;

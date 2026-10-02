@@ -11,7 +11,14 @@
 //   EnvIds     what the board actor hides by: overlay-added / replaced ids (MergeOverlay), the spawned component ids
 //   ApplyFailure  P7c: Apply != ok with the assets loaded -> the full P5c look (base layout, backdrop, tray, fog)
 //   Actor      the board actor: nothing on grids or a refused map profile (no line), the shipped Sarpedon / Marmoreal
-//              once the map import ran (paste on or the traced P5c fallback; -EnvLayoutVariant=p5c; Marmoreal off)
+//              once the map import ran (P8: the lit 3D island on or the traced P5c fallback; -EnvLayoutVariant=p5c;
+//              Marmoreal off)
+//   ENV-MAPS P8 (lit3d, docs/art-pipeline/ENV-P8-3D-UNDER-PAINT-TASK.md):
+//   PasteKind  -ConceptPaste=paste on the shipped Sarpedon: the P7 paste or the traced P5c fallback
+//   Lit3dScene ApplyLit3d (no sheet, lights in the budget, missing / failed), the lit3d hide list, ApplyScene (casters,
+//              giOff, the sea ring to -300, the falls stretched), idempotent, RestoreHides
+//   MaterialOverride  the env-layout prop "material" (every slot / per slot, rejections, overlay, spawn, missing kept)
+//   LightsOff  -ArtPreviewLightsOff (gate G1): the engine lights at 0, the fog hidden, the lit3d sky hidden
 //   UnrealEditor-Cmd.exe Unmatched.uproject
 //     -ExecCmds="Automation RunTests Unmatched.S08.ConceptPaste; Quit" -unattended -nosplash -nullrhi
 #if WITH_AUTOMATION_TESTS
@@ -23,7 +30,10 @@
 #include "S08Contracts.h"
 #include "S08Diorama.h"
 #include "S08EnvLayout.h"
+#include "Components/DirectionalLightComponent.h"
+#include "Components/ExponentialHeightFogComponent.h"
 #include "Components/PointLightComponent.h"
+#include "Components/SkyLightComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Dom/JsonObject.h"
 #include "Dom/JsonValue.h"
@@ -105,11 +115,11 @@ FString Doc(const FString& MapBlock, const FString& GridBlock = FString()) {
       *GridExtra, *MapExtra);
 }
 
-/** ValidBlock with one field replaced / added (Field "" = no change) or removed (Value "" with bRemove). */
-FString BlockWith(const FString& Field, const FString& Value, bool bRemove = false) {
+/** Block with one field replaced / added (Field "" = no change) or removed (Value "" with bRemove). */
+FString BlockWithOn(const FString& Block, const FString& Field, const FString& Value, bool bRemove = false) {
   TSharedPtr<FJsonObject> Obj;
   FString Problem;
-  if (!FS08Contracts::TryParseJsonObject(ValidBlock, Obj, Problem) || !Obj.IsValid()) return FString();
+  if (!FS08Contracts::TryParseJsonObject(Block, Obj, Problem) || !Obj.IsValid()) return FString();
   if (bRemove) {
     Obj->RemoveField(Field);
   } else if (!Field.IsEmpty()) {
@@ -123,6 +133,31 @@ FString BlockWith(const FString& Field, const FString& Value, bool bRemove = fal
   const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&Out);
   FJsonSerializer::Serialize(Obj.ToSharedRef(), Writer);
   return Out;
+}
+
+/** ValidBlock with one field replaced / added / removed. */
+FString BlockWith(const FString& Field, const FString& Value, bool bRemove = false) {
+  return BlockWithOn(ValidBlock, Field, Value, bRemove);
+}
+
+/** ENV-MAPS P8: a valid "lit3d" object (no sky: the test assets have no sky plate) and ValidBlock with it as the default
+ *  kind ("mode": "lit3d"). */
+const TCHAR* const ValidLit3d = TEXT(
+    "{\"note\":\"t\",\"variant\":\"scene\",\"manifest\":\"tools/art/concept_scene/manifest.t.json\","
+    "\"required\":[\"/Game/EnvMaps/Scene/M_EnvScene\",\"/Game/EnvMaps/NoSuchCp/Scene/SM_Env_S_Island\"],"
+    "\"sky\":false,\"seaZUU\":-300,\"waterfallScaleZ\":2,"
+    "\"hide\":[\"tray\",\"ground\",\"backdrop\",\"fog\",\"baseProps\",\"baseFx\",\"layoutLights\"],"
+    "\"lights\":[{\"id\":\"fire-fort\",\"loc\":[-492.3,-427.3,54],\"colorSrgb\":\"#FF8A3D\",\"intensityCd\":65,\"radius\":460,"
+    "\"flicker\":{\"amp\":0.18,\"hz\":6}},{\"id\":\"lantern-deck-n\",\"loc\":[522.4,-157.4,82.4],\"colorSrgb\":\"#FFA552\","
+    "\"intensityCd\":95,\"radius\":420}],"
+    "\"anims\":[{\"prop\":\"lantern-rail\",\"swayDeg\":4,\"swayHz\":0.4}],"
+    "\"winds\":[\"banner-ship\",\"tree-*\"],\"casters\":[\"island\",\"ship*\",\"tree-*\"],\"giOff\":[\"island\"]}");
+
+FString Lit3dBlock() { return BlockWithOn(BlockWith(TEXT("lit3d"), ValidLit3d), TEXT("mode"), TEXT("\"lit3d\"")); }
+
+/** Lit3dBlock with one field of its "lit3d" object replaced / added / removed. */
+FString Lit3dWith(const FString& Field, const FString& Value, bool bRemove = false) {
+  return BlockWithOn(BlockWith(TEXT("lit3d"), BlockWithOn(ValidLit3d, Field, Value, bRemove)), TEXT("mode"), TEXT("\"lit3d\""));
 }
 
 const FS08BoardArtProfile* Find(const FS08BoardArtData& Data, const TCHAR* Id) {
@@ -369,6 +404,41 @@ bool FS08ConceptPasteParserTest::RunTest(const FString&) {
                    !S.Sea.bSet && S.Hide.Names() == TEXT("-") && S.Lights.IsEmpty());
     }
   }
+  {
+    // ENV-MAPS P8: the lit3d object and "mode"; the paste fields stay as they were
+    FS08BoardArtData Data;
+    TArray<FString> Errors;
+    if (TestTrue(TEXT("lit3d block parses: ") + FString::Join(Errors, TEXT(" | ")), Data.ParseJson(Doc(Lit3dBlock()), Errors))) {
+      const FS08ConceptPasteSpec& S = Find(Data, TEXT("cpmap"))->ConceptPaste;
+      const FS08ConceptLit3dSpec& L = S.Lit3d;
+      TestTrue("lit3d: set, default kind lit3d, the paste kept", S.bSet && L.bSet && S.DefaultKind == ES08ConceptKind::Lit3d &&
+                                                                     S.Variant == TEXT("concept") && S.Lights.Num() == 2);
+      TestTrue("lit3d: variant / manifest / required", L.Variant == TEXT("scene") && L.ManifestPath.EndsWith(TEXT("manifest.t.json")) &&
+                                                          L.Required.Num() == 2 && L.Required[0] == S08ConceptPasteSpec::SceneMaterialPath);
+      TestTrue("lit3d: no sky, sea ring z -300, falls x2", !L.bSky && L.bSeaZ && L.SeaZUU == -300.0f && L.WaterfallScaleZ == 2.0f);
+      TestEqual("lit3d: hide (sea and waterfalls come back)", L.Hide.Names(),
+                FString(TEXT("tray+ground+backdrop+fog+baseProps+baseFx+layoutLights")));
+      TestTrue("lit3d: lights / anim / winds / casters / giOff",
+               L.Lights.Num() == 2 && L.Lights[0].Id == TEXT("fire-fort") && FMath::IsNearlyEqual(L.Lights[0].FlickerAmp, 0.18f) &&
+                   L.Anims.Num() == 1 && L.WindProps == TArray<FString>({TEXT("banner-ship"), TEXT("tree-*")}) &&
+                   L.Casters.Num() == 3 && L.GiOff == TArray<FString>({TEXT("island")}));
+      TestTrue("per-kind accessors", &S.HideFor(ES08ConceptKind::Lit3d) == &L.Hide && &S.HideFor(ES08ConceptKind::Paste) == &S.Hide &&
+                                         S.LightsFor(ES08ConceptKind::Lit3d).Num() == 2 && S.VariantFor(ES08ConceptKind::Lit3d) == TEXT("scene") &&
+                                         S.VariantFor(ES08ConceptKind::Paste) == TEXT("concept") && S.MaxModeLights() == 2);
+      TestEqual("asset list: the paste's 6 + the 2 required", S.AssetPaths().Num(), 8);
+    }
+    // a lit3d object with the paste as the default kind (no "mode")
+    FS08BoardArtData Data2;
+    TArray<FString> Errors2;
+    if (TestTrue(TEXT("lit3d without mode parses: ") + FString::Join(Errors2, TEXT(" | ")),
+                 Data2.ParseJson(Doc(BlockWith(TEXT("lit3d"), ValidLit3d)), Errors2))) {
+      const FS08ConceptPasteSpec& S = Find(Data2, TEXT("cpmap"))->ConceptPaste;
+      TestTrue("no mode: the paste is the default kind", S.Lit3d.bSet && S.DefaultKind == ES08ConceptKind::Paste);
+    }
+    FS08ConceptLit3dSpec Defaults;
+    TestTrue("lit3d defaults: scene, sky on, sea kept, falls x1", Defaults.Variant == TEXT("scene") && Defaults.bSky && !Defaults.bSeaZ &&
+                                                                  Defaults.WaterfallScaleZ == 1.0f && !Defaults.bSet);
+  }
   struct FCase {
     const TCHAR* Name;
     FString MapBlock;
@@ -423,6 +493,28 @@ bool FS08ConceptPasteParserTest::RunTest(const FString&) {
       {TEXT("flow regions"), BlockWith(TEXT("flow"), TEXT("{\"regions\":[{},{},{}]}")), FString(), TEXT("flow.regions must be")},
       {TEXT("flow field"), BlockWith(TEXT("flow"), TEXT("{\"river\":{}}")), FString(), TEXT("flow must be an object")},
       {TEXT("sea flow without the sea"), BlockWith(TEXT("sea"), FString(), true), FString(), TEXT("flow.sea needs the sea layer")},
+      // ENV-MAPS P8 lit3d
+      {TEXT("lit3d on a grid"), FString(), Lit3dBlock(), TEXT("conceptPaste is for map-image boards only")},
+      {TEXT("mode name"), BlockWith(TEXT("mode"), TEXT("\"sheet\"")), FString(), TEXT("mode must be")},
+      {TEXT("mode lit3d without the object"), BlockWith(TEXT("mode"), TEXT("\"lit3d\"")), FString(), TEXT("mode \"lit3d\" needs the lit3d object")},
+      {TEXT("lit3d not an object"), BlockWith(TEXT("lit3d"), TEXT("[1]")), FString(), TEXT("lit3d must be an object")},
+      {TEXT("lit3d unknown field"), Lit3dWith(TEXT("meshes"), TEXT("[]")), FString(), TEXT("lit3d.meshes is not a field")},
+      {TEXT("lit3d no required"), Lit3dWith(TEXT("required"), FString(), true), FString(), TEXT("lit3d.required must be")},
+      {TEXT("lit3d required outside EnvMaps"), Lit3dWith(TEXT("required"), TEXT("[\"/Game/EnvKit/X/SM_X\"]")), FString(), TEXT("lit3d.required[0]")},
+      {TEXT("lit3d required never-cooked"), Lit3dWith(TEXT("required"), TEXT("[\"/Game/EnvMaps/Data/SM_X\"]")), FString(), TEXT("lit3d.required[0]")},
+      {TEXT("lit3d variant = the paste's"), Lit3dWith(TEXT("variant"), TEXT("\"concept\"")), FString(), TEXT("lit3d.variant must differ")},
+      {TEXT("lit3d variant = the off variant"), Lit3dWith(TEXT("variant"), TEXT("\"p5c\"")), FString(), TEXT("lit3d.variant must differ")},
+      {TEXT("lit3d sky"), Lit3dWith(TEXT("sky"), TEXT("1")), FString(), TEXT("lit3d.sky must be a bool")},
+      {TEXT("lit3d sea above the tray"), Lit3dWith(TEXT("seaZUU"), TEXT("0")), FString(), TEXT("lit3d.seaZUU must be")},
+      {TEXT("lit3d falls"), Lit3dWith(TEXT("waterfallScaleZ"), TEXT("9")), FString(), TEXT("lit3d.waterfallScaleZ must be")},
+      {TEXT("lit3d hide name"), Lit3dWith(TEXT("hide"), TEXT("[\"island\"]")), FString(), TEXT("lit3d.hide 'island'")},
+      {TEXT("lit3d lights keep layout lights"), Lit3dWith(TEXT("hide"), TEXT("[\"tray\"]")), FString(), TEXT("lit3d.lights replace the env-layout lights")},
+      {TEXT("lit3d light"), Lit3dWith(TEXT("lights"), TEXT("[{\"id\":\"l\"}]")), FString(), TEXT("lit3d.lights[0] needs")},
+      {TEXT("lit3d budget with the profile"), Lit3dWith(TEXT("lights"), Six), FString(), TEXT("conceptPaste lights 6 + light profile L points 1 > 6")},
+      {TEXT("lit3d anim"), Lit3dWith(TEXT("anims"), TEXT("[{\"prop\":\"x\"}]")), FString(), TEXT("lit3d.anims[0] needs")},
+      {TEXT("lit3d caster pattern"), Lit3dWith(TEXT("casters"), TEXT("[\"is*land\"]")), FString(), TEXT("lit3d.casters[0] must be")},
+      {TEXT("lit3d giOff duplicate"), Lit3dWith(TEXT("giOff"), TEXT("[\"a\",\"a\"]")), FString(), TEXT("lit3d.giOff[1] must be")},
+      {TEXT("lit3d winds not a list"), Lit3dWith(TEXT("winds"), TEXT("\"tree-*\"")), FString(), TEXT("lit3d.winds must be")},
   };
   for (const FCase& C : Cases) {
     FS08BoardArtData Data;
@@ -477,6 +569,70 @@ bool FS08ConceptPasteModeTest::RunTest(const FString&) {
     TestTrue(FString::Printf(TEXT("%s: on=%d reason=%s override=%d variant='%s'"), C.Name, M.bOn ? 1 : 0, *M.Reason,
                              M.bOverrideVariant ? 1 : 0, *M.Variant),
              M.bOn == C.bOn && M.Reason == C.Reason && M.bOverrideVariant == C.bOverride && M.Variant == C.Variant);
+  }
+  // ENV-MAPS P8: the kinds - Sarpedon-like (lit3d default, paste selectable) and a paste default with a lit3d object
+  FS08ConceptPasteSpec Lit;
+  Lit.bSet = true;
+  Lit.bDefaultOn = true;
+  Lit.OffVariant = TEXT("p5c");
+  Lit.DefaultKind = ES08ConceptKind::Lit3d;
+  Lit.Lit3d.bSet = true;
+  FS08ConceptPasteSpec PasteFirst = Lit;
+  PasteFirst.DefaultKind = ES08ConceptKind::Paste;
+  PasteFirst.bDefaultOn = false;
+  struct FKindCase {
+    const TCHAR* Name;
+    const FS08ConceptPasteSpec* Spec;
+    const TCHAR* Cmd;
+    bool bOn;
+    const TCHAR* Reason;
+    ES08ConceptKind Kind;
+    bool bOverride;
+    const TCHAR* Variant;
+  };
+  const ES08ConceptKind P = ES08ConceptKind::Paste, L3 = ES08ConceptKind::Lit3d;
+  const FKindCase KindCases[] = {
+      {TEXT("lit3d by default -> the scene overlay"), &Lit, TEXT(""), true, TEXT("default"), L3, true, TEXT("scene")},
+      {TEXT("a bare -ConceptPaste = the default kind"), &Lit, TEXT("-ConceptPaste"), true, TEXT("flag-on"), L3, true, TEXT("scene")},
+      {TEXT("-ConceptPaste=paste -> the P7 look"), &Lit, TEXT("-ConceptPaste=paste"), true, TEXT("flag-on"), P, true, TEXT("concept")},
+      {TEXT("-ConceptPaste=LIT3D on a paste-default block"), &PasteFirst, TEXT("-ConceptPaste=LIT3D"), true, TEXT("flag-on"), L3, true, TEXT("scene")},
+      {TEXT("-ConceptPaste=lit3d on a paste-only block -> the paste"), &On, TEXT("-ConceptPaste=lit3d"), true, TEXT("flag-on"), P, true, TEXT("concept")},
+      {TEXT("-EnvLayoutVariant=scene -> lit3d"), &PasteFirst, TEXT("-EnvLayoutVariant=scene"), true, TEXT("variant"), L3, true, TEXT("scene")},
+      {TEXT("-EnvLayoutVariant=concept -> paste"), &Lit, TEXT("-EnvLayoutVariant=concept"), true, TEXT("variant"), P, true, TEXT("concept")},
+      {TEXT("-ConceptPaste with the scene variant -> lit3d"), &PasteFirst, TEXT("-ConceptPaste -EnvLayoutVariant=scene"), true, TEXT("flag-on"), L3, true, TEXT("scene")},
+      {TEXT("-ConceptPaste=0 -> off, the command line decides"), &Lit, TEXT("-ConceptPaste=0"), false, TEXT("flag-off"), P, false, TEXT("")},
+      {TEXT("-NoConceptPaste with the scene variant -> base"), &Lit, TEXT("-NoConceptPaste -EnvLayoutVariant=scene"), false, TEXT("flag-off"), P, true, TEXT("")},
+      {TEXT("-EnvLayoutVariant=p5c -> off + base"), &Lit, TEXT("-EnvLayoutVariant=p5c"), false, TEXT("variant-off"), P, true, TEXT("")},
+      {TEXT("-EnvLayoutVariant=user -> off, that overlay"), &Lit, TEXT("-EnvLayoutVariant=user"), false, TEXT("variant-other"), P, false, TEXT("")},
+      {TEXT("scene variant on a paste-only block = another variant"), &On, TEXT("-EnvLayoutVariant=scene"), false, TEXT("variant-other"), P, false, TEXT("")},
+  };
+  for (const FKindCase& C : KindCases) {
+    const FS08ConceptPasteMode M = S08ConceptPaste::ResolveMode(*C.Spec, Inputs(C.Cmd), true);
+    TestTrue(FString::Printf(TEXT("%s: on=%d reason=%s kind=%s override=%d variant='%s'"), C.Name, M.bOn ? 1 : 0, *M.Reason,
+                             S08ConceptKindName(M.Kind), M.bOverrideVariant ? 1 : 0, *M.Variant),
+             M.bOn == C.bOn && M.Reason == C.Reason && (!M.bOn || M.Kind == C.Kind) && M.bOverrideVariant == C.bOverride &&
+                 M.Variant == C.Variant);
+  }
+  {
+    const FS08ConceptPasteInputs K = Inputs(TEXT("-ConceptPaste=Lit3D -ArtPreviewLightsOff"));
+    TestTrue("inputs: -ConceptPaste=<kind> is on with the kind, case-insensitive", K.bFlagOn && K.bKindSet &&
+                                                                               K.Kind == ES08ConceptKind::Lit3d && K.FlagText == TEXT("lit3d"));
+    TestTrue("inputs: -ArtPreviewLightsOff", K.bLightsOff && !Inputs(TEXT("-ConceptPaste")).bLightsOff);
+    TestTrue("inputs: a later =1 drops the kind", !Inputs(TEXT("-ConceptPaste=paste -ConceptPaste=1")).bKindSet);
+    const FS08ConceptPasteMode F = S08ConceptPaste::FallbackOff(Lit, Inputs(TEXT("-EnvLayoutVariant=scene")), TEXT("missing-assets"));
+    TestTrue("fallback, asked for the scene overlay: the base (P5c)", !F.bOn && F.bOverrideVariant && F.Variant.IsEmpty());
+    ES08ConceptKind Kind = ES08ConceptKind::Paste;
+    TestTrue("kind names", S08ConceptPaste::KindFromName(TEXT("lit3d"), Kind) && Kind == ES08ConceptKind::Lit3d &&
+                               S08ConceptPaste::KindFromName(TEXT("PASTE"), Kind) && Kind == ES08ConceptKind::Paste &&
+                               !S08ConceptPaste::KindFromName(TEXT("3d"), Kind) &&
+                               FString(S08ConceptKindName(ES08ConceptKind::Lit3d)) == TEXT("lit3d"));
+    // prop patterns (winds / casters / giOff)
+    const TArray<FString> Ids = {TEXT("island"), TEXT("tree-1"), TEXT("ship-hull"), TEXT("tree-2"), TEXT("treeline")};
+    TArray<FString> Unmatched;
+    const TArray<int32> Got = S08ConceptPaste::MatchProps({TEXT("tree-*"), TEXT("island"), TEXT("tree-1"), TEXT("fort*"), TEXT("ship")},
+                                                          Ids, &Unmatched);
+    TestTrue("MatchProps: prefixes, exact ids, each index once, ascending", Got == TArray<int32>({0, 1, 3}));
+    TestTrue("MatchProps: the patterns that named nothing", Unmatched == TArray<FString>({TEXT("fort*"), TEXT("ship")}));
   }
   const FS08ConceptPasteInputs In = Inputs(TEXT("game -log -ConceptPasteCalib -EnvLayoutVariant=\"p5c\" -conceptpaste=1"));
   TestTrue("inputs: calib, quoted variant, case-insensitive flag",
@@ -571,7 +727,67 @@ bool FS08ConceptPasteShippedTest::RunTest(const FString&) {
   }
   TestTrue("sarpedon: the banner cloth's material wind (P7c, live runs only)",
            S.WindProps.Num() == 1 && S.WindProps[0] == TEXT("banner-ship"));
+  // ENV-MAPS P8: Sarpedon's lit3d object (task doc section 4 P8.2)
+  const FS08ConceptLit3dSpec& L3 = S.Lit3d;
+  TestTrue("sarpedon: mode lit3d, the scene overlay, a manifest", L3.bSet && S.DefaultKind == ES08ConceptKind::Lit3d &&
+                                                                     L3.Variant == TEXT("scene") && !L3.ManifestPath.IsEmpty());
+  TestTrue("sarpedon lit3d: M_EnvScene and the island are required",
+           L3.Required.Contains(S08ConceptPasteSpec::SceneMaterialPath) &&
+               L3.Required.Contains(TEXT("/Game/EnvMaps/Sarpedon/Scene/SM_Env_S_Island")));
+  TestEqual("sarpedon lit3d: hide (the sea ring and the waterfalls come back)", L3.Hide.Names(),
+            FString(TEXT("tray+ground+backdrop+fog+baseProps+baseFx+layoutLights")));
+  TestTrue("sarpedon lit3d: the sky cylinder stays, the sea ring at -300 under the cliffs (R3)",
+           L3.bSky && S.Sea.bSet && L3.bSeaZ && L3.SeaZUU == -300.0f && L3.WaterfallScaleZ >= 1.0f);
+  TestTrue(FString::Printf(TEXT("sarpedon lit3d: profile points %d + 5 lights <= 6"), Night ? Night->Points.Num() : -1),
+           Night && L3.Lights.Num() == 5 && Night->Points.Num() + L3.Lights.Num() <= S08ConceptPasteSpec::CombinedPointBudget);
+  {
+    // P8.3 tune: lantern-deck-n's point moved to lantern-bay (the painted warm pool on the beach; the dock was over-lit)
+    TSet<FString> Want = {TEXT("fire-fort"), TEXT("fire-brazier"), TEXT("lantern-left"), TEXT("lantern-bay"), TEXT("lantern-deck-se")};
+    for (const FS08ConceptLight& L : L3.Lights) {
+      Want.Remove(L.Id);
+      TestTrue(L.Id + TEXT(": flickers"), L.FlickerAmp > 0.0f && L.FlickerHz > 0.0f);
+      for (const FDetail& D : Details) {
+        if (L.Id == D.Id) {
+          TestTrue(L.Id + TEXT(": on its design detail (XY)"),
+                   FVector2D(L.Loc.X, L.Loc.Y).Equals(FVector2D(D.World.X, D.World.Y), 0.11));
+        }
+      }
+    }
+    TestEqual("sarpedon lit3d: the five design lights", Want.Num(), 0);
+  }
+  TestTrue("sarpedon lit3d: banner wind, casters for the island masses",
+           L3.WindProps.Contains(TEXT("banner-ship")) && L3.Casters.Num() > 0);
+  {
+    // the scene overlay (track A, EnvLayouts/sarpedon.scene.layout.json) once it exists: every caster / wind pattern names
+    // one of its props and the required island mesh is placed
+    const FString Overlay = S08EnvLayout::OverlayFileFor(S08EnvLayout::DefaultDir(), TEXT("sarpedon"), L3.Variant);
+    FString Text;
+    TSharedPtr<FJsonObject> Root;
+    FString Problem;
+    if (FFileHelper::LoadFileToString(Text, *Overlay) && FS08Contracts::TryParseJsonObject(Text, Root, Problem) && Root.IsValid()) {
+      TArray<FString> Ids, Meshes;
+      const TSharedPtr<FJsonObject>* Props = nullptr;
+      const TArray<TSharedPtr<FJsonValue>>* Added = nullptr;
+      if (Root->TryGetObjectField(TEXT("props"), Props) && Props && (*Props)->TryGetArrayField(TEXT("add"), Added) && Added) {
+        for (const TSharedPtr<FJsonValue>& V : *Added) {
+          const TSharedPtr<FJsonObject>* P = nullptr;
+          FString Id, Mesh;
+          if (V.IsValid() && V->TryGetObject(P) && P && (*P)->TryGetStringField(TEXT("id"), Id)) Ids.Add(Id);
+          if (V.IsValid() && V->TryGetObject(P) && P && (*P)->TryGetStringField(TEXT("mesh"), Mesh)) Meshes.Add(PackageOf(Mesh));
+        }
+      }
+      for (const FString& Pattern : L3.Casters) {
+        TArray<FString> Unmatched;
+        S08ConceptPaste::MatchProps({Pattern}, Ids, &Unmatched);
+        TestTrue(TEXT("scene overlay: caster pattern ") + Pattern + TEXT(" names a prop"), Unmatched.IsEmpty());
+      }
+      TestTrue("scene overlay: the island is placed", Meshes.Contains(TEXT("/Game/EnvMaps/Sarpedon/Scene/SM_Env_S_Island")));
+    } else {
+      AddWarning(TEXT("EnvLayouts/sarpedon.scene.layout.json not there yet (track A): the caster patterns were not checked against it"));
+    }
+  }
   const FS08ConceptPasteSpec& M = Marmoreal->ConceptPaste;
+  TestTrue("marmoreal: no lit3d (the accepted look, paste comparison only)", !M.Lit3d.bSet && M.DefaultKind == ES08ConceptKind::Paste);
   TestTrue("marmoreal: no material wind", M.WindProps.IsEmpty());
   TestTrue("marmoreal: block present, OFF by default (the accepted look)", M.bSet && !M.bDefaultOn && M.Variant == TEXT("concept"));
   TestTrue("marmoreal: no lights of its own, the layout lights stay, no sea", M.Lights.IsEmpty() && !M.Hide.bLayoutLights && !M.Sea.bSet);
@@ -581,8 +797,15 @@ bool FS08ConceptPasteShippedTest::RunTest(const FString&) {
   const FS08ConceptPasteInputs NoFlags = Inputs(TEXT("Unmatched -game -ArtPreview -ArtPreviewDiorama"));
   const FS08ConceptPasteMode SarMode = S08ConceptPaste::ResolveMode(S, NoFlags, true);
   const FS08ConceptPasteMode MarMode = S08ConceptPaste::ResolveMode(M, NoFlags, true);
-  TestTrue("sarpedon default: on, the concept overlay", SarMode.bOn && SarMode.Reason == TEXT("default") &&
-                                                           SarMode.bOverrideVariant && SarMode.Variant == TEXT("concept"));
+  // ENV-MAPS P8: the default is the lit 3D island (the scene overlay); the P7 paste stays selectable
+  TestTrue("sarpedon default: on, lit3d, the scene overlay", SarMode.bOn && SarMode.Reason == TEXT("default") &&
+                                                                 SarMode.Kind == ES08ConceptKind::Lit3d && SarMode.bOverrideVariant &&
+                                                                 SarMode.Variant == TEXT("scene"));
+  const FS08ConceptPasteMode SarPaste = S08ConceptPaste::ResolveMode(S, Inputs(TEXT("-ConceptPaste=paste")), true);
+  TestTrue("sarpedon -ConceptPaste=paste: the P7 look (concept overlay)", SarPaste.bOn && SarPaste.Kind == ES08ConceptKind::Paste &&
+                                                                         SarPaste.Variant == TEXT("concept"));
+  const FS08ConceptPasteMode SarOff = S08ConceptPaste::ResolveMode(S, Inputs(TEXT("-ConceptPaste=0")), true);
+  TestTrue("sarpedon -ConceptPaste=0: off, the command line (no variant) = the base layout", !SarOff.bOn && !SarOff.bOverrideVariant);
   TestTrue("marmoreal default: off, the env layout reads the command line exactly as before",
            !MarMode.bOn && MarMode.Reason == TEXT("default") && !MarMode.bOverrideVariant);
   const FS08ConceptPasteMode P5c = S08ConceptPaste::ResolveMode(S, Inputs(TEXT("-EnvLayoutVariant=p5c")), true);
@@ -845,6 +1068,15 @@ bool FS08ConceptPasteActorTest::RunTest(const FString&) {
           TestFalse("refused map-image: the mode is off", A->GetConceptPasteMode().bOn);
         }
       }
+      // ENV-MAPS P8: a lit3d block changes nothing on a grid either (Cobble bit for bit)
+      FS08BoardArtData Lit3dData;
+      TArray<FString> Lit3dErrors;
+      if (TestTrue("doc with a lit3d block", Lit3dData.ParseJson(Doc(Lit3dBlock()), Lit3dErrors))) {
+        A->SetArtDataForTest(Lit3dData);
+        TestTrue("rebuild the 3x2 grid profile (lit3d data)", A->Rebuild(GridBoard(3, 2)));
+        NoPaste(A, TEXT("grid 3x2 with lit3d data"));
+        TestTrue("grid with lit3d data: no scene tweak", A->GetConceptPasteRuntime().Tweaks.IsEmpty());
+      }
       A->Destroy();
     }
   }
@@ -867,9 +1099,12 @@ bool FS08ConceptPasteActorTest::RunTest(const FString&) {
     return true;
   }
   const FS08ConceptPasteSpec& S = Sarpedon->ConceptPaste;
-  const bool bAssets = FPackageName::DoesPackageExist(S.SheetMeshPath) && FPackageName::DoesPackageExist(S.PlateBPath) &&
-                       FPackageName::DoesPackageExist(PackageOf(S.MaterialPath));
-  const bool bOverlay = FPaths::FileExists(S08EnvLayout::OverlayFileFor(S08EnvLayout::DefaultDir(), TEXT("sarpedon"), S.Variant));
+  // ENV-MAPS P8: the default is lit3d - its required packages (out of git: tools/art/concept_scene) and the scene overlay
+  // (track A); the P7 paste has its own test (Unmatched.S08.ConceptPaste.PasteKind)
+  bool bAssets = S.Lit3d.bSet;
+  for (const FString& Path : S.Lit3d.Required) bAssets = bAssets && FPackageName::DoesPackageExist(Path);
+  const bool bOverlay =
+      FPaths::FileExists(S08EnvLayout::OverlayFileFor(S08EnvLayout::DefaultDir(), TEXT("sarpedon"), S.Lit3d.Variant));
   {
     AS08BoardActor* A = W.Spawn();
     if (TestNotNull("board actor (sarpedon)", A)) {
@@ -881,39 +1116,61 @@ bool FS08ConceptPasteActorTest::RunTest(const FString&) {
       TestTrue("map-image active", A->IsMapImageActive());
       const FS08ConceptPasteRuntime& Rt = A->GetConceptPasteRuntime();
       if (bAssets && bOverlay) {
-        TestTrue(TEXT("sarpedon default: the paste is on (") + A->GetConceptPasteMode().Reason + TEXT(")"), A->IsConceptPasteOn());
-        TestEqual("env variant = the concept overlay", A->GetEnvLayoutRuntime().Variant.Name, S.Variant);
-        TestTrue("sheet + sea plane + sky segments", Rt.SheetParts == 1 && Rt.SeaParts == 1 + S.Sea.SkySegments);
-        TestEqual("the block's lights", A->GetConceptPasteLights().Num(), S.Lights.Num());
+        TestTrue(TEXT("sarpedon default: the lit 3D island is on (") + A->GetConceptPasteMode().Reason + TEXT(")"),
+                 A->IsConceptPasteOn() && A->GetConceptPasteMode().Kind == ES08ConceptKind::Lit3d);
+        TestEqual("env variant = the scene overlay", A->GetEnvLayoutRuntime().Variant.Name, S.Lit3d.Variant);
+        TestTrue("no sheet, no sea plane: at most the sky cylinder",
+                 Rt.SheetParts == 0 && (Rt.SeaParts == 0 || Rt.SeaParts == S.Sea.SkySegments));
+        TestEqual("the lit3d lights", A->GetConceptPasteLights().Num(), S.Lit3d.Lights.Num());
         int32 Clean = 0;
         for (const UStaticMeshComponent* Part : A->GetConceptPasteParts()) {
-          Clean += Part && !Part->CastShadow && !Part->bAffectDynamicIndirectLighting && !Part->bAffectDistanceFieldLighting &&
-                           Part->GetCollisionEnabled() == ECollisionEnabled::NoCollision
+          Clean += Part && !Part->CastShadow && !Part->bAffectDynamicIndirectLighting && Part->GetCollisionEnabled() == ECollisionEnabled::NoCollision
                        ? 1 : 0;
         }
-        TestEqual("every part: no shadow, no Lumen GI / DF, no collision", Clean, A->GetConceptPasteParts().Num());
-        const UStaticMeshComponent* Sheet = A->GetConceptPasteParts().Num() ? A->GetConceptPasteParts()[0].Get() : nullptr;
-        const UMaterial* Base = Sheet && Sheet->GetMaterial(0) ? Sheet->GetMaterial(0)->GetMaterial() : nullptr;
-        TestTrue("sheet on M_ConceptPaste: unlit, masked", Base && Base->GetName() == TEXT("M_ConceptPaste") &&
-                                                               Base->GetShadingModels().HasOnlyShadingModel(MSM_Unlit) &&
-                                                               Base->GetBlendMode() == BLEND_Masked);
-        TestFalse("the fog hidden (the plate has its own haze)", A->GetAppliedRender().bFog);
-        if (A->GetDioramaTray()) TestFalse("the tray hidden (the painted island replaces it)", A->GetDioramaTray()->IsVisible());
+        TestEqual("the sky parts: no shadow, no Lumen GI, no collision", Clean, A->GetConceptPasteParts().Num());
+        TestTrue(FString::Printf(TEXT("the island masses cast shadows (shadowsOn=%d casters=%d overlayProps=%d)"), Rt.SceneShadows,
+                                 Rt.SceneCasters, Rt.SceneProps),
+                 Rt.SceneShadows > 0 && Rt.SceneCasters > 0 && Rt.SceneProps > 0);
+        const UStaticMeshComponent* Island = nullptr;
+        for (const UStaticMeshComponent* C : A->GetEnvProps()) {
+          if (C && C->GetStaticMesh() && C->GetStaticMesh()->GetName() == TEXT("SM_Env_S_Island")) Island = C;
+        }
+        if (TestNotNull("the island spawned", Island)) {
+          TestTrue("island: visible, casts, no collision",
+                   Island->IsVisible() && Island->CastShadow && Island->GetCollisionEnabled() == ECollisionEnabled::NoCollision);
+          const UMaterial* Base = Island->GetMaterial(0) ? Island->GetMaterial(0)->GetMaterial() : nullptr;
+          TestTrue("island: lit (never unlit for layer B)", Base && !Base->GetShadingModels().HasOnlyShadingModel(MSM_Unlit));
+        }
+        int32 Seas = 0;
+        for (const TWeakObjectPtr<UStaticMeshComponent>& G : A->GetEnvLayoutRuntime().Ground) {
+          const UStaticMeshComponent* C = G.Get();
+          if (!C || S08ConceptPaste::GroundKindOf(C->GetName()) != TEXT("sea")) continue;
+          ++Seas;
+          TestTrue(TEXT("the sea ring is back, under the cliffs: ") + C->GetRelativeLocation().ToString(),
+                   C->IsVisible() && (!S.Lit3d.bSeaZ || FMath::IsNearlyEqual(C->GetRelativeLocation().Z, S.Lit3d.SeaZUU, 0.01)));
+        }
+        if (Seas == 0) AddWarning(TEXT("no sea ring in the ground section (P5 ground assets not imported)"));
+        TestFalse("the fog hidden", A->GetAppliedRender().bFog);
+        if (A->GetDioramaTray()) TestFalse("the tray hidden (the island replaces it)", A->GetDioramaTray()->IsVisible());
         int32 VisibleLayoutLights = 0;
         for (const UPointLightComponent* L : A->GetEnvLights()) VisibleLayoutLights += L && L->IsVisible() ? 1 : 0;
         TestEqual("layout lights hidden (the block's lights replace them)", VisibleLayoutLights, 0);
         const FS08LightProfile* Night = Shipped.LightFor(*Sarpedon);
         TestTrue("1 key + <= 6 points", Night && Night->Points.Num() + A->GetConceptPasteLights().Num() <= 6);
+        for (const UPointLightComponent* L : A->GetConceptPasteLights()) {
+          TestTrue("a block light casts no shadow", L && !L->CastShadows);
+        }
       } else {
-        AddWarning(FString::Printf(TEXT("concept assets %s / overlay %s not there (ue_import_concept_paste.py, ue_concept_material.py, EnvLayouts/sarpedon.%s.layout.json): the P5c fallback was checked"),
-                                   bAssets ? TEXT("ok") : TEXT("missing"), bOverlay ? TEXT("ok") : TEXT("missing"), *S.Variant));
-        TestFalse("fallback: the paste is off", A->IsConceptPasteOn());
+        AddWarning(FString::Printf(TEXT("lit3d assets %s / scene overlay %s not there (tools/art/concept_scene/ue_scene_material.py, ue_import_concept_scene.py, EnvLayouts/sarpedon.%s.layout.json): the P5c fallback was checked"),
+                                   bAssets ? TEXT("ok") : TEXT("missing"), bOverlay ? TEXT("ok") : TEXT("missing"), *S.Lit3d.Variant));
+        TestFalse("fallback: the island is off", A->IsConceptPasteOn());
         TestTrue(TEXT("fallback reason: ") + A->GetConceptPasteMode().Reason,
                  A->GetConceptPasteMode().Reason == TEXT("missing-assets") || A->GetConceptPasteMode().Reason == TEXT("overlay-absent"));
         NoPaste(A, TEXT("sarpedon fallback"));
         TestTrue("fallback traced", Rt.bTraced);
         TestTrue("fallback: the night fog stays (P5c)", A->GetAppliedRender().bFog);
         if (A->GetDioramaTray()) TestTrue("fallback: the tray stays", A->GetDioramaTray()->IsVisible());
+        TestTrue("fallback: the base layout (no scene overlay)", A->GetEnvLayoutRuntime().Variant.Name.IsEmpty());
       }
       // a grid afterwards clears everything
       TestTrue("rebuild a 5x6 grid", A->Rebuild(GridBoard(5, 6)));
@@ -974,9 +1231,11 @@ bool FS08ConceptPasteApplyFailureTest::RunTest(const FString&) {
   }
   const FS08ConceptPasteSpec& S = Sarpedon->ConceptPaste;
   const bool bMap = FPackageName::DoesPackageExist(Sarpedon->Map.MaterialInstancePath);
-  const bool bAssets = FPackageName::DoesPackageExist(S.SheetMeshPath) && FPackageName::DoesPackageExist(S.PlateBPath) &&
-                       FPackageName::DoesPackageExist(PackageOf(S.MaterialPath));
-  const bool bOverlay = FPaths::FileExists(S08EnvLayout::OverlayFileFor(S08EnvLayout::DefaultDir(), TEXT("sarpedon"), S.Variant));
+  // ENV-MAPS P8: the default kind is lit3d - its required packages and the scene overlay
+  bool bAssets = S.Lit3d.bSet;
+  for (const FString& Path : S.Lit3d.Required) bAssets = bAssets && FPackageName::DoesPackageExist(Path);
+  const bool bOverlay =
+      FPaths::FileExists(S08EnvLayout::OverlayFileFor(S08EnvLayout::DefaultDir(), TEXT("sarpedon"), S.Lit3d.Variant));
   if (!bMap || !bAssets || !bOverlay) {
     AddWarning(TEXT("map / concept assets or the concept overlay not there (out of git): the Apply-failure fallback was NOT exercised"));
     return true;
@@ -1056,6 +1315,365 @@ bool FS08ConceptPasteApplyFailureTest::RunTest(const FString&) {
     TestEqual("props unchanged", LookOf(A).VisibleProps, P5c.VisibleProps);
     A->Destroy();
   }
+  return true;
+}
+
+// ---- ENV-MAPS P8 (lit3d, docs/art-pipeline/ENV-P8-3D-UNDER-PAINT-TASK.md section 4 P8.2) -----------------------------
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08ConceptPastePasteKindTest,
+    "Unmatched.S08.ConceptPaste.PasteKind -ConceptPaste=paste on the shipped Sarpedon: the P7 paste (sheet, sea, lights) or the traced P5c fallback",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08ConceptPastePasteKindTest::RunTest(const FString&) {
+  using namespace S08ConceptPasteTest;
+  FScope Scope(TEXT("-ConceptPaste=paste"));
+  FWorld W(TEXT("S08ConceptPastePasteKind"));
+  if (!TestNotNull("test world", W.World)) return false;
+  FS08BoardArtData Shipped;
+  TArray<FString> Errors;
+  if (!TestTrue("shipped data", Shipped.LoadFile(FS08BoardArtData::DefaultPath(), Errors))) return false;
+  const FS08BoardArtProfile* Sarpedon = Find(Shipped, TEXT("sarpedon-original"));
+  FS08BoardModel SarBoard;
+  FString SarId;
+  if (!Sarpedon || !TopologyBoard(TEXT("sarpedon.topology.json"), SarBoard, SarId)) {
+    AddError(TEXT("shipped Sarpedon profile or topology fixture missing"));
+    return false;
+  }
+  if (!FPackageName::DoesPackageExist(Sarpedon->Map.MaterialInstancePath)) {
+    AddWarning(TEXT("map assets not imported (ENV-U3: out of git): the paste kind was NOT exercised"));
+    return true;
+  }
+  const FS08ConceptPasteSpec& S = Sarpedon->ConceptPaste;
+  const bool bAssets = FPackageName::DoesPackageExist(S.SheetMeshPath) && FPackageName::DoesPackageExist(S.PlateBPath) &&
+                       FPackageName::DoesPackageExist(PackageOf(S.MaterialPath));
+  const bool bOverlay = FPaths::FileExists(S08EnvLayout::OverlayFileFor(S08EnvLayout::DefaultDir(), TEXT("sarpedon"), S.Variant));
+  AS08BoardActor* A = W.Spawn();
+  if (!TestNotNull("board actor (sarpedon, paste)", A)) return false;
+  A->EnsureDioramaTray(true);
+  TestTrue("env gate armed", A->EnsureEnvLayout(true));
+  A->SetArtDataForTest(Shipped);
+  A->SetRoomBoardId(SarId);
+  TestTrue("rebuild Sarpedon", A->Rebuild(SarBoard));
+  const FS08ConceptPasteRuntime& Rt = A->GetConceptPasteRuntime();
+  if (bAssets && bOverlay) {
+    TestTrue(TEXT("-ConceptPaste=paste: the P7 paste is on (") + A->GetConceptPasteMode().Reason + TEXT(")"),
+             A->IsConceptPasteOn() && A->GetConceptPasteMode().Kind == ES08ConceptKind::Paste);
+    TestEqual("env variant = the concept overlay", A->GetEnvLayoutRuntime().Variant.Name, S.Variant);
+    TestTrue("sheet + sea plane + sky segments", Rt.SheetParts == 1 && Rt.SeaParts == 1 + S.Sea.SkySegments);
+    TestEqual("the paste's lights", A->GetConceptPasteLights().Num(), S.Lights.Num());
+    int32 Clean = 0;
+    for (const UStaticMeshComponent* Part : A->GetConceptPasteParts()) {
+      Clean += Part && !Part->CastShadow && !Part->bAffectDynamicIndirectLighting && !Part->bAffectDistanceFieldLighting &&
+                       Part->GetCollisionEnabled() == ECollisionEnabled::NoCollision
+                   ? 1 : 0;
+    }
+    TestEqual("every part: no shadow, no Lumen GI / DF, no collision", Clean, A->GetConceptPasteParts().Num());
+    const UStaticMeshComponent* Sheet = A->GetConceptPasteParts().Num() ? A->GetConceptPasteParts()[0].Get() : nullptr;
+    const UMaterial* Base = Sheet && Sheet->GetMaterial(0) ? Sheet->GetMaterial(0)->GetMaterial() : nullptr;
+    TestTrue("sheet on M_ConceptPaste: unlit, masked", Base && Base->GetName() == TEXT("M_ConceptPaste") &&
+                                                           Base->GetShadingModels().HasOnlyShadingModel(MSM_Unlit) &&
+                                                           Base->GetBlendMode() == BLEND_Masked);
+    TestFalse("the fog hidden (the plate has its own haze)", A->GetAppliedRender().bFog);
+    if (A->GetDioramaTray()) TestFalse("the tray hidden (the painted island replaces it)", A->GetDioramaTray()->IsVisible());
+    TestTrue("paste: no lit3d scene tweak", Rt.Tweaks.IsEmpty() && Rt.Kind == ES08ConceptKind::Paste);
+  } else {
+    AddWarning(FString::Printf(TEXT("concept assets %s / overlay %s not there (ue_import_concept_paste.py, ue_concept_material.py): the P5c fallback was checked"),
+                               bAssets ? TEXT("ok") : TEXT("missing"), bOverlay ? TEXT("ok") : TEXT("missing")));
+    TestFalse("fallback: the paste is off", A->IsConceptPasteOn());
+    TestTrue(TEXT("fallback reason: ") + A->GetConceptPasteMode().Reason,
+             A->GetConceptPasteMode().Reason == TEXT("missing-assets") || A->GetConceptPasteMode().Reason == TEXT("overlay-absent"));
+    TestTrue("fallback: the night fog stays (P5c)", A->GetAppliedRender().bFog);
+  }
+  A->Destroy();
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08ConceptPasteLit3dSceneTest,
+    "Unmatched.S08.ConceptPaste.Lit3dScene lit3d: no sheet, lights within the budget, hides, casters / GI / sea ring / falls, restore, missing / failed",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08ConceptPasteLit3dSceneTest::RunTest(const FString&) {
+  using namespace S08ConceptPasteTest;
+  FS08BoardArtData Data;
+  TArray<FString> Errors;
+  if (!TestTrue(TEXT("lit3d doc parses: ") + FString::Join(Errors, TEXT(" | ")), Data.ParseJson(Doc(Lit3dBlock()), Errors))) {
+    return false;
+  }
+  const FS08BoardArtProfile* Profile = Find(Data, TEXT("cpmap"));
+  const FS08ConceptPasteSpec& Spec = Profile->ConceptPaste;
+  const FS08LightProfile* Light = Data.LightFor(*Profile);
+  // the base layout + the scene overlay (the island masses with castShadow false: the casters switch them on)
+  const FString Base = TEXT(
+      "{\"schema\":\"unmatched.env-layout/1\",\"map\":\"cptest\",\"boardId\":\"cidCp\",\"props\":["
+      "{\"id\":\"fort\",\"mesh\":\"/Engine/BasicShapes/Cube\",\"loc\":[-600,-400,-3]}],"
+      "\"lights\":[{\"id\":\"lamp\",\"type\":\"point\",\"loc\":[-600,0,150],\"colorSrgb\":\"#FFB870\",\"intensityCd\":40,\"radius\":450}]}");
+  const FString Overlay = TEXT(
+      "{\"schema\":\"unmatched.env-layout-overlay/1\",\"map\":\"cptest\",\"variant\":\"scene\",\"boardId\":\"cidCp\","
+      "\"props\":{\"add\":["
+      "{\"id\":\"island\",\"mesh\":\"/Engine/BasicShapes/Cube\",\"loc\":[-700,350,-3],\"castShadow\":false},"
+      "{\"id\":\"ship-hull\",\"mesh\":\"/Engine/BasicShapes/Cube\",\"loc\":[700,0,-3],\"castShadow\":false},"
+      "{\"id\":\"tree-1\",\"mesh\":\"/Engine/BasicShapes/Cone\",\"loc\":[-650,-100,-3],\"castShadow\":false},"
+      "{\"id\":\"tree-2\",\"mesh\":\"/Engine/BasicShapes/Cone\",\"loc\":[-650,100,-3],\"castShadow\":false},"
+      "{\"id\":\"banner-ship\",\"mesh\":\"/Engine/BasicShapes/Plane\",\"loc\":[831,-133,49],\"castShadow\":false}]}}");
+  FS08EnvLayout Merged;
+  FS08EnvVariantResult R;
+  if (!TestTrue(TEXT("scene overlay merges: ") + FString::Join(R.Errors, TEXT(" | ")),
+                S08EnvLayout::MergeOverlay(Base, Overlay, TEXT("cptest"), TEXT("scene"), Merged, R))) {
+    return false;
+  }
+  FWorld W(TEXT("S08ConceptPasteLit3dScene"));
+  AActor* Owner = W.World ? W.World->SpawnActor<AActor>(AActor::StaticClass(), FTransform::Identity) : nullptr;
+  if (!TestNotNull("owner actor", Owner)) return false;
+  USceneComponent* Root = NewObject<USceneComponent>(Owner, TEXT("Root"));
+  Owner->SetRootComponent(Root);
+  Root->RegisterComponent();
+  TArray<TObjectPtr<UStaticMeshComponent>> Props;
+  TArray<TObjectPtr<UPointLightComponent>> EnvLights;
+  FS08EnvLayoutRuntime Env;
+  Env.Layout = Merged;
+  Env.Stats = S08EnvLayout::Spawn(Merged, *Owner, Root, FVector2D(445.66667, 288.66667), FBox2D(ForceInit), Props, EnvLights);
+  TestEqual("6 props spawned", Props.Num(), 6);
+  // the ground section's parts by their S08EnvGround names (meshless: bounds = the component location)
+  TMap<FString, UStaticMeshComponent*> Ground;
+  struct FGroundPart {
+    const TCHAR* Name;
+    FVector Loc;
+  };
+  const FGroundPart GroundParts[] = {
+      {TEXT("EnvGround_0"), FVector(0, 0, -1)},          {TEXT("EnvSea"), FVector(0, -45, -172)},
+      {TEXT("EnvWaterfall_fall_s_Sheet"), FVector(-144, 425, 0)}, {TEXT("EnvWaterfall_fall_s_Foam"), FVector(-144, 425, -120)},
+      {TEXT("EnvWaterfall_fall_s_Lip"), FVector(-144, 425, 0)}};
+  for (const FGroundPart& G : GroundParts) {
+    UStaticMeshComponent* C = NewObject<UStaticMeshComponent>(Owner, FName(G.Name));
+    C->SetupAttachment(Root);
+    C->SetRelativeLocation(G.Loc);
+    C->RegisterComponent();
+    Ground.Add(G.Name, C);
+    Env.Ground.Add(C);
+  }
+  TArray<TObjectPtr<UStaticMeshComponent>> Parts;
+  TArray<TObjectPtr<UPointLightComponent>> Lights;
+  FS08ConceptPasteRuntime Rt;
+  Rt.ProfileId = TEXT("cpmap");
+  // a required package missing -> nothing spawned (the board actor falls back to P5c)
+  FS08ConceptPasteAssets Assets;
+  Assets.Kind = ES08ConceptKind::Lit3d;
+  TestFalse("lit3d assets: required not loaded", Assets.RequiredOk());
+  S08ConceptPaste::ApplyLit3d(Spec, Assets, FrameHalf, ES08ConceptGrade::AcesInverse, 1.0f, true, *Owner, Root, Parts, Lights, Rt);
+  TestTrue("missing: status missing, nothing spawned", Rt.Status == TEXT("missing") && Parts.IsEmpty() && Lights.IsEmpty());
+  // the automation hook: failed (the board actor's full P5c fallback)
+  Assets.bSceneOk = true;
+  S08ConceptPaste::SetForceApplyFailureForTest(true);
+  S08ConceptPaste::ApplyLit3d(Spec, Assets, FrameHalf, ES08ConceptGrade::AcesInverse, 1.0f, true, *Owner, Root, Parts, Lights, Rt);
+  S08ConceptPaste::SetForceApplyFailureForTest(false);
+  TestTrue("forced failure: status failed, nothing spawned", Rt.Status == TEXT("failed") && Parts.IsEmpty() && Lights.IsEmpty());
+  // ok: no sheet, no sea plane (the test block has no sky), the lit3d lights
+  S08ConceptPaste::ApplyLit3d(Spec, Assets, FrameHalf, ES08ConceptGrade::AcesInverse, 1.0f, true, *Owner, Root, Parts, Lights, Rt);
+  TestTrue("ok: lit3d, no sheet / sea / sky parts", Rt.Status == TEXT("ok") && Rt.Kind == ES08ConceptKind::Lit3d && Parts.IsEmpty() &&
+                                                        Rt.SheetParts == 0 && Rt.SeaParts == 0);
+  TestEqual("the lit3d lights", Lights.Num(), Spec.Lit3d.Lights.Num());
+  for (const UPointLightComponent* L : Lights) TestTrue("a block light casts no shadow", L && !L->CastShadows && L->IsRegistered());
+  TestTrue("light budget: profile points + block lights <= 6",
+           Light && Light->Points.Num() + Lights.Num() <= S08ConceptPasteSpec::CombinedPointBudget);
+  // hides: the lit3d list keeps the sea ring and the falls
+  S08ConceptPaste::ApplyHides(Spec.HideFor(ES08ConceptKind::Lit3d), Env, Props, EnvLights, nullptr, Rt);
+  const int32 Fort = Env.Stats.PropComponentIds.IndexOfByKey(TEXT("fort"));
+  const int32 Island = Env.Stats.PropComponentIds.IndexOfByKey(TEXT("island"));
+  const int32 Hull = Env.Stats.PropComponentIds.IndexOfByKey(TEXT("ship-hull"));
+  const int32 Tree = Env.Stats.PropComponentIds.IndexOfByKey(TEXT("tree-1"));
+  const int32 Banner = Env.Stats.PropComponentIds.IndexOfByKey(TEXT("banner-ship"));
+  if (!TestTrue("prop ids", Fort != INDEX_NONE && Island != INDEX_NONE && Hull != INDEX_NONE && Tree != INDEX_NONE && Banner != INDEX_NONE)) {
+    return false;
+  }
+  TestTrue("base prop hidden, the scene's kept", !Props[Fort]->IsVisible() && Props[Island]->IsVisible() && Props[Hull]->IsVisible());
+  TestTrue("layout light hidden", !EnvLights[0]->IsVisible());
+  TestTrue("ground strips hidden, the sea ring and the falls back", !Ground[TEXT("EnvGround_0")]->IsVisible() &&
+                                                                       Ground[TEXT("EnvSea")]->IsVisible() &&
+                                                                       Ground[TEXT("EnvWaterfall_fall_s_Sheet")]->IsVisible() &&
+                                                                       Ground[TEXT("EnvWaterfall_fall_s_Foam")]->IsVisible());
+  // the scene tweaks
+  S08ConceptPaste::ApplyScene(Spec.Lit3d, Env, Props, Rt);
+  TestTrue("casters: island / ship-hull / trees cast", Props[Island]->CastShadow && Props[Hull]->CastShadow && Props[Tree]->CastShadow);
+  TestTrue("casters feed Lumen GI, giOff takes the island out", Props[Hull]->bAffectDynamicIndirectLighting &&
+                                                                    Props[Tree]->bAffectDynamicIndirectLighting &&
+                                                                    !Props[Island]->bAffectDynamicIndirectLighting);
+  TestFalse("not a caster: the banner keeps its layout flag", Props[Banner]->CastShadow);
+  TestTrue(FString::Printf(TEXT("counts: casters %d (4), giOff %d (1), overlay props %d (5), shadowsOn %d (4 visible)"), Rt.SceneCasters,
+                           Rt.SceneGiOff, Rt.SceneProps, Rt.SceneShadows),
+           Rt.SceneCasters == 4 && Rt.SceneGiOff == 1 && Rt.SceneProps == 5 && Rt.SceneShadows == 4);
+  TestTrue(TEXT("the sea ring under the cliffs: ") + Ground[TEXT("EnvSea")]->GetRelativeLocation().ToString(),
+           Ground[TEXT("EnvSea")]->GetRelativeLocation().Equals(FVector(0, -45, -300), 1e-3) && Rt.SceneSeaMoved == 1);
+  TestTrue("the fall sheet x2 in Z from the lip", FMath::IsNearlyEqual(Ground[TEXT("EnvWaterfall_fall_s_Sheet")]->GetRelativeScale3D().Z, 2.0) &&
+                                                      FMath::IsNearlyEqual(Ground[TEXT("EnvWaterfall_fall_s_Sheet")]->GetRelativeLocation().Z, 0.0));
+  TestTrue(TEXT("the foam keeps its size and follows the drop: ") + Ground[TEXT("EnvWaterfall_fall_s_Foam")]->GetRelativeLocation().ToString(),
+           FMath::IsNearlyEqual(Ground[TEXT("EnvWaterfall_fall_s_Foam")]->GetRelativeLocation().Z, -240.0, 0.01) &&
+               FMath::IsNearlyEqual(Ground[TEXT("EnvWaterfall_fall_s_Foam")]->GetRelativeScale3D().Z, 1.0));
+  TestTrue("the lip stays", Ground[TEXT("EnvWaterfall_fall_s_Lip")]->GetRelativeScale3D().Equals(FVector::OneVector) &&
+                                FMath::IsNearlyEqual(Ground[TEXT("EnvWaterfall_fall_s_Lip")]->GetRelativeLocation().Z, 0.0) &&
+                                Rt.SceneFallsScaled == 2);
+  S08ConceptPaste::ApplyScene(Spec.Lit3d, Env, Props, Rt);
+  TestEqual("idempotent: each component remembered once", Rt.Tweaks.Num(), 7);
+  TestTrue("idempotent: a second call computes from the originals",
+           FMath::IsNearlyEqual(Ground[TEXT("EnvWaterfall_fall_s_Sheet")]->GetRelativeScale3D().Z, 2.0) &&
+               FMath::IsNearlyEqual(Ground[TEXT("EnvWaterfall_fall_s_Foam")]->GetRelativeLocation().Z, -240.0, 0.01) &&
+               FMath::IsNearlyEqual(Ground[TEXT("EnvSea")]->GetRelativeLocation().Z, -300.0, 0.01));
+  // restore: everything as the layout spawned it
+  S08ConceptPaste::RestoreHides(Rt);
+  TestTrue("restore: shadows / GI back", !Props[Island]->CastShadow && Props[Island]->bAffectDynamicIndirectLighting &&
+                                             !Props[Hull]->CastShadow && !Props[Tree]->CastShadow);
+  TestTrue("restore: the sea ring and the falls back", Ground[TEXT("EnvSea")]->GetRelativeLocation().Equals(FVector(0, -45, -172), 1e-3) &&
+                                                          FMath::IsNearlyEqual(Ground[TEXT("EnvWaterfall_fall_s_Sheet")]->GetRelativeScale3D().Z, 1.0) &&
+                                                          FMath::IsNearlyEqual(Ground[TEXT("EnvWaterfall_fall_s_Foam")]->GetRelativeLocation().Z, -120.0, 0.01));
+  TestTrue("restore: hidden parts visible, no tweak left", Props[Fort]->IsVisible() && EnvLights[0]->IsVisible() &&
+                                                              Ground[TEXT("EnvGround_0")]->IsVisible() && Rt.Tweaks.IsEmpty());
+  S08ConceptPaste::Clear(Parts, Lights, Rt);
+  TestTrue("clear: no light left", Lights.IsEmpty() && Rt.Lights == 0);
+  for (TPair<FString, UStaticMeshComponent*>& G : Ground) G.Value->DestroyComponent();
+  S08EnvLayout::Clear(Props, EnvLights);
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08ConceptPasteMaterialOverrideTest,
+    "Unmatched.S08.ConceptPaste.MaterialOverride env-layout prop \"material\": every slot / per slot, rejections, overlay replace, spawn, missing kept",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08ConceptPasteMaterialOverrideTest::RunTest(const FString&) {
+  using namespace S08ConceptPasteTest;
+  const FString Grid = TEXT("/Engine/EngineDebugMaterials/VertexColorMaterial");
+  auto Layout = [](const FString& Props) {
+    return TEXT("{\"schema\":\"unmatched.env-layout/1\",\"map\":\"cptest\",\"boardId\":\"cidCp\",\"props\":[") + Props + TEXT("]}");
+  };
+  const FString Good = Layout(
+      TEXT("{\"id\":\"a\",\"mesh\":\"/Engine/BasicShapes/Cube\",\"loc\":[600,0,-3],\"material\":\"/Engine/EngineDebugMaterials/VertexColorMaterial\"},"
+           "{\"id\":\"b\",\"mesh\":\"/Engine/BasicShapes/Cube\",\"loc\":[650,0,-3],\"material\":[null,\"/Engine/EngineDebugMaterials/VertexColorMaterial\"]},"
+           "{\"id\":\"c\",\"mesh\":\"/Engine/BasicShapes/Cube\",\"loc\":[700,0,-3],\"material\":[\"/Engine/EngineDebugMaterials/VertexColorMaterial\"]},"
+           "{\"id\":\"d\",\"mesh\":\"/Engine/BasicShapes/Cube\",\"loc\":[750,0,-3],\"material\":\"/Game/EnvMaps/NoSuchScene/MI_NoSuchScene\"},"
+           "{\"id\":\"e\",\"mesh\":\"/Engine/BasicShapes/Cube\",\"loc\":[800,0,-3]}"));
+  FS08EnvLayout L;
+  TArray<FString> Errors;
+  if (!TestTrue(TEXT("layout with overrides parses: ") + FString::Join(Errors, TEXT(" | ")), L.ParseJson(Good, Errors))) return false;
+  const FS08EnvProp* A = L.FindProp(TEXT("a"));
+  const FS08EnvProp* B = L.FindProp(TEXT("b"));
+  const FS08EnvProp* E = L.FindProp(TEXT("e"));
+  TestTrue("a: one path for every slot", A && A->bMaterialAllSlots && A->Materials.Num() == 1 && A->MaterialForSlot(0) == Grid &&
+                                             A->MaterialForSlot(3) == Grid);
+  TestTrue("b: per slot, null = the mesh's own", B && !B->bMaterialAllSlots && B->Materials.Num() == 2 &&
+                                                     B->MaterialForSlot(0).IsEmpty() && B->MaterialForSlot(1) == Grid &&
+                                                     B->MaterialForSlot(2).IsEmpty());
+  TestTrue("e: no override", E && E->Materials.IsEmpty() && E->MaterialForSlot(0).IsEmpty());
+  FString Seventeen = TEXT("[");
+  for (int32 I = 0; I < 17; ++I) Seventeen += I ? TEXT(",\"\"") : TEXT("\"\"");
+  Seventeen += TEXT("]");
+  for (const FString& Bad : {FString(TEXT("5")), FString(TEXT("\"Game/X/MI_X\"")), FString(TEXT("[]")), FString(TEXT("[5]")),
+                             FString(TEXT("[\"/Game/X MI\"]")), Seventeen}) {
+    FS08EnvLayout Rejected;
+    TArray<FString> E2;
+    const bool bOk = Rejected.ParseJson(
+        Layout(TEXT("{\"id\":\"x\",\"mesh\":\"/Engine/BasicShapes/Cube\",\"loc\":[600,0,-3],\"material\":") + Bad + TEXT("}")), E2);
+    TestTrue(TEXT("rejected material ") + Bad, !bOk && FString::Join(E2, TEXT(" | ")).Contains(TEXT("material must be")));
+  }
+  // an overlay may replace / add the field (the scene overlay puts projected MIs on pack meshes)
+  const FString Overlay = TEXT(
+      "{\"schema\":\"unmatched.env-layout-overlay/1\",\"map\":\"cptest\",\"variant\":\"scene\","
+      "\"props\":{\"replace\":[{\"id\":\"e\",\"material\":\"/Engine/EngineDebugMaterials/VertexColorMaterial\"}],"
+      "\"add\":[{\"id\":\"f\",\"mesh\":\"/Engine/BasicShapes/Cube\",\"loc\":[850,0,-3],\"material\":[\"\"]}]}}");
+  FS08EnvLayout Merged;
+  FS08EnvVariantResult R;
+  if (TestTrue(TEXT("overlay with material merges: ") + FString::Join(R.Errors, TEXT(" | ")),
+               S08EnvLayout::MergeOverlay(Good, Overlay, TEXT("cptest"), TEXT("scene"), Merged, R))) {
+    const FS08EnvProp* Replaced = Merged.FindProp(TEXT("e"));
+    TestTrue("replace: e gets the material", Replaced && Replaced->MaterialForSlot(0) == Grid);
+  }
+  // spawn: the override on the component, the mesh's own where none / missing
+  FWorld W(TEXT("S08ConceptPasteMaterialOverride"));
+  AActor* Owner = W.World ? W.World->SpawnActor<AActor>(AActor::StaticClass(), FTransform::Identity) : nullptr;
+  if (!TestNotNull("owner actor", Owner)) return false;
+  USceneComponent* Root = NewObject<USceneComponent>(Owner, TEXT("Root"));
+  Owner->SetRootComponent(Root);
+  Root->RegisterComponent();
+  TArray<TObjectPtr<UStaticMeshComponent>> Props;
+  TArray<TObjectPtr<UPointLightComponent>> Lights;
+  const FS08EnvSpawnStats S = S08EnvLayout::Spawn(L, *Owner, Root, FVector2D(445.66667, 288.66667), FBox2D(ForceInit), Props, Lights);
+  if (!TestEqual("5 props", Props.Num(), 5)) return false;
+  auto MatName = [](const UStaticMeshComponent* C) {
+    return C && C->GetMaterial(0) ? C->GetMaterial(0)->GetName() : FString(TEXT("-"));
+  };
+  const FString Own = MatName(Props[4]);  // e: the cube's own material
+  TestNotEqual(TEXT("the cube's own material is not the override"), Own, FString(TEXT("VertexColorMaterial")));
+  TestEqual("a: every slot", MatName(Props[0]), FString(TEXT("VertexColorMaterial")));
+  TestEqual("b: slot 0 kept (null), the extra slot ignored", MatName(Props[1]), Own);
+  TestEqual("c: per slot 0", MatName(Props[2]), FString(TEXT("VertexColorMaterial")));
+  TestEqual("d: missing material -> the mesh's own", MatName(Props[3]), Own);
+  TestTrue(FString::Printf(TEXT("stats: overrides %d (2), missing materials %d (1)"), S.MaterialOverrides, S.MissingMaterials),
+           S.MaterialOverrides == 2 && S.MissingMaterials == 1);
+  S08EnvLayout::Clear(Props, Lights);
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08ConceptPasteLightsOffTest,
+    "Unmatched.S08.ConceptPaste.LightsOff -ArtPreviewLightsOff (gate G1): key / points / sky light at 0, fog hidden, block lights at 0, lit3d sky hidden",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08ConceptPasteLightsOffTest::RunTest(const FString&) {
+  using namespace S08ConceptPasteTest;
+  FWorld W(TEXT("S08ConceptPasteLightsOff"));
+  if (!TestNotNull("test world", W.World)) return false;
+  AActor* LightActor = W.World->SpawnActor<AActor>(AActor::StaticClass(), FTransform::Identity);
+  AActor* Owner = W.World->SpawnActor<AActor>(AActor::StaticClass(), FTransform::Identity);
+  if (!TestNotNull("actors", LightActor) || !TestNotNull("owner", Owner)) return false;
+  USceneComponent* Root = NewObject<USceneComponent>(Owner, TEXT("Root"));
+  Owner->SetRootComponent(Root);
+  Root->RegisterComponent();
+  USceneComponent* LightRoot = NewObject<USceneComponent>(LightActor, TEXT("LightRoot"));
+  LightActor->SetRootComponent(LightRoot);
+  LightRoot->RegisterComponent();
+  UDirectionalLightComponent* Key = NewObject<UDirectionalLightComponent>(LightActor, TEXT("Key"));
+  Key->SetupAttachment(LightRoot);
+  Key->SetMobility(EComponentMobility::Movable);
+  Key->RegisterComponent();
+  Key->SetIntensity(3.0f);
+  UPointLightComponent* MoonPool = NewObject<UPointLightComponent>(LightActor, TEXT("MoonPool"));
+  MoonPool->SetupAttachment(LightRoot);
+  MoonPool->SetMobility(EComponentMobility::Movable);
+  MoonPool->RegisterComponent();
+  MoonPool->SetIntensity(260.0f);
+  USkyLightComponent* Sky = NewObject<USkyLightComponent>(LightActor, TEXT("Sky"));  // not registered: no capture
+  Sky->SetMobility(EComponentMobility::Movable);
+  Sky->Intensity = 3.0f;
+  UExponentialHeightFogComponent* Fog = NewObject<UExponentialHeightFogComponent>(LightActor, TEXT("Fog"));
+  Fog->SetupAttachment(LightRoot);
+  Fog->RegisterComponent();
+  auto Point = [Owner, Root](const TCHAR* Name, float Cd) {
+    UPointLightComponent* L = NewObject<UPointLightComponent>(Owner, FName(Name));
+    L->SetupAttachment(Root);
+    L->SetMobility(EComponentMobility::Movable);
+    L->RegisterComponent();
+    L->SetIntensity(Cd);
+    return L;
+  };
+  TArray<TObjectPtr<UPointLightComponent>> EnvLights = {Point(TEXT("EnvLamp"), 40.0f)};
+  TArray<TObjectPtr<UPointLightComponent>> BlockLights = {Point(TEXT("FireFort"), 65.0f), Point(TEXT("DeckN"), 95.0f)};
+  UStaticMeshComponent* SkyPart = NewObject<UStaticMeshComponent>(Owner, TEXT("ConceptSceneSky"));
+  SkyPart->SetupAttachment(Root);
+  SkyPart->RegisterComponent();
+  TArray<TObjectPtr<UStaticMeshComponent>> BlockParts = {SkyPart};
+  TArray<TObjectPtr<UStaticMeshComponent>> EnvProps;
+  FS08EnvLayoutRuntime Env;
+  const TArray<TObjectPtr<AActor>> SceneActors = {LightActor};
+  // the paste keeps its painted layer (the P7c reference of G1)
+  FS08LightsOffStats S = S08ConceptPaste::ApplyLightsOff(SceneActors, EnvLights, BlockLights, EnvProps, Env, BlockParts, false,
+                                                         W.World, nullptr, TEXT("cpmap"));
+  TestTrue("paste: the block's parts stay", SkyPart->IsVisible() && S.SkyParts == 0);
+  TestTrue(FString::Printf(TEXT("key %g, moon-pool %g, sky %g at 0"), Key->Intensity, MoonPool->Intensity, Sky->Intensity),
+           Key->Intensity == 0.0f && MoonPool->Intensity == 0.0f && Sky->Intensity == 0.0f);
+  TestTrue("env + block points at 0", EnvLights[0]->Intensity == 0.0f && BlockLights[0]->Intensity == 0.0f && BlockLights[1]->Intensity == 0.0f);
+  TestTrue("fog hidden", !Fog->IsVisible() && S.bFogHidden);
+  TestTrue(FString::Printf(TEXT("counts: directional %d, points %d, sky %d, env %d, block %d"), S.Directional, S.ProfilePoints,
+                           S.SkyLights, S.EnvLights, S.ConceptLights),
+           S.Directional == 1 && S.ProfilePoints == 1 && S.SkyLights == 1 && S.EnvLights == 1 && S.ConceptLights == 2);
+  TestFalse("no MPC without the collection", S.bCollection);
+  // lit3d: the unlit sky cylinder goes too (the environment must be dark without engine light)
+  S = S08ConceptPaste::ApplyLightsOff(SceneActors, EnvLights, BlockLights, EnvProps, Env, BlockParts, true, W.World, nullptr,
+                                      TEXT("cpmap"));
+  TestTrue("lit3d: the sky cylinder hidden, idempotent", !SkyPart->IsVisible() && S.SkyParts == 1 && Key->Intensity == 0.0f);
+  TestTrue("the emissive scalars it zeroes", S08ConceptPaste::LightsOffEmissiveParams().Contains(FName(TEXT("EmissiveIntensity"))) &&
+                                                  S08ConceptPaste::LightsOffEmissiveParams().Contains(FName(TEXT("EmissiveStrength"))));
   return true;
 }
 

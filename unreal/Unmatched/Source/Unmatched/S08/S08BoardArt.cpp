@@ -1024,9 +1024,10 @@ bool FS08BoardArtData::ParseJson(const FString& Text, TArray<FString>& OutErrors
         }
         if (!S08ConceptPaste::ParseJson(B.Id, *Block, B.ConceptPaste, OutErrors)) continue;
         const FS08LightProfile& Light = Lights.FindChecked(B.LightId);
-        if (Light.Points.Num() + B.ConceptPaste.Lights.Num() > S08ConceptPasteSpec::CombinedPointBudget) {
+        // ENV-MAPS P8: either kind's lights (paste / lit3d) share the budget
+        if (Light.Points.Num() + B.ConceptPaste.MaxModeLights() > S08ConceptPasteSpec::CombinedPointBudget) {
           OutErrors.Add(FString::Printf(TEXT("board %s: conceptPaste lights %d + light profile %s points %d > %d"), *B.Id,
-                                        B.ConceptPaste.Lights.Num(), *B.LightId, Light.Points.Num(),
+                                        B.ConceptPaste.MaxModeLights(), *B.LightId, Light.Points.Num(),
                                         S08ConceptPasteSpec::CombinedPointBudget));
           continue;
         }

@@ -20,6 +20,20 @@ gitignored `unreal/Unmatched/Content/<Pack>/` и в git не попадают. �
 | [Water Materials](https://www.fab.com/listings/063155ea-d9d2-4f29-b09f-33270b0bc861) | tharlevfx | **CC BY 4.0** | разрешён | `WaterMaterials` (по факту папки) | 5.8 | вода реки/прибоя/водопада Sarpedon |
 | FREE Stylized Rocks Pack - Stylized Stones & Boulders | StyleHex Studio | Fab Standard | **NoAI** | `StyleHex_Studio` | 5.8 | добавил пользователь 2026-10-01; только вариант раскладки для пользователя, кадры не подаются ИИ |
 
+## Poly Haven CC0
+
+ENV-MAPS P8 (Sarpedon, путь 1: настоящая 3D-подложка под живопись концепта). Модели [Poly Haven](https://polyhaven.com)
+(лицензия **CC0**, атрибуция не требуется — перечислены для учёта), glTF, текстуры 1K; это CC0-содержимое пака
+Smuggler's Cove. Скачал оркестратор 2026-10-02 в `C:/tmp/envmaps-research/p8/polyhaven/<id>/` (вне git, sha256 в
+`manifest.json` той же папки). В git — только производная геометрия (FBX) и скрипты; текстуры Poly Haven в игре не
+используются (альбедо — из de-lit плиты концепта, задание §2, риск R2).
+
+| Ассет | Лицензия | Использование в P8.1 |
+|---|---|---|
+| [dutch_ship_large_01](https://polyhaven.com/a/dutch_ship_large_01) | CC0 | корпус → `SM_Env_S_Ship` (`tools/art/concept_scene/ship_build.py`: децимация, совмещение с нарисованным бортом по пикселям C0, срез невидимой дальней части; мачты собраны заново по пикселям рисунка) |
+| [modular_fort_01](https://polyhaven.com/a/modular_fort_01) | CC0 | справочно (модули 8,5 м — не подошли к нарисованной руине; `SM_Env_S_Fort` собран из блоков по силуэту рисунка, `fort_build.py`) |
+| dutch_ship_medium, modular_wooden_pier, wooden_barrels_01, wooden_crate_01, wooden_crate_02, wooden_lantern_01, cannon_01, stone_fire_pit, rock_moss_set_01, rock_moss_set_02, rock_07, rock_09, rock_face_01, rock_face_02, moon_rock_02, moon_rock_03, boulder_01, namaqualand_boulders_01, namaqualand_cliff_01, coastal_cliff_01, tree_stump_01, dead_tree_trunk, fern_02 | CC0 | скачаны про запас (P8.0), в P8.1 не экспортируются; бочки / ящики / камни / деревья сцены — из паков, уже лежащих в Content (EnvKit, StylizedForest, Fantasy_Forest) |
+
 ## Атрибуция CC BY 4.0
 
 - «Free Niagara Particles» © SoftTofuVFX, CC BY 4.0, https://www.fab.com/listings/183732bc-c2fb-465c-9453-f70a1ce7ba2c — используется с изменениями (цвет/масштаб под ночную сцену): листья-лепестки `NS_leaf` и огоньки `NS_Sparkling_Animate_2` (P5c).
