@@ -5,6 +5,7 @@
 #include "S08FlowGameMode.h"
 
 #include "S08ArtTuner.h"
+#include "S08ArtTunerPanel.h"
 #include "S08ArtView.h"
 #include "S08BoardActor.h"
 #include "S08BoardArt.h"
@@ -12,8 +13,12 @@
 #include "S08TraceLog.h"
 #include "Dom/JsonObject.h"
 #include "Dom/JsonValue.h"
+#include "Engine/Engine.h"
+#include "Engine/GameViewportClient.h"
 #include "Engine/World.h"
+#include "Framework/Application/SlateApplication.h"
 #include "GameFramework/PlayerController.h"
+#include "Widgets/Layout/SBox.h"
 #include "HAL/FileManager.h"
 #include "HAL/PlatformTime.h"
 #include "InputCoreTypes.h"
@@ -149,6 +154,9 @@ bool AS08FlowGameMode::ArtTunerRebase(const FString& ProfilesPath, TArray<FStrin
 void AS08FlowGameMode::ArtTunerEnd() {
   if (!ArtTuner.IsValid()) return;
   ArtTunerSetPanelOpen(false);
+  if (ArtTuner->PanelRoot.IsValid() && GEngine && GEngine->GameViewport) {
+    GEngine->GameViewport->RemoveViewportWidgetContent(ArtTuner->PanelRoot.ToSharedRef());
+  }
   ArtTuner.Reset();
 }
 
@@ -506,6 +514,59 @@ void AS08FlowGameMode::LiveTuneArtView(const FS08LiveCommand& Cmd, FS08LiveResul
   Result.Extra->SetNumberField(TEXT("heroLights"), BoardActor ? BoardActor->GetHeroLightCount() : 0);
 }
 
+void AS08FlowGameMode::ArtTunerResetRow(const FString& RowId) {
+  if (!ArtTuner.IsValid()) return;
+  FS08ArtTunerSession& S = *ArtTuner;
+  const FS08TunerParam* P = S.FindParam(RowId);
+  if (!P) return;
+  S.Model.Reset(P->Pointer);
+  if (P->Type == ES08TunerType::Ev100) {
+    for (const TCHAR* Leaf : {TEXT("/ev100"), TEXT("/minBrightness"), TEXT("/maxBrightness")}) S.Model.Reset(P->Pointer + Leaf);
+  }
+  FS08BoardArtData Data;
+  TArray<FString> Errors;
+  if (S.Model.Build(Data, Errors)) {
+    S.PendingData = MoveTemp(Data);
+    S.bPending = true;
+    S.PendingScopes |= static_cast<uint8>(P->Scope);
+  }
+  ++S.Version;
+}
+
 void AS08FlowGameMode::ArtTunerSetPanelOpen(bool bOpen) {
-  if (ArtTuner.IsValid()) ArtTuner->bPanelOpen = bOpen;  // M3: the Slate panel
+  if (!ArtTuner.IsValid()) return;
+  FS08ArtTunerSession& S = *ArtTuner;
+  if (bOpen && !S.Panel.IsValid() && GEngine && GEngine->GameViewport) {
+    TWeakObjectPtr<AS08FlowGameMode> Self(this);
+    FS08ArtTunerPanelActions Actions;
+    Actions.Set = [Self](const FString& RowId, const TSharedPtr<FJsonValue>& Value, FString& OutError) {
+      return Self.IsValid() && Self->ArtTunerSetValue(RowId, Value, OutError);
+    };
+    Actions.ResetRow = [Self](const FString& RowId) {
+      if (Self.IsValid()) Self->ArtTunerResetRow(RowId);
+    };
+    Actions.ResetGroup = [Self](const FString& GroupId) {
+      if (Self.IsValid()) Self->ArtTunerReset(GroupId);
+    };
+    Actions.Save = [Self]() {
+      if (!Self.IsValid() || !Self->ArtTuner.IsValid()) return;
+      FString Path, Error;
+      if (!Self->ArtTunerSave(FString(), Path, Error)) Self->ArtTuner->LastError = Error;
+      else Self->ArtTuner->LastError.Reset();
+    };
+    Actions.Close = [Self]() {
+      if (Self.IsValid()) Self->ArtTunerSetPanelOpen(false);
+    };
+    S.Panel = SNew(SS08ArtTunerPanel, ArtTuner, MoveTemp(Actions));
+    S.PanelRoot = SNew(SBox)
+                      .HAlign(HAlign_Right)
+                      .VAlign(VAlign_Fill)
+                      .Padding(FMargin(0.0f, 12.0f, 12.0f, 12.0f))[SNew(SBox).WidthOverride(480.0f)[S.Panel.ToSharedRef()]];
+    GEngine->GameViewport->AddViewportWidgetContent(S.PanelRoot.ToSharedRef(), 40);
+  }
+  if (!bOpen && S.Panel.IsValid()) S.Panel->Flush();
+  if (S.PanelRoot.IsValid()) S.PanelRoot->SetVisibility(bOpen ? EVisibility::SelfHitTestInvisible : EVisibility::Collapsed);
+  if (!bOpen && FSlateApplication::IsInitialized()) FSlateApplication::Get().SetAllUserFocusToGameViewport();
+  S.bPanelOpen = bOpen && S.Panel.IsValid();
+  FS08Trace::Write(FString::Printf(TEXT("ARTTUNER panel open=%d"), S.bPanelOpen ? 1 : 0));
 }

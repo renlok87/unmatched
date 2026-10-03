@@ -509,6 +509,8 @@ private:
   /** One group (empty = all) back to the profile file's values. */
   void ArtTunerReset(const FString& GroupId);
   void ArtTunerSetPanelOpen(bool bOpen);
+  /** One row back to the profile file's value (the panel's reset arrow). */
+  void ArtTunerResetRow(const FString& RowId);
   TSharedPtr<class FJsonObject> ArtTunerState() const;
   void LiveTuneTuner(const struct FS08LiveCommand& Cmd, struct FS08LiveResult& Result);
   void LiveTuneArtView(const struct FS08LiveCommand& Cmd, struct FS08LiveResult& Result);
