@@ -71,7 +71,11 @@ param(
   # W5b-R: require the pixel provenance line of every published frame (SHOT captured, t53-thresholds shotCaptured).
   [switch]$RequireShotCaptured,
   # Extra client arguments, '+'-separated (diagnostics only, e.g. -dx11+-S08LegacyRender).
-  [string]$ClientExtraArgs = ''
+  [string]$ClientExtraArgs = '',
+  # T4.3 real OS input (tools/s08/t43_real_input.py, RD-5): the HOST window is shown (no -RenderOffScreen) so the
+  # runner can send real mouse / wheel / Space input to it after the evidence shot. The joiner stays offscreen.
+  # Only the idle-gated runner passes this: a visible client takes the foreground on the user's desktop.
+  [switch]$VisibleHost
 )
 
 # W5b-R (t53-thresholds.json shotCaptured): every published frame must carry its pixel provenance line
@@ -465,7 +469,8 @@ function Invoke-Phase2Demo {
   if ($ArtPreviewHeroesV2) { $common += '-ArtPreviewHeroesV2' }
   if ($ArtPreviewDiorama) { $common += '-ArtPreviewDiorama' }
   if ($ClientCsvFrames -gt 0) { $common += @("-csvCaptureFrames=$ClientCsvFrames", '-csvGpuStats') }
-  $hostArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
+  $hostCommon = if ($VisibleHost) { @($common | Where-Object { $_ -ne '-RenderOffScreen' }) } else { $common }
+  $hostArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $hostCommon + @(
     "-S08Auto", "-S08Create",
     "-S08HeroId=$heroA", "-S08Trace=$hostTrace", "-S08Shot=$hostShot",
     "-S08ExitAfter=$RunSeconds")
@@ -783,7 +788,7 @@ function Invoke-Phase2Demo {
         'WS DROPPED', 'WS closed', 'WS reconnect attempt', 'WS reconnected', 'CUE move') 'joiner'
     }
     if ($ArtPreviewBoardId) {
-      $artStatus = [ordered]@{ boardId = $ArtPreviewBoardId; artBoardProfile = $ArtBoard.id; boardSize = $ArtBoardSize; lightProfile = $ArtBoard.light; artFixture = [bool]$ArtBoard.artFixture; multizoneCells = $ArtBoard.expect.multizoneCells; hostAssetsLoaded = $true; joinerAssetsLoaded = $true; hostLiveZones = $ArtBoard.expect.zoneCells; joinerLiveZones = $ArtBoard.expect.zoneCells; hostFocusZoom = $ArtPreviewFocusZoom; medusaVariant = $ArtPreviewMedusaVariant; medusaVariantExplicit = $MedusaVariantExplicit; shotAfterSeconds = $ArtPreviewShotAfter; runSeconds = $RunSeconds; clientFps = $ClientFps; clientPerf = [bool]$ClientPerf; allMedusa = [bool]$ArtPreviewAllMedusa; heroesV2 = [bool]$ArtPreviewHeroesV2; inputPlan = $ArtPreviewInputPlan; iconSize = $ArtPreviewIconSize; iconProbe = [bool]$ArtPreviewIconProbe }
+      $artStatus = [ordered]@{ boardId = $ArtPreviewBoardId; artBoardProfile = $ArtBoard.id; boardSize = $ArtBoardSize; lightProfile = $ArtBoard.light; artFixture = [bool]$ArtBoard.artFixture; multizoneCells = $ArtBoard.expect.multizoneCells; hostAssetsLoaded = $true; joinerAssetsLoaded = $true; hostLiveZones = $ArtBoard.expect.zoneCells; joinerLiveZones = $ArtBoard.expect.zoneCells; hostFocusZoom = $ArtPreviewFocusZoom; medusaVariant = $ArtPreviewMedusaVariant; medusaVariantExplicit = $MedusaVariantExplicit; shotAfterSeconds = $ArtPreviewShotAfter; runSeconds = $RunSeconds; clientFps = $ClientFps; clientPerf = [bool]$ClientPerf; allMedusa = [bool]$ArtPreviewAllMedusa; heroesV2 = [bool]$ArtPreviewHeroesV2; inputPlan = $ArtPreviewInputPlan; iconSize = $ArtPreviewIconSize; iconProbe = [bool]$ArtPreviewIconProbe; visibleHost = [bool]$VisibleHost }
       if ($ArtPreviewDiorama) { $artStatus.diorama = $true }
       if ($ArtBoardMap) { $artStatus.mapImage = $ArtBoard.mapImage.name; $artStatus.spaces = $ArtBoard.expect.spaces; $artStatus.links = $ArtBoard.expect.links; $artStatus.topologyFixture = $ArtBoard.fixture }
       [System.IO.File]::WriteAllText((Join-Path $Script:Staging 'art-preview-status.json'), ($artStatus | ConvertTo-Json), $Utf8NoBom)
