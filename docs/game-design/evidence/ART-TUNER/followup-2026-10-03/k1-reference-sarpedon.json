@@ -1,0 +1,157 @@
+{
+ "schema": "unmatched.bench-reference/1",
+ "map": "sarpedon",
+ "board": "sarpedon-original",
+ "shotAt": "2026-10-03 (UTC 02:5x)",
+ "reason": "the P9b reference (2026-10-02 22:48 UTC) gave 0.59 mean |diff| on K1 even for the old build 09c7d2f9 shot on 2026-10-03 at M6 (gate 0.5, run-to-run noise then 0.42); reshot from the current build for later comparisons",
+ "build": {
+  "commit": "fe12eb7cb242b387c1c1d6d59207cd382db2ce20",
+  "sourceHash": "b436bc76cbe1e221344c3cf340dbc3f89ed48e3fab182651608b6ffbbbf76f9e",
+  "skipBuild": false,
+  "builtAt": "2026-10-03T07:51:08.8834837+05:00"
+ },
+ "profilesSha256": "23e4ebed8a80fd76210ae46553ac32642fda969fa9929c2b6982a03ec8755c6d",
+ "profilesSource": "pak",
+ "renderReference": "render_fingerprint.py check: reference=true on K1, K2x1p6, K2x2p5",
+ "cmdline": "<repo>\\unreal\\Unmatched\\Saved\\StagedBuilds\\Windows\\Unmatched.exe /Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode -windowed -resx=1920 -resy=1080 -ForceRes -RenderOffScreen -nosplash -unattended -NoSound -ArtPreview -ArtPreviewDiorama -ArtPreviewHeroesV2 -Bench -BenchFixture=../../../Unmatched/Config/Bench/S08BenchSarpedon.json -BenchWarmup=60 -BenchSettle=6 -BenchMeasure=3 -BenchOut=<out> -BenchViews=K1+K2x1.6+K2x2.5 -S08Trace=<out>\\bench.trace.log -BenchNoProfileGPU -BenchFps=60 -S08RenderPreset=High -abslog=<out>\\client.log -ExecCmds=DisableAllScreenMessages",
+ "frames": {
+  "bench-K1-1920x1080.png": "c255bc63acd089e678d92b0d7a4cf9c7bc4a0f877caea8638574bb741c38183c",
+  "bench-K2x1p6-1920x1080.png": "2551f3c6205d324670297b4230bee9bcbfbcd710ac8b7e9f0fc74a333cd618de",
+  "bench-K2x2p5-1920x1080.png": "589276e533b8f285e7bd7fecb1089e851690ac1fd8add6d3540a99dee343d58b"
+ },
+ "noiseCompanion": {
+  "dir": "noise/",
+  "frames": {
+   "bench-K1-1920x1080.png": "30fd0ec926fe1ebf737ca169d66280961c16b212d05e78c997caa5ebefe5853f",
+   "bench-K2x1p6-1920x1080.png": "eb2754a73197fd50901b3f0356ea769aabe3d1ccbc97f22a234f474987c93fb5",
+   "bench-K2x2p5-1920x1080.png": "b4a1f9a42d2451a3456e5c748085223b88cccab66d799010041d37310c7c6f76"
+  }
+ },
+ "chosen": "run2 of three fresh runs (the medoid: smallest sum of K1 diffs to the other two); noise/ = run3",
+ "runToRunNoise": {
+  "run2-vs-run1": {
+   "K1": {
+    "meanAbs": 0.3389,
+    "pxOver24Pct": 0.0538
+   },
+   "K2x1p6": {
+    "meanAbs": 0.3868,
+    "pxOver24Pct": 0.1194
+   },
+   "K2x2p5": {
+    "meanAbs": 0.3719,
+    "pxOver24Pct": 0.0026
+   }
+  },
+  "run3-vs-run1": {
+   "K1": {
+    "meanAbs": 0.3428,
+    "pxOver24Pct": 0.0363
+   },
+   "K2x1p6": {
+    "meanAbs": 0.3881,
+    "pxOver24Pct": 0.0737
+   },
+   "K2x2p5": {
+    "meanAbs": 0.3724,
+    "pxOver24Pct": 0.0025
+   }
+  },
+  "run3-vs-run2": {
+   "K1": {
+    "meanAbs": 0.3051,
+    "pxOver24Pct": 0.0522
+   },
+   "K2x1p6": {
+    "meanAbs": 0.3698,
+    "pxOver24Pct": 0.1109
+   },
+   "K2x2p5": {
+    "meanAbs": 0.3481,
+    "pxOver24Pct": 0.0046
+   }
+  }
+ },
+ "controlRun1VsReference": {
+  "K1": {
+   "meanAbs": 0.3389,
+   "pxOver24Pct": 0.0538,
+   "outsideNoise": {
+    "meanAbs": 0.3042,
+    "pxOver24Pct": 0.0001,
+    "maskedPct": 1.051,
+    "pass": true
+   }
+  },
+  "K2x1p6": {
+   "meanAbs": 0.3868,
+   "pxOver24Pct": 0.1194,
+   "outsideNoise": {
+    "meanAbs": 0.3395,
+    "pxOver24Pct": 0.0,
+    "maskedPct": 1.063,
+    "pass": true
+   }
+  },
+  "K2x2p5": {
+   "meanAbs": 0.3719,
+   "pxOver24Pct": 0.0026,
+   "outsideNoise": {
+    "meanAbs": 0.3617,
+    "pxOver24Pct": 0.0007,
+    "maskedPct": 0.782,
+    "pass": true
+   }
+  }
+ },
+ "controlPass": {
+  "plain": false,
+  "outsideNoise": true
+ },
+ "vsOldP9bReference": {
+  "run1-vs-old": {
+   "K1": {
+    "meanAbs": 0.4435,
+    "pxOver24Pct": 0.057
+   },
+   "K2x1p6": {
+    "meanAbs": 0.514,
+    "pxOver24Pct": 0.1202
+   },
+   "K2x2p5": {
+    "meanAbs": 0.4818,
+    "pxOver24Pct": 0.0287
+   }
+  },
+  "run2-vs-old": {
+   "K1": {
+    "meanAbs": 0.3423,
+    "pxOver24Pct": 0.0533
+   },
+   "K2x1p6": {
+    "meanAbs": 0.3981,
+    "pxOver24Pct": 0.0849
+   },
+   "K2x2p5": {
+    "meanAbs": 0.3598,
+    "pxOver24Pct": 0.018
+   }
+  },
+  "run3-vs-old": {
+   "K1": {
+    "meanAbs": 0.4133,
+    "pxOver24Pct": 0.062
+   },
+   "K2x1p6": {
+    "meanAbs": 0.5018,
+    "pxOver24Pct": 0.109
+   },
+   "K2x2p5": {
+    "meanAbs": 0.4705,
+    "pxOver24Pct": 0.0433
+   }
+  }
+ },
+ "howToCompare": "python tools/art/render/live_tune.py compare --a <fresh -Bench dir> --b C:/tmp/envmaps-research/lightcheck/sarpedon --noise C:/tmp/envmaps-research/lightcheck/sarpedon/noise   (gate: passOutsideNoise; the plain pxOver24 <= 0.05 % fails even between two fresh runs on K1/K2x1.6 - fires and water)",
+ "oldReference": "C:/tmp/envmaps-research/lightcheck/sarpedon-p9b-2026-10-02 (kept, unchanged)"
+}

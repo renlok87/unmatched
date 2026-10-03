@@ -785,6 +785,10 @@ def self_check() -> list[str]:
 # ---- CLI ---------------------------------------------------------------------------------------------------------------
 
 def main(argv: list[str] | None = None) -> int:
+    # the tuner rows carry Russian labels and units (×, °): a redirected stdout on a cp1251 console would raise
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--check", action="store_true", help="self-test against a fake client (no UE)")
     ap.add_argument("--root", default=str(ROOT), help="session root (session.json pointer); default C:/tmp/live-tune")
