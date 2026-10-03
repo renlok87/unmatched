@@ -120,8 +120,15 @@ public:
   static FString AutoManeuverPlanFromCommandLine();
   /** Plans RunAutoManeuverPlan knows: "boost3". */
   static bool IsKnownManeuverPlan(const FString& Plan);
-  /** Runs Plan on the open draft (the hero step already carried in by the
-   *  pre-draft), every operation through the draft API with src=auto.
+  /** The driver sends beginManeuver: with a hero step (AutoManeuverTarget)
+   *  always; without one only when a known plan fills the draft (a hero boxed
+   *  in by its own sidekicks - the Cobble 5x6 opening). Without a plan the
+   *  one-step driver keeps waiting, as before. */
+  static bool AutoManeuverBegins(bool bHeroStep, const FString& Plan) {
+    return bHeroStep || IsKnownManeuverPlan(Plan);
+  }
+  /** Runs Plan on the open draft (the hero step carried in by the pre-draft
+   *  when the hero had one), every operation through the draft API, src=auto.
    *  "boost3": (1) the own-hand card with the highest printed BOOST (the first
    *  of equals in hand order; a card already selected with a printed BOOST is
    *  kept) - ToggleBoostCard, five-argument form; (2) own fighters without a

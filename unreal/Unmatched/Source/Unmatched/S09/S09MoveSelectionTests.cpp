@@ -2248,6 +2248,44 @@ bool FS09MoveSelAutoManeuverPlanTest::RunTest(const FString&) {
              Kept.BoostCardId == TEXT("c1") && Line.Contains(TEXT(" boost=c1 value=1 maxRequired=1 ")));
   }
 
+  // ---- a hero boxed in by its own sidekicks (the Cobble 5x6 opening, M1 live run
+  // 2026-10-04): no hero step, the plan begins without a pre-draft and moves 3 sidekicks ----
+  {
+    const FS08BoardModel Cobble = MsGrid(5, 6);
+    FS08BoardFighter Boxed = MsFighter(TEXT("h"), Me, 2, 2, 3.0);
+    Boxed.bIsHero = true;
+    FS08BoardFighter Arthur = MsFighter(TEXT("e"), Opp, 2, 3);
+    Arthur.bIsHero = true;
+    const TArray<FS08BoardFighter> Box = {Boxed, MsFighter(TEXT("s1"), Me, 1, 2, 2.0), MsFighter(TEXT("s2"), Me, 3, 2, 2.0),
+                                          MsFighter(TEXT("s3"), Me, 2, 1, 2.0), Arthur, MsFighter(TEXT("m"), Opp, 3, 3)};
+    FS09CommandUi BoxUi = MsOpen(Turn, Cobble, Box);
+    FString HeroId;
+    FIntPoint Target;
+    const bool bStep = FS09MoveInput::AutoManeuverTarget(BoxUi, Cobble, Box, HeroId, Target);
+    TestFalse(TEXT("boxed: no hero step"), bStep);
+    TestFalse(TEXT("boxed without a plan: the one-step driver keeps waiting"),
+              FS09MoveInput::AutoManeuverBegins(bStep, FString()));
+    TestTrue(TEXT("boxed with boost3: begins"), FS09MoveInput::AutoManeuverBegins(bStep, TEXT("boost3")));
+    TestFalse(TEXT("an unknown plan does not begin"), FS09MoveInput::AutoManeuverBegins(bStep, TEXT("boost2")));
+    TestTrue(TEXT("a hero step always begins"), FS09MoveInput::AutoManeuverBegins(true, FString()));
+    FString Why;
+    TestTrue(TEXT("boxed: begin legal"), BoxUi.CanBeginManeuver(Turn, Why));
+    BoxUi.OnSnapshot(Draft, Cobble, Box);
+    TestTrue(TEXT("boxed: the draft opens empty"), BoxUi.Mode == ES09CommandMode::ManeuverDraft && BoxUi.Moves.Num() == 0);
+    FString Line;
+    TestTrue(TEXT("boxed: boost3 ok"), FS09MoveInput::RunAutoManeuverPlan(TEXT("boost3"), BoxUi, Draft, Cobble, Box, Line));
+    TestTrue(TEXT("boxed: summary"), Line.StartsWith(TEXT("AUTO maneuver plan=boost3 ok=1 moves=3 boost=c3 value=3 maxRequired=3 sidekicks=3 confirmable=1 list=s1@")));
+    if (BoxUi.Moves.Num() == 3) {
+      TestTrue(TEXT("boxed: s1 goes base + boost"), BoxUi.Moves[0].FighterId == TEXT("s1") &&
+                                                       BoxUi.Moves[0].Path.Num() == 5 && BoxUi.Moves[0].RequiredBoost == 3);
+      TestTrue(TEXT("boxed: s2, s3 the nearest"), BoxUi.Moves[1].FighterId == TEXT("s2") && BoxUi.Moves[1].Path.Num() == 1 &&
+                                                     BoxUi.Moves[2].FighterId == TEXT("s3") && BoxUi.Moves[2].Path.Num() == 1);
+    }
+    FS09ManeuverCommand BoxCommand;
+    TestTrue(TEXT("boxed: confirm"), BoxUi.ConfirmManeuver(Draft, Cobble, Box, BoxCommand, Why) &&
+                                         BoxCommand.Moves.Num() == 3 && BoxCommand.BoostCardId == TEXT("c3"));
+  }
+
   // ---- refusals: the summary names them, the draft keeps only Ok moves ----
   {
     FS09CommandUi NoBoost = OpenDriverDraft(Team, MsSnapshot({{TEXT("cn"), false, 0}}, ManeuverA, 5));

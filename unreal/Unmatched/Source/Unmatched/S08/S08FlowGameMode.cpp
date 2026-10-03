@@ -3660,14 +3660,25 @@ void AS08FlowGameMode::RunAutoManeuver() {
   if (CommandUi.Mode != ES09CommandMode::None) return;
   FString HeroId;
   FIntPoint Target;
-  if (!FS09MoveInput::AutoManeuverTarget(CommandUi, BoardModel, Fighters, HeroId, Target)) return;
+  // M1: with -S08ManeuverPlan the hero step is optional - a hero boxed in by
+  // its own sidekicks (the Cobble 5x6 opening) begins without a pre-draft and
+  // the plan fills the draft (sidekicks first). Without the flag: unchanged.
+  const bool bHeroStep = FS09MoveInput::AutoManeuverTarget(CommandUi, BoardModel, Fighters, HeroId, Target);
+  if (!FS09MoveInput::AutoManeuverBegins(bHeroStep, AutoManeuverPlan)) return;
   const FS08Snapshot& Snap = Flow->GetAppliedSnapshot();
-  const ES09InputSource PreviousSource = CommandUi.DraftSource;
-  CommandUi.DraftSource = ES09InputSource::Auto;
-  bool bUnchanged = false;
-  const bool bPreDraft = CommandUi.InspectFighter(HeroId, Snap, BoardModel, Fighters) &&
-                         CommandUi.SetPreDraft(HeroId, Target.X, Target.Y, Snap, BoardModel, Fighters, bUnchanged);
-  CommandUi.DraftSource = PreviousSource;
+  bool bPreDraft = true;
+  if (bHeroStep) {
+    const ES09InputSource PreviousSource = CommandUi.DraftSource;
+    CommandUi.DraftSource = ES09InputSource::Auto;
+    bool bUnchanged = false;
+    bPreDraft = CommandUi.InspectFighter(HeroId, Snap, BoardModel, Fighters) &&
+                CommandUi.SetPreDraft(HeroId, Target.X, Target.Y, Snap, BoardModel, Fighters, bUnchanged);
+    CommandUi.DraftSource = PreviousSource;
+  } else if (!bAutoManeuverNoStepTraced) {
+    bAutoManeuverNoStepTraced = true;
+    FS08Trace::Write(FString::Printf(TEXT("AUTO maneuver plan=%s: the hero has no free step - begin without a pre-draft"),
+                                     *AutoManeuverPlan.ToLower()));
+  }
   FString Reason;
   if (!bPreDraft || !CommandUi.CanBeginManeuver(Snap, Reason) || !Flow->BeginManeuver()) {
     CommandUi.ClearPreDraft();
@@ -3676,8 +3687,9 @@ void AS08FlowGameMode::RunAutoManeuver() {
     return;
   }
   BoardActor->SetSelectedFighter(CommandUi.SelectedFighterId, CommandUi.ReachableCells);
-  Toast = FString::Printf(TEXT("AUTO maneuver: %s -> %s (through the draft)"), *HeroId,
-                          *BoardModel.CellLabel(Target.X, Target.Y));
+  Toast = bHeroStep ? FString::Printf(TEXT("AUTO maneuver: %s -> %s (through the draft)"), *HeroId,
+                                      *BoardModel.CellLabel(Target.X, Target.Y))
+                    : FString::Printf(TEXT("AUTO maneuver: plan %s (through the draft)"), *AutoManeuverPlan.ToLower());
   ToastUntil = Elapsed + 5.0f;
   bAutoManeuverDone = true; // one shot only; WS/HTTP dedupe proven by traces
   bAutoManeuverAwaitDraft = true;

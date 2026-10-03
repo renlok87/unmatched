@@ -605,6 +605,7 @@ private:
   bool bLegacyQuickMove = false;      // -S08LegacyQuickMove: TASK-022 two-click move (MS-R-32)
   bool bAutoManeuverAwaitDraft = false; // -S08Maneuver: confirm once the draft opens (MS-R-62)
   FString AutoManeuverPlan;             // -S08ManeuverPlan=<plan>: run on the opened draft first (M1)
+  bool bAutoManeuverNoStepTraced = false; // M1: "no free hero step" traced once
   FString TracedToast;             // the last toast written to the trace (MS-AT-18)
   int32 ManeuverTargetX = -1;
   int32 ManeuverTargetY = -1;
