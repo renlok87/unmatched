@@ -412,56 +412,64 @@ def g_bolt(ctx, sp: Spec, s=1.0):
     ctx.fill()
 
 
+# Отпечаток левой ноги (внутренняя сторона +x, носок вверх), в долях w × h: широкий скруглённый носок с большим пальцем
+# ближе к внутренней стороне, свод — вогнутость по внутренней стороне, наружный край почти прямой, каблук уже подошвы.
+# Приёмка ART-011 О-1: симметричная капсула + прямоугольный каблук читались парой «!!» — так рисовать нельзя.
+BOOT_FOOT = ((-0.47, -0.28), (-0.34, -0.44), (-0.10, -0.51), (0.16, -0.49), (0.38, -0.40), (0.50, -0.21),
+             (0.44, -0.02), (0.22, 0.16), (0.27, 0.32), (0.17, 0.47), (-0.04, 0.50), (-0.24, 0.46),
+             (-0.35, 0.32), (-0.42, 0.12), (-0.50, -0.10))
+BOOT_CUT = ((0.30, 0.15), (-0.50, 0.26))   # ось зазора подошва / каблук: по своду, внутренний конец выше (как в DE)
+
+
+def _smooth_closed(ctx, pts, tension=0.5):
+    """Замкнутый сплайн Catmull-Rom через точки (кубические Безье, касательные непрерывны)."""
+    n = len(pts)
+    ctx.move_to(*pts[0])
+    for i in range(n):
+        p0, p1, p2, p3 = pts[i - 1], pts[i], pts[(i + 1) % n], pts[(i + 2) % n]
+        c1 = (p1[0] + (p2[0] - p0[0]) * tension / 3, p1[1] + (p2[1] - p0[1]) * tension / 3)
+        c2 = (p2[0] - (p3[0] - p1[0]) * tension / 3, p2[1] - (p3[1] - p1[1]) * tension / 3)
+        ctx.curve_to(*c1, *c2, *p2)
+    ctx.close_path()
+
+
 def _boot(ctx, sp: Spec, w, h, rot=0.0, mirror=1, solid=False):
-    """Отпечаток ботинка как в DE и на карте героя: подошва (широкий скруглённый носок, сужение к подъёму, плоский
-    срез) + отдельный каблук (скруглённый прямоугольник) через зазор ≥ 1 px; solid — без зазора (16 px).
-    Начало — центр отпечатка, носок вверх; mirror −1 — правая нога."""
+    """Отпечаток ботинка как в DE: подошва со сводом и каблук, разделённые диагональным зазором ≥ 1 px по своду
+    (внутренний конец выше); solid — без зазора (16 px). Начало — центр отпечатка, носок вверх; mirror −1 — правая
+    нога. Обе части — одна фигура BOOT_FOOT под клипом полуплоскости (вырез CLEAR задел бы соседний отпечаток)."""
     g = 0.0 if solid else sp.pxu(1.0)
-    heel_h = 0.27 * h
-    sole_bot = h / 2 - heel_h - g
-    r1 = w / 2                              # носок
-    y1 = -h / 2 + r1 * 1.05
-    r2 = 0.36 * w                           # подъём
-    y2 = sole_bot - r2 * 0.55
+    pts = [(x * w, y * h) for x, y in BOOT_FOOT]
+    (ax, ay), (bx, by) = [(x * w, y * h) for x, y in BOOT_CUT]
+    dx, dy = bx - ax, by - ay
+    L = math.hypot(dx, dy)
+    nx, ny = -dy / L, dx / L
+    if ny < 0:                                  # нормаль к каблуку (вниз)
+        nx, ny = -nx, -ny
+    ex, ey = dx / L * 3 * h, dy / L * 3 * h
     ctx.save()
     ctx.scale(mirror, 1)
     ctx.rotate(math.radians(rot))
-    # подошва: оболочка двух окружностей, низ срезан по sole_bot (носок чуть смещён наружу — асимметрия стопы);
-    # срез — клипом одной фигуры (вырез CLEAR задел бы соседний отпечаток в той же группе)
-    ctx.save()
-    ctx.rectangle(-2 * w, -h, 4 * w, sole_bot + h)
-    ctx.clip()
-    ctx.new_sub_path()
-    ctx.save()
-    ctx.translate(-0.06 * w, 0)
-    al = -math.asin((r1 - r2) / (y2 - y1))
-    ctx.move_to(r1 * math.cos(al), y1 + r1 * math.sin(al))
-    ctx.line_to(r2 * math.cos(al), y2 + r2 * math.sin(al))
-    ctx.arc(0, y2, r2, al, math.pi - al)
-    ctx.line_to(r1 * math.cos(math.pi - al), y1 + r1 * math.sin(math.pi - al))
-    ctx.arc(0, y1, r1, math.pi - al, 2 * math.pi + al)
-    ctx.close_path()
-    ctx.restore()
-    ctx.fill()
-    ctx.restore()
-    # каблук
-    hw = 0.36 * w
-    rr = min(0.45 * hw, 0.4 * heel_h)
-    y0, y1h = sole_bot + g, h / 2
-    rect_path = [(-hw, y0), (hw, y0), (hw, y1h), (-hw, y1h)]
-    rounded_polygon(ctx, rect_path, [0.15, 0.15, rr, rr])
-    ctx.fill()
+    for side in ((0,) if solid else (-1, 1)):
+        ctx.save()
+        if side:
+            off, far = side * g / 2, side * 3 * h
+            p0 = (ax + nx * off - ex, ay + ny * off - ey)
+            p1 = (ax + nx * off + ex, ay + ny * off + ey)
+            poly(ctx, [p0, p1, (p1[0] + nx * far, p1[1] + ny * far), (p0[0] + nx * far, p0[1] + ny * far)])
+            ctx.clip()
+        _smooth_closed(ctx, pts)
+        ctx.fill()
+        ctx.restore()
     ctx.restore()
 
 
 def g_boots(ctx, sp: Spec):
-    """Манёвр: два отпечатка ботинка как в DE (левый выше правого, носки чуть врозь); detail 0 — без зазора каблука."""
+    """Манёвр: два отпечатка ботинка как в DE (левый выше правого, носки врозь на 12°); detail 0 — без зазора."""
     solid = sp.detail == 0
-    w, h = (5.4, 13.0) if sp.detail >= 1 else (5.8, 13.0)
-    for dx, dy, m, rot in ((-3.25, -2.2, 1, -6.0), (3.25, 2.2, -1, -6.0)):
+    for dx, dy, m, rot in ((-3.6, -2.0, 1, -12.0), (3.6, 2.0, -1, -12.0)):
         ctx.save()
         ctx.translate(dx, dy)
-        _boot(ctx, sp, w, h, rot=rot, mirror=m, solid=solid)
+        _boot(ctx, sp, 6.4, 13.4, rot=rot, mirror=m, solid=solid)
         ctx.restore()
 
 
@@ -756,11 +764,34 @@ def _signal_bars(sp: Spec, shift=0.0):
     return bars
 
 
+SIGNAL_SIGN = (-7.25, -7.25)   # центр знака связи (= pivot слоя sign в icon-motion.json: 16 + x, 16 + y)
+SIGNAL_BARS_SHIFT = 3.75      # сдвиг столбиков вправо при знаке (= tx «appear_from_online» в icon-motion.json)
+
+
+def _arrow_arc_path(ctx, ra, lw, a0, a1, head_len=0.0, head_hw=0.0):
+    """Круговая стрелка одним замкнутым контуром: полоса дуги ra ± lw/2 от a0 до a1 (рост угла) и наконечник —
+    основание по нормали к дуге в конце (центр — конец дуги), остриё на касательной; без наконечника — срез по
+    нормали. Один контур → keyline обводкой без ступенек на стыке (приёмка ART-011 О-2)."""
+    ro, ri = ra + lw / 2, ra - lw / 2
+    c1, s1 = math.cos(a1), math.sin(a1)
+    ctx.new_sub_path()
+    ctx.arc(0, 0, ro, a0, a1)
+    if head_len > 0:
+        tx, ty = -s1, c1                       # касательная по ходу дуги
+        ctx.line_to((ra + head_hw) * c1, (ra + head_hw) * s1)
+        ctx.line_to(ra * c1 + head_len * tx, ra * s1 + head_len * ty)
+        ctx.line_to((ra - head_hw) * c1, (ra - head_hw) * s1)
+    ctx.line_to(ri * c1, ri * s1)
+    ctx.arc_negative(0, 0, ri, a1, a0)
+    ctx.close_path()
+
+
 def g_signal(ctx, sp: Spec, state="online", angle=0.0, keyline=True, part=None):
-    """Связь: три столбика сигнала (online — card.glyph; reconnecting / lost — text.secondary) + знак слева сверху:
-    круговая стрелка r 4 штрихом W со сплошным наконечником 3 u (reconnecting; detail 0 — дуга 270° без головки)
-    или красный X (lost). Keyline вокруг каждого штриха; знак лежит поверх столбиков с keyline-ореолом."""
-    bars = _signal_bars(sp, shift=0.0 if state == "online" else 2.5)
+    """Связь: три столбика сигнала (online — card.glyph; reconnecting / lost — text.secondary) + знак слева сверху
+    (центр SIGNAL_SIGN): круговая стрелка r 3,8 штрихом W2 с наконечником 3,6 × 3,8 u (reconnecting; при ≤ 24 px — дуга
+    270° без головки) или красный X (lost). Keyline вокруг каждого штриха. Знак (с ореолом) отстоит от ореола
+    столбиков (сдвиг SIGNAL_BARS_SHIFT) ≥ 1 u в мастере и ≥ 1 px при 24 px при любом угле поворота «cycle»."""
+    bars = _signal_bars(sp, shift=0.0 if state == "online" else SIGNAL_BARS_SHIFT)
     col = C["glyph"] if state == "online" else C["dim"]
     if part == "sign":
         bars = []
@@ -773,36 +804,33 @@ def g_signal(ctx, sp: Spec, state="online", angle=0.0, keyline=True, part=None):
         fill(ctx, col)
     if state == "online" or part == "bars":
         return
-    sx_, sy_ = -6.0, -5.0
+    sx_, sy_ = SIGNAL_SIGN
     if state == "lost":
         ctx.save()
         ctx.translate(sx_, sy_)
         g_x(ctx, sp, half=3.25, w=sp.W, col=C["error"], keyline=keyline)
         ctx.restore()
         return
-    ra = 3.6
-    lw = sp.W if sp.detail >= 1 else max(sp.W, 1.0 / sp.k)
+    ra = 3.8
+    lw = sp.W2 if sp.detail >= 1 else max(sp.W2, 1.0 / sp.k)    # тонкий штрих: наконечник шире штриха вдвое
     ctx.save()
     ctx.translate(sx_, sy_)
     ctx.rotate(angle)
-    a0, a1 = math.radians(-225), math.radians(45) if sp.detail == 0 else math.radians(25)
-    head_len, head_hw = 3.2, 2.1
-    for pass_ in ((0, 1) if keyline else (1,)):
-        gk = sp.K if pass_ == 0 else 0
-        ctx.new_sub_path()
-        ctx.arc(0, 0, ra, a0 - (gk / ra if gk else 0), a1)
-        ctx.set_line_width(lw + 2 * gk)
-        ctx.set_line_cap(cairo.LINE_CAP_BUTT)
-        rgb(ctx, C["keyline"] if pass_ == 0 else C["glyph"])
-        ctx.stroke()
-        if sp.detail >= 1:
-            hx_, hy_ = ra * math.cos(a1), ra * math.sin(a1)
-            ctx.save()
-            ctx.translate(hx_, hy_)
-            ctx.rotate(a1 + math.pi / 2)                # ось наконечника — касательная (ведущий конец)
-            poly(ctx, [(-0.3 - gk, -head_hw - gk * 1.3), (-0.3 - gk, head_hw + gk * 1.3), (head_len + gk * 1.4, 0)])
-            fill(ctx, C["keyline"] if pass_ == 0 else C["glyph"])
-            ctx.restore()
+    # поза покоя «↻»: щель справа вверху, головка сверху смотрит вправо, в щель (вращение «cycle» — от этой позы).
+    # Головка — только от 32 px: при ≤ 24 px знак ~7 px и головка читается крючком (приёмка ART-011 О-2) — дуга.
+    if sp.size > 24:
+        a0, a1, head = math.radians(-30), math.radians(255), (3.6, 1.9)
+    else:
+        a0, a1, head = math.radians(-15), math.radians(255), (0.0, 0.0)
+    _arrow_arc_path(ctx, ra, lw, a0, a1, *head)
+    if keyline:
+        ctx.set_line_width(2 * sp.K)
+        ctx.set_line_join(cairo.LINE_JOIN_ROUND)
+        rgb(ctx, C["keyline"])
+        ctx.stroke_preserve()
+        ctx.fill_preserve()
+    rgb(ctx, C["glyph"])
+    ctx.fill()
     ctx.restore()
 
 
@@ -1228,7 +1256,11 @@ def render(name: str, size: int, **kw) -> Image.Image:
 
 
 def render_example(name, size):
-    return render(name, size, **EXAMPLE.get(name, {}))
+    """Образец для листов; при detail 0 (≤ 20 px) число не рисуется (STYLE-v3 §3.2) — и на листе тоже (ART-011 Д-4)."""
+    kw = dict(EXAMPLE.get(name, {}))
+    if Spec(size).detail == 0:
+        kw.pop("text", None)
+    return render(name, size, **kw)
 
 
 # ------------------------------------------------------------------------------------------------ самопроверка

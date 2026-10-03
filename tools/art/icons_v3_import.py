@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import struct
 from pathlib import Path
 
@@ -51,12 +52,24 @@ def png_size(data: bytes) -> tuple[int, int, int]:
 
 def main() -> None:
     tools = u.AssetToolsHelpers.get_asset_tools()
+    # ICONS_V3_ONLY=<id>,<id>: re-import only these icons (and their layers); every other texture keeps its report
+    # entry, which must still match its source (a changed source that is not re-imported fails the run).
+    only = {x.strip() for x in os.environ.get("ICONS_V3_ONLY", "").split(",") if x.strip()}
+    previous = {}
+    if only and REPORT.exists():
+        previous = {e["asset"]: e for e in json.loads(REPORT.read_text(encoding="utf-8"))["textures"]}
     entries = []
     for name in texture_names():
         sub = "layers" if "_" in name else "sizes"
         for size in SIZES:
             source = ICONS / sub / f"{name}-{size}.png"
             data = source.read_bytes()
+            if only and name.split("_")[0] not in only:
+                old = previous.get(f"{DEST}/T_IV3_{name.replace('-', '_')}_{size}")
+                if not old or old["sourceSha256"] != hashlib.sha256(data).hexdigest():
+                    raise RuntimeError(f"{source.name}: source changed but not in ICONS_V3_ONLY")
+                entries.append(old)
+                continue
             width, height, color_type = png_size(data)
             if height != size or width not in (size, 2 * size) or color_type != 6:
                 raise RuntimeError(f"{source.name}: expected {size}px RGBA, got {width}x{height} type={color_type}")
@@ -95,7 +108,7 @@ def main() -> None:
         "count": len(entries),
         "textures": entries,
     }, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
-    u.log(f"ICONS_V3_IMPORT_PASS textures={len(entries)} dest={DEST}")
+    u.log(f"ICONS_V3_IMPORT_PASS textures={len(entries)} reimported={'all' if not only else ','.join(sorted(only))} dest={DEST}")
 
 
 main()

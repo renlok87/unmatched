@@ -100,7 +100,7 @@
 | `resource-connection-reconnecting` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
 | `resource-connection-reconnecting` | cycle | loop | 1200 | 0 | sign.rotate — круговая стрелка вращается, столбики стоят | статично |
 | `resource-connection-lost` | appear | enter | 180 | 110 | bars.opacity; sign.scale — связи нет с самого начала: приглушённые столбики проявляются, красный X «штампуется» (удар 110) | bars.opacity; sign.opacity 100 мс |
-| `resource-connection-lost` | appear_from_online | enter | 180 | 110 | bars.opacity; bars.tx; from.opacity; from.tx; sign.scale — связь пропала во время игры (вместо online): столбики online уезжают вправо на место приглушённых и гаснут, X «штампуется», без мигания | bars.opacity; from.opacity; sign.opacity 100 мс |
+| `resource-connection-lost` | appear_from_online | enter | 180 | 110 | bars.opacity; bars.tx; from.opacity; from.tx; sign.scale — связь пропала во время игры (вместо online): столбики online уезжают вправо (3,75 u) на место приглушённых и гаснут, X «штампуется», без мигания | bars.opacity; from.opacity; sign.opacity 100 мс |
 | `resource-connection-lost` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
 | `resource-hp-full` | appear | enter | 180 | — | all.opacity; all.scale — «кладут на стол»: 0,80 → 1,04 → 1,00; кадр 0 не пустой (opacity 0,15) | all.opacity 100 мс |
 | `resource-hp-full` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |

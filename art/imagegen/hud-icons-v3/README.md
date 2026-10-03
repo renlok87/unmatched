@@ -39,7 +39,7 @@ python art/imagegen/hud-icons-v3/_tools/draw_icons.py
 | Слои для анимации (тело, глиф, блок команды) | `layers/<id>_{body,glyph,team}[-size].png` |
 | Варианты того же id | `resource-hp-full-enemy` (чужое сердце), `marker-status-p1` / `-p2` (превью цвета команды) |
 | Листы | `sheets/sheet-masters.png`, `sheet-sizes.png`, `sheet-context-panel.png`, `compare-v2-v3.png` |
-| Движение (прототип) | `sheets/motion/frames-*.png`, `*.gif`, `frames-transitions.png` |
+| Движение (эталон контракта) | `sheets/motion/frames-*.png`, `*.gif`, `reel.mp4`, `index.html` |
 | Метрики самопроверки | `sheets/audit.json`: поле, мусор по краю, симметрия, центроиды, масса глифа, швы |
 | Хэши | `manifest.json` (sha1 мастеров, размеров и слоёв) |
 

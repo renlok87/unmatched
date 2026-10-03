@@ -270,7 +270,7 @@ ICONS = {
         "demo": [["appear"], ["wait", 800], ["leave"]]},
     "resource-connection-reconnecting": {
         "canvas_u": [32, 32], "layers": [layer("bars", "resource-connection-reconnecting_bars"),
-                                         layer("sign", "resource-connection-reconnecting_sign", pivot=(10, 11))],
+                                         layer("sign", "resource-connection-reconnecting_sign", pivot=(8.75, 8.75))],
         "anims": {"appear": APPEAR_FADE, "leave": LEAVE,
                   "cycle": {"kind": "loop", "duration_ms": 1200, "beat_ms": 0, "tracks": [
                       {"target": "sign", "prop": "rotate", "keys": [[0, 0.0, "linear"], [1200, 360.0, "constant"]]}],
@@ -279,7 +279,7 @@ ICONS = {
     "resource-connection-lost": {
         "canvas_u": [32, 32], "layers": [layer("from", "resource-connection-online", rest={"opacity": 0.0}),
                                          layer("bars", "resource-connection-lost_bars"),
-                                         layer("sign", "resource-connection-lost_sign", pivot=(10, 11))],
+                                         layer("sign", "resource-connection-lost_sign", pivot=(8.75, 8.75))],
         "anims": {"appear": {"kind": "enter", "duration_ms": 180, "beat_ms": 110, "tracks": [
             {"target": "bars", "prop": "opacity", "keys": [[0, 0.15, "ease_out_quad"], [150, 1.0, "constant"]]},
             {"target": "sign", "prop": "scale", "keys": [[0, 0.0, "ease_out_cubic"], [110, 1.08, "ease_in_quad"], [180, 1.0, "constant"]]}],
@@ -289,15 +289,15 @@ ICONS = {
             "note": "связи нет с самого начала: приглушённые столбики проявляются, красный X «штампуется» (удар 110)"},
             "appear_from_online": {"kind": "enter", "duration_ms": 180, "beat_ms": 110, "tracks": [
             {"target": "from", "prop": "opacity", "keys": [[0, 1.0, "ease_in_quad"], [150, 0.0, "constant"]]},
-            {"target": "from", "prop": "tx", "keys": [[0, 0.0, "ease_out_cubic"], [150, 2.5, "constant"]]},
+            {"target": "from", "prop": "tx", "keys": [[0, 0.0, "ease_out_cubic"], [150, 3.75, "constant"]]},
             {"target": "bars", "prop": "opacity", "keys": [[0, 0.0, "ease_in_quad"], [150, 1.0, "constant"]]},
-            {"target": "bars", "prop": "tx", "keys": [[0, -2.5, "ease_out_cubic"], [150, 0.0, "constant"]]},
+            {"target": "bars", "prop": "tx", "keys": [[0, -3.75, "ease_out_cubic"], [150, 0.0, "constant"]]},
             {"target": "sign", "prop": "scale", "keys": [[0, 0.0, "ease_out_cubic"], [110, 1.08, "ease_in_quad"], [180, 1.0, "constant"]]}],
             "reduced": {"duration_ms": 100, "tracks": [
                 {"target": "from", "prop": "opacity", "keys": [[0, 1.0, "linear"], [50, 0.0, "constant"]]},
                 {"target": "bars", "prop": "opacity", "keys": [[0, 0.0, "constant"], [50, 0.0, "linear"], [100, 1.0, "constant"]]},
                 {"target": "sign", "prop": "opacity", "keys": [[0, 0.0, "constant"], [50, 0.0, "linear"], [100, 1.0, "constant"]]}]},
-            "note": "связь пропала во время игры (вместо online): столбики online уезжают вправо на место приглушённых и гаснут, X «штампуется», без мигания"},
+            "note": "связь пропала во время игры (вместо online): столбики online уезжают вправо (3,75 u) на место приглушённых и гаснут, X «штампуется», без мигания"},
             "leave": LEAVE},
         "demo": [["appear_from_online"], ["wait", 800], ["leave"], ["wait", 300], ["appear"], ["wait", 600], ["leave"]]},
     "resource-hp-full": {
@@ -340,7 +340,7 @@ def contract():
     assert list(ICONS) == ORDER or set(ICONS) == set(ORDER), sorted(set(ORDER) ^ set(ICONS))
     return {
         "schema": "unmatched.icon-motion/1",
-        "revision": "icon-motion-2026-10-03",
+        "revision": "icon-motion-2026-10-03b",   # b: ART-011 О-2 — знак связи (pivot 8,75; 8,75), сдвиг столбиков 3,75
         "status": "предложено",
         "source": "docs/unreal/contracts/hud/ICON-MOTION-PLAN.md; art/imagegen/hud-icons-v3/STYLE-v3.md §7; генератор art/imagegen/hud-icons-v3/_tools/motion_contract.py",
         "units": {"t": "ms", "canvas": "u (32 u = сторона значка; плашки 64 × 32)", "tx/ty": "u", "rotate": "градусы по часовой",
