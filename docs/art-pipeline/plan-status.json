@@ -2128,13 +2128,14 @@
         "art/imagegen/hud-icons-v3/sheets/sheet-masters.png",
         "art/imagegen/hud-icons-v3/sheets/compare-v2-v3.png",
         "art/imagegen/hud-icons-v3/sheets/sheet-sizes.png",
-        "art/imagegen/hud-icons-v3/_tools/draw_icons.py"
+        "art/imagegen/hud-icons-v3/_tools/draw_icons.py",
+        "docs/game-design/evidence/ART-011/hud-icons-v3-2026-10-03/README.md"
       ],
-      "next": "Арт-приёмка пользователя (ART-011): значки v3 — ПРЕДЛОЖЕНИЕ; после неё — штатный жетон цели v3 (сейчас за флагом -S08IconMotion).",
+      "next": "Сравнение UE-галереи для action-maneuver / reconnecting / lost (порог в акте); жетон цели v3 по умолчанию после живого боя (РД-1).",
       "blocker": null,
       "assets": [],
       "updated": "2026-10-03T12:14:00Z",
-      "note": "Коммит 496b38e2. Пользователь отверг v2 («криво», «топорно») и выбрал основой Digital Edition. Концепция — workflow Fable xhigh (аудит v2, три направления, судья), исследование DE (скриншоты и трейлер Steam, 18 источников), сборка, независимое ревью и правки. Восемь правок основной сессии (STYLE-v3 §10): отпечатки ботинок, колючая звезда атаки, якорь вместо ядра на цепи, красная кромка сердец, эллипс-клетка, раздвинутый знак связи. Новый токен state.pending (бирюза, «можно выбрать»), И-3/И-4/И-6/И-10 пересмотрены."
+      "note": "Коммит 496b38e2. Пользователь отверг v2 («криво», «топорно») и выбрал основой Digital Edition. Концепция — workflow Fable xhigh (аудит v2, три направления, судья), исследование DE (скриншоты и трейлер Steam, 18 источников), сборка, независимое ревью и правки. Восемь правок основной сессии (STYLE-v3 §10): отпечатки ботинок, колючая звезда атаки, якорь вместо ядра на цепи, красная кромка сердец, эллипс-клетка, раздвинутый знак связи. Новый токен state.pending (бирюза, «можно выбрать»), И-3/И-4/И-6/И-10 пересмотрены. 2026-10-03 ART-011: панель 1 — доработать (2 глифа + документы), правки 444c1cc6, панель 2 — ПРИНЯТЬ: принято по делегированию (без личного просмотра пользователя); акт docs/game-design/evidence/ART-011/hud-icons-v3-2026-10-03/README.md."
     },
     {
       "id": "HUD-FONT",
@@ -2173,13 +2174,14 @@
         "docs/game-design/evidence/ICON-MOTION/2026-10-03/automation-2026-10-03.txt",
         "art/imagegen/hud-icons-v3/sheets/motion/index.html",
         "art/imagegen/hud-icons-v3/sheets/motion/reel.mp4",
-        "art/imagegen/hud-icons-v3/ue-import-report.json"
+        "art/imagegen/hud-icons-v3/ue-import-report.json",
+        "docs/game-design/evidence/ART-011/hud-icons-v3-2026-10-03/README.md"
       ],
       "next": "Живой бой жетона цели: упакованный клиент и tools/s08/run-phase2-demo.ps1 -ArtPreviewIconProbe -ClientExtraArgs \"-S08IconMotion\"; звук на удары (beat_ms); состояния подбора хода V-02..V-16 — через API US08AnimatedIconWidget (MS-T).",
       "blocker": null,
       "assets": [],
       "updated": "2026-10-03T12:14:00Z",
-      "note": "Коммиты a5916c05 (контракт icon-motion.json + раскадровка, вычислитель и эталонный рендер: листы, GIF, ролики), 1730044f (S08IconMotion — порт вычислителя, US08AnimatedIconWidget без WBP, -S08IconGallery со съёмкой по времени, 264 текстуры T_IV3_* в /Game/S08/UI/IconsV3, жетон цели за -S08IconMotion), 11d4947e (ревью Fable: 21 замечание — уход после удержания затухает, семантика событий, честный замер). Факт: голден 3646 поз, 0 расхождений; UE против эталона — средняя |Δ| 0,45 (64 px) / 0,81 (32 px) / 0,02 (reduced), два прогона совпали до пикселя; +0,23–0,24 мс GT в медиане за 23 анимирующихся значка (редакторская сборка); UE 33/33, pytest 16/16."
+      "note": "Коммиты a5916c05 (контракт icon-motion.json + раскадровка, вычислитель и эталонный рендер: листы, GIF, ролики), 1730044f (S08IconMotion — порт вычислителя, US08AnimatedIconWidget без WBP, -S08IconGallery со съёмкой по времени, 264 текстуры T_IV3_* в /Game/S08/UI/IconsV3, жетон цели за -S08IconMotion), 11d4947e (ревью Fable: 21 замечание — уход после удержания затухает, семантика событий, честный замер). Факт: голден 3646 поз, 0 расхождений; UE против эталона — средняя |Δ| 0,45 (64 px) / 0,81 (32 px) / 0,02 (reduced), два прогона совпали до пикселя; +0,23–0,24 мс GT в медиане за 23 анимирующихся значка (редакторская сборка); UE 33/33, pytest 16/16. 2026-10-03: контракт icon-motion-2026-10-03b (знак связи, ART-011 О-2); движение принято по делегированию (акт ART-011)."
     },
     {
       "id": "MOVE-SEL-PLAN",
