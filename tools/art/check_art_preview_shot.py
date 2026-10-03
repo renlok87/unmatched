@@ -1,4 +1,4 @@
-"""Conservative pixel gate for a live Cobble art-review screenshot.
+"""Conservative pixel gate for a live art-review screenshot (an original map since 2026-10-04, real boards only).
 
 Geometry/zone count and authoritative state are checked separately in the
 client traces. This gate only rejects empty, unlit, missing-HUD and
@@ -6,11 +6,10 @@ wrong-resolution captures; it does not approve K1 readability by itself.
 
     python check_art_preview_shot.py <png> [--min-board-lit F]
 
---min-board-lit (default 0.75, the Cobble value) is the lit fraction the board
-box needs. Boards with obstacle cells draw them as intentional dark voids
-(T3.2 'tiles' surface); since the W4-A render (DX12 + Lumen, fixed exposure)
-those voids read black, so run-phase2-demo passes 0.75 x the registered
-passable-cell fraction for such boards (T4.2, 2026-09-29).
+--min-board-lit (default 0.75, set on the retired Cobble board; run-phase2-demo passes
+0.75 for the original maps) is the lit fraction the board box needs. Grid boards with
+obstacle cells drew them as intentional dark voids (T3.2 'tiles' surface), so the demo
+used to pass 0.75 x the passable-cell fraction for them (T4.2, 2026-09-29).
 """
 import json
 import statistics

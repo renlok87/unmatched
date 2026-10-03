@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Stage 3 T5.2 «Арт 3 живьём»: K3 packaged pairs + QA-010 derivatives on three boards.
+"""HISTORICAL (2026-10-04): kept as the record of stage 3 T5.2; not rebased. Its board set (Cobble City 5x6 and the
+ART FIXTURE Sherwood Forest / T. Rex Paddock grids) left the client data and the DB on 2026-10-04 (user decision «Давай
+оставим только доски, которые осуществлены на реальных досках из игры.»,
+docs/game-design/decisions/2026-10-04-real-boards-only.md), so new runs of `k3` / `analyze` on those boards are refused
+by the demo scripts and do not count as evidence (НД-6). New work uses the original maps (Marmoreal, Sarpedon).
+
+Stage 3 T5.2 «Арт 3 живьём»: K3 packaged pairs + QA-010 derivatives on three boards.
 
 Runs in the art worktree against ONE packaged build (the G/P records of
 art004_live_k2.py build/package) and the art-worktree backend on :3120.

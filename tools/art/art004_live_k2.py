@@ -79,8 +79,11 @@ PACKAGE = REPO / "tools" / "s08" / "package-client.ps1"
 # 5c-B2: the demo accounts (S08_DEMO_*) live in the .env of the checkout whose backend serves :3120.
 # The main checkout's backend/.env has none, so UNMATCHED_BACKEND_ENV may point at that file (read only).
 BACKEND_ENV = Path(os.environ.get("UNMATCHED_BACKEND_ENV") or (REPO / "backend" / ".env"))
-REVIEW_BOARD_ID = "cmuhgs4b2001mwik4f2b2xtf8"  # Board row of the 5x6 Cobble review board
-# T3.2: every art board (Cobble + the art fixtures) is registered in the client's own data file;
+# 2026-10-04 (docs/game-design/decisions/2026-10-04-real-boards-only.md): only boards made from real game maps count;
+# the default review board is Marmoreal · original map (registry entry marmoreal-original). The former default, the
+# Cobble 5x6 review board cmuhgs4b2001mwik4f2b2xtf8, is gone from the client data and the DB; its runs are history.
+REVIEW_BOARD_ID = "c121b47f8d6eb28daccb76d05"  # Board row of Marmoreal · original map
+# T3.2: every art board is registered in the client's own data file (the two original maps since 2026-10-04);
 # run accepts exactly the Board row ids listed there (boards[].match.boardIds).
 ART_BOARDS = PROJECT_DIR / "Config" / "ArtBoards" / "S08ArtBoardProfiles.json"
 

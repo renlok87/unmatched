@@ -21,7 +21,7 @@ python tools/art/render/live_tune.py reload [--profiles <json>] [--env-dir <dir>
 python tools/art/render/live_tune.py shot --views K1 --out <dir> [--settle 6] [--live] [--clock free] [--no-fresh]
 python tools/art/render/live_tune.py state
 python tools/art/render/live_tune.py stop
-python tools/art/render/live_tune.py bench --map cobble --views K1+K2x1.6+K2x2.5 --out <dir>   # свежий -Bench
+python tools/art/render/live_tune.py bench --map marmoreal --views K1+K2x1.6+K2x2.5 --out <dir>   # свежий -Bench
 python tools/art/render/live_tune.py compare --a <bench run> --b <live run> --noise <второй bench run>
 python tools/art/render/live_tune.py --check        # самопроверка на фейковом клиенте (без UE)
 ```
@@ -79,6 +79,9 @@ python tools/art/render/live_tune.py --check        # самопроверка �
 |---|---|---|---|---|
 | Sarpedon | 0,45 / 0,015 % / вне шума 0 % | 0,49 / 0,114 % / 0,0002 % | 0,45 / 0,006 % / 0,0001 % | 0,33 / 0,063 %; 0,36 / 0,114 %; 0,36 / 0,002 % |
 | Cobble | 0,39 / 0,003 % / 0,0003 % | 0,51 / 0,003 % / 0,0001 % | **0,72** / 0,008 % / 0,0004 % | 0,24 / 0,003 %; 0,38 / 0,002 %; 0,48 / 0,008 % |
+
+Замеры 2026-10-02. Доска Cobble с 2026-10-04 убрана (только настоящие карты: `--map sarpedon|marmoreal`); её строка —
+история замера.
 
 - Вне маски шума бенча доля пикселей > 24 на всех видах обеих карт ≤ 0,0004 %. RENDER `reference=1` на всех кадрах.
 - Без маски Sarpedon K2x1,6 даёт 0,11 %. Это шум огня и воды: столько же между двумя свежими бенчами.
