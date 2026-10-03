@@ -1659,7 +1659,9 @@ export class GameActionExecutorService {
   }
 
   /**
-   * Создаёт начальное состояние игры
+   * Создаёт начальное состояние игры.
+   * Только для спеков (сетка 20×20 — тестовая геометрия): живой старт игры строит
+   * состояние в GameInitializationService на реальной доске (НД-2).
    */
   async createInitialState(params: InitialGameStateParams): Promise<GameState> {
     const { gameId, players, boardId } = params;

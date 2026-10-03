@@ -1,6 +1,7 @@
 import { GameInitializationService } from './game-initialization.service';
 import { DeckManagementService } from '../../game-engine/services/deck-management.service';
 import { GameStateService } from '../game-state.service';
+import { marmorealBoardRow } from '../../test/fixtures/real-board';
 
 describe('physical card instance identity', () => {
   it('keeps repeated cards unique across mirror decks, initial hands, draws and private views', async () => {
@@ -9,7 +10,9 @@ describe('physical card instance identity', () => {
       nameRu: 'Repeated Scheme', cardType: 'SCHEME', count: 6, effects: [],
     };
     const prisma = {
-      game: { findUnique: jest.fn().mockResolvedValue({ boardId: null }) },
+      // НД-2: the game starts on a real board (the default one), never on an empty 20x20 grid
+      game: { findUnique: jest.fn().mockResolvedValue({ boardId: marmorealBoardRow().id }) },
+      board: { findUnique: jest.fn().mockResolvedValue(marmorealBoardRow()) },
       gamePlayer: { findMany: jest.fn().mockResolvedValue([
         { userId: 'first', heroId: 'shared-hero', seatOrder: 0 },
         { userId: 'second', heroId: 'shared-hero', seatOrder: 1 },

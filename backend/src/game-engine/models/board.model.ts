@@ -90,9 +90,10 @@ export interface Door {
 }
 
 /**
- * Создаёт пустое состояние доски
+ * Создаёт пустое состояние доски заданного размера (размер обязателен: пустая сетка 20×20
+ * больше не подставляется вместо доски игры, НД-2). Нужна тестам и легаси-чтению старых сейвов.
  */
-export function createEmptyBoardState(width: number = 20, height: number = 20): BoardState {
+export function createEmptyBoardState(width: number, height: number): BoardState {
   // Создаём сетку клеток
   const cells: Cell[][] = [];
   for (let y = 0; y < height; y++) {

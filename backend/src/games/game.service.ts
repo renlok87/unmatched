@@ -16,6 +16,7 @@ import { GameActionType } from './models/game-action.model';
 import { GameStatus, GameMode } from './dto';
 import { GameResponse } from './models';
 import { GameAccessDeniedException, MaxActiveGamesException } from './exceptions/game.exceptions';
+import { DEFAULT_BOARD_ID, DEFAULT_BOARD_NAME } from './default-board';
 import * as crypto from 'node:crypto';
 
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -110,13 +111,20 @@ export class GameService {
       throw new MaxActiveGamesException(activeGamesCount, this.MAX_ACTIVE_GAMES);
     }
 
-    // Получаем дефолтную доску, если не указана
-    let boardId = dto.boardId;
-    if (!boardId) {
-      const defaultBoard = await this.prisma.board.findFirst({
-        orderBy: { createdAt: 'asc' },
-      });
-      boardId = defaultBoard?.id || 'default';
+    // НД-1: без boardId — Marmoreal · original map; доска обязана существовать
+    // (у Game.boardId нет внешнего ключа — несуществующий id стал бы игрой без доски)
+    const boardId = dto.boardId || DEFAULT_BOARD_ID;
+    const board = await this.prisma.board.findUnique({
+      where: { id: boardId },
+      select: { id: true },
+    });
+    if (!board) {
+      throw new BadRequestException(
+        dto.boardId
+          ? `Доска ${boardId} не найдена`
+          : `Доска по умолчанию «${DEFAULT_BOARD_NAME}» (${DEFAULT_BOARD_ID}) отсутствует в БД: ` +
+            'засейте её prisma/seed-env-map-boards.ts',
+      );
     }
 
     // Генерируем уникальный код для приглашения

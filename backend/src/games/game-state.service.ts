@@ -678,7 +678,10 @@ export class GameStateService {
     }
 
     // Легаси-состояния могли быть сохранены без cells/w/h, а engine-BoardState
-    // требует их обязательно — fallback на пустую сетку 20×20
+    // требует их обязательно — fallback на пустую сетку 20×20. Это только ЧТЕНИЕ
+    // старых сейвов, новые игры без доски не стартуют (НД-2). Путь оставлен: в основной
+    // БД на 2026-10-04 такой сейв есть у 3 строк GameState (игры ABORTED от 2026-06-11,
+    // b = {dr, fg, tk} без cells/w/h). Нет таких строк — путь можно удалить.
     const hasCells = Array.isArray(data.b?.cells) && data.b.cells.length > 0;
     const fallbackBoard = hasCells ? null : createEmptyBoardState(20, 20);
 
@@ -959,7 +962,9 @@ export class GameStateService {
   }
 
   /**
-   * Создать начальное состояние игры
+   * Создать начальное состояние игры.
+   * Только для спеков (сетка 20×20 — тестовая геометрия): живой старт игры строит
+   * состояние в GameInitializationService на реальной доске (НД-2).
    */
   async createInitialState(gameId: string, playerIds: string[]): Promise<GameState> {
     const players = await this.prisma.gamePlayer.findMany({

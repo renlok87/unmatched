@@ -23,6 +23,7 @@ import { GamePhase } from '../../game-engine/models';
 import { getCellZones, getFighterAttackType, getFighterMovement } from '../../game-engine/models';
 import { bannerAllows } from '../../game-engine/validators/game-rules.validator';
 import { s03Engine } from '../../test/fixtures/s03-engine.fixture';
+import { marmorealBoardRow } from '../../test/fixtures/real-board';
 import type { Fighter, PendingEffect } from '../../game-engine/models';
 
 const root = resolve(__dirname, '../../../..');
@@ -535,7 +536,9 @@ describe('S09: card instance id uniqueness across zones in full driven duels', (
       nameRu: 'A Momentary Glance', cardType: 'SCHEME', count: 2, effects: [],
     };
     const prisma = {
-      game: { findUnique: jest.fn().mockResolvedValue({ boardId: null }) },
+      // НД-2: the game starts on a real board (the default one), never on an empty 20x20 grid
+      game: { findUnique: jest.fn().mockResolvedValue({ boardId: marmorealBoardRow().id }) },
+      board: { findUnique: jest.fn().mockResolvedValue(marmorealBoardRow()) },
       gamePlayer: { findMany: jest.fn().mockResolvedValue([
         { userId: 'first', heroId: 'glance-hero', seatOrder: 0 },
         { userId: 'second', heroId: 'other-hero', seatOrder: 1 },

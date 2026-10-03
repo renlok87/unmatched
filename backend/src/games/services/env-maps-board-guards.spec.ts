@@ -14,11 +14,12 @@ import {
 
 type BoardRow = { id: string; createdAt: Date; cells: unknown; features: unknown };
 
-const cobble: BoardRow = {
-  id: 'cobble',
+/** A web-catalog board (grid cells, no links), e.g. one of the imported real maps */
+const catalog: BoardRow = {
+  id: 'catalog',
   createdAt: new Date('2025-01-01T00:00:00Z'),
   cells: [{ x: 0, y: 0, zones: ['blue'] }],
-  features: null,
+  features: { mapKey: 'hells-kitchen' },
 };
 const topologyRows = fixtureFiles().map((file) => {
   const { fixture, sha256 } = loadTopologyFixture(file);
@@ -53,18 +54,19 @@ function defaultBoardId(prisma: ReturnType<typeof prismaWith>): Promise<string> 
   return (svc as unknown as { getDefaultBoardId(): Promise<string> }).getDefaultBoardId();
 }
 
-describe('ENV-MAPS guards: matchmaking default board', () => {
-  it('uses the oldest board like GameService.createGame, not the heap order', async () => {
-    await expect(defaultBoardId(prismaWith([marmoreal, cobble]))).resolves.toBe('cobble');
+describe('ENV-MAPS guards: matchmaking board (web catalog only)', () => {
+  it('uses the oldest catalog board, not the heap order', async () => {
+    await expect(defaultBoardId(prismaWith([marmoreal, catalog]))).resolves.toBe('catalog');
   });
 
   it('never picks a topology board, even when it is the oldest one', async () => {
     const olderTopology = { ...marmoreal, createdAt: new Date('2024-01-01T00:00:00Z') };
-    await expect(defaultBoardId(prismaWith([olderTopology, cobble]))).resolves.toBe('cobble');
+    await expect(defaultBoardId(prismaWith([olderTopology, catalog]))).resolves.toBe('catalog');
   });
 
-  it('falls back to the placeholder id when only topology boards exist', async () => {
-    await expect(defaultBoardId(prismaWith([marmoreal]))).resolves.toBe('default-board');
+  it('throws when no catalog board exists (no placeholder board id)', async () => {
+    await expect(defaultBoardId(prismaWith([marmoreal]))).rejects.toThrow('No catalog board');
+    await expect(defaultBoardId(prismaWith([]))).rejects.toThrow('No catalog board');
   });
 });
 
@@ -80,8 +82,8 @@ describe('ENV-MAPS guards: backfill-board-cells never overwrites a topology boar
   });
 
   it('leaves grid boards to the backfill', () => {
-    expect(isTopologyBoard(cobble)).toBe(false);
-    expect(isTopologyBoard({ cells: [], features: { mapKey: 'cobble-city' } })).toBe(false);
+    expect(isTopologyBoard(catalog)).toBe(false);
+    expect(isTopologyBoard({ cells: [], features: { mapKey: 'hells-kitchen' } })).toBe(false);
     expect(isTopologyBoard({ cells: null, features: undefined })).toBe(false);
   });
 

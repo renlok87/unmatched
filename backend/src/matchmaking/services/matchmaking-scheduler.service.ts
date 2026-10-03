@@ -247,10 +247,11 @@ export class MatchmakingSchedulerService implements OnModuleInit, OnModuleDestro
   }
 
   /**
-   * Получить ID доски по умолчанию: та же доска, что у GameService.createGame
-   * (самая старая по createdAt). Доски с топологией оригинальной карты
-   * (ENV-MAPS, cells с links) играются только UE-клиентом — дефолтом матчмейкинга
-   * они не становятся (web-клиент такую игру не отрисует).
+   * Доска матча: самая старая по createdAt доска веб-каталога. Матчмейкингом
+   * пользуется только web-клиент, а он не рисует доски с топологией оригинальной
+   * карты (ENV-MAPS, cells с links) — поэтому здесь не доска по умолчанию
+   * GameService.createGame (Marmoreal · original map, НД-1), а каталог.
+   * Нет ни одной доски каталога — ошибка, матч не создаётся.
    */
   private async getDefaultBoardId(): Promise<string> {
     const boards = await this.prisma.board.findMany({
@@ -258,7 +259,10 @@ export class MatchmakingSchedulerService implements OnModuleInit, OnModuleDestro
       select: { id: true, cells: true },
     });
     const board = boards.find((b) => !boardCellsHaveTopology(b.cells));
-    return board?.id || 'default-board';
+    if (!board) {
+      throw new Error('No catalog board (a board without topology) for a matchmaking game');
+    }
+    return board.id;
   }
 
   /**

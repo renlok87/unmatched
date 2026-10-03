@@ -28,7 +28,6 @@ import {
   ACTIONS_PER_TURN,
   CardType,
   FighterType,
-  createEmptyBoardState,
   getCellZones,
   normalizeAttackType,
   normalizeCardEffects,
@@ -42,8 +41,6 @@ import type { Board } from '@prisma/client';
 const STARTING_HAND_SIZE = 5;
 const MAX_HAND_SIZE = 7;
 
-/** Размеры fallback-сетки (поведение до фикса геометрии) */
-const FALLBACK_BOARD_SIZE = 20;
 /** Sanity-границы сетки: отсекают пиксельные координаты (картинки 400×230 и т.п.) */
 const MIN_GRID_SIZE = 2;
 const MAX_GRID_SIZE = 50;
@@ -85,7 +82,7 @@ export class GameInitializationService {
    * Вызывается из startGame после перевода статуса в IN_PROGRESS.
    */
   async initializeGameState(gameId: string): Promise<GameState> {
-    // --- Доска: реальная геометрия из БД (Board.cells), fallback — пустая 20×20 ---
+    // --- Доска: реальная геометрия из БД (Board.cells); без годной доски игра не стартует (НД-2) ---
     const game = await this.prisma.game.findUnique({
       where: { id: gameId },
       select: { boardId: true },
@@ -93,7 +90,7 @@ export class GameInitializationService {
     const board = game?.boardId
       ? await this.prisma.board.findUnique({ where: { id: game.boardId } })
       : null;
-    const boardState = this.buildBoardState(board);
+    const boardState = this.buildBoardState(board, game?.boardId);
 
     const players = await this.prisma.gamePlayer.findMany({
       where: { gameId },
@@ -280,7 +277,7 @@ export class GameInitializationService {
       decks,
       discardPiles,
       handZones,
-      // Реальная геометрия доски из БД (или fallback-сетка 20×20) —
+      // Реальная геометрия доски из БД (без годной доски старт не проходит) —
       // game-engine (movement/adjacency) читает cells[y][x]
       boardState,
       metadata: {
@@ -368,8 +365,9 @@ export class GameInitializationService {
    *
    * Ожидаемый формат данных: плоский массив [{x, y, isObstacle?, zones?: string[]}, ...]
    * в grid-координатах. Любая невалидность (нет доски, cells=[], кривой JSON,
-   * пиксельные координаты) → fallback на пустую сетку 20×20 — поведение
-   * бит-в-бит как до фикса, регресса нет.
+   * пиксельные координаты) → BadRequestException: старт игры не проходит,
+   * startGame откатывает статус в LOBBY. Пустая сетка 20×20 больше не
+   * подставляется (НД-2, docs/game-design/decisions/2026-10-04-real-boards-only.md).
    *
    * ENV-MAPS (контракт unmatched.board-topology/1): клетка может нести
    * spaceId / layout / start / links — они копируются ЯВНО (только если есть,
@@ -380,18 +378,16 @@ export class GameInitializationService {
    * заполнять 'normal' (движок/AI могли бы поставить туда бойца):
    * она становится 'obstacle'.
    */
-  private buildBoardState(board: Board | null): BoardState {
+  private buildBoardState(board: Board | null, boardId?: string): BoardState {
     if (!board) {
-      return createEmptyBoardState(FALLBACK_BOARD_SIZE, FALLBACK_BOARD_SIZE);
+      throw new BadRequestException(
+        `Доска игры ${boardId ? `«${boardId}» ` : ''}не найдена — игру на ней начать нельзя`,
+      );
     }
 
     const rawCells = this.parseBoardCells(board.cells);
     if (rawCells.length === 0) {
-      // Штатная ситуация для текущих данных (у всех досок cells=[]) — не warn
-      this.logger.log(
-        `Доска «${board.name}»: cells пусты — используется пустая сетка ${FALLBACK_BOARD_SIZE}×${FALLBACK_BOARD_SIZE}`,
-      );
-      return createEmptyBoardState(FALLBACK_BOARD_SIZE, FALLBACK_BOARD_SIZE);
+      throw new BadRequestException(`Доска «${board.name}»: cells пусты — игру на ней начать нельзя`);
     }
 
     // Валидация: целые неотрицательные координаты у каждой клетки
@@ -401,10 +397,9 @@ export class GameInitializationService {
       const x = (cell as any)?.x;
       const y = (cell as any)?.y;
       if (!Number.isInteger(x) || !Number.isInteger(y) || x < 0 || y < 0) {
-        this.logger.warn(
-          `Доска «${board.name}»: невалидная клетка в cells (${JSON.stringify(cell)?.slice(0, 100)}) — fallback на пустую сетку ${FALLBACK_BOARD_SIZE}×${FALLBACK_BOARD_SIZE}`,
+        throw new BadRequestException(
+          `Доска «${board.name}»: невалидная клетка в cells (${JSON.stringify(cell)?.slice(0, 100)}) — игру на ней начать нельзя`,
         );
-        return createEmptyBoardState(FALLBACK_BOARD_SIZE, FALLBACK_BOARD_SIZE);
       }
       maxX = Math.max(maxX, x);
       maxY = Math.max(maxY, y);
@@ -415,10 +410,9 @@ export class GameInitializationService {
     // Sanity: Board.width/height в БД — пиксели картинок (напр. 400×230);
     // если в cells оказались пиксельные координаты — это не игровая сетка
     if (width < MIN_GRID_SIZE || height < MIN_GRID_SIZE || width > MAX_GRID_SIZE || height > MAX_GRID_SIZE) {
-      this.logger.warn(
-        `Доска «${board.name}»: размер сетки ${width}×${height} вне диапазона ${MIN_GRID_SIZE}..${MAX_GRID_SIZE} — fallback на пустую сетку ${FALLBACK_BOARD_SIZE}×${FALLBACK_BOARD_SIZE}`,
+      throw new BadRequestException(
+        `Доска «${board.name}»: размер сетки ${width}×${height} вне диапазона ${MIN_GRID_SIZE}..${MAX_GRID_SIZE} — игру на ней начать нельзя`,
       );
-      return createEmptyBoardState(FALLBACK_BOARD_SIZE, FALLBACK_BOARD_SIZE);
     }
 
     // Топология оригинальной карты: хотя бы одна клетка несёт массив links

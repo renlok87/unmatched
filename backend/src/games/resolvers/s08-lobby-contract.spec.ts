@@ -24,6 +24,7 @@ import { GqlAuthGuard } from '../../auth/guards/gql-auth.guard';
 import { GqlThrottlerGuard } from '../guards/gql-throttler.guard';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { marmorealBoardRow } from '../../test/fixtures/real-board';
 
 const boardSource = JSON.parse(readFileSync(
   resolve(__dirname, '../../../../docs/game-design/evidence/S01/content-board.json'), 'utf8'),
@@ -45,6 +46,7 @@ describe('S08 GD-029: code resolution and duplicate-create guard', () => {
   let app: INestApplication;
   let url: string;
   let prisma: any;
+  const marmoreal = marmorealBoardRow();
 
   beforeAll(async () => {
     const games = new Map<string, any>();
@@ -126,8 +128,8 @@ describe('S08 GD-029: code resolution and duplicate-create guard', () => {
       hero: { findUnique: async ({ where }: any) => ({ id: where.id, name: where.id, health: 10,
         movement: 2, properties: { attackType: 'melee' }, sidekicks: [],
         cards: [{ id: `${where.id}-card`, name: 'Fixture', cardType: 'VERSATILE', count: 30, effects: [] }] }) },
-      board: { findUnique: async ({ where }: any) => (where.id === boardSource.id ? boardSource : null),
-        findFirst: async () => boardSource },
+      // createGame without boardId plays on the default board, Marmoreal · original map (НД-1)
+      board: { findUnique: async ({ where }: any) => [boardSource, marmoreal].find((b) => b.id === where.id) ?? null },
       user: { findUnique: async ({ where }: any) => users.get(where.id) ?? null },
       gameState: {
         findUnique: async ({ where }: any) => states.get(where.gameId) ?? null,
@@ -185,6 +187,7 @@ describe('S08 GD-029: code resolution and duplicate-create guard', () => {
   it('duplicate createGame with the same idempotency key returns the same room', async () => {
     const first = await http('a', 'createGame', { input: { mode: 'ONE_V_ONE' }, key: 'stable-key-1' });
     expect(first.errors).toBeUndefined();
+    expect(first.data.createGame.boardId).toBe(marmoreal.id);
     const second = await http('a', 'createGame', { input: { mode: 'ONE_V_ONE' }, key: 'stable-key-1' });
     expect(second.errors).toBeUndefined();
     expect(second.data.createGame.id).toBe(first.data.createGame.id);

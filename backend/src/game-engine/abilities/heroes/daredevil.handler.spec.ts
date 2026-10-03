@@ -68,7 +68,7 @@ describe('DaredevilHandler', () => {
           maxSize: 5,
         },
       },
-      boardState: createEmptyBoardState(),
+      boardState: createEmptyBoardState(20, 20),
       metadata: {
         lastActionAt: new Date(),
         lastActionBy: playerId,

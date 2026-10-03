@@ -21,13 +21,17 @@
  *     sha256 + size (ENV-U3: the image itself stays out of git and out of the
  *     DB - imageUrl is null), zones palette, uuPerPx, spaceRadiusPx, summary }.
  *
- * Safety (same rules as seed-art-fixture-boards.ts):
- *   - writes ONLY to the isolated S09 test database (127.0.0.1/localhost:55434);
+ * Safety (DB guards in prisma/db-guards.ts):
+ *   - writes ONLY to the isolated S09 test database (127.0.0.1/localhost:55434),
+ *     or with --allow-main-dev-db to the canonical dev DB localhost:5433/unmatched;
  *     every other DATABASE_URL is refused before a client is created;
  *   - never touches rows it did not create (upsert by the fixture ids only; a
  *     name owned by another row is refused);
- *   - refuses to become the default board: createGame without boardId picks the
- *     FIRST created Board row, so an empty Board table is refused.
+ *   - writes the default board: createGame without boardId plays on
+ *     Marmoreal · original map (src/games/default-board.ts, decision НД-1 of
+ *     docs/game-design/decisions/2026-10-04-real-boards-only.md). The pinned id
+ *     must be one of the fixtures (refused otherwise), and --apply/--verify fail
+ *     unless that row is present and verified afterwards.
  *
  * Modes:
  *   --dry-run (default) OFFLINE: validates both fixtures, builds the rows and
@@ -45,12 +49,8 @@ import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
 import type { Prisma } from '@prisma/client';
-import {
-  DbGuardOptions,
-  ISOLATED_DB_HOSTS,
-  ISOLATED_DB_PORTS,
-  isMainDevDatabase,
-} from './seed-art-fixture-boards';
+import { DbGuardOptions, ISOLATED_DB_HOSTS, ISOLATED_DB_PORTS, isMainDevDatabase } from './db-guards';
+import { DEFAULT_BOARD_ID, DEFAULT_BOARD_NAME } from '../src/games/default-board';
 
 /**
  * Refuses every database except the isolated S09 test DB (throws). With `--allow-main-dev-db`
@@ -366,6 +366,22 @@ export function fixtureFiles(dir = TOPOLOGY_FIXTURE_DIR): string[] {
   return TOPOLOGY_MAPS.map((m) => path.join(dir, `${m}.topology.json`));
 }
 
+/**
+ * The pinned default board (src/games/default-board.ts) must be one of the rows this seed writes,
+ * under the same name - otherwise createGame without boardId would point at a row no seed creates.
+ */
+export function assertDefaultBoardSeeded(rows: ReadonlyArray<{ id: string; name: string }>): void {
+  const row = rows.find((r) => r.id === DEFAULT_BOARD_ID);
+  if (!row)
+    throw new Error(
+      `REFUSED: the default board ${DEFAULT_BOARD_ID} (${DEFAULT_BOARD_NAME}) is not one of the topology fixtures`,
+    );
+  if (row.name !== DEFAULT_BOARD_NAME)
+    throw new Error(
+      `REFUSED: the default board ${DEFAULT_BOARD_ID} is seeded as "${row.name}", expected "${DEFAULT_BOARD_NAME}"`,
+    );
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const mode = args.includes('--apply')
@@ -387,11 +403,13 @@ async function main(): Promise<void> {
     sha256,
     row: topologyBoardRow(fixture, sha256, file),
   }));
+  assertDefaultBoardSeeded(rows.map(({ row }) => row));
 
   const report: Record<string, unknown> = {
     schema: 'unmatched.env-map-seed/1',
     mode,
     startedUtc: new Date().toISOString(),
+    defaultBoard: { id: DEFAULT_BOARD_ID, name: DEFAULT_BOARD_NAME },
     boards: rows.map(({ fixture, sha256, row }) => ({
       map: fixture.map,
       id: row.id,
@@ -449,15 +467,6 @@ async function main(): Promise<void> {
     const { PrismaClient } = require('@prisma/client') as typeof import('@prisma/client');
     const prisma = new PrismaClient();
     try {
-      const first = await prisma.board.findFirst({
-        orderBy: { createdAt: 'asc' },
-        select: { id: true, name: true },
-      });
-      report.defaultBoardBefore = first;
-      if (!first)
-        throw new Error(
-          'REFUSED: Board table is empty - a topology board would become the default board of createGame',
-        );
       const entries = report.boards as Array<Record<string, unknown>>;
       for (let i = 0; i < rows.length; i++) {
         const { row, sha256 } = rows[i];
@@ -484,14 +493,11 @@ async function main(): Promise<void> {
         };
         entry.verified = Object.values(entry.verify as Record<string, boolean>).every(Boolean);
       }
-      const firstAfter = await prisma.board.findFirst({
-        orderBy: { createdAt: 'asc' },
-        select: { id: true, name: true },
-      });
-      report.defaultBoardAfter = firstAfter;
-      report.defaultBoardUnchanged = firstAfter?.id === first.id;
+      // НД-1: the default board of createGame is one of these rows - it must be there and verified
+      report.defaultBoardVerified =
+        entries.find((b) => b.id === DEFAULT_BOARD_ID)?.verified === true;
       report.ok =
-        report.defaultBoardUnchanged === true && entries.every((b) => b.verified === true);
+        report.defaultBoardVerified === true && entries.every((b) => b.verified === true);
     } finally {
       await prisma.$disconnect();
     }
