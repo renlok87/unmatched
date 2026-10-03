@@ -109,6 +109,10 @@ export class AdjacencyService {
 
   /**
    * Получить достижимые клетки (BFS)
+   *
+   * Достижимость бойцов (резолв MOVE-эффекта, validateMovement) с MS-T-02
+   * считает movement/canonical-path.computeReach; этот общий BFS остаётся
+   * эталоном «как было» для move-parity.property.spec.ts.
    */
   getReachableCells(
     boardState: BoardState,

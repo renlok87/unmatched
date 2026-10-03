@@ -41,6 +41,7 @@ import { GameRulesValidator, bannerAllows } from '../validators/game-rules.valid
 import { CombatResolverService } from '../engine/combat-resolver.service';
 import { MovementService } from '../engine/movement.service';
 import { isCellPassable, isLivingFighter } from '../movement/traversal';
+import { computeReach, reachDistance } from '../movement/canonical-path';
 import { ValueModifierService } from '../engine/value-modifier.service';
 import { AdjacencyService } from '../engine/adjacency.service';
 import { boardDistance, hasTopology } from '../engine/board-topology';
@@ -641,24 +642,17 @@ export class GameActionExecutorService {
         const staysInPlace = target.x === fighter.position.x && target.y === fighter.position.y;
         if (!staysInPlace) {
           // Дистанция эффекта (не movement бойца): союзники проходимы,
-          // враги блокируют путь, занятое назначение уже проверено выше.
-          // Winged Frenzy: canPassThroughEnemies — враги НЕ блокируют путь
-          // (проход сквозь них разрешён), конечная клетка всё равно свободна.
+          // враги (относительно владельца двигаемого бойца) блокируют путь,
+          // занятое назначение уже проверено выше. Winged Frenzy:
+          // canPassThroughEnemies — враги НЕ блокируют путь, конечная клетка
+          // всё равно свободна. MS-T-02: каноническая достижимость
+          // movement/canonical-path (та же BFS, что была здесь через
+          // getReachableCells + blockedPositions — property-тест сверяет их).
           const allowance = pending.value ?? 1;
-          const blockedPositions = pending.canPassThroughEnemies
-            ? new Set<string>()
-            : new Set(
-                currentState.fighters
-                  .filter((f) => f.id !== fighter.id && isLivingFighter(f) && f.ownerId !== fighter.ownerId)
-                  .map((f) => `${f.position.x}:${f.position.y}`),
-              );
-          const reachable = this.adjacencyService.getReachableCells(
-            currentState.boardState,
-            fighter.position,
-            allowance,
-            { blockedPositions },
-          );
-          if (!reachable.has(`${target.x}:${target.y}`)) {
+          const reach = computeReach(currentState, fighter.id, allowance, {
+            passThroughEnemies: Boolean(pending.canPassThroughEnemies),
+          });
+          if (reachDistance(reach, target) === undefined) {
             return {
               success: false,
               error: `До клетки (${target.x}, ${target.y}) не добраться за ${allowance} шаг(ов)`,

@@ -9,6 +9,7 @@ import type { GameState, Fighter, Position } from '../models';
 import { getFighterMovement, positionEqual, getActionsRemaining } from '../models';
 import { AdjacencyService } from '../engine/adjacency.service';
 import { isCellPassable, isFreeEndpoint, isLivingFighter, isTraversable } from '../movement/traversal';
+import { computeReach, reachDistance } from '../movement/canonical-path';
 import { isAdjacent, isWithinDistance } from '../engine/board-topology';
 
 export interface ValidationResult {
@@ -443,25 +444,11 @@ export class GameRulesValidator {
 
     // Проверка очков движения: цель должна быть достижима BFS по проходимым
     // клеткам (соседи board-topology, как isAdjacent); живые ВРАГИ блокируют прохождение,
-    // живые союзники проходимы насквозь (GD-015), побеждённые не блокируют
+    // живые союзники проходимы насквозь (GD-015), побеждённые не блокируют.
+    // MS-T-02: каноническая достижимость movement/canonical-path.
     const allowance = getFighterMovement(fighter);
-    const blockedPositions = new Set(
-      state.fighters
-        .filter(
-          (f) =>
-            f.id !== fighterId &&
-            isLivingFighter(f) &&
-            f.ownerId !== fighter.ownerId,
-        )
-        .map((f) => `${f.position.x}:${f.position.y}`),
-    );
-    const reachable = this.adjacency.getReachableCells(
-      state.boardState,
-      fighter.position,
-      allowance,
-      { blockedPositions },
-    );
-    if (!reachable.has(`${target.x}:${target.y}`)) {
+    const reach = computeReach(state, fighterId, allowance);
+    if (reachDistance(reach, target) === undefined) {
       return {
         valid: false,
         error: `Недостаточно очков движения: до клетки (${target.x}, ${target.y}) не добраться за ${allowance} шаг(ов) по проходимым клеткам`,
