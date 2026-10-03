@@ -1,0 +1,422 @@
+{
+ "schema": "unmatched.hud-icons-v2/1",
+ "date": "2026-10-03",
+ "status": "предложено (арт-приёмка — ART-011 / MS-Q-04)",
+ "doc": "docs/unreal/contracts/hud/HUD-AND-ICONS.md §3.4",
+ "brief": "docs/unreal/contracts/hud/IMAGEGEN-BRIEF-icons.md",
+ "tokens_revision": "hud-icons-2026-10-03",
+ "composer": {
+  "file": "_tools/compose_icons.py",
+  "sha256": "2c8391c7e5fa1b793154e96c3f1dafdd9de2ab50ddab4a901fbf2ba6587a02e8"
+ },
+ "glyphs_manifest": {
+  "file": "glyphs/manifest.json",
+  "sha256": "9b89d1475e34d74906d21426cb0b80bf18dff6e40fa07a32c43c8fe4d6def8fc"
+ },
+ "glyphs": [
+  {
+   "file": "glyphs/glyph-chain.png",
+   "sha256": "5c5a28278bacb7125194e3da6c947231c3ab2c76b54cc2b8895073d3700ec052"
+  },
+  {
+   "file": "glyphs/glyph-circular-arrow.png",
+   "sha256": "dcdb26f7dceed1569097c30787d052940671d53f002ed1b2ed51df8104b6a056"
+  },
+  {
+   "file": "glyphs/glyph-eye.png",
+   "sha256": "4c53edc0d27a9736516e6a83d8921c5bc03f86252a2ce0dd2baeb90215191e3e"
+  },
+  {
+   "file": "glyphs/glyph-footprint.png",
+   "sha256": "62225892bf3a76612fb8f37150fe055e0adffc87842c10665fe54f876b81439a"
+  },
+  {
+   "file": "glyphs/glyph-hourglass.png",
+   "sha256": "32de9531caf2fb0770eb598127877b989855c8f14cecf902804fa920e106c6da"
+  },
+  {
+   "file": "glyphs/glyph-lightbulb.png",
+   "sha256": "8a71bbf197cedb243bd3377f3a432c509521c544c8772d733507bb0ce8338fff"
+  },
+  {
+   "file": "glyphs/glyph-lock.png",
+   "sha256": "c2ef349c31a2548526ba8b869f2a69be4b70a61c6aebdbbb30557211e63316a2"
+  },
+  {
+   "file": "glyphs/glyph-map-pin.png",
+   "sha256": "6b577d75b2d757eb14795be7b263807b568e52107c92b3244f0efbce55710f51"
+  },
+  {
+   "file": "glyphs/glyph-move-arrows.png",
+   "sha256": "b64b4a6e73aade742c3e9c1656def71c0076917eb1362740fc6141bc1fecaa69"
+  }
+ ],
+ "icons": [
+  {
+   "id": "state-boost",
+   "file": "state-boost.png",
+   "width": 1024,
+   "height": 1024,
+   "source": "script: shape.boost_disc",
+   "replaces": [
+    "v2 boost",
+    "mvp-v1 ui-action-boost-*",
+    "mvp-v1 ui-resource-boost"
+   ],
+   "status": "предложено",
+   "sha256": "1e724a9e64759ef8b1b2b7b02094a2ae6655dd349da34bd8a9139e54f8a07b09"
+  },
+  {
+   "id": "state-enemy",
+   "file": "state-enemy.png",
+   "width": 1024,
+   "height": 1024,
+   "source": "glyphs/glyph-lock.png",
+   "replaces": [
+    "v2 enemy"
+   ],
+   "status": "предложено",
+   "sha256": "8adb9cd02cd95d437cacb38f74204a91c1649102d95a0c5c1fe965727e8e5cde"
+  },
+  {
+   "id": "state-sent",
+   "file": "state-sent.png",
+   "width": 1024,
+   "height": 1024,
+   "source": "glyphs/glyph-hourglass.png",
+   "replaces": [
+    "v2 sent"
+   ],
+   "status": "предложено",
+   "sha256": "b38c290c1f07f34c9a163f30dea44662739b3cc912b54e05dc87ba2d18485edd"
+  },
+  {
+   "id": "state-pending-move",
+   "file": "state-pending-move.png",
+   "width": 1024,
+   "height": 1024,
+   "source": "glyphs/glyph-move-arrows.png",
+   "replaces": [
+    "v2 pending-move",
+    "mvp-v1 markers/marker-pending"
+   ],
+   "status": "предложено",
+   "sha256": "72264b099686675e8a28d95a6946bc6ace7d94d91d2f0cf3ea85e63244ed222a"
+  },
+  {
+   "id": "state-pending-place",
+   "file": "state-pending-place.png",
+   "width": 1024,
+   "height": 1024,
+   "source": "glyphs/glyph-map-pin.png",
+   "replaces": [
+    "v2 pending-place",
+    "mvp-v1 markers/marker-pending"
+   ],
+   "status": "предложено",
+   "sha256": "c8825c60431f1691ebed09811fcf059fcdd045d585c91014c0e913b9010385d1"
+  },
+  {
+   "id": "state-hint",
+   "file": "state-hint.png",
+   "width": 2048,
+   "height": 1024,
+   "source": "glyphs/glyph-lightbulb.png on shape.title_plate",
+   "replaces": [
+    "v2 hint"
+   ],
+   "status": "предложено",
+   "sha256": "a197329f558ac8be6ef9607b9d487e3ceac0ddcf550980f79755100a43260de3"
+  },
+  {
+   "id": "state-threat",
+   "file": "state-threat.png",
+   "width": 2048,
+   "height": 1024,
+   "source": "glyphs/glyph-eye.png on shape.title_plate",
+   "replaces": [
+    "v2 threat"
+   ],
+   "status": "предложено",
+   "sha256": "95e0aefabda320a3ec551a5805683a1053669f90190e004b662b9c7f3ee2ad11"
+  },
+  {
+   "id": "state-immobilized",
+   "file": "state-immobilized.png",
+   "width": 1024,
+   "height": 1024,
+   "source": "glyphs/glyph-chain.png",
+   "replaces": [
+    "v2 immobilized"
+   ],
+   "status": "предложено",
+   "sha256": "f1acb0b3ebcc686e1635c125aec312bae6da99e337e630e88d5d2f6042d68537"
+  },
+  {
+   "id": "action-attack",
+   "file": "action-attack.png",
+   "width": 1024,
+   "height": 1024,
+   "source": "polygon card_icons._starburst",
+   "replaces": [
+    "mvp-v1 ui-action-attack-{active,disabled,normal}",
+    "mvp-v1 sized/ui-action-attack-normal-{24,32,48}"
+   ],
+   "status": "предложено",
+   "sha256": "9d0ae23cea2e756f924aca2f5fae06537dea87781df01f8a64fdcff40561f1bf"
+  },
+  {
+   "id": "action-attack-token",
+   "file": "action-attack-token.png",
+   "width": 1024,
+   "height": 1024,
+   "source": "polygon card_icons._starburst, D-5 token",
+   "replaces": [
+    "mvp-v1 sized/ui-action-attack-token-{24,32,48}"
+   ],
+   "status": "предложено",
+   "sha256": "3f33dce3026ea690552fed2467deafd50639523d57afba9a4fa55213d8d5f679"
+  },
+  {
+   "id": "action-attack-token-glyphmask",
+   "file": "action-attack-token-glyphmask.png",
+   "width": 1024,
+   "height": 1024,
+   "source": "polygon card_icons._starburst",
+   "replaces": [
+    "mvp-v1 sized/ui-action-attack-token-*-glyphmask"
+   ],
+   "status": "предложено",
+   "sha256": "0576e3a52513798494ec136bece7278ed67167964bd8e39f8ffd48ff389b712e"
+  },
+  {
+   "id": "action-defense",
+   "file": "action-defense.png",
+   "width": 1024,
+   "height": 1024,
+   "source": "polygon compose_icons.heater_shield",
+   "replaces": [
+    "mvp-v1 ui-action-defense-*"
+   ],
+   "status": "предложено",
+   "sha256": "8636b14640cb27f65010f44e24037739a6f999e58581bd98417e17f5b712bfbe"
+  },
+  {
+   "id": "action-maneuver",
+   "file": "action-maneuver.png",
+   "width": 1024,
+   "height": 1024,
+   "source": "glyphs/glyph-footprint.png",
+   "replaces": [
+    "mvp-v1 ui-action-maneuver-*"
+   ],
+   "status": "предложено",
+   "sha256": "52d3c416c4cab37882fd5a0a836a0608f94347e4fb5c1272a381f230016d46df"
+  },
+  {
+   "id": "action-scheme",
+   "file": "action-scheme.png",
+   "width": 1024,
+   "height": 1024,
+   "source": "polygon card_icons._lightning",
+   "replaces": [
+    "mvp-v1 ui-action-scheme-*"
+   ],
+   "status": "предложено",
+   "sha256": "1433bc297d20ee13fb680b3518cd0b5e10e2410d45248944c65bfc7a7e305473"
+  },
+  {
+   "id": "marker-status",
+   "file": "marker-status.png",
+   "width": 1024,
+   "height": 1024,
+   "source": "script: shape.hero_ribbon",
+   "replaces": [
+    "mvp-v1 markers/marker-status"
+   ],
+   "status": "предложено",
+   "sha256": "db91f5af4022930048d0631018f29f1a8c29756da00001418dafcad31d85872b"
+  },
+  {
+   "id": "loader-spinner",
+   "file": "loader-spinner.png",
+   "width": 1024,
+   "height": 1024,
+   "source": "script",
+   "replaces": [
+    "mvp-v1 ui-loader-spinner-normal"
+   ],
+   "status": "предложено",
+   "sha256": "7f4b5917318d7b1527262a4092133a0700568a022c87ed7f7bf8cd8567027e4e"
+  },
+  {
+   "id": "resource-action-full",
+   "file": "resource-action-full.png",
+   "width": 1024,
+   "height": 1024,
+   "source": "script",
+   "replaces": [
+    "mvp-v1 ui-resource-action-full",
+    "mvp-v1 ui-resource-action-full-v2"
+   ],
+   "status": "предложено",
+   "sha256": "a0d44784541366a23ccec42006789341934b5bb70fd61ac8152ca9e172e7cbe2"
+  },
+  {
+   "id": "resource-action-empty",
+   "file": "resource-action-empty.png",
+   "width": 1024,
+   "height": 1024,
+   "source": "script",
+   "replaces": [
+    "mvp-v1 ui-resource-action-empty"
+   ],
+   "status": "предложено",
+   "sha256": "5fed61a238902d2ef62c637865477bb96f11c8b959a3c0c9b6fb462e4e8a0058"
+  },
+  {
+   "id": "resource-card",
+   "file": "resource-card.png",
+   "width": 1024,
+   "height": 1024,
+   "source": "script",
+   "replaces": [
+    "mvp-v1 ui-resource-card"
+   ],
+   "status": "предложено",
+   "sha256": "b380381546271b88891be3ae4b5fadc8820ca03f5222e03170d496dee98ec9a5"
+  },
+  {
+   "id": "resource-connection-online",
+   "file": "resource-connection-online.png",
+   "width": 1024,
+   "height": 1024,
+   "source": "script",
+   "replaces": [
+    "mvp-v1 ui-resource-connection-online"
+   ],
+   "status": "предложено",
+   "sha256": "ed3957762c74a4c2b90a81a8e5ba5acffb99dad7069992a588bf23662c23a2bb"
+  },
+  {
+   "id": "resource-connection-reconnecting",
+   "file": "resource-connection-reconnecting.png",
+   "width": 1024,
+   "height": 1024,
+   "source": "script + glyphs/glyph-circular-arrow.png",
+   "replaces": [
+    "mvp-v1 ui-resource-connection-reconnecting"
+   ],
+   "status": "предложено",
+   "sha256": "db15fef671a80851ae90d61e3d885b91ccb05df17c808706e48de6978f691ae6"
+  },
+  {
+   "id": "resource-connection-lost",
+   "file": "resource-connection-lost.png",
+   "width": 1024,
+   "height": 1024,
+   "source": "script",
+   "replaces": [
+    "mvp-v1 ui-resource-connection-lost"
+   ],
+   "status": "предложено",
+   "sha256": "9743a0c16f2161c65ba2fa93fd083c1f2434c608f4b7cdda5e11e77071a55c3c"
+  },
+  {
+   "id": "resource-hp-full",
+   "file": "resource-hp-full.png",
+   "width": 1024,
+   "height": 1024,
+   "source": "script",
+   "replaces": [
+    "mvp-v1 ui-resource-hp-full"
+   ],
+   "status": "предложено",
+   "sha256": "75c6347a66a8f211167eb7802bf7cd1dac3ea1662d4a9c771401cee6dd9fdde1"
+  },
+  {
+   "id": "resource-hp-empty",
+   "file": "resource-hp-empty.png",
+   "width": 1024,
+   "height": 1024,
+   "source": "script",
+   "replaces": [
+    "mvp-v1 ui-resource-hp-empty"
+   ],
+   "status": "предложено",
+   "sha256": "5d10c527521eb25f4647578c5097c0a7bbbc6ab18693e5b160f3e83ad853686a"
+  }
+ ],
+ "compare": [
+  {
+   "file": "compare-sheet.png",
+   "sha256": "5ccac33968ba9996412e7749b4634e95a57bbc1220a98f094a010cf7f4816356"
+  },
+  {
+   "file": "compare-gray-24px-x4.png",
+   "sha256": "26674b92789ca0f6e33e44d0043ad194af5e974b5c925c0552bed2bf0ca3cb9a"
+  },
+  {
+   "file": "compare-gray-32px-x4.png",
+   "sha256": "58126a84d8ae6d51084db5145ef2d846cb9b107d6a7033ff6a0b5c83f0d6466c"
+  }
+ ],
+ "reference_v2": [
+  {
+   "file": "reference-v2/v2-ally-256.png",
+   "sha256": "e508f351db0731c189b21478d33f63a7cf4916021e3007d182dd83071d138c14"
+  },
+  {
+   "file": "reference-v2/v2-attack-from-256.png",
+   "sha256": "72a7f9f340240881eae6e1a646e2bf490f687a48c49365e0b8988c353fb73c96"
+  },
+  {
+   "file": "reference-v2/v2-boost-256.png",
+   "sha256": "4d21dad0eebb5cd0d84218f46fcfe5d565aa626d25a12fed13e3dd069c85a030"
+  },
+  {
+   "file": "reference-v2/v2-conflict-256.png",
+   "sha256": "b06ab17c81c5c39ecd61701cfc5e1e3c33aa702259ed33699c0419321b5128db"
+  },
+  {
+   "file": "reference-v2/v2-enemy-256.png",
+   "sha256": "fc2d24a52c8363cf7eec9b5062e8a7b235b0da9835e77f51db1945e79a4ef7e9"
+  },
+  {
+   "file": "reference-v2/v2-hint-256.png",
+   "sha256": "be511c9fb9f8cdb67074d5f172c9e25dc3f4689ae9320a29797fd25da3ac6359"
+  },
+  {
+   "file": "reference-v2/v2-immobilized-256.png",
+   "sha256": "541787611275eeeed3357f745cede993047b74987033d7bddc2039c28cbf4b28"
+  },
+  {
+   "file": "reference-v2/v2-order-256.png",
+   "sha256": "e521cec3b441fa7a8f0ba9d029000c2356728f119898cee83b48880f55aaa43e"
+  },
+  {
+   "file": "reference-v2/v2-order-p2-256.png",
+   "sha256": "ed2b0d453054ca0e924ce6870aefe9eeb563fa989cb6235f7c91f491705664b4"
+  },
+  {
+   "file": "reference-v2/v2-pending-move-256.png",
+   "sha256": "ae2f7f33be8bda11ca0b2a5922a30e76e2787781f62e2e07f4784d6dc9757493"
+  },
+  {
+   "file": "reference-v2/v2-pending-place-256.png",
+   "sha256": "ccd39cf9a5b64601973569f8cc03f407e171b37a52819de56e683f1aafec92c3"
+  },
+  {
+   "file": "reference-v2/v2-refuse-256.png",
+   "sha256": "5e5423ddb621f0aae4bc4cc0c71b05cb2deb242d47264dc0c30990be0d5572a0"
+  },
+  {
+   "file": "reference-v2/v2-sent-256.png",
+   "sha256": "d4fbd2ea27485626c2089f9bed1f0fedb9782e113d48852a5fc261e982b0a27a"
+  },
+  {
+   "file": "reference-v2/v2-threat-256.png",
+   "sha256": "f1c4aadc62cee4fa52e68f04c0b8d19083af44e0f6fad2589ada12f0eb8e0d43"
+  }
+ ]
+}

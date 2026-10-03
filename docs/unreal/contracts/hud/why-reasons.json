@@ -1,8 +1,8 @@
 {
  "schema": "unmatched.why-reasons/1",
- "revision": "w4d-2026-09-29",
+ "revision": "hud-icons-2026-10-03",
  "status": "предложено",
- "status_note": "Коды причин недоступности (P2) для StringTable ST_Why (правило 4 HUD-RULES.md). Ключи — 02 §4.2 (ПРЕДЛОЖЕНИЕ). Тексты RU/EN — предложение составителя W4-D; финальные тексты — GD-048/QA-011. Английская проза остаётся только в трассах; тесты сверяют коды, а не прозу.",
+ "status_note": "Коды причин недоступности (P2) для StringTable ST_Why (правило 4 HUD-RULES.md). Ключи — 02 §4.2 (ПРЕДЛОЖЕНИЕ). Тексты RU/EN — предложение составителя W4-D; финальные тексты — GD-048/QA-011. Английская проза остаётся только в трассах; тесты сверяют коды, а не прозу. HUD-ICONS (2026-10-03): добавлены 25 ключей подбора хода из docs/game-design/move-selection/03-ux-spec.md §8.2 (поля source и codes — справочные; сопоставление «код сервера → ключ → что с черновиком» нормативно только в docs/game-design/move-selection/02-rules-and-edge-cases.md §1.1, задача MS-T-06); перечень ключей в 02 §4.2 дополнен той же правкой. Тексты существующих 8 ключей не менялись; расхождение why.no.actions с 03 §8.2 — HUD-AND-ICONS.md §5.",
  "string_table": {"asset": "/Game/UI/Localization/ST_Why", "namespace": "why", "source_culture": "en", "cultures": ["en", "ru"], "default_ui_culture": "ru", "default_note": "UI-ACC-010: язык интерфейса по умолчанию RU; исходная культура строк — EN (стандартный путь gather/translate UE). Выбор исходной культуры — предложение"},
  "reasons": [
   {"key": "why.not.your.turn", "en": "Not your turn", "ru": "Сейчас не ваш ход", "args": []},
@@ -12,6 +12,31 @@
   {"key": "why.syncing", "en": "Syncing…", "ru": "Синхронизация…", "args": []},
   {"key": "why.wait.defender", "en": "Waiting for the defender", "ru": "Ждём защитника", "args": []},
   {"key": "why.immobilized", "en": "{fighterName} cannot move", "ru": "{fighterName} не может двигаться", "args": ["fighterName"]},
-  {"key": "why.not.in.range", "en": "Target out of range", "ru": "Цель вне досягаемости", "args": []}
+  {"key": "why.not.in.range", "en": "Target out of range", "ru": "Цель вне досягаемости", "args": []},
+  {"key": "why.cell.unreachable", "en": "Not enough movement: need {need}, have {have}", "ru": "Не хватает шагов: нужно {need}, есть {have}", "args": ["need", "have"], "source": "move-selection/03-ux-spec.md §8.2", "codes": "NOT_ENOUGH_MOVEMENT; клиент — путь есть, но длиннее допуска с максимальным бустом"},
+  {"key": "why.cell.no.path", "en": "No way to get there", "ru": "Туда не пройти", "args": [], "source": "move-selection/03-ux-spec.md §8.2", "codes": "клиент — пути нет вовсе (MS-E-19, MS-E-28)"},
+  {"key": "why.cell.needs.boost", "en": "Needs boost +{n}", "ru": "Нужен буст +{n}", "args": ["n"], "source": "move-selection/03-ux-spec.md §8.2", "codes": "клиент — NeedBoost"},
+  {"key": "why.cell.enemy", "en": "An enemy is here", "ru": "Здесь враг", "args": [], "source": "move-selection/03-ux-spec.md §8.2", "codes": "PATH_BLOCKED_BY_ENEMY, клетка = цель"},
+  {"key": "why.cell.enemy.path", "en": "The path is blocked by an enemy", "ru": "Путь закрыт врагом", "args": [], "source": "move-selection/03-ux-spec.md §8.2", "codes": "PATH_BLOCKED_BY_ENEMY, клетка ≠ цель"},
+  {"key": "why.cell.ally", "en": "Occupied by an ally", "ru": "Пространство занято союзником", "args": [], "source": "move-selection/03-ux-spec.md §8.2", "codes": "POSITION_OCCUPIED (манёвр)"},
+  {"key": "why.cell.occupied", "en": "The space is occupied", "ru": "Пространство занято", "args": [], "source": "move-selection/03-ux-spec.md §8.2", "codes": "POSITION_OCCUPIED (эффект)"},
+  {"key": "why.cell.not.linked", "en": "These spaces are not linked", "ru": "Нет линии между пространствами", "args": [], "source": "move-selection/03-ux-spec.md §8.2", "codes": "клиент (наведение на соседа по решётке без связи)"},
+  {"key": "why.cell.not.space", "en": "Not a board space", "ru": "Это не пространство поля", "args": [], "source": "move-selection/03-ux-spec.md §8.2", "codes": "INVALID_POSITION (эффект)"},
+  {"key": "why.swap.impossible", "en": "Fighters cannot swap spaces", "ru": "Бойцы не могут поменяться местами", "args": [], "source": "move-selection/03-ux-spec.md §8.2", "codes": "клиент (MS-E-35)"},
+  {"key": "why.draft.conflict", "en": "{fighterName}: move is no longer legal", "ru": "{fighterName}: ход больше недопустим", "args": ["fighterName"], "source": "move-selection/03-ux-spec.md §8.2", "codes": "клиент — Conflict"},
+  {"key": "why.draft.open", "en": "Confirm the maneuver first", "ru": "Сначала подтвердите манёвр", "args": [], "source": "move-selection/03-ux-spec.md §8.2", "codes": "клиент"},
+  {"key": "why.fighter.not.yours", "en": "That is an opponent's fighter", "ru": "Это боец соперника", "args": [], "source": "move-selection/03-ux-spec.md §8.2", "codes": "NOT_YOUR_FIGHTER"},
+  {"key": "why.fighter.defeated", "en": "Fighter is defeated", "ru": "Боец побеждён", "args": [], "source": "move-selection/03-ux-spec.md §8.2", "codes": "FIGHTER_DEFEATED"},
+  {"key": "why.boost.no.value", "en": "This card has no BOOST", "ru": "У карты нет BOOST", "args": [], "source": "move-selection/03-ux-spec.md §8.2", "codes": "BOOST_NO_VALUE; клиент (MS-D-20)"},
+  {"key": "why.boost.card.gone", "en": "The boost card is no longer in hand", "ru": "Карты буста больше нет в руке", "args": [], "source": "move-selection/03-ux-spec.md §8.2", "codes": "CARD_NOT_IN_HAND"},
+  {"key": "why.maneuver.not.open", "en": "No maneuver in progress", "ru": "Манёвр не начат", "args": [], "source": "move-selection/03-ux-spec.md §8.2", "codes": "MANEUVER_NOT_OPEN, INVALID_PHASE"},
+  {"key": "why.place.zone", "en": "Choose a space in {fighterName}'s zone", "ru": "Нужно пространство в зоне {fighterName}", "args": ["fighterName"], "source": "move-selection/03-ux-spec.md §8.2", "codes": "PLACE_OUTSIDE_ZONE"},
+  {"key": "why.predraft.lost", "en": "Target no longer reachable — choose again", "ru": "Цель больше недоступна — выберите заново", "args": [], "source": "move-selection/03-ux-spec.md §8.2", "codes": "клиент"},
+  {"key": "why.wait.opponent.choice", "en": "Waiting for the opponent's choice", "ru": "Соперник делает выбор", "args": [], "source": "move-selection/03-ux-spec.md §8.2", "codes": "клиент (MS-E-47)"},
+  {"key": "why.board.too.large", "en": "Board wider than 20 — maneuver unavailable", "ru": "Поле больше 20 — манёвр недоступен", "args": [], "source": "move-selection/03-ux-spec.md §8.2", "codes": "клиент (MS-E-31)"},
+  {"key": "why.state.changed", "en": "The game state changed — refreshing", "ru": "Состояние игры изменилось — обновляем", "args": [], "source": "move-selection/03-ux-spec.md §8.2", "codes": "STATE_CHANGED, PENDING_CHOICE_OPEN, COMBAT_IN_PROGRESS, GAME_OVER"},
+  {"key": "why.client.desync", "en": "Out of sync with the server — refreshing", "ru": "Расхождение с сервером — обновляем", "args": [], "source": "move-selection/03-ux-spec.md §8.2", "codes": "FIGHTER_NOT_FOUND, HAND_NOT_FOUND, EMPTY_PATH, INVALID_STEP, INVALID_POSITION (манёвр), BEGIN_NOT_ALLOWED, DUPLICATE_FIGHTER, PENDING_WRONG_FIGHTER, PLAYER_NOT_IN_GAME"},
+  {"key": "why.command.rejected", "en": "Command rejected — refreshing", "ru": "Команда отклонена — обновляем", "args": [], "source": "move-selection/03-ux-spec.md §8.2", "codes": "нет ruleCode или неизвестный код (MS-E-93)"},
+  {"key": "why.auth.refreshed", "en": "Session refreshed — confirm again", "ru": "Сессия обновлена — подтвердите ещё раз", "args": [], "source": "move-selection/03-ux-spec.md §8.2", "codes": "клиент (MS-E-92)"}
  ]
 }
