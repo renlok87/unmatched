@@ -224,6 +224,9 @@ private:
    *  tracking, hand baseline, discard browser, inspector, maneuver draft) and
    *  re-renders. Idempotent; called on every exit from Started. */
   void ClearGameplayHud();
+  /** MS-T-04 (MS-R-55): binds the command UI's draft write-through / read-back
+   *  to the controller's maneuver draft cache (survives ClearGameplayHud). */
+  void BindManeuverDraftCache();
   /** GD-036: user-facing Lobby entry panel (authenticated user) rendered in
    *  the HUD overlay - the legacy grey-flow form stays an F10 overlay. */
   void BuildLobbyPanel();

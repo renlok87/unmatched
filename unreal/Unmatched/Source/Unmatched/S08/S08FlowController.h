@@ -62,6 +62,23 @@ struct UNMATCHED_API FS08ManeuverMove {
   TArray<FIntPoint> Path;
 };
 
+/** MS-T-04 (MS-R-55, move-selection 04 §5): the viewer's local maneuver draft
+ *  kept by the controller, so it survives the gameplay-HUD reset of a
+ *  re-entry into the SAME match inside one process (a session expiry and a
+ *  re-login tear the stream down but keep this). The draft owner
+ *  (FS09CommandUi) writes it on every draft operation and reads it back only
+ *  when a snapshot reopens exactly this pendingManeuver.id for the same user
+ *  in the same match. */
+struct UNMATCHED_API FS08ManeuverDraftCache {
+  FString GameId;              // the match (stamped by the controller)
+  FString UserId;              // the viewer (stamped by the controller)
+  FString ManeuverId;          // pendingManeuver.id; empty = no draft
+  TArray<FString> FighterIds;  // moves[] order
+  TArray<FIntPoint> Dests;     // same index as FighterIds
+  FString BoostCardId;
+  bool IsEmpty() const { return ManeuverId.IsEmpty(); }
+};
+
 class UNMATCHED_API FS08FlowController {
 public:
   FS08FlowController(FString HttpUrl, FString WsUrl, FString InViewerId = FString());
@@ -215,6 +232,9 @@ public:
     return MutationRecoveryPendingChoiceId;
   }
   int32 GetTestHttpSendCountForTest() const { return TestHttpSendCount; }
+  /** Variables of the last SendHttp (harness + network) - the wire shape of a
+   *  command (MS-R-44: no empty path in maneuver.moves). */
+  TSharedPtr<FJsonObject> GetLastHttpVariablesForTest() const { return TestLastHttpVariables; }
   void SetAuthForTest(const FString& InAccessToken, const FString& InRefreshToken) {
     Http.SetAccessToken(InAccessToken);
     RefreshToken = InRefreshToken;
@@ -265,9 +285,17 @@ public:
   bool BeginManeuver();
   /** Completes the open maneuver: one move per fighter, orthogonal steps.
    *  GD-033: optional BoostCardId - an exact hand instance id (the card drawn
-   *  by beginManeuver is a legal boost: ACC-006/R-03). Empty = no boost. */
+   *  by beginManeuver is a legal boost: ACC-006/R-03). Empty = no boost.
+   *  MS-R-44: a move with an empty path ("stay") is never serialized (the
+   *  server answers EMPTY_PATH for the whole maneuver) - dropped with a trace. */
   bool SubmitManeuver(const FString& ManeuverId, const TArray<FS08ManeuverMove>& Moves,
                       const FString& BoostCardId = FString());
+  /** MS-T-04 draft cache (see FS08ManeuverDraftCache): Store stamps the
+   *  current match and user (an empty ManeuverId clears it); Recall answers
+   *  only for the same match, the same user AND the same maneuver id; an
+   *  accepted leaveGame clears it. */
+  void StoreManeuverDraft(const FS08ManeuverDraftCache& Draft);
+  bool RecallManeuverDraft(const FString& ManeuverId, FS08ManeuverDraftCache& OutDraft) const;
   /** GD-033: endTurn - legal only when actionsRemaining == 0 and no pending
    *  choice (server rejects otherwise; error surfaces through OnFlowError). */
   bool EndTurn();
@@ -496,6 +524,8 @@ private:
   TArray<FString> CriticalProblems;
   TArray<FS08HeroEntry> Heroes;
   bool bManeuverInFlight = false; // INT-005: one logical command at a time
+  // MS-T-04: the viewer's maneuver draft of this match (StoreManeuverDraft).
+  FS08ManeuverDraftCache ManeuverDraftCache;
   // WS recovery state: <0 = idle, otherwise seconds until the retry.
   float WsReconnectCountdown = -1.0f;
   float WsReconnectBackoff = 1.0f; // doubles per failure, capped in cpp
@@ -573,6 +603,7 @@ private:
   int32 WsGeneration = 0;      // MakeWs() invocations (WS recreation proof)
 #if WITH_AUTOMATION_TESTS
   int32 TestHttpSendCount = 0; // real SendHttp calls (harness + network)
+  TSharedPtr<FJsonObject> TestLastHttpVariables; // variables of the last SendHttp
 #endif
 
 #if WITH_AUTOMATION_TESTS

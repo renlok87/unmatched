@@ -333,9 +333,18 @@ public:
   uint32 DraftRevision = 0;
   /** Reason of the last refused draft operation (why.* key + args). */
   FS09Reason LastReason;
-  /** Draft trace lines (MS-DRAFT, MS-PATH) also written to FS08Trace; the
-   *  last 64 are kept for tests. */
+  /** Draft trace lines (MS-DRAFT, MS-PATH, MS-DATA) also written to FS08Trace;
+   *  the last 64 are kept for tests. */
   TArray<FString> DraftTrace;
+  // ---- MS-T-04: draft cache by maneuverId (MS-R-55, 04 §5) ----
+  /** Write-through of the draft (ExportDraft) whenever it changes; the owner
+   *  binds it to FS08FlowController::StoreManeuverDraft. Unbound = no cache
+   *  (pure tests). */
+  TFunction<void(const FS08ManeuverDraftCache&)> StoreDraftHook;
+  /** Read-back when a snapshot opens a pendingManeuver id this UI holds no
+   *  draft for (FS08FlowController::RecallManeuverDraft): true with the
+   *  cached draft of exactly that id. Another id never restores anything. */
+  TFunction<bool(const FString& /*ManeuverId*/, FS08ManeuverDraftCache&)> RecallDraftHook;
 
   // Discard draft state
   FS08PendingHandDiscard PendingDiscard;
@@ -388,7 +397,9 @@ public:
    *  open pending, no command in flight (duplicate-begin gate). */
   bool CanBeginManeuver(const FS08Snapshot& Snapshot, FString& OutReason) const;
 
-  /** Maneuver draft ops (no server calls; every one is reversible). */
+  /** Maneuver draft ops (no server calls; every one is reversible).
+   *  SelectFighter refuses a fighter CanMoveFighter refuses (LastReason,
+   *  e.g. why.immobilized - MS-R-05) and keeps the previous selection. */
   bool SelectFighter(const FString& FighterId, const FS08Snapshot& Snapshot,
                      const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters);
   /** MS-T-05: what (X, Y) would be as FighterId's destination - evaluated on
@@ -404,8 +415,10 @@ public:
   /** Sets/overwrites the drafted destination for FighterId (EvaluateDestination
    *  decides): an overwrite keeps the move's place in the order (MS-E-38), a
    *  new move goes last (MS-E-114). A cell in the boost tier is accepted with
-   *  the NeedBoost status (MS-E-14). Fails with OutReason (and LastReason)
-   *  when no path exists within the best boost. */
+   *  the NeedBoost status (MS-E-14). The fighter's own cell is "stay": its
+   *  move (if any) is cleared and nothing is recorded (MS-E-16, B-01). Fails
+   *  with OutReason (and LastReason) when CanMoveFighter refuses or no path
+   *  exists within the best boost. */
   bool SetDestination(const FString& FighterId, int32 X, int32 Y,
                       const FS08Snapshot& Snapshot, const FS08BoardModel& Board,
                       const TArray<FS08BoardFighter>& Fighters, FString& OutReason);
@@ -423,6 +436,16 @@ public:
   /** Drops the selection (the draft stays): SelectedFighterId, SelectedTiers
    *  and ReachableCells together. */
   void DeselectFighter();
+  /** MS-T-04 (MS-R-05, MS-E-40/77): may the viewer move FighterId in this
+   *  maneuver? Own fighter on the board with health > 0 (the mover role:
+   *  isDefeated with health > 0 still moves, as the server), not
+   *  immobilized. False with why.client.desync / why.fighter.not.yours /
+   *  why.fighter.defeated / why.immobilized {fighterName} - the panel greys
+   *  the fighter with that reason. */
+  bool CanMoveFighter(const FString& FighterId, const TArray<FS08BoardFighter>& Fighters,
+                      FS09Reason& OutReason) const;
+  /** The current draft in the cache format (empty outside a maneuver draft). */
+  FS08ManeuverDraftCache ExportDraft() const;
   /** Boost toggle: only an exact own-hand instance id with a printed BOOST is
    *  accepted (null -> why.boost.no.value, MS-D-20); another card replaces
    *  the selected one; the draft is re-evaluated in the same call (MS-R-15).
@@ -443,7 +466,8 @@ public:
   /** Confirm gate: legal while the draft is open (zero moves is a legal
    *  maneuver - ACC-006) and every move is Ok after a fresh evaluation; a
    *  NeedBoost or Conflict move blocks it with its reason (MS-R-16). The
-   *  command carries the canonical paths. */
+   *  command carries the canonical paths; a zero-length move is never in it
+   *  (MS-R-44). */
   bool ConfirmManeuver(const FS08Snapshot& Snapshot, const FS08BoardModel& Board,
                        const TArray<FS08BoardFighter>& Fighters,
                        FS09ManeuverCommand& OutCommand, FString& OutReason);
@@ -514,7 +538,9 @@ public:
   bool PendingLegalFighters(const TArray<FS08BoardFighter>& Fighters,
                             TArray<FString>& OutIds) const;
   /** Legal destination cells for MOVE/PLACE/CHOOSE_SPACE (server reachability
-   *  + zone/anchor rules). Empty set for fighter/card/option types. */
+   *  + zone/anchor rules). Empty set for fighter/card/option types. MOVE:
+   *  FS08BoardModel::ComputeReachMap with `value` steps (absent -> 1, 0 -> 0)
+   *  - the mover's cell plus every endpoint (04 §3.3). */
   TSet<uint64> ComputePendingCells(const FS08Snapshot& Snapshot,
                                    const FS08BoardModel& Board,
                                    const TArray<FS08BoardFighter>& Fighters) const;
@@ -590,6 +616,20 @@ private:
                                         const TArray<FS08BoardFighter>& Fighters) const;
   /** Resets the evaluation, the selected tiers and the reach set. */
   void ResetDraftEval();
+  /** MS-T-04: drops the whole maneuver draft (id, moves, boost, selection,
+   *  evaluation) - no pendingManeuver of the viewer, or another id. */
+  void ResetManeuverDraft();
+  /** MS-T-04: StoreDraftHook(ExportDraft()) when the draft changed since the
+   *  last store. */
+  void SyncDraftCache();
+  /** MS-T-04: "MS-DATA dirtyDefeated fighter=<id>" once per maneuver for a
+   *  mover with isDefeated and health > 0 (04 §9). */
+  void TraceDirtyDefeated(const TArray<FS08BoardFighter>& Fighters, const FString& FighterId);
+  FS08ManeuverDraftCache LastStoredDraft;
+  /** False until the first store: a fresh UI always reports its (possibly
+   *  empty) draft once, so a stale cache of a closed maneuver is cleared. */
+  bool bDraftCacheSynced = false;
+  TSet<FString> DirtyDefeatedTraced;
   /** FS08Trace + DraftTrace (last 64). */
   void DraftTraceLine(const FString& Line);
   /** "MS-DRAFT op=<Op> rev=<n> ..." (04 §9) for FighterId's move (or the
@@ -602,9 +642,10 @@ private:
   void ResetPendingDraft();
   /** Head identity the draft belongs to (id + stage + mode + chooseCount). */
   FString PendingHeadKey() const;
-  /** Server MOVE reachability: BFS with `allowance` steps; enemies block the
-   *  path unless bCanPassThroughEnemies; destination must be endpoint-free
-   *  (own current cell included = zero-step legal resolve). */
+  /** Server MOVE reachability (ComputeReachMap): `allowance` steps; living
+   *  enemies of the mover's owner (IsAliveBlocker) block unless
+   *  bCanPassThroughEnemies; destination endpoint-free (own current cell
+   *  included = zero-step legal resolve). */
   TSet<uint64> PendingMoveCells(const FS08BoardModel& Board,
                                 const TArray<FS08BoardFighter>& Fighters,
                                 const FS08BoardFighter& Mover, int32 Allowance,

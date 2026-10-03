@@ -138,6 +138,7 @@ void FS08FlowController::SendHttp(const FString& Query, const TSharedPtr<FJsonOb
                                   FS08GraphqlClient::FResult&& OnDone) {
 #if WITH_AUTOMATION_TESTS
   ++TestHttpSendCount;
+  TestLastHttpVariables = Variables;
   if (DispatchQueuedHttpForTest(MoveTemp(OnDone))) return;
 #endif
   Http.Execute(Query, Variables, MoveTemp(OnDone));
@@ -496,6 +497,9 @@ void FS08FlowController::LeaveRoom() {
         }
         Trace(TEXT("LEFT room=") + GameId);
         Room = FS08RoomState();
+        // MS-T-04: the player left the match - its maneuver draft goes too (a
+        // relogin teardown keeps it: the same user may re-enter the match).
+        ManeuverDraftCache = FS08ManeuverDraftCache();
         // Stage first: the teardown below can observe WS close side effects,
         // and a reconnect must only ever arm while the match is live.
         SetStage(ES08Stage::Lobby);
@@ -1690,7 +1694,14 @@ bool FS08FlowController::SubmitManeuver(const FString& ManeuverId,
   Variables->SetStringField(TEXT("gameId"), Room.GameId);
   Variables->SetStringField(TEXT("maneuverId"), ManeuverId);
   TArray<TSharedPtr<FJsonValue>> MoveValues;
+  int32 ZeroLength = 0;
   for (const FS08ManeuverMove& Move : Moves) {
+    // MS-R-44 (B-01): "stay" is no entry in moves[] - an empty path would
+    // fail the whole maneuver with EMPTY_PATH.
+    if (Move.Path.IsEmpty()) {
+      ++ZeroLength;
+      continue;
+    }
     TSharedRef<FJsonObject> MoveObject = MakeShared<FJsonObject>();
     MoveObject->SetStringField(TEXT("fighterId"), Move.FighterId);
     TArray<TSharedPtr<FJsonValue>> PathValues;
@@ -1704,6 +1715,10 @@ bool FS08FlowController::SubmitManeuver(const FString& ManeuverId,
     MoveValues.Add(MakeShared<FJsonValueObject>(MoveObject));
   }
   Variables->SetArrayField(TEXT("moves"), MoveValues);
+  if (ZeroLength > 0) {
+    Trace(FString::Printf(TEXT("MANEUVER zero-length moves dropped=%d sent=%d (MS-R-44)"), ZeroLength,
+                          MoveValues.Num()));
+  }
   if (BoostCardId.IsEmpty()) {
     Variables->SetField(TEXT("boostCardId"), MakeShared<FJsonValueNull>());
   } else {
@@ -1759,6 +1774,27 @@ bool FS08FlowController::SubmitManeuver(const FString& ManeuverId,
         // the WS stream and collapse in the seq guard (merge).
       };
 SendHttp(ManeuverMutation, Variables, MoveTemp(OnDone));
+  return true;
+}
+
+void FS08FlowController::StoreManeuverDraft(const FS08ManeuverDraftCache& Draft) {
+  if (Draft.IsEmpty()) {
+    ManeuverDraftCache = FS08ManeuverDraftCache();
+    return;
+  }
+  ManeuverDraftCache = Draft;
+  ManeuverDraftCache.GameId = Room.GameId;
+  ManeuverDraftCache.UserId = UserId;
+}
+
+bool FS08FlowController::RecallManeuverDraft(const FString& ManeuverId, FS08ManeuverDraftCache& OutDraft) const {
+  if (ManeuverDraftCache.IsEmpty() || ManeuverId.IsEmpty() || Room.GameId.IsEmpty() ||
+      !ManeuverDraftCache.ManeuverId.Equals(ManeuverId, ESearchCase::CaseSensitive) ||
+      !ManeuverDraftCache.GameId.Equals(Room.GameId, ESearchCase::CaseSensitive) ||
+      !ManeuverDraftCache.UserId.Equals(UserId, ESearchCase::CaseSensitive)) {
+    return false;
+  }
+  OutDraft = ManeuverDraftCache;
   return true;
 }
 

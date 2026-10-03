@@ -162,6 +162,7 @@ void AS08FlowGameMode::BeginPlay() {
   FString WsUrl = HttpUrl.Replace(TEXT("http://"), TEXT("ws://"));
 
   Flow = MakeUnique<FS08FlowController>(HttpUrl, WsUrl);
+  BindManeuverDraftCache();
   ES08Stage PrevFlowStage = ES08Stage::Boot;
   Flow->OnStage.AddLambda([this, PrevFlowStage](ES08Stage Stage) mutable {
     OnStageChanged(PrevFlowStage, Stage);
@@ -432,6 +433,11 @@ void AS08FlowGameMode::HandleApplied(const FS08Snapshot& Snapshot, ES08SeqDecisi
       AppliedCount, Snapshot.SequenceNumber, static_cast<int32>(Decision),
       Snapshot.Fighters.IsValid() ? 1 : 0, Snapshot.BoardState.IsValid() ? 1 : 0));
   TrackCombatResult(Snapshot, Decision);
+  // MS-T-04: the board of THIS snapshot is decoded before the command UI sees
+  // it - a maneuver draft (one restored after a re-entry too) is evaluated on
+  // it, not on the previous (or the reset, empty) board. The render path
+  // below reuses the result.
+  const bool bBoardDecoded = BoardModel.Decode(Snapshot.BoardState);
   // ---- GD-032/033: feed the HUD model and the command-state machine ----
   const FString ViewerId = Flow.IsValid() ? Flow->GetUserId() : FString();
   if (!ViewerId.IsEmpty()) {
@@ -503,7 +509,7 @@ void AS08FlowGameMode::HandleApplied(const FS08Snapshot& Snapshot, ES08SeqDecisi
     FS08Trace::Write(TEXT("BOARD: fighters projection missing - board not rendered"));
     return;
   }
-  if (!BoardModel.Decode(Snapshot.BoardState)) {
+  if (!bBoardDecoded) {
     FS08Trace::Write(TEXT("BOARD: boardState undecodable - board not rendered"));
     return;
   }
@@ -975,8 +981,7 @@ void AS08FlowGameMode::HandleClick() {
     if (CommandUi.Mode == ES09CommandMode::ManeuverDraft &&
         !CommandUi.SelectedFighterId.IsEmpty()) {
       // Draft stays open; only the drafted-destination focus resets.
-      CommandUi.SelectedFighterId.Reset();
-      CommandUi.ReachableCells.Reset();
+      CommandUi.DeselectFighter();
       BoardActor->SetSelectedFighter(FString(), TSet<uint64>());
       Toast = TEXT("draft fighter deselected (draft stays open)");
       ToastUntil = Elapsed + 3.0f;
@@ -998,9 +1003,12 @@ void AS08FlowGameMode::HandleClick() {
     if (AS08FighterActor* FighterActor = Cast<AS08FighterActor>(Hit.GetActor())) {
       const FS08BoardFighter& Fighter = FighterActor->GetFighter();
       if (Flow.IsValid() && Fighter.OwnerId == Flow->GetUserId()) {
-        CommandUi.SelectFighter(Fighter.Id, Flow->GetAppliedSnapshot(), BoardModel, Fighters);
+        if (CommandUi.SelectFighter(Fighter.Id, Flow->GetAppliedSnapshot(), BoardModel, Fighters)) {
+          Toast = FString::Printf(TEXT("draft: selected %s - click a green cell"), *Fighter.Label);
+        } else {
+          Toast = TEXT("draft: ") + CommandUi.LastReason.Describe(); // e.g. why.immobilized (MS-R-05)
+        }
         BoardActor->SetSelectedFighter(CommandUi.SelectedFighterId, CommandUi.ReachableCells);
-        Toast = FString::Printf(TEXT("draft: selected %s - click a green cell"), *Fighter.Label);
       } else {
         Toast = TEXT("draft: enemy fighters cannot move");
       }
@@ -1019,8 +1027,10 @@ void AS08FlowGameMode::HandleClick() {
     FString Reason;
     if (CommandUi.SetDestination(CommandUi.SelectedFighterId, CellX, CellY,
                                  Flow->GetAppliedSnapshot(), BoardModel, Fighters, Reason)) {
-      Toast = FString::Printf(TEXT("draft: %s -> (%d,%d) [M/Enter confirm, Esc cancel]"),
-                              *CommandUi.SelectedFighterId, CellX, CellY);
+      Toast = CommandUi.MoveIndexOf(CommandUi.SelectedFighterId) == INDEX_NONE
+                  ? FString::Printf(TEXT("draft: %s stays (no move)"), *CommandUi.SelectedFighterId) // MS-E-16
+                  : FString::Printf(TEXT("draft: %s -> (%d,%d) [M/Enter confirm, Esc cancel]"),
+                                    *CommandUi.SelectedFighterId, CellX, CellY);
     } else {
       Toast = TEXT("draft rejected: ") + Reason;
     }
@@ -4046,9 +4056,21 @@ void AS08FlowGameMode::OnStageChanged(ES08Stage OldStage, ES08Stage NewStage) {
   }
 }
 
+void AS08FlowGameMode::BindManeuverDraftCache() {
+  // The draft outlives this command UI in the controller: a re-entry into the
+  // same match restores it for the same pendingManeuver.id (MS-R-55).
+  CommandUi.StoreDraftHook = [this](const FS08ManeuverDraftCache& Draft) {
+    if (Flow.IsValid()) Flow->StoreManeuverDraft(Draft);
+  };
+  CommandUi.RecallDraftHook = [this](const FString& ManeuverId, FS08ManeuverDraftCache& OutDraft) {
+    return Flow.IsValid() && Flow->RecallManeuverDraft(ManeuverId, OutDraft);
+  };
+}
+
 void AS08FlowGameMode::ClearGameplayHud() {
   Hud = FS09HudModel();
   CommandUi = FS09CommandUi();
+  BindManeuverDraftCache();
   if (Flow.IsValid()) CommandUi.ViewerId = Flow->GetUserId();
   LastCombatResult = FS09CombatResult();
   PrevApplied = FS08Snapshot();

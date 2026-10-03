@@ -378,7 +378,7 @@ pending MOVE с таким бойцом нет): резолв MOVE/PLACE тре�
 | Этап | Что защищает | Клиент | Состояние |
 |---|---|---|---|
 | `beginManeuver` | `expectedSequenceNumber` (`game-action-executor.service.ts:1656-1657`) | флаг «в полёте»; без автоповтора; `STATE_CHANGED` → refetch | MS-S-05 |
-| Черновик | ничего не уходит на сервер | локально; кэш по `maneuverId` в `FS08FlowController` переживает переподключение в том же процессе; при `!IsStreamReady()` подтверждение неактивно (MS-E-91) | MS-S-06..08 |
+| Черновик | ничего не уходит на сервер | локально; кэш по `maneuverId` в `FS08FlowController` переживает переподключение в том же процессе (MS-T-04: ключ — матч, пользователь и `maneuverId`; переживает и сброс HUD при выходе из матча с повторным входом после перелогина, очищается принятым `leaveGame`, закрытым манёвром и `GAME_OVER`); при `!IsStreamReady()` подтверждение неактивно (MS-E-91) | MS-S-06..08 |
 | `maneuver` | `maneuverId == pendingManeuver.id`, после успеха поле очищается (`:1708-1711`, `:1811`) | одна команда на подтверждение (`bManeuverInFlight`) | MS-S-09 |
 | Дедлайн | нет ответа 10 с | запрос отменяется, исход «неизвестен» → `EnterMutationRecovery`, без повтора (MS-E-89) | MS-S-10 |
 | Снапшот раньше HTTP | WS принёс снапшот, закрывший мой `maneuverId` (или открывший мой `pendingManeuver` после `begin`) | гейт `bManeuverInFlight` снимается применением снапшота; поздний HTTP-ответ — только трасса `MS-NET late-reply` (MS-E-90). Сейчас гейт снимается только в `OnDone` (`S08FlowController.cpp:1714, 1722`) | MS-S-09 → MS-S-01 |
@@ -587,7 +587,7 @@ ACC-022 1080p p95 ≤ 16,7 мс; демо двух клиентов — по 30 
 
 | Строка | Когда | Поля |
 |---|---|---|
-| `MS-DRAFT op=<assign|clear|boost|order|undo|reset|snapshot> rev=<n> src=<click|key|auto>` | любая операция черновика | `fighter`, `dest=<CellLabel>`, `order`, `status`, `required`, `boost` |
+| `MS-DRAFT op=<assign|clear|boost|order|undo|reset|snapshot|restore> rev=<n> src=<click|key|auto>` | любая операция черновика (`restore` — черновик из кэша по `maneuverId`, MS-T-04) | `fighter`, `dest=<CellLabel>`, `order`, `status`, `required`, `boost` |
 | `MS-PATH fighter=<id> steps=<n> allowance=<n> key=<canonical>` | новый путь хода или превью | `cells=M13>M14>M18` |
 | `MS-HL base=<n> boost=<n> ally=<n> enemy=<n> conflict=<n> needboost=<n> ghosts=<n> paths=<n>` | смена вида | счётчики подложек по состояниям |
 | `MS-HL geom ringIn=<uu> ringOut=<uu> outline=<uu>..<uu> clear=<uu> pipCut=<deg>` | сборка доски | геометрия подложки (MS-AT-21, MS-AT-30) |

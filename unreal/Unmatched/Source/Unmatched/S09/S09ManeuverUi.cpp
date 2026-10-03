@@ -563,12 +563,7 @@ bool FS09CommandUi::OnSnapshot(const FS08Snapshot& Snapshot, const FS08BoardMode
   // early-returns, GameInProgressGuard blocks after the row goes FINISHED).
   if (Snapshot.Phase == TEXT("GAME_OVER")) {
     Mode = ES09CommandMode::None;
-    PendingManeuverId.Reset();
-    Moves.Reset();
-    BoostCardId.Reset();
-    SelectedFighterId.Reset();
-    ReachableCells.Reset();
-    ResetDraftEval();
+    ResetManeuverDraft();
     PendingDiscard = FS08PendingHandDiscard();
     DiscardSelection.Reset();
     AttackAttackerId.Reset();
@@ -577,6 +572,7 @@ bool FS09CommandUi::OnSnapshot(const FS08Snapshot& Snapshot, const FS08BoardMode
     DefenseCardId.Reset();
     SchemeCardId.Reset();
     ResetPendingDraft();
+    SyncDraftCache();
     return Mode != OldMode;
   }
 
@@ -610,26 +606,61 @@ bool FS09CommandUi::OnSnapshot(const FS08Snapshot& Snapshot, const FS08BoardMode
     SchemeCardId.Reset();
   }
 
-  if (PendingManeuverFor(Snapshot, ViewerId, ManeuverId)) {
+  const bool bOwnManeuver = PendingManeuverFor(Snapshot, ViewerId, ManeuverId);
+  // MS-T-04: without the viewer's pendingManeuver no maneuver draft survives
+  // in ANY mode (it would otherwise leak into the next maneuver).
+  if (!bOwnManeuver) ResetManeuverDraft();
+
+  if (bOwnManeuver) {
     Mode = ES09CommandMode::ManeuverDraft;
-    PendingManeuverId = ManeuverId;
+    bool bRestored = false;
+    if (!PendingManeuverId.Equals(ManeuverId, ESearchCase::CaseSensitive)) {
+      // MS-R-55: a draft belongs to ONE pendingManeuver.id. Another id starts
+      // empty; the same id after a gameplay-HUD reset (re-entry into the
+      // match inside this process) comes back from the controller's cache.
+      ResetManeuverDraft();
+      PendingManeuverId = ManeuverId;
+      FS08ManeuverDraftCache Cached;
+      if (RecallDraftHook && RecallDraftHook(ManeuverId, Cached)) {
+        for (int32 Index = 0; Index < Cached.FighterIds.Num() && Index < Cached.Dests.Num(); ++Index) {
+          FS09DraftMove& Move = Moves.AddDefaulted_GetRef();
+          Move.FighterId = Cached.FighterIds[Index];
+          Move.DestX = Cached.Dests[Index].X;
+          Move.DestY = Cached.Dests[Index].Y;
+        }
+        BoostCardId = Cached.BoostCardId;
+        bRestored = true;
+      }
+    }
     // Revalidate the carried draft against the FRESH authoritative state:
-    // moves of fighters no longer selectable are dropped, a boost card that
-    // left the hand is cleared (the server would reject both).
+    // moves of fighters that can no longer move at all (defeated, gone, not
+    // own - MS-E-41) are dropped; every other move stays and is re-evaluated
+    // below - a lost path is a Conflict, a longer one NeedBoost (MS-E-53).
     Moves.RemoveAll([&](const FS09DraftMove& Move) {
-      return FindOwnFighter(Fighters, Move.FighterId) == nullptr;
+      const FS08BoardFighter* Own = FindOwnFighter(Fighters, Move.FighterId);
+      // MS-E-16: a carried move that now ends on the fighter's own cell (an
+      // effect put it there) is a "stay" - never an entry of the draft.
+      return Own == nullptr || (Own->X == Move.DestX && Own->Y == Move.DestY);
     });
     if (!BoostCardId.IsEmpty() && !OwnHandIds(Snapshot).Contains(BoostCardId)) {
+      // MS-E-15: the card left the hand - the boost is dropped, the moves
+      // re-evaluate (NeedBoost), the reason stays for the toast.
       BoostCardId.Reset();
+      LastReason = FS09Reason::Make(TEXT("why.boost.card.gone"));
     }
-    if (!SelectedFighterId.IsEmpty() && FindOwnFighter(Fighters, SelectedFighterId) == nullptr) {
-      SelectedFighterId.Reset();
+    FS09Reason SelectionGate;
+    if (!SelectedFighterId.IsEmpty() && !CanMoveFighter(SelectedFighterId, Fighters, SelectionGate)) {
+      SelectedFighterId.Reset(); // e.g. immobilized since the last snapshot (MS-R-05)
     }
     // MS-T-05: every snapshot re-evaluates the whole draft on the fresh
     // positions and hand (statuses, paths, the selected fighter's tiers).
     DraftHand = FS09DraftEval::BoostHand(Snapshot, ViewerId);
     ReevaluateDraft(Board, Fighters);
-    if (Moves.Num() > 0 || !BoostCardId.IsEmpty()) TraceDraftOp(TEXT("snapshot"), FString(), Board);
+    if (bRestored) {
+      TraceDraftOp(TEXT("restore"), FString(), Board);
+    } else if (Moves.Num() > 0 || !BoostCardId.IsEmpty()) {
+      TraceDraftOp(TEXT("snapshot"), FString(), Board);
+    }
   } else if (bHasDiscard && Discard.PlayerId == ViewerId) {
     Mode = ES09CommandMode::DiscardDraft;
     PendingDiscard = Discard;
@@ -708,12 +739,6 @@ bool FS09CommandUi::OnSnapshot(const FS08Snapshot& Snapshot, const FS08BoardMode
     }
   } else {
     Mode = ES09CommandMode::None;
-    PendingManeuverId.Reset();
-    Moves.Reset();
-    BoostCardId.Reset();
-    SelectedFighterId.Reset();
-    ReachableCells.Reset();
-    ResetDraftEval();
     PendingDiscard = FS08PendingHandDiscard();
     DiscardSelection.Reset();
     AttackAttackerId.Reset();
@@ -723,6 +748,7 @@ bool FS09CommandUi::OnSnapshot(const FS08Snapshot& Snapshot, const FS08BoardMode
     SchemeCardId.Reset();
     ResetPendingDraft();
   }
+  SyncDraftCache();
   return Mode != OldMode;
 }
 
@@ -771,12 +797,84 @@ TArray<FString> FS09CommandUi::OwnHandIds(const FS08Snapshot& Snapshot) const {
 
 const FS08BoardFighter* FS09CommandUi::FindOwnFighter(
     const TArray<FS08BoardFighter>& Fighters, const FString& FighterId) const {
+  // MS-T-04 (F10): the maneuver MOVER role - validateManeuver rejects only
+  // health <= 0, so isDefeated with health > 0 still moves (MS-E-77); ids
+  // compare exactly. Immobilized is CanMoveFighter's gate, not this one.
+  // SelectAttacker shares the lookup (unchanged: health > 0 with a position).
   for (const FS08BoardFighter& Fighter : Fighters) {
-    if (Fighter.Id == FighterId && Fighter.OwnerId == ViewerId && Fighter.IsAlive()) {
+    if (SameDraftId(Fighter.Id, FighterId) && SameDraftId(Fighter.OwnerId, ViewerId) && Fighter.CanBeMover() &&
+        Fighter.X >= 0 && Fighter.Y >= 0) {
       return &Fighter;
     }
   }
   return nullptr;
+}
+
+bool FS09CommandUi::CanMoveFighter(const FString& FighterId, const TArray<FS08BoardFighter>& Fighters,
+                                   FS09Reason& OutReason) const {
+  OutReason.Reset();
+  const FS08BoardFighter* Fighter = FindWorkFighter(Fighters, FighterId);
+  if (!Fighter) {
+    OutReason = FS09Reason::Make(TEXT("why.client.desync"));
+  } else if (!SameDraftId(Fighter->OwnerId, ViewerId)) {
+    OutReason = FS09Reason::Make(TEXT("why.fighter.not.yours"));
+  } else if (!Fighter->CanBeMover()) {
+    OutReason = FS09Reason::Make(TEXT("why.fighter.defeated"));
+  } else if (!FindOwnFighter(Fighters, FighterId)) {
+    OutReason = FS09Reason::Make(TEXT("why.client.desync")); // living, but no board position
+  } else if (FS09DraftEval::IsImmobilized(*Fighter)) {
+    // MS-R-05 / B-06: greyed with the reason, no target may be assigned.
+    OutReason = FS09Reason::Make(TEXT("why.immobilized")).Arg(TEXT("fighterName"), FighterDisplayName(*Fighter));
+  }
+  return !OutReason.IsSet();
+}
+
+FS08ManeuverDraftCache FS09CommandUi::ExportDraft() const {
+  FS08ManeuverDraftCache Out;
+  if (Mode != ES09CommandMode::ManeuverDraft || PendingManeuverId.IsEmpty()) return Out;
+  Out.ManeuverId = PendingManeuverId;
+  for (const FS09DraftMove& Move : Moves) {
+    Out.FighterIds.Add(Move.FighterId);
+    Out.Dests.Add(FIntPoint(Move.DestX, Move.DestY));
+  }
+  Out.BoostCardId = BoostCardId;
+  return Out;
+}
+
+void FS09CommandUi::SyncDraftCache() {
+  if (!StoreDraftHook) return;
+  const FS08ManeuverDraftCache Draft = ExportDraft();
+  auto SameIds = [](const TArray<FString>& A, const TArray<FString>& B) {
+    if (A.Num() != B.Num()) return false;
+    for (int32 Index = 0; Index < A.Num(); ++Index) {
+      if (!SameDraftId(A[Index], B[Index])) return false;
+    }
+    return true;
+  };
+  if (bDraftCacheSynced && SameDraftId(Draft.ManeuverId, LastStoredDraft.ManeuverId) &&
+      SameIds(Draft.FighterIds, LastStoredDraft.FighterIds) && Draft.Dests == LastStoredDraft.Dests &&
+      SameDraftId(Draft.BoostCardId, LastStoredDraft.BoostCardId)) {
+    return;
+  }
+  bDraftCacheSynced = true;
+  LastStoredDraft = Draft;
+  StoreDraftHook(Draft);
+}
+
+void FS09CommandUi::ResetManeuverDraft() {
+  PendingManeuverId.Reset();
+  Moves.Reset();
+  BoostCardId.Reset();
+  SelectedFighterId.Reset();
+  ResetDraftEval();
+  DirtyDefeatedTraced.Reset();
+}
+
+void FS09CommandUi::TraceDirtyDefeated(const TArray<FS08BoardFighter>& Fighters, const FString& FighterId) {
+  const FS08BoardFighter* Fighter = FindWorkFighter(Fighters, FighterId);
+  if (!Fighter || !Fighter->bDefeated || Fighter->Health <= 0 || DirtyDefeatedTraced.Contains(FighterId)) return;
+  DirtyDefeatedTraced.Add(FighterId);
+  DraftTraceLine(FString::Printf(TEXT("MS-DATA dirtyDefeated fighter=%s"), *FighterId));
 }
 
 // ---- MS-T-05 draft bookkeeping ----------------------------------------------
@@ -804,6 +902,7 @@ void FS09CommandUi::ReevaluateDraft(const FS08BoardModel& Board, const TArray<FS
   Eval = FS09DraftEval::Evaluate(Board, Fighters, Moves, DraftHand, BoostCardId, ViewerId);
   RefreshSelectedTiers(Board, Fighters);
   ++DraftRevision;
+  SyncDraftCache();
 }
 
 void FS09CommandUi::RefreshSelectedTiers(const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters) {
@@ -868,7 +967,8 @@ bool FS09CommandUi::SelectFighter(const FString& FighterId, const FS08Snapshot& 
                                   const FS08BoardModel& Board,
                                   const TArray<FS08BoardFighter>& Fighters) {
   if (Mode != ES09CommandMode::ManeuverDraft) return false;
-  if (FindOwnFighter(Fighters, FighterId) == nullptr) return false;
+  if (!CanMoveFighter(FighterId, Fighters, LastReason)) return false; // MS-R-05: e.g. why.immobilized
+  TraceDirtyDefeated(Fighters, FighterId);
   SelectedFighterId = FighterId;
   DraftHand = FS09DraftEval::BoostHand(Snapshot, ViewerId);
   ReevaluateDraft(Board, Fighters);
@@ -883,18 +983,7 @@ bool FS09CommandUi::EvaluateDestination(const FString& FighterId, int32 X, int32
   OutMove.DestX = X;
   OutMove.DestY = Y;
   OutReason.Reset();
-  const FS08BoardFighter* Own = FindOwnFighter(Fighters, FighterId);
-  if (!Own) {
-    const FS08BoardFighter* Any = FindFighter(Fighters, FighterId);
-    const TCHAR* Key = TEXT("why.fighter.defeated");
-    if (!Any) {
-      Key = TEXT("why.client.desync");
-    } else if (Any->OwnerId != ViewerId) {
-      Key = TEXT("why.fighter.not.yours");
-    }
-    OutReason = FS09Reason::Make(Key);
-    return false;
-  }
+  if (!CanMoveFighter(FighterId, Fighters, OutReason)) return false;
   const int32 Selected = FS09DraftEval::SelectedBoostOf(DraftHand, BoostCardId);
   const int32 MaxBoost = FS09DraftEval::MaxBoostOf(DraftHand);
   const TArray<FS08BoardFighter> Work = WorkStateFor(FighterId, Board, Fighters);
@@ -935,11 +1024,24 @@ bool FS09CommandUi::SetDestination(const FString& FighterId, int32 X, int32 Y,
     OutReason = TEXT("no open maneuver draft");
     return false;
   }
-  if (!FindOwnFighter(Fighters, FighterId)) {
-    OutReason = TEXT("not one of your living fighters");
+  DraftHand = FS09DraftEval::BoostHand(Snapshot, ViewerId);
+  const FS08BoardFighter* Own = FindOwnFighter(Fighters, FighterId);
+  if (Own && Own->X == X && Own->Y == Y) {
+    // MS-E-16 / B-01: the own cell is "stay" - never a move of the draft;
+    // a drafted move of this fighter is cleared (MS-R-11).
+    const int32 Index = MoveIndexOf(FighterId);
+    if (Index != INDEX_NONE) {
+      Moves.RemoveAt(Index);
+      ReevaluateDraft(Board, Fighters);
+      TraceDraftOp(TEXT("clear"), FighterId, Board);
+    }
+    return true;
+  }
+  if (!CanMoveFighter(FighterId, Fighters, LastReason)) {
+    OutReason = LastReason.Describe();
     return false;
   }
-  DraftHand = FS09DraftEval::BoostHand(Snapshot, ViewerId);
+  TraceDirtyDefeated(Fighters, FighterId);
   FS09DraftMove Candidate;
   if (!EvaluateDestination(FighterId, X, Y, Board, Fighters, Candidate, LastReason)) {
     OutReason = LastReason.Describe();
@@ -1107,9 +1209,12 @@ bool FS09CommandUi::ConfirmManeuver(const FS08Snapshot& Snapshot,
   OutCommand.ManeuverId = PendingManeuverId;
   OutCommand.BoostCardId = BoostCardId;
   for (const FS09DraftMove& Move : Moves) {
+    // MS-R-44 (B-01): "stay" is no entry in moves[] (the server would reject
+    // the whole maneuver with EMPTY_PATH).
+    if (Move.Path.IsEmpty()) continue;
     FS08ManeuverMove Out;
     Out.FighterId = Move.FighterId;
-    Out.Path = Move.Path; // canonical path (04 §3.1); empty = stay
+    Out.Path = Move.Path; // canonical path (04 §3.1)
     OutCommand.Moves.Add(MoveTemp(Out));
   }
   // Zero moves + optional boost/no-boost is a legal completion (ACC-006).
@@ -1504,8 +1609,11 @@ bool FS09CommandUi::PendingLegalFighters(const TArray<FS08BoardFighter>& Fighter
       continue;
     }
     // Revive-PLACE may pick a DEFEATED fighter; every other MOVE/PLACE
-    // needs a living one (server: 'Боец не найден или повержен').
-    if (!Fighter.IsAlive() && !(Type == TEXT("PLACE") && PendingChoice.bRestoreFullHealth)) {
+    // needs a living one (server: 'Боец не найден или повержен' -
+    // isLivingFighter, so isDefeated with health > 0 is NOT movable by an
+    // effect: MS-T-04, the IsAliveBlocker role).
+    const bool bLiving = Fighter.IsAliveBlocker() && Fighter.X >= 0 && Fighter.Y >= 0;
+    if (!bLiving && !(Type == TEXT("PLACE") && PendingChoice.bRestoreFullHealth)) {
       continue;
     }
     // Banner restriction from the card text ('Move Daredevil…'):
@@ -1547,47 +1655,19 @@ TSet<uint64> FS09CommandUi::PendingMoveCells(const FS08BoardModel& Board,
                                              const FS08BoardFighter& Mover,
                                              int32 Allowance,
                                              bool bPassThroughEnemies) const {
+  // 04 §3.3 (MS-T-04): the canonical reach of the model - living enemies of
+  // the moved fighter's owner (IsAliveBlocker) block unless the effect passes
+  // through them; allies and defeated fighters never block.
   TSet<uint64> Out;
-  // Living enemy cells block the path unless the effect passes through them.
-  TSet<uint64> Blocked;
-  if (!bPassThroughEnemies) {
-    for (const FS08BoardFighter& Other : Fighters) {
-      if (Other.Id != Mover.Id && Other.IsAlive() && Other.OwnerId != Mover.OwnerId) {
-        Blocked.Add(FS08BoardModel::CellKey(Other.X, Other.Y));
-      }
-    }
-  }
-  // BFS from the mover's cell; allies are pass-through (server semantics).
-  TSet<uint64> Visited;
-  TArray<TPair<int32, int32>> Frontier;
-  Frontier.Add(TPair<int32, int32>(Mover.X, Mover.Y));
-  Visited.Add(FS08BoardModel::CellKey(Mover.X, Mover.Y));
-  for (int32 Step = 0; Step < Allowance && Frontier.Num() > 0; Step++) {
-    TArray<TPair<int32, int32>> Next;
-    for (const TPair<int32, int32>& Cell : Frontier) {
-      // Board neighbours (links on an original-map board, orthogonal on a
-      // grid) - the server getReachableCells graph.
-      for (const FIntPoint& Neighbour : Board.Neighbours(FIntPoint(Cell.Key, Cell.Value))) {
-        const int32 NX = Neighbour.X;
-        const int32 NY = Neighbour.Y;
-        const uint64 Key = FS08BoardModel::CellKey(NX, NY);
-        if (Visited.Contains(Key)) continue;
-        const FS08Cell* BoardCell = Board.CellAt(NX, NY);
-        if (!BoardCell || !BoardCell->IsPassable() || Blocked.Contains(Key)) continue;
-        Visited.Add(Key);
-        Next.Add(TPair<int32, int32>(NX, NY));
-      }
-    }
-    Frontier = MoveTemp(Next);
-  }
-  for (const uint64 Key : Visited) {
-    // Destination rule: no OTHER living fighter on the cell; the mover's own
-    // cell stays legal (zero-step resolve of an "up to N" move).
-    const int32 X = static_cast<int32>(Key >> 32);
-    const int32 Y = static_cast<int32>(Key & 0xFFFFFFFF);
-    if (FS08BoardModel::FighterAt(Fighters, X, Y, Mover.Id) == nullptr) {
-      Out.Add(Key);
-    }
+  FS08ReachOptions Options;
+  Options.bPassThroughEnemies = bPassThroughEnemies;
+  const FS08ReachMap Reach = FS08BoardModel::ComputeReachMap(Board, Fighters, Mover.Id, Allowance, Options);
+  if (!Reach.bValid) return Out;
+  // The mover's own cell stays legal (zero-step resolve of an "up to N" move);
+  // every other cell must be free of another living fighter.
+  Out.Add(FS08BoardModel::CellKey(Reach.Start.X, Reach.Start.Y));
+  for (const FIntPoint& Cell : FS08BoardModel::ReachEndpoints(Board, Fighters, Reach, Allowance)) {
+    Out.Add(FS08BoardModel::CellKey(Cell.X, Cell.Y));
   }
   return Out;
 }

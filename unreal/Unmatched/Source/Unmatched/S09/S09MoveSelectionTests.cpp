@@ -8,6 +8,14 @@
 //       re-evaluates statuses and tiers in the same call, NeedBoost by the
 //       absolute RequiredBoost, card highlight, tiers by MS-E-80, null / +0 /
 //       two copies.
+//   Unmatched.S09.MoveSel.ZeroLengthNotSent - MS-AT-11 (MS-T-04): the own cell
+//       never becomes a move, ConfirmManeuver and SubmitManeuver drop "stay".
+//   Unmatched.S09.MoveSel.MovementParity  - MS-AT-14 (MS-T-04): raw movement,
+//       immobilized gate, the two "alive" roles, MS-DATA dirtyDefeated.
+//   Unmatched.S09.MoveSel.ReconnectAndRebuild - MS-AT-20, the MS-T-04 part:
+//       the draft cache by maneuverId, re-evaluation on a new seq, a boost card
+//       that left the hand, another id / closed maneuver / GAME_OVER. (Deadline,
+//       auth refresh and why.syncing: MS-T-06; undo stack: MS-T-07.)
 // Headless run:
 //   UnrealEditor-Cmd.exe Unmatched.uproject
 //     "-ExecCmds=Automation RunTests Unmatched.S09.MoveSel; Quit"
@@ -26,6 +34,7 @@
 #include "Misc/Paths.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
+#include "Serialization/JsonWriter.h"
 
 // Named namespace (not anonymous): unity builds merge test files.
 namespace S09MoveSelTest {
@@ -652,6 +661,572 @@ bool FS09MoveSelBoostRecomputeTest::RunTest(const FString&) {
               Ui.ConfirmManeuver(Snap, Board, Fighters, Command, Reason));
     TestEqual(TEXT("it is a Conflict, not NeedBoost"), MsStatus(MsMove(Ui, TEXT("a"))), FString(TEXT("conflict")));
     TestEqual(TEXT("why.cell.unreachable"), MsKey(Ui.Moves[0].Reason), FString(TEXT("why.cell.unreachable")));
+  }
+  return true;
+}
+
+// ---- MS-T-04 ------------------------------------------------------------------
+
+namespace S09MoveSelTest {
+
+/** Fighter projection entry (the shape DecodeFighters reads); Movement is
+ *  set raw (number, string, null) unless absent. */
+TSharedRef<FJsonObject> MsFighterJson(const FString& Id, const FString& Owner, int32 X, int32 Y, int32 Health,
+                                      TSharedPtr<FJsonValue> Movement, bool bDefeated = false,
+                                      const FString& Effect = FString()) {
+  TSharedRef<FJsonObject> F = MakeShared<FJsonObject>();
+  F->SetStringField(TEXT("id"), Id);
+  F->SetStringField(TEXT("ownerId"), Owner);
+  F->SetStringField(TEXT("heroId"), TEXT("hero-") + Owner);
+  F->SetStringField(TEXT("name"), Id);
+  F->SetStringField(TEXT("type"), TEXT("MINION"));
+  F->SetNumberField(TEXT("health"), Health);
+  F->SetNumberField(TEXT("maxHealth"), 10);
+  TSharedRef<FJsonObject> Pos = MakeShared<FJsonObject>();
+  Pos->SetNumberField(TEXT("x"), X);
+  Pos->SetNumberField(TEXT("y"), Y);
+  F->SetObjectField(TEXT("position"), Pos);
+  F->SetStringField(TEXT("attackType"), TEXT("melee"));
+  F->SetBoolField(TEXT("isDefeated"), bDefeated);
+  TArray<TSharedPtr<FJsonValue>> Effects;
+  if (!Effect.IsEmpty()) {
+    TSharedRef<FJsonObject> E = MakeShared<FJsonObject>();
+    E->SetStringField(TEXT("type"), Effect);
+    Effects.Add(MakeShared<FJsonValueObject>(E));
+  }
+  F->SetArrayField(TEXT("effects"), Effects);
+  if (Movement.IsValid()) F->SetField(TEXT("movement"), Movement);
+  return F;
+}
+
+TArray<FS08BoardFighter> MsDecode(const TArray<TSharedRef<FJsonObject>>& Entries) {
+  TArray<TSharedPtr<FJsonValue>> Values;
+  for (const TSharedRef<FJsonObject>& Entry : Entries) Values.Add(MakeShared<FJsonValueObject>(Entry));
+  TArray<FS08BoardFighter> Out;
+  FS08BoardModel::DecodeFighters(MakeShared<FJsonValueArray>(Values), Out);
+  return Out;
+}
+
+TSharedPtr<FJsonValue> MsNum(double V) { return MakeShared<FJsonValueNumber>(V); }
+TSharedPtr<FJsonValue> MsStr(const TCHAR* V) { return MakeShared<FJsonValueString>(V); }
+
+/** Snapshot with metadata.pendingEffects = [one head of the viewer]: Type
+ *  MOVE / PLACE; Value < 0 = no `value` field (MOVE allowance 1). */
+FS08Snapshot MsPendingMoveSnapshot(int32 Value, const TCHAR* Type = TEXT("MOVE"), bool bPassThrough = false,
+                                   bool bRevive = false) {
+  FS08Snapshot Snapshot = MsSnapshot({}, FString());
+  const TSharedRef<FJsonObject> Meta = MakeShared<FJsonObject>(*Snapshot.Metadata->AsObject());
+  TSharedRef<FJsonObject> Head = MakeShared<FJsonObject>();
+  Head->SetStringField(TEXT("id"), TEXT("effect-1"));
+  Head->SetStringField(TEXT("playerId"), Me);
+  Head->SetStringField(TEXT("type"), Type);
+  if (Value >= 0) Head->SetNumberField(TEXT("value"), Value);
+  if (bPassThrough) Head->SetBoolField(TEXT("canPassThroughEnemies"), true);
+  if (bRevive) Head->SetBoolField(TEXT("restoreFullHealth"), true);
+  Head->SetStringField(TEXT("fighterName"), TEXT(""));
+  Head->SetStringField(TEXT("zoneFighterName"), TEXT(""));
+  Head->SetStringField(TEXT("mode"), TEXT(""));
+  Head->SetStringField(TEXT("text"), TEXT("Move up to 2 spaces"));
+  TArray<TSharedPtr<FJsonValue>> Effects = {MakeShared<FJsonValueObject>(Head)};
+  Meta->SetArrayField(TEXT("pendingEffects"), Effects);
+  Snapshot.Metadata = MakeShared<FJsonValueObject>(Meta);
+  return Snapshot;
+}
+
+/** The viewer's snapshot with metadata.pendingHandDiscard (no pendingManeuver). */
+FS08Snapshot MsDiscardSnapshot(const TArray<FMsCard>& Hand, int32 Seq) {
+  FS08Snapshot Snapshot = MsSnapshot(Hand, FString(), Seq);
+  Snapshot.Phase = TEXT("TURN_END");
+  const TSharedRef<FJsonObject> Meta = MakeShared<FJsonObject>(*Snapshot.Metadata->AsObject());
+  TSharedRef<FJsonObject> Discard = MakeShared<FJsonObject>();
+  Discard->SetStringField(TEXT("id"), TEXT("discard:1:30"));
+  Discard->SetStringField(TEXT("playerId"), Me);
+  Discard->SetNumberField(TEXT("count"), 1);
+  Meta->SetObjectField(TEXT("pendingHandDiscard"), Discard);
+  Snapshot.Metadata = MakeShared<FJsonValueObject>(Meta);
+  return Snapshot;
+}
+
+bool MsTraced(const FS09CommandUi& Ui, const FString& Needle, int32& OutCount) {
+  OutCount = 0;
+  for (const FString& Line : Ui.DraftTrace) OutCount += Line.Contains(Needle) ? 1 : 0;
+  return OutCount > 0;
+}
+
+void MsBindCache(FS09CommandUi& Ui, FS08FlowController& Flow) {
+  Ui.StoreDraftHook = [&Flow](const FS08ManeuverDraftCache& Draft) { Flow.StoreManeuverDraft(Draft); };
+  Ui.RecallDraftHook = [&Flow](const FString& Id, FS08ManeuverDraftCache& Out) {
+    return Flow.RecallManeuverDraft(Id, Out);
+  };
+}
+
+// The live fixture 04 (S08 evidence) - a full snapshot the controller's
+// critical-field gate accepts (the SubmitManeuver leg needs one).
+const TCHAR* const LiveHost = TEXT("cmugykjjb0000wi9w2nq4qlkj");
+
+bool MsLoadLiveSnapshot(FS08Snapshot& Out) {
+  FString Dir;
+  if (!FParse::Value(FCommandLine::Get(), TEXT("S08Fixtures="), Dir) || Dir.IsEmpty()) {
+    Dir = FPaths::Combine(FPaths::ProjectDir(), TEXT("../../docs/game-design/evidence/S08/fixtures"));
+  }
+  FString Text;
+  if (!FFileHelper::LoadFileToString(Text, *FPaths::Combine(Dir, TEXT("04-game-state-query-host.json")))) return false;
+  TSharedPtr<FJsonValue> Value;
+  FString Problem;
+  if (!FS08Contracts::TryParseJsonValue(Text, Value, Problem)) return false;
+  const TSharedPtr<FJsonObject>* Root = nullptr;
+  if (!Value->TryGetObject(Root) || !Root->IsValid()) return false;
+  FString Body;
+  const TSharedPtr<FJsonObject>* RawObject = nullptr;
+  if ((*Root)->TryGetStringField(TEXT("raw"), Body)) {
+    // raw is the response text
+  } else if ((*Root)->TryGetObjectField(TEXT("raw"), RawObject) && RawObject->IsValid()) {
+    const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&Body);
+    FJsonSerializer::Serialize(RawObject->ToSharedRef(), Writer);
+  }
+  FString RawState;
+  FS08GraphQLError Error;
+  if (!FS08Contracts::ParseGameStateQuery(Body, Out, RawState, Error)) return false;
+  const TSharedRef<FJsonObject> Meta = MakeShared<FJsonObject>(*(Out.Metadata->AsObject()));
+  TSharedRef<FJsonObject> Pending = MakeShared<FJsonObject>();
+  Pending->SetStringField(TEXT("id"), TEXT("maneuver:1:5"));
+  Pending->SetStringField(TEXT("playerId"), LiveHost);
+  Meta->SetObjectField(TEXT("pendingManeuver"), Pending);
+  Out.Metadata = MakeShared<FJsonValueObject>(Meta);
+  return true;
+}
+
+/** graphql-transport-ws 'next' for the harness op s08-1 at the baseline seq
+ *  (proves the operation live; the equal seq merges). */
+FString MsBarrierFrame(const FS08Snapshot& Baseline) {
+  TSharedRef<FJsonObject> Event = MakeShared<FJsonObject>();
+  Event->SetNumberField(TEXT("sequenceNumber"), Baseline.SequenceNumber);
+  Event->SetStringField(TEXT("phase"), Baseline.Phase);
+  Event->SetNumberField(TEXT("turnCount"), Baseline.TurnCount);
+  Event->SetStringField(TEXT("currentTurnPlayerId"), Baseline.CurrentTurnPlayerId);
+  TSharedRef<FJsonObject> Data = MakeShared<FJsonObject>();
+  Data->SetObjectField(TEXT("gameStateUpdated"), Event);
+  TSharedRef<FJsonObject> Payload = MakeShared<FJsonObject>();
+  Payload->SetObjectField(TEXT("data"), Data);
+  TSharedRef<FJsonObject> Frame = MakeShared<FJsonObject>();
+  Frame->SetStringField(TEXT("type"), TEXT("next"));
+  Frame->SetStringField(TEXT("id"), TEXT("s08-1"));
+  Frame->SetObjectField(TEXT("payload"), Payload);
+  FString Out;
+  FJsonSerializer::Serialize(Frame, TJsonWriterFactory<>::Create(&Out));
+  return Out;
+}
+
+} // namespace S09MoveSelTest
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09MoveSelZeroLengthNotSentTest, "Unmatched.S09.MoveSel.ZeroLengthNotSent",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS09MoveSelZeroLengthNotSentTest::RunTest(const FString&) {
+  const FS08BoardModel Board = MsGrid(5, 5);
+  const FS08Snapshot Snap = MsSnapshot({{TEXT("c2"), true, 2}});
+  const TArray<FS08BoardFighter> Fighters = {MsFighter(TEXT("a"), Me, 1, 1), MsFighter(TEXT("b"), Me, 3, 3)};
+  FString Reason;
+  FS09ManeuverCommand Command;
+
+  // ---- MS-E-16: the own cell never becomes a move ----
+  FS09CommandUi Ui = MsOpen(Snap, Board, Fighters);
+  TestTrue(TEXT("own cell without a move: accepted"), Ui.SetDestination(TEXT("a"), 1, 1, Snap, Board, Fighters, Reason));
+  TestEqual(TEXT("no zero-length move recorded"), Ui.Moves.Num(), 0);
+  TestTrue(TEXT("A drafted"), Ui.SetDestination(TEXT("a"), 2, 1, Snap, Board, Fighters, Reason));
+  TestTrue(TEXT("B drafted"), Ui.SetDestination(TEXT("b"), 4, 3, Snap, Board, Fighters, Reason));
+  TestTrue(TEXT("own cell clears A's move (MS-R-11)"), Ui.SetDestination(TEXT("a"), 1, 1, Snap, Board, Fighters, Reason));
+  TestEqual(TEXT("A's move gone, B's kept"), Ui.Moves.Num(), 1);
+  TestEqual(TEXT("B moved up to 0"), Ui.MoveIndexOf(TEXT("b")), 0);
+  int32 Clears = 0;
+  MsTraced(Ui, TEXT("MS-DRAFT op=clear"), Clears);
+  TestEqual(TEXT("one MS-DRAFT op=clear"), Clears, 1);
+
+  // ---- a stay entry that slipped into the draft is never sent ----
+  Ui.Moves.AddDefaulted_GetRef().FighterId = TEXT("a");
+  Ui.Moves.Last().DestX = 1;
+  Ui.Moves.Last().DestY = 1;
+  TestTrue(TEXT("confirm with a stay entry"), Ui.ConfirmManeuver(Snap, Board, Fighters, Command, Reason));
+  TestEqual(TEXT("only B in the command"), Command.Moves.Num(), 1);
+  bool bEmptyPath = false;
+  for (const FS08ManeuverMove& Move : Command.Moves) bEmptyPath |= Move.Path.IsEmpty();
+  TestFalse(TEXT("no empty path in the command (MS-R-44)"), bEmptyPath);
+
+  // ---- MS-E-09: no moves + a boost is a legal maneuver ----
+  FS09CommandUi Boosted = MsOpen(Snap, Board, Fighters);
+  TestTrue(TEXT("boost selected"), Boosted.ToggleBoostCard(TEXT("c2"), Snap, Board, Fighters, Reason));
+  TestTrue(TEXT("boost without moves confirms"), Boosted.ConfirmManeuver(Snap, Board, Fighters, Command, Reason));
+  TestEqual(TEXT("zero moves"), Command.Moves.Num(), 0);
+  TestEqual(TEXT("boost card sent"), Command.BoostCardId, FString(TEXT("c2")));
+
+  // ---- SubmitManeuver drops an empty path before the wire (MS-R-44) ----
+  FS08Snapshot Live;
+  if (!MsLoadLiveSnapshot(Live)) {
+    AddError(TEXT("fixture 04 not loaded"));
+    return true;
+  }
+  FS08FlowController Flow(TEXT("http://127.0.0.1:9/graphql"), TEXT("ws://127.0.0.1:9/graphql"), LiveHost);
+  TArray<FString> Traces;
+  Flow.OnTrace.AddLambda([&Traces](const FString& Line) { Traces.Add(Line); });
+  Flow.AttachStreamHarnessForTest(TEXT("ms-zero-game"));
+  Flow.ApplySnapshot(Live);
+  Flow.InjectWsFrameForTest(MsBarrierFrame(Flow.GetAppliedSnapshot()));
+  TestTrue(TEXT("stream live"), Flow.IsStreamReady());
+  Flow.QueueHttpResultForTest(false, {}, /*bDeferDelivery=*/true); // no real POST
+  TArray<FS08ManeuverMove> Moves;
+  Moves.AddDefaulted_GetRef().FighterId = TEXT("f-0-hero"); // stay: empty path
+  FS08ManeuverMove& Step = Moves.AddDefaulted_GetRef();
+  Step.FighterId = TEXT("f-0-sk0");
+  Step.Path = {FIntPoint(0, 2)};
+  TestTrue(TEXT("submit dispatched"), Flow.SubmitManeuver(TEXT("maneuver:1:5"), Moves));
+  TestEqual(TEXT("one HTTP leg"), Flow.GetTestHttpSendCountForTest(), 1);
+  bool bDropped = false;
+  for (const FString& Line : Traces) bDropped |= Line.Contains(TEXT("MANEUVER zero-length moves dropped=1 sent=1"));
+  TestTrue(TEXT("the stay entry is dropped before the wire (trace)"), bDropped);
+  const TSharedPtr<FJsonObject> Sent = Flow.GetLastHttpVariablesForTest();
+  const TArray<TSharedPtr<FJsonValue>>* WireMoves = nullptr;
+  TestTrue(TEXT("maneuver variables captured"), Sent.IsValid() && Sent->TryGetArrayField(TEXT("moves"), WireMoves));
+  if (WireMoves) {
+    TestEqual(TEXT("one move on the wire"), WireMoves->Num(), 1);
+    for (const TSharedPtr<FJsonValue>& Move : *WireMoves) {
+      const TArray<TSharedPtr<FJsonValue>>* Path = nullptr;
+      TestTrue(TEXT("the wire move has a non-empty path"),
+               Move->AsObject()->TryGetArrayField(TEXT("path"), Path) && Path->Num() == 1);
+      TestEqual(TEXT("the wire move is the sidekick's"), Move->AsObject()->GetStringField(TEXT("fighterId")),
+                FString(TEXT("f-0-sk0")));
+    }
+  }
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09MoveSelMovementParityTest, "Unmatched.S09.MoveSel.MovementParity",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS09MoveSelMovementParityTest::RunTest(const FString&) {
+  const FS08BoardModel Board = MsGrid(9, 9);
+  const FS08Snapshot Snap = MsSnapshot({});
+  FString Reason;
+
+  // ---- MS-E-04 / MS-E-107: getFighterMovement on the raw value ----
+  {
+    struct FCase {
+      const TCHAR* Id;
+      TSharedPtr<FJsonValue> Raw; // invalid = absent
+      int32 Base;
+    };
+    const TArray<FCase> Cases = {{TEXT("m0"), MsNum(0), 2},        {TEXT("mabsent"), nullptr, 2},
+                                 {TEXT("mnull"), MakeShared<FJsonValueNull>(), 2},
+                                 {TEXT("m25"), MsNum(2.5), 2},     {TEXT("m35"), MsNum(3.5), 2},
+                                 {TEXT("ms3"), MsStr(TEXT("3")), 3}, {TEXT("ms35"), MsStr(TEXT("3.5")), 2},
+                                 {TEXT("m4"), MsNum(4), 4}};
+    const FS08BoardModel Open = MsGrid(13, 13);
+    for (const FCase& Case : Cases) {
+      const TArray<FS08BoardFighter> Fighters = MsDecode({MsFighterJson(Case.Id, Me, 6, 6, 5, Case.Raw)});
+      FS09CommandUi Ui = MsOpen(Snap, Open, Fighters);
+      TestTrue(FString::Printf(TEXT("%s selectable"), Case.Id), Ui.SelectFighter(Case.Id, Snap, Open, Fighters));
+      TestEqual(FString::Printf(TEXT("%s base"), Case.Id), Ui.SelectedTiers.Base, Case.Base);
+      TestTrue(FString::Printf(TEXT("%s: base steps reachable"), Case.Id),
+               Ui.SetDestination(Case.Id, 6 + Case.Base, 6, Snap, Open, Fighters, Reason));
+      TestFalse(FString::Printf(TEXT("%s: base + 1 refused without a boost"), Case.Id),
+                Ui.SetDestination(Case.Id, 6, 6 + Case.Base + 1, Snap, Open, Fighters, Reason));
+      TestEqual(FString::Printf(TEXT("%s: have = base"), Case.Id), Ui.LastReason.Args.FindRef(TEXT("have")),
+                FString::FromInt(Case.Base));
+    }
+  }
+
+  // ---- MS-E-40 / MS-R-05: an immobilized fighter is greyed, others move ----
+  {
+    const TArray<FS08BoardFighter> Fighters =
+        MsDecode({MsFighterJson(TEXT("imm"), Me, 1, 1, 5, MsNum(3), false, TEXT("immobilized")),
+                  MsFighterJson(TEXT("free"), Me, 6, 6, 5, MsNum(3))});
+    FS09CommandUi Ui = MsOpen(Snap, Board, Fighters);
+    FS09Reason Why;
+    TestFalse(TEXT("CanMoveFighter refuses the immobilized"), Ui.CanMoveFighter(TEXT("imm"), Fighters, Why));
+    TestEqual(TEXT("why.immobilized"), MsKey(Why), FString(TEXT("why.immobilized")));
+    TestEqual(TEXT("reason names the fighter"), Why.Args.FindRef(TEXT("fighterName")), FString(TEXT("imm")));
+    TestFalse(TEXT("immobilized not selectable"), Ui.SelectFighter(TEXT("imm"), Snap, Board, Fighters));
+    TestEqual(TEXT("select reason why.immobilized"), MsKey(Ui.LastReason), FString(TEXT("why.immobilized")));
+    TestFalse(TEXT("no target for the immobilized"), Ui.SetDestination(TEXT("imm"), 2, 1, Snap, Board, Fighters, Reason));
+    TestTrue(TEXT("refusal reason names the key"), Reason.Contains(TEXT("why.immobilized")));
+    TestEqual(TEXT("nothing drafted"), Ui.Moves.Num(), 0);
+    TestTrue(TEXT("the other fighter moves"), Ui.SetDestination(TEXT("free"), 6, 4, Snap, Board, Fighters, Reason));
+
+    // A drafted move whose fighter becomes immobilized stays as a Conflict.
+    const TArray<FS08BoardFighter> Before = MsDecode({MsFighterJson(TEXT("x"), Me, 1, 1, 5, MsNum(3))});
+    FS09CommandUi Later = MsOpen(Snap, Board, Before);
+    TestTrue(TEXT("x drafted"), Later.SetDestination(TEXT("x"), 3, 1, Snap, Board, Before, Reason));
+    const TArray<FS08BoardFighter> After =
+        MsDecode({MsFighterJson(TEXT("x"), Me, 1, 1, 5, MsNum(3), false, TEXT("immobilized"))});
+    Later.OnSnapshot(MsSnapshot({}, ManeuverA, 6), Board, After);
+    TestEqual(TEXT("the move is kept"), Later.Moves.Num(), 1);
+    TestEqual(TEXT("as a Conflict"), MsStatus(MsMove(Later, TEXT("x"))), FString(TEXT("conflict")));
+    TestEqual(TEXT("why.immobilized"), MsMove(Later, TEXT("x")) ? MsKey(MsMove(Later, TEXT("x"))->Reason) : FString(),
+              FString(TEXT("why.immobilized")));
+    TestTrue(TEXT("own-cell click still clears it"), Later.SetDestination(TEXT("x"), 1, 1, Snap, Board, After, Reason));
+    TestEqual(TEXT("cleared"), Later.Moves.Num(), 0);
+  }
+
+  // ---- MS-E-23 / MS-E-24: defeated blockers and occupants ----
+  {
+    // Corridor y = 1 (rows 0 and 2 walled), 6 wide.
+    const FS08BoardModel Corridor =
+        MsGrid(6, 3, {FIntPoint(0, 0), FIntPoint(1, 0), FIntPoint(2, 0), FIntPoint(3, 0), FIntPoint(4, 0),
+                      FIntPoint(5, 0), FIntPoint(0, 2), FIntPoint(1, 2), FIntPoint(2, 2), FIntPoint(3, 2),
+                      FIntPoint(4, 2), FIntPoint(5, 2)});
+    const TArray<FS08BoardFighter> Fighters =
+        MsDecode({MsFighterJson(TEXT("m"), Me, 0, 1, 5, MsNum(4)),
+                  MsFighterJson(TEXT("dirty-enemy"), Opp, 1, 1, 5, MsNum(2), /*bDefeated=*/true),
+                  MsFighterJson(TEXT("dead-enemy"), Opp, 2, 1, 0, MsNum(2)),
+                  MsFighterJson(TEXT("dirty-ally"), Me, 3, 1, 5, MsNum(2), /*bDefeated=*/true)});
+    FS09CommandUi Ui = MsOpen(Snap, Corridor, Fighters);
+    TestTrue(TEXT("through a dirty-defeated and a dead enemy onto a dirty-defeated ally's cell"),
+             Ui.SetDestination(TEXT("m"), 3, 1, Snap, Corridor, Fighters, Reason));
+    const FS09DraftMove* M = MsMove(Ui, TEXT("m"));
+    TestTrue(TEXT("path (1,1) (2,1) (3,1)"),
+             M && MsSameCells(M->Path, {FIntPoint(1, 1), FIntPoint(2, 1), FIntPoint(3, 1)}));
+    TestEqual(TEXT("ok"), MsStatus(M), FString(TEXT("ok")));
+  }
+
+  // ---- MS-E-77: a dirty-defeated MOVER moves (as the server), MS-DATA ----
+  {
+    const TArray<FS08BoardFighter> Fighters =
+        MsDecode({MsFighterJson(TEXT("dirty"), Me, 2, 2, 3, MsNum(3), /*bDefeated=*/true),
+                  MsFighterJson(TEXT("dead"), Me, 5, 5, 0, MsNum(3))});
+    FS09CommandUi Ui = MsOpen(Snap, Board, Fighters);
+    TestTrue(TEXT("dirty-defeated mover selectable"), Ui.SelectFighter(TEXT("dirty"), Snap, Board, Fighters));
+    TestTrue(TEXT("dirty-defeated mover drafted"), Ui.SetDestination(TEXT("dirty"), 4, 2, Snap, Board, Fighters, Reason));
+    TestEqual(TEXT("ok"), MsStatus(MsMove(Ui, TEXT("dirty"))), FString(TEXT("ok")));
+    int32 Count = 0;
+    MsTraced(Ui, TEXT("MS-DATA dirtyDefeated fighter=dirty"), Count);
+    TestEqual(TEXT("MS-DATA dirtyDefeated once per maneuver"), Count, 1);
+    TestFalse(TEXT("health 0 is not a mover"), Ui.SelectFighter(TEXT("dead"), Snap, Board, Fighters));
+    TestEqual(TEXT("why.fighter.defeated"), MsKey(Ui.LastReason), FString(TEXT("why.fighter.defeated")));
+    TArray<FS08BoardFighter> WithEnemy = Fighters;
+    WithEnemy.Add(MsFighter(TEXT("enemy"), Opp, 7, 7));
+    FS09Reason Why;
+    TestFalse(TEXT("an enemy fighter is no mover"), Ui.CanMoveFighter(TEXT("enemy"), WithEnemy, Why));
+    TestEqual(TEXT("why.fighter.not.yours"), MsKey(Why), FString(TEXT("why.fighter.not.yours")));
+    TestFalse(TEXT("an unknown id is no mover"), Ui.CanMoveFighter(TEXT("ghost"), WithEnemy, Why));
+    TestEqual(TEXT("why.client.desync"), MsKey(Why), FString(TEXT("why.client.desync")));
+  }
+
+  // ---- pending MOVE: the moved fighter and the blockers use isLivingFighter ----
+  {
+    const TArray<FS08BoardFighter> Fighters =
+        MsDecode({MsFighterJson(TEXT("p"), Me, 0, 4, 5, MsNum(3)),
+                  MsFighterJson(TEXT("dirty-own"), Me, 8, 8, 5, MsNum(3), /*bDefeated=*/true),
+                  MsFighterJson(TEXT("dirty-enemy"), Opp, 1, 4, 5, MsNum(3), /*bDefeated=*/true)});
+    const FS08Snapshot Pending = MsPendingMoveSnapshot(2);
+    FS09CommandUi Ui = MsOpen(Pending, Board, Fighters);
+    TestTrue(TEXT("pending choice open"), Ui.Mode == ES09CommandMode::PendingChoice);
+    TArray<FString> Legal;
+    Ui.PendingLegalFighters(Fighters, Legal);
+    TestTrue(TEXT("living own fighter is a legal MOVE target"), Legal.Contains(TEXT("p")));
+    TestFalse(TEXT("dirty-defeated fighter is not (server isLivingFighter)"), Legal.Contains(TEXT("dirty-own")));
+    TestTrue(TEXT("pick p"), Ui.SelectPendingFighter(TEXT("p"), Pending, Fighters, Reason));
+    const TSet<uint64> Cells = Ui.ComputePendingCells(Pending, Board, Fighters);
+    TestTrue(TEXT("stay is legal"), Cells.Contains(FS08BoardModel::CellKey(0, 4)));
+    TestTrue(TEXT("a dirty-defeated enemy does not block"), Cells.Contains(FS08BoardModel::CellKey(2, 4)));
+    TestTrue(TEXT("its cell is free"), Cells.Contains(FS08BoardModel::CellKey(1, 4)));
+    TestFalse(TEXT("3 steps exceed value 2"), Cells.Contains(FS08BoardModel::CellKey(3, 4)));
+
+    // value 0 -> only "stay" (MS-E-76); absent -> 1 step (MS-E-57).
+    const FS08Snapshot Zero = MsPendingMoveSnapshot(0);
+    FS09CommandUi ZeroUi = MsOpen(Zero, Board, Fighters);
+    ZeroUi.SelectPendingFighter(TEXT("p"), Zero, Fighters, Reason);
+    const TSet<uint64> ZeroCells = ZeroUi.ComputePendingCells(Zero, Board, Fighters);
+    TestTrue(TEXT("value 0: only the own cell"), ZeroCells.Num() == 1 && ZeroCells.Contains(FS08BoardModel::CellKey(0, 4)));
+    const FS08Snapshot Absent = MsPendingMoveSnapshot(-1);
+    FS09CommandUi AbsentUi = MsOpen(Absent, Board, Fighters);
+    AbsentUi.SelectPendingFighter(TEXT("p"), Absent, Fighters, Reason);
+    const TSet<uint64> OneCells = AbsentUi.ComputePendingCells(Absent, Board, Fighters);
+    TestTrue(TEXT("no value: 1 step"), OneCells.Contains(FS08BoardModel::CellKey(0, 3)) &&
+                                          !OneCells.Contains(FS08BoardModel::CellKey(0, 2)));
+
+    // A LIVING enemy blocks unless the effect passes through enemies (MS-E-60).
+    TArray<FS08BoardFighter> Walled = Fighters;
+    Walled.Add(MsFighter(TEXT("wall-n"), Opp, 0, 3));
+    Walled.Add(MsFighter(TEXT("wall-e"), Opp, 1, 3));
+    Walled.Add(MsFighter(TEXT("wall-s"), Opp, 0, 5));
+    Walled.Add(MsFighter(TEXT("wall-se"), Opp, 1, 5));
+    Walled.Add(MsFighter(TEXT("wall-ee"), Opp, 2, 4));
+    // p at (0,4): (1,4) is free (the dirty-defeated enemy), (2,4) a living enemy.
+    FS09CommandUi Blocked = MsOpen(Pending, Board, Walled);
+    Blocked.SelectPendingFighter(TEXT("p"), Pending, Walled, Reason);
+    const TSet<uint64> BlockedCells = Blocked.ComputePendingCells(Pending, Board, Walled);
+    TestTrue(TEXT("boxed in: own cell and (1,4) only"),
+             BlockedCells.Num() == 2 && BlockedCells.Contains(FS08BoardModel::CellKey(1, 4)));
+    const FS08Snapshot Through = MsPendingMoveSnapshot(2, TEXT("MOVE"), /*bPassThrough=*/true);
+    FS09CommandUi ThroughUi = MsOpen(Through, Board, Walled);
+    ThroughUi.SelectPendingFighter(TEXT("p"), Through, Walled, Reason);
+    const TSet<uint64> ThroughCells = ThroughUi.ComputePendingCells(Through, Board, Walled);
+    TestTrue(TEXT("pass-through: beyond the enemies, never onto them"),
+             ThroughCells.Contains(FS08BoardModel::CellKey(0, 2)) && !ThroughCells.Contains(FS08BoardModel::CellKey(0, 3)));
+
+    // Revive PLACE may pick a defeated fighter (restoreFullHealth); a plain PLACE may not.
+    TArray<FS08BoardFighter> WithDead = Fighters;
+    WithDead.Add(MsFighter(TEXT("fallen"), Me, 5, 5, 3.0, 0));
+    const FS08Snapshot Revive = MsPendingMoveSnapshot(-1, TEXT("PLACE"), false, /*bRevive=*/true);
+    FS09CommandUi ReviveUi = MsOpen(Revive, Board, WithDead);
+    TArray<FString> ReviveLegal;
+    ReviveUi.PendingLegalFighters(WithDead, ReviveLegal);
+    TestTrue(TEXT("revive PLACE: the fallen fighter is legal"), ReviveLegal.Contains(TEXT("fallen")));
+    const FS08Snapshot Place = MsPendingMoveSnapshot(-1, TEXT("PLACE"));
+    FS09CommandUi PlaceUi = MsOpen(Place, Board, WithDead);
+    TArray<FString> PlaceLegal;
+    PlaceUi.PendingLegalFighters(WithDead, PlaceLegal);
+    TestFalse(TEXT("plain PLACE: the fallen fighter is not"), PlaceLegal.Contains(TEXT("fallen")));
+    TestFalse(TEXT("plain PLACE: nor the dirty-defeated one"), PlaceLegal.Contains(TEXT("dirty-own")));
+  }
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09MoveSelReconnectAndRebuildTest, "Unmatched.S09.MoveSel.ReconnectAndRebuild",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS09MoveSelReconnectAndRebuildTest::RunTest(const FString&) {
+  // Open 6 x 3 board: row 1 is the straight line, rows 0 and 2 the detours.
+  const FS08BoardModel Board = MsGrid(6, 3);
+  const TArray<FMsCard> Hand = {{TEXT("c2"), true, 2}, {TEXT("c1"), true, 1}};
+  const FS08Snapshot Snap = MsSnapshot(Hand, ManeuverA, 5);
+  const TArray<FS08BoardFighter> Fighters = {MsFighter(TEXT("a"), Me, 0, 1), MsFighter(TEXT("b"), Me, 5, 2)};
+  FString Reason;
+  FS08FlowController Flow(TEXT("http://127.0.0.1:9/graphql"), TEXT("ws://127.0.0.1:9/graphql"), Me);
+  Flow.SetRoomForTest(TEXT("g1"), ES08Stage::Started);
+
+  // ---- MS-R-55: the draft survives a gameplay-HUD reset (same id) ----
+  FS09CommandUi First;
+  First.ViewerId = Me;
+  MsBindCache(First, Flow);
+  First.OnSnapshot(Snap, Board, Fighters);
+  TestTrue(TEXT("a drafted"), First.SetDestination(TEXT("a"), 3, 1, Snap, Board, Fighters, Reason));
+  TestTrue(TEXT("b drafted"), First.SetDestination(TEXT("b"), 5, 0, Snap, Board, Fighters, Reason));
+  TestTrue(TEXT("boost c2"), First.ToggleBoostCard(TEXT("c2"), Snap, Board, Fighters, Reason));
+  FS08ManeuverDraftCache Cached;
+  TestTrue(TEXT("the controller holds the draft"), Flow.RecallManeuverDraft(ManeuverA, Cached));
+  TestEqual(TEXT("cached moves in order"), FString::Join(Cached.FighterIds, TEXT(",")), FString(TEXT("a,b")));
+  TestEqual(TEXT("cached boost"), Cached.BoostCardId, FString(TEXT("c2")));
+  TestFalse(TEXT("another maneuver id never recalls it"), Flow.RecallManeuverDraft(TEXT("maneuver:2:9"), Cached));
+
+  FS09CommandUi Second; // ClearGameplayHud: a fresh command UI, same controller
+  Second.ViewerId = Me;
+  MsBindCache(Second, Flow);
+  Second.OnSnapshot(Snap, Board, Fighters);
+  TestEqual(TEXT("restored: two moves"), Second.Moves.Num(), 2);
+  TestTrue(TEXT("restored in order with the destinations"),
+           Second.Moves.Num() == 2 && Second.Moves[0].FighterId == TEXT("a") && Second.Moves[0].DestX == 3 &&
+               Second.Moves[1].FighterId == TEXT("b") && Second.Moves[1].DestY == 0);
+  TestEqual(TEXT("restored boost"), Second.BoostCardId, FString(TEXT("c2")));
+  TestTrue(TEXT("restored moves re-evaluated"), Second.Eval.IsConfirmable() && Second.Eval.NumOk == 2);
+  int32 Restores = 0;
+  TestTrue(TEXT("MS-DRAFT op=restore"), MsTraced(Second, TEXT("MS-DRAFT op=restore"), Restores));
+
+  // Another match never restores this draft.
+  Flow.SetRoomForTest(TEXT("g2"), ES08Stage::Started);
+  TestFalse(TEXT("other match: no recall"), Flow.RecallManeuverDraft(ManeuverA, Cached));
+  Flow.SetRoomForTest(TEXT("g1"), ES08Stage::Started);
+  TestTrue(TEXT("back in the match: recall"), Flow.RecallManeuverDraft(ManeuverA, Cached));
+
+  // ---- MS-E-53: a new seq with changed positions re-evaluates, never deletes ----
+  {
+    TestTrue(TEXT("+1 replaces +2"), Second.ToggleBoostCard(TEXT("c1"), Snap, Board, Fighters, Reason));
+    // An enemy now stands on a's straight line: the detour is 5 steps -> NeedBoost.
+    TArray<FS08BoardFighter> Moved = Fighters;
+    Moved.Add(MsFighter(TEXT("e"), Opp, 1, 1));
+    Second.OnSnapshot(MsSnapshot(Hand, ManeuverA, 6), Board, Moved);
+    TestEqual(TEXT("both moves kept"), Second.Moves.Num(), 2);
+    const FS09DraftMove* A = MsMove(Second, TEXT("a"));
+    TestEqual(TEXT("longer path: NeedBoost, not Conflict"), MsStatus(A), FString(TEXT("needBoost")));
+    TestEqual(TEXT("needs +2 (5 steps, movement 3, +1 selected)"), A ? A->RequiredBoost : -1, 2);
+    TestEqual(TEXT("c1 still selected"), Second.BoostCardId, FString(TEXT("c1")));
+    // An enemy now stands on a's destination: Conflict, kept.
+    TArray<FS08BoardFighter> Blocked = Fighters;
+    Blocked.Add(MsFighter(TEXT("e"), Opp, 3, 1));
+    Second.OnSnapshot(MsSnapshot(Hand, ManeuverA, 7), Board, Blocked);
+    TestEqual(TEXT("still two moves"), Second.Moves.Num(), 2);
+    TestEqual(TEXT("enemy on the target: Conflict"), MsStatus(MsMove(Second, TEXT("a"))), FString(TEXT("conflict")));
+    TestEqual(TEXT("why.cell.enemy"), MsMove(Second, TEXT("a")) ? MsKey(MsMove(Second, TEXT("a"))->Reason) : FString(),
+              FString(TEXT("why.cell.enemy")));
+  }
+
+  // ---- MS-E-15: the boost card left the hand ----
+  {
+    Second.OnSnapshot(MsSnapshot({{TEXT("c2"), true, 2}}, ManeuverA, 8), Board, Fighters);
+    TestTrue(TEXT("boost dropped"), Second.BoostCardId.IsEmpty());
+    TestEqual(TEXT("why.boost.card.gone"), MsKey(Second.LastReason), FString(TEXT("why.boost.card.gone")));
+    TestEqual(TEXT("moves kept"), Second.Moves.Num(), 2);
+    TestTrue(TEXT("the cache follows (no boost)"), Flow.RecallManeuverDraft(ManeuverA, Cached) && Cached.BoostCardId.IsEmpty());
+  }
+
+  // ---- MS-E-41: a fighter that died leaves the draft ----
+  {
+    TArray<FS08BoardFighter> Dead = Fighters;
+    Dead[1].Health = 0;
+    Second.OnSnapshot(MsSnapshot(Hand, ManeuverA, 9), Board, Dead);
+    TestEqual(TEXT("b's move dropped"), Second.MoveIndexOf(TEXT("b")), INDEX_NONE);
+    TestEqual(TEXT("a's move kept"), Second.Moves.Num(), 1);
+  }
+
+  // ---- another maneuver id: the old draft never carries over ----
+  {
+    Second.OnSnapshot(MsSnapshot(Hand, TEXT("maneuver:2:12"), 12), Board, Fighters);
+    TestEqual(TEXT("new id: empty draft"), Second.Moves.Num(), 0);
+    TestTrue(TEXT("new id: no boost"), Second.BoostCardId.IsEmpty());
+    TestEqual(TEXT("pending id switched"), Second.PendingManeuverId, FString(TEXT("maneuver:2:12")));
+    TestFalse(TEXT("the old id is no longer cached"), Flow.RecallManeuverDraft(ManeuverA, Cached));
+  }
+
+  // ---- the maneuver closes / GAME_OVER: draft and cache gone ----
+  {
+    TestTrue(TEXT("draft on the new id"),
+             Second.SetDestination(TEXT("a"), 1, 1, MsSnapshot(Hand, TEXT("maneuver:2:12"), 12), Board, Fighters, Reason));
+    TestTrue(TEXT("cached"), Flow.RecallManeuverDraft(TEXT("maneuver:2:12"), Cached));
+    Second.OnSnapshot(MsSnapshot(Hand, FString(), 13), Board, Fighters);
+    TestTrue(TEXT("closed pending: mode none"), Second.Mode == ES09CommandMode::None);
+    TestEqual(TEXT("closed pending: no moves"), Second.Moves.Num(), 0);
+    TestFalse(TEXT("closed pending: cache cleared"), Flow.RecallManeuverDraft(TEXT("maneuver:2:12"), Cached));
+
+    FS09CommandUi Third;
+    Third.ViewerId = Me;
+    MsBindCache(Third, Flow);
+    Third.OnSnapshot(Snap, Board, Fighters);
+    TestTrue(TEXT("third draft"), Third.SetDestination(TEXT("a"), 2, 1, Snap, Board, Fighters, Reason));
+    FS08Snapshot Over = MsSnapshot(Hand, ManeuverA, 20);
+    Over.Phase = TEXT("GAME_OVER");
+    Third.OnSnapshot(Over, Board, Fighters);
+    TestTrue(TEXT("GAME_OVER closes the draft"), Third.Mode == ES09CommandMode::None && Third.Moves.Num() == 0);
+    TestFalse(TEXT("GAME_OVER clears the cache"), Flow.RecallManeuverDraft(ManeuverA, Cached));
+  }
+
+  // ---- MS-E-46: the maneuver ends into a discard (hand > 7) or a pending
+  // choice: the draft is gone in that mode too, so is the cache ----
+  for (int32 Kind = 0; Kind < 2; ++Kind) {
+    FS09CommandUi Ui;
+    Ui.ViewerId = Me;
+    MsBindCache(Ui, Flow);
+    Ui.OnSnapshot(Snap, Board, Fighters);
+    TestTrue(TEXT("draft held"), Ui.SetDestination(TEXT("a"), 2, 1, Snap, Board, Fighters, Reason));
+    TestTrue(TEXT("draft cached"), Flow.RecallManeuverDraft(ManeuverA, Cached));
+    const FS08Snapshot Next = Kind == 0 ? MsDiscardSnapshot(Hand, 31) : MsPendingMoveSnapshot(2);
+    Ui.OnSnapshot(Next, Board, Fighters);
+    const TCHAR* Name = Kind == 0 ? TEXT("discard") : TEXT("pending choice");
+    TestTrue(FString::Printf(TEXT("%s mode opens"), Name),
+             Ui.Mode == (Kind == 0 ? ES09CommandMode::DiscardDraft : ES09CommandMode::PendingChoice));
+    TestTrue(FString::Printf(TEXT("%s: no maneuver draft left"), Name),
+             Ui.Moves.Num() == 0 && Ui.PendingManeuverId.IsEmpty() && Ui.BoostCardId.IsEmpty());
+    TestFalse(FString::Printf(TEXT("%s: cache cleared"), Name), Flow.RecallManeuverDraft(ManeuverA, Cached));
+  }
+
+  // ---- a fresh UI whose first snapshot has no maneuver clears a stale cache ----
+  {
+    FS09CommandUi Old;
+    Old.ViewerId = Me;
+    MsBindCache(Old, Flow);
+    Old.OnSnapshot(Snap, Board, Fighters);
+    TestTrue(TEXT("old draft"), Old.SetDestination(TEXT("a"), 2, 1, Snap, Board, Fighters, Reason));
+    TestTrue(TEXT("old draft cached"), Flow.RecallManeuverDraft(ManeuverA, Cached));
+    FS09CommandUi Fresh;
+    Fresh.ViewerId = Me;
+    MsBindCache(Fresh, Flow);
+    Fresh.OnSnapshot(MsSnapshot(Hand, FString(), 40), Board, Fighters);
+    TestFalse(TEXT("closed maneuver seen by a fresh UI: cache cleared"), Flow.RecallManeuverDraft(ManeuverA, Cached));
   }
   return true;
 }
