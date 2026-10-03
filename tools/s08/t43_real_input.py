@@ -44,7 +44,8 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 DEMO = REPO / "tools" / "s08" / "run-phase2-demo.ps1"
 GPU_LOCK = Path(os.environ.get("UNMATCHED_GPU_LOCK", "C:/tmp/unmatched-gpu.lock"))
-REVIEW_BOARD_ID = "cmuhgs4b2001mwik4f2b2xtf8"  # 5x6 Cobble review board (S08ArtBoardProfiles.json)
+# Real game map only (user decision 2026-10-04): Marmoreal · original map, `marmoreal-original` in S08ArtBoardProfiles.json.
+MAP_BOARD_ID = "c121b47f8d6eb28daccb76d05"
 TAG = 0x54343354                               # dwExtraInfo of our SendInput events ('T43T')
 NO_WINDOW = 0x08000000
 
@@ -538,7 +539,7 @@ def main() -> int:
     r = sub.add_parser("run")
     r.add_argument("--wait-idle", type=float, default=600.0)
     r.add_argument("--max-wait-min", type=float, default=720.0)
-    r.add_argument("--board-id", default=REVIEW_BOARD_ID)
+    r.add_argument("--board-id", default=MAP_BOARD_ID)
     r.add_argument("--api", default="http://localhost:3000/graphql")
     r.add_argument("--backend-env")
     r.add_argument("--run-seconds", type=int, default=120)
