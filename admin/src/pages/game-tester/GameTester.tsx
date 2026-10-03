@@ -38,6 +38,9 @@ import {
 
 const { Title, Text } = Typography;
 
+/** Доска по умолчанию — Marmoreal · original map (НД-1, backend/src/games/default-board.ts) */
+const DEFAULT_BOARD_ID = 'c121b47f8d6eb28daccb76d05';
+
 type PlayerKey = 'P1' | 'P2';
 
 interface PlayerSlot {
@@ -445,7 +448,11 @@ export const GameTester: React.FC = () => {
     setBoards(b.boardList.items);
     if (!heroP1 && h.heroList.items[0]) setHeroP1(h.heroList.items[0].id);
     if (!heroP2 && h.heroList.items[1]) setHeroP2(h.heroList.items[1].id);
-    if (!boardId && b.boardList.items[0]) setBoardId(b.boardList.items[0].id);
+    if (!boardId) {
+      const items: Array<{ id: string }> = b.boardList.items;
+      const preferred = items.find((x) => x.id === DEFAULT_BOARD_ID) ?? items[0];
+      if (preferred) setBoardId(preferred.id);
+    }
   };
 
   useEffect(() => {
