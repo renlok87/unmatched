@@ -44,7 +44,7 @@
 |---|---|---|
 | `backend/src/game-engine/movement/canonical-path.ts` (новый) | `computeReach(state, moverId, maxSteps, opts)` → `{dist, parent}`; `canonicalPath(reach, state, dest)`; ключ `spaceId`/`(y,x)` | MS-T-02 |
 | `backend/src/game-engine/movement/canonical-path.spec.ts`, `move-parity.spec.ts`, `move-parity.property.spec.ts` (новые) | golden-фикстуры и property-тест | MS-T-02 |
-| `backend/test/fixtures/move-fixture-state.ts` (новый) | сборщик полного `GameState` из фикстуры §4.8 поверх `s03Engine()`/`s03Fixture()` (`backend/test/fixtures/s03-engine.fixture.ts`, импорт — `s03-turn.spec.ts:2`): фаза, `pendingManeuver`, `handZones`, колоды, реестр способностей | MS-T-02 |
+| `backend/src/test/fixtures/move-fixture-state.ts` (новый) | сборщик полного `GameState` из фикстуры §4.8 поверх `s03Engine()`/`s03Fixture()` (`backend/test/fixtures/s03-engine.fixture.ts`, импорт — `s03-turn.spec.ts:2`): фаза, `pendingManeuver`, `handZones`, колоды, реестр способностей | MS-T-02 |
 | `backend/prisma/fixtures/movement/*.move-fixture.json` (новые) | golden-фикстуры паритета (формат §4.8) | MS-T-02 |
 | `backend/src/game-engine/models/game-state.model.ts` | `GameStateMetadata.lastMovement?: LastMovement` (рядом с `pendingManeuver`, `:160`) | MS-T-14 |
 | `backend/src/games/game-state.service.ts` | `serialize`/`deserialize` (`:556-663`, `:671-790`) пишут и читают ключ `lm` ← `lastMovement`; поле `lm?` в `SerializedGameState` (`:49-84`). Без этого след теряется при чтении из БД (промах кэша, перезапуск — `getState` → `deserialize`, `:488`) | MS-T-14 |
@@ -95,7 +95,7 @@ computeReach(board, fighters, mover, maxSteps, opts):
   dist[start] = 0; parent[start] = none; queue = [start]          // FIFO
   while queue:
     c = pop_front(queue)
-    if dist[c] == maxSteps: continue
+    if dist[c] >= maxSteps: continue                              // >=: сервер и паритет (MS-T-02)
     for n in neighbours(board, c):                                // links (симметризованы) | 4 ортогональных
       if n in dist: continue
       if not passableTerrain(board, n): continue                   // wall/obstacle/closed door/нет клетки
@@ -318,7 +318,13 @@ struct FS08MoveDraftView { TArray<FS08PlateView> Plates; TArray<FS08PathView> Pa
 
 ### 4.8. Golden-фикстура паритета
 
-`backend/prisma/fixtures/movement/<name>.move-fixture.json` (формат `unmatched.move-fixture/1`, развитие R4 §3.5):
+`backend/prisma/fixtures/movement/<name>.move-fixture.json` (формат `unmatched.move-fixture/1`, развитие R4 §3.5).
+Дополнения формата, сделанные в MS-T-02 (`name`, `description`, `cases`, `actor`, `board.lattice`, принудительный
+`draft.moves[i].path`, сырой `fighters[i].movement`, `expect.serverDetail`, `expect.pendingRuleChange`, сравнение
+`reach` множествами и `paths` точно), описаны в заголовке `backend/src/test/fixtures/move-fixture-state.ts` — это
+эталон для читателя паритета в UE (MS-T-03). Тай-брейк сравнивает id пространств по порядку кодов (ordinal, с учётом
+регистра). Наблюдение MS-T-02 (не проверено прогоном): резолв MOVE-эффекта отклоняет бойца с `isDefeated` и
+здоровьем > 0, а манёвр принимает — к двум предикатам «живой» MS-T-03/MS-T-04.
 
 ```json
 {
