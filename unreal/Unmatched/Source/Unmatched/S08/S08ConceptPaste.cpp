@@ -266,6 +266,69 @@ void CpParseIdList(const TSharedPtr<FJsonObject>& O, const TCHAR* Field, const F
   }
 }
 
+/** Art Tuner M4 "materialOverrides": {<Look>: {tintGain 0..4, tint [r,g,b] 0..4, windAmp, windHz, windHeight, windFlutter}}. */
+void CpParseMaterialOverrides(const TSharedPtr<FJsonObject>& O, const FString& Prefix, TArray<FS08ConceptMaterialOverride>& Out,
+                              FCpFail Fail) {
+  if (!O->HasField(TEXT("materialOverrides"))) return;
+  const TSharedPtr<FJsonObject>* Looks = nullptr;
+  if (!O->TryGetObjectField(TEXT("materialOverrides"), Looks) || !Looks || !Looks->IsValid() ||
+      (*Looks)->Values.Num() > S08ConceptPasteSpec::MaxMaterialLooks) {
+    Fail(FString::Printf(TEXT("%smaterialOverrides must be an object of at most %d looks"), *Prefix,
+                         S08ConceptPasteSpec::MaxMaterialLooks));
+    return;
+  }
+  for (const TPair<FString, TSharedPtr<FJsonValue>>& Look : (*Looks)->Values) {
+    bool bName = !Look.Key.IsEmpty() && Look.Key.Len() <= 32 && FChar::IsAlpha(Look.Key[0]);
+    for (const TCHAR C : Look.Key) bName = bName && FChar::IsAlnum(C);
+    const TSharedPtr<FJsonObject> L = Look.Value.IsValid() && Look.Value->Type == EJson::Object ? Look.Value->AsObject() : nullptr;
+    if (!bName || !L.IsValid()) {
+      Fail(FString::Printf(TEXT("%smaterialOverrides.%s must be a look name [A-Za-z][A-Za-z0-9]{0,31} with an object"), *Prefix,
+                           *Look.Key));
+      continue;
+    }
+    FS08ConceptMaterialOverride M;
+    M.Look = Look.Key;
+    bool bOk = true;
+    for (const TPair<FString, TSharedPtr<FJsonValue>>& Field : L->Values) {
+      const FString& K = Field.Key;
+      if (K == TEXT("tintGain")) {
+        bOk &= CpOptNumber(L, TEXT("tintGain"), 0.0, S08ConceptPasteSpec::MaxTintGain, M.TintGain);
+        continue;
+      }
+      if (K == TEXT("tint")) {
+        const TArray<TSharedPtr<FJsonValue>>* Arr = nullptr;
+        double R = 0, G = 0, B = 0;
+        const bool bArr = L->TryGetArrayField(TEXT("tint"), Arr) && Arr && Arr->Num() == 3 && (*Arr)[0].IsValid() &&
+                          (*Arr)[1].IsValid() && (*Arr)[2].IsValid() && (*Arr)[0]->Type == EJson::Number &&
+                          (*Arr)[1]->Type == EJson::Number && (*Arr)[2]->Type == EJson::Number && (*Arr)[0]->TryGetNumber(R) &&
+                          (*Arr)[1]->TryGetNumber(G) && (*Arr)[2]->TryGetNumber(B);
+        const double Max = S08ConceptPasteSpec::MaxTintGain;
+        if (!bArr || R < 0 || G < 0 || B < 0 || R > Max || G > Max || B > Max) {
+          bOk = false;
+          continue;
+        }
+        M.bTint = true;
+        M.Tint = FLinearColor(static_cast<float>(R), static_cast<float>(G), static_cast<float>(B));
+        continue;
+      }
+      const S08ConceptPaste::FS08MaterialScalarSpec* Spec = S08ConceptPaste::MaterialScalarSpecs().FindByPredicate(
+          [&](const S08ConceptPaste::FS08MaterialScalarSpec& S) { return K == S.Key; });
+      float V = 0.0f;
+      if (!Spec || !CpOptNumber(L, Spec->Key, Spec->Min, Spec->Max, V)) {
+        bOk = false;
+        continue;
+      }
+      M.Scalars.Add({FName(Spec->Param), V});
+    }
+    if (!bOk) {
+      Fail(FString::Printf(TEXT("%smaterialOverrides.%s takes tintGain 0..%.0f, tint [r,g,b] 0..%.0f, windAmp 0..40, windHz 0..3, windHeight 10..1000, windFlutter 0..5"),
+                           *Prefix, *Look.Key, S08ConceptPasteSpec::MaxTintGain, S08ConceptPasteSpec::MaxTintGain));
+      continue;
+    }
+    Out.Add(MoveTemp(M));
+  }
+}
+
 /** One point light of the block (P7 paste / P8 lit3d): Movable, candelas (unless -S08LegacyRender), no shadow. */
 UPointLightComponent* CpSpawnLight(AActor& Owner, USceneComponent* Root, const FS08ConceptLight& L, const TCHAR* TracePrefix) {
   const bool bCandelas = !S08LegacyRender();
@@ -735,7 +798,7 @@ bool ParseJson(const FString& BoardId, const TSharedPtr<FJsonObject>& O, FS08Con
     } else {
       if (!CpKnownFields(*L, {TEXT("variant"), TEXT("manifest"), TEXT("required"), TEXT("sky"), TEXT("seaZUU"),
                               TEXT("waterfallScaleZ"), TEXT("hide"), TEXT("lights"), TEXT("anims"), TEXT("winds"),
-                              TEXT("casters"), TEXT("giOff")},
+                              TEXT("casters"), TEXT("giOff"), TEXT("materialOverrides")},
                          LitUnknown)) {
         Fail(FString::Printf(TEXT("lit3d.%s is not a field"), *LitUnknown));
       }
@@ -787,6 +850,7 @@ bool ParseJson(const FString& BoardId, const TSharedPtr<FJsonObject>& O, FS08Con
       CpParseIdList(*L, TEXT("winds"), P, S08ConceptPasteSpec::MaxWinds, true, S.WindProps, Fail);
       CpParseIdList(*L, TEXT("casters"), P, S08ConceptPasteSpec::MaxScenePatterns, true, S.Casters, Fail);
       CpParseIdList(*L, TEXT("giOff"), P, S08ConceptPasteSpec::MaxScenePatterns, true, S.GiOff, Fail);
+      CpParseMaterialOverrides(*L, P, S.MaterialOverrides, Fail);
       S.bSet = Errors.Num() == Lit3dBefore;
     }
   }
@@ -1662,6 +1726,39 @@ void US08ConceptPasteAnimComponent::AddWind(UStaticMeshComponent* Prop) {
   }
   Winds.Add(Prop);
 }
+
+namespace S08ConceptPaste {
+FString LookFromMaterialName(const FString& Name) {
+  for (const TCHAR* Prefix : S08ConceptPasteSpec::LookPrefixes) {
+    if (Name.StartsWith(Prefix, ESearchCase::CaseSensitive) && Name.Len() > FCString::Strlen(Prefix)) {
+      return Name.Mid(FCString::Strlen(Prefix));
+    }
+  }
+  return FString();
+}
+
+FString LookOfMaterial(const UMaterialInterface* Material) {
+  for (int32 Depth = 0; Material && Depth < 8; ++Depth) {
+    if (!Material->IsA<UMaterialInstanceDynamic>()) {
+      const FString Look = LookFromMaterialName(Material->GetName());
+      if (!Look.IsEmpty()) return Look;
+    }
+    const UMaterialInstance* Instance = Cast<UMaterialInstance>(Material);
+    Material = Instance ? Instance->Parent.Get() : nullptr;
+  }
+  return FString();
+}
+
+const TArray<FS08MaterialScalarSpec>& MaterialScalarSpecs() {
+  static const TArray<FS08MaterialScalarSpec> Specs = {
+      {TEXT("windAmp"), TEXT("WindAmp"), 0.0f, 40.0f},
+      {TEXT("windHz"), TEXT("WindHz"), 0.0f, 3.0f},
+      {TEXT("windHeight"), TEXT("WindHeight"), 10.0f, 1000.0f},
+      {TEXT("windFlutter"), TEXT("WindFlutter"), 0.0f, 5.0f},
+  };
+  return Specs;
+}
+}  // namespace S08ConceptPaste
 
 void US08ConceptPasteAnimComponent::UpdateFlicker(UPointLightComponent* Light, const FS08ConceptLight& Spec) {
   if (!Light) return;

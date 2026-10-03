@@ -163,6 +163,13 @@ constexpr float MinWaterfallScaleZ = 0.25f;
 constexpr float MaxWaterfallScaleZ = 4.0f;
 /** -ArtPreviewLightsOff (gate G1): a bench frame without the engine's light. */
 inline const TCHAR* const LightsOffFlagName = TEXT("ArtPreviewLightsOff");
+/** Art Tuner M4 "lit3d.materialOverrides" (docs/art-pipeline/ART-TUNER-PLAN.md section 5): looks per block, the tint gain
+ *  range, the tint params a gain scales (own colour = BakedTint or FallbackTint, the projected plate = AlbedoGain) and the
+ *  look prefixes of the scene MIs (tools/art/concept_scene/ue_scene_material.py). */
+constexpr int32 MaxMaterialLooks = 24;
+constexpr float MaxTintGain = 4.0f;
+inline const TCHAR* const TintParamNames[] = {TEXT("BakedTint"), TEXT("FallbackTint"), TEXT("AlbedoGain")};
+inline const TCHAR* const LookPrefixes[] = {TEXT("MI_Env_S_"), TEXT("MI_EnvScene_Proj_"), TEXT("MI_EnvScene_")};
 }  // namespace S08ConceptPasteSpec
 
 /** ENV-MAPS P8: what the on mode shows - the P7 projected paste or the lit 3D island. */
@@ -270,6 +277,17 @@ struct UNMATCHED_API FS08ConceptSeaSpec {
   int32 SkySegments = 48;
 };
 
+/** Art Tuner M4: one look of "lit3d.materialOverrides" ({"Island": {"tintGain": 1.2}, "Foliage": {"windAmp": 10}}): a
+ *  brightness gain (x the MI's tints, optional linear tint on top) and scalar overrides (the foliage wind), set on per-slot
+ *  MIDs of the env props whose material chain has a MI_Env_S_<Look> / MI_EnvScene_Proj_<Look> / MI_EnvScene_<Look>. */
+struct UNMATCHED_API FS08ConceptMaterialOverride {
+  FString Look;
+  float TintGain = 1.0f;
+  bool bTint = false;
+  FLinearColor Tint = FLinearColor::White;  // linear, 0..4 each
+  TArray<TPair<FName, float>> Scalars;      // WindAmp / WindHz / WindHeight / WindFlutter
+};
+
 /** ENV-MAPS P8 "lit3d" object of the block (see the file comment). Prop lists take ids or "prefix*" patterns. */
 struct UNMATCHED_API FS08ConceptLit3dSpec {
   bool bSet = false;
@@ -286,6 +304,8 @@ struct UNMATCHED_API FS08ConceptLit3dSpec {
   TArray<FString> WindProps;
   TArray<FString> Casters;
   TArray<FString> GiOff;
+  /** Art Tuner M4 "materialOverrides" (absent = no MID is created: the MIs' look, bit for bit). */
+  TArray<FS08ConceptMaterialOverride> MaterialOverrides;
 };
 
 struct UNMATCHED_API FS08ConceptPasteSpec {
@@ -596,6 +616,19 @@ UNMATCHED_API FS08LightsOffStats ApplyLightsOff(const TArray<TObjectPtr<AActor>>
                                                 const TArray<TObjectPtr<UStaticMeshComponent>>& BlockParts,
                                                 bool bHideConceptParts, UWorld* World,
                                                 UMaterialParameterCollection* Collection, const FString& ProfileId);
+/** Art Tuner M4: the look of a scene material name ("MI_Env_S_Island" -> "Island", "MI_EnvScene_Proj_Foliage" ->
+ *  "Foliage", "MI_EnvScene_FrameWood" -> "FrameWood"); empty for any other name. */
+UNMATCHED_API FString LookFromMaterialName(const FString& Name);
+/** The look of a material: the first instance in its parent chain with a scene look name (a MID's own name is skipped). */
+UNMATCHED_API FString LookOfMaterial(const class UMaterialInterface* Material);
+/** The scalar overrides of "materialOverrides" (JSON key -> material parameter, range). */
+struct FS08MaterialScalarSpec {
+  const TCHAR* Key;
+  const TCHAR* Param;
+  float Min;
+  float Max;
+};
+UNMATCHED_API const TArray<FS08MaterialScalarSpec>& MaterialScalarSpecs();
 /** The scalar parameters ApplyLightsOff zeroes on the env props' slots. */
 UNMATCHED_API const TArray<FName>& LightsOffEmissiveParams();
 /** Destroys the parts and lights (Runtime counts back to 0; Hidden untouched). */

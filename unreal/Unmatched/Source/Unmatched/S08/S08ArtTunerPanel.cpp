@@ -369,7 +369,11 @@ double SS08ArtTunerPanel::NumberOf(const FString& RowId) const {
   const TSharedPtr<FS08ArtTunerSession> S = Session.Pin();
   if (!S.IsValid()) return 0.0;
   const TSharedPtr<FJsonValue> J = S->Model.Value(ValuePointer(RowId));
-  if (J.IsValid()) J->TryGetNumber(V);
+  if (J.IsValid()) {
+    J->TryGetNumber(V);
+  } else if (const FS08TunerParam* P = Find(RowId)) {
+    V = P->bHasDefault ? P->DefaultNumber : 0.0;  // an absent optional key
+  }
   return V;
 }
 

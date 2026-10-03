@@ -17,6 +17,7 @@
 #include "S08BoardActor.h"
 #include "S08BoardArt.h"
 #include "S08BoardModel.h"
+#include "S08ConceptPaste.h"
 #include "S08FighterActor.h"
 #include "Components/DirectionalLightComponent.h"
 #include "Components/ExponentialHeightFogComponent.h"
@@ -133,7 +134,9 @@ bool FS08ArtTunerPointerTest::RunTest(const FString&) {
   TestEqual("array sibling kept", S08JsonPointer::Get(O, TEXT("/a/b/2/1"))->AsNumber(), 4.0);
   TestFalse("new key refused", S08JsonPointer::Set(O, TEXT("/a/new"), Num(1), false, Error));
   TestTrue("new key allowed", S08JsonPointer::Set(O, TEXT("/a/new"), Num(1), true, Error));
-  TestFalse("new key needs its parent", S08JsonPointer::Set(O, TEXT("/q/new"), Num(1), true, Error));
+  TestTrue("missing objects on the way are created", S08JsonPointer::Set(O, TEXT("/q/r/new"), Num(1), true, Error) &&
+                                                          S08JsonPointer::Get(O, TEXT("/q/r/new"))->AsNumber() == 1.0);
+  TestFalse("never inside an array", S08JsonPointer::Set(O, TEXT("/a/b/7/x"), Num(1), true, Error));
   TestFalse("below a value", S08JsonPointer::Set(O, TEXT("/s/x"), Num(1), true, Error));
   TestFalse("the root is not a value", S08JsonPointer::Set(O, TEXT(""), Num(1), true, Error));
   TestEqual("text of a NumberString", S08JsonPointer::ToText(NumText(TEXT("7.50"))), FString(TEXT("7.50")));
@@ -482,6 +485,71 @@ bool FS08ArtTunerApplyTest::RunTest(const FString&) {
   }
   GEngine->DestroyWorldContext(World);
   World->DestroyWorld(false);
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08ArtTunerMaterialOverridesTest,
+    "Unmatched.S08.ArtTuner.MaterialOverrides lit3d materialOverrides: absent by default, written by a row, validated",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08ArtTunerMaterialOverridesTest::RunTest(const FString&) {
+  using namespace S08ArtTunerTest;
+  TestEqual("baked look", S08ConceptPaste::LookFromMaterialName(TEXT("MI_Env_S_Island")), FString(TEXT("Island")));
+  TestEqual("projected look", S08ConceptPaste::LookFromMaterialName(TEXT("MI_EnvScene_Proj_Foliage")), FString(TEXT("Foliage")));
+  TestEqual("scene look", S08ConceptPaste::LookFromMaterialName(TEXT("MI_EnvScene_FrameWood")), FString(TEXT("FrameWood")));
+  TestTrue("other names", S08ConceptPaste::LookFromMaterialName(TEXT("MI_EnvFab_ForestNight")).IsEmpty() &&
+                              S08ConceptPaste::LookFromMaterialName(TEXT("MI_Env_S_")).IsEmpty());
+  FString Profiles;
+  FS08ArtTunerRegistry Registry;
+  TArray<FString> Errors;
+  if (!TestTrue("shipped files load", LoadShipped(Profiles, Registry, Errors))) return false;
+  FS08BoardArtData Shipped;
+  TestTrue("shipped profile parses", Shipped.ParseJson(Profiles, Errors));
+  for (const FS08BoardArtProfile& B : Shipped.Boards) {
+    TestTrue(FString::Printf(TEXT("%s: no materialOverrides block (the MIs' look)"), *B.Id), B.ConceptPaste.Lit3d.MaterialOverrides.IsEmpty());
+  }
+  FS08ArtTunerModel M;
+  M.SetBase(Profiles, TEXT("sha"), Errors);
+  int32 Sarpedon = INDEX_NONE;
+  for (int32 I = 0; I < Shipped.Boards.Num(); ++I) {
+    if (Shipped.Boards[I].Id == TEXT("sarpedon-original")) Sarpedon = I;
+  }
+  if (!TestTrue("sarpedon board", Sarpedon != INDEX_NONE)) return false;
+  const FString Root = FString::Printf(TEXT("/boards/%d/conceptPaste/lit3d/materialOverrides"), Sarpedon);
+  const TArray<FS08TunerGroup> Groups = Registry.Expand(M.GetBase(), TEXT("sarpedon-night"), Sarpedon);
+  const FS08TunerGroup* Materials = Groups.FindByPredicate([](const FS08TunerGroup& G) { return G.Id == TEXT("materials"); });
+  if (TestNotNull("materials rows on Sarpedon", Materials)) {
+    TestEqual("11 looks + 4 wind rows", Materials->Params.Num(), 15);
+    TestTrue("absent keys with defaults", Materials->Params[0].bCreate && Materials->Params[0].bHasDefault &&
+                                              Materials->Params[0].DefaultNumber == 1.0);
+  }
+  FString Error;
+  TestTrue("island gain (new block, new look)", M.SetValue(Root + TEXT("/Island/tintGain"), NumText(TEXT("1.25")), true, Error));
+  TestTrue("foliage wind", M.SetValue(Root + TEXT("/Foliage/windAmp"), NumText(TEXT("12")), true, Error));
+  TestFalse("no create flag: refused", M.SetValue(Root + TEXT("/Ship/tintGain"), Num(1.1), false, Error));
+  FS08BoardArtData Data;
+  Errors.Reset();
+  if (TestTrue(FString::Printf(TEXT("build (%s)"), *FString::Join(Errors, TEXT("; "))), M.Build(Data, Errors))) {
+    const TArray<FS08ConceptMaterialOverride>& O = Data.Boards[Sarpedon].ConceptPaste.Lit3d.MaterialOverrides;
+    TestEqual("two looks", O.Num(), 2);
+    const FS08ConceptMaterialOverride* Island = O.FindByPredicate([](const FS08ConceptMaterialOverride& X) { return X.Look == TEXT("Island"); });
+    const FS08ConceptMaterialOverride* Foliage = O.FindByPredicate([](const FS08ConceptMaterialOverride& X) { return X.Look == TEXT("Foliage"); });
+    TestTrue("island gain", Island && FMath::IsNearlyEqual(Island->TintGain, 1.25f) && Island->Scalars.IsEmpty());
+    TestTrue("foliage WindAmp", Foliage && Foliage->Scalars.Num() == 1 && Foliage->Scalars[0].Key == FName(TEXT("WindAmp")) &&
+                                    FMath::IsNearlyEqual(Foliage->Scalars[0].Value, 12.0f) && Foliage->TintGain == 1.0f);
+  }
+  auto Refused = [&](const FString& Pointer, const TSharedPtr<FJsonValue>& V, const TCHAR* Why) {
+    FS08ArtTunerModel B;
+    TArray<FString> E;
+    B.SetBase(Profiles, TEXT("sha"), E);
+    FString SetError;
+    B.SetValue(Pointer, V, true, SetError);
+    FS08BoardArtData D;
+    TestFalse(FString::Printf(TEXT("refused: %s"), Why), B.Build(D, E));
+  };
+  Refused(Root + TEXT("/Island/tintGain"), Num(4.5), TEXT("tintGain above 4"));
+  Refused(Root + TEXT("/Island/glow"), Num(1), TEXT("an unknown key"));
+  Refused(Root + TEXT("/1sland/tintGain"), Num(1), TEXT("a look name starting with a digit"));
+  Refused(Root + TEXT("/Foliage/windHeight"), Num(5), TEXT("windHeight below 10"));
   return true;
 }
 

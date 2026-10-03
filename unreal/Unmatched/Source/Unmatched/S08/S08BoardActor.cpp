@@ -1225,6 +1225,8 @@ void AS08BoardActor::UpdateConceptPaste() {
                                                                           (ConceptInputs.bLightsOff ? TEXT(",emissive-off") : TEXT(""));
     FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW concept-scene collection=%s path=%s"), *ConceptRuntime.SceneCollection,
                                      S08ConceptPasteSpec::SceneCollectionPath));
+    // Art Tuner M4: "materialOverrides" (absent: nothing is created)
+    ApplyMaterialOverrides();
   }
   // light budget: 1 key + profile points + this block's lights + the env lights still visible <= 6 points
   int32 VisibleLayoutLights = 0;
@@ -2483,6 +2485,8 @@ void AS08BoardActor::ResetArtRuntimeForReload() {
   ConceptAssetsProfileId.Reset();      // the spec's asset paths may have changed: LoadAssets again
   ConceptApplyFailedProfileId.Reset();
   S08EnvLayout::Clear(EnvProps, EnvLights);
+  TunedMaterialMids.Reset();  // the env prop components (and their MIDs) are gone
+  MaterialOverridesTraceKey.Reset();
   S08EnvGround::Clear(EnvRuntime.Ground);
   S08EnvLayout::ClearFx(EnvRuntime.Fx);
   EnvRuntime = FS08EnvLayoutRuntime();

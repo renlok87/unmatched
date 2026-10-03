@@ -14,6 +14,7 @@
 #include "Engine/PointLight.h"
 #include "Engine/PostProcessVolume.h"
 #include "Engine/SkyLight.h"
+#include "Materials/MaterialInstanceDynamic.h"
 
 bool AS08BoardActor::ApplyTunedArtData(const FS08BoardArtData& Data, uint8 Scopes, const FString& ProfilesSource,
                                        FString& OutNote) {
@@ -150,4 +151,73 @@ bool AS08BoardActor::ApplyTunedConceptLights() {
   return true;
 }
 
-bool AS08BoardActor::ApplyMaterialOverrides() { return true; }  // M4
+bool AS08BoardActor::ApplyMaterialOverrides() {
+  const bool bLit3d = IsConceptPasteOn() && ConceptMode.Kind == ES08ConceptKind::Lit3d;
+  const TArray<FS08ConceptMaterialOverride> None;
+  const TArray<FS08ConceptMaterialOverride>& Overrides = bLit3d ? ActiveProfile.ConceptPaste.Lit3d.MaterialOverrides : None;
+  if (Overrides.IsEmpty() && TunedMaterialMids.IsEmpty()) return true;
+  // 1) every MID written before gets its parent's values back (a look that left the block is undone)
+  auto RestoreFromParent = [](UMaterialInstanceDynamic* Mid) {
+    const UMaterialInterface* Parent = Mid ? Mid->Parent.Get() : nullptr;
+    if (!Parent) return;
+    for (const TCHAR* Name : S08ConceptPasteSpec::TintParamNames) {
+      FLinearColor V;
+      if (Parent->GetVectorParameterValue(FHashedMaterialParameterInfo(Name), V)) Mid->SetVectorParameterValue(Name, V);
+    }
+    for (const S08ConceptPaste::FS08MaterialScalarSpec& S : S08ConceptPaste::MaterialScalarSpecs()) {
+      float V = 0.0f;
+      if (Parent->GetScalarParameterValue(FHashedMaterialParameterInfo(S.Param), V)) Mid->SetScalarParameterValue(S.Param, V);
+    }
+  };
+  for (const TWeakObjectPtr<UMaterialInstanceDynamic>& W : TunedMaterialMids) RestoreFromParent(W.Get());
+  TunedMaterialMids.Reset();
+  // 2) the overrides, per slot of every env prop whose material chain names a look of the block
+  TMap<FString, int32> Slots;
+  int32 Params = 0;
+  for (UStaticMeshComponent* Prop : EnvProps) {
+    if (!Prop) continue;
+    for (int32 Slot = 0; Slot < Prop->GetNumMaterials(); ++Slot) {
+      UMaterialInterface* Material = Prop->GetMaterial(Slot);
+      const FString Look = S08ConceptPaste::LookOfMaterial(Material);
+      const FS08ConceptMaterialOverride* O =
+          Look.IsEmpty() ? nullptr : Overrides.FindByPredicate([&](const FS08ConceptMaterialOverride& X) { return X.Look == Look; });
+      if (!O) continue;
+      UMaterialInstanceDynamic* Mid = Cast<UMaterialInstanceDynamic>(Material);
+      if (!Mid) Mid = Prop->CreateDynamicMaterialInstance(Slot, Material);
+      const UMaterialInterface* Parent = Mid ? Mid->Parent.Get() : nullptr;
+      if (!Parent) continue;
+      for (const TCHAR* Name : S08ConceptPasteSpec::TintParamNames) {
+        FLinearColor V;
+        if (!Parent->GetVectorParameterValue(FHashedMaterialParameterInfo(Name), V)) continue;
+        const FLinearColor Tint = O->bTint ? O->Tint : FLinearColor::White;
+        Mid->SetVectorParameterValue(Name, FLinearColor(V.R * O->TintGain * Tint.R, V.G * O->TintGain * Tint.G,
+                                                        V.B * O->TintGain * Tint.B, V.A));
+        ++Params;
+      }
+      for (const TPair<FName, float>& S : O->Scalars) {
+        float Base = 0.0f;
+        if (!Parent->GetScalarParameterValue(FHashedMaterialParameterInfo(S.Key), Base)) continue;
+        Mid->SetScalarParameterValue(S.Key, S.Value);
+        ++Params;
+      }
+      TunedMaterialMids.AddUnique(Mid);
+      ++Slots.FindOrAdd(Look);
+    }
+  }
+  TArray<FString> Parts, Missing;
+  for (const FS08ConceptMaterialOverride& O : Overrides) {
+    const int32* N = Slots.Find(O.Look);
+    if (!N) Missing.Add(O.Look);
+    Parts.Add(FString::Printf(TEXT("%s:%d(gain %.2f%s)"), *O.Look, N ? *N : 0, O.TintGain,
+                              O.Scalars.IsEmpty() ? TEXT("") : *FString::Printf(TEXT(", %d scalars"), O.Scalars.Num())));
+  }
+  const FString Key = FString::Join(Parts, TEXT(" ")) + TEXT("|") + FString::Join(Missing, TEXT(","));
+  if (Key != MaterialOverridesTraceKey) {
+    // one line per distinct result (a slider drag does not flood the trace)
+    MaterialOverridesTraceKey = Key;
+    FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW concept-scene materials looks=%d mids=%d params=%d %s missing=%s"),
+                                     Overrides.Num(), TunedMaterialMids.Num(), Params, Parts.IsEmpty() ? TEXT("-") : *FString::Join(Parts, TEXT(" ")),
+                                     Missing.IsEmpty() ? TEXT("-") : *FString::Join(Missing, TEXT(","))));
+  }
+  return true;
+}

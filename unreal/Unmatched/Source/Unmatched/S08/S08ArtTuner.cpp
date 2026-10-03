@@ -122,10 +122,12 @@ TSharedPtr<FJsonValue> TunerWith(const TSharedPtr<FJsonValue>& Node, const TArra
   if (Node->Type == EJson::Object) {
     const TSharedPtr<FJsonObject> Obj = Node->AsObject();
     TSharedPtr<FJsonValue> Child = Obj->TryGetField(Seg);
-    if (!Child.IsValid() && !(bLeaf && bCreateLeaf)) {
+    if (!Child.IsValid() && !bCreateLeaf) {
       OutError = FString::Printf(TEXT("no key '%s'"), *Seg);
       return nullptr;
     }
+    // a missing object on the way to a new leaf (Art Tuner M4: lit3d.materialOverrides.<Look>.<key>)
+    if (!Child.IsValid() && !bLeaf) Child = MakeShared<FJsonValueObject>(MakeShared<FJsonObject>());
     const TSharedPtr<FJsonValue> NewChild = TunerWith(Child, Segments, I + 1, Value, bCreateLeaf, OutError);
     if (!NewChild.IsValid()) return nullptr;
     Obj->SetField(Seg, NewChild);
@@ -393,6 +395,8 @@ bool FS08ArtTunerRegistry::Parse(const FString& Text, TArray<FString>& OutErrors
       P.SliderMax = TunerNumber(PO, TEXT("sliderMax"), P.bHasMax ? P.Max : 1.0);
       P.bCross = TunerBool(PO, TEXT("cross"), false);
       P.bCreate = TunerBool(PO, TEXT("create"), false);
+      P.bHasDefault = PO->HasField(TEXT("default"));
+      P.DefaultNumber = TunerNumber(PO, TEXT("default"), 0.0);
       if (P.Step <= 0.0) OutErrors.Add(FString::Printf(TEXT("params: %s.%s step must be > 0"), *T.Id, *P.Id));
       if (P.SliderMax <= P.SliderMin) {
         OutErrors.Add(FString::Printf(TEXT("params: %s.%s slider range %g..%g is empty"), *T.Id, *P.Id, P.SliderMin, P.SliderMax));
@@ -469,12 +473,16 @@ TArray<FS08TunerGroup> FS08ArtTunerRegistry::Expand(const TSharedPtr<FJsonObject
         const bool bExists = S08JsonPointer::Get(Doc, P.Pointer).IsValid();
         if (!bExists) {
           if (!P.bCreate) continue;
-          // a new optional key: the parent object must exist
-          FString Parent;
-          FString Leaf;
-          if (!P.Pointer.Split(TEXT("/"), &Parent, &Leaf, ESearchCase::CaseSensitive, ESearchDir::FromEnd)) continue;
-          const TSharedPtr<FJsonValue> ParentValue = S08JsonPointer::Get(Doc, Parent);
-          if (!ParentValue.IsValid() || ParentValue->Type != EJson::Object) continue;
+          // a new optional key: the nearest existing ancestor must be an object
+          FString Ancestor = P.Pointer;
+          TSharedPtr<FJsonValue> AncestorValue;
+          while (!AncestorValue.IsValid()) {
+            FString Parent, Leaf;
+            if (!Ancestor.Split(TEXT("/"), &Parent, &Leaf, ESearchCase::CaseSensitive, ESearchDir::FromEnd)) break;
+            Ancestor = Parent;
+            AncestorValue = Ancestor.IsEmpty() ? MakeShared<FJsonValueObject>(Doc) : S08JsonPointer::Get(Doc, Ancestor);
+          }
+          if (!AncestorValue.IsValid() || AncestorValue->Type != EJson::Object) continue;
         }
         if (P.Type == ES08TunerType::Ev100) {
           const TSharedPtr<FJsonValue> Ev = S08JsonPointer::Get(Doc, P.Pointer + TEXT("/ev100"));
@@ -549,11 +557,16 @@ bool FS08ArtTunerModel::SetValue(const FString& Pointer, const TSharedPtr<FJsonV
       return false;
     }
   } else {
-    FString Parent;
-    FString Leaf;
-    const bool bSplit = Pointer.Split(TEXT("/"), &Parent, &Leaf, ESearchCase::CaseSensitive, ESearchDir::FromEnd);
-    const TSharedPtr<FJsonValue> ParentValue = bSplit ? BaseValue(Parent) : nullptr;
-    if (!bCreate || !ParentValue.IsValid() || ParentValue->Type != EJson::Object) {
+    // a new key: the nearest existing ancestor must be an object (missing objects below it are created)
+    FString Ancestor = Pointer;
+    TSharedPtr<FJsonValue> AncestorValue;
+    while (!AncestorValue.IsValid()) {
+      FString Parent, Leaf;
+      if (!Ancestor.Split(TEXT("/"), &Parent, &Leaf, ESearchCase::CaseSensitive, ESearchDir::FromEnd)) break;
+      Ancestor = Parent;
+      AncestorValue = Ancestor.IsEmpty() ? MakeShared<FJsonValueObject>(Base) : BaseValue(Ancestor);
+    }
+    if (!bCreate || !AncestorValue.IsValid() || AncestorValue->Type != EJson::Object) {
       OutError = FString::Printf(TEXT("%s: not in the profiles document"), *Pointer);
       return false;
     }

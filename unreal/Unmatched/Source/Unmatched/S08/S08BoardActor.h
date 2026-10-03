@@ -194,6 +194,8 @@ public:
   /** Full Rebuilds since spawn (a Rebuild with unchanged geometry keeps the tiles and is not counted). */
   int32 GetBuildCount() const { return BuildCount; }
   const FS08BoardArtData& GetArtData() const { return ArtData; }
+  /** Art Tuner M4: env-prop MIDs the lit3d material overrides wrote (0 without the block). */
+  int32 GetTunedMaterialCount() const { return TunedMaterialMids.Num(); }
   /** Spawned art light actors of the light profile (key, points, SkyLight, fog, exposure volume). */
   int32 GetArtLightActorCount() const { return ArtLights.Num(); }
   /** Live tune: the fx mode of this board (unset = the command line: -Bench freezes unless -EnvFxLive); applies on the
@@ -387,8 +389,12 @@ private:
   void ApplyTunedLights(const FS08LightProfile& Light);
   /** Art Tuner: the lit3d light values on ConceptLights (+ the flicker base); false = needs a rebuild. */
   bool ApplyTunedConceptLights();
-  /** Art Tuner M4: the lit3d "materialOverrides" on the env props' MIDs; false = needs a rebuild. */
+  /** Art Tuner M4: the lit3d "materialOverrides" on the env props' MIDs (every MID it touched before goes back to its
+   *  parent's values first, so a removed look is undone); always true (no rebuild needed). */
   bool ApplyMaterialOverrides();
+  /** MIDs the material overrides wrote (owned by the env prop components). */
+  TArray<TWeakObjectPtr<UMaterialInstanceDynamic>> TunedMaterialMids;
+  FString MaterialOverridesTraceKey;
   /** ENV-MAPS P2: the profile's "mapGrade" on the map MID of a map-image board (traced; no block = the MI values). */
   void ApplyMapGrade(const FS08LightProfile& Light);
   void ApplySurfaceMaterials();

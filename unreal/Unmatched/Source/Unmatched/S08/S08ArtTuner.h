@@ -55,8 +55,8 @@ UNMATCHED_API bool Split(const FString& Pointer, TArray<FString>& OutSegments);
 UNMATCHED_API FString Escape(const FString& Segment);
 /** The value at Pointer (null when a segment is missing or an array index is out of range / not a number). */
 UNMATCHED_API TSharedPtr<FJsonValue> Get(const TSharedPtr<FJsonObject>& Root, const FString& Pointer);
-/** Replaces the value at Pointer in place. bCreateLeaf: the last segment may be a new key of an existing object. Arrays
- *  are rebuilt (FJsonValueArray holds its elements by value). */
+/** Replaces the value at Pointer in place. bCreate: missing keys are created (the leaf and any missing objects on the
+ *  way; never inside an array or below a value). Arrays are rebuilt (FJsonValueArray holds its elements by value). */
 UNMATCHED_API bool Set(const TSharedPtr<FJsonObject>& Root, const FString& Pointer, const TSharedPtr<FJsonValue>& Value,
                        bool bCreateLeaf, FString& OutError);
 /** Compact JSON text of one value (numbers as the shortest round-trip text of a NumberString). */
@@ -85,7 +85,9 @@ struct UNMATCHED_API FS08TunerParam {
   double SliderMax = 1.0;
   double Step = 0.01;
   bool bCross = false;   // the parser checks it together with other fields (cone pair, heights, fog range)
-  bool bCreate = false;  // the key may be absent (the row writes a new optional field)
+  bool bCreate = false;  // the key may be absent (the row writes a new optional field, and its missing parent objects)
+  bool bHasDefault = false;  // the value an absent key means (shown by the panel; writing it back removes the entry)
+  double DefaultNumber = 0.0;
   /** Decimals of Step (0.05 -> 2, 1 -> 0): the saved text of a value. */
   int32 Decimals() const;
   /** Value snapped to Step and clamped to the hard bounds. */
@@ -140,7 +142,8 @@ public:
   TSharedPtr<FJsonValue> Value(const FString& Pointer) const;
   bool IsChanged(const FString& Pointer) const { return IndexOf(Pointer) != INDEX_NONE; }
   /** Stores a value (a value equal to the base removes the entry). Refused: a pointer that is neither in the base nor an
-   *  allowed new key (bCreate + an existing parent object), or a value of another JSON type than the base one. */
+   *  allowed new key (bCreate + the nearest existing ancestor is an object), or a value of another JSON type than the
+   *  base one. */
   bool SetValue(const FString& Pointer, const TSharedPtr<FJsonValue>& Value, bool bCreate, FString& OutError);
   void Reset(const FString& Pointer);
   void ResetAll() { Entries.Reset(); }

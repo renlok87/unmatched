@@ -186,6 +186,12 @@ bool AS08FlowGameMode::ArtTunerSetValue(const FString& PointerOrId, const TShare
     }
   };
   for (const TPair<FString, TSharedPtr<FJsonValue>>& W : Writes) {
+    // an absent optional key set to the value it means anyway: no entry (the file stays minimal)
+    if (P->bHasDefault && !S.Model.BaseValue(W.Key).IsValid() && W.Value->Type == EJson::Number &&
+        FMath::Abs(W.Value->AsNumber() - P->DefaultNumber) <= 1e-9) {
+      S.Model.Reset(W.Key);
+      continue;
+    }
     if (!S.Model.SetValue(W.Key, W.Value, P->bCreate, OutError)) {
       Revert();
       return false;
@@ -370,6 +376,7 @@ TSharedPtr<FJsonObject> AS08FlowGameMode::ArtTunerState() const {
       PO->SetNumberField(TEXT("sliderMin"), P.SliderMin);
       PO->SetNumberField(TEXT("sliderMax"), P.SliderMax);
       PO->SetNumberField(TEXT("step"), P.Step);
+      if (P.bHasDefault) PO->SetNumberField(TEXT("default"), P.DefaultNumber);
       Rows.Add(MakeShared<FJsonValueObject>(PO));
     }
     GO->SetArrayField(TEXT("rows"), Rows);
