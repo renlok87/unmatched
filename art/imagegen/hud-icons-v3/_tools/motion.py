@@ -1,260 +1,327 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Движение значков v3: каждый кадр — чистая функция времени t (мс), без случайности.
+"""Эталонный рендер движения значков v3 по контракту icon-motion.json (как его сыграет UE).
 
-    python motion.py            # sheets/motion/: frames-<id>.png (12 кадров: 2 появления, 9 цикла, 1 уход; строка
-                                # reduced motion под обычной), <id>.gif, frames-transitions.png
+    python art/imagegen/hud-icons-v3/_tools/motion.py            # всё: листы, GIF, ролик MP4, index.html
+    python art/imagegen/hud-icons-v3/_tools/motion.py --only state-sent,action-attack
 
-Константы — токены motion.icon.* (STYLE-v3.md §7); «удар» каждого цикла — одна константа (на неё вешаются звук и
-хаптика): щелчок стрелок 520 мс, переворот часов 650 мс, проход головы спиннера через 12 ч, «тук» метки 300 мс.
+Как в UE: каждый слой — текстура точного размера (sizes/, layers/), поза из icon_motion.Animator, аффинное
+преобразование «слой → корень» с билинейной выборкой, непрозрачность корня × слоя. Сценарий — demo из контракта
+(тот же играет галерея UE -S08IconGallery). Всё — функция t; повторный запуск даёт те же кадры.
+
+Выход в sheets/motion/:
+  frames-<id>.png        12 кадров сценария (96 px и 32 px ×3), строка reduced motion под обычной;
+  <id>.gif               сценарий целиком, 50 к/с, 96 / 48 / 32 px на панели;
+  <id>-reduced.gif       то же при reduced motion;
+  reel.mp4, reel-reduced.mp4   все 23 значка сеткой, 60 к/с (нужен ffmpeg);
+  index.html             страница просмотра: GIF всех значков и ролики.
 """
 from __future__ import annotations
 
+import io
 import math
 import os
+import shutil
+import subprocess
+import sys
 
+import numpy as np
 from PIL import Image
 
-import draw_icons as D
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+import draw_icons as D  # noqa: E402
+import icon_motion as M  # noqa: E402
 
 OUT = os.path.join(D.ROOT, "sheets", "motion")
-
-APPEAR_MS, LEAVE_MS = 180, 120
-REDUCED_MS = 100
-SPINNER_STEP_MS = 125
-PERIOD = {"loader-spinner": 8 * SPINNER_STEP_MS, "state-pending-move": 1200, "state-pending-place": 1200,
-          "state-sent": 1500, "resource-connection-reconnecting": 1200}
-HIT_MS = {"state-pending-move": 520, "state-sent": 650, "state-pending-place": 300, "loader-spinner": 0,
-          "resource-connection-reconnecting": 0}
+TEAM_DEMO = D.C["team1"]
+PANEL = D.PANEL
 
 
-def clamp01(x):
-    return 0.0 if x < 0 else 1.0 if x > 1 else x
+# ------------------------------------------------------------------------------------------------ текстуры
+_cache = {}
 
 
-def ease_out_cubic(x):
-    x = clamp01(x)
-    return 1 - (1 - x) ** 3
+def texture(src, frame, size):
+    name = src
+    if src.endswith("#"):
+        name = f"{src[:-1]}_f{int(frame):02d}"
+    key = (name, size)
+    if key not in _cache:
+        sub = "layers" if "_" in name else "sizes"
+        path = os.path.join(D.ROOT, sub, f"{name}-{size}.png")
+        _cache[key] = Image.open(path).convert("RGBA")
+    return _cache[key]
 
 
-def ease_in_quad(x):
-    x = clamp01(x)
-    return x * x
+def affine(pose, pivot_u, px_per_u):
+    """3×3: p → pivot + R(θ)·diag(s·sx, s·sy)·(p − pivot) + t (в px)."""
+    s = pose["scale"]
+    sx, sy = s * pose["scale_x"], s * pose["scale_y"]
+    th = math.radians(pose["rotate"])
+    c, si = math.cos(th), math.sin(th)
+    px, py = pivot_u[0] * px_per_u, pivot_u[1] * px_per_u
+    tx, ty = pose["tx"] * px_per_u, pose["ty"] * px_per_u
+    a, b = c * sx, -si * sy
+    d, e = si * sx, c * sy
+    return np.array([[a, b, px + tx - (a * px + b * py)],
+                     [d, e, py + ty - (d * px + e * py)],
+                     [0, 0, 1.0]])
 
 
-def ease_out_quad(x):
-    x = clamp01(x)
-    return 1 - (1 - x) ** 2
+def compose(anim, pp, size):
+    """Кадр значка (RGBA) размера size по позе pp."""
+    cw, ch = anim.d["canvas_u"]
+    k = size / 32.0
+    pad = round(0.25 * size)                  # как в UE: трансформ рисует за границей виджета (клип выключен)
+    W, H = round(size * cw / 32) + 2 * pad, round(size * ch / 32) + 2 * pad
+    pose, pivots = pp["pose"], pp["pivot"]
+    shift = np.array([[1, 0, pad], [0, 1, pad], [0, 0, 1.0]])
+    A_all = shift @ affine(pose["all"], anim.pivot_of("all", pivots), k)
+    out = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    for l in anim.d["layers"]:
+        lp = pose[l["id"]]
+        op = pose["all"]["opacity"] * lp["opacity"]
+        if op <= 1e-4:
+            continue
+        tex = texture(l["src"], lp["frame"], size)
+        if l.get("tint") == "team":
+            arr = np.asarray(tex).astype(np.float32)
+            arr[..., :3] *= np.array(TEAM_DEMO, dtype=np.float32)
+            tex = Image.fromarray(arr.clip(0, 255).astype(np.uint8), "RGBA")
+        Mx = A_all @ affine(lp, anim.pivot_of(l["id"], pivots), k)
+        if abs(np.linalg.det(Mx[:2, :2])) < 1e-6:      # масштаб 0 — слоя не видно (так же в UE)
+            continue
+        inv = np.linalg.inv(Mx)
+        im = tex.transform((W, H), Image.AFFINE, data=tuple(inv[:2].ravel()), resample=Image.BILINEAR)
+        if op < 1.0:
+            im.putalpha(im.getchannel("A").point(lambda v, o=op: int(v * o + 0.5)))
+        out.alpha_composite(im)
+    return out
 
 
-def ease_in_out_cubic(x):
-    x = clamp01(x)
-    return 4 * x ** 3 if x < 0.5 else 1 - (-2 * x + 2) ** 3 / 2
+def frames_for(icon, reduced, times, sizes):
+    c = M.load_contract()
+    rows, total = M.run_demo(c, icon, reduced, times)
+    res = []
+    for t, (pp, visible), anim in rows:
+        res.append((t, {s: (compose(anim, pp, s) if visible else None) for s in sizes}))
+    return res, total
 
 
-def ease_out_back(x, s=0.75):
-    x = clamp01(x)
-    return 1 + (s + 1) * (x - 1) ** 3 + s * (x - 1) ** 2
+def on_panel(im, w, h):
+    bg = Image.new("RGBA", (w, h), PANEL)
+    if im is not None:
+        bg.alpha_composite(im, ((w - im.width) // 2, (h - im.height) // 2))
+    return bg
 
 
-def lerp(a, b, k):
-    return a + (b - a) * k
+# ------------------------------------------------------------------------------------------------ листы и GIF
+def key_times(c, icon, reduced, total, n=12):
+    """12 моментов сценария, привязанных к командам (а не равномерно): у каждой анимации — доли её длительности,
+    у цикла — четверти периода; так на листе видны и события, и удар цикла."""
+    base = c["icons"][c.get("variants", {}).get(icon, icon)]
+    sched, _ = M.demo_schedule(c, icon, reduced)
+
+    def dur(name):
+        a = base["anims"][name]
+        br = a.get("reduced") if reduced else None
+        return float((br or a)["duration_ms"])
+
+    want = []
+    for t0, op in sched:
+        d = dur(op)
+        if op == "appear":
+            want += [t0, t0 + 0.35 * d, t0 + d]
+            if "cycle" in base["anims"]:
+                cd = dur("cycle")
+                if cd > 0:
+                    want += [t0 + d + f * cd for f in (0.2, 0.4, 0.55, 0.7, 0.85)]
+        elif op == "leave":
+            want += [t0 + 0.5 * d]
+        else:
+            want += [t0 + 0.3 * d, t0 + 0.7 * d] if d > 0 else [t0]
+    want = sorted({round(min(max(w, 0.0), total * 0.995)) for w in want})
+    if len(want) > n:
+        idx = [round(i * (len(want) - 1) / (n - 1)) for i in range(n)]
+        want = [want[i] for i in idx]
+    while len(want) < n:
+        gaps = [(b - a, i) for i, (a, b) in enumerate(zip(want, want[1:]))] or [(total, 0)]
+        g, i = max(gaps)
+        want.insert(i + 1, round(want[i] + g / 2) if len(want) > 1 else round(total / 2))
+    return want
 
 
-# ------------------------------------------------------------------ параметры циклов
-def spinner_params(t, reduced=False):
-    step = SPINNER_STEP_MS * (2 if reduced else 1)
-    return {"step": int(t // step) % 8}
+def padded(s, wide):
+    """Размер кадра compose() для стороны s: холст значка + поле 0,25 s с каждой стороны."""
+    p = round(0.25 * s)
+    return (2 * s if wide else s) + 2 * p, s + 2 * p
 
 
-def pending_move_params(t, reduced=False):
-    if reduced:
-        return {"ext": 1.0}
-    t = t % PERIOD["state-pending-move"]
-    if t < 180:
-        ext = 1.0
-    elif t < 480:
-        ext = lerp(1.0, 0.86, ease_in_quad((t - 180) / 300))
-    elif t < 520:
-        ext = 0.86
-    elif t < 760:
-        ext = lerp(0.86, 1.0, ease_out_cubic((t - 520) / 240))
-    else:
-        ext = 1.0
-    return {"ext": ext}
-
-
-def pending_place_params(t, reduced=False):
-    if reduced:
-        return {"dy": 0.0}
-    t = t % PERIOD["state-pending-place"]
-    if t < 300:
-        dy = -2.4 * ease_out_quad(t / 300)
-    elif t < 600:
-        dy = -2.4 * (1 - ease_in_quad((t - 300) / 300))
-    else:
-        dy = 0.0
-    return {"dy": dy}
-
-
-def sent_params(t, reduced=False):
-    if reduced:
-        return {"top": 0.55, "bottom": 0.45, "angle": 0.0, "stream": False}
-    t = t % PERIOD["state-sent"]
-    if t < 550:
-        k = t / 550
-        return {"top": 0.55 * (1 - k), "bottom": 0.45 + 0.55 * k, "angle": 0.0, "stream": True}
-    if t < 650:
-        return {"top": 0.0, "bottom": 1.0, "angle": 0.0, "stream": False}
-    if t < 950:
-        return {"top": 0.0, "bottom": 1.0, "angle": math.pi * ease_in_out_cubic((t - 650) / 300), "stream": False}
-    if t < 1400:
-        k = (t - 950) / 450
-        return {"top": 1.0 - 0.45 * k, "bottom": 0.45 * k, "angle": 0.0, "stream": True}
-    return {"top": 0.55, "bottom": 0.45, "angle": 0.0, "stream": False}
-
-
-def reconnect_params(t, reduced=False):
-    if reduced:
-        return {"angle": 0.0}
-    return {"angle": 2 * math.pi * ((t % PERIOD["resource-connection-reconnecting"]) / PERIOD["resource-connection-reconnecting"])}
-
-
-CYCLES = {
-    "loader-spinner": spinner_params, "state-pending-move": pending_move_params,
-    "state-pending-place": pending_place_params, "state-sent": sent_params,
-    "resource-connection-reconnecting": reconnect_params,
-}
-
-
-# ------------------------------------------------------------------ огибающая появления / ухода
-def envelope(t, total, reduced=False):
-    """(scale, opacity) всего значка: appear 180 мс (0,80 → 1,04 на 40 % → 1,00, ease-out-back; opacity за 120),
-    leave 120 мс (opacity → 0, scale → 0,92 ease-in-quad). reduced: только opacity ≤ 100 мс."""
-    if reduced:
-        if t < REDUCED_MS:
-            return 1.0, clamp01(t / REDUCED_MS)
-        if t > total - REDUCED_MS:
-            return 1.0, clamp01((total - t) / REDUCED_MS)
-        return 1.0, 1.0
-    if t < APPEAR_MS:
-        return lerp(0.80, 1.0, ease_out_back(t / APPEAR_MS)), 0.15 + 0.85 * clamp01(t / 120)   # кадр 0 не пустой
-    if t > total - LEAVE_MS:
-        x = (t - (total - LEAVE_MS)) / LEAVE_MS
-        return 1.0 - 0.08 * ease_in_quad(x), 1.0 - ease_in_quad(x)
-    return 1.0, 1.0
-
-
-def frame(icon, size, t, total, reduced=False):
-    """Кадр в момент t: цикл начинается после появления (t − 180), уход — последние 120 мс."""
-    params = CYCLES[icon](max(0.0, t - APPEAR_MS), reduced) if icon in CYCLES else {}
-    base = D.render(icon, size, **params)
-    sc, op = envelope(t, total, reduced)
-    w, h = base.size
-    if abs(sc - 1.0) > 1e-3:
-        im = base.resize((max(1, round(w * sc)), max(1, round(h * sc))), Image.LANCZOS)
-        base = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-        base.paste(im, ((w - im.width) // 2, (h - im.height) // 2), im)
-    if op < 1.0:
-        base.putalpha(base.getchannel("A").point(lambda v: int(v * op)))
-    return base
-
-
-# ------------------------------------------------------------------ листы
-def frame_sheet(icon):
-    period = PERIOD[icon]
-    total = APPEAR_MS + period + LEAVE_MS
-    ts = [40, 120] + [APPEAR_MS + period * i / 9 for i in range(9)] + [total - 50]
+def frame_sheet(icon, c):
+    _, total = M.demo_schedule(c, icon, False)
+    _, total_r = M.demo_schedule(c, icon, True)
+    wide = c["icons"][c.get("variants", {}).get(icon, icon)]["canvas_u"][0] > 32
     big, small = 96, 32
-    wide = D.is_wide(icon)
-    cw = (2 * big if wide else big) + 24 + (2 * small if wide else small) * 3 + 16
-    ch = big + 8
-    W = 20 + 12 * cw
+    bw, bh = padded(big, wide)
+    sw, sh = padded(small, wide)
+    cw = bw + 16 + sw * 3 + 16
+    ch = max(bh, sh * 3) + 8
+    n = 12
+    W = 20 + n * cw
     H = 60 + 2 * (ch + 36)
     sheet = Image.new("RGBA", (W, H), D.SHEET_BG)
-    D.paste(sheet, D.label(W, 36, f"{icon}: 12 кадров = 2 появления (180 мс) + 9 цикла ({period} мс) + 1 ухода (120 мс); 96 px и 32 px ×3; верх — обычный, низ — reduced motion; удар цикла при {HIT_MS[icon]} мс", 15), 0, 8)
-    for row, red in ((0, False), (1, True)):
+    sched = ", ".join(f"{int(t)} {op}" for t, op in M.demo_schedule(c, icon, False)[0])
+    D.paste(sheet, D.label(W, 36, f"{icon}: сценарий {int(total)} мс ({sched}); 96 px и 32 px ×3; низ — reduced motion", 15), 0, 8)
+    for row, (red, tot) in enumerate(((False, total), (True, total_r))):
+        times = key_times(c, icon, red, tot, n)
+        frames, _ = frames_for(icon, red, times, (big, small))
         y = 60 + row * (ch + 36)
-        for i, t in enumerate(ts):
+        for i, (t, ims) in enumerate(frames):
             x = 20 + i * cw
-            panel = Image.new("RGBA", (cw - 8, ch), D.PANEL)
-            D.paste(panel, frame(icon, big, t, total, red), 4, 4)
-            s = frame(icon, small, t, total, red)
-            D.paste(panel, D.xN(s, 3), (2 * big if wide else big) + 16, (ch - small * 3) // 2)
+            panel = Image.new("RGBA", (cw - 8, ch), PANEL)
+            if ims[big] is not None:
+                D.paste(panel, ims[big], 4, (ch - bh) // 2)
+                D.paste(panel, D.xN(ims[small], 3), bw + 12, (ch - sh * 3) // 2)
             D.paste(sheet, panel, x, y)
-            D.paste(sheet, D.label(cw - 8, 20, f"t = {int(t)} мс" + ("  reduced" if red else ""), 12), x, y + ch + 6)
+            D.paste(sheet, D.label(cw - 8, 20, f"t = {t} мс" + ("  reduced" if red else ""), 12), x, y + ch + 6)
     p = os.path.join(OUT, f"frames-{icon}.png")
-    sheet.convert("RGB").save(p)
+    sheet.convert("RGB").save(p, optimize=True)
     return p
 
 
-def gif(icon):
-    """GIF: длительности в единицах 10 мс → кадры по 20 мс; спиннер — 8 кадров 120/130 мс."""
-    period = PERIOD[icon]
-    sizes = (128, 48, 32, 24)
-    gap = 16
-    W = sum(2 * s if D.is_wide(icon) else s for s in sizes) + gap * (len(sizes) + 1)
-    H = 128 + 2 * gap
-    if icon == "loader-spinner":
-        times = [APPEAR_MS + i * SPINNER_STEP_MS for i in range(8)]
-        durations = [120, 130] * 4
-    else:
-        n = period // 20
-        times = [APPEAR_MS + i * 20 for i in range(n)]
-        durations = [20] * n
-    frames = []
-    total = APPEAR_MS + period + LEAVE_MS + 10 ** 6   # без ухода в зацикленном GIF
-    for t in times:
-        bg = Image.new("RGBA", (W, H), D.PANEL)
+def gif(icon, c, reduced=False, step=20, sizes=(96, 48, 32)):
+    _, total = M.demo_schedule(c, icon, reduced)
+    total += 300
+    times = list(range(0, int(total), step))
+    frames, _ = frames_for(icon, reduced, times, sizes)
+    wide = c["icons"][c.get("variants", {}).get(icon, icon)]["canvas_u"][0] > 32
+    gap = 8
+    W = sum(padded(s, wide)[0] for s in sizes) + gap * (len(sizes) + 1)
+    H = padded(max(sizes), wide)[1] + 2 * gap
+    pal_frames = []
+    for t, ims in frames:
+        bg = Image.new("RGBA", (W, H), PANEL)
         x = gap
         for s in sizes:
-            im = frame(icon, s, t, total)
-            D.paste(bg, im, x, gap + (128 - s) // 2)
-            x += im.width + gap
-        frames.append(bg.convert("RGB").quantize(colors=64, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE))
-    p = os.path.join(OUT, f"{icon}.gif")
-    frames[0].save(p, save_all=True, append_images=frames[1:], duration=durations, loop=0, disposal=1)
+            w, h = padded(s, wide)
+            if ims[s] is not None:
+                bg.alpha_composite(ims[s], (x, (H - h) // 2))
+            x += w + gap
+        pal_frames.append(bg.convert("RGB"))
+    # общая палитра на весь GIF — без мерцания цветов между кадрами
+    strip = Image.new("RGB", (W, H * min(len(pal_frames), 24)))
+    for i in range(min(len(pal_frames), 24)):
+        strip.paste(pal_frames[i * len(pal_frames) // min(len(pal_frames), 24)], (0, i * H))
+    pal = strip.quantize(colors=128, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
+    q = [f.quantize(palette=pal, dither=Image.Dither.NONE) for f in pal_frames]
+    p = os.path.join(OUT, f"{icon}{'-reduced' if reduced else ''}.gif")
+    q[0].save(p, save_all=True, append_images=q[1:], duration=step, loop=0, disposal=1, optimize=False)
     return p
 
 
-def transitions_sheet(icons=("state-enemy", "action-attack", "marker-status-p1", "resource-hp-full")):
-    """Появление (180 мс, 7 кадров) и уход (120 мс, 5 кадров): первый кадр не пустой, последний появления = мастер."""
-    n_a, n_l, big = 7, 5, 96
+# ------------------------------------------------------------------------------------------------ ролик
+def reel(c, reduced=False, fps=60, size=96, cols=6):
+    ff = shutil.which("ffmpeg") or os.path.expandvars(
+        r"%LOCALAPPDATA%\Microsoft\WinGet\Packages\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\ffmpeg-8.1-full_build\bin\ffmpeg.exe")
+    if not os.path.exists(ff):
+        print("ffmpeg не найден — ролик пропущен")
+        return None
+    icons = c["order"]
+    totals = {i: M.demo_schedule(c, i, reduced)[1] + 400 for i in icons}
+    length = max(totals.values())
+    n = int(length / 1000 * fps)
+    pw, ph = padded(size, True)
+    cell_w, cell_h = pw + 8, ph + 32
+    rows = math.ceil(len(icons) / cols)
+    W, H = cols * cell_w + 24, rows * cell_h + 24
+    W += W % 2
+    H += H % 2
+    labels = {i: D.label(cell_w - 8, 22, i, 13) for i in icons}
+    anims = {}
+    scheds = {}
+    for i in icons:
+        scheds[i] = M.demo_schedule(c, i, reduced)[0]
+        anims[i] = None
+    tmp = os.path.join(OUT, "_reel_tmp")
+    os.makedirs(tmp, exist_ok=True)
+    for f in range(n):
+        t_global = f * 1000.0 / fps
+        frame = Image.new("RGBA", (W, H), D.SHEET_BG)
+        for idx, icon in enumerate(icons):
+            t = t_global % totals[icon]
+            if anims[icon] is None or t < anims[icon][1]:
+                anims[icon] = [M.Animator(c, icon, reduced), t, 0]
+            a, _, si = anims[icon]
+            sched = scheds[icon]
+            while si < len(sched) and sched[si][0] <= t:
+                a.play(sched[si][1], sched[si][0])
+                si += 1
+            anims[icon][1], anims[icon][2] = t, si
+            pp, vis = a.pose(t)
+            x = 12 + (idx % cols) * cell_w
+            y = 12 + (idx // cols) * cell_h
+            cell = Image.new("RGBA", (cell_w - 8, ph), PANEL)
+            if vis:
+                im = compose(a, pp, size)
+                cell.alpha_composite(im, ((cell.width - im.width) // 2, (ph - im.height) // 2))
+            frame.alpha_composite(cell, (x, y))
+            frame.alpha_composite(labels[icon], (x, y + ph + 4))
+        frame.convert("RGB").save(os.path.join(tmp, f"{f:05d}.png"))
+    out = os.path.join(OUT, f"reel{'-reduced' if reduced else ''}.mp4")
+    subprocess.run([ff, "-y", "-loglevel", "error", "-framerate", str(fps), "-i", os.path.join(tmp, "%05d.png"),
+                    "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "18", out], check=True)
+    shutil.rmtree(tmp, ignore_errors=True)
+    return out
+
+
+def index_html(c):
     rows = []
-    for icon in icons:
-        cells = []
-        total = APPEAR_MS + 1000 + LEAVE_MS
-        for i in range(n_a):
-            cells.append((f"+{int(i * APPEAR_MS / (n_a - 1))}", frame(icon, big, i * APPEAR_MS / (n_a - 1), total)))
-        for i in range(n_l):
-            t = total - LEAVE_MS + i * LEAVE_MS / (n_l - 1)
-            cells.append((f"−{int(LEAVE_MS - i * LEAVE_MS / (n_l - 1))}", frame(icon, big, t, total)))
-        rows.append((icon, cells))
-    cw = 2 * big + 16
-    W = 20 + (n_a + n_l) * cw
-    H = 50 + len(rows) * (big + 50)
-    sheet = Image.new("RGBA", (W, H), D.SHEET_BG)
-    D.paste(sheet, D.label(W, 36, "переходы: появление 180 мс (scale 0,80 → 1,04 → 1,00 ease-out-back, opacity за 120) и уход 120 мс (opacity → 0, scale → 0,92); reduced motion — только opacity ≤ 100 мс", 15), 0, 8)
-    for r, (icon, cells) in enumerate(rows):
-        y = 50 + r * (big + 50)
-        for i, (lab, im) in enumerate(cells):
-            x = 20 + i * cw
-            panel = Image.new("RGBA", (cw - 8, big + 8), D.PANEL)
-            D.paste(panel, im, (panel.width - im.width) // 2, 4)
-            D.paste(sheet, panel, x, y)
-            D.paste(sheet, D.label(cw - 8, 20, f"{icon} {lab} мс", 11), x, y + big + 10)
-    p = os.path.join(OUT, "frames-transitions.png")
-    sheet.convert("RGB").save(p)
+    for icon in c["order"]:
+        d = c["icons"][icon]
+        names = ", ".join(d["anims"].keys())
+        rows.append(f'<figure><figcaption><b>{icon}</b><br><small>{names}</small></figcaption>'
+                    f'<img src="{icon}.gif" alt="{icon}"><img class="r" src="{icon}-reduced.gif" alt="{icon} reduced"></figure>')
+    html = f"""<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Движение значков v3</title><style>
+:root{{--bg:#1e2028;--panel:#161a28;--fg:#ece6dc;--mut:#9a958c}}
+body{{margin:0;background:var(--bg);color:var(--fg);font:14px/1.4 system-ui,sans-serif;padding:16px}}
+h1{{font-size:20px;margin:0 0 4px}} p{{color:var(--mut);margin:0 0 16px;max-width:900px}}
+.grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px}}
+figure{{margin:0;background:var(--panel);border-radius:8px;padding:10px}} img{{display:block;max-width:100%;margin-top:6px}}
+img.r{{opacity:.85}} small{{color:var(--mut)}} video{{max-width:100%;border-radius:8px;margin:8px 0 20px}}
+</style></head><body>
+<h1>Движение значков HUD v3</h1>
+<p>Эталон по контракту <code>docs/unreal/contracts/hud/icon-motion.json</code>: так же сыграет UE. В каждой карточке верхний GIF — обычное
+движение (96 / 48 / 32 px), нижний — reduced motion. Сценарий значка — поле <code>demo</code> контракта.</p>
+<video src="reel.mp4" controls loop muted autoplay playsinline></video>
+<div class="grid">{''.join(rows)}</div>
+<h1 style="margin-top:20px">Reduced motion</h1><video src="reel-reduced.mp4" controls loop muted playsinline></video>
+</body></html>"""
+    p = os.path.join(OUT, "index.html")
+    with io.open(p, "w", encoding="utf-8", newline="\n") as f:
+        f.write(html)
     return p
 
 
-def build():
+def build(only=None):
     os.makedirs(OUT, exist_ok=True)
-    for icon in CYCLES:
-        print(frame_sheet(icon))
-        print(gif(icon))
-    print(transitions_sheet())
+    c = M.load_contract()
+    icons = only or c["order"]
+    for icon in icons:
+        print(frame_sheet(icon, c))
+        print(gif(icon, c, False))
+        print(gif(icon, c, True))
+    if not only:
+        for stale in os.listdir(OUT):
+            if stale.startswith("frames-transitions") or stale.endswith(".gif") and stale[:-4].replace("-reduced", "") not in c["order"]:
+                os.remove(os.path.join(OUT, stale))
+        print(reel(c, False))
+        print(reel(c, True))
+        print(index_html(c))
 
 
 if __name__ == "__main__":
-    build()
+    args = sys.argv[1:]
+    only = args[args.index("--only") + 1].split(",") if "--only" in args else None
+    build(only)

@@ -614,18 +614,21 @@ def ellipse(ctx, cx, cy, rx, ry):
     ctx.restore()
 
 
-def g_place(ctx, sp: Spec, dy=0.0):
+def g_place(ctx, sp: Spec, dy=0.0, part=None):
     """Выбор места: стрелка вниз на клетку поля — плоский эллипс (диск пространства в перспективе, как клетки DE на
     доске) с ободком-вырезом; зазор остриё/клетка 1,25 u. detail 0 — стрелка над сплошным эллипсом."""
     rx, ry, cyd = 7.0, 3.6, 5.6
     hw, hb, hh = (sp.W / 2, 3.75, 4.0) if sp.detail >= 1 else (max(sp.W, 1.0 / sp.k) / 2, 3.0, 3.0)
     gap = 1.25 if sp.detail >= 1 else 0.6
     tip = cyd - ry - gap
-    ctx.save()
-    ctx.translate(0, dy)
-    poly(ctx, [(-hw, -9.6), (hw, -9.6), (hw, tip - hh), (hb, tip - hh), (0, tip), (-hb, tip - hh), (-hw, tip - hh)])
-    ctx.fill()
-    ctx.restore()
+    if part in (None, "arrow"):
+        ctx.save()
+        ctx.translate(0, dy)
+        poly(ctx, [(-hw, -9.6), (hw, -9.6), (hw, tip - hh), (hb, tip - hh), (0, tip), (-hb, tip - hh), (-hw, tip - hh)])
+        ctx.fill()
+        ctx.restore()
+    if part == "arrow":
+        return
     ellipse(ctx, 0, cyd, rx, ry)
     ctx.fill()
     ring = sp.pxu(1.0)
@@ -753,12 +756,14 @@ def _signal_bars(sp: Spec, shift=0.0):
     return bars
 
 
-def g_signal(ctx, sp: Spec, state="online", angle=0.0, keyline=True):
+def g_signal(ctx, sp: Spec, state="online", angle=0.0, keyline=True, part=None):
     """Связь: три столбика сигнала (online — card.glyph; reconnecting / lost — text.secondary) + знак слева сверху:
     круговая стрелка r 4 штрихом W со сплошным наконечником 3 u (reconnecting; detail 0 — дуга 270° без головки)
     или красный X (lost). Keyline вокруг каждого штриха; знак лежит поверх столбиков с keyline-ореолом."""
     bars = _signal_bars(sp, shift=0.0 if state == "online" else 2.5)
     col = C["glyph"] if state == "online" else C["dim"]
+    if part == "sign":
+        bars = []
     if keyline:
         for x, y, w, h in bars:
             ctx.rectangle(x - sp.K, y - sp.K, w + 2 * sp.K, h + 2 * sp.K)
@@ -766,7 +771,7 @@ def g_signal(ctx, sp: Spec, state="online", angle=0.0, keyline=True):
     for x, y, w, h in bars:
         ctx.rectangle(x, y, w, h)
         fill(ctx, col)
-    if state == "online":
+    if state == "online" or part == "bars":
         return
     sx_, sy_ = -6.0, -5.0
     if state == "lost":
@@ -982,6 +987,9 @@ def draw_state_pending_move(ctx, sp: Spec, ext=1.0, layer=None):
 
 
 def draw_state_pending_place(ctx, sp: Spec, dy=0.0, layer=None):
+    if layer in ("space", "arrow"):
+        glyph(ctx, sp, 16.0, 16.0, lambda: g_place(ctx, sp, dy=dy, part=layer))
+        return
     _state(ctx, sp, g_place, body=C["pending"], layer=layer, dy=dy)
 
 
@@ -1016,29 +1024,29 @@ def draw_state_threat(ctx, sp: Spec, text=None, layer=None):
     _plate(ctx, sp, g_eye, text=text, layer=layer)
 
 
-def _action(ctx, sp: Spec, fn, body, col=None, cy=16.0, **kw):
-    """Пипс действия как в DE: цветной диск, кремовое кольцо, keyline; глиф белый (хитрость — navy)."""
-    token(ctx, disc_sil(sp), sp, body=body)
-    glyph(ctx, sp, 16.0, cy, lambda: fn(ctx, sp, **kw), col=col)
+def _action(ctx, sp: Spec, fn, body, col=None, cy=16.0, layer=None, **kw):
+    """Пипс действия как в DE: цветной диск, кремовое кольцо, keyline; глиф белый (хитрость — navy).
+    layer: body — диск с кольцом; glyph — только глиф (для движения по частям)."""
+    if layer in (None, "body"):
+        token(ctx, disc_sil(sp), sp, body=body)
+    if layer in (None, "glyph"):
+        glyph(ctx, sp, 16.0, cy, lambda: fn(ctx, sp, **kw), col=col)
 
 
-def draw_action_attack(ctx, sp: Spec):
-    _action(ctx, sp, g_burst, C["attack"], R=9.0)
+def draw_action_attack(ctx, sp: Spec, layer=None):
+    _action(ctx, sp, g_burst, C["attack"], layer=layer, R=9.0)
 
 
-def draw_action_defense(ctx, sp: Spec):
-    _action(ctx, sp, g_shield, C["defense"], cy=16.0, w=11.0, h=13.0)
+def draw_action_defense(ctx, sp: Spec, layer=None):
+    _action(ctx, sp, g_shield, C["defense"], cy=16.0, layer=layer, w=11.0, h=13.0)
 
 
-def draw_action_maneuver(ctx, sp: Spec, variant="two"):
-    if variant == "one":
-        _action(ctx, sp, g_boot_single, C["maneuver"])
-    else:
-        _action(ctx, sp, g_boots, C["maneuver"])
+def draw_action_maneuver(ctx, sp: Spec, layer=None):
+    _action(ctx, sp, g_boots, C["maneuver"], layer=layer)
 
 
-def draw_action_scheme(ctx, sp: Spec):
-    _action(ctx, sp, g_bolt, C["scheme"], col=C["body"], cy=15.75, s=1.0)
+def draw_action_scheme(ctx, sp: Spec, layer=None):
+    _action(ctx, sp, g_bolt, C["scheme"], col=C["body"], cy=15.75, layer=layer, s=1.0)
 
 
 def draw_action_attack_token(ctx, sp: Spec, mask=False):
@@ -1092,8 +1100,8 @@ def draw_resource_card(ctx, sp: Spec):
     glyph(ctx, sp, 16.0, 16.0, lambda: g_card_stack(ctx, sp))
 
 
-def draw_resource_connection(ctx, sp: Spec, state="online", angle=0.0):
-    glyph(ctx, sp, 16.0, 16.0, lambda: g_signal(ctx, sp, state=state, angle=angle))
+def draw_resource_connection(ctx, sp: Spec, state="online", angle=0.0, layer=None):
+    glyph(ctx, sp, 16.0, 16.0, lambda: g_signal(ctx, sp, state=state, angle=angle, part=layer))
 
 
 def draw_resource_hp(ctx, sp: Spec, mode="light", text=None):
@@ -1138,15 +1146,35 @@ VARIANTS = {
     "marker-status-p2": (draw_marker_status, {"team": C["team2"]}, False),
 }
 LAYERS = {
+    "action-attack": ("body", "glyph"),
+    "action-defense": ("body", "glyph"),
+    "action-maneuver": ("body", "glyph"),
+    "action-scheme": ("body", "glyph"),
+    "resource-connection-reconnecting": ("bars", "sign"),
+    "resource-connection-lost": ("bars", "sign"),
     "marker-status": ("body", "team"),
     "state-sent": ("body", "glyph"),
     "state-pending-move": ("body", "glyph"),
-    "state-pending-place": ("body", "glyph"),
+    "state-pending-place": ("body", "space", "arrow"),
     "state-enemy": ("body", "glyph"),
     "state-immobilized": ("body", "glyph"),
     "state-hint": ("body", "glyph"),
     "state-threat": ("body", "glyph"),
 }
+# Флипбуки слоёв для движения (контракт icon-motion.json: src «<id>_<layer>#» → файлы <id>_<layer>_fNN):
+# песок часов state-sent — 12 кадров цикла 1500 мс (кадры 0–6 пересыпание за 550 мс, 7–11 после переворота).
+def _sent_frames():
+    out = []
+    for i in range(7):                                   # 0, 92, … 550 мс: верх 0,55 → 0, низ 0,45 → 1
+        k = i / 6
+        out.append({"top": 0.55 * (1 - k), "bottom": 0.45 + 0.55 * k, "stream": 0 < i < 6})
+    for j in range(5):                                   # 950, 1040, … 1310 мс: верх 1 → 0,55+, низ 0 → 0,45−
+        k = j / 5
+        out.append({"top": 1.0 - 0.45 * k, "bottom": 0.45 * k, "stream": True})
+    return out
+
+
+FLIPBOOKS = {("state-sent", "glyph"): _sent_frames()}
 ALL = list(ICONS) + list(VARIANTS)
 ORDER23 = [k for k in ICONS if k != "action-attack-token-glyphmask"]
 EXAMPLE = {"state-boost": {"text": "+2"}, "state-hint": {"text": "1"}, "state-threat": {"text": "3"},
@@ -1177,6 +1205,14 @@ def to_pil(surf) -> Image.Image:
     af = np.where(a > 0, a, 1.0)
     out = np.stack([np.clip(r * 255 / af + 0.5, 0, 255), np.clip(g * 255 / af + 0.5, 0, 255),
                     np.clip(b * 255 / af + 0.5, 0, 255), a], axis=-1)
+    # Alpha bleed: прозрачные пиксели получают цвет ближайшего непрозрачного (альфа не меняется). Текстура UE с прямой
+    # альфой при билинейной выборке (анимация: поворот, масштаб, субпиксельный сдвиг) иначе тянет чёрный в край
+    # белого глифа — тёмный ореол.
+    empty = a == 0
+    if empty.any() and (~empty).any():
+        from scipy import ndimage
+        _, (iy, ix) = ndimage.distance_transform_edt(empty, return_indices=True)
+        out[..., :3] = out[iy, ix, :3]
     return Image.fromarray(out.astype(np.uint8), "RGBA")
 
 
@@ -1398,6 +1434,10 @@ def build(names=None, review_dir=None):
             render(n, MASTER, layer=layer).save(os.path.join(dirs["layers"], f"{n}_{layer}.png"))
             for s in SIZES:
                 render(n, s, layer=layer).save(os.path.join(dirs["layers"], f"{n}_{layer}-{s}.png"))
+            for fi, kw in enumerate(FLIPBOOKS.get((n, layer), ())):
+                render(n, MASTER, layer=layer, **kw).save(os.path.join(dirs["layers"], f"{n}_{layer}_f{fi:02d}.png"))
+                for s in SIZES:
+                    render(n, s, layer=layer, **kw).save(os.path.join(dirs["layers"], f"{n}_{layer}_f{fi:02d}-{s}.png"))
         print("ok", n, im.size, audits[n].get("margin_px"), "body%", audits[n].get("glyph_area_pct_of_body"), "seam", audits[n].get("seam_px"))
     show = [n for n in ORDER23 if n in names] + [n for n in ("action-attack-token-glyphmask",) + tuple(VARIANTS) if n in names]
     sheet_masters(show, os.path.join(dirs["sheets"], "sheet-masters.png"))
