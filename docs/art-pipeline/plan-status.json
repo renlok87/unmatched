@@ -2260,7 +2260,7 @@
     },
     {
       "id": "MOVE-SEL-M1",
-      "title": "Подбор хода, реализация: MS-T-01 (правила), MS-T-02 (каноническая достижимость + фикстуры), MS-T-03 (паритет UE), MS-T-14 (след перемещения); MS-T-04/05 — в работе",
+      "title": "Подбор хода, реализация: MS-T-01 (правила), 02 (каноническая достижимость + фикстуры), 03 (паритет UE), 04/05 (черновик S09), 14 (след перемещения); MS-T-06/07 — в работе",
       "track": "tech",
       "source": "move-selection",
       "status": "in_progress",
@@ -2270,13 +2270,14 @@
         "backend/src/game-engine/movement/canonical-path.ts",
         "backend/src/game-engine/services/last-movement.spec.ts",
         "unreal/Unmatched/Source/Unmatched/S08/S08MoveParityTests.cpp",
-        "docs/game-design/move-selection/05-implementation-plan.md"
+        "docs/game-design/move-selection/05-implementation-plan.md",
+        "unreal/Unmatched/Source/Unmatched/S09/S09MoveSelectionTests.cpp"
       ],
-      "next": "MS-T-05 (FS09DraftEval) и MS-T-04 (исправления черновика) — агент; затем MS-T-06, MS-T-07 (веха M1), MS-T-15 (клиент читает lastMovement).",
+      "next": "MS-T-06 (коды ошибок) и MS-T-07 (ввод) — агент, затем проверка выхода M1; далее M2 (MS-T-08…13, 28) и MS-T-15.",
       "blocker": null,
       "assets": [],
       "updated": "2026-10-03T14:53:13Z",
-      "note": "07a229bd (R6: MS-T-19/20 разблокированы), 25ba829d/e016fb8e (102 фикстуры, 30 ручных; 1555 тестов), 03506cca (UE: 98/102 фикстур, 0 расхождений; S08+S09 95/95), c09adf2e/5b51305c/613f9d30 (lastMovement; MS-Q-05 — id буста публичен, MS-Q-06 — состояние между begin и maneuver не меняется; 1616 тестов)."
+      "note": "07a229bd (R6: MS-T-19/20 разблокированы), 25ba829d/e016fb8e (102 фикстуры, 30 ручных; 1555 тестов), 03506cca (UE: 98/102 фикстур, 0 расхождений; S08+S09 95/95), c09adf2e/5b51305c/613f9d30 (lastMovement; MS-Q-05 — id буста публичен, MS-Q-06 — состояние между begin и maneuver не меняется; 1616 тестов). b360ba02 (MS-T-05: FS09DraftEval = evaluateDraft, 98/102 фикстур черновика без расхождений; S09 71/71, S08+S10 237/237), caac03e9 (MS-T-04: нулевые ходы не шлются, immobilized, «живой» по ролям, кэш черновика по maneuverId; S09 74/74)."
     }
   ],
   "waves": [
