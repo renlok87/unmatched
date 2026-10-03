@@ -254,8 +254,28 @@ bool FS08ArtTunerRegistryTest::RunTest(const FString&) {
   TestFalse("cobble has no fog", Has(Cobble, TEXT("fog")));
   TestFalse("cobble has no map grade", Has(Cobble, TEXT("mapGrade")));
   TestFalse("cobble has no lit3d lights", Has(Cobble, TEXT("conceptLights")));
+  TestFalse("cobble has no paste tone", Has(Cobble, TEXT("pasteGrade")) || Has(Cobble, TEXT("pasteLights")));
+  // the paste mode rows (registry-only additions): Sarpedon's paste lights and tone; Marmoreal has a tone, no lights
+  for (const FS08TunerGroup& G : Sarpedon) {
+    if (G.Id == TEXT("pasteLights")) TestEqual("5 paste lights x 5 rows", G.Params.Num(), 25);
+    if (G.Id == TEXT("pasteGrade")) TestEqual("paste tone: gain, devignette, emissive", G.Params.Num(), 3);
+  }
+  TestTrue("sarpedon paste rows", Has(Sarpedon, TEXT("pasteLights")) && Has(Sarpedon, TEXT("pasteGrade")));
+  const TArray<FS08TunerGroup> Marmoreal = Groups(TEXT("marmoreal-original"), TEXT("marmoreal-night"));
+  TestTrue("marmoreal paste tone", Has(Marmoreal, TEXT("pasteGrade")));
+  TestFalse("marmoreal has no paste lights", Has(Marmoreal, TEXT("pasteLights")));
   // broken registries
   FS08ArtTunerRegistry Bad;
+  Errors.Reset();
+  TestFalse("a colour default must be [r, g, b]",
+            Bad.Parse(TEXT("{\"schema\":\"unmatched.art-tuner-params/1\",\"groups\":[{\"id\":\"g\",\"scope\":\"materials\","
+                           "\"params\":[{\"id\":\"a\",\"pointer\":\"/x\",\"type\":\"colorLinear\",\"default\":1}]}]}"),
+                      Errors));
+  Errors.Reset();
+  TestFalse("a number default must be a number",
+            Bad.Parse(TEXT("{\"schema\":\"unmatched.art-tuner-params/1\",\"groups\":[{\"id\":\"g\",\"scope\":\"materials\","
+                           "\"params\":[{\"id\":\"a\",\"pointer\":\"/x\",\"type\":\"number\",\"default\":[1,1,1]}]}]}"),
+                      Errors));
   Errors.Reset();
   TestFalse("schema", Bad.Parse(TEXT("{\"schema\":\"x\",\"groups\":[]}"), Errors));
   Errors.Reset();
@@ -518,11 +538,21 @@ bool FS08ArtTunerMaterialOverridesTest::RunTest(const FString&) {
   const TArray<FS08TunerGroup> Groups = Registry.Expand(M.GetBase(), TEXT("sarpedon-night"), Sarpedon);
   const FS08TunerGroup* Materials = Groups.FindByPredicate([](const FS08TunerGroup& G) { return G.Id == TEXT("materials"); });
   if (TestNotNull("materials rows on Sarpedon", Materials)) {
-    TestEqual("11 looks + 4 wind rows", Materials->Params.Num(), 15);
+    TestEqual("11 looks + island / ship tints + 4 wind rows", Materials->Params.Num(), 17);
     TestTrue("absent keys with defaults", Materials->Params[0].bCreate && Materials->Params[0].bHasDefault &&
                                               Materials->Params[0].DefaultNumber == 1.0);
+    const FS08TunerParam* Tint = Materials->Params.FindByPredicate([](const FS08TunerParam& P) { return P.Id == TEXT("materials.Island.tint"); });
+    if (TestNotNull("island tint row", Tint)) {
+      TestTrue("tint: a new optional colour that means white", Tint->Type == ES08TunerType::ColorLinear && Tint->bCreate &&
+                                                                   Tint->DefaultColor == TArray<double>({1.0, 1.0, 1.0}));
+      TestEqual("tint default as JSON", S08JsonPointer::ToText(Tint->DefaultValue()), FString(TEXT("[1, 1, 1]")));
+    }
+    TestTrue("ship tint row", Materials->Params.ContainsByPredicate([](const FS08TunerParam& P) { return P.Id == TEXT("materials.Ship.tint"); }));
   }
   FString Error;
+  TestTrue("ship tint (new look, colour)", M.SetValue(Root + TEXT("/Ship/tint"),
+                                                      MakeShared<FJsonValueArray>(TArray<TSharedPtr<FJsonValue>>{NumText(TEXT("1.1")), NumText(TEXT("0.9")), NumText(TEXT("0.8"))}),
+                                                      true, Error));
   TestTrue("island gain (new block, new look)", M.SetValue(Root + TEXT("/Island/tintGain"), NumText(TEXT("1.25")), true, Error));
   TestTrue("foliage wind", M.SetValue(Root + TEXT("/Foliage/windAmp"), NumText(TEXT("12")), true, Error));
   TestFalse("no create flag: refused", M.SetValue(Root + TEXT("/Ship/tintGain"), Num(1.1), false, Error));
@@ -530,7 +560,9 @@ bool FS08ArtTunerMaterialOverridesTest::RunTest(const FString&) {
   Errors.Reset();
   if (TestTrue(FString::Printf(TEXT("build (%s)"), *FString::Join(Errors, TEXT("; "))), M.Build(Data, Errors))) {
     const TArray<FS08ConceptMaterialOverride>& O = Data.Boards[Sarpedon].ConceptPaste.Lit3d.MaterialOverrides;
-    TestEqual("two looks", O.Num(), 2);
+    TestEqual("three looks", O.Num(), 3);
+    const FS08ConceptMaterialOverride* Ship = O.FindByPredicate([](const FS08ConceptMaterialOverride& X) { return X.Look == TEXT("Ship"); });
+    TestTrue("ship tint", Ship && Ship->bTint && Ship->TintGain == 1.0f && Ship->Tint.Equals(FLinearColor(1.1f, 0.9f, 0.8f), 1e-5f));
     const FS08ConceptMaterialOverride* Island = O.FindByPredicate([](const FS08ConceptMaterialOverride& X) { return X.Look == TEXT("Island"); });
     const FS08ConceptMaterialOverride* Foliage = O.FindByPredicate([](const FS08ConceptMaterialOverride& X) { return X.Look == TEXT("Foliage"); });
     TestTrue("island gain", Island && FMath::IsNearlyEqual(Island->TintGain, 1.25f) && Island->Scalars.IsEmpty());
@@ -550,6 +582,10 @@ bool FS08ArtTunerMaterialOverridesTest::RunTest(const FString&) {
   Refused(Root + TEXT("/Island/glow"), Num(1), TEXT("an unknown key"));
   Refused(Root + TEXT("/1sland/tintGain"), Num(1), TEXT("a look name starting with a digit"));
   Refused(Root + TEXT("/Foliage/windHeight"), Num(5), TEXT("windHeight below 10"));
+  Refused(Root + TEXT("/Island/tint"), MakeShared<FJsonValueArray>(TArray<TSharedPtr<FJsonValue>>{Num(1), Num(4.5), Num(1)}),
+          TEXT("a tint channel above 4"));
+  Refused(Root + TEXT("/Island/tint"), MakeShared<FJsonValueArray>(TArray<TSharedPtr<FJsonValue>>{Num(1), Num(1)}),
+          TEXT("a tint of two channels"));
   return true;
 }
 

@@ -208,7 +208,8 @@ bool AS08BoardActor::ApplyMaterialOverrides() {
   for (const FS08ConceptMaterialOverride& O : Overrides) {
     const int32* N = Slots.Find(O.Look);
     if (!N) Missing.Add(O.Look);
-    Parts.Add(FString::Printf(TEXT("%s:%d(gain %.2f%s)"), *O.Look, N ? *N : 0, O.TintGain,
+    Parts.Add(FString::Printf(TEXT("%s:%d(gain %.2f%s%s)"), *O.Look, N ? *N : 0, O.TintGain,
+                              O.bTint ? *FString::Printf(TEXT(", tint %.2f/%.2f/%.2f"), O.Tint.R, O.Tint.G, O.Tint.B) : TEXT(""),
                               O.Scalars.IsEmpty() ? TEXT("") : *FString::Printf(TEXT(", %d scalars"), O.Scalars.Num())));
   }
   const FString Key = FString::Join(Parts, TEXT(" ")) + TEXT("|") + FString::Join(Missing, TEXT(","));

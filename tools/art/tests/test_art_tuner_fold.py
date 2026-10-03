@@ -109,6 +109,30 @@ class FoldTest(unittest.TestCase):
         self.assertEqual(len(saves), 1)
         self.assertEqual(json.loads(saves[0].read_text(encoding="utf-8"))["boards"][0]["board"], "sarpedon-original")
 
+    def test_tint_and_paste_tone(self):
+        """The rows added after M6: a material tint ([r, g, b] in a new key of a new look) and the paste tone."""
+        si = self.si
+        gain_was = self.base["boards"][si]["conceptPaste"]["grade"]["gainLinear"]
+        self.write_overrides([
+            f'{{"pointer": "/boards/{si}/conceptPaste/lit3d/materialOverrides/Island/tint", "value": [1.1, 0.95, 0.8], "was": null}}',
+            f'{{"pointer": "/boards/{si}/conceptPaste/lit3d/materialOverrides/Ship/tintGain", "value": 1.2, "was": null}}',
+            f'{{"pointer": "/boards/{si}/conceptPaste/lit3d/materialOverrides/Ship/tint", "value": [0.9, 1, 1.05], "was": null}}',
+            f'{{"pointer": "/boards/{si}/conceptPaste/grade/gainLinear", "value": 1.05, "was": {json.dumps(gain_was)}}}',
+        ])
+        self.assertEqual(self.run_fold(), 0)
+        new_text = self.prof.read_text(encoding="utf-8")
+        new = json.loads(new_text)
+        cp = new["boards"][si]["conceptPaste"]
+        self.assertEqual(cp["lit3d"]["materialOverrides"],
+                         {"Island": {"tint": [1.1, 0.95, 0.8]}, "Ship": {"tintGain": 1.2, "tint": [0.9, 1, 1.05]}})
+        self.assertEqual(cp["grade"]["gainLinear"], 1.05)
+        expected = json.loads(self.base_text)
+        expected["revision"] += 1
+        expected["boards"][si]["conceptPaste"]["grade"]["gainLinear"] = 1.05
+        expected["boards"][si]["conceptPaste"]["lit3d"]["materialOverrides"] = cp["lit3d"]["materialOverrides"]
+        self.assertEqual(new, expected)
+        self.assertEqual(len(self.base_text.splitlines()), len(new_text.splitlines()))
+
     def test_idempotent(self):
         self.write_overrides(self.standard_entries())
         self.assertEqual(self.run_fold("--no-archive"), 0)

@@ -405,6 +405,11 @@ TArray<double> SS08ArtTunerPanel::LinearOf(const FString& RowId) const {
     const TSharedPtr<FS08ArtTunerSession> S = Session.Pin();
     J = S.IsValid() ? S->Model.Value(ValuePointer(RowId)) : nullptr;
   }
+  if (!J.IsValid()) {
+    // an absent optional key (a material tint): the colour it means, not black
+    const FS08TunerParam* P = Find(RowId);
+    if (P && P->DefaultColor.Num() == 3) return P->DefaultColor;
+  }
   if (J.IsValid() && J->Type == EJson::Array) {
     for (int32 I = 0; I < 3 && I < J->AsArray().Num(); ++I) {
       if (J->AsArray()[I].IsValid()) J->AsArray()[I]->TryGetNumber(Out[I]);

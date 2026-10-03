@@ -88,6 +88,9 @@ struct UNMATCHED_API FS08TunerParam {
   bool bCreate = false;  // the key may be absent (the row writes a new optional field, and its missing parent objects)
   bool bHasDefault = false;  // the value an absent key means (shown by the panel; writing it back removes the entry)
   double DefaultNumber = 0.0;
+  TArray<double> DefaultColor;  // colorLinear rows: the [r, g, b] an absent key means (e.g. a tint: [1, 1, 1])
+  /** The value an absent key means as JSON (a number, or [r, g, b] for colorLinear); null without "default". */
+  TSharedPtr<FJsonValue> DefaultValue() const;
   /** Decimals of Step (0.05 -> 2, 1 -> 0): the saved text of a value. */
   int32 Decimals() const;
   /** Value snapped to Step and clamped to the hard bounds. */

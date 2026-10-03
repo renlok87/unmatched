@@ -295,6 +295,14 @@ int32 FS08TunerParam::Decimals() const {
   return D;
 }
 
+TSharedPtr<FJsonValue> FS08TunerParam::DefaultValue() const {
+  if (!bHasDefault) return nullptr;
+  if (Type != ES08TunerType::ColorLinear) return MakeShared<FJsonValueNumber>(DefaultNumber);
+  TArray<TSharedPtr<FJsonValue>> Channels;
+  for (const double C : DefaultColor) Channels.Add(MakeShared<FJsonValueNumber>(C));
+  return MakeShared<FJsonValueArray>(Channels);
+}
+
 double FS08TunerParam::Snap(double Value) const {
   double V = Step > 0.0 ? FMath::RoundToDouble(Value / Step) * Step : Value;
   // the decimals of the step (0.1 * 3 = 0.30000000000000004 -> 0.3)
@@ -397,6 +405,23 @@ bool FS08ArtTunerRegistry::Parse(const FString& Text, TArray<FString>& OutErrors
       P.bCreate = TunerBool(PO, TEXT("create"), false);
       P.bHasDefault = PO->HasField(TEXT("default"));
       P.DefaultNumber = TunerNumber(PO, TEXT("default"), 0.0);
+      if (P.bHasDefault) {
+        // a number row means a number; a colorLinear row [r, g, b] (a tint absent from the profile = [1, 1, 1])
+        const TSharedPtr<FJsonValue> D = PO->TryGetField(TEXT("default"));
+        bool bOk = D.IsValid() && (P.Type == ES08TunerType::ColorLinear ? D->Type == EJson::Array && D->AsArray().Num() == 3
+                                                                         : D->Type == EJson::Number);
+        if (bOk && P.Type == ES08TunerType::ColorLinear) {
+          for (const TSharedPtr<FJsonValue>& C : D->AsArray()) {
+            double V = 0.0;
+            bOk = bOk && C.IsValid() && C->Type == EJson::Number && C->TryGetNumber(V) && FMath::IsFinite(V);
+            P.DefaultColor.Add(V);
+          }
+        }
+        if (!bOk || (P.Type != ES08TunerType::Number && P.Type != ES08TunerType::ColorLinear)) {
+          OutErrors.Add(FString::Printf(TEXT("params: %s.%s default must be a number (number rows) or [r, g, b] (colorLinear rows)"),
+                                        *T.Id, *P.Id));
+        }
+      }
       if (P.Step <= 0.0) OutErrors.Add(FString::Printf(TEXT("params: %s.%s step must be > 0"), *T.Id, *P.Id));
       if (P.SliderMax <= P.SliderMin) {
         OutErrors.Add(FString::Printf(TEXT("params: %s.%s slider range %g..%g is empty"), *T.Id, *P.Id, P.SliderMin, P.SliderMax));
