@@ -45,10 +45,19 @@ import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
 import type { Prisma } from '@prisma/client';
-import { ISOLATED_DB_HOSTS, ISOLATED_DB_PORTS } from './seed-art-fixture-boards';
+import {
+  DbGuardOptions,
+  ISOLATED_DB_HOSTS,
+  ISOLATED_DB_PORTS,
+  isMainDevDatabase,
+} from './seed-art-fixture-boards';
 
-/** Refuses every database except the isolated S09 test DB (throws). */
-export function assertIsolatedDatabase(url: string | undefined): URL {
+/**
+ * Refuses every database except the isolated S09 test DB (throws). With `--allow-main-dev-db`
+ * (opts.allowMainDevDb) the local main dev DB localhost:5433/unmatched is accepted as well - the canonical
+ * data set the stands are cloned from (docs/backend-api/db-divergence-2026-10-03.md).
+ */
+export function assertIsolatedDatabase(url: string | undefined, opts: DbGuardOptions = {}): URL {
   if (!url) throw new Error('DATABASE_URL is not set');
   let parsed: URL;
   try {
@@ -56,6 +65,7 @@ export function assertIsolatedDatabase(url: string | undefined): URL {
   } catch {
     throw new Error('DATABASE_URL is not a URL');
   }
+  if (opts.allowMainDevDb && isMainDevDatabase(parsed)) return parsed;
   if (!ISOLATED_DB_HOSTS.includes(parsed.hostname) || !ISOLATED_DB_PORTS.includes(parsed.port)) {
     throw new Error(
       `REFUSED: original-map boards go only to the isolated test DB (${ISOLATED_DB_HOSTS.join('|')}:${ISOLATED_DB_PORTS.join('|')}), ` +
@@ -370,6 +380,7 @@ async function main(): Promise<void> {
     path: path.join(__dirname, '..', '.env'),
   });
 
+  const guard: DbGuardOptions = { allowMainDevDb: args.includes('--allow-main-dev-db') };
   const loaded = fixtureFiles().map((file) => ({ file, ...loadTopologyFixture(file) }));
   const rows = loaded.map(({ file, fixture, sha256 }) => ({
     fixture,
@@ -408,7 +419,7 @@ async function main(): Promise<void> {
       report.ok = true;
     } else {
       try {
-        const db = assertIsolatedDatabase(url);
+        const db = assertIsolatedDatabase(url, guard);
         report.database = {
           host: db.hostname,
           port: db.port,
@@ -426,12 +437,12 @@ async function main(): Promise<void> {
       }
     }
   } else {
-    const db = assertIsolatedDatabase(process.env.DATABASE_URL);
+    const db = assertIsolatedDatabase(process.env.DATABASE_URL, guard);
     report.database = {
       host: db.hostname,
       port: db.port,
       name: db.pathname.replace(/^\//, ''),
-      rule: 'isolated S09 test DB only',
+      rule: guard.allowMainDevDb ? 'isolated S09 test DB or main dev DB (--allow-main-dev-db)' : 'isolated S09 test DB only',
     };
     // Lazy: specs import this module without touching the Prisma client.
     // eslint-disable-next-line @typescript-eslint/no-require-imports

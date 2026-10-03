@@ -255,6 +255,9 @@ const CARDS = [
 
 const BOARDS = [
   {
+    // Fixed id: the UE board profile cobble-city, the S08 bench and the demo scripts key on it, and every dev
+    // stand is a clone of the canonical DB (docs/backend-api/db-divergence-2026-10-03.md section 9).
+    id: 'cmuhgs4b2001mwik4f2b2xtf8',
     name: 'Cobble City',
     nameEn: 'Cobble City',
     nameRu: 'Булыжный город',

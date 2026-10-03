@@ -197,4 +197,19 @@ describe('seed-env-map-boards: isolated database only', () => {
     expect(() => assertIsolatedDatabase(undefined)).toThrow('DATABASE_URL is not set');
     expect(() => assertIsolatedDatabase('not a url')).toThrow('not a URL');
   });
+
+  it('accepts the local main dev DB only with the explicit allowMainDevDb flag', () => {
+    const main = 'postgresql://u:p@localhost:5433/unmatched';
+    expect(() => assertIsolatedDatabase(main)).toThrow(/REFUSED/);
+    expect(assertIsolatedDatabase(main, { allowMainDevDb: true }).port).toBe('5433');
+    expect(assertIsolatedDatabase('postgresql://u:p@127.0.0.1:5433/unmatched', { allowMainDevDb: true }).port).toBe('5433');
+  });
+
+  it.each([
+    'postgresql://u:p@localhost:5433/other_db',
+    'postgresql://u:p@db.example.com:5433/unmatched',
+    'postgresql://u:p@localhost:5432/unmatched',
+  ])('still refuses %s with allowMainDevDb', (url) => {
+    expect(() => assertIsolatedDatabase(url, { allowMainDevDb: true })).toThrow(/REFUSED/);
+  });
 });

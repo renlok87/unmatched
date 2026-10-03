@@ -8,7 +8,8 @@ services:
       POSTGRES_DB: unmatched
       POSTGRES_HOST_AUTH_METHOD: md5
     ports:
-      - "5433:5432"
+      # local only, like the dev stands in docker-compose.stands.yml
+      - "127.0.0.1:5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -21,8 +22,10 @@ services:
     image: redis:7-alpine
     container_name: unmatched-redis
     ports:
-      - 6379:6379
+      - "127.0.0.1:6379:6379"
     command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
     healthcheck:
       test: [CMD, redis-cli, ping]
       interval: 5s
@@ -45,7 +48,7 @@ services:
       FRONTEND_URL: http://localhost:5173
       DISABLE_CACHE: true
     ports:
-      - 3000:3000
+      - "127.0.0.1:3000:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -58,4 +61,5 @@ services:
 
 volumes:
   postgres_data:
+  redis_data:
   backend_node_modules:

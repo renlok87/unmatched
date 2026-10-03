@@ -29,6 +29,25 @@ import * as path from 'path';
 
 export const ISOLATED_DB_PORTS = ['55434'];
 export const ISOLATED_DB_HOSTS = ['127.0.0.1', 'localhost'];
+/**
+ * Canonical dev DB (user decision 2026-10-03, docs/backend-api/db-divergence-2026-10-03.md: one identical data set
+ * on every stand). Allowed only with the explicit `--allow-main-dev-db` flag; the stands are then cloned from it
+ * by tools/db/sync-dev-stands.cjs.
+ */
+export const MAIN_DEV_DB = { port: '5433', database: 'unmatched' };
+
+export interface DbGuardOptions {
+  allowMainDevDb?: boolean;
+}
+
+/** True for the local main dev DB (localhost/127.0.0.1:5433/unmatched). */
+export function isMainDevDatabase(parsed: URL): boolean {
+  return (
+    ISOLATED_DB_HOSTS.includes(parsed.hostname) &&
+    parsed.port === MAIN_DEV_DB.port &&
+    parsed.pathname.replace(/^\//, '') === MAIN_DEV_DB.database
+  );
+}
 export const FIXTURE_DIR = path.join(__dirname, 'fixtures', 'art-boards');
 export const FIXTURE_SCHEMA = 'unmatched.art-board-fixture/1';
 const ID_RE = /^c[a-z0-9]{24}$/;
@@ -56,8 +75,8 @@ export interface ArtFixture {
   cells: ArtFixtureCell[];
 }
 
-/** Refuses every database except the isolated S09 test DB (throws). */
-export function assertIsolatedDatabase(url: string | undefined): URL {
+/** Refuses every database except the isolated S09 test DB (and, with allowMainDevDb, the local main dev DB). */
+export function assertIsolatedDatabase(url: string | undefined, opts: DbGuardOptions = {}): URL {
   if (!url) throw new Error('DATABASE_URL is not set');
   let parsed: URL;
   try {
@@ -65,6 +84,7 @@ export function assertIsolatedDatabase(url: string | undefined): URL {
   } catch {
     throw new Error('DATABASE_URL is not a URL');
   }
+  if (opts.allowMainDevDb && isMainDevDatabase(parsed)) return parsed;
   if (!ISOLATED_DB_HOSTS.includes(parsed.hostname) || !ISOLATED_DB_PORTS.includes(parsed.port)) {
     throw new Error(
       `REFUSED: art fixtures go only to the isolated test DB (${ISOLATED_DB_HOSTS.join('|')}:${ISOLATED_DB_PORTS.join('|')}), ` +
@@ -140,7 +160,7 @@ async function main(): Promise<void> {
   // Credentials come from the ignored backend/.env of THIS checkout (never argv).
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
-  const db = assertIsolatedDatabase(process.env.DATABASE_URL);
+  const db = assertIsolatedDatabase(process.env.DATABASE_URL, { allowMainDevDb: args.includes('--allow-main-dev-db') });
 
   const files = fs
     .readdirSync(FIXTURE_DIR)

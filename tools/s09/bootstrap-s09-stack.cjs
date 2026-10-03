@@ -24,6 +24,18 @@ const fs = require('fs');
 const path = require('path');
 
 const argv = process.argv.slice(2);
+// Since 2026-10-03 every dev stand (S08/S09/S10) is a clone of the canonical main DB, so seeding S09 on its
+// own would make the stands diverge again (docs/backend-api/db-divergence-2026-10-03.md section 9).
+// Use: docker compose -f docker-compose.stands.yml --env-file .env.stands --profile s09 up -d
+//      node tools/db/sync-dev-stands.cjs sync --apply --only s09
+if (!argv.includes('--legacy-seed')) {
+  console.error(
+    'bootstrap-s09-stack is superseded: the S09 stand is a clone of the canonical DB.\n' +
+      '  node tools/db/sync-dev-stands.cjs sync --apply --only s09\n' +
+      'Pass --legacy-seed to run the old per-stand seed chain anyway (the stand will differ from main).',
+  );
+  process.exit(2);
+}
 const dryRun = argv.includes('--dry-run');
 const envFileIdx = argv.indexOf('--env-file');
 if (envFileIdx >= 0 && !argv[envFileIdx + 1]) {

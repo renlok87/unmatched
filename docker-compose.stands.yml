@@ -1,0 +1,171 @@
+# Dev stands S08/S09/S10 and the S04 test DB - one definition, identical to the main stack (docker-compose.yml):
+# postgres:16-alpine, redis:7-alpine with AOF, ports on 127.0.0.1 only, named volumes, the same healthchecks.
+# Data: every stand DB is a clone of the canonical main DB (localhost:5433/unmatched), made by
+#   node tools/db/sync-dev-stands.cjs sync --apply
+# Passwords stay in the ignored .env.stands (created by `node tools/db/sync-dev-stands.cjs init-env`).
+# Start only what you need, e.g.:
+#   docker compose -f docker-compose.stands.yml --env-file .env.stands --profile s09 up -d
+# Decision and history: docs/backend-api/db-divergence-2026-10-03.md (section 9).
+name: unmatched-stands
+
+x-postgres: &postgres
+  image: postgres:16-alpine
+  healthcheck:
+    test: [CMD-SHELL, 'pg_isready -U "$${POSTGRES_USER}"']
+    interval: 5s
+    timeout: 5s
+    retries: 5
+
+x-redis: &redis
+  image: redis:7-alpine
+  command: redis-server --appendonly yes
+  healthcheck:
+    test: [CMD, redis-cli, ping]
+    interval: 5s
+    timeout: 3s
+    retries: 5
+
+# Stand backends run the SAME code as the main backend: image unmached-backend, ./backend of the checkout this file
+# is started from (run it from the main checkout), the compiled dist (`node dist/src/main`, like the main entrypoint)
+# and the main node_modules volume. No `prisma db push` here - the schema comes with the canonical clone.
+# Env = docker-compose.yml backend env; only PORT / DATABASE_URL / REDIS_HOST differ per stand.
+x-backend: &backend
+  image: unmached-backend
+  build:
+    context: ./backend
+    dockerfile: Dockerfile
+  working_dir: /app
+  entrypoint: [node, dist/src/main]
+  volumes:
+    - ./backend:/app
+    - backend_node_modules:/app/node_modules
+
+x-backend-env: &backend-env
+  REDIS_PORT: 6379
+  JWT_SECRET: your-super-secret-jwt-key-change-in-production
+  JWT_REFRESH_SECRET: your-super-secret-refresh-token-key-change-in-production
+  NODE_ENV: development
+  FRONTEND_URL: http://localhost:5173
+  DISABLE_CACHE: 'true'
+
+services:
+  s04-postgres:
+    <<: *postgres
+    profiles: [s04, all]
+    container_name: codex-s04-postgres
+    environment:
+      # S04 concurrency spec: postgresql://postgres@127.0.0.1:55432/s04_test (test-only DB, local trust)
+      POSTGRES_DB: s04_test
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports: ['127.0.0.1:55432:5432']
+    volumes: [s04_postgres:/var/lib/postgresql/data]
+
+  s08-postgres:
+    <<: *postgres
+    profiles: [s08, all]
+    container_name: codex-s08-postgres
+    environment:
+      POSTGRES_USER: unmatched
+      POSTGRES_PASSWORD: ${S08_PG_PASSWORD:?run tools/db/sync-dev-stands.cjs init-env}
+      POSTGRES_DB: unmatched
+    ports: ['127.0.0.1:55433:5432']
+    volumes: [s08_postgres:/var/lib/postgresql/data]
+
+  s08-redis:
+    <<: *redis
+    profiles: [s08, all]
+    container_name: codex-s08-redis
+    ports: ['127.0.0.1:6380:6379']
+    volumes: [s08_redis:/data]
+
+  s08-backend:
+    <<: *backend
+    profiles: [s08, all]
+    container_name: codex-s08-backend
+    environment:
+      <<: *backend-env
+      PORT: 3100
+      DATABASE_URL: postgresql://unmatched:${S08_PG_PASSWORD:?}@s08-postgres:5432/unmatched?schema=public
+      REDIS_HOST: s08-redis
+    ports: ['127.0.0.1:3100:3100']
+    depends_on:
+      s08-postgres: { condition: service_healthy }
+      s08-redis: { condition: service_healthy }
+
+  s09-postgres:
+    <<: *postgres
+    profiles: [s09, all]
+    container_name: codex-s09-postgres
+    environment:
+      POSTGRES_USER: unmatched
+      POSTGRES_PASSWORD: ${S09_PG_PASSWORD:?run tools/db/sync-dev-stands.cjs init-env}
+      POSTGRES_DB: unmatched
+    ports: ['127.0.0.1:55434:5432']
+    volumes: [s09_postgres:/var/lib/postgresql/data]
+
+  s09-redis:
+    <<: *redis
+    profiles: [s09, all]
+    container_name: codex-s09-redis
+    ports: ['127.0.0.1:6381:6379']
+    volumes: [s09_redis:/data]
+
+  s09-backend:
+    <<: *backend
+    profiles: [s09, all]
+    container_name: codex-s09-backend
+    environment:
+      <<: *backend-env
+      PORT: 3120
+      DATABASE_URL: postgresql://unmatched:${S09_PG_PASSWORD:?}@s09-postgres:5432/unmatched?schema=public
+      REDIS_HOST: s09-redis
+    ports: ['127.0.0.1:3120:3120']
+    depends_on:
+      s09-postgres: { condition: service_healthy }
+      s09-redis: { condition: service_healthy }
+
+  s10-postgres:
+    <<: *postgres
+    profiles: [s10, all]
+    container_name: codex-s10-postgres
+    environment:
+      POSTGRES_USER: unmatched
+      POSTGRES_PASSWORD: ${S10_PG_PASSWORD:?run tools/db/sync-dev-stands.cjs init-env}
+      # unmatched_s10_live = canonical clone (stand); unmatched_s10_tests = spec-owned test DB
+      POSTGRES_DB: unmatched_s10_live
+    ports: ['127.0.0.1:55435:5432']
+    volumes: [s10_postgres:/var/lib/postgresql/data]
+
+  s10-redis:
+    <<: *redis
+    profiles: [s10, all]
+    container_name: codex-s10-redis
+    ports: ['127.0.0.1:6382:6379']
+    volumes: [s10_redis:/data]
+
+  s10-backend:
+    <<: *backend
+    profiles: [s10, all]
+    container_name: codex-s10-backend
+    environment:
+      <<: *backend-env
+      PORT: 3121
+      DATABASE_URL: postgresql://unmatched:${S10_PG_PASSWORD:?}@s10-postgres:5432/unmatched_s10_live?schema=public
+      REDIS_HOST: s10-redis
+    ports: ['127.0.0.1:3121:3121']
+    depends_on:
+      s10-postgres: { condition: service_healthy }
+      s10-redis: { condition: service_healthy }
+
+volumes:
+  # shared with the main stack (docker-compose.yml, project "unmached")
+  backend_node_modules:
+    external: true
+    name: unmached_backend_node_modules
+  s04_postgres:
+  s08_postgres:
+  s08_redis:
+  s09_postgres:
+  s09_redis:
+  s10_postgres:
+  s10_redis:

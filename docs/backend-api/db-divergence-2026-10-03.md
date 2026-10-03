@@ -345,3 +345,74 @@ S08. Нужные доски, аккаунты и свежие партии ес
   `git log -S'attackType: hero.attack'`; `git log --diff-filter=A` для сидов.
 - **Docker:** `docker inspect` (Created, StartedAt, PortBindings, Labels, Mounts; переменные
   окружения выводились с маскированными паролями); `docker logs unmatched-backend`.
+
+## 9. Выполнено 2026-10-03: одна обвязка и одни данные на всех стендах
+
+Решение пользователя (чат 2026-10-03): «Мне нужно, чтобы база, Redis и все остальное в обвязке было одинаковым.
+Нужно привести ее к максимально эффективному последнему виду.» Ответ на D1 — вариант A: эталон — основная БД. Ответ на
+D2 — разрешено: появился явный флаг `--allow-main-dev-db`.
+
+### 9.1. Резервные копии
+
+Перед любыми изменениями сняты полные дампы (`pg_dump -Fc`) всех 7 БД в `C:/tmp/db-backups-2026-10-03/`:
+`unmatched-postgres--unmatched`, `codex-s04-postgres--s04_test`, `codex-s08-postgres--unmatched`,
+`codex-s09-postgres--unmatched`, `codex-s10-postgres--{unmatched,unmatched_s10_live,unmatched_s10_tests}`.
+
+Старые анонимные volume удалённых контейнеров не удалялись, их список — в `old-container-volumes.txt` в той же папке.
+
+### 9.2. Эталон: основная БД `localhost:5433/unmatched`
+
+| Шаг | Результат |
+|---|---|
+| `fix-card-gaps.ts`, `fix-audit-findings.ts` (текущие версии) | карт без значений 0; Krang, Shredder, Ms. Marvel, Daredevil актуальны |
+| `backfill-attack-type.ts --check` | exit 0, 84 из 84 |
+| `backfill-board-cells.ts --force` | 30 досок перезаписаны по текущему `maps.json`; `biege` заменено на `beige` |
+| `backfill-card-effects.ts` | 855 карт, `parserVersion` 9. Полностью распознано 271 карта против 240 при v6. Ручных правок нет |
+| `seed-env-map-boards.ts --allow-main-dev-db` (dry-run, apply, verify) | доски-графы Marmoreal `c121b47f…` и Sarpedon `c7fa64a2…`; доска по умолчанию не изменилась |
+| `seed-art-fixture-boards.ts --allow-main-dev-db` (dry-run, apply, verify) | арт-фикстуры Sherwood и T. Rex |
+| Аккаунты из S09 | 8 демо- и арт-аккаунтов (`art-preview-*`, `s09-gd034-*`, `s09-*-tester`, `s09-*-muhisb0t`) перенесены вместе с `UserSettings` и `UserStats`, хеши паролей те же. Тестовый мусор `@test.invalid` не переносился |
+| id Cobble City | закреплён `cmuhgs4b2001mwik4f2b2xtf8` — тот id, на который ссылаются UE-профиль, бенч, `run-phase2-demo.ps1` и арт-скрипты; 72 игры перепривязаны; `seed.ts` теперь создаёт Cobble с этим id |
+
+Итог эталона: Hero 84, Card 880, Board 34 (из них 2 графа и 2 арт-фикстуры), User 17, эффекты v9.
+
+### 9.3. Одинаковая обвязка
+
+| Что | Было | Стало |
+|---|---|---|
+| Определение стендов | ручные `docker run`, анонимные volume | `docker-compose.stands.yml` с профилями `s04`, `s08`, `s09`, `s10`, `all`; именованные volume |
+| Порты | основной Postgres, Redis и бэкенд, а также S04 на `0.0.0.0` | всё только на `127.0.0.1` (`docker-compose.yml`, `docker-compose.stands.yml`) |
+| Postgres | 16.14 везде | без изменений, один образ `postgres:16-alpine` |
+| Redis | 7.4.9; AOF только у основного и S08 | `redis:7-alpine --appendonly yes` везде, именованные volume (у основного тоже) |
+| Бэкенды стендов (:3100, :3120, :3121) | процессы из старых worktree с разным кодом | сервисы `codex-sNN-backend`: образ `unmached-backend`, тот же `./backend` и `dist`, общий volume `node_modules`, переменные окружения как у основного бэкенда (`DISABLE_CACHE=true`) |
+| Данные стендов | разные цепочки сидов | побайтовые клоны эталона (`tools/db/sync-dev-stands.cjs sync --apply`), Redis стенда очищается |
+| Пароли стендов | в `docker run` | прежние значения в игнорируемом `.env.stands`; `backend/.env` в worktree (ENV-MAPS, S09) подходят без правок |
+| Тестовые БД спек (`s04_test`, `unmatched_s10_tests`) | — | восстановлены из дампов, не клонируются; S04 по-прежнему trust, но только на `127.0.0.1` |
+| Устаревшая БД `codex-s10-postgres/unmatched` (миграция `init`) | — | не воссоздавалась; дамп есть |
+| `tools/s09/bootstrap-s09-stack.cjs` | сеял S09 отдельно | по умолчанию отказывается работать и отправляет к `sync-dev-stands.cjs`; старый путь — только с флагом `--legacy-seed` |
+
+### 9.4. Проверка
+
+- `node tools/db/sync-dev-stands.cjs status`: s08, s09 и s10 — **IDENTICAL** с main. Совпадают md5 таблиц Hero, Card,
+  Board, User, UserSettings, UserStats, Game, GamePlayer, GameState, версия эффектов и число досок-графов.
+- API: логин тестовым аккаунтом и списки досок и героев на `:3000`, `:3100`, `:3120`, `:3121` совпадают по md5.
+- Логины стендов по паролям из `.env.stands` и `backend/.env` worktree работают; S04 по trust работает.
+- Админка (`:5480`) показывает «Marmoreal · original map» и «Sarpedon · original map».
+- `env-maps-board-seed.spec.ts`: 26 из 26, в том числе новые проверки `allowMainDevDb`.
+- После проверки стенды остановлены. Запущен только основной стек — он нужен админке.
+
+### 9.5. Как пользоваться дальше
+
+```bash
+docker compose -f docker-compose.stands.yml --env-file .env.stands --profile s09 up -d   # поднять стенд целиком
+node tools/db/sync-dev-stands.cjs status                                                 # сверить стенды с эталоном
+node tools/db/sync-dev-stands.cjs sync --apply [--only s09]                              # пересинхронизировать после изменений эталона
+```
+
+- Изменения данных делаются только в эталоне (`:5433`), затем `sync --apply`.
+- Бэкенды стендов не запускать из worktree: их порты заняты сервисами compose.
+
+Открыто:
+- e2e-тесты бэкенда по-прежнему могут писать в основную БД (риск 7 в разделе 5).
+- `backend/docker-compose.test.yml` конфликтует по портам.
+- Миграции Prisma устарели, проект живёт на `db push` (C10).
+- Помощник Krang «Unknown» 0/0 — значение из источника данных (вопрос 6 в разделе 7).
