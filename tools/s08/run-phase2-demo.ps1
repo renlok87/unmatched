@@ -75,7 +75,10 @@ param(
   # T4.3 real OS input (tools/s08/t43_real_input.py, RD-5): the HOST window is shown (no -RenderOffScreen) so the
   # runner can send real mouse / wheel / Space input to it after the evidence shot. The joiner stays offscreen.
   # Only the idle-gated runner passes this: a visible client takes the foreground on the user's desktop.
-  [switch]$VisibleHost
+  [switch]$VisibleHost,
+  # Opt-in (move selection M1, 2026-10-04): with -ArtPreviewBoardId the host still runs the auto maneuver
+  # (-S08Maneuver -S08ManeuverAfter=HostManeuverAfter), which the art path drops by default. Host only.
+  [switch]$HostManeuver
 )
 
 # W5b-R (t53-thresholds.json shotCaptured): every published frame must carry its pixel provenance line
@@ -482,6 +485,7 @@ function Invoke-Phase2Demo {
     if ($ArtPreviewInputPlan) { $hostArgs += "-ArtPreviewInputPlan=$ArtPreviewInputPlan" }
     if ($ArtPreviewIconSize -gt 0) { $hostArgs += "-ArtPreviewIconSize=$ArtPreviewIconSize" }
     if ($ArtPreviewIconProbe) { $hostArgs += '-ArtPreviewIconProbe' }
+    if ($HostManeuver) { $hostArgs += @('-S08Maneuver', "-S08ManeuverAfter=$HostManeuverAfter") }
   } else {
     $hostArgs += @('-S08Maneuver', "-S08ManeuverAfter=$HostManeuverAfter")
   }
