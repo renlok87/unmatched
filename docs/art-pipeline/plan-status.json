@@ -1,7 +1,7 @@
 {
   "schema": "unmatched-plan-status/v1",
-  "generated": "2026-10-01T13:30:00Z",
-  "head": "59a5e59327b6a01093b92fa0df89a325da1653e1",
+  "generated": "2026-10-03T02:45:00Z",
+  "head": "747e98d5fe4277b67e56354bea2f6f58687e3753",
   "sources": [
     {
       "id": "handover",
@@ -51,7 +51,22 @@
     {
       "id": "env-maps",
       "path": "docs/art-pipeline/ENV-MAPS-PLAN.md",
-      "title": "План и итог трека ENV-MAPS: доски-диорамы на оригинальных картах Marmoreal и Sarpedon, фазы P0–P6 (2026-09-30…10-01, ветка feat/env-original-maps); решения — docs/game-design/decisions/2026-09-30-env-original-maps-decisions.md"
+      "title": "План и итог трека ENV-MAPS: доски-диорамы на оригинальных картах Marmoreal и Sarpedon, фазы P0–P6 (итог 2026-10-01); P7–P9b — журнал решений ENV-U15 и evidence ENV-MAPS"
+    },
+    {
+      "id": "session-1003",
+      "path": "git log 59a5e593..747e98d5",
+      "title": "Коммиты 2026-10-01…03: render_bench P6, ENV-U15, Sarpedon P7–P9b, подсветка героев, скорость итераций, live tune, Art Tuner M1–M6, путь B"
+    },
+    {
+      "id": "art-tuner",
+      "path": "docs/art-pipeline/ART-TUNER-PLAN.md",
+      "title": "План Art Tuner: окно доски без сервера (-ArtView) и панель настройки (F10), вехи M1–M6"
+    },
+    {
+      "id": "scratch",
+      "path": "docs/art-pipeline/SCRATCH-MODEL-PIPELINE.md",
+      "title": "Путь B: модель с нуля в Blender по 2D-пакету Codex (spec.json, сетка, HANDOFF), пилот Merlin"
     }
   ],
   "tasks": [
@@ -1269,16 +1284,23 @@
         "docs/art-pipeline/table-base-report.md",
         "docs/game-design/evidence/ART-005/corner-bracket-review-2026-09-28.md",
         "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30.md",
-        "docs/game-design/evidence/ENV-MAPS/p5c-fab-2026-10-01/README.md"
+        "docs/game-design/evidence/ENV-MAPS/p5c-fab-2026-10-01/README.md",
+        "docs/game-design/evidence/ENV-MAPS/p8-3d-under-paint-2026-10-02/README.md",
+        "docs/game-design/evidence/ENV-MAPS/p9-fixes-hero-light-2026-10-02/README.md"
       ],
-      "next": "Поднос SM_TableBase — «технически импортировано», в игре за -ArtPreviewDiorama (5c-B2, 6B); художественная приёмка подноса (кромка, тон, чёрная юбка в свете Cobble). На оригинальных картах (ENV-MAPS, 2026-10-01) — общий поднос T2b, рамка frame-002 и кит окружения технически импортированы (реестр ASSET-ENV-KIT-001…); их остатки — строка ART-009 бэклога. Фонарь/фасады/ящик декора Cobble — UE-импорт (CLI static-candidate).",
+      "next": "Поднос SM_TableBase — «технически импортировано», в игре за -ArtPreviewDiorama (5c-B2, 6B); художественная приёмка подноса (кромка, тон, чёрная юбка в свете Cobble). На оригинальных картах (ENV-MAPS, 2026-10-01) — общий поднос T2b, рамка frame-002 и кит окружения технически импортированы (реестр ASSET-ENV-KIT-001…); их остатки — строка ART-009 бэклога. Фонарь/фасады/ящик декора Cobble — UE-импорт (CLI static-candidate). Sarpedon после ENV-U15 (P7–P9): вклейка концепта, остров, корабль, руины форта, частокол, сваи, знамя, тёмная полоса рамы и каскад водопада — «технически импортировано» (реестр ASSET-ENV-CONCEPT-PASTE-001, ASSET-ENV-S-ISLAND/SHIP/FORT/PROPS-001); ENV-U15: глубину юбки подноса (4a) и ширину рамы (4b) оставить.",
       "blocker": null,
       "assets": [
         "ASSET-DECOR-KIT-001",
         "ASSET-TABLE-BASE-001",
-        "ASSET-BOARD-COBBLE-001"
+        "ASSET-BOARD-COBBLE-001",
+        "ASSET-ENV-CONCEPT-PASTE-001",
+        "ASSET-ENV-S-ISLAND-001",
+        "ASSET-ENV-S-SHIP-001",
+        "ASSET-ENV-S-FORT-001",
+        "ASSET-ENV-S-PROPS-001"
       ],
-      "updated": "2026-10-01T13:30:00Z"
+      "updated": "2026-10-03T02:45:00Z"
     },
     {
       "id": "ART-010",
@@ -1374,18 +1396,22 @@
         "docs/game-design/evidence/ART-012/heroes-v2-live-2026-09-30.md",
         "docs/game-design/evidence/ART-005/art3-live-3boards-r3-2026-09-30/5cb1-editor-2026-09-30.md",
         "docs/art-pipeline/evidence/lookdev-r3-2026-09-30/summary.json",
-        "docs/game-design/evidence/GD-058/interim-2026-09-30/k1-k3-acts-2026-09-30.md"
+        "docs/game-design/evidence/GD-058/interim-2026-09-30/k1-k3-acts-2026-09-30.md",
+        "docs/art-pipeline/ENV-HERO-LIGHT.md",
+        "docs/game-design/evidence/ENV-MAPS/p9-fixes-hero-light-2026-10-02/README.md",
+        "docs/game-design/evidence/ENV-MAPS/p9b-hero-light-detail-2026-10-02/README.md"
       ],
-      "next": "Свет фигур Arthur на K2 (сталь темнее, плащ светлее — свет доски/ракурс); тёмные перья Harpy — материал (отдельный класс MatID для маховых); на оригинальных картах свет — ENV.",
+      "next": "Подсветка героев (P9 → P9b) на всех досках: key + rim на Lighting Channel 1, после ревью — акцент (прирост фигуры +13–28 %, клиппинг ≤ 0,05 %, подставки не освещаются); открыты D1 (рельеф 0,92–0,99 < 1,0), D2/D5/D6 на Marmoreal, D4 на Cobble. Свет фигур Arthur на K2 (сталь темнее, плащ светлее); тёмные перья Harpy — материал (отдельный класс MatID для маховых). Значения подсветки — строки Art Tuner.",
       "blocker": null,
       "assets": [
-        "ASSET-MEDUSA-001",
-        "ASSET-KING-ARTHUR-001",
-        "ASSET-MERLIN-001",
+        "ASSET-BOARD-COBBLE-001",
         "ASSET-HARPY-001",
-        "ASSET-BOARD-COBBLE-001"
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MARKERS-001.BASES",
+        "ASSET-MEDUSA-001",
+        "ASSET-MERLIN-001"
       ],
-      "updated": "2026-09-30T22:30:00Z",
+      "updated": "2026-10-03T02:45:00Z",
       "note": "Look-dev r3 при EV100 2,05: Medusa 5/5, Arthur 6/6, Merlin 4/5, Harpy 4/5 (5c-B1) / 5/5 (r2) — критерии выполнены, у Harpy регрессия «тёмных» перьев против b2. В игре прокси по цвету не пересчитывался на r3 (K2 2,5× r2/r3 глазом неотличимы)."
     },
     {
@@ -1502,10 +1528,12 @@
         "docs/game-design/evidence/GD-058/interim-2026-09-30/qa010-report-2026-09-30.md",
         "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/runs-2026-09-30.md",
         "docs/game-design/evidence/GD-058/interim-2026-09-30/fix-w7/fix-w7-2026-09-30.md",
-        "docs/game-design/evidence/ENV-MAPS/p6-live-2026-10-01/README.md"
+        "docs/game-design/evidence/ENV-MAPS/p6-live-2026-10-01/README.md",
+        "docs/game-design/decisions/2026-09-30-env-original-maps-decisions.md",
+        "docs/game-design/evidence/ENV-MAPS/p9b-hero-light-detail-2026-10-02/README.md"
       ],
-      "next": "Промежуточно принято по делегированию пользователя (без личного просмотра пользователя; без окружения и оригинальных карт), 2026-09-30 — вердикт панели 4/4, §9 акта GD-058. «Художественно принято» не ставится. Финальный GD-058 — в сессии карт после волны ENV, на диораме оригинальной карты (передано: SESSION-CLOSEOUT-2026-09-30.md). Волна ENV-MAPS P0–P6 закрыта 2026-10-01 (packaged-сборка и живые партии на Marmoreal и Sarpedon); финальная художественная приёмка на досках-картах ждёт решения пользователя. Волна 7 закрыла §8 п. 9 и п. 13 (измерено) и п. 12 (реестр); открыты п. 14–16 (теги на шве/void, разметка зон, отладочный текст HUD), п. 17 (postgres-сьюты), гейт attackType в K3.",
-      "blocker": "ACC-022 на D-07 не измерен (целевого ПК нет); T4.3 не выполнен (пользователь активен); художественная приёмка досок-карт — решение пользователя (ENV-MAPS P0–P6 закрыта 2026-10-01).",
+      "next": "Промежуточно принято по делегированию пользователя (без личного просмотра пользователя; без окружения и оригинальных карт), 2026-09-30 — вердикт панели 4/4, §9 акта GD-058. «Художественно принято» не ставится. Финальный GD-058 — в сессии карт после волны ENV, на диораме оригинальной карты (передано: SESSION-CLOSEOUT-2026-09-30.md). Волна ENV-MAPS P0–P6 закрыта 2026-10-01 (packaged-сборка и живые партии на Marmoreal и Sarpedon); финальная художественная приёмка на досках-картах ждёт решения пользователя. Волна 7 закрыла §8 п. 9 и п. 13 (измерено) и п. 12 (реестр); открыты п. 14–16 (теги на шве/void, разметка зон, отладочный текст HUD), п. 17 (postgres-сьюты), гейт attackType в K3. 2026-10-01 ENV-U15: Marmoreal — «Принято» (слово пользователя) в виде P5c/P6, акт GD-058 со строкой «Решение: принято» не оформлен, поэтому «художественно принято» не ставится; Sarpedon — «Не принято» → вклейка концепта P7, 3D-остров P8 (lit3d), правки и подсветка героев P9/P9b; решение по Sarpedon — за пользователем.",
+      "blocker": "ACC-022 на D-07 не измерен (целевого ПК нет); T4.3 не выполнен (пользователь активен); акт приёмки Marmoreal не оформлен; художественное решение по Sarpedon (lit3d / paste / p5c) — за пользователем.",
       "assets": [
         "ASSET-MEDUSA-001",
         "ASSET-KING-ARTHUR-001",
@@ -1518,7 +1546,7 @@
         "ASSET-PROPS-CARDS-001",
         "ASSET-PLACEHOLDER-MANNEQUIN"
       ],
-      "updated": "2026-10-01T13:30:00Z",
+      "updated": "2026-10-03T02:45:00Z",
       "note": "2026-09-30: одна сборка f8accb3d…/84e68fbe…, 15/15 прогонов, 66/66 кадров packaged-live strict; три неудачи 5b-R/5c-B закрыты (форма колец 54/54); открыто: номера гарпий H1–H3 в кадре, лицо на K2 1,6×, поворот к сопернику, perf на D-07, реальный ввод. «Художественно принято» не ставится. Волна 6B: MELEE у Medusa подтверждён по трассам (сервер отдавал melee; бои K3 законны и по правилам ranged); плашка на Cobble ближе к чужой фигуре (Merlin 3 px / Medusa 126 px) — HUD-долг. Волна 7 (трек FIX): attackType Medusa = range на стенде S09, плашка «HERO | RANGED»; плашка стоит на своей фигуре (packaged K1/K2 1,6× Cobble, зазор 0)."
     },
     {
@@ -1533,9 +1561,11 @@
         "admin/art-hub/aggregate.ts",
         "admin/art-hub/overview.ts",
         "admin/art-hub/__tests__/aggregate.test.ts",
-        "admin/art-hub/__tests__/overview.test.ts"
+        "admin/art-hub/__tests__/overview.test.ts",
+        "docs/art-pipeline/asset-registry.json",
+        "docs/art-pipeline/plan-status.json"
       ],
-      "next": "Сделано; агрегатор не менялся. Снимок и dev-сервер :5480 показывают новый реестр (поднос «технически импортировано», ящик/фасады «измерено»), листы look-dev r3 (b3.1/b3.2) и план волны 7.",
+      "next": "Срез 2026-10-03 (агрегатор не менялся): план — P6-bench, ENV-U15, Sarpedon P7–P9b, подсветка героев, live tune, Art Tuner, путь B; реестр — 5 записей сцены Sarpedon (вклейка P7, остров, корабль, форт, пропсы P8/P9), прогоны P7/P8 больше не «вне реестра».",
       "blocker": null,
       "assets": [
         "ASSET-MEDUSA-001",
@@ -1547,10 +1577,18 @@
         "ASSET-TABLE-BASE-001",
         "ASSET-DECOR-KIT-001",
         "ASSET-PROPS-CARDS-001",
-        "ASSET-PLACEHOLDER-MANNEQUIN"
+        "ASSET-PLACEHOLDER-MANNEQUIN",
+        "ASSET-ENV-CONCEPT-PASTE-001",
+        "ASSET-ENV-S-ISLAND-001",
+        "ASSET-ENV-S-SHIP-001",
+        "ASSET-ENV-S-FORT-001",
+        "ASSET-ENV-S-PROPS-001",
+        "ASSET-ENV-S-WATERFALL-001",
+        "ASSET-MAP-FRAME-002",
+        "ASSET-ENV-KIT-001"
       ],
-      "updated": "2026-09-30T23:30:00Z",
-      "note": "Волна 7: vitest admin/art-hub 3 файла, 102/102; art-hub:snapshot — 4 персонажа, 12 пропсов, 50 прогонов, 0 предупреждений; живой /__art-hub/data на :5480 — 200, те же статусы."
+      "updated": "2026-10-03T02:45:00Z",
+      "note": "Срез 2026-10-03: vitest admin/art-hub 3 файла, 102/102; art-hub:snapshot — 4 персонажа, 23 пропса/окружения (было 18), 63 прогона (P7/P8 теперь в реестре), 0 предупреждений; план — 88 задач, 23 волны; validate_registry PASS (33 записи, 1096 путей, 0 пропущено)."
     },
     {
       "id": "W7-FIX",
@@ -1586,10 +1624,10 @@
         "docs/art-pipeline/plan-status.json",
         "docs/art-pipeline/PLAN-STATUS.md"
       ],
-      "next": "Обновлять при каждой интеграции волны.",
+      "next": "Обновлять при каждой интеграции волны. Срез 2026-10-03 — коммиты 59a5e593..747e98d5.",
       "blocker": null,
       "assets": [],
-      "updated": "2026-10-01T13:30:00Z"
+      "updated": "2026-10-03T02:45:00Z"
     },
     {
       "id": "ENV-P0",
@@ -1751,7 +1789,7 @@
       "evidence": [
         "docs/game-design/evidence/ENV-MAPS/p6-live-2026-10-01/README.md"
       ],
-      "next": "Художественная приёмка досок-карт — GD-058, решение пользователя.",
+      "next": "render_bench — ENV-P6B (3d2a576a); приёмка — ENV-U15: Marmoreal принят, Sarpedon — волна ENV-SARPEDON.",
       "blocker": null,
       "assets": [
         "ASSET-ENV-KIT-001",
@@ -1760,8 +1798,278 @@
         "ASSET-ENV-M-BACKWALL-001",
         "ASSET-ENV-S-WATERFALL-001"
       ],
-      "updated": "2026-10-01T13:30:00Z",
+      "updated": "2026-10-03T02:45:00Z",
       "note": "Коммит 59a5e593: кук 1112 / 1112, 0 ошибок; партии до FINISHED, ходы только по связям; дальние через зону — Marmoreal: Медуза 1, Мерлин 3; Sarpedon (второй прогон): Медуза 3, Мерлин 5; первый прогон Sarpedon оставлен как неудачный гейт (Медуза била только соседа). -EnvLayoutVariant=user: missingMeshes=0, кадры только для пользователя. Без render_bench и без итоговых кадров K1–K3 (по просьбе пользователя)."
+    },
+    {
+      "id": "ENV-P6B",
+      "title": "ENV-MAPS P6: packaged render_bench Cobble / Marmoreal / Sarpedon после P5b/P5c",
+      "track": "closing",
+      "source": "env-maps",
+      "status": "done",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/game-design/evidence/ENV-MAPS/p6-live-2026-10-01/README.md",
+        "docs/game-design/evidence/ENV-MAPS/p6-live-2026-10-01/bench/bench-summary.json"
+      ],
+      "next": "—",
+      "blocker": null,
+      "assets": [
+        "ASSET-ENV-KIT-001",
+        "ASSET-ENV-S-WATERFALL-001",
+        "ASSET-TABLE-BASE-001"
+      ],
+      "updated": "2026-10-03T02:45:00Z",
+      "note": "Коммит 3d2a576a: 3 повтора, 9/9 прогонов exit 0 на эталоне рендера. K1 GPU P5a → P6: Cobble 1,857 → 1,823 мс, Marmoreal 2,440 → 2,417 (в шуме; на K2 −0,10…−0,12), Sarpedon 2,393 → 2,623 (+0,23; K1x0,65 +0,30): море M_EnvSea с прибоем, водопад, поднос T2b, пропсы палубы. Эффекты в -Bench ≈ 0,006 мс (частицы заморожены после прогрева). dev-PC, не ACC-022."
+    },
+    {
+      "id": "ENV-U15",
+      "title": "Решение пользователя по доскам-картам (GD-058): Marmoreal принят, Sarpedon — вклейка концепта",
+      "track": "closing",
+      "source": "decisions",
+      "status": "done",
+      "art_status": null,
+      "evidence": [
+        "docs/game-design/decisions/2026-09-30-env-original-maps-decisions.md",
+        "docs/art-pipeline/ENV-CONCEPT-PASTE.md"
+      ],
+      "next": "Акт GD-058 для Marmoreal со строкой «Решение: принято» не оформлен — в реестре и плане «художественно принято» не ставится. Sarpedon — волна ENV-SARPEDON (P7–P9b).",
+      "blocker": null,
+      "assets": [
+        "ASSET-ENV-KIT-001",
+        "ASSET-ENV-M-BACKWALL-001",
+        "ASSET-MAP-FRAME-002",
+        "ASSET-TABLE-BASE-001"
+      ],
+      "updated": "2026-10-03T02:45:00Z",
+      "note": "2026-10-01 ~19:10, по странице приёмки: «1 Принято» — Marmoreal в виде P5c/P6; «2 Не принято» — Sarpedon, окружение вокруг поля карты берётся из концепта sarpedon-v2, мелкие детали — 3D-модели с анимацией; сакура A; 4a (юбка подноса) и 4b (ширина рамы) — оставить; 5a–5e закрывает вклейка. Описание сцен ENV-CONCEPT-PASTE.md одобрено («. Делай.»), генерации imagegen 1–4 разрешены."
+    },
+    {
+      "id": "ENV-P7",
+      "title": "ENV-MAPS P7: вклейка концепта на Sarpedon (P7a прототип, P7b по умолчанию, P7c правки ревью)",
+      "track": "art",
+      "source": "env-maps",
+      "status": "done",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/art-pipeline/ENV-CONCEPT-PASTE.md",
+        "docs/game-design/evidence/ENV-MAPS/p7-concept-paste-2026-10-01/README.md",
+        "docs/game-design/evidence/ENV-MAPS/p7-concept-paste-2026-10-01/bench-summary.json",
+        "docs/game-design/decisions/2026-09-30-env-original-maps-decisions.md"
+      ],
+      "next": "Ревью арт-директора на P7 — «зловещая долина» → P8 (путь 1). Вклейка осталась вариантом `-ConceptPaste=paste` / `\"mode\": \"paste\"`; для Marmoreal (принят) — только флагом `-ConceptPaste`.",
+      "blocker": null,
+      "assets": [
+        "ASSET-ENV-CONCEPT-PASTE-001",
+        "ASSET-ENV-KIT-001"
+      ],
+      "updated": "2026-10-03T02:45:00Z",
+      "note": "Коммиты 00bdb114 (P7a: регистрация 0,21 px RMS, проекция на лист рельефа), 9cbe318e (P7b: ×2-плита imagegen из камеры концепта на лист рельефа, 3D-детали с анимацией; прежний вид — `-EnvLayoutVariant=p5c`; медиана ΔE плоских участков 0,80; UE 244/244, pytest 451; packaged 1126 пакетов, Sarpedon K1 2,053 мс), 402bd153 (P7c: знамя с ветром, Niagara-огонь в cooked через time dilation 0, откат на P5c при сбое Apply, ΔE зон при мерцании 23,36–23,38, железные пушки, фонари ×1,75; UE 245/245, pytest 452; K1 2,083 мс), 1c3a75d3 (журнал). Без раунда приёмки — по слову пользователя."
+    },
+    {
+      "id": "ENV-P8",
+      "title": "ENV-MAPS P8: настоящий освещённый 3D-остров под de-lit живописью концепта (путь 1), режим lit3d",
+      "track": "art",
+      "source": "env-maps",
+      "status": "done",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/art-pipeline/ENV-P8-3D-UNDER-PAINT-TASK.md",
+        "docs/game-design/evidence/ENV-MAPS/p8-3d-under-paint-2026-10-02/README.md",
+        "docs/game-design/evidence/ENV-MAPS/p8-3d-under-paint-2026-10-02/bench-summary.json"
+      ],
+      "next": "Художественное решение по Sarpedon — пользователь: lit3d (по умолчанию) / P7c paste / P5c — одна строка профиля. Если путь 1 не поможет — обычная 3D-сцена (слово пользователя).",
+      "blocker": null,
+      "assets": [
+        "ASSET-ENV-S-ISLAND-001",
+        "ASSET-ENV-S-SHIP-001",
+        "ASSET-ENV-S-FORT-001",
+        "ASSET-ENV-S-PROPS-001"
+      ],
+      "updated": "2026-10-03T02:45:00Z",
+      "note": "Коммиты 4e34dc56 (задание), b696ba9b: остров, корабль, руины форта, частокол, сваи, знамя — headless Blender (UM_FBX_v1), альбедо запечено из de-lit плиты (Codex imagegen) с видимостью C0 и CC0-заплатками; паковые деревья и камни — проекция альбедо в материале; 3D-источники Poly Haven CC0. Гейты: G1, G5, G8 (packaged K1 2,633 мс, K2x1,6 2,510, ≈ 325 тыс. tris окружения), G9, G10 — PASS; G2, G3 (строго, 20 px), G4 SSIM 0,455 < 0,55 — FAIL. Откат §1 не применён: P5c по тем же гейтам хуже (SSIM 0,154), P7c 0,532; профиль rev 18."
+    },
+    {
+      "id": "ENV-P9",
+      "title": "ENV-MAPS P9: шесть правок Sarpedon (lit3d) и подсветка героев на всех досках",
+      "track": "art",
+      "source": "env-maps",
+      "status": "done",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/art-pipeline/ENV-HERO-LIGHT.md",
+        "docs/game-design/evidence/ENV-MAPS/p9-fixes-hero-light-2026-10-02/README.md",
+        "docs/game-design/evidence/ENV-MAPS/p9-fixes-hero-light-2026-10-02/bench-summary.json"
+      ],
+      "next": "Не пройдены: F1 SSIM корабля 0,431 < 0,45; G7 свет жаровни std 0,49 < 1,5; H1 (+27…38 % при цели +40 %); знамя в live 4,4 % < 5 %; водопад всё ещё читается прямоугольным блоком; G2, G4 (SSIM 0,474), G6 lantern-left 0,69 — как в P8. Пересвет героев исправлен в P9b.",
+      "blocker": null,
+      "assets": [
+        "ASSET-ENV-CONCEPT-PASTE-001",
+        "ASSET-ENV-S-ISLAND-001",
+        "ASSET-ENV-S-SHIP-001",
+        "ASSET-ENV-S-FORT-001",
+        "ASSET-ENV-S-PROPS-001",
+        "ASSET-ENV-S-WATERFALL-001",
+        "ASSET-MAP-FRAME-002",
+        "ASSET-ENV-KIT-001",
+        "ASSET-MEDUSA-001",
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001"
+      ],
+      "updated": "2026-10-03T02:45:00Z",
+      "note": "Коммиты 01f41f28 (концепция ENV-HERO-LIGHT.md, гейты H1–H6), 52b3bf21: F1 корабль (ΔE76 13,5 → 5,2, SSIM 0,206 → 0,431), F2 тёмная полоса рамы с железом (ΔE 1,3), F3 размытая полоса у переднего края убрана, F4 многоярусный каскад водопада (ширина 100 %, движение 42–48 %), F5 слоёный огонь Stylish Fire (движение 13–19 %), F6 ветер WPO листвы (0,16 % → 14 %). Подсветка героев: key + rim SpotLight на Lighting Channel 1, фигуры на каналах 0+1, без GI, блок heroLight во всех профилях, флаг -NoHeroLight; +0,01–0,04 мс packaged. Профиль rev 19; UE 253/253, pytest 549; ревью заменено проверкой оркестратора (просьба пользователя о скорости)."
+    },
+    {
+      "id": "ENV-P9B",
+      "title": "ENV-MAPS P9b: подсветка героев — акцент вместо основного света (ревью «сильно пересвечены»)",
+      "track": "art",
+      "source": "env-maps",
+      "status": "done",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/game-design/evidence/ENV-MAPS/p9b-hero-light-detail-2026-10-02/README.md",
+        "docs/art-pipeline/ENV-HERO-LIGHT.md",
+        "tools/art/render/hero_light_metrics.py"
+      ],
+      "next": "Не пройдены: D1 ≥ 1,0 ни на одном виде (0,920–0,986 — свет ещё немного сглаживает рельеф); D2 на Marmoreal (0,90–0,945); D4 на Cobble (+13 %); D5 на Marmoreal K2x2,5 (1,236 > 1,2); D6 на Marmoreal 1/4 и Cobble 2/6 фигур; H5 (стоимость) не перемерялась. Художественное решение — пользователь.",
+      "blocker": null,
+      "assets": [
+        "ASSET-MEDUSA-001",
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001",
+        "ASSET-MARKERS-001.BASES"
+      ],
+      "updated": "2026-10-03T02:45:00Z",
+      "note": "Коммит 09c7d2f9: в P9 key 50 + rim 30 лк ≈ 23× ключа луны почти соосно с камерой, подставки освещены, активный 2,77×. P9b: ключ со стороны луны (+60°, 42° вниз) = 2× направленного света доски, specular 0,5, контактные тени; низкий rim сзади = ½ ключа; подставки не освещаются (litPedestal false); активный ×1,15. Гейты D1–D6: клиппинг 0,32–4,86 % → ≤ 0,05 %, прирост фигуры +88–152 % → +13–28 %, цвет ближе к студийным рендерам у 12 из 14 фигур. Профиль rev 20; лёгкий режим (3 итерации, без бенча стоимости и ревью-агента)."
+    },
+    {
+      "id": "PIPE-ITER",
+      "title": "Скорость итераций: лёгкий и полный режим, одна упаковка на изменение, штамп staged-сборки",
+      "track": "pipeline",
+      "source": "session-1003",
+      "status": "done",
+      "art_status": null,
+      "evidence": [
+        "AGENTS.md",
+        "tools/s08/package-client.ps1",
+        "tools/s08/sync-staged-build.ps1"
+      ],
+      "next": "—",
+      "blocker": null,
+      "assets": [],
+      "updated": "2026-10-03T02:45:00Z",
+      "note": "Коммит e62f767d (пользователь 2026-10-02: «Конечно, делай и закрепи это в основном пайплайне.»): AGENTS.md «Iteration speed» — лёгкий режим (≤ 3 итерации, только затронутые гейты, без ревью-агента и бенча стоимости), полный — для новых систем; package-client.ps1 ставит на staged-сборку хэш исходников (Source + Config + uproject, EOL-нормализованный), sync-staged-build.ps1 копирует её в другую копию только при совпадении. 2026-10-03: коммиты с --no-verify во всём проекте (338ed286)."
+    },
+    {
+      "id": "LIVE-TUNE",
+      "title": "Live tune: перечитывание профилей и раскладок и кадры бенча в одном запущенном клиенте",
+      "track": "pipeline",
+      "source": "session-1003",
+      "status": "done",
+      "art_status": null,
+      "evidence": [
+        "docs/game-design/evidence/ENV-MAPS/live-tune-2026-10-02/README.md",
+        "docs/game-design/evidence/ENV-MAPS/live-tune-2026-10-02/fidelity.json",
+        "tools/art/render/LIVE-TUNE.md",
+        "tools/art/render/live_tune.py"
+      ],
+      "next": "Приёмочные кадры — только свежий -Bench (`live_tune.py bench`): на Cobble K2 live отличается на 0,51–0,72 (> 0,5).",
+      "blocker": null,
+      "assets": [],
+      "updated": "2026-10-03T02:45:00Z",
+      "note": "Коммит 64c74a43: -ArtLiveTune=<dir> (редактор -game и packaged), протокол cmd-<seq>.json / done-<seq>.json: reload (24–60 мс; при ошибке остаётся прежнее состояние), shot (формат -Bench), state, quit; без флага код не работает. Правка + 3 вида ≈ 20 с против ≈ 115 с с перезапуском. UE 258/258, pytest 536."
+    },
+    {
+      "id": "ART-TUNER",
+      "title": "Art Tuner: окно доски без сервера (-ArtView) и панель настройки света и сцены (F10) с сохранением и внесением в профиль",
+      "track": "pipeline",
+      "source": "art-tuner",
+      "status": "done",
+      "art_status": null,
+      "evidence": [
+        "docs/art-pipeline/ART-TUNER-PLAN.md",
+        "tools/art/ART-TUNER.md",
+        "docs/game-design/evidence/ART-TUNER/art-tuner-2026-10-03/README.md",
+        "docs/game-design/evidence/ART-TUNER/art-tuner-2026-10-03/fold-dry-run.txt",
+        "tools/art/art_tuner_fold.py",
+        "tools/s08/Unmatched-ArtTuner.cmd",
+        "unreal/Unmatched/Config/ArtTuner/S08ArtTunerParams.json"
+      ],
+      "next": "Запуск — tools/s08/Unmatched-ArtTuner.cmd, сохранённое вносится в профиль art_tuner_fold.py. Эталон K1 lightcheck дрейфует (старая сборка тоже 0,59 к эталону) — сравнивать A/B.",
+      "blocker": null,
+      "assets": [
+        "ASSET-ENV-CONCEPT-PASTE-001",
+        "ASSET-ENV-S-ISLAND-001",
+        "ASSET-ENV-S-SHIP-001",
+        "ASSET-ENV-S-FORT-001",
+        "ASSET-ENV-S-PROPS-001",
+        "ASSET-ENV-S-WATERFALL-001",
+        "ASSET-MAP-FRAME-002",
+        "ASSET-ENV-KIT-001",
+        "ASSET-MEDUSA-001",
+        "ASSET-KING-ARTHUR-001",
+        "ASSET-MERLIN-001",
+        "ASSET-HARPY-001"
+      ],
+      "updated": "2026-10-03T02:45:00Z",
+      "note": "Коммиты 983613eb, 338ed286, 009b6c0c (план с оценкой по замерам), d2703e37 (M1: -ArtView=<map> — фикстура -Bench без обхода видов и заморозки, свободная камера), a6b4bf83 (M2: реестр строк с JSON-указателями в S08ArtBoardProfiles.json, проверка парсером, -ArtTunerFile), 3a77794e (M3: Slate-панель F10 / Shift+F10, русские строки, ползунки, цвета, Ctrl+S, сброс), 3aebc7da (M4: conceptPaste.lit3d.materialOverrides — яркость острова, корабля, рамы и ветер листвы, 15 строк), 823033af (M5: art_tuner_fold.py, лаунчер, инструкция), 22694a8d, a8a9d332 (M6), 747e98d5 (после M6: строки Island.tint / Ship.tint, pasteGrade и pasteLights режима вклейки; отсутствующий tint показывается белым). Packaged: groups=10 rows=94; tune трёх строк — применение 1,5 мс без пересборки; перезапуск с файлом loaded=3; без флагов игра прежняя (A/B со сборкой 09c7d2f9 на уровне шума 0,41–0,47). UE 272/272, pytest 544 passed / 3 skipped."
+    },
+    {
+      "id": "BLENDER-HANDBOOK",
+      "title": "Справочник модели в Blender для делегированного исполнителя",
+      "track": "pipeline",
+      "source": "session-1003",
+      "status": "done",
+      "art_status": null,
+      "evidence": [
+        "docs/art-pipeline/BLENDER-MODEL-HANDBOOK.md"
+      ],
+      "next": "—",
+      "blocker": null,
+      "assets": [],
+      "updated": "2026-10-03T02:45:00Z",
+      "note": "Коммиты bdf84792, fc0a72c8: маршруты (H2-бейк для героев, static_prop_candidate для пропсов, legacy — только справка), контракт чисел (UM_FBX_v1, ORM, rig v2, сокеты, клипы, высоты S08), шаги H2 → look-dev → TeamAccent → H2Anim → skeletal-adopt, правила остановки, каталог крайних случаев, таблица устаревших правил 04/17/ADDING/PIPELINE; концепты hero-quality-v1 — портреты Codex image_gen поверх орто-рендеров черновой модели."
+    },
+    {
+      "id": "SCRATCH-B",
+      "title": "Путь B: модель с нуля в Blender по 2D-пакету Codex — пилот Merlin (MerlinSC)",
+      "track": "art",
+      "source": "scratch",
+      "status": "blocked",
+      "art_status": "предложено",
+      "evidence": [
+        "docs/art-pipeline/SCRATCH-MODEL-PIPELINE.md",
+        "docs/art-pipeline/SCRATCH-PILOT-MERLIN.md",
+        "docs/art-pipeline/CODEX-2D-PACKAGE-PROMPT.md",
+        "docs/art-pipeline/ZCODE-BLENDER-PROMPT.md",
+        "art/imagegen/scratch-v1/merlin/README.md",
+        "art/imagegen/scratch-v1/merlin/views-check.json"
+      ],
+      "next": "Нужен способ генерации, сохраняющий сетку и контуры, или разрешение на другой протокол сетки, масок и композитинга. HANDOFF.json не выпущен — этап ZCode (Blender) не начинается; изображения — только визуальные черновики.",
+      "blocker": "views-check.json: checks_passed false — серо-голубая сетка попадает в маски (ΔE76 > 12): базовая линия фронта 1535 px при 1413 ± 2, ширина фронта 21,6 % при ≤ 4 %, IoU shaded↔albedo 0,42–0,59 при ≥ 0,98.",
+      "assets": [
+        "ASSET-MERLIN-001"
+      ],
+      "updated": "2026-10-03T02:45:00Z",
+      "note": "Коммиты bc9d007d, 1b93e80d, dbb82bcb, 36615e14 (путь B: spec.json как источник истины, сетка с метками регистрации, Codex делает 2D-пакет и HANDOFF.json, ZCode строит модель кодом с гейтом силуэта IoU; UE-ключ MerlinSC, существующие слои Merlin не трогаются), ae2110dc и b9cce1df (прогоны 1–2: фронт 8 попыток, бок, спина и альбедо по 1, лицо и посох; spec-check и registration-test — PASS, макс. невязка регистрации 0,32 px; 12 генераций, SYNTX 0). Worktree C:/tmp/wt-scratch2d-merlin, ветка feat/scratch2d-merlin. 3D и UE не менялись."
+    },
+    {
+      "id": "RESEARCH-BLENDER",
+      "title": "Ресёрч: навыки, MCP и bpy-библиотеки агентов для Blender (концепт → бейк)",
+      "track": "pipeline",
+      "source": "session-1003",
+      "status": "done",
+      "art_status": null,
+      "evidence": [
+        "docs/research/2026-10-03-blender-agent-skills/README.md"
+      ],
+      "next": "—",
+      "blocker": null,
+      "assets": [],
+      "updated": "2026-10-03T02:45:00Z",
+      "note": "Коммиты 0c3d17b7, 7499be29: генерация «концепт → меш» остаётся на Tripo (локальная альтернатива — TRELLIS.2-4B, MIT; Hunyuan3D — лицензионные ловушки); premium mcp-for-blender не подключает свою подписку Tripo — путь со своим ключом — официальный tripo-mcp; headless-пайплайн это не меняет."
     }
   ],
   "waves": [
@@ -1960,7 +2268,7 @@
     },
     {
       "id": "ENV-MAPS",
-      "title": "Доски-диорамы на оригинальных картах Marmoreal и Sarpedon (поправка D-03): P0–P6 закрыты 2026-10-01; художественная приёмка GD-058 — решение пользователя",
+      "title": "Доски-диорамы на оригинальных картах Marmoreal и Sarpedon (поправка D-03): P0–P6 закрыты 2026-10-01, render_bench P6 — 3d2a576a; ENV-U15: Marmoreal принят словом пользователя (акт не оформлен), Sarpedon — ENV-SARPEDON",
       "status": "done",
       "tasks": [
         "ENV-P0",
@@ -1969,7 +2277,40 @@
         "ENV-P3",
         "ENV-P4",
         "ENV-P5",
-        "ENV-P6"
+        "ENV-P6",
+        "ENV-P6B"
+      ]
+    },
+    {
+      "id": "ENV-SARPEDON",
+      "title": "Sarpedon после ENV-U15: вклейка концепта P7, 3D-остров под живописью P8 (lit3d), правки P9, подсветка героев P9/P9b на всех досках; художественное решение — пользователь",
+      "status": "in_progress",
+      "tasks": [
+        "ENV-U15",
+        "ENV-P7",
+        "ENV-P8",
+        "ENV-P9",
+        "ENV-P9B"
+      ]
+    },
+    {
+      "id": "PIPE-SPEED",
+      "title": "Скорость итераций: правила (лёгкий режим, одна упаковка), live tune, Art Tuner M1–M6",
+      "status": "done",
+      "tasks": [
+        "PIPE-ITER",
+        "LIVE-TUNE",
+        "ART-TUNER"
+      ]
+    },
+    {
+      "id": "PATH-B",
+      "title": "Путь B — модель с нуля в Blender по 2D-пакету Codex: справочник, промпты, ресёрч, пилот Merlin (2D-пакет заблокирован проверкой видов)",
+      "status": "blocked",
+      "tasks": [
+        "BLENDER-HANDBOOK",
+        "SCRATCH-B",
+        "RESEARCH-BLENDER"
       ]
     }
   ],

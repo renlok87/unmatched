@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "registryId": "unmatched-mvp-3d-asset-registry",
-  "snapshotDate": "2026-10-01",
+  "snapshotDate": "2026-10-03",
   "language": "ru",
   "purpose": "Машиночитаемый реестр обязательных 3D-ассетов MVP: источники, стадия, владение файлами, следующий шаг, блокер, критерий готовности. Реестр пайплайна; не заменяет нормативный 06-asset-manifest.csv и не меняет статусы бэклога.",
   "validator": "tools/tripo-pipeline/validate_registry.py",
@@ -2734,8 +2734,8 @@
         }
       ],
       "manifest06": {"verificationStatusIn06": "нет строки", "drift": "В 06 нет строки: ассеты окружения оригинальных карт появились в треке ENV-MAPS (поправка D-03, 2026-09-30); ASSET-DECOR-KIT-001 в 06 описывает декор Cobble.", "proposedChange": "Предложено: строки 06 для окружения оригинальных карт — после художественной приёмки GD-058."},
-      "nextStep": "Художественная приёмка досок-карт — GD-058, решение пользователя. Замер render_bench.py (packaged -Bench) после P5b/P5c. Открытые пункты — бэклог ART-009 и раздел «Итог» ENV-MAPS-PLAN.md.",
-      "blocker": "Художественной приёмки нет (GD-058 — решение пользователя).",
+      "nextStep": "Marmoreal: пользователь принял доску 2026-10-01 (ENV-U15, «1 Принято») в виде P5c/P6 — акт GD-058 со строкой «Решение: принято» не оформлен, поэтому статус не повышен. Sarpedon не принят → вклейка концепта P7 и 3D-остров P8 (lit3d), правки P9 (записи ASSET-ENV-CONCEPT-PASTE-001, ASSET-ENV-S-*-001). render_bench после P5b/P5c сделан (P6, 3d2a576a: Marmoreal в шуме, Sarpedon K1 +0,23 мс). Открытые пункты — бэклог ART-009 и раздел «Итог» ENV-MAPS-PLAN.md.",
+      "blocker": "Акт приёмки Marmoreal (ENV-U15) не оформлен; Sarpedon не принят — решение пользователя по варианту lit3d / paste / p5c.",
       "doneCriteria": "Пропсы не закрывают круги карты на всех зумах (layout_check 0 ERROR / 0 WARN); свет в бюджете 1 ключ + 6 точек; решение пользователя по GD-058.",
       "acceptanceEvidence": [],
       "evidence": [
@@ -2937,7 +2937,7 @@
         }
       ],
       "manifest06": {"verificationStatusIn06": "нет строки", "drift": "В 06 нет строки для рамки досок-карт (трек ENV-MAPS).", "proposedChange": "Предложено: строка 06 после художественной приёмки GD-058."},
-      "nextStep": "Художественная приёмка. Ширина бруса 24 uu закреплена FrameHalf (иначе сдвинутся камера и раскладки); её изменение отложено до приёмки (ENV-U14).",
+      "nextStep": "Ширина рамы — оставить (ENV-U15, п. 4b, 2026-10-01): брус 24 uu (FrameHalf) не меняется. На Sarpedon в режиме lit3d поверх рамы — тёмная полоса с железом (P9 F2, ASSET-ENV-S-PROPS-001). Художественная приёмка.",
       "blocker": "Художественной приёмки нет (GD-058 — решение пользователя).",
       "doneCriteria": "Проём совпадает с картой, модули без растяжения (exactFit=1), рамка не закрывает круги.",
       "acceptanceEvidence": [],
@@ -3005,7 +3005,7 @@
       ],
       "manifest06": {"verificationStatusIn06": "нет строки", "drift": "В 06 нет строки: ассеты окружения оригинальных карт появились в треке ENV-MAPS (поправка D-03, 2026-09-30); ASSET-DECOR-KIT-001 в 06 описывает декор Cobble.", "proposedChange": "Предложено: строки 06 для окружения оригинальных карт — после художественной приёмки GD-058."},
       "nextStep": "Градиент окон: у M_EnvProp нет UV-члена, окна в BC залиты одним цветом — нужна новая функция мастер-материала (градиент по локальной высоте или UV окна) или градиент в T_Env_BackWall_BC/_E. Художественная приёмка.",
-      "blocker": "Нет функции мастер-материала для градиента окон; художественной приёмки нет.",
+      "blocker": "Нет функции мастер-материала для градиента окон; Marmoreal принят словом пользователя (ENV-U15), акт приёмки не оформлен.",
       "doneCriteria": "Стена не ярче карты на K1; окна не перегорают; тень стены на поле не попадает.",
       "acceptanceEvidence": [],
       "evidence": [
@@ -3074,13 +3074,373 @@
         }
       ],
       "manifest06": {"verificationStatusIn06": "нет строки", "drift": "В 06 нет строки: ассеты окружения оригинальных карт появились в треке ENV-MAPS (поправка D-03, 2026-09-30); ASSET-DECOR-KIT-001 в 06 описывает декор Cobble.", "proposedChange": "Предложено: строки 06 для окружения оригинальных карт — после художественной приёмки GD-058."},
-      "nextStep": "Художественная приёмка. Вода, водопад и прибой анимируются нодой Time: для попиксельного совпадения кадров бенча нужны MI с нулевой скоростью (P5c, «Пробелы»).",
+      "nextStep": "Художественная приёмка. В режиме lit3d Sarpedon (P9 F4) добавлен многоярусный каскад по уступам скалы — ASSET-ENV-S-PROPS-001 (SM_Env_S_Cascade / SM_Env_S_CascadeFoam); водопад всё ещё читается прямоугольным блоком. Вода, водопад и прибой анимируются нодой Time: для попиксельного совпадения кадров бенча нужны MI с нулевой скоростью (P5c, «Пробелы»).",
       "blocker": "Художественной приёмки нет (GD-058 — решение пользователя).",
       "doneCriteria": "Лист не задевает скалу T2b; трасса `sea=ok`; вода за рамкой без «дыр».",
       "acceptanceEvidence": [],
       "evidence": [
         {"path": "docs/game-design/evidence/ENV-MAPS/p5k-blender-assets-2026-10-01/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P5 линия K: ассеты из Blender"},
         {"path": "docs/game-design/evidence/ENV-MAPS/p5c-fab-2026-10-01/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P5c: море и водопад на Water Materials"}
+      ],
+      "plannedPaths": []
+    },
+    {
+      "id": "ASSET-ENV-CONCEPT-PASTE-001",
+      "name": "Вклейка концепта (P7): листы рельефа Sarpedon и Marmoreal, головы фонарей, ткань знамени, железные пушки",
+      "category": "modular-environment",
+      "contentKey": null,
+      "manifest06Row": null,
+      "backlog": ["ART-009"],
+      "parent": "ASSET-ENV-KIT-001",
+      "instances": 1,
+      "status": "технически импортировано",
+      "stage": "live-packaged-probe",
+      "ownership": {"existingFiles": "pipeline", "nextCandidates": "pipeline", "acceptance": "art-chat"},
+      "sourceImages": {
+        "selectionManifest": null,
+        "recommended": [],
+        "excludedCandidates": [],
+        "note": "Плиты imagegen (Codex) по концептам sarpedon-v2 / Marmoreal: чистая, ×2 (ИИ-апскейл, ENV-U6), достройка краёв, море и небо; регистрация к кадру карты 0,21 px RMS (tools/art/concept_paste/registration.json). Плиты и производные текстуры — вне git (ENV-U3/U7)."
+      },
+      "source3d": [],
+      "layers": [
+        {
+          "layer": "blender-candidate 20261001-p7 (листы рельефа, голова фонаря, ткань знамени)",
+          "stage": "blender-candidate",
+          "status": "измерено",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-ENV-CONCEPT-PASTE-001/20261001-p7/reports/build-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "сборка и проверки (checks_passed true)"},
+            {"path": "art/pipeline-candidates/ASSET-ENV-CONCEPT-PASTE-001/20261001-p7/scripts/cp-assets-params.json", "root": "repo", "kind": "file", "expect": "exists", "role": "параметры"},
+            {"path": "tools/art/concept_paste/cp_proxies.py", "root": "repo", "kind": "file", "expect": "exists", "role": "листы рельефа из карты глубины"},
+            {"path": "tools/art/concept_paste/blender_cp_assets.py", "root": "repo", "kind": "file", "expect": "exists", "role": "головы фонарей и ткань знамени в headless Blender"}
+          ],
+          "note": "Headless Blender, UM_FBX_v1: SM_Sarpedon_ConceptSheet 10 564 tris, SM_Marmoreal_ConceptSheet 7 486, SM_EnvCP_LanternHead 1 813, SM_EnvCP_BannerCloth 828."
+        },
+        {
+          "layer": "ue-editor-import /Game/EnvKit/ConceptPaste + /Game/EnvMaps/{ConceptPaste,Sarpedon/ConceptPaste,Marmoreal/ConceptPaste}",
+          "stage": "ue-editor-frames",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "tools/art/concept_paste/ue_import_concept_paste.py", "root": "repo", "kind": "file", "expect": "exists", "role": "импорт листов, плит и 3D-деталей"},
+            {"path": "tools/art/concept_paste/ue_concept_material.py", "root": "repo", "kind": "file", "expect": "exists", "role": "M_ConceptPaste"},
+            {"path": "/Game/EnvMaps/ConceptPaste/M_ConceptPaste", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "unlit masked материал вклейки (тон-кривая fitScale/fitPower, девиньетка)"},
+            {"path": "/Game/EnvMaps/Sarpedon/ConceptPaste/SM_Sarpedon_ConceptSheet", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "лист рельефа Sarpedon"},
+            {"path": "/Game/EnvMaps/Marmoreal/ConceptPaste/SM_Marmoreal_ConceptSheet", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "лист рельефа Marmoreal (только флаг -ConceptPaste)"},
+            {"path": "/Game/EnvKit/ConceptPaste/SM_EnvCP_LanternHead", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "голова фонаря (P7c ×1,75)"},
+            {"path": "/Game/EnvKit/ConceptPaste/SM_EnvCP_BannerCloth", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "ткань знамени (WPO-ветер)"},
+            {"path": "/Game/EnvKit/ConceptPaste/SM_EnvCP_Cannon", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "пушка (P7c: тёмное железо MI_EnvCP_CannonIron)"}
+          ],
+          "note": "S08ConceptPaste (блок профиля conceptPaste) прячет нарисованные пропсы, поднос, землю, море, задник и туман только на досках-картах. Marmoreal по умолчанию не меняется."
+        },
+        {
+          "layer": "live-packaged P7b/P7c (Sarpedon concept-paste mode=on)",
+          "stage": "live-packaged-probe",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "docs/game-design/evidence/ENV-MAPS/p7-concept-paste-2026-10-01/packaged-sarpedon/bench.trace.log", "root": "repo", "kind": "file", "expect": "exists", "role": "P7b: packaged -Bench Sarpedon"},
+            {"path": "docs/game-design/evidence/ENV-MAPS/p7-concept-paste-2026-10-01/p7c/packaged-sarpedon/bench.trace.log", "root": "repo", "kind": "file", "expect": "exists", "role": "P7c: packaged -Bench Sarpedon после правок ревью"},
+            {"path": "docs/game-design/evidence/ENV-MAPS/p7-concept-paste-2026-10-01/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P7a–P7c: вклейка концепта, замеры, packaged"}
+          ],
+          "note": "P7b: 1126 пакетов, Sarpedon K1 2,053 мс GPU (P6 2,623), медиана ΔE плоских участков к плите 0,80. P7c: знамя видно и с ветром, Niagara-огонь рисуется в cooked, сбой Apply → откат на вид P5c, мин. ΔE76 зон при мерцании 23,36–23,38; UE 245/245, pytest 452; K1 2,083 мс. С P8 вид Sarpedon по умолчанию — lit3d; вклейка — вариант `\"mode\": \"paste\"` / `-ConceptPaste=paste`."
+        }
+      ],
+      "manifest06": {"verificationStatusIn06": "нет строки", "drift": "В 06 нет строки: ассеты окружения оригинальных карт появились в треке ENV-MAPS (поправка D-03, 2026-09-30); сцена Sarpedon P7–P9 — после решения пользователя ENV-U15.", "proposedChange": "Предложено: строки 06 для окружения оригинальных карт — после художественной приёмки GD-058."},
+      "nextStep": "Вклейка — вариант сравнения и откат для Sarpedon (одна строка профиля); ревью арт-директора P7 — «зловещая долина» → P8. Художественное решение по Sarpedon: lit3d (по умолчанию с P8, профиль rev 18+) / вклейка P7c (`\"mode\": \"paste\"`) / P5c (`\"default\": \"off\"`) — одна строка профиля.",
+      "blocker": "Художественной приёмки нет: Sarpedon не принят (ENV-U15), решение по варианту lit3d / paste / p5c — за пользователем.",
+      "doneCriteria": "Сбой Apply откатывает на P5c (тест ConceptPaste.ApplyFailure); мин. ΔE76 смежных зон ≥ 23,2 при мерцании; Marmoreal и Cobble по умолчанию не меняются.",
+      "acceptanceEvidence": [],
+      "evidence": [
+        {"path": "docs/art-pipeline/ENV-CONCEPT-PASTE.md", "root": "repo", "kind": "file", "expect": "exists", "role": "описание сцен из концепта (одобрено пользователем)"},
+        {"path": "docs/game-design/evidence/ENV-MAPS/p7-concept-paste-2026-10-01/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P7: evidence"},
+        {"path": "docs/game-design/decisions/2026-09-30-env-original-maps-decisions.md", "root": "repo", "kind": "file", "expect": "exists", "role": "ENV-U15 и итог P7"}
+      ],
+      "plannedPaths": []
+    },
+    {
+      "id": "ASSET-ENV-S-ISLAND-001",
+      "name": "Остров Sarpedon (P8, lit3d): освещённая 3D-масса острова под de-lit альбедо концепта",
+      "category": "modular-environment",
+      "contentKey": null,
+      "manifest06Row": null,
+      "backlog": ["ART-009"],
+      "parent": "ASSET-ENV-KIT-001",
+      "instances": 1,
+      "status": "технически импортировано",
+      "stage": "live-packaged-probe",
+      "ownership": {"existingFiles": "pipeline", "nextCandidates": "pipeline", "acceptance": "art-chat"},
+      "sourceImages": {
+        "selectionManifest": null,
+        "recommended": [],
+        "excludedCandidates": [],
+        "note": "Альбедо запечено из de-lit плиты концепта sarpedon-v2 (Codex imagegen, сдвиг 0 px; низкие частоты de-lit × детали ночной ×2-плиты) с видимостью из камеры концепта C0 и CC0-заплатками вне C0; AO и детальная нормаль по яркости. Плиты и запечённые текстуры — вне git (ENV-U3/U7)."
+      },
+      "source3d": [],
+      "layers": [
+        {
+          "layer": "blender-candidate 20261002-v1",
+          "stage": "blender-candidate",
+          "status": "измерено",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-ENV-S-ISLAND-001/20261002-v1/reports/build-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "экспорт и соответствие UM_FBX_v1"},
+            {"path": "art/pipeline-candidates/ASSET-ENV-S-ISLAND-001/20261002-v1/reports/island-build.json", "root": "repo", "kind": "file", "expect": "exists", "role": "сборка острова"},
+            {"path": "tools/art/concept_scene/island_build.py", "root": "repo", "kind": "file", "expect": "exists", "role": "геометрия острова (headless Blender)"},
+            {"path": "tools/art/concept_scene/bake_albedo.py", "root": "repo", "kind": "file", "expect": "exists", "role": "бейк альбедо из de-lit плиты"}
+          ],
+          "note": "Headless Blender 5.2, UM_FBX_v1: SM_Env_S_Island 16 899 tris, слот MI_Env_S_Island, UV без перекрытий."
+        },
+        {
+          "layer": "ue-editor-import /Game/EnvMaps/Sarpedon/Scene (режим conceptPaste lit3d)",
+          "stage": "ue-editor-frames",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "tools/art/concept_scene/ue_import_concept_scene.py", "root": "repo", "kind": "file", "expect": "exists", "role": "импорт мешей и текстур сцены Sarpedon (--check)"},
+            {"path": "tools/art/concept_scene/ue_scene_material.py", "root": "repo", "kind": "file", "expect": "exists", "role": "материалы M_EnvScene / MI_Env_S_*"},
+            {"path": "/Game/EnvMaps/Sarpedon/Scene/SM_Env_S_Island", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "меш острова"},
+            {"path": "/Game/EnvMaps/Sarpedon/Scene/MI_Env_S_Island", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "MI острова"},
+            {"path": "/Game/EnvMaps/Sarpedon/Scene/T_Env_S_Island_BC", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "запечённое альбедо"}
+          ],
+          "note": "lit M_EnvScene: тени и Lumen GI на массах острова; оверлей EnvLayouts/sarpedon.scene.layout.json (layout_check, правило 12)."
+        },
+        {
+          "layer": "live-packaged P8/P9 (Sarpedon, conceptPaste mode lit3d)",
+          "stage": "live-packaged-probe",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "docs/game-design/evidence/ENV-MAPS/p8-3d-under-paint-2026-10-02/packaged-sarpedon/cmdline.txt", "root": "repo", "kind": "file", "expect": "exists", "role": "P8: packaged -Bench Sarpedon"},
+            {"path": "docs/game-design/evidence/ENV-MAPS/p8-3d-under-paint-2026-10-02/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P8: интеграция, гейты G1–G10, решение P8.5"},
+            {"path": "docs/game-design/evidence/ENV-MAPS/p9-fixes-hero-light-2026-10-02/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P9: правки сцены и гейты"}
+          ],
+          "note": "P8: G1, G5, G8 (packaged K1 2,633 мс, K2x1,6 2,510; окружение ≈ 325 тыс. tris), G9, G10 — PASS; G2, G3 (строго, 20 px), G4 SSIM 0,455 < 0,55 — FAIL; откат не применён (P5c по тем же гейтам 0,154). P9: G4 0,474."
+        }
+      ],
+      "manifest06": {"verificationStatusIn06": "нет строки", "drift": "В 06 нет строки: ассеты окружения оригинальных карт появились в треке ENV-MAPS (поправка D-03, 2026-09-30); сцена Sarpedon P7–P9 — после решения пользователя ENV-U15.", "proposedChange": "Предложено: строки 06 для окружения оригинальных карт — после художественной приёмки GD-058."},
+      "nextStep": "Художественное решение по Sarpedon: lit3d (по умолчанию с P8, профиль rev 18+) / вклейка P7c (`\"mode\": \"paste\"`) / P5c (`\"default\": \"off\"`) — одна строка профиля. Если путь 1 не поможет — обычная 3D-сцена (слово пользователя, ENV-U15). Яркость и ветер — строки Art Tuner (`materialOverrides`).",
+      "blocker": "Художественной приёмки нет: Sarpedon не принят (ENV-U15), решение по варианту lit3d / paste / p5c — за пользователем.",
+      "doneCriteria": "Гейты G1–G10 ENV-P8-3D-UNDER-PAINT-TASK.md §1; packaged K1 ≤ 3,5 мс, K2x1,6 ≤ 3,8 мс; ≤ 450 тыс. tris окружения.",
+      "acceptanceEvidence": [],
+      "evidence": [
+        {"path": "docs/art-pipeline/ENV-P8-3D-UNDER-PAINT-TASK.md", "root": "repo", "kind": "file", "expect": "exists", "role": "задание P8: гейты, архитектура, правило отката"},
+        {"path": "docs/game-design/evidence/ENV-MAPS/p8-3d-under-paint-2026-10-02/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P8: evidence"}
+      ],
+      "plannedPaths": []
+    },
+    {
+      "id": "ASSET-ENV-S-SHIP-001",
+      "name": "Корабль Sarpedon (P8, борт перестроен в P9 F1)",
+      "category": "modular-environment",
+      "contentKey": null,
+      "manifest06Row": null,
+      "backlog": ["ART-009"],
+      "parent": "ASSET-ENV-KIT-001",
+      "instances": 1,
+      "status": "технически импортировано",
+      "stage": "live-packaged-probe",
+      "ownership": {"existingFiles": "pipeline", "nextCandidates": "pipeline", "acceptance": "art-chat"},
+      "sourceImages": {
+        "selectionManifest": null,
+        "recommended": [],
+        "excludedCandidates": [],
+        "note": "Альбедо запечено из de-lit плиты концепта sarpedon-v2 (Codex imagegen, сдвиг 0 px; низкие частоты de-lit × детали ночной ×2-плиты) с видимостью из камеры концепта C0 и CC0-заплатками вне C0; AO и детальная нормаль по яркости. Плиты и запечённые текстуры — вне git (ENV-U3/U7)."
+      },
+      "source3d": [],
+      "layers": [
+        {
+          "layer": "blender-candidate 20261002-v1",
+          "stage": "blender-candidate",
+          "status": "измерено",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-ENV-S-SHIP-001/20261002-v1/reports/build-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "экспорт и соответствие UM_FBX_v1"},
+            {"path": "art/pipeline-candidates/ASSET-ENV-S-SHIP-001/20261002-v1/reports/ship-build.json", "root": "repo", "kind": "file", "expect": "exists", "role": "сборка корабля"},
+            {"path": "tools/art/concept_scene/ship_build.py", "root": "repo", "kind": "file", "expect": "exists", "role": "процедурный борт по нарисованным пикселям"}
+          ],
+          "note": "SM_Env_S_Ship 5 822 tris, слот MI_Env_S_Ship. P9 F1: стенка с клинкерной обшивкой, планширь на нарисованном поручне, 3 порта с пушками, палуба, мачта с реем и вантами, фонарь на кронштейне, знамя; BakedTint 0,45 → 1,3 (только корабль)."
+        },
+        {
+          "layer": "ue-editor-import /Game/EnvMaps/Sarpedon/Scene (режим conceptPaste lit3d)",
+          "stage": "ue-editor-frames",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "tools/art/concept_scene/ue_import_concept_scene.py", "root": "repo", "kind": "file", "expect": "exists", "role": "импорт мешей и текстур сцены Sarpedon (--check)"},
+            {"path": "tools/art/concept_scene/ue_scene_material.py", "root": "repo", "kind": "file", "expect": "exists", "role": "материалы M_EnvScene / MI_Env_S_*"},
+            {"path": "/Game/EnvMaps/Sarpedon/Scene/SM_Env_S_Ship", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "меш корабля"},
+            {"path": "/Game/EnvMaps/Sarpedon/Scene/MI_Env_S_Ship", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "MI корабля"}
+          ],
+          "note": "Тот же lit M_EnvScene, что у острова; яркость — Art Tuner materialOverrides.Ship."
+        },
+        {
+          "layer": "live-packaged P8/P9 (Sarpedon, conceptPaste mode lit3d)",
+          "stage": "live-packaged-probe",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "docs/game-design/evidence/ENV-MAPS/p8-3d-under-paint-2026-10-02/packaged-sarpedon/cmdline.txt", "root": "repo", "kind": "file", "expect": "exists", "role": "P8: packaged -Bench Sarpedon"},
+            {"path": "docs/game-design/evidence/ENV-MAPS/p8-3d-under-paint-2026-10-02/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P8: интеграция, гейты G1–G10, решение P8.5"},
+            {"path": "docs/game-design/evidence/ENV-MAPS/p9-fixes-hero-light-2026-10-02/packaged-sarpedon/cmdline.txt", "root": "repo", "kind": "file", "expect": "exists", "role": "P9: packaged -Bench Sarpedon"},
+            {"path": "docs/game-design/evidence/ENV-MAPS/p9-fixes-hero-light-2026-10-02/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P9: F1 корабль"}
+          ],
+          "note": "P9 F1: SSIM ¼ полигона корабля на C0 0,206 → 0,431 (порог 0,45 — FAIL), ΔE76 полигона 13,5 → 5,2 (порог 6 — PASS)."
+        }
+      ],
+      "manifest06": {"verificationStatusIn06": "нет строки", "drift": "В 06 нет строки: ассеты окружения оригинальных карт появились в треке ENV-MAPS (поправка D-03, 2026-09-30); сцена Sarpedon P7–P9 — после решения пользователя ENV-U15.", "proposedChange": "Предложено: строки 06 для окружения оригинальных карт — после художественной приёмки GD-058."},
+      "nextStep": "Художественное решение по Sarpedon: lit3d (по умолчанию с P8, профиль rev 18+) / вклейка P7c (`\"mode\": \"paste\"`) / P5c (`\"default\": \"off\"`) — одна строка профиля. Если путь 1 не поможет — обычная 3D-сцена (слово пользователя, ENV-U15). Яркость и ветер — строки Art Tuner (`materialOverrides`).",
+      "blocker": "Художественной приёмки нет: Sarpedon не принят (ENV-U15), решение по варианту lit3d / paste / p5c — за пользователем.",
+      "doneCriteria": "P9 F1: SSIM полигона корабля на C0 ≥ 0,45, ΔE76 ≤ 6.",
+      "acceptanceEvidence": [],
+      "evidence": [
+        {"path": "docs/game-design/evidence/ENV-MAPS/p9-fixes-hero-light-2026-10-02/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P9: evidence"}
+      ],
+      "plannedPaths": []
+    },
+    {
+      "id": "ASSET-ENV-S-FORT-001",
+      "name": "Руины форта Sarpedon (P8, lit3d)",
+      "category": "modular-environment",
+      "contentKey": null,
+      "manifest06Row": null,
+      "backlog": ["ART-009"],
+      "parent": "ASSET-ENV-KIT-001",
+      "instances": 1,
+      "status": "технически импортировано",
+      "stage": "live-packaged-probe",
+      "ownership": {"existingFiles": "pipeline", "nextCandidates": "pipeline", "acceptance": "art-chat"},
+      "sourceImages": {
+        "selectionManifest": null,
+        "recommended": [],
+        "excludedCandidates": [],
+        "note": "Альбедо запечено из de-lit плиты концепта sarpedon-v2 (Codex imagegen, сдвиг 0 px; низкие частоты de-lit × детали ночной ×2-плиты) с видимостью из камеры концепта C0 и CC0-заплатками вне C0; AO и детальная нормаль по яркости. Плиты и запечённые текстуры — вне git (ENV-U3/U7)."
+      },
+      "source3d": [],
+      "layers": [
+        {
+          "layer": "blender-candidate 20261002-v1",
+          "stage": "blender-candidate",
+          "status": "измерено",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-ENV-S-FORT-001/20261002-v1/reports/build-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "экспорт и соответствие UM_FBX_v1"},
+            {"path": "art/pipeline-candidates/ASSET-ENV-S-FORT-001/20261002-v1/reports/fort-build.json", "root": "repo", "kind": "file", "expect": "exists", "role": "сборка форта"},
+            {"path": "tools/art/concept_scene/fort_build.py", "root": "repo", "kind": "file", "expect": "exists", "role": "геометрия руин"}
+          ],
+          "note": "SM_Env_S_Fort 1 892 tris, слот MI_Env_S_Fort."
+        },
+        {
+          "layer": "ue-editor-import /Game/EnvMaps/Sarpedon/Scene (режим conceptPaste lit3d)",
+          "stage": "ue-editor-frames",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "tools/art/concept_scene/ue_import_concept_scene.py", "root": "repo", "kind": "file", "expect": "exists", "role": "импорт мешей и текстур сцены Sarpedon (--check)"},
+            {"path": "tools/art/concept_scene/ue_scene_material.py", "root": "repo", "kind": "file", "expect": "exists", "role": "материалы M_EnvScene / MI_Env_S_*"},
+            {"path": "/Game/EnvMaps/Sarpedon/Scene/SM_Env_S_Fort", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "меш форта"},
+            {"path": "/Game/EnvMaps/Sarpedon/Scene/MI_Env_S_Fort", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "MI форта"}
+          ],
+          "note": "Огонь форта — слоёный Stylish Fire (P9 F5), без собственного света; точка огня в бюджете lit3d."
+        },
+        {
+          "layer": "live-packaged P8/P9 (Sarpedon, conceptPaste mode lit3d)",
+          "stage": "live-packaged-probe",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "docs/game-design/evidence/ENV-MAPS/p8-3d-under-paint-2026-10-02/packaged-sarpedon/cmdline.txt", "root": "repo", "kind": "file", "expect": "exists", "role": "P8: packaged -Bench Sarpedon"},
+            {"path": "docs/game-design/evidence/ENV-MAPS/p8-3d-under-paint-2026-10-02/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P8: интеграция, гейты G1–G10, решение P8.5"}
+          ],
+          "note": "Руины форта — в составе сцены P8/P9; ΔE76 пятна форта к концепту на C0 10,9 (G4, P8)."
+        }
+      ],
+      "manifest06": {"verificationStatusIn06": "нет строки", "drift": "В 06 нет строки: ассеты окружения оригинальных карт появились в треке ENV-MAPS (поправка D-03, 2026-09-30); сцена Sarpedon P7–P9 — после решения пользователя ENV-U15.", "proposedChange": "Предложено: строки 06 для окружения оригинальных карт — после художественной приёмки GD-058."},
+      "nextStep": "Художественное решение по Sarpedon: lit3d (по умолчанию с P8, профиль rev 18+) / вклейка P7c (`\"mode\": \"paste\"`) / P5c (`\"default\": \"off\"`) — одна строка профиля. Если путь 1 не поможет — обычная 3D-сцена (слово пользователя, ENV-U15). Яркость и ветер — строки Art Tuner (`materialOverrides`).",
+      "blocker": "Художественной приёмки нет: Sarpedon не принят (ENV-U15), решение по варианту lit3d / paste / p5c — за пользователем.",
+      "doneCriteria": "Гейты G1–G10 ENV-P8-3D-UNDER-PAINT-TASK.md §1 (сцена целиком).",
+      "acceptanceEvidence": [],
+      "evidence": [
+        {"path": "docs/game-design/evidence/ENV-MAPS/p8-3d-under-paint-2026-10-02/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P8: evidence"}
+      ],
+      "plannedPaths": []
+    },
+    {
+      "id": "ASSET-ENV-S-PROPS-001",
+      "name": "Пропсы сцены Sarpedon (P8/P9): частокол, сваи, знамя, тёмная полоса рамы, каскад водопада и пена",
+      "category": "modular-environment",
+      "contentKey": null,
+      "manifest06Row": null,
+      "backlog": ["ART-009"],
+      "parent": "ASSET-ENV-KIT-001",
+      "instances": 1,
+      "status": "технически импортировано",
+      "stage": "live-packaged-probe",
+      "ownership": {"existingFiles": "pipeline", "nextCandidates": "pipeline", "acceptance": "art-chat"},
+      "sourceImages": {
+        "selectionManifest": null,
+        "recommended": [],
+        "excludedCandidates": [],
+        "note": "Альбедо запечено из de-lit плиты концепта sarpedon-v2 (Codex imagegen, сдвиг 0 px; низкие частоты de-lit × детали ночной ×2-плиты) с видимостью из камеры концепта C0 и CC0-заплатками вне C0; AO и детальная нормаль по яркости. Плиты и запечённые текстуры — вне git (ENV-U3/U7)."
+      },
+      "source3d": [],
+      "layers": [
+        {
+          "layer": "blender-candidate 20261002-v1",
+          "stage": "blender-candidate",
+          "status": "измерено",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "art/pipeline-candidates/ASSET-ENV-S-PROPS-001/20261002-v1/reports/build-report.json", "root": "repo", "kind": "file", "expect": "exists", "role": "экспорт шести мешей и соответствие UM_FBX_v1"},
+            {"path": "art/pipeline-candidates/ASSET-ENV-S-PROPS-001/20261002-v1/reports/palisade-build.json", "root": "repo", "kind": "file", "expect": "exists", "role": "частокол"},
+            {"path": "art/pipeline-candidates/ASSET-ENV-S-PROPS-001/20261002-v1/reports/piles-build.json", "root": "repo", "kind": "file", "expect": "exists", "role": "сваи"},
+            {"path": "art/pipeline-candidates/ASSET-ENV-S-PROPS-001/20261002-v1/reports/banner-build.json", "root": "repo", "kind": "file", "expect": "exists", "role": "знамя"},
+            {"path": "art/pipeline-candidates/ASSET-ENV-S-PROPS-001/20261002-v1/reports/frameband-build.json", "root": "repo", "kind": "file", "expect": "exists", "role": "полоса рамы (P9 F2)"},
+            {"path": "art/pipeline-candidates/ASSET-ENV-S-PROPS-001/20261002-v1/reports/cascade-build.json", "root": "repo", "kind": "file", "expect": "exists", "role": "каскад водопада (P9 F4)"}
+          ],
+          "note": "SM_Env_S_Palisade 1 286 tris, SM_Env_S_Piles 3 484, SM_Env_S_Banner 828, SM_Env_S_FrameBand 3 520 (P9 F2: тёмная тяжёлая полоса с железными уголками и стяжками вместо светлой «плиты»), SM_Env_S_Cascade 2 800 + SM_Env_S_CascadeFoam 320 (P9 F4: многоярусный каскад по уступам скалы, пена и туман)."
+        },
+        {
+          "layer": "ue-editor-import /Game/EnvMaps/Sarpedon/Scene (режим conceptPaste lit3d)",
+          "stage": "ue-editor-frames",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "tools/art/concept_scene/ue_import_concept_scene.py", "root": "repo", "kind": "file", "expect": "exists", "role": "импорт мешей и текстур сцены Sarpedon (--check)"},
+            {"path": "tools/art/concept_scene/ue_scene_material.py", "root": "repo", "kind": "file", "expect": "exists", "role": "материалы M_EnvScene / MI_Env_S_*"},
+            {"path": "/Game/EnvMaps/Sarpedon/Scene/SM_Env_S_Palisade", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "частокол"},
+            {"path": "/Game/EnvMaps/Sarpedon/Scene/SM_Env_S_Piles", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "сваи"},
+            {"path": "/Game/EnvMaps/Sarpedon/Scene/SM_Env_S_Banner", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "знамя"},
+            {"path": "/Game/EnvMaps/Sarpedon/Scene/SM_Env_S_FrameBand", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "полоса рамы"},
+            {"path": "/Game/EnvMaps/Sarpedon/Scene/SM_Env_S_Cascade", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "каскад водопада"},
+            {"path": "/Game/EnvMaps/Sarpedon/Scene/SM_Env_S_CascadeFoam", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "пена каскада"},
+            {"path": "/Game/EnvMaps/Sarpedon/Scene/MI_EnvScene_FrameIron", "root": "repo", "kind": "ue-asset", "expect": "exists", "role": "железо рамы"}
+          ],
+          "note": "Ветер знамени и листвы — WPO (P9 F6: живые кроны 0,16 % → 14 %); ветер и яркость рамы — строки Art Tuner (materialOverrides)."
+        },
+        {
+          "layer": "live-packaged P8/P9 (Sarpedon, conceptPaste mode lit3d)",
+          "stage": "live-packaged-probe",
+          "status": "технически импортировано",
+          "owner": "pipeline",
+          "paths": [
+            {"path": "docs/game-design/evidence/ENV-MAPS/p8-3d-under-paint-2026-10-02/packaged-sarpedon/cmdline.txt", "root": "repo", "kind": "file", "expect": "exists", "role": "P8: packaged -Bench Sarpedon"},
+            {"path": "docs/game-design/evidence/ENV-MAPS/p8-3d-under-paint-2026-10-02/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P8: интеграция, гейты G1–G10, решение P8.5"},
+            {"path": "docs/game-design/evidence/ENV-MAPS/p9-fixes-hero-light-2026-10-02/packaged-sarpedon/cmdline.txt", "root": "repo", "kind": "file", "expect": "exists", "role": "P9: packaged -Bench Sarpedon"},
+            {"path": "docs/game-design/evidence/ENV-MAPS/p9-fixes-hero-light-2026-10-02/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P9: F2–F4, F6"}
+          ],
+          "note": "P9: F2 рама ΔE 1,3 — PASS; водопад во всю ширину (100 %) и в движении (42–48 %), но всё ещё читается прямоугольным блоком (художественно — открыто); знамя в live 4,4 % < 5 % (P8 5,75)."
+        }
+      ],
+      "manifest06": {"verificationStatusIn06": "нет строки", "drift": "В 06 нет строки: ассеты окружения оригинальных карт появились в треке ENV-MAPS (поправка D-03, 2026-09-30); сцена Sarpedon P7–P9 — после решения пользователя ENV-U15.", "proposedChange": "Предложено: строки 06 для окружения оригинальных карт — после художественной приёмки GD-058."},
+      "nextStep": "Художественное решение по Sarpedon: lit3d (по умолчанию с P8, профиль rev 18+) / вклейка P7c (`\"mode\": \"paste\"`) / P5c (`\"default\": \"off\"`) — одна строка профиля. Если путь 1 не поможет — обычная 3D-сцена (слово пользователя, ENV-U15). Яркость и ветер — строки Art Tuner (`materialOverrides`).",
+      "blocker": "Художественной приёмки нет: Sarpedon не принят (ENV-U15), решение по варианту lit3d / paste / p5c — за пользователем.",
+      "doneCriteria": "P9: рама ΔE ≤ порога, водопад во всю ширину и в движении, листва ≥ 5 % живых пикселей.",
+      "acceptanceEvidence": [],
+      "evidence": [
+        {"path": "docs/game-design/evidence/ENV-MAPS/p9-fixes-hero-light-2026-10-02/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P9: evidence"},
+        {"path": "docs/game-design/evidence/ENV-MAPS/p8-3d-under-paint-2026-10-02/README.md", "root": "repo", "kind": "file", "expect": "exists", "role": "P8: evidence"}
       ],
       "plannedPaths": []
     }
