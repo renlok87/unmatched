@@ -44,6 +44,16 @@ struct UNMATCHED_API FS08ArtHudFontToken {
   FSlateFontInfo Resolve() const;
 };
 
+/** HI-07 (HUD-AND-ICONS.md; hud-style-tokens font.card, decided 2026-10-03): numbers and short labels of icons
+ *  (+N BOOST, turn order, threat count, hint rank), the step badge, the maneuver panel title use Roboto Bold
+ *  Condensed = the "BoldCondensed" typeface of the core Slate default font (Engine/Content/Slate/Fonts, staged in
+ *  the client pak; Apache 2.0, Licenses/THIRD_PARTY_NOTICES.txt). No project UFont: the engine UFont
+ *  /Engine/EngineFonts/Roboto lacks this face, the Slate default font (FCoreStyle) has it. */
+namespace S08ArtHudFonts {
+inline const TCHAR* const CardTypeface = TEXT("BoldCondensed");
+inline FS08ArtHudFontToken Card(int32 Size) { return FS08ArtHudFontToken(CardTypeface, Size); }
+}  // namespace S08ArtHudFonts
+
 /** Plate (name / HP / statuses) tokens. */
 USTRUCT(BlueprintType)
 struct UNMATCHED_API FS08ArtHudPlateStyle {

@@ -20,9 +20,14 @@
 #include "Components/TextBlock.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
+#include "Fonts/CompositeFont.h"
+#include "Fonts/FontMeasure.h"
+#include "Framework/Application/SlateApplication.h"
 #include "Internationalization/Regex.h"
 #include "Layout/ArrangedChildren.h"
 #include "Misc/AutomationTest.h"
+#include "Misc/Paths.h"
+#include "Rendering/SlateRenderer.h"
 #include "Widgets/SWidget.h"
 
 namespace {
@@ -141,6 +146,37 @@ bool FS08ArtHudUmgTokensTest::RunTest(const FString&) {
   TestEqual("name typeface", Name.TypefaceFontName, FName(TEXT("Bold")));
   TestTrue("default composite font (the Slate plate font)", Name.GetCompositeFont() != nullptr);
   TestEqual("status font Regular 8", Style.StatusFont.Resolve().Size, 8.0f);
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08ArtHudUmgCardFontTest,
+    "Unmatched.S08.ArtHudUmg.CardFont font.card resolves to Roboto Bold Condensed of the Slate default font (HI-07)",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08ArtHudUmgCardFontTest::RunTest(const FString&) {
+  const FSlateFontInfo Card = S08ArtHudFonts::Card(14).Resolve();
+  TestEqual("typeface", Card.TypefaceFontName, FName(TEXT("BoldCondensed")));
+  TestEqual("size", Card.Size, 14.0f);
+  const FCompositeFont* Composite = Card.GetCompositeFont();
+  if (!TestNotNull("default composite font", Composite)) return false;
+  const FTypefaceEntry* Entry = Composite->DefaultTypeface.Fonts.FindByPredicate(
+      [](const FTypefaceEntry& E) { return E.Name == FName(TEXT("BoldCondensed")); });
+  if (!TestNotNull("BoldCondensed entry in the default typeface", Entry)) return false;
+  const FString File = Entry->Font.GetFontFilename();
+  TestTrue(FString::Printf(TEXT("face file %s"), *File), File.EndsWith(TEXT("Roboto-BoldCondensed.ttf")));
+  TestTrue("face file exists", FPaths::FileExists(File));
+  if (FSlateApplication::IsInitialized()) {
+    // The face really resolves: Slate falls back to the first entry (Regular) for an unknown typeface, and the
+    // condensed face sets the same digits and Cyrillic narrower than Bold.
+    const TSharedRef<FSlateFontMeasure> Measure = FSlateApplication::Get().GetRenderer()->GetFontMeasureService();
+    const FString Sample = TEXT("+3 12/14 № Жизни");
+    const float Condensed = Measure->Measure(Sample, Card).X;
+    const float Bold = Measure->Measure(Sample, FS08ArtHudFontToken(TEXT("Bold"), 14).Resolve()).X;
+    AddInfo(FString::Printf(TEXT("width condensed %.1f, bold %.1f"), Condensed, Bold));
+    TestTrue("measured", Condensed > 0.0f);
+    TestTrue("narrower than Bold", Condensed < Bold * 0.95f);
+  } else {
+    AddInfo(TEXT("no Slate application: width check skipped"));
+  }
   return true;
 }
 

@@ -2138,7 +2138,7 @@
     },
     {
       "id": "HUD-FONT",
-      "title": "Шрифт клиента вместо Bahnschrift: Roboto Bold Condensed из движка UE 5.8 (Apache 2.0, кириллица)",
+      "title": "Шрифт клиента вместо Bahnschrift: Roboto Bold Condensed из движка UE 5.8 (Apache 2.0, кириллица), в UE — токен font.card",
       "track": "art",
       "source": "hud-1003",
       "status": "done",
@@ -2146,13 +2146,16 @@
       "evidence": [
         "docs/unreal/contracts/hud/hud-style-tokens.json",
         "docs/unreal/contracts/hud/HUD-AND-ICONS.md",
-        "docs/game-design/17-art-production-spec.md"
+        "docs/game-design/17-art-production-spec.md",
+        "unreal/Unmatched/Source/Unmatched/S08/S08ArtHudStyle.h",
+        "unreal/Unmatched/Source/Unmatched/S08/S08ArtHudUmgTests.cpp",
+        "unreal/Unmatched/Licenses/THIRD_PARTY_NOTICES.txt"
       ],
-      "next": "В UE: UFontFace из Engine/Content/Slate/Fonts/Roboto-BoldCondensed.ttf, composite font RU/EN, текст лицензии в third-party notices (HI-07).",
+      "next": "Применить S08ArtHudFonts::Card в новых виджетах (бейджи L6, бейдж шагов, панель манёвра — MS-T); THIRD_PARTY_NOTICES.txt попадёт в клиент со следующей упаковкой.",
       "blocker": null,
       "assets": [],
       "updated": "2026-10-03T12:14:00Z",
-      "note": "Решение по делегированию пользователя («Бери любой, который посчитаешь оптимальным»): статический, вес 700, ширина 3, кириллица 96/96 и «», №, —, −, ×. Bahnschrift отклонён (fsType 8, переменный шрифт — Slate осями не управляет). Закрывает AD-OPEN-24 для HUD (17 §AD-OPEN-24, токен font.card)."
+      "note": "2026-10-03 HI-07 в UE: S08ArtHudFonts::Card(size) = начертание BoldCondensed дефолтного шрифта Slate (.ttf уже в паке клиента), тест Unmatched.S08.ArtHudUmg.CardFont (17/17 вместе с IconMotion); отдельный UFontFace не нужен; лицензия Apache 2.0 — Licenses/THIRD_PARTY_NOTICES.txt (Build.cs NonUFS)."
     },
     {
       "id": "ICON-MOTION",

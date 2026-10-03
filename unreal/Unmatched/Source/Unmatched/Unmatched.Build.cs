@@ -51,5 +51,8 @@ public class Unmatched : ModuleRules {
     // HUD icon motion v3 (S08IconMotion.h): the animation contract, a copy of
     // docs/unreal/contracts/hud/icon-motion.json written by motion_contract.py.
     RuntimeDependencies.Add("$(ProjectDir)/Config/S08IconMotion.json", StagedFileType.UFS);
+    // HI-07 and docs/game-design/18 (THIRD_PARTY_NOTICES registry): the notices and license texts of the
+    // third-party components the client ships (Roboto, Apache 2.0) - a loose file next to the game, not in the pak.
+    RuntimeDependencies.Add("$(ProjectDir)/Licenses/THIRD_PARTY_NOTICES.txt", StagedFileType.NonUFS);
   }
 }
