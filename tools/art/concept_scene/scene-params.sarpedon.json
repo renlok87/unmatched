@@ -173,6 +173,11 @@
   "offsetUU": {"lip": 14.0, "land": 6.0, "sea": 16.0}, "ledgeLiftUU": 3.0,
   "steepSegments": [0, 3, 5, 7], "subDrop": 7, "subLedge": 2, "fallPower": 1.7, "bowFrac": 0.16,
   "seaLiftUU": 1.0, "foamLiftUU": 1.2, "foamDepthUU": {"ledge": 26.0, "sea": 60.0}, "foamBackUU": 6.0, "foamWiden": 1.25,
+  "rag": {"notches": [[-229.0, 17.0, 9.0], [-152.0, 14.0, 8.0], [-80.0, 18.0, 10.0], [-6.0, 15.0, 8.0]],
+          "noiseUU": 4.0, "noiseScaleUU": 11.0, "seed": 10301},
+  "phase": {"streamsV": [0.0, 0.2, 0.07, 0.27], "noise": 0.1, "noiseScaleUU": 24.0, "seed": 10311},
+  "foamJitter": {"depthFrac": [0.45, 1.0], "innerUU": 4.0, "scaleUU": 16.0, "seed": 10321},
+  "noteP10": "P10 (RD-3 V-1, the K1 'box' at the bottom edge): rag = a torn top - Gaussian notches [x, depth, half-width] (the rock teeth of the outlet, <= 18 + 4 uu: the top -> lip drop stays >= 5 uu) + 0..noiseUU value noise under the beam, so the water's top edge is no straight line; phase = per stream tier offsets (fraction of a tier ~ 0..20 uu) + noise, so the lip foam / streak bands of the four streams do not line up; foamJitter = torn foam pads (depth x 0.45..1, inner edge +- 4 uu) instead of one straight white strip per ledge",
   "note": "P9 F4: the painted multi-tier cascade (C0 x ~640-1001, sarpedon.paste.json overlays.waterfall) = 4 streams over the island's front cliff in the nearLip outlet (X -270..42): from under the near beam (frameBand faceYUU / faceBottomZ) over the cliff rings (lip offset 14 > rockDispUU 11, ledges lifted 3) with every drop bowed outward (bowFrac x drop), cut at the sea plane; foam pads on the 3 ledges + a wider one on the sea (mist / spray anchors = the tier landings of reports/cascade-build.json). P9 tune i1 (UE frames: four rectangular panels with straight rock gaps read boxy): the streams overlap by 8 uu and uvPerStream gives each stream its own u 0..1, so M_EnvWaterfall's wobbling side fades soften every stream side (FallCard.x = the mean stream width)"
  },
  "banner": {
@@ -209,17 +214,18 @@
    "note": "on the cliff ledges (island_build profile rings 2 / 3 / 5 / 7) of the sides seen from the board cameras (outward normal +Y, west, or east south of the centre), every ~120 uu of rim, not in the waterfall; extraPx = the painted bay rocks"
   },
   "props": [
-   {"id": "crate-deck-n", "kit": "CrateStack", "footPx": [1580, 420], "heightPx": 75, "yawDeg": 140.1, "scaleRange": [0.6, 3.0]},
-   {"id": "crate-deck-mid", "kit": "CrateStack", "footPx": [1742, 640], "heightPx": 95, "yawDeg": 140.1, "scaleRange": [0.6, 3.0]},
-   {"id": "crate-deck-se", "kit": "CrateStack", "footPx": [1725, 765], "heightPx": 110, "yawDeg": 128.0, "scaleRange": [0.6, 3.0]},
-   {"id": "barrel-dock-1", "kit": "Barrel", "footPx": [1660, 500], "heightPx": 75, "scaleRange": [0.6, 3.0]},
-   {"id": "barrel-dock-2", "kit": "Barrel", "footPx": [1785, 690], "heightPx": 85, "scaleRange": [0.6, 3.0]},
+   {"id": "crate-deck-n", "kit": "CrateStack", "footPx": [1580, 420], "heightPx": 75, "yawDeg": 140.1, "scaleRange": [0.6, 2.3]},
+   {"id": "crate-deck-mid", "kit": "CrateStack", "footPx": [1742, 640], "heightPx": 95, "yawDeg": 140.1, "scaleRange": [0.6, 2.3]},
+   {"id": "crate-deck-se", "kit": "CrateStack", "footPx": [1725, 765], "heightPx": 110, "yawDeg": 128.0, "scaleRange": [0.6, 2.3]},
+   {"id": "barrel-dock-1", "kit": "Barrel", "footPx": [1660, 500], "heightPx": 75, "scaleRange": [0.6, 2.3]},
+   {"id": "barrel-dock-2", "kit": "Barrel", "footPx": [1785, 690], "heightPx": 85, "scaleRange": [0.6, 2.3]},
    {"id": "coil-dock", "kit": "Rope", "footPx": [1638, 800], "heightPx": 45, "scaleRange": [0.8, 3.5]},
    {"id": "crate-ne", "kit": "CrateStack", "footPx": [1312, 262], "heightPx": 38, "yawDeg": 100.0, "scaleRange": [0.5, 3.0]},
    {"id": "barrel-beach", "kit": "Barrel", "footPx": [867, 205], "heightPx": 30, "scaleRange": [0.5, 3.0]},
    {"id": "barrel-fort", "kit": "Barrel", "footPx": [546, 170], "heightPx": 30, "scaleRange": [0.5, 3.0]}
   ],
   "propsNote": "P9 F1: the dock props re-read on sarpedon-v2 with a 2x C0 grid (P8: coil-dock at y 885 lay on the rocks, barrel-dock-2 at the painted sack); crate-deck-mid = the crate under cannon 3; yaw 140.1 = the hull's outward normal (crates square to the hull side); propClearance moves a prop towards the board when its footprint would cut into the hull side / the frame band",
+  "propsNoteP10": "P10 (RD-3 V-3): the dock crates / barrels (crate-deck-n / -mid / -se, barrel-dock-1 / -2) read larger than the painted ones at C0 (their scale hit the 3.0 cap): cap 2.3 (a 1.8 cap was probed: ship SSIM unchanged, the hull-red patch dE 5.5 -> 6.5); the port cannons: details.cannonScaleMul / cannonOutUU / cannonYawOffsetDeg (scene_layout.py, about the painted muzzle)",
   "propClearance": {"bandUU": 2.0, "hullUU": 6.5},
   "shipDeckProps": [
    {"id": "barrel-ship-1", "kit": "Barrel", "centrePx": [1585, 45], "heightPx": 60, "yawDeg": 20.0, "scaleRange": [0.6, 3.0]},
@@ -238,7 +244,8 @@
    "lanternSizeMul": 2.1,
    "lanternMaterial": "MI_EnvScene_LanternHead",
    "lanternNote": "x1.2 the P7c sizeMul 1.75 (task: 6 lanterns at x1.2 the P7c size, G6 glass glow >= 80 % of the painted area); the glow point on the painted lantern pixel's ray, in front of its real host",
-   "cannonSizeMul": 1.35,
+   "cannonSizeMul": 1.35, "cannonYawOffsetDeg": 0.0, "cannonScaleMul": 1.25, "cannonOutUU": 6.0,
+   "cannonNoteP10": "P10 (RD-3 V-3): the barrels read muzzle-on and black (only 8 x scale + 2 uu of bare barrel out of the port): x1.25 about the painted muzzle (it stays on its pixel) and 6 uu further out along the axis, with the lighter iron of MI_EnvCP_CannonIron; turning them to the painted direction (yaw offset +12 .. +25 about the muzzle, probed) pushes the carriage wheels through the hull side next to the port, so the yaw stays the hull normal (offset 0)",
    "cannonNote": "P9 F1: in the ship's gun ports (ship_build.py ports: barrel axis point = the painted cannon pixel on the plane 6 uu outside the hull side, yaw = the hull's outward normal)",
    "bannerOutUU": 8.0, "bannerLengthUU": 320.0,
    "bannerNote": "P9 F1: flat against the procedural hull side (yaw = its outward normal), 8 uu outside it (clear of the 4 uu wales), the painted top pixel on that plane (P8 floated it 290 uu toward C0 in front of the Poly Haven hull's flare)",

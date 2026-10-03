@@ -144,9 +144,12 @@ ENV_PROP_MASTER = KIT_ROOT + "/Shared/M_EnvProp"
 CANNON_TEXTURES = ("BaseColorTexture", "NormalTexture", "ORMTexture")
 # P7c tune (C0 crops): the painted barrels are neutral dark iron with bright rims; v1 (S x 0.15, V x 0.42, rough
 # 0.25..0.75) read dark brown under the lantern light -> grey (S x 0), a bit lighter, glossier
-CANNON_LOOK = {"vectors": {"RestAdjust": (0.0, 0.55, 0.0, 0.0)}, "scalars": {"RoughnessMin": 0.18, "RoughnessMax": 0.5}}
+# ENV-MAPS P10 (RD-3 V-3): in the lit3d ship ports the barrels still read black (ΔL* to the hull side <= 5 at C0) ->
+# lighter iron (V x 0.55 -> 1.2) and glossier (roughness 0.12..0.35: the moon / lantern highlight on the rims)
+CANNON_LOOK = {"vectors": {"RestAdjust": (0.0, 1.2, 0.0, 0.0)}, "scalars": {"RoughnessMin": 0.12, "RoughnessMax": 0.35}}
 CANNON_TAG = "EnvMapsConceptCannon"
-CANNON_VERSION = "2"
+CANNON_VERSION = "2"  # the mesh copy (unchanged since P7c)
+CANNON_MI_VERSION = "3"  # P10: the MI look alone
 LINEAR_KEYS = ("Water",)
 
 
@@ -491,7 +494,7 @@ def ensure_cannon(force: bool) -> dict:
         return {"action": "skipped", "error": f"{KIT_CANNON} or {ENV_PROP_MASTER} missing (run ue_import_env_kit.py)"}
     kit_mi = kit_mesh.get_material(0)
     mi = u.load_asset(CANNON_MI) if eal.does_asset_exist(CANNON_MI) else None
-    if mi is None or force or eal.get_metadata_tag(mi, CANNON_TAG) != CANNON_VERSION:
+    if mi is None or force or eal.get_metadata_tag(mi, CANNON_TAG) != CANNON_MI_VERSION:
         action = "updated" if mi is not None else "created"
         if mi is None:
             folder, name = CANNON_MI.rsplit("/", 1)
@@ -510,7 +513,7 @@ def ensure_cannon(force: bool) -> dict:
             mel.set_material_instance_vector_parameter_value(mi, k, u.LinearColor(*[float(x) for x in v]))
         for k, v in CANNON_LOOK["scalars"].items():
             mel.set_material_instance_scalar_parameter_value(mi, k, float(v))
-        eal.set_metadata_tag(mi, CANNON_TAG, CANNON_VERSION)
+        eal.set_metadata_tag(mi, CANNON_TAG, CANNON_MI_VERSION)
         if not eal.save_loaded_asset(mi, False):
             raise RuntimeError(f"could not save {CANNON_MI}")
         out["mi"] = {"action": action, "parent": ENV_PROP_MASTER, "kitMi": kit_mi.get_path_name() if kit_mi else None,

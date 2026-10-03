@@ -3,7 +3,7 @@
  "map": "sarpedon",
  "status": "измерено (ENV-MAPS P8.3 + P9 tune; художественная приёмка - решение пользователя)",
  "note": "Parameters only (task section 4 P8.3 item 3), read last by tools/art/concept_scene/ue_scene_material.mi_plan over the manifest / default MI values; journal C:/tmp/envmaps-research/p8/tune/log.md (out of git), evidence docs/game-design/evidence/ENV-MAPS/p8-3d-under-paint-2026-10-02/README.md. The point lights are in S08ArtBoardProfiles.json conceptPaste.lit3d.lights.",
- "iteration": "p9-i3",
+ "iteration": "p10-i2",
  "baked": {
   "*": {
    "vectors": {
@@ -32,13 +32,25 @@
   "Ship": {
    "vectors": {
     "BakedTint": [
-     1.3,
-     1.3,
-     1.3,
+     1.442,
+     1.4,
+     1.358,
      1.0
     ]
    },
-   "noteP9": "P9 F1: the ship is the only place where more albedo is wanted (the user keeps the dark overall light): 0.45 -> 0.75 (track A) -> 1.0 (p9-i1: the painted ship polygon at C0 read 1.9x darker in linear light, sRGB (25, 17, 19) vs the concept (40, 25, 22)); the rest of the environment unchanged; p9-i2 1.3 (the polygon still read dL* -3.5 at i1)"
+   "noteP9": "P9 F1: the ship is the only place where more albedo is wanted (the user keeps the dark overall light): 0.45 -> 0.75 (track A) -> 1.0 (p9-i1: the painted ship polygon at C0 read 1.9x darker in linear light, sRGB (25, 17, 19) vs the concept (40, 25, 22)); the rest of the environment unchanged; p9-i2 1.3 (the polygon still read dL* -3.5 at i1)",
+   "noteP10": "P10 (RD-3 V-4): a little more and warmer albedo on the hull (1.3 -> 1.4 x [1.03, 1, 0.97]); live tune probes of materials.Ship.gain / tint: the panel's x1.45 with [1.1, 1, 0.9] put the gates.py hull-red patch at dE76 6.6 (> 6: the painted hull side is a neutral dark red, the warm tint over-saturates it), x1.45 with [1.03, 1, 0.97] 5.8 (polygon dE 5.2 -> 4.4), x1.6 neutral 6.1"
+  },
+  "Fort": {
+   "vectors": {
+    "BakedTint": [
+     0.279,
+     0.279,
+     0.279,
+     1.0
+    ]
+   },
+   "noteP10": "P10 (RD-3 V-2): the fort wall read orange and over-lit at C0 (patch 'fort' sRGB (113, 64, 34) vs the concept (84, 48, 27), dE76 12.1, dL* +8.5); live tune probes of the Art Tuner row materials.Fort.gain: 0.75 -> dE 8.1, 0.62 -> 5.9, 0.55 -> 5.2 (dL* -0.8): 0.45 x 0.62 = 0.279 (the fort fire stays 40 cd)"
   }
  },
  "looks": {
@@ -92,8 +104,8 @@
   "FallsSheet": {
    "vectors": {
     "FallLook": [
+     0.4,
      0.5,
-     0.96,
      0.9,
      1.0
     ],
@@ -102,9 +114,45 @@
      6.0,
      30.0,
      0.12
+    ],
+    "FallShade": [
+     0.08,
+     0.25,
+     0.55,
+     2.0
+    ],
+    "WaterFoam": [
+     0.66,
+     0.72,
+     0.8,
+     0.65
     ]
    },
-   "note": "P9 F4 p9-i1: body opacity 0.62 -> 0.5 (the rocks show through; the cascade read brighter and bluer than the painted one: mean sRGB (83, 97, 125) vs (44, 61, 86)); p9-i3: side fade 18 -> 30 uu, wobble 0.9 (with uvPerStream every stream gets a soft wobbling side: separate curtains instead of one rectangular sheet)"
+   "note": "P9 F4 p9-i1: body opacity 0.62 -> 0.5 (the rocks show through; the cascade read brighter and bluer than the painted one: mean sRGB (83, 97, 125) vs (44, 61, 86)); p9-i3: side fade 18 -> 30 uu, wobble 0.9 (with uvPerStream every stream gets a soft wobbling side: separate curtains instead of one rectangular sheet)",
+   "noteP10": "P10 (RD-3 V-1, i1): the cascade read as a pale blue sheet (C0 body (660-980, 870-1000) sRGB (66, 72, 87) vs the painted (38, 50, 67), dE76 10.9, dL* +10.4) with a straight bright lip under the beam: body opacity 0.5 -> 0.4, foam opacity 0.96 -> 0.5, the parent's emissive lift FallShade.w 4 -> 2 (the night falls glowed), foam amount 0.85 -> 0.65 with a slightly bluer foam"
+  },
+  "FallsFoam": {
+   "vectors": {
+    "FallLook": [
+     0.5,
+     0.5,
+     0.9,
+     1.0
+    ],
+    "FallShade": [
+     0.08,
+     0.25,
+     0.55,
+     2.0
+    ],
+    "WaterFoam": [
+     0.7,
+     0.76,
+     0.83,
+     0.8
+    ]
+   },
+   "noteP10": "P10 (RD-3 V-1, i1): the white foam pads on the ledges read as straight opaque strips: opacity 0.85 / 1.0 -> 0.5 / 0.5 (still above the sheet's 0.4), emissive lift 4 -> 2, foam 0.8 x (0.70, 0.76, 0.83)"
   }
  }
 }

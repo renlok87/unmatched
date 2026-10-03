@@ -394,6 +394,19 @@ def build(base: dict, meshes: dict):
         P = np.array(pt["axisPoint"], float)
         s = float(pt["scale"])
         yaw = float(pt["yawDeg"])
+        # P10 (RD-3 V-3): the barrels turned from the hull's outward normal towards the painted direction (P7 measured
+        # yaw 158 on the concept crop) about the painted muzzle (it stays on its pixel), scaled about it, and pushed
+        # out along the new axis (more bare barrel out of the port), so they read in profile instead of muzzle-on
+        off = float(D.get("cannonYawOffsetDeg", 0.0))
+        k = float(D.get("cannonScaleMul", 1.0))
+        out = float(D.get("cannonOutUU", 0.0))
+        if off or k != 1.0 or out:
+            M = np.array(pt["muzzle"], float)
+            reach = float(np.linalg.norm((M - P)[:2])) / s  # kit uu from the axis point to the muzzle (along +X)
+            yaw += off
+            s *= k
+            d = np.array([math.cos(math.radians(yaw)), math.sin(math.radians(yaw)), 0.0])
+            P = M + d * (out - reach * s)
         loc = P - rot_yaw(axis * s, yaw)
         add.append({"id": cid, "mesh": "/Game/EnvKit/ConceptPaste/SM_EnvCP_Cannon", "loc": [r2(v) for v in loc],
                     "yawDeg": yaw, "scale": round(s, 3), "castShadow": True})

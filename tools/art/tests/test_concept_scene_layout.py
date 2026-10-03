@@ -108,19 +108,32 @@ class P9Placements(unittest.TestCase):
     def test_cannons_in_the_ports(self):
         ports = {p["cannon"]: p for p in self.ship["info"]["ports"]}
         km = SB.kit_metrics()
+        D = self.allp["layout"]["details"]
+        # P10 (RD-3 V-3): the barrels may be scaled / turned about the painted muzzle and pushed out along their axis
+        off, k, out = (float(D.get(n, dv)) for n, dv in (("cannonYawOffsetDeg", 0.0), ("cannonScaleMul", 1.0),
+                                                          ("cannonOutUU", 0.0)))
         for cid, pt in ports.items():
             p = self.add[cid]
-            self.assertAlmostEqual(p["yawDeg"], pt["yawDeg"], places=2)
-            self.assertAlmostEqual(p["scale"], pt["scale"], places=3)
+            self.assertAlmostEqual(p["yawDeg"], pt["yawDeg"] + off, places=2)
+            self.assertAlmostEqual(p["scale"], round(pt["scale"] * k, 3), places=3)
             a = np.radians(p["yawDeg"])
             R = np.array([[np.cos(a), -np.sin(a), 0.0], [np.sin(a), np.cos(a), 0.0], [0.0, 0.0, 1.0]])
             axis = R @ (np.array(km["axis"]) * p["scale"]) + np.array(p["loc"])
-            self.assertLess(float(np.linalg.norm(axis - np.array(pt["axisPoint"]))), 0.05, cid)
             muzzle = axis + R @ np.array([km["muzzleX"] * p["scale"], 0.0, 0.0])
+            want = np.array(pt["muzzle"], float) + out * np.array([np.cos(a), np.sin(a), 0.0])
+            self.assertLess(float(np.linalg.norm(muzzle - want)), 0.05, f"{cid}: the muzzle on the painted pixel (+ out)")
+            if not off and k == 1.0 and not out:
+                self.assertLess(float(np.linalg.norm(axis - np.array(pt["axisPoint"]))), 0.05, cid)
             d = self.wall.sdz(muzzle)[1]
-            self.assertAlmostEqual(d, -pt["protrusionUU"], delta=0.05, msg=f"{cid}: only the bare barrel leaves the hull")
+            self.assertAlmostEqual(d, -(pt["protrusionUU"] + out * np.cos(np.radians(off))), delta=0.05,
+                                   msg=f"{cid}: the bare barrel (+ out) leaves the hull")
+            # the carriage front (the bare barrel behind the muzzle) stays within the port frame (P9: muzzleClearUU out)
+            P = self.allp["ship"]["ports"]
+            carriage_out = -d - P["barrelOnlyUU"] * p["scale"] * np.cos(np.radians(off))
+            self.assertLessEqual(carriage_out, P["muzzleClearUU"] + P["frameUU"] + 1e-6, f"{cid}: carriage out of the port")
             s, _, z = self.wall.sdz(muzzle)
-            self.assertLess(abs(s - pt["s"]) + abs(z - pt["z"]), 0.1, f"{cid}: through the port centre")
+            self.assertLess(abs(s - pt["s"]) + abs(z - pt["z"]), 0.1 + abs(out * np.sin(np.radians(off))),
+                            f"{cid}: through the port centre")
 
     def test_dock_props_clear_of_band_and_hull(self):
         ext = FBB.outer_extents(self.allp["frameBand"])

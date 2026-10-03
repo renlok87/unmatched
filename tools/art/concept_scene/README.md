@@ -92,3 +92,17 @@ Status: *proposed / technically exported / measured on the plate at C0* (no UE r
   corners, between streams on tiers 2 / 3, its lower sides, the sea foot).
 - `scene-tune.sarpedon.json`: Ship `BakedTint` 1.3; `materials` FrameWood `BakedTint` (0.63, 0.48, 0.42) (the band read
   dL* -6.4 under the painted frame), FrameIron 1.3, FallsSheet `FallLook` (0.5, 0.96, 0.9, 1) / `FallFlow` side 30 uu.
+
+## P10 (2026-10-03, RD-3 rework; evidence `docs/game-design/evidence/ENV-MAPS/p10-sarpedon-rework-2026-10-03/`)
+
+- `cascade.rag` (cascade_build.py `ragged_top_dip`): the water's top under the beam is torn - Gaussian notches
+  `[x, depth, half-width]` + positive value noise, so the K1 bottom edge has no straight bright line.
+- `cascade.phase` (`column_phase` -> `ribbon(phase=...)`): per stream tier offsets + noise; v -> phase + (1 - phase) v,
+  so the lip foam / streak bands of the four streams do not line up.
+- `cascade.foamJitter`: torn foam pads (per column depth x 0.45..1, inner edge +- 4 uu).
+- `layout.details.cannonScaleMul / cannonOutUU / cannonYawOffsetDeg` (scene_layout.py): the port cannons scaled /
+  turned about the painted muzzle and pushed out along their axis (the carriage stays within the port frame:
+  test_concept_scene_layout `test_cannons_in_the_ports`); dock crates / barrels capped at scale 2.3.
+- `scene-tune.sarpedon.json` (MIs, ue_scene_material.py): Fort `BakedTint` 0.279, Ship 1.4 x [1.03, 1, 0.97], FallsSheet
+  / FallsFoam opacity, foam and the emissive lift (`FallShade.w` 4 -> 2). The cannon iron: `ue_import_concept_paste.py`
+  `CANNON_LOOK` (`CANNON_MI_VERSION` 3).

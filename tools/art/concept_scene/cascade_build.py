@@ -127,15 +127,45 @@ def column_path(ring_pts: np.ndarray, n2: np.ndarray, P: dict, top: np.ndarray, 
     return D, landings
 
 
-def ribbon(cols: list[np.ndarray], u: np.ndarray, cuts: list[int]):
+def ragged_top_dip(P: dict, x: np.ndarray) -> np.ndarray:
+    """P10 (RD-3 V-1): how far (uu, >= 0) each column's top sits under the default top (beam bottom - topBelowBeamUU):
+    Gaussian notches [x, depth, half-width] (the rock teeth of a torn outlet) + positive value noise, so the water's
+    top edge is no straight line under the beam. No "rag" block: 0 (the P9 straight top)."""
+    R = P.get("rag")
+    x = np.asarray(x, float)
+    if not R:
+        return np.zeros_like(x)
+    d = np.zeros_like(x)
+    for cx, depth, hw in R.get("notches", []):
+        d = np.maximum(d, float(depth) * np.exp(-0.5 * ((x - float(cx)) / float(hw)) ** 2))
+    n = CS.value_noise(x, np.zeros_like(x), float(R.get("noiseScaleUU", 20.0)), int(R.get("seed", 1)))
+    return d + float(R.get("noiseUU", 0.0)) * (0.5 * n + 0.5)
+
+
+def column_phase(P: dict, si: int, x: np.ndarray) -> np.ndarray:
+    """P10 (RD-3 V-1): the tier phase of every column (0 .. <1, a fraction of the tier): per stream a base offset +
+    value noise; ribbon() maps v -> phase + (1 - phase) v, so the lip foam / streak bands of the tiers are offset per
+    stream (and wobble inside it) instead of one straight band across the cascade. No "phase" block: 0."""
+    Q = P.get("phase")
+    x = np.asarray(x, float)
+    if not Q:
+        return np.zeros_like(x)
+    base = float(Q["streamsV"][si % len(Q["streamsV"])])
+    n = CS.value_noise(x, np.zeros_like(x), float(Q.get("noiseScaleUU", 30.0)), int(Q.get("seed", 1)) + si)
+    return np.clip(base + float(Q.get("noise", 0.0)) * (0.5 * n + 0.5), 0.0, 0.45)
+
+
+def ribbon(cols: list[np.ndarray], u: np.ndarray, cuts: list[int], phase: np.ndarray | None = None):
     """Quads between consecutive column paths (truncated to the shortest), one UV island per tier: rows
     cuts[k] .. cuts[k + 1] get v = arc length from the tier's lip / the tier's length (top -> bottom, Blender v), so
     every tier has its own lip foam and its landing fade; the tier boundaries are duplicated vertices. u = the given
-    global u across the whole cascade. Returns V, F, UV, the mean tier length."""
+    global u across the whole cascade. P10: phase (per column, 0 .. <1) maps v -> phase + (1 - phase) v (the tier's
+    lip band starts lower on that column). Returns V, F, UV, the mean tier length."""
     m = len(cols)
     q = min(len(c) for c in cols)
     cols = [c[:q] for c in cols]
     cuts = [c for c in cuts if c < q - 1] + [q - 1]
+    ph = np.zeros(m) if phase is None else np.asarray(phase, float)
     Vs, F, UV, lens = [], [], [], []
     base = 0
     for k in range(len(cuts) - 1):
@@ -146,6 +176,7 @@ def ribbon(cols: list[np.ndarray], u: np.ndarray, cuts: list[int]):
         L = seg[:, -1:]
         lens.append(float(L.mean()))
         v = seg / np.maximum(L, 1e-6)
+        v = ph[:, None] + (1.0 - ph[:, None]) * v
         Vs.append(np.vstack(part))
         for i in range(m - 1):
             for j in range(rows - 1):
@@ -183,10 +214,11 @@ def build(P: dict, rimd, sea_z: float, beam: dict):
         nc = max(2, int(math.ceil((x1 - x0) / P["columnStepUU"])) + 1)
         xc = np.linspace(x0, x1, nc)
         rp, n2 = rim_columns(rimd, xc)
+        dip = ragged_top_dip(P, xc)
         cols, lands = [], []
         for c in range(nc):
-            # the top: under the near beam's bottom edge, just in front of its face
-            top = np.array([xc[c], beam["faceY"] + P["topOutUU"], beam["bottomZ"] - P["topBelowBeamUU"]])
+            # the top: under the near beam's bottom edge, just in front of its face (P10: torn, dip >= 0)
+            top = np.array([xc[c], beam["faceY"] + P["topOutUU"], beam["bottomZ"] - P["topBelowBeamUU"] - dip[c]])
             D, ld = column_path(rp[:, c, :], n2[c], P, top, sea_z)
             cols.append(D)
             lands.append(ld)
@@ -200,7 +232,7 @@ def build(P: dict, rimd, sea_z: float, beam: dict):
             X0, X1 = streams[0][0], streams[-1][1]
         u = (xc - X0) / (X1 - X0)
         cuts = [0] + sorted({lands[0][t] for t in lands[0]})
-        V, F, UV, tier_len = ribbon(cols, u, cuts)
+        V, F, UV, tier_len = ribbon(cols, u, cuts, column_phase(P, si, xc))
         L = float(np.mean(tier_len))
         # faces towards the viewer: outward (+Y mostly) and up
         F, UV = orient(V, F, UV, lambda c: np.tile(np.array([0.0, 0.8, 0.6]), (len(c), 1)))
@@ -223,8 +255,21 @@ def build(P: dict, rimd, sea_z: float, beam: dict):
             back = P["foamBackUU"]
             cen = Lp.mean(0)
             Lw = cen + (Lp - cen) * widen
-            inner = Lw - nh * back + np.array([0.0, 0.0, P["foamLiftUU"]])
-            outer = Lw + nh * depth + np.array([0.0, 0.0, P["foamLiftUU"]])
+            # P10 (RD-3 V-1): a torn foam pad - per column depth x [lo, hi] and the inner edge +- innerUU (value
+            # noise along X, a different seed per tier / stream) instead of a straight white strip per ledge
+            J = P.get("foamJitter")
+            if J:
+                xs = Lw[:, 0]
+                nd = CS.value_noise(xs, np.full_like(xs, 13.0 * t), float(J.get("scaleUU", 18.0)), int(J.get("seed", 1)) + 7 * si)
+                ni = CS.value_noise(xs, np.full_like(xs, 29.0 * t), float(J.get("scaleUU", 18.0)), int(J.get("seed", 1)) + 7 * si + 3)
+                lo, hi = (float(v) for v in J.get("depthFrac", (1.0, 1.0)))
+                dcol = depth * (lo + (hi - lo) * (0.5 * nd + 0.5))
+                icol = back + float(J.get("innerUU", 0.0)) * ni
+            else:
+                dcol = np.full(nc, float(depth))
+                icol = np.full(nc, float(back))
+            inner = Lw - nh * icol[:, None] + np.array([0.0, 0.0, P["foamLiftUU"]])
+            outer = Lw + nh * dcol[:, None] + np.array([0.0, 0.0, P["foamLiftUU"]])
             if sea:
                 inner[:, 2] = outer[:, 2] = sea_z + P["seaLiftUU"] + P["foamLiftUU"]
             else:
