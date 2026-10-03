@@ -1,7 +1,7 @@
 {
   "schema": "unmatched-plan-status/v1",
-  "generated": "2026-10-03T02:45:00Z",
-  "head": "747e98d5fe4277b67e56354bea2f6f58687e3753",
+  "generated": "2026-10-03T12:14:00Z",
+  "head": "11d4947ef8f64e7677fbb7b55a4bbae6ed438e74",
   "sources": [
     {
       "id": "handover",
@@ -67,6 +67,26 @@
       "id": "scratch",
       "path": "docs/art-pipeline/SCRATCH-MODEL-PIPELINE.md",
       "title": "Путь B: модель с нуля в Blender по 2D-пакету Codex (spec.json, сетка, HANDOFF), пилот Merlin"
+    },
+    {
+      "id": "hud-1003",
+      "path": "docs/unreal/contracts/hud/HUD-AND-ICONS.md",
+      "title": "HUD и значки: архитектура, реестр 99 + 15 значков, правила И-1..И-10 (v3 — STYLE-v3 §8), задачи HI/HD"
+    },
+    {
+      "id": "icon-motion",
+      "path": "docs/unreal/contracts/hud/ICON-MOTION-PLAN.md",
+      "title": "Анимация значков HUD v3: план, фазы A–G, статус"
+    },
+    {
+      "id": "move-selection",
+      "path": "docs/game-design/move-selection/README.md",
+      "title": "Подбор хода: исследование, план реализации v2, UX, техдизайн, макеты на реальных данных"
+    },
+    {
+      "id": "git-1003b",
+      "path": "git log 747e98d5..11d4947e",
+      "title": "коммиты 2026-10-03: Art Tuner (живая дуэль), подбор хода, эталонная БД стендов, HUD и значки v3, анимация значков"
     }
   ],
   "tasks": [
@@ -1587,8 +1607,8 @@
         "ASSET-MAP-FRAME-002",
         "ASSET-ENV-KIT-001"
       ],
-      "updated": "2026-10-03T02:45:00Z",
-      "note": "Срез 2026-10-03: vitest admin/art-hub 3 файла, 102/102; art-hub:snapshot — 4 персонажа, 23 пропса/окружения (было 18), 63 прогона (P7/P8 теперь в реестре), 0 предупреждений; план — 88 задач, 23 волны; validate_registry PASS (33 записи, 1096 путей, 0 пропущено)."
+      "updated": "2026-10-03T12:14:00Z",
+      "note": "Срез 2026-10-03: vitest admin/art-hub 3 файла, 102/102; art-hub:snapshot — 4 персонажа, 23 пропса/окружения (было 18), 63 прогона (P7/P8 теперь в реестре), 0 предупреждений; план — 88 задач, 23 волны; validate_registry PASS (33 записи, 1096 путей, 0 пропущено). Срез 2026-10-03 (второй, HEAD 11d4947e): в план — волна HUD-V3 и задачи HUD-DOC, HUD-ICONS-V3, HUD-FONT, ICON-MOTION, MOVE-SEL-PLAN, DB-STANDS; агрегатор не менялся. Факт: art-hub:snapshot — 4 персонажа, 23 пропса/окружения, 63 прогона, 0 предупреждений; план — 94 задачи, 24 волны, 0 предупреждений, все доказательства на месте; vitest admin/art-hub 102/102, typecheck:art-hub OK. Значки HUD в реестр ассетов не входят (excludedFromRegistry: UI-* — 2D UI-семейства, ART-011)."
     },
     {
       "id": "W7-FIX",
@@ -1627,7 +1647,8 @@
       "next": "Обновлять при каждой интеграции волны. Срез 2026-10-03 — коммиты 59a5e593..747e98d5.",
       "blocker": null,
       "assets": [],
-      "updated": "2026-10-03T02:45:00Z"
+      "updated": "2026-10-03T12:14:00Z",
+      "note": " Срез 2026-10-03 (второй) — коммиты 747e98d5..11d4947e: Art Tuner в живой дуэли, подбор хода (план v2, макеты), эталонная БД стендов, HUD и значки v3, шрифт, анимация значков."
     },
     {
       "id": "ENV-P0",
@@ -1995,7 +2016,9 @@
         "docs/game-design/evidence/ART-TUNER/art-tuner-2026-10-03/fold-dry-run.txt",
         "tools/art/art_tuner_fold.py",
         "tools/s08/Unmatched-ArtTuner.cmd",
-        "unreal/Unmatched/Config/ArtTuner/S08ArtTunerParams.json"
+        "unreal/Unmatched/Config/ArtTuner/S08ArtTunerParams.json",
+        "docs/game-design/evidence/ART-TUNER/followup-2026-10-03/README.md",
+        "docs/game-design/evidence/ART-TUNER/followup-2026-10-03/k1-reference-sarpedon.json"
       ],
       "next": "Запуск — tools/s08/Unmatched-ArtTuner.cmd, сохранённое вносится в профиль art_tuner_fold.py. Эталон K1 lightcheck дрейфует (старая сборка тоже 0,59 к эталону) — сравнивать A/B.",
       "blocker": null,
@@ -2013,8 +2036,8 @@
         "ASSET-MERLIN-001",
         "ASSET-HARPY-001"
       ],
-      "updated": "2026-10-03T02:45:00Z",
-      "note": "Коммиты 983613eb, 338ed286, 009b6c0c (план с оценкой по замерам), d2703e37 (M1: -ArtView=<map> — фикстура -Bench без обхода видов и заморозки, свободная камера), a6b4bf83 (M2: реестр строк с JSON-указателями в S08ArtBoardProfiles.json, проверка парсером, -ArtTunerFile), 3a77794e (M3: Slate-панель F10 / Shift+F10, русские строки, ползунки, цвета, Ctrl+S, сброс), 3aebc7da (M4: conceptPaste.lit3d.materialOverrides — яркость острова, корабля, рамы и ветер листвы, 15 строк), 823033af (M5: art_tuner_fold.py, лаунчер, инструкция), 22694a8d, a8a9d332 (M6), 747e98d5 (после M6: строки Island.tint / Ship.tint, pasteGrade и pasteLights режима вклейки; отсутствующий tint показывается белым). Packaged: groups=10 rows=94; tune трёх строк — применение 1,5 мс без пересборки; перезапуск с файлом loaded=3; без флагов игра прежняя (A/B со сборкой 09c7d2f9 на уровне шума 0,41–0,47). UE 272/272, pytest 544 passed / 3 skipped."
+      "updated": "2026-10-03T12:14:00Z",
+      "note": "Коммиты 983613eb, 338ed286, 009b6c0c (план с оценкой по замерам), d2703e37 (M1: -ArtView=<map> — фикстура -Bench без обхода видов и заморозки, свободная камера), a6b4bf83 (M2: реестр строк с JSON-указателями в S08ArtBoardProfiles.json, проверка парсером, -ArtTunerFile), 3a77794e (M3: Slate-панель F10 / Shift+F10, русские строки, ползунки, цвета, Ctrl+S, сброс), 3aebc7da (M4: conceptPaste.lit3d.materialOverrides — яркость острова, корабля, рамы и ветер листвы, 15 строк), 823033af (M5: art_tuner_fold.py, лаунчер, инструкция), 22694a8d, a8a9d332 (M6), 747e98d5 (после M6: строки Island.tint / Ship.tint, pasteGrade и pasteLights режима вклейки; отсутствующий tint показывается белым). Packaged: groups=10 rows=94; tune трёх строк — применение 1,5 мс без пересборки; перезапуск с файлом loaded=3; без флагов игра прежняя (A/B со сборкой 09c7d2f9 на уровне шума 0,41–0,47). UE 272/272, pytest 544 passed / 3 skipped. Дальше (2026-10-03): 29080626 — проверка панели в живой дуэли (-ArtTuner в S09), строки режима вклейки, эталон K1 Sarpedon переснят с noise/ (сравнивать compare --noise); fe12eb7c — клавиша закрытия панели в живой игре, подписи оттенка влезают; a703fae2 — заметка: тон вклейки в режиме lit3d не влияет (×2 на уровне шума)."
     },
     {
       "id": "BLENDER-HANDBOOK",
@@ -2070,6 +2093,128 @@
       "assets": [],
       "updated": "2026-10-03T02:45:00Z",
       "note": "Коммиты 0c3d17b7, 7499be29: генерация «концепт → меш» остаётся на Tripo (локальная альтернатива — TRELLIS.2-4B, MIT; Hunyuan3D — лицензионные ловушки); premium mcp-for-blender не подключает свою подписку Tripo — путь со своим ключом — официальный tripo-mcp; headless-пайплайн это не меняет."
+    },
+    {
+      "id": "HUD-DOC",
+      "title": "HUD и значки: документ архитектуры и реестра (99 PNG mvp-v1 + 15 v2), правила И-1..И-10, токены карт, ревью Fable xhigh",
+      "track": "art",
+      "source": "hud-1003",
+      "status": "done",
+      "art_status": "предложено",
+      "evidence": [
+        "docs/unreal/contracts/hud/HUD-AND-ICONS.md",
+        "docs/unreal/contracts/hud/HUD-AND-ICONS-review-log.md",
+        "docs/unreal/contracts/hud/IMAGEGEN-BRIEF-icons.md",
+        "docs/unreal/contracts/hud/hud-style-tokens.json",
+        "docs/unreal/contracts/hud/why-reasons.json",
+        "art/imagegen/hud-icons-v2/README.md"
+      ],
+      "next": "Арт-приёмка языка значков (ART-011); задачи HI-02…HI-12 и долг HUD HD-01…11 — по документу.",
+      "blocker": null,
+      "assets": [],
+      "updated": "2026-10-03T12:14:00Z",
+      "note": "Коммиты 68c8c7d7 (бриф), 9aae2670: инвентаризация с path:line, архитектура (Slate S09 + UMG-слой 4 WBP), реестр 99 + 15 значков с решением «оставить / перерисовать / заменить», токены card.*, 25 ключей why.*, ревью Fable xhigh по трём линзам — 47 замечаний, 3 блокера сняты; волна 1 ImageGen (9 глиф-масок) — значки v2, пользователь отверг их стиль (см. HUD-ICONS-V3)."
+    },
+    {
+      "id": "HUD-ICONS-V3",
+      "title": "Значки HUD v3 на языке Unmatched: Digital Edition: 23 значка тем же набором, векторный движок, поштучное ревью",
+      "track": "art",
+      "source": "hud-1003",
+      "status": "done",
+      "art_status": "предложено",
+      "evidence": [
+        "art/imagegen/hud-icons-v3/README.md",
+        "art/imagegen/hud-icons-v3/STYLE-v3.md",
+        "art/imagegen/hud-icons-v3/sheets/sheet-masters.png",
+        "art/imagegen/hud-icons-v3/sheets/compare-v2-v3.png",
+        "art/imagegen/hud-icons-v3/sheets/sheet-sizes.png",
+        "art/imagegen/hud-icons-v3/_tools/draw_icons.py"
+      ],
+      "next": "Арт-приёмка пользователя (ART-011): значки v3 — ПРЕДЛОЖЕНИЕ; после неё — штатный жетон цели v3 (сейчас за флагом -S08IconMotion).",
+      "blocker": null,
+      "assets": [],
+      "updated": "2026-10-03T12:14:00Z",
+      "note": "Коммит 496b38e2. Пользователь отверг v2 («криво», «топорно») и выбрал основой Digital Edition. Концепция — workflow Fable xhigh (аудит v2, три направления, судья), исследование DE (скриншоты и трейлер Steam, 18 источников), сборка, независимое ревью и правки. Восемь правок основной сессии (STYLE-v3 §10): отпечатки ботинок, колючая звезда атаки, якорь вместо ядра на цепи, красная кромка сердец, эллипс-клетка, раздвинутый знак связи. Новый токен state.pending (бирюза, «можно выбрать»), И-3/И-4/И-6/И-10 пересмотрены."
+    },
+    {
+      "id": "HUD-FONT",
+      "title": "Шрифт клиента вместо Bahnschrift: Roboto Bold Condensed из движка UE 5.8 (Apache 2.0, кириллица)",
+      "track": "art",
+      "source": "hud-1003",
+      "status": "done",
+      "art_status": null,
+      "evidence": [
+        "docs/unreal/contracts/hud/hud-style-tokens.json",
+        "docs/unreal/contracts/hud/HUD-AND-ICONS.md",
+        "docs/game-design/17-art-production-spec.md"
+      ],
+      "next": "В UE: UFontFace из Engine/Content/Slate/Fonts/Roboto-BoldCondensed.ttf, composite font RU/EN, текст лицензии в third-party notices (HI-07).",
+      "blocker": null,
+      "assets": [],
+      "updated": "2026-10-03T12:14:00Z",
+      "note": "Решение по делегированию пользователя («Бери любой, который посчитаешь оптимальным»): статический, вес 700, ширина 3, кириллица 96/96 и «», №, —, −, ×. Bahnschrift отклонён (fsType 8, переменный шрифт — Slate осями не управляет). Закрывает AD-OPEN-24 для HUD (17 §AD-OPEN-24, токен font.card)."
+    },
+    {
+      "id": "ICON-MOTION",
+      "title": "Анимация значков HUD v3: контракт движения, эталон Python, рантайм UE (вычислитель, виджет, галерея), жетон цели",
+      "track": "art",
+      "source": "icon-motion",
+      "status": "in_progress",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/unreal/contracts/hud/ICON-MOTION-PLAN.md",
+        "docs/unreal/contracts/hud/ICON-MOTION.md",
+        "docs/unreal/contracts/hud/icon-motion.json",
+        "docs/game-design/evidence/ICON-MOTION/2026-10-03/README.md",
+        "docs/game-design/evidence/ICON-MOTION/2026-10-03/normal/compare.png",
+        "docs/game-design/evidence/ICON-MOTION/2026-10-03/automation-2026-10-03.txt",
+        "art/imagegen/hud-icons-v3/sheets/motion/index.html",
+        "art/imagegen/hud-icons-v3/sheets/motion/reel.mp4",
+        "art/imagegen/hud-icons-v3/ue-import-report.json"
+      ],
+      "next": "Живой бой жетона цели: упакованный клиент и tools/s08/run-phase2-demo.ps1 -ArtPreviewIconProbe -ClientExtraArgs \"-S08IconMotion\"; звук на удары (beat_ms); состояния подбора хода V-02..V-16 — через API US08AnimatedIconWidget (MS-T).",
+      "blocker": null,
+      "assets": [],
+      "updated": "2026-10-03T12:14:00Z",
+      "note": "Коммиты a5916c05 (контракт icon-motion.json + раскадровка, вычислитель и эталонный рендер: листы, GIF, ролики), 1730044f (S08IconMotion — порт вычислителя, US08AnimatedIconWidget без WBP, -S08IconGallery со съёмкой по времени, 264 текстуры T_IV3_* в /Game/S08/UI/IconsV3, жетон цели за -S08IconMotion), 11d4947e (ревью Fable: 21 замечание — уход после удержания затухает, семантика событий, честный замер). Факт: голден 3646 поз, 0 расхождений; UE против эталона — средняя |Δ| 0,45 (64 px) / 0,81 (32 px) / 0,02 (reduced), два прогона совпали до пикселя; +0,23–0,24 мс GT в медиане за 23 анимирующихся значка (редакторская сборка); UE 33/33, pytest 16/16."
+    },
+    {
+      "id": "MOVE-SEL-PLAN",
+      "title": "Подбор хода: исследование, план реализации v2, UX и техдизайн, макеты на реальных данных и значки в языке карт (MS-T-00)",
+      "track": "art",
+      "source": "move-selection",
+      "status": "done",
+      "art_status": "предложено",
+      "evidence": [
+        "docs/game-design/move-selection/README.md",
+        "docs/game-design/move-selection/05-implementation-plan.md",
+        "docs/game-design/move-selection/03-ux-spec.md",
+        "art/imagegen/move-selection-v2/README.md",
+        "tools/art/move_selection/build_mockups.py"
+      ],
+      "next": "Реализация MS-T-01…28 (план одобрен 2026-10-03); значки состояний V-02..V-16 — уже v3 с анимацией (HUD-ICONS-V3, ICON-MOTION).",
+      "blocker": null,
+      "assets": [],
+      "updated": "2026-10-03T12:14:00Z",
+      "note": "Коммиты c5a21767 (исследование, план v2, ревью, одобрение), a7c08f1c (макеты MS-C-01…09 на реальных картах, топологии, героях и RU-картах; ImageGen-концепты пользователь отклонил — UI-макеты только на данных бэкенда). Сканы карт и производные — вне git (ENV-U3), в репо — сборщик, README и manifest с sha256."
+    },
+    {
+      "id": "DB-STANDS",
+      "title": "Один эталонный dev-DB, стенды — его клоны (единый docker-compose.stands.yml)",
+      "track": "tech",
+      "source": "git-1003b",
+      "status": "done",
+      "art_status": null,
+      "evidence": [
+        "docs/backend-api/db-divergence-2026-10-03.md",
+        "docker-compose.stands.yml",
+        "tools/db/sync-dev-stands.cjs"
+      ],
+      "next": "Данные менять только в основной БД (:5433), затем node tools/db/sync-dev-stands.cjs sync --apply.",
+      "blocker": null,
+      "assets": [],
+      "updated": "2026-10-03T12:14:00Z",
+      "note": "Коммиты e32c0b6f (аудит расхождения БД), 58d5e8ab, 74098302, c2b4aa96 (RK-16 закрыт): разные данные стендов давали разные живые прогоны (доски, эффекты); теперь стенды клонируются из эталона."
     }
   ],
   "waves": [
@@ -2311,6 +2456,18 @@
         "BLENDER-HANDBOOK",
         "SCRATCH-B",
         "RESEARCH-BLENDER"
+      ]
+    },
+    {
+      "id": "HUD-V3",
+      "title": "HUD и значки v3: документ и реестр значков, значки на языке Digital Edition, шрифт клиента, анимация в UE, подбор хода (план и макеты); художественное решение — пользователь (ART-011)",
+      "status": "in_progress",
+      "tasks": [
+        "HUD-DOC",
+        "HUD-ICONS-V3",
+        "HUD-FONT",
+        "ICON-MOTION",
+        "MOVE-SEL-PLAN"
       ]
     }
   ],
