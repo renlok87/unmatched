@@ -204,12 +204,18 @@ TSharedRef<SWidget> SS08ArtTunerPanel::RowFrame(const FS08TunerParam& P, const T
                  SNew(STextBlock).Font(PanelFont(10)).ColorAndOpacity(GChangedColor).Text(FText::FromString(TEXT("●")))
                      .Visibility_Lambda([this, Id]() { return IsChanged(Id) ? EVisibility::Visible : EVisibility::Hidden; })]] +
          SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Top)[
-             SNew(SBox).WidthOverride(26.0f).Visibility_Lambda([this, Id]() {
+             SNew(SBox).WidthOverride(34.0f).HeightOverride(20.0f).Visibility_Lambda([this, Id]() {
                return IsChanged(Id) ? EVisibility::Visible : EVisibility::Hidden;
-             })[SmallButton(FText::FromString(TEXT("×")), FText::FromString(TEXT("Вернуть значение профиля")), [this, Id]() {
-               if (PendingId == Id) PendingId.Reset();
-               if (Actions.ResetRow) Actions.ResetRow(Id);
-             })]];
+             })[SNew(SButton)
+                    .ContentPadding(FMargin(0.0f))
+                    .HAlign(HAlign_Center)
+                    .VAlign(VAlign_Center)
+                    .ToolTipText(FText::FromString(TEXT("Вернуть значение профиля")))
+                    .OnClicked_Lambda([this, Id]() {
+                      if (PendingId == Id) PendingId.Reset();
+                      if (Actions.ResetRow) Actions.ResetRow(Id);
+                      return FReply::Handled();
+                    })[SNew(STextBlock).Font(PanelFont(10, true)).Text(FText::FromString(TEXT("×")))]]];
 }
 
 TSharedRef<SWidget> SS08ArtTunerPanel::BuildNumberRow(const FS08TunerParam& P) {
