@@ -28,6 +28,9 @@ struct UNMATCHED_API FS09CardView {
   int32 AttackValue = 0;
   int32 DefenseValue = 0;
   int32 BoostValue = 0;
+  // MS-T-05: boostValue was a JSON number (backend cardBoost); null / absent /
+  // a string = no printed BOOST - such a card is never offered as a boost.
+  bool bHasBoostValue = false;
   FString BannerName;
   FString Text;
   bool bHidden = false;  // server placeholder: no face anywhere (count only)

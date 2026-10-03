@@ -252,6 +252,13 @@ struct FS09DraftOp { TArray<FS09DraftMove> Moves; FString BoostCardId; };  // з
 struct FS09PreDraft { FString FighterId; int32 X = -1, Y = -1; bool bSet = false; int32 RequiredBoost = 0; };
 ```
 
+Уточнение MS-T-05 (реализация): `FS09DraftMove` дополнительно несёт `Conflict` (`ES09DraftConflict`: missing,
+not-yours, defeated, immobilized, duplicate, no-path — как `DraftConflict` сервера), `Base` (`FighterMovement`) и
+`Allowance` (`Base + s`, бейдж «шаги/допуск»). `FS09DraftEval` — статический `Evaluate` над массивом ходов (поля хода
+пишутся на месте) с итогом `SelectedBoost`, `MaxBoost`, ярусами каждого хода на `work_i` (`FS09ReachTiers`: база, буст,
+`ReachMap` для превью), `Work` (`work_n`), счётчиками статусов и `HighlightCardIds`. `why.cell.unreachable {have}` —
+`base + max(s, M)`: с лучшим бустом руки не хватает и его.
+
 ### 4.5. Описание вида (`FS08MoveDraftView`)
 
 ```cpp

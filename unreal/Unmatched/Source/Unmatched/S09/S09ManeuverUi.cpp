@@ -1,6 +1,7 @@
 #include "S09ManeuverUi.h"
 #include "Dom/JsonObject.h"
 #include "S09HudModel.h"
+#include "../S08/S08TraceLog.h"
 
 namespace {
 bool OwnHandCards(const FS08Snapshot& Snapshot, const FString& ViewerId,
@@ -267,12 +268,295 @@ bool FS09CommandUi::PickRangedPosition(const FS08BoardModel& Board, const TArray
   return bFound;
 }
 
+// ---- MS-T-05: sequential draft evaluation (04 §3.2) ------------------------
+
+namespace {
+bool SameDraftId(const FString& A, const FString& B) { return A.Equals(B, ESearchCase::CaseSensitive); }
+
+int32 ClampSteps(int64 Steps) { return static_cast<int32>(FMath::Clamp<int64>(Steps, MIN_int32, MAX_int32)); }
+
+FS08BoardFighter* FindWorkFighter(TArray<FS08BoardFighter>& Work, const FString& Id) {
+  return Work.FindByPredicate([&Id](const FS08BoardFighter& F) { return SameDraftId(F.Id, Id); });
+}
+
+const FS08BoardFighter* FindWorkFighter(const TArray<FS08BoardFighter>& Work, const FString& Id) {
+  return Work.FindByPredicate([&Id](const FS08BoardFighter& F) { return SameDraftId(F.Id, Id); });
+}
+
+FString FighterDisplayName(const FS08BoardFighter& Fighter) {
+  return Fighter.Label.IsEmpty() ? (Fighter.Name.IsEmpty() ? Fighter.Id : Fighter.Name) : Fighter.Label;
+}
+
+const TCHAR* DraftStatusName(ES09DraftMoveStatus Status) {
+  switch (Status) {
+    case ES09DraftMoveStatus::Ok: return TEXT("ok");
+    case ES09DraftMoveStatus::NeedBoost: return TEXT("needBoost");
+    default: return TEXT("conflict");
+  }
+}
+} // namespace
+
+FString FS09Reason::Describe() const {
+  if (!IsSet()) return FString();
+  auto ArgOf = [this](const TCHAR* Name) {
+    const FString* Value = Args.Find(Name);
+    return Value ? *Value : FString(TEXT("?"));
+  };
+  const FString* Cell = Args.Find(TEXT("cell"));
+  const FString Where = Cell ? FString::Printf(TEXT("cell %s"), **Cell) : FString(TEXT("cell"));
+  const FString K = Key.ToString();
+  FString Text;
+  if (K == TEXT("why.cell.unreachable")) {
+    Text = FString::Printf(TEXT("%s exceeds movement: need %s, have %s"), *Where, *ArgOf(TEXT("need")),
+                           *ArgOf(TEXT("have")));
+  } else if (K == TEXT("why.cell.no.path")) {
+    Text = Where + TEXT(": no way to get there");
+  } else if (K == TEXT("why.cell.needs.boost")) {
+    Text = FString::Printf(TEXT("needs boost +%s"), *ArgOf(TEXT("n")));
+  } else if (K == TEXT("why.cell.enemy")) {
+    Text = Where + TEXT(": an enemy is here");
+  } else if (K == TEXT("why.cell.ally")) {
+    Text = Where + TEXT(": occupied by an ally");
+    if (Args.Contains(TEXT("orderHint"))) Text += TEXT(" (it leaves later - change the order)");
+  } else if (K == TEXT("why.cell.not.space")) {
+    Text = Where + TEXT(": not a board space");
+  } else if (K == TEXT("why.swap.impossible")) {
+    Text = TEXT("fighters cannot swap spaces");
+  } else if (K == TEXT("why.immobilized")) {
+    Text = ArgOf(TEXT("fighterName")) + TEXT(" cannot move");
+  } else if (K == TEXT("why.fighter.not.yours")) {
+    Text = TEXT("that is an opponent's fighter");
+  } else if (K == TEXT("why.fighter.defeated")) {
+    Text = TEXT("fighter is defeated");
+  } else if (K == TEXT("why.boost.no.value")) {
+    Text = TEXT("this card has no BOOST");
+  } else if (K == TEXT("why.boost.card.gone")) {
+    Text = TEXT("the boost card is no longer in hand");
+  } else if (K == TEXT("why.client.desync")) {
+    Text = TEXT("out of sync with the server");
+  } else {
+    Text = K;
+  }
+  return Text + TEXT(" [") + K + TEXT("]");
+}
+
+FString FS09DraftMove::BadgeText() const {
+  if (Status == ES09DraftMoveStatus::Conflict) return FString();
+  FString Text = FString::Printf(TEXT("%d/%d"), Path.Num(), Allowance);
+  if (Status == ES09DraftMoveStatus::NeedBoost) Text += FString::Printf(TEXT(" \u00B7 need +%d"), RequiredBoost);
+  return Text;
+}
+
+int32 FS09ReachTiers::ChipAt(const FIntPoint& Cell) const {
+  if (!bValid || !BoostTier.Contains(Cell)) return 0;
+  const int32 Steps = Reach.DistanceTo(Cell);
+  return Steps == INDEX_NONE ? 0 : Steps - Base;
+}
+
+TArray<FS09BoostCard> FS09DraftEval::BoostHand(const FS08Snapshot& Snapshot, const FString& ViewerId) {
+  TArray<FS09BoostCard> Out;
+  TArray<FS09CardView> Cards;
+  if (!OwnHandCards(Snapshot, ViewerId, Cards)) return Out;
+  for (const FS09CardView& Card : Cards) {
+    if (Card.bHidden) continue;
+    FS09BoostCard Boost;
+    Boost.InstanceId = Card.InstanceId;
+    Boost.bHasBoost = Card.bHasBoostValue;
+    Boost.Boost = Card.bHasBoostValue ? Card.BoostValue : 0;
+    Out.Add(MoveTemp(Boost));
+  }
+  return Out;
+}
+
+int32 FS09DraftEval::SelectedBoostOf(const TArray<FS09BoostCard>& Hand, const FString& BoostCardId) {
+  if (BoostCardId.IsEmpty()) return 0;
+  const FS09BoostCard* Card =
+      Hand.FindByPredicate([&BoostCardId](const FS09BoostCard& C) { return SameDraftId(C.InstanceId, BoostCardId); });
+  return Card && Card->bHasBoost ? Card->Boost : 0; // cardBoost(selected) ?? 0
+}
+
+int32 FS09DraftEval::MaxBoostOf(const TArray<FS09BoostCard>& Hand) {
+  int32 Max = 0; // hand.reduce((m, c) => Math.max(m, cardBoost(c) ?? 0), 0)
+  for (const FS09BoostCard& Card : Hand) {
+    if (Card.bHasBoost) Max = FMath::Max(Max, Card.Boost);
+  }
+  return Max;
+}
+
+bool FS09DraftEval::IsImmobilized(const FS08BoardFighter& Fighter) {
+  return Fighter.Effects.ContainsByPredicate(
+      [](const FString& Effect) { return Effect.Equals(TEXT("immobilized"), ESearchCase::CaseSensitive); });
+}
+
+FS09ReachTiers FS09DraftEval::ComputeTiers(const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Work,
+                                           const FString& FighterId, int32 SelectedBoost, int32 MaxBoost) {
+  FS09ReachTiers Tiers;
+  Tiers.FighterId = FighterId;
+  const FS08BoardFighter* Fighter = FindWorkFighter(Work, FighterId);
+  if (!Fighter) return Tiers;
+  Tiers.Base = FS08BoardModel::FighterMovement(*Fighter);
+  Tiers.BaseSteps = ClampSteps(int64(Tiers.Base) + SelectedBoost);
+  Tiers.BoostSteps = ClampSteps(int64(Tiers.Base) + MaxBoost);
+  const int32 MaxSteps = FMath::Max(Tiers.BaseSteps, Tiers.BoostSteps);
+  Tiers.Reach = FS08BoardModel::ComputeReachMap(Board, Work, FighterId, MaxSteps);
+  if (!Tiers.Reach.bValid) return Tiers;
+  Tiers.bValid = true;
+  Tiers.Start = Tiers.Reach.Start;
+  // backend reachTiers: endpoints by K, split by distance.
+  for (const FIntPoint& Cell : FS08BoardModel::ReachEndpoints(Board, Work, Tiers.Reach, MaxSteps)) {
+    const int32 Steps = Tiers.Reach.DistanceTo(Cell);
+    if (Steps <= Tiers.BaseSteps) {
+      Tiers.BaseTier.Add(Cell);
+    } else if (Steps <= Tiers.BoostSteps) {
+      Tiers.BoostTier.Add(Cell);
+    }
+  }
+  return Tiers;
+}
+
+FS09Reason FS09DraftEval::DestinationReason(const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Work,
+                                            const FS08BoardFighter& Mover, const FIntPoint& Dest, int32 Base,
+                                            int32 SelectedBoost, int32 MaxBoost,
+                                            const TArray<FS09DraftMove>& Draft) {
+  const FString Cell = Board.CellLabel(Dest.X, Dest.Y);
+  if (!Board.IsBoardSpace(Dest.X, Dest.Y)) return FS09Reason::Make(TEXT("why.cell.not.space")).Arg(TEXT("cell"), Cell);
+  if (const FS08BoardFighter* Occupant = FS08BoardModel::FighterAt(Work, Dest.X, Dest.Y, Mover.Id)) {
+    if (!SameDraftId(Occupant->OwnerId, Mover.OwnerId)) {
+      return FS09Reason::Make(TEXT("why.cell.enemy")).Arg(TEXT("cell"), Cell);
+    }
+    // An ally still on Dest: its own move (not applied yet - later in the
+    // order, or itself in conflict) either ends on the mover's cell (a swap,
+    // impossible in any order - MS-E-35) or, when it comes LATER in the
+    // order, leaves Dest after the mover (MS-E-34: the order hint). A mover
+    // without a move counts as last (a new move goes to the end).
+    int32 MoverIndex = Draft.IndexOfByPredicate(
+        [&Mover](const FS09DraftMove& Move) { return SameDraftId(Move.FighterId, Mover.Id); });
+    if (MoverIndex == INDEX_NONE) MoverIndex = Draft.Num();
+    for (int32 Index = 0; Index < Draft.Num(); ++Index) {
+      const FS09DraftMove& Other = Draft[Index];
+      if (!SameDraftId(Other.FighterId, Occupant->Id)) continue;
+      if (Other.DestX == Mover.X && Other.DestY == Mover.Y) {
+        return FS09Reason::Make(TEXT("why.swap.impossible")).Arg(TEXT("cell"), Cell);
+      }
+      if (Index > MoverIndex && (Other.DestX != Dest.X || Other.DestY != Dest.Y)) {
+        return FS09Reason::Make(TEXT("why.cell.ally")).Arg(TEXT("cell"), Cell).Arg(TEXT("orderHint"), 1);
+      }
+      break;
+    }
+    return FS09Reason::Make(TEXT("why.cell.ally")).Arg(TEXT("cell"), Cell);
+  }
+  const FS08Cell* Terrain = Board.CellAt(Dest.X, Dest.Y);
+  if (!Terrain || !Terrain->IsPassable()) return FS09Reason::Make(TEXT("why.cell.no.path")).Arg(TEXT("cell"), Cell);
+  // MS-E-19: a path that exists but is longer than the best boost names the
+  // numbers; no path at all (blocked, no links) does not.
+  const FS08ReachMap Unlimited = FS08BoardModel::ComputeReachMap(Board, Work, Mover.Id, MAX_int32);
+  const int32 Need = Unlimited.DistanceTo(Dest);
+  if (Need != INDEX_NONE) {
+    return FS09Reason::Make(TEXT("why.cell.unreachable"))
+        .Arg(TEXT("cell"), Cell)
+        .Arg(TEXT("need"), Need)
+        .Arg(TEXT("have"), ClampSteps(int64(Base) + FMath::Max(SelectedBoost, MaxBoost)));
+  }
+  return FS09Reason::Make(TEXT("why.cell.no.path")).Arg(TEXT("cell"), Cell);
+}
+
+FS09DraftEval FS09DraftEval::Evaluate(const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters,
+                                      TArray<FS09DraftMove>& Moves, const TArray<FS09BoostCard>& Hand,
+                                      const FString& BoostCardId, const FString& ActorId) {
+  FS09DraftEval Eval;
+  Eval.SelectedBoost = SelectedBoostOf(Hand, BoostCardId);
+  Eval.MaxBoost = MaxBoostOf(Hand);
+  Eval.Work = Fighters;
+  Eval.Tiers.SetNum(Moves.Num());
+  TArray<FString> Seen;
+  for (int32 Index = 0; Index < Moves.Num(); ++Index) {
+    FS09DraftMove& Move = Moves[Index];
+    Move.Order = Index;
+    Move.Path.Reset();
+    Move.Status = ES09DraftMoveStatus::Ok;
+    Move.Conflict = ES09DraftConflict::None;
+    Move.RequiredBoost = 0;
+    Move.Reason.Reset();
+    FS08BoardFighter* Fighter = FindWorkFighter(Eval.Work, Move.FighterId);
+    Move.Base = Fighter ? FS08BoardModel::FighterMovement(*Fighter) : 0;
+    Move.Allowance = ClampSteps(int64(Move.Base) + Eval.SelectedBoost);
+    auto SetConflict = [&Move](ES09DraftConflict Why, FS09Reason Reason) {
+      Move.Status = ES09DraftMoveStatus::Conflict;
+      Move.Conflict = Why;
+      Move.Reason = MoveTemp(Reason);
+      Move.Path.Reset();
+      Move.RequiredBoost = 0;
+    };
+    // backend evaluateDraft gate order: duplicate, missing, not-yours,
+    // defeated (health <= 0 only - MS-E-77), immobilized.
+    if (Seen.ContainsByPredicate([&Move](const FString& Id) { return SameDraftId(Id, Move.FighterId); })) {
+      SetConflict(ES09DraftConflict::Duplicate, FS09Reason::Make(TEXT("why.client.desync")));
+      continue;
+    }
+    Seen.Add(Move.FighterId);
+    if (!Fighter) {
+      SetConflict(ES09DraftConflict::Missing, FS09Reason::Make(TEXT("why.client.desync")));
+      continue;
+    }
+    if (!ActorId.IsEmpty() && !SameDraftId(Fighter->OwnerId, ActorId)) {
+      SetConflict(ES09DraftConflict::NotYours, FS09Reason::Make(TEXT("why.fighter.not.yours")));
+      continue;
+    }
+    if (!Fighter->CanBeMover()) {
+      SetConflict(ES09DraftConflict::Defeated, FS09Reason::Make(TEXT("why.fighter.defeated")));
+      continue;
+    }
+    if (IsImmobilized(*Fighter)) {
+      SetConflict(ES09DraftConflict::Immobilized,
+                  FS09Reason::Make(TEXT("why.immobilized")).Arg(TEXT("fighterName"), FighterDisplayName(*Fighter)));
+      continue;
+    }
+    FS09ReachTiers& Tiers = Eval.Tiers[Index];
+    Tiers = ComputeTiers(Board, Eval.Work, Move.FighterId, Eval.SelectedBoost, Eval.MaxBoost);
+    const FIntPoint Dest(Move.DestX, Move.DestY);
+    if (!FS08BoardModel::BuildCanonicalPath(Board, Eval.Work, Tiers.Reach, Dest, Move.Path)) {
+      // no-path: the tiers stay (backend conflict('no-path', tiers)).
+      SetConflict(ES09DraftConflict::NoPath, DestinationReason(Board, Eval.Work, *Fighter, Dest, Move.Base,
+                                                               Eval.SelectedBoost, Eval.MaxBoost, Moves));
+      continue;
+    }
+    Move.RequiredBoost = FMath::Max(0, Move.Path.Num() - Move.Base);
+    if (Move.RequiredBoost > Eval.SelectedBoost) {
+      Move.Status = ES09DraftMoveStatus::NeedBoost;
+      Move.Reason = FS09Reason::Make(TEXT("why.cell.needs.boost"))
+                        .Arg(TEXT("cell"), Board.CellLabel(Dest.X, Dest.Y))
+                        .Arg(TEXT("n"), Move.RequiredBoost);
+    }
+    Fighter->X = Dest.X;
+    Fighter->Y = Dest.Y;
+  }
+  for (const FS09DraftMove& Move : Moves) {
+    switch (Move.Status) {
+      case ES09DraftMoveStatus::Ok: ++Eval.NumOk; break;
+      case ES09DraftMoveStatus::NeedBoost:
+        ++Eval.NumNeedBoost;
+        Eval.HighlightMinBoost = FMath::Max(Eval.HighlightMinBoost, Move.RequiredBoost);
+        break;
+      default: ++Eval.NumConflict; break;
+    }
+  }
+  if (Eval.HighlightMinBoost > 0) {
+    for (const FS09BoostCard& Card : Hand) {
+      if (Card.bHasBoost && Card.Boost >= Eval.HighlightMinBoost && !SameDraftId(Card.InstanceId, BoostCardId)) {
+        Eval.HighlightCardIds.Add(Card.InstanceId);
+      }
+    }
+  }
+  return Eval;
+}
+
 bool FS09CommandUi::OnSnapshot(const FS08Snapshot& Snapshot, const FS08BoardModel& Board,
                                const TArray<FS08BoardFighter>& Fighters) {
   const ES09CommandMode OldMode = Mode;
   // ENV-O6: attack range of the board-less draft overloads follows the
   // latest authoritative board (links + zones).
   SnapshotBoard = Board;
+  SnapshotFighters = Fighters;
 
   // GD-036: terminal state closes every local draft - gameplay input is
   // dead on the result screen (the server would reject it anyway: executor
@@ -284,6 +568,7 @@ bool FS09CommandUi::OnSnapshot(const FS08Snapshot& Snapshot, const FS08BoardMode
     BoostCardId.Reset();
     SelectedFighterId.Reset();
     ReachableCells.Reset();
+    ResetDraftEval();
     PendingDiscard = FS08PendingHandDiscard();
     DiscardSelection.Reset();
     AttackAttackerId.Reset();
@@ -339,15 +624,12 @@ bool FS09CommandUi::OnSnapshot(const FS08Snapshot& Snapshot, const FS08BoardMode
     }
     if (!SelectedFighterId.IsEmpty() && FindOwnFighter(Fighters, SelectedFighterId) == nullptr) {
       SelectedFighterId.Reset();
-      ReachableCells.Reset();
-    } else if (!SelectedFighterId.IsEmpty()) {
-      // Allowance may have changed (boost cleared above) - refresh hints.
-      const FS08BoardFighter* Fighter = FindOwnFighter(Fighters, SelectedFighterId);
-      if (Fighter) {
-        ReachableCells = FS08BoardModel::ComputeReachableCells(
-            Board, Fighters, Fighter->Id, Fighter->Movement + BoostValueFromHand(Snapshot));
-      }
     }
+    // MS-T-05: every snapshot re-evaluates the whole draft on the fresh
+    // positions and hand (statuses, paths, the selected fighter's tiers).
+    DraftHand = FS09DraftEval::BoostHand(Snapshot, ViewerId);
+    ReevaluateDraft(Board, Fighters);
+    if (Moves.Num() > 0 || !BoostCardId.IsEmpty()) TraceDraftOp(TEXT("snapshot"), FString(), Board);
   } else if (bHasDiscard && Discard.PlayerId == ViewerId) {
     Mode = ES09CommandMode::DiscardDraft;
     PendingDiscard = Discard;
@@ -431,6 +713,7 @@ bool FS09CommandUi::OnSnapshot(const FS08Snapshot& Snapshot, const FS08BoardMode
     BoostCardId.Reset();
     SelectedFighterId.Reset();
     ReachableCells.Reset();
+    ResetDraftEval();
     PendingDiscard = FS08PendingHandDiscard();
     DiscardSelection.Reset();
     AttackAttackerId.Reset();
@@ -486,16 +769,6 @@ TArray<FString> FS09CommandUi::OwnHandIds(const FS08Snapshot& Snapshot) const {
   return Ids;
 }
 
-int32 FS09CommandUi::BoostValueFromHand(const FS08Snapshot& Snapshot) const {
-  if (BoostCardId.IsEmpty()) return 0;
-  TArray<FS09CardView> Cards;
-  if (!OwnHandCards(Snapshot, ViewerId, Cards)) return 0;
-  for (const FS09CardView& Card : Cards) {
-    if (Card.InstanceId == BoostCardId) return Card.BoostValue;
-  }
-  return 0;
-}
-
 const FS08BoardFighter* FS09CommandUi::FindOwnFighter(
     const TArray<FS08BoardFighter>& Fighters, const FString& FighterId) const {
   for (const FS08BoardFighter& Fighter : Fighters) {
@@ -506,15 +779,149 @@ const FS08BoardFighter* FS09CommandUi::FindOwnFighter(
   return nullptr;
 }
 
+// ---- MS-T-05 draft bookkeeping ----------------------------------------------
+
+int32 FS09CommandUi::MoveIndexOf(const FString& FighterId) const {
+  return Moves.IndexOfByPredicate(
+      [&FighterId](const FS09DraftMove& Move) { return SameDraftId(Move.FighterId, FighterId); });
+}
+
+void FS09CommandUi::ResetDraftEval() {
+  Eval = FS09DraftEval();
+  SelectedTiers = FS09ReachTiers();
+  ReachableCells.Reset();
+  DraftHand.Reset();
+  LastReason.Reset();
+}
+
+void FS09CommandUi::DeselectFighter() {
+  SelectedFighterId.Reset();
+  SelectedTiers = FS09ReachTiers();
+  ReachableCells.Reset();
+}
+
+void FS09CommandUi::ReevaluateDraft(const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters) {
+  Eval = FS09DraftEval::Evaluate(Board, Fighters, Moves, DraftHand, BoostCardId, ViewerId);
+  RefreshSelectedTiers(Board, Fighters);
+  ++DraftRevision;
+}
+
+void FS09CommandUi::RefreshSelectedTiers(const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters) {
+  SelectedTiers = FS09ReachTiers();
+  ReachableCells.Reset();
+  if (SelectedFighterId.IsEmpty()) return;
+  const FS08BoardFighter* Own = FindOwnFighter(Fighters, SelectedFighterId);
+  if (!Own) return;
+  const int32 Index = MoveIndexOf(SelectedFighterId);
+  if (Index != INDEX_NONE) {
+    // Its move keeps its place: the tiers on the positions before it.
+    if (Eval.Tiers.IsValidIndex(Index)) SelectedTiers = Eval.Tiers[Index];
+  } else if (!FS09DraftEval::IsImmobilized(*Own)) {
+    // A new move goes last: the tiers after every drafted move (work_n).
+    SelectedTiers =
+        FS09DraftEval::ComputeTiers(Board, Eval.Work, SelectedFighterId, Eval.SelectedBoost, Eval.MaxBoost);
+  }
+  if (!SelectedTiers.bValid) return;
+  ReachableCells.Add(FS08BoardModel::CellKey(SelectedTiers.Start.X, SelectedTiers.Start.Y));
+  for (const FIntPoint& Cell : SelectedTiers.BaseTier) ReachableCells.Add(FS08BoardModel::CellKey(Cell.X, Cell.Y));
+}
+
+TArray<FS08BoardFighter> FS09CommandUi::WorkStateFor(const FString& FighterId, const FS08BoardModel& Board,
+                                                     const TArray<FS08BoardFighter>& Fighters) const {
+  const int32 Index = MoveIndexOf(FighterId);
+  TArray<FS09DraftMove> Prefix;
+  Prefix.Append(Moves.GetData(), Index == INDEX_NONE ? Moves.Num() : Index);
+  return FS09DraftEval::Evaluate(Board, Fighters, Prefix, DraftHand, BoostCardId, ViewerId).Work;
+}
+
+void FS09CommandUi::DraftTraceLine(const FString& Line) {
+  FS08Trace::Write(Line);
+  DraftTrace.Add(Line);
+  if (DraftTrace.Num() > 64) DraftTrace.RemoveAt(0, DraftTrace.Num() - 64);
+}
+
+void FS09CommandUi::TraceDraftOp(const TCHAR* Op, const FString& FighterId, const FS08BoardModel& Board) {
+  FString Line = FString::Printf(TEXT("MS-DRAFT op=%s rev=%u"), Op, DraftRevision);
+  const int32 Index = FighterId.IsEmpty() ? INDEX_NONE : MoveIndexOf(FighterId);
+  if (Index != INDEX_NONE) {
+    const FS09DraftMove& Move = Moves[Index];
+    Line += FString::Printf(TEXT(" fighter=%s dest=%s order=%d status=%s required=%d"), *Move.FighterId,
+                            *Board.CellLabel(Move.DestX, Move.DestY), Move.Order + 1, DraftStatusName(Move.Status),
+                            Move.RequiredBoost);
+  } else if (!FighterId.IsEmpty()) {
+    Line += FString::Printf(TEXT(" fighter=%s"), *FighterId);
+  }
+  Line += FString::Printf(TEXT(" boost=%d moves=%d ok=%d needboost=%d conflict=%d"), Eval.SelectedBoost, Moves.Num(),
+                          Eval.NumOk, Eval.NumNeedBoost, Eval.NumConflict);
+  DraftTraceLine(Line);
+  if (Index == INDEX_NONE || FCString::Strcmp(Op, TEXT("assign")) != 0) return;
+  const FS09DraftMove& Move = Moves[Index];
+  if (Move.Status == ES09DraftMoveStatus::Conflict || !Eval.Tiers.IsValidIndex(Index)) return;
+  const FIntPoint Start = Eval.Tiers[Index].Start;
+  TArray<FString> Cells = {Board.CellLabel(Start.X, Start.Y)};
+  for (const FIntPoint& Cell : Move.Path) Cells.Add(Board.CellLabel(Cell.X, Cell.Y));
+  DraftTraceLine(FString::Printf(TEXT("MS-PATH fighter=%s steps=%d allowance=%d key=canonical cells=%s"),
+                                 *Move.FighterId, Move.Path.Num(), Move.Allowance, *FString::Join(Cells, TEXT(">"))));
+}
+
 bool FS09CommandUi::SelectFighter(const FString& FighterId, const FS08Snapshot& Snapshot,
                                   const FS08BoardModel& Board,
                                   const TArray<FS08BoardFighter>& Fighters) {
   if (Mode != ES09CommandMode::ManeuverDraft) return false;
   if (FindOwnFighter(Fighters, FighterId) == nullptr) return false;
   SelectedFighterId = FighterId;
-  const FS08BoardFighter* Fighter = FindOwnFighter(Fighters, FighterId);
-  ReachableCells = FS08BoardModel::ComputeReachableCells(
-      Board, Fighters, FighterId, Fighter->Movement + BoostValueFromHand(Snapshot));
+  DraftHand = FS09DraftEval::BoostHand(Snapshot, ViewerId);
+  ReevaluateDraft(Board, Fighters);
+  return true;
+}
+
+bool FS09CommandUi::EvaluateDestination(const FString& FighterId, int32 X, int32 Y, const FS08BoardModel& Board,
+                                        const TArray<FS08BoardFighter>& Fighters, FS09DraftMove& OutMove,
+                                        FS09Reason& OutReason) const {
+  OutMove = FS09DraftMove();
+  OutMove.FighterId = FighterId;
+  OutMove.DestX = X;
+  OutMove.DestY = Y;
+  OutReason.Reset();
+  const FS08BoardFighter* Own = FindOwnFighter(Fighters, FighterId);
+  if (!Own) {
+    const FS08BoardFighter* Any = FindFighter(Fighters, FighterId);
+    const TCHAR* Key = TEXT("why.fighter.defeated");
+    if (!Any) {
+      Key = TEXT("why.client.desync");
+    } else if (Any->OwnerId != ViewerId) {
+      Key = TEXT("why.fighter.not.yours");
+    }
+    OutReason = FS09Reason::Make(Key);
+    return false;
+  }
+  const int32 Selected = FS09DraftEval::SelectedBoostOf(DraftHand, BoostCardId);
+  const int32 MaxBoost = FS09DraftEval::MaxBoostOf(DraftHand);
+  const TArray<FS08BoardFighter> Work = WorkStateFor(FighterId, Board, Fighters);
+  const FS08BoardFighter* Mover = FindWorkFighter(Work, FighterId);
+  if (!Mover) {
+    OutReason = FS09Reason::Make(TEXT("why.client.desync"));
+    return false;
+  }
+  const FS09ReachTiers Tiers = FS09DraftEval::ComputeTiers(Board, Work, FighterId, Selected, MaxBoost);
+  OutMove.Base = Tiers.Base;
+  OutMove.Allowance = ClampSteps(int64(Tiers.Base) + Selected);
+  const FIntPoint Dest(X, Y);
+  if (!FS08BoardModel::BuildCanonicalPath(Board, Work, Tiers.Reach, Dest, OutMove.Path)) {
+    OutReason =
+        FS09DraftEval::DestinationReason(Board, Work, *Mover, Dest, Tiers.Base, Selected, MaxBoost, Moves);
+    OutMove.Status = ES09DraftMoveStatus::Conflict;
+    OutMove.Conflict = ES09DraftConflict::NoPath;
+    OutMove.Reason = OutReason;
+    return false;
+  }
+  OutMove.RequiredBoost = FMath::Max(0, OutMove.Path.Num() - OutMove.Base);
+  if (OutMove.RequiredBoost > Selected) {
+    OutMove.Status = ES09DraftMoveStatus::NeedBoost;
+    OutMove.Reason = FS09Reason::Make(TEXT("why.cell.needs.boost"))
+                         .Arg(TEXT("cell"), Board.CellLabel(X, Y))
+                         .Arg(TEXT("n"), OutMove.RequiredBoost);
+  }
   return true;
 }
 
@@ -523,60 +930,107 @@ bool FS09CommandUi::SetDestination(const FString& FighterId, int32 X, int32 Y,
                                    const TArray<FS08BoardFighter>& Fighters,
                                    FString& OutReason) {
   OutReason.Reset();
+  LastReason.Reset();
   if (Mode != ES09CommandMode::ManeuverDraft) {
     OutReason = TEXT("no open maneuver draft");
     return false;
   }
-  const FS08BoardFighter* Fighter = FindOwnFighter(Fighters, FighterId);
-  if (!Fighter) {
+  if (!FindOwnFighter(Fighters, FighterId)) {
     OutReason = TEXT("not one of your living fighters");
     return false;
   }
-  const int32 Allowance = Fighter->Movement + BoostValueFromHand(Snapshot);
-  const TSet<uint64> Reach = FS08BoardModel::ComputeReachableCells(Board, Fighters,
-                                                                   FighterId, Allowance);
-  if (!Reach.Contains(FS08BoardModel::CellKey(X, Y))) {
-    OutReason = FString::Printf(TEXT("cell (%d,%d) exceeds movement %d or is blocked"),
-                                X, Y, Allowance);
+  DraftHand = FS09DraftEval::BoostHand(Snapshot, ViewerId);
+  FS09DraftMove Candidate;
+  if (!EvaluateDestination(FighterId, X, Y, Board, Fighters, Candidate, LastReason)) {
+    OutReason = LastReason.Describe();
     return false;
   }
-  for (FS09DraftMove& Move : Moves) {
-    if (Move.FighterId == FighterId) {
-      Move.DestX = X;
-      Move.DestY = Y;
-      return true;
-    }
+  const int32 Index = MoveIndexOf(FighterId);
+  if (Index != INDEX_NONE) {
+    // MS-E-38: an overwrite keeps the move's place in the order.
+    Moves[Index].DestX = X;
+    Moves[Index].DestY = Y;
+  } else {
+    // MS-E-114: a new (or re-assigned) move goes last.
+    FS09DraftMove Move;
+    Move.FighterId = FighterId;
+    Move.DestX = X;
+    Move.DestY = Y;
+    Moves.Add(MoveTemp(Move));
   }
-  FS09DraftMove Move;
-  Move.FighterId = FighterId;
-  Move.DestX = X;
-  Move.DestY = Y;
-  Moves.Add(Move);
+  ReevaluateDraft(Board, Fighters);
+  TraceDraftOp(TEXT("assign"), FighterId, Board);
   return true;
 }
 
 void FS09CommandUi::ClearMove(const FString& FighterId) {
-  Moves.RemoveAll([&](const FS09DraftMove& Move) { return Move.FighterId == FighterId; });
+  LastReason.Reset();
+  if (Moves.RemoveAll([&FighterId](const FS09DraftMove& Move) { return SameDraftId(Move.FighterId, FighterId); }) ==
+      0) {
+    return;
+  }
+  ReevaluateDraft(SnapshotBoard, SnapshotFighters);
+  TraceDraftOp(TEXT("clear"), FighterId, SnapshotBoard);
+}
+
+bool FS09CommandUi::MoveOrder(const FString& FighterId, int32 Delta, const FS08Snapshot& Snapshot,
+                              const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters) {
+  LastReason.Reset();
+  if (Mode != ES09CommandMode::ManeuverDraft || Delta == 0) return false;
+  const int32 From = MoveIndexOf(FighterId);
+  if (From == INDEX_NONE) return false;
+  const int32 To = FMath::Clamp(From + Delta, 0, Moves.Num() - 1);
+  if (To == From) return false;
+  FS09DraftMove Move = Moves[From];
+  Moves.RemoveAt(From);
+  Moves.Insert(MoveTemp(Move), To);
+  DraftHand = FS09DraftEval::BoostHand(Snapshot, ViewerId);
+  ReevaluateDraft(Board, Fighters);
+  TraceDraftOp(TEXT("order"), FighterId, Board);
+  return true;
 }
 
 bool FS09CommandUi::ToggleBoostCard(const FString& InstanceId, const FS08Snapshot& Snapshot,
                                     FString& OutReason) {
+  return ToggleBoostCard(InstanceId, Snapshot, SnapshotBoard, SnapshotFighters, OutReason);
+}
+
+bool FS09CommandUi::ToggleBoostCard(const FString& InstanceId, const FS08Snapshot& Snapshot,
+                                    const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters,
+                                    FString& OutReason) {
   OutReason.Reset();
+  LastReason.Reset();
   if (Mode != ES09CommandMode::ManeuverDraft) {
     OutReason = TEXT("boost is chosen inside an open maneuver draft");
     return false;
   }
-  if (BoostCardId == InstanceId) {
+  DraftHand = FS09DraftEval::BoostHand(Snapshot, ViewerId);
+  if (!BoostCardId.IsEmpty() && SameDraftId(BoostCardId, InstanceId)) {
     BoostCardId.Reset();
-    return true;
+  } else {
+    const FS09BoostCard* Card = DraftHand.FindByPredicate(
+        [&InstanceId](const FS09BoostCard& C) { return SameDraftId(C.InstanceId, InstanceId); });
+    if (!Card) {
+      LastReason = FS09Reason::Make(TEXT("why.boost.card.gone"));
+      OutReason = TEXT("boost must be an exact card instance in your hand");
+      return false;
+    }
+    if (!Card->bHasBoost) {
+      LastReason = FS09Reason::Make(TEXT("why.boost.no.value"));
+      OutReason = LastReason.Describe();
+      return false;
+    }
+    // One card per maneuver: another card REPLACES the selected one.
+    BoostCardId = InstanceId;
   }
-  const TArray<FString> Hand = OwnHandIds(Snapshot);
-  if (!Hand.Contains(InstanceId)) {
-    OutReason = TEXT("boost must be an exact card instance in your hand");
-    return false;
-  }
-  BoostCardId = InstanceId;
+  // MS-R-15: plates and statuses follow the boost in the same call.
+  ReevaluateDraft(Board, Fighters);
+  TraceDraftOp(TEXT("boost"), FString(), Board);
   return true;
+}
+
+TArray<FS09BoostCard> FS09CommandUi::BoostOffers() const {
+  return DraftHand.FilterByPredicate([](const FS09BoostCard& Card) { return Card.bHasBoost; });
 }
 
 void FS09CommandUi::CancelDraft() {
@@ -586,7 +1040,11 @@ void FS09CommandUi::CancelDraft() {
   Moves.Reset();
   BoostCardId.Reset();
   SelectedFighterId.Reset();
-  ReachableCells.Reset();
+  LastReason.Reset();
+  // The draft stays open (same pending id): an empty draft evaluated on the
+  // last snapshot keeps the hand data (max BOOST, offers) current.
+  ReevaluateDraft(SnapshotBoard, SnapshotFighters);
+  TraceDraftOp(TEXT("reset"), FString(), SnapshotBoard);
 }
 
 bool FS09CommandUi::CanResumeManeuver(const FS08Snapshot& Snapshot) const {
@@ -599,6 +1057,7 @@ bool FS09CommandUi::ConfirmManeuver(const FS08Snapshot& Snapshot,
                                     const TArray<FS08BoardFighter>& Fighters,
                                     FS09ManeuverCommand& OutCommand, FString& OutReason) {
   OutReason.Reset();
+  LastReason.Reset();
   OutCommand = FS09ManeuverCommand();
   if (Mode != ES09CommandMode::ManeuverDraft) {
     OutReason = TEXT("no open maneuver draft");
@@ -614,39 +1073,43 @@ bool FS09CommandUi::ConfirmManeuver(const FS08Snapshot& Snapshot,
   }
   // Destination conflicts between drafted moves: the server applies moves
   // sequentially and rejects a second fighter on an occupied cell - catch it
-  // locally with an actionable reason.
+  // locally with an actionable reason (MS-E-36).
   TSet<uint64> Used;
   for (const FS09DraftMove& Move : Moves) {
     const uint64 Key = FS08BoardModel::CellKey(Move.DestX, Move.DestY);
     if (Used.Contains(Key)) {
+      LastReason = FS09Reason::Make(TEXT("why.cell.ally")).Arg(TEXT("cell"), Board.CellLabel(Move.DestX, Move.DestY));
       OutReason = FString::Printf(
           TEXT("two drafted moves end on the same cell (%d,%d)"), Move.DestX, Move.DestY);
       return false;
     }
     Used.Add(Key);
   }
-  OutCommand.ManeuverId = PendingManeuverId;
-  OutCommand.BoostCardId = BoostCardId;
   for (const FS09DraftMove& Move : Moves) {
-    const FS08BoardFighter* Fighter = FindOwnFighter(Fighters, Move.FighterId);
-    if (!Fighter) {
+    if (!FindOwnFighter(Fighters, Move.FighterId)) {
       OutReason = TEXT("drafted fighter is no longer selectable");
       return false;
     }
+  }
+  // MS-T-05: a fresh sequential evaluation on the confirm-time state; every
+  // move must be Ok (MS-R-16) - NeedBoost and Conflict block with a reason.
+  DraftHand = FS09DraftEval::BoostHand(Snapshot, ViewerId);
+  ReevaluateDraft(Board, Fighters);
+  for (const FS09DraftMove& Move : Moves) {
+    if (Move.Status == ES09DraftMoveStatus::Ok) continue;
+    LastReason = Move.Reason;
+    OutReason = FString::Printf(TEXT("move %d (%s) %s: %s"), Move.Order + 1, *Move.FighterId,
+                                Move.Status == ES09DraftMoveStatus::NeedBoost ? TEXT("needs a bigger boost")
+                                                                               : TEXT("is in conflict"),
+                                *Move.Reason.Describe());
+    return false;
+  }
+  OutCommand.ManeuverId = PendingManeuverId;
+  OutCommand.BoostCardId = BoostCardId;
+  for (const FS09DraftMove& Move : Moves) {
     FS08ManeuverMove Out;
-    if (Move.DestX == Fighter->X && Move.DestY == Fighter->Y) {
-      // Zero-length legal resolve: stay in place.
-      Out.FighterId = Move.FighterId;
-    } else if (!FS08BoardModel::BuildManeuverPath(Board, Fighters, Move.FighterId,
-                                                  Fighter->Movement + BoostValueFromHand(Snapshot),
-                                                  Move.DestX, Move.DestY, Out.Path) ||
-               Out.Path.IsEmpty()) {
-      OutReason = FString::Printf(TEXT("no legal path to (%d,%d) for %s"), Move.DestX,
-                                  Move.DestY, *Move.FighterId);
-      return false;
-    } else {
-      Out.FighterId = Move.FighterId;
-    }
+    Out.FighterId = Move.FighterId;
+    Out.Path = Move.Path; // canonical path (04 §3.1); empty = stay
     OutCommand.Moves.Add(MoveTemp(Out));
   }
   // Zero moves + optional boost/no-boost is a legal completion (ACC-006).

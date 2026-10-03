@@ -36,6 +36,12 @@ bool FS09HudFactory::CardFromJson(const TSharedPtr<FJsonValue>& Value,
   ReadValue(TEXT("attackValue"), OutCard.AttackValue);
   ReadValue(TEXT("defenseValue"), OutCard.DefenseValue);
   ReadValue(TEXT("boostValue"), OutCard.BoostValue);
+  {
+    const TSharedPtr<FJsonValue> Boost = Card->TryGetField(TEXT("boostValue"));
+    double BoostNumber = 0.0;
+    OutCard.bHasBoostValue = Boost.IsValid() && Boost->Type == EJson::Number && Boost->TryGetNumber(BoostNumber) &&
+                             FMath::IsFinite(BoostNumber);
+  }
   if (FS08Contracts::IsHiddenCard(Value)) {
     // Strip every identity field: a placeholder carries no face anywhere.
     OutCard = HiddenCard(OutCard.InstanceId);

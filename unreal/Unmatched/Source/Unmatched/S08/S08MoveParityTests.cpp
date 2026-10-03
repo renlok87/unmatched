@@ -16,8 +16,8 @@
 //       BuildManeuverPath equal the pre-MS-T-03 algorithms on both maps.
 // Reference reader: backend/src/test/fixtures/move-fixture-state.ts (format
 // additions to 04 §4.8, buildMoveFixtureState, computeFixtureExpect). The
-// draft walk below mirrors evaluateDraft only as far as the fixtures need it;
-// the client draft evaluator is FS09DraftEval (MS-T-05).
+// draft walk goes through the client draft evaluator FS09DraftEval (MS-T-05),
+// so the fixtures pin it too.
 // Headless run:
 //   UnrealEditor-Cmd.exe Unmatched.uproject
 //     "-ExecCmds=Automation RunTests Unmatched.S08.MoveParity; Quit"
@@ -26,6 +26,7 @@
 #if WITH_AUTOMATION_TESTS
 
 #include "S08BoardModel.h"
+#include "../S09/S09ManeuverUi.h"
 #include "Algo/Reverse.h"
 #include "Dom/JsonObject.h"
 #include "Dom/JsonValue.h"
@@ -437,17 +438,6 @@ const FS08BoardFighter* MpFind(const TArray<FS08BoardFighter>& Fighters, const F
   return nullptr;
 }
 
-FS08BoardFighter* MpFindMutable(TArray<FS08BoardFighter>& Fighters, const FString& Id) {
-  for (FS08BoardFighter& F : Fighters) {
-    if (MpSameId(F.Id, Id)) return &F;
-  }
-  return nullptr;
-}
-
-int32 MpClampSteps(int64 Steps) {
-  return static_cast<int32>(FMath::Clamp<int64>(Steps, MIN_int32, MAX_int32));
-}
-
 // ---- the client result of one fixture ---------------------------------------
 
 struct FMpGot {
@@ -484,29 +474,22 @@ struct FMpCard {
   int32 Boost = 0;
 };
 
-/** The draft of a fixture through the model, in the order of draft.moves on
- *  the positions after the previous moves (backend evaluateDraft as far as
- *  the fixtures need: mover gates, base = FighterMovement, reach with
+/** The draft of a fixture through the client evaluator FS09DraftEval (MS-T-05,
+ *  backend evaluateDraft): moves in the order of draft.moves on the positions
+ *  after the previous moves, base = FighterMovement, reach with
  *  base + max(selected, max hand BOOST), tiers, canonical path, required
- *  BOOST). A repeated fighter keeps its first entry (computeFixtureExpect). */
+ *  BOOST. A repeated fighter keeps its first entry (computeFixtureExpect). */
 bool MpEvaluateDraft(const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Initial,
                      const TSharedPtr<FJsonObject>& Draft, const TArray<FMpCard>& Hand, const FString& Actor,
                      TArray<FMpGot>& Out, FString& OutError) {
   FString BoostCardId;
   Draft->TryGetStringField(TEXT("boostCardId"), BoostCardId);
-  int32 Selected = 0, MaxBoost = 0;
-  for (const FMpCard& Card : Hand) {
-    if (!Card.bHasBoost) continue;
-    MaxBoost = FMath::Max(MaxBoost, Card.Boost);
-    if (!BoostCardId.IsEmpty() && MpSameId(Card.Id, BoostCardId)) Selected = Card.Boost;
-  }
   const TArray<TSharedPtr<FJsonValue>>* Moves = nullptr;
   if (!Draft->TryGetArrayField(TEXT("moves"), Moves) || !Moves) {
     OutError = TEXT("draft.moves missing");
     return false;
   }
-  TArray<FS08BoardFighter> Work = Initial;
-  TArray<FString> Seen;
+  TArray<FS09DraftMove> DraftMoves;
   for (const TSharedPtr<FJsonValue>& MoveValue : *Moves) {
     const TSharedPtr<FJsonObject>* MovePtr = nullptr;
     FString Id;
@@ -529,47 +512,35 @@ bool MpEvaluateDraft(const FS08BoardModel& Board, const TArray<FS08BoardFighter>
         Dest = FIntPoint(AtStart->X, AtStart->Y);
       }
     }
+    FS09DraftMove& Entry = DraftMoves.AddDefaulted_GetRef();
+    Entry.FighterId = Id;
+    Entry.DestX = Dest.X;
+    Entry.DestY = Dest.Y;
+  }
+  TArray<FS09BoostCard> BoostHand;
+  for (const FMpCard& Card : Hand) {
+    FS09BoostCard& Boost = BoostHand.AddDefaulted_GetRef();
+    Boost.InstanceId = Card.Id;
+    Boost.bHasBoost = Card.bHasBoost;
+    Boost.Boost = Card.Boost;
+  }
+  const FS09DraftEval Eval = FS09DraftEval::Evaluate(Board, Initial, DraftMoves, BoostHand, BoostCardId, Actor);
+  for (int32 Index = 0; Index < DraftMoves.Num(); ++Index) {
+    const FS09DraftMove& Move = DraftMoves[Index];
+    if (MpGotFor(Out, Move.FighterId)) continue; // a repeated fighter keeps its first entry
     FMpGot Got;
-    Got.FighterId = Id;
-    auto Record = [&Out](const FMpGot& G) {
-      if (!MpGotFor(Out, G.FighterId)) Out.Add(G);
-    };
-    auto Conflict = [&](FMpGot& G) {
-      G.bPath = false;
-      G.Path.Reset();
-      G.Status = TEXT("conflict");
-      G.Required = 0;
-      Record(G);
-    };
-    if (Seen.ContainsByPredicate([&](const FString& S) { return MpSameId(S, Id); })) {
-      Conflict(Got); // duplicate
-      continue;
+    Got.FighterId = Move.FighterId;
+    if (Eval.Tiers.IsValidIndex(Index) && Eval.Tiers[Index].bValid) {
+      Got.Base = Eval.Tiers[Index].BaseTier; // the early conflicts carry no tiers
+      Got.Boost = Eval.Tiers[Index].BoostTier;
     }
-    Seen.Add(Id);
-    FS08BoardFighter* Fighter = MpFindMutable(Work, Id);
-    const bool bImmobilized =
-        Fighter && Fighter->Effects.ContainsByPredicate([](const FString& E) {
-          return E.Equals(TEXT("immobilized"), ESearchCase::CaseSensitive);
-        });
-    if (!Fighter || !MpSameId(Fighter->OwnerId, Actor) || !Fighter->CanBeMover() || bImmobilized) {
-      Conflict(Got); // missing / not-yours / defeated (health <= 0) / immobilized: no tiers
-      continue;
-    }
-    const int32 Base = FS08BoardModel::FighterMovement(*Fighter);
-    const int32 BaseSteps = MpClampSteps(int64(Base) + Selected);
-    const int32 BoostSteps = MpClampSteps(int64(Base) + MaxBoost);
-    const FS08ReachMap Reach = FS08BoardModel::ComputeReachMap(Board, Work, Id, FMath::Max(BaseSteps, BoostSteps));
-    MpTiers(Board, Work, Reach, BaseSteps, BoostSteps, Got);
-    if (!FS08BoardModel::BuildCanonicalPath(Board, Work, Reach, Dest, Got.Path)) {
-      Conflict(Got); // no-path: the tiers stay
-      continue;
-    }
-    Got.bPath = true;
-    Got.Required = FMath::Max(0, Got.Path.Num() - Base);
-    Got.Status = Got.Required <= Selected ? TEXT("ok") : TEXT("needBoost");
-    Record(Got);
-    Fighter->X = Dest.X;
-    Fighter->Y = Dest.Y;
+    Got.bPath = Move.Status != ES09DraftMoveStatus::Conflict;
+    Got.Path = Move.Path;
+    Got.Status = Move.Status == ES09DraftMoveStatus::Ok          ? TEXT("ok")
+                 : Move.Status == ES09DraftMoveStatus::NeedBoost ? TEXT("needBoost")
+                                                                 : TEXT("conflict");
+    Got.Required = Move.RequiredBoost;
+    Out.Add(Got);
   }
   return true;
 }

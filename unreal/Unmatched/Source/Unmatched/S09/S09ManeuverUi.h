@@ -6,11 +6,15 @@
 //
 // Maneuver contract (ACC-006 / GD-013):
 //   beginManeuver  -> server draws ONE card, opens metadata.pendingManeuver;
-//   local draft    -> zero or more own fighters, one destination each
-//                     (neighbour path built from the board model: links on
-//                     an original-map board, orthogonal on a grid), optional
-//                     boost = any exact own-hand instance id (the card drawn
-//                     by begin is legal - it is already in the hand);
+//   local draft    -> zero or more own fighters, one destination each, in
+//                     send order (MS-T-05: evaluated sequentially - each move
+//                     on the positions after the previous ones - with the
+//                     canonical path of the board model: links on an
+//                     original-map board, orthogonal on a grid; status
+//                     Ok / NeedBoost / Conflict by the absolute RequiredBoost),
+//                     optional boost = an exact own-hand instance id with a
+//                     printed BOOST (the card drawn by begin is legal - it is
+//                     already in the hand);
 //   confirm        -> maneuver(maneuverId, moves, boostCardId?). Zero moves
 //                     is a legal completion (draw + no movement).
 // CANCEL is local-only: the committed server draw is never reversed and
@@ -43,10 +47,137 @@ enum class ES09CommandMode : uint8 {
                   // schemes G used to spend the wrong card/action.
 };
 
+// ---- MS-T-05: sequential draft evaluation (docs/game-design/move-selection
+// 04 §3.2, §4.4; reference: backend game-engine/movement/canonical-path.ts
+// evaluateDraft). The moves are evaluated in send order on the positions after
+// the previous moves; reach uses base + max(selected BOOST, max hand BOOST);
+// the absolute RequiredBoost = max(0, len(path) - base) decides Ok/NeedBoost.
+
+enum class ES09DraftMoveStatus : uint8 { Ok, NeedBoost, Conflict };
+
+/** Why a drafted move is a Conflict (backend DraftConflict). */
+enum class ES09DraftConflict : uint8 { None, Missing, NotYours, Defeated, Immobilized, Duplicate, NoPath };
+
+/** A why.* reason key (03 §8.2) with its arguments ({cell}, {need}, {have},
+ *  {n}, {fighterName}). The RU/EN texts come with MS-T-06 / MS-T-28. */
+struct UNMATCHED_API FS09Reason {
+  FName Key;
+  TMap<FString, FString> Args;
+
+  bool IsSet() const { return !Key.IsNone(); }
+  void Reset() {
+    Key = NAME_None;
+    Args.Reset();
+  }
+  static FS09Reason Make(const TCHAR* InKey) {
+    FS09Reason Reason;
+    Reason.Key = FName(InKey);
+    return Reason;
+  }
+  FS09Reason& Arg(const TCHAR* Name, const FString& Value) {
+    Args.Add(Name, Value);
+    return *this;
+  }
+  FS09Reason& Arg(const TCHAR* Name, int32 Value) { return Arg(Name, FString::FromInt(Value)); }
+  /** English placeholder text followed by " [key]" - toasts and traces until
+   *  MS-T-06 / MS-T-28 put the keys into the string tables. */
+  FString Describe() const;
+};
+
 struct UNMATCHED_API FS09DraftMove {
   FString FighterId;
   int32 DestX = -1;
   int32 DestY = -1;
+  // ---- MS-T-05 evaluation (FS09DraftEval::Evaluate rewrites these on every
+  // draft operation; DestX/DestY and the array order are the input) ----
+  int32 Order = 0;                 // index in moves[] (send order)
+  TArray<FIntPoint> Path;          // canonical path WITHOUT the start; empty = stay or Conflict
+  ES09DraftMoveStatus Status = ES09DraftMoveStatus::Ok;
+  ES09DraftConflict Conflict = ES09DraftConflict::None;
+  int32 RequiredBoost = 0;         // absolute BOOST: max(0, len - Base); 0 for Conflict
+  int32 Base = 0;                  // FighterMovement of the fighter
+  int32 Allowance = 0;             // Base + selected BOOST (the badge "steps/allowance")
+  FS09Reason Reason;               // why.* of a NeedBoost / Conflict move
+
+  /** Badge data of 03 §4.3: "{steps}/{allowance}" and, when the move needs a
+   *  bigger boost, " · need +{RequiredBoost}" ("6/5 · need +3"). Empty for a
+   *  Conflict. English until MS-T-28. */
+  FString BadgeText() const;
+};
+
+/** One own-hand card as the boost model sees it (backend DraftHandCard). */
+struct UNMATCHED_API FS09BoostCard {
+  FString InstanceId;
+  bool bHasBoost = false; // a printed BOOST (JSON number); null is never offered (MS-D-20)
+  int32 Boost = 0;
+  /** "+N" ("+0" for a zero BOOST); empty without a printed BOOST. */
+  FString Label() const { return bHasBoost ? FString::Printf(TEXT("+%d"), Boost) : FString(); }
+};
+
+/** Plate tiers of one fighter on one work state (04 §3.2, MS-E-80): base =
+ *  endpoints at 1..Base+s steps, boost = Base+s+1..Base+M (empty when s >= M);
+ *  Reach is the BFS with Base + max(s, M) steps (the hover preview reuses it). */
+struct UNMATCHED_API FS09ReachTiers {
+  bool bValid = false;
+  FString FighterId;
+  FIntPoint Start = FIntPoint(-1, -1);
+  int32 Base = 0;
+  int32 BaseSteps = 0;
+  int32 BoostSteps = 0;
+  TArray<FIntPoint> BaseTier;  // sorted by K
+  TArray<FIntPoint> BoostTier; // sorted by K
+  FS08ReachMap Reach;
+
+  /** The "+N" chip of a boost-tier cell: dist - Base (absolute BOOST); 0 for
+   *  any other cell. */
+  int32 ChipAt(const FIntPoint& Cell) const;
+};
+
+/** Result of FS09DraftEval::Evaluate (the per-move fields live in the
+ *  evaluated FS09DraftMove array). */
+struct UNMATCHED_API FS09DraftEval {
+  int32 SelectedBoost = 0; // BOOST of the selected card (no card / no BOOST -> 0)
+  int32 MaxBoost = 0;      // max BOOST of the hand cards that have one, 0 if none
+  /** Tiers of each move's fighter on the positions before its move (same
+   *  index as the moves); invalid for the early Conflicts (missing,
+   *  not-yours, defeated, immobilized, duplicate). */
+  TArray<FS09ReachTiers> Tiers;
+  /** work_n: the fighters after every Ok / NeedBoost move. */
+  TArray<FS08BoardFighter> Work;
+  int32 NumOk = 0;
+  int32 NumNeedBoost = 0;
+  int32 NumConflict = 0;
+  /** MS-E-14 / MS-E-79: max RequiredBoost over the NeedBoost moves (0 = no
+   *  highlight) and the hand cards with BOOST >= it, except the selected one. */
+  int32 HighlightMinBoost = 0;
+  TArray<FString> HighlightCardIds;
+
+  bool IsConfirmable() const { return NumNeedBoost == 0 && NumConflict == 0; }
+
+  /** The viewer's own hand as boost cards (snapshot order). */
+  static TArray<FS09BoostCard> BoostHand(const FS08Snapshot& Snapshot, const FString& ViewerId);
+  static int32 SelectedBoostOf(const TArray<FS09BoostCard>& Hand, const FString& BoostCardId);
+  static int32 MaxBoostOf(const TArray<FS09BoostCard>& Hand);
+  /** backend isImmobilized: an effect of type 'immobilized' (exact). */
+  static bool IsImmobilized(const FS08BoardFighter& Fighter);
+  /** Tiers of FighterId on Work with BOOST s (selected) and M (max hand). */
+  static FS09ReachTiers ComputeTiers(const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Work,
+                                     const FString& FighterId, int32 SelectedBoost, int32 MaxBoost);
+  /** Why Dest cannot end Mover's move on Work (the BFS with Base + max(s, M)
+   *  found no path): not a board space, an enemy / an ally on it (an ally
+   *  whose own drafted move ends on Mover's cell = a swap, MS-E-35; an ally
+   *  that leaves it later in the order gets the "orderHint" argument,
+   *  MS-E-34), a path longer than the best boost (need / have) or no path. */
+  static FS09Reason DestinationReason(const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Work,
+                                      const FS08BoardFighter& Mover, const FIntPoint& Dest, int32 Base,
+                                      int32 SelectedBoost, int32 MaxBoost, const TArray<FS09DraftMove>& Draft);
+  /** backend evaluateDraft over Moves (in place: Order, Path, Status,
+   *  Conflict, RequiredBoost, Base, Allowance, Reason). ActorId (empty = no
+   *  check) rejects fighters of another owner; the mover needs only
+   *  health > 0 (MS-E-77), blockers use IsAliveBlocker (MS-E-24). */
+  static FS09DraftEval Evaluate(const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters,
+                                TArray<FS09DraftMove>& Moves, const TArray<FS09BoostCard>& Hand,
+                                const FString& BoostCardId, const FString& ActorId);
 };
 
 /** Result intent produced by Confirm() - executed by the flow controller. */
@@ -181,10 +312,30 @@ public:
 
   // Maneuver draft state
   FString PendingManeuverId;
+  /** The draft in send order (moves[] of the command). Every draft operation
+   *  re-evaluates all moves (FS09DraftEval): status, path, RequiredBoost. */
   TArray<FS09DraftMove> Moves;
   FString BoostCardId;
   FString SelectedFighterId; // fighter whose destination the next cell click sets
+  /** Legacy reach set of the selected fighter (the TASK-022 ring): its own
+   *  cell plus the base tier of SelectedTiers. */
   TSet<uint64> ReachableCells;
+  // ---- MS-T-05 ----
+  /** Evaluation of Moves after the last draft operation. */
+  FS09DraftEval Eval;
+  /** Tiers of the selected fighter: on the positions before its move when it
+   *  has one, else after every move (a new move goes last) - 04 §3.2. */
+  FS09ReachTiers SelectedTiers;
+  /** The viewer's hand as boost cards (refreshed by every snapshot / op that
+   *  passes one). */
+  TArray<FS09BoostCard> DraftHand;
+  /** +1 on every draft operation (assign, clear, boost, order, snapshot). */
+  uint32 DraftRevision = 0;
+  /** Reason of the last refused draft operation (why.* key + args). */
+  FS09Reason LastReason;
+  /** Draft trace lines (MS-DRAFT, MS-PATH) also written to FS08Trace; the
+   *  last 64 are kept for tests. */
+  TArray<FString> DraftTrace;
 
   // Discard draft state
   FS08PendingHandDiscard PendingDiscard;
@@ -223,6 +374,9 @@ public:
   /** Board of the last OnSnapshot (attack-range basis of the board-less
    *  overloads). Callers holding the live model pass it explicitly. */
   FS08BoardModel SnapshotBoard;
+  /** Fighters of the last OnSnapshot: the re-evaluation basis of the draft
+   *  operations that take no model (ClearMove, the 3-argument boost toggle). */
+  TArray<FS08BoardFighter> SnapshotFighters;
 
   /** Feed one authoritative applied snapshot. Clears/resumes drafts strictly
    *  from the server state (pending appeared -> draft open; pending gone ->
@@ -237,23 +391,59 @@ public:
   /** Maneuver draft ops (no server calls; every one is reversible). */
   bool SelectFighter(const FString& FighterId, const FS08Snapshot& Snapshot,
                      const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters);
-  /** Sets/overwrites the drafted destination for FighterId. Fails with
-   *  OutReason when the cell is not reachable (movement + boost allowance). */
+  /** MS-T-05: what (X, Y) would be as FighterId's destination - evaluated on
+   *  the positions before its move (it keeps its place in the order) or, for
+   *  a fighter without a move, after every move (a new move goes last).
+   *  True with OutMove (Path, Status Ok / NeedBoost, RequiredBoost, Base,
+   *  Allowance) when a path exists within Base + max(selected, max hand
+   *  BOOST); false with OutReason (why.*) otherwise. Own cell = an empty
+   *  path ("stay"). Does not change the draft. */
+  bool EvaluateDestination(const FString& FighterId, int32 X, int32 Y, const FS08BoardModel& Board,
+                           const TArray<FS08BoardFighter>& Fighters, FS09DraftMove& OutMove,
+                           FS09Reason& OutReason) const;
+  /** Sets/overwrites the drafted destination for FighterId (EvaluateDestination
+   *  decides): an overwrite keeps the move's place in the order (MS-E-38), a
+   *  new move goes last (MS-E-114). A cell in the boost tier is accepted with
+   *  the NeedBoost status (MS-E-14). Fails with OutReason (and LastReason)
+   *  when no path exists within the best boost. */
   bool SetDestination(const FString& FighterId, int32 X, int32 Y,
                       const FS08Snapshot& Snapshot, const FS08BoardModel& Board,
                       const TArray<FS08BoardFighter>& Fighters, FString& OutReason);
+  /** Drops FighterId's move (the later moves move up one place) and
+   *  re-evaluates the draft on the last snapshot's model. */
   void ClearMove(const FString& FighterId);
-  /** Boost toggle: only an exact own-hand instance id is accepted. */
+  /** MS-R-17 (Ctrl+Up = -1, Ctrl+Down = +1): moves FighterId's move Delta
+   *  places in the send order and re-evaluates every move. No action (false)
+   *  for a fighter without a move, the first move up and the last move down
+   *  (MS-E-96). */
+  bool MoveOrder(const FString& FighterId, int32 Delta, const FS08Snapshot& Snapshot,
+                 const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters);
+  /** Index of FighterId's move in Moves, INDEX_NONE without one. */
+  int32 MoveIndexOf(const FString& FighterId) const;
+  /** Drops the selection (the draft stays): SelectedFighterId, SelectedTiers
+   *  and ReachableCells together. */
+  void DeselectFighter();
+  /** Boost toggle: only an exact own-hand instance id with a printed BOOST is
+   *  accepted (null -> why.boost.no.value, MS-D-20); another card replaces
+   *  the selected one; the draft is re-evaluated in the same call (MS-R-15).
+   *  The 3-argument form re-evaluates on the last snapshot's model. */
   bool ToggleBoostCard(const FString& InstanceId, const FS08Snapshot& Snapshot,
                        FString& OutReason);
+  bool ToggleBoostCard(const FString& InstanceId, const FS08Snapshot& Snapshot,
+                       const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters,
+                       FString& OutReason);
+  /** The hand cards offered as a boost (a printed BOOST, "+0" included). */
+  TArray<FS09BoostCard> BoostOffers() const;
   /** Local-only cancel: drops the draft; the server pendingManeuver stays
    *  (the committed draw is NOT reversed) - Resume re-enters the draft. */
   void CancelDraft();
   /** True while a pendingManeuver exists for the viewer (draft resumable). */
   bool CanResumeManeuver(const FS08Snapshot& Snapshot) const;
 
-  /** Confirm gate: always legal while the draft is open (zero moves is a
-   *  legal maneuver - ACC-006). Destination conflicts are rejected. */
+  /** Confirm gate: legal while the draft is open (zero moves is a legal
+   *  maneuver - ACC-006) and every move is Ok after a fresh evaluation; a
+   *  NeedBoost or Conflict move blocks it with its reason (MS-R-16). The
+   *  command carries the canonical paths. */
   bool ConfirmManeuver(const FS08Snapshot& Snapshot, const FS08BoardModel& Board,
                        const TArray<FS08BoardFighter>& Fighters,
                        FS09ManeuverCommand& OutCommand, FString& OutReason);
@@ -387,10 +577,24 @@ public:
 
 private:
   TArray<FString> OwnHandIds(const FS08Snapshot& Snapshot) const;
-  /** boostValue of the currently selected boost card (0 = none/unknown). */
-  int32 BoostValueFromHand(const FS08Snapshot& Snapshot) const;
   const FS08BoardFighter* FindOwnFighter(const TArray<FS08BoardFighter>& Fighters,
                                          const FString& FighterId) const;
+  /** MS-T-05: Eval + the evaluated Moves, then SelectedTiers / ReachableCells;
+   *  +1 DraftRevision. */
+  void ReevaluateDraft(const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters);
+  /** Tiers of the selected fighter on its work state (see SelectedTiers). */
+  void RefreshSelectedTiers(const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters);
+  /** The fighters before FighterId's move (it keeps its place) or after every
+   *  move (no move yet). */
+  TArray<FS08BoardFighter> WorkStateFor(const FString& FighterId, const FS08BoardModel& Board,
+                                        const TArray<FS08BoardFighter>& Fighters) const;
+  /** Resets the evaluation, the selected tiers and the reach set. */
+  void ResetDraftEval();
+  /** FS08Trace + DraftTrace (last 64). */
+  void DraftTraceLine(const FString& Line);
+  /** "MS-DRAFT op=<Op> rev=<n> ..." (04 §9) for FighterId's move (or the
+   *  summary); an assign also writes MS-PATH. */
+  void TraceDraftOp(const TCHAR* Op, const FString& FighterId, const FS08BoardModel& Board);
   /** GD-034 helpers. */
   const FS08BoardFighter* FindFighter(const TArray<FS08BoardFighter>& Fighters,
                                       const FString& FighterId) const;
