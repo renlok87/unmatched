@@ -36,11 +36,9 @@ public class Unmatched : ModuleRules {
     // build (FileFilter.ResolveWildcard; an absent folder stages nothing): a layout added later needs a
     // rebuild of the target before packaging.
     RuntimeDependencies.Add("$(ProjectDir)/Config/ArtBoards/EnvLayouts/*.layout.json", StagedFileType.UFS);
-    // W4-A -Bench: the captured Cobble 5x6 game state the backend-less render
-    // bench replays (S08FlowGameMode.cpp RunRenderBench).
-    RuntimeDependencies.Add("$(ProjectDir)/Config/Bench/S08BenchCobble.json", StagedFileType.UFS);
-    // ENV-MAPS: the same scene on the original maps (-BenchFixture=<file>; generated from the topology
-    // fixtures by tools/art/render/env_bench_fixtures.cts).
+    // W4-A -Bench: the game states the backend-less render bench replays (S08FlowGameMode.cpp RunRenderBench),
+    // one per original map (default Marmoreal, -BenchFixture=<file> for Sarpedon; real boards only since
+    // 2026-10-04); generated from the topology fixtures by tools/art/render/env_bench_fixtures.cts.
     RuntimeDependencies.Add("$(ProjectDir)/Config/Bench/S08BenchMarmoreal.json", StagedFileType.UFS);
     RuntimeDependencies.Add("$(ProjectDir)/Config/Bench/S08BenchSarpedon.json", StagedFileType.UFS);
     // Art Tuner (docs/art-pipeline/ART-TUNER-PLAN.md): the rows of the -ArtTuner panel (S08ArtTuner.h).

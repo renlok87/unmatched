@@ -185,7 +185,7 @@ constexpr int32 BackdropTranslucencySortPriority = -10;  // drawn before the gam
 
 enum class ES08ZoneStroke : uint8 { Solid, Dash2, Dash3, Dash4, Dots5, Double, DashDot };
 enum class ES08ZoneGlyph : uint8 { Diamond, Bar1, Bars2, Bars3, HBars2, Square, Cross, X, Tee, Chevron, Ring };
-enum class ES08BoardSurface : uint8 { Tiles, Cobble5x6Mesh, MapImage };
+enum class ES08BoardSurface : uint8 { Tiles, MapImage };
 enum class ES08ProfileMatch : uint8 { None, BoardId, Signature };
 
 UNMATCHED_API const TCHAR* S08ZoneStrokeName(ES08ZoneStroke Stroke);
@@ -454,7 +454,6 @@ struct UNMATCHED_API FS08BoardArtProfile {
   TArray<FString> MatchZoneKeys;  // sorted
   ES08BoardSurface Surface = ES08BoardSurface::Tiles;
   FString LightId;
-  bool bLegacyCobbleTrace = false;
   bool bArtFixture = false;
   /** "glyphs": "zone" (default) = glyph in the zone colour (unlit tint),
    *  "review" = the ART-005 review glyph material (Cobble, kept exact). */

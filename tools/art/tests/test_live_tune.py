@@ -94,7 +94,7 @@ class Locks(unittest.TestCase):
             with self.assertRaises(LT.LiveTuneError) as e:
                 LT.lock_acquire(lock, "again", timeout=0.3, poll=0.1)
             self.assertEqual(e.exception.code, 3)
-            LT.lock_rewrite(lock, "owner=LIVE-TUNE pid=777 map=cobble session=x live-tune")
+            LT.lock_rewrite(lock, "owner=LIVE-TUNE pid=777 map=marmoreal session=x live-tune")
             self.assertFalse(LT.lock_release(lock, pid=778), "another session's pid")
             self.assertTrue(LT.lock_release(lock, pid=777))
             self.assertFalse(lock.exists())

@@ -868,6 +868,39 @@ bool ValueWrites(const FS08TunerParam& P, const TSharedPtr<FJsonValue>& Value,
   OutError = TEXT("unknown row type");
   return false;
 }
+
+int32 ReanchorBoard(FS08TunerOverridesFile::FBoard& Board, int32 CurrentIndex) {
+  if (CurrentIndex == INDEX_NONE || Board.Board.IsEmpty()) return 0;
+  const FString Prefix = TEXT("/boards/");
+  const FString Suffix = TEXT("/id");
+  TSet<FString> OldIndices;
+  for (const TPair<FString, FString>& A : Board.Anchors) {
+    if (A.Value != Board.Board || !A.Key.StartsWith(Prefix, ESearchCase::CaseSensitive) ||
+        !A.Key.EndsWith(Suffix, ESearchCase::CaseSensitive)) {
+      continue;
+    }
+    const FString Index = A.Key.Mid(Prefix.Len(), A.Key.Len() - Prefix.Len() - Suffix.Len());
+    bool bDigits = !Index.IsEmpty();
+    for (const TCHAR C : Index) bDigits = bDigits && FChar::IsDigit(C);
+    if (bDigits && FCString::Atoi(*Index) != CurrentIndex) OldIndices.Add(Index);
+  }
+  if (OldIndices.IsEmpty()) return 0;
+  const FString NewPrefix = FString::Printf(TEXT("/boards/%d/"), CurrentIndex);
+  auto Move = [&](FString& Pointer) {
+    for (const FString& Old : OldIndices) {
+      const FString OldPrefix = Prefix + Old + TEXT("/");
+      if (Pointer.StartsWith(OldPrefix, ESearchCase::CaseSensitive)) {
+        Pointer = NewPrefix + Pointer.Mid(OldPrefix.Len());
+        return 1;
+      }
+    }
+    return 0;
+  };
+  int32 Moved = 0;
+  for (TPair<FString, FString>& A : Board.Anchors) Moved += Move(A.Key);
+  for (FS08TunerOverridesFile::FEntry& E : Board.Entries) Moved += Move(E.Pointer);
+  return Moved;
+}
 }  // namespace S08ArtTuner
 
 const FS08TunerParam* FS08ArtTunerSession::FindParam(const FString& PointerOrId) const {

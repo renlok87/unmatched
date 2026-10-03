@@ -19,7 +19,8 @@ REPO = Path(__file__).resolve().parents[3]
 PROFILES = REPO / "unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json"
 S08 = REPO / "unreal/Unmatched/Source/Unmatched/S08"
 DOC = REPO / "docs/art-pipeline/ENV-HERO-LIGHT.md"
-LIGHT_IDS = ("cobble-probe", "forest-probe", "paddock-probe", "marmoreal-night", "sarpedon-night")
+# the original maps only (2026-10-04, real boards only: the probe profiles of the synthetic boards are gone)
+LIGHT_IDS = ("marmoreal-night", "sarpedon-night")
 MAX_PER_FIGURE, MAX_PER_BOARD = 2, 14
 
 BLOCK_FIELDS = {"enabled", "note", "cameraAzimuthDeg", "aimHeight", "litPedestal", "key", "rim", "states"}
@@ -107,7 +108,7 @@ class ShippedBlocks(unittest.TestCase):
         self.lights = self.prof["lightProfiles"]
 
     def test_every_light_profile_lights_the_figures(self):
-        # «Все сцены»: Marmoreal, Sarpedon, Cobble and the probe boards
+        # «Все сцены»: Marmoreal and Sarpedon (the synthetic probe boards left the profile on 2026-10-04)
         self.assertEqual(set(self.lights), set(LIGHT_IDS))
         for lid in LIGHT_IDS:
             block = self.lights[lid].get("heroLight")

@@ -200,6 +200,12 @@ UNMATCHED_API bool NormalizeHex(const FString& In, FString& Out);
  *  hard bounds checked, a bool, a #RRGGBB, three linear channels, or ev100 (ev100 + min = max brightness 2^ev). */
 UNMATCHED_API bool ValueWrites(const FS08TunerParam& Param, const TSharedPtr<FJsonValue>& Value,
                                TArray<TPair<FString, TSharedPtr<FJsonValue>>>& OutWrites, FString& OutError);
+/** Re-anchors a saved board block by its board id (2026-10-04: the synthetic boards left the profile, so a board's index
+ *  in boards[] moved, e.g. Sarpedon 4 -> 1): an anchor "/boards/N/id" whose value is the block's own board id and whose N
+ *  differs from CurrentIndex (the index of that id in the document now) moves to "/boards/CurrentIndex/id", and every
+ *  entry pointer under "/boards/N/" moves with it. Returns the number of moved pointers (anchors + entries); 0 when the
+ *  block is already on CurrentIndex or CurrentIndex is INDEX_NONE (the anchor check then decides as before). */
+UNMATCHED_API int32 ReanchorBoard(FS08TunerOverridesFile::FBoard& Board, int32 CurrentIndex);
 }  // namespace S08ArtTuner
 
 /** One -ArtTuner session of the game mode (S08FlowGameModeArtTuner.cpp): the registry rows of the active board, the

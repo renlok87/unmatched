@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """W4-A render bench driver: packaged Development client in -Bench mode.
 
-The client (S08FlowGameMode.cpp RunRenderBench) replays the captured Cobble 5x6
-game state (Config/Bench/S08BenchCobble.json) without a backend, warms up,
+The client (S08FlowGameMode.cpp RunRenderBench) replays a game state on an
+original map (default Config/Bench/S08BenchMarmoreal.json since 2026-10-04,
+real boards only; --bench-fixture .../S08BenchSarpedon.json for Sarpedon)
+without a backend, warms up,
 then per view (K1 overview, K2 5x on Medusa) settles, measures frame / GPU /
 game / render thread ms with no frame cap (t.MaxFPS 0, VSync 0), records a
 CSV profiler window (-csvGpuStats: per-pass GPU ms), dumps one ProfileGPU
@@ -102,6 +104,10 @@ def profiles_rev1(out: Path) -> Path:
     return p
 
 
+# 2026-10-04 (real boards only): the default bench scene is Marmoreal, passed explicitly so an older package (whose own
+# default was the retired Cobble 5x6 fixture) replays the same board; read from the pak (cwd Binaries/Win64).
+DEFAULT_BENCH_FIXTURE = "../../../Unmatched/Config/Bench/S08BenchMarmoreal.json"
+
 def variant_args(name: str, out: Path) -> tuple[list[str], list[str], dict]:
     """(client args, extra ExecCmds, notes)."""
     if name == "dx12-lumen-high":
@@ -112,7 +118,7 @@ def variant_args(name: str, out: Path) -> tuple[list[str], list[str], dict]:
                 {"heroesV2": True, "diorama": True, "heroLight": "off (-NoHeroLight)", "profiles": "pak rev 2"})
     if name in ("dx12-lumen-high-v2", "dx12-lumen-high-v2-fps60"):
         # Wave 6 (GD-058 interim): the reference plus the 5c-B look-dev heroes (-ArtPreviewHeroesV2) and the
-        # diorama tray (-ArtPreviewDiorama) on the same Cobble bench state; -fps60 caps the single client at
+        # diorama tray (-ArtPreviewDiorama) on the same bench state; -fps60 caps the single client at
         # 60 FPS (-BenchFps=60, the packaged default) to record the effective frame rate, not the pass cost.
         args = ["-S08RenderPreset=High", "-ArtPreviewHeroesV2", "-ArtPreviewDiorama"]
         notes = {"heroesV2": True, "diorama": True, "profiles": "pak rev 2"}
@@ -646,7 +652,9 @@ def main(argv=None) -> int:
     r.add_argument("--warmup", type=int, default=30)
     r.add_argument("--settle", type=int, default=8)
     r.add_argument("--measure", type=int, default=20)
-    r.add_argument("--bench-fixture", default="", help="-BenchFixture=<json> (default: the client's S08BenchCobble.json)")
+    r.add_argument("--bench-fixture", default=DEFAULT_BENCH_FIXTURE,
+                   help="-BenchFixture=<json> (default: Marmoreal, the original map; ../../../Unmatched/Config/Bench/"
+                        "S08BenchSarpedon.json for Sarpedon)")
     r.add_argument("--name", default="", help="output directory name under --out (default: the variant)")
     s = sub.add_parser("summarize")
     s.add_argument("--out", required=True)

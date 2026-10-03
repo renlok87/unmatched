@@ -3187,8 +3187,8 @@ namespace {
 const TCHAR* S09ProbeHostId = TEXT("cmugykjjb0000wi9w2nq4qlkj");
 
 // A captured gameState(gameId) response {"raw": <body object or string>}.
-// W4-A -Bench reuses it for the Cobble scene (Config/Bench/S08BenchCobble.json,
-// which adds benchViewerId / benchBoardId at the root).
+// W4-A -Bench reuses it for its scene (Config/Bench/S08Bench<Map>.json, default
+// S08BenchMarmoreal.json, which adds benchViewerId / benchBoardId at the root).
 bool S08LoadGameStateFixture(const FString& File, FS08Snapshot& Out, TSharedPtr<FJsonObject>* OutRoot = nullptr) {
   FString Text;
   if (!FFileHelper::LoadFileToString(Text, *File)) {
@@ -7025,8 +7025,9 @@ void AS08FlowGameMode::WriteArtHudWidgetLines(const FString& Prefix, bool bLate)
 }
 
 // ---- W4-A render bench (-Bench) -------------------------------------------
-// Backend-less, deterministic scene: the captured Cobble 5x6 game state
-// (Config/Bench/S08BenchCobble.json, staged as UFS) goes through the same
+// Backend-less, deterministic scene: a captured game state on an original map
+// (default Config/Bench/S08BenchMarmoreal.json since 2026-10-04 - real boards
+// only; S08BenchSarpedon.json via -BenchFixture; staged as UFS) goes through the same
 // SyncBoardFromApplied path as a live snapshot, so the board, the light
 // profile, the fighters and the game layer are exactly the -ArtPreview ones.
 // Per view (default K1 + K2 5x on the viewer's hero): warm-up (first view),
@@ -7101,7 +7102,7 @@ void AS08FlowGameMode::RunRenderBench() {
     B.bProfileGpu = !FParse::Param(Cmd, TEXT("BenchNoProfileGPU"));
     B.bCsv = FParse::Param(Cmd, TEXT("BenchCsv"));
     FString Fixture = ArtView.IsValid() ? ArtView->Fixture
-                                        : FPaths::Combine(FPaths::ProjectConfigDir(), TEXT("Bench"), TEXT("S08BenchCobble.json"));
+                                        : FPaths::Combine(FPaths::ProjectConfigDir(), TEXT("Bench"), TEXT("S08BenchMarmoreal.json"));
     FParse::Value(Cmd, TEXT("BenchFixture="), Fixture);
     // ENV-MAPS live tune: the fixture init below, then the session owns the views (S08FlowGameModeLiveTune.cpp)
     const bool bLiveTune = S08LiveTune::Enabled();

@@ -44,9 +44,8 @@ blender/ASSET-MEDUSA-001/variants/head-tilt-v31-*/** -text
 # ART-004 T2.3 K2 ID depth maps (rev1-t23 mask reprojection): keep the report and .npz bytes as written.
 docs/game-design/evidence/ART-004/k2-id-depth-2026-09-28/** -text
 
-# Stage 3 T3.2 art boards: the fixture JSONs are checked byte-for-byte against a fresh build from
-# maps.json, run records hash the board-profile data, run manifests hash traces and logs.
-backend/prisma/fixtures/art-boards/** -text
+# Stage 3 T3.2 art boards: run records hash the board-profile data, run manifests hash traces and logs
+# (the ART FIXTURE grid JSONs of backend/prisma/fixtures/art-boards are retired since 2026-10-04).
 unreal/Unmatched/Config/ArtBoards/** -text
 docs/game-design/evidence/ART-005/art-boards-t32/** -text
 
@@ -54,7 +53,7 @@ docs/game-design/evidence/ART-005/art-boards-t32/** -text
 art/um-materials/** -text
 
 # ART-004 W4-A render (DX12/SM6 + Lumen, High): run manifests and bench records hash the exact bytes of
-# traces, client logs and JSON; the -Bench Cobble fixture is replayed byte-for-byte by the packaged client.
+# traces, client logs and JSON; the -Bench map fixtures are replayed byte-for-byte by the packaged client.
 docs/game-design/evidence/ART-004/render-dx12-lumen-2026-09-29/** -text
 unreal/Unmatched/Config/Bench/** -text
 

@@ -277,8 +277,9 @@ bool FS08HeroLightShippedTest::RunTest(const FString&) {
                 Data.LoadFile(FS08BoardArtData::DefaultPath(), Errors))) {
     return false;
   }
-  for (const TCHAR* Id : {TEXT("marmoreal-night"), TEXT("sarpedon-night"), TEXT("cobble-probe"), TEXT("forest-probe"),
-                          TEXT("paddock-probe")}) {
+  // 2026-10-04 (real boards only): the probe profiles of the synthetic boards are gone; the two map profiles remain
+  TestEqual("two light profiles", Data.Lights.Num(), 2);
+  for (const TCHAR* Id : {TEXT("marmoreal-night"), TEXT("sarpedon-night")}) {
     const FS08LightProfile* L = Data.Lights.Find(Id);
     if (!TestNotNull(FString::Printf(TEXT("light profile %s"), Id), L)) continue;
     const FS08HeroLightSpec& H = L->HeroLight;

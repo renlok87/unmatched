@@ -66,17 +66,18 @@ class Raster(unittest.TestCase):
 
 class Camera(unittest.TestCase):
     def test_s08_fit_distance(self):
-        # state.md 2.5: Cobble 5x6 -> 1931 uu, whole map at 2/3 uu per px (891x577) -> ~1872 uu
+        # state.md 2.5: a 5x6 grid -> 1931 uu, whole map at 2/3 uu per px (891x577) -> ~1872 uu
         self.assertAlmostEqual(k1_mock.s08_fit_distance(250.0, 300.0), 1931.0, delta=1.0)
         self.assertAlmostEqual(k1_mock.s08_fit_distance(891.333 / 2, 577.333 / 2), 1872.0, delta=1.0)
 
     def test_overview_distance_env_u9(self):
-        # ENV-U9: the two map-image profiles carry k1DistanceMul 1.25 -> K1 2340 uu; Cobble keeps its fit (1931)
+        # ENV-U9: the two map-image profiles carry k1DistanceMul 1.25 -> K1 2340 uu; a grid keeps its fit (1931)
         self.assertEqual(k1_mock.k1_distance_mul("c121b47f8d6eb28daccb76d05"), 1.25)  # Marmoreal
         self.assertEqual(k1_mock.k1_distance_mul("c7fa64a26c29a0835f2383e63"), 1.25)  # Sarpedon
-        self.assertEqual(k1_mock.k1_distance_mul("cmuhgs4b2001mwik4f2b2xtf8"), 1.0)   # Cobble City 5x6
         with self.assertRaises(ValueError):
             k1_mock.k1_distance_mul("no-such-board")
+        with self.assertRaises(ValueError):  # Cobble City 5x6: no profile since 2026-10-04 (real boards only)
+            k1_mock.k1_distance_mul("cmuhgs4b2001mwik4f2b2xtf8")
         self.assertAlmostEqual(k1_mock.s08_overview_distance(891.333 / 2, 577.333 / 2, 1.25), 2340.2, delta=0.5)
         self.assertEqual(k1_mock.s08_overview_distance(250.0, 300.0), k1_mock.s08_fit_distance(250.0, 300.0))
 

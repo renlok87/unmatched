@@ -62,7 +62,14 @@ bool AS08FlowGameMode::ArtTunerBegin() {
     TArray<FString> FileErrors;
     File.LoadFile(S.File, FileErrors);
     for (const FString& E : FileErrors) S.Warnings.Add(TEXT("файл: ") + E);
-    if (const FS08TunerOverridesFile::FBoard* Board = File.FindBoard(S.BoardId)) {
+    if (const FS08TunerOverridesFile::FBoard* Saved = File.FindBoard(S.BoardId)) {
+      // 2026-10-04: a block saved while the board sat at another index of boards[] is re-anchored by its board id
+      FS08TunerOverridesFile::FBoard Reanchored = *Saved;
+      if (const int32 Moved = S08ArtTuner::ReanchorBoard(Reanchored, S.BoardIndex)) {
+        S.Warnings.Add(FString::Printf(TEXT("файл: записи доски %s перенесены на /boards/%d (%d указателей; доски профиля сдвинулись)"),
+                                       *S.BoardId, S.BoardIndex, Moved));
+      }
+      const FS08TunerOverridesFile::FBoard* Board = &Reanchored;
       bool bAnchors = true;
       for (const TPair<FString, FString>& A : Board->Anchors) {
         const TSharedPtr<FJsonValue> V = S.Model.BaseValue(A.Key);

@@ -474,8 +474,8 @@ bool FS08DioramaT2ActorTest::RunTest(const FString&) {
         TestTrue(FString::Printf(TEXT("the map frame sits inside the flat top (narrowest apron %.1f)"),
                                  T2MinApronUU(MapFrameHalf, T2DefaultOffsetY)),
                  T2MinApronUU(MapFrameHalf, T2DefaultOffsetY) > T2RimUU);
-        // A grid art board afterwards: the FitTray placement shows T1 again (Cobble slab: yaw -90, scale 1).
-        Actor->PlaceDioramaTray(true, FVector2D(278.0, 328.0), TEXT("cobble-5x6-mesh"));
+        // A grid art board afterwards: the FitTray placement shows T1 again (a 278 x 328 frame: yaw -90, scale 1).
+        Actor->PlaceDioramaTray(true, FVector2D(278.0, 328.0), TEXT("tiles"));
         TestTrue("grid board: back to SM_TableBase",
                  Tray->GetStaticMesh() && Tray->GetStaticMesh()->GetPathName().StartsWith(MeshPath));
         const UMaterialInterface* T1Mi = Tray->GetMaterial(0);

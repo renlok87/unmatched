@@ -292,11 +292,9 @@ private:
 
   // ART-005 / T3.2 -ArtPreview board art, selected per board from the data in
   // Config/ArtBoards/S08ArtBoardProfiles.json (S08BoardArt.h). Surface
-  // 'cobble-5x6-mesh' keeps the ART-005 Cobble slab; 'tiles' dresses the
+  // 'map-image' draws an original map (topology boards); 'tiles' dresses the
   // parametric tiles of any W x H board. The instanced tiles always stay the
-  // exact click surfaces.
-  UPROPERTY()
-  TObjectPtr<UStaticMeshComponent> ArtBoard;
+  // exact click surfaces of a grid.
   UPROPERTY()
   TObjectPtr<UInstancedStaticMeshComponent> ArtCorners;
   // 'tiles' surface: one lit stone slab per passable cell + four wood frame
@@ -314,7 +312,6 @@ private:
   UPROPERTY()
   TMap<FString, TObjectPtr<UInstancedStaticMeshComponent>> ArtZoneGlyphMeshes;
   bool bArtAssetsReady = false;   // shared art assets + Medusa candidate + board data
-  bool bCobbleMeshReady = false;  // ART-005 Cobble slab and its two material slots
   bool bTileArtReady = false;     // stone/wood probe materials + dark void tint for 'tiles'
   bool bArtActive = false;
   bool bArtTiles = false;
@@ -374,8 +371,8 @@ private:
   FString BuiltForBoardId;
 
   UInstancedStaticMeshComponent* ZoneStrokeComponent(const FS08ZoneStyle& Style);
-  /** Authored material when it supports instancing (or on the legacy Cobble
-   *  profile, kept exact), else an unlit tint of the data colour. */
+  /** Authored material when it supports instancing (-S08LegacyRender only), else the zone MI or an unlit tint of
+   *  the data colour. */
   UMaterialInterface* ZoneMaterialFor(const FS08ZoneStyle& Style, bool& bOutAuthored, bool& bOutIsmUsage);
   /** T4.2: the zone MI of a style (fallback style under ""), nullptr = not in the data or not loaded. */
   UMaterialInterface* ZoneInstanceFor(const FS08ZoneStyle& Style) const;
@@ -384,7 +381,7 @@ private:
   void ClearArtSurface();
   void AddArtSurfacePart(UMaterialInterface* Material, const FTransform& Transform);
   void ClearArtLights();
-  void ApplyArtLights(const FS08LightProfile& Light, bool bLegacyCobbleTrace);
+  void ApplyArtLights(const FS08LightProfile& Light);
   /** Art Tuner: the values of Light on the spawned profile actors (no respawn). */
   void ApplyTunedLights(const FS08LightProfile& Light);
   /** Art Tuner: the lit3d light values on ConceptLights (+ the flicker base); false = needs a rebuild. */

@@ -11,7 +11,10 @@ board entries and the line endings stay exactly as they are. Never re-serializes
   python tools/art/art_tuner_fold.py --board sarpedon-original --force   # one board; take the artist's value on a conflict
 
 Checks before anything is written:
-  * anchors ("/boards/4/id": "sarpedon-original") - the board index still means that board;
+  * anchors ("/boards/1/id": "sarpedon-original") - the board index still means that board; a block saved while its
+    board sat at another index (2026-10-04: the synthetic boards left boards[], Sarpedon moved 4 -> 1) is re-anchored
+    by its board id first: the anchor and every /boards/<old>/ pointer of the block move to the board's index now
+    (reported under "reanchored"); an anchor whose board id is not in the profile stays a refusal;
   * "was" - the profile still has the value the artist started from; another value (another session changed it) is a
     conflict: refused with an explanation unless --force;
   * the result parses, every entry reads back, and every other value of the document is unchanged.
@@ -30,7 +33,7 @@ import json
 import os
 import re
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
@@ -304,6 +307,43 @@ class FoldResult:
     applied: list
     skipped: list
     conflicts: list
+    reanchored: list = field(default_factory=list)
+
+
+_BOARD_ANCHOR = re.compile(r"/boards/(\d+)/id")
+_BOARD_POINTER = re.compile(r"/boards/(\d+)(/.*)?")
+
+
+def reanchor(doc: dict, b: Board) -> tuple[Board, list[str]]:
+    """The block of board b with its board index re-anchored by id: an anchor "/boards/N/id" that names b.board but
+    no longer matches, while b.board sits at index M now, becomes "/boards/M/id", and every entry pointer under
+    /boards/N/ moves to /boards/M/. Anything else stays as it is (the anchor check then decides)."""
+    boards = doc.get("boards") if isinstance(doc.get("boards"), list) else []
+    remap: dict[str, int] = {}
+    for ptr, want in b.anchors.items():
+        m = _BOARD_ANCHOR.fullmatch(ptr)
+        if not m or want != b.board:
+            continue
+        idx = int(m.group(1))
+        if idx < len(boards) and isinstance(boards[idx], dict) and boards[idx].get("id") == want:
+            continue
+        found = [i for i, x in enumerate(boards) if isinstance(x, dict) and x.get("id") == want]
+        if len(found) == 1:
+            remap[m.group(1)] = found[0]
+    if not remap:
+        return b, []
+
+    def move(ptr: str) -> str:
+        m = _BOARD_POINTER.fullmatch(ptr)
+        if m and m.group(1) in remap:
+            return f"/boards/{remap[m.group(1)]}{m.group(2) or ''}"
+        return ptr
+
+    notes = [f"{b.board}: /boards/{old}/ -> /boards/{new}/ (the board's index in the profile now)"
+             for old, new in sorted(remap.items())]
+    anchors = {move(k): v for k, v in b.anchors.items()}
+    entries = [replace(e, pointer=move(e.pointer)) for e in b.entries]
+    return Board(b.board, b.profile, anchors, entries), notes
 
 
 def fold_text(profile_text: str, boards: list[Board], force: bool = False, bump: bool = True) -> FoldResult:
@@ -312,8 +352,10 @@ def fold_text(profile_text: str, boards: list[Board], force: bool = False, bump:
     edits: list[tuple[int, int, str]] = []
     inserts: dict[int, dict] = {}  # object start -> nested dict of new keys
     expected = copy.deepcopy(doc)
-    applied, skipped, conflicts = [], [], []
+    applied, skipped, conflicts, reanchored = [], [], [], []
     for b in boards:
+        b, notes = reanchor(doc, b)
+        reanchored += notes
         anchor_bad = []
         for ptr, want in b.anchors.items():
             try:
@@ -362,7 +404,7 @@ def fold_text(profile_text: str, boards: list[Board], force: bool = False, bump:
             pointer_set(expected, seg, e.value)
             applied.append(f"{e.pointer}: {json.dumps(current) if exists else '(new)'} -> {e.value_text}")
     if conflicts and not force:
-        return FoldResult(profile_text, applied, skipped, conflicts)
+        return FoldResult(profile_text, applied, skipped, conflicts, reanchored)
     for start, info in inserts.items():
         obj = info["node"]
         colon, comma, one_line, indent = object_style(profile_text, obj)
@@ -392,7 +434,7 @@ def fold_text(profile_text: str, boards: list[Board], force: bool = False, bump:
             raise FoldError(f"internal: the folded text does not parse ({ex}) - nothing written") from ex
         if not same(result, expected):
             raise FoldError("internal: the folded document differs from the profile + the entries - nothing written")
-    return FoldResult(out, applied, skipped, conflicts)
+    return FoldResult(out, applied, skipped, conflicts, reanchored)
 
 
 def inline_changes(old: str, new: str, context: int = 48) -> list[str]:
@@ -487,6 +529,8 @@ def main(argv: list[str] | None = None) -> int:
         res = fold_text(text, boards, force=a.force, bump=not a.no_bump)
         report = {"ok": not res.conflicts or a.force, "profiles": str(prof_path), "overrides": str(ov_path),
                   "applied": res.applied, "skipped": res.skipped, "conflicts": res.conflicts}
+        if res.reanchored:
+            report["reanchored"] = res.reanchored
         d = diff(text, res.text, prof_path.name)
         if res.conflicts and not a.force:
             print(json.dumps(report, ensure_ascii=False, indent=1))

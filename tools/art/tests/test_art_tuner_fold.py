@@ -38,17 +38,18 @@ class FoldTest(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.tmp, ignore_errors=True)
 
-    def write_overrides(self, entries: list[str], anchor_index: int | None = None, board: str = "sarpedon-original"):
+    def write_overrides(self, entries: list[str], anchor_index: int | None = None, board: str = "sarpedon-original",
+                        anchor_board: str = "sarpedon-original"):
         idx = self.si if anchor_index is None else anchor_index
         text = ("{\n \"schema\": \"unmatched.art-tuner-overrides/1\",\n \"savedAt\": \"2026-10-03T00:00:00Z\",\n"
                 " \"baseProfilesSha256\": \"x\",\n \"baseRevision\": 20,\n \"boards\": [\n  {\n"
                 f"   \"board\": \"{board}\",\n   \"profile\": \"sarpedon-night\",\n"
-                f"   \"anchors\": {{\"/boards/{idx}/id\": \"sarpedon-original\"}},\n   \"entries\": [\n    "
+                f"   \"anchors\": {{\"/boards/{idx}/id\": \"{anchor_board}\"}},\n   \"entries\": [\n    "
                 + ",\n    ".join(entries) + "\n   ]\n  }\n ]\n}\n")
         self.ov.write_text(text, encoding="utf-8")
 
-    def standard_entries(self) -> list[str]:
-        si = self.si
+    def standard_entries(self, si: int | None = None) -> list[str]:
+        si = self.si if si is None else si
         return [
             f'{{"pointer": "/lightProfiles/sarpedon-night/heroLight/key/lux", "value": 9.5, "was": {json.dumps(self.lux_was)}}}',
             f'{{"pointer": "/boards/{si}/conceptPaste/lit3d/lights/1/intensityCd", "value": 120, "was": {json.dumps(self.cd_was)}}}',
@@ -170,20 +171,41 @@ class FoldTest(unittest.TestCase):
         self.assertEqual(json.loads(self.prof.read_text(encoding="utf-8"))["lightProfiles"]["sarpedon-night"]["heroLight"]["key"]["lux"], 9.5)
 
     def test_anchor_mismatch(self):
-        self.write_overrides(self.standard_entries(), anchor_index=0)
+        # the anchor names a board id the profile no longer has (Cobble City, gone 2026-10-04): refused, nothing written
+        self.write_overrides(self.standard_entries(), anchor_index=0, anchor_board="cobble-city")
         self.assertEqual(self.run_fold(), 2)
         self.assertEqual(self.prof.read_text(encoding="utf-8"), self.base_text)
+
+    def test_reanchored_by_board_id(self):
+        """A save made while Sarpedon was boards[4] (before the synthetic boards left the profile): the anchor and the
+        /boards/4/ pointers move to Sarpedon's index now; the fold equals a save made on the new index."""
+        self.assertNotEqual(self.si, 4, "the shipped profile moved Sarpedon off index 4")
+        self.write_overrides(self.standard_entries(si=4), anchor_index=4)
+        self.assertEqual(self.run_fold("--dry-run"), 0)
+        self.assertEqual(self.prof.read_text(encoding="utf-8"), self.base_text)
+        self.assertEqual(self.run_fold("--no-archive"), 0)
+        moved = self.prof.read_text(encoding="utf-8")
+        shutil.copyfile(PROFILES, self.prof)
+        self.write_overrides(self.standard_entries())
+        self.assertEqual(self.run_fold("--no-archive"), 0)
+        self.assertEqual(moved, self.prof.read_text(encoding="utf-8"))
+        res = F.fold_text(self.base_text, F.load_overrides(self.ov)[1])
+        self.assertEqual(res.reanchored, [], "already on the new index")
+        self.write_overrides(self.standard_entries(si=4), anchor_index=4)
+        res = F.fold_text(self.base_text, F.load_overrides(self.ov)[1])
+        self.assertEqual(res.reanchored, [f"sarpedon-original: /boards/4/ -> /boards/{self.si}/ (the board's index in the profile now)"])
+        self.assertEqual(res.conflicts, [])
 
     def test_other_board_kept_in_the_file(self):
         self.write_overrides(self.standard_entries())
         doc = json.loads(self.ov.read_text(encoding="utf-8"))
-        doc["boards"].append({"board": "cobble-city", "profile": "cobble-probe", "anchors": {}, "entries": [
-            {"pointer": "/lightProfiles/cobble-probe/sky/intensity", "value": 12, "was": 11.2}]})
+        doc["boards"].append({"board": "marmoreal-original", "profile": "marmoreal-night", "anchors": {}, "entries": [
+            {"pointer": "/lightProfiles/marmoreal-night/sky/intensity", "value": 3.5, "was": 3.0}]})
         self.ov.write_text(json.dumps(doc, indent=1), encoding="utf-8")
         self.assertEqual(self.run_fold("--board", "sarpedon-original"), 0)
         rest = json.loads(self.ov.read_text(encoding="utf-8"))
-        self.assertEqual([b["board"] for b in rest["boards"]], ["cobble-city"])
-        self.assertNotEqual(json.loads(self.prof.read_text(encoding="utf-8"))["lightProfiles"]["cobble-probe"]["sky"]["intensity"], 12)
+        self.assertEqual([b["board"] for b in rest["boards"]], ["marmoreal-original"])
+        self.assertNotEqual(json.loads(self.prof.read_text(encoding="utf-8"))["lightProfiles"]["marmoreal-night"]["sky"]["intensity"], 3.5)
 
     def test_no_file_nothing_to_do(self):
         self.assertEqual(self.run_fold(), 0)

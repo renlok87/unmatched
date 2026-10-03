@@ -1,4 +1,4 @@
-// Art Tuner M1 (docs/art-pipeline/ART-TUNER-PLAN.md §6): -ArtView=sarpedon|marmoreal|cobble - the board, the six figures
+// Art Tuner M1 (docs/art-pipeline/ART-TUNER-PLAN.md §6): -ArtView=sarpedon|marmoreal - the board, the six figures
 // and the camera of a -Bench fixture WITHOUT a backend and without the bench's view walk / exit: a free view for the
 // artist. The effects stay live (no -Bench freeze), the camera gets an orbit and a pan on top of the zoom rig, the keys
 // 1-5 are the bench views, Tab cycles the "active" figure (hero light state), H / P / F1 switch the hero light, the pause
@@ -52,7 +52,7 @@ struct UNMATCHED_API FS08ArtViewCamera {
 
 /** Runtime state of one -ArtView session (owned by the game mode; null without the flag). */
 struct FS08ArtViewSession {
-  FString Map;      // sarpedon | marmoreal | cobble
+  FString Map;      // sarpedon | marmoreal
   FString Fixture;  // absolute path of Config/Bench/S08Bench<Map>.json (or -BenchFixture=)
   FString HeroId;   // the fixture viewer's hero (the K2 views focus it when nothing is selected)
   FString View = TEXT("K1");
@@ -79,7 +79,7 @@ namespace S08ArtView {
 UNMATCHED_API bool Enabled(const TCHAR* CommandLine = nullptr);
 /** The lower-case map name of -ArtView= (empty without the flag). */
 UNMATCHED_API FString MapFromCommandLine(const TCHAR* CommandLine = nullptr);
-/** sarpedon -> S08BenchSarpedon.json, marmoreal -> S08BenchMarmoreal.json, cobble -> S08BenchCobble.json. */
+/** sarpedon -> S08BenchSarpedon.json, marmoreal -> S08BenchMarmoreal.json (the original maps only, 2026-10-04). */
 UNMATCHED_API bool FixtureFileFor(const FString& Map, FString& OutFileName);
 UNMATCHED_API const TArray<FString>& Maps();
 /** The bench views on the keys 1..5: K1, K1x0.65, K2x1.6, K2x2.5, Fitx1.45. */

@@ -1,8 +1,8 @@
 // Art Tuner M2 automation tests (S08ArtTuner.h, docs/art-pipeline/ART-TUNER-PLAN.md §9):
 //   Pointer      RFC 6901 split / escape / get / set (objects in place, arrays rebuilt, a new leaf only when allowed);
 //   Values       saved number text, #RRGGBB, the writes of every row type (snap, hard bounds, ev100 -> min = max);
-//   Registry     the shipped Config/ArtTuner/S08ArtTunerParams.json parses; the rows of Sarpedon / Cobble expand from the
-//                shipped profile; every row points into the document;
+//   Registry     the shipped Config/ArtTuner/S08ArtTunerParams.json parses; the rows of Sarpedon / Marmoreal expand from
+//                the shipped profile; every row points into the document;
 //   Ranges       the registry's hard bounds ARE the C++ parser's: on every shipped board each number row passes at its
 //                min / max and the document is refused one step outside a hard bound (rows checked together skipped);
 //   Model        entries: equal to the base -> gone, type / pointer checks, build = the parser's data;
@@ -204,7 +204,7 @@ bool FS08ArtTunerValuesTest::RunTest(const FString&) {
 }
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08ArtTunerRegistryTest,
-    "Unmatched.S08.ArtTuner.Registry shipped params parse; Sarpedon / Cobble rows expand from the shipped profile",
+    "Unmatched.S08.ArtTuner.Registry shipped params parse; Sarpedon / Marmoreal rows expand from the shipped profile",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FS08ArtTunerRegistryTest::RunTest(const FString&) {
   using namespace S08ArtTunerTest;
@@ -249,12 +249,14 @@ bool FS08ArtTunerRegistryTest::RunTest(const FString&) {
       TestFalse(FString::Printf(TEXT("%s: template resolved"), *P.Id), P.Pointer.Contains(TEXT("{")));
     }
   }
-  const TArray<FS08TunerGroup> Cobble = Groups(TEXT("cobble-city"), TEXT("cobble-probe"));
-  TestTrue("cobble hero key", Has(Cobble, TEXT("heroKey")));
-  TestFalse("cobble has no fog", Has(Cobble, TEXT("fog")));
-  TestFalse("cobble has no map grade", Has(Cobble, TEXT("mapGrade")));
-  TestFalse("cobble has no lit3d lights", Has(Cobble, TEXT("conceptLights")));
-  TestFalse("cobble has no paste tone", Has(Cobble, TEXT("pasteGrade")) || Has(Cobble, TEXT("pasteLights")));
+  // 2026-10-04 (real boards only): the original maps are the only boards; Marmoreal has no lit3d scene
+  const TArray<FS08TunerGroup> MarmorealRows = Groups(TEXT("marmoreal-original"), TEXT("marmoreal-night"));
+  TestTrue("marmoreal hero key", Has(MarmorealRows, TEXT("heroKey")));
+  TestTrue("marmoreal fog", Has(MarmorealRows, TEXT("fog")));
+  TestTrue("marmoreal map grade", Has(MarmorealRows, TEXT("mapGrade")));
+  TestFalse("marmoreal has no lit3d lights", Has(MarmorealRows, TEXT("conceptLights")));
+  TestEqual("two shipped boards", BoardIndex(TEXT("sarpedon-original")) >= 0 && BoardIndex(TEXT("marmoreal-original")) >= 0 &&
+                                      BoardIndex(TEXT("cobble-city")) == INDEX_NONE, true);
   // the paste mode rows (registry-only additions): Sarpedon's paste lights and tone; Marmoreal has a tone, no lights
   for (const FS08TunerGroup& G : Sarpedon) {
     if (G.Id == TEXT("pasteLights")) TestEqual("5 paste lights x 5 rows", G.Params.Num(), 25);
@@ -384,15 +386,15 @@ bool FS08ArtTunerOverridesTest::RunTest(const FString&) {
   FS08TunerOverridesFile::FBoard A;
   A.Board = TEXT("sarpedon-original");
   A.Profile = TEXT("sarpedon-night");
-  A.Anchors.Add({TEXT("/boards/4/id"), TEXT("sarpedon-original")});
+  A.Anchors.Add({TEXT("/boards/1/id"), TEXT("sarpedon-original")});
   A.Entries.Add({TEXT("/lightProfiles/sarpedon-night/heroLight/key/lux"), NumText(TEXT("7.5")), NumText(TEXT("7.0"))});
   A.Entries.Add({TEXT("/lightProfiles/sarpedon-night/heroLight/key/colorSrgb"), MakeShared<FJsonValueString>(TEXT("#FFE0C0")),
                  MakeShared<FJsonValueString>(TEXT("#FFF0E0"))});
   A.Entries.Add({TEXT("/lightProfiles/sarpedon-night/heroLight/rim/contactShadowLength"), NumText(TEXT("0.1")), nullptr});
   F.PutBoard(A);
   FS08TunerOverridesFile::FBoard Bo;
-  Bo.Board = TEXT("cobble-city");
-  Bo.Entries.Add({TEXT("/lightProfiles/cobble-probe/sky/intensity"), NumText(TEXT("12")), NumText(TEXT("11.2"))});
+  Bo.Board = TEXT("marmoreal-original");
+  Bo.Entries.Add({TEXT("/lightProfiles/marmoreal-night/sky/intensity"), NumText(TEXT("3.5")), NumText(TEXT("3.0"))});
   F.PutBoard(Bo);
   const FString Text = F.ToJson();
   TestTrue("value text kept", Text.Contains(TEXT("\"value\": 7.5, \"was\": 7.0")));
@@ -414,7 +416,29 @@ bool FS08ArtTunerOverridesTest::RunTest(const FString&) {
   G.PutBoard(A2);
   TestEqual("still two boards", G.Boards.Num(), 2);
   TestEqual("replaced", G.FindBoard(TEXT("sarpedon-original"))->Entries.Num(), 1);
-  TestEqual("the other kept", G.FindBoard(TEXT("cobble-city"))->Entries.Num(), 1);
+  TestEqual("the other kept", G.FindBoard(TEXT("marmoreal-original"))->Entries.Num(), 1);
+  // 2026-10-04: a block saved while Sarpedon was boards[4] (before the synthetic boards left the profile) is re-anchored
+  // by its board id onto its index now; other indices, light pointers and anchors of other boards stay
+  {
+    FS08TunerOverridesFile::FBoard Old;
+    Old.Board = TEXT("sarpedon-original");
+    Old.Anchors.Add({TEXT("/boards/4/id"), TEXT("sarpedon-original")});
+    Old.Entries.Add({TEXT("/boards/4/conceptPaste/grade/gainLinear"), NumText(TEXT("1.05")), NumText(TEXT("1"))});
+    Old.Entries.Add({TEXT("/boards/40/x"), NumText(TEXT("1")), nullptr});
+    Old.Entries.Add({TEXT("/lightProfiles/sarpedon-night/heroLight/key/lux"), NumText(TEXT("7.5")), nullptr});
+    TestEqual("re-anchored: the anchor + one board entry", S08ArtTuner::ReanchorBoard(Old, 1), 2);
+    TestEqual("anchor moved", Old.Anchors[0].Key, FString(TEXT("/boards/1/id")));
+    TestEqual("board entry moved", Old.Entries[0].Pointer, FString(TEXT("/boards/1/conceptPaste/grade/gainLinear")));
+    TestEqual("another index untouched", Old.Entries[1].Pointer, FString(TEXT("/boards/40/x")));
+    TestEqual("light entry untouched", Old.Entries[2].Pointer, FString(TEXT("/lightProfiles/sarpedon-night/heroLight/key/lux")));
+    TestEqual("already on its index: nothing moves", S08ArtTuner::ReanchorBoard(Old, 1), 0);
+    TestEqual("no index (board gone): nothing moves", S08ArtTuner::ReanchorBoard(Old, INDEX_NONE), 0);
+    FS08TunerOverridesFile::FBoard Foreign;
+    Foreign.Board = TEXT("sarpedon-original");
+    Foreign.Anchors.Add({TEXT("/boards/0/id"), TEXT("cobble-city")});
+    Foreign.Entries.Add({TEXT("/boards/0/x"), NumText(TEXT("1")), nullptr});
+    TestEqual("an anchor naming another board is never moved", S08ArtTuner::ReanchorBoard(Foreign, 1), 0);
+  }
   // broken files / entries
   Errors.Reset();
   TestFalse("wrong schema", G.Parse(TEXT("{\"schema\":\"x\",\"boards\":[]}"), Errors));

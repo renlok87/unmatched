@@ -42,7 +42,7 @@ void AS08FlowGameMode::ArtViewBegin() {
   V.Map = S08ArtView::MapFromCommandLine();
   FString File;
   if (!S08ArtView::FixtureFileFor(V.Map, File)) {
-    FS08Trace::Write(FString::Printf(TEXT("ARTVIEW unknown map '%s' (sarpedon | marmoreal | cobble): using sarpedon"), *V.Map));
+    FS08Trace::Write(FString::Printf(TEXT("ARTVIEW unknown map '%s' (sarpedon | marmoreal): using sarpedon"), *V.Map));
     V.Map = TEXT("sarpedon");
     S08ArtView::FixtureFileFor(V.Map, File);
   }

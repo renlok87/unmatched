@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
-"""Art-board fixtures (stage 3 T3.2, variant (a)): grid approximations of real maps.
+"""Board-art helpers (stage 3 T3.2): the maps.json space extraction, the lattice choice and the board profile validator.
 
-"art fixture, не правила": the real Unmatched maps are graphs of round spaces, not
-grids. This tool builds a GRID APPROXIMATION of a real map for the art review only:
-every real space becomes one grid cell carrying the space's REAL zone keys (a
-multizone space keeps all of its zones), every other grid cell is an obstacle. The
-result is written as a committed fixture JSON (backend/prisma/fixtures/art-boards)
-that backend/prisma/seed-art-fixture-boards.ts seeds into the ISOLATED test DB only.
+RETIRED OUTPUT (2026-10-04, user decision «Давай оставим только доски, которые осуществлены на реальных досках из
+игры.», docs/game-design/decisions/2026-10-04-real-boards-only.md): this tool used to write ART FIXTURE grid
+approximations of real maps ("art fixture, не правила": backend/prisma/fixtures/art-boards/*.art-fixture.json, the
+"ART FIXTURE · Sherwood Forest 8x5" / "T. Rex Paddock 7x5" Board rows and their UE profiles). Those boards, files and
+profiles are gone, and the `build` command, the fixture schema and the light-section check went with them. Old runs on
+them stay history. What stays here:
+  * the maps.json reader and the SVG space extraction (decode_devalue_maps, extract_spaces) and the deterministic
+    lattice choice (choose_grid) - tools/art/board_topology.py (the original-map topology fixtures) and
+    tools/art/map_surface/build_map_textures.py use them;
+  * `check`: the validator of unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json (light budgets, W4-A render
+    blocks, night fog / map grade, T4.2 zone content, readability, map frame / backdrop).
 
 Source data: scraped-data/api/maps.json (SvelteKit devalue payload, gitignored, only
 in the main checkout). Per zone, `svgGroup` holds the zone's shapes on the map image:
@@ -25,21 +30,11 @@ centres are assigned to the cell centres of a W x H lattice spanning their bound
 by an optimal assignment (Hungarian, cost = squared distance in cell units). Among
 the lattices whose space cells are 4-connected (orthogonal moves, the game's movement
 rule) the one with the smallest maximum displacement wins; ties -> smaller total
-cost, then fewer cells, then smaller W. Board ids are deterministic cuid-shaped
-strings ('c' + 24 hex of sha256("unmatched-art-fixture:<key>:v<version>")), so a
-reseed of the isolated DB yields the same ids.
+cost, then fewer cells, then smaller W. fixture_board_id() keeps the id scheme of the
+retired fixtures ('c' + 24 hex of sha256("unmatched-art-fixture:<key>:v<version>")) so
+the topology tests can prove their ids never collide with it.
 
-Map images are NOT downloaded, cooked or committed: only their sha256 (recorded
-earlier in docs/game-design/evidence/ART-002/PROMPTS.md) is carried as provenance.
-
-  build   --maps <maps.json> [--out-dir DIR] [--keys k1,k2]  write the fixture JSONs
-  check   [--maps <maps.json>] [--profiles <json>]           validate committed fixtures
-          (schema, ids, W x H, real zone keys, >= 2 multizone cells, 4-connectivity,
-          light sections != zones, consistency with the UE board profiles); with
-          --maps the fixtures must also be byte-identical to a fresh build.
-
-Status vocabulary: the fixtures and the lighting data are «предложено»; a live run
-on them is «измерено»; nothing here is «художественно принято».
+  check   [--profiles <json>]   validate the UE board profiles (exit 1 on an error)
 """
 from __future__ import annotations
 
@@ -52,32 +47,13 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
-DEFAULT_OUT = REPO / "backend" / "prisma" / "fixtures" / "art-boards"
 DEFAULT_PROFILES = REPO / "unreal" / "Unmatched" / "Config" / "ArtBoards" / "S08ArtBoardProfiles.json"
 MAIN_CHECKOUT_MAPS = Path("C:/Users/ren/WebstormProjects/unmached/unmached/scraped-data/api/maps.json")
-FIXTURE_SCHEMA = "unmatched.art-board-fixture/1"
-GENERATOR = "tools/art/art_board_fixtures.py"
 FIXTURE_VERSION = 1
 CLUSTER_PX = 20.0
 W_RANGE = range(6, 11)
 H_RANGE = range(4, 7)
-CELL_UU = 100.0
 ID_RE = re.compile(r"^c[a-z0-9]{24}$")
-LABEL = "art fixture, не правила"
-
-# Real map images: sha256 only (fetched once to OS temp for ART-002, never kept in the repo).
-MAP_IMAGES = {
-    "sherwood-forest": {
-        "sha256": "24f84b2dc91eee28a942f568be8e24a14b479bdaac51c11a2fc3dc9382b51162",
-        "size": [1337, 742],
-    },
-    "t-rex-paddock": {
-        "sha256": "c08794b2b3d7aae3451f1e0bb93e3d21bdf28d6579b6a5e26cd82f1c9a16e927",
-        "size": [1337, 742],
-    },
-}
-MAP_IMAGES_SOURCE = "docs/game-design/evidence/ART-002/PROMPTS.md"
-DEFAULT_KEYS = ("sherwood-forest", "t-rex-paddock")
 
 
 # ------------------------------------------------------------------ source
@@ -329,91 +305,9 @@ def choose_grid(spaces: list[dict]) -> tuple[dict, list[dict]]:
     return ok[0], summary
 
 
-# ------------------------------------------------------------------ fixture
+# ------------------------------------------------------------------ ids
 def fixture_board_id(key: str, version: int = FIXTURE_VERSION) -> str:
     return "c" + hashlib.sha256(f"unmatched-art-fixture:{key}:v{version}".encode("utf-8")).hexdigest()[:24]
-
-
-def build_fixture(m: dict, maps_sha256: str) -> dict:
-    key = m["key"]
-    spaces = extract_spaces(m)
-    if len(spaces) != m.get("spacesCount"):
-        raise ValueError(f"{key}: {len(spaces)} spaces extracted, map says {m.get('spacesCount')}")
-    zone_keys = [z["key"] for z in m["zones"]]
-    grid, candidates = choose_grid(spaces)
-    w, h = grid["width"], grid["height"]
-    by_cell = {}
-    for s, (x, y) in zip(spaces, grid["placed"]):
-        by_cell[(x, y)] = s
-    cells = []
-    for y in range(h):
-        for x in range(w):
-            s = by_cell.get((x, y))
-            if s is None:
-                cells.append({"x": x, "y": y, "isObstacle": True})
-            else:
-                cells.append({"x": x, "y": y, "zones": [k for k in zone_keys if k in s["zones"]]})
-    mapping = []
-    for s, (x, y) in sorted(zip(spaces, grid["placed"]), key=lambda t: (t[1][1], t[1][0])):
-        mapping.append({"cell": [x, y], "mapPx": [round(s["px"][0], 2), round(s["px"][1], 2)],
-                        "zones": [k for k in zone_keys if k in s["zones"]]})
-    counts = {k: 0 for k in zone_keys}
-    multi = triple = 0
-    for c in cells:
-        zs = c.get("zones") or []
-        for k in zs:
-            counts[k] += 1
-        multi += len(zs) > 1
-        triple += len(zs) > 2
-    img = MAP_IMAGES.get(key)
-    fixture = {
-        "schema": FIXTURE_SCHEMA,
-        "artFixture": True,
-        "label": LABEL,
-        "status": "предложено",
-        "key": key,
-        "boardId": fixture_board_id(key),
-        "name": f"ART FIXTURE · {m['name']}",
-        "set": "art-fixture",
-        "generator": {"tool": GENERATOR, "fixtureVersion": FIXTURE_VERSION},
-        "source": {
-            "mapsJson": "scraped-data/api/maps.json (gitignored; main checkout only)",
-            "mapsJsonSha256": maps_sha256,
-            "mapId": m.get("id"),
-            "mapKey": key,
-            "mapName": m.get("name"),
-            "mapSizeClass": m.get("size"),
-            "spacesCount": m.get("spacesCount"),
-            "zonesCount": m.get("zonesCount"),
-            "zoneKeys": zone_keys,
-            "zoneColors": {z["key"]: z.get("color") for z in m["zones"]},
-            "image": ({"sha256": img["sha256"], "sizePx": img["size"], "recordedIn": MAP_IMAGES_SOURCE,
-                       "rule": "только sha256: изображение не скачивается, не кукается и не коммитится"}
-                      if img else None),
-        },
-        "method": {
-            "spaces": "circle = single-zone space; half-disk / wedge path = one zone's share of a multizone space; "
-                      f"pieces within {CLUSTER_PX:g} px are one space",
-            "grid": "optimal assignment of space centres to a W x H lattice over their bounding box; "
-                    "smallest max displacement among 4-connected lattices (W 6..10, H 4..6)",
-            "nonSpaceCells": "isObstacle (not a space on the real map)",
-            "notRules": "adjacency, ranges and zones of the real map graph are NOT reproduced; art review only",
-            "candidates": candidates,
-        },
-        "grid": {"width": w, "height": h,
-                 "maxDisplacementCells": round(math.sqrt(grid["maxCost"]), 4),
-                 "meanSquaredDisplacementCells": round(grid["sumCost"] / len(spaces), 4)},
-        "summary": {"cells": w * h, "spaceCells": len(spaces), "obstacleCells": w * h - len(spaces),
-                    "zoneCells": len(spaces), "multizoneCells": multi, "tripleZoneCells": triple,
-                    "zoneCellCounts": counts, "connected4": grid["connected4"]},
-        "cells": cells,
-        "spaces": mapping,
-    }
-    return fixture
-
-
-def dump(doc) -> str:
-    return json.dumps(doc, ensure_ascii=False, indent=1) + "\n"
 
 
 def load_maps(path: Path) -> tuple[list[dict], str]:
@@ -422,128 +316,11 @@ def load_maps(path: Path) -> tuple[list[dict], str]:
 
 
 # ------------------------------------------------------------------ validation
-def board_to_world(profile_at: list[float], w: int, h: int) -> tuple[float, float]:
-    """Normalised board coordinates (u, v in -0.5..0.5 of the board extent) -> world XY."""
-    return profile_at[0] * w * CELL_UU, profile_at[1] * h * CELL_UU
-
-
-def cell_world(x: int, y: int, w: int, h: int) -> tuple[float, float]:
-    """INT-019: World(x,y) = ((x - (W-1)/2)*100, (y - (H-1)/2)*100)."""
-    return (x - (w - 1) / 2.0) * CELL_UU, (y - (h - 1) / 2.0) * CELL_UU
-
-
-def light_sections_vs_zones(fixture: dict, light: dict) -> dict:
-    """Jaccard overlap of each non-ambient point light's section (cells whose centre is
-    within half the attenuation radius) with every zone's cells. «Секции света != зоны»:
-    a section must not coincide with one zone (max Jaccard < 0.5)."""
-    w, h = fixture["grid"]["width"], fixture["grid"]["height"]
-    zones: dict[str, set] = {}
-    for c in fixture["cells"]:
-        for k in c.get("zones") or []:
-            zones.setdefault(k, set()).add((c["x"], c["y"]))
-    out = {}
-    for p in light.get("points", []):
-        if p.get("role") == "fill":
-            continue
-        if "at" in p:
-            lx, ly = board_to_world(p["at"], w, h)
-        else:
-            lx, ly = p["posUU"][0], p["posUU"][1]
-        section = {(c["x"], c["y"]) for c in fixture["cells"]
-                   if "zones" in c and math.dist(cell_world(c["x"], c["y"], w, h), (lx, ly)) <= 0.5 * p["radiusUU"]}
-        best = (0.0, None)
-        for k, cells in zones.items():
-            union = section | cells
-            j = len(section & cells) / len(union) if union else 0.0
-            if j > best[0]:
-                best = (j, k)
-        out[p["name"]] = {"sectionCells": len(section), "maxJaccard": round(best[0], 4), "zone": best[1]}
-    return out
-
-
-def check_fixture(fx: dict) -> list[str]:
+def check_profiles(profiles: dict) -> list[str]:
+    """The whole S08ArtBoardProfiles document: light budgets and render / night blocks, T4.2 content, the map-image
+    board blocks (readability, map frame, backdrop)."""
     errs = []
-    if fx.get("schema") != FIXTURE_SCHEMA:
-        errs.append("schema")
-    if fx.get("artFixture") is not True or fx.get("label") != LABEL:
-        errs.append("art fixture mark missing")
-    if not ID_RE.match(fx.get("boardId", "")) or fx["boardId"] != fixture_board_id(fx.get("key", "")):
-        errs.append("boardId not the deterministic cuid-shaped id")
-    w, h = fx["grid"]["width"], fx["grid"]["height"]
-    if len(fx["cells"]) != w * h:
-        errs.append("cells != W*H")
-    seen = set()
-    real = set(fx["source"]["zoneKeys"])
-    spaces = set()
-    multi = 0
-    for c in fx["cells"]:
-        xy = (c["x"], c["y"])
-        if xy in seen or not (0 <= c["x"] < w and 0 <= c["y"] < h):
-            errs.append(f"bad/duplicate cell {xy}")
-        seen.add(xy)
-        zs = c.get("zones")
-        if c.get("isObstacle"):
-            if zs:
-                errs.append(f"obstacle with zones {xy}")
-            continue
-        if not zs:
-            errs.append(f"space without zones {xy}")
-            continue
-        if len(set(zs)) != len(zs) or not set(zs) <= real:
-            errs.append(f"zones not real/unique at {xy}: {zs}")
-        multi += len(zs) > 1
-        spaces.add(xy)
-    if len(spaces) != fx["source"]["spacesCount"]:
-        errs.append("space cells != spacesCount")
-    if multi < 2:
-        errs.append("fewer than 2 multizone cells")
-    if multi != fx["summary"]["multizoneCells"]:
-        errs.append("summary.multizoneCells mismatch")
-    if not connected4(spaces):
-        errs.append("space cells not 4-connected")
-    used = {k for c in fx["cells"] for k in c.get("zones") or []}
-    if used != real:
-        errs.append(f"not every real zone key used: missing {sorted(real - used)}")
-    return errs
-
-
-def check_profiles(fixtures: list[dict], profiles: dict) -> list[str]:
-    errs = []
-    boards = {b["id"]: b for b in profiles.get("boards", [])}
-    styles = profiles.get("zoneStyles", {})
     lights = profiles.get("lightProfiles", {})
-    for fx in fixtures:
-        matches = [b for b in boards.values() if fx["boardId"] in (b.get("match", {}).get("boardIds") or [])]
-        if len(matches) != 1:
-            errs.append(f"{fx['key']}: {len(matches)} profile(s) match boardId {fx['boardId']}")
-            continue
-        b = matches[0]
-        mt = b["match"]
-        if (mt.get("width"), mt.get("height")) != (fx["grid"]["width"], fx["grid"]["height"]):
-            errs.append(f"{fx['key']}: profile size {mt.get('width')}x{mt.get('height')} != fixture")
-        if sorted(mt.get("zoneKeys") or []) != sorted(fx["source"]["zoneKeys"]):
-            errs.append(f"{fx['key']}: profile zoneKeys != real zone keys")
-        exp = b.get("expect") or {}
-        s = fx["summary"]
-        for k_prof, k_fx in (("cells", "cells"), ("zoneCells", "zoneCells"), ("multizoneCells", "multizoneCells"),
-                             ("obstacles", "obstacleCells")):
-            if exp.get(k_prof) != s[k_fx]:
-                errs.append(f"{fx['key']}: expect.{k_prof}={exp.get(k_prof)} != fixture {s[k_fx]}")
-        if exp.get("zoneCellCounts") != s["zoneCellCounts"]:
-            errs.append(f"{fx['key']}: expect.zoneCellCounts != fixture")
-        glyphs = [styles.get(k, {}).get("glyph") for k in fx["source"]["zoneKeys"]]
-        strokes = [styles.get(k, {}).get("stroke") for k in fx["source"]["zoneKeys"]]
-        if None in glyphs or len(set(glyphs)) != len(glyphs):
-            errs.append(f"{fx['key']}: zone glyphs missing or not unique per board: {glyphs}")
-        if None in strokes or len(set(strokes)) != len(strokes):
-            errs.append(f"{fx['key']}: zone strokes missing or not unique per board: {strokes}")
-        lp = lights.get(b.get("light"))
-        if not lp:
-            errs.append(f"{fx['key']}: light profile {b.get('light')!r} missing")
-            continue
-        for name, r in light_sections_vs_zones(fx, lp).items():
-            if r["maxJaccard"] >= 0.5:
-                errs.append(f"{fx['key']}: light section {name} coincides with zone {r['zone']} (J={r['maxJaccard']})")
     for lid, lp in lights.items():
         d = lp.get("directional") or {}
         pts = lp.get("points") or []
@@ -737,79 +514,23 @@ def check_frame_backdrop_blocks(bid: str, board: dict) -> list[str]:
 
 
 # ------------------------------------------------------------------ commands
-def cmd_build(a) -> int:
-    maps, sha = load_maps(Path(a.maps))
-    out = Path(a.out_dir)
-    out.mkdir(parents=True, exist_ok=True)
-    keys = a.keys.split(",") if a.keys else list(DEFAULT_KEYS)
-    for key in keys:
-        m = next((x for x in maps if x.get("key") == key), None)
-        if m is None:
-            print(f"map {key!r} not in maps.json")
-            return 2
-        fx = build_fixture(m, sha)
-        errs = check_fixture(fx)
-        if errs:
-            print(key, "INVALID", errs)
-            return 1
-        p = out / f"{key}.art-fixture.json"
-        p.write_text(dump(fx), encoding="utf-8", newline="\n")
-        s = fx["summary"]
-        print(f"{key}: {fx['grid']['width']}x{fx['grid']['height']} id={fx['boardId']} spaces={s['spaceCells']} "
-              f"obstacles={s['obstacleCells']} multizone={s['multizoneCells']} triple={s['tripleZoneCells']} "
-              f"maxDisp={fx['grid']['maxDisplacementCells']} -> {p}")
-    return 0
-
-
 def cmd_check(a) -> int:
-    out = Path(a.out_dir)
-    files = sorted(out.glob("*.art-fixture.json"))
-    if not files:
-        print(f"no fixtures in {out}")
-        return 1
-    fixtures = [json.loads(f.read_text(encoding="utf-8")) for f in files]
-    bad = 0
-    for f, fx in zip(files, fixtures):
-        errs = check_fixture(fx)
-        print(f"{f.name}: {'PASS' if not errs else 'FAIL ' + '; '.join(errs)}")
-        bad += bool(errs)
     profiles_path = Path(a.profiles)
-    if profiles_path.is_file():
-        errs = check_profiles(fixtures, json.loads(profiles_path.read_text(encoding="utf-8")))
-        print(f"profiles {profiles_path.name}: {'PASS' if not errs else 'FAIL ' + '; '.join(errs)}")
-        bad += bool(errs)
-        profiles = json.loads(profiles_path.read_text(encoding="utf-8"))
-        for fx in fixtures:
-            b = next(b for b in profiles["boards"] if fx["boardId"] in (b["match"].get("boardIds") or []))
-            print(f"  {fx['key']} light sections:", json.dumps(
-                light_sections_vs_zones(fx, profiles["lightProfiles"][b["light"]]), ensure_ascii=False))
-    else:
+    if not profiles_path.is_file():
         print(f"profiles {profiles_path}: not found")
-        bad += 1
-    if a.maps:
-        maps, sha = load_maps(Path(a.maps))
-        for f, fx in zip(files, fixtures):
-            m = next((x for x in maps if x.get("key") == fx["key"]), None)
-            fresh = dump(build_fixture(m, sha)) if m else None
-            same = fresh == f.read_text(encoding="utf-8")
-            print(f"{f.name}: reproducible from maps.json {'PASS' if same else 'FAIL'}")
-            bad += not same
-    return 0 if not bad else 1
+        return 1
+    errs = check_profiles(json.loads(profiles_path.read_text(encoding="utf-8")))
+    print(f"profiles {profiles_path.name}: {'PASS' if not errs else 'FAIL ' + '; '.join(errs)}")
+    return 0 if not errs else 1
 
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
-    b = sub.add_parser("build")
-    b.add_argument("--maps", default=str(MAIN_CHECKOUT_MAPS))
-    b.add_argument("--out-dir", default=str(DEFAULT_OUT))
-    b.add_argument("--keys", default="")
     c = sub.add_parser("check")
-    c.add_argument("--maps", default="")
-    c.add_argument("--out-dir", default=str(DEFAULT_OUT))
     c.add_argument("--profiles", default=str(DEFAULT_PROFILES))
     a = ap.parse_args(argv)
-    return {"build": cmd_build, "check": cmd_check}[a.cmd](a)
+    return {"check": cmd_check}[a.cmd](a)
 
 
 if __name__ == "__main__":

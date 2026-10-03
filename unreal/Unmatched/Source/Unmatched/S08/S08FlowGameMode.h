@@ -478,8 +478,8 @@ private:
   float S10AbortLobbyShotAtElapsed = -1.0f;
   float S10AbortLobbyNotBeforeElapsed = -1.0f; // toast cleared + settle beat
   bool bS10AbortProofComplete = false;    // early exit fired exactly once
-  // W4-A -Bench: backend-less render bench on a captured Cobble game state
-  // (Config/Bench/S08BenchCobble.json): warm-up, per-view frame/GPU timing,
+  // W4-A -Bench: backend-less render bench on a captured game state of an original map
+  // (default Config/Bench/S08BenchMarmoreal.json): warm-up, per-view frame/GPU timing,
   // ProfileGPU, optional CSV GPU stats and one shot per view (K1, K2 5x) with
   // the RENDER fingerprint. Driver: tools/art/render/render_bench.py.
   bool bBench = false;

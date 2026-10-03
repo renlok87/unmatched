@@ -38,7 +38,9 @@ bool FS08ArtViewFixturesTest::RunTest(const FString&) {
   }
   FString File;
   TestTrue("sarpedon", S08ArtView::FixtureFileFor(TEXT("sarpedon"), File) && File == TEXT("S08BenchSarpedon.json"));
-  TestTrue("cobble", S08ArtView::FixtureFileFor(TEXT("cobble"), File) && File == TEXT("S08BenchCobble.json"));
+  TestTrue("marmoreal", S08ArtView::FixtureFileFor(TEXT("marmoreal"), File) && File == TEXT("S08BenchMarmoreal.json"));
+  TestEqual("the original maps only", S08ArtView::Maps().Num(), 2);
+  TestFalse("cobble is gone (real boards only, 2026-10-04)", S08ArtView::FixtureFileFor(TEXT("cobble"), File));
   TestFalse("unknown map", S08ArtView::FixtureFileFor(TEXT("sherwood"), File));
   TestTrue("any case -> the shipped file name",
            S08ArtView::FixtureFileFor(TEXT("SARPEDON"), File) && File == TEXT("S08BenchSarpedon.json"));

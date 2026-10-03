@@ -637,7 +637,6 @@ const TCHAR* S08ZoneGlyphName(ES08ZoneGlyph Glyph) {
 
 const TCHAR* S08BoardSurfaceName(ES08BoardSurface Surface) {
   switch (Surface) {
-    case ES08BoardSurface::Cobble5x6Mesh: return TEXT("cobble-5x6-mesh");
     case ES08BoardSurface::MapImage: return TEXT("map-image");
     default: return TEXT("tiles");
   }
@@ -919,9 +918,7 @@ bool FS08BoardArtData::ParseJson(const FString& Text, TArray<FString>& OutErrors
       B.MatchZoneKeys.Sort();
       FString Surface;
       (*Obj)->TryGetStringField(TEXT("surface"), Surface);
-      if (Surface == TEXT("cobble-5x6-mesh")) {
-        B.Surface = ES08BoardSurface::Cobble5x6Mesh;
-      } else if (Surface == TEXT("tiles")) {
+      if (Surface == TEXT("tiles")) {
         B.Surface = ES08BoardSurface::Tiles;
       } else if (Surface == TEXT("map-image")) {
         B.Surface = ES08BoardSurface::MapImage;
@@ -953,7 +950,6 @@ bool FS08BoardArtData::ParseJson(const FString& Text, TArray<FString>& OutErrors
         OutErrors.Add(FString::Printf(TEXT("board %s: light profile '%s' missing or invalid"), *B.Id, *B.LightId));
         continue;
       }
-      (*Obj)->TryGetBoolField(TEXT("legacyCobbleTrace"), B.bLegacyCobbleTrace);
       (*Obj)->TryGetBoolField(TEXT("artFixture"), B.bArtFixture);
       FString Glyphs;
       if ((*Obj)->TryGetStringField(TEXT("glyphs"), Glyphs)) {

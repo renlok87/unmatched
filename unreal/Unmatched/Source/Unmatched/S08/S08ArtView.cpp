@@ -48,7 +48,7 @@ FString MapFromCommandLine(const TCHAR* CommandLine) {
 }
 
 const TArray<FString>& Maps() {
-  static const TArray<FString> Names = {TEXT("sarpedon"), TEXT("marmoreal"), TEXT("cobble")};
+  static const TArray<FString> Names = {TEXT("sarpedon"), TEXT("marmoreal")};
   return Names;
 }
 

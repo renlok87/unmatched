@@ -5,7 +5,7 @@ The client runs the -Bench fixture with -ArtLiveTune=<session dir> and serves a 
 writes <dir>/cmd-<seq>.json and waits for <dir>/done-<seq>.json. No sockets. One session at a time; it holds
 C:/tmp/unmatched-gpu.lock (owner=LIVE-TUNE pid=<client pid> map=<map>) from start to stop.
 
-  python tools/art/render/live_tune.py start --map sarpedon|marmoreal|cobble [--packaged] [--profiles <json>]
+  python tools/art/render/live_tune.py start --map sarpedon|marmoreal [--packaged] [--profiles <json>]
                                              [--env-dir <dir>] [--warmup 60] [--extra=-NoHeroLight ...]
   python tools/art/render/live_tune.py reload [--profiles <json>] [--env-dir <dir>]
   python tools/art/render/live_tune.py shot  --views K1+K2x1.6+K2x2.5 --out <dir> [--tag t] [--settle 6] [--measure 0]
@@ -42,7 +42,8 @@ UE_EDITOR = Path(os.environ.get("UE_ROOT", r"C:\Program Files\Epic Games\UE_5.8"
 STAGED_EXE = REPO / "unreal/Unmatched/Saved/StagedBuilds/Windows/Unmatched.exe"
 PROFILES = REPO / "unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json"
 ENV_DIR = REPO / "unreal/Unmatched/Config/ArtBoards/EnvLayouts"
-FIXTURES = {"sarpedon": "S08BenchSarpedon.json", "marmoreal": "S08BenchMarmoreal.json", "cobble": "S08BenchCobble.json"}
+# the original maps only (2026-10-04, docs/game-design/decisions/2026-10-04-real-boards-only.md: Cobble 5x6 is gone)
+FIXTURES = {"sarpedon": "S08BenchSarpedon.json", "marmoreal": "S08BenchMarmoreal.json"}
 GPU_LOCK = Path(os.environ.get("UNMATCHED_GPU_LOCK", "C:/tmp/unmatched-gpu.lock"))
 ROOT = Path(os.environ.get("LIVE_TUNE_ROOT", "C:/tmp/live-tune"))
 POINTER = "session.json"
@@ -772,11 +773,11 @@ def self_check() -> list[str]:
                  "-S08RenderPreset=High", "-ArtLiveTuneWarmup=30", "S08BenchSarpedon.json", "-NoHeroLight"):
         if not any(want in x for x in ed):
             fails.append(f"editor args miss {want}")
-    bn = bench_args("editor", "cobble", Path("C:/tmp/lt/b"), "K1+K2x1.6", BENCH["editor"], [])
+    bn = bench_args("editor", "marmoreal", Path("C:/tmp/lt/b"), "K1+K2x1.6", BENCH["editor"], [])
     if any(x.startswith("-ArtLiveTune") for x in bn) or "-BenchViews=K1+K2x1.6" not in bn or not any(
             x.startswith("-BenchOut=") for x in bn):
         fails.append(f"bench args {bn}")
-    pk = client_args("packaged", "cobble", Path("C:/tmp/lt/y"), 60, BENCH["packaged"], None, None, [])
+    pk = client_args("packaged", "marmoreal", Path("C:/tmp/lt/y"), 60, BENCH["packaged"], None, None, [])
     if "-game" in pk or not any(x.startswith("-BenchMeasure=3") for x in pk) or "Unmatched.exe" not in pk[0]:
         fails.append(f"packaged args {pk[:3]}")
     return fails

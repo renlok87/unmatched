@@ -1,9 +1,10 @@
-"""Tests for tools/art/art_board_fixtures.py (stage 3 T3.2 art-board fixtures).
+"""Tests for tools/art/art_board_fixtures.py (stage 3 T3.2 board-art helpers).
 
-Pure-function tests run everywhere; the committed-fixture tests read
-backend/prisma/fixtures/art-boards/*.art-fixture.json and the UE board profiles;
-the reproducibility test additionally needs the gitignored scraped-data/api/maps.json
-of the main checkout and is skipped (reported) when it is absent.
+Pure-function tests run everywhere; the profile tests read the UE board profiles
+(unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json); the original-map tests
+need the gitignored scraped-data/api/maps.json of the main checkout and are skipped
+(reported) when it is absent. The ART FIXTURE output (backend/prisma/fixtures/art-boards)
+is retired since 2026-10-04 (real boards only), and its tests went with it.
 
   python -m unittest discover -s tools/art/tests -v
 """
@@ -19,11 +20,12 @@ sys.path.insert(0, str(HERE.parent))
 
 import art_board_fixtures as F  # noqa: E402
 
-FIXTURES = sorted(F.DEFAULT_OUT.glob("*.art-fixture.json"))
 
-
-def load(p: Path) -> dict:
-    return json.loads(p.read_text(encoding="utf-8"))
+def grid_board(bid: str = "grid-5x6") -> dict:
+    """A grid ('tiles') board entry: the map-image-only blocks must be refused on it (no grid board ships since
+    2026-10-04, so the test builds one)."""
+    return {"id": bid, "match": {"boardIds": ["c" + "0" * 24], "width": 5, "height": 6, "zoneKeys": ["blue", "red"]},
+            "surface": "tiles", "light": "marmoreal-night"}
 
 
 def mini_map() -> dict:
@@ -152,62 +154,26 @@ class PurePieces(unittest.TestCase):
         self.assertNotEqual(a, F.fixture_board_id("t-rex-paddock"))
         self.assertNotEqual(a, F.fixture_board_id("sherwood-forest", 2))
 
-    def test_int019_cell_world(self):
-        self.assertEqual(F.cell_world(0, 0, 5, 6), (-200.0, -250.0))
-        self.assertEqual(F.cell_world(4, 5, 5, 6), (200.0, 250.0))
 
 
-class CommittedFixtures(unittest.TestCase):
-    def test_two_fixtures_exist(self):
-        self.assertEqual([p.name for p in FIXTURES],
-                         ["sherwood-forest.art-fixture.json", "t-rex-paddock.art-fixture.json"])
-
-    def test_each_fixture_passes_its_invariants(self):
-        for p in FIXTURES:
-            with self.subTest(p.name):
-                self.assertEqual(F.check_fixture(load(p)), [])
-
-    def test_art_fixture_mark_and_image_hash_only(self):
-        for p in FIXTURES:
-            fx = load(p)
-            with self.subTest(p.name):
-                self.assertTrue(fx["artFixture"])
-                self.assertEqual(fx["label"], "art fixture, не правила")
-                img = fx["source"]["image"]
-                self.assertRegex(img["sha256"], r"^[0-9a-f]{64}$")
-                self.assertNotIn("url", json.dumps(img).lower())
-
-    def test_multizone_cells_keep_all_zones(self):
-        for p in FIXTURES:
-            fx = load(p)
-            with self.subTest(p.name):
-                by_cell = {tuple(s["cell"]): s["zones"] for s in fx["spaces"]}
-                for c in fx["cells"]:
-                    if c.get("zones"):
-                        self.assertEqual(c["zones"], by_cell[(c["x"], c["y"])])
-                self.assertGreaterEqual(fx["summary"]["multizoneCells"], 2)
-
-    def test_real_zone_keys_are_the_map_keys(self):
-        expected = {
-            "sherwood-forest": ["gray", "light-gray", "green", "brown", "light-green", "orange", "yellow"],
-            "t-rex-paddock": ["blue", "gray", "green", "blue-green", "purple", "yellow"],
-        }
-        for p in FIXTURES:
-            fx = load(p)
-            self.assertEqual(fx["source"]["zoneKeys"], expected[fx["key"]])
-
-    def test_profiles_consistent(self):
+class ShippedProfiles(unittest.TestCase):
+    def test_profiles_valid_and_original_maps_only(self):
         profiles = json.loads(F.DEFAULT_PROFILES.read_text(encoding="utf-8"))
-        self.assertEqual(F.check_profiles([load(p) for p in FIXTURES], profiles), [])
+        self.assertEqual(F.check_profiles(profiles), [])
+        # 2026-10-04 (real boards only): the two original maps, their night lights, no synthetic board / probe light
+        self.assertEqual([b["id"] for b in profiles["boards"]], ["marmoreal-original", "sarpedon-original"])
+        self.assertEqual(sorted(profiles["lightProfiles"]), ["marmoreal-night", "sarpedon-night"])
+        self.assertTrue(all(b["surface"] == "map-image" for b in profiles["boards"]))
+        self.assertEqual(F.main(["check"]), 0)
 
     def test_profile_budget_rule_detects_violations(self):
         profiles = json.loads(F.DEFAULT_PROFILES.read_text(encoding="utf-8"))
         bad = json.loads(json.dumps(profiles))
-        lp = bad["lightProfiles"]["forest-probe"]
-        lp["points"] = lp["points"] * 3  # 9 points (W4-A: the forest profile has 3 points, the fill became the sky)
+        lp = bad["lightProfiles"]["marmoreal-night"]
+        lp["points"] = lp["points"] * 9  # 9 points (the night profile has one moon pool)
         lp["points"][0] = dict(lp["points"][0], castShadows=True)
         lp["directional"]["castShadows"] = False
-        errs = F.check_profiles([load(p) for p in FIXTURES], bad)
+        errs = F.check_profiles(bad)
         self.assertTrue(any("> 6" in e for e in errs))
         self.assertTrue(any("must not cast shadows" in e for e in errs))
         self.assertTrue(any("directional light with a shadow" in e for e in errs))
@@ -216,18 +182,18 @@ class CommittedFixtures(unittest.TestCase):
         # W4-A: units in candelas/lux, SkyLight instead of a point fill, fixed exposure.
         profiles = json.loads(F.DEFAULT_PROFILES.read_text(encoding="utf-8"))
         bad = json.loads(json.dumps(profiles))
-        lp = bad["lightProfiles"]["cobble-probe"]
+        lp = bad["lightProfiles"]["marmoreal-night"]
         del lp["units"]
         lp["sky"]["cubemap"] = "/Engine/MapTemplates/Sky/DaylightAmbientCubemap"
         lp["points"].append({"name": "fill", "role": "fill", "posUU": [0, -100, 550], "intensity": 700,
                              "radiusUU": 1800})
         lp["exposure"]["maxBrightness"] = 4.0
-        errs = F.check_render_blocks("cobble-probe", lp)
+        errs = F.check_render_blocks("marmoreal-night", lp)
         self.assertTrue(any("units must be" in e for e in errs))
         self.assertTrue(any("sky needs" in e for e in errs))
         self.assertTrue(any("'fill' ambient" in e for e in errs))
         self.assertTrue(any("exposure needs" in e for e in errs))
-        self.assertEqual(F.check_render_blocks("cobble-probe", profiles["lightProfiles"]["cobble-probe"]), [])
+        self.assertEqual(F.check_render_blocks("marmoreal-night", profiles["lightProfiles"]["marmoreal-night"]), [])
 
     def test_profile_night_blocks(self):
         # ENV-MAPS P2 (rev 9): the shipped night profiles carry a valid fog and map grade; broken ones are reported.
@@ -280,10 +246,10 @@ class CommittedFixtures(unittest.TestCase):
                 rgb = [int(r["reach"]["colorSrgb"][i:i + 2], 16) for i in (1, 3, 5)]
                 self.assertTrue(rgb[0] > rgb[1] > rgb[2], "warm reach colour (not the mint green)")
                 self.assertAlmostEqual(r["frameWood"]["valueScaleSrgb"], 0.7, delta=0.1)
-        grid = json.loads(json.dumps(next(b for b in profiles["boards"] if b["id"] == "cobble-city")))
+        grid = grid_board()
         grid["readability"] = {"labelPlates": True}
-        self.assertEqual(F.check_readability_block("cobble-city", grid),
-                         ["board cobble-city: readability is for map-image boards only"])
+        self.assertEqual(F.check_readability_block("grid-5x6", grid),
+                         ["board grid-5x6: readability is for map-image boards only"])
         mp = json.loads(json.dumps(next(b for b in profiles["boards"] if b["id"] == "marmoreal-original")))
         cases = (
             (("reach", "segments"), 8, "readability.reach"),
@@ -315,10 +281,10 @@ class CommittedFixtures(unittest.TestCase):
             self.assertEqual(F.check_frame_backdrop_blocks(b["id"], b), [], b["id"])
         by_id = {b["id"]: b for b in profiles["boards"]}
         self.assertEqual(len(by_id["marmoreal-original"]["backdrop"]["mist"]), 2)
-        grid = json.loads(json.dumps(by_id["cobble-city"]))
+        grid = grid_board()
         grid["mapFrame"] = {"kit": "frame-002"}
-        self.assertEqual(F.check_frame_backdrop_blocks("cobble-city", grid),
-                         ["board cobble-city: mapFrame is for map-image boards only"])
+        self.assertEqual(F.check_frame_backdrop_blocks("grid-5x6", grid),
+                         ["board grid-5x6: mapFrame is for map-image boards only"])
         mp = by_id["marmoreal-original"]
         cases = (
             (lambda b: b["mapFrame"].update(kit="frame-003"), "mapFrame.kit"),
@@ -354,25 +320,6 @@ class CommittedFixtures(unittest.TestCase):
         self.assertTrue(any("unknown glyph 'star'" in e for e in errs))
         self.assertTrue(any("glyphMeshes ring" in e for e in errs))
         self.assertTrue(any("glyph 'cross' has no glyph mesh" in e for e in errs))
-
-    def test_light_section_on_a_zone_is_rejected(self):
-        fx = load(F.DEFAULT_OUT / "t-rex-paddock.art-fixture.json")
-        # a warm spot centred on the blue column (x=0) covers exactly blue cells
-        r = F.light_sections_vs_zones(fx, {"points": [
-            {"name": "on-blue", "role": "warm", "at": [-3.0 / 7.0, 0.0, 250], "radiusUU": 420}]})
-        self.assertGreaterEqual(r["on-blue"]["maxJaccard"], 0.5)
-        self.assertEqual(r["on-blue"]["zone"], "blue")
-
-    def test_reproducible_from_maps_json(self):
-        maps_path = F.MAIN_CHECKOUT_MAPS
-        if not maps_path.is_file():
-            self.skipTest(f"maps.json not present at {maps_path} (gitignored, main checkout only)")
-        maps, sha = F.load_maps(maps_path)
-        for p in FIXTURES:
-            fx = load(p)
-            m = next(x for x in maps if x["key"] == fx["key"])
-            with self.subTest(p.name):
-                self.assertEqual(F.dump(F.build_fixture(m, sha)), p.read_text(encoding="utf-8"))
 
 
 EVIDENCE = F.REPO / "docs" / "game-design" / "evidence" / "ENV-MAPS" / "2026-09-30-research"

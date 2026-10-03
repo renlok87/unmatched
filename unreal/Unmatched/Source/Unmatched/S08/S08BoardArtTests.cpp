@@ -1,9 +1,9 @@
 // ART-005 / stage 3 T3.2 automation tests: data-driven board art (S08BoardArt.h).
-// Pure functions only (no world): the shipped profile data, the parser's
-// budget/shape validation, profile selection (board id, then signature), the
-// Cobble 5x6 legacy geometry and lights kept exact, multizone cells keeping
-// every zone, and the committed art fixtures (backend/prisma/fixtures/
-// art-boards) decoded through FS08BoardModel::Decode against their profiles.
+// Pure functions only (no world): the shipped profile data (2026-10-04: the two
+// original maps only, docs/game-design/decisions/2026-10-04-real-boards-only.md),
+// the parser's budget/shape validation, profile selection (board id, then
+// signature), the ART-005 blue/red zone mark geometry kept exact (an in-code
+// 5x6 grid) and multizone cells keeping every zone.
 // T4.2: the zone MI / glyph mesh fields of the data, the glyph anchors, and
 // (ZoneContent, editor assets) the MIs and glyph meshes themselves.
 // ENV-MAPS track S: the 'map-image' surface (MapImageParser, MapProfiles on the committed topology fixtures
@@ -63,7 +63,9 @@ FS08BoardModel MakeBoard(int32 W, int32 H) {
   return Board;
 }
 
-FS08BoardModel CobbleBoard() {
+/** In-code 5x6 grid, rows 0-2 zone blue and rows 3-5 zone red: the ART-005 zone mark geometry (test data only; the
+ *  Cobble City board and its profile are gone since 2026-10-04). */
+FS08BoardModel BlueRedBoard() {
   FS08BoardModel Board = MakeBoard(5, 6);
   for (FS08Cell& Cell : Board.Cells) Cell.Zones = {Cell.Y < 3 ? TEXT("blue") : TEXT("red")};
   return Board;
@@ -71,60 +73,6 @@ FS08BoardModel CobbleBoard() {
 
 bool LoadShipped(FS08BoardArtData& Data, TArray<FString>& Errors) {
   return Data.LoadFile(FS08BoardArtData::DefaultPath(), Errors);
-}
-
-FString FixtureDir() {
-  return FPaths::ConvertRelativePathToFull(
-      FPaths::Combine(FPaths::ProjectDir(), TEXT("../../backend/prisma/fixtures/art-boards")));
-}
-
-/** Fixture JSON (flat cells, backend Board.cells format) -> the boardState
- *  projection that buildBoardState produces (rows cells[y][x]). */
-bool FixtureBoardState(const FString& File, TSharedPtr<FJsonValue>& OutState, FString& OutBoardId,
-                       FS08BoardExpect& OutSummary) {
-  FString Text;
-  if (!FFileHelper::LoadFileToString(Text, *File)) return false;
-  TSharedPtr<FJsonObject> Root;
-  FString Problem;
-  if (!FS08Contracts::TryParseJsonObject(Text, Root, Problem)) return false;
-  OutBoardId = Root->GetStringField(TEXT("boardId"));
-  const TSharedPtr<FJsonObject> Grid = Root->GetObjectField(TEXT("grid"));
-  const int32 W = static_cast<int32>(Grid->GetNumberField(TEXT("width")));
-  const int32 H = static_cast<int32>(Grid->GetNumberField(TEXT("height")));
-  const TSharedPtr<FJsonObject> Summary = Root->GetObjectField(TEXT("summary"));
-  OutSummary.Cells = static_cast<int32>(Summary->GetNumberField(TEXT("cells")));
-  OutSummary.ZoneCells = static_cast<int32>(Summary->GetNumberField(TEXT("zoneCells")));
-  OutSummary.MultizoneCells = static_cast<int32>(Summary->GetNumberField(TEXT("multizoneCells")));
-  OutSummary.Obstacles = static_cast<int32>(Summary->GetNumberField(TEXT("obstacleCells")));
-  TArray<TArray<TSharedPtr<FJsonValue>>> Rows;
-  Rows.SetNum(H);
-  for (int32 Y = 0; Y < H; ++Y) Rows[Y].SetNum(W);
-  for (const TSharedPtr<FJsonValue>& V : Root->GetArrayField(TEXT("cells"))) {
-    const TSharedPtr<FJsonObject> C = V->AsObject();
-    const int32 X = static_cast<int32>(C->GetNumberField(TEXT("x")));
-    const int32 Y = static_cast<int32>(C->GetNumberField(TEXT("y")));
-    TSharedRef<FJsonObject> Cell = MakeShared<FJsonObject>();
-    bool bObstacle = false;
-    C->TryGetBoolField(TEXT("isObstacle"), bObstacle);
-    Cell->SetStringField(TEXT("type"), bObstacle ? TEXT("obstacle") : TEXT("normal"));
-    Cell->SetNumberField(TEXT("x"), X);
-    Cell->SetNumberField(TEXT("y"), Y);
-    const TArray<TSharedPtr<FJsonValue>>* Zones = nullptr;
-    if (C->TryGetArrayField(TEXT("zones"), Zones) && Zones) {
-      Cell->SetArrayField(TEXT("zones"), *Zones);
-      Cell->SetStringField(TEXT("zone"), (*Zones)[0]->AsString());
-    }
-    Rows[Y][X] = MakeShared<FJsonValueObject>(Cell);
-  }
-  TArray<TSharedPtr<FJsonValue>> RowValues;
-  for (const TArray<TSharedPtr<FJsonValue>>& Row : Rows) RowValues.Add(MakeShared<FJsonValueArray>(Row));
-  TSharedRef<FJsonObject> State = MakeShared<FJsonObject>();
-  State->SetNumberField(TEXT("width"), W);
-  State->SetNumberField(TEXT("height"), H);
-  State->SetArrayField(TEXT("cells"), RowValues);
-  State->SetObjectField(TEXT("doors"), MakeShared<FJsonObject>());
-  OutState = MakeShared<FJsonValueObject>(State);
-  return true;
 }
 
 const TCHAR* MinimalDoc = TEXT(
@@ -151,8 +99,16 @@ bool FS08BoardArtShippedTest::RunTest(const FString&) {
   for (const FString& E : Errors) AddError(E);
   TestTrue("shipped Config/ArtBoards/S08ArtBoardProfiles.json parses without errors", bOk);
   TestTrue("revision >= 1", Data.Revision >= 1);
-  // ENV-MAPS (profile rev 6): + the map-image profiles of Marmoreal and Sarpedon.
-  TestEqual("five board profiles (Cobble + 2 fixtures + 2 original maps)", Data.Boards.Num(), 5);
+  // Profile rev 21 (2026-10-04, real boards only): the map-image profiles of Marmoreal and Sarpedon, nothing else.
+  TestEqual("two board profiles (the two original maps)", Data.Boards.Num(), 2);
+  TestEqual("two light profiles (marmoreal-night, sarpedon-night)", Data.Lights.Num(), 2);
+  for (const TCHAR* Gone : {TEXT("cobble-city"), TEXT("sherwood-forest-art-fixture"), TEXT("t-rex-paddock-art-fixture")}) {
+    TestNull(FString::Printf(TEXT("synthetic board %s is gone"), Gone),
+             Data.Boards.FindByPredicate([&](const FS08BoardArtProfile& B) { return B.Id == Gone; }));
+  }
+  for (const TCHAR* Gone : {TEXT("cobble-probe"), TEXT("forest-probe"), TEXT("paddock-probe")}) {
+    TestFalse(FString::Printf(TEXT("probe light %s is gone"), Gone), Data.Lights.Contains(Gone));
+  }
   for (const TPair<FString, FS08LightProfile>& Light : Data.Lights) {
     FString Reason;
     TestTrue(FString::Printf(TEXT("light %s budget: %s"), *Light.Key, *Reason), Light.Value.BudgetOk(Reason));
@@ -214,7 +170,6 @@ bool FS08BoardArtShippedTest::RunTest(const FString&) {
                    B.Expect.MultizoneCells >= 0);
       TestTrue(FString::Printf(TEXT("%s: no W x H expect (cells / obstacles)"), *B.Id),
                B.Expect.Cells < 0 && B.Expect.Obstacles < 0);
-      TestFalse(FString::Printf(TEXT("%s: no legacy Cobble trace"), *B.Id), B.bLegacyCobbleTrace);
       continue;
     }
     TSet<ES08ZoneStroke> Strokes;
@@ -241,13 +196,6 @@ bool FS08BoardArtShippedTest::RunTest(const FString&) {
       TestTrue(FString(Map.Profile) + TEXT(": map-image surface matched by the topology fixture's board id"),
                P->Surface == ES08BoardSurface::MapImage && P->MatchBoardIds.Contains(Map.BoardId));
     }
-  }
-  const FS08BoardArtProfile* Cobble = Data.Boards.FindByPredicate(
-      [](const FS08BoardArtProfile& B) { return B.Id == TEXT("cobble-city"); });
-  if (TestNotNull("cobble-city profile", Cobble)) {
-    TestTrue("Cobble keeps the ART-005 slab", Cobble->Surface == ES08BoardSurface::Cobble5x6Mesh);
-    TestTrue("Cobble keeps the legacy trace lines", Cobble->bLegacyCobbleTrace);
-    TestFalse("Cobble keeps the ART-005 review glyph material", Cobble->bZoneColorGlyphs);
   }
   // A key never listed falls back visibly (drawn + traced, never dropped).
   TestTrue("unknown key -> fallback style", Data.StyleFor(TEXT("no-such-zone")).bFallback);
@@ -470,22 +418,18 @@ bool FS08BoardArtSelectTest::RunTest(const FString&) {
   return true;
 }
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08BoardArtCobbleLegacyTest,
-    "Unmatched.S08.BoardArt.Cobble 5x6 keeps the ART-005 marks, counts and probe lights",
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08BoardArtBlueRedMarksTest,
+    "Unmatched.S08.BoardArt.ZoneMarks blue / red keep the ART-005 stroke and glyph geometry",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
-bool FS08BoardArtCobbleLegacyTest::RunTest(const FString&) {
+bool FS08BoardArtBlueRedMarksTest::RunTest(const FString&) {
   FS08BoardArtData Data;
   TArray<FString> Errors;
   if (!TestTrue("shipped data", LoadShipped(Data, Errors))) return false;
-  const FS08BoardModel Board = CobbleBoard();
+  const FS08BoardModel Board = BlueRedBoard();
   ES08ProfileMatch Match;
-  const FS08BoardArtProfile* P = Data.Select(Board, TEXT("cmuhgs4b2001mwik4f2b2xtf8"), Match);
-  if (!TestTrue("Cobble row id -> cobble-city", P && P->Id == TEXT("cobble-city"))) return false;
-  P = Data.Select(Board, FString(), Match);
-  TestTrue("Cobble signature -> cobble-city", P && P->Id == TEXT("cobble-city") && Match == ES08ProfileMatch::Signature);
-  TestEqual("Cobble expect met", S08ExpectMismatch(*P, S08SummarizeBoard(Board)), FString());
+  TestNull("no shipped profile matches a 5x6 grid (real boards only)", Data.Select(Board, FString(), Match));
   const FS08ZoneMarkLayout L = S08BuildZoneMarks(Board, Data);
-  // 'ARTPREVIEW Cobble active 5x6 zones=30 blue=15 red=15 blueMarks=15 redMarks=45'
+  // the ART-005 counts of the shipped blue / red zone styles: 15 + 15 cells, 15 solid + 45 dash3 stroke pieces
   TestEqual("blue cells", L.CellsByKey.FindRef(TEXT("blue")), 15);
   TestEqual("red cells", L.CellsByKey.FindRef(TEXT("red")), 15);
   TestEqual("blueMarks", L.StrokePiecesByKey.FindRef(TEXT("blue")), 15);
@@ -514,27 +458,6 @@ bool FS08BoardArtCobbleLegacyTest::RunTest(const FString&) {
   if (TestNotNull("blue diamond", Diamond)) {
     TestTrue("diamond at the near-left slot", Diamond->Transform.GetTranslation().Equals(BlueWorld + FVector(-32, 32, 0.38f), 1e-4f));
     TestTrue("diamond rotated 45", Diamond->Transform.Rotator().Equals(FRotator(0, 45, 0), 0.01f));
-  }
-  // Probe lights: key 4.5 lux at (-350,-150,600) rot (-55,30,0) with shadow (5c-B1 rev 5: Pitch -55;
-  // rev 4 had (0,-55,30) = a horizontal key); warm 85 cd. W4-A: the point fill (700) became the SkyLight,
-  // units are candelas/lux, exposure fixed (5c-B1 rev 5: EV100 2.05, was 1.3), key CSM 3000 uu / 2 cascades.
-  const FS08LightProfile* Light = Data.LightFor(*P);
-  if (TestNotNull("cobble light profile", Light)) {
-    const TArray<FS08PlacedLight> Placed = S08PlaceLights(*Light, Board);
-    if (TestEqual("1 directional + 1 point", Placed.Num(), 2)) {
-      TestTrue("key", Placed[0].Spec.bDirectional && Placed[0].Position.Equals(FVector(-350, -150, 600)) &&
-                          Placed[0].Spec.Rotation.Equals(FRotator(-55, 30, 0)) &&
-                          FMath::IsNearlyEqual(Placed[0].Spec.Intensity, 4.5f) && Placed[0].Spec.bCastShadows &&
-                          !Placed[0].Spec.bHasColor);
-      TestTrue("warm", Placed[1].Position.Equals(FVector(260, -300, 250)) &&
-                           FMath::IsNearlyEqual(Placed[1].Spec.Intensity, 85.0f) &&
-                           FMath::IsNearlyEqual(Placed[1].Spec.RadiusUU, 450.0f));
-    }
-    TestTrue("candelas/lux", Light->HasPhysicalUnits());
-    TestTrue("sky from the ambient dome", Light->Sky.bSet && Light->Sky.CubemapPath == TEXT("/Game/S08/Render/TC_S08_AmbientDome"));
-    TestTrue("exposure EV100 2.05 fixed", Light->Exposure.bSet && FMath::IsNearlyEqual(Light->Exposure.MinBrightness, 4.14106f) &&
-                                             FMath::IsNearlyEqual(Light->Exposure.Bias, 0.0f));
-    TestTrue("key csm", Light->KeyShadow.bSet && Light->KeyShadow.Cascades == 2);
   }
   return true;
 }
@@ -575,60 +498,6 @@ bool FS08BoardArtMultizoneTest::RunTest(const FString&) {
   TestTrue("zone 0 near side, zone 1 left side, zone 2 far side", bNear && bLeft && bFar);
   TestTrue("per-cell line lists all zones",
            L.MultizoneLines.ContainsByPredicate([](const FString& S) { return S.StartsWith(TEXT("(1,0) gray+brown+yellow")) && S.EndsWith(TEXT("marked=3/3")); }));
-  return true;
-}
-
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08BoardArtFixtureTest,
-    "Unmatched.S08.BoardArt.Committed Sherwood and T. Rex fixtures decode to their profiles",
-    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
-bool FS08BoardArtFixtureTest::RunTest(const FString&) {
-  FS08BoardArtData Data;
-  TArray<FString> Errors;
-  if (!TestTrue("shipped data", LoadShipped(Data, Errors))) return false;
-  TArray<FString> Files;
-  IFileManager::Get().FindFiles(Files, *FPaths::Combine(FixtureDir(), TEXT("*.art-fixture.json")), true, false);
-  Files.Sort();
-  if (!TestEqual(TEXT("two fixtures in ") + FixtureDir(), Files.Num(), 2)) return false;
-  for (const FString& Name : Files) {
-    TSharedPtr<FJsonValue> State;
-    FString BoardId;
-    FS08BoardExpect FromFixture;
-    if (!TestTrue(Name + TEXT(": fixture -> boardState"),
-                  FixtureBoardState(FPaths::Combine(FixtureDir(), Name), State, BoardId, FromFixture))) continue;
-    FS08BoardModel Board;
-    if (!TestTrue(Name + TEXT(": FS08BoardModel::Decode"), Board.Decode(State))) continue;
-    ES08ProfileMatch Match;
-    const FS08BoardArtProfile* P = Data.Select(Board, BoardId, Match);
-    if (!TestTrue(Name + TEXT(": profile by board id"), P && Match == ES08ProfileMatch::BoardId)) continue;
-    const FS08BoardSummary S = S08SummarizeBoard(Board);
-    TestEqual(Name + TEXT(": expect met"), S08ExpectMismatch(*P, S), FString());
-    TestEqual(Name + TEXT(": cells = fixture"), S.Cells, FromFixture.Cells);
-    TestEqual(Name + TEXT(": multizone = fixture"), S.MultizoneCells, FromFixture.MultizoneCells);
-    TestEqual(Name + TEXT(": obstacles = fixture"), S.Obstacles, FromFixture.Obstacles);
-    TestTrue(Name + TEXT(": >= 2 multizone cells"), S.MultizoneCells >= 2);
-    ES08ProfileMatch BySignature;
-    TestTrue(Name + TEXT(": the signature alone selects the same profile"),
-             Data.Select(Board, FString(), BySignature) == P && BySignature == ES08ProfileMatch::Signature);
-    TestTrue(Name + TEXT(": 'tiles' surface, zone-colour glyphs"),
-             P->Surface == ES08BoardSurface::Tiles && P->bArtFixture && P->bZoneColorGlyphs);
-    const FS08ZoneMarkLayout L = S08BuildZoneMarks(Board, Data);
-    TestEqual(Name + TEXT(": all multizone zones marked"), L.MultizoneZonesMarked, L.MultizoneZonesListed);
-    TestEqual(Name + TEXT(": no fallback zone style"), L.FallbackKeys.Num(), 0);
-    const FS08LightProfile* Light = Data.LightFor(*P);
-    if (TestNotNull(Name + TEXT(": light profile"), Light)) {
-      const TArray<FS08PlacedLight> Placed = S08PlaceLights(*Light, Board);
-      int32 Warm = 0, Cool = 0;
-      for (const FS08PlacedLight& Pl : Placed) {
-        Warm += Pl.Spec.Role == TEXT("warm");
-        Cool += Pl.Spec.Role == TEXT("cool");
-        if (!Pl.Spec.bDirectional && !Pl.Spec.bHasPosUU) {
-          TestTrue(Name + TEXT(": board-relative spot inside the board footprint"),
-                   FMath::Abs(Pl.Position.X) <= Board.Width * 50.0 && FMath::Abs(Pl.Position.Y) <= Board.Height * 50.0);
-        }
-      }
-      TestTrue(Name + TEXT(": separate warm and cool spots"), Warm >= 1 && Cool >= 1);
-    }
-  }
   return true;
 }
 
@@ -724,8 +593,19 @@ bool FS08BoardArtZoneContentTest::RunTest(const FString&) {
 // driver only tried one-cell steps. PickApproachDestination (multi-step, allies
 // pass-through, terrain distance to the nearest enemy) must get her out and
 // into melee range within a few maneuvers; the start layout is the one the
-// backend placed in that run (host trace SHOT fighter lines).
+// backend placed in that run (host trace SHOT fighter lines). The art fixture
+// file is gone (2026-10-04, real boards only): its 7x5 obstacle layout is test
+// data in code now.
 namespace {
+FS08BoardModel BoxedInBoard() {
+  FS08BoardModel Board = MakeBoard(7, 5);
+  for (const FIntPoint Obstacle : {FIntPoint(1, 1), FIntPoint(1, 3), FIntPoint(3, 2), FIntPoint(3, 3), FIntPoint(4, 1),
+                                   FIntPoint(4, 3), FIntPoint(5, 3), FIntPoint(6, 0), FIntPoint(6, 4)}) {
+    Board.Cells[Obstacle.Y * Board.Width + Obstacle.X].Type = ES08CellType::Obstacle;
+  }
+  return Board;
+}
+
 FS08BoardFighter ApproachFighter(const TCHAR* Id, const TCHAR* Owner, bool bHero, int32 X, int32 Y,
                                  int32 Movement) {
   FS08BoardFighter F;
@@ -754,17 +634,8 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08BoardArtAutoApproachTest,
     "Unmatched.S08.BoardArt.AutoApproach S09AUTO multi-step approach leaves a boxed-in start and reaches melee range",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FS08BoardArtAutoApproachTest::RunTest(const FString&) {
-  // 1. T. Rex art fixture, the T3.2 attempt layout.
-  TSharedPtr<FJsonValue> State;
-  FString BoardId;
-  FS08BoardExpect Summary;
-  if (!TestTrue(TEXT("T. Rex fixture -> boardState"),
-                FixtureBoardState(FPaths::Combine(FixtureDir(), TEXT("t-rex-paddock.art-fixture.json")), State,
-                                  BoardId, Summary))) {
-    return false;
-  }
-  FS08BoardModel Board;
-  if (!TestTrue(TEXT("T. Rex decode"), Board.Decode(State))) return false;
+  // 1. The 7x5 obstacle layout of the T3.2 attempt (in code).
+  const FS08BoardModel Board = BoxedInBoard();
   TestTrue(TEXT("(3,2) is the obstacle next to Medusa"), Board.CellAt(3, 2) && !Board.CellAt(3, 2)->IsPassable());
   TArray<FS08BoardFighter> Fighters = {
       ApproachFighter(TEXT("f-0-hero"), TEXT("A"), true, 2, 2, 3),
@@ -1115,11 +986,11 @@ bool FS08BoardArtKeylineTest::RunTest(const FString&) {
                Outer <= SlabHalfUU + 1e-3);
     }
   }
-  // 5) the layout: keylines are never part of the zone counts (legacy Cobble trace byte-compatible)
+  // 5) the layout: keylines are never part of the zone counts
   FS08BoardArtData Data;
   TArray<FString> Errors;
   if (!TestTrue("shipped data", LoadShipped(Data, Errors))) return false;
-  const FS08BoardModel Board = CobbleBoard();
+  const FS08BoardModel Board = BlueRedBoard();
   const FS08ZoneMarkLayout L = S08BuildZoneMarks(Board, Data);
   TestEqual("stroke keylines = stroke pieces", L.StrokeKeylines.Num(), L.Strokes.Num());
   TestEqual("glyph keylines = glyph pieces", L.GlyphKeylines.Num(), L.Glyphs.Num());
@@ -1478,7 +1349,7 @@ bool FS08BoardArtMapProfilesTest::RunTest(const FString&) {
 }
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08BoardArtMapCameraTest,
-    "Unmatched.S08.BoardArt.MapCamera K1 distance: grids unchanged (Cobble 1931), map canvas fit 1872 x k1DistanceMul 1.25 = 2340",
+    "Unmatched.S08.BoardArt.MapCamera K1 distance: grids unchanged (5x6 1931), map canvas fit 1872 x k1DistanceMul 1.25 = 2340",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FS08BoardArtMapCameraTest::RunTest(const FString&) {
   using namespace S08MapTest;
@@ -1507,9 +1378,9 @@ bool FS08BoardArtMapCameraTest::RunTest(const FString&) {
     TestTrue(FString::Printf(TEXT("%dx%d grid overview (k1DistanceMul 1) == the fit exactly"), Size.X, Size.Y),
              S08K1OverviewDistanceUU(GridFit, 1.0f) == GridFit);
   }
-  TestTrue(FString::Printf(TEXT("Cobble 5x6 K1 %.1f = 1931 +- 1"), S08K1FitDistanceUU(S08BoardHalfExtentUU(MakeBoard(5, 6)))),
+  TestTrue(FString::Printf(TEXT("5x6 grid K1 %.1f = 1931 +- 1"), S08K1FitDistanceUU(S08BoardHalfExtentUU(MakeBoard(5, 6)))),
            FMath::Abs(S08K1FitDistanceUU(S08BoardHalfExtentUU(MakeBoard(5, 6))) - 1931.0f) <= 1.0f);
-  // ENV-U9 in the shipped data: the two map-image profiles carry 1.25, every grid profile (Cobble first) keeps 1.
+  // ENV-U9 in the shipped data: the two map-image profiles carry 1.25 (no grid profile ships since 2026-10-04).
   {
     FS08BoardArtData Shipped;
     TArray<FString> Errors;
@@ -1522,15 +1393,7 @@ bool FS08BoardArtMapCameraTest::RunTest(const FString&) {
                  B.K1DistanceMul == (bMap ? 1.25f : 1.0f));
       }
       TestEqual("two map-image profiles", Maps, 2);
-      const FS08BoardArtProfile* Cobble =
-          Shipped.Boards.FindByPredicate([](const FS08BoardArtProfile& B) { return B.Id == TEXT("cobble-city"); });
-      if (TestNotNull("cobble-city profile", Cobble)) {
-        const float CobbleFit = S08K1FitDistanceUU(S08BoardHalfExtentUU(MakeBoard(5, 6)));
-        const float CobbleOverview = S08K1OverviewDistanceUU(CobbleFit, Cobble->K1DistanceMul);
-        TestTrue(FString::Printf(TEXT("Cobble overview %.3f == its fit (1931 unchanged)"), CobbleOverview),
-                 CobbleOverview == CobbleFit);
-        TestEqual("Cobble overview = the pre-ENV-MAPS formula", CobbleOverview, Legacy(5, 6));
-      }
+      TestEqual("only map-image profiles ship", Shipped.Boards.Num(), Maps);
     }
   }
   FS08BoardModel Topo;
@@ -2025,7 +1888,7 @@ bool FS08BoardArtReadabilityParserTest::RunTest(const FString&) {
              FString::Join(Errs, TEXT(" | ")).Contains(ErrorPart));
   };
   {
-    // grids never carry it (Cobble and the art fixtures stay bit for bit)
+    // grids never carry it (grid profiles stay bit for bit)
     FString OnGrid = S08MapTest::MapDoc();
     TestTrue("grid anchor present", OnGrid.Contains(TEXT("\"surface\":\"tiles\",")));
     OnGrid.ReplaceInline(TEXT("\"surface\":\"tiles\","), TEXT("\"surface\":\"tiles\",\"readability\":{\"labelPlates\":true},"));
@@ -2527,7 +2390,7 @@ bool FS08BoardArtFrameBackdropParserTest::RunTest(const FString&) {
              FString::Join(Errs, TEXT(" | ")).Contains(ErrorPart));
   };
   {
-    // grids never carry them (Cobble and the art fixtures stay bit for bit)
+    // grids never carry them (grid profiles stay bit for bit)
     for (const TCHAR* Block : {TEXT("\"mapFrame\":{\"kit\":\"frame-002\"},"), TEXT("\"backdrop\":{\"moon\":{}},")}) {
       FString OnGrid = S08MapTest::MapDoc();
       OnGrid.ReplaceInline(TEXT("\"surface\":\"tiles\","), *(FString(TEXT("\"surface\":\"tiles\",")) + Block));
@@ -2679,7 +2542,7 @@ bool FS08BoardArtFrameBackdropActorTest::RunTest(const FString&) {
              A->GetMapFrameParts().IsEmpty() && A->GetBackdropParts().IsEmpty() && A->GetBackdropRuntime().MistPlanes == 0 &&
                  !A->GetBackdropRuntime().bMoon);
   };
-  // 1) grids (Cobble-size, no art data) and the refused map-image profile: nothing, and a grid-only run traces nothing
+  // 1) grids (5x6, no art data) and the refused map-image profile: nothing, and a grid-only run traces nothing
   FS08BoardModel Topo;
   if (TestTrue("synthetic topology board", SyntheticTopology(Topo))) {
     AS08BoardActor* A = World->SpawnActor<AS08BoardActor>(AS08BoardActor::StaticClass(), FVector::ZeroVector,

@@ -145,25 +145,12 @@ bool FS08DioramaAssetsTest::RunTest(const FString&) {
            Box.Min.Equals(FVector(-MeshHalfX, -MeshHalfY, BottomZ), 0.5) &&
                Box.Max.Equals(FVector(MeshHalfX, MeshHalfY, TopZ), 0.5));
   TestEqual("one material slot", Mesh->GetStaticMaterials().Num(), 1);
-  // ART-005 Cobble slab frame at the in-game yaw -90 (S08BoardActor): the tray rim is 50 uu on every side.
-  UStaticMesh* Board = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/ArtTests/ART005F/Meshes/SM_ART005_BoardStoneV4_WoodUV"));
-  TestNotNull("ART-005 Cobble slab loads", Board);
-  if (Board) {
-    const FBox B = Board->GetBoundingBox().TransformBy(FTransform(FRotator(0.0f, -90.0f, 0.0f)));
-    const FVector2D Half(FMath::Max(-B.Min.X, B.Max.X), FMath::Max(-B.Min.Y, B.Max.Y));
-    const FTrayFit Fit = FitTray(Half);
-    AddInfo(FString::Printf(TEXT("Cobble slab world %s half %s -> tray yaw %.0f scale %s"), *B.ToString(), *Half.ToString(),
-                            Fit.YawDeg, *Fit.Scale.ToString()));
-    TestEqual("Cobble slab -> yaw -90", Fit.YawDeg, -90.0f);
-    TestTrue(FString::Printf(TEXT("Cobble slab -> scale 1 +-0.01 (%s)"), *Fit.Scale.ToString()),
-             Fit.Scale.Equals(FVector::OneVector, 0.01));
-    TestTrue(FString::Printf(TEXT("board top %.2f above the tray top -3"), B.Max.Z), B.Max.Z > TopZ);
-  }
+  // (The ART-005 Cobble slab check left with the Cobble 5x6 surface, 2026-10-04: the client no longer loads the slab.)
   return true;
 }
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08DioramaActorTest,
-    "Unmatched.S08.Diorama.Actor board actor creates the tray only with the flag, NoCollision, under the Cobble slab",
+    "Unmatched.S08.Diorama.Actor board actor creates the tray only with the flag, NoCollision, fitted to the board frame",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FS08DioramaActorTest::RunTest(const FString&) {
   using namespace S08Diorama;
@@ -207,8 +194,9 @@ bool FS08DioramaActorTest::RunTest(const FString&) {
         // qualified: S08BoardArtTests.cpp has its own MakeBoard (unity builds may put both files in one TU)
         Actor->Rebuild(S08DioramaTest::MakeBoard(5, 6));
         TestFalse("grey board: tray hidden", Tray->IsVisible());
-        // Cobble 5x6 slab placement: (0,0,0), yaw -90, scale 1, top on Z -3, 50 uu rim.
-        Actor->PlaceDioramaTray(true, CobbleHalf, TEXT("cobble-5x6-mesh"));
+        // A frame of the tray's design size (the former ART-005 slab, 278 x 328): (0,0,0), yaw -90, scale 1, top on
+        // Z -3, 50 uu rim.
+        Actor->PlaceDioramaTray(true, CobbleHalf, TEXT("tiles"));
         TestTrue("tray visible on an art board", Tray->IsVisible());
         TestTrue("tray at the board centre", Tray->GetComponentLocation().Equals(FVector::ZeroVector, 1e-3));
         TestTrue(FString::Printf(TEXT("tray yaw %.2f == -90"), Tray->GetComponentRotation().Yaw),

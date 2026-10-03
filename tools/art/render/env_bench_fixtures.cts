@@ -1,7 +1,13 @@
 /**
  * ENV-MAPS -Bench fixtures: Config/Bench/S08Bench<Map>.json for the original
- * maps (Marmoreal, Sarpedon), in the exact shape of the captured Cobble bench
- * fixture (Config/Bench/S08BenchCobble.json, a gameState(gameId) response).
+ * maps (Marmoreal, Sarpedon), in the shape of a gameState(gameId) response.
+ *
+ * Template (2026-10-04, real boards only): the committed Marmoreal fixture
+ * (Config/Bench/S08BenchMarmoreal.json). Its non-board content is the former
+ * Cobble capture (S08BenchCobble.json, removed with the Cobble City board), so
+ * the generated files stay byte for byte what they were; the "source" text
+ * keeps that provenance. Only its players / ids / fighters / decks / hands /
+ * metadata are read - its boardState and positions are replaced below.
  *
  * The board and the starting positions are NOT hand-placed: this script runs
  * the server's own GameInitializationService.initializeGameState on the Board
@@ -14,7 +20,7 @@
  * Arthur) on start space 2, Merlin by the same BFS.
  *
  * Everything else (players, user / hero ids, fighter names and stats, decks,
- * hands, metadata) is copied from the Cobble capture, so -ArtPreviewHeroesV2
+ * hands, metadata) is copied from the template, so -ArtPreviewHeroesV2
  * maps the same four figures and the viewer (benchViewerId = seat 0) is the
  * same. benchBoardId = the fixture's deterministic Board id, which selects the
  * map-image art profile (<map>-original) and the env layout.
@@ -39,7 +45,7 @@ const { fixtureFiles, loadTopologyFixture, topologyBoardRow } = require(
 /* eslint-enable @typescript-eslint/no-var-requires */
 
 const BENCH_DIR = path.join(REPO, 'unreal', 'Unmatched', 'Config', 'Bench');
-const COBBLE = path.join(BENCH_DIR, 'S08BenchCobble.json');
+const TEMPLATE = path.join(BENCH_DIR, 'S08BenchMarmoreal.json');
 const MAPS: Array<{ key: string; file: string }> = [
   { key: 'marmoreal', file: 'S08BenchMarmoreal.json' },
   { key: 'sarpedon', file: 'S08BenchSarpedon.json' },
@@ -150,7 +156,8 @@ async function build(mapKey: string, cobble: any): Promise<{ doc: any; summary: 
 
 async function main(): Promise<void> {
   const check = process.argv.includes('--check');
-  const cobble = JSON.parse(fs.readFileSync(COBBLE, 'utf8'));
+  // Read once before any write: the template is one of the outputs.
+  const cobble = JSON.parse(fs.readFileSync(TEMPLATE, 'utf8'));
   let drift = 0;
   for (const m of MAPS) {
     const { doc, summary } = await build(m.key, cobble);
