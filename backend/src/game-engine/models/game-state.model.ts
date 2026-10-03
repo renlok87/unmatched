@@ -5,7 +5,7 @@
  * Используется во всём game-engine модуле.
  */
 
-import type { Fighter } from './fighter.model';
+import type { Fighter, Position } from './fighter.model';
 import type { Card, CardEffect, DeckState, HandZone } from './card.model';
 import type { BoardState } from './board.model';
 import type { CombatResolutionProgress } from '../engine/combat-progress';
@@ -153,11 +153,63 @@ export interface CombatEffectContinuation {
 }
 
 /**
+ * MS-T-14 (move-selection 04 §4.3): the BOOST card of a maneuver in the
+ * public trail. All fields are public: the card is already in its owner's
+ * discard pile, which filterPrivateData shows to the opponent with its
+ * instance id (MS-Q-05).
+ */
+export interface LastMovementBoost {
+  /** Instance id of the discarded card (the same id as in discardPiles) */
+  readonly cardId: string;
+  /** Catalog id (Card.cardId) */
+  readonly catalogId: string;
+  readonly name: string;
+  /** Printed BOOST; null when the card has none */
+  readonly value: number | null;
+}
+
+/** One movement in the trail, in the order it was applied. */
+export interface LastMovementMove {
+  readonly order: number;
+  readonly fighterId: string;
+  /** MOVE: step by step along `path`; PLACE: a jump to the single cell of `path` */
+  readonly kind: 'MOVE' | 'PLACE';
+  /** Position before this movement (after the previous moves of the same maneuver) */
+  readonly from: Position;
+  /** Cells WITHOUT the start (the maneuver wire format); PLACE — the target only */
+  readonly path: readonly Position[];
+}
+
+/**
+ * MS-T-14 (04 §4.3, MS-D-11): public trail of the last recorded movement.
+ * Written by executeManeuver (source MANEUVER) and by the resolution of a
+ * pending MOVE/PLACE effect (source EFFECT); hero abilities and reactions do
+ * not write it. It lives until the next recorded movement replaces it: the
+ * client uses it only when `seq` equals the applied snapshot's sequenceNumber.
+ * Stored in the DB under the short key `lm`; saves without it read as "no trail".
+ */
+export interface LastMovement {
+  /** sequenceNumber of the state this movement produced */
+  readonly seq: number;
+  /** Player whose command or choice moved the fighters */
+  readonly playerId: string;
+  readonly source: 'MANEUVER' | 'EFFECT';
+  /** MANEUVER — the maneuverId; EFFECT — the id of the resolved pending effect */
+  readonly sourceRef: string;
+  /** MANEUVER with a BOOST card only; null otherwise */
+  readonly boost: LastMovementBoost | null;
+  /** In the order applied; fighters that stayed are not listed ([] = nothing moved) */
+  readonly moves: readonly LastMovementMove[];
+}
+
+/**
  * Метаданные состояния
  */
 export interface GameStateMetadata {
   /** Maneuver has drawn and spent its action; movement/boost still await the owner. */
   readonly pendingManeuver?: { readonly id: string; readonly playerId: string };
+  /** MS-T-14: public trail of the last maneuver or MOVE/PLACE effect (see LastMovement) */
+  readonly lastMovement?: LastMovement;
   /** End-turn effects have completed; selected excess instances must be discarded. */
   readonly pendingHandDiscard?: { readonly id: string; readonly playerId: string; readonly count: number };
   readonly lastActionAt: Date;

@@ -82,6 +82,7 @@ export interface SerializedGameState {
     hs?: Record<string, string>; // heroStances — текущая стойка героя по userId (STANCE)
     fp?: string; // firstPlayerId — явный первый игрок матча (GD-016)
     pte?: GameStateMetadata['pendingTurnEnd']; // GD-018: отложенная передача хода
+    lm?: GameStateMetadata['lastMovement']; // MS-T-14: публичный след перемещения (сейвы без поля → «следа нет»)
   };
 }
 
@@ -661,6 +662,8 @@ export class GameStateService {
         fp: state.metadata.firstPlayerId,
         // GD-018: отложенная передача хода (легаси-сейвы без поля → undefined)
         pte: state.metadata.pendingTurnEnd,
+        // MS-T-14: публичный след последнего перемещения (без поля — undefined)
+        lm: state.metadata.lastMovement,
       },
     };
   }
@@ -785,6 +788,8 @@ export class GameStateService {
         firstPlayerId: data.m.fp,
         // GD-018: отложенная передача хода (легаси-сейвы без поля → undefined)
         pendingTurnEnd: data.m.pte,
+        // MS-T-14: сейвы до следа (без lm) → undefined, «следа нет» (MS-E-108)
+        lastMovement: data.m.lm,
       },
     };
   }

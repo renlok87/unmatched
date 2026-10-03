@@ -14,7 +14,16 @@ import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { MetricsService } from '../../metrics/metrics.service';
 // P3: единые engine-модели (GameState/GamePhase/CombatState) — value-импорт
 // engine→games убран, рантайм-цикла модулей больше нет
-import type { GameState, CombatState, HandCard, Card, PendingEffect } from '../models';
+import type {
+  GameState,
+  CombatState,
+  HandCard,
+  Card,
+  PendingEffect,
+  LastMovement,
+  LastMovementMove,
+  Position,
+} from '../models';
 import {
   GamePhase,
   CardType,
@@ -41,7 +50,7 @@ import { GameRulesValidator, bannerAllows } from '../validators/game-rules.valid
 import { CombatResolverService } from '../engine/combat-resolver.service';
 import { MovementService } from '../engine/movement.service';
 import { isCellPassable, isLivingFighter } from '../movement/traversal';
-import { computeReach, reachDistance } from '../movement/canonical-path';
+import { canonicalPath, cardBoost, computeReach, reachDistance } from '../movement/canonical-path';
 import { ValueModifierService } from '../engine/value-modifier.service';
 import { AdjacencyService } from '../engine/adjacency.service';
 import { boardDistance, hasTopology } from '../engine/board-topology';
@@ -122,6 +131,18 @@ export interface InitialGameStateParams {
 
 // Состояние боя (CombatState) перенесено в ../models/game-state.model —
 // единый типизированный контракт metadata.combatInfo для executor'а и guard'ов
+
+/**
+ * MS-T-14: records the public movement trail (04 §4.3) on the FINAL state of
+ * an action, so `seq` equals the sequenceNumber the client applies. Replaces
+ * the previous trail; other actions leave it as it is.
+ */
+function withLastMovement(state: GameState, trail: Omit<LastMovement, 'seq'>): GameState {
+  return {
+    ...state,
+    metadata: { ...state.metadata, lastMovement: { seq: state.sequenceNumber, ...trail } },
+  };
+}
 
 @Injectable()
 export class GameActionExecutorService {
@@ -636,10 +657,16 @@ export class GameActionExecutorService {
         return { success: false, error: 'Клетка занята' };
       }
 
+      // MS-T-14: path of the public trail (04 §4.3) — the canonical path for
+      // MOVE, the target cell for PLACE; [] when the fighter stays.
+      const from = { x: fighter.position.x, y: fighter.position.y };
+      const staysInPlace = target.x === from.x && target.y === from.y;
+      let trailPath: Position[] = [];
+      if (pending.type === 'PLACE' && !staysInPlace) trailPath = [{ x: target.x, y: target.y }];
+
       if (pending.type === 'MOVE') {
         // Нулевой шаг легален для «up to N»: остаться на месте — валидный
         // резолв (mandatory-MOVE без достижимых свободных клеток не strand'ит).
-        const staysInPlace = target.x === fighter.position.x && target.y === fighter.position.y;
         if (!staysInPlace) {
           // Дистанция эффекта (не movement бойца): союзники проходимы,
           // враги (относительно владельца двигаемого бойца) блокируют путь,
@@ -658,6 +685,11 @@ export class GameActionExecutorService {
               error: `До клетки (${target.x}, ${target.y}) не добраться за ${allowance} шаг(ов)`,
             };
           }
+          // The end cell was checked free above (the rule of isFreeEndpoint),
+          // so a reached target always has a canonical path (MS-D-05). Were it
+          // ever missing, the trail would list no move (the client then takes
+          // its own canonical path, 04 §4.6) — a trail never rejects a move.
+          trailPath = canonicalPath(reach, currentState, target) ?? [];
         }
       }
       // PLACE: любая валидная свободная клетка. Зонное ограничение
@@ -699,6 +731,23 @@ export class GameActionExecutorService {
       // отреагировать. seq НЕ бампим: «прицеплено» к +1 резолва эффекта выше.
       newState = await this.applyMoveReactions(currentState, newState);
       newState = await this.drainAfterChoice(newState, userId, context.gameId, currentState.sequenceNumber);
+      // MS-T-14: the trail carries the final seq of this resolution (the drain
+      // above does not add its own +1).
+      newState = withLastMovement(newState, {
+        playerId: userId,
+        source: 'EFFECT',
+        sourceRef: pending.id,
+        boost: null,
+        moves: trailPath.length > 0
+          ? [{
+              order: 0,
+              fighterId: fighter.id,
+              kind: pending.type === 'PLACE' ? 'PLACE' : 'MOVE',
+              from,
+              path: trailPath,
+            }]
+          : [],
+      });
 
       return {
         success: true,
@@ -1731,6 +1780,8 @@ export class GameActionExecutorService {
         // Ходы применяются ПОСЛЕДОВАТЕЛЬНО: валидация каждого — на состоянии
         // после предыдущего (освободившиеся/занятые клетки учитываются)
         let workState: GameState = currentState;
+        // MS-T-14: public trail — the paths the client sent, in the order applied
+        const trailMoves: LastMovementMove[] = [];
         for (const mv of moves) {
           const validation = await this.metrics.measureValidation('maneuver', () =>
             this.rulesValidator.validateManeuver(
@@ -1763,6 +1814,16 @@ export class GameActionExecutorService {
             this.metrics.incrementGameAction('maneuver', undefined, 'error');
             return { success: false, error: `Клетка (${dest.x}, ${dest.y}) занята` };
           }
+
+          // validateManeuver found the fighter on workState
+          const mover = workState.fighters.find((f) => f.id === mv.fighterId)!;
+          trailMoves.push({
+            order: trailMoves.length,
+            fighterId: mv.fighterId,
+            kind: 'MOVE',
+            from: { x: mover.position.x, y: mover.position.y },
+            path: mv.path.map((p) => ({ x: p.x, y: p.y })),
+          });
 
           workState = {
             ...workState,
@@ -1810,6 +1871,27 @@ export class GameActionExecutorService {
         if (newState.phase !== GamePhase.GAME_OVER && getActionsRemaining(newState) === 0) {
           newState = await this.advanceTurn(newState, userId, false);
         }
+
+        // MS-T-14: public trail on the final state (the turn may have passed in
+        // the same seq, MS-E-45). The BOOST card is public: it is now in the
+        // discard pile with the same instance id (MS-Q-05).
+        const boostCard = boostCardId
+          ? currentState.handZones[userId]?.cards.find((c) => c.id === boostCardId)
+          : undefined;
+        newState = withLastMovement(newState, {
+          playerId: userId,
+          source: 'MANEUVER',
+          sourceRef: pending.id,
+          boost: boostCard
+            ? {
+                cardId: boostCard.id,
+                catalogId: boostCard.cardId,
+                name: boostCard.name,
+                value: cardBoost(boostCard),
+              }
+            : null,
+          moves: trailMoves,
+        });
 
         this.metrics.incrementGameAction('maneuver', undefined, 'success');
 
