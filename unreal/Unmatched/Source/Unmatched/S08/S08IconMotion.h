@@ -103,6 +103,10 @@ UNMATCHED_API float EvalKeys(const TArray<FS08IconKey>& Keys, float T, float Sta
 /** UI-ACC-005/006 reduced motion: CVar s08.ReducedMotion > 0, or the -S08ReducedMotion command-line flag.
  *  MS-T-16 (US08UserSettings) becomes the source of the CVar. */
 UNMATCHED_API bool IsReducedMotion();
+/** RD-1 (ART-011 accepted by delegation 2026-10-03): the combat target token is the animated v3
+ *  `action-attack-token` by default; -S08IconLegacy restores the W5b-R token widget (rollback). The former opt-in
+ *  -S08IconMotion is still accepted and changes nothing. */
+UNMATCHED_API bool UseAnimatedCombatToken(const TCHAR* CommandLine);
 /** /Game/S08/UI/IconsV3/T_IV3_<src with '-' -> '_'>[_fNN]_<size>.T_IV3_... (tools/art/icons_v3_import.py). */
 UNMATCHED_API FString TextureObjectPath(const FString& Src, int32 Frame, int32 SizePx);
 /** Gallery / reference demo script: (t, command) pairs and the total length (icon_motion.demo_schedule). */

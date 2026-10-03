@@ -7,7 +7,8 @@
 //   Widget  - US08AnimatedIconWidget builds one image per layer and applies the evaluator's pose;
 //   Semantics - events over the base (review 2026-10-03): leave after hold fades, tap after hover returns to it,
 //             a future appear is invisible, equal start time -> the later command wins;
-//   CombatView - the -S08IconMotion combat token view: show = appear + pulse, hide = leave, then hidden.
+//   CombatView - the combat token view: show = appear + pulse, hide = leave, then hidden.
+//   DefaultToken - RD-1: the animated v3 token is the default, -S08IconLegacy is the rollback.
 // Headless:
 //   UnrealEditor-Cmd.exe Unmatched.uproject -ExecCmds="Automation RunTests Unmatched.S08.IconMotion; Quit"
 //     -unattended -nosplash -nullrhi
@@ -213,8 +214,10 @@ bool FS08IconMotionTexturesTest::RunTest(const FString& Parameters) {
       const FIntPoint Imported = Tex->GetImportedSize();
       TestEqual(*FString::Printf(TEXT("%s width"), *Path), Imported.X, bWide ? 2 * Px : Px);
       TestEqual(*FString::Printf(TEXT("%s height"), *Path), Imported.Y, Px);
+#if WITH_EDITORONLY_DATA  // MipGenSettings is editor-only data: the packaged game target has no such member
       TestEqual(*FString::Printf(TEXT("%s no mips"), *Path), static_cast<int32>(Tex->MipGenSettings),
                 static_cast<int32>(TMGS_NoMipmaps));
+#endif
     }
   }
   AddInfo(FString::Printf(TEXT("ICONMOTION textures checked=%d names=%d"), Checked, Names.Num()));
@@ -340,6 +343,16 @@ bool FS08IconMotionCombatViewTest::RunTest(const FString& Parameters) {
   TestTrue(TEXT("still visible while leaving"), Icon->GetLastPose().bVisible);
   Icon->ApplyPose(1121.0f);
   TestFalse(TEXT("hidden after the 120 ms leave"), Icon->GetLastPose().bVisible);
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08IconMotionDefaultTokenTest, "Unmatched.S08.IconMotion.DefaultToken",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FS08IconMotionDefaultTokenTest::RunTest(const FString& Parameters) {
+  TestTrue(TEXT("no flag: animated v3 token"), S08IconMotion::UseAnimatedCombatToken(TEXT("")));
+  TestTrue(TEXT("former opt-in flag: still v3"), S08IconMotion::UseAnimatedCombatToken(TEXT("-S08IconMotion")));
+  TestFalse(TEXT("-S08IconLegacy: rollback to the W5b-R token"),
+            S08IconMotion::UseAnimatedCombatToken(TEXT("-ArtPreview -S08IconLegacy")));
   return true;
 }
 

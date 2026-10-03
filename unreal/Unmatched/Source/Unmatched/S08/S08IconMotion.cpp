@@ -263,6 +263,10 @@ bool S08IconMotion::IsReducedMotion() {
   return CVarS08ReducedMotion.GetValueOnGameThread() > 0 || FParse::Param(FCommandLine::Get(), TEXT("S08ReducedMotion"));
 }
 
+bool S08IconMotion::UseAnimatedCombatToken(const TCHAR* CommandLine) {
+  return !FParse::Param(CommandLine, TEXT("S08IconLegacy"));
+}
+
 FString S08IconMotion::TextureObjectPath(const FString& Src, int32 Frame, int32 SizePx) {
   FString Name = Src;
   if (Name.EndsWith(TEXT("#"))) Name = Name.LeftChop(1) + FString::Printf(TEXT("_f%02d"), Frame);

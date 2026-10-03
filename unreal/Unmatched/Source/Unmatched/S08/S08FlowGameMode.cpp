@@ -5525,9 +5525,10 @@ void AS08FlowGameMode::BuildArtHudWidgets(const TSharedRef<SConstraintCanvas>& C
         bUmgPlate = true;
       }
     }
-    // HUD icon motion v3 (opt-in until the v3 icons pass the art acceptance): -S08IconMotion shows the combat
-    // token as the animated `action-attack-token` (appear, 1 Hz pulse, leave; S08AnimatedIconWidget.h).
-    if (FParse::Param(FCommandLine::Get(), TEXT("S08IconMotion"))) {
+    // HUD icon motion v3 (RD-1, ART-011 accepted by delegation 2026-10-03): the combat token is the animated
+    // `action-attack-token` (appear, 1 Hz pulse, leave; S08AnimatedIconWidget.h) by default; -S08IconLegacy and the
+    // -S08LegacyRender diagnostic keep the W5b-R token widget below.
+    if (S08IconMotion::UseAnimatedCombatToken(FCommandLine::Get()) && !S08LegacyRender()) {
       if (US08AnimatedIconWidget* Motion = CreateWidget<US08AnimatedIconWidget>(World, US08AnimatedIconWidget::StaticClass())) {
         WidgetLine(TEXT("icon"), US08AnimatedIconWidget::StaticClass(), TEXT("icon-motion-v3"), true, FString(), true);
         // SHOT/ICON trace lines name the texture really drawn (qa010 reads `texture=`).
