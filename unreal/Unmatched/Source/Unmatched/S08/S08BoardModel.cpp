@@ -1,7 +1,115 @@
 #include "S08BoardModel.h"
 #include "Dom/JsonObject.h"
+#include <limits>
 
 namespace {
+constexpr double S08JsNaN = std::numeric_limits<double>::quiet_NaN();
+
+// ECMAScript WhiteSpace + LineTerminator (StringToNumber trims both).
+bool IsJsWhitespace(TCHAR C) {
+  switch (C) {
+    case 0x0009: case 0x000A: case 0x000B: case 0x000C: case 0x000D: case 0x0020: case 0x00A0:
+    case 0x1680: case 0x2028: case 0x2029: case 0x202F: case 0x205F: case 0x3000: case 0xFEFF:
+      return true;
+    default:
+      return C >= 0x2000 && C <= 0x200A;
+  }
+}
+
+bool IsAsciiDigit(TCHAR C) { return C >= TEXT('0') && C <= TEXT('9'); }
+
+// ECMAScript StringToNumber: trimmed; "" -> 0; StrDecimalLiteral (sign,
+// digits, '.', exponent, "Infinity"); 0x/0o/0b integers without a sign;
+// anything else -> NaN. The validated decimal text goes to Atod (strtod,
+// correctly rounded like JS).
+double JsStringToNumber(const FString& In) {
+  int32 Begin = 0, End = In.Len();
+  while (Begin < End && IsJsWhitespace(In[Begin])) ++Begin;
+  while (End > Begin && IsJsWhitespace(In[End - 1])) --End;
+  if (Begin == End) return 0.0;
+  const FString S = In.Mid(Begin, End - Begin);
+  const int32 Len = S.Len();
+  if (Len > 2 && S[0] == TEXT('0')) {
+    const TCHAR Prefix = S[1];
+    const int32 Base = (Prefix == TEXT('x') || Prefix == TEXT('X'))   ? 16
+                       : (Prefix == TEXT('o') || Prefix == TEXT('O')) ? 8
+                       : (Prefix == TEXT('b') || Prefix == TEXT('B')) ? 2
+                                                                      : 0;
+    if (Base != 0) {
+      double Value = 0.0;
+      for (int32 I = 2; I < Len; ++I) {
+        const TCHAR C = S[I];
+        const int32 Digit = IsAsciiDigit(C)                          ? C - TEXT('0')
+                            : (C >= TEXT('a') && C <= TEXT('f')) ? C - TEXT('a') + 10
+                            : (C >= TEXT('A') && C <= TEXT('F')) ? C - TEXT('A') + 10
+                                                                     : -1;
+        if (Digit < 0 || Digit >= Base) return S08JsNaN;
+        Value = Value * Base + Digit;
+      }
+      return Value;
+    }
+  }
+  int32 I = 0;
+  bool bNegative = false;
+  if (S[I] == TEXT('+') || S[I] == TEXT('-')) {
+    bNegative = S[I] == TEXT('-');
+    ++I;
+  }
+  if (S.Mid(I).Equals(TEXT("Infinity"), ESearchCase::CaseSensitive)) {
+    return bNegative ? -std::numeric_limits<double>::infinity() : std::numeric_limits<double>::infinity();
+  }
+  int32 Digits = 0;
+  while (I < Len && IsAsciiDigit(S[I])) { ++I; ++Digits; }
+  if (I < Len && S[I] == TEXT('.')) {
+    ++I;
+    while (I < Len && IsAsciiDigit(S[I])) { ++I; ++Digits; }
+  }
+  if (Digits == 0) return S08JsNaN;
+  if (I < Len && (S[I] == TEXT('e') || S[I] == TEXT('E'))) {
+    ++I;
+    if (I < Len && (S[I] == TEXT('+') || S[I] == TEXT('-'))) ++I;
+    int32 ExpDigits = 0;
+    while (I < Len && IsAsciiDigit(S[I])) { ++I; ++ExpDigits; }
+    if (ExpDigits == 0) return S08JsNaN;
+  }
+  if (I != Len) return S08JsNaN;
+  return FCString::Atod(*S);
+}
+
+// JS truthiness of a JSON value (`!f.isDefeated`): absent/null/false/0/NaN/""
+// are false; any array or object is true.
+bool JsTruthy(const TSharedPtr<FJsonValue>& Value) {
+  if (!Value.IsValid()) return false;
+  switch (Value->Type) {
+    case EJson::Boolean: return Value->AsBool();
+    case EJson::Number: {
+      double D = 0.0;
+      Value->TryGetNumber(D);
+      return D != 0.0 && !FMath::IsNaN(D);
+    }
+    case EJson::String: {
+      FString S;
+      Value->TryGetString(S);
+      return !S.IsEmpty();
+    }
+    case EJson::Array:
+    case EJson::Object:
+      return true;
+    default:
+      return false;
+  }
+}
+
+// Fighter ids compare exactly (server `===`; FString == ignores case).
+bool SameId(const FString& A, const FString& B) { return A.Equals(B, ESearchCase::CaseSensitive); }
+
+const FS08BoardFighter* FindFighter(const TArray<FS08BoardFighter>& Fighters, const FString& Id) {
+  for (const FS08BoardFighter& Fighter : Fighters) {
+    if (SameId(Fighter.Id, Id)) return &Fighter;
+  }
+  return nullptr;
+}
+
 ES08CellType ParseCellType(const FString& Type) {
   if (Type == TEXT("normal")) return ES08CellType::Normal;
   if (Type == TEXT("wall")) return ES08CellType::Wall;
@@ -295,8 +403,11 @@ bool FS08BoardModel::WorldToSpace(const FVector& World, int32& OutX, int32& OutY
 const FS08BoardFighter* FS08BoardModel::FighterAt(const TArray<FS08BoardFighter>& Fighters,
                                                   int32 X, int32 Y,
                                                   const FString& IgnoreFighterId) {
+  // Occupant role = backend isLivingFighter (MS-E-23/24): a fighter with
+  // isDefeated never occupies a cell, whatever its health. A fighter without
+  // a position (X < 0) is not on the board.
   for (const FS08BoardFighter& Fighter : Fighters) {
-    if (Fighter.Id == IgnoreFighterId || !Fighter.IsAlive()) continue;
+    if (SameId(Fighter.Id, IgnoreFighterId) || !Fighter.IsAliveBlocker() || Fighter.X < 0) continue;
     if (Fighter.X == X && Fighter.Y == Y) return &Fighter;
   }
   return nullptr;
@@ -317,51 +428,180 @@ bool FS08BoardModel::IsEndpointFree(const TArray<FS08BoardFighter>& Fighters,
   return FighterAt(Fighters, X, Y, Mover.Id) == nullptr;
 }
 
+// ---- MS-T-03: canonical reach and path (04 §3.1) ----------------------------
+
+int32 FS08ReachMap::DistanceTo(const FIntPoint& Cell) const {
+  const int32* Steps = Dist.Find(FS08BoardModel::CellKey(Cell.X, Cell.Y));
+  return Steps ? *Steps : INDEX_NONE;
+}
+
+double FS08BoardModel::JsNumber(const TSharedPtr<FJsonValue>& Value) {
+  if (!Value.IsValid()) return S08JsNaN; // undefined
+  switch (Value->Type) {
+    case EJson::Null: return 0.0;
+    case EJson::Boolean: return Value->AsBool() ? 1.0 : 0.0;
+    case EJson::Number: {
+      double D = 0.0;
+      return Value->TryGetNumber(D) ? D : S08JsNaN;
+    }
+    case EJson::String: {
+      FString S;
+      Value->TryGetString(S);
+      return JsStringToNumber(S);
+    }
+    case EJson::Array: {
+      // ToPrimitive joins the elements with ',': [] -> "" -> 0, two or more
+      // elements always carry a comma -> NaN, one element is its String().
+      const TArray<TSharedPtr<FJsonValue>>& Items = Value->AsArray();
+      if (Items.Num() == 0) return 0.0;
+      if (Items.Num() > 1) return S08JsNaN;
+      const TSharedPtr<FJsonValue>& Item = Items[0];
+      if (!Item.IsValid() || Item->Type == EJson::Null || Item->Type == EJson::None) return 0.0; // String(null) in join = ""
+      if (Item->Type == EJson::Boolean || Item->Type == EJson::Object) return S08JsNaN; // "true" / "[object Object]"
+      return JsNumber(Item); // number, string or nested array: Number(String(x)) == Number(x)
+    }
+    default:
+      return S08JsNaN; // object -> "[object Object]"
+  }
+}
+
+int32 FS08BoardModel::FighterMovement(const FS08BoardFighter& Fighter) {
+  if (!Fighter.bMovementPresent) return DefaultFighterMovement; // Number(undefined) = NaN
+  const double M = Fighter.MovementRaw;
+  if (!FMath::IsFinite(M) || M < 1.0 || FMath::FloorToDouble(M) != M) return DefaultFighterMovement;
+  return M >= static_cast<double>(MAX_int32) ? MAX_int32 : static_cast<int32>(M);
+}
+
+FS08ReachMap FS08BoardModel::ComputeReachMap(const FS08BoardModel& Board,
+                                             const TArray<FS08BoardFighter>& Fighters,
+                                             const FString& MoverId, int32 MaxSteps,
+                                             const FS08ReachOptions& Options) {
+  FS08ReachMap Reach;
+  Reach.MoverId = MoverId;
+  Reach.MaxSteps = MaxSteps;
+  Reach.bPassThroughEnemies = Options.bPassThroughEnemies;
+  const FS08BoardFighter* Mover = FindFighter(Fighters, MoverId);
+  if (!Mover || Mover->X < 0 || Mover->Y < 0) return Reach;
+  Reach.bValid = true;
+  Reach.OwnerId = Mover->OwnerId;
+  Reach.Start = FIntPoint(Mover->X, Mover->Y);
+  Reach.Dist.Add(CellKey(Mover->X, Mover->Y), 0);
+  Reach.Order.Add(Reach.Start);
+
+  // Living enemies of the MOVED fighter's owner (an effect may move the
+  // opponent's fighter: enemies are relative to it, not to the chooser).
+  TSet<uint64> EnemyCells;
+  if (!Options.bPassThroughEnemies) {
+    for (const FS08BoardFighter& Other : Fighters) {
+      if (SameId(Other.Id, MoverId) || !Other.IsAliveBlocker() || Other.X < 0) continue;
+      if (!SameId(Other.OwnerId, Mover->OwnerId)) EnemyCells.Add(CellKey(Other.X, Other.Y));
+    }
+  }
+
+  // FIFO: Order is the queue; Head walks it while new cells are appended.
+  for (int32 Head = 0; Head < Reach.Order.Num(); ++Head) {
+    const FIntPoint Current = Reach.Order[Head];
+    const uint64 CurrentKey = CellKey(Current.X, Current.Y);
+    const int32 Steps = Reach.Dist.FindChecked(CurrentKey);
+    if (Steps >= MaxSteps) continue; // `>=`: the server rule and the parity contract
+    for (const FIntPoint& Next : Board.Neighbours(Current)) {
+      const uint64 NextKey = CellKey(Next.X, Next.Y);
+      if (Reach.Dist.Contains(NextKey)) continue;
+      const FS08Cell* Cell = Board.CellAt(Next.X, Next.Y);
+      if (!Cell || !Cell->IsPassable()) continue;
+      if (EnemyCells.Contains(NextKey)) continue;
+      Reach.Dist.Add(NextKey, Steps + 1);
+      Reach.Parent.Add(NextKey, CurrentKey);
+      Reach.Order.Add(Next);
+    }
+  }
+  return Reach;
+}
+
+bool FS08BoardModel::IsReachEndpoint(const TArray<FS08BoardFighter>& Fighters, const FS08ReachMap& Reach,
+                                     const FIntPoint& Cell) {
+  if (!Reach.bValid) return false;
+  return Cell == Reach.Start || FighterAt(Fighters, Cell.X, Cell.Y, Reach.MoverId) == nullptr;
+}
+
+int32 FS08BoardModel::CompareCanonical(const FS08BoardModel& Board, const FIntPoint& A, const FIntPoint& B) {
+  if (Board.bHasTopology) {
+    const FS08Cell* CellA = Board.CellAt(A.X, A.Y);
+    const FS08Cell* CellB = Board.CellAt(B.X, B.Y);
+    static const FString None;
+    const FString& IdA = CellA ? CellA->SpaceId : None;
+    const FString& IdB = CellB ? CellB->SpaceId : None;
+    // Ordinal, case sensitive (TCHAR code units) - JS string `<`.
+    const int32 ById = IdA.Compare(IdB, ESearchCase::CaseSensitive);
+    if (ById != 0) return ById < 0 ? -1 : 1;
+  }
+  if (A.Y != B.Y) return A.Y < B.Y ? -1 : 1;
+  if (A.X != B.X) return A.X < B.X ? -1 : 1;
+  return 0;
+}
+
+bool FS08BoardModel::BuildCanonicalPath(const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters,
+                                        const FS08ReachMap& Reach, const FIntPoint& Dest,
+                                        TArray<FIntPoint>& OutPath) {
+  OutPath.Reset();
+  if (!Reach.bValid) return false;
+  if (Dest == Reach.Start) return true; // "stay": no entry in moves[]
+  const int32 Steps = Reach.DistanceTo(Dest);
+  if (Steps == INDEX_NONE || !IsReachEndpoint(Fighters, Reach, Dest)) return false;
+  OutPath.SetNum(Steps);
+  OutPath[Steps - 1] = Dest;
+  FIntPoint Current = Dest;
+  for (int32 D = Steps; D > 1; --D) {
+    bool bFound = false;
+    FIntPoint Best(-1, -1);
+    for (const FIntPoint& Candidate : Board.Neighbours(Current)) {
+      if (Reach.DistanceTo(Candidate) != D - 1) continue;
+      if (!bFound || CompareCanonical(Board, Candidate, Best) < 0) {
+        Best = Candidate;
+        bFound = true;
+      }
+    }
+    // BFS invariant: a cell at distance d has a neighbour at d - 1.
+    if (!bFound) {
+      OutPath.Reset();
+      return false;
+    }
+    OutPath[D - 2] = Best;
+    Current = Best;
+  }
+  return true;
+}
+
+TArray<FIntPoint> FS08BoardModel::ReachEndpoints(const FS08BoardModel& Board,
+                                                 const TArray<FS08BoardFighter>& Fighters,
+                                                 const FS08ReachMap& Reach, int32 MaxSteps) {
+  TArray<FIntPoint> Out;
+  if (!Reach.bValid) return Out;
+  for (const FIntPoint& Cell : Reach.Order) {
+    const int32 Steps = Reach.Dist.FindChecked(CellKey(Cell.X, Cell.Y));
+    if (Steps < 1 || Steps > MaxSteps) continue;
+    if (IsReachEndpoint(Fighters, Reach, Cell)) Out.Add(Cell);
+  }
+  Out.Sort([&Board](const FIntPoint& A, const FIntPoint& B) { return CompareCanonical(Board, A, B) < 0; });
+  return Out;
+}
+
+// ---- legacy wrappers --------------------------------------------------------
+
 TSet<uint64> FS08BoardModel::ComputeReachableCells(const FS08BoardModel& Board,
                                                    const TArray<FS08BoardFighter>& Fighters,
                                                    const FString& FighterId,
                                                    int32 Allowance) {
   TSet<uint64> Reachable;
-  const FS08BoardFighter* Mover = nullptr;
-  for (const FS08BoardFighter& Fighter : Fighters) {
-    if (Fighter.Id == FighterId) {
-      Mover = &Fighter;
-      break;
-    }
-  }
+  const FS08BoardFighter* Mover = FindFighter(Fighters, FighterId);
   if (!Mover || !Mover->IsAlive() || Allowance < 0) return Reachable;
-  Reachable.Add(CellKey(Mover->X, Mover->Y)); // zero-step legal resolve
-
-  // BFS frontier: (x, y, stepsUsed). Passing through a living ALLY is legal
-  // but the ally's cell is not a valid endpoint - endpoint legality is
-  // checked when collecting results, not when expanding.
-  struct FNode {
-    int32 X, Y, Steps;
-  };
-  TMap<uint64, int32> Best;
-  TArray<FNode> Frontier;
-  Frontier.Push({Mover->X, Mover->Y, 0});
-  Best.Add(CellKey(Mover->X, Mover->Y), 0);
-  while (Frontier.Num() > 0) {
-    const FNode Node = Frontier.Pop(EAllowShrinking::No);
-    if (Node.Steps >= Allowance) continue;
-    // Board neighbours: links on a topology board, the in-bounds orthogonal
-    // cells (+X, -X, +Y, -Y - the old order) on a grid.
-    for (const FIntPoint& Next : Board.Neighbours(FIntPoint(Node.X, Node.Y))) {
-      const int32 NX = Next.X;
-      const int32 NY = Next.Y;
-      if (!IsStepTraversable(Board, Fighters, *Mover, NX, NY)) continue;
-      const uint64 Key = CellKey(NX, NY);
-      const int32 NewSteps = Node.Steps + 1;
-      if (const int32* Existing = Best.Find(Key)) {
-        if (*Existing <= NewSteps) continue;
-      }
-      Best.Add(Key, NewSteps);
-      Frontier.Push({NX, NY, NewSteps});
-      if (IsEndpointFree(Fighters, *Mover, NX, NY)) {
-        Reachable.Add(Key);
-      }
-    }
+  // The former stack frontier with relaxation converged to the BFS
+  // distances, so "reached within Allowance and endpoint-free" is the same
+  // set; the start stays in it (zero-step legal resolve).
+  const FS08ReachMap Reach = ComputeReachMap(Board, Fighters, FighterId, Allowance);
+  Reachable.Add(CellKey(Mover->X, Mover->Y));
+  for (const FIntPoint& Cell : Reach.Order) {
+    if (Cell != Reach.Start && IsReachEndpoint(Fighters, Reach, Cell)) Reachable.Add(CellKey(Cell.X, Cell.Y));
   }
   return Reachable;
 }
@@ -372,63 +612,30 @@ bool FS08BoardModel::BuildManeuverPath(const FS08BoardModel& Board,
                                        int32 TargetX, int32 TargetY,
                                        TArray<FIntPoint>& OutPath) {
   OutPath.Reset();
-  const FS08BoardFighter* Mover = nullptr;
-  for (const FS08BoardFighter& Fighter : Fighters) {
-    if (Fighter.Id == FighterId) {
-      Mover = &Fighter;
-      break;
-    }
-  }
+  const FS08BoardFighter* Mover = FindFighter(Fighters, FighterId);
   if (!Mover || !Mover->IsAlive() || Allowance < 0) return false;
   if (TargetX == Mover->X && TargetY == Mover->Y) return true; // zero-step resolve
 
-  struct FNode {
-    int32 X, Y, Steps;
-  };
-  TMap<uint64, int32> Best;
-  TArray<FNode> Frontier;
-  Frontier.Push({Mover->X, Mover->Y, 0});
-  Best.Add(CellKey(Mover->X, Mover->Y), 0);
-  while (Frontier.Num() > 0) {
-    const FNode Node = Frontier.Pop(EAllowShrinking::No);
-    if (Node.Steps >= Allowance) continue;
-    for (const FIntPoint& Next : Board.Neighbours(FIntPoint(Node.X, Node.Y))) {
-      const int32 NX = Next.X;
-      const int32 NY = Next.Y;
-      if (!IsStepTraversable(Board, Fighters, *Mover, NX, NY)) continue;
-      const uint64 Key = CellKey(NX, NY);
-      const int32 NewSteps = Node.Steps + 1;
-      if (const int32* Existing = Best.Find(Key)) {
-        if (*Existing <= NewSteps) continue;
-      }
-      Best.Add(Key, NewSteps);
-      Frontier.Push({NX, NY, NewSteps});
-    }
-  }
-
-  const uint64 TargetKey = CellKey(TargetX, TargetY);
-  const int32* TargetSteps = Best.Find(TargetKey);
-  if (!TargetSteps) return false;
-  // Walk from the target back to the mover by descending step counts: any
-  // neighbour with steps-1 is on a shortest legal route (links are
-  // symmetric, so the predecessor is always among the neighbours).
+  const FS08ReachMap Reach = ComputeReachMap(Board, Fighters, FighterId, Allowance);
+  int32 Steps = Reach.DistanceTo(FIntPoint(TargetX, TargetY));
+  if (Steps == INDEX_NONE) return false;
+  // The former reverse walk, kept as it was: from the target, the FIRST
+  // board neighbour one step closer (Neighbours order) - not the canonical
+  // K choice of BuildCanonicalPath.
   TArray<FIntPoint> Reversed;
-  int32 CX = TargetX, CY = TargetY;
-  int32 Steps = *TargetSteps;
+  FIntPoint Current(TargetX, TargetY);
   while (Steps > 0) {
-    Reversed.Add(FIntPoint(CX, CY));
+    Reversed.Add(Current);
     --Steps;
-    bool Advanced = false;
-    for (const FIntPoint& Prev : Board.Neighbours(FIntPoint(CX, CY))) {
-      const int32* PrevSteps = Best.Find(CellKey(Prev.X, Prev.Y));
-      if (PrevSteps && *PrevSteps == Steps) {
-        CX = Prev.X;
-        CY = Prev.Y;
-        Advanced = true;
+    bool bAdvanced = false;
+    for (const FIntPoint& Prev : Board.Neighbours(Current)) {
+      if (Reach.DistanceTo(Prev) == Steps) {
+        Current = Prev;
+        bAdvanced = true;
         break;
       }
     }
-    if (!Advanced) return false;
+    if (!bAdvanced) return false;
   }
   for (int32 Index = Reversed.Num() - 1; Index >= 0; --Index) {
     OutPath.Add(Reversed[Index]);
@@ -533,6 +740,12 @@ bool FS08BoardModel::DecodeFighters(const TSharedPtr<FJsonValue>& FightersValue,
     FS08Contracts::ReadIntLike(Fighter, TEXT("health"), Entry.Health, Present);
     FS08Contracts::ReadIntLike(Fighter, TEXT("maxHealth"), Entry.MaxHealth, Present);
     FS08Contracts::ReadIntLike(Fighter, TEXT("movement"), Entry.Movement, Present);
+    // MS-T-03: the raw value for FighterMovement (getFighterMovement parity,
+    // MS-E-04/107) and isDefeated for the role predicates (MS-E-24/77).
+    const TSharedPtr<FJsonValue> MovementField = Fighter->TryGetField(TEXT("movement"));
+    Entry.bMovementPresent = MovementField.IsValid();
+    Entry.MovementRaw = Entry.bMovementPresent ? JsNumber(MovementField) : 0.0;
+    Entry.bDefeated = JsTruthy(Fighter->TryGetField(TEXT("isDefeated")));
     Entry.AttackType = Fighter->GetStringField(TEXT("attackType"));
     const TArray<TSharedPtr<FJsonValue>>* EffectValues = nullptr;
     if (Fighter->TryGetArrayField(TEXT("effects"), EffectValues) && EffectValues) {

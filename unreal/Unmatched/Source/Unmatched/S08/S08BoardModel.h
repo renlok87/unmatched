@@ -20,6 +20,15 @@
 // link is NOT adjacent and one link may span several lattice steps - and
 // CellToWorld/WorldToCell go through the layout (FS08LayoutFrame). Without
 // links every rule below is the old orthogonal grid, bit for bit.
+//
+// MS-T-03 (move selection, docs/game-design/move-selection/04 §3.1): the
+// canonical reach and path - ComputeReachMap (FIFO BFS, dist/parent, step
+// limit `>=`) and BuildCanonicalPath (predecessor with the smallest key
+// K = (spaceId ordinal, y, x) on a topology board, (y, x) on a grid) - mirror
+// backend game-engine/movement/canonical-path.ts. FighterMovement mirrors
+// getFighterMovement on the RAW `movement` value; the "alive" predicates are
+// split by role exactly as on the server. Parity: the golden fixtures
+// backend/prisma/fixtures/movement (S08MoveParityTests.cpp, MS-AT-10).
 #pragma once
 
 #include "CoreMinimal.h"
@@ -85,13 +94,75 @@ struct UNMATCHED_API FS08BoardFighter {
   int32 MaxHealth = 0;
   int32 X = -1;
   int32 Y = -1;
+  // Legacy int decode of `movement` (ReadIntLike: 3.5 -> 3, absent/0 -> 0).
+  // Kept for the callers MS-T-04 moves to FS08BoardModel::FighterMovement;
+  // the movement RULE is FighterMovement on MovementRaw (MS-E-04, MS-E-107).
   int32 Movement = 0;
+  // MS-T-03: raw `movement` as the server holds it, converted like JS
+  // Number(x) (number; numeric string; true -> 1; null -> 0; unparsable or
+  // absent -> NaN). bMovementPresent: the field was sent (null included).
+  double MovementRaw = 0.0;
+  bool bMovementPresent = false;
+  // MS-T-03: the projection's `isDefeated` (JS truthiness). With health > 0
+  // it is "dirty" data: the server ignores it for a maneuver mover but treats
+  // the fighter as dead for blocking and occupying (MS-E-24, MS-E-77).
+  bool bDefeated = false;
   FString AttackType;
   FString Label; // display label: 'Medusa', 'Harpies 2', ...
   // Public fighter effects from the projection (`effects[]`: a string, or an
   // object's type/name/id). Plate status chips only (ART-004 T2.2).
   TArray<FString> Effects;
+  /** Display predicate: a figure stands on the board (health > 0 and a
+   *  position). Not a movement rule - see the two role predicates below. */
   bool IsAlive() const { return Health > 0 && X >= 0; }
+  /** Role "blocks a step / occupies a cell / is moved by an effect": backend
+   *  traversal.isLivingFighter (health > 0 && !isDefeated). A living enemy
+   *  blocks the step, any such fighter makes the cell an illegal END; the
+   *  resolve of a MOVE/PLACE effect also requires it of the moved fighter
+   *  (except the revive PLACE). MS-E-23, MS-E-24. */
+  bool IsAliveBlocker() const { return Health > 0 && !bDefeated; }
+  /** Role "maneuver mover": validateManeuver rejects only health <= 0, so a
+   *  fighter with isDefeated and health > 0 still moves (MS-E-77). */
+  bool CanBeMover() const { return Health > 0; }
+  /** Test/hand-built helper: sets the raw value and the legacy int decode as
+   *  DecodeFighters would for a JSON number. */
+  void SetRawMovement(double Raw) {
+    MovementRaw = Raw;
+    bMovementPresent = true;
+    Movement = FMath::IsFinite(Raw) ? static_cast<int32>(FMath::Clamp(Raw, -2147483648.0, 2147483647.0)) : 0;
+  }
+};
+
+/** Options of ComputeReachMap (backend canonical-path ReachOptions). */
+struct UNMATCHED_API FS08ReachOptions {
+  /** Living enemies do not block steps (Winged Frenzy, pending
+   *  canPassThroughEnemies). The END cell rule is unchanged. */
+  bool bPassThroughEnemies = false;
+};
+
+/** 04 §3.1 computeReach result: BFS distances from the mover's cell. Only
+ *  Dist is normative; Parent/Order depend on the neighbour order (the client
+ *  grid order is +X, -X, +Y, -Y, the server's N, E, S, W) and are NOT. */
+struct UNMATCHED_API FS08ReachMap {
+  /** The mover was found and has a board position (X, Y >= 0). An invalid
+   *  map reaches nothing, not even the start. */
+  bool bValid = false;
+  FString MoverId;
+  FString OwnerId;
+  FIntPoint Start = FIntPoint(-1, -1);
+  /** Step limit; MAX_int32 = no limit (cue fallback, 04 §4.6). */
+  int32 MaxSteps = 0;
+  bool bPassThroughEnemies = false;
+  /** CellKey -> steps from the start (start = 0). */
+  TMap<uint64, int32> Dist;
+  /** CellKey -> CellKey of the BFS discovery parent; the start has none. */
+  TMap<uint64, uint64> Parent;
+  /** FIFO discovery order (the BFS queue), start first. */
+  TArray<FIntPoint> Order;
+
+  /** Steps to Cell, INDEX_NONE when not reached. */
+  int32 DistanceTo(const FIntPoint& Cell) const;
+  bool Reaches(const FIntPoint& Cell) const { return DistanceTo(Cell) != INDEX_NONE; }
 };
 
 class UNMATCHED_API FS08BoardModel {
@@ -185,7 +256,8 @@ public:
     return OutX >= 0 && OutY >= 0 && OutX < Width && OutY < Height;
   }
 
-  /** True when the cell holds a living fighter other than IgnoreFighterId. */
+  /** The fighter standing on (X,Y) in the "occupies a cell" role
+   *  (IsAliveBlocker, with a board position) other than IgnoreFighterId. */
   static const FS08BoardFighter* FighterAt(const TArray<FS08BoardFighter>& Fighters,
                                            int32 X, int32 Y, const FString& IgnoreFighterId);
 
@@ -199,21 +271,81 @@ public:
   static bool IsEndpointFree(const TArray<FS08BoardFighter>& Fighters,
                              const FS08BoardFighter& Mover, int32 X, int32 Y);
 
-  /** BFS over legal movement (TASK-027 grey subset): every cell reachable by
-   *  a path of <= Allowance neighbour steps (Neighbours: links / orthogonal)
-   *  under the traversal rules; results are cells where the mover may
-   *  legally END the move (endpoint free) plus the mover's own cell
-   *  (zero-length legal resolve). */
+  // ---- MS-T-03: canonical reach and path (04 §3.1) -------------------------
+
+  /** backend getFighterMovement on the RAW value: Number(movement) that is an
+   *  integer >= 1, otherwise 2 (absent, null, 0, 2.5, 3.5, "3.5", "abc" -> 2;
+   *  "3" -> 3). Values above MAX_int32 clamp to it (practically unlimited),
+   *  so a caller adding BOOST widens to int64 before clamping the sum. */
+  static constexpr int32 DefaultFighterMovement = 2;
+  static int32 FighterMovement(const FS08BoardFighter& Fighter);
+
+  /** JS Number(x) of a JSON value (absent -> NaN, null -> 0, bool -> 0/1,
+   *  string -> StringToNumber, [] -> 0, [v] -> Number(v), other arrays and
+   *  objects -> NaN). The raw-movement decode of DecodeFighters. */
+  static double JsNumber(const TSharedPtr<FJsonValue>& Value);
+
+  /** 04 §3.1 computeReach: FIFO BFS from the mover's cell over Neighbours;
+   *  a cell at distance d >= MaxSteps is not expanded; a step enters only a
+   *  passable cell (in bounds, not wall/obstacle/closed door) without a
+   *  living enemy of the mover (IsAliveBlocker, other owner) unless
+   *  bPassThroughEnemies. Allies and defeated fighters never block. MaxSteps
+   *  < 0 or no board reach only the start. The mover's own state is NOT
+   *  checked - that is the caller's role (CanBeMover for a maneuver,
+   *  IsAliveBlocker for an effect). Missing mover or no position -> invalid. */
+  static FS08ReachMap ComputeReachMap(const FS08BoardModel& Board,
+                                      const TArray<FS08BoardFighter>& Fighters,
+                                      const FString& MoverId, int32 MaxSteps,
+                                      const FS08ReachOptions& Options = FS08ReachOptions());
+
+  /** 04 §3.1 isEndpoint: the start ("stay") or a cell without another fighter
+   *  in the occupant role (IsAliveBlocker). Reach distance is not checked. */
+  static bool IsReachEndpoint(const TArray<FS08BoardFighter>& Fighters, const FS08ReachMap& Reach,
+                              const FIntPoint& Cell);
+
+  /** Total order of cells by K: (SpaceId, Y, X) on a topology board - the
+   *  SpaceId compared ordinally, case sensitive (UTF-16 code units, as JS
+   *  `<`) - and (Y, X) on a grid. <0, 0, >0. */
+  static int32 CompareCanonical(const FS08BoardModel& Board, const FIntPoint& A, const FIntPoint& B);
+
+  /** 04 §3.1 canonicalPath: the path WITHOUT the start cell (wire format of
+   *  maneuver.moves[].path). Dest == start -> true with an empty path
+   *  ("stay", never sent). Dest not reached or not an endpoint -> false.
+   *  Every predecessor is the neighbour one step closer with the smallest
+   *  K, so the path does not depend on the order of links or neighbours. */
+  static bool BuildCanonicalPath(const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters,
+                                 const FS08ReachMap& Reach, const FIntPoint& Dest,
+                                 TArray<FIntPoint>& OutPath);
+
+  /** backend reachableEndpoints: cells at 1..MaxSteps steps that may END the
+   *  move (start excluded), sorted by K. Plate tiers split this list by
+   *  distance (04 §3.2, MS-E-80). */
+  static TArray<FIntPoint> ReachEndpoints(const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters,
+                                          const FS08ReachMap& Reach, int32 MaxSteps);
+
+  // ---- legacy wrappers ------------------------------------------------------
+  // Behaviour unchanged except the server rules this task brings into the
+  // model: a fighter blocks/occupies only in the IsAliveBlocker role (a
+  // dirty-defeated fighter no longer does, MS-E-24), ids compare exactly,
+  // and a cell holding any living enemy blocks (formerly only the first
+  // fighter found on the cell decided - two fighters never share a cell).
+
+  /** Wrapper over ComputeReachMap (TASK-027 contract kept): empty when the
+   *  mover is missing, not IsAlive() or Allowance < 0; otherwise the mover's
+   *  own cell (zero-length legal resolve) plus every cell at 1..Allowance
+   *  steps where the mover may legally END the move (IsReachEndpoint). On
+   *  game data the set equals the former DFS-with-relaxation result. */
   static TSet<uint64> ComputeReachableCells(const FS08BoardModel& Board,
                                             const TArray<FS08BoardFighter>& Fighters,
                                             const FString& FighterId, int32 Allowance);
 
-  /** Shortest legal route from the fighter's cell to (TargetX,TargetY) under
-   *  the same rules as ComputeReachableCells. The backend maneuver validator
-   *  expects the path WITHOUT the fighter's starting cell (every entry must
-   *  be one neighbour step - a link on topology boards - after the previous
-   *  one, starting from the fighter's current position). Empty when no
-   *  legal route exists. */
+  /** Wrapper over ComputeReachMap: a shortest legal route from the fighter's
+   *  cell to (TargetX,TargetY) WITHOUT the starting cell; true with an empty
+   *  path for the own cell; false when unreached. Kept as before: the
+   *  route among equal shortest ones is the former reverse walk (first
+   *  Neighbours entry one step closer), NOT the canonical K choice, and the
+   *  end cell is not checked for occupants. New code calls
+   *  BuildCanonicalPath; callers move in MS-T-04/05/07. */
   static bool BuildManeuverPath(const FS08BoardModel& Board,
                                 const TArray<FS08BoardFighter>& Fighters,
                                 const FString& FighterId, int32 Allowance,
@@ -245,7 +377,8 @@ public:
 
   /** Decodes the fighters projection into grey-board fighters; same-name
    *  fighters get numbered labels ('Harpies' x3 -> 'Harpies 1/2/3') per
-   *  TASK-021, keyed by stable fighter id (never by array order). */
+   *  TASK-021, keyed by stable fighter id (never by array order). Also reads
+   *  the raw `movement` (JsNumber) and `isDefeated` (MS-T-03). */
   static bool DecodeFighters(const TSharedPtr<FJsonValue>& FightersValue,
                              TArray<FS08BoardFighter>& OutFighters);
 

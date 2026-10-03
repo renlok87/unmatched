@@ -59,7 +59,7 @@
 
 | Файл | Изменение | Задача |
 |---|---|---|
-| `S08/S08BoardModel.h/.cpp` | `FS08ReachMap`, `ComputeReachMap` (FIFO BFS, dist/parent), `BuildCanonicalPath`; `FS08BoardFighter`: `bDefeated`, сырое значение движения (`double MovementRaw`, `bool bMovementPresent`, строка → `Number`-подобный разбор); `FighterMovement` (зеркало `getFighterMovement` по сырому значению, MS-E-107); предикаты `IsAliveBlocker()` (`health > 0 && !bDefeated`) и `CanBeMover()` (`health > 0`) — MS-E-24, MS-E-77; `ComputeReachableCells`/`BuildManeuverPath` становятся обёртками | MS-T-03, MS-T-04 |
+| `S08/S08BoardModel.h/.cpp` | `FS08ReachMap`, `ComputeReachMap` (FIFO BFS, dist/parent), `BuildCanonicalPath`; `FS08BoardFighter`: `bDefeated`, сырое значение движения (`double MovementRaw`, `bool bMovementPresent`, строка → `Number`-подобный разбор); `FighterMovement` (зеркало `getFighterMovement` по сырому значению, MS-E-107); предикаты `IsAliveBlocker()` (`health > 0 && !bDefeated`) и `CanBeMover()` (`health > 0`) — MS-E-24, MS-E-77; `ComputeReachableCells`/`BuildManeuverPath` становятся обёртками. Сделано в MS-T-03, с уточнениями: обёртки сохраняют прежнее поведение, в том числе выбор маршрута `BuildManeuverPath` обратным обходом соседей (не по `K`) и отсутствие проверки конечной клетки, кроме правил сервера, внесённых в модель: блокирует и занимает только `IsAliveBlocker` (боец с `isDefeated` при здоровье > 0 — нет, MS-E-24; это и через `FighterAt`), id сравниваются точно; канонический путь даёт только `BuildCanonicalPath`, вызовы переводятся в MS-T-04/05/07. Поле `Movement` (int, прежний разбор) остаётся до перевода вызовов на `FighterMovement` в MS-T-04. Добавлены `IsReachEndpoint`, `CompareCanonical`, `ReachEndpoints` (ярусы — разбиение по дистанции), `JsNumber` (разбор сырого значения как JS `Number()`) | MS-T-03, MS-T-04 |
 | `S08/S08Contracts.h/.cpp` | `FS08GraphQLError` (`S08Contracts.h:15-22`) получает `RuleCode`, разбор `extensions.ruleCode` рядом с `extensions.code` (`S08Contracts.cpp:263-269`) | MS-T-06 |
 | `S09/S09ManeuverUi.h/.cpp` | `FS09DraftMove` + `Path`, `Order`, `Status`, `RequiredBoost`; `FS09DraftEval` (последовательная симуляция); стек отката с барьером по seq; `ClearMove` в ввод; предвыбор; `ConfirmManeuver` без нулевых ходов; `ToggleBoostCard` с пересчётом; гейт `immobilized`; причины как `FS09Reason{Key, Args}`; `BuildDraftView()`; `PendingChoice.bHasValue` сохраняется (MS-E-57/76) | MS-T-04, MS-T-05, MS-T-07 |
 | `S08/S08FlowGameMode.cpp` | клавиши 03 §3.2; клик на отпускании; клетка — луч к плоскости поля (§6.2); hover-кэш; предвыбор и MS-S-04; быстрый ход TASK-022 (`:1211-1260`) за флагом `-S08LegacyQuickMove`; автодрайвер `-S08Maneuver` (`RunAutoManeuver`, `:3405-3437`, второй шаг `:3645-3651`) переводится на путь черновика S09; панель манёвра; индикатор соперника; лента событий; стрелка у края | MS-T-07, MS-T-11, MS-T-17 |
@@ -118,8 +118,10 @@ K(c) = (spaceId(c), c.y, c.x) на графовой доске; (c.y, c.x) на 
 
 - «Живой» для блокировки и конца пути = `isLivingFighter` (`health > 0 && !isDefeated`, `traversal.ts:19-21`).
   Двигаемый боец допускается при `health > 0` (`game-rules.validator.ts:294-296`) — клиент повторяет оба предиката
-  по ролям (MS-E-24, MS-E-77).
-- `neighbours` на клиенте — `FS08BoardModel::Neighbours` (`S08BoardModel.h:139`); на сервере — `board-topology.ts:174-185`.
+  по ролям (MS-E-24, MS-E-77). Уточнение MS-T-03: третья роль — боец, двигаемый MOVE/PLACE-эффектом, — на сервере
+  тоже `isLivingFighter` (`game-action-executor.service.ts:617`, кроме revive-PLACE), на клиенте `IsAliveBlocker()`.
+  `ComputeReachMap` состояние двигаемого не проверяет — это делает вызывающий по роли.
+- `neighbours` на клиенте — `FS08BoardModel::Neighbours` (`S08BoardModel.h`; номер строки сдвинулся в MS-T-03); на сервере — `board-topology.ts:174-185`.
   Порядок соседей на результат не влияет: `dist` от порядка не зависит, `K` выбирает предшественника однозначно.
 - Кандидаты-предшественники проходимы по построению (`dist` определён только для проходимых клеток), союзники в них
   допустимы — как на сервере.
@@ -325,8 +327,10 @@ struct FS08MoveDraftView { TArray<FS08PlateView> Plates; TArray<FS08PathView> Pa
 `draft.moves[i].path`, сырой `fighters[i].movement`, `expect.serverDetail`, `expect.pendingRuleChange`, сравнение
 `reach` множествами и `paths` точно), описаны в заголовке `backend/src/test/fixtures/move-fixture-state.ts` — это
 эталон для читателя паритета в UE (MS-T-03). Тай-брейк сравнивает id пространств по порядку кодов (ordinal, с учётом
-регистра). Наблюдение MS-T-02 (не проверено прогоном): резолв MOVE-эффекта отклоняет бойца с `isDefeated` и
-здоровьем > 0, а манёвр принимает — к двум предикатам «живой» MS-T-03/MS-T-04.
+регистра). Наблюдение MS-T-02: резолв MOVE-эффекта отклоняет бойца с `isDefeated` и здоровьем > 0, а манёвр
+принимает — к двум предикатам «живой» MS-T-03/MS-T-04. В MS-T-03 подтверждено чтением кода (прогоном — нет: фикстуры
+pending MOVE с таким бойцом нет): резолв MOVE/PLACE требует `isLivingFighter` от двигаемого бойца, кроме revive-PLACE
+(`game-action-executor.service.ts:617`); роль «двигаемый эффектом» на клиенте — `IsAliveBlocker()` (§3.1).
 
 ```json
 {
