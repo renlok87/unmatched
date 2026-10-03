@@ -45,6 +45,8 @@ public:
   float GetClockMs() const { return ClockOverrideMs >= 0.0f ? ClockOverrideMs : ClockMs; }
   /** Applies the pose at TMs to the widget tree. */
   void ApplyPose(float TMs);
+  /** Driven by a parent (the gallery replays and applies poses itself): the widget's own tick does nothing. */
+  void SetExternallyDriven(bool bInExternal) { bExternal = bInExternal; }
 
   FS08IconAnimator& GetAnimator() { return Animator; }
   const FS08IconPose& GetLastPose() const { return LastPose; }
@@ -78,6 +80,7 @@ private:
   bool bReduced = false;
   bool bDirty = true;
   bool bWasMoving = false;
+  bool bExternal = false;
   FLinearColor TeamTint = FLinearColor::White;
 };
 
@@ -90,7 +93,7 @@ class UNMATCHED_API US08IconGalleryWidget : public UUserWidget {
 public:
   virtual bool Initialize() override;
   /** Builds the grid; SizeSu = icon side, TexturePx = texture size. Returns the icon count. */
-  int32 Build(float InSizeSu, int32 InTexturePx, bool bInReduced, int32 Columns = 6);
+  int32 Build(float InSizeSu, int32 InTexturePx, bool bInReduced, int32 Columns = 6, bool bLabels = true);
   /** >= 0 freezes the gallery clock (shots); < 0 = real time. */
   void SetClockOverrideMs(float Ms) { ClockOverrideMs = Ms; }
   float GetClockMs() const { return ClockOverrideMs >= 0.0f ? ClockOverrideMs : ClockMs; }

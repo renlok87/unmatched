@@ -18,6 +18,18 @@ FLinearColor S08Srgb(uint8 R, uint8 G, uint8 B, float A = 1.0f) {
   return C;
 }
 
+bool SameTransform(const FWidgetTransform& A, const FWidgetTransform& B) {
+  return A.Translation.Equals(B.Translation, 1.0e-4) && A.Scale.Equals(B.Scale, 1.0e-5) &&
+         FMath::IsNearlyEqual(A.Angle, B.Angle, 1.0e-4f);
+}
+
+/** Sets transform / pivot / opacity only when they change: an idle icon then invalidates nothing. */
+void ApplyIfChanged(UWidget& W, const FWidgetTransform& T, const FVector2D& Pivot, float Opacity) {
+  if (!W.GetRenderTransformPivot().Equals(Pivot, 1.0e-5)) W.SetRenderTransformPivot(Pivot);
+  if (!SameTransform(W.GetRenderTransform(), T)) W.SetRenderTransform(T);
+  if (!FMath::IsNearlyEqual(W.GetRenderOpacity(), Opacity, 1.0e-4f)) W.SetRenderOpacity(Opacity);
+}
+
 FWidgetTransform ToWidgetTransform(const FS08IconTargetPose& P, float SuPerU) {
   const float S = P.Get(ES08IconProp::Scale);
   return FWidgetTransform(FVector2D(P.Get(ES08IconProp::Tx), P.Get(ES08IconProp::Ty)) * SuPerU,
@@ -54,6 +66,8 @@ UTexture2D* US08AnimatedIconWidget::GetLayerTexture(int32 Layer, int32 Frame) co
 bool US08AnimatedIconWidget::SetIcon(FName InIconId, float InSizeSu, int32 InTexturePx) {
   const FS08IconMotionDef* NewDef = FS08IconMotionLibrary::Get().Find(InIconId);
   if (!NewDef || !Stage || !Box) return false;
+  // Same icon, new size (DPI, zoom): rebuild the images but keep the animation state (no restart of appear/pulse).
+  const bool bSameIcon = NewDef == Def && InIconId == IconId;
   Def = NewDef;
   IconId = InIconId;
   SizeSu = InSizeSu;
@@ -96,7 +110,7 @@ bool US08AnimatedIconWidget::SetIcon(FName InIconId, float InSizeSu, int32 InTex
     LayerImages.Add(Image);
     CurrentFrame.Add(0);
   }
-  Animator.Init(Def, bReduced);
+  if (!bSameIcon) Animator.Init(Def, bReduced);
   bDirty = true;
   ApplyPose(GetClockMs());
   return true;
@@ -125,6 +139,7 @@ void US08AnimatedIconWidget::SetReducedMotion(bool bInReduced) {
 }
 
 void US08AnimatedIconWidget::SetClockOverrideMs(float Ms) {
+  if (Ms == ClockOverrideMs) return;  // the gallery sets the same frozen time every frame: no second ApplyPose
   if (Ms < 0.0f && ClockOverrideMs >= 0.0f) ClockMs = ClockOverrideMs;
   ClockOverrideMs = Ms;
   bDirty = true;
@@ -133,20 +148,17 @@ void US08AnimatedIconWidget::SetClockOverrideMs(float Ms) {
 void US08AnimatedIconWidget::ApplyPose(float TMs) {
   if (!Def || !Stage || !Box) return;
   LastPose = Animator.Pose(TMs);
-  Box->SetVisibility(LastPose.bVisible ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Hidden);
+  const ESlateVisibility Vis = LastPose.bVisible ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Hidden;
+  if (Box->GetVisibility() != Vis) Box->SetVisibility(Vis);
   if (!LastPose.bVisible) return;
   const float SuPerU = SizeSu / 32.0f;
   const FVector2D Canvas = Def->CanvasU;
   const FS08IconTargetPose& Root = LastPose.Targets[0];
-  Stage->SetRenderTransformPivot(Root.PivotU / Canvas);
-  Stage->SetRenderTransform(ToWidgetTransform(Root, SuPerU));
-  Stage->SetRenderOpacity(Root.Get(ES08IconProp::Opacity));
+  ApplyIfChanged(*Stage, ToWidgetTransform(Root, SuPerU), Root.PivotU / Canvas, Root.Get(ES08IconProp::Opacity));
   for (int32 L = 0; L < LayerImages.Num(); ++L) {
     const FS08IconTargetPose& P = LastPose.Targets[L + 1];
     UImage* Image = LayerImages[L];
-    Image->SetRenderTransformPivot(P.PivotU / Canvas);
-    Image->SetRenderTransform(ToWidgetTransform(P, SuPerU));
-    Image->SetRenderOpacity(P.Get(ES08IconProp::Opacity));
+    ApplyIfChanged(*Image, ToWidgetTransform(P, SuPerU), P.PivotU / Canvas, P.Get(ES08IconProp::Opacity));
     const int32 Frame = FMath::FloorToInt(P.Get(ES08IconProp::Frame) + 1.0e-4f);
     if (LayerFrameCount[L] > 1 && Frame != CurrentFrame[L]) {
       CurrentFrame[L] = Frame;
@@ -159,6 +171,7 @@ void US08AnimatedIconWidget::ApplyPose(float TMs) {
 
 void US08AnimatedIconWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime) {
   Super::NativeTick(MyGeometry, InDeltaTime);
+  if (bExternal) return;
   if (ClockOverrideMs < 0.0f) ClockMs += InDeltaTime * 1000.0f;
   const float T = GetClockMs();
   const bool bMoving = Animator.IsMoving(T);
@@ -187,7 +200,7 @@ bool US08IconGalleryWidget::Initialize() {
   return bFirst;
 }
 
-int32 US08IconGalleryWidget::Build(float InSizeSu, int32 InTexturePx, bool bInReduced, int32 Columns) {
+int32 US08IconGalleryWidget::Build(float InSizeSu, int32 InTexturePx, bool bInReduced, int32 Columns, bool bLabels) {
   if (!Grid) return 0;
   bReduced = bInReduced;
   Grid->ClearChildren();
@@ -211,6 +224,7 @@ int32 US08IconGalleryWidget::Build(float InSizeSu, int32 InTexturePx, bool bInRe
     Panel->SetContent(Ov);
     US08AnimatedIconWidget* Icon = CreateWidget<US08AnimatedIconWidget>(this, US08AnimatedIconWidget::StaticClass());
     Icon->SetReducedMotion(bReduced);
+    Icon->SetExternallyDriven(true);  // EvaluateAt applies every pose (and is what the perf sample measures)
     Icon->SetIcon(Id, InSizeSu, InTexturePx);
     Icon->SetTeamTint(FLinearColor::FromSRGBColor(FColor(0xDA, 0xC5, 0x76)));  // team.p1.screen (reference demo)
     UOverlaySlot* IconSlot = Ov->AddChildToOverlay(Icon);
@@ -218,6 +232,7 @@ int32 US08IconGalleryWidget::Build(float InSizeSu, int32 InTexturePx, bool bInRe
     IconSlot->SetVerticalAlignment(VAlign_Top);
     IconSlot->SetPadding(FMargin(0.0f, Pad, 0.0f, 0.0f));
     UTextBlock* Label = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
+    if (!bLabels) Label->SetVisibility(ESlateVisibility::Collapsed);  // perf: the icons alone
     Label->SetText(FText::FromName(Id));
     FSlateFontInfo Font = Label->GetFont();
     Font.Size = 9;

@@ -42,7 +42,9 @@ bool AS08FlowGameMode::IconGalleryBegin() {
   const bool bReduced = S08IconMotion::IsReducedMotion();
   const FS08IconMotionLibrary& Lib = FS08IconMotionLibrary::Get();
   IconGallery = CreateWidget<US08IconGalleryWidget>(GetWorld(), US08IconGalleryWidget::StaticClass());
-  const int32 Count = IconGallery ? IconGallery->Build(static_cast<float>(SizePx), SizePx, bReduced) : 0;
+  // -S08IconGalleryNoLabels: no id captions (the perf A/B then measures the icons and their panels only).
+  const bool bLabels = !FParse::Param(Cmd, TEXT("S08IconGalleryNoLabels"));
+  const int32 Count = IconGallery ? IconGallery->Build(static_cast<float>(SizePx), SizePx, bReduced, 6, bLabels) : 0;
   if (IconGallery) IconGallery->AddToViewport(1000);
   if (IconGallery && IconGalleryTimes.Num() > 0 && !IconGalleryShotDir.IsEmpty()) {
     IconGallery->SetClockOverrideMs(IconGalleryTimes[0]);
@@ -57,27 +59,46 @@ bool AS08FlowGameMode::IconGalleryBegin() {
 
 void AS08FlowGameMode::IconGalleryTick(float DeltaSeconds) {
   if (!IconGallery || IconGalleryShotDir.IsEmpty()) return;
-  // -S08IconGalleryPerfFrames=<n>: n free-running frames first (clock advancing, every icon animating) - the cost
-  // sample: EvaluateAt of all icons (gallery replays every script each frame - an upper bound of real use) and
-  // the game-thread frame time.
+  // -S08IconGalleryPerfFrames=<n>: n free-running frames first (clock advancing, every icon animating), in blocks
+  // of 100 frames that alternate gallery COLLAPSED (no tick, no paint) and SHOWN - the same-process A/B of the whole
+  // icon layer cost on the game thread (Slate tick + layout + paint + EvaluateAt), the first 5 frames after each
+  // switch skipped. Also the EvaluateAt cost alone (the gallery replays every script each frame - an upper bound).
+  constexpr int32 PerfBlock = 100;
+  constexpr int32 PerfSkip = 5;
   if (IconGalleryPerfLeft < 0) {
     IconGalleryPerfLeft = 0;
     FParse::Value(FCommandLine::Get(), TEXT("S08IconGalleryPerfFrames="), IconGalleryPerfLeft);
+    IconGalleryPerfTotal = IconGalleryPerfLeft;
     if (IconGalleryPerfLeft > 0) {
       IconGallery->SetClockOverrideMs(-1.0f);
       IconGallery->ResetPerf();
     }
   }
   if (IconGalleryPerfLeft > 0) {
-    IconGalleryGtMs.Add(FPlatformTime::ToMilliseconds(GGameThreadTime));
+    const int32 Done = IconGalleryPerfTotal - IconGalleryPerfLeft;
+    const bool bShown = ((Done / PerfBlock) % 2) == 1;  // hidden block first
+    const int32 InBlock = Done % PerfBlock;
+    if (InBlock == 0) {
+      IconGallery->SetVisibility(bShown ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
+    }
+    if (InBlock >= PerfSkip) {
+      (bShown ? IconGalleryGtMs : IconGalleryGtHiddenMs).Add(FPlatformTime::ToMilliseconds(GGameThreadTime));
+    }
     if (--IconGalleryPerfLeft == 0) {
-      TArray<float> S = IconGalleryGtMs;
-      S.Sort();
-      float Sum = 0.0f;
-      for (const float V : S) Sum += V;
-      const float P95 = S.Num() ? S[FMath::Clamp(FMath::CeilToInt(0.95f * S.Num()) - 1, 0, S.Num() - 1)] : 0.0f;
-      FS08Trace::Write(FString::Printf(TEXT("ICONGALLERY perf %s gtMsAvg=%.3f gtMsP95=%.3f"),
-                                       *IconGallery->PerfSummary(), S.Num() ? Sum / S.Num() : 0.0f, P95));
+      auto Stats = [](TArray<float> S, float& Median, float& P95) {
+        S.Sort();
+        Median = S.Num() ? S[S.Num() / 2] : 0.0f;
+        P95 = S.Num() ? S[FMath::Clamp(FMath::CeilToInt(0.95f * S.Num()) - 1, 0, S.Num() - 1)] : 0.0f;
+      };
+      float ShownMed = 0.0f, ShownP95 = 0.0f, HiddenMed = 0.0f, HiddenP95 = 0.0f;
+      Stats(IconGalleryGtMs, ShownMed, ShownP95);
+      Stats(IconGalleryGtHiddenMs, HiddenMed, HiddenP95);
+      FS08Trace::Write(FString::Printf(
+          TEXT("ICONGALLERY perf %s gtShownMed=%.3f gtShownP95=%.3f gtHiddenMed=%.3f gtHiddenP95=%.3f "
+               "deltaMed=%.3f deltaP95=%.3f shownFrames=%d hiddenFrames=%d"),
+          *IconGallery->PerfSummary(), ShownMed, ShownP95, HiddenMed, HiddenP95, ShownMed - HiddenMed,
+          ShownP95 - HiddenP95, IconGalleryGtMs.Num(), IconGalleryGtHiddenMs.Num()));
+      IconGallery->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
       if (IconGalleryTimes.Num() > 0) IconGallery->SetClockOverrideMs(IconGalleryTimes[0]);
     }
     return;

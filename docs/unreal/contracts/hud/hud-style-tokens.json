@@ -87,15 +87,15 @@
   "hp_bar.max_ms": {"value": 400, "status": "предложено", "source": "R3.0 (HP-бар ≤ 400 мс)"},
   "reduced.max_ms": {"value": 100, "status": "предложено", "source": "02 UI-ACC-006"},
   "refuse.ms": {"value": 350, "status": "предложено", "source": "docs/game-design/move-selection/03-ux-spec.md §4.2 V-08 и §5 (CUE-004: 350 мс, встряска 150 мс; reduced motion — 100 мс без встряски)", "use": "показ значка отказа V-08; при reduced motion значок и текст причины — единственный канал"},
-  "icon.appear.ms": {"value": 180, "status": "предложено", "source": "art/imagegen/hud-icons-v3/STYLE-v3.md §7", "use": "scale 0,80 → 1,04 (40 %) → 1,00 ease-out-back; opacity 0,15 → 1 за 120 мс"},
-  "icon.leave.ms": {"value": 120, "status": "предложено", "source": "art/imagegen/hud-icons-v3/STYLE-v3.md §7", "use": "opacity → 0, scale → 0,92 ease-in-quad"},
-  "icon.tap.ms": {"value": 150, "status": "предложено", "source": "art/imagegen/hud-icons-v3/STYLE-v3.md §7", "use": "scale 1 → 0,94 → 1 при смене числа на жетоне"},
-  "icon.press.ms": {"value": 80, "status": "предложено", "source": "art/imagegen/hud-icons-v3/STYLE-v3.md §7", "use": "диски действий: scale 0,96 (hover — hover.ms, scale 1,06)"},
-  "icon.cycle.pending.ms": {"value": 1200, "status": "предложено", "source": "art/imagegen/hud-icons-v3/STYLE-v3.md §7", "use": "цикл стрелок MOVE (щелчок при 520) и метки PLACE («тук» при 300)"},
-  "icon.cycle.sent.ms": {"value": 1500, "status": "предложено", "source": "art/imagegen/hud-icons-v3/STYLE-v3.md §7", "use": "песочные часы: переворот 650–950 мс"},
-  "icon.spinner.step.ms": {"value": 125, "status": "предложено", "source": "art/imagegen/hud-icons-v3/STYLE-v3.md §7", "use": "спиннер: 8 ступеней Constant (reduced motion — 250)"},
-  "icon.reconnect.ms": {"value": 1200, "status": "предложено", "source": "art/imagegen/hud-icons-v3/STYLE-v3.md §7", "use": "круговая стрелка переподключения: linear 360°"},
-  "icon.hp_hit.ms": {"value": 200, "status": "предложено", "source": "art/imagegen/hud-icons-v3/STYLE-v3.md §7", "use": "урон: светлое сердце 1 → 1,15 (60 мс) → 0 (140 мс) поверх пустого"},
-  "icon.ribbon.appear.ms": {"value": 220, "status": "предложено", "source": "art/imagegen/hud-icons-v3/STYLE-v3.md §7", "use": "лента порядка: scaleY 0 → 1, pivot сверху"}
+  "icon.appear.ms": {"value": 180, "status": "предложено", "source": "art/imagegen/hud-icons-v3/STYLE-v3.md §7; кривые и события — docs/unreal/contracts/hud/icon-motion.json", "use": "scale 0,80 → 1,04 (40 %) → 1,00 ease-out-back; opacity 0,15 → 1 за 120 мс"},
+  "icon.leave.ms": {"value": 120, "status": "предложено", "source": "art/imagegen/hud-icons-v3/STYLE-v3.md §7; кривые и события — docs/unreal/contracts/hud/icon-motion.json", "use": "opacity → 0, scale → 0,92 ease-in-quad"},
+  "icon.tap.ms": {"value": 150, "status": "предложено", "source": "art/imagegen/hud-icons-v3/STYLE-v3.md §7; кривые и события — docs/unreal/contracts/hud/icon-motion.json", "use": "scale 1 → 0,94 → 1 при смене числа на жетоне"},
+  "icon.press.ms": {"value": 80, "status": "предложено", "source": "art/imagegen/hud-icons-v3/STYLE-v3.md §7; кривые и события — docs/unreal/contracts/hud/icon-motion.json", "use": "диски действий: scale 0,96 (hover — hover.ms, scale 1,06)"},
+  "icon.cycle.pending.ms": {"value": 1200, "status": "предложено", "source": "art/imagegen/hud-icons-v3/STYLE-v3.md §7; кривые и события — docs/unreal/contracts/hud/icon-motion.json", "use": "цикл стрелок MOVE (щелчок при 520) и метки PLACE («тук» при 300)"},
+  "icon.cycle.sent.ms": {"value": 1500, "status": "предложено", "source": "art/imagegen/hud-icons-v3/STYLE-v3.md §7; кривые и события — docs/unreal/contracts/hud/icon-motion.json", "use": "песочные часы: переворот 650–950 мс"},
+  "icon.spinner.step.ms": {"value": 125, "status": "предложено", "source": "art/imagegen/hud-icons-v3/STYLE-v3.md §7; кривые и события — docs/unreal/contracts/hud/icon-motion.json", "use": "спиннер: 8 ступеней Constant (reduced motion — 250)"},
+  "icon.reconnect.ms": {"value": 1200, "status": "предложено", "source": "art/imagegen/hud-icons-v3/STYLE-v3.md §7; кривые и события — docs/unreal/contracts/hud/icon-motion.json", "use": "круговая стрелка переподключения: linear 360°"},
+  "icon.hp_hit.ms": {"value": 200, "status": "предложено", "source": "art/imagegen/hud-icons-v3/STYLE-v3.md §7; кривые и события — docs/unreal/contracts/hud/icon-motion.json", "use": "урон: светлое сердце 1 → 1,15 (60 мс) → 0 (140 мс) поверх пустого"},
+  "icon.ribbon.appear.ms": {"value": 220, "status": "предложено", "source": "art/imagegen/hud-icons-v3/STYLE-v3.md §7; кривые и события — docs/unreal/contracts/hud/icon-motion.json", "use": "лента порядка: scaleY 0 → 1, pivot сверху"}
  }
 }

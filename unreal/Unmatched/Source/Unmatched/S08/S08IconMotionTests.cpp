@@ -5,6 +5,8 @@
 //   Reduced - s08.ReducedMotion drives S08IconMotion::IsReducedMotion;
 //   Textures- every layer texture of the contract exists at 24/32/48/64 px with the exact size and no mips;
 //   Widget  - US08AnimatedIconWidget builds one image per layer and applies the evaluator's pose;
+//   Semantics - events over the base (review 2026-10-03): leave after hold fades, tap after hover returns to it,
+//             a future appear is invisible, equal start time -> the later command wins;
 //   CombatView - the -S08IconMotion combat token view: show = appear + pulse, hide = leave, then hidden.
 // Headless:
 //   UnrealEditor-Cmd.exe Unmatched.uproject -ExecCmds="Automation RunTests Unmatched.S08.IconMotion; Quit"
@@ -255,6 +257,56 @@ bool FS08IconMotionWidgetTest::RunTest(const FString& Parameters) {
     Sent->ApplyPose(180.0f + 300.0f);  // cycle frame 3 (275 ms)
     const UObject* Res = Sent->GetLayerImage(1)->GetBrush().GetResourceObject();
     TestEqual(TEXT("sand frame 3 texture"), Res, static_cast<const UObject*>(Sent->GetLayerTexture(1, 3)));
+  }
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08IconMotionSemanticsTest, "Unmatched.S08.IconMotion.Semantics",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FS08IconMotionSemanticsTest::RunTest(const FString& Parameters) {
+  // Review 2026-10-03 (same cases as tools/s08/hud_contract/test_icon_motion.py IconMotionSemanticsTests).
+  FS08IconMotionLibrary Lib;
+  if (!TestTrue(TEXT("contract loads"), Lib.LoadFile(FS08IconMotionLibrary::DefaultPath()))) return false;
+  const FS08IconMotionDef* Attack = Lib.Find(TEXT("action-attack"));
+  const FS08IconMotionDef* Hint = Lib.Find(TEXT("state-hint"));
+  if (!TestNotNull(TEXT("action-attack"), Attack) || !TestNotNull(TEXT("state-hint"), Hint)) return false;
+  auto Root = [](const FS08IconAnimator& A, float T, ES08IconProp P) { return A.Pose(T).Targets[0].Get(P); };
+  {
+    FS08IconAnimator A;
+    A.Init(Attack, false);
+    A.Play(TEXT("appear"), 0.0f);
+    A.Play(TEXT("hover_in"), 300.0f);
+    A.Play(TEXT("spend"), 500.0f);
+    A.Play(TEXT("leave"), 1000.0f);
+    TestTrue(TEXT("leave after hold: visible while fading"), A.Pose(1060.0f).bVisible);
+    TestTrue(TEXT("leave after hold: opacity fades below the held 0.4"), Root(A, 1060.0f, ES08IconProp::Opacity) < 0.4f);
+    TestTrue(TEXT("leave after hold: scale leaves the held 1.06"), Root(A, 1060.0f, ES08IconProp::Scale) < 1.06f);
+    TestFalse(TEXT("leave after hold: hidden at the end"), A.Pose(1121.0f).bVisible);
+  }
+  {
+    FS08IconAnimator A;
+    A.Init(Attack, false);
+    A.Play(TEXT("appear"), 0.0f);
+    A.Play(TEXT("hover_in"), 300.0f);
+    A.Play(TEXT("tap"), 600.0f);
+    TestTrue(TEXT("tap starts from the hover scale (no jump)"), FMath::IsNearlyEqual(Root(A, 600.0f, ES08IconProp::Scale), 1.06f, 1.0e-4f));
+    TestTrue(TEXT("tap dips to 0.94"), FMath::IsNearlyEqual(Root(A, 650.0f, ES08IconProp::Scale), 0.94f, 1.0e-4f));
+    TestTrue(TEXT("after the tap the hover holds again"), FMath::IsNearlyEqual(Root(A, 800.0f, ES08IconProp::Scale), 1.06f, 1.0e-4f));
+  }
+  {
+    FS08IconAnimator A;
+    A.Init(Hint, false);
+    A.Play(TEXT("appear"), 120.0f);
+    TestFalse(TEXT("appear scheduled in the future is invisible before it starts"), A.Pose(60.0f).bVisible);
+    TestTrue(TEXT("visible from its start"), A.Pose(120.0f).bVisible);
+  }
+  {
+    FS08IconAnimator A;
+    A.Init(Attack, false);
+    A.Play(TEXT("appear"), 0.0f);
+    A.Play(TEXT("release"), 500.0f);
+    A.Play(TEXT("hover_out"), 500.0f);
+    TestTrue(TEXT("equal start time: the later command wins"), FMath::IsNearlyEqual(Root(A, 700.0f, ES08IconProp::Scale), 1.0f, 1.0e-4f));
   }
   return true;
 }

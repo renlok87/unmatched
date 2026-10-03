@@ -298,9 +298,11 @@ public:
     const float SizeSu = static_cast<float>(Brush.ImageSize.X);
     if (SizeSu <= 0.0f) return;
     if (Widget->GetIconId().IsNone() || !FMath::IsNearlyEqual(SizeSu, LastSizeSu, 1.0e-3f)) {
+      const bool bFirst = Widget->GetIconId().IsNone();
       LastSizeSu = SizeSu;
+      // A resize (DPI, zoom) keeps the running animation; only the first brush may start the appear.
       Widget->SetIcon(TEXT("action-attack-token"), SizeSu, Px);
-      if (bShown) Widget->PlayAnim(TEXT("appear"));
+      if (bFirst && bShown) Widget->PlayAnim(TEXT("appear"));
     }
   }
   void SetShown(bool bInShown) override {

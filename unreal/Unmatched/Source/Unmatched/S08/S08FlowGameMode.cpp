@@ -5530,6 +5530,8 @@ void AS08FlowGameMode::BuildArtHudWidgets(const TSharedRef<SConstraintCanvas>& C
     if (FParse::Param(FCommandLine::Get(), TEXT("S08IconMotion"))) {
       if (US08AnimatedIconWidget* Motion = CreateWidget<US08AnimatedIconWidget>(World, US08AnimatedIconWidget::StaticClass())) {
         WidgetLine(TEXT("icon"), US08AnimatedIconWidget::StaticClass(), TEXT("icon-motion-v3"), true, FString(), true);
+        // SHOT/ICON trace lines name the texture really drawn (qa010 reads `texture=`).
+        ArtHud.IconTexturePath = S08IconMotion::TextureObjectPath(TEXT("action-attack-token"), 0, ArtHud.IconSize);
         ArtHudWidgets.Add(Motion);
         AddIcon(S08MakeAnimatedIconView(*Motion, ArtHud.IconSize), false);
         bUmgIcon = true;

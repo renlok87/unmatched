@@ -1,6 +1,6 @@
 #include "S08IconMotion.h"
 
-#include "Algo/StableSort.h"
+#include "Algo/Sort.h"
 #include "Dom/JsonObject.h"
 #include "HAL/IConsoleManager.h"
 #include "Misc/CommandLine.h"
@@ -140,8 +140,17 @@ bool ParseIcon(FName Icon, const TSharedPtr<FJsonObject>& Obj, FS08IconMotionDef
     }
     Def.Layers.Add(MoveTemp(Layer));
   }
-  for (const auto& Pair : Obj->GetObjectField(TEXT("anims"))->Values) {
-    const TSharedPtr<FJsonObject> A = Pair.Value->AsObject();
+  const TSharedPtr<FJsonObject>* AnimsObj = nullptr;
+  if (!Obj->TryGetObjectField(TEXT("anims"), AnimsObj)) {
+    Err = FString::Printf(TEXT("%s: no anims"), *Icon.ToString());
+    return false;
+  }
+  for (const auto& Pair : (*AnimsObj)->Values) {
+    const TSharedPtr<FJsonObject> A = Pair.Value.IsValid() ? Pair.Value->AsObject() : nullptr;
+    if (!A.IsValid()) {
+      Err = FString::Printf(TEXT("%s.%s: not an object"), *Icon.ToString(), *Pair.Key);
+      return false;
+    }
     FS08IconAnim Anim;
     Anim.Name = FName(*Pair.Key);
     if (!ParseKind(A->GetStringField(TEXT("kind")), Anim.Kind)) {
@@ -183,7 +192,12 @@ bool ParseIcon(FName Icon, const TSharedPtr<FJsonObject>& Obj, FS08IconMotionDef
   const TArray<TSharedPtr<FJsonValue>>* Demo = nullptr;
   if (Obj->TryGetArrayField(TEXT("demo"), Demo)) {
     for (const TSharedPtr<FJsonValue>& SV : *Demo) {
-      const TArray<TSharedPtr<FJsonValue>>& S = SV->AsArray();
+      const TArray<TSharedPtr<FJsonValue>>* SA = nullptr;
+      if (!SV.IsValid() || !SV->TryGetArray(SA) || SA->Num() == 0) {
+        Err = FString::Printf(TEXT("%s: bad demo step"), *Icon.ToString());
+        return false;
+      }
+      const TArray<TSharedPtr<FJsonValue>>& S = *SA;
       FS08IconDemoStep Step;
       Step.Op = FName(*S[0]->AsString());
       if (S.Num() > 1) Step.Value = static_cast<float>(S[1]->AsNumber());
@@ -315,10 +329,17 @@ bool FS08IconMotionLibrary::LoadFromString(const FString& Json, FString* OutErro
   if (Root->TryGetObjectField(TEXT("variants"), VarObj)) {
     for (const auto& Pair : (*VarObj)->Values) Variants.Add(FName(*Pair.Key), FName(*Pair.Value->AsString()));
   }
-  for (const auto& Pair : Root->GetObjectField(TEXT("icons"))->Values) {
+  const TSharedPtr<FJsonObject>* IconsObj = nullptr;
+  if (!Root->TryGetObjectField(TEXT("icons"), IconsObj)) {
+    if (OutError) *OutError = TEXT("no icons");
+    return false;
+  }
+  for (const auto& Pair : (*IconsObj)->Values) {
     FS08IconMotionDef Def;
     FString Err;
-    if (!ParseIcon(FName(*Pair.Key), Pair.Value->AsObject(), Def, Err)) {
+    const TSharedPtr<FJsonObject> IconObj = Pair.Value.IsValid() ? Pair.Value->AsObject() : nullptr;
+    if (!IconObj.IsValid() || !ParseIcon(FName(*Pair.Key), IconObj, Def, Err)) {
+      if (Err.IsEmpty()) Err = FString::Printf(TEXT("%s: not an object"), *Pair.Key);
       if (OutError) *OutError = Err;
       Icons.Reset();
       return false;
@@ -330,8 +351,9 @@ bool FS08IconMotionLibrary::LoadFromString(const FString& Json, FString* OutErro
 }
 
 const FS08IconMotionLibrary& FS08IconMotionLibrary::Get() {
-  static FS08IconMotionLibrary Lib;
-  if (!Lib.bLoaded) {
+  static FS08IconMotionLibrary Lib;  // game thread only (widgets, gallery, tests)
+  if (!Lib.bLoadAttempted) {
+    Lib.bLoadAttempted = true;
     FString Err;
     if (!Lib.LoadFile(DefaultPath(), &Err)) UE_LOG(LogTemp, Error, TEXT("S08 icon motion: %s"), *Err);
   }
@@ -363,6 +385,7 @@ bool FS08IconAnimator::Play(FName AnimName, float TMs) {
   FPlay P;
   P.Anim = Anim;
   P.T0 = TMs;
+  P.Seq = ++SeqCounter;
   P.Branch = &Anim->Branch(bReduced);
   P.Dur = P.Branch->DurationMs;
   bool bNeeds = false;
@@ -381,7 +404,9 @@ bool FS08IconAnimator::Play(FName AnimName, float TMs) {
       const bool bDone = TMs - E.T0 >= E.Dur;
       bool bSubset = true;
       for (const FS08IconTrack& Tr : E.Branch->Tracks) bSubset &= Covered.Contains(Key(Tr.Target, Tr.Prop));
-      if (bDone && bSubset) continue;
+      // A finished event is dropped when the new one covers all its tracks; a held one only by a new held one
+      // (a short tap plays over a hover and hands the hover's value back).
+      if (bDone && bSubset && (!E.Anim->bHold || Anim->bHold)) continue;
       Keep.Add(MoveTemp(E));
     }
     Keep.Add(MoveTemp(P));
@@ -394,8 +419,11 @@ bool FS08IconAnimator::Play(FName AnimName, float TMs) {
       bHasHiddenFrom = false;
       Events.Reset();
     } else if (Anim->Kind == ES08IconAnimKind::Exit) {
+      // The exit owns everything: held events (hover, spend) no longer cover the fade; their values are already
+      // in the exit's from-start keys.
       bHasHiddenFrom = true;
       HiddenFrom = TMs + Base.Dur;
+      Events.Reset();
     }
   }
   return true;
@@ -415,12 +443,14 @@ bool FS08IconAnimator::BaseAt(float TMs, FPlay& OutPlay, float& OutLocal) const 
     OutPlay.T0 = Base.T0 + Base.Dur;
     OutPlay.Dur = Br.DurationMs;
     OutLocal = FMath::Fmod(TMs - OutPlay.T0, OutPlay.Dur);
+    if (OutLocal < 0.0f) OutLocal += OutPlay.Dur;  // Python % semantics
     return true;
   }
   if (Base.Anim->Kind == ES08IconAnimKind::Loop) {
     if (Base.Dur <= 0.0f || Base.Branch->Tracks.Num() == 0) return false;
     OutPlay = Base;
     OutLocal = FMath::Fmod(Lt, Base.Dur);
+    if (OutLocal < 0.0f) OutLocal += Base.Dur;
     return true;
   }
   OutPlay = Base;
@@ -436,6 +466,8 @@ FS08IconPose FS08IconAnimator::Pose(float TMs) const {
     FMemory::Memcpy(Out.Targets[I + 1].V, Def->Layers[I].Rest, sizeof(Def->Layers[I].Rest));
   }
   Out.bVisible = bShown && (!bHasHiddenFrom || TMs < HiddenFrom);
+  // An appear scheduled in the future (hint cascade, stagger_ms) has not started yet.
+  if (bHasBase && Base.Anim && Base.Anim->Kind == ES08IconAnimKind::Enter && TMs < Base.T0) Out.bVisible = false;
   TMap<int32, FVector2D> Pivots;
   FPlay B;
   float Lt = 0.0f;
@@ -447,35 +479,37 @@ FS08IconPose FS08IconAnimator::Pose(float TMs) const {
     }
     for (const auto& P : B.Anim->Pivots) Pivots.Add(P.Key, P.Value);
   }
-  // An event owns its (target, prop) from its start until a later event with the same track takes it over.
-  // Active or hold -> sets the value; finished without hold -> hands the property back to the base/rest.
-  TArray<const FPlay*> Started;
+  // An event in effect (running, or held) owns its (target, prop) until a later event in effect takes the same
+  // track; a finished event without hold owns nothing, so an earlier hold (hover 1.06 after a tap) or the
+  // base/rest shows again. Order (T0, Seq): at equal T0 the later command wins.
+  TArray<const FPlay*, TInlineAllocator<8>> Started;
   for (const FPlay& E : Events) {
-    if (TMs >= E.T0) Started.Add(&E);
+    if (TMs >= E.T0 && (TMs - E.T0 < E.Dur || E.Anim->bHold)) Started.Add(&E);
   }
-  Algo::StableSort(Started, [](const FPlay* A, const FPlay* B2) { return A->T0 > B2->T0; });
-  TSet<uint32> Claimed;
+  Algo::Sort(Started, [](const FPlay* A, const FPlay* B2) { return A->T0 != B2->T0 ? A->T0 > B2->T0 : A->Seq > B2->Seq; });
+  TSet<uint32, DefaultKeyFuncs<uint32>, TInlineSetAllocator<16>> Claimed;
   for (const FPlay* E : Started) {
     const float Local = TMs - E->T0;
-    const bool bActive = Local < E->Dur || E->Anim->bHold;
     for (const FS08IconTrack& Tr : E->Branch->Tracks) {
       const uint32 K = Key(Tr.Target, Tr.Prop);
       if (Claimed.Contains(K)) continue;
       Claimed.Add(K);
-      if (bActive) {
-        float& Slot = Out.Targets[Tr.Target].V[static_cast<int32>(Tr.Prop)];
-        const float* S = E->Start.Find(K);
-        Slot = S08IconMotion::EvalKeys(Tr.Keys, FMath::Min(Local, E->Dur), S ? *S : Slot);
-      }
+      float& Slot = Out.Targets[Tr.Target].V[static_cast<int32>(Tr.Prop)];
+      const float* S = E->Start.Find(K);
+      Slot = S08IconMotion::EvalKeys(Tr.Keys, FMath::Min(Local, E->Dur), S ? *S : Slot);
     }
-    if (bActive) {
-      for (const auto& P : E->Anim->Pivots) {
-        if (!Pivots.Contains(P.Key)) Pivots.Add(P.Key, P.Value);
-      }
+    for (const auto& P : E->Anim->Pivots) {
+      if (!Pivots.Contains(P.Key)) Pivots.Add(P.Key, P.Value);
     }
   }
   for (int32 T = 0; T < Out.Targets.Num(); ++T) Out.Targets[T].PivotU = Def->PivotOf(T, Pivots);
   return Out;
+}
+
+bool FS08IconAnimator::IsCycling(float TMs) const {
+  FPlay B;
+  float Lt = 0.0f;
+  return BaseAt(TMs, B, Lt) && B.Anim && B.Anim->Kind == ES08IconAnimKind::Loop;
 }
 
 bool FS08IconAnimator::IsMoving(float TMs) const {

@@ -502,7 +502,9 @@ private:
   int32 IconGalleryWait = 0;
   bool bIconGalleryShotPending = false;
   int32 IconGalleryPerfLeft = -1;
+  int32 IconGalleryPerfTotal = 0;
   TArray<float> IconGalleryGtMs;
+  TArray<float> IconGalleryGtHiddenMs;
   // Art Tuner M2/M3 (S08ArtTuner.h, S08FlowGameModeArtTuner.cpp, S08ArtTunerPanel.cpp): the panel's model, apply, save and
   // the live-tune actions tune / tunerState / tunerSave / tunerReset / tunerPanel / artView. Null without -ArtTuner.
   TSharedPtr<struct FS08ArtTunerSession> ArtTuner;

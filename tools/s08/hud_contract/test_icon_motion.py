@@ -51,10 +51,11 @@ class IconMotionContractTests(unittest.TestCase):
                         self.assertLessEqual(ts[-1], branch["duration_ms"] + 1e-6, (icon, name, tr["prop"]))
                         for k in tr["keys"]:
                             self.assertIn(k[2], eases, (icon, name))
-                if a["kind"] != "loop":
+                # null = «значение на старте команды»: имеет смысл у событий и ухода; у появления и цикла начального
+                # состояния нет — там только числа
+                if a["kind"] in ("enter", "loop"):
                     for tr in a["tracks"]:
-                        if tr["prop"] != "frame":
-                            self.assertNotIn(None, [k[1] for k in tr["keys"][1:]], (icon, name))
+                        self.assertNotIn(None, [k[1] for k in tr["keys"]], (icon, name))
 
     def test_reduced_motion_is_opacity_only_and_short(self):
         """UI-ACC-005/006: в ветке reduced только opacity ≤ 100 мс (спиннер — ступени поворота, индикатор прогресса)."""
@@ -102,6 +103,52 @@ class IconMotionContractTests(unittest.TestCase):
                     if "cycle" in self.c["icons"][icon]["anims"]:
                         continue
                     self.assertAlmostEqual(pose[p], M.REST[p] if tgt == "all" else a.rest[tgt][p], 6, (icon, tgt, p))
+
+
+class IconMotionSemanticsTests(unittest.TestCase):
+    """Ревью 2026-10-03: события поверх базы. Те же случаи проверяет UE-тест Unmatched.S08.IconMotion.Semantics."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.c = M.load_contract(str(CONTRACT))
+
+    def pose(self, a, t):
+        pp, vis = a.pose(t)
+        return pp["pose"], vis
+
+    def test_leave_after_hold_fades(self):
+        a = M.Animator(self.c, "action-attack")
+        a.play("appear", 0)
+        a.play("hover_in", 300)
+        a.play("spend", 500)
+        a.play("leave", 1000)
+        p, vis = self.pose(a, 1060)
+        self.assertTrue(vis)
+        self.assertLess(p["all"]["opacity"], 0.4)       # от 0,4 (spend) к 0
+        self.assertLess(p["all"]["scale"], 1.06)        # от 1,06 (hover) к 0,92
+        self.assertFalse(self.pose(a, 1121)[1])
+
+    def test_tap_after_hover_returns_to_hover(self):
+        a = M.Animator(self.c, "action-attack")
+        a.play("appear", 0)
+        a.play("hover_in", 300)
+        a.play("tap", 600)
+        self.assertAlmostEqual(self.pose(a, 600)[0]["all"]["scale"], 1.06, 4)   # без скачка в первый кадр
+        self.assertAlmostEqual(self.pose(a, 650)[0]["all"]["scale"], 0.94, 4)
+        self.assertAlmostEqual(self.pose(a, 800)[0]["all"]["scale"], 1.06, 4)
+
+    def test_future_appear_is_invisible(self):
+        a = M.Animator(self.c, "state-hint")
+        a.play("appear", 120)
+        self.assertFalse(self.pose(a, 60)[1])
+        self.assertTrue(self.pose(a, 120)[1])
+
+    def test_equal_time_later_command_wins(self):
+        a = M.Animator(self.c, "action-attack")
+        a.play("appear", 0)
+        a.play("release", 500)
+        a.play("hover_out", 500)
+        self.assertAlmostEqual(self.pose(a, 700)[0]["all"]["scale"], 1.0, 4)
 
 
 if __name__ == "__main__":

@@ -58,9 +58,9 @@ LEAVE = {"kind": "exit", "duration_ms": 120, "beat_ms": None, "tracks": [
     "reduced": {"duration_ms": 100, "tracks": [{"target": "all", "prop": "opacity", "keys": [[0, None, "linear"], [100, 0.0, "constant"]]}]},
     "note": "opacity → 0, scale → 0,92"}
 TAP = {"kind": "event", "duration_ms": 150, "beat_ms": 50, "tracks": [
-    {"target": "all", "prop": "scale", "keys": [[0, 1.0, "ease_out_quad"], [50, 0.94, "ease_out_cubic"], [150, 1.0, "constant"]]}],
+    {"target": "all", "prop": "scale", "keys": [[0, None, "ease_out_quad"], [50, 0.94, "ease_out_cubic"], [150, None, "constant"]]}],
     "reduced": {"duration_ms": 0, "tracks": []},
-    "note": "смена числа на значке (цифру рисует игра)"}
+    "note": "смена числа на значке (цифру рисует игра): от текущего масштаба к 0,94 и обратно к нему же"}
 
 
 def hold(kind_note, target, prop, to, ms, reduced_to=None, reduced_prop=None):
@@ -104,8 +104,8 @@ ACTION_EVENTS = {
     "press": hold("нажатие: 0,96", "all", "scale", 0.96, 80),
     "release": hold("отпускание: обратно к 1,06", "all", "scale", 1.06, 80),
     "select": {"kind": "event", "duration_ms": 200, "beat_ms": 70, "tracks": [
-        {"target": "glyph", "prop": "scale", "keys": [[0, 1.0, "ease_out_quad"], [70, 1.12, "ease_out_cubic"], [200, 1.0, "constant"]]}],
-        "reduced": static_reduced(), "note": "действие выбрано: импульс глифа"},
+        {"target": "glyph", "prop": "scale", "keys": [[0, None, "ease_out_quad"], [70, 1.12, "ease_out_cubic"], [200, None, "constant"]]}],
+        "reduced": static_reduced(), "note": "действие выбрано: импульс глифа от текущего масштаба и обратно"},
     "spend": hold("действие потрачено: opacity 0,4 (02:895)", "all", "opacity", 0.4, 150, reduced_to=0.4),
     "restore": hold("действие снова доступно", "all", "opacity", 1.0, 150, reduced_to=1.0),
     "tap": TAP,
@@ -121,16 +121,16 @@ def action(icon):
 
 
 SENT_FRAMES = 12
-SENT_FRAME_T = [0, 92, 183, 275, 367, 458, 550, 950, 1040, 1130, 1220, 1310]
+SENT_FRAME_T = [0, 92, 183, 275, 367, 458, 550, 950, 1060, 1170, 1280, 1390]   # шаг ≈ 91 / 110 мс, без застоя на кадре 0
 
 ICONS = {
     "state-boost": {
         "canvas_u": [32, 32], "layers": [layer("icon", "state-boost")],
         "anims": {"appear": APPEAR, "leave": LEAVE, "tap": TAP,
-                  "reveal": {"kind": "event", "duration_ms": 240, "beat_ms": 160, "tracks": [
-                      {"target": "all", "prop": "scale_x", "keys": [[0, 0.05, "ease_out_cubic"], [160, 1.06, "ease_in_quad"], [240, 1.0, "constant"]]}],
+                  "reveal": {"kind": "event", "duration_ms": 240, "beat_ms": 80, "tracks": [
+                      {"target": "all", "prop": "scale_x", "keys": [[0, None, "ease_in_quad"], [80, 0.05, "ease_out_cubic"], [160, 1.06, "ease_in_quad"], [240, 1.0, "constant"]]}],
                       "reduced": {"duration_ms": 100, "tracks": [{"target": "all", "prop": "opacity", "keys": [[0, 0.0, "linear"], [100, 1.0, "constant"]]}]},
-                      "note": "BOOST вскрыт: «переворот монеты» по X"}},
+                      "note": "BOOST вскрыт: «переворот монеты» по X — схлопнулся ребром (удар 80) и раскрылся с перелётом"}},
         "demo": [["appear"], ["wait", 400], ["reveal"], ["wait", 400], ["tap"], ["wait", 400], ["leave"]]},
     "state-enemy": {
         "canvas_u": [32, 32], "layers": [layer("body", "state-enemy_body"), layer("glyph", "state-enemy_glyph")],
@@ -143,7 +143,7 @@ ICONS = {
                                          layer("glyph", "state-sent_glyph#", pivot=(16, 16), frames=SENT_FRAMES)],
         "anims": {"appear": APPEAR, "leave": LEAVE,
                   "cycle": {"kind": "loop", "duration_ms": 1500, "beat_ms": 650, "tracks": [
-                      {"target": "glyph", "prop": "frame", "keys": [[t, i, "constant"] for i, t in enumerate(SENT_FRAME_T)] + [[1400, 0, "constant"], [1500, 0, "constant"]]},
+                      {"target": "glyph", "prop": "frame", "keys": [[t, i, "constant"] for i, t in enumerate(SENT_FRAME_T)] + [[1500, 0, "constant"]]},
                       {"target": "glyph", "prop": "rotate", "keys": [[0, 0, "constant"], [650, 0, "ease_in_out_cubic"], [950, 180, "constant"], [950, 0, "constant"], [1500, 0, "constant"]]}],
                       "reduced": static_reduced(),
                       "note": "песок пересыпается (кадры 0–6, 550 мс), переворот 650–950 (удар 650), песок снова сверху (кадры 7–11)"}},
@@ -259,10 +259,10 @@ ICONS = {
     "resource-card": {
         "canvas_u": [32, 32], "layers": [layer("icon", "resource-card")],
         "anims": {"appear": APPEAR, "leave": LEAVE, "tap": TAP,
-                  "draw": {"kind": "event", "duration_ms": 180, "beat_ms": 0, "tracks": [
+                  "draw": {"kind": "event", "duration_ms": 180, "beat_ms": 180, "tracks": [
                       {"target": "all", "prop": "ty", "keys": [[0, -3.0, "ease_out_cubic"], [180, 0.0, "constant"]]},
                       {"target": "all", "prop": "scale", "keys": [[0, 1.1, "ease_out_cubic"], [180, 1.0, "constant"]]}],
-                      "reduced": static_reduced(), "note": "добор карты: стопка «подпрыгивает»"}},
+                      "reduced": static_reduced(), "note": "добор карты: стопка «падает» на место, удар — приземление 180"}},
         "demo": [["appear"], ["wait", 400], ["draw"], ["wait", 400], ["tap"], ["wait", 400], ["leave"]]},
     "resource-connection-online": {
         "canvas_u": [32, 32], "layers": [layer("icon", "resource-connection-online")],
@@ -281,6 +281,13 @@ ICONS = {
                                          layer("bars", "resource-connection-lost_bars"),
                                          layer("sign", "resource-connection-lost_sign", pivot=(10, 11))],
         "anims": {"appear": {"kind": "enter", "duration_ms": 180, "beat_ms": 110, "tracks": [
+            {"target": "bars", "prop": "opacity", "keys": [[0, 0.15, "ease_out_quad"], [150, 1.0, "constant"]]},
+            {"target": "sign", "prop": "scale", "keys": [[0, 0.0, "ease_out_cubic"], [110, 1.08, "ease_in_quad"], [180, 1.0, "constant"]]}],
+            "reduced": {"duration_ms": 100, "tracks": [
+                {"target": "bars", "prop": "opacity", "keys": [[0, 0.0, "linear"], [100, 1.0, "constant"]]},
+                {"target": "sign", "prop": "opacity", "keys": [[0, 0.0, "linear"], [100, 1.0, "constant"]]}]},
+            "note": "связи нет с самого начала: приглушённые столбики проявляются, красный X «штампуется» (удар 110)"},
+            "appear_from_online": {"kind": "enter", "duration_ms": 180, "beat_ms": 110, "tracks": [
             {"target": "from", "prop": "opacity", "keys": [[0, 1.0, "ease_in_quad"], [150, 0.0, "constant"]]},
             {"target": "from", "prop": "tx", "keys": [[0, 0.0, "ease_out_cubic"], [150, 2.5, "constant"]]},
             {"target": "bars", "prop": "opacity", "keys": [[0, 0.0, "ease_in_quad"], [150, 1.0, "constant"]]},
@@ -290,9 +297,9 @@ ICONS = {
                 {"target": "from", "prop": "opacity", "keys": [[0, 1.0, "linear"], [50, 0.0, "constant"]]},
                 {"target": "bars", "prop": "opacity", "keys": [[0, 0.0, "constant"], [50, 0.0, "linear"], [100, 1.0, "constant"]]},
                 {"target": "sign", "prop": "opacity", "keys": [[0, 0.0, "constant"], [50, 0.0, "linear"], [100, 1.0, "constant"]]}]},
-            "note": "связь потеряна: столбики online уезжают вправо на место приглушённых и гаснут, красный X «штампуется» (удар 110), без мигания"},
+            "note": "связь пропала во время игры (вместо online): столбики online уезжают вправо на место приглушённых и гаснут, X «штампуется», без мигания"},
             "leave": LEAVE},
-        "demo": [["appear"], ["wait", 800], ["leave"]]},
+        "demo": [["appear_from_online"], ["wait", 800], ["leave"], ["wait", 300], ["appear"], ["wait", 600], ["leave"]]},
     "resource-hp-full": {
         "canvas_u": [32, 32], "layers": [layer("under", "resource-hp-empty", rest={"opacity": 0.0}),
                                          layer("icon", "resource-hp-full", pivot=(16, 16))],

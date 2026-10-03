@@ -125,6 +125,7 @@ public:
   TMap<FName, FS08IconMotionDef> Icons;
   TMap<FName, FName> Variants;
   bool bLoaded = false;
+  bool bLoadAttempted = false;  // Get() reads the file once, also when it failed
 };
 
 /** State of one icon: commands Play(name, t) and Pose(t). Pure: no clock, no UObject. */
@@ -136,6 +137,8 @@ public:
   FS08IconPose Pose(float TMs) const;
   /** True while anything moves at TMs (enter/exit/loop or an active event) - the widget skips work otherwise. */
   bool IsMoving(float TMs) const;
+  /** True while the contract's cycle loops at TMs (contract rules.budget: <= 3 cycling icons per frame). */
+  bool IsCycling(float TMs) const;
   const FS08IconMotionDef* GetDef() const { return Def; }
   bool IsReduced() const { return bReduced; }
 
@@ -143,6 +146,7 @@ private:
   struct FPlay {
     const FS08IconAnim* Anim = nullptr;
     float T0 = 0.0f;
+    int32 Seq = 0;  // command order: at equal T0 the later command wins
     float Dur = 0.0f;
     const FS08IconBranch* Branch = nullptr;
     TMap<uint32, float> Start;  // (target << 8 | prop) -> value at command start
@@ -159,4 +163,5 @@ private:
   bool bShown = false;
   bool bHasHiddenFrom = false;
   float HiddenFrom = 0.0f;
+  int32 SeqCounter = 0;
 };

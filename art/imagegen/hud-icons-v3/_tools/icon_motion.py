@@ -74,9 +74,9 @@ def eval_keys(keys, t, start):
 
 # ------------------------------------------------------------------------------------------------ аниматор
 class Play:
-    __slots__ = ("name", "t0", "dur", "kind", "hold", "tracks", "pivot", "start")
+    __slots__ = ("name", "t0", "dur", "kind", "hold", "tracks", "pivot", "start", "seq")
 
-    def __init__(self, name, t0, anim, reduced):
+    def __init__(self, name, t0, anim, reduced, seq=0):
         branch = anim.get("reduced") if reduced else None
         self.name = name
         self.t0 = float(t0)
@@ -86,6 +86,7 @@ class Play:
         self.tracks = (branch or anim)["tracks"]
         self.pivot = anim.get("pivot_u", {})
         self.start = {}
+        self.seq = seq
 
 
 class Animator:
@@ -106,11 +107,13 @@ class Animator:
         self.events = []          # Play (event), по времени старта
         self.hidden_from = None   # после exit
         self.shown = False
+        self.seq = 0              # порядок команд: при равном t0 побеждает сыгранная позже
 
     # -------------------------------------------------------------------- команды
     def play(self, name, t):
         anim = self.d["anims"][name]
-        p = Play(name, t, anim, self.reduced)
+        self.seq += 1
+        p = Play(name, t, anim, self.reduced, self.seq)
         needs = {(tr["target"], tr["prop"]) for tr in p.tracks if any(k[1] is None for k in tr["keys"])}
         if needs:
             cur, _ = self.pose(t)
@@ -121,7 +124,9 @@ class Animator:
             for e in self.events:
                 done = t - e.t0 >= e.dur
                 mine = {(tr["target"], tr["prop"]) for tr in e.tracks}
-                if done and mine <= covered:
+                # закончившееся событие больше не нужно, если новое перекрывает все его дорожки; удержанное (hold)
+                # снимает только новое удержанное — короткое (tap) пройдёт поверх и вернёт его значение
+                if done and mine <= covered and (not e.hold or p.hold):
                     continue
                 keep.append(e)
             self.events = keep + [p]
@@ -132,7 +137,10 @@ class Animator:
                 self.hidden_from = None
                 self.events = []
             if p.kind == "exit":
+                # уход владеет всем: удержанные события (hover, spend) больше не перекрывают затухание; их значения
+                # уже попали в start ключей None
                 self.hidden_from = t + p.dur
+                self.events = []
 
     def has(self, name):
         return name in self.d["anims"]
@@ -161,29 +169,31 @@ class Animator:
         pose = {k: dict(v) for k, v in self.rest.items()}
         pivots = {}
         visible = self.shown and (self.hidden_from is None or t < self.hidden_from)
+        if self.base is not None and self.base.kind == "enter" and t < self.base.t0:
+            visible = False       # появление, назначенное на будущее (каскад stagger_ms), ещё не началось
         b, lt = self._base_at(t)
         if b:
             for tr in b.tracks:
                 start = b.start.get((tr["target"], tr["prop"]), pose[tr["target"]][tr["prop"]])
                 pose[tr["target"]][tr["prop"]] = eval_keys(tr["keys"], lt, start)
             pivots.update(b.pivot)
-        # Событие владеет своими (цель, свойство) с момента старта, пока его не перекроет более позднее событие с той
-        # же дорожкой. Активное или hold-событие задаёт значение; закончившееся без hold — отдаёт свойство базе/покою.
+        # Действующее событие (идёт или hold) владеет своими (цель, свойство), пока его не перекроет более позднее
+        # действующее событие с той же дорожкой; закончившееся без hold ничем не владеет — под ним снова видны более
+        # ранний hold (hover 1,06 после tap) или база/покой. Порядок: (t0, seq) — при равном t0 побеждает сыгранное позже.
         claimed = set()
-        for e in sorted((e for e in self.events if t >= e.t0), key=lambda e: e.t0, reverse=True):
+        for e in sorted((e for e in self.events if t >= e.t0), key=lambda e: (e.t0, e.seq), reverse=True):
             local = t - e.t0
-            active = local < e.dur or e.hold
+            if not (local < e.dur or e.hold):
+                continue
             for tr in e.tracks:
                 key = (tr["target"], tr["prop"])
                 if key in claimed:
                     continue
                 claimed.add(key)
-                if active:
-                    start = e.start.get(key, pose[key[0]][key[1]])
-                    pose[key[0]][key[1]] = eval_keys(tr["keys"], min(local, e.dur), start)
-            if active:
-                for tgt, pv in e.pivot.items():
-                    pivots.setdefault(tgt, pv)
+                start = e.start.get(key, pose[key[0]][key[1]])
+                pose[key[0]][key[1]] = eval_keys(tr["keys"], min(local, e.dur), start)
+            for tgt, pv in e.pivot.items():
+                pivots.setdefault(tgt, pv)
         return {"pose": pose, "pivot": pivots}, visible
 
     def pivot_of(self, target, pivots):

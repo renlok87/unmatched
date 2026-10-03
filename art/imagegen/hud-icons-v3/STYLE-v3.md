@@ -421,6 +421,8 @@ K + W + K шире) → строится от того же внешнего с�
 
 ## 7. Движение (константы `motion.icon.*`)
 
+**Норматив движения — контракт [`icon-motion.json`](../../../docs/unreal/contracts/hud/icon-motion.json)** (раскадровка [ICON-MOTION.md](../../../docs/unreal/contracts/hud/ICON-MOTION.md), план [ICON-MOTION-PLAN.md](../../../docs/unreal/contracts/hud/ICON-MOTION-PLAN.md)). Таблица ниже — исходные константы прототипа; где контракт уточнил кривые и события (ревью 2026-10-03), прав контракт.
+
 | Константа | мс | Кривая | Что движется |
 |---|---|---|---|
 | appear | 180 | scale 0,80 → 1,04 (40 %) → 1,00 ease-out-back; opacity 0,15 → 1 за 120 | весь значок |
