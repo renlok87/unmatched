@@ -4,6 +4,7 @@
 #include "S08Render.h"
 #include "S08ArtHudText.h"
 #include "S08ArtHudViews.h"
+#include "S08AnimatedIconWidget.h"
 #include "S08ArtHudWidgets.h"
 #include "S08Team.h"
 #include "Blueprint/UserWidget.h"
@@ -310,6 +311,8 @@ void AS08FlowGameMode::BeginPlay() {
       FS08Trace::Write(FString::Printf(TEXT("RENDER preset applied=%s flag=S08RenderPreset"), *Preset));
     }
   }
+  // HUD icon motion v3: -S08IconGallery is backend-less too (no login, no room, no board HUD).
+  if (IconGalleryBegin()) return;
   // W4-A -Bench: backend-less render bench (no login, no room, no HUD).
   // Art Tuner M1: -ArtView=<map> takes the same backend-less path (S08FlowGameModeArtView.cpp)
   if (S08ArtView::Enabled()) ArtViewBegin();
@@ -3561,6 +3564,10 @@ void AS08FlowGameMode::TakeEvidenceShot(const FString& InPath) {
 void AS08FlowGameMode::Tick(float DeltaSeconds) {
   Super::Tick(DeltaSeconds);
   Elapsed += DeltaSeconds;
+  if (bIconGallery) {
+    IconGalleryTick(DeltaSeconds);
+    return;
+  }
   PollAccumulator += DeltaSeconds;
   // ART-004 T1.1 opt-in frame timing (-S08Perf). FApp::GetDeltaTime() is the
   // real frame interval (it includes the t.MaxFPS wait), so fps is the
@@ -5518,10 +5525,21 @@ void AS08FlowGameMode::BuildArtHudWidgets(const TSharedRef<SConstraintCanvas>& C
         bUmgPlate = true;
       }
     }
-    UClass* IconClass = S08LoadArtHudWidgetClass(US08ArtIconWidget::WidgetBlueprintPath,
-                                                 US08ArtIconWidget::StaticClass());
+    // HUD icon motion v3 (opt-in until the v3 icons pass the art acceptance): -S08IconMotion shows the combat
+    // token as the animated `action-attack-token` (appear, 1 Hz pulse, leave; S08AnimatedIconWidget.h).
+    if (FParse::Param(FCommandLine::Get(), TEXT("S08IconMotion"))) {
+      if (US08AnimatedIconWidget* Motion = CreateWidget<US08AnimatedIconWidget>(World, US08AnimatedIconWidget::StaticClass())) {
+        WidgetLine(TEXT("icon"), US08AnimatedIconWidget::StaticClass(), TEXT("icon-motion-v3"), true, FString(), true);
+        ArtHudWidgets.Add(Motion);
+        AddIcon(S08MakeAnimatedIconView(*Motion, ArtHud.IconSize), false);
+        bUmgIcon = true;
+      }
+    }
+    UClass* IconClass = bUmgIcon ? nullptr
+                                 : S08LoadArtHudWidgetClass(US08ArtIconWidget::WidgetBlueprintPath,
+                                                            US08ArtIconWidget::StaticClass());
     UClass* IconUse = IconClass ? IconClass : US08ArtIconWidget::StaticClass();
-    if (US08ArtIconWidget* IconWidget = CreateWidget<US08ArtIconWidget>(World, IconUse)) {
+    if (US08ArtIconWidget* IconWidget = bUmgIcon ? nullptr : CreateWidget<US08ArtIconWidget>(World, IconUse)) {
       FString Missing;
       const bool bParts = IconWidget->HasAllParts(&Missing);
       const TCHAR* Source = IconClass ? US08ArtIconWidget::WidgetBlueprintPath : TEXT("code-default");

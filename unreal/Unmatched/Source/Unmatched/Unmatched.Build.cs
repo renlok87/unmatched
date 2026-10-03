@@ -48,5 +48,8 @@ public class Unmatched : ModuleRules {
     // W4-C: the art HUD string table (LOCTABLE_FROMFILE_GAME, Content-relative)
     // is a CSV, not an asset - staged into the pak like the board profiles.
     RuntimeDependencies.Add("$(ProjectDir)/Content/Localization/StringTables/S08ArtHud.csv", StagedFileType.UFS);
+    // HUD icon motion v3 (S08IconMotion.h): the animation contract, a copy of
+    // docs/unreal/contracts/hud/icon-motion.json written by motion_contract.py.
+    RuntimeDependencies.Add("$(ProjectDir)/Config/S08IconMotion.json", StagedFileType.UFS);
   }
 }

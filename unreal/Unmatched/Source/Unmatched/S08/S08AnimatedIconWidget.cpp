@@ -1,0 +1,280 @@
+#include "S08AnimatedIconWidget.h"
+
+#include "Blueprint/WidgetTree.h"
+#include "Components/Border.h"
+#include "Components/Image.h"
+#include "Components/Overlay.h"
+#include "Components/OverlaySlot.h"
+#include "Components/SizeBox.h"
+#include "Components/TextBlock.h"
+#include "Components/UniformGridPanel.h"
+#include "Components/UniformGridSlot.h"
+#include "Engine/Texture2D.h"
+
+namespace {
+FLinearColor S08Srgb(uint8 R, uint8 G, uint8 B, float A = 1.0f) {
+  FLinearColor C = FLinearColor::FromSRGBColor(FColor(R, G, B));
+  C.A = A;
+  return C;
+}
+
+FWidgetTransform ToWidgetTransform(const FS08IconTargetPose& P, float SuPerU) {
+  const float S = P.Get(ES08IconProp::Scale);
+  return FWidgetTransform(FVector2D(P.Get(ES08IconProp::Tx), P.Get(ES08IconProp::Ty)) * SuPerU,
+                          FVector2D(S * P.Get(ES08IconProp::ScaleX), S * P.Get(ES08IconProp::ScaleY)),
+                          FVector2D::ZeroVector, P.Get(ES08IconProp::Rotate));
+}
+}  // namespace
+
+// ------------------------------------------------------------------------------------------- icon
+
+bool US08AnimatedIconWidget::Initialize() {
+  const bool bFirst = Super::Initialize();
+  if (bFirst && WidgetTree && !WidgetTree->RootWidget) {
+    Box = WidgetTree->ConstructWidget<USizeBox>(USizeBox::StaticClass(), TEXT("Box"));
+    Stage = WidgetTree->ConstructWidget<UOverlay>(UOverlay::StaticClass(), TEXT("Stage"));
+    Box->AddChild(Stage);
+    WidgetTree->RootWidget = Box;
+    bReduced = S08IconMotion::IsReducedMotion();
+  }
+  return bFirst;
+}
+
+FVector2D US08AnimatedIconWidget::GetCanvasSizeSu() const {
+  return Def ? Def->CanvasU * (SizeSu / 32.0f) : FVector2D(SizeSu, SizeSu);
+}
+
+UTexture2D* US08AnimatedIconWidget::GetLayerTexture(int32 Layer, int32 Frame) const {
+  if (!LayerFirstTexture.IsValidIndex(Layer)) return nullptr;
+  const int32 N = LayerFrameCount[Layer];
+  const int32 Index = LayerFirstTexture[Layer] + FMath::Clamp(Frame, 0, FMath::Max(N - 1, 0));
+  return Textures.IsValidIndex(Index) ? Textures[Index].Get() : nullptr;
+}
+
+bool US08AnimatedIconWidget::SetIcon(FName InIconId, float InSizeSu, int32 InTexturePx) {
+  const FS08IconMotionDef* NewDef = FS08IconMotionLibrary::Get().Find(InIconId);
+  if (!NewDef || !Stage || !Box) return false;
+  Def = NewDef;
+  IconId = InIconId;
+  SizeSu = InSizeSu;
+  TexturePx = InTexturePx;
+  Stage->ClearChildren();
+  LayerImages.Reset();
+  Textures.Reset();
+  LayerFirstTexture.Reset();
+  LayerFrameCount.Reset();
+  CurrentFrame.Reset();
+  const FVector2D Size = GetCanvasSizeSu();
+  Box->SetWidthOverride(Size.X);
+  Box->SetHeightOverride(Size.Y);
+  // Variants of the same id (resource-hp-full-enemy) keep the base icon's animations but draw their own texture:
+  // a whole-icon layer whose src is the base id takes the variant id.
+  const FString BaseId = Def->Icon.ToString();
+  for (int32 L = 0; L < Def->Layers.Num(); ++L) {
+    const FS08IconLayer& Layer = Def->Layers[L];
+    FString Src = Layer.Src;
+    if (Src == BaseId && InIconId != Def->Icon) Src = InIconId.ToString();
+    const int32 Frames = Src.EndsWith(TEXT("#")) ? FMath::Max(Layer.Frames, 1) : 1;
+    LayerFirstTexture.Add(Textures.Num());
+    LayerFrameCount.Add(Frames);
+    for (int32 F = 0; F < Frames; ++F) {
+      const FString Path = S08IconMotion::TextureObjectPath(Src, F, TexturePx);
+      UTexture2D* Tex = LoadObject<UTexture2D>(nullptr, *Path);
+      if (!Tex) UE_LOG(LogTemp, Warning, TEXT("S08 icon motion: texture %s not found"), *Path);
+      Textures.Add(Tex);
+    }
+    UImage* Image = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass());
+    FSlateBrush Brush;
+    Brush.SetResourceObject(GetLayerTexture(L, 0));
+    Brush.ImageSize = Size;
+    Brush.DrawAs = ESlateBrushDrawType::Image;
+    Image->SetBrush(Brush);
+    if (Layer.bTintTeam) Image->SetColorAndOpacity(TeamTint);
+    UOverlaySlot* LayerSlot = Stage->AddChildToOverlay(Image);
+    LayerSlot->SetHorizontalAlignment(HAlign_Fill);
+    LayerSlot->SetVerticalAlignment(VAlign_Fill);
+    LayerImages.Add(Image);
+    CurrentFrame.Add(0);
+  }
+  Animator.Init(Def, bReduced);
+  bDirty = true;
+  ApplyPose(GetClockMs());
+  return true;
+}
+
+bool US08AnimatedIconWidget::PlayAnim(FName Anim) { return PlayAnimAt(Anim, GetClockMs()); }
+
+bool US08AnimatedIconWidget::PlayAnimAt(FName Anim, float TMs) {
+  const bool bOk = Animator.Play(Anim, TMs);
+  bDirty |= bOk;
+  return bOk;
+}
+
+void US08AnimatedIconWidget::SetTeamTint(const FLinearColor& Tint) {
+  TeamTint = Tint;
+  if (!Def) return;
+  for (int32 L = 0; L < Def->Layers.Num() && L < LayerImages.Num(); ++L) {
+    if (Def->Layers[L].bTintTeam) LayerImages[L]->SetColorAndOpacity(TeamTint);
+  }
+}
+
+void US08AnimatedIconWidget::SetReducedMotion(bool bInReduced) {
+  bReduced = bInReduced;
+  Animator.Init(Def, bReduced);
+  bDirty = true;
+}
+
+void US08AnimatedIconWidget::SetClockOverrideMs(float Ms) {
+  if (Ms < 0.0f && ClockOverrideMs >= 0.0f) ClockMs = ClockOverrideMs;
+  ClockOverrideMs = Ms;
+  bDirty = true;
+}
+
+void US08AnimatedIconWidget::ApplyPose(float TMs) {
+  if (!Def || !Stage || !Box) return;
+  LastPose = Animator.Pose(TMs);
+  Box->SetVisibility(LastPose.bVisible ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Hidden);
+  if (!LastPose.bVisible) return;
+  const float SuPerU = SizeSu / 32.0f;
+  const FVector2D Canvas = Def->CanvasU;
+  const FS08IconTargetPose& Root = LastPose.Targets[0];
+  Stage->SetRenderTransformPivot(Root.PivotU / Canvas);
+  Stage->SetRenderTransform(ToWidgetTransform(Root, SuPerU));
+  Stage->SetRenderOpacity(Root.Get(ES08IconProp::Opacity));
+  for (int32 L = 0; L < LayerImages.Num(); ++L) {
+    const FS08IconTargetPose& P = LastPose.Targets[L + 1];
+    UImage* Image = LayerImages[L];
+    Image->SetRenderTransformPivot(P.PivotU / Canvas);
+    Image->SetRenderTransform(ToWidgetTransform(P, SuPerU));
+    Image->SetRenderOpacity(P.Get(ES08IconProp::Opacity));
+    const int32 Frame = FMath::FloorToInt(P.Get(ES08IconProp::Frame) + 1.0e-4f);
+    if (LayerFrameCount[L] > 1 && Frame != CurrentFrame[L]) {
+      CurrentFrame[L] = Frame;
+      FSlateBrush Brush = Image->GetBrush();
+      Brush.SetResourceObject(GetLayerTexture(L, Frame));
+      Image->SetBrush(Brush);
+    }
+  }
+}
+
+void US08AnimatedIconWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime) {
+  Super::NativeTick(MyGeometry, InDeltaTime);
+  if (ClockOverrideMs < 0.0f) ClockMs += InDeltaTime * 1000.0f;
+  const float T = GetClockMs();
+  const bool bMoving = Animator.IsMoving(T);
+  // Moving, just stopped (settle on the final pose), or a command/clock change since the last frame.
+  if (bMoving || bWasMoving || bDirty) {
+    ApplyPose(T);
+    bDirty = false;
+  }
+  bWasMoving = bMoving;
+}
+
+// ------------------------------------------------------------------------------------------- gallery
+
+bool US08IconGalleryWidget::Initialize() {
+  const bool bFirst = Super::Initialize();
+  if (bFirst && WidgetTree && !WidgetTree->RootWidget) {
+    Background = WidgetTree->ConstructWidget<UBorder>(UBorder::StaticClass(), TEXT("Background"));
+    Background->SetBrushColor(S08Srgb(0x1E, 0x20, 0x28));  // sheet background of the reference (D.SHEET_BG)
+    Background->SetHorizontalAlignment(HAlign_Center);
+    Background->SetVerticalAlignment(VAlign_Center);
+    Grid = WidgetTree->ConstructWidget<UUniformGridPanel>(UUniformGridPanel::StaticClass(), TEXT("Grid"));
+    Grid->SetSlotPadding(FMargin(6.0f));
+    Background->SetContent(Grid);
+    WidgetTree->RootWidget = Background;
+  }
+  return bFirst;
+}
+
+int32 US08IconGalleryWidget::Build(float InSizeSu, int32 InTexturePx, bool bInReduced, int32 Columns) {
+  if (!Grid) return 0;
+  bReduced = bInReduced;
+  Grid->ClearChildren();
+  Icons.Reset();
+  Scripts.Reset();
+  const FS08IconMotionLibrary& Lib = FS08IconMotionLibrary::Get();
+  const float Pad = FMath::RoundToFloat(0.25f * InSizeSu);
+  const FVector2D Cell(FMath::Max(2.0f * InSizeSu + 2.0f * Pad, 168.0f), InSizeSu + 2.0f * Pad + 34.0f);
+  int32 Index = 0;
+  for (const FName Id : Lib.Order) {
+    const FS08IconMotionDef* Def = Lib.Find(Id);
+    if (!Def) continue;
+    USizeBox* CellBox = WidgetTree->ConstructWidget<USizeBox>(USizeBox::StaticClass());
+    CellBox->SetWidthOverride(Cell.X);
+    CellBox->SetHeightOverride(Cell.Y);
+    UBorder* Panel = WidgetTree->ConstructWidget<UBorder>(UBorder::StaticClass());
+    Panel->SetBrushColor(S08Srgb(0x16, 0x1A, 0x28));  // tag.background - the HUD panel
+    Panel->SetPadding(FMargin(0.0f));
+    CellBox->AddChild(Panel);
+    UOverlay* Ov = WidgetTree->ConstructWidget<UOverlay>(UOverlay::StaticClass());
+    Panel->SetContent(Ov);
+    US08AnimatedIconWidget* Icon = CreateWidget<US08AnimatedIconWidget>(this, US08AnimatedIconWidget::StaticClass());
+    Icon->SetReducedMotion(bReduced);
+    Icon->SetIcon(Id, InSizeSu, InTexturePx);
+    Icon->SetTeamTint(FLinearColor::FromSRGBColor(FColor(0xDA, 0xC5, 0x76)));  // team.p1.screen (reference demo)
+    UOverlaySlot* IconSlot = Ov->AddChildToOverlay(Icon);
+    IconSlot->SetHorizontalAlignment(HAlign_Center);
+    IconSlot->SetVerticalAlignment(VAlign_Top);
+    IconSlot->SetPadding(FMargin(0.0f, Pad, 0.0f, 0.0f));
+    UTextBlock* Label = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
+    Label->SetText(FText::FromName(Id));
+    FSlateFontInfo Font = Label->GetFont();
+    Font.Size = 9;
+    Label->SetFont(Font);
+    Label->SetColorAndOpacity(FSlateColor(S08Srgb(0xEC, 0xE6, 0xDC)));
+    Label->SetAutoWrapText(true);
+    Label->SetJustification(ETextJustify::Center);
+    UOverlaySlot* LabelSlot = Ov->AddChildToOverlay(Label);
+    LabelSlot->SetHorizontalAlignment(HAlign_Fill);  // a width for AutoWrapText; the text itself is centred
+    LabelSlot->SetVerticalAlignment(VAlign_Bottom);
+    LabelSlot->SetPadding(FMargin(0.0f, 0.0f, 0.0f, 3.0f));
+    UUniformGridSlot* GridSlot = Grid->AddChildToUniformGrid(CellBox, Index / Columns, Index % Columns);
+    GridSlot->SetHorizontalAlignment(HAlign_Center);
+    GridSlot->SetVerticalAlignment(VAlign_Center);
+    FScript Script;
+    float Total = 0.0f;
+    S08IconMotion::DemoSchedule(*Def, bReduced, Script.Commands, Total);
+    Script.PeriodMs = Total + PauseMs;
+    Scripts.Add(MoveTemp(Script));
+    Icons.Add(Icon);
+    ++Index;
+  }
+  EvaluateAt(GetClockMs());
+  return Icons.Num();
+}
+
+void US08IconGalleryWidget::EvaluateAt(float TMs) {
+  const FS08IconMotionLibrary& Lib = FS08IconMotionLibrary::Get();
+  for (int32 I = 0; I < Icons.Num(); ++I) {
+    US08AnimatedIconWidget* Icon = Icons[I];
+    const FScript& S = Scripts[I];
+    const float Local = FMath::Fmod(TMs, S.PeriodMs);
+    Icon->GetAnimator().Init(Lib.Find(Icon->GetIconId()), bReduced);
+    for (const TPair<float, FName>& C : S.Commands) {
+      if (C.Key > Local) break;
+      Icon->PlayAnimAt(C.Value, C.Key);
+    }
+    Icon->SetClockOverrideMs(Local);
+    Icon->ApplyPose(Local);
+  }
+}
+
+void US08IconGalleryWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime) {
+  Super::NativeTick(MyGeometry, InDeltaTime);
+  if (ClockOverrideMs < 0.0f) ClockMs += InDeltaTime * 1000.0f;
+  const double T0 = FPlatformTime::Seconds();
+  EvaluateAt(GetClockMs());
+  EvalSamples.Add(static_cast<float>((FPlatformTime::Seconds() - T0) * 1000.0));
+}
+
+FString US08IconGalleryWidget::PerfSummary() const {
+  if (EvalSamples.Num() == 0) return TEXT("evalMsAvg=0 evalMsP95=0 evalMsMax=0 frames=0");
+  TArray<float> S = EvalSamples;
+  S.Sort();
+  float Sum = 0.0f;
+  for (const float V : S) Sum += V;
+  const float P95 = S[FMath::Clamp(FMath::CeilToInt(0.95f * S.Num()) - 1, 0, S.Num() - 1)];
+  return FString::Printf(TEXT("evalMsAvg=%.4f evalMsP95=%.4f evalMsMax=%.4f frames=%d icons=%d"), Sum / S.Num(), P95,
+                         S.Last(), S.Num(), Icons.Num());
+}

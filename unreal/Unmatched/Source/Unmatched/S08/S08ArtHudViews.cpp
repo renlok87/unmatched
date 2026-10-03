@@ -1,5 +1,7 @@
 #include "S08ArtHudViews.h"
 
+#include "S08AnimatedIconWidget.h"
+
 #include "Misc/PackageName.h"
 #include "Styling/CoreStyle.h"
 #include "UObject/UObjectGlobals.h"
@@ -277,4 +279,51 @@ TSharedRef<IS08ArtPlateView> S08MakeUmgPlateView(US08ArtPlateWidget& Widget, con
 
 TSharedRef<IS08ArtIconView> S08MakeUmgIconView(US08ArtIconWidget& Widget, const FString& Source) {
   return MakeShared<FS08UmgIconView>(Widget, Source);
+}
+
+namespace {
+/** The combat token as the animated v3 icon. The controller keeps calling SetIconBrush (size) and SetShown;
+ *  show = appear (then the contract's 1 Hz pulse loops), hide = leave - the widget stays visible while the
+ *  leave plays and hides itself when the pose says so. */
+class FS08AnimatedIconView final : public IS08ArtIconView {
+public:
+  FS08AnimatedIconView(US08AnimatedIconWidget& InWidget, int32 InPx) : Widget(&InWidget), Px(InPx) {
+    InWidget.SetVisibility(ESlateVisibility::HitTestInvisible);
+  }
+  const TCHAR* ImplName() const override { return TEXT("umg-motion"); }
+  FString Source() const override { return TEXT("S08AnimatedIconWidget:action-attack-token"); }
+  TSharedRef<SWidget> GetRoot() override { return Widget->TakeWidget(); }
+  void SetIconBrush(const FSlateBrush& Brush) override {
+    if (!Widget.IsValid()) return;
+    const float SizeSu = static_cast<float>(Brush.ImageSize.X);
+    if (SizeSu <= 0.0f) return;
+    if (Widget->GetIconId().IsNone() || !FMath::IsNearlyEqual(SizeSu, LastSizeSu, 1.0e-3f)) {
+      LastSizeSu = SizeSu;
+      Widget->SetIcon(TEXT("action-attack-token"), SizeSu, Px);
+      if (bShown) Widget->PlayAnim(TEXT("appear"));
+    }
+  }
+  void SetShown(bool bInShown) override {
+    if (!Widget.IsValid() || bInShown == bShown) return;
+    bShown = bInShown;
+    Widget->PlayAnim(bShown ? TEXT("appear") : TEXT("leave"));
+  }
+  void SetTwin(bool bInTwin) override {
+    bTwin = bInTwin;
+    if (Widget.IsValid()) Widget->SetRenderOpacity(bInTwin ? 0.0f : 1.0f);
+  }
+  void CollectParts(TArray<FS08WidgetPart>& Out) const override {
+    if (Widget.IsValid()) Out.Add({S08ArtHudIds::Icon, Widget->GetCachedWidget()});
+  }
+
+private:
+  TWeakObjectPtr<US08AnimatedIconWidget> Widget;
+  int32 Px = 48;
+  float LastSizeSu = -1.0f;
+  bool bShown = false;
+};
+}  // namespace
+
+TSharedRef<IS08ArtIconView> S08MakeAnimatedIconView(US08AnimatedIconWidget& Widget, int32 TexturePx) {
+  return MakeShared<FS08AnimatedIconView>(Widget, TexturePx);
 }

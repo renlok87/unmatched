@@ -490,6 +490,19 @@ private:
   void ArtViewRefreshOverlay();
   /** -ArtTuner on the command line (the panel; S08ArtTuner.h). */
   bool ArtTunerEnabled() const;
+  // HUD icon motion v3 (S08AnimatedIconWidget.h, S08FlowGameModeIconGallery.cpp, ICON-MOTION-PLAN.md):
+  // -S08IconGallery = backend-less gallery of every icon looping its demo script; -S08IconGalleryShots=<dir>
+  // with -S08IconGalleryTimes=<ms,ms,...> freezes the clock at each time and takes a UI shot, then exits.
+  bool IconGalleryBegin();
+  void IconGalleryTick(float DeltaSeconds);
+  bool bIconGallery = false;
+  FString IconGalleryShotDir;
+  TArray<float> IconGalleryTimes;
+  int32 IconGalleryShot = 0;
+  int32 IconGalleryWait = 0;
+  bool bIconGalleryShotPending = false;
+  int32 IconGalleryPerfLeft = -1;
+  TArray<float> IconGalleryGtMs;
   // Art Tuner M2/M3 (S08ArtTuner.h, S08FlowGameModeArtTuner.cpp, S08ArtTunerPanel.cpp): the panel's model, apply, save and
   // the live-tune actions tune / tunerState / tunerSave / tunerReset / tunerPanel / artView. Null without -ArtTuner.
   TSharedPtr<struct FS08ArtTunerSession> ArtTuner;
@@ -546,6 +559,9 @@ private:
   // W4-C: the UMG art HUD widgets (plate, icon) hosted in HudCanvas slots.
   UPROPERTY()
   TArray<TObjectPtr<UUserWidget>> ArtHudWidgets;
+  // -S08IconGallery: the gallery widget (null without the flag).
+  UPROPERTY()
+  TObjectPtr<class US08IconGalleryWidget> IconGallery;
 
   FS08BoardModel BoardModel;
   TArray<FS08BoardFighter> Fighters;

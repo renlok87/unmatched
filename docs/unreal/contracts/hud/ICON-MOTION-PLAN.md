@@ -97,5 +97,8 @@ STYLE-v3 §7), методичка «Мультики кодом» (анимац�
 |---|---|
 | A | **готово**: контракт `icon-motion.json` (+ копия `Config/S08IconMotion.json`), раскадровка [ICON-MOTION.md](ICON-MOTION.md) из генератора `motion_contract.py`, тесты `tools/s08/hud_contract/test_icon_motion.py` (7) |
 | B | **готово**: вычислитель `icon_motion.py` (эталон для C++), эталонные позы `icon-motion-golden.json` (3566 отсчётов), рендер `motion.py`: 23 листа кадров, GIF обычный и reduced, `reel.mp4` / `reel-reduced.mp4`, `index.html` в `art/imagegen/hud-icons-v3/sheets/motion/`; слои и флипбук песка добавлены в движок значков; alpha bleed у текстур (без тёмного ореола при повороте и масштабе) |
-| C | в работе |
-| D–G | ждут |
+| C | **готово**: `S08IconMotion.h/.cpp` — порт вычислителя (паритет с Python: 3566 поз, 0 расхождений), `US08AnimatedIconWidget` (нативный, без WBP), `s08.ReducedMotion` / `-S08ReducedMotion`, контракт в pak (`RuntimeDependencies`), 6 автотестов `Unmatched.S08.IconMotion.*` |
+| D | **готово**: 264 текстуры `T_IV3_*` в `/Game/S08/UI/IconsV3` (24/32/48/64 px, без мипов, UI), `tools/art/icons_v3_import.py`, отчёт `art/imagegen/hud-icons-v3/ue-import-report.json` |
+| E | **готово**: `-S08IconGallery` (+ `-S08IconGalleryShots/-Times/-PerfFrames`); кадры UE против эталона — средняя \|Δ\| 0,45 / 0,02 (reduced), детерминизм до пикселя, `EvaluateAt` 23 значков 0,075 мс в среднем — [доказательства](../../../game-design/evidence/ICON-MOTION/2026-10-03/README.md) |
+| F | **частично**: жетон цели в бою — анимированный вид `umg-motion` за флагом `-S08IconMotion` (до арт-приёмки v3 штатный жетон не меняется), тест `CombatView`; живой бой не снят (нужен упакованный клиент и двухклиентное демо). API для MS-T: `SetIcon`, `PlayAnim(appear/leave/<событие>)`, `SetTeamTint`, `SetReducedMotion` |
+| G | в работе |

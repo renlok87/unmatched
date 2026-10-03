@@ -57,4 +57,16 @@ python art/imagegen/hud-icons-v3/_tools/draw_icons.py
 - Дальтонизм: проверен только серый.
 - Экспорт `-light` для светлых панелей.
 
-Анимация значков в этом наборе — только прототип кадров. Её план пользователь определяет отдельно.
+## Движение
+
+План — [ICON-MOTION-PLAN.md](../../../docs/unreal/contracts/hud/ICON-MOTION-PLAN.md), раскадровка —
+[ICON-MOTION.md](../../../docs/unreal/contracts/hud/ICON-MOTION.md).
+
+| Что | Где |
+|---|---|
+| Контракт: слои, дорожки, ключи, удар, reduced motion | `docs/unreal/contracts/hud/icon-motion.json` (копия `unreal/Unmatched/Config/S08IconMotion.json`) |
+| Генератор контракта и раскадровки | `_tools/motion_contract.py` |
+| Вычислитель позы — эталон для C++ | `_tools/icon_motion.py`; позы для теста UE — `icon-motion-golden.json` |
+| Эталонный рендер: листы, GIF, ролики, страница | `_tools/motion.py` → `sheets/motion/` (`index.html`, `reel.mp4`, `reel-reduced.mp4`) |
+| Рантайм UE | `S08IconMotion.h`, `S08AnimatedIconWidget.h` (+ галерея `-S08IconGallery`) |
+| UE против эталона | `_tools/compare_ue_gallery.py`, `docs/game-design/evidence/ICON-MOTION/2026-10-03/` |

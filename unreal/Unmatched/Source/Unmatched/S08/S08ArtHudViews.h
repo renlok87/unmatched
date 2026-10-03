@@ -82,6 +82,11 @@ TSharedRef<IS08ArtIconView> S08MakeSlateIconView();
 /** Views over live UMG widgets (the caller keeps the UObjects referenced). */
 TSharedRef<IS08ArtPlateView> S08MakeUmgPlateView(US08ArtPlateWidget& Widget, const FString& Source);
 TSharedRef<IS08ArtIconView> S08MakeUmgIconView(US08ArtIconWidget& Widget, const FString& Source);
+/** HUD icon motion v3 (-S08IconMotion, S08AnimatedIconWidget.h): the combat target token as the animated v3 icon
+ *  `action-attack-token` - appear on show, the 1 Hz pulse while shown, leave on hide (reduced motion: fades only).
+ *  TexturePx = the exact-size texture (24 / 32 / 48 px, ArtHud.IconSize). impl = "umg-motion". */
+class US08AnimatedIconWidget;
+TSharedRef<IS08ArtIconView> S08MakeAnimatedIconView(US08AnimatedIconWidget& Widget, int32 TexturePx);
 
 /** Loads the WBP class of a widget (object path without the _C suffix), or
  *  nullptr when it is not cooked / not a child of Native. */
