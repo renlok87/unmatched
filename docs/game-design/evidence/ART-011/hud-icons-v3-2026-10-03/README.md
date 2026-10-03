@@ -56,8 +56,21 @@
 2. `art/imagegen/hud-icons-v3/sheets/motion/resource-connection-reconnecting.gif` — вращение «↻» при 32 px: читается ли
    как «переподключение», а не как второй спиннер.
 
-## Что следует из решения (РД-1)
+## Что следует из решения (РД-1) — выполнено
 
-Жетон цели v3 с анимацией становится видом по умолчанию после проверки в живом бою (qa010 `icon`); прежний вид —
-флагом отката. Статус в [plan-status.json](../../../../art-pipeline/plan-status.json): HUD-ICONS-V3 — «принято по
+Жетон цели v3 с анимацией — вид по умолчанию с коммита `f5d6d740`; прежний вид W5b-R — флагом `-S08IconLegacy`
+(тест `Unmatched.S08.IconMotion.DefaultToken`).
+
+**Живой бой** ([live-token/run-20261003-191204](live-token/run-20261003-191204/)): упакованная сборка `8f524d8b`,
+двухклиентное демо `run-phase2-demo.ps1` на Cobble 5×6, K2 × 1,6, зонд цели хоста (`-ArtPreviewIconProbe`), 32 px,
+`-S08ReducedMotion` (статичный жетон в родном размере для qa010), **без флага `-S08IconMotion`**:
+- трасса хоста: `HUD art widget icon impl=umg source=icon-motion-v3`, `SHOT icon … visible=1 …
+  texture=/Game/S08/UI/IconsV3/T_IV3_action_attack_token_32`;
+- qa010 `icon` rev 3 по нарисованной текстуре (`sizes/action-attack-token-32.png`, маска `…-glyphmask-32.png`):
+  **pass** — глиф / тело 16,3 : 1, кромка 4,0 : 1 (порог 3), серый и дейтеранопия pass, присутствие NCC 0,993 /
+  IoU 0,953 ([qa010-icon-v3.json](live-token/run-20261003-191204/qa010-icon-v3.json));
+- демо прошло свои проверки, игра этого прогона снята (`ABORTED (verified)`). Трассы переименованы в `.txt` (`*.log`
+  в git не попадает); `manifest.json` демо называет их исходными именами.
+
+Не проверено в живом бою: жетон в анимации (pulse) — qa010 меряет только родной размер, поэтому прогон в reduced. Статус в [plan-status.json](../../../../art-pipeline/plan-status.json): HUD-ICONS-V3 — «принято по
 делегированию», `art_status` остаётся «технически импортировано».
