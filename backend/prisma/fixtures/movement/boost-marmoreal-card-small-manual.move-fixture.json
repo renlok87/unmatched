@@ -1,0 +1,50 @@
+{
+  "schema": "unmatched.move-fixture/1",
+  "name": "boost-marmoreal-card-small-manual",
+  "expectSource": "manual",
+  "description": "movement 3 with +2 selected, M05 is 6 steps from M13 (M07 M01 M02 M03 M04 M05): NeedBoost(3), not 1",
+  "cases": ["MS-E-78", "MS-E-13"],
+  "board": { "key": "marmoreal", "topologySha256": "425bebf254a98724c8192ab11d692eceb0ab2e31b7238dab3057b52ac9e5d38f" },
+  "fighters": [
+    {
+      "id": "medusa",
+      "ownerId": "p1",
+      "position": { "x": 0, "y": 2 },
+      "name": "Medusa",
+      "type": "HERO",
+      "health": 16,
+      "movement": 3
+    },
+    {
+      "id": "arthur",
+      "ownerId": "p2",
+      "position": { "x": 5, "y": 5 },
+      "name": "King Arthur",
+      "type": "HERO",
+      "health": 18,
+      "movement": 2
+    }
+  ],
+  "hand": [
+    { "id": "c2", "boostValue": 2 },
+    { "id": "c4", "boostValue": 4 }
+  ],
+  "draft": {
+    "moves": [
+      {
+        "fighterId": "medusa",
+        "dest": { "x": 4, "y": 0 }
+      }
+    ],
+    "boostCardId": "c2"
+  },
+  "expect": {
+    "layer": "executor",
+    "paths": {
+      "medusa": [[0, 1], [0, 0], [1, 0], [2, 0], [3, 0], [4, 0]]
+    },
+    "status": { "medusa": "needBoost" },
+    "requiredBoost": { "medusa": 3 },
+    "server": "NOT_ENOUGH_MOVEMENT"
+  }
+}

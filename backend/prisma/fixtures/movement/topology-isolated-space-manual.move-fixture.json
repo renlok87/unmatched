@@ -1,0 +1,62 @@
+{
+  "schema": "unmatched.move-fixture/1",
+  "name": "topology-isolated-space-manual",
+  "expectSource": "manual",
+  "description": "a space without links (0,0): only stay; a one-step forced path is INVALID_STEP",
+  "cases": ["MS-E-28"],
+  "board": {
+    "key": "isolated-3x2",
+    "lattice": {
+      "width": 3,
+      "height": 2,
+      "edges": [
+        [[1, 0], [2, 0]],
+        [[0, 1], [1, 1]],
+        [[1, 1], [2, 1]]
+      ]
+    }
+  },
+  "fighters": [
+    {
+      "id": "medusa",
+      "ownerId": "p1",
+      "position": { "x": 0, "y": 0 },
+      "name": "Medusa",
+      "type": "HERO",
+      "health": 16,
+      "movement": 3
+    },
+    {
+      "id": "arthur",
+      "ownerId": "p2",
+      "position": { "x": 2, "y": 1 },
+      "name": "King Arthur",
+      "type": "HERO",
+      "health": 18,
+      "movement": 2
+    }
+  ],
+  "draft": {
+    "moves": [
+      {
+        "fighterId": "medusa",
+        "path": [
+          { "x": 1, "y": 0 }
+        ]
+      }
+    ]
+  },
+  "expect": {
+    "layer": "executor",
+    "reach": {
+      "medusa": {
+        "base": [],
+        "boost": []
+      }
+    },
+    "paths": { "medusa": null },
+    "status": { "medusa": "conflict" },
+    "requiredBoost": { "medusa": 0 },
+    "server": "INVALID_STEP"
+  }
+}

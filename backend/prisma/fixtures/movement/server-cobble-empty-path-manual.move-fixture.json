@@ -1,0 +1,48 @@
+{
+  "schema": "unmatched.move-fixture/1",
+  "name": "server-cobble-empty-path-manual",
+  "expectSource": "manual",
+  "description": "a move entry with an empty path: EMPTY_PATH (the client drops stay moves instead)",
+  "cases": ["MS-E-16"],
+  "board": {
+    "key": "cobble-5x6",
+    "lattice": { "width": 5, "height": 6 }
+  },
+  "fighters": [
+    {
+      "id": "medusa",
+      "ownerId": "p1",
+      "position": { "x": 1, "y": 1 },
+      "name": "Medusa",
+      "type": "HERO",
+      "health": 16,
+      "movement": 2
+    },
+    {
+      "id": "arthur",
+      "ownerId": "p2",
+      "position": { "x": 4, "y": 5 },
+      "name": "King Arthur",
+      "type": "HERO",
+      "health": 18,
+      "movement": 2
+    }
+  ],
+  "draft": {
+    "moves": [
+      {
+        "fighterId": "medusa",
+        "path": []
+      }
+    ]
+  },
+  "expect": {
+    "layer": "validator",
+    "paths": {
+      "medusa": []
+    },
+    "status": { "medusa": "ok" },
+    "requiredBoost": { "medusa": 0 },
+    "server": "EMPTY_PATH"
+  }
+}

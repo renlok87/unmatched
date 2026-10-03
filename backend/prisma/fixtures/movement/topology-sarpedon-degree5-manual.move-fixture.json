@@ -1,0 +1,51 @@
+{
+  "schema": "unmatched.move-fixture/1",
+  "name": "topology-sarpedon-degree5-manual",
+  "expectSource": "manual",
+  "description": "S21 has degree 5 (S11 S12 S20 S24 S31); S21-S31 is a long link",
+  "cases": ["MS-E-25", "MS-E-26"],
+  "board": { "key": "sarpedon", "topologySha256": "d1a7221454e3b6f61a08468f9ea5469071c1683604da8287e7d74c2354978b37" },
+  "fighters": [
+    {
+      "id": "medusa",
+      "ownerId": "p1",
+      "position": { "x": 3, "y": 2 },
+      "name": "Medusa",
+      "type": "HERO",
+      "health": 16,
+      "movement": 1
+    },
+    {
+      "id": "arthur",
+      "ownerId": "p2",
+      "position": { "x": 7, "y": 5 },
+      "name": "King Arthur",
+      "type": "HERO",
+      "health": 18,
+      "movement": 2
+    }
+  ],
+  "draft": {
+    "moves": [
+      {
+        "fighterId": "medusa",
+        "dest": { "x": 3, "y": 4 }
+      }
+    ]
+  },
+  "expect": {
+    "layer": "executor",
+    "reach": {
+      "medusa": {
+        "base": [[3, 1], [4, 1], [2, 2], [2, 3], [3, 4]],
+        "boost": []
+      }
+    },
+    "paths": {
+      "medusa": [[3, 4]]
+    },
+    "status": { "medusa": "ok" },
+    "requiredBoost": { "medusa": 0 },
+    "server": "ok"
+  }
+}

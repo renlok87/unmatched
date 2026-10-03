@@ -1,0 +1,63 @@
+{
+  "schema": "unmatched.move-fixture/1",
+  "name": "blockers-cobble-ally-target-manual",
+  "expectSource": "manual",
+  "description": "a Harpy on (1,0) is passable but not an end: POSITION_OCCUPIED",
+  "cases": ["MS-E-22"],
+  "board": {
+    "key": "cobble-5x6",
+    "lattice": { "width": 5, "height": 6 }
+  },
+  "fighters": [
+    {
+      "id": "medusa",
+      "ownerId": "p1",
+      "position": { "x": 0, "y": 0 },
+      "name": "Medusa",
+      "type": "HERO",
+      "health": 16,
+      "movement": 2
+    },
+    {
+      "id": "harpy-1",
+      "ownerId": "p1",
+      "position": { "x": 1, "y": 0 },
+      "name": "Harpy 1",
+      "type": "MINION",
+      "health": 1,
+      "movement": 3
+    },
+    {
+      "id": "arthur",
+      "ownerId": "p2",
+      "position": { "x": 4, "y": 5 },
+      "name": "King Arthur",
+      "type": "HERO",
+      "health": 18,
+      "movement": 2
+    }
+  ],
+  "draft": {
+    "moves": [
+      {
+        "fighterId": "medusa",
+        "path": [
+          { "x": 1, "y": 0 }
+        ]
+      }
+    ]
+  },
+  "expect": {
+    "layer": "executor",
+    "reach": {
+      "medusa": {
+        "base": [[0, 1], [2, 0], [1, 1], [0, 2]],
+        "boost": []
+      }
+    },
+    "paths": { "medusa": null },
+    "status": { "medusa": "conflict" },
+    "requiredBoost": { "medusa": 0 },
+    "server": "POSITION_OCCUPIED"
+  }
+}

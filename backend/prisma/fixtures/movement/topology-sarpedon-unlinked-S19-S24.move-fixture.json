@@ -1,0 +1,51 @@
+{
+  "schema": "unmatched.move-fixture/1",
+  "name": "topology-sarpedon-unlinked-S19-S24",
+  "expectSource": "generated",
+  "description": "S19 and S24 are lattice neighbours without a line: not a step (forced one-step path is INVALID_STEP)",
+  "cases": ["MS-E-25"],
+  "board": { "key": "sarpedon", "topologySha256": "d1a7221454e3b6f61a08468f9ea5469071c1683604da8287e7d74c2354978b37" },
+  "fighters": [
+    {
+      "id": "medusa",
+      "ownerId": "p1",
+      "position": { "x": 1, "y": 3 },
+      "name": "Medusa",
+      "type": "HERO",
+      "health": 16,
+      "movement": 1
+    },
+    {
+      "id": "arthur",
+      "ownerId": "p2",
+      "position": { "x": 8, "y": 0 },
+      "name": "King Arthur",
+      "type": "HERO",
+      "health": 18,
+      "movement": 2
+    }
+  ],
+  "draft": {
+    "moves": [
+      {
+        "fighterId": "medusa",
+        "path": [
+          { "x": 2, "y": 3 }
+        ]
+      }
+    ]
+  },
+  "expect": {
+    "layer": "executor",
+    "reach": {
+      "medusa": {
+        "base": [[0, 2], [2, 2], [0, 3]],
+        "boost": []
+      }
+    },
+    "paths": { "medusa": null },
+    "status": { "medusa": "conflict" },
+    "requiredBoost": { "medusa": 0 },
+    "server": "INVALID_STEP"
+  }
+}

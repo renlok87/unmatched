@@ -1,0 +1,49 @@
+{
+  "schema": "unmatched.move-fixture/1",
+  "name": "server-cobble-dto-coord20-manual",
+  "expectSource": "manual",
+  "description": "x = 20 is rejected by @Max(19) of PositionInput before the executor",
+  "cases": ["MS-E-31"],
+  "board": {
+    "key": "cobble-5x6",
+    "lattice": { "width": 5, "height": 6 }
+  },
+  "fighters": [
+    {
+      "id": "medusa",
+      "ownerId": "p1",
+      "position": { "x": 2, "y": 2 },
+      "name": "Medusa",
+      "type": "HERO",
+      "health": 16,
+      "movement": 3
+    },
+    {
+      "id": "arthur",
+      "ownerId": "p2",
+      "position": { "x": 4, "y": 5 },
+      "name": "King Arthur",
+      "type": "HERO",
+      "health": 18,
+      "movement": 2
+    }
+  ],
+  "draft": {
+    "moves": [
+      {
+        "fighterId": "medusa",
+        "path": [
+          { "x": 20, "y": 2 }
+        ]
+      }
+    ]
+  },
+  "expect": {
+    "layer": "dto",
+    "paths": { "medusa": null },
+    "status": { "medusa": "conflict" },
+    "requiredBoost": { "medusa": 0 },
+    "server": "DTO_REJECTED",
+    "serverDetail": "moves.0.path.0.x:max"
+  }
+}

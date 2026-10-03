@@ -1,0 +1,60 @@
+{
+  "schema": "unmatched.move-fixture/1",
+  "name": "multi-marmoreal-swap-manual",
+  "expectSource": "manual",
+  "description": "Medusa (M14) and Harpy 1 (M17) cannot swap",
+  "cases": ["MS-E-35"],
+  "board": { "key": "marmoreal", "topologySha256": "425bebf254a98724c8192ab11d692eceb0ab2e31b7238dab3057b52ac9e5d38f" },
+  "fighters": [
+    {
+      "id": "medusa",
+      "ownerId": "p1",
+      "position": { "x": 1, "y": 2 },
+      "name": "Medusa",
+      "type": "HERO",
+      "health": 16,
+      "movement": 3
+    },
+    {
+      "id": "harpy-1",
+      "ownerId": "p1",
+      "position": { "x": 2, "y": 3 },
+      "name": "Harpy 1",
+      "type": "MINION",
+      "health": 1,
+      "movement": 3
+    },
+    {
+      "id": "arthur",
+      "ownerId": "p2",
+      "position": { "x": 5, "y": 5 },
+      "name": "King Arthur",
+      "type": "HERO",
+      "health": 18,
+      "movement": 2
+    }
+  ],
+  "draft": {
+    "moves": [
+      {
+        "fighterId": "medusa",
+        "path": [
+          { "x": 2, "y": 3 }
+        ]
+      },
+      {
+        "fighterId": "harpy-1",
+        "path": [
+          { "x": 1, "y": 2 }
+        ]
+      }
+    ]
+  },
+  "expect": {
+    "layer": "executor",
+    "paths": { "medusa": null, "harpy-1": null },
+    "status": { "medusa": "conflict", "harpy-1": "conflict" },
+    "requiredBoost": { "medusa": 0, "harpy-1": 0 },
+    "server": "POSITION_OCCUPIED"
+  }
+}

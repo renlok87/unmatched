@@ -1,0 +1,51 @@
+{
+  "schema": "unmatched.move-fixture/1",
+  "name": "tiebreak-marmoreal-M08-M17",
+  "expectSource": "generated",
+  "description": "two shortest paths M08-M09-M17 and M08-M14-M17: K picks M09",
+  "cases": ["MS-E-32"],
+  "board": { "key": "marmoreal", "topologySha256": "425bebf254a98724c8192ab11d692eceb0ab2e31b7238dab3057b52ac9e5d38f" },
+  "fighters": [
+    {
+      "id": "medusa",
+      "ownerId": "p1",
+      "position": { "x": 1, "y": 1 },
+      "name": "Medusa",
+      "type": "HERO",
+      "health": 16,
+      "movement": 2
+    },
+    {
+      "id": "arthur",
+      "ownerId": "p2",
+      "position": { "x": 5, "y": 5 },
+      "name": "King Arthur",
+      "type": "HERO",
+      "health": 18,
+      "movement": 2
+    }
+  ],
+  "draft": {
+    "moves": [
+      {
+        "fighterId": "medusa",
+        "dest": { "x": 2, "y": 3 }
+      }
+    ]
+  },
+  "expect": {
+    "layer": "executor",
+    "reach": {
+      "medusa": {
+        "base": [[0, 0], [0, 1], [2, 1], [0, 2], [1, 2], [3, 2], [2, 3]],
+        "boost": []
+      }
+    },
+    "paths": {
+      "medusa": [[2, 1], [2, 3]]
+    },
+    "status": { "medusa": "ok" },
+    "requiredBoost": { "medusa": 0 },
+    "server": "ok"
+  }
+}

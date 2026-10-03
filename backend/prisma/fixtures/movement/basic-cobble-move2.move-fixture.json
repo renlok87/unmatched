@@ -1,0 +1,54 @@
+{
+  "schema": "unmatched.move-fixture/1",
+  "name": "basic-cobble-move2",
+  "expectSource": "generated",
+  "description": "movement 2 on Cobble 5x6: base plates and a 2-step move",
+  "cases": ["MS-E-01"],
+  "board": {
+    "key": "cobble-5x6",
+    "lattice": { "width": 5, "height": 6 }
+  },
+  "fighters": [
+    {
+      "id": "medusa",
+      "ownerId": "p1",
+      "position": { "x": 2, "y": 2 },
+      "name": "Medusa",
+      "type": "HERO",
+      "health": 16,
+      "movement": 2
+    },
+    {
+      "id": "arthur",
+      "ownerId": "p2",
+      "position": { "x": 4, "y": 5 },
+      "name": "King Arthur",
+      "type": "HERO",
+      "health": 18,
+      "movement": 2
+    }
+  ],
+  "draft": {
+    "moves": [
+      {
+        "fighterId": "medusa",
+        "dest": { "x": 3, "y": 3 }
+      }
+    ]
+  },
+  "expect": {
+    "layer": "executor",
+    "reach": {
+      "medusa": {
+        "base": [[2, 0], [1, 1], [2, 1], [3, 1], [0, 2], [1, 2], [3, 2], [4, 2], [1, 3], [2, 3], [3, 3], [2, 4]],
+        "boost": []
+      }
+    },
+    "paths": {
+      "medusa": [[3, 2], [3, 3]]
+    },
+    "status": { "medusa": "ok" },
+    "requiredBoost": { "medusa": 0 },
+    "server": "ok"
+  }
+}

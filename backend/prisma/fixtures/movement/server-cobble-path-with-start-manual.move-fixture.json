@@ -1,0 +1,51 @@
+{
+  "schema": "unmatched.move-fixture/1",
+  "name": "server-cobble-path-with-start-manual",
+  "expectSource": "manual",
+  "description": "a path that repeats the start cell first: INVALID_STEP",
+  "cases": ["MS-E-18"],
+  "board": {
+    "key": "cobble-5x6",
+    "lattice": { "width": 5, "height": 6 }
+  },
+  "fighters": [
+    {
+      "id": "medusa",
+      "ownerId": "p1",
+      "position": { "x": 1, "y": 1 },
+      "name": "Medusa",
+      "type": "HERO",
+      "health": 16,
+      "movement": 2
+    },
+    {
+      "id": "arthur",
+      "ownerId": "p2",
+      "position": { "x": 4, "y": 5 },
+      "name": "King Arthur",
+      "type": "HERO",
+      "health": 18,
+      "movement": 2
+    }
+  ],
+  "draft": {
+    "moves": [
+      {
+        "fighterId": "medusa",
+        "path": [
+          { "x": 1, "y": 1 },
+          { "x": 2, "y": 1 }
+        ]
+      }
+    ]
+  },
+  "expect": {
+    "layer": "validator",
+    "paths": {
+      "medusa": [[2, 1]]
+    },
+    "status": { "medusa": "ok" },
+    "requiredBoost": { "medusa": 0 },
+    "server": "INVALID_STEP"
+  }
+}

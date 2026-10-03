@@ -1,0 +1,63 @@
+{
+  "schema": "unmatched.move-fixture/1",
+  "name": "blockers-cobble-ally-path-manual",
+  "expectSource": "manual",
+  "description": "the only 2-step way to (2,0) runs through the Harpy on (1,0): legal",
+  "cases": ["MS-E-20", "MS-E-22"],
+  "board": {
+    "key": "cobble-5x6",
+    "lattice": { "width": 5, "height": 6 }
+  },
+  "fighters": [
+    {
+      "id": "medusa",
+      "ownerId": "p1",
+      "position": { "x": 0, "y": 0 },
+      "name": "Medusa",
+      "type": "HERO",
+      "health": 16,
+      "movement": 2
+    },
+    {
+      "id": "harpy-1",
+      "ownerId": "p1",
+      "position": { "x": 1, "y": 0 },
+      "name": "Harpy 1",
+      "type": "MINION",
+      "health": 1,
+      "movement": 3
+    },
+    {
+      "id": "arthur",
+      "ownerId": "p2",
+      "position": { "x": 4, "y": 5 },
+      "name": "King Arthur",
+      "type": "HERO",
+      "health": 18,
+      "movement": 2
+    }
+  ],
+  "draft": {
+    "moves": [
+      {
+        "fighterId": "medusa",
+        "dest": { "x": 2, "y": 0 }
+      }
+    ]
+  },
+  "expect": {
+    "layer": "executor",
+    "reach": {
+      "medusa": {
+        "base": [[0, 1], [2, 0], [1, 1], [0, 2]],
+        "boost": []
+      }
+    },
+    "paths": {
+      "medusa": [[1, 0], [2, 0]]
+    },
+    "status": { "medusa": "ok" },
+    "requiredBoost": { "medusa": 0 },
+    "server": "ok"
+  }
+}

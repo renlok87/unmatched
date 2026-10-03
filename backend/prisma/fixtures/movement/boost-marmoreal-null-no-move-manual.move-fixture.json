@@ -1,0 +1,40 @@
+{
+  "schema": "unmatched.move-fixture/1",
+  "name": "boost-marmoreal-null-no-move-manual",
+  "expectSource": "manual",
+  "description": "moves [] with a card without printed BOOST: the server discards it today",
+  "cases": ["MS-E-81"],
+  "board": { "key": "marmoreal", "topologySha256": "425bebf254a98724c8192ab11d692eceb0ab2e31b7238dab3057b52ac9e5d38f" },
+  "fighters": [
+    {
+      "id": "medusa",
+      "ownerId": "p1",
+      "position": { "x": 0, "y": 2 },
+      "name": "Medusa",
+      "type": "HERO",
+      "health": 16,
+      "movement": 3
+    },
+    {
+      "id": "arthur",
+      "ownerId": "p2",
+      "position": { "x": 5, "y": 5 },
+      "name": "King Arthur",
+      "type": "HERO",
+      "health": 18,
+      "movement": 2
+    }
+  ],
+  "hand": [
+    { "id": "c-null", "boostValue": null }
+  ],
+  "draft": {
+    "moves": [],
+    "boostCardId": "c-null"
+  },
+  "expect": {
+    "layer": "executor",
+    "server": "ok",
+    "pendingRuleChange": { "task": "MS-T-20", "rule": "RL-07 / MS-E-81 (R6 S6)", "server": "BOOST_NO_VALUE" }
+  }
+}

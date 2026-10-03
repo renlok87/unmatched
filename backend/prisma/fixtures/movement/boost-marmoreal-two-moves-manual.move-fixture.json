@@ -1,0 +1,64 @@
+{
+  "schema": "unmatched.move-fixture/1",
+  "name": "boost-marmoreal-two-moves-manual",
+  "expectSource": "manual",
+  "description": "Medusa M13-M04 needs +2, Harpy 1 M27-M12 (M28 M29 M22 M18 M10 M11 M12) needs +4; +2 selected",
+  "cases": ["MS-E-79"],
+  "board": { "key": "marmoreal", "topologySha256": "425bebf254a98724c8192ab11d692eceb0ab2e31b7238dab3057b52ac9e5d38f" },
+  "fighters": [
+    {
+      "id": "medusa",
+      "ownerId": "p1",
+      "position": { "x": 0, "y": 2 },
+      "name": "Medusa",
+      "type": "HERO",
+      "health": 16,
+      "movement": 3
+    },
+    {
+      "id": "harpy-1",
+      "ownerId": "p1",
+      "position": { "x": 1, "y": 5 },
+      "name": "Harpy 1",
+      "type": "MINION",
+      "health": 1,
+      "movement": 3
+    },
+    {
+      "id": "arthur",
+      "ownerId": "p2",
+      "position": { "x": 5, "y": 0 },
+      "name": "King Arthur",
+      "type": "HERO",
+      "health": 18,
+      "movement": 2
+    }
+  ],
+  "hand": [
+    { "id": "c2", "boostValue": 2 },
+    { "id": "c4", "boostValue": 4 }
+  ],
+  "draft": {
+    "moves": [
+      {
+        "fighterId": "medusa",
+        "dest": { "x": 3, "y": 0 }
+      },
+      {
+        "fighterId": "harpy-1",
+        "dest": { "x": 6, "y": 1 }
+      }
+    ],
+    "boostCardId": "c2"
+  },
+  "expect": {
+    "layer": "executor",
+    "paths": {
+      "medusa": [[0, 1], [0, 0], [1, 0], [2, 0], [3, 0]],
+      "harpy-1": [[2, 5], [3, 5], [3, 3], [4, 3], [4, 1], [5, 1], [6, 1]]
+    },
+    "status": { "medusa": "ok", "harpy-1": "needBoost" },
+    "requiredBoost": { "medusa": 2, "harpy-1": 4 },
+    "server": "NOT_ENOUGH_MOVEMENT"
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "schema": "unmatched.move-fixture/1",
+  "name": "topology-sarpedon-degree5-S11",
+  "expectSource": "generated",
+  "description": "degree-5 vertex S11 (and S21): S11-S21-S24",
+  "cases": ["MS-E-28"],
+  "board": { "key": "sarpedon", "topologySha256": "d1a7221454e3b6f61a08468f9ea5469071c1683604da8287e7d74c2354978b37" },
+  "fighters": [
+    {
+      "id": "medusa",
+      "ownerId": "p1",
+      "position": { "x": 3, "y": 1 },
+      "name": "Medusa",
+      "type": "HERO",
+      "health": 16,
+      "movement": 2
+    },
+    {
+      "id": "arthur",
+      "ownerId": "p2",
+      "position": { "x": 7, "y": 5 },
+      "name": "King Arthur",
+      "type": "HERO",
+      "health": 18,
+      "movement": 2
+    }
+  ],
+  "draft": {
+    "moves": [
+      {
+        "fighterId": "medusa",
+        "dest": { "x": 2, "y": 3 }
+      }
+    ]
+  },
+  "expect": {
+    "layer": "executor",
+    "reach": {
+      "medusa": {
+        "base": [[1, 0], [2, 0], [3, 0], [4, 0], [1, 1], [2, 1], [4, 1], [5, 1], [2, 2], [3, 2], [2, 3], [3, 4]],
+        "boost": []
+      }
+    },
+    "paths": {
+      "medusa": [[3, 2], [2, 3]]
+    },
+    "status": { "medusa": "ok" },
+    "requiredBoost": { "medusa": 0 },
+    "server": "ok"
+  }
+}

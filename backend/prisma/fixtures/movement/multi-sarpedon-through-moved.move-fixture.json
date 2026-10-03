@@ -1,0 +1,69 @@
+{
+  "schema": "unmatched.move-fixture/1",
+  "name": "multi-sarpedon-through-moved",
+  "expectSource": "generated",
+  "description": "A steps S19-S20, then B goes S23-S19-S20-S10 through A",
+  "cases": ["MS-E-37"],
+  "board": { "key": "sarpedon", "topologySha256": "d1a7221454e3b6f61a08468f9ea5469071c1683604da8287e7d74c2354978b37" },
+  "fighters": [
+    {
+      "id": "medusa",
+      "ownerId": "p1",
+      "position": { "x": 1, "y": 3 },
+      "name": "Medusa",
+      "type": "HERO",
+      "health": 16,
+      "movement": 3
+    },
+    {
+      "id": "harpy-1",
+      "ownerId": "p1",
+      "position": { "x": 0, "y": 3 },
+      "name": "Harpy 1",
+      "type": "MINION",
+      "health": 1,
+      "movement": 3
+    },
+    {
+      "id": "arthur",
+      "ownerId": "p2",
+      "position": { "x": 7, "y": 5 },
+      "name": "King Arthur",
+      "type": "HERO",
+      "health": 18,
+      "movement": 2
+    }
+  ],
+  "draft": {
+    "moves": [
+      {
+        "fighterId": "medusa",
+        "dest": { "x": 2, "y": 2 }
+      },
+      {
+        "fighterId": "harpy-1",
+        "dest": { "x": 2, "y": 1 }
+      }
+    ]
+  },
+  "expect": {
+    "layer": "executor",
+    "reach": {
+      "medusa": {
+        "base": [[0, 0], [2, 0], [0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [0, 2], [2, 2], [3, 2], [2, 3], [0, 4], [1, 4], [2, 4], [3, 4], [1, 5]],
+        "boost": []
+      },
+      "harpy-1": {
+        "base": [[0, 0], [0, 1], [1, 1], [2, 1], [0, 2], [1, 3], [3, 2], [2, 3], [0, 4], [1, 4], [2, 4], [3, 4], [1, 5]],
+        "boost": []
+      }
+    },
+    "paths": {
+      "medusa": [[2, 2]],
+      "harpy-1": [[1, 3], [2, 2], [2, 1]]
+    },
+    "status": { "medusa": "ok", "harpy-1": "ok" },
+    "requiredBoost": { "medusa": 0, "harpy-1": 0 },
+    "server": "ok"
+  }
+}

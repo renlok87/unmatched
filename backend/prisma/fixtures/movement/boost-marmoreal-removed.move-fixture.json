@@ -1,0 +1,54 @@
+{
+  "schema": "unmatched.move-fixture/1",
+  "name": "boost-marmoreal-removed",
+  "expectSource": "generated",
+  "description": "boost removed after drawing: the 6-step move becomes NeedBoost(3), not Conflict",
+  "cases": ["MS-E-13", "MS-E-14", "MS-E-19"],
+  "board": { "key": "marmoreal", "topologySha256": "425bebf254a98724c8192ab11d692eceb0ab2e31b7238dab3057b52ac9e5d38f" },
+  "fighters": [
+    {
+      "id": "medusa",
+      "ownerId": "p1",
+      "position": { "x": 0, "y": 2 },
+      "name": "Medusa",
+      "type": "HERO",
+      "health": 16,
+      "movement": 3
+    },
+    {
+      "id": "arthur",
+      "ownerId": "p2",
+      "position": { "x": 5, "y": 5 },
+      "name": "King Arthur",
+      "type": "HERO",
+      "health": 18,
+      "movement": 2
+    }
+  ],
+  "hand": [
+    { "id": "c4", "boostValue": 4 }
+  ],
+  "draft": {
+    "moves": [
+      {
+        "fighterId": "medusa",
+        "dest": { "x": 4, "y": 0 }
+      }
+    ]
+  },
+  "expect": {
+    "layer": "executor",
+    "reach": {
+      "medusa": {
+        "base": [[0, 0], [1, 0], [0, 1], [1, 1], [2, 1], [1, 2], [0, 3], [1, 3], [2, 4], [1, 5], [2, 5]],
+        "boost": [[2, 0], [3, 0], [4, 0], [5, 0], [4, 1], [5, 1], [6, 1], [3, 2], [6, 2], [2, 3], [4, 3], [5, 2], [3, 3], [5, 3], [6, 3], [4, 4], [3, 5], [4, 5]]
+      }
+    },
+    "paths": {
+      "medusa": [[0, 1], [0, 0], [1, 0], [2, 0], [3, 0], [4, 0]]
+    },
+    "status": { "medusa": "needBoost" },
+    "requiredBoost": { "medusa": 3 },
+    "server": "NOT_ENOUGH_MOVEMENT"
+  }
+}

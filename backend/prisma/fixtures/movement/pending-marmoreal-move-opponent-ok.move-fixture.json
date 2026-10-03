@@ -1,0 +1,61 @@
+{
+  "schema": "unmatched.move-fixture/1",
+  "name": "pending-marmoreal-move-opponent-ok",
+  "expectSource": "generated",
+  "description": "p1 moves Arthur (p2) M14-M09-M15",
+  "cases": ["MS-E-59"],
+  "board": { "key": "marmoreal", "topologySha256": "425bebf254a98724c8192ab11d692eceb0ab2e31b7238dab3057b52ac9e5d38f" },
+  "fighters": [
+    {
+      "id": "medusa",
+      "ownerId": "p1",
+      "position": { "x": 1, "y": 1 },
+      "name": "Medusa",
+      "type": "HERO",
+      "health": 16,
+      "movement": 3
+    },
+    {
+      "id": "arthur",
+      "ownerId": "p2",
+      "position": { "x": 1, "y": 2 },
+      "name": "King Arthur",
+      "type": "HERO",
+      "health": 18,
+      "movement": 2
+    },
+    {
+      "id": "harpy-1",
+      "ownerId": "p1",
+      "position": { "x": 5, "y": 5 },
+      "name": "Harpy 1",
+      "type": "MINION",
+      "health": 1,
+      "movement": 3
+    }
+  ],
+  "pending": {
+    "type": "MOVE",
+    "fighterId": "arthur",
+    "ownerId": "p1",
+    "value": 2,
+    "targetsOpponent": true,
+    "optional": true,
+    "target": { "x": 3, "y": 2 }
+  },
+  "expect": {
+    "layer": "resolvePending",
+    "reach": {
+      "arthur": {
+        "base": [[2, 1], [3, 2], [2, 3], [3, 3]],
+        "boost": []
+      }
+    },
+    "paths": {
+      "arthur": [[2, 1], [3, 2]]
+    },
+    "status": { "arthur": "ok" },
+    "requiredBoost": { "arthur": 0 },
+    "server": "ok"
+  }
+}

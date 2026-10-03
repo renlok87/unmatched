@@ -1,0 +1,60 @@
+{
+  "schema": "unmatched.move-fixture/1",
+  "name": "pending-marmoreal-move-stay-value0",
+  "expectSource": "generated",
+  "description": "value 0: staying on the own space is the only legal answer",
+  "cases": ["MS-E-76", "MS-E-58"],
+  "board": { "key": "marmoreal", "topologySha256": "425bebf254a98724c8192ab11d692eceb0ab2e31b7238dab3057b52ac9e5d38f" },
+  "fighters": [
+    {
+      "id": "medusa",
+      "ownerId": "p1",
+      "position": { "x": 0, "y": 2 },
+      "name": "Medusa",
+      "type": "HERO",
+      "health": 16,
+      "movement": 3
+    },
+    {
+      "id": "harpy-1",
+      "ownerId": "p1",
+      "position": { "x": 1, "y": 2 },
+      "name": "Harpy 1",
+      "type": "MINION",
+      "health": 1,
+      "movement": 3
+    },
+    {
+      "id": "arthur",
+      "ownerId": "p2",
+      "position": { "x": 5, "y": 5 },
+      "name": "King Arthur",
+      "type": "HERO",
+      "health": 18,
+      "movement": 2
+    }
+  ],
+  "pending": {
+    "type": "MOVE",
+    "fighterId": "harpy-1",
+    "ownerId": "p1",
+    "value": 0,
+    "optional": true,
+    "target": { "x": 1, "y": 2 }
+  },
+  "expect": {
+    "layer": "resolvePending",
+    "reach": {
+      "harpy-1": {
+        "base": [],
+        "boost": []
+      }
+    },
+    "paths": {
+      "harpy-1": []
+    },
+    "status": { "harpy-1": "ok" },
+    "requiredBoost": { "harpy-1": 0 },
+    "server": "ok"
+  }
+}

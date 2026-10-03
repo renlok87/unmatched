@@ -1,0 +1,74 @@
+{
+  "schema": "unmatched.move-fixture/1",
+  "name": "blockers-cobble-defeated-manual",
+  "expectSource": "manual",
+  "description": "a defeated Merlin (health 0) on (1,0) and a dirty 'isDefeated with health 3' shade on (0,1) block nothing",
+  "cases": ["MS-E-23", "MS-E-24"],
+  "board": {
+    "key": "cobble-5x6",
+    "lattice": { "width": 5, "height": 6 }
+  },
+  "fighters": [
+    {
+      "id": "medusa",
+      "ownerId": "p1",
+      "position": { "x": 0, "y": 0 },
+      "name": "Medusa",
+      "type": "HERO",
+      "health": 16,
+      "movement": 1
+    },
+    {
+      "id": "arthur",
+      "ownerId": "p2",
+      "position": { "x": 4, "y": 5 },
+      "name": "King Arthur",
+      "type": "HERO",
+      "health": 18,
+      "movement": 2
+    },
+    {
+      "id": "merlin",
+      "ownerId": "p2",
+      "position": { "x": 1, "y": 0 },
+      "name": "Merlin",
+      "type": "MINION",
+      "health": 0,
+      "isDefeated": true,
+      "movement": 2
+    },
+    {
+      "id": "shade",
+      "ownerId": "p2",
+      "position": { "x": 0, "y": 1 },
+      "name": "Shade",
+      "type": "MINION",
+      "health": 3,
+      "isDefeated": true,
+      "movement": 2
+    }
+  ],
+  "draft": {
+    "moves": [
+      {
+        "fighterId": "medusa",
+        "dest": { "x": 1, "y": 0 }
+      }
+    ]
+  },
+  "expect": {
+    "layer": "executor",
+    "reach": {
+      "medusa": {
+        "base": [[1, 0], [0, 1]],
+        "boost": []
+      }
+    },
+    "paths": {
+      "medusa": [[1, 0]]
+    },
+    "status": { "medusa": "ok" },
+    "requiredBoost": { "medusa": 0 },
+    "server": "ok"
+  }
+}

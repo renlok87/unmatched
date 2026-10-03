@@ -1,0 +1,60 @@
+{
+  "schema": "unmatched.move-fixture/1",
+  "name": "blockers-sarpedon-ally-path",
+  "expectSource": "generated",
+  "description": "a Harpy on S21 is passable: S20-S21-S12",
+  "cases": ["MS-E-20"],
+  "board": { "key": "sarpedon", "topologySha256": "d1a7221454e3b6f61a08468f9ea5469071c1683604da8287e7d74c2354978b37" },
+  "fighters": [
+    {
+      "id": "medusa",
+      "ownerId": "p1",
+      "position": { "x": 2, "y": 2 },
+      "name": "Medusa",
+      "type": "HERO",
+      "health": 16,
+      "movement": 2
+    },
+    {
+      "id": "harpy-1",
+      "ownerId": "p1",
+      "position": { "x": 3, "y": 2 },
+      "name": "Harpy 1",
+      "type": "MINION",
+      "health": 1,
+      "movement": 3
+    },
+    {
+      "id": "arthur",
+      "ownerId": "p2",
+      "position": { "x": 5, "y": 5 },
+      "name": "King Arthur",
+      "type": "HERO",
+      "health": 18,
+      "movement": 2
+    }
+  ],
+  "draft": {
+    "moves": [
+      {
+        "fighterId": "medusa",
+        "dest": { "x": 4, "y": 1 }
+      }
+    ]
+  },
+  "expect": {
+    "layer": "executor",
+    "reach": {
+      "medusa": {
+        "base": [[2, 0], [1, 1], [2, 1], [3, 1], [4, 1], [0, 2], [1, 3], [0, 3], [2, 3], [2, 4], [3, 4]],
+        "boost": []
+      }
+    },
+    "paths": {
+      "medusa": [[3, 2], [4, 1]]
+    },
+    "status": { "medusa": "ok" },
+    "requiredBoost": { "medusa": 0 },
+    "server": "ok"
+  }
+}

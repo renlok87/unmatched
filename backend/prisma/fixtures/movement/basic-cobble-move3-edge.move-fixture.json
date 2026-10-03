@@ -1,0 +1,54 @@
+{
+  "schema": "unmatched.move-fixture/1",
+  "name": "basic-cobble-move3-edge",
+  "expectSource": "generated",
+  "description": "movement 3 from the corner of Cobble 5x6: plates clipped by the board edge",
+  "cases": ["MS-E-01"],
+  "board": {
+    "key": "cobble-5x6",
+    "lattice": { "width": 5, "height": 6 }
+  },
+  "fighters": [
+    {
+      "id": "medusa",
+      "ownerId": "p1",
+      "position": { "x": 4, "y": 5 },
+      "name": "Medusa",
+      "type": "HERO",
+      "health": 16,
+      "movement": 3
+    },
+    {
+      "id": "arthur",
+      "ownerId": "p2",
+      "position": { "x": 0, "y": 0 },
+      "name": "King Arthur",
+      "type": "HERO",
+      "health": 18,
+      "movement": 2
+    }
+  ],
+  "draft": {
+    "moves": [
+      {
+        "fighterId": "medusa",
+        "dest": { "x": 2, "y": 4 }
+      }
+    ]
+  },
+  "expect": {
+    "layer": "executor",
+    "reach": {
+      "medusa": {
+        "base": [[4, 2], [3, 3], [4, 3], [2, 4], [3, 4], [4, 4], [1, 5], [2, 5], [3, 5]],
+        "boost": []
+      }
+    },
+    "paths": {
+      "medusa": [[4, 4], [3, 4], [2, 4]]
+    },
+    "status": { "medusa": "ok" },
+    "requiredBoost": { "medusa": 0 },
+    "server": "ok"
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "schema": "unmatched.move-fixture/1",
+  "name": "tiebreak-sarpedon-S31-S18-manual",
+  "expectSource": "manual",
+  "description": "K compares spaceId first: S31-S21-S20-S19-S18, not the (y,x)-first S31-S30-S29-S23-S18",
+  "cases": ["MS-E-32"],
+  "board": { "key": "sarpedon", "topologySha256": "d1a7221454e3b6f61a08468f9ea5469071c1683604da8287e7d74c2354978b37" },
+  "fighters": [
+    {
+      "id": "medusa",
+      "ownerId": "p1",
+      "position": { "x": 3, "y": 4 },
+      "name": "Medusa",
+      "type": "HERO",
+      "health": 16,
+      "movement": 4
+    },
+    {
+      "id": "arthur",
+      "ownerId": "p2",
+      "position": { "x": 7, "y": 5 },
+      "name": "King Arthur",
+      "type": "HERO",
+      "health": 18,
+      "movement": 2
+    }
+  ],
+  "draft": {
+    "moves": [
+      {
+        "fighterId": "medusa",
+        "dest": { "x": 0, "y": 2 }
+      }
+    ]
+  },
+  "expect": {
+    "layer": "executor",
+    "paths": {
+      "medusa": [[3, 2], [2, 2], [1, 3], [0, 2]]
+    },
+    "status": { "medusa": "ok" },
+    "requiredBoost": { "medusa": 0 },
+    "server": "ok"
+  }
+}

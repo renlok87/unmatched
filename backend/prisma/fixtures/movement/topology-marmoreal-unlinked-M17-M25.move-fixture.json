@@ -1,0 +1,51 @@
+{
+  "schema": "unmatched.move-fixture/1",
+  "name": "topology-marmoreal-unlinked-M17-M25",
+  "expectSource": "generated",
+  "description": "M17 and M25 are lattice neighbours without a line: not a step (forced one-step path is INVALID_STEP)",
+  "cases": ["MS-E-25"],
+  "board": { "key": "marmoreal", "topologySha256": "425bebf254a98724c8192ab11d692eceb0ab2e31b7238dab3057b52ac9e5d38f" },
+  "fighters": [
+    {
+      "id": "medusa",
+      "ownerId": "p1",
+      "position": { "x": 2, "y": 3 },
+      "name": "Medusa",
+      "type": "HERO",
+      "health": 16,
+      "movement": 1
+    },
+    {
+      "id": "arthur",
+      "ownerId": "p2",
+      "position": { "x": 5, "y": 5 },
+      "name": "King Arthur",
+      "type": "HERO",
+      "health": 18,
+      "movement": 2
+    }
+  ],
+  "draft": {
+    "moves": [
+      {
+        "fighterId": "medusa",
+        "path": [
+          { "x": 2, "y": 4 }
+        ]
+      }
+    ]
+  },
+  "expect": {
+    "layer": "executor",
+    "reach": {
+      "medusa": {
+        "base": [[2, 1], [1, 2], [3, 3]],
+        "boost": []
+      }
+    },
+    "paths": { "medusa": null },
+    "status": { "medusa": "conflict" },
+    "requiredBoost": { "medusa": 0 },
+    "server": "INVALID_STEP"
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "schema": "unmatched.move-fixture/1",
+  "name": "basic-grid20-edge",
+  "expectSource": "generated",
+  "description": "movement 2 from the corner (0,0) of a 20x20 grid",
+  "cases": ["MS-E-01"],
+  "board": {
+    "key": "grid-20x20",
+    "lattice": { "width": 20, "height": 20 }
+  },
+  "fighters": [
+    {
+      "id": "medusa",
+      "ownerId": "p1",
+      "position": { "x": 0, "y": 0 },
+      "name": "Medusa",
+      "type": "HERO",
+      "health": 16,
+      "movement": 2
+    },
+    {
+      "id": "arthur",
+      "ownerId": "p2",
+      "position": { "x": 19, "y": 19 },
+      "name": "King Arthur",
+      "type": "HERO",
+      "health": 18,
+      "movement": 2
+    }
+  ],
+  "draft": {
+    "moves": [
+      {
+        "fighterId": "medusa",
+        "dest": { "x": 1, "y": 1 }
+      }
+    ]
+  },
+  "expect": {
+    "layer": "executor",
+    "reach": {
+      "medusa": {
+        "base": [[1, 0], [2, 0], [0, 1], [1, 1], [0, 2]],
+        "boost": []
+      }
+    },
+    "paths": {
+      "medusa": [[1, 0], [1, 1]]
+    },
+    "status": { "medusa": "ok" },
+    "requiredBoost": { "medusa": 0 },
+    "server": "ok"
+  }
+}
