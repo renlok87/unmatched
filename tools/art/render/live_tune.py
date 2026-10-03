@@ -267,7 +267,12 @@ def cmd_start(a: argparse.Namespace) -> int:
     # the packaged client reads the pak at start; its reloads read the worktree files (profilesSource=override)
     reload_profiles = a.profiles or (str(PROFILES) if a.packaged else None)
     reload_env = a.env_dir or (str(ENV_DIR) if a.packaged else None)
-    args = client_args(mode, a.map, session_dir, warmup, bench, a.profiles, a.env_dir, a.extra or [],
+    extra = list(a.extra or [])
+    if getattr(a, "tuner", False) or getattr(a, "tuner_file", None):
+        extra.append("-ArtTuner")
+    if getattr(a, "tuner_file", None):
+        extra.append(f"-ArtTunerFile={Path(a.tuner_file).resolve().as_posix()}")
+    args = client_args(mode, a.map, session_dir, warmup, bench, a.profiles, a.env_dir, extra,
                        art_view=getattr(a, "art_view", False))
     lock = Path(a.lock) if a.lock else GPU_LOCK
     lock_acquire(lock, f"live-tune {a.map} starting", timeout=a.lock_timeout)
@@ -401,6 +406,82 @@ def cmd_cycle(a):
 def cmd_state(a):
     s = load_session(Path(a.root))
     return report(send(s, {"action": "state"}, a.timeout or 60.0))
+
+
+# ---- Art Tuner (docs/art-pipeline/ART-TUNER-PLAN.md section 8): the panel's code path, driven by an agent ----
+
+def parse_value(text: str):
+    """--value: JSON (7.5, true, "#FFE0C0", [0.6, 0.7, 1.0]); a bare word is taken as a string."""
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        return text
+
+
+def tune_cmd(a: argparse.Namespace) -> dict:
+    sets = list(a.set or [])
+    if a.pointer is not None:
+        sets.insert(0, f"{a.pointer}={a.value}")
+    entries = []
+    for item in sets:
+        if "=" not in item:
+            raise LiveTuneError(f"--set needs <pointer or row id>=<json value>: {item}", 2)
+        pointer, value = item.split("=", 1)
+        entries.append({"pointer": pointer, "value": parse_value(value)})
+    if not entries:
+        raise LiveTuneError("tune: give --pointer/--value or --set pointer=value", 2)
+    return {"action": "tune", "entries": entries}
+
+
+def cmd_tune(a):
+    s = load_session(Path(a.root))
+    return report(send(s, tune_cmd(a), a.timeout or 60.0))
+
+
+def cmd_tuner_state(a):
+    s = load_session(Path(a.root))
+    return report(send(s, {"action": "tunerState"}, a.timeout or 60.0))
+
+
+def cmd_tuner_save(a):
+    s = load_session(Path(a.root))
+    cmd = {"action": "tunerSave"}
+    if a.file:
+        cmd["file"] = Path(a.file).resolve().as_posix()
+    return report(send(s, cmd, a.timeout or 60.0))
+
+
+def cmd_tuner_reset(a):
+    s = load_session(Path(a.root))
+    cmd = {"action": "tunerReset"}
+    if a.group:
+        cmd["group"] = a.group
+    return report(send(s, cmd, a.timeout or 60.0))
+
+
+def cmd_tuner_panel(a):
+    s = load_session(Path(a.root))
+    return report(send(s, {"action": "tunerPanel", "open": a.state == "open"}, a.timeout or 60.0))
+
+
+def art_view_cmd(a: argparse.Namespace) -> dict:
+    cmd: dict = {"action": "artView"}
+    for key in ("view", "yaw", "pitch", "select"):
+        v = getattr(a, key, None)
+        if v is not None:
+            cmd[key] = v
+    if a.pan is not None:
+        cmd["pan"] = [float(x) for x in a.pan.split(",")]
+    for key in ("hero_light", "pause", "help"):
+        v = getattr(a, key, None)
+        if v is not None:
+            cmd[{"hero_light": "heroLight"}.get(key, key)] = v == "on"
+    return cmd
+
+
+def cmd_art_view(a):
+    s = load_session(Path(a.root))
+    return report(send(s, art_view_cmd(a), a.timeout or 60.0))
 
 
 def cmd_stop(a):
@@ -542,6 +623,7 @@ class FakeClient(threading.Thread):
         self.last = 0
         self.stop_flag = threading.Event()
         self.revision = 1
+        self.tuned: dict = {}
 
     def run(self):
         (self.dir / "ready.json").write_text(json.dumps({"state": "ready", "board": {"profile": "fake"}}), encoding="utf-8")
@@ -582,6 +664,25 @@ class FakeClient(threading.Thread):
                 res["files"].append(str(trace))
             elif cmd["action"] == "state":
                 res["state"] = {"profiles": {"revision": self.revision}}
+            elif cmd["action"] == "tune":
+                bad = [e["pointer"] for e in cmd.get("entries", []) if not str(e.get("pointer", "")).startswith(("/", "hero", "scene"))]
+                if bad:
+                    res.update(ok=False, errors=[f"{p} - not a tuner row" for p in bad])
+                else:
+                    self.tuned.update({e["pointer"]: e["value"] for e in cmd["entries"]})
+                    res["applied"] = [{"pointer": e["pointer"], "value": e["value"]} for e in cmd["entries"]]
+                    res["entries"] = len(self.tuned)
+            elif cmd["action"] == "tunerState":
+                res["tuner"] = {"active": True, "entries": [{"pointer": k, "value": v} for k, v in self.tuned.items()]}
+            elif cmd["action"] == "tunerSave":
+                path = Path(cmd.get("file") or (self.dir / "overrides.json"))
+                path.write_text(json.dumps({"schema": "unmatched.art-tuner-overrides/1", "boards": [
+                    {"board": "fake", "entries": [{"pointer": k, "value": v} for k, v in self.tuned.items()]}]}), encoding="utf-8")
+                res["files"] = [str(path)]
+            elif cmd["action"] == "tunerReset":
+                self.tuned.clear()
+            elif cmd["action"] in ("tunerPanel", "artView"):
+                res["echo"] = {k: v for k, v in cmd.items() if k not in ("seq", "action")}
             elif cmd["action"] == "quit":
                 self.stop_flag.set()
             write_atomic(self.dir / f"done-{seq}.json", json.dumps(res))
@@ -629,6 +730,24 @@ def self_check() -> list[str]:
                 fails.append(f"state {r}")
             if next_seq(sdir) != 5:
                 fails.append(f"next seq {next_seq(sdir)}")
+            # Art Tuner commands (the command shapes; the real checks are the UE automation tests)
+            ta = argparse.Namespace(pointer="heroKey.key.lux", value="7.5", set=["/x/colorSrgb=\"#FFE0C0\"", "/x/c=[0.6, 0.7, 1]"])
+            tc = tune_cmd(ta)
+            if [e["value"] for e in tc["entries"]] != [7.5, "#FFE0C0", [0.6, 0.7, 1]]:
+                fails.append(f"tune values {tc}")
+            r = send(session, tc, 5)
+            if not r["ok"] or r["entries"] != 3:
+                fails.append(f"tune {r}")
+            r = send(session, {"action": "tunerSave", "file": str(root / "ov.json")}, 5)
+            if not r["ok"] or not (root / "ov.json").exists():
+                fails.append(f"tunerSave {r}")
+            av = art_view_cmd(argparse.Namespace(view="K2x1.6", yaw=-60.0, pitch=None, select=None, pan="10,-20",
+                                                 hero_light="off", pause=None, help=None))
+            if av != {"action": "artView", "view": "K2x1.6", "yaw": -60.0, "pan": [10.0, -20.0], "heroLight": False}:
+                fails.append(f"artView cmd {av}")
+            r = send(session, {"action": "tunerReset"}, 5)
+            if not r["ok"]:
+                fails.append(f"tunerReset {r}")
             # stop: quit answered, the lock released (ours), the pointer gone
             rc = cmd_stop(argparse.Namespace(root=str(root), timeout=5))
             if rc != 0 or lock.exists() or pointer_path(root).exists():
@@ -685,6 +804,8 @@ def main(argv: list[str] | None = None) -> int:
     st.add_argument("--lock-timeout", type=float, default=3600.0)
     st.add_argument("--extra", action="append", help="extra client argument (repeat; use --extra=-Flag)")
     st.add_argument("--art-view", action="store_true", help="-ArtView=<map> instead of -Bench: live fx, free camera (Art Tuner)")
+    st.add_argument("--tuner", action="store_true", help="-ArtTuner: the panel model (tune / tuner-* commands)")
+    st.add_argument("--tuner-file", help="-ArtTunerFile=<path>: the overrides file the tuner saves / loads (implies --tuner)")
     for name in ("reload", "cycle"):
         p = sub.add_parser(name)
         p.add_argument("--profiles")
@@ -710,6 +831,31 @@ def main(argv: list[str] | None = None) -> int:
             p.add_argument("--timeout", type=float)
     for name in ("state", "stop"):
         sub.add_parser(name).add_argument("--timeout", type=float)
+    tp = sub.add_parser("tune", help="Art Tuner: set panel rows (registry pointer or row id) and apply at once")
+    tp.add_argument("--pointer", help="row pointer or id, e.g. heroKey.key.lux or /lightProfiles/sarpedon-night/heroLight/key/lux")
+    tp.add_argument("--value", help="JSON value: 7.5, true, \"#FFE0C0\", [0.6,0.7,1.0]")
+    tp.add_argument("--set", action="append", help="<pointer or id>=<json value> (repeat)")
+    tp.add_argument("--timeout", type=float)
+    sub.add_parser("tuner-state", help="Art Tuner: the rows, values and entries").add_argument("--timeout", type=float)
+    sp = sub.add_parser("tuner-save", help="Art Tuner: write S08ArtTuner.overrides.json")
+    sp.add_argument("--file")
+    sp.add_argument("--timeout", type=float)
+    rp = sub.add_parser("tuner-reset", help="Art Tuner: a group (or everything) back to the profile file")
+    rp.add_argument("--group")
+    rp.add_argument("--timeout", type=float)
+    pp = sub.add_parser("tuner-panel", help="Art Tuner: open / close the panel (shots with the panel)")
+    pp.add_argument("state", choices=["open", "close"])
+    pp.add_argument("--timeout", type=float)
+    vp = sub.add_parser("art-view", help="-ArtView camera / keys: view, orbit, pan, selection, hero light, pause, help")
+    vp.add_argument("--view")
+    vp.add_argument("--yaw", type=float)
+    vp.add_argument("--pitch", type=float)
+    vp.add_argument("--pan", help="x,y uu")
+    vp.add_argument("--select", help="fighter id ('' clears)")
+    vp.add_argument("--hero-light", choices=["on", "off"])
+    vp.add_argument("--pause", choices=["on", "off"])
+    vp.add_argument("--help-card", dest="help", choices=["on", "off"])
+    vp.add_argument("--timeout", type=float)
     bp = sub.add_parser("bench", help="one fresh -Bench launch (the fidelity reference)")
     bp.add_argument("--map", required=True, choices=sorted(FIXTURES))
     bp.add_argument("--views", required=True)
@@ -732,7 +878,9 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps({"selfTest": "PASS" if not fails else "FAIL", "failures": fails}, indent=2))
         return 0 if not fails else 1
     handlers = {"start": cmd_start, "reload": cmd_reload, "shot": cmd_shot, "cycle": cmd_cycle, "state": cmd_state,
-                "stop": cmd_stop, "compare": cmd_compare, "bench": cmd_bench}
+                "stop": cmd_stop, "compare": cmd_compare, "bench": cmd_bench, "tune": cmd_tune,
+                "tuner-state": cmd_tuner_state, "tuner-save": cmd_tuner_save, "tuner-reset": cmd_tuner_reset,
+                "tuner-panel": cmd_tuner_panel, "art-view": cmd_art_view}
     if a.cmd not in handlers:
         ap.print_usage(sys.stderr)
         return 2

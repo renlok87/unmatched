@@ -1,0 +1,83 @@
+{
+ "schema": "unmatched.art-tuner-params/1",
+ "note": "Art Tuner (docs/art-pipeline/ART-TUNER-PLAN.md): the rows of the in-game panel. Ranges: min/max = the C++ parser bounds (minHard/maxHard: a value outside is refused; soft = the parser only needs > 0); sliderMin/sliderMax = the slider ends only (the number field takes more). Pointers are RFC 6901 into S08ArtBoardProfiles.json; {profile} = the board's light profile id, {board} = the board's index; 'each' = one row block per element of that array ({each} = its pointer, {id} / {name} = its id / name). cross = checked together with other fields by the parser. scope = how a change reaches the scene: heroLight / profileLights / mapGrade / conceptLights / materials = on the components at once, rebuild = a board rebuild (throttled). Status: предложено.",
+ "groups": [
+  {"id": "heroKey", "label": "Подсветка героев · ключ", "scope": "heroLight", "when": "/lightProfiles/{profile}/heroLight/key", "params": [
+   {"id": "key.lux", "label": "Ключ · сила", "pointer": "/lightProfiles/{profile}/heroLight/key/lux", "type": "number", "step": 0.1, "min": 0.1, "minHard": false, "max": 50, "maxHard": true, "unit": "лк"},
+   {"id": "key.color", "label": "Ключ · цвет", "pointer": "/lightProfiles/{profile}/heroLight/key/colorSrgb", "type": "colorSrgb"},
+   {"id": "key.azimuth", "label": "Ключ · азимут", "pointer": "/lightProfiles/{profile}/heroLight/key/azimuthDeg", "type": "number", "step": 1, "min": -360, "minHard": true, "max": 360, "maxHard": true, "sliderMin": -180, "sliderMax": 180, "unit": "°"},
+   {"id": "key.elevation", "label": "Ключ · высота", "pointer": "/lightProfiles/{profile}/heroLight/key/elevationDeg", "type": "number", "step": 1, "min": 5, "minHard": true, "max": 89, "maxHard": true, "unit": "°"},
+   {"id": "key.inner", "label": "Ключ · конус внутр.", "pointer": "/lightProfiles/{profile}/heroLight/key/innerConeDeg", "type": "number", "step": 1, "min": 0, "minHard": true, "max": 80, "maxHard": true, "unit": "°", "cross": true, "note": "не больше внешнего"},
+   {"id": "key.outer", "label": "Ключ · конус внеш.", "pointer": "/lightProfiles/{profile}/heroLight/key/outerConeDeg", "type": "number", "step": 1, "min": 1, "minHard": true, "max": 80, "maxHard": true, "unit": "°", "cross": true},
+   {"id": "key.heightMul", "label": "Ключ · высота источника", "pointer": "/lightProfiles/{profile}/heroLight/key/heightMul", "type": "number", "step": 0.05, "min": 0.3, "minHard": true, "max": 6, "maxHard": true, "unit": "× фигуры", "cross": true, "note": "не ниже точки прицела + 0,2"},
+   {"id": "key.radiusMul", "label": "Ключ · радиус", "pointer": "/lightProfiles/{profile}/heroLight/key/radiusMul", "type": "number", "step": 0.05, "min": 1.05, "minHard": true, "max": 4, "maxHard": true, "unit": "× расст."},
+   {"id": "key.specular", "label": "Ключ · блик", "pointer": "/lightProfiles/{profile}/heroLight/key/specularScale", "type": "number", "step": 0.05, "min": 0, "minHard": true, "max": 1, "maxHard": true},
+   {"id": "key.contact", "label": "Ключ · контактная тень", "pointer": "/lightProfiles/{profile}/heroLight/key/contactShadowLength", "type": "number", "step": 0.01, "min": 0, "minHard": true, "max": 0.5, "maxHard": true, "create": true}
+  ]},
+  {"id": "heroRim", "label": "Подсветка героев · контур", "scope": "heroLight", "when": "/lightProfiles/{profile}/heroLight/rim", "params": [
+   {"id": "rim.lux", "label": "Контур · сила", "pointer": "/lightProfiles/{profile}/heroLight/rim/lux", "type": "number", "step": 0.1, "min": 0.1, "minHard": false, "max": 50, "maxHard": true, "unit": "лк"},
+   {"id": "rim.color", "label": "Контур · цвет", "pointer": "/lightProfiles/{profile}/heroLight/rim/colorSrgb", "type": "colorSrgb"},
+   {"id": "rim.azimuth", "label": "Контур · азимут", "pointer": "/lightProfiles/{profile}/heroLight/rim/azimuthDeg", "type": "number", "step": 1, "min": -360, "minHard": true, "max": 360, "maxHard": true, "sliderMin": -180, "sliderMax": 180, "unit": "°"},
+   {"id": "rim.elevation", "label": "Контур · высота", "pointer": "/lightProfiles/{profile}/heroLight/rim/elevationDeg", "type": "number", "step": 1, "min": 5, "minHard": true, "max": 89, "maxHard": true, "unit": "°"},
+   {"id": "rim.inner", "label": "Контур · конус внутр.", "pointer": "/lightProfiles/{profile}/heroLight/rim/innerConeDeg", "type": "number", "step": 1, "min": 0, "minHard": true, "max": 80, "maxHard": true, "unit": "°", "cross": true, "note": "не больше внешнего"},
+   {"id": "rim.outer", "label": "Контур · конус внеш.", "pointer": "/lightProfiles/{profile}/heroLight/rim/outerConeDeg", "type": "number", "step": 1, "min": 1, "minHard": true, "max": 80, "maxHard": true, "unit": "°", "cross": true},
+   {"id": "rim.heightMul", "label": "Контур · высота источника", "pointer": "/lightProfiles/{profile}/heroLight/rim/heightMul", "type": "number", "step": 0.05, "min": 0.3, "minHard": true, "max": 6, "maxHard": true, "unit": "× фигуры", "cross": true, "note": "не ниже точки прицела + 0,2"},
+   {"id": "rim.radiusMul", "label": "Контур · радиус", "pointer": "/lightProfiles/{profile}/heroLight/rim/radiusMul", "type": "number", "step": 0.05, "min": 1.05, "minHard": true, "max": 4, "maxHard": true, "unit": "× расст."},
+   {"id": "rim.specular", "label": "Контур · блик", "pointer": "/lightProfiles/{profile}/heroLight/rim/specularScale", "type": "number", "step": 0.05, "min": 0, "minHard": true, "max": 1, "maxHard": true},
+   {"id": "rim.contact", "label": "Контур · контактная тень", "pointer": "/lightProfiles/{profile}/heroLight/rim/contactShadowLength", "type": "number", "step": 0.01, "min": 0, "minHard": true, "max": 0.5, "maxHard": true, "create": true}
+  ]},
+  {"id": "heroCommon", "label": "Подсветка героев · общее и состояния", "scope": "heroLight", "when": "/lightProfiles/{profile}/heroLight", "params": [
+   {"id": "enabled", "label": "Подсветка включена", "pointer": "/lightProfiles/{profile}/heroLight/enabled", "type": "bool"},
+   {"id": "cameraAzimuth", "label": "Азимут камеры", "pointer": "/lightProfiles/{profile}/heroLight/cameraAzimuthDeg", "type": "number", "step": 1, "min": -360, "minHard": true, "max": 360, "maxHard": true, "sliderMin": -180, "sliderMax": 180, "unit": "°"},
+   {"id": "aimHeight", "label": "Точка прицела", "pointer": "/lightProfiles/{profile}/heroLight/aimHeight", "type": "number", "step": 0.05, "min": 0, "minHard": true, "max": 1.5, "maxHard": true, "unit": "× фигуры", "cross": true},
+   {"id": "litPedestal", "label": "Подсвечивать пьедестал", "pointer": "/lightProfiles/{profile}/heroLight/litPedestal", "type": "bool"},
+   {"id": "activeMul", "label": "Активный герой ×", "pointer": "/lightProfiles/{profile}/heroLight/states/activeMul", "type": "number", "step": 0.01, "min": 1, "minHard": true, "max": 3, "maxHard": true, "unit": "×"},
+   {"id": "breathHz", "label": "Дыхание · частота", "pointer": "/lightProfiles/{profile}/heroLight/states/breathHz", "type": "number", "step": 0.05, "min": 0, "minHard": true, "max": 3, "maxHard": true, "unit": "Гц"},
+   {"id": "breathAmp", "label": "Дыхание · амплитуда", "pointer": "/lightProfiles/{profile}/heroLight/states/breathAmp", "type": "number", "step": 0.01, "min": 0, "minHard": true, "max": 0.5, "maxHard": true},
+   {"id": "defeatedMul", "label": "Побеждён ×", "pointer": "/lightProfiles/{profile}/heroLight/states/defeatedMul", "type": "number", "step": 0.05, "min": 0, "minHard": true, "max": 1, "maxHard": true, "unit": "×"}
+  ]},
+  {"id": "scene", "label": "Свет сцены", "scope": "profileLights", "when": "/lightProfiles/{profile}/directional", "params": [
+   {"id": "moon.intensity", "label": "Луна · сила", "pointer": "/lightProfiles/{profile}/directional/intensity", "type": "number", "step": 0.05, "min": 0.05, "minHard": false, "sliderMax": 20, "unit": "лк"},
+   {"id": "moon.color", "label": "Луна · цвет (линейный)", "pointer": "/lightProfiles/{profile}/directional/colorLinear", "type": "colorLinear", "step": 0.01, "min": 0, "minHard": false, "sliderMax": 2.0},
+   {"id": "moon.contact", "label": "Луна · контактная тень", "pointer": "/lightProfiles/{profile}/directional/shadow/contactShadowLength", "type": "number", "step": 0.005, "min": 0, "minHard": true, "max": 0.1, "maxHard": true},
+   {"id": "sky.intensity", "label": "Небо · сила", "pointer": "/lightProfiles/{profile}/sky/intensity", "type": "number", "step": 0.05, "min": 0.05, "minHard": false, "sliderMax": 20},
+   {"id": "sky.color", "label": "Небо · цвет (линейный)", "pointer": "/lightProfiles/{profile}/sky/colorLinear", "type": "colorLinear", "step": 0.01, "min": 0, "minHard": false, "sliderMax": 2.0},
+   {"id": "exposure.ev100", "label": "Экспозиция", "pointer": "/lightProfiles/{profile}/exposure", "type": "ev100", "step": 0.05, "unit": "EV100", "sliderMin": -2, "sliderMax": 8},
+   {"id": "exposure.bias", "label": "Поправка экспозиции", "pointer": "/lightProfiles/{profile}/exposure/bias", "type": "number", "step": 0.05, "sliderMin": -4, "sliderMax": 4, "unit": "EV"}
+  ]},
+  {"id": "points", "label": "Точечные огни профиля", "scope": "profileLights", "each": "/lightProfiles/{profile}/points", "params": [
+   {"id": "intensity", "label": "{name} · сила", "pointer": "{each}/intensity", "type": "number", "step": 1, "min": 1, "minHard": false, "sliderMax": 2000, "unit": "кд"},
+   {"id": "radius", "label": "{name} · радиус", "pointer": "{each}/radiusUU", "type": "number", "step": 10, "min": 10, "minHard": false, "sliderMax": 5000, "unit": "uu"},
+   {"id": "color", "label": "{name} · цвет (линейный)", "pointer": "{each}/colorLinear", "type": "colorLinear", "step": 0.01, "min": 0, "minHard": false, "sliderMax": 2.0}
+  ]},
+  {"id": "fog", "label": "Туман", "scope": "profileLights", "when": "/lightProfiles/{profile}/fog", "hiddenIf": {"pointer": "/boards/{board}/conceptPaste/lit3d/hide", "contains": "fog", "note": "скрыт на этой карте (lit3d.hide): ползунки сцену не меняют"}, "params": [
+   {"id": "density", "label": "Плотность", "pointer": "/lightProfiles/{profile}/fog/density", "type": "number", "step": 0.005, "min": 0.001, "minHard": false, "max": 1, "maxHard": true},
+   {"id": "falloff", "label": "Спад по высоте", "pointer": "/lightProfiles/{profile}/fog/heightFalloff", "type": "number", "step": 0.01, "min": 0.001, "minHard": false, "max": 2, "maxHard": true},
+   {"id": "heightZ", "label": "Высота", "pointer": "/lightProfiles/{profile}/fog/heightZ", "type": "number", "step": 10, "min": -100000, "minHard": true, "max": 100000, "maxHard": true, "sliderMin": -2000, "sliderMax": 2000, "unit": "uu"},
+   {"id": "start", "label": "Начало", "pointer": "/lightProfiles/{profile}/fog/startDistanceUU", "type": "number", "step": 50, "min": 0, "minHard": true, "max": 100000, "maxHard": true, "sliderMin": 0, "sliderMax": 10000, "unit": "uu", "cross": true},
+   {"id": "end", "label": "Конец (0 = нет)", "pointer": "/lightProfiles/{profile}/fog/endDistanceUU", "type": "number", "step": 50, "min": 0, "minHard": true, "max": 1000000, "maxHard": true, "sliderMin": 0, "sliderMax": 20000, "unit": "uu", "cross": true, "note": "0 или дальше начала"},
+   {"id": "maxOpacity", "label": "Макс. непрозрачность", "pointer": "/lightProfiles/{profile}/fog/maxOpacity", "type": "number", "step": 0.01, "min": 0, "minHard": true, "max": 1, "maxHard": true},
+   {"id": "color", "label": "Цвет (линейный)", "pointer": "/lightProfiles/{profile}/fog/colorLinear", "type": "colorLinear", "step": 0.01, "min": 0, "minHard": true, "sliderMax": 2.0, "max": 10, "maxHard": true}
+  ]},
+  {"id": "mapGrade", "label": "Тон карты", "scope": "mapGrade", "when": "/lightProfiles/{profile}/mapGrade", "params": [
+   {"id": "nightEV", "label": "Ночь · яркость", "pointer": "/lightProfiles/{profile}/mapGrade/nightEV", "type": "number", "step": 0.05, "min": -4, "minHard": true, "max": 2, "maxHard": true, "unit": "EV"},
+   {"id": "nightSaturation", "label": "Ночь · насыщенность", "pointer": "/lightProfiles/{profile}/mapGrade/nightSaturation", "type": "number", "step": 0.01, "min": 0, "minHard": true, "max": 1.5, "maxHard": true},
+   {"id": "lift", "label": "Подъём теней", "pointer": "/lightProfiles/{profile}/mapGrade/lift", "type": "number", "step": 0.05, "min": 0, "minHard": true, "max": 20, "maxHard": true},
+   {"id": "nightTint", "label": "Ночь · оттенок (линейный)", "pointer": "/lightProfiles/{profile}/mapGrade/nightTintLinear", "type": "colorLinear", "step": 0.01, "min": 0, "minHard": true, "sliderMax": 2.0, "max": 4, "maxHard": true},
+   {"id": "maskSaturation", "label": "Зоны · насыщенность", "pointer": "/lightProfiles/{profile}/mapGrade/maskSaturation", "type": "number", "step": 0.01, "min": 0, "minHard": true, "max": 3, "maxHard": true},
+   {"id": "liftSaturation", "label": "Подъём · насыщенность", "pointer": "/lightProfiles/{profile}/mapGrade/liftSaturation", "type": "number", "step": 0.01, "min": 0, "minHard": true, "max": 3, "maxHard": true},
+   {"id": "maskInverseTint", "label": "Зоны · обратный оттенок", "pointer": "/lightProfiles/{profile}/mapGrade/maskInverseTintLinear", "type": "colorLinear", "step": 0.01, "min": 0, "minHard": true, "sliderMax": 2.0, "max": 4, "maxHard": true}
+  ]},
+  {"id": "conceptLights", "label": "Огни сцены (lit3d)", "scope": "conceptLights", "each": "/boards/{board}/conceptPaste/lit3d/lights", "params": [
+   {"id": "intensity", "label": "{id} · сила", "pointer": "{each}/intensityCd", "type": "number", "step": 1, "min": 0, "minHard": true, "max": 10000, "maxHard": true, "sliderMin": 0, "sliderMax": 300, "unit": "кд"},
+   {"id": "radius", "label": "{id} · радиус", "pointer": "{each}/radius", "type": "number", "step": 10, "min": 1, "minHard": true, "max": 5000, "maxHard": true, "sliderMin": 10, "sliderMax": 1500, "unit": "uu"},
+   {"id": "color", "label": "{id} · цвет", "pointer": "{each}/colorSrgb", "type": "colorSrgb"},
+   {"id": "flickerAmp", "label": "{id} · мерцание", "pointer": "{each}/flicker/amp", "type": "number", "step": 0.01, "min": 0, "minHard": true, "max": 0.5, "maxHard": true},
+   {"id": "flickerHz", "label": "{id} · мерцание, частота", "pointer": "{each}/flicker/hz", "type": "number", "step": 0.1, "min": 0, "minHard": true, "max": 20, "maxHard": true, "unit": "Гц"}
+  ]},
+  {"id": "sceneGeometry", "label": "Сцена (пересборка)", "scope": "rebuild", "when": "/boards/{board}/conceptPaste/lit3d", "params": [
+   {"id": "seaZ", "label": "Уровень моря", "pointer": "/boards/{board}/conceptPaste/lit3d/seaZUU", "type": "number", "step": 5, "min": -1000, "minHard": true, "max": -3, "maxHard": true, "unit": "uu"},
+   {"id": "waterfallZ", "label": "Высота водопада", "pointer": "/boards/{board}/conceptPaste/lit3d/waterfallScaleZ", "type": "number", "step": 0.05, "min": 0.25, "minHard": true, "max": 4, "maxHard": true, "unit": "×"}
+  ]}
+ ]
+}

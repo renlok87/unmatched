@@ -17,7 +17,14 @@
 //           board build, BENCH view / RENDER / SHOT blocks), so the bench metric scripts read it unchanged.
 //   state   the applied profile revision / sha, overlay sha, light counts, hero-light summary (done.json "state").
 //   quit    answers, then exits.
-// Reusable entry point for a later slider panel ("Art Tuner"): write the JSON, then the reload command.
+// Art Tuner (S08ArtTuner.h, docs/art-pipeline/ART-TUNER-PLAN.md section 8) - the same code as the panel's sliders:
+//   tune        {pointer, value} or {entries: [{pointer, value}]}: panel rows (registry pointers or row ids), validated by
+//               the profile parser, applied at once (done.json: the scopes, the apply time, the values);
+//   tunerState  the rows of this board with their values, the changed entries, the save file;
+//   tunerSave   {file?}: writes S08ArtTuner.overrides.json (default -ArtTunerFile);
+//   tunerReset  {group?}: one group (or everything) back to the profile file's values;
+//   tunerPanel  {open}: shows / hides the panel (shots "with the panel");
+//   artView     {view?, yaw?, pitch?, pan?: [x, y], select?, heroLight?, pause?, help?}: the -ArtView camera and keys.
 #pragma once
 
 #include "CoreMinimal.h"
@@ -37,9 +44,13 @@ inline const TCHAR* const ReadyFile = TEXT("ready.json");
 inline const TCHAR* const TraceFile = TEXT("bench.trace.log");
 /** The -Bench post-measure wait before a shot (ProfileGPU frame), RunRenderBench case 4 -> 5. */
 constexpr float BenchPostSeconds = 3.0f;
+inline const TCHAR* const ActionList =
+    TEXT("reload | shot | state | quit | tune | tunerState | tunerSave | tunerReset | tunerPanel | artView");
 }  // namespace S08LiveTuneSpec
 
-enum class ES08LiveAction : uint8 { None, Reload, Shot, State, Quit };
+enum class ES08LiveAction : uint8 {
+  None, Reload, Shot, State, Quit, Tune, TunerState, TunerSave, TunerReset, TunerPanel, ArtView
+};
 
 UNMATCHED_API const TCHAR* S08LiveActionName(ES08LiveAction Action);
 
@@ -72,6 +83,22 @@ struct UNMATCHED_API FS08LiveCommand {
   float BenchMeasure = -1.0f;
   float BenchGap = -2.0f;       // < -1.5 = unset; -1 = the live gap; >= 0 = the first capture -> next anchor time
   float BenchGapLater = -2.0f;  // the same after the second and later captures
+  // Art Tuner: tune (pointer -> value, in order), tunerSave (file), tunerReset (group), tunerPanel (open)
+  TArray<TPair<FString, TSharedPtr<class FJsonValue>>> TuneEntries;
+  FString TunerFile;
+  FString TunerGroup;
+  bool bPanelOpen = false;
+  // artView: unset = keep (NaN / empty / -1)
+  FString ArtViewView;
+  float ArtViewYaw = NAN;
+  float ArtViewPitch = NAN;
+  bool bArtViewPan = false;
+  FVector2D ArtViewPan = FVector2D::ZeroVector;
+  bool bArtViewSelect = false;
+  FString ArtViewSelect;
+  int32 ArtViewHeroLight = -1;  // -1 keep, 0 off, 1 on
+  int32 ArtViewPause = -1;
+  int32 ArtViewHelp = -1;
 
   /** Parses Text; FileSeq = the seq of the file name (a "seq" field must match it). */
   static bool Parse(const FString& Text, int32 FileSeq, FS08LiveCommand& Out, TArray<FString>& OutErrors);

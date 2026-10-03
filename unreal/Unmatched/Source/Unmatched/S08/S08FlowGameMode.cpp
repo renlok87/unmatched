@@ -28,6 +28,7 @@
 #include "Serialization/JsonSerializer.h"
 #include "Serialization/JsonWriter.h"
 #include "S08TraceLog.h"
+#include "S08ArtTuner.h"
 #include "S08ArtView.h"
 #include "S08LiveTune.h"
 #include "Widgets/Input/SEditableTextBox.h"
@@ -312,6 +313,7 @@ void AS08FlowGameMode::BeginPlay() {
   // W4-A -Bench: backend-less render bench (no login, no room, no HUD).
   // Art Tuner M1: -ArtView=<map> takes the same backend-less path (S08FlowGameModeArtView.cpp)
   if (S08ArtView::Enabled()) ArtViewBegin();
+  bArtTunerFlag = S08ArtTunerSpec::Enabled();
   bBench = FParse::Param(FCommandLine::Get(), TEXT("Bench")) || ArtView.IsValid();
   if (bBench) {
     FS08Trace::Write(TEXT("BENCH start (W4-A backend-less render bench)"));
@@ -1774,7 +1776,9 @@ void AS08FlowGameMode::HandleHudKeys() {
     return;
   }
 
-  if (PC->WasInputKeyJustPressed(EKeys::F10)) {
+  // Art Tuner: Shift+F10 is the tuner panel (ArtTunerTick), F10 alone the debug overlay
+  const bool bTunerKey = bArtTunerFlag && (PC->IsInputKeyDown(EKeys::LeftShift) || PC->IsInputKeyDown(EKeys::RightShift));
+  if (PC->WasInputKeyJustPressed(EKeys::F10) && !bTunerKey) {
     // Operator-only debug overlay (login/lobby/trace panel) during gameplay.
     bDebugPanelForced = !bDebugPanelForced;
     RefreshUi();
@@ -3718,6 +3722,7 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
     }
   }
   if (ArtView.IsValid()) ArtViewTick(DeltaSeconds);
+  if (bArtTunerFlag) ArtTunerTick();
   UpdateBoardCamera(DeltaSeconds);
   UpdateArtHud(DeltaSeconds);
   // ART-004 T1.1 K2 gate: log once when the requested focus zoom has arrived

@@ -109,6 +109,9 @@ public:
   /** Automation only: board profile data without BeginPlay / -ArtPreview (art assets treated as ready; the
    *  map-image path loads its own assets and falls back when they are missing). */
   void SetArtDataForTest(const FS08BoardArtData& Data);
+  /** Automation only: a 'tiles' profile activates without its probe materials (a test world runs no BeginPlay asset
+   *  load), so its lights / fog / hero light spawn as in a real build. */
+  void SetTileArtReadyForTest() { bTileArtReady = true; }
   /** ENV-MAPS P4: the "readability" block of the ACTIVE map-image profile (nullptr on grids, without art, on a
    *  refused map-image profile, or when the profile has no block). */
   const FS08BoardReadabilitySpec* GetActiveReadability() const {
@@ -180,6 +183,14 @@ public:
                      TArray<FString>& OutWarnings);
   /** Tears the art runtime down like ReloadArtData (same data) and makes the next Rebuild a full one. */
   void RequestFullRebuild();
+  // ---- Art Tuner (S08ArtTuner.h, S08BoardActorTuner.cpp); unused without -ArtTuner ----
+  /** Swaps in a tuned document (FS08ArtTunerModel::Build: the applied one + the panel's values) and pushes the changed
+   *  scopes (ES08TunerScope bits) onto the existing components: hero rigs, the light profile's actors, the map grade MID,
+   *  the lit3d lights and their flicker base. A Rebuild scope - or a change the components cannot take (another light
+   *  count, a flicker that needs the anim component) - tears the art runtime down like RequestFullRebuild instead: then
+   *  it returns true and the caller rebuilds through the normal path (SyncBoardFromApplied). ProfilesSource goes into the
+   *  RENDER fingerprint ("tuner" while values differ from the file). */
+  bool ApplyTunedArtData(const FS08BoardArtData& Data, uint8 Scopes, const FString& ProfilesSource, FString& OutNote);
   /** Full Rebuilds since spawn (a Rebuild with unchanged geometry keeps the tiles and is not counted). */
   int32 GetBuildCount() const { return BuildCount; }
   const FS08BoardArtData& GetArtData() const { return ArtData; }
@@ -372,6 +383,12 @@ private:
   void AddArtSurfacePart(UMaterialInterface* Material, const FTransform& Transform);
   void ClearArtLights();
   void ApplyArtLights(const FS08LightProfile& Light, bool bLegacyCobbleTrace);
+  /** Art Tuner: the values of Light on the spawned profile actors (no respawn). */
+  void ApplyTunedLights(const FS08LightProfile& Light);
+  /** Art Tuner: the lit3d light values on ConceptLights (+ the flicker base); false = needs a rebuild. */
+  bool ApplyTunedConceptLights();
+  /** Art Tuner M4: the lit3d "materialOverrides" on the env props' MIDs; false = needs a rebuild. */
+  bool ApplyMaterialOverrides();
   /** ENV-MAPS P2: the profile's "mapGrade" on the map MID of a map-image board (traced; no block = the MI values). */
   void ApplyMapGrade(const FS08LightProfile& Light);
   void ApplySurfaceMaterials();

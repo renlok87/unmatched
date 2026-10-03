@@ -298,6 +298,20 @@ void AS08FlowGameMode::LiveTuneHandleCommand(const FString& Path, int32 Seq) {
     case ES08LiveAction::Shot:
       LiveTuneStartShot();
       return;
+    case ES08LiveAction::Tune:
+    case ES08LiveAction::TunerState:
+    case ES08LiveAction::TunerSave:
+    case ES08LiveAction::TunerReset:
+    case ES08LiveAction::TunerPanel:
+      LiveTuneTuner(Cmd, Result);
+      Result.bOk = Result.Errors.IsEmpty();
+      LiveTuneWriteDone(Result);
+      return;
+    case ES08LiveAction::ArtView:
+      LiveTuneArtView(Cmd, Result);
+      Result.bOk = Result.Errors.IsEmpty();
+      LiveTuneWriteDone(Result);
+      return;
     default:
       Result.Errors.Add(TEXT("unknown action"));
       LiveTuneWriteDone(Result);
@@ -348,6 +362,12 @@ void AS08FlowGameMode::LiveTuneReload(const FS08LiveCommand& Cmd, FS08LiveResult
       BoardActor->GetFighters().Num(), BoardActor->GetHeroLightCount(), (FPlatformTime::Seconds() - S.CmdStartSeconds) * 1000.0));
   S.BuildLines = FS08Trace::JournalSlice(0, FS08Trace::JournalNum());
   FS08Trace::TruncateJournal(0);
+  // Art Tuner: the panel continues on the reloaded document (its values written in again)
+  ArtTunerProfilesPath = Path;
+  if (ArtTuner.IsValid()) {
+    ArtTunerRebase(Path, Warnings);
+    ArtTunerApplyPending(true);
+  }
   Result.Warnings = Warnings;
   Result.Extra = MakeShared<FJsonObject>();
   Result.Extra->SetNumberField(TEXT("revision"), Data.Revision);

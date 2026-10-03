@@ -16,6 +16,12 @@ const TCHAR* S08LiveActionName(ES08LiveAction Action) {
     case ES08LiveAction::Shot: return TEXT("shot");
     case ES08LiveAction::State: return TEXT("state");
     case ES08LiveAction::Quit: return TEXT("quit");
+    case ES08LiveAction::Tune: return TEXT("tune");
+    case ES08LiveAction::TunerState: return TEXT("tunerState");
+    case ES08LiveAction::TunerSave: return TEXT("tunerSave");
+    case ES08LiveAction::TunerReset: return TEXT("tunerReset");
+    case ES08LiveAction::TunerPanel: return TEXT("tunerPanel");
+    case ES08LiveAction::ArtView: return TEXT("artView");
     default: return TEXT("none");
   }
 }
@@ -93,15 +99,83 @@ bool FS08LiveCommand::Parse(const FString& Text, int32 FileSeq, FS08LiveCommand&
   if (Seq != FileSeq) OutErrors.Add(FString::Printf(TEXT("seq %d != the file's %d"), Seq, FileSeq));
   FString Action;
   if (!Root->TryGetStringField(TEXT("action"), Action)) {
-    OutErrors.Add(TEXT("'action' missing (reload | shot | state | quit)"));
+    OutErrors.Add(FString::Printf(TEXT("'action' missing (%s)"), S08LiveTuneSpec::ActionList));
     return false;
   }
-  for (ES08LiveAction A : {ES08LiveAction::Reload, ES08LiveAction::Shot, ES08LiveAction::State, ES08LiveAction::Quit}) {
+  for (ES08LiveAction A : {ES08LiveAction::Reload, ES08LiveAction::Shot, ES08LiveAction::State, ES08LiveAction::Quit,
+                           ES08LiveAction::Tune, ES08LiveAction::TunerState, ES08LiveAction::TunerSave,
+                           ES08LiveAction::TunerReset, ES08LiveAction::TunerPanel, ES08LiveAction::ArtView}) {
     if (Action == S08LiveActionName(A)) Out.Action = A;
   }
   if (Out.Action == ES08LiveAction::None) {
-    OutErrors.Add(FString::Printf(TEXT("unknown action '%s' (reload | shot | state | quit)"), *Action));
+    OutErrors.Add(FString::Printf(TEXT("unknown action '%s' (%s)"), *Action, S08LiveTuneSpec::ActionList));
     return false;
+  }
+  if (Out.Action == ES08LiveAction::Tune) {
+    auto AddEntry = [&](const TSharedPtr<FJsonObject>& E, const FString& Where) {
+      FString Pointer;
+      const TSharedPtr<FJsonValue> Value = E->TryGetField(TEXT("value"));
+      if (!E->TryGetStringField(TEXT("pointer"), Pointer) || Pointer.IsEmpty() || !Value.IsValid()) {
+        OutErrors.Add(FString::Printf(TEXT("tune: %s needs 'pointer' (a panel row pointer or id) and 'value'"), *Where));
+        return;
+      }
+      Out.TuneEntries.Add({Pointer, Value});
+    };
+    const TArray<TSharedPtr<FJsonValue>>* Entries = nullptr;
+    if (Root->TryGetArrayField(TEXT("entries"), Entries) && Entries) {
+      for (int32 I = 0; I < Entries->Num(); ++I) {
+        const TSharedPtr<FJsonValue>& V = (*Entries)[I];
+        const TSharedPtr<FJsonObject> E = V.IsValid() && V->Type == EJson::Object ? V->AsObject() : nullptr;
+        if (!E.IsValid()) {
+          OutErrors.Add(FString::Printf(TEXT("tune: entries[%d] must be an object"), I));
+          continue;
+        }
+        AddEntry(E, FString::Printf(TEXT("entries[%d]"), I));
+      }
+    } else {
+      AddEntry(Root, TEXT("the command"));
+    }
+    if (Out.TuneEntries.IsEmpty() && OutErrors.Num() == Before) OutErrors.Add(TEXT("tune: no entries"));
+  }
+  if (Out.Action == ES08LiveAction::TunerSave) {
+    LiveString(Root, TEXT("file"), Out.TunerFile, OutErrors);
+    Out.TunerFile = Out.TunerFile.TrimStartAndEnd();
+    if (!Out.TunerFile.IsEmpty() && FPaths::IsRelative(Out.TunerFile)) {
+      OutErrors.Add(TEXT("tunerSave: 'file' must be an absolute path"));
+    }
+  }
+  if (Out.Action == ES08LiveAction::TunerReset) LiveString(Root, TEXT("group"), Out.TunerGroup, OutErrors);
+  if (Out.Action == ES08LiveAction::TunerPanel) {
+    if (!Root->HasField(TEXT("open"))) OutErrors.Add(TEXT("tunerPanel: 'open' (true | false) missing"));
+    LiveBool(Root, TEXT("open"), Out.bPanelOpen, OutErrors);
+  }
+  if (Out.Action == ES08LiveAction::ArtView) {
+    LiveString(Root, TEXT("view"), Out.ArtViewView, OutErrors);
+    if (!Out.ArtViewView.IsEmpty()) {
+      TArray<FString> Views;
+      S08LiveTune::ParseViews(Out.ArtViewView, Views, OutErrors);
+      if (Views.Num() != 1) OutErrors.Add(TEXT("artView: 'view' must be one view (K1, K2x1.6, ...)"));
+    }
+    LiveNumber(Root, TEXT("yaw"), -720.0f, 720.0f, Out.ArtViewYaw, OutErrors);
+    LiveNumber(Root, TEXT("pitch"), 0.0f, 90.0f, Out.ArtViewPitch, OutErrors);
+    if (Root->HasField(TEXT("pan"))) {
+      const TArray<TSharedPtr<FJsonValue>>* Pan = nullptr;
+      double X = 0.0, Y = 0.0;
+      if (!Root->TryGetArrayField(TEXT("pan"), Pan) || !Pan || Pan->Num() != 2 || !(*Pan)[0].IsValid() ||
+          !(*Pan)[1].IsValid() || !(*Pan)[0]->TryGetNumber(X) || !(*Pan)[1]->TryGetNumber(Y)) {
+        OutErrors.Add(TEXT("artView: 'pan' must be [x, y] (uu)"));
+      } else {
+        Out.bArtViewPan = true;
+        Out.ArtViewPan = FVector2D(X, Y);
+      }
+    }
+    if (Root->HasField(TEXT("select"))) Out.bArtViewSelect = LiveString(Root, TEXT("select"), Out.ArtViewSelect, OutErrors);
+    const TCHAR* Names[] = {TEXT("heroLight"), TEXT("pause"), TEXT("help")};
+    int32* Slots[] = {&Out.ArtViewHeroLight, &Out.ArtViewPause, &Out.ArtViewHelp};
+    for (int32 I = 0; I < 3; ++I) {
+      bool B = false;
+      if (Root->HasField(Names[I]) && LiveBool(Root, Names[I], B, OutErrors)) *Slots[I] = B ? 1 : 0;
+    }
   }
   if (Out.Action == ES08LiveAction::Reload) {
     LiveString(Root, TEXT("profiles"), Out.ProfilesPath, OutErrors);

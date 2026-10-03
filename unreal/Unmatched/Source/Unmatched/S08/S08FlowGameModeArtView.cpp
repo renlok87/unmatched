@@ -36,8 +36,6 @@ TSharedRef<SBorder> S08ArtViewCard(const TSharedRef<SWidget>& Content) {
 }
 }  // namespace
 
-bool AS08FlowGameMode::ArtTunerEnabled() const { return FParse::Param(FCommandLine::Get(), TEXT("ArtTuner")); }
-
 void AS08FlowGameMode::ArtViewBegin() {
   ArtView = MakeShared<FS08ArtViewSession>();
   FS08ArtViewSession& V = *ArtView;

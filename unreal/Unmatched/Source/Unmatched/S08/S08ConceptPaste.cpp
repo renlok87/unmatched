@@ -1663,6 +1663,22 @@ void US08ConceptPasteAnimComponent::AddWind(UStaticMeshComponent* Prop) {
   Winds.Add(Prop);
 }
 
+void US08ConceptPasteAnimComponent::UpdateFlicker(UPointLightComponent* Light, const FS08ConceptLight& Spec) {
+  if (!Light) return;
+  for (int32 I = 0; I < Flickers.Num(); ++I) {
+    if (Flickers[I].Light.Get() != Light) continue;
+    if (Spec.FlickerAmp <= 0.0f || Spec.FlickerHz <= 0.0f) {
+      Flickers.RemoveAt(I);
+      Light->SetIntensity(Spec.IntensityCd);
+      return;
+    }
+    Flickers[I].Spec = Spec;
+    Flickers[I].BaseIntensity = Spec.IntensityCd;
+    return;
+  }
+  AddFlicker(Light, Spec);
+}
+
 void US08ConceptPasteAnimComponent::RestoreBase() {
   for (const FWindParam& W : WindParams) {
     if (UMaterialInstanceDynamic* Mid = W.Mid.Get()) Mid->SetScalarParameterValue(W.Name, W.Base);

@@ -490,6 +490,28 @@ private:
   void ArtViewRefreshOverlay();
   /** -ArtTuner on the command line (the panel; S08ArtTuner.h). */
   bool ArtTunerEnabled() const;
+  // Art Tuner M2/M3 (S08ArtTuner.h, S08FlowGameModeArtTuner.cpp, S08ArtTunerPanel.cpp): the panel's model, apply, save and
+  // the live-tune actions tune / tunerState / tunerSave / tunerReset / tunerPanel / artView. Null without -ArtTuner.
+  TSharedPtr<struct FS08ArtTunerSession> ArtTuner;
+  bool bArtTunerFlag = false;
+  /** The profiles path of the last live-tune reload (the tuner's base; empty = the startup source). */
+  FString ArtTunerProfilesPath;
+  void ArtTunerTick();
+  bool ArtTunerBegin();
+  void ArtTunerEnd();
+  bool ArtTunerRebase(const FString& ProfilesPath, TArray<FString>& OutWarnings);
+  /** The one path of a value change (panel row, live-tune "tune", the saved file at start): registry row -> validated
+   *  writes -> the model -> the profile parser; a refused document leaves the model unchanged. */
+  bool ArtTunerSetValue(const FString& PointerOrId, const TSharedPtr<class FJsonValue>& Value, FString& OutError);
+  /** Pushes the pending document onto the board (throttled unless bForce). */
+  void ArtTunerApplyPending(bool bForce);
+  bool ArtTunerSave(const FString& PathOverride, FString& OutPath, FString& OutError);
+  /** One group (empty = all) back to the profile file's values. */
+  void ArtTunerReset(const FString& GroupId);
+  void ArtTunerSetPanelOpen(bool bOpen);
+  TSharedPtr<class FJsonObject> ArtTunerState() const;
+  void LiveTuneTuner(const struct FS08LiveCommand& Cmd, struct FS08LiveResult& Result);
+  void LiveTuneArtView(const struct FS08LiveCommand& Cmd, struct FS08LiveResult& Result);
   // -S09HudProbe=<dir>: backend-less packaged probe - renders the fixture-04
   // HUD states and captures UI-inclusive shots + a Slate key-input check.
   bool bS09Probe = false;

@@ -43,6 +43,8 @@ public class Unmatched : ModuleRules {
     // fixtures by tools/art/render/env_bench_fixtures.cts).
     RuntimeDependencies.Add("$(ProjectDir)/Config/Bench/S08BenchMarmoreal.json", StagedFileType.UFS);
     RuntimeDependencies.Add("$(ProjectDir)/Config/Bench/S08BenchSarpedon.json", StagedFileType.UFS);
+    // Art Tuner (docs/art-pipeline/ART-TUNER-PLAN.md): the rows of the -ArtTuner panel (S08ArtTuner.h).
+    RuntimeDependencies.Add("$(ProjectDir)/Config/ArtTuner/S08ArtTunerParams.json", StagedFileType.UFS);
     // W4-C: the art HUD string table (LOCTABLE_FROMFILE_GAME, Content-relative)
     // is a CSV, not an asset - staged into the pak like the board profiles.
     RuntimeDependencies.Add("$(ProjectDir)/Content/Localization/StringTables/S08ArtHud.csv", StagedFileType.UFS);

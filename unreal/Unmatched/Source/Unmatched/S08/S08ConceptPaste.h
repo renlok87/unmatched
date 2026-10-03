@@ -627,6 +627,9 @@ public:
   void AddSway(USceneComponent* Prop, const FS08ConceptAnim& Spec);
   /** P7c: the material wind of a prop (a MID per slot with WindLive = 1; RestoreBase sets 0). */
   void AddWind(UStaticMeshComponent* Prop);
+  /** Art Tuner: a new spec for the flicker of Light (its intensity already set to Spec.IntensityCd): the base and the
+   *  noise follow at once; amp / hz 0 stops it, a light without a flicker yet starts one. */
+  void UpdateFlicker(UPointLightComponent* Light, const FS08ConceptLight& Spec);
   int32 Num() const { return Flickers.Num() + Sways.Num() + Winds.Num(); }
   int32 NumWinds() const { return Winds.Num(); }
   /** Back to the base intensity / rotation (before the component goes away). */
