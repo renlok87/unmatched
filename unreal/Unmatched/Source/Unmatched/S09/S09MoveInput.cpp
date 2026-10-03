@@ -443,6 +443,159 @@ bool FS09MoveInput::AutoManeuverSettled(int32 StartSeq, const FS08Snapshot& Snap
   return Snapshot.SequenceNumber >= StartSeq + 2 && FS08Contracts::PendingManeuverId(Snapshot).IsEmpty();
 }
 
+// ---- M1 (MS-AT-32): -S08ManeuverPlan ------------------------------------------
+
+FString FS09MoveInput::AutoManeuverPlanFromCommandLine() {
+  FString Plan;
+  if (!FParse::Value(FCommandLine::Get(), TEXT("S08ManeuverPlan="), Plan)) return FString();
+  return Plan.TrimStartAndEnd();
+}
+
+bool FS09MoveInput::IsKnownManeuverPlan(const FString& Plan) {
+  return Plan.Equals(TEXT("boost3"), ESearchCase::IgnoreCase);
+}
+
+namespace {
+constexpr int32 S09PlanMoves = 3;
+
+/** "<fighter>@<cell>:<steps>/<allowance>" for the plan summary. */
+FString S09PlanMoveText(const FS09DraftMove& Move, const FS08BoardModel& Board) {
+  return FString::Printf(TEXT("%s@%s:%d/%d"), *Move.FighterId, *Board.CellLabel(Move.DestX, Move.DestY),
+                         Move.Path.Num(), Move.Allowance);
+}
+
+/** Drops every move that is not Ok (the plan never confirms a NeedBoost or
+ *  Conflict move); returns how many went. */
+int32 S09DropNonOkMoves(FS09CommandUi& Ui, const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters) {
+  TArray<FString> Drop;
+  for (const FS09DraftMove& Move : Ui.Moves) {
+    if (Move.Status != ES09DraftMoveStatus::Ok) Drop.Add(Move.FighterId);
+  }
+  for (const FString& Id : Drop) Ui.ClearMove(Id, Board, Fighters);
+  return Drop.Num();
+}
+}  // namespace
+
+bool FS09MoveInput::RunAutoManeuverPlan(const FString& Plan, FS09CommandUi& Ui, const FS08Snapshot& Snapshot,
+                                        const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters,
+                                        FString& OutSummary) {
+  const FString PlanName = Plan.ToLower();
+  OutSummary = FString::Printf(TEXT("AUTO maneuver plan=%s"), *PlanName);
+  if (!IsKnownManeuverPlan(Plan)) {
+    OutSummary += TEXT(" ok=0 reason=plan.unknown");
+    return false;
+  }
+  if (Ui.Mode != ES09CommandMode::ManeuverDraft) {
+    OutSummary += TEXT(" ok=0 reason=draft.closed");
+    return false;
+  }
+  FS09SourceScope Scope(Ui, ES09InputSource::Auto);
+  TArray<FString> Refusals;
+  FString Reason;
+
+  // (1) BOOST: the own-hand card with the highest printed BOOST (first of
+  // equals in hand order); a selected card with a printed BOOST is kept.
+  const TArray<FS09BoostCard> Hand = FS09DraftEval::BoostHand(Snapshot, Ui.ViewerId);
+  const FS09BoostCard* Kept = Ui.BoostCardId.IsEmpty() ? nullptr : Hand.FindByPredicate([&Ui](const FS09BoostCard& C) {
+    return C.bHasBoost && C.InstanceId.Equals(Ui.BoostCardId, ESearchCase::CaseSensitive);
+  });
+  if (!Kept) {
+    const FS09BoostCard* Best = nullptr;
+    for (const FS09BoostCard& Card : Hand) {
+      if (Card.bHasBoost && (!Best || Card.Boost > Best->Boost)) Best = &Card;
+    }
+    if (!Best) {
+      Refusals.Add(TEXT("boost.none"));
+    } else if (!Ui.ToggleBoostCard(Best->InstanceId, Snapshot, Board, Fighters, Reason)) {
+      Refusals.Add(TEXT("boost:") + Ui.LastReason.Key.ToString());
+    }
+  }
+  // The carried hero step (or any earlier move) must be Ok with this boost.
+  if (S09DropNonOkMoves(Ui, Board, Fighters) > 0) Refusals.Add(TEXT("carried.notOk"));
+
+  // (2) own fighters without a move: sidekicks first, then heroes (Fighters
+  // order), one destination each until the draft holds 3 moves.
+  TArray<const FS08BoardFighter*> Candidates;
+  for (int32 Pass = 0; Pass < 2; ++Pass) {
+    const bool bHeroes = Pass == 1;
+    for (const FS08BoardFighter& Fighter : Fighters) {
+      if (Fighter.bIsHero != bHeroes || !Fighter.OwnerId.Equals(Ui.ViewerId, ESearchCase::CaseSensitive)) continue;
+      FS09Reason Gate;
+      if (!Ui.CanMoveFighter(Fighter.Id, Fighters, Gate)) continue;
+      Candidates.Add(&Fighter);
+    }
+  }
+  int32 Added = 0;
+  for (const FS08BoardFighter* Fighter : Candidates) {
+    if (Ui.Moves.Num() >= S09PlanMoves) break;
+    if (Ui.MoveIndexOf(Fighter->Id) != INDEX_NONE) continue;
+    if (!Ui.SelectFighter(Fighter->Id, Snapshot, Board, Fighters)) {
+      Refusals.Add(FString::Printf(TEXT("select:%s:%s"), *Fighter->Id, *Ui.LastReason.Key.ToString()));
+      continue;
+    }
+    const FS09ReachTiers Tiers = Ui.SelectedTiers;
+    if (!Tiers.bValid || Tiers.BaseTier.Num() == 0) {
+      Refusals.Add(FString::Printf(TEXT("tier.empty:%s"), *Fighter->Id));
+      continue;
+    }
+    // The first fighter the plan adds goes as far as the base tier allows (it
+    // spends the boost when the boost adds steps); the next ones the nearest.
+    const bool bFarthest = Added == 0;
+    TArray<FIntPoint> Cells = Tiers.BaseTier;
+    Cells.StableSort([&Tiers, bFarthest](const FIntPoint& A, const FIntPoint& B) {
+      const int32 DA = Tiers.Reach.DistanceTo(A);
+      const int32 DB = Tiers.Reach.DistanceTo(B);
+      return bFarthest ? DA > DB : DA < DB;
+    });
+    bool bPlaced = false;
+    for (const FIntPoint& Cell : Cells) {
+      FS09DraftMove Probe;
+      FS09Reason Why;
+      if (!Ui.EvaluateDestination(Fighter->Id, Cell.X, Cell.Y, Board, Fighters, Probe, Why) ||
+          Probe.Status != ES09DraftMoveStatus::Ok || Probe.Path.Num() == 0) {
+        continue;
+      }
+      if (!Ui.SetDestination(Fighter->Id, Cell.X, Cell.Y, Snapshot, Board, Fighters, Reason)) continue;
+      const int32 Index = Ui.MoveIndexOf(Fighter->Id);
+      if (Index != INDEX_NONE && Ui.Moves[Index].Status == ES09DraftMoveStatus::Ok) {
+        bPlaced = true;
+        break;
+      }
+      Ui.ClearMove(Fighter->Id, Board, Fighters);
+    }
+    if (bPlaced) {
+      ++Added;
+    } else {
+      Refusals.Add(FString::Printf(TEXT("no.ok.destination:%s"), *Fighter->Id));
+    }
+  }
+  Ui.DeselectFighter();
+  if (S09DropNonOkMoves(Ui, Board, Fighters) > 0) Refusals.Add(TEXT("move.notOk"));
+
+  // (3) the draft must evaluate confirmable with 3 moves and a boost card.
+  const int32 Value = FS09DraftEval::SelectedBoostOf(Ui.DraftHand, Ui.BoostCardId);
+  int32 MaxRequired = 0;
+  int32 Sidekicks = 0;
+  TArray<FString> List;
+  for (const FS09DraftMove& Move : Ui.Moves) {
+    MaxRequired = FMath::Max(MaxRequired, Move.RequiredBoost);
+    for (const FS08BoardFighter& Fighter : Fighters) {
+      if (Fighter.Id.Equals(Move.FighterId, ESearchCase::CaseSensitive) && !Fighter.bIsHero) ++Sidekicks;
+    }
+    List.Add(S09PlanMoveText(Move, Board));
+  }
+  if (Ui.Moves.Num() < S09PlanMoves) Refusals.Add(FString::Printf(TEXT("moves.short:%d"), Ui.Moves.Num()));
+  if (Ui.BoostCardId.IsEmpty() && !Refusals.Contains(TEXT("boost.none"))) Refusals.Add(TEXT("boost.missing"));
+  if (!Ui.Eval.IsConfirmable()) Refusals.Add(TEXT("draft.notConfirmable"));
+  const bool bOk = Refusals.Num() == 0;
+  OutSummary += FString::Printf(TEXT(" ok=%d moves=%d boost=%s value=%d maxRequired=%d sidekicks=%d confirmable=%d list=%s"),
+                                bOk ? 1 : 0, Ui.Moves.Num(), Ui.BoostCardId.IsEmpty() ? TEXT("none") : *Ui.BoostCardId,
+                                Value, MaxRequired, Sidekicks, Ui.Eval.IsConfirmable() ? 1 : 0,
+                                List.Num() > 0 ? *FString::Join(List, TEXT(",")) : TEXT("-"));
+  if (!bOk) OutSummary += TEXT(" reason=") + FString::Join(Refusals, TEXT(";"));
+  return bOk;
+}
+
 bool FS09MoveInput::LegacyQuickMoveEnabled() {
   return FParse::Param(FCommandLine::Get(), TEXT("S08LegacyQuickMove"));
 }

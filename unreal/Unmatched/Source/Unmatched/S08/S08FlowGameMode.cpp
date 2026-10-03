@@ -243,6 +243,13 @@ void AS08FlowGameMode::BeginPlay() {
   bAuto = FParse::Param(FCommandLine::Get(), TEXT("S08Auto"));
   bAutoCreate = FParse::Param(FCommandLine::Get(), TEXT("S08Create"));
   bAutoManeuver = FParse::Param(FCommandLine::Get(), TEXT("S08Maneuver"));
+  // M1 (MS-AT-32): opt-in plan of the driver on the opened draft; without the
+  // flag the one-step driver is unchanged.
+  AutoManeuverPlan = FS09MoveInput::AutoManeuverPlanFromCommandLine();
+  if (!AutoManeuverPlan.IsEmpty() && !FS09MoveInput::IsKnownManeuverPlan(AutoManeuverPlan)) {
+    UE_LOG(LogTemp, Warning, TEXT("S08 unknown -S08ManeuverPlan=%s - ignored"), *AutoManeuverPlan);
+    AutoManeuverPlan.Reset();
+  }
   // MS-R-32: the TASK-022 two-click quick move only behind this dev flag.
   bLegacyQuickMove = FS09MoveInput::LegacyQuickMoveEnabled();
   AutoEmail = FPlatformMisc::GetEnvironmentVariable(TEXT("S08_EMAIL"));
@@ -356,6 +363,9 @@ void AS08FlowGameMode::RunAutoDrive() {
                                  bAutoCreate ? 1 : 0,
                                  AutoCode.IsEmpty() ? TEXT("no") : TEXT("yes"),
                                  bAutoManeuver ? 1 : 0));
+  if (bAutoManeuver && !AutoManeuverPlan.IsEmpty()) {
+    FS08Trace::Write(FString::Printf(TEXT("AUTO maneuver plan=%s armed"), *AutoManeuverPlan.ToLower()));
+  }
   Flow->Login(AutoEmail, AutoPassword);
 }
 
@@ -3910,6 +3920,16 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
     if (bAutoManeuverAwaitDraft && CommandUi.Mode == ES09CommandMode::ManeuverDraft &&
         !Flow->IsManeuverInFlight()) {
       bAutoManeuverAwaitDraft = false;
+      // M1 (MS-AT-32): -S08ManeuverPlan fills the draft (boost card + moves,
+      // src=auto) first; a refused plan keeps only Ok moves and still confirms
+      // so the demo gate (seq + 2) closes - the summary line says ok=0.
+      if (!AutoManeuverPlan.IsEmpty()) {
+        FString Summary;
+        FS09MoveInput::RunAutoManeuverPlan(AutoManeuverPlan, CommandUi, Flow->GetAppliedSnapshot(), BoardModel,
+                                           Fighters, Summary);
+        FS08Trace::Write(Summary);
+        if (BoardActor) BoardActor->SetSelectedFighter(CommandUi.SelectedFighterId, CommandUi.ReachableCells);
+      }
       FS08Trace::Write(FString::Printf(TEXT("AUTO maneuver draft open moves=%d - confirm"), CommandUi.Moves.Num()));
       ConfirmDraft();
     }

@@ -25,6 +25,9 @@
 //       without a mutation, the target carried into the draft by the new hand,
 //       why.predraft.lost, no quick move, the -S08Maneuver driver (src=auto).
 //   Unmatched.S09.MoveSel.ExhaustionConfirm - MS-AT-17 (MS-T-07): MS-S-04.
+//   Unmatched.S09.MoveSel.AutoManeuverPlan - M1 / MS-AT-32 (driver part): the opt-in
+//       -S08ManeuverPlan=boost3 on the driver's draft - the best BOOST card, three
+//       moves (hero step + two sidekicks), src=auto, confirmable; refusals.
 //   Unmatched.S09.MoveSel.ReconnectAndRebuild - MS-AT-20, the MS-T-04 part:
 //       the draft cache by maneuverId, re-evaluation on a new seq, a boost card
 //       that left the hand, another id / closed maneuver / GAME_OVER. (Deadline,
@@ -2156,6 +2159,129 @@ bool FS09MoveSelExhaustionConfirmTest::RunTest(const FString&) {
   Over.Phase = TEXT("GAME_OVER");
   Ui.OnSnapshot(Over, Board, Hurt);
   TestTrue(TEXT("hero dead: no draft"), Ui.Mode == ES09CommandMode::None && Ui.Moves.Num() == 0);
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09MoveSelAutoManeuverPlanTest, "Unmatched.S09.MoveSel.AutoManeuverPlan",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS09MoveSelAutoManeuverPlanTest::RunTest(const FString&) {
+  // M1 (MS-AT-32): -S08ManeuverPlan=boost3 on the draft the -S08Maneuver
+  // driver opened - the hero step carried in (src=auto), then the best BOOST
+  // card and two sidekicks (the first as far as the boost reaches, the next
+  // the nearest), all through the draft API with src=auto.
+  const FS08BoardModel Board = MsGrid(9, 5);
+  FS08BoardFighter Hero = MsFighter(TEXT("h"), Me, 0, 2, 2.0);
+  Hero.bIsHero = true;
+  const TArray<FS08BoardFighter> Team = {Hero, MsFighter(TEXT("s1"), Me, 0, 1, 2.0), MsFighter(TEXT("s2"), Me, 0, 3, 2.0),
+                                         MsFighter(TEXT("s3"), Me, 2, 0, 2.0), MsFighter(TEXT("e"), Opp, 8, 4)};
+  const TArray<FMsCard> Before = {{TEXT("c1"), true, 1}};
+  // After the draw: +1, a printed-null card, two +3 (the first of equals wins).
+  const TArray<FMsCard> After = {{TEXT("c1"), true, 1}, {TEXT("cn"), false, 0}, {TEXT("c3"), true, 3},
+                                 {TEXT("c3b"), true, 3}};
+  const FS08Snapshot Turn = MsTurnSnapshot(Before, 4);
+  const FS08Snapshot Draft = MsSnapshot(After, ManeuverA, 5);
+
+  // ---- the flag: opt-in, one known plan ----
+  TestTrue(TEXT("no -S08ManeuverPlan in this run: empty plan (driver unchanged)"),
+           FS09MoveInput::AutoManeuverPlanFromCommandLine().IsEmpty());
+  TestTrue(TEXT("boost3 is known"), FS09MoveInput::IsKnownManeuverPlan(TEXT("boost3")) &&
+                                        FS09MoveInput::IsKnownManeuverPlan(TEXT("BOOST3")));
+  TestFalse(TEXT("another plan is not"), FS09MoveInput::IsKnownManeuverPlan(TEXT("boost2")));
+  TestFalse(TEXT("an empty plan is not"), FS09MoveInput::IsKnownManeuverPlan(FString()));
+
+  // ---- the driver's pre-draft, begin, the draft opens with the hero step ----
+  auto OpenDriverDraft = [&](const TArray<FS08BoardFighter>& Fighters, const FS08Snapshot& Opened) {
+    FS09CommandUi Ui = MsOpen(Turn, Board, Fighters);
+    FString HeroId;
+    FIntPoint Target;
+    bool bUnchanged = false;
+    const bool bPre = FS09MoveInput::AutoManeuverTarget(Ui, Board, Fighters, HeroId, Target) &&
+                      Ui.InspectFighter(HeroId, Turn, Board, Fighters) &&
+                      Ui.SetPreDraft(HeroId, Target.X, Target.Y, Turn, Board, Fighters, bUnchanged);
+    TestTrue(TEXT("driver pre-draft"), bPre);
+    Ui.OnSnapshot(Opened, Board, Fighters);
+    return Ui;
+  };
+  FS09CommandUi Ui = OpenDriverDraft(Team, Draft);
+  TestTrue(TEXT("draft open with the hero step"), Ui.Mode == ES09CommandMode::ManeuverDraft && Ui.Moves.Num() == 1 &&
+                                                      Ui.Moves[0].FighterId == TEXT("h"));
+  Ui.DraftTrace.Reset();
+
+  FString Summary;
+  TestTrue(TEXT("boost3: ok"), FS09MoveInput::RunAutoManeuverPlan(TEXT("boost3"), Ui, Draft, Board, Team, Summary));
+  TestTrue(TEXT("summary line"), Summary.StartsWith(TEXT("AUTO maneuver plan=boost3 ok=1 moves=3 boost=c3 value=3 maxRequired=3 sidekicks=2 confirmable=1 list=h@")));
+  TestEqual(TEXT("the highest printed BOOST, first of equals"), Ui.BoostCardId, FString(TEXT("c3")));
+  TestEqual(TEXT("three moves"), Ui.Moves.Num(), 3);
+  if (Ui.Moves.Num() == 3) {
+    TestEqual(TEXT("1: the carried hero step"), Ui.Moves[0].FighterId, FString(TEXT("h")));
+    TestEqual(TEXT("2: the first sidekick"), Ui.Moves[1].FighterId, FString(TEXT("s1")));
+    TestEqual(TEXT("3: the next sidekick"), Ui.Moves[2].FighterId, FString(TEXT("s2")));
+    TestTrue(TEXT("the first added goes base + boost (spends the boost)"),
+             Ui.Moves[1].Path.Num() == 5 && Ui.Moves[1].RequiredBoost == 3 && Ui.Moves[1].Allowance == 5);
+    TestTrue(TEXT("the next one the nearest"), Ui.Moves[2].Path.Num() == 1 && Ui.Moves[2].RequiredBoost == 0);
+    for (const FS09DraftMove& Move : Ui.Moves) {
+      TestEqual(FString::Printf(TEXT("%s is Ok"), *Move.FighterId), MsStatus(&Move), FString(TEXT("ok")));
+    }
+  }
+  TestTrue(TEXT("no selection left"), Ui.SelectedFighterId.IsEmpty());
+  TestTrue(TEXT("MS-DRAFT op=boost ... src=auto"), MsTracedLine(Ui, {TEXT("op=boost"), TEXT("src=auto")}));
+  TestTrue(TEXT("MS-DRAFT op=assign fighter=s1 ... src=auto"),
+           MsTracedLine(Ui, {TEXT("op=assign"), TEXT("src=auto"), TEXT("fighter=s1")}));
+  TestTrue(TEXT("MS-DRAFT op=assign fighter=s2 ... src=auto"),
+           MsTracedLine(Ui, {TEXT("op=assign"), TEXT("src=auto"), TEXT("fighter=s2")}));
+  TestFalse(TEXT("nothing as a click or a key"), MsTracedLine(Ui, {TEXT("src=click")}) || MsTracedLine(Ui, {TEXT("src=key")}));
+  TestTrue(TEXT("the source is restored"), Ui.DraftSource == ES09InputSource::Auto);
+  FS09ManeuverCommand Command;
+  FString Reason;
+  TestTrue(TEXT("confirm"), Ui.ConfirmManeuver(Draft, Board, Team, Command, Reason));
+  TestTrue(TEXT("the command: 3 moves + the boost card"), Command.Moves.Num() == 3 && Command.BoostCardId == TEXT("c3") &&
+                                                              Command.ManeuverId == ManeuverA);
+
+  // ---- a selected card with a printed BOOST is kept ----
+  {
+    FS09CommandUi Kept = OpenDriverDraft(Team, Draft);
+    FString Why;
+    TestTrue(TEXT("c1 selected first"), Kept.ToggleBoostCard(TEXT("c1"), Draft, Board, Team, Why));
+    FString Line;
+    TestTrue(TEXT("kept: ok"), FS09MoveInput::RunAutoManeuverPlan(TEXT("boost3"), Kept, Draft, Board, Team, Line));
+    TestTrue(TEXT("kept: c1 stays, the far move uses +1"),
+             Kept.BoostCardId == TEXT("c1") && Line.Contains(TEXT(" boost=c1 value=1 maxRequired=1 ")));
+  }
+
+  // ---- refusals: the summary names them, the draft keeps only Ok moves ----
+  {
+    FS09CommandUi NoBoost = OpenDriverDraft(Team, MsSnapshot({{TEXT("cn"), false, 0}}, ManeuverA, 5));
+    FString Line;
+    TestFalse(TEXT("no printed BOOST: refused"),
+              FS09MoveInput::RunAutoManeuverPlan(TEXT("boost3"), NoBoost, MsSnapshot({{TEXT("cn"), false, 0}}, ManeuverA, 5),
+                                                 Board, Team, Line));
+    TestTrue(TEXT("no printed BOOST: ok=0 boost=none reason=boost.none"),
+             Line.Contains(TEXT(" ok=0 moves=3 boost=none ")) && Line.Contains(TEXT("reason=boost.none")));
+    TestTrue(TEXT("no printed BOOST: the moves are Ok (confirmable)"), NoBoost.Eval.IsConfirmable());
+  }
+  {
+    const TArray<FS08BoardFighter> Small = {Hero, MsFighter(TEXT("s1"), Me, 0, 1, 2.0), MsFighter(TEXT("e"), Opp, 8, 4)};
+    FS09CommandUi Short = OpenDriverDraft(Small, Draft);
+    FString Line;
+    TestFalse(TEXT("two own fighters: refused"),
+              FS09MoveInput::RunAutoManeuverPlan(TEXT("boost3"), Short, Draft, Board, Small, Line));
+    TestTrue(TEXT("two own fighters: moves.short:2"),
+             Line.Contains(TEXT(" ok=0 moves=2 boost=c3 ")) && Line.Contains(TEXT("moves.short:2")));
+    TestTrue(TEXT("two own fighters: still confirmable"), Short.Eval.IsConfirmable());
+  }
+  {
+    FS09CommandUi Same = OpenDriverDraft(Team, Draft);
+    const int32 Moves = Same.Moves.Num();
+    FString Line;
+    TestFalse(TEXT("unknown plan: refused"),
+              FS09MoveInput::RunAutoManeuverPlan(TEXT("boost2"), Same, Draft, Board, Team, Line));
+    TestTrue(TEXT("unknown plan: reason, draft untouched"),
+             Line == TEXT("AUTO maneuver plan=boost2 ok=0 reason=plan.unknown") && Same.Moves.Num() == Moves &&
+                 Same.BoostCardId.IsEmpty());
+    FS09CommandUi Idle = MsOpen(Turn, Board, Team);
+    TestFalse(TEXT("no draft: refused"), FS09MoveInput::RunAutoManeuverPlan(TEXT("boost3"), Idle, Turn, Board, Team, Line));
+    TestEqual(TEXT("no draft: reason"), Line, FString(TEXT("AUTO maneuver plan=boost3 ok=0 reason=draft.closed")));
+  }
   return true;
 }
 

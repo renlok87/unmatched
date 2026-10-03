@@ -4,7 +4,9 @@
 // store with an in-flight gate (GD-031). Packaged demo drive:
 //   -S08Auto -S08Create (host) or -S08Code=XXXXXX (joiner),
 //   -S08HeroId=<prisma id>, -S08Maneuver (auto maneuver when the board is
-//   live and it is this client's turn), -S08Shot=<abs path> (1920x1080
+//   live and it is this client's turn; -S08ManeuverPlan=boost3 fills the
+//   opened draft with a boost card and three moves before the confirm - M1,
+//   MS-AT-32), -S08Shot=<abs path> (1920x1080
 //   HighResShot after the maneuver), -S08DropWsAfter=<seconds> (test hook:
 //   abrupt WS loss mid-run to prove reconnect convergence),
 //   -S08ExitAfter=<seconds>.
@@ -602,6 +604,7 @@ private:
   FS09MoveInput MoveInput;
   bool bLegacyQuickMove = false;      // -S08LegacyQuickMove: TASK-022 two-click move (MS-R-32)
   bool bAutoManeuverAwaitDraft = false; // -S08Maneuver: confirm once the draft opens (MS-R-62)
+  FString AutoManeuverPlan;             // -S08ManeuverPlan=<plan>: run on the opened draft first (M1)
   FString TracedToast;             // the last toast written to the trace (MS-AT-18)
   int32 ManeuverTargetX = -1;
   int32 ManeuverTargetY = -1;

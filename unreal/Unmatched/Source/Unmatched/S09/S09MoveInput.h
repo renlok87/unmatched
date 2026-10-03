@@ -115,6 +115,28 @@ public:
   /** The demo gate (S08FlowGameMode): begin (+1) and maneuver (+1) applied and
    *  the pendingManeuver closed. */
   static bool AutoManeuverSettled(int32 StartSeq, const FS08Snapshot& Snapshot);
+  /** M1 (MS-AT-32): the opt-in -S08ManeuverPlan=<plan> of the driver; empty
+   *  without the flag (the one-step driver above, unchanged). */
+  static FString AutoManeuverPlanFromCommandLine();
+  /** Plans RunAutoManeuverPlan knows: "boost3". */
+  static bool IsKnownManeuverPlan(const FString& Plan);
+  /** Runs Plan on the open draft (the hero step already carried in by the
+   *  pre-draft), every operation through the draft API with src=auto.
+   *  "boost3": (1) the own-hand card with the highest printed BOOST (the first
+   *  of equals in hand order; a card already selected with a printed BOOST is
+   *  kept) - ToggleBoostCard, five-argument form; (2) own fighters without a
+   *  move (sidekicks first, then heroes, Fighters order) get a destination
+   *  until the draft holds 3 moves - SelectFighter, then the endpoints of its
+   *  base tier (base + selected BOOST) checked by EvaluateDestination, Ok
+   *  only: the first added fighter takes the farthest one (it spends the
+   *  boost when the boost adds steps), the next ones the nearest - and
+   *  SetDestination; (3) the draft must evaluate confirmable. True when the
+   *  draft holds 3 moves, a boost card and evaluates Ok. OutSummary is the
+   *  AUTO trace line ("AUTO maneuver plan=boost3 ok=1 moves=3 boost=<id> ...");
+   *  on a refusal it names the reason and the draft keeps only Ok moves. */
+  static bool RunAutoManeuverPlan(const FString& Plan, FS09CommandUi& Ui, const FS08Snapshot& Snapshot,
+                                  const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters,
+                                  FString& OutSummary);
   /** MS-R-32: the TASK-022 two-click quick move only with -S08LegacyQuickMove. */
   static bool LegacyQuickMoveEnabled();
   /** Board clicks and the move-selection keys of this mode go through
