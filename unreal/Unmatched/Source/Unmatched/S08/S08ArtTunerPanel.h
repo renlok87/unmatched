@@ -20,6 +20,7 @@ struct FS08ArtTunerPanelActions {
   TFunction<void(const FString& GroupId)> ResetGroup;  // empty = every group
   TFunction<void()> Save;
   TFunction<void()> Close;
+  FString CloseKey = TEXT("F10");  // the key that toggles the panel (Shift+F10 in a live game)
 };
 
 class SS08ArtTunerPanel : public SCompoundWidget {

@@ -563,6 +563,8 @@ void AS08FlowGameMode::ArtTunerSetPanelOpen(bool bOpen) {
     Actions.Close = [Self]() {
       if (Self.IsValid()) Self->ArtTunerSetPanelOpen(false);
     };
+    // F10 alone stays the operator debug panel in a live game (ArtTunerTick)
+    Actions.CloseKey = ArtView.IsValid() ? TEXT("F10") : TEXT("Shift+F10");
     S.Panel = SNew(SS08ArtTunerPanel, ArtTuner, MoveTemp(Actions));
     S.PanelRoot = SNew(SBox)
                       .HAlign(HAlign_Right)

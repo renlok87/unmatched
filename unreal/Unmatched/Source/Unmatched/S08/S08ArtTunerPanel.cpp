@@ -93,7 +93,8 @@ void SS08ArtTunerPanel::Construct(const FArguments& InArgs, const TSharedPtr<FS0
                                   })] +
                   SHorizontalBox::Slot().FillWidth(1.0f)[SNew(SSpacer)] +
                   SHorizontalBox::Slot().AutoWidth()[
-                      SmallButton(FText::FromString(TEXT("Закрыть (F10)")), FText::FromString(TEXT("Спрятать панель")), [this]() {
+                      SmallButton(FText::FromString(FString::Printf(TEXT("Закрыть (%s)"), *Actions.CloseKey)),
+                                  FText::FromString(TEXT("Спрятать панель")), [this]() {
                         Flush();
                         if (Actions.Close) Actions.Close();
                       })]] +
