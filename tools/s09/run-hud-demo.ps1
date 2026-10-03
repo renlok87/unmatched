@@ -3,10 +3,16 @@ param(
   [string]$Api = "http://localhost:3120/graphql",
   [string]$EvidenceDir = "",
   [int]$RunSeconds = 100,
-  [string]$ShotMode = "request"
+  [string]$ShotMode = "request",
+  # The board of the room (2026-10-04, real boards only: docs/game-design/decisions/2026-10-04-real-boards-only.md):
+  # a Board row id of an original map registered in unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json, sent
+  # by the host as -S08BoardId (no -ArtPreview: the HUD runs on the grey topology view of the map). Default
+  # Marmoreal - original map; Sarpedon - original map is c7fa64a26c29a0835f2383e63. The traces must show the map
+  # board ('BOARD <lattice WxH> cells' + 'BOARD topology spaces=<n> links=<m>'), never the old 'BOARD 20x20'.
+  [string]$BoardId = "c121b47f8d6eb28daccb76d05"
 )
 # GD-032/GD-033 two-client packaged HUD demo against the S09 worktree-local
-# backend. Coverage plan (exact hand math: start 5, +1 per beginManeuver,
+# backend, on an original map (-BoardId, default Marmoreal; 2026-10-04). Coverage plan (exact hand math: start 5, +1 per beginManeuver,
 # limit 7):
 #   host   -S09Flow:        T1 begin->zero-move confirm; T1 begin->hero step;
 #                           end turn; T2 begin->hero+sidekick multi-fighter;
@@ -28,6 +34,20 @@ $ErrorActionPreference = 'Stop'
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 if (-not $Exe) { $Exe = Join-Path $RepoRoot 'unreal\Unmatched\Saved\StagedBuilds\Windows\Unmatched.exe' }
 if (-not $EvidenceDir) { $EvidenceDir = Join-Path $RepoRoot 'docs\game-design\evidence\S09\run' }
+
+# The registered original map of -BoardId: its topology fixture gives the lattice W x H and the space graph the traces
+# must show (one source of truth with the client's art board registry, as run-phase2-demo).
+if ($BoardId -cnotmatch '^c[a-z0-9]{24}$') { throw "BoardId '$BoardId' is not a Board row id (cuid)" }
+$BoardsDoc = [System.IO.File]::ReadAllText((Join-Path $RepoRoot 'unreal\Unmatched\Config\ArtBoards\S08ArtBoardProfiles.json'), [System.Text.Encoding]::UTF8) | ConvertFrom-Json
+$BoardProfile = @($BoardsDoc.boards | Where-Object { @($_.match.boardIds) -ccontains $BoardId }) | Select-Object -First 1
+if (-not $BoardProfile -or $BoardProfile.surface -ne 'map-image') {
+  throw "BoardId '$BoardId' is not a registered original map (S08ArtBoardProfiles.json boards[].match.boardIds, surface map-image)"
+}
+$BoardTopology = [System.IO.File]::ReadAllText((Join-Path $RepoRoot $BoardProfile.fixture), [System.Text.Encoding]::UTF8) | ConvertFrom-Json
+if ($BoardTopology.boardId -cne $BoardId) { throw "topology fixture $($BoardProfile.fixture) is board $($BoardTopology.boardId), not $BoardId" }
+$BoardSize = "$($BoardTopology.lattice.width)x$($BoardTopology.lattice.height)"
+$BoardIdSource = if ($PSBoundParameters.ContainsKey('BoardId')) { 'argument' } else { 'default' }
+Write-Output "board: profile=$($BoardProfile.id) boardId=$BoardId source=$BoardIdSource size=$BoardSize spaces=$($BoardProfile.expect.spaces) links=$($BoardProfile.expect.links)"
 
 # The packaged build keeps its last SAVED resolution (888x500 was found in
 # the staged GameUserSettings.ini) and ignores -resx/-resy: publish the
@@ -208,7 +228,7 @@ function Invoke-HudDemo {
   $common = @("-windowed", "-resx=1280", "-resy=720", "-RenderOffScreen", "log=GrepLog",
     "-ForceAbandonSequences", "-S08Api=$Api", "-S09ShotMode=$ShotMode")
   $hostArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
-    "-S08Auto", "-S08Create", "-S08HeroId=$heroA", "-S08Trace=$hostTrace",
+    "-S08Auto", "-S08Create", "-S08BoardId=$BoardId", "-S08HeroId=$heroA", "-S08Trace=$hostTrace",
     "-S09Flow", "-S09ShotDir=$hostShots", "-S08ExitAfter=$RunSeconds")
   $joinArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
     "-S08Auto", "-S08HeroId=$heroB", "-S08Trace=$joinTrace",
@@ -250,6 +270,15 @@ function Invoke-HudDemo {
     }
     if (-not $code) { throw "no room code found in host trace" }
     Write-Output "room created by this run (code redacted from output; id=$Script:ThisRunGameId)"
+    # The authoritative game row must be on the requested board (the backend refuses an unknown boardId).
+    $loginBody = @{ query = 'mutation L($input: LoginDto!) { login(input: $input) { accessToken } }'; variables = @{ input = @{ email = $AccountA.email; password = $AccountA.password } } } | ConvertTo-Json -Depth 5
+    $login = Invoke-RestMethod -Uri $Api -Method Post -ContentType 'application/json' -Body $loginBody
+    Assert-GqlOk $login 'board check login'
+    $lookup = @{ query = 'query G($id: String!) { game(id: $id) { id boardId } }'; variables = @{ id = $Script:ThisRunGameId } } | ConvertTo-Json -Depth 5
+    $game = Invoke-RestMethod -Uri $Api -Method Post -ContentType 'application/json' -Headers @{ authorization = "Bearer $($login.data.login.accessToken)" } -Body $lookup
+    Assert-GqlOk $game 'board check lookup'
+    if ($game.data.game.boardId -cne $BoardId) { throw "created room has boardId=$($game.data.game.boardId), expected $BoardId" }
+    Write-Output "boardId verified against the authoritative game row: $BoardId ($($BoardProfile.id))"
 
     $joinStartUtc = [DateTime]::UtcNow
     $joinProc = Start-S09Client $joinArgs $AccountB.email $AccountB.password $code
@@ -370,20 +399,22 @@ function Invoke-HudDemo {
     # (consumeAction -> advanceTurn), so the client endTurn mutation is
     # unreachable without card effects (GD-034+). The turn handover is
     # asserted through the server-driven phase/view instead.
-    Assert-Trace $hostTrace @(
-      'SNAPSHOT applied', 'BOARD 20x20', 'FIGHTERS synced n=6', 'SUBSCRIBED gameStateUpdated',
+    # The map board (2026-10-04): its lattice line and its space graph, on both clients.
+    $boardLines = @("BOARD $BoardSize cells", "BOARD topology spaces=$($BoardProfile.expect.spaces) links=$($BoardProfile.expect.links) starts=")
+    Assert-Trace $hostTrace (@(
+      'SNAPSHOT applied', 'FIGHTERS synced n=6', 'SUBSCRIBED gameStateUpdated',
       'HUD seq=', 'DRAFT-OPEN draw committed', 'turn=opp', 'S09AUTO draft-open shot',
       'S09AUTO zero-move confirm', 'MANEUVER-CONFIRM moves=0 boost=none', 'MANEUVER done',
       'MANEUVER-CONFIRM moves=1', 'S09AUTO multi-fighter moves=2', 'MANEUVER-CONFIRM moves=2',
       'DISCARD-DRAFT count=2', 'S09AUTO discard picks=2',
-      'DISCARD-CONFIRM pending=', 'count=2') 'host'
-    Assert-Trace $joinTrace @(
-      'SNAPSHOT applied', 'BOARD 20x20', 'FIGHTERS synced n=6', 'SUBSCRIBED gameStateUpdated',
+      'DISCARD-CONFIRM pending=', 'count=2', "CREATE boardId=$BoardId source=S08BoardId") + $boardLines) 'host'
+    Assert-Trace $joinTrace (@(
+      'SNAPSHOT applied', 'FIGHTERS synced n=6', 'SUBSCRIBED gameStateUpdated',
       'HUD seq=', 'DRAFT-OPEN draw committed', 'turn=opp', 'S09AUTO draft-open shot',
       'S09AUTO boost(new card) set',
       'MANEUVER-CONFIRM moves=0 boost=card', 'MANEUVER done',
       'MANEUVER-CONFIRM moves=1',
-      'DISCARD-DRAFT count=1', 'DISCARD-CONFIRM pending=', 'count=1') 'joiner'
+      'DISCARD-DRAFT count=1', 'DISCARD-CONFIRM pending=', 'count=1') + $boardLines) 'joiner'
 
     # Privacy cross-check inside the traces: the JOINER must never see host
     # card identity, only counts (the HUD summary line never carries names).
@@ -441,7 +472,8 @@ function Invoke-HudDemo {
     }
     $manifest = [ordered]@{
       stamp   = $Stamp
-      verdict = 'GD-032/033 P1: HUD traces + zero-move + boost(new card) + multi-fighter + exact-count discards + draft/discard state-marker shots at exact 1280x720 + negative/swap controls + seq convergence'
+      verdict = "GD-032/033 P1 on $($BoardProfile.id) ($BoardId, lattice $BoardSize, $($BoardProfile.expect.spaces) spaces / $($BoardProfile.expect.links) links): HUD traces + zero-move + boost(new card) + multi-fighter + exact-count discards + draft/discard state-marker shots at exact 1280x720 + negative/swap controls + seq convergence"
+      board   = [ordered]@{ boardId = $BoardId; source = $BoardIdSource; profile = $BoardProfile.id; lattice = $BoardSize; spaces = $BoardProfile.expect.spaces; links = $BoardProfile.expect.links }
       files   = @()
     }
     function Get-Sha256Hex([string]$Path) {

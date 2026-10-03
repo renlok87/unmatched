@@ -268,13 +268,21 @@ void FS08FlowController::CreateRoom(const FString& Mode) {
   TSharedRef<FJsonObject> Variables = MakeShared<FJsonObject>();
   TSharedRef<FJsonObject> Input = MakeShared<FJsonObject>();
   Input->SetStringField(TEXT("mode"), Mode.IsEmpty() ? TEXT("ONE_V_ONE") : Mode);
-  // Opt-in art review: select a real board explicitly instead of relying on
-  // the database's first-created (historically 20x20) default board.
-  FString ArtBoardId;
-  if (FParse::Param(FCommandLine::Get(), TEXT("ArtPreview")) &&
-      FParse::Value(FCommandLine::Get(), TEXT("ArtPreviewBoardId="), ArtBoardId) &&
-      !ArtBoardId.IsEmpty()) {
-    Input->SetStringField(TEXT("boardId"), ArtBoardId);
+  // The board of the new room, explicit (2026-10-04, real boards only): -S08BoardId=<Board row id> (any run), else
+  // the art-review pair -ArtPreview -ArtPreviewBoardId=<id>; without either the backend picks its default board
+  // (Marmoreal - original map).
+  FString BoardId;
+  const TCHAR* BoardSource = TEXT("S08BoardId");
+  if (!FParse::Value(FCommandLine::Get(), TEXT("S08BoardId="), BoardId) || BoardId.IsEmpty()) {
+    BoardId.Reset();
+    BoardSource = TEXT("ArtPreviewBoardId");
+    if (FParse::Param(FCommandLine::Get(), TEXT("ArtPreview"))) {
+      FParse::Value(FCommandLine::Get(), TEXT("ArtPreviewBoardId="), BoardId);
+    }
+  }
+  if (!BoardId.IsEmpty()) {
+    Input->SetStringField(TEXT("boardId"), BoardId);
+    Trace(FString::Printf(TEXT("CREATE boardId=%s source=%s"), *BoardId, BoardSource));
   }
   Variables->SetObjectField(TEXT("input"), Input);
   Variables->SetStringField(TEXT("idempotencyKey"), IdempotencyKey);

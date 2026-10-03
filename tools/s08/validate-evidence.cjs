@@ -1,3 +1,10 @@
+// HISTORICAL VALIDATOR (2026-10-04): it checks the S08 phase-2 evidence recorded on the old backend-default
+// 20x20 grey grid (the 'BOARD 20x20' trace gate and the grid verdicts of the retired check-board-shot.ps1).
+// New runs are NOT gated by it: since 2026-10-04 (real boards only, docs/game-design/decisions/
+// 2026-10-04-real-boards-only.md, ND-4/ND-6) tools/s08/run-phase2-demo.ps1 runs on an original map
+// (default Marmoreal) and gates its own map-board trace lines and art-check shots; a 20x20 run no longer
+// counts as evidence. Kept so the historical S08 runs stay verifiable.
+//
 // Strict validator for the latest published S08 phase-2 evidence run.
 // Usage:
 //   node validate-evidence.cjs <evidenceRoot>   validate <root>/latest.json target

@@ -2146,8 +2146,12 @@ void AS08FlowGameMode::HandleHudKeys() {
 
 namespace {
 // One step for FighterId into a reachable board neighbour (a linked space on
-// an original map, the orthogonal cells +X/-X/+Y/-Y on a grid); returns
-// false when no neighbour is legal (blocked board edge case).
+// an original map, the orthogonal cells +X/-X/+Y/-Y on a grid). A fighter
+// whose every neighbour is taken (2026-10-04, real boards only: Medusa opens
+// on Marmoreal M13 boxed in by her own Harpies) gets the nearest legal
+// endpoint within its movement instead - allies pass-through; fewest steps,
+// then lower Y, then lower X - traced 'S09AUTO step fallback'. Returns false
+// when nothing is legal.
 bool StepOneCell(FS09CommandUi& Ui, const FS08Snapshot& Snap, const FS08BoardModel& Board,
                  const TArray<FS08BoardFighter>& Fighters, const FString& FighterId) {
   Ui.SelectFighter(FighterId, Snap, Board, Fighters);
@@ -2159,6 +2163,34 @@ bool StepOneCell(FS09CommandUi& Ui, const FS08Snapshot& Snap, const FS08BoardMod
   FString Reason;
   for (const FIntPoint& Next : Board.Neighbours(FIntPoint(Fighter->X, Fighter->Y))) {
     if (Ui.SetDestination(FighterId, Next.X, Next.Y, Snap, Board, Fighters, Reason)) {
+      return true;
+    }
+  }
+  struct FStepCandidate {
+    int32 Steps;
+    int32 X;
+    int32 Y;
+  };
+  const int32 Movement = FS08BoardModel::FighterMovement(*Fighter);
+  TArray<FStepCandidate> Candidates;
+  for (const uint64 Key : FS08BoardModel::ComputeReachableCells(Board, Fighters, FighterId, Movement)) {
+    const int32 X = static_cast<int32>(static_cast<uint32>(Key >> 32));
+    const int32 Y = static_cast<int32>(static_cast<uint32>(Key & 0xffffffffull));
+    if (X == Fighter->X && Y == Fighter->Y) continue;
+    TArray<FIntPoint> Path;
+    if (!FS08BoardModel::BuildManeuverPath(Board, Fighters, FighterId, Movement, X, Y, Path)) continue;
+    Candidates.Add({Path.Num(), X, Y});
+  }
+  Candidates.Sort([](const FStepCandidate& A, const FStepCandidate& B) {
+    if (A.Steps != B.Steps) return A.Steps < B.Steps;
+    return A.Y != B.Y ? A.Y < B.Y : A.X < B.X;
+  });
+  for (const FStepCandidate& Candidate : Candidates) {
+    if (Ui.SetDestination(FighterId, Candidate.X, Candidate.Y, Snap, Board, Fighters, Reason)) {
+      FS08Trace::Write(FString::Printf(
+          TEXT("S09AUTO step fallback fighter=%s from=%s to=%s steps=%d allowance=%d (no free neighbour)"), *FighterId,
+          *Board.CellLabel(Fighter->X, Fighter->Y), *Board.CellLabel(Candidate.X, Candidate.Y), Candidate.Steps,
+          Movement));
       return true;
     }
   }

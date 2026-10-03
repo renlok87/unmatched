@@ -6,12 +6,13 @@ param(
   [ValidateRange(1, 60)][int]$ClientFps = 30,
   [int]$JoinerDropWsAfter = 12,
   [int]$HostManeuverAfter = 25,
-  # Opt-in ART-004/005 review on an explicitly selected art board: a Board row
-  # id registered in unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json
-  # (boards[].match.boardIds: the 5x6 Cobble review board or a T3.2 art
-  # fixture). Its W x H, zone counts and light profile come from that data and
-  # gate the traces ('BOARD WxH'). The default S08 20x20 path is unchanged.
-  [string]$ArtPreviewBoardId = "",
+  # The board of the run (2026-10-04, real boards only: docs/game-design/decisions/2026-10-04-real-boards-only.md,
+  # ND-4): a Board row id registered in unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json
+  # (boards[].match.boardIds of an original-map profile, surface map-image). Default Marmoreal - original map
+  # (marmoreal-original); Sarpedon - original map is c7fa64a26c29a0835f2383e63. The board is always explicit: the
+  # backend-default path with its 'BOARD 20x20' gate, the grey-grid shot checker and the Cobble 5x6 branch are gone.
+  # Its lattice W x H (from the profile's topology fixture), space graph, painted zones and light profile gate the traces.
+  [string]$ArtPreviewBoardId = "c121b47f8d6eb28daccb76d05",
   # Optional K2 review: zoom toward the selected host hero while the joiner
   # stays at K1. 1.6 is the written proposal; larger values are diagnostic.
   [double]$ArtPreviewFocusZoom = 0,
@@ -76,8 +77,9 @@ param(
   # runner can send real mouse / wheel / Space input to it after the evidence shot. The joiner stays offscreen.
   # Only the idle-gated runner passes this: a visible client takes the foreground on the user's desktop.
   [switch]$VisibleHost,
-  # Opt-in (move selection M1, 2026-10-04): with -ArtPreviewBoardId the host still runs the auto maneuver
-  # (-S08Maneuver -S08ManeuverAfter=HostManeuverAfter), which the art path drops by default. Host only.
+  # Opt-in (move selection M1, 2026-10-04): the host runs the auto maneuver (-S08Maneuver
+  # -S08ManeuverAfter=HostManeuverAfter; a plan via -ClientExtraArgs '-S08ManeuverPlan=boost3'), gated as
+  # 'MANEUVER begin seq=' + 'MANEUVER done' + 'CUE move' on the host and 'CUE move' on the joiner. Host only.
   [switch]$HostManeuver
 )
 
@@ -96,12 +98,14 @@ function Assert-ShotCaptured([string]$TracePath, [string]$Name, [string]$Who) {
   Write-Output ("shot captured {0} {1}: frame={2} lateFrame={3} px={4}x{5} sha256={6}" -f $Who, $Name, $capFrame, $lateFrame, $cap.Matches[0].Groups[2].Value, $cap.Matches[0].Groups[3].Value, $cap.Matches[0].Groups[4].Value.Substring(0, 12))
 }
 # GD-030/GD-031 two-client packaged demo: both clients hidden (-RenderOffScreen)
-# against the SAME real backend. Sequence under test:
-#   host   -> login, create, hero, ready, start, ONE legal maneuver
-#             (beginManeuver + maneuver) at HostManeuverAfter
+# against the SAME real backend, on an original map (-ArtPreview path, default
+# Marmoreal; real boards only since 2026-10-04). Sequence under test:
+#   host   -> login, create on -ArtPreviewBoardId, hero, ready, start, the
+#             selected own hero at ArtPreviewShotAfter; with -HostManeuver ONE
+#             legal maneuver (beginManeuver + maneuver) at HostManeuverAfter
 #   joiner -> login, join by code, hero, ready, WS DROPPED at
 #             JoinerDropWsAfter, bounded-backoff reconnect, refetch +
-#             resubscribe from applied seq, then convergence to the maneuver.
+#             resubscribe from applied seq, then convergence (same max seq).
 # Both take a 1920x1080 HighResShot after the board settles.
 #
 # S08 hardening:
@@ -129,65 +133,53 @@ function Assert-ShotCaptured([string]$TracePath, [string]$Name, [string]$Who) {
 #     $Script:CleanupFailure is rethrown after the finally block, so a failed
 #     scoped cleanup makes the whole demo exit nonzero.
 $ErrorActionPreference = 'Stop'
-if ($ArtPreviewFocusZoom -gt 0 -and (-not $ArtPreviewBoardId -or $ArtPreviewFocusZoom -le 1)) {
-  throw 'ArtPreviewFocusZoom requires ArtPreviewBoardId and a zoom greater than 1'
+if ($ArtPreviewFocusZoom -gt 0 -and $ArtPreviewFocusZoom -le 1) {
+  throw 'ArtPreviewFocusZoom must be a zoom greater than 1'
 }
 # An explicitly passed variant (even face-neck-v2) reaches the clients, so an
 # explicit v2 run is distinguishable from the no-flag default path in traces.
 $MedusaVariantExplicit = $PSBoundParameters.ContainsKey('ArtPreviewMedusaVariant')
-if (($ArtPreviewMedusaVariant -ne 'face-neck-v2' -or $MedusaVariantExplicit) -and -not $ArtPreviewBoardId) {
-  throw 'ArtPreviewMedusaVariant requires ArtPreviewBoardId'
-}
-# ArtPreviewBoardId must be a Board ROW id (cuid). The backend stores any
-# string but silently builds an empty 20x20 grid when no Board row has that id,
-# so a content slug such as 'cobble-city' is refused up front.
-if ($ArtPreviewBoardId -and $ArtPreviewBoardId -cnotmatch '^c[a-z0-9]{24}$') {
-  throw "ArtPreviewBoardId '$ArtPreviewBoardId' is not a Board row id (cuid); content slugs such as 'cobble-city' are refused. Use a Board row id registered in unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json (e.g. the 5x6 Cobble review board cmuhgs4b2001mwik4f2b2xtf8)."
+# Whether the board came from the command line or is the Marmoreal default (traced in the stdout and the status JSON).
+$BoardIdExplicit = $PSBoundParameters.ContainsKey('ArtPreviewBoardId')
+# ArtPreviewBoardId must be a Board ROW id (cuid) of a registered original map; the backend refuses an unknown
+# boardId (2026-10-04) and content slugs are refused up front.
+if ($ArtPreviewBoardId -cnotmatch '^c[a-z0-9]{24}$') {
+  throw "ArtPreviewBoardId '$ArtPreviewBoardId' is not a Board row id (cuid). Use a Board row id registered in unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json (Marmoreal c121b47f8d6eb28daccb76d05, Sarpedon c7fa64a26c29a0835f2383e63)."
 }
 # T3.2: the art board registry is the client's own data file (one source of
-# truth): the profile that lists this Board row id gives the expected W x H,
-# zone/multizone/obstacle counts and the light profile the traces must show.
-$ArtBoard = $null
-if ($ArtPreviewBoardId) {
-  $ArtBoardsPath = Join-Path (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path 'unreal\Unmatched\Config\ArtBoards\S08ArtBoardProfiles.json'
-  if (-not (Test-Path -LiteralPath $ArtBoardsPath)) { throw "art board registry missing: $ArtBoardsPath" }
-  $ArtBoardsDoc = [System.IO.File]::ReadAllText($ArtBoardsPath, [System.Text.Encoding]::UTF8) | ConvertFrom-Json
-  $ArtBoard = @($ArtBoardsDoc.boards | Where-Object { @($_.match.boardIds) -ccontains $ArtPreviewBoardId }) | Select-Object -First 1
-  if (-not $ArtBoard) {
-    $known = (@($ArtBoardsDoc.boards | ForEach-Object { "$($_.id)=$(@($_.match.boardIds) -join '|')" }) -join ', ')
-    throw "ArtPreviewBoardId '$ArtPreviewBoardId' is not a registered art board ($known); the backend would build an unrelated grid"
-  }
-  $ArtLight = $ArtBoardsDoc.lightProfiles.($ArtBoard.light)
-  if (-not $ArtLight) { throw "art board '$($ArtBoard.id)' names a missing light profile '$($ArtBoard.light)'" }
-  $ArtBoardSize = "$($ArtBoard.match.width)x$($ArtBoard.match.height)"
-  $ArtBoardLegacy = [bool]$ArtBoard.legacyCobbleTrace
-  # ENV-MAPS: an original-map profile (surface map-image, e.g. marmoreal-original) registers no grid
-  # W x H; the board is its space graph and the backend derives W x H from the lattice of the committed
-  # topology fixture the profile names. Its gates are the map-image / topology trace lines below.
-  $ArtBoardMap = ($ArtBoard.surface -eq 'map-image')
-  $ArtTopology = $null
-  if ($ArtBoardMap) {
-    $topologyPath = Join-Path (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path $ArtBoard.fixture
-    if (-not $ArtBoard.fixture -or -not (Test-Path -LiteralPath $topologyPath)) { throw "map-image board '$($ArtBoard.id)' names no readable topology fixture: '$($ArtBoard.fixture)'" }
-    $ArtTopology = [System.IO.File]::ReadAllText($topologyPath, [System.Text.Encoding]::UTF8) | ConvertFrom-Json
-    if ($ArtTopology.boardId -cne $ArtPreviewBoardId) { throw "topology fixture $($ArtBoard.fixture) is board $($ArtTopology.boardId), not $ArtPreviewBoardId" }
-    $ArtBoardSize = "$($ArtTopology.lattice.width)x$($ArtTopology.lattice.height)"
-  }
-  Write-Output "art board: profile=$($ArtBoard.id) size=$ArtBoardSize light=$($ArtBoard.light) legacyCobble=$ArtBoardLegacy map=$ArtBoardMap"
+# truth): the profile that lists this Board row id gives the topology fixture
+# (lattice W x H, spaces / links), the painted zones and the light profile the
+# traces must show.
+$ArtBoardsPath = Join-Path (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path 'unreal\Unmatched\Config\ArtBoards\S08ArtBoardProfiles.json'
+if (-not (Test-Path -LiteralPath $ArtBoardsPath)) { throw "art board registry missing: $ArtBoardsPath" }
+$ArtBoardsDoc = [System.IO.File]::ReadAllText($ArtBoardsPath, [System.Text.Encoding]::UTF8) | ConvertFrom-Json
+$ArtBoard = @($ArtBoardsDoc.boards | Where-Object { @($_.match.boardIds) -ccontains $ArtPreviewBoardId }) | Select-Object -First 1
+if (-not $ArtBoard) {
+  $known = (@($ArtBoardsDoc.boards | ForEach-Object { "$($_.id)=$(@($_.match.boardIds) -join '|')" }) -join ', ')
+  throw "ArtPreviewBoardId '$ArtPreviewBoardId' is not a registered art board ($known); the client would show no board art for it"
 }
-if (($ArtPreviewAllMedusa -or $ArtPreviewHeroesV2 -or $ArtPreviewInputPlan -or $ArtPreviewIconSize -gt 0 -or $ArtPreviewIconProbe) -and -not $ArtPreviewBoardId) {
-  throw 'ArtPreviewAllMedusa / ArtPreviewHeroesV2 / ArtPreviewInputPlan / ArtPreviewIconSize / ArtPreviewIconProbe require ArtPreviewBoardId'
+$ArtLight = $ArtBoardsDoc.lightProfiles.($ArtBoard.light)
+if (-not $ArtLight) { throw "art board '$($ArtBoard.id)' names a missing light profile '$($ArtBoard.light)'" }
+# ENV-MAPS: an original-map profile (surface map-image, e.g. marmoreal-original) registers no grid
+# W x H; the board is its space graph and the backend derives W x H from the lattice of the committed
+# topology fixture the profile names. Its gates are the map-image / topology trace lines below.
+# Real boards only (2026-10-04): every registered profile is an original map; anything else is refused.
+if ($ArtBoard.surface -ne 'map-image') {
+  throw "art board '$($ArtBoard.id)' has surface '$($ArtBoard.surface)', not map-image: only original maps count (docs/game-design/decisions/2026-10-04-real-boards-only.md)"
 }
-if ($ArtPreviewDiorama -and -not $ArtPreviewBoardId) {
-  throw 'ArtPreviewDiorama requires ArtPreviewBoardId'
-}
+$topologyPath = Join-Path (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path $ArtBoard.fixture
+if (-not $ArtBoard.fixture -or -not (Test-Path -LiteralPath $topologyPath)) { throw "map-image board '$($ArtBoard.id)' names no readable topology fixture: '$($ArtBoard.fixture)'" }
+$ArtTopology = [System.IO.File]::ReadAllText($topologyPath, [System.Text.Encoding]::UTF8) | ConvertFrom-Json
+if ($ArtTopology.boardId -cne $ArtPreviewBoardId) { throw "topology fixture $($ArtBoard.fixture) is board $($ArtTopology.boardId), not $ArtPreviewBoardId" }
+$ArtBoardSize = "$($ArtTopology.lattice.width)x$($ArtTopology.lattice.height)"
+Write-Output "art board: profile=$($ArtBoard.id) boardId=$ArtPreviewBoardId source=$(if ($BoardIdExplicit) { 'argument' } else { 'default' }) size=$ArtBoardSize light=$($ArtBoard.light) map=$($ArtBoard.mapImage.name) spaces=$($ArtBoard.expect.spaces) links=$($ArtBoard.expect.links)"
 if ($ArtPreviewHeroesV2 -and $ArtPreviewAllMedusa) {
   throw 'ArtPreviewHeroesV2 and ArtPreviewAllMedusa are separate reviews; pass one of them'
 }
 if ($ArtPreviewInputPlan -and $ArtPreviewInputPlan -notmatch '^[A-Za-z]+(\*[0-9]+)?(\+[A-Za-z]+(\*[0-9]+)?)*$') {
   throw "ArtPreviewInputPlan '$ArtPreviewInputPlan' is not a '+'-separated token list"
 }
-if ($ArtPreviewBoardId -and $RunSeconds -lt ($ArtPreviewShotAfter + 10)) {
+if ($RunSeconds -lt ($ArtPreviewShotAfter + 10)) {
   throw "RunSeconds=$RunSeconds must be at least ArtPreviewShotAfter+10 ($($ArtPreviewShotAfter + 10))"
 }
 $ExpectedMedusaMesh = @{
@@ -465,7 +457,7 @@ function Invoke-Phase2Demo {
   $common = @("-windowed", "-resx=1920", "-resy=1080", "-RenderOffScreen", "log=GrepLog", "-ForceAbandonSequences", "-S08Api=$Api")
   if ($ClientRenderPreset -ne 'None') { $common += "-S08RenderPreset=$ClientRenderPreset" }
   if ($ClientExtraArgs) { $common += @($ClientExtraArgs.Split('+') | Where-Object { $_ }) }
-  if ($ArtPreviewBoardId) { $common += @('-ArtPreview', '-ForceRes') }
+  $common += @('-ArtPreview', '-ForceRes')
   if ($ArtPreviewMedusaVariant -ne 'face-neck-v2' -or $MedusaVariantExplicit) { $common += "-ArtPreviewMedusaVariant=$ArtPreviewMedusaVariant" }
   if ($ClientPerf) { $common += '-S08Perf' }
   if ($ArtPreviewAllMedusa) { $common += '-ArtPreviewAllMedusa' }
@@ -477,18 +469,14 @@ function Invoke-Phase2Demo {
     "-S08Auto", "-S08Create",
     "-S08HeroId=$heroA", "-S08Trace=$hostTrace", "-S08Shot=$hostShot",
     "-S08ExitAfter=$RunSeconds")
-  if ($ArtPreviewBoardId) {
-    $hostArgs += @("-ArtPreviewBoardId=$ArtPreviewBoardId", "-ArtPreviewShotAfter=$ArtPreviewShotAfter", '-ArtPreviewSelectOwnHero')
-    if ($ArtPreviewFocusZoom -gt 0) {
-      $hostArgs += ('-ArtPreviewFocusZoom={0}' -f $ArtPreviewFocusZoom.ToString('0.###', [Globalization.CultureInfo]::InvariantCulture))
-    }
-    if ($ArtPreviewInputPlan) { $hostArgs += "-ArtPreviewInputPlan=$ArtPreviewInputPlan" }
-    if ($ArtPreviewIconSize -gt 0) { $hostArgs += "-ArtPreviewIconSize=$ArtPreviewIconSize" }
-    if ($ArtPreviewIconProbe) { $hostArgs += '-ArtPreviewIconProbe' }
-    if ($HostManeuver) { $hostArgs += @('-S08Maneuver', "-S08ManeuverAfter=$HostManeuverAfter") }
-  } else {
-    $hostArgs += @('-S08Maneuver', "-S08ManeuverAfter=$HostManeuverAfter")
+  $hostArgs += @("-ArtPreviewBoardId=$ArtPreviewBoardId", "-ArtPreviewShotAfter=$ArtPreviewShotAfter", '-ArtPreviewSelectOwnHero')
+  if ($ArtPreviewFocusZoom -gt 0) {
+    $hostArgs += ('-ArtPreviewFocusZoom={0}' -f $ArtPreviewFocusZoom.ToString('0.###', [Globalization.CultureInfo]::InvariantCulture))
   }
+  if ($ArtPreviewInputPlan) { $hostArgs += "-ArtPreviewInputPlan=$ArtPreviewInputPlan" }
+  if ($ArtPreviewIconSize -gt 0) { $hostArgs += "-ArtPreviewIconSize=$ArtPreviewIconSize" }
+  if ($ArtPreviewIconProbe) { $hostArgs += '-ArtPreviewIconProbe' }
+  if ($HostManeuver) { $hostArgs += @('-S08Maneuver', "-S08ManeuverAfter=$HostManeuverAfter") }
 
   $hostProc = $null
   $joinProc = $null
@@ -529,23 +517,21 @@ function Invoke-Phase2Demo {
     }
     if (-not $code) { throw "no room code found in host trace" }
     Write-Output "room created by this run (code redacted from output; id=$Script:ThisRunGameId)"
-    if ($ArtPreviewBoardId) {
-      $loginBody = @{ query = 'mutation L($input: LoginDto!) { login(input: $input) { accessToken } }'; variables = @{ input = @{ email = $AccountA.email; password = $AccountA.password } } } | ConvertTo-Json -Depth 5
-      $login = Invoke-RestMethod -Uri $Api -Method Post -ContentType 'application/json' -Body $loginBody
-      Assert-GqlOk $login 'art-preview host login'
-      $lookup = @{ query = 'query G($id: String!) { game(id: $id) { id boardId } }'; variables = @{ id = $Script:ThisRunGameId } } | ConvertTo-Json -Depth 5
-      $game = Invoke-RestMethod -Uri $Api -Method Post -ContentType 'application/json' -Headers @{ authorization = "Bearer $($login.data.login.accessToken)" } -Body $lookup
-      Assert-GqlOk $game 'art-preview board lookup'
-      if ($game.data.game.boardId -cne $ArtPreviewBoardId) {
-        throw "created room has boardId=$($game.data.game.boardId), expected $ArtPreviewBoardId"
-      }
-      Write-Output 'art-preview boardId verified against the authoritative game row'
+    $loginBody = @{ query = 'mutation L($input: LoginDto!) { login(input: $input) { accessToken } }'; variables = @{ input = @{ email = $AccountA.email; password = $AccountA.password } } } | ConvertTo-Json -Depth 5
+    $login = Invoke-RestMethod -Uri $Api -Method Post -ContentType 'application/json' -Body $loginBody
+    Assert-GqlOk $login 'art-preview host login'
+    $lookup = @{ query = 'query G($id: String!) { game(id: $id) { id boardId } }'; variables = @{ id = $Script:ThisRunGameId } } | ConvertTo-Json -Depth 5
+    $game = Invoke-RestMethod -Uri $Api -Method Post -ContentType 'application/json' -Headers @{ authorization = "Bearer $($login.data.login.accessToken)" } -Body $lookup
+    Assert-GqlOk $game 'art-preview board lookup'
+    if ($game.data.game.boardId -cne $ArtPreviewBoardId) {
+      throw "created room has boardId=$($game.data.game.boardId), expected $ArtPreviewBoardId"
     }
+    Write-Output 'art-preview boardId verified against the authoritative game row'
 
     $joinArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
       "-S08Auto", "-S08HeroId=$heroB", "-S08Trace=$joinTrace", "-S08Shot=$joinShot",
       "-S08DropWsAfter=$JoinerDropWsAfter", "-S08ExitAfter=$RunSeconds")
-    if ($ArtPreviewBoardId) { $joinArgs += "-ArtPreviewShotAfter=$ArtPreviewShotAfter" }
+    $joinArgs += "-ArtPreviewShotAfter=$ArtPreviewShotAfter"
     $joinStartUtc = [DateTime]::UtcNow
     $joinProc = Start-S08Client $joinArgs $AccountB.email $AccountB.password $code
     Write-Output "joiner pid=$($joinProc.Id)"
@@ -572,19 +558,15 @@ function Invoke-Phase2Demo {
     # A missing trace file means that client exited before
     # AS08FlowGameMode::BeginPlay opened it (e.g. the ART-004 v3 startup crash
     # in UObject class registration); the board id is not the cause then.
-    # The backend stores any boardId string but silently falls back to an empty
-    # 20x20 grid when no Board row has that id (e.g. the content slug
-    # 'cobble-city'). Then the art board and its shot gate never activate;
-    # report that cause instead of a generic missing shot.
-    if ($ArtPreviewBoardId) {
-      foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
-        if (-not (Test-Path -LiteralPath $pair[1])) {
-          throw "$($pair[0]) trace missing: $($pair[1]). The client likely crashed before AS08FlowGameMode::BeginPlay; copy $(Join-Path (Split-Path -Parent $Exe) 'Unmatched\Saved\Logs')\Unmatched*.log before the next package step wipes it"
-        }
-        if (-not (Select-String -LiteralPath $pair[1] -SimpleMatch -Pattern "BOARD $ArtBoardSize cells" -Quiet)) {
-          $seen = Select-String -LiteralPath $pair[1] -Pattern 'BOARD \d+x\d+ cells' | Select-Object -First 1
-          throw "$($pair[0]) trace has no 'BOARD $ArtBoardSize': ArtPreviewBoardId=$ArtPreviewBoardId is registered as $($ArtBoard.id) $ArtBoardSize, the client built '$(if ($seen) { $seen.Line } else { 'no BOARD line' })'"
-        }
+    # A board other than the registered one (no art profile, so the shot gate
+    # never activates) is reported here instead of a generic missing shot.
+    foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
+      if (-not (Test-Path -LiteralPath $pair[1])) {
+        throw "$($pair[0]) trace missing: $($pair[1]). The client likely crashed before AS08FlowGameMode::BeginPlay; copy $(Join-Path (Split-Path -Parent $Exe) 'Unmatched\Saved\Logs')\Unmatched*.log before the next package step wipes it"
+      }
+      if (-not (Select-String -LiteralPath $pair[1] -SimpleMatch -Pattern "BOARD $ArtBoardSize cells" -Quiet)) {
+        $seen = Select-String -LiteralPath $pair[1] -Pattern 'BOARD \d+x\d+ cells' | Select-Object -First 1
+        throw "$($pair[0]) trace has no 'BOARD $ArtBoardSize': ArtPreviewBoardId=$ArtPreviewBoardId is registered as $($ArtBoard.id) $ArtBoardSize, the client built '$(if ($seen) { $seen.Line } else { 'no BOARD line' })'"
       }
     }
     Assert-FreshShot $hostShot $hostStartUtc 'host'
@@ -597,206 +579,151 @@ function Invoke-Phase2Demo {
         if (-not $text.Contains($needle)) { throw "$Who trace missing '$needle'" }
       }
     }
-    $expectedBoard = if ($ArtPreviewBoardId) { "BOARD $ArtBoardSize cells" } else { 'BOARD 20x20' }
-    if ($ArtPreviewBoardId) {
-      # T3.2 data-driven board art: profile chosen by THIS Board row id, the
-      # decoded board equals the registered expectation (expectOk=1), every
-      # zone of every multizone cell marked, the light profile applied within
-      # budget (1 directional with shadow + <= 6 points without shadow).
-      $exp = $ArtBoard.expect
-      $pointCount = @($ArtLight.points).Count
-      if ($ArtBoardMap) {
-        # ENV-MAPS map-image board: the painted map draws no zone marks, so the T3.2 cells/zoneCells/multizone
-        # lines do not exist; the gate is the map-image active line (spaces/links of the registration,
-        # expectOk=1 below), the client's own topology line and one painted-zone line per registered zone.
-        $artLines = @(
-          'ARTPREVIEW board profiles loaded=1',
-          "ARTPREVIEW board profile=$($ArtBoard.id) match=boardId board=$ArtBoardSize boardId=$ArtPreviewBoardId surface=$($ArtBoard.surface) light=$($ArtBoard.light)",
-          "ARTPREVIEW board active profile=$($ArtBoard.id) $ArtBoardSize surface=map-image map=$($ArtBoard.mapImage.name) spaces=$($exp.spaces) links=$($exp.links) ",
-          "BOARD topology spaces=$($exp.spaces) links=$($exp.links) starts=",
-          "ARTPREVIEW lights applied profile=$($ArtBoard.light) directional=1 shadow=1 points=$pointCount pointShadows=0 budgetOk=1",
-          'ARTPREVIEW board assets ready cobbleMesh=', ' tiles=1 ')
-        foreach ($zk in @($exp.zoneCellCounts.PSObject.Properties)) {
-          $artLines += "ARTPREVIEW board map zone key=$($zk.Name) spaces=$($zk.Value) (painted"
-        }
-      } else {
-      $artLines = @(
-        'ARTPREVIEW board profiles loaded=1',
-        "ARTPREVIEW board profile=$($ArtBoard.id) match=boardId board=$ArtBoardSize boardId=$ArtPreviewBoardId surface=$($ArtBoard.surface) light=$($ArtBoard.light)",
-        "ARTPREVIEW board active profile=$($ArtBoard.id) $ArtBoardSize surface=$($ArtBoard.surface) cells=$($exp.cells) zoneCells=$($exp.zoneCells) multizone=$($exp.multizoneCells) ",
-        "obstacles=$($exp.obstacles) zoneKeys=$(@($ArtBoard.match.zoneKeys).Count) ",
-        "ARTPREVIEW lights applied profile=$($ArtBoard.light) directional=1 shadow=1 points=$pointCount pointShadows=0 budgetOk=1",
-        "ARTPREVIEW board multizone cells=$($exp.multizoneCells) ")
-      if ($ArtBoardLegacy) {
-        # ART-005 Cobble evidence lines stay byte-compatible; the probe-lights
-        # line follows the registered profile (W4-A: the point fill became the
-        # SkyLight, so fill=0 unless a point named 'fill' is registered).
-        $inv = [Globalization.CultureInfo]::InvariantCulture
-        $fillPoint = @($ArtLight.points | Where-Object { $_.name -eq 'fill' }) | Select-Object -First 1
-        $warmPoint = @($ArtLight.points | Where-Object { $_.name -eq 'warm' }) | Select-Object -First 1
-        $probeKey = ([double]$ArtLight.directional.intensity).ToString('G', $inv)
-        $probeFill = if ($fillPoint) { ([double]$fillPoint.intensity).ToString('G', $inv) } else { '0' }
-        $probeWarm = if ($warmPoint) { ([double]$warmPoint.intensity).ToString('G', $inv) } else { '0' }
-        $artLines += @('ARTPREVIEW Cobble assets ready', 'ARTPREVIEW Cobble active 5x6 zones=30 blue=15 red=15 blueMarks=15 redMarks=45',
-          "ARTPREVIEW Cobble probe lights key=$probeKey fill=$probeFill warm=$probeWarm")
-      } else {
-        $artLines += @('ARTPREVIEW board assets ready cobbleMesh=', ' tiles=1 ')
-      }
-      }
-      # 5c-B2: with -ArtPreviewHeroesV2 the look-dev C figure replaces the Medusa candidate, so the
-      # client reports the candidate as not eligible (bMedusaCandidate = !bHeroV2 && ...) with the v2 mesh.
-      $medusaFighterLine = if ($ArtPreviewHeroesV2) { 'ARTPREVIEW fighter=Medusa hero=1 eligible=0 visual=1 mesh=SK_Medusa_H2LD' } else { 'ARTPREVIEW fighter=Medusa hero=1 eligible=1 visual=1' }
-      Assert-Trace $hostTrace (@('SNAPSHOT applied', $expectedBoard, 'FIGHTERS synced n=6', 'SHOT ctx',
-        $medusaFighterLine,
-        'ARTPREVIEW selection ownHero=1 selected=1 fighter=Medusa',
-        'ARTPREVIEW selection ring shown fighter=Medusa mesh=SM_Marker_SelectionRing') + $artLines) 'host'
-      Assert-Trace $joinTrace (@('SNAPSHOT applied', $expectedBoard, 'FIGHTERS synced n=6', 'SHOT ctx',
-        'WS DROPPED', 'WS closed', 'WS reconnect attempt', 'WS reconnected',
-        $medusaFighterLine) + $artLines) 'joiner'
-      foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
-        $active = Select-String -LiteralPath $pair[1] -Pattern ('ARTPREVIEW board active profile=' + [regex]::Escape($ArtBoard.id) + ' .* expectOk=(\d)') | Select-Object -Last 1
-        if (-not $active -or $active.Matches[0].Groups[1].Value -ne '1') {
-          throw "$($pair[0]) board art does not match its registered expectation: $(if ($active) { $active.Line } else { 'no active line' })"
-        }
-        $mz = Select-String -LiteralPath $pair[1] -Pattern 'ARTPREVIEW board multizone cells=(\d+) zonesListed=(\d+) zonesMarked=(\d+)' | Select-Object -Last 1
-        if ($ArtBoardMap) {
-          # The painted map has no zone marks (and no multizone mark line); its zones were gated above.
-          if ($mz) { throw "$($pair[0]) map-image board drew grid zone marks: $($mz.Line)" }
-        } elseif (-not $mz -or $mz.Matches[0].Groups[2].Value -ne $mz.Matches[0].Groups[3].Value) {
-          throw "$($pair[0]) multizone cells lost zones: $(if ($mz) { $mz.Line } else { 'no multizone line' })"
-        }
-        # ENV-MAPS: a map profile registers no grid match.zoneKeys (@($null) would yield one empty key);
-        # its painted zones are gated by the 'board map zone key=' lines above.
-        foreach ($key in @($ArtBoard.match.zoneKeys | Where-Object { $_ })) {
-          $zoneLine =Select-String -LiteralPath $pair[1] -Pattern ('ARTPREVIEW board zone key=' + [regex]::Escape($key) + ' cells=(\d+) .* fallback=0') | Select-Object -Last 1
-          $want = $exp.zoneCellCounts.$key
-          if (-not $zoneLine -or [int]$zoneLine.Matches[0].Groups[1].Value -ne [int]$want) {
-            throw "$($pair[0]) zone '$key' expected $want cells: $(if ($zoneLine) { $zoneLine.Line } else { 'no zone line' })"
-          }
-          if ($ArtBoardsDoc.glyphMeshes) {
-            # T4.2 content: the zone draws with its MI (MI_ART005_Zone_*) and one glyph-mesh instance per zone cell.
-            $content = Select-String -LiteralPath $pair[1] -Pattern ('ARTPREVIEW board zone key=' + [regex]::Escape($key) + ' cells=\d+ .* mi=(MI_ART005_Zone_\S+) glyphMesh=(SM_ART005_ZoneGlyph_\S+) glyphInstances=(\d+) fallback=0') | Select-Object -Last 1
-            if (-not $content -or [int]$content.Matches[0].Groups[3].Value -ne [int]$want) {
-              throw "$($pair[0]) zone '$key' T4.2 content (MI + $want glyph-mesh instances) missing: $(if ($zoneLine) { $zoneLine.Line } else { 'no zone line' })"
-            }
-          }
-        }
-        if ($ArtBoardsDoc.glyphMeshes) {
-          $zc = Select-String -LiteralPath $pair[1] -Pattern 'ARTPREVIEW zone content instances=(\d+)/(\d+) glyphMeshes=(\d+)/(\d+)' | Select-Object -Last 1
-          if (-not $zc -or $zc.Matches[0].Groups[1].Value -ne $zc.Matches[0].Groups[2].Value -or $zc.Matches[0].Groups[3].Value -ne $zc.Matches[0].Groups[4].Value -or [int]$zc.Matches[0].Groups[2].Value -eq 0) {
-            throw "$($pair[0]) T4.2 zone content not fully loaded: $(if ($zc) { $zc.Line } else { 'no zone content line' })"
-          }
-        }
-      }
-      if ($ArtBoardMap) {
-        # Topology board: the reachable spaces of the selected hero are rings on the painted circles.
-        if (-not (Select-String -LiteralPath $hostTrace -Pattern 'ARTPREVIEW reachable rings cells=[1-9]\d* placed=1' -Quiet)) {
-          throw 'host trace has no placed reachable-space rings for the selected hero (map-image board)'
-        }
-      } elseif ($ArtBoardLegacy) {
-        Assert-Trace $hostTrace @('ARTPREVIEW reachable corners cells=13 placed=1') 'host Cobble reachable'
-      } elseif (-not (Select-String -LiteralPath $hostTrace -Pattern 'ARTPREVIEW reachable corners cells=[1-9]\d* placed=1' -Quiet)) {
-        throw 'host trace has no placed reachable-corner highlights for the selected hero'
-      }
-      $requestedLabel = if ($MedusaVariantExplicit) { $ArtPreviewMedusaVariant } else { '(default)' }
-      foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
-        Assert-Trace $pair[1] @("ARTPREVIEW medusa candidate variant=$ArtPreviewMedusaVariant mesh=$ExpectedMedusaMesh requested=$requestedLabel",
-          "visual=1 mesh=$ExpectedFigureMedusaMesh", 'boardValid=1', 'HUD seq=',
-          "SHOT head fighter=", "socket=Head mesh=$ExpectedFigureMedusaMesh") "$($pair[0]) Medusa candidate"
-        if ($ClientPerf) { Assert-Trace $pair[1] @('PERF config', 'PERF summary scope=started') "$($pair[0]) perf" }
-        # W4-A: every SHOT carries a RENDER fingerprint; acceptance runs
-        # (-RequireRenderReference) also need it on the reference.
-        $render = Select-String -LiteralPath $pair[1] -Pattern 'RENDER tag=SHOT .* reference=(\d)' | Select-Object -Last 1
-        if ($RequireRenderReference) {
-          if (-not $render) { throw "$($pair[0]) trace has no RENDER fingerprint at its SHOT" }
-          if ($render.Matches[0].Groups[1].Value -ne '1') { throw "$($pair[0]) SHOT is off the render reference: $($render.Line)" }
-        }
-        if ($RequireShotCaptured) {
-          $shotName = if ($pair[0] -eq 'host') { Split-Path -Leaf $hostShot } else { Split-Path -Leaf $joinShot }
-          Assert-ShotCaptured $pair[1] $shotName $pair[0]
-        }
-      }
-      # ART-004 T2.2: zoom config, flag-marked input and the QA-010 selection/
-      # plate lines. The plate must cover no destination cell of the selection
-      # (client-side count; tools/art/qa010 plate re-checks the same bbox).
-      Assert-Trace $hostTrace @('CAMERA config overview=', 'INPUT select src=flag') 'host T2.2'
-      if ($ArtPreviewFocusZoom -gt 0) {
-        Assert-Trace $hostTrace @('INPUT zoom src=flag', 'CAMERA focus src=flag', 'SHOT selection fighter=',
-          'SHOT reachable fighter=', 'SHOT plate fighter=', 'PLATE fighter=') 'host T2.2 plate'
-        $plateLine = Select-String -LiteralPath $hostTrace -Pattern 'SHOT plate fighter=\S+ bbox=\((-?\d+),(-?\d+),(-?\d+),(-?\d+)\) overlapReachable=(\d+) .* geom=(\w+)' | Select-Object -Last 1
-        if (-not $plateLine) { throw 'host SHOT plate line missing or malformed' }
-        if ($plateLine.Matches[0].Groups[6].Value -ne 'painted') { throw "host SHOT plate geometry is not painted: $($plateLine.Line)" }
-        if ([int]$plateLine.Matches[0].Groups[5].Value -ne 0) { throw "host plate covers destination cells: $($plateLine.Line)" }
-      }
-      if ($ArtPreviewAllMedusa) {
-        foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
-          $copies = @(Select-String -LiteralPath $pair[1] -Pattern ('ARTPREVIEW allMedusa copy fighter=(\S+) hero=\d team=\w+ visual=1 mesh=' + [regex]::Escape($ExpectedMedusaMesh) + ' ') |
-            ForEach-Object { $_.Matches[0].Groups[1].Value } | Sort-Object -Unique)
-          if ($copies.Count -ne 6) { throw "$($pair[0]) trace shows $($copies.Count)/6 Medusa copies with visual=1 mesh=$ExpectedMedusaMesh" }
-          Assert-Trace $pair[1] @('ARTPREVIEW allMedusa copies=6 visual=6') "$($pair[0]) all-Medusa"
-        }
-      }
-      if ($ArtPreviewHeroesV2) {
-        foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
-          Assert-Trace $pair[1] @('ARTPREVIEW heroesV2 summary fighters=6 mapped=6 v2=6', 'ARTPREVIEW anim fighter=') "$($pair[0]) heroes v2"
-          $v2 = @(Select-String -LiteralPath $pair[1] -Pattern 'ARTPREVIEW heroesV2 fighter=(\S+) mesh=/Game/PipelineCandidates/\S+ mi=/Game/PipelineCandidates/\S+_P[12] yaw=' |
-            ForEach-Object { $_.Matches[0].Groups[1].Value } | Sort-Object -Unique)
-          if ($v2.Count -ne 6) { throw "$($pair[0]) trace shows $($v2.Count)/6 v2 figures" }
-          $idle = @(Select-String -LiteralPath $pair[1] -Pattern 'ARTPREVIEW anim fighter=(\S+) clip=Idle len=' |
-            ForEach-Object { $_.Matches[0].Groups[1].Value } | Sort-Object -Unique)
-          if ($idle.Count -ne 6) { throw "$($pair[0]) trace shows Idle on $($idle.Count)/6 v2 figures" }
-          $missing = Select-String -LiteralPath $pair[1] -Pattern 'ARTPREVIEW (heroesV2 fighter=\S+ missing=|anim fighter=\S+ clip=\S+ missing=1)' | Select-Object -First 1
-          if ($missing) { throw "$($pair[0]) v2 asset missing in the pak: $($missing.Line)" }
-        }
-      }
-      if ($ArtPreviewDiorama) {
-        foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
-          Assert-Trace $pair[1] @('ARTPREVIEW diorama requested mesh=/Game/PipelineCandidates/TableBase/', 'ARTPREVIEW diorama tray=/Game/PipelineCandidates/TableBase/') "$($pair[0]) diorama"
-          $trayMissing = Select-String -LiteralPath $pair[1] -Pattern 'ARTPREVIEW diorama tray missing' | Select-Object -First 1
-          if ($trayMissing) { throw "$($pair[0]) diorama tray not shown: $($trayMissing.Line)" }
-          if ($ArtBoardMap) {
-            # ENV-MAPS: the map's 3D perimeter (props + lights) and themed ground spawn with the tray.
-            $mapKey = $ArtTopology.map
-            $envLine = Select-String -LiteralPath $pair[1] -Pattern ('ARTPREVIEW envlayout map=' + [regex]::Escape($mapKey) + ' props=\d+ .* missingMeshes=0 .*combinedBudgetOk=1 .*boardId=' + [regex]::Escape($ArtPreviewBoardId) + ' .* status=ok') | Select-Object -Last 1
-            if (-not $envLine) { throw "$($pair[0]) env layout of $mapKey not spawned ok (no 'ARTPREVIEW envlayout map=$mapKey ... status=ok')" }
-            $ground = Select-String -LiteralPath $pair[1] -Pattern ('ARTPREVIEW envlayout ground map=' + [regex]::Escape($mapKey) + ' .* status=ok') | Select-Object -Last 1
-            if (-not $ground) { throw "$($pair[0]) env ground of $mapKey not spawned ok" }
-          }
-        }
-      }
-      if ($ArtPreviewInputPlan) {
-        Assert-Trace $hostTrace @('INPUT plan src=flag steps=', 'INPUT plan done src=flag') 'host input plan'
-        $clicks = @(Select-String -LiteralPath $hostTrace -Pattern 'INPUT click button=left src=flag step=(\w+) .* match=(\d)')
-        foreach ($c in $clicks) {
-          if ($c.Matches[0].Groups[2].Value -ne '1') { throw "flag click did not hit its expected target: $($c.Line)" }
-        }
-        if ($ArtPreviewInputPlan -match 'wheel') { Assert-Trace $hostTrace @('INPUT wheel dir=', 'CAMERA wheel dir=') 'host wheel' }
-        if ($ArtPreviewInputPlan -match 'space') { Assert-Trace $hostTrace @('INPUT space src=flag', 'CAMERA space src=flag') 'host Space' }
-        if (Select-String -LiteralPath $hostTrace -Pattern 'INPUT (wheel|space|click) .*src=os' -Quiet) {
-          throw 'host trace carries src=os input in an offscreen flag run'
-        }
-      }
-      if ($ArtPreviewIconProbe) {
-        Assert-Trace $hostTrace @('ARTPREVIEW icon probe src=flag', 'SHOT icon fighter=') 'host icon probe'
-      }
-      if ($ArtPreviewFocusZoom -gt 0) {
-        Assert-Trace $hostTrace @('ARTPREVIEW camera focus requested zoom=', 'CAMERA settled') 'host K2'
-        # The evidence shot must be taken after the focus zoom arrived.
-        if (-not (Select-String -LiteralPath $hostTrace -Pattern 'SHOT camera .* settled=1 ' -Quiet)) {
-          throw 'host K2 shot was taken before the camera settled (SHOT camera settled=0); raise ArtPreviewShotAfter'
-        }
-      }
-    } else {
-      Assert-Trace $hostTrace @('SNAPSHOT applied', $expectedBoard, 'FIGHTERS synced n=6', 'MANEUVER begin seq=', 'MANEUVER done', 'CUE move') 'host'
-      Assert-Trace $joinTrace @('SNAPSHOT applied', $expectedBoard, 'FIGHTERS synced n=6', 'SUBSCRIBED gameStateUpdated',
-        'WS DROPPED', 'WS closed', 'WS reconnect attempt', 'WS reconnected', 'CUE move') 'joiner'
+    $expectedBoard = "BOARD $ArtBoardSize cells"
+    # T3.2 data-driven board art: profile chosen by THIS Board row id, the
+    # decoded board equals the registered expectation (expectOk=1), the light
+    # profile applied within budget (1 directional with shadow + <= 6 points
+    # without shadow).
+    $exp = $ArtBoard.expect
+    $pointCount = @($ArtLight.points).Count
+    # ENV-MAPS map-image board: the painted map draws no zone marks, so the T3.2 cells/zoneCells/multizone
+    # lines do not exist; the gate is the map-image active line (spaces/links of the registration,
+    # expectOk=1 below), the client's own topology line and one painted-zone line per registered zone.
+    # 'board assets ready tiles=' (2026-10-04): the shared art assets loaded, no Cobble slab involved.
+    $artLines = @(
+      'ARTPREVIEW board profiles loaded=1',
+      "ARTPREVIEW board profile=$($ArtBoard.id) match=boardId board=$ArtBoardSize boardId=$ArtPreviewBoardId surface=$($ArtBoard.surface) light=$($ArtBoard.light)",
+      "ARTPREVIEW board active profile=$($ArtBoard.id) $ArtBoardSize surface=map-image map=$($ArtBoard.mapImage.name) spaces=$($exp.spaces) links=$($exp.links) ",
+      "BOARD topology spaces=$($exp.spaces) links=$($exp.links) starts=",
+      "ARTPREVIEW lights applied profile=$($ArtBoard.light) directional=1 shadow=1 points=$pointCount pointShadows=0 budgetOk=1",
+      'ARTPREVIEW board assets ready tiles=')
+    foreach ($zk in @($exp.zoneCellCounts.PSObject.Properties)) {
+      $artLines += "ARTPREVIEW board map zone key=$($zk.Name) spaces=$($zk.Value) (painted"
     }
-    if ($ArtPreviewBoardId) {
-      $artStatus = [ordered]@{ boardId = $ArtPreviewBoardId; artBoardProfile = $ArtBoard.id; boardSize = $ArtBoardSize; lightProfile = $ArtBoard.light; artFixture = [bool]$ArtBoard.artFixture; multizoneCells = $ArtBoard.expect.multizoneCells; hostAssetsLoaded = $true; joinerAssetsLoaded = $true; hostLiveZones = $ArtBoard.expect.zoneCells; joinerLiveZones = $ArtBoard.expect.zoneCells; hostFocusZoom = $ArtPreviewFocusZoom; medusaVariant = $ArtPreviewMedusaVariant; medusaVariantExplicit = $MedusaVariantExplicit; shotAfterSeconds = $ArtPreviewShotAfter; runSeconds = $RunSeconds; clientFps = $ClientFps; clientPerf = [bool]$ClientPerf; allMedusa = [bool]$ArtPreviewAllMedusa; heroesV2 = [bool]$ArtPreviewHeroesV2; inputPlan = $ArtPreviewInputPlan; iconSize = $ArtPreviewIconSize; iconProbe = [bool]$ArtPreviewIconProbe; visibleHost = [bool]$VisibleHost }
-      if ($ArtPreviewDiorama) { $artStatus.diorama = $true }
-      if ($ArtBoardMap) { $artStatus.mapImage = $ArtBoard.mapImage.name; $artStatus.spaces = $ArtBoard.expect.spaces; $artStatus.links = $ArtBoard.expect.links; $artStatus.topologyFixture = $ArtBoard.fixture }
-      [System.IO.File]::WriteAllText((Join-Path $Script:Staging 'art-preview-status.json'), ($artStatus | ConvertTo-Json), $Utf8NoBom)
+    # 5c-B2: with -ArtPreviewHeroesV2 the look-dev C figure replaces the Medusa candidate, so the
+    # client reports the candidate as not eligible (bMedusaCandidate = !bHeroV2 && ...) with the v2 mesh.
+    $medusaFighterLine = if ($ArtPreviewHeroesV2) { 'ARTPREVIEW fighter=Medusa hero=1 eligible=0 visual=1 mesh=SK_Medusa_H2LD' } else { 'ARTPREVIEW fighter=Medusa hero=1 eligible=1 visual=1' }
+    Assert-Trace $hostTrace (@('SNAPSHOT applied', $expectedBoard, 'FIGHTERS synced n=6', 'SHOT ctx',
+      $medusaFighterLine,
+      'ARTPREVIEW selection ownHero=1 selected=1 fighter=Medusa',
+      'ARTPREVIEW selection ring shown fighter=Medusa mesh=SM_Marker_SelectionRing') + $artLines) 'host'
+    Assert-Trace $joinTrace (@('SNAPSHOT applied', $expectedBoard, 'FIGHTERS synced n=6', 'SHOT ctx', 'SUBSCRIBED gameStateUpdated',
+      'WS DROPPED', 'WS closed', 'WS reconnect attempt', 'WS reconnected',
+      $medusaFighterLine) + $artLines) 'joiner'
+    foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
+      $active = Select-String -LiteralPath $pair[1] -Pattern ('ARTPREVIEW board active profile=' + [regex]::Escape($ArtBoard.id) + ' .* expectOk=(\d)') | Select-Object -Last 1
+      if (-not $active -or $active.Matches[0].Groups[1].Value -ne '1') {
+        throw "$($pair[0]) board art does not match its registered expectation: $(if ($active) { $active.Line } else { 'no active line' })"
+      }
+      $mz = Select-String -LiteralPath $pair[1] -Pattern 'ARTPREVIEW board multizone cells=(\d+) zonesListed=(\d+) zonesMarked=(\d+)' | Select-Object -Last 1
+      # The painted map has no zone marks (and no multizone mark line); its zones were gated above.
+      if ($mz) { throw "$($pair[0]) map-image board drew grid zone marks: $($mz.Line)" }
+      if ($ArtBoardsDoc.glyphMeshes) {
+        $zc = Select-String -LiteralPath $pair[1] -Pattern 'ARTPREVIEW zone content instances=(\d+)/(\d+) glyphMeshes=(\d+)/(\d+)' | Select-Object -Last 1
+        if (-not $zc -or $zc.Matches[0].Groups[1].Value -ne $zc.Matches[0].Groups[2].Value -or $zc.Matches[0].Groups[3].Value -ne $zc.Matches[0].Groups[4].Value -or [int]$zc.Matches[0].Groups[2].Value -eq 0) {
+          throw "$($pair[0]) T4.2 zone content not fully loaded: $(if ($zc) { $zc.Line } else { 'no zone content line' })"
+        }
+      }
     }
+    # Topology board: the reachable spaces of the selected hero are rings on the painted circles.
+    if (-not (Select-String -LiteralPath $hostTrace -Pattern 'ARTPREVIEW reachable rings cells=[1-9]\d* placed=1' -Quiet)) {
+      throw 'host trace has no placed reachable-space rings for the selected hero (map-image board)'
+    }
+    if ($HostManeuver) {
+      # The opt-in host maneuver (M1): begun and applied on the host, its move cues on both clients.
+      Assert-Trace $hostTrace @('MANEUVER begin seq=', 'MANEUVER done', 'CUE move') 'host maneuver'
+      Assert-Trace $joinTrace @('CUE move') 'joiner maneuver'
+    }
+    $requestedLabel = if ($MedusaVariantExplicit) { $ArtPreviewMedusaVariant } else { '(default)' }
+    foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
+      Assert-Trace $pair[1] @("ARTPREVIEW medusa candidate variant=$ArtPreviewMedusaVariant mesh=$ExpectedMedusaMesh requested=$requestedLabel",
+        "visual=1 mesh=$ExpectedFigureMedusaMesh", 'boardValid=1', 'HUD seq=',
+        "SHOT head fighter=", "socket=Head mesh=$ExpectedFigureMedusaMesh") "$($pair[0]) Medusa candidate"
+      if ($ClientPerf) { Assert-Trace $pair[1] @('PERF config', 'PERF summary scope=started') "$($pair[0]) perf" }
+      # W4-A: every SHOT carries a RENDER fingerprint; acceptance runs
+      # (-RequireRenderReference) also need it on the reference.
+      $render = Select-String -LiteralPath $pair[1] -Pattern 'RENDER tag=SHOT .* reference=(\d)' | Select-Object -Last 1
+      if ($RequireRenderReference) {
+        if (-not $render) { throw "$($pair[0]) trace has no RENDER fingerprint at its SHOT" }
+        if ($render.Matches[0].Groups[1].Value -ne '1') { throw "$($pair[0]) SHOT is off the render reference: $($render.Line)" }
+      }
+      if ($RequireShotCaptured) {
+        $shotName = if ($pair[0] -eq 'host') { Split-Path -Leaf $hostShot } else { Split-Path -Leaf $joinShot }
+        Assert-ShotCaptured $pair[1] $shotName $pair[0]
+      }
+    }
+    # ART-004 T2.2: zoom config, flag-marked input and the QA-010 selection/
+    # plate lines. The plate must cover no destination cell of the selection
+    # (client-side count; tools/art/qa010 plate re-checks the same bbox).
+    Assert-Trace $hostTrace @('CAMERA config overview=', 'INPUT select src=flag') 'host T2.2'
+    if ($ArtPreviewFocusZoom -gt 0) {
+      Assert-Trace $hostTrace @('INPUT zoom src=flag', 'CAMERA focus src=flag', 'SHOT selection fighter=',
+        'SHOT reachable fighter=', 'SHOT plate fighter=', 'PLATE fighter=') 'host T2.2 plate'
+      $plateLine = Select-String -LiteralPath $hostTrace -Pattern 'SHOT plate fighter=\S+ bbox=\((-?\d+),(-?\d+),(-?\d+),(-?\d+)\) overlapReachable=(\d+) .* geom=(\w+)' | Select-Object -Last 1
+      if (-not $plateLine) { throw 'host SHOT plate line missing or malformed' }
+      if ($plateLine.Matches[0].Groups[6].Value -ne 'painted') { throw "host SHOT plate geometry is not painted: $($plateLine.Line)" }
+      if ([int]$plateLine.Matches[0].Groups[5].Value -ne 0) { throw "host plate covers destination cells: $($plateLine.Line)" }
+    }
+    if ($ArtPreviewAllMedusa) {
+      foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
+        $copies = @(Select-String -LiteralPath $pair[1] -Pattern ('ARTPREVIEW allMedusa copy fighter=(\S+) hero=\d team=\w+ visual=1 mesh=' + [regex]::Escape($ExpectedMedusaMesh) + ' ') |
+          ForEach-Object { $_.Matches[0].Groups[1].Value } | Sort-Object -Unique)
+        if ($copies.Count -ne 6) { throw "$($pair[0]) trace shows $($copies.Count)/6 Medusa copies with visual=1 mesh=$ExpectedMedusaMesh" }
+        Assert-Trace $pair[1] @('ARTPREVIEW allMedusa copies=6 visual=6') "$($pair[0]) all-Medusa"
+      }
+    }
+    if ($ArtPreviewHeroesV2) {
+      foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
+        Assert-Trace $pair[1] @('ARTPREVIEW heroesV2 summary fighters=6 mapped=6 v2=6', 'ARTPREVIEW anim fighter=') "$($pair[0]) heroes v2"
+        $v2 = @(Select-String -LiteralPath $pair[1] -Pattern 'ARTPREVIEW heroesV2 fighter=(\S+) mesh=/Game/PipelineCandidates/\S+ mi=/Game/PipelineCandidates/\S+_P[12] yaw=' |
+          ForEach-Object { $_.Matches[0].Groups[1].Value } | Sort-Object -Unique)
+        if ($v2.Count -ne 6) { throw "$($pair[0]) trace shows $($v2.Count)/6 v2 figures" }
+        $idle = @(Select-String -LiteralPath $pair[1] -Pattern 'ARTPREVIEW anim fighter=(\S+) clip=Idle len=' |
+          ForEach-Object { $_.Matches[0].Groups[1].Value } | Sort-Object -Unique)
+        if ($idle.Count -ne 6) { throw "$($pair[0]) trace shows Idle on $($idle.Count)/6 v2 figures" }
+        $missing = Select-String -LiteralPath $pair[1] -Pattern 'ARTPREVIEW (heroesV2 fighter=\S+ missing=|anim fighter=\S+ clip=\S+ missing=1)' | Select-Object -First 1
+        if ($missing) { throw "$($pair[0]) v2 asset missing in the pak: $($missing.Line)" }
+      }
+    }
+    if ($ArtPreviewDiorama) {
+      foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
+        Assert-Trace $pair[1] @('ARTPREVIEW diorama requested mesh=/Game/PipelineCandidates/TableBase/', 'ARTPREVIEW diorama tray=/Game/PipelineCandidates/TableBase/') "$($pair[0]) diorama"
+        $trayMissing = Select-String -LiteralPath $pair[1] -Pattern 'ARTPREVIEW diorama tray missing' | Select-Object -First 1
+        if ($trayMissing) { throw "$($pair[0]) diorama tray not shown: $($trayMissing.Line)" }
+        # ENV-MAPS: the map's 3D perimeter (props + lights) and themed ground spawn with the tray.
+        $mapKey = $ArtTopology.map
+        $envLine = Select-String -LiteralPath $pair[1] -Pattern ('ARTPREVIEW envlayout map=' + [regex]::Escape($mapKey) + ' props=\d+ .* missingMeshes=0 .*combinedBudgetOk=1 .*boardId=' + [regex]::Escape($ArtPreviewBoardId) + ' .* status=ok') | Select-Object -Last 1
+        if (-not $envLine) { throw "$($pair[0]) env layout of $mapKey not spawned ok (no 'ARTPREVIEW envlayout map=$mapKey ... status=ok')" }
+        $ground = Select-String -LiteralPath $pair[1] -Pattern ('ARTPREVIEW envlayout ground map=' + [regex]::Escape($mapKey) + ' .* status=ok') | Select-Object -Last 1
+        if (-not $ground) { throw "$($pair[0]) env ground of $mapKey not spawned ok" }
+      }
+    }
+    if ($ArtPreviewInputPlan) {
+      Assert-Trace $hostTrace @('INPUT plan src=flag steps=', 'INPUT plan done src=flag') 'host input plan'
+      $clicks = @(Select-String -LiteralPath $hostTrace -Pattern 'INPUT click button=left src=flag step=(\w+) .* match=(\d)')
+      foreach ($c in $clicks) {
+        if ($c.Matches[0].Groups[2].Value -ne '1') { throw "flag click did not hit its expected target: $($c.Line)" }
+      }
+      if ($ArtPreviewInputPlan -match 'wheel') { Assert-Trace $hostTrace @('INPUT wheel dir=', 'CAMERA wheel dir=') 'host wheel' }
+      if ($ArtPreviewInputPlan -match 'space') { Assert-Trace $hostTrace @('INPUT space src=flag', 'CAMERA space src=flag') 'host Space' }
+      if (Select-String -LiteralPath $hostTrace -Pattern 'INPUT (wheel|space|click) .*src=os' -Quiet) {
+        throw 'host trace carries src=os input in an offscreen flag run'
+      }
+    }
+    if ($ArtPreviewIconProbe) {
+      Assert-Trace $hostTrace @('ARTPREVIEW icon probe src=flag', 'SHOT icon fighter=') 'host icon probe'
+    }
+    if ($ArtPreviewFocusZoom -gt 0) {
+      Assert-Trace $hostTrace @('ARTPREVIEW camera focus requested zoom=', 'CAMERA settled') 'host K2'
+      # The evidence shot must be taken after the focus zoom arrived.
+      if (-not (Select-String -LiteralPath $hostTrace -Pattern 'SHOT camera .* settled=1 ' -Quiet)) {
+        throw 'host K2 shot was taken before the camera settled (SHOT camera settled=0); raise ArtPreviewShotAfter'
+      }
+    }
+    $artStatus = [ordered]@{ boardId = $ArtPreviewBoardId; boardIdDefault = (-not $BoardIdExplicit); artBoardProfile = $ArtBoard.id; boardSize = $ArtBoardSize; lightProfile = $ArtBoard.light; multizoneCells = $ArtBoard.expect.multizoneCells; hostAssetsLoaded = $true; joinerAssetsLoaded = $true; hostManeuver = [bool]$HostManeuver; hostFocusZoom = $ArtPreviewFocusZoom; medusaVariant = $ArtPreviewMedusaVariant; medusaVariantExplicit = $MedusaVariantExplicit; shotAfterSeconds = $ArtPreviewShotAfter; runSeconds = $RunSeconds; clientFps = $ClientFps; clientPerf = [bool]$ClientPerf; allMedusa = [bool]$ArtPreviewAllMedusa; heroesV2 = [bool]$ArtPreviewHeroesV2; inputPlan = $ArtPreviewInputPlan; iconSize = $ArtPreviewIconSize; iconProbe = [bool]$ArtPreviewIconProbe; visibleHost = [bool]$VisibleHost }
+    if ($ArtPreviewDiorama) { $artStatus.diorama = $true }
+    $artStatus.mapImage = $ArtBoard.mapImage.name; $artStatus.spaces = $ArtBoard.expect.spaces; $artStatus.links = $ArtBoard.expect.links; $artStatus.topologyFixture = $ArtBoard.fixture
+    [System.IO.File]::WriteAllText((Join-Path $Script:Staging 'art-preview-status.json'), ($artStatus | ConvertTo-Json), $Utf8NoBom)
 
     # ProjectWorldLocationToScreen can return true even for offscreen pixels.
     # Count only living fighters whose projected centers lie inside 1920x1080.
@@ -840,25 +767,13 @@ function Invoke-Phase2Demo {
     if (-not $hostSeq -or -not $joinSeq) { throw "missing applied seq in traces" }
     if ($hostSeq -ne $joinSeq) { throw "clients diverged: host seq=$hostSeq joiner seq=$joinSeq" }
 
-    # The old S08 checker locates a MID-GREY 20x20 tile box; it cannot judge
-    # painted Cobble stone. The art check instead rejects dark/flat/missing-HUD
-    # frames; gameplay geometry and all 30 zone instances are trace-gated.
-    $checker = Join-Path $PSScriptRoot 'check-board-shot.ps1'
+    # The art check rejects dark/flat/missing-HUD frames (min board lit 0.75); the map geometry, its spaces and
+    # painted zones are trace-gated above. (The grey 20x20 tile checker check-board-shot.ps1 is gone, 2026-10-04.)
     foreach ($pair in @(@('host', $hostShot), @('joiner', $joinShot))) {
       $who = $pair[0]; $shot = $pair[1]
-      if ($ArtPreviewBoardId) {
-        $jsonPath = $shot -replace '\.png$', '-artcheck.json'
-        # T4.2: obstacle cells of a registered board are intentional dark voids; the lit-fraction gate scales
-        # with the registered passable fraction (Cobble: no obstacles -> the original 0.75).
-        $minLit = 0.75
-        if ($ArtBoard -and $ArtBoard.expect -and [int]$ArtBoard.expect.cells -gt 0 -and [int]$ArtBoard.expect.obstacles -gt 0) {
-          $minLit = [math]::Round(0.75 * (1.0 - [double]$ArtBoard.expect.obstacles / [double]$ArtBoard.expect.cells), 4)
-        }
-        $jsonLines = & python (Join-Path $RepoRoot 'tools/art/check_art_preview_shot.py') $shot --min-board-lit ([string]::Format([Globalization.CultureInfo]::InvariantCulture, '{0}', $minLit))
-      } else {
-        $jsonPath = $shot -replace '\.png$', '-grid.json'
-        $jsonLines = & powershell -NoProfile -ExecutionPolicy Bypass -File $checker -Path $shot
-      }
+      $jsonPath = $shot -replace '\.png$', '-artcheck.json'
+      $minLit = 0.75
+      $jsonLines = & python (Join-Path $RepoRoot 'tools/art/check_art_preview_shot.py') $shot --min-board-lit ([string]::Format([Globalization.CultureInfo]::InvariantCulture, '{0}', $minLit))
       [System.IO.File]::WriteAllLines($jsonPath, [string[]]$jsonLines, $Utf8NoBom)
       Write-Output $jsonLines
       if ($LASTEXITCODE -ne 0) { throw "board-shot checker FAILED for $who (see $jsonPath)" }
@@ -877,14 +792,8 @@ function Invoke-Phase2Demo {
     # anywhere above leaves the previous run untouched and this run's staging
     # behind for inspection.
     $publishNames = @('phase2-client-host.trace.log', 'phase2-client-joiner.trace.log',
-      'phase2-board-host-1920x1080.png', 'phase2-board-joiner-1920x1080.png')
-    if ($ArtPreviewBoardId) {
-      $publishNames += @('phase2-board-host-1920x1080-artcheck.json',
-        'phase2-board-joiner-1920x1080-artcheck.json', 'art-preview-status.json')
-    } else {
-      $publishNames += @('phase2-board-host-1920x1080-grid.json',
-        'phase2-board-joiner-1920x1080-grid.json')
-    }
+      'phase2-board-host-1920x1080.png', 'phase2-board-joiner-1920x1080.png',
+      'phase2-board-host-1920x1080-artcheck.json', 'phase2-board-joiner-1920x1080-artcheck.json', 'art-preview-status.json')
     $RunDir = Join-Path $EvidenceDir ("run-" + $Stamp)
     if (Test-Path -LiteralPath $RunDir) { throw "run dir already exists: $RunDir" }
     New-Item -ItemType Directory -Path $RunDir | Out-Null
@@ -905,17 +814,7 @@ function Invoke-Phase2Demo {
     }
     $manifest = [ordered]@{
       stamp   = $Stamp
-      verdict = if ($ArtPreviewBoardId) {
-        if ($ArtBoardMap) {
-          "ART PREVIEW $(if ($ArtPreviewFocusZoom -gt 0) { 'K2 PROBE' } else { 'K1' }): live original map $($ArtBoard.mapImage.name) ($($ArtBoard.id), lattice $ArtBoardSize) on its space graph ($($ArtBoard.expect.spaces) spaces / $($ArtBoard.expect.links) links, $(@($ArtBoard.expect.zones).Count) painted zones) + light profile $($ArtBoard.light) + six projected fighters + HUD/board pixel gate; visual review still required"
-        } elseif ($ArtPreviewFocusZoom -gt 0) {
-          "ART PREVIEW K2 PROBE: live $ArtBoardSize board ($($ArtBoard.id)) + selected host hero projected + joiner six fighters + HUD/board pixel gate; visual K2 review still required"
-        } else {
-          "ART PREVIEW: live $ArtBoardSize board ($($ArtBoard.id)) + $($ArtBoard.expect.zoneCells) zone cells / $($ArtBoard.expect.multizoneCells) multizone + light profile $($ArtBoard.light) + six projected fighters + HUD/board pixel gate; visual K1 review still required"
-        }
-      } else {
-        'TRACES OK + SHOTS PRESENT + GRID VERIFIED + SIX FIGHTERS (trace: n=6, all projected in frame)'
-      }
+      verdict = "ART PREVIEW $(if ($ArtPreviewFocusZoom -gt 0) { 'K2 PROBE' } else { 'K1' }): live original map $($ArtBoard.mapImage.name) ($($ArtBoard.id), lattice $ArtBoardSize) on its space graph ($($ArtBoard.expect.spaces) spaces / $($ArtBoard.expect.links) links, $(@($ArtBoard.expect.zones).Count) painted zones) + light profile $($ArtBoard.light) + WS drop/reconnect convergence$(if ($HostManeuver) { ' + host maneuver' }) + six projected fighters + HUD/board pixel gate; visual review still required"
       files   = @()
     }
     function Get-Sha256Hex([string]$Path) {
@@ -983,19 +882,12 @@ function Invoke-Phase2Demo {
       foreach ($f in $legacy) { Move-Item -LiteralPath $f.FullName (Join-Path $legacyDir $f.Name) -Force }
     }
     Write-Output "published evidence run dir: $RunDir (pointer: latest.json)"
-    if ($ArtPreviewBoardId) {
-      if ($ArtPreviewFocusZoom -gt 0) {
-        Write-Output 'ART PREVIEW K2 PROBE: host selected hero in frame at the requested zoom; joiner K1 has six fighters in frame. Visual art review remains separate.'
-      } elseif ($ArtBoardMap) {
-        Write-Output "ART PREVIEW: live original map $($ArtBoard.mapImage.name) (lattice $ArtBoardSize, $($ArtBoard.id)), $($ArtBoard.expect.spaces) spaces / $($ArtBoard.expect.links) links, light profile $($ArtBoard.light), two 1920x1080 HUD shots, six fighter centers in frame; visual art review remains separate."
-      } else {
-        Write-Output "ART PREVIEW: live $ArtBoardSize board ($($ArtBoard.id)), $($ArtBoard.expect.zoneCells) zone cells, light profile $($ArtBoard.light), two 1920x1080 HUD shots, six fighter centers in frame; visual art review remains separate."
-      }
-      Write-Output 'NOTE: the pixel gate checks a lit textured board and HUD regions; it does not prove K1 readability or color-blind access.'
+    if ($ArtPreviewFocusZoom -gt 0) {
+      Write-Output 'ART PREVIEW K2 PROBE: host selected hero in frame at the requested zoom; joiner K1 has six fighters in frame. Visual art review remains separate.'
     } else {
-      Write-Output "TRACES OK + SHOTS PRESENT + GRID VERIFIED + SIX FIGHTERS (trace: n=6, all projected in frame)"
-      Write-Output "NOTE: silhouette shapes in the PNGs are confirmed by manual screenshot review (the image checker proves grid+team colors only)."
+      Write-Output "ART PREVIEW: live original map $($ArtBoard.mapImage.name) (lattice $ArtBoardSize, $($ArtBoard.id)), $($ArtBoard.expect.spaces) spaces / $($ArtBoard.expect.links) links, light profile $($ArtBoard.light), two 1920x1080 HUD shots, six fighter centers in frame; visual art review remains separate."
     }
+    Write-Output 'NOTE: the pixel gate checks a lit textured board and HUD regions; it does not prove K1 readability or color-blind access.'
     Write-Output "--- host trace (tail) ---"
     Get-Content -LiteralPath (Join-Path $RunDir 'phase2-client-host.trace.log') | Select-Object -Last 25
     Write-Output "--- joiner trace (tail) ---"
