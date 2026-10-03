@@ -496,6 +496,15 @@ WS не несут `decks`, и без него счётчик колоды по�
   `UGameViewportClient` — способ определения выбирается в MS-T-07) или отсутствие клетки под курсором сбрасывают
   сохранённое нажатие и hover (MS-E-104). Придёт ли событие отпускания после Alt+Tab — **не проверено**; правило от
   этого не зависит.
+- Уточнение MS-T-07 (реализация): семантика ввода — чистая логика `FS09MoveInput` (`S09/S09MoveInput.h`) над
+  `FS09CommandUi`: клавиши 03 §3.2, лестница Esc/ПКМ, клик на отпускании, приоритет MS-R-71, панель буста MS-S-08 со
+  стрелочным курсором, подтверждение истощения MS-S-04; режим игры только опрашивает ввод и применяет результат
+  (`ApplyMoveInput`). Плоскость поля — z актора доски; фокус — `FApp::HasFocus() && Viewport->HasFocus()`, без фокуса
+  нажатие и hover сбрасываются. Предвыбор (MS-S-02/03) живёт в `FS09CommandUi::PreDraft`, переживает перечитывания
+  (в том числе MS-S-10), снимается при выходе из хода; при открытии черновика с новым id переносится ходом по новой руке
+  (`MS-DRAFT op=assign src=<источник предвыбора>`) или даёт `why.predraft.lost`. Стек отката — `FS09CommandUi::UndoStack`
+  (запись до операции: назначение, снятие, буст, порядок, сброс Esc, перенос предвыбора). Клик в pending MS-S-12 остаётся
+  на нажатии до MS-T-12; бейджи, призраки (и 50 % уходящей фигурки, `FadedFighters`) и кнопки ▲/▼ панели — MS-T-10/11.
 
 ### 6.3. Анимация перемещения
 
@@ -623,7 +632,7 @@ ACC-022 1080p p95 ≤ 16,7 мс; демо двух клиентов — по 30 
 
 | Строка | Когда | Поля |
 |---|---|---|
-| `MS-DRAFT op=<assign|clear|boost|order|undo|reset|snapshot|restore> rev=<n> src=<click|key|auto>` | любая операция черновика (`restore` — черновик из кэша по `maneuverId`, MS-T-04) | `fighter`, `dest=<CellLabel>`, `order`, `status`, `required`, `boost` |
+| `MS-DRAFT op=<assign|clear|boost|order|undo|reset|snapshot|restore|predraft|predraft.lost> rev=<n> src=<click|key|auto|snapshot>` | любая операция черновика (`restore` — черновик из кэша по `maneuverId`, MS-T-04; `snapshot`/`restore` пишутся с `src=snapshot`; `predraft` — цель предвыбора MS-S-03, `predraft.lost` — цель не перенеслась, MS-T-07) | `fighter`, `dest=<CellLabel>`, `order`, `status`, `required`, `boost` |
 | `MS-PATH fighter=<id> steps=<n> allowance=<n> key=<canonical>` | новый путь хода или превью | `cells=M13>M14>M18` |
 | `MS-HL base=<n> boost=<n> ally=<n> enemy=<n> conflict=<n> needboost=<n> ghosts=<n> paths=<n>` | смена вида | счётчики подложек по состояниям |
 | `MS-HL geom ringIn=<uu> ringOut=<uu> outline=<uu>..<uu> clear=<uu> pipCut=<deg>` | сборка доски | геометрия подложки (MS-AT-21, MS-AT-30) |

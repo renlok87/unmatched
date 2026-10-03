@@ -1,5 +1,5 @@
 // Move selection (docs/game-design/move-selection) automation tests of the S09
-// draft: 06 MS-AT-11..14, 18..20.
+// draft: 06 MS-AT-11..20.
 //   Unmatched.S09.MoveSel.SequentialDraft - MS-AT-13 (MS-T-05): moves in send
 //       order on the positions after the previous moves, order changes,
 //       overwrite / re-assign numbering, conflict reasons, the command against
@@ -18,6 +18,13 @@
 //   Unmatched.S09.MoveSel.InFlightGate    - MS-AT-19 (MS-T-06 part): 10 presses ->
 //       1 mutation, 3 s why.syncing, 10 s deadline -> recovery, gate released
 //       by snapshot, late reply traced only, 429, begin never repeated.
+//   Unmatched.S09.MoveSel.InputSemantics  - MS-AT-15 (MS-T-07): Esc / RMB by steps
+//       (D / I first), undo stack 32 + barrier, Delete, Tab, Ctrl+Up/Down before
+//       the D arrows, MS-S-08 arrows, click on release, MS-R-71, bindings list.
+//   Unmatched.S09.MoveSel.PreDraftAndNoQuickMove - MS-AT-16 (MS-T-07): MS-S-02/03
+//       without a mutation, the target carried into the draft by the new hand,
+//       why.predraft.lost, no quick move, the -S08Maneuver driver (src=auto).
+//   Unmatched.S09.MoveSel.ExhaustionConfirm - MS-AT-17 (MS-T-07): MS-S-04.
 //   Unmatched.S09.MoveSel.ReconnectAndRebuild - MS-AT-20, the MS-T-04 part:
 //       the draft cache by maneuverId, re-evaluation on a new seq, a boost card
 //       that left the hand, another id / closed maneuver / GAME_OVER. (Deadline,
@@ -30,6 +37,7 @@
 #if WITH_AUTOMATION_TESTS
 
 #include "S09ManeuverUi.h"
+#include "S09MoveInput.h"
 #include "../S08/S08BoardModel.h"
 #include "../S08/S08Contracts.h"
 #include "../S08/S08WhyText.h"
@@ -1723,6 +1731,431 @@ bool FS09MoveSelInFlightGateTest::RunTest(const FString&) {
     FString Reason;
     TestTrue(TEXT("controls stay usable"), Flow.CanIssueGameplayCommand(Reason));
   }
+  return true;
+}
+
+// ---- MS-T-07: input semantics, pre-draft, exhaustion --------------------------
+
+namespace S09MoveSelTest {
+
+/** A full click: press and release over the same space / fighter. */
+FS09InputResult MsClick(FS09MoveInput& In, FS09CommandUi& Ui, const FS08Snapshot& Snap, const FS08BoardModel& Board,
+                        const TArray<FS08BoardFighter>& Fighters, const FIntPoint& Cell,
+                        const FString& FighterId = FString()) {
+  In.OnPointerPressed(Cell, FighterId);
+  return In.OnPointerReleased(Cell, FighterId, Ui, Snap, Board, Fighters);
+}
+
+/** The viewer's turn before the begin: no pendingManeuver, actions left. */
+FS08Snapshot MsTurnSnapshot(const TArray<FMsCard>& Hand, int32 Seq = 4) {
+  return MsSnapshot(Hand, FString(), Seq);
+}
+
+int32 MsUndoDepth(const FS09CommandUi& Ui) { return Ui.UndoStack.Num(); }
+
+/** One draft trace line carries every needle. */
+bool MsTracedLine(const FS09CommandUi& Ui, std::initializer_list<const TCHAR*> Needles) {
+  for (const FString& Line : Ui.DraftTrace) {
+    bool bAll = true;
+    for (const TCHAR* Needle : Needles) bAll &= Line.Contains(Needle);
+    if (bAll) return true;
+  }
+  return false;
+}
+
+} // namespace S09MoveSelTest
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09MoveSelInputSemanticsTest, "Unmatched.S09.MoveSel.InputSemantics",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS09MoveSelInputSemanticsTest::RunTest(const FString&) {
+  const FS08BoardModel Board = MsGrid(6, 3);
+  const TArray<FMsCard> Hand = {{TEXT("c2"), true, 2}, {TEXT("c1"), true, 1}};
+  const FS08Snapshot Snap = MsSnapshot(Hand, ManeuverA, 5);
+  const TArray<FS08BoardFighter> Fighters = {MsFighter(TEXT("a"), Me, 0, 1, 2.0), MsFighter(TEXT("b"), Me, 5, 1, 2.0),
+                                             MsFighter(TEXT("e"), Opp, 5, 0)};
+  FString Reason;
+
+  // ---- Esc by steps; D / I close first and leave the draft alone (MS-E-98) ----
+  {
+    FS09CommandUi Ui = MsOpen(Snap, Board, Fighters);
+    FS09MoveInput In;
+    TestTrue(TEXT("select a"), Ui.SelectFighter(TEXT("a"), Snap, Board, Fighters));
+    TestTrue(TEXT("a drafted"), Ui.SetDestination(TEXT("a"), 2, 1, Snap, Board, Fighters, Reason));
+    FS09InputView WithD;
+    WithD.bDiscardBrowserOpen = true;
+    FS09InputResult R = In.OnKey(ES09MoveKey::Escape, Ui, Snap, Board, Fighters, WithD);
+    TestTrue(TEXT("Esc closes D first"), R.bHandled && R.bCloseDiscardBrowser && !R.bCloseInspector);
+    TestTrue(TEXT("... the draft untouched"), Ui.Moves.Num() == 1 && Ui.SelectedFighterId == TEXT("a"));
+    FS09InputView WithI;
+    WithI.bInspectorOpen = true;
+    R = In.OnKey(ES09MoveKey::Escape, Ui, Snap, Board, Fighters, WithI);
+    TestTrue(TEXT("Esc closes I first"), R.bCloseInspector && Ui.Moves.Num() == 1 && Ui.SelectedFighterId == TEXT("a"));
+    TestTrue(TEXT("B opens the boost panel"), In.OnKey(ES09MoveKey::B, Ui, Snap, Board, Fighters, {}).bHandled &&
+                                                  In.bBoostPanelOpen);
+    In.OnKey(ES09MoveKey::Escape, Ui, Snap, Board, Fighters, {});
+    TestTrue(TEXT("Esc closes MS-S-08"), !In.bBoostPanelOpen && Ui.SelectedFighterId == TEXT("a"));
+    In.OnKey(ES09MoveKey::Escape, Ui, Snap, Board, Fighters, {});
+    TestTrue(TEXT("Esc: MS-S-07 -> MS-S-06 (selection dropped, move kept)"),
+             Ui.SelectedFighterId.IsEmpty() && Ui.Moves.Num() == 1);
+    In.OnKey(ES09MoveKey::Escape, Ui, Snap, Board, Fighters, {});
+    TestEqual(TEXT("Esc in MS-S-06 with moves: reset"), Ui.Moves.Num(), 0);
+    In.OnKey(ES09MoveKey::Backspace, Ui, Snap, Board, Fighters, {});
+    TestEqual(TEXT("the reset is undone by Backspace"), Ui.Moves.Num(), 1);
+    In.OnKey(ES09MoveKey::Escape, Ui, Snap, Board, Fighters, {});
+    R = In.OnKey(ES09MoveKey::Escape, Ui, Snap, Board, Fighters, {});
+    TestEqual(TEXT("Esc in an empty MS-S-06: ms.confirm.zero"), MsKey(R.Toast), FString(TEXT("ms.confirm.zero")));
+    // RMB: a step back that never resets the draft.
+    TestTrue(TEXT("re-select a"), Ui.SelectFighter(TEXT("a"), Snap, Board, Fighters));
+    TestTrue(TEXT("a drafted again"), Ui.SetDestination(TEXT("a"), 2, 1, Snap, Board, Fighters, Reason));
+    In.OnRightClick(Ui, Snap, Board, Fighters);
+    TestTrue(TEXT("RMB drops the selection"), Ui.SelectedFighterId.IsEmpty() && Ui.Moves.Num() == 1);
+    In.OnRightClick(Ui, Snap, Board, Fighters);
+    TestEqual(TEXT("RMB never resets the draft"), Ui.Moves.Num(), 1);
+  }
+
+  // ---- Esc outside the draft: MS-S-03 -> MS-S-02 -> MS-S-01 -> pause.unavailable ----
+  {
+    const FS08Snapshot Turn = MsTurnSnapshot(Hand);
+    FS09CommandUi Ui = MsOpen(Turn, Board, Fighters);
+    FS09MoveInput In;
+    TestTrue(TEXT("no draft before the begin"), Ui.Mode == ES09CommandMode::None);
+    MsClick(In, Ui, Turn, Board, Fighters, FIntPoint(0, 1), TEXT("a"));
+    TestEqual(TEXT("MS-S-02: a inspected"), Ui.SelectedFighterId, FString(TEXT("a")));
+    MsClick(In, Ui, Turn, Board, Fighters, FIntPoint(2, 1));
+    TestTrue(TEXT("MS-S-03: a pre-draft"), Ui.PreDraft.bSet);
+    In.OnKey(ES09MoveKey::Escape, Ui, Turn, Board, Fighters, {});
+    TestTrue(TEXT("Esc: MS-S-03 -> MS-S-02"), !Ui.PreDraft.bSet && Ui.SelectedFighterId == TEXT("a"));
+    In.OnKey(ES09MoveKey::Escape, Ui, Turn, Board, Fighters, {});
+    TestTrue(TEXT("Esc: MS-S-02 -> MS-S-01"), Ui.SelectedFighterId.IsEmpty());
+    const FS09InputResult R = In.OnKey(ES09MoveKey::Escape, Ui, Turn, Board, Fighters, {});
+    TestTrue(TEXT("Esc without a selection: pause unavailable (MS-E-99)"), R.bHandled && R.bPauseUnavailable);
+  }
+
+  // ---- undo stack: 32 records, the 33rd evicts the oldest; barrier; maneuverId ----
+  {
+    FS09CommandUi Ui = MsOpen(Snap, Board, Fighters);
+    FS09MoveInput In;
+    for (int32 Op = 0; Op < 33; ++Op) Ui.ToggleBoostCard(TEXT("c2"), Snap, Board, Fighters, Reason);
+    TestEqual(TEXT("33 ops -> 32 records (MS-E-94)"), MsUndoDepth(Ui), FS09CommandUi::MaxUndo);
+    TestEqual(TEXT("after 33 toggles c2 is selected"), Ui.BoostCardId, FString(TEXT("c2")));
+    for (int32 Back = 0; Back < 32; ++Back) In.OnKey(ES09MoveKey::CtrlZ, Ui, Snap, Board, Fighters, {});
+    // (each undo popped one record; the failed operations below push none)
+    TestEqual(TEXT("32 undos reach the state after op 1 (c2), not the start"), Ui.BoostCardId, FString(TEXT("c2")));
+    TestFalse(TEXT("an empty stack undoes nothing"), Ui.Undo(Board, Fighters));
+    TestFalse(TEXT("a refused target"), Ui.SetDestination(TEXT("a"), 5, 0, Snap, Board, Fighters, Reason));
+    TestFalse(TEXT("a refused boost"), Ui.ToggleBoostCard(TEXT("nope"), Snap, Board, Fighters, Reason));
+    TestFalse(TEXT("an order no-op"), Ui.MoveOrder(TEXT("a"), -1, Snap, Board, Fighters));
+    TestEqual(TEXT("failed operations push no undo record"), MsUndoDepth(Ui), 0);
+    TestTrue(TEXT("a drafted"), Ui.SetDestination(TEXT("a"), 2, 1, Snap, Board, Fighters, Reason));
+    TestTrue(TEXT("b drafted"), Ui.SetDestination(TEXT("b"), 3, 1, Snap, Board, Fighters, Reason));
+    TestTrue(TEXT("order changed"), Ui.MoveOrder(TEXT("b"), -1, Snap, Board, Fighters));
+    In.OnKey(ES09MoveKey::Backspace, Ui, Snap, Board, Fighters, {});
+    TestTrue(TEXT("undo of the order"), Ui.Moves.Num() == 2 && Ui.Moves[0].FighterId == TEXT("a"));
+    // A server rejection re-reads the same seq: the stack stays (MS-E-113).
+    const int32 Depth = MsUndoDepth(Ui);
+    Ui.OnSnapshot(Snap, Board, Fighters);
+    TestEqual(TEXT("same seq (a rejection's refetch): stack kept"), MsUndoDepth(Ui), Depth);
+    // A new applied seq is a barrier (MS-E-95).
+    Ui.OnSnapshot(MsSnapshot(Hand, ManeuverA, 6), Board, Fighters);
+    TestEqual(TEXT("new seq: stack cleared"), MsUndoDepth(Ui), 0);
+    TestEqual(TEXT("new seq: the draft itself stays"), Ui.Moves.Num(), 2);
+    TestTrue(TEXT("one more op"), Ui.SetDestination(TEXT("a"), 1, 1, MsSnapshot(Hand, ManeuverA, 6), Board, Fighters, Reason));
+    TestEqual(TEXT("one record"), MsUndoDepth(Ui), 1);
+    Ui.OnSnapshot(MsSnapshot(Hand, TEXT("maneuver:2:9"), 6), Board, Fighters);
+    TestEqual(TEXT("another maneuverId: stack cleared"), MsUndoDepth(Ui), 0);
+  }
+
+  // ---- Delete, Tab / Shift+Tab, Ctrl+Up/Down before the D arrows, MS-S-08 arrows ----
+  {
+    TArray<FS08BoardFighter> Team = Fighters;
+    Team.Add(MsFighter(TEXT("c"), Me, 2, 2, 2.0));
+    Team.Add(MsFighter(TEXT("dead"), Me, 3, 2, 2.0, 0));
+    FS08BoardFighter Stuck = MsFighter(TEXT("stuck"), Me, 4, 2, 2.0);
+    Stuck.Effects.Add(TEXT("immobilized"));
+    Team.Add(Stuck);
+    TArray<FMsCard> Big;
+    for (int32 Index = 0; Index < 10; ++Index) Big.Add({FString::Printf(TEXT("k%d"), Index), true, Index % 3});
+    const FS08Snapshot BigSnap = MsSnapshot(Big, ManeuverA, 5);
+    FS09CommandUi Ui = MsOpen(BigSnap, Board, Team);
+    FS09MoveInput In;
+    In.OnKey(ES09MoveKey::Tab, Ui, BigSnap, Board, Team, {});
+    TestEqual(TEXT("Tab: first own fighter"), Ui.SelectedFighterId, FString(TEXT("a")));
+    In.OnKey(ES09MoveKey::Tab, Ui, BigSnap, Board, Team, {});
+    TestEqual(TEXT("Tab: next"), Ui.SelectedFighterId, FString(TEXT("b")));
+    In.OnKey(ES09MoveKey::Tab, Ui, BigSnap, Board, Team, {});
+    TestEqual(TEXT("Tab: c"), Ui.SelectedFighterId, FString(TEXT("c")));
+    In.OnKey(ES09MoveKey::Tab, Ui, BigSnap, Board, Team, {});
+    TestEqual(TEXT("Tab skips the dead and the immobilized, wraps"), Ui.SelectedFighterId, FString(TEXT("a")));
+    In.OnKey(ES09MoveKey::ShiftTab, Ui, BigSnap, Board, Team, {});
+    TestEqual(TEXT("Shift+Tab: previous"), Ui.SelectedFighterId, FString(TEXT("c")));
+    TestTrue(TEXT("c drafted"), Ui.SetDestination(TEXT("c"), 2, 1, BigSnap, Board, Team, Reason));
+    In.OnKey(ES09MoveKey::Tab, Ui, BigSnap, Board, Team, {});
+    TestTrue(TEXT("a drafted"), Ui.SetDestination(TEXT("a"), 1, 1, BigSnap, Board, Team, Reason));
+    FS09InputView WithD;
+    WithD.bDiscardBrowserOpen = true;
+    const FS09InputResult Up = In.OnKey(ES09MoveKey::CtrlUp, Ui, BigSnap, Board, Team, WithD);
+    TestTrue(TEXT("Ctrl+Up with D open: the draft order (MS-E-98)"),
+             Up.bHandled && Ui.Moves.Num() == 2 && Ui.Moves[0].FighterId == TEXT("a"));
+    const FS09InputResult Top = In.OnKey(ES09MoveKey::CtrlUp, Ui, BigSnap, Board, Team, WithD);
+    TestTrue(TEXT("Ctrl+Up on the first move: no action, no toast (MS-E-96)"), Top.bHandled && !Top.Toast.IsSet());
+    In.OnKey(ES09MoveKey::Delete, Ui, BigSnap, Board, Team, {});
+    TestTrue(TEXT("Delete clears the selected fighter's move"), Ui.MoveIndexOf(TEXT("a")) == INDEX_NONE && Ui.Moves.Num() == 1);
+    TestTrue(TEXT("MS-DRAFT op=clear ... src=key (one line)"), MsTracedLine(Ui, {TEXT("op=clear"), TEXT("src=key")}));
+    // MS-S-08 with 10 cards: the 10th only by the arrows (MS-E-97).
+    In.OnKey(ES09MoveKey::B, Ui, BigSnap, Board, Team, {});
+    TestTrue(TEXT("panel open"), In.bBoostPanelOpen);
+    TestFalse(TEXT("arrows with D open stay with D"), In.OnKey(ES09MoveKey::Left, Ui, BigSnap, Board, Team, WithD).bHandled);
+    In.OnKey(ES09MoveKey::Left, Ui, BigSnap, Board, Team, {});
+    TestEqual(TEXT("Left wraps to the 10th card"), In.BoostCursor, 9);
+    In.OnKey(ES09MoveKey::Enter, Ui, BigSnap, Board, Team, {});
+    TestEqual(TEXT("Enter in MS-S-08 picks the card under the cursor"), Ui.BoostCardId, FString(TEXT("k9")));
+    TestFalse(TEXT("the pick closes MS-S-08"), In.bBoostPanelOpen);
+  }
+
+  // ---- click on release; a drag or a lost focus cancels (MS-R-34, MS-E-104) ----
+  {
+    FS09CommandUi Ui = MsOpen(Snap, Board, Fighters);
+    FS09MoveInput In;
+    MsClick(In, Ui, Snap, Board, Fighters, FIntPoint(0, 1), TEXT("a"));
+    TestEqual(TEXT("click on a selects it"), Ui.SelectedFighterId, FString(TEXT("a")));
+    In.OnPointerPressed(FIntPoint(2, 1), FString());
+    TestEqual(TEXT("nothing happens on the press"), Ui.Moves.Num(), 0);
+    In.OnPointerReleased(FIntPoint(3, 1), FString(), Ui, Snap, Board, Fighters);
+    TestEqual(TEXT("release over another space: no target"), Ui.Moves.Num(), 0);
+    In.OnPointerPressed(FIntPoint(2, 1), FString());
+    In.SetHover(FIntPoint(2, 1));
+    In.OnFocusLost();
+    TestTrue(TEXT("focus lost: hover cleared"), In.HoverCell == FIntPoint(-1, -1));
+    In.OnPointerReleased(FIntPoint(2, 1), FString(), Ui, Snap, Board, Fighters);
+    TestEqual(TEXT("focus lost: the press is gone"), Ui.Moves.Num(), 0);
+    MsClick(In, Ui, Snap, Board, Fighters, FIntPoint(2, 1));
+    TestEqual(TEXT("press + release over the same space: target set"), Ui.Moves.Num(), 1);
+    const uint32 Revision = Ui.DraftRevision;
+    MsClick(In, Ui, Snap, Board, Fighters, FIntPoint(2, 1));
+    TestEqual(TEXT("the same target again: no action (MS-E-83)"), Ui.DraftRevision, Revision);
+    const FS09InputResult Far = MsClick(In, Ui, Snap, Board, Fighters, FIntPoint(4, 0));
+    TestTrue(TEXT("unreachable: CUE-004 + reason, target unchanged"),
+             Far.IllegalCell == FIntPoint(4, 0) && Far.Toast.IsSet() && Ui.Moves[0].DestX == 2);
+    TestTrue(TEXT("MS-DRAFT op=assign ... src=click (one line)"), MsTracedLine(Ui, {TEXT("op=assign"), TEXT("src=click")}));
+  }
+
+  // ---- MS-R-71: the plan of MS-E-33 by mouse; the figure that leaves goes to 50 % ----
+  {
+    const TArray<FS08BoardFighter> Line = {MsFighter(TEXT("a"), Me, 2, 1, 2.0), MsFighter(TEXT("b"), Me, 0, 1, 2.0)};
+    FS09CommandUi Ui = MsOpen(Snap, Board, Line);
+    FS09MoveInput In;
+    MsClick(In, Ui, Snap, Board, Line, FIntPoint(2, 1), TEXT("a"));
+    MsClick(In, Ui, Snap, Board, Line, FIntPoint(3, 1));
+    TestEqual(TEXT("A leaves first"), Ui.Moves.Num(), 1);
+    MsClick(In, Ui, Snap, Board, Line, FIntPoint(0, 1), TEXT("b"));
+    TestEqual(TEXT("B selected"), Ui.SelectedFighterId, FString(TEXT("b")));
+    // The press/release lands on A's figure, but A's space is in B's tiers (A has left by then).
+    MsClick(In, Ui, Snap, Board, Line, FIntPoint(2, 1), TEXT("a"));
+    TestEqual(TEXT("the space wins over the figure: B targets A's space"), Ui.Moves.Num(), 2);
+    TestTrue(TEXT("B's target is X"), Ui.Moves.Num() == 2 && Ui.Moves[1].FighterId == TEXT("b") && Ui.Moves[1].DestX == 2);
+    TestEqual(TEXT("B stays selected"), Ui.SelectedFighterId, FString(TEXT("b")));
+    TestTrue(TEXT("A is drawn at 50 %"), Ui.FadedFighters(Line).Contains(TEXT("a")));
+    TestFalse(TEXT("B is not"), Ui.FadedFighters(Line).Contains(TEXT("b")));
+    MsClick(In, Ui, Snap, Board, Line, FIntPoint(0, 1), TEXT("b"));
+    TestEqual(TEXT("a click on the selected fighter's own space clears its move"), Ui.MoveIndexOf(TEXT("b")), INDEX_NONE);
+  }
+
+  // ---- routing: no click outside a draft reaches the TASK-022 quick move without the flag (B1) ----
+  for (const ES09CommandMode Mode : {ES09CommandMode::None, ES09CommandMode::ManeuverDraft, ES09CommandMode::DiscardDraft,
+                                     ES09CommandMode::AttackDraft, ES09CommandMode::CombatDefense,
+                                     ES09CommandMode::CombatResolve, ES09CommandMode::PendingChoice,
+                                     ES09CommandMode::SchemeChoice}) {
+    const int32 M = static_cast<int32>(Mode);
+    TestFalse(FString::Printf(TEXT("mode %d: no quick move without the flag"), M),
+              FS09MoveInput::LegacyQuickMoveReachable(Mode, false));
+    TestTrue(FString::Printf(TEXT("mode %d: quick move with the flag only from None"), M),
+             FS09MoveInput::LegacyQuickMoveReachable(Mode, true) == (Mode == ES09CommandMode::None));
+    TestTrue(FString::Printf(TEXT("mode %d: move-selection routing"), M),
+             FS09MoveInput::RoutesMoveSelection(Mode, false) ==
+                 (Mode == ES09CommandMode::None || Mode == ES09CommandMode::ManeuverDraft));
+  }
+  TestFalse(TEXT("with the flag, None keeps the legacy bindings"),
+            FS09MoveInput::RoutesMoveSelection(ES09CommandMode::None, true));
+
+  // ---- MS-S-00: outside the viewer's action time a click only shows the plate ----
+  {
+    FS08Snapshot Combat = MsTurnSnapshot(Hand);
+    Combat.Phase = TEXT("COMBAT");
+    FS09CommandUi Ui = MsOpen(Combat, Board, Fighters);
+    FS09MoveInput In;
+    const FS09InputResult R = MsClick(In, Ui, Combat, Board, Fighters, FIntPoint(0, 1), TEXT("a"));
+    TestTrue(TEXT("no inspection in COMBAT"), !R.bHandled && Ui.SelectedFighterId.IsEmpty());
+  }
+
+  // ---- no binding needs a held key; every chord has a single-key alternative (MS-R-35) ----
+  for (const FS09KeyBinding& Binding : FS09MoveInput::Bindings()) {
+    TestFalse(FString::Printf(TEXT("%s: no hold"), Binding.Input), Binding.bHold);
+    if (Binding.bChord) {
+      TestTrue(FString::Printf(TEXT("%s: has an alternative"), Binding.Input), FCString::Strlen(Binding.Alternative) > 0);
+    }
+  }
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09MoveSelPreDraftAndNoQuickMoveTest, "Unmatched.S09.MoveSel.PreDraftAndNoQuickMove",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS09MoveSelPreDraftAndNoQuickMoveTest::RunTest(const FString&) {
+  const FS08BoardModel Board = MsGrid(7, 3);
+  const TArray<FS08BoardFighter> Fighters = {MsFighter(TEXT("a"), Me, 0, 1, 2.0), MsFighter(TEXT("e"), Opp, 6, 0)};
+  const TArray<FMsCard> Before = {{TEXT("c1"), true, 1}};
+  const FS08Snapshot Turn = MsTurnSnapshot(Before, 4);
+
+  TestFalse(TEXT("TASK-022 quick move is off without -S08LegacyQuickMove"), FS09MoveInput::LegacyQuickMoveEnabled());
+
+  // ---- clicks outside the draft never send: inspect, pre-draft, same target ----
+  FS09CommandUi Ui = MsOpen(Turn, Board, Fighters);
+  FS09MoveInput In;
+  int32 Sends = 0;
+  auto Count = [&Sends](const FS09InputResult& R) { Sends += (R.bBeginManeuver || R.bConfirmManeuver) ? 1 : 0; };
+  Count(MsClick(In, Ui, Turn, Board, Fighters, FIntPoint(0, 1), TEXT("a")));
+  TestEqual(TEXT("MS-S-02: a inspected"), Ui.SelectedFighterId, FString(TEXT("a")));
+  TestTrue(TEXT("tiers by the hand before the draw: base 2, boost +1"),
+           Ui.SelectedTiers.bValid && Ui.SelectedTiers.BaseTier.Contains(FIntPoint(2, 1)) &&
+               Ui.SelectedTiers.BoostTier.Contains(FIntPoint(3, 1)));
+  Count(MsClick(In, Ui, Turn, Board, Fighters, FIntPoint(2, 1)));
+  TestTrue(TEXT("MS-S-03: pre-draft (Ok)"), Ui.PreDraft.bSet && Ui.PreDraft.X == 2 &&
+                                                Ui.PreDraft.Status == ES09DraftMoveStatus::Ok);
+  Count(MsClick(In, Ui, Turn, Board, Fighters, FIntPoint(2, 1)));
+  TestTrue(TEXT("the same target again: unchanged (MS-E-83)"), Ui.PreDraft.bSet && Ui.PreDraft.X == 2);
+  const FS09InputResult Boosted = MsClick(In, Ui, Turn, Board, Fighters, FIntPoint(3, 1));
+  Count(Boosted);
+  TestTrue(TEXT("boost tier: needs boost +1 (MS-E-82)"), Ui.PreDraft.Status == ES09DraftMoveStatus::NeedBoost &&
+                                                             Ui.PreDraft.RequiredBoost == 1);
+  TestEqual(TEXT("its toast"), MsKey(Boosted.Toast), FString(TEXT("why.cell.needs.boost")));
+  TestEqual(TEXT("0 mutations before Enter (MS-R-01)"), Sends, 0);
+  TestTrue(TEXT("MS-DRAFT op=predraft ... src=click (one line)"), MsTracedLine(Ui, {TEXT("op=predraft"), TEXT("src=click")}));
+
+  // ---- Enter begins; the target moves into the draft by the NEW hand ----
+  const FS09InputResult Begin = In.OnKey(ES09MoveKey::Enter, Ui, Turn, Board, Fighters, {});
+  TestTrue(TEXT("Enter in MS-S-03: beginManeuver"), Begin.bBeginManeuver);
+  // A same-seq re-read (e.g. the recovery of an unknown outcome, MS-E-84) keeps the pre-draft.
+  Ui.OnSnapshot(Turn, Board, Fighters);
+  TestTrue(TEXT("pre-draft survives a re-read"), Ui.PreDraft.bSet);
+  const TArray<FMsCard> After = {{TEXT("c1"), true, 1}, {TEXT("c3"), true, 3}};
+  Ui.OnSnapshot(MsSnapshot(After, ManeuverA, 5), Board, Fighters);
+  TestTrue(TEXT("draft open"), Ui.Mode == ES09CommandMode::ManeuverDraft);
+  const FS09DraftMove* Carried = MsMove(Ui, TEXT("a"));
+  TestTrue(TEXT("the target is a move of the draft"), Carried && Carried->DestX == 3 && Carried->DestY == 1);
+  TestEqual(TEXT("by the new hand: NeedBoost (+1 > no card)"), MsStatus(Carried), FString(TEXT("needBoost")));
+  TestFalse(TEXT("the pre-draft is consumed"), Ui.PreDraft.bSet);
+  TestTrue(TEXT("carried as a click (op=assign ... src=click, one line)"),
+           MsTracedLine(Ui, {TEXT("MS-DRAFT op=assign"), TEXT("src=click")}));
+  TestEqual(TEXT("the carried move is one undo record"), MsUndoDepth(Ui), 1);
+  In.OnKey(ES09MoveKey::Backspace, Ui, MsSnapshot(After, ManeuverA, 5), Board, Fighters, {});
+  TestEqual(TEXT("Backspace removes the carried target"), Ui.Moves.Num(), 0);
+
+  // ---- no path even with the new hand's best BOOST: why.predraft.lost ----
+  {
+    const TArray<FMsCard> Rich = {{TEXT("c4"), true, 4}};
+    FS09CommandUi Lost = MsOpen(MsTurnSnapshot(Rich, 4), Board, Fighters);
+    FS09MoveInput In2;
+    MsClick(In2, Lost, MsTurnSnapshot(Rich, 4), Board, Fighters, FIntPoint(0, 1), TEXT("a"));
+    MsClick(In2, Lost, MsTurnSnapshot(Rich, 4), Board, Fighters, FIntPoint(6, 1));
+    TestTrue(TEXT("far pre-draft with +4 in hand"), Lost.PreDraft.bSet);
+    // After the draw the hand holds only a +0 card: no path even with its best BOOST.
+    Lost.OnSnapshot(MsSnapshot({{TEXT("c0"), true, 0}}, ManeuverA, 5), Board, Fighters);
+    TestEqual(TEXT("why.predraft.lost"), MsKey(Lost.LastReason), FString(TEXT("why.predraft.lost")));
+    TestEqual(TEXT("the draft opens without a target"), Lost.Moves.Num(), 0);
+  }
+
+  // ---- the turn passes: the pre-draft goes (exit to MS-S-00) ----
+  {
+    FS09CommandUi Gone = MsOpen(Turn, Board, Fighters);
+    FS09MoveInput In3;
+    MsClick(In3, Gone, Turn, Board, Fighters, FIntPoint(0, 1), TEXT("a"));
+    MsClick(In3, Gone, Turn, Board, Fighters, FIntPoint(2, 1));
+    FS08Snapshot Theirs = MsTurnSnapshot(Before, 6);
+    Theirs.CurrentTurnPlayerId = Opp;
+    Gone.OnSnapshot(Theirs, Board, Fighters);
+    TestTrue(TEXT("not my turn: pre-draft and selection gone"), !Gone.PreDraft.bSet && Gone.SelectedFighterId.IsEmpty());
+  }
+
+  // ---- -S08Maneuver auto driver through the draft (src=auto), demo gate seq + 2 ----
+  {
+    FS08BoardFighter Hero = MsFighter(TEXT("h"), Me, 0, 1, 2.0);
+    Hero.bIsHero = true;
+    const TArray<FS08BoardFighter> Team = {Hero, MsFighter(TEXT("e"), Opp, 6, 0)};
+    FS09CommandUi Auto = MsOpen(Turn, Board, Team);
+    FString HeroId;
+    FIntPoint Target;
+    TestTrue(TEXT("auto target"), FS09MoveInput::AutoManeuverTarget(Auto, Board, Team, HeroId, Target));
+    TestTrue(TEXT("one step of the hero"), HeroId == TEXT("h") && Board.Neighbours(FIntPoint(0, 1)).Contains(Target));
+    bool bUnchanged = false;
+    TestTrue(TEXT("auto pre-draft"), Auto.InspectFighter(HeroId, Turn, Board, Team) &&
+                                         Auto.SetPreDraft(HeroId, Target.X, Target.Y, Turn, Board, Team, bUnchanged));
+    FString Reason;
+    TestTrue(TEXT("begin legal"), Auto.CanBeginManeuver(Turn, Reason));
+    Auto.OnSnapshot(MsSnapshot(Before, ManeuverA, 5), Board, Team);
+    TestTrue(TEXT("MS-DRAFT op=assign ... src=auto (one line)"), MsTracedLine(Auto, {TEXT("op=assign"), TEXT("src=auto")}));
+    FS09ManeuverCommand Command;
+    TestTrue(TEXT("auto confirm"), Auto.ConfirmManeuver(MsSnapshot(Before, ManeuverA, 5), Board, Team, Command, Reason));
+    TestEqual(TEXT("one canonical step"), Command.Moves.Num() == 1 ? Command.Moves[0].Path.Num() : 0, 1);
+    TestFalse(TEXT("gate: begin applied only (seq + 1)"),
+              FS09MoveInput::AutoManeuverSettled(4, MsSnapshot(Before, ManeuverA, 5)));
+    TestFalse(TEXT("gate: seq + 2 with the maneuver still open"),
+              FS09MoveInput::AutoManeuverSettled(4, MsSnapshot(Before, ManeuverA, 6)));
+    TestTrue(TEXT("gate: seq + 2, maneuver closed"), FS09MoveInput::AutoManeuverSettled(4, MsTurnSnapshot(Before, 6)));
+  }
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09MoveSelExhaustionConfirmTest, "Unmatched.S09.MoveSel.ExhaustionConfirm",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS09MoveSelExhaustionConfirmTest::RunTest(const FString&) {
+  const FS08BoardModel Board = MsGrid(6, 3);
+  FS08BoardFighter Hero = MsFighter(TEXT("h"), Me, 0, 1, 2.0);
+  Hero.bIsHero = true;
+  const TArray<FS08BoardFighter> Team = {Hero, MsFighter(TEXT("s1"), Me, 1, 0, 2.0), MsFighter(TEXT("s2"), Me, 1, 2, 2.0),
+                                         MsFighter(TEXT("e"), Opp, 5, 1)};
+  const FS08Snapshot Turn = MsTurnSnapshot({{TEXT("c1"), true, 1}}, 4);
+  FS09CommandUi Ui = MsOpen(Turn, Board, Team);
+  FS09MoveInput In;
+  FS09InputView Empty;
+  Empty.OwnDeckCount = 0;
+
+  FS09InputResult R = In.OnKey(ES09MoveKey::M, Ui, Turn, Board, Team, Empty);
+  TestTrue(TEXT("empty deck: MS-S-04, no begin"), In.bExhaustionOpen && !R.bBeginManeuver);
+  TestEqual(TEXT("the prompt names the fighters"), MsKey(R.Toast), FString(TEXT("ms.begin.exhaustion")));
+  TestTrue(TEXT("3 own fighters take the damage"), R.Toast.Text().Contains(TEXT("(3)")));
+  // MS-S-04 is modal: other keys and board clicks are swallowed.
+  TestTrue(TEXT("Tab swallowed"), In.OnKey(ES09MoveKey::Tab, Ui, Turn, Board, Team, Empty).bHandled &&
+                                      Ui.SelectedFighterId.IsEmpty());
+  TestTrue(TEXT("a click swallowed"), MsClick(In, Ui, Turn, Board, Team, FIntPoint(0, 1), TEXT("h")).bHandled &&
+                                          Ui.SelectedFighterId.IsEmpty() && In.bExhaustionOpen);
+  R = In.OnKey(ES09MoveKey::Escape, Ui, Turn, Board, Team, Empty);
+  TestTrue(TEXT("Cancel: closed, nothing sent"), !In.bExhaustionOpen && !R.bBeginManeuver);
+  TestEqual(TEXT("a stale but known 0 still prompts"), FS09MoveInput::DeckCountForPrompt(0, true), 0);
+  TestEqual(TEXT("no deck projection yet: no prompt"), FS09MoveInput::DeckCountForPrompt(5, false), -1);
+  In.OnKey(ES09MoveKey::M, Ui, Turn, Board, Team, Empty);
+  R = In.OnKey(ES09MoveKey::Enter, Ui, Turn, Board, Team, Empty);
+  TestTrue(TEXT("Begin anyway: beginManeuver"), R.bBeginManeuver && !In.bExhaustionOpen);
+  FS09InputView Full;
+  Full.OwnDeckCount = 5;
+  TestTrue(TEXT("a deck with cards: M begins at once"), In.OnKey(ES09MoveKey::M, Ui, Turn, Board, Team, Full).bBeginManeuver);
+
+  // After the exhaustion damage: the dead sidekick is out of the draft; an empty hand has no boost panel.
+  TArray<FS08BoardFighter> Hurt = Team;
+  Hurt[1].Health = 0;
+  const FS08Snapshot Draft = MsSnapshot({}, ManeuverA, 5);
+  Ui.OnSnapshot(Draft, Board, Hurt);
+  In.OnSnapshot(Ui, Draft);
+  TestTrue(TEXT("draft open"), Ui.Mode == ES09CommandMode::ManeuverDraft);
+  TestFalse(TEXT("the dead sidekick cannot be selected"), Ui.SelectFighter(TEXT("s1"), Draft, Board, Hurt));
+  TestEqual(TEXT("why.fighter.defeated"), MsKey(Ui.LastReason), FString(TEXT("why.fighter.defeated")));
+  TestEqual(TEXT("Tab skips it"), Ui.CycleFighter(Hurt, 1), FString(TEXT("h")));
+  R = In.OnKey(ES09MoveKey::B, Ui, Draft, Board, Hurt, {});
+  TestTrue(TEXT("empty hand: no boost panel"), !In.bBoostPanelOpen && MsKey(R.Toast) == TEXT("ms.boost.empty"));
+  TestEqual(TEXT("empty hand: no offers"), Ui.BoostOffers().Num(), 0);
+  // The hero died of exhaustion: GAME_OVER, no draft.
+  FS08Snapshot Over = MsSnapshot({}, ManeuverA, 6);
+  Over.Phase = TEXT("GAME_OVER");
+  Ui.OnSnapshot(Over, Board, Hurt);
+  TestTrue(TEXT("hero dead: no draft"), Ui.Mode == ES09CommandMode::None && Ui.Moves.Num() == 0);
   return true;
 }
 

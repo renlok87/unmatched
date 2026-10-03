@@ -288,6 +288,15 @@ FString FighterDisplayName(const FS08BoardFighter& Fighter) {
   return Fighter.Label.IsEmpty() ? (Fighter.Name.IsEmpty() ? Fighter.Id : Fighter.Name) : Fighter.Label;
 }
 
+const TCHAR* S09DraftSourceName(ES09InputSource Source) {
+  switch (Source) {
+    case ES09InputSource::Click: return TEXT("click");
+    case ES09InputSource::Key: return TEXT("key");
+    case ES09InputSource::Snapshot: return TEXT("snapshot");
+    default: return TEXT("auto");
+  }
+}
+
 const TCHAR* DraftStatusName(ES09DraftMoveStatus Status) {
   switch (Status) {
     case ES09DraftMoveStatus::Ok: return TEXT("ok");
@@ -569,6 +578,13 @@ bool FS09CommandUi::OnSnapshot(const FS08Snapshot& Snapshot, const FS08BoardMode
   // latest authoritative board (links + zones).
   SnapshotBoard = Board;
   SnapshotFighters = Fighters;
+  // MS-E-95: an applied snapshot with a new seq is the undo barrier (a
+  // same-seq re-read - e.g. the refetch after a rejection - is not).
+  if (Snapshot.SequenceNumber != LastSnapshotSeq) UndoStack.Reset();
+  LastSnapshotSeq = Snapshot.SequenceNumber;
+  // MS-S-02/03: the fighter inspected outside a draft (kept below while the
+  // viewer may still begin).
+  const FString Inspected = OldMode == ES09CommandMode::None ? SelectedFighterId : FString();
 
   // GD-036: terminal state closes every local draft - gameplay input is
   // dead on the result screen (the server would reject it anyway: executor
@@ -576,6 +592,7 @@ bool FS09CommandUi::OnSnapshot(const FS08Snapshot& Snapshot, const FS08BoardMode
   if (Snapshot.Phase == TEXT("GAME_OVER")) {
     Mode = ES09CommandMode::None;
     ResetManeuverDraft();
+    ClearPreDraft();
     PendingDiscard = FS08PendingHandDiscard();
     DiscardSelection.Reset();
     AttackAttackerId.Reset();
@@ -626,7 +643,9 @@ bool FS09CommandUi::OnSnapshot(const FS08Snapshot& Snapshot, const FS08BoardMode
   if (bOwnManeuver) {
     Mode = ES09CommandMode::ManeuverDraft;
     bool bRestored = false;
+    bool bOpened = false;
     if (!PendingManeuverId.Equals(ManeuverId, ESearchCase::CaseSensitive)) {
+      bOpened = true;
       // MS-R-55: a draft belongs to ONE pendingManeuver.id. Another id starts
       // empty; the same id after a gameplay-HUD reset (re-entry into the
       // match inside this process) comes back from the controller's cache.
@@ -672,6 +691,13 @@ bool FS09CommandUi::OnSnapshot(const FS08Snapshot& Snapshot, const FS08BoardMode
       TraceDraftOp(TEXT("restore"), FString(), Board);
     } else if (Moves.Num() > 0 || !BoostCardId.IsEmpty()) {
       TraceDraftOp(TEXT("snapshot"), FString(), Board);
+    }
+    // MS-R-02 / MS-E-84: a freshly opened draft takes the pre-draft target
+    // (also after MS-S-10); a restored draft (same id) keeps its own.
+    if (bOpened && !bRestored && PreDraft.bSet) {
+      CarryPreDraft(Board, Fighters);
+    } else if (bOpened) {
+      ClearPreDraft();
     }
   } else if (bHasDiscard && Discard.PlayerId == ViewerId) {
     Mode = ES09CommandMode::DiscardDraft;
@@ -759,6 +785,31 @@ bool FS09CommandUi::OnSnapshot(const FS08Snapshot& Snapshot, const FS08BoardMode
     DefenseCardId.Reset();
     SchemeCardId.Reset();
     ResetPendingDraft();
+  }
+  // MS-S-02/03 live on while the viewer may still begin (the pre-draft
+  // survives MS-S-10 re-reads, MS-R-02); any other state drops them.
+  if (Mode == ES09CommandMode::None && !Inspected.IsEmpty() && CanKeepPreDraft(Snapshot)) {
+    FS09Reason Gate;
+    if (CanMoveFighter(Inspected, Fighters, Gate)) {
+      SelectedFighterId = Inspected;
+      DraftHand = FS09DraftEval::BoostHand(Snapshot, ViewerId);
+      ReevaluateDraft(Board, Fighters);
+      if (PreDraft.bSet) {
+        FS09DraftMove Probe;
+        FS09Reason Why;
+        if (EvaluateDestination(PreDraft.FighterId, PreDraft.X, PreDraft.Y, Board, Fighters, Probe, Why)) {
+          PreDraft.Status = Probe.Status;
+          PreDraft.RequiredBoost = Probe.RequiredBoost;
+        } else {
+          LastReason = FS09Reason::Make(TEXT("why.predraft.lost")).Arg(TEXT("cell"), Board.CellLabel(PreDraft.X, PreDraft.Y));
+          ClearPreDraft();
+        }
+      }
+    } else {
+      ClearPreDraft();
+    }
+  } else if (Mode != ES09CommandMode::ManeuverDraft) {
+    ClearPreDraft();
   }
   SyncDraftCache();
   return Mode != OldMode;
@@ -940,6 +991,7 @@ void FS09CommandUi::SyncDraftCache() {
 }
 
 void FS09CommandUi::ResetManeuverDraft() {
+  UndoStack.Reset(); // another maneuverId / no maneuver: the stack goes (MS-E-113)
   PendingManeuverId.Reset();
   Moves.Reset();
   BoostCardId.Reset();
@@ -1018,7 +1070,10 @@ void FS09CommandUi::DraftTraceLine(const FString& Line) {
 }
 
 void FS09CommandUi::TraceDraftOp(const TCHAR* Op, const FString& FighterId, const FS08BoardModel& Board) {
-  FString Line = FString::Printf(TEXT("MS-DRAFT op=%s rev=%u"), Op, DraftRevision);
+  // 04 §9: src= click | key | auto; a re-evaluation by the server state is snapshot.
+  const bool bServerOp = FCString::Strcmp(Op, TEXT("snapshot")) == 0 || FCString::Strcmp(Op, TEXT("restore")) == 0;
+  FString Line = FString::Printf(TEXT("MS-DRAFT op=%s rev=%u src=%s"), Op, DraftRevision,
+                                 bServerOp ? TEXT("snapshot") : S09DraftSourceName(DraftSource));
   const int32 Index = FighterId.IsEmpty() ? INDEX_NONE : MoveIndexOf(FighterId);
   if (Index != INDEX_NONE) {
     const FS09DraftMove& Move = Moves[Index];
@@ -1109,6 +1164,7 @@ bool FS09CommandUi::SetDestination(const FString& FighterId, int32 X, int32 Y,
     // a drafted move of this fighter is cleared (MS-R-11).
     const int32 Index = MoveIndexOf(FighterId);
     if (Index != INDEX_NONE) {
+      PushUndo(Moves, BoostCardId);
       Moves.RemoveAt(Index);
       ReevaluateDraft(Board, Fighters);
       TraceDraftOp(TEXT("clear"), FighterId, Board);
@@ -1125,6 +1181,7 @@ bool FS09CommandUi::SetDestination(const FString& FighterId, int32 X, int32 Y,
     OutReason = LastReason.Describe();
     return false;
   }
+  PushUndo(Moves, BoostCardId);
   const int32 Index = MoveIndexOf(FighterId);
   if (Index != INDEX_NONE) {
     // MS-E-38: an overwrite keeps the move's place in the order.
@@ -1143,14 +1200,19 @@ bool FS09CommandUi::SetDestination(const FString& FighterId, int32 X, int32 Y,
   return true;
 }
 
-void FS09CommandUi::ClearMove(const FString& FighterId) {
+void FS09CommandUi::ClearMove(const FString& FighterId) { ClearMove(FighterId, SnapshotBoard, SnapshotFighters); }
+
+void FS09CommandUi::ClearMove(const FString& FighterId, const FS08BoardModel& Board,
+                              const TArray<FS08BoardFighter>& Fighters) {
   LastReason.Reset();
+  const TArray<FS09DraftMove> Before = Moves;
   if (Moves.RemoveAll([&FighterId](const FS09DraftMove& Move) { return SameDraftId(Move.FighterId, FighterId); }) ==
       0) {
     return;
   }
-  ReevaluateDraft(SnapshotBoard, SnapshotFighters);
-  TraceDraftOp(TEXT("clear"), FighterId, SnapshotBoard);
+  PushUndo(Before, BoostCardId);
+  ReevaluateDraft(Board, Fighters);
+  TraceDraftOp(TEXT("clear"), FighterId, Board);
 }
 
 bool FS09CommandUi::MoveOrder(const FString& FighterId, int32 Delta, const FS08Snapshot& Snapshot,
@@ -1161,6 +1223,7 @@ bool FS09CommandUi::MoveOrder(const FString& FighterId, int32 Delta, const FS08S
   if (From == INDEX_NONE) return false;
   const int32 To = FMath::Clamp(From + Delta, 0, Moves.Num() - 1);
   if (To == From) return false;
+  PushUndo(Moves, BoostCardId);
   FS09DraftMove Move = Moves[From];
   Moves.RemoveAt(From);
   Moves.Insert(MoveTemp(Move), To);
@@ -1185,6 +1248,7 @@ bool FS09CommandUi::ToggleBoostCard(const FString& InstanceId, const FS08Snapsho
     return false;
   }
   DraftHand = FS09DraftEval::BoostHand(Snapshot, ViewerId);
+  const FString BoostBefore = BoostCardId;
   if (!BoostCardId.IsEmpty() && SameDraftId(BoostCardId, InstanceId)) {
     BoostCardId.Reset();
   } else {
@@ -1203,6 +1267,7 @@ bool FS09CommandUi::ToggleBoostCard(const FString& InstanceId, const FS08Snapsho
     // One card per maneuver: another card REPLACES the selected one.
     BoostCardId = InstanceId;
   }
+  PushUndo(Moves, BoostBefore);
   // MS-R-15: plates and statuses follow the boost in the same call.
   ReevaluateDraft(Board, Fighters);
   TraceDraftOp(TEXT("boost"), FString(), Board);
@@ -1217,6 +1282,8 @@ void FS09CommandUi::CancelDraft() {
   // LOCAL-ONLY: the server pendingManeuver stays exactly as it is - the
   // committed draw is not reversed and beginManeuver must not be re-sent
   // (CanBeginManeuver keeps refusing while the pending exists).
+  // Esc's reset is undoable with Backspace (03 §3.2).
+  if (Moves.Num() > 0 || !BoostCardId.IsEmpty()) PushUndo(Moves, BoostCardId);
   Moves.Reset();
   BoostCardId.Reset();
   SelectedFighterId.Reset();
@@ -1225,6 +1292,155 @@ void FS09CommandUi::CancelDraft() {
   // last snapshot keeps the hand data (max BOOST, offers) current.
   ReevaluateDraft(SnapshotBoard, SnapshotFighters);
   TraceDraftOp(TEXT("reset"), FString(), SnapshotBoard);
+}
+
+// ---- MS-T-07: input (03 §3, 04 §4.4) -------------------------------------------
+
+void FS09CommandUi::PushUndo(const TArray<FS09DraftMove>& BeforeMoves, const FString& BeforeBoost) {
+  FS09DraftOp Op;
+  Op.Moves = BeforeMoves;
+  Op.BoostCardId = BeforeBoost;
+  UndoStack.Add(MoveTemp(Op));
+  if (UndoStack.Num() > MaxUndo) UndoStack.RemoveAt(0, UndoStack.Num() - MaxUndo); // MS-E-94
+}
+
+bool FS09CommandUi::Undo(const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters) {
+  LastReason.Reset();
+  if (Mode != ES09CommandMode::ManeuverDraft || UndoStack.Num() == 0) return false;
+  const FS09DraftOp Op = UndoStack.Pop();
+  Moves.Reset();
+  for (const FS09DraftMove& Saved : Op.Moves) {
+    FS09DraftMove& Move = Moves.AddDefaulted_GetRef();
+    Move.FighterId = Saved.FighterId;
+    Move.DestX = Saved.DestX;
+    Move.DestY = Saved.DestY;
+  }
+  BoostCardId = Op.BoostCardId;
+  ReevaluateDraft(Board, Fighters);
+  TraceDraftOp(TEXT("undo"), FString(), Board);
+  return true;
+}
+
+bool FS09CommandUi::InspectFighter(const FString& FighterId, const FS08Snapshot& Snapshot,
+                                   const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters) {
+  LastReason.Reset();
+  if (Mode != ES09CommandMode::None) return false;
+  if (!CanMoveFighter(FighterId, Fighters, LastReason)) return false;
+  if (PreDraft.bSet && !SameDraftId(PreDraft.FighterId, FighterId)) ClearPreDraft();
+  SelectedFighterId = FighterId;
+  DraftHand = FS09DraftEval::BoostHand(Snapshot, ViewerId);
+  ReevaluateDraft(Board, Fighters); // no moves: the tiers on the snapshot positions
+  return true;
+}
+
+bool FS09CommandUi::SetPreDraft(const FString& FighterId, int32 X, int32 Y, const FS08Snapshot& Snapshot,
+                                const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters,
+                                bool& bOutUnchanged) {
+  bOutUnchanged = false;
+  LastReason.Reset();
+  if (Mode != ES09CommandMode::None) return false;
+  if (!CanMoveFighter(FighterId, Fighters, LastReason)) return false;
+  const FS08BoardFighter* Own = FindOwnFighter(Fighters, FighterId);
+  if (Own && Own->X == X && Own->Y == Y) {
+    ClearPreDraft(); // the own space: no target
+    return true;
+  }
+  if (PreDraft.bSet && SameDraftId(PreDraft.FighterId, FighterId) && PreDraft.X == X && PreDraft.Y == Y) {
+    bOutUnchanged = true; // MS-E-83
+    return true;
+  }
+  DraftHand = FS09DraftEval::BoostHand(Snapshot, ViewerId);
+  FS09DraftMove Candidate;
+  if (!EvaluateDestination(FighterId, X, Y, Board, Fighters, Candidate, LastReason)) return false;
+  if (!SameDraftId(SelectedFighterId, FighterId)) {
+    SelectedFighterId = FighterId;
+    ReevaluateDraft(Board, Fighters);
+  }
+  PreDraft.FighterId = FighterId;
+  PreDraft.X = X;
+  PreDraft.Y = Y;
+  PreDraft.bSet = true;
+  PreDraft.Status = Candidate.Status;
+  PreDraft.RequiredBoost = Candidate.RequiredBoost;
+  PreDraft.Source = DraftSource;
+  DraftTraceLine(FString::Printf(TEXT("MS-DRAFT op=predraft rev=%u src=%s fighter=%s dest=%s status=%s required=%d"),
+                                 DraftRevision, S09DraftSourceName(DraftSource), *FighterId, *Board.CellLabel(X, Y),
+                                 DraftStatusName(Candidate.Status), Candidate.RequiredBoost));
+  return true;
+}
+
+void FS09CommandUi::CarryPreDraft(const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters) {
+  const FS09PreDraft Carried = PreDraft;
+  ClearPreDraft();
+  const ES09InputSource Previous = DraftSource;
+  DraftSource = Carried.Source;
+  FS09Reason Gate;
+  if (CanMoveFighter(Carried.FighterId, Fighters, Gate)) SelectedFighterId = Carried.FighterId;
+  FS09DraftMove Candidate;
+  FS09Reason Why;
+  if (!SelectedFighterId.IsEmpty() &&
+      EvaluateDestination(Carried.FighterId, Carried.X, Carried.Y, Board, Fighters, Candidate, Why) &&
+      Candidate.Path.Num() > 0) {
+    // By the NEW hand: Ok or NeedBoost (MS-R-02).
+    PushUndo(Moves, BoostCardId);
+    FS09DraftMove& Move = Moves.AddDefaulted_GetRef();
+    Move.FighterId = Carried.FighterId;
+    Move.DestX = Carried.X;
+    Move.DestY = Carried.Y;
+    ReevaluateDraft(Board, Fighters);
+    TraceDraftOp(TEXT("assign"), Carried.FighterId, Board);
+  } else {
+    // No path even with the best BOOST of the new hand.
+    LastReason = FS09Reason::Make(TEXT("why.predraft.lost")).Arg(TEXT("cell"), Board.CellLabel(Carried.X, Carried.Y));
+    RefreshSelectedTiers(Board, Fighters);
+    DraftTraceLine(FString::Printf(TEXT("MS-DRAFT op=predraft.lost rev=%u src=%s fighter=%s dest=%s"), DraftRevision,
+                                   S09DraftSourceName(DraftSource), *Carried.FighterId,
+                                   *Board.CellLabel(Carried.X, Carried.Y)));
+  }
+  DraftSource = Previous;
+}
+
+bool FS09CommandUi::CanKeepPreDraft(const FS08Snapshot& Snapshot) const {
+  if (Snapshot.CurrentTurnPlayerId != ViewerId) return false;
+  if (Snapshot.Phase != TEXT("ACTION_MANEUVER") && Snapshot.Phase != TEXT("ACTION_ATTACK")) return false;
+  const TSharedPtr<FJsonObject> Meta = Snapshot.Metadata.IsValid() ? Snapshot.Metadata->AsObject() : nullptr;
+  double Actions = 1.0;
+  return !(Meta.IsValid() && Meta->TryGetNumberField(TEXT("actionsRemaining"), Actions) && Actions <= 0.0);
+}
+
+FString FS09CommandUi::CycleFighter(const TArray<FS08BoardFighter>& Fighters, int32 Direction) const {
+  TArray<FString> Ids;
+  for (const FS08BoardFighter& Fighter : Fighters) {
+    FS09Reason Why;
+    if (SameDraftId(Fighter.OwnerId, ViewerId) && CanMoveFighter(Fighter.Id, Fighters, Why)) Ids.Add(Fighter.Id);
+  }
+  if (Ids.Num() == 0) return FString();
+  const int32 Current = Ids.IndexOfByPredicate([this](const FString& Id) { return SameDraftId(Id, SelectedFighterId); });
+  if (Current == INDEX_NONE) return Direction >= 0 ? Ids[0] : Ids.Last();
+  return Ids[(Current + (Direction >= 0 ? 1 : -1) + Ids.Num()) % Ids.Num()];
+}
+
+TArray<FString> FS09CommandUi::FadedFighters(const TArray<FS08BoardFighter>& Fighters) const {
+  TArray<FString> Out;
+  for (const FS09DraftMove& Leaving : Moves) {
+    const FS08BoardFighter* Fighter = FindWorkFighter(Fighters, Leaving.FighterId);
+    if (!Fighter) continue;
+    for (const FS09DraftMove& Other : Moves) {
+      if (!SameDraftId(Other.FighterId, Leaving.FighterId) && Other.DestX == Fighter->X && Other.DestY == Fighter->Y) {
+        Out.AddUnique(Fighter->Id);
+        break;
+      }
+    }
+  }
+  return Out;
+}
+
+int32 FS09CommandUi::OwnLivingFighters(const TArray<FS08BoardFighter>& Fighters) const {
+  int32 Count = 0;
+  for (const FS08BoardFighter& Fighter : Fighters) {
+    Count += SameDraftId(Fighter.OwnerId, ViewerId) && Fighter.Health > 0 && Fighter.X >= 0 ? 1 : 0;
+  }
+  return Count;
 }
 
 bool FS09CommandUi::CanResumeManeuver(const FS08Snapshot& Snapshot) const {

@@ -45,6 +45,12 @@ const FRow GRows[] = {
     {TEXT("why.auth.refreshed"), TEXT("Session refreshed — confirm again")},
     // ---- ms.* (03 §9) ----
     {TEXT("ms.begin.already"), TEXT("Maneuver already begun — Enter confirms")},
+    {TEXT("ms.begin.exhaustion"),
+     TEXT("Your deck is empty: the maneuver deals 2 damage to each of your fighters ({n})")},
+    {TEXT("ms.btn.begin.anyway"), TEXT("Begin anyway")},
+    {TEXT("ms.btn.cancel"), TEXT("Cancel")},
+    {TEXT("ms.boost.empty"), TEXT("No cards to boost with")},
+    {TEXT("ms.confirm.zero"), TEXT("You may stay: confirm the maneuver without moving")},
     {TEXT("ms.order.swap.hint"), TEXT("Change the order (Ctrl+↑/↓)")},
 };
 

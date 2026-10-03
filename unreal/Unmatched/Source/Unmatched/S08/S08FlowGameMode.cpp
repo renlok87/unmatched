@@ -29,6 +29,7 @@
 #include "Serialization/JsonSerializer.h"
 #include "Serialization/JsonWriter.h"
 #include "S08TraceLog.h"
+#include "S08WhyText.h"
 #include "S08ArtTuner.h"
 #include "S08ArtView.h"
 #include "S08LiveTune.h"
@@ -242,6 +243,8 @@ void AS08FlowGameMode::BeginPlay() {
   bAuto = FParse::Param(FCommandLine::Get(), TEXT("S08Auto"));
   bAutoCreate = FParse::Param(FCommandLine::Get(), TEXT("S08Create"));
   bAutoManeuver = FParse::Param(FCommandLine::Get(), TEXT("S08Maneuver"));
+  // MS-R-32: the TASK-022 two-click quick move only behind this dev flag.
+  bLegacyQuickMove = FS09MoveInput::LegacyQuickMoveEnabled();
   AutoEmail = FPlatformMisc::GetEnvironmentVariable(TEXT("S08_EMAIL"));
   AutoPassword = FPlatformMisc::GetEnvironmentVariable(TEXT("S08_PASSWORD"));
   AutoCode = FPlatformMisc::GetEnvironmentVariable(TEXT("S08_ROOM_CODE"));
@@ -468,7 +471,19 @@ void AS08FlowGameMode::HandleApplied(const FS08Snapshot& Snapshot, ES08SeqDecisi
           CommandUi.Mode == ES09CommandMode::ManeuverDraft) {
         // The server draw is committed: beginManeuver MUST NOT be re-sent.
         FS08Trace::Write(TEXT("DRAFT-OPEN draw committed (resume instead of begin)"));
+        // MS-R-02: the pre-draft target found no path with the new hand.
+        if (CommandUi.LastReason.Key == FName(TEXT("why.predraft.lost"))) ShowReason(CommandUi.LastReason, 4.0f);
       }
+    }
+    const bool bExhaustionWasOpen = MoveInput.bExhaustionOpen;
+    MoveInput.OnSnapshot(CommandUi, Snapshot);
+    if (bExhaustionWasOpen && !MoveInput.bExhaustionOpen) {
+      Toast.Reset(); // the MS-S-04 prompt is gone with its state
+      ToastUntil = 0.0f;
+    }
+    if (CommandUi.Mode == ES09CommandMode::None && CommandUi.LastReason.Key == FName(TEXT("why.predraft.lost"))) {
+      ShowReason(CommandUi.LastReason, 4.0f);
+      CommandUi.LastReason.Reset();
     }
     Hud.Build(Snapshot, ViewerId, PreviousOwnHandIds, Flow->GetDecksSeq(),
               Flow->GetDiscardPilesSeq());
@@ -752,11 +767,14 @@ void AS08FlowGameMode::SyncBoardFromApplied() {
     if (CommandUi.Mode == ES09CommandMode::PendingChoice &&
         (!CommandUi.PendingFighterId.IsEmpty() || CommandUi.PendingCells.Num() > 0)) {
       BoardActor->SetSelectedFighter(CommandUi.PendingFighterId, CommandUi.PendingCells);
-    } else if (CommandUi.Mode == ES09CommandMode::ManeuverDraft &&
-        !CommandUi.SelectedFighterId.IsEmpty()) {
+    } else if ((CommandUi.Mode == ES09CommandMode::ManeuverDraft || CommandUi.Mode == ES09CommandMode::None) &&
+               !CommandUi.SelectedFighterId.IsEmpty()) {
+      // MS-T-07: the draft selection and the MS-S-02/03 inspection alike.
       BoardActor->SetSelectedFighter(CommandUi.SelectedFighterId, CommandUi.ReachableCells);
     } else if (!SelectedFighterId.IsEmpty()) {
       SelectFighter(SelectedFighterId);
+    } else if (CommandUi.Mode == ES09CommandMode::None && !bLegacyQuickMove) {
+      BoardActor->SetSelectedFighter(FString(), TSet<uint64>()); // the inspection ended (turn passed)
     }
   }
   RefreshUi();
@@ -959,7 +977,7 @@ void AS08FlowGameMode::SelectFighter(const FString& FighterId) {
   } else {
     SelectedFighterId = FighterId;
     ReachableCells = FS08BoardModel::ComputeReachableCells(
-        BoardModel, Fighters, FighterId, Fighter->Movement);
+        BoardModel, Fighters, FighterId, FS08BoardModel::FighterMovement(*Fighter));
   }
   if (BoardActor) BoardActor->SetSelectedFighter(SelectedFighterId, ReachableCells);
   RefreshUi();
@@ -979,17 +997,53 @@ void AS08FlowGameMode::HandleClick() {
   if (PC->WasInputKeyJustPressed(EKeys::LeftMouseButton)) TraceOsClick(EKeys::LeftMouseButton);
   if (PC->WasInputKeyJustPressed(EKeys::RightMouseButton)) TraceOsClick(EKeys::RightMouseButton);
 
-  if (PC->WasInputKeyJustPressed(EKeys::RightMouseButton)) {
-    if (CommandUi.Mode == ES09CommandMode::ManeuverDraft &&
-        !CommandUi.SelectedFighterId.IsEmpty()) {
-      // Draft stays open; only the drafted-destination focus resets.
-      CommandUi.DeselectFighter();
-      BoardActor->SetSelectedFighter(FString(), TSet<uint64>());
-      Toast = TEXT("draft fighter deselected (draft stays open)");
-      ToastUntil = Elapsed + 3.0f;
-      RefreshUi();
+  // ---- MS-T-07: move selection (MS-S-01..03 and the draft MS-S-06..08) ----
+  // The space is a ray to the board plane (decor and figures never pick it),
+  // the click acts on the RELEASE over the same space (MS-R-34) and the
+  // priority of MS-R-71 holds - FS09MoveInput decides, this picks and applies.
+  // Outside a draft a click never sends a mutation (MS-R-01); the TASK-022
+  // two-click quick move stays behind -S08LegacyQuickMove (MS-R-32).
+  if (FS09MoveInput::RoutesMoveSelection(CommandUi.Mode, bLegacyQuickMove) && Flow.IsValid()) {
+    FIntPoint Cell(-1, -1);
+    FString HitFighterId;
+    if (!ViewportHasFocus()) {
+      // MS-E-104: focus lost (Alt+Tab) - the press and the hover drop; a
+      // release away from the pressed space cancels in OnPointerReleased.
+      if (MoveInput.bPressed || MoveInput.HoverCell.X >= 0) MoveInput.OnFocusLost();
       return;
     }
+    // MS-S-05 / MS-S-09: nothing edits the pre-draft or the draft while a
+    // command is in flight.
+    if (CommandUi.bCommandInFlight || Flow->IsManeuverInFlight()) {
+      if (MoveInput.bPressed) MoveInput.OnFocusLost();
+      return;
+    }
+    const bool bLeftDown = PC->WasInputKeyJustPressed(EKeys::LeftMouseButton);
+    const bool bLeftUp = PC->WasInputKeyJustReleased(EKeys::LeftMouseButton);
+    const bool bRight = PC->WasInputKeyJustPressed(EKeys::RightMouseButton);
+    if (!bLeftDown && !bLeftUp && !bRight) return; // the hover preview needs it from MS-T-09
+    PickBoardUnderCursor(PC, Cell, HitFighterId);
+    MoveInput.SetHover(Cell);
+    if (bRight) {
+      ApplyMoveInput(MoveInput.OnRightClick(CommandUi, Flow->GetAppliedSnapshot(), BoardModel, Fighters));
+      return;
+    }
+    if (bLeftDown) MoveInput.OnPointerPressed(Cell, HitFighterId);
+    if (bLeftUp) {
+      const bool bWasPressed = MoveInput.bPressed;
+      const FS09InputResult Result =
+          MoveInput.OnPointerReleased(Cell, HitFighterId, CommandUi, Flow->GetAppliedSnapshot(), BoardModel, Fighters);
+      if (bWasPressed) {
+        FS08Trace::Write(FString::Printf(TEXT("INPUT release src=os cell=%s fighter=%s handled=%d mode=%d"),
+                                         Cell.X >= 0 ? *BoardModel.CellLabel(Cell.X, Cell.Y) : TEXT("none"),
+                                         HitFighterId.IsEmpty() ? TEXT("none") : *HitFighterId,
+                                         Result.bHandled ? 1 : 0, static_cast<int32>(CommandUi.Mode)));
+      }
+      ApplyMoveInput(Result);
+    }
+    return;
+  }
+  if (PC->WasInputKeyJustPressed(EKeys::RightMouseButton)) {
     SelectedFighterId.Reset();
     ReachableCells.Reset();
     BoardActor->ClearSelection();
@@ -997,60 +1051,6 @@ void AS08FlowGameMode::HandleClick() {
   }
   if (!PC->WasInputKeyJustPressed(EKeys::LeftMouseButton)) return;
 
-  // ---- GD-033: board clicks draft destinations while a maneuver draft is open
-  if (CommandUi.Mode == ES09CommandMode::ManeuverDraft) {
-    if (!Flow.IsValid() || Flow->IsManeuverInFlight()) return;
-    FHitResult Hit;
-    if (!PC->GetHitResultUnderCursor(ECC_Visibility, false, Hit)) return;
-    if (AS08FighterActor* FighterActor = Cast<AS08FighterActor>(Hit.GetActor())) {
-      const FS08BoardFighter& Fighter = FighterActor->GetFighter();
-      if (Flow.IsValid() && Fighter.OwnerId == Flow->GetUserId()) {
-        if (CommandUi.SelectFighter(Fighter.Id, Flow->GetAppliedSnapshot(), BoardModel, Fighters)) {
-          // B-05: no colour word - the ring colour is per board (03 §4.2b).
-          Toast = FString::Printf(TEXT("draft: selected %s - click a highlighted space"), *Fighter.Label);
-          ToastUntil = Elapsed + 3.0f;
-        } else {
-          ShowReason(CommandUi.LastReason, 3.0f); // e.g. why.immobilized (MS-R-05)
-        }
-        BoardActor->SetSelectedFighter(CommandUi.SelectedFighterId, CommandUi.ReachableCells);
-      } else {
-        ShowReason(FS09Reason::Make(TEXT("why.fighter.not.yours")), 3.0f);
-      }
-      RefreshUi();
-      return;
-    }
-    int32 CellX, CellY;
-    if (!BoardActor->WorldToCell(Hit.ImpactPoint, CellX, CellY)) return;
-    if (CommandUi.SelectedFighterId.IsEmpty()) {
-      Toast = TEXT("draft: select one of your fighters first");
-      ToastUntil = Elapsed + 3.0f;
-      RefreshUi();
-      return;
-    }
-    FString Reason;
-    if (CommandUi.SetDestination(CommandUi.SelectedFighterId, CellX, CellY,
-                                 Flow->GetAppliedSnapshot(), BoardModel, Fighters, Reason)) {
-      // B-03 / B-04: Enter confirms (M only begins); the space by CellLabel.
-      Toast = CommandUi.MoveIndexOf(CommandUi.SelectedFighterId) == INDEX_NONE
-                  ? FString::Printf(TEXT("draft: %s stays (no move)"), *CommandUi.SelectedFighterId) // MS-E-16
-                  : FString::Printf(TEXT("draft: %s -> %s [Enter confirm, Esc cancel]"),
-                                    *CommandUi.SelectedFighterId, *BoardModel.CellLabel(CellX, CellY));
-      ToastUntil = Elapsed + 3.0f;
-    } else {
-      // B-13: a refused space gets the CUE-004 ring like the quick move and
-      // the pending pick; the toast is the reason by key (B-04: CellLabel).
-      if (CommandUi.LastReason.IsSet()) {
-        ShowReason(CommandUi.LastReason, 3.0f);
-      } else {
-        Toast = TEXT("draft rejected: ") + Reason;
-        ToastUntil = Elapsed + 3.0f;
-      }
-      BoardActor->ShowIllegalCell(CellX, CellY);
-      IllegalUntil = Elapsed + 1.5f;
-    }
-    RefreshHud();
-    return;
-  }
   if (CommandUi.Mode == ES09CommandMode::DiscardDraft) {
     Toast = FString::Printf(TEXT("discard choice open: pick exactly %d cards (1-9 keys)"),
                             CommandUi.PendingDiscard.Count);
@@ -1166,6 +1166,18 @@ void AS08FlowGameMode::HandleClick() {
     return;
   }
 
+  // MS-R-01 / MS-R-32: the TASK-022 quick move below sends beginManeuver from
+  // a click - only behind -S08LegacyQuickMove and never from a command mode
+  // (the scheme picker falls here: it is driven by the hand and Enter).
+  if (!FS09MoveInput::LegacyQuickMoveReachable(CommandUi.Mode, bLegacyQuickMove)) {
+    if (CommandUi.Mode == ES09CommandMode::SchemeChoice) {
+      Toast = TEXT("scheme choice: pick the card (1-9 or click) and press Enter; G/Esc cancels");
+      ToastUntil = Elapsed + 3.0f;
+      RefreshUi();
+    }
+    return;
+  }
+
   FString Reason;
   if (Flow.IsValid() && !Flow->CanIssueGameplayCommand(Reason)) {
     Toast = TEXT("input blocked: ") + Reason;
@@ -1234,6 +1246,112 @@ void AS08FlowGameMode::HandleClick() {
   TryManeuverTo(CellX, CellY);
 }
 
+bool AS08FlowGameMode::PickBoardUnderCursor(APlayerController* PC, FIntPoint& OutCell, FString& OutFighterId) const {
+  OutCell = FIntPoint(-1, -1);
+  OutFighterId.Reset();
+  if (!PC || !BoardActor) return false;
+  // The fighter actor under the cursor (selection only, MS-R-71 step 2).
+  FHitResult Hit;
+  if (PC->GetHitResultUnderCursor(ECC_Visibility, false, Hit)) {
+    if (const AS08FighterActor* Actor = Cast<AS08FighterActor>(Hit.GetActor())) OutFighterId = Actor->GetFighterId();
+  }
+  // 04 §6.2: the space is the ray to the board plane - 3D decor of the
+  // ENV-MAPS islands and the figures never decide it.
+  FVector Origin, Direction;
+  if (!PC->DeprojectMousePositionToWorld(Origin, Direction) || FMath::IsNearlyZero(Direction.Z)) {
+    return !OutFighterId.IsEmpty();
+  }
+  const double PlaneZ = 0.0; // the play plane (04 §6.2; CellToWorld works at z = 0)
+  const double T = (PlaneZ - Origin.Z) / Direction.Z;
+  if (T <= 0.0) return !OutFighterId.IsEmpty();
+  int32 X = -1, Y = -1;
+  if (BoardActor->WorldToCell(Origin + Direction * T, X, Y)) OutCell = FIntPoint(X, Y);
+  return OutCell.X >= 0 || !OutFighterId.IsEmpty();
+}
+
+bool AS08FlowGameMode::ViewportHasFocus() const {
+  UGameViewportClient* ViewportClient = GetWorld() ? GetWorld()->GetGameViewport() : nullptr;
+  if (!ViewportClient || !ViewportClient->Viewport) return false;
+  // A packaged window that is not the OS foreground window has no keyboard
+  // focus: a press made before Alt+Tab must not act on the release after it.
+  return FApp::HasFocus() && ViewportClient->Viewport->HasFocus();
+}
+
+FS09InputView AS08FlowGameMode::MoveInputView() const {
+  FS09InputView View;
+  View.bDiscardBrowserOpen = bDiscardBrowserOpen;
+  View.bInspectorOpen = bInspecting;
+  if (const FS09PlayerPanel* Own = Hud.ViewerPanel()) {
+    View.OwnDeckCount = FS09MoveInput::DeckCountForPrompt(Own->DeckCount, Flow.IsValid() && Flow->GetDecksSeq() > 0);
+  }
+  return View;
+}
+
+void AS08FlowGameMode::ApplyMoveInput(const FS09InputResult& Result) {
+  if (!Result.bHandled) return;
+  if (Result.bCloseDiscardBrowser) {
+    bDiscardBrowserOpen = false;
+    DiscardBrowserIndex = -1;
+  }
+  if (Result.bCloseInspector) {
+    bInspecting = false;
+    InspectedHandIndex = -1;
+  }
+  if (Result.bPauseUnavailable) FS08Trace::Write(TEXT("INPUT esc pause.unavailable (no pause screen yet, MS-E-99)"));
+  if (Result.Toast.IsSet()) ShowReason(Result.Toast, Result.ToastSeconds);
+  if (MoveInput.bExhaustionOpen && Result.Toast.Key == FName(TEXT("ms.begin.exhaustion"))) {
+    // MS-S-04 until the panel (MS-T-11): the two answers in the prompt itself.
+    Toast += FString::Printf(TEXT(" — Enter: %s, Esc: %s"), *S08WhyText::En(FName(TEXT("ms.btn.begin.anyway"))),
+                             *S08WhyText::En(FName(TEXT("ms.btn.cancel"))));
+  }
+  if (Result.IllegalCell.X >= 0 && BoardActor) {
+    BoardActor->ShowIllegalCell(Result.IllegalCell.X, Result.IllegalCell.Y); // CUE-004 (B-13)
+    IllegalUntil = Elapsed + 1.5f;
+  }
+  if (Result.bBeginManeuver && Flow.IsValid()) {
+    if (Flow->BeginManeuver()) {
+      Toast = TEXT("begin maneuver sent (server draws 1 card)");
+      ToastUntil = Elapsed + 3.0f;
+    } else {
+      ShowReason(FS09Reason::Make(*Flow->GameplayGateKey().ToString()), 3.0f); // MS-E-91
+    }
+  }
+  if (!Result.Toast.IsSet() && !Result.ToastText.IsEmpty()) {
+    Toast = Result.ToastText;
+    ToastUntil = Elapsed + Result.ToastSeconds;
+  }
+  if (Result.bConfirmManeuver) SubmitConfirmedManeuver(Result.Command);
+  // Until the panel (MS-T-11): what the keys did, in the toast line.
+  if (!Result.Toast.IsSet() && Result.ToastText.IsEmpty()) {
+    const TArray<FS09BoostCard> Offers = CommandUi.BoostOffers();
+    if (MoveInput.bBoostPanelOpen && Offers.IsValidIndex(MoveInput.BoostCursor)) {
+      Toast = FString::Printf(TEXT("boost: %s %s (Left/Right, Enter picks, B/Esc closes)"),
+                              *Offers[MoveInput.BoostCursor].InstanceId, *Offers[MoveInput.BoostCursor].Label());
+      ToastUntil = Elapsed + 4.0f;
+    } else if (CommandUi.Mode == ES09CommandMode::None && CommandUi.PreDraft.bSet && Result.bSelectionChanged) {
+      Toast = FString::Printf(TEXT("pre-draft: %s -> %s (Enter or M begins the maneuver)"), *CommandUi.PreDraft.FighterId,
+                              *BoardModel.CellLabel(CommandUi.PreDraft.X, CommandUi.PreDraft.Y));
+      ToastUntil = Elapsed + 4.0f;
+    }
+  }
+  if (Result.bSelectionChanged && BoardActor) {
+    BoardActor->SetSelectedFighter(CommandUi.SelectedFighterId, CommandUi.ReachableCells);
+  }
+  RefreshHud();
+}
+
+void AS08FlowGameMode::SubmitConfirmedManeuver(const FS09ManeuverCommand& Command) {
+  if (!Flow.IsValid()) return;
+  FS08Trace::Write(FString::Printf(TEXT("MANEUVER-CONFIRM moves=%d boost=%s"), Command.Moves.Num(),
+                                   Command.BoostCardId.IsEmpty() ? TEXT("none") : TEXT("card")));
+  if (S09FirstConfirmSeq < 0) S09FirstConfirmSeq = Flow->GetAppliedSnapshot().SequenceNumber;
+  if (Flow->SubmitManeuver(Command.ManeuverId, Command.Moves, Command.BoostCardId)) {
+    NextCommandAt = Elapsed + 1.2f;
+  } else {
+    ShowReason(FS09Reason::Make(*Flow->GameplayGateKey().ToString()), 3.0f); // MS-E-91: the draft stays
+  }
+}
+
 void AS08FlowGameMode::TryManeuverTo(int32 CellX, int32 CellY) {
   if (!Flow.IsValid()) return;
   const FString PendingId = FS08Contracts::PendingManeuverId(Flow->GetAppliedSnapshot());
@@ -1269,7 +1387,7 @@ void AS08FlowGameMode::FinishPendingManeuver(int32 CellX, int32 CellY) {
   // Backend path convention (validateManeuver): every entry is one orthogonal
   // step after the previous one, starting from the fighter's current cell -
   // the starting cell itself is NOT part of the path.
-  if (!FS08BoardModel::BuildManeuverPath(BoardModel, Fighters, Mover->Id, Mover->Movement,
+  if (!FS08BoardModel::BuildManeuverPath(BoardModel, Fighters, Mover->Id, FS08BoardModel::FighterMovement(*Mover),
                                          CellX, CellY, Move.Path) ||
       Move.Path.IsEmpty()) {
     FS08Trace::Write(FString::Printf(TEXT("MANEUVER path to (%d,%d) not buildable"), CellX, CellY));
@@ -1286,7 +1404,7 @@ void AS08FlowGameMode::FinishPendingManeuver(int32 CellX, int32 CellY) {
 
 // ---- GD-033 command handlers ---------------------------------------------
 
-void AS08FlowGameMode::HandleHandCardClick(int32 HandIndex) {
+void AS08FlowGameMode::HandleHandCardClick(int32 HandIndex, ES09InputSource Source) {
   const FS09PlayerPanel* Own = Hud.ViewerPanel();
   if (!Own || !Own->Cards.IsValidIndex(HandIndex) || !Flow.IsValid()) return;
   const FS09CardView& Card = Own->Cards[HandIndex];
@@ -1328,8 +1446,15 @@ void AS08FlowGameMode::HandleHandCardClick(int32 HandIndex) {
     return;
   }
   if (CommandUi.Mode == ES09CommandMode::ManeuverDraft) {
+    if (CommandUi.bCommandInFlight || Flow->IsManeuverInFlight()) return; // MS-S-09: frozen
     FString Reason;
-    if (CommandUi.ToggleBoostCard(Card.InstanceId, EffectiveSnapshot(), Reason)) {
+    // MS-T-07: the live model (5-argument form); src= click (hand strip) / key (1-9).
+    const ES09InputSource PreviousSource = CommandUi.DraftSource;
+    CommandUi.DraftSource = Source;
+    const bool bToggled = CommandUi.ToggleBoostCard(Card.InstanceId, EffectiveSnapshot(), BoardModel, Fighters, Reason);
+    CommandUi.DraftSource = PreviousSource;
+    if (bToggled) {
+      MoveInput.bBoostPanelOpen = false; // a pick closes MS-S-08
       Toast = FString::Printf(TEXT("boost %s: %s"),
                               CommandUi.BoostCardId == Card.InstanceId ? TEXT("set") : TEXT("cleared"),
                               *Card.InstanceId);
@@ -1499,18 +1624,7 @@ void AS08FlowGameMode::ConfirmDraft() {
       RefreshHud();
       return;
     }
-    FS08Trace::Write(FString::Printf(TEXT("MANEUVER-CONFIRM moves=%d boost=%s"),
-                                     Command.Moves.Num(),
-                                     Command.BoostCardId.IsEmpty() ? TEXT("none") : TEXT("card")));
-    if (S09FirstConfirmSeq < 0) {
-      S09FirstConfirmSeq = Flow->GetAppliedSnapshot().SequenceNumber;
-    }
-    if (Flow->SubmitManeuver(Command.ManeuverId, Command.Moves, Command.BoostCardId)) {
-      NextCommandAt = Elapsed + 1.2f;
-    } else {
-      // MS-E-91: the stream is reconnecting (why.syncing) - the draft stays.
-      ShowReason(FS09Reason::Make(*Flow->GameplayGateKey().ToString()), 3.0f);
-    }
+    SubmitConfirmedManeuver(Command);
     RefreshHud();
     return;
   }
@@ -1856,6 +1970,66 @@ void AS08FlowGameMode::HandleHudKeys() {
     return;
   }
 
+  // ---- MS-T-07: move-selection keys (03 §3.2) ahead of the older chain:
+  // Ctrl+Up/Down before the discard-browser arrows (MS-E-98), Esc by steps with
+  // D / I first, Backspace / Ctrl+Z undo, Delete, Tab, B and the MS-S-08
+  // arrows. A key FS09MoveInput leaves unhandled falls through.
+  if (!bS09Probe && FS09MoveInput::RoutesMoveSelection(CommandUi.Mode, bLegacyQuickMove)) {
+    const bool bCtrl = PC->IsInputKeyDown(EKeys::LeftControl) || PC->IsInputKeyDown(EKeys::RightControl);
+    const bool bShift = PC->IsInputKeyDown(EKeys::LeftShift) || PC->IsInputKeyDown(EKeys::RightShift);
+    TOptional<ES09MoveKey> Key;
+    if (bCtrl && PC->WasInputKeyJustPressed(EKeys::Up)) {
+      Key = ES09MoveKey::CtrlUp;
+    } else if (bCtrl && PC->WasInputKeyJustPressed(EKeys::Down)) {
+      Key = ES09MoveKey::CtrlDown;
+    } else if (bCtrl && PC->WasInputKeyJustPressed(EKeys::Z)) {
+      Key = ES09MoveKey::CtrlZ;
+    } else if (PC->WasInputKeyJustPressed(EKeys::M)) {
+      Key = ES09MoveKey::M;
+    } else if (PC->WasInputKeyJustPressed(EKeys::Enter)) {
+      Key = ES09MoveKey::Enter;
+    } else if (PC->WasInputKeyJustPressed(EKeys::Escape)) {
+      Key = ES09MoveKey::Escape;
+    } else if (PC->WasInputKeyJustPressed(EKeys::BackSpace)) {
+      Key = ES09MoveKey::Backspace;
+    } else if (PC->WasInputKeyJustPressed(EKeys::Delete)) {
+      Key = ES09MoveKey::Delete;
+    } else if (PC->WasInputKeyJustPressed(EKeys::Tab)) {
+      Key = bShift ? ES09MoveKey::ShiftTab : ES09MoveKey::Tab;
+    } else if (PC->WasInputKeyJustPressed(EKeys::B)) {
+      Key = ES09MoveKey::B;
+    } else if (!bCtrl && PC->WasInputKeyJustPressed(EKeys::Left)) {
+      Key = ES09MoveKey::Left;
+    } else if (!bCtrl && PC->WasInputKeyJustPressed(EKeys::Right)) {
+      Key = ES09MoveKey::Right;
+    } else if (PC->WasInputKeyJustPressed(EKeys::E)) {
+      Key = ES09MoveKey::E;
+    }
+    const bool bInFlight = CommandUi.bCommandInFlight || Flow->IsManeuverInFlight();
+    if (Key.IsSet() && bInFlight) {
+      // MS-S-05 / MS-S-09: nothing edits the pre-draft or the draft while a
+      // command is in flight; only the D / I overlays keep Esc and the arrows.
+      if (Key.GetValue() == ES09MoveKey::Escape && (bDiscardBrowserOpen || bInspecting)) {
+        FS09InputResult Close;
+        Close.bHandled = true;
+        Close.bCloseDiscardBrowser = bDiscardBrowserOpen;
+        Close.bCloseInspector = bInspecting;
+        ApplyMoveInput(Close);
+        return;
+      }
+      const bool bBrowserArrow = bDiscardBrowserOpen &&
+                                 (Key.GetValue() == ES09MoveKey::Left || Key.GetValue() == ES09MoveKey::Right);
+      if (!bBrowserArrow) return;
+    } else if (Key.IsSet()) {
+      const FS09InputResult Result =
+          MoveInput.OnKey(Key.GetValue(), CommandUi, EffectiveSnapshot(), BoardModel, Fighters, MoveInputView());
+      if (Result.bHandled) {
+        ApplyMoveInput(Result);
+        return;
+      }
+    }
+  }
+
   if (PC->WasInputKeyJustPressed(EKeys::M)) {
     BeginManeuverCommand();
   } else if (PC->WasInputKeyJustPressed(EKeys::E)) {
@@ -1950,7 +2124,7 @@ void AS08FlowGameMode::HandleHudKeys() {
           ToastUntil = Elapsed + 3.0f;
           RefreshHud();
         } else {
-          HandleHandCardClick(I);
+          HandleHandCardClick(I, ES09InputSource::Key);
         }
         break;
       }
@@ -2822,7 +2996,7 @@ void AS08FlowGameMode::RunS09Auto() {
             Own ? 1 : 0, Own ? Own->Cards.Num() : -1));
       } else if (NewCard && CommandUi.BoostCardId != NewCard->InstanceId) {
         FString Reason;
-        if (CommandUi.ToggleBoostCard(NewCard->InstanceId, Snap, Reason)) {
+        if (CommandUi.ToggleBoostCard(NewCard->InstanceId, Snap, BoardModel, Fighters, Reason)) {
           FS08Trace::Write(FString::Printf(TEXT("S09AUTO boost(new card) set (B%d)"),
                                            NewCard->BoostValue));
         } else {
@@ -2869,13 +3043,14 @@ void AS08FlowGameMode::RunS09Auto() {
         int32 FromDist = 0, ToDist = 0, Steps = 0;
         FString Reason;
         const bool bPicked = FS08BoardModel::PickApproachDestination(
-            BoardModel, Fighters, Hero->Id, Hero->Movement, Dest, FromDist, ToDist, Steps);
+            BoardModel, Fighters, Hero->Id, FS08BoardModel::FighterMovement(*Hero), Dest, FromDist, ToDist, Steps);
         if (bPicked &&
             CommandUi.SetDestination(Hero->Id, Dest.X, Dest.Y, Snap, BoardModel, Fighters,
                                      Reason)) {
           FS08Trace::Write(FString::Printf(
               TEXT("S09AUTO approach fighter=%s from=(%d,%d) to=(%d,%d) steps=%d allowance=%d enemyDist=%d->%d"),
-              *Hero->Id, Hero->X, Hero->Y, Dest.X, Dest.Y, Steps, Hero->Movement, FromDist, ToDist));
+              *Hero->Id, Hero->X, Hero->Y, Dest.X, Dest.Y, Steps, FS08BoardModel::FighterMovement(*Hero), FromDist,
+              ToDist));
         } else if (bPicked) {
           FS08Trace::Write(FString::Printf(
               TEXT("S09AUTO approach: destination (%d,%d) refused by the draft (%s)"), Dest.X, Dest.Y,
@@ -2903,7 +3078,8 @@ void AS08FlowGameMode::RunS09Auto() {
           FIntPoint Dest(-1, -1);
           int32 Steps = 0;
           FString ZoneTarget;
-          if (!FS09CommandUi::PickRangedPosition(BoardModel, Fighters, Entry.Id, Entry.Movement, Reserved, Dest,
+          if (!FS09CommandUi::PickRangedPosition(BoardModel, Fighters, Entry.Id, FS08BoardModel::FighterMovement(Entry),
+                                                 Reserved, Dest,
                                                  Steps, ZoneTarget)) {
             continue;
           }
@@ -3217,7 +3393,8 @@ void AS08FlowGameMode::RunS09HudProbe() {
     Hud.Build(S09ProbeSnapshot, S09ProbeHostId, S09ProbePreviousIds,
               S09ProbeSnapshot.SequenceNumber, S09ProbeSnapshot.SequenceNumber);
     FString Reason;
-    CommandUi.ToggleBoostCard(TEXT("drawn-new::9"), S09ProbeSnapshot, Reason);
+    CommandUi.ToggleBoostCard(TEXT("drawn-new::9"), S09ProbeSnapshot, CommandUi.SnapshotBoard,
+                              CommandUi.SnapshotFighters, Reason);
     SyncBoardFromApplied(); // 3D board behind the HUD
     RefreshHud();
     FS08Trace::Write(TEXT("S09PROBE maneuver-draft view live (hand=6, new=drawn-new::9, boost set)"));
@@ -3465,34 +3642,36 @@ void AS08FlowGameMode::RunAutoManeuver() {
   // S10/GD-040: never attempt a maneuver in an interrupted room - the gate
   // would reject it every poll tick (blocked-trace spam in the live run).
   if (Flow->IsRoomAborted()) return;
-  // Pick the own hero; move one step to a legal board neighbour (a linked
-  // space on an original map, orthogonal +X/-X/+Y/-Y on a grid).
-  const FS08BoardFighter* Hero = nullptr;
-  for (const FS08BoardFighter& Entry : Fighters) {
-    if (Entry.OwnerId == Flow->GetUserId() && Entry.bIsHero && Entry.IsAlive()) {
-      Hero = &Entry;
-      break;
-    }
+  // MS-R-62 / RK-13: the demo driver goes through the S09 draft - a pre-draft
+  // of one hero step (src=auto), beginManeuver, the snapshot with the
+  // pendingManeuver carries it into the draft, Tick confirms it. The demo gate
+  // stays begin + 1, maneuver + 1 (ManeuverStartSeq + 2, FS09MoveInput::
+  // AutoManeuverSettled).
+  if (CommandUi.Mode != ES09CommandMode::None) return;
+  FString HeroId;
+  FIntPoint Target;
+  if (!FS09MoveInput::AutoManeuverTarget(CommandUi, BoardModel, Fighters, HeroId, Target)) return;
+  const FS08Snapshot& Snap = Flow->GetAppliedSnapshot();
+  const ES09InputSource PreviousSource = CommandUi.DraftSource;
+  CommandUi.DraftSource = ES09InputSource::Auto;
+  bool bUnchanged = false;
+  const bool bPreDraft = CommandUi.InspectFighter(HeroId, Snap, BoardModel, Fighters) &&
+                         CommandUi.SetPreDraft(HeroId, Target.X, Target.Y, Snap, BoardModel, Fighters, bUnchanged);
+  CommandUi.DraftSource = PreviousSource;
+  FString Reason;
+  if (!bPreDraft || !CommandUi.CanBeginManeuver(Snap, Reason) || !Flow->BeginManeuver()) {
+    CommandUi.ClearPreDraft();
+    FS08Trace::Write(FString::Printf(TEXT("AUTO maneuver not begun (%s) - retry on the next poll"),
+                                     Reason.IsEmpty() ? *CommandUi.LastReason.Describe() : *Reason));
+    return;
   }
-  if (!Hero) return;
-  const TSet<uint64> Reachable = FS08BoardModel::ComputeReachableCells(
-      BoardModel, Fighters, Hero->Id, Hero->Movement);
-  int32 TargetX = -1, TargetY = -1;
-  for (const FIntPoint& Next : BoardModel.Neighbours(FIntPoint(Hero->X, Hero->Y))) {
-    if (Reachable.Contains(FS08BoardModel::CellKey(Next.X, Next.Y))) {
-      TargetX = Next.X;
-      TargetY = Next.Y;
-      break;
-    }
-  }
-  if (TargetX < 0) return;
-  SelectFighter(Hero->Id);
-  Toast = FString::Printf(TEXT("AUTO maneuver: %s [%s] (%d,%d)->(%d,%d)"), *Hero->Label,
-                          *Hero->Id, Hero->X, Hero->Y, TargetX, TargetY);
+  BoardActor->SetSelectedFighter(CommandUi.SelectedFighterId, CommandUi.ReachableCells);
+  Toast = FString::Printf(TEXT("AUTO maneuver: %s -> %s (through the draft)"), *HeroId,
+                          *BoardModel.CellLabel(Target.X, Target.Y));
   ToastUntil = Elapsed + 5.0f;
   bAutoManeuverDone = true; // one shot only; WS/HTTP dedupe proven by traces
-  ManeuverStartSeq = Flow->GetAppliedSnapshot().SequenceNumber;
-  TryManeuverTo(TargetX, TargetY);
+  bAutoManeuverAwaitDraft = true;
+  ManeuverStartSeq = Snap.SequenceNumber;
 }
 
 void AS08FlowGameMode::TakeEvidenceShot(const FString& InPath) {
@@ -3726,6 +3905,14 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
         FinishPendingManeuver(ManeuverTargetX, ManeuverTargetY);
       }
     }
+    // MS-R-62: the -S08Maneuver driver confirms its draft (the pre-draft
+    // target carried in with src=auto) once the snapshot opened it.
+    if (bAutoManeuverAwaitDraft && CommandUi.Mode == ES09CommandMode::ManeuverDraft &&
+        !Flow->IsManeuverInFlight()) {
+      bAutoManeuverAwaitDraft = false;
+      FS08Trace::Write(FString::Printf(TEXT("AUTO maneuver draft open moves=%d - confirm"), CommandUi.Moves.Num()));
+      ConfirmDraft();
+    }
   }
   HandleClick();
   HandleHudKeys();
@@ -3837,9 +4024,7 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
     // before the evidence shot.
     const FS08Snapshot& Snap = Flow->GetAppliedSnapshot();
     const bool ManeuverSettled =
-        bAutoManeuver && bAutoManeuverDone &&
-        Snap.SequenceNumber >= ManeuverStartSeq + 2 &&
-        FS08Contracts::PendingManeuverId(Snap).IsEmpty();
+        bAutoManeuver && bAutoManeuverDone && FS09MoveInput::AutoManeuverSettled(ManeuverStartSeq, Snap);
     const bool CueSeen = !bAutoManeuver && bSawCue;
     if (ShotAtElapsed < 0.0f && (ManeuverSettled || CueSeen)) {
       ShotAtElapsed = Elapsed + 1.5f;
@@ -5744,7 +5929,8 @@ void AS08FlowGameMode::CurrentSelection(FString& OutFighterId, TSet<uint64>& Out
       (!CommandUi.PendingFighterId.IsEmpty() || CommandUi.PendingCells.Num() > 0)) {
     OutFighterId = CommandUi.PendingFighterId;
     OutLegalCells = CommandUi.PendingCells;
-  } else if (CommandUi.Mode == ES09CommandMode::ManeuverDraft && !CommandUi.SelectedFighterId.IsEmpty()) {
+  } else if ((CommandUi.Mode == ES09CommandMode::ManeuverDraft || CommandUi.Mode == ES09CommandMode::None) &&
+             !CommandUi.SelectedFighterId.IsEmpty()) {
     OutFighterId = CommandUi.SelectedFighterId;
     OutLegalCells = CommandUi.ReachableCells;
   } else if (!SelectedFighterId.IsEmpty()) {

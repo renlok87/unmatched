@@ -20,6 +20,7 @@
 #include "S08ArtHud.h"
 #include "../S09/S09HudModel.h"
 #include "../S09/S09ManeuverUi.h"
+#include "../S09/S09MoveInput.h"
 #include "S08FlowGameMode.generated.h"
 
 class SEditableTextBox;
@@ -166,7 +167,7 @@ private:
   void RefreshHud();
   void BuildHudWidgets();
   void HandleHudKeys();
-  void HandleHandCardClick(int32 HandIndex);
+  void HandleHandCardClick(int32 HandIndex, ES09InputSource Source = ES09InputSource::Click);
   void InspectCard(const FS09CardView& Card);
   // ---- GD-032 public discard browser ----
   /** Selects a card of one PUBLIC pile (0 = own, 1 = opponent) into the
@@ -188,6 +189,19 @@ private:
    *  4 s, the named space marked (CUE-004 ring); the draft reaction itself is
    *  the refetched snapshot (class И keeps, С rebuilds or closes). */
   void HandleRejection(const FS08Rejection& Rejection);
+  // ---- MS-T-07: move-selection input (03 §3, 04 §6.2) ----
+  /** The space under the cursor - a ray to the board plane (decor and figures
+   *  never pick it) - and the fighter actor hit; false off the board. */
+  bool PickBoardUnderCursor(class APlayerController* PC, FIntPoint& OutCell, FString& OutFighterId) const;
+  /** Applies an FS09MoveInput result: sends, toasts, D/I closing, the board
+   *  highlight. */
+  void ApplyMoveInput(const FS09InputResult& Result);
+  /** The one send path of a confirmed maneuver (Enter in FS09MoveInput, the
+   *  older ConfirmDraft, the -S08Maneuver driver). */
+  void SubmitConfirmedManeuver(const FS09ManeuverCommand& Command);
+  FS09InputView MoveInputView() const;
+  /** The game viewport has the OS focus (MS-E-104). */
+  bool ViewportHasFocus() const;
   // ---- GD-034 combat UI ----
   void BeginAttackDraft();        // A: open the local attack draft
   void NoDefenseCommand();        // N: defender closes the window (no card)
@@ -584,6 +598,10 @@ private:
   float ToastUntil = 0.0f;
   float IllegalUntil = 0.0f;
   bool bCommandSlowShown = false; // MS-E-89: the 3 s why.syncing banner of the open command
+  // MS-T-07: input state of the move selection (boost panel, MS-S-04, the press).
+  FS09MoveInput MoveInput;
+  bool bLegacyQuickMove = false;      // -S08LegacyQuickMove: TASK-022 two-click move (MS-R-32)
+  bool bAutoManeuverAwaitDraft = false; // -S08Maneuver: confirm once the draft opens (MS-R-62)
   FString TracedToast;             // the last toast written to the trace (MS-AT-18)
   int32 ManeuverTargetX = -1;
   int32 ManeuverTargetY = -1;

@@ -119,6 +119,29 @@ struct UNMATCHED_API FS09BoostCard {
   FString Label() const { return bHasBoost ? FString::Printf(TEXT("+%d"), Boost) : FString(); }
 };
 
+/** MS-T-07: where a draft operation came from - the src= of MS-DRAFT (04 §9). */
+enum class ES09InputSource : uint8 { Click, Key, Auto, Snapshot };
+
+/** MS-T-07 (04 §4.4, MS-R-18): one undo record - the draft before an
+ *  operation (destinations and order; the evaluation is recomputed). */
+struct UNMATCHED_API FS09DraftOp {
+  TArray<FS09DraftMove> Moves;
+  FString BoostCardId;
+};
+
+/** MS-T-07 (04 §4.4, MS-S-03): the target picked before the maneuver began. */
+struct UNMATCHED_API FS09PreDraft {
+  FString FighterId;
+  int32 X = -1;
+  int32 Y = -1;
+  bool bSet = false;
+  /** By the hand BEFORE the draw - information only (MS-E-82). */
+  ES09DraftMoveStatus Status = ES09DraftMoveStatus::Ok;
+  int32 RequiredBoost = 0;
+  /** src= of the move it becomes when the draft opens. */
+  ES09InputSource Source = ES09InputSource::Click;
+};
+
 /** Plate tiers of one fighter on one work state (04 §3.2, MS-E-80): base =
  *  endpoints at 1..Base+s steps, boost = Base+s+1..Base+M (empty when s >= M);
  *  Reach is the BFS with Base + max(s, M) steps (the hover preview reuses it). */
@@ -350,6 +373,17 @@ public:
    *  draft for (FS08FlowController::RecallManeuverDraft): true with the
    *  cached draft of exactly that id. Another id never restores anything. */
   TFunction<bool(const FString& /*ManeuverId*/, FS08ManeuverDraftCache&)> RecallDraftHook;
+  // ---- MS-T-07: input (03 §3, 04 §4.4) ----
+  /** src= of the next draft operations (the input layer sets click / key;
+   *  drivers keep auto; snapshot re-evaluations write snapshot). */
+  ES09InputSource DraftSource = ES09InputSource::Auto;
+  /** MS-R-18: undo records, at most MaxUndo (the 33rd evicts the oldest,
+   *  MS-E-94). An applied snapshot with a new seq is a barrier (MS-E-95) and
+   *  another maneuverId clears it; a server rejection leaves it (MS-E-113). */
+  static constexpr int32 MaxUndo = 32;
+  TArray<FS09DraftOp> UndoStack;
+  /** MS-S-03: the pre-draft target (moves into the draft when it opens). */
+  FS09PreDraft PreDraft;
 
   // Discard draft state
   FS08PendingHandDiscard PendingDiscard;
@@ -449,6 +483,41 @@ public:
   /** Drops the selection (the draft stays): SelectedFighterId, SelectedTiers
    *  and ReachableCells together. */
   void DeselectFighter();
+  // ---- MS-T-07 ----
+  /** MS-S-02 (no draft open): inspect an own fighter - its tiers by the hand
+   *  BEFORE the draw (information only). Refused like SelectFighter. */
+  bool InspectFighter(const FString& FighterId, const FS08Snapshot& Snapshot, const FS08BoardModel& Board,
+                      const TArray<FS08BoardFighter>& Fighters);
+  /** MS-S-03 (no draft open): the pre-draft target of FighterId - a space its
+   *  move can end on with the best BOOST of the current hand (Ok in the base
+   *  tier, NeedBoost "needs boost +k" in the boost tier, MS-E-82). The same
+   *  target again sets bOutUnchanged and changes nothing (MS-E-83); the own
+   *  space clears the target. False with LastReason. */
+  bool SetPreDraft(const FString& FighterId, int32 X, int32 Y, const FS08Snapshot& Snapshot,
+                   const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters, bool& bOutUnchanged);
+  void ClearPreDraft() { PreDraft = FS09PreDraft(); }
+  /** MS-R-18 (Backspace / Ctrl+Z): the draft before its last operation,
+   *  re-evaluated. False on an empty stack. */
+  bool Undo(const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters);
+  /** Delete: ClearMove on the live model. */
+  void ClearMove(const FString& FighterId, const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters);
+  /** Tab / Shift+Tab (MS-R-04): the next / previous own fighter after the
+   *  selected one in fighters[] order that CanMoveFighter accepts (the dead
+   *  and the immobilized are skipped); empty without one. */
+  FString CycleFighter(const TArray<FS08BoardFighter>& Fighters, int32 Direction) const;
+  /** MS-R-71: fighters that leave a space another drafted move ends on - drawn
+   *  at 50 % under that move's ghost (the drawing comes with the ghosts, MS-T-10). */
+  TArray<FString> FadedFighters(const TArray<FS08BoardFighter>& Fighters) const;
+  /** Own fighters with health > 0 on the board (MS-S-04: who takes the
+   *  exhaustion damage). */
+  int32 OwnLivingFighters(const TArray<FS08BoardFighter>& Fighters) const;
+  /** MS-S-01/02/03 input may act now: the viewer's action phase with actions
+   *  left (CanKeepPreDraft), no pending choice and no combat window. */
+  bool CanPreDraftNow(const FS08Snapshot& Snapshot) const {
+    return CanKeepPreDraft(Snapshot) && !bHasPendingChoice && !Combat.bPresent;
+  }
+  /** MS-S-02/03 survive a snapshot while the viewer may still begin. */
+  bool CanKeepPreDraft(const FS08Snapshot& Snapshot) const;
   /** MS-T-04 (MS-R-05, MS-E-40/77): may the viewer move FighterId in this
    *  maneuver? Own fighter on the board with health > 0 (the mover role:
    *  isDefeated with health > 0 still moves, as the server), not
@@ -642,6 +711,12 @@ private:
   /** MS-T-04: StoreDraftHook(ExportDraft()) when the draft changed since the
    *  last store. */
   void SyncDraftCache();
+  /** MS-T-07: the draft before an operation goes on the undo stack. */
+  void PushUndo(const TArray<FS09DraftMove>& BeforeMoves, const FString& BeforeBoost);
+  /** MS-R-02: the pre-draft target becomes the first move of the freshly
+   *  opened draft (Ok / NeedBoost by the new hand) or why.predraft.lost. */
+  void CarryPreDraft(const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters);
+  int32 LastSnapshotSeq = INDEX_NONE;
   /** MS-T-04: "MS-DATA dirtyDefeated fighter=<id>" once per maneuver for a
    *  mover with isDefeated and health > 0 (04 §9). */
   void TraceDirtyDefeated(const TArray<FS08BoardFighter>& Fighters, const FString& FighterId);
