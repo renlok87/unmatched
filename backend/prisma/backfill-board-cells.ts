@@ -1,11 +1,12 @@
 /**
- * Backfill Board.cells: у всех досок в БД cells=[] → buildBoardState всегда
- * падает в fallback-сетку 20×20. Скрипт генерирует играбельные сетки:
+ * Backfill Board.cells: доски каталога (импорт настоящих карт) пришли с cells=[],
+ * а без клеток игра на доске не стартует (НД-2). Скрипт генерирует играбельные сетки:
  *   - размер: пиксели картинки (Board.width/height) масштабируются в сетку
- *     12 клеток по большей стороне; доски с width/height <= 14 (Cobble City 5×6)
- *     считаются уже grid'ом и берутся как есть;
+ *     12 клеток по большей стороне;
  *   - зоны: 2-4 реальных zone-ключа из scraped-data/api/maps.json (матч по
  *     Board.name, fallback — features.mapKey), полосы вдоль большей стороны;
+ *     доска без карты в maps.json пропускается (не настоящая карта —
+ *     docs/game-design/decisions/2026-10-04-real-boards-only.md);
  *   - препятствия: цель 5-15% клеток, симметричные пары (180°), запрет рядом
  *     с углами и стартовыми позициями, после каждой пары — проверка 4-связности
  *     (та же метрика, что adjacency.service); при провале финальной проверки —
@@ -35,9 +36,7 @@ const MAPS_PATH = path.join(__dirname, '../../scraped-data/api/maps.json');
 
 /** Сетка: большая сторона 12 клеток (коридор buildBoardState 2..50 соблюдён) */
 const TARGET_LONG_SIDE = 12;
-/** Доски с размерами <= 14 — уже grid (Cobble City 5×6), не масштабируем */
-const GRID_AS_IS_MAX = 14;
-/** Дефолтные зоны для досок без маппинга в maps.json (Cobble City) */
+/** Добивка зон, если у карты в maps.json меньше двух zone-ключей */
 const DEFAULT_ZONE_KEYS = ['blue', 'red'];
 
 // ---------- Парс maps.json (по образцу update-scraped-data.ts) ----------
@@ -175,11 +174,8 @@ function clamp(v: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, v));
 }
 
-/** Размер сетки из размеров доски (пиксели → ~12 по большей стороне; малые — как есть) */
+/** Размер сетки из размеров доски (пиксели → ~12 по большей стороне) */
 function computeGridSize(width: number, height: number): { gw: number; gh: number } {
-  if (width <= GRID_AS_IS_MAX && height <= GRID_AS_IS_MAX && width >= 2 && height >= 2) {
-    return { gw: width, gh: height };
-  }
   if (width >= height) {
     return { gw: TARGET_LONG_SIDE, gh: clamp(Math.round((TARGET_LONG_SIDE * height) / width), 2, 50) };
   }
@@ -362,17 +358,18 @@ async function main() {
     const mapKey = typeof features.mapKey === 'string' ? features.mapKey : '';
     const map = byName.get(board.name) ?? (mapKey ? byKey.get(mapKey) : undefined);
     if (!map) {
-      // Cobble City и прочие кастомные доски — генерим по width/height с дефолтными зонами
+      // Не карта из игры — сетку не выдумываем
       noMapping++;
-      console.log(`   ℹ️  ${board.name}: нет в maps.json — дефолтные зоны [${DEFAULT_ZONE_KEYS.join(', ')}]`);
+      console.log(`   ⏭️  ${board.name}: нет в maps.json — пропуск`);
+      continue;
     }
 
     const { cells, gw, gh, obstacleCount } = generateCells(
       board.name,
       board.width,
       board.height,
-      map?.zoneKeys?.length ? map.zoneKeys : DEFAULT_ZONE_KEYS,
-      map ? map.zonesCount ?? 3 : DEFAULT_ZONE_KEYS.length,
+      map.zoneKeys?.length ? map.zoneKeys : DEFAULT_ZONE_KEYS,
+      map.zonesCount ?? 3,
     );
 
     await prisma.board.update({
@@ -385,7 +382,7 @@ async function main() {
     );
   }
 
-  console.log(`\n📊 Итог: обновлено ${updated}, пропущено (cells непустые) ${skippedNonEmpty}, пропущено (топология) ${skippedTopology}, без маппинга в maps.json ${noMapping}, всего досок ${boards.length}`);
+  console.log(`\n📊 Итог: обновлено ${updated}, пропущено (cells непустые) ${skippedNonEmpty}, пропущено (топология) ${skippedTopology}, пропущено (нет в maps.json) ${noMapping}, всего досок ${boards.length}`);
 }
 
 // Specs import isTopologyBoard without running the backfill.

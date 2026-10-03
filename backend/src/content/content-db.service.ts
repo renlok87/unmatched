@@ -350,13 +350,6 @@ export class ContentDbService {
     return this.mapper.prismaBoardToBoardDefinition(board);
   }
 
-  /**
-   * Get default board
-   */
-  async getDefaultBoard(): Promise<BoardDefinition> {
-    return this.getBoardBySlug('cobble-city');
-  }
-
   // ==================== Content Diff ====================
 
   /**

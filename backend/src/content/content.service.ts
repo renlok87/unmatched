@@ -1,10 +1,9 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { RedisService } from '../redis';
-import type { HeroDefinition, CardDefinition, BoardDefinition, ContentDiff } from './interfaces';
+import type { HeroDefinition, CardDefinition } from './interfaces';
 import { ContentMapper } from './mappers/content.mapper';
 import { getAllHeroes, getHeroDefinition, getHeroesBySet } from './data/heroes';
-import { getAllBoards, getBoardDefinition } from './data/boards';
-import type { PaginatedHeroesDto, PaginatedBoardsDto, PaginationInfoDto } from './dto/content.dto';
+import type { PaginatedHeroesDto, PaginationInfoDto } from './dto/content.dto';
 
 /**
  * Content version for cache invalidation
@@ -24,12 +23,16 @@ const CACHE_KEYS = {
   ALL_HEROES: 'content:heroes:all',
   ALL_BOARDS: 'content:boards:all',
   HERO_BY_ID: (id: string) => `content:heroes:${id}`,
-  BOARD_BY_ID: (id: string) => `content:boards:${id}`,
   HEROES_BY_SET: (set: string) => `content:heroes:set:${set}`,
   ALL_SETS: 'content:sets:all',
   SUMMARY: 'content:summary',
 } as const;
 
+/**
+ * Static hero content (data/heroes). Boards, the content summary and the content diff are served from the
+ * database by ContentDbService; the static Cobble City registry was removed with the synthetic boards
+ * (docs/game-design/decisions/2026-10-04-real-boards-only.md).
+ */
 @Injectable()
 export class ContentService {
   private readonly logger = new Logger(ContentService.name);
@@ -185,101 +188,6 @@ export class ContentService {
     return null;
   }
 
-  // ==================== Boards ====================
-
-  /**
-   * Get all available boards (with cache)
-   */
-  async getAllBoards(): Promise<BoardDefinition[]> {
-    const cacheKey = CACHE_KEYS.ALL_BOARDS;
-    const cached = await this.getFromCache<BoardDefinition[]>(cacheKey);
-    if (cached) {
-      return cached;
-    }
-
-    const boards = getAllBoards();
-    await this.setCache(cacheKey, boards);
-    return boards;
-  }
-
-  /**
-   * Get paginated boards
-   */
-  async getBoardsPaginated(page: number = 1, limit: number = 10): Promise<PaginatedBoardsDto> {
-    const boards = await this.getAllBoards();
-
-    const total = boards.length;
-    const totalPages = Math.ceil(total / limit);
-    const validPage = Math.max(1, Math.min(page, totalPages || 1));
-    const offset = (validPage - 1) * limit;
-
-    const items = boards.slice(offset, offset + limit);
-    const pagination: PaginationInfoDto = {
-      total,
-      page: validPage,
-      limit,
-      totalPages,
-      hasNextPage: validPage < totalPages,
-      hasPreviousPage: validPage > 1,
-    };
-
-    return {
-      items: items.map((b) => this.mapper.toBoardDto(b)),
-      pagination,
-    };
-  }
-
-  /**
-   * Get a board by ID (with cache)
-   * @throws NotFoundException if board not found
-   */
-  async getBoardById(id: string): Promise<BoardDefinition> {
-    const cacheKey = CACHE_KEYS.BOARD_BY_ID(id);
-    const cached = await this.getFromCache<BoardDefinition[]>(cacheKey);
-    if (cached) {
-      return cached as unknown as BoardDefinition;
-    }
-
-    try {
-      const board = getBoardDefinition(id);
-      await this.setCache(cacheKey, board);
-      return board;
-    } catch (error) {
-      throw new NotFoundException(`Board not found: ${id}`);
-    }
-  }
-
-  /**
-   * Get default board
-   */
-  async getDefaultBoard(): Promise<BoardDefinition> {
-    return this.getBoardById('cobble-city');
-  }
-
-  // ==================== Content Diff ====================
-
-  /**
-   * Get content diff for version checking
-   * Returns null if versions match
-   */
-  async getContentDiff(oldVersion: string): Promise<ContentDiff | null> {
-    if (oldVersion === CONTENT_VERSION) {
-      return null;
-    }
-
-    const heroes = await this.getAllHeroes();
-    const boards = await this.getAllBoards();
-
-    return {
-      oldVersion,
-      newVersion: CONTENT_VERSION,
-      heroesChanged: true,
-      boardsChanged: true,
-      changedHeroIds: heroes.map((h) => h.id),
-      changedBoardIds: boards.map((b) => b.id),
-    };
-  }
-
   // ==================== Metadata ====================
 
   /**
@@ -298,32 +206,6 @@ export class ContentService {
 
     await this.setCache(cacheKey, sortedSets);
     return sortedSets;
-  }
-
-  /**
-   * Get content summary (with cache)
-   */
-  async getContentSummary() {
-    const cacheKey = CACHE_KEYS.SUMMARY;
-    const cached = await this.getFromCache(cacheKey);
-    if (cached) {
-      return cached;
-    }
-
-    const heroes = await this.getAllHeroes();
-    const boards = await this.getAllBoards();
-    const sets = await this.getAllSets();
-
-    const summary = {
-      version: CONTENT_VERSION,
-      heroesCount: heroes.length,
-      boardsCount: boards.length,
-      setsCount: sets.length,
-      sets,
-    };
-
-    await this.setCache(cacheKey, summary);
-    return summary;
   }
 
   // ==================== Cache Management ====================

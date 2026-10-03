@@ -181,40 +181,11 @@ async function importCards() {
   return { created, updated, errors: errors.join('; ') };
 }
 
-/**
- * Скрипт импорта досок
+/*
+ * Доски этот скрипт не импортирует. Синтетическая доска 'cobble-city' 6×6 удалена вместе с остальными
+ * ненастоящими досками (docs/game-design/decisions/2026-10-04-real-boards-only.md): доски игры —
+ * оригинальные карты (prisma/seed-env-map-boards.ts) и каталог настоящих карт (prisma/seed-all-scraped.ts).
  */
-async function importBoards() {
-  console.log('🔍 Importing boards from scraped-data...');
-
-  // Создать базовую доску Cobble City
-  const board = await prisma.board.upsert({
-    where: { name: 'cobble-city' },
-    update: {},
-    create: {
-      name: 'cobble-city',
-      nameEn: 'Cobble City',
-      nameRu: 'Булыжник Город',
-      set: 'default',
-      width: 6,
-      height: 6,
-      cells: JSON.stringify(
-        Array.from({ length: 6 }, (_, y) =>
-          Array.from({ length: 6 }, (_, x) => ({
-            x,
-            y,
-            zones: [],
-            isObstacle: false,
-          }))
-        )
-      ),
-    },
-  });
-
-  console.log(`   ✓ Board: ${board.name}`);
-
-  return { created: 1, updated: 0, errors: '' };
-}
 
 /**
  * Главный процесс импорта
@@ -223,17 +194,12 @@ async function main() {
   console.log('🚀 Starting import from scraped-data...\n');
 
   try {
-    const [heroesResult, cardsResult, boardsResult] = await Promise.all([
-      importHeroes(),
-      importCards(),
-      importBoards(),
-    ]);
+    const [heroesResult, cardsResult] = await Promise.all([importHeroes(), importCards()]);
 
     console.log('\n🎉 Import complete!');
     console.log('\n📋 Summary:');
     console.log(`   Heroes: ${heroesResult.created} created, ${heroesResult.updated} updated`);
     console.log(`   Cards: ${cardsResult.created} created, ${cardsResult.updated} updated`);
-    console.log(`   Boards: ${boardsResult.created} created, ${boardsResult.updated} updated`);
 
     if (heroesResult.errors || cardsResult.errors) {
       console.log('\n⚠️  Errors occurred:');

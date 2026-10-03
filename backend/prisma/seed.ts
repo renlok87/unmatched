@@ -253,26 +253,10 @@ const CARDS = [
   },
 ];
 
-const BOARDS = [
-  {
-    // Fixed id: the UE board profile cobble-city, the S08 bench and the demo scripts key on it, and every dev
-    // stand is a clone of the canonical DB (docs/backend-api/db-divergence-2026-10-03.md section 9).
-    id: 'cmuhgs4b2001mwik4f2b2xtf8',
-    name: 'Cobble City',
-    nameEn: 'Cobble City',
-    nameRu: 'Булыжный город',
-    set: 'Hell\'s Kitchen',
-    width: 5,
-    height: 6,
-    cells: [],
-    features: {
-      type: 'urban',
-      description: 'Urban cityscape with multiple zones',
-    },
-    imageUrl: null,
-    imageUrlDark: null,
-  },
-];
+// Доски этот сид не создаёт. Синтетическая Cobble City 5×6 (cmuhgs4b2001mwik4f2b2xtf8) выведена
+// (docs/game-design/decisions/2026-10-04-real-boards-only.md). Доски игры: оригинальные карты
+// (prisma/seed-env-map-boards.ts, доска по умолчанию — Marmoreal · original map) и каталог
+// настоящих карт для веба (prisma/seed-all-scraped.ts).
 
 async function main() {
   console.log('🌱 Seed: Создание тестовых данных...\n');
@@ -393,28 +377,6 @@ async function main() {
       console.log(`✅ Создана карта: ${card.name} (${hero.name})`);
     } catch (error) {
       console.error(`❌ Ошибка при создании карты ${cardData.name}:`, error);
-    }
-  }
-
-  console.log('\n🗺️  Создание досок...');
-  for (const boardData of BOARDS) {
-    try {
-      const existingBoard = await prisma.board.findUnique({
-        where: { name: boardData.name },
-      });
-
-      if (existingBoard) {
-        console.log(`⏭️  Пропуск доски: ${boardData.name} (уже существует)`);
-        continue;
-      }
-
-      const board = await prisma.board.create({
-        data: boardData,
-      });
-
-      console.log(`✅ Создана доска: ${board.name}`);
-    } catch (error) {
-      console.error(`❌ Ошибка при создании доски ${boardData.name}:`, error);
     }
   }
 
