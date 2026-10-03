@@ -145,7 +145,7 @@ JSON: [criteria-before.json](criteria-before.json), [criteria-after-packaged.jso
 
 | Набор | Файлы |
 |---|---|
-| После (packaged, эталонный отпечаток) | [K1](sarpedon-packaged/bench-K1-1920x1080.png), [C0 = Fitx1,45](sarpedon-packaged/bench-Fitx1p45-1920x1080.png), [K2x1,6](sarpedon-packaged/bench-K2x1p6-1920x1080.png), [трасса](sarpedon-packaged/bench.trace.log), [cmdline](sarpedon-packaged/cmdline.txt) |
+| После (packaged, эталонный отпечаток) | [K1](sarpedon-packaged/bench-K1-1920x1080.png), [C0 = Fitx1,45](sarpedon-packaged/bench-Fitx1p45-1920x1080.png), [K2x1,6](sarpedon-packaged/bench-K2x1p6-1920x1080.png), [трасса](sarpedon-packaged/bench.trace.txt) (`*.log` в .gitignore), [cmdline](sarpedon-packaged/cmdline.txt) |
 | До | K1: эталон 10-03 (вне git, `C:/tmp/envmaps-research/lightcheck/sarpedon/`) и [P9b K1](../p9b-hero-light-detail-2026-10-02/sarpedon/bench-K1-1920x1080.png); C0: [P9 Fitx1,45](../p9-fixes-hero-light-2026-10-02/sarpedon/bench-Fitx1p45-1920x1080.png) |
 | До / после (только кадры UE) | [K1, нижняя кромка](montage-k1-front-band.jpg), [C0: водопад и форт](montage-c0-falls-fort.jpg), [C0: борт](montage-c0-ship.jpg) |
 | Метрики | [criteria-before.json](criteria-before.json), [criteria-after-packaged.json](criteria-after-packaged.json), [iterations.json](iterations.json), [g7-live.json](g7-live.json), [bench-summary.json](bench-summary.json) |
