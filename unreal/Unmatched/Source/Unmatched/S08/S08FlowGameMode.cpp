@@ -213,6 +213,8 @@ void AS08FlowGameMode::BeginPlay() {
         S09AttackAutoBudget.Sends, S09AttackAutoBudget.Max));
     RefreshHud();
   });
+  // MS-T-06: classified server rejections of the maneuver commands.
+  Flow->OnRejection.AddUObject(this, &AS08FlowGameMode::HandleRejection);
   Flow->OnTrace.AddLambda([this](const FString& Line) {
     TraceLines.Add(Line);
     if (TraceLines.Num() > 200) TraceLines.RemoveAt(0, TraceLines.Num() - 200);
@@ -1004,22 +1006,23 @@ void AS08FlowGameMode::HandleClick() {
       const FS08BoardFighter& Fighter = FighterActor->GetFighter();
       if (Flow.IsValid() && Fighter.OwnerId == Flow->GetUserId()) {
         if (CommandUi.SelectFighter(Fighter.Id, Flow->GetAppliedSnapshot(), BoardModel, Fighters)) {
-          Toast = FString::Printf(TEXT("draft: selected %s - click a green cell"), *Fighter.Label);
+          // B-05: no colour word - the ring colour is per board (03 §4.2b).
+          Toast = FString::Printf(TEXT("draft: selected %s - click a highlighted space"), *Fighter.Label);
+          ToastUntil = Elapsed + 3.0f;
         } else {
-          Toast = TEXT("draft: ") + CommandUi.LastReason.Describe(); // e.g. why.immobilized (MS-R-05)
+          ShowReason(CommandUi.LastReason, 3.0f); // e.g. why.immobilized (MS-R-05)
         }
         BoardActor->SetSelectedFighter(CommandUi.SelectedFighterId, CommandUi.ReachableCells);
       } else {
-        Toast = TEXT("draft: enemy fighters cannot move");
+        ShowReason(FS09Reason::Make(TEXT("why.fighter.not.yours")), 3.0f);
       }
-      ToastUntil = Elapsed + 3.0f;
       RefreshUi();
       return;
     }
     int32 CellX, CellY;
     if (!BoardActor->WorldToCell(Hit.ImpactPoint, CellX, CellY)) return;
     if (CommandUi.SelectedFighterId.IsEmpty()) {
-      Toast = TEXT("draft: select one of your fighters (blue base) first");
+      Toast = TEXT("draft: select one of your fighters first");
       ToastUntil = Elapsed + 3.0f;
       RefreshUi();
       return;
@@ -1027,14 +1030,24 @@ void AS08FlowGameMode::HandleClick() {
     FString Reason;
     if (CommandUi.SetDestination(CommandUi.SelectedFighterId, CellX, CellY,
                                  Flow->GetAppliedSnapshot(), BoardModel, Fighters, Reason)) {
+      // B-03 / B-04: Enter confirms (M only begins); the space by CellLabel.
       Toast = CommandUi.MoveIndexOf(CommandUi.SelectedFighterId) == INDEX_NONE
                   ? FString::Printf(TEXT("draft: %s stays (no move)"), *CommandUi.SelectedFighterId) // MS-E-16
-                  : FString::Printf(TEXT("draft: %s -> (%d,%d) [M/Enter confirm, Esc cancel]"),
-                                    *CommandUi.SelectedFighterId, CellX, CellY);
+                  : FString::Printf(TEXT("draft: %s -> %s [Enter confirm, Esc cancel]"),
+                                    *CommandUi.SelectedFighterId, *BoardModel.CellLabel(CellX, CellY));
+      ToastUntil = Elapsed + 3.0f;
     } else {
-      Toast = TEXT("draft rejected: ") + Reason;
+      // B-13: a refused space gets the CUE-004 ring like the quick move and
+      // the pending pick; the toast is the reason by key (B-04: CellLabel).
+      if (CommandUi.LastReason.IsSet()) {
+        ShowReason(CommandUi.LastReason, 3.0f);
+      } else {
+        Toast = TEXT("draft rejected: ") + Reason;
+        ToastUntil = Elapsed + 3.0f;
+      }
+      BoardActor->ShowIllegalCell(CellX, CellY);
+      IllegalUntil = Elapsed + 1.5f;
     }
-    ToastUntil = Elapsed + 3.0f;
     RefreshHud();
     return;
   }
@@ -1113,7 +1126,7 @@ void AS08FlowGameMode::HandleClick() {
         CommandUi.PendingCells = CommandUi.ComputePendingCells(EffectiveSnapshot(), BoardModel,
                                                                Fighters);
         BoardActor->SetSelectedFighter(CommandUi.PendingFighterId, CommandUi.PendingCells);
-        Toast = FString::Printf(TEXT("pending: %s selected - click a green cell or Enter"),
+        Toast = FString::Printf(TEXT("pending: %s selected - click a highlighted space or Enter"),
                                 *FighterActor->GetFighter().Label);
         if (!bTakesCell) Toast = FString::Printf(TEXT("pending target: %s - Enter confirms"),
                                                  *FighterActor->GetFighter().Label);
@@ -1134,7 +1147,7 @@ void AS08FlowGameMode::HandleClick() {
     }
     if (CommandUi.SelectPendingCell(CellX, CellY, EffectiveSnapshot(), BoardModel, Fighters,
                                     Reason)) {
-      Toast = FString::Printf(TEXT("pending cell (%d,%d) set - Enter confirms"), CellX, CellY);
+      Toast = FString::Printf(TEXT("pending space %s set - Enter confirms"), *BoardModel.CellLabel(CellX, CellY));
     } else {
       Toast = TEXT("pending cell rejected: ") + Reason;
       BoardActor->ShowIllegalCell(CellX, CellY);
@@ -1166,12 +1179,12 @@ void AS08FlowGameMode::HandleClick() {
   if (AS08FighterActor* FighterActor = Cast<AS08FighterActor>(Hit.GetActor())) {
     const FS08BoardFighter& Fighter = FighterActor->GetFighter();
     if (Fighter.OwnerId != Flow->GetUserId()) {
-      Toast = FString::Printf(TEXT("%s is an ENEMY fighter (red base) - select your own (blue base)"),
+      Toast = FString::Printf(TEXT("%s is an ENEMY fighter - select one of your own"),
                               *Fighter.Label);
       ToastUntil = Elapsed + 3.0f;
     } else {
       SelectFighter(Fighter.Id);
-      Toast = FString::Printf(TEXT("selected %s [%s] - green cells are legal destinations"),
+      Toast = FString::Printf(TEXT("selected %s [%s] - highlighted spaces are legal destinations"),
                               *Fighter.Label, *Fighter.Id);
       ToastUntil = Elapsed + 3.0f;
     }
@@ -1188,7 +1201,7 @@ void AS08FlowGameMode::HandleClick() {
     return;
   }
   if (SelectedFighterId.IsEmpty()) {
-    Toast = TEXT("select one of your fighters (blue base) first");
+    Toast = TEXT("select one of your fighters first");
     ToastUntil = Elapsed + 3.0f;
     RefreshUi();
     return;
@@ -1207,8 +1220,8 @@ void AS08FlowGameMode::HandleClick() {
       Toast = TEXT("cell is occupied by another living fighter");
     } else if (Mover) {
       Toast = FString::Printf(
-          TEXT("cell (%d,%d) exceeds %s movement %d or an enemy blocks the path"),
-          CellX, CellY, *Mover->Label, Mover->Movement);
+          TEXT("space %s exceeds %s movement %d or an enemy blocks the path"),
+          *BoardModel.CellLabel(CellX, CellY), *Mover->Label, FS08BoardModel::FighterMovement(*Mover));
     } else {
       Toast = TEXT("destination is illegal");
     }
@@ -1428,18 +1441,45 @@ bool AS08FlowGameMode::TerminalScreenOwnsKeys(ES08Stage Stage, bool bGameOver,
 void AS08FlowGameMode::BeginManeuverCommand() {
   if (!Flow.IsValid()) return;
   FString Reason;
-  if (!CommandUi.CanBeginManeuver(Flow->GetAppliedSnapshot(), Reason)) {
-    Toast = TEXT("begin maneuver blocked: ") + Reason;
-    ToastUntil = Elapsed + 3.0f;
+  FS09Reason Key;
+  if (!CommandUi.CanBeginManeuver(Flow->GetAppliedSnapshot(), Reason, Key)) {
+    // B-03: M inside a draft says how to go on (Enter confirms), not "blocked".
+    ShowReason(Key.Key == FName(TEXT("why.draft.open")) ? FS09Reason::Make(TEXT("ms.begin.already")) : Key, 3.0f);
     RefreshHud();
     return;
   }
   if (Flow->BeginManeuver()) {
     Toast = TEXT("begin maneuver sent (server draws 1 card)");
+    ToastUntil = Elapsed + 3.0f;
   } else {
-    Toast = TEXT("begin maneuver not sent - command gate blocked it (see trace)");
+    ShowReason(FS09Reason::Make(*Flow->GameplayGateKey().ToString()), 3.0f); // MS-E-91: why.syncing
   }
-  ToastUntil = Elapsed + 3.0f;
+  RefreshHud();
+}
+
+void AS08FlowGameMode::ShowReason(const FS09Reason& Reason, float Seconds) {
+  // A refusal never stays silent: no key (e.g. an open gate) reads as syncing.
+  const FS09Reason Shown = Reason.IsSet() ? Reason : FS09Reason::Make(TEXT("why.syncing"));
+  Toast = Shown.Text();
+  ToastUntil = Elapsed + Seconds;
+  // MS-AT-18: the toast by key - the trace proves no grid coordinates leak.
+  FS08Trace::Write(FString::Printf(TEXT("TOAST why=%s text=\"%s\""), *Shown.Key.ToString(), *Toast));
+  TracedToast = Toast;
+  RefreshUi();
+}
+
+void AS08FlowGameMode::HandleRejection(const FS08Rejection& Rejection) {
+  // Every argument filled from the draft model (no "?" placeholder).
+  const FS09Reason Reason = CommandUi.RejectionReason(Rejection, BoardModel, Fighters);
+  const bool bCell = Rejection.Cell.X >= 0 && Rejection.Cell.Y >= 0;
+  CommandUi.LastReason = Reason;
+  // 03 MS-R-21: the banner 4 s (or until the next input); the draft itself
+  // follows the refetched snapshot (class И keeps it, С rebuilds or closes).
+  ShowReason(Reason, 4.0f);
+  if (bCell && BoardActor && Reason.Key.ToString().StartsWith(TEXT("why.cell."))) {
+    BoardActor->ShowIllegalCell(Rejection.Cell.X, Rejection.Cell.Y);
+    IllegalUntil = Elapsed + 1.5f;
+  }
   RefreshHud();
 }
 
@@ -1450,8 +1490,12 @@ void AS08FlowGameMode::ConfirmDraft() {
     FString Reason;
     if (!CommandUi.ConfirmManeuver(Flow->GetAppliedSnapshot(), BoardModel, Fighters, Command,
                                    Reason)) {
-      Toast = TEXT("confirm rejected: ") + Reason;
-      ToastUntil = Elapsed + 3.0f;
+      if (CommandUi.LastReason.IsSet()) {
+        ShowReason(CommandUi.LastReason, 3.0f); // MS-R-16: NeedBoost / Conflict by key
+      } else {
+        Toast = TEXT("confirm rejected: ") + Reason;
+        ToastUntil = Elapsed + 3.0f;
+      }
       RefreshHud();
       return;
     }
@@ -1464,7 +1508,8 @@ void AS08FlowGameMode::ConfirmDraft() {
     if (Flow->SubmitManeuver(Command.ManeuverId, Command.Moves, Command.BoostCardId)) {
       NextCommandAt = Elapsed + 1.2f;
     } else {
-      Toast = TEXT("maneuver confirm not sent - command gate blocked it (see trace)");
+      // MS-E-91: the stream is reconnecting (why.syncing) - the draft stays.
+      ShowReason(FS09Reason::Make(*Flow->GameplayGateKey().ToString()), 3.0f);
     }
     RefreshHud();
     return;
@@ -3646,7 +3691,20 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
   }
   if (Flow.IsValid()) {
     // GD-028 recovery: bounded-backoff WS reconnect (idle when attached).
+    // MS-T-06: also the 3 s / 10 s clock of a maneuver command.
     Flow->TickConnectivity(DeltaSeconds);
+    if (Flow->IsCommandSlow() && !bCommandSlowShown) {
+      bCommandSlowShown = true; // MS-E-89: 3 s without an answer
+      ShowReason(FS09Reason::Make(TEXT("why.syncing")), 7.0f);
+    } else if (!Flow->IsCommandSlow() && bCommandSlowShown) {
+      bCommandSlowShown = false;
+      // The answer (or the deadline) came: the syncing banner goes with it.
+      if (Toast == FS09Reason::Make(TEXT("why.syncing")).Text()) {
+        Toast.Reset();
+        ToastUntil = 0.0f;
+        RefreshUi();
+      }
+    }
     // Test hook: abrupt transport loss after the stream is live.
     if (AutoDropWsAfter > 0.0f && !bWsDroppedForTest && Flow->IsStreamAttached() &&
         Elapsed >= AutoDropWsAfter) {
@@ -3694,6 +3752,12 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
     ToastUntil = 0.0f;
     Toast.Reset();
     RefreshUi();
+  }
+  // MS-AT-18: every toast lands in the trace once (ShowReason writes the
+  // keyed form; the rest are written here) - the "no (x,y)" search sees all.
+  if (!Toast.IsEmpty() && Toast != TracedToast) {
+    TracedToast = Toast;
+    FS08Trace::Write(FString::Printf(TEXT("TOAST text=\"%s\""), *Toast));
   }
   if (IllegalUntil > 0.0f && Elapsed > IllegalUntil) {
     IllegalUntil = 0.0f;
@@ -4692,7 +4756,7 @@ void AS08FlowGameMode::RefreshHud() {
               FLinearColor(1.0f, 0.6f, 1.0f, 1.0f));
     AddLine(FString::Printf(TEXT("moves drafted: %d   boost: %s"), CommandUi.Moves.Num(),
                             CommandUi.BoostCardId.IsEmpty() ? TEXT("none") : TEXT("card")));
-    AddLine(TEXT("click an own fighter, then a green cell; 1-9 boost card; Enter confirm; Esc cancel"));
+    AddLine(TEXT("click an own fighter, then a highlighted space; 1-9 boost card; Enter confirm; Esc cancel"));
     CommandBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
         [SNew(SHorizontalBox) +
          SHorizontalBox::Slot().AutoWidth().Padding(0, 0, 8, 0)
@@ -5025,18 +5089,17 @@ void AS08FlowGameMode::RefreshHud() {
       AddLine(FString::Printf(TEXT("fighter: %s   destination: %s"),
                               *FighterLabel,
                               CommandUi.bPendingCellSet
-                                  ? *FString::Printf(TEXT("(%d,%d)"), CommandUi.PendingCellX,
-                                                     CommandUi.PendingCellY)
+                                  ? *BoardModel.CellLabel(CommandUi.PendingCellX, CommandUi.PendingCellY)
                                   : TEXT("-")));
       if (PendingType == TEXT("MOVE")) {
-        AddLine(FString::Printf(TEXT("move up to %d - click the fighter, then a green cell"),
+        AddLine(FString::Printf(TEXT("move up to %d - click the fighter, then a highlighted space"),
                                 Pending.bHasValue ? Pending.Value : 1));
       } else {
         AddLine(Pending.bRestoreFullHealth
-                    ? TEXT("place the defeated fighter (full health) - click it, then a green cell")
-                    : TEXT("place: click the fighter, then a green cell"));
+                    ? TEXT("place the defeated fighter (full health) - click it, then a highlighted space")
+                    : TEXT("place: click the fighter, then a highlighted space"));
         if (!Pending.ZoneFighterName.IsEmpty()) {
-          AddLine(FString::Printf(TEXT("restricted to %s's zone (green cells)"),
+          AddLine(FString::Printf(TEXT("restricted to %s's zone (highlighted spaces)"),
                                   *Pending.ZoneFighterName));
         }
       }
@@ -5045,14 +5108,13 @@ void AS08FlowGameMode::RefreshHud() {
                               Pending.Stage == 2 ? TEXT("adjacent to the first pick")
                                                  : TEXT("inside the zone"),
                               CommandUi.bPendingCellSet
-                                  ? *FString::Printf(TEXT("(%d,%d)"), CommandUi.PendingCellX,
-                                                     CommandUi.PendingCellY)
+                                  ? *BoardModel.CellLabel(CommandUi.PendingCellX, CommandUi.PendingCellY)
                                   : TEXT("-")));
       if (Pending.Stage == 2 && Pending.bHasAnchor) {
-        AddLine(FString::Printf(TEXT("anchor: (%d,%d) - green cells are the legal picks"),
-                                Pending.AnchorX, Pending.AnchorY));
+        AddLine(FString::Printf(TEXT("anchor: %s - highlighted spaces are the legal picks"),
+                                *BoardModel.CellLabel(Pending.AnchorX, Pending.AnchorY)));
       } else if (!Pending.ZoneFighterName.IsEmpty()) {
-        AddLine(FString::Printf(TEXT("pick any green cell in %s's zone"), *Pending.ZoneFighterName));
+        AddLine(FString::Printf(TEXT("pick any highlighted space in %s's zone"), *Pending.ZoneFighterName));
       }
       if (Pending.bHasDamage) {
         AddLine(FString::Printf(TEXT("then %d damage to every enemy on both cells"), Pending.Damage));

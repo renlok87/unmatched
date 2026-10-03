@@ -8,7 +8,7 @@
 
 FS08GraphqlClient::FS08GraphqlClient(FString InBaseUrl) : BaseUrl(MoveTemp(InBaseUrl)) {}
 
-void FS08GraphqlClient::Execute(const FString& Query, const TSharedPtr<FJsonObject>& Variables,
+FHttpRequestPtr FS08GraphqlClient::Execute(const FString& Query, const TSharedPtr<FJsonObject>& Variables,
                                 FResult OnDone) {
   TSharedRef<FJsonObject> RequestBody = MakeShared<FJsonObject>();
   RequestBody->SetStringField(TEXT("query"), Query);
@@ -69,4 +69,5 @@ void FS08GraphqlClient::Execute(const FString& Query, const TSharedPtr<FJsonObje
         OnDone(!HasGraphQLErrors, Errors, Data ? *Data : nullptr, Body);
       });
   Request->ProcessRequest();
+  return Request;
 }

@@ -79,9 +79,14 @@ struct UNMATCHED_API FS09Reason {
     return *this;
   }
   FS09Reason& Arg(const TCHAR* Name, int32 Value) { return Arg(Name, FString::FromInt(Value)); }
-  /** English placeholder text followed by " [key]" - toasts and traces until
-   *  MS-T-06 / MS-T-28 put the keys into the string tables. */
+  /** English placeholder text followed by " [key]" - the trace / OutReason
+   *  form (tests match on it). */
   FString Describe() const;
+  /** MS-T-06: the toast text BY KEY - the EN text of S08WhyText (the "en"
+   *  column of why-reasons.json; RU with MS-T-28) with the arguments, prefixed
+   *  by the space it names ("M13: An enemy is here") - a CellLabel, never grid
+   *  coordinates (B-04). */
+  FString Text() const;
 };
 
 struct UNMATCHED_API FS09DraftMove {
@@ -396,6 +401,14 @@ public:
   /** True when beginManeuver may be sent: viewer's turn, action phase, no
    *  open pending, no command in flight (duplicate-begin gate). */
   bool CanBeginManeuver(const FS08Snapshot& Snapshot, FString& OutReason) const;
+  /** MS-T-06: the same gate with the why.* key of the refusal (03 §8.2):
+   *  why.state.changed (over), why.draft.open (a draft is open - the M toast
+   *  is ms.begin.already), why.wait.opponent.choice (the pending head belongs
+   *  to the opponent, MS-E-47), why.state.changed (own pending choice /
+   *  discard open), why.syncing (in flight), why.not.your.turn,
+   *  why.no.actions (metadata.actionsRemaining 0), why.maneuver.not.open
+   *  (phase). */
+  bool CanBeginManeuver(const FS08Snapshot& Snapshot, FString& OutReason, FS09Reason& OutKey) const;
 
   /** Maneuver draft ops (no server calls; every one is reversible).
    *  SelectFighter refuses a fighter CanMoveFighter refuses (LastReason,
@@ -444,6 +457,13 @@ public:
    *  the fighter with that reason. */
   bool CanMoveFighter(const FString& FighterId, const TArray<FS08BoardFighter>& Fighters,
                       FS09Reason& OutReason) const;
+  /** MS-T-06: the toast reason of a classified server rejection - its why.*
+   *  key with every argument the text needs: the space by CellLabel, the
+   *  fighter (the move ending on the space, a drafted immobilized one, the
+   *  selected / pending fighter), need / have from the draft model; a missing
+   *  need with no path at all becomes why.cell.no.path. No "?" placeholder. */
+  FS09Reason RejectionReason(const FS08Rejection& Rejection, const FS08BoardModel& Board,
+                             const TArray<FS08BoardFighter>& Fighters) const;
   /** The current draft in the cache format (empty outside a maneuver draft). */
   FS08ManeuverDraftCache ExportDraft() const;
   /** Boost toggle: only an exact own-hand instance id with a printed BOOST is

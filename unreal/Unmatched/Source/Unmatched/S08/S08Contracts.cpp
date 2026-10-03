@@ -270,6 +270,9 @@ bool FS08Contracts::ExtractGraphQLErrors(const TSharedRef<FJsonObject> Root,
       if (Error.Code.IsEmpty()) {
         (*Extensions)->TryGetStringField(TEXT("code"), Error.Code);
       }
+      // MS-T-06: the rule code of a gameplay rejection (formatGraphqlError
+      // keeps it in development and production).
+      (*Extensions)->TryGetStringField(TEXT("ruleCode"), Error.RuleCode);
       double ExtStatus = 0.0;
       if (Error.HttpStatus == 0 &&
           ((*Extensions)->TryGetNumberField(TEXT("status"), ExtStatus) ||
@@ -923,4 +926,184 @@ bool FS08Contracts::ValidateCriticalFields(const FS08Snapshot& Snapshot,
     OutProblems.Add(TEXT("handZones missing - own hand cannot be displayed"));
   }
   return OutProblems.Num() == 0;
+}
+
+// ---- MS-T-06: rule codes (move-selection 02 §1.1) ------------------------------
+
+const TCHAR* FS08Rejection::ClassLetter() const {
+  // Cyrillic I / S of the 02 §1.1 class column (the trace file is UTF-8).
+  return Class == ES08RejectClass::Fixable ? TEXT("И") : TEXT("С");
+}
+
+const TCHAR* FS08Rejection::OpName(ES08RejectOp InOp) {
+  switch (InOp) {
+    case ES08RejectOp::Begin: return TEXT("begin");
+    case ES08RejectOp::Maneuver: return TEXT("maneuver");
+    default: return TEXT("pending");
+  }
+}
+
+namespace {
+struct FS08RuleRow {
+  const TCHAR* Code;
+  const TCHAR* ManeuverKey; // begin / maneuver
+  const TCHAR* EffectKey;   // resolvePendingEffect (MOVE/PLACE)
+  ES08RejectClass ManeuverClass;
+  ES08RejectClass EffectClass;
+};
+// The rows of 02 §1.1, in its order. PATH_BLOCKED_BY_ENEMY's key depends on the
+// cell (Classify); "why.cell.enemy.path" here is its off-target form.
+constexpr ES08RejectClass S08RcFixable = ES08RejectClass::Fixable;
+constexpr ES08RejectClass S08RcState = ES08RejectClass::State;
+const FS08RuleRow GS08RuleRows[] = {
+    {TEXT("FIGHTER_NOT_FOUND"), TEXT("why.client.desync"), TEXT("why.client.desync"), S08RcState, S08RcState},
+    {TEXT("NOT_YOUR_FIGHTER"), TEXT("why.fighter.not.yours"), TEXT("why.fighter.not.yours"), S08RcFixable, S08RcFixable},
+    {TEXT("FIGHTER_DEFEATED"), TEXT("why.fighter.defeated"), TEXT("why.fighter.defeated"), S08RcState, S08RcState},
+    {TEXT("FIGHTER_IMMOBILIZED"), TEXT("why.immobilized"), TEXT("why.immobilized"), S08RcFixable, S08RcFixable},
+    {TEXT("INVALID_PHASE"), TEXT("why.maneuver.not.open"), TEXT("why.maneuver.not.open"), S08RcState, S08RcState},
+    {TEXT("HAND_NOT_FOUND"), TEXT("why.client.desync"), TEXT("why.client.desync"), S08RcState, S08RcState},
+    {TEXT("CARD_NOT_IN_HAND"), TEXT("why.boost.card.gone"), TEXT("why.boost.card.gone"), S08RcFixable, S08RcFixable},
+    {TEXT("EMPTY_PATH"), TEXT("why.client.desync"), TEXT("why.client.desync"), S08RcState, S08RcState},
+    {TEXT("INVALID_POSITION"), TEXT("why.client.desync"), TEXT("why.cell.not.space"), S08RcState, S08RcFixable},
+    {TEXT("NOT_ENOUGH_MOVEMENT"), TEXT("why.cell.unreachable"), TEXT("why.cell.unreachable"), S08RcFixable, S08RcFixable},
+    {TEXT("INVALID_STEP"), TEXT("why.client.desync"), TEXT("why.client.desync"), S08RcState, S08RcState},
+    {TEXT("PATH_BLOCKED_BY_ENEMY"), TEXT("why.cell.enemy.path"), TEXT("why.cell.enemy.path"), S08RcFixable, S08RcFixable},
+    {TEXT("POSITION_OCCUPIED"), TEXT("why.cell.ally"), TEXT("why.cell.occupied"), S08RcFixable, S08RcFixable},
+    {TEXT("NOT_YOUR_TURN"), TEXT("why.not.your.turn"), TEXT("why.not.your.turn"), S08RcState, S08RcState},
+    {TEXT("PLAYER_NOT_IN_GAME"), TEXT("why.client.desync"), TEXT("why.client.desync"), S08RcState, S08RcState},
+    {TEXT("BEGIN_NOT_ALLOWED"), TEXT("why.client.desync"), TEXT("why.client.desync"), S08RcState, S08RcState},
+    {TEXT("STATE_CHANGED"), TEXT("why.state.changed"), TEXT("why.state.changed"), S08RcState, S08RcState},
+    {TEXT("PENDING_CHOICE_OPEN"), TEXT("why.state.changed"), TEXT("why.state.changed"), S08RcState, S08RcState},
+    {TEXT("COMBAT_IN_PROGRESS"), TEXT("why.state.changed"), TEXT("why.state.changed"), S08RcState, S08RcState},
+    {TEXT("GAME_OVER"), TEXT("why.state.changed"), TEXT("why.state.changed"), S08RcState, S08RcState},
+    {TEXT("MANEUVER_NOT_OPEN"), TEXT("why.maneuver.not.open"), TEXT("why.maneuver.not.open"), S08RcState, S08RcState},
+    {TEXT("DUPLICATE_FIGHTER"), TEXT("why.client.desync"), TEXT("why.client.desync"), S08RcState, S08RcState},
+    {TEXT("PENDING_WRONG_FIGHTER"), TEXT("why.client.desync"), TEXT("why.client.desync"), S08RcState, S08RcState},
+    {TEXT("PLACE_OUTSIDE_ZONE"), TEXT("why.place.zone"), TEXT("why.place.zone"), S08RcFixable, S08RcFixable},
+    {TEXT("BOOST_NO_VALUE"), TEXT("why.boost.no.value"), TEXT("why.boost.no.value"), S08RcFixable, S08RcFixable},
+};
+
+bool S08RcParseIntAt(const FString& Text, int32& InOutIndex, int32& OutValue) {
+  int32 Index = InOutIndex;
+  const bool bNegative = Index < Text.Len() && Text[Index] == TEXT('-');
+  if (bNegative) ++Index;
+  const int32 Start = Index;
+  int64 Value = 0;
+  while (Index < Text.Len() && FChar::IsDigit(Text[Index]) && Index - Start < 9) {
+    Value = Value * 10 + (Text[Index] - TEXT('0'));
+    ++Index;
+  }
+  if (Index == Start) return false;
+  OutValue = static_cast<int32>(bNegative ? -Value : Value);
+  InOutIndex = Index;
+  return true;
+}
+
+/** Numbers of a message in reading order ("Путь длиной 3 ... (2)" -> 3, 2). */
+TArray<int32> S08RcNumbersIn(const FString& Text) {
+  TArray<int32> Out;
+  for (int32 Index = 0; Index < Text.Len();) {
+    int32 Value = 0;
+    int32 Cursor = Index;
+    if (FChar::IsDigit(Text[Index]) && S08RcParseIntAt(Text, Cursor, Value)) {
+      Out.Add(Value);
+      Index = Cursor;
+    } else {
+      ++Index;
+    }
+  }
+  return Out;
+}
+} // namespace
+
+bool FS08RuleCodes::CellInMessage(const FString& Message, FIntPoint& OutCell) {
+  // The last "(x, y)" / "(x,y)" group of the text.
+  for (int32 Open = Message.Len() - 1; Open >= 0; --Open) {
+    if (Message[Open] != TEXT('(')) continue;
+    int32 Index = Open + 1;
+    int32 X = 0, Y = 0;
+    if (!S08RcParseIntAt(Message, Index, X)) continue;
+    if (Index >= Message.Len() || Message[Index] != TEXT(',')) continue;
+    ++Index;
+    while (Index < Message.Len() && Message[Index] == TEXT(' ')) ++Index;
+    if (!S08RcParseIntAt(Message, Index, Y)) continue;
+    if (Index >= Message.Len() || Message[Index] != TEXT(')')) continue;
+    OutCell = FIntPoint(X, Y);
+    return true;
+  }
+  return false;
+}
+
+const TArray<FString>& FS08RuleCodes::KnownCodes() {
+  static const TArray<FString> Codes = [] {
+    TArray<FString> Out;
+    for (const FS08RuleRow& Row : GS08RuleRows) Out.Add(Row.Code);
+    return Out;
+  }();
+  return Codes;
+}
+
+FS08Rejection FS08RuleCodes::Classify(const TArray<FS08GraphQLError>& Errors, ES08RejectOp Op,
+                                      const TArray<FIntPoint>& Destinations) {
+  FS08Rejection Out;
+  Out.Op = Op;
+  const FS08GraphQLError* First = Errors.Num() > 0 ? &Errors[0] : nullptr;
+  if (First) {
+    Out.RuleCode = First->RuleCode;
+    Out.Message = First->Message;
+  }
+  bool bRateLimited = false;
+  for (const FS08GraphQLError& Error : Errors) {
+    bRateLimited |= Error.HttpStatus == 429 || Error.Code == TEXT("RATE_LIMIT") ||
+                    Error.Code == TEXT("TOO_MANY_REQUESTS");
+  }
+  if (bRateLimited) {
+    // 02 §1.1: the throttle answer - why.syncing, repeated only by the player.
+    Out.WhyKey = FName(TEXT("why.syncing"));
+    Out.Class = ES08RejectClass::Fixable;
+    Out.bRefetch = false;
+    return Out;
+  }
+  const FS08RuleRow* Row = nullptr;
+  for (const FS08RuleRow& Candidate : GS08RuleRows) {
+    if (Out.RuleCode.Equals(Candidate.Code, ESearchCase::CaseSensitive)) Row = &Candidate;
+  }
+  if (!Row) {
+    // MS-E-93: a guard rejection without a code or an unknown code.
+    Out.WhyKey = FName(TEXT("why.command.rejected"));
+    Out.Class = ES08RejectClass::State;
+    return Out;
+  }
+  const bool bEffect = Op == ES08RejectOp::PendingEffect;
+  Out.WhyKey = FName(bEffect ? Row->EffectKey : Row->ManeuverKey);
+  Out.Class = bEffect ? Row->EffectClass : Row->ManeuverClass;
+  FIntPoint Cell;
+  if (CellInMessage(Out.Message, Cell)) {
+    Out.Cell = Cell;
+  } else if (Destinations.Num() == 1 &&
+             (Out.WhyKey.ToString().StartsWith(TEXT("why.cell.")) || Out.WhyKey == FName(TEXT("why.place.zone")))) {
+    // One end cell in the command: the space the rejection is about.
+    Out.Cell = Destinations[0];
+  }
+  if (Out.RuleCode == TEXT("PLACE_OUTSIDE_ZONE")) {
+    // "Клетка должна быть в зоне «{fighterName}»"
+    const int32 Open = Out.Message.Find(TEXT("«"));
+    const int32 Close = Out.Message.Find(TEXT("»"), ESearchCase::CaseSensitive, ESearchDir::FromEnd);
+    if (Open != INDEX_NONE && Close > Open + 1) Out.WhyArgs.Add(TEXT("fighterName"), Out.Message.Mid(Open + 1, Close - Open - 1));
+  }
+  if (Out.RuleCode == TEXT("PATH_BLOCKED_BY_ENEMY")) {
+    // The validator checks every path cell including the target (MS-E-21).
+    if (Out.Cell.X >= 0 && Destinations.Contains(Out.Cell)) Out.WhyKey = FName(TEXT("why.cell.enemy"));
+  } else if (Out.RuleCode == TEXT("NOT_ENOUGH_MOVEMENT")) {
+    const TArray<int32> Numbers = S08RcNumbersIn(Out.Message);
+    if (!bEffect && Numbers.Num() >= 2) {
+      // "Путь длиной {need} превышает очки движения бойца ({have})"
+      Out.WhyArgs.Add(TEXT("need"), FString::FromInt(Numbers[0]));
+      Out.WhyArgs.Add(TEXT("have"), FString::FromInt(Numbers[1]));
+    } else if (bEffect && Numbers.Num() >= 3) {
+      // "До клетки (x, y) не добраться за {have} шаг(ов)"
+      Out.WhyArgs.Add(TEXT("have"), FString::FromInt(Numbers[2]));
+    }
+  }
+  return Out;
 }

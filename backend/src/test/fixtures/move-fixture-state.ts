@@ -14,9 +14,10 @@
  * Generated ones come from backend/scripts/gen-move-fixtures.ts; manual ones
  * (expectSource "manual") are written by hand from the rules and only read.
  *
- * Until MS-T-06 adds ActionResult.code the executor reports only the error
- * text, so `serverCodeOf` maps today's texts to the codes of 02 §1.1
- * (RULE_CODE_BY_MESSAGE); an ActionResult.code, once present, wins.
+ * MS-T-06: the executor and resolvePendingEffect report ActionResult.code
+ * (02 §1.1); `serverCodeOf` takes that code and nothing else - a rejection
+ * without a code is reported as NO_CODE (a missing MS-T-06 code fails the
+ * fixture instead of being guessed from the error text).
  *
  * Format additions to 04 §4.8 (the interfaces below are the reference for
  * the UE parity reader, MS-T-03):
@@ -434,51 +435,11 @@ export function computeFixtureExpect(fx: MoveFixture): ComputedExpect {
 // Server layers — MS-AT-02
 // ---------------------------------------------------------------------------
 
-/**
- * Today's error texts → codes of 02 §1.1 (executor and resolvePendingEffect
- * drop the validator code). MS-T-06 replaces this with ActionResult.code.
- */
-export const RULE_CODE_BY_MESSAGE: ReadonlyArray<readonly [RegExp, string]> = [
-  // validator (game-rules.validator.ts validateManeuver)
-  [/^Fighter not found$/, 'FIGHTER_NOT_FOUND'],
-  [/^Not your fighter$/, 'NOT_YOUR_FIGHTER'],
-  [/^Fighter is defeated$/, 'FIGHTER_DEFEATED'],
-  [/^Боец обездвижен/, 'FIGHTER_IMMOBILIZED'],
-  [/^Can only maneuver during action phase$/, 'INVALID_PHASE'],
-  [/^Hand not found$/, 'HAND_NOT_FOUND'],
-  [/^Boost card not in hand$/, 'CARD_NOT_IN_HAND'],
-  [/^Path is empty$/, 'EMPTY_PATH'],
-  [/^Invalid position in path$/, 'INVALID_POSITION'],
-  [/^Путь длиной \d+ превышает/, 'NOT_ENOUGH_MOVEMENT'],
-  [/не является ходом на соседнюю клетку$/, 'INVALID_STEP'],
-  [/^Путь проходит через живого противника/, 'PATH_BLOCKED_BY_ENEMY'],
-  [/^Target position is occupied$/, 'POSITION_OCCUPIED'],
-  // executeManeuver
-  [/^Resolve the pending choice first$/, 'PENDING_CHOICE_OPEN'],
-  [/^Resolve the pending combat effect first$/, 'COMBAT_IN_PROGRESS'],
-  [/^Game is already over$/, 'GAME_OVER'],
-  [/^Begin maneuver first/, 'MANEUVER_NOT_OPEN'],
-  [/^Boost must be a card instance in your hand$/, 'CARD_NOT_IN_HAND'],
-  [/^Каждый боец двигается в манёвре не более одного раза$/, 'DUPLICATE_FIGHTER'],
-  [/^Клетка \(-?\d+, -?\d+\) занята$/, 'POSITION_OCCUPIED'],
-  // executeResolvePendingEffect (MOVE/PLACE)
-  [/^This fighter is not a target of the pending effect$/, 'PENDING_WRONG_FIGHTER'],
-  [/^Эффект двигает не этого бойца$/, 'PENDING_WRONG_FIGHTER'],
-  [/^Эффект двигает только/, 'PENDING_WRONG_FIGHTER'],
-  [/^Клетка вне доски$/, 'INVALID_POSITION'],
-  [/^Клетка непроходима$/, 'INVALID_POSITION'],
-  [/^Клетка занята$/, 'POSITION_OCCUPIED'],
-  [/^До клетки .* не добраться/, 'NOT_ENOUGH_MOVEMENT'],
-  [/^Клетка должна быть в зоне/, 'PLACE_OUTSIDE_ZONE'],
-];
-
-/** Code of a failed ActionResult: its own `code` (MS-T-06) or the mapped text; UNMAPPED otherwise. */
+/** Code of a failed ActionResult: its own `code` (MS-T-06); NO_CODE: <text> otherwise. */
 export function serverCodeOf(result: { success: boolean; error?: string; code?: string }): string {
   if (result.success) return 'ok';
   if (result.code) return result.code;
-  const text = result.error ?? '';
-  const hit = RULE_CODE_BY_MESSAGE.find(([re]) => re.test(text));
-  return hit ? hit[1] : `UNMAPPED: ${text}`;
+  return `NO_CODE: ${result.error ?? ''}`;
 }
 
 export interface CommandMove {

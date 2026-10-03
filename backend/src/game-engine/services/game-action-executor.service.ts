@@ -78,6 +78,12 @@ export interface ActionResult {
   readonly success: boolean;
   readonly gameState?: GameState;
   readonly error?: string;
+  /**
+   * MS-T-06: machine code of a rejection (move-selection 02 §1.1). The
+   * resolver forwards it as GraphQLError extensions.ruleCode; the message
+   * text stays as it was for old clients and the web.
+   */
+  readonly code?: string;
   readonly metadata?: {
     readonly action: string;
     readonly performedAt: Date;
@@ -540,10 +546,10 @@ export class GameActionExecutorService {
     context: ActionContext,
   ): Promise<ActionResult> {
     if (context.currentState.metadata.pendingManeuver || context.currentState.metadata.pendingHandDiscard) {
-      return { success: false, error: 'Resolve the pending resource choice first' };
+      return { success: false, error: 'Resolve the pending resource choice first', code: 'PENDING_CHOICE_OPEN' };
     }
     if (applyTerminalState(context.currentState).phase === GamePhase.GAME_OVER) {
-      return { success: false, error: 'Game is already over' };
+      return { success: false, error: 'Game is already over', code: 'GAME_OVER' };
     }
     try {
       const { userId, currentState } = context;
@@ -551,12 +557,16 @@ export class GameActionExecutorService {
         (p) => p.id === dto.effectId,
       );
       if (!pending) {
-        return { success: false, error: 'Отложенный эффект не найден (протух или уже резолвлен)' };
+        return {
+          success: false,
+          error: 'Отложенный эффект не найден (протух или уже резолвлен)',
+          code: 'STATE_CHANGED',
+        };
       }
       // GD-018: голова очереди — ВСЕГДА (не только в бою): выборы
       // выполняются строго последовательно, out-of-order отклоняется.
       if (currentState.metadata.pendingEffects?.[0]?.id !== pending.id) {
-        return { success: false, error: 'Resolve the first pending choice first' };
+        return { success: false, error: 'Resolve the first pending choice first', code: 'STATE_CHANGED' };
       }
       if (pending.playerId !== userId) {
         return { success: false, error: 'Этот выбор принадлежит другому игроку' };
@@ -610,12 +620,20 @@ export class GameActionExecutorService {
 
       const fighter = currentState.fighters.find((f) => f.id === dto.fighterId);
       if (pending.fighterIds && !pending.fighterIds.includes(dto.fighterId)) {
-        return { success: false, error: 'This fighter is not a target of the pending effect' };
+        return {
+          success: false,
+          error: 'This fighter is not a target of the pending effect',
+          code: 'PENDING_WRONG_FIGHTER',
+        };
       }
       // Revive-PLACE (Winged Frenzy: return a defeated Harpy) возвращает
       // ПОВЕРЖЕННОГО бойца — defeated разрешён ровно для этого pending-типа.
       if (!fighter || (fighter.health <= 0 && pending.restoreFullHealth !== true) || (fighter.isDefeated && pending.restoreFullHealth !== true)) {
-        return { success: false, error: 'Боец не найден или повержен' };
+        return {
+          success: false,
+          error: 'Боец не найден или повержен',
+          code: fighter ? 'FIGHTER_DEFEATED' : 'FIGHTER_NOT_FOUND',
+        };
       }
 
       // Чей боец двигается: свой (обычные MOVE) или противника
@@ -624,7 +642,7 @@ export class GameActionExecutorService {
       // combat»); проверка владельца выключена.
       if (!pending.anyOwner &&
           (pending.targetsOpponent ? fighter.ownerId === userId : fighter.ownerId !== userId)) {
-        return { success: false, error: 'Эффект двигает не этого бойца' };
+        return { success: false, error: 'Эффект двигает не этого бойца', code: 'PENDING_WRONG_FIGHTER' };
       }
 
       // Именное ограничение из текста карты («Move Daredevil…», «each Harpy»)
@@ -632,6 +650,7 @@ export class GameActionExecutorService {
         return {
           success: false,
           error: `Эффект двигает только «${pending.fighterName}» (выбран ${fighter.name})`,
+          code: 'PENDING_WRONG_FIGHTER',
         };
       }
 
@@ -642,19 +661,19 @@ export class GameActionExecutorService {
         target.x >= currentState.boardState.width ||
         target.y >= currentState.boardState.height
       ) {
-        return { success: false, error: 'Клетка вне доски' };
+        return { success: false, error: 'Клетка вне доски', code: 'INVALID_POSITION' };
       }
       const cell = currentState.boardState.cells[target.y]?.[target.x];
       // GD-015-семантика isCellPassable: стены/препятствия/закрытые двери И
       // дыры сетки (undefined внутри границ) — непроходимы для MOVE/PLACE.
       if (!isCellPassable(cell)) {
-        return { success: false, error: 'Клетка непроходима' };
+        return { success: false, error: 'Клетка непроходима', code: 'INVALID_POSITION' };
       }
       const occupied = currentState.fighters.some(
         (f) => f.id !== fighter.id && isLivingFighter(f) && f.position.x === target.x && f.position.y === target.y,
       );
       if (occupied) {
-        return { success: false, error: 'Клетка занята' };
+        return { success: false, error: 'Клетка занята', code: 'POSITION_OCCUPIED' };
       }
 
       // MS-T-14: path of the public trail (04 §4.3) — the canonical path for
@@ -683,6 +702,7 @@ export class GameActionExecutorService {
             return {
               success: false,
               error: `До клетки (${target.x}, ${target.y}) не добраться за ${allowance} шаг(ов)`,
+              code: 'NOT_ENOUGH_MOVEMENT',
             };
           }
           // The end cell was checked free above (the rule of isFreeEndpoint),
@@ -700,7 +720,11 @@ export class GameActionExecutorService {
           fighterNameMatches(f.name, pending.zoneFighterName!),
         );
         if (!zoneAnchor || !this.adjacencyService.isInSameZone(currentState, zoneAnchor.position, target)) {
-          return { success: false, error: `Клетка должна быть в зоне «${pending.zoneFighterName}»` };
+          return {
+            success: false,
+            error: `Клетка должна быть в зоне «${pending.zoneFighterName}»`,
+            code: 'PLACE_OUTSIDE_ZONE',
+          };
         }
       }
 
@@ -1690,14 +1714,16 @@ export class GameActionExecutorService {
   ): Promise<ActionResult> {
     const { currentState: state, userId } = context;
     const validation = this.rulesValidator.canPlayerAct(state, userId);
-    if (!validation.valid) return { success: false, error: validation.error };
+    if (!validation.valid) return { success: false, error: validation.error, code: validation.code };
     if (applyTerminalState(state).phase === GamePhase.GAME_OVER ||
         ![GamePhase.ACTION_MANEUVER, GamePhase.ACTION_ATTACK].includes(state.phase) ||
         state.metadata.combatResolutionProgress || state.metadata.pendingManeuver || state.metadata.pendingHandDiscard ||
         (state.metadata.pendingEffects?.length ?? 0) > 0 ||
-        getActionsRemaining(state) <= 0) return { success: false, error: 'Cannot begin maneuver in current state' };
+        getActionsRemaining(state) <= 0) {
+      return { success: false, error: 'Cannot begin maneuver in current state', code: 'BEGIN_NOT_ALLOWED' };
+    }
     if (!Number.isInteger(dto.expectedSequenceNumber) || dto.expectedSequenceNumber !== state.sequenceNumber) {
-      return { success: false, error: 'State changed; reload before beginning maneuver' };
+      return { success: false, error: 'State changed; reload before beginning maneuver', code: 'STATE_CHANGED' };
     }
     try {
       let next = await this.deckManagement.drawCards({ ...state, metadata: { ...state.metadata,
@@ -1738,13 +1764,13 @@ export class GameActionExecutorService {
     context: ActionContext,
   ): Promise<ActionResult> {
     if ((context.currentState.metadata.pendingEffects?.length ?? 0) > 0) {
-      return { success: false, error: 'Resolve the pending choice first' };
+      return { success: false, error: 'Resolve the pending choice first', code: 'PENDING_CHOICE_OPEN' };
     }
     if (context.currentState.metadata.combatResolutionProgress) {
-      return { success: false, error: 'Resolve the pending combat effect first' };
+      return { success: false, error: 'Resolve the pending combat effect first', code: 'COMBAT_IN_PROGRESS' };
     }
     if (applyTerminalState(context.currentState).phase === GamePhase.GAME_OVER) {
-      return { success: false, error: 'Game is already over' };
+      return { success: false, error: 'Game is already over', code: 'GAME_OVER' };
     }
     return this.metrics.measureServiceDuration('executeManeuver', 'GameActionExecutor', async () => {
       try {
@@ -1752,7 +1778,11 @@ export class GameActionExecutorService {
         const pending = currentState.metadata.pendingManeuver;
         if (!pending || pending.id !== dto.maneuverId || pending.playerId !== userId ||
             currentState.currentTurnPlayerId !== userId || currentState.metadata.pendingHandDiscard) {
-          return { success: false, error: 'Begin maneuver first, then resolve its matching choice' };
+          return {
+            success: false,
+            error: 'Begin maneuver first, then resolve its matching choice',
+            code: 'MANEUVER_NOT_OPEN',
+          };
         }
 
         // BOOST-карта манёвра: явный boostCardId, либо legacy cardId
@@ -1760,7 +1790,7 @@ export class GameActionExecutorService {
         // карты валиден: чистые «добор 1 + движение» (правила Unmatched).
         const boostCardId = dto.boostCardId ?? dto.cardId;
         if (boostCardId && !currentState.handZones[userId]?.cards.some(c => c.id === boostCardId)) {
-          return { success: false, error: 'Boost must be a card instance in your hand' };
+          return { success: false, error: 'Boost must be a card instance in your hand', code: 'CARD_NOT_IN_HAND' };
         }
 
         // Манёвр двигает ВСЕХ своих бойцов (C3): moves[] — несколько ходов,
@@ -1774,7 +1804,11 @@ export class GameActionExecutorService {
         const uniqueFighters = new Set(moves.map((m) => m.fighterId));
         if (uniqueFighters.size !== moves.length) {
           this.metrics.incrementGameAction('maneuver', undefined, 'error');
-          return { success: false, error: 'Каждый боец двигается в манёвре не более одного раза' };
+          return {
+            success: false,
+            error: 'Каждый боец двигается в манёвре не более одного раза',
+            code: 'DUPLICATE_FIGHTER',
+          };
         }
 
         // Ходы применяются ПОСЛЕДОВАТЕЛЬНО: валидация каждого — на состоянии
@@ -1797,6 +1831,7 @@ export class GameActionExecutorService {
             return {
               success: false,
               error: validation.error || 'Maneuver validation failed',
+              code: validation.code,
             };
           }
 
@@ -1812,7 +1847,7 @@ export class GameActionExecutorService {
           );
           if (occupied) {
             this.metrics.incrementGameAction('maneuver', undefined, 'error');
-            return { success: false, error: `Клетка (${dest.x}, ${dest.y}) занята` };
+            return { success: false, error: `Клетка (${dest.x}, ${dest.y}) занята`, code: 'POSITION_OCCUPIED' };
           }
 
           // validateManeuver found the fighter on workState

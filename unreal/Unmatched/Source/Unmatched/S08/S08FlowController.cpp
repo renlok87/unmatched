@@ -134,14 +134,16 @@ bool FS08FlowController::CanApplyRoomEntryAnswer(const TCHAR* Action) {
 
 void FS08FlowController::Trace(const FString& Line) { OnTrace.Broadcast(Line); }
 
-void FS08FlowController::SendHttp(const FString& Query, const TSharedPtr<FJsonObject>& Variables,
-                                  FS08GraphqlClient::FResult&& OnDone) {
+FHttpRequestPtr FS08FlowController::SendHttp(const FString& Query, const TSharedPtr<FJsonObject>& Variables,
+                                             FS08GraphqlClient::FResult&& OnDone) {
 #if WITH_AUTOMATION_TESTS
   ++TestHttpSendCount;
   TestLastHttpVariables = Variables;
-  if (DispatchQueuedHttpForTest(MoveTemp(OnDone))) return;
+  TestHttpQueries.Add(Query);
+  if (TestHttpQueries.Num() > 256) TestHttpQueries.RemoveAt(0);
+  if (DispatchQueuedHttpForTest(MoveTemp(OnDone))) return nullptr;
 #endif
-  Http.Execute(Query, Variables, MoveTemp(OnDone));
+  return Http.Execute(Query, Variables, MoveTemp(OnDone));
 }
 
 void FS08FlowController::Login(const FString& Email, const FString& Password) {
@@ -534,6 +536,8 @@ void FS08FlowController::TeardownGameStateStream() {
   WsReconnectBackoff = 1.0f;
   bWsReconnectAckPending = false;
   OpRecoveryAttempts = 0;
+  EndManeuverOp(); // MS-T-06: the open command (clock, request) belonged to this match
+  RetiredCommandTokens.Reset();
   bManeuverInFlight = false;
   bMutationRecoveryActive = false; // the lost command belonged to this match
   MutationRecoveryAttempts = 0;
@@ -826,6 +830,7 @@ void FS08FlowController::EnterSessionExpired(const FString& Why) {
   RefreshToken.Reset();
   bMutationRecoveryActive = false;
   MutationRecoveryRetryCountdown = -1.0f;
+  EndManeuverOp(); // MS-T-06: no deadline / recovery for a dead session
   // The socket was authenticated with the dead token: drop it and disarm the
   // reconnect ladder (it would loop with 4403s forever).
   if (Ws.IsValid()) {
@@ -1009,6 +1014,8 @@ void FS08FlowController::ScheduleWsReconnect(const FString& Reason) {
 }
 
 void FS08FlowController::TickConnectivity(float DeltaSeconds) {
+  // MS-T-06: the 3 s / 10 s clock of a beginManeuver / maneuver command.
+  TickCommandDeadline(DeltaSeconds);
   // GD-037: the lost-response recovery ladder ticks independently of the WS
   // transport ladder (a dead HTTP path must not wait for a socket cycle).
   if (MutationRecoveryRetryCountdown >= 0.0f) {
@@ -1474,6 +1481,9 @@ ES08SeqDecision FS08FlowController::ApplySnapshot(const FS08Snapshot& Snapshot) 
     Trace(FString::Printf(TEXT("SNAPSHOT applied seq=%d phase=%s"), Applied.SequenceNumber,
                           *Applied.Phase));
   }
+  // MS-E-90: the snapshot may settle the open maneuver command before its
+  // HTTP answer - the gate opens before the render/HUD sees this state.
+  ReleaseManeuverGateBySnapshot(Snapshot);
   OnApplied.Broadcast(Applied, Decision);
   if (Cues.Num() > 0) OnCues.Broadcast(Cues);
   return Decision;
@@ -1533,6 +1543,7 @@ void FS08FlowController::HandleRoomResponse(TSharedPtr<FJsonObject> Data, const 
         bMutationRecoveryHasBaseline = false;
         MutationRecoveryPendingChoiceId.Reset();
         bMutationRecoveryPendingChoiceIsDiscard = false;
+        EndManeuverOp(); // MS-T-06: its 10 s deadline must not re-arm the recovery
         bManeuverInFlight = false;
       } else if (Room.Status == TEXT("FINISHED") && Applied.Phase != TEXT("GAME_OVER")) {
         Trace(TEXT("ROOM finished without a local GAME_OVER body - refetching state"));
@@ -1576,7 +1587,10 @@ void FS08FlowController::ParseRoomFrom(const TSharedPtr<FJsonObject>& Game) {
   // A different room id (new room, or a re-join of this id after a leave)
   // starts a new match generation: callbacks still in flight for the
   // previous incarnation must not act on the new one.
-  if (NewRoom.GameId != Room.GameId) ++MatchGeneration;
+  if (NewRoom.GameId != Room.GameId) {
+    ++MatchGeneration;
+    EndManeuverOp(); // MS-T-06: the command belonged to the previous room
+  }
   Room = MoveTemp(NewRoom);
 }
 
@@ -1619,10 +1633,10 @@ bool FS08FlowController::BeginManeuver() {
   Variables->SetNumberField(TEXT("expectedSequenceNumber"), SeqGuard.Local);
   const FString GameId = Room.GameId;
   const int32 Gen = MatchGeneration;
-  bManeuverInFlight = true;
+  const int32 Token = StartManeuverOp(EManeuverOp::Begin, FString());
   FS08GraphqlClient::FResult OnDone =
-      [this, GameId, Gen](bool bOk, const TArray<FS08GraphQLError>& Errors,
-                          TSharedPtr<FJsonObject>, const FString& RawBody) {
+      [this, GameId, Gen, Token](bool bOk, const TArray<FS08GraphQLError>& Errors,
+                                 TSharedPtr<FJsonObject>, const FString& RawBody) {
         // Stale answer for a left/replaced match: drop BEFORE the in-flight
         // clear - the flag now belongs to the CURRENT match's command.
         if (!IsSameMatchRequest(GameId, Gen)) {
@@ -1630,14 +1644,23 @@ bool FS08FlowController::BeginManeuver() {
                                 *GameId));
           return;
         }
-        bManeuverInFlight = false;
+        // MS-E-90 / MS-E-89: a snapshot or the deadline settled the command
+        // first - the late answer changes no gate and shows no error; a late
+        // SUCCESS body is still merged (it carries the decks the WS omits).
+        if (!TakeManeuverOpAnswer(Token, EManeuverOp::Begin, bOk)) {
+          if (bOk) MergeLateManeuverAnswer(RawBody, TEXT("beginManeuver"));
+          return;
+        }
         if (!bOk) {
           if (IsAuthError(Errors) && !bSessionExpired) {
             // P2(5): 401 ANSWERED the command (definitely not applied):
             // refresh once, then converge through the authoritative read -
             // the command itself is never replayed.
             Trace(TEXT("MANEUVER begin auth rejected - refreshing; the command is not resent"));
-            if (TryRefreshAuth()) return;
+            if (TryRefreshAuth()) {
+              NotifyAuthRefreshed(ES08RejectOp::Begin);
+              return;
+            }
             if (bSessionExpired) return;
           }
           if (IsOutcomeUnknown(Errors)) {
@@ -1648,6 +1671,9 @@ bool FS08FlowController::BeginManeuver() {
           }
           Trace(TEXT("MANEUVER begin failed: ") +
                 (Errors.Num() ? Errors[0].Message : TEXT("?")));
+          // MS-T-06: classified by 02 §1.1; never re-sent automatically
+          // (STATE_CHANGED -> refetch only, MS-E-50).
+          HandleRejection(Errors, ES08RejectOp::Begin, {});
           OnFlowError.Broadcast(Errors.Num() ? Errors[0]
                                              : FS08GraphQLError{TEXT("TRANSPORT"),
                                                                 TEXT("beginManeuver failed"),
@@ -1670,7 +1696,9 @@ bool FS08FlowController::BeginManeuver() {
                                                                  : TEXT("merge"),
                               *PendingId));
       };
-SendHttp(BeginManeuverMutation, Variables, MoveTemp(OnDone));
+  FHttpRequestPtr Request = SendHttp(BeginManeuverMutation, Variables, MoveTemp(OnDone));
+  // A harness answer may have closed the command synchronously.
+  if (InFlightOp != EManeuverOp::None && InFlightToken == Token) InFlightRequest = Request;
   return true;
 }
 
@@ -1726,19 +1754,31 @@ bool FS08FlowController::SubmitManeuver(const FString& ManeuverId,
   }
   const FString GameId = Room.GameId;
   const int32 Gen = MatchGeneration;
-  bManeuverInFlight = true;
+  // PATH_BLOCKED_BY_ENEMY on an end cell is why.cell.enemy (02 §1.1).
+  TArray<FIntPoint> Destinations;
+  for (const FS08ManeuverMove& Move : Moves) {
+    if (!Move.Path.IsEmpty()) Destinations.Add(Move.Path.Last());
+  }
+  const int32 Token = StartManeuverOp(EManeuverOp::Maneuver, ManeuverId);
   FS08GraphqlClient::FResult OnDone =
-      [this, GameId, Gen, BoostCardId](bool bOk, const TArray<FS08GraphQLError>& Errors,
-                                       TSharedPtr<FJsonObject>, const FString& RawBody) {
+      [this, GameId, Gen, BoostCardId, Token, Destinations](bool bOk, const TArray<FS08GraphQLError>& Errors,
+                                                            TSharedPtr<FJsonObject>, const FString& RawBody) {
         if (!IsSameMatchRequest(GameId, Gen)) {
           Trace(FString::Printf(TEXT("MANEUVER stale answer room=%s ignored"), *GameId));
           return;
         }
-        bManeuverInFlight = false;
+        if (!TakeManeuverOpAnswer(Token, EManeuverOp::Maneuver, bOk)) {
+          if (bOk) MergeLateManeuverAnswer(RawBody, TEXT("maneuver"));
+          return;
+        }
         if (!bOk) {
           if (IsAuthError(Errors) && !bSessionExpired) {
             Trace(TEXT("MANEUVER auth rejected - refreshing; the command is not resent"));
-            if (TryRefreshAuth()) return;
+            if (TryRefreshAuth()) {
+              // MS-E-92: the draft stays; the player confirms again.
+              NotifyAuthRefreshed(ES08RejectOp::Maneuver);
+              return;
+            }
             if (bSessionExpired) return;
           }
           if (IsOutcomeUnknown(Errors)) {
@@ -1749,6 +1789,7 @@ bool FS08FlowController::SubmitManeuver(const FString& ManeuverId,
           }
           Trace(TEXT("MANEUVER failed: ") +
                 (Errors.Num() ? Errors[0].Message : TEXT("?")));
+          HandleRejection(Errors, ES08RejectOp::Maneuver, Destinations);
           OnFlowError.Broadcast(Errors.Num() ? Errors[0]
                                              : FS08GraphQLError{TEXT("TRANSPORT"),
                                                                 TEXT("maneuver failed"),
@@ -1773,8 +1814,166 @@ bool FS08FlowController::SubmitManeuver(const FString& ManeuverId,
         // The move was accepted; the same seq will also arrive over
         // the WS stream and collapse in the seq guard (merge).
       };
-SendHttp(ManeuverMutation, Variables, MoveTemp(OnDone));
+  FHttpRequestPtr Request = SendHttp(ManeuverMutation, Variables, MoveTemp(OnDone));
+  if (InFlightOp != EManeuverOp::None && InFlightToken == Token) InFlightRequest = Request;
   return true;
+}
+
+// ---- MS-T-06: the maneuver command in flight (move-selection 04 §5) ----------
+
+const TCHAR* FS08FlowController::ManeuverOpName(EManeuverOp Op) {
+  switch (Op) {
+    case EManeuverOp::Begin: return TEXT("begin");
+    case EManeuverOp::Maneuver: return TEXT("maneuver");
+    default: return TEXT("none");
+  }
+}
+
+int32 FS08FlowController::StartManeuverOp(EManeuverOp Op, const FString& ManeuverId) {
+  bManeuverInFlight = true;
+  InFlightOp = Op;
+  InFlightToken = ++NextCommandToken;
+  InFlightAge = 0.0f;
+  bInFlightSlow = false;
+  InFlightBaseSeq = SeqGuard.Local;
+  InFlightManeuverId = ManeuverId;
+  InFlightRequest.Reset();
+  return InFlightToken;
+}
+
+void FS08FlowController::EndManeuverOp() {
+  if (InFlightOp != EManeuverOp::None) bManeuverInFlight = false;
+  InFlightOp = EManeuverOp::None;
+  InFlightToken = 0;
+  InFlightAge = 0.0f;
+  bInFlightSlow = false;
+  InFlightManeuverId.Reset();
+  InFlightRequest.Reset();
+}
+
+bool FS08FlowController::TakeManeuverOpAnswer(int32 Token, EManeuverOp Op, bool bOk) {
+  if (InFlightOp != EManeuverOp::None && Token == InFlightToken) {
+    EndManeuverOp();
+    return true;
+  }
+  const FString* Why = RetiredCommandTokens.Find(Token);
+  Trace(FString::Printf(TEXT("MS-NET late-reply op=%s ok=%d settled=%s"), ManeuverOpName(Op), bOk ? 1 : 0,
+                        Why ? **Why : TEXT("unknown")));
+  RetiredCommandTokens.Remove(Token);
+  return false;
+}
+
+void FS08FlowController::MergeLateManeuverAnswer(const FString& RawBody, const TCHAR* Field) {
+  // The WS events omit decks (S08GraphqlWs): the HTTP body is their only fresh
+  // source after the own begin / maneuver. Through the seq guard a same-seq
+  // body merges without cues; a newer one applies (e.g. after the deadline the
+  // recovery lock releases on it - it IS the outcome).
+  FS08Snapshot Snapshot;
+  FS08GraphQLError Error;
+  if (!FS08Contracts::ParseMutationResult(RawBody, Field, Snapshot, Error)) return;
+  const ES08SeqDecision Decision = ApplyMatchSnapshot(Snapshot);
+  Trace(FString::Printf(TEXT("MS-NET late-reply merged seq=%d (%s)"), Snapshot.SequenceNumber,
+                        Decision == ES08SeqDecision::Apply   ? TEXT("apply")
+                        : Decision == ES08SeqDecision::Merge ? TEXT("merge")
+                                                             : TEXT("ignore")));
+}
+
+void FS08FlowController::TickCommandDeadline(float DeltaSeconds) {
+  if (InFlightOp == EManeuverOp::None) return;
+  if (bSessionExpired || Stage != ES08Stage::Started || IsRoomAborted() || IsRoomTerminal()) {
+    // The match or the session is gone: no clock may lock what follows.
+    EndManeuverOp();
+    return;
+  }
+  InFlightAge += DeltaSeconds;
+  const EManeuverOp Op = InFlightOp;
+  if (!bInFlightSlow && InFlightAge >= CommandSlowSeconds) {
+    bInFlightSlow = true;
+    Trace(FString::Printf(TEXT("MS-NET slow op=%s after=%.0fs why=why.syncing"), ManeuverOpName(Op),
+                          CommandSlowSeconds));
+  }
+  if (InFlightAge < CommandDeadlineSeconds) return;
+  // MS-E-89: no answer in 10 s - the request is cancelled and its outcome is
+  // unknown (the server may have applied it): recovery lock, never a resend.
+  Trace(FString::Printf(TEXT("MS-NET deadline op=%s after=%.0fs - request cancelled, outcome unknown"),
+                        ManeuverOpName(Op), CommandDeadlineSeconds));
+  const FHttpRequestPtr Request = InFlightRequest;
+  if (RetiredCommandTokens.Num() >= 64) RetiredCommandTokens.Reset();
+  RetiredCommandTokens.Add(InFlightToken, TEXT("deadline"));
+  EndManeuverOp();
+  EnterMutationRecovery(FString::Printf(TEXT("MANEUVER %s deadline %.0fs"), ManeuverOpName(Op),
+                                        CommandDeadlineSeconds),
+                        FString());
+  // Its completion (if the HTTP module reports one) is a late reply.
+  if (Request.IsValid()) Request->CancelRequest();
+}
+
+void FS08FlowController::ReleaseManeuverGateBySnapshot(const FS08Snapshot& Snapshot) {
+  if (InFlightOp == EManeuverOp::None || Snapshot.SequenceNumber <= InFlightBaseSeq) return;
+  // The proof must be in THIS body: a partial WS body keeps stale metadata in
+  // the applied store (merge semantics) and proves nothing.
+  const TSharedPtr<FJsonObject> Meta =
+      Snapshot.Metadata.IsValid() ? Snapshot.Metadata->AsObject() : TSharedPtr<FJsonObject>();
+  if (!Meta.IsValid()) return;
+  FString PendingId;
+  FString PendingPlayer;
+  const TSharedPtr<FJsonObject>* Pending = nullptr;
+  if (Meta->TryGetObjectField(TEXT("pendingManeuver"), Pending) && Pending && Pending->IsValid()) {
+    (*Pending)->TryGetStringField(TEXT("id"), PendingId);
+    (*Pending)->TryGetStringField(TEXT("playerId"), PendingPlayer);
+  }
+  const bool bSettled =
+      InFlightOp == EManeuverOp::Begin
+          ? !PendingId.IsEmpty() && PendingPlayer.Equals(UserId, ESearchCase::CaseSensitive)
+          : !PendingId.Equals(InFlightManeuverId, ESearchCase::CaseSensitive);
+  if (!bSettled) return;
+  Trace(FString::Printf(TEXT("MS-NET gate released by snapshot op=%s seq=%d (before the HTTP answer)"),
+                        ManeuverOpName(InFlightOp), Snapshot.SequenceNumber));
+  if (RetiredCommandTokens.Num() >= 64) RetiredCommandTokens.Reset();
+  RetiredCommandTokens.Add(InFlightToken, TEXT("snapshot"));
+  EndManeuverOp();
+}
+
+void FS08FlowController::HandleRejection(const TArray<FS08GraphQLError>& Errors, ES08RejectOp Op,
+                                         const TArray<FIntPoint>& Destinations) {
+  if (bSessionExpired) return; // the login screen owns the flow; a refetch would fail
+  const FS08Rejection Rejection = FS08RuleCodes::Classify(Errors, Op, Destinations);
+  Trace(FString::Printf(TEXT("MS-REJECT code=%s why=%s class=%s op=%s"),
+                        Rejection.RuleCode.IsEmpty() ? TEXT("-") : *Rejection.RuleCode,
+                        *Rejection.WhyKey.ToString(), Rejection.ClassLetter(), FS08Rejection::OpName(Op)));
+  OnRejection.Broadcast(Rejection);
+  if (Rejection.bRefetch) {
+    // 02 §1.1: both classes re-read the authoritative snapshot (И: the draft
+    // is re-checked on it; С: it is rebuilt or closed). Never a resend.
+    Trace(TEXT("MS-REJECT refetch: re-reading the authoritative snapshot (no resend)"));
+    FetchGameState();
+  }
+}
+
+void FS08FlowController::NotifyAuthRefreshed(ES08RejectOp Op) {
+  FS08Rejection Rejection;
+  Rejection.Op = Op;
+  Rejection.RuleCode = TEXT("AUTH");
+  Rejection.WhyKey = FName(TEXT("why.auth.refreshed"));
+  Rejection.Class = ES08RejectClass::Fixable;
+  Rejection.bRefetch = false;
+  Trace(FString::Printf(TEXT("MS-REJECT code=AUTH why=why.auth.refreshed class=%s op=%s (not resent)"),
+                        Rejection.ClassLetter(), FS08Rejection::OpName(Op)));
+  OnRejection.Broadcast(Rejection);
+}
+
+FName FS08FlowController::GameplayGateKey() const {
+  FString Reason;
+  if (CanIssueGameplayCommand(Reason)) return NAME_None;
+  if ((Stage == ES08Stage::Started && IsRoomAborted()) || IsRoomTerminal() ||
+      Applied.Phase == TEXT("GAME_OVER")) {
+    return FName(TEXT("why.state.changed"));
+  }
+  if (!IsInputBlocked() && Stage == ES08Stage::Started && IsStreamReady() && !bMutationRecoveryActive &&
+      !IsMyTurn()) {
+    return FName(TEXT("why.not.your.turn"));
+  }
+  return FName(TEXT("why.syncing"));
 }
 
 void FS08FlowController::StoreManeuverDraft(const FS08ManeuverDraftCache& Draft) {
@@ -2014,6 +2213,13 @@ bool FS08FlowController::RunCombatMutation(const FString& Tag, const TCHAR* Fiel
           }
           Trace(Tag + TEXT(" failed: ") +
                 (Errors.Num() ? Errors[0].Message : TEXT("?")));
+          // MS-T-06: a pending-choice resolve (MOVE/PLACE codes of 02 §1.1)
+          // is classified like a maneuver command.
+          if (Tag == TEXT("PEND resolve")) {
+            TArray<FIntPoint> Cell;
+            if (PendingResolveCell.X >= 0) Cell.Add(PendingResolveCell);
+            HandleRejection(Errors, ES08RejectOp::PendingEffect, Cell);
+          }
           // Answered GraphQL/4xx rejection: definitely not applied - notify
           // the draft holders, then surface the error as before.
           OnCommandRejected.Broadcast(Tag, Errors.Num() ? Errors[0].Message : FString());
@@ -2149,6 +2355,7 @@ bool FS08FlowController::ResolvePendingEffect(
   TSharedRef<FJsonObject> Variables = MakeShared<FJsonObject>();
   Variables->SetStringField(TEXT("gameId"), Room.GameId);
   Variables->SetStringField(TEXT("effectId"), EffectId);
+  PendingResolveCell = bHasCell ? FIntPoint(X, Y) : FIntPoint(-1, -1); // MS-T-06: the space a rejection names
   if (FighterId.IsEmpty()) {
     Variables->SetField(TEXT("fighterId"), MakeShared<FJsonValueNull>());
   } else {

@@ -57,50 +57,7 @@ import depthLimit from 'graphql-depth-limit';
           }),
         ],
         // Санитайзация ошибок в production
-        formatError: (error: any) => {
-          // Логируем все ошибки
-          console.error('GraphQL Error:', {
-            message: error.message,
-            path: error.path,
-            extensions: error.extensions,
-          });
-
-          const isProd = process.env.NODE_ENV === 'production';
-
-          // В production не раскрываем внутренние детали ошибок
-          if (isProd) {
-            // Проверяем, это системная ошибка или бизнес-логика
-            const isBusinessError =
-              error.extensions?.code === 'BAD_USER_INPUT' ||
-              error.extensions?.code === 'GRAPHQL_VALIDATION_FAILED' ||
-              error.message.includes('not found') ||
-              error.message.includes('unauthorized');
-
-            if (isBusinessError) {
-              // Бизнес ошибки можно показывать
-              return {
-                message: error.message,
-                code: error.extensions?.code || 'USER_ERROR',
-                path: error.path,
-              };
-            }
-
-            // Системные ошибки скрываем
-            return {
-              message: 'Internal server error',
-              code: 'INTERNAL_SERVER_ERROR',
-            };
-          }
-
-          // В development возвращаем полную информацию
-          return {
-            message: error.message,
-            code: error.extensions?.code || 'INTERNAL_SERVER_ERROR',
-            path: error.path,
-            locations: error.locations,
-            extensions: error.extensions,
-          };
-        },
+        formatError: formatGraphqlError,
         // Plugin для логирования запросов
         plugins: [
           {
@@ -126,6 +83,63 @@ import depthLimit from 'graphql-depth-limit';
   exports: [],
 })
 export class GraphqlModule {}
+
+/**
+ * Apollo formatError (the first argument is the formatted error).
+ * Production hides system errors; business errors keep message + code.
+ * MS-T-06 (move-selection 04 §4.2, MS-R-46): `extensions.ruleCode` - the rule
+ * code of a gameplay rejection - passes through in BOTH modes; production
+ * keeps no other extension.
+ */
+export function formatGraphqlError(error: any): any {
+  // Логируем все ошибки
+  console.error('GraphQL Error:', {
+    message: error.message,
+    path: error.path,
+    extensions: error.extensions,
+  });
+
+  const isProd = process.env.NODE_ENV === 'production';
+  const ruleCode: unknown = error.extensions?.ruleCode;
+  const withRuleCode = typeof ruleCode === 'string' && ruleCode.length > 0;
+
+  // В production не раскрываем внутренние детали ошибок
+  if (isProd) {
+    // Проверяем, это системная ошибка или бизнес-логика
+    const isBusinessError =
+      error.extensions?.code === 'BAD_USER_INPUT' ||
+      error.extensions?.code === 'GRAPHQL_VALIDATION_FAILED' ||
+      error.message.includes('not found') ||
+      error.message.includes('unauthorized');
+
+    if (isBusinessError) {
+      // Бизнес ошибки можно показывать
+      const code = error.extensions?.code || 'USER_ERROR';
+      return {
+        message: error.message,
+        code,
+        path: error.path,
+        ...(withRuleCode ? { extensions: { code, ruleCode } } : {}),
+      };
+    }
+
+    // Системные ошибки скрываем
+    return {
+      message: 'Internal server error',
+      code: 'INTERNAL_SERVER_ERROR',
+      ...(withRuleCode ? { extensions: { code: 'INTERNAL_SERVER_ERROR', ruleCode } } : {}),
+    };
+  }
+
+  // В development возвращаем полную информацию (ruleCode is inside extensions)
+  return {
+    message: error.message,
+    code: error.extensions?.code || 'INTERNAL_SERVER_ERROR',
+    path: error.path,
+    locations: error.locations,
+    extensions: error.extensions,
+  };
+}
 
 /**
  * Санитайзация сообщений об ошибках

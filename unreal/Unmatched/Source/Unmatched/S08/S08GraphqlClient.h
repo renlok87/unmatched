@@ -7,6 +7,7 @@
 #include "CoreMinimal.h"
 #include "Dom/JsonObject.h"
 #include "S08Contracts.h"
+#include "Interfaces/IHttpRequest.h"
 
 class UNMATCHED_API FS08GraphqlClient {
 public:
@@ -19,8 +20,9 @@ public:
   bool HasAccessToken() const { return !AccessToken.IsEmpty(); }
   const FString& GetAccessToken() const { return AccessToken; }
 
-  /** Executes one GraphQL document. Variables may be null. */
-  void Execute(const FString& Query, const TSharedPtr<FJsonObject>& Variables, FResult OnDone);
+  /** Executes one GraphQL document. Variables may be null. Returns the request
+   *  (MS-T-06: the controller cancels a maneuver command at its 10 s deadline). */
+  FHttpRequestPtr Execute(const FString& Query, const TSharedPtr<FJsonObject>& Variables, FResult OnDone);
 
 private:
   FString BaseUrl;

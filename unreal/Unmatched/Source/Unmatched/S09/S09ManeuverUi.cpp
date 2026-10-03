@@ -2,6 +2,7 @@
 #include "Dom/JsonObject.h"
 #include "S09HudModel.h"
 #include "../S08/S08TraceLog.h"
+#include "../S08/S08WhyText.h"
 
 namespace {
 bool OwnHandCards(const FS08Snapshot& Snapshot, const FString& ViewerId,
@@ -338,6 +339,17 @@ FString FS09Reason::Describe() const {
     Text = K;
   }
   return Text + TEXT(" [") + K + TEXT("]");
+}
+
+FString FS09Reason::Text() const {
+  if (!IsSet()) return FString();
+  FString Out = S08WhyText::En(Key, Args);
+  if (Args.Contains(TEXT("orderHint"))) {
+    // MS-E-34: the ally leaves later in the order - say how to fix it.
+    Out += TEXT(". ") + S08WhyText::En(FName(TEXT("ms.order.swap.hint")));
+  }
+  const FString* Cell = Args.Find(TEXT("cell"));
+  return Cell && !Cell->IsEmpty() ? *Cell + TEXT(": ") + Out : Out;
 }
 
 FString FS09DraftMove::BadgeText() const {
@@ -754,34 +766,46 @@ bool FS09CommandUi::OnSnapshot(const FS08Snapshot& Snapshot, const FS08BoardMode
 
 bool FS09CommandUi::CanBeginManeuver(const FS08Snapshot& Snapshot,
                                      FString& OutReason) const {
+  FS09Reason Key;
+  return CanBeginManeuver(Snapshot, OutReason, Key);
+}
+
+bool FS09CommandUi::CanBeginManeuver(const FS08Snapshot& Snapshot, FString& OutReason,
+                                     FS09Reason& OutKey) const {
   OutReason.Reset();
-  if (Snapshot.Phase == TEXT("GAME_OVER")) {
-    OutReason = TEXT("the duel is over - no gameplay input on the result screen");
+  OutKey.Reset();
+  auto Refuse = [&](const TCHAR* Key, const FString& Reason) {
+    OutKey = FS09Reason::Make(Key);
+    OutReason = Reason;
     return false;
+  };
+  if (Snapshot.Phase == TEXT("GAME_OVER")) {
+    return Refuse(TEXT("why.state.changed"), TEXT("the duel is over - no gameplay input on the result screen"));
   }
   if (Mode == ES09CommandMode::ManeuverDraft) {
-    OutReason = TEXT("a maneuver draft is already open (server draw committed)");
-    return false;
+    return Refuse(TEXT("why.draft.open"), TEXT("a maneuver draft is already open (server draw committed)"));
   }
   if (Mode == ES09CommandMode::DiscardDraft) {
-    OutReason = TEXT("finish the discard choice first");
-    return false;
+    return Refuse(TEXT("why.state.changed"), TEXT("finish the discard choice first"));
   }
   if (bHasPendingChoice) {
-    OutReason = TEXT("a pending choice is open (resolve the queue head first)");
-    return false;
+    // MS-E-47: the opponent's choice blocks the begin on the server.
+    return Refuse(PendingChoice.PlayerId != ViewerId ? TEXT("why.wait.opponent.choice") : TEXT("why.state.changed"),
+                  TEXT("a pending choice is open (resolve the queue head first)"));
   }
   if (bCommandInFlight) {
-    OutReason = TEXT("a command is already in flight");
-    return false;
+    return Refuse(TEXT("why.syncing"), TEXT("a command is already in flight"));
   }
   if (Snapshot.CurrentTurnPlayerId != ViewerId) {
-    OutReason = TEXT("not your turn");
-    return false;
+    return Refuse(TEXT("why.not.your.turn"), TEXT("not your turn"));
   }
   if (Snapshot.Phase != TEXT("ACTION_MANEUVER") && Snapshot.Phase != TEXT("ACTION_ATTACK")) {
-    OutReason = TEXT("maneuver is not legal in phase ") + Snapshot.Phase;
-    return false;
+    return Refuse(TEXT("why.maneuver.not.open"), TEXT("maneuver is not legal in phase ") + Snapshot.Phase);
+  }
+  const TSharedPtr<FJsonObject> Meta = Snapshot.Metadata.IsValid() ? Snapshot.Metadata->AsObject() : nullptr;
+  double Actions = 1.0;
+  if (Meta.IsValid() && Meta->TryGetNumberField(TEXT("actionsRemaining"), Actions) && Actions <= 0.0) {
+    return Refuse(TEXT("why.no.actions"), TEXT("no actions left"));
   }
   return true;
 }
@@ -827,6 +851,60 @@ bool FS09CommandUi::CanMoveFighter(const FString& FighterId, const TArray<FS08Bo
     OutReason = FS09Reason::Make(TEXT("why.immobilized")).Arg(TEXT("fighterName"), FighterDisplayName(*Fighter));
   }
   return !OutReason.IsSet();
+}
+
+FS09Reason FS09CommandUi::RejectionReason(const FS08Rejection& Rejection, const FS08BoardModel& Board,
+                                          const TArray<FS08BoardFighter>& Fighters) const {
+  FS09Reason Out = FS09Reason::Make(*Rejection.WhyKey.ToString());
+  for (const TPair<FString, FString>& Arg : Rejection.WhyArgs) Out.Arg(*Arg.Key, Arg.Value);
+  const bool bCell = Rejection.Cell.X >= 0 && Rejection.Cell.Y >= 0;
+  if (bCell) Out.Arg(TEXT("cell"), Board.CellLabel(Rejection.Cell.X, Rejection.Cell.Y));
+  const bool bEffect = Rejection.Op == ES08RejectOp::PendingEffect;
+  // Who the rejection is about.
+  FString Who;
+  if (!bEffect) {
+    for (const FS09DraftMove& Move : Moves) {
+      if (bCell && Move.DestX == Rejection.Cell.X && Move.DestY == Rejection.Cell.Y) Who = Move.FighterId;
+    }
+    if (Who.IsEmpty() && Rejection.WhyKey == FName(TEXT("why.immobilized"))) {
+      for (const FS09DraftMove& Move : Moves) {
+        const FS08BoardFighter* Fighter = FindWorkFighter(Fighters, Move.FighterId);
+        if (Fighter && FS09DraftEval::IsImmobilized(*Fighter)) {
+          Who = Move.FighterId;
+          break;
+        }
+      }
+    }
+    if (Who.IsEmpty()) Who = SelectedFighterId;
+    if (Who.IsEmpty() && Moves.Num() > 0) Who = Moves[0].FighterId;
+  } else {
+    Who = PendingFighterId;
+  }
+  const FS08BoardFighter* Mover = FindWorkFighter(Fighters, Who);
+  const FString Template = S08WhyText::Template(Out.Key);
+  if (Template.Contains(TEXT("{fighterName}")) && !Out.Args.Contains(TEXT("fighterName"))) {
+    Out.Arg(TEXT("fighterName"), Mover ? FighterDisplayName(*Mover) : (Who.IsEmpty() ? FString(TEXT("-")) : Who));
+  }
+  if (Template.Contains(TEXT("{have}")) && !Out.Args.Contains(TEXT("have"))) {
+    const int32 Have = bEffect ? (PendingChoice.bHasValue ? PendingChoice.Value : 1)
+                               : (Mover ? FS08BoardModel::FighterMovement(*Mover) : 0) +
+                                     FS09DraftEval::SelectedBoostOf(DraftHand, BoostCardId);
+    Out.Arg(TEXT("have"), Have);
+  }
+  if (Template.Contains(TEXT("{need}")) && !Out.Args.Contains(TEXT("need"))) {
+    // The steps of the shortest path on the snapshot (unlimited allowance).
+    const int32 Need = Mover && bCell
+                           ? FS08BoardModel::ComputeReachMap(Board, Fighters, Mover->Id, MAX_int32)
+                                 .DistanceTo(Rejection.Cell)
+                           : INDEX_NONE;
+    if (Need == INDEX_NONE) {
+      FS09Reason NoPath = FS09Reason::Make(TEXT("why.cell.no.path"));
+      if (bCell) NoPath.Arg(TEXT("cell"), Board.CellLabel(Rejection.Cell.X, Rejection.Cell.Y));
+      return NoPath;
+    }
+    Out.Arg(TEXT("need"), Need);
+  }
+  return Out;
 }
 
 FS08ManeuverDraftCache FS09CommandUi::ExportDraft() const {
@@ -1777,7 +1855,8 @@ bool FS09CommandUi::SelectPendingCell(int32 X, int32 Y,
   }
   const TSet<uint64> Legal = ComputePendingCells(Snapshot, Board, Fighters);
   if (!Legal.Contains(FS08BoardModel::CellKey(X, Y))) {
-    OutReason = FString::Printf(TEXT("cell (%d,%d) is not legal for this choice"), X, Y);
+    // B-04: the space by CellLabel (the exact why.* of a pending pick: MS-T-12).
+    OutReason = FString::Printf(TEXT("space %s is not legal for this choice"), *Board.CellLabel(X, Y));
     return false;
   }
   PendingCellX = X;

@@ -781,7 +781,7 @@ export async function buildFixture(sc: Scenario): Promise<MoveFixture> {
   };
   const computed = computeFixtureExpect(fx);
   const outcome = await runFixtureLayer(fx);
-  if (outcome.server.startsWith('UNMAPPED')) {
+  if (/^(UNMAPPED|NO_CODE)/.test(outcome.server)) {
     throw new Error(`${sc.name}: server answer has no 02 §1.1 code: ${outcome.server}`);
   }
   const nonEmpty = <T extends object>(o: T) => (Object.keys(o).length > 0 ? o : undefined);

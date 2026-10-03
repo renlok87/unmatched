@@ -180,6 +180,14 @@ private:
   void ConfirmDraft();
   void CancelDraft();
   void EndTurnCommand();
+  // ---- MS-T-06: reasons by key (move-selection 02 §1.1, 03 §8.2) ----
+  /** Toast of a why.* / ms.* reason by key (FS09Reason::Text: EN table,
+   *  CellLabel, no grid coordinates) for Seconds; trace "TOAST why=<key>". */
+  void ShowReason(const FS09Reason& Reason, float Seconds = 4.0f);
+  /** A classified server rejection (FS08FlowController::OnRejection): banner
+   *  4 s, the named space marked (CUE-004 ring); the draft reaction itself is
+   *  the refetched snapshot (class И keeps, С rebuilds or closes). */
+  void HandleRejection(const FS08Rejection& Rejection);
   // ---- GD-034 combat UI ----
   void BeginAttackDraft();        // A: open the local attack draft
   void NoDefenseCommand();        // N: defender closes the window (no card)
@@ -575,6 +583,8 @@ private:
   FString Toast;
   float ToastUntil = 0.0f;
   float IllegalUntil = 0.0f;
+  bool bCommandSlowShown = false; // MS-E-89: the 3 s why.syncing banner of the open command
+  FString TracedToast;             // the last toast written to the trace (MS-AT-18)
   int32 ManeuverTargetX = -1;
   int32 ManeuverTargetY = -1;
   bool bAwaitManeuverFinish = false; // begin leg sent, waiting for pending id

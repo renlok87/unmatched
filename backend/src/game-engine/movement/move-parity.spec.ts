@@ -69,14 +69,12 @@ describe('MS-AT-02 fixture contract', () => {
     expect([...layers].sort()).toEqual(['dto', 'executor', 'resolvePending', 'validator']);
   });
 
-  it('serverCodeOf prefers ActionResult.code (MS-T-06) and flags unknown texts', () => {
+  it('serverCodeOf takes ActionResult.code only (MS-T-06) and flags a missing code', () => {
     expect(serverCodeOf({ success: true })).toBe('ok');
-    expect(serverCodeOf({ success: false, error: 'Клетка (3, 4) занята' })).toBe(
-      'POSITION_OCCUPIED',
-    );
     expect(serverCodeOf({ success: false, error: 'Клетка занята', code: 'X_CODE' })).toBe('X_CODE');
-    expect(serverCodeOf({ success: false, error: 'something new' })).toBe(
-      'UNMAPPED: something new',
+    // No guessing from the text any more: a rejection without a code fails the fixture.
+    expect(serverCodeOf({ success: false, error: 'Клетка (3, 4) занята' })).toBe(
+      'NO_CODE: Клетка (3, 4) занята',
     );
   });
 });

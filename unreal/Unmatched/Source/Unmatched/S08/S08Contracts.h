@@ -19,6 +19,49 @@ struct UNMATCHED_API FS08GraphQLError {
   FString Path;    // dotted response path when present
   int32 HttpStatus = 0; // raw HTTP status when the response was not 200
                         // (0 = no HTTP answer at all / transport loss)
+  FString RuleCode;     // MS-T-06 (move-selection 04 §4.2): extensions.ruleCode
+                        // of a gameplay rejection (02 §1.1); empty = none
+};
+
+/** MS-T-06 (move-selection 02 §1.1): how the client treats a rejection. */
+enum class ES08RejectClass : uint8 {
+  Fixable, // "И": the draft stays (MS-S-06/07); the snapshot is re-read, moves re-checked
+  State,   // "С": the snapshot is re-read; the draft is rebuilt (same pendingManeuver) or closed
+};
+
+/** The command a rejection answered (one code can mean two things). */
+enum class ES08RejectOp : uint8 { Begin, Maneuver, PendingEffect };
+
+/** A definitive (answered) rejection, classified by 02 §1.1 - the only
+ *  "code -> why.* key -> draft reaction" table. */
+struct UNMATCHED_API FS08Rejection {
+  ES08RejectOp Op = ES08RejectOp::Maneuver;
+  FString RuleCode;                 // as received; empty = no code (guards)
+  FName WhyKey;                     // why.* of 03 §8.2
+  TMap<FString, FString> WhyArgs;   // read from the message when it carries them (need / have)
+  ES08RejectClass Class = ES08RejectClass::State;
+  bool bRefetch = true;             // re-read the snapshot (both classes; not after a rate limit / auth refresh)
+  FIntPoint Cell = FIntPoint(-1, -1); // the space named by the message (PATH_BLOCKED_BY_ENEMY, pending)
+  FString Message;
+
+  /** The MS-REJECT trace letter: "И" / "С" (UTF-8 in the trace). */
+  const TCHAR* ClassLetter() const;
+  static const TCHAR* OpName(ES08RejectOp InOp);
+};
+
+struct UNMATCHED_API FS08RuleCodes {
+  /** 02 §1.1 for the first error of an answered rejection. Destinations: the
+   *  end cells of the command's moves - PATH_BLOCKED_BY_ENEMY on one of them is
+   *  why.cell.enemy, elsewhere why.cell.enemy.path. A rate limit (HTTP 429 /
+   *  RATE_LIMIT / TOO_MANY_REQUESTS) is why.syncing (И, no refetch, no
+   *  automatic retry); no ruleCode or an unknown one is why.command.rejected
+   *  (С, refetch). */
+  static FS08Rejection Classify(const TArray<FS08GraphQLError>& Errors, ES08RejectOp Op,
+                                const TArray<FIntPoint>& Destinations);
+  /** The ruleCodes of 02 §1.1 this client maps (everything else: why.command.rejected). */
+  static const TArray<FString>& KnownCodes();
+  /** "(x, y)" - the last cell written in a server message; false without one. */
+  static bool CellInMessage(const FString& Message, FIntPoint& OutCell);
 };
 
 /** Snapshot of a viewer-projected game state (HTTP query gameState and WS

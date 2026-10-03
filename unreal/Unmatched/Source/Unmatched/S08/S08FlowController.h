@@ -94,6 +94,7 @@ public:
   /** Tag is the trace tag of the command ("ATTACK", "PEND resolve", ...). */
   DECLARE_MULTICAST_DELEGATE_TwoParams(FOnCommandRejected, const FString& /*Tag*/,
                                        const FString& /*Reason*/);
+  DECLARE_MULTICAST_DELEGATE_OneParam(FOnRejection, const FS08Rejection&);
 
   FOnStage OnStage;
   FOnRoom OnRoom;
@@ -114,6 +115,25 @@ public:
    *  S09AUTO's AttackDraft) uses this to reset that draft so its next
    *  decision happens against fresh authoritative state. */
   FOnCommandRejected OnCommandRejected;
+  /** MS-T-06 (move-selection 02 §1.1): a DEFINITIVE rejection of
+   *  beginManeuver / maneuver / a pending-choice resolve, classified (why.*
+   *  key, class И/С); also the auth-refresh answer of a maneuver command
+   *  (why.auth.refreshed - the command is not resent). Never fired for an
+   *  unknown outcome: that arms the recovery lock. Trace: MS-REJECT. */
+  FOnRejection OnRejection;
+
+  /** MS-T-06 (MS-E-89, 04 §5): seconds a beginManeuver / maneuver command may
+   *  wait for its HTTP answer: after Slow the UI shows why.syncing, at the
+   *  Deadline the request is cancelled and the outcome is unknown (recovery,
+   *  no resend). */
+  static constexpr float CommandSlowSeconds = 3.0f;
+  static constexpr float CommandDeadlineSeconds = 10.0f;
+  /** True while the open beginManeuver / maneuver has waited >= 3 s. */
+  bool IsCommandSlow() const { return InFlightOp != EManeuverOp::None && bInFlightSlow; }
+  /** The why.* key CanIssueGameplayCommand refuses with (NAME_None = open):
+   *  why.syncing (not started, stream not ready, recovery, in flight, invalid
+   *  critical fields), why.not.your.turn, why.state.changed (over, aborted). */
+  FName GameplayGateKey() const;
 
   /** Public content heroes (id/name/health/sidekickCount) for the pick UI. */
   const TArray<FS08HeroEntry>& GetHeroes() const { return Heroes; }
@@ -235,6 +255,13 @@ public:
   /** Variables of the last SendHttp (harness + network) - the wire shape of a
    *  command (MS-R-44: no empty path in maneuver.moves). */
   TSharedPtr<FJsonObject> GetLastHttpVariablesForTest() const { return TestLastHttpVariables; }
+  /** MS-T-06: how many SendHttp documents contained Needle (e.g. "beginManeuver(",
+   *  "maneuver(input", "gameState(") - which command went out, not just how many. */
+  int32 CountHttpSendsForTest(const FString& Needle) const {
+    int32 Count = 0;
+    for (const FString& Query : TestHttpQueries) Count += Query.Contains(Needle, ESearchCase::CaseSensitive) ? 1 : 0;
+    return Count;
+  }
   void SetAuthForTest(const FString& InAccessToken, const FString& InRefreshToken) {
     Http.SetAccessToken(InAccessToken);
     RefreshToken = InRefreshToken;
@@ -478,9 +505,52 @@ private:
    *  server-controlled text. */
   static const TCHAR* WsCloseDescription(int32 StatusCode);
   /** Central HTTP send (harness-aware): every controller request goes
-   *  through here so tests can count real sends. */
-  void SendHttp(const FString& Query, const TSharedPtr<FJsonObject>& Variables,
-                FS08GraphqlClient::FResult&& OnDone);
+   *  through here so tests can count real sends. Returns the network request
+   *  (null for a harness answer). */
+  FHttpRequestPtr SendHttp(const FString& Query, const TSharedPtr<FJsonObject>& Variables,
+                           FS08GraphqlClient::FResult&& OnDone);
+  // ---- MS-T-06: the beginManeuver / maneuver command in flight (04 §5) ----
+  enum class EManeuverOp : uint8 { None, Begin, Maneuver };
+  static const TCHAR* ManeuverOpName(EManeuverOp Op);
+  /** Opens the command: in-flight gate, a fresh token, the deadline clock,
+   *  the seq it was sent at and (maneuver) the pendingManeuver id it closes. */
+  int32 StartManeuverOp(EManeuverOp Op, const FString& ManeuverId);
+  /** The HTTP answer of Token: true when it is the open command (which it
+   *  closes); false - traced as MS-NET late-reply - when a snapshot or the
+   *  deadline already settled it. */
+  bool TakeManeuverOpAnswer(int32 Token, EManeuverOp Op, bool bOk);
+  /** A late SUCCESS answer is still merged through the seq guard (decks are
+   *  only in HTTP bodies); no gate change, no error. */
+  void MergeLateManeuverAnswer(const FString& RawBody, const TCHAR* Field);
+  /** Closes the open command (gate, clock, request handle). */
+  void EndManeuverOp();
+  /** 3 s -> slow (why.syncing); 10 s -> request cancelled, MS-NET deadline,
+   *  EnterMutationRecovery (no resend, MS-E-89). */
+  void TickCommandDeadline(float DeltaSeconds);
+  /** MS-E-90: an applied snapshot that settles the open command (begin: my
+   *  pendingManeuver is open; maneuver: its pendingManeuver id is closed) at a
+   *  seq past the send releases the gate before the HTTP answer. */
+  void ReleaseManeuverGateBySnapshot(const FS08Snapshot& Snapshot);
+  /** Classify (FS08RuleCodes), trace MS-REJECT, broadcast OnRejection and
+   *  re-read the snapshot when the class asks for it. */
+  void HandleRejection(const TArray<FS08GraphQLError>& Errors, ES08RejectOp Op,
+                       const TArray<FIntPoint>& Destinations);
+  /** MS-E-92: a maneuver command answered 401 - the token is being refreshed,
+   *  the command is NOT resent; the player confirms again (why.auth.refreshed). */
+  void NotifyAuthRefreshed(ES08RejectOp Op);
+  EManeuverOp InFlightOp = EManeuverOp::None;
+  int32 InFlightToken = 0;
+  int32 NextCommandToken = 0;
+  float InFlightAge = 0.0f;
+  bool bInFlightSlow = false;
+  int32 InFlightBaseSeq = 0;
+  FString InFlightManeuverId;
+  FHttpRequestPtr InFlightRequest;
+  /** Tokens settled before their answer (snapshot / deadline): the answer is
+   *  only traced (MS-NET late-reply). Bounded. */
+  TMap<int32, FString> RetiredCommandTokens;
+  /** The space of the last pending-choice resolve ((-1,-1) without one). */
+  FIntPoint PendingResolveCell = FIntPoint(-1, -1);
   /** Cues for one authoritative transition (old vs new fighters), by id. */
   static void ComputeCues(int32 Seq, const TSharedPtr<FJsonValue>& OldFighters,
                           const TSharedPtr<FJsonValue>& NewFighters,
@@ -604,6 +674,7 @@ private:
 #if WITH_AUTOMATION_TESTS
   int32 TestHttpSendCount = 0; // real SendHttp calls (harness + network)
   TSharedPtr<FJsonObject> TestLastHttpVariables; // variables of the last SendHttp
+  TArray<FString> TestHttpQueries; // documents of every SendHttp (bounded)
 #endif
 
 #if WITH_AUTOMATION_TESTS

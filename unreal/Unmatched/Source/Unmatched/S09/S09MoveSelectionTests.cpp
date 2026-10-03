@@ -1,5 +1,5 @@
 // Move selection (docs/game-design/move-selection) automation tests of the S09
-// draft: 06 MS-AT-11..14, 20.
+// draft: 06 MS-AT-11..14, 18..20.
 //   Unmatched.S09.MoveSel.SequentialDraft - MS-AT-13 (MS-T-05): moves in send
 //       order on the positions after the previous moves, order changes,
 //       overwrite / re-assign numbering, conflict reasons, the command against
@@ -12,10 +12,16 @@
 //       never becomes a move, ConfirmManeuver and SubmitManeuver drop "stay".
 //   Unmatched.S09.MoveSel.MovementParity  - MS-AT-14 (MS-T-04): raw movement,
 //       immobilized gate, the two "alive" roles, MS-DATA dirtyDefeated.
+//   Unmatched.S09.MoveSel.ReasonsAndStrings - MS-AT-18 (MS-T-06): every code of
+//       02 §1.1 -> why.* key and class И/С, the wire ruleCode, the EN table =
+//       why-reasons.json, CellLabel in toasts, MS-REJECT + refetch, no resend.
+//   Unmatched.S09.MoveSel.InFlightGate    - MS-AT-19 (MS-T-06 part): 10 presses ->
+//       1 mutation, 3 s why.syncing, 10 s deadline -> recovery, gate released
+//       by snapshot, late reply traced only, 429, begin never repeated.
 //   Unmatched.S09.MoveSel.ReconnectAndRebuild - MS-AT-20, the MS-T-04 part:
 //       the draft cache by maneuverId, re-evaluation on a new seq, a boost card
 //       that left the hand, another id / closed maneuver / GAME_OVER. (Deadline,
-//       auth refresh and why.syncing: MS-T-06; undo stack: MS-T-07.)
+//       auth refresh and why.syncing: MS-T-06, at the end; undo stack: MS-T-07.)
 // Headless run:
 //   UnrealEditor-Cmd.exe Unmatched.uproject
 //     "-ExecCmds=Automation RunTests Unmatched.S09.MoveSel; Quit"
@@ -26,6 +32,7 @@
 #include "S09ManeuverUi.h"
 #include "../S08/S08BoardModel.h"
 #include "../S08/S08Contracts.h"
+#include "../S08/S08WhyText.h"
 #include "Dom/JsonObject.h"
 #include "Dom/JsonValue.h"
 #include "Misc/AutomationTest.h"
@@ -1079,6 +1086,646 @@ bool FS09MoveSelMovementParityTest::RunTest(const FString&) {
   return true;
 }
 
+// ---- MS-T-06: rule codes, reasons by key, the in-flight gate --------------------
+
+namespace S09MoveSelTest {
+
+/** 02 §1.1, typed here by hand (independent of FS08RuleCodes' own table):
+ *  code -> key for the maneuver commands / for a pending MOVE-PLACE resolve,
+ *  class И (true) / С (false). PATH_BLOCKED_BY_ENEMY: the off-target form. */
+struct FMsRuleRow {
+  const TCHAR* Code;
+  const TCHAR* ManeuverKey;
+  const TCHAR* EffectKey;
+  bool bManeuverFixable;
+  bool bEffectFixable;
+};
+const FMsRuleRow MsRuleTable[] = {
+    {TEXT("FIGHTER_NOT_FOUND"), TEXT("why.client.desync"), TEXT("why.client.desync"), false, false},
+    {TEXT("NOT_YOUR_FIGHTER"), TEXT("why.fighter.not.yours"), TEXT("why.fighter.not.yours"), true, true},
+    {TEXT("FIGHTER_DEFEATED"), TEXT("why.fighter.defeated"), TEXT("why.fighter.defeated"), false, false},
+    {TEXT("FIGHTER_IMMOBILIZED"), TEXT("why.immobilized"), TEXT("why.immobilized"), true, true},
+    {TEXT("INVALID_PHASE"), TEXT("why.maneuver.not.open"), TEXT("why.maneuver.not.open"), false, false},
+    {TEXT("HAND_NOT_FOUND"), TEXT("why.client.desync"), TEXT("why.client.desync"), false, false},
+    {TEXT("CARD_NOT_IN_HAND"), TEXT("why.boost.card.gone"), TEXT("why.boost.card.gone"), true, true},
+    {TEXT("EMPTY_PATH"), TEXT("why.client.desync"), TEXT("why.client.desync"), false, false},
+    {TEXT("INVALID_POSITION"), TEXT("why.client.desync"), TEXT("why.cell.not.space"), false, true},
+    {TEXT("NOT_ENOUGH_MOVEMENT"), TEXT("why.cell.unreachable"), TEXT("why.cell.unreachable"), true, true},
+    {TEXT("INVALID_STEP"), TEXT("why.client.desync"), TEXT("why.client.desync"), false, false},
+    {TEXT("PATH_BLOCKED_BY_ENEMY"), TEXT("why.cell.enemy.path"), TEXT("why.cell.enemy.path"), true, true},
+    {TEXT("POSITION_OCCUPIED"), TEXT("why.cell.ally"), TEXT("why.cell.occupied"), true, true},
+    {TEXT("NOT_YOUR_TURN"), TEXT("why.not.your.turn"), TEXT("why.not.your.turn"), false, false},
+    {TEXT("PLAYER_NOT_IN_GAME"), TEXT("why.client.desync"), TEXT("why.client.desync"), false, false},
+    {TEXT("BEGIN_NOT_ALLOWED"), TEXT("why.client.desync"), TEXT("why.client.desync"), false, false},
+    {TEXT("STATE_CHANGED"), TEXT("why.state.changed"), TEXT("why.state.changed"), false, false},
+    {TEXT("PENDING_CHOICE_OPEN"), TEXT("why.state.changed"), TEXT("why.state.changed"), false, false},
+    {TEXT("COMBAT_IN_PROGRESS"), TEXT("why.state.changed"), TEXT("why.state.changed"), false, false},
+    {TEXT("GAME_OVER"), TEXT("why.state.changed"), TEXT("why.state.changed"), false, false},
+    {TEXT("MANEUVER_NOT_OPEN"), TEXT("why.maneuver.not.open"), TEXT("why.maneuver.not.open"), false, false},
+    {TEXT("DUPLICATE_FIGHTER"), TEXT("why.client.desync"), TEXT("why.client.desync"), false, false},
+    {TEXT("PENDING_WRONG_FIGHTER"), TEXT("why.client.desync"), TEXT("why.client.desync"), false, false},
+    {TEXT("PLACE_OUTSIDE_ZONE"), TEXT("why.place.zone"), TEXT("why.place.zone"), true, true},
+    {TEXT("BOOST_NO_VALUE"), TEXT("why.boost.no.value"), TEXT("why.boost.no.value"), true, true},
+};
+
+FS08GraphQLError MsRuleError(const FString& RuleCode, const FString& Message) {
+  FS08GraphQLError Error;
+  Error.Code = TEXT("BAD_USER_INPUT");
+  Error.Message = Message;
+  Error.RuleCode = RuleCode;
+  return Error;
+}
+
+/** A graph board (original-map style): W spaces "S1".."SW" in a row, y = 0,
+ *  each linked to its row neighbours. */
+FS08BoardModel MsLine(int32 W) {
+  TArray<TSharedPtr<FJsonValue>> Row;
+  for (int32 X = 0; X < W; ++X) {
+    TSharedRef<FJsonObject> Cell = MakeShared<FJsonObject>();
+    Cell->SetNumberField(TEXT("x"), X);
+    Cell->SetNumberField(TEXT("y"), 0);
+    Cell->SetStringField(TEXT("type"), TEXT("normal"));
+    Cell->SetStringField(TEXT("spaceId"), FString::Printf(TEXT("S%d"), X + 1));
+    TSharedRef<FJsonObject> Layout = MakeShared<FJsonObject>(); // a map space has a layout point
+    Layout->SetNumberField(TEXT("x"), 100 + 200 * X);
+    Layout->SetNumberField(TEXT("y"), 100);
+    Cell->SetObjectField(TEXT("layout"), Layout);
+    TArray<TSharedPtr<FJsonValue>> Links;
+    for (const int32 N : {X - 1, X + 1}) {
+      if (N < 0 || N >= W) continue;
+      TSharedRef<FJsonObject> Link = MakeShared<FJsonObject>();
+      Link->SetNumberField(TEXT("x"), N);
+      Link->SetNumberField(TEXT("y"), 0);
+      Links.Add(MakeShared<FJsonValueObject>(Link));
+    }
+    Cell->SetArrayField(TEXT("links"), Links);
+    Row.Add(MakeShared<FJsonValueObject>(Cell));
+  }
+  TArray<TSharedPtr<FJsonValue>> Lines = {MakeShared<FJsonValueArray>(Row)};
+  TSharedRef<FJsonObject> Board = MakeShared<FJsonObject>();
+  Board->SetNumberField(TEXT("width"), W);
+  Board->SetNumberField(TEXT("height"), 1);
+  Board->SetArrayField(TEXT("cells"), Lines);
+  Board->SetObjectField(TEXT("doors"), MakeShared<FJsonObject>());
+  FS08BoardModel Model;
+  Model.Decode(MakeShared<FJsonValueObject>(Board));
+  return Model;
+}
+
+/** The live fixture snapshot without metadata.pendingManeuver (a turn before begin). */
+FS08Snapshot MsWithoutManeuver(const FS08Snapshot& Live, int32 Seq) {
+  FS08Snapshot Out = Live;
+  Out.SequenceNumber = Seq;
+  const TSharedRef<FJsonObject> Meta = MakeShared<FJsonObject>(*Live.Metadata->AsObject());
+  Meta->RemoveField(TEXT("pendingManeuver"));
+  Out.Metadata = MakeShared<FJsonValueObject>(Meta);
+  return Out;
+}
+
+/** graphql-transport-ws 'next' of op s08-1 carrying seq/phase/turn and the
+ *  metadata projection (a JSON STRING, as the server sends it). */
+FString MsWsMetaFrame(const FS08Snapshot& Base, int32 Seq) {
+  TSharedRef<FJsonObject> Event = MakeShared<FJsonObject>();
+  Event->SetNumberField(TEXT("sequenceNumber"), Seq);
+  Event->SetStringField(TEXT("phase"), Base.Phase);
+  Event->SetNumberField(TEXT("turnCount"), Base.TurnCount);
+  Event->SetStringField(TEXT("currentTurnPlayerId"), Base.CurrentTurnPlayerId);
+  FString MetaText;
+  FJsonSerializer::Serialize(Base.Metadata->AsObject().ToSharedRef(), TJsonWriterFactory<>::Create(&MetaText));
+  Event->SetStringField(TEXT("metadata"), MetaText);
+  TSharedRef<FJsonObject> Data = MakeShared<FJsonObject>();
+  Data->SetObjectField(TEXT("gameStateUpdated"), Event);
+  TSharedRef<FJsonObject> Payload = MakeShared<FJsonObject>();
+  Payload->SetObjectField(TEXT("data"), Data);
+  TSharedRef<FJsonObject> Frame = MakeShared<FJsonObject>();
+  Frame->SetStringField(TEXT("type"), TEXT("next"));
+  Frame->SetStringField(TEXT("id"), TEXT("s08-1"));
+  Frame->SetObjectField(TEXT("payload"), Payload);
+  FString Out;
+  FJsonSerializer::Serialize(Frame, TJsonWriterFactory<>::Create(&Out));
+  return Out;
+}
+
+/** Captures what the controller tells the UI. */
+struct FMsFlowCapture {
+  TArray<FString> Traces;
+  TArray<FS08Rejection> Rejections;
+  int32 FlowErrors = 0;
+  void Bind(FS08FlowController& Flow) {
+    Flow.OnTrace.AddLambda([this](const FString& Line) { Traces.Add(Line); });
+    Flow.OnRejection.AddLambda([this](const FS08Rejection& R) { Rejections.Add(R); });
+    Flow.OnFlowError.AddLambda([this](const FS08GraphQLError&) { ++FlowErrors; });
+  }
+  int32 Count(const FString& Needle) const {
+    int32 N = 0;
+    for (const FString& Line : Traces) N += Line.Contains(Needle) ? 1 : 0;
+    return N;
+  }
+};
+
+/** Controller on the live fixture (viewer LiveHost, its pendingManeuver
+ *  maneuver:1:5 unless bWithoutManeuver) with a proven-live stream. */
+bool MsLiveFlow(FS08FlowController& Flow, FS08Snapshot& OutApplied, bool bWithoutManeuver = false) {
+  FS08Snapshot Live;
+  if (!MsLoadLiveSnapshot(Live)) return false;
+  OutApplied = bWithoutManeuver ? MsWithoutManeuver(Live, Live.SequenceNumber) : Live;
+  Flow.AttachStreamHarnessForTest(TEXT("ms-net-game"));
+  Flow.ApplySnapshot(OutApplied);
+  Flow.InjectWsFrameForTest(MsBarrierFrame(Flow.GetAppliedSnapshot()));
+  return Flow.IsStreamReady();
+}
+
+const TCHAR* const MsManeuverDoc = TEXT("maneuver(input");
+const TCHAR* const MsBeginDoc = TEXT("beginManeuver(");
+const TCHAR* const MsStateDoc = TEXT("gameState(");
+
+} // namespace S09MoveSelTest
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09MoveSelReasonsAndStringsTest, "Unmatched.S09.MoveSel.ReasonsAndStrings",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS09MoveSelReasonsAndStringsTest::RunTest(const FString&) {
+  // ---- every code of 02 §1.1 -> key and class, for both command kinds ----
+  for (const FMsRuleRow& Row : MsRuleTable) {
+    TestTrue(FString::Printf(TEXT("%s is a known code"), Row.Code), FS08RuleCodes::KnownCodes().Contains(Row.Code));
+    const FS08Rejection Maneuver =
+        FS08RuleCodes::Classify({MsRuleError(Row.Code, TEXT("text"))}, ES08RejectOp::Maneuver, {});
+    TestEqual(FString::Printf(TEXT("%s maneuver key"), Row.Code), Maneuver.WhyKey.ToString(), FString(Row.ManeuverKey));
+    TestTrue(FString::Printf(TEXT("%s maneuver class"), Row.Code),
+             (Maneuver.Class == ES08RejectClass::Fixable) == Row.bManeuverFixable);
+    TestTrue(FString::Printf(TEXT("%s re-reads the snapshot"), Row.Code), Maneuver.bRefetch);
+    const FS08Rejection Begin = FS08RuleCodes::Classify({MsRuleError(Row.Code, TEXT("text"))}, ES08RejectOp::Begin, {});
+    TestEqual(FString::Printf(TEXT("%s begin key"), Row.Code), Begin.WhyKey.ToString(), FString(Row.ManeuverKey));
+    const FS08Rejection Effect =
+        FS08RuleCodes::Classify({MsRuleError(Row.Code, TEXT("text"))}, ES08RejectOp::PendingEffect, {});
+    TestEqual(FString::Printf(TEXT("%s effect key"), Row.Code), Effect.WhyKey.ToString(), FString(Row.EffectKey));
+    TestTrue(FString::Printf(TEXT("%s effect class"), Row.Code),
+             (Effect.Class == ES08RejectClass::Fixable) == Row.bEffectFixable);
+    TestTrue(FString::Printf(TEXT("%s: key in the EN table"), Row.Code), S08WhyText::Has(Maneuver.WhyKey) &&
+                                                                          S08WhyText::Has(Effect.WhyKey));
+  }
+  TestEqual(TEXT("the client maps exactly the 02 §1.1 codes"), FS08RuleCodes::KnownCodes().Num(),
+            static_cast<int32>(UE_ARRAY_COUNT(MsRuleTable)));
+  TestEqual(TEXT("class letter И"), FString(FS08RuleCodes::Classify({MsRuleError(TEXT("POSITION_OCCUPIED"), TEXT(""))},
+                                                                    ES08RejectOp::Maneuver, {}).ClassLetter()),
+            FString(TEXT("И")));
+  TestEqual(TEXT("class letter С"), FString(FS08RuleCodes::Classify({MsRuleError(TEXT("STATE_CHANGED"), TEXT(""))},
+                                                                    ES08RejectOp::Maneuver, {}).ClassLetter()),
+            FString(TEXT("С")));
+
+  // ---- PATH_BLOCKED_BY_ENEMY: on the target -> why.cell.enemy, else .path ----
+  {
+    const FS08GraphQLError Blocked =
+        MsRuleError(TEXT("PATH_BLOCKED_BY_ENEMY"), TEXT("Путь проходит через живого противника на клетке (3, 1)"));
+    const FS08Rejection OnTarget = FS08RuleCodes::Classify({Blocked}, ES08RejectOp::Maneuver, {FIntPoint(3, 1)});
+    TestEqual(TEXT("enemy on the target"), OnTarget.WhyKey.ToString(), FString(TEXT("why.cell.enemy")));
+    TestTrue(TEXT("the cell read from the message"), OnTarget.Cell == FIntPoint(3, 1));
+    const FS08Rejection OnPath = FS08RuleCodes::Classify({Blocked}, ES08RejectOp::Maneuver, {FIntPoint(4, 1)});
+    TestEqual(TEXT("enemy on the way"), OnPath.WhyKey.ToString(), FString(TEXT("why.cell.enemy.path")));
+    const FS08Rejection Short = FS08RuleCodes::Classify(
+        {MsRuleError(TEXT("NOT_ENOUGH_MOVEMENT"), TEXT("Путь длиной 3 превышает очки движения бойца (2)"))},
+        ES08RejectOp::Maneuver, {});
+    TestEqual(TEXT("need from the message"), Short.WhyArgs.FindRef(TEXT("need")), FString(TEXT("3")));
+    TestEqual(TEXT("have from the message"), Short.WhyArgs.FindRef(TEXT("have")), FString(TEXT("2")));
+  }
+
+  // ---- no code / unknown code -> why.command.rejected + refetch (MS-E-93) ----
+  {
+    FS08GraphQLError Guard;
+    Guard.Code = TEXT("BAD_REQUEST");
+    Guard.Message = TEXT("Invalid phase. Current: COMBAT");
+    const FS08Rejection NoCode = FS08RuleCodes::Classify({Guard}, ES08RejectOp::Maneuver, {});
+    TestEqual(TEXT("guard: why.command.rejected"), NoCode.WhyKey.ToString(), FString(TEXT("why.command.rejected")));
+    TestTrue(TEXT("guard: class С + refetch"), NoCode.Class == ES08RejectClass::State && NoCode.bRefetch);
+    const FS08Rejection Unknown =
+        FS08RuleCodes::Classify({MsRuleError(TEXT("SOMETHING_NEW"), TEXT("x"))}, ES08RejectOp::Begin, {});
+    TestEqual(TEXT("unknown code: why.command.rejected"), Unknown.WhyKey.ToString(), FString(TEXT("why.command.rejected")));
+    FS08GraphQLError Throttled;
+    Throttled.Code = TEXT("RATE_LIMIT");
+    Throttled.HttpStatus = 429;
+    const FS08Rejection Limit = FS08RuleCodes::Classify({Throttled}, ES08RejectOp::Maneuver, {});
+    TestEqual(TEXT("429: why.syncing"), Limit.WhyKey.ToString(), FString(TEXT("why.syncing")));
+    TestTrue(TEXT("429: class И, no refetch, no retry"), Limit.Class == ES08RejectClass::Fixable && !Limit.bRefetch);
+  }
+
+  // ---- the wire: extensions.ruleCode is read (MS-T-06) ----
+  {
+    TSharedPtr<FJsonObject> Root;
+    FString Problem;
+    TestTrue(TEXT("errors body parses"),
+             FS08Contracts::TryParseJsonObject(
+                 TEXT("{\"errors\":[{\"message\":\"Target position is occupied\",\"path\":[\"maneuver\"],")
+                 TEXT("\"extensions\":{\"code\":\"BAD_USER_INPUT\",\"ruleCode\":\"POSITION_OCCUPIED\"}}],\"data\":null}"),
+                 Root, Problem));
+    TArray<FS08GraphQLError> Errors;
+    TestTrue(TEXT("errors extracted"), Root.IsValid() && FS08Contracts::ExtractGraphQLErrors(Root.ToSharedRef(), Errors));
+    TestTrue(TEXT("extensions.code and extensions.ruleCode"),
+             Errors.Num() == 1 && Errors[0].Code == TEXT("BAD_USER_INPUT") && Errors[0].RuleCode == TEXT("POSITION_OCCUPIED"));
+  }
+
+  // ---- the EN table == why-reasons.json "en"; every key it carries exists ----
+  {
+    const FString Path = FPaths::ConvertRelativePathToFull(
+        FPaths::Combine(FPaths::ProjectDir(), TEXT("../../docs/unreal/contracts/hud/why-reasons.json")));
+    FString Text;
+    TSharedPtr<FJsonObject> Doc;
+    const TArray<TSharedPtr<FJsonValue>>* Reasons = nullptr;
+    if (!FFileHelper::LoadFileToString(Text, *Path) ||
+        !FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(Text), Doc) || !Doc.IsValid() ||
+        !Doc->TryGetArrayField(TEXT("reasons"), Reasons)) {
+      AddError(Path + TEXT(" not readable"));
+    } else {
+      TSet<FString> JsonKeys;
+      for (const TSharedPtr<FJsonValue>& Value : *Reasons) {
+        const TSharedPtr<FJsonObject> Reason = Value->AsObject();
+        const FString Key = Reason->GetStringField(TEXT("key"));
+        JsonKeys.Add(Key);
+        TestEqual(FString::Printf(TEXT("EN text of %s == why-reasons.json"), *Key), S08WhyText::Template(FName(*Key)),
+                  Reason->GetStringField(TEXT("en")));
+      }
+      for (const FName& Key : S08WhyText::Keys()) {
+        const FString K = Key.ToString();
+        if (K.StartsWith(TEXT("why."))) {
+          TestTrue(FString::Printf(TEXT("%s is in why-reasons.json"), *K), JsonKeys.Contains(K));
+        }
+      }
+    }
+  }
+
+  // ---- the opponent's choice blocks the begin with why.wait.opponent.choice (MS-E-47) ----
+  {
+    FS08Snapshot Waiting = MsPendingMoveSnapshot(1);
+    const TSharedRef<FJsonObject> Meta = MakeShared<FJsonObject>(*Waiting.Metadata->AsObject());
+    const TArray<TSharedPtr<FJsonValue>> Heads = Meta->GetArrayField(TEXT("pendingEffects"));
+    const TSharedRef<FJsonObject> Head = MakeShared<FJsonObject>(*Heads[0]->AsObject());
+    Head->SetStringField(TEXT("playerId"), Opp);
+    TArray<TSharedPtr<FJsonValue>> OpponentHead;
+    OpponentHead.Add(MakeShared<FJsonValueObject>(Head));
+    Meta->SetArrayField(TEXT("pendingEffects"), OpponentHead);
+    Waiting.Metadata = MakeShared<FJsonValueObject>(Meta);
+    FS09CommandUi Ui;
+    Ui.ViewerId = Me;
+    Ui.OnSnapshot(Waiting, MsGrid(4, 4), {MsFighter(TEXT("a"), Me, 0, 0)});
+    FString Reason;
+    FS09Reason Key;
+    TestFalse(TEXT("begin refused"), Ui.CanBeginManeuver(Waiting, Reason, Key));
+    TestEqual(TEXT("why.wait.opponent.choice"), MsKey(Key), FString(TEXT("why.wait.opponent.choice")));
+    TestEqual(TEXT("its text"), Key.Text(), FString(TEXT("Waiting for the opponent's choice")));
+    FS08Snapshot NoActions = MsSnapshot({}, FString());
+    const TSharedRef<FJsonObject> Spent = MakeShared<FJsonObject>(*NoActions.Metadata->AsObject());
+    Spent->SetNumberField(TEXT("actionsRemaining"), 0);
+    NoActions.Metadata = MakeShared<FJsonValueObject>(Spent);
+    FS09CommandUi Idle;
+    Idle.ViewerId = Me;
+    Idle.OnSnapshot(NoActions, MsGrid(4, 4), {MsFighter(TEXT("a"), Me, 0, 0)});
+    TestFalse(TEXT("no actions: begin refused"), Idle.CanBeginManeuver(NoActions, Reason, Key));
+    TestEqual(TEXT("why.no.actions"), MsKey(Key), FString(TEXT("why.no.actions")));
+    FS09CommandUi Draft = MsOpen(MsSnapshot({}), MsGrid(4, 4), {MsFighter(TEXT("a"), Me, 0, 0)});
+    TestFalse(TEXT("draft open: begin refused"), Draft.CanBeginManeuver(MsSnapshot({}), Reason, Key));
+    TestEqual(TEXT("why.draft.open (the M toast: ms.begin.already)"), MsKey(Key), FString(TEXT("why.draft.open")));
+    TestEqual(TEXT("ms.begin.already text"), FS09Reason::Make(TEXT("ms.begin.already")).Text(),
+              FString(TEXT("Maneuver already begun — Enter confirms")));
+  }
+
+  // ---- graph board: toasts name spaces by CellLabel, never (x,y) (B-04) ----
+  {
+    const FS08BoardModel Line = MsLine(6);
+    TestTrue(TEXT("graph board"), Line.bHasTopology);
+    const FS08Snapshot Snap = MsSnapshot({{TEXT("c1"), true, 1}});
+    const TArray<FS08BoardFighter> Fighters = {MsFighter(TEXT("a"), Me, 0, 0, 2.0), MsFighter(TEXT("e"), Opp, 4, 0),
+                                               MsFighter(TEXT("b"), Me, 2, 0, 2.0)};
+    FS09CommandUi Ui = MsOpen(Snap, Line, Fighters);
+    FString Reason;
+    TArray<FString> Toasts;
+    TestFalse(TEXT("ally space refused"), Ui.SetDestination(TEXT("a"), 2, 0, Snap, Line, Fighters, Reason));
+    Toasts.Add(Ui.LastReason.Text());
+    TestEqual(TEXT("ally: why.cell.ally"), MsKey(Ui.LastReason), FString(TEXT("why.cell.ally")));
+    TestFalse(TEXT("enemy space refused"), Ui.SetDestination(TEXT("b"), 4, 0, Snap, Line, Fighters, Reason));
+    Toasts.Add(Ui.LastReason.Text());
+    TestFalse(TEXT("too far refused"), Ui.SetDestination(TEXT("a"), 5, 0, Snap, Line, Fighters, Reason));
+    Toasts.Add(Ui.LastReason.Text());
+    FS09Reason Server = FS09Reason::Make(TEXT("why.cell.enemy"));
+    Server.Arg(TEXT("cell"), Line.CellLabel(3, 0));
+    Toasts.Add(Server.Text());
+    TestEqual(TEXT("server reason with the space"), Toasts.Last(), FString(TEXT("S4: An enemy is here")));
+    for (const FString& Toast : Toasts) {
+      TestFalse(FString::Printf(TEXT("no grid coordinates: \"%s\""), *Toast), Toast.Contains(TEXT("(")));
+      TestTrue(FString::Printf(TEXT("a space label: \"%s\""), *Toast), Toast.StartsWith(TEXT("S")));
+    }
+  }
+
+  // ---- a server rejection's toast has every argument (no "?" placeholder) ----
+  {
+    const FS08BoardModel Grid = MsGrid(5, 3);
+    const FS08Snapshot Snap = MsSnapshot({{TEXT("c1"), true, 1}});
+    FS08BoardFighter Stuck = MsFighter(TEXT("s"), Me, 4, 2, 2.0);
+    Stuck.Effects.Add(TEXT("immobilized"));
+    const TArray<FS08BoardFighter> Team = {MsFighter(TEXT("a"), Me, 0, 1, 2.0), Stuck, MsFighter(TEXT("e"), Opp, 4, 0)};
+    FS09CommandUi Ui = MsOpen(Snap, Grid, Team);
+    FString Reason;
+    TestTrue(TEXT("a drafted to (2,1)"), Ui.SetDestination(TEXT("a"), 2, 1, Snap, Grid, Team, Reason));
+    Ui.Moves.AddDefaulted_GetRef().FighterId = TEXT("s"); // what a stale client could have sent
+    Ui.Moves.Last().DestX = 3;
+    Ui.Moves.Last().DestY = 2;
+    Ui.PendingFighterId = TEXT("a");
+    Ui.PendingChoice.bHasValue = true;
+    Ui.PendingChoice.Value = 1;
+    auto MessageOf = [](const FString& Code, bool bEffect) -> FString {
+      if (Code == TEXT("NOT_ENOUGH_MOVEMENT")) {
+        return bEffect ? FString(TEXT("До клетки (2, 0) не добраться за 1 шаг(ов)"))
+                       : FString(TEXT("Путь длиной 3 превышает очки движения бойца (2)"));
+      }
+      if (Code == TEXT("PATH_BLOCKED_BY_ENEMY")) return TEXT("Путь проходит через живого противника на клетке (2, 1)");
+      if (Code == TEXT("PLACE_OUTSIDE_ZONE")) return TEXT("Клетка должна быть в зоне «Medusa»");
+      if (Code == TEXT("FIGHTER_IMMOBILIZED")) return TEXT("Боец обездвижен до конца хода (эффект карты)");
+      return TEXT("text");
+    };
+    for (const FMsRuleRow& Row : MsRuleTable) {
+      for (const bool bEffect : {false, true}) {
+        const FS08Rejection R = FS08RuleCodes::Classify(
+            {MsRuleError(Row.Code, MessageOf(Row.Code, bEffect))},
+            bEffect ? ES08RejectOp::PendingEffect : ES08RejectOp::Maneuver,
+            bEffect ? TArray<FIntPoint>{FIntPoint(1, 1)} : TArray<FIntPoint>{FIntPoint(2, 1), FIntPoint(3, 2)});
+        const FString Text = Ui.RejectionReason(R, Grid, Team).Text();
+        TestFalse(FString::Printf(TEXT("%s (%s): \"%s\" has no placeholder"), Row.Code, bEffect ? TEXT("effect") : TEXT("maneuver"), *Text),
+                  Text.IsEmpty() || Text.Contains(TEXT("?")) || Text.Contains(TEXT("{")));
+      }
+    }
+    const FS08Rejection Zone = FS08RuleCodes::Classify(
+        {MsRuleError(TEXT("PLACE_OUTSIDE_ZONE"), TEXT("Клетка должна быть в зоне «Medusa»"))}, ES08RejectOp::PendingEffect,
+        {FIntPoint(1, 1)});
+    TestEqual(TEXT("the zone fighter from the message"), Ui.RejectionReason(Zone, Grid, Team).Text(),
+              FString(TEXT("(1,1): Choose a space in Medusa's zone")));
+    const FS08Rejection Stiff = FS08RuleCodes::Classify(
+        {MsRuleError(TEXT("FIGHTER_IMMOBILIZED"), TEXT("Боец обездвижен до конца хода (эффект карты)"))},
+        ES08RejectOp::Maneuver, {FIntPoint(2, 1), FIntPoint(3, 2)});
+    TestEqual(TEXT("the immobilized fighter of the draft"), Ui.RejectionReason(Stiff, Grid, Team).Text(),
+              FString(TEXT("s cannot move")));
+    const FS08Rejection Short = FS08RuleCodes::Classify(
+        {MsRuleError(TEXT("NOT_ENOUGH_MOVEMENT"), TEXT("До клетки (2, 0) не добраться за 1 шаг(ов)"))},
+        ES08RejectOp::PendingEffect, {FIntPoint(2, 0)});
+    TestEqual(TEXT("effect: need from the board, have from the message"), Ui.RejectionReason(Short, Grid, Team).Text(),
+              FString(TEXT("(2,0): Not enough movement: need 3, have 1")));
+  }
+
+  // ---- the controller: a rejection is classified, traced, re-read; never resent ----
+  {
+    FS08FlowController Flow(TEXT("http://127.0.0.1:9/graphql"), TEXT("ws://127.0.0.1:9/graphql"), LiveHost);
+    FMsFlowCapture Cap;
+    Cap.Bind(Flow);
+    FS08Snapshot Live;
+    if (!MsLiveFlow(Flow, Live)) {
+      AddError(TEXT("fixture 04 / live stream not ready"));
+      return true;
+    }
+    // Class И: the target space is taken (the server's sequential check).
+    Flow.QueueHttpResultForTest(false, {MsRuleError(TEXT("POSITION_OCCUPIED"), TEXT("Target position is occupied"))});
+    Flow.QueueHttpResultForTest(true, {}, /*bDeferDelivery=*/true); // the refetch: never delivered, no real POST
+    TArray<FS08ManeuverMove> Moves;
+    FS08ManeuverMove& Step = Moves.AddDefaulted_GetRef();
+    Step.FighterId = TEXT("f-0-sk0");
+    Step.Path = {FIntPoint(0, 2)};
+    TestTrue(TEXT("maneuver dispatched"), Flow.SubmitManeuver(TEXT("maneuver:1:5"), Moves));
+    TestEqual(TEXT("one rejection broadcast"), Cap.Rejections.Num(), 1);
+    if (Cap.Rejections.Num() == 1) {
+      TestEqual(TEXT("why.cell.ally"), Cap.Rejections[0].WhyKey.ToString(), FString(TEXT("why.cell.ally")));
+      TestTrue(TEXT("class И"), Cap.Rejections[0].Class == ES08RejectClass::Fixable);
+    }
+    TestEqual(TEXT("MS-REJECT traced"), Cap.Count(TEXT("MS-REJECT code=POSITION_OCCUPIED why=why.cell.ally class=И")), 1);
+    TestEqual(TEXT("the snapshot is re-read"), Flow.CountHttpSendsForTest(MsStateDoc), 1);
+    TestEqual(TEXT("the maneuver is not resent"), Flow.CountHttpSendsForTest(MsManeuverDoc), 1);
+    TestFalse(TEXT("an answered rejection is no recovery lock"), Flow.IsMutationRecoveryActiveForTest());
+
+    // Class С with no code at all (a guard): why.command.rejected, re-read.
+    FS08FlowController Guarded(TEXT("http://127.0.0.1:9/graphql"), TEXT("ws://127.0.0.1:9/graphql"), LiveHost);
+    FMsFlowCapture GuardCap;
+    GuardCap.Bind(Guarded);
+    if (MsLiveFlow(Guarded, Live)) {
+      FS08GraphQLError Guard;
+      Guard.Code = TEXT("BAD_REQUEST");
+      Guard.Message = TEXT("Not your turn. Current player: x");
+      Guarded.QueueHttpResultForTest(false, {Guard});
+      Guarded.QueueHttpResultForTest(true, {}, /*bDeferDelivery=*/true);
+      TestTrue(TEXT("guarded maneuver dispatched"), Guarded.SubmitManeuver(TEXT("maneuver:1:5"), Moves));
+      TestTrue(TEXT("why.command.rejected, class С"),
+               GuardCap.Rejections.Num() == 1 && GuardCap.Rejections[0].WhyKey == FName(TEXT("why.command.rejected")) &&
+                   GuardCap.Rejections[0].Class == ES08RejectClass::State);
+      TestEqual(TEXT("guard: re-read"), Guarded.CountHttpSendsForTest(MsStateDoc), 1);
+    } else {
+      AddError(TEXT("second live stream not ready"));
+    }
+  }
+
+  // ---- the draft after a rejection: И keeps it, С rebuilds or closes it ----
+  {
+    const FS08BoardModel Board = MsGrid(5, 5);
+    const TArray<FMsCard> Hand = {{TEXT("c2"), true, 2}};
+    const FS08Snapshot Snap = MsSnapshot(Hand, ManeuverA, 5);
+    const TArray<FS08BoardFighter> Fighters = {MsFighter(TEXT("a"), Me, 0, 0), MsFighter(TEXT("b"), Me, 4, 4)};
+    FString Reason;
+    FS09CommandUi Ui = MsOpen(Snap, Board, Fighters);
+    TestTrue(TEXT("drafted"), Ui.SetDestination(TEXT("a"), 2, 0, Snap, Board, Fighters, Reason));
+    // The refetch of an И rejection returns the same state: the draft is kept and re-checked.
+    Ui.OnSnapshot(Snap, Board, Fighters);
+    TestEqual(TEXT("И: the move is kept"), Ui.Moves.Num(), 1);
+    // С, the same pendingManeuver at a new seq: rebuilt (re-evaluated), not deleted.
+    TArray<FS08BoardFighter> Moved = Fighters;
+    Moved.Add(MsFighter(TEXT("e"), Opp, 2, 0));
+    Ui.OnSnapshot(MsSnapshot(Hand, ManeuverA, 6), Board, Moved);
+    TestEqual(TEXT("С, same maneuver: rebuilt, kept"), Ui.Moves.Num(), 1);
+    TestEqual(TEXT("С, same maneuver: now a Conflict"), MsStatus(MsMove(Ui, TEXT("a"))), FString(TEXT("conflict")));
+    // С, the maneuver is gone: closed.
+    Ui.OnSnapshot(MsSnapshot(Hand, FString(), 7), Board, Fighters);
+    TestTrue(TEXT("С, maneuver closed: draft closed"), Ui.Mode == ES09CommandMode::None && Ui.Moves.Num() == 0);
+  }
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09MoveSelInFlightGateTest, "Unmatched.S09.MoveSel.InFlightGate",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS09MoveSelInFlightGateTest::RunTest(const FString&) {
+  TArray<FS08ManeuverMove> Moves;
+  FS08ManeuverMove& Step = Moves.AddDefaulted_GetRef();
+  Step.FighterId = TEXT("f-0-sk0");
+  Step.Path = {FIntPoint(0, 2)};
+
+  // ---- 10 confirms -> 1 mutation; the gate closes in the same call ----
+  // ---- 3 s -> why.syncing; a snapshot that closes the maneuver releases the
+  //      gate before the HTTP answer; the late answer is only traced ----
+  {
+    FS08FlowController Flow(TEXT("http://127.0.0.1:9/graphql"), TEXT("ws://127.0.0.1:9/graphql"), LiveHost);
+    FMsFlowCapture Cap;
+    Cap.Bind(Flow);
+    FS08Snapshot Live;
+    if (!MsLiveFlow(Flow, Live)) {
+      AddError(TEXT("fixture 04 / live stream not ready"));
+      return true;
+    }
+    Flow.QueueHttpResultForTest(false, {MsRuleError(TEXT("MANEUVER_NOT_OPEN"), TEXT("late"))}, /*bDeferDelivery=*/true);
+    TestTrue(TEXT("first confirm dispatched"), Flow.SubmitManeuver(TEXT("maneuver:1:5"), Moves));
+    TestTrue(TEXT("in flight in the same call (\"Sent...\" within a frame)"), Flow.IsManeuverInFlight());
+    for (int32 Press = 1; Press < 10; ++Press) Flow.SubmitManeuver(TEXT("maneuver:1:5"), Moves);
+    TestEqual(TEXT("10 presses -> 1 mutation"), Flow.CountHttpSendsForTest(MsManeuverDoc), 1);
+    Flow.TickConnectivity(2.9f);
+    TestFalse(TEXT("not slow before 3 s"), Flow.IsCommandSlow());
+    Flow.TickConnectivity(0.2f);
+    TestTrue(TEXT("slow after 3 s (why.syncing)"), Flow.IsCommandSlow());
+    TestEqual(TEXT("MS-NET slow traced"), Cap.Count(TEXT("MS-NET slow op=maneuver")), 1);
+    // The WS snapshot of the applied maneuver (seq + 1, no pendingManeuver).
+    Flow.InjectWsFrameForTest(MsWsMetaFrame(MsWithoutManeuver(Live, Live.SequenceNumber + 1), Live.SequenceNumber + 1));
+    TestFalse(TEXT("the snapshot released the gate"), Flow.IsManeuverInFlight());
+    TestEqual(TEXT("released by snapshot (traced)"), Cap.Count(TEXT("MS-NET gate released by snapshot op=maneuver")), 1);
+    TestFalse(TEXT("no longer slow"), Flow.IsCommandSlow());
+    const int32 ErrorsBefore = Cap.FlowErrors;
+    Flow.DeliverQueuedHttpForTest(); // the late HTTP answer
+    TestEqual(TEXT("late reply traced"), Cap.Count(TEXT("MS-NET late-reply op=maneuver ok=0 settled=snapshot")), 1);
+    TestEqual(TEXT("late reply: no error shown"), Cap.FlowErrors, ErrorsBefore);
+    TestEqual(TEXT("late reply: no rejection"), Cap.Rejections.Num(), 0);
+    TestEqual(TEXT("late reply: no refetch"), Flow.CountHttpSendsForTest(MsStateDoc), 0);
+    Flow.TickConnectivity(20.0f);
+    TestFalse(TEXT("a settled command has no deadline"), Flow.IsMutationRecoveryActiveForTest());
+  }
+
+  // ---- 10 s -> deadline: cancelled, outcome unknown, recovery lock, no resend ----
+  {
+    FS08FlowController Flow(TEXT("http://127.0.0.1:9/graphql"), TEXT("ws://127.0.0.1:9/graphql"), LiveHost);
+    FMsFlowCapture Cap;
+    Cap.Bind(Flow);
+    FS08Snapshot Live;
+    if (!MsLiveFlow(Flow, Live)) {
+      AddError(TEXT("live stream not ready (deadline)"));
+      return true;
+    }
+    Flow.QueueHttpResultForTest(true, {}, /*bDeferDelivery=*/true); // the maneuver: no answer
+    Flow.QueueHttpResultForTest(true, {}, /*bDeferDelivery=*/true); // the recovery read: never delivered
+    TestTrue(TEXT("dispatched"), Flow.SubmitManeuver(TEXT("maneuver:1:5"), Moves));
+    Flow.TickConnectivity(9.9f);
+    TestTrue(TEXT("still waiting at 9.9 s"), Flow.IsManeuverInFlight() && !Flow.IsMutationRecoveryActiveForTest());
+    Flow.TickConnectivity(0.2f);
+    TestEqual(TEXT("MS-NET deadline traced"), Cap.Count(TEXT("MS-NET deadline op=maneuver")), 1);
+    TestTrue(TEXT("outcome unknown: recovery lock (MS-S-10)"), Flow.IsMutationRecoveryActiveForTest());
+    TestFalse(TEXT("the command gate is not the in-flight flag any more"), Flow.IsManeuverInFlight());
+    TestEqual(TEXT("the recovery reads the state"), Flow.CountHttpSendsForTest(MsStateDoc), 1);
+    TestEqual(TEXT("no resend"), Flow.CountHttpSendsForTest(MsManeuverDoc), 1);
+    FString Reason;
+    TestFalse(TEXT("commands locked while recovering"), Flow.SubmitManeuver(TEXT("maneuver:1:5"), Moves));
+    TestEqual(TEXT("why.syncing while locked"), Flow.GameplayGateKey().ToString(), FString(TEXT("why.syncing")));
+    Flow.DeliverQueuedHttpForTest(); // the maneuver answer after its deadline
+    TestEqual(TEXT("late reply after the deadline"), Cap.Count(TEXT("MS-NET late-reply op=maneuver ok=1 settled=deadline")), 1);
+    TestEqual(TEXT("still exactly one maneuver"), Flow.CountHttpSendsForTest(MsManeuverDoc), 1);
+  }
+
+  // ---- begin: a snapshot that opens my pendingManeuver releases the gate;
+  //      an answered STATE_CHANGED is re-read, never re-sent ----
+  {
+    FS08FlowController Flow(TEXT("http://127.0.0.1:9/graphql"), TEXT("ws://127.0.0.1:9/graphql"), LiveHost);
+    FMsFlowCapture Cap;
+    Cap.Bind(Flow);
+    FS08Snapshot Before;
+    if (!MsLiveFlow(Flow, Before, /*bWithoutManeuver=*/true)) {
+      AddError(TEXT("live stream not ready (begin)"));
+      return true;
+    }
+    FS08Snapshot Live;
+    MsLoadLiveSnapshot(Live);
+    Flow.QueueHttpResultForTest(true, {}, /*bDeferDelivery=*/true);
+    TestTrue(TEXT("begin dispatched"), Flow.BeginManeuver());
+    TestTrue(TEXT("begin in flight"), Flow.IsManeuverInFlight());
+    FS08Snapshot Opened = Live;
+    Opened.SequenceNumber = Before.SequenceNumber + 1;
+    Flow.InjectWsFrameForTest(MsWsMetaFrame(Opened, Opened.SequenceNumber));
+    TestFalse(TEXT("my pendingManeuver opened by WS: gate released"), Flow.IsManeuverInFlight());
+    TestEqual(TEXT("begin released by snapshot"), Cap.Count(TEXT("MS-NET gate released by snapshot op=begin")), 1);
+    Flow.DeliverQueuedHttpForTest();
+    TestEqual(TEXT("late begin answer traced only"), Cap.Count(TEXT("MS-NET late-reply op=begin")), 1);
+
+    FS08FlowController Stale(TEXT("http://127.0.0.1:9/graphql"), TEXT("ws://127.0.0.1:9/graphql"), LiveHost);
+    FMsFlowCapture StaleCap;
+    StaleCap.Bind(Stale);
+    if (MsLiveFlow(Stale, Before, /*bWithoutManeuver=*/true)) {
+      Stale.QueueHttpResultForTest(false, {MsRuleError(TEXT("STATE_CHANGED"), TEXT("State changed; reload before beginning maneuver"))});
+      Stale.QueueHttpResultForTest(true, {}, /*bDeferDelivery=*/true);
+      TestTrue(TEXT("stale begin dispatched"), Stale.BeginManeuver());
+      TestTrue(TEXT("why.state.changed"), StaleCap.Rejections.Num() == 1 &&
+                                              StaleCap.Rejections[0].WhyKey == FName(TEXT("why.state.changed")));
+      TestEqual(TEXT("STATE_CHANGED: re-read"), Stale.CountHttpSendsForTest(MsStateDoc), 1);
+      TestEqual(TEXT("STATE_CHANGED: begin not repeated (MS-E-50)"), Stale.CountHttpSendsForTest(MsBeginDoc), 1);
+    } else {
+      AddError(TEXT("live stream not ready (stale begin)"));
+    }
+  }
+
+  // ---- a late SUCCESS answer is merged (decks ride only in HTTP bodies) ----
+  {
+    FS08FlowController Flow(TEXT("http://127.0.0.1:9/graphql"), TEXT("ws://127.0.0.1:9/graphql"), LiveHost);
+    FMsFlowCapture Cap;
+    Cap.Bind(Flow);
+    FS08Snapshot Live;
+    if (!MsLiveFlow(Flow, Live)) {
+      AddError(TEXT("live stream not ready (late success)"));
+      return true;
+    }
+    const int32 Next = Live.SequenceNumber + 1;
+    const FString Inner = FString::Printf(
+        TEXT("{\\\"players\\\":[{\\\"userId\\\":\\\"%s\\\"},{\\\"userId\\\":\\\"p-x\\\"}],")
+        TEXT("\\\"decks\\\":{\\\"%s\\\":{\\\"count\\\":3}}}"),
+        LiveHost, LiveHost);
+    const FString Body = FString::Printf(
+        TEXT("{\"data\":{\"maneuver\":{\"state\":\"%s\",\"sequenceNumber\":%d,\"phase\":\"%s\",")
+        TEXT("\"turnCount\":%d,\"currentTurnPlayerId\":\"%s\"}}}"),
+        *Inner, Next, *Live.Phase, Live.TurnCount, *Live.CurrentTurnPlayerId);
+    Flow.QueueHttpResultForTest(true, {}, /*bDeferDelivery=*/true, Body);
+    TestTrue(TEXT("dispatched"), Flow.SubmitManeuver(TEXT("maneuver:1:5"), Moves));
+    Flow.InjectWsFrameForTest(MsWsMetaFrame(MsWithoutManeuver(Live, Next), Next));
+    TestFalse(TEXT("released by the WS snapshot"), Flow.IsManeuverInFlight());
+    const int32 DecksBefore = Flow.GetDecksSeq();
+    Flow.DeliverQueuedHttpForTest();
+    TestEqual(TEXT("the late success body is merged"), Cap.Count(FString::Printf(TEXT("MS-NET late-reply merged seq=%d (merge)"), Next)), 1);
+    TestTrue(TEXT("its decks are fresh"), Flow.GetDecksSeq() == Next && DecksBefore != Next);
+    TestFalse(TEXT("no gate change"), Flow.IsManeuverInFlight());
+    TestEqual(TEXT("no rejection"), Cap.Rejections.Num(), 0);
+  }
+
+  // ---- the match is left with the command in flight: its deadline locks nothing ----
+  {
+    FS08FlowController Flow(TEXT("http://127.0.0.1:9/graphql"), TEXT("ws://127.0.0.1:9/graphql"), LiveHost);
+    FS08Snapshot Live;
+    if (!MsLiveFlow(Flow, Live)) {
+      AddError(TEXT("live stream not ready (left match)"));
+      return true;
+    }
+    Flow.QueueHttpResultForTest(true, {}, /*bDeferDelivery=*/true);
+    TestTrue(TEXT("dispatched"), Flow.SubmitManeuver(TEXT("maneuver:1:5"), Moves));
+    Flow.SetRoomForTest(TEXT("ms-net-game"), ES08Stage::Room); // the stage left Started
+    Flow.TickConnectivity(11.0f);
+    TestFalse(TEXT("no recovery lock after the match is gone"), Flow.IsMutationRecoveryActiveForTest());
+    TestFalse(TEXT("no slow banner either"), Flow.IsCommandSlow());
+  }
+
+  // ---- 429: why.syncing, no automatic retry, controls stay usable ----
+  {
+    FS08FlowController Flow(TEXT("http://127.0.0.1:9/graphql"), TEXT("ws://127.0.0.1:9/graphql"), LiveHost);
+    FMsFlowCapture Cap;
+    Cap.Bind(Flow);
+    FS08Snapshot Live;
+    if (!MsLiveFlow(Flow, Live)) {
+      AddError(TEXT("live stream not ready (429)"));
+      return true;
+    }
+    FS08GraphQLError Throttled;
+    Throttled.Code = TEXT("RATE_LIMIT");
+    Throttled.Message = TEXT("HTTP 429 from server");
+    Throttled.HttpStatus = 429;
+    Flow.QueueHttpResultForTest(false, {Throttled});
+    TestTrue(TEXT("dispatched"), Flow.SubmitManeuver(TEXT("maneuver:1:5"), Moves));
+    TestTrue(TEXT("why.syncing"), Cap.Rejections.Num() == 1 && Cap.Rejections[0].WhyKey == FName(TEXT("why.syncing")));
+    TestEqual(TEXT("no automatic retry"), Flow.CountHttpSendsForTest(MsManeuverDoc), 1);
+    TestEqual(TEXT("no refetch"), Flow.CountHttpSendsForTest(MsStateDoc), 0);
+    FString Reason;
+    TestTrue(TEXT("controls stay usable"), Flow.CanIssueGameplayCommand(Reason));
+  }
+  return true;
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09MoveSelReconnectAndRebuildTest, "Unmatched.S09.MoveSel.ReconnectAndRebuild",
                                  EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FS09MoveSelReconnectAndRebuildTest::RunTest(const FString&) {
@@ -1227,6 +1874,64 @@ bool FS09MoveSelReconnectAndRebuildTest::RunTest(const FString&) {
     MsBindCache(Fresh, Flow);
     Fresh.OnSnapshot(MsSnapshot(Hand, FString(), 40), Board, Fighters);
     TestFalse(TEXT("closed maneuver seen by a fresh UI: cache cleared"), Flow.RecallManeuverDraft(ManeuverA, Cached));
+  }
+
+  // ---- MS-T-06 (MS-E-91, MS-E-92, MS-E-51): the stream reconnects, the
+  // session is refreshed, the outcome is unknown - the command is never
+  // resent and the draft stays ----
+  {
+    FS09CommandUi Ui;
+    Ui.ViewerId = Me;
+    Ui.OnSnapshot(Snap, Board, Fighters);
+    TestTrue(TEXT("draft for the network cases"), Ui.SetDestination(TEXT("a"), 3, 1, Snap, Board, Fighters, Reason));
+    TArray<FS08ManeuverMove> Moves;
+    FS08ManeuverMove& Step = Moves.AddDefaulted_GetRef();
+    Step.FighterId = TEXT("f-0-sk0");
+    Step.Path = {FIntPoint(0, 2)};
+
+    FS08FlowController Down(TEXT("http://127.0.0.1:9/graphql"), TEXT("ws://127.0.0.1:9/graphql"), LiveHost);
+    FS08Snapshot LiveSnap;
+    if (!MsLiveFlow(Down, LiveSnap)) {
+      AddError(TEXT("fixture 04 / live stream not ready"));
+      return true;
+    }
+    Down.DropWsForTest();
+    TestFalse(TEXT("stream reconnecting: confirm inactive"), Down.SubmitManeuver(TEXT("maneuver:1:5"), Moves));
+    TestEqual(TEXT("stream reconnecting: why.syncing"), Down.GameplayGateKey().ToString(), FString(TEXT("why.syncing")));
+    TestEqual(TEXT("stream reconnecting: nothing sent"), Down.CountHttpSendsForTest(MsManeuverDoc), 0);
+    TestEqual(TEXT("stream reconnecting: the draft stays"), Ui.Moves.Num(), 1);
+
+    FS08FlowController Auth(TEXT("http://127.0.0.1:9/graphql"), TEXT("ws://127.0.0.1:9/graphql"), LiveHost);
+    FMsFlowCapture AuthCap;
+    AuthCap.Bind(Auth);
+    Auth.SetAuthForTest(TEXT("access-1"), TEXT("refresh-1"));
+    if (MsLiveFlow(Auth, LiveSnap)) {
+      Auth.QueueHttpResultForTest(false, {FS08GraphQLError{TEXT("AUTH"), TEXT("HTTP 401 from server"), FString(), 401}});
+      Auth.QueueHttpResultForTest(true, {}, /*bDeferDelivery=*/true); // the refresh: never delivered
+      TestTrue(TEXT("auth: dispatched"), Auth.SubmitManeuver(TEXT("maneuver:1:5"), Moves));
+      TestEqual(TEXT("auth: one refresh"), Auth.CountHttpSendsForTest(TEXT("refreshTokens(")), 1);
+      TestEqual(TEXT("auth: the command is not resent"), Auth.CountHttpSendsForTest(MsManeuverDoc), 1);
+      TestTrue(TEXT("auth: why.auth.refreshed (class И)"),
+               AuthCap.Rejections.Num() == 1 && AuthCap.Rejections[0].WhyKey == FName(TEXT("why.auth.refreshed")) &&
+                   AuthCap.Rejections[0].Class == ES08RejectClass::Fixable);
+      TestEqual(TEXT("auth: the banner text"), FS09Reason::Make(TEXT("why.auth.refreshed")).Text(),
+                FString(TEXT("Session refreshed — confirm again")));
+      TestEqual(TEXT("auth: the draft stays"), Ui.Moves.Num(), 1);
+    } else {
+      AddError(TEXT("live stream not ready (auth)"));
+    }
+
+    FS08FlowController Lost(TEXT("http://127.0.0.1:9/graphql"), TEXT("ws://127.0.0.1:9/graphql"), LiveHost);
+    if (MsLiveFlow(Lost, LiveSnap)) {
+      Lost.QueueHttpResultForTest(false, {FS08GraphQLError{TEXT("TRANSPORT"), TEXT("lost"), FString()}});
+      Lost.QueueHttpResultForTest(true, {}, /*bDeferDelivery=*/true); // the recovery read
+      TestTrue(TEXT("lost: dispatched"), Lost.SubmitManeuver(TEXT("maneuver:1:5"), Moves));
+      TestTrue(TEXT("lost: recovery lock"), Lost.IsMutationRecoveryActiveForTest());
+      TestFalse(TEXT("lost: a second confirm is refused"), Lost.SubmitManeuver(TEXT("maneuver:1:5"), Moves));
+      TestEqual(TEXT("lost: 0 resends"), Lost.CountHttpSendsForTest(MsManeuverDoc), 1);
+    } else {
+      AddError(TEXT("live stream not ready (lost)"));
+    }
   }
   return true;
 }

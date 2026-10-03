@@ -17,6 +17,7 @@
 import { Resolver, Mutation, Args, Context } from '@nestjs/graphql';
 import { UseGuards, Logger } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
+import { GraphQLError } from 'graphql';
 import { GqlAuthGuard } from '../../auth/guards/gql-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { GameStateService, GameState } from '../game-state.service';
@@ -129,12 +130,21 @@ export class GameActionsResolver {
   }
 
   /**
-   * Обработка ошибок выполнения действия с логированием
+   * Обработка ошибок выполнения действия с логированием.
+   * MS-T-06 (move-selection 04 §4.2): a rejection with a rule code becomes a
+   * GraphQLError with extensions { code: 'BAD_USER_INPUT', ruleCode } -
+   * formatGraphqlError passes ruleCode through in development AND production;
+   * the message text is unchanged for old clients and the web. A rejection
+   * without a code keeps the previous BadRequestException.
    */
-  private handleActionResult(result: { success: boolean; error?: string }, actionName: string): void {
+  private handleActionResult(result: { success: boolean; error?: string; code?: string }, actionName: string): void {
     if (!result.success) {
-      this.logger.warn(`${actionName} failed: ${result.error}`);
-      throw new BadRequestException(result.error || `${actionName} failed`);
+      this.logger.warn(`${actionName} failed: ${result.error}${result.code ? ` [${result.code}]` : ''}`);
+      const message = result.error || `${actionName} failed`;
+      if (result.code) {
+        throw new GraphQLError(message, { extensions: { code: 'BAD_USER_INPUT', ruleCode: result.code } });
+      }
+      throw new BadRequestException(message);
     }
   }
 
@@ -145,7 +155,7 @@ export class GameActionsResolver {
     dto: T,
     userId: string,
     actionName: string,
-    executor: (context: ActionContext) => Promise<{ success: boolean; gameState?: GameState; error?: string }>,
+    executor: (context: ActionContext) => Promise<{ success: boolean; gameState?: GameState; error?: string; code?: string }>,
     eventType: string,
     scheduleAutoResolve?: boolean,
   ): Promise<GameMutationResult> {
@@ -246,7 +256,11 @@ export class GameActionsResolver {
 
           return createMutationResult(filteredState);
         } catch (error) {
-          if (error instanceof BadRequestException || error instanceof ConflictException) {
+          if (
+            error instanceof BadRequestException ||
+            error instanceof ConflictException ||
+            error instanceof GraphQLError
+          ) {
             throw error;
           }
           this.logger.error(`Unexpected error in ${actionName}: ${error}`);

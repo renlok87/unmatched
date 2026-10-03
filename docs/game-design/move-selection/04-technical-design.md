@@ -201,6 +201,29 @@ highlightCards = карты с BOOST >= max(required_i по NeedBoost), кром
 `extensions.code`; клиент сейчас читает только `extensions.code` (`S08Contracts.cpp:263-269`) и получает поле
 `RuleCode` в MS-T-06. Текст ошибки остаётся для старых клиентов и веба.
 
+Уточнение MS-T-06 (реализация):
+- Сервер. Кроме мест таблицы 02 §1.1 код получают ранние отказы `resolvePendingEffect`: открыт
+  `pendingManeuver`/`pendingHandDiscard` — `PENDING_CHOICE_OPEN`, конец игры — `GAME_OVER`, выбор не найден или не голова
+  очереди — `STATE_CHANGED`, боец вне `fighterIds` эффекта — `PENDING_WRONG_FIGHTER`, «Боец не найден или повержен» —
+  `FIGHTER_NOT_FOUND` или `FIGHTER_DEFEATED`. Тексты сообщений не менялись. Отказ без кода (остальные мутации, «выбор
+  принадлежит другому игроку») остаётся `BadRequestException`, ответы guard'ов не менялись — клиент показывает для них
+  `why.command.rejected` (так `NOT_YOUR_TURN` и `INVALID_PHASE` при обычном запросе приходят от `ActionPhaseGuard` без
+  `ruleCode`; с кодом они доходят только из исполнителя). `formatError` вынесен в экспортируемую `formatGraphqlError`:
+  в production бизнес-ошибка с `ruleCode` получает `extensions: { code, ruleCode }`, системная — только `ruleCode`, если
+  он есть. Apollo отвечает на такой отказ HTTP 200 (проверено в `maneuver-error-codes.spec.ts`), клиент читает его из
+  `errors[]`.
+- Клиент. Таблица 02 §1.1 — `FS08RuleCodes::Classify` (`S08/S08Contracts.h`): ключ `why.*`, класс И/С, клетка из текста
+  (`PATH_BLOCKED_BY_ENEMY` на конце хода → `why.cell.enemy`), `need`/`have` из текста `NOT_ENOUGH_MOVEMENT`; лимит
+  запросов → `why.syncing` без перечитывания; без кода или неизвестный код → `why.command.rejected`. Недостающие
+  аргументы тоста заполняет `FS09CommandUi::RejectionReason` (пространство по одному концу хода команды, имя бойца из
+  черновика или pending-выбора и из «…» текста `PLACE_OUTSIDE_ZONE`, `need` — путь на снапшоте, `have` — допуск;
+  пути нет — `why.cell.no.path`), поэтому в тосте нет «?». Оба класса
+  перечитывают снапшот (`FetchGameState`), команда не повторяется. Трасса `MS-REJECT code=<ruleCode|-> why=<key>
+  class=<И|С> op=<begin|maneuver|pending>`: контроллер не знает `CellLabel`, поэтому пространство пишет трасса тоста
+  `TOAST why=<key> text="…"` режима игры. EN-тексты по ключам — таблица кода `S08/S08WhyText` (столбец `en`
+  `why-reasons.json`, тест сверяет побайтно; RU и StringTable — MS-T-28). Новый ключ `ms.begin.already` («Maneuver
+  already begun — Enter confirms») — тост клавиши M в черновике (03 §3.2, B-03).
+
 ### 4.3. `metadata.lastMovement` (новое, публичное, аддитивное)
 
 ```json
@@ -387,6 +410,19 @@ pending MOVE с таким бойцом нет): резолв MOVE/PLACE тре�
 | Дубли HTTP-эхо и WS | seq-guard, один cue на seq (`S08FlowController.cpp:1327-1358`) | анимация по первому применению seq (QA-007) | MS-P-01/02 |
 | Барьер, пропуск seq | cue не выпускается | снап без анимации (MS-E-71) | — |
 | Снапшот с новым seq во время черновика | — | черновик пересчитывается §3.2 (Conflict/NeedBoost); стек отката очищается | MS-S-06/07 |
+
+Уточнение MS-T-06 (реализация): дедлайн считает `FS08FlowController` (`TickConnectivity`), а не таймаут HTTP-модуля —
+так одинаково работают живая сеть и офлайн-харнесс тестов. Команда `beginManeuver`/`maneuver` получает токен; через 3 с
+`IsCommandSlow()` (баннер `why.syncing`, трасса `MS-NET slow`), через 10 с запрос отменяется (`CancelRequest`, `Execute`
+возвращает запрос), трасса `MS-NET deadline`, `EnterMutationRecovery` без повтора. Снапшот снимает гейт, если его seq
+больше seq отправки и **его собственные** метаданные показывают итог (`begin` — открыт мой `pendingManeuver`;
+`maneuver` — `pendingManeuver` с этим id закрыт); частичное тело без `metadata` ничего не доказывает. Ответ на уже
+закрытый токен (снапшотом, дедлайном или отменой) не трогает гейт и не показывает ошибок: трасса
+`MS-NET late-reply op=<…> ok=<0|1> settled=<snapshot|deadline>`. Отступление от буквы MS-E-90 («только трасса»), решение
+ревью MS-T-06: **успешное** позднее тело всё же сливается через seq-guard (`MS-NET late-reply merged seq=<n>`) — события
+WS не несут `decks`, и без него счётчик колоды после своего `begin`/`maneuver` остаётся устаревшим (нужен MS-S-04). Тело
+того же seq сливается без cue; более новое применяется (после дедлайна оно и есть исход и снимает recovery-lock). Ход,
+открытый в момент выхода из матча, истечения сессии или отмены комнаты, закрывается без дедлайна.
 
 `expectedSequenceNumber` в `maneuver` не добавляется, пока не найдено, что состояние может измениться между `begin` и
 `maneuver` не по воле игрока (MS-Q-06; проверка — MS-T-14). Если найдётся — добавить необязательным полем DTO.
