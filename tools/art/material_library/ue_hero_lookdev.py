@@ -24,8 +24,9 @@ Review config (JSON): {"hero", "run_dir" (skeletal-adopt run), "concept": {"fron
 "variants": {"neutral"|"Blue"|"Red"|"debug": MI package}, "base_mi": {variant: MI package}, "zones": [class ids],
 "key_zones": [...] (exposure anchor: geometric mean over these), "tolerance": {"luma_ratio", "hue_deg", "sat"},
 "legacy_render_gate": {...}, "previous": [{"label", "frames_dir"}] (older UE frames for the sheets)}.
-Look-dev C (2026-09-30) keys, all optional: "zone_class" {zone: preset class id} (zones named apart from their MatID
-class, e.g. two feather zones of one class, or horn_claw in the brass column), "decode_classes" [class ids] (every class
+Look-dev C (2026-09-30) keys, all optional: "zone_class" {zone: preset class id, or a list of ids = their union (ART-016:
+a class split into two columns)} (zones named apart from their MatID class, e.g. two feather zones of one class, or
+horn_claw in the brass column), "decode_classes" [class ids] (every class
 of the hero's MatID, for the debug-colour decode), "gate_on_variant" (render_gates evaluated once per view on that
 variant's frame and the same pixels used for every variant, e.g. "neutral": a -1 EV or dyed frame then measures the
 same pixels), "team_variants" [two variant names] (= "teams"; sheet columns), "sheet_label" (column label prefix,
@@ -345,7 +346,20 @@ def _cmd_review(a, cfg) -> dict:
     if not ue_rep.get("passed"):
         raise SystemExit("the run's ue-import did not pass")
     names = ue_rep["destination"]["assets"]
-    light = json.loads(PROFILES_JSON.read_text(encoding="utf-8"))["lightProfiles"][LIGHT_PROFILE]
+    profiles = json.loads(PROFILES_JSON.read_text(encoding="utf-8"))["lightProfiles"]
+    light_source = "%s lightProfiles.%s" % (rel(PROFILES_JSON), LIGHT_PROFILE)
+    if LIGHT_PROFILE in profiles:
+        light = profiles[LIGHT_PROFILE]
+    elif cfg.get("light_profile_pinned"):
+        # 2026-10-04 (real boards only, ND-5): cobble-probe left S08ArtBoardProfiles.json; a look-dev series keeps the
+        # exact light of its earlier captures: the data recorded in the pinned review report (same light, same numbers)
+        pinned = REPO / cfg["light_profile_pinned"]
+        light = json.loads(pinned.read_text(encoding="utf-8"))["light_profile"]["data"]
+        light_source = "%s light_profile.data (pinned: %s removed from %s by ND-5, 2026-10-04)" % (
+            rel(pinned), LIGHT_PROFILE, rel(PROFILES_JSON))
+    else:
+        raise SystemExit("light profile %s is not in %s and the config pins none (light_profile_pinned)"
+                         % (LIGHT_PROFILE, rel(PROFILES_JSON)))
     out = Path(a.out).resolve()
     out.mkdir(parents=True, exist_ok=True)
     ue = Ue()
@@ -362,7 +376,7 @@ def _cmd_review(a, cfg) -> dict:
               "kind": "EDITOR review frames (live UnrealEditor via MCP): not packaged, no HUD, no RENDER fingerprint, "
                       "not K1/K2 acceptance", "config": cfg, "assets": names, "original_level": original,
               "review_level": LEVEL, "cell": CELL,
-              "light_profile": {"source": "%s lightProfiles.%s" % (rel(PROFILES_JSON), LIGHT_PROFILE), "data": light},
+              "light_profile": {"source": light_source, "data": light},
               "key_rotation_pitch_yaw_roll": KEY_ROTATION, "scalability_before": sg_before, "console": []}
     temp = [L_FIG, L_BASE, L_SKY, L_CAM]
     variants = cfg["variants"]
@@ -720,6 +734,22 @@ def zone_region(cfg, zone: str, view: str, cls):
     return m
 
 
+def zone_classes(cfg, ids: dict) -> dict:
+    """zone -> tuple of MatID columns of the zone: cfg["zone_class"][zone] is a preset class id or a LIST of ids (the
+    union: a class split into two columns keeps the zone definition, e.g. ART-016 feathers + metal_forged = the slot of
+    feathers_flight); default = the zone name itself."""
+    zc = cfg.get("zone_class") or {}
+    out = {}
+    for z in cfg["zones"]:
+        v = zc.get(z, z)
+        out[z] = tuple(ids[c] for c in (v if isinstance(v, list) else [v]))
+    return out
+
+
+def zone_mask(cls, cids) -> np.ndarray:
+    return np.isin(cls, list(cids))
+
+
 def load_frame(out: Path, hero: str, tag: str, name: str):
     p = out / "frames" / ("%s-%s-%s.png" % (hero.lower(), tag, name))
     return np.asarray(Image.open(p).convert("RGB")) if p.is_file() else None
@@ -732,9 +762,8 @@ def cmd_measure(a, cfg) -> dict:
     names = {c["index"]: c["id"] for c in presets["classes"]}
     ids = {v: k for k, v in names.items()}
     zones_cfg = cfg["zones"]
-    zone_class = cfg.get("zone_class") or {}
-    cls_of = {z: ids[zone_class.get(z, z)] for z in zones_cfg}
-    classes = sorted(set(cls_of.values()) | {ids[c] for c in cfg.get("decode_classes") or []} | {0})
+    cls_of = zone_classes(cfg, ids)
+    classes = sorted({c for cs in cls_of.values() for c in cs} | {ids[c] for c in cfg.get("decode_classes") or []} | {0})
     gate_on = cfg.get("gate_on_variant")
     concept = json.loads((REPO / cfg["concept_zones"]).read_text(encoding="utf-8"))["zones"]
     gates = cfg.get("render_gates") or {}
@@ -755,8 +784,7 @@ def cmd_measure(a, cfg) -> dict:
         Image.fromarray(vis).save(out / "frames" / ("%s-%s-%s-classmap.png" % (hero.lower(), tag, view)))
         per_view[view] = {}
         for zone in zones_cfg:
-            c = cls_of[zone]
-            m = erode(cls == c, 1)
+            m = erode(zone_mask(cls, cls_of[zone]), 1)
             reg = zone_region(cfg, zone, view, cls)
             if reg is not None:
                 m &= reg

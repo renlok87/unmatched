@@ -61,7 +61,8 @@
    "expected": "H3 BC except the cord texels, the dielectric luminance clamp and the UE feedback gains (5c-B0, round 2)",
    "measured": {
     "by_class": {
-     "feathers": 4846746,
+     "feathers": 2170312,
+     "feathers_flight": 2676434,
      "horn_claw": 86031,
      "leather_smooth": 48113,
      "skin": 637056
@@ -74,6 +75,13 @@
    "expected": "<= 5 %",
    "measured": {
     "feathers": {
+     "range": [
+      0.008,
+      0.7
+     ],
+     "share_outside": 0.0
+    },
+    "feathers_flight": {
      "range": [
       0.008,
       0.7
@@ -164,7 +172,7 @@
    "expected": "half values equal",
    "measured": {
     "bytes": 2196,
-    "dds_sha256": "732baf0a1a061e06fa01d70611e9ba3879e39935a3a04620d4c93d4552033fe4"
+    "dds_sha256": "778044d6c6da95433106b7288a712a3b55fed6e4305c7d0fbaad54f32859eb56"
    },
    "passed": true
   },
@@ -176,6 +184,7 @@
   "matid_values_valid": {
    "expected": "index x 16 + 8",
    "measured": [
+    56,
     72,
     88,
     120,
@@ -200,16 +209,34 @@
       "B_mean": 0.0,
       "B_min": 0,
       "ok": true,
-      "texels": 1748974
+      "texels": 1432358
      },
      "4k": {
       "B_max": 0,
       "B_mean": 0.0,
       "B_min": 0,
       "ok": true,
-      "texels": 7250757
+      "texels": 6134237
      },
      "column": 12,
+     "preset_metallic": 0
+    },
+    "feathers_flight": {
+     "2k": {
+      "B_max": 0,
+      "B_mean": 0.0,
+      "B_min": 0,
+      "ok": true,
+      "texels": 220497
+     },
+     "4k": {
+      "B_max": 0,
+      "B_mean": 0.0,
+      "B_min": 0,
+      "ok": true,
+      "texels": 1116520
+     },
+     "column": 3,
      "preset_metallic": 0
     },
     "gold_antique": {
@@ -313,24 +340,54 @@
    "passed": true
   }
  },
+ "class_splits": {
+  "feathers_flight": {
+   "column": 3,
+   "from": "feathers",
+   "mask": "dark_primaries",
+   "share_of_figure_area": 0.1595,
+   "share_of_parent_before": 0.1652,
+   "small_components_back_to_parent_texels_4k": 2686,
+   "texels_4k_covered": 1116520,
+   "weight_min": 0.5
+  }
+ },
  "classes": {
   "feathers": {
    "Y_p5_p50_p95": [
-    0.0132,
-    0.049,
-    0.2021
+    0.02,
+    0.0595,
+    0.2125
    ],
    "bc_linear_median": [
-    0.0808,
-    0.0414,
-    0.0254
+    0.1022,
+    0.0496,
+    0.0286
    ],
    "column": 12,
-   "edge_mask_mean": 0.1196,
+   "edge_mask_mean": 0.1244,
    "matid_value": 200,
-   "share_of_figure_area": 0.9655,
-   "team_accent_mean": 0.0573,
-   "texels_4k": 7250757
+   "share_of_figure_area": 0.806,
+   "team_accent_mean": 0.0143,
+   "texels_4k": 6134237
+  },
+  "feathers_flight": {
+   "Y_p5_p50_p95": [
+    0.0129,
+    0.014,
+    0.019
+   ],
+   "bc_linear_median": [
+    0.0174,
+    0.0132,
+    0.0124
+   ],
+   "column": 3,
+   "edge_mask_mean": 0.0936,
+   "matid_value": 56,
+   "share_of_figure_area": 0.1595,
+   "team_accent_mean": 0.294,
+   "texels_4k": 1116520
   },
   "gold_antique": {
    "Y_p5_p50_p95": [
@@ -409,7 +466,7 @@
   "Edge": "R8 linear: EdgeMaskTexture of the v2 master",
   "MatID": "G8 linear (TC_Grayscale, sRGB off, NoMipmaps, Nearest, never streamed); value = column x 16 + 8",
   "N": "DirectX, = H3; N_OpenGL = H3",
-  "ORM": "R AO, G roughness (H3; ignored by library classes), B metallic binary = preset metallic of the class in the column (horn_claw 0)",
+  "ORM": "R AO, G roughness (H3; ignored by library classes), B metallic binary = preset metallic of the class in the column (horn_claw, feathers_flight 0)",
   "TeamAccent": "R8 linear (TC_Grayscale, sRGB off): 1 = TeamColor dye (UE: TeamMaskTexture of the v2 MI = TeamAccent; dye only on classes with teamDyeAllowed)",
   "TeamMask": "H3 W4-B mask, byte copy, deprecated"
  },
@@ -484,6 +541,7 @@
   }
  },
  "hero_slots": {
+  "feathers_flight": "metal_forged",
   "horn_claw": "brass"
  },
  "luminance_clamp": {
@@ -693,9 +751,9 @@
     "class": "feathers",
     "field": "bc",
     "value": [
-     0.0808,
-     0.0414,
-     0.0254
+     0.1022,
+     0.0496,
+     0.0286
     ]
    },
    {
@@ -706,7 +764,7 @@
    {
     "class": "feathers",
     "field": "ymedClassHero",
-    "value": 0.04904
+    "value": 0.05946
    },
    {
     "class": "gold_antique",
@@ -737,6 +795,185 @@
     "value": 0.02
    },
    {
+    "class": "metal_forged",
+    "field": "bakeLuminanceModulation",
+    "value": 0.0
+   },
+   {
+    "class": "metal_forged",
+    "field": "bc",
+    "value": [
+     0.0174,
+     0.0132,
+     0.0124
+    ]
+   },
+   {
+    "class": "metal_forged",
+    "field": "bcMode",
+    "value": 0.0
+   },
+   {
+    "class": "metal_forged",
+    "field": "cavityDarken",
+    "value": 0.0
+   },
+   {
+    "class": "metal_forged",
+    "field": "cavityTintB",
+    "value": 0.0
+   },
+   {
+    "class": "metal_forged",
+    "field": "cavityTintG",
+    "value": 0.0
+   },
+   {
+    "class": "metal_forged",
+    "field": "cavityTintR",
+    "value": 0.0
+   },
+   {
+    "class": "metal_forged",
+    "field": "cavityTintStrength",
+    "value": 0.0
+   },
+   {
+    "class": "metal_forged",
+    "field": "clothAmount",
+    "value": 0.0
+   },
+   {
+    "class": "metal_forged",
+    "field": "luminanceMax",
+    "value": 0.7
+   },
+   {
+    "class": "metal_forged",
+    "field": "luminanceMin",
+    "value": 0.008
+   },
+   {
+    "class": "metal_forged",
+    "field": "maxChannel",
+    "value": 0.9
+   },
+   {
+    "class": "metal_forged",
+    "field": "metallic",
+    "value": 0.0
+   },
+   {
+    "class": "metal_forged",
+    "field": "normalStrength",
+    "value": 1.0
+   },
+   {
+    "class": "metal_forged",
+    "field": "roughHi",
+    "value": 0.75
+   },
+   {
+    "class": "metal_forged",
+    "field": "roughLo",
+    "value": 0.4
+   },
+   {
+    "class": "metal_forged",
+    "field": "roughTypical",
+    "value": 0.55
+   },
+   {
+    "class": "metal_forged",
+    "field": "roughVariation",
+    "value": 0.1
+   },
+   {
+    "class": "metal_forged",
+    "field": "shadingModel",
+    "value": 0.0
+   },
+   {
+    "class": "metal_forged",
+    "field": "sheenIntensity",
+    "value": 0.0
+   },
+   {
+    "class": "metal_forged",
+    "field": "sheenRoughness",
+    "value": 0.0
+   },
+   {
+    "class": "metal_forged",
+    "field": "sheenTint",
+    "value": 0.0
+   },
+   {
+    "class": "metal_forged",
+    "field": "slice",
+    "value": 12.0
+   },
+   {
+    "class": "metal_forged",
+    "field": "specular",
+    "value": 0.575
+   },
+   {
+    "class": "metal_forged",
+    "field": "teamDyeAllowed",
+    "value": 1.0
+   },
+   {
+    "class": "metal_forged",
+    "field": "tilesPerMeter",
+    "value": 21.0
+   },
+   {
+    "class": "metal_forged",
+    "field": "wearStrength",
+    "value": 0.0
+   },
+   {
+    "class": "metal_forged",
+    "field": "wornBCB",
+    "value": 0.0
+   },
+   {
+    "class": "metal_forged",
+    "field": "wornBCG",
+    "value": 0.0
+   },
+   {
+    "class": "metal_forged",
+    "field": "wornBCMode",
+    "value": 0.0
+   },
+   {
+    "class": "metal_forged",
+    "field": "wornBCR",
+    "value": 0.0
+   },
+   {
+    "class": "metal_forged",
+    "field": "wornBCScale",
+    "value": 1.0
+   },
+   {
+    "class": "metal_forged",
+    "field": "wornRoughness",
+    "value": -1.0
+   },
+   {
+    "class": "metal_forged",
+    "field": "wornRoughnessDelta",
+    "value": 0.0
+   },
+   {
+    "class": "metal_forged",
+    "field": "ymedClassHero",
+    "value": 0.01398
+   },
+   {
     "class": "skin",
     "field": "bc",
     "value": [
@@ -753,15 +990,15 @@
   ],
   "builder": "tools/art/material_library/build_ue_inputs.py 2.0.0 (imported, main() not run)",
   "dds": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/T_UM_MatLUT_Harpy.dds",
-  "dds_sha256": "732baf0a1a061e06fa01d70611e9ba3879e39935a3a04620d4c93d4552033fe4",
+  "dds_sha256": "778044d6c6da95433106b7288a712a3b55fed6e4305c7d0fbaad54f32859eb56",
   "gold_antique_f0_hero": [
    1.0,
    0.437,
    0.1032
   ],
-  "layout": "build_ue_inputs.LUT_ROWS (rows 0-9, 10-15 reserved), column = class index (hero slot 5 = horn_claw)",
+  "layout": "build_ue_inputs.LUT_ROWS (rows 0-9, 10-15 reserved), column = class index (hero slots: 3 = feathers_flight, 5 = horn_claw)",
   "overrides_json": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/T_UM_MatLUT_Harpy.overrides.json",
-  "overrides_sha256": "f89d5857951ee77ab93da39658940b42cc0d5df68a10b6f84001a87a7c762a4b"
+  "overrides_sha256": "9525baec031c83ca8040e65723eb305966d620dd7eae8900e05a21e83e18737a"
  },
  "passed": true,
  "preview_textures": {
@@ -796,10 +1033,10 @@
    ]
   },
   "CLASS": {
-   "bytes": 35093,
+   "bytes": 191713,
    "mode": "RGB",
    "path": "work/lookdev/preview/LD_CLASS.png",
-   "sha256": "49f15f9e5eb0f03fc16b916b2b0dd99b69b7195ad6b43c68d42cda217dfe1b6b",
+   "sha256": "2d415b57b315f0853d6fb89f27bb6f14583b834798a018abbd9d2d8e9af4d5d3",
    "size": [
     2048,
     2048
@@ -880,10 +1117,10 @@
     ]
    },
    "MatID": {
-    "bytes": 21979,
+    "bytes": 141648,
     "mode": "L",
     "path": "textures/2k/T_Harpy_H3LD_MatID.png",
-    "sha256": "1f62aede2a0db49637e9211e1a56dd6bfb6e028d7128f61c412810780662f883",
+    "sha256": "d967c448408685c431531d19b8299b01afb0cbaca3174fefc67c2900d1163ce3",
     "size": [
      2048,
      2048
@@ -953,10 +1190,10 @@
     ]
    },
    "MatID": {
-    "bytes": 53595,
+    "bytes": 335523,
     "mode": "L",
     "path": "textures/4k/T_Harpy_H3LD_MatID.png",
-    "sha256": "4474b4ebcf673af8a38d465f59f4c011751c606684531abadef4bfbdb57ce731",
+    "sha256": "5d1295cba6b8477db20b4804d7218c10ea5d0f2a45c7dd12a13fae417257df86",
     "size": [
      4096,
      4096

@@ -71,7 +71,7 @@ class Multi:
         self.px = {}
         for view, cls in masks.items():
             for zone in cfg["zones"]:
-                m = U.erode(cls == cls_of[zone], 1)
+                m = U.erode(U.zone_mask(cls, cls_of[zone]), 1)
                 reg = U.zone_region(cfg, zone, view, cls)
                 if reg is not None:
                     m &= reg

@@ -204,6 +204,16 @@ class Mutations(unittest.TestCase):
         self.save(vl.PRESETS, d)
         self.assertOnlyFails("presets_tiles")
 
+    def test_feathers_flight_is_feathers_in_own_column(self):
+        # ART-016 (2026-10-04): physics and tiles of feathers, its own LUT column through a hero slot
+        d = self.load(vl.PRESETS)
+        c, f = self.ext(d, "feathers_flight"), self.preset(d, "feathers")
+        self.assertEqual((c["extension"]["libraryIndex"], c["extension"]["arraySlice"], c["detail"]["tileFrom"]), (17, 12, "feathers"))
+        for k in ("metallic", "baseColor", "roughness", "teamDyeAllowed"):
+            self.assertEqual({x: y for x, y in c[k].items() if x != "note"} if isinstance(c[k], dict) else c[k],
+                             {x: y for x, y in f[k].items() if x != "note"} if isinstance(f[k], dict) else f[k], k)
+        self.assertEqual((c["specular"]["value"], c["specular"]["f0"]), (f["specular"]["value"], f["specular"]["f0"]))
+
     def test_non_cc0_license(self):
         m = self.load(vl.MANIFEST)
         m["assets"][0]["license"] = "CC BY 4.0"

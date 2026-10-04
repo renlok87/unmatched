@@ -44,12 +44,12 @@
   },
   "feathers": {
    "bc": [
-    0.0808,
-    0.0414,
-    0.0254
+    0.1022,
+    0.0496,
+    0.0286
    ],
    "luminanceMin": 0.008,
-   "ymedClassHero": 0.04904
+   "ymedClassHero": 0.05946
   },
   "gold_antique": {
    "bc": [
@@ -67,6 +67,47 @@
    ],
    "ymedClassHero": 0.02
   },
+  "metal_forged": {
+   "bakeLuminanceModulation": 0.0,
+   "bc": [
+    0.0174,
+    0.0132,
+    0.0124
+   ],
+   "bcMode": 0.0,
+   "cavityDarken": 0.0,
+   "cavityTintB": 0.0,
+   "cavityTintG": 0.0,
+   "cavityTintR": 0.0,
+   "cavityTintStrength": 0.0,
+   "clothAmount": 0.0,
+   "luminanceMax": 0.7,
+   "luminanceMin": 0.008,
+   "maxChannel": 0.9,
+   "metallic": 0.0,
+   "normalStrength": 1.0,
+   "roughHi": 0.75,
+   "roughLo": 0.4,
+   "roughTypical": 0.55,
+   "roughVariation": 0.1,
+   "shadingModel": 0.0,
+   "sheenIntensity": 0.0,
+   "sheenRoughness": 0.0,
+   "sheenTint": 0.0,
+   "slice": 12.0,
+   "specular": 0.575,
+   "teamDyeAllowed": 1.0,
+   "tilesPerMeter": 21.0,
+   "wearStrength": 0.0,
+   "wornBCB": 0.0,
+   "wornBCG": 0.0,
+   "wornBCMode": 0.0,
+   "wornBCR": 0.0,
+   "wornBCScale": 1.0,
+   "wornRoughness": -1.0,
+   "wornRoughnessDelta": 0.0,
+   "ymedClassHero": 0.01398
+  },
   "skin": {
    "bc": [
     0.409,
@@ -79,9 +120,10 @@
  "generator": "tools/tripo-pipeline/blender/h2_bake_harpy/lookdev_maps.py (ld_maps)",
  "hero": "Harpy",
  "heroSlots": {
-  "brass": "horn_claw"
+  "brass": "horn_claw",
+  "metal_forged": "feathers_flight"
  },
- "heroSlotsNote": "column of the library class brass (5) carries the extension class horn_claw (all fields, detail slice 14 = stone_base); MatID of the talons = 88 (README §3a)",
+ "heroSlotsNote": "column of the library class metal_forged (3) carries the extension class feathers_flight (all fields, detail slice 12); MatID 56; column of the library class brass (5) carries the extension class horn_claw (all fields, detail slice 14); MatID 88 (README §3a)",
  "rebuild": "python tools/art/material_library/build_ue_inputs.py --skip-arrays --hero Harpy --overrides <this file>",
  "schema": "unmatched.um-v2-hero-overrides/1",
  "why": {

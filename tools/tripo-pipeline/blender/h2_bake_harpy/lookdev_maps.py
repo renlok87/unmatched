@@ -7,6 +7,8 @@
 2. classes per 4K texel (hero LUT columns): feathers by default (feather and scale parts), skin (H3 skin weight, holes
    of the face filled), horn_claw in the hero slot of brass (H3 talon weight), gold_antique = the rims of the ankle band,
    leather_smooth = the cord inset of the band (the central half: TeamAccent of the band, metals are never dyed);
+   after the BC edits of step 5, feathers_flight in the hero slot of metal_forged = the feather texels under the H3
+   dark-primary mask (profile classes.feathers_flight, ART-016 look-dev r3.3: own LUT column for the primaries);
 3. MatID (R8, class column x 16 + 8, no mips): 4K labels -> 2K majority (ties: the lower index); every atlas texel
    (gutters too) has a class of its nearest island;
 4. TeamAccent (R8, new): the dark primaries (the H3 W4-B mask) within edge_width of the frontal (XZ) silhouette =
@@ -46,7 +48,8 @@ import lookdev_state as S  # noqa: E402
 
 LUMA = np.array([0.2126, 0.7152, 0.0722])
 TEAM = {"P1": "#E8C06A", "P2": "#5A7F9F"}
-CLASS_COLOURS = {0: (90, 90, 90), 4: (235, 180, 40), 5: (40, 40, 60), 7: (220, 40, 200), 12: (60, 160, 160), 13: (250, 205, 175)}
+CLASS_COLOURS = {0: (90, 90, 90), 3: (20, 70, 75), 4: (235, 180, 40), 5: (40, 40, 60), 7: (220, 40, 200), 12: (60, 160, 160),
+                 13: (250, 205, 175)}   # 3 = feathers_flight (hero slot, ART-016): a darker teal than feathers
 
 
 def ue_inputs():
@@ -334,6 +337,22 @@ def main():
                         "bc_median_linear_before": [r(v, 5) for v in np.median(b0, 0)],
                         "bc_median_linear_after": [r(v, 5) for v in np.median(bc[sel2], 0)],
                         "Y_median_before_after": [r(float(np.median(b0 @ LUMA)), 5), r(float(np.median(bc[sel2] @ LUMA)), 5)]})
+    # ART-016 (2026-10-04, look-dev r3.3): classes split off another class by a mask AFTER every BC edit (the edits
+    # select the parent class x mask, so the BC bytes stay; only MatID / LUT change). profile classes.<ext id>:
+    # {"from": parent class, "mask": "dark_primaries", "weight_min", "min_component_px"}; gutters follow their texel
+    split_info = {}
+    for eid, sc in sorted((cid_, v) for cid_, v in cc.items() if isinstance(v, dict) and v.get("from")):
+        if sc.get("mask") != "dark_primaries":
+            raise ValueError("classes.%s: unknown mask %s" % (eid, sc.get("mask")))
+        parent = lab == col[sc["from"]]
+        sel_s = parent & (dark[jy, jx] >= float(sc["weight_min"]))
+        lab[sel_s] = col[eid]
+        lab, rm_s = clean_small(lab, [col[eid]], int(sc.get("min_component_px", cc["min_component_px"])), col[sc["from"]])
+        split_info[eid] = {"from": sc["from"], "column": int(col[eid]), "mask": sc["mask"], "weight_min": sc["weight_min"],
+                           "texels_4k_covered": int(((lab == col[eid]) & cov).sum()),
+                           "small_components_back_to_parent_texels_4k": int(sum(rm_s.values())),
+                           "share_of_figure_area": r(share(lab == col[eid]), 4),
+                           "share_of_parent_before": r(share(lab == col[eid]) / max(share(parent), 1e-9), 4)}
     # metallic per column from the class that OCCUPIES the column (col_class: a hero slot carries its extension
     # class, e.g. horn_claw in the brass column 5 is a dielectric), never from the library class of the column index
     metal_cols = [ci for ci in sorted(set(np.unique(lab).tolist())) if allc[col_class[ci]]["metallic"] == 1]
@@ -405,7 +424,7 @@ def main():
         if allc[cid]["metallic"] != 1:
             d_["bc"] = area[cid]["bc_linear_median"]
     for cid, fields in ld.get("lut_overrides", {}).items():
-        d_ = ov.setdefault(cid, {})
+        d_ = ov.setdefault(slot_of.get(cid, cid), {})   # an extension class id -> its hero-slot column
         for k_, v_ in fields.items():
             if k_ != "note":
                 d_[k_] = v_
@@ -414,8 +433,10 @@ def main():
               "rebuild": "python tools/art/material_library/build_ue_inputs.py --skip-arrays --hero %s --overrides <this file>"
                          % ld["lut_hero"],
               "heroSlots": {slot_of[e]: e for e in slot_of},
-              "heroSlotsNote": "column of the library class brass (5) carries the extension class horn_claw (all fields, "
-                               "detail slice 14 = stone_base); MatID of the talons = 88 (README §3a)",
+              "heroSlotsNote": "; ".join(
+                  "column of the library class %s (%d) carries the extension class %s (all fields, detail slice %d); "
+                  "MatID %d" % (slot_of[e], col[e], e, int(ext[e]["extension"]["arraySlice"]), col[e] * 16 + 8)
+                  for e in sorted(slot_of, key=lambda e_: col[e_])) + " (README §3a)",
               "why": {"bc": "медиана класса в BC героя (DebugBakeFromLUT); у gold_antique — F0 героя, тон концепта",
                       "ymedClassHero": "медиана яркости BC героя в классе (README §4)"},
               "classes": ov}
@@ -545,7 +566,7 @@ def main():
               "source": {"profile": rel(src_prof_path), "profile_sha256": S.sha256(src_prof_path), "run": rel(src_run),
                          "fbx_sha256": fbx},
               "h3_replay": repro, "seat_scale": scale, "figure_area_m2_final": r(area_all, 5),
-              "classes": area, "hero_slots": {e: slot_of[e] for e in slot_of},
+              "classes": area, "hero_slots": {e: slot_of[e] for e in slot_of}, "class_splits": split_info,
               "skin_holes_filled_texels_4k": int(skin_holes.sum()) if sk.get("fill_holes_in_face") else 0,
               "small_components_to_default": {col_class[k]: v for k, v in removed.items()},
               "bracelet": {"z_band_source_m": [zlo, zhi], "cord_z_source_m": [r(zc - half, 4), r(zc + half, 4)],
@@ -563,7 +584,8 @@ def main():
               "ue_feedback_r2": r2_info, **({"ue_feedback_r3": r3_info} if r3_info else {}),
               "lut": {"dds": rel(dds), "dds_sha256": S.sha256(dds), "overrides_json": rel(ov_path),
                       "overrides_sha256": S.sha256(ov_path), "applied": applied, "gold_antique_f0_hero": [r(v, 4) for v in gold_f0],
-                      "layout": "build_ue_inputs.LUT_ROWS (rows 0-9, 10-15 reserved), column = class index (hero slot 5 = horn_claw)",
+                      "layout": "build_ue_inputs.LUT_ROWS (rows 0-9, 10-15 reserved), column = class index (hero slots: %s)"
+                                % ", ".join("%d = %s" % (col[e], e) for e in sorted(slot_of, key=lambda e_: col[e_])),
                       "builder": "tools/art/material_library/build_ue_inputs.py %s (imported, main() not run)" % UI.GENERATOR_VERSION},
               "textures": out, "base_textures": base_out,
               "base_note": "SM_Harpy_Base keeps M_UM_BaseMarker: band colour = hero gold F0 (visible with BandKeepsTexture 1; "
@@ -573,7 +595,7 @@ def main():
                               "TeamAccent": "R8 linear (TC_Grayscale, sRGB off): 1 = TeamColor dye (UE: TeamMaskTexture of the v2 MI = TeamAccent; dye only on classes with teamDyeAllowed)",
                               "TeamMask": "H3 W4-B mask, byte copy, deprecated",
                               "Edge": "R8 linear: EdgeMaskTexture of the v2 master",
-                              "ORM": "R AO, G roughness (H3; ignored by library classes), B metallic binary = preset metallic of the class in the column (horn_claw 0)",
+                              "ORM": "R AO, G roughness (H3; ignored by library classes), B metallic binary = preset metallic of the class in the column (horn_claw, feathers_flight 0)",
                               "N": "DirectX, = H3; N_OpenGL = H3"},
               "checks": checks, "passed": all(c["passed"] for c in checks.values())}
     (run / "reports").mkdir(parents=True, exist_ok=True)

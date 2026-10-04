@@ -28,7 +28,8 @@
   "gutter_px": 16,
   "hero_slots": {
    "brass": "horn_claw",
-   "note": "horn_claw is an extension class of the library (no global MatID, README §3a): Harpy has no brass, so its LUT column 5 carries horn_claw (all fields, detail slice 14 = stone_base tiles); the MatID of the talons is 5 x 16 + 8 = 88"
+   "metal_forged": "feathers_flight",
+   "note": "horn_claw is an extension class of the library (no global MatID, README §3a): Harpy has no brass, so its LUT column 5 carries horn_claw (all fields, detail slice 14 = stone_base tiles); the MatID of the talons is 5 x 16 + 8 = 88. ART-016 (2026-10-04, look-dev r3.3): feathers_flight (the dark primaries, extension 17) in the unused column 3 (metal_forged: all fields of the extension, detail slice 12 = feathers tiles), MatID 3 x 16 + 8 = 56; column 3 because its DebugView colour is the farthest from every other Harpy class colour (the UE zone decode, review-config debug_calibration)"
   },
   "classes": {
    "default": "feathers",
@@ -36,13 +37,15 @@
    "skin": {"weight_min": 0.5, "face_density_min": 2.0, "fill_holes_in_face": true,
             "note": "H3 skin weight (textures.materials.feathers.skin: head part, v >= 0.45, s <= 0.4) >= 0.5; holes of the skin inside the face islands (brows, eyes, lip line: dark painted features) are filled, so the face is one skin class"},
    "horn_claw": {"weight_min": 0.5, "note": "H3 talon weight (textures.materials.talons: feet parts, s <= 0.3, v <= 0.4, opened 3 px) >= 0.5"},
+   "feathers_flight": {"from": "feathers", "mask": "dark_primaries", "weight_min": 0.5, "min_component_px": 12,
+                       "note": "ART-016 (2026-10-04, look-dev r3.3): feather texels under the H3 dark-primary mask (the W4-B TeamMask the r2 / 5c-B0 albedo edits use, weighted) >= 0.5 -> their own class, so the LUT gives the primaries specular 0.35 and the rufous feathers keep 0.575. Applied after every BC edit (those select feathers x mask, so the BC bytes do not change); components smaller than min_component_px go back to feathers"},
    "bracelet": {"part": "tripo_part_13", "z_band_source_m": [0.143, 0.174], "cord_core": 0.5, "gold": "gold_antique", "cord": "leather_smooth",
                 "note": "the band of part 13 is z 0.1430-0.1740 (source frame; measured 2026-09-29: metallic mean 0.75-0.91 inside, 0.04 / 0.17 in the lowest / highest decile = leg scales of the same part -> feathers). Concept: two gold rims and a central braid (~55 % of the height). The central half of the band becomes the team-colour cord inset (leather_smooth: dyeable dielectric; metals are never dyed, rule 5c-A), the rims stay gold_antique",
                 "cord_tone": "dark leather: the Tripo BC of the braid texels scaled so the cord median luminance = the median luminance of the wing accent texels (one TeamDyeGain gives both the same team colour)"},
    "min_component_px": 12,
    "dielectric_clamp": "shader",
    "dielectric_clamp_note": "clamp(Y, lo, hi) of the v2 core applied in the texture (not the Medusa toe): measured 2026-09-29, the toe lifted every feather texel below Y 0.04 (41 % of the feathers) and the Cobble K2 dark share of the body fell from 17 % (H3) to 11 % against 34 % of the concept; the hard clamp moves only the texels below the albedo floor 0.02",
-   "luminance_range_hero": {"feathers": [0.008, 0.7],
+   "luminance_range_hero": {"feathers": [0.008, 0.7], "feathers_flight": [0.008, 0.7],
                             "note": "look-dev round 2 (2026-09-30): the dark primaries carry an effective albedo below the preset feather floor 0.02 (ue_feedback_r2 dark_primaries, Y p50 0.0201 -> 0.0138); the hero LUT feathers luminanceMin (lut_overrides) is 0.008, so the v2 core does not lift them back; the texture clamp itself stays the preset one (the other feather texels are unchanged); used by the check dielectric_bc_in_class_range"}
   },
   "ue_feedback": {
@@ -80,7 +83,8 @@
   },
   "edge": {"curvature_per_m": [150, 600], "smooth_px": 3, "note": "as Medusa look-dev: convexity of the baked tangent normal (div n.xy / metres per texel, final frame), smoothstep"},
   "lut_overrides": {
-   "feathers": {"luminanceMin": 0.008, "note": "look-dev round 2 (2026-09-30): hero floor below the preset 0.02 for the dark primaries (classes.luminance_range_hero, ue_feedback_r2 dark_primaries_r2); every other feather texel is >= 0.02 in the texture, so the v2 core shows the texture"},
+   "feathers": {"luminanceMin": 0.008, "note": "look-dev round 2 (2026-09-30): hero floor below the preset 0.02 for the dark primaries (classes.luminance_range_hero, ue_feedback_r2 dark_primaries_r2); every other feather texel is >= 0.02 in the texture, so the v2 core shows the texture. Kept after the r3.3 split: the mask-edge texels (dark weight < 0.5, partly darkened by r2) stay feathers"},
+   "feathers_flight": {"luminanceMin": 0.008, "note": "ART-016 (r3.3): the same hero floor as feathers for the primaries (their effective albedo Y p50 0.0138 lies below the preset 0.02); written into the slot column metal_forged"},
    "gold_antique": {"bc": [1.0, 0.4371, 0.1032], "note": "hero F0 = concept tone (ld_compose gold_tone). Iteration 0 = preset F0 (1.0, 0.766, 0.336): LD render gold hue 47 deg / S 0.36 / luma 132 against the concept 33 deg / 0.66 / 124 (front + back framing, preview light); suggestion iteration 1 = (1.0, 0.4371, 0.1032), Y 0.533"}
   },
   "uv1": {"layer_name": "UV1_m", "density_tolerance": 0.02,

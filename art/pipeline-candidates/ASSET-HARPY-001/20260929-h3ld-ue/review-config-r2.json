@@ -27,14 +27,21 @@
   "claw"
  ],
  "zone_class": {
-  "orange": "feathers",
-  "dark": "feathers",
+  "orange": [
+   "feathers",
+   "metal_forged"
+  ],
+  "dark": [
+   "feathers",
+   "metal_forged"
+  ],
   "skin": "skin",
   "gold": "gold_antique",
   "claw": "brass"
  },
  "decode_classes": [
   "feathers",
+  "metal_forged",
   "skin",
   "brass",
   "gold_antique",
@@ -229,5 +236,8 @@
   }
  },
  "render_regions_note": "look-dev round 2 (2026-09-30): the concept dark zone is the two outer-wing boxes of the look-dev profile (concept x 60-330 / 1140-1410, y 180-560 of 1470 x 1070; figure extent x 48-1418, y 100-865 to the feet) with v <= 0.3; the UE side took every feather pixel with v <= 0.45 of the whole figure (shaded body, legs and covert undersides: 22 % of the zone pixels with sat >= 0.38, 13 % >= 0.5 on b1), so its per-channel median was pulled to sat 0.27. The region mirrors the boxes in figure-relative coordinates (ue_hero_lookdev.zone_region: x_outer = |x - centre| / half-width, y = (y - top) / (feet - top)); front and back only, as the concept boxes (side has none)",
- "concept_zones_note": "concept-zones-r2.json (spec concept-zones-spec-r2.json): the dark zone without the grey-blue studio backdrop (hue 185-265) that its v <= 0.3 filter let in: 25 % of the zone pixels, concept dark (50 45 43, sat 0.14, Y 0.0273) -> (46 39 37, sat 0.196, Y 0.0217); other zones byte-identical to concept-zones.json"
+ "concept_zones_note": "concept-zones-r2.json (spec concept-zones-spec-r2.json): the dark zone without the grey-blue studio backdrop (hue 185-265) that its v <= 0.3 filter let in: 25 % of the zone pixels, concept dark (50 45 43, sat 0.14, Y 0.0273) -> (46 39 37, sat 0.196, Y 0.0217); other zones byte-identical to concept-zones.json",
+ "zone_class_note": "ART-016 (2026-10-04, look-dev r3.3): the dark primaries left the feathers column for their own class feathers_flight in the hero slot metal_forged (column 3, MatID 56); the feather zones take both columns, so the zone definition is the one of b2 / b3.x (frames before r3.3 have no column-3 pixels: same masks). Column 3 decodes with debug_calibration[\"3\"] (wall value, 74+ levels from every other Harpy class colour)",
+ "light_profile_pinned": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/review/b3.2/review-b3.2.json",
+ "light_profile_pinned_note": "2026-10-04: lightProfiles.cobble-probe was removed from S08ArtBoardProfiles.json (real boards only, ND-5); b3.3 and later use the light data recorded by the b3.2 capture (rev 5 cobble-probe: key 4.5 lux (-55, 30, 0), sky 11.2, EV100 2.05 board / reading bias of this config) so the series stays comparable. Look-dev scene only (L_P17ControlScene), not an in-game board"
 }

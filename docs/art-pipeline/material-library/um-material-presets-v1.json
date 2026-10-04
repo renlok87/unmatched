@@ -1035,6 +1035,68 @@
     "arraySliceNote": "срез массива деталей класса tileFrom (stone_base = 14)",
     "why": "4-битный MatID занят классами 0–15 (README §10); отдельный класс нужен, чтобы коготь не делил шероховатость/износ с пером или кожей. Физика кератина — как у перьев (F0 0.046), отличие — гладкость и износ"
    }
+  },
+  {
+   "family": "dielectric",
+   "metallic": 0,
+   "index": 17,
+   "id": "feathers_flight",
+   "nameRu": "маховые перья (кератин)",
+   "shadingModel": "DefaultLit",
+   "baseColor": {
+    "mode": "bake-clamped",
+    "typicalLinear": [0.06, 0.05, 0.045],
+    "luminanceRange": [0.02, 0.7],
+    "maxChannel": 0.9,
+    "sourceKind": "art",
+    "source": [
+     "ALBEDO",
+     "ART-DIR"
+    ],
+    "note": "как feathers: превью-цвет тёмного пера Harpy; в рантайме — альбедо героя"
+   },
+   "roughness": {
+    "typical": 0.55,
+    "range": [0.4, 0.75],
+    "variation": 0.1,
+    "sourceKind": "art",
+    "source": [
+     "ART-DIR"
+    ],
+    "note": "как feathers: стержень глаже опахала (R тайла)"
+   },
+   "specular": {
+    "value": 0.575,
+    "f0": 0.046,
+    "sourceKind": "reference",
+    "source": [
+     "RTR4-T9.1",
+     "IOR-F0"
+    ],
+    "note": "кератин = F0 волос 0.046, как feathers. Блик маховых герой меняет в своей LUT отдельно от кроющих (Harpy: specular 0.35 — арт-решение по кадрам UE look-dev r3, не справочное значение)"
+   },
+   "detail": {
+    "DetailN": "art/material-library/v1/tiles/feathers/feathers_DetailN.png",
+    "DetailRMH": "art/material-library/v1/tiles/feathers/feathers_DetailRMH.png",
+    "tileSizePx": 1024,
+    "tilesPerMeter": 21.0,
+    "tileWorldSizeM": 0.048,
+    "feature": "тайл feathers: 4 × 8 контурных перьев на тайл → перо ~12 мм шириной",
+    "normalStrength": 1.0,
+    "tileFrom": "feathers"
+   },
+   "edgeWear": {
+    "enabled": false
+   },
+   "teamDyeAllowed": true,
+   "extension": {
+    "libraryIndex": 17,
+    "globalMatId": false,
+    "heroSlot": "столбец LUT класса, которого у героя нет (у Harpy — metal_forged, индекс 3); MatID героя = слот × 16 + 8",
+    "arraySlice": 12,
+    "arraySliceNote": "срез массива деталей класса tileFrom (feathers = 12)",
+    "why": "Маховые и кроющие перья — один материал (кератин), но крупные плоские опахала маховых ловят блик купола иначе, чем мелкие кроющие: при общем столбце LUT правка блика маховых меняет и рыжие перья тела (Harpy look-dev r3, ART-016). Физика — как у feathers; отличие только в том, что у класса свой столбец"
+   }
   }
  ]
 }

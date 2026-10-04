@@ -133,7 +133,13 @@ class Ue:
         The editor log is no proof either way: typed `py` commands are not always echoed as `Cmd:` lines (a command
         that ran was missing from LogsToolset.GetLogEntries, 2026-09-29). So a command that can prove it started
         passes `started` (a file its script writes first, see ue_py/_run.py): no file within grace_s -> typed again,
-        at most `attempts` times. Without `started` the command is typed once."""
+        at most `attempts` times. Without `started` the command is typed once.
+
+        UE_CONSOLE_DROP=<dir> (editor started hidden with ue_py/console_drop.py on that dir, ART-016 2026-10-04): the
+        command is handed over as a file instead of typed (a hidden editor cannot focus its console box)."""
+        drop = os.environ.get("UE_CONSOLE_DROP")
+        if drop:
+            return self._console_drop(drop, command, started, grace_s * attempts)
         for attempt in range(attempts):
             ref = self._console_box()
             self.call("slate", "Type", {"ref": ref, "text": command, "submit": True}, record=False)
@@ -148,6 +154,38 @@ class Ue:
         else:
             raise UeError("console command did not start after %d attempts (editor focus?): %s" % (attempts, command))
         self.calls.append({"console": command, "attempts": attempt + 1})
+
+    def _console_drop(self, drop, command, started, wait_s):
+        """ue_py/console_drop.py protocol: cmd-<seq>.json in, done-<seq>.json out. A `py` task with `started` returns
+        once it started (the caller waits for its out file); any other command returns when it is done."""
+        if not os.path.exists(os.path.join(drop, "ready.json")):
+            raise UeError("UE_CONSOLE_DROP=%s: no ready.json (console_drop.py not running in the editor)" % drop)
+        seq = int(time.time() * 1000)
+        while os.path.exists(os.path.join(drop, "cmd-%d.json" % seq)) or os.path.exists(os.path.join(drop, "done-%d.json" % seq)):
+            seq += 1
+        path = os.path.join(drop, "cmd-%d.json" % seq)
+        with open(path + ".tmp", "w", encoding="utf-8") as handle:
+            json.dump({"seq": seq, "command": command}, handle)
+        os.replace(path + ".tmp", path)
+        done = os.path.join(drop, "done-%d.json" % seq)
+        deadline = time.time() + wait_s
+        while time.time() < deadline:
+            if started is not None and os.path.exists(started):
+                break
+            if os.path.exists(done):
+                try:
+                    with open(done, encoding="utf-8") as handle:
+                        res = json.load(handle)
+                except ValueError:
+                    time.sleep(0.1)
+                    continue
+                if not res.get("ok"):
+                    raise UeError("console (drop) %s failed: %s" % (command, res.get("error")))
+                break
+            time.sleep(0.1)
+        else:
+            raise UeError("console (drop) %s: not taken within %.0f s (editor busy or console_drop.py gone)" % (command, wait_s))
+        self.calls.append({"console": command, "drop": seq})
 
     def run_task(self, script, out_json, timeout=600, **args):
         """Run a UE-side task script through ue_py/_run.py (errors come back as {"error": ...})."""

@@ -56,9 +56,8 @@ def srgb(x):
 def load_masks(cfg, frames: Path, tag: str):
     presets = json.loads((REPO / "docs/art-pipeline/material-library/um-material-presets-v1.json").read_text(encoding="utf-8"))
     ids = {c["id"]: c["index"] for c in presets["classes"]}
-    zone_class = cfg.get("zone_class") or {}
-    cls_of = {z: ids[zone_class.get(z, z)] for z in cfg["zones"]}
-    classes = sorted(set(cls_of.values()) | {ids[c] for c in cfg.get("decode_classes") or []} | {0})
+    cls_of = U.zone_classes(cfg, ids)
+    classes = sorted({c for cs in cls_of.values() for c in cs} | {ids[c] for c in cfg.get("decode_classes") or []} | {0})
     masks = {}
     for view in U.ORTHO:
         dbg = U.load_frame(frames, cfg["hero"], tag, "%s-debug" % view)
@@ -76,7 +75,7 @@ def select_pixels(cfg, frames, tag, masks, cls_of, zone, select, sat_max=0.38):
     teams = U.teams_of(cfg)
     gates = cfg.get("render_gates") or {}
     for view, cls in masks.items():
-        m = cls == cls_of[zone]
+        m = U.zone_mask(cls, cls_of[zone])
         reg = U.zone_region(cfg, zone, view, cls)
         if reg is not None:
             m &= reg
@@ -136,7 +135,7 @@ class Fast:
         self.px = {}      # (zone, var) -> (pixels uint8 [N,3], changed bool [N])
         for view, cls in masks.items():
             for zone in cfg["zones"]:
-                m = U.erode(cls == cls_of[zone], 1)
+                m = U.erode(U.zone_mask(cls, cls_of[zone]), 1)
                 reg = U.zone_region(cfg, zone, view, cls)
                 if reg is not None:
                     m &= reg

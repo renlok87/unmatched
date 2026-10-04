@@ -1,0 +1,52 @@
+{
+ "schema": "unmatched.lookdev-r3-reimport-plan/1",
+ "date": "2026-10-04",
+ "iteration": "r3.3",
+ "task": "ART-016",
+ "status": "план итерации r3.3 (только Harpy): маховые — свой класс MatID feathers_flight (слот metal_forged, столбец 3, MatID 56) и столбец LUT со specular 0,35; рыжим перьям (feathers) — specular 0,575 пресета; решает съёмка UE b3.3",
+ "how": "python tools/art/material_library/ue_h5cb1.py reimport-r3 --iter r3.3 --hero harpy; затем review --tag b3.3",
+ "heroes": {
+  "harpy": {
+   "textures": [
+    {
+     "asset": "/Game/PipelineCandidates/Harpy/H3LD/Textures/T_Harpy_H3LD_MatID",
+     "file": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3-lookdev/textures/2k/T_Harpy_H3LD_MatID.png",
+     "sha256": "d967c448408685c431531d19b8299b01afb0cbaca3174fefc67c2900d1163ce3",
+     "was_sha256": "1f62aede2a0db49637e9211e1a56dd6bfb6e028d7128f61c412810780662f883",
+     "settings": {
+      "srgb": false,
+      "compression_settings": "TC_GRAYSCALE",
+      "filter": "TF_NEAREST",
+      "mip_gen_settings": "TMGS_NO_MIPMAPS",
+      "never_stream": true,
+      "px": [
+       2048,
+       2048
+      ]
+     },
+     "note": "ld_maps r3.3: тексели перьев под маской тёмных маховых H3 (вес >= 0,5) -> столбец 3 (56); остальные значения те же (56, 72, 88, 120, 200, 216); настройки как при импорте look-dev C (ue-import-report: TC_Grayscale, sRGB off, Nearest, NoMipmaps, NeverStream)"
+    },
+    {
+     "asset": "/Game/PipelineCandidates/Harpy/H3LD/Textures/T_UM_MatLUT_Harpy",
+     "file": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/lut/T_UM_MatLUT_Harpy_UE_r3.3.dds",
+     "sha256": "63d0472bce9d79d7fd764d508e66e2ea1e846915e83099c5eee413d10f56a979",
+     "was_sha256": "4386eb6198119bf1e1bfa0c65f11f86e51cf54164bc51f3311cda260df246b0b",
+     "settings": {
+      "srgb": false,
+      "compression_settings": "TC_HDR",
+      "filter": "TF_NEAREST",
+      "mip_gen_settings": "TMGS_NO_MIPMAPS",
+      "never_stream": true,
+      "px": [
+       16,
+       16
+      ]
+     },
+     "note": "от r3.2: столбец 3 = feathers_flight (все поля пресета, luminanceMin 0,008, specular 0,35); столбец 12 feathers: specular 0,35 -> 0,575 (пресет), bc / ymedClassHero = медианы класса без маховых"
+    }
+   ],
+   "mi": {},
+   "unchanged": "BC, N, ORM, Edge, TeamAccent, FBX, MI (байты BC/ORM/TeamAccent/Edge ld_maps r3.3 = r3.2)"
+  }
+ }
+}
