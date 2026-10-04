@@ -7,6 +7,8 @@ gitignored `unreal/Unmatched/Content/<Pack>/` и в git не попадают. �
 Выбор — ENV-U13/U14 (`docs/game-design/decisions/2026-09-30-env-original-maps-decisions.md`), ресёрч —
 `fab-free-assets-research-2026-10-01.md`.
 
+Звук ведётся отдельно: [CREDITS-audio.md](CREDITS-audio.md) (DE-013, кандидаты с лицензиями, ничего не импортировано).
+
 | Пак | Издатель | Лицензия | ИИ | Папка Content | Версия при добавлении | Назначение |
 |---|---|---|---|---|---|---|
 | [Stylized Environment - Forest](https://www.fab.com/listings/7b06f300-f295-40fe-9972-b9de3a0abe03) | SilverSet Studios | Fab Standard, уровень «Личное» | разрешён | `StylizedForest` | 5.7 → проект 5.8 | розовые деревья (сакура Marmoreal), дубы, кусты, заборы, камни |
