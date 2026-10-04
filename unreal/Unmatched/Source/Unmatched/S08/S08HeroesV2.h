@@ -22,6 +22,8 @@
 #include "CoreMinimal.h"
 #include "S08Team.h"
 
+class UAnimSequenceBase;
+
 namespace S08HeroesV2 {
 
 /** Rollback flag (ART-DEFAULT): -S08HeroesLegacy keeps the pre-default figures (Medusa candidate, ART-003 blockouts). */
@@ -94,6 +96,10 @@ struct FHeroSpec {
   // and the imported skeletal bounds top (sword tip of Arthur, staff crystal of Merlin).
   float BoundsTopUU;
   float IdleSeconds;  // AM_<Key>_Idle play length (anim-v2 decisions (4))
+  // DE-010 (01 F-03): contact frame of AM_<Key>_LungeAttack at ClipFps, from the clip build profile
+  // (art/pipeline-candidates/ASSET-*/build-profiles/*-h2anim.json): Arthur's chop k.7, Merlin's staff thrust k.8,
+  // Medusa's arrow release k.8, the Harpy's claw strike k.7 (its strike window is k.7-9: contact = first frame).
+  int32 LungeContactFrame;
 };
 
 /** The four look-dev C heroes (King Arthur, Merlin, Medusa, Harpies). */
@@ -115,5 +121,24 @@ UNMATCHED_API FString SkeletonPath(const FHeroSpec& Spec);
 UNMATCHED_API FString ClipPath(const FHeroSpec& Spec, EClip Clip);
 /** Expected play length of a clip (s): Idle per hero, LungeAttack 0.583, HitReact 0.417, DeathSettle 0.875. */
 UNMATCHED_API float ExpectedClipSeconds(const FHeroSpec& Spec, EClip Clip);
+
+// ---- DE-010 (W-26, 01 F-03): the contact frame of LungeAttack and the hit tint of the figure material.
+/** Frame rate of the H2Anim clips (build profiles "fps"). */
+constexpr float ClipFps = 24.0f;
+/** Event name of the contact notify in every LungeAttack (US08ContactAnimNotify). */
+inline const TCHAR* const ContactNotifyName = TEXT("Contact");
+/** Contact time of the build profile (s): LungeContactFrame / ClipFps - the fallback when a clip has no notify. */
+UNMATCHED_API float ProfileContactSeconds(const FHeroSpec& Spec);
+/** Trigger time (s) of the first "Contact" notify of Anim, or a negative value (no clip, no notify). */
+UNMATCHED_API float NotifyContactSeconds(const UAnimSequenceBase* Anim);
+/** Contact time of a LungeAttack: the notify when the clip has one, otherwise the profile frame. */
+UNMATCHED_API float ContactSeconds(const FHeroSpec& Spec, const UAnimSequenceBase* LungeAttack);
+
+/** Custom Primitive Data slot of the hit tint in M_UM_Figure_v2 (v2.2, DE-010): scalar CPD_HitTint, 0 = off (the
+ *  figure renders exactly as without it), 1 = full red fill (HitTintColor x HitTintStrength on the albedo plus
+ *  HitTintEmissive). The v1 slots 0-11 (art/um-materials/um-masters.json) are unchanged. Driven by CUE-011 (DE-018):
+ *  450 ms from the contact frame, 550 ms when lethal. */
+constexpr int32 HitTintCpdIndex = 12;
+inline const TCHAR* const HitTintParamName = TEXT("CPD_HitTint");
 
 }  // namespace S08HeroesV2

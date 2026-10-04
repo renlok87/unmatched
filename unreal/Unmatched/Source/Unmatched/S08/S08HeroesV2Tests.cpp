@@ -10,6 +10,7 @@
 
 #include "S08HeroesV2.h"
 #include "S08BoardModel.h"
+#include "S08ContactAnimNotify.h"
 #include "S08FighterActor.h"
 #include "Animation/AnimSequenceBase.h"
 #include "Animation/Skeleton.h"
@@ -22,6 +23,8 @@
 #include "Materials/Material.h"
 #include "Materials/MaterialInstance.h"
 #include "Materials/MaterialInterface.h"
+#include "Materials/MaterialExpressionScalarParameter.h"
+#include "Materials/MaterialExpressionVectorParameter.h"
 #include "Misc/AutomationTest.h"
 #include "Misc/Paths.h"
 
@@ -455,6 +458,93 @@ bool FS08HeroesV2ActorTest::RunTest(const FString&) {
   }
   GEngine->DestroyWorldContext(World);
   World->DestroyWorld(false);
+  return true;
+}
+
+// DE-010 (W-26, 01 F-03): one "Contact" notify per LungeAttack at the frame of the clip build profile, none in the
+// other clips, clip lengths unchanged (Assets above); without a notify the profile frame is the fallback.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08HeroesV2ContactTest,
+    "Unmatched.S08.HeroesV2.Contact LungeAttack carries the Contact notify at the profile frame (DE-010)",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08HeroesV2ContactTest::RunTest(const FString&) {
+  using namespace S08HeroesV2;
+  // Build profiles (*-h2anim.json, 24 fps): Arthur k.7 = 292 ms, Merlin k.8 = 333, Medusa k.8 = 333, Harpy k.7 = 292.
+  const TMap<FString, float> WantMs = {{TEXT("KingArthur"), 291.667f}, {TEXT("Merlin"), 333.333f},
+                                       {TEXT("Medusa"), 333.333f}, {TEXT("Harpy"), 291.667f}};
+  const FName Contact(ContactNotifyName);
+  for (const FHeroSpec& Spec : Specs()) {
+    const float* Want = WantMs.Find(Spec.Key);
+    TestNotNull(FString::Printf(TEXT("%s has a contact frame"), Spec.Key), Want);
+    if (!Want) continue;
+    TestTrue(FString::Printf(TEXT("%s profile contact %.1f ms == %.1f"), Spec.Key, ProfileContactSeconds(Spec) * 1000.0f, *Want),
+             FMath::IsNearlyEqual(ProfileContactSeconds(Spec) * 1000.0f, *Want, 0.5f));
+    TestEqual(FString::Printf(TEXT("%s fallback without a clip"), Spec.Key), ContactSeconds(Spec, nullptr),
+              ProfileContactSeconds(Spec));
+    for (const EClip Clip : {EClip::Idle, EClip::LungeAttack, EClip::HitReact, EClip::DeathSettle}) {
+      const UAnimSequenceBase* Anim = LoadObject<UAnimSequenceBase>(nullptr, *ClipPath(Spec, Clip));
+      TestNotNull(FString::Printf(TEXT("%s %s loads"), Spec.Key, ClipName(Clip)), Anim);
+      if (!Anim) continue;
+      int32 Count = 0;
+      for (const FAnimNotifyEvent& Event : Anim->Notifies) {
+        if (Event.NotifyName != Contact) continue;
+        ++Count;
+        TestTrue(FString::Printf(TEXT("%s %s Contact is a US08ContactAnimNotify"), Spec.Key, ClipName(Clip)),
+                 Event.Notify && Event.Notify->IsA<US08ContactAnimNotify>());
+      }
+      if (Clip != EClip::LungeAttack) {
+        TestEqual(FString::Printf(TEXT("%s %s has no Contact notify"), Spec.Key, ClipName(Clip)), Count, 0);
+        continue;
+      }
+      TestEqual(FString::Printf(TEXT("%s LungeAttack has one Contact notify"), Spec.Key), Count, 1);
+      const float At = NotifyContactSeconds(Anim);
+      AddInfo(FString::Printf(TEXT("%s LungeAttack Contact at %.1f ms (profile %.1f), clip %.3f s"), Spec.Key,
+                              At * 1000.0f, ProfileContactSeconds(Spec) * 1000.0f, Anim->GetPlayLength()));
+      TestTrue(FString::Printf(TEXT("%s Contact %.1f ms == profile %.1f ms (+-half a frame)"), Spec.Key, At * 1000.0f,
+                               ProfileContactSeconds(Spec) * 1000.0f),
+               FMath::IsNearlyEqual(At, ProfileContactSeconds(Spec), 0.5f / ClipFps));
+      TestTrue(FString::Printf(TEXT("%s Contact inside the clip"), Spec.Key), At > 0.0f && At < Anim->GetPlayLength());
+      TestEqual(FString::Printf(TEXT("%s ContactSeconds reads the notify"), Spec.Key), ContactSeconds(Spec, Anim), At);
+    }
+  }
+  return true;
+}
+
+// DE-010: the hit tint of M_UM_Figure_v2 (v2.2) is CPD 12, neutral at 0 (a figure without it renders as before).
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08HeroesV2HitTintTest,
+    "Unmatched.S08.HeroesV2.HitTint M_UM_Figure_v2 has the CPD hit tint slot, neutral by default (DE-010)",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08HeroesV2HitTintTest::RunTest(const FString&) {
+  using namespace S08HeroesV2;
+  const UMaterial* Master = LoadObject<UMaterial>(nullptr, TEXT("/Game/UM/Materials/v2/M_UM_Figure_v2.M_UM_Figure_v2"));
+  TestNotNull("M_UM_Figure_v2 loads", Master);
+  if (!Master) return false;
+#if WITH_EDITORONLY_DATA
+  int32 HitTint = 0, OtherOnSlot = 0, Colour = 0;
+  for (const UMaterialExpression* Expr : Master->GetExpressions()) {
+    if (const UMaterialExpressionScalarParameter* P = Cast<UMaterialExpressionScalarParameter>(Expr)) {
+      if (P->ParameterName == FName(HitTintParamName)) {
+        ++HitTint;
+        TestTrue("CPD_HitTint reads Custom Primitive Data", P->bUseCustomPrimitiveData);
+        TestEqual("CPD_HitTint slot", static_cast<int32>(P->PrimitiveDataIndex), HitTintCpdIndex);
+        TestEqual("CPD_HitTint default 0 (neutral)", P->DefaultValue, 0.0f);
+      } else if (P->bUseCustomPrimitiveData && P->PrimitiveDataIndex == HitTintCpdIndex) {
+        ++OtherOnSlot;
+      }
+    } else if (const UMaterialExpressionVectorParameter* V = Cast<UMaterialExpressionVectorParameter>(Expr)) {
+      if (V->ParameterName == TEXT("HitTintColor")) ++Colour;
+      if (V->bUseCustomPrimitiveData && V->PrimitiveDataIndex <= HitTintCpdIndex && V->PrimitiveDataIndex + 3 >= HitTintCpdIndex) {
+        ++OtherOnSlot;
+      }
+    }
+  }
+  TestEqual("one CPD_HitTint parameter", HitTint, 1);
+  TestEqual("one HitTintColor parameter", Colour, 1);
+  TestEqual("no other CPD parameter on slot 12", OtherOnSlot, 0);
+#endif
+  float Default = -1.0f;
+  TestTrue("CPD_HitTint is a scalar parameter of the master",
+           Master->GetScalarParameterDefaultValue(FHashedMaterialParameterInfo(FName(HitTintParamName)), Default));
+  TestEqual("CPD_HitTint parameter default 0", Default, 0.0f);
   return true;
 }
 

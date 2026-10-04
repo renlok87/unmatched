@@ -12,6 +12,8 @@ Layout of the graph:
   UV0, UV1 (StaticSwitch UseUV1Metres), knobs, team colour (CPD)  --+        IsCloth, debug emissive
   dye mask: StaticSwitch UseTeamAccent (v2.1, default on) -> TeamAccentTexture.R | TeamMaskTexture.R (v2.0 path)
   cue chain of v1 (CPD FxFlash / Rim / Fade) on top of the core base colour; If(IsCloth) -> ShadingModel
+  hit tint (v2.2, DE-010, CPD 12 CPD_HitTint): albedo lerp to HitTintColor by HitTint x HitTintStrength after the fade,
+  plus HitTintColor x HitTint x HitTintEmissive (display units, EyeAdaptationInverse); 0 = exactly the v2.1 output
   everything -> MakeMaterialAttributes (ClearCoat pin = CustomData0 = Cloth, SubsurfaceColor = Fuzz Color)
 """
 from __future__ import annotations
@@ -52,6 +54,16 @@ V2_SCALARS = [
     ("DebugMatIDOverride", -1.0, "Debug", "-1 = MatID texture; 0..15 = whole material one class"),
     ("DebugBakeFromLUT", 0.0, "Debug", "1 = bake albedo replaced by the class typical colour (tests without a bake)"),
 ]
+
+
+# v2-only Custom Primitive Data slots after the v1 layout 0-11 (art/um-materials/um-masters.json, unchanged: the v1
+# masters and their tests keep it). Every slot is neutral at 0 (a primitive that sets nothing renders like its MI).
+V2_CPD = {"HitTint": {"index": 12, "size": 1,
+                      "meaning": "DE-010 / CUE-011: 0..1 red hit fill from the contact frame (0 = off)"}}
+# DE-010 hit tint knobs (Cue group, MI-overridable): colour linear, albedo weight at HitTint 1, emissive (display units)
+HIT_TINT_COLOR = [0.85, 0.03, 0.02, 1.0]
+HIT_TINT_STRENGTH = 0.7
+HIT_TINT_EMISSIVE = 0.35
 
 
 class Graph:
@@ -237,6 +249,23 @@ def figure_v2_graph(spec: dict) -> Graph:
     g.link("core", "return", "base_final", "A")
     g.link("fade_t", "", "base_final", "B")
     g.link("cpd_fade", "", "base_final", "Alpha")
+    # ---- hit tint (v2.2, DE-010): CPD 12, after the fade; HitTint 0 -> lerp(x, c, 0) = x and + 0 emissive
+    scalar(g, "cpd_hit", "CPD_HitTint", 0.0, "", 5, cpd=V2_CPD["HitTint"]["index"])
+    vector(g, "p_hitcol", "HitTintColor", HIT_TINT_COLOR, "Cue", 5, sort=10)
+    scalar(g, "p_hitstr", "HitTintStrength", HIT_TINT_STRENGTH, "Cue", 5, sort=11)
+    scalar(g, "p_hitemi", "HitTintEmissive", HIT_TINT_EMISSIVE, "Cue", 5, sort=12)
+    binop(g, "hit_a", "Multiply", "cpd_hit", "p_hitstr", 12)
+    g.add("base_hit", "LinearInterpolate", {}, 13)
+    g.link("base_final", "", "base_hit", "A")
+    g.link("p_hitcol", "RGB", "base_hit", "B")
+    g.link("hit_a", "", "base_hit", "Alpha")
+    binop(g, "hit_k", "Multiply", "cpd_hit", "p_hitemi", 12)
+    binop(g, "hit_c", "Multiply", "p_hitcol", "hit_k", 13, "RGB", "")
+    g.add("hit_alpha", "Constant", {"r": 1.0}, 13)
+    g.add("hit_eai", "EyeAdaptationInverse", {}, 14)
+    g.link("hit_c", "", "hit_eai", "LightValueInput")
+    g.link("hit_alpha", "", "hit_eai", "AlphaInput")
+    binop(g, "em_hit", "Add", "em_total", "hit_eai", 15, "", "EyeAdaptationInverse")
     # ---- shading model per pixel: If(IsCloth > 0.5) Cloth else DefaultLit
     g.add("sm_cloth", "ShadingModel", {"shading_model": "MSM_CLOTH"}, 6)
     g.add("sm_lit", "ShadingModel", {"shading_model": "MSM_DEFAULT_LIT"}, 6)
@@ -249,10 +278,10 @@ def figure_v2_graph(spec: dict) -> Graph:
     g.link("sm_lit", "", "sm_if", "A < B")
     # ---- attributes
     g.add("mma", "MakeMaterialAttributes", {}, 14)
-    for pin, (src, out) in {"BaseColor": ("base_final", ""), "Metallic": ("core", "Metal"),
+    for pin, (src, out) in {"BaseColor": ("base_hit", ""), "Metallic": ("core", "Metal"),
                             "Specular": ("core", "Spec"), "Roughness": ("core", "Rough"),
                             "AmbientOcclusion": ("core", "AO"), "Normal": ("core", "NormalTS"),
-                            "EmissiveColor": ("em_total", ""), "ClearCoat": ("core", "Cloth"),
+                            "EmissiveColor": ("em_hit", ""), "ClearCoat": ("core", "Cloth"),
                             "SubsurfaceColor": ("core", "Fuzz"), "ShadingModel": ("sm_if", "")}.items():
         g.link(src, out, "mma", pin)
     g.attr("MP_MATERIAL_ATTRIBUTES", "mma", "")

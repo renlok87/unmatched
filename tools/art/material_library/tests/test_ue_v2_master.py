@@ -77,6 +77,59 @@ class Graph(unittest.TestCase):
         self.assertIn("dyeW = DyeMask;", body)               # class 0: the mask alone in both modes
 
 
+
+@unittest.skipUnless(HAVE_SPEC, "um-masters.json missing")
+class HitTint(unittest.TestCase):
+    """v2.2 (DE-010, 01 F-03): CPD 12 hit tint after the fade; 0 is exactly the v2.1 output."""
+
+    def setUp(self):
+        self.g = vm.figure_v2_graph(vm.load_spec())
+
+    def links_to(self, dst, inp):
+        return [l for l in self.g.links if l[2] == dst and l[3] == inp]
+
+    def test_slot_is_free_and_neutral(self):
+        v1 = vm.load_spec()["custom_primitive_data"]
+        used = set()
+        for k, v in v1.items():
+            if isinstance(v, dict):
+                used |= set(range(v["index"], v["index"] + v["size"]))
+        self.assertNotIn(vm.V2_CPD["HitTint"]["index"], used)
+        n = self.g.nodes["cpd_hit"]
+        self.assertEqual(n["props"]["parameter_name"], "CPD_HitTint")
+        self.assertTrue(n["props"]["use_custom_primitive_data"])
+        self.assertEqual(n["props"]["primitive_data_index"], 12)
+        self.assertEqual(n["props"]["default_value"], 0.0)
+
+    def test_routing_after_the_fade(self):
+        self.assertEqual(self.links_to("base_hit", "A"), [["base_final", "", "base_hit", "A"]])
+        self.assertEqual(self.links_to("base_hit", "B"), [["p_hitcol", "RGB", "base_hit", "B"]])
+        self.assertEqual(self.links_to("base_hit", "Alpha"), [["hit_a", "", "base_hit", "Alpha"]])
+        self.assertEqual(self.links_to("mma", "BaseColor"), [["base_hit", "", "mma", "BaseColor"]])
+        self.assertEqual(self.links_to("mma", "EmissiveColor"), [["em_hit", "", "mma", "EmissiveColor"]])
+        self.assertEqual(self.links_to("em_hit", "A"), [["em_total", "", "em_hit", "A"]])
+        # every term of the hit tint is a product with CPD_HitTint: 0 adds nothing
+        self.assertEqual(sorted(l[0] for l in self.links_to("hit_a", "A") + self.links_to("hit_k", "A")),
+                         ["cpd_hit", "cpd_hit"])
+        self.assertEqual(self.links_to("hit_c", "B"), [["hit_k", "", "hit_c", "B"]])
+        self.assertEqual(self.links_to("hit_eai", "LightValueInput"), [["hit_c", "", "hit_eai", "LightValueInput"]])
+
+    def test_knobs(self):
+        p = {n["props"]["parameter_name"]: n["props"] for n in self.g.nodes.values()
+             if n["class"].endswith("Parameter") and "parameter_name" in n["props"]}
+        self.assertEqual(p["HitTintStrength"]["group"], "Cue")
+        self.assertGreater(p["HitTintStrength"]["default_value"], 0.0)
+        self.assertLessEqual(p["HitTintStrength"]["default_value"], 1.0)
+        col = p["HitTintColor"]["default_value"]
+        self.assertGreater(col["r"], 5 * max(col["g"], col["b"]), "red fill")
+
+    def test_v21_graph_is_a_subgraph(self):
+        """Nothing of v2.1 changed except the two attribute pins that now read the hit tint."""
+        new = {k for k in self.g.nodes if k.startswith(("hit_", "p_hit", "cpd_hit", "base_hit", "em_hit"))}
+        self.assertEqual(new, {"cpd_hit", "p_hitcol", "p_hitstr", "p_hitemi", "hit_a", "base_hit", "hit_k", "hit_c",
+                               "hit_alpha", "hit_eai", "em_hit"})
+        self.assertEqual(len(self.g.nodes), 71 + len(new))
+
 @unittest.skipUnless(HAVE_SPEC, "um-masters.json missing")
 class TestInstances(unittest.TestCase):
     def setUp(self):

@@ -102,7 +102,8 @@ MakeMaterialAttributes используется потому, что в Python-�
 | Library | **`MatIDTexture`**, **`MatLUT`**, `DetailStrength` 1, `WearStrength` 1, `SheenStrength` 1, `MetresPerLocalUnit` 0.01, static switch `UseUV1Metres` false | MatID legacy, LUT глобальная |
 | Team | static switch **`UseTeamAccent`** (v2.1), `TeamColor`, `TeamDye`, `TeamDyeGain` (как в v1), **`TeamDyeCeiling`** (v2.1) | `UseTeamAccent` true; `TeamDyeCeiling` 0 (= только `TeamDyeGain`); остальное как v1 |
 | Knobs | `RoughnessMin/Max`, `NormalStrength`, `AOToBaseColor`, `Saturation`, `ValueLift`, `EmissiveIntensity`, `RimColor` (как в v1) | нейтральные, как v1 |
-| CustomPrimitiveData | `CPD_TeamColor` 0–3, `CPD_FxFlash` 5–8, `CPD_RimIntensity` 9, `CPD_RimWidth` 10, `CPD_Fade` 11 (раскладка v1) | 0 |
+| CustomPrimitiveData | `CPD_TeamColor` 0–3, `CPD_FxFlash` 5–8, `CPD_RimIntensity` 9, `CPD_RimWidth` 10, `CPD_Fade` 11 (раскладка v1); **`CPD_HitTint` 12** (v2.2, только v2) | 0 |
+| Cue | **`HitTintColor`** (0.85, 0.03, 0.02), **`HitTintStrength`** 0.7, **`HitTintEmissive`** 0.35 (v2.2) | как указано |
 | Debug | `DebugView` (0 выкл.; 1 класс, 2 roughness, 3 metallic, 4 нормаль детали, 5 износ, 6 итоговая нормаль, 7 альбедо, 8 fuzz, 9 RMH тайла, 10 вес красителя (v2.1); вывод в emissive, поверхность чёрная), `DebugMatIDOverride` (−1 = из текстуры; 0–15 = весь материал один класс), `DebugBakeFromLUT` (1 = бейк заменён типичным цветом класса) | 0 / −1 / 0 |
 
 Имена и раскладка CPD совпадают с v1, поэтому MI героя переносится сменой родителя и добавлением трёх текстур:
@@ -234,6 +235,32 @@ true, 8/8 проверок.
 Остаток регрессии в освещённом кадре — 0.7 уровня сверх шума при одинаковом G-buffer. Значит, разница возникает в
 проходах освещения, а не в материале. Вероятные причины: история Lumen/TSR при смене материала или захват карточек
 surface cache. Причина не доказана, записана как остаток.
+
+### 6.2. v2.2 — заливка удара `CPD_HitTint` (DE-010, 2026-10-04)
+
+Зачем: CUE-011 (01 F-03) красит цель красной заливкой в кадр контакта выпада — 450 мс, при смерти 550 мс. Кривую задаёт
+код боя (DE-018); мастер даёт только параметр.
+
+- **Слот.** CPD 12, скаляр `CPD_HitTint`, 0…1, по умолчанию 0. Раскладка v1 (CPD 0–11, `art/um-materials/um-masters.json`)
+  не тронута: слот только у v2 (`V2_CPD` в `ue_v2_master.py`), мастера v1 и их тесты не меняются. C++ —
+  `S08HeroesV2::HitTintCpdIndex`, `HitTintParamName`.
+- **Граф.** После `Fade`: альбедо `lerp(x, HitTintColor, HitTint × HitTintStrength)`; к emissive добавляется
+  `HitTintColor × HitTint × HitTintEmissive` через `EyeAdaptationInverse` (единицы экрана, не зависит от экспозиции).
+  При 0 обе ветви дают ровно прежний результат (`lerp(x, c, 0) = x`, `+ 0`).
+- **Ручки** (группа Cue, MI может переопределить): цвет (0.85, 0.03, 0.02) линейный, сила 0.7, свечение 0.35. Это
+  предложение; вид заливки — кандидат до листа A/B (DE-028).
+- **Сборка.** Тем же построителем `ue/um_v2_master.py` (граф пересобран на месте, личность ассета сохранена), но без MI:
+  `instances` пуст, MI героев и тестовые MI не пересохранялись. Запуск — `tools/art/de010/de010.py apply`
+  (UnrealEditor-Cmd без окна). Ошибок компиляции нет; 82 узла, 98 связей, сигнатура графа `8490f47c…`; PS 710
+  инструкций (v2.1: 698), VS 315, сэмплеров 10.
+- **Проверка** (`docs/art-pipeline/evidence/de010-2026-10-04/de010-report.json`, `all_ok`). Пустая карта, четыре v2-фигуры
+  в MI P1, SceneCapture2D без Lumen GI и отражений, без TAA и блума, ручная экспозиция; кадр детерминирован (два запуска
+  «до» совпали побайтно):
+  - `CPD_HitTint` 0, до и после: освещённый и unlit-кадр совпадают побайтно (max 0);
+  - старый мастер слот 12 не читал: 1 = 0 побайтно;
+  - после: 1 меняет 92 тыс. пикселей фигур, «краснота» R − (G + B)/2 растёт с 32 до 173 уровней.
+  Кадры редактора — проверка материала, не K1–K3 и не художественная приёмка. Packaged K1 до/после снимает агент приёмки
+  прогона A04.
 
 ## 7. Как читаются классы (кадры `scene-r3`, свет Cobble, High)
 

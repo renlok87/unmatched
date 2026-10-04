@@ -1,6 +1,7 @@
 #include "S08HeroesV2.h"
 
 #include "S08ArtPreviewMedusa.h"
+#include "Animation/AnimSequenceBase.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
 
@@ -95,11 +96,12 @@ const TArray<FHeroSpec>& Specs() {
   // merlin-lookdev-v2.md + merlin-h2-lookdev-ue-import.json (hood 44.986, staff crystal 49.42),
   // medusa-lookdev-v2.md (55.009 / 55.01), harpy-lookdev-v2.md (42.00, wings do not rise above it).
   // Idle lengths: anim-v2 decisions (4) / the H2Anim tables of the look-dev reports.
+  // Contact frames (DE-010): LungeAttack "design" of the *-h2anim.json build profiles (01 F-03).
   static const TArray<FHeroSpec> Table = {
-      {TEXT("King Arthur"), TEXT("KingArthur"), TEXT("H2LD"), true, 55.0f, 52.0f, 56.0f, 55.0f, 60.06f, 2.5f},
-      {TEXT("Merlin"), TEXT("Merlin"), TEXT("H2LD"), false, 45.0f, 40.0f, 48.0f, 44.986f, 49.42f, 3.0f},
-      {TEXT("Medusa"), TEXT("Medusa"), TEXT("H2LD"), true, 55.0f, 50.0f, 55.0f, 55.009f, 55.01f, 56.0f / 24.0f},
-      {TEXT("Harpies"), TEXT("Harpy"), TEXT("H3LD"), false, 42.0f, 35.0f, 42.0f, 42.0f, 42.0f, 2.0f},
+      {TEXT("King Arthur"), TEXT("KingArthur"), TEXT("H2LD"), true, 55.0f, 52.0f, 56.0f, 55.0f, 60.06f, 2.5f, 7},
+      {TEXT("Merlin"), TEXT("Merlin"), TEXT("H2LD"), false, 45.0f, 40.0f, 48.0f, 44.986f, 49.42f, 3.0f, 8},
+      {TEXT("Medusa"), TEXT("Medusa"), TEXT("H2LD"), true, 55.0f, 50.0f, 55.0f, 55.009f, 55.01f, 56.0f / 24.0f, 8},
+      {TEXT("Harpies"), TEXT("Harpy"), TEXT("H3LD"), false, 42.0f, 35.0f, 42.0f, 42.0f, 42.0f, 2.0f, 7},
   };
   return Table;
 }
@@ -156,6 +158,22 @@ float ExpectedClipSeconds(const FHeroSpec& Spec, EClip Clip) {
     case EClip::DeathSettle: return 21.0f / 24.0f;
     default: return 0.0f;
   }
+}
+
+float ProfileContactSeconds(const FHeroSpec& Spec) { return static_cast<float>(Spec.LungeContactFrame) / ClipFps; }
+
+float NotifyContactSeconds(const UAnimSequenceBase* Anim) {
+  if (!Anim) return -1.0f;
+  const FName Name(ContactNotifyName);
+  for (const FAnimNotifyEvent& Event : Anim->Notifies) {
+    if (Event.NotifyName == Name) return Event.GetTriggerTime();
+  }
+  return -1.0f;
+}
+
+float ContactSeconds(const FHeroSpec& Spec, const UAnimSequenceBase* LungeAttack) {
+  const float FromNotify = NotifyContactSeconds(LungeAttack);
+  return FromNotify >= 0.0f ? FromNotify : ProfileContactSeconds(Spec);
 }
 
 }  // namespace S08HeroesV2
