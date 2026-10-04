@@ -644,12 +644,30 @@ function Invoke-Phase2Demo {
       }
     }
     # Topology board: the reachable spaces of the selected hero are rings on the painted circles.
-    if (-not (Select-String -LiteralPath $hostTrace -Pattern 'ARTPREVIEW reachable rings cells=[1-9]\d* placed=1' -Quiet)) {
+    # MS-T-08: with -S08MovePlates the reachable spaces are the ISM move plates (no ring actors are spawned): the plate
+    # material is loaded and a reach view of the selected fighter shows its rings.
+    if ($ClientExtraArgs -match '(^|\+)-S08MovePlates(\+|$)') {
+      foreach ($pat in @('MS-HL assets plate=M_UM_MovePlate .* ready=1', 'MS-HL geom .* ok=1$')) {
+        if (-not (Select-String -LiteralPath $hostTrace -Pattern $pat -Quiet)) { throw "host trace missing move plates line /$pat/" }
+      }
+      if (-not (Select-String -LiteralPath $hostTrace -Pattern 'MS-HL view source=reach .* ring=[1-9]\d*' -Quiet)) {
+        throw 'host trace has no reach view of move plates for the selected fighter (-S08MovePlates, map-image board)'
+      }
+    } elseif (-not (Select-String -LiteralPath $hostTrace -Pattern 'ARTPREVIEW reachable rings cells=[1-9]\d* placed=1' -Quiet)) {
       throw 'host trace has no placed reachable-space rings for the selected hero (map-image board)'
     }
     if ($HostManeuver) {
       # The opt-in host maneuver (M1): begun and applied on the host, its move cues on both clients.
-      Assert-Trace $hostTrace @('MANEUVER begin seq=', 'MANEUVER done', 'CUE move') 'host maneuver'
+      # When the snapshot of a leg arrives over WS before its HTTP answer, the flow settles that leg on the snapshot
+      # ('MS-NET gate released by snapshot ...', then 'MS-NET late-reply op=<leg> ok=1') and writes no
+      # 'MANEUVER begin seq=' / 'MANEUVER done' line: an accepted late reply counts (run B G-LIVE, A04 note 1).
+      Assert-Trace $hostTrace @('CUE move') 'host maneuver'
+      $legs = @(@('MANEUVER begin seq=', 'MS-NET late-reply op=begin ok=1'), @('MANEUVER done', 'MS-NET late-reply op=maneuver ok=1'))
+      foreach ($leg in $legs) {
+        if (-not (Select-String -LiteralPath $hostTrace -SimpleMatch -Pattern $leg -Quiet)) {
+          throw "host maneuver trace has neither '$($leg[0])' nor '$($leg[1])'"
+        }
+      }
       Assert-Trace $joinTrace @('CUE move') 'joiner maneuver'
     }
     $requestedLabel = if ($MedusaVariantExplicit) { $ArtPreviewMedusaVariant } else { '(default)' }
@@ -752,7 +770,17 @@ function Invoke-Phase2Demo {
     # ProjectWorldLocationToScreen can return true even for offscreen pixels.
     # Count only living fighters whose projected centers lie inside 1920x1080.
     function Assert-SixFightersInFrame([string]$Path, [string]$Who) {
-      $lines = @(Select-String -Path $Path -Pattern 'SHOT fighter .* screen=\((-?\d+),(-?\d+)\) projected=1 alive=1')
+      # Only the block of the run's evidence shot (phase2-board-*): an opt-in extra frame (-S08ManeuverDraftShot)
+      # writes its own SHOT ctx / SHOT fighter block before it.
+      $all = @(Get-Content -LiteralPath $Path)
+      $ctxIdx = @(for ($i = 0; $i -lt $all.Count; $i++) { if ($all[$i] -match 'SHOT ctx ') { $i } })
+      $start = 0; $end = $all.Count
+      for ($k = 0; $k -lt $ctxIdx.Count; $k++) {
+        $segEnd = if ($k + 1 -lt $ctxIdx.Count) { $ctxIdx[$k + 1] } else { $all.Count }
+        $req = @($all[$ctxIdx[$k]..($segEnd - 1)] | Where-Object { $_ -match 'SHOT request(ed)? ' } | Select-Object -First 1)
+        if ($req.Count -gt 0 -and $req[0] -match 'phase2-board-') { $start = $ctxIdx[$k]; $end = $segEnd }
+      }
+      $lines = @($all[$start..($end - 1)] | Select-String -Pattern 'SHOT fighter .* screen=\((-?\d+),(-?\d+)\) projected=1 alive=1')
       $inside = 0
       foreach ($line in $lines) {
         $x = [int]$line.Matches[0].Groups[1].Value
