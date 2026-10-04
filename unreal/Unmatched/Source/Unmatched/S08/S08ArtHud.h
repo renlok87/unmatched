@@ -368,10 +368,12 @@ inline const TCHAR* S08InputSourceName(ES08InputSource Source) {
 
 /** Flag-driven input emulation steps (-ArtPreviewInputPlan=). Real OS input
  *  is T4.3; every emulated step is traced src=flag. */
-enum class ES08InputStep : uint8 { WheelIn, WheelOut, Space, ClickHero, ClickAbove, ClickCell };
+enum class ES08InputStep : uint8 { WheelIn, WheelOut, Space, ClickHero, ClickAbove, ClickCell, EndTurnKey, HudEndTurn };
 const TCHAR* S08InputStepName(ES08InputStep Step);
 /** '+'-separated tokens (',' truncates FParse::Value): wheelin, wheelout,
- *  space, clickhero, clickabove, clickcell; "token*N" repeats (N 1..20).
+ *  space, clickhero, clickabove, clickcell, endturnkey (the E key path, DE-015),
+ *  hudendturn (a press + release on the live END TURN element, DE-014);
+ *  "token*N" repeats (N 1..20).
  *  At most 40 steps. Unknown tokens fail the whole plan. */
 bool S08ParseInputPlan(const FString& Text, TArray<ES08InputStep>& OutSteps, FString& OutError);
 

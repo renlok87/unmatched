@@ -472,6 +472,10 @@ bool FS08ArtHudFlagsTest::RunTest(const FString&) {
   TestTrue("order kept", Steps.Num() == 16 && Steps[0] == ES08InputStep::ClickHero &&
                              Steps[3] == ES08InputStep::WheelOut && Steps[6] == ES08InputStep::Space &&
                              Steps[15] == ES08InputStep::WheelIn);
+  TestTrue("run B G-LIVE steps parse", S08ParseInputPlan(TEXT("endturnkey+hudendturn*2"), Steps, Error) &&
+                                           Steps.Num() == 3 && Steps[0] == ES08InputStep::EndTurnKey &&
+                                           Steps[2] == ES08InputStep::HudEndTurn &&
+                                           FCString::Strcmp(S08InputStepName(Steps[1]), TEXT("hudendturn")) == 0);
   TestFalse("unknown token refused", S08ParseInputPlan(TEXT("wheelin+jump"), Steps, Error));
   TestTrue("error names the token", Error.Contains(TEXT("jump")) && Steps.Num() == 0);
   TestFalse("repeat > 20 refused", S08ParseInputPlan(TEXT("wheelin*21"), Steps, Error));

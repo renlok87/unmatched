@@ -263,6 +263,9 @@ void AS08FlowGameMode::BeginPlay() {
   FParse::Value(FCommandLine::Get(), TEXT("S08Shot="), AutoShotPath);
   FParse::Value(FCommandLine::Get(), TEXT("S08DropWsAfter="), AutoDropWsAfter);
   FParse::Value(FCommandLine::Get(), TEXT("S08ManeuverAfter="), AutoManeuverAfter);
+  FParse::Value(FCommandLine::Get(), TEXT("S08ManeuverDraftHold="), AutoManeuverDraftHold);
+  FParse::Value(FCommandLine::Get(), TEXT("S08ManeuverDraftShot="), AutoManeuverDraftShot);
+  AutoManeuverDraftHold = FMath::Clamp(AutoManeuverDraftHold, 0.0f, 10.0f);
   FParse::Value(FCommandLine::Get(), TEXT("S08ExitAfter="), AutoExitAfter);
   // Review tooling (S08ArtLook::ReviewTooling, -ArtPreview): the evidence shot, the K2 focus zoom and the own-hero
   // selection. The art look itself is the default (S08ArtLook::Enabled).
@@ -1643,13 +1646,16 @@ TSharedRef<SWidget> AS08FlowGameMode::MakeHudPress(FName Id, TFunction<FS09Reaso
   // The look of the old SButton, dimmed when the element is blocked now; the
   // decision itself is taken again on the click (the state may change first).
   const bool bDimmed = Blocked && Blocked().IsSet();
-  return SNew(SS09HudPress)
-      .Id(Id)
-      .Arbiter(HudPress)
-      .OnOutcome_Lambda([this, Blocked, Action](const FS09HudPressOutcome& Outcome) {
-        HandleHudPressOutcome(Outcome, Blocked, Action);
-      })
-      [SNew(SButton).ContentPadding(Padding).ButtonColorAndOpacity(Tint).IsEnabled(!bDimmed)[Label]];
+  TSharedRef<SS09HudPress> Element =
+      SNew(SS09HudPress)
+          .Id(Id)
+          .Arbiter(HudPress)
+          .OnOutcome_Lambda([this, Blocked, Action](const FS09HudPressOutcome& Outcome) {
+            HandleHudPressOutcome(Outcome, Blocked, Action);
+          })
+          [SNew(SButton).ContentPadding(Padding).ButtonColorAndOpacity(Tint).IsEnabled(!bDimmed)[Label]];
+  HudPressWidgets.Add(Id, Element); // the newest instance of the id (flag step 'hudendturn')
+  return Element;
 }
 
 void AS08FlowGameMode::HandleHudPressOutcome(const FS09HudPressOutcome& Outcome, const TFunction<FS09Reason()>& Blocked,
@@ -4046,7 +4052,29 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
     }
     // MS-R-62: the -S08Maneuver driver confirms its draft (the pre-draft
     // target carried in with src=auto) once the snapshot opened it.
-    if (bAutoManeuverAwaitDraft && CommandUi.Mode == ES09CommandMode::ManeuverDraft &&
+    bool bDraftHeld = false;
+    if (bAutoManeuverAwaitDraft && AutoManeuverDraftHold > 0.0f && CommandUi.Mode == ES09CommandMode::ManeuverDraft &&
+        !Flow->IsManeuverInFlight()) {
+      // Run B G-LIVE: the opened draft stays as the snapshot opened it (rings, tiers) for the hold; the frame is taken
+      // once the plates had time to show, never on top of another pending capture.
+      if (AutoDraftOpenAt < 0.0f) {
+        AutoDraftOpenAt = Elapsed;
+        FS08Trace::Write(FString::Printf(TEXT("AUTO maneuver draft hold=%.1f selected=%s"), AutoManeuverDraftHold,
+                                         CommandUi.SelectedFighterId.IsEmpty() ? TEXT("-")
+                                                                               : *CommandUi.SelectedFighterId));
+      }
+      if (!bAutoDraftShotTaken && !AutoManeuverDraftShot.IsEmpty() && Elapsed >= AutoDraftOpenAt + 0.6f &&
+          !FScreenshotRequest::IsScreenshotRequested() && ArtHud.PendingCapturePath.IsEmpty()) {
+        bAutoDraftShotTaken = true;
+        const bool bMainShotTaken = bShotTaken; // the draft frame never stands in for the run's evidence shot
+        TakeEvidenceShot(AutoManeuverDraftShot);
+        bShotTaken = bMainShotTaken;
+      }
+      bDraftHeld = Elapsed < AutoDraftOpenAt + AutoManeuverDraftHold ||
+                   (!AutoManeuverDraftShot.IsEmpty() && !bAutoDraftShotTaken &&
+                    Elapsed < AutoDraftOpenAt + AutoManeuverDraftHold + 3.0f);
+    }
+    if (bAutoManeuverAwaitDraft && !bDraftHeld && CommandUi.Mode == ES09CommandMode::ManeuverDraft &&
         !Flow->IsManeuverInFlight()) {
       bAutoManeuverAwaitDraft = false;
       // M1 (MS-AT-32): -S08ManeuverPlan fills the draft (boost card + moves,
@@ -7003,6 +7031,45 @@ void AS08FlowGameMode::EmulateInputStep(ES08InputStep Step) {
     case ES08InputStep::WheelIn: ApplyWheel(+1, ES08InputSource::Flag); return;
     case ES08InputStep::WheelOut: ApplyWheel(-1, ES08InputSource::Flag); return;
     case ES08InputStep::Space: ApplySpace(ES08InputSource::Flag); return;
+    case ES08InputStep::EndTurnKey: {
+      // Run B G-LIVE (DE-015): the path of the E key in HandleHudKeys - the move input first, then EndTurnCommand,
+      // which answers a reason by key (TOAST why= / ENDTURN refused) or sends endTurn.
+      FS08Trace::Write(TEXT("INPUT key=E src=flag"));
+      if (CommandUi.bCommandInFlight || Flow->IsManeuverInFlight()) {
+        ShowReason(FS09Reason::Make(TEXT("why.syncing")), 3.0f);
+        return;
+      }
+      const FS09InputResult Result =
+          MoveInput.OnKey(ES09MoveKey::E, CommandUi, EffectiveSnapshot(), BoardModel, Fighters, MoveInputView());
+      if (Result.bHandled) {
+        ApplyMoveInput(Result);
+      } else {
+        EndTurnCommand();
+      }
+      return;
+    }
+    case ES08InputStep::HudEndTurn: {
+      // Run B G-LIVE (DE-014): a press and a release on the live END TURN element through its own Slate handlers
+      // (SS09HudPress -> arbiter -> HandleHudPressOutcome), at the centre of its painted geometry.
+      const FName Id(TEXT("hud.end.turn"));
+      const TSharedPtr<SS09HudPress> Element = HudPressWidgets.Contains(Id) ? HudPressWidgets[Id].Pin() : nullptr;
+      if (!Element.IsValid()) {
+        FS08Trace::Write(TEXT("INPUT hudpress src=flag id=hud.end.turn skipped=no-element"));
+        return;
+      }
+      FGeometry Geometry = Element->GetCachedGeometry();
+      const bool bPainted = Geometry.GetLocalSize().X > 0.0f && Geometry.GetLocalSize().Y > 0.0f;
+      if (!bPainted) Geometry = FGeometry::MakeRoot(FVector2D(160.0, 40.0), FSlateLayoutTransform());
+      const FVector2D At = Geometry.LocalToAbsolute(Geometry.GetLocalSize() * 0.5f);
+      const FPointerEvent Down(0, At, At, TSet<FKey>{EKeys::LeftMouseButton}, EKeys::LeftMouseButton, 0.0f,
+                               FModifierKeysState());
+      const FPointerEvent Up(0, At, At, TSet<FKey>(), EKeys::LeftMouseButton, 0.0f, FModifierKeysState());
+      FS08Trace::Write(FString::Printf(TEXT("INPUT hudpress src=flag id=hud.end.turn at=(%.0f,%.0f) geom=%s"), At.X,
+                                       At.Y, bPainted ? TEXT("painted") : TEXT("synthetic")));
+      Element->OnMouseButtonDown(Geometry, Down);
+      Element->OnMouseButtonUp(Geometry, Up);
+      return;
+    }
     default: break;
   }
   // Clicks: a screen point from the same projection the SHOT lines use, then

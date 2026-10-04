@@ -642,6 +642,14 @@ private:
   bool bAutoManeuverAwaitDraft = false; // -S08Maneuver: confirm once the draft opens (MS-R-62)
   FString AutoManeuverPlan;             // -S08ManeuverPlan=<plan>: run on the opened draft first (M1)
   bool bAutoManeuverNoStepTraced = false; // M1: "no free hero step" traced once
+  // Run B G-LIVE (opt-in evidence): -S08ManeuverDraftHold=<s> keeps the opened draft (MS-S-06, the V-17 rings of
+  // DE-017) s seconds before the plan / confirm; -S08ManeuverDraftShot=<abs png> takes the frame of it.
+  float AutoManeuverDraftHold = 0.0f;
+  FString AutoManeuverDraftShot;
+  float AutoDraftOpenAt = -1.0f;
+  bool bAutoDraftShotTaken = false;
+  // Run B G-LIVE: the live element of each HUD id (MakeHudPress), for the flag step 'hudendturn' (DE-014).
+  TMap<FName, TWeakPtr<SS09HudPress>> HudPressWidgets;
   FString TracedToast;             // the last toast written to the trace (MS-AT-18)
   int32 ManeuverTargetX = -1;
   int32 ManeuverTargetY = -1;

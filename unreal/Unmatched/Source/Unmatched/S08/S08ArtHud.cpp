@@ -665,6 +665,8 @@ const TCHAR* S08InputStepName(ES08InputStep Step) {
     case ES08InputStep::ClickHero: return TEXT("clickhero");
     case ES08InputStep::ClickAbove: return TEXT("clickabove");
     case ES08InputStep::ClickCell: return TEXT("clickcell");
+    case ES08InputStep::EndTurnKey: return TEXT("endturnkey");
+    case ES08InputStep::HudEndTurn: return TEXT("hudendturn");
   }
   return TEXT("unknown");
 }
@@ -703,6 +705,8 @@ bool S08ParseInputPlan(const FString& Text, TArray<ES08InputStep>& OutSteps, FSt
     else if (Name == TEXT("clickhero")) Step = ES08InputStep::ClickHero;
     else if (Name == TEXT("clickabove")) Step = ES08InputStep::ClickAbove;
     else if (Name == TEXT("clickcell")) Step = ES08InputStep::ClickCell;
+    else if (Name == TEXT("endturnkey")) Step = ES08InputStep::EndTurnKey;
+    else if (Name == TEXT("hudendturn")) Step = ES08InputStep::HudEndTurn;
     else {
       OutError = FString::Printf(TEXT("unknown step '%s'"), *Name);
       OutSteps.Reset();

@@ -724,6 +724,12 @@ function Invoke-Phase2Demo {
       }
       if ($ArtPreviewInputPlan -match 'wheel') { Assert-Trace $hostTrace @('INPUT wheel dir=', 'CAMERA wheel dir=') 'host wheel' }
       if ($ArtPreviewInputPlan -match 'space') { Assert-Trace $hostTrace @('INPUT space src=flag', 'CAMERA space src=flag') 'host Space' }
+      # Run B G-LIVE: a flag press on END TURN is answered (DE-014, never silent); the E key answers by key or sends (DE-015).
+      if ($ArtPreviewInputPlan -match 'hudendturn') { Assert-Trace $hostTrace @('INPUT hudpress src=flag id=hud.end.turn', 'HUD-PRESS id=hud.end.turn result=') 'host END TURN press' }
+      if ($ArtPreviewInputPlan -match 'endturnkey') {
+        Assert-Trace $hostTrace @('INPUT key=E src=flag') 'host E key'
+        if (-not (Select-String -LiteralPath $hostTrace -Pattern '(TOAST why=|ENDTURN refused|endTurn)' -Quiet)) { throw 'host E key got no answer (no TOAST why= / ENDTURN refused / endTurn)' }
+      }
       if (Select-String -LiteralPath $hostTrace -Pattern 'INPUT (wheel|space|click) .*src=os' -Quiet) {
         throw 'host trace carries src=os input in an offscreen flag run'
       }
