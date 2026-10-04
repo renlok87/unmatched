@@ -30,17 +30,19 @@
 
 1. **Окно игры.** Узнать заголовок:
    `powershell -NoProfile -Command "Get-Process | ? MainWindowTitle | select Name,MainWindowTitle"`.
-2. **Видео 60 fps** (NVENC, чтобы не грузить CPU):
+2. **Видео и звук.** Рекордер `C:/tmp/de-footage/tools/de_record.py` пишет окно игры 60 fps через NVENC
+   (`video.mkv`) и системный звук через WASAPI loopback (`audio.wav`, пакет `soundcard` в venv). Метки старта
+   кладутся в `sync.json`. Проверен 2026-10-04: h264 60 fps, выход с кодом 0.
 
    ```bash
-   ffmpeg -f gdigrab -framerate 60 -draw_mouse 1 -i title="<заголовок окна DE>" -c:v h264_nvenc -preset p5 -cq 19 C:/tmp/de-live/<дата>/session-01.mkv
+   C:/tmp/de-footage/tools/venv/Scripts/python C:/tmp/de-footage/tools/de_record.py "<заголовок окна DE>" C:/tmp/de-live/<дата>/session-01
    ```
 
-   Запуск — в фоне, остановка — `q` в stdin или завершение процесса после проверки его командной строки.
-3. **Звук (R-12).**
-   - Проверить устройства: `ffmpeg -list_devices true -f dshow -i dummy`.
-   - Если есть «Stereo Mix» или виртуальный кабель, добавить его к записи: `-f dshow -i audio="<устройство>"`.
-   - Если нет, пользователь сам включает запись в OBS с захватом звука рабочего стола. Писать с микрофона не нужно.
+   Запуск — в фоне. Стоп — создать файл `STOP` в папке сессии; процессы не убивать.
+3. **Сведение звука.** В системе нет «Stereo Mix», поэтому ffmpeg звук игры не пишет — только рекордер.
+   - Сдвиг звука к видео калибруется по клику в интерфейсе: звук клика против кадра, где курсор нажимает.
+     Точность ±17 мс.
+   - Заголовок окна передавать латиницей: кириллица в bash ломается (cp866).
 4. **Измерение.**
    - Указать видео: `C:/tmp/de-footage/work/video.txt` → путь к записи.
    - Ленты: `python C:/tmp/de-footage/pipeline/burst.py strip T0 T1 60 6 400 OUT.jpg [w:h:x:y]`; 1 тайл = 16,7 мс.
