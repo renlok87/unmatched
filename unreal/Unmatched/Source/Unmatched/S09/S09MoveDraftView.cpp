@@ -52,6 +52,9 @@ FS08MoveDraftInput BuildInput(const FS09CommandUi& Ui, const FS08BoardModel& Boa
                                                                              : PositionOf(Move.FighterId);
     }
     In.bSent = Ui.bCommandInFlight;
+    // V-17 (DE-017, MS-R-75): MS-S-06 - no fighter selected, the draft not sent - rings under every own fighter that
+    // may move; they go out in the frame a fighter is selected (and stay out while the maneuver is in flight)
+    if (Ui.SelectedFighterId.IsEmpty() && !Ui.bCommandInFlight) In.CandidateFighterIds = Ui.MovableFighterIds(Fighters);
   } else if (Ui.Mode == ES09CommandMode::None && Ui.PreDraft.bSet) {
     // MS-S-03: the pre-draft target is a destination (V-04 / V-04b) before the maneuver began
     FS08MoveDraftInput::FMove& Out = In.Moves.AddDefaulted_GetRef();

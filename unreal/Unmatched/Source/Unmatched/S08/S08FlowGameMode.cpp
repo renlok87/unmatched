@@ -800,6 +800,9 @@ void AS08FlowGameMode::SyncBoardFromApplied() {
     } else if (CommandUi.Mode == ES09CommandMode::None && !bLegacyQuickMove) {
       BoardActor->SetSelectedFighter(FString(), TSet<uint64>()); // the inspection ended (turn passed)
     }
+    // DE-017 (MS-R-75): the candidate rings V-17 of a draft that opened with no fighter selected - in this frame,
+    // not on the next tick (the plates' key covers the mode, the draft revision and the selection)
+    if (CommandUi.Mode == ES09CommandMode::ManeuverDraft) SyncMovePlates();
   }
   RefreshUi();
 }

@@ -23,7 +23,8 @@
 namespace S09MoveDraftView {
 /** The plate input of the current draft: the selected fighter's tiers (MS-S-06/07, also the MS-S-02 inspection), every
  *  drafted move with its status and path, the pre-draft target (MS-S-03), the in-flight flag (MS-S-05) and a pending
- *  MOVE / PLACE head of the viewer (MS-S-12). Hover, leader pips and candidates are the caller's. */
+ *  MOVE / PLACE head of the viewer (MS-S-12) and the candidate rings V-17 of MS-S-06 (DE-017: every own fighter that
+ *  may move while none is selected and the draft is not sent). Hover and leader pips are the caller's. */
 UNMATCHED_API FS08MoveDraftInput BuildInput(const FS09CommandUi& Ui, const FS08BoardModel& Board,
                                             const TArray<FS08BoardFighter>& Fighters);
 }  // namespace S09MoveDraftView

@@ -186,7 +186,7 @@ FS08MoveDraftView BuildDraftView(const FS08BoardModel& Board, const TArray<FS08B
       }
     }
   }
-  // V-17: candidate rings under the own fighters that may move (DE-017 decides which, and when)
+  // V-17: candidate rings under the own fighters that may move (DE-017: S09MoveDraftView::BuildInput, MS-S-06)
   for (const FString& Id : Input.CandidateFighterIds) {
     for (const FS08BoardFighter& F : Fighters) {
       if (F.Id != Id || !F.IsAlive()) continue;

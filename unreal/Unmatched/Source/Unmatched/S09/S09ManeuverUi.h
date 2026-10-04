@@ -516,6 +516,14 @@ public:
    *  selected one in fighters[] order that CanMoveFighter accepts (the dead
    *  and the immobilized are skipped); empty without one. */
   FString CycleFighter(const TArray<FS08BoardFighter>& Fighters, int32 Direction) const;
+  /** DE-017 (MS-R-75, V-17): the own fighters CanMoveFighter accepts, in
+   *  fighters[] order - the candidate rings of MS-S-06 and the Tab ring. The
+   *  dead and the immobilized are not candidates. */
+  TArray<FString> MovableFighterIds(const TArray<FS08BoardFighter>& Fighters) const;
+  /** DE-017 (MS-R-75): the draft of THIS pendingManeuver.id auto-selected its
+   *  only movable fighter when it opened (MS-S-07 at once). Once per id: Esc
+   *  back to MS-S-06 does not repeat it, a later snapshot does not either. */
+  bool bAutoSelected = false;
   /** MS-R-71: fighters that leave a space another drafted move ends on - drawn
    *  at 50 % under that move's ghost (the drawing comes with the ghosts, MS-T-10). */
   TArray<FString> FadedFighters(const TArray<FS08BoardFighter>& Fighters) const;

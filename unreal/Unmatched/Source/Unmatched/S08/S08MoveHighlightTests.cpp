@@ -505,6 +505,16 @@ bool FS08MoveHLBenchDraftTest::RunTest(const FString&) {
       TestEqual(Name + TEXT(": one Ok"), Ui.Eval.NumOk, 1);
       TestEqual(Name + TEXT(": one NeedBoost"), Ui.Eval.NumNeedBoost, 1);
       TestEqual(Name + TEXT(": one Conflict"), Ui.Eval.NumConflict, 1);
+    } else if (Fixture.Scene.StartsWith(TEXT("0-"))) {
+      // DE-017 (MS-R-75): MS-S-06 - a candidate ring V-17 under every own fighter that may move, nothing selected
+      const TArray<FString> Movers = Ui.MovableFighterIds(B.Fighters);
+      const FS08MoveDraftView View =
+          S08MoveHighlight::BuildDraftView(B.Board, B.Fighters, S09MoveDraftView::BuildInput(Ui, B.Board, B.Fighters));
+      int32 Rings = 0;
+      for (const FS08PlateView& P : View.Plates) Rings += P.Ring == ES08RingState::Candidate ? 1 : 0;
+      TestTrue(Name + TEXT(": scene 0 has no selection and no move"), Ui.SelectedFighterId.IsEmpty() && Ui.Moves.Num() == 0);
+      TestTrue(Name + TEXT(": several own movers (Medusa + Harpies)"), Movers.Num() >= 2);
+      TestEqual(Name + TEXT(": one candidate ring per mover"), Rings, Movers.Num());
     }
   }
   // a fighter or a card the bench state does not have: MS-BENCH mismatch, no draft

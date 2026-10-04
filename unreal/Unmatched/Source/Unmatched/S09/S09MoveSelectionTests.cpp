@@ -31,6 +31,11 @@
 //   Unmatched.S09.MoveSel.TurnStartInput - DE-015 (SD-44 / SD-47, MS-R-79): the
 //       first click of the own turn accepted in the apply frame, END TURN / E
 //       answer why.actions.remaining {n}, no pass, the TURN-INPUT trace pair.
+//   Unmatched.S09.MoveSel.CandidatesAndAutoSelect - DE-017 (W-10, MS-R-75, V-17):
+//       candidate rings under every own movable fighter in the frame the draft
+//       opens (not the immobilized, the dead, the enemy), gone on selection and
+//       in flight; one movable fighter - MS-S-07 at once, once per maneuver id;
+//       no advance after a move, the selection kept over a boost, Tab cycles.
 //   Unmatched.S09.MoveSel.AutoManeuverPlan - M1 / MS-AT-32 (driver part): the opt-in
 //       -S08ManeuverPlan=boost3 on the driver's draft - the best BOOST card, three
 //       moves (hero step + two sidekicks), src=auto, confirmable; refusals.
@@ -48,6 +53,8 @@
 #include "S09ManeuverUi.h"
 #include "S09MoveInput.h"
 #include "S09HudPress.h"
+#include "S09MoveDraftView.h"
+#include "../S08/S08MoveHighlight.h"
 #include "../S08/S08BoardModel.h"
 #include "../S08/S08Contracts.h"
 #include "../S08/S08WhyText.h"
@@ -2832,6 +2839,145 @@ bool FS09MoveSelTurnStartInputTest::RunTest(const FString&) {
     TestTrue(TEXT("the next own turn opens again"), Watch.IsOpen());
     Watch.OnApplied(true, true, 5, 31);
     TestFalse(TEXT("the result screen closes it"), Watch.IsOpen());
+  }
+  return true;
+}
+
+// ---- DE-017 (W-10; 03 MS-R-75, V-17; 01 F-08): candidate rings and auto-select ----
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09MoveSelCandidatesAndAutoSelectTest, "Unmatched.S09.MoveSel.CandidatesAndAutoSelect",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS09MoveSelCandidatesAndAutoSelectTest::RunTest(const FString&) {
+  const FS08BoardModel Board = MsGrid(8, 8);
+  const FS08Snapshot Snap = MsSnapshot({{TEXT("c1"), true, 2}});
+  FString Reason;
+  auto RingAt = [](const FS08MoveDraftView& View, int32 X, int32 Y) {
+    const FS08PlateView* P = View.Find(X, Y);
+    return P ? P->Ring : ES08RingState::None;
+  };
+  auto CandidateRings = [](const FS08MoveDraftView& View) {
+    int32 N = 0;
+    for (const FS08PlateView& P : View.Plates) N += P.Ring == ES08RingState::Candidate ? 1 : 0;
+    return N;
+  };
+  auto ViewOf = [&Board](const FS09CommandUi& Ui, const TArray<FS08BoardFighter>& Fighters) {
+    return S08MoveHighlight::BuildDraftView(Board, Fighters, S09MoveDraftView::BuildInput(Ui, Board, Fighters));
+  };
+  auto IsCandidate = [](ES08RingState State) { return State == ES08RingState::Candidate; };
+
+  // ---- three movable (hero + two sidekicks), an immobilized, a dead and an enemy fighter ----
+  {
+    TArray<FS08BoardFighter> Fighters =
+        MsDecode({MsFighterJson(TEXT("medusa"), Me, 1, 1, 8, MsNum(3)), MsFighterJson(TEXT("h1"), Me, 2, 1, 1, MsNum(3)),
+                  MsFighterJson(TEXT("h2"), Me, 3, 1, 1, MsNum(3)),
+                  MsFighterJson(TEXT("imm"), Me, 5, 5, 4, MsNum(3), false, TEXT("immobilized")),
+                  MsFighterJson(TEXT("dead"), Me, 6, 6, 0, MsNum(3)), MsFighterJson(TEXT("enemy"), Opp, 7, 7, 5, MsNum(3))});
+    for (FS08BoardFighter& F : Fighters) F.bIsHero = F.Id == TEXT("medusa");
+    FS09CommandUi Ui = MsOpen(Snap, Board, Fighters);
+    TestTrue(TEXT("the draft is open (MS-S-06)"), Ui.Mode == ES09CommandMode::ManeuverDraft);
+    TestTrue(TEXT("several movers: nothing auto-selected"), Ui.SelectedFighterId.IsEmpty() && !Ui.bAutoSelected);
+    TestEqual(TEXT("movable = the three living, free own fighters"),
+              FString::Join(Ui.MovableFighterIds(Fighters), TEXT(",")), FString(TEXT("medusa,h1,h2")));
+    TestTrue(TEXT("MS-DRAFT op=candidates traced on opening"),
+             MsTracedLine(Ui, {TEXT("MS-DRAFT op=candidates"), TEXT("n=3"), TEXT("ids=medusa,h1,h2"),
+                               TEXT("autoselect=-")}));
+    const FS08MoveDraftInput Input = S09MoveDraftView::BuildInput(Ui, Board, Fighters);
+    TestEqual(TEXT("three candidates in the input"), Input.CandidateFighterIds.Num(), 3);
+    const FS08MoveDraftView Open = ViewOf(Ui, Fighters);
+    TestTrue(TEXT("V-17 under the hero"), IsCandidate(RingAt(Open, 1, 1)));
+    TestTrue(TEXT("V-17 under sidekick 1"), IsCandidate(RingAt(Open, 2, 1)));
+    TestTrue(TEXT("V-17 under sidekick 2"), IsCandidate(RingAt(Open, 3, 1)));
+    TestFalse(TEXT("the immobilized has no ring"), IsCandidate(RingAt(Open, 5, 5)));
+    TestFalse(TEXT("the dead has no ring"), IsCandidate(RingAt(Open, 6, 6)));
+    TestFalse(TEXT("the enemy has no ring"), IsCandidate(RingAt(Open, 7, 7)));
+    TestEqual(TEXT("exactly three candidate rings"), CandidateRings(Open), 3);
+    const FS08PlateView* Hero = Open.Find(1, 1);
+    const FS08PlateView* Side = Open.Find(2, 1);
+    TestTrue(TEXT("hero ring at figure scale 1, sidekick smaller"),
+             Hero && Side && FMath::IsNearlyEqual(Hero->FigureScale, 1.0f) && Side->FigureScale < 1.0f);
+
+    // selecting a fighter puts every candidate ring out in the same view (MS-S-07)
+    TestTrue(TEXT("select h1"), Ui.SelectFighter(TEXT("h1"), Snap, Board, Fighters));
+    TestEqual(TEXT("no candidate after the selection"), CandidateRings(ViewOf(Ui, Fighters)), 0);
+    // no advance to the next fighter after a move is assigned
+    TestTrue(TEXT("h1 -> (2,3)"), Ui.SetDestination(TEXT("h1"), 2, 3, Snap, Board, Fighters, Reason));
+    TestEqual(TEXT("h1 stays selected after its move"), Ui.SelectedFighterId, FString(TEXT("h1")));
+    // a boost keeps the selection; the tiers are recomputed for the same fighter (MS-R-76)
+    TestTrue(TEXT("boost c1"), Ui.ToggleBoostCard(TEXT("c1"), Snap, Board, Fighters, Reason));
+    TestEqual(TEXT("h1 stays selected after the boost"), Ui.SelectedFighterId, FString(TEXT("h1")));
+    TestTrue(TEXT("tiers of h1 after the boost"), Ui.SelectedTiers.bValid && Ui.SelectedTiers.FighterId == TEXT("h1"));
+    // Tab cycles the movers only (the immobilized and the dead are skipped)
+    TestEqual(TEXT("Tab h1 -> h2"), Ui.CycleFighter(Fighters, 1), FString(TEXT("h2")));
+    TestTrue(TEXT("select h2"), Ui.SelectFighter(TEXT("h2"), Snap, Board, Fighters));
+    TestEqual(TEXT("Tab h2 -> medusa (wraps, skips imm and dead)"), Ui.CycleFighter(Fighters, 1),
+              FString(TEXT("medusa")));
+    TestEqual(TEXT("Shift+Tab h2 -> h1"), Ui.CycleFighter(Fighters, -1), FString(TEXT("h1")));
+    // Esc back to MS-S-06: the candidates return (a drafted move keeps its fighter a candidate)
+    Ui.DeselectFighter();
+    TestEqual(TEXT("candidates back in MS-S-06"), CandidateRings(ViewOf(Ui, Fighters)), 3);
+    // in flight (MS-S-09): no candidate rings
+    Ui.bCommandInFlight = true;
+    TestEqual(TEXT("no candidates while the maneuver is in flight"), CandidateRings(ViewOf(Ui, Fighters)), 0);
+    Ui.bCommandInFlight = false;
+    // a snapshot of the same maneuver re-evaluates: still MS-S-06, no auto-select
+    Ui.OnSnapshot(MsSnapshot({{TEXT("c1"), true, 2}}, ManeuverA, 6), Board, Fighters);
+    TestTrue(TEXT("same id: no selection made by the snapshot"), Ui.SelectedFighterId.IsEmpty());
+  }
+
+  // ---- exactly one movable fighter: MS-S-07 at once, once per maneuver id ----
+  {
+    const TArray<FS08BoardFighter> Fighters =
+        MsDecode({MsFighterJson(TEXT("solo"), Me, 2, 2, 6, MsNum(2)),
+                  MsFighterJson(TEXT("imm"), Me, 4, 4, 3, MsNum(2), false, TEXT("immobilized")),
+                  MsFighterJson(TEXT("dead"), Me, 6, 6, 0, MsNum(2)),
+                  MsFighterJson(TEXT("enemy"), Opp, 7, 7, 5, MsNum(2))});
+    FS09CommandUi Ui = MsOpen(Snap, Board, Fighters);
+    TestEqual(TEXT("the only mover is selected on opening"), Ui.SelectedFighterId, FString(TEXT("solo")));
+    TestTrue(TEXT("flagged as an auto-select"), Ui.bAutoSelected);
+    TestTrue(TEXT("its tiers are ready in the opening frame"), Ui.SelectedTiers.bValid &&
+                                                                   Ui.SelectedTiers.FighterId == TEXT("solo") &&
+                                                                   Ui.SelectedTiers.BaseTier.Num() > 0);
+    TestTrue(TEXT("its reachable cells are ready"), Ui.ReachableCells.Num() > 1);
+    TestTrue(TEXT("trace names the auto-select"),
+             MsTracedLine(Ui, {TEXT("MS-DRAFT op=candidates"), TEXT("n=1"), TEXT("autoselect=solo")}));
+    const FS08MoveDraftView View = ViewOf(Ui, Fighters);
+    TestEqual(TEXT("MS-S-07: no candidate ring"), CandidateRings(View), 0);
+    TestTrue(TEXT("MS-S-07: the base tier is drawn"), RingAt(View, 3, 2) == ES08RingState::ReachBase);
+    // Esc back to MS-S-06 does not re-select; a later snapshot of the same id does not either
+    Ui.DeselectFighter();
+    Ui.OnSnapshot(MsSnapshot({{TEXT("c1"), true, 2}}, ManeuverA, 6), Board, Fighters);
+    TestTrue(TEXT("no second auto-select for the same maneuver"), Ui.SelectedFighterId.IsEmpty());
+    TestTrue(TEXT("its candidate ring instead"), IsCandidate(RingAt(ViewOf(Ui, Fighters), 2, 2)));
+    // the next maneuver opens a new draft: auto-select again
+    Ui.OnSnapshot(MsSnapshot({}, FString(), 7), Board, Fighters);
+    Ui.OnSnapshot(MsSnapshot({{TEXT("c1"), true, 2}}, TEXT("maneuver:2:9"), 9), Board, Fighters);
+    TestEqual(TEXT("a new maneuver id auto-selects again"), Ui.SelectedFighterId, FString(TEXT("solo")));
+  }
+
+  // ---- a carried pre-draft target selects its own fighter: not an auto-select ----
+  {
+    const TArray<FS08BoardFighter> Fighters =
+        MsDecode({MsFighterJson(TEXT("a"), Me, 1, 1, 6, MsNum(2)), MsFighterJson(TEXT("b"), Me, 5, 1, 6, MsNum(2))});
+    FS09CommandUi Ui;
+    Ui.ViewerId = Me;
+    const FS08Snapshot Before = MsSnapshot({{TEXT("c1"), true, 2}}, FString(), 4);
+    Ui.OnSnapshot(Before, Board, Fighters);
+    bool bUnchanged = false;
+    TestTrue(TEXT("pre-draft b -> (5,3)"), Ui.SetPreDraft(TEXT("b"), 5, 3, Before, Board, Fighters, bUnchanged));
+    Ui.OnSnapshot(Snap, Board, Fighters);
+    TestEqual(TEXT("the carried target selects b"), Ui.SelectedFighterId, FString(TEXT("b")));
+    TestFalse(TEXT("not an auto-select"), Ui.bAutoSelected);
+  }
+
+  // ---- nobody may move: no ring, no selection ----
+  {
+    const TArray<FS08BoardFighter> Fighters =
+        MsDecode({MsFighterJson(TEXT("imm"), Me, 1, 1, 4, MsNum(3), false, TEXT("immobilized")),
+                  MsFighterJson(TEXT("dead"), Me, 2, 2, 0, MsNum(3))});
+    FS09CommandUi Ui = MsOpen(Snap, Board, Fighters);
+    TestTrue(TEXT("no selection"), Ui.SelectedFighterId.IsEmpty());
+    TestEqual(TEXT("no candidate ring"), CandidateRings(ViewOf(Ui, Fighters)), 0);
+    TestTrue(TEXT("trace n=0"), MsTracedLine(Ui, {TEXT("MS-DRAFT op=candidates"), TEXT("n=0")}));
   }
   return true;
 }

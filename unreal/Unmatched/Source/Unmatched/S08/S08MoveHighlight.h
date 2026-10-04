@@ -13,8 +13,8 @@
 //
 // Until the user's art acceptance (MS-T-27) the plates are opt-in: -S08MovePlates. Without the flag the board keeps
 // the old readability ring (AS08BoardActor::SetSelectedFighter), so the reference frames of other sessions do not
-// change (05 §4). Path line, ghosts and badges come with MS-T-09 / MS-T-10; the candidate ring V-17 is drawn here
-// and switched on by DE-017.
+// change (05 §4). Path line, ghosts and badges come with MS-T-09 / MS-T-10; the candidate ring V-17 is drawn here;
+// S09MoveDraftView::BuildInput fills its fighters in MS-S-06 (DE-017).
 #pragma once
 
 #include "CoreMinimal.h"

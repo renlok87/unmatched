@@ -699,6 +699,24 @@ bool FS09CommandUi::OnSnapshot(const FS08Snapshot& Snapshot, const FS08BoardMode
     } else if (bOpened) {
       ClearPreDraft();
     }
+    // DE-017 (MS-R-75; 01 F-08): the candidate rings (V-17) of MS-S-06 are
+    // drawn in the frame the draft opens; with exactly one movable fighter
+    // the draft opens in MS-S-07 on it. Only on opening: after Esc back to
+    // MS-S-06 nothing re-selects, and there is never an advance to the next
+    // fighter after a move is assigned.
+    if (bOpened) {
+      const TArray<FString> Movers = MovableFighterIds(Fighters);
+      if (SelectedFighterId.IsEmpty() && Movers.Num() == 1) {
+        SelectedFighterId = Movers[0];
+        bAutoSelected = true;
+        RefreshSelectedTiers(Board, Fighters);
+        ++DraftRevision;
+      }
+      DraftTraceLine(FString::Printf(TEXT("MS-DRAFT op=candidates rev=%u src=snapshot n=%d ids=%s autoselect=%s"),
+                                     DraftRevision, Movers.Num(),
+                                     Movers.Num() > 0 ? *FString::Join(Movers, TEXT(",")) : TEXT("-"),
+                                     bAutoSelected ? *SelectedFighterId : TEXT("-")));
+    }
   } else if (bHasDiscard && Discard.PlayerId == ViewerId) {
     Mode = ES09CommandMode::DiscardDraft;
     PendingDiscard = Discard;
@@ -1029,6 +1047,7 @@ void FS09CommandUi::ResetManeuverDraft() {
   Moves.Reset();
   BoostCardId.Reset();
   SelectedFighterId.Reset();
+  bAutoSelected = false;
   ResetDraftEval();
   DirtyDefeatedTraced.Reset();
 }
@@ -1441,12 +1460,17 @@ bool FS09CommandUi::CanKeepPreDraft(const FS08Snapshot& Snapshot) const {
   return !(Meta.IsValid() && Meta->TryGetNumberField(TEXT("actionsRemaining"), Actions) && Actions <= 0.0);
 }
 
-FString FS09CommandUi::CycleFighter(const TArray<FS08BoardFighter>& Fighters, int32 Direction) const {
+TArray<FString> FS09CommandUi::MovableFighterIds(const TArray<FS08BoardFighter>& Fighters) const {
   TArray<FString> Ids;
   for (const FS08BoardFighter& Fighter : Fighters) {
     FS09Reason Why;
     if (SameDraftId(Fighter.OwnerId, ViewerId) && CanMoveFighter(Fighter.Id, Fighters, Why)) Ids.Add(Fighter.Id);
   }
+  return Ids;
+}
+
+FString FS09CommandUi::CycleFighter(const TArray<FS08BoardFighter>& Fighters, int32 Direction) const {
+  const TArray<FString> Ids = MovableFighterIds(Fighters);
   if (Ids.Num() == 0) return FString();
   const int32 Current = Ids.IndexOfByPredicate([this](const FString& Id) { return SameDraftId(Id, SelectedFighterId); });
   if (Current == INDEX_NONE) return Direction >= 0 ? Ids[0] : Ids.Last();
