@@ -126,11 +126,17 @@ docs/game-design/de-footage/task/04-de-live-research.md, затем решени
 | [../findings/](../findings/) `A1.json` … `A7.json` | Сырые данные семи аналитиков |
 | [00-TASK.md](00-TASK.md) | Постановка пакета: полномочия, границы, гейты, готовность |
 | [01-decisions.md](01-decisions.md) | Решения D-DE-01…12 (пять — за Claude после исследования) |
-| [02-spec-deltas.md](02-spec-deltas.md) | Правки спецификаций SD-01…40 |
-| [03-work-items.md](03-work-items.md) | Рабочие пункты W-01…W-20 |
+| [02-spec-deltas.md](02-spec-deltas.md) | Правки спецификаций SD-01…56 (SD-41…56 — по живому исследованию и ревью) |
+| [03-work-items.md](03-work-items.md) | Рабочие пункты W-01…W-31 |
 | [04-de-live-research.md](04-de-live-research.md) | Протокол живого исследования R-01…R-15 |
 | [05-workflow-plan.md](05-workflow-plan.md) | Нарезка на прогоны A–D, шаблон промпта |
 | [06-live-study-runbook.md](06-live-study-runbook.md) | Эта инструкция |
+| [07-sprint-plan.md](07-sprint-plan.md) | Набор задач по спринтам: S10, S11b…S11f, A04, S12/S13, post-MVP; гейты, прогоны, спорное (2026-10-04) |
+| [07-sprint-backlog.csv](07-sprint-backlog.csv) | 38 задач DE-001…DE-038 в формате `14-sprint-backlog.csv` (2026-10-04) |
+| [../live-2026-10-04/README.md](../live-2026-10-04/README.md) | Итоговый протокол живого исследования, серии s01–s05 (2026-10-04) |
+| [../live-2026-10-04/timings-live.csv](../live-2026-10-04/timings-live.csv) | Живые замеры `source=live60` (2026-10-04) |
+| [../live-2026-10-04/APPROXIMATION.md](../live-2026-10-04/APPROXIMATION.md) | Перенос DE на нашу игру по доменам (2026-10-04); при расхождении чисел действует 01 |
+| [runs/REVIEW-2026-10-04-fable.md](runs/REVIEW-2026-10-04-fable.md) | Журнал ревью Fable High: резолюции спорных пунктов, перемеры (2026-10-04) |
 | [../../../../tools/de-footage/](../../../../tools/de-footage/README.md) | Инструменты: загрузка, раскадровка, ленты, рекордер, предполётная проверка |
 
 Локально, не в git:
