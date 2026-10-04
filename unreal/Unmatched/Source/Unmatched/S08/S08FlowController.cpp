@@ -1,4 +1,5 @@
 #include "S08FlowController.h"
+#include "Algo/StableSort.h"
 #include "Dom/JsonObject.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Guid.h"
@@ -1281,9 +1282,167 @@ bool FS08FlowController::CanIssueGameplayCommand(FString& OutReason) const {
   return true;
 }
 
+// ---- MS-T-15: move cues with path, order, kind and source (04 §4.6) -------
+
+TArray<FS08MoveCueTiming> FS08MoveCueSchedule::Compute(const TArray<FS08MoveCueInput>& Moves,
+                                                       const FS08MoveCueParams& Params, double SpeedMul) {
+  // 04 §6.3: base/caps scale with the speed, the minimum step does not; the
+  // seq is compressed by k so the overlapped total fits the seq cap; starts
+  // follow the ACTUAL durations; the moves that still end past the cap
+  // (+1 ms) snap together at the end of the last animated one, in order.
+  const int32 N = Moves.Num();
+  TArray<FS08MoveCueTiming> Out;
+  Out.SetNum(N);
+  if (N == 0) return Out;
+  const double Mul = SpeedMul > 0.0 ? SpeedMul : 1.0;
+  const double Base = Params.StepMs * Mul;
+  const double CapF = Params.CapSubjectMs * Mul;
+  const double CapM = Params.CapSeqMs * Mul;
+  const double MinStep = Params.MinStepMs;
+  const double Lead = 1.0 - Params.Overlap;
+  TArray<double> Dur;
+  Dur.SetNum(N);
+  double Total = 0.0;
+  for (int32 I = 0; I < N; ++I) {
+    const bool bPlace = Moves[I].Kind == ES08MoveKind::Place;
+    Out[I].Steps = bPlace ? 1 : FMath::Max(1, Moves[I].Steps);
+    Dur[I] = bPlace ? Params.PlaceMs * Mul : FMath::Min(Out[I].Steps * Base, CapF);
+    Total += I < N - 1 ? Lead * Dur[I] : Dur[I];
+  }
+  const double K = Total > 0.0 ? FMath::Min(1.0, CapM / Total) : 1.0;
+  double Start = 0.0;
+  for (int32 I = 0; I < N; ++I) {
+    Out[I].StepMs = FMath::Max(Dur[I] * K / Out[I].Steps, MinStep);
+    Out[I].DurationMs = Out[I].StepMs * Out[I].Steps;
+    Out[I].StartMs = Start;
+    Start += Lead * Out[I].DurationMs;
+  }
+  int32 FirstSnap = N;
+  for (int32 I = 0; I < N; ++I) {
+    if (Out[I].StartMs + Out[I].DurationMs > CapM + 1.0) {
+      FirstSnap = I;
+      break;
+    }
+  }
+  const double SnapAt = FirstSnap > 0 ? Out[FirstSnap - 1].StartMs + Out[FirstSnap - 1].DurationMs : 0.0;
+  for (int32 I = FirstSnap; I < N; ++I) {
+    Out[I].bSnapped = true;
+    Out[I].StartMs = SnapAt;
+    Out[I].StepMs = 0.0;
+    Out[I].DurationMs = 0.0;
+  }
+  return Out;
+}
+
+TArray<FS08MoveCueTiming> FS08MoveCueSchedule::ForCues(const TArray<FS08Cue>& Cues,
+                                                       TArray<const FS08Cue*>& OutMovesInOrder,
+                                                       const FS08MoveCueParams& Params, double SpeedMul) {
+  OutMovesInOrder.Reset();
+  for (const FS08Cue& Cue : Cues) {
+    if (Cue.Type == ES08CueType::FighterMoved) OutMovesInOrder.Add(&Cue);
+  }
+  Algo::StableSortBy(OutMovesInOrder, [](const FS08Cue* Cue) { return Cue->OrderInSeq; });
+  TArray<FS08MoveCueInput> Inputs;
+  for (const FS08Cue* Cue : OutMovesInOrder) {
+    FS08MoveCueInput Input;
+    Input.Kind = Cue->Kind;
+    Input.Steps = Cue->Steps();
+    Inputs.Add(Input);
+  }
+  return Compute(Inputs, Params, SpeedMul);
+}
+
+namespace S08MoveCue {
+
+bool ReadXY(const TSharedPtr<FJsonValue>& Value, FIntPoint& Out) {
+  const TSharedPtr<FJsonObject>* Object = nullptr;
+  if (!Value.IsValid() || !Value->TryGetObject(Object) || !Object || !Object->IsValid()) return false;
+  bool bX = false, bY = false;
+  int32 X = -1, Y = -1;
+  if (!FS08Contracts::ReadIntLike(Object->ToSharedRef(), TEXT("x"), X, bX) || !bX) return false;
+  if (!FS08Contracts::ReadIntLike(Object->ToSharedRef(), TEXT("y"), Y, bY) || !bY) return false;
+  Out = FIntPoint(X, Y);
+  return true;
+}
+
+/** One lastMovement.moves[] entry (04 §4.3). bValid: every field readable,
+ *  kind MOVE/PLACE, a non-empty path (PLACE: exactly the target). */
+struct FTrailMove {
+  int32 Order = 0;
+  ES08MoveKind Kind = ES08MoveKind::Move;
+  FIntPoint From = FIntPoint(-1, -1);
+  TArray<FIntPoint> Path; // without the start
+  bool bValid = false;
+};
+
+/** metadata.lastMovement of Seq: fighter id -> its trail entry. False when
+ *  there is no trail of exactly this seq (absent, null, another seq,
+ *  malformed). A fighter listed twice is kept as an invalid entry (the
+ *  trail cannot describe it, the cue falls back). */
+bool ReadTrailOfSeq(const TSharedPtr<FJsonValue>& Metadata, int32 Seq, TMap<FString, FTrailMove>& Out) {
+  Out.Reset();
+  const TSharedPtr<FJsonObject> Meta = Metadata.IsValid() ? Metadata->AsObject() : nullptr;
+  if (!Meta.IsValid()) return false;
+  const TSharedPtr<FJsonValue> TrailValue = Meta->TryGetField(TEXT("lastMovement"));
+  const TSharedPtr<FJsonObject>* Trail = nullptr;
+  if (!TrailValue.IsValid() || !TrailValue->TryGetObject(Trail) || !Trail || !Trail->IsValid()) return false;
+  int32 TrailSeq = 0;
+  bool bSeq = false;
+  if (!FS08Contracts::ReadIntLike(Trail->ToSharedRef(), TEXT("seq"), TrailSeq, bSeq) || !bSeq || TrailSeq != Seq) {
+    return false;
+  }
+  const TArray<TSharedPtr<FJsonValue>>* Moves = nullptr;
+  if (!(*Trail)->TryGetArrayField(TEXT("moves"), Moves) || !Moves) return false;
+  for (int32 Index = 0; Index < Moves->Num(); ++Index) {
+    const TSharedPtr<FJsonObject>* Move = nullptr;
+    if (!(*Moves)[Index].IsValid() || !(*Moves)[Index]->TryGetObject(Move) || !Move || !Move->IsValid()) continue;
+    FString FighterId;
+    if (!(*Move)->TryGetStringField(TEXT("fighterId"), FighterId) || FighterId.IsEmpty()) continue;
+    FTrailMove Entry;
+    bool bOrder = false;
+    Entry.Order = Index;
+    FS08Contracts::ReadIntLike(Move->ToSharedRef(), TEXT("order"), Entry.Order, bOrder);
+    const FString Kind = (*Move)->GetStringField(TEXT("kind"));
+    const bool bKnownKind = Kind == TEXT("MOVE") || Kind == TEXT("PLACE");
+    Entry.Kind = Kind == TEXT("PLACE") ? ES08MoveKind::Place : ES08MoveKind::Move;
+    const bool bFrom = ReadXY((*Move)->TryGetField(TEXT("from")), Entry.From);
+    bool bPath = false;
+    const TArray<TSharedPtr<FJsonValue>>* Path = nullptr;
+    if ((*Move)->TryGetArrayField(TEXT("path"), Path) && Path && Path->Num() > 0) {
+      bPath = true;
+      for (const TSharedPtr<FJsonValue>& Step : *Path) {
+        FIntPoint Cell;
+        if (!ReadXY(Step, Cell)) {
+          bPath = false;
+          break;
+        }
+        Entry.Path.Add(Cell);
+      }
+    }
+    Entry.bValid = bKnownKind && bFrom && bPath && (Entry.Kind == ES08MoveKind::Move || Entry.Path.Num() == 1);
+    if (FTrailMove* Seen = Out.Find(FighterId)) {
+      Seen->bValid = false; // listed twice: not describable by one entry
+      continue;
+    }
+    Out.Add(FighterId, MoveTemp(Entry));
+  }
+  return true;
+}
+
+const TCHAR* SourceName(ES08PathSource Source) {
+  switch (Source) {
+  case ES08PathSource::Trail: return TEXT("trail");
+  case ES08PathSource::Canonical: return TEXT("canonical");
+  case ES08PathSource::Straight: return TEXT("straight");
+  default: return TEXT("none");
+  }
+}
+
+} // namespace S08MoveCue
+
 void FS08FlowController::ComputeCues(int32 Seq, const TSharedPtr<FJsonValue>& OldFighters,
-                                     const TSharedPtr<FJsonValue>& NewFighters,
-                                     TArray<FS08Cue>& OutCues) {
+                                     const TSharedPtr<FJsonValue>& NewFighters, const FS08BoardModel& Board,
+                                     const TSharedPtr<FJsonValue>& Metadata, TArray<FS08Cue>& OutCues) {
   OutCues.Reset();
   if (!OldFighters.IsValid() || !NewFighters.IsValid()) return;
   const TArray<TSharedPtr<FJsonValue>>* OldArray = nullptr;
@@ -1300,7 +1459,16 @@ void FS08FlowController::ComputeCues(int32 Seq, const TSharedPtr<FJsonValue>& Ol
       FS08Contracts::ReadIntLike(Position->ToSharedRef(), TEXT("y"), OutY, Present);
     }
   };
-  for (const TSharedPtr<FJsonValue>& NewValue : *NewArray) {
+  TMap<FString, S08MoveCue::FTrailMove> Trail;
+  S08MoveCue::ReadTrailOfSeq(Metadata, Seq, Trail);
+  // The canonical fallback runs on the positions BEFORE this snapshot.
+  TArray<FS08BoardFighter> OldBoardFighters;
+  bool bOldDecoded = false;
+  TArray<FS08Cue> MoveCues;
+  TArray<int64> MoveKeys; // trail order first, then fighters[] order
+  TArray<FS08Cue> DamageCues;
+  for (int32 NewIndex = 0; NewIndex < NewArray->Num(); ++NewIndex) {
+    const TSharedPtr<FJsonValue>& NewValue = (*NewArray)[NewIndex];
     const TSharedPtr<FJsonObject>* NewFighter = nullptr;
     if (!NewValue.IsValid() || !NewValue->TryGetObject(NewFighter) || !NewFighter->IsValid()) {
       continue;
@@ -1326,7 +1494,34 @@ void FS08FlowController::ComputeCues(int32 Seq, const TSharedPtr<FJsonValue>& Ol
       Cue.SequenceNumber = Seq;
       Cue.FighterId = Id;
       Cue.FromX = OldX; Cue.FromY = OldY; Cue.ToX = NewX; Cue.ToY = NewY;
-      OutCues.Add(MoveTemp(Cue));
+      const FIntPoint From(OldX, OldY);
+      const FIntPoint To(NewX, NewY);
+      const S08MoveCue::FTrailMove* Entry = Trail.Find(Id);
+      if (Entry && Entry->bValid && Entry->From == From && Entry->Path.Last() == To) {
+        Cue.PathSource = ES08PathSource::Trail;
+        Cue.Kind = Entry->Kind;
+        Cue.Path.Add(From);
+        Cue.Path.Append(Entry->Path);
+      } else {
+        Cue.bTrailMismatch = Entry != nullptr;
+        if (!bOldDecoded) {
+          FS08BoardModel::DecodeFighters(OldFighters, OldBoardFighters);
+          bOldDecoded = true;
+        }
+        TArray<FIntPoint> Tail;
+        const FS08ReachMap Reach = FS08BoardModel::ComputeReachMap(Board, OldBoardFighters, Id, MAX_int32);
+        if (Reach.bValid && Reach.Start == From &&
+            FS08BoardModel::BuildCanonicalPath(Board, OldBoardFighters, Reach, To, Tail) && Tail.Num() > 0) {
+          Cue.PathSource = ES08PathSource::Canonical;
+          Cue.Path.Add(From);
+          Cue.Path.Append(Tail);
+        } else {
+          Cue.PathSource = ES08PathSource::Straight;
+          Cue.Path = {From, To};
+        }
+      }
+      MoveKeys.Add(Entry ? static_cast<int64>(Entry->Order) : (static_cast<int64>(1) << 32) + NewIndex);
+      MoveCues.Add(MoveTemp(Cue));
     }
     bool Present = false;
     int32 OldHealth = 0, NewHealth = 0;
@@ -1338,8 +1533,38 @@ void FS08FlowController::ComputeCues(int32 Seq, const TSharedPtr<FJsonValue>& Ol
       Cue.SequenceNumber = Seq;
       Cue.FighterId = Id;
       Cue.Damage = OldHealth - NewHealth;
-      OutCues.Add(MoveTemp(Cue));
+      DamageCues.Add(MoveTemp(Cue));
     }
+  }
+  // OrderInSeq: the trail's moves[] order, then the untracked fighters; the
+  // damage cues follow every move (MS-E-48: the cascade waits for the move).
+  TArray<int32> Index;
+  for (int32 I = 0; I < MoveCues.Num(); ++I) Index.Add(I);
+  Algo::StableSortBy(Index, [&MoveKeys](int32 I) { return MoveKeys[I]; });
+  for (int32 Rank = 0; Rank < Index.Num(); ++Rank) {
+    FS08Cue& Cue = MoveCues[Index[Rank]];
+    Cue.OrderInSeq = Rank;
+    OutCues.Add(MoveTemp(Cue));
+  }
+  OutCues.Append(MoveTemp(DamageCues));
+}
+
+void FS08FlowController::MoveCueTraceLines(const TArray<FS08Cue>& Cues, const FS08BoardModel& Board,
+                                           TArray<FString>& OutLines) {
+  OutLines.Reset();
+  TArray<const FS08Cue*> Moves;
+  const TArray<FS08MoveCueTiming> Timing = FS08MoveCueSchedule::ForCues(Cues, Moves);
+  for (int32 I = 0; I < Moves.Num(); ++I) {
+    const FS08Cue& Cue = *Moves[I];
+    TArray<FString> Cells;
+    for (const FIntPoint& Cell : Cue.Path) Cells.Add(Board.CellLabel(Cell.X, Cell.Y));
+    OutLines.Add(FString::Printf(
+        TEXT("MS-CUE move seq=%d fighter=%s order=%d of=%d kind=%s steps=%d source=%s start=%d ms=%d snapped=%d path=%s%s"),
+        Cue.SequenceNumber, *Cue.FighterId, Cue.OrderInSeq, Moves.Num(),
+        Cue.Kind == ES08MoveKind::Place ? TEXT("place") : TEXT("move"), Cue.Steps(),
+        S08MoveCue::SourceName(Cue.PathSource), FMath::RoundToInt(Timing[I].StartMs),
+        FMath::RoundToInt(Timing[I].DurationMs), Timing[I].bSnapped ? 1 : 0, *FString::Join(Cells, TEXT(">")),
+        Cue.bTrailMismatch ? TEXT(" trail=mismatch") : TEXT("")));
   }
 }
 
@@ -1357,6 +1582,7 @@ ES08SeqDecision FS08FlowController::ApplySnapshot(const FS08Snapshot& Snapshot) 
   // events) carries no intermediate transitions - diffing across it would
   // fabricate stale animations (ACC-012: old CUEs are not replayed).
   TArray<FS08Cue> Cues;
+  TArray<FString> MoveCueLines;
   if (Decision == ES08SeqDecision::Apply) {
     if (bBarrierHttpBody || bWsBarrierFrame) {
       // P1(3)/P1(2): an HTTP gameState body (reconnect barrier or recovery
@@ -1369,7 +1595,14 @@ ES08SeqDecision FS08FlowController::ApplySnapshot(const FS08Snapshot& Snapshot) 
                               Snapshot.SequenceNumber));
       }
     } else if (SeqGuard.HasLocal && Snapshot.SequenceNumber == SeqGuard.Local + 1) {
-      ComputeCues(Snapshot.SequenceNumber, Applied.Fighters, Snapshot.Fighters, Cues);
+      // MS-T-15: the trail is read from THIS body's own metadata (a merged
+      // older lastMovement is never this seq's); the canonical fallback and
+      // the trace labels use the board of the body, else the applied one.
+      FS08BoardModel CueBoard;
+      CueBoard.Decode(Snapshot.BoardState.IsValid() ? Snapshot.BoardState : Applied.BoardState);
+      ComputeCues(Snapshot.SequenceNumber, Applied.Fighters, Snapshot.Fighters, CueBoard, Snapshot.Metadata,
+                  Cues);
+      MoveCueTraceLines(Cues, CueBoard, MoveCueLines);
     } else if (SeqGuard.HasLocal) {
       Trace(FString::Printf(TEXT("SEQ %d gap from %d: cues suppressed"), Snapshot.SequenceNumber,
                             SeqGuard.Local));
@@ -1493,6 +1726,8 @@ ES08SeqDecision FS08FlowController::ApplySnapshot(const FS08Snapshot& Snapshot) 
   // HTTP answer - the gate opens before the render/HUD sees this state.
   ReleaseManeuverGateBySnapshot(Snapshot);
   OnApplied.Broadcast(Applied, Decision);
+  // MS-T-15 (04 §9): one MS-CUE line per move cue, at the cue's start.
+  for (const FString& Line : MoveCueLines) Trace(Line);
   if (Cues.Num() > 0) OnCues.Broadcast(Cues);
   return Decision;
 }

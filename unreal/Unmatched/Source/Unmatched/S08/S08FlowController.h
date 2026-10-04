@@ -10,6 +10,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "S08BoardModel.h"
 #include "S08Contracts.h"
 #include "S08GraphqlClient.h"
 #include "S08GraphqlWs.h"
@@ -48,12 +49,81 @@ struct FS08HeroEntry {
  *  HTTP echo + WS event of the same seq produce exactly one cue set. */
 enum class ES08CueType : uint8 { FighterMoved, FighterDamaged };
 
+/** MS-T-15 (move-selection 04 §4.6): how a FighterMoved cue travels - Move
+ *  step by step along Path, Place as one jump to the last cell (steps = 1). */
+enum class ES08MoveKind : uint8 { Move, Place };
+/** MS-T-15 (04 §4.6, MS-R-48): where the Path of a FighterMoved cue comes
+ *  from. Trail = metadata.lastMovement of this very seq; Canonical = the
+ *  client canonical path on the positions BEFORE the snapshot with no step
+ *  limit; Straight = from -> to when no such path exists. */
+enum class ES08PathSource : uint8 { None, Trail, Canonical, Straight };
+
 struct UNMATCHED_API FS08Cue {
   ES08CueType Type;
   int32 SequenceNumber = 0;
   FString FighterId;
   int32 FromX = 0, FromY = 0, ToX = 0, ToY = 0; // move
   int32 Damage = 0;                             // health decrease
+  // ---- MS-T-15: FighterMoved only ----
+  /** Cells WITH the start: Path[0] = from, Path.Last() = to. Place: [from, to]. */
+  TArray<FIntPoint> Path;
+  /** 0..n-1 among the move cues of this seq: the trail's moves[] order
+   *  first, then the fighters without a trail entry in fighters[] order. */
+  int32 OrderInSeq = 0;
+  ES08MoveKind Kind = ES08MoveKind::Move;
+  ES08PathSource PathSource = ES08PathSource::None;
+  /** The trail of this seq listed the fighter but did not match the snapshot
+   *  (its from / last cell differ from the positions, e.g. an ability moved
+   *  the fighter further in the same seq): the path fell back to Canonical /
+   *  Straight (trace `trail=mismatch`). */
+  bool bTrailMismatch = false;
+  /** Animation steps of CUE-007: path cells without the start; Place = 1. */
+  int32 Steps() const {
+    return Kind == ES08MoveKind::Place ? 1 : FMath::Max(1, Path.Num() - 1);
+  }
+};
+
+/** MS-T-15: CUE-007 timing - docs/unreal/contracts/cue-dispatcher/cue-table.json
+ *  CUE-007 duration_per_step_ms, cap_subject_ms, cap_seq_ms, min_step_ms,
+ *  overlap, place_ms (MS-D-14). The defaults ARE the contract values
+ *  (Unmatched.S08.MoveAnim.CueTrace compares them with the table). */
+struct UNMATCHED_API FS08MoveCueParams {
+  double StepMs = 280.0;
+  double CapSubjectMs = 1400.0;
+  double CapSeqMs = 2400.0;
+  double MinStepMs = 90.0;  // not scaled by the speed multiplier
+  double Overlap = 0.3;
+  double PlaceMs = 240.0;
+};
+
+/** One move of a seq for the schedule. */
+struct UNMATCHED_API FS08MoveCueInput {
+  ES08MoveKind Kind = ES08MoveKind::Move;
+  int32 Steps = 1;
+};
+
+/** Schedule entry of one move (milliseconds from the first move's start). */
+struct UNMATCHED_API FS08MoveCueTiming {
+  double StartMs = 0.0;
+  double StepMs = 0.0;     // per step; 0 when snapped
+  int32 Steps = 0;
+  double DurationMs = 0.0; // StepMs * Steps; 0 when snapped
+  bool bSnapped = false;   // did not fit the seq cap: snaps at StartMs
+};
+
+/** 04 §6.3 schedule of one seq's moves in OrderInSeq order - a pure
+ *  function, mirrored by tools/s08/cue_contract/cue_contract.py
+ *  move_schedule (check-trace verifies the MS-CUE `ms=`). SpeedMul: Fast
+ *  0.5, Normal 1, Slow 1.5; MS-T-15 traces Normal. Reduced motion and the
+ *  speed setting are MS-T-16 (FS08MoveAnim). */
+struct UNMATCHED_API FS08MoveCueSchedule {
+  static TArray<FS08MoveCueTiming> Compute(const TArray<FS08MoveCueInput>& Moves,
+                                           const FS08MoveCueParams& Params = FS08MoveCueParams(),
+                                           double SpeedMul = 1.0);
+  /** The move cues of Cues (any order) sorted by OrderInSeq, then Compute. */
+  static TArray<FS08MoveCueTiming> ForCues(const TArray<FS08Cue>& Cues, TArray<const FS08Cue*>& OutMovesInOrder,
+                                           const FS08MoveCueParams& Params = FS08MoveCueParams(),
+                                           double SpeedMul = 1.0);
 };
 
 /** One maneuver move: fighter id + orthogonal step path. */
@@ -233,6 +303,29 @@ public:
   /** Applies an incoming snapshot through the seq guard and critical-field
    *  validation. Returns the decision taken (Ignore/Merge/Apply). */
   ES08SeqDecision ApplySnapshot(const FS08Snapshot& Snapshot);
+
+  /** Cues for one authoritative transition (old vs new fighters, by id) -
+   *  pure. MS-T-15 (04 §4.6): every FighterMoved cue carries its Path (with
+   *  the start), OrderInSeq, Kind and PathSource - the trail
+   *  (Metadata.lastMovement, used only when its seq == Seq and its entry for
+   *  the fighter starts at the old position and ends at the new one), else
+   *  FS08BoardModel::BuildCanonicalPath on Board over the OLD fighters with
+   *  no step limit, else Straight. Metadata is the snapshot's OWN metadata
+   *  (absent = no trail). Move cues come first in OrderInSeq order, then
+   *  the damage cues in fighters[] order. A fighter whose position did not
+   *  change gets no move cue even when the trail lists it. */
+  static void ComputeCues(int32 Seq, const TSharedPtr<FJsonValue>& OldFighters,
+                          const TSharedPtr<FJsonValue>& NewFighters, const FS08BoardModel& Board,
+                          const TSharedPtr<FJsonValue>& Metadata, TArray<FS08Cue>& OutCues);
+  /** MS-T-15 (04 §9) trace lines of the move cues of one seq, in
+   *  OrderInSeq order, timed by FS08MoveCueSchedule (Normal speed):
+   *  "MS-CUE move seq=<n> fighter=<id> order=<k> of=<n> kind=<move|place>
+   *   steps=<n> source=<trail|canonical|straight> start=<ms> ms=<ms>
+   *   snapped=<0|1> path=<A>B>C>[ trail=mismatch]" - cells as
+   *  Board.CellLabel. cue_contract.py check-trace verifies steps, path and
+   *  ms against cue-table.json CUE-007. */
+  static void MoveCueTraceLines(const TArray<FS08Cue>& Cues, const FS08BoardModel& Board,
+                                TArray<FString>& OutLines);
 
 #if WITH_AUTOMATION_TESTS
   /** Offline harness: attach the state stream against a socket-less
@@ -551,11 +644,6 @@ private:
   TMap<int32, FString> RetiredCommandTokens;
   /** The space of the last pending-choice resolve ((-1,-1) without one). */
   FIntPoint PendingResolveCell = FIntPoint(-1, -1);
-  /** Cues for one authoritative transition (old vs new fighters), by id. */
-  static void ComputeCues(int32 Seq, const TSharedPtr<FJsonValue>& OldFighters,
-                          const TSharedPtr<FJsonValue>& NewFighters,
-                          TArray<FS08Cue>& OutCues);
-
   FS08GraphqlClient Http;
   TUniquePtr<FS08GraphqlWs> Ws;
   FString WsUrl;
