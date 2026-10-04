@@ -537,7 +537,10 @@ bool FS08ArtHudCapsuleTest::RunTest(const FString&) {
   if (!Actor) {
     AddError(TEXT("fighter actor not spawned"));
   } else {
+    // The isolated candidate is the legacy figure since ART-DEFAULT (v2 is the default): -S08HeroesLegacy.
+    S08HeroesV2::SetFlagOverrideForTest(false);
     Actor->ApplyFighter(Medusa, Cell, true, /*bArtPreview=*/true);
+    S08HeroesV2::ResetFlagOverrideForTest();
     TestTrue("candidate sculpt visible (art worktree /Game/ArtPreview/Medusa)", Actor->HasMedusaCandidate());
     const UCapsuleComponent* Capsule = Actor->FindComponentByClass<UCapsuleComponent>();
     TestNotNull("click capsule exists", Capsule);

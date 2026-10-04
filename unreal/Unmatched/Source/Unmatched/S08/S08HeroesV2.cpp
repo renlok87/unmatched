@@ -1,5 +1,6 @@
 #include "S08HeroesV2.h"
 
+#include "S08ArtPreviewMedusa.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
 
@@ -11,8 +12,11 @@ int32 GFlagOverride = -1;
 
 bool FlagEnabled() {
   if (GFlagOverride >= 0) return GFlagOverride == 1;
-  return FParse::Param(FCommandLine::Get(), FlagName);
+  // ART-DEFAULT: on unless rolled back; -ArtPreviewHeroesV2 (FlagName) is not read any more (no-op alias).
+  return Decide(LegacyRequested(), S08ArtPreviewAllMedusa());
 }
+
+bool LegacyRequested() { return FParse::Param(FCommandLine::Get(), LegacyFlagName); }
 
 void SetFlagOverrideForTest(bool bEnabled) { GFlagOverride = bEnabled ? 1 : 0; }
 
@@ -100,8 +104,8 @@ const TArray<FHeroSpec>& Specs() {
   return Table;
 }
 
-const FHeroSpec* Find(bool bArtPreview, bool bHeroesV2, const FString& FighterName) {
-  if (!bArtPreview || !bHeroesV2) return nullptr;
+const FHeroSpec* Find(bool bArtBoard, bool bHeroesV2, const FString& FighterName) {
+  if (!bArtBoard || !bHeroesV2) return nullptr;
   for (const FHeroSpec& Spec : Specs()) {
     if (FighterName.Equals(Spec.FighterName, ESearchCase::IgnoreCase)) return &Spec;
   }

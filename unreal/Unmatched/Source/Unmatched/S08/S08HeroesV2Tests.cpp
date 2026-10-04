@@ -1,7 +1,8 @@
-// Wave 5c-B automation tests of -ArtPreviewHeroesV2 (S08HeroesV2.h): name -> asset mapping with and
-// without the flag, the +X -> +Y facing offset on both board sides, the height budget scale, the
-// clip choice per combat event, the real look-dev C assets (bounds, skeletons, clip lengths) and the
-// fighter actor end to end (mesh, MI by look, yaw, Idle / HitReact / LungeAttack / DeathSettle).
+// Wave 5c-B automation tests of the heroes v2 (S08HeroesV2.h; the default figures since ART-DEFAULT 2026-10-04,
+// rollback -S08HeroesLegacy): name -> asset mapping on an art board by default and none with the rollback or on the
+// grey board, the +X -> +Y facing offset on both board sides, the height budget scale, the clip choice per combat
+// event, the real look-dev C assets (bounds, skeletons, clip lengths) and the fighter actor end to end (mesh, MI by
+// look, yaw, Idle / HitReact / LungeAttack / DeathSettle). The command-line default is S08ArtLookTests.cpp.
 // Headless run:
 //   UnrealEditor-Cmd.exe Unmatched.uproject
 //     -ExecCmds="Automation RunTests Unmatched.S08.HeroesV2; Quit" -unattended -nosplash -nullrhi
@@ -69,12 +70,16 @@ const UStaticMeshComponent* StaticComponentOf(const AS08FighterActor* Actor, con
 }  // namespace S08HeroesV2Test
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08HeroesV2MappingTest,
-    "Unmatched.S08.HeroesV2.Mapping fighter name to v2 assets only with -ArtPreview and -ArtPreviewHeroesV2",
+    "Unmatched.S08.HeroesV2.Mapping fighter name to v2 assets on an art board by default, none with -S08HeroesLegacy or on the grey board",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FS08HeroesV2MappingTest::RunTest(const FString&) {
   using namespace S08HeroesV2;
   using namespace S08HeroesV2Test;
-  TestEqual("flag name", FString(FlagName), FString(TEXT("ArtPreviewHeroesV2")));
+  TestEqual("no-op alias name", FString(FlagName), FString(TEXT("ArtPreviewHeroesV2")));
+  TestEqual("rollback flag name", FString(LegacyFlagName), FString(TEXT("S08HeroesLegacy")));
+  TestTrue("default: v2", Decide(false, false));
+  TestFalse("-S08HeroesLegacy: legacy figures", Decide(true, false));
+  TestFalse("-ArtPreview -ArtPreviewAllMedusa review: the Medusa candidate on every fighter", Decide(false, true));
   {
     FFlagScope Off(false);
     TestFalse("override off", FlagEnabled());
@@ -84,9 +89,9 @@ bool FS08HeroesV2MappingTest::RunTest(const FString&) {
     TestTrue("override on", FlagEnabled());
   }
   for (const TCHAR* Name : {TEXT("King Arthur"), TEXT("Merlin"), TEXT("Medusa"), TEXT("Harpies")}) {
-    TestNull(FString::Printf(TEXT("%s: no mapping without the flag"), Name), Find(true, false, Name));
-    TestNull(FString::Printf(TEXT("%s: no mapping without -ArtPreview"), Name), Find(false, true, Name));
-    TestNotNull(FString::Printf(TEXT("%s: mapped with both flags"), Name), Find(true, true, Name));
+    TestNull(FString::Printf(TEXT("%s: no mapping with -S08HeroesLegacy"), Name), Find(true, false, Name));
+    TestNull(FString::Printf(TEXT("%s: no mapping on the grey board"), Name), Find(false, true, Name));
+    TestNotNull(FString::Printf(TEXT("%s: mapped on an art board (default)"), Name), Find(true, true, Name));
   }
   TestNull("unmapped hero stays legacy", Find(true, true, TEXT("Sinbad")));
   TestNull("a Harpy label is not a fighter name", Find(true, true, TEXT("Harpies 2")));
@@ -300,7 +305,7 @@ bool FS08HeroesV2AssetsTest::RunTest(const FString&) {
 }
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08HeroesV2ActorTest,
-    "Unmatched.S08.HeroesV2.Actor fighter actor shows v2 figures only with the flag and plays their clips",
+    "Unmatched.S08.HeroesV2.Actor fighter actor shows v2 figures by default, legacy figures with -S08HeroesLegacy, and plays the clips",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FS08HeroesV2ActorTest::RunTest(const FString&) {
   using namespace S08HeroesV2;
@@ -315,7 +320,7 @@ bool FS08HeroesV2ActorTest::RunTest(const FString&) {
   const FVector Near(0.0, -50.0, 0.0);  // cell (2,2)
   const FVector Far(0.0, 50.0, 0.0);    // cell (2,3)
 
-  // --- without the flag: byte-for-byte the legacy mapping (ART-003 blockout, Medusa candidate)
+  // --- -S08HeroesLegacy (override off): byte-for-byte the legacy mapping (ART-003 blockout, Medusa candidate)
   {
     FFlagScope Off(false);
     AS08FighterActor* Arthur = World->SpawnActor<AS08FighterActor>(AS08FighterActor::StaticClass(), Near, FRotator::ZeroRotator);
@@ -323,20 +328,20 @@ bool FS08HeroesV2ActorTest::RunTest(const FString&) {
     if (Arthur && Medusa) {
       Arthur->SetTeam(ES08TeamSlot::P1, ES08TeamSlot::P1, ES08TeamColorMode::Absolute);
       Arthur->ApplyFighter(MakeFighter(TEXT("f-0-hero"), TEXT("King Arthur"), true, 2, 2), Near, true, true);
-      TestFalse("no flag: Arthur is not v2", Arthur->IsHeroV2());
-      TestTrue("no flag: Arthur keeps the ART-003 blockout", Arthur->IsBlockout());
+      TestFalse("legacy: Arthur is not v2", Arthur->IsHeroV2());
+      TestTrue("legacy: Arthur keeps the ART-003 blockout", Arthur->IsBlockout());
       Medusa->SetTeam(ES08TeamSlot::P2, ES08TeamSlot::P2, ES08TeamColorMode::Absolute);
       Medusa->ApplyFighter(MakeFighter(TEXT("f-1-hero"), TEXT("Medusa"), true, 2, 3), Far, false, true);
-      TestFalse("no flag: Medusa is not v2", Medusa->IsHeroV2());
-      TestTrue("no flag: Medusa keeps the isolated candidate", Medusa->HasMedusaCandidate());
+      TestFalse("legacy: Medusa is not v2", Medusa->IsHeroV2());
+      TestTrue("legacy: Medusa keeps the isolated candidate", Medusa->HasMedusaCandidate());
       const USkeletalMeshComponent* Skel = ArtBodyOf(Medusa);
-      TestTrue("no flag: candidate mesh", Skel && Skel->GetSkeletalMeshAsset() &&
+      TestTrue("legacy: candidate mesh", Skel && Skel->GetSkeletalMeshAsset() &&
                    Skel->GetSkeletalMeshAsset()->GetName().StartsWith(TEXT("SK_Medusa_FaceNeck_v2Candidate")));
-      TestEqual("no flag: candidate yaw stays 180 on the far side",
+      TestEqual("legacy: candidate yaw stays 180 on the far side",
                 Skel ? static_cast<float>(Skel->GetRelativeRotation().Yaw) : -1.0f, 180.0f);
-      TestTrue("no flag: no v2 clip", Medusa->GetHeroClip() == EClip::None);
+      TestTrue("legacy: no v2 clip", Medusa->GetHeroClip() == EClip::None);
       Medusa->NotifyHeroAnimEvent(EEvent::Damaged, 7);
-      TestTrue("no flag: combat events are ignored", Medusa->GetHeroClip() == EClip::None);
+      TestTrue("legacy: combat events are ignored", Medusa->GetHeroClip() == EClip::None);
     } else {
       AddError(TEXT("fighter actors not spawned"));
     }
@@ -344,7 +349,7 @@ bool FS08HeroesV2ActorTest::RunTest(const FString&) {
     if (Medusa) Medusa->Destroy();
   }
 
-  // --- with the flag: v2 mesh, MI by look, pedestal, yaw, scale, Idle, combat clips, death hold
+  // --- default (v2 on): v2 mesh, MI by look, pedestal, yaw, scale, Idle, combat clips, death hold
   {
     FFlagScope On(true);
     struct FCase {
@@ -433,18 +438,18 @@ bool FS08HeroesV2ActorTest::RunTest(const FString&) {
       TestEqual(FString::Printf(TEXT("%s final pose holds"), C.Name), FString(ClipName(Actor->GetHeroClip())), FString(TEXT("DeathSettle")));
       Actor->Destroy();
     }
-    // Unmapped hero under the flag keeps the legacy grey mannequin path.
+    // An unmapped hero keeps the legacy grey mannequin path.
     AS08FighterActor* Other = World->SpawnActor<AS08FighterActor>(AS08FighterActor::StaticClass(), Near, FRotator::ZeroRotator);
     if (Other) {
       Other->ApplyFighter(MakeFighter(TEXT("f-0-hero"), TEXT("Sinbad"), true, 2, 2), Near, true, true);
       TestFalse("unmapped hero is not v2", Other->IsHeroV2());
       Other->Destroy();
     }
-    // No -ArtPreview: the flag alone changes nothing.
+    // The grey board (-S08GreyBoard, or no registered art profile): v2 on changes nothing.
     AS08FighterActor* Grey = World->SpawnActor<AS08FighterActor>(AS08FighterActor::StaticClass(), Near, FRotator::ZeroRotator);
     if (Grey) {
       Grey->ApplyFighter(MakeFighter(TEXT("f-0-hero"), TEXT("King Arthur"), true, 2, 2), Near, true, false);
-      TestFalse("flag without -ArtPreview: grey slice", Grey->IsHeroV2() || Grey->HasArtFigure());
+      TestFalse("v2 on the grey board: grey slice", Grey->IsHeroV2() || Grey->HasArtFigure());
       Grey->Destroy();
     }
   }

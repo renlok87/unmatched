@@ -6,7 +6,9 @@ param(
   [string]$ShotMode = "request",
   # The board of the room (2026-10-04, real boards only: docs/game-design/decisions/2026-10-04-real-boards-only.md):
   # a Board row id of an original map registered in unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json, sent
-  # by the host as -S08BoardId (no -ArtPreview: the HUD runs on the grey topology view of the map). Default
+  # by the host as -S08BoardId. The HUD runs on the grey topology view of the map: since ART-DEFAULT (2026-10-04) the
+  # art look is the client default, so both clients pass its rollback -S08GreyBoard explicitly (this logic harness, its
+  # marker gates and its uncapped two-client load were built on the grey view; drop the flag to run it on the art look). Default
   # Marmoreal - original map; Sarpedon - original map is c7fa64a26c29a0835f2383e63. The traces must show the map
   # board ('BOARD <lattice WxH> cells' + 'BOARD topology spaces=<n> links=<m>'), never the old 'BOARD 20x20'.
   [string]$BoardId = "c121b47f8d6eb28daccb76d05"
@@ -226,7 +228,7 @@ function Invoke-HudDemo {
   $Script:ThisRunGameCode = $null
 
   $common = @("-windowed", "-resx=1280", "-resy=720", "-RenderOffScreen", "log=GrepLog",
-    "-ForceAbandonSequences", "-S08Api=$Api", "-S09ShotMode=$ShotMode")
+    "-ForceAbandonSequences", "-S08Api=$Api", "-S09ShotMode=$ShotMode", "-S08GreyBoard")
   $hostArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
     "-S08Auto", "-S08Create", "-S08BoardId=$BoardId", "-S08HeroId=$heroA", "-S08Trace=$hostTrace",
     "-S09Flow", "-S09ShotDir=$hostShots", "-S08ExitAfter=$RunSeconds")

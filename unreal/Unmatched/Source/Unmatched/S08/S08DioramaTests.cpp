@@ -1,7 +1,8 @@
-// Wave 5c-B automation tests: the -ArtPreviewDiorama tray (S08Diorama.h, AS08BoardActor::EnsureDioramaTray /
-// PlaceDioramaTray). Fit = pure yaw/scale math on the three art boards; Assets = SM_TableBase / MI_TableBase_Candidate
-// against docs/art-pipeline/table-base-report.md; Actor = the board actor creates the tray only with -ArtPreview and
-// the flag, NoCollision, hidden on a grey board, placed at (0,0,0) yaw -90 scale 1 under the Cobble 5x6 slab.
+// Wave 5c-B automation tests: the diorama tray (S08Diorama.h, AS08BoardActor::EnsureDioramaTray / PlaceDioramaTray;
+// the default since ART-DEFAULT 2026-10-04, rollback -S08DioramaLegacy). Fit = pure yaw/scale math on the three art
+// boards; Assets = SM_TableBase / MI_TableBase_Candidate against docs/art-pipeline/table-base-report.md; Actor = the
+// board actor creates the tray only on the art look without the rollback, NoCollision, hidden on a grey board, placed
+// at (0,0,0) yaw -90 scale 1 under the Cobble 5x6 slab; Default = the default and the rollback flag.
 //   UnrealEditor-Cmd.exe Unmatched.uproject
 //     -ExecCmds="Automation RunTests Unmatched.S08.Diorama; Quit" -unattended -nosplash -nullrhi
 #if WITH_AUTOMATION_TESTS
@@ -53,12 +54,12 @@ bool FS08DioramaFitTest::RunTest(const FString&) {
   using namespace S08DioramaTest;
   {
     FFlagScope On(true);
-    TestFalse("flag without -ArtPreview: no tray", Enabled(false));
-    TestTrue("flag with -ArtPreview: tray", Enabled(true));
+    TestFalse("tray on, grey board: no tray", Enabled(false));
+    TestTrue("tray on, art look: tray", Enabled(true));
   }
   {
     FFlagScope Off(false);
-    TestFalse("-ArtPreview without the flag: no tray (previous board)", Enabled(true));
+    TestFalse("-S08DioramaLegacy on the art look: no tray (the board before -ArtPreviewDiorama)", Enabled(true));
   }
   // Cobble 5x6 mesh: exactly the report placement (yaw -90, scale 1).
   const FTrayFit Cobble = FitTray(CobbleHalf);
@@ -150,7 +151,7 @@ bool FS08DioramaAssetsTest::RunTest(const FString&) {
 }
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08DioramaActorTest,
-    "Unmatched.S08.Diorama.Actor board actor creates the tray only with the flag, NoCollision, fitted to the board frame",
+    "Unmatched.S08.Diorama.Actor board actor creates the tray only on the art look without -S08DioramaLegacy, NoCollision, fitted to the board frame",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FS08DioramaActorTest::RunTest(const FString&) {
   using namespace S08Diorama;
@@ -168,8 +169,8 @@ bool FS08DioramaActorTest::RunTest(const FString&) {
                                                               FRotator::ZeroRotator);
     TestNotNull("board actor spawned", Actor);
     if (Actor) {
-      TestFalse("no flag: EnsureDioramaTray is a no-op", Actor->EnsureDioramaTray(true));
-      TestNull("no flag: no tray component", Actor->GetDioramaTray());
+      TestFalse("-S08DioramaLegacy: EnsureDioramaTray is a no-op", Actor->EnsureDioramaTray(true));
+      TestNull("-S08DioramaLegacy: no tray component", Actor->GetDioramaTray());
       Actor->Destroy();
     }
   }
@@ -178,9 +179,9 @@ bool FS08DioramaActorTest::RunTest(const FString&) {
     AS08BoardActor* Actor = World->SpawnActor<AS08BoardActor>(AS08BoardActor::StaticClass(), FVector::ZeroVector,
                                                               FRotator::ZeroRotator);
     if (Actor) {
-      TestFalse("flag without -ArtPreview: no tray", Actor->EnsureDioramaTray(false));
-      TestNull("flag without -ArtPreview: no tray component", Actor->GetDioramaTray());
-      TestTrue("flag with -ArtPreview: tray created", Actor->EnsureDioramaTray(true));
+      TestFalse("grey board (-S08GreyBoard): no tray", Actor->EnsureDioramaTray(false));
+      TestNull("grey board (-S08GreyBoard): no tray component", Actor->GetDioramaTray());
+      TestTrue("art look: tray created", Actor->EnsureDioramaTray(true));
       const UStaticMeshComponent* Tray = Actor->GetDioramaTray();
       TestNotNull("tray component", Tray);
       if (Tray) {

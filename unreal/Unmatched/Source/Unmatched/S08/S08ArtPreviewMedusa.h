@@ -42,6 +42,9 @@ inline FS08MedusaCandidate S08SelectMedusaCandidate() {
 // ART-004 T2.2 opt-in review: -ArtPreviewAllMedusa puts the selected candidate
 // on all six live fighters (team MI, hero/sidekick scale) so one packaged frame
 // shows six sculpts on the board. Review only; never a hero mapping.
+// ART-DEFAULT (2026-10-04, S08ArtLook.h): review tooling - it needs -ArtPreview now that the art board itself is the
+// default, and the default v2 figures yield to it (S08HeroesV2::FlagEnabled).
 inline bool S08ArtPreviewAllMedusa() {
-  return FParse::Param(FCommandLine::Get(), TEXT("ArtPreviewAllMedusa"));
+  return FParse::Param(FCommandLine::Get(), TEXT("ArtPreview")) &&
+         FParse::Param(FCommandLine::Get(), TEXT("ArtPreviewAllMedusa"));
 }

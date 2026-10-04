@@ -698,10 +698,10 @@ bool OptOut() {
   return FParse::Param(FCommandLine::Get(), S08EnvLayoutSpec::NoEnvFlagName);
 }
 
-bool Enabled(bool bArtPreview) { return S08Diorama::Enabled(bArtPreview) && !OptOut(); }
+bool Enabled(bool bArtLook) { return S08Diorama::Enabled(bArtLook) && !OptOut(); }
 
-bool Arm(bool bArtPreview) {
-  if (!S08Diorama::Enabled(bArtPreview)) return false;
+bool Arm(bool bArtLook) {
+  if (!S08Diorama::Enabled(bArtLook)) return false;
   if (OptOut()) {
     FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW envlayout disabled (-%s)"), S08EnvLayoutSpec::NoEnvFlagName));
     return false;

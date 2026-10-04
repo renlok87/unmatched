@@ -1,6 +1,7 @@
 #include "S08FighterActor.h"
 #include "S08ArtHudText.h"
 #include "S08ArtHud.h"
+#include "S08ArtLook.h"
 #include "S08ArtPreviewMedusa.h"
 #include "S08Render.h"
 #include "S08TraceLog.h"
@@ -154,7 +155,9 @@ AS08FighterActor::AS08FighterActor() {
 
 void AS08FighterActor::BeginPlay() {
   Super::BeginPlay();
-  if (FParse::Param(FCommandLine::Get(), TEXT("ArtPreview"))) {
+  // ART-DEFAULT (S08ArtLook.h): the art markers (selection ring, target arcs and icon, team rings) belong to the
+  // accepted look - default on, -S08GreyBoard off (they used to need -ArtPreview).
+  if (S08ArtLook::Enabled()) {
     if (UStaticMesh* ArtRing = LoadObject<UStaticMesh>(nullptr,
             TEXT("/Game/ArtTests/ARTMarkers/Meshes/SM_Marker_SelectionRing"))) {
       Ring->SetStaticMesh(ArtRing);
@@ -227,8 +230,9 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
 
   bool bVisualArt = false;
   bool bVisualBlockout = false;
-  // Wave 5c-B -ArtPreviewHeroesV2: the look-dev C figure replaces the Medusa candidate / ART-003 blockout of a
-  // mapped fighter; a missing asset falls back to the legacy path (traced). Without the flag V2Spec is null.
+  // Wave 5c-B heroes v2 (the default since ART-DEFAULT): the look-dev C figure replaces the Medusa candidate / ART-003
+  // blockout of a mapped fighter; a missing asset falls back to the legacy path (traced). With -S08HeroesLegacy (or the
+  // -ArtPreview -ArtPreviewAllMedusa review) and on the grey board V2Spec is null.
   const S08HeroesV2::FHeroSpec* V2Spec =
       S08HeroesV2::Find(bArtPreview, S08HeroesV2::FlagEnabled(), Fighter.Name);
   USkeletalMesh* V2Mesh = nullptr;

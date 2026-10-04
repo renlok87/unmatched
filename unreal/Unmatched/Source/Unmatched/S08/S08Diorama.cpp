@@ -16,8 +16,11 @@ int32 GFlagOverride = -1;
 
 bool FlagEnabled() {
   if (GFlagOverride >= 0) return GFlagOverride == 1;
-  return FParse::Param(FCommandLine::Get(), FlagName);
+  // ART-DEFAULT: on unless rolled back; -ArtPreviewDiorama (FlagName) is not read any more (no-op alias).
+  return Decide(LegacyRequested());
 }
+
+bool LegacyRequested() { return FParse::Param(FCommandLine::Get(), LegacyFlagName); }
 
 void SetFlagOverrideForTest(bool bEnabled) { GFlagOverride = bEnabled ? 1 : 0; }
 

@@ -883,6 +883,8 @@ bool FS08BoardArtTeamRingTest::RunTest(const FString&) {
       F.X = 1;
       F.Y = 1;
       Actor->SetTeam(ES08TeamSlot::P2, ES08TeamSlot::P2, ES08TeamColorMode::Absolute);
+      // The ART-003 blockouts are the legacy figures since ART-DEFAULT (v2 is the default): -S08HeroesLegacy.
+      S08HeroesV2::SetFlagOverrideForTest(false);
       Actor->ApplyFighter(F, FVector::ZeroVector, false, true);
       TestTrue("blockout = art figure", Actor->HasArtFigure() && Actor->IsBlockout());
       TestTrue("team ring shown", Actor->HasTeamRing() && Actor->IsTeamRingVisible());
@@ -904,6 +906,7 @@ bool FS08BoardArtTeamRingTest::RunTest(const FString&) {
       AS08FighterActor* Grey = World->SpawnActor<AS08FighterActor>(AS08FighterActor::StaticClass());
       Grey->LoadTeamRingAssets();
       Grey->ApplyFighter(F, FVector::ZeroVector, true, false);
+      S08HeroesV2::ResetFlagOverrideForTest();
       TestTrue("grey path: base disc kept, no team ring", Grey->IsBaseVisible() && !Grey->IsTeamRingVisible());
     }
     GEngine->DestroyWorldContext(World);

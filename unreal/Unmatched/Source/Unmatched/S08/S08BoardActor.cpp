@@ -1,5 +1,6 @@
 #include "S08BoardActor.h"
 #include "S08ArtHudText.h"
+#include "S08ArtLook.h"
 #include "S08ArtPreviewMedusa.h"
 #include "S08Diorama.h"
 #include "S08FighterActor.h"
@@ -152,10 +153,14 @@ void AS08BoardActor::BeginPlay() {
     ArtVoidMaterial = UMaterialInstanceDynamic::Create(Tile, this);
     ArtVoidMaterial->SetVectorParameterValue(TEXT("Tint"), FLinearColor(0.012f, 0.012f, 0.016f));
   }
-  if (!FParse::Param(FCommandLine::Get(), TEXT("ArtPreview"))) return;
-  // Wave 5c-B: the diorama tray only with -ArtPreviewDiorama (hidden until an art profile is active).
+  // ART-DEFAULT (2026-10-04, S08ArtLook.h): the accepted art look - the room board's art profile, the map image, the
+  // v2 figures, the tray and the light - is the default of every run (it used to need -ArtPreview, which is now the
+  // review tooling only); -S08GreyBoard keeps the grey board. One line states the effective look of the run.
+  FS08Trace::Write(S08ArtLook::TraceLine());
+  if (!S08ArtLook::Enabled()) return;
+  // Wave 5c-B: the diorama tray (default; -S08DioramaLegacy: none) - hidden until an art profile is active.
   EnsureDioramaTray(true);
-  // ENV-MAPS track C: the environment around map-image boards (same flags; nothing is created here).
+  // ENV-MAPS track C: the environment around map-image boards (same gate; nothing is created here).
   EnsureEnvLayout(true);
 
   // T3.2 board data: zone palette/glyphs per key, light profiles, board
@@ -814,9 +819,9 @@ void AS08BoardActor::ApplySurfaceMaterials() {
   if (Underlay) UnderlayTiles->SetMaterial(0, Underlay);
 }
 
-bool AS08BoardActor::EnsureDioramaTray(bool bArtPreview) {
+bool AS08BoardActor::EnsureDioramaTray(bool bArtLook) {
   if (DioramaTray) return true;
-  if (!S08Diorama::Enabled(bArtPreview)) return false;
+  if (!S08Diorama::Enabled(bArtLook)) return false;
   UStaticMesh* TrayMesh = LoadObject<UStaticMesh>(nullptr, S08Diorama::MeshPath);
   UMaterialInterface* TrayMi = LoadObject<UMaterialInterface>(nullptr, S08Diorama::MaterialPath);
   if (!TrayMesh) {
@@ -974,8 +979,8 @@ void AS08BoardActor::UpdateDioramaTray(const FS08BoardModel& Board) {
   PlaceDioramaTray(true, Half, S08BoardSurfaceName(ActiveProfile.Surface));
 }
 
-bool AS08BoardActor::EnsureEnvLayout(bool bArtPreview) {
-  bEnvLayoutEnabled = S08EnvLayout::Arm(bArtPreview);
+bool AS08BoardActor::EnsureEnvLayout(bool bArtLook) {
+  bEnvLayoutEnabled = S08EnvLayout::Arm(bArtLook);
   return bEnvLayoutEnabled;
 }
 
@@ -986,7 +991,7 @@ void AS08BoardActor::UpdateEnvLayout() {
 }
 
 void AS08BoardActor::ApplyEnvLayout() {
-  // Without the flags nothing was ever created: a grid board (and every run without -ArtPreviewDiorama) is untouched.
+  // Without the gate nothing was ever created: a grid board (and every -S08DioramaLegacy / -S08GreyBoard run) is untouched.
   if (!bEnvLayoutEnabled && !EnvRuntime.bApplied && EnvProps.IsEmpty() && EnvLights.IsEmpty()) return;
   FS08EnvLayoutRequest Request;
   Request.bEnabled = bEnvLayoutEnabled;
@@ -1659,7 +1664,7 @@ void AS08BoardActor::SyncFighters(const FS08BoardModel& Board,
     FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW allMedusa copies=%d visual=%d"),
                                      FighterActors.Num(), Visual));
   }
-  // Wave 5c-B: one summary per change of the v2 roster (-ArtPreviewHeroesV2 only).
+  // Wave 5c-B: one summary per change of the v2 roster (default since ART-DEFAULT; none with -S08HeroesLegacy).
   if (bArtActive && S08HeroesV2::FlagEnabled() && FighterActors.Num() > 0) {
     int32 Mapped = 0, V2 = 0;
     for (const AS08FighterActor* Actor : FighterActors) {

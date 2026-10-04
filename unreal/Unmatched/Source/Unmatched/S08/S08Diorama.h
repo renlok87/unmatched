@@ -1,7 +1,8 @@
 // Wave 5c-B: the diorama tray ASSET-TABLE-BASE-001 (SM_TableBase, Tripo c2e5e3bf -> Blender -> UE,
-// docs/art-pipeline/table-base-report.md) under the live S08 art board, behind the opt-in flag
-// -ArtPreviewDiorama (only together with -ArtPreview). Without the flag the board actor creates no
-// component and loads nothing from here: the board is byte-for-byte the previous one.
+// docs/art-pipeline/table-base-report.md) under the live S08 art board. ART-DEFAULT (2026-10-04, S08ArtLook.h): the
+// tray - and with it the environment of the map boards (S08EnvLayout::Enabled) - is ON by default on every art board;
+// the former opt-in flag -ArtPreviewDiorama is a no-op alias. Rollback: -S08DioramaLegacy - the board actor then creates
+// no component and loads nothing from here: the board is byte-for-byte the one before -ArtPreviewDiorama.
 //
 // Placement (report "Исправление по ревью"): the tray pivot is the board centre, its flat top lies on
 // Z = -3 (the nearest board horizontal is the tile top at -1.2: no z-fight), the mesh is 756 x 656 x 150 uu
@@ -49,7 +50,9 @@ class UStaticMesh;
 
 namespace S08Diorama {
 
-/** Command-line flag (with -ArtPreview): -ArtPreviewDiorama. */
+/** Rollback flag (ART-DEFAULT): -S08DioramaLegacy - no tray and no environment (the board before -ArtPreviewDiorama). */
+inline const TCHAR* const LegacyFlagName = TEXT("S08DioramaLegacy");
+/** The former opt-in flag -ArtPreviewDiorama: still accepted (scripts pass it), a no-op - the tray is the default. */
 inline const TCHAR* const FlagName = TEXT("ArtPreviewDiorama");
 inline const TCHAR* const MeshPath =
     TEXT("/Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31/Meshes/SM_TableBase");
@@ -131,10 +134,15 @@ UNMATCHED_API UMaterialInterface* LoadTrayT2Material(ETrayT2Kind Kind, const FSt
  *  [t2b=failed]' (the first map-image board; the leading fields are those of the T2-only line before P5). */
 UNMATCHED_API FString TrayT2LoadTraceLine(const FTrayT2Assets& Assets);
 
-/** True when -ArtPreviewDiorama is on the command line (or the automation override is set). */
+/** World-free rule: the tray unless the rollback flag is on the command line. */
+constexpr bool Decide(bool bLegacyFlag) { return !bLegacyFlag; }
+/** True when the tray is on: by default; false with -S08DioramaLegacy (or the automation override). (The name is the
+ *  opt-in one: it read -ArtPreviewDiorama before ART-DEFAULT.) */
 UNMATCHED_API bool FlagEnabled();
-/** The tray is spawned only with -ArtPreview AND -ArtPreviewDiorama. */
-inline bool Enabled(bool bArtPreview) { return bArtPreview && FlagEnabled(); }
+/** True when -S08DioramaLegacy is on the command line. */
+UNMATCHED_API bool LegacyRequested();
+/** The tray is spawned only on the art look (bArtLook: S08ArtLook::Enabled() in BeginPlay) AND without the rollback. */
+inline bool Enabled(bool bArtLook) { return bArtLook && FlagEnabled(); }
 /** Automation tests only: force the flag on/off (Reset -> read the command line again). */
 UNMATCHED_API void SetFlagOverrideForTest(bool bEnabled);
 UNMATCHED_API void ResetFlagOverrideForTest();

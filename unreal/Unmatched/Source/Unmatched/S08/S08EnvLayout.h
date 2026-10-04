@@ -19,8 +19,9 @@
 // /Game/EnvKit/<Map>/, cooked through DirectoriesToAlwaysCook /Game/EnvKit). At most 6 point lights per layout,
 // never shadowed (budget: the key light stays in the art light profile).
 //
-// Gate: the board actor spawns the environment only with -ArtPreview AND -ArtPreviewDiorama (S08Diorama::Enabled),
-// without -ArtPreviewNoEnv (A/B and perf opt-out), and only while a 'map-image' art profile is active. A grid board
+// Gate: the board actor spawns the environment only on the art look with the tray (S08Diorama::Enabled; both the
+// default since ART-DEFAULT 2026-10-04 - rollbacks -S08GreyBoard / -S08DioramaLegacy, S08ArtLook.h), without
+// -ArtPreviewNoEnv (A/B and perf opt-out), and only while a 'map-image' art profile is active. A grid board
 // (Cobble, the 'tiles' fixtures) never loads a layout nor creates a component; a board change destroys what was
 // spawned. A missing mesh skips its props (traced), never the whole layout. Invalid documents spawn nothing.
 // Trace (evidence contract):
@@ -297,7 +298,7 @@ struct UNMATCHED_API FS08EnvFxStats {
 
 /** Inputs of one board-actor update (the actor fills it from its active art profile). */
 struct UNMATCHED_API FS08EnvLayoutRequest {
-  bool bEnabled = false;         // S08EnvLayout::Enabled(-ArtPreview)
+  bool bEnabled = false;         // S08EnvLayout::Enabled(art look)
   bool bMapImageActive = false;  // the active art profile draws the 'map-image' surface
   FString ProfileId;
   FString MapKey;                // lower-case FS08MapImageSpec::Name
@@ -333,13 +334,13 @@ struct UNMATCHED_API FS08EnvLayoutRuntime {
 };
 
 namespace S08EnvLayout {
-/** -ArtPreview AND -ArtPreviewDiorama AND NOT -ArtPreviewNoEnv. */
-UNMATCHED_API bool Enabled(bool bArtPreview);
+/** The art look AND the tray (S08Diorama::Enabled: default, -S08DioramaLegacy off) AND NOT -ArtPreviewNoEnv. */
+UNMATCHED_API bool Enabled(bool bArtLook);
 UNMATCHED_API bool OptOut();
 /** Enabled(bArtPreview) plus its trace: 'ARTPREVIEW envlayout enabled dir=.. source=pak|override files=N', or
  *  'ARTPREVIEW envlayout disabled (-ArtPreviewNoEnv)' when the diorama is on but the environment opted out; nothing
  *  without the diorama flag (the previous board, byte for byte). */
-UNMATCHED_API bool Arm(bool bArtPreview);
+UNMATCHED_API bool Arm(bool bArtLook);
 /** Automation only: force -ArtPreviewNoEnv on/off (Reset -> command line). The diorama flag has its own override. */
 UNMATCHED_API void SetOptOutOverrideForTest(bool bOptOut);
 UNMATCHED_API void ResetOptOutOverrideForTest();

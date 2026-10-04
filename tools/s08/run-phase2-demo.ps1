@@ -36,17 +36,21 @@ param(
   # hero/sidekick scale) - the six-copies review; asserted as six
   # 'ARTPREVIEW allMedusa copy ... visual=1 mesh=' lines per client.
   [switch]$ArtPreviewAllMedusa,
-  # Wave 5c-B (ArtPreviewBoardId only, not with ArtPreviewAllMedusa): both clients get
-  # -ArtPreviewHeroesV2 - King Arthur, Merlin, Medusa and the three Harpies on the look-dev C
-  # figures (SK_<Hero>_H2LD / SK_Harpy_H3LD, team MI by look, H2Anim clips). Asserted as
-  # 'ARTPREVIEW heroesV2 summary fighters=6 mapped=6 v2=6', six 'ARTPREVIEW heroesV2 fighter=' lines
-  # and an Idle 'ARTPREVIEW anim' line per client, no 'missing=' fallback.
+  # ART-DEFAULT (2026-10-04, unreal/Unmatched/Source/Unmatched/S08/S08ArtLook.h): the accepted look is the client
+  # DEFAULT - King Arthur, Merlin, Medusa and the three Harpies are the look-dev C figures (SK_<Hero>_H2LD /
+  # SK_Harpy_H3LD, team MI by look, H2Anim clips) and the diorama tray (T2b on the maps) with the map's environment
+  # stands under the board, with no switch. Gated on both clients unless rolled back: the 'ARTLOOK art=1 ...' line,
+  # 'ARTPREVIEW heroesV2 summary fighters=6 mapped=6 v2=6', six 'ARTPREVIEW heroesV2 fighter=' lines and Idle on 6/6
+  # with no 'missing=' fallback; 'ARTPREVIEW diorama tray=/Game/PipelineCandidates/TableBase/...', no 'diorama tray
+  # missing', the env layout and ground of the map 'status=ok'. -ArtPreviewHeroesV2 / -ArtPreviewDiorama stay harmless
+  # switches (they pass the client's no-op alias flags; the gates are the same).
   [switch]$ArtPreviewHeroesV2,
-  # Wave 5c-B (ArtPreviewBoardId only): both clients get -ArtPreviewDiorama - the diorama tray
-  # SM_TableBase (ASSET-TABLE-BASE-001 candidate) under the art board, NoCollision, top on Z -3.
-  # Asserted as 'ARTPREVIEW diorama tray=/Game/PipelineCandidates/TableBase/... bounds=' per client,
-  # no 'diorama tray missing'. Changes the lit scene (Lumen GI): its frames are a separate set.
   [switch]$ArtPreviewDiorama,
+  # ART-DEFAULT rollbacks: -HeroesLegacy passes -S08HeroesLegacy (the isolated Medusa candidate + the ART-003 grey
+  # blockouts, gated as before the default); -DioramaLegacy passes -S08DioramaLegacy (no tray, no environment; their
+  # gates are skipped).
+  [switch]$HeroesLegacy,
+  [switch]$DioramaLegacy,
   # Host-only flag input emulation after its evidence shot ('+'-separated:
   # wheelin, wheelout, space, clickhero, clickabove, clickcell, token*N). Every
   # step is traced 'INPUT ... src=flag'; real OS input is T4.3.
@@ -98,8 +102,10 @@ function Assert-ShotCaptured([string]$TracePath, [string]$Name, [string]$Who) {
   Write-Output ("shot captured {0} {1}: frame={2} lateFrame={3} px={4}x{5} sha256={6}" -f $Who, $Name, $capFrame, $lateFrame, $cap.Matches[0].Groups[2].Value, $cap.Matches[0].Groups[3].Value, $cap.Matches[0].Groups[4].Value.Substring(0, 12))
 }
 # GD-030/GD-031 two-client packaged demo: both clients hidden (-RenderOffScreen)
-# against the SAME real backend, on an original map (-ArtPreview path, default
-# Marmoreal; real boards only since 2026-10-04). Sequence under test:
+# against the SAME real backend, on an original map (default Marmoreal; real
+# boards only since 2026-10-04) in the client's default art look (ART-DEFAULT;
+# -ArtPreview only adds the review tooling: board id, evidence shot, own-hero
+# selection). Sequence under test:
 #   host   -> login, create on -ArtPreviewBoardId, hero, ready, start, the
 #             selected own hero at ArtPreviewShotAfter; with -HostManeuver ONE
 #             legal maneuver (beginManeuver + maneuver) at HostManeuverAfter
@@ -176,6 +182,14 @@ Write-Output "art board: profile=$($ArtBoard.id) boardId=$ArtPreviewBoardId sour
 if ($ArtPreviewHeroesV2 -and $ArtPreviewAllMedusa) {
   throw 'ArtPreviewHeroesV2 and ArtPreviewAllMedusa are separate reviews; pass one of them'
 }
+if ($ArtPreviewHeroesV2 -and $HeroesLegacy) { throw 'ArtPreviewHeroesV2 and HeroesLegacy contradict each other' }
+if ($ArtPreviewDiorama -and $DioramaLegacy) { throw 'ArtPreviewDiorama and DioramaLegacy contradict each other' }
+# ART-DEFAULT: what the clients show - the v2 figures unless rolled back (the six-Medusa review replaces them by
+# design), the tray unless rolled back.
+$HeroesV2 = (-not $HeroesLegacy) -and (-not $ArtPreviewAllMedusa)
+$Diorama = -not $DioramaLegacy
+$HeroesLook = if ($HeroesV2) { 'v2' } elseif ($HeroesLegacy) { 'legacy(-S08HeroesLegacy)' } else { 'legacy(-ArtPreviewAllMedusa)' }
+$TrayLook = if ($Diorama) { 'on' } else { 'legacy(-S08DioramaLegacy)' }
 if ($ArtPreviewInputPlan -and $ArtPreviewInputPlan -notmatch '^[A-Za-z]+(\*[0-9]+)?(\+[A-Za-z]+(\*[0-9]+)?)*$') {
   throw "ArtPreviewInputPlan '$ArtPreviewInputPlan' is not a '+'-separated token list"
 }
@@ -186,9 +200,9 @@ $ExpectedMedusaMesh = @{
   'face-neck-v2' = 'SK_Medusa_FaceNeck_v2Candidate'
   'head-tilt-v3' = 'SK_Medusa_HeadTilt_v3Candidate'
 }[$ArtPreviewMedusaVariant]
-# The live Medusa figure: the isolated candidate, or the look-dev C mesh with -ArtPreviewHeroesV2
-# (the board still loads and traces the candidate as its asset-readiness line).
-$ExpectedFigureMedusaMesh = if ($ArtPreviewHeroesV2) { 'SK_Medusa_H2LD' } else { $ExpectedMedusaMesh }
+# The live Medusa figure: the look-dev C mesh (default), or the isolated candidate with -HeroesLegacy /
+# -ArtPreviewAllMedusa (the board still loads and traces the candidate as its asset-readiness line).
+$ExpectedFigureMedusaMesh = if ($HeroesV2) { 'SK_Medusa_H2LD' } else { $ExpectedMedusaMesh }
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 if (-not $Exe) { $Exe = Join-Path $RepoRoot 'unreal\Unmatched\Saved\StagedBuilds\Windows\Unmatched.exe' }
 if (-not $EvidenceDir) { $EvidenceDir = Join-Path $RepoRoot 'docs\game-design\evidence\S08\run' }
@@ -463,6 +477,8 @@ function Invoke-Phase2Demo {
   if ($ArtPreviewAllMedusa) { $common += '-ArtPreviewAllMedusa' }
   if ($ArtPreviewHeroesV2) { $common += '-ArtPreviewHeroesV2' }
   if ($ArtPreviewDiorama) { $common += '-ArtPreviewDiorama' }
+  if ($HeroesLegacy) { $common += '-S08HeroesLegacy' }
+  if ($DioramaLegacy) { $common += '-S08DioramaLegacy' }
   if ($ClientCsvFrames -gt 0) { $common += @("-csvCaptureFrames=$ClientCsvFrames", '-csvGpuStats') }
   $hostCommon = if ($VisibleHost) { @($common | Where-Object { $_ -ne '-RenderOffScreen' }) } else { $common }
   $hostArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $hostCommon + @(
@@ -600,9 +616,11 @@ function Invoke-Phase2Demo {
     foreach ($zk in @($exp.zoneCellCounts.PSObject.Properties)) {
       $artLines += "ARTPREVIEW board map zone key=$($zk.Name) spaces=$($zk.Value) (painted"
     }
-    # 5c-B2: with -ArtPreviewHeroesV2 the look-dev C figure replaces the Medusa candidate, so the
+    # 5c-B2: the look-dev C figure (default since ART-DEFAULT) replaces the Medusa candidate, so the
     # client reports the candidate as not eligible (bMedusaCandidate = !bHeroV2 && ...) with the v2 mesh.
-    $medusaFighterLine = if ($ArtPreviewHeroesV2) { 'ARTPREVIEW fighter=Medusa hero=1 eligible=0 visual=1 mesh=SK_Medusa_H2LD' } else { 'ARTPREVIEW fighter=Medusa hero=1 eligible=1 visual=1' }
+    # ART-DEFAULT: the effective look of each client (S08ArtLook::TraceLine).
+    $artLines += "ARTLOOK art=1 source=default heroes=$HeroesLook tray=$TrayLook "
+    $medusaFighterLine = if ($HeroesV2) { 'ARTPREVIEW fighter=Medusa hero=1 eligible=0 visual=1 mesh=SK_Medusa_H2LD' } else { 'ARTPREVIEW fighter=Medusa hero=1 eligible=1 visual=1' }
     Assert-Trace $hostTrace (@('SNAPSHOT applied', $expectedBoard, 'FIGHTERS synced n=6', 'SHOT ctx',
       $medusaFighterLine,
       'ARTPREVIEW selection ownHero=1 selected=1 fighter=Medusa',
@@ -672,7 +690,7 @@ function Invoke-Phase2Demo {
         Assert-Trace $pair[1] @('ARTPREVIEW allMedusa copies=6 visual=6') "$($pair[0]) all-Medusa"
       }
     }
-    if ($ArtPreviewHeroesV2) {
+    if ($HeroesV2) {
       foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
         Assert-Trace $pair[1] @('ARTPREVIEW heroesV2 summary fighters=6 mapped=6 v2=6', 'ARTPREVIEW anim fighter=') "$($pair[0]) heroes v2"
         $v2 = @(Select-String -LiteralPath $pair[1] -Pattern 'ARTPREVIEW heroesV2 fighter=(\S+) mesh=/Game/PipelineCandidates/\S+ mi=/Game/PipelineCandidates/\S+_P[12] yaw=' |
@@ -685,7 +703,7 @@ function Invoke-Phase2Demo {
         if ($missing) { throw "$($pair[0]) v2 asset missing in the pak: $($missing.Line)" }
       }
     }
-    if ($ArtPreviewDiorama) {
+    if ($Diorama) {
       foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
         Assert-Trace $pair[1] @('ARTPREVIEW diorama requested mesh=/Game/PipelineCandidates/TableBase/', 'ARTPREVIEW diorama tray=/Game/PipelineCandidates/TableBase/') "$($pair[0]) diorama"
         $trayMissing = Select-String -LiteralPath $pair[1] -Pattern 'ARTPREVIEW diorama tray missing' | Select-Object -First 1
@@ -720,8 +738,8 @@ function Invoke-Phase2Demo {
         throw 'host K2 shot was taken before the camera settled (SHOT camera settled=0); raise ArtPreviewShotAfter'
       }
     }
-    $artStatus = [ordered]@{ boardId = $ArtPreviewBoardId; boardIdDefault = (-not $BoardIdExplicit); artBoardProfile = $ArtBoard.id; boardSize = $ArtBoardSize; lightProfile = $ArtBoard.light; multizoneCells = $ArtBoard.expect.multizoneCells; hostAssetsLoaded = $true; joinerAssetsLoaded = $true; hostManeuver = [bool]$HostManeuver; hostFocusZoom = $ArtPreviewFocusZoom; medusaVariant = $ArtPreviewMedusaVariant; medusaVariantExplicit = $MedusaVariantExplicit; shotAfterSeconds = $ArtPreviewShotAfter; runSeconds = $RunSeconds; clientFps = $ClientFps; clientPerf = [bool]$ClientPerf; allMedusa = [bool]$ArtPreviewAllMedusa; heroesV2 = [bool]$ArtPreviewHeroesV2; inputPlan = $ArtPreviewInputPlan; iconSize = $ArtPreviewIconSize; iconProbe = [bool]$ArtPreviewIconProbe; visibleHost = [bool]$VisibleHost }
-    if ($ArtPreviewDiorama) { $artStatus.diorama = $true }
+    $artStatus = [ordered]@{ boardId = $ArtPreviewBoardId; boardIdDefault = (-not $BoardIdExplicit); artBoardProfile = $ArtBoard.id; boardSize = $ArtBoardSize; lightProfile = $ArtBoard.light; multizoneCells = $ArtBoard.expect.multizoneCells; hostAssetsLoaded = $true; joinerAssetsLoaded = $true; hostManeuver = [bool]$HostManeuver; hostFocusZoom = $ArtPreviewFocusZoom; medusaVariant = $ArtPreviewMedusaVariant; medusaVariantExplicit = $MedusaVariantExplicit; shotAfterSeconds = $ArtPreviewShotAfter; runSeconds = $RunSeconds; clientFps = $ClientFps; clientPerf = [bool]$ClientPerf; allMedusa = [bool]$ArtPreviewAllMedusa; heroesV2 = [bool]$HeroesV2; heroesLegacy = [bool]$HeroesLegacy; dioramaLegacy = [bool]$DioramaLegacy; artLookDefault = $true; inputPlan = $ArtPreviewInputPlan; iconSize = $ArtPreviewIconSize; iconProbe = [bool]$ArtPreviewIconProbe; visibleHost = [bool]$VisibleHost }
+    $artStatus.diorama = [bool]$Diorama
     $artStatus.mapImage = $ArtBoard.mapImage.name; $artStatus.spaces = $ArtBoard.expect.spaces; $artStatus.links = $ArtBoard.expect.links; $artStatus.topologyFixture = $ArtBoard.fixture
     [System.IO.File]::WriteAllText((Join-Path $Script:Staging 'art-preview-status.json'), ($artStatus | ConvertTo-Json), $Utf8NoBom)
 
@@ -814,7 +832,7 @@ function Invoke-Phase2Demo {
     }
     $manifest = [ordered]@{
       stamp   = $Stamp
-      verdict = "ART PREVIEW $(if ($ArtPreviewFocusZoom -gt 0) { 'K2 PROBE' } else { 'K1' }): live original map $($ArtBoard.mapImage.name) ($($ArtBoard.id), lattice $ArtBoardSize) on its space graph ($($ArtBoard.expect.spaces) spaces / $($ArtBoard.expect.links) links, $(@($ArtBoard.expect.zones).Count) painted zones) + light profile $($ArtBoard.light) + WS drop/reconnect convergence$(if ($HostManeuver) { ' + host maneuver' }) + six projected fighters + HUD/board pixel gate; visual review still required"
+      verdict = "ART PREVIEW $(if ($ArtPreviewFocusZoom -gt 0) { 'K2 PROBE' } else { 'K1' }): default art look (heroes $HeroesLook, tray $TrayLook) on the live original map $($ArtBoard.mapImage.name) ($($ArtBoard.id), lattice $ArtBoardSize) on its space graph ($($ArtBoard.expect.spaces) spaces / $($ArtBoard.expect.links) links, $(@($ArtBoard.expect.zones).Count) painted zones) + light profile $($ArtBoard.light) + WS drop/reconnect convergence$(if ($HostManeuver) { ' + host maneuver' }) + six projected fighters + HUD/board pixel gate; visual review still required"
       files   = @()
     }
     function Get-Sha256Hex([string]$Path) {

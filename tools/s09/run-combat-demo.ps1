@@ -38,10 +38,11 @@
   # Opt-in per-client frame timing in the trace (PERF config/window/summary),
   # as run-phase2-demo -ClientPerf. Measurement only.
   [switch]$ClientPerf,
-  # Wave 5c-B2 port of the run-phase2-demo 5c-B flags (-ArtPreview + -ArtPreviewBoardId only):
-  # both clients get -ArtPreviewHeroesV2 (King Arthur, Merlin, Medusa and the three Harpies on the
-  # look-dev C figures with the H2Anim clips) and/or -ArtPreviewDiorama (SM_TableBase under the board).
-  # Asserted as in run-phase2-demo: 'ARTPREVIEW heroesV2 summary fighters=6 mapped=6 v2=6', six v2
+  # Wave 5c-B2 port of the run-phase2-demo 5c-B flags (-ArtPreview + -ArtPreviewBoardId only). Since ART-DEFAULT
+  # (2026-10-04) the look-dev C figures and the tray are the client DEFAULT (the art look too, -ArtPreview or not):
+  # the client flags -ArtPreviewHeroesV2 / -ArtPreviewDiorama are no-op aliases, and these switches now only add the
+  # gates below (rollbacks: -ClientExtraArgs is not offered here; the client flags are -S08HeroesLegacy /
+  # -S08DioramaLegacy / -S08GreyBoard). Asserted as in run-phase2-demo: 'ARTPREVIEW heroesV2 summary fighters=6 mapped=6 v2=6', six v2
   # 'ARTPREVIEW heroesV2 fighter=' lines, Idle on 6/6, no 'missing=' fallback; the diorama tray line
   # and no 'diorama tray missing'. The combat clip lines (LungeAttack / HitReact / DeathSettle) are
   # counted into the manifest (heroesV2Anim), not gated: which of them fire depends on the duel.

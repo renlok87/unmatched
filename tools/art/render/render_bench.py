@@ -16,9 +16,12 @@ frame and takes one 1920x1080 SHOT with the RENDER fingerprint.
   python tools/art/render/render_bench.py summarize --out <dir> <variant dirs...>
   python tools/art/render/render_bench.py variants
 
-Variants (one binary; the pre-W4 look is emulated with -S08LegacyRender):
-  dx12-lumen-high      reference: DX12 SM6, Lumen GI + reflections, sg.* = 2, SP 100, profile rev 2
-  dx12-lumen-high-v2   reference + -ArtPreviewHeroesV2 -ArtPreviewDiorama (5c-B heroes and diorama tray)
+Variants (one binary; the pre-W4 look is emulated with -S08LegacyRender). ART-DEFAULT (2026-10-04): the look-dev
+heroes v2 and the diorama tray are the client default; every variant without "-v2" keeps its meaning by passing the
+rollbacks -S08HeroesLegacy -S08DioramaLegacy explicitly (LEGACY_LOOK), the "-v2" variants still pass the no-op alias
+flags -ArtPreviewHeroesV2 -ArtPreviewDiorama (an older package still reads them).
+  dx12-lumen-high      reference: DX12 SM6, Lumen GI + reflections, sg.* = 2, SP 100, profile rev 2 (legacy figures, no tray)
+  dx12-lumen-high-v2   reference + 5c-B heroes v2 and diorama tray (the default look; GD-058 final)
   dx12-lumen-high-v2-fps60  the same capped at 60 FPS (-BenchFps=60): effective FPS of one client
   dx12-lumen-high-v2-nohero the v2 reference without the ENV-MAPS P9 hero light (-NoHeroLight): gate H5 (its cost)
   dx12-lumen-high-vsm  same + r.Shadow.Virtual.Enable 1 (VSM instead of the profile CSM)
@@ -104,12 +107,25 @@ def profiles_rev1(out: Path) -> Path:
     return p
 
 
+# ART-DEFAULT (2026-10-04): the rollbacks that keep a non-"-v2" variant on the figures and board it always measured (the
+# isolated Medusa candidate + ART-003 blockouts, no tray / environment) now that heroes v2 and the tray are the default.
+LEGACY_LOOK = ["-S08HeroesLegacy", "-S08DioramaLegacy"]
+
+
 # 2026-10-04 (real boards only): the default bench scene is Marmoreal, passed explicitly so an older package (whose own
 # default was the retired Cobble 5x6 fixture) replays the same board; read from the pak (cwd Binaries/Win64).
 DEFAULT_BENCH_FIXTURE = "../../../Unmatched/Config/Bench/S08BenchMarmoreal.json"
 
 def variant_args(name: str, out: Path) -> tuple[list[str], list[str], dict]:
-    """(client args, extra ExecCmds, notes)."""
+    """(client args, extra ExecCmds, notes). ART-DEFAULT: every variant without "-v2" gets LEGACY_LOOK."""
+    args, execs, notes = _variant_args(name, out)
+    if "-v2" not in name:
+        args = args + LEGACY_LOOK
+        notes = {**notes, "look": "legacy figures, no tray (" + " ".join(LEGACY_LOOK) + "; ART-DEFAULT)"}
+    return args, execs, notes
+
+
+def _variant_args(name: str, out: Path) -> tuple[list[str], list[str], dict]:
     if name == "dx12-lumen-high":
         return ["-S08RenderPreset=High"], [], {"rhi": "default DX12", "profiles": "pak rev 2"}
     if name == "dx12-lumen-high-v2-nohero":

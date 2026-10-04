@@ -460,15 +460,15 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08EnvLayoutResolveTest,
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FS08EnvLayoutResolveTest::RunTest(const FString&) {
   using namespace S08EnvLayoutTest;
-  // gate: -ArtPreview AND -ArtPreviewDiorama AND NOT -ArtPreviewNoEnv
+  // gate: the art look AND the tray (both default since ART-DEFAULT) AND NOT -ArtPreviewNoEnv
   {
     FGateScope Gate(true, false);
-    TestTrue("diorama + ArtPreview: enabled", S08EnvLayout::Enabled(true));
-    TestFalse("no ArtPreview: disabled", S08EnvLayout::Enabled(false));
+    TestTrue("tray on the art look: enabled", S08EnvLayout::Enabled(true));
+    TestFalse("grey board (-S08GreyBoard): disabled", S08EnvLayout::Enabled(false));
   }
   {
     FGateScope Gate(false, false);
-    TestFalse("no diorama flag: disabled", S08EnvLayout::Enabled(true));
+    TestFalse("-S08DioramaLegacy: disabled", S08EnvLayout::Enabled(true));
   }
   {
     FGateScope Gate(true, true);
@@ -710,7 +710,7 @@ bool FS08EnvLayoutActorTest::RunTest(const FString&) {
     TestEqual(FString::Printf(TEXT("%s: no env fx (P5c)"), What), A->GetEnvLayoutRuntime().Fx.Num(), 0);
     TestFalse(FString::Printf(TEXT("%s: env never applied"), What), A->GetEnvLayoutRuntime().bApplied);
   };
-  // 1) no -ArtPreviewDiorama: the gate stays shut; grid and topology boards alike
+  // 1) -S08DioramaLegacy (the board before -ArtPreviewDiorama): the gate stays shut; grid and topology boards alike
   {
     FGateScope Gate(false, false);
     AS08BoardActor* A = W.SpawnBoard();

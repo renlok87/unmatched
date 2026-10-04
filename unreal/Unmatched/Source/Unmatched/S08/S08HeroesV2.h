@@ -1,8 +1,9 @@
 // Wave 5c-B: the look-dev C heroes (rig v2 UM_HUMANOID_17_v2, M_UM_Figure_v2.1 with
-// TeamAccent) on the live S08 board, behind the opt-in flag -ArtPreviewHeroesV2
-// (together with -ArtPreview). Without the flag nothing here is consulted and the
-// board is byte-for-byte the previous one (the isolated Medusa candidate,
-// the ART-003 grey blockouts, -ArtPreviewAllMedusa, -S08LegacyRender).
+// TeamAccent) on the live S08 board. ART-DEFAULT (2026-10-04, S08ArtLook.h): they are the DEFAULT figures of every
+// art board; the former opt-in flag -ArtPreviewHeroesV2 is a no-op alias. Rollback: -S08HeroesLegacy (or the
+// -ArtPreview -ArtPreviewAllMedusa review) - nothing here is consulted then and the figures are byte-for-byte the
+// previous ones (the isolated Medusa candidate, the ART-003 grey blockouts). The grey board (-S08GreyBoard, or a
+// board without a registered art profile) never maps a figure.
 //
 // One place for the whole mapping (world-free, automation-tested in
 // S08HeroesV2Tests.cpp):
@@ -23,11 +24,20 @@
 
 namespace S08HeroesV2 {
 
-/** Command-line flag (with -ArtPreview): -ArtPreviewHeroesV2. */
+/** Rollback flag (ART-DEFAULT): -S08HeroesLegacy keeps the pre-default figures (Medusa candidate, ART-003 blockouts). */
+inline const TCHAR* const LegacyFlagName = TEXT("S08HeroesLegacy");
+/** The former opt-in flag -ArtPreviewHeroesV2: still accepted (scripts pass it), a no-op - v2 is the default. */
 inline const TCHAR* const FlagName = TEXT("ArtPreviewHeroesV2");
 
-/** True when -ArtPreviewHeroesV2 is on the command line (or the automation override is set). */
+/** World-free rule: v2 figures unless the rollback flag, or the six-Medusa review (-ArtPreview -ArtPreviewAllMedusa)
+ *  that asks for the Medusa candidate on every fighter. */
+constexpr bool Decide(bool bLegacyFlag, bool bAllMedusaReview) { return !bLegacyFlag && !bAllMedusaReview; }
+
+/** True when the v2 figures are on: by default; false with -S08HeroesLegacy or -ArtPreview -ArtPreviewAllMedusa (or
+ *  the automation override). (The name is the opt-in one: it read -ArtPreviewHeroesV2 before ART-DEFAULT.) */
 UNMATCHED_API bool FlagEnabled();
+/** True when -S08HeroesLegacy is on the command line (the trace names the reason of a legacy run). */
+UNMATCHED_API bool LegacyRequested();
 /** Automation tests only: force the flag on/off (Reset -> read the command line again). */
 UNMATCHED_API void SetFlagOverrideForTest(bool bEnabled);
 UNMATCHED_API void ResetFlagOverrideForTest();
@@ -88,8 +98,9 @@ struct FHeroSpec {
 
 /** The four look-dev C heroes (King Arthur, Merlin, Medusa, Harpies). */
 UNMATCHED_API const TArray<FHeroSpec>& Specs();
-/** Spec for a fighter name, or nullptr (unmapped hero / flag off / no -ArtPreview). */
-UNMATCHED_API const FHeroSpec* Find(bool bArtPreview, bool bHeroesV2, const FString& FighterName);
+/** Spec for a fighter name, or nullptr (unmapped hero / v2 off / no art board: the grey board or a board without a
+ *  registered profile - bArtBoard is the board actor's bArtActive). */
+UNMATCHED_API const FHeroSpec* Find(bool bArtBoard, bool bHeroesV2, const FString& FighterName);
 
 /** Scale that brings the measured figure top to the budget: BudgetUU / FigureTopUU, clamped to [0.5, 2]. */
 UNMATCHED_API float FigureScale(const FHeroSpec& Spec);

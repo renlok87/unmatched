@@ -1,6 +1,7 @@
 #include "S08FlowGameMode.h"
 #include "S08BoardActor.h"
 #include "S08FighterActor.h"
+#include "S08ArtLook.h"
 #include "S08Render.h"
 #include "S08ArtHudText.h"
 #include "S08ArtHudViews.h"
@@ -263,7 +264,9 @@ void AS08FlowGameMode::BeginPlay() {
   FParse::Value(FCommandLine::Get(), TEXT("S08DropWsAfter="), AutoDropWsAfter);
   FParse::Value(FCommandLine::Get(), TEXT("S08ManeuverAfter="), AutoManeuverAfter);
   FParse::Value(FCommandLine::Get(), TEXT("S08ExitAfter="), AutoExitAfter);
-  if (FParse::Param(FCommandLine::Get(), TEXT("ArtPreview"))) {
+  // Review tooling (S08ArtLook::ReviewTooling, -ArtPreview): the evidence shot, the K2 focus zoom and the own-hero
+  // selection. The art look itself is the default (S08ArtLook::Enabled).
+  if (S08ArtLook::ReviewTooling()) {
     FParse::Value(FCommandLine::Get(), TEXT("ArtPreviewShotAfter="), ArtPreviewShotAfter);
     FParse::Value(FCommandLine::Get(), TEXT("ArtPreviewFocusZoom="), ArtPreviewFocusZoom);
     bArtPreviewSelectOwnHero = FParse::Param(
@@ -5638,9 +5641,13 @@ void AS08FlowGameMode::BuildArtHudWidgets(const TSharedRef<SConstraintCanvas>& C
   // BuildUi runs before BeginPlay opens the trace file: these lines are kept
   // in ArtHud.PendingTrace and flushed right after FS08Trace::Open().
   const TCHAR* Cmd = FCommandLine::Get();
-  const bool bArtPreview = FParse::Param(Cmd, TEXT("ArtPreview"));
-  ArtHud.bEnabled = bArtPreview && !FParse::Param(Cmd, TEXT("ArtPreviewNoPlate"));
-  ArtHud.bIconProbe = bArtPreview && FParse::Param(Cmd, TEXT("ArtPreviewIconProbe"));
+  // ART-DEFAULT (2026-10-04, S08ArtLook.h): the art HUD layer - plate, screen tags, team chips, the target token and
+  // the damage number - is part of the accepted look: default on, -S08GreyBoard off. -ArtPreview is the review tooling
+  // only (the icon probe and the flag input plan below).
+  const bool bArtLook = S08ArtLook::Enabled();
+  const bool bReview = S08ArtLook::ReviewTooling();
+  ArtHud.bEnabled = bArtLook && !FParse::Param(Cmd, TEXT("ArtPreviewNoPlate"));
+  ArtHud.bIconProbe = bArtLook && bReview && FParse::Param(Cmd, TEXT("ArtPreviewIconProbe"));
   FString SizeText;
   FParse::Value(Cmd, TEXT("ArtPreviewIconSize="), SizeText);
   ArtHud.IconSize = S08ParseIconSize(SizeText, 32);
@@ -5666,7 +5673,7 @@ void AS08FlowGameMode::BuildArtHudWidgets(const TSharedRef<SConstraintCanvas>& C
   // Exact-size combat icon textures (no mips, UI group): a 1254 px concept
   // drawn at 24 px without mips aliases badly, so each size is its own
   // pre-filtered texture (tools/art/art004_hud_icon_import.py).
-  if (bArtPreview) {
+  if (bArtLook) {
     // W5b-R D-5: the opaque target token (dark body, light rim); the T2.2 concept size stays the fallback.
     const FString TokenPath = FString::Printf(TEXT("/Game/ArtTests/ARTMarkers/Textures/T_UI_Action_AttackToken_%d"),
                                               ArtHud.IconSize);
@@ -5710,7 +5717,7 @@ void AS08FlowGameMode::BuildArtHudWidgets(const TSharedRef<SConstraintCanvas>& C
                                      Texture ? Texture->GetSizeX() : 0, Texture ? Texture->GetSizeY() : 0,
                                      ArtHud.bIconProbe ? 1 : 0, ArtHud.bEnabled ? 1 : 0));
     FString PlanText;
-    if (FParse::Value(Cmd, TEXT("ArtPreviewInputPlan="), PlanText) && !PlanText.IsEmpty()) {
+    if (bReview && FParse::Value(Cmd, TEXT("ArtPreviewInputPlan="), PlanText) && !PlanText.IsEmpty()) {
       FString Error;
       if (S08ParseInputPlan(PlanText, ArtHud.Plan, Error)) {
         // BuildUi runs before BeginPlay parses -ArtPreviewShotAfter: read it here.
@@ -5745,9 +5752,9 @@ void AS08FlowGameMode::BuildArtHudWidgets(const TSharedRef<SConstraintCanvas>& C
   }
   ArtHud.Impl = static_cast<uint8>(Impl);
   ArtHud.bTextTableReady = S08ArtHudText::EnsureTable();
-  // The plate and the icon exist only on the -ArtPreview board (bEnabled and
-  // the icon both require it); other runs (S09/S10 probes) get no art layer.
-  if (!bArtPreview) return;
+  // The plate and the icon exist only on the art look (bEnabled and the icon both require it); a -S08GreyBoard run
+  // (the S09 HUD harness) gets no art layer.
+  if (!bArtLook) return;
 
   const bool bUmg = Impl != ES08ArtHudImpl::Slate;
   const bool bSlate = Impl != ES08ArtHudImpl::Umg;

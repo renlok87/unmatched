@@ -49,11 +49,11 @@ public:
   /** W4-A: light units / SkyLight / exposure / profile sha actually applied
    *  (input of the RENDER fingerprint line of every SHOT). */
   const FS08AppliedRender& GetAppliedRender() const { return AppliedRender; }
-  /** Wave 5c-B -ArtPreviewDiorama tray component (nullptr without the flag). */
+  /** Wave 5c-B diorama tray component (default since ART-DEFAULT; nullptr with -S08DioramaLegacy / -S08GreyBoard). */
   const UStaticMeshComponent* GetDioramaTray() const { return DioramaTray; }
-  /** Wave 5c-B: creates the diorama tray component when S08Diorama::Enabled(bArtPreview) (called from BeginPlay;
-   *  a no-op without -ArtPreview -ArtPreviewDiorama). Returns true when the tray component exists. */
-  bool EnsureDioramaTray(bool bArtPreview);
+  /** Wave 5c-B: creates the diorama tray component when S08Diorama::Enabled(bArtLook) (called from BeginPlay on the
+   *  art look; a no-op with -S08DioramaLegacy). Returns true when the tray component exists. */
+  bool EnsureDioramaTray(bool bArtLook);
   /** Wave 5c-B: shows the tray fitted to a board frame of world half extent BoardHalf (S08Diorama::FitTray), or
    *  hides it; writes the 'ARTPREVIEW diorama tray=' line. Public for the automation test.
    *  ENV-MAPS (ENV-O8 T1): Offset shifts the tray (extra rim on one side), Waiver names the exception the
@@ -67,9 +67,9 @@ public:
    *  the caller then keeps the T1 placeholder. Public for the automation test. */
   bool PlaceDioramaTrayT2(const FVector2D& FrameHalf, const FVector2D& LayoutHalf, float OffsetY, const TCHAR* Source);
   /** ENV-MAPS track C (S08EnvLayout.h): arms the environment around map-image boards when
-   *  S08EnvLayout::Enabled(bArtPreview) (-ArtPreview -ArtPreviewDiorama, no -ArtPreviewNoEnv); creates nothing by
-   *  itself (called from BeginPlay; a grid board never gets a component). Returns the gate. */
-  bool EnsureEnvLayout(bool bArtPreview);
+   *  S08EnvLayout::Enabled(bArtLook) (the art look with the tray - both default -, no -ArtPreviewNoEnv); creates
+   *  nothing by itself (called from BeginPlay; a grid board never gets a component). Returns the gate. */
+  bool EnsureEnvLayout(bool bArtLook);
   /** Environment components spawned from Config/ArtBoards/EnvLayouts/<map>.layout.json for the active map-image
    *  board (empty on grids, without the flags, or when the layout is absent / invalid). */
   const TArray<TObjectPtr<UStaticMeshComponent>>& GetEnvProps() const { return EnvProps; }
@@ -245,8 +245,8 @@ public:
    *  exactly once per (fighter, authoritative seq) - a repeated cue for the
    *  same seq (reapply, reconnect replay) is traced and ignored (T2.2). */
   void ShowDamageNumber(const FString& FighterId, int32 Damage, int32 SequenceNumber);
-  /** Wave 5c-B -ArtPreviewHeroesV2: a combat event (attack / damage) of a fighter drives its v2 clip,
-   *  exactly once per (event, fighter, authoritative seq). A no-op without the flag or a v2 figure. */
+  /** Wave 5c-B heroes v2 (default since ART-DEFAULT): a combat event (attack / damage) of a fighter drives its v2
+   *  clip, exactly once per (event, fighter, authoritative seq). A no-op with -S08HeroesLegacy or without a v2 figure. */
   void NotifyFighterAnimEvent(const FString& FighterId, S08HeroesV2::EEvent Event, int32 SequenceNumber);
 
   /** TASK-022 selection ring + reachable-cell highlights. */
@@ -395,7 +395,7 @@ private:
   /** ENV-MAPS P2: the profile's "mapGrade" on the map MID of a map-image board (traced; no block = the MI values). */
   void ApplyMapGrade(const FS08LightProfile& Light);
   void ApplySurfaceMaterials();
-  /** Wave 5c-B -ArtPreviewDiorama: shows / hides and fits the tray under the active art board (traced). */
+  /** Wave 5c-B diorama tray (default since ART-DEFAULT): shows / hides and fits the tray under the active art board (traced). */
   void UpdateDioramaTray(const FS08BoardModel& Board);
   /** ENV-MAPS track C: spawns / keeps / clears the environment of the active map-image board (S08EnvLayout::Update);
    *  called first thing in UpdateDioramaTray, whose map-image tray then takes the layout's tray (S08EnvLayout::ApplyTrayT2 -> the shared
@@ -418,7 +418,8 @@ private:
   bool bAllMedusaSummaryTraced = false;
   FS08SeqDedupe AnimEventDedupe;
   FString HeroesV2SummaryKey;
-  // Wave 5c-B -ArtPreviewDiorama (S08Diorama.h): created at runtime only with the flag, nullptr otherwise.
+  // Wave 5c-B diorama tray (S08Diorama.h): created at runtime on the art look (default), nullptr with -S08DioramaLegacy /
+  // -S08GreyBoard.
   UPROPERTY()
   TObjectPtr<UStaticMeshComponent> DioramaTray;
   // ENV-U10 track TRAY: the tray component swaps between T1 (SM_TableBase, grid boards and the map-image fallback)
@@ -433,7 +434,7 @@ private:
   TObjectPtr<UMaterialInterface> TrayT2Mi;
   bool bTrayT2Tried = false;
   // ENV-MAPS track C (S08EnvLayout.h): environment props / point lights of the active map-image board, created at
-  // runtime only with -ArtPreview -ArtPreviewDiorama; destroyed on a board change.
+  // runtime only on the art look with the tray (both default; S08ArtLook.h); destroyed on a board change.
   UPROPERTY()
   TArray<TObjectPtr<UStaticMeshComponent>> EnvProps;
   UPROPERTY()
