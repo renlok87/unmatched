@@ -1,0 +1,25 @@
+# MS-T-15 tests and builds, 2026-10-04 (commit fd585184)
+
+## UnmatchedEditor Win64 Development -NoXGE -MaxParallelActions=2
+Result: Succeeded
+Total execution time: 95.25 seconds
+
+## Unmatched Win64 Development -NoXGE -MaxParallelActions=4 (game target)
+Result: Succeeded
+Total execution time: 51.57 seconds
+
+## Headless Unmatched.S08+Unmatched.S09 (UnrealEditor-Cmd -nullrhi -unattended)
+LogAutomationCommandLine: Display: Found 248 automation tests based on 'Unmatched.S08+Unmatched.S09'
+LogAutomationCommandLine: Display: **** TEST COMPLETE. EXIT CODE: 0 ****
+Result={Success}: 248  Result={Fail}: 0
+LogAutomationController: Display: Test Completed. Result={Success} Name={CueSource} Path={Unmatched.S08.MoveAnim.CueSource}
+LogAutomationController: Display: Test Completed. Result={Success} Name={CueTrace} Path={Unmatched.S08.MoveAnim.CueTrace}
+
+## check-trace on that automation log (C++ MS-CUE lines vs the Python schedule)
+CUE_TRACE PASS {"presented": 0, "spawned": 0, "fallback": 0, "duplicate": 0, "stale": 0, "done": 0, "unique_triples": 0, "ms_cue": 25, "ms_cue_sets": 13, "ms_cue_sources": {"trail": 16, "canonical": 8, "straight": 1}}
+
+## cue_contract.py
+CUE_TABLE PASS cues 18
+FIXTURE OK  move-seq-caps.json 
+CUE_FIXTURES PASS fixtures 13 bad 0
+23 passed in 0.34s
