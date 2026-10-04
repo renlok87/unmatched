@@ -336,14 +336,47 @@ def to_screen(pt, viewport, client_origin, client_size):
     return round(client_origin[0] + pt[0] * sx), round(client_origin[1] + pt[1] * sy)
 
 
+class PROCESSENTRY32W(ctypes.Structure):
+    _fields_ = [("dwSize", wt.DWORD), ("cntUsage", wt.DWORD), ("th32ProcessID", wt.DWORD),
+                ("th32DefaultHeapID", ULONG_PTR), ("th32ModuleID", wt.DWORD), ("cntThreads", wt.DWORD),
+                ("th32ParentProcessID", wt.DWORD), ("pcPriClassBase", wt.LONG), ("dwFlags", wt.DWORD),
+                ("szExeFile", wt.WCHAR * 260)]
+
+
+def process_tree(pid: int) -> set[int]:
+    """pid and all its descendants. The staged Unmatched.exe is a stub that starts the real client
+    (Unmatched/Binaries/Win64/...) as a child: the window belongs to the child, not to the pid the demo prints."""
+    kernel32.CreateToolhelp32Snapshot.restype = wt.HANDLE
+    snap = kernel32.CreateToolhelp32Snapshot(0x2, 0)              # TH32CS_SNAPPROCESS
+    parents: dict[int, int] = {}
+    try:
+        e = PROCESSENTRY32W()
+        e.dwSize = ctypes.sizeof(PROCESSENTRY32W)
+        ok = kernel32.Process32FirstW(snap, ctypes.byref(e))
+        while ok:
+            parents[e.th32ProcessID] = e.th32ParentProcessID
+            ok = kernel32.Process32NextW(snap, ctypes.byref(e))
+    finally:
+        kernel32.CloseHandle(snap)
+    tree, grew = {pid}, True
+    while grew:
+        grew = False
+        for child, parent in parents.items():
+            if parent in tree and child not in tree and child != parent:
+                tree.add(child)
+                grew = True
+    return tree
+
+
 def find_window(pid: int):
     found = []
+    pids = process_tree(pid)
 
     @ctypes.WINFUNCTYPE(wt.BOOL, wt.HWND, wt.LPARAM)
     def cb(hwnd, _):
         p = wt.DWORD()
         user32.GetWindowThreadProcessId(hwnd, ctypes.byref(p))
-        if p.value == pid and user32.IsWindowVisible(hwnd):
+        if p.value in pids and user32.IsWindowVisible(hwnd):
             r = wt.RECT()
             user32.GetClientRect(hwnd, ctypes.byref(r))
             found.append((r.right * r.bottom, hwnd, r.right, r.bottom))
@@ -571,7 +604,8 @@ def cmd_run(a) -> int:
         target = own_hero_target(tail.read_all())
         win = find_window(int(host_pid))
         if not win:
-            return finish("ошибка: окно хоста не найдено (видимое окно процесса)", target=target)
+            return finish("ошибка: окно хоста не найдено (видимое окно процесса)", target=target,
+                          processTree=sorted(process_tree(int(host_pid))))
         report.update(target=target, window={"origin": win["origin"], "size": win["size"]})
         inj = Injector(guard, report["steps"])
         report["virtualScreen"] = [inj.vx, inj.vy, inj.vw, inj.vh]
@@ -634,6 +668,7 @@ def cmd_check() -> int:
     assert pi.poll() == 3.0
     if os.name == "nt":
         win_setup()
+        assert os.getpid() in process_tree(os.getppid())         # the client window lives in a child of the stub
         print(f"idle now {idle_seconds():.1f} s")
     print("T43_CHECK_PASS")
     return 0
