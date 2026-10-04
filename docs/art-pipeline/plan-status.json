@@ -1,7 +1,7 @@
 {
   "schema": "unmatched-plan-status/v1",
-  "generated": "2026-10-03T14:53:13Z",
-  "head": "03506cca5588addd005ef9456a6afba28af1707c",
+  "generated": "2026-10-03T23:58:34Z",
+  "head": "d37ae1fe8de6de6afa1e1ce06e56650804afc586",
   "sources": [
     {
       "id": "handover",
@@ -97,6 +97,16 @@
       "id": "git-1003c",
       "path": "git log 11d4947e..03506cca",
       "title": "коммиты 2026-10-03 (вечер): HI-07, ART-011 и жетон v3, Sarpedon P10, финал GD-058, ACC-022, подбор хода MS-T-01/02/03/14, раннер T4.3"
+    },
+    {
+      "id": "real-boards-1004",
+      "path": "docs/game-design/decisions/2026-10-04-real-boards-only.md",
+      "title": "Решение 2026-10-04 «только настоящие доски» (НД-1…НД-6): Marmoreal и Sarpedon остаются, Cobble 5×6, ART FIXTURE и сетка 20×20 выведены"
+    },
+    {
+      "id": "git-1004a",
+      "path": "git log 03506cca..d37ae1fe",
+      "title": "коммиты 2026-10-03/04: подбор хода MS-T-04…07 и веха M1, только настоящие доски, раннер T4.3 на Marmoreal"
     }
   ],
   "tasks": [
@@ -648,12 +658,12 @@
         "docs/game-design/evidence/GD-058/interim-2026-09-30/packaged/t43-real-input.json",
         "tools/s08/t43_real_input.py"
       ],
-      "next": "Раннер tools/s08/t43_real_input.py (7509eacb): ждёт простоя пользователя ≥ 600 с (GetLastInputInfo), прерывается при первом вводе; запуск 2026-10-03 19:04 — пользователь активен.",
+      "next": "Раннер tools/s08/t43_real_input.py теперь идёт на Marmoreal · original map (fc8dae1b); перезапущен 2026-10-04 04:01 на упаковке 606e7ec0 с окном ожидания 100 мин.",
       "blocker": "Только при простое пользователя ≥ 10 мин (делегирование 2026-09-29, РД-5).",
       "assets": [
         "ASSET-MARKERS-001"
       ],
-      "updated": "2026-10-03T14:53:13Z",
+      "updated": "2026-10-03T23:58:34Z",
       "note": "Волна 6 (2026-09-30): шесть замеров GetLastInputInfo, максимум простоя 37,4 с < 600 с — SendInput не запускался, флаговая эмуляция за реальный ввод не выдаётся."
     },
     {
@@ -2260,10 +2270,10 @@
     },
     {
       "id": "MOVE-SEL-M1",
-      "title": "Подбор хода, реализация: MS-T-01 (правила), 02 (каноническая достижимость + фикстуры), 03 (паритет UE), 04/05 (черновик S09), 14 (след перемещения); MS-T-06/07 — в работе",
+      "title": "Подбор хода, веха M1: MS-T-01…07 и MS-T-14; живой манёвр «буст + 3 бойца» на Marmoreal",
       "track": "tech",
       "source": "move-selection",
-      "status": "in_progress",
+      "status": "done",
       "art_status": null,
       "evidence": [
         "docs/game-design/move-selection/_research/R6-rules-faq.md",
@@ -2271,13 +2281,32 @@
         "backend/src/game-engine/services/last-movement.spec.ts",
         "unreal/Unmatched/Source/Unmatched/S08/S08MoveParityTests.cpp",
         "docs/game-design/move-selection/05-implementation-plan.md",
-        "unreal/Unmatched/Source/Unmatched/S09/S09MoveSelectionTests.cpp"
+        "unreal/Unmatched/Source/Unmatched/S09/S09MoveSelectionTests.cpp",
+        "docs/game-design/evidence/MOVE-SEL/m1-live-2026-10-04/README.md"
       ],
-      "next": "MS-T-06 (коды ошибок) и MS-T-07 (ввод) — агент, затем проверка выхода M1; далее M2 (MS-T-08…13, 28) и MS-T-15.",
+      "next": "Далее MS-T-15 (клиент читает lastMovement) и M2 (MS-T-08…13, 28).",
       "blocker": null,
       "assets": [],
-      "updated": "2026-10-03T14:53:13Z",
-      "note": "07a229bd (R6: MS-T-19/20 разблокированы), 25ba829d/e016fb8e (102 фикстуры, 30 ручных; 1555 тестов), 03506cca (UE: 98/102 фикстур, 0 расхождений; S08+S09 95/95), c09adf2e/5b51305c/613f9d30 (lastMovement; MS-Q-05 — id буста публичен, MS-Q-06 — состояние между begin и maneuver не меняется; 1616 тестов). b360ba02 (MS-T-05: FS09DraftEval = evaluateDraft, 98/102 фикстур черновика без расхождений; S09 71/71, S08+S10 237/237), caac03e9 (MS-T-04: нулевые ходы не шлются, immobilized, «живой» по ролям, кэш черновика по maneuverId; S09 74/74)."
+      "updated": "2026-10-03T23:58:34Z",
+      "note": "ebc661df (план драйвера -S08ManeuverPlan=boost3), ce41dfa6 (герой зажат на старте → манёвр без предчерновика), 48051537 (-HostManeuver), 1a7be134 (акт): MANEUVER done seq=3 boost=card, CUE move ×3 у второго клиента, seq 3 = 3, без MS-REJECT и рассинхрона. Прогоны на Cobble 5×6 — только история (решение 2026-10-04)."
+    },
+    {
+      "id": "REAL-BOARDS",
+      "title": "Только настоящие доски: Marmoreal и Sarpedon (оригинальные карты); Cobble 5×6, ART FIXTURE и сетка 20×20 выведены из игры, демо и проверок",
+      "track": "tech",
+      "source": "real-boards-1004",
+      "status": "done",
+      "art_status": null,
+      "evidence": [
+        "docs/game-design/decisions/2026-10-04-real-boards-only.md",
+        "docs/game-design/evidence/REAL-BOARDS/2026-10-04/README.md",
+        "docs/backend-api/retired-boards-2026-10-04.json"
+      ],
+      "next": "Открыто: 29 досок каталога веба — сетки 12×8, приближения настоящих карт (веб не рисует оригинальные карты) — решение пользователя; переснять фикстуру 04 (снимок сервера 20×20) на Marmoreal.",
+      "blocker": null,
+      "assets": [],
+      "updated": "2026-10-03T23:58:34Z",
+      "note": "Бэкенд cdc896bd/a809114f/a0275581/e58d8e09: доска по умолчанию Marmoreal, без подстановки 20×20, 3 строки удалены после выгрузки, стенды пересобраны; jest 1950/1950. UE и скрипты ea09b99c/284e6e52/f859f04b/d37ae1fe: профили rev 21 только карты, демо по умолчанию на Marmoreal; UE 246/246, pytest 570; упаковка f859f04b; оба демо без аргумента доски прошли на Marmoreal."
     }
   ],
   "waves": [
@@ -2544,7 +2573,8 @@
         "ENV-P10",
         "GD-058",
         "T4.3",
-        "MOVE-SEL-M1"
+        "MOVE-SEL-M1",
+        "REAL-BOARDS"
       ]
     }
   ],
