@@ -49,6 +49,25 @@ assert acc == {f'ACC-{i:03}' for i in range(1, 23)}
 all_ids = {row['id'] for row in backlog}
 assert all_ids == ({f'GD-{i:03}' for i in range(1, 59)} | {f'ART-{i:03}' for i in range(1, 19)})
 by_id = {row['id']: row for row in backlog}
+
+# DE set (live DE study, DE-008 2026-10-04): its own CSV, same columns and parser as 14.
+de_backlog = read_csv('de-footage/task/07-sprint-backlog.csv', 'id')
+assert list(de_backlog[0]) == list(backlog[0]), '07-sprint-backlog.csv: columns differ from 14'
+de_ids = {row['id'] for row in de_backlog}
+assert de_ids == {f'DE-{i:03}' for i in range(1, 39)}
+de_loads = Counter()
+for row in de_backlog:
+    assert row['status'] in {'planned', 'in_progress', 'blocked', 'done'}, f'{row["id"]}: invalid status'
+    unknown = {dep for dep in ids(row['depends_on'])
+               if dep not in de_ids | all_ids and not re.fullmatch(r'MS-T-\d{2}', dep)}
+    assert not unknown, f'{row["id"]}: unknown dependency {unknown}'
+    if row['owner'] == 'ART':
+        assert row['sprint'] == 'A04', f'{row["id"]}: ART outside A04'
+    else:
+        assert row['owner'] == 'DEV' and re.fullmatch(r'S1[0-3]|S11[b-g]|post-MVP', row['sprint']), row['id']
+        de_loads[row['sprint']] += float(row['estimate_days'])
+assert all(effort <= 8 for effort in de_loads.values())
+
 covered_sources = set()
 covered_acc = set()
 loads = Counter()
@@ -85,7 +104,7 @@ for row in backlog:
 assert legacy_tasks <= covered_sources, f'Unmapped old tasks: {legacy_tasks - covered_sources}'
 assert covered_acc == acc, f'Acceptance without task: {acc - covered_acc}'
 assert len(loads) == 14 and all(effort <= 8 for effort in loads.values())
-assert sum(loads.values()) == 103 and art_load == 46.5
+assert sum(loads.values()) == 102 and art_load == 46.5  # GD-044 1.5 -> 0.5 (DE-008, 2026-10-04)
 
 visited, active = set(), set()
 
@@ -151,5 +170,7 @@ print('PASS: 34/34 legacy tasks mapped; 69 new tasks; 22/22 acceptance checks li
 print('PASS: dependency DAG; no future DEV dependency; 14 sprints <=8 DEV days')
 print('DEV loads:', ', '.join(f'{key}={loads[key]:g}' for key in sorted(loads)))
 print(f'PASS: total DEV={sum(loads.values()):g} days; ART={art_load:g} days; progress statuses have artifact references')
+print(f'PASS: DE set {len(de_backlog)} tasks in 07-sprint-backlog.csv, same columns as 14; DEV loads:',
+      ', '.join(f'{key}={de_loads[key]:g}' for key in sorted(de_loads)))
 print('PASS: local links and new document IDs')
 print('THIS VALIDATOR DOES NOT TEST: live server, UE, Blender import, gameplay correctness, performance')
