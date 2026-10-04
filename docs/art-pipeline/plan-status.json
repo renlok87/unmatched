@@ -1306,7 +1306,7 @@
         "docs/art-pipeline/harpy-lookdev-v2.md",
         "docs/art-pipeline/harpy-h3-report.md"
       ],
-      "next": "ART-016 (тёмные первичные), ART-012/013; носитель номера экземпляра (AD-OPEN-06).",
+      "next": "ART-012/013; носитель номера экземпляра (AD-OPEN-06). ART-016 (маховые, r3.3) сделано 2026-10-04.",
       "blocker": "Формально зависит от GD-058; AD-OPEN-06.",
       "assets": [
         "ASSET-HARPY-001"
@@ -1488,7 +1488,7 @@
       "title": "Маска акцента Arthur (мипы) и насыщенность зон героев",
       "track": "art",
       "source": "session",
-      "status": "in_progress",
+      "status": "done",
       "art_status": "измерено",
       "evidence": [
         "docs/art-pipeline/king-arthur-lookdev-v2.md",
@@ -1496,17 +1496,22 @@
         "docs/art-pipeline/merlin-lookdev-v2.md",
         "docs/art-pipeline/material-library/team-accent.md",
         "docs/art-pipeline/evidence/lookdev-r3-2026-09-30/summary.json",
-        "docs/art-pipeline/evidence/lookdev-r3-2026-09-30/reimport-plan-r3.2.json"
+        "docs/art-pipeline/evidence/lookdev-r3-2026-09-30/reimport-plan-r3.2.json",
+        "docs/art-pipeline/evidence/art016-harpy-r3.3-2026-10-04/marmoreal-k2x2p5-harpies-before-after.jpg",
+        "docs/art-pipeline/evidence/art016-harpy-r3.3-2026-10-04/dark-zone-split-b2-b3.2-b3.3.json",
+        "docs/art-pipeline/evidence/lookdev-r3-2026-09-30/reimport-plan-r3.3.json",
+        "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/review/b3.3/measure-b3.3.json",
+        "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/review/b3.3/measure-b3.3-r2def.json"
       ],
-      "next": "Harpy: выделить маховые в свой класс MatID + строку LUT (specular 0,35), рыжим перьям вернуть 0,575; переимпорт, съёмка b3.3, замер по обоим определениям.",
+      "next": "Сделано (Harpy r3.3, 2026-10-04). Необязательные остатки: «тёмные» 5c-B1 — смешанная зона, маховые внутри — вне допуска по насыщенности (+0,146 при −0,75 EV; в b2 +0,124 — тоже вне), рычаг — BC рыжих перьев в тени; маховые r2 1,14 у края допуска 1,15 — запасной шаг specular столбца 3 0,30.",
       "blocker": null,
       "assets": [
         "ASSET-KING-ARTHUR-001",
         "ASSET-HARPY-001",
         "ASSET-MERLIN-001"
       ],
-      "updated": "2026-09-30T22:30:00Z",
-      "note": "Маска акцента Arthur и BC пояса — 5c-B1; look-dev r3 (1d0e6f20): Medusa 5/5, Merlin 4/5 (потёртая кожа в допуске), Harpy 4/5 с регрессией «тёмных» перьев; дерево лука/посоха и волосы Arthur — материал вне счёта зон."
+      "updated": "2026-10-04T02:15:00Z",
+      "note": "Маска акцента Arthur и BC пояса — 5c-B1; look-dev r3 (1d0e6f20): Medusa 5/5, Merlin 4/5 (потёртая кожа в допуске); дерево лука/посоха и волосы Arthur — материал вне счёта зон. Harpy r3.3 (1e1d7e44): маховые — свой класс MatID feathers_flight (слот metal_forged, MatID 56, 15,95 % фигуры) со specular 0,35, рыжим перьям 0,575; переимпорт MatID + LUT, съёмка b3.3 (маски зон b3.2). −0,75 EV: r2 5/5 (маховые 1,08 → 1,14), 5c-B1 4/5 («тёмные» 0,83 → 0,88, нас. +0,164 → +0,146); EV100 1,3: r2 2/5, 5c-B1 3/5 — счёт как в b3.2. Затенённые рыжие перья без маховых вернулись ровно к b2 (Y 0,0226, нас. 0,463). Marmoreal свежий -Bench до/после: разница только на крыльях Harpy (0,9–1,4 % пикселей > 24), остальное — шум. Измерено, не художественная приёмка."
     },
     {
       "id": "ART-017",
@@ -1520,7 +1525,7 @@
         "tools/tripo-pipeline/validate_registry.py",
         "docs/art-pipeline/SESSION-CLOSEOUT-2026-09-30.md"
       ],
-      "next": "Сделано. Новые слои — по мере прогонов (ENV, Harpy MatID маховых).",
+      "next": "Сделано. Новые слои — по мере прогонов (ENV); слой Harpy r3.3 (MatID маховых, ART-016) добавлен 2026-10-04.",
       "blocker": null,
       "assets": [
         "ASSET-MEDUSA-001",
@@ -2611,8 +2616,8 @@
       "scope": "один тип × 3 экземпляра, крылья, браслет, метки экземпляров",
       "candidate": "/Game/PipelineCandidates/Harpy/H3LD",
       "art_status": "технически импортировано",
-      "gap": "тёмные рыжие перья (отдельный класс MatID для маховых); носитель номера AD-OPEN-06",
-      "action": "ART-016, ART-008",
+      "gap": "носитель номера AD-OPEN-06; «тёмные» 5c-B1 (смешанная зона с маховыми) вне допуска по насыщенности — необязательный остаток ART-016",
+      "action": "ART-008",
       "tripo": false
     },
     {

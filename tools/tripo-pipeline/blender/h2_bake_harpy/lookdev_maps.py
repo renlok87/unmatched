@@ -341,18 +341,22 @@ def main():
     # select the parent class x mask, so the BC bytes stay; only MatID / LUT change). profile classes.<ext id>:
     # {"from": parent class, "mask": "dark_primaries", "weight_min", "min_component_px"}; gutters follow their texel
     split_info = {}
+    part_g = part[jy, jx]
     for eid, sc in sorted((cid_, v) for cid_, v in cc.items() if isinstance(v, dict) and v.get("from")):
         if sc.get("mask") != "dark_primaries":
             raise ValueError("classes.%s: unknown mask %s" % (eid, sc.get("mask")))
         parent = lab == col[sc["from"]]
-        sel_s = parent & (dark[jy, jx] >= float(sc["weight_min"]))
-        lab[sel_s] = col[eid]
+        cand = parent & (dark[jy, jx] >= float(sc["weight_min"]))
+        lab[cand] = col[eid]
         lab, rm_s = clean_small(lab, [col[eid]], int(sc.get("min_component_px", cc["min_component_px"])), col[sc["from"]])
+        by_part = {parts[i_]: r(share(cand & (part_g == i_)), 4) for i_ in sorted(set(np.unique(part_g[cand & cov]).tolist()))
+                   if i_ >= 0}
         split_info[eid] = {"from": sc["from"], "column": int(col[eid]), "mask": sc["mask"], "weight_min": sc["weight_min"],
                            "texels_4k_covered": int(((lab == col[eid]) & cov).sum()),
                            "small_components_back_to_parent_texels_4k": int(sum(rm_s.values())),
                            "share_of_figure_area": r(share(lab == col[eid]), 4),
-                           "share_of_parent_before": r(share(lab == col[eid]) / max(share(parent), 1e-9), 4)}
+                           "share_of_parent_before": r(share(lab == col[eid]) / max(share(parent), 1e-9), 4),
+                           "mask_share_of_figure_by_part": by_part}
     # metallic per column from the class that OCCUPIES the column (col_class: a hero slot carries its extension
     # class, e.g. horn_claw in the brass column 5 is a dielectric), never from the library class of the column index
     metal_cols = [ci for ci in sorted(set(np.unique(lab).tolist())) if allc[col_class[ci]]["metallic"] == 1]

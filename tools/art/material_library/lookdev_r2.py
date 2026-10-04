@@ -1,7 +1,8 @@
 """Look-dev round 2 (2026-09-30, after 5c-B1): joint BC-ratio fit and forecast on the CONVERGED UE frames b1 of a hero,
 several zones at once (no editor, no Blender, no render).
 
-    # measure the b1 frames with a review config (scratch copy of the frames: cmd_measure writes class maps there)
+    # measure the b1 frames with a review config (scratch copy of the frames: cmd_measure writes class maps there);
+    # --masks-from <review dir> --masks-tag <tag>: the class masks of another capture of the same views (ART-016)
     python tools/art/material_library/lookdev_r2.py measure --config <review json> --frames <review/b1> --tag b1 \
         --scratch C:/tmp/lr2/<hero> [--out <json>]
 
@@ -222,8 +223,23 @@ def cmd_measure(a, cfg):
     for p in (Path(a.frames) / "frames").glob("%s-%s-*.png" % (cfg["hero"].lower(), a.tag)):
         if not (scratch / "frames" / p.name).is_file():
             shutil.copyfile(p, scratch / "frames" / p.name)
+    masks_from = None
+    if getattr(a, "masks_from", None):
+        # ART-016 (2026-10-04): the class masks (debug + plate frames) of an earlier capture of the same views, so a
+        # capture whose MatID split one class into two finely interleaved columns is measured on exactly the zone
+        # pixels of the earlier one (its own debug frame loses the anti-aliased mix of the two class colours)
+        hero = cfg["hero"].lower()
+        masks_from = {"frames": Path(a.masks_from).resolve().as_posix(), "tag": a.masks_tag, "files": {}}
+        for view in U.ORTHO:
+            for kind in ("debug", "plate"):
+                src = Path(a.masks_from) / "frames" / ("%s-%s-%s-%s.png" % (hero, a.masks_tag, view, kind))
+                shutil.copyfile(src, scratch / "frames" / ("%s-%s-%s-%s.png" % (hero, a.tag, view, kind)))
+                masks_from["files"]["%s-%s" % (view, kind)] = U.sha(src)
     with contextlib.redirect_stdout(io.StringIO()):
         res = U.cmd_measure(argparse.Namespace(out=str(scratch), tag=a.tag), cfg)
+    if masks_from:
+        res["masks_from"] = masks_from
+        U.write_json(scratch / ("measure-%s.json" % a.tag), res)
     if a.out:
         shutil.copyfile(scratch / ("measure-%s.json" % a.tag), a.out)
     for var in ("reading", "neutral"):
@@ -248,6 +264,8 @@ def main() -> int:
     ap.add_argument("--scratch", default="C:/tmp/lr2/scratch")
     ap.add_argument("--edit-config", help="forecast: config whose zone definitions pick the edited pixels")
     ap.add_argument("--out")
+    ap.add_argument("--masks-from", help="measure: review dir whose debug + plate frames give the class masks")
+    ap.add_argument("--masks-tag", help="measure: tag of the --masks-from capture")
     a = ap.parse_args()
     cfg = load_cfg(a.config)
     {"measure": cmd_measure, "fit": cmd_fit, "forecast": cmd_forecast}[a.command](a, cfg)
