@@ -1,6 +1,8 @@
 """Record the DE window (60 fps, NVENC) and the system sound (WASAPI loopback) for the live study.
 
 usage: C:/tmp/de-footage/tools/venv/Scripts/python tools/de-footage/de_record.py "<window title>" <out_dir>
+       ... de_record.py "region:X,Y,WxH" <out_dir>   (desktop region; use when title capture gives a black frame:
+       the UE/D3D window is not capturable by gdigrab title mode. X,Y = client origin on the desktop, e.g. 412,172,1920x1080)
 Stop: create <out_dir>/STOP (the script then finishes ffmpeg with 'q' and closes the WAV).
 Outputs: video.mkv, audio.wav, sync.json (start stamps of both streams, perf_counter + wall clock).
 Align later by a calibration click: the UI click sound vs the frame where the cursor clicks.
@@ -43,8 +45,14 @@ def audio():
 
 t = threading.Thread(target=audio, daemon=True)
 t.start()
+if title.startswith("region:"):
+    xy, size = title[7:].rsplit(",", 1)
+    ox, oy = xy.split(",")
+    src = ["-offset_x", ox, "-offset_y", oy, "-video_size", size, "-i", "desktop"]
+else:
+    src = ["-i", f"title={title}"]
 cmd = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-f", "gdigrab", "-framerate", "60",
-       "-draw_mouse", "1", "-i", f"title={title}", "-c:v", "h264_nvenc", "-preset", "p5", "-cq", "19",
+       "-draw_mouse", "1", *src, "-c:v", "h264_nvenc", "-preset", "p5", "-cq", "19",
        os.path.join(out, "video.mkv")]
 sync["video_spawn_perf"] = time.perf_counter()
 sync["video_spawn_wall"] = time.time()
