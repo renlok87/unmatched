@@ -54,7 +54,7 @@ by_id = {row['id']: row for row in backlog}
 de_backlog = read_csv('de-footage/task/07-sprint-backlog.csv', 'id')
 assert list(de_backlog[0]) == list(backlog[0]), '07-sprint-backlog.csv: columns differ from 14'
 de_ids = {row['id'] for row in de_backlog}
-assert de_ids == {f'DE-{i:03}' for i in range(1, 39)}
+assert de_ids == {f'DE-{i:03}' for i in range(1, 40)}  # DE-039 from the DE-027 spike (2026-10-04)
 de_loads = Counter()
 for row in de_backlog:
     assert row['status'] in {'planned', 'in_progress', 'blocked', 'done'}, f'{row["id"]}: invalid status'
