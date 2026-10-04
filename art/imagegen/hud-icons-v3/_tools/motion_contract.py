@@ -364,7 +364,8 @@ def storyboard_md(c):
     lines = ["# Движение значков HUD v3: раскадровка", "",
              "Сгенерировано из контракта [`icon-motion.json`](icon-motion.json) скриптом",
              "`art/imagegen/hud-icons-v3/_tools/motion_contract.py` — не править руками. План и фазы —",
-             "[ICON-MOTION-PLAN.md](ICON-MOTION-PLAN.md). Ключи и модель позы — в шапке генератора и в `rules` контракта.", "",
+             "[ICON-MOTION-PLAN.md](ICON-MOTION-PLAN.md). Ключи и модель позы — в шапке генератора и в `rules` контракта.",
+             "Исключение — ручной раздел в конце файла (ниже маркера `MANUAL_MARKER`): генератор переносит его без изменений.", "",
              "Удар — момент события в цикле, на него позже вешается звук (±40 мс). Reduced motion — ветка `reduced`.", "",
              "| Значок | Анимация | Вид | мс | Удар | Что двигается | Reduced motion |", "|---|---|---|---|---|---|---|"]
     for icon in c["order"]:
@@ -382,6 +383,21 @@ def storyboard_md(c):
     return "\n".join(lines)
 
 
+# Всё ниже этой строки в ICON-MOTION.md пишется руками (запланированные записи до переноса в контракт, DE-007)
+# и при перегенерации сохраняется как есть.
+MANUAL_MARKER = "<!-- ручной раздел: motion_contract.py сохраняет всё ниже этой строки -->"
+
+
+def manual_tail(path):
+    """Ручной раздел существующей раскадровки (с маркером) или пустая строка."""
+    if not os.path.exists(path):
+        return ""
+    with io.open(path, encoding="utf-8") as f:
+        old = f.read()
+    i = old.find(MANUAL_MARKER)
+    return "" if i < 0 else "\n" + old[i:]
+
+
 def dump(obj):
     return json.dumps(obj, ensure_ascii=False, indent=1) + "\n"
 
@@ -393,8 +409,9 @@ def main():
         os.makedirs(os.path.dirname(p), exist_ok=True)
         with io.open(p, "w", encoding="utf-8", newline="\n") as f:
             f.write(text)
+    tail = manual_tail(OUT_MD)
     with io.open(OUT_MD, "w", encoding="utf-8", newline="\n") as f:
-        f.write(storyboard_md(c))
+        f.write(storyboard_md(c) + tail)
     print(OUT_JSON, hashlib.sha1(text.encode("utf-8")).hexdigest()[:12])
     print(OUT_CFG)
     print(OUT_MD)
