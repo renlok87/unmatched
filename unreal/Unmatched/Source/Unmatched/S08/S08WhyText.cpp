@@ -43,6 +43,9 @@ const FRow GRows[] = {
     {TEXT("why.client.desync"), TEXT("Out of sync with the server — refreshing")},
     {TEXT("why.command.rejected"), TEXT("Command rejected — refreshing")},
     {TEXT("why.auth.refreshed"), TEXT("Session refreshed — confirm again")},
+    {TEXT("why.actions.remaining"), TEXT("Use your actions first: {n} left")},
+    {TEXT("why.effect.no.targets"), TEXT("No legal targets — effect skipped")},
+    {TEXT("why.defense.none"), TEXT("Nothing to defend with")},
     // ---- ms.* (03 §9) ----
     {TEXT("ms.begin.already"), TEXT("Maneuver already begun — Enter confirms")},
     {TEXT("ms.begin.exhaustion"),

@@ -5,6 +5,11 @@
 документа — **MS-R-41..MS-R-70, MS-R-73, MS-R-74**. Пути UE даны от `unreal/Unmatched/Source/Unmatched/`, если не
 указано иное.
 
+Синхронизация с живым исследованием DE (DE-004, прогон A, 2026-10-04): §6.3 «Анимация перемещения» и блок `anim` §4.7 —
+по SD-50 ([02-spec-deltas](../de-footage/task/02-spec-deltas.md)) и решению [01 F-02](../de-footage/task/01-decisions.md#f-02-d-de-02-шаг-и-подскок) (по умолчанию,
+D-DE-02; R-14 live 2026-10-04): время постоянно на ребро, подскок 0 (параметр), наклон хода 10°, доворот 120 мс,
+возврат в Idle 150 мс, ease — параметр, по умолчанию выкл.
+
 ## 1. Архитектура
 
 ```
@@ -25,7 +30,7 @@
                                                        ▼
                                                      AS08BoardActor ── US08MoveHighlightComponent (НОВОЕ: ISM-подложки,
                                                        │                 ISM-сегменты пути, призраки, бейджи)
-                                                     AS08FighterActor ── FS08MoveAnim (НОВОЕ: скольжение + подскок)
+                                                     AS08FighterActor ── FS08MoveAnim (НОВОЕ: скольжение + наклон, подскок 0)
 ```
 
 Принципы:
@@ -69,7 +74,7 @@
 | `S08/S08BoardActor.h/.cpp` | `SetSelectedFighter` (`:1750-1895`) перестаёт спавнить акторы; новый `SetMoveDraftView(const FS08MoveDraftView&)`; владеет `US08MoveHighlightComponent`; `ShowIllegalCell` остаётся для CUE-004 | MS-T-08 |
 | `S08/S08MoveHighlight.h/.cpp` (новые) | `US08MoveHighlightComponent`: ISM подложек (4 канала), ISM сегментов пути, точек и наконечников, призраки, бейджи | MS-T-08..MS-T-10 |
 | `S08/S08MoveAnim.h/.cpp` (новые) | чистая функция расписания анимации; интеграция с `AS08FighterActor` | MS-T-16 |
-| `S08/S08FighterActor.h/.cpp` | визуальная позиция отдельно от логической; `PlayMove(points, schedule)`, `SnapToLogical()`; подскок; доворот | MS-T-16 |
+| `S08/S08FighterActor.h/.cpp` | визуальная позиция отдельно от логической; `PlayMove(points, schedule)`, `SnapToLogical()`; наклон хода, разворот и доворот, возврат в Idle; подскок — параметр, по умолчанию 0 (D-DE-02) | MS-T-16, DE-021 |
 | `S08/S08UserSettings.h/.cpp` (новые) | `US08UserSettings : UGameUserSettings`: `bReducedMotion`, `AnimSpeed`, `bScreenShake` (UI-ACC-005) | MS-T-16 |
 | `unreal/Unmatched/Config/DefaultEngine.ini` | `[/Script/Engine.Engine] GameUserSettingsClassName=/Script/Unmatched.S08UserSettings` | MS-T-16 |
 | `S09/S09MoveSelectionTests.cpp`, `S08/S08MoveHighlightTests.cpp`, `S08/S08MoveAnimTests.cpp`, `S08/S08MoveParityTests.cpp` (новые) | автотесты MS-AT-10..29 | по задачам |
@@ -358,7 +363,8 @@ struct FS08MoveDraftView { TArray<FS08PlateView> Plates; TArray<FS08PathView> Pa
   "invalid": { "colorSrgb": "#D9483F", "ms": 350 },
   "lastMove": { "alpha": 0.6, "fadeMs": 300 },
   "anim": { "stepMs": 280, "capFighterMs": 1400, "capManeuverMs": 2400, "minStepMs": 90,
-            "overlap": 0.3, "placeMs": 240, "hopHeightRel": 0.08, "turnMs": 100 }
+            "overlap": 0.3, "placeMs": 240, "hopHeightRel": 0.0, "turnMs": 120, "startTurnMs": 50,
+            "travelLeanDeg": 10.0, "leanInMs": 60, "settleMs": 150, "easeEnds": false }
 }
 ```
 
@@ -367,8 +373,11 @@ struct FS08MoveDraftView { TArray<FS08PlateView> Plates; TArray<FS08PathView> Pa
 кольцо с кромкой в полосе [30, 40] uu, контур внутри 41,6 uu (как у `readability.reach` — `S08BoardArt.cpp:430-433`);
 нарушение отклоняет документ (как остальные блоки, `S08BoardArt.cpp:385-386`).
 
-`hopHeightRel` — доля роста фигурки (07 §4 предлагает 8–15 %); 0 — чистое скольжение. Значение по умолчанию утверждает
-пользователь (MS-Q-04). Отсутствие обоих блоков → поведение по умолчанию из кода с теми же числами (тест «нет блока»,
+`hopHeightRel` — доля роста фигурки; по умолчанию **0** — скольжение без подскока (по умолчанию, D-DE-02; 01 F-02;
+R-14 live 2026-10-04: корень 3D-героя DE без подскока, отклонение ≤ 2 px, S4H-M17). Параметр остаётся для A/B (лист
+DE-028); значение > 0 — только по слову пользователя (MS-Q-04 остаётся за ним, 01 «Резолюция ревью» п. 3).
+`travelLeanDeg`/`leanInMs` — наклон корпуса в пути, `startTurnMs` — разворот к первому ребру, `turnMs` — доворот на
+вершине, `settleMs` — возврат в Idle, `easeEnds` — ease-in-out на первом и последнем ребре (§6.3). Отсутствие обоих блоков → поведение по умолчанию из кода с теми же числами (тест «нет блока»,
 на сетке и на карте).
 
 ### 4.8. Golden-фикстура паритета
@@ -550,10 +559,23 @@ schedule(moves[], p, speed, reducedMotion) -> [{fighterId, startMs, stepDurMs, s
 2400 мс, шаг 110,6 мс; 4×7 «Медленно» — конец 3600 мс; 9×9 «Обычно» — 3 анимации (концы 810, 1377, 1944 мс) и 6 snap в
 1944 мс; 9×9 «Быстро» — 1 анимация, 8 snap в 810 мс; PLACE — 240 мс.
 
-- Позиция на шаге: линейно по сегменту с ease-in-out (sine) на первом и последнем шаге пути; подскок —
-  `z = hopHeight * sin(π t)` на каждом шаге (`hopHeight = hopHeightRel × рост фигурки`); доворот корпуса к направлению
-  следующего сегмента за `turnMs`; после финиша — возврат к ориентации по правилу половины поля
-  (`S08FighterActor.cpp:550-561`).
+- Шаг = ребро графа. Время шага (`stepDur_i` выше) одно для коротких и длинных рёбер; скорость внутри ребра постоянна
+  (линейно по сегменту); на промежуточных вершинах нет ни остановки, ни замедления (SD-50 п. 1; R-14 live 2026-10-04:
+  у DE одно время на ребро для 131–392 px, два ребра — 683 мс без паузы; TL `move_edge`, `move_two_edges`).
+- Ease-in-out (sine) на первом и последнем ребре пути — параметр `easeEnds`, по умолчанию **выкл** (02 «Резолюция
+  ревью» п. 1): у DE ease нет, резкую остановку прячет возврат в Idle. A/B-кадр — DE-028.
+- Подскок `z = hopHeight * sin(π t)` на каждом ребре (`hopHeight = hopHeightRel × рост фигурки`) остаётся в коде как
+  параметр; по умолчанию `hopHeightRel = 0` — подскока нет (по умолчанию, D-DE-02; 01 F-02).
+- Поза перемещения: процедурный наклон корпуса вперёд по ходу `travelLeanDeg` 10°, вход за `leanInMs` 60 мс от старта
+  движения (0 = выкл). Кадр LungeAttack для позы не держим: выпад у нас — сигнал удара (01 F-03); нового клипа нет
+  (D-11). Основание — поза рывка 3D-героя DE (S4HV-O01).
+- Разворот к первому ребру — не дольше `startTurnMs` 50 мс; доворот к следующему ребру на вершине — `turnMs` 120 мс на
+  ходу, без остановки (DE ~100–150 мс, s04 517.917–518.067).
+- После прибытия — возврат в Idle за `settleMs` 150 мс: наклон → 0, ориентация → правило половины поля
+  (`S08FighterActor.cpp:550-561`; DE 130–170 мс, S4HV-M05, TL `hero_move_return_to_idle`). Поворот к цели и итоговое
+  направление — ART-012, за пользователем.
+- Старт — в кадр применения снапшота с перемещением (MS-R-22, SD-13).
+- Посадку жетона DE (134–167 мс) не переносим: жетонов нет, все 6 фигур скелетные — одно правило на всех.
 - PLACE (`kind: PLACE`): dithered fade-out 120 мс в старой точке и fade-in 120 мс в новой (решение AD-CNF-29 в пользу
   «телепорт с переходом» — ПРЕДЛОЖЕНИЕ); reduced motion — snap.
 - Пропуск: любая клавиша или кнопка мыши, кроме Space и колеса (они — камера), — все активные анимации к финалу за
@@ -578,7 +600,7 @@ schedule(moves[], p, speed, reducedMotion) -> [{fighterId, startMs, stepDurMs, s
 | ID | Требование | Тест |
 |---|---|---|
 | MS-R-53 | Расписание анимации — чистая функция с алгоритмом выше (масштаб, минимальный шаг, старты от фактических длительностей, одновременный snap не уместившихся); логическая позиция фигурки и хит-тест — по снапшоту, визуальная догоняет | MS-AT-24 |
-| MS-R-54 | Reduced motion (флаг `-S08ReducedMotion` и `bReducedMotion` в `US08UserSettings`) даёт snap для перемещения, отключает пульсы, подскок и встряску V-08; `bScreenShake = false` выключает встряску | MS-AT-33 |
+| MS-R-54 | Reduced motion (флаг `-S08ReducedMotion` и `bReducedMotion` в `US08UserSettings`) даёт snap для перемещения, отключает пульсы, подскок (если высота > 0), наклон хода и встряску V-08; `bScreenShake = false` выключает встряску | MS-AT-33 |
 
 ### 6.4. Bench-сцена для кадров
 
