@@ -6,12 +6,12 @@
 
 | Файл | Что это |
 | --- | --- |
-| [cue-table.json](cue-table.json) | данные 18 CUE (`unmatched.cue-table/1`): ассеты, сокет, длительности, поведение; сейчас все ассеты `missing` — это и есть missing-report ART-010 |
+| [cue-table.json](cue-table.json) | данные 18 CUE (`unmatched.cue-table/1`): ассеты, сокет, длительности, поведение; VFX и звуки пока `missing` — это и есть missing-report ART-010; клипы HitReact и DeathSettle есть у всех v2-фигур (DE-003) |
 | [cue-table.schema.json](cue-table.schema.json) | JSON Schema таблицы (draft 2020-12) |
 | [cue-fixture.schema.json](cue-fixture.schema.json) | схема фикстур `unmatched.cue-fixture/1` |
 | [fixtures/](fixtures/) | 8 сценариев (события → точная трасса) и 4 негативные трассы для гейта |
 | [tools/s08/cue_contract/cue_contract.py](../../../../tools/s08/cue_contract/cue_contract.py) | `validate-table`, `run-fixtures`, `check-trace`: валидатор таблицы, эталонная модель, гейт трассы |
-| [tools/s08/cue_contract/test_cue_contract.py](../../../../tools/s08/cue_contract/test_cue_contract.py) | 10 юнит-тестов |
+| [tools/s08/cue_contract/test_cue_contract.py](../../../../tools/s08/cue_contract/test_cue_contract.py) | юнит-тесты валидатора, расписания CUE-007, эталонной модели и гейта |
 
 ## 1. Зачем
 
@@ -38,7 +38,7 @@
 | `feedback_delay_ms`, `blocks_input`, `skippable` | из 07; блокировка ввода ≤ 1000 мс, кроме терминального CUE-016 |
 | `vfx` | Niagara: `system` (soft path) или `status: missing` + `missing_reason`; `attach` `socket`/`world`, `socket` (`Weapon`, `Head`, `Root`, `Base`); `sim: cpu`, `deterministic: true`, `prewarm: true` |
 | `sfx` | `sound` — **USoundBase** (SoundWave, SoundCue и MetaSoundSource взаимозаменяемы без правки кода); `sound_class` UI/SFX/Music; `priority` 1–3; `concurrency` → USoundConcurrency (`max_count` = MaxCount, `resolution` StopOldest/PreventNew, `retrigger_ms` = RetriggerTime) |
-| `clip` | роль клипа драйвера анимации (`LungeAttack`, `HitReact`, `DeathSettle`); путь AnimSequence или `missing` |
+| `clip` | роль клипа драйвера анимации (`LungeAttack`, `HitReact`, `DeathSettle`); путь AnimSequence (`sequence`) или клип у каждого скелета (`sequence_by_fighter`: `FHeroSpec.Key` → путь, DE-003), или `missing`; `null` — клипа у CUE нет (CUE-008, F-03). Валидатор проверяет, что `.uasset` каждого пути есть в `Content` |
 | `material` | параметр Custom Primitive Data мастера `M_UM_Figure`: `FxFlash` (5–8), `Rim` (9–10), `Fade` (11) — раскладка меморандума §1 п.4 |
 | `ui`, `marker`, `postprocess` | виджет HUD, маркер игрового слоя, дельта профиля света (CUE-016/017) |
 | `on_new_event` | `replace`, `cascade` (CUE-005), `jump_to_final` (CUE-007, CUE-013), `interrupt` (CUE-008), `none` (терминальный CUE-016, длящийся CUE-017) |
@@ -56,6 +56,43 @@
 - VFX никогда не единственный носитель информации: урон дублируется цифрой (виджет) и HP в HUD.
 - Звук: SoundClass Master → UI / SFX / Music (ползунки UI-ACC-007..009); окно без фокуса уже заглушено движком (`[Audio] UnfocusedVolumeMultiplier=0.0`), что совпадает с UI-ACC-011.
 
+### 3.1 Шкала боя, смерти и начала хода (DE-003, 2026-10-04)
+
+Числа — из окончательных решений по живому исследованию DE ([01-decisions.md](../../../game-design/de-footage/task/01-decisions.md) F-01, F-03, F-04, F-07, F-09 и «Резолюция ревью»), основание — строки [timings-live.csv](../../../game-design/de-footage/live-2026-10-04/timings-live.csv). Схема `unmatched.cue-table/1` не допускает удержаний как полей строки CUE, поэтому они записаны здесь. В таблице `duration_ms` CUE-010/011/013 — анимированная часть, она блокирует ввод ≤ 1 с; удержания ниже ввод не блокируют: клик, Space или Enter их пропускают. Реализация в диспетчере, трассе и фикстурах — DE-018 (W-14) и DE-019 (W-16); до неё эталонная модель (§4 D12) считает только `duration_ms`.
+
+| Параметр | Значение (×1) | Скоростью | Пропуск | Основание |
+| --- | --- | --- | --- | --- |
+| CUE-008 объявление | 600 (+150), прицел и вспышка, **без клипа** | масштаб. | да | F-03; TL `combat_intro_to_defense_prompt` |
+| CUE-010 анимация раскрытия и слэма | 800: переворот 130–200 на месте, атакующая первой, защитная +120; слэм ~180 | масштаб. | да | F-01; TL `defense_check_to_reveal`, `reveal_to_score` |
+| `combat.readHoldMs` — «прочитать карту» | 1000, если на раскрытых картах есть текст эффекта, иначе 0 | нет | да | F-01; TL `reveal_to_score` (DE ~3000) |
+| `combat.effectStepMs` — строка эффекта | 600 на сработавшую строку: подсветка 400 (масштаб.) + 200 | частично | да | F-01; TL `reveal_to_score_one_effect` (DE +1,6–1,7 с) |
+| `combat.slamToLungeMs` — пауза «счёт» | 300 | нет | да | F-01; TL `score_to_attack_anim_start` (DE 1983) |
+| Метка исхода «победил …» / «защита держит» | со слэма до конца CUE-011, ~1,5 с | нет | да | F-01; TL `wins_ribbon_hold` (DE 2500, не копируем) |
+| Вступление CUE-011 — LungeAttack атакующего | старт = конец CUE-010; play rate × скорость | масштаб. | клип ≤ 0,9 с не обрывается | F-03, «Резолюция» п. 4 |
+| Кадр контакта | AnimNotify `Contact` (DE-010); фолбэк — кадр профиля: Arthur к. 7 = 292, Merlin к. 8 = 333, Medusa к. 8 = 333 (выпуск стрелы), Harpy к. 7–9 = 292–375 мс | масштаб. | — | `art/pipeline-candidates/*/build-profiles/*-h2anim.json` |
+| HitReact цели + заливка `FxFlash` | в кадр контакта; 450 (летально 550) | нет | клип не обрывается | F-03; TL `target_red_flash`, `target_red_flash_lethal` |
+| «−N» | контакт +60; 900 × скорость (×0,5 → 450, ×1,5 → 1350) | масштаб. | да | F-04, SD-49; TL `hit_to_minus_n_popup`, `damage_popup_minus_n` |
+| Новое число HP | контакт +80 | нет | — | F-03; TL `hit_to_hp_number` |
+| CUE-011 `duration_ms` | 900 **от кадра контакта**; вступление в неё не входит | — | — | «Резолюция» п. 4 |
+| Урон 0 | выпад играется, HitReact нет, метка «защита держит» | — | — | F-03 |
+| Звук удара CUE-011 | в кадре контакта, а не в момент снапшота | — | — | SD-51; TL `sound_hit_vs_contact_frame` |
+
+Бой без защиты, на раскрытой карте есть текст эффекта, сработавших строк 0: 600 + 800 + 1000 + 300 + ~300 + 900 ≈ **3,9 с**; без текста — ≈ 2,9 с; +0,6 с на каждую строку. Камера неподвижна (D-10). Крупные карты боя — в слое HUD у левого и правого края поля, не над центром доски (SD-48 п. 4).
+
+Смерть (CUE-013), от кадра контакта, одна схема на все 6 v2-фигур (F-09):
+
+| Этап | Герой (Arthur, Medusa) | Помощник (Merlin, Harpy) |
+| --- | --- | --- |
+| HitReact + заливка | 0–450 | 0–450 |
+| DeathSettle (CUE-013 `duration_ms` 950 = клип 875 + запуск) | 450–1325 | 450–1325 |
+| Крест на сердце плашки | +1100 | +1100 |
+| Неподвижно | 300 | 0 |
+| Растворение цветом команды С-11 через `Fade` (вид — DE-011; до арт-приёмки простой fade) | 500 | 400 |
+| Фигура исчезла | ≈ 2125 | ≈ 1725 |
+| Экран результата (CUE-016, только смерть героя) | исчезновение + 1000, удар → экран ≈ 3,1 с | — |
+
+Начало хода (CUE-015, F-07): кольцо у портрета активного игрока у обеих сторон — вспышка всего обода 1000 мс, затем тлеющее кольцо (opacity ≈ 0,35, без искр) до конца хода; reduced motion — статичное кольцо. Баннер «Ваш ход» 600 мс только на свой ход. Ввод своего хода открыт с кадра применения снапшота: кольцо и баннер его не задерживают (SD-47).
+
 ## 4. Семантика диспетчера (нормативно)
 
 Правила пронумерованы; эталонная модель `ReferenceDispatcher` исполняет их в этом порядке, фикстуры фиксируют результат.
@@ -71,7 +108,7 @@
 - **D9. Звук: одновременность.** При `max_count` активных звуках этого CUE: `StopOldest` останавливает самый старый (строка `CUE sfx stop … reason=concurrency`), `PreventNew` не играет новый (`sfx=limited`).
 - **D10. Отсутствие ассета.** Если путь не задан или ассет не загрузился, канал получает `missing`, показ получает `result=fallback`, UE-адаптер пишет Warning и выполняет `fallback.behaviour` из 07. Длительность и `done` сохраняются.
 - **D11. Сокращённые анимации.** При включённой UI-ACC-006 длительность `shorten` ≤ `max_ms`, `snap` = 0; в строке `reduced=1`. `keep` не меняется (`reduced=0`).
-- **D12. Длительность.** Показ длится `duration_ms` (или шаг × клетки); при 0 `done` пишется сразу. Звук считается активным на ту же длительность.
+- **D12. Длительность.** Показ длится `duration_ms` (или шаг × клетки); при 0 `done` пишется сразу. Звук считается активным на ту же длительность. Удержания боя и этапы смерти §3.1 модель пока не исполняет (DE-018, DE-019).
 
 ## 5. Трасса
 
@@ -91,7 +128,7 @@ CUE settings reduced_motion=<0|1> t=<ms>
 Пример (фикстура `attack-interrupt`):
 
 ```
-CUE fx id=CUE-008 subject=arthur seq=50 t=0 vfx=NS_Test_Flash sfx=SW_Test_Attack clip=AS_Test_Lunge mat=none socket=Weapon reduced=0 result=spawned
+CUE fx id=CUE-008 subject=arthur seq=50 t=0 vfx=NS_Test_Flash sfx=SW_Test_Attack clip=none mat=none socket=Weapon reduced=0 result=spawned
 CUE fx done id=CUE-008 subject=arthur seq=50 t=300 ms=300 cut=interrupt
 CUE fx id=CUE-011 subject=medusa seq=51 t=300 vfx=NS_Test_Hit sfx=SW_Test_Hit clip=AS_Test_HitReact mat=FxFlash socket=Head reduced=0 result=spawned
 CUE fx done id=CUE-011 subject=medusa seq=51 t=1200 ms=900 cut=0
@@ -127,9 +164,9 @@ CUE fx done id=CUE-011 subject=medusa seq=51 t=1200 ms=900 cut=0
 | `reconnect-no-replay` | D4, D5: разрыв, повторный разрыв, восстановление R=14, запоздавшие seq 12 и 14 — `stale`, seq 15 — показ (QA-108) |
 | `sfx-concurrency-stop-oldest` | D9: третий звук урона останавливает старейший, VFX показываются все |
 | `hover-retrigger` | D6 (`replace_scope: cue`), D8: контур переходит сразу, тик не чаще 1/150 мс |
-| `missing-assets-fallback` | D10: таблица без ассетов и незагрузившийся тестовый VFX → `fallback`, длительности сохраняются |
+| `missing-assets-fallback` | D10: таблица без VFX и звука (клип — свой у фигуры) и незагрузившийся тестовый VFX → `fallback`, длительности сохраняются |
 | `reduced-motion` | D11: урон 900 → 100 мс, перемещение `snap`, наведение `keep` |
-| `attack-interrupt` | D7: LungeAttack обрывается уроном через 300 мс |
+| `attack-interrupt` | D7: объявление атаки (без клипа, F-03) обрывается уроном через 300 мс |
 | `stale-seq-and-move-jump` | D3, D6 (`jump`): новое перемещение той же фигуры, запоздавший seq 59 |
 | `neg-*` (4) | гейт ловит G2, G3, G4+G8, G5+G6 |
 
@@ -146,6 +183,6 @@ CUE fx done id=CUE-011 subject=medusa seq=51 t=1200 ms=900 cut=0
 ## 9. Открытые вопросы
 
 1. Стиль VFX (AD-OPEN-34) и библиотека ART-010 — ассеты таблицы остаются `missing` до них.
-2. Длительности HitReact (0,4 с в 04 против 0,9 с CUE-011) и DeathSettle (0,9 против ≤ 0,95 с) — таблица берёт 07; при изменении 07 валидатор покажет расхождение.
+2. Длительности HitReact (0,4 с в 04 против 0,9 с CUE-011) и DeathSettle (0,9 против ≤ 0,95 с) — таблица берёт 07; при изменении 07 валидатор покажет расхождение. Закрыто DE-003: CUE-011 = 900 мс от кадра контакта, внутри — клип HitReact 417 мс и заливка 450 / 550 мс (§3.1).
 3. CUE-014 у Medusa: луч от сокета `Head` к цели, у Arthur — свечение `Weapon`. Сейчас строка задаёт `Weapon`; сокет по герою — поле DataAsset героя (GD-044).
 4. Бюджет: худший набор 2×CUE-011 + 013 + 007 + 014 — ΔGPU ≤ 1 мс по ProfileGPU (bench fx/ui меморандума §2). На DX12 + Lumen эмиссивные частицы могут попадать в Lumen-сцену: проверить на bench, при необходимости исключить эффекты из непрямого освещения.

@@ -67,7 +67,11 @@
       "required": ["role", "status"],
       "properties": {
         "role": {"enum": ["LungeAttack", "HitReact", "DeathSettle"]},
-        "sequence": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/softPath"}]}
+        "sequence": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/softPath"}]},
+        "sequence_by_fighter": {"type": "object", "minProperties": 1,
+          "propertyNames": {"pattern": "^[A-Za-z0-9_]+$"},
+          "additionalProperties": {"$ref": "#/$defs/softPath"},
+          "description": "клип своей роли у каждого скелета: ключ — FHeroSpec.Key (S08HeroesV2), значение — путь AnimSequence; вместо sequence, когда клип у каждой фигуры свой (DE-003)"}
       }
     },
     "cue": {

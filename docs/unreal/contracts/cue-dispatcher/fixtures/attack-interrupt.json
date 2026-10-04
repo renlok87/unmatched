@@ -2,14 +2,13 @@
  "schema": "unmatched.cue-fixture/1",
  "id": "attack-interrupt",
  "kind": "scenario",
- "description": "Объявление атаки (LungeAttack, 600 мс) обрывается уроном через 300 мс: done cut=interrupt ms=300; урон показывается полностью.",
+ "description": "Объявление атаки (прицел и вспышка, 600 мс, без клипа — F-03) обрывается уроном через 300 мс: done cut=interrupt ms=300; урон показывается полностью.",
  "covers": [
-  "07 CUE-008 onNewEvent: следующее событие боя обрывает клип",
+  "07 CUE-008 onNewEvent: следующее событие боя обрывает объявление",
   "GD-044 состояние не ждёт клипа"
  ],
  "assets_present": {
   "CUE-008": {
-   "clip": "/Game/Anim/Test/AS_Test_Lunge.AS_Test_Lunge",
    "sfx": "/Game/Audio/Test/SW_Test_Attack.SW_Test_Attack",
    "vfx": "/Game/FX/Test/NS_Test_Flash.NS_Test_Flash"
   },
@@ -36,7 +35,7 @@
   }
  ],
  "expect_trace": [
-  "CUE fx id=CUE-008 subject=arthur seq=50 t=0 vfx=NS_Test_Flash sfx=SW_Test_Attack clip=AS_Test_Lunge mat=none socket=Weapon reduced=0 result=spawned",
+  "CUE fx id=CUE-008 subject=arthur seq=50 t=0 vfx=NS_Test_Flash sfx=SW_Test_Attack clip=none mat=none socket=Weapon reduced=0 result=spawned",
   "CUE fx done id=CUE-008 subject=arthur seq=50 t=300 ms=300 cut=interrupt",
   "CUE fx id=CUE-011 subject=medusa seq=51 t=300 vfx=NS_Test_Hit sfx=SW_Test_Hit clip=AS_Test_HitReact mat=FxFlash socket=Head reduced=0 result=spawned",
   "CUE fx done id=CUE-011 subject=medusa seq=51 t=1200 ms=900 cut=0"

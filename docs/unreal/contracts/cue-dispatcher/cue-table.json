@@ -1,8 +1,8 @@
 {
  "schema": "unmatched.cue-table/1",
- "revision": "ms-t-15-2026-10-04",
+ "revision": "de-003-2026-10-04",
  "status": "предложено",
- "status_note": "Контракт FS08CueDispatcher (волна 4, W4-D; меморандум engine-gate §1 п.8). Данные 18 CUE из 07-animation-vfx-audio.csv; все ассеты пока отсутствуют — таблица служит missing-report ART-010. Реализация диспетчера — GD-044, эффекты — GD-049. Не художественная приёмка.",
+ "status_note": "Контракт FS08CueDispatcher (волна 4, W4-D; меморандум engine-gate §1 п.8). Данные 18 CUE из 07-animation-vfx-audio.csv; VFX и звуки пока отсутствуют — таблица служит missing-report ART-010; клипы HitReact и DeathSettle есть у всех 6 v2-фигур (H2Anim, S08HeroesV2), LungeAttack — вступление CUE-011 (DE-003, 2026-10-04: живые данные DE, docs/game-design/de-footage/task/01-decisions.md F-01…F-12). Реализация диспетчера — GD-044, эффекты — GD-049. Не художественная приёмка.",
  "asset_path_rule": "soft object path /Game/...: Niagara — UNiagaraSystem, звук — USoundBase (SoundWave, SoundCue и MetaSoundSource взаимозаменяемы без кода). Пути удерживаются в cook через PrimaryAssetLabel или DirectoriesToAlwaysCook (строки LoadObject кукер не видит — ловушка 5)",
  "sockets_from": "docs/art-pipeline/rig/rig-contract.json ue_import.sockets_v2 (Weapon, Head) + Root/Base актора",
  "cues": [
@@ -375,7 +375,7 @@
     "sim": "cpu",
     "deterministic": true,
     "prewarm": true,
-    "note": "вспышка направления; рамка цели — маркер SM_Marker_TargetRing"
+    "note": "вспышка направления; рамка цели — маркер SM_Marker_TargetRing; клипа нет — LungeAttack перенесён во вступление CUE-011 (F-03)"
    },
    "sfx": {
     "sound": null,
@@ -389,11 +389,7 @@
      "retrigger_ms": 0
     }
    },
-   "clip": {
-    "role": "LungeAttack",
-    "status": "missing",
-    "missing_reason": "производственного клипа нет: ART-006..008 после GD-058; черновики Medusa — v1, закрыты (RIG-CONTRACT §0)"
-   },
+   "clip": null,
    "material": null,
    "ui": null,
    "marker": null,
@@ -413,7 +409,7 @@
    },
    "shake": null,
    "fallback": {
-    "behaviour": "без клипа: рамка цели + звук; фигурка статична",
+    "behaviour": "без VFX и звука: только рамка цели; фигурка в Idle",
     "log": "Warning"
    },
    "source_row": "docs/game-design/07-animation-vfx-audio.csv#CUE-008"
@@ -505,7 +501,8 @@
    "clip": null,
    "material": null,
    "ui": {
-    "widget": "UI-HUD-COMBAT"
+    "widget": "UI-HUD-COMBAT",
+    "element": "крупные карты атаки и защиты у левого и правого края поля; метка исхода; удержания боя — CUE-DISPATCHER.md §3.1"
    },
    "marker": null,
    "postprocess": null,
@@ -519,7 +516,7 @@
    },
    "shake": null,
    "fallback": {
-    "behaviour": "текстовые значения в HUD без 3D-карт",
+    "behaviour": "значения атаки/защиты текстом в HUD без анимации карт",
     "log": "Warning"
    },
    "source_row": "docs/game-design/07-animation-vfx-audio.csv#CUE-010"
@@ -543,7 +540,7 @@
     "sim": "cpu",
     "deterministic": true,
     "prewarm": true,
-    "note": "всплеск удара; цифра «−N» — экранный виджет"
+    "note": "всплеск удара в кадре контакта выпада; цифра «−N» — экранный виджет (контакт +60 мс)"
    },
    "sfx": {
     "sound": null,
@@ -559,8 +556,14 @@
    },
    "clip": {
     "role": "HitReact",
-    "status": "missing",
-    "missing_reason": "производственного клипа нет: ART-006..008 после GD-058; черновики Medusa — v1, закрыты (RIG-CONTRACT §0)"
+    "status": "present",
+    "sequence": null,
+    "sequence_by_fighter": {
+     "KingArthur": "/Game/PipelineCandidates/KingArthur/H2Anim/AM_KingArthur_HitReact.AM_KingArthur_HitReact",
+     "Merlin": "/Game/PipelineCandidates/Merlin/H2Anim/AM_Merlin_HitReact.AM_Merlin_HitReact",
+     "Medusa": "/Game/PipelineCandidates/Medusa/H2Anim/AM_Medusa_HitReact.AM_Medusa_HitReact",
+     "Harpy": "/Game/PipelineCandidates/Harpy/H2Anim/AM_Harpy_HitReact.AM_Harpy_HitReact"
+    }
    },
    "material": {
     "cpd_param": "FxFlash",
@@ -573,7 +576,7 @@
    },
    "ui": {
     "widget": "UI-HUD-BOARD",
-    "element": "цифра над фигурой (экранная, не TextRender)"
+    "element": "цифра «−N» над фигурой (экранная, не TextRender): контакт +60 мс, 900 мс × скорость; HP — контакт +80 мс"
    },
    "marker": null,
    "postprocess": null,
@@ -587,7 +590,7 @@
    },
    "shake": null,
    "fallback": {
-    "behaviour": "цифра без звука и без клипа (манекен: только цифра)",
+    "behaviour": "нет VFX/звука: HitReact + заливка + цифра; нет клипа: заливка и цифра без вздрагивания",
     "log": "Warning"
    },
    "source_row": "docs/game-design/07-animation-vfx-audio.csv#CUE-011"
@@ -667,7 +670,7 @@
     "sim": "cpu",
     "deterministic": true,
     "prewarm": true,
-    "note": "дым/пепел у фигурки"
+    "note": "«пепел» цвета команды С-11 при растворении (кандидат DE-011; до арт-приёмки — простой fade материала)"
    },
    "sfx": {
     "sound": null,
@@ -683,8 +686,14 @@
    },
    "clip": {
     "role": "DeathSettle",
-    "status": "missing",
-    "missing_reason": "производственного клипа нет: ART-006..008 после GD-058; черновики Medusa — v1, закрыты (RIG-CONTRACT §0)"
+    "status": "present",
+    "sequence": null,
+    "sequence_by_fighter": {
+     "KingArthur": "/Game/PipelineCandidates/KingArthur/H2Anim/AM_KingArthur_DeathSettle.AM_KingArthur_DeathSettle",
+     "Merlin": "/Game/PipelineCandidates/Merlin/H2Anim/AM_Merlin_DeathSettle.AM_Merlin_DeathSettle",
+     "Medusa": "/Game/PipelineCandidates/Medusa/H2Anim/AM_Medusa_DeathSettle.AM_Medusa_DeathSettle",
+     "Harpy": "/Game/PipelineCandidates/Harpy/H2Anim/AM_Harpy_DeathSettle.AM_Harpy_DeathSettle"
+    }
    },
    "material": {
     "cpd_param": "Fade",
@@ -705,7 +714,7 @@
    },
    "shake": null,
    "fallback": {
-    "behaviour": "мгновенное скрытие фигурки + лог",
+    "behaviour": "нет VFX: DeathSettle и простой fade материала Fade 500 / 400 мс; нет клипа или материала — мгновенное скрытие фигурки",
     "log": "Warning"
    },
    "source_row": "docs/game-design/07-animation-vfx-audio.csv#CUE-013"
@@ -790,7 +799,7 @@
    "material": null,
    "ui": {
     "widget": "UI-HUD-TOP",
-    "element": "баннер хода"
+    "element": "баннер хода 600 мс (только свой ход); кольцо портрета активного игрока: вспышка 1000 мс + тлеющее до конца хода"
    },
    "marker": null,
    "postprocess": null,

@@ -29,7 +29,10 @@ class TableTests(unittest.TestCase):
         expected = sum(1 for c in TABLE["cues"] for ch in ("vfx", "sfx", "clip")
                        if c.get(ch) and c[ch]["status"] == "missing")
         self.assertEqual(len(miss), expected)
-        self.assertIn(("CUE-011", "clip", row(TABLE, "CUE-011")["clip"]["missing_reason"]), miss)
+        self.assertIn(("CUE-011", "vfx", row(TABLE, "CUE-011")["vfx"]["missing_reason"]), miss)
+        # DE-003: клипы H2Anim есть у всех v2-фигур, в missing-report их нет; у объявления атаки клипа нет (F-03)
+        self.assertFalse([m for m in miss if m[1] == "clip"])
+        self.assertIsNone(row(TABLE, "CUE-008")["clip"])
 
     def test_semantic_errors_detected(self):
         cases = []
@@ -39,11 +42,29 @@ class TableTests(unittest.TestCase):
         t = copy.deepcopy(TABLE); row(t, "CUE-008")["interrupted_by"] = ["CUE-099"]; cases.append((t, "interrupted_by"))
         t = copy.deepcopy(TABLE); r = row(t, "CUE-013"); r["duration_ms"] = 1200; cases.append((t, "P3"))
         t = copy.deepcopy(TABLE); t["cues"] = t["cues"][:-1]; cases.append((t, "07"))
-        t = copy.deepcopy(TABLE); row(t, "CUE-011")["clip"]["status"] = "missing"; row(t, "CUE-011")["clip"]["sequence"] = "/Game/A/B.B"
+        t = copy.deepcopy(TABLE); clip = row(t, "CUE-011")["clip"]
+        clip.update(status="missing", missing_reason="нет", sequence="/Game/A/B.B"); del clip["sequence_by_fighter"]
         cases.append((t, "путь задан"))
+        t = copy.deepcopy(TABLE); clip = row(t, "CUE-013")["clip"]
+        clip.update(status="missing", missing_reason="нет"); cases.append((t, "путь задан"))  # путь в sequence_by_fighter
+        t = copy.deepcopy(TABLE); del row(t, "CUE-011")["clip"]["sequence_by_fighter"]; cases.append((t, "present без пути"))
+        if cc.CONTENT_DIR.is_dir():
+            t = copy.deepcopy(TABLE); row(t, "CUE-011")["clip"]["sequence_by_fighter"]["Merlin"] = "/Game/Nope/AM_X.AM_X"
+            cases.append((t, "нет ассета"))
         for bad, needle in cases:
             errs = cc.validate_table(bad)
             self.assertTrue(any(needle in e for e in errs), (needle, errs))
+
+    def test_clip_by_fighter(self):
+        """DE-003: клип своей роли у каждого скелета (FHeroSpec.Key); субъект трассы находит свой клип."""
+        d = cc.ReferenceDispatcher(TABLE)
+        self.assertEqual(d._asset("CUE-011", "clip", "merlin"), "AM_Merlin_HitReact")
+        self.assertEqual(d._asset("CUE-011", "clip", "arthur"), "AM_KingArthur_HitReact")
+        self.assertEqual(d._asset("CUE-013", "clip", "harpy2"), "AM_Harpy_DeathSettle")
+        self.assertEqual(d._asset("CUE-011", "clip", "dummy"), "missing")
+        self.assertEqual(d._asset("CUE-008", "clip", "arthur"), "none")
+        t = copy.deepcopy(TABLE); row(t, "CUE-011")["clip"]["sequence_by_fighter"]["bad key"] = "/Game/A/B.B"
+        self.assertTrue(any(e.startswith("schema") for e in cc.validate_table(t)))
 
     def test_schema_errors_detected(self):
         t = copy.deepcopy(TABLE); row(t, "CUE-011")["vfx"]["sim"] = "gpu"

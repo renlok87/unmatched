@@ -33,6 +33,7 @@ FIXTURE_SCHEMA = CONTRACT_DIR / "cue-fixture.schema.json"
 FIXTURES = CONTRACT_DIR / "fixtures"
 CSV07 = REPO / "docs/game-design/07-animation-vfx-audio.csv"
 RIG_CONTRACT = REPO / "docs/art-pipeline/rig/rig-contract.json"
+CONTENT_DIR = REPO / "unreal/Unmatched/Content"  # /Game/… → Content/….uasset (проверка путей клипов)
 
 RESULTS_PRESENTED = ("spawned", "fallback")
 RESULTS = RESULTS_PRESENTED + ("duplicate", "stale")
@@ -53,6 +54,23 @@ def short_name(soft_path):
 
 def rows_by_id(table):
     return {c["id"]: c for c in table["cues"]}
+
+
+def content_file(soft_path, content_dir=CONTENT_DIR):
+    """/Game/A/B.B -> <Content>/A/B.uasset."""
+    return Path(content_dir) / (soft_path[len("/Game/"):].rsplit(".", 1)[0] + ".uasset")
+
+
+def fighter_clip(spec, subject):
+    """Путь клипа из clip.sequence_by_fighter для субъекта трассы (merlin → Merlin, arthur → KingArthur)."""
+    s = re.sub(r"[^a-z]", "", (subject or "").lower())
+    if len(s) < 3:
+        return None
+    for key, path in (spec.get("sequence_by_fighter") or {}).items():
+        k = key.lower()
+        if s == k or k.endswith(s) or s.startswith(k):
+            return path
+    return None
 
 
 def _num(text):
@@ -103,7 +121,7 @@ def move_schedule(moves, params, mul=1.0, reduced=False):
     return out
 
 
-def validate_table(table, schema=None, csv07=CSV07, rig_contract=RIG_CONTRACT):
+def validate_table(table, schema=None, csv07=CSV07, rig_contract=RIG_CONTRACT, content_dir=CONTENT_DIR):
     """Список ошибок таблицы: JSON Schema, затем семантика и сверка с 07."""
     import jsonschema
 
@@ -162,11 +180,15 @@ def validate_table(table, schema=None, csv07=CSV07, rig_contract=RIG_CONTRACT):
             a = c.get(ch)
             if not a:
                 continue
-            path = a.get(key)
+            path = a.get(key) or a.get("sequence_by_fighter")
             if a["status"] == "present" and not path:
                 errors.append("%s: %s.status present без пути %s" % (cid, ch, key))
             if a["status"] == "missing" and path:
                 errors.append("%s: %s.status missing, но путь задан" % (cid, ch))
+            if content_dir and Path(content_dir).is_dir():
+                for fighter, soft in (a.get("sequence_by_fighter") or {}).items():
+                    if not content_file(soft, content_dir).is_file():
+                        errors.append("%s: %s.sequence_by_fighter.%s: нет ассета %s" % (cid, ch, fighter, soft))
         v = c.get("vfx")
         if v and v["attach"] == "socket" and v["socket"] not in sockets:
             errors.append("%s: сокет %s не из контракта рига (%s)" % (cid, v["socket"], sorted(sockets)))
@@ -213,13 +235,15 @@ class ReferenceDispatcher:
         self.now = 0
 
     # -- helpers
-    def _asset(self, cid, channel):
+    def _asset(self, cid, channel, subject=None):
         row = self.rows[cid]
         spec = row.get(channel)
         if not spec:
             return "none"
         key = {"vfx": "system", "sfx": "sound", "clip": "sequence"}[channel]
         path = self.present.get(cid, {}).get(channel) or spec.get(key)
+        if not path and channel == "clip":
+            path = fighter_clip(spec, subject)
         if not path or path in self.unloadable:
             return "missing"
         return short_name(path)
@@ -310,7 +334,7 @@ class ReferenceDispatcher:
             per_cue = row["replace_scope"] == "cue"
             self._cut(lambda i: i["id"] == cid and (per_cue or i["subject"] == subject), t, cut)
         dur, reduced = self._duration(row, event)
-        vfx, clip = self._asset(cid, "vfx"), self._asset(cid, "clip")
+        vfx, clip = self._asset(cid, "vfx"), self._asset(cid, "clip", subject)
         sfx = self._asset(cid, "sfx")
         if sfx not in ("none", "missing"):
             conc = row["sfx"]["concurrency"]
