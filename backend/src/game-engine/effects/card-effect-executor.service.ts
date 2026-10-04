@@ -34,6 +34,12 @@ import {
 import { ValueModifierService } from '../engine/value-modifier.service';
 import { AdjacencyService } from '../engine/adjacency.service';
 import { DeckManagementService } from '../services/deck-management.service';
+import { fighterNameMatches } from './fighter-name';
+import {
+  NO_VALID_TARGETS_MESSAGE,
+  pruneHeadPendingsWithoutTargets,
+  withSkippedEffect,
+} from './pending-targets';
 
 /**
  * Результат выполнения одного эффекта
@@ -48,27 +54,7 @@ export interface EffectResult {
   readonly manual?: boolean;
 }
 
-/**
- * Матчинг имени бойца против имени из текста карты/способности.
- *  - «Harpy 2» (клон сайдкика) матчит «Harpy»;
- *  - «Harpies» (имя сайдкика в каталоге) матчит «Harpy» (единственное число
- *    из текста карты) — нормализация множественного числа: ies→y, s/es→;
- *  - регистронезависимо.
- */
-export function fighterNameMatches(fighterName: string, effectName: string): boolean {
-  const stem = (s: string): string => {
-    const base = s.replace(/\s+\d+$/, '').trim().toLowerCase();
-    if (/ies$/.test(base)) return base.replace(/ies$/, 'y');
-    if (/es$/.test(base)) return base.replace(/es$/, '');
-    if (/s$/.test(base)) return base.replace(/s$/, '');
-    return base;
-  };
-  const f = fighterName.trim().toLowerCase();
-  const e = effectName.trim().toLowerCase();
-  const fBase = fighterName.replace(/\s+\d+$/, '').trim().toLowerCase();
-  return fBase === e || f === e || stem(fighterName) === stem(effectName);
-}
-
+export { fighterNameMatches } from './fighter-name';
 export type { CombatContext, EffectContext } from '../models';
 
 /** Результат стадии ON_REVEAL */
@@ -391,7 +377,33 @@ export class CardEffectExecutorService {
   // Применение одного эффекта (единая точка)
   // =========================================================================
 
+  /**
+   * DE-016 (D-DE-11): a choice this effect opens on an EMPTY queue becomes its
+   * head at once — if it has no legal target it is dropped here with a
+   * SkippedEffect note, so nothing waits for input. On an open queue the new
+   * choice is checked when it reaches the head (pruneHeadPendingsWithoutTargets
+   * from the drain after every resolve/decline).
+   */
   private async applyOneEffect(
+    state: GameState,
+    effect: CardEffect,
+    context: EffectContext,
+  ): Promise<ApplyOutcome> {
+    const outcome = await this.applyOneEffectRaw(state, effect, context);
+    if ((state.metadata.pendingEffects?.length ?? 0) > 0) return outcome;
+    const pruned = pruneHeadPendingsWithoutTargets(outcome.state, this.adjacencyService);
+    if (pruned === outcome.state) return outcome;
+    const kept = pruned.metadata.pendingEffects?.length ?? 0;
+    return {
+      ...outcome,
+      state: pruned,
+      result: kept > 0
+        ? outcome.result
+        : { success: false, effectId: effect.id, targetIds: [], message: NO_VALID_TARGETS_MESSAGE },
+    };
+  }
+
+  private async applyOneEffectRaw(
     state: GameState,
     effect: CardEffect,
     context: EffectContext,
@@ -406,6 +418,14 @@ export class CardEffectExecutorService {
       valueApplied: partial.valueApplied,
       message: partial.message,
       manual: partial.manual,
+    });
+    // DE-016: an automatic effect without targets is skipped with a note too
+    // (the client explains it with why.effect.no.targets).
+    const noTargets = (): ApplyOutcome => ({
+      state: withSkippedEffect(state, {
+        playerId: context.playerId, effectId: effect.id, kind: effect.type, text: effect.text,
+      }),
+      result: { success: false, effectId: effect.id, targetIds: [], message: NO_VALID_TARGETS_MESSAGE },
     });
 
     switch (effect.type) {
@@ -487,7 +507,7 @@ export class CardEffectExecutorService {
         if (effect.target === EffectTarget.ANY_FIGHTER_IN_ZONE) {
           const zoneTargets = this.fightersInZoneOf(state, effect.fighterName ?? '');
           if (zoneTargets.length === 0) {
-            return { state, result: { success: false, effectId: effect.id, targetIds: [], message: 'No valid targets' } };
+            return noTargets();
           }
           const pending = {
             id: `${effect.id}-p${state.metadata.pendingEffects?.length ?? 0}`,
@@ -511,7 +531,7 @@ export class CardEffectExecutorService {
         }
         const targets = await this.resolveTargets(state, effect, context);
         if (targets.length === 0) {
-          return { state, result: { success: false, effectId: effect.id, targetIds: [], message: 'No valid targets' } };
+          return noTargets();
         }
         let next = state;
         for (const t of targets) next = this.applyDamage(next, t, value);
@@ -521,7 +541,7 @@ export class CardEffectExecutorService {
       case EffectType.HEAL: {
         const targets = await this.resolveTargets(state, effect, context);
         if (targets.length === 0) {
-          return { state, result: { success: false, effectId: effect.id, targetIds: [], message: 'No valid targets' } };
+          return noTargets();
         }
         let next = state;
         for (const t of targets) next = this.applyHeal(next, t, value);
@@ -671,7 +691,7 @@ export class CardEffectExecutorService {
         // A defeated combatant cannot move or provide an old board position.
         // PLACE may explicitly return a defeated sidekick, so keep its own flow.
         if (effect.type === EffectType.MOVE && fighterIds.length === 0) {
-          return { state, result: { success: false, effectId: effect.id, targetIds: [], message: 'No valid targets' } };
+          return noTargets();
         }
         const text = effect.text ?? `${effect.type} ${value || ''}`.trim();
 

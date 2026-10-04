@@ -5,3 +5,4 @@
  */
 
 export * from './card-effect-executor.service';
+export * from './pending-targets';

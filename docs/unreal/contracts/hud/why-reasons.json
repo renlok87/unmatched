@@ -39,7 +39,7 @@
   {"key": "why.command.rejected", "en": "Command rejected — refreshing", "ru": "Команда отклонена — обновляем", "args": [], "source": "move-selection/03-ux-spec.md §8.2", "codes": "нет ruleCode или неизвестный код (MS-E-93)"},
   {"key": "why.auth.refreshed", "en": "Session refreshed — confirm again", "ru": "Сессия обновлена — подтвердите ещё раз", "args": [], "source": "move-selection/03-ux-spec.md §8.2", "codes": "клиент (MS-E-92)"},
   {"key": "why.actions.remaining", "en": "Use your actions first: {n} left", "ru": "Сначала потратьте действия: осталось {n}", "args": ["n"], "source": "move-selection/03-ux-spec.md §8.2", "codes": "ACTIONS_REMAINING (endTurn до двух действий; при pendingManeuver — why.draft.open, при pendingHandDiscard — строка сброса); SD-44"},
-  {"key": "why.effect.no.targets", "en": "No legal targets — effect skipped", "ru": "Нет допустимых целей — эффект пропущен", "args": [], "source": "move-selection/03-ux-spec.md §8.2", "codes": "сервер message 'No valid targets' (доставка — DE-020); CUE-004; SD-16, D-DE-11"},
+  {"key": "why.effect.no.targets", "en": "No legal targets — effect skipped", "ru": "Нет допустимых целей — эффект пропущен", "args": [], "source": "move-selection/03-ux-spec.md §8.2", "codes": "сервер: metadata.skippedEffects[].reason = NO_VALID_TARGETS (DE-016, move-selection/04 §4.3.1); EffectResult.message 'No valid targets'; показ — DE-020; CUE-004; SD-16, D-DE-11"},
   {"key": "why.defense.none", "en": "Nothing to defend with", "ru": "Защититься нечем", "args": [], "source": "move-selection/03-ux-spec.md §8.2", "codes": "клиент — у защитника нет играбельной карты защиты; SD-16, D-DE-11"}
  ]
 }

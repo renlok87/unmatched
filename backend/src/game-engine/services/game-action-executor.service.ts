@@ -56,6 +56,7 @@ import { AdjacencyService } from '../engine/adjacency.service';
 import { boardDistance, hasTopology } from '../engine/board-topology';
 import { DeckManagementService } from './deck-management.service';
 import { applyTerminalState } from '../engine/terminal-state';
+import { pruneHeadPendingsWithoutTargets } from '../effects/pending-targets';
 import type { CombatResolutionProgress } from '../engine/combat-progress';
 // Residual-импорт engine→games: DTO-классы мутаций (runtime-импорт, но уже не
 // value-критичный цикл — состояние/фазы идут из ../models). Перенос DTO — вне скоупа F3.
@@ -222,14 +223,17 @@ export class GameActionExecutorService {
    *     incrementSeq=false (+1 уже сделала сама мутация резолва) и
    *     endEffectsApplied из marker'а (не повторять TURN_END-хуки);
    *  c) иначе — состояние как есть (ход продолжается).
+   * DE-016 (D-DE-11): сначала новая голова очереди без допустимых целей
+   * снимается с заметкой skippedEffects — ввода без подсвеченной цели не ждём.
    */
   private async drainAfterChoice(
-    resolved: GameState,
+    resolvedChoice: GameState,
     userId: string,
     gameId: string,
     baseSeq: number,
   ): Promise<GameState> {
-    if (resolved.phase === GamePhase.GAME_OVER) return resolved;
+    if (resolvedChoice.phase === GamePhase.GAME_OVER) return resolvedChoice;
+    const resolved = pruneHeadPendingsWithoutTargets(resolvedChoice, this.adjacencyService);
     if ((resolved.metadata.pendingEffects?.length ?? 0) > 0) return resolved;
     if (resolved.metadata.combatResolutionProgress) {
       const resumed = await this.executeResolveCombat({ gameId }, {
@@ -371,6 +375,17 @@ export class GameActionExecutorService {
   }
 
   /**
+   * DE-016 (D-DE-11): hero hooks open choices directly (generic-hero-ability:
+   * «move» of an ability). A choice opened on an EMPTY queue is its head at
+   * once — drop it when it has no legal target, as applyOneEffect does for
+   * card effects. On an open queue the drain checks the head later.
+   */
+  private pruneOpenedChoice(before: GameState, after: GameState): GameState {
+    if ((before.metadata.pendingEffects?.length ?? 0) > 0) return after;
+    return pruneHeadPendingsWithoutTargets(after, this.adjacencyService);
+  }
+
+  /**
    * Вызвать extended-хук onTurnStart героя текущего игрока (TASK A, infra).
    *
    * Слаг для реестра берём с бойца-героя игрока (heroSlug ?? heroId) — тот же
@@ -387,7 +402,8 @@ export class GameActionExecutorService {
       return state;
     }
     const slug = heroFighter.heroSlug ?? heroFighter.heroId;
-    return this.abilityRegistry.triggerOnTurnStartExtended(slug, state, playerId);
+    return this.pruneOpenedChoice(state,
+      await this.abilityRegistry.triggerOnTurnStartExtended(slug, state, playerId));
   }
 
   /**
@@ -407,7 +423,8 @@ export class GameActionExecutorService {
       return state;
     }
     const slug = heroFighter.heroSlug ?? heroFighter.heroId;
-    return this.abilityRegistry.triggerOnTurnEndExtended(slug, state, playerId);
+    return this.pruneOpenedChoice(state,
+      await this.abilityRegistry.triggerOnTurnEndExtended(slug, state, playerId));
   }
 
   /**
@@ -429,7 +446,7 @@ export class GameActionExecutorService {
       return state;
     }
     const slug = attackerFighter.heroSlug ?? attackerFighter.heroId;
-    return this.abilityRegistry.triggerOnAfterCombat(slug, state, ctx);
+    return this.pruneOpenedChoice(state, await this.abilityRegistry.triggerOnAfterCombat(slug, state, ctx));
   }
 
   /**
@@ -450,7 +467,7 @@ export class GameActionExecutorService {
       return state;
     }
     const slug = defenderFighter.heroSlug ?? defenderFighter.heroId;
-    return this.abilityRegistry.triggerOnAfterCombat(slug, state, ctx);
+    return this.pruneOpenedChoice(state, await this.abilityRegistry.triggerOnAfterCombat(slug, state, ctx));
   }
 
   /**
@@ -478,7 +495,7 @@ export class GameActionExecutorService {
       return state;
     }
     const slug = ownerHero.heroSlug ?? ownerHero.heroId;
-    return this.abilityRegistry.triggerOnFighterDefeated(slug, state, fallen);
+    return this.pruneOpenedChoice(state, await this.abilityRegistry.triggerOnFighterDefeated(slug, state, fallen));
   }
 
   /**

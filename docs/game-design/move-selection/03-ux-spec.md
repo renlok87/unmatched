@@ -518,7 +518,7 @@ n = 6/3/6; TL `move_edge`); у DE выпад жетона и «−N» масшт
 | `why.command.rejected` | Команда отклонена — обновляем | Command rejected — refreshing | нет `ruleCode` или неизвестный код (MS-E-93) |
 | `why.auth.refreshed` | Сессия обновлена — подтвердите ещё раз | Session refreshed — confirm again | клиент (MS-E-92) |
 | `why.actions.remaining` | Сначала потратьте действия: осталось {n} | Use your actions first: {n} left | `ACTIONS_REMAINING` (`game-rules.validator.ts:515-516`): «Конец хода» и клавиша E до двух действий (02 §4.10, DE-015; SD-44, делегировано). Тем же кодом сервер отвечает при открытом `pendingManeuver` (клиент показывает `why.draft.open`) и при `pendingHandDiscard` (строка обязательного сброса) |
-| `why.effect.no.targets` | Нет допустимых целей — эффект пропущен | No legal targets — effect skipped | сервер, `message: 'No valid targets'` (доставка до клиента — W-11, DE-020); CUE-004 (SD-16, SD-10; по умолчанию, D-DE-11; 01 F-11; R-10 live 2026-10-04 — нет данных) |
+| `why.effect.no.targets` | Нет допустимых целей — эффект пропущен | No legal targets — effect skipped | сервер: `metadata.skippedEffects[].reason = NO_VALID_TARGETS` (DE-016, 04 §4.3.1; показ — DE-020); CUE-004 (SD-16, SD-10; по умолчанию, D-DE-11; 01 F-11; R-10 live 2026-10-04 — нет данных) |
 | `why.defense.none` | Защититься нечем | Nothing to defend with | клиент: у защитника нет карты защиты, которую можно сыграть (SD-16; по умолчанию, D-DE-11; R-10 — нет данных) |
 | `why.syncing` | Синхронизация… | Syncing… | (есть); лимит запросов, исход неизвестен, поток WS не готов |
 | `why.no.actions` | Действий не осталось | No actions left | (есть) |

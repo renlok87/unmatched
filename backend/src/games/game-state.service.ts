@@ -83,6 +83,7 @@ export interface SerializedGameState {
     fp?: string; // firstPlayerId — явный первый игрок матча (GD-016)
     pte?: GameStateMetadata['pendingTurnEnd']; // GD-018: отложенная передача хода
     lm?: GameStateMetadata['lastMovement']; // MS-T-14: публичный след перемещения (сейвы без поля → «следа нет»)
+    se?: GameStateMetadata['skippedEffects']; // DE-016: эффекты, пропущенные без целей (сейвы без поля → «пропусков нет»)
   };
 }
 
@@ -664,6 +665,8 @@ export class GameStateService {
         pte: state.metadata.pendingTurnEnd,
         // MS-T-14: публичный след последнего перемещения (без поля — undefined)
         lm: state.metadata.lastMovement,
+        // DE-016: эффекты, пропущенные без допустимых целей (без поля — undefined)
+        se: state.metadata.skippedEffects,
       },
     };
   }
@@ -793,6 +796,8 @@ export class GameStateService {
         pendingTurnEnd: data.m.pte,
         // MS-T-14: сейвы до следа (без lm) → undefined, «следа нет» (MS-E-108)
         lastMovement: data.m.lm,
+        // DE-016: сейвы без se → undefined, «пропусков нет»
+        skippedEffects: data.m.se,
       },
     };
   }

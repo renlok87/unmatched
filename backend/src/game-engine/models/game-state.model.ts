@@ -202,6 +202,34 @@ export interface LastMovement {
   readonly moves: readonly LastMovementMove[];
 }
 
+/** DE-016: why an effect was skipped without waiting for input (why.effect.no.targets on the client). */
+export type SkippedEffectReason = 'NO_VALID_TARGETS';
+
+/**
+ * DE-016 (D-DE-11, SD-10, SD-16): an effect the server skipped because it had
+ * no legal target — a choice is never left waiting without a highlighted
+ * target. Kept in metadata.skippedEffects (the last SKIPPED_EFFECTS_KEPT
+ * notes, oldest first). Stored in the DB under the short key `se`.
+ */
+export interface SkippedEffect {
+  /** Monotonic within the game (1, 2, …): the client explains every note whose n is above the last it has seen */
+  readonly n: number;
+  /** sequenceNumber of the state the skip was made on; the snapshot that first carries the note has seq >= it */
+  readonly seq: number;
+  readonly reason: SkippedEffectReason;
+  /** Owner of the effect (the player who would have chosen) */
+  readonly playerId: string;
+  /** PendingEffect.id of a dropped choice, CardEffect.id of an automatic effect */
+  readonly effectId: string;
+  /** PendingEffect.type of a dropped choice, EffectType of an automatic effect */
+  readonly kind: string;
+  /** Printed effect text, when known */
+  readonly text?: string;
+}
+
+/** How many SkippedEffect notes metadata keeps */
+export const SKIPPED_EFFECTS_KEPT = 8;
+
 /**
  * Метаданные состояния
  */
@@ -210,6 +238,8 @@ export interface GameStateMetadata {
   readonly pendingManeuver?: { readonly id: string; readonly playerId: string };
   /** MS-T-14: public trail of the last maneuver or MOVE/PLACE effect (see LastMovement) */
   readonly lastMovement?: LastMovement;
+  /** DE-016: effects skipped for lack of a legal target (see SkippedEffect) */
+  readonly skippedEffects?: readonly SkippedEffect[];
   /** End-turn effects have completed; selected excess instances must be discarded. */
   readonly pendingHandDiscard?: { readonly id: string; readonly playerId: string; readonly count: number };
   readonly lastActionAt: Date;
