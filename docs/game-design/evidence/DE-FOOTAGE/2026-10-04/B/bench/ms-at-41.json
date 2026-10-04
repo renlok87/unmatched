@@ -1,0 +1,92 @@
+{
+ "schema": "run-b.ms-at-41/1",
+ "rule": "06 MS-AT-41: GPU <= +0.30 ms, draw calls <= 7 + 4*S (S = MS-HL ghost sections; MS-T-10 not built, S = 0)",
+ "package": "36a74fc5",
+ "gpu": "RTX 4090, no frame cap, packaged -Bench, 2 repeats",
+ "maps": {
+  "marmoreal": {
+   "K1": {
+    "gpuMsBase": [
+     2.51,
+     2.51
+    ],
+    "gpuMsPlates": [
+     2.52,
+     2.52
+    ],
+    "dGpuMs": 0.01,
+    "drawCallsBase": [
+     435.5,
+     435.5
+    ],
+    "drawCallsPlates": [
+     443.5,
+     443.5
+    ],
+    "dDrawCalls": 8.0
+   },
+   "K2x1.6": {
+    "gpuMsBase": [
+     2.46,
+     2.45
+    ],
+    "gpuMsPlates": [
+     2.47,
+     2.46
+    ],
+    "dGpuMs": 0.01,
+    "drawCallsBase": [
+     347.7,
+     348.0
+    ],
+    "drawCallsPlates": [
+     319.4,
+     319.3
+    ],
+    "dDrawCalls": -28.5
+   }
+  },
+  "sarpedon": {
+   "K1": {
+    "gpuMsBase": [
+     2.63,
+     2.63
+    ],
+    "gpuMsPlates": [
+     2.65,
+     2.64
+    ],
+    "dGpuMs": 0.015,
+    "drawCallsBase": [
+     480.6,
+     480.6
+    ],
+    "drawCallsPlates": [
+     488.7,
+     488.7
+    ],
+    "dDrawCalls": 8.0
+   },
+   "K2x1.6": {
+    "gpuMsBase": [
+     2.52,
+     2.51
+    ],
+    "gpuMsPlates": [
+     2.51,
+     2.51
+    ],
+    "dGpuMs": -0.005,
+    "drawCallsBase": [
+     474.7,
+     473.4
+    ],
+    "drawCallsPlates": [
+     400.8,
+     399.2
+    ],
+    "dDrawCalls": -74.0
+   }
+  }
+ }
+}

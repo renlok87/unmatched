@@ -1,0 +1,576 @@
+2026.10.04-23.15.35 --- S08 trace open 2026.10.04-23.15.35 ---
+2026.10.04-23.15.35 HUD team chips ready=1 mode=absolute tagNames=rule
+2026.10.04-23.15.35 HUD icon texture size=32 ready=1 path=/Game/ArtTests/ARTMarkers/Textures/T_UI_Action_AttackToken_32 texture=32x32 probe=0 plate=1
+2026.10.04-23.15.35 INPUT plan src=flag steps=2 after=31.50 step=0.35 plan=endturnkey+hudendturn
+2026.10.04-23.15.35 HUD art widget tag impl=umg source=/Game/S08/UI/ArtHud/WBP_S08ArtTag class=/Game/S08/UI/ArtHud/WBP_S08ArtTag.WBP_S08ArtTag_C count=8 missing=- codeDefaultTree=0
+2026.10.04-23.15.35 HUD art widget plate impl=umg source=/Game/S08/UI/ArtHud/WBP_S08ArtPlate class=/Game/S08/UI/ArtHud/WBP_S08ArtPlate.WBP_S08ArtPlate_C parts=1 missing=- codeDefaultTree=0
+2026.10.04-23.15.35 HUD art widget icon impl=umg source=icon-motion-v3 class=/Script/Unmatched.S08AnimatedIconWidget parts=1 missing=- codeDefaultTree=1
+2026.10.04-23.15.35 HUD art widget damage impl=umg source=/Game/S08/UI/ArtHud/WBP_S08ArtDamage class=/Game/S08/UI/ArtHud/WBP_S08ArtDamage.WBP_S08ArtDamage_C parts=1 missing=- codeDefaultTree=0
+2026.10.04-23.15.35 RENDER preset applied=High flag=S08RenderPreset
+2026.10.04-23.15.35 AUTO maneuver plan=boost3 armed
+2026.10.04-23.15.35 LOGIN ok user=art-preview-host
+2026.10.04-23.15.38 CREATE boardId=c7fa64a26c29a0835f2383e63 source=ArtPreviewBoardId
+2026.10.04-23.15.38 HEROES loaded 84
+2026.10.04-23.15.38 createGame -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=LOBBY
+2026.10.04-23.15.40 PERF config tMaxFPS=30.0 frameRateLimit=60.0 vsync=0 smoothFrameRate=0 fixedFrameRate=0 rhi=D3D12
+2026.10.04-23.15.40 RENDER tag=PERF rhi=D3D12 featureLevel=SM6 shaderPlatform=PCD3D_SM6 lumenPlatform=1 gi=lumen giMethod=1 refl=lumen reflMethod=1 shadows=csm vsmEnable=0 sg.res=100 sg.view=2 sg.aa=2 sg.shadow=2 sg.gi=2 sg.refl=2 sg.pp=2 sg.tex=2 sg.fx=2 sg.foliage=2 sg.shading=2 sg.landscape=2 preset=High screenPct=100.0 screenPctMode=0 aa=TSR aaMethod=4 exposure=engine-default expMin=1.00000 expMax=1.00000 expBias=1.000 ev100=0.00 lightUnits=- sky=0 skyIntensity=0.000 keyShadow=- shadowCasters=0 profile=- profilesSha256=- profilesSource=- legacyRender=0 gameLayer=unlit-eyeadaptinv tMaxFPS=30.0 vsync=0 frameRateLimit=60.0 substrate=0 nanite=1 meshDF=1 viewport=1920x1080 reference=0 notReference=noArtProfile,exposure,lightUnits,profilesSource
+2026.10.04-23.15.40 PERF window t=0.0-5.0 frames=151 fps=30.00 frameMs avg=33.33 p50=33.33 p95=33.33 p99=33.34 max=33.37 hitches50=0 gpuMs avg=2.38 p50=1.53 p95=4.23 gameMs avg=1.16 p95=1.53 renderMs avg=2846.52 p95=3.63
+2026.10.04-23.15.41 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=LOBBY
+2026.10.04-23.15.41 selectHero -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=LOBBY
+2026.10.04-23.15.44 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=LOBBY
+2026.10.04-23.15.44 toggleReady -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=LOBBY
+2026.10.04-23.15.45 PERF window t=5.0-10.0 frames=150 fps=30.00 frameMs avg=33.33 p50=33.33 p95=33.33 p99=33.35 max=33.38 hitches50=0 gpuMs avg=1.35 p50=1.36 p95=1.45 gameMs avg=1.08 p95=1.87 renderMs avg=2.39 p95=4.33
+2026.10.04-23.15.47 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=LOBBY
+2026.10.04-23.15.50 PERF window t=10.0-15.0 frames=150 fps=30.00 frameMs avg=33.33 p50=33.33 p95=33.33 p99=33.35 max=33.51 hitches50=0 gpuMs avg=1.42 p50=1.42 p95=1.50 gameMs avg=0.88 p95=1.04 renderMs avg=2.12 p95=2.87
+2026.10.04-23.15.50 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=LOBBY
+2026.10.04-23.15.53 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=LOBBY
+2026.10.04-23.15.53 startGame -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.15.53 SNAPSHOT applied seq=1 phase=ACTION_MANEUVER
+2026.10.04-23.15.53 HANDLE_APPLIED #1 seq=1 decision=2 fightersValid=1 boardValid=1
+2026.10.04-23.15.53 TURN-INPUT open seq=1 frame=550 gate=none
+2026.10.04-23.15.53 MODE seq=1 mode=0 combat=0 pending=0
+2026.10.04-23.15.53 HUD seq=1 phase=ACTION_MANEUVER turn=you hand=5 oppHand=5(hidden) oppDeck=25 deck=25 discard=0
+2026.10.04-23.15.53 ARTLOOK art=1 source=default heroes=v2 tray=on env=on review=1 legacyRender=0 aliases=-
+2026.10.04-23.15.53 ARTPREVIEW diorama requested mesh=/Game/PipelineCandidates/TableBase/20260928-table-base-tripo-h31/Meshes/SM_TableBase.SM_TableBase mi=MI_TableBase_Candidate
+2026.10.04-23.15.53 ARTPREVIEW envlayout enabled dir=Config/ArtBoards/EnvLayouts source=pak files=2 names=marmoreal.layout.json+sarpedon.layout.json overlays=marmoreal.concept.layout.json+marmoreal.user.layout.json+sarpedon.concept.layout.json+sarpedon.scene.layout.json+sarpedon.user.layout.json
+2026.10.04-23.15.53 ARTPREVIEW board profiles loaded=1 revision=22 boards=2 zoneStyles=11 lightProfiles=2 errors=0 path=Config/ArtBoards/S08ArtBoardProfiles.json
+2026.10.04-23.15.53 ARTPREVIEW board profiles source=pak sha256=0a3417258f46ad3d99620bcbabd1b37615192b7a59f090c77515189845b33bb7
+2026.10.04-23.15.53 ARTPREVIEW zone content instances=12/12 glyphMeshes=11/11
+2026.10.04-23.15.53 ARTPREVIEW zone keyline content mi=MI_ART005_Zone_Keyline glyphKeyMeshes=11/11 color=#111317
+2026.10.04-23.15.53 ARTPREVIEW game layer material=M_S08_GameLayerUnlit unlitEyeAdaptInv=1 legacyRender=0
+2026.10.04-23.15.53 ARTPREVIEW board assets ready tiles=1 zoneMaterials=2
+2026.10.04-23.15.53 ARTPREVIEW medusa candidate variant=face-neck-v2 mesh=SK_Medusa_FaceNeck_v2Candidate requested=(default)
+2026.10.04-23.15.53 ARTPREVIEW map-image assets map=Sarpedon mi=MI_Sarpedon_MapBoard material=M_MapBoard bc=T_Sarpedon_Map_BC_4K mask=T_Sarpedon_Map_GameMask_4K boundBc=1 boundMask=1 sdf=-1 id=-1
+2026.10.04-23.15.53 ARTPREVIEW board profile=sarpedon-original match=boardId board=9x6 boardId=c7fa64a26c29a0835f2383e63 surface=map-image light=sarpedon-night artFixture=0 map=Sarpedon
+2026.10.04-23.15.53 ARTPREVIEW light profile=sarpedon-night name=key role=key kind=directional at=(-350,-150,600) intensity=3.5 units=lux radius=0 color=(0.60,0.71,0.97) shadow=1
+2026.10.04-23.15.53 ARTPREVIEW light profile=sarpedon-night name=moon-pool role=cool kind=point at=(0,0,750) intensity=260 units=candelas radius=1250 color=(0.82,0.88,1.00) shadow=0
+2026.10.04-23.15.53 ARTPREVIEW sky profile=sarpedon-night cubemap=/Game/S08/Render/TC_S08_AmbientDome loaded=1 spawned=1 intensity=3 color=(0.58,0.70,1.00) lowerBlack=0
+2026.10.04-23.15.53 ARTPREVIEW fog profile=sarpedon-night spawned=1 color=(0.2000,0.2550,0.4600) density=0.32 falloff=0.2 heightZ=-400 start=2900 end=6000 maxOpacity=1.00 volumetric=0
+2026.10.04-23.15.53 ARTPREVIEW exposure profile=sarpedon-night method=histogram-fixed min=4.14106 max=4.14106 bias=0.000 ev100=2.05 volume=1
+2026.10.04-23.15.53 ARTPREVIEW lights applied profile=sarpedon-night directional=1 shadow=1 points=1 pointShadows=0 budgetOk=1
+2026.10.04-23.15.53 ARTPREVIEW render profile=sarpedon-night units=candelas sky=1 exposure=1 keyShadow=csm-3600uu-2c-contact0.000 shadowCasters=1 legacyRender=0
+2026.10.04-23.15.53 ARTPREVIEW map grade profile=sarpedon-night source=profile nightEV=-0.35 nightSaturation=0.75 lift=1.70 nightTint=(0.9700,1.0000,1.0500) maskSaturation=1.07 liftSaturation=1.10 maskInverseTint=(1.0500,0.9960,0.8910) graph=v2 maskTerms=1
+2026.10.04-23.15.53 ARTPREVIEW map frame wood=frame-wood material=M_MapFrameWood valueScaleSrgb=0.70 valueScaleLinear=0.4563 saturation=0.75
+2026.10.04-23.15.53 ARTPREVIEW map frame kit=frame-002 parts=20 corner=4 a=4 b=8 mid=4 segments=5x3 stretch=1.000000x1.000000 exactFit=1 woodSlots=20/20 ironSlots=8 wood=MID_M_MapFrameWood_2147482338 iron=MI_MapFrame002_Iron ironProudUU=2.0 replaces=bars+corners
+2026.10.04-23.15.53 ARTPREVIEW board active profile=sarpedon-original 9x6 surface=map-image map=Sarpedon spaces=38 links=61 starts=4 zoneKeys=6 multizone=4 triple=2 obstacles=16 size=891.3x577.3 src=1337x866 uuPerPx=0.6666667 frameUU=24 surfaceParts=0 corners=0 zoneMarks=0 lattice=0 pick=445.7x288.7 mi=MI_Sarpedon_MapBoard wood=1 expectOk=1
+2026.10.04-23.15.53 ARTPREVIEW board map zone key=blue spaces=6 (painted, no zone marks)
+2026.10.04-23.15.53 ARTPREVIEW board map zone key=brown spaces=5 (painted, no zone marks)
+2026.10.04-23.15.53 ARTPREVIEW board map zone key=green spaces=8 (painted, no zone marks)
+2026.10.04-23.15.53 ARTPREVIEW board map zone key=purple spaces=11 (painted, no zone marks)
+2026.10.04-23.15.53 ARTPREVIEW board map zone key=red spaces=6 (painted, no zone marks)
+2026.10.04-23.15.53 ARTPREVIEW board map zone key=yellow spaces=8 (painted, no zone marks)
+2026.10.04-23.15.53 ARTPREVIEW envlayout variant=scene map=sarpedon status=ok file=sarpedon.scene.layout.json sha256=34742d7ddabf44a165379029dc370bb01c83500e254f5568073c1c768dfb3818 propsRemoved=54 propsReplaced=0 propsAdded=88 fxRemoved=1 fxRemovedWithAnchor=5 fxReplaced=2 fxAdded=17 errors=0
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=scene-island mesh=SM_Env_S_Island loc=(0.0,-700.0,0.0) yaw=0.0 scale=1.000 shadow=1 size=2197.7x1723.9x347.7 bounds=(-1401.9,-1146.3,-332.6)..(795.8,577.7,15.2) overMap=1 onTray=0
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=scene-ship mesh=SM_Env_S_Ship loc=(850.5,-32.3,0.0) yaw=0.0 scale=1.000 shadow=1 size=752.6x859.2x1008.8 bounds=(508.4,-407.3,-330.0)..(1261.1,451.9,678.8) overMap=0 onTray=0
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=scene-fort mesh=SM_Env_S_Fort loc=(-457.6,-447.2,-12.7) yaw=0.0 scale=1.000 shadow=1 size=244.4x141.7x226.5 bounds=(-580.7,-499.4,-12.7)..(-336.3,-357.7,213.8) overMap=0 onTray=1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=scene-palisade mesh=SM_Env_S_Palisade loc=(-734.5,131.0,0.0) yaw=0.0 scale=1.000 shadow=1 size=480.6x776.0x323.2 bounds=(-754.4,-502.5,-65.2)..(-273.8,273.5,258.0) overMap=1 onTray=1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=scene-piles mesh=SM_Env_S_Piles loc=(-164.8,-469.9,0.0) yaw=0.0 scale=1.000 shadow=0 size=1024.8x959.9x619.8 bounds=(-629.1,-501.9,-131.4)..(395.8,458.1,488.4) overMap=1 onTray=1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=scene-frameband mesh=SM_Env_S_FrameBand loc=(0.0,330.0,0.0) yaw=0.0 scale=1.000 shadow=1 size=1008.4x684.7x51.8 bounds=(-503.2,-327.6,-39.7)..(505.2,357.1,12.1) overMap=1 onTray=1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=scene-cascade mesh=SM_Env_S_Cascade loc=(-114.0,420.0,0.0) yaw=0.0 scale=1.000 shadow=0 size=307.9x237.2x256.7 bounds=(-268.0,357.5,-299.0)..(39.9,594.7,-42.3) overMap=0 onTray=1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=scene-cascadefoam mesh=SM_Env_S_CascadeFoam loc=(-114.0,420.0,0.0) yaw=0.0 scale=1.000 shadow=0 size=328.4x259.4x230.8 bounds=(-277.0,387.1,-297.8)..(51.3,646.6,-67.0) overMap=0 onTray=1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-foot-w1 mesh=SM_Env_RockOutcrop loc=(-706.0,262.0,-300.0) yaw=25.0 scale=1.700 shadow=0 size=152.4x168.2x119.0 bounds=(-782.2,177.9,-300.0)..(-629.8,346.1,-181.0) overMap=0 onTray=1 material=MI_EnvScene_Proj_RockWetx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-foot-w2 mesh=SM_Env_RockOutcrop loc=(-702.0,352.0,-300.0) yaw=140.0 scale=1.600 shadow=0 size=158.0x161.8x112.0 bounds=(-781.0,271.1,-300.0)..(-623.0,432.9,-188.0) overMap=0 onTray=1 material=MI_EnvScene_Proj_RockWetx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-falls-tl mesh=SM_EnvFab_RockWet loc=(-262.0,410.0,-75.0) yaw=20.0 scale=0.220 shadow=0 size=75.8x73.2x45.5 bounds=(-300.6,375.4,-93.4)..(-224.8,448.6,-47.9) overMap=0 onTray=1 material=MI_EnvScene_Proj_RockWetx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-falls-tr mesh=SM_EnvFab_RockWet loc=(34.0,415.0,-80.0) yaw=200.0 scale=0.220 shadow=0 size=75.8x73.2x45.5 bounds=(-3.2,376.4,-98.4)..(72.6,449.6,-52.9) overMap=0 onTray=1 material=MI_EnvScene_Proj_RockWetx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-falls-m2 mesh=SM_EnvFab_RockWet loc=(-150.0,470.0,-148.0) yaw=75.0 scale=0.140 shadow=0 size=44.3x46.3x28.9 bounds=(-173.5,447.2,-159.7)..(-129.2,493.5,-130.8) overMap=0 onTray=0 material=MI_EnvScene_Proj_RockWetx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-falls-m3 mesh=SM_EnvFab_RockWet loc=(-80.0,532.0,-232.0) yaw=130.0 scale=0.160 shadow=0 size=59.4x59.8x33.1 bounds=(-110.9,501.1,-245.4)..(-51.5,560.9,-212.3) overMap=0 onTray=0 material=MI_EnvScene_Proj_RockWetx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-falls-bl mesh=SM_EnvFab_RockWet loc=(-255.0,540.0,-235.0) yaw=250.0 scale=0.200 shadow=0 size=66.5x68.9x41.3 bounds=(-286.4,504.9,-251.7)..(-219.9,573.8,-210.4) overMap=0 onTray=0 material=MI_EnvScene_Proj_RockWetx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-falls-br mesh=SM_EnvFab_RockWet loc=(28.0,545.0,-235.0) yaw=310.0 scale=0.200 shadow=0 size=74.2x74.7x41.3 bounds=(-7.6,508.9,-251.7)..(66.6,583.6,-210.4) overMap=0 onTray=0 material=MI_EnvScene_Proj_RockWetx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-falls-sl mesh=SM_EnvFab_RockWet loc=(-200.0,610.0,-300.0) yaw=40.0 scale=0.250 shadow=0 size=93.4x92.7x51.7 bounds=(-248.2,565.5,-320.9)..(-154.9,658.2,-269.2) overMap=0 onTray=0 material=MI_EnvScene_Proj_RockWetx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-falls-sr mesh=SM_EnvFab_RockWet loc=(0.0,615.0,-300.0) yaw=160.0 scale=0.250 shadow=0 size=86.2x83.1x51.7 bounds=(-43.9,571.2,-320.9)..(42.3,654.3,-269.2) overMap=0 onTray=0 material=MI_EnvScene_Proj_RockWetx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=tree-00 mesh=SM_EnvFab_OakDark loc=(-663.4,-358.7,6.0) yaw=351.5 scale=0.144 shadow=0 size=196.3x165.0x202.7 bounds=(-757.1,-437.7,6.0)..(-560.9,-272.7,208.7) overMap=0 onTray=1 material=MI_EnvScene_Proj_Foliagex2
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=tree-01 mesh=SM_EnvFab_ForestRound loc=(-374.6,-632.0,-7.0) yaw=206.6 scale=0.207 shadow=1 size=199.8x185.9x260.6 bounds=(-468.9,-725.3,-7.0)..(-269.1,-539.4,253.7) overMap=0 onTray=0 material=MI_EnvScene_Proj_Foliagex2
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=tree-02 mesh=SM_EnvFab_ForestNarrow loc=(-718.0,-76.9,7.0) yaw=119.4 scale=0.250 shadow=1 size=153.0x148.7x326.2 bounds=(-799.1,-148.7,7.0)..(-646.1,-0.1,333.2) overMap=0 onTray=1 material=MI_EnvScene_Proj_Foliagex2
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=tree-03 mesh=SM_EnvFab_ForestSmall loc=(-526.9,-569.7,-7.0) yaw=11.7 scale=0.217 shadow=1 size=144.2x130.4x260.0 bounds=(-594.0,-633.0,-7.0)..(-449.8,-502.6,253.0) overMap=0 onTray=0 material=MI_EnvScene_Proj_Foliagex2
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=tree-04 mesh=SM_EnvFab_OakDark loc=(-788.7,35.6,6.9) yaw=87.0 scale=0.085 shadow=1 size=88.3x109.0x119.6 bounds=(-835.1,-16.6,6.9)..(-746.8,92.4,126.5) overMap=0 onTray=0 material=MI_EnvScene_Proj_Foliagex2
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=tree-05 mesh=SM_EnvFab_ForestRound loc=(-809.1,-120.4,9.1) yaw=346.9 scale=0.135 shadow=1 size=120.1x105.0x170.0 bounds=(-871.8,-170.5,9.1)..(-751.7,-65.5,179.0) overMap=0 onTray=0 material=MI_EnvScene_Proj_Foliagex2
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=tree-06 mesh=SM_EnvFab_ForestNarrow loc=(-456.0,-642.4,-6.9) yaw=214.1 scale=0.226 shadow=1 size=137.6x140.4x294.9 bounds=(-526.7,-716.9,-6.9)..(-389.1,-576.5,288.0) overMap=0 onTray=0 material=MI_EnvScene_Proj_Foliagex2
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=tree-07 mesh=SM_EnvFab_ForestSmall loc=(-685.4,-166.4,5.1) yaw=33.3 scale=0.169 shadow=1 size=127.3x123.3x202.5 bounds=(-745.9,-225.3,5.1)..(-618.6,-102.0,207.6) overMap=0 onTray=1 material=MI_EnvScene_Proj_Foliagex2
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=tree-08 mesh=SM_EnvFab_OakDark loc=(-821.2,-294.6,9.5) yaw=331.4 scale=0.084 shadow=1 size=130.1x121.4x118.2 bounds=(-883.2,-354.3,9.5)..(-753.1,-232.8,127.7) overMap=0 onTray=0 material=MI_EnvScene_Proj_Foliagex2
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=tree-09 mesh=SM_EnvFab_ForestRound loc=(-1033.3,-60.5,4.7) yaw=274.8 scale=0.115 shadow=1 size=78.3x94.1x144.8 bounds=(-1071.2,-104.7,4.7)..(-992.9,-10.6,149.4) overMap=0 onTray=0 material=MI_EnvScene_Proj_Foliagex2
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=tree-10 mesh=SM_EnvFab_ForestNarrow loc=(-812.6,-1.2,8.3) yaw=281.6 scale=0.165 shadow=1 size=89.2x83.3x215.3 bounds=(-854.8,-45.4,8.3)..(-765.6,38.0,223.6) overMap=0 onTray=0 material=MI_EnvScene_Proj_Foliagex2
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=tree-11 mesh=SM_EnvFab_ForestSmall loc=(-600.2,-581.8,-0.1) yaw=62.2 scale=0.153 shadow=1 size=108.1x113.3x183.3 bounds=(-652.9,-634.8,-0.1)..(-544.9,-521.6,183.3) overMap=0 onTray=0 material=MI_EnvScene_Proj_Foliagex2
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=tree-12 mesh=SM_EnvFab_OakDark loc=(-758.2,-358.4,9.4) yaw=308.7 scale=0.080 shadow=1 size=122.5x125.7x112.6 bounds=(-816.3,-421.5,9.4)..(-693.8,-295.8,122.0) overMap=0 onTray=1 material=MI_EnvScene_Proj_Foliagex2
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=tree-13 mesh=SM_EnvFab_ForestRound loc=(-703.7,-286.7,9.8) yaw=251.8 scale=0.105 shadow=1 size=87.0x97.1x132.2 bounds=(-745.1,-333.4,9.8)..(-658.1,-236.3,142.0) overMap=0 onTray=1 material=MI_EnvScene_Proj_Foliagex2
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=tree-14 mesh=SM_EnvFab_ForestNarrow loc=(-853.1,-272.5,8.2) yaw=15.9 scale=0.161 shadow=1 size=85.6x90.7x210.1 bounds=(-893.6,-315.3,8.2)..(-808.0,-224.7,218.3) overMap=0 onTray=0 material=MI_EnvScene_Proj_Foliagex2
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=tree-15 mesh=SM_EnvFab_ForestSmall loc=(-640.2,-554.1,4.6) yaw=301.5 scale=0.140 shadow=1 size=101.2x105.0x167.8 bounds=(-688.6,-609.3,4.6)..(-587.4,-504.3,172.4) overMap=0 onTray=0 material=MI_EnvScene_Proj_Foliagex2
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=tree-16 mesh=SM_EnvFab_OakDark loc=(-674.0,-145.1,3.4) yaw=31.7 scale=0.080 shadow=1 size=124.8x118.1x112.6 bounds=(-735.9,-201.2,3.4)..(-611.0,-83.0,116.0) overMap=0 onTray=1 material=MI_EnvScene_Proj_Foliagex2
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=bush-17 mesh=SM_EnvFab_Bush loc=(-625.4,-731.2,3.5) yaw=336.8 scale=0.345 shadow=1 size=99.8x97.4x62.3 bounds=(-677.0,-778.0,-0.4)..(-577.3,-680.6,61.9) overMap=0 onTray=0 material=MI_EnvScene_Proj_Foliagex1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=bush-18 mesh=SM_EnvFab_Bush loc=(-904.4,11.5,-63.6) yaw=257.7 scale=0.302 shadow=1 size=76.7x79.7x54.6 bounds=(-941.5,-26.6,-67.1)..(-864.7,53.2,-12.5) overMap=0 onTray=0 material=MI_EnvScene_Proj_Foliagex1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=bush-19 mesh=SM_EnvFab_Bush loc=(-744.6,-100.7,9.0) yaw=291.7 scale=0.292 shadow=1 size=81.5x83.6x52.8 bounds=(-785.3,-140.3,5.7)..(-703.8,-56.7,58.5) overMap=0 onTray=1 material=MI_EnvScene_Proj_Foliagex1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-00 mesh=SM_EnvFab_RockWet loc=(701.8,2.3,-62.0) yaw=57.4 scale=0.252 shadow=1 size=91.2x92.7x52.1 bounds=(654.1,-42.7,-83.0)..(745.3,50.0,-31.0) overMap=0 onTray=1 material=MI_EnvScene_Proj_Rockx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-01 mesh=SM_Env_RockOutcrop loc=(746.2,124.8,-168.8) yaw=70.5 scale=0.903 shadow=1 size=87.1x76.5x63.2 bounds=(702.7,86.6,-168.8)..(789.7,163.1,-105.6) overMap=0 onTray=1 material=MI_EnvScene_Proj_RockWetx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-02 mesh=SM_EnvFab_RockWet loc=(648.2,502.2,-235.4) yaw=118.1 scale=0.190 shadow=1 size=67.1x68.7x39.3 bounds=(613.1,467.0,-251.2)..(680.2,535.7,-212.0) overMap=0 onTray=0 material=MI_EnvScene_Proj_RockWetx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-03 mesh=SM_Env_RockOutcrop loc=(468.0,386.8,-69.2) yaw=146.5 scale=0.538 shadow=1 size=51.4x54.4x37.7 bounds=(442.3,359.6,-69.2)..(493.8,414.0,-31.5) overMap=0 onTray=1 material=MI_EnvScene_Proj_Rockx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-04 mesh=SM_EnvFab_RockWet loc=(218.9,425.9,-68.5) yaw=162.4 scale=0.138 shadow=1 size=46.7x44.9x28.5 bounds=(195.2,402.2,-80.0)..(241.9,447.1,-51.5) overMap=0 onTray=0 material=MI_EnvScene_Proj_Rockx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-05 mesh=SM_Env_RockOutcrop loc=(93.9,473.4,-161.6) yaw=110.7 scale=0.736 shadow=1 size=71.4x63.2x51.5 bounds=(58.2,441.8,-161.6)..(129.6,505.0,-110.1) overMap=0 onTray=0 material=MI_EnvScene_Proj_RockWetx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-06 mesh=SM_EnvFab_RockWet loc=(-285.4,542.8,-230.0) yaw=224.7 scale=0.253 shadow=1 size=94.5x94.5x52.3 bounds=(-330.9,493.8,-251.1)..(-236.4,588.3,-198.9) overMap=0 onTray=0 material=MI_EnvScene_Proj_RockWetx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-07 mesh=SM_Env_RockOutcrop loc=(-412.2,391.4,-66.0) yaw=142.8 scale=0.897 shadow=1 size=87.5x90.8x62.8 bounds=(-456.0,345.9,-66.0)..(-368.4,436.8,-3.2) overMap=0 onTray=1 material=MI_EnvScene_Proj_Rockx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-08 mesh=SM_EnvFab_RockWet loc=(-561.1,363.0,-67.4) yaw=104.8 scale=0.259 shadow=1 size=81.8x85.5x53.5 bounds=(-604.4,319.6,-89.0)..(-522.6,405.1,-35.5) overMap=0 onTray=1 material=MI_EnvScene_Proj_Rockx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-09 mesh=SM_Env_RockOutcrop loc=(-652.7,272.9,-170.4) yaw=136.1 scale=0.976 shadow=1 size=97.6x98.2x68.3 bounds=(-701.5,223.8,-170.4)..(-603.9,322.0,-102.1) overMap=0 onTray=1 material=MI_EnvScene_Proj_RockWetx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-10 mesh=SM_EnvFab_RockWet loc=(-745.1,187.3,-230.3) yaw=109.7 scale=0.193 shadow=1 size=64.0x66.4x39.9 bounds=(-778.9,153.5,-246.4)..(-714.9,219.9,-206.5) overMap=0 onTray=1 material=MI_EnvScene_Proj_RockWetx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-x0 mesh=SM_EnvFab_RockWet loc=(-204.0,-675.6,4.1) yaw=203.4 scale=0.187 shadow=1 size=65.9x64.0x38.6 bounds=(-236.3,-709.2,-11.5)..(-170.3,-645.2,27.1) overMap=0 onTray=0 material=MI_EnvScene_Proj_Rockx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-x1 mesh=SM_EnvFab_RockWet loc=(-128.5,-718.4,6.9) yaw=185.2 scale=0.243 shadow=1 size=72.0x67.6x50.2 bounds=(-164.3,-754.5,-13.4)..(-92.3,-686.9,36.8) overMap=0 onTray=0 material=MI_EnvScene_Proj_Rockx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-x2 mesh=SM_EnvFab_RockWet loc=(-80.9,-631.3,6.1) yaw=280.1 scale=0.188 shadow=1 size=56.1x59.1x38.8 bounds=(-107.1,-660.5,-9.6)..(-51.1,-601.4,29.3) overMap=0 onTray=0 material=MI_EnvScene_Proj_Rockx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-x3 mesh=SM_EnvFab_RockWet loc=(-242.1,-617.8,8.8) yaw=24.5 scale=0.256 shadow=1 size=90.9x88.3x52.9 bounds=(-288.5,-659.7,-12.6)..(-197.7,-571.4,40.3) overMap=0 onTray=0 material=MI_EnvScene_Proj_Rockx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-x4 mesh=SM_EnvFab_RockWet loc=(261.1,-397.4,7.0) yaw=318.8 scale=0.210 shadow=1 size=78.5x78.1x43.4 bounds=(223.2,-434.9,-10.5)..(301.7,-356.8,32.9) overMap=0 onTray=1 material=MI_EnvScene_Proj_Rockx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-p00 mesh=SM_EnvFab_RockWet loc=(-563.3,-158.8,5.5) yaw=271.2 scale=0.192 shadow=1 size=49.9x53.7x39.7 bounds=(-586.4,-185.6,-10.6)..(-536.5,-131.9,29.1) overMap=0 onTray=1 material=MI_EnvScene_Proj_Rockx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-p01 mesh=SM_EnvFab_RockWet loc=(272.1,-367.4,3.9) yaw=168.8 scale=0.180 shadow=1 size=57.3x54.5x37.2 bounds=(243.1,-396.4,-11.1)..(300.4,-341.9,26.1) overMap=0 onTray=1 material=MI_EnvScene_Proj_Rockx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-p02 mesh=SM_EnvFab_RockWet loc=(-487.7,312.0,2.8) yaw=355.0 scale=0.156 shadow=1 size=46.1x43.2x32.2 bounds=(-510.6,291.9,-10.2)..(-464.5,335.1,22.0) overMap=0 onTray=1 material=MI_EnvScene_Proj_Rockx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-p03 mesh=SM_EnvFab_RockWet loc=(-297.2,-368.5,3.2) yaw=354.3 scale=0.169 shadow=1 size=50.4x47.3x34.9 bounds=(-322.2,-390.6,-10.9)..(-271.9,-343.2,24.0) overMap=0 onTray=1 material=MI_EnvScene_Proj_Rockx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-p04 mesh=SM_EnvFab_RockWet loc=(-555.8,-15.0,3.4) yaw=221.9 scale=0.155 shadow=1 size=57.9x57.7x32.0 bounds=(-583.8,-45.0,-9.5)..(-525.8,12.8,22.5) overMap=0 onTray=1 material=MI_EnvScene_Proj_Rockx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-p05 mesh=SM_EnvFab_RockWet loc=(-253.2,-373.9,3.1) yaw=32.1 scale=0.166 shadow=1 size=61.0x59.9x34.3 bounds=(-284.6,-402.5,-10.7)..(-223.6,-342.6,23.6) overMap=0 onTray=1 material=MI_EnvScene_Proj_Rockx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-p06 mesh=SM_EnvFab_RockWet loc=(244.8,-399.8,3.3) yaw=243.8 scale=0.155 shadow=1 size=54.1x55.5x32.0 bounds=(219.1,-428.2,-9.6)..(273.2,-372.7,22.4) overMap=0 onTray=1 material=MI_EnvScene_Proj_Rockx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-p07 mesh=SM_EnvFab_RockWet loc=(-155.2,-379.9,2.7) yaw=239.3 scale=0.154 shadow=1 size=55.2x56.3x31.8 bounds=(-181.5,-408.9,-10.2)..(-126.3,-352.6,21.6) overMap=0 onTray=1 material=MI_EnvScene_Proj_Rockx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-p08 mesh=SM_EnvFab_RockWet loc=(-486.8,273.9,2.0) yaw=189.2 scale=0.132 shadow=1 size=41.1x38.9x27.3 bounds=(-507.2,253.2,-9.0)..(-466.1,292.0,18.2) overMap=0 onTray=1 material=MI_EnvScene_Proj_Rockx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-p09 mesh=SM_EnvFab_RockWet loc=(-567.2,97.0,2.6) yaw=322.2 scale=0.132 shadow=1 size=49.2x48.7x27.3 bounds=(-591.0,73.6,-8.4)..(-541.8,122.3,18.9) overMap=0 onTray=1 material=MI_EnvScene_Proj_Rockx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-p10 mesh=SM_EnvFab_RockWet loc=(-204.3,-403.1,1.4) yaw=18.0 scale=0.124 shadow=1 size=42.1x40.5x25.6 bounds=(-225.7,-422.2,-9.0)..(-183.7,-381.7,16.6) overMap=0 onTray=1 material=MI_EnvScene_Proj_Rockx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=rock-p11 mesh=SM_EnvFab_RockWet loc=(-529.3,-33.8,1.7) yaw=210.7 scale=0.120 shadow=1 size=43.9x43.0x24.8 bounds=(-550.7,-56.3,-8.3)..(-506.8,-13.2,16.5) overMap=0 onTray=1 material=MI_EnvScene_Proj_Rockx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=crate-deck-n mesh=SM_Env_CrateStack loc=(566.5,-134.6,-4.5) yaw=140.1 scale=2.300 shadow=1 size=111.6x119.4x103.5 bounds=(510.7,-194.3,-4.5)..(622.2,-74.8,99.0) overMap=0 onTray=1 material=MI_EnvScene_Proj_Woodx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=crate-deck-mid mesh=SM_Env_CrateStack loc=(682.2,104.9,-3.3) yaw=140.1 scale=2.300 shadow=1 size=111.6x119.4x103.5 bounds=(626.5,45.2,-3.3)..(738.0,164.6,100.2) overMap=0 onTray=1 material=MI_EnvScene_Proj_Woodx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=crate-deck-se mesh=SM_Env_CrateStack loc=(649.5,230.8,-4.5) yaw=128.0 scale=2.300 shadow=1 size=120.5x109.7x103.5 bounds=(589.3,175.9,-4.5)..(709.8,285.6,99.0) overMap=0 onTray=1 material=MI_EnvScene_Proj_Woodx1
+2026.10.04-23.15.53 ARTPREVIEW envlayout prop id=barrel-dock-1 mesh=SM_Env_Barrel loc=(630.8,-46.3,-4.2) yaw=150.6 scale=2.300 shadow=1 size=67.1x67.1x64.4 bounds=(597.2,-79.8,-4.2)..(664.4,-12.7,60.2) overMap=0 onTray=1 material=MI_EnvScene_Proj_Woodx1
+2026.10.04-23.15.54 ARTPREVIEW envlayout prop id=barrel-dock-2 mesh=SM_Env_Barrel loc=(713.2,153.6,-7.8) yaw=297.7 scale=2.300 shadow=1 size=66.5x66.5x64.4 bounds=(679.9,120.3,-7.8)..(746.5,186.8,56.6) overMap=0 onTray=1 material=MI_EnvScene_Proj_Woodx1
+2026.10.04-23.15.54 ARTPREVIEW envlayout prop id=coil-dock mesh=SM_Env_Rope loc=(571.2,265.2,-4.1) yaw=282.9 scale=3.500 shadow=1 size=91.7x89.9x36.6 bounds=(525.3,220.3,-4.1)..(617.0,310.2,32.6) overMap=0 onTray=1 material=MI_EnvScene_Proj_Woodx1
+2026.10.04-23.15.54 ARTPREVIEW envlayout prop id=crate-ne mesh=SM_Env_CrateStack loc=(335.7,-351.7,-4.0) yaw=100.0 scale=1.404 shadow=1 size=73.5x42.5x63.2 bounds=(299.0,-372.9,-4.0)..(372.5,-330.4,59.2) overMap=0 onTray=1 material=MI_EnvScene_Proj_Woodx1
+2026.10.04-23.15.54 ARTPREVIEW envlayout prop id=barrel-beach mesh=SM_Env_Barrel loc=(-90.0,-397.6,-3.9) yaw=341.1 scale=1.807 shadow=1 size=49.2x49.2x50.6 bounds=(-114.6,-422.2,-3.9)..(-65.4,-373.0,46.7) overMap=0 onTray=1 material=MI_EnvScene_Proj_Woodx1
+2026.10.04-23.15.54 ARTPREVIEW envlayout prop id=barrel-fort mesh=SM_Env_Barrel loc=(-404.3,-444.4,-5.7) yaw=182.6 scale=1.824 shadow=1 size=40.8x40.8x51.1 bounds=(-424.7,-464.8,-5.7)..(-383.9,-424.0,45.4) overMap=0 onTray=1 material=MI_EnvScene_Proj_Woodx1
+2026.10.04-23.15.54 ARTPREVIEW envlayout prop id=barrel-ship-1 mesh=SM_Env_Barrel loc=(620.5,-298.6,198.6) yaw=20.0 scale=3.000 shadow=1 size=82.4x82.4x84.0 bounds=(579.3,-339.8,198.6)..(661.7,-257.5,282.6) overMap=0 onTray=1 material=MI_EnvScene_Proj_Woodx1
+2026.10.04-23.15.54 ARTPREVIEW envlayout prop id=barrel-ship-2 mesh=SM_Env_Barrel loc=(788.6,-78.0,200.4) yaw=75.0 scale=3.000 shadow=1 size=78.7x78.7x84.0 bounds=(749.3,-117.3,200.4)..(828.0,-38.6,284.4) overMap=0 onTray=0 material=MI_EnvScene_Proj_Woodx1
+2026.10.04-23.15.54 ARTPREVIEW envlayout prop id=lantern-bay mesh=SM_EnvCP_LanternHead loc=(-134.5,-455.6,106.8) yaw=90.0 scale=2.595 shadow=0 size=48.2x40.0x98.9 bounds=(-158.6,-475.6,106.8)..(-110.4,-435.5,205.7) overMap=0 onTray=1 material=MI_EnvScene_LanternHeadx1
+2026.10.04-23.15.54 ARTPREVIEW envlayout prop id=lantern-left mesh=SM_EnvCP_LanternHead loc=(-550.1,3.0,189.6) yaw=90.0 scale=2.389 shadow=0 size=44.4x36.9x91.0 bounds=(-572.3,-15.5,189.6)..(-527.9,21.4,280.7) overMap=0 onTray=1 material=MI_EnvScene_LanternHeadx1
+2026.10.04-23.15.54 ARTPREVIEW envlayout prop id=lantern-stern mesh=SM_EnvCP_LanternHead loc=(416.1,-419.2,126.1) yaw=90.0 scale=2.358 shadow=0 size=43.8x36.4x89.9 bounds=(394.2,-437.4,126.1)..(438.0,-401.0,215.9) overMap=0 onTray=1 material=MI_EnvScene_LanternHeadx1
+2026.10.04-23.15.54 ARTPREVIEW envlayout prop id=lantern-rail mesh=SM_EnvCP_LanternHead loc=(659.2,-33.4,330.6) yaw=90.0 scale=2.651 shadow=0 size=49.3x40.9x101.0 bounds=(634.5,-53.9,330.6)..(683.8,-12.9,431.6) overMap=0 onTray=1 material=MI_EnvScene_LanternHeadx1
+2026.10.04-23.15.54 ARTPREVIEW envlayout prop id=lantern-deck-n mesh=SM_EnvCP_LanternHead loc=(505.6,-102.5,124.1) yaw=90.0 scale=2.305 shadow=0 size=42.9x35.6x87.8 bounds=(484.2,-120.3,124.1)..(527.0,-84.7,212.0) overMap=0 onTray=1 material=MI_EnvScene_LanternHeadx1
+2026.10.04-23.15.54 ARTPREVIEW envlayout prop id=lantern-deck-se mesh=SM_EnvCP_LanternHead loc=(606.7,263.4,125.5) yaw=90.0 scale=2.911 shadow=0 size=54.1x44.9x110.9 bounds=(579.6,241.0,125.4)..(633.7,285.9,236.4) overMap=0 onTray=1 material=MI_EnvScene_LanternHeadx1
+2026.10.04-23.15.54 ARTPREVIEW envlayout prop id=cannon-1 mesh=SM_EnvCP_Cannon loc=(565.6,-250.0,89.8) yaw=140.1 scale=3.044 shadow=1 size=166.8x161.7x81.7 bounds=(482.2,-330.8,89.8)..(649.1,-169.1,171.5) overMap=0 onTray=1
+2026.10.04-23.15.54 ARTPREVIEW envlayout prop id=cannon-2 mesh=SM_EnvCP_Cannon loc=(636.5,-164.3,68.9) yaw=140.1 scale=3.009 shadow=1 size=164.9x159.8x80.8 bounds=(554.0,-244.3,68.9)..(718.9,-84.4,149.7) overMap=0 onTray=1
+2026.10.04-23.15.54 ARTPREVIEW envlayout prop id=cannon-3 mesh=SM_EnvCP_Cannon loc=(737.3,-52.3,-24.2) yaw=140.1 scale=3.353 shadow=1 size=183.8x178.1x90.0 bounds=(645.4,-141.4,-24.2)..(829.2,36.7,65.7) overMap=0 onTray=1
+2026.10.04-23.15.54 ARTPREVIEW envlayout prop id=banner-ship mesh=SM_Env_S_Banner loc=(745.3,41.4,273.8) yaw=140.1 scale=2.000 shadow=1 size=69.4x80.2x325.6 bounds=(708.4,3.2,-51.8)..(777.8,83.3,273.8) overMap=0 onTray=1
+2026.10.04-23.15.54 ARTPREVIEW envlayout prop id=fire-fort-pit mesh=SM_Env_Campfire loc=(-492.5,-428.2,-5.0) yaw=0.0 scale=1.400 shadow=0 size=56.0x55.8x23.6 bounds=(-520.5,-456.1,-5.0)..(-464.5,-400.3,18.6) overMap=0 onTray=1 material=MI_EnvScene_Proj_Rockx1
+2026.10.04-23.15.54 ARTPREVIEW envlayout light id=campfire-nw kind=point at=(-548.0,-352.0,60.0) intensity=65 units=candelas radius=460 color=#FF8A3D shadow=0
+2026.10.04-23.15.54 ARTPREVIEW envlayout light id=campfire-w kind=point at=(-560.0,85.0,60.0) intensity=55 units=candelas radius=420 color=#FF9A4A shadow=0
+2026.10.04-23.15.54 ARTPREVIEW envlayout light id=ship-lantern-n kind=point at=(598.0,-225.0,150.0) intensity=95 units=candelas radius=420 color=#FFA552 shadow=0
+2026.10.04-23.15.54 ARTPREVIEW envlayout light id=ship-lantern-s kind=point at=(592.0,0.0,145.0) intensity=90 units=candelas radius=400 color=#FFA552 shadow=0
+2026.10.04-23.15.54 ARTPREVIEW envlayout light id=ship-lantern-stern kind=point at=(585.0,225.0,140.0) intensity=75 units=candelas radius=380 color=#FFA552 shadow=0
+2026.10.04-23.15.54 ARTPREVIEW envlayout ground map=sarpedon mode=runtime strips=4 material=MI_EnvGround_Sarpedon z=-1.0 outer=(-780.0,-515.0)..(780.0,425.0) hole=(-467.7,-310.7)..(467.7,310.7) splatRect=(-820.0,-560.0)..(820.0,470.0) splatCovers=1 areaUU2=885246 falls=1/1 fallCards=1 status=ok fallMeshes=1 fallMeshParts=3 sea=ok
+2026.10.04-23.15.54 ARTPREVIEW envlayout fx id=fireflies-forest-n system=NS_Env_Fireflies anchor=- at=(-707.6,-118.9,150.0) yaw=0.0 scale=1.000 seed=1725416364 warmup=3.50s ticks=105 mode=live particles=14 emitters=1 gpuEmitters=0 deterministic=1 nearBand=0 user=-
+2026.10.04-23.15.54 ARTPREVIEW envlayout fx id=fireflies-forest-s system=NS_Env_Fireflies anchor=- at=(-695.2,125.2,150.0) yaw=0.0 scale=1.000 seed=97628021 warmup=3.50s ticks=105 mode=live particles=13 emitters=1 gpuEmitters=0 deterministic=1 nearBand=0 user=-
+2026.10.04-23.15.54 ARTPREVIEW envlayout fx id=flame-lantern-bay system=NS_Env_LanternFlame anchor=lantern-bay at=(-133.7,-457.9,134.2) yaw=90.0 scale=2.595 seed=2080362060 warmup=1.50s ticks=45 mode=live particles=46 emitters=3 gpuEmitters=0 deterministic=1 nearBand=0 user=-
+2026.10.04-23.15.54 ARTPREVIEW envlayout fx id=flame-lantern-left system=NS_Env_LanternFlame anchor=lantern-left at=(-549.4,0.8,214.8) yaw=90.0 scale=2.389 seed=1350007212 warmup=1.50s ticks=45 mode=live particles=44 emitters=3 gpuEmitters=0 deterministic=1 nearBand=0 user=-
+2026.10.04-23.15.54 ARTPREVIEW envlayout fx id=flame-lantern-stern system=NS_Env_LanternFlame anchor=lantern-stern at=(416.8,-421.3,150.9) yaw=90.0 scale=2.358 seed=2041647646 warmup=1.50s ticks=45 mode=live particles=48 emitters=3 gpuEmitters=0 deterministic=1 nearBand=0 user=-
+2026.10.04-23.15.54 ARTPREVIEW envlayout fx id=flame-lantern-rail system=NS_Env_LanternFlame anchor=lantern-rail at=(659.9,-35.8,358.5) yaw=90.0 scale=2.651 seed=1934390597 warmup=1.50s ticks=45 mode=live particles=43 emitters=3 gpuEmitters=0 deterministic=1 nearBand=0 user=-
+2026.10.04-23.15.54 ARTPREVIEW envlayout fx id=flame-lantern-deck-n system=NS_Env_LanternFlame anchor=lantern-deck-n at=(506.3,-104.6,148.4) yaw=90.0 scale=2.305 seed=744847447 warmup=1.50s ticks=45 mode=live particles=47 emitters=3 gpuEmitters=0 deterministic=1 nearBand=0 user=-
+2026.10.04-23.15.54 ARTPREVIEW envlayout fx id=flame-lantern-deck-se system=NS_Env_LanternFlame anchor=lantern-deck-se at=(607.5,260.8,156.1) yaw=90.0 scale=2.911 seed=1704310633 warmup=1.50s ticks=45 mode=live particles=48 emitters=3 gpuEmitters=0 deterministic=1 nearBand=0 user=-
+2026.10.04-23.15.54 ARTPREVIEW envlayout fx id=fire-brazier-core system=NS_Env_FireCore anchor=- at=(-577.3,139.8,27.8) yaw=0.0 scale=1.000 seed=824559950 warmup=1.50s ticks=45 mode=live particles=102 emitters=3 gpuEmitters=0 deterministic=1 nearBand=0 user=-
+2026.10.04-23.15.54 ARTPREVIEW envlayout fx id=fire-brazier-tongues system=NS_Env_FireTongues anchor=- at=(-577.3,139.8,28.8) yaw=0.0 scale=1.000 seed=2057684158 warmup=1.50s ticks=45 mode=live particles=35 emitters=4 gpuEmitters=0 deterministic=1 nearBand=0 user=-
+2026.10.04-23.15.54 ARTPREVIEW envlayout fx id=fire-brazier-embers system=NS_Env_FireEmbers anchor=- at=(-577.3,139.8,41.8) yaw=0.0 scale=1.000 seed=1696491349 warmup=1.50s ticks=45 mode=live particles=14 emitters=1 gpuEmitters=0 deterministic=1 nearBand=0 user=-
+2026.10.04-23.15.54 ARTPREVIEW envlayout fx id=fire-brazier-smoke system=NS_Env_FireSmoke anchor=- at=(-577.3,139.8,53.8) yaw=0.0 scale=1.000 seed=1050374560 warmup=1.50s ticks=45 mode=live particles=36 emitters=3 gpuEmitters=0 deterministic=1 nearBand=0 user=-
+2026.10.04-23.15.54 ARTPREVIEW envlayout fx id=fire-fort-core system=NS_Env_FireCore anchor=- at=(-492.1,-426.4,0.0) yaw=0.0 scale=1.200 seed=1107146133 warmup=1.50s ticks=45 mode=live particles=98 emitters=3 gpuEmitters=0 deterministic=1 nearBand=0 user=-
+2026.10.04-23.15.54 ARTPREVIEW envlayout fx id=fire-fort-tongues system=NS_Env_FireTongues anchor=- at=(-492.1,-426.4,1.0) yaw=45.0 scale=1.200 seed=1895526915 warmup=1.50s ticks=45 mode=live particles=34 emitters=4 gpuEmitters=0 deterministic=1 nearBand=0 user=-
+2026.10.04-23.15.54 ARTPREVIEW envlayout fx id=fire-fort-embers system=NS_Env_FireEmbers anchor=- at=(-492.1,-426.4,14.0) yaw=0.0 scale=1.200 seed=1583429198 warmup=1.50s ticks=45 mode=live particles=15 emitters=1 gpuEmitters=0 deterministic=1 nearBand=0 user=-
+2026.10.04-23.15.54 ARTPREVIEW envlayout fx id=fire-fort-smoke system=NS_Env_FireSmoke anchor=- at=(-492.1,-426.4,28.0) yaw=0.0 scale=1.200 seed=803906176 warmup=1.50s ticks=45 mode=live particles=36 emitters=3 gpuEmitters=0 deterministic=1 nearBand=0 user=-
+2026.10.04-23.15.54 ARTPREVIEW envlayout fx id=falls-mist-1 system=NS_Env_FallsSpray anchor=- at=(-115.8,401.1,-69.2) yaw=0.0 scale=0.600 seed=722961037 warmup=1.50s ticks=45 mode=live particles=48 emitters=1 gpuEmitters=0 deterministic=1 nearBand=1 user=-
+2026.10.04-23.15.54 ARTPREVIEW envlayout fx id=falls-mist-2 system=NS_Env_FallsSpray anchor=- at=(-115.7,457.7,-144.8) yaw=0.0 scale=0.800 seed=840880951 warmup=1.50s ticks=45 mode=live particles=49 emitters=1 gpuEmitters=0 deterministic=1 nearBand=1 user=-
+2026.10.04-23.15.54 ARTPREVIEW envlayout fx id=falls-mist-3 system=NS_Env_FallsSpray anchor=- at=(-115.7,520.1,-231.3) yaw=0.0 scale=1.000 seed=1159324577 warmup=1.50s ticks=45 mode=live particles=45 emitters=1 gpuEmitters=0 deterministic=1 nearBand=1 user=-
+2026.10.04-23.15.54 ARTPREVIEW envlayout fx map=sarpedon fx=19 layoutFx=19 missingSystems=0 skippedMissing=0 skippedDisabled=0 skippedAnchor=0 skippedInsideMap=0 skippedLightRenderer=0 nearBand=3 gpuEmitters=0 nonDeterministic=0 particles=815 userSet=0 userMissing=0 mode=live still=0
+2026.10.04-23.15.54 ARTPREVIEW envlayout map=sarpedon props=88 lights=5 missingMeshes=0 layoutProps=88 layoutLights=5 skippedMissing=0 skippedInsideMap=0 intrusions=4 outsideTray=30 outsideKit=9 shadowCasters=67 profilePoints=1 combinedPoints=6 combinedBudgetOk=1 tray=layout trayApronMismatch=0 profile=sarpedon-original boardId=c7fa64a26c29a0835f2383e63 file=Config/ArtBoards/EnvLayouts/sarpedon.layout.json sha256=89a3cfb965c134557d7a5e2733bd89562321ddf1c61d428dc8952d7fc4006c78 source=pak status=ok
+2026.10.04-23.15.54 ARTPREVIEW concept-paste mode=on profile=sarpedon-original map=sarpedon reason=default default=on flag=- cmdVariant=- envVariant=scene:ok overlay=sarpedon.scene.layout.json overlaySha256=34742d7ddabf44a165379029dc370bb01c83500e254f5568073c1c768dfb3818 spec=tools/art/concept_paste/sarpedon.paste.json manifest=tools/art/concept_scene/manifest.sarpedon.json hide=tray+ground+waterfalls+backdrop+fog+baseProps+baseFx+layoutLights kind=lit3d
+2026.10.04-23.15.54 ARTPREVIEW concept-scene sky profile=sarpedon-original plate=T_Sarpedon_ConceptSea z=-300..600 centre=(0,-45) radius=1900 segments=48 unlit=1
+2026.10.04-23.15.54 ARTPREVIEW concept-scene light id=fire-fort kind=point at=(-492.3,-427.3,54.0) intensity=40 units=candelas radius=460 color=#FF8A3D shadow=0 flicker=0.18@6.0Hz
+2026.10.04-23.15.54 ARTPREVIEW concept-scene light id=fire-brazier kind=point at=(-600.0,139.9,90.0) intensity=80 units=candelas radius=180 color=#FF9A4A shadow=0 flicker=0.25@1.6Hz
+2026.10.04-23.15.54 ARTPREVIEW concept-scene light id=lantern-left kind=point at=(-565.9,-46.1,154.3) intensity=30 units=candelas radius=300 color=#FFA552 shadow=0 flicker=0.04@4.0Hz
+2026.10.04-23.15.54 ARTPREVIEW concept-scene light id=lantern-bay kind=point at=(-129.7,-397.7,150.0) intensity=95 units=candelas radius=420 color=#FFA552 shadow=0 flicker=0.08@4.5Hz
+2026.10.04-23.15.54 ARTPREVIEW concept-scene light id=lantern-deck-se kind=point at=(622.9,228.1,104.0) intensity=60 units=candelas radius=400 color=#FFA552 shadow=0 flicker=0.08@5.0Hz
+2026.10.04-23.15.54 ARTPREVIEW concept-scene status=ok profile=sarpedon-original mode=lit3d variant=scene required=2 sky=48 lights=5 manifest=tools/art/concept_scene/manifest.sarpedon.json collection=MPC_EnvScene lit=1
+2026.10.04-23.15.54 ARTPREVIEW concept-paste hide profile=sarpedon-original props=0 fx=0 layoutLights=5 ground=4 sea=0 waterfalls=4 fog=1 backdrop=0 overlayProps=88 overlayFx=19
+2026.10.04-23.15.54 ARTPREVIEW concept-scene apply profile=sarpedon-original overlayProps=88 shadowsOn=67 lumenGI=88 casters=4/4 giOff=0/0 unmatched=- sea=z-300(1) falls=3 scaleZ=2.50
+2026.10.04-23.15.54 ARTPREVIEW concept-scene collection=live path=/Game/EnvMaps/Scene/MPC_EnvScene
+2026.10.04-23.15.54 ARTPREVIEW concept-paste budget profile=sarpedon-original profilePoints=1 conceptLights=5 layoutLightsVisible=0 combinedPoints=6 combinedBudgetOk=1
+2026.10.04-23.15.54 ARTPREVIEW concept-paste anim profile=sarpedon-original mode=live flickers=5 sways=1 winds=21/21 missingProps=0
+2026.10.04-23.15.54 ARTPREVIEW envlayout tray map=sarpedon source=layout outerHalf=780.0x470.0 offsetY=-45.0 frameHalf=469.7x312.7 mesh=T2 t2Top=780.0x470.0 mismatchUU=0.0
+2026.10.04-23.15.54 ARTPREVIEW diorama tray-t2 loaded mesh=/Game/PipelineCandidates/TableBase/T2b/SM_TableBase_T2b mi=MI_TableBase_T2b_Sarpedon kind=T2b
+2026.10.04-23.15.54 ARTPREVIEW diorama tray=/Game/PipelineCandidates/TableBase/T2b/SM_TableBase_T2b.SM_TableBase_T2b mi=MI_TableBase_T2b_Sarpedon surface=map-image yaw=0.0 scale=1.000x1.000x1.000 bounds=(-815.7,-546.3,-215.7)..(815.7,456.3,1.7) size=1631.4x1002.6x217.5 topZ=-3.0 boardHalf=469.7x312.7 rimUU=112.3 collision=none kind=T2b topHalf=780.0x470.0 layoutHalf=780.0x470.0 offset=(0.0,-45.0) source=layout mismatchUU=0.0 match=1 anisotropy=1.000 lipTopZ=1.7 lipBandUU=20.0
+2026.10.04-23.15.54 ARTPREVIEW concept-paste tray hidden profile=sarpedon-original mesh=SM_TableBase_T2b (the painted island replaces it)
+2026.10.04-23.15.54 MS-HL assets plate=M_UM_MovePlate path=- ghost=- plane=Plane ready=1
+2026.10.04-23.15.54 MS-HL build n=1 spaces=38 channels=4 shape=circle style=board plate=#FFC857 path=#FFC857 ready=1
+2026.10.04-23.15.54 MS-HL geom style=board ring=32.75..39.25 inBand=1 outline=39.60..41.00 outlineOk=1 occupiedClear=30.00 clearOk=1 pipCut=15.0 pipHalf=9.2 pipClear=1 ok=1
+2026.10.04-23.15.54 CAMERA extents source=map-image half=445.7x288.7 dist=2340.2 fit=1872.2 k1Mul=1.250
+2026.10.04-23.15.54 CAMERA dist=2340 loc=(0,1342,1917) pitch=-55 yaw=-90
+2026.10.04-23.15.54 CAMERA config overview=2340.2 nearest=300.0 farthest=2880.2 zoomRange=0.81-7.80 fit=1872.2 k1Mul=1.250 minDist=300.0 outRatio=0.650 step=1.250 animMs=200 returnMs=300 followFrom=1.20 source=defaults issues=0
+2026.10.04-23.15.54 BOARD 9x6 cells | control points: (0,0)=(-393,-219,0) (8,5)=(400,250,0) | neighbor pair (dist 140 uu)
+2026.10.04-23.15.54 BOARD topology spaces=38 links=61 starts=3:S03,4:S14,1:S20,2:S32 frame=1337x866px uuPerPx=0.6667 radius=42.0uu (default)
+2026.10.04-23.15.54 ARTPREVIEW team mapping mode=absolute source=seatOrder viewerTeam=P1 p1=f-0-hero,f-0-sk0,f-0-sk1,f-0-sk2 p2=f-1-hero,f-1-sk0
+2026.10.04-23.15.54 ARTPREVIEW heroesV2 fighter=f-0-hero mesh=/Game/PipelineCandidates/Medusa/H2LD/Meshes/SK_Medusa_H2LD mi=/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_P1 yaw=90.0 scale=0.9998 name=Medusa hero=1 look=P1 base=/Game/PipelineCandidates/Medusa/H2LD/Meshes/SM_Medusa_H2LD_Base baseMi=/Game/PipelineCandidates/Medusa/H2LD/Materials/MI_Medusa_H2LD_Base_P1 skeleton=/Game/PipelineCandidates/Medusa/Rig/SK_Medusa_Skeleton.SK_Medusa_Skeleton clips=4/4 boundsTop=55.00 figureTop=55.00 budget=55.0
+2026.10.04-23.15.54 ARTPREVIEW click capsule fighter=f-0-hero mesh=SK_Medusa_H2LD physicsAsset=0 radius=11.6 halfHeight=27.5 top=55.0 bodyCollision=0 source=meshBounds
+2026.10.04-23.15.54 ARTPREVIEW fighter=Medusa hero=1 eligible=0 visual=1 mesh=SK_Medusa_H2LD
+2026.10.04-23.15.54 ARTPREVIEW team ring fighter=f-0-hero team=P1 look=P1 mode=absolute shape=circle shown=1 mesh=SM_Marker_TeamRing_P1 fill=#E8C06A keyline=#111317 fillLinear=(0.8070,0.5271,0.1441) zMin=0.60 zMax=1.20 scale=1.00 base=hidden blockout=0 art=1 rim=#FFFFFF
+2026.10.04-23.15.54 ARTPREVIEW anim fighter=f-0-hero clip=Idle len=2.333 event=spawn loop=1 phase=0.8071 seq=-1 asset=AM_Medusa_Idle
+2026.10.04-23.15.54 ARTPREVIEW readability contact shadow material=/Game/EnvMaps/M_MapContactShadow.M_MapContactShadow loaded=1
+2026.10.04-23.15.54 ARTPREVIEW readability fighter=f-0-hero hero=1 contactShadow=1 diameterUU=52.0 strength=0.25 leaderPip=1 look=P1 ringScale=1.00
+2026.10.04-23.15.54 ARTPREVIEW heroesV2 fighter=f-0-sk0 mesh=/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD mi=/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_P1 yaw=270.0 scale=1.0000 name=Harpies hero=0 look=P1 base=/Game/PipelineCandidates/Harpy/H3LD/Meshes/SM_Harpy_H3LD_Base baseMi=/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_Base_P1 skeleton=/Game/PipelineCandidates/Harpy/Rig/SK_Harpy_Skeleton.SK_Harpy_Skeleton clips=4/4 boundsTop=42.00 figureTop=42.00 budget=42.0
+2026.10.04-23.15.54 ARTPREVIEW click capsule fighter=f-0-sk0 mesh=SK_Harpy_H3LD physicsAsset=0 radius=20.0 halfHeight=21.0 top=42.0 bodyCollision=0 source=meshBounds
+2026.10.04-23.15.54 ARTPREVIEW team ring fighter=f-0-sk0 team=P1 look=P1 mode=absolute shape=circle shown=1 mesh=SM_Marker_TeamRing_P1 fill=#E8C06A keyline=#111317 fillLinear=(0.8070,0.5271,0.1441) zMin=0.60 zMax=1.20 scale=0.78 base=hidden blockout=0 art=1 rim=#FFFFFF
+2026.10.04-23.15.54 ARTPREVIEW anim fighter=f-0-sk0 clip=Idle len=2.000 event=spawn loop=1 phase=0.6635 seq=-1 asset=AM_Harpy_Idle
+2026.10.04-23.15.54 ARTPREVIEW readability fighter=f-0-sk0 hero=0 contactShadow=1 diameterUU=40.6 strength=0.25 leaderPip=0 look=P1 ringScale=0.78
+2026.10.04-23.15.54 ARTPREVIEW heroesV2 fighter=f-0-sk1 mesh=/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD mi=/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_P1 yaw=90.0 scale=1.0000 name=Harpies hero=0 look=P1 base=/Game/PipelineCandidates/Harpy/H3LD/Meshes/SM_Harpy_H3LD_Base baseMi=/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_Base_P1 skeleton=/Game/PipelineCandidates/Harpy/Rig/SK_Harpy_Skeleton.SK_Harpy_Skeleton clips=4/4 boundsTop=42.00 figureTop=42.00 budget=42.0
+2026.10.04-23.15.54 ARTPREVIEW click capsule fighter=f-0-sk1 mesh=SK_Harpy_H3LD physicsAsset=0 radius=20.0 halfHeight=21.0 top=42.0 bodyCollision=0 source=meshBounds
+2026.10.04-23.15.54 ARTPREVIEW team ring fighter=f-0-sk1 team=P1 look=P1 mode=absolute shape=circle shown=1 mesh=SM_Marker_TeamRing_P1 fill=#E8C06A keyline=#111317 fillLinear=(0.8070,0.5271,0.1441) zMin=0.60 zMax=1.20 scale=0.78 base=hidden blockout=0 art=1 rim=#FFFFFF
+2026.10.04-23.15.54 ARTPREVIEW anim fighter=f-0-sk1 clip=Idle len=2.000 event=spawn loop=1 phase=0.9016 seq=-1 asset=AM_Harpy_Idle
+2026.10.04-23.15.54 ARTPREVIEW readability fighter=f-0-sk1 hero=0 contactShadow=1 diameterUU=40.6 strength=0.25 leaderPip=0 look=P1 ringScale=0.78
+2026.10.04-23.15.54 ARTPREVIEW heroesV2 fighter=f-0-sk2 mesh=/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD mi=/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_P1 yaw=270.0 scale=1.0000 name=Harpies hero=0 look=P1 base=/Game/PipelineCandidates/Harpy/H3LD/Meshes/SM_Harpy_H3LD_Base baseMi=/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_Base_P1 skeleton=/Game/PipelineCandidates/Harpy/Rig/SK_Harpy_Skeleton.SK_Harpy_Skeleton clips=4/4 boundsTop=42.00 figureTop=42.00 budget=42.0
+2026.10.04-23.15.54 ARTPREVIEW click capsule fighter=f-0-sk2 mesh=SK_Harpy_H3LD physicsAsset=0 radius=20.0 halfHeight=21.0 top=42.0 bodyCollision=0 source=meshBounds
+2026.10.04-23.15.54 ARTPREVIEW team ring fighter=f-0-sk2 team=P1 look=P1 mode=absolute shape=circle shown=1 mesh=SM_Marker_TeamRing_P1 fill=#E8C06A keyline=#111317 fillLinear=(0.8070,0.5271,0.1441) zMin=0.60 zMax=1.20 scale=0.78 base=hidden blockout=0 art=1 rim=#FFFFFF
+2026.10.04-23.15.54 ARTPREVIEW anim fighter=f-0-sk2 clip=Idle len=2.000 event=spawn loop=1 phase=0.1873 seq=-1 asset=AM_Harpy_Idle
+2026.10.04-23.15.54 ARTPREVIEW readability fighter=f-0-sk2 hero=0 contactShadow=1 diameterUU=40.6 strength=0.25 leaderPip=0 look=P1 ringScale=0.78
+2026.10.04-23.15.54 ARTPREVIEW heroesV2 fighter=f-1-hero mesh=/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SK_KingArthur_H2LD mi=/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_P2 yaw=270.0 scale=1.0000 name=King Arthur hero=1 look=P2 base=/Game/PipelineCandidates/KingArthur/H2LD/Meshes/SM_KingArthur_H2LD_Base baseMi=/Game/PipelineCandidates/KingArthur/H2LD/Materials/MI_KingArthur_H2LD_Base_P2 skeleton=/Game/PipelineCandidates/KingArthur/Rig/SK_KingArthur_Skeleton.SK_KingArthur_Skeleton clips=4/4 boundsTop=60.06 figureTop=55.00 budget=55.0
+2026.10.04-23.15.54 ARTPREVIEW click capsule fighter=f-1-hero mesh=SK_KingArthur_H2LD physicsAsset=0 radius=12.8 halfHeight=30.0 top=60.1 bodyCollision=0 source=meshBounds
+2026.10.04-23.15.54 ARTPREVIEW team ring fighter=f-1-hero team=P2 look=P2 mode=absolute shape=hexagon shown=1 mesh=SM_Marker_TeamRing_P2 fill=#5A7F9F keyline=#111317 fillLinear=(0.1022,0.2122,0.3467) zMin=0.60 zMax=1.20 scale=1.00 base=hidden blockout=0 art=1 rim=#FFFFFF
+2026.10.04-23.15.54 ARTPREVIEW anim fighter=f-1-hero clip=Idle len=2.500 event=spawn loop=1 phase=0.3470 seq=-1 asset=AM_KingArthur_Idle
+2026.10.04-23.15.54 ARTPREVIEW readability fighter=f-1-hero hero=1 contactShadow=1 diameterUU=52.0 strength=0.25 leaderPip=1 look=P2 ringScale=1.00
+2026.10.04-23.15.54 ARTPREVIEW heroesV2 fighter=f-1-sk0 mesh=/Game/PipelineCandidates/Merlin/H2LD/Meshes/SK_Merlin_H2LD mi=/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_P2 yaw=270.0 scale=1.0003 name=Merlin hero=0 look=P2 base=/Game/PipelineCandidates/Merlin/H2LD/Meshes/SM_Merlin_H2LD_Base baseMi=/Game/PipelineCandidates/Merlin/H2LD/Materials/MI_Merlin_H2LD_Base_P2 skeleton=/Game/PipelineCandidates/Merlin/Rig/SK_Merlin_Skeleton.SK_Merlin_Skeleton clips=4/4 boundsTop=49.44 figureTop=45.00 budget=45.0
+2026.10.04-23.15.54 ARTPREVIEW click capsule fighter=f-1-sk0 mesh=SK_Merlin_H2LD physicsAsset=0 radius=10.5 halfHeight=24.7 top=49.4 bodyCollision=0 source=meshBounds
+2026.10.04-23.15.54 ARTPREVIEW team ring fighter=f-1-sk0 team=P2 look=P2 mode=absolute shape=hexagon shown=1 mesh=SM_Marker_TeamRing_P2 fill=#5A7F9F keyline=#111317 fillLinear=(0.1022,0.2122,0.3467) zMin=0.60 zMax=1.20 scale=0.78 base=hidden blockout=0 art=1 rim=#FFFFFF
+2026.10.04-23.15.54 ARTPREVIEW anim fighter=f-1-sk0 clip=Idle len=3.000 event=spawn loop=1 phase=0.8028 seq=-1 asset=AM_Merlin_Idle
+2026.10.04-23.15.54 ARTPREVIEW readability fighter=f-1-sk0 hero=0 contactShadow=1 diameterUU=40.6 strength=0.25 leaderPip=0 look=P2 ringScale=0.78
+2026.10.04-23.15.54 ARTPREVIEW hero-light rig fighter=f-0-hero layers=2 height=55.0 channel=1 shadowMaps=0 indirect=0 translucency=0 pedestal=0 key=7.00lux rim=3.50lux key=(-103,60,138)d160/17.984cd/r353/cone22-32/#FFF0E0/spec0.50/contact0.100 rim=(-16,-59,55)d66/1.528cd/r132/cone16-30/#A8C0FF/spec0.80/contact0.000
+2026.10.04-23.15.54 ARTPREVIEW hero-light fighter=f-0-hero state=idle layers=2 lightsOn=2 keyCd=17.984 rimCd=1.528 mul=1.000 pulse=none
+2026.10.04-23.15.54 ARTPREVIEW hero-light rig fighter=f-0-sk0 layers=2 height=42.0 channel=1 shadowMaps=0 indirect=0 translucency=0 pedestal=0 key=7.00lux rim=3.50lux key=(-79,45,105)d122/10.487cd/r269/cone22-32/#FFF0E0/spec0.50/contact0.100 rim=(-12,-45,42)d50/0.891cd/r101/cone16-30/#A8C0FF/spec0.80/contact0.000
+2026.10.04-23.15.54 ARTPREVIEW hero-light fighter=f-0-sk0 state=idle layers=2 lightsOn=2 keyCd=10.487 rimCd=0.891 mul=1.000 pulse=none
+2026.10.04-23.15.54 ARTPREVIEW hero-light rig fighter=f-0-sk1 layers=2 height=42.0 channel=1 shadowMaps=0 indirect=0 translucency=0 pedestal=0 key=7.00lux rim=3.50lux key=(-79,45,105)d122/10.487cd/r269/cone22-32/#FFF0E0/spec0.50/contact0.100 rim=(-12,-45,42)d50/0.891cd/r101/cone16-30/#A8C0FF/spec0.80/contact0.000
+2026.10.04-23.15.54 ARTPREVIEW hero-light fighter=f-0-sk1 state=idle layers=2 lightsOn=2 keyCd=10.487 rimCd=0.891 mul=1.000 pulse=none
+2026.10.04-23.15.54 ARTPREVIEW hero-light rig fighter=f-0-sk2 layers=2 height=42.0 channel=1 shadowMaps=0 indirect=0 translucency=0 pedestal=0 key=7.00lux rim=3.50lux key=(-79,45,105)d122/10.487cd/r269/cone22-32/#FFF0E0/spec0.50/contact0.100 rim=(-12,-45,42)d50/0.891cd/r101/cone16-30/#A8C0FF/spec0.80/contact0.000
+2026.10.04-23.15.54 ARTPREVIEW hero-light fighter=f-0-sk2 state=idle layers=2 lightsOn=2 keyCd=10.487 rimCd=0.891 mul=1.000 pulse=none
+2026.10.04-23.15.54 ARTPREVIEW hero-light rig fighter=f-1-hero layers=2 height=60.1 channel=1 shadowMaps=0 indirect=0 translucency=0 pedestal=0 key=7.00lux rim=3.50lux key=(-113,65,150)d175/21.443cd/r385/cone22-32/#FFF0E0/spec0.50/contact0.100 rim=(-17,-65,60)d72/1.822cd/r144/cone16-30/#A8C0FF/spec0.80/contact0.000
+2026.10.04-23.15.54 ARTPREVIEW hero-light fighter=f-1-hero state=idle layers=2 lightsOn=2 keyCd=21.443 rimCd=1.822 mul=1.000 pulse=none
+2026.10.04-23.15.54 ARTPREVIEW hero-light rig fighter=f-1-sk0 layers=2 height=49.4 channel=1 shadowMaps=0 indirect=0 translucency=0 pedestal=0 key=7.00lux rim=3.50lux key=(-93,54,124)d144/14.530cd/r317/cone22-32/#FFF0E0/spec0.50/contact0.100 rim=(-14,-53,49)d59/1.234cd/r119/cone16-30/#A8C0FF/spec0.80/contact0.000
+2026.10.04-23.15.54 ARTPREVIEW hero-light fighter=f-1-sk0 state=idle layers=2 lightsOn=2 keyCd=14.530 rimCd=1.234 mul=1.000 pulse=none
+2026.10.04-23.15.54 ARTPREVIEW hero-light board profile=sarpedon-original light=sarpedon-night on=1 reason=profile fighters=6 litFigures=6 layers=2 lightsOn=12 budget=12/14 perFigure<=2 channel=1 frozen=0
+2026.10.04-23.15.54 ARTPREVIEW heroesV2 summary fighters=6 mapped=6 v2=6
+2026.10.04-23.15.54 FIGHTERS synced n=6 alive=6 own=4 enemy=2
+2026.10.04-23.15.54 STATE seq=1 -> apply
+2026.10.04-23.15.54 HUD art layer plate=1 iconSize=32 iconTexture=1 iconProbe=0 plan=2
+2026.10.04-23.15.54 HUD art impl=umg plateViews=umg:/Game/S08/UI/ArtHud/WBP_S08ArtPlate iconViews=umg-motion:S08AnimatedIconWidget:action-attack-token textTable=S08ArtHud entries=13 missingKeys=0
+2026.10.04-23.15.54 HUD tags boardPlate=1 hardPadPx=3 profile=sarpedon-original
+2026.10.04-23.15.54 TAG fighter=f-1-hero bbox=(1404,62,1506,84) mode=compact look=P2 placement=left ring=0 hardPx2=0 softPx2=0 order=0 bound=1
+2026.10.04-23.15.54 TAG fighter=f-1-sk0 bbox=(1172,255,1256,277) mode=compact look=P2 placement=above ring=0 hardPx2=0 softPx2=0 order=1 bound=1
+2026.10.04-23.15.54 ARTPREVIEW screen labels=1 (world TextRender labels and damage text hidden)
+2026.10.04-23.15.54 SUBSCRIBED gameStateUpdated since=1
+2026.10.04-23.15.54 TAG fighter=f-0-hero bbox=(623,430,725,452) mode=compact look=P1 placement=above ring=0 hardPx2=0 softPx2=0 order=0 bound=1
+2026.10.04-23.15.54 TAG fighter=f-0-sk0 bbox=(509,496,593,518) mode=compact look=P1 placement=above ring=0 hardPx2=0 softPx2=0 order=2 bound=1
+2026.10.04-23.15.54 TAG fighter=f-0-sk1 bbox=(396,458,480,480) mode=compact look=P1 placement=above ring=0 hardPx2=0 softPx2=0 order=1 bound=1
+2026.10.04-23.15.54 TAG fighter=f-0-sk2 bbox=(308,584,392,606) mode=compact look=P1 placement=left ring=0 hardPx2=0 softPx2=0 order=4 bound=1
+2026.10.04-23.15.54 TAG fighter=f-1-hero bbox=(977,619,1079,641) mode=compact look=P2 placement=left ring=0 hardPx2=0 softPx2=0 order=5 bound=1
+2026.10.04-23.15.54 TAG fighter=f-1-sk0 bbox=(1130,510,1214,532) mode=compact look=P2 placement=above ring=0 hardPx2=0 softPx2=0 order=3 bound=1
+2026.10.04-23.15.54 SNAPSHOT applied seq=1 phase=ACTION_MANEUVER
+2026.10.04-23.15.54 HANDLE_APPLIED #2 seq=1 decision=1 fightersValid=1 boardValid=1
+2026.10.04-23.15.54 MODE seq=1 mode=0 combat=0 pending=0
+2026.10.04-23.15.54 HUD seq=1 phase=ACTION_MANEUVER turn=you hand=5 oppHand=5(hidden) oppDeck=25 deck=25 discard=0
+2026.10.04-23.15.54 ARTPREVIEW fighter=Medusa hero=1 eligible=0 visual=1 mesh=SK_Medusa_H2LD
+2026.10.04-23.15.54 FIGHTERS synced n=6 alive=6 own=4 enemy=2
+2026.10.04-23.15.54 WS seq=1 phase=ACTION_MANEUVER (merge)
+2026.10.04-23.15.54 TAG fighter=f-0-hero bbox=(623,430,725,452) mode=compact look=P1 placement=above ring=0 hardPx2=0 softPx2=0 order=0 bound=1
+2026.10.04-23.15.54 TAG fighter=f-0-sk0 bbox=(509,496,593,518) mode=compact look=P1 placement=above ring=0 hardPx2=0 softPx2=0 order=2 bound=1
+2026.10.04-23.15.54 TAG fighter=f-0-sk1 bbox=(396,458,480,480) mode=compact look=P1 placement=above ring=0 hardPx2=0 softPx2=0 order=1 bound=1
+2026.10.04-23.15.54 TAG fighter=f-0-sk2 bbox=(308,584,392,606) mode=compact look=P1 placement=left ring=0 hardPx2=0 softPx2=0 order=4 bound=1
+2026.10.04-23.15.54 TAG fighter=f-1-hero bbox=(977,619,1079,641) mode=compact look=P2 placement=left ring=0 hardPx2=0 softPx2=0 order=5 bound=1
+2026.10.04-23.15.54 TAG fighter=f-1-sk0 bbox=(1130,510,1214,532) mode=compact look=P2 placement=above ring=0 hardPx2=0 softPx2=0 order=3 bound=1
+2026.10.04-23.15.55 PERF window t=15.0-20.0 frames=145 fps=28.96 frameMs avg=34.53 p50=33.33 p95=33.33 p99=51.84 max=188.34 hitches50=2 gpuMs avg=1.96 p50=1.47 p95=3.24 gameMs avg=2.49 p95=1.57 renderMs avg=3.65 p95=3.70
+2026.10.04-23.15.56 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.15.59 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.16.00 PERF window t=20.0-25.1 frames=151 fps=30.00 frameMs avg=33.33 p50=33.33 p95=33.33 p99=33.33 max=33.34 hitches50=0 gpuMs avg=3.08 p50=3.07 p95=3.67 gameMs avg=1.33 p95=1.61 renderMs avg=3.18 p95=3.74
+2026.10.04-23.16.02 MS-DRAFT op=predraft rev=1 src=auto fighter=f-0-hero dest=S10 status=ok required=0
+2026.10.04-23.16.02 ARTPREVIEW selection ring shown fighter=Medusa mesh=SM_Marker_SelectionRing
+2026.10.04-23.16.02 ARTPREVIEW hero-light fighter=f-0-hero state=active layers=2 lightsOn=2 keyCd=21.400 rimCd=1.818 mul=1.190 pulse=0.40Hz+-4%
+2026.10.04-23.16.02 MS-HL view source=inspect rev=1172954953 plates=35 fill=21 ring=32 outline=0 glyph=0 paths=1 updates=53 hover=-
+2026.10.04-23.16.02 TOAST text="AUTO maneuver: f-0-hero -> S10 (through the draft)"
+2026.10.04-23.16.02 HUD plate content fighter=f-0-hero name=Medusa hp=16/16 team=own statuses=HERO  |  RANGED teamSlot=P1 look=P1 shape=circle chip=#DAC576
+2026.10.04-23.16.02 PLATE fighter=f-0-hero bbox=(366,210,538,264) overlapReachable=0 placement=above ring=23 gap=212 selection=f-0-hero destinations=19 clean=1 softPx2=0 tested=4896 bound=1
+2026.10.04-23.16.02 TAG fighter=f-0-sk0 bbox=(509,496,593,518) mode=compact look=P1 placement=above ring=0 hardPx2=0 softPx2=0 order=1 bound=1
+2026.10.04-23.16.02 TAG fighter=f-0-sk1 bbox=(396,458,480,480) mode=compact look=P1 placement=above ring=0 hardPx2=0 softPx2=0 order=0 bound=1
+2026.10.04-23.16.02 TAG fighter=f-0-sk2 bbox=(308,584,392,606) mode=compact look=P1 placement=left ring=0 hardPx2=0 softPx2=0 order=3 bound=1
+2026.10.04-23.16.02 TAG fighter=f-1-hero bbox=(977,619,1079,641) mode=compact look=P2 placement=left ring=0 hardPx2=0 softPx2=0 order=4 bound=1
+2026.10.04-23.16.02 TAG fighter=f-1-sk0 bbox=(1130,510,1214,532) mode=compact look=P2 placement=above ring=0 hardPx2=0 softPx2=0 order=2 bound=1
+2026.10.04-23.16.02 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.16.02 SNAPSHOT applied seq=2 phase=ACTION_MANEUVER
+2026.10.04-23.16.02 HANDLE_APPLIED #3 seq=2 decision=2 fightersValid=1 boardValid=1
+2026.10.04-23.16.02 MS-DRAFT op=assign rev=3 src=auto fighter=f-0-hero dest=S10 order=1 status=ok required=0 boost=0 moves=1 ok=1 needboost=0 conflict=0
+2026.10.04-23.16.02 MS-PATH fighter=f-0-hero steps=1 allowance=3 key=canonical cells=S20>S10
+2026.10.04-23.16.02 MS-DRAFT op=candidates rev=3 src=snapshot n=4 ids=f-0-hero,f-0-sk0,f-0-sk1,f-0-sk2 autoselect=-
+2026.10.04-23.16.02 MANEUVER-DRAFT mode=maneuver:1:1
+2026.10.04-23.16.02 DRAFT-OPEN draw committed (resume instead of begin)
+2026.10.04-23.16.02 MODE seq=2 mode=1 combat=0 pending=0
+2026.10.04-23.16.02 HUD seq=2 phase=ACTION_MANEUVER turn=you hand=6 oppHand=5(hidden) oppDeck=25 deck=24 discard=0
+2026.10.04-23.16.02 ARTPREVIEW fighter=Medusa hero=1 eligible=0 visual=1 mesh=SK_Medusa_H2LD
+2026.10.04-23.16.02 ARTPREVIEW selection ring shown fighter=Medusa mesh=SM_Marker_SelectionRing
+2026.10.04-23.16.02 FIGHTERS synced n=6 alive=6 own=4 enemy=2
+2026.10.04-23.16.02 ARTPREVIEW selection ring shown fighter=Medusa mesh=SM_Marker_SelectionRing
+2026.10.04-23.16.02 MS-HL view source=draft rev=2867574334 plates=35 fill=21 ring=32 outline=0 glyph=0 paths=1 updates=2 hover=-
+2026.10.04-23.16.02 MANEUVER begin seq=2 (apply) pending=maneuver:1:1
+2026.10.04-23.16.02 SNAPSHOT applied seq=2 phase=ACTION_MANEUVER
+2026.10.04-23.16.02 HANDLE_APPLIED #4 seq=2 decision=1 fightersValid=1 boardValid=1
+2026.10.04-23.16.02 MS-DRAFT op=snapshot rev=4 src=snapshot boost=0 moves=1 ok=1 needboost=0 conflict=0
+2026.10.04-23.16.02 MODE seq=2 mode=1 combat=0 pending=0
+2026.10.04-23.16.02 HUD seq=2 phase=ACTION_MANEUVER turn=you hand=6 oppHand=5(hidden) oppDeck=25 deck=24 discard=0
+2026.10.04-23.16.02 ARTPREVIEW fighter=Medusa hero=1 eligible=0 visual=1 mesh=SK_Medusa_H2LD
+2026.10.04-23.16.02 ARTPREVIEW selection ring shown fighter=Medusa mesh=SM_Marker_SelectionRing
+2026.10.04-23.16.02 FIGHTERS synced n=6 alive=6 own=4 enemy=2
+2026.10.04-23.16.02 ARTPREVIEW selection ring shown fighter=Medusa mesh=SM_Marker_SelectionRing
+2026.10.04-23.16.02 WS seq=2 phase=ACTION_MANEUVER (merge)
+2026.10.04-23.16.02 AUTO maneuver draft hold=2.5 selected=f-0-hero
+2026.10.04-23.16.02 TAG fighter=f-0-sk0 bbox=(509,496,593,518) mode=compact look=P1 placement=above ring=0 hardPx2=0 softPx2=0 order=1 bound=1
+2026.10.04-23.16.02 TAG fighter=f-0-sk1 bbox=(396,458,480,480) mode=compact look=P1 placement=above ring=0 hardPx2=0 softPx2=0 order=0 bound=1
+2026.10.04-23.16.02 TAG fighter=f-0-sk2 bbox=(308,584,392,606) mode=compact look=P1 placement=left ring=0 hardPx2=0 softPx2=0 order=3 bound=1
+2026.10.04-23.16.02 TAG fighter=f-1-hero bbox=(977,619,1079,641) mode=compact look=P2 placement=left ring=0 hardPx2=0 softPx2=0 order=4 bound=1
+2026.10.04-23.16.02 TAG fighter=f-1-sk0 bbox=(1130,510,1214,532) mode=compact look=P2 placement=above ring=0 hardPx2=0 softPx2=0 order=2 bound=1
+2026.10.04-23.16.03 SHOT ctx viewport=1920x1080 viewTarget=CameraActor_2147482088 cam=(0,1342,1917) rot=(-55,-90,0)
+2026.10.04-23.16.03 RENDER tag=SHOT rhi=D3D12 featureLevel=SM6 shaderPlatform=PCD3D_SM6 lumenPlatform=1 gi=lumen giMethod=1 refl=lumen reflMethod=1 shadows=csm vsmEnable=0 sg.res=100 sg.view=2 sg.aa=2 sg.shadow=2 sg.gi=2 sg.refl=2 sg.pp=2 sg.tex=2 sg.fx=2 sg.foliage=2 sg.shading=2 sg.landscape=2 preset=High screenPct=100.0 screenPctMode=0 aa=TSR aaMethod=4 exposure=fixed-histogram expMin=4.14106 expMax=4.14106 expBias=0.000 ev100=2.05 lightUnits=candelas sky=1 skyIntensity=3.000 keyShadow=csm-3600uu-2c-contact0.000 shadowCasters=1 profile=sarpedon-night profilesSha256=0a3417258f46ad3d99620bcbabd1b37615192b7a59f090c77515189845b33bb7 profilesSource=pak legacyRender=0 gameLayer=unlit-eyeadaptinv tMaxFPS=30.0 vsync=0 frameRateLimit=60.0 substrate=0 nanite=1 meshDF=1 viewport=1920x1080 reference=1
+2026.10.04-23.16.03 SHOT fighter f-0-hero pos=(2,2) world=(-218,-13,0) screen=(678,527) projected=1 alive=1
+2026.10.04-23.16.03 SHOT fighter f-0-sk0 pos=(1,3) world=(-309,33,0) screen=(555,576) projected=1 alive=1
+2026.10.04-23.16.03 SHOT fighter f-0-sk1 pos=(0,2) world=(-398,-3,0) screen=(442,537) projected=1 alive=1
+2026.10.04-23.16.03 SHOT fighter f-0-sk2 pos=(0,3) world=(-394,92,0) screen=(435,640) projected=1 alive=1
+2026.10.04-23.16.03 SHOT fighter f-1-hero pos=(5,4) world=(119,141,0) screen=(1120,695) projected=1 alive=1
+2026.10.04-23.16.03 SHOT fighter f-1-sk0 pos=(6,3) world=(159,52,0) screen=(1169,596) projected=1 alive=1
+2026.10.04-23.16.03 SHOT camera dist=2340.2 target=2340.2 overview=2340.2 errPct=0.000 focusErr=0.00 settled=1 zoom=1.00
+2026.10.04-23.16.03 SHOT head fighter=f-0-hero socket=Head mesh=SK_Medusa_H2LD world=(-218.0,-12.2,47.2) screen=(672.4,491.2) top=(671.8,486.5) bottom=(673.0,495.8) headPx=9.4 projected=1
+2026.10.04-23.16.03 SHOT head fighter=f-0-sk0 socket=Head mesh=SK_Harpy_H3LD world=(-308.8,28.4,34.3) screen=(550.5,544.7) top=(549.6,540.2) bottom=(551.4,549.3) headPx=9.3 projected=1
+2026.10.04-23.16.03 SHOT head fighter=f-0-sk1 socket=Head mesh=SK_Harpy_H3LD world=(-399.0,2.5,34.1) screen=(434.2,517.0) top=(433.1,512.4) bottom=(435.3,521.5) headPx=9.4 projected=1
+2026.10.04-23.16.03 SHOT head fighter=f-0-sk2 socket=Head mesh=SK_Harpy_H3LD world=(-393.9,86.8,34.0) screen=(429.9,609.5) top=(428.7,605.0) bottom=(431.0,613.9) headPx=9.3 projected=1
+2026.10.04-23.16.03 SHOT head fighter=f-1-hero socket=Head mesh=SK_KingArthur_H2LD world=(119.5,140.5,50.0) screen=(1124.0,658.5) top=(1124.3,654.1) bottom=(1123.6,663.0) headPx=9.0 projected=1
+2026.10.04-23.16.03 SHOT head fighter=f-1-sk0 socket=Head mesh=SK_Merlin_H2LD world=(159.0,49.1,36.7) screen=(1172.1,565.6) top=(1172.6,561.1) bottom=(1171.7,570.1) headPx=9.1 projected=1
+2026.10.04-23.16.03 SHOT selection fighter=f-0-hero ownCell=(2,2) legal=20 destinations=19 ownCellExcluded=1 plateFighter=f-0-hero
+2026.10.04-23.16.03 SHOT reachable fighter=f-0-hero n=19 cells=(0,0)(1,0)(2,0)(3,0)(4,0)(0,1)(1,1)(2,1)(3,1)(4,1)(5,1)(3,2)(2,3)(0,4)(1,4)(2,4)(3,4)(4,4)(1,5)
+2026.10.04-23.16.03 SHOT plate fighter=f-0-hero bbox=(366,210,538,264) overlapReachable=0 placement=above gap=212 anchor=(632,454,716,557) planned=(366,210,538,264) geom=painted stableFrames=27
+2026.10.04-23.16.03 SHOT figure fighter=f-0-hero bbox=(632,454,716,557) ringR=28.50 art=1 blockout=0 team=P1 look=P1 ring=1
+2026.10.04-23.16.03 SHOT figure fighter=f-0-sk0 bbox=(516,520,586,600) ringR=22.23 art=1 blockout=0 team=P1 look=P1 ring=1
+2026.10.04-23.16.03 SHOT figure fighter=f-0-sk1 bbox=(402,482,474,561) ringR=22.23 art=1 blockout=0 team=P1 look=P1 ring=1
+2026.10.04-23.16.03 SHOT figure fighter=f-0-sk2 bbox=(394,584,467,665) ringR=22.23 art=1 blockout=0 team=P1 look=P1 ring=1
+2026.10.04-23.16.03 SHOT figure fighter=f-1-hero bbox=(1081,619,1165,728) ringR=28.50 art=1 blockout=0 team=P2 look=P2 ring=1
+2026.10.04-23.16.03 SHOT figure fighter=f-1-sk0 bbox=(1139,534,1204,620) ringR=22.23 art=1 blockout=0 team=P2 look=P2 ring=1
+2026.10.04-23.16.03 SHOT request file=draft-sarpedon-host.png frame=833
+2026.10.04-23.16.03 SHOT requested: FScreenshotRequest(bShowUI) -> C:/tmp/b-live/draft-sarpedon-host.png
+2026.10.04-23.16.03 SHOT captured file=draft-sarpedon-host.png frame=833 px=1920x1080 sha256=f843f02f4959cb93b5c7aebc7628e4a375620ce8fd8beca3b9a25abdb62dce77 order=BGRA saved=1
+2026.10.04-23.16.03 SHOT late begin file=draft-sarpedon-host.png frame=833 requestFrame=833
+2026.10.04-23.16.03 SHOT iconstate visible=0 lastFighter=none frame=833
+2026.10.04-23.16.03 SHOT widget id=plate impl=umg state=own fighter=f-0-hero bbox=(366,210,538,264) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtPlate frame=833
+2026.10.04-23.16.03 SHOT widget id=plate.marker impl=umg state=own fighter=f-0-hero bbox=(366,210,538,213) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtPlate frame=833
+2026.10.04-23.16.03 SHOT widget id=plate.name impl=umg state=own fighter=f-0-hero bbox=(372,215,472,234) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtPlate frame=833
+2026.10.04-23.16.03 SHOT widget id=plate.team impl=umg state=own fighter=f-0-hero bbox=(472,218,532,231) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtPlate frame=833
+2026.10.04-23.16.03 SHOT widget id=plate.hpbar impl=umg state=own fighter=f-0-hero bbox=(372,240,468,247) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtPlate frame=833
+2026.10.04-23.16.03 SHOT widget id=plate.hpfill impl=umg state=own fighter=f-0-hero bbox=(372,240,468,247) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtPlate frame=833
+2026.10.04-23.16.03 SHOT widget id=plate.hp impl=umg state=own fighter=f-0-hero bbox=(474,236,527,251) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtPlate frame=833
+2026.10.04-23.16.03 SHOT widget id=plate.status impl=umg state=own fighter=f-0-hero bbox=(372,253,532,266) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtPlate frame=833
+2026.10.04-23.16.03 SHOT widget id=plate.teamshape impl=umg state=own fighter=f-0-hero bbox=(476,219,488,231) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtPlate frame=833
+2026.10.04-23.16.03 SHOT widget id=board.tag impl=umg state=hidden fighter=f-0-hero bbox=(0,0,0,0) geom=unpainted visible=0 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=hidden look=P1 shape=circle placement=above ring=0 order=0 bound=1 softPx2=0 planned=(623,430,725,452) frame=833
+2026.10.04-23.16.03 SHOT widget id=board.tag.hp impl=umg state=hidden fighter=f-0-hero bbox=(0,0,0,0) geom=unpainted visible=0 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=hidden look=P1 shape=circle placement=above ring=0 order=0 bound=1 softPx2=0 planned=(623,430,725,452) frame=833 font=11
+2026.10.04-23.16.03 SHOT widget id=board.tag.bar impl=umg state=hidden fighter=f-0-hero bbox=(0,0,0,0) geom=unpainted visible=0 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=hidden look=P1 shape=circle placement=above ring=0 order=0 bound=1 softPx2=0 planned=(623,430,725,452) frame=833
+2026.10.04-23.16.03 SHOT widget id=board.tag.chip impl=umg state=hidden fighter=f-0-hero bbox=(0,0,0,0) geom=unpainted visible=0 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=hidden look=P1 shape=circle placement=above ring=0 order=0 bound=1 softPx2=0 planned=(623,430,725,452) frame=833
+2026.10.04-23.16.03 SHOT widget id=board.tag impl=umg state=compact fighter=f-0-sk0 bbox=(509,496,593,518) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P1 shape=circle placement=above ring=0 order=1 bound=1 softPx2=0 planned=(509,496,593,518) frame=833
+2026.10.04-23.16.03 SHOT widget id=board.tag.hp impl=umg state=compact fighter=f-0-sk0 bbox=(565,498,589,516) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P1 shape=circle placement=above ring=0 order=1 bound=1 softPx2=0 planned=(509,496,593,518) frame=833 font=11
+2026.10.04-23.16.03 SHOT widget id=board.tag.bar impl=umg state=compact fighter=f-0-sk0 bbox=(528,505,562,510) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P1 shape=circle placement=above ring=0 order=1 bound=1 softPx2=0 planned=(509,496,593,518) frame=833
+2026.10.04-23.16.03 SHOT widget id=board.tag.chip impl=umg state=compact fighter=f-0-sk0 bbox=(513,501,525,513) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P1 shape=circle placement=above ring=0 order=1 bound=1 softPx2=0 planned=(509,496,593,518) frame=833
+2026.10.04-23.16.03 SHOT widget id=board.tag impl=umg state=compact fighter=f-0-sk1 bbox=(396,458,480,480) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P1 shape=circle placement=above ring=0 order=0 bound=1 softPx2=0 planned=(396,458,480,480) frame=833
+2026.10.04-23.16.03 SHOT widget id=board.tag.hp impl=umg state=compact fighter=f-0-sk1 bbox=(452,460,476,478) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P1 shape=circle placement=above ring=0 order=0 bound=1 softPx2=0 planned=(396,458,480,480) frame=833 font=11
+2026.10.04-23.16.03 SHOT widget id=board.tag.bar impl=umg state=compact fighter=f-0-sk1 bbox=(415,467,449,472) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P1 shape=circle placement=above ring=0 order=0 bound=1 softPx2=0 planned=(396,458,480,480) frame=833
+2026.10.04-23.16.03 SHOT widget id=board.tag.chip impl=umg state=compact fighter=f-0-sk1 bbox=(400,463,412,475) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P1 shape=circle placement=above ring=0 order=0 bound=1 softPx2=0 planned=(396,458,480,480) frame=833
+2026.10.04-23.16.03 SHOT widget id=board.tag impl=umg state=compact fighter=f-0-sk2 bbox=(308,584,392,606) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P1 shape=circle placement=left ring=0 order=3 bound=1 softPx2=0 planned=(308,584,392,606) frame=833
+2026.10.04-23.16.03 SHOT widget id=board.tag.hp impl=umg state=compact fighter=f-0-sk2 bbox=(364,586,388,604) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P1 shape=circle placement=left ring=0 order=3 bound=1 softPx2=0 planned=(308,584,392,606) frame=833 font=11
+2026.10.04-23.16.03 SHOT widget id=board.tag.bar impl=umg state=compact fighter=f-0-sk2 bbox=(327,593,361,598) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P1 shape=circle placement=left ring=0 order=3 bound=1 softPx2=0 planned=(308,584,392,606) frame=833
+2026.10.04-23.16.03 SHOT widget id=board.tag.chip impl=umg state=compact fighter=f-0-sk2 bbox=(312,589,324,601) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P1 shape=circle placement=left ring=0 order=3 bound=1 softPx2=0 planned=(308,584,392,606) frame=833
+2026.10.04-23.16.03 SHOT widget id=board.tag impl=umg state=compact fighter=f-1-hero bbox=(977,619,1079,641) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P2 shape=hex placement=left ring=0 order=4 bound=1 softPx2=0 planned=(977,619,1079,641) frame=833
+2026.10.04-23.16.03 SHOT widget id=board.tag.hp impl=umg state=compact fighter=f-1-hero bbox=(1033,621,1075,639) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P2 shape=hex placement=left ring=0 order=4 bound=1 softPx2=0 planned=(977,619,1079,641) frame=833 font=11
+2026.10.04-23.16.03 SHOT widget id=board.tag.bar impl=umg state=compact fighter=f-1-hero bbox=(996,628,1030,633) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P2 shape=hex placement=left ring=0 order=4 bound=1 softPx2=0 planned=(977,619,1079,641) frame=833
+2026.10.04-23.16.03 SHOT widget id=board.tag.chip impl=umg state=compact fighter=f-1-hero bbox=(981,624,993,636) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P2 shape=hex placement=left ring=0 order=4 bound=1 softPx2=0 planned=(977,619,1079,641) frame=833
+2026.10.04-23.16.03 SHOT widget id=board.tag impl=umg state=compact fighter=f-1-sk0 bbox=(1130,510,1214,532) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P2 shape=hex placement=above ring=0 order=2 bound=1 softPx2=0 planned=(1130,510,1214,532) frame=833
+2026.10.04-23.16.03 SHOT widget id=board.tag.hp impl=umg state=compact fighter=f-1-sk0 bbox=(1186,512,1210,530) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P2 shape=hex placement=above ring=0 order=2 bound=1 softPx2=0 planned=(1130,510,1214,532) frame=833 font=11
+2026.10.04-23.16.03 SHOT widget id=board.tag.bar impl=umg state=compact fighter=f-1-sk0 bbox=(1149,519,1183,524) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P2 shape=hex placement=above ring=0 order=2 bound=1 softPx2=0 planned=(1130,510,1214,532) frame=833
+2026.10.04-23.16.03 SHOT widget id=board.tag.chip impl=umg state=compact fighter=f-1-sk0 bbox=(1134,515,1146,527) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P2 shape=hex placement=above ring=0 order=2 bound=1 softPx2=0 planned=(1130,510,1214,532) frame=833
+2026.10.04-23.16.03 SHOT panel id=hud.command bbox=(0,0,772,156) geom=painted visible=1 frame=833
+2026.10.04-23.16.03 SHOT panel id=hud.side bbox=(1432,0,1920,121) geom=painted visible=1 frame=833
+2026.10.04-23.16.03 SHOT panel id=hud.hand bbox=(359,985,1561,1080) geom=painted visible=1 frame=833
+2026.10.04-23.16.03 SHOT late end file=draft-sarpedon-host.png frame=833
+2026.10.04-23.16.03 ARTPREVIEW selection ring shown fighter=Medusa mesh=SM_Marker_SelectionRing
+2026.10.04-23.16.03 ARTPREVIEW selection ownHero=1 selected=1 fighter=Medusa reachable=20 fighterId=f-0-hero
+2026.10.04-23.16.03 INPUT select src=flag fighter=f-0-hero flag=ArtPreviewSelectOwnHero
+2026.10.04-23.16.05 MS-DRAFT op=boost rev=5 src=auto boost=4 moves=1 ok=1 needboost=0 conflict=0
+2026.10.04-23.16.05 MS-DRAFT op=assign rev=7 src=auto fighter=f-0-sk0 dest=S06 order=2 status=ok required=4 boost=4 moves=2 ok=2 needboost=0 conflict=0
+2026.10.04-23.16.05 MS-PATH fighter=f-0-sk0 steps=7 allowance=7 key=canonical cells=S19>S20>S21>S12>S13>S16>S14>S06
+2026.10.04-23.16.05 MS-DRAFT op=assign rev=9 src=auto fighter=f-0-sk1 dest=S08 order=3 status=ok required=0 boost=4 moves=3 ok=3 needboost=0 conflict=0
+2026.10.04-23.16.05 MS-PATH fighter=f-0-sk1 steps=1 allowance=7 key=canonical cells=S18>S08
+2026.10.04-23.16.05 AUTO maneuver plan=boost3 ok=1 moves=3 boost=cmq7d7b4400rgwi74xj2ntnbf::0 value=4 maxRequired=4 sidekicks=2 confirmable=1 list=f-0-hero@S10:1/7,f-0-sk0@S06:7/7,f-0-sk1@S08:1/7
+2026.10.04-23.16.05 ARTPREVIEW hero-light fighter=f-0-hero state=idle layers=2 lightsOn=2 keyCd=17.984 rimCd=1.528 mul=1.000 pulse=none
+2026.10.04-23.16.05 MS-HL view source=draft rev=33244891 plates=12 fill=3 ring=7 outline=0 glyph=0 paths=3 updates=56 hover=-
+2026.10.04-23.16.05 AUTO maneuver draft open moves=3 - confirm
+2026.10.04-23.16.05 MANEUVER-CONFIRM moves=3 boost=card
+2026.10.04-23.16.05 MS-HL view source=draft rev=2999378778 plates=9 fill=3 ring=3 outline=0 glyph=0 paths=3 updates=10 hover=-
+2026.10.04-23.16.05 TAG fighter=f-0-sk0 bbox=(509,496,593,518) mode=compact look=P1 placement=above ring=0 hardPx2=0 softPx2=0 order=1 bound=1
+2026.10.04-23.16.05 TAG fighter=f-0-sk1 bbox=(396,458,480,480) mode=compact look=P1 placement=above ring=0 hardPx2=0 softPx2=0 order=0 bound=1
+2026.10.04-23.16.05 TAG fighter=f-0-sk2 bbox=(308,584,392,606) mode=compact look=P1 placement=left ring=0 hardPx2=0 softPx2=0 order=3 bound=1
+2026.10.04-23.16.05 TAG fighter=f-1-hero bbox=(977,619,1079,641) mode=compact look=P2 placement=left ring=0 hardPx2=0 softPx2=0 order=4 bound=1
+2026.10.04-23.16.05 TAG fighter=f-1-sk0 bbox=(1130,510,1214,532) mode=compact look=P2 placement=above ring=0 hardPx2=0 softPx2=0 order=2 bound=1
+2026.10.04-23.16.05 SNAPSHOT applied seq=3 phase=ACTION_MANEUVER
+2026.10.04-23.16.05 HANDLE_APPLIED #5 seq=3 decision=2 fightersValid=1 boardValid=1
+2026.10.04-23.16.05 closed mode=
+2026.10.04-23.16.05 MODE seq=3 mode=0 combat=0 pending=0
+2026.10.04-23.16.05 HUD seq=3 phase=ACTION_MANEUVER turn=you hand=5 oppHand=5(hidden) oppDeck=25 deck=24 discard=1
+2026.10.04-23.16.05 ARTPREVIEW fighter=Medusa hero=1 eligible=0 visual=1 mesh=SK_Medusa_H2LD
+2026.10.04-23.16.05 ARTPREVIEW heroesV2 fighter=f-0-sk0 mesh=/Game/PipelineCandidates/Harpy/H3LD/Meshes/SK_Harpy_H3LD mi=/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_P1 yaw=90.0 scale=1.0000 name=Harpies hero=0 look=P1 base=/Game/PipelineCandidates/Harpy/H3LD/Meshes/SM_Harpy_H3LD_Base baseMi=/Game/PipelineCandidates/Harpy/H3LD/Materials/MI_Harpy_H3LD_Base_P1 skeleton=/Game/PipelineCandidates/Harpy/Rig/SK_Harpy_Skeleton.SK_Harpy_Skeleton clips=4/4 boundsTop=42.00 figureTop=42.00 budget=42.0
+2026.10.04-23.16.05 FIGHTERS synced n=6 alive=6 own=4 enemy=2
+2026.10.04-23.16.05 ARTPREVIEW selection ring shown fighter=Medusa mesh=SM_Marker_SelectionRing
+2026.10.04-23.16.05 ARTPREVIEW hero-light fighter=f-0-hero state=active layers=2 lightsOn=2 keyCd=21.373 rimCd=1.816 mul=1.188 pulse=0.40Hz+-4%
+2026.10.04-23.16.05 MS-HL view source=reach rev=1695544162 plates=16 fill=16 ring=16 outline=0 glyph=0 paths=0 updates=38 hover=-
+2026.10.04-23.16.05 MS-CUE move seq=3 fighter=f-0-hero order=0 of=3 kind=move steps=1 source=trail start=0 ms=280 snapped=0 path=S20>S10
+2026.10.04-23.16.05 MS-CUE move seq=3 fighter=f-0-sk0 order=1 of=3 kind=move steps=7 source=trail start=196 ms=1400 snapped=0 path=S19>S20>S21>S12>S13>S16>S14>S06
+2026.10.04-23.16.05 MS-CUE move seq=3 fighter=f-0-sk1 order=2 of=3 kind=move steps=1 source=trail start=1176 ms=280 snapped=0 path=S18>S08
+2026.10.04-23.16.05 CUE move f-0-hero (2,2)->(2,1) seq=3
+2026.10.04-23.16.05 CUE move f-0-sk0 (1,3)->(7,0) seq=3
+2026.10.04-23.16.05 CUE move f-0-sk1 (0,2)->(0,1) seq=3
+2026.10.04-23.16.05 MANEUVER done seq=3 (apply) fighters=6 boost=card
+2026.10.04-23.16.05 SNAPSHOT applied seq=3 phase=ACTION_MANEUVER
+2026.10.04-23.16.05 HANDLE_APPLIED #6 seq=3 decision=1 fightersValid=1 boardValid=1
+2026.10.04-23.16.05 MODE seq=3 mode=0 combat=0 pending=0
+2026.10.04-23.16.05 HUD seq=3 phase=ACTION_MANEUVER turn=you hand=5 oppHand=5(hidden) oppDeck=25 deck=24 discard=1
+2026.10.04-23.16.05 ARTPREVIEW fighter=Medusa hero=1 eligible=0 visual=1 mesh=SK_Medusa_H2LD
+2026.10.04-23.16.05 ARTPREVIEW selection ring shown fighter=Medusa mesh=SM_Marker_SelectionRing
+2026.10.04-23.16.05 FIGHTERS synced n=6 alive=6 own=4 enemy=2
+2026.10.04-23.16.05 ARTPREVIEW selection ring shown fighter=Medusa mesh=SM_Marker_SelectionRing
+2026.10.04-23.16.05 WS seq=3 phase=ACTION_MANEUVER (merge)
+2026.10.04-23.16.05 PLATE fighter=f-0-hero bbox=(579,192,751,246) overlapReachable=0 placement=above ring=13 gap=110 selection=f-0-hero destinations=16 clean=1 softPx2=0 tested=2268 bound=1
+2026.10.04-23.16.05 TAG fighter=f-0-sk0 bbox=(1300,261,1384,283) mode=compact look=P1 placement=above ring=0 hardPx2=0 softPx2=0 order=0 bound=1
+2026.10.04-23.16.05 TAG fighter=f-0-sk1 bbox=(412,340,496,362) mode=compact look=P1 placement=above ring=0 hardPx2=0 softPx2=0 order=1 bound=1
+2026.10.04-23.16.05 TAG fighter=f-0-sk2 bbox=(389,560,473,582) mode=compact look=P1 placement=above ring=0 hardPx2=0 softPx2=0 order=3 bound=1
+2026.10.04-23.16.05 TAG fighter=f-1-hero bbox=(977,619,1079,641) mode=compact look=P2 placement=left ring=0 hardPx2=0 softPx2=0 order=4 bound=1
+2026.10.04-23.16.05 TAG fighter=f-1-sk0 bbox=(1130,510,1214,532) mode=compact look=P2 placement=above ring=0 hardPx2=0 softPx2=0 order=2 bound=1
+2026.10.04-23.16.05 TAG fighter=f-0-sk0 bbox=(1300,261,1384,283) mode=compact look=P1 placement=above ring=0 hardPx2=0 softPx2=0 order=0 bound=1
+2026.10.04-23.16.05 TAG fighter=f-0-sk1 bbox=(412,340,496,362) mode=compact look=P1 placement=above ring=0 hardPx2=0 softPx2=0 order=1 bound=1
+2026.10.04-23.16.05 TAG fighter=f-0-sk2 bbox=(389,560,473,582) mode=compact look=P1 placement=above ring=0 hardPx2=0 softPx2=0 order=3 bound=1
+2026.10.04-23.16.05 TAG fighter=f-1-hero bbox=(977,619,1079,641) mode=compact look=P2 placement=left ring=0 hardPx2=0 softPx2=0 order=4 bound=1
+2026.10.04-23.16.05 TAG fighter=f-1-sk0 bbox=(1130,510,1214,532) mode=compact look=P2 placement=above ring=0 hardPx2=0 softPx2=0 order=2 bound=1
+2026.10.04-23.16.05 SHOT ctx viewport=1920x1080 viewTarget=CameraActor_2147482088 cam=(0,1342,1917) rot=(-55,-90,0)
+2026.10.04-23.16.05 RENDER tag=SHOT rhi=D3D12 featureLevel=SM6 shaderPlatform=PCD3D_SM6 lumenPlatform=1 gi=lumen giMethod=1 refl=lumen reflMethod=1 shadows=csm vsmEnable=0 sg.res=100 sg.view=2 sg.aa=2 sg.shadow=2 sg.gi=2 sg.refl=2 sg.pp=2 sg.tex=2 sg.fx=2 sg.foliage=2 sg.shading=2 sg.landscape=2 preset=High screenPct=100.0 screenPctMode=0 aa=TSR aaMethod=4 exposure=fixed-histogram expMin=4.14106 expMax=4.14106 expBias=0.000 ev100=2.05 lightUnits=candelas sky=1 skyIntensity=3.000 keyShadow=csm-3600uu-2c-contact0.000 shadowCasters=1 profile=sarpedon-night profilesSha256=0a3417258f46ad3d99620bcbabd1b37615192b7a59f090c77515189845b33bb7 profilesSource=pak legacyRender=0 gameLayer=unlit-eyeadaptinv tMaxFPS=30.0 vsync=0 frameRateLimit=60.0 substrate=0 nanite=1 meshDF=1 viewport=1920x1080 reference=1
+2026.10.04-23.16.05 SHOT fighter f-0-hero pos=(2,1) world=(-220,-108,0) screen=(682,428) projected=1 alive=1
+2026.10.04-23.16.05 SHOT fighter f-0-sk0 pos=(7,0) world=(305,-197,0) screen=(1339,340) projected=1 alive=1
+2026.10.04-23.16.05 SHOT fighter f-0-sk1 pos=(0,1) world=(-397,-116,0) screen=(458,419) projected=1 alive=1
+2026.10.04-23.16.05 SHOT fighter f-0-sk2 pos=(0,3) world=(-394,92,0) screen=(435,640) projected=1 alive=1
+2026.10.04-23.16.05 SHOT fighter f-1-hero pos=(5,4) world=(119,141,0) screen=(1120,695) projected=1 alive=1
+2026.10.04-23.16.05 SHOT fighter f-1-sk0 pos=(6,3) world=(159,52,0) screen=(1169,596) projected=1 alive=1
+2026.10.04-23.16.05 SHOT camera dist=2340.2 target=2340.2 overview=2340.2 errPct=0.000 focusErr=0.00 settled=1 zoom=1.00
+2026.10.04-23.16.05 SHOT head fighter=f-0-hero socket=Head mesh=SK_Medusa_H2LD world=(-220.2,-107.2,47.1) screen=(676.3,392.1) top=(675.7,387.3) bottom=(676.9,396.8) headPx=9.6 projected=1
+2026.10.04-23.16.05 SHOT head fighter=f-0-sk0 socket=Head mesh=SK_Harpy_H3LD world=(304.7,-191.7,34.3) screen=(1343.0,317.8) top=(1343.8,313.0) bottom=(1342.3,322.6) headPx=9.7 projected=1
+2026.10.04-23.16.05 SHOT head fighter=f-0-sk1 socket=Head mesh=SK_Harpy_H3LD world=(-397.5,-111.1,34.1) screen=(450.7,398.4) top=(449.6,393.7) bottom=(451.7,403.1) headPx=9.6 projected=1
+2026.10.04-23.16.05 SHOT head fighter=f-0-sk2 socket=Head mesh=SK_Harpy_H3LD world=(-394.0,86.8,34.0) screen=(429.8,609.4) top=(428.6,605.0) bottom=(430.9,613.9) headPx=9.3 projected=1
+2026.10.04-23.16.05 SHOT head fighter=f-1-hero socket=Head mesh=SK_KingArthur_H2LD world=(119.0,141.0,50.1) screen=(1123.3,659.1) top=(1123.7,654.6) bottom=(1122.9,663.5) headPx=8.9 projected=1
+2026.10.04-23.16.05 SHOT head fighter=f-1-sk0 socket=Head mesh=SK_Merlin_H2LD world=(159.2,48.6,36.5) screen=(1172.4,565.2) top=(1172.9,560.7) bottom=(1171.9,569.8) headPx=9.1 projected=1
+2026.10.04-23.16.05 SHOT selection fighter=f-0-hero ownCell=(2,1) legal=17 destinations=16 ownCellExcluded=1 plateFighter=f-0-hero
+2026.10.04-23.16.05 SHOT reachable fighter=f-0-hero n=16 cells=(0,0)(1,0)(2,0)(3,0)(4,0)(1,1)(3,1)(4,1)(5,1)(0,2)(2,2)(3,2)(1,3)(2,3)(2,4)(3,4)
+2026.10.04-23.16.05 SHOT plate fighter=f-0-hero bbox=(0,0,0,0) overlapReachable=0 placement=above gap=110 anchor=(637,356,720,457) planned=(579,192,751,246) geom=unpainted stableFrames=1
+2026.10.04-23.16.05 SHOT figure fighter=f-0-hero bbox=(637,356,720,457) ringR=28.50 art=1 blockout=0 team=P1 look=P1 ring=1
+2026.10.04-23.16.05 SHOT figure fighter=f-0-sk0 bbox=(1309,285,1374,362) ringR=22.23 art=1 blockout=0 team=P1 look=P1 ring=1
+2026.10.04-23.16.05 SHOT figure fighter=f-0-sk1 bbox=(419,364,489,442) ringR=22.23 art=1 blockout=0 team=P1 look=P1 ring=1
+2026.10.04-23.16.05 SHOT figure fighter=f-0-sk2 bbox=(394,584,467,665) ringR=22.23 art=1 blockout=0 team=P1 look=P1 ring=1
+2026.10.04-23.16.05 SHOT figure fighter=f-1-hero bbox=(1081,619,1165,728) ringR=28.50 art=1 blockout=0 team=P2 look=P2 ring=1
+2026.10.04-23.16.05 SHOT figure fighter=f-1-sk0 bbox=(1139,534,1204,620) ringR=22.23 art=1 blockout=0 team=P2 look=P2 ring=1
+2026.10.04-23.16.05 SHOT request file=phase2-board-host-1920x1080.png frame=889
+2026.10.04-23.16.05 SHOT requested: FScreenshotRequest(bShowUI) -> C:\Users\ren\AppData\Local\Temp\s08-phase2-20261005-041533-49572\phase2-board-host-1920x1080.png
+2026.10.04-23.16.05 SHOT captured file=phase2-board-host-1920x1080.png frame=889 px=1920x1080 sha256=6e462b9c4cea767f106be5e6bec7034a7f814b7254b37e0f2c44e4ffe8c3db26 order=BGRA saved=1
+2026.10.04-23.16.05 SHOT late begin file=phase2-board-host-1920x1080.png frame=889 requestFrame=889
+2026.10.04-23.16.05 SHOT iconstate visible=0 lastFighter=none frame=889
+2026.10.04-23.16.05 SHOT widget id=plate impl=umg state=own fighter=f-0-hero bbox=(0,0,0,0) geom=unpainted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtPlate frame=889
+2026.10.04-23.16.05 SHOT widget id=plate.marker impl=umg state=own fighter=f-0-hero bbox=(0,0,0,0) geom=unpainted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtPlate frame=889
+2026.10.04-23.16.05 SHOT widget id=plate.name impl=umg state=own fighter=f-0-hero bbox=(0,0,0,0) geom=unpainted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtPlate frame=889
+2026.10.04-23.16.05 SHOT widget id=plate.team impl=umg state=own fighter=f-0-hero bbox=(0,0,0,0) geom=unpainted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtPlate frame=889
+2026.10.04-23.16.05 SHOT widget id=plate.hpbar impl=umg state=own fighter=f-0-hero bbox=(0,0,0,0) geom=unpainted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtPlate frame=889
+2026.10.04-23.16.05 SHOT widget id=plate.hpfill impl=umg state=own fighter=f-0-hero bbox=(0,0,0,0) geom=unpainted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtPlate frame=889
+2026.10.04-23.16.05 SHOT widget id=plate.hp impl=umg state=own fighter=f-0-hero bbox=(0,0,0,0) geom=unpainted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtPlate frame=889
+2026.10.04-23.16.05 SHOT widget id=plate.status impl=umg state=own fighter=f-0-hero bbox=(0,0,0,0) geom=unpainted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtPlate frame=889
+2026.10.04-23.16.05 SHOT widget id=plate.teamshape impl=umg state=own fighter=f-0-hero bbox=(0,0,0,0) geom=unpainted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtPlate frame=889
+2026.10.04-23.16.05 SHOT widget id=board.tag impl=umg state=hidden fighter=f-0-hero bbox=(0,0,0,0) geom=unpainted visible=0 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=hidden look=P1 shape=circle placement=above ring=0 order=0 bound=1 softPx2=0 planned=(623,430,725,452) frame=889
+2026.10.04-23.16.05 SHOT widget id=board.tag.hp impl=umg state=hidden fighter=f-0-hero bbox=(0,0,0,0) geom=unpainted visible=0 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=hidden look=P1 shape=circle placement=above ring=0 order=0 bound=1 softPx2=0 planned=(623,430,725,452) frame=889 font=11
+2026.10.04-23.16.05 SHOT widget id=board.tag.bar impl=umg state=hidden fighter=f-0-hero bbox=(0,0,0,0) geom=unpainted visible=0 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=hidden look=P1 shape=circle placement=above ring=0 order=0 bound=1 softPx2=0 planned=(623,430,725,452) frame=889
+2026.10.04-23.16.05 SHOT widget id=board.tag.chip impl=umg state=hidden fighter=f-0-hero bbox=(0,0,0,0) geom=unpainted visible=0 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=hidden look=P1 shape=circle placement=above ring=0 order=0 bound=1 softPx2=0 planned=(623,430,725,452) frame=889
+2026.10.04-23.16.05 SHOT widget id=board.tag impl=umg state=compact fighter=f-0-sk0 bbox=(1300,261,1384,283) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P1 shape=circle placement=above ring=0 order=0 bound=1 softPx2=0 planned=(1300,261,1384,283) frame=889
+2026.10.04-23.16.05 SHOT widget id=board.tag.hp impl=umg state=compact fighter=f-0-sk0 bbox=(1356,263,1380,281) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P1 shape=circle placement=above ring=0 order=0 bound=1 softPx2=0 planned=(1300,261,1384,283) frame=889 font=11
+2026.10.04-23.16.05 SHOT widget id=board.tag.bar impl=umg state=compact fighter=f-0-sk0 bbox=(1319,270,1353,275) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P1 shape=circle placement=above ring=0 order=0 bound=1 softPx2=0 planned=(1300,261,1384,283) frame=889
+2026.10.04-23.16.05 SHOT widget id=board.tag.chip impl=umg state=compact fighter=f-0-sk0 bbox=(1304,266,1316,278) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P1 shape=circle placement=above ring=0 order=0 bound=1 softPx2=0 planned=(1300,261,1384,283) frame=889
+2026.10.04-23.16.05 SHOT widget id=board.tag impl=umg state=compact fighter=f-0-sk1 bbox=(412,340,496,362) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P1 shape=circle placement=above ring=0 order=1 bound=1 softPx2=0 planned=(412,340,496,362) frame=889
+2026.10.04-23.16.05 SHOT widget id=board.tag.hp impl=umg state=compact fighter=f-0-sk1 bbox=(468,342,492,360) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P1 shape=circle placement=above ring=0 order=1 bound=1 softPx2=0 planned=(412,340,496,362) frame=889 font=11
+2026.10.04-23.16.05 SHOT widget id=board.tag.bar impl=umg state=compact fighter=f-0-sk1 bbox=(431,349,465,354) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P1 shape=circle placement=above ring=0 order=1 bound=1 softPx2=0 planned=(412,340,496,362) frame=889
+2026.10.04-23.16.05 SHOT widget id=board.tag.chip impl=umg state=compact fighter=f-0-sk1 bbox=(416,345,428,357) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P1 shape=circle placement=above ring=0 order=1 bound=1 softPx2=0 planned=(412,340,496,362) frame=889
+2026.10.04-23.16.05 SHOT widget id=board.tag impl=umg state=compact fighter=f-0-sk2 bbox=(389,560,473,582) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P1 shape=circle placement=above ring=0 order=3 bound=1 softPx2=0 planned=(389,560,473,582) frame=889
+2026.10.04-23.16.05 SHOT widget id=board.tag.hp impl=umg state=compact fighter=f-0-sk2 bbox=(445,562,469,580) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P1 shape=circle placement=above ring=0 order=3 bound=1 softPx2=0 planned=(389,560,473,582) frame=889 font=11
+2026.10.04-23.16.05 SHOT widget id=board.tag.bar impl=umg state=compact fighter=f-0-sk2 bbox=(408,569,442,574) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P1 shape=circle placement=above ring=0 order=3 bound=1 softPx2=0 planned=(389,560,473,582) frame=889
+2026.10.04-23.16.05 SHOT widget id=board.tag.chip impl=umg state=compact fighter=f-0-sk2 bbox=(393,565,405,577) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P1 shape=circle placement=above ring=0 order=3 bound=1 softPx2=0 planned=(389,560,473,582) frame=889
+2026.10.04-23.16.05 SHOT widget id=board.tag impl=umg state=compact fighter=f-1-hero bbox=(977,619,1079,641) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P2 shape=hex placement=left ring=0 order=4 bound=1 softPx2=0 planned=(977,619,1079,641) frame=889
+2026.10.04-23.16.05 SHOT widget id=board.tag.hp impl=umg state=compact fighter=f-1-hero bbox=(1033,621,1075,639) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P2 shape=hex placement=left ring=0 order=4 bound=1 softPx2=0 planned=(977,619,1079,641) frame=889 font=11
+2026.10.04-23.16.05 SHOT widget id=board.tag.bar impl=umg state=compact fighter=f-1-hero bbox=(996,628,1030,633) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P2 shape=hex placement=left ring=0 order=4 bound=1 softPx2=0 planned=(977,619,1079,641) frame=889
+2026.10.04-23.16.05 SHOT widget id=board.tag.chip impl=umg state=compact fighter=f-1-hero bbox=(981,624,993,636) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P2 shape=hex placement=left ring=0 order=4 bound=1 softPx2=0 planned=(977,619,1079,641) frame=889
+2026.10.04-23.16.05 SHOT widget id=board.tag impl=umg state=compact fighter=f-1-sk0 bbox=(1130,510,1214,532) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P2 shape=hex placement=above ring=0 order=2 bound=1 softPx2=0 planned=(1130,510,1214,532) frame=889
+2026.10.04-23.16.05 SHOT widget id=board.tag.hp impl=umg state=compact fighter=f-1-sk0 bbox=(1186,512,1210,530) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P2 shape=hex placement=above ring=0 order=2 bound=1 softPx2=0 planned=(1130,510,1214,532) frame=889 font=11
+2026.10.04-23.16.05 SHOT widget id=board.tag.bar impl=umg state=compact fighter=f-1-sk0 bbox=(1149,519,1183,524) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P2 shape=hex placement=above ring=0 order=2 bound=1 softPx2=0 planned=(1130,510,1214,532) frame=889
+2026.10.04-23.16.05 SHOT widget id=board.tag.chip impl=umg state=compact fighter=f-1-sk0 bbox=(1134,515,1146,527) geom=painted visible=1 twin=0 source=/Game/S08/UI/ArtHud/WBP_S08ArtTag mode=compact look=P2 shape=hex placement=above ring=0 order=2 bound=1 softPx2=0 planned=(1130,510,1214,532) frame=889
+2026.10.04-23.16.05 SHOT panel id=hud.command bbox=(0,0,601,138) geom=painted visible=1 frame=889
+2026.10.04-23.16.05 SHOT panel id=hud.side bbox=(1432,0,1920,121) geom=painted visible=1 frame=889
+2026.10.04-23.16.05 SHOT panel id=hud.hand bbox=(498,985,1422,1080) geom=painted visible=1 frame=889
+2026.10.04-23.16.05 SHOT late end file=phase2-board-host-1920x1080.png frame=889
+2026.10.04-23.16.05 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.16.05 PERF window t=25.1-30.3 frames=143 fps=27.58 frameMs avg=36.25 p50=33.33 p95=33.33 p99=237.05 max=247.36 hitches50=2 gpuMs avg=3.13 p50=3.03 p95=3.71 gameMs avg=3.32 p95=4.57 renderMs avg=3.23 p95=3.88
+2026.10.04-23.16.07 INPUT step src=flag index=1/2 step=endturnkey
+2026.10.04-23.16.07 INPUT key=E src=flag
+2026.10.04-23.16.07 ENDTURN refused why=why.actions.remaining
+2026.10.04-23.16.07 TOAST why=why.actions.remaining text="Use your actions first: 1 left"
+2026.10.04-23.16.07 INPUT step src=flag index=2/2 step=hudendturn
+2026.10.04-23.16.07 INPUT hudpress src=flag id=hud.end.turn at=(352,108) geom=painted
+2026.10.04-23.16.07 HUD-PRESS id=hud.end.turn result=refused over=hud.end.turn rebuilds=0 frames=939->939 why=why.actions.remaining
+2026.10.04-23.16.07 TURN-INPUT first src=hud id=hud.end.turn result=refused frame=939 open=550 dframes=389 why=why.actions.remaining
+2026.10.04-23.16.07 TOAST why=why.actions.remaining text="Use your actions first: 1 left"
+2026.10.04-23.16.07 INPUT plan done src=flag steps=2 zoom=1.00 dist=2340.2
+2026.10.04-23.16.08 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.16.10 PERF window t=30.3-35.3 frames=151 fps=30.00 frameMs avg=33.33 p50=33.33 p95=33.33 p99=33.34 max=33.35 hitches50=0 gpuMs avg=2.89 p50=2.88 p95=3.23 gameMs avg=2.93 p95=1.85 renderMs avg=3.15 p95=3.77
+2026.10.04-23.16.11 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.16.14 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.16.15 PERF window t=35.3-40.3 frames=151 fps=30.00 frameMs avg=33.33 p50=33.33 p95=33.33 p99=33.34 max=33.36 hitches50=0 gpuMs avg=2.96 p50=2.90 p95=3.45 gameMs avg=1.51 p95=1.76 renderMs avg=3.26 p95=3.82
+2026.10.04-23.16.17 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.16.20 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.16.20 PERF window t=40.3-45.4 frames=151 fps=30.00 frameMs avg=33.33 p50=33.33 p95=33.33 p99=33.35 max=33.35 hitches50=0 gpuMs avg=2.90 p50=2.89 p95=3.19 gameMs avg=1.48 p95=1.80 renderMs avg=3.14 p95=3.77
+2026.10.04-23.16.23 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.16.25 PERF window t=45.4-50.4 frames=151 fps=30.00 frameMs avg=33.33 p50=33.33 p95=33.33 p99=33.34 max=33.35 hitches50=0 gpuMs avg=2.90 p50=2.87 p95=3.19 gameMs avg=1.43 p95=1.65 renderMs avg=3.13 p95=3.59
+2026.10.04-23.16.26 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.16.29 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.16.31 PERF window t=50.4-55.4 frames=151 fps=30.00 frameMs avg=33.33 p50=33.33 p95=33.33 p99=33.34 max=33.35 hitches50=0 gpuMs avg=2.92 p50=2.88 p95=3.32 gameMs avg=1.45 p95=1.77 renderMs avg=3.15 p95=3.92
+2026.10.04-23.16.32 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.16.35 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.16.36 PERF window t=55.4-60.5 frames=151 fps=30.00 frameMs avg=33.33 p50=33.33 p95=33.33 p99=33.34 max=33.34 hitches50=0 gpuMs avg=2.93 p50=2.90 p95=3.23 gameMs avg=1.45 p95=1.68 renderMs avg=3.13 p95=3.74
+2026.10.04-23.16.38 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.16.41 PERF window t=60.5-65.5 frames=151 fps=30.00 frameMs avg=33.33 p50=33.33 p95=33.33 p99=33.34 max=33.34 hitches50=0 gpuMs avg=2.93 p50=2.90 p95=3.32 gameMs avg=1.48 p95=1.90 renderMs avg=3.16 p95=3.73
+2026.10.04-23.16.41 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.16.44 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.16.46 PERF window t=65.5-70.5 frames=150 fps=30.00 frameMs avg=33.33 p50=33.33 p95=33.33 p99=33.35 max=33.37 hitches50=0 gpuMs avg=2.91 p50=2.89 p95=3.26 gameMs avg=1.46 p95=1.67 renderMs avg=3.15 p95=3.60
+2026.10.04-23.16.47 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.16.50 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.16.51 PERF window t=70.5-75.5 frames=151 fps=30.00 frameMs avg=33.33 p50=33.33 p95=33.33 p99=33.34 max=33.35 hitches50=0 gpuMs avg=2.90 p50=2.89 p95=3.21 gameMs avg=1.46 p95=1.77 renderMs avg=3.20 p95=3.77
+2026.10.04-23.16.53 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.16.56 PERF window t=75.5-80.6 frames=151 fps=30.00 frameMs avg=33.33 p50=33.33 p95=33.33 p99=33.34 max=33.34 hitches50=0 gpuMs avg=2.90 p50=2.87 p95=3.26 gameMs avg=1.46 p95=1.67 renderMs avg=3.13 p95=3.49
+2026.10.04-23.16.56 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.16.59 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.17.01 PERF window t=80.6-85.6 frames=151 fps=30.00 frameMs avg=33.33 p50=33.33 p95=33.33 p99=33.35 max=33.35 hitches50=0 gpuMs avg=2.90 p50=2.89 p95=3.21 gameMs avg=1.48 p95=1.84 renderMs avg=3.22 p95=3.97
+2026.10.04-23.17.02 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.17.05 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.17.06 PERF window t=85.6-90.6 frames=151 fps=30.00 frameMs avg=33.33 p50=33.33 p95=33.33 p99=33.34 max=33.35 hitches50=0 gpuMs avg=2.90 p50=2.88 p95=3.27 gameMs avg=1.47 p95=1.73 renderMs avg=3.14 p95=3.63
+2026.10.04-23.17.08 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.17.11 PERF window t=90.6-95.7 frames=151 fps=30.00 frameMs avg=33.33 p50=33.33 p95=33.33 p99=33.33 max=33.34 hitches50=0 gpuMs avg=2.89 p50=2.88 p95=3.22 gameMs avg=1.48 p95=1.82 renderMs avg=3.15 p95=3.72
+2026.10.04-23.17.11 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.17.14 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.17.16 PERF window t=95.7-100.7 frames=151 fps=30.00 frameMs avg=33.33 p50=33.33 p95=33.33 p99=33.35 max=33.36 hitches50=0 gpuMs avg=2.93 p50=2.90 p95=3.43 gameMs avg=1.49 p95=1.78 renderMs avg=3.14 p95=3.72
+2026.10.04-23.17.17 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.17.20 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.17.21 PERF window t=100.7-105.7 frames=151 fps=30.00 frameMs avg=33.33 p50=33.33 p95=33.33 p99=33.34 max=33.34 hitches50=0 gpuMs avg=2.92 p50=2.89 p95=3.24 gameMs avg=1.51 p95=1.81 renderMs avg=3.19 p95=3.85
+2026.10.04-23.17.23 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.17.26 PERF window t=105.7-110.8 frames=151 fps=30.00 frameMs avg=33.33 p50=33.33 p95=33.33 p99=33.34 max=33.34 hitches50=0 gpuMs avg=2.92 p50=2.89 p95=3.46 gameMs avg=1.47 p95=1.75 renderMs avg=3.14 p95=3.54
+2026.10.04-23.17.26 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.17.29 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.17.31 PERF window t=110.8-115.8 frames=150 fps=30.00 frameMs avg=33.33 p50=33.33 p95=33.33 p99=33.34 max=33.40 hitches50=0 gpuMs avg=2.94 p50=2.90 p95=3.26 gameMs avg=1.50 p95=1.90 renderMs avg=3.21 p95=3.95
+2026.10.04-23.17.32 game -> room=cmuufvp9g0089t84nxzy964bo code=<redacted> status=IN_PROGRESS
+2026.10.04-23.17.35 PERF summary scope=afterWarmup warmup=5 elapsed=120.0 frames=3434 fps=29.85 frameMs avg=33.51 p50=33.33 p95=33.33 p99=33.34 max=247.36 hitches50=4 gpuMs avg=2.76 p50=2.88 p95=3.32 gameMs avg=1.61 p95=1.77 renderMs avg=3.11 p95=3.74
+2026.10.04-23.17.35 PERF summary scope=started elapsed=120.0 frames=3034 fps=29.83 frameMs avg=33.53 p50=33.33 p95=33.33 p99=33.34 max=247.36 hitches50=4 gpuMs avg=2.94 p50=2.90 p95=3.35 gameMs avg=1.69 p95=1.78 renderMs avg=3.22 p95=3.75
+2026.10.04-23.17.35 PERF summary scope=artHud impl=umg elapsed=120.0 frames=2778 fps=29.86 frameMs avg=33.48 p50=33.33 p95=33.33 p99=33.34 max=247.36 hitches50=2 gpuMs avg=2.92 p50=2.89 p95=3.30 gameMs avg=1.65 p95=1.79 renderMs avg=3.17 p95=3.74
+2026.10.04-23.17.35 --- S08 trace close ---
