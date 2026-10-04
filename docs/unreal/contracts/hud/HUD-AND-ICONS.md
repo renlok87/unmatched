@@ -175,7 +175,7 @@ Unmatched: Digital Edition. Набор из 23 значков с прежним�
 - `Content/Localization/StringTables/S08ArtHud.csv` — 13 ключей, только EN. Загрузка — `S08ArtHudText.cpp:38`,
   проверка ключей — `:55-64`, упаковка — `Unmatched.Build.cs:50`. Если ключа нет, на экран выводится сам ключ
   (`S08ArtHudText.cpp:83`).
-- `ST_Why` описан в `why-reasons.json` (33 ключа), но ассета ещё нет (MS-T-28). Ключи `ms.*` — 03-ux-spec §9.
+- `ST_Why` описан в `why-reasons.json` (36 ключей; +3 — DE-004, 2026-10-04), но ассета ещё нет (MS-T-28). Ключи `ms.*` — 03-ux-spec §9.
 - Slate HUD S09 строит текст через `FText::FromString` из литералов (≈250–300 строк, GD-048).
 - Строки с числом («Подтвердить: {n} бойц(а/ов)», «и ещё {n}») хранятся в StringTable с синтаксисом
   `{n}|plural(one=…,few=…,many=…,other=…)` для RU и `one/other` для EN (03-ux-spec §9). `FText::Format` это
