@@ -1,0 +1,39 @@
+{
+ "schema": "unmatched.cue-fixture/1",
+ "id": "move-seq-caps",
+ "kind": "scenario",
+ "description": "Манёвр из четырёх перемещений по 7 шагов в одном seq 70 (MS-T-15, move-selection 04 §6.3): потолок бойца 1400 мс, потолок seq 2400 мс → k = 0,553, шаг 110,6 мс, каждое перемещение 774 мс; старты с перекрытием 30 % (0, 542, 1084, 1626), последнее кончается ровно в 2400 мс.",
+ "covers": [
+  "CUE-007 cap_subject_ms / cap_seq_ms / overlap",
+  "move-selection MS-E-66 (4 × 7, «Обычно»)"
+ ],
+ "events": [
+  {"t": 0, "kind": "cue", "id": "CUE-007", "subject": "harpy-1", "seq": 70, "steps": 7, "order": 0,
+   "seq_moves": [{"steps": 7}, {"steps": 7}, {"steps": 7}, {"steps": 7}]},
+  {"t": 542, "kind": "cue", "id": "CUE-007", "subject": "harpy-2", "seq": 70, "steps": 7, "order": 1,
+   "seq_moves": [{"steps": 7}, {"steps": 7}, {"steps": 7}, {"steps": 7}]},
+  {"t": 1084, "kind": "cue", "id": "CUE-007", "subject": "harpy-3", "seq": 70, "steps": 7, "order": 2,
+   "seq_moves": [{"steps": 7}, {"steps": 7}, {"steps": 7}, {"steps": 7}]},
+  {"t": 1626, "kind": "cue", "id": "CUE-007", "subject": "medusa", "seq": 70, "steps": 7, "order": 3,
+   "seq_moves": [{"steps": 7}, {"steps": 7}, {"steps": 7}, {"steps": 7}]}
+ ],
+ "expect_trace": [
+  "CUE fx id=CUE-007 subject=harpy-1 seq=70 t=0 vfx=missing sfx=missing clip=none mat=none socket=- reduced=0 result=fallback",
+  "CUE fx id=CUE-007 subject=harpy-2 seq=70 t=542 vfx=missing sfx=missing clip=none mat=none socket=- reduced=0 result=fallback",
+  "CUE fx done id=CUE-007 subject=harpy-1 seq=70 t=774 ms=774 cut=0",
+  "CUE fx id=CUE-007 subject=harpy-3 seq=70 t=1084 vfx=missing sfx=missing clip=none mat=none socket=- reduced=0 result=fallback",
+  "CUE fx done id=CUE-007 subject=harpy-2 seq=70 t=1316 ms=774 cut=0",
+  "CUE fx id=CUE-007 subject=medusa seq=70 t=1626 vfx=missing sfx=missing clip=none mat=none socket=- reduced=0 result=fallback",
+  "CUE fx done id=CUE-007 subject=harpy-3 seq=70 t=1858 ms=774 cut=0",
+  "CUE fx done id=CUE-007 subject=medusa seq=70 t=2400 ms=774 cut=0"
+ ],
+ "expect_summary": {
+  "presented": 4,
+  "spawned": 0,
+  "fallback": 4,
+  "duplicate": 0,
+  "stale": 0,
+  "done": 4,
+  "unique_triples": 4
+ }
+}

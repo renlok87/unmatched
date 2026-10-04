@@ -1,6 +1,6 @@
 {
  "schema": "unmatched.cue-table/1",
- "revision": "w4d-2026-09-29",
+ "revision": "ms-t-15-2026-10-04",
  "status": "предложено",
  "status_note": "Контракт FS08CueDispatcher (волна 4, W4-D; меморандум engine-gate §1 п.8). Данные 18 CUE из 07-animation-vfx-audio.csv; все ассеты пока отсутствуют — таблица служит missing-report ART-010. Реализация диспетчера — GD-044, эффекты — GD-049. Не художественная приёмка.",
  "asset_path_rule": "soft object path /Game/...: Niagara — UNiagaraSystem, звук — USoundBase (SoundWave, SoundCue и MetaSoundSource взаимозаменяемы без кода). Пути удерживаются в cook через PrimaryAssetLabel или DirectoriesToAlwaysCook (строки LoadObject кукер не видит — ловушка 5)",
@@ -342,7 +342,19 @@
     "log": "Warning"
    },
    "source_row": "docs/game-design/07-animation-vfx-audio.csv#CUE-007",
-   "duration_per_step_ms": 280
+   "duration_per_step_ms": 280,
+   "cap_subject_ms": 1400,
+   "cap_seq_ms": 2400,
+   "min_step_ms": 90,
+   "overlap": 0.3,
+   "place_ms": 240,
+   "params": {
+    "path": "клетки пути со стартом (FS08Cue.Path): след metadata.lastMovement этого seq, если его ход начинается в позиции до снапшота и кончается в позиции снапшота; иначе канонический путь клиента на позициях до снапшота без предела шагов; иначе прямая from→to (move-selection 04 §4.6)",
+    "order_in_seq": "порядок бойца среди перемещений seq (FS08Cue.OrderInSeq, 0..n-1): порядок moves[] следа, затем бойцы без следа в порядке fighters[]; расписание 04 §6.3 идёт в этом порядке",
+    "kind": "move — шаги по пути; place — перенос в последнюю клетку пути, считается одним шагом длительностью place_ms",
+    "steps": "число шагов анимации: клеток пути без старта; у place и у прямой from→to — 1",
+    "path_source": "trail | canonical | straight (FS08Cue.PathSource; трасса MS-CUE source=)"
+   }
   },
   {
    "id": "CUE-008",

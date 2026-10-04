@@ -31,6 +31,11 @@
           "seq": {"type": ["integer", "null"], "minimum": 0},
           "channel": {"enum": ["http", "ws", "local"]},
           "steps": {"type": "integer", "minimum": 1},
+          "move_kind": {"enum": ["move", "place"], "description": "CUE-007: вид перемещения (place — один шаг place_ms)"},
+          "order": {"type": "integer", "minimum": 0, "description": "CUE-007: индекс этого перемещения в seq_moves"},
+          "seq_moves": {"type": "array", "minItems": 1, "description": "CUE-007: все перемещения seq по порядку — длительность считает расписание 04 §6.3",
+            "items": {"type": "object", "required": ["steps"], "additionalProperties": false,
+              "properties": {"steps": {"type": "integer", "minimum": 1}, "kind": {"enum": ["move", "place"]}}}},
           "recovered_seq": {"type": "integer", "minimum": 0},
           "reduced_motion": {"type": "boolean"}
         },

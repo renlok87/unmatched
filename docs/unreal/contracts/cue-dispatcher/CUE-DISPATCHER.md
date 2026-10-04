@@ -34,6 +34,7 @@
 | `trigger` | тип события (`input.hover`, `state.fighter_damaged`, `net.recovered` …) — имя будущего `ES08CueType` |
 | `subject` | над кем показ: `fighter`, `target`, `cursor`, `hud`, `scene` |
 | `duration_ms` / `duration_per_step_ms` | из 07; у CUE-007 280 мс на клетку |
+| `cap_subject_ms`, `cap_seq_ms`, `min_step_ms`, `overlap`, `place_ms`, `params` | только у CUE-007 (MS-T-15): потолки расписания перемещения [move-selection 04 §6.3](../../../game-design/move-selection/04-technical-design.md) — 1400 мс на бойца, 2400 мс на seq, шаг ≥ 90 мс, перекрытие 30 %, PLACE 240 мс; `params` описывает поля события (`path`, `order_in_seq`, `kind`, `steps`, `path_source`). Длительность показа = расписание по всем перемещениям seq |
 | `feedback_delay_ms`, `blocks_input`, `skippable` | из 07; блокировка ввода ≤ 1000 мс, кроме терминального CUE-016 |
 | `vfx` | Niagara: `system` (soft path) или `status: missing` + `missing_reason`; `attach` `socket`/`world`, `socket` (`Weapon`, `Head`, `Root`, `Base`); `sim: cpu`, `deterministic: true`, `prewarm: true` |
 | `sfx` | `sound` — **USoundBase** (SoundWave, SoundCue и MetaSoundSource взаимозаменяемы без правки кода); `sound_class` UI/SFX/Music; `priority` 1–3; `concurrency` → USoundConcurrency (`max_count` = MaxCount, `resolution` StopOldest/PreventNew, `retrigger_ms` = RetriggerTime) |
@@ -112,7 +113,9 @@ CUE fx done id=CUE-011 subject=medusa seq=51 t=1200 ms=900 cut=0
 | G8 | `result=fallback` не совпадает с наличием `missing` в vfx/sfx/clip |
 | G9 | время строк убывает |
 
-Сводка гейта: `presented`, `spawned`, `fallback`, `duplicate`, `stale`, `done`, `unique_triples`. Для ACC-012 в пакете доказательств записывается строка `CUE_TRACE PASS {…}`.
+Трассы перемещения `MS-CUE move seq=… fighter=… order=… of=… kind=… steps=… source=… start=… ms=… snapped=… path=…` (MS-T-15, move-selection 04 §9) тот же гейт проверяет отдельно: M1 — формат и поля; M2 — набор строк одного seq (ровно `of` подряд, `order` 0..of−1, бойцы без повторов); M3 — шаги, вид и путь (`place` и `straight` — 1 шаг, в пути steps+1 клеток); M4 — `start`/`ms`/`snapped` по расписанию 04 §6.3 с потолками CUE-007 (±1 мс); M5 — строк меньше `--min-ms-cue N`.
+
+Сводка гейта: `presented`, `spawned`, `fallback`, `duplicate`, `stale`, `done`, `unique_triples`, `ms_cue`, `ms_cue_sets`, `ms_cue_sources`. Для ACC-012 в пакете доказательств записывается строка `CUE_TRACE PASS {…}`.
 
 ## 7. Фикстуры без мира
 
