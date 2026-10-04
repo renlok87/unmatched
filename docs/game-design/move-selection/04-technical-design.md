@@ -317,6 +317,27 @@ struct FS08MoveDraftView { TArray<FS08PlateView> Plates; TArray<FS08PathView> Pa
 
 Дедуп `(cue, subject, seq)` (контракт D2) не меняется: у бойцов разный subject.
 
+Уточнение MS-T-15 (реализация, `FS08FlowController::ComputeCues`):
+- След читается только из метаданных самого тела (`Snapshot.Metadata`). Частичное тело без `metadata` — «следа нет»:
+  более старый `lastMovement`, оставшийся в хранилище после слияния, никогда не относится к этому seq.
+- Ход следа берётся, только если его `from` равен позиции бойца до снапшота, а последняя клетка `path` — позиции в
+  снапшоте (`kind` MOVE или PLACE, у PLACE ровно одна клетка). Иначе — правило, отложенное в §4.3: способность или
+  реакция сдвинула бойца в том же seq дальше (или боец указан в следе дважды), и путь строится как без следа
+  (канонический, иначе прямая); у cue `bTrailMismatch`, в трассе хвост `trail=mismatch`, порядок — по следу.
+- Канонический путь — `ComputeReachMap` с `MaxSteps = MAX_int32` и `BuildCanonicalPath` на бойцах **до** снапшота по
+  обычным правилам: живые враги блокируют шаг, конечная клетка свободна на позициях до снапшота. Пути нет — прямая
+  from→to, один шаг.
+- Боец, чья позиция не изменилась, cue не получает, даже если след его упоминает (путь с возвратом на старт).
+- `OrderInSeq` — 0..n−1: порядок `moves[]` следа, затем бойцы без хода в следе в порядке `fighters[]`. В наборе cue
+  сначала перемещения по `OrderInSeq`, затем урон (каскад MS-E-48 строит MS-T-16).
+- Доска канонического пути и подписей трассы — `boardState` тела, иначе применённая.
+- Трасса при выпуске cue — по строке на перемещение: `MS-CUE move seq=<n> fighter=<id> order=<k> of=<n>
+  kind=<move|place> steps=<n> source=<trail|canonical|straight> start=<мс> ms=<мс> snapped=<0|1>
+  path=<CellLabel>>…[ trail=mismatch]`. `start`, `ms`, `snapped` — расписание §6.3 (`FS08MoveCueSchedule`, скорость
+  «Обычно», потолки по умолчанию = `cue-table.json` CUE-007, тест `Unmatched.S08.MoveAnim.CueTrace` их сверяет).
+  Скорость и reduced motion подключает MS-T-16 (гейт уже понимает поля `speed=` и `reduced=`). Проверка —
+  `cue_contract.py check-trace` (коды M1..M5, `docs/unreal/contracts/cue-dispatcher/CUE-DISPATCHER.md` §6).
+
 ### 4.7. Стиль подсветки в профиле досок
 
 `unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json`: корневой блок `moveSelection` задаёт умолчания для всех
@@ -640,14 +661,14 @@ ACC-022 1080p p95 ≤ 16,7 мс; демо двух клиентов — по 30 
 | `MS-REJECT code=<ruleCode> why=<key> class=<И|С>` | отказ клиента или сервера | `cell`, `fighter` |
 | `MS-NET late-reply op=<begin|maneuver>` / `MS-NET deadline op=<…>` | поздний HTTP-ответ, дедлайн 10 с | — |
 | `MS-DATA dirtyDefeated fighter=<id>` | двигаемый боец с `isDefeated` при `health > 0` | — |
-| `MS-CUE move seq=<n> fighter=<id> order=<k> steps=<n> source=<trail|canonical|straight> ms=<n>` | старт анимации | `snapped=<0|1>` |
+| `MS-CUE move seq=<n> fighter=<id> order=<k> of=<n> kind=<move|place> steps=<n> source=<trail|canonical|straight> start=<ms> ms=<n> snapped=<0|1> path=<A>B>…>` | выпуск cue перемещения (MS-T-15), старт анимации (MS-T-16) | `trail=mismatch`; MS-T-16 — `speed=`, `reduced=` |
 | `MS-ANIM skip|jump|snap seq=<n> count=<n>` | пропуск, `jump_to_final`, snap | — |
 | `MS-PERF draft us=<n> view us=<n>` | каждые 60 пересчётов (агрегат p50/p95) | — |
 | `MS-OPP planning=<0|1>` | смена индикатора соперника | — |
 | `MS-BENCH mismatch id=<id>` | id из `-BenchMoveDraft` нет в bench-фикстуре | — |
 
 `tools/s08/cue_contract/cue_contract.py` (`check-trace`) получает проверку параметра `steps`, источника пути и
-длительности `ms=` по расписанию §6.3 для CUE-007.
+длительности `ms=` по расписанию §6.3 для CUE-007 — сделано в MS-T-15 (коды M1..M5, `--min-ms-cue N`).
 
 | ID | Требование | Тест |
 |---|---|---|
