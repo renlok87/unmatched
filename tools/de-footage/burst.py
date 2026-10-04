@@ -2,7 +2,7 @@
 
   python tools/de-footage/burst.py strip T0 T1 FPS COLS WIDTH OUT.jpg [CROP]
       Grid of consecutive frames between T0 and T1 (seconds, absolute video time),
-      each labelled with its timestamp in ms (e.g. 30 6 400). Count frames between
+      each labelled with its timestamp in ms (e.g. 30 6 400). Env DE_VIDEO=<path> overrides video.txt. Count frames between
       labels to time an animation (1 tile = 1000/FPS ms; source is 30 fps, so 30 is
       the finest step). CROP = w:h:x:y in 1920x1080 source pixels zooms one region.
   python tools/de-footage/burst.py frame T OUT.png [CROP]
@@ -13,6 +13,7 @@
       Motion segments (start-end, duration, 4x4 cells that moved; cell = row*4+col).
 """
 import math
+import os
 import subprocess
 import sys
 
@@ -23,7 +24,8 @@ FONT = "C\\:/Windows/Fonts/arialbd.ttf"
 
 
 def video():
-    return open(VIDEO_FILE, encoding="utf-8").read().strip()
+    # DE_VIDEO overrides video.txt, so parallel reviewers can each read their own recording
+    return os.environ.get("DE_VIDEO") or open(VIDEO_FILE, encoding="utf-8").read().strip()
 
 
 def strip(t0, t1, fps=30, cols=6, width=400, out="strip.jpg", crop=None):
