@@ -446,6 +446,89 @@ struct UNMATCHED_API FS08BackdropSpec {
   FS08BackdropMoonSpec Moon;
 };
 
+/** MS-T-08 (docs/game-design/move-selection/04 §4.7, MS-D-24, MS-R-50): the move-selection style - the root
+ *  "moveSelection" block of the document (defaults of every board) and boards[i].moveSelection (an override of any
+ *  field for one board, allowed on EVERY surface: it is not part of "readability", which grids reject). The code
+ *  defaults below are the 04 §4.7 numbers, so a document without both blocks draws the same. Status: предложено
+ *  until the user's art acceptance (MS-Q-04); live tune (MS-T-13) edits the values without a relaunch. Parsed by
+ *  S08ParseMoveSelection; S08ValidateMoveSelection keeps the plate inside the space (03 §4.1, MS-R-72). */
+struct UNMATCHED_API FS08MoveSelectionSpec {
+  // "plate" (V-01..V-12, 03 §4.1 / §4.2): radii in uu from the space centre, z above the play plane
+  FColor PlateColor = FColor(0xF2, 0xE9, 0xD8, 255);  // "colorSrgb" (a map board overrides it, 03 §4.2b)
+  FColor KeylineColor = FColor(0x11, 0x13, 0x17, 255); // "keylineSrgb" (mark.keyline)
+  float FillAlpha = 0.18f;
+  float RingCenterUU = 36.0f;
+  float RingWidthUU = 3.5f;
+  float KeylineUU = 1.5f;
+  float OutlineInnerUU = 39.6f;
+  float OutlineOuterUU = 41.0f;
+  float OccupiedClearUU = 30.0f;  // nothing of the plate at r <= this on a space with a living fighter
+  float PipCutDeg = 15.0f;        // half angle of the cut around the leader pip (+Y) on a hero's space
+  float ZFill = 0.3f;
+  float ZRing = 0.9f;
+  // "boostTier" (V-02 / V-04b)
+  int32 DashCount = 12;
+  float DashDuty = 0.6f;
+  FColor ChipBgColor = FColor(0x16, 0x1A, 0x28, 255);
+  FColor ChipTextColor = FColor(0xF2, 0xEC, 0xDE, 255);
+  // "path" (V-03, MS-T-09)
+  FColor PathColor = FColor(0xFF, 0xF4, 0xDC, 255);
+  float PathWidthUU = 6.0f;
+  float PathKeylineUU = 1.5f;
+  float StepDotUU = 8.0f;
+  float PathZ = 1.5f;
+  // "ghost" (V-04 / MS-R-71, MS-T-10)
+  float GhostAlpha = 0.45f;
+  float GhostAlphaSent = 0.30f;
+  float LeavingFighterAlpha = 0.5f;
+  // "invalid" (V-08)
+  FColor InvalidColor = FColor(0xD9, 0x48, 0x3F, 255);
+  int32 InvalidMs = 350;
+  // "lastMove" (V-14 / V-15, MS-T-17)
+  float LastMoveAlpha = 0.6f;
+  int32 LastMoveFadeMs = 300;
+  // "candidate" (V-17, MS-R-75 - DE-017): a thin ring under an own fighter that may move, in the band of the
+  // selection ring V-05 (SM_Marker_SelectionRing 17.8..20 uu), thinner than it and without the team ring; the radius
+  // scales with the figure (sidekicks 0.78); z above the figure's pedestal top.
+  float CandidateRadiusUU = 18.9f;
+  float CandidateWidthUU = 1.2f;
+  float CandidateAlpha = 0.7f;
+  float CandidateZ = 1.6f;
+  // "anim" (04 §6.3, MS-T-16): numbers only here; hopHeightRel 0 = glide without a hop (D-DE-02)
+  int32 StepMs = 280;
+  int32 CapFighterMs = 1400;
+  int32 CapManeuverMs = 2400;
+  int32 MinStepMs = 90;
+  float Overlap = 0.3f;
+  int32 PlaceMs = 240;
+  float HopHeightRel = 0.0f;
+  int32 TurnMs = 120;
+  int32 StartTurnMs = 50;
+  float TravelLeanDeg = 10.0f;
+  int32 LeanInMs = 60;
+  int32 SettleMs = 150;
+  bool bEaseEnds = false;
+  /** Where the values came from: "code" (no block), "root" (the root block only), "board" (a board override). */
+  FString Source = TEXT("code");
+
+  float RingInnerUU() const { return RingCenterUU - RingWidthUU * 0.5f; }
+  float RingOuterUU() const { return RingCenterUU + RingWidthUU * 0.5f; }
+  /** The ring with its keyline on both sides: [RingInnerUU - KeylineUU, RingOuterUU + KeylineUU]. */
+  float RingBandInnerUU() const { return RingInnerUU() - KeylineUU; }
+  float RingBandOuterUU() const { return RingOuterUU() + KeylineUU; }
+};
+
+/** Applies a "moveSelection" object onto InOut (absent fields keep InOut's value: the root block starts from the code
+ *  defaults, a board block from the root). Context names the block in the errors ("root", "board <id>"). Unknown
+ *  sub-blocks / fields and out-of-range values are errors (a broken block rejects the document - never a silent
+ *  default, like the other profile blocks). Validates the result with S08ValidateMoveSelection. */
+UNMATCHED_API bool S08ParseMoveSelection(const FString& Context, const TSharedPtr<FJsonObject>& Object,
+                                         FS08MoveSelectionSpec& InOut, TArray<FString>& OutErrors);
+/** 03 §4.1 / 04 §4.7 geometry: the ring with its keyline inside [30, 40] uu, the outline inside [39.6, 41.6] (the
+ *  painted rim) and outside the ring band, the occupied clear radius <= the ring band, the pip cut 0..45 deg. */
+UNMATCHED_API bool S08ValidateMoveSelection(const FString& Context, const FS08MoveSelectionSpec& Spec,
+                                            TArray<FString>& OutErrors);
+
 struct UNMATCHED_API FS08BoardArtProfile {
   FString Id;
   TArray<FString> MatchBoardIds;
@@ -477,6 +560,9 @@ struct UNMATCHED_API FS08BoardArtProfile {
   /** ENV-MAPS P7 (ENV-U15): optional "conceptPaste" block (map-image boards only; S08ConceptPaste.h). Its lights count
    *  against the light profile's points (profile points + block lights <= 6, the block hides the layout lights). */
   FS08ConceptPasteSpec ConceptPaste;
+  /** MS-T-08: the move-selection style of this board - the root "moveSelection" with this board's override applied
+   *  (Source "board" when the profile has its own block). */
+  FS08MoveSelectionSpec MoveSelection;
 };
 
 /** Counts of one decoded board (what the art and the trace describe). */
@@ -516,6 +602,8 @@ public:
   TMap<FString, FString> GlyphMeshPaths;
   /** W5b-R D-4 zone keylines (bSet = the profile has a valid "zoneKeyline" block). */
   FS08ZoneKeyline Keyline;
+  /** MS-T-08: the root "moveSelection" block (code defaults without one) - the style of a board without a profile. */
+  FS08MoveSelectionSpec MoveSelection;
 
   /** <ProjectConfigDir>/ArtBoards/S08ArtBoardProfiles.json (staged as a UFS
    *  runtime dependency of the Unmatched module, see Unmatched.Build.cs). */

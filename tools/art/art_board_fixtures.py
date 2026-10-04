@@ -332,10 +332,93 @@ def check_profiles(profiles: dict) -> list[str]:
             errs.append(f"light {lid}: point lights must not cast shadows")
         errs += check_render_blocks(lid, lp)
     errs += check_content_blocks(profiles)
+    root_move = dict(MOVE_SELECTION_DEFAULTS)
+    if "moveSelection" in profiles:
+        root_move, move_errs = merge_move_selection("root", profiles["moveSelection"], MOVE_SELECTION_DEFAULTS)
+        errs += move_errs
     for b in profiles.get("boards", []):
         errs += check_readability_block(b.get("id", "?"), b)
         errs += check_frame_backdrop_blocks(b.get("id", "?"), b)
+        if "moveSelection" in b:
+            errs += merge_move_selection(f"board {b.get('id', '?')}", b["moveSelection"], root_move)[1]
     return errs
+
+
+# MS-T-08 "moveSelection" (docs/game-design/move-selection/04 §4.7): (block, field) -> (kind, lo, hi, default); the same
+# rules as S08BoardArt.cpp S08ParseMoveSelection / S08ValidateMoveSelection (kind: num, int, hex, bool).
+MOVE_SELECTION_FIELDS = {
+    ("plate", "colorSrgb"): ("hex", None, None, "#F2E9D8"), ("plate", "keylineSrgb"): ("hex", None, None, "#111317"),
+    ("plate", "fillAlpha"): ("num", 0.0, 0.2, 0.18), ("plate", "ringCenterUU"): ("num", 20.0, 42.0, 36.0),
+    ("plate", "ringWidthUU"): ("num", 0.5, 8.0, 3.5), ("plate", "keylineUU"): ("num", 0.0, 3.0, 1.5),
+    ("plate", "outlineInnerUU"): ("num", 30.0, 42.0, 39.6), ("plate", "outlineOuterUU"): ("num", 30.0, 42.0, 41.0),
+    ("plate", "occupiedClearUU"): ("num", 0.0, 40.0, 30.0), ("plate", "pipCutDeg"): ("num", 0.0, 45.0, 15.0),
+    ("plate", "zFill"): ("num", 0.05, 3.0, 0.3), ("plate", "zRing"): ("num", 0.05, 3.0, 0.9),
+    ("boostTier", "dashCount"): ("int", 4, 48, 12), ("boostTier", "dashDuty"): ("num", 0.2, 0.9, 0.6),
+    ("boostTier", "chipBgSrgb"): ("hex", None, None, "#161A28"), ("boostTier", "chipTextSrgb"): ("hex", None, None, "#F2ECDE"),
+    ("path", "colorSrgb"): ("hex", None, None, "#FFF4DC"), ("path", "widthUU"): ("num", 1.0, 16.0, 6.0),
+    ("path", "keylineUU"): ("num", 0.0, 4.0, 1.5), ("path", "stepDotUU"): ("num", 2.0, 24.0, 8.0),
+    ("path", "z"): ("num", 0.05, 5.0, 1.5),
+    ("ghost", "alpha"): ("num", 0.05, 1.0, 0.45), ("ghost", "alphaSent"): ("num", 0.05, 1.0, 0.30),
+    ("ghost", "leavingFighterAlpha"): ("num", 0.05, 1.0, 0.5),
+    ("invalid", "colorSrgb"): ("hex", None, None, "#D9483F"), ("invalid", "ms"): ("int", 50, 3000, 350),
+    ("lastMove", "alpha"): ("num", 0.05, 1.0, 0.6), ("lastMove", "fadeMs"): ("int", 0, 5000, 300),
+    ("candidate", "radiusUU"): ("num", 8.0, 30.0, 18.9), ("candidate", "widthUU"): ("num", 0.4, 4.0, 1.2),
+    ("candidate", "alpha"): ("num", 0.1, 1.0, 0.7), ("candidate", "z"): ("num", 0.05, 5.0, 1.6),
+    ("anim", "stepMs"): ("int", 40, 2000, 280), ("anim", "capFighterMs"): ("int", 100, 10000, 1400),
+    ("anim", "capManeuverMs"): ("int", 100, 20000, 2400), ("anim", "minStepMs"): ("int", 10, 2000, 90),
+    ("anim", "overlap"): ("num", 0.0, 1.0, 0.3), ("anim", "placeMs"): ("int", 0, 5000, 240),
+    ("anim", "hopHeightRel"): ("num", 0.0, 1.0, 0.0), ("anim", "turnMs"): ("int", 0, 2000, 120),
+    ("anim", "startTurnMs"): ("int", 0, 2000, 50), ("anim", "travelLeanDeg"): ("num", 0.0, 45.0, 10.0),
+    ("anim", "leanInMs"): ("int", 0, 2000, 60), ("anim", "settleMs"): ("int", 0, 2000, 150),
+    ("anim", "easeEnds"): ("bool", None, None, False),
+}
+MOVE_SELECTION_DEFAULTS = {k: v[3] for k, v in MOVE_SELECTION_FIELDS.items()}
+
+
+def merge_move_selection(ctx: str, block, base: dict) -> tuple[dict, list[str]]:
+    """A "moveSelection" object applied onto base (absent fields keep base): unknown blocks / fields and out-of-range
+    values are errors; then the 03 §4.1 geometry (S08ValidateMoveSelection). Returns (merged, errors)."""
+    if not isinstance(block, dict):
+        return dict(base), [f"{ctx}: moveSelection must be an object"]
+    errs = []
+    out = dict(base)
+    blocks = {b for b, _ in MOVE_SELECTION_FIELDS}
+    for name, sub in block.items():
+        if name.startswith("note"):
+            continue
+        if name not in blocks:
+            errs.append(f"{ctx}: moveSelection.{name} is not a known block")
+            continue
+        if not isinstance(sub, dict):
+            errs.append(f"{ctx}: moveSelection.{name} must be an object")
+            continue
+        for field, value in sub.items():
+            spec = MOVE_SELECTION_FIELDS.get((name, field))
+            if spec is None:
+                errs.append(f"{ctx}: moveSelection.{name}.{field} is not a known field")
+                continue
+            kind, lo, hi, _ = spec
+            ok = (kind == "hex" and _hex(value)) or (kind == "bool" and isinstance(value, bool)) or                  (kind == "num" and _num(value) and lo <= value <= hi) or                  (kind == "int" and _num(value) and float(value).is_integer() and lo <= value <= hi)
+            if not ok:
+                errs.append(f"{ctx}: moveSelection.{name}.{field} out of range / wrong type ({value!r})")
+            else:
+                out[(name, field)] = value
+    if errs:
+        return dict(base), errs
+    c, w, k = out[("plate", "ringCenterUU")], out[("plate", "ringWidthUU")], out[("plate", "keylineUU")]
+    band_in, band_out = c - w / 2 - k, c + w / 2 + k
+    oi, oo = out[("plate", "outlineInnerUU")], out[("plate", "outlineOuterUU")]
+    occ = out[("plate", "occupiedClearUU")]
+    eps = 1e-3
+    if band_in < 30 - eps or band_out > 40 + eps:
+        errs.append(f"{ctx}: moveSelection.plate ring with keyline {band_in:.2f}..{band_out:.2f} uu must stay in [30, 40]")
+    if oi >= oo or oi < band_out - eps or oo > 41.6 + eps:
+        errs.append(f"{ctx}: moveSelection.plate outline {oi:.2f}..{oo:.2f} uu must lie between the ring band and the rim 41.6")
+    if occ > band_in + eps:
+        errs.append(f"{ctx}: moveSelection.plate occupiedClearUU {occ:.2f} must not exceed the ring band inner edge {band_in:.2f}")
+    if out[("candidate", "radiusUU")] + out[("candidate", "widthUU")] / 2 > occ:
+        errs.append(f"{ctx}: moveSelection.candidate ring must stay inside the occupied clear circle (under the figure)")
+    return (dict(base), errs) if errs else (out, [])
 
 
 GLYPH_NAMES = ("diamond", "bar1", "bars2", "bars3", "hbars2", "square", "cross", "x", "tee", "chevron", "ring")

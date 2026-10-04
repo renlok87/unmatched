@@ -132,6 +132,12 @@ def _variant_args(name: str, out: Path) -> tuple[list[str], list[str], dict]:
         # ENV-MAPS P9 gate H5 (docs/art-pipeline/ENV-HERO-LIGHT.md): the v2 reference minus the hero light rig
         return (["-S08RenderPreset=High", "-ArtPreviewHeroesV2", "-ArtPreviewDiorama", "-NoHeroLight"], [],
                 {"heroesV2": True, "diorama": True, "heroLight": "off (-NoHeroLight)", "profiles": "pak rev 2"})
+    if name == "dx12-lumen-high-v2-moveplates":
+        # MS-T-08 / MS-AT-41 (docs/game-design/move-selection 04 §7): the v2 reference plus the move-selection plates
+        # over a -BenchMoveDraft scene (--move-draft, absolute; run_one adds it); compare with dx12-lumen-high-v2 on the
+        # same --bench-fixture (GPU <= +0.30 ms MVP / +0.50 ms worst case, draw calls from the CSV column RHI/DrawCalls)
+        return (["-S08RenderPreset=High", "-ArtPreviewHeroesV2", "-ArtPreviewDiorama", "-S08MovePlates"], [],
+                {"heroesV2": True, "diorama": True, "movePlates": True, "profiles": "pak"})
     if name in ("dx12-lumen-high-v2", "dx12-lumen-high-v2-fps60"):
         # Wave 6 (GD-058 interim): the reference plus the 5c-B look-dev heroes (-ArtPreviewHeroesV2) and the
         # diorama tray (-ArtPreviewDiorama) on the same bench state; -fps60 caps the single client at
@@ -185,6 +191,7 @@ def _variant_args(name: str, out: Path) -> tuple[list[str], list[str], dict]:
 
 
 VARIANTS = ["dx12-lumen-high", "dx12-lumen-high-v2", "dx12-lumen-high-v2-fps60", "dx12-lumen-high-v2-nohero",
+            "dx12-lumen-high-v2-moveplates",
             "dx12-lumen-high-vsm",
             "dx12-lumen-high-csmdefault", "dx11-legacy",
             "dx12sm5-legacy", "dx12-medium", "dx12-low", "dx12-sm5-fallback", "dx11-fallback", "sky-<k>"]
@@ -298,8 +305,22 @@ def parse_csv(p: Path) -> dict:
         except ValueError:
             continue
         data.append(r)
-    out = {"file": p.name, "frames": len(data), "gpu": {}}
+    out = {"file": p.name, "frames": len(data), "gpu": {}, "rhi": {}}
     for h, i in idx.items():
+        # MS-T-08: draw calls / primitives of the frame (the CSV profiler's RHI category; the column's presence in our
+        # CSV was not verified before MS-T-08 - absent = no "rhi" entry, reported as such by the caller)
+        if h in ("RHI/DrawCalls", "RHI/PrimitivesDrawn"):
+            vals = []
+            for r in data:
+                try:
+                    vals.append(float(r[i]) if i < len(r) else 0.0)
+                except ValueError:
+                    pass
+            if vals:
+                vals.sort()
+                out["rhi"][h] = {"mean": round(sum(vals) / len(vals), 2), "p50": vals[len(vals) // 2],
+                                 "max": vals[-1]}
+            continue
         if h == "GPUTime" or h.startswith("GPU/") or h in ("FrameTime", "GameThreadTime", "RenderThreadTime"):
             vals = []
             for r in data:
@@ -406,6 +427,13 @@ def run_one(variant: str, rdir: Path, a) -> dict:
            "-ArtPreview", "-Bench", f"-BenchOut={rdir}", f"-S08Trace={trace}", f"-BenchViews={a.views}",
            f"-BenchWarmup={a.warmup}", f"-BenchSettle={a.settle}", f"-BenchMeasure={a.measure}",
            "-BenchCsv", "-csvGpuStats", f"-abslog={log}"] + args
+    if variant.endswith("-moveplates"):
+        # MS-T-08: the -BenchMoveDraft scene over the bench fixture (tools/s08/fixtures/move-draft/<board>-<scene>.json)
+        if not a.move_draft:
+            raise SystemExit(f"{variant} needs --move-draft <tools/s08/fixtures/move-draft/...json>")
+        md = Path(a.move_draft).resolve()
+        cmd.append(f"-BenchMoveDraft={md}")
+        notes = {**notes, "moveDraft": rel(md)}
     if a.bench_fixture:
         # ENV-MAPS: the same scene on another board (S08BenchMarmoreal/Sarpedon.json); a relative path is read
         # by the packaged client from its pak (cwd Binaries/Win64, e.g. ../../../Unmatched/Config/Bench/<file>)
@@ -671,6 +699,9 @@ def main(argv=None) -> int:
     r.add_argument("--bench-fixture", default=DEFAULT_BENCH_FIXTURE,
                    help="-BenchFixture=<json> (default: Marmoreal, the original map; ../../../Unmatched/Config/Bench/"
                         "S08BenchSarpedon.json for Sarpedon)")
+    r.add_argument("--move-draft", default="",
+                   help="MS-T-08: -BenchMoveDraft scene for the *-moveplates variant (tools/s08/fixtures/move-draft/"
+                        "<board>-<scene>.json; its benchFixture must match --bench-fixture)")
     r.add_argument("--name", default="", help="output directory name under --out (default: the variant)")
     s = sub.add_parser("summarize")
     s.add_argument("--out", required=True)

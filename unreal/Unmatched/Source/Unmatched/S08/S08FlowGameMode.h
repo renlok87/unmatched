@@ -26,6 +26,8 @@
 #include "../S09/S09HudPress.h"
 #include "S08FlowGameMode.generated.h"
 
+struct FS08MoveDraftView;
+
 class SEditableTextBox;
 class SConstraintCanvas;
 class STextBlock;
@@ -500,6 +502,19 @@ private:
   FString BenchViewerId;   // fixture player whose fighters are "own" (blue)
   FString BenchBoardId;    // Board row id of the fixture (art profile match)
   void RunRenderBench();
+  // ---- MS-T-08 move plates (S08MoveHighlight.h, S08FlowGameModeMoveDraft.cpp) ----
+  /** The board's view provider: the plates of the CommandUi draft (draft / inspection / pending MOVE-PLACE); false =
+   *  the plain reachable set (legacy quick select, other pending types). */
+  bool BuildMoveDraftViewFor(const FString& FighterId, const TSet<uint64>& Reachable, FS08MoveDraftView& OutView);
+  /** Tick: re-draws the plates when the draft changed without a selection change (assign, boost, order, in flight). */
+  void SyncMovePlates();
+  /** -BenchMoveDraft=<abs path> (04 §6.4): the draft of the fixture file over the bench game state; false with the
+   *  reason (a 'MS-BENCH mismatch id=' id, a refused operation) - the bench then takes no frame. */
+  bool ApplyBenchMoveDraft(const FS08Snapshot& Snapshot, const FString& Path, FString& OutError);
+  bool bBenchMoveDraft = false;
+  /** Space under the cursor of the plates (MS-T-09 drives it live; the bench fixture's "hover" now). */
+  FIntPoint MoveHoverCell = FIntPoint(-1, -1);
+  uint32 MovePlatesKey = 0;
   /** One -Bench view's camera: selection + zoom per the view name, traced 'BENCH view=...' (RunRenderBench case 2;
    *  also the live-tune shot). */
   void BenchSetupView(const FString& View, const FString& HeroId);

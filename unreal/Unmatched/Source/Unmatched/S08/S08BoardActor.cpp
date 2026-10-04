@@ -1417,6 +1417,7 @@ bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
     }
     UpdateDioramaTray(Board);
     ClearChildren();
+    BuildMoveHighlight();  // MS-T-08: the plates of the map's spaces
     return true;
   }
   HideTopologyComponents();  // a grid after a topology board: the map plane / discs / pick box go away
@@ -1598,6 +1599,8 @@ bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
   }
   UpdateDioramaTray(Board);
   ClearChildren();
+  // MS-T-08: the move plates get one instance per space of the new board (and the style of its profile)
+  BuildMoveHighlight();
   return true;
 }
 
@@ -1702,6 +1705,11 @@ void AS08BoardActor::SetSelectedFighter(const FString& FighterId,
     if (Tile) Tile->Destroy();
   }
   HighlightTiles.Reset();
+  // MS-T-08: the plates replace the spawned highlight actors (MS-R-49: instance data only)
+  if (UsesMovePlates()) {
+    ApplyMovePlates(FighterId, ReachableCells);
+    return;
+  }
   if (FighterId.IsEmpty()) return;
 
   UMaterialInterface* Solid = S08GameLayerMaterial();  // W4-A game layer
@@ -1840,6 +1848,56 @@ void AS08BoardActor::SetSelectedFighter(const FString& FighterId,
 
 void AS08BoardActor::ClearSelection() {
   SetSelectedFighter(FString(), TSet<uint64>());
+}
+
+// ---- MS-T-08 move plates ----
+
+bool AS08BoardActor::UsesMovePlates() const {
+  return S08MoveHighlight::PlatesEnabled() && MoveHighlight && MoveHighlight->IsReady() &&
+         MoveHighlight->GetSpaceCount() > 0;
+}
+
+FS08MoveSelectionSpec AS08BoardActor::ActiveMoveSelection() const {
+  if (bArtActive) return ActiveProfile.MoveSelection;
+  if (bArtDataLoaded) return ArtData.MoveSelection;
+  return FS08MoveSelectionSpec();
+}
+
+void AS08BoardActor::BuildMoveHighlight() {
+  if (!S08MoveHighlight::PlatesEnabled() || BoardModel.Width <= 0) return;
+  if (!MoveHighlight) {
+    MoveHighlight = NewObject<US08MoveHighlightComponent>(this, TEXT("MoveHighlight"));
+    MoveHighlight->SetupAttachment(RootComponent);
+    MoveHighlight->RegisterComponent();
+    MoveHighlight->Initialize(PlaneMesh);
+  }
+  MoveHighlight->BuildForBoard(BoardModel, ActiveMoveSelection());
+}
+
+US08MoveHighlightComponent* AS08BoardActor::EnsureMoveHighlightForTest() {
+  BuildMoveHighlight();
+  if (MoveHighlight && !MoveHighlight->IsReady()) {
+    MoveHighlight->SetReadyForTest();
+    MoveHighlight->BuildForBoard(BoardModel, ActiveMoveSelection());
+  }
+  return MoveHighlight;
+}
+
+void AS08BoardActor::ApplyMovePlates(const FString& FighterId, const TSet<uint64>& Reachable) {
+  if (!MoveHighlight) return;
+  FS08MoveDraftView View;
+  if (!(MoveDraftViewProvider && MoveDraftViewProvider(FighterId, Reachable, View))) {
+    View = S08MoveHighlight::ViewFromReachable(BoardModel, Fighters, FighterId, Reachable, DrawsLeaderPips());
+  }
+  MoveHighlight->ApplyView(View);
+}
+
+void AS08BoardActor::SetMoveDraftView(const FS08MoveDraftView& View) {
+  if (UsesMovePlates()) MoveHighlight->ApplyView(View);
+}
+
+void AS08BoardActor::RefreshMoveDraftView() {
+  if (UsesMovePlates()) ApplyMovePlates(SelectedFighterId, ReachableCells);
 }
 
 void AS08BoardActor::ShowIllegalCell(int32 X, int32 Y) {

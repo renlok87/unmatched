@@ -748,6 +748,187 @@ FString FS08BoardArtData::ResolvePath(bool& bOutOverride) {
   return bOutOverride ? Override : DefaultPath();
 }
 
+// ---- MS-T-08: the "moveSelection" block (root defaults + boards[i] override, any surface) ----
+bool S08ParseMoveSelection(const FString& Context, const TSharedPtr<FJsonObject>& Object, FS08MoveSelectionSpec& InOut,
+                           TArray<FString>& OutErrors) {
+  const int32 ErrorsBefore = OutErrors.Num();
+  auto Fail = [&](const FString& What) {
+    OutErrors.Add(FString::Printf(TEXT("%s: moveSelection.%s"), *Context, *What));
+  };
+  if (!Object.IsValid()) {
+    OutErrors.Add(FString::Printf(TEXT("%s: moveSelection must be an object"), *Context));
+    return false;
+  }
+  FS08MoveSelectionSpec Spec = InOut;
+  // One sub-block: every present field is checked; unknown fields are errors (a typo never becomes a silent default).
+  auto Block = [&](const TCHAR* Name, TFunctionRef<void(const TSharedPtr<FJsonObject>&, TSet<FString>&)> Read) {
+    if (!Object->HasField(Name)) return;
+    const TSharedPtr<FJsonObject>* Sub = nullptr;
+    if (!Object->TryGetObjectField(Name, Sub) || !Sub || !Sub->IsValid()) {
+      Fail(FString::Printf(TEXT("%s must be an object"), Name));
+      return;
+    }
+    TSet<FString> Known;
+    Read(*Sub, Known);
+    for (const TPair<FString, TSharedPtr<FJsonValue>>& Pair : (*Sub)->Values) {
+      if (!Known.Contains(Pair.Key)) Fail(FString::Printf(TEXT("%s.%s is not a known field"), Name, *Pair.Key));
+    }
+  };
+  auto Number = [&](const TCHAR* BlockName, const TSharedPtr<FJsonObject>& O, TSet<FString>& Known, const TCHAR* Field,
+                    double Min, double Max, float& Out) {
+    Known.Add(Field);
+    if (!O->HasField(Field)) return;
+    double V = 0.0;
+    if (!O->TryGetNumberField(Field, V) || !FMath::IsFinite(V) || V < Min || V > Max) {
+      Fail(FString::Printf(TEXT("%s.%s must be a number in [%g, %g]"), BlockName, Field, Min, Max));
+      return;
+    }
+    Out = static_cast<float>(V);
+  };
+  auto Int = [&](const TCHAR* BlockName, const TSharedPtr<FJsonObject>& O, TSet<FString>& Known, const TCHAR* Field,
+                 int32 Min, int32 Max, int32& Out) {
+    Known.Add(Field);
+    if (!O->HasField(Field)) return;
+    double V = 0.0;
+    if (!O->TryGetNumberField(Field, V) || !FMath::IsFinite(V) || V != FMath::RoundToDouble(V) || V < Min || V > Max) {
+      Fail(FString::Printf(TEXT("%s.%s must be a whole number in [%d, %d]"), BlockName, Field, Min, Max));
+      return;
+    }
+    Out = static_cast<int32>(V);
+  };
+  auto Hex = [&](const TCHAR* BlockName, const TSharedPtr<FJsonObject>& O, TSet<FString>& Known, const TCHAR* Field,
+                 FColor& Out) {
+    Known.Add(Field);
+    if (!O->HasField(Field)) return;
+    FString Text;
+    FColor C;
+    if (!O->TryGetStringField(Field, Text) || !ParseHexColor(Text, C)) {
+      Fail(FString::Printf(TEXT("%s.%s must be sRGB #RRGGBB"), BlockName, Field));
+      return;
+    }
+    Out = C;
+  };
+  auto Bool = [&](const TCHAR* BlockName, const TSharedPtr<FJsonObject>& O, TSet<FString>& Known, const TCHAR* Field,
+                  bool& Out) {
+    Known.Add(Field);
+    if (!O->HasField(Field)) return;
+    const TSharedPtr<FJsonValue> Value = O->TryGetField(Field);
+    if (!Value.IsValid() || Value->Type != EJson::Boolean) {
+      Fail(FString::Printf(TEXT("%s.%s must be true|false"), BlockName, Field));
+      return;
+    }
+    Out = Value->AsBool();
+  };
+  Block(TEXT("plate"), [&](const TSharedPtr<FJsonObject>& O, TSet<FString>& K) {
+    const TCHAR* B = TEXT("plate");
+    Hex(B, O, K, TEXT("colorSrgb"), Spec.PlateColor);
+    Hex(B, O, K, TEXT("keylineSrgb"), Spec.KeylineColor);
+    Number(B, O, K, TEXT("fillAlpha"), 0.0, 0.2, Spec.FillAlpha);  // 03 §4.1: never denser than 20 %
+    Number(B, O, K, TEXT("ringCenterUU"), 20.0, 42.0, Spec.RingCenterUU);
+    Number(B, O, K, TEXT("ringWidthUU"), 0.5, 8.0, Spec.RingWidthUU);
+    Number(B, O, K, TEXT("keylineUU"), 0.0, 3.0, Spec.KeylineUU);
+    Number(B, O, K, TEXT("outlineInnerUU"), 30.0, 42.0, Spec.OutlineInnerUU);
+    Number(B, O, K, TEXT("outlineOuterUU"), 30.0, 42.0, Spec.OutlineOuterUU);
+    Number(B, O, K, TEXT("occupiedClearUU"), 0.0, 40.0, Spec.OccupiedClearUU);
+    Number(B, O, K, TEXT("pipCutDeg"), 0.0, 45.0, Spec.PipCutDeg);
+    Number(B, O, K, TEXT("zFill"), 0.05, 3.0, Spec.ZFill);
+    Number(B, O, K, TEXT("zRing"), 0.05, 3.0, Spec.ZRing);
+  });
+  Block(TEXT("boostTier"), [&](const TSharedPtr<FJsonObject>& O, TSet<FString>& K) {
+    const TCHAR* B = TEXT("boostTier");
+    Int(B, O, K, TEXT("dashCount"), 4, 48, Spec.DashCount);
+    Number(B, O, K, TEXT("dashDuty"), 0.2, 0.9, Spec.DashDuty);
+    Hex(B, O, K, TEXT("chipBgSrgb"), Spec.ChipBgColor);
+    Hex(B, O, K, TEXT("chipTextSrgb"), Spec.ChipTextColor);
+  });
+  Block(TEXT("path"), [&](const TSharedPtr<FJsonObject>& O, TSet<FString>& K) {
+    const TCHAR* B = TEXT("path");
+    Hex(B, O, K, TEXT("colorSrgb"), Spec.PathColor);
+    Number(B, O, K, TEXT("widthUU"), 1.0, 16.0, Spec.PathWidthUU);
+    Number(B, O, K, TEXT("keylineUU"), 0.0, 4.0, Spec.PathKeylineUU);
+    Number(B, O, K, TEXT("stepDotUU"), 2.0, 24.0, Spec.StepDotUU);
+    Number(B, O, K, TEXT("z"), 0.05, 5.0, Spec.PathZ);
+  });
+  Block(TEXT("ghost"), [&](const TSharedPtr<FJsonObject>& O, TSet<FString>& K) {
+    const TCHAR* B = TEXT("ghost");
+    Number(B, O, K, TEXT("alpha"), 0.05, 1.0, Spec.GhostAlpha);
+    Number(B, O, K, TEXT("alphaSent"), 0.05, 1.0, Spec.GhostAlphaSent);
+    Number(B, O, K, TEXT("leavingFighterAlpha"), 0.05, 1.0, Spec.LeavingFighterAlpha);
+  });
+  Block(TEXT("invalid"), [&](const TSharedPtr<FJsonObject>& O, TSet<FString>& K) {
+    const TCHAR* B = TEXT("invalid");
+    Hex(B, O, K, TEXT("colorSrgb"), Spec.InvalidColor);
+    Int(B, O, K, TEXT("ms"), 50, 3000, Spec.InvalidMs);
+  });
+  Block(TEXT("lastMove"), [&](const TSharedPtr<FJsonObject>& O, TSet<FString>& K) {
+    const TCHAR* B = TEXT("lastMove");
+    Number(B, O, K, TEXT("alpha"), 0.05, 1.0, Spec.LastMoveAlpha);
+    Int(B, O, K, TEXT("fadeMs"), 0, 5000, Spec.LastMoveFadeMs);
+  });
+  Block(TEXT("candidate"), [&](const TSharedPtr<FJsonObject>& O, TSet<FString>& K) {
+    const TCHAR* B = TEXT("candidate");
+    Number(B, O, K, TEXT("radiusUU"), 8.0, 30.0, Spec.CandidateRadiusUU);
+    Number(B, O, K, TEXT("widthUU"), 0.4, 4.0, Spec.CandidateWidthUU);
+    Number(B, O, K, TEXT("alpha"), 0.1, 1.0, Spec.CandidateAlpha);
+    Number(B, O, K, TEXT("z"), 0.05, 5.0, Spec.CandidateZ);
+  });
+  Block(TEXT("anim"), [&](const TSharedPtr<FJsonObject>& O, TSet<FString>& K) {
+    const TCHAR* B = TEXT("anim");
+    Int(B, O, K, TEXT("stepMs"), 40, 2000, Spec.StepMs);
+    Int(B, O, K, TEXT("capFighterMs"), 100, 10000, Spec.CapFighterMs);
+    Int(B, O, K, TEXT("capManeuverMs"), 100, 20000, Spec.CapManeuverMs);
+    Int(B, O, K, TEXT("minStepMs"), 10, 2000, Spec.MinStepMs);
+    Number(B, O, K, TEXT("overlap"), 0.0, 1.0, Spec.Overlap);
+    Int(B, O, K, TEXT("placeMs"), 0, 5000, Spec.PlaceMs);
+    Number(B, O, K, TEXT("hopHeightRel"), 0.0, 1.0, Spec.HopHeightRel);
+    Int(B, O, K, TEXT("turnMs"), 0, 2000, Spec.TurnMs);
+    Int(B, O, K, TEXT("startTurnMs"), 0, 2000, Spec.StartTurnMs);
+    Number(B, O, K, TEXT("travelLeanDeg"), 0.0, 45.0, Spec.TravelLeanDeg);
+    Int(B, O, K, TEXT("leanInMs"), 0, 2000, Spec.LeanInMs);
+    Int(B, O, K, TEXT("settleMs"), 0, 2000, Spec.SettleMs);
+    Bool(B, O, K, TEXT("easeEnds"), Spec.bEaseEnds);
+  });
+  static const TSet<FString> Blocks = {TEXT("plate"), TEXT("boostTier"), TEXT("path"), TEXT("ghost"), TEXT("invalid"),
+                                       TEXT("lastMove"), TEXT("candidate"), TEXT("anim")};
+  for (const TPair<FString, TSharedPtr<FJsonValue>>& Pair : Object->Values) {
+    // "note*" fields carry the document's prose (the other blocks keep theirs the same way)
+    if (!Blocks.Contains(Pair.Key) && !Pair.Key.StartsWith(TEXT("note"))) {
+      Fail(FString::Printf(TEXT("%s is not a known block"), *Pair.Key));
+    }
+  }
+  if (OutErrors.Num() != ErrorsBefore) return false;
+  if (!S08ValidateMoveSelection(Context, Spec, OutErrors)) return false;
+  InOut = Spec;
+  return true;
+}
+
+bool S08ValidateMoveSelection(const FString& Context, const FS08MoveSelectionSpec& Spec, TArray<FString>& OutErrors) {
+  const int32 ErrorsBefore = OutErrors.Num();
+  auto Fail = [&](const FString& What) {
+    OutErrors.Add(FString::Printf(TEXT("%s: moveSelection.%s"), *Context, *What));
+  };
+  // 03 §4.1 / MS-R-72: the ring with its keyline lies in the band of the old readability ring (r 30..40)
+  if (Spec.RingBandInnerUU() < 30.0f - KINDA_SMALL_NUMBER || Spec.RingBandOuterUU() > 40.0f + KINDA_SMALL_NUMBER) {
+    Fail(FString::Printf(TEXT("plate ring with keyline %.2f..%.2f uu must stay in [30, 40]"), Spec.RingBandInnerUU(),
+                         Spec.RingBandOuterUU()));
+  }
+  // the outline sits outside the ring band and inside the painted rim (41.6 uu)
+  if (Spec.OutlineInnerUU >= Spec.OutlineOuterUU || Spec.OutlineInnerUU < Spec.RingBandOuterUU() - KINDA_SMALL_NUMBER ||
+      Spec.OutlineOuterUU > 41.6f + KINDA_SMALL_NUMBER) {
+    Fail(FString::Printf(TEXT("plate outline %.2f..%.2f uu must lie between the ring band (%.2f) and the rim 41.6"),
+                         Spec.OutlineInnerUU, Spec.OutlineOuterUU, Spec.RingBandOuterUU()));
+  }
+  // an occupied space keeps the team ring and the contact shadow free: the ring band starts outside the clear circle
+  if (Spec.OccupiedClearUU > Spec.RingBandInnerUU() + KINDA_SMALL_NUMBER) {
+    Fail(FString::Printf(TEXT("plate occupiedClearUU %.2f must not exceed the ring band inner edge %.2f"),
+                         Spec.OccupiedClearUU, Spec.RingBandInnerUU()));
+  }
+  if (Spec.CandidateRadiusUU + Spec.CandidateWidthUU * 0.5f > Spec.OccupiedClearUU) {
+    Fail(TEXT("candidate ring must stay inside the occupied clear circle (under the figure)"));
+  }
+  return OutErrors.Num() == ErrorsBefore;
+}
+
 bool FS08BoardArtData::LoadFile(const FString& Path, TArray<FString>& OutErrors) {
   TArray<uint8> Bytes;
   if (!FFileHelper::LoadFileToArray(Bytes, *Path)) {
@@ -783,6 +964,16 @@ bool FS08BoardArtData::ParseJson(const FString& Text, TArray<FString>& OutErrors
   Root->TryGetNumberField(TEXT("revision"), Rev);
   Revision = static_cast<int32>(Rev);
   Root->TryGetStringField(TEXT("status"), Status);
+  // MS-T-08: the root "moveSelection" block (defaults of every board; code defaults without it)
+  MoveSelection = FS08MoveSelectionSpec();
+  if (Root->HasField(TEXT("moveSelection"))) {
+    const TSharedPtr<FJsonObject>* MoveObj = nullptr;
+    if (!Root->TryGetObjectField(TEXT("moveSelection"), MoveObj) || !MoveObj || !MoveObj->IsValid()) {
+      OutErrors.Add(TEXT("root: moveSelection must be an object"));
+    } else if (S08ParseMoveSelection(TEXT("root"), *MoveObj, MoveSelection, OutErrors)) {
+      MoveSelection.Source = TEXT("root");
+    }
+  }
 
   const TSharedPtr<FJsonObject>* Styles = nullptr;
   if (Root->TryGetObjectField(TEXT("zoneStyles"), Styles) && Styles && Styles->IsValid()) {
@@ -970,6 +1161,19 @@ bool FS08BoardArtData::ParseJson(const FString& Text, TArray<FString>& OutErrors
           continue;
         }
         B.K1DistanceMul = static_cast<float>(Mul);
+      }
+      // MS-T-08: optional move-selection override on ANY surface (not inside "readability", which grids reject).
+      B.MoveSelection = MoveSelection;
+      if ((*Obj)->HasField(TEXT("moveSelection"))) {
+        const TSharedPtr<FJsonObject>* MoveObj = nullptr;
+        if (!(*Obj)->TryGetObjectField(TEXT("moveSelection"), MoveObj) || !MoveObj || !MoveObj->IsValid()) {
+          OutErrors.Add(FString::Printf(TEXT("board %s: moveSelection must be an object"), *B.Id));
+          continue;
+        }
+        if (!S08ParseMoveSelection(FString::Printf(TEXT("board %s"), *B.Id), *MoveObj, B.MoveSelection, OutErrors)) {
+          continue;
+        }
+        B.MoveSelection.Source = TEXT("board");
       }
       // ENV-MAPS P4: optional readability block, map-image boards only (grids stay bit for bit).
       if ((*Obj)->HasField(TEXT("readability"))) {

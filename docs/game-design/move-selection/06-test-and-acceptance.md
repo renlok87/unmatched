@@ -115,6 +115,12 @@ MS-T-13) — в том числе таблица ΔE цвета подложки
 id бойцов и карт берутся из него, несовпадение — трасса `MS-BENCH mismatch`, кадр не снимается. Шесть сцен на доску и
 сцена худшего случая с синтетическим `gameState` на 9 бойцов (MS-AT-30).
 
+Состояние на 2026-10-04 (MS-T-08): есть сцены 1 и 2 для обеих досок — `marmoreal-1-select-boost.json`,
+`marmoreal-2-draft-conflict-needboost.json`, `sarpedon-1-select-boost.json`, `sarpedon-2-draft-conflict-needboost.json`
+(формат дополнен полем `moveOrder`, 04 §6.1 «Уточнение MS-T-08»). Их разбор и применение к настоящим bench-состояниям
+проверяет `Unmatched.S08.MoveHL.BenchDraft`, ссылки на id и пространства — `tools/art/tests/test_render_bench_moveplates.py`.
+Сцены 3–6 и худший случай добавляют MS-T-09/10/12/17 и MS-T-27.
+
 ### 6.3. Данные для живой дуэли
 
 Колоды и бойцы MVP-пары Medusa/King Arthur (`docs/game-design/evidence/S01/content-medusa.json`,

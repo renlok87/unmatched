@@ -166,6 +166,32 @@ class ShippedProfiles(unittest.TestCase):
         self.assertTrue(all(b["surface"] == "map-image" for b in profiles["boards"]))
         self.assertEqual(F.main(["check"]), 0)
 
+    def test_move_selection_blocks(self):
+        # MS-T-08 (04 §4.7): the root block = the code defaults, the two maps override the plate / path colour; the
+        # override is legal on a grid too (not part of "readability"); broken geometry, unknown fields are rejected.
+        profiles = json.loads(F.DEFAULT_PROFILES.read_text(encoding="utf-8"))
+        root, errs = F.merge_move_selection("root", profiles["moveSelection"], F.MOVE_SELECTION_DEFAULTS)
+        self.assertEqual(errs, [])
+        self.assertEqual(root, F.MOVE_SELECTION_DEFAULTS)
+        for b in profiles["boards"]:
+            merged, errs = F.merge_move_selection(b["id"], b["moveSelection"], root)
+            self.assertEqual(errs, [])
+            self.assertEqual(merged[("plate", "colorSrgb")], "#FFC857")
+            self.assertEqual(merged[("path", "colorSrgb")], "#FFC857")
+            self.assertEqual(merged[("plate", "ringCenterUU")], 36.0)
+        bad = json.loads(json.dumps(profiles))
+        bad["boards"].append({"id": "grid", "surface": "tiles", "moveSelection": {"plate": {"colorSrgb": "#4CD2DC"}}})
+        self.assertEqual(F.check_profiles(bad), [])
+        for block, needle in (({"plate": {"ringWidthUU": 8}}, "must stay in [30, 40]"),
+                              ({"plate": {"outlineOuterUU": 42}}, "rim 41.6"),
+                              ({"plate": {"colour": "#FFFFFF"}}, "not a known field"),
+                              ({"plates": {}}, "not a known block"),
+                              ({"boostTier": {"dashCount": 12.5}}, "out of range"),
+                              ({"anim": {"easeEnds": "yes"}}, "out of range")):
+            with self.subTest(block=block):
+                errs = F.merge_move_selection("board x", block, root)[1]
+                self.assertTrue(any(needle in e for e in errs), errs)
+
     def test_profile_budget_rule_detects_violations(self):
         profiles = json.loads(F.DEFAULT_PROFILES.read_text(encoding="utf-8"))
         bad = json.loads(json.dumps(profiles))

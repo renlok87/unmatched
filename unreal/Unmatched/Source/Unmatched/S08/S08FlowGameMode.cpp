@@ -693,6 +693,11 @@ void AS08FlowGameMode::SyncBoardFromApplied() {
     if (BoardActor) {
       // T3.2: the room's Board row id selects the -ArtPreview board profile.
       BoardActor->SetRoomBoardId(RoomBoardId);
+      // MS-T-08: with -S08MovePlates the plates show the CommandUi draft (tiers, moves, statuses), not only a set
+      BoardActor->SetMoveDraftViewProvider(
+          [this](const FString& FighterId, const TSet<uint64>& Reachable, FS08MoveDraftView& OutView) {
+            return BuildMoveDraftViewFor(FighterId, Reachable, OutView);
+          });
       BoardActor->Rebuild(BoardModel);
       SetupCameraForBoard();
       // INT-019 control points (evidence line, also asserted by automation
@@ -4056,6 +4061,7 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
   RunS10AbortProof();
   if (bS09Probe) RunS09HudProbe();
   if (bBench) RunRenderBench();
+  SyncMovePlates();
   // GD-034: the server deadline countdown must tick without a new snapshot.
   if (CommandUi.Mode == ES09CommandMode::CombatDefense ||
       CommandUi.Mode == ES09CommandMode::CombatResolve) {
@@ -7276,6 +7282,16 @@ void AS08FlowGameMode::RunRenderBench() {
     }
     if (bLiveTune) LiveTuneBeforeBuild();
     SyncBoardFromApplied();
+    // MS-T-08 (04 §6.4): -BenchMoveDraft lays a draft over the fixture; a mismatch or a refused operation takes no frame
+    FString MoveDraftPath;
+    if (FParse::Value(Cmd, TEXT("BenchMoveDraft="), MoveDraftPath) && !MoveDraftPath.IsEmpty()) {
+      FString MoveDraftError;
+      if (!ApplyBenchMoveDraft(Snap, MoveDraftPath, MoveDraftError)) {
+        Finish(FString::Printf(TEXT("BENCH FAILED move-draft %s: %s"), *FPaths::GetCleanFilename(MoveDraftPath),
+                               *MoveDraftError));
+        return;
+      }
+    }
     FS08Trace::Write(FString::Printf(
         TEXT("BENCH scene fixture=%s board=%dx%d fighters=%d viewer=%s hero=%s art=%d profile=%s views=%s warmup=%.0f settle=%.0f measure=%.0f fps=%.0f profileGpu=%d csv=%d"),
         *FPaths::GetCleanFilename(Fixture), BoardModel.Width, BoardModel.Height, Fighters.Num(),
@@ -7425,6 +7441,9 @@ void AS08FlowGameMode::BenchSetupView(const FString& View, const FString& HeroId
     FS08Trace::Write(FString::Printf(TEXT("BENCH view=%s overview target=%.1f fit=%.1f"), *View, CameraZoom.Target,
                                      CameraZoom.Fit));
   }
+  // MS-T-08: a -BenchMoveDraft scene keeps the draft's selection on the board in every view (the camera focus above
+  // only moves the camera)
+  if (bBenchMoveDraft && BoardActor) BoardActor->SetSelectedFighter(CommandUi.SelectedFighterId, CommandUi.ReachableCells);
 }
 
 bool AS08FlowGameMode::BenchCameraSettled() const {

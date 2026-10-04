@@ -14,6 +14,7 @@
 #include "S08MapBackdrop.h"
 #include "S08ArtHud.h"
 #include "S08HeroesV2.h"
+#include "S08MoveHighlight.h"
 #include "S08Render.h"
 #include "S08Team.h"
 #include "S08BoardActor.generated.h"
@@ -249,9 +250,35 @@ public:
    *  clip, exactly once per (event, fighter, authoritative seq). A no-op with -S08HeroesLegacy or without a v2 figure. */
   void NotifyFighterAnimEvent(const FString& FighterId, S08HeroesV2::EEvent Event, int32 SequenceNumber);
 
-  /** TASK-022 selection ring + reachable-cell highlights. */
+  /** TASK-022 selection ring + reachable-cell highlights. MS-T-08: with the move plates (-S08MovePlates) the
+   *  highlights are the plates of US08MoveHighlightComponent - the view comes from the provider (the game mode's draft,
+   *  SetMoveDraftViewProvider), else from Reachable (S08MoveHighlight::ViewFromReachable); no actor is spawned. */
   void SetSelectedFighter(const FString& FighterId, const TSet<uint64>& Reachable);
   void ClearSelection();
+  // ---- MS-T-08 move plates (S08MoveHighlight.h) ----
+  /** True when the plates draw the highlights: -S08MovePlates, M_UM_MovePlate loaded and a board built. */
+  bool UsesMovePlates() const;
+  /** Draws View on the plates (no-op without them). */
+  void SetMoveDraftView(const FS08MoveDraftView& View);
+  /** The game mode's view of the current selection (false = the plain reachable set). */
+  using FMoveDraftViewProvider = TFunction<bool(const FString& /*FighterId*/, const TSet<uint64>& /*Reachable*/,
+                                                FS08MoveDraftView& /*OutView*/)>;
+  void SetMoveDraftViewProvider(FMoveDraftViewProvider Provider) { MoveDraftViewProvider = MoveTemp(Provider); }
+  /** Rebuilds the view of the current selection (a draft operation without a selection change). */
+  void RefreshMoveDraftView();
+  /** The move-selection style of the active board: the art profile's (root + board override), else the document root,
+   *  else the code defaults. */
+  FS08MoveSelectionSpec ActiveMoveSelection() const;
+  /** The readability leader pips are drawn on this board (the plates cut around them). */
+  bool DrawsLeaderPips() const {
+    const FS08BoardReadabilitySpec* R = GetActiveReadability();
+    return R && R->bLeaderPip;
+  }
+  const US08MoveHighlightComponent* GetMoveHighlight() const { return MoveHighlight; }
+  /** Spawned highlight actors of the old path (0 with the plates, MS-R-49). */
+  int32 GetHighlightActorCount() const { return HighlightTiles.Num(); }
+  /** Automation: the move plates on a test world (material checked like a game; SetReadyForTest when absent). */
+  US08MoveHighlightComponent* EnsureMoveHighlightForTest();
   /** One-shot illegal-destination feedback (red tile) with a reason. */
   void ShowIllegalCell(int32 X, int32 Y);
   void HideIllegalCell();
@@ -547,6 +574,15 @@ private:
   int32 HeroLightCount = 0;
   int32 HeroLightLayersPerFigure = 0;
   FString HeroLightTraceKey;
+
+  // ---- MS-T-08 move plates ----
+  UPROPERTY()
+  TObjectPtr<US08MoveHighlightComponent> MoveHighlight;
+  FMoveDraftViewProvider MoveDraftViewProvider;
+  /** Creates the component once (-S08MovePlates) and builds its instances for the current board. */
+  void BuildMoveHighlight();
+  /** The view of (FighterId, Reachable) on the plates. */
+  void ApplyMovePlates(const FString& FighterId, const TSet<uint64>& Reachable);
 
   FS08BoardModel BoardModel;
   TArray<FS08BoardFighter> Fighters;
