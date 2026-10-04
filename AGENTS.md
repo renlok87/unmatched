@@ -223,3 +223,48 @@ User request: «Конечно, делай и закрепи это в осно�
   - rebuild UnmatchedEditor;
   - copy the staged build with `tools/s08/sync-staged-build.ps1 -From <worktree>`. It refuses when the stamp commit differs from the main HEAD; do not repackage.
 - **Packaging trap.** A new or renamed `Config/**.json` reaches the pak only after the game makefile is regenerated: touch `unreal/Unmatched/Source/Unmatched/Unmatched.Build.cs`, then build the game target with `-MaxParallelActions=4`.
+
+## Board scenes and heroes (user decisions, binding)
+
+The user's words on 2026-10-04: «закрепи это в главных правилах проекта, как собираются сцены с героями». They gave
+this order after two mistakes on 2026-10-04: grey blockouts shown instead of the finished hero models, and a
+3D-modelled backdrop shown on a map that must be painted. This section wins over older notes, evidence and
+memory. A change that contradicts it needs the user's explicit word first.
+
+- **Boards: only the real game maps** (decision record `docs/game-design/decisions/2026-10-04-real-boards-only.md`):
+  - Marmoreal · original map — Board `c121b47f8d6eb28daccb76d05`, profile `marmoreal-original`. This is the
+    default board for new games, demos and tools.
+  - Sarpedon · original map — Board `c7fa64a26c29a0835f2383e63`, profile `sarpedon-original`.
+
+  Synthetic boards do not count as evidence and are never used for new runs or acceptance: Cobble City 5×6,
+  the ART FIXTURE grids and the 20×20 fallback. Every live run passes a real map (`-ArtPreviewBoardId` or the
+  backend default).
+- **Backdrop around the map field.** The board itself is always the painted map field. Around it:
+  - **Marmoreal**: a painted backdrop taken from the concept (concept paste). It has a static painted plate plus
+    semi-static animated elements: flicker, water, wind and the like. Small details from the concept-paste design
+    may be 3D models with animation. The user's answer on 2026-10-04: «Нарисованный задник». The 3D-modelled
+    surroundings of P5c (palace, 3D trees, layout props) are a rollback flag only, never the default. The user's
+    acceptance of the 3D P5c look on 2026-10-01 is superseded.
+  - **Sarpedon**: `lit3d`, path 1 — a 3D island under the de-lit concept paint, with animated waterfall, fire,
+    banner and cannons. The user's answer on 2026-10-04: «lit3d — путь 1». Do not switch it to `paste` or to the
+    plain 3D scene without the user.
+  - Never turn on extra 3D-modelled surroundings by default on top of a painted backdrop. Never take a "look" from
+    a bench variant or an older acceptance act without checking it against this section.
+- **Heroes: the finished look-dev v2 figures are the default.** That means King Arthur, Merlin, Medusa and the
+  three Harpies: `SK_<Hero>_H2LD` / `SK_Harpy_H3LD`, `S08HeroesV2`, team MIs and Idle/Lunge/Hit/Death clips.
+  Grey blockouts and the Medusa candidate appear only through the rollback flag `-S08HeroesLegacy`.
+- **Accepted art is the default; flags only roll it back.** This holds even for art accepted by delegation.
+  - Never hide finished art behind an opt-in review flag.
+  - `-ArtPreview` gates review tooling only: shots, probes, focus zoom, input plans.
+  - Rollback flags: `-S08GreyBoard`, `-S08HeroesLegacy`, `-S08DioramaLegacy`, `-S08IconLegacy` and
+    `-S08LegacyRender`.
+  - The client writes the look it used in the trace line `ARTLOOK …`.
+- **Look before you report.** Before reporting any live run, demo, package or acceptance, open the shot yourself
+  (Read the PNG). Check against this section: the board is a real map, the backdrop is right for that map, and
+  all six figures are the v2 models. Trace lines alone are not enough.
+- **Still open, decided by the user, not by default:**
+  - figure facing (ART-012; unfinished draft on branch `wip/art012-facing-2026-10-04`, not integrated);
+  - HUD name plates over the figures.
+- **Known gap at 2026-10-04.** Since `0f2bdb9a`, Marmoreal shows the 3D P5c surroundings by default, which
+  violates the backdrop rule above. Fixing it (ENV-U16) is the next Unreal task. The user stopped all Unreal work
+  on 2026-10-04, so do not start it without the user's go-ahead.
