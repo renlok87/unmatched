@@ -10,6 +10,10 @@
 подкладка, лента) и на подставке, сам герой остаётся в цветах концепта. Путь v2.0 (TeamMask × `teamDyeAllowed`) оставлен
 за выключенным свитчем. Подробности — §3 п. 7, §6.1, решения LDV-12…LDV-16.
 
+**v2.3 (2026-10-04, DE-011): растворение при смерти** — static switch `UseDissolve`, по умолчанию выключен: мастер
+остаётся Opaque, граф и шейдер v2.2 не меняются. Растворение включают только MIC `/Game/UM/Materials/v2/Dissolve/*`
+(Masked). Подробности — §6.3.
+
 Архитектура взята из [README библиотеки](README.md), §3–§7. Здесь описано, как она реализована и где от неё отступили.
 Решения с номерами LDV-* записаны в [журнале решений LD](../../game-design/decisions/2026-09-29-lookdev-v2-decisions.md).
 
@@ -102,8 +106,9 @@ MakeMaterialAttributes используется потому, что в Python-�
 | Library | **`MatIDTexture`**, **`MatLUT`**, `DetailStrength` 1, `WearStrength` 1, `SheenStrength` 1, `MetresPerLocalUnit` 0.01, static switch `UseUV1Metres` false | MatID legacy, LUT глобальная |
 | Team | static switch **`UseTeamAccent`** (v2.1), `TeamColor`, `TeamDye`, `TeamDyeGain` (как в v1), **`TeamDyeCeiling`** (v2.1) | `UseTeamAccent` true; `TeamDyeCeiling` 0 (= только `TeamDyeGain`); остальное как v1 |
 | Knobs | `RoughnessMin/Max`, `NormalStrength`, `AOToBaseColor`, `Saturation`, `ValueLift`, `EmissiveIntensity`, `RimColor` (как в v1) | нейтральные, как v1 |
-| CustomPrimitiveData | `CPD_TeamColor` 0–3, `CPD_FxFlash` 5–8, `CPD_RimIntensity` 9, `CPD_RimWidth` 10, `CPD_Fade` 11 (раскладка v1); **`CPD_HitTint` 12** (v2.2, только v2) | 0 |
+| CustomPrimitiveData | `CPD_TeamColor` 0–3, `CPD_FxFlash` 5–8, `CPD_RimIntensity` 9, `CPD_RimWidth` 10, `CPD_Fade` 11 (раскладка v1); **`CPD_HitTint` 12** (v2.2, только v2); **`CPD_Dissolve` 13**, **`CPD_DissolveStyle` 14** (v2.3, только перестановка `UseDissolve`) | 0 |
 | Cue | **`HitTintColor`** (0.85, 0.03, 0.02), **`HitTintStrength`** 0.7, **`HitTintEmissive`** 0.35 (v2.2) | как указано |
+| Cue (v2.3) | static switch **`UseDissolve`**; **`DissolveEdgeWidth`** 0.12, **`DissolveNoiseScale`** 40, **`DissolveHeightBias`** 0.45, **`DissolveHeightUU`** 60, **`DissolveAshValue`** 0.25, **`DissolveEdgeEmissive`** 1.5 | `UseDissolve` выкл.; ручки как указано |
 | Debug | `DebugView` (0 выкл.; 1 класс, 2 roughness, 3 metallic, 4 нормаль детали, 5 износ, 6 итоговая нормаль, 7 альбедо, 8 fuzz, 9 RMH тайла, 10 вес красителя (v2.1); вывод в emissive, поверхность чёрная), `DebugMatIDOverride` (−1 = из текстуры; 0–15 = весь материал один класс), `DebugBakeFromLUT` (1 = бейк заменён типичным цветом класса) | 0 / −1 / 0 |
 
 Имена и раскладка CPD совпадают с v1, поэтому MI героя переносится сменой родителя и добавлением трёх текстур:
@@ -261,6 +266,48 @@ surface cache. Причина не доказана, записана как о�
   - после: 1 меняет 92 тыс. пикселей фигур, «краснота» R − (G + B)/2 растёт с 32 до 173 уровней.
   Кадры редактора — проверка материала, не K1–K3 и не художественная приёмка. Packaged K1 до/после снимает агент приёмки
   прогона A04.
+
+### 6.3. v2.3 — растворение при смерти `UseDissolve` (DE-011, 2026-10-04)
+
+Зачем: CUE-013 по 01 F-09 — после DeathSettle и удержания фигура растворяется за 500 мс (герой) или 400 мс (помощник)
+вместо мгновенного скрытия. По умолчанию — простой fade; «пепел» цвета команды С-11 — кандидат до листа A/B (DE-028).
+Кривую и замену материала делает код смерти (DE-019); мастер даёт перестановку и параметры.
+
+- **Почему не Masked-мастер.** Правило мастеров «без Masked» (PIPELINE.md) и живые фигуры без маскированного прохода
+  глубины. Masked нужен только умирающей фигуре на полсекунды, поэтому:
+  - мастер получает static switch `UseDissolve` (по умолчанию выкл.). Его выход False — ровно пины v2.2 (`base_hit`,
+    `em_hit`, OpacityMask = 1). Перестановка по умолчанию компилирует тот же граф: PS мастера 710, как в v2.2;
+  - на каждый MI тела героя есть MIC растворения `/Game/UM/Materials/v2/Dissolve/MI_<Key>_<Stage>_<Look>_Dissolve`.
+    Это ребёнок MI героя, поэтому текстуры, ручки и свитчи (`UseUV1Metres` вкл. у всех четырёх героев, `UseTeamAccent`)
+    наследуются. MIC меняет только `UseDissolve` (вкл.) и blend mode (Masked). Восемь MIC (4 героя × P1/P2) с одним
+    набором статических параметров дают один шейдер. PS 768 против 706 у MI героя.
+  - MID на другом мастере не подошёл: при копировании параметров MID теряет статические свитчи, а `UseUV1Metres` у
+    героев включён.
+- **Слоты.** CPD 13 `CPD_Dissolve` — прогресс 0…1 (0 = вся фигура, побайтно как MI героя; 1 = отсечён каждый пиксель).
+  CPD 14 `CPD_DissolveStyle`: 0 — fade, 1 — «пепел». Оба нейтральны в 0 и читаются только перестановкой `UseDissolve`.
+  C++: `S08HeroesV2::DissolveCpdIndex`, `DissolveStyleCpdIndex`, `DissolveMaterialPath`, `SetDissolve`,
+  `DissolveSeconds` (0,5 / 0,4 с), `DecideDissolveStyle` (пепел только с `-S08DissolveAsh` и никогда при reduced motion).
+- **Узел `UM_V2_Dissolve`** (`ue/um_v2_dissolve.hlsl`), возвращает маску 1/0:
+  - fade — экранный дизеринг (interleaved gradient noise, сдвиг каждый кадр): TSR сводит его в плавное исчезновение
+    (идея DitherTemporalAA);
+  - пепел — поле = lerp(3D value noise по позиции до скиннинга, высота над подставкой, `DissolveHeightBias`). Шум из
+    двух октав, решётка повёрнута, поле не плывёт с анимацией. Фигура сгорает от ног вверх. Полоса `DissolveEdgeWidth`
+    перед порогом светится оттенком команды (цвет команды, приведённый к полной яркости: тёмно-синий P2 тоже виден):
+    альбедо → оттенок × `DissolveAshValue`, emissive += оттенок × `DissolveEdgeEmissive` через `EyeAdaptationInverse`.
+- **Подставка.** `M_UM_BaseMarker` (v1) не меняется: подставка гаснет слотом v1 `CPD_Fade` (11) с тем же прогрессом и
+  скрывается вместе с фигурой в конце (DE-019).
+- **Сборка.** `tools/art/de011/de011.py apply`: мастер пересобран на месте построителем `ue/um_v2_master.py` без MI героев
+  и тестовых MI, затем созданы 8 MIC. Ошибок компиляции нет; 101 узел, 127 связей, сигнатура графа `8af74265…`.
+- **Проверка** (`docs/art-pipeline/evidence/de011-2026-10-04/de011-report.json`, `all_ok`, 10/10). Та же сцена, что в
+  §6.2, плюс подставки; Arthur и Medusa в P1, Merlin и Harpy в P2:
+  - умолчания до и после — освещённый и unlit-кадр побайтно (max 0); при `CPD_Dissolve` 0,6 и стиле 1 на MI героев кадр
+    тоже побайтно прежний (перестановка по умолчанию слоты не читает);
+  - MIC при прогрессе 0 = MI героя побайтно: подмена материала в начале растворения не видна;
+  - прогресс 1 = пустой кадр (фигуры скрыты) побайтно в обоих стилях; доля пикселей фигур падает монотонно
+    (fade 77 → 66 → 36 → 0 тыс. на 0/35/70/100 %);
+  - «пепел» отличается от fade.
+  Кадры без TAA: fade на них — точечный узор, в игре его сглаживает TSR. Это проверка материала, а не K1–K3 и не
+  художественная приёмка.
 
 ## 7. Как читаются классы (кадры `scene-r3`, свет Cobble, High)
 

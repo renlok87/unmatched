@@ -23,6 +23,7 @@
 #include "S08Team.h"
 
 class UAnimSequenceBase;
+class UPrimitiveComponent;
 
 namespace S08HeroesV2 {
 
@@ -140,5 +141,46 @@ UNMATCHED_API float ContactSeconds(const FHeroSpec& Spec, const UAnimSequenceBas
  *  450 ms from the contact frame, 550 ms when lethal. */
 constexpr int32 HitTintCpdIndex = 12;
 inline const TCHAR* const HitTintParamName = TEXT("CPD_HitTint");
+
+// ---- DE-011 (W-27, 01 F-09): the death dissolve of the v2 figures (tools/art/de011/de011.py).
+// M_UM_Figure_v2 v2.3 has a static switch UseDissolve, off in every hero MI: the accepted figures stay Opaque and
+// compile the v2.2 graph unchanged. One dissolve MIC per body MI (/Game/UM/Materials/v2/Dissolve/MI_<Key>_<Stage>_
+// <Look>_Dissolve) is a child of that MI (textures, knobs and static switches inherited) with UseDissolve on and the
+// blend mode overridden to Masked. A dying figure swaps its body slots to it (DE-019) and drives the progress by CPD.
+/** Static switch of M_UM_Figure_v2 that compiles the dissolve (default off). */
+inline const TCHAR* const DissolveSwitchName = TEXT("UseDissolve");
+/** CPD slots read only by the dissolve permutation: progress 0..1 (0 = the whole figure, exactly its MI look; 1 =
+ *  every pixel clipped) and style (EDissolveStyle). 0 is neutral in both. */
+constexpr int32 DissolveCpdIndex = 13;
+constexpr int32 DissolveStyleCpdIndex = 14;
+inline const TCHAR* const DissolveParamName = TEXT("CPD_Dissolve");
+inline const TCHAR* const DissolveStyleParamName = TEXT("CPD_DissolveStyle");
+/** The pedestal (M_UM_BaseMarker, v1, Opaque) has no dissolve: its v1 slot CPD_Fade greys it out with the same
+ *  progress, and the caller hides it with the figure at the end. */
+constexpr int32 PedestalFadeCpdIndex = 11;
+/** 01 F-09: the dissolve takes 500 ms for a hero (Arthur, Medusa) and 400 ms for a sidekick (Merlin, Harpies). */
+constexpr float DissolveSecondsHero = 0.5f;
+constexpr float DissolveSecondsSidekick = 0.4f;
+inline float DissolveSeconds(const FHeroSpec& Spec) { return Spec.bHero ? DissolveSecondsHero : DissolveSecondsSidekick; }
+
+/** Fade = screen-space dither that TSR resolves into a smooth fade: the default and the reduced-motion style.
+ *  Ash = the figure burns away from the feet up with a team-colour (C-11) glowing front: a candidate for the A/B
+ *  sheet (DE-028) until the user accepts it, shown only with -S08DissolveAsh. */
+enum class EDissolveStyle : uint8 { Fade = 0, Ash = 1 };
+inline const TCHAR* const DissolveAshFlagName = TEXT("S08DissolveAsh");
+/** World-free rule: the ash candidate only on request and never under reduced motion. */
+constexpr EDissolveStyle DecideDissolveStyle(bool bAshFlag, bool bReducedMotion) {
+  return bAshFlag && !bReducedMotion ? EDissolveStyle::Ash : EDissolveStyle::Fade;
+}
+/** DecideDissolveStyle with -S08DissolveAsh from the command line and S08IconMotion::IsReducedMotion(). */
+UNMATCHED_API EDissolveStyle DissolveStyle();
+UNMATCHED_API const TCHAR* DissolveStyleName(EDissolveStyle Style);
+/** /Game/UM/Materials/v2/Dissolve/MI_<Key>_<Stage>_<Look>_Dissolve (the dissolve MIC of BodyMaterialPath). */
+UNMATCHED_API FString DissolveMaterialPath(const FHeroSpec& Spec, ES08TeamSlot Look);
+/** One dissolve frame: CPD_Dissolve = Progress (clamped to 0..1) and CPD_DissolveStyle on Body, CPD_Fade = Progress on
+ *  Pedestal. Either component may be null. Body must already carry the dissolve MIC (on a hero MI the slots are not
+ *  compiled and nothing changes). */
+UNMATCHED_API void SetDissolve(UPrimitiveComponent* Body, UPrimitiveComponent* Pedestal, float Progress,
+                               EDissolveStyle Style);
 
 }  // namespace S08HeroesV2

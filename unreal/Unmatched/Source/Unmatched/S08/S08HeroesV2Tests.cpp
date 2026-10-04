@@ -22,8 +22,10 @@
 #include "Engine/World.h"
 #include "Materials/Material.h"
 #include "Materials/MaterialInstance.h"
+#include "Materials/MaterialInstanceConstant.h"
 #include "Materials/MaterialInterface.h"
 #include "Materials/MaterialExpressionScalarParameter.h"
+#include "Materials/MaterialExpressionStaticSwitchParameter.h"
 #include "Materials/MaterialExpressionVectorParameter.h"
 #include "Misc/AutomationTest.h"
 #include "Misc/Paths.h"
@@ -545,6 +547,115 @@ bool FS08HeroesV2HitTintTest::RunTest(const FString&) {
   TestTrue("CPD_HitTint is a scalar parameter of the master",
            Master->GetScalarParameterDefaultValue(FHashedMaterialParameterInfo(FName(HitTintParamName)), Default));
   TestEqual("CPD_HitTint parameter default 0", Default, 0.0f);
+  return true;
+}
+
+// DE-011 (W-27, 01 F-09): the death dissolve. M_UM_Figure_v2 stays Opaque with the dissolve behind the static switch
+// UseDissolve (off by default, CPD 13 / 14 neutral at 0); every body MI has a Masked dissolve MIC that inherits it and
+// only switches the dissolve on; 500 / 400 ms; the fade is the default, the ash candidate only on request.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08HeroesV2DissolveTest,
+    "Unmatched.S08.HeroesV2.Dissolve Masked dissolve MICs over the Opaque master, fade by default (DE-011)",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08HeroesV2DissolveTest::RunTest(const FString&) {
+  using namespace S08HeroesV2;
+  const UMaterial* Master = LoadObject<UMaterial>(nullptr, TEXT("/Game/UM/Materials/v2/M_UM_Figure_v2.M_UM_Figure_v2"));
+  TestNotNull("M_UM_Figure_v2 loads", Master);
+  if (!Master) return false;
+  TestEqual("the master stays Opaque", static_cast<int32>(Master->BlendMode), static_cast<int32>(BLEND_Opaque));
+#if WITH_EDITORONLY_DATA
+  TMap<int32, int32> OnSlot;
+  int32 Progress = 0, Style = 0, Switches = 0;
+  for (const UMaterialExpression* Expr : Master->GetExpressions()) {
+    if (const UMaterialExpressionScalarParameter* P = Cast<UMaterialExpressionScalarParameter>(Expr)) {
+      if (P->bUseCustomPrimitiveData) OnSlot.FindOrAdd(P->PrimitiveDataIndex)++;
+      if (P->ParameterName == FName(DissolveParamName)) {
+        ++Progress;
+        TestTrue("CPD_Dissolve reads Custom Primitive Data", P->bUseCustomPrimitiveData);
+        TestEqual("CPD_Dissolve slot", static_cast<int32>(P->PrimitiveDataIndex), DissolveCpdIndex);
+        TestEqual("CPD_Dissolve default 0", P->DefaultValue, 0.0f);
+      } else if (P->ParameterName == FName(DissolveStyleParamName)) {
+        ++Style;
+        TestTrue("CPD_DissolveStyle reads Custom Primitive Data", P->bUseCustomPrimitiveData);
+        TestEqual("CPD_DissolveStyle slot", static_cast<int32>(P->PrimitiveDataIndex), DissolveStyleCpdIndex);
+        TestEqual("CPD_DissolveStyle default 0 (fade)", P->DefaultValue, 0.0f);
+      }
+    } else if (const UMaterialExpressionVectorParameter* V = Cast<UMaterialExpressionVectorParameter>(Expr)) {
+      if (V->bUseCustomPrimitiveData) {
+        for (int32 I = 0; I < 4; ++I) OnSlot.FindOrAdd(V->PrimitiveDataIndex + I)++;
+      }
+    } else if (const UMaterialExpressionStaticSwitchParameter* W = Cast<UMaterialExpressionStaticSwitchParameter>(Expr)) {
+      if (W->ParameterName == FName(DissolveSwitchName)) {
+        ++Switches;
+        TestFalse("UseDissolve is off by default", W->DefaultValue);
+      }
+    }
+  }
+  TestEqual("one CPD_Dissolve parameter", Progress, 1);
+  TestEqual("one CPD_DissolveStyle parameter", Style, 1);
+  TestTrue("UseDissolve switch nodes (base colour, emissive, opacity mask)", Switches >= 3);
+  TestEqual("slot 13 has only CPD_Dissolve", OnSlot.FindRef(DissolveCpdIndex), 1);
+  TestEqual("slot 14 has only CPD_DissolveStyle", OnSlot.FindRef(DissolveStyleCpdIndex), 1);
+#endif
+  // 01 F-09: hero 500 ms, sidekick 400 ms.
+  const TMap<FString, float> WantSeconds = {{TEXT("KingArthur"), 0.5f}, {TEXT("Merlin"), 0.4f},
+                                            {TEXT("Medusa"), 0.5f}, {TEXT("Harpy"), 0.4f}};
+  for (const FHeroSpec& Spec : Specs()) {
+    const float* Want = WantSeconds.Find(Spec.Key);
+    TestNotNull(FString::Printf(TEXT("%s has a dissolve length"), Spec.Key), Want);
+    if (Want) TestEqual(FString::Printf(TEXT("%s dissolve seconds"), Spec.Key), DissolveSeconds(Spec), *Want);
+    for (const ES08TeamSlot Look : {ES08TeamSlot::P1, ES08TeamSlot::P2}) {
+      const FString BodyPath = BodyMaterialPath(Spec, Look);
+      const FString MicPath = DissolveMaterialPath(Spec, Look);
+      UMaterialInterface* Body = LoadObject<UMaterialInterface>(nullptr, *BodyPath);
+      UMaterialInstanceConstant* Mic = LoadObject<UMaterialInstanceConstant>(nullptr, *MicPath);
+      TestNotNull(FString::Printf(TEXT("%s loads"), *BodyPath), Body);
+      TestNotNull(FString::Printf(TEXT("%s loads"), *MicPath), Mic);
+      if (!Body || !Mic) continue;
+      TestTrue(FString::Printf(TEXT("%s is a child of %s"), *MicPath, *BodyPath), Mic->Parent == Body);
+      TestEqual(FString::Printf(TEXT("%s body MI stays Opaque"), Spec.Key), static_cast<int32>(Body->GetBlendMode()),
+                static_cast<int32>(BLEND_Opaque));
+      TestEqual(FString::Printf(TEXT("%s dissolve MIC is Masked"), Spec.Key), static_cast<int32>(Mic->GetBlendMode()),
+                static_cast<int32>(BLEND_Masked));
+#if WITH_EDITORONLY_DATA
+      for (const TCHAR* Name : {DissolveSwitchName, TEXT("UseTeamAccent"), TEXT("UseUV1Metres")}) {
+        bool bBody = false, bMic = false;
+        FGuid Guid;
+        const FHashedMaterialParameterInfo Info{FName(Name)};
+        TestTrue(FString::Printf(TEXT("%s %s on the body MI"), Spec.Key, Name),
+                 Body->GetStaticSwitchParameterValue(Info, bBody, Guid));
+        TestTrue(FString::Printf(TEXT("%s %s on the dissolve MIC"), Spec.Key, Name),
+                 Mic->GetStaticSwitchParameterValue(Info, bMic, Guid));
+        const bool bDissolveSwitch = FCString::Strcmp(Name, DissolveSwitchName) == 0;
+        TestEqual(FString::Printf(TEXT("%s %s: dissolve MIC %d, body %d"), Spec.Key, Name, bMic ? 1 : 0, bBody ? 1 : 0),
+                  bMic, bDissolveSwitch ? true : bBody);
+        if (bDissolveSwitch) TestFalse(FString::Printf(TEXT("%s body MI keeps the dissolve off"), Spec.Key), bBody);
+      }
+#endif
+    }
+  }
+  // Style: the fade by default and under reduced motion; the ash candidate only on request.
+  TestTrue("default fade", DecideDissolveStyle(false, false) == EDissolveStyle::Fade);
+  TestTrue("reduced motion fade", DecideDissolveStyle(false, true) == EDissolveStyle::Fade);
+  TestTrue("ash on request", DecideDissolveStyle(true, false) == EDissolveStyle::Ash);
+  TestTrue("reduced motion wins over the ash request", DecideDissolveStyle(true, true) == EDissolveStyle::Fade);
+  TestEqual("style names", FString(DissolveStyleName(EDissolveStyle::Ash)), FString(TEXT("ash")));
+  // One frame: progress clamped, style, pedestal CPD_Fade.
+  USkeletalMeshComponent* BodyComp = NewObject<USkeletalMeshComponent>();
+  UStaticMeshComponent* BaseComp = NewObject<UStaticMeshComponent>();
+  SetDissolve(BodyComp, BaseComp, 1.7f, EDissolveStyle::Ash);
+  const TArray<float>& BodyData = BodyComp->GetCustomPrimitiveData().Data;
+  const TArray<float>& BaseData = BaseComp->GetCustomPrimitiveData().Data;
+  TestTrue("body CPD reaches the style slot", BodyData.Num() > DissolveStyleCpdIndex);
+  TestTrue("pedestal CPD reaches the fade slot", BaseData.Num() > PedestalFadeCpdIndex);
+  if (BodyData.Num() > DissolveStyleCpdIndex && BaseData.Num() > PedestalFadeCpdIndex) {
+    TestEqual("progress clamped to 1", BodyData[DissolveCpdIndex], 1.0f);
+    TestEqual("style ash = 1", BodyData[DissolveStyleCpdIndex], 1.0f);
+    TestEqual("pedestal fade follows the progress", BaseData[PedestalFadeCpdIndex], 1.0f);
+    TestEqual("hit tint untouched", BodyData[HitTintCpdIndex], 0.0f);
+  }
+  SetDissolve(BodyComp, nullptr, 0.25f, EDissolveStyle::Fade);
+  TestEqual("progress 0.25", BodyComp->GetCustomPrimitiveData().Data[DissolveCpdIndex], 0.25f);
+  TestEqual("style fade = 0", BodyComp->GetCustomPrimitiveData().Data[DissolveStyleCpdIndex], 0.0f);
   return true;
 }
 

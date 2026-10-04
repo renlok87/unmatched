@@ -1,7 +1,9 @@
 #include "S08HeroesV2.h"
 
 #include "S08ArtPreviewMedusa.h"
+#include "S08IconMotion.h"
 #include "Animation/AnimSequenceBase.h"
+#include "Components/PrimitiveComponent.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
 
@@ -174,6 +176,26 @@ float NotifyContactSeconds(const UAnimSequenceBase* Anim) {
 float ContactSeconds(const FHeroSpec& Spec, const UAnimSequenceBase* LungeAttack) {
   const float FromNotify = NotifyContactSeconds(LungeAttack);
   return FromNotify >= 0.0f ? FromNotify : ProfileContactSeconds(Spec);
+}
+
+EDissolveStyle DissolveStyle() {
+  return DecideDissolveStyle(FParse::Param(FCommandLine::Get(), DissolveAshFlagName), S08IconMotion::IsReducedMotion());
+}
+
+const TCHAR* DissolveStyleName(EDissolveStyle Style) { return Style == EDissolveStyle::Ash ? TEXT("ash") : TEXT("fade"); }
+
+FString DissolveMaterialPath(const FHeroSpec& Spec, ES08TeamSlot Look) {
+  return FString::Printf(TEXT("/Game/UM/Materials/v2/Dissolve/MI_%s_%s_%s_Dissolve"), Spec.Key, Spec.Stage,
+                         S08TeamSlotName(Look));
+}
+
+void SetDissolve(UPrimitiveComponent* Body, UPrimitiveComponent* Pedestal, float Progress, EDissolveStyle Style) {
+  const float P = FMath::Clamp(Progress, 0.0f, 1.0f);
+  if (Body) {
+    Body->SetCustomPrimitiveDataFloat(DissolveCpdIndex, P);
+    Body->SetCustomPrimitiveDataFloat(DissolveStyleCpdIndex, static_cast<float>(static_cast<uint8>(Style)));
+  }
+  if (Pedestal) Pedestal->SetCustomPrimitiveDataFloat(PedestalFadeCpdIndex, P);
 }
 
 }  // namespace S08HeroesV2

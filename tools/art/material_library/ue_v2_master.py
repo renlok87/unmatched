@@ -14,6 +14,10 @@ Layout of the graph:
   cue chain of v1 (CPD FxFlash / Rim / Fade) on top of the core base colour; If(IsCloth) -> ShadingModel
   hit tint (v2.2, DE-010, CPD 12 CPD_HitTint): albedo lerp to HitTintColor by HitTint x HitTintStrength after the fade,
   plus HitTintColor x HitTint x HitTintEmissive (display units, EyeAdaptationInverse); 0 = exactly the v2.1 output
+  dissolve (v2.3, DE-011, static switch UseDissolve, default OFF = exactly the v2.2 output and shaders): Custom
+  "UM_V2_Dissolve" (ue/um_v2_dissolve.hlsl) on CPD 13 CPD_Dissolve (progress) / CPD 14 CPD_DissolveStyle (0 fade,
+  1 ash) -> OpacityMask, ash albedo and a team-colour glow on the burning front; only the dissolve MICs (Masked
+  override, /Game/UM/Materials/v2/Dissolve) turn it on
   everything -> MakeMaterialAttributes (ClearCoat pin = CustomData0 = Cloth, SubsurfaceColor = Fuzz Color)
 """
 from __future__ import annotations
@@ -26,6 +30,7 @@ HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[2]
 UM_SPEC = REPO / "art" / "um-materials" / "um-masters.json"
 CORE_HLSL = HERE / "ue" / "um_v2_core.hlsl"
+DISSOLVE_HLSL = HERE / "ue" / "um_v2_dissolve.hlsl"
 ROOT = "/Game/UM/Materials/v2"
 MASTER = ROOT + "/M_UM_Figure_v2"
 TEMPLATE = ROOT + "/MI_UM_Figure_v2_Template"
@@ -59,11 +64,29 @@ V2_SCALARS = [
 # v2-only Custom Primitive Data slots after the v1 layout 0-11 (art/um-materials/um-masters.json, unchanged: the v1
 # masters and their tests keep it). Every slot is neutral at 0 (a primitive that sets nothing renders like its MI).
 V2_CPD = {"HitTint": {"index": 12, "size": 1,
-                      "meaning": "DE-010 / CUE-011: 0..1 red hit fill from the contact frame (0 = off)"}}
+                      "meaning": "DE-010 / CUE-011: 0..1 red hit fill from the contact frame (0 = off)"},
+          "Dissolve": {"index": 13, "size": 1,
+                       "meaning": "DE-011 / CUE-013: 0..1 dissolve progress (UseDissolve permutation only; 0 = whole)"},
+          "DissolveStyle": {"index": 14, "size": 1,
+                            "meaning": "DE-011: 0 = simple fade (default, reduced motion), 1 = team-colour ash "
+                                       "(candidate until the A/B sheet DE-028)"}}
 # DE-010 hit tint knobs (Cue group, MI-overridable): colour linear, albedo weight at HitTint 1, emissive (display units)
 HIT_TINT_COLOR = [0.85, 0.03, 0.02, 1.0]
 HIT_TINT_STRENGTH = 0.7
 HIT_TINT_EMISSIVE = 0.35
+# DE-011 dissolve knobs (Cue group, MI-overridable). Proposal: the ash look is a candidate for the A/B sheet (DE-028)
+DISSOLVE_SWITCH = "UseDissolve"
+DISSOLVE_INPUTS = ["P", "LocalUnitM", "Progress", "Style", "Team", "EdgeWidth", "NoiseScale", "HeightBias",
+                   "HeightUU"]
+DISSOLVE_OUTPUTS = [("Edge", "CMOT_FLOAT1"), ("TeamHue", "CMOT_FLOAT3")]
+DISSOLVE_KNOBS = [
+    ("DissolveEdgeWidth", 0.12, "ash: width of the glowing front in field units (0..1)"),
+    ("DissolveNoiseScale", 40.0, "ash: noise cells per metre of the pre-skinned figure (40 = 2.5 cm)"),
+    ("DissolveHeightBias", 0.45, "ash: 0 = noise only, 1 = from the feet up by height only"),
+    ("DissolveHeightUU", 60.0, "ash: figure height in pre-skinned units (the tallest v2 bounds top is 60.06)"),
+    ("DissolveAshValue", 0.25, "ash: albedo of the front = team hue x value"),
+    ("DissolveEdgeEmissive", 1.5, "ash: glow of the front = team hue x this (display units)"),
+]
 
 
 class Graph:
@@ -266,6 +289,39 @@ def figure_v2_graph(spec: dict) -> Graph:
     g.link("hit_c", "", "hit_eai", "LightValueInput")
     g.link("hit_alpha", "", "hit_eai", "AlphaInput")
     binop(g, "em_hit", "Add", "em_total", "hit_eai", 15, "", "EyeAdaptationInverse")
+    # ---- dissolve (v2.3, DE-011): static switch UseDissolve, default off -> the attribute pins read base_hit / em_hit
+    # exactly as in v2.2 (the Custom node is not compiled); on (dissolve MICs, Masked) -> UM_V2_Dissolve
+    scalar(g, "cpd_dis", "CPD_Dissolve", 0.0, "", 5, cpd=V2_CPD["Dissolve"]["index"])
+    scalar(g, "cpd_dstyle", "CPD_DissolveStyle", 0.0, "", 5, cpd=V2_CPD["DissolveStyle"]["index"])
+    for i, (name, default, _) in enumerate(DISSOLVE_KNOBS):
+        scalar(g, "p_" + name, name, default, "Cue", 5, sort=20 + i)
+    g.add("dis", "Custom", {"code": DISSOLVE_HLSL.read_text(encoding="utf-8"), "description": "UM_V2_Dissolve",
+                            "output_type": "CMOT_FLOAT1", "inputs": DISSOLVE_INPUTS,
+                            "additional_outputs": [list(o) for o in DISSOLVE_OUTPUTS]}, 12)
+    for inp, (src, out) in {"P": ("vi_p", "PS"), "LocalUnitM": ("p_MetresPerLocalUnit", ""),
+                            "Progress": ("cpd_dis", ""), "Style": ("cpd_dstyle", ""), "Team": ("team", ""),
+                            "EdgeWidth": ("p_DissolveEdgeWidth", ""), "NoiseScale": ("p_DissolveNoiseScale", ""),
+                            "HeightBias": ("p_DissolveHeightBias", ""), "HeightUU": ("p_DissolveHeightUU", "")}.items():
+        g.link(src, out, "dis", inp)
+    binop(g, "dis_ash", "Multiply", "dis", "p_DissolveAshValue", 13, "TeamHue", "")
+    g.add("base_dis", "LinearInterpolate", {}, 14)
+    g.link("base_hit", "", "base_dis", "A")
+    g.link("dis_ash", "", "base_dis", "B")
+    g.link("dis", "Edge", "base_dis", "Alpha")
+    binop(g, "dis_k", "Multiply", "dis", "p_DissolveEdgeEmissive", 13, "Edge", "")
+    binop(g, "dis_c", "Multiply", "dis", "dis_k", 14, "TeamHue", "")
+    g.add("dis_alpha", "Constant", {"r": 1.0}, 14)
+    g.add("dis_eai", "EyeAdaptationInverse", {}, 15)
+    g.link("dis_c", "", "dis_eai", "LightValueInput")
+    g.link("dis_alpha", "", "dis_eai", "AlphaInput")
+    binop(g, "em_dis", "Add", "em_hit", "dis_eai", 16, "", "EyeAdaptationInverse")
+    for nid, on, off in (("sw_dis_base", ("base_dis", ""), ("base_hit", "")),
+                         ("sw_dis_em", ("em_dis", ""), ("em_hit", "")),
+                         ("sw_dis_mask", ("dis", ""), ("one", ""))):
+        g.add(nid, "StaticSwitchParameter", {"parameter_name": DISSOLVE_SWITCH, "default_value": False,
+                                             "group": "Cue", "sort_priority": 19}, 17)
+        g.link(on[0], on[1], nid, "True")
+        g.link(off[0], off[1], nid, "False")
     # ---- shading model per pixel: If(IsCloth > 0.5) Cloth else DefaultLit
     g.add("sm_cloth", "ShadingModel", {"shading_model": "MSM_CLOTH"}, 6)
     g.add("sm_lit", "ShadingModel", {"shading_model": "MSM_DEFAULT_LIT"}, 6)
@@ -278,11 +334,12 @@ def figure_v2_graph(spec: dict) -> Graph:
     g.link("sm_lit", "", "sm_if", "A < B")
     # ---- attributes
     g.add("mma", "MakeMaterialAttributes", {}, 14)
-    for pin, (src, out) in {"BaseColor": ("base_hit", ""), "Metallic": ("core", "Metal"),
+    for pin, (src, out) in {"BaseColor": ("sw_dis_base", ""), "Metallic": ("core", "Metal"),
                             "Specular": ("core", "Spec"), "Roughness": ("core", "Rough"),
                             "AmbientOcclusion": ("core", "AO"), "Normal": ("core", "NormalTS"),
-                            "EmissiveColor": ("em_hit", ""), "ClearCoat": ("core", "Cloth"),
-                            "SubsurfaceColor": ("core", "Fuzz"), "ShadingModel": ("sm_if", "")}.items():
+                            "EmissiveColor": ("sw_dis_em", ""), "ClearCoat": ("core", "Cloth"),
+                            "SubsurfaceColor": ("core", "Fuzz"), "ShadingModel": ("sm_if", ""),
+                            "OpacityMask": ("sw_dis_mask", "")}.items():
         g.link(src, out, "mma", pin)
     g.attr("MP_MATERIAL_ATTRIBUTES", "mma", "")
     return g

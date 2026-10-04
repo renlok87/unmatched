@@ -1,5 +1,5 @@
-"""Tests for tools/art/material_library/ue_v2_master.py: M_UM_Figure_v2.1 graph (static switch UseTeamAccent, LDV-12/13)
-and the test MIs of the dye check (no editor needed).
+"""Tests for tools/art/material_library/ue_v2_master.py: M_UM_Figure_v2.1 graph (static switch UseTeamAccent, LDV-12/13),
+the v2.2 hit tint (DE-010), the v2.3 dissolve (DE-011) and the test MIs of the dye check (no editor needed).
 
   python -m unittest discover -s tools/art/material_library/tests -v
 """
@@ -105,8 +105,9 @@ class HitTint(unittest.TestCase):
         self.assertEqual(self.links_to("base_hit", "A"), [["base_final", "", "base_hit", "A"]])
         self.assertEqual(self.links_to("base_hit", "B"), [["p_hitcol", "RGB", "base_hit", "B"]])
         self.assertEqual(self.links_to("base_hit", "Alpha"), [["hit_a", "", "base_hit", "Alpha"]])
-        self.assertEqual(self.links_to("mma", "BaseColor"), [["base_hit", "", "mma", "BaseColor"]])
-        self.assertEqual(self.links_to("mma", "EmissiveColor"), [["em_hit", "", "mma", "EmissiveColor"]])
+        # v2.3: the pins read base_hit / em_hit through the dissolve switch (off by default; class Dissolve)
+        self.assertEqual(self.links_to("sw_dis_base", "False"), [["base_hit", "", "sw_dis_base", "False"]])
+        self.assertEqual(self.links_to("sw_dis_em", "False"), [["em_hit", "", "sw_dis_em", "False"]])
         self.assertEqual(self.links_to("em_hit", "A"), [["em_total", "", "em_hit", "A"]])
         # every term of the hit tint is a product with CPD_HitTint: 0 adds nothing
         self.assertEqual(sorted(l[0] for l in self.links_to("hit_a", "A") + self.links_to("hit_k", "A")),
@@ -124,11 +125,87 @@ class HitTint(unittest.TestCase):
         self.assertGreater(col["r"], 5 * max(col["g"], col["b"]), "red fill")
 
     def test_v21_graph_is_a_subgraph(self):
-        """Nothing of v2.1 changed except the two attribute pins that now read the hit tint."""
+        """Nothing of v2.1 changed except the two attribute pins that now read the hit tint (through the v2.3 dissolve
+        switch, whose False input is base_hit / em_hit: class Dissolve)."""
         new = {k for k in self.g.nodes if k.startswith(("hit_", "p_hit", "cpd_hit", "base_hit", "em_hit"))}
         self.assertEqual(new, {"cpd_hit", "p_hitcol", "p_hitstr", "p_hitemi", "hit_a", "base_hit", "hit_k", "hit_c",
                                "hit_alpha", "hit_eai", "em_hit"})
-        self.assertEqual(len(self.g.nodes), 71 + len(new))
+        self.assertEqual(len(self.g.nodes), 71 + len(new) + len(DISSOLVE_NODES))
+
+
+# v2.3 (DE-011) nodes: CPD 13 / 14, the knobs, the Custom node, ash albedo, glow, three switches
+DISSOLVE_NODES = {"cpd_dis", "cpd_dstyle", "dis", "dis_ash", "base_dis", "dis_k", "dis_c", "dis_alpha", "dis_eai",
+                  "em_dis", "sw_dis_base", "sw_dis_em", "sw_dis_mask"} | {"p_" + k[0] for k in vm.DISSOLVE_KNOBS}
+
+
+@unittest.skipUnless(HAVE_SPEC, "um-masters.json missing")
+class Dissolve(unittest.TestCase):
+    """v2.3 (DE-011, 01 F-09): the dissolve behind the static switch UseDissolve; off = exactly the v2.2 output."""
+
+    def setUp(self):
+        self.g = vm.figure_v2_graph(vm.load_spec())
+
+    def links_to(self, dst, inp):
+        return [l for l in self.g.links if l[2] == dst and l[3] == inp]
+
+    def test_slots_are_free_and_neutral(self):
+        v1 = vm.load_spec()["custom_primitive_data"]
+        used = set()
+        for v in v1.values():
+            if isinstance(v, dict):
+                used |= set(range(v["index"], v["index"] + v["size"]))
+        used.add(vm.V2_CPD["HitTint"]["index"])
+        for key, nid, index in (("Dissolve", "cpd_dis", 13), ("DissolveStyle", "cpd_dstyle", 14)):
+            self.assertEqual(vm.V2_CPD[key]["index"], index)
+            self.assertNotIn(index, used)
+            n = self.g.nodes[nid]["props"]
+            self.assertTrue(n["use_custom_primitive_data"])
+            self.assertEqual(n["primitive_data_index"], index)
+            self.assertEqual(n["default_value"], 0.0)
+
+    def test_switch_off_is_the_v22_output(self):
+        """The attribute pins read the switches; their False inputs are the v2.2 pins (base_hit, em_hit, 1)."""
+        self.assertEqual(self.links_to("mma", "BaseColor"), [["sw_dis_base", "", "mma", "BaseColor"]])
+        self.assertEqual(self.links_to("mma", "EmissiveColor"), [["sw_dis_em", "", "mma", "EmissiveColor"]])
+        self.assertEqual(self.links_to("mma", "OpacityMask"), [["sw_dis_mask", "", "mma", "OpacityMask"]])
+        self.assertEqual(self.links_to("sw_dis_base", "False"), [["base_hit", "", "sw_dis_base", "False"]])
+        self.assertEqual(self.links_to("sw_dis_em", "False"), [["em_hit", "", "sw_dis_em", "False"]])
+        self.assertEqual(self.links_to("sw_dis_mask", "False"), [["one", "", "sw_dis_mask", "False"]])
+        for nid in ("sw_dis_base", "sw_dis_em", "sw_dis_mask"):
+            props = self.g.nodes[nid]["props"]
+            self.assertEqual(props["parameter_name"], vm.DISSOLVE_SWITCH)
+            self.assertIs(props["default_value"], False)
+        # the master stays Opaque: only the dissolve MICs override the blend mode
+        self.assertEqual(vm.SETTINGS["blend_mode"], "BLEND_OPAQUE")
+
+    def test_switch_on_routing(self):
+        self.assertEqual(self.links_to("sw_dis_mask", "True"), [["dis", "", "sw_dis_mask", "True"]])
+        self.assertEqual(self.links_to("base_dis", "A"), [["base_hit", "", "base_dis", "A"]])
+        self.assertEqual(self.links_to("base_dis", "Alpha"), [["dis", "Edge", "base_dis", "Alpha"]])
+        self.assertEqual(self.links_to("em_dis", "A"), [["em_hit", "", "em_dis", "A"]])
+        wired = {l[3]: l[0] for l in self.g.links if l[2] == "dis"}
+        self.assertEqual(sorted(wired), sorted(vm.DISSOLVE_INPUTS))
+        self.assertEqual(wired["Progress"], "cpd_dis")
+        self.assertEqual(wired["Style"], "cpd_dstyle")
+        self.assertEqual(wired["Team"], "team")
+        self.assertEqual(wired["P"], "vi_p")
+
+    def test_hlsl_contract(self):
+        code = vm.DISSOLVE_HLSL.read_text(encoding="utf-8")
+        for name in vm.DISSOLVE_INPUTS + [o[0] for o in vm.DISSOLVE_OUTPUTS]:
+            self.assertRegex(code, r"\b%s\b" % name)
+        self.assertEqual(self.g.nodes["dis"]["props"]["code"], code)
+        self.assertIn("return keepFade;", code)
+
+    def test_mask_ends_mirror_the_hlsl(self):
+        """Progress 0 keeps every pixel (no edge), progress 1 clips every pixel - both styles (python mirror)."""
+        w = dict((k[0], k[1]) for k in vm.DISSOLVE_KNOBS)["DissolveEdgeWidth"]
+        for field in np.linspace(0.0, 1.0, 101):
+            for p, keep in ((0.0, True), (1.0, False)):
+                t = p * (1.0 + w + 0.01) - w
+                self.assertEqual(field > t, keep)
+                ign = field * 0.999          # fade dither in [0, 1)
+                self.assertEqual((1.0 - p) > ign, keep)
 
 @unittest.skipUnless(HAVE_SPEC, "um-masters.json missing")
 class TestInstances(unittest.TestCase):
