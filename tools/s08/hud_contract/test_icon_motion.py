@@ -27,7 +27,8 @@ class IconMotionContractTests(unittest.TestCase):
         self.assertEqual(CONTRACT.read_bytes(), CONFIG.read_bytes(), "запустить motion_contract.py: копия в Config/ устарела")
 
     def test_all_23_icons_with_appear_and_leave(self):
-        self.assertEqual(len(self.c["order"]), 23)
+        """23 принятых значка v3 плюс кандидаты DE-012 (список `candidates`)."""
+        self.assertEqual(len(self.c["order"]) - len(self.c.get("candidates", [])), 23)
         self.assertEqual(set(self.c["order"]), set(self.c["icons"]))
         for icon, d in self.c["icons"].items():
             self.assertIn("appear", d["anims"], icon)
@@ -103,6 +104,94 @@ class IconMotionContractTests(unittest.TestCase):
                     if "cycle" in self.c["icons"][icon]["anims"]:
                         continue
                     self.assertAlmostEqual(pose[p], M.REST[p] if tgt == "all" else a.rest[tgt][p], 6, (icon, tgt, p))
+
+
+SOURCE = REPO / "unreal" / "Unmatched" / "Source"
+CANDIDATES = ["marker-turn-ring", "marker-turn-ring-team", "resource-hp-fallen", "marker-x-stamp", "marker-action-slot-de"]
+
+
+class IconMotionCandidatesTests(unittest.TestCase):
+    """DE-012 (W-15 арт): записи набора DE по ICON-MOTION.md и 01 F-07, F-09, F-12; до арт-приёмки — только галерея."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.c = M.load_contract(str(CONTRACT))
+        cls.icons = cls.c["icons"]
+
+    def keys(self, icon, anim, target, prop, reduced=False):
+        a = self.icons[icon]["anims"][anim]
+        br = a["reduced"] if reduced else a
+        return [tr["keys"] for tr in br["tracks"] if tr["target"] == target and tr["prop"] == prop][0]
+
+    def test_candidates_listed_in_order(self):
+        self.assertEqual(self.c["candidates"], CANDIDATES)
+        self.assertEqual(self.c["order"][-len(CANDIDATES):], CANDIDATES)
+
+    def test_candidates_are_gallery_only(self):
+        """Принятый арт — по умолчанию: ни один id кандидата не упоминается в коде UE вне автотестов (галерея берёт их из
+        контракта)."""
+        hits = []
+        for path in SOURCE.rglob("*"):
+            if path.suffix not in (".cpp", ".h") or path.name.endswith("Tests.cpp"):
+                continue
+            text = path.read_text(encoding="utf-8", errors="ignore")
+            hits += [f"{path.name}: {cid}" for cid in CANDIDATES if f'"{cid}"' in text]
+        self.assertEqual(hits, [])
+
+    def test_turn_ring_flash_1000_then_smoulder(self):
+        for icon in ("marker-turn-ring", "marker-turn-ring-team"):
+            a = self.icons[icon]["anims"]["appear"]
+            self.assertEqual(a["duration_ms"], 1000, icon)
+            rim = {l["id"]: l for l in self.icons[icon]["layers"]}["rim"]
+            self.assertEqual(rim["rest"]["opacity"], 0.35, icon)
+            self.assertEqual(self.keys(icon, "appear", "rim", "opacity")[-1][:2], [1000, 0.35], icon)
+            self.assertEqual(self.keys(icon, "appear", "flash", "opacity")[-1][:2], [1000, 0.0], icon)
+            self.assertEqual(self.keys(icon, "appear", "rim", "opacity", reduced=True)[-1][:2], [100, 0.35], icon)
+            self.assertNotIn("cycle", self.icons[icon]["anims"], icon)          # кольцо не циклится (бюджет)
+            self.assertEqual(self.icons[icon]["anims"]["leave"]["duration_ms"], 120, icon)
+        frames = self.keys("marker-turn-ring", "appear", "flash", "frame")
+        self.assertEqual([k[1] for k in frames], [0, 1, 2, 3, 4, 5, 6, 6])
+        team = {l["id"]: l.get("tint") for l in self.icons["marker-turn-ring-team"]["layers"]}
+        self.assertEqual(team, {"rim": "team", "flash": "team"})
+
+    def test_heart_damage_1000_with_glow_pulse(self):
+        a = self.icons["resource-hp-full"]["anims"]["damage"]
+        self.assertEqual((a["duration_ms"], a["beat_ms"], a.get("hold", False)), (1000, 60, False))
+        self.assertEqual([k[:2] for k in self.keys("resource-hp-full", "damage", "glow", "opacity")],
+                         [[0, 0.0], [200, 0.0], [320, 1.0], [560, 0.45], [760, 0.85], [1000, 0.0]])
+        self.assertEqual(a["reduced"]["tracks"], [])
+
+    def test_stamps_200_beat_120(self):
+        for icon, target in (("resource-hp-fallen", "cross"), ("marker-x-stamp", "sign")):
+            a = self.icons[icon]["anims"]["appear"]
+            self.assertEqual((a["duration_ms"], a["beat_ms"]), (200, 120), icon)
+            self.assertEqual([k[:2] for k in self.keys(icon, "appear", target, "scale")], [[0, 0.0], [120, 1.08], [200, 1.0]])
+        heart = {l["id"]: l["src"] for l in self.icons["resource-hp-fallen"]["layers"]}["heart"]
+        self.assertEqual(heart, "resource-hp-empty")
+
+    def test_tracker_de_variant(self):
+        d = self.icons["marker-action-slot-de"]["anims"]
+        self.assertEqual((d["slot_pulse"]["kind"], d["slot_pulse"]["duration_ms"]), ("loop", 770))
+        self.assertEqual((d["fill"]["duration_ms"], d["fill"]["hold"]), (300, True))
+        self.assertEqual(self.keys("marker-action-slot-de", "fill", "body", "opacity")[0][:2], [0, 0.4])
+        self.assertTrue(d["unfill"]["hold"])
+        # v3 по умолчанию не тронут: spend = opacity 0,4 за 150 мс
+        for icon in ("action-attack", "action-defense", "action-maneuver", "action-scheme"):
+            sp = self.icons[icon]["anims"]["spend"]
+            self.assertEqual((sp["duration_ms"], sp["tracks"][0]["keys"][-1][1]), (150, 0.4), icon)
+            self.assertNotIn("fill", self.icons[icon]["anims"], icon)
+
+    def test_candidate_demo_plays(self):
+        """Сценарий галереи: заполненный слот виден, кольцо после заливки погасло; крест павшего встал в покой."""
+        a = M.Animator(self.c, "marker-action-slot-de")
+        sched, _ = M.demo_schedule(self.c, "marker-action-slot-de")
+        t_fill = [t for t, op in sched if op == "fill"][0]
+        for t, op in sched:
+            if t <= t_fill + 300:
+                a.play(op, t)
+        p = a.pose(t_fill + 300)[0]["pose"]
+        self.assertAlmostEqual(p["body"]["opacity"], 1.0, 6)
+        self.assertAlmostEqual(p["ring"]["opacity"], 0.0, 6)
 
 
 class IconMotionSemanticsTests(unittest.TestCase):

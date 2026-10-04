@@ -1,5 +1,6 @@
 // HUD icon motion v3 automation tests (docs/unreal/contracts/hud/ICON-MOTION-PLAN.md, phase C):
-//   Load    - Config/S08IconMotion.json parses: 23 icons, appear/leave each, revision = the golden file's;
+//   Load    - Config/S08IconMotion.json parses: 23 icons + 5 DE-012 candidates, appear/leave each, revision = the
+//             golden file's;
 //   Golden  - FS08IconAnimator replays every icon's demo script (normal and reduced) and matches the Python
 //             reference poses docs/unreal/contracts/hud/icon-motion-golden.json (8 props + pivot, 1e-3);
 //   Reduced - s08.ReducedMotion drives S08IconMotion::IsReducedMotion;
@@ -69,8 +70,13 @@ bool FS08IconMotionLoadTest::RunTest(const FString& Parameters) {
   FS08IconMotionLibrary Lib;
   FString Err;
   if (!TestTrue(TEXT("contract loads: ") + Err, Lib.LoadFile(FS08IconMotionLibrary::DefaultPath(), &Err))) return false;
-  TestEqual(TEXT("23 icons in order"), Lib.Order.Num(), 23);
-  TestEqual(TEXT("23 icon definitions"), Lib.Icons.Num(), 23);
+  // 23 accepted v3 icons + 5 DE-012 candidates (gallery only until the user's art acceptance; contract `candidates`).
+  TestEqual(TEXT("28 icons in order"), Lib.Order.Num(), 28);
+  TestEqual(TEXT("28 icon definitions"), Lib.Icons.Num(), 28);
+  for (const TCHAR* Candidate : {TEXT("marker-turn-ring"), TEXT("marker-turn-ring-team"), TEXT("resource-hp-fallen"),
+                                 TEXT("marker-x-stamp"), TEXT("marker-action-slot-de")}) {
+    TestNotNull(*FString::Printf(TEXT("candidate %s defined"), Candidate), Lib.Find(Candidate));
+  }
   for (const FName Id : Lib.Order) {
     const FS08IconMotionDef* Def = Lib.Find(Id);
     if (!TestNotNull(*FString::Printf(TEXT("%s defined"), *Id.ToString()), Def)) continue;

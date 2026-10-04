@@ -47,6 +47,8 @@ TOKENS = {
     "card.type.scheme": "#FDBE72",
     # новые (STYLE-v3.md §2.1)
     "state.pending": "#0D7A89",
+    # кандидаты DE-012 (STYLE-v3.md §11, до арт-приёмки пользователя): тёплые тона вспышки кольца хода
+    "turn.flash.yellow": "#F2C14E", "turn.flash.orange": "#E8812C",
 }
 ROLE = {
     "body": "card.navy",            # тело жетонов состояния, плашек, ленты, тёмных ресурсов
@@ -63,6 +65,11 @@ ROLE = {
     "token.body": "icon.token.body", "token.rim": "icon.token.rim",
     "hp.rim": "card.type.attack",   # кромка сердца здоровья (приём DE): красный игры, не state.error
     "panel": "tag.background",
+    # кандидаты DE-012 (STYLE-v3.md §11)
+    "ring.yellow": "turn.flash.yellow",   # вспышка кольца хода: жёлтый → оранжевый → красный (01 F-07)
+    "ring.orange": "turn.flash.orange",   # тлеющее кольцо хода; кольцо текущего слота трекера (вариант DE)
+    "ring.red": "card.type.attack",       # конец вспышки — красный игры, не state.error (правило ДНК 7)
+    "hp.glow": "card.type.attack",        # ореол сердца при уроне: плоская полоса за keyline, без градиента
 }
 
 
@@ -1132,12 +1139,101 @@ def draw_resource_connection(ctx, sp: Spec, state="online", angle=0.0, layer=Non
     glyph(ctx, sp, 16.0, 16.0, lambda: g_signal(ctx, sp, state=state, angle=angle, part=layer))
 
 
-def draw_resource_hp(ctx, sp: Spec, mode="light", text=None):
-    """Здоровье: своё — светлое сердце (DE), чужое — тёмное, потрачено — пустой контур text.secondary."""
-    heart_token(ctx, sp, 16.0, 16.9, mode=mode, scale=1.0)
+HEART_C = (16.0, 16.9)   # центр ядра сердца resource-hp-* (heart_path: доли (±5,5; −3,5), остриё +10)
+
+
+def draw_resource_hp(ctx, sp: Spec, mode="light", text=None, layer=None):
+    """Здоровье: своё — светлое сердце (DE), чужое — тёмное, потрачено — пустой контур text.secondary.
+    layer glow — кандидат DE-012: ореол урона под сердцем (слой glow в icon-motion.json, покой opacity 0)."""
+    if layer == "glow":
+        heart_glow(ctx, sp, *HEART_C)
+        return
+    heart_token(ctx, sp, *HEART_C, mode=mode, scale=1.0)
     if text:
         text_path(ctx, text, 9.0 if len(text) <= 1 else 8.0, 16.0, 15.6, tracking=-0.2)
         fill(ctx, C["body"] if mode == "light" else C["glyph"])
+
+
+# ------------------------------------------------------------------------------------------------ кандидаты DE-012
+# W-15 арт (DE-012; ICON-MOTION.md, раздел DE; STYLE-v3.md §11). До арт-приёмки пользователя — только галерея
+# -S08IconGallery и лист sheets/de012/: в контракте они перечислены в `candidates`, HUD их не использует.
+RING_BAND = 2.5           # полоса тлеющего обода; окно портрета ⌀ 21 u в поле 32 u (мастер: 15 − 1 − 2,5 − 1)
+RING_FLASH_GROW = 0.75    # вспышка шире тлеющего обода внутрь на 0,75 u — «обод целиком вспыхнул»
+RING_FLASH_FRAMES = 7     # флипбук вспышки: жёлтый (f00) → оранжевый (f03) → красный (f06) за 1000 мс
+
+
+def ring_flash_colour(frame, frames=RING_FLASH_FRAMES):
+    """Цвет кадра вспышки: линейно в sRGB жёлтый → оранжевый (первая половина), оранжевый → красный (вторая)."""
+    k = frame / max(frames - 1, 1)
+    a, b, f = (C["ring.yellow"], C["ring.orange"], k * 2) if k <= 0.5 else (C["ring.orange"], C["ring.red"], k * 2 - 1)
+    return tuple(a[i] + (b[i] - a[i]) * f for i in range(3))
+
+
+def _annulus(ctx, sp: Spec, r_out, r_in, col):
+    """Обод-высечка: keyline снаружи и внутри, полоса цвета между ними, окно прозрачное (одна заливка + вырез)."""
+    circle(ctx, U / 2, U / 2, r_out)
+    fill(ctx, C["keyline"])
+    circle(ctx, U / 2, U / 2, r_out - sp.K)
+    fill(ctx, col)
+    circle(ctx, U / 2, U / 2, r_in + sp.K)
+    fill(ctx, C["keyline"])
+    circle(ctx, U / 2, U / 2, r_in)
+    clear(ctx)
+
+
+def draw_marker_turn_ring(ctx, sp: Spec, layer=None, frame=0, team=False):
+    """Кольцо хода у портрета (SD-34, 01 F-07): обод целиком. rim — тлеющий обод (оранжевый; у варианта team — белый,
+    игра умножает на цвет команды С-11), flash — тот же обод шире внутрь, кадр флипбука жёлтый → красный.
+    Без layer — поза покоя: только rim (вспышка в покое opacity 0)."""
+    R = U / 2 - sp.M
+    band = sp.pxu(RING_BAND)              # полоса в целых пикселях: при 16 px окно не съедает цвет
+    if layer in (None, "rim"):
+        _annulus(ctx, sp, R, R - 2 * sp.K - band, C["white"] if team else C["ring.orange"])
+    if layer == "flash":
+        grow = sp.pxu(RING_FLASH_GROW)
+        _annulus(ctx, sp, R, R - 2 * sp.K - band - grow, C["white"] if team else ring_flash_colour(frame))
+
+
+def heart_glow(ctx, sp: Spec, cx, cy):
+    """Ореол урона: плоская полоса hp.glow 1,5 u за keyline сердца (правило ДНК 1 — без градиента; пульс даёт
+    opacity слоя). Внутри ореола — та же заливка: слой лежит под сердцем и закрыт им."""
+    rim = sp.pxu(1.6)
+
+    def core():
+        heart_path(ctx, cx, cy, 5.5, 5.5, -3.5, 10.0)
+
+    ctx.set_line_join(cairo.LINE_JOIN_MITER)
+    ctx.set_miter_limit(4)
+    inset_fill(ctx, core, -(rim + sp.K + sp.pxu(1.5)), C["hp.glow"])
+
+
+FALLEN_X = (16.0, 16.4)   # центр креста на пустом сердце (оптический центр ядра; pivot слоя cross в контракте)
+
+
+def draw_resource_hp_fallen(ctx, sp: Spec, layer=None):
+    """Павший (SD-38): пустое сердце resource-hp-empty и крест-знак X state.error (правило ДНК 7: красный — только X).
+    Слой heart в контракте — текстура resource-hp-empty, здесь рисуется только для мастера."""
+    if layer in (None, "heart"):
+        heart_token(ctx, sp, *HEART_C, mode="hollow", scale=1.0)
+    if layer in (None, "cross"):
+        glyph(ctx, sp, *FALLEN_X, lambda: g_x(ctx, sp, half=5.75, w=sp.pxu(3.0), col=C["error"]))
+
+
+def draw_marker_x_stamp(ctx, sp: Spec):
+    """Крест-штамп (SD-37): «нет защиты» / «отменено» — тот же знак X state.error, что у resource-connection-lost,
+    крупно (полуразмах 10,5 u, штрих 3,5 u) с keyline; тела нет — штамп ложится на слот или карту."""
+    glyph(ctx, sp, 16.0, 16.0, lambda: g_x(ctx, sp, half=10.5, w=sp.pxu(3.5), col=C["error"]))
+
+
+def draw_marker_action_slot_de(ctx, sp: Spec, layer=None):
+    """Слот трекера, вариант DE (01 F-12, только галерея): серый призрак — пустой диск text.secondary (правило «пусто»),
+    вокруг — оранжевое кольцо 1,5 u, которое пульсирует, пока выбирается действие. Заливка типом — слои body/glyph
+    action-* поверх (в контракте)."""
+    R = U / 2 - sp.M
+    band = sp.pxu(1.5)
+    if layer in (None, "ring"):
+        _annulus(ctx, sp, R, R - 2 * sp.K - band, C["ring.orange"])
+        hollow_token(ctx, Disc(U / 2, U / 2, R - 2 * sp.K - band - sp.pxu(1.0)), sp, edge=C["dim"])
 
 
 # id → (функция, kwargs, широкий?)
@@ -1173,6 +1269,15 @@ VARIANTS = {
     "marker-status-p1": (draw_marker_status, {"team": C["team1"]}, False),
     "marker-status-p2": (draw_marker_status, {"team": C["team2"]}, False),
 }
+# кандидаты DE-012 (W-15 арт): новые id до арт-приёмки пользователя — в мастерах, размерах и слоях, но не на листах
+# принятого набора (ORDER23); свой лист sheets/de012/. В контракте движения — список `candidates`.
+CANDIDATES = {
+    "marker-turn-ring": (draw_marker_turn_ring, {}, False),
+    "marker-turn-ring-team": (draw_marker_turn_ring, {"team": True}, False),
+    "resource-hp-fallen": (draw_resource_hp_fallen, {}, False),
+    "marker-x-stamp": (draw_marker_x_stamp, {}, False),
+    "marker-action-slot-de": (draw_marker_action_slot_de, {}, False),
+}
 LAYERS = {
     "action-attack": ("body", "glyph"),
     "action-defense": ("body", "glyph"),
@@ -1188,6 +1293,12 @@ LAYERS = {
     "state-immobilized": ("body", "glyph"),
     "state-hint": ("body", "glyph"),
     "state-threat": ("body", "glyph"),
+    # кандидаты DE-012
+    "resource-hp-full": ("glow",),
+    "marker-turn-ring": ("rim", "flash"),
+    "marker-turn-ring-team": ("rim", "flash"),
+    "resource-hp-fallen": ("cross",),
+    "marker-action-slot-de": ("ring",),
 }
 # Флипбуки слоёв для движения (контракт icon-motion.json: src «<id>_<layer>#» → файлы <id>_<layer>_fNN):
 # песок часов state-sent — 12 кадров цикла 1500 мс (кадры 0–6 пересыпание за 550 мс, 7–11 после переворота).
@@ -1202,16 +1313,21 @@ def _sent_frames():
     return out
 
 
-FLIPBOOKS = {("state-sent", "glyph"): _sent_frames()}
-ALL = list(ICONS) + list(VARIANTS)
+FLIPBOOKS = {("state-sent", "glyph"): _sent_frames(),
+             ("marker-turn-ring", "flash"): [{"frame": i} for i in range(RING_FLASH_FRAMES)]}
+ALL = list(ICONS) + list(VARIANTS) + list(CANDIDATES)
 ORDER23 = [k for k in ICONS if k != "action-attack-token-glyphmask"]
 EXAMPLE = {"state-boost": {"text": "+2"}, "state-hint": {"text": "1"}, "state-threat": {"text": "3"},
            "marker-status": {"text": "1", "team": C["team1"]}, "marker-status-p1": {"text": "1"},
            "marker-status-p2": {"text": "2"}, "resource-hp-full": {"text": "17"}, "resource-hp-full-enemy": {"text": "16"}}
 
 
+def _entry(name):
+    return ICONS.get(name) or VARIANTS.get(name) or CANDIDATES[name]
+
+
 def is_wide(name):
-    return (ICONS.get(name) or VARIANTS.get(name))[2]
+    return _entry(name)[2]
 
 
 # ------------------------------------------------------------------------------------------------ рендер
@@ -1245,7 +1361,7 @@ def to_pil(surf) -> Image.Image:
 
 
 def render(name: str, size: int, **kw) -> Image.Image:
-    fn, base_kw, wide = ICONS.get(name) or VARIANTS[name]
+    fn, base_kw, wide = _entry(name)
     sp = Spec(size)
     surf, ctx = surface(2 * size if wide else size, size)
     ctx.scale(sp.k, sp.k)
@@ -1447,6 +1563,71 @@ def sheet_context_panel(names, path):
     return path
 
 
+def _tinted(im, col):
+    a = np.asarray(im).astype(np.float32)
+    a[..., :3] *= np.array(col, dtype=np.float32)
+    return Image.fromarray(a.clip(0, 255).astype(np.uint8), "RGBA")
+
+
+def _over(*ims):
+    out = ims[0].copy()
+    for im in ims[1:]:
+        out.alpha_composite(im)
+    return out
+
+
+def candidate_items():
+    """Лист арт-приёмки DE-012: (подпись, f(size) → RGBA). Мастер 1024 и 48/32/24/16; слои — как их видит игра."""
+    tf = RING_FLASH_FRAMES - 1
+    return [
+        ("marker-turn-ring · rim (тлеющее, в игре opacity 0,35)", lambda s: render("marker-turn-ring", s)),
+        ("marker-turn-ring · flash f00 (жёлтый, 0–143 мс)", lambda s: render("marker-turn-ring", s, layer="flash", frame=0)),
+        (f"marker-turn-ring · flash f{tf // 2:02d} (оранжевый)", lambda s: render("marker-turn-ring", s, layer="flash", frame=tf // 2)),
+        (f"marker-turn-ring · flash f{tf:02d} (красный, к 1000 мс)", lambda s: render("marker-turn-ring", s, layer="flash", frame=tf)),
+        ("marker-turn-ring-team · rim × team.p1", lambda s: _tinted(render("marker-turn-ring-team", s), C["team1"])),
+        ("marker-turn-ring-team · rim × team.p2", lambda s: _tinted(render("marker-turn-ring-team", s), C["team2"])),
+        ("resource-hp-fallen (пустое сердце + X)", lambda s: render("resource-hp-fallen", s)),
+        ("marker-x-stamp (нет защиты / отменено)", lambda s: render("marker-x-stamp", s)),
+        ("marker-action-slot-de · ring (призрак + кольцо)", lambda s: render("marker-action-slot-de", s)),
+        ("marker-action-slot-de · заполнен (action-attack поверх)",
+         lambda s: _over(render("marker-action-slot-de", s), render("action-attack", s))),
+        ("resource-hp-full · glow (пик пульса урона)",
+         lambda s: _over(render("resource-hp-full", s, layer="glow"), render("resource-hp-full", s))),
+    ]
+
+
+def sheet_candidates(path):
+    """Мастер 1024 при 256 px | 48/32/24/16 цвет | серый | ×4 nearest 32/24/16 — на панели tag.background."""
+    items = candidate_items()
+    name_w, mcell = 300, 256
+    row_h = mcell + 24
+    sizes_w = sum(s + 18 for s in SHEET_SIZES) + 20
+    x4_w = sum(4 * (s + 4) + 12 for s in (32, 24, 16)) + 20
+    W = name_w + mcell + 30 + 2 * sizes_w + x4_w + 20
+    H = 60 + len(items) * row_h
+    sheet = Image.new("RGBA", (W, H), SHEET_BG)
+    paste(sheet, label(W, 40, "DE-012 — кандидаты до арт-приёмки пользователя: мастер 1024 (×0,25) | 48 / 32 / 24 / 16 px цвет | серый | ×4 nearest 32 / 24 / 16 — на панели tag.background", 17), 0, 8)
+    for r, (title, fn) in enumerate(items):
+        y = 60 + r * row_h
+        paste(sheet, label(name_w, 44, title, 12), 0, y + 8)
+        m = fn(MASTER).resize((mcell, mcell), Image.LANCZOS)
+        paste(sheet, on_bg(m, PANEL, 0), name_w, y)
+        x = name_w + mcell + 30
+        for mode in ("colour", "grey"):
+            for s in SHEET_SIZES:
+                im = on_bg(fn(s), PANEL, 4)
+                paste(sheet, grey(im) if mode == "grey" else im, x, y + 8)
+                x += im.width + 10
+            x += 20
+        for s in (32, 24, 16):
+            big = xN(on_bg(fn(s), PANEL, 2), 4)
+            paste(sheet, big, x, y + 8)
+            x += big.width + 12
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    sheet.convert("RGB").save(path)
+    return path
+
+
 # ------------------------------------------------------------------------------------------------ сборка
 def build(names=None, review_dir=None):
     names = names or ALL
@@ -1476,6 +1657,8 @@ def build(names=None, review_dir=None):
     sheet_sizes(show, os.path.join(dirs["sheets"], "sheet-sizes.png"))
     sheet_context_panel([n for n in ORDER23 if n in names] + [v for v in ("resource-hp-full-enemy",) if v in names],
                         os.path.join(dirs["sheets"], "sheet-context-panel.png"))
+    if all(n in names for n in CANDIDATES):
+        sheet_candidates(os.path.join(dirs["sheets"], "de012", "sheet-candidates.png"))
     with open(os.path.join(dirs["sheets"], "audit.json"), "w", encoding="utf-8") as f:
         json.dump(audits, f, ensure_ascii=False, indent=1)
     for d in ("masters", "sizes", "layers"):

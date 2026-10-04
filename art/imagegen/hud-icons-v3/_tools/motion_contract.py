@@ -106,7 +106,7 @@ ACTION_EVENTS = {
     "select": {"kind": "event", "duration_ms": 200, "beat_ms": 70, "tracks": [
         {"target": "glyph", "prop": "scale", "keys": [[0, None, "ease_out_quad"], [70, 1.12, "ease_out_cubic"], [200, None, "constant"]]}],
         "reduced": static_reduced(), "note": "действие выбрано: импульс глифа от текущего масштаба и обратно"},
-    "spend": hold("действие потрачено: opacity 0,4 (02:895)", "all", "opacity", 0.4, 150, reduced_to=0.4),
+    "spend": hold("действие потрачено: opacity 0,4 (02 §8 UI-ICON-ACTION)", "all", "opacity", 0.4, 150, reduced_to=0.4),
     "restore": hold("действие снова доступно", "all", "opacity", 1.0, 150, reduced_to=1.0),
     "tap": TAP,
 }
@@ -302,12 +302,15 @@ ICONS = {
         "demo": [["appear_from_online"], ["wait", 800], ["leave"], ["wait", 300], ["appear"], ["wait", 600], ["leave"]]},
     "resource-hp-full": {
         "canvas_u": [32, 32], "layers": [layer("under", "resource-hp-empty", rest={"opacity": 0.0}),
+                                         layer("glow", "resource-hp-full_glow", rest={"opacity": 0.0}),
                                          layer("icon", "resource-hp-full", pivot=(16, 16))],
         "anims": {"appear": APPEAR, "leave": LEAVE, "tap": TAP,
-                  "damage": {"kind": "event", "duration_ms": 200, "beat_ms": 60, "tracks": [
+                  "damage": {"kind": "event", "duration_ms": 1000, "beat_ms": 60, "tracks": [
                       {"target": "all", "prop": "scale", "keys": [[0, 1.0, "ease_out_quad"], [60, 1.15, "ease_in_quad"], [200, 1.0, "constant"]]},
-                      {"target": "all", "prop": "tx", "keys": [[0, 0.0, "linear"], [40, -0.8, "linear"], [80, 0.8, "linear"], [120, -0.5, "linear"], [160, 0.3, "linear"], [200, 0.0, "constant"]]}],
-                      "reduced": static_reduced(), "note": "урон: сердце вздрагивает, число меняет игра; reduced — без движения"},
+                      {"target": "all", "prop": "tx", "keys": [[0, 0.0, "linear"], [40, -0.8, "linear"], [80, 0.8, "linear"], [120, -0.5, "linear"], [160, 0.3, "linear"], [200, 0.0, "constant"]]},
+                      {"target": "glow", "prop": "opacity", "keys": [[0, 0.0, "constant"], [200, 0.0, "ease_out_quad"], [320, 1.0, "ease_in_out_cubic"], [560, 0.45, "ease_in_out_cubic"], [760, 0.85, "ease_in_quad"], [1000, 0.0, "constant"]]}],
+                      "reduced": static_reduced(),
+                      "note": "урон (SD-35, DE-012): 0–200 сердце вздрагивает (удар 60), 200–1000 вспышка и один пульс ореола glow (вид — кандидат до арт-приёмки); число меняет игра на +80 от контакта; reduced — без движения"},
                   "deplete": {"kind": "event", "hold": True, "duration_ms": 200, "beat_ms": 60, "tracks": [
                       {"target": "under", "prop": "opacity", "keys": [[0, 1.0, "constant"], [200, 1.0, "constant"]]},
                       {"target": "icon", "prop": "scale", "keys": [[0, 1.0, "ease_out_quad"], [60, 1.15, "ease_in_quad"], [200, 0.0, "constant"]]},
@@ -322,17 +325,108 @@ ICONS = {
                       {"target": "icon", "prop": "opacity", "keys": [[0, 0.0, "ease_out_quad"], [80, 1.0, "constant"]]}],
                       "reduced": {"duration_ms": 100, "tracks": [{"target": "icon", "prop": "opacity", "keys": [[0, 0.0, "linear"], [100, 1.0, "constant"]]}]},
                       "note": "лечение: сердце наполняется"}},
-        "demo": [["appear"], ["wait", 400], ["damage"], ["wait", 400], ["deplete"], ["wait", 500], ["heal"], ["wait", 400], ["leave"]]},
+        "demo": [["appear"], ["wait", 400], ["damage"], ["wait", 1200], ["deplete"], ["wait", 500], ["heal"], ["wait", 400], ["leave"]]},
     "resource-hp-empty": {
         "canvas_u": [32, 32], "layers": [layer("icon", "resource-hp-empty")],
         "anims": {"appear": APPEAR_FADE, "leave": LEAVE},
         "demo": [["appear"], ["wait", 800], ["leave"]]},
 }
+# ------------------------------------------------------------------------------------------------ кандидаты DE-012
+# W-15 арт (ICON-MOTION.md, раздел DE; 01 F-07, F-09, F-12; 02 SD-34…SD-38). Новые id — только галерея -S08IconGallery
+# до арт-приёмки пользователя: HUD их не использует (pytest test_candidates_are_gallery_only). Числа — из 01.
+RING_FLASH_FRAMES = 7     # = draw_icons.RING_FLASH_FRAMES: жёлтый (f00) → оранжевый (f03) → красный (f06)
+RING_REST_OPACITY = 0.35  # тлеющее кольцо весь ход (01 F-07, «Резолюция» п. 6)
+
+
+def turn_ring(icon, flash_frames):
+    """Кольцо хода: rim — тлеющий обод (покой 0,35), flash — вспышка 1000 мс (флипбук цвета или цвет команды)."""
+    team = None if flash_frames else "team"
+    tracks = [
+        {"target": "flash", "prop": "opacity", "keys": [[0, 0.15, "ease_out_quad"], [120, 1.0, "ease_in_quad"], [1000, 0.0, "constant"]]},
+        {"target": "rim", "prop": "opacity", "keys": [[0, 0.0, "linear"], [1000, RING_REST_OPACITY, "constant"]]}]
+    if flash_frames:
+        tracks.append({"target": "flash", "prop": "frame",
+                       "keys": [[round(i * 1000 / flash_frames, 3), i, "constant"] for i in range(flash_frames)]
+                       + [[1000, flash_frames - 1, "constant"]]})
+    return {
+        "canvas_u": [32, 32],
+        "layers": [layer("rim", f"{icon}_rim", rest={"opacity": RING_REST_OPACITY}, tint=team),
+                   layer("flash", f"{icon}_flash#" if flash_frames else f"{icon}_flash", rest={"opacity": 0.0},
+                         frames=flash_frames or None, tint=team)],
+        "anims": {
+            "appear": {"kind": "enter", "duration_ms": 1000, "beat_ms": 0, "tracks": tracks,
+                       "reduced": {"duration_ms": 100, "tracks": [
+                           {"target": "rim", "prop": "opacity", "keys": [[0, 0.0, "linear"], [100, RING_REST_OPACITY, "constant"]]}]},
+                       "note": "старт хода стороны (CUE-015, 01 F-07): обод целиком вспыхивает "
+                               + ("жёлтый → оранжевый → красный" if flash_frames else "цветом команды С-11")
+                               + " за 1000 мс и гаснет в тлеющее кольцо 0,35 до конца хода; ввод не блокирует; reduced — статичное кольцо 0,35"},
+            "leave": {"kind": "exit", "duration_ms": 120, "beat_ms": None, "tracks": [
+                {"target": "all", "prop": "opacity", "keys": [[0, None, "ease_in_quad"], [120, 0.0, "constant"]]}],
+                "reduced": {"duration_ms": 100, "tracks": [{"target": "all", "prop": "opacity", "keys": [[0, None, "linear"], [100, 0.0, "constant"]]}]},
+                "note": "ход перешёл к другой стороне: opacity → 0 без масштаба"}},
+        "demo": [["appear"], ["wait", 1500], ["leave"]]}
+
+
+CANDIDATE_ICONS = {
+    "marker-turn-ring": turn_ring("marker-turn-ring", RING_FLASH_FRAMES),
+    "marker-turn-ring-team": turn_ring("marker-turn-ring-team", 0),
+    "resource-hp-fallen": {
+        "canvas_u": [32, 32], "layers": [layer("heart", "resource-hp-empty"),
+                                         layer("cross", "resource-hp-fallen_cross", pivot=(16, 16.4))],
+        "anims": {"appear": {"kind": "enter", "duration_ms": 200, "beat_ms": 120, "tracks": [
+            {"target": "cross", "prop": "scale", "keys": [[0, 0.0, "ease_out_cubic"], [120, 1.08, "ease_in_quad"], [200, 1.0, "constant"]]}],
+            "reduced": {"duration_ms": 100, "tracks": [{"target": "cross", "prop": "opacity", "keys": [[0, 0.0, "linear"], [100, 1.0, "constant"]]}]},
+            "note": "павший (SD-38): крест «штампуется» на пустое сердце, сердце неподвижно; игра запускает на +1100 от кадра контакта (01 F-09)"},
+            "leave": LEAVE},
+        "demo": [["appear"], ["wait", 900], ["leave"]]},
+    "marker-x-stamp": {
+        "canvas_u": [32, 32], "layers": [layer("sign", "marker-x-stamp", pivot=(16, 16))],
+        "anims": {"appear": {"kind": "enter", "duration_ms": 200, "beat_ms": 120, "tracks": [
+            {"target": "all", "prop": "opacity", "keys": [[0, 0.15, "ease_out_quad"], [150, 1.0, "constant"]]},
+            {"target": "sign", "prop": "scale", "keys": [[0, 0.0, "ease_out_cubic"], [120, 1.08, "ease_in_quad"], [200, 1.0, "constant"]]}],
+            "reduced": {"duration_ms": 100, "tracks": [{"target": "all", "prop": "opacity", "keys": [[0, 0.0, "linear"], [100, 1.0, "constant"]]}]},
+            "note": "крест-штамп (SD-37): «нет защиты» (CUE-009) / «отменено»; удар скоростью анимации не масштабируется"},
+            "leave": LEAVE},
+        "demo": [["appear"], ["wait", 800], ["leave"]]},
+    "marker-action-slot-de": {
+        "canvas_u": [32, 32], "layers": [layer("ring", "marker-action-slot-de_ring", pivot=(16, 16), rest={"opacity": 0.6}),
+                                         layer("body", "action-attack_body", rest={"opacity": 0.0}),
+                                         layer("glyph", "action-attack_glyph", pivot=(16, 16), rest={"opacity": 0.0})],
+        "anims": {"appear": APPEAR, "leave": LEAVE,
+                  "slot_pulse": {"kind": "loop", "duration_ms": 770, "beat_ms": 0, "tracks": [
+                      {"target": "ring", "prop": "scale", "keys": [[0, 1.0, "ease_in_out_cubic"], [385, 1.06, "ease_in_out_cubic"], [770, 1.0, "constant"]]},
+                      {"target": "ring", "prop": "opacity", "keys": [[0, 0.6, "ease_in_out_cubic"], [385, 1.0, "ease_in_out_cubic"], [770, 0.6, "constant"]]}],
+                      "reduced": static_reduced(),
+                      "note": "вариант DE (01 F-12, только галерея): пульс текущего слота, пока выбирается действие; reduced — обводка без пульса"},
+                  "fill": {"kind": "event", "hold": True, "duration_ms": 300, "beat_ms": 200, "tracks": [
+                      {"target": "body", "prop": "opacity", "keys": [[0, 0.4, "ease_out_quad"], [300, 1.0, "constant"]]},
+                      {"target": "glyph", "prop": "opacity", "keys": [[0, 0.4, "ease_out_quad"], [300, 1.0, "constant"]]},
+                      {"target": "glyph", "prop": "scale", "keys": [[0, 0.8, "ease_out_cubic"], [200, 1.04, "ease_in_quad"], [300, 1.0, "constant"]]},
+                      {"target": "ring", "prop": "opacity", "keys": [[0, None, "ease_out_quad"], [150, 0.0, "constant"]]}],
+                      "reduced": {"duration_ms": 100, "tracks": [
+                          {"target": "body", "prop": "opacity", "keys": [[0, 0.0, "linear"], [100, 1.0, "constant"]]},
+                          {"target": "glyph", "prop": "opacity", "keys": [[0, 0.0, "linear"], [100, 1.0, "constant"]]},
+                          {"target": "ring", "prop": "opacity", "keys": [[0, None, "linear"], [100, 0.0, "constant"]]}]},
+                      "note": "вариант DE: «потрачено = заполнено значком типа» 0,4 → 1 за 300 мс в момент выбора (слои action-<тип>; в галерее атака)"},
+                  "unfill": {"kind": "event", "hold": True, "duration_ms": 150, "beat_ms": None, "tracks": [
+                      {"target": "body", "prop": "opacity", "keys": [[0, None, "ease_in_quad"], [150, 0.0, "constant"]]},
+                      {"target": "glyph", "prop": "opacity", "keys": [[0, None, "ease_in_quad"], [150, 0.0, "constant"]]},
+                      {"target": "ring", "prop": "opacity", "keys": [[0, None, "ease_out_quad"], [150, 0.6, "constant"]]}],
+                      "reduced": {"duration_ms": 100, "tracks": [
+                          {"target": "body", "prop": "opacity", "keys": [[0, None, "linear"], [100, 0.0, "constant"]]},
+                          {"target": "glyph", "prop": "opacity", "keys": [[0, None, "linear"], [100, 0.0, "constant"]]},
+                          {"target": "ring", "prop": "opacity", "keys": [[0, None, "linear"], [100, 0.6, "constant"]]}]},
+                      "note": "вариант DE: Undo — слот снова пуст (01 F-12)"}},
+        "demo": [["appear"], ["slot_pulse"], ["wait", 1540], ["fill"], ["wait", 800], ["unfill"], ["wait", 500], ["leave"]]},
+}
+ICONS.update(CANDIDATE_ICONS)
+CANDIDATES = list(CANDIDATE_ICONS)
+
 ORDER = ["state-boost", "state-enemy", "state-sent", "state-pending-move", "state-pending-place", "state-hint",
          "state-threat", "state-immobilized", "action-attack", "action-attack-token", "action-defense", "action-maneuver",
          "action-scheme", "marker-status", "loader-spinner", "resource-action-full", "resource-action-empty",
          "resource-card", "resource-connection-online", "resource-connection-reconnecting", "resource-connection-lost",
-         "resource-hp-full", "resource-hp-empty"]
+         "resource-hp-full", "resource-hp-empty"] + CANDIDATES
 VARIANT_OF = {"resource-hp-full-enemy": "resource-hp-full", "marker-status-p1": "marker-status", "marker-status-p2": "marker-status"}
 
 
@@ -340,7 +434,8 @@ def contract():
     assert list(ICONS) == ORDER or set(ICONS) == set(ORDER), sorted(set(ORDER) ^ set(ICONS))
     return {
         "schema": "unmatched.icon-motion/1",
-        "revision": "icon-motion-2026-10-03b",   # b: ART-011 О-2 — знак связи (pivot 8,75; 8,75), сдвиг столбиков 3,75
+        # 2026-10-04: DE-012 — кандидаты набора DE (`candidates`), damage сердца 1000 мс с ореолом glow
+        "revision": "icon-motion-2026-10-04",
         "status": "предложено",
         "source": "docs/unreal/contracts/hud/ICON-MOTION-PLAN.md; art/imagegen/hud-icons-v3/STYLE-v3.md §7; генератор art/imagegen/hud-icons-v3/_tools/motion_contract.py",
         "units": {"t": "ms", "canvas": "u (32 u = сторона значка; плашки 64 × 32)", "tx/ty": "u", "rotate": "градусы по часовой",
@@ -355,6 +450,8 @@ def contract():
             "budget": "≤ 3 одновременно циклящих значка в кадре; тик только у активных анимаций",
         },
         "variants": VARIANT_OF,
+        "candidates": CANDIDATES,
+        "candidates_note": "кандидаты DE-012 до арт-приёмки пользователя: только галерея -S08IconGallery, HUD их не использует",
         "order": ORDER,
         "icons": {k: ICONS[k] for k in ORDER},
     }
