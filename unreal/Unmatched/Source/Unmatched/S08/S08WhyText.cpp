@@ -46,6 +46,10 @@ const FRow GRows[] = {
     {TEXT("why.actions.remaining"), TEXT("Use your actions first: {n} left")},
     {TEXT("why.effect.no.targets"), TEXT("No legal targets — effect skipped")},
     {TEXT("why.defense.none"), TEXT("Nothing to defend with")},
+    {TEXT("why.discard.count"), TEXT("Choose {need} cards to discard: {have} chosen")},
+    {TEXT("why.scheme.none"), TEXT("Pick a scheme card first")},
+    {TEXT("why.choice.required"), TEXT("This choice is mandatory")},
+    {TEXT("why.deadline.passed"), TEXT("Time is up — the server resolves")},
     // ---- ms.* (03 §9) ----
     {TEXT("ms.begin.already"), TEXT("Maneuver already begun — Enter confirms")},
     {TEXT("ms.begin.exhaustion"),

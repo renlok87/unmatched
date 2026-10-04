@@ -295,6 +295,32 @@ FS09InputResult FS09MoveInput::OnRightClick(FS09CommandUi& Ui, const FS08Snapsho
   return StepBack(/*bRightMouse=*/true, Ui, Snapshot, Board, Fighters, FS09InputView());
 }
 
+FS09InputResult FS09MoveInput::OnPointerReleasedGated(const FIntPoint& Cell, const FString& FighterId,
+                                                      const FS09Reason& Gate) {
+  FS09InputResult Out;
+  if (!bPressed) return Out;
+  const bool bSameSpace = Cell.X >= 0 && Cell == PressedCell;
+  const bool bSameFighter = !FighterId.IsEmpty() && FighterId == PressedFighterId;
+  bPressed = false;
+  PressedCell = FIntPoint(-1, -1);
+  PressedFighterId.Reset();
+  Out.bHandled = true;
+  if (bSameSpace || bSameFighter) {
+    Out.Toast = Gate.IsSet() ? Gate : FS09Reason::Make(TEXT("why.syncing"));
+  }
+  return Out;
+}
+
+FS09Reason FS09MoveInput::IdleClickReason(const FS09CommandUi& Ui, const FS08Snapshot& Snapshot) {
+  if (Snapshot.CurrentTurnPlayerId != Ui.ViewerId) {
+    return FS09Reason::Make(Ui.bHasPendingChoice ? TEXT("why.wait.opponent.choice") : TEXT("why.not.your.turn"));
+  }
+  if (Ui.bHasPendingChoice) return FS09Reason::Make(TEXT("why.wait.opponent.choice"));
+  if (Ui.Combat.bPresent) return FS09Reason::Make(TEXT("why.wait.defender"));
+  if (!Ui.CanKeepPreDraft(Snapshot)) return FS09Reason::Make(TEXT("why.no.actions"));
+  return FS09Reason::Make(TEXT("why.syncing"));
+}
+
 void FS09MoveInput::OnFocusLost() {
   bPressed = false;
   PressedCell = FIntPoint(-1, -1);
@@ -309,8 +335,19 @@ FS09InputResult FS09MoveInput::Click(const FIntPoint& Cell, const FString& Fight
   const bool bDraft = Ui.Mode == ES09CommandMode::ManeuverDraft;
   const bool bIdle = Ui.Mode == ES09CommandMode::None;
   if (!bDraft && !bIdle) return Out;
-  // MS-S-00 / MS-S-13 (not the viewer's action time): the plate only (caller).
-  if (bIdle && !Ui.CanPreDraftNow(Snapshot)) return Out;
+  // MS-S-00 / MS-S-13 (not the viewer's action time): the plate only (caller)
+  // for a fighter; an empty space is never a silent click (DE-014,
+  // UI-INP-011): CUE-004 with why the board waits.
+  if (bIdle && !Ui.CanPreDraftNow(Snapshot)) {
+    const bool bOnFighter =
+        !FighterId.IsEmpty() ||
+        (Cell.X >= 0 && Cell.Y >= 0 && FS08BoardModel::FighterAt(Fighters, Cell.X, Cell.Y, FString()) != nullptr);
+    if (!bOnFighter && Cell.X >= 0 && Cell.Y >= 0) {
+      Out.bHandled = true;
+      Out.Toast = IdleClickReason(Ui, Snapshot);
+    }
+    return Out;
+  }
   if (bExhaustionOpen) {
     Out.bHandled = true; // MS-S-04 is modal
     return Out;

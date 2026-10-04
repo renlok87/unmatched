@@ -25,6 +25,9 @@
 //       without a mutation, the target carried into the draft by the new hand,
 //       why.predraft.lost, no quick move, the -S08Maneuver driver (src=auto).
 //   Unmatched.S09.MoveSel.ExhaustionConfirm - MS-AT-17 (MS-T-07): MS-S-04.
+//   Unmatched.S09.MoveSel.ClickReliability - DE-014 (UI-INP-011): n = 20 clicks
+//       per space kind with a 0 / 50 ms hold - 0 lost (target or why.*),
+//       MS-S-00 empty space why.not.your.turn, in flight why.syncing.
 //   Unmatched.S09.MoveSel.AutoManeuverPlan - M1 / MS-AT-32 (driver part): the opt-in
 //       -S08ManeuverPlan=boost3 on the driver's draft - the best BOOST card, three
 //       moves (hero step + two sidekicks), src=auto, confirmable; refusals.
@@ -1997,6 +2000,138 @@ bool FS09MoveSelInputSemanticsTest::RunTest(const FString&) {
       TestTrue(FString::Printf(TEXT("%s: has an alternative"), Binding.Input), FCString::Strlen(Binding.Alternative) > 0);
     }
   }
+  return true;
+}
+
+// DE-014 (W-21, UI-INP-011; MS-D-17 / MS-R-34 for the board): n = 20 synthetic
+// clicks on board spaces with a 0 ms hold (press and release in one poll) and a
+// 50 ms hold (snapshots applied between them) per space kind - 0 lost: every
+// click selects / targets, or answers CUE-004 with a why.* key; a click made
+// while a command is in flight is answered why.syncing and edits nothing.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09MoveSelClickReliabilityTest, "Unmatched.S09.MoveSel.ClickReliability",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS09MoveSelClickReliabilityTest::RunTest(const FString&) {
+  const FS08BoardModel Board = MsGrid(6, 3);
+  const TArray<FMsCard> Hand = {{TEXT("c2"), true, 2}, {TEXT("c1"), true, 1}};
+  const TArray<FS08BoardFighter> Fighters = {MsFighter(TEXT("a"), Me, 0, 1, 2.0), MsFighter(TEXT("b"), Me, 5, 1, 2.0),
+                                             MsFighter(TEXT("e"), Opp, 5, 0)};
+  constexpr int32 N = 20;
+  int32 Clicks = 0;
+  int32 Lost = 0;
+  // One click: press, (50 ms hold: the snapshots that arrive meanwhile), release.
+  auto Click = [&](FS09MoveInput& In, FS09CommandUi& Ui, const FS08Snapshot& Snap, const FIntPoint& Cell,
+                   const FString& FighterId, bool bHold) {
+    In.OnPointerPressed(Cell, FighterId);
+    if (bHold) {
+      FS08Snapshot Fresh = Snap;
+      Fresh.SequenceNumber += 1;
+      Ui.OnSnapshot(Fresh, Board, Fighters);
+      In.OnSnapshot(Ui, Fresh);
+    }
+    return In.OnPointerReleased(Cell, FighterId, Ui, Snap, Board, Fighters);
+  };
+  auto Answered = [](const FS09InputResult& R) { return R.bHandled && (R.bSelectionChanged || R.Toast.IsSet()); };
+  for (const bool bHold : {false, true}) {
+    const TCHAR* HoldTag = bHold ? TEXT("50 ms") : TEXT("0 ms");
+    // ---- reachable spaces in the draft: each click sets the target ----
+    {
+      const FS08Snapshot Snap = MsSnapshot(Hand, ManeuverA, 5);
+      FS09CommandUi Ui = MsOpen(Snap, Board, Fighters);
+      FS09MoveInput In;
+      int32 Ok = 0;
+      for (int32 K = 0; K < N; ++K) {
+        const FS09InputResult Pick = Click(In, Ui, Snap, FIntPoint(0, 1), TEXT("a"), bHold);
+        const FIntPoint Target = (K % 2) ? FIntPoint(1, 1) : FIntPoint(2, 1);
+        const FS09InputResult R = Click(In, Ui, Snap, Target, FString(), bHold);
+        const FS09DraftMove* Move = MsMove(Ui, TEXT("a"));
+        const bool bSet = Answered(Pick) && Answered(R) && Move && Move->DestX == Target.X && Move->DestY == Target.Y;
+        Ok += bSet ? 1 : 0;
+        Clicks += 2;
+        Lost += bSet ? 0 : 1;
+      }
+      TestEqual(FString::Printf(TEXT("reachable space, hold %s: every click targets"), HoldTag), Ok, N);
+    }
+    // ---- an unreachable space: CUE-004 with the reason, the target unchanged ----
+    {
+      const FS08Snapshot Snap = MsSnapshot(Hand, ManeuverA, 5);
+      FS09CommandUi Ui = MsOpen(Snap, Board, Fighters);
+      FS09MoveInput In;
+      Click(In, Ui, Snap, FIntPoint(0, 1), TEXT("a"), false);
+      int32 Ok = 0;
+      for (int32 K = 0; K < N; ++K) {
+        const FS09InputResult R = Click(In, Ui, Snap, FIntPoint(4, 0), FString(), bHold);
+        const bool bWhy =
+            Answered(R) && R.Toast.Key.ToString().StartsWith(TEXT("why.")) && R.IllegalCell == FIntPoint(4, 0);
+        Ok += bWhy ? 1 : 0;
+        ++Clicks;
+        Lost += bWhy ? 0 : 1;
+      }
+      TestEqual(FString::Printf(TEXT("unreachable space, hold %s: every click answers why.*"), HoldTag), Ok, N);
+      TestEqual(TEXT("... and the draft is unchanged"), Ui.Moves.Num(), 0);
+    }
+    // ---- MS-S-00 (the opponent's turn): an empty space answers why.not.your.turn ----
+    {
+      FS08Snapshot Snap = MsTurnSnapshot(Hand);
+      Snap.CurrentTurnPlayerId = Opp;
+      FS09CommandUi Ui = MsOpen(Snap, Board, Fighters);
+      FS09MoveInput In;
+      int32 Ok = 0;
+      for (int32 K = 0; K < N; ++K) {
+        const FS09InputResult R = Click(In, Ui, Snap, FIntPoint(1 + K % 3, 2), FString(), bHold);
+        const bool bWhy = Answered(R) && R.Toast.Key == FName(TEXT("why.not.your.turn"));
+        Ok += bWhy ? 1 : 0;
+        ++Clicks;
+        Lost += bWhy ? 0 : 1;
+      }
+      TestEqual(FString::Printf(TEXT("MS-S-00 empty space, hold %s: every click answers why.not.your.turn"), HoldTag),
+                Ok, N);
+      const FS09InputResult Plate = Click(In, Ui, Snap, FIntPoint(0, 1), TEXT("a"), bHold);
+      TestTrue(TEXT("MS-S-00 own fighter: the plate only (no selection, no toast)"),
+               !Plate.bHandled && Ui.SelectedFighterId.IsEmpty());
+    }
+    // ---- a command in flight (MS-S-05 / MS-S-09): why.syncing, nothing edited ----
+    {
+      const FS08Snapshot Snap = MsSnapshot(Hand, ManeuverA, 5);
+      FS09CommandUi Ui = MsOpen(Snap, Board, Fighters);
+      FS09MoveInput In;
+      Click(In, Ui, Snap, FIntPoint(0, 1), TEXT("a"), false);
+      const uint32 Revision = Ui.DraftRevision;
+      int32 Ok = 0;
+      for (int32 K = 0; K < N; ++K) {
+        const FIntPoint Cell = (K % 2) ? FIntPoint(1, 1) : FIntPoint(2, 1);
+        In.OnPointerPressed(Cell, FString());
+        const FS09InputResult R = In.OnPointerReleasedGated(Cell, FString(), FS09Reason::Make(TEXT("why.syncing")));
+        const bool bWhy = R.bHandled && R.Toast.Key == FName(TEXT("why.syncing"));
+        Ok += bWhy ? 1 : 0;
+        ++Clicks;
+        Lost += bWhy ? 0 : 1;
+      }
+      TestEqual(FString::Printf(TEXT("in flight, hold %s: every click answers why.syncing"), HoldTag), Ok, N);
+      TestEqual(TEXT("... and edits nothing"), Ui.DraftRevision, Revision);
+      In.OnPointerPressed(FIntPoint(1, 1), FString());
+      const FS09InputResult Away =
+          In.OnPointerReleasedGated(FIntPoint(2, 1), FString(), FS09Reason::Make(TEXT("why.syncing")));
+      TestFalse(TEXT("in flight: a drag away cancels silently (MS-R-34)"), Away.Toast.IsSet());
+    }
+  }
+  // ---- the idle reasons by state ----
+  {
+    FS08Snapshot Snap = MsTurnSnapshot(Hand);
+    FS09CommandUi Ui = MsOpen(Snap, Board, Fighters);
+    Snap.CurrentTurnPlayerId = Opp;
+    TestEqual(TEXT("idle reason: not your turn"), FS09MoveInput::IdleClickReason(Ui, Snap).Key.ToString(),
+              FString(TEXT("why.not.your.turn")));
+    Snap.CurrentTurnPlayerId = Me;
+    Snap.Phase = TEXT("TURN_END");
+    TestEqual(TEXT("idle reason: no actions"), FS09MoveInput::IdleClickReason(Ui, Snap).Key.ToString(),
+              FString(TEXT("why.no.actions")));
+    Ui.bHasPendingChoice = true;
+    TestEqual(TEXT("idle reason: the opponent's choice"), FS09MoveInput::IdleClickReason(Ui, Snap).Key.ToString(),
+              FString(TEXT("why.wait.opponent.choice")));
+  }
+  TestEqual(TEXT("0 lost board clicks"), Lost, 0);
+  AddInfo(FString::Printf(TEXT("DE-014 board clicks: %d synthetic clicks over the 0 and 50 ms holds, lost %d"), Clicks,
+                          Lost));
   return true;
 }
 

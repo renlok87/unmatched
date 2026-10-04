@@ -86,6 +86,15 @@ public:
   FS09InputResult OnPointerReleased(const FIntPoint& Cell, const FString& FighterId, FS09CommandUi& Ui,
                                     const FS08Snapshot& Snapshot, const FS08BoardModel& Board,
                                     const TArray<FS08BoardFighter>& Fighters);
+  /** DE-014 (UI-INP-011 p. 3): the release of a press made while the input is
+   *  gated (a command in flight, MS-S-05 / MS-S-09): a click over the same
+   *  space or fighter edits nothing and answers with Gate (CUE-004 toast,
+   *  bHandled) instead of vanishing; a release elsewhere cancels (MS-R-34). */
+  FS09InputResult OnPointerReleasedGated(const FIntPoint& Cell, const FString& FighterId, const FS09Reason& Gate);
+  /** DE-014: why a completed click on an empty space does nothing in MS-S-00 /
+   *  MS-S-13 (not the viewer's action time): why.not.your.turn,
+   *  why.wait.opponent.choice, why.wait.defender, why.no.actions or why.syncing. */
+  static FS09Reason IdleClickReason(const FS09CommandUi& Ui, const FS08Snapshot& Snapshot);
   /** Right button: one step back like Esc, never the draft reset (03 §3.1). */
   FS09InputResult OnRightClick(FS09CommandUi& Ui, const FS08Snapshot& Snapshot, const FS08BoardModel& Board,
                                const TArray<FS08BoardFighter>& Fighters);
@@ -95,7 +104,9 @@ public:
   /** A completed click (MS-R-71 priority): (1) a space of the selected
    *  fighter's tiers (base or boost; its own space clears its move) gets the
    *  target even with a figure on it; (2) an own fighter (actor hit or
-   *  standing on the space) is selected; (3) otherwise the space is judged. */
+   *  standing on the space) is selected; (3) otherwise the space is judged.
+   *  Outside the viewer's action time a fighter keeps the plate (MS-S-00,
+   *  unhandled) and an empty space answers IdleClickReason (DE-014). */
   FS09InputResult Click(const FIntPoint& Cell, const FString& FighterId, FS09CommandUi& Ui,
                         const FS08Snapshot& Snapshot, const FS08BoardModel& Board,
                         const TArray<FS08BoardFighter>& Fighters);

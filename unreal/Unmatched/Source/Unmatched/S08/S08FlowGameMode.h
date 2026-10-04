@@ -23,6 +23,7 @@
 #include "../S09/S09HudModel.h"
 #include "../S09/S09ManeuverUi.h"
 #include "../S09/S09MoveInput.h"
+#include "../S09/S09HudPress.h"
 #include "S08FlowGameMode.generated.h"
 
 class SEditableTextBox;
@@ -198,6 +199,19 @@ private:
   /** Applies an FS09MoveInput result: sends, toasts, D/I closing, the board
    *  highlight. */
   void ApplyMoveInput(const FS09InputResult& Result);
+  // ---- DE-014 (W-21, UI-INP-011): HUD presses never lost, never silent ----
+  /** One pressable HUD element (S09HudPress.h) with the SButton look of
+   *  Padding / Tint / Label (hit-test invisible); on the click Blocked() is
+   *  asked AT THAT MOMENT - a reason shows CUE-004 (toast by key), none runs
+   *  Action. The look is dimmed when Blocked() already holds at build time. */
+  TSharedRef<SWidget> MakeHudPress(FName Id, TFunction<FS09Reason()> Blocked, TFunction<void()> Action,
+                                   const FMargin& Padding, const FLinearColor& Tint,
+                                   const TSharedRef<SWidget>& Label);
+  /** The arbiter resolved a release: trace HUD-PRESS, then the action or CUE-004. */
+  void HandleHudPressOutcome(const FS09HudPressOutcome& Outcome, const TFunction<FS09Reason()>& Blocked,
+                             const TFunction<void()>& Action);
+  /** The press reason of a command blocked by the in-flight gate. */
+  FS09Reason HudBusyReason() const;
   /** The one send path of a confirmed maneuver (Enter in FS09MoveInput, the
    *  older ConfirmDraft, the -S08Maneuver driver). */
   void SubmitConfirmedManeuver(const FS09ManeuverCommand& Command);
@@ -602,6 +616,8 @@ private:
   bool bCommandSlowShown = false; // MS-E-89: the 3 s why.syncing banner of the open command
   // MS-T-07: input state of the move selection (boost panel, MS-S-04, the press).
   FS09MoveInput MoveInput;
+  // DE-014: press arbitration of the Slate HUD by element id (survives RefreshHud).
+  TSharedPtr<FS09HudPressArbiter> HudPress = MakeShared<FS09HudPressArbiter>();
   bool bLegacyQuickMove = false;      // -S08LegacyQuickMove: TASK-022 two-click move (MS-R-32)
   bool bAutoManeuverAwaitDraft = false; // -S08Maneuver: confirm once the draft opens (MS-R-62)
   FString AutoManeuverPlan;             // -S08ManeuverPlan=<plan>: run on the opened draft first (M1)

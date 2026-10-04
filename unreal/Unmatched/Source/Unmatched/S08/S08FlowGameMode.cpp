@@ -1025,18 +1025,29 @@ void AS08FlowGameMode::HandleClick() {
       if (MoveInput.bPressed || MoveInput.HoverCell.X >= 0) MoveInput.OnFocusLost();
       return;
     }
-    // MS-S-05 / MS-S-09: nothing edits the pre-draft or the draft while a
-    // command is in flight.
-    if (CommandUi.bCommandInFlight || Flow->IsManeuverInFlight()) {
-      if (MoveInput.bPressed) MoveInput.OnFocusLost();
-      return;
-    }
     const bool bLeftDown = PC->WasInputKeyJustPressed(EKeys::LeftMouseButton);
     const bool bLeftUp = PC->WasInputKeyJustReleased(EKeys::LeftMouseButton);
     const bool bRight = PC->WasInputKeyJustPressed(EKeys::RightMouseButton);
     if (!bLeftDown && !bLeftUp && !bRight) return; // the hover preview needs it from MS-T-09
     PickBoardUnderCursor(PC, Cell, HitFighterId);
     MoveInput.SetHover(Cell);
+    // MS-S-05 / MS-S-09: nothing edits the pre-draft or the draft while a
+    // command is in flight - but a click made then is answered with the
+    // reason instead of vanishing (DE-014, UI-INP-011 p. 3).
+    if (CommandUi.bCommandInFlight || Flow->IsManeuverInFlight()) {
+      if (bLeftDown) MoveInput.OnPointerPressed(Cell, HitFighterId);
+      if (bLeftUp) {
+        const FS09InputResult Gated =
+            MoveInput.OnPointerReleasedGated(Cell, HitFighterId, FS09Reason::Make(TEXT("why.syncing")));
+        if (Gated.Toast.IsSet()) {
+          FS08Trace::Write(FString::Printf(TEXT("INPUT release src=os cell=%s gated=in-flight why=%s"),
+                                           Cell.X >= 0 ? *BoardModel.CellLabel(Cell.X, Cell.Y) : TEXT("none"),
+                                           *Gated.Toast.Key.ToString()));
+        }
+        ApplyMoveInput(Gated);
+      }
+      return;
+    }
     if (bRight) {
       ApplyMoveInput(MoveInput.OnRightClick(CommandUi, Flow->GetAppliedSnapshot(), BoardModel, Fighters));
       return;
@@ -1459,7 +1470,11 @@ void AS08FlowGameMode::HandleHandCardClick(int32 HandIndex, ES09InputSource Sour
     return;
   }
   if (CommandUi.Mode == ES09CommandMode::ManeuverDraft) {
-    if (CommandUi.bCommandInFlight || Flow->IsManeuverInFlight()) return; // MS-S-09: frozen
+    if (CommandUi.bCommandInFlight || Flow->IsManeuverInFlight()) {
+      ShowReason(FS09Reason::Make(TEXT("why.syncing")), 3.0f); // MS-S-09: frozen, never silent (DE-014)
+      RefreshHud();
+      return;
+    }
     FString Reason;
     // MS-T-07: the live model (5-argument form); src= click (hand strip) / key (1-9).
     const ES09InputSource PreviousSource = CommandUi.DraftSource;
@@ -1604,6 +1619,43 @@ void AS08FlowGameMode::ShowReason(const FS09Reason& Reason, float Seconds) {
   FS08Trace::Write(FString::Printf(TEXT("TOAST why=%s text=\"%s\""), *Shown.Key.ToString(), *Toast));
   TracedToast = Toast;
   RefreshUi();
+}
+
+TSharedRef<SWidget> AS08FlowGameMode::MakeHudPress(FName Id, TFunction<FS09Reason()> Blocked, TFunction<void()> Action,
+                                                  const FMargin& Padding, const FLinearColor& Tint,
+                                                  const TSharedRef<SWidget>& Label) {
+  // The look of the old SButton, dimmed when the element is blocked now; the
+  // decision itself is taken again on the click (the state may change first).
+  const bool bDimmed = Blocked && Blocked().IsSet();
+  return SNew(SS09HudPress)
+      .Id(Id)
+      .Arbiter(HudPress)
+      .OnOutcome_Lambda([this, Blocked, Action](const FS09HudPressOutcome& Outcome) {
+        HandleHudPressOutcome(Outcome, Blocked, Action);
+      })
+      [SNew(SButton).ContentPadding(Padding).ButtonColorAndOpacity(Tint).IsEnabled(!bDimmed)[Label]];
+}
+
+void AS08FlowGameMode::HandleHudPressOutcome(const FS09HudPressOutcome& Outcome, const TFunction<FS09Reason()>& Blocked,
+                                             const TFunction<void()>& Action) {
+  // UI-INP-011: in the frame of the release - the action with its response,
+  // or CUE-004 (the toast by key, "TOAST why=" in the trace). Never silent.
+  const FS09HudPressOutcome Traced = FS09HudPressArbiter::Decide(
+      Outcome, Outcome.Result == ES09HudPressResult::Act && Blocked ? Blocked() : FS09Reason());
+  FS08Trace::Write(FS09HudPressArbiter::TraceLine(Traced));
+  if (Traced.Result == ES09HudPressResult::Act) {
+    if (Action) Action();
+    return;
+  }
+  if (Traced.Result == ES09HudPressResult::Refused) {
+    ShowReason(Traced.Reason, 3.0f); // CUE-004
+    RefreshHud();
+  }
+}
+
+FS09Reason AS08FlowGameMode::HudBusyReason() const {
+  const bool bInFlight = CommandUi.bCommandInFlight || (Flow.IsValid() && Flow->IsManeuverInFlight());
+  return bInFlight ? FS09Reason::Make(TEXT("why.syncing")) : FS09Reason();
 }
 
 void AS08FlowGameMode::HandleRejection(const FS08Rejection& Rejection) {
@@ -2032,7 +2084,10 @@ void AS08FlowGameMode::HandleHudKeys() {
       }
       const bool bBrowserArrow = bDiscardBrowserOpen &&
                                  (Key.GetValue() == ES09MoveKey::Left || Key.GetValue() == ES09MoveKey::Right);
-      if (!bBrowserArrow) return;
+      if (!bBrowserArrow) {
+        ShowReason(FS09Reason::Make(TEXT("why.syncing")), 3.0f); // DE-014: a key in flight is answered, not dropped
+        return;
+      }
     } else if (Key.IsSet()) {
       const FS09InputResult Result =
           MoveInput.OnKey(Key.GetValue(), CommandUi, EffectiveSnapshot(), BoardModel, Fighters, MoveInputView());
@@ -3981,6 +4036,14 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
       ConfirmDraft();
     }
   }
+  // DE-014: a HUD press whose pressed instance was rebuilt away and whose
+  // release landed off every HUD element (Slate delivered it to the viewport)
+  // still resolves - refused with a reason after a rebuild, else cancelled.
+  if (HudPress->IsPressed() && FSlateApplication::IsInitialized() &&
+      !FSlateApplication::Get().GetPressedMouseButtons().Contains(EKeys::LeftMouseButton)) {
+    const FS09HudPressOutcome Stray = HudPress->Release(NAME_None, GFrameCounter);
+    if (Stray.Result == ES09HudPressResult::Refused) HandleHudPressOutcome(Stray, nullptr, nullptr);
+  }
   HandleClick();
   HandleHudKeys();
   // Sync the in-flight gate every tick, not only on applied snapshots: a
@@ -4646,6 +4709,9 @@ FString AS08FlowGameMode::CommittedCardLabel(const FString& InstanceId) const {
 void AS08FlowGameMode::RefreshHud() {
   SyncCombatFocus();
   if (!HandBox.IsValid() || !PanelsBox.IsValid() || !CommandBox.IsValid()) return;
+  // DE-014: every pressable element is rebuilt below; a held press survives by
+  // its element id (S09HudPress.h), the arbiter only learns the layout moved.
+  HudPress->NoteRebuild();
   HandBox->ClearChildren();
   PanelsBox->ClearChildren();
   CommandBox->ClearChildren();
@@ -4713,18 +4779,18 @@ void AS08FlowGameMode::RefreshHud() {
     AddLine(TEXT("gameplay input is disabled; L or Enter returns you to the lobby"));
     AddMarker(GS09ResultButtonMarker);
     CommandBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
-        [SNew(SButton)
-             .ContentPadding(FMargin(14, 8))
-             .IsEnabled(!bS09LobbyReturnSent)
-             .OnClicked_Lambda([this]() {
+        [MakeHudPress(
+             FName(TEXT("hud.result.lobby")),
+             [this]() { return bS09LobbyReturnSent ? FS09Reason::Make(TEXT("why.syncing")) : FS09Reason(); },
+             [this]() {
                ReturnToLobbyCommand();
-               return FReply::Handled();
-             })
-             [SNew(STextBlock)
+             },
+             FMargin(14, 8), FLinearColor::White,
+             SNew(STextBlock)
                   .Text(FText::FromString(bS09LobbyReturnSent
                                               ? TEXT("RETURNING TO LOBBY...")
                                               : TEXT("RETURN TO LOBBY (L)")))
-                  .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14))]];
+                  .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14)))];
     return;
   }
 
@@ -4750,18 +4816,18 @@ void AS08FlowGameMode::RefreshHud() {
              TEXT("gameplay input is disabled; L or Enter returns you to the lobby")))
              .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14))];
     CommandBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
-        [SNew(SButton)
-             .ContentPadding(FMargin(14, 8))
-             .IsEnabled(!bS09LobbyReturnSent)
-             .OnClicked_Lambda([this]() {
+        [MakeHudPress(
+             FName(TEXT("hud.abort.lobby")),
+             [this]() { return bS09LobbyReturnSent ? FS09Reason::Make(TEXT("why.syncing")) : FS09Reason(); },
+             [this]() {
                ReturnToLobbyCommand();
-               return FReply::Handled();
-             })
-             [SNew(STextBlock)
+             },
+             FMargin(14, 8), FLinearColor::White,
+             SNew(STextBlock)
                   .Text(FText::FromString(bS09LobbyReturnSent
                                               ? TEXT("RETURNING TO LOBBY...")
                                               : TEXT("RETURN TO LOBBY (L)")))
-                  .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14))]];
+                  .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14)))];
     return;
   }
 
@@ -4812,17 +4878,17 @@ void AS08FlowGameMode::RefreshHud() {
       }
       const bool bSelected = InspectedHandIndex == I;
       Strip->AddSlot().AutoWidth().Padding(3)
-          [SNew(SButton)
-               .ContentPadding(FMargin(10, 8))
-               .ButtonColorAndOpacity(
-                   FLinearColor(bSelected ? 0.42f : 0.22f, bSelected ? 0.42f : 0.22f,
-                                bSelected ? 0.42f : 0.22f, 1.0f))
-               .OnClicked_Lambda([this, I]() {
+          [MakeHudPress(
+               FName(*(TEXT("hand.") + Card.InstanceId)),
+               nullptr,
+               [this, I]() {
                  HandleHandCardClick(I);
-                 return FReply::Handled();
-               })
-               [SNew(STextBlock).Text(FText::FromString(Chip))
-                    .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14))]];
+               },
+               FMargin(10, 8),
+               FLinearColor(bSelected ? 0.42f : 0.22f, bSelected ? 0.42f : 0.22f,
+                            bSelected ? 0.42f : 0.22f, 1.0f),
+               SNew(STextBlock).Text(FText::FromString(Chip))
+                    .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14)))];
     }
     HandBox->AddSlot().AutoHeight().Padding(0, 0, 0, 6)
         [SNew(STextBlock)
@@ -4863,22 +4929,22 @@ void AS08FlowGameMode::RefreshHud() {
   // a face-down placeholder renders and inspects as faceless by construction
   // (selection is read-only: no draft, hand pick or server command changes). ----
   PanelsBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
-      [SNew(SButton)
-           .ContentPadding(FMargin(8, 3))
-           .ButtonColorAndOpacity(
-               FLinearColor(bDiscardBrowserOpen ? 0.32f : 0.20f, bDiscardBrowserOpen ? 0.32f : 0.20f,
-                            bDiscardBrowserOpen ? 0.32f : 0.20f, 1.0f))
-           .OnClicked_Lambda([this]() {
+      [MakeHudPress(
+           FName(TEXT("hud.discard.browse")),
+           nullptr,
+           [this]() {
              bDiscardBrowserOpen = !bDiscardBrowserOpen;
              DiscardBrowserIndex = -1;
              RefreshHud();
-             return FReply::Handled();
-           })
-           [SNew(STextBlock)
+           },
+           FMargin(8, 3),
+           FLinearColor(bDiscardBrowserOpen ? 0.32f : 0.20f, bDiscardBrowserOpen ? 0.32f : 0.20f,
+                        bDiscardBrowserOpen ? 0.32f : 0.20f, 1.0f),
+           SNew(STextBlock)
                 .Text(FText::FromString(FString::Printf(
                     TEXT("%s DISCARD PILES  (D)"),
                     bDiscardBrowserOpen ? TEXT("HIDE") : TEXT("BROWSE"))))
-                .Font(FCoreStyle::GetDefaultFontStyle("Bold", 12))]];
+                .Font(FCoreStyle::GetDefaultFontStyle("Bold", 12)))];
   if (bDiscardBrowserOpen) {
     for (int32 Pile = 0; Pile < 2; ++Pile) {
       const FS09PlayerPanel* Panel =
@@ -4910,17 +4976,17 @@ void AS08FlowGameMode::RefreshHud() {
         const bool bChipSelected = Pile == DiscardBrowserPile &&
                                    I == DiscardBrowserIndex;
         Wrap->AddSlot().Padding(2)
-            [SNew(SButton)
-                 .ContentPadding(FMargin(8, 3))
-                 .ButtonColorAndOpacity(
-                     FLinearColor(bChipSelected ? 0.42f : 0.22f, bChipSelected ? 0.42f : 0.22f,
-                                  bChipSelected ? 0.42f : 0.22f, 1.0f))
-                 .OnClicked_Lambda([this, P, I]() {
+            [MakeHudPress(
+                 FName(*FString::Printf(TEXT("discard.%d.%s"), P, *Card.InstanceId)),
+                 nullptr,
+                 [this, P, I]() {
                    HandleDiscardCardClick(P, I);
-                   return FReply::Handled();
-                 })
-                 [SNew(STextBlock).Text(FText::FromString(Chip))
-                      .Font(FCoreStyle::GetDefaultFontStyle("Bold", 12))]];
+                 },
+                 FMargin(8, 3),
+                 FLinearColor(bChipSelected ? 0.42f : 0.22f, bChipSelected ? 0.42f : 0.22f,
+                              bChipSelected ? 0.42f : 0.22f, 1.0f),
+                 SNew(STextBlock).Text(FText::FromString(Chip))
+                      .Font(FCoreStyle::GetDefaultFontStyle("Bold", 12)))];
       }
       PanelsBox->AddSlot().AutoHeight()
           [SNew(SBox).WidthOverride(370)[Wrap]];
@@ -4967,7 +5033,6 @@ void AS08FlowGameMode::RefreshHud() {
   // targets >= 32px tall: P1 acceptance for 1280x720 readability. ----
   const bool bDraft = CommandUi.Mode == ES09CommandMode::ManeuverDraft;
   const bool bDiscard = CommandUi.Mode == ES09CommandMode::DiscardDraft;
-  const bool bBusy = CommandUi.bCommandInFlight;
   auto AddMarker = [this](const FLinearColor& Color) {
     CommandBox->AddSlot().AutoHeight().Padding(0, 0, 0, 4)
         [SNew(SBox).WidthOverride(220).HeightOverride(14)
@@ -5012,24 +5077,25 @@ void AS08FlowGameMode::RefreshHud() {
     CommandBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
         [SNew(SHorizontalBox) +
          SHorizontalBox::Slot().AutoWidth().Padding(0, 0, 8, 0)
-             [SNew(SButton)
-                  .ContentPadding(FMargin(14, 8))
-                  .IsEnabled(!bBusy)
-                  .OnClicked_Lambda([this]() {
+             [MakeHudPress(
+                  FName(TEXT("hud.maneuver.confirm")),
+                  [this]() { return HudBusyReason(); },
+                  [this]() {
                     ConfirmDraft();
-                    return FReply::Handled();
-                  })
-                  [SNew(STextBlock).Text(FText::FromString(TEXT("CONFIRM MANEUVER (Enter)")))
-                       .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14))]] +
+                  },
+                  FMargin(14, 8), FLinearColor::White,
+                  SNew(STextBlock).Text(FText::FromString(TEXT("CONFIRM MANEUVER (Enter)")))
+                       .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14)))] +
          SHorizontalBox::Slot().AutoWidth()
-             [SNew(SButton)
-                  .ContentPadding(FMargin(14, 8))
-                  .OnClicked_Lambda([this]() {
+             [MakeHudPress(
+                  FName(TEXT("hud.maneuver.clear")),
+                  nullptr,
+                  [this]() {
                     CancelDraft();
-                    return FReply::Handled();
-                  })
-                  [SNew(STextBlock).Text(FText::FromString(TEXT("CLEAR DRAFT (Esc)")))
-                       .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14))]]];
+                  },
+                  FMargin(14, 8), FLinearColor::White,
+                  SNew(STextBlock).Text(FText::FromString(TEXT("CLEAR DRAFT (Esc)")))
+                       .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14)))]];
   } else if (bDiscard) {
     const int32 Need = CommandUi.PendingDiscard.Count;
     const int32 Have = CommandUi.DiscardSelection.Num();
@@ -5041,17 +5107,23 @@ void AS08FlowGameMode::RefreshHud() {
                FLinearColor(1.0f, 1.0f, 1.0f, 1.0f));
     AddLine(TEXT("click cards or press 1-9 to toggle [DROP]; Enter confirms"));
     CommandBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
-        [SNew(SButton)
-             .ContentPadding(FMargin(14, 8))
-             .IsEnabled(Have == Need && !bBusy)
-             .OnClicked_Lambda([this]() {
+        [MakeHudPress(
+             FName(TEXT("hud.discard.confirm")),
+             [this]() {
+               if (HudBusyReason().IsSet()) return HudBusyReason();
+               const int32 Need = CommandUi.PendingDiscard.Count;
+               const int32 Have = CommandUi.DiscardSelection.Num();
+               if (Have == Need) return FS09Reason();
+               return FS09Reason::Make(TEXT("why.discard.count")).Arg(TEXT("need"), Need).Arg(TEXT("have"), Have);
+             },
+             [this]() {
                ConfirmDraft();
-               return FReply::Handled();
-             })
-             [SNew(STextBlock)
+             },
+             FMargin(14, 8), FLinearColor::White,
+             SNew(STextBlock)
                   .Text(FText::FromString(FString::Printf(
                       TEXT("CONFIRM DISCARD %d/%d (Enter)"), Have, Need)))
-                  .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14))]];
+                  .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14)))];
   } else if (CommandUi.Mode == ES09CommandMode::AttackDraft) {
     auto FighterLabel = [this](const FString& Id) {
       for (const FS08BoardFighter& Entry : Fighters) {
@@ -5085,24 +5157,25 @@ void AS08FlowGameMode::RefreshHud() {
     CommandBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
         [SNew(SHorizontalBox) +
          SHorizontalBox::Slot().AutoWidth().Padding(0, 0, 8, 0)
-             [SNew(SButton)
-                  .ContentPadding(FMargin(14, 8))
-                  .IsEnabled(!bBusy)
-                  .OnClicked_Lambda([this]() {
+             [MakeHudPress(
+                  FName(TEXT("hud.attack.confirm")),
+                  [this]() { return HudBusyReason(); },
+                  [this]() {
                     ConfirmCombat();
-                    return FReply::Handled();
-                  })
-                  [SNew(STextBlock).Text(FText::FromString(TEXT("ATTACK (Enter)")))
-                       .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14))]] +
+                  },
+                  FMargin(14, 8), FLinearColor::White,
+                  SNew(STextBlock).Text(FText::FromString(TEXT("ATTACK (Enter)")))
+                       .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14)))] +
          SHorizontalBox::Slot().AutoWidth()
-             [SNew(SButton)
-                  .ContentPadding(FMargin(14, 8))
-                  .OnClicked_Lambda([this]() {
+             [MakeHudPress(
+                  FName(TEXT("hud.attack.close")),
+                  nullptr,
+                  [this]() {
                     CancelDraft();
-                    return FReply::Handled();
-                  })
-                  [SNew(STextBlock).Text(FText::FromString(TEXT("CLOSE DRAFT (Esc)")))
-                       .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14))]]];
+                  },
+                  FMargin(14, 8), FLinearColor::White,
+                  SNew(STextBlock).Text(FText::FromString(TEXT("CLOSE DRAFT (Esc)")))
+                       .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14)))]];
   } else if (CommandUi.Mode == ES09CommandMode::SchemeChoice) {
     // S09 UX: the explicit picker. The selected EXACT card is spelled out -
     // legibility requirement from the wrong-card-spend review.
@@ -5125,24 +5198,28 @@ void AS08FlowGameMode::RefreshHud() {
     CommandBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
         [SNew(SHorizontalBox) +
          SHorizontalBox::Slot().AutoWidth().Padding(0, 0, 8, 0)
-             [SNew(SButton)
-                  .ContentPadding(FMargin(14, 8))
-                  .IsEnabled(!bBusy && !CommandUi.SchemeCardId.IsEmpty())
-                  .OnClicked_Lambda([this]() {
+             [MakeHudPress(
+                  FName(TEXT("hud.scheme.play")),
+                  [this]() {
+                    if (HudBusyReason().IsSet()) return HudBusyReason();
+                    return CommandUi.SchemeCardId.IsEmpty() ? FS09Reason::Make(TEXT("why.scheme.none")) : FS09Reason();
+                  },
+                  [this]() {
                     ConfirmSchemeCommand();
-                    return FReply::Handled();
-                  })
-                  [SNew(STextBlock).Text(FText::FromString(TEXT("PLAY SELECTED SCHEME (Enter)")))
-                       .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14))]] +
+                  },
+                  FMargin(14, 8), FLinearColor::White,
+                  SNew(STextBlock).Text(FText::FromString(TEXT("PLAY SELECTED SCHEME (Enter)")))
+                       .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14)))] +
          SHorizontalBox::Slot().AutoWidth()
-             [SNew(SButton)
-                  .ContentPadding(FMargin(14, 8))
-                  .OnClicked_Lambda([this]() {
+             [MakeHudPress(
+                  FName(TEXT("hud.scheme.cancel")),
+                  nullptr,
+                  [this]() {
                     PlaySchemeCommand(); // G semantics: close without sending
-                    return FReply::Handled();
-                  })
-                  [SNew(STextBlock).Text(FText::FromString(TEXT("CANCEL (G/Esc)")))
-                       .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14))]]];
+                  },
+                  FMargin(14, 8), FLinearColor::White,
+                  SNew(STextBlock).Text(FText::FromString(TEXT("CANCEL (G/Esc)")))
+                       .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14)))]];
   } else if (CommandUi.Mode == ES09CommandMode::CombatDefense) {
     const double Left = CommandUi.Combat.bHasTimeoutAt
                             ? CommandUi.Combat.SecondsUntilDeadline() : -1.0;
@@ -5160,25 +5237,33 @@ void AS08FlowGameMode::RefreshHud() {
     CommandBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
         [SNew(SHorizontalBox) +
          SHorizontalBox::Slot().AutoWidth().Padding(0, 0, 8, 0)
-             [SNew(SButton)
-                  .ContentPadding(FMargin(14, 8))
-                  .IsEnabled(!bBusy && Left > 0.0)
-                  .OnClicked_Lambda([this]() {
+             [MakeHudPress(
+                  FName(TEXT("hud.defense.play")),
+                  [this]() {
+                    if (HudBusyReason().IsSet()) return HudBusyReason();
+                    const bool bOpen = CommandUi.Combat.bHasTimeoutAt && CommandUi.Combat.SecondsUntilDeadline() > 0.0;
+                    return bOpen ? FS09Reason() : FS09Reason::Make(TEXT("why.deadline.passed"));
+                  },
+                  [this]() {
                     ConfirmCombat();
-                    return FReply::Handled();
-                  })
-                  [SNew(STextBlock).Text(FText::FromString(TEXT("PLAY DEFENSE (Enter)")))
-                       .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14))]] +
+                  },
+                  FMargin(14, 8), FLinearColor::White,
+                  SNew(STextBlock).Text(FText::FromString(TEXT("PLAY DEFENSE (Enter)")))
+                       .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14)))] +
          SHorizontalBox::Slot().AutoWidth()
-             [SNew(SButton)
-                  .ContentPadding(FMargin(14, 8))
-                  .IsEnabled(!bBusy && Left > 0.0)
-                  .OnClicked_Lambda([this]() {
+             [MakeHudPress(
+                  FName(TEXT("hud.defense.none")),
+                  [this]() {
+                    if (HudBusyReason().IsSet()) return HudBusyReason();
+                    const bool bOpen = CommandUi.Combat.bHasTimeoutAt && CommandUi.Combat.SecondsUntilDeadline() > 0.0;
+                    return bOpen ? FS09Reason() : FS09Reason::Make(TEXT("why.deadline.passed"));
+                  },
+                  [this]() {
                     NoDefenseCommand();
-                    return FReply::Handled();
-                  })
-                  [SNew(STextBlock).Text(FText::FromString(TEXT("NO DEFENSE (N)")))
-                       .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14))]]];
+                  },
+                  FMargin(14, 8), FLinearColor::White,
+                  SNew(STextBlock).Text(FText::FromString(TEXT("NO DEFENSE (N)")))
+                       .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14)))]];
   } else if (CommandUi.Mode == ES09CommandMode::CombatResolve) {
     const double Left = CommandUi.Combat.bHasTimeoutAt
                             ? CommandUi.Combat.SecondsUntilDeadline() : -1.0;
@@ -5271,15 +5356,19 @@ void AS08FlowGameMode::RefreshHud() {
       AddLine(TEXT("R resolves the combat (any participant); the attacker cannot close the defense window"));
     }
     CommandBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
-        [SNew(SButton)
-             .ContentPadding(FMargin(14, 8))
-             .IsEnabled(!bBusy && !bPendingBlocksResolve)
-             .OnClicked_Lambda([this]() {
+        [MakeHudPress(
+             FName(TEXT("hud.combat.resolve")),
+             [this]() {
+               if (HudBusyReason().IsSet()) return HudBusyReason();
+               return CommandUi.PendingQueue.Num() > 0 ? FS09Reason::Make(TEXT("why.wait.opponent.choice"))
+                                                       : FS09Reason();
+             },
+             [this]() {
                ResolveCombatCommand();
-               return FReply::Handled();
-             })
-             [SNew(STextBlock).Text(FText::FromString(TEXT("RESOLVE COMBAT (R)")))
-                  .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14))]];
+             },
+             FMargin(14, 8), FLinearColor::White,
+             SNew(STextBlock).Text(FText::FromString(TEXT("RESOLVE COMBAT (R)")))
+                  .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14)))];
   } else if (CommandUi.Mode == ES09CommandMode::PendingChoice) {
     // GD-035: the server waits on THIS viewer's queue head. A MANDATORY
     // choice renders louder (red header) than any normal HUD/inspector line.
@@ -5387,13 +5476,10 @@ void AS08FlowGameMode::RefreshHud() {
       for (int32 OptionIdx = 0; OptionIdx < Pending.Options.Num(); OptionIdx++) {
         const int32 StableIndex = Pending.Options[OptionIdx].Index;
         CommandBox->AddSlot().AutoHeight().Padding(6, 2)
-            [SNew(SButton)
-                 .ContentPadding(FMargin(10, 6))
-                 .ButtonColorAndOpacity(FLinearColor(
-                     CommandUi.PendingOptionIndex == OptionIdx ? 0.45f : 0.22f,
-                     CommandUi.PendingOptionIndex == OptionIdx ? 0.45f : 0.22f,
-                     CommandUi.PendingOptionIndex == OptionIdx ? 0.45f : 0.22f, 1.0f))
-                 .OnClicked_Lambda([this, OptionIdx]() {
+            [MakeHudPress(
+                 FName(*FString::Printf(TEXT("pending.option.%d"), OptionIdx)),
+                 nullptr,
+                 [this, OptionIdx]() {
                    FString Reason;
                    if (CommandUi.SelectPendingOption(OptionIdx, Reason)) {
                      Toast = TEXT("option selected - Enter confirms");
@@ -5402,15 +5488,18 @@ void AS08FlowGameMode::RefreshHud() {
                    }
                    ToastUntil = Elapsed + 3.0f;
                    RefreshHud();
-                   return FReply::Handled();
-                 })
-                 [SNew(STextBlock)
+                 },
+                 FMargin(10, 6), FLinearColor(
+                     CommandUi.PendingOptionIndex == OptionIdx ? 0.45f : 0.22f,
+                     CommandUi.PendingOptionIndex == OptionIdx ? 0.45f : 0.22f,
+                     CommandUi.PendingOptionIndex == OptionIdx ? 0.45f : 0.22f, 1.0f),
+                 SNew(STextBlock)
                       .Text(FText::FromString(FString::Printf(
                           TEXT("%d. %s%s"), OptionIdx + 1,
                           *Pending.Options[OptionIdx].Label,
                           CommandUi.PendingOptionIndex == OptionIdx ? TEXT("  [SELECTED]")
                                                                     : TEXT(""))))
-                      .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14))]];
+                      .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14)))];
         (void)StableIndex;
       }
     } else if (PendingType == TEXT("DISCARD_CARDS")) {
@@ -5434,12 +5523,10 @@ void AS08FlowGameMode::RefreshHud() {
         for (const FS09CardView& Card : Revealed) {
           const int32 PickIndex = CommandUi.PendingCardIds.IndexOfByKey(Card.InstanceId);
           CommandBox->AddSlot().AutoHeight().Padding(6, 2)
-              [SNew(SButton)
-                   .ContentPadding(FMargin(10, 6))
-                   .ButtonColorAndOpacity(FLinearColor(
-                       PickIndex >= 0 ? 0.45f : 0.22f, PickIndex >= 0 ? 0.45f : 0.22f,
-                       PickIndex >= 0 ? 0.45f : 0.22f, 1.0f))
-                   .OnClicked_Lambda([this, InstanceId = Card.InstanceId]() {
+              [MakeHudPress(
+                   FName(*(TEXT("pending.reveal.") + Card.InstanceId)),
+                   nullptr,
+                   [this, InstanceId = Card.InstanceId]() {
                      FString Reason;
                      if (CommandUi.TogglePendingCard(InstanceId, EffectiveSnapshot(), Reason)) {
                        Toast = TEXT("revealed pick toggled");
@@ -5448,14 +5535,16 @@ void AS08FlowGameMode::RefreshHud() {
                      }
                      ToastUntil = Elapsed + 3.0f;
                      RefreshHud();
-                     return FReply::Handled();
-                   })
-                   [SNew(STextBlock)
+                   },
+                   FMargin(10, 6), FLinearColor(
+                       PickIndex >= 0 ? 0.45f : 0.22f, PickIndex >= 0 ? 0.45f : 0.22f,
+                       PickIndex >= 0 ? 0.45f : 0.22f, 1.0f),
+                   SNew(STextBlock)
                         .Text(FText::FromString(FString::Printf(
                             TEXT("%s%s"), *Card.Name,
                             PickIndex >= 0 ? *FString::Printf(TEXT("  [#%d]"), PickIndex + 1)
                                            : TEXT(""))))
-                        .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14))]];
+                        .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14)))];
         }
       } else {
         AddLine(TEXT("revealed cards are hidden from this seat"));
@@ -5464,25 +5553,29 @@ void AS08FlowGameMode::RefreshHud() {
     CommandBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
         [SNew(SHorizontalBox) +
          SHorizontalBox::Slot().AutoWidth().Padding(0, 0, 8, 0)
-             [SNew(SButton)
-                  .ContentPadding(FMargin(14, 8))
-                  .IsEnabled(!bBusy)
-                  .OnClicked_Lambda([this]() {
+             [MakeHudPress(
+                  FName(TEXT("hud.pending.confirm")),
+                  [this]() { return HudBusyReason(); },
+                  [this]() {
                     ConfirmCombat();
-                    return FReply::Handled();
-                  })
-                  [SNew(STextBlock).Text(FText::FromString(TEXT("CONFIRM (Enter)")))
-                       .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14))]] +
+                  },
+                  FMargin(14, 8), FLinearColor::White,
+                  SNew(STextBlock).Text(FText::FromString(TEXT("CONFIRM (Enter)")))
+                       .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14)))] +
          SHorizontalBox::Slot().AutoWidth()
-             [SNew(SButton)
-                  .ContentPadding(FMargin(14, 8))
-                  .IsEnabled(!bBusy && CommandUi.PendingChoice.bOptional)
-                  .OnClicked_Lambda([this]() {
+             [MakeHudPress(
+                  FName(TEXT("hud.pending.decline")),
+                  [this]() {
+                    if (HudBusyReason().IsSet()) return HudBusyReason();
+                    return CommandUi.PendingChoice.bOptional ? FS09Reason()
+                                                             : FS09Reason::Make(TEXT("why.choice.required"));
+                  },
+                  [this]() {
                     DeclinePendingChoiceCommand();
-                    return FReply::Handled();
-                  })
-                  [SNew(STextBlock).Text(FText::FromString(TEXT("DECLINE (X)")))
-                       .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14))]]];
+                  },
+                  FMargin(14, 8), FLinearColor::White,
+                  SNew(STextBlock).Text(FText::FromString(TEXT("DECLINE (X)")))
+                       .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14)))]];
   } else if (CommandUi.bHasPendingChoice) {
     // GD-035: the head belongs to the OPPONENT - their choice, never ours.
     AddHeader(FString::Printf(TEXT("WAITING - opponent's choice (%s)"),
@@ -5502,25 +5595,34 @@ void AS08FlowGameMode::RefreshHud() {
     CommandBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
         [SNew(SHorizontalBox) +
          SHorizontalBox::Slot().AutoWidth().Padding(0, 0, 8, 0)
-             [SNew(SButton)
-                  .ContentPadding(FMargin(14, 8))
-                  .IsEnabled(!bBusy && Hud.ActionsRemaining > 0)
-                  .OnClicked_Lambda([this]() {
+             [MakeHudPress(
+                  FName(TEXT("hud.begin.maneuver")),
+                  [this]() {
+                    if (HudBusyReason().IsSet()) return HudBusyReason();
+                    return Hud.ActionsRemaining > 0 ? FS09Reason() : FS09Reason::Make(TEXT("why.no.actions"));
+                  },
+                  [this]() {
                     BeginManeuverCommand();
-                    return FReply::Handled();
-                  })
-                  [SNew(STextBlock).Text(FText::FromString(TEXT("BEGIN MANEUVER (M)")))
-                       .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14))]] +
+                  },
+                  FMargin(14, 8), FLinearColor::White,
+                  SNew(STextBlock).Text(FText::FromString(TEXT("BEGIN MANEUVER (M)")))
+                       .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14)))] +
          SHorizontalBox::Slot().AutoWidth()
-             [SNew(SButton)
-                  .ContentPadding(FMargin(14, 8))
-                  .IsEnabled(!bBusy && Hud.ActionsRemaining == 0)
-                  .OnClicked_Lambda([this]() {
+             [MakeHudPress(
+                  FName(TEXT("hud.end.turn")),
+                  [this]() {
+                    if (HudBusyReason().IsSet()) return HudBusyReason();
+                    if (Hud.ActionsRemaining > 0) {
+                      return FS09Reason::Make(TEXT("why.actions.remaining")).Arg(TEXT("n"), Hud.ActionsRemaining);
+                    }
+                    return Hud.ActionsRemaining == 0 ? FS09Reason() : FS09Reason::Make(TEXT("why.syncing"));
+                  },
+                  [this]() {
                     EndTurnCommand();
-                    return FReply::Handled();
-                  })
-                  [SNew(STextBlock).Text(FText::FromString(TEXT("END TURN (E)")))
-                       .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14))]]];
+                  },
+                  FMargin(14, 8), FLinearColor::White,
+                  SNew(STextBlock).Text(FText::FromString(TEXT("END TURN (E)")))
+                       .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14)))]];
   } else {
     AddHeader(TEXT("OPPONENT'S TURN"), FLinearColor(1.0f, 0.8f, 0.6f, 1.0f));
     if (Flow.IsValid() && Flow->IsBotActing()) {
