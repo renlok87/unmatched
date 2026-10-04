@@ -87,6 +87,33 @@ private:
   int32 RebuildSerial = 0;
 };
 
+/** DE-015 (W-22, SD-47; move-selection 03 §5 MS-R-79): input of the own turn is
+ *  open from the frame the snapshot that handed the turn over is applied - no
+ *  ring, banner or timer gates it. The game mode's handlers read the applied
+ *  snapshot synchronously, so the proof is a trace pair:
+ *    "TURN-INPUT open seq=<n> frame=<f> gate=none" when an applied snapshot
+ *        hands the turn to the viewer,
+ *    "TURN-INPUT first src=hud|board id=<element> result=act|refused
+ *        frame=<f> open=<f0> dframes=<f-f0> [why=<key>]" for the first
+ *        resolved mouse input after it.
+ *  World-free (headless-testable); an empty string = nothing to trace. */
+class UNMATCHED_API FS09TurnInputWatch {
+public:
+  /** Every applied snapshot (HandleApplied): opens the watch on the
+   *  transition into the viewer's turn; leaving the turn (or the result
+   *  screen) closes it without a line. */
+  FString OnApplied(bool bViewerTurn, bool bGameOver, int32 Seq, uint64 Frame);
+  /** A resolved mouse input (a HUD press or a board release that answered):
+   *  the first one after "open" is traced and closes the watch. */
+  FString NoteInput(const TCHAR* Src, const FString& Id, bool bAct, const FS09Reason& Why, uint64 Frame);
+  bool IsOpen() const { return bOpen; }
+
+private:
+  bool bViewerTurn = false;
+  bool bOpen = false;
+  uint64 OpenFrame = 0;
+};
+
 DECLARE_DELEGATE_OneParam(FS09OnHudPressOutcome, const FS09HudPressOutcome&);
 
 /** One pressable HUD element (button, hand card, deck/discard control). */

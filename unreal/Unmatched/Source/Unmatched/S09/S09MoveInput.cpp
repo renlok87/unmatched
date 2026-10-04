@@ -447,7 +447,7 @@ const TArray<FS09KeyBinding>& FS09MoveInput::Bindings() {
       {TEXT("Left/Right"), TEXT("boost panel cursor"), TEXT(""), false, false},
       {TEXT("Ctrl+Up"), TEXT("move earlier"), TEXT("panel button (MS-T-11)"), true, false},
       {TEXT("Ctrl+Down"), TEXT("move later"), TEXT("panel button (MS-T-11)"), true, false},
-      {TEXT("E"), TEXT("end turn (refused in the draft)"), TEXT(""), false, false},
+      {TEXT("E"), TEXT("end turn (after both actions; why.* before - DE-015)"), TEXT(""), false, false},
   };
   return List;
 }

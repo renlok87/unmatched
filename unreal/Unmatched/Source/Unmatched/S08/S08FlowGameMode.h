@@ -214,6 +214,9 @@ private:
                              const TFunction<void()>& Action);
   /** The press reason of a command blocked by the in-flight gate. */
   FS09Reason HudBusyReason() const;
+  /** DE-015: the first answered board release of the own turn closes the
+   *  TURN-INPUT watch (src=board; refused = a CUE-004 key). */
+  void NoteTurnBoardInput(const FIntPoint& Cell, const FString& FighterId, const FS09InputResult& Result);
   /** The one send path of a confirmed maneuver (Enter in FS09MoveInput, the
    *  older ConfirmDraft, the -S08Maneuver driver). */
   void SubmitConfirmedManeuver(const FS09ManeuverCommand& Command);
@@ -633,6 +636,8 @@ private:
   FS09MoveInput MoveInput;
   // DE-014: press arbitration of the Slate HUD by element id (survives RefreshHud).
   TSharedPtr<FS09HudPressArbiter> HudPress = MakeShared<FS09HudPressArbiter>();
+  // DE-015: the TURN-INPUT trace pair - own-turn input open from the applied snapshot (SD-47).
+  FS09TurnInputWatch TurnInputWatch;
   bool bLegacyQuickMove = false;      // -S08LegacyQuickMove: TASK-022 two-click move (MS-R-32)
   bool bAutoManeuverAwaitDraft = false; // -S08Maneuver: confirm once the draft opens (MS-R-62)
   FString AutoManeuverPlan;             // -S08ManeuverPlan=<plan>: run on the opened draft first (M1)

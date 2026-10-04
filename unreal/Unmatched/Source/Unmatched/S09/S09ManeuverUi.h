@@ -443,6 +443,17 @@ public:
    *  why.no.actions (metadata.actionsRemaining 0), why.maneuver.not.open
    *  (phase). */
   bool CanBeginManeuver(const FS08Snapshot& Snapshot, FString& OutReason, FS09Reason& OutKey) const;
+  /** DE-015 (W-22, SD-44; 02 §4.10): why endTurn may not be sent now - the
+   *  one answer of the END TURN button AND the E key (CUE-004 by key); an
+   *  unset reason = send. In order: why.state.changed (over), why.syncing (in
+   *  flight), why.not.your.turn, why.draft.open (a maneuver draft or an open
+   *  pendingManeuver), why.discard.count {need} {have} (discard to the limit),
+   *  why.wait.opponent.choice / why.choice.required (a pending choice),
+   *  why.wait.defender (combat window), why.actions.remaining {n} (server
+   *  ACTIONS_REMAINING: before both actions), why.syncing (no action phase or
+   *  actionsRemaining unknown). After the second action the server ends the
+   *  turn itself - there is no "pass" (PASS_NOT_ALLOWED). */
+  FS09Reason EndTurnReason(const FS08Snapshot& Snapshot) const;
 
   /** Maneuver draft ops (no server calls; every one is reversible).
    *  SelectFighter refuses a fighter CanMoveFighter refuses (LastReason,

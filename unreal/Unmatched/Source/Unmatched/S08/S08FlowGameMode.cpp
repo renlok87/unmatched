@@ -500,6 +500,12 @@ void AS08FlowGameMode::HandleApplied(const FS08Snapshot& Snapshot, ES08SeqDecisi
     }
     Hud.Build(Snapshot, ViewerId, PreviousOwnHandIds, Flow->GetDecksSeq(),
               Flow->GetDiscardPilesSeq());
+    // DE-015 (SD-47): the own turn takes input from THIS apply - CommandUi,
+    // MoveInput and the HUD model above are already fed; nothing waits for
+    // the turn ring or a banner.
+    const FString TurnOpen = TurnInputWatch.OnApplied(Hud.bViewerTurn, Hud.bGameOver, Snapshot.SequenceNumber,
+                                                      GFrameCounter);
+    if (!TurnOpen.IsEmpty()) FS08Trace::Write(TurnOpen);
     FS08Trace::Write(FString::Printf(TEXT("MODE seq=%d mode=%d combat=%d pending=%d"),
         Snapshot.SequenceNumber, static_cast<int32>(CommandUi.Mode),
         CommandUi.Combat.bPresent ? 1 : 0, CommandUi.bHasPendingChoice ? 1 : 0));
@@ -1048,6 +1054,7 @@ void AS08FlowGameMode::HandleClick() {
           FS08Trace::Write(FString::Printf(TEXT("INPUT release src=os cell=%s gated=in-flight why=%s"),
                                            Cell.X >= 0 ? *BoardModel.CellLabel(Cell.X, Cell.Y) : TEXT("none"),
                                            *Gated.Toast.Key.ToString()));
+          NoteTurnBoardInput(Cell, HitFighterId, Gated);
         }
         ApplyMoveInput(Gated);
       }
@@ -1067,6 +1074,7 @@ void AS08FlowGameMode::HandleClick() {
                                          Cell.X >= 0 ? *BoardModel.CellLabel(Cell.X, Cell.Y) : TEXT("none"),
                                          HitFighterId.IsEmpty() ? TEXT("none") : *HitFighterId,
                                          Result.bHandled ? 1 : 0, static_cast<int32>(CommandUi.Mode)));
+        NoteTurnBoardInput(Cell, HitFighterId, Result);
       }
       ApplyMoveInput(Result);
     }
@@ -1648,6 +1656,10 @@ void AS08FlowGameMode::HandleHudPressOutcome(const FS09HudPressOutcome& Outcome,
   const FS09HudPressOutcome Traced = FS09HudPressArbiter::Decide(
       Outcome, Outcome.Result == ES09HudPressResult::Act && Blocked ? Blocked() : FS09Reason());
   FS08Trace::Write(FS09HudPressArbiter::TraceLine(Traced));
+  const FString TurnFirst =
+      TurnInputWatch.NoteInput(TEXT("hud"), Traced.PressedId.IsNone() ? FString() : Traced.PressedId.ToString(),
+                               Traced.Result == ES09HudPressResult::Act, Traced.Reason, GFrameCounter);
+  if (!TurnFirst.IsEmpty()) FS08Trace::Write(TurnFirst);
   if (Traced.Result == ES09HudPressResult::Act) {
     if (Action) Action();
     return;
@@ -1656,6 +1668,18 @@ void AS08FlowGameMode::HandleHudPressOutcome(const FS09HudPressOutcome& Outcome,
     ShowReason(Traced.Reason, 3.0f); // CUE-004
     RefreshHud();
   }
+}
+
+void AS08FlowGameMode::NoteTurnBoardInput(const FIntPoint& Cell, const FString& FighterId,
+                                          const FS09InputResult& Result) {
+  // DE-015: only a release that answered counts (a plate-only click on a
+  // fighter outside the action time is not a turn input).
+  if (!TurnInputWatch.IsOpen() || !Result.bHandled) return;
+  const FString Id = !FighterId.IsEmpty() ? FighterId
+                     : Cell.X >= 0       ? BoardModel.CellLabel(Cell.X, Cell.Y)
+                                         : FString();
+  const FString Line = TurnInputWatch.NoteInput(TEXT("board"), Id, !Result.Toast.IsSet(), Result.Toast, GFrameCounter);
+  if (!Line.IsEmpty()) FS08Trace::Write(Line);
 }
 
 FS09Reason AS08FlowGameMode::HudBusyReason() const {
@@ -1744,32 +1768,27 @@ void AS08FlowGameMode::CancelDraft() {
 
 void AS08FlowGameMode::EndTurnCommand() {
   if (!Flow.IsValid()) return;
-  const FS08Snapshot& Snap = Flow->GetAppliedSnapshot();
-  if (CommandUi.Mode == ES09CommandMode::ManeuverDraft ||
-      CommandUi.Mode == ES09CommandMode::DiscardDraft) {
-    Toast = TEXT("finish the open draft first");
-  } else if (!Hud.bViewerTurn) {
-    Toast = TEXT("not your turn");
-  } else if (Hud.ActionsRemaining > 0) {
-    Toast = FString::Printf(TEXT("%d action(s) remaining - maneuver first"), Hud.ActionsRemaining);
-  } else if (!FS08Contracts::PendingManeuverId(Snap).IsEmpty()) {
-    Toast = TEXT("a pending maneuver is open - confirm it first");
-  } else if (CommandUi.bHasPendingChoice) {
-    // Server: 'Resolve the pending choice first' - no endTurn roundtrip.
-    Toast = TEXT("resolve the pending choice first");
-  } else if (!FS08FlowController::IsEndTurnPhase(Snap.Phase)) {
-    // Server network guard (game-turn.guard) only accepts endTurn in
-    // ACTION_MANEUVER/ACTION_ATTACK: a send from COMBAT/COMBAT_RESOLVE burns
-    // an authoritative 'Invalid phase' rejection (8 in the S09 11:47 run).
-    Toast = FString::Printf(TEXT("end turn waits for an action phase (now %s)"),
-                            *Snap.Phase);
-  } else if (Flow->EndTurn()) {
+  // DE-015 (W-22, SD-44): the END TURN button and the E key give ONE answer -
+  // before both actions CUE-004 with why.actions.remaining {n} (server
+  // ACTIONS_REMAINING), an open draft / pending choice / combat window / a
+  // phase the network guard refuses (an 'Invalid phase' rejection burned 8
+  // sends in the S09 11:47 run) by its key - and nothing is sent. After the
+  // second action the server ends the turn itself; there is no pass.
+  FS09Reason Why = HudBusyReason();
+  if (!Why.IsSet()) Why = CommandUi.EndTurnReason(EffectiveSnapshot());
+  if (Why.IsSet()) {
+    FS08Trace::Write(TEXT("ENDTURN refused why=") + Why.Key.ToString());
+    ShowReason(Why, 3.0f); // CUE-004
+    RefreshHud();
+    return;
+  }
+  if (Flow->EndTurn()) {
     FS08Trace::Write(TEXT("ENDTURN sent"));
     Toast = TEXT("end turn sent");
+    ToastUntil = Elapsed + 3.0f;
   } else {
-    Toast = TEXT("end turn not sent - command gate blocked it (see trace)");
+    ShowReason(FS09Reason::Make(*Flow->GameplayGateKey().ToString()), 3.0f); // the transport gate: why.syncing
   }
-  ToastUntil = Elapsed + 3.0f;
   RefreshHud();
 }
 
@@ -5617,11 +5636,9 @@ void AS08FlowGameMode::RefreshHud() {
              [MakeHudPress(
                   FName(TEXT("hud.end.turn")),
                   [this]() {
+                    // DE-015: the same answer as the E key (EndTurnCommand).
                     if (HudBusyReason().IsSet()) return HudBusyReason();
-                    if (Hud.ActionsRemaining > 0) {
-                      return FS09Reason::Make(TEXT("why.actions.remaining")).Arg(TEXT("n"), Hud.ActionsRemaining);
-                    }
-                    return Hud.ActionsRemaining == 0 ? FS09Reason() : FS09Reason::Make(TEXT("why.syncing"));
+                    return CommandUi.EndTurnReason(EffectiveSnapshot());
                   },
                   [this]() {
                     EndTurnCommand();

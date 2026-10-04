@@ -78,6 +78,35 @@ FString FS09HudPressArbiter::TraceLine(const FS09HudPressOutcome& Outcome) {
   return Line;
 }
 
+// ---- FS09TurnInputWatch (DE-015) ----------------------------------------------
+
+FString FS09TurnInputWatch::OnApplied(bool bInViewerTurn, bool bGameOver, int32 Seq, uint64 Frame) {
+  const bool bTurn = bInViewerTurn && !bGameOver;
+  const bool bEntered = bTurn && !bViewerTurn;
+  bViewerTurn = bTurn;
+  if (!bTurn) {
+    bOpen = false;
+    return FString();
+  }
+  if (!bEntered) return FString(); // an equal-seq merge or a later body of the same turn
+  bOpen = true;
+  OpenFrame = Frame;
+  return FString::Printf(TEXT("TURN-INPUT open seq=%d frame=%llu gate=none"), Seq,
+                         static_cast<unsigned long long>(Frame));
+}
+
+FString FS09TurnInputWatch::NoteInput(const TCHAR* Src, const FString& Id, bool bAct, const FS09Reason& Why,
+                                      uint64 Frame) {
+  if (!bOpen) return FString();
+  bOpen = false;
+  FString Line = FString::Printf(TEXT("TURN-INPUT first src=%s id=%s result=%s frame=%llu open=%llu dframes=%llu"), Src,
+                                 Id.IsEmpty() ? TEXT("none") : *Id, bAct ? TEXT("act") : TEXT("refused"),
+                                 static_cast<unsigned long long>(Frame), static_cast<unsigned long long>(OpenFrame),
+                                 static_cast<unsigned long long>(Frame >= OpenFrame ? Frame - OpenFrame : 0));
+  if (!bAct && Why.IsSet()) Line += TEXT(" why=") + Why.Key.ToString();
+  return Line;
+}
+
 // ---- SS09HudPress --------------------------------------------------------------
 
 void SS09HudPress::Construct(const FArguments& InArgs) {

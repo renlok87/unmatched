@@ -861,6 +861,39 @@ bool FS09CommandUi::CanBeginManeuver(const FS08Snapshot& Snapshot, FString& OutR
   return true;
 }
 
+FS09Reason FS09CommandUi::EndTurnReason(const FS08Snapshot& Snapshot) const {
+  // DE-015 (SD-44): the server rule - endTurn only after both actions
+  // (ACTIONS_REMAINING), never a pass (PASS_NOT_ALLOWED) - explained before
+  // the send, by key; the button and the E key share this one answer.
+  if (Snapshot.Phase == TEXT("GAME_OVER")) return FS09Reason::Make(TEXT("why.state.changed"));
+  if (bCommandInFlight) return FS09Reason::Make(TEXT("why.syncing"));
+  if (Snapshot.CurrentTurnPlayerId != ViewerId) return FS09Reason::Make(TEXT("why.not.your.turn"));
+  if (Mode == ES09CommandMode::ManeuverDraft || !FS08Contracts::PendingManeuverId(Snapshot).IsEmpty()) {
+    return FS09Reason::Make(TEXT("why.draft.open"));
+  }
+  if (Mode == ES09CommandMode::DiscardDraft) {
+    return FS09Reason::Make(TEXT("why.discard.count"))
+        .Arg(TEXT("need"), PendingDiscard.Count)
+        .Arg(TEXT("have"), DiscardSelection.Num());
+  }
+  if (bHasPendingChoice) {
+    return FS09Reason::Make(PendingChoice.PlayerId != ViewerId ? TEXT("why.wait.opponent.choice")
+                                                               : TEXT("why.choice.required"));
+  }
+  if (Combat.bPresent) return FS09Reason::Make(TEXT("why.wait.defender"));
+  int32 Actions = 0;
+  bool bPresent = false;
+  const TSharedPtr<FJsonObject> Meta = Snapshot.Metadata.IsValid() ? Snapshot.Metadata->AsObject() : nullptr;
+  if (Meta.IsValid()) FS08Contracts::ReadIntLike(Meta.ToSharedRef(), TEXT("actionsRemaining"), Actions, bPresent);
+  if (bPresent && Actions > 0) {
+    return FS09Reason::Make(TEXT("why.actions.remaining")).Arg(TEXT("n"), Actions);
+  }
+  // The network guard accepts endTurn only in ACTION_MANEUVER / ACTION_ATTACK;
+  // an unknown count (a merge without metadata) waits for the next body.
+  if (!FS08FlowController::IsEndTurnPhase(Snapshot.Phase) || !bPresent) return FS09Reason::Make(TEXT("why.syncing"));
+  return FS09Reason();
+}
+
 TArray<FString> FS09CommandUi::OwnHandIds(const FS08Snapshot& Snapshot) const {
   TArray<FS09CardView> Cards;
   TArray<FString> Ids;

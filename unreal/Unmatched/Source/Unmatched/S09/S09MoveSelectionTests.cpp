@@ -28,6 +28,9 @@
 //   Unmatched.S09.MoveSel.ClickReliability - DE-014 (UI-INP-011): n = 20 clicks
 //       per space kind with a 0 / 50 ms hold - 0 lost (target or why.*),
 //       MS-S-00 empty space why.not.your.turn, in flight why.syncing.
+//   Unmatched.S09.MoveSel.TurnStartInput - DE-015 (SD-44 / SD-47, MS-R-79): the
+//       first click of the own turn accepted in the apply frame, END TURN / E
+//       answer why.actions.remaining {n}, no pass, the TURN-INPUT trace pair.
 //   Unmatched.S09.MoveSel.AutoManeuverPlan - M1 / MS-AT-32 (driver part): the opt-in
 //       -S08ManeuverPlan=boost3 on the driver's draft - the best BOOST card, three
 //       moves (hero step + two sidekicks), src=auto, confirmable; refusals.
@@ -44,6 +47,7 @@
 
 #include "S09ManeuverUi.h"
 #include "S09MoveInput.h"
+#include "S09HudPress.h"
 #include "../S08/S08BoardModel.h"
 #include "../S08/S08Contracts.h"
 #include "../S08/S08WhyText.h"
@@ -2664,6 +2668,170 @@ bool FS09MoveSelReconnectAndRebuildTest::RunTest(const FString&) {
     } else {
       AddError(TEXT("live stream not ready (lost)"));
     }
+  }
+  return true;
+}
+
+
+// DE-015 (W-22, SD-44 / SD-47; 03 §5 MS-R-79, MS-AT-15 case DE-015): the own
+// turn takes input from the applied snapshot that handed it over - the first
+// click (pressed before the snapshot or after it, released in that frame) is
+// accepted, n = 20 per hold; an earlier click is answered, never lost; the END
+// TURN button and the E key answer why.actions.remaining {n} before both
+// actions (one function), the other blockers by key; no pass binding; the
+// TURN-INPUT trace pair.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09MoveSelTurnStartInputTest, "Unmatched.S09.MoveSel.TurnStartInput",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS09MoveSelTurnStartInputTest::RunTest(const FString&) {
+  const FS08BoardModel Board = MsGrid(6, 3);
+  const TArray<FMsCard> Hand = {{TEXT("c2"), true, 2}, {TEXT("c1"), true, 1}};
+  const TArray<FS08BoardFighter> Fighters = {MsFighter(TEXT("a"), Me, 0, 1, 2.0), MsFighter(TEXT("b"), Me, 5, 1, 2.0),
+                                             MsFighter(TEXT("e"), Opp, 5, 0)};
+  // A fresh body (own metadata object) of Player's turn; Actions < 0 = no actionsRemaining field.
+  auto Turn = [&](const TCHAR* Player, int32 Actions, int32 Seq, const TCHAR* Phase = TEXT("ACTION_MANEUVER")) {
+    FS08Snapshot Snap = MsTurnSnapshot(Hand, Seq);
+    Snap.CurrentTurnPlayerId = Player;
+    Snap.Phase = Phase;
+    TSharedRef<FJsonObject> Meta = MakeShared<FJsonObject>();
+    if (Actions >= 0) Meta->SetNumberField(TEXT("actionsRemaining"), Actions);
+    Snap.Metadata = MakeShared<FJsonValueObject>(Meta);
+    return Snap;
+  };
+  constexpr int32 N = 20;
+  constexpr uint64 ApplyFrame = 100;
+
+  // ---- the first click of the own turn, in the frame of the snapshot ----
+  for (const bool bHold : {false, true}) {
+    const TCHAR* HoldTag = bHold ? TEXT("pressed before the snapshot") : TEXT("pressed after it");
+    int32 Accepted = 0;
+    for (int32 K = 0; K < N; ++K) {
+      const FS08Snapshot Before = Turn(Opp, 2, 10 + 2 * K);
+      FS09CommandUi Ui = MsOpen(Before, Board, Fighters);
+      FS09MoveInput In;
+      FS09TurnInputWatch Watch;
+      FS09HudModel Hud;
+      Hud.Build(Before, Me, TSet<FString>(), Before.SequenceNumber, Before.SequenceNumber);
+      const bool bNoOpen =
+          Watch.OnApplied(Hud.bViewerTurn, Hud.bGameOver, Before.SequenceNumber, ApplyFrame - 5).IsEmpty();
+      if (bHold) In.OnPointerPressed(FIntPoint(0, 1), TEXT("a"));
+      // The snapshot that hands the turn over - fed exactly as HandleApplied does.
+      const FS08Snapshot Mine = Turn(Me, 2, Before.SequenceNumber + 1);
+      Ui.OnSnapshot(Mine, Board, Fighters);
+      In.OnSnapshot(Ui, Mine);
+      Hud.Build(Mine, Me, TSet<FString>(), Mine.SequenceNumber, Mine.SequenceNumber);
+      const FString Open = Watch.OnApplied(Hud.bViewerTurn, Hud.bGameOver, Mine.SequenceNumber, ApplyFrame);
+      if (!bHold) In.OnPointerPressed(FIntPoint(0, 1), TEXT("a"));
+      const FS09InputResult R = In.OnPointerReleased(FIntPoint(0, 1), TEXT("a"), Ui, Mine, Board, Fighters);
+      const bool bAct = R.bHandled && !R.Toast.IsSet() && R.bSelectionChanged && Ui.SelectedFighterId == TEXT("a");
+      const FString First = Watch.NoteInput(TEXT("board"), TEXT("a"), bAct, R.Toast, ApplyFrame);
+      FString BeginWhy;
+      FS09Reason BeginKey;
+      const bool bBegin = Ui.CanBeginManeuver(Mine, BeginWhy, BeginKey);
+      const bool bOk = bNoOpen && bAct && bBegin && Open.StartsWith(TEXT("TURN-INPUT open seq=")) &&
+                       Open.EndsWith(TEXT("frame=100 gate=none")) &&
+                       First.StartsWith(TEXT("TURN-INPUT first src=board id=a result=act frame=100 open=100")) &&
+                       First.EndsWith(TEXT("dframes=0"));
+      Accepted += bOk ? 1 : 0;
+      if (!bOk && K == 0) {
+        AddInfo(FString::Printf(TEXT("%s | %s | begin=%d %s"), *Open, *First, bBegin ? 1 : 0, *BeginWhy));
+      }
+    }
+    TestEqual(FString::Printf(TEXT("first click of the own turn, %s: accepted in the apply frame"), HoldTag), Accepted,
+              N);
+  }
+
+  // ---- a click before the turn is answered (SD-47 / UI-INP-011), never lost ----
+  {
+    const FS08Snapshot Before = Turn(Opp, 2, 60);
+    FS09CommandUi Ui = MsOpen(Before, Board, Fighters);
+    FS09MoveInput In;
+    const FS09InputResult Early = MsClick(In, Ui, Before, Board, Fighters, FIntPoint(2, 2));
+    TestTrue(TEXT("an empty space before the turn: why.not.your.turn"),
+             Early.bHandled && Early.Toast.Key == FName(TEXT("why.not.your.turn")));
+    TestEqual(TEXT("END TURN / E before the turn: why.not.your.turn"), MsKey(Ui.EndTurnReason(Before)),
+              FString(TEXT("why.not.your.turn")));
+  }
+
+  // ---- END TURN and E: one answer by key ----
+  {
+    const FS08Snapshot Two = Turn(Me, 2, 70);
+    FS09CommandUi Ui = MsOpen(Two, Board, Fighters);
+    const FS09Reason Remaining = Ui.EndTurnReason(Two);
+    TestEqual(TEXT("2 actions left: why.actions.remaining"), MsKey(Remaining), FString(TEXT("why.actions.remaining")));
+    TestEqual(TEXT("... {n} = 2"), Remaining.Args.FindRef(TEXT("n")), FString(TEXT("2")));
+    const FS08Snapshot One = Turn(Me, 1, 71, TEXT("ACTION_ATTACK"));
+    Ui.OnSnapshot(One, Board, Fighters);
+    TestEqual(TEXT("1 action left: {n} = 1"), Ui.EndTurnReason(One).Args.FindRef(TEXT("n")), FString(TEXT("1")));
+    const FS08Snapshot Zero = Turn(Me, 0, 72, TEXT("ACTION_ATTACK"));
+    Ui.OnSnapshot(Zero, Board, Fighters);
+    TestFalse(TEXT("both actions spent, action phase: endTurn is sent"), Ui.EndTurnReason(Zero).IsSet());
+    const FS08Snapshot Unknown = Turn(Me, -1, 73, TEXT("ACTION_ATTACK"));
+    Ui.OnSnapshot(Unknown, Board, Fighters);
+    TestEqual(TEXT("actionsRemaining unknown: why.syncing"), MsKey(Ui.EndTurnReason(Unknown)),
+              FString(TEXT("why.syncing")));
+    const FS08Snapshot TurnEnd = Turn(Me, 0, 74, TEXT("TURN_END"));
+    Ui.OnSnapshot(TurnEnd, Board, Fighters);
+    TestEqual(TEXT("no action phase (network guard): why.syncing"), MsKey(Ui.EndTurnReason(TurnEnd)),
+              FString(TEXT("why.syncing")));
+    Ui.OnSnapshot(Zero, Board, Fighters);
+    Ui.bCommandInFlight = true;
+    TestEqual(TEXT("in flight: why.syncing"), MsKey(Ui.EndTurnReason(Zero)), FString(TEXT("why.syncing")));
+    Ui.bCommandInFlight = false;
+    Ui.bHasPendingChoice = true;
+    Ui.PendingChoice.PlayerId = Opp;
+    TestEqual(TEXT("the opponent's pending choice: why.wait.opponent.choice"), MsKey(Ui.EndTurnReason(Zero)),
+              FString(TEXT("why.wait.opponent.choice")));
+    Ui.PendingChoice.PlayerId = Me;
+    TestEqual(TEXT("own pending choice: why.choice.required"), MsKey(Ui.EndTurnReason(Zero)),
+              FString(TEXT("why.choice.required")));
+    Ui.bHasPendingChoice = false;
+    const FS08Snapshot Over = Turn(Me, 0, 75, TEXT("GAME_OVER"));
+    TestEqual(TEXT("the duel is over: why.state.changed"), MsKey(Ui.EndTurnReason(Over)),
+              FString(TEXT("why.state.changed")));
+    // An open pendingManeuver (the draft) answers why.draft.open before the action count.
+    const FS08Snapshot Draft = MsSnapshot(Hand, ManeuverA, 76);
+    FS09CommandUi DraftUi = MsOpen(Draft, Board, Fighters);
+    TestEqual(TEXT("maneuver draft open: why.draft.open"), MsKey(DraftUi.EndTurnReason(Draft)),
+              FString(TEXT("why.draft.open")));
+    for (const TCHAR* Key : {TEXT("why.actions.remaining"), TEXT("why.not.your.turn"), TEXT("why.draft.open"),
+                             TEXT("why.discard.count"), TEXT("why.wait.opponent.choice"), TEXT("why.choice.required"),
+                             TEXT("why.wait.defender"), TEXT("why.syncing"), TEXT("why.state.changed")}) {
+      TestTrue(FString::Printf(TEXT("%s in the EN table"), Key), S08WhyText::Has(FName(Key)));
+    }
+  }
+
+  // ---- no pass: E ends the turn, no binding passes (SD-44, PASS_NOT_ALLOWED) ----
+  {
+    bool bE = false;
+    bool bPass = false;
+    for (const FS09KeyBinding& Binding : FS09MoveInput::Bindings()) {
+      const FString Action = FString(Binding.Action).ToLower();
+      bE |= FCString::Strcmp(Binding.Input, TEXT("E")) == 0 && Action.StartsWith(TEXT("end turn"));
+      bPass |= Action.Contains(TEXT("pass"));
+    }
+    TestTrue(TEXT("E is the end-turn key"), bE);
+    TestFalse(TEXT("no pass binding"), bPass);
+  }
+
+  // ---- the TURN-INPUT watch ----
+  {
+    FS09TurnInputWatch Watch;
+    TestTrue(TEXT("opponent's turn: nothing"), Watch.OnApplied(false, false, 1, 10).IsEmpty());
+    TestTrue(TEXT("no watch: no first line"), Watch.NoteInput(TEXT("hud"), TEXT("x"), true, FS09Reason(), 11).IsEmpty());
+    TestFalse(TEXT("the turn handed over: open"), Watch.OnApplied(true, false, 2, 12).IsEmpty());
+    TestTrue(TEXT("an equal-seq merge of the same turn: no second open"), Watch.OnApplied(true, false, 2, 13).IsEmpty());
+    const FString Refused = Watch.NoteInput(TEXT("hud"), TEXT("hud.end.turn"), false,
+                                            FS09Reason::Make(TEXT("why.actions.remaining")), 15);
+    TestEqual(TEXT("first input refused with its key"), Refused,
+              FString(TEXT("TURN-INPUT first src=hud id=hud.end.turn result=refused frame=15 open=12 dframes=3 "
+                           "why=why.actions.remaining")));
+    TestTrue(TEXT("only the first input is traced"),
+             Watch.NoteInput(TEXT("board"), TEXT("a"), true, FS09Reason(), 16).IsEmpty());
+    Watch.OnApplied(false, false, 3, 20);
+    Watch.OnApplied(true, false, 4, 30);
+    TestTrue(TEXT("the next own turn opens again"), Watch.IsOpen());
+    Watch.OnApplied(true, true, 5, 31);
+    TestFalse(TEXT("the result screen closes it"), Watch.IsOpen());
   }
   return true;
 }
