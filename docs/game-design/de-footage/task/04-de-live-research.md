@@ -28,14 +28,15 @@
 
 ## 2. Запись и измерение
 
+0. **Предполётная проверка:** `python tools/de-footage/de_preflight.py`. Инструкция для пользователя — [06-live-study-runbook.md](06-live-study-runbook.md).
 1. **Окно игры.** Узнать заголовок:
    `powershell -NoProfile -Command "Get-Process | ? MainWindowTitle | select Name,MainWindowTitle"`.
-2. **Видео и звук.** Рекордер `C:/tmp/de-footage/tools/de_record.py` пишет окно игры 60 fps через NVENC
+2. **Видео и звук.** Рекордер `tools/de-footage/de_record.py` пишет окно игры 60 fps через NVENC
    (`video.mkv`) и системный звук через WASAPI loopback (`audio.wav`, пакет `soundcard` в venv). Метки старта
    кладутся в `sync.json`. Проверен 2026-10-04: h264 60 fps, выход с кодом 0.
 
    ```bash
-   C:/tmp/de-footage/tools/venv/Scripts/python C:/tmp/de-footage/tools/de_record.py "<заголовок окна DE>" C:/tmp/de-live/<дата>/session-01
+   C:/tmp/de-footage/tools/venv/Scripts/python tools/de-footage/de_record.py "<заголовок окна DE>" C:/tmp/de-live/<дата>/session-01
    ```
 
    Запуск — в фоне. Стоп — создать файл `STOP` в папке сессии; процессы не убивать.
@@ -45,7 +46,7 @@
    - Заголовок окна передавать латиницей: кириллица в bash ломается (cp866).
 4. **Измерение.**
    - Указать видео: `C:/tmp/de-footage/work/video.txt` → путь к записи.
-   - Ленты: `python C:/tmp/de-footage/pipeline/burst.py strip T0 T1 60 6 400 OUT.jpg [w:h:x:y]`; 1 тайл = 16,7 мс.
+   - Ленты: `python tools/de-footage/burst.py strip T0 T1 60 6 400 OUT.jpg [w:h:x:y]`; 1 тайл = 16,7 мс.
    - Команды `segs` и `motion` работают только для ролика YouTube, на записи их не использовать.
 5. **Результат:**
    - `docs/game-design/de-footage/live-<дата>/README.md` — по пункту R на раздел: что сделано, что увидели, числа,
