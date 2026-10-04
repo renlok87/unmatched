@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """T4.3 real OS input on the packaged client (RD-5, docs/game-design/decisions/2026-10-03-delegated-decisions.md).
 
-Rule (user delegation 2026-09-29, kept by RD-5): real input only while the user is idle >= 10 min by GetLastInputInfo,
-and it stops at the first move of the user. Nothing is simulated by flags: every step goes through SendInput and is
+Rule (user delegation 2026-09-29, kept by RD-5): real input only while the user is idle >= 10 min, and it stops at
+the first move of the user. Idle = no PHYSICAL input (class PhysicalIdle): input injected by other programs (a
+keep-awake tool pressing F15 every 60 s, 2026-10-04) does not count; a GetLastInputInfo change no injected event
+explains does. Nothing is simulated by flags: every step goes through SendInput and is
 proven by the client's own trace line 'INPUT ... src=os'.
 
   python tools/s08/t43_real_input.py idle                       # current idle seconds
@@ -11,7 +13,8 @@ proven by the client's own trace line 'INPUT ... src=os'.
   python tools/s08/t43_real_input.py --check                    # self-test without UE (structures, trace parsing, mapping)
 
 run:
-  1. waits until the user is idle >= --wait-idle seconds (polls every 15 s, gives up after --max-wait-min);
+  1. waits until the user is idle >= --wait-idle seconds (PhysicalIdle, polled every second, sampled into the
+     report every 15 s; gives up after --max-wait-min);
   2. takes C:/tmp/unmatched-gpu.lock (owner=T43) - waits while another GPU run holds it;
   3. starts tools/s08/run-phase2-demo.ps1 -VisibleHost (host window shown, joiner offscreen; credentials S08_DEMO_*
      from --backend-env into the child environment only);
@@ -128,19 +131,34 @@ def win_setup() -> str:
     return mode
 
 
-def idle_seconds() -> float:
+def last_input_tick() -> int:
     lii = LASTINPUTINFO(ctypes.sizeof(LASTINPUTINFO), 0)
     if not user32.GetLastInputInfo(ctypes.byref(lii)):
         raise OSError(ctypes.get_last_error(), "GetLastInputInfo")
-    return ((kernel32.GetTickCount() - lii.dwTime) & 0xFFFFFFFF) / 1000.0
+    return lii.dwTime
+
+
+def idle_seconds() -> float:
+    return ((kernel32.GetTickCount() - last_input_tick()) & 0xFFFFFFFF) / 1000.0
+
+
+def tick_delta(a: int, b: int) -> int:
+    """Signed a - b in milliseconds for 32-bit tick counts (wraparound-safe)."""
+    return ((a - b + 0x80000000) & 0xFFFFFFFF) - 0x80000000
 
 
 class UserGuard:
-    """Low-level hooks: a mouse or keyboard event without the injected flag is the user -> tripped."""
+    """Low-level hooks: a mouse or keyboard event without the injected flag is the user -> tripped.
+
+    Also remembers the tick of the last physical (non-injected) event and the ticks of injected events of OTHER
+    programs (not ours: dwExtraInfo != TAG), for PhysicalIdle."""
 
     def __init__(self):
         self.tripped: str | None = None
         self.injected = 0
+        self.physical_tick: int | None = None
+        self.foreign_ticks: list[int] = []      # ring of the last 256 injected-by-others event ticks
+        self.foreign_kinds: dict[str, int] = {}
         self._tid = None
         self._ready = threading.Event()
         self._procs = []
@@ -159,8 +177,12 @@ class UserGuard:
                 info = ctypes.cast(lparam, ctypes.POINTER(MSLLHOOKSTRUCT)).contents
                 if info.flags & LLMHF_INJECTED:
                     self.injected += 1
-                elif self.tripped is None:
-                    self.tripped = f"mouse msg=0x{wparam:04x} at ({info.pt.x},{info.pt.y}) {now_local()}"
+                    if info.dwExtraInfo != TAG:
+                        self._foreign(info.time, f"mouse msg=0x{wparam:04x}")
+                else:
+                    self.physical_tick = info.time
+                    if self.tripped is None:
+                        self.tripped = f"mouse msg=0x{wparam:04x} at ({info.pt.x},{info.pt.y}) {now_local()}"
             return user32.CallNextHookEx(None, code, wparam, lparam)
 
         def keyboard(code, wparam, lparam):
@@ -168,8 +190,12 @@ class UserGuard:
                 info = ctypes.cast(lparam, ctypes.POINTER(KBDLLHOOKSTRUCT)).contents
                 if info.flags & LLKHF_INJECTED:
                     self.injected += 1
-                elif self.tripped is None:
-                    self.tripped = f"keyboard vk=0x{info.vkCode:02x} {now_local()}"
+                    if info.dwExtraInfo != TAG:
+                        self._foreign(info.time, f"key vk=0x{info.vkCode:02x}")
+                else:
+                    self.physical_tick = info.time
+                    if self.tripped is None:
+                        self.tripped = f"keyboard vk=0x{info.vkCode:02x} {now_local()}"
             return user32.CallNextHookEx(None, code, wparam, lparam)
 
         self._procs = [HOOKPROC(mouse), HOOKPROC(keyboard)]
@@ -184,10 +210,54 @@ class UserGuard:
             if h:
                 user32.UnhookWindowsHookEx(h)
 
+    def _foreign(self, tick: int, kind: str):
+        self.foreign_ticks.append(tick)
+        del self.foreign_ticks[:-256]
+        self.foreign_kinds[kind] = self.foreign_kinds.get(kind, 0) + 1
+
     def stop(self):
         if self._tid:
             user32.PostThreadMessageW(self._tid, WM_QUIT, 0, 0)
         self._thread.join(3)
+
+
+class PhysicalIdle:
+    """User idle = time since the last PHYSICAL input.
+
+    GetLastInputInfo also counts input injected by other programs: on 2026-10-04 a keep-awake tool pressed F15
+    (injected) every 60 s, so the plain idle never passed 52 s and three runner windows were lost. Here an injected
+    event of another program is not the user. Conservative rules:
+    - before start, the history is unknown: the last input before start counts as the user's;
+    - a non-injected hook event is the user;
+    - a GetLastInputInfo change that no injected hook event explains (within EXPLAIN_MS) also counts as the user,
+      which covers input the hooks cannot see.
+    Poll often (about once a second) so that two changes inside one poll cannot hide each other."""
+
+    EXPLAIN_MS = 500
+
+    def __init__(self, guard: UserGuard, tick_now=None, last_tick=None):
+        self.guard = guard
+        self._now = tick_now or (lambda: kernel32.GetTickCount())
+        self._last = last_tick or last_input_tick
+        self.seen_tick = self._last()
+        self.user_tick = self.seen_tick
+        self.explained = 0
+        self.unexplained = 0
+
+    def poll(self) -> float:
+        tick = self._last()
+        if tick != self.seen_tick:
+            if any(abs(tick_delta(tick, t)) <= self.EXPLAIN_MS for t in list(self.guard.foreign_ticks)):
+                self.explained += 1
+            else:
+                self.unexplained += 1
+                if tick_delta(tick, self.user_tick) > 0:
+                    self.user_tick = tick
+            self.seen_tick = tick
+        phys = self.guard.physical_tick
+        if phys is not None and tick_delta(phys, self.user_tick) > 0:
+            self.user_tick = phys
+        return max(0, tick_delta(self._now(), self.user_tick)) / 1000.0
 
 
 class Injector:
@@ -408,7 +478,9 @@ def cmd_run(a) -> int:
     out.mkdir(parents=True, exist_ok=True)
     report = {"schema": "unmatched.t43-real-input/2", "task": "T4.3 real OS input (click, wheel, Space, hover) on the "
               "packaged client", "rule": "RD-5 / delegation 2026-09-29: only while the user is idle >= 10 min "
-              "(GetLastInputInfo); abort at the first user input (low-level hooks, non-injected event)",
+              "(no physical input: injected input of other programs such as a keep-awake key does not count, a "
+              "GetLastInputInfo change no injected event explains does); abort at the first user input (low-level "
+              "hooks, non-injected event)",
               "startedLocal": now_local(), "dpiAwareness": win_mode, "thresholdSeconds": a.wait_idle,
               "samples": [], "steps": [], "status": None}
 
@@ -420,15 +492,34 @@ def cmd_run(a) -> int:
         return 0 if status == "выполнено" else 3
 
     deadline = time.time() + a.max_wait_min * 60
-    while True:
-        idle = idle_seconds()
-        report["samples"].append({"local": now_local(), "idleSeconds": round(idle, 1)})
-        if idle >= a.wait_idle:
-            break
-        if time.time() > deadline:
-            return finish("не выполнено: пользователь активен", maxIdleSeconds=max(s["idleSeconds"] for s in report["samples"]))
-        time.sleep(15)
-    report["samples"] = report["samples"][-20:]
+    watcher = UserGuard()
+    watcher.start()
+    pidle = PhysicalIdle(watcher)
+    max_idle = max_plain = 0.0
+    next_sample = 0.0
+    try:
+        while True:
+            idle = pidle.poll()
+            max_idle = max(max_idle, idle)
+            if time.time() >= next_sample or idle >= a.wait_idle:
+                plain = idle_seconds()
+                max_plain = max(max_plain, plain)
+                report["samples"].append({"local": now_local(), "idleSeconds": round(idle, 1),
+                                          "lastInputIdleSeconds": round(plain, 1)})
+                del report["samples"][:-40]
+                next_sample = time.time() + 15
+            if idle >= a.wait_idle:
+                break
+            if time.time() > deadline:
+                return finish("не выполнено: пользователь активен", maxIdleSeconds=round(max_idle, 1),
+                              maxLastInputIdleSeconds=round(max_plain, 1),
+                              foreignInjected=dict(watcher.foreign_kinds), lastInputChangesExplained=pidle.explained,
+                              lastInputChangesCountedAsUser=pidle.unexplained)
+            time.sleep(1)
+    finally:
+        watcher.stop()
+    report.update(foreignInjected=dict(watcher.foreign_kinds), lastInputChangesExplained=pidle.explained,
+                  lastInputChangesCountedAsUser=pidle.unexplained, maxLastInputIdleSeconds=round(max_plain, 1))
 
     env_file = Path(a.backend_env or os.environ.get("UNMATCHED_BACKEND_ENV") or REPO / "backend/.env")
     benv = load_env(env_file)
@@ -524,6 +615,23 @@ def cmd_check() -> int:
     assert to_screen(t["body"], t["viewport"], (100, 50), (1280, 720)) == (550, 389)
     assert re.search(r"INPUT hover src=os .*fighter=(?!f\-0\-hero\b)\S+", "INPUT hover src=os screen=(1,2) fighter=none")
     assert not re.search(r"INPUT hover src=os .*fighter=(?!f\-0\-hero\b)\S+", "INPUT hover src=os screen=(1,2) fighter=f-0-hero")
+    assert tick_delta(5, 0xFFFFFFF0) == 21 and tick_delta(0xFFFFFFF0, 5) == -21
+
+    class FakeGuard:
+        foreign_ticks: list = []
+        physical_tick = None
+
+    g, clock = FakeGuard(), {"now": 100_000, "last": 90_000}
+    pi = PhysicalIdle(g, tick_now=lambda: clock["now"], last_tick=lambda: clock["last"])
+    assert pi.poll() == 10.0                                   # history before start counts as the user
+    clock.update(now=160_000, last=150_000)
+    g.foreign_ticks.append(150_000)                            # keep-awake F15 (injected by another program)
+    assert pi.poll() == 70.0 and pi.explained == 1             # ... does not reset the user's idle
+    clock.update(now=170_000, last=165_000)                    # change no injected event explains -> the user
+    assert pi.poll() == 5.0 and pi.unexplained == 1
+    g.physical_tick = 168_000                                  # physical hook event -> the user
+    clock.update(now=171_000)
+    assert pi.poll() == 3.0
     if os.name == "nt":
         win_setup()
         print(f"idle now {idle_seconds():.1f} s")
