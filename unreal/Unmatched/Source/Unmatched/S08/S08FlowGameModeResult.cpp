@@ -41,9 +41,11 @@ constexpr FLinearColor GResultScreenMarker(FColor(255, 215, 0, 255));   // #FFD7
 constexpr FLinearColor GResultOutcomeMarker(FColor(255, 0, 100, 255));  // #FF0064
 constexpr FLinearColor GResultSupportMarker(FColor(0, 255, 160, 255));  // #00FFA0
 constexpr FLinearColor GResultButtonMarker(FColor(128, 0, 255, 255));   // #8000FF
-/** One stripe segment: 120 x 6 su = 80 x 4 px at 720p (the gate wants >= 100 px of each). */
+/** One stripe segment: 120 x 12 su = 80 x 8 px at 720p. The GD-036 gates (run-duel-demo, run-vs-ai-demo) sample every
+ *  second pixel in both axes and want >= 100 samples of each marker: 40 x 4 = 160 at 720p. The first cut (120 x 6 su)
+ *  gave 40 x 2 = 80 and failed the live duel gate at 720p (DE-031). */
 constexpr float GMarkerW = 120.0f;
-constexpr float GMarkerH = 6.0f;
+constexpr float GMarkerH = 12.0f;
 constexpr float GPanelWidthSu = 760.0f;
 constexpr float GDiscOuterSu = 120.0f;
 constexpr float GDiscInnerSu = 108.0f;
