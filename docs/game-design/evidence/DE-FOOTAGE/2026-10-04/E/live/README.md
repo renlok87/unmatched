@@ -138,7 +138,7 @@ run-phase2-demo.ps1 -Api http://localhost:3000/graphql -ArtPreviewBoardId <board
 - В трёх партиях, где рука дошла до 7, ровно одна строка `HUD-HINT rule=hand-limit show … blocking=0`, затем `close=turn`. Второго `show` нет.
 - `TURN-INPUT open … gate=none` идут как обычно.
 - В итоговом пакете тост жил меньше 0,4 с: автоклиент сразу завершал ход. Поэтому кадры [Marmoreal, хост](demo/marmoreal/combat-20261005-135610/host/s09-hand-limit-hint.jpg) и [Sarpedon, джойнер](demo/sarpedon/combat-20261005-135712/joiner/s09-hand-limit-hint.jpg) сняты уже после закрытия: рука 7/7, тоста нет. Это верно, правило закрывает тост концом хода.
-- Сброс до лимита вживую не выпал: рука не превышала 7.
+- Сброс до лимита вживую не выпал: к концу своего хода рука ни разу не превышала 7. Внутри хода она доходила до 8/7 (Marmoreal, хост, seq 10–11; виден на [кадре баннера](demo/marmoreal/combat-20261005-135610/host/s09-turn-banner.jpg)), но лишняя карта ушла в бой того же хода (правка ревьюера).
 
 **DE-026 — слот карты-источника.**
 - [Sarpedon, хост — своя схема](demo/sarpedon/combat-20261005-135712/host/s09-card-slot-own.jpg) и [джойнер — схема соперника](demo/sarpedon/combat-20261005-135712/joiner/s09-card-slot-opp.jpg). Карта слева сверху под командной панелью, лента SCHEME читается, текст карты не обрезан, у соперника есть строка пропуска.
