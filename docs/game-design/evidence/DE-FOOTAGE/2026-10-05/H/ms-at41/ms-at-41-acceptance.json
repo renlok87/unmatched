@@ -1,0 +1,131 @@
+{
+ "schema": "run-h.ms-at-41/1",
+ "rule": "06 MS-AT-41: GPU <= +0.30 ms, draw calls <= 7 + 4*S (S = MS-HL ghost sections; MS-T-10 not built, S = 0)",
+ "package": "e35c69f1 (run H acceptance, R-02..R-05)",
+ "gpu": "RTX 4090, no frame cap, packaged -Bench, same flags as run B",
+ "maps": {
+  "marmoreal": {
+   "K1": {
+    "gpuMsBase": [
+     2.5,
+     2.5
+    ],
+    "gpuMsPlates": [
+     2.49,
+     2.5
+    ],
+    "dGpuMs": -0.005,
+    "drawCallsBase": [
+     435.52,
+     435.52
+    ],
+    "drawCallsPlates": [
+     437.52,
+     437.52
+    ],
+    "dDrawCalls": 2.0,
+    "dPasses": {
+     "BeginOcclusionTests": 0.98,
+     "Translucency": 0.98
+    },
+    "drawCallsCandidatesScene0": [
+     437.73
+    ]
+   },
+   "K2x1.6": {
+    "gpuMsBase": [
+     2.43,
+     2.45
+    ],
+    "gpuMsPlates": [
+     2.44,
+     2.45
+    ],
+    "dGpuMs": 0.005,
+    "drawCallsBase": [
+     347.7,
+     347.94
+    ],
+    "drawCallsPlates": [
+     313.39,
+     313.37
+    ],
+    "dDrawCalls": -34.44,
+    "dPasses": {
+     "Basepass": -16.69,
+     "BeginOcclusionTests": -15.7,
+     "Prepass": -2.4,
+     "Translucency": 0.99
+    },
+    "drawCallsCandidatesScene0": [
+     313.36
+    ]
+   }
+  },
+  "sarpedon": {
+   "K1": {
+    "gpuMsBase": [
+     2.59,
+     2.62
+    ],
+    "gpuMsPlates": [
+     2.62,
+     2.62
+    ],
+    "dGpuMs": 0.015,
+    "drawCallsBase": [
+     480.77,
+     480.77
+    ],
+    "drawCallsPlates": [
+     482.77,
+     482.76
+    ],
+    "dDrawCalls": 2.0,
+    "dPasses": {
+     "Basepass": 0.3,
+     "BeginOcclusionTests": 1.41,
+     "Lights": 0.07,
+     "Prepass": 0.09,
+     "RenderVelocities": 0.16,
+     "ShadowDepths": 0.09,
+     "Translucency": 1.01
+    },
+    "drawCallsCandidatesScene0": [
+     482.78
+    ]
+   },
+   "K2x1.6": {
+    "gpuMsBase": [
+     2.52,
+     2.51
+    ],
+    "gpuMsPlates": [
+     2.51,
+     2.51
+    ],
+    "dGpuMs": -0.005,
+    "drawCallsBase": [
+     474.97,
+     473.47
+    ],
+    "drawCallsPlates": [
+     394.84,
+     394.82
+    ],
+    "dDrawCalls": -79.39,
+    "dPasses": {
+     "Basepass": -38.14,
+     "BeginOcclusionTests": -37.17,
+     "Prepass": -3.35,
+     "RenderVelocities": 0.1,
+     "ShadowDepths": 0.06,
+     "Translucency": 1.0
+    },
+    "drawCallsCandidatesScene0": [
+     394.86
+    ]
+   }
+  }
+ }
+}
