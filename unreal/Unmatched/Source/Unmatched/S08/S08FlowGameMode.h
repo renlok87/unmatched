@@ -35,6 +35,7 @@
 #include "../S09/S09HandLimit.h"
 #include "../S09/S09CardSlot.h"
 #include "S08CueDispatcher.h"
+#include "S08CueSound.h"
 #include "S08MoveAnim.h"
 #include "S08TurnPortraitWidget.h"
 #include "S08FlowGameMode.generated.h"
@@ -277,7 +278,8 @@ private:
   void WriteCueLines(const TArray<FString>& Lines);
   /** CUE-011 pieces outside or inside a staging: the damage number (+ evidence shot scheduling) and the hit. */
   void PresentDamageNumber(const FString& FighterId, int32 Damage, int32 Seq, float LifeSeconds);
-  void PresentHit(const FString& FighterId, int32 Seq, int32 TintMs);
+  /** DE-032: DueMs = the contact boundary of a staged hit (its sound's `due`), -1 for an unstaged one. */
+  void PresentHit(const FString& FighterId, int32 Seq, int32 TintMs, int64 DueMs = -1);
   // ---- MS-T-16 move animation (CUE-007, S08MoveAnim.h) ----
   /** Any key or mouse button but Space and the wheel while a figure travels: every move jumps to its final pose in the
    *  same frame (MS-E-70 / MS-E-110). The input is not consumed - it acts on the logical (snapshot) state as usual. */
@@ -450,6 +452,23 @@ private:
   // LungeAttack is no longer sent at COMBAT_RESOLVE: the staging plays it after the slam + 300 ms (01 F-03).
   FS08CueDispatcher CueDispatcher;
   FS09CombatStage CombatStage;
+  // DE-032 (W-25, SD-51; S08FlowGameModeSound.cpp): the sound of the CUE sync points - ui in the release response
+  // frame, the hit in the contact frame, one step per edge, the chime of the own turn only, the result sting with the
+  // screen - and the volumes "master" / "ambience" applied without a restart. No asset yet: fallback lines only.
+  FS08CueSound CueSound;
+  void InitCueSound();
+  /** The saved volumes in force now (`CUE audio`): master = the audio device's transient primary volume. */
+  void ApplyAudioSettings(bool bStart);
+  void PlayCueSound(const FS08SoundRequest& Request);
+  /** A ui sound (CUE-002/003/004) in this frame - the frame of the visual response of the release. */
+  void PlayUiSound(const TCHAR* CueId, const FString& Subject);
+  void PlayBoardUiSound(const FS09InputResult& Result, const FString& FighterId);
+  /** CUE-007: one step sound per edge of every plan of this seq (a replaced move drops its pending steps). */
+  void ScheduleStepSounds(const TArray<FS08MovePlan>& Plans);
+  void TickStepSounds();
+  void PlayHitSound(const FString& FighterId, int32 Seq, int64 DueMs);
+  void PlayTurnSound(int32 Seq, bool bOwnTurn);
+  void PlayResultSting(int32 Seq, int64 ScreenMs);
   // MS-T-16: the motion settings (US08UserSettings + flags, read at BeginPlay), the move pose parameters and the
   // damage cues held until their target arrives. DE-025: re-read when the settings are saved (US08UserSettings::
   // OnChanged) - the next move seq and the next combat staging use them, no restart.
@@ -941,6 +960,9 @@ private:
   // Keeps the exact-size combat icon textures alive while the brush uses them.
   UPROPERTY()
   TArray<TObjectPtr<UObject>> ArtHudAssets;
+  // DE-032: the loaded CUE sounds by soft path (null entries = a path that did not load; warned once).
+  UPROPERTY()
+  TMap<FString, TObjectPtr<UObject>> CueSoundAssets;
   // W4-C: the UMG art HUD widgets (plate, icon) hosted in HudCanvas slots.
   UPROPERTY()
   TArray<TObjectPtr<UUserWidget>> ArtHudWidgets;

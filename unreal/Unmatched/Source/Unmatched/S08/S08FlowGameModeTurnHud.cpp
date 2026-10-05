@@ -120,6 +120,9 @@ void AS08FlowGameMode::FeedTurnHud(const FS08Snapshot& Snapshot) {
                                                    Hud.bGameOver, Now, MoveMotion.bReducedMotion);
   if (!Event.bChanged) return;
   bTrackerResetPending = !Event.bGameOver;  // 01 F-12: both trackers snap in the frame the turn passes
+  // DE-032 (SD-51 p. 4): the chime of the own turn with its banner; the opponent's turn start is silent. A join or a
+  // reconnect mid-turn (initial) shows no banner and plays nothing.
+  if (!Event.bGameOver && !Event.bInitial) PlayTurnSound(Snapshot.SequenceNumber, Event.bOwn);
   if (!OwnPortrait || !OpponentPortrait) return;
   US08TurnPortraitWidget* Active = Event.bGameOver ? nullptr : (Event.bOwn ? OwnPortrait.Get() : OpponentPortrait.Get());
   for (US08TurnPortraitWidget* Portrait : {OwnPortrait.Get(), OpponentPortrait.Get()}) {

@@ -9,12 +9,13 @@
   python tools/s08/cue_contract/cue_contract.py validate-table [--table P]   схема + семантика + сверка с 07; missing-report
   python tools/s08/cue_contract/cue_contract.py run-fixtures [--dir D]       эталонная модель против expect_trace и гейт
   python tools/s08/cue_contract/cue_contract.py check-trace <log> [--table P] [--min-ms-cue N] [--min-combat N]
-                                                             [--min-death N]
+                                                             [--min-death N] [--min-sound N]
                                                                            гейт трассы `CUE fx … result=`, `MS-CUE move …`
                                                                            (move-selection 04 §9, MS-AT-28), постановки боя
-                                                                           `CUE combat …` (DE-018, C1-C6) и смерти
+                                                                           `CUE combat …` (DE-018, C1-C6), смерти
                                                                            `CUE death …` / `RESULT screen …` (DE-019, DS1-DS5)
-                                                                           реального лога
+                                                                           и звука `CUE sound …` / `CUE audio …` (DE-032,
+                                                                           AU1-AU10) реального лога
 
 Эталонная модель — исполняемая форма спецификации для фикстур (C++-тесты GD-044 портируют те же
 фикстуры), не код движка. Только stdlib + jsonschema (есть в системном Python).
@@ -638,6 +639,223 @@ def check_trace(lines, table):
     d_errors, d_summary = check_death(lines)
     errors.extend(d_errors)
     summary.update(d_summary)
+    s_errors, s_summary = check_sound(lines, table)
+    errors.extend(s_errors)
+    summary.update(s_summary)
+    return errors, summary
+
+
+# ----------------------------------------------------------------------------- звук точек синхронизации (DE-032)
+SOUND_RE = re.compile(r"(CUE sound\b.*)$")
+AUDIO_RE = re.compile(r"(CUE audio\b.*)$")
+HUD_TURN_RE = re.compile(r"(HUD-TURN seq=.*)$")
+SOUND_POINTS = {"ui": ("CUE-002", "CUE-003", "CUE-004"), "hit": ("CUE-011",), "step": ("CUE-007",),
+                "turn": ("CUE-015",), "result": ("CUE-016",)}
+SOUND_RESULTS = ("played", "fallback", "silent", "throttled")
+SOUND_NEED = ("id", "point", "subject", "seq", "t", "event_t", "dt", "class", "sound", "gain", "result")
+AUDIO_NEED = ("master", "master_mute", "ambience", "ambience_mute", "gain_master", "gain_ambience", "t", "applied")
+SOUND_MS = {  # CUE-DISPATCHER.md §3.2: звук против кадра события и кадр против расписания (как DS4/DS5)
+    "frame": 17, "frame_tolerance": 100,
+}
+
+
+def _gain(text):
+    try:
+        return float(text)
+    except (TypeError, ValueError):
+        return None
+
+
+def check_sound(lines, table):
+    """Гейт звука точек синхронизации `CUE sound …` и громкостей `CUE audio …` (DE-032, CUE-DISPATCHER.md §3.2, §6):
+    AU1 формат (точка, id точки, класс по таблице); AU2 звук в кадре события: dt = t − event_t, |dt| ≤ 17 мс;
+    AU3 перезвон только на свой ход (turn=opp — silent reason=opponent) и сверка с `HUD-TURN` (не initial);
+    AU4 звук и результат согласованы (fallback ⇔ sound=missing, played ⇔ имя ассета, silent/throttled ⇔ none);
+    AU5 удар: один на (seq, цель), due = кадр контакта `CUE combat stage=contact` своего seq, t − due ∈ [0, 100];
+    AU6 шаг: один звук на ребро (edge=k/n, все k при отсутствии drop) или один edge=snap, t − due ∈ [0, 100];
+    AU7 стинг результата: один на каждый `RESULT screen`, event_t = t экрана;
+    AU8 громкости: строка `CUE audio` до первого звука, gain_* по формуле, gain звука = gain его класса
+    (Ambience — gain_ambience, иначе gain_master), silent reason=muted ⇔ gain 0;
+    AU9 частота: throttled только внутри retrigger_ms прошлого звука этого CUE, иначе звук играет.
+    В трассе без `CUE audio` и `CUE sound` (клиент без DE-032) сверки AU3/AU7 с `HUD-TURN` и экраном не делаются."""
+    rows = rows_by_id(table)
+    errors = []
+    gains = None
+    contact = {}
+    screens = []
+    hud_turns = []
+    dropped = set()  # (seq, fighter|"*")
+    hits = {}
+    steps = {}  # (seq, subject) -> {"n": n, "edges": [k], "snap": count, "line": n}
+    results = []
+    turn_sounds = []
+    last_sound = {}  # id -> t прошлого звука (played/fallback)
+    summary = {"sounds": 0, "sound_points": {p: 0 for p in SOUND_POINTS}, "sound_fallback": 0, "sound_played": 0,
+               "sound_silent": 0, "sound_throttled": 0, "audio_lines": 0, "sound_dt_max": 0}
+    for n, raw in enumerate(lines, 1):
+        line = raw.rstrip("\r\n")
+        cf = parse_combat(line)
+        if cf is not None:
+            t = _int_or_none(cf.get("t"))
+            if cf.get("stage") == "contact" and t is not None:
+                contact[cf.get("seq")] = t
+            continue
+        m = RESULT_SCREEN_RE.search(line)
+        if m:
+            f = _fields(m.group(1), 2)
+            t = _int_or_none(f.get("t"))
+            if t is not None:
+                screens.append({"t": t, "seq": f.get("seq"), "_n": n})
+            continue
+        m = HUD_TURN_RE.search(line)
+        if m:
+            f = _fields(m.group(1), 1)
+            if f.get("initial") == "0" and f.get("turn") in ("own", "opp"):
+                hud_turns.append((f.get("seq"), f.get("turn"), n))
+            continue
+        m = AUDIO_RE.search(line)
+        if m:
+            f = _fields(m.group(1), 2)
+            summary["audio_lines"] += 1
+            missing = [k for k in AUDIO_NEED if k not in f]
+            nums = {k: _int_or_none(f.get(k)) for k in ("master", "master_mute", "ambience", "ambience_mute")}
+            if missing or any(v is None for v in nums.values()) or f.get("applied") not in ("start", "change"):
+                errors.append(("AU1", "строка %d: CUE audio без полей %s или неверное значение" % (n, missing)))
+                continue
+            g_master = 0.0 if nums["master_mute"] else max(0, min(100, nums["master"])) / 100.0
+            g_amb = g_master * (0.0 if nums["ambience_mute"] else max(0, min(100, nums["ambience"])) / 100.0)
+            got_m, got_a = _gain(f["gain_master"]), _gain(f["gain_ambience"])
+            if got_m is None or got_a is None or abs(got_m - g_master) > 0.006 or abs(got_a - g_amb) > 0.006:
+                errors.append(("AU8", "строка %d: gain_master/gain_ambience %s/%s ≠ %.2f/%.2f" % (
+                    n, f["gain_master"], f["gain_ambience"], g_master, g_amb)))
+            gains = {"master": g_master, "ambience": g_amb}
+            continue
+        m = SOUND_RE.search(line)
+        if not m:
+            continue
+        words = m.group(1).split()
+        if len(words) > 2 and words[2] == "drop":
+            f = _fields(m.group(1), 3)
+            if f.get("point") != "step" or f.get("seq") is None or f.get("reason") not in ("skip", "replace"):
+                errors.append(("AU1", "строка %d: CUE sound drop без point=step/seq/reason" % n))
+                continue
+            dropped.add((f["seq"], f.get("fighter", "*")))
+            continue
+        f = _fields(m.group(1), 2)
+        missing = [k for k in SOUND_NEED if k not in f]
+        t, ev, dt = _int_or_none(f.get("t")), _int_or_none(f.get("event_t")), _int_or_none(f.get("dt"))
+        point, cid, res = f.get("point"), f.get("id"), f.get("result")
+        if (missing or None in (t, ev, dt) or point not in SOUND_POINTS or cid not in SOUND_POINTS[point]
+                or res not in SOUND_RESULTS or _gain(f.get("gain")) is None):
+            errors.append(("AU1", "строка %d: CUE sound без полей %s или неверное значение" % (n, missing)))
+            continue
+        row_sfx = (rows.get(cid) or {}).get("sfx") or {}
+        if row_sfx.get("sound_class") and f["class"] != row_sfx["sound_class"]:
+            errors.append(("AU1", "строка %d: класс %s ≠ %s в таблице" % (n, f["class"], row_sfx["sound_class"])))
+        summary["sounds"] += 1
+        summary["sound_points"][point] += 1
+        summary["sound_" + res] += 1
+        # AU2: в кадре события
+        if dt != t - ev or abs(dt) > SOUND_MS["frame"]:
+            errors.append(("AU2", "строка %d: звук через %d мс от кадра события (dt=%s)" % (n, t - ev, f["dt"])))
+        summary["sound_dt_max"] = max(summary["sound_dt_max"], abs(t - ev))
+        # AU4: звук и результат
+        snd = f["sound"]
+        want_snd = {"fallback": snd == "missing", "played": snd not in ("none", "missing"),
+                    "silent": snd == "none", "throttled": snd == "none"}[res]
+        if not want_snd:
+            errors.append(("AU4", "строка %d: result=%s при sound=%s" % (n, res, snd)))
+        # AU8: громкость
+        gain = _gain(f["gain"])
+        if gains is None:
+            errors.append(("AU8", "строка %d: звук до строки CUE audio" % n))
+        else:
+            want = gains["ambience"] if f["class"] == "Ambience" else gains["master"]
+            if abs(gain - want) > 0.006:
+                errors.append(("AU8", "строка %d: gain %s ≠ %.2f (класс %s)" % (n, f["gain"], want, f["class"])))
+        if res == "silent" and f.get("reason") not in ("muted", "opponent"):
+            errors.append(("AU4", "строка %d: silent без reason=muted|opponent" % n))
+        if (res == "silent" and f.get("reason") == "muted" and gain > 0.0) or (
+                res in ("played", "fallback") and gain <= 0.0):
+            errors.append(("AU8", "строка %d: result=%s reason=%s при gain %s" % (n, res, f.get("reason"), f["gain"])))
+        # AU9: частота
+        retrig = (row_sfx.get("concurrency") or {}).get("retrigger_ms") or 0
+        prev = last_sound.get(cid)
+        if res == "throttled":
+            if prev is None or t - prev >= retrig:
+                errors.append(("AU9", "строка %d: throttled через %s мс при retrigger_ms %d" % (
+                    n, "-" if prev is None else t - prev, retrig)))
+        elif res in ("played", "fallback"):
+            if prev is not None and retrig and t - prev < retrig:
+                errors.append(("AU9", "строка %d: %s звучит через %d мс < %d" % (n, cid, t - prev, retrig)))
+            last_sound[cid] = t
+        # точки
+        due = _int_or_none(f.get("due"))
+        key = (f["seq"], f["subject"])
+        if point == "turn":
+            turn = f.get("turn")
+            if turn not in ("own", "opp"):
+                errors.append(("AU3", "строка %d: перезвон без turn=own|opp" % n))
+            elif turn == "opp" and (res != "silent" or f.get("reason") != "opponent"):
+                errors.append(("AU3", "строка %d: начало хода соперника не беззвучно (result=%s)" % (n, res)))
+            elif turn == "own" and res == "silent" and f.get("reason") != "muted":
+                errors.append(("AU3", "строка %d: свой ход без перезвона" % n))
+            turn_sounds.append((f["seq"], turn, n))
+        elif point == "hit":
+            hits[key] = hits.get(key, 0) + 1
+            if hits[key] > 1:
+                errors.append(("AU5", "строка %d: второй удар %s" % (n, key)))
+            # due — только у удара постановки (кадр контакта); удар без постановки (каскад, способность) — в свой кадр
+            if due is not None and f["seq"] in contact and due != contact[f["seq"]]:
+                errors.append(("AU5", "строка %d: due=%s ≠ кадр контакта %d" % (n, f.get("due"), contact[f["seq"]])))
+            if due is not None and not 0 <= t - due <= SOUND_MS["frame_tolerance"]:
+                errors.append(("AU5", "строка %d: удар через %d мс после контакта" % (n, t - due)))
+        elif point == "step":
+            edge = f.get("edge", "")
+            st = steps.setdefault(key, {"n": None, "edges": [], "snap": 0, "line": n})
+            if due is None or not 0 <= t - due <= SOUND_MS["frame_tolerance"]:
+                errors.append(("AU6", "строка %d: шаг без due или через %s мс после начала ребра" % (
+                    n, "-" if due is None else t - due)))
+            if edge == "snap":
+                st["snap"] += 1
+            else:
+                k, _, total = edge.partition("/")
+                k, total = _int_or_none(k), _int_or_none(total)
+                if k is None or total is None or not 1 <= k <= total or (st["n"] not in (None, total)):
+                    errors.append(("AU6", "строка %d: edge=%s" % (n, edge)))
+                    continue
+                st["n"] = total
+                if k in st["edges"]:
+                    errors.append(("AU6", "строка %d: ребро %d прозвучало дважды %s" % (n, k, key)))
+                st["edges"].append(k)
+        elif point == "result":
+            results.append({"t": t, "ev": ev, "seq": f["seq"], "_n": n})
+    for key, st in steps.items():
+        cut = (key[0], key[1]) in dropped or (key[0], "*") in dropped
+        if st["snap"] and (st["edges"] or st["snap"] > 1):
+            errors.append(("AU6", "%s: у прыжка %d звуков (нужен один)" % (key, st["snap"] + len(st["edges"]))))
+        elif st["n"] is not None and not cut and sorted(st["edges"]) != list(range(1, st["n"] + 1)):
+            errors.append(("AU6", "%s: рёбер %d, звуков %s" % (key, st["n"], sorted(st["edges"]))))
+    if not summary["audio_lines"] and not summary["sounds"]:
+        return errors, summary  # трасса клиента без DE-032 (старые логи, фикстуры): сверять экран и ход не с чем
+    if hud_turns:
+        sounded = {(s, tn) for s, tn, _ in turn_sounds}
+        traced = {(s, tn) for s, tn, _ in hud_turns}
+        for s, tn, n in hud_turns:
+            if (s, tn) not in sounded:
+                errors.append(("AU3", "строка %d: начало хода seq %s (%s) без строки перезвона" % (n, s, tn)))
+        for s, tn, n in turn_sounds:
+            if (s, tn) not in traced:
+                errors.append(("AU3", "строка %d: перезвон seq %s (%s) без HUD-TURN" % (n, s, tn)))
+    used = set()
+    for sc in screens:
+        own = [r for r in results if r["ev"] == sc["t"] and r["_n"] not in used]
+        if len(own) != 1:
+            errors.append(("AU7", "строка %d: экран результата t=%d, стингов %d" % (sc["_n"], sc["t"], len(own))))
+        used.update(r["_n"] for r in own)
+    for r in results:
+        if r["_n"] not in used:
+            errors.append(("AU7", "строка %d: стинг без экрана результата (event_t=%d)" % (r["_n"], r["ev"])))
     return errors, summary
 
 
@@ -1037,6 +1255,8 @@ def main(argv=None):
                    help="C7: не меньше N завершённых постановок боя `CUE combat` (живой бой DE-018/DE-031)")
     c.add_argument("--min-death", type=int, default=0,
                    help="DS6: не меньше N смертей `CUE death` (живая партия до GAME_OVER, DE-019/DE-031)")
+    c.add_argument("--min-sound", type=int, default=0,
+                   help="AU10: не меньше N строк `CUE sound` (живой прогон со звуком точек синхронизации, DE-032)")
     a = ap.parse_args(argv)
     table = load_json(a.table)
     if a.cmd == "validate-table":
@@ -1065,6 +1285,8 @@ def main(argv=None):
         errors.append(("C7", "постановок боя %d < %d" % (summary["combat_sets"], a.min_combat)))
     if summary["death_sets"] < a.min_death:
         errors.append(("DS6", "смертей %d < %d" % (summary["death_sets"], a.min_death)))
+    if summary["sounds"] < a.min_sound:
+        errors.append(("AU10", "строк CUE sound %d < %d" % (summary["sounds"], a.min_sound)))
     for code, text in errors:
         print("GATE", code, text)
     print("CUE_TRACE", "PASS" if not errors else "FAIL", json.dumps(summary))

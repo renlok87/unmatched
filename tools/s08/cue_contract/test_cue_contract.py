@@ -419,5 +419,130 @@ class DeathStageTests(unittest.TestCase):
         self.assertEqual(cc.check_trace(["RESULT screen seq=3 t=500 due=500 gameOver=500 heroGone=- wait=0"], TABLE)[0], [])
 
 
+def snd(cid, point, t, seq="-", subject="-", cls=None, sound="missing", gain="1.00", result="fallback", ev=None,
+        extra=""):
+    """Строка `CUE sound …` в формате FS08CueSound::Play (S08CueSoundTests.cpp пишет те же строки)."""
+    cls = cls or row(TABLE, cid)["sfx"]["sound_class"]
+    ev = t if ev is None else ev
+    line = ("LogS08: CUE sound id=%s point=%s subject=%s seq=%s t=%d event_t=%d dt=%d class=%s sound=%s gain=%s "
+            "result=%s" % (cid, point, subject, seq, t, ev, t - ev, cls, sound, gain, result))
+    return line + (" " + extra if extra else "")
+
+
+AUDIO_START = ("CUE audio master=100 master_mute=0 ambience=60 ambience_mute=0 gain_master=1.00 gain_ambience=0.60 "
+               "t=0 applied=start")
+
+
+class SoundGateTests(unittest.TestCase):
+    """DE-032: звук точек синхронизации (CUE-DISPATCHER.md §3.2, гейт AU1–AU10)."""
+
+    def good(self):
+        return [
+            AUDIO_START,
+            snd("CUE-003", "ui", 1000, seq="12", subject="hud.endturn"),
+            snd("CUE-004", "ui", 1100, seq="12"),
+            snd("CUE-004", "ui", 1250, seq="12", sound="none", result="throttled"),
+            snd("CUE-004", "ui", 1400, seq="12"),
+            snd("CUE-007", "step", 1500, seq="20", subject="arthur", extra="edge=1/3 due=1500"),
+            snd("CUE-007", "step", 1790, seq="20", subject="arthur", extra="edge=2/3 due=1780"),
+            snd("CUE-007", "step", 2070, seq="20", subject="arthur", extra="edge=3/3 due=2060"),
+            snd("CUE-007", "step", 2100, seq="21", subject="medusa", extra="edge=snap due=2100"),
+            "HUD-TURN seq=30 turn=opp initial=0 ring=none flash=0 banner=0 reduced=0",
+            snd("CUE-015", "turn", 3000, seq="30", sound="none", result="silent", extra="turn=opp reason=opponent"),
+            "HUD-TURN seq=34 turn=own initial=0 ring=none flash=0 banner=600 reduced=0",
+            snd("CUE-015", "turn", 3500, seq="34", extra="turn=own"),
+            "CUE audio master=50 master_mute=0 ambience=60 ambience_mute=1 gain_master=0.50 gain_ambience=0.00 "
+            "t=4000 applied=change",
+            snd("CUE-011", "hit", 5000, seq="41", subject="medusa", gain="0.50"),
+            "RESULT screen seq=50 t=9000 due=9000 gameOver=9000 heroGone=- wait=0",
+            snd("CUE-016", "result", 9000, seq="50", gain="0.50"),
+        ]
+
+    def codes(self, lines):
+        return {c for c, _ in cc.check_sound(lines, TABLE)[0]}
+
+    def test_good_trace_passes_the_whole_gate(self):
+        errs, summary = cc.check_trace(self.good(), TABLE)
+        self.assertEqual(errs, [])
+        self.assertEqual(summary["sounds"], 12)
+        self.assertEqual(summary["sound_points"], {"ui": 4, "hit": 1, "step": 4, "turn": 2, "result": 1})
+        self.assertEqual((summary["sound_fallback"], summary["sound_silent"], summary["sound_throttled"]), (10, 1, 1))
+        self.assertEqual(summary["audio_lines"], 2)
+        self.assertEqual(summary["sound_dt_max"], 0)
+
+    def test_sound_off_the_event_frame(self):
+        self.assertIn("AU2", self.codes([AUDIO_START, snd("CUE-003", "ui", 1033, ev=1000)]))
+        self.assertEqual(self.codes([AUDIO_START, snd("CUE-003", "ui", 1016, ev=1000)]), set())
+
+    def test_opponent_turn_must_be_silent_and_match_hud_turn(self):
+        self.assertIn("AU3", self.codes([AUDIO_START, snd("CUE-015", "turn", 3000, seq="30", extra="turn=opp")]))
+        no_chime = ["HUD-TURN seq=34 turn=own initial=0 ring=none flash=0 banner=600 reduced=0", AUDIO_START]
+        self.assertIn("AU3", self.codes(no_chime))
+        # initial (вход посреди хода): без баннера и без перезвона
+        self.assertEqual(self.codes(["HUD-TURN seq=2 turn=own initial=1 ring=none flash=0 banner=0 reduced=0"]), set())
+
+    def test_sound_token_and_result_agree(self):
+        self.assertIn("AU4", self.codes([AUDIO_START, snd("CUE-003", "ui", 10, sound="SW_Click")]))
+        self.assertEqual(self.codes([AUDIO_START, snd("CUE-003", "ui", 10, sound="SW_Click", result="played")]), set())
+
+    def test_hit_on_the_contact_frame(self):
+        contact = "CUE combat seq=24 stage=contact t=2000 offset=292 window=900 src=notify"
+        ok = snd("CUE-011", "hit", 2016, seq="24", subject="medusa", extra="due=2000")
+        self.assertEqual(self.codes([AUDIO_START, contact, ok]), set())
+        # при применении снапшота (до контакта) — AU5; второй удар той же цели — AU5
+        early = snd("CUE-011", "hit", 1500, seq="24", subject="medusa", extra="due=1500")
+        self.assertIn("AU5", self.codes([AUDIO_START, contact, early]))
+        self.assertIn("AU5", self.codes([AUDIO_START, contact, ok, ok]))
+        wrong_due = snd("CUE-011", "hit", 2016, seq="24", subject="medusa", extra="due=1990")
+        self.assertIn("AU5", self.codes([AUDIO_START, contact, wrong_due]))
+        # удар без постановки (каскад после перемещения) того же seq — в свой кадр, без due
+        cascade = snd("CUE-011", "hit", 2500, seq="24", subject="harpy1")
+        self.assertEqual(self.codes([AUDIO_START, contact, ok, cascade]), set())
+
+    def test_one_step_per_edge_unless_dropped(self):
+        lines = [AUDIO_START, snd("CUE-007", "step", 1500, seq="20", subject="arthur", extra="edge=1/3 due=1500")]
+        self.assertIn("AU6", self.codes(lines))
+        dropped = lines + ["CUE sound drop point=step seq=20 fighter=* t=1600 count=2 reason=skip"]
+        self.assertEqual(self.codes(dropped), set())
+        twice = lines + [lines[1]]
+        self.assertIn("AU6", self.codes(twice + ["CUE sound drop point=step seq=20 fighter=arthur t=1600 count=1 "
+                                                 "reason=replace"]))
+        late = [AUDIO_START, snd("CUE-007", "step", 1700, seq="22", subject="arthur", extra="edge=snap due=1500")]
+        self.assertIn("AU6", self.codes(late))
+
+    def test_result_sting_with_the_screen(self):
+        screen = "RESULT screen seq=50 t=9000 due=9000 gameOver=9000 heroGone=- wait=0"
+        self.assertIn("AU7", self.codes([AUDIO_START, screen]))
+        self.assertIn("AU7", self.codes([AUDIO_START, snd("CUE-016", "result", 9000, seq="50")]))
+
+    def test_volumes_apply_to_the_next_sound(self):
+        self.assertIn("AU8", self.codes([snd("CUE-003", "ui", 10)]))  # звук до CUE audio
+        change = ("CUE audio master=50 master_mute=0 ambience=60 ambience_mute=0 gain_master=0.50 gain_ambience=0.30 "
+                  "t=100 applied=change")
+        self.assertEqual(self.codes([AUDIO_START, change, snd("CUE-003", "ui", 200, gain="0.50")]), set())
+        self.assertIn("AU8", self.codes([AUDIO_START, change, snd("CUE-003", "ui", 200, gain="1.00")]))
+        bad_formula = change.replace("gain_ambience=0.30", "gain_ambience=0.60")
+        self.assertIn("AU8", self.codes([AUDIO_START, bad_formula]))
+        muted = AUDIO_START.replace("master_mute=0", "master_mute=1").replace("gain_master=1.00", "gain_master=0.00") \
+            .replace("gain_ambience=0.60", "gain_ambience=0.00")
+        self.assertEqual(self.codes([muted, snd("CUE-016", "result", 10, sound="none", gain="0.00", result="silent",
+                                                extra="reason=muted")]
+                                    + ["RESULT screen seq=1 t=10 due=10 gameOver=10 heroGone=- wait=0"]), set())
+        self.assertIn("AU8", self.codes([muted, snd("CUE-003", "ui", 10, gain="0.00")]))
+
+    def test_retrigger(self):
+        self.assertIn("AU9", self.codes([AUDIO_START, snd("CUE-004", "ui", 100), snd("CUE-004", "ui", 200)]))
+        self.assertIn("AU9", self.codes([AUDIO_START, snd("CUE-004", "ui", 100),
+                                         snd("CUE-004", "ui", 500, sound="none", result="throttled")]))
+
+    def test_cli_min_sound(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            log = Path(d) / "trace.log"
+            log.write_text("\n".join(self.good()) + "\n", encoding="utf-8")
+            self.assertEqual(cc.main(["check-trace", str(log), "--min-sound", "12"]), 0)
+            self.assertEqual(cc.main(["check-trace", str(log), "--min-sound", "13"]), 1)
+
+
 if __name__ == "__main__":
     unittest.main()

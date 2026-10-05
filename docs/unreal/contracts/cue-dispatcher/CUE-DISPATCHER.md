@@ -98,6 +98,20 @@
 
 Начало хода (CUE-015, F-07): кольцо у портрета активного игрока у обеих сторон — вспышка всего обода 1000 мс, затем тлеющее кольцо (opacity ≈ 0,35, без искр) до конца хода; reduced motion — статичное кольцо. Баннер «Ваш ход» 600 мс только на свой ход. Ввод своего хода открыт с кадра применения снапшота: кольцо и баннер его не задерживают (SD-47).
 
+### 3.2 Звук по точкам синхронизации (DE-032, 2026-10-05)
+
+Основание — 02 SD-51, R-12, колонка `sound` в 07 (CUE-002/003/007/011/015/016). Звуков DE нет и не будет (EULA); ассеты — лицензируемая библиотека DE-013 / ART-010. Пока `sfx.sound` в таблице `null`, каждая точка пишет строку `result=fallback`, ничего не играет и ошибок не пишет (D10). Код: `FS08CueSound` (`S08CueSound.h`, без мира) решает, когда и с какой громкостью; адаптер `S08FlowGameModeSound.cpp` играет решение в том же кадре, что и визуальное событие. Строки звука — встроенные (`S08SoundRows::All`), тест `Unmatched.S08.CueSound.Table` сверяет `sound_class`, `priority`, `retrigger_ms` и путь `sound` с этой таблицей.
+
+| Точка | CUE | Кадр звука | Правило |
+| --- | --- | --- | --- |
+| `ui` | 002 / 003 / 004 | кадр отклика на отпускание (UI-INP-011, SD-46): нажатие HUD сработало → 003, отказано → 004; отпускание на поле: отказ (тост, недопустимая клетка) → 004, отправка команды → 003, выбор своей фигуры → 002, прочая смена выбора → 003, без отклика — без звука | CUE-004 не чаще 1 раза в 300 мс (D8, `result=throttled`) |
+| `hit` | 011 | кадр контакта выпада: этап `contact` постановки боя (`due` = его `t`); удар без постановки (каскад после перемещения, способность) — в кадр своего HitReact | не в момент применения снапшота с уроном; урон 0 — без звука |
+| `step` | 007 | кадр, в котором фигура начинает ребро: старт перемещения + k × шаг (`due`) | один звук на ребро; прыжок (reduced motion, скорость «Нет», потолок seq) — один звук в кадр посадки (`edge=snap`); пропуск перемещения (MS-E-70) и новое перемещение той же фигуры (`jump_to_final`) снимают оставшиеся шаги (`CUE sound drop`) |
+| `turn` | 015 | кадр применения снапшота нового хода (кадр баннера) | только свой ход; начало хода соперника беззвучно (`result=silent reason=opponent`); вход и реконнект посреди хода (`initial`) — ни баннера, ни звука |
+| `result` | 016 | кадр открытия экрана результата (`RESULT screen`) | стинг ~2–3 с — длина ассета; кроссфейд музыки — с музыкой GD-049 |
+
+Громкости (DE-025 хранит, DE-032 применяет; 02 SD-55): «Общая» — громкость всего вывода процесса, `FAudioDevice::SetTransientPrimaryVolume`; «Окружение» — громкость класса `Ambience` (звук задника SD-51, пока его нет) поверх общей. Mute даёт 0. Изменение (`US08UserSettings::Save` → `OnChanged`, консоль `s08.Settings master=… ambience=…`) применяется сразу: строка `CUE audio … applied=change`, следующий звук идёт с новым `gain`. При общей громкости 0 точки пишут `result=silent reason=muted`. Одновременность (D9) у звука точек — `USoundConcurrency` ассета, когда ассет появится; частота (D8) решается здесь.
+
 ## 4. Семантика диспетчера (нормативно)
 
 Правила пронумерованы; эталонная модель `ReferenceDispatcher` исполняет их в этом порядке, фикстуры фиксируют результат.
@@ -160,6 +174,14 @@ RESULT screen seq=<n> t=<ms> due=<ms> gameOver=<ms> heroGone=<ms|-> wait=<мс>
 
 `RESULT screen` — кадр, в котором открылась панель результата (CUE-016): `due` = max(GAME_OVER, исчезновение героя + 1000), без смерти героя — кадр GAME_OVER; страховка — GAME_OVER + 10 000. Пока у постановки летальный удар по герою не дошёл до падения, экран не открывается. Состояние GAME_OVER применяется сразу: ждёт только панель.
 
+Звук точек синхронизации и громкости (DE-032, §3.2). `t` — кадр, в котором звук запущен; `event_t` — кадр визуального события, `dt` = `t` − `event_t`; `due` — время по расписанию (контакт постановки, начало ребра):
+
+```
+CUE audio master=<0-100> master_mute=<0|1> ambience=<0-100> ambience_mute=<0|1> gain_master=<g> gain_ambience=<g> t=<ms> applied=<start|change>
+CUE sound id=<CUE-NNN> point=<ui|hit|step|turn|result> subject=<id|-> seq=<N|-> t=<ms> event_t=<ms> dt=<мс> class=<UI|SFX|Music|Ambience> sound=<имя|missing|none> gain=<g> result=<played|fallback|silent|throttled> [turn=own|opp] [edge=<k>/<n>|edge=snap] [due=<ms>] [reason=<opponent|muted>]
+CUE sound drop point=step seq=<N> fighter=<id|*> t=<ms> count=<n> reason=<skip|replace>
+```
+
 `total` = CUE-008 (600 × скорость) + (конец − раскрытие) — величина «бой ≈ 3,9 с» из 01 F-01. CUE-010 — `subject=scene`, `done` с `hold=`; CUE-011 — `subject=<цель>`, показ из кадра контакта. Без урона (защита держит) или когда урон уже показан во время паузы боя (`shown=1`) строк `hit`/`minus`/`hp`/`fall` и CUE-011 нет. Пример — фикстура `combat-staging-text`.
 
 Пример (фикстура `attack-interrupt`):
@@ -193,7 +215,9 @@ CUE fx done id=CUE-011 subject=medusa seq=51 t=1200 ms=900 cut=0
 
 Смерть `CUE death …` и экран `RESULT screen …` (DE-019): DS1 — формат и поля `fall`, поля `RESULT screen`; DS2 — одна смерть на (seq, боец), у неё ровно одна `mark` и одна `gone`, ничего до `fall`; DS3 — этапы F-09 от падения: `mark` +650, `dissolve` = падение + `settle` + `still` (есть тогда и только тогда, когда `dissolve` > 0), `gone` = + `dissolve` и равно полю `gone`, `style=none` тогда и только тогда, когда `dissolve=0`, у v2-фигуры (`settle` > 0) план 875 / 300 у героя и 0 у помощника / 500 или 400 (0 — фолбэк без MIC); DS4 — `staged=1`: есть этап `fall` постановки того же seq и цели, падение смерти — не раньше и не позже 100 мс после него; DS5 — `due` по правилу выше (исчезновение героя из смертей после прошлого экрана), `heroGone` совпадает, экран не раньше `due` и не позже `due` + 100, `wait` = `t` − `gameOver`. DS6 — смертей меньше `--min-death N` (живая партия до GAME_OVER). Сводка: `death_sets`, `death_heroes`, `result_screens`, `hit_to_screen` (контакт постановки → экран, «≈ 3,1 с»).
 
-Сводка гейта: `presented`, `spawned`, `fallback`, `duplicate`, `stale`, `done`, `unique_triples`, `ms_cue`, `ms_cue_sets`, `ms_cue_sources`, `combat_sets`, `combat_cut`, `combat_skipped`, `combat_totals`, `death_sets`, `death_heroes`, `result_screens`, `hit_to_screen`. Для ACC-012 в пакете доказательств записывается строка `CUE_TRACE PASS {…}`.
+Звук `CUE sound …` и громкости `CUE audio …` (DE-032, §3.2): AU1 — формат, точка и её CUE, `class` = `sound_class` таблицы, поля `CUE audio` и `CUE sound drop`; AU2 — звук в кадре события: `dt` = `t` − `event_t`, |`dt`| ≤ 17 мс; AU3 — перезвон только на свой ход (`turn=opp` — `silent reason=opponent`, `turn=own` — не silent, кроме `muted`), каждому `HUD-TURN … initial=0` (own/opp) — строка перезвона того же seq и наоборот; AU4 — `fallback` ⇔ `sound=missing`, `played` ⇔ имя ассета, `silent`/`throttled` ⇔ `none`, `silent` только с `reason`; AU5 — удар: один на (seq, цель), `due` = `t` этапа `contact` постановки своего seq, `t` − `due` ∈ [0, 100]; AU6 — шаг: `edge=k/n` без повторов и все n, если для seq нет `drop`; прыжок — ровно один `edge=snap`; `t` − `due` ∈ [0, 100]; AU7 — на каждый `RESULT screen` ровно один стинг с `event_t` = `t` экрана, стинга без экрана нет; AU8 — `CUE audio` до первого звука, `gain_master` = master/100 (0 при mute), `gain_ambience` = `gain_master` × ambience/100 (0 при mute), `gain` звука = `gain_ambience` у класса `Ambience`, иначе `gain_master`, при 0 — `silent reason=muted`; AU9 — `throttled` только внутри `retrigger_ms` прошлого звука этого CUE, звук внутри него — ошибка; AU10 — строк `CUE sound` меньше `--min-sound N`. В трассе без `CUE audio` и `CUE sound` (клиент до DE-032) AU3/AU7 не сверяются. Сводка: `sounds`, `sound_points`, `sound_fallback`, `sound_played`, `sound_silent`, `sound_throttled`, `audio_lines`, `sound_dt_max`.
+
+Сводка гейта: `presented`, `spawned`, `fallback`, `duplicate`, `stale`, `done`, `unique_triples`, `ms_cue`, `ms_cue_sets`, `ms_cue_sources`, `combat_sets`, `combat_cut`, `combat_skipped`, `combat_totals`, `death_sets`, `death_heroes`, `result_screens`, `hit_to_screen`, поля звука (выше). Для ACC-012 в пакете доказательств записывается строка `CUE_TRACE PASS {…}`.
 
 ## 7. Фикстуры без мира
 

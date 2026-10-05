@@ -341,7 +341,10 @@ void AS08FlowGameMode::BenchResultBegin(const FS08Snapshot& Fixture, bool bBoard
   Hud.Build(S, BenchViewerId, TSet<FString>(), S.SequenceNumber, S.SequenceNumber);
   FString GateLine;
   ResultGate.Update(NowMs(), S.SequenceNumber, Hud.bGameOver, false, -1, GateLine);
-  if (!GateLine.IsEmpty()) FS08Trace::Write(GateLine);
+  if (!GateLine.IsEmpty()) {
+    FS08Trace::Write(GateLine);
+    PlayResultSting(S.SequenceNumber, NowMs());  // DE-032: the sting with the screen (the bench replay too)
+  }
   RefreshHud();
   TickResultScreen();
   if (bBoard) ToggleResultBoard(TEXT("bench"));

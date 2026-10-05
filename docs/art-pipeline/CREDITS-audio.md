@@ -81,5 +81,7 @@
    укладывается в 2–3 с, заменяется следующим кандидатом; не растягивать.
 4. Импортировать в `/Game/Audio/Cue/` и задать класс звука по `sound_class`. Пути удерживать в cook
    (`asset_path_rule` в `cue-table.json`).
-5. В `cue-table.json` указать `sfx.sound` и сменить `status` на `present`. Гейт G-CUE.
+5. В `cue-table.json` указать `sfx.sound` и сменить `status` на `present`. Тот же soft path — в `S08SoundRows::All()`
+   (`unreal/Unmatched/Source/Unmatched/S08/S08CueSound.cpp`, DE-032): UE-тест `Unmatched.S08.CueSound.Table` сверяет
+   его с таблицей. Гейты G-CUE и `check-trace` (AU4: `result=played` с именем ассета вместо `fallback`).
 6. Строку атрибуции внести в `THIRD_PARTY_NOTICES.txt`, а в этом файле сменить статус источника на «импортирован».

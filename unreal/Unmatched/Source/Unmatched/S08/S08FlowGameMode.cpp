@@ -242,9 +242,10 @@ void AS08FlowGameMode::BeginPlay() {
       MoveAnimParams.LeanInMs, MoveAnimParams.TurnMs, MoveAnimParams.SettleMs, MoveAnimParams.bEaseEnds ? 1 : 0));
   // DE-025: the stored settings (UI-ACC-012/013, the volumes - DE-032 applies them) and the combat speed of this run.
   if (const US08UserSettings* Settings = US08UserSettings::Get()) {
-    ArtHud.PendingTrace.Add(FString::Printf(TEXT("SETTINGS saved %s combatSpeed=%.2f audioApplied=0"),
+    ArtHud.PendingTrace.Add(FString::Printf(TEXT("SETTINGS saved %s combatSpeed=%.2f audioApplied=1"),
                                             *Settings->Describe(), CombatSpeedMul()));
   }
+  InitCueSound();  // DE-032: the CUE sounds and the saved volumes (`CUE audio … applied=start`)
   SettingsChangedHandle = US08UserSettings::OnChanged.AddUObject(this, &AS08FlowGameMode::RefreshMotionSettings);
 
   BuildUi();
@@ -1017,6 +1018,7 @@ void AS08FlowGameMode::HandleCues(const TArray<FS08Cue>& InCues) {
       Cues, MoveMotion, [this](const FIntPoint& Cell) { return BoardModel.CellToWorld(Cell.X, Cell.Y); });
   if (Plans.Num() > 0) {
     const int32 Animated = BoardActor ? BoardActor->PlayFighterMoves(Plans, MoveAnimParams, NowMs()) : 0;
+    if (BoardActor) ScheduleStepSounds(Plans);  // DE-032: one step per edge; the first ones play in this frame
     double EndMs = 0.0;
     for (const FS08MovePlan& Plan : Plans) {
       ArriveMs.Add(Plan.FighterId, Plan.ArriveMs());
@@ -1187,6 +1189,11 @@ void AS08FlowGameMode::TryMoveSkip() {
   if (!Pressed) return;
   const int32 Skipped = BoardActor->SkipFighterMoves();
   for (FDeferredDamage& D : DeferredDamage) D.DueMs = FMath::Min(D.DueMs, NowMs());
+  {
+    TArray<FString> Lines;  // DE-032: the landed edges are not shown - their step sounds do not play
+    CueSound.DropSteps(NowMs(), TEXT("skip"), Lines);
+    WriteCueLines(Lines);
+  }
   FS08Trace::Write(FString::Printf(TEXT("MS-ANIM skip key=%s fighters=%d frame=%llu"), *Pressed->ToString(), Skipped,
                                    static_cast<unsigned long long>(GFrameCounter)));
 }
@@ -1220,11 +1227,12 @@ void AS08FlowGameMode::PresentDamageNumber(const FString& FighterId, int32 Damag
   }
 }
 
-void AS08FlowGameMode::PresentHit(const FString& FighterId, int32 Seq, int32 TintMs) {
+void AS08FlowGameMode::PresentHit(const FString& FighterId, int32 Seq, int32 TintMs, int64 DueMs) {
   if (!BoardActor) return;
   // Wave 5c-B: HitReact of a v2 figure; DE-018: the red hit tint from the same frame (450 ms, lethal 550).
   BoardActor->NotifyFighterAnimEvent(FighterId, S08HeroesV2::EEvent::Damaged, Seq);
   BoardActor->PlayFighterHitTint(FighterId, TintMs / 1000.0f);
+  PlayHitSound(FighterId, Seq, DueMs);  // DE-032 (SD-51 p. 2): the hit sound in the same (contact) frame
 }
 
 // ---- DE-025 settings without a restart --------------------------------------
@@ -1234,6 +1242,7 @@ void AS08FlowGameMode::RefreshMotionSettings() {
   const US08UserSettings* Settings = US08UserSettings::Get();
   FS08Trace::Write(FString::Printf(TEXT("SETTINGS changed %s motionChanged=%d"),
                                    Settings ? *Settings->Describe() : TEXT("missing"), Now == MoveMotion ? 0 : 1));
+  ApplyAudioSettings(false);  // DE-032: the volumes apply at once (`CUE audio … applied=change`)
   if (Now == MoveMotion) return;
   MoveMotion = Now;
   if (Flow) Flow->SetMoveMotion(MoveMotion);
@@ -1359,7 +1368,7 @@ void AS08FlowGameMode::RunCombatEvents(const TArray<FS09CombatStageEvent>& Event
         }
         break;
       case ES09CombatEvent::HitReact:
-        PresentHit(In.TargetId, In.Seq, CombatStage.GetHitTintMs());
+        PresentHit(In.TargetId, In.Seq, CombatStage.GetHitTintMs(), Event.AtMs);
         break;
       case ES09CombatEvent::Minus:
         PresentDamageNumber(In.TargetId, In.Damage, In.Seq, CombatStage.MinusLifeMs() / 1000.0f);
@@ -1452,6 +1461,7 @@ void AS08FlowGameMode::TickDeathStage() {
   if (ResultGate.Update(NowMs(), Hud.SequenceNumber, Hud.bGameOver, bHeroFallPending, DeathStage.LatestHeroGoneMs(),
                         Line)) {
     FS08Trace::Write(Line);
+    PlayResultSting(Hud.SequenceNumber, NowMs());  // DE-032 (SD-51 p. 5): the sting starts with the screen
     RefreshHud();
   }
 }
@@ -1637,6 +1647,7 @@ void AS08FlowGameMode::HandleClick() {
                                            Cell.X >= 0 ? *BoardModel.CellLabel(Cell.X, Cell.Y) : TEXT("none"),
                                            *Gated.Toast.Key.ToString()));
           NoteTurnBoardInput(Cell, HitFighterId, Gated);
+          PlayBoardUiSound(Gated, HitFighterId);
         }
         ApplyMoveInput(Gated);
       }
@@ -1657,6 +1668,7 @@ void AS08FlowGameMode::HandleClick() {
                                          HitFighterId.IsEmpty() ? TEXT("none") : *HitFighterId,
                                          Result.bHandled ? 1 : 0, static_cast<int32>(CommandUi.Mode)));
         NoteTurnBoardInput(Cell, HitFighterId, Result);
+        PlayBoardUiSound(Result, HitFighterId);
       }
       ApplyMoveInput(Result);
     }
@@ -2270,11 +2282,14 @@ void AS08FlowGameMode::HandleHudPressOutcome(const FS09HudPressOutcome& Outcome,
       TurnInputWatch.NoteInput(TEXT("hud"), Traced.PressedId.IsNone() ? FString() : Traced.PressedId.ToString(),
                                Traced.Result == ES09HudPressResult::Act, Traced.Reason, GFrameCounter);
   if (!TurnFirst.IsEmpty()) FS08Trace::Write(TurnFirst);
+  const FString PressedId = Traced.PressedId.IsNone() ? FString() : Traced.PressedId.ToString();
   if (Traced.Result == ES09HudPressResult::Act) {
+    PlayUiSound(TEXT("CUE-003"), PressedId);  // DE-032: in the frame of the response (UI-INP-011, SD-51 p. 1)
     if (Action) Action();
     return;
   }
   if (Traced.Result == ES09HudPressResult::Refused) {
+    PlayUiSound(TEXT("CUE-004"), PressedId);
     ShowReason(Traced.Reason, 3.0f); // CUE-004
     RefreshHud();
   }
@@ -4910,6 +4925,7 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
   // MS-T-16: the moves advance on the game clock; a skip key lands them this frame, then the due cascade damage.
   // DE-021 -BenchMovePose: the bench hero's move is held at its review moment.
   if (BoardActor) BoardActor->TickFighterMoves(bBenchMovePose ? BenchMovePoseClockMs : NowMs());
+  if (!bBenchMovePose) TickStepSounds();  // DE-032: the step sound in the frame its edge starts
   TryMoveSkip();
   TickDeferredDamage();
   TickOpponentView();  // MS-T-17: the last-move reveal after the move, its fade, the feed line, the edge arrow
