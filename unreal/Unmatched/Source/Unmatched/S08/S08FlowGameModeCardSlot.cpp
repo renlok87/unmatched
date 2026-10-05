@@ -188,6 +188,7 @@ void AS08FlowGameMode::FeedCardSlot(const FS08Snapshot& Snapshot, const TArray<F
       Step.bFightersChanged = !Before || Before->X != After.X || Before->Y != After.Y ||
                               Before->Health != After.Health || Before->bDefeated != After.bDefeated;
     }
+    Step.bOwnerTurn = Snapshot.CurrentTurnPlayerId == Step.OwnerId;
     Step.Trail = Trail;
     if (const TCHAR* Why = S09SchemeChainContinues(Step)) {
       CardSlot.ContinueChain(Snapshot.SequenceNumber, Why, Lines);

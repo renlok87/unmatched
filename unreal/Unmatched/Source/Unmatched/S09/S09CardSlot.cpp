@@ -344,7 +344,7 @@ const TCHAR* S09SchemeChainContinues(const FS09SchemeChainStep& Step) {
   if (bTrailOfSeq && Step.Trail.Source == TEXT("MANEUVER")) return nullptr;  // a maneuver is a new action
   if (bTrailOfSeq && Step.Trail.Source == TEXT("EFFECT") && Step.Trail.PlayerId == Step.OwnerId) return TEXT("effect");
   if (Step.bPrevQueueOpen) return TEXT("choice");  // no new action is legal while an effect is pending
-  if (!Step.bFightersChanged) return TEXT("quiet");
+  if (!Step.bFightersChanged && Step.bOwnerTurn) return TEXT("quiet");
   return nullptr;
 }
 

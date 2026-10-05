@@ -188,13 +188,14 @@ struct UNMATCHED_API FS09SchemeChainStep {
   bool bNewCard = false;         // the watch put a new SCHEME / BOOSTED card into the slot (a new action)
   bool bPrevQueueOpen = false;   // the previous applied snapshot had an open pending effect (the scheme's choices)
   bool bFightersChanged = true;  // positions / HP / defeat of any fighter differ from the previous snapshot
+  bool bOwnerTurn = true;        // the scheme's owner still has the turn in the new snapshot
   FS09LastMovement Trail;        // metadata.lastMovement of the new snapshot
 };
 
 /** The reason the seq is the rest of the held scheme - "effect" (an EFFECT trail of this seq by the owner),
- *  "choice" (it answers a pending effect open before it), "quiet" (no fighter changed: a draw, the turn passing) -
- *  or nullptr: a new action (a maneuver trail of this seq, a combat, a new slot card, a fighter change with no open
- *  effect), which releases the hold and plays its held moves. */
+ *  "choice" (it answers a pending effect open before it), "quiet" (no fighter changed and the owner keeps the turn:
+ *  a draw) - or nullptr: a new action (a maneuver trail of this seq, a combat, a new slot card, a fighter change with no open
+ *  effect, any other seq once the turn is no longer the owner's - my own begin of a maneuver must see the board), which releases the hold and plays its held moves. */
 UNMATCHED_API const TCHAR* S09SchemeChainContinues(const FS09SchemeChainStep& Step);
 
 /** The held cues of several seqs played as one set (the hold's release): one move cue per fighter - its paths joined

@@ -824,7 +824,13 @@ bool FS09SlotChainTest::RunTest(const FString&) {
   FS09SchemeChainStep Quiet = Answer;
   Quiet.bPrevQueueOpen = false;
   Quiet.bFightersChanged = false;
-  TestEqual("nothing changed on the board (a draw, the turn passing)", Why(Quiet), FString(TEXT("quiet")));
+  TestEqual("nothing changed on the board in the owner's turn (a draw)", Why(Quiet), FString(TEXT("quiet")));
+  FS09SchemeChainStep Passed = Quiet;
+  Passed.bOwnerTurn = false;
+  TestEqual("a quiet seq after the turn passed (my begin of a maneuver) is new", Why(Passed), FString(TEXT("new")));
+  FS09SchemeChainStep PassedAnswer = Answer;
+  PassedAnswer.bOwnerTurn = false;
+  TestEqual("the scheme's open choice still holds after the turn passed", Why(PassedAnswer), FString(TEXT("choice")));
   FS09SchemeChainStep Moved = Quiet;
   Moved.bFightersChanged = true;
   TestEqual("a board change with nothing open is new", Why(Moved), FString(TEXT("new")));
