@@ -7,6 +7,11 @@
 - Проверка — `python tools/art/de013/de013.py check`.
 - Тесты — `python -m pytest tools/art/tests/test_de013_sound_list.py`.
 
+**Обновление 2026-10-05 (AU-S4).** Kenney Interface / Impact / RPG Audio скачаны (CC0), из них собраны SFX
+(`tools/audio/sfx_build.py`); роли DE-013 заменены единицами реестра [03-sound-registry.csv](../game-design/audio/03-sound-registry.csv)
+(колонка `de013_role`). Музыка, стинги и голоса — генерация через SYNTX, окружение — собственный синтез. Итог —
+[07-production-log.md](../game-design/audio/07-production-log.md). Атрибуция — `unreal/Unmatched/Licenses/THIRD_PARTY_NOTICES.txt`.
+
 **Состояние на 2026-10-04.**
 - Ни один звук не скачан и не импортирован, покупок нет.
 - У всех CUE в `docs/unreal/contracts/cue-dispatcher/cue-table.json` остаётся `sfx.status = missing`.
