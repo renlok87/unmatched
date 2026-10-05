@@ -854,7 +854,7 @@ function Invoke-CombatDemo {
       # written; not gated.
       foreach ($side in @('host', 'joiner')) {
         foreach ($leaf in @('s09-turn-banner.png', 's09-hand-limit-hint.png', 's09-discard-open.png',
-            's09-card-slot-opp.png', 's09-card-slot-own.png')) {
+            's09-card-slot-opp.png', 's09-card-slot-own.png', 's09-no-defense-stamp.png')) {
           $runEFrame = Join-Path $side $leaf
           if (Test-Path -LiteralPath (Join-Path $Script:Staging $runEFrame)) { $publishNames += $runEFrame }
           else { Write-Output "run E frame: $side has no $leaf" }

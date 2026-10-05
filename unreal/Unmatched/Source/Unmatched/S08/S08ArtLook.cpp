@@ -5,6 +5,7 @@
 #include "S08EnvLayout.h"
 #include "S08HeroesV2.h"
 #include "S08Render.h"
+#include "S08TurnPortraitWidget.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
 
@@ -51,10 +52,14 @@ FString TraceLine() {
   if (FParse::Param(Cmd, S08Diorama::FlagName)) Aliases.Add(FString(TEXT("-")) + S08Diorama::FlagName);
   // On the grey board the figure / tray choice is not consulted (no art board): the fields still say what an art board
   // of this run would show.
-  return FString::Printf(TEXT("ARTLOOK art=%d source=%s heroes=%s tray=%s env=%s review=%d legacyRender=%d aliases=%s%s"),
-                         bArt ? 1 : 0, Source, *Heroes, *Tray, *Env, ReviewTooling() ? 1 : 0,
-                         S08LegacyRender() ? 1 : 0, Aliases.Num() ? *FString::Join(Aliases, TEXT(",")) : TEXT("-"),
-                         bArt ? TEXT("") : TEXT(" (grey board: no art profile, figures, tray or art HUD layer)"));
+  if (FParse::Param(Cmd, TEXT("S08HeartGlow"))) Aliases.Add(TEXT("-S08HeartGlow"));  // run I: the glow is the default
+  // Run I (AB-5..AB-8): the turn HUD look of the portraits and the combat panel (S08TurnPortraitWidget.h)
+  const FString HudLook = FS08TurnHudLook::ArtLookField(Cmd);
+  return FString::Printf(
+      TEXT("ARTLOOK art=%d source=%s heroes=%s tray=%s env=%s review=%d legacyRender=%d aliases=%s %s%s"), bArt ? 1 : 0,
+      Source, *Heroes, *Tray, *Env, ReviewTooling() ? 1 : 0, S08LegacyRender() ? 1 : 0,
+      Aliases.Num() ? *FString::Join(Aliases, TEXT(",")) : TEXT("-"), *HudLook,
+      bArt ? TEXT("") : TEXT(" (grey board: no art profile, figures, tray or art HUD layer)"));
 }
 
 }  // namespace S08ArtLook

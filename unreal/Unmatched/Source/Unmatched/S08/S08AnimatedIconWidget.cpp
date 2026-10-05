@@ -68,6 +68,7 @@ bool US08AnimatedIconWidget::SetIcon(FName InIconId, float InSizeSu, int32 InTex
   if (!NewDef || !Stage || !Box) return false;
   // Same icon, new size (DPI, zoom): rebuild the images but keep the animation state (no restart of appear/pulse).
   const bool bSameIcon = NewDef == Def && InIconId == IconId;
+  if (!bSameIcon) LayerSources.Reset();
   Def = NewDef;
   IconId = InIconId;
   SizeSu = InSizeSu;
@@ -88,6 +89,7 @@ bool US08AnimatedIconWidget::SetIcon(FName InIconId, float InSizeSu, int32 InTex
     const FS08IconLayer& Layer = Def->Layers[L];
     FString Src = Layer.Src;
     if (Src == BaseId && InIconId != Def->Icon) Src = InIconId.ToString();
+    if (const FString* Override = LayerSources.Find(Layer.Id)) Src = *Override;
     const int32 Frames = Src.EndsWith(TEXT("#")) ? FMath::Max(Layer.Frames, 1) : 1;
     LayerFirstTexture.Add(Textures.Num());
     LayerFrameCount.Add(Frames);
@@ -149,6 +151,36 @@ void US08AnimatedIconWidget::SetLayerHidden(FName LayerId, bool bHidden) {
     bDirty = true;
     ApplyPose(GetClockMs());
   }
+}
+
+bool US08AnimatedIconWidget::SetLayerSource(FName LayerId, const FString& Src) {
+  if (!Def || Src.IsEmpty() || Src.EndsWith(TEXT("#"))) return false;
+  for (int32 L = 0; L < Def->Layers.Num() && L < LayerImages.Num(); ++L) {
+    if (Def->Layers[L].Id != LayerId) continue;
+    if (LayerFrameCount[L] != 1) return false;
+    if (GetLayerSource(LayerId) == Src) return true;
+    UTexture2D* Tex = LoadObject<UTexture2D>(nullptr, *S08IconMotion::TextureObjectPath(Src, 0, TexturePx));
+    if (!Tex) {
+      UE_LOG(LogTemp, Warning, TEXT("S08 icon motion: layer %s src %s not found"), *LayerId.ToString(), *Src);
+      return false;
+    }
+    Textures[LayerFirstTexture[L]] = Tex;
+    FSlateBrush Brush = LayerImages[L]->GetBrush();
+    Brush.SetResourceObject(Tex);
+    LayerImages[L]->SetBrush(Brush);
+    LayerSources.Add(LayerId, Src);
+    return true;
+  }
+  return false;
+}
+
+FString US08AnimatedIconWidget::GetLayerSource(FName LayerId) const {
+  if (const FString* Override = LayerSources.Find(LayerId)) return *Override;
+  if (!Def) return FString();
+  for (const FS08IconLayer& Layer : Def->Layers) {
+    if (Layer.Id == LayerId) return Layer.Src;
+  }
+  return FString();
 }
 
 void US08AnimatedIconWidget::ShowAtRest(FName HeldEvent) {

@@ -734,6 +734,20 @@ bool FS09DeathStageResultGateTest::RunTest(const FString&) {
       TestTrue("the line names the staging hold", Line.EndsWith(FString::Printf(TEXT(" staging=%lld"), PlainDue + 233)));
     }
     {
+      // run I acceptance (Marmoreal, seq 59): live, the staging is inactive on the tick it ends, so the caller passes
+      // -1 exactly when the held screen opens - the gate still opens at the staging end and names the hold.
+      FS09ResultGate Gate;
+      FString Line;
+      int64 Shown = -1;
+      const int64 End = PlainDue + 1525;
+      for (int64 T = 2000; T <= 9000 && Shown < 0; ++T) {
+        if (Gate.Update(T, 59, true, false, Death.LatestHeroGoneMs(), Line, T < End ? End : -1)) Shown = T;
+      }
+      TestEqual("staging gone on its end tick: the screen opens at that end", Shown, End);
+      TestTrue("staging gone on its end tick: the line still names the hold",
+               Line.EndsWith(FString::Printf(TEXT(" staging=%lld"), End)));
+    }
+    {
       FS09ResultGate Gate;
       FString Line;
       int64 Shown = -1;

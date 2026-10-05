@@ -1504,7 +1504,9 @@ void AS08FlowGameMode::NoteBoardDeaths(const TArray<FS08BoardFighter>& BoardView
         In.DissolveMs = FMath::RoundToInt(Plan.DissolveSeconds * 1000.0f);
         In.Style = Style;
       }
-      DeathStage.Begin(In, NowMs(), CueDispatcher, Lines);
+      // run I (AB-8): the heart mark crosses the fallen hero's heart (resource-hp-fallen) wherever the portraits draw
+      // it; -S08CrossLegacy and the grey board (no portraits) keep the dark heart
+      DeathStage.Begin(In, NowMs(), CueDispatcher, Lines, OwnPortrait != nullptr && TurnHudLook.bCrossGlyphs);
       AudioOnDeath(In.FighterId, In.bHero, In.Seq, In.SettleMs + In.StillMs);  // AU-S4: CUE-013, VO, stings
     }
     BoardAliveById.Add(F.Id, bAlive);
@@ -1597,7 +1599,33 @@ void AS08FlowGameMode::BuildCombatStageHud() {
       [CardPanel(FString::Printf(TEXT("ATTACK - %s"), *In.AttackerLabel), R.bAttackKnown ? &R.Attack : nullptr,
                  AttackValue, AttackAccent)];
   if (R.bNoDefense) {
-    // SD-04: the red cross stamp of "no defense" comes with the reveal.
+    // SD-04: the red cross stamp of "no defense" comes with the reveal. Run I (AB-8): the accepted marker-x-stamp
+    // (appear: the X stamps in 0 -> 1.08 -> 1, 200 ms) once per combat on one persistent widget - RefreshHud rebuilds
+    // this panel; -S08CrossLegacy and the grey board keep the text X.
+    TSharedRef<SWidget> Stamp = SNew(STextBlock).Text(FText::FromString(TEXT("X")))
+                                    .Font(FCoreStyle::GetDefaultFontStyle("Bold", 54))
+                                    .ColorAndOpacity(FSlateColor(CrossRed));
+    if (OwnPortrait && TurnHudLook.bCrossGlyphs && GetWorld()) {
+      if (!NoDefenseStamp) {
+        NoDefenseStamp = CreateWidget<US08AnimatedIconWidget>(GetWorld(), US08AnimatedIconWidget::StaticClass());
+        if (NoDefenseStamp && !NoDefenseStamp->SetIcon(FS08TurnHudLook::NoDefenseStampIcon, 64.0f, 64)) {
+          NoDefenseStamp = nullptr;
+        }
+        if (NoDefenseStamp) NoDefenseStamp->SetVisibility(ESlateVisibility::HitTestInvisible);
+      }
+      if (NoDefenseStamp) {
+        const FString Key = FString::Printf(TEXT("%d|%s"), In.Seq, *In.TargetId);
+        if (Key != NoDefenseStampKey) {
+          NoDefenseStampKey = Key;
+          NoDefenseStamp->PlayAnim(TEXT("appear"));
+          FS08Trace::Write(FString::Printf(TEXT("HUD-STAMP no-defense seq=%d target=%s icon=%s"), In.Seq,
+                                           *In.TargetId, FS08TurnHudLook::NoDefenseStampIcon));
+          // run I acceptance: the auto client frames the first stamp once its 200 ms appear has landed
+          if (bAutoS09 && !S09ShotDir.IsEmpty() && ShotStampAtElapsed < 0.0f) ShotStampAtElapsed = Elapsed + 0.25f;
+        }
+        Stamp = NoDefenseStamp->TakeWidget();
+      }
+    }
     CombatEdgeRight->AddSlot().AutoHeight()
         [SNew(SBorder)
              .BorderImage(FCoreStyle::Get().GetBrush("WhiteBrush"))
@@ -1609,10 +1637,7 @@ void AS08FlowGameMode::BuildCombatStageHud() {
                        [SNew(STextBlock).Text(FText::FromString(FString::Printf(TEXT("DEFENSE - %s"), *In.TargetLabel)))
                             .Font(FCoreStyle::GetDefaultFontStyle("Bold", 13))
                             .ColorAndOpacity(FSlateColor(DefenseAccent))] +
-                   SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Center)
-                       [SNew(STextBlock).Text(FText::FromString(TEXT("X")))
-                            .Font(FCoreStyle::GetDefaultFontStyle("Bold", 54))
-                            .ColorAndOpacity(FSlateColor(CrossRed))] +
+                   SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Center).Padding(0, 4)[Stamp] +
                    SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Center)
                        [SNew(STextBlock).Text(FText::FromString(TEXT("NO DEFENSE")))
                             .Font(FCoreStyle::GetDefaultFontStyle("Bold", 16))
@@ -4208,6 +4233,7 @@ void AS08FlowGameMode::TakeS09Shots() {
   TakeOnce(bS09ShotHint, ShotHintAtElapsed, TEXT("s09-hand-limit-hint.png"));
   TakeOnce(bS09ShotSlotOpp, ShotSlotOppAtElapsed, TEXT("s09-card-slot-opp.png"));
   TakeOnce(bS09ShotSlotOwn, ShotSlotOwnAtElapsed, TEXT("s09-card-slot-own.png"));
+  TakeOnce(bS09ShotStamp, ShotStampAtElapsed, TEXT("s09-no-defense-stamp.png"));  // run I acceptance (AB-8)
   TakeS09DeckPanelShots();
   if (!bS09ShotHud && ShotHudAtElapsed >= 0.0f && Elapsed >= ShotHudAtElapsed) {
     bS09ShotHud = true;
@@ -4746,10 +4772,48 @@ void AS08FlowGameMode::RunAutoManeuver() {
   ManeuverStartSeq = Snap.SequenceNumber;
 }
 
+bool AS08FlowGameMode::IsEvidenceCaptureBusy() const {
+  return FScreenshotRequest::IsScreenshotRequested() || !ArtHud.PendingCapturePath.IsEmpty();
+}
+
 void AS08FlowGameMode::TakeEvidenceShot(const FString& InPath) {
   auto* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
   if (!PC) return;
   bShotTaken = true;
+  const FString BasePath = InPath.IsEmpty() ? AutoShotPath : InPath;
+  // I-03 (D-1 of run H): only the FScreenshotRequest path holds one engine-wide request; the slate capture and the
+  // path-less diagnostics run at once.
+  const bool bRequestCapture = !BasePath.IsEmpty() && !(S09ShotMode == TEXT("slate") && HudCanvas.IsValid());
+  if (bRequestCapture) {
+    const bool bBusy = IsEvidenceCaptureBusy();
+    const bool bSameFrame = EvidenceShotQueue.IssuedThisFrame(GFrameCounter);
+    const int32 Ahead = EvidenceShotQueue.Num();
+    if (!EvidenceShotQueue.Admit(BasePath, GFrameCounter, bBusy)) {
+      FS08Trace::Write(FString::Printf(TEXT("SHOT queued file=%s frame=%llu ahead=%d reason=%s"),
+                                       *FPaths::GetCleanFilename(BasePath),
+                                       static_cast<unsigned long long>(GFrameCounter), Ahead,
+                                       Ahead > 0 ? TEXT("order") : bSameFrame ? TEXT("same-frame") : TEXT("in-flight")));
+      return;
+    }
+  }
+  CaptureEvidenceShot(BasePath);
+}
+
+void AS08FlowGameMode::DrainEvidenceShotQueue() {
+  if (EvidenceShotQueue.Num() == 0) return;
+  if (!GetWorld() || !GetWorld()->GetFirstPlayerController()) return;
+  FS08ShotQueue::FEntry Entry;
+  if (!EvidenceShotQueue.PopReady(GFrameCounter, IsEvidenceCaptureBusy(), Entry)) return;
+  FS08Trace::Write(FString::Printf(TEXT("SHOT dequeued file=%s frame=%llu queuedFrame=%llu left=%d"),
+                                   *FPaths::GetCleanFilename(Entry.Path),
+                                   static_cast<unsigned long long>(GFrameCounter),
+                                   static_cast<unsigned long long>(Entry.QueuedFrame), EvidenceShotQueue.Num()));
+  CaptureEvidenceShot(Entry.Path);
+}
+
+void AS08FlowGameMode::CaptureEvidenceShot(const FString& BasePath) {
+  auto* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
+  if (!PC) return;
   // Diagnostics: what the renderer actually sees at this moment.
   {
     FVector2D ViewportSize(0.0, 0.0);
@@ -4833,7 +4897,6 @@ void AS08FlowGameMode::TakeEvidenceShot(const FString& InPath) {
   // composites the viewport + Slate UI (UE 5.8 UnrealClient.h). "slate" mode
   // renders the HUD canvas widget alone through the Slate renderer for the
   // offscreen fallback probe.
-  const FString BasePath = InPath.IsEmpty() ? AutoShotPath : InPath;
   if (BasePath.IsEmpty()) return;
   if (S09ShotMode == TEXT("slate") && HudCanvas.IsValid()) {
     TArray<FColor> Pixels;
@@ -4870,6 +4933,7 @@ void AS08FlowGameMode::TakeEvidenceShot(const FString& InPath) {
 void AS08FlowGameMode::Tick(float DeltaSeconds) {
   Super::Tick(DeltaSeconds);
   Elapsed += DeltaSeconds;
+  DrainEvidenceShotQueue(); // I-03: a queued evidence shot goes out before this frame asks for new ones
   if (bIconGallery) {
     IconGalleryTick(DeltaSeconds);
     return;
@@ -5500,6 +5564,8 @@ void AS08FlowGameMode::ClearGameplayHud() {
   ActionTracker.Reset();
   TurnCue.Reset();  // DE-023
   TrackerMarks.Reset();
+  OwnChosenType = NAME_None;
+  NoDefenseStampKey.Reset();
   OwnHeart.Reset();
   OpponentHeart.Reset();
   bTrackerResetPending = true;

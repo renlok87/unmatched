@@ -177,10 +177,14 @@ public:
     int32 Spent = 0;
     bool operator==(const FSlots& O) const { return Slots == O.Slots && Spent == O.Spent; }
   };
-  /** An applied snapshot. ActionsRemaining -1 = unknown (a merge without metadata): the marks stay. Returns the
-   *  'MS-TRACK ...' trace line when anything visible changed ('' otherwise). */
+  /** An applied snapshot. ActionsRemaining -1 = unknown (a merge without metadata): the marks stay. SpentAs = the
+   *  action type of the slots this snapshot spends (S09OpponentView::SpentActionType; run I, AB-7: the DE tracker
+   *  fills a spent slot with the icon of its type). Returns the 'MS-TRACK ...' trace line when anything visible
+   *  changed ('' otherwise). */
   FString OnApplied(int32 Seq, const FString& TurnPlayerId, int32 TurnCount, int32 ActionsRemaining,
-                    const FString& ViewerId, double NowMs);
+                    const FString& ViewerId, double NowMs, FName SpentAs = NAME_None);
+  /** The type of spent slot Index of the active turn ('attack' / 'maneuver' / 'scheme'; NAME_None unknown). */
+  FName SpentType(int32 Index) const { return SpentTypes.IsValidIndex(Index) ? SpentTypes[Index] : NAME_None; }
   FSlots Own() const { return bOwnTurn ? TurnSlots : FSlots(); }
   FSlots Opponent() const { return bOpponentTurn ? TurnSlots : FSlots(); }
   bool OpponentVisible() const { return bOpponentTurn; }
@@ -194,6 +198,7 @@ private:
   bool bOwnTurn = false;
   bool bOpponentTurn = false;
   FSlots TurnSlots;  // the active player's marks of this turn
+  TArray<FName> SpentTypes;  // the type of each spent slot of this turn (index = slot)
   double OpponentSinceMs = 0.0;
   FString TraceKey;
 };
@@ -242,6 +247,11 @@ UNMATCHED_API FEdgeArrow EdgeArrow(const FVector2D& Target, bool bProjected, con
  *  Maneuver, the opponent's pendingHandDiscard -> Card, the opponent's turn -> Turn; None otherwise and at
  *  GAME_OVER. */
 UNMATCHED_API ES09OpponentVerb OpponentVerb(const FS08Snapshot& Snapshot, const FString& ViewerId);
+/** Run I (AB-7, the DE tracker): the action type a snapshot that spends an action shows - 'maneuver' (an open
+ *  pendingManeuver, or a MANEUVER lastMovement of this very seq), 'attack' (the open combat: combatInfo or a COMBAT
+ *  phase), else 'scheme' (the third action of the turn - a scheme card leaves neither). The snapshot carries no
+ *  type of its own; a seq gap that skipped the maneuver / combat snapshot reads as 'scheme'. */
+UNMATCHED_API FName SpentActionType(const FS08Snapshot& Snapshot);
 /** metadata.pendingEffects with only id / playerId / type / text read (server order; [0] is the head). */
 UNMATCHED_API TArray<FS08PendingEffect> PendingQueue(const FS08Snapshot& Snapshot);
 /** ms.opp.planning / ms.opp.phase.* of a verb (NAME_None for None). */

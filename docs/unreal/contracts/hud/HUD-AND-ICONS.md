@@ -610,20 +610,22 @@ DE, сердце павшего и штамп в форме Codex (`art/imagegen
 
 | Id (окончательный) | Рабочий id W-05 | Статус | Что | Слои / текстуры | Куда в HUD |
 |---|---|---|---|---|---|
-| `marker-turn-ring` | тот же | принят (AB-5, форма v3) | кольцо хода у портрета активного игрока (SD-34, F-07): тлеющий обод + вспышка жёлтый → красный | `_rim`, `_flash#` (7 кадров) | DE-023, постоянный UMG-виджет портрета, по умолчанию |
+| `marker-turn-ring` | тот же | принят (AB-5, форма v3) | кольцо хода у портрета активного игрока (SD-34, F-07): тлеющий обод + вспышка жёлтый → красный | `_rim`, `_flash#` (7 кадров) | DE-023, постоянный UMG-виджет портрета, по умолчанию; откат `-S08TurnRingLegacy` |
 | `marker-turn-ring-team` | — | кандидат | вариант кольца «обод цветом команды С-11» | `_rim`, `_flash` (белые, `tint: team`) | только галерея и опция `-S08TurnRingIcon` |
-| `resource-hp-fallen` | тот же | принят (AB-8, форма Codex) | сердце павшего бойца (SD-38): почерневшее сердце + малый X `state.error` | `_heart` + `_cross` | DE-019 / DE-023, плашка бойца |
-| `marker-x-stamp` | тот же | принят (AB-8, форма Codex) | компактный крест-штамп «нет защиты» / «отменено» (SD-37) | весь значок | слот защиты (CUE-009) |
-| `marker-action-slot-de` | «слот трекера (вариант DE)» | принят (AB-7, форма Codex) | трекер DE (F-12): оранжевый обод и серый диск-призрак, заливка типом | `_ring` + `action-<тип>_body/_glyph` | трекер портрета DE-023 по умолчанию, v3 — флагом отката |
-| `resource-hp-full` (новый слой) | damage | принят (AB-6) | ореол урона `_glow` под пульс damage 1000 мс (SD-35) | `resource-hp-full_glow` | DE-023, по умолчанию |
+| `resource-hp-fallen` | тот же | принят (AB-8, форма Codex) | сердце павшего бойца (SD-38): почерневшее сердце + малый X `state.error` | `_heart` + `_cross` | сердце портрета героя DE-023 на метке смерти DE-019 (+1100 от контакта), по умолчанию; откат `-S08CrossLegacy` |
+| `marker-x-stamp` | тот же | принят (AB-8, форма Codex) | компактный крест-штамп «нет защиты» / «отменено» (SD-37) | весь значок | панель защиты боя «NO DEFENSE» (CUE-009, SD-04), 64 px, по умолчанию; откат `-S08CrossLegacy` |
+| `marker-action-slot-de` | «слот трекера (вариант DE)» | принят (AB-7, форма Codex) | трекер DE (F-12): оранжевый обод и серый диск-призрак, заливка типом | `_ring` + `action-<тип>_body/_glyph` | трекер портрета DE-023 по умолчанию; откат `-S08TrackerLegacy` (v3) |
+| `resource-hp-full` (новый слой) | damage | принят (AB-6) | ореол урона `_glow` под пульс damage 1000 мс (SD-35) | `resource-hp-full_glow` | DE-023, по умолчанию; откат `-S08HeartGlowLegacy` |
 
 Текстуры UE — `/Game/S08/UI/IconsV3/T_IV3_<id>_<px>` (24/32/48/64), отчёт `ue-import-report.json` (340 текстур; 2026-10-05 переимпортированы сердце павшего, штамп и слот DE, добавлен слой `resource-hp-fallen_heart`).
 
 **DE-023 (2026-10-05).** Постоянный UMG-портрет игрока `US08TurnPortraitWidget` (`S08/S08TurnPortraitWidget.*`):
-кольцо хода, сердце `resource-hp-full` (24 px), трекер `resource-action-full` (32 px). По умолчанию кандидатов в HUD
-нет: кольцо — опция `-S08TurnRingIcon=<id>`, ореол сердца — `-S08HeartGlow`. Обе — для листа A/B DE-028; превью
-портретов в галерее — `-S08IconGallery -S08IconGalleryPortraits`. После арт-приёмки 2026-10-05 кольцо, ореол и трекер
-DE становятся видом по умолчанию — это код HUD прогона I ([I-2026-10-05.md](../../../game-design/de-footage/task/runs/I-2026-10-05.md)).
+кольцо хода, сердце `resource-hp-full` (24 px), трекер (32 px). Превью портретов в галерее — `-S08IconGallery
+-S08IconGalleryPortraits`. **С прогона I (I-02, [I-2026-10-05.md](../../../game-design/de-footage/task/runs/I-2026-10-05.md))
+принятый вид AB-5…AB-8 — по умолчанию:** тёплое кольцо `marker-turn-ring`, ореол урона, трекер DE
+`marker-action-slot-de` с заливкой типом действия, сердце павшего `resource-hp-fallen` на метке смерти и штамп
+`marker-x-stamp` «нет защиты». Откаты: `-S08TurnRingLegacy`, `-S08HeartGlowLegacy`, `-S08TrackerLegacy`, `-S08CrossLegacy` (S08TurnPortraitWidget.h, S08ArtLook.h). Строка `ARTLOOK`
+пишет вид полем `hud=…`. `-S08TurnRingIcon=<id>` выбирает другую запись кольца (кандидат цвета команды — для ревью).
 
 ## 4. Трассировка
 

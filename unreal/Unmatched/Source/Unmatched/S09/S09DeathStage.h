@@ -115,5 +115,8 @@ private:
   int64 GameOverMs = -1;
   int64 HeroGoneMs = -1;
   int64 ShownMs = -1;
+  // run I acceptance: the latest staging end seen after GAME_OVER. The staging goes inactive on the very tick it ends,
+  // which is the tick the held screen opens - the gate keeps the end so that tick still knows (and traces) the hold.
+  int64 HeldStagingEndMs = -1;
   bool bShown = false;
 };

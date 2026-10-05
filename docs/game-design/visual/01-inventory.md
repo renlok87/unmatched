@@ -56,6 +56,10 @@
 - **Принятое лично 2026-10-05 в коде выключено.** Кольцо хода только с `-S08TurnRingIcon=`, ореол только с
   `-S08HeartGlow`, трекер v3, сердца павшего и штампа X нет. Формы Codex не перенесены в движок v3 и UE. Это нарушает
   правило AGENTS.md «принятый арт по умолчанию». «Прогон I» не спланирован, владельца нет.
+  **Обновление 2026-10-05:** закрыто прогоном I
+  ([I-2026-10-05.md](../de-footage/task/runs/I-2026-10-05.md)):
+  - I-01 перенёс формы Codex в движок v3 и UE;
+  - I-02 включил AB-5…AB-8 по умолчанию; откаты — `-S08TurnRingLegacy`, `-S08HeartGlowLegacy`, `-S08TrackerLegacy`, `-S08CrossLegacy`.
 - **Marmoreal по умолчанию — 3D P5c,** а не нарисованный задник ENV-U16 (`conceptPaste.default "off"`). Нарисованный
   есть только флагом `-ConceptPaste`: сырой концепт без чистой плиты и без анимации. `0f2bdb9a` сделал P5c видом без
   флагов, но нарисованного Marmoreal по умолчанию не было и раньше: корень — трактовка ENV-U15 п. 5 от 2026-10-01.
@@ -221,10 +225,10 @@
 | Движение значков: контракт, эталон Python, рантайм | технически импортировано; UE против эталона \|Δ\| 0,393 (64 px), 0,726 (32 px) | по делегированию (ART-011) | анимируются жетон, сердце, трекер; галерея `-S08IconGallery` | [icon-motion.json:3-4](../../unreal/contracts/hud/icon-motion.json), [ICON-MOTION.md](../../unreal/contracts/hud/ICON-MOTION.md) |
 | Живой жетон, qa010 icon pass | измерено на Cobble 5×6 в reduced motion; после 2026-10-04 доказательством не считается | — | — | [ART-011 README.md:63-75](../evidence/ART-011/hud-icons-v3-2026-10-03/README.md) |
 | Формы DE-012 от Codex: кольцо хода (форма v3), сердце павшего, штамп X, слот DE | **художественно принято**; в движке и UE нет | лично, 2026-10-05: «приемку DE012 я одобряю» | — | [01-decisions.md:675-680](../de-footage/task/01-decisions.md), [hud-icons-de012-codex/README.md](../../../art/imagegen/hud-icons-de012-codex/README.md) |
-| AB-5 тёплое кольцо хода | лично принято; не включено | лично, 2026-10-05: «тёплое» (пересказ) | только `-S08TurnRingIcon=marker-turn-ring` | [S08TurnPortraitWidget.h:36](../../../unreal/Unmatched/Source/Unmatched/S08/S08TurnPortraitWidget.h) |
-| AB-6 ореол сердца | лично принято; не включено; цвет не решён | лично, 2026-10-05: «вкл» (пересказ) | только `-S08HeartGlow` | [STYLE-v3.md:543,548](../../../art/imagegen/hud-icons-v3/STYLE-v3.md) |
-| AB-7 трекер DE | лично принято; не реализовано (галерея показывает форму движка) | лично, 2026-10-05: «DE» (пересказ) | трекер v3 | [01-decisions.md:672](../de-footage/task/01-decisions.md) |
-| AB-8 сердце павшего и штамп X | лично принято; не реализовано; «NO DEFENSE» рисуется текстовой X | лично, 2026-10-05: «да», в форме Codex (пересказ) | сердце только чернеет | [01-decisions.md:673](../de-footage/task/01-decisions.md) |
+| AB-5 тёплое кольцо хода | лично принято; включено по умолчанию в I-02 (откат `-S08TurnRingLegacy`) | лично, 2026-10-05: «тёплое» (пересказ) | только `-S08TurnRingIcon=marker-turn-ring` | [S08TurnPortraitWidget.h:36](../../../unreal/Unmatched/Source/Unmatched/S08/S08TurnPortraitWidget.h) |
+| AB-6 ореол сердца | лично принято; включено по умолчанию в I-02 (откат `-S08HeartGlowLegacy`); цвет как в STYLE-v3 | лично, 2026-10-05: «вкл» (пересказ) | только `-S08HeartGlow` | [STYLE-v3.md:543,548](../../../art/imagegen/hud-icons-v3/STYLE-v3.md) |
+| AB-7 трекер DE | лично принято; по умолчанию в I-02 (откат `-S08TrackerLegacy`) | лично, 2026-10-05: «DE» (пересказ) | трекер v3 | [01-decisions.md:672](../de-footage/task/01-decisions.md) |
+| AB-8 сердце павшего и штамп X | лично принято; по умолчанию в I-02 (откат `-S08CrossLegacy`) | лично, 2026-10-05: «да», в форме Codex (пересказ) | сердце только чернеет | [01-decisions.md:673](../de-footage/task/01-decisions.md) |
 | `marker-turn-ring-team` | отклонено выбором AB-5; из контракта и Content не удалён | лично, 2026-10-05 | опция `-S08TurnRingIcon=` | [ICON-MOTION.md:202-203](../../unreal/contracts/hud/ICON-MOTION.md) |
 | Значки v2 (9 масок ImageGen + `compose_icons.py`) | отклонено | лично, 2026-10-03 | не используется | [hud-icons-v2/README.md:3](../../../art/imagegen/hud-icons-v2/README.md) |
 | mvp-v1 UI: 99 PNG (из 304 в mvp-v1) | заменено: 72 «перерисовать», 19 «заменить», 8 «оставить» | — | чипы `T_UI_TeamShape_*` в плашках — по умолчанию | [HUD-AND-ICONS.md:417-534](../../unreal/contracts/hud/HUD-AND-ICONS.md) |

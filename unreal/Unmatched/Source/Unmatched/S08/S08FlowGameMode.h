@@ -41,6 +41,7 @@
 #include "S08VoDirector.h"
 #include "S08Ambience.h"
 #include "S08MoveAnim.h"
+#include "S08ShotQueue.h"
 #include "S08TurnPortraitWidget.h"
 #include "S08FlowGameMode.generated.h"
 
@@ -367,7 +368,15 @@ private:
   }
   // ---- demo drive ----
   void RunAutoManeuver();
+  /** Evidence PNG (InPath empty = AutoShotPath). I-03 (D-1 of run H): at most one FScreenshotRequest per frame - a
+   *  shot asked while one is in flight (or after another one this frame) waits in EvidenceShotQueue and is captured in
+   *  a following frame under its own name ("SHOT queued" / "SHOT dequeued"); the SHOT ctx / RENDER / fighter lines are
+   *  written when the request really leaves. */
   void TakeEvidenceShot(const FString& InPath);
+  void CaptureEvidenceShot(const FString& BasePath);
+  /** Start of Tick: lets the oldest queued evidence shot out when no capture is in flight and none left this frame. */
+  void DrainEvidenceShotQueue();
+  bool IsEvidenceCaptureBusy() const;
   // ---- ART-004 stage 3 T2.2: art HUD (plate, compact labels, exact-size
   // combat icon), zoom config and INPUT/CAMERA/PLATE/SHOT traces ----
   void BuildArtHudWidgets(const TSharedRef<SConstraintCanvas>& Canvas);
@@ -696,6 +705,9 @@ private:
   float ShotHintAtElapsed = -1.0f;
   float ShotSlotOppAtElapsed = -1.0f;
   float ShotSlotOwnAtElapsed = -1.0f;
+  // Run I acceptance (AB-8): one frame of the first "no defense" stamp (marker-x-stamp) in the combat panel.
+  bool bS09ShotStamp = false;
+  float ShotStampAtElapsed = -1.0f;
   // Run F G-LIVE (DE-031): the deck side panel (DE-030) in a live match - the auto client opens it in the opponent's
   // turn once both discard piles hold a card, frames my deck, then the opponent's, and leaves it open so my next turn
   // closes it (trace 'DECK panel close ... why=input:turn'); the final board of the result screen (DE-029).
@@ -863,6 +875,8 @@ private:
   FS09TrackerMarks TrackerMarks;
   FS09HeartWatch OwnHeart;
   FS09HeartWatch OpponentHeart;
+  /** Run I (AB-7): the type of the own action last chosen (NoteActionChosen) - the DE slot of the local mark. */
+  FName OwnChosenType;
   bool bTrackerResetPending = true;
   bool bTurnRingAtRest = false;
   FString TurnHudShownKey;
@@ -1060,6 +1074,11 @@ private:
   TObjectPtr<US08TurnPortraitWidget> OpponentPortrait;
   UPROPERTY()
   TArray<TObjectPtr<US08TurnPortraitWidget>> GalleryPortraits;
+  // Run I (AB-8): the marker-x-stamp of "no defense" in the combat panel - one persistent widget (RefreshHud rebuilds
+  // the panel; the stamp plays its appear once per combat, NoDefenseStampKey).
+  UPROPERTY()
+  TObjectPtr<class US08AnimatedIconWidget> NoDefenseStamp;
+  FString NoDefenseStampKey;
 
   FS08BoardModel BoardModel;
   TArray<FS08BoardFighter> Fighters;
@@ -1100,6 +1119,7 @@ private:
   bool bAutoCreate = false;
   bool bAutoManeuver = false;
   bool bShotTaken = false;
+  FS08ShotQueue EvidenceShotQueue; // I-03: one FScreenshotRequest per frame, FIFO
   bool bAutoManeuverDone = false;
   bool bSawCue = false; // joiner evidence shot trigger: an authoritative event arrived
   FString AutoEmail, AutoPassword, AutoCode, AutoHeroId, AutoShotPath;

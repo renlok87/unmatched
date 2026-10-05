@@ -27,6 +27,12 @@
 //   -S08HeroesLegacy    the pre-default figures (isolated Medusa candidate, ART-003 grey blockouts) - S08HeroesV2.h.
 //   -S08DioramaLegacy   no tray and no environment around the map (the board as before -ArtPreviewDiorama) - S08Diorama.h.
 //   -S08LegacyRender    unchanged: the pre-W4 render emulation (lights, exposure, game layer) of the bench, S08Render.h.
+//   Run I (2026-10-05, the user's answers AB-5..AB-8 to the DE-028 A/B sheet; S08TurnPortraitWidget.h):
+//   -S08TurnRingLegacy  no turn ring on the portraits (AB-5: the warm marker-turn-ring is the default).
+//   -S08HeartGlowLegacy the heart damage without its red glow halo (AB-6).
+//   -S08TrackerLegacy   the v3 tracker slots resource-action-full (AB-7: the DE slots filled with the action type).
+//   -S08CrossLegacy     the dark heart of a fallen hero and the text X of "no defense" (AB-8: resource-hp-fallen at the
+//                       heart mark, marker-x-stamp in the combat panel).
 // -ArtPreviewHeroesV2 / -ArtPreviewDiorama stay accepted as no-op aliases (scripts pass them).
 //
 // The trace tags of the art path stay 'ARTPREVIEW ...' (every gate script and tool reads them); one 'ARTLOOK ...' line
@@ -55,7 +61,9 @@ UNMATCHED_API void SetOverrideForTest(bool bEnabled);
 UNMATCHED_API void ResetOverrideForTest();
 
 /** 'ARTLOOK art=1|0 source=default|S08GreyBoard|override heroes=v2|legacy(..) tray=on|legacy(..)|off env=on|off(..)
- *   review=0|1 legacyRender=0|1 aliases=<-ArtPreviewHeroesV2,-ArtPreviewDiorama or ->' - the effective look of this run. */
+ *   review=0|1 legacyRender=0|1 aliases=<-ArtPreviewHeroesV2,-ArtPreviewDiorama,-S08HeartGlow or ->
+ *   hud=ring:<id>|legacy(..),glow:on|legacy(..),tracker:de|legacy(..),cross:on|legacy(..)' - the effective look of
+ *   this run (the hud field: FS08TurnHudLook::ArtLookField). */
 UNMATCHED_API FString TraceLine();
 
 }  // namespace S08ArtLook

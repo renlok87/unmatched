@@ -306,7 +306,7 @@ void FS09EventFeed::Reset() {
 // ---------------------------------------------------------------------------------------------------- DE-022
 
 FString FS09ActionTracker::OnApplied(int32 Seq, const FString& TurnPlayerId, int32 TurnCount, int32 ActionsRemaining,
-                                     const FString& ViewerId, double NowMs) {
+                                     const FString& ViewerId, double NowMs, FName SpentAs) {
   const bool bWasOpponentTurn = bOpponentTurn;
   const FString Key = FString::Printf(TEXT("%s#%d"), *TurnPlayerId, TurnCount);
   if (Key != TurnKey) {
@@ -314,14 +314,18 @@ FString FS09ActionTracker::OnApplied(int32 Seq, const FString& TurnPlayerId, int
     // reconnect mid-turn sees 2 - actionsRemaining spent)
     TurnKey = Key;
     TurnSlots = FSlots();
+    SpentTypes.Reset();
     LastRemaining = -1;
     if (ActionsRemaining >= 0) {
       TurnSlots.Spent = FMath::Clamp(PerTurn - ActionsRemaining, 0, PerTurn);
       TurnSlots.Slots = FMath::Max(PerTurn, TurnSlots.Spent + ActionsRemaining);
+      // a reconnect mid-turn: the earlier actions' types are not in the snapshot - the one it shows stands for them
+      SpentTypes.Init(SpentAs, TurnSlots.Spent);
     }
   } else if (ActionsRemaining >= 0 && LastRemaining >= 0 && ActionsRemaining != LastRemaining) {
     if (ActionsRemaining < LastRemaining) {
       TurnSlots.Spent += LastRemaining - ActionsRemaining;  // an action chosen (beginManeuver / attack / scheme)
+      while (SpentTypes.Num() < TurnSlots.Spent) SpentTypes.Add(SpentAs);
     }
     // a gained action (GAIN_ACTION, a hero ability) adds a slot; spent ones stay marked
     TurnSlots.Slots = FMath::Max(PerTurn, TurnSlots.Spent + ActionsRemaining);
@@ -377,6 +381,23 @@ FString PendingManeuverPlayer(const FS08Snapshot& Snapshot) {
   FString PlayerId;
   (*Pending)->TryGetStringField(TEXT("playerId"), PlayerId);
   return PlayerId;
+}
+
+FName SpentActionType(const FS08Snapshot& Snapshot) {
+  if (!PendingManeuverPlayer(Snapshot).IsEmpty()) return FName(TEXT("maneuver"));
+  FS09LastMovement Trail;
+  if (FS09LastMovement::Read(Snapshot.Metadata, Trail) && Trail.Source == TEXT("MANEUVER") &&
+      Trail.Seq == Snapshot.SequenceNumber) {
+    return FName(TEXT("maneuver"));
+  }
+  const TSharedPtr<FJsonObject> Meta =
+      Snapshot.Metadata.IsValid() && Snapshot.Metadata->Type == EJson::Object ? Snapshot.Metadata->AsObject() : nullptr;
+  const TSharedPtr<FJsonObject>* Combat = nullptr;
+  if (Snapshot.Phase.StartsWith(TEXT("COMBAT")) ||
+      (Meta.IsValid() && Meta->TryGetObjectField(TEXT("combatInfo"), Combat) && Combat && Combat->IsValid())) {
+    return FName(TEXT("attack"));
+  }
+  return FName(TEXT("scheme"));
 }
 
 bool OpponentPlanning(const FS08Snapshot& Snapshot, const FString& ViewerId) {
