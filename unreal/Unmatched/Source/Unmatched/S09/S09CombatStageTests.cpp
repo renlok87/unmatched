@@ -228,6 +228,12 @@ bool FS09CombatStageTimelineTest::RunTest(const FString&) {
     RunToEnd(Run, In);
     TestEqual("fast: 300 + 400 + 1000 + 300 + 146 + 450", Run.Stage.TotalMs(), static_cast<int64>(2596));
     TestEqual("fast -N 450", Run.Stage.MinusLifeMs(), 450);
+    // DE-025: the lunge clip at play rate 2 lands its contact frame on the scaled 146; the tint stays 450.
+    TestEqual("fast lunge rate 2", Run.Stage.LungePlayRate(), 2.0f);
+    TestEqual("fast: hit tint not scaled", Run.Stage.GetHitTintMs(), 450);
+    bool bRateLine = false;
+    for (const FString& L : Run.Lines) bRateLine |= L.Contains(TEXT(" stage=lunge ")) && L.Contains(TEXT(" rate=2.00"));
+    TestTrue("lunge line carries rate=2.00", bRateLine);
   }
   {
     FRun Run;
@@ -237,6 +243,7 @@ bool FS09CombatStageTimelineTest::RunTest(const FString&) {
     TestEqual("slow: 900 + 1200 + 1000 + 300 + 438 + 1000 (CUE-011 <= 1 s block)", Run.Stage.TotalMs(),
               static_cast<int64>(4838));
     TestEqual("slow -N 1350", Run.Stage.MinusLifeMs(), 1350);
+    TestTrue("slow lunge rate 1/1.5", FMath::IsNearlyEqual(Run.Stage.LungePlayRate(), 1.0f / 1.5f));
   }
   {
     FRun Run;
@@ -244,6 +251,9 @@ bool FS09CombatStageTimelineTest::RunTest(const FString&) {
     In.SpeedMul = 0.0f;
     RunToEnd(Run, In);
     TestEqual("none: animations 0, holds stay (1000 + 300 + 450)", Run.Stage.TotalMs(), static_cast<int64>(1750));
+    TestEqual("none: no lunge clip (rate 0)", Run.Stage.LungePlayRate(), 0.0f);
+    TestEqual("none: -N keeps the fast 450", Run.Stage.MinusLifeMs(), 450);
+    TestEqual("none: contact = lunge frame", Run.Stage.GetContactMs(), Run.Stage.GetLungeMs());
   }
   // ---- reduced motion (D11): CUE-010 <= 100, CUE-011 <= 100, the holds stay ----
   {

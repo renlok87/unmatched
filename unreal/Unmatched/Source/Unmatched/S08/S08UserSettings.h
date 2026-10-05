@@ -12,13 +12,39 @@
 //
 // There is no settings screen yet (UI-SCR-PAUSE is not in the client): the ini and the flags -S08ReducedMotion /
 // -S08AnimSpeed=<none|fast|normal|slow> change them; the flags win over the saved values (S08Motion::Resolve).
-// DE-024 adds UI-ACC-012 "rule hints" (bRuleHints; flag -S08RuleHints=on|off, ResolveRuleHints); DE-025 adds the volumes.
+// DE-024 adds UI-ACC-012 "rule hints" (bRuleHints; flag -S08RuleHints=on|off, ResolveRuleHints).
+//
+// DE-025 (W-24; 02 SD-49, SD-55): the volumes "master" and "ambience" with their mutes are stored here (no UI-ACC rows
+// yet - they come with the settings screen GD-047 and the backdrop sound SD-51; DE-032 applies them, AudioNow). Save
+// broadcasts OnChanged: a running client re-reads the motion settings without a restart (the next move seq and the
+// next combat staging use the new speed). Until the settings screen exists the console command
+//   s08.Settings [speed=<none|fast|normal|slow>] [reduced=0|1] [shake=0|1] [ruleHints=0|1] [master=<0-100>]
+//                [masterMute=0|1] [ambience=<0-100>] [ambienceMute=0|1]
+// changes the saved values, saves them and broadcasts OnChanged (no arguments: prints the current values).
 #pragma once
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 #include "S08MoveAnim.h"
 #include "S08UserSettings.generated.h"
+
+/** DE-025: the stored volumes (percent 0-100, clamped on read) and mutes; DE-032 applies them to the sound mix. */
+struct UNMATCHED_API FS08AudioSettings {
+  int32 MasterPercent = 100;
+  bool bMasterMuted = false;
+  int32 AmbiencePercent = 60;
+  bool bAmbienceMuted = false;
+  /** The ambience gain 0..1 after the master volume and both mutes (the backdrop sound, SD-51). */
+  float AmbienceGain() const;
+  /** The master gain 0..1 after its mute. */
+  float MasterGain() const;
+  bool operator==(const FS08AudioSettings& Other) const {
+    return MasterPercent == Other.MasterPercent && bMasterMuted == Other.bMasterMuted &&
+           AmbiencePercent == Other.AmbiencePercent && bAmbienceMuted == Other.bAmbienceMuted;
+  }
+};
+
+DECLARE_MULTICAST_DELEGATE(FS08UserSettingsChanged);
 
 UCLASS(config = GameUserSettings)
 class UNMATCHED_API US08UserSettings : public UObject {
@@ -30,8 +56,24 @@ public:
 
   /** Resets the values to the defaults (not saved). */
   void SetToDefaults();
-  /** Writes the values to the saved GameUserSettings.ini. */
+  /** Writes the values to the saved GameUserSettings.ini and broadcasts OnChanged (applied without a restart). */
   void Save();
+
+  /** DE-025: fired after Save (and by NotifyChanged): a running client re-reads the settings. */
+  static FS08UserSettingsChanged OnChanged;
+  static void NotifyChanged() { OnChanged.Broadcast(); }
+
+  /** Sets one value by its console name (speed, reduced, shake, ruleHints, master, masterMute, ambience,
+   *  ambienceMute); false and an error text for an unknown name or a bad value (nothing changed then). */
+  bool ApplySetting(const FString& Name, const FString& Value, FString& OutError);
+  /** The values as one trace token list: "speed=normal reduced=0 shake=1 ruleHints=1 master=100 ...". */
+  FString Describe() const;
+
+  /** The saved volumes, clamped to 0-100. */
+  FS08AudioSettings GetSavedAudio() const;
+  void SetSavedAudio(const FS08AudioSettings& Audio);
+  /** The saved volumes of the settings object (no command-line overrides: there are no volume flags). */
+  static FS08AudioSettings AudioNow();
 
   /** The saved motion settings (no command-line overrides). */
   FS08MotionSettings GetSavedMotion() const;
@@ -52,6 +94,20 @@ public:
   /** UI-ACC-012 (DE-024, 02 SD-42): the one-shot rule toasts (the first is the hand limit 7); false = no toasts. */
   UPROPERTY(config)
   bool bRuleHints = true;
+
+  /** DE-025 (SD-55): DE "Master" + mute - the overall volume, percent 0-100. */
+  UPROPERTY(config)
+  int32 MasterVolume = 100;
+
+  UPROPERTY(config)
+  bool bMasterMuted = false;
+
+  /** DE-025 (SD-55): DE "Ambience" + mute - the backdrop sound (SD-51), percent 0-100. */
+  UPROPERTY(config)
+  int32 AmbienceVolume = 60;
+
+  UPROPERTY(config)
+  bool bAmbienceMuted = false;
 
   /** UI-ACC-012 of this run: -S08RuleHints=on|off (also 1|0, true|false; any case) wins over the saved value; another
    *  value keeps it. */

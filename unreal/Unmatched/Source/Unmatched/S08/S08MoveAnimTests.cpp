@@ -29,6 +29,7 @@
 #include "GameFramework/GameUserSettings.h"
 #include "Engine/World.h"
 #include "Misc/AutomationTest.h"
+#include "Misc/CommandLine.h"
 
 // Named namespace (not anonymous): unity builds merge test files.
 namespace S08MoveAnimTest {
@@ -374,6 +375,60 @@ bool FS08MoveAnimSettingsTest::RunTest(const FString&) {
   const FS08MovePose Pose = FS08MoveAnim::Sample(Reduced[0], HopLean, 0.0, 55.0);
   TestTrue("reduced motion: lands at 0 with no hop and no lean",
            Pose.bDone && Pose.Location.Equals(FVector(200, 0, 0)) && Pose.LeanDeg == 0.0 && Pose.HopUU == 0.0);
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08MoveAnimSettingsStoreTest, "Unmatched.S08.MoveAnim.SettingsStore",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08MoveAnimSettingsStoreTest::RunTest(const FString&) {
+  // DE-025 (W-24; 02 SD-49, SD-55): the volumes "master" / "ambience" + mutes are stored next to UI-ACC-012/013;
+  // a saved change reaches a running client without a restart (OnChanged -> S08Motion::Current).
+  const US08UserSettings* Cdo = GetDefault<US08UserSettings>();
+  TestTrue("saved volume defaults: master 100, ambience 60, no mute",
+           Cdo->MasterVolume == 100 && Cdo->AmbienceVolume == 60 && !Cdo->bMasterMuted && !Cdo->bAmbienceMuted);
+  US08UserSettings* Temp = NewObject<US08UserSettings>(GetTransientPackage());
+  FString Error;
+  TestTrue("speed=fast", Temp->ApplySetting(TEXT("speed"), TEXT("fast"), Error) && Temp->AnimSpeed == TEXT("fast"));
+  TestTrue("master=80", Temp->ApplySetting(TEXT("master"), TEXT("80"), Error) && Temp->MasterVolume == 80);
+  TestTrue("Ambience=25 (any case)", Temp->ApplySetting(TEXT("Ambience"), TEXT("25"), Error) && Temp->AmbienceVolume == 25);
+  TestTrue("ambienceMute=on", Temp->ApplySetting(TEXT("ambienceMute"), TEXT("on"), Error) && Temp->bAmbienceMuted);
+  TestTrue("ruleHints=0", Temp->ApplySetting(TEXT("ruleHints"), TEXT("0"), Error) && !Temp->bRuleHints);
+  TestFalse("master=101 refused", Temp->ApplySetting(TEXT("master"), TEXT("101"), Error));
+  TestFalse("master=4.5 refused", Temp->ApplySetting(TEXT("master"), TEXT("4.5"), Error));
+  TestFalse("speed=warp refused", Temp->ApplySetting(TEXT("speed"), TEXT("warp"), Error));
+  TestFalse("unknown name refused", Temp->ApplySetting(TEXT("music"), TEXT("50"), Error));
+  TestTrue("a refused value changes nothing", Temp->MasterVolume == 80 && Temp->AnimSpeed == TEXT("fast"));
+  TestEqual("Describe", Temp->Describe(),
+            FString(TEXT("speed=fast reduced=0 shake=1 ruleHints=0 master=80 masterMute=0 ambience=25 ambienceMute=1")));
+  // Gains: the ambience goes through the master volume and both mutes; the ini values are clamped on read.
+  FS08AudioSettings Audio = Temp->GetSavedAudio();
+  TestTrue("ambience muted -> gain 0", Audio.AmbienceGain() == 0.0f && FMath::IsNearlyEqual(Audio.MasterGain(), 0.8f));
+  Audio.bAmbienceMuted = false;
+  TestTrue("ambience 25 % of master 80 % = 0.2", FMath::IsNearlyEqual(Audio.AmbienceGain(), 0.2f));
+  Audio.bMasterMuted = true;
+  TestTrue("master mute silences the ambience", Audio.AmbienceGain() == 0.0f && Audio.MasterGain() == 0.0f);
+  Temp->MasterVolume = 250;
+  Temp->AmbienceVolume = -3;
+  TestTrue("out-of-range ini values clamp", Temp->GetSavedAudio().MasterPercent == 100 && Temp->GetSavedAudio().AmbiencePercent == 0);
+  Temp->SetToDefaults();
+  TestTrue("SetToDefaults resets the volumes", Temp->GetSavedAudio() == FS08AudioSettings());
+  Temp->MarkAsGarbage();
+  // Applied without a restart: a change of the saved speed is what S08Motion::Current reads next, and OnChanged
+  // tells the running game mode to re-read it (the CDO is restored; nothing is written to the ini here).
+  US08UserSettings* Live = US08UserSettings::Get();
+  const FString SavedSpeed = Live->AnimSpeed;
+  int32 Fired = 0;
+  const FDelegateHandle Handle = US08UserSettings::OnChanged.AddLambda([&Fired] { ++Fired; });
+  const bool bSpeedFlag = FString(FCommandLine::Get()).Contains(TEXT("S08AnimSpeed="));
+  Live->AnimSpeed = TEXT("slow");
+  US08UserSettings::NotifyChanged();
+  TestEqual("OnChanged fires once", Fired, 1);
+  if (!bSpeedFlag) {
+    TestTrue("the next read sees slow", S08Motion::Current().Speed == ES08AnimSpeed::Slow);
+    TestEqual("combat multiplier 1.5", S08Motion::SpeedMul(S08Motion::Current().Speed), 1.5);
+  }
+  Live->AnimSpeed = SavedSpeed;
+  US08UserSettings::OnChanged.Remove(Handle);
   return true;
 }
 

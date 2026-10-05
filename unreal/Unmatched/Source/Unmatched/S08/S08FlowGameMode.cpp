@@ -240,6 +240,12 @@ void AS08FlowGameMode::BeginPlay() {
       MoveMotion.bReducedMotion ? 1 : 0, S08Motion::SpeedName(MoveMotion.Speed), MoveMotion.bScreenShake ? 1 : 0,
       US08UserSettings::Get() ? 1 : 0, MoveAnimParams.HopHeightRel, MoveAnimParams.TravelLeanDeg,
       MoveAnimParams.LeanInMs, MoveAnimParams.TurnMs, MoveAnimParams.SettleMs, MoveAnimParams.bEaseEnds ? 1 : 0));
+  // DE-025: the stored settings (UI-ACC-012/013, the volumes - DE-032 applies them) and the combat speed of this run.
+  if (const US08UserSettings* Settings = US08UserSettings::Get()) {
+    ArtHud.PendingTrace.Add(FString::Printf(TEXT("SETTINGS saved %s combatSpeed=%.2f audioApplied=0"),
+                                            *Settings->Describe(), CombatSpeedMul()));
+  }
+  SettingsChangedHandle = US08UserSettings::OnChanged.AddUObject(this, &AS08FlowGameMode::RefreshMotionSettings);
 
   BuildUi();
   // W5b-R: SHOT lines of the HUD layer at the END of the requesting frame (actual visibility + painted geometry) and
@@ -1041,7 +1047,8 @@ void AS08FlowGameMode::HandleCues(const TArray<FS08Cue>& Cues) {
                             NowMs() + static_cast<int64>(FMath::CeilToDouble(*Arrive))});
         Line += FString::Printf(TEXT(" after=move ms=%d"), FMath::RoundToInt(*Arrive));
       } else if (BoardActor) {
-        PresentDamageNumber(Cue.FighterId, Cue.Damage, Cue.SequenceNumber, FS09CombatTiming::MinusLifeMs / 1000.0f);
+        PresentDamageNumber(Cue.FighterId, Cue.Damage, Cue.SequenceNumber,
+                            FS09CombatStage::MinusLifeMsAt(CombatSpeedMul()) / 1000.0f);
         if (Cue.Damage > 0) PresentHit(Cue.FighterId, Cue.SequenceNumber, FS09CombatTiming::HitTintMs);
       }
       if (!bStaged && BoardActor && CommandUi.Combat.bPresent && CommandUi.Combat.TargetFighterId == Cue.FighterId) {
@@ -1148,7 +1155,7 @@ void AS08FlowGameMode::TickDeferredDamage() {
     }
   }
   for (const FDeferredDamage& D : Due) {
-    PresentDamageNumber(D.FighterId, D.Damage, D.Seq, FS09CombatTiming::MinusLifeMs / 1000.0f);
+    PresentDamageNumber(D.FighterId, D.Damage, D.Seq, FS09CombatStage::MinusLifeMsAt(CombatSpeedMul()) / 1000.0f);
     if (D.Damage > 0) PresentHit(D.FighterId, D.Seq, FS09CombatTiming::HitTintMs);
     FS08Trace::Write(FString::Printf(TEXT("MS-ANIM cascade damage fighter=%s seq=%d amount=%d"), *D.FighterId, D.Seq,
                                      D.Damage));
@@ -1204,6 +1211,22 @@ void AS08FlowGameMode::PresentHit(const FString& FighterId, int32 Seq, int32 Tin
   BoardActor->PlayFighterHitTint(FighterId, TintMs / 1000.0f);
 }
 
+// ---- DE-025 settings without a restart --------------------------------------
+
+void AS08FlowGameMode::RefreshMotionSettings() {
+  const FS08MotionSettings Now = S08Motion::Current();
+  const US08UserSettings* Settings = US08UserSettings::Get();
+  FS08Trace::Write(FString::Printf(TEXT("SETTINGS changed %s motionChanged=%d"),
+                                   Settings ? *Settings->Describe() : TEXT("missing"), Now == MoveMotion ? 0 : 1));
+  if (Now == MoveMotion) return;
+  MoveMotion = Now;
+  if (Flow) Flow->SetMoveMotion(MoveMotion);
+  // The same tokens as the boot line, so a reader of the trace sees which speed the next seq / combat uses.
+  FS08Trace::Write(FString::Printf(TEXT("MS-ANIM settings changed reduced=%d speed=%s shake=%d combatSpeed=%.2f"),
+                                   MoveMotion.bReducedMotion ? 1 : 0, S08Motion::SpeedName(MoveMotion.Speed),
+                                   MoveMotion.bScreenShake ? 1 : 0, CombatSpeedMul()));
+}
+
 // ---- DE-018 combat staging ------------------------------------------------
 
 void AS08FlowGameMode::WriteCueLines(const TArray<FString>& Lines) {
@@ -1247,7 +1270,7 @@ void AS08FlowGameMode::StartCombatStage(const FS08Snapshot& Closing, const FS08S
   const int32 Contact = BoardActor ? BoardActor->GetFighterContactMs(Combat.AttackerId, Source) : -1;
   In.ContactMs = Contact >= 0 ? Contact : FS09CombatTiming::DefaultContactMs;
   In.ContactSource = Contact >= 0 ? Source : FString(TEXT("default"));
-  In.SpeedMul = 1.0f;  // the speed setting (UI-ACC-013) arrives with MS-T-16 / DE-025
+  In.SpeedMul = CombatSpeedMul();  // DE-025: UI-ACC-013 (saved value or -S08AnimSpeed)
   TickCombatStage();
   TArray<FString> Lines;
   TArray<FS09CombatStageEvent> Events;
@@ -1312,8 +1335,12 @@ void AS08FlowGameMode::RunCombatEvents(const TArray<FS09CombatStageEvent>& Event
   for (const FS09CombatStageEvent& Event : Events) {
     switch (Event.Type) {
       case ES09CombatEvent::Lunge:
-        // CUE-011 intro: the attacker's LungeAttack after the slam + the pause "score" (01 F-03).
-        if (BoardActor) BoardActor->NotifyFighterAnimEvent(In.AttackerId, S08HeroesV2::EEvent::Attack, In.Seq);
+        // CUE-011 intro: the attacker's LungeAttack after the slam + the pause "score" (01 F-03). DE-025 (SD-49): at
+        // the animation speed (play rate 1 / speed); speed "none" plays no clip - the contact is this frame.
+        if (BoardActor && CombatStage.LungePlayRate() > 0.0f) {
+          BoardActor->NotifyFighterAnimEvent(In.AttackerId, S08HeroesV2::EEvent::Attack, In.Seq,
+                                             CombatStage.LungePlayRate());
+        }
         break;
       case ES09CombatEvent::HitReact:
         PresentHit(In.TargetId, In.Seq, CombatStage.GetHitTintMs());
@@ -4984,6 +5011,7 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
 
 void AS08FlowGameMode::EndPlay(const EEndPlayReason::Type Reason) {
   FCoreDelegates::OnEndFrame.Remove(EndFrameHandle);
+  US08UserSettings::OnChanged.Remove(SettingsChangedHandle);
   UGameViewportClient::OnScreenshotCaptured().Remove(ScreenshotCapturedHandle);
   FS08Trace::Close();
   if (Flow.IsValid()) Flow.Reset();

@@ -63,11 +63,13 @@ int32 FS09CombatStage::Scaled(int32 Ms) const {
   return Input.SpeedMul <= 0.0f ? 0 : FMath::RoundToInt(Ms * Input.SpeedMul);
 }
 
-int32 FS09CombatStage::MinusLifeMs() const {
+int32 FS09CombatStage::MinusLifeMsAt(float SpeedMul) {
   // 01 F-04: 900 x speed; "none" (instant animations) keeps the number readable at the fast 450.
-  const float Mul = Input.SpeedMul <= 0.0f ? 0.5f : Input.SpeedMul;
+  const float Mul = SpeedMul <= 0.0f ? 0.5f : SpeedMul;
   return FMath::RoundToInt(FS09CombatTiming::MinusLifeMs * Mul);
 }
+
+float FS09CombatStage::LungePlayRateAt(float SpeedMul) { return SpeedMul <= 0.0f ? 0.0f : 1.0f / SpeedMul; }
 
 int32 FS09CombatStage::HoldTotalMs() const {
   int32 Total = ReadMs;
@@ -225,7 +227,8 @@ void FS09CombatStage::Tick(int64 NowMs, FS08CueDispatcher& Cues, TArray<FString>
         Phase = ES09CombatStagePhase::Lunge;
         OutLines.Add(Prefix(TEXT("pause"), T) +
                      FString::Printf(TEXT(" ms=%d skipped=%d"), PauseMs, bPauseSkipped ? 1 : 0));
-        OutLines.Add(Prefix(TEXT("lunge"), T) + FString::Printf(TEXT(" attacker=%s"), *Input.AttackerId));
+        OutLines.Add(Prefix(TEXT("lunge"), T) +
+                     FString::Printf(TEXT(" attacker=%s rate=%.2f"), *Input.AttackerId, LungePlayRate()));
         Release(ES09CombatEvent::Lunge, T, OutEvents);
         break;
       case EBoundary::Contact:

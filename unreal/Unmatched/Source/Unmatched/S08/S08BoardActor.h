@@ -268,7 +268,8 @@ public:
   FString GetFighterClipName(const FString& FighterId, S08HeroesV2::EClip Clip) const;
   /** Wave 5c-B heroes v2 (default since ART-DEFAULT): a combat event (attack / damage) of a fighter drives its v2
    *  clip, exactly once per (event, fighter, authoritative seq). A no-op with -S08HeroesLegacy or without a v2 figure. */
-  void NotifyFighterAnimEvent(const FString& FighterId, S08HeroesV2::EEvent Event, int32 SequenceNumber);
+  void NotifyFighterAnimEvent(const FString& FighterId, S08HeroesV2::EEvent Event, int32 SequenceNumber,
+                              float PlayRate = 1.0f);
 
   /** TASK-022 selection ring + reachable-cell highlights. MS-T-08: with the move plates (-S08MovePlates) the
    *  highlights are the plates of US08MoveHighlightComponent - the view comes from the provider (the game mode's draft,

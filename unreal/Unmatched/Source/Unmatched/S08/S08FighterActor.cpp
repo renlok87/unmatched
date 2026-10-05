@@ -712,13 +712,16 @@ bool AS08FighterActor::ApplyHeroV2(const S08HeroesV2::FHeroSpec& Spec, const FVe
   return true;
 }
 
-void AS08FighterActor::NotifyHeroAnimEvent(S08HeroesV2::EEvent Event, int32 Seq) {
+void AS08FighterActor::NotifyHeroAnimEvent(S08HeroesV2::EEvent Event, int32 Seq, float PlayRate) {
   if (!bHeroV2Visual) return;
   const S08HeroesV2::FClipChoice Choice = S08HeroesV2::NextClip(HeroClip, Event);
-  if (Choice.bRestart) PlayHeroClip(Choice.Clip, Event, Seq);
+  if (!Choice.bRestart) return;
+  // DE-025 (SD-49): only the lunge follows the animation speed; HitReact (with its tint) and the rest never do.
+  const bool bScaled = Choice.Clip == S08HeroesV2::EClip::LungeAttack && PlayRate > 0.0f;
+  PlayHeroClip(Choice.Clip, Event, Seq, bScaled ? PlayRate : 1.0f);
 }
 
-void AS08FighterActor::PlayHeroClip(S08HeroesV2::EClip Clip, S08HeroesV2::EEvent Event, int32 Seq) {
+void AS08FighterActor::PlayHeroClip(S08HeroesV2::EClip Clip, S08HeroesV2::EEvent Event, int32 Seq, float PlayRate) {
   using namespace S08HeroesV2;
   UAnimSequenceBase* Anim = HeroClips.IsValidIndex(static_cast<int32>(Clip))
       ? HeroClips[static_cast<int32>(Clip)].Get() : nullptr;
@@ -730,19 +733,22 @@ void AS08FighterActor::PlayHeroClip(S08HeroesV2::EClip Clip, S08HeroesV2::EEvent
   const bool bLoop = ClipLoops(Clip);
   const float Len = Anim->GetPlayLength();
   const float Phase = Clip == EClip::Idle ? IdlePhase(Fighter.Id) : 0.0f;
+  const float Rate = PlayRate > 0.0f ? PlayRate : 1.0f;
   ArtBody->PlayAnimation(Anim, bLoop);
+  ArtBody->SetPlayRate(Rate);  // explicit: a new clip never inherits the lunge rate
   if (Phase > 0.0f) ArtBody->SetPosition(Phase * Len, false);
   HeroClip = Clip;
   if (UWorld* World = GetWorld()) {
     FTimerManager& Timers = World->GetTimerManager();
     Timers.ClearTimer(HeroClipTimer);
     if (Clip == EClip::LungeAttack || Clip == EClip::HitReact) {
-      Timers.SetTimer(HeroClipTimer, this, &AS08FighterActor::OnHeroClipFinished, FMath::Max(Len, 0.05f), false);
+      Timers.SetTimer(HeroClipTimer, this, &AS08FighterActor::OnHeroClipFinished, FMath::Max(Len / Rate, 0.05f),
+                      false);
     }
   }
   FS08Trace::Write(FString::Printf(
-      TEXT("ARTPREVIEW anim fighter=%s clip=%s len=%.3f event=%s loop=%d phase=%.4f seq=%d asset=%s"),
-      *Fighter.Id, ClipName(Clip), Len, EventName(Event), bLoop ? 1 : 0, Phase, Seq, *Anim->GetName()));
+      TEXT("ARTPREVIEW anim fighter=%s clip=%s len=%.3f event=%s loop=%d phase=%.4f seq=%d asset=%s rate=%.2f"),
+      *Fighter.Id, ClipName(Clip), Len, EventName(Event), bLoop ? 1 : 0, Phase, Seq, *Anim->GetName(), Rate));
 }
 
 bool AS08FighterActor::GetHeroClipTime(float& OutPosition, float& OutLength) const {

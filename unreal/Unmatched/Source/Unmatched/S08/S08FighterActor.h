@@ -91,8 +91,9 @@ public:
   /** Yaw / uniform scale applied to the v2 figure (0 / 0 when none). */
   float GetHeroV2Yaw() const { return bHeroV2Visual ? HeroV2Yaw : 0.0f; }
   float GetHeroV2Scale() const { return bHeroV2Visual ? HeroV2Scale : 0.0f; }
-  /** Combat event of this fighter (attack / damage); a no-op unless a v2 figure is shown. */
-  void NotifyHeroAnimEvent(S08HeroesV2::EEvent Event, int32 Seq);
+  /** Combat event of this fighter (attack / damage); a no-op unless a v2 figure is shown. DE-025 (SD-49): PlayRate
+   *  (> 0) applies to LungeAttack only - the combat animation speed; HitReact / DeathSettle / Idle always play at 1. */
+  void NotifyHeroAnimEvent(S08HeroesV2::EEvent Event, int32 Seq, float PlayRate = 1.0f);
   /** DE-018 (01 F-03): contact frame (ms at x1) of this v2 figure's LungeAttack - the "Contact" AnimNotify (DE-010),
    *  else the build-profile frame; -1 without a v2 figure. OutSource = notify | profile. */
   int32 GetLungeContactMs(FString& OutSource) const;
@@ -285,7 +286,7 @@ private:
   void TickHitTint();
   /** Loads and applies the v2 figure; false (nothing changed) when an asset is missing. */
   bool ApplyHeroV2(const S08HeroesV2::FHeroSpec& Spec, const FVector& CellCenter, USkeletalMesh*& OutMesh);
-  void PlayHeroClip(S08HeroesV2::EClip Clip, S08HeroesV2::EEvent Event, int32 Seq);
+  void PlayHeroClip(S08HeroesV2::EClip Clip, S08HeroesV2::EEvent Event, int32 Seq, float PlayRate = 1.0f);
   void OnHeroClipFinished();
   void OnDeathHoldFinished();
   void BeginHeroDeath();

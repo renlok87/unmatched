@@ -325,6 +325,17 @@ class CombatStagingTests(unittest.TestCase):
         forged = trace[:-1] + ["CUE combat seq=52 stage=minus t=4532 amount=1 life=900", trace[-1]]
         self.assertIn("C5", {c for c, _ in cc.check_trace(forged, TABLE)[0]})
 
+    def test_lunge_rate_and_minus_life_follow_speed(self):
+        # DE-025 (SD-49): play rate выпада = 1 / скорость, «−N» = 900 × скорость; заливка от скорости не зависит
+        trace = self.fixture("combat-staging-text")["expect_trace"]
+        self.assertTrue(any(" stage=lunge " in l and " rate=1.00" in l for l in trace))
+        fast_rate = [l.replace(" rate=1.00", " rate=2.00") if " stage=lunge " in l else l for l in trace]
+        self.assertIn("C4", {c for c, _ in cc.check_trace(fast_rate, TABLE)[0]})
+        long_minus = [l.replace(" life=900", " life=1350") if " stage=minus " in l else l for l in trace]
+        self.assertIn("C5", {c for c, _ in cc.check_trace(long_minus, TABLE)[0]})
+        no_rate = [l.replace(" rate=1.00", "") for l in trace]  # трасса до DE-025 без поля rate=
+        self.assertEqual(cc.check_trace(no_rate, TABLE)[0], [])
+
     def test_cut_staging_checks_order_only(self):
         lines = ["CUE combat seq=9 stage=start t=0 attacker=a target=b text=0 lines=0 damage=1 lethal=0 shown=0 "
                  "speed=1.00 flip=620 contact=292 src=default a=3 d=2 outcome=win",

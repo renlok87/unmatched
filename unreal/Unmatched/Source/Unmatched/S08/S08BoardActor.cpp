@@ -1739,14 +1739,14 @@ void AS08BoardActor::SyncFighters(const FS08BoardModel& Board,
 }
 
 void AS08BoardActor::NotifyFighterAnimEvent(const FString& FighterId, S08HeroesV2::EEvent Event,
-                                            int32 SequenceNumber) {
+                                            int32 SequenceNumber, float PlayRate) {
   if (!bArtActive || !S08HeroesV2::FlagEnabled()) return;
   AS08FighterActor* Actor = FindFighterActor(FighterId);
   if (!Actor || !Actor->IsHeroV2()) return;
   if (!AnimEventDedupe.Accept(FString(S08HeroesV2::EventName(Event)) + TEXT(":") + FighterId, SequenceNumber)) {
     return;
   }
-  Actor->NotifyHeroAnimEvent(Event, SequenceNumber);
+  Actor->NotifyHeroAnimEvent(Event, SequenceNumber, PlayRate);
 }
 
 void AS08BoardActor::SetSelectedFighter(const FString& FighterId,

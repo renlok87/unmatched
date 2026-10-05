@@ -422,10 +422,18 @@ bool FS08HeroesV2ActorTest::RunTest(const FString&) {
       TestEqual(FString::Printf(TEXT("%s attack -> LungeAttack"), C.Name), FString(ClipName(Actor->GetHeroClip())), FString(TEXT("LungeAttack")));
       Actor->ApplyFighter(F, C.Cell, C.Look == ES08TeamSlot::P1, true);
       TestEqual(FString::Printf(TEXT("%s re-sync keeps the lunge"), C.Name), FString(ClipName(Actor->GetHeroClip())), FString(TEXT("LungeAttack")));
+      TestEqual(FString::Printf(TEXT("%s lunge at rate 1 by default"), C.Name), Skel->GetPlayRate(), 1.0f);
       Actor->NotifyHeroAnimEvent(EEvent::ClipFinished, -1);
       TestEqual(FString::Printf(TEXT("%s back to Idle"), C.Name), FString(ClipName(Actor->GetHeroClip())), FString(TEXT("Idle")));
-      Actor->NotifyHeroAnimEvent(EEvent::Damaged, 11);
+      // DE-025 (SD-49): the combat speed scales the lunge only (fast = rate 2); the next clip is back at rate 1.
+      Actor->NotifyHeroAnimEvent(EEvent::Attack, 20, 2.0f);
+      TestTrue(FString::Printf(TEXT("%s fast lunge at rate 2"), C.Name),
+               Actor->GetHeroClip() == EClip::LungeAttack && FMath::IsNearlyEqual(Skel->GetPlayRate(), 2.0f));
+      Actor->NotifyHeroAnimEvent(EEvent::ClipFinished, -1);
+      TestEqual(FString::Printf(TEXT("%s Idle after the fast lunge at rate 1"), C.Name), Skel->GetPlayRate(), 1.0f);
+      Actor->NotifyHeroAnimEvent(EEvent::Damaged, 11, 2.0f);
       TestEqual(FString::Printf(TEXT("%s damage -> HitReact"), C.Name), FString(ClipName(Actor->GetHeroClip())), FString(TEXT("HitReact")));
+      TestEqual(FString::Printf(TEXT("%s HitReact never scaled"), C.Name), Skel->GetPlayRate(), 1.0f);
       TestTrue(FString::Printf(TEXT("%s single-node animation asset set"), C.Name),
                Skel->GetAnimationMode() == EAnimationMode::AnimationSingleNode);
       // Defeat: DeathSettle plays where the fighter stood, the figure is held (visible) and later cues change nothing.

@@ -651,7 +651,7 @@ COMBAT_START_NEED = ("attacker", "target", "text", "lines", "damage", "lethal", 
                      "src", "a", "d", "outcome")
 COMBAT_MS = {  # 01 F-01 / F-03 / F-04 / F-09 при скорости ×1 (CUE-DISPATCHER.md §3.1)
     "declare": 600, "read": 1000, "effect_step": 600, "effect_highlight": 400, "pause": 300,
-    "minus": 60, "hp": 80, "fall": 450, "tint": 450, "tint_lethal": 550,
+    "minus": 60, "hp": 80, "fall": 450, "tint": 450, "tint_lethal": 550, "minus_life": 900,
 }
 
 
@@ -780,6 +780,11 @@ def check_combat(lines, cue_starts=()):
             errors.append(("C4", "seq %s: пауза «счёт» %d мс ≠ %d" % (seq, pause_ms, COMBAT_MS["pause"])))
         if lunge["_t"] != pause["_t"]:
             errors.append(("C4", "seq %s: выпад не в конце паузы" % seq))
+        # DE-025 (SD-49): play rate LungeAttack = 1 / скорость, при «Нет» клипа нет (0); поле rate= — с DE-025
+        if "rate" in lunge:
+            want_rate = 0.0 if speed <= 0 else 1.0 / speed
+            if abs(float(lunge["rate"]) - want_rate) > 0.006:
+                errors.append(("C4", "seq %s: play rate выпада %s ≠ 1/скорость %.2f" % (seq, lunge["rate"], want_rate)))
         if contact["_t"] != lunge["_t"] + int(st["contact"]) or contact.get("offset") != st["contact"]:
             errors.append(("C4", "seq %s: контакт t=%d ≠ выпад + %s" % (seq, contact["_t"], st["contact"])))
         # C5: от кадра контакта
@@ -793,6 +798,10 @@ def check_combat(lines, cue_starts=()):
                 errors.append(("C5", "seq %s: HitReact и заливка %d мс не в кадре контакта" % (seq, tint)))
             if not minus or minus["_t"] - ct != COMBAT_MS["minus"]:
                 errors.append(("C5", "seq %s: «−N» не через %d мс после контакта" % (seq, COMBAT_MS["minus"])))
+            # F-04 / DE-025: «−N» живёт 900 × скорость («Нет» — как «Быстро», 450)
+            want_life = int(round(COMBAT_MS["minus_life"] * (speed if speed > 0 else 0.5)))
+            if minus and "life" in minus and int(minus["life"]) != want_life:
+                errors.append(("C5", "seq %s: «−N» живёт %s мс ≠ %d" % (seq, minus["life"], want_life)))
             if not hp or hp["_t"] - ct != COMBAT_MS["hp"]:
                 errors.append(("C5", "seq %s: HP не через %d мс после контакта" % (seq, COMBAT_MS["hp"])))
             if lethal and (not fall or fall["_t"] - ct != COMBAT_MS["fall"]):

@@ -446,8 +446,13 @@ private:
   FS08CueDispatcher CueDispatcher;
   FS09CombatStage CombatStage;
   // MS-T-16: the motion settings (US08UserSettings + flags, read at BeginPlay), the move pose parameters and the
-  // damage cues held until their target arrives.
+  // damage cues held until their target arrives. DE-025: re-read when the settings are saved (US08UserSettings::
+  // OnChanged) - the next move seq and the next combat staging use them, no restart.
   FS08MotionSettings MoveMotion;
+  FDelegateHandle SettingsChangedHandle;
+  void RefreshMotionSettings();
+  /** DE-025 (UI-ACC-013, SD-49): the combat animation multiplier - 0 none, 0.5 fast, 1 normal, 1.5 slow. */
+  float CombatSpeedMul() const { return static_cast<float>(S08Motion::SpeedMul(MoveMotion.Speed)); }
   FS08MoveAnimParams MoveAnimParams;
   struct FDeferredDamage {
     FString FighterId;

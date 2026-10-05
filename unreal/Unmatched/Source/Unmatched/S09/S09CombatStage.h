@@ -18,6 +18,7 @@
 //   CUE combat seq=<n> stage=read|effect|pause t=<end> ms=<actual> skipped=<0|1> [i=<k>]
 //   CUE combat seq=<n> stage=slam t=<ms> | lunge | contact | hit tint=<ms> | minus amount=<n> | hp from=<a> to=<b>
 //              | fall | skip src=<click|space|enter> | end total=<ms> skipped=<0|1> cut=<0|replace|reconnect>
+//   (the lunge line carries rate=<LungeAttack play rate> since DE-025)
 // and the `CUE fx` lines of CUE-010 (subject=scene, done with hold=) and CUE-011 (subject=target, from contact)
 // through FS08CueDispatcher.
 #pragma once
@@ -143,7 +144,13 @@ public:
     return Input.bLethal ? FS09CombatTiming::HitTintLethalMs : FS09CombatTiming::HitTintMs;
   }
   /** "-N" lifetime (ms) at the input speed (F-04: 900 x speed; "none" keeps the fast 450). */
-  int32 MinusLifeMs() const;
+  int32 MinusLifeMs() const { return MinusLifeMsAt(Input.SpeedMul); }
+  static int32 MinusLifeMsAt(float SpeedMul);
+  /** DE-025 (SD-49): play rate of the attacker's LungeAttack at the input speed - 1 / speed (fast 2, slow 0.67), so
+   *  the clip's contact frame lands on the scaled contact; 0 for "none" (instant animations: the clip is not played,
+   *  the contact is the lunge frame). */
+  float LungePlayRate() const { return LungePlayRateAt(Input.SpeedMul); }
+  static float LungePlayRateAt(float SpeedMul);
 
 private:
   FS09CombatStageInput Input;

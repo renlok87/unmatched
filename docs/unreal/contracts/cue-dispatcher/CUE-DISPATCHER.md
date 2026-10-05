@@ -73,7 +73,7 @@
 | `combat.effectStepMs` — строка эффекта | 600 на сработавшую строку: подсветка 400 (масштаб.) + 200 | частично | да | F-01; TL `reveal_to_score_one_effect` (DE +1,6–1,7 с) |
 | `combat.slamToLungeMs` — пауза «счёт» | 300 | нет | да | F-01; TL `score_to_attack_anim_start` (DE 1983) |
 | Метка исхода «победил …» / «защита держит» | со слэма до конца CUE-011, ~1,5 с | нет | да | F-01; TL `wins_ribbon_hold` (DE 2500, не копируем) |
-| Вступление CUE-011 — LungeAttack атакующего | старт = конец CUE-010; play rate × скорость | масштаб. | клип ≤ 0,9 с не обрывается | F-03, «Резолюция» п. 4 |
+| Вступление CUE-011 — LungeAttack атакующего | старт = конец CUE-010; длительность × скорость (play rate = 1 / скорость: ×0,5 → 2, ×1,5 → 0,67; «Нет» — клип не играется, контакт в кадр выпада; DE-025) | масштаб. | клип ≤ 0,9 с не обрывается | F-03, «Резолюция» п. 4 |
 | Кадр контакта | AnimNotify `Contact` (DE-010); фолбэк — кадр профиля: Arthur к. 7 = 292, Merlin к. 8 = 333, Medusa к. 8 = 333 (выпуск стрелы), Harpy к. 7–9 = 292–375 мс | масштаб. | — | `art/pipeline-candidates/*/build-profiles/*-h2anim.json` |
 | HitReact цели + заливка `FxFlash` | в кадр контакта; 450 (летально 550) | нет | клип не обрывается | F-03; TL `target_red_flash`, `target_red_flash_lethal` |
 | «−N» | контакт +60; 900 × скорость (×0,5 → 450, ×1,5 → 1350) | масштаб. | да | F-04, SD-49; TL `hit_to_minus_n_popup`, `damage_popup_minus_n` |
@@ -138,7 +138,7 @@ CUE combat seq=<n> stage=read t=<конец> ms=<факт> skipped=<0|1>        
 CUE combat seq=<n> stage=effect t=<конец> i=<k> ms=<факт> skipped=<0|1>  (на каждую сработавшую строку)
 CUE combat seq=<n> stage=slam t=<ms> a=<A> d=<D> outcome=<win|hold>       (слэм и метка исхода)
 CUE combat seq=<n> stage=pause t=<конец> ms=<факт> skipped=<0|1>          (пауза «счёт»)
-CUE combat seq=<n> stage=lunge t=<ms> attacker=<id>                       (LungeAttack — вступление CUE-011)
+CUE combat seq=<n> stage=lunge t=<ms> attacker=<id> rate=<x>              (LungeAttack — вступление CUE-011; rate = 1 / скорость, 0 при «Нет» — клип не играется; DE-025)
 CUE combat seq=<n> stage=contact t=<ms> offset=<мс> window=<мс> src=<…>  (кадр контакта; window — CUE-011 от контакта)
 CUE combat seq=<n> stage=hit t=<ms> target=<id> tint=<450|550>            (HitReact + заливка)
 CUE combat seq=<n> stage=minus t=<ms> amount=<n> life=<мс>                («−N»)
