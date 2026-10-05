@@ -1331,7 +1331,11 @@ void AS08FlowGameMode::HandleClick() {
   // priority of MS-R-71 holds - FS09MoveInput decides, this picks and applies.
   // Outside a draft a click never sends a mutation (MS-R-01); the TASK-022
   // two-click quick move stays behind -S08LegacyQuickMove (MS-R-32).
-  if (FS09MoveInput::RoutesMoveSelection(CommandUi.Mode, bLegacyQuickMove) && Flow.IsValid()) {
+  // MS-T-12: an own pending MOVE / PLACE head (MS-S-12) takes the same
+  // release / MS-R-71 path; the other pending types keep the handlers below.
+  if ((FS09MoveInput::RoutesMoveSelection(CommandUi.Mode, bLegacyQuickMove) ||
+       FS09MoveInput::RoutesPendingBoard(CommandUi)) &&
+      Flow.IsValid()) {
     FIntPoint Cell(-1, -1);
     FString HitFighterId;
     if (!ViewportHasFocus()) {
@@ -1676,7 +1680,11 @@ void AS08FlowGameMode::ApplyMoveInput(const FS09InputResult& Result) {
     }
   }
   if (Result.bSelectionChanged && BoardActor) {
-    BoardActor->SetSelectedFighter(CommandUi.SelectedFighterId, CommandUi.ReachableCells);
+    if (FS09MoveInput::RoutesPendingBoard(CommandUi)) {
+      BoardActor->SetSelectedFighter(CommandUi.PendingFighterId, CommandUi.PendingCells); // MS-S-12
+    } else {
+      BoardActor->SetSelectedFighter(CommandUi.SelectedFighterId, CommandUi.ReachableCells);
+    }
   }
   RefreshHud();
 }
@@ -2186,12 +2194,28 @@ void AS08FlowGameMode::DeclinePendingChoiceCommand() {
   if (Flow->DeclinePendingEffect(Command.EffectId)) {
     FS08Trace::Write(FString::Printf(TEXT("PEND-DECLINE sent type=%s"),
                                      *CommandUi.PendingChoice.Type));
-    Toast = TEXT("boost declined");
+    Toast = FString::Printf(TEXT("%s declined"), *CommandUi.PendingChoice.Type);
   } else {
     Toast = TEXT("decline not sent - command gate blocked it (see trace)");
   }
   ToastUntil = Elapsed + 3.0f;
   RefreshHud();
+}
+
+void AS08FlowGameMode::StayPendingInPlaceCommand() {
+  // MS-T-12 (ms.btn.stay): the own space as the MOVE target, sent at once.
+  if (!Flow.IsValid()) return;
+  FS09Reason Why;
+  if (!CommandUi.StayPendingInPlace(BoardModel, Fighters, Why)) {
+    ShowReason(Why, 3.0f);
+    RefreshHud();
+    return;
+  }
+  FS08Trace::Write(FString::Printf(TEXT("MS-PENDING stay id=%s fighter=%s space=%s"), *CommandUi.PendingChoice.Id,
+                                   *CommandUi.PendingFighterId,
+                                   *BoardModel.CellLabel(CommandUi.PendingCellX, CommandUi.PendingCellY)));
+  if (BoardActor) BoardActor->SetSelectedFighter(CommandUi.PendingFighterId, CommandUi.PendingCells);
+  ConfirmCombat();
 }
 
 void AS08FlowGameMode::PlaySchemeCommand() {
@@ -2370,6 +2394,16 @@ void AS08FlowGameMode::HandleHudKeys() {
   // Ctrl+Up/Down before the discard-browser arrows (MS-E-98), Esc by steps with
   // D / I first, Backspace / Ctrl+Z undo, Delete, Tab, B and the MS-S-08
   // arrows. A key FS09MoveInput leaves unhandled falls through.
+  // MS-T-12 (MS-S-12): Esc steps back in an own pending MOVE / PLACE - the
+  // target, then the fighter; with nothing to clear the older chain keeps it.
+  if (!bS09Probe && FS09MoveInput::RoutesPendingBoard(CommandUi) && PC->WasInputKeyJustPressed(EKeys::Escape) &&
+      !bDiscardBrowserOpen && !bInspecting) {
+    const FS09InputResult Back = MoveInput.PendingStepBack(CommandUi, Fighters);
+    if (Back.bHandled) {
+      ApplyMoveInput(Back);
+      return;
+    }
+  }
   if (!bS09Probe && FS09MoveInput::RoutesMoveSelection(CommandUi.Mode, bLegacyQuickMove)) {
     const bool bCtrl = PC->IsInputKeyDown(EKeys::LeftControl) || PC->IsInputKeyDown(EKeys::RightControl);
     const bool bShift = PC->IsInputKeyDown(EKeys::LeftShift) || PC->IsInputKeyDown(EKeys::RightShift);
@@ -5822,22 +5856,37 @@ void AS08FlowGameMode::RefreshHud() {
     }
     const FString& PendingType = Pending.Type;
     if (PendingType == TEXT("MOVE") || PendingType == TEXT("PLACE")) {
-      FString FighterLabel;
-      for (const FS08BoardFighter& Entry : Fighters) {
-        if (Entry.Id == CommandUi.PendingFighterId) FighterLabel = Entry.Label;
-      }
-      AddLine(FString::Printf(TEXT("fighter: %s   destination: %s"),
-                              *FighterLabel,
-                              CommandUi.bPendingCellSet
-                                  ? *BoardModel.CellLabel(CommandUi.PendingCellX, CommandUi.PendingCellY)
-                                  : TEXT("-")));
-      if (PendingType == TEXT("MOVE")) {
-        AddLine(FString::Printf(TEXT("move up to %d - click the fighter, then a highlighted space"),
-                                Pending.bHasValue ? Pending.Value : 1));
+      // MS-T-12 (MS-S-12, MS-R-25): whose choice it is (always the viewer's
+      // here) and whose fighter moves (MS-E-59), the allowance (`value`
+      // absent -> 1, 0 -> 0: MS-E-57 / MS-E-76), "Stay in place" / "Decline"
+      // and the no-space case (MS-E-61) - the same data the plates show.
+      const FS09PendingMovePrompt Prompt = CommandUi.DescribePendingMovePlace(BoardModel, Fighters);
+      AddBigLine(TEXT("YOUR CHOICE: ") + Prompt.Prompt.Text(), FLinearColor(0.8f, 0.88f, 1.0f, 1.0f));
+      const bool bStayTarget = CommandUi.bPendingCellSet && !Prompt.bPlace && [&]() {
+        for (const FS08BoardFighter& Entry : Fighters) {
+          if (Entry.Id == Prompt.FighterId) return Entry.X == CommandUi.PendingCellX && Entry.Y == CommandUi.PendingCellY;
+        }
+        return false;
+      }();
+      AddLine(FString::Printf(TEXT("fighter: %s   %s: %s"), Prompt.FighterLabel.IsEmpty() ? TEXT("-") : *Prompt.FighterLabel,
+                              Prompt.bPlace ? TEXT("space") : TEXT("destination"),
+                              bStayTarget                  ? TEXT("stays in place")
+                              : CommandUi.bPendingCellSet ? *BoardModel.CellLabel(CommandUi.PendingCellX, CommandUi.PendingCellY)
+                                                          : TEXT("-")));
+      if (Prompt.bNoSpace) {
+        AddLine(S08WhyText::En(FName(TEXT("ms.place.no.space"))));
+      } else if (Prompt.FighterId.IsEmpty()) {
+        AddLine(S08WhyText::En(FName(TEXT("ms.choice.object"))) + TEXT(" - click one of the effect's fighters"));
+      } else if (!Prompt.bPlace && Prompt.Allowance == 0) {
+        AddLine(TEXT("no steps allowed - Stay in place confirms"));
+      } else if (!Prompt.bPlace) {
+        AddLine(FString::Printf(TEXT("click a highlighted space (%d legal, up to %d step(s)) or Stay in place; Enter confirms"),
+                                Prompt.Targets, Prompt.Allowance));
       } else {
-        AddLine(Pending.bRestoreFullHealth
-                    ? TEXT("place the defeated fighter (full health) - click it, then a highlighted space")
-                    : TEXT("place: click the fighter, then a highlighted space"));
+        AddLine(FString::Printf(TEXT("%s - click a highlighted space (%d legal); Enter confirms"),
+                                Pending.bRestoreFullHealth ? TEXT("the defeated fighter returns at full health")
+                                                           : TEXT("place ignores the movement rules"),
+                                Prompt.Targets));
         if (!Pending.ZoneFighterName.IsEmpty()) {
           AddLine(FString::Printf(TEXT("restricted to %s's zone (highlighted spaces)"),
                                   *Pending.ZoneFighterName));
@@ -5961,6 +6010,20 @@ void AS08FlowGameMode::RefreshHud() {
                   FMargin(14, 8), FLinearColor::White,
                   SNew(STextBlock).Text(FText::FromString(TEXT("CONFIRM (Enter)")))
                        .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14)))] +
+         SHorizontalBox::Slot().AutoWidth().Padding(0, 0, 8, 0)
+             [CommandUi.DescribePendingMovePlace(BoardModel, Fighters).bCanStay
+                  // MS-T-12 (ms.btn.stay, MS-E-58 / MS-E-76): the zero-step resolve in one press - shown once a
+                  // MOVE fighter is picked (the only legal one is picked by the snapshot), so it never refuses
+                  // with anything but the HUD's own why.* (DE-014)
+                  ? MakeHudPress(
+                        FName(TEXT("hud.pending.stay")),
+                        [this]() { return HudBusyReason(); },
+                        [this]() { StayPendingInPlaceCommand(); },
+                        FMargin(14, 8), FLinearColor::White,
+                        SNew(STextBlock)
+                            .Text(FText::FromString(S08WhyText::En(FName(TEXT("ms.btn.stay"))).ToUpper()))
+                            .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14)))
+                  : SNullWidget::NullWidget] +
          SHorizontalBox::Slot().AutoWidth()
              [MakeHudPress(
                   FName(TEXT("hud.pending.decline")),
@@ -7873,7 +7936,13 @@ void AS08FlowGameMode::BenchSetupView(const FString& View, const FString& HeroId
   }
   // MS-T-08: a -BenchMoveDraft scene keeps the draft's selection on the board in every view (the camera focus above
   // only moves the camera)
-  if (bBenchMoveDraft && BoardActor) BoardActor->SetSelectedFighter(CommandUi.SelectedFighterId, CommandUi.ReachableCells);
+  if (bBenchMoveDraft && BoardActor) {
+    if (CommandUi.IsPendingMovePlace()) {
+      BoardActor->SetSelectedFighter(CommandUi.PendingFighterId, CommandUi.PendingCells); // MS-T-12 pending scene
+    } else {
+      BoardActor->SetSelectedFighter(CommandUi.SelectedFighterId, CommandUi.ReachableCells);
+    }
+  }
 }
 
 bool AS08FlowGameMode::BenchCameraSettled() const {

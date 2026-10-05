@@ -39,6 +39,10 @@ void AS08FlowGameMode::SyncMovePlates() {
   Key = HashCombineFast(Key, GetTypeHash(CommandUi.PreDraft.FighterId));
   Key = HashCombineFast(Key, GetTypeHash(CommandUi.SelectedFighterId));
   Key = HashCombineFast(Key, GetTypeHash(CommandUi.PendingCells.Num()));
+  // MS-T-12: the pending fighter and target (V-04 + path of a picked MOVE / PLACE target)
+  Key = HashCombineFast(Key, GetTypeHash(CommandUi.PendingFighterId));
+  Key = HashCombineFast(Key, GetTypeHash(CommandUi.bPendingCellSet ? FIntPoint(CommandUi.PendingCellX, CommandUi.PendingCellY)
+                                                                   : FIntPoint(-1, -1)));
   Key = HashCombineFast(Key, GetTypeHash(MoveHoverCell));
   if (Key == MovePlatesKey) return;
   MovePlatesKey = Key;
@@ -71,7 +75,11 @@ bool AS08FlowGameMode::ApplyBenchMoveDraft(const FS08Snapshot& Snapshot, const F
   MoveHoverCell = Result.Hover;
   FS08Trace::Write(Result.Summary);
   if (BoardActor) {
-    BoardActor->SetSelectedFighter(CommandUi.SelectedFighterId, CommandUi.ReachableCells);
+    if (CommandUi.IsPendingMovePlace()) {
+      BoardActor->SetSelectedFighter(CommandUi.PendingFighterId, CommandUi.PendingCells); // MS-T-12 scene
+    } else {
+      BoardActor->SetSelectedFighter(CommandUi.SelectedFighterId, CommandUi.ReachableCells);
+    }
     FS08Trace::Write(FString::Printf(TEXT("MS-BENCH plates=%d%s"), BoardActor->UsesMovePlates() ? 1 : 0,
                                      BoardActor->UsesMovePlates()
                                          ? TEXT("")

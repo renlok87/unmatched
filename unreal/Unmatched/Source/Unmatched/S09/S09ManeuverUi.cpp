@@ -330,6 +330,12 @@ FString FS09Reason::Describe() const {
     if (Args.Contains(TEXT("orderHint"))) Text += TEXT(" (it leaves later - change the order)");
   } else if (K == TEXT("why.cell.not.space")) {
     Text = Where + TEXT(": not a board space");
+  } else if (K == TEXT("why.cell.occupied")) {
+    Text = Where + TEXT(": the space is occupied");
+  } else if (K == TEXT("why.cell.enemy.path")) {
+    Text = Where + TEXT(": the path is blocked by an enemy");
+  } else if (K == TEXT("why.place.zone")) {
+    Text = Where + TEXT(": not in ") + ArgOf(TEXT("fighterName")) + TEXT("'s zone");
   } else if (K == TEXT("why.swap.impossible")) {
     Text = TEXT("fighters cannot swap spaces");
   } else if (K == TEXT("why.immobilized")) {
@@ -741,14 +747,24 @@ bool FS09CommandUi::OnSnapshot(const FS08Snapshot& Snapshot, const FS08BoardMode
       PendingLegalFighters(Fighters, Legal);
       if (!Legal.Contains(PendingFighterId)) PendingFighterId.Reset();
     }
-    if (bPendingCellSet) {
+    // MS-T-12 (MS-S-12): the only legal fighter of a MOVE / PLACE head is
+    // picked at once (its spaces light up without a click - with `value` 0
+    // the panel offers just "Stay in place"), and the picked fighter's legal
+    // spaces follow every snapshot, not only while a target is set.
+    const bool bMovePlace = IsPendingMovePlace();
+    if (bMovePlace && PendingFighterId.IsEmpty()) {
+      TArray<FString> Legal;
+      if (PendingLegalFighters(Fighters, Legal) && Legal.Num() == 1) PendingFighterId = Legal[0];
+    }
+    if (bPendingCellSet || (bMovePlace && !PendingFighterId.IsEmpty())) {
       PendingCells = ComputePendingCells(Snapshot, Board, Fighters);
-      if (!PendingCells.Contains(FS08BoardModel::CellKey(PendingCellX, PendingCellY))) {
+      if (bPendingCellSet && !PendingCells.Contains(FS08BoardModel::CellKey(PendingCellX, PendingCellY))) {
         bPendingCellSet = false;
       }
     } else {
       PendingCells.Reset();
     }
+    if (bMovePlace) TracePendingMovePlace(Board, Fighters);
     if (PendingOptionIndex >= PendingChoice.Options.Num()) PendingOptionIndex = -1;
     if (PendingCardIds.Num() > 0) {
       TSet<FString> Allowed;
@@ -2034,34 +2050,10 @@ TSet<uint64> FS09CommandUi::PendingMoveCells(const FS08BoardModel& Board,
 TSet<uint64> FS09CommandUi::ComputePendingCells(const FS08Snapshot& Snapshot,
                                                 const FS08BoardModel& Board,
                                                 const TArray<FS08BoardFighter>& Fighters) const {
-  TSet<uint64> Out;
+  (void)Snapshot;
   const FString& Type = PendingChoice.Type;
-  if (Type == TEXT("MOVE") || Type == TEXT("PLACE")) {
-    for (const FS08BoardFighter& Fighter : Fighters) {
-      if (Fighter.Id != PendingFighterId) continue;
-      if (Type == TEXT("MOVE")) {
-        return PendingMoveCells(Board, Fighters, Fighter,
-                                PendingChoice.bHasValue ? PendingChoice.Value : 1,
-                                PendingChoice.bCanPassThroughEnemies);
-      }
-      // PLACE: any passable free cell (revive may target a defeated fighter,
-      // whose own cell counts as free); optional zone restriction.
-      for (int32 Y = 0; Y < Board.Height; Y++) {
-        for (int32 X = 0; X < Board.Width; X++) {
-          const FS08Cell* Cell = Board.CellAt(X, Y);
-          if (!Cell || !Cell->IsPassable()) continue;
-          if (FS08BoardModel::FighterAt(Fighters, X, Y, Fighter.Id) != nullptr) continue;
-          if (!PendingChoice.ZoneFighterName.IsEmpty() &&
-              !CellSharesZoneWith(Board, Fighters, PendingChoice.ZoneFighterName, X, Y)) {
-            continue;
-          }
-          Out.Add(FS08BoardModel::CellKey(X, Y));
-        }
-      }
-      return Out;
-    }
-    return Out;
-  }
+  if (Type == TEXT("MOVE") || Type == TEXT("PLACE")) return PendingCellsFor(PendingFighterId, Board, Fighters);
+  TSet<uint64> Out;
   if (Type == TEXT("CHOOSE_SPACE")) {
     if (PendingChoice.Stage != 2) {
       // Stage 1: any passable cell sharing the named fighter's zone.
@@ -2087,6 +2079,196 @@ TSet<uint64> FS09CommandUi::ComputePendingCells(const FS08Snapshot& Snapshot,
           Out.Add(FS08BoardModel::CellKey(Neighbour.X, Neighbour.Y));
         }
       }
+    }
+    return Out;
+  }
+  return Out;
+}
+
+bool FS09CommandUi::IsPendingMovePlace() const {
+  return Mode == ES09CommandMode::PendingChoice && bHasPendingChoice && PendingChoice.PlayerId == ViewerId &&
+         (PendingChoice.Type == TEXT("MOVE") || PendingChoice.Type == TEXT("PLACE"));
+}
+
+FS09PendingMovePrompt FS09CommandUi::DescribePendingMovePlace(const FS08BoardModel& Board,
+                                                              const TArray<FS08BoardFighter>& Fighters) const {
+  FS09PendingMovePrompt Out;
+  if (!IsPendingMovePlace()) return Out;
+  Out.bValid = true;
+  Out.bPlace = PendingChoice.Type == TEXT("PLACE");
+  Out.bCanDecline = PendingChoice.bOptional;
+  Out.Allowance = PendingChoice.bHasValue ? PendingChoice.Value : 1; // MS-E-57 / MS-E-76
+  TArray<FString> Legal;
+  PendingLegalFighters(Fighters, Legal);
+  Out.LegalFighters = Legal.Num();
+  Out.FighterId = !PendingFighterId.IsEmpty() ? PendingFighterId : (Legal.Num() == 1 ? Legal[0] : FString());
+  auto LabelOf = [](const FS08BoardFighter& F) { return F.Label.IsEmpty() ? F.Name : F.Label; };
+  // MS-E-61: no legal fighter, or (PLACE) no legal fighter has a free space.
+  bool bAnySpace = false;
+  for (const FString& Id : Legal) {
+    if (PendingCellsFor(Id, Board, Fighters).Num() > 0) {
+      bAnySpace = true;
+      break;
+    }
+  }
+  Out.bNoSpace = !bAnySpace;
+  if (const FS08BoardFighter* Fighter = FindFighter(Fighters, Out.FighterId)) {
+    Out.FighterLabel = LabelOf(*Fighter);
+    Out.bEnemyFighter = Fighter->OwnerId != ViewerId;
+    Out.bImmobilized = !Out.bPlace && FS09DraftEval::IsImmobilized(*Fighter);
+    const TSet<uint64> Cells = PendingCellsFor(Fighter->Id, Board, Fighters);
+    const bool bOwnSpace = Fighter->X >= 0 && Fighter->Y >= 0 &&
+                           Cells.Contains(FS08BoardModel::CellKey(Fighter->X, Fighter->Y));
+    Out.Targets = Cells.Num() - (bOwnSpace ? 1 : 0);
+    Out.bCanStay = !Out.bPlace && bOwnSpace;
+  } else {
+    // several legal fighters, none picked yet: name them all (max 3)
+    TArray<FString> Names;
+    for (const FString& Id : Legal) {
+      if (const FS08BoardFighter* F = FindFighter(Fighters, Id)) Names.Add(LabelOf(*F));
+      if (Names.Num() == 3) break;
+    }
+    Out.FighterLabel = FString::Join(Names, TEXT(" / "));
+  }
+  if (Out.bNoSpace) {
+    Out.Prompt = FS09Reason::Make(TEXT("ms.place.no.space"));
+  } else if (Out.bPlace) {
+    Out.Prompt = FS09Reason::Make(TEXT("ms.pending.place")).Arg(TEXT("fighterName"), Out.FighterLabel);
+  } else if (Out.bEnemyFighter) {
+    Out.Prompt = FS09Reason::Make(TEXT("ms.pending.move.enemy")).Arg(TEXT("fighterName"), Out.FighterLabel);
+  } else {
+    Out.Prompt = FS09Reason::Make(TEXT("ms.pending.move"))
+                     .Arg(TEXT("fighterName"), Out.FighterLabel)
+                     .Arg(TEXT("n"), Out.Allowance);
+  }
+  return Out;
+}
+
+bool FS09CommandUi::StayPendingInPlace(const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters,
+                                       FS09Reason& OutWhy) {
+  OutWhy.Reset();
+  if (!IsPendingMovePlace() || PendingChoice.Type != TEXT("MOVE")) {
+    OutWhy = FS09Reason::Make(TEXT("why.state.changed"));
+    return false;
+  }
+  if (bCommandInFlight) {
+    OutWhy = FS09Reason::Make(TEXT("why.syncing"));
+    return false;
+  }
+  if (PendingFighterId.IsEmpty()) {
+    TArray<FString> Legal;
+    if (!PendingLegalFighters(Fighters, Legal) || Legal.Num() != 1) {
+      OutWhy = FS09Reason::Make(TEXT("ms.choice.object"));
+      return false;
+    }
+    PendingFighterId = Legal[0];
+  }
+  const FS08BoardFighter* Mover = FindFighter(Fighters, PendingFighterId);
+  const TSet<uint64> Cells = PendingCellsFor(PendingFighterId, Board, Fighters);
+  if (!Mover || Mover->X < 0 || Mover->Y < 0 || !Cells.Contains(FS08BoardModel::CellKey(Mover->X, Mover->Y))) {
+    OutWhy = FS09Reason::Make(TEXT("why.state.changed"));
+    return false;
+  }
+  PendingCells = Cells;
+  PendingCellX = Mover->X;
+  PendingCellY = Mover->Y;
+  bPendingCellSet = true;
+  return true;
+}
+
+FS09Reason FS09CommandUi::PendingCellReason(int32 X, int32 Y, const FS08BoardModel& Board,
+                                            const TArray<FS08BoardFighter>& Fighters) const {
+  if (!IsPendingMovePlace() || PendingFighterId.IsEmpty()) return FS09Reason();
+  if (PendingCellsFor(PendingFighterId, Board, Fighters).Contains(FS08BoardModel::CellKey(X, Y))) return FS09Reason();
+  const FString Cell = Board.CellLabel(X, Y);
+  auto Make = [&Cell](const TCHAR* Key) { return FS09Reason::Make(Key).Arg(TEXT("cell"), Cell); };
+  const FS08Cell* Terrain = Board.CellAt(X, Y);
+  if (!Board.IsBoardSpace(X, Y) || !Terrain || !Terrain->IsPassable()) return Make(TEXT("why.cell.not.space"));
+  const FS08BoardFighter* Mover = FindFighter(Fighters, PendingFighterId);
+  if (!Mover) return FS09Reason::Make(TEXT("why.client.desync"));
+  const FS08BoardFighter* Occupant = FS08BoardModel::FighterAt(Fighters, X, Y, Mover->Id);
+  if (PendingChoice.Type == TEXT("PLACE")) {
+    if (Occupant) return Make(TEXT("why.cell.occupied"));
+    if (!PendingChoice.ZoneFighterName.IsEmpty() &&
+        !CellSharesZoneWith(Board, Fighters, PendingChoice.ZoneFighterName, X, Y)) {
+      return Make(TEXT("why.place.zone")).Arg(TEXT("fighterName"), PendingChoice.ZoneFighterName);
+    }
+    return Make(TEXT("why.cell.not.space"));
+  }
+  // MOVE: the occupant first (an endpoint is never taken), then the path.
+  if (Occupant) return Make(Occupant->OwnerId != Mover->OwnerId ? TEXT("why.cell.enemy") : TEXT("why.cell.ally"));
+  FS08ReachOptions Options;
+  Options.bPassThroughEnemies = PendingChoice.bCanPassThroughEnemies;
+  const FS08ReachMap Unlimited = FS08BoardModel::ComputeReachMap(Board, Fighters, Mover->Id, MAX_int32, Options);
+  const int32 Need = Unlimited.DistanceTo(FIntPoint(X, Y));
+  const int32 Have = PendingChoice.bHasValue ? PendingChoice.Value : 1;
+  if (Need != INDEX_NONE && Need > Have) {
+    return Make(TEXT("why.cell.unreachable")).Arg(TEXT("need"), Need).Arg(TEXT("have"), Have);
+  }
+  if (Need == INDEX_NONE && !Options.bPassThroughEnemies) {
+    FS08ReachOptions Through;
+    Through.bPassThroughEnemies = true;
+    if (FS08BoardModel::ComputeReachMap(Board, Fighters, Mover->Id, MAX_int32, Through).Reaches(FIntPoint(X, Y))) {
+      return Make(TEXT("why.cell.enemy.path"));
+    }
+  }
+  return Make(TEXT("why.cell.no.path"));
+}
+
+void FS09CommandUi::TracePendingMovePlace(const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters) {
+  const FS09PendingMovePrompt Prompt = DescribePendingMovePlace(Board, Fighters);
+  if (!Prompt.bValid) return;
+  const FString Key = PendingHeadKey() + TEXT("|") + Prompt.FighterId;
+  if (Key == PendingTracedKey) return;
+  PendingTracedKey = Key;
+  DraftTraceLine(FString::Printf(
+      TEXT("MS-PENDING open id=%s type=%s value=%s optional=%d fighter=%s owner=%s legal=%d targets=%d stay=%d ")
+      TEXT("decline=%d"),
+      *PendingChoice.Id, *PendingChoice.Type,
+      PendingChoice.bHasValue ? *FString::FromInt(PendingChoice.Value) : TEXT("absent(1)"),
+      PendingChoice.bOptional ? 1 : 0, Prompt.FighterId.IsEmpty() ? TEXT("-") : *Prompt.FighterId,
+      Prompt.FighterId.IsEmpty() ? TEXT("-") : (Prompt.bEnemyFighter ? TEXT("opponent") : TEXT("own")),
+      Prompt.LegalFighters, Prompt.Targets, Prompt.bCanStay ? 1 : 0, Prompt.bCanDecline ? 1 : 0));
+  if (Prompt.bNoSpace) {
+    // MS-E-61: the server neither resolves nor refuses (R1-D07); since DE-016
+    // it should not open such a head at all - a line here is a server gap.
+    DraftTraceLine(FString::Printf(TEXT("MS-REJECT place.no.space id=%s type=%s legal=%d"), *PendingChoice.Id,
+                                   *PendingChoice.Type, Prompt.LegalFighters));
+  }
+  if (Prompt.bImmobilized) {
+    // MS-E-63: allowed as the server allows it (R1-D02); the rule is open until MS-T-19.
+    DraftTraceLine(FString::Printf(TEXT("MS-DATA pending.move.immobilized fighter=%s id=%s (allowed; rule open, MS-T-19)"),
+                                   *Prompt.FighterId, *PendingChoice.Id));
+  }
+}
+
+TSet<uint64> FS09CommandUi::PendingCellsFor(const FString& FighterId, const FS08BoardModel& Board,
+                                            const TArray<FS08BoardFighter>& Fighters) const {
+  TSet<uint64> Out;
+  const FString& Type = PendingChoice.Type;
+  if (Type == TEXT("MOVE") || Type == TEXT("PLACE")) {
+    for (const FS08BoardFighter& Fighter : Fighters) {
+      if (FighterId.IsEmpty() || Fighter.Id != FighterId) continue;
+      if (Type == TEXT("MOVE")) {
+        return PendingMoveCells(Board, Fighters, Fighter,
+                                PendingChoice.bHasValue ? PendingChoice.Value : 1,
+                                PendingChoice.bCanPassThroughEnemies);
+      }
+      // PLACE: any passable free cell (revive may target a defeated fighter,
+      // whose own cell counts as free); optional zone restriction.
+      for (int32 Y = 0; Y < Board.Height; Y++) {
+        for (int32 X = 0; X < Board.Width; X++) {
+          const FS08Cell* Cell = Board.CellAt(X, Y);
+          if (!Cell || !Cell->IsPassable()) continue;
+          if (FS08BoardModel::FighterAt(Fighters, X, Y, Fighter.Id) != nullptr) continue;
+          if (!PendingChoice.ZoneFighterName.IsEmpty() &&
+              !CellSharesZoneWith(Board, Fighters, PendingChoice.ZoneFighterName, X, Y)) {
+            continue;
+          }
+          Out.Add(FS08BoardModel::CellKey(X, Y));
+        }
+      }
+      return Out;
     }
     return Out;
   }
@@ -2136,8 +2318,10 @@ bool FS09CommandUi::SelectPendingCell(int32 X, int32 Y,
   }
   const TSet<uint64> Legal = ComputePendingCells(Snapshot, Board, Fighters);
   if (!Legal.Contains(FS08BoardModel::CellKey(X, Y))) {
-    // B-04: the space by CellLabel (the exact why.* of a pending pick: MS-T-12).
-    OutReason = FString::Printf(TEXT("space %s is not legal for this choice"), *Board.CellLabel(X, Y));
+    // B-04: the space by CellLabel; MOVE / PLACE name the exact why.* (MS-T-12).
+    const FS09Reason Why = PendingCellReason(X, Y, Board, Fighters);
+    OutReason = Why.IsSet() ? Why.Describe()
+                            : FString::Printf(TEXT("space %s is not legal for this choice"), *Board.CellLabel(X, Y));
     return false;
   }
   PendingCellX = X;

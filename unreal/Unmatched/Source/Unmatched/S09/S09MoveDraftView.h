@@ -11,7 +11,12 @@
 //     "scene": "<name>", "selected": "<fighter id>", "hover": "<space id>" | [x, y],
 //     "boostCardId": "<own hand instance id>", "moves": [{"fighterId": "<id>", "to": "<space id>" | [x, y]}],
 //     "moveOrder": [{"fighterId": "<id>", "delta": -1 | 1}],
-//     "lastMovement": {...}, "pending": {...} }      <- reserved for MS-T-17 / MS-T-12 (traced as skipped)
+//     "lastMovement": {...},                          <- reserved for MS-T-17 (traced as skipped)
+//     "pending": {"type": "MOVE" | "PLACE", "fighterId": "<id>", "value": <n>, "optional": <bool>,
+//                 "targetsOpponent": <bool>, "to": "<space id>" | [x, y]} }
+// MS-T-12: "pending" synthesises metadata.pendingEffects [{id "bench-pending:<file name>", playerId benchViewerId,
+// type, value (omitted = absent), optional, fighterIds [fighterId], targetsOpponent}] INSTEAD of the pendingManeuver -
+// the MS-S-12 plates V-11 / V-12 (and V-04 + path with "to"); it excludes boostCardId / moves / moveOrder / selected.
 #pragma once
 
 #include "CoreMinimal.h"
@@ -57,7 +62,18 @@ struct UNMATCHED_API FFixture {
     int32 Delta = 0;
   };
   TArray<FOrder> MoveOrder;
-  /** Reserved fields present in the file (lastMovement, pending): traced, not applied by MS-T-08. */
+  /** MS-T-12: a pending MOVE / PLACE head of the viewer (MS-S-12) instead of a maneuver draft. */
+  struct FPending {
+    bool bSet = false;
+    FString Type;
+    FString FighterId;
+    int32 Value = -1;  // < 0: the field is absent (server `value ?? 1`)
+    bool bOptional = false;
+    bool bTargetsOpponent = false;
+    FCellRef To;
+  };
+  FPending Pending;
+  /** Reserved fields present in the file (lastMovement): traced, not applied. */
   TArray<FString> Skipped;
 };
 

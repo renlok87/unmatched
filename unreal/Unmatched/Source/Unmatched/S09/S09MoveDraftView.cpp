@@ -17,12 +17,32 @@ FS08MoveDraftInput BuildInput(const FS09CommandUi& Ui, const FS08BoardModel& Boa
     }
     return FIntPoint(-1, -1);
   };
-  // MS-S-12: the legal spaces of a pending MOVE / PLACE head of this viewer (V-11 / V-12; MS-T-12 adds the rest)
+  // MS-S-12 (MS-T-12): the legal spaces of a pending MOVE / PLACE head of this viewer (V-11 / V-12). The picked
+  // fighter's own space is no plate - "stay" is the panel button (MS-E-58), so `value` 0 lights nothing (MS-E-76);
+  // a picked target is a destination (V-04) with the canonical path for MOVE (V-03) and no path for PLACE (V-12).
   if (Ui.Mode == ES09CommandMode::PendingChoice) {
     if (Ui.bHasPendingChoice && (Ui.PendingChoice.Type == TEXT("MOVE") || Ui.PendingChoice.Type == TEXT("PLACE"))) {
+      const bool bPlace = Ui.PendingChoice.Type == TEXT("PLACE");
       In.bPending = true;
-      In.bPendingPlace = Ui.PendingChoice.Type == TEXT("PLACE");
+      In.bPendingPlace = bPlace;
       In.PendingCells = Ui.PendingCells;
+      const FIntPoint Start = PositionOf(Ui.PendingFighterId);
+      if (!bPlace && Start.X >= 0) In.PendingCells.Remove(FS08BoardModel::CellKey(Start.X, Start.Y));
+      const FIntPoint Dest(Ui.PendingCellX, Ui.PendingCellY);
+      if (!Ui.PendingFighterId.IsEmpty() && Ui.bPendingCellSet && Dest != Start) {
+        FS08MoveDraftInput::FMove& Out = In.Moves.AddDefaulted_GetRef();
+        Out.FighterId = Ui.PendingFighterId;
+        Out.Start = Start;
+        Out.Dest = Dest;
+        Out.Status = FS08MoveDraftInput::EMoveStatus::Ok;
+        if (!bPlace) {
+          FS08ReachOptions Options;
+          Options.bPassThroughEnemies = Ui.PendingChoice.bCanPassThroughEnemies;
+          const FS08ReachMap Reach = FS08BoardModel::ComputeReachMap(
+              Board, Fighters, Ui.PendingFighterId, Ui.PendingChoice.bHasValue ? Ui.PendingChoice.Value : 1, Options);
+          FS08BoardModel::BuildCanonicalPath(Board, Fighters, Reach, Dest, Out.Path);
+        }
+      }
     }
     return In;
   }
@@ -182,11 +202,111 @@ bool Parse(const FString& Text, const FString& FileName, FFixture& Out, TArray<F
       }
     }
   }
-  for (const TCHAR* Reserved : {TEXT("lastMovement"), TEXT("pending")}) {
+  for (const TCHAR* Reserved : {TEXT("lastMovement")}) {
     if (Root->HasField(Reserved)) Out.Skipped.Add(Reserved);
+  }
+  // MS-T-12: the pending MOVE / PLACE scene (MS-S-12)
+  if (Root->HasField(TEXT("pending"))) {
+    const TSharedPtr<FJsonObject>* Obj = nullptr;
+    FFixture::FPending& P = Out.Pending;
+    if (!Root->TryGetObjectField(TEXT("pending"), Obj) || !Obj || !(*Obj)->TryGetStringField(TEXT("type"), P.Type) ||
+        (P.Type != TEXT("MOVE") && P.Type != TEXT("PLACE")) || !(*Obj)->TryGetStringField(TEXT("fighterId"), P.FighterId) ||
+        P.FighterId.IsEmpty()) {
+      OutErrors.Add(TEXT("pending needs type MOVE | PLACE and fighterId"));
+    } else {
+      double Value = 0.0;
+      if ((*Obj)->TryGetNumberField(TEXT("value"), Value)) P.Value = FMath::Max(0, static_cast<int32>(Value));
+      (*Obj)->TryGetBoolField(TEXT("optional"), P.bOptional);
+      (*Obj)->TryGetBoolField(TEXT("targetsOpponent"), P.bTargetsOpponent);
+      if ((*Obj)->HasField(TEXT("to")) && !ReadCell((*Obj)->TryGetField(TEXT("to")), P.To)) {
+        OutErrors.Add(TEXT("pending.to must be a space id or [x, y]"));
+      }
+      P.bSet = true;
+      if (!Out.BoostCardId.IsEmpty() || Out.Moves.Num() > 0 || Out.MoveOrder.Num() > 0 || !Out.Selected.IsEmpty()) {
+        OutErrors.Add(TEXT("pending excludes boostCardId, moves, moveOrder and selected"));
+      }
+    }
   }
   return OutErrors.Num() == ErrorsBefore;
 }
+
+namespace {
+/** MS-T-12: the pending MOVE / PLACE scene - metadata.pendingEffects of the viewer, the same OnSnapshot as a live
+ *  snapshot, the fighter picked and (with "to") the target set through the pending draft functions. */
+FApplyResult ApplyPending(const FFixture& Fixture, const FS08Snapshot& Snapshot, const FS08BoardModel& Board,
+                          const TArray<FS08BoardFighter>& Fighters, const FString& ViewerId, FS09CommandUi& Ui) {
+  FApplyResult R;
+  const FFixture::FPending& P = Fixture.Pending;
+  if (!Fighters.ContainsByPredicate([&P](const FS08BoardFighter& F) { return F.Id == P.FighterId; })) {
+    R.MismatchId = P.FighterId;
+    R.Error = FString::Printf(TEXT("fighter %s is not in the bench fixture"), *P.FighterId);
+    return R;
+  }
+  R.Snapshot = Snapshot;
+  const TSharedPtr<FJsonObject> Meta = MakeShared<FJsonObject>();
+  if (Snapshot.Metadata.IsValid() && Snapshot.Metadata->Type == EJson::Object && Snapshot.Metadata->AsObject().IsValid()) {
+    for (const TPair<FString, TSharedPtr<FJsonValue>>& Pair : Snapshot.Metadata->AsObject()->Values) {
+      Meta->SetField(Pair.Key, Pair.Value);
+    }
+  }
+  Meta->RemoveField(TEXT("pendingManeuver"));
+  const TSharedRef<FJsonObject> Head = MakeShared<FJsonObject>();
+  Head->SetStringField(TEXT("id"), TEXT("bench-pending:") + Fixture.File);
+  Head->SetStringField(TEXT("playerId"), ViewerId);
+  Head->SetStringField(TEXT("type"), P.Type);
+  if (P.Value >= 0) Head->SetNumberField(TEXT("value"), P.Value);
+  if (P.bOptional) Head->SetBoolField(TEXT("optional"), true);
+  if (P.bTargetsOpponent) Head->SetBoolField(TEXT("targetsOpponent"), true);
+  TArray<TSharedPtr<FJsonValue>> Ids;
+  Ids.Add(MakeShared<FJsonValueString>(P.FighterId));
+  Head->SetArrayField(TEXT("fighterIds"), Ids);
+  Head->SetStringField(TEXT("text"), FString::Printf(TEXT("bench %s"), *Fixture.Scene));
+  TArray<TSharedPtr<FJsonValue>> Effects;
+  Effects.Add(MakeShared<FJsonValueObject>(Head));
+  Meta->SetArrayField(TEXT("pendingEffects"), Effects);
+  R.Snapshot.Metadata = MakeShared<FJsonValueObject>(Meta);
+  const FS08Snapshot& Snap = R.Snapshot;
+  Ui.ViewerId = ViewerId;
+  Ui.bCommandInFlight = false;
+  Ui.OnSnapshot(Snap, Board, Fighters);
+  if (!Ui.IsPendingMovePlace()) {
+    R.Error = TEXT("the synthesised pendingEffects head did not open MS-S-12");
+    return R;
+  }
+  FString Reason;
+  if (!Ui.SelectPendingFighter(P.FighterId, Snap, Fighters, Reason)) {
+    R.Error = FString::Printf(TEXT("pending fighter %s refused: %s"), *P.FighterId, *Reason);
+    return R;
+  }
+  Ui.PendingCells = Ui.ComputePendingCells(Snap, Board, Fighters);
+  if (P.To.bSet) {
+    FIntPoint To;
+    if (!P.To.Resolve(Board, To)) {
+      R.Error = FString::Printf(TEXT("pending.to %s is not a board space"), *P.To.Describe());
+      return R;
+    }
+    if (!Ui.SelectPendingCell(To.X, To.Y, Snap, Board, Fighters, Reason)) {
+      R.Error = FString::Printf(TEXT("pending.to %s refused: %s"), *P.To.Describe(), *Reason);
+      return R;
+    }
+  }
+  if (Fixture.Hover.bSet && !Fixture.Hover.Resolve(Board, R.Hover)) {
+    R.Error = FString::Printf(TEXT("hover %s is not a board space"), *Fixture.Hover.Describe());
+    return R;
+  }
+  const FS09PendingMovePrompt Prompt = Ui.DescribePendingMovePlace(Board, Fighters);
+  R.bOk = true;
+  R.Summary = FString::Printf(
+      TEXT("MS-BENCH pending file=%s scene=%s board=%s type=%s fighter=%s value=%s cells=%d targets=%d to=%s hover=%s ")
+      TEXT("skipped=%s"),
+      *Fixture.File, Fixture.Scene.IsEmpty() ? TEXT("-") : *Fixture.Scene, Fixture.Board.IsEmpty() ? TEXT("-") : *Fixture.Board,
+      *P.Type, *P.FighterId, P.Value >= 0 ? *FString::FromInt(P.Value) : TEXT("absent"), Ui.PendingCells.Num(),
+      Prompt.Targets, Ui.bPendingCellSet ? *Board.CellLabel(Ui.PendingCellX, Ui.PendingCellY) : TEXT("-"),
+      R.Hover.X >= 0 ? *Board.CellLabel(R.Hover.X, R.Hover.Y) : TEXT("-"),
+      Fixture.Skipped.Num() > 0 ? *FString::Join(Fixture.Skipped, TEXT("+")) : TEXT("-"));
+  return R;
+}
+}  // namespace
 
 FApplyResult Apply(const FFixture& Fixture, const FS08Snapshot& Snapshot, const FS08BoardModel& Board,
                    const TArray<FS08BoardFighter>& Fighters, const FString& ViewerId, FS09CommandUi& Ui) {
@@ -206,6 +326,7 @@ FApplyResult Apply(const FFixture& Fixture, const FS08Snapshot& Snapshot, const 
       return R;
     }
   }
+  if (Fixture.Pending.bSet) return ApplyPending(Fixture, Snapshot, Board, Fighters, ViewerId, Ui);
   // the synthesised pendingManeuver of the viewer on top of the fixture's metadata
   R.Snapshot = Snapshot;
   const TSharedPtr<FJsonObject> Meta = MakeShared<FJsonObject>();

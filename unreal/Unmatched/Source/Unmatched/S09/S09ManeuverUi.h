@@ -260,6 +260,24 @@ struct UNMATCHED_API FS09PendingChoiceCommand {
   TArray<FString> CardIds;
 };
 
+/** MS-T-12 (move-selection 03 MS-S-12, MS-R-25; 02 MS-E-57..63, 76): what the
+ *  panel of an own pending MOVE / PLACE head says and offers. */
+struct UNMATCHED_API FS09PendingMovePrompt {
+  bool bValid = false;         // an own MOVE / PLACE head is open (MS-S-12)
+  bool bPlace = false;         // PLACE (V-12, no path) - else MOVE (V-11)
+  FString FighterId;           // the picked fighter (or the only legal one)
+  FString FighterLabel;
+  bool bEnemyFighter = false;  // MS-E-59: the viewer moves an opponent's fighter
+  bool bImmobilized = false;   // MS-E-63: allowed as the server does, traced
+  int32 Allowance = 0;         // MOVE: `value` (absent -> 1, 0 -> 0)
+  int32 LegalFighters = 0;
+  int32 Targets = 0;           // legal spaces other than the fighter's own one
+  bool bCanStay = false;       // MOVE with a fighter: "Stay in place" (MS-E-58, MS-E-76)
+  bool bCanDecline = false;    // optional: "Decline (X)"
+  bool bNoSpace = false;       // MS-E-61: nothing to pick - "No free space. Waiting for the server"
+  FS09Reason Prompt;           // ms.pending.move / ms.pending.move.enemy / ms.pending.place / ms.place.no.space
+};
+
 class UNMATCHED_API FS09CommandUi {
 public:
   /** Server bannerAllows mirror (game-rules.validator): 'Harpy' matches
@@ -689,6 +707,27 @@ public:
                             bool bDecline, FS09PendingChoiceCommand& OutCommand,
                             FString& OutReason) const;
 
+  // ---- MS-T-12: an own pending MOVE / PLACE head (MS-S-12) ----
+  /** True in PendingChoice with an own MOVE / PLACE head. */
+  bool IsPendingMovePlace() const;
+  /** The panel of MS-S-12: whose fighter, the allowance, "Stay in place" /
+   *  "Decline" and the no-space case (MS-R-25, MS-E-57..63, 76). */
+  FS09PendingMovePrompt DescribePendingMovePlace(const FS08BoardModel& Board,
+                                                 const TArray<FS08BoardFighter>& Fighters) const;
+  /** "Stay in place" (ms.btn.stay): the MOVE target becomes the picked
+   *  fighter's own space - the zero-step resolve the server accepts for any
+   *  `value`, 0 included (MS-E-58, MS-E-76). The only legal fighter is picked
+   *  when none is; several and none picked -> false with ms.choice.object. */
+  bool StayPendingInPlace(const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters,
+                          FS09Reason& OutWhy);
+  /** why.* of a space the open MOVE / PLACE head refuses for the picked
+   *  fighter, by key with the space (B-04): why.cell.not.space, .enemy, .ally,
+   *  .occupied, .enemy.path, .no.path, .unreachable {need, have} (MS-E-76:
+   *  `value` 0 refuses every other space with need/have), why.place.zone
+   *  {fighterName}. Unset when no fighter is picked or the space is legal. */
+  FS09Reason PendingCellReason(int32 X, int32 Y, const FS08BoardModel& Board,
+                               const TArray<FS08BoardFighter>& Fighters) const;
+
   // ---- S09 UX: explicit exact-instance scheme choice ----
   /** True when G may OPEN the scheme picker: viewer's turn, action phase,
    *  no open server pending, nothing in flight (mirror of the server
@@ -767,6 +806,13 @@ private:
                                 const TArray<FS08BoardFighter>& Fighters,
                                 const FS08BoardFighter& Mover, int32 Allowance,
                                 bool bPassThroughEnemies) const;
+  /** ComputePendingCells for MOVE / PLACE of the given fighter (not only the picked one). */
+  TSet<uint64> PendingCellsFor(const FString& FighterId, const FS08BoardModel& Board,
+                               const TArray<FS08BoardFighter>& Fighters) const;
+  /** MS-T-12: one MS-PENDING line per head and picked fighter (+ MS-REJECT
+   *  place.no.space, MS-E-61, and MS-DATA pending.move.immobilized, MS-E-63). */
+  void TracePendingMovePlace(const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters);
+  FString PendingTracedKey;
   /** True when (X,Y) shares a board zone with the cell of the living fighter
    *  named ZoneFighterName (PLACE/CHOOSE_SPACE stage 1 rule). */
   bool CellSharesZoneWith(const FS08BoardModel& Board,

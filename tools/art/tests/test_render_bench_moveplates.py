@@ -80,10 +80,19 @@ class MoveDraftFixtures(unittest.TestCase):
                 ids = [m["fighterId"] for m in doc.get("moves", [])] + [o["fighterId"] for o in doc.get("moveOrder", [])]
                 if doc.get("selected"):
                     ids.append(doc["selected"])
+                pending = doc.get("pending")  # MS-T-12: the MS-S-12 scene
+                if pending:
+                    self.assertIn(pending["type"], ("MOVE", "PLACE"))
+                    ids.append(pending["fighterId"])
+                    for excluded in ("moves", "moveOrder", "selected", "boostCardId"):
+                        self.assertNotIn(excluded, doc)
                 self.assertTrue(set(ids) <= fighters, set(ids) - fighters)
                 if doc.get("boostCardId"):
                     self.assertIn(doc["boostCardId"], hand)
-                for cell in [m["to"] for m in doc.get("moves", [])] + ([doc["hover"]] if "hover" in doc else []):
+                cells = [m["to"] for m in doc.get("moves", [])] + ([doc["hover"]] if "hover" in doc else [])
+                if pending and "to" in pending:
+                    cells.append(pending["to"])
+                for cell in cells:
                     self.assertIn(cell, spaces)
         self.assertEqual(boards, {"marmoreal-original", "sarpedon-original"})
 

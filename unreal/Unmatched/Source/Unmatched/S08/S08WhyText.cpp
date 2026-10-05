@@ -59,6 +59,14 @@ const FRow GRows[] = {
     {TEXT("ms.boost.empty"), TEXT("No cards to boost with")},
     {TEXT("ms.confirm.zero"), TEXT("You may stay: confirm the maneuver without moving")},
     {TEXT("ms.order.swap.hint"), TEXT("Change the order (Ctrl+↑/↓)")},
+    // MS-T-12: the pending MOVE / PLACE panel (MS-S-12, MS-R-25)
+    {TEXT("ms.pending.move"), TEXT("Effect choice: move {fighterName} up to {n}")},
+    {TEXT("ms.pending.move.enemy"), TEXT("You are moving an opponent's fighter: {fighterName}")},
+    {TEXT("ms.pending.place"), TEXT("Effect choice: place {fighterName}")},
+    {TEXT("ms.btn.stay"), TEXT("Stay in place")},
+    {TEXT("ms.btn.decline"), TEXT("Decline (X)")},
+    {TEXT("ms.place.no.space"), TEXT("No free space. Waiting for the server")},
+    {TEXT("ms.choice.object"), TEXT("Choose what to move")},
 };
 
 const FRow* Find(FName Key) {

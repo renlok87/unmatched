@@ -39,6 +39,11 @@
 //   Unmatched.S09.MoveSel.AutoManeuverPlan - M1 / MS-AT-32 (driver part): the opt-in
 //       -S08ManeuverPlan=boost3 on the driver's draft - the best BOOST card, three
 //       moves (hero step + two sidekicks), src=auto, confirmable; refusals.
+//   Unmatched.S09.MoveSel.PendingMovePlace - MS-AT-27 (MS-T-12): MS-S-12 - V-11 / V-12
+//       (not V-01), no plate under the mover, value absent -> 1 / 0 -> stay only,
+//       Stay in place / Decline, an opponent's fighter by its owner's rules,
+//       pass-through, PLACE in a zone, no free space (MS-REJECT place.no.space),
+//       immobilized traced, click on release + MS-R-71, why.* by key, Esc steps.
 //   Unmatched.S09.MoveSel.ReconnectAndRebuild - MS-AT-20, the MS-T-04 part:
 //       the draft cache by maneuverId, re-evaluation on a new seq, a boost card
 //       that left the hand, another id / closed maneuver / GAME_OVER. (Deadline,
@@ -2978,6 +2983,298 @@ bool FS09MoveSelCandidatesAndAutoSelectTest::RunTest(const FString&) {
     TestTrue(TEXT("no selection"), Ui.SelectedFighterId.IsEmpty());
     TestEqual(TEXT("no candidate ring"), CandidateRings(ViewOf(Ui, Fighters)), 0);
     TestTrue(TEXT("trace n=0"), MsTracedLine(Ui, {TEXT("MS-DRAFT op=candidates"), TEXT("n=0")}));
+  }
+  return true;
+}
+
+// ---------------------------------------------------------------------------
+// MS-T-12 / MS-AT-27: pending MOVE / PLACE (MS-S-12)
+
+namespace S09MoveSelTest {
+
+/** W x H grid with zones: cells with X < SplitX in "red", the rest in "blue". */
+FS08BoardModel MsZoneGrid(int32 W, int32 H, int32 SplitX) {
+  TArray<TSharedPtr<FJsonValue>> Lines;
+  for (int32 Y = 0; Y < H; ++Y) {
+    TArray<TSharedPtr<FJsonValue>> Line;
+    for (int32 X = 0; X < W; ++X) {
+      TSharedRef<FJsonObject> Cell = MakeShared<FJsonObject>();
+      Cell->SetNumberField(TEXT("x"), X);
+      Cell->SetNumberField(TEXT("y"), Y);
+      Cell->SetStringField(TEXT("type"), TEXT("normal"));
+      TArray<TSharedPtr<FJsonValue>> Zones;
+      Zones.Add(MakeShared<FJsonValueString>(X < SplitX ? TEXT("red") : TEXT("blue")));
+      Cell->SetArrayField(TEXT("zones"), Zones);
+      Line.Add(MakeShared<FJsonValueObject>(Cell));
+    }
+    Lines.Add(MakeShared<FJsonValueArray>(Line));
+  }
+  TSharedRef<FJsonObject> Board = MakeShared<FJsonObject>();
+  Board->SetNumberField(TEXT("width"), W);
+  Board->SetNumberField(TEXT("height"), H);
+  Board->SetArrayField(TEXT("cells"), Lines);
+  Board->SetObjectField(TEXT("doors"), MakeShared<FJsonObject>());
+  FS08BoardModel Model;
+  Model.Decode(MakeShared<FJsonValueObject>(Board));
+  return Model;
+}
+
+/** One pending head of Owner (MOVE / PLACE) over a no-maneuver snapshot; Edit adds fields. */
+FS08Snapshot MsPendingHead(const TCHAR* Type, int32 Value, TFunction<void(FJsonObject&)> Edit = nullptr,
+                           const FString& Owner = Me, const FString& Id = TEXT("effect-12")) {
+  FS08Snapshot Snapshot = MsSnapshot({}, FString());
+  const TSharedRef<FJsonObject> Meta = MakeShared<FJsonObject>(*Snapshot.Metadata->AsObject());
+  TSharedRef<FJsonObject> Head = MakeShared<FJsonObject>();
+  Head->SetStringField(TEXT("id"), Id);
+  Head->SetStringField(TEXT("playerId"), Owner);
+  Head->SetStringField(TEXT("type"), Type);
+  if (Value >= 0) Head->SetNumberField(TEXT("value"), Value);
+  Head->SetStringField(TEXT("text"), TEXT("effect"));
+  if (Edit) Edit(*Head);
+  TArray<TSharedPtr<FJsonValue>> Effects = {MakeShared<FJsonValueObject>(Head)};
+  Meta->SetArrayField(TEXT("pendingEffects"), Effects);
+  Snapshot.Metadata = MakeShared<FJsonValueObject>(Meta);
+  return Snapshot;
+}
+
+FS08MoveDraftView MsPendingView(const FS09CommandUi& Ui, const FS08BoardModel& Board,
+                                const TArray<FS08BoardFighter>& Fighters) {
+  return S08MoveHighlight::BuildDraftView(Board, Fighters, S09MoveDraftView::BuildInput(Ui, Board, Fighters));
+}
+
+int32 MsRings(const FS08MoveDraftView& View, ES08RingState Ring) {
+  int32 N = 0;
+  for (const FS08PlateView& P : View.Plates) N += P.Ring == Ring ? 1 : 0;
+  return N;
+}
+
+const FS08PlateView* MsPlateAt(const FS08MoveDraftView& View, int32 X, int32 Y) { return View.Find(X, Y); }
+
+FS09InputResult MsClick(FS09MoveInput& Input, const FIntPoint& Cell, const FString& FighterId, FS09CommandUi& Ui,
+                        const FS08Snapshot& Snap, const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters) {
+  Input.OnPointerPressed(Cell, FighterId);
+  return Input.OnPointerReleased(Cell, FighterId, Ui, Snap, Board, Fighters);
+}
+
+}  // namespace S09MoveSelTest
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09MoveSelPendingMovePlaceTest, "Unmatched.S09.MoveSel.PendingMovePlace",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS09MoveSelPendingMovePlaceTest::RunTest(const FString&) {
+  const FS08BoardModel Board = MsGrid(7, 7);
+  FString Reason;
+
+  // ---- V-11 (not V-01), the only legal fighter picked at once, no plate under it, value 2 ----
+  {
+    const TArray<FS08BoardFighter> Fighters = {MsFighter(TEXT("m"), Me, 3, 3), MsFighter(TEXT("e"), Opp, 6, 6)};
+    const FS08Snapshot Snap = MsPendingHead(TEXT("MOVE"), 2, [](FJsonObject& H) {
+      H.SetArrayField(TEXT("fighterIds"), {MakeShared<FJsonValueString>(TEXT("m"))});
+    });
+    FS09CommandUi Ui = MsOpen(Snap, Board, Fighters);
+    TestTrue(TEXT("MS-S-12 open"), Ui.IsPendingMovePlace() && FS09MoveInput::RoutesPendingBoard(Ui));
+    TestEqual(TEXT("the only legal fighter is picked by the snapshot"), Ui.PendingFighterId, FString(TEXT("m")));
+    TestTrue(TEXT("its spaces follow the snapshot"), Ui.PendingCells.Contains(FS08BoardModel::CellKey(3, 1)));
+    const FS08MoveDraftView View = MsPendingView(Ui, Board, Fighters);
+    TestEqual(TEXT("V-11 on the 12 spaces within 2 steps (own space excluded)"), MsRings(View, ES08RingState::PendingMove), 12);
+    TestEqual(TEXT("no V-01 / V-02 for an effect"), MsRings(View, ES08RingState::ReachBase) + MsRings(View, ES08RingState::ReachBoost), 0);
+    const FS08PlateView* Under = MsPlateAt(View, 3, 3);
+    TestTrue(TEXT("no plate under the mover"), !Under || Under->Ring != ES08RingState::PendingMove);
+    const FS09PendingMovePrompt Prompt = Ui.DescribePendingMovePlace(Board, Fighters);
+    TestEqual(TEXT("prompt ms.pending.move"), MsKey(Prompt.Prompt), FString(TEXT("ms.pending.move")));
+    TestEqual(TEXT("prompt text names the fighter and the allowance"), Prompt.Prompt.Text(),
+              FString(TEXT("Effect choice: move m up to 2")));
+    TestTrue(TEXT("stay offered, decline not (mandatory)"), Prompt.bCanStay && !Prompt.bCanDecline);
+    TestEqual(TEXT("12 targets"), Prompt.Targets, 12);
+    int32 Lines = 0;
+    MsTraced(Ui, TEXT("MS-PENDING open id=effect-12 type=MOVE value=2"), Lines);
+    TestEqual(TEXT("MS-PENDING once"), Lines, 1);
+    Ui.OnSnapshot(Snap, Board, Fighters);
+    MsTraced(Ui, TEXT("MS-PENDING open"), Lines);
+    TestEqual(TEXT("MS-PENDING not repeated by the same head"), Lines, 1);
+
+    // click on release (MS-R-34) - a drag cancels, a click on a legal space sets the target with the path
+    FS09MoveInput Input;
+    Input.OnPointerPressed(FIntPoint(3, 1), FString());
+    FS09InputResult R = Input.OnPointerReleased(FIntPoint(4, 1), FString(), Ui, Snap, Board, Fighters);
+    TestTrue(TEXT("a drag to another space cancels"), R.bHandled && !Ui.bPendingCellSet);
+    R = MsClick(Input, FIntPoint(3, 1), FString(), Ui, Snap, Board, Fighters);
+    TestTrue(TEXT("release over the pressed space sets the target"),
+             R.bSelectionChanged && Ui.bPendingCellSet && Ui.PendingCellX == 3 && Ui.PendingCellY == 1);
+    const FS08MoveDraftView Picked = MsPendingView(Ui, Board, Fighters);
+    const FS08PlateView* Dest = MsPlateAt(Picked, 3, 1);
+    TestTrue(TEXT("the target is a destination V-04"), Dest && Dest->Ring == ES08RingState::Destination);
+    const FS08PlateView* Mid = MsPlateAt(Picked, 3, 2);
+    TestTrue(TEXT("the canonical path has its dot"), Mid && Mid->bPathDot);
+    FS09PendingChoiceCommand Command;
+    TestTrue(TEXT("confirm"), Ui.ConfirmPendingChoice(Snap, false, Command, Reason));
+    TestTrue(TEXT("payload fighter + cell"), Command.FighterId == TEXT("m") && Command.CellX == 3 && Command.CellY == 1);
+    // MS-R-71: a click on the mover's own figure is the "stay" target (its space is legal)
+    R = MsClick(Input, FIntPoint(3, 3), TEXT("m"), Ui, Snap, Board, Fighters);
+    TestTrue(TEXT("own figure = stay target"), Ui.bPendingCellSet && Ui.PendingCellX == 3 && Ui.PendingCellY == 3);
+    // a refused space: why.* by key with CUE-004 on it, never silent
+    R = MsClick(Input, FIntPoint(3, 6), FString(), Ui, Snap, Board, Fighters);
+    TestEqual(TEXT("3 steps for value 2: why.cell.unreachable"), MsKey(R.Toast), FString(TEXT("why.cell.unreachable")));
+    TestEqual(TEXT("need/have in the text"), R.Toast.Text(), FString(TEXT("(3,6): Not enough movement: need 3, have 2")));
+    TestTrue(TEXT("CUE-004 on the space"), R.IllegalCell == FIntPoint(3, 6));
+    R = MsClick(Input, FIntPoint(6, 6), TEXT("e"), Ui, Snap, Board, Fighters);
+    TestEqual(TEXT("an enemy figure: why.cell.enemy"), MsKey(R.Toast), FString(TEXT("why.cell.enemy")));
+    // Esc / RMB: the target first; the only legal fighter stays picked
+    FS09InputResult Back = Input.PendingStepBack(Ui, Fighters);
+    TestTrue(TEXT("Esc clears the target"), Back.bHandled && !Ui.bPendingCellSet);
+    Back = Input.OnRightClick(Ui, Snap, Board, Fighters);
+    TestTrue(TEXT("then nothing to clear (one legal fighter): the older chain keeps the key"),
+             !Back.bHandled && Ui.PendingFighterId == TEXT("m"));
+  }
+
+  // ---- value 0 -> only "Stay in place"; absent -> 1 (MS-E-76, MS-E-57, MS-E-58) ----
+  {
+    const TArray<FS08BoardFighter> Fighters = {MsFighter(TEXT("m"), Me, 3, 3)};
+    const FS08Snapshot Zero = MsPendingHead(TEXT("MOVE"), 0);
+    FS09CommandUi Ui = MsOpen(Zero, Board, Fighters);
+    TestEqual(TEXT("value 0: no plates"), MsPendingView(Ui, Board, Fighters).Plates.Num(), 0);
+    const FS09PendingMovePrompt Prompt = Ui.DescribePendingMovePlace(Board, Fighters);
+    TestTrue(TEXT("value 0: stay only"), Prompt.bCanStay && Prompt.Targets == 0 && Prompt.Allowance == 0);
+    FS09MoveInput Input;
+    const FS09InputResult R = MsClick(Input, FIntPoint(3, 2), FString(), Ui, Zero, Board, Fighters);
+    TestEqual(TEXT("value 0: another space -> why.cell.unreachable"), MsKey(R.Toast), FString(TEXT("why.cell.unreachable")));
+    TestEqual(TEXT("need 1, have 0"), R.Toast.Text(), FString(TEXT("(3,2): Not enough movement: need 1, have 0")));
+    FS09Reason Why;
+    TestTrue(TEXT("Stay in place"), Ui.StayPendingInPlace(Board, Fighters, Why));
+    FS09PendingChoiceCommand Command;
+    TestTrue(TEXT("stay confirms"), Ui.ConfirmPendingChoice(Zero, false, Command, Reason));
+    TestTrue(TEXT("stay = the own space"), Command.CellX == 3 && Command.CellY == 3 && Command.FighterId == TEXT("m"));
+    const FS08Snapshot Absent = MsPendingHead(TEXT("MOVE"), -1);
+    FS09CommandUi AbsentUi = MsOpen(Absent, Board, Fighters);
+    TestEqual(TEXT("absent: 1 step (4 spaces)"), MsRings(MsPendingView(AbsentUi, Board, Fighters), ES08RingState::PendingMove), 4);
+    TestEqual(TEXT("absent: allowance 1"), AbsentUi.DescribePendingMovePlace(Board, Fighters).Allowance, 1);
+  }
+
+  // ---- optional: Decline (X); mandatory: refused (why.choice.required in the HUD) ----
+  {
+    const TArray<FS08BoardFighter> Fighters = {MsFighter(TEXT("m"), Me, 3, 3)};
+    const FS08Snapshot Optional = MsPendingHead(TEXT("MOVE"), 1, [](FJsonObject& H) { H.SetBoolField(TEXT("optional"), true); });
+    FS09CommandUi Ui = MsOpen(Optional, Board, Fighters);
+    TestTrue(TEXT("optional: decline offered"), Ui.DescribePendingMovePlace(Board, Fighters).bCanDecline);
+    FS09PendingChoiceCommand Command;
+    TestTrue(TEXT("optional: decline legal"), Ui.ConfirmPendingChoice(Optional, true, Command, Reason) && Command.bDecline);
+    FS09CommandUi Mandatory = MsOpen(MsPendingHead(TEXT("MOVE"), 1), Board, Fighters);
+    TestFalse(TEXT("mandatory: decline refused"), Mandatory.ConfirmPendingChoice(MsPendingHead(TEXT("MOVE"), 1), true, Command, Reason));
+    TestEqual(TEXT("ms.btn.decline text"), S08WhyText::En(FName(TEXT("ms.btn.decline"))), FString(TEXT("Decline (X)")));
+    TestEqual(TEXT("ms.btn.stay text"), S08WhyText::En(FName(TEXT("ms.btn.stay"))), FString(TEXT("Stay in place")));
+  }
+
+  // ---- an opponent's fighter by its owner's rules (MS-E-59), pass-through (MS-E-60) ----
+  {
+    // the enemy e at (3,3); my m at (3,2) and (2,3) walls for it; (4,3) free
+    const TArray<FS08BoardFighter> Fighters = {MsFighter(TEXT("e"), Opp, 3, 3), MsFighter(TEXT("m"), Me, 3, 2),
+                                               MsFighter(TEXT("m2"), Me, 2, 3)};
+    const FS08Snapshot Snap = MsPendingHead(TEXT("MOVE"), 2, [](FJsonObject& H) {
+      H.SetBoolField(TEXT("targetsOpponent"), true);
+      H.SetArrayField(TEXT("fighterIds"), {MakeShared<FJsonValueString>(TEXT("e"))});
+    });
+    FS09CommandUi Ui = MsOpen(Snap, Board, Fighters);
+    TestEqual(TEXT("the opponent's fighter is the pick"), Ui.PendingFighterId, FString(TEXT("e")));
+    const FS09PendingMovePrompt Prompt = Ui.DescribePendingMovePlace(Board, Fighters);
+    TestTrue(TEXT("enemy fighter flagged"), Prompt.bEnemyFighter);
+    TestEqual(TEXT("prompt ms.pending.move.enemy"), MsKey(Prompt.Prompt), FString(TEXT("ms.pending.move.enemy")));
+    TestTrue(TEXT("trace owner=opponent"), MsTracedLine(Ui, {TEXT("MS-PENDING open"), TEXT("fighter=e"), TEXT("owner=opponent")}));
+    TestFalse(TEXT("my fighters are walls for it: (2,2) (2 steps, only through m / m2)"),
+              Ui.PendingCells.Contains(FS08BoardModel::CellKey(2, 2)));
+    TestTrue(TEXT("(5,3) is free 2 steps away"), Ui.PendingCells.Contains(FS08BoardModel::CellKey(5, 3)));
+    FS09MoveInput Input;
+    const FS09InputResult R = MsClick(Input, FIntPoint(1, 3), FString(), Ui, Snap, Board, Fighters);
+    TestEqual(TEXT("(1,3): 4 steps round m2 -> why.cell.unreachable"), R.Toast.Text(),
+              FString(TEXT("(1,3): Not enough movement: need 4, have 2")));
+    const FS08Snapshot Through = MsPendingHead(TEXT("MOVE"), 2, [](FJsonObject& H) {
+      H.SetBoolField(TEXT("targetsOpponent"), true);
+      H.SetBoolField(TEXT("canPassThroughEnemies"), true);
+    });
+    FS09CommandUi ThroughUi = MsOpen(Through, Board, Fighters);
+    TestTrue(TEXT("pass-through: (3,1) beyond m and (2,2)"), ThroughUi.PendingCells.Contains(FS08BoardModel::CellKey(3, 1)) &&
+                                                                    ThroughUi.PendingCells.Contains(FS08BoardModel::CellKey(2, 2)));
+  }
+
+  // ---- the path blocked by an enemy names why.cell.enemy.path ----
+  {
+    // m at (0,0) in a corridor: (1,0) enemy; target (2,0) needs 2 steps through it, value 2
+    const FS08BoardModel Corridor = MsGrid(3, 1);
+    const TArray<FS08BoardFighter> Fighters = {MsFighter(TEXT("m"), Me, 0, 0), MsFighter(TEXT("e"), Opp, 1, 0)};
+    const FS08Snapshot Snap = MsPendingHead(TEXT("MOVE"), 2);
+    FS09CommandUi Ui = MsOpen(Snap, Corridor, Fighters);
+    TestEqual(TEXT("why.cell.enemy.path"), MsKey(Ui.PendingCellReason(2, 0, Corridor, Fighters)), FString(TEXT("why.cell.enemy.path")));
+    TestTrue(TEXT("SelectPendingCell names the key"), !Ui.SelectPendingCell(2, 0, Snap, Corridor, Fighters, Reason) &&
+                                                         Reason.Contains(TEXT("[why.cell.enemy.path]")));
+  }
+
+  // ---- PLACE in a zone (V-12, MS-E-62) and no free space (MS-E-61) ----
+  {
+    const FS08BoardModel Zoned = MsZoneGrid(4, 2, 2);  // red: x 0..1, blue: x 2..3
+    const TArray<FS08BoardFighter> Fighters = {MsFighter(TEXT("Medusa"), Me, 0, 0), MsFighter(TEXT("h"), Me, 3, 1),
+                                               MsFighter(TEXT("e"), Opp, 1, 1)};
+    const FS08Snapshot Snap = MsPendingHead(TEXT("PLACE"), -1, [](FJsonObject& H) {
+      H.SetStringField(TEXT("zoneFighterName"), TEXT("Medusa"));
+      H.SetArrayField(TEXT("fighterIds"), {MakeShared<FJsonValueString>(TEXT("h"))});
+    });
+    FS09CommandUi Ui = MsOpen(Snap, Zoned, Fighters);
+    TestEqual(TEXT("PLACE: h picked"), Ui.PendingFighterId, FString(TEXT("h")));
+    const FS08MoveDraftView View = MsPendingView(Ui, Zoned, Fighters);
+    TestEqual(TEXT("V-12 only on the free red spaces (1,0), (0,1)"), MsRings(View, ES08RingState::PendingPlace), 2);
+    TestEqual(TEXT("no V-11 for a PLACE"), MsRings(View, ES08RingState::PendingMove), 0);
+    const FS09PendingMovePrompt Prompt = Ui.DescribePendingMovePlace(Zoned, Fighters);
+    TestTrue(TEXT("PLACE: no stay button, prompt ms.pending.place"),
+             !Prompt.bCanStay && MsKey(Prompt.Prompt) == TEXT("ms.pending.place"));
+    TestEqual(TEXT("outside the zone: why.place.zone"), MsKey(Ui.PendingCellReason(2, 0, Zoned, Fighters)), FString(TEXT("why.place.zone")));
+    TestEqual(TEXT("an occupied space: why.cell.occupied"), MsKey(Ui.PendingCellReason(1, 1, Zoned, Fighters)),
+              FString(TEXT("why.cell.occupied")));
+    TestTrue(TEXT("place in the zone"), Ui.SelectPendingCell(1, 0, Snap, Zoned, Fighters, Reason));
+    const FS08MoveDraftView Placed = MsPendingView(Ui, Zoned, Fighters);
+    const FS08PlateView* Dest = MsPlateAt(Placed, 1, 0);
+    TestTrue(TEXT("the PLACE target is a destination without a path"), Dest && Dest->Ring == ES08RingState::Destination);
+    int32 Dots = 0;
+    for (const FS08PlateView& P : Placed.Plates) Dots += P.bPathDot ? 1 : 0;
+    TestEqual(TEXT("no path line for PLACE"), Dots, 0);
+
+    // MS-E-61: every red space taken - "No free space. Waiting for the server" + MS-REJECT place.no.space
+    const TArray<FS08BoardFighter> Full = {MsFighter(TEXT("Medusa"), Me, 0, 0), MsFighter(TEXT("h"), Me, 3, 1),
+                                           MsFighter(TEXT("e"), Opp, 1, 1), MsFighter(TEXT("e2"), Opp, 1, 0),
+                                           MsFighter(TEXT("e3"), Opp, 0, 1)};
+    FS09CommandUi FullUi = MsOpen(Snap, Zoned, Full);
+    const FS09PendingMovePrompt NoSpace = FullUi.DescribePendingMovePlace(Zoned, Full);
+    TestTrue(TEXT("no space flagged"), NoSpace.bNoSpace);
+    TestEqual(TEXT("ms.place.no.space text"), NoSpace.Prompt.Text(), FString(TEXT("No free space. Waiting for the server")));
+    TestTrue(TEXT("MS-REJECT place.no.space traced"), MsTracedLine(FullUi, {TEXT("MS-REJECT place.no.space"), TEXT("effect-12")}));
+  }
+
+  // ---- two legal fighters: nothing picked, ms.choice.object; MS-E-63 immobilized traced ----
+  {
+    FS08BoardFighter Stuck = MsFighter(TEXT("s"), Me, 5, 5);
+    Stuck.Effects.Add(TEXT("immobilized"));
+    const TArray<FS08BoardFighter> Fighters = {MsFighter(TEXT("a"), Me, 1, 1), Stuck};
+    const FS08Snapshot Snap = MsPendingHead(TEXT("MOVE"), 1);
+    FS09CommandUi Ui = MsOpen(Snap, Board, Fighters);
+    TestTrue(TEXT("two legal: none picked"), Ui.PendingFighterId.IsEmpty() && Ui.PendingCells.Num() == 0);
+    FS09Reason Why;
+    TestFalse(TEXT("stay needs a pick"), Ui.StayPendingInPlace(Board, Fighters, Why));
+    TestEqual(TEXT("ms.choice.object"), MsKey(Why), FString(TEXT("ms.choice.object")));
+    FS09MoveInput Input;
+    FS09InputResult R = MsClick(Input, FIntPoint(3, 3), FString(), Ui, Snap, Board, Fighters);
+    TestEqual(TEXT("an empty space before a pick: ms.choice.object"), MsKey(R.Toast), FString(TEXT("ms.choice.object")));
+    R = MsClick(Input, FIntPoint(5, 5), FString(), Ui, Snap, Board, Fighters);
+    TestTrue(TEXT("the figure on the space is picked (MS-R-71 step 2)"), R.bSelectionChanged && Ui.PendingFighterId == TEXT("s"));
+    Ui.OnSnapshot(Snap, Board, Fighters);
+    TestTrue(TEXT("MS-DATA pending.move.immobilized (allowed as the server)"),
+             MsTracedLine(Ui, {TEXT("MS-DATA pending.move.immobilized"), TEXT("fighter=s")}));
+    TestTrue(TEXT("the immobilized fighter still has its spaces (server allows, MS-E-63)"), Ui.PendingCells.Num() > 1);
+    const FS09InputResult Back = Input.PendingStepBack(Ui, Fighters);
+    TestTrue(TEXT("Esc drops the fighter when another may be picked"), Back.bHandled && Ui.PendingFighterId.IsEmpty());
+  }
+
+  // ---- the opponent's head is not MS-S-12 ----
+  {
+    const TArray<FS08BoardFighter> Fighters = {MsFighter(TEXT("m"), Me, 3, 3)};
+    FS09CommandUi Ui = MsOpen(MsPendingHead(TEXT("MOVE"), 1, nullptr, Opp), Board, Fighters);
+    TestFalse(TEXT("opponent's head: no pending board routing"), FS09MoveInput::RoutesPendingBoard(Ui));
+    TestFalse(TEXT("no prompt"), Ui.DescribePendingMovePlace(Board, Fighters).bValid);
   }
   return true;
 }

@@ -494,6 +494,35 @@ bool FS08MoveHLBenchDraftTest::RunTest(const FString&) {
     const S09MoveDraftBench::FApplyResult R = S09MoveDraftBench::Apply(Fixture, B.Snapshot, B.Board, B.Fighters, B.ViewerId, Ui);
     TestTrue(Name + TEXT(" applies: ") + R.Error, R.bOk);
     AddInfo(R.Summary);
+    if (Fixture.Pending.bSet) {
+      // MS-T-12 (MS-S-12): the pending MOVE / PLACE scene - V-11 / V-12 on the legal spaces, none under the mover,
+      // the picked target a destination with the canonical path (MOVE)
+      TestTrue(Name + TEXT(": MS-S-12"), Ui.IsPendingMovePlace());
+      TestEqual(Name + TEXT(": the scene's fighter"), Ui.PendingFighterId, Fixture.Pending.FighterId);
+      const FS08MoveDraftView View =
+          S08MoveHighlight::BuildDraftView(B.Board, B.Fighters, S09MoveDraftView::BuildInput(Ui, B.Board, B.Fighters));
+      const FS08BoardFighter* Mover = B.Fighters.FindByPredicate(
+          [&Fixture](const FS08BoardFighter& F) { return F.Id == Fixture.Pending.FighterId; });
+      int32 PendingRings = 0, Destinations = 0, Dots = 0;
+      bool bUnderMover = false;
+      for (const FS08PlateView& P : View.Plates) {
+        const bool bPendingRing = P.Ring == ES08RingState::PendingMove || P.Ring == ES08RingState::PendingPlace;
+        PendingRings += bPendingRing ? 1 : 0;
+        Destinations += P.Ring == ES08RingState::Destination ? 1 : 0;
+        Dots += P.bPathDot ? 1 : 0;
+        bUnderMover |= bPendingRing && Mover && P.X == Mover->X && P.Y == Mover->Y;
+      }
+      TestTrue(Name + TEXT(": V-11 plates on the legal spaces"), PendingRings > 0);
+      TestFalse(Name + TEXT(": no plate under the mover (Stay in place is the button)"), bUnderMover);
+      TestEqual(Name + TEXT(": a destination only with 'to'"), Destinations, Fixture.Pending.To.bSet ? 1 : 0);
+      if (Fixture.Pending.To.bSet && Fixture.Pending.Type == TEXT("MOVE")) {
+        TestTrue(Name + TEXT(": the canonical path of a 2+ step target has a dot"), Dots >= 1);
+      }
+      const FS09PendingMovePrompt Prompt = Ui.DescribePendingMovePlace(B.Board, B.Fighters);
+      TestEqual(Name + TEXT(": prompt by whose fighter"), Prompt.Prompt.Key.ToString(),
+                FString(Fixture.Pending.bTargetsOpponent ? TEXT("ms.pending.move.enemy") : TEXT("ms.pending.move")));
+      continue;
+    }
     TestTrue(Name + TEXT(": draft mode"), Ui.Mode == ES09CommandMode::ManeuverDraft);
     TestTrue(Name + TEXT(": bench maneuver id"), Ui.PendingManeuverId == TEXT("bench:") + Name);
     if (Fixture.Scene.StartsWith(TEXT("1-"))) {

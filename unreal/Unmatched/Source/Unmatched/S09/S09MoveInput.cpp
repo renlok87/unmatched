@@ -292,6 +292,7 @@ FS09InputResult FS09MoveInput::OnPointerReleased(const FIntPoint& Cell, const FS
 FS09InputResult FS09MoveInput::OnRightClick(FS09CommandUi& Ui, const FS08Snapshot& Snapshot,
                                             const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters) {
   bPressed = false;
+  if (Ui.Mode == ES09CommandMode::PendingChoice) return PendingStepBack(Ui, Fighters); // MS-S-12 (MS-T-12)
   return StepBack(/*bRightMouse=*/true, Ui, Snapshot, Board, Fighters, FS09InputView());
 }
 
@@ -331,6 +332,8 @@ void FS09MoveInput::OnFocusLost() {
 FS09InputResult FS09MoveInput::Click(const FIntPoint& Cell, const FString& FighterId, FS09CommandUi& Ui,
                                      const FS08Snapshot& Snapshot, const FS08BoardModel& Board,
                                      const TArray<FS08BoardFighter>& Fighters) {
+  // MS-T-12: an own pending MOVE / PLACE head (MS-S-12) takes the same click-on-release pair.
+  if (Ui.Mode == ES09CommandMode::PendingChoice) return PendingClick(Cell, FighterId, Ui, Snapshot, Board, Fighters);
   FS09InputResult Out;
   const bool bDraft = Ui.Mode == ES09CommandMode::ManeuverDraft;
   const bool bIdle = Ui.Mode == ES09CommandMode::None;
@@ -639,6 +642,85 @@ bool FS09MoveInput::LegacyQuickMoveEnabled() {
 
 bool FS09MoveInput::RoutesMoveSelection(ES09CommandMode Mode, bool bLegacyQuickMove) {
   return Mode == ES09CommandMode::ManeuverDraft || (Mode == ES09CommandMode::None && !bLegacyQuickMove);
+}
+
+bool FS09MoveInput::RoutesPendingBoard(const FS09CommandUi& Ui) { return Ui.IsPendingMovePlace(); }
+
+FS09InputResult FS09MoveInput::PendingClick(const FIntPoint& Cell, const FString& FighterId, FS09CommandUi& Ui,
+                                            const FS08Snapshot& Snapshot, const FS08BoardModel& Board,
+                                            const TArray<FS08BoardFighter>& Fighters) {
+  FS09InputResult Out;
+  if (!RoutesPendingBoard(Ui)) return Out;
+  Out.bHandled = true;
+  const bool bCell = Cell.X >= 0 && Cell.Y >= 0;
+  FString Reason;
+  // (1) MS-R-71 in MS-S-12: a legal space of the picked fighter wins over the figure on it (its own space = stay).
+  if (bCell && !Ui.PendingFighterId.IsEmpty() && Ui.PendingCells.Contains(FS08BoardModel::CellKey(Cell.X, Cell.Y)) &&
+      Ui.SelectPendingCell(Cell.X, Cell.Y, Snapshot, Board, Fighters, Reason)) {
+    const FS08BoardFighter* Mover = S09FighterById(Fighters, Ui.PendingFighterId);
+    const bool bStay = Mover && Mover->X == Cell.X && Mover->Y == Cell.Y;
+    Out.bSelectionChanged = true;
+    Out.ToastText = FString::Printf(TEXT("%s: %s - Enter confirms"), *Board.CellLabel(Cell.X, Cell.Y),
+                                    bStay ? TEXT("stay in place") : TEXT("destination set"));
+    return Out;
+  }
+  // (2) a legal fighter of the effect: the actor hit, else the figure standing on the space.
+  TArray<FString> Legal;
+  Ui.PendingLegalFighters(Fighters, Legal);
+  FString PickId = Legal.Contains(FighterId) ? FighterId : FString();
+  if (PickId.IsEmpty() && bCell) {
+    for (const FS08BoardFighter& Fighter : Fighters) {
+      if (Fighter.X == Cell.X && Fighter.Y == Cell.Y && Legal.Contains(Fighter.Id)) {
+        PickId = Fighter.Id;
+        break;
+      }
+    }
+  }
+  if (!PickId.IsEmpty() && Ui.SelectPendingFighter(PickId, Snapshot, Fighters, Reason)) {
+    Ui.PendingCells = Ui.ComputePendingCells(Snapshot, Board, Fighters);
+    const FS08BoardFighter* Picked = S09FighterById(Fighters, PickId);
+    Out.bSelectionChanged = true;
+    Out.ToastText = FString::Printf(TEXT("%s picked - click a highlighted space%s"),
+                                    Picked ? *(Picked->Label.IsEmpty() ? Picked->Name : Picked->Label) : *PickId,
+                                    Ui.PendingChoice.Type == TEXT("MOVE") ? TEXT(" or Stay in place") : TEXT(""));
+    return Out;
+  }
+  // (3) refused - never silent (DE-014): the why.* of the space, CUE-004 on it.
+  if (Ui.PendingFighterId.IsEmpty()) {
+    Out.Toast = FS09Reason::Make(TEXT("ms.choice.object"));
+    if (bCell) Out.IllegalCell = Cell;
+    return Out;
+  }
+  if (!bCell) {
+    Out.ToastText = TEXT("this fighter is not a legal pick of the effect");
+    return Out;
+  }
+  Out.Toast = Ui.PendingCellReason(Cell.X, Cell.Y, Board, Fighters);
+  if (!Out.Toast.IsSet()) Out.Toast = FS09Reason::Make(TEXT("why.cell.not.space")).Arg(TEXT("cell"), Board.CellLabel(Cell.X, Cell.Y));
+  Out.IllegalCell = Cell;
+  return Out;
+}
+
+FS09InputResult FS09MoveInput::PendingStepBack(FS09CommandUi& Ui, const TArray<FS08BoardFighter>& Fighters) {
+  FS09InputResult Out;
+  if (!RoutesPendingBoard(Ui)) return Out;
+  if (Ui.bPendingCellSet) {
+    Ui.bPendingCellSet = false; // the target first
+    Out.bHandled = true;
+    Out.bSelectionChanged = true;
+    Out.ToastText = TEXT("target cleared");
+    return Out;
+  }
+  TArray<FString> Legal;
+  Ui.PendingLegalFighters(Fighters, Legal);
+  if (!Ui.PendingFighterId.IsEmpty() && Legal.Num() > 1) {
+    Ui.PendingFighterId.Reset(); // then the fighter, when there is another one to pick
+    Ui.PendingCells.Reset();
+    Out.bHandled = true;
+    Out.bSelectionChanged = true;
+    Out.Toast = FS09Reason::Make(TEXT("ms.choice.object"));
+  }
+  return Out;
 }
 
 bool FS09MoveInput::LegacyQuickMoveReachable(ES09CommandMode Mode, bool bLegacyQuickMove) {

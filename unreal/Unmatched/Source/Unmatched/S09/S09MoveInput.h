@@ -160,6 +160,22 @@ public:
   /** Board clicks and the move-selection keys of this mode go through
    *  FS09MoveInput (the draft; outside a draft unless the legacy flag is on). */
   static bool RoutesMoveSelection(ES09CommandMode Mode, bool bLegacyQuickMove);
+  /** MS-T-12 (MS-S-12): board clicks of an own pending MOVE / PLACE head go
+   *  through the click-on-release pair (MS-R-34) as well; the other pending
+   *  types keep their handlers in the game mode. */
+  static bool RoutesPendingBoard(const FS09CommandUi& Ui);
+  /** A completed click in MS-S-12 (MS-R-71): (1) a legal space of the picked
+   *  fighter (its own space = stay) becomes the target even with a figure on
+   *  it; (2) a legal fighter of the effect (the actor hit or the figure on
+   *  the space) is picked and its spaces light up; (3) otherwise the why.* of
+   *  the space (PendingCellReason) with CUE-004, or ms.choice.object while
+   *  no fighter is picked - never silent (DE-014). */
+  FS09InputResult PendingClick(const FIntPoint& Cell, const FString& FighterId, FS09CommandUi& Ui,
+                               const FS08Snapshot& Snapshot, const FS08BoardModel& Board,
+                               const TArray<FS08BoardFighter>& Fighters);
+  /** Esc / RMB in MS-S-12: the target first, then the fighter when another
+   *  one may be picked; unhandled otherwise (the older chain keeps the key). */
+  FS09InputResult PendingStepBack(FS09CommandUi& Ui, const TArray<FS08BoardFighter>& Fighters);
   /** The TASK-022 tail of HandleClick (TryManeuverTo) may run: only with the
    *  flag and no command mode open - never from the scheme picker, a pending
    *  choice or any draft (MS-R-01, MS-R-32). */

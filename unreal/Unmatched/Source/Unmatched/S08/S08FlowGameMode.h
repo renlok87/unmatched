@@ -230,6 +230,7 @@ private:
   void NoDefenseCommand();        // N: defender closes the window (no card)
   void ResolveCombatCommand();    // R: resolve (COMBAT_RESOLVE / no-defense)
   void DeclinePendingChoiceCommand(); // X: decline an optional boost choice
+  void StayPendingInPlaceCommand();   // MS-T-12: "Stay in place" of a pending MOVE (zero-step resolve)
   void PlaySchemeCommand();       // G: open/close the EXACT-instance scheme picker
   /** Enter inside the scheme picker: sends the selected EXACT instance or
    *  rejects a stale/dead selection (never substitutes another card). */

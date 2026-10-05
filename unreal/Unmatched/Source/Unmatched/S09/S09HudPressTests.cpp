@@ -65,6 +65,7 @@ TArray<FElement> HudLayout() {
       FElement{FName(TEXT("hud.defense.none")), TEXT("button"), FS09Reason::Make(TEXT("why.deadline.passed"))},
       FElement{FName(TEXT("hud.combat.resolve")), TEXT("button"), FS09Reason::Make(TEXT("why.wait.opponent.choice"))},
       Button(TEXT("hud.pending.confirm")),
+      Button(TEXT("hud.pending.stay")),
       FElement{FName(TEXT("hud.pending.decline")), TEXT("button"), FS09Reason::Make(TEXT("why.choice.required"))},
       Button(TEXT("pending.option.0")),
       Button(TEXT("pending.reveal.card::7")),

@@ -580,6 +580,41 @@ bool MpEvaluatePendingMove(const FS08BoardModel& Board, const TArray<FS08BoardFi
   return true;
 }
 
+/** MS-T-12: a pending PLACE of the fixture through FS09CommandUi (the MS-S-12 spaces): is `target` legal, and the
+ *  why.* of a refused one (PendingCellReason). */
+bool MpEvaluatePendingPlace(const FS08BoardModel& Board, const TArray<FS08BoardFighter>& Fighters,
+                            const TSharedPtr<FJsonObject>& Pending, bool& bOutLegal, FString& OutWhy, FString& OutError) {
+  FString Id, Owner;
+  FIntPoint Target(-1, -1);
+  if (!Pending->TryGetStringField(TEXT("fighterId"), Id) || !Pending->TryGetStringField(TEXT("ownerId"), Owner) ||
+      !MpReadXY(Pending->TryGetField(TEXT("target")), Target)) {
+    OutError = TEXT("pending PLACE without fighterId/ownerId/target");
+    return false;
+  }
+  FS09CommandUi Ui;
+  Ui.ViewerId = Owner;
+  Ui.Mode = ES09CommandMode::PendingChoice;
+  Ui.bHasPendingChoice = true;
+  Ui.PendingChoice.Id = TEXT("parity");
+  Ui.PendingChoice.PlayerId = Owner;
+  Ui.PendingChoice.Type = TEXT("PLACE");
+  Pending->TryGetStringField(TEXT("zoneFighterName"), Ui.PendingChoice.ZoneFighterName);
+  Pending->TryGetBoolField(TEXT("optional"), Ui.PendingChoice.bOptional);
+  Pending->TryGetBoolField(TEXT("restoreFullHealth"), Ui.PendingChoice.bRestoreFullHealth);
+  Pending->TryGetBoolField(TEXT("targetsOpponent"), Ui.PendingChoice.bTargetsOpponent);
+  Ui.PendingChoice.FighterIds.Add(Id);
+  Ui.PendingFighterId = Id;
+  TArray<FString> Legal;
+  Ui.PendingLegalFighters(Fighters, Legal);
+  if (!Legal.Contains(Id)) {
+    OutError = FString::Printf(TEXT("PLACE fighter %s is not a legal pick of the client"), *Id);
+    return false;
+  }
+  bOutLegal = Ui.ComputePendingCells(FS08Snapshot(), Board, Fighters).Contains(FS08BoardModel::CellKey(Target.X, Target.Y));
+  OutWhy = bOutLegal ? FString() : Ui.PendingCellReason(Target.X, Target.Y, Board, Fighters).Key.ToString();
+  return true;
+}
+
 // ---- comparison with `expect` -----------------------------------------------
 
 struct FMpCounters {
@@ -910,7 +945,7 @@ bool FS08MoveParityGoldenFixturesTest::RunTest(const FString&) {
 
   TMap<FString, FS08BoardModel> BoardCache;
   FMpCounters Count;
-  int32 Checked = 0, CheckedManual = 0, CheckedGenerated = 0, CheckedDraft = 0, CheckedPending = 0;
+  int32 Checked = 0, CheckedManual = 0, CheckedGenerated = 0, CheckedDraft = 0, CheckedPending = 0, CheckedPlace = 0;
   int32 Errored = 0, Mismatched = 0, Manual = 0;
   TMap<FString, int32> SkipReasons;
   TArray<FString> Skipped;
@@ -949,9 +984,10 @@ bool FS08MoveParityGoldenFixturesTest::RunTest(const FString&) {
     if (bPending) (*PendingPtr)->TryGetStringField(TEXT("type"), PendingType);
 
     // Which fixtures apply to the client model: a draft with moves or a
-    // pending MOVE, both with client-side expectations. Only two kinds carry
-    // nothing but the server outcome of their layer (MS-AT-02, backend) and
-    // are skipped: a pending PLACE and a draft without moves. Anything else
+    // pending MOVE, both with client-side expectations, and (MS-T-12) a
+    // pending PLACE, whose server outcome is compared with the client PLACE
+    // legality. Only a draft without moves carries nothing but the server
+    // outcome of its layer (MS-AT-02, backend) and is skipped. Anything else
     // without client expectations is an error, never a silent skip.
     const bool bHasClientExpect = Expect->HasField(TEXT("reach")) || Expect->HasField(TEXT("paths")) ||
                                   Expect->HasField(TEXT("status")) || Expect->HasField(TEXT("requiredBoost"));
@@ -962,11 +998,8 @@ bool FS08MoveParityGoldenFixturesTest::RunTest(const FString&) {
     if (bDraft == bPending) {
       Unsupported = TEXT("needs exactly one of draft / pending");
     } else if (bPending && PendingType == TEXT("PLACE")) {
-      if (bHasClientExpect) {
-        Unsupported = TEXT("pending PLACE with client expectations: the board model has no PLACE cells (MS-T-12)");
-      } else {
-        SkipReason = TEXT("pending PLACE: no reach/path in the board model (client PLACE cells: MS-T-12); server outcome only");
-      }
+      // MS-T-12: a PLACE has no reach / path; its server outcome is compared with the client legality below
+      if (bHasClientExpect) Unsupported = TEXT("pending PLACE with reach/paths expectations (PLACE has no path)");
     } else if (bPending && PendingType != TEXT("MOVE")) {
       Unsupported = FString::Printf(TEXT("pending type '%s' is not modelled"), *PendingType);
     } else if (!bHasClientExpect) {
@@ -1002,6 +1035,36 @@ bool FS08MoveParityGoldenFixturesTest::RunTest(const FString&) {
         !MpFixtureFighters(*FighterSpecs, Fighters, Error)) {
       AddError(FString::Printf(TEXT("%s: fighters: %s"), *Name, *Error));
       ++Errored;
+      continue;
+    }
+    if (bPending && PendingType == TEXT("PLACE")) {
+      // MS-T-12 (MS-E-62, MS-S-12): the client PLACE spaces (FS09CommandUi::ComputePendingCells) agree with the
+      // server outcome of the target: legal <=> "ok"; a refused target names the why.* of the server code.
+      FString Server, Why;
+      bool bLegal = false;
+      Expect->TryGetStringField(TEXT("server"), Server);
+      if (!MpEvaluatePendingPlace(Board, Fighters, *PendingPtr, bLegal, Why, Error)) {
+        AddError(FString::Printf(TEXT("%s: %s"), *Name, *Error));
+        ++Errored;
+        continue;
+      }
+      const bool bServerOk = Server == TEXT("ok");
+      FString WantWhy;
+      if (!bServerOk) {
+        FS08GraphQLError Rejected;
+        Rejected.RuleCode = Server;
+        Rejected.Message = Server;
+        WantWhy = FS08RuleCodes::Classify({Rejected}, ES08RejectOp::PendingEffect, {}).WhyKey.ToString();
+      }
+      if (bLegal != bServerOk || (!bServerOk && Why != WantWhy)) {
+        AddError(FString::Printf(TEXT("%s (%s): client PLACE legal=%d why=%s, server %s (why %s)"), *Name, *Source,
+                                 bLegal ? 1 : 0, *Why, *Server, *WantWhy));
+        ++Mismatched;
+      }
+      ++Checked;
+      ++CheckedPlace;
+      (Source == TEXT("manual") ? CheckedManual : CheckedGenerated)++;
+      BoardCounts.FindOrAdd(Key)++;
       continue;
     }
     TArray<FMpGot> Got;
@@ -1052,9 +1115,10 @@ bool FS08MoveParityGoldenFixturesTest::RunTest(const FString&) {
   TArray<FString> SkipParts;
   for (const TPair<FString, int32>& S : SkipReasons) SkipParts.Add(FString::Printf(TEXT("%d x %s"), S.Value, *S.Key));
   const FString Summary = FString::Printf(
-      TEXT("MS-PARITY fixtures=%d checked=%d (manual %d, generated %d; draft %d, pendingMove %d) skipped=%d "
-           "mismatched=%d errored=%d boards=[%s] compared: reach=%d paths=%d status=%d requiredBoost=%d"),
-      Files.Num(), Checked, CheckedManual, CheckedGenerated, CheckedDraft, CheckedPending, Skipped.Num(), Mismatched,
+      TEXT("MS-PARITY fixtures=%d checked=%d (manual %d, generated %d; draft %d, pendingMove %d, pendingPlace %d) "
+           "skipped=%d mismatched=%d errored=%d boards=[%s] compared: reach=%d paths=%d status=%d requiredBoost=%d"),
+      Files.Num(), Checked, CheckedManual, CheckedGenerated, CheckedDraft, CheckedPending, CheckedPlace, Skipped.Num(),
+      Mismatched,
       Errored,
       *FString::Join(BoardParts, TEXT(" ")), Count.Reach, Count.Paths, Count.Status, Count.Required);
   AddInfo(Summary);
@@ -1080,6 +1144,7 @@ bool FS08MoveParityGoldenFixturesTest::RunTest(const FString&) {
   }
   TestEqual(TEXT("fixtures with a mismatch"), Mismatched, 0);
   TestEqual(TEXT("fixtures that could not be evaluated"), Errored, 0);
+  TestTrue(FString::Printf(TEXT("MS-T-12: the pending PLACE fixtures are checked (%d)"), CheckedPlace), CheckedPlace >= 2);
   return true;
 }
 
