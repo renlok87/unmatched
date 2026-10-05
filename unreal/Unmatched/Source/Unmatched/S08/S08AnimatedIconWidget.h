@@ -51,6 +51,12 @@ public:
    *  candidate layer until the user's art acceptance). Survives SetIcon of the same icon. */
   void SetLayerHidden(FName LayerId, bool bHidden);
   bool IsLayerHidden(FName LayerId) const { return HiddenLayers.Contains(LayerId); }
+  /** Run I (AB-7): draw a single-frame layer from another contract texture src (the DE tracker slot fills its
+   *  body / glyph layers with action-<type>_body / _glyph). Survives SetIcon of the same icon; a new icon drops it.
+   *  False = no such layer, a flipbook layer, or the texture is missing (the layer keeps its texture). */
+  bool SetLayerSource(FName LayerId, const FString& Src);
+  /** The src a layer draws now (the contract's, or the SetLayerSource override); '' for no such layer. */
+  FString GetLayerSource(FName LayerId) const;
   /** DE-023: the icon at rest now, without its appear (a HUD tracker reset "in one frame", 01 F-12); with HeldEvent a
    *  hold event (spend) already played out - the reconnect mid-turn state. */
   void ShowAtRest(FName HeldEvent = NAME_None);
@@ -90,6 +96,7 @@ private:
   bool bExternal = false;
   FLinearColor TeamTint = FLinearColor::White;
   TSet<FName> HiddenLayers;
+  TMap<FName, FString> LayerSources;  // SetLayerSource overrides (layer id -> src)
 };
 
 /** Backend-less gallery: every contract icon in a grid on the HUD panel colour, each looping its demo script

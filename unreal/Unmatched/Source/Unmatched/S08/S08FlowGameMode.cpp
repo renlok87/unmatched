@@ -1497,7 +1497,9 @@ void AS08FlowGameMode::NoteBoardDeaths(const TArray<FS08BoardFighter>& BoardView
         In.DissolveMs = FMath::RoundToInt(Plan.DissolveSeconds * 1000.0f);
         In.Style = Style;
       }
-      DeathStage.Begin(In, NowMs(), CueDispatcher, Lines);
+      // run I (AB-8): the heart mark crosses the fallen hero's heart (resource-hp-fallen) wherever the portraits draw
+      // it; -S08CrossLegacy and the grey board (no portraits) keep the dark heart
+      DeathStage.Begin(In, NowMs(), CueDispatcher, Lines, OwnPortrait != nullptr && TurnHudLook.bCrossGlyphs);
     }
     BoardAliveById.Add(F.Id, bAlive);
   }
@@ -1589,7 +1591,31 @@ void AS08FlowGameMode::BuildCombatStageHud() {
       [CardPanel(FString::Printf(TEXT("ATTACK - %s"), *In.AttackerLabel), R.bAttackKnown ? &R.Attack : nullptr,
                  AttackValue, AttackAccent)];
   if (R.bNoDefense) {
-    // SD-04: the red cross stamp of "no defense" comes with the reveal.
+    // SD-04: the red cross stamp of "no defense" comes with the reveal. Run I (AB-8): the accepted marker-x-stamp
+    // (appear: the X stamps in 0 -> 1.08 -> 1, 200 ms) once per combat on one persistent widget - RefreshHud rebuilds
+    // this panel; -S08CrossLegacy and the grey board keep the text X.
+    TSharedRef<SWidget> Stamp = SNew(STextBlock).Text(FText::FromString(TEXT("X")))
+                                    .Font(FCoreStyle::GetDefaultFontStyle("Bold", 54))
+                                    .ColorAndOpacity(FSlateColor(CrossRed));
+    if (OwnPortrait && TurnHudLook.bCrossGlyphs && GetWorld()) {
+      if (!NoDefenseStamp) {
+        NoDefenseStamp = CreateWidget<US08AnimatedIconWidget>(GetWorld(), US08AnimatedIconWidget::StaticClass());
+        if (NoDefenseStamp && !NoDefenseStamp->SetIcon(FS08TurnHudLook::NoDefenseStampIcon, 64.0f, 64)) {
+          NoDefenseStamp = nullptr;
+        }
+        if (NoDefenseStamp) NoDefenseStamp->SetVisibility(ESlateVisibility::HitTestInvisible);
+      }
+      if (NoDefenseStamp) {
+        const FString Key = FString::Printf(TEXT("%d|%s"), In.Seq, *In.TargetId);
+        if (Key != NoDefenseStampKey) {
+          NoDefenseStampKey = Key;
+          NoDefenseStamp->PlayAnim(TEXT("appear"));
+          FS08Trace::Write(FString::Printf(TEXT("HUD-STAMP no-defense seq=%d target=%s icon=%s"), In.Seq,
+                                           *In.TargetId, FS08TurnHudLook::NoDefenseStampIcon));
+        }
+        Stamp = NoDefenseStamp->TakeWidget();
+      }
+    }
     CombatEdgeRight->AddSlot().AutoHeight()
         [SNew(SBorder)
              .BorderImage(FCoreStyle::Get().GetBrush("WhiteBrush"))
@@ -1601,10 +1627,7 @@ void AS08FlowGameMode::BuildCombatStageHud() {
                        [SNew(STextBlock).Text(FText::FromString(FString::Printf(TEXT("DEFENSE - %s"), *In.TargetLabel)))
                             .Font(FCoreStyle::GetDefaultFontStyle("Bold", 13))
                             .ColorAndOpacity(FSlateColor(DefenseAccent))] +
-                   SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Center)
-                       [SNew(STextBlock).Text(FText::FromString(TEXT("X")))
-                            .Font(FCoreStyle::GetDefaultFontStyle("Bold", 54))
-                            .ColorAndOpacity(FSlateColor(CrossRed))] +
+                   SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Center).Padding(0, 4)[Stamp] +
                    SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Center)
                        [SNew(STextBlock).Text(FText::FromString(TEXT("NO DEFENSE")))
                             .Font(FCoreStyle::GetDefaultFontStyle("Bold", 16))
@@ -5490,6 +5513,8 @@ void AS08FlowGameMode::ClearGameplayHud() {
   ActionTracker.Reset();
   TurnCue.Reset();  // DE-023
   TrackerMarks.Reset();
+  OwnChosenType = NAME_None;
+  NoDefenseStampKey.Reset();
   OwnHeart.Reset();
   OpponentHeart.Reset();
   bTrackerResetPending = true;

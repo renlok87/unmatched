@@ -4,18 +4,23 @@
 //     mine below (02 §4.1: UI-HUD-PANEL-OPP over UI-HUD-PANEL-LOC; the top-left corner is the S09 command panel).
 //     They are built once with the HUD and never recreated by RefreshHud: the ring, the tracker marks and the heart
 //     pulse play on them (02 §4.3 п. 4).
-//   - The turn ring at BOTH sides on the active player's portrait (FS09TurnCue): appear = the flash 1000 ms, then the
-//     smouldering rim to the end of the turn; reduced motion = a static rim. Drawn only with -S08TurnRingIcon=<id>
-//     until the user's art acceptance of the DE-012 ring glyph (IMPL: candidates are prepared, not on by default).
+//   - The turn ring at BOTH sides on the active player's portrait (FS09TurnCue): appear = the warm flash 1000 ms, then
+//     the smouldering rim to the end of the turn; reduced motion = a static rim. Run I (AB-5): marker-turn-ring by
+//     default, rollback -S08TurnRingLegacy (no ring).
 //   - The "Your turn" banner (CUE-015): own turn only, 600 ms (reduced 100), hit-test invisible - input stays open
 //     from the apply (DE-015).
 //   - The trackers: mine marks the slot at the choice (FS09TrackerMarks - a local attack / scheme draft or the sent
 //     command) and gives it back on cancel; the opponent's shows only in their turn, fading in over 150 ms
-//     (FS09ActionTracker, DE-022). A new turn snaps both in one frame.
+//     (FS09ActionTracker, DE-022). A new turn snaps both in one frame. Run I (AB-7): the DE slots filled with the
+//     icon of the spent action's type (own: the chosen action; server marks: S09OpponentView::SpentActionType of the
+//     spending snapshot), rollback -S08TrackerLegacy (the v3 slots).
 //   - The hero heart: damage / deplete / heal when the SHOWN hero HP changes (HudFighters: the combat staging holds the
-//     HP to the contact + 80 ms); damage plays without the `glow` candidate layer unless -S08HeartGlow.
+//     HP to the contact + 80 ms); damage plays its `glow` halo (run I, AB-6; rollback -S08HeartGlowLegacy). At the
+//     heart mark of the hero's death (DE-019, contact + 1100) the heart becomes resource-hp-fallen and its cross
+//     stamps in (AB-8; rollback -S08CrossLegacy - the emptied heart stays).
 // Off the art look (-S08GreyBoard, the S09 HUD harness) nothing is built and the DE-022 Slate tracker rows stay.
-// Trace: 'HUD-TURN config ...', 'HUD-TURN seq=... turn=own|opp ...', 'HUD-TRACK ...', 'HUD-HEART ...'.
+// Trace: 'HUD-TURN config ...', 'HUD-TURN seq=... turn=own|opp ...', 'HUD-TRACK ...', 'HUD-HEART ...' (fallen:
+// 'HUD-HEART side=... hero=... anim=fallen glyph=cross played=1').
 #include "S08FlowGameMode.h"
 
 #include "S08AnimatedIconWidget.h"
@@ -154,6 +159,7 @@ void AS08FlowGameMode::NoteActionChosen(const TCHAR* What) {
   const double Now = static_cast<double>(NowMs());
   const int32 Seq = Flow->GetAppliedSnapshot().SequenceNumber;
   TrackerMarks.Choose(ActionTracker.Own().Spent, Seq, Now);
+  OwnChosenType = FName(What);  // AB-7: the DE slot of the local mark fills with this type
   FS08Trace::Write(FString::Printf(TEXT("HUD-TRACK chosen=%s seq=%d spent=%d"), What, Seq, ActionTracker.Own().Spent));
 }
 
@@ -206,6 +212,16 @@ void AS08FlowGameMode::TickTurnHud() {
       }
     }
     Portrait->SetHeroName(PlayerHeroName(Panel->PlayerId));
+    // AB-8 (DE-019, SD-38): the heart mark of the hero's death - the fallen heart with its cross; a new game (the
+    // death stage reset) brings the full heart back. The fallen hero may be gone from the fighters by now.
+    const FString HeroId = Hero ? Hero->Id : Heart.GetHeroId();
+    if (!HeroId.IsEmpty()) {
+      const bool bFallen = DeathStage.HeartState(HeroId, static_cast<int64>(Now)) == ES09HeartState::Crossed;
+      if (Portrait->SetHeartFallen(bFallen) && bFallen) {
+        FS08Trace::Write(FString::Printf(TEXT("HUD-HEART side=%s hero=%s anim=fallen glyph=cross played=1"),
+                                         Portrait->IsOpponent() ? TEXT("opp") : TEXT("own"), *HeroId));
+      }
+    }
     if (!Hero) return;
     Portrait->SetHealth(Hero->Health, Hero->MaxHealth);
     if (BoardActor) {
@@ -232,8 +248,20 @@ void AS08FlowGameMode::TickTurnHud() {
   const int32 OwnShown = TrackerMarks.Shown(Own.Spent, Own.Slots, bDraftOpen, Now);
   const FS09ActionTracker::FSlots Opp = ActionTracker.Opponent();
   const bool bReset = bTrackerResetPending;
-  const FString OwnAnim = OwnPortrait->ApplyTracker(Own.Slots, OwnShown, bReset);
-  const FString OppAnim = OpponentPortrait->ApplyTracker(Opp.Slots, Opp.Spent, bReset);
+  // AB-7: the type of each shown slot - the server's (the spending snapshot), the local mark's from the choice
+  TArray<FName> OwnTypes;
+  for (int32 I = 0; I < OwnShown; ++I) {
+    FName Type = I < Own.Spent ? ActionTracker.SpentType(I) : NAME_None;
+    if (I >= Own.Spent || Type.IsNone()) {
+      Type = bDraftOpen ? FName(CommandUi.Mode == ES09CommandMode::AttackDraft ? TEXT("attack") : TEXT("scheme"))
+                        : OwnChosenType;
+    }
+    OwnTypes.Add(Type);
+  }
+  TArray<FName> OppTypes;
+  for (int32 I = 0; I < Opp.Spent; ++I) OppTypes.Add(ActionTracker.SpentType(I));
+  const FString OwnAnim = OwnPortrait->ApplyTracker(Own.Slots, OwnShown, bReset, OwnTypes);
+  const FString OppAnim = OpponentPortrait->ApplyTracker(Opp.Slots, Opp.Spent, bReset, OppTypes);
   bTrackerResetPending = false;
   // DE-029: no action is left after GAME_OVER - the final board shows names, HP and the heart, not the trackers
   OwnPortrait->SetTrackerOpacity(Hud.bGameOver ? 0.0f : 1.0f);
@@ -327,12 +355,12 @@ void AS08FlowGameMode::GalleryPortraitsAt(float TMs) {
     if (!Portrait->IsOpponent()) {
       Portrait->PlayRing(false);
       Portrait->ApplyTracker(2, 0, true);
-      Portrait->ApplyTracker(2, 1, false);
+      Portrait->ApplyTracker(2, 1, false, {FName(TEXT("attack"))});  // the DE slot fills with the attack (AB-7)
       if (Portrait->GetHeartIcon()) Portrait->GetHeartIcon()->ShowAtRest();
       Portrait->PlayHeart(TEXT("damage"));
     } else {
       Portrait->StopRing();
-      Portrait->ApplyTracker(2, 1, true);
+      Portrait->ApplyTracker(2, 1, true, {FName(TEXT("maneuver"))});
     }
     Portrait->SetClockOverrideMs(TMs);
   }

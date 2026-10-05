@@ -794,6 +794,8 @@ private:
   FS09TrackerMarks TrackerMarks;
   FS09HeartWatch OwnHeart;
   FS09HeartWatch OpponentHeart;
+  /** Run I (AB-7): the type of the own action last chosen (NoteActionChosen) - the DE slot of the local mark. */
+  FName OwnChosenType;
   bool bTrackerResetPending = true;
   bool bTurnRingAtRest = false;
   FString TurnHudShownKey;
@@ -982,6 +984,11 @@ private:
   TObjectPtr<US08TurnPortraitWidget> OpponentPortrait;
   UPROPERTY()
   TArray<TObjectPtr<US08TurnPortraitWidget>> GalleryPortraits;
+  // Run I (AB-8): the marker-x-stamp of "no defense" in the combat panel - one persistent widget (RefreshHud rebuilds
+  // the panel; the stamp plays its appear once per combat, NoDefenseStampKey).
+  UPROPERTY()
+  TObjectPtr<class US08AnimatedIconWidget> NoDefenseStamp;
+  FString NoDefenseStampKey;
 
   FS08BoardModel BoardModel;
   TArray<FS08BoardFighter> Fighters;

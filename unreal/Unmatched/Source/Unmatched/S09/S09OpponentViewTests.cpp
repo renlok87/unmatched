@@ -568,6 +568,42 @@ bool FS09MoveSelOpponentStatusTest::RunTest(const FString&) {
     TestTrue(TEXT("a reconnect mid-turn sees 2 - actionsRemaining spent"), Rejoin.Opponent() == FS09ActionTracker::FSlots{2, 1});
   }
 
+  // ---- run I (AB-7, the DE tracker): the type of a spent action, from the spending snapshot ----
+  {
+    using S09OpponentView::SpentActionType;
+    const FString Maneuver = FString::Printf(TEXT("{\"actionsRemaining\":1,\"pendingManeuver\":{\"id\":\"m:1\",\"playerId\":\"%s\"}}"), *Opp);
+    TestEqual(TEXT("an open pendingManeuver: maneuver"), SpentActionType(With(Opp, Maneuver)), FName(TEXT("maneuver")));
+    FS08Snapshot Done = With(Opp, FString::Printf(TEXT("{\"actionsRemaining\":1,\"lastMovement\":{\"seq\":%d,\"playerId\":\"%s\",")
+                                                      TEXT("\"source\":\"MANEUVER\",\"moves\":[]}}"), B.Snapshot.SequenceNumber, *Opp));
+    TestEqual(TEXT("a MANEUVER lastMovement of this seq: maneuver"), SpentActionType(Done), FName(TEXT("maneuver")));
+    FS08Snapshot Older = Done;
+    Older.SequenceNumber += 1;
+    TestEqual(TEXT("an older MANEUVER trail is not this action: scheme"), SpentActionType(Older), FName(TEXT("scheme")));
+    TestEqual(TEXT("the open combat: attack"),
+              SpentActionType(With(Opp, TEXT("{\"actionsRemaining\":1,") + CombatJson(TEXT("f-1-hero"), Me, TEXT("f-0-hero")) + TEXT("}"),
+                                   TEXT("COMBAT"))),
+              FName(TEXT("attack")));
+    TestEqual(TEXT("a COMBAT phase alone: attack"), SpentActionType(With(Opp, TEXT("{\"actionsRemaining\":1}"), TEXT("COMBAT"))),
+              FName(TEXT("attack")));
+    TestEqual(TEXT("neither: the scheme"), SpentActionType(With(Opp, TEXT("{\"actionsRemaining\":1}"))), FName(TEXT("scheme")));
+
+    FS09ActionTracker T;
+    T.OnApplied(50, Opp, 7, 2, Me, 0.0, FName(TEXT("scheme")));
+    TestEqual(TEXT("nothing spent: no type"), T.SpentType(0), FName(NAME_None));
+    T.OnApplied(51, Opp, 7, 1, Me, 10.0, FName(TEXT("attack")));
+    TestEqual(TEXT("slot 0 spent by the attack"), T.SpentType(0), FName(TEXT("attack")));
+    T.OnApplied(52, Opp, 7, 1, Me, 20.0, FName(TEXT("scheme")));
+    TestEqual(TEXT("no new spend: the type stays"), T.SpentType(0), FName(TEXT("attack")));
+    T.OnApplied(53, Opp, 7, 0, Me, 30.0, FName(TEXT("maneuver")));
+    TestTrue(TEXT("slot 1 spent by the maneuver"), T.SpentType(0) == FName(TEXT("attack")) && T.SpentType(1) == FName(TEXT("maneuver")));
+    T.OnApplied(54, Me, 8, 2, Me, 40.0, FName(TEXT("scheme")));
+    TestEqual(TEXT("a new turn drops the types"), T.SpentType(0), FName(NAME_None));
+    FS09ActionTracker Rejoin;
+    Rejoin.OnApplied(60, Opp, 9, 0, Me, 0.0, FName(TEXT("attack")));
+    TestTrue(TEXT("a reconnect mid-turn types every spent slot by the snapshot"),
+             Rejoin.SpentType(0) == FName(TEXT("attack")) && Rejoin.SpentType(1) == FName(TEXT("attack")));
+  }
+
   // ---- 03 §7 п. 3: the opponent's effect moves MY fighter - source card + "your fighter"; effect lines ----
   {
     FS09EffectSources Sources;

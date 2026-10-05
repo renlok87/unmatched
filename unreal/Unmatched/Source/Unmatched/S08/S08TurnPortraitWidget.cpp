@@ -40,29 +40,60 @@ FSlateFontInfo PortraitFont(const TCHAR* Typeface, int32 Size) { return FS08ArtH
 
 // ------------------------------------------------------------------------------------------------- look
 
+namespace {
+/** A contract record the ring can play: appear + leave. */
+bool RingRecordOk(const FString& Id) {
+  const FS08IconMotionDef* Def = FS08IconMotionLibrary::Get().Find(FName(*Id));
+  return Def && Def->FindAnim(TEXT("appear")) && Def->FindAnim(TEXT("leave"));
+}
+}  // namespace
+
 FS08TurnHudLook FS08TurnHudLook::FromCommandLine(const TCHAR* CommandLine) {
   FS08TurnHudLook Out;
-  if (!CommandLine) return Out;
-  FString Ring;
-  if (FParse::Value(CommandLine, TEXT("S08TurnRingIcon="), Ring) && !Ring.IsEmpty() &&
-      !Ring.Equals(TEXT("none"), ESearchCase::IgnoreCase)) {
-    // any contract record with appear + leave (the DE-012 ring candidates and whatever the art acceptance names);
-    // the id comes from the command line, no candidate id is built into the client (test_candidates_are_gallery_only)
-    const FS08IconMotionDef* Def = FS08IconMotionLibrary::Get().Find(FName(*Ring));
-    if (Def && Def->FindAnim(TEXT("appear")) && Def->FindAnim(TEXT("leave"))) {
-      Out.RingIcon = FName(*Ring);
-    } else {
-      Out.Issues = FString::Printf(TEXT("ring '%s' refused (no such contract record with appear + leave)"), *Ring);
-    }
+  const TCHAR* Cmd = CommandLine ? CommandLine : TEXT("");
+  FString Ring = DefaultRingIcon;
+  FString Chosen;
+  if (FParse::Value(Cmd, TEXT("S08TurnRingIcon="), Chosen) && !Chosen.IsEmpty()) Ring = Chosen;
+  if (FParse::Param(Cmd, RingLegacyFlag) || Ring.Equals(TEXT("none"), ESearchCase::IgnoreCase)) {
+    Out.RingIcon = NAME_None;
+  } else if (RingRecordOk(Ring)) {
+    // the accepted ring, or a review choice of the A/B sheet (the team candidate comes from the command line only -
+    // no candidate id is built into the client, test_candidates_are_gallery_only)
+    Out.RingIcon = FName(*Ring);
+  } else {
+    Out.RingIcon = NAME_None;
+    Out.Issues = FString::Printf(TEXT("ring '%s' refused (no such contract record with appear + leave)"), *Ring);
   }
-  Out.bHeartGlow = FParse::Param(CommandLine, TEXT("S08HeartGlow"));
+  Out.bHeartGlow = !FParse::Param(Cmd, HeartGlowLegacyFlag);
+  Out.bTrackerDe = !FParse::Param(Cmd, TrackerLegacyFlag);
+  Out.bCrossGlyphs = !FParse::Param(Cmd, CrossLegacyFlag);
   return Out;
 }
 
 FString FS08TurnHudLook::Describe() const {
-  return FString::Printf(TEXT("ring=%s heartGlow=%d%s%s"), RingIcon.IsNone() ? TEXT("none") : *RingIcon.ToString(),
-                         bHeartGlow ? 1 : 0, Issues.IsEmpty() ? TEXT("") : TEXT(" issues="),
+  return FString::Printf(TEXT("ring=%s heartGlow=%d tracker=%s cross=%d%s%s"),
+                         RingIcon.IsNone() ? TEXT("none") : *RingIcon.ToString(), bHeartGlow ? 1 : 0,
+                         bTrackerDe ? TEXT("de") : TEXT("v3"), bCrossGlyphs ? 1 : 0,
+                         Issues.IsEmpty() ? TEXT("") : TEXT(" issues="),
                          Issues.IsEmpty() ? TEXT("") : *Issues.Replace(TEXT(" "), TEXT("_")));
+}
+
+FString FS08TurnHudLook::ArtLookField(const TCHAR* CommandLine) {
+  const TCHAR* Cmd = CommandLine ? CommandLine : TEXT("");
+  const FS08TurnHudLook Look = FromCommandLine(Cmd);
+  auto Legacy = [](const TCHAR* Flag) { return FString::Printf(TEXT("legacy(-%s)"), Flag); };
+  FString Ring;
+  if (FParse::Param(Cmd, RingLegacyFlag)) {
+    Ring = Legacy(RingLegacyFlag);
+  } else if (Look.RingIcon.IsNone()) {
+    Ring = Look.Issues.IsEmpty() ? FString(TEXT("none(-S08TurnRingIcon)")) : FString(TEXT("none(refused)"));
+  } else {
+    Ring = Look.RingIcon.ToString();
+  }
+  return FString::Printf(TEXT("hud=ring:%s,glow:%s,tracker:%s,cross:%s"), *Ring,
+                         Look.bHeartGlow ? TEXT("on") : *Legacy(HeartGlowLegacyFlag),
+                         Look.bTrackerDe ? TEXT("de") : *Legacy(TrackerLegacyFlag),
+                         Look.bCrossGlyphs ? TEXT("on") : *Legacy(CrossLegacyFlag));
 }
 
 // ------------------------------------------------------------------------------------------------- widget
@@ -212,43 +243,101 @@ void US08TurnPortraitWidget::StopRing() {
   RingIcon->PlayAnim(TEXT("leave"));
 }
 
-FString US08TurnPortraitWidget::ApplyTracker(int32 Slots, int32 Shown, bool bReset) {
+namespace {
+/** The DE slot's fill: body / glyph layers from the accepted action-<type> icon. */
+bool FillSlot(US08AnimatedIconWidget& Icon, FName Type) {
+  if (Type.IsNone()) return false;
+  const FString Base = FString::Printf(TEXT("action-%s"), *Type.ToString());
+  if (!FS08IconMotionLibrary::Get().Find(FName(*Base))) return false;
+  const bool bBody = Icon.SetLayerSource(TEXT("body"), Base + TEXT("_body"));
+  const bool bGlyph = Icon.SetLayerSource(TEXT("glyph"), Base + TEXT("_glyph"));
+  return bBody && bGlyph;
+}
+}  // namespace
+
+FString US08TurnPortraitWidget::ApplyTracker(int32 Slots, int32 Shown, bool bReset, const TArray<FName>& Types) {
   Slots = FMath::Clamp(Slots, 0, 6);
   Shown = FMath::Clamp(Shown, 0, Slots);
+  const bool bDe = Look.bTrackerDe;
+  // AB-7: the DE slot plays fill / unfill (held) where the v3 slot plays spend / gain; the game events are the same
+  const FName SpendAnim(bDe ? TEXT("fill") : TEXT("spend"));
+  const FName GainAnim(bDe ? TEXT("unfill") : TEXT("gain"));
+  auto TypeOf = [&Types](int32 I) { return Types.IsValidIndex(I) ? Types[I] : FName(NAME_None); };
+  auto Fill = [&](int32 I) {
+    if (!bDe || !TrackerIcons.IsValidIndex(I)) return;
+    const FName Type = TypeOf(I);
+    if (!Type.IsNone() && TrackerFill.IsValidIndex(I) && TrackerFill[I] != Type && FillSlot(*TrackerIcons[I], Type)) {
+      TrackerFill[I] = Type;
+    }
+  };
   bool bRebuilt = false;
   if (TrackerRow && Slots != TrackerIcons.Num()) {
     // a GAIN_ACTION adds a slot (FS09ActionTracker), a new turn goes back to two: rebuild, poses snap below
     while (TrackerIcons.Num() > Slots) {
       TrackerIcons.Last()->RemoveFromParent();
       TrackerIcons.Pop();
+      TrackerFill.Pop();
     }
     while (TrackerIcons.Num() < Slots) {
       US08AnimatedIconWidget* Icon = CreateWidget<US08AnimatedIconWidget>(this, US08AnimatedIconWidget::StaticClass());
-      if (!Icon || !Icon->SetIcon(TEXT("resource-action-full"), TrackerIconSu, GTrackerTexturePx)) break;
+      if (!Icon || !Icon->SetIcon(Look.TrackerIcon(), TrackerIconSu, GTrackerTexturePx)) break;
       UHorizontalBoxSlot* IconSlot = TrackerRow->AddChildToHorizontalBox(Icon);
       IconSlot->SetVerticalAlignment(VAlign_Center);
       IconSlot->SetPadding(FMargin(1.0f, 0.0f));
-      Icon->ShowAtRest(TrackerIcons.Num() < TrackerShown ? FName(TEXT("spend")) : NAME_None);
       TrackerIcons.Add(Icon);
+      TrackerFill.Add(NAME_None);
+      const int32 I = TrackerIcons.Num() - 1;
+      if (I < TrackerShown) Fill(I);
+      Icon->ShowAtRest(I < TrackerShown ? SpendAnim : FName(NAME_None));
     }
     bRebuilt = true;
   }
   Shown = FMath::Min(Shown, TrackerIcons.Num());
   if (bReset) {
     for (int32 I = 0; I < TrackerIcons.Num(); ++I) {
-      TrackerIcons[I]->ShowAtRest(I < Shown ? FName(TEXT("spend")) : NAME_None);
+      if (I < Shown) Fill(I);
+      TrackerIcons[I]->ShowAtRest(I < Shown ? SpendAnim : FName(NAME_None));
     }
     TrackerShown = Shown;
     return TEXT("reset");
   }
   if (Shown == TrackerShown) return bRebuilt ? TEXT("slots") : TEXT("");
   const bool bSpend = Shown > TrackerShown;
-  // 01 F-12: the slot of the action being chosen is marked now (spend, 150 ms, held); a cancel gives it back (gain)
+  // 01 F-12: the slot of the action being chosen is marked now (spend, 150 ms, held; DE: filled with its type,
+  // 300 ms); a cancel gives it back (gain / unfill)
   for (int32 I = FMath::Min(Shown, TrackerShown); I < FMath::Max(Shown, TrackerShown); ++I) {
-    if (TrackerIcons.IsValidIndex(I)) TrackerIcons[I]->PlayAnim(bSpend ? TEXT("spend") : TEXT("gain"));
+    if (!TrackerIcons.IsValidIndex(I)) continue;
+    if (bSpend) Fill(I);
+    TrackerIcons[I]->PlayAnim(bSpend ? SpendAnim : GainAnim);
   }
   TrackerShown = Shown;
   return bSpend ? TEXT("spend") : TEXT("gain");
+}
+
+FString US08TurnPortraitWidget::GetTrackerFill(int32 Index) const {
+  if (!Look.bTrackerDe || !TrackerFill.IsValidIndex(Index) || TrackerFill[Index].IsNone()) return FString();
+  return TrackerFill[Index].ToString();
+}
+
+bool US08TurnPortraitWidget::SetHeartFallen(bool bFallen, bool bAtRest) {
+  if (!HeartIcon || !Look.bCrossGlyphs || bFallen == bHeartFallen) return false;
+  bHeartFallen = bFallen;
+  if (bFallen) {
+    // AB-8 (SD-38, the Codex form): the blackened heart, the small cross stamps in (appear 200 ms)
+    if (!HeartIcon->SetIcon(FS08TurnHudLook::FallenHeartIcon, SmallIconSu, GSmallTexturePx)) {
+      bHeartFallen = false;
+      return false;
+    }
+    if (bAtRest) {
+      HeartIcon->ShowAtRest();
+    } else {
+      HeartIcon->PlayAnim(TEXT("appear"));
+    }
+  } else {
+    HeartIcon->SetIcon(TEXT("resource-hp-full"), SmallIconSu, GSmallTexturePx);
+    HeartIcon->ShowAtRest();
+  }
+  return true;
 }
 
 void US08TurnPortraitWidget::SetClockOverrideMs(float Ms) {

@@ -145,6 +145,17 @@ class IconMotionCandidatesTests(unittest.TestCase):
             hits += [f"{path.name}: {cid}" for cid in CANDIDATES if f'"{cid}"' in text]
         self.assertEqual(hits, [])
 
+    def test_accepted_de012_are_client_defaults(self):
+        """Прогон I (AB-5…AB-8, ответ пользователя 2026-10-05): принятые id DE-012 рисует клиент без флагов — каждый
+        назван в коде UE вне автотестов (FS08TurnHudLook), а прежний вид — только флагом отката `-S08…Legacy`."""
+        text = ""
+        for path in SOURCE.rglob("*"):
+            if path.suffix in (".cpp", ".h") and not path.name.endswith("Tests.cpp"):
+                text += path.read_text(encoding="utf-8", errors="ignore")
+        self.assertEqual([cid for cid in ACCEPTED_DE012 if f'"{cid}"' not in text], [])
+        for flag in ("S08TurnRingLegacy", "S08HeartGlowLegacy", "S08TrackerLegacy", "S08CrossLegacy"):
+            self.assertIn(f'"{flag}"', text, flag)
+
     def test_accepted_forms_match_codex_proposal(self):
         """Принятые 2026-10-05 формы — те, что видел пользователь: PNG набора v3 совпадают с экспортом Codex
         (art/imagegen/hud-icons-de012-codex/vector-codex) по альфе и цвету (с учётом альфы) на 1024 / 32 / 24 / 16."""

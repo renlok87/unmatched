@@ -69,7 +69,8 @@ void AS08FlowGameMode::FeedOpponentView(const FS08Snapshot& Snapshot) {
   }
   // DE-022 (01 F-12): the tracker marks by actionsRemaining of the snapshot
   const FString TrackLine = ActionTracker.OnApplied(Snapshot.SequenceNumber, Snapshot.CurrentTurnPlayerId,
-                                                    Snapshot.TurnCount, ActionsRemainingOf(Snapshot), ViewerId, Now);
+                                                    Snapshot.TurnCount, ActionsRemainingOf(Snapshot), ViewerId, Now,
+                                                    S09OpponentView::SpentActionType(Snapshot));  // run I, AB-7
   if (!TrackLine.IsEmpty()) FS08Trace::Write(TrackLine);
   // MS-S-11: the indicator follows pendingManeuver.playerId; the opponent's draft itself never reaches this client
   const bool bPlanning = S09OpponentView::OpponentPlanning(Snapshot, ViewerId);

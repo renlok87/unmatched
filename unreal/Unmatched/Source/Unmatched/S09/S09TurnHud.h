@@ -95,6 +95,8 @@ public:
   /** HP of the hero now (-1 = no hero on the board: nothing changes). */
   ES09HeartEvent Sample(const FString& HeroId, int32 Health);
   int32 GetHealth() const { return Health; }
+  /** The hero last sampled (run I: the fallen heart of a hero no longer among the HUD fighters). */
+  const FString& GetHeroId() const { return HeroId; }
   void Reset() { *this = FS09HeartWatch(); }
 
 private:

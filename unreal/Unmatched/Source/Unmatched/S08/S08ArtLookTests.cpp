@@ -103,6 +103,9 @@ bool FS08ArtLookDefaultTest::RunTest(const FString&) {
     TestTrue(FString::Printf(TEXT("default trace line: %s"), *Line),
              Line.StartsWith(TEXT("ARTLOOK art=1 source=default heroes=v2 tray=on env=on review=0 ")) &&
                  Line.Contains(TEXT(" aliases=-")) && !Line.Contains(TEXT("grey board")));
+    // run I (AB-5..AB-8, 2026-10-05): the accepted turn HUD look is in the line
+    TestTrue(FString::Printf(TEXT("default hud look traced: %s"), *Line),
+             Line.Contains(TEXT(" hud=ring:marker-turn-ring,glow:on,tracker:de,cross:on")));
   }
   // 2) the former opt-in flags are accepted and change nothing
   {
@@ -114,6 +117,15 @@ bool FS08ArtLookDefaultTest::RunTest(const FString&) {
     TestTrue(FString::Printf(TEXT("aliases traced: %s"), *Line),
              Line.Contains(TEXT("heroes=v2 tray=on")) &&
                  Line.Contains(TEXT("aliases=-ArtPreviewHeroesV2,-ArtPreviewDiorama")));
+  }
+  // 2b) run I: the turn HUD rollbacks are traced by their flags, the former -S08HeartGlow is a no-op alias
+  {
+    FCommandLineScope Cmd(TEXT("-S08TrackerLegacy -S08CrossLegacy -S08HeartGlow"));
+    const FString Line = S08ArtLook::TraceLine();
+    TestTrue(FString::Printf(TEXT("hud rollbacks traced: %s"), *Line),
+             Line.Contains(TEXT(" aliases=-S08HeartGlow ")) &&
+                 Line.Contains(TEXT(" hud=ring:marker-turn-ring,glow:on,tracker:legacy(-S08TrackerLegacy),")
+                                   TEXT("cross:legacy(-S08CrossLegacy)")));
   }
   // 3) -S08HeroesLegacy: the pre-default figures, the rest of the look stays
   {
