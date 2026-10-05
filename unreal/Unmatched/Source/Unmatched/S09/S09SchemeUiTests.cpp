@@ -644,6 +644,14 @@ bool FS09SlotWatchTest::RunTest(const FString&) {
   const FS09CardView MyBoost = SlotCard(TEXT("h::10"), TEXT("Feint"), TEXT("ATTACK"), 2);
   TestFalse("own boost", Watch.OnApplied(SlotHud(20, TEXT("ACTION_1"), {Old, OwnScheme, MyDrop, MyBoost}, OppBoost),
                                          NoQueue, Mine, HostId, Out));
+  // run E G-LIVE: my own boost with a SCHEME card (A Momentary Glance) is a boost, not a played scheme
+  FS09LastMovement MineScheme = Mine;
+  MineScheme.Seq = 22;
+  MineScheme.BoostName = TEXT("A Momentary Glance");
+  const FS09CardView MySchemeBoost = SlotCard(TEXT("h::11"), TEXT("A Momentary Glance"), TEXT("SCHEME"), 2);
+  TestFalse("own SCHEME-card boost", Watch.OnApplied(SlotHud(22, TEXT("ACTION_1"),
+                                                             {Old, OwnScheme, MyDrop, MyBoost, MySchemeBoost}, OppBoost),
+                                                     NoQueue, MineScheme, HostId, Out));
   // a boost card not in the pile: the trail's name and value
   FS09LastMovement Bare = Trail;
   Bare.Seq = 21;

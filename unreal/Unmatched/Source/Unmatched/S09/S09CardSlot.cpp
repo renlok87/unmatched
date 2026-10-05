@@ -110,8 +110,10 @@ bool FS09PlayedCardWatch::OnApplied(const FS09HudModel& Hud, const TArray<FS08Pe
   for (const FS08PendingEffect& Effect : Queue) {
     if (Effect.Type == TEXT("DISCARD_CARDS") || Effect.Type == TEXT("BOOST_CHOICE")) DiscardOpen.Add(Effect.PlayerId);
   }
-  const bool bBoostTrail = Trail.bValid && Trail.Seq == Hud.SequenceNumber && Trail.Source == TEXT("MANEUVER") &&
-                           Trail.bBoost && !Trail.PlayerId.IsEmpty() && Trail.PlayerId != ViewerId;
+  // the maneuver boost of this seq, either side: its card is a boost, never a played scheme (a SCHEME card can boost)
+  const bool bAnyBoostTrail = Trail.bValid && Trail.Seq == Hud.SequenceNumber && Trail.Source == TEXT("MANEUVER") &&
+                              Trail.bBoost && !Trail.PlayerId.IsEmpty();
+  const bool bBoostTrail = bAnyBoostTrail && Trail.PlayerId != ViewerId;
   if (!bWasPrimed) {
     if (bBoostTrail) BoostSeqSeen = Trail.Seq;  // entry / reconnect: an old boost is not replayed
     return false;
@@ -153,8 +155,14 @@ bool FS09PlayedCardWatch::OnApplied(const FS09HudModel& Hud, const TArray<FS08Pe
   if (!bCombat) {
     for (const FNew& Entry : News) {
       if (OpenBefore.Contains(Entry.Panel->PlayerId)) continue;
+      // run E G-LIVE: my own maneuver boost (not shown, decision 9) is the newest card of its name in my pile
+      bool bOwnBoostSkipped = !bAnyBoostTrail || Trail.PlayerId != Entry.Panel->PlayerId || BoostCard != nullptr;
       for (int32 I = Entry.Cards.Num() - 1; I >= 0; --I) {
         const FS09CardView* Card = Entry.Cards[I];
+        if (!bOwnBoostSkipped && Card->Name.Equals(Trail.BoostName, ESearchCase::IgnoreCase)) {
+          bOwnBoostSkipped = true;
+          continue;
+        }
         if (Card == BoostCard || Card->CardType != TEXT("SCHEME")) continue;
         Out = FS09SlotCard();
         Out.Card = *Card;
