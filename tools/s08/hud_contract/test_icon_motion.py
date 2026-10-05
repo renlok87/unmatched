@@ -27,8 +27,8 @@ class IconMotionContractTests(unittest.TestCase):
         self.assertEqual(CONTRACT.read_bytes(), CONFIG.read_bytes(), "запустить motion_contract.py: копия в Config/ устарела")
 
     def test_all_23_icons_with_appear_and_leave(self):
-        """23 принятых значка v3 плюс кандидаты DE-012 (список `candidates`)."""
-        self.assertEqual(len(self.c["order"]) - len(self.c.get("candidates", [])), 23)
+        """23 принятых значка v3, 4 принятых DE-012 (`accepted_de012`, 2026-10-05) и кандидат DE-012 (`candidates`)."""
+        self.assertEqual(len(self.c["order"]) - len(self.c.get("candidates", [])) - len(self.c.get("accepted_de012", [])), 23)
         self.assertEqual(set(self.c["order"]), set(self.c["icons"]))
         for icon, d in self.c["icons"].items():
             self.assertIn("appear", d["anims"], icon)
@@ -107,11 +107,16 @@ class IconMotionContractTests(unittest.TestCase):
 
 
 SOURCE = REPO / "unreal" / "Unmatched" / "Source"
-CANDIDATES = ["marker-turn-ring", "marker-turn-ring-team", "resource-hp-fallen", "marker-x-stamp", "marker-action-slot-de"]
+# DE-012: арт-приёмка пользователя 2026-10-05 (01-decisions, «Лист A/B DE-028 — ответ пользователя»): тёплое кольцо,
+# сердце павшего, штамп и трекер DE — принятый набор; кольцо цвета команды — кандидат (AB-5 выбрал тёплое).
+ACCEPTED_DE012 = ["marker-turn-ring", "resource-hp-fallen", "marker-x-stamp", "marker-action-slot-de"]
+CANDIDATES = ["marker-turn-ring-team"]
+DE012 = ["marker-turn-ring", "marker-turn-ring-team", "resource-hp-fallen", "marker-x-stamp", "marker-action-slot-de"]
 
 
 class IconMotionCandidatesTests(unittest.TestCase):
-    """DE-012 (W-15 арт): записи набора DE по ICON-MOTION.md и 01 F-07, F-09, F-12; до арт-приёмки — только галерея."""
+    """DE-012 (W-15 арт): записи набора DE по ICON-MOTION.md и 01 F-07, F-09, F-12; принятые — по умолчанию, кандидат —
+    только галерея."""
 
     @classmethod
     def setUpClass(cls):
@@ -125,7 +130,9 @@ class IconMotionCandidatesTests(unittest.TestCase):
 
     def test_candidates_listed_in_order(self):
         self.assertEqual(self.c["candidates"], CANDIDATES)
-        self.assertEqual(self.c["order"][-len(CANDIDATES):], CANDIDATES)
+        self.assertEqual(self.c["accepted_de012"], ACCEPTED_DE012)
+        self.assertEqual(self.c["order"][-len(DE012):], DE012)
+        self.assertFalse(set(CANDIDATES) & set(ACCEPTED_DE012))
 
     def test_candidates_are_gallery_only(self):
         """Принятый арт — по умолчанию: ни один id кандидата не упоминается в коде UE вне автотестов (галерея берёт их из
@@ -137,6 +144,24 @@ class IconMotionCandidatesTests(unittest.TestCase):
             text = path.read_text(encoding="utf-8", errors="ignore")
             hits += [f"{path.name}: {cid}" for cid in CANDIDATES if f'"{cid}"' in text]
         self.assertEqual(hits, [])
+
+    def test_accepted_forms_match_codex_proposal(self):
+        """Принятые 2026-10-05 формы — те, что видел пользователь: PNG набора v3 совпадают с экспортом Codex
+        (art/imagegen/hud-icons-de012-codex/vector-codex) по альфе и цвету (с учётом альфы) на 1024 / 32 / 24 / 16."""
+        import numpy as np
+        from PIL import Image
+        codex = REPO / "art" / "imagegen" / "hud-icons-de012-codex" / "vector-codex"
+        for name in ("marker-turn-ring", "resource-hp-fallen", "resource-hp-fallen_heart", "resource-hp-fallen_cross",
+                     "marker-x-stamp", "marker-action-slot-de"):
+            for size in (1024, 32, 24, 16):
+                sub = "layers" if "_" in name else ("masters" if size == 1024 else "sizes")
+                ours = ICONS_V3 / sub / (f"{name}.png" if size == 1024 else f"{name}-{size}.png")
+                a = np.asarray(Image.open(ours).convert("RGBA")).astype(float)
+                b = np.asarray(Image.open(codex / str(size) / f"{name}.png").convert("RGBA")).astype(float)
+                self.assertEqual(a.shape, b.shape, (name, size))
+                self.assertEqual(np.abs(a[..., 3] - b[..., 3]).max(), 0, (name, size))
+                pa, pb = a[..., :3] * a[..., 3:] / 255, b[..., :3] * b[..., 3:] / 255
+                self.assertLess(np.abs(pa - pb).max(), 1.0, (name, size))
 
     def test_turn_ring_flash_1000_then_smoulder(self):
         for icon in ("marker-turn-ring", "marker-turn-ring-team"):
@@ -166,8 +191,9 @@ class IconMotionCandidatesTests(unittest.TestCase):
             a = self.icons[icon]["anims"]["appear"]
             self.assertEqual((a["duration_ms"], a["beat_ms"]), (200, 120), icon)
             self.assertEqual([k[:2] for k in self.keys(icon, "appear", target, "scale")], [[0, 0.0], [120, 1.08], [200, 1.0]])
+        # форма Codex (2026-10-05): почерневшее сердце — свой слой, не текстура пустого сердца
         heart = {l["id"]: l["src"] for l in self.icons["resource-hp-fallen"]["layers"]}["heart"]
-        self.assertEqual(heart, "resource-hp-empty")
+        self.assertEqual(heart, "resource-hp-fallen_heart")
 
     def test_tracker_de_variant(self):
         d = self.icons["marker-action-slot-de"]["anims"]

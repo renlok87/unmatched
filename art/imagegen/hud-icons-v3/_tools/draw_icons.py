@@ -47,7 +47,7 @@ TOKENS = {
     "card.type.scheme": "#FDBE72",
     # новые (STYLE-v3.md §2.1)
     "state.pending": "#0D7A89",
-    # кандидаты DE-012 (STYLE-v3.md §11, до арт-приёмки пользователя): тёплые тона вспышки кольца хода
+    # набор DE-012 (STYLE-v3.md §11, принят пользователем 2026-10-05): тёплые тона вспышки кольца хода
     "turn.flash.yellow": "#F2C14E", "turn.flash.orange": "#E8812C",
 }
 ROLE = {
@@ -65,7 +65,7 @@ ROLE = {
     "token.body": "icon.token.body", "token.rim": "icon.token.rim",
     "hp.rim": "card.type.attack",   # кромка сердца здоровья (приём DE): красный игры, не state.error
     "panel": "tag.background",
-    # кандидаты DE-012 (STYLE-v3.md §11)
+    # набор DE-012 (STYLE-v3.md §11)
     "ring.yellow": "turn.flash.yellow",   # вспышка кольца хода: жёлтый → оранжевый → красный (01 F-07)
     "ring.orange": "turn.flash.orange",   # тлеющее кольцо хода; кольцо текущего слота трекера (вариант DE)
     "ring.red": "card.type.attack",       # конец вспышки — красный игры, не state.error (правило ДНК 7)
@@ -1144,7 +1144,7 @@ HEART_C = (16.0, 16.9)   # центр ядра сердца resource-hp-* (heart
 
 def draw_resource_hp(ctx, sp: Spec, mode="light", text=None, layer=None):
     """Здоровье: своё — светлое сердце (DE), чужое — тёмное, потрачено — пустой контур text.secondary.
-    layer glow — кандидат DE-012: ореол урона под сердцем (слой glow в icon-motion.json, покой opacity 0)."""
+    layer glow — DE-012 (AB-6, принят 2026-10-05): ореол урона под сердцем (слой glow в icon-motion.json, покой 0)."""
     if layer == "glow":
         heart_glow(ctx, sp, *HEART_C)
         return
@@ -1154,9 +1154,11 @@ def draw_resource_hp(ctx, sp: Spec, mode="light", text=None, layer=None):
         fill(ctx, C["body"] if mode == "light" else C["glyph"])
 
 
-# ------------------------------------------------------------------------------------------------ кандидаты DE-012
-# W-15 арт (DE-012; ICON-MOTION.md, раздел DE; STYLE-v3.md §11). До арт-приёмки пользователя — только галерея
-# -S08IconGallery и лист sheets/de012/: в контракте они перечислены в `candidates`, HUD их не использует.
+# ------------------------------------------------------------------------------------------------ набор DE-012
+# W-15 арт (DE-012; ICON-MOTION.md, раздел DE; STYLE-v3.md §11). Арт-приёмка пользователя 2026-10-05 (01-decisions,
+# «Лист A/B DE-028 — ответ пользователя»: AB-5 тёплое кольцо, AB-7 трекер DE, AB-8 да, форма Codex): кольцо хода — форма
+# v3 как есть; павшее сердце, штамп и слот DE — формы Codex (art/imagegen/hud-icons-de012-codex/, draw_icons_codex.py).
+# Кандидатом остаётся только кольцо цвета команды (AB-5 выбрал тёплое): галерея -S08IconGallery и лист sheets/de012/.
 RING_BAND = 2.5           # полоса тлеющего обода; окно портрета ⌀ 21 u в поле 32 u (мастер: 15 − 1 − 2,5 − 1)
 RING_FLASH_GROW = 0.75    # вспышка шире тлеющего обода внутрь на 0,75 u — «обод целиком вспыхнул»
 RING_FLASH_FRAMES = 7     # флипбук вспышки: жёлтый (f00) → оранжевый (f03) → красный (f06) за 1000 мс
@@ -1207,33 +1209,48 @@ def heart_glow(ctx, sp: Spec, cx, cy):
     inset_fill(ctx, core, -(rim + sp.K + sp.pxu(1.5)), C["hp.glow"])
 
 
-FALLEN_X = (16.0, 16.4)   # центр креста на пустом сердце (оптический центр ядра; pivot слоя cross в контракте)
+FALLEN_X = (16.0, 16.4)   # центр креста на сердце (оптический центр ядра; pivot слоя cross в контракте)
 
 
 def draw_resource_hp_fallen(ctx, sp: Spec, layer=None):
-    """Павший (SD-38): пустое сердце resource-hp-empty и крест-знак X state.error (правило ДНК 7: красный — только X).
-    Слой heart в контракте — текстура resource-hp-empty, здесь рисуется только для мастера."""
+    """Павший (SD-38), форма Codex (принята 2026-10-05, AB-8): почерневшее сердце — внешний контур пустого сердца
+    resource-hp-empty (keyline + полоса text.secondary), середина залита card.navy (сердце «почернело» до штампа), —
+    и уменьшенный крест state.error: полуразмах 4 u, штрих 2,5 u (было 5,75 / 3) — доли и нижний кончик сердца видны
+    (правило ДНК 7: красный — только X). Слои heart и cross в контракте: сердце стоит, крест «штампуется»."""
     if layer in (None, "heart"):
-        heart_token(ctx, sp, *HEART_C, mode="hollow", scale=1.0)
+        def core():
+            heart_path(ctx, *HEART_C)
+        inset_fill(ctx, core, -(sp.E + sp.K), C["keyline"])
+        inset_fill(ctx, core, -sp.E, C["dim"])
+        inset_fill(ctx, core, sp.pxu(1.0), C["body"])
     if layer in (None, "cross"):
-        glyph(ctx, sp, *FALLEN_X, lambda: g_x(ctx, sp, half=5.75, w=sp.pxu(3.0), col=C["error"]))
+        glyph(ctx, sp, *FALLEN_X, lambda: g_x(ctx, sp, half=4.0, w=sp.pxu(2.5), col=C["error"]))
 
 
 def draw_marker_x_stamp(ctx, sp: Spec):
-    """Крест-штамп (SD-37): «нет защиты» / «отменено» — тот же знак X state.error, что у resource-connection-lost,
-    крупно (полуразмах 10,5 u, штрих 3,5 u) с keyline; тела нет — штамп ложится на слот или карту."""
-    glyph(ctx, sp, 16.0, 16.0, lambda: g_x(ctx, sp, half=10.5, w=sp.pxu(3.5), col=C["error"]))
+    """Крест-штамп (SD-37), форма Codex (принята 2026-10-05, AB-8): «нет защиты» / «отменено» — тот же знак X
+    state.error, что у resource-connection-lost, компактный (полуразмах 9 u, было 10,5; штрих 3,5 u, прямые окончания)
+    с keyline: на 16 px остаётся 1 px поля до края холста. Тела нет — штамп ложится на слот или карту."""
+    glyph(ctx, sp, 16.0, 16.0, lambda: g_x(ctx, sp, half=9.0, w=sp.pxu(3.5), col=C["error"]))
 
 
 def draw_marker_action_slot_de(ctx, sp: Spec, layer=None):
-    """Слот трекера, вариант DE (01 F-12, только галерея): серый призрак — пустой диск text.secondary (правило «пусто»),
-    вокруг — оранжевое кольцо 1,5 u, которое пульсирует, пока выбирается действие. Заливка типом — слои body/glyph
-    action-* поверх (в контракте)."""
-    R = U / 2 - sp.M
-    band = sp.pxu(1.5)
+    """Слот трекера DE (01 F-12), форма Codex (принята 2026-10-05, AB-7): один оранжевый обод ring.orange 1,5 u с
+    keyline, внутри тело card.navy и серый диск-призрак text.secondary с opacity 0,35 (⌀ 13 u) — отличает трекер от
+    кольца портрета без второго серого контура. Пульсирует, пока выбирается действие; заполнение — слои body/glyph
+    принятых action-* поверх (в контракте)."""
+    r = U / 2 - sp.M
     if layer in (None, "ring"):
-        _annulus(ctx, sp, R, R - 2 * sp.K - band, C["ring.orange"])
-        hollow_token(ctx, Disc(U / 2, U / 2, R - 2 * sp.K - band - sp.pxu(1.0)), sp, edge=C["dim"])
+        circle(ctx, U / 2, U / 2, r)
+        fill(ctx, C["keyline"])
+        circle(ctx, U / 2, U / 2, r - sp.K)
+        fill(ctx, C["ring.orange"])
+        circle(ctx, U / 2, U / 2, r - sp.K - sp.pxu(1.5))
+        fill(ctx, C["keyline"])
+        circle(ctx, U / 2, U / 2, r - 2 * sp.K - sp.pxu(1.5))
+        fill(ctx, C["body"])
+        circle(ctx, U / 2, U / 2, sp.pxu(6.5))
+        fill(ctx, C["dim"], 0.35)
 
 
 # id → (функция, kwargs, широкий?)
@@ -1269,14 +1286,18 @@ VARIANTS = {
     "marker-status-p1": (draw_marker_status, {"team": C["team1"]}, False),
     "marker-status-p2": (draw_marker_status, {"team": C["team2"]}, False),
 }
-# кандидаты DE-012 (W-15 арт): новые id до арт-приёмки пользователя — в мастерах, размерах и слоях, но не на листах
-# принятого набора (ORDER23); свой лист sheets/de012/. В контракте движения — список `candidates`.
-CANDIDATES = {
+# набор DE-012, принятый пользователем 2026-10-05 (AB-5, AB-7, AB-8): новые id после 23 значков v3 — на листах
+# принятого набора (ORDER_ACCEPTED) и на своём листе sheets/de012/. В контракте движения — список `accepted_de012`.
+DE_ACCEPTED = {
     "marker-turn-ring": (draw_marker_turn_ring, {}, False),
-    "marker-turn-ring-team": (draw_marker_turn_ring, {"team": True}, False),
     "resource-hp-fallen": (draw_resource_hp_fallen, {}, False),
     "marker-x-stamp": (draw_marker_x_stamp, {}, False),
     "marker-action-slot-de": (draw_marker_action_slot_de, {}, False),
+}
+# кандидаты DE-012 до арт-приёмки: в мастерах, размерах и слоях, но не на листах принятого набора; лист sheets/de012/.
+# В контракте движения — список `candidates`. AB-5 выбрал тёплое кольцо: вариант цвета команды остаётся галереей.
+CANDIDATES = {
+    "marker-turn-ring-team": (draw_marker_turn_ring, {"team": True}, False),
 }
 LAYERS = {
     "action-attack": ("body", "glyph"),
@@ -1293,11 +1314,11 @@ LAYERS = {
     "state-immobilized": ("body", "glyph"),
     "state-hint": ("body", "glyph"),
     "state-threat": ("body", "glyph"),
-    # кандидаты DE-012
+    # набор DE-012 (glow, кольцо, павший, слот — приняты 2026-10-05; кольцо team — кандидат)
     "resource-hp-full": ("glow",),
     "marker-turn-ring": ("rim", "flash"),
     "marker-turn-ring-team": ("rim", "flash"),
-    "resource-hp-fallen": ("cross",),
+    "resource-hp-fallen": ("heart", "cross"),
     "marker-action-slot-de": ("ring",),
 }
 # Флипбуки слоёв для движения (контракт icon-motion.json: src «<id>_<layer>#» → файлы <id>_<layer>_fNN):
@@ -1315,15 +1336,16 @@ def _sent_frames():
 
 FLIPBOOKS = {("state-sent", "glyph"): _sent_frames(),
              ("marker-turn-ring", "flash"): [{"frame": i} for i in range(RING_FLASH_FRAMES)]}
-ALL = list(ICONS) + list(VARIANTS) + list(CANDIDATES)
+ALL = list(ICONS) + list(VARIANTS) + list(DE_ACCEPTED) + list(CANDIDATES)
 ORDER23 = [k for k in ICONS if k != "action-attack-token-glyphmask"]
+ORDER_ACCEPTED = ORDER23 + list(DE_ACCEPTED)       # 27 принятых: 23 v3 (2026-10-03) + 4 DE-012 (2026-10-05)
 EXAMPLE = {"state-boost": {"text": "+2"}, "state-hint": {"text": "1"}, "state-threat": {"text": "3"},
            "marker-status": {"text": "1", "team": C["team1"]}, "marker-status-p1": {"text": "1"},
            "marker-status-p2": {"text": "2"}, "resource-hp-full": {"text": "17"}, "resource-hp-full-enemy": {"text": "16"}}
 
 
 def _entry(name):
-    return ICONS.get(name) or VARIANTS.get(name) or CANDIDATES[name]
+    return ICONS.get(name) or VARIANTS.get(name) or DE_ACCEPTED.get(name) or CANDIDATES[name]
 
 
 def is_wide(name):
@@ -1576,29 +1598,32 @@ def _over(*ims):
     return out
 
 
-def candidate_items():
-    """Лист арт-приёмки DE-012: (подпись, f(size) → RGBA). Мастер 1024 и 48/32/24/16; слои — как их видит игра."""
+def de012_items():
+    """Лист набора DE-012 (принят 2026-10-05): (подпись, f(size) → RGBA). Мастер 1024 и 48/32/24/16; слои — как их
+    видит игра; последние строки — кандидат team и ореол."""
     tf = RING_FLASH_FRAMES - 1
     return [
         ("marker-turn-ring · rim (тлеющее, в игре opacity 0,35)", lambda s: render("marker-turn-ring", s)),
         ("marker-turn-ring · flash f00 (жёлтый, 0–143 мс)", lambda s: render("marker-turn-ring", s, layer="flash", frame=0)),
         (f"marker-turn-ring · flash f{tf // 2:02d} (оранжевый)", lambda s: render("marker-turn-ring", s, layer="flash", frame=tf // 2)),
         (f"marker-turn-ring · flash f{tf:02d} (красный, к 1000 мс)", lambda s: render("marker-turn-ring", s, layer="flash", frame=tf)),
-        ("marker-turn-ring-team · rim × team.p1", lambda s: _tinted(render("marker-turn-ring-team", s), C["team1"])),
-        ("marker-turn-ring-team · rim × team.p2", lambda s: _tinted(render("marker-turn-ring-team", s), C["team2"])),
-        ("resource-hp-fallen (пустое сердце + X)", lambda s: render("resource-hp-fallen", s)),
+        ("resource-hp-fallen · heart (почернело, до штампа)", lambda s: render("resource-hp-fallen", s, layer="heart")),
+        ("resource-hp-fallen (сердце + малый X)", lambda s: render("resource-hp-fallen", s)),
         ("marker-x-stamp (нет защиты / отменено)", lambda s: render("marker-x-stamp", s)),
-        ("marker-action-slot-de · ring (призрак + кольцо)", lambda s: render("marker-action-slot-de", s)),
-        ("marker-action-slot-de · заполнен (action-attack поверх)",
-         lambda s: _over(render("marker-action-slot-de", s), render("action-attack", s))),
+        ("marker-action-slot-de · ring (обод + призрак)", lambda s: render("marker-action-slot-de", s)),
+    ] + [(f"marker-action-slot-de · заполнен {a}",
+          (lambda a: lambda s: _over(render("marker-action-slot-de", s), render(f"action-{a}", s)))(a))
+         for a in ("attack", "defense", "maneuver", "scheme")] + [
         ("resource-hp-full · glow (пик пульса урона)",
          lambda s: _over(render("resource-hp-full", s, layer="glow"), render("resource-hp-full", s))),
+        ("КАНДИДАТ marker-turn-ring-team · rim × team.p1", lambda s: _tinted(render("marker-turn-ring-team", s), C["team1"])),
+        ("КАНДИДАТ marker-turn-ring-team · rim × team.p2", lambda s: _tinted(render("marker-turn-ring-team", s), C["team2"])),
     ]
 
 
-def sheet_candidates(path):
+def sheet_de012(path):
     """Мастер 1024 при 256 px | 48/32/24/16 цвет | серый | ×4 nearest 32/24/16 — на панели tag.background."""
-    items = candidate_items()
+    items = de012_items()
     name_w, mcell = 300, 256
     row_h = mcell + 24
     sizes_w = sum(s + 18 for s in SHEET_SIZES) + 20
@@ -1606,7 +1631,7 @@ def sheet_candidates(path):
     W = name_w + mcell + 30 + 2 * sizes_w + x4_w + 20
     H = 60 + len(items) * row_h
     sheet = Image.new("RGBA", (W, H), SHEET_BG)
-    paste(sheet, label(W, 40, "DE-012 — кандидаты до арт-приёмки пользователя: мастер 1024 (×0,25) | 48 / 32 / 24 / 16 px цвет | серый | ×4 nearest 32 / 24 / 16 — на панели tag.background", 17), 0, 8)
+    paste(sheet, label(W, 40, "DE-012 — принято пользователем 2026-10-05 (формы Codex; кольцо — v3), внизу кандидат team: мастер 1024 (×0,25) | 48 / 32 / 24 / 16 px цвет | серый | ×4 nearest 32 / 24 / 16 — на панели tag.background", 17), 0, 8)
     for r, (title, fn) in enumerate(items):
         y = 60 + r * row_h
         paste(sheet, label(name_w, 44, title, 12), 0, y + 8)
@@ -1652,13 +1677,13 @@ def build(names=None, review_dir=None):
                 for s in SIZES:
                     render(n, s, layer=layer, **kw).save(os.path.join(dirs["layers"], f"{n}_{layer}_f{fi:02d}-{s}.png"))
         print("ok", n, im.size, audits[n].get("margin_px"), "body%", audits[n].get("glyph_area_pct_of_body"), "seam", audits[n].get("seam_px"))
-    show = [n for n in ORDER23 if n in names] + [n for n in ("action-attack-token-glyphmask",) + tuple(VARIANTS) if n in names]
+    show = [n for n in ORDER_ACCEPTED if n in names] + [n for n in ("action-attack-token-glyphmask",) + tuple(VARIANTS) if n in names]
     sheet_masters(show, os.path.join(dirs["sheets"], "sheet-masters.png"))
     sheet_sizes(show, os.path.join(dirs["sheets"], "sheet-sizes.png"))
-    sheet_context_panel([n for n in ORDER23 if n in names] + [v for v in ("resource-hp-full-enemy",) if v in names],
+    sheet_context_panel([n for n in ORDER_ACCEPTED if n in names] + [v for v in ("resource-hp-full-enemy",) if v in names],
                         os.path.join(dirs["sheets"], "sheet-context-panel.png"))
-    if all(n in names for n in CANDIDATES):
-        sheet_candidates(os.path.join(dirs["sheets"], "de012", "sheet-candidates.png"))
+    if all(n in names for n in list(DE_ACCEPTED) + list(CANDIDATES)):
+        sheet_de012(os.path.join(dirs["sheets"], "de012", "sheet-de012.png"))
     with open(os.path.join(dirs["sheets"], "audit.json"), "w", encoding="utf-8") as f:
         json.dump(audits, f, ensure_ascii=False, indent=1)
     for d in ("masters", "sizes", "layers"):

@@ -1,6 +1,6 @@
 {
  "schema": "unmatched.icon-motion/1",
- "revision": "icon-motion-2026-10-04",
+ "revision": "icon-motion-2026-10-05",
  "status": "предложено",
  "source": "docs/unreal/contracts/hud/ICON-MOTION-PLAN.md; art/imagegen/hud-icons-v3/STYLE-v3.md §7; генератор art/imagegen/hud-icons-v3/_tools/motion_contract.py",
  "units": {
@@ -42,14 +42,17 @@
   "marker-status-p1": "marker-status",
   "marker-status-p2": "marker-status"
  },
- "candidates": [
+ "accepted_de012": [
   "marker-turn-ring",
-  "marker-turn-ring-team",
   "resource-hp-fallen",
   "marker-x-stamp",
   "marker-action-slot-de"
  ],
- "candidates_note": "кандидаты DE-012 до арт-приёмки пользователя: только галерея -S08IconGallery, HUD их не использует",
+ "accepted_de012_note": "набор DE-012, принят пользователем 2026-10-05 (AB-5 тёплое кольцо, AB-7 трекер DE, AB-8 сердце павшего и штамп в форме Codex): принятый арт — по умолчанию, флаги только откатывают (AGENTS.md)",
+ "candidates": [
+  "marker-turn-ring-team"
+ ],
+ "candidates_note": "кандидаты DE-012 до арт-приёмки пользователя (кольцо цвета команды — AB-5 выбрал тёплое): только галерея -S08IconGallery, HUD их не использует",
  "order": [
   "state-boost",
   "state-enemy",
@@ -6193,7 +6196,7 @@
       "duration_ms": 0,
       "tracks": []
      },
-     "note": "урон (SD-35, DE-012): 0–200 сердце вздрагивает (удар 60), 200–1000 вспышка и один пульс ореола glow (вид — кандидат до арт-приёмки); число меняет игра на +80 от контакта; reduced — без движения"
+     "note": "урон (SD-35, DE-012): 0–200 сердце вздрагивает (удар 60), 200–1000 вспышка и один пульс ореола glow (принят 2026-10-05, AB-6); число меняет игра на +80 от контакта; reduced — без движения"
     },
     "deplete": {
      "kind": "event",
@@ -6899,7 +6902,7 @@
    "layers": [
     {
      "id": "heart",
-     "src": "resource-hp-empty"
+     "src": "resource-hp-fallen_heart"
     },
     {
      "id": "cross",
@@ -6959,7 +6962,7 @@
        }
       ]
      },
-     "note": "павший (SD-38): крест «штампуется» на пустое сердце, сердце неподвижно; игра запускает на +1100 от кадра контакта (01 F-09)"
+     "note": "павший (SD-38, форма Codex): малый крест «штампуется» на почерневшее сердце, сердце неподвижно; игра запускает на +1100 от кадра контакта (01 F-09)"
     },
     "leave": {
      "kind": "exit",
@@ -7409,7 +7412,7 @@
       "duration_ms": 0,
       "tracks": []
      },
-     "note": "вариант DE (01 F-12, только галерея): пульс текущего слота, пока выбирается действие; reduced — обводка без пульса"
+     "note": "трекер DE (01 F-12, принят 2026-10-05, AB-7): пульс текущего слота, пока выбирается действие; reduced — обод без пульса"
     },
     "fill": {
      "kind": "event",
@@ -7540,7 +7543,7 @@
        }
       ]
      },
-     "note": "вариант DE: «потрачено = заполнено значком типа» 0,4 → 1 за 300 мс в момент выбора (слои action-<тип>; в галерее атака)"
+     "note": "трекер DE: «потрачено = заполнено значком типа» 0,4 → 1 за 300 мс в момент выбора (слои принятых action-<тип>; в галерее атака)"
     },
     "unfill": {
      "kind": "event",
@@ -7650,7 +7653,7 @@
        }
       ]
      },
-     "note": "вариант DE: Undo — слот снова пуст (01 F-12)"
+     "note": "трекер DE: Undo — слот снова пуст (01 F-12)"
     }
    },
    "demo": [

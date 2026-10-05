@@ -310,7 +310,7 @@ ICONS = {
                       {"target": "all", "prop": "tx", "keys": [[0, 0.0, "linear"], [40, -0.8, "linear"], [80, 0.8, "linear"], [120, -0.5, "linear"], [160, 0.3, "linear"], [200, 0.0, "constant"]]},
                       {"target": "glow", "prop": "opacity", "keys": [[0, 0.0, "constant"], [200, 0.0, "ease_out_quad"], [320, 1.0, "ease_in_out_cubic"], [560, 0.45, "ease_in_out_cubic"], [760, 0.85, "ease_in_quad"], [1000, 0.0, "constant"]]}],
                       "reduced": static_reduced(),
-                      "note": "урон (SD-35, DE-012): 0–200 сердце вздрагивает (удар 60), 200–1000 вспышка и один пульс ореола glow (вид — кандидат до арт-приёмки); число меняет игра на +80 от контакта; reduced — без движения"},
+                      "note": "урон (SD-35, DE-012): 0–200 сердце вздрагивает (удар 60), 200–1000 вспышка и один пульс ореола glow (принят 2026-10-05, AB-6); число меняет игра на +80 от контакта; reduced — без движения"},
                   "deplete": {"kind": "event", "hold": True, "duration_ms": 200, "beat_ms": 60, "tracks": [
                       {"target": "under", "prop": "opacity", "keys": [[0, 1.0, "constant"], [200, 1.0, "constant"]]},
                       {"target": "icon", "prop": "scale", "keys": [[0, 1.0, "ease_out_quad"], [60, 1.15, "ease_in_quad"], [200, 0.0, "constant"]]},
@@ -331,9 +331,11 @@ ICONS = {
         "anims": {"appear": APPEAR_FADE, "leave": LEAVE},
         "demo": [["appear"], ["wait", 800], ["leave"]]},
 }
-# ------------------------------------------------------------------------------------------------ кандидаты DE-012
-# W-15 арт (ICON-MOTION.md, раздел DE; 01 F-07, F-09, F-12; 02 SD-34…SD-38). Новые id — только галерея -S08IconGallery
-# до арт-приёмки пользователя: HUD их не использует (pytest test_candidates_are_gallery_only). Числа — из 01.
+# ------------------------------------------------------------------------------------------------ набор DE-012
+# W-15 арт (ICON-MOTION.md, раздел DE; 01 F-07, F-09, F-12; 02 SD-34…SD-38). Числа — из 01. Арт-приёмка пользователя
+# 2026-10-05 (01-decisions, «Лист A/B DE-028 — ответ пользователя»): тёплое кольцо, павшее сердце, штамп и трекер DE —
+# принятый набор (`accepted_de012`, формы Codex у сердца, штампа и слота); кольцо цвета команды остаётся кандидатом —
+# только галерея -S08IconGallery, HUD его не использует (pytest test_candidates_are_gallery_only).
 RING_FLASH_FRAMES = 7     # = draw_icons.RING_FLASH_FRAMES: жёлтый (f00) → оранжевый (f03) → красный (f06)
 RING_REST_OPACITY = 0.35  # тлеющее кольцо весь ход (01 F-07, «Резолюция» п. 6)
 
@@ -371,12 +373,12 @@ CANDIDATE_ICONS = {
     "marker-turn-ring": turn_ring("marker-turn-ring", RING_FLASH_FRAMES),
     "marker-turn-ring-team": turn_ring("marker-turn-ring-team", 0),
     "resource-hp-fallen": {
-        "canvas_u": [32, 32], "layers": [layer("heart", "resource-hp-empty"),
+        "canvas_u": [32, 32], "layers": [layer("heart", "resource-hp-fallen_heart"),
                                          layer("cross", "resource-hp-fallen_cross", pivot=(16, 16.4))],
         "anims": {"appear": {"kind": "enter", "duration_ms": 200, "beat_ms": 120, "tracks": [
             {"target": "cross", "prop": "scale", "keys": [[0, 0.0, "ease_out_cubic"], [120, 1.08, "ease_in_quad"], [200, 1.0, "constant"]]}],
             "reduced": {"duration_ms": 100, "tracks": [{"target": "cross", "prop": "opacity", "keys": [[0, 0.0, "linear"], [100, 1.0, "constant"]]}]},
-            "note": "павший (SD-38): крест «штампуется» на пустое сердце, сердце неподвижно; игра запускает на +1100 от кадра контакта (01 F-09)"},
+            "note": "павший (SD-38, форма Codex): малый крест «штампуется» на почерневшее сердце, сердце неподвижно; игра запускает на +1100 от кадра контакта (01 F-09)"},
             "leave": LEAVE},
         "demo": [["appear"], ["wait", 900], ["leave"]]},
     "marker-x-stamp": {
@@ -397,7 +399,7 @@ CANDIDATE_ICONS = {
                       {"target": "ring", "prop": "scale", "keys": [[0, 1.0, "ease_in_out_cubic"], [385, 1.06, "ease_in_out_cubic"], [770, 1.0, "constant"]]},
                       {"target": "ring", "prop": "opacity", "keys": [[0, 0.6, "ease_in_out_cubic"], [385, 1.0, "ease_in_out_cubic"], [770, 0.6, "constant"]]}],
                       "reduced": static_reduced(),
-                      "note": "вариант DE (01 F-12, только галерея): пульс текущего слота, пока выбирается действие; reduced — обводка без пульса"},
+                      "note": "трекер DE (01 F-12, принят 2026-10-05, AB-7): пульс текущего слота, пока выбирается действие; reduced — обод без пульса"},
                   "fill": {"kind": "event", "hold": True, "duration_ms": 300, "beat_ms": 200, "tracks": [
                       {"target": "body", "prop": "opacity", "keys": [[0, 0.4, "ease_out_quad"], [300, 1.0, "constant"]]},
                       {"target": "glyph", "prop": "opacity", "keys": [[0, 0.4, "ease_out_quad"], [300, 1.0, "constant"]]},
@@ -407,7 +409,7 @@ CANDIDATE_ICONS = {
                           {"target": "body", "prop": "opacity", "keys": [[0, 0.0, "linear"], [100, 1.0, "constant"]]},
                           {"target": "glyph", "prop": "opacity", "keys": [[0, 0.0, "linear"], [100, 1.0, "constant"]]},
                           {"target": "ring", "prop": "opacity", "keys": [[0, None, "linear"], [100, 0.0, "constant"]]}]},
-                      "note": "вариант DE: «потрачено = заполнено значком типа» 0,4 → 1 за 300 мс в момент выбора (слои action-<тип>; в галерее атака)"},
+                      "note": "трекер DE: «потрачено = заполнено значком типа» 0,4 → 1 за 300 мс в момент выбора (слои принятых action-<тип>; в галерее атака)"},
                   "unfill": {"kind": "event", "hold": True, "duration_ms": 150, "beat_ms": None, "tracks": [
                       {"target": "body", "prop": "opacity", "keys": [[0, None, "ease_in_quad"], [150, 0.0, "constant"]]},
                       {"target": "glyph", "prop": "opacity", "keys": [[0, None, "ease_in_quad"], [150, 0.0, "constant"]]},
@@ -416,17 +418,19 @@ CANDIDATE_ICONS = {
                           {"target": "body", "prop": "opacity", "keys": [[0, None, "linear"], [100, 0.0, "constant"]]},
                           {"target": "glyph", "prop": "opacity", "keys": [[0, None, "linear"], [100, 0.0, "constant"]]},
                           {"target": "ring", "prop": "opacity", "keys": [[0, None, "linear"], [100, 0.6, "constant"]]}]},
-                      "note": "вариант DE: Undo — слот снова пуст (01 F-12)"}},
+                      "note": "трекер DE: Undo — слот снова пуст (01 F-12)"}},
         "demo": [["appear"], ["slot_pulse"], ["wait", 1540], ["fill"], ["wait", 800], ["unfill"], ["wait", 500], ["leave"]]},
 }
 ICONS.update(CANDIDATE_ICONS)
-CANDIDATES = list(CANDIDATE_ICONS)
+# порядок записей в `order` прежний (23 v3, затем пять записей DE-012); принятые и кандидаты — отдельными списками
+CANDIDATES = ["marker-turn-ring-team"]
+ACCEPTED_DE012 = [k for k in CANDIDATE_ICONS if k not in CANDIDATES]
 
 ORDER = ["state-boost", "state-enemy", "state-sent", "state-pending-move", "state-pending-place", "state-hint",
          "state-threat", "state-immobilized", "action-attack", "action-attack-token", "action-defense", "action-maneuver",
          "action-scheme", "marker-status", "loader-spinner", "resource-action-full", "resource-action-empty",
          "resource-card", "resource-connection-online", "resource-connection-reconnecting", "resource-connection-lost",
-         "resource-hp-full", "resource-hp-empty"] + CANDIDATES
+         "resource-hp-full", "resource-hp-empty"] + list(CANDIDATE_ICONS)
 VARIANT_OF = {"resource-hp-full-enemy": "resource-hp-full", "marker-status-p1": "marker-status", "marker-status-p2": "marker-status"}
 
 
@@ -435,7 +439,8 @@ def contract():
     return {
         "schema": "unmatched.icon-motion/1",
         # 2026-10-04: DE-012 — кандидаты набора DE (`candidates`), damage сердца 1000 мс с ореолом glow
-        "revision": "icon-motion-2026-10-04",
+        # 2026-10-05: арт-приёмка DE-012 — четыре записи в `accepted_de012`, сердце павшего на слое fallen_heart
+        "revision": "icon-motion-2026-10-05",
         "status": "предложено",
         "source": "docs/unreal/contracts/hud/ICON-MOTION-PLAN.md; art/imagegen/hud-icons-v3/STYLE-v3.md §7; генератор art/imagegen/hud-icons-v3/_tools/motion_contract.py",
         "units": {"t": "ms", "canvas": "u (32 u = сторона значка; плашки 64 × 32)", "tx/ty": "u", "rotate": "градусы по часовой",
@@ -450,8 +455,10 @@ def contract():
             "budget": "≤ 3 одновременно циклящих значка в кадре; тик только у активных анимаций",
         },
         "variants": VARIANT_OF,
+        "accepted_de012": ACCEPTED_DE012,
+        "accepted_de012_note": "набор DE-012, принят пользователем 2026-10-05 (AB-5 тёплое кольцо, AB-7 трекер DE, AB-8 сердце павшего и штамп в форме Codex): принятый арт — по умолчанию, флаги только откатывают (AGENTS.md)",
         "candidates": CANDIDATES,
-        "candidates_note": "кандидаты DE-012 до арт-приёмки пользователя: только галерея -S08IconGallery, HUD их не использует",
+        "candidates_note": "кандидаты DE-012 до арт-приёмки пользователя (кольцо цвета команды — AB-5 выбрал тёплое): только галерея -S08IconGallery, HUD их не использует",
         "order": ORDER,
         "icons": {k: ICONS[k] for k in ORDER},
     }
