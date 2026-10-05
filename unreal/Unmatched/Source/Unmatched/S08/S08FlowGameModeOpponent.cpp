@@ -125,7 +125,10 @@ void AS08FlowGameMode::FeedOpponentView(const FS08Snapshot& Snapshot) {
 void AS08FlowGameMode::TickOpponentView() {
   const double Now = static_cast<double>(NowMs());
   const bool bMoving = BoardActor && BoardActor->AnyFighterMoving();
-  for (const FString& Line : LastMoveTracker.Tick(Now, bMoving)) FS08Trace::Write(Line);
+  // DE-026 (01 F-10): the trail of a held opponent's scheme is revealed after its move, not before the effect starts
+  if (!CardSlot.HoldsEffect()) {
+    for (const FString& Line : LastMoveTracker.Tick(Now, bMoving)) FS08Trace::Write(Line);
+  }
   if (BoardActor) BoardActor->SetLastMoveFade(LastMoveTracker.IsDrawn() ? LastMoveTracker.Alpha(Now) : 1.0f);
 
   // the feed line of a maneuver comes with its highlight (03 §7 "После": MS-P-03 + the line); DE-022: an EFFECT

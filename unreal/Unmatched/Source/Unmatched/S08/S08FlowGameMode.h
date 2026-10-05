@@ -31,6 +31,7 @@
 #include "../S09/S09TurnStatus.h"
 #include "../S09/S09TurnHud.h"
 #include "../S09/S09HandLimit.h"
+#include "../S09/S09CardSlot.h"
 #include "S08CueDispatcher.h"
 #include "S08MoveAnim.h"
 #include "S08TurnPortraitWidget.h"
@@ -706,6 +707,41 @@ private:
   bool bRuleHintOffTraced = false;
   TSharedPtr<class SBox> HandHintBox;
   TSharedPtr<class STextBlock> HandHintText;
+  // ---- DE-026 (W-18; 01 F-10; 02 SD-02, SD-26, SD-28 п. 4, SD-54): the hand lowered during a board pick and the
+  // source-card slot (S09/S09CardSlot.h, S08FlowGameModeCardSlot.cpp) ----
+  /** The slot at the top left, under the command panel (built once; hit-test invisible - a click on it is a click
+   *  on the field, i.e. the skip of the opponent's scheme hold). */
+  void BuildCardSlotWidgets(const TSharedRef<SConstraintCanvas>& Canvas);
+  /** An applied snapshot (before the board sync): a new seq releases a held effect, a played card enters the slot;
+   *  the opponent's scheme holds the fighters of FightersBefore and the cues of its seq. */
+  void FeedCardSlot(const FS08Snapshot& Snapshot, const TArray<FS08BoardFighter>& FightersBefore);
+  /** Every frame: the slot's times, the release of the held effect, the hand lowering, the widgets. */
+  void TickCardSlot();
+  /** A click / Space / Enter during the hold of the opponent's scheme starts its effect. True when the input is
+   *  consumed (the hold hides my own choice it opened, or the skip happened in the opponent's turn). */
+  bool TryCardSlotSkip();
+  /** HandleCues: the cues of the held seq wait for the release (true = held). */
+  bool HoldCardSlotCues(const TArray<FS08Cue>& Cues);
+  /** The fighters as they stood before the held opponent's scheme (HUD view and board view). */
+  void ApplyCardSlotHold(TArray<FS08BoardFighter>& View) const;
+  /** The held effect starts: the board and the HUD go to the snapshot, the held cues play (bPlayCues) or are
+   *  dropped (a newer seq / a cut catches up with the snapshot). */
+  void OnCardSlotReleased(bool bPlayCues, const TCHAR* Why);
+  void RebuildCardSlotWidget();
+  /** The OS cursor is over a HUD panel (the lowered hand counts with its raised rectangle). False without a cursor. */
+  bool CursorOverHud() const;
+  FS09PlayedCardWatch PlayedCards;
+  FS09SourceSlot CardSlot;
+  FS09HandLower HandLower;
+  TArray<FS08BoardFighter> SlotHeldFighters;
+  TArray<FS08Cue> SlotHeldCues;
+  uint32 CardSlotBuiltRevision = MAX_uint32;
+  bool bCardSlotHidesChoice = false;
+  bool bHandPreviewHidden = false;
+  bool bCardSlotQueueOpen = false;    // pendingEffects of the last applied snapshot not empty (the effect runs)
+  bool bCardSlotBuiltHolding = false;
+  float HandOffsetApplied = 0.0f;
+  TSharedPtr<class SBox> CardSlotBox;
   /** One -Bench view's camera: selection + zoom per the view name, traced 'BENCH view=...' (RunRenderBench case 2;
    *  also the live-tune shot). */
   void BenchSetupView(const FString& View, const FString& HeroId);

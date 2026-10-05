@@ -474,6 +474,9 @@ void AS08FlowGameMode::HandleApplied(const FS08Snapshot& Snapshot, ES08SeqDecisi
       AppliedCount, Snapshot.SequenceNumber, static_cast<int32>(Decision),
       Snapshot.Fighters.IsValid() ? 1 : 0, Snapshot.BoardState.IsValid() ? 1 : 0));
   TrackCombatResult(Snapshot, Decision);
+  // DE-026 (01 F-10): the fighters as they stood before this snapshot - an opponent's scheme holds them until its
+  // effect is due
+  const TArray<FS08BoardFighter> FightersBefore = Fighters;
   // MS-T-04: the board of THIS snapshot is decoded before the command UI sees
   // it - a maneuver draft (one restored after a re-entry too) is evaluated on
   // it, not on the previous (or the reset, empty) board. The render path
@@ -536,6 +539,7 @@ void AS08FlowGameMode::HandleApplied(const FS08Snapshot& Snapshot, ES08SeqDecisi
     FeedOpponentView(Snapshot);        // MS-T-17: planning indicator, last-move highlight (MS-P-03), feed
     FeedTurnHud(Snapshot);             // DE-023: turn ring + banner, tracker marks of the portraits
     FeedHandLimitHint(Snapshot);       // DE-024: the one-shot hand limit rule toast (UI-ACC-012)
+    FeedCardSlot(Snapshot, FightersBefore);  // DE-026: the source-card slot; the opponent's scheme holds its effect
     // GD-036: one RESULT trace line per authoritative seq - an equal-seq
     // merge (WS push + HTTP refetch of the terminal body) never re-logs.
     if (Hud.bGameOver && Snapshot.SequenceNumber != S09ResultTraceSeq) {
@@ -809,9 +813,11 @@ void AS08FlowGameMode::SyncBoardFromApplied() {
     // DE-018: the staged target keeps its HP (and, for a lethal blow, its figure) until the contact frame.
     ShownFighters = Fighters;
     CombatStage.GetHold().Apply(ShownFighters, /*bBoardView=*/false);
+    ApplyCardSlotHold(ShownFighters);  // DE-026: the opponent's scheme waits 1500 ms before its effect
     {
       TArray<FS08BoardFighter> BoardView = Fighters;
       CombatStage.GetHold().Apply(BoardView, /*bBoardView=*/true);
+      ApplyCardSlotHold(BoardView);
       BoardActor->SyncFighters(BoardModel, BoardView, ViewerId);
       NoteBoardDeaths(BoardView);
     }
@@ -993,6 +999,8 @@ void AS08FlowGameMode::HandleCues(const TArray<FS08Cue>& Cues) {
   // One cue set per authoritative seq (GD-031): the same seq arriving again
   // over the second channel merges silently and never re-fires these.
   bSawCue = true;
+  // DE-026 (01 F-10): the effect of the opponent's scheme waits for the end of its hold (or the skip)
+  if (HoldCardSlotCues(Cues)) return;
   // MS-T-16 (CUE-007): the moves of this seq start in the frame the snapshot is applied (SD-13, MS-R-22) - the
   // figures were just synced to their snapshot cells and now travel there from their start cells; damage of the same
   // seq waits for its target's arrival (MS-E-48).
@@ -1368,7 +1376,7 @@ void AS08FlowGameMode::RunCombatEvents(const TArray<FS09CombatStageEvent>& Event
 }
 
 const TArray<FS08BoardFighter>& AS08FlowGameMode::HudFighters() const {
-  return CombatStage.GetHold().IsSet() ? ShownFighters : Fighters;
+  return CombatStage.GetHold().IsSet() || CardSlot.HoldsEffect() ? ShownFighters : Fighters;
 }
 
 const FS08BoardFighter* AS08FlowGameMode::FindShownFighter(const FString& FighterId) const {
@@ -1380,9 +1388,11 @@ void AS08FlowGameMode::RefreshShownFighters(bool bSyncBoard) {
   const FS09CombatHold& Hold = CombatStage.GetHold();
   ShownFighters = Fighters;
   Hold.Apply(ShownFighters, /*bBoardView=*/false);
+  ApplyCardSlotHold(ShownFighters);  // DE-026
   if (!bSyncBoard || !BoardActor || Fighters.Num() == 0) return;
   TArray<FS08BoardFighter> BoardView = Fighters;
   Hold.Apply(BoardView, /*bBoardView=*/true);
+  ApplyCardSlotHold(BoardView);
   BoardActor->SyncFighters(BoardModel, BoardView, Flow.IsValid() ? Flow->GetUserId() : FString());
   NoteBoardDeaths(BoardView);
   SyncCombatFocus();
@@ -4842,11 +4852,12 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
   TickDeferredDamage();
   TickOpponentView();  // MS-T-17: the last-move reveal after the move, its fade, the feed line, the edge arrow
   TickTurnHud();       // DE-023: portraits (names, HP, heart, tracker marks, opponent fade) and the turn banner
+  TickCardSlot();      // DE-026: the source-card slot (the release of a held scheme effect) and the hand lowering
   // DE-018: the combat staging runs on the game clock; a click / Space / Enter during its holds is the skip and
   // is not handled a second time below (a HUD press keeps its own action).
   TickCombatStage();
   TickDeathStage();  // DE-019: death lines and the result gate (after the staging released this frame's fall)
-  if (!TryCombatSkip()) {
+  if (!TryCombatSkip() && !TryCardSlotSkip()) {
     HandleClick();
     HandleHudKeys();
   }
@@ -5270,6 +5281,19 @@ void AS08FlowGameMode::ClearGameplayHud() {
   PendingStepTraceKey.Reset();
   PendingNoTargetsTraceKey.Reset();
   ResultGate.Reset();
+  // DE-026: the slot, the held scheme effect and the hand lowering belong to one game
+  PlayedCards.Reset();
+  CardSlot.Reset();
+  HandLower.Reset();
+  SlotHeldFighters.Reset();
+  SlotHeldCues.Reset();
+  CardSlotBuiltRevision = MAX_uint32;
+  bCardSlotHidesChoice = false;
+  bHandPreviewHidden = false;
+  bCardSlotQueueOpen = false;
+  HandOffsetApplied = 0.0f;
+  if (const TSharedPtr<SWidget> Panel = ArtHud.CommandPanel.Pin()) Panel->SetVisibility(EVisibility::Visible);
+  if (const TSharedPtr<SWidget> Panel = ArtHud.HandPanel.Pin()) Panel->SetRenderTransform(TOptional<FSlateRenderTransform>());
   // MS-T-17: the opponent view belongs to one game
   LastMoveTracker.Reset();
   EventFeed.Reset();
@@ -5422,6 +5446,7 @@ void AS08FlowGameMode::BuildHudWidgets() {
                     .ColorAndOpacity(FSlateColor(FLinearColor(1.0f, 0.9f, 0.6f)))]]];
   BuildOpponentHudWidgets(Canvas);  // MS-T-17: the edge arrow (MS-E-73)
   BuildTurnHudWidgets(Canvas);      // DE-023: the persistent portraits and the "Your turn" banner
+  BuildCardSlotWidgets(Canvas);     // DE-026: the source-card slot under the command panel
 
   GEngine->GameViewport->AddViewportWidgetContent(Canvas, 1);
 }
@@ -5885,7 +5910,9 @@ void AS08FlowGameMode::RefreshHud() {
              .ColorAndOpacity(FSlateColor(FLinearColor(0.6f, 0.6f, 0.6f, 1.0f)))];
   }
 
-  if (bInspecting) {
+  // DE-026 (SD-26): while the hand is lowered for a board pick the hand-card preview is not drawn (it never covers
+  // the field); the inspection itself stays and comes back with the hand
+  if (bInspecting && !(bHandPreviewHidden && InspectedSource == 0)) {
     static const TCHAR* SourceLabels[3] = {TEXT("hand"), TEXT("your discard"),
                                            TEXT("opponent discard")};
     const int32 Source = FMath::Clamp(InspectedSource, 0, 2);
