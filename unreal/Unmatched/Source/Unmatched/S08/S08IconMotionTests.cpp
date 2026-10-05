@@ -1,6 +1,6 @@
 // HUD icon motion v3 automation tests (docs/unreal/contracts/hud/ICON-MOTION-PLAN.md, phase C):
-//   Load    - Config/S08IconMotion.json parses: 23 icons + 5 DE-012 candidates, appear/leave each, revision = the
-//             golden file's;
+//   Load    - Config/S08IconMotion.json parses: 23 v3 icons + 5 DE-012 records (4 accepted 2026-10-05, the team ring
+//             a candidate), appear/leave each, the fallen heart on its own blackened layer, revision = the golden file's;
 //   Golden  - FS08IconAnimator replays every icon's demo script (normal and reduced) and matches the Python
 //             reference poses docs/unreal/contracts/hud/icon-motion-golden.json (8 props + pivot, 1e-3);
 //   Reduced - s08.ReducedMotion drives S08IconMotion::IsReducedMotion;
@@ -75,12 +75,22 @@ bool FS08IconMotionLoadTest::RunTest(const FString& Parameters) {
   FS08IconMotionLibrary Lib;
   FString Err;
   if (!TestTrue(TEXT("contract loads: ") + Err, Lib.LoadFile(FS08IconMotionLibrary::DefaultPath(), &Err))) return false;
-  // 23 accepted v3 icons + 5 DE-012 candidates (gallery only until the user's art acceptance; contract `candidates`).
+  // 23 accepted v3 icons + 5 DE-012 records: the warm turn ring, the fallen heart, the X stamp and the DE tracker slot
+  // accepted by the user on 2026-10-05 (contract `accepted_de012`, Codex forms), the team-tint ring still a candidate
+  // (gallery only; contract `candidates`).
   TestEqual(TEXT("28 icons in order"), Lib.Order.Num(), 28);
   TestEqual(TEXT("28 icon definitions"), Lib.Icons.Num(), 28);
-  for (const TCHAR* Candidate : {TEXT("marker-turn-ring"), TEXT("marker-turn-ring-team"), TEXT("resource-hp-fallen"),
-                                 TEXT("marker-x-stamp"), TEXT("marker-action-slot-de")}) {
-    TestNotNull(*FString::Printf(TEXT("candidate %s defined"), Candidate), Lib.Find(Candidate));
+  for (const TCHAR* De012 : {TEXT("marker-turn-ring"), TEXT("marker-turn-ring-team"), TEXT("resource-hp-fallen"),
+                             TEXT("marker-x-stamp"), TEXT("marker-action-slot-de")}) {
+    TestNotNull(*FString::Printf(TEXT("DE-012 %s defined"), De012), Lib.Find(De012));
+  }
+  if (const FS08IconMotionDef* Fallen = Lib.Find(TEXT("resource-hp-fallen"))) {
+    // Codex form: a blackened heart under the small X, not the empty-heart texture.
+    TestEqual(TEXT("fallen heart layers"), Fallen->Layers.Num(), 2);
+    if (Fallen->Layers.Num() == 2) {
+      TestEqual(TEXT("fallen heart layer src"), Fallen->Layers[0].Src, FString(TEXT("resource-hp-fallen_heart")));
+      TestEqual(TEXT("fallen cross layer src"), Fallen->Layers[1].Src, FString(TEXT("resource-hp-fallen_cross")));
+    }
   }
   for (const FName Id : Lib.Order) {
     const FS08IconMotionDef* Def = Lib.Find(Id);

@@ -106,7 +106,7 @@
 | `resource-hp-full` | appear | enter | 180 | — | all.opacity; all.scale — «кладут на стол»: 0,80 → 1,04 → 1,00; кадр 0 не пустой (opacity 0,15) | all.opacity 100 мс |
 | `resource-hp-full` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
 | `resource-hp-full` | tap | event | 150 | 50 | all.scale — смена числа на значке (цифру рисует игра): от текущего масштаба к 0,94 и обратно к нему же | статично |
-| `resource-hp-full` | damage | event | 1000 | 60 | all.scale; all.tx; glow.opacity — урон (SD-35, DE-012): 0–200 сердце вздрагивает (удар 60), 200–1000 вспышка и один пульс ореола glow (вид — кандидат до арт-приёмки); число меняет игра на +80 от контакта; reduced — без движения | статично |
+| `resource-hp-full` | damage | event | 1000 | 60 | all.scale; all.tx; glow.opacity — урон (SD-35, DE-012): 0–200 сердце вздрагивает (удар 60), 200–1000 вспышка и один пульс ореола glow (принят 2026-10-05, AB-6); число меняет игра на +80 от контакта; reduced — без движения | статично |
 | `resource-hp-full` | deplete | event (hold) | 200 | 60 | icon.opacity; icon.scale; under.opacity — пип здоровья потерян: полное сердце 1 → 1,15 → 0 поверх пустого (hp_hit) | icon.opacity; under.opacity 100 мс |
 | `resource-hp-full` | heal | event | 180 | 120 | icon.opacity; icon.scale; under.opacity — лечение: сердце наполняется | icon.opacity 100 мс |
 | `resource-hp-empty` | appear | enter | 150 | — | all.opacity — кроссфейд без масштаба (связь, спиннер) | all.opacity 100 мс |
@@ -115,21 +115,21 @@
 | `marker-turn-ring` | leave | exit | 120 | — | all.opacity — ход перешёл к другой стороне: opacity → 0 без масштаба | all.opacity 100 мс |
 | `marker-turn-ring-team` | appear | enter | 1000 | 0 | flash.opacity; rim.opacity — старт хода стороны (CUE-015, 01 F-07): обод целиком вспыхивает цветом команды С-11 за 1000 мс и гаснет в тлеющее кольцо 0,35 до конца хода; ввод не блокирует; reduced — статичное кольцо 0,35 | rim.opacity 100 мс |
 | `marker-turn-ring-team` | leave | exit | 120 | — | all.opacity — ход перешёл к другой стороне: opacity → 0 без масштаба | all.opacity 100 мс |
-| `resource-hp-fallen` | appear | enter | 200 | 120 | cross.scale — павший (SD-38): крест «штампуется» на пустое сердце, сердце неподвижно; игра запускает на +1100 от кадра контакта (01 F-09) | cross.opacity 100 мс |
+| `resource-hp-fallen` | appear | enter | 200 | 120 | cross.scale — павший (SD-38, форма Codex): малый крест «штампуется» на почерневшее сердце, сердце неподвижно; игра запускает на +1100 от кадра контакта (01 F-09) | cross.opacity 100 мс |
 | `resource-hp-fallen` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
 | `marker-x-stamp` | appear | enter | 200 | 120 | all.opacity; sign.scale — крест-штамп (SD-37): «нет защиты» (CUE-009) / «отменено»; удар скоростью анимации не масштабируется | all.opacity 100 мс |
 | `marker-x-stamp` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
 | `marker-action-slot-de` | appear | enter | 180 | — | all.opacity; all.scale — «кладут на стол»: 0,80 → 1,04 → 1,00; кадр 0 не пустой (opacity 0,15) | all.opacity 100 мс |
 | `marker-action-slot-de` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
-| `marker-action-slot-de` | slot_pulse | loop | 770 | 0 | ring.opacity; ring.scale — вариант DE (01 F-12, только галерея): пульс текущего слота, пока выбирается действие; reduced — обводка без пульса | статично |
-| `marker-action-slot-de` | fill | event (hold) | 300 | 200 | body.opacity; glyph.opacity; glyph.scale; ring.opacity — вариант DE: «потрачено = заполнено значком типа» 0,4 → 1 за 300 мс в момент выбора (слои action-<тип>; в галерее атака) | body.opacity; glyph.opacity; ring.opacity 100 мс |
-| `marker-action-slot-de` | unfill | event (hold) | 150 | — | body.opacity; glyph.opacity; ring.opacity — вариант DE: Undo — слот снова пуст (01 F-12) | body.opacity; glyph.opacity; ring.opacity 100 мс |
+| `marker-action-slot-de` | slot_pulse | loop | 770 | 0 | ring.opacity; ring.scale — трекер DE (01 F-12, принят 2026-10-05, AB-7): пульс текущего слота, пока выбирается действие; reduced — обод без пульса | статично |
+| `marker-action-slot-de` | fill | event (hold) | 300 | 200 | body.opacity; glyph.opacity; glyph.scale; ring.opacity — трекер DE: «потрачено = заполнено значком типа» 0,4 → 1 за 300 мс в момент выбора (слои принятых action-<тип>; в галерее атака) | body.opacity; glyph.opacity; ring.opacity 100 мс |
+| `marker-action-slot-de` | unfill | event (hold) | 150 | — | body.opacity; glyph.opacity; ring.opacity — трекер DE: Undo — слот снова пуст (01 F-12) | body.opacity; glyph.opacity; ring.opacity 100 мс |
 
 Варианты того же id играют анимации основного значка: `resource-hp-full-enemy` → `resource-hp-full`, `marker-status-p1` → `marker-status`, `marker-status-p2` → `marker-status`.
 
 <!-- ручной раздел: motion_contract.py сохраняет всё ниже этой строки -->
 
-## Записи набора DE (DE-012, 2026-10-04): в контракте как кандидаты
+## Записи набора DE (DE-012): приняты 2026-10-05
 
 Записи из живой сверки с DE 2.2.1 внесены в контракт ревизии `icon-motion-2026-10-04` генератором
 `motion_contract.py` (DE-012; было запланировано в W-05 / DE-007). Числа — из окончательных решений F-07, F-09, F-12 и
@@ -137,14 +137,20 @@
 дельт SD-34…SD-38 ([02-spec-deltas.md](../../../game-design/de-footage/task/02-spec-deltas.md)). Таблица выше их
 содержит, здесь — только то, чего в ней не видно.
 
-**Кандидаты до арт-приёмки пользователя.** Новые id перечислены в `candidates` контракта:
-`marker-turn-ring`, `marker-turn-ring-team`, `resource-hp-fallen`, `marker-x-stamp`, `marker-action-slot-de`.
-- Они играют только в галерее `-S08IconGallery`. HUD их не использует: pytest `test_candidates_are_gallery_only`
-  проверяет, что их id нет в коде UE вне автотестов.
-- Вид — арт-приёмка пользователя: поштучно на 1024 px и на 16 / 24 / 32 px, лист
-  `art/imagegen/hud-icons-v3/sheets/de012/sheet-candidates.png`. До неё принятый набор v3 остаётся по умолчанию.
-- Подключение к HUD — DE-023 (кольцо, сердце, трекер), DE-019 (крест павшего) и задача слота защиты (CUE-009), после
-  приёмки.
+**Арт-приёмка пользователя 2026-10-05** (ответ AB-5…AB-8 листа A/B DE-028,
+[01-decisions.md](../../../game-design/de-footage/task/01-decisions.md); контракт ревизии `icon-motion-2026-10-05`):
+- **приняты** (список `accepted_de012`): `marker-turn-ring` (тёплое, форма v3), `resource-hp-fallen`, `marker-x-stamp`,
+  `marker-action-slot-de` (формы Codex), слой `resource-hp-full_glow` (ореол урона включён, AB-6). Принятый арт — по
+  умолчанию; флаги только откатывают (AGENTS.md);
+- **кандидат** (список `candidates`): только `marker-turn-ring-team`. Он играет только в галерее `-S08IconGallery`, а
+  pytest `test_candidates_are_gallery_only` проверяет, что его id нет в коде UE вне автотестов;
+- сердце павшего теперь лежит на своём слое `heart` — текстуре `resource-hp-fallen_heart`, почерневшем сердце. Прежняя
+  текстура `resource-hp-empty` больше не используется. Числа анимаций не менялись;
+- лист набора — `art/imagegen/hud-icons-v3/sheets/de012/sheet-de012.png`, построение — STYLE-v3 §11;
+- подключение к HUD по умолчанию — код HUD, прогон I ([I-2026-10-05.md](../../../game-design/de-footage/task/runs/I-2026-10-05.md)):
+  кольцо, ореол и трекер DE (DE-023), крест павшего (DE-019), штамп слота защиты (CUE-009).
+
+История до приёмки:
 - **DE-023 (2026-10-05) подключил к HUD только принятые значки** (портрет `US08TurnPortraitWidget`): `resource-hp-full`
   (damage без слоя `glow`), `resource-action-full` (трекер). Кандидаты — только опциями A/B для листа DE-028:
   `-S08TurnRingIcon=<id>` (кольцо: `marker-turn-ring` или `marker-turn-ring-team`; id приходит с командной строки, в
@@ -156,9 +162,9 @@
 | `marker-turn-ring` appear | вспышка `flash` 1000 мс, флипбук 7 кадров жёлтый → оранжевый → красный, затем тлеющий обод `rim` 0,35 до конца хода; удар 0 — точка звука хода (только свой ход, SD-51 п. 4); reduced — статичный обод 0,35 за 100 мс; цикла и искр нет; leave 120 мс без масштаба | 01 F-07; TL `turn_start_ring_own` 983–1080 мс, `turn_start_ring_ai` 950 мс |
 | `marker-turn-ring-team` | тот же обод, `rim` и `flash` белые с `tint: team` — вариант «обод цветом команды С-11» (STYLE-v3 §5.1 «ж») для A/B | 01 F-07 (тона — арт-приёмка) |
 | `resource-hp-full` damage | 1000 мс: 0–200 прежнее вздрагивание (удар 60), 200–1000 вспышка и пульс нового слоя `glow` (0 → 1 → 0,45 → 0,85 → 0); reduced — статично | SD-35; YT `hp_heart_glow` 1030 мс |
-| `resource-hp-fallen` appear | крест `cross` 0 → 1,08 (120) → 1,00 (200) на неподвижное пустое сердце (`heart` = текстура `resource-hp-empty`); игра запускает на +1100 от кадра контакта | SD-38, 01 F-09; TL `death_hero_hit_to_heart_cross` 1083 мс |
+| `resource-hp-fallen` appear | крест `cross` 0 → 1,08 (120) → 1,00 (200) на неподвижное почерневшее сердце (`heart` = текстура `resource-hp-fallen_heart`, форма Codex; до 2026-10-05 — `resource-hp-empty`); игра запускает на +1100 от кадра контакта | SD-38, 01 F-09; TL `death_hero_hit_to_heart_cross` 1083 мс |
 | `marker-x-stamp` appear | opacity 0,15 → 1 (150), `sign` 0 → 1,08 (120) → 1,00 (200); скоростью анимации не масштабируется | SD-37; YT `no_defense_x_stamp` 200 мс; TL `defense_check_to_reveal` 600 мс |
-| `marker-action-slot-de` | вариант DE трекера: `slot_pulse` (loop 770, кольцо 1,00 → 1,06, opacity 0,6 → 1), `fill` (hold 300, удар 200: слои `action-attack` 0,4 → 1, глиф 0,80 → 1,04 → 1,00, кольцо гаснет), `unfill` (Undo, 150) | 01 F-12; TL `tracker_slot_fill` 300 мс, `tracker_pulse_period` 770 мс |
+| `marker-action-slot-de` | трекер DE (принят, AB-7): `slot_pulse` (loop 770, кольцо 1,00 → 1,06, opacity 0,6 → 1), `fill` (hold 300, удар 200: слои `action-attack` 0,4 → 1, глиф 0,80 → 1,04 → 1,00, кольцо гаснет), `unfill` (Undo, 150) | 01 F-12; TL `tracker_slot_fill` 300 мс, `tracker_pulse_period` 770 мс |
 
 Отличия от плана W-05 (решения DE-012, журнал `runs/A04-2026-10-04.md`):
 - **Кольцо: вспышка начинается с opacity 0,15, а не 0.** Правило набора «кадр 0 не пустой» (STYLE-v3 §1.9).
@@ -191,7 +197,8 @@
 | Начало моего хода | трекер соперника скрыт за 1 кадр | в кадре снапшота | s04 647.900 |
 | Свой трекер | виден всегда | — | 01 F-12 |
 
-Вариант DE (`marker-action-slot-de`) — только галерея, для A/B на арт-приёмке.
+Вариант DE (`marker-action-slot-de`) принят 2026-10-05 (AB-7). Таблица выше описывает вид v3 до переключения; трекер DE
+в HUD (`marker-action-slot-de` + слои `action-<тип>`, v3 — флагом отката) подключает код HUD в прогоне I.
 
 ### Что осталось
 
@@ -199,5 +206,6 @@
   на Slate-виджетах, которые `RefreshHud` пересоздаёт (02 §4.3 п. 4; DE-022, DE-023). Бюджет `rules.budget` не меняется:
   кольцо не циклится, пульс слота циклится только в галерее.
 - Пометка «(02:895)» у `action-*` spend исправлена на «(02 §8 UI-ICON-ACTION)».
-- После арт-приёмки: перенести выбранные кандидаты из `candidates` в принятый набор (README, HUD-AND-ICONS §3.4) и
-  подключить в HUD; отклонённые удалить из контракта и `Content/S08/UI/IconsV3`.
+- После арт-приёмки (2026-10-05, прогон I, I-01) выбранные записи перенесены из `candidates` в `accepted_de012`
+  (README, STYLE-v3 §11, HUD-AND-ICONS §3.4). Не выбрано только кольцо цвета команды. Оно оставлено кандидатом для
+  галереи, а не удалено: на него ссылаются лист A/B DE-028 и опция `-S08TurnRingIcon`.
