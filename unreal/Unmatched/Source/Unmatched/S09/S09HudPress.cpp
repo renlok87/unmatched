@@ -3,6 +3,7 @@
 #include "Application/SlateApplicationBase.h"
 #include "Styling/CoreStyle.h"
 #include "Widgets/Layout/SBorder.h"
+#include "Widgets/Input/SButton.h"
 #include "Widgets/Layout/SBox.h"
 #include "Widgets/SOverlay.h"
 
@@ -50,6 +51,8 @@ FS09HudPressOutcome FS09HudPressArbiter::Release(FName OverId, uint64 Frame) {
   Reset();
   return Out;
 }
+
+uint64 FS09HudPressArbiter::Now() const { return FrameClock ? FrameClock() : GFrameCounter; }
 
 void FS09HudPressArbiter::Reset() {
   bPressed = false;
@@ -125,6 +128,16 @@ void SS09HudPress::Construct(const FArguments& InArgs) {
                 .BorderBackgroundColor(this, &SS09HudPress::HighlightColor)]];
 }
 
+TSharedRef<SS09HudPress> SS09HudPress::MakeButton(FName InId, const TSharedPtr<FS09HudPressArbiter>& InArbiter,
+                                                 const FS09OnHudPressOutcome& InOnOutcome, const FMargin& Padding,
+                                                 const FLinearColor& Tint, bool bDimmed,
+                                                 const TSharedRef<SWidget>& Label) {
+  return SNew(SS09HudPress)
+      .Id(InId)
+      .Arbiter(InArbiter)
+      .OnOutcome(InOnOutcome)[SNew(SButton).ContentPadding(Padding).ButtonColorAndOpacity(Tint).IsEnabled(!bDimmed)[Label]];
+}
+
 FSlateColor SS09HudPress::HighlightColor() const {
   // Hover rim in the same frame (tl:51); a held press reads stronger.
   const bool bHeld = Arbiter.IsValid() && Arbiter->IsPressed(Id);
@@ -134,7 +147,7 @@ FSlateColor SS09HudPress::HighlightColor() const {
 
 FReply SS09HudPress::OnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) {
   if (MouseEvent.GetEffectingButton() != EKeys::LeftMouseButton || !Arbiter.IsValid()) return FReply::Unhandled();
-  Arbiter->Press(Id, GFrameCounter);
+  Arbiter->Press(Id, Arbiter->Now());
   // Capture keeps the release with this instance while it lives; when a
   // rebuild destroys it, Slate routes the release to the element under the
   // cursor - the arbiter, not the capture, decides the click.
@@ -151,7 +164,7 @@ FReply SS09HudPress::OnMouseButtonUp(const FGeometry& MyGeometry, const FPointer
   // Released over this element (geometry test, no hover state needed) or,
   // while this instance holds the capture, possibly outside it.
   const bool bOver = MyGeometry.IsUnderLocation(MouseEvent.GetScreenSpacePosition());
-  const FS09HudPressOutcome Outcome = Arbiter->Release(bOver ? Id : NAME_None, GFrameCounter);
+  const FS09HudPressOutcome Outcome = Arbiter->Release(bOver ? Id : NAME_None, Arbiter->Now());
   FReply Reply = FReply::Handled();
   if (FSlateApplicationBase::IsInitialized() && HasMouseCapture()) Reply.ReleaseMouseCapture();
   if (Outcome.Result == ES09HudPressResult::Act || Outcome.Result == ES09HudPressResult::Refused) {

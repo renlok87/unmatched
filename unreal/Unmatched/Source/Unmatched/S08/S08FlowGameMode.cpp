@@ -2357,14 +2357,12 @@ TSharedRef<SWidget> AS08FlowGameMode::MakeHudPress(FName Id, TFunction<FS09Reaso
   // The look of the old SButton, dimmed when the element is blocked now; the
   // decision itself is taken again on the click (the state may change first).
   const bool bDimmed = Blocked && Blocked().IsSet();
-  TSharedRef<SS09HudPress> Element =
-      SNew(SS09HudPress)
-          .Id(Id)
-          .Arbiter(HudPress)
-          .OnOutcome_Lambda([this, Blocked, Action](const FS09HudPressOutcome& Outcome) {
-            HandleHudPressOutcome(Outcome, Blocked, Action);
-          })
-          [SNew(SButton).ContentPadding(Padding).ButtonColorAndOpacity(Tint).IsEnabled(!bDimmed)[Label]];
+  // One builder with the HUD tests (Unmatched.S09.HudPress.Interactable checks this very construction).
+  TSharedRef<SS09HudPress> Element = SS09HudPress::MakeButton(
+      Id, HudPress, FS09OnHudPressOutcome::CreateLambda([this, Blocked, Action](const FS09HudPressOutcome& Outcome) {
+        HandleHudPressOutcome(Outcome, Blocked, Action);
+      }),
+      Padding, Tint, bDimmed, Label);
   HudPressWidgets.Add(Id, Element); // the newest instance of the id (flag step 'hudendturn')
   return Element;
 }

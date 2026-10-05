@@ -69,6 +69,10 @@ public:
   bool IsPressed(FName Id) const { return bPressed && PressedId == Id; }
   FName GetPressedId() const { return PressedId; }
   int32 GetRebuildSerial() const { return RebuildSerial; }
+  /** The frame a press or a release is stamped with: GFrameCounter, or the
+   *  clock a test steps through a hold (Unmatched.S09.HudPress.SyntheticClicks). */
+  uint64 Now() const;
+  void SetFrameClock(TFunction<uint64()> InClock) { FrameClock = MoveTemp(InClock); }
 
   /** The element's answer to a resolved release: an Act whose element is
    *  blocked right now (BlockedNow set) becomes Refused with that reason
@@ -85,6 +89,7 @@ private:
   uint64 PressFrame = 0;
   int32 PressRebuilds = 0;
   int32 RebuildSerial = 0;
+  TFunction<uint64()> FrameClock;
 };
 
 /** DE-015 (W-22, SD-47; move-selection 03 §5 MS-R-79): input of the own turn is
@@ -132,6 +137,14 @@ public:
 
   void Construct(const FArguments& InArgs);
   FName GetId() const { return Id; }
+
+  /** The HUD element exactly as the game mode builds it (MakeHudPress): the
+   *  old SButton look as content, dimmed when the element is blocked now, and
+   *  never the target of the press (the content is hit-test invisible). */
+  static TSharedRef<SS09HudPress> MakeButton(FName Id, const TSharedPtr<FS09HudPressArbiter>& Arbiter,
+                                             const FS09OnHudPressOutcome& OnOutcome, const FMargin& Padding,
+                                             const FLinearColor& Tint, bool bDimmed,
+                                             const TSharedRef<SWidget>& Label);
 
   virtual FReply OnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
   virtual FReply OnMouseButtonDoubleClick(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
