@@ -827,6 +827,10 @@ function Invoke-CombatDemo {
         $resultScreen = Join-Path $side 's09-result-screen.png'
         if (Test-Path -LiteralPath (Join-Path $Script:Staging $resultScreen)) { $publishNames += $resultScreen }
         else { Write-Output "result-screen frame: $side has none" }
+        # Run F G-LIVE (DE-029): the final board ("VIEW BOARD") after the result screen; published when written.
+        $resultBoard = Join-Path $side 's09-result-board.png'
+        if (Test-Path -LiteralPath (Join-Path $Script:Staging $resultBoard)) { $publishNames += $resultBoard }
+        else { Write-Output "result-board frame: $side has none" }
       }
     }
     # Run D G-LIVE (move-selection 06 MS-AT-30): the opponent-client frames of the first opponent move - in flight
@@ -848,6 +852,13 @@ function Invoke-CombatDemo {
           $runEFrame = Join-Path $side $leaf
           if (Test-Path -LiteralPath (Join-Path $Script:Staging $runEFrame)) { $publishNames += $runEFrame }
           else { Write-Output "run E frame: $side has no $leaf" }
+        }
+        # Run F G-LIVE (DE-030): the deck side panel - my deck, then the opponent's (opened by the auto client in the
+        # opponent's turn); published when written; not gated.
+        foreach ($leaf in @('s09-deck-own.png', 's09-deck-opp.png')) {
+          $runFFrame = Join-Path $side $leaf
+          if (Test-Path -LiteralPath (Join-Path $Script:Staging $runFFrame)) { $publishNames += $runFFrame }
+          else { Write-Output "run F frame: $side has no $leaf" }
         }
       }
     }

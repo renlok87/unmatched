@@ -40,7 +40,8 @@ FPointerEvent LeftEvent(const FVector2D& At, bool bDown) {
 
 /** The HUD layout of the S09 panels: every element the game mode builds with
  *  MakeHudPress (buttons of every command panel, three hand cards, the
- *  deck/discard browse control and a discard chip), one row each. */
+ *  deck/discard browse control and a discard chip, the deck side panel of
+ *  DE-030 and the result screen of DE-029), one row each. */
 struct FElement {
   FName Id;
   const TCHAR* Kind;   // button | card | deck
@@ -79,6 +80,16 @@ TArray<FElement> HudLayout() {
       FElement{FName(TEXT("hand.card::2")), TEXT("card"), FS09Reason()},
       FElement{FName(TEXT("hud.discard.browse")), TEXT("deck"), FS09Reason()},
       FElement{FName(TEXT("discard.0.card::4")), TEXT("deck"), FS09Reason()},
+      // DE-031 (the HUD gate of the whole DE set): the DE-030 deck side panel and the DE-029 result screen
+      FElement{FName(TEXT("hud.deck.own")), TEXT("deck"), FS09Reason()},
+      FElement{FName(TEXT("hud.deck.opp")), TEXT("deck"), FS09Reason()},
+      Button(TEXT("hud.deck.tab.own")),
+      Button(TEXT("hud.deck.tab.opp")),
+      Button(TEXT("hud.deck.close")),
+      FElement{FName(TEXT("hud.deck.row.card-7")), TEXT("deck"), FS09Reason()},
+      Button(TEXT("hud.result.board")),
+      Button(TEXT("hud.result.back")),
+      FElement{FName(TEXT("hud.result.board.lobby")), TEXT("button"), FS09Reason::Make(TEXT("why.syncing"))},
   };
   return L;
 }

@@ -308,6 +308,8 @@ void AS08FlowGameMode::BeginPlay() {
   bAutoS09 = FParse::Param(FCommandLine::Get(), TEXT("S09Flow"));
   bAutoS09Boost = FParse::Param(FCommandLine::Get(), TEXT("S09FlowBoost"));
   FParse::Value(FCommandLine::Get(), TEXT("S09ShotDir="), S09ShotDir);
+  FParse::Value(FCommandLine::Get(), TEXT("S09SchemeQuiet="), S09SchemeQuietSec);  // run F G-LIVE, see the header
+  S09SchemeQuietSec = FMath::Clamp(S09SchemeQuietSec, 0.0f, 10.0f);
   // S10/GD-040 opt-in packaged proof harness: -S10AbortProof arms the
   // interruption evidence drive (screen shot -> ONE leaveGame -> lobby shot
   // -> clean early exit). Without the flag the drive stays fully dormant -
@@ -3062,6 +3064,9 @@ void AS08FlowGameMode::DriveS09ResultFlow() {
       // (dozens of painted frames at the demo's 30 FPS cap) first.
       if (ResultPanelBuiltAtElapsed < 0.0f) ResultPanelBuiltAtElapsed = Elapsed;
       if (Elapsed < ResultPanelBuiltAtElapsed + 2.0f) return;
+      // Run F G-LIVE (DE-029): "Turn N · m:ss" needs endedAt of the FINISHED room row, which the 3 s room poll brings
+      // after GAME_OVER - wait for it (bounded) so the frame shows the duration the player sees.
+      if (ResultSummary.DurationSec < 0 && Elapsed < ResultPanelBuiltAtElapsed + 8.0f) return;
       bS09ShotResultScreen = true;
       S09ShotResultScreenPath = S09ShotDir / TEXT("s09-result-screen.png");
       ShotResultScreenAtElapsed = Elapsed;
@@ -3076,6 +3081,26 @@ void AS08FlowGameMode::DriveS09ResultFlow() {
     if (Elapsed < ShotResultScreenAtElapsed + 12.0f) return;
     FS08Trace::Write(TEXT("S09AUTO result shot file never appeared - proceeding WITHOUT the shot"));
     S09ShotResultScreenPath.Reset();
+  }
+  // Run F G-LIVE (DE-029): the final board - "VIEW BOARD", one frame after the 250 ms crossfade, then the lobby (the
+  // lobby return works from either view).
+  if (!bS09ShotResultBoard && !S09ShotDir.IsEmpty() && !bS09LobbyReturnSent) {
+    if (ShotResultBoardAtElapsed < 0.0f) {
+      if (!ResultView.IsBoardView()) ToggleResultBoard(TEXT("auto"));
+      ShotResultBoardAtElapsed = Elapsed + 1.0f;
+      return;
+    }
+    if (Elapsed < ShotResultBoardAtElapsed || FScreenshotRequest::IsScreenshotRequested()) return;
+    bS09ShotResultBoard = true;
+    S09ShotResultBoardPath = S09ShotDir / TEXT("s09-result-board.png");
+    FS08Trace::Write(TEXT("S09AUTO run-f shot s09-result-board.png"));
+    TakeEvidenceShot(S09ShotResultBoardPath);
+    return;
+  }
+  if (!S09ShotResultBoardPath.IsEmpty() && !FPaths::FileExists(S09ShotResultBoardPath)) {
+    if (Elapsed < ShotResultBoardAtElapsed + 12.0f) return;
+    FS08Trace::Write(TEXT("S09AUTO result-board shot file never appeared - proceeding WITHOUT the shot"));
+    S09ShotResultBoardPath.Reset();
   }
   if (!bS09LobbyReturnSent) {
     // A failed leave must not be fired again on every auto-drive tick. The
@@ -3283,6 +3308,9 @@ void AS08FlowGameMode::RunS09Auto() {
   if (S09AutoStage == ES08Stage::Started && Flow->IsRoomAborted()) return;
   if (Flow->IsManeuverInFlight()) return;
   if (Elapsed < NextCommandAt) return;
+  // Run F G-LIVE (DE-024 tail): the hand-limit toast closes with the turn - hold the next command (bounded) until its
+  // frame is asked for, or the end of the turn takes the toast away before the frame (run E: < 0.4 s on screen).
+  if (ShotHintAtElapsed >= 0.0f && !bS09ShotHint && Elapsed < ShotHintAtElapsed + 1.0f) return;
   // Hold every follow-up command until the requested combat-result shot hit
   // the disk (bounded): the frame is captured a few ticks after the request,
   // and the next draft would repaint the command panel into that frame.
@@ -3639,6 +3667,8 @@ void AS08FlowGameMode::RunS09Auto() {
     }
     return;
   }
+  // Run F G-LIVE (-S09SchemeQuiet): no new action until the quiet after the own scheme is over.
+  if (Elapsed < S09SchemeQuietUntil) return;
   // attack plan: strike the first legal adjacent pair before maneuvering.
   if (HasPlan(TEXT("attack")) && Hud.bViewerTurn && CommandUi.Mode == ES09CommandMode::None &&
       (Snap.Phase == TEXT("ACTION_MANEUVER") || Snap.Phase == TEXT("ACTION_ATTACK")) &&
@@ -3807,6 +3837,11 @@ void AS08FlowGameMode::RunS09Auto() {
           FS08Trace::Write(TEXT("S09AUTO scheme"));
           NoteActionChosen(TEXT("scheme"));
           NextCommandAt = Elapsed + 1.2f;
+          if (S09SchemeQuietSec > 0.0f) {
+            S09SchemeQuietUntil = Elapsed + S09SchemeQuietSec;
+            FS08Trace::Write(FString::Printf(TEXT("S09AUTO scheme quiet %.1fs (choices answered, next action waits)"),
+                                             S09SchemeQuietSec));
+          }
         }
         // Blocked scheme: no advance, no log - the next tick retries once the
         // command gate reopens (the controller already traces the block).
@@ -4051,6 +4086,7 @@ void AS08FlowGameMode::TakeS09Shots() {
   TakeOnce(bS09ShotHint, ShotHintAtElapsed, TEXT("s09-hand-limit-hint.png"));
   TakeOnce(bS09ShotSlotOpp, ShotSlotOppAtElapsed, TEXT("s09-card-slot-opp.png"));
   TakeOnce(bS09ShotSlotOwn, ShotSlotOwnAtElapsed, TEXT("s09-card-slot-own.png"));
+  TakeS09DeckPanelShots();
   if (!bS09ShotHud && ShotHudAtElapsed >= 0.0f && Elapsed >= ShotHudAtElapsed) {
     bS09ShotHud = true;
     TakeEvidenceShot(S09ShotDir / TEXT("s09-hud-after-first-maneuver.png"));

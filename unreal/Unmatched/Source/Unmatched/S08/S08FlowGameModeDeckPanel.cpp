@@ -26,6 +26,7 @@
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
 #include "Styling/CoreStyle.h"
+#include "UnrealClient.h"
 #include "Widgets/Colors/SColorBlock.h"
 #include "Widgets/Layout/SBorder.h"
 #include "Widgets/Layout/SBox.h"
@@ -425,4 +426,67 @@ bool AS08FlowGameMode::BenchDeckPanelBegin(const FS08Snapshot& Fixture, const FS
   FS08Trace::Write(FString::Printf(TEXT("BENCH deck-panel side=%s lists=%d valid=%d"), S09DeckPanel::SideName(Side),
                                    DeckLists.Num(), Hud.bValid ? 1 : 0));
   return true;
+}
+
+void AS08FlowGameMode::TakeS09DeckPanelShots() {
+  // Run F G-LIVE (DE-031): the deck panel of a live match. The auto client opens it in the opponent's turn (no input of
+  // mine pending) once both public discard piles hold a card and the lists are loaded, frames my deck, switches to the
+  // opponent's deck, frames it and leaves the panel open: my next turn (or my defense window) closes it by itself.
+  // An early close before a frame retries on a later opponent turn (at most four attempts).
+  if (!bAutoS09 || S09ShotDir.IsEmpty() || S09DeckShotStage >= 4 || !Flow.IsValid()) return;
+  if (FScreenshotRequest::IsScreenshotRequested()) return;
+  auto Interrupted = [this](const TCHAR* Why) {
+    FS08Trace::Write(FString::Printf(TEXT("S09AUTO deck-panel shots interrupted stage=%d why=%s try=%d"),
+                                     S09DeckShotStage, Why, S09DeckShotTries));
+    S09DeckShotStage = S09DeckShotTries >= 4 ? 4 : 0;
+  };
+  switch (S09DeckShotStage) {
+    case 0: {
+      const FS09PlayerPanel* Own = Hud.ViewerPanel();
+      const FS09PlayerPanel* Opp = Hud.OpponentPanel();
+      if (!Hud.bValid || Hud.bGameOver || Hud.bViewerTurn || !Own || !Opp || Own->Discard.Num() == 0 ||
+          Opp->Discard.Num() == 0 || DeckLists.Num() < 2 || DeckPanel.IsOpen() || !DeckDemandKeyNow().IsEmpty()) {
+        return;
+      }
+      ++S09DeckShotTries;
+      const ES09DeckSide Side = bS09ShotDeckOwn ? ES09DeckSide::Opponent : ES09DeckSide::Own;
+      FS08Trace::Write(FString::Printf(TEXT("S09AUTO deck-panel open side=%s try=%d discard=%d/%d"),
+                                       S09DeckPanel::SideName(Side), S09DeckShotTries, Own->Discard.Num(),
+                                       Opp->Discard.Num()));
+      ToggleDeckPanel(Side, TEXT("auto"));
+      S09DeckShotAt = Elapsed + 0.6f;  // open fade 80 ms + the rows' first paint
+      S09DeckShotStage = bS09ShotDeckOwn ? 3 : 1;
+      return;
+    }
+    case 1:
+    case 3: {
+      if (!DeckPanel.IsOpen()) {
+        Interrupted(TEXT("closed"));
+        return;
+      }
+      if (Elapsed < S09DeckShotAt) return;
+      const bool bOwnShot = S09DeckShotStage == 1;
+      (bOwnShot ? bS09ShotDeckOwn : bS09ShotDeckOpp) = true;
+      const TCHAR* Leaf = bOwnShot ? TEXT("s09-deck-own.png") : TEXT("s09-deck-opp.png");
+      FS08Trace::Write(FString::Printf(TEXT("S09AUTO run-f shot %s"), Leaf));
+      TakeEvidenceShot(S09ShotDir / Leaf);
+      S09DeckShotStage = bOwnShot ? 2 : 4;
+      S09DeckShotAt = Elapsed + 0.3f;
+      return;
+    }
+    case 2: {
+      // the own frame is written (no request pending above): switch the open panel to the opponent's deck
+      if (!DeckPanel.IsOpen()) {
+        Interrupted(TEXT("closed"));
+        return;
+      }
+      if (Elapsed < S09DeckShotAt) return;
+      ToggleDeckPanel(ES09DeckSide::Opponent, TEXT("auto"));
+      S09DeckShotAt = Elapsed + 0.6f;
+      S09DeckShotStage = 3;
+      return;
+    }
+    default:
+      return;
+  }
 }

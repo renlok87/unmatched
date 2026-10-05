@@ -303,6 +303,8 @@ private:
   int64 NowMs() const { return static_cast<int64>(FMath::RoundToDouble(static_cast<double>(Elapsed) * 1000.0)); }
   void RunS09Auto();
   void TakeS09Shots();
+  /** Run F G-LIVE (DE-031): the deck side panel frames of the S09 auto client (S08FlowGameModeDeckPanel.cpp). */
+  void TakeS09DeckPanelShots();
   // ---- GD-036 result screen + lobby return ----
   /** LeaveGame from the result screen; safe to press repeatedly (one send). */
   void ReturnToLobbyCommand();
@@ -600,6 +602,22 @@ private:
   float ShotHintAtElapsed = -1.0f;
   float ShotSlotOppAtElapsed = -1.0f;
   float ShotSlotOwnAtElapsed = -1.0f;
+  // Run F G-LIVE (DE-031): the deck side panel (DE-030) in a live match - the auto client opens it in the opponent's
+  // turn once both discard piles hold a card, frames my deck, then the opponent's, and leaves it open so my next turn
+  // closes it (trace 'DECK panel close ... why=input:turn'); the final board of the result screen (DE-029).
+  bool bS09ShotDeckOwn = false;
+  bool bS09ShotDeckOpp = false;
+  int32 S09DeckShotStage = 0;  // 0 idle, 1 own open, 2 own shot asked, 3 opp open, 4 done
+  int32 S09DeckShotTries = 0;
+  float S09DeckShotAt = -1.0f;
+  bool bS09ShotResultBoard = false;
+  float ShotResultBoardAtElapsed = -1.0f;
+  FString S09ShotResultBoardPath;
+  // Run F G-LIVE (DE-026 tail): -S09SchemeQuiet=<s> - after its own scheme the auto client waits this long before its
+  // next ACTION (the scheme's own choices are still answered at once), so the opponent's slot releases the held
+  // scheme by time (release=time) instead of by the next action. 0 (default) = off.
+  float S09SchemeQuietSec = 0.0f;
+  float S09SchemeQuietUntil = -1.0f;
   int32 LastSeenTurnCount = -1; // S09 auto: own-turn boundary detection
   // Rate-limited diagnostics (a stranded mandatory head used to emit one
   // trace line per tick - 98k lines / 9.7 MB in the GD-035 capture).
