@@ -1612,6 +1612,8 @@ void AS08FlowGameMode::BuildCombatStageHud() {
           NoDefenseStamp->PlayAnim(TEXT("appear"));
           FS08Trace::Write(FString::Printf(TEXT("HUD-STAMP no-defense seq=%d target=%s icon=%s"), In.Seq,
                                            *In.TargetId, FS08TurnHudLook::NoDefenseStampIcon));
+          // run I acceptance: the auto client frames the first stamp once its 200 ms appear has landed
+          if (bAutoS09 && !S09ShotDir.IsEmpty() && ShotStampAtElapsed < 0.0f) ShotStampAtElapsed = Elapsed + 0.25f;
         }
         Stamp = NoDefenseStamp->TakeWidget();
       }
@@ -4223,6 +4225,7 @@ void AS08FlowGameMode::TakeS09Shots() {
   TakeOnce(bS09ShotHint, ShotHintAtElapsed, TEXT("s09-hand-limit-hint.png"));
   TakeOnce(bS09ShotSlotOpp, ShotSlotOppAtElapsed, TEXT("s09-card-slot-opp.png"));
   TakeOnce(bS09ShotSlotOwn, ShotSlotOwnAtElapsed, TEXT("s09-card-slot-own.png"));
+  TakeOnce(bS09ShotStamp, ShotStampAtElapsed, TEXT("s09-no-defense-stamp.png"));  // run I acceptance (AB-8)
   TakeS09DeckPanelShots();
   if (!bS09ShotHud && ShotHudAtElapsed >= 0.0f && Elapsed >= ShotHudAtElapsed) {
     bS09ShotHud = true;

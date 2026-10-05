@@ -636,6 +636,9 @@ private:
   float ShotHintAtElapsed = -1.0f;
   float ShotSlotOppAtElapsed = -1.0f;
   float ShotSlotOwnAtElapsed = -1.0f;
+  // Run I acceptance (AB-8): one frame of the first "no defense" stamp (marker-x-stamp) in the combat panel.
+  bool bS09ShotStamp = false;
+  float ShotStampAtElapsed = -1.0f;
   // Run F G-LIVE (DE-031): the deck side panel (DE-030) in a live match - the auto client opens it in the opponent's
   // turn once both discard piles hold a card, frames my deck, then the opponent's, and leaves it open so my next turn
   // closes it (trace 'DECK panel close ... why=input:turn'); the final board of the result screen (DE-029).
