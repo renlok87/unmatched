@@ -1,0 +1,135 @@
+{
+ "schema": "run-h.ms-at-41/1",
+ "rule": "06 MS-AT-41: GPU <= +0.30 ms, draw calls <= 7 + 4*S (S = MS-HL ghost sections; MS-T-10 not built, S = 0)",
+ "package": "36a74fc5 (run B, four ISMs)",
+ "gpu": "RTX 4090, no frame cap, packaged -Bench; recomputed from the run B CSVs (C:/tmp/b-live/bench) with dc_summary.py for the per-pass split",
+ "maps": {
+  "marmoreal": {
+   "K1": {
+    "gpuMsBase": [
+     2.51,
+     2.51
+    ],
+    "gpuMsPlates": [
+     2.52,
+     2.52
+    ],
+    "dGpuMs": 0.01,
+    "drawCallsBase": [
+     435.52,
+     435.52
+    ],
+    "drawCallsPlates": [
+     443.52,
+     443.52
+    ],
+    "dDrawCalls": 8.0,
+    "dPasses": {
+     "Basepass": 0.37,
+     "BeginOcclusionTests": 4.52,
+     "Lights": 0.09,
+     "Prepass": 0.2,
+     "RenderVelocities": 0.12,
+     "ShadowDepths": 0.1,
+     "Translucency": 3.99
+    },
+    "drawCallsCandidatesScene0": [
+     443.52
+    ]
+   },
+   "K2x1.6": {
+    "gpuMsBase": [
+     2.46,
+     2.45
+    ],
+    "gpuMsPlates": [
+     2.47,
+     2.46
+    ],
+    "dGpuMs": 0.01,
+    "drawCallsBase": [
+     347.68,
+     348.05
+    ],
+    "drawCallsPlates": [
+     319.37,
+     319.32
+    ],
+    "dDrawCalls": -28.52,
+    "dPasses": {
+     "Basepass": -16.42,
+     "BeginOcclusionTests": -12.41,
+     "Lights": 0.1,
+     "Prepass": -2.3,
+     "RenderVelocities": 0.09,
+     "ShadowDepths": 0.12,
+     "Translucency": 4.0
+    },
+    "drawCallsCandidatesScene0": [
+     319.36
+    ]
+   }
+  },
+  "sarpedon": {
+   "K1": {
+    "gpuMsBase": [
+     2.63,
+     2.63
+    ],
+    "gpuMsPlates": [
+     2.65,
+     2.64
+    ],
+    "dGpuMs": 0.015,
+    "drawCallsBase": [
+     480.77,
+     480.76
+    ],
+    "drawCallsPlates": [
+     488.79,
+     488.78
+    ],
+    "dDrawCalls": 8.02,
+    "dPasses": {
+     "Basepass": -0.06,
+     "BeginOcclusionTests": 3.89,
+     "Translucency": 3.96
+    },
+    "drawCallsCandidatesScene0": [
+     488.77
+    ]
+   },
+   "K2x1.6": {
+    "gpuMsBase": [
+     2.52,
+     2.51
+    ],
+    "gpuMsPlates": [
+     2.51,
+     2.51
+    ],
+    "dGpuMs": -0.005,
+    "drawCallsBase": [
+     474.73,
+     473.38
+    ],
+    "drawCallsPlates": [
+     400.82,
+     399.23
+    ],
+    "dDrawCalls": -74.03,
+    "dPasses": {
+     "Basepass": -38.59,
+     "BeginOcclusionTests": -34.66,
+     "Prepass": -3.62,
+     "RenderVelocities": -0.1,
+     "ShadowDepths": -0.07,
+     "Translucency": 3.92
+    },
+    "drawCallsCandidatesScene0": [
+     400.82
+    ]
+   }
+  }
+ }
+}

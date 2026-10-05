@@ -543,14 +543,22 @@ WS не несут `decks`, и без него счётчик колоды по�
   вызывает `SetMoveDraftView` — старые вызовы (`S08FlowGameMode.cpp:743, 746, 953, 977, 999, 1102, 1496`) работают без изменений до перевода.
 
 Уточнение MS-T-08 (реализация, 2026-10-04):
-- **MPC не заводится.** Стиль (`moveSelection`) идёт скалярными и векторными параметрами MID каждого из четырёх ISM
-  (`S08MovePlateSpec::Param*`); live tune меняет параметры MID и не трогает экземпляры — то же свойство, что у MPC,
+- **MPC не заводится.** Стиль (`moveSelection`) идёт скалярными и векторными параметрами MID (с MS-AT-41 — одного MID
+  одной ISM; `S08MovePlateSpec::Param*`); live tune меняет параметры MID и не трогает экземпляры — то же свойство, что у MPC,
   без лишнего ассета и без глобального состояния мира. Время пульса и reduced motion — параметрами MID в MS-T-16.
 - **Материал** `M_UM_MovePlate`: unlit, translucent (заливка 18 % / 35 % требует прозрачности; masked дал бы дизеринг под
   TSR), `bUsedWithInstancedStaticMeshes`, без тумана (`Apply Fogging` off), responsive AA, emissive через
   EyeAdaptationInverse (правило игрового слоя). Экземпляр — плоскость движка 100 uu в масштабе 2 × 44 / 100; форму рисует
   Custom-узел по LocalPosition (начало экземпляра) и custom data, переданным в пиксельный шейдер двумя VertexInterpolator.
-  Порядок слоёв — `TranslucentSortPriority` 10..13 (заливка < кольцо < контур < глиф). Сборка —
+  Порядок слоёв — `TranslucentSortPriority` 10..13 (заливка < кольцо < контур < глиф). **Уточнение MS-AT-41 (прогон H,
+  R-04, 2026-10-05):** четыре ISM стоили +8 draw calls (по вызову Translucency и запросу окклюзии на примитив; отключить
+  запрос у компонента нельзя — только глобально). Теперь плашки — **одна** ISM `MoveHL_Plates` с одним MID и одним
+  слотом материала, без теней и декалей: 4 экземпляра на пространство, по каналам подряд (экземпляр = канал × число
+  пространств + пространство), канал — custom data `[6]` (`S08MovePlateCpd::Channel`, `NumCustomData` = 7), в
+  материале graph 3 вход `Channel` Custom-узла читается из custom data через третий VertexInterpolator (HLSL не менялся).
+  Порядок слоёв держит порядок экземпляров: прозрачная ISM его сохраняет (`FMeshBatchElement::bPreserveInstanceOrder`);
+  приоритет сортировки — 10. `LastMoveFade` — параметр общего MID, читает его только канал контура. Итог: +1 Translucency
+  и +1 запрос окклюзии на все плашки (06 §4). Сборка —
   `tools/art/move_selection/ue_move_plate_material.py` (UnrealEditor-Cmd, `-run=pythonscript`), `--check` сверяет имена
   параметров с `S08MoveHighlight.h`. Ассет лежит в gitignored `Content/` и добавлен принудительно, как остальные `/Game/S08`.
 - **Каналы.** Состояние канала = custom data `[0]`; скрытый экземпляр — масштаб 0 (пикселей нет). Кольцо: V-01 сплошное,

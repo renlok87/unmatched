@@ -1,0 +1,133 @@
+{
+ "schema": "run-h.ms-at-41/1",
+ "rule": "06 MS-AT-41: GPU <= +0.30 ms, draw calls <= 7 + 4*S (S = MS-HL ghost sections; MS-T-10 not built, S = 0)",
+ "package": "9c8f92b7 (run H R-04, one ISM)",
+ "gpu": "RTX 4090, no frame cap, packaged -Bench, same flags as run B",
+ "maps": {
+  "marmoreal": {
+   "K1": {
+    "gpuMsBase": [
+     2.53,
+     2.53
+    ],
+    "gpuMsPlates": [
+     2.53,
+     2.51
+    ],
+    "dGpuMs": -0.01,
+    "drawCallsBase": [
+     435.93,
+     435.74
+    ],
+    "drawCallsPlates": [
+     437.52,
+     437.52
+    ],
+    "dDrawCalls": 1.68,
+    "dPasses": {
+     "Basepass": 0.08,
+     "BeginOcclusionTests": 1.11,
+     "Translucency": 1.0
+    },
+    "drawCallsCandidatesScene0": [
+     437.52
+    ]
+   },
+   "K2x1.6": {
+    "gpuMsBase": [
+     2.47,
+     2.48
+    ],
+    "gpuMsPlates": [
+     2.46,
+     2.46
+    ],
+    "dGpuMs": -0.015,
+    "drawCallsBase": [
+     348.04,
+     346.88
+    ],
+    "drawCallsPlates": [
+     313.35,
+     313.37
+    ],
+    "dDrawCalls": -34.1,
+    "dPasses": {
+     "Basepass": -16.88,
+     "BeginOcclusionTests": -15.92,
+     "Prepass": -2.11,
+     "Translucency": 0.98
+    },
+    "drawCallsCandidatesScene0": [
+     313.38
+    ]
+   }
+  },
+  "sarpedon": {
+   "K1": {
+    "gpuMsBase": [
+     2.64,
+     2.65
+    ],
+    "gpuMsPlates": [
+     2.67,
+     2.67
+    ],
+    "dGpuMs": 0.025,
+    "drawCallsBase": [
+     476.79,
+     480.77
+    ],
+    "drawCallsPlates": [
+     482.78,
+     482.77
+    ],
+    "dDrawCalls": 4.0,
+    "dPasses": {
+     "Basepass": 0.83,
+     "BeginOcclusionTests": 0.75,
+     "Prepass": -0.06,
+     "RenderVelocities": 0.9,
+     "Translucency": 0.97
+    },
+    "drawCallsCandidatesScene0": [
+     482.77
+    ]
+   },
+   "K2x1.6": {
+    "gpuMsBase": [
+     2.53,
+     2.54
+    ],
+    "gpuMsPlates": [
+     2.53,
+     2.53
+    ],
+    "dGpuMs": -0.005,
+    "drawCallsBase": [
+     469.61,
+     473.95
+    ],
+    "drawCallsPlates": [
+     394.85,
+     394.52
+    ],
+    "dDrawCalls": -77.09,
+    "dPasses": {
+     "Basepass": -38.03,
+     "BeginOcclusionTests": -38.03,
+     "Lights": -0.1,
+     "Prepass": -3.09,
+     "RenderVelocities": 0.73,
+     "ShadowDepths": -0.16,
+     "Translucency": 0.95
+    },
+    "drawCallsCandidatesScene0": [
+     394.8
+    ]
+   }
+  }
+ },
+ "exeSha256": "44f5745902264c52c05bf80b8fe64d5286c0cda07dfb9041408e896d33ef98ce",
+ "note": "Sarpedon K1 base r1 drew ~4 fewer Basepass/RenderVelocities calls than r2 and run B (scene noise unrelated to the plates); against base r2 = run B base 480.77 the plates add +2.0 (Translucency +0.97, BeginOcclusionTests +0.71)"
+}
