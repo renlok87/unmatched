@@ -46,8 +46,10 @@ bool AS08FlowGameMode::IconGalleryBegin() {
   const bool bLabels = !FParse::Param(Cmd, TEXT("S08IconGalleryNoLabels"));
   const int32 Count = IconGallery ? IconGallery->Build(static_cast<float>(SizePx), SizePx, bReduced, 6, bLabels) : 0;
   if (IconGallery) IconGallery->AddToViewport(1000);
+  if (FParse::Param(Cmd, TEXT("S08IconGalleryPortraits"))) GalleryPortraitsBegin();  // DE-023 review tooling
   if (IconGallery && IconGalleryTimes.Num() > 0 && !IconGalleryShotDir.IsEmpty()) {
     IconGallery->SetClockOverrideMs(IconGalleryTimes[0]);
+    GalleryPortraitsAt(IconGalleryTimes[0]);
   }
   if (APlayerController* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr) PC->bShowMouseCursor = true;
   FS08Trace::Write(FString::Printf(
@@ -124,6 +126,7 @@ void AS08FlowGameMode::IconGalleryTick(float DeltaSeconds) {
     return;
   }
   IconGallery->SetClockOverrideMs(T);
+  if (IconGalleryWait == 0) GalleryPortraitsAt(T);
   if (++IconGalleryWait < GalleryShotSettleFrames) return;
   IconGalleryWait = 0;
   const FString Name = FString::Printf(TEXT("icon-gallery-%s-%05d.png"),

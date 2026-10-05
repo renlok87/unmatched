@@ -138,6 +138,31 @@ void US08AnimatedIconWidget::SetReducedMotion(bool bInReduced) {
   bDirty = true;
 }
 
+void US08AnimatedIconWidget::SetLayerHidden(FName LayerId, bool bHidden) {
+  const bool bChanged = bHidden ? !HiddenLayers.Contains(LayerId) : HiddenLayers.Contains(LayerId);
+  if (bHidden) {
+    HiddenLayers.Add(LayerId);
+  } else {
+    HiddenLayers.Remove(LayerId);
+  }
+  if (bChanged) {
+    bDirty = true;
+    ApplyPose(GetClockMs());
+  }
+}
+
+void US08AnimatedIconWidget::ShowAtRest(FName HeldEvent) {
+  if (!Def) return;
+  // a fresh animator, the appear (and the held event) far enough in the past to be over: the pose is the rest pose now
+  constexpr float Past = 100000.0f;
+  const float T = GetClockMs();
+  Animator.Init(Def, bReduced);
+  Animator.Play(TEXT("appear"), T - Past);
+  if (!HeldEvent.IsNone()) Animator.Play(HeldEvent, T - Past * 0.5f);
+  bDirty = true;
+  ApplyPose(T);
+}
+
 void US08AnimatedIconWidget::SetClockOverrideMs(float Ms) {
   if (Ms == ClockOverrideMs) return;  // the gallery sets the same frozen time every frame: no second ApplyPose
   if (Ms < 0.0f && ClockOverrideMs >= 0.0f) ClockMs = ClockOverrideMs;
@@ -158,7 +183,8 @@ void US08AnimatedIconWidget::ApplyPose(float TMs) {
   for (int32 L = 0; L < LayerImages.Num(); ++L) {
     const FS08IconTargetPose& P = LastPose.Targets[L + 1];
     UImage* Image = LayerImages[L];
-    ApplyIfChanged(*Image, ToWidgetTransform(P, SuPerU), P.PivotU / Canvas, P.Get(ES08IconProp::Opacity));
+    const float Opacity = HiddenLayers.Contains(Def->Layers[L].Id) ? 0.0f : P.Get(ES08IconProp::Opacity);
+    ApplyIfChanged(*Image, ToWidgetTransform(P, SuPerU), P.PivotU / Canvas, Opacity);
     const int32 Frame = FMath::FloorToInt(P.Get(ES08IconProp::Frame) + 1.0e-4f);
     if (LayerFrameCount[L] > 1 && Frame != CurrentFrame[L]) {
       CurrentFrame[L] = Frame;

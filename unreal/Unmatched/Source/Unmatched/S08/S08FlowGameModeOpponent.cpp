@@ -243,7 +243,7 @@ void AS08FlowGameMode::BuildOpponentHudWidgets(const TSharedRef<SConstraintCanva
 
 void AS08FlowGameMode::AddOpponentPanelLines() {
   if (!PanelsBox.IsValid()) return;
-  AddActionTrackerRow(true);  // DE-022 (01 F-12): only in the opponent's turn
+  if (!TurnHudTrackers()) AddActionTrackerRow(true);  // DE-022 (01 F-12): only in the opponent's turn (DE-023: portrait)
   // DE-022 (03 §7 п. 1): the verb from the server state - "Opponent is planning a maneuver" (MS-S-11) is one of them
   const FName Key = S09OpponentView::VerbKey(OpponentVerbNow);
   if (Key.IsNone()) return;

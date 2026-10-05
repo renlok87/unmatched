@@ -29,8 +29,10 @@
 #include "../S09/S09PendingPresent.h"
 #include "../S09/S09OpponentView.h"
 #include "../S09/S09TurnStatus.h"
+#include "../S09/S09TurnHud.h"
 #include "S08CueDispatcher.h"
 #include "S08MoveAnim.h"
+#include "S08TurnPortraitWidget.h"
 #include "S08FlowGameMode.generated.h"
 
 struct FS08MoveDraftView;
@@ -660,6 +662,28 @@ private:
   FString YoursCalloutText;
   double YoursCalloutSinceMs = 0.0;
   FString TurnStatusTraceKey;
+  // ---- DE-023 (W-15 HUD; 01 F-07, F-12): the persistent UMG portraits (ring, tracker, heart) and the "Your turn"
+  // banner (S09/S09TurnHud.h, S08/S08TurnPortraitWidget.h, S08FlowGameModeTurnHud.cpp) ----
+  /** Builds the two portraits (bottom-left column: the opponent above, mine below) and the banner; art look only. */
+  void BuildTurnHudWidgets(const TSharedRef<SConstraintCanvas>& Canvas);
+  /** An applied snapshot: the turn cue (ring, banner), the tracker's server marks and turn reset. */
+  void FeedTurnHud(const FS08Snapshot& Snapshot);
+  /** Every frame: names / HP / heart events from the HUD fighters, the tracker marks (local choice), the opponent
+   *  tracker fade, the banner opacity, visibility. */
+  void TickTurnHud();
+  /** The own action was just chosen and sent (beginManeuver / attack / scheme): the tracker marks it before the answer. */
+  void NoteActionChosen(const TCHAR* What);
+  /** True while the portraits carry the trackers (the Slate tracker rows of DE-022 are then not drawn). */
+  bool TurnHudTrackers() const { return OwnPortrait != nullptr; }
+  FS08TurnHudLook TurnHudLook;
+  FS09TurnCue TurnCue;
+  FS09TrackerMarks TrackerMarks;
+  FS09HeartWatch OwnHeart;
+  FS09HeartWatch OpponentHeart;
+  bool bTrackerResetPending = true;
+  bool bTurnRingAtRest = false;
+  FString TurnHudShownKey;
+  TSharedPtr<class SBorder> TurnBanner;
   /** One -Bench view's camera: selection + zoom per the view name, traced 'BENCH view=...' (RunRenderBench case 2;
    *  also the live-tune shot). */
   void BenchSetupView(const FString& View, const FString& HeroId);
@@ -696,6 +720,10 @@ private:
   // with -S08IconGalleryTimes=<ms,ms,...> freezes the clock at each time and takes a UI shot, then exits.
   bool IconGalleryBegin();
   void IconGalleryTick(float DeltaSeconds);
+  /** DE-023 review tooling (-S08IconGallery -S08IconGalleryPortraits): the two turn portraits over the gallery with
+   *  sample data, replayed at the gallery clock (ring appear, a spent slot and the heart damage all start at 0). */
+  void GalleryPortraitsBegin();
+  void GalleryPortraitsAt(float TMs);
   bool bIconGallery = false;
   FString IconGalleryShotDir;
   TArray<float> IconGalleryTimes;
@@ -765,6 +793,13 @@ private:
   // -S08IconGallery: the gallery widget (null without the flag).
   UPROPERTY()
   TObjectPtr<class US08IconGalleryWidget> IconGallery;
+  // DE-023: the persistent portraits (null without the art look).
+  UPROPERTY()
+  TObjectPtr<US08TurnPortraitWidget> OwnPortrait;
+  UPROPERTY()
+  TObjectPtr<US08TurnPortraitWidget> OpponentPortrait;
+  UPROPERTY()
+  TArray<TObjectPtr<US08TurnPortraitWidget>> GalleryPortraits;
 
   FS08BoardModel BoardModel;
   TArray<FS08BoardFighter> Fighters;

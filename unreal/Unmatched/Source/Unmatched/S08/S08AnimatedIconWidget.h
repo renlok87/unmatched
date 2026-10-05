@@ -47,6 +47,13 @@ public:
   void ApplyPose(float TMs);
   /** Driven by a parent (the gallery replays and applies poses itself): the widget's own tick does nothing. */
   void SetExternallyDriven(bool bInExternal) { bExternal = bInExternal; }
+  /** DE-023: a layer drawn at opacity 0 whatever the pose says (the HUD heart plays damage without the DE-012 `glow`
+   *  candidate layer until the user's art acceptance). Survives SetIcon of the same icon. */
+  void SetLayerHidden(FName LayerId, bool bHidden);
+  bool IsLayerHidden(FName LayerId) const { return HiddenLayers.Contains(LayerId); }
+  /** DE-023: the icon at rest now, without its appear (a HUD tracker reset "in one frame", 01 F-12); with HeldEvent a
+   *  hold event (spend) already played out - the reconnect mid-turn state. */
+  void ShowAtRest(FName HeldEvent = NAME_None);
 
   FS08IconAnimator& GetAnimator() { return Animator; }
   const FS08IconPose& GetLastPose() const { return LastPose; }
@@ -82,6 +89,7 @@ private:
   bool bWasMoving = false;
   bool bExternal = false;
   FLinearColor TeamTint = FLinearColor::White;
+  TSet<FName> HiddenLayers;
 };
 
 /** Backend-less gallery: every contract icon in a grid on the HUD panel colour, each looping its demo script

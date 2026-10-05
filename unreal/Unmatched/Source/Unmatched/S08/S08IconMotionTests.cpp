@@ -10,6 +10,9 @@
 //             a future appear is invisible, equal start time -> the later command wins;
 //   CombatView - the combat token view: show = appear + pulse, hide = leave, then hidden.
 //   DefaultToken - RD-1: the animated v3 token is the default, -S08IconLegacy is the rollback.
+//   TurnPortrait - DE-023: the persistent HUD portrait - no ring by default (the DE-012 ring is a candidate until the
+//             art acceptance, -S08TurnRingIcon=<id> draws it: flash 1000 ms -> rim 0.35, at rest, leave), the heart
+//             damage without its glow layer (-S08HeartGlow keeps it), the tracker spend / gain / reset in one frame.
 // Headless:
 //   UnrealEditor-Cmd.exe Unmatched.uproject -ExecCmds="Automation RunTests Unmatched.S08.IconMotion; Quit"
 //     -unattended -nosplash -nullrhi
@@ -18,6 +21,8 @@
 #include "S08AnimatedIconWidget.h"
 #include "S08ArtHudViews.h"
 #include "S08IconMotion.h"
+#include "S08TurnPortraitWidget.h"
+#include "Components/TextBlock.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/Image.h"
 #include "Components/Overlay.h"
@@ -359,6 +364,117 @@ bool FS08IconMotionDefaultTokenTest::RunTest(const FString& Parameters) {
   TestTrue(TEXT("former opt-in flag: still v3"), S08IconMotion::UseAnimatedCombatToken(TEXT("-S08IconMotion")));
   TestFalse(TEXT("-S08IconLegacy: rollback to the W5b-R token"),
             S08IconMotion::UseAnimatedCombatToken(TEXT("-ArtPreview -S08IconLegacy")));
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08IconMotionTurnPortraitTest, "Unmatched.S08.IconMotion.TurnPortrait",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FS08IconMotionTurnPortraitTest::RunTest(const FString& Parameters) {
+  FS08IconTestWorld W(TEXT("S08IconMotionTurnPortraitTest"));
+  if (!TestNotNull(TEXT("test world"), W.World)) return false;
+  const FLinearColor Gold = FLinearColor::FromSRGBColor(FColor(0xDA, 0xC5, 0x76));
+
+  // the default look: no ring drawn (accepted art by default - the ring glyph waits for the art acceptance)
+  const FS08TurnHudLook Default = FS08TurnHudLook::FromCommandLine(TEXT("-ArtPreview"));
+  TestTrue(TEXT("default: no ring icon"), Default.RingIcon.IsNone());
+  TestFalse(TEXT("default: no heart glow"), Default.bHeartGlow);
+  US08TurnPortraitWidget* Own = CreateWidget<US08TurnPortraitWidget>(W.World, US08TurnPortraitWidget::StaticClass());
+  if (!TestNotNull(TEXT("portrait"), Own)) return false;
+  Own->Setup(false, Default, Gold);
+  TestFalse(TEXT("default: ring widget absent"), Own->HasRingIcon());
+  Own->PlayRing(false);
+  TestFalse(TEXT("default: PlayRing is a no-op"), Own->IsRingShown());
+  Own->SetActive(true);
+  TestEqual(TEXT("own active status"), Own->GetStatusText()->GetText().ToString(), FString(TEXT("YOUR TURN")));
+  Own->SetActive(false);
+  TestEqual(TEXT("idle status"), Own->GetStatusText()->GetText().ToString(), FString(TEXT("waiting")));
+
+  // heart: damage plays (1000 ms, the shake 0-200) but the glow layer stays at 0 by default
+  US08AnimatedIconWidget* Heart = Own->GetHeartIcon();
+  if (TestNotNull(TEXT("heart icon"), Heart)) {
+    const FS08IconMotionDef* Def = FS08IconMotionLibrary::Get().Find(TEXT("resource-hp-full"));
+    int32 Glow = INDEX_NONE;
+    for (int32 L = 0; Def && L < Def->Layers.Num(); ++L) {
+      if (Def->Layers[L].Id == FName(TEXT("glow"))) Glow = L;
+    }
+    if (TestTrue(TEXT("resource-hp-full has a glow layer"), Glow != INDEX_NONE)) {
+      TestTrue(TEXT("glow hidden by default"), Heart->IsLayerHidden(TEXT("glow")));
+      Heart->SetReducedMotion(false);
+      Heart->ShowAtRest();
+      TestTrue(TEXT("damage plays"), Heart->PlayAnimAt(TEXT("damage"), Heart->GetClockMs()));
+      Heart->ApplyPose(Heart->GetClockMs() + 320.0f);
+      TestTrue(TEXT("pose: glow at 1.0 at 320 ms"),
+               FMath::IsNearlyEqual(Heart->GetLastPose().Targets[Glow + 1].Get(ES08IconProp::Opacity), 1.0f, 1.0e-3f));
+      TestTrue(TEXT("drawn: glow at 0"), FMath::IsNearlyEqual(Heart->GetLayerImage(Glow)->GetRenderOpacity(), 0.0f));
+    }
+    US08TurnPortraitWidget* WithGlow =
+        CreateWidget<US08TurnPortraitWidget>(W.World, US08TurnPortraitWidget::StaticClass());
+    WithGlow->Setup(false, FS08TurnHudLook::FromCommandLine(TEXT("-S08HeartGlow")), Gold);
+    TestFalse(TEXT("-S08HeartGlow: glow drawn"), WithGlow->GetHeartIcon()->IsLayerHidden(TEXT("glow")));
+  }
+
+  // tracker: resource-action-full slots; spend at the choice, gain on cancel, reset in one frame
+  TestEqual(TEXT("first apply resets"), Own->ApplyTracker(2, 0, true), FString(TEXT("reset")));
+  TestEqual(TEXT("two slots"), Own->GetTrackerSlots(), 2);
+  TestEqual(TEXT("unchanged: nothing"), Own->ApplyTracker(2, 0, false), FString());
+  for (int32 I = 0; I < Own->GetTrackerSlots(); ++I) Own->GetTrackerIcon(I)->SetReducedMotion(false);
+  Own->ApplyTracker(2, 0, true);  // back at rest after the motion switch
+  TestEqual(TEXT("chosen: spend"), Own->ApplyTracker(2, 1, false), FString(TEXT("spend")));
+  US08AnimatedIconWidget* Slot0 = Own->GetTrackerIcon(0);
+  if (TestNotNull(TEXT("slot 0"), Slot0)) {
+    Slot0->ApplyPose(Slot0->GetClockMs() + 150.0f);
+    // resource-action-full layers: under (resource-action-empty), icon - spend fades the icon out (held)
+    TestTrue(TEXT("spent: icon layer at 0"),
+             FMath::IsNearlyEqual(Slot0->GetLayerImage(1)->GetRenderOpacity(), 0.0f, 1.0e-3f));
+    TestTrue(TEXT("spent: empty token shown"),
+             FMath::IsNearlyEqual(Slot0->GetLayerImage(0)->GetRenderOpacity(), 1.0f, 1.0e-3f));
+  }
+  TestEqual(TEXT("cancelled: gain"), Own->ApplyTracker(2, 0, false), FString(TEXT("gain")));
+  TestEqual(TEXT("gained action: a third slot"), Own->ApplyTracker(3, 0, false), FString(TEXT("slots")));
+  TestEqual(TEXT("three slots"), Own->GetTrackerSlots(), 3);
+  TestEqual(TEXT("new turn: reset"), Own->ApplyTracker(2, 1, true), FString(TEXT("reset")));
+  TestEqual(TEXT("back to two slots"), Own->GetTrackerSlots(), 2);
+  if (Own->GetTrackerIcon(0) && Own->GetTrackerIcon(1)) {
+    TestTrue(TEXT("reset with a spent slot: slot 0 faded at once"),
+             FMath::IsNearlyEqual(Own->GetTrackerIcon(0)->GetLayerImage(1)->GetRenderOpacity(), 0.0f, 1.0e-3f));
+    TestTrue(TEXT("reset: slot 1 full at once"),
+             FMath::IsNearlyEqual(Own->GetTrackerIcon(1)->GetLayerImage(1)->GetRenderOpacity(), 1.0f, 1.0e-3f));
+  }
+
+  // the ring candidate only through the command line (the A/B option): flash 1000 ms -> rim 0.35, at rest, leave
+  const FS08TurnHudLook Bad = FS08TurnHudLook::FromCommandLine(TEXT("-S08TurnRingIcon=no-such-icon"));
+  TestTrue(TEXT("unknown ring refused"), Bad.RingIcon.IsNone() && !Bad.Issues.IsEmpty());
+  const FS08TurnHudLook Ring = FS08TurnHudLook::FromCommandLine(TEXT("-S08TurnRingIcon=marker-turn-ring"));
+  TestEqual(TEXT("ring id from the flag"), Ring.RingIcon, FName(TEXT("marker-turn-ring")));
+  US08TurnPortraitWidget* Opp = CreateWidget<US08TurnPortraitWidget>(W.World, US08TurnPortraitWidget::StaticClass());
+  Opp->Setup(true, Ring, Gold);
+  Opp->SetActive(true);
+  TestEqual(TEXT("opponent active status"), Opp->GetStatusText()->GetText().ToString(), FString(TEXT("THEIR TURN")));
+  if (TestTrue(TEXT("ring widget present"), Opp->HasRingIcon())) {
+    US08AnimatedIconWidget* RingIcon = Opp->GetRingIcon();
+    RingIcon->SetReducedMotion(false);
+    Opp->PlayRing(false);
+    TestTrue(TEXT("ring shown"), Opp->IsRingShown());
+    const float T0 = RingIcon->GetClockMs();
+    RingIcon->ApplyPose(T0 + 120.0f);
+    TestTrue(TEXT("flash at full at 120 ms"),
+             FMath::IsNearlyEqual(RingIcon->GetLayerImage(1)->GetRenderOpacity(), 1.0f, 1.0e-3f));
+    RingIcon->ApplyPose(T0 + 1000.0f);
+    TestTrue(TEXT("rim smoulders at 0.35 after 1000 ms"),
+             FMath::IsNearlyEqual(RingIcon->GetLayerImage(0)->GetRenderOpacity(), 0.35f, 1.0e-3f));
+    TestTrue(TEXT("flash gone after 1000 ms"),
+             FMath::IsNearlyEqual(RingIcon->GetLayerImage(1)->GetRenderOpacity(), 0.0f, 1.0e-3f));
+    RingIcon->ApplyPose(T0 + 60000.0f);
+    TestTrue(TEXT("still smouldering a minute later (no cycle)"), RingIcon->GetLastPose().bVisible);
+    Opp->StopRing();
+    RingIcon->ApplyPose(RingIcon->GetClockMs() + 200.0f);
+    TestFalse(TEXT("leave hides it"), RingIcon->GetLastPose().bVisible);
+    Opp->PlayRing(true);
+    TestTrue(TEXT("at rest: rim 0.35 at once"),
+             FMath::IsNearlyEqual(RingIcon->GetLayerImage(0)->GetRenderOpacity(), 0.35f, 1.0e-3f));
+    TestTrue(TEXT("at rest: no flash"),
+             FMath::IsNearlyEqual(RingIcon->GetLayerImage(1)->GetRenderOpacity(), 0.0f, 1.0e-3f));
+  }
   return true;
 }
 

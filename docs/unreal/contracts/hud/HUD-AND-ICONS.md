@@ -617,6 +617,11 @@ Painted Miniature для 3D (`03:4`), а палитра панелей откр�
 
 Текстуры UE — `/Game/S08/UI/IconsV3/T_IV3_<id>_<px>` (24/32/48/64), отчёт `ue-import-report.json` (336 текстур).
 
+**DE-023 (2026-10-05).** Постоянный UMG-портрет игрока `US08TurnPortraitWidget` (`S08/S08TurnPortraitWidget.*`):
+кольцо хода, сердце `resource-hp-full` (24 px), трекер `resource-action-full` (32 px). По умолчанию кандидатов в HUD
+нет: кольцо — опция `-S08TurnRingIcon=<id>`, ореол сердца — `-S08HeartGlow`. Обе — для листа A/B DE-028; превью
+портретов в галерее — `-S08IconGallery -S08IconGalleryPortraits`.
+
 ## 4. Трассировка
 
 | Значок / состояние | Требование | Тест | Задача |

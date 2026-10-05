@@ -528,6 +528,7 @@ void AS08FlowGameMode::HandleApplied(const FS08Snapshot& Snapshot, ES08SeqDecisi
         CommandUi.Combat.bPresent ? 1 : 0, CommandUi.bHasPendingChoice ? 1 : 0));
     FeedPendingPresentation(Snapshot); // DE-020: skipped-effect notes, modal / compact / toast
     FeedOpponentView(Snapshot);        // MS-T-17: planning indicator, last-move highlight (MS-P-03), feed
+    FeedTurnHud(Snapshot);             // DE-023: turn ring + banner, tracker marks of the portraits
     // GD-036: one RESULT trace line per authoritative seq - an equal-seq
     // merge (WS push + HTTP refetch of the terminal body) never re-logs.
     if (Hud.bGameOver && Snapshot.SequenceNumber != S09ResultTraceSeq) {
@@ -1884,6 +1885,7 @@ void AS08FlowGameMode::ApplyMoveInput(const FS09InputResult& Result) {
   }
   if (Result.bBeginManeuver && Flow.IsValid()) {
     if (Flow->BeginManeuver()) {
+      NoteActionChosen(TEXT("maneuver"));  // DE-023 (01 F-12): the slot is marked at the choice
       Toast = TEXT("begin maneuver sent (server draws 1 card)");
       ToastUntil = Elapsed + 3.0f;
     } else {
@@ -1939,6 +1941,7 @@ void AS08FlowGameMode::TryManeuverTo(int32 CellX, int32 CellY) {
     // P1 regression: a blocked begin (stream not ready/recovery lock) must
     // not leave the await flag armed - the submit leg would never fire.
     bAwaitManeuverFinish = Flow->BeginManeuver();
+    if (bAwaitManeuverFinish) NoteActionChosen(TEXT("maneuver"));  // DE-023 (01 F-12)
     if (!bAwaitManeuverFinish) {
       ManeuverTargetX = ManeuverTargetY = -1;
       Toast = TEXT("maneuver blocked - see trace; the state stream is not ready yet");
@@ -2172,6 +2175,7 @@ void AS08FlowGameMode::BeginManeuverCommand() {
     return;
   }
   if (Flow->BeginManeuver()) {
+    NoteActionChosen(TEXT("maneuver"));  // DE-023 (01 F-12): the slot is marked at the choice
     Toast = TEXT("begin maneuver sent (server draws 1 card)");
     ToastUntil = Elapsed + 3.0f;
   } else {
@@ -2609,6 +2613,7 @@ void AS08FlowGameMode::ConfirmSchemeCommand() {
   }
   if (Flow->PlayScheme(InstanceId)) {
     FS08Trace::Write(TEXT("SCHEME sent"));
+    NoteActionChosen(TEXT("scheme"));  // DE-023 (01 F-12): the slot stays marked until the server's answer
     CommandUi.Mode = ES09CommandMode::None;
     CommandUi.SchemeCardId.Reset();
     Toast = TEXT("scheme sent");
@@ -2642,6 +2647,7 @@ bool AS08FlowGameMode::ConfirmCombat() {
       // DE-020 (SD-56): ability= says whether the hero ability boost rode along (never the card identity).
       FS08Trace::Write(FString::Printf(TEXT("ATTACK sent ability=%s"),
                                        Command.AbilityBoostCardId.IsEmpty() ? TEXT("none") : TEXT("card")));
+      NoteActionChosen(TEXT("attack"));  // DE-023 (01 F-12): the slot stays marked until the server's answer
       CommandUi.CloseAttackAbilityPrompt();
       Toast = TEXT("attack sent");
     } else {
@@ -3749,6 +3755,7 @@ void AS08FlowGameMode::RunS09Auto() {
       if (Fallback) {
         if (Flow->PlayScheme(Fallback->InstanceId)) {
           FS08Trace::Write(TEXT("S09AUTO scheme"));
+          NoteActionChosen(TEXT("scheme"));
           NextCommandAt = Elapsed + 1.2f;
         }
         // Blocked scheme: no advance, no log - the next tick retries once the
@@ -4509,6 +4516,7 @@ void AS08FlowGameMode::RunAutoManeuver() {
                                      Reason.IsEmpty() ? *CommandUi.LastReason.Describe() : *Reason));
     return;
   }
+  NoteActionChosen(TEXT("maneuver"));  // DE-023 (01 F-12)
   BoardActor->SetSelectedFighter(CommandUi.SelectedFighterId, CommandUi.ReachableCells);
   Toast = bHeroStep ? FString::Printf(TEXT("AUTO maneuver: %s -> %s (through the draft)"), *HeroId,
                                       *BoardModel.CellLabel(Target.X, Target.Y))
@@ -4805,6 +4813,7 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
   TryMoveSkip();
   TickDeferredDamage();
   TickOpponentView();  // MS-T-17: the last-move reveal after the move, its fade, the feed line, the edge arrow
+  TickTurnHud();       // DE-023: portraits (names, HP, heart, tracker marks, opponent fade) and the turn banner
   // DE-018: the combat staging runs on the game clock; a click / Space / Enter during its holds is the skip and
   // is not handled a second time below (a HUD press keeps its own action).
   TickCombatStage();
@@ -5243,6 +5252,12 @@ void AS08FlowGameMode::ClearGameplayHud() {
   OpponentVerbNow = ES09OpponentVerb::None;
   bOpponentVerbKnown = false;
   ActionTracker.Reset();
+  TurnCue.Reset();  // DE-023
+  TrackerMarks.Reset();
+  OwnHeart.Reset();
+  OpponentHeart.Reset();
+  bTrackerResetPending = true;
+  TurnHudShownKey.Reset();
   EffectSources.Reset();
   EffectTrailSeq = -1;
   EffectTrailCard.Reset();
@@ -5375,6 +5390,7 @@ void AS08FlowGameMode::BuildHudWidgets() {
                     .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14))
                     .ColorAndOpacity(FSlateColor(FLinearColor(1.0f, 0.9f, 0.6f)))]]];
   BuildOpponentHudWidgets(Canvas);  // MS-T-17: the edge arrow (MS-E-73)
+  BuildTurnHudWidgets(Canvas);      // DE-023: the persistent portraits and the "Your turn" banner
 
   GEngine->GameViewport->AddViewportWidgetContent(Canvas, 1);
 }
@@ -5738,7 +5754,7 @@ void AS08FlowGameMode::RefreshHud() {
     PanelsBox->AddSlot().AutoHeight()
         [SNew(STextBlock).Text(FText::FromString(PanelLine(TEXT("you"), *Own)))
              .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14))];
-    AddActionTrackerRow(false);  // DE-022 (01 F-12): own tracker, always
+    if (!TurnHudTrackers()) AddActionTrackerRow(false);  // DE-022 (01 F-12): own tracker, always (DE-023: the portrait)
   }
   if (const FS09PlayerPanel* Opponent = Hud.OpponentPanel()) {
     PanelsBox->AddSlot().AutoHeight()
