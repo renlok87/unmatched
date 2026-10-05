@@ -8077,6 +8077,7 @@ void AS08FlowGameMode::UpdateBoardLabels(bool bActive, const FString& IconTarget
 }
 
 void AS08FlowGameMode::HandleEndFrame() {
+  FlushPendingHits();  // AU-S4: the hits of this frame, after every presentation of the tick
   if (ArtHud.LateShots.Num() == 0) return;
   const TArray<FS08ArtHudRuntime::FLateShot> Shots = MoveTemp(ArtHud.LateShots);
   ArtHud.LateShots.Reset();

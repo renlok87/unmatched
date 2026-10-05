@@ -513,12 +513,14 @@ private:
   int32 AudioOwnHand = -1;
   int32 AudioOppHand = -1;
   int64 AudioLastInputMs = 0;
+  int64 AudioHandLimitMs = MIN_int64 / 2;
   int64 SubtitleUntilMs = 0;
   TSharedPtr<class SBox> SubtitleBox;
   TSharedPtr<class STextBlock> SubtitleText;
   void InitAudioRuntime();
   void ShutdownAudioRuntime();
   void TickAudioRuntime();
+  void FlushPendingHits();
   class USoundBase* LoadAudio(const FString& SoftPath);
   void PlayBankSfx(const FString& BankId, const TCHAR* SoundClass, const TCHAR* Tag, float GainMul = 1.0f);
   void PlayCueBank(const TCHAR* CueId, const FString& Subject, int32 Seq, const FString& BankId);

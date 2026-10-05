@@ -158,25 +158,31 @@ void AS08FlowGameMode::StartTheme(const FString& Theme) {
                                    L1 ? TEXT("ok") : TEXT("missing"), L2 ? TEXT("ok") : TEXT("missing")));
 }
 
+void AS08FlowGameMode::FlushPendingHits() {
+  // hits of this frame: one sound, the rest grouped (02 §4.5). Called at the end of the frame (HandleEndFrame), after
+  // every presentation of the tick (the deferred cascade damage comes late in Tick) - the sound stays in its frame.
+  if (!PendingHits.Num()) return;
+  TArray<FString> Lines;
+  const int64 Now = NowMs();
+  const bool bMulti = PendingHits.Num() > 1;
+  bool bExhaust = bMulti;
+  for (const FS08PendingHit& H : PendingHits) bExhaust &= !H.bStaged && H.Damage == 2;
+  for (int32 I = 0; I < PendingHits.Num(); ++I) {
+    FS08SoundRequest R = PendingHits[I].Request;
+    if (I == 0) {
+      if (bMulti) R.BankId = bExhaust ? TEXT("CMB-EXHAUST") : TEXT("CMB-HIT-MULTI");
+      PlayCueSound(R);
+    } else {
+      CueSound.Grouped(R, Now, Lines);
+    }
+  }
+  PendingHits.Reset();
+  WriteCueLines(Lines);
+}
+
 void AS08FlowGameMode::TickAudioRuntime() {
   const int64 Now = NowMs();
   TArray<FString> Lines;
-  // hits of this frame: one sound, the rest grouped (02 §4.5)
-  if (PendingHits.Num()) {
-    const bool bMulti = PendingHits.Num() > 1;
-    bool bExhaust = bMulti;
-    for (const FS08PendingHit& H : PendingHits) bExhaust &= !H.bStaged && H.Damage == 2;
-    for (int32 I = 0; I < PendingHits.Num(); ++I) {
-      FS08SoundRequest R = PendingHits[I].Request;
-      if (I == 0) {
-        if (bMulti) R.BankId = bExhaust ? TEXT("CMB-EXHAUST") : TEXT("CMB-HIT-MULTI");
-        PlayCueSound(R);
-      } else {
-        CueSound.Grouped(R, Now, Lines);
-      }
-    }
-    PendingHits.Reset();
-  }
   // delayed one-shots (dissolve after the settle, VO answers, the result lines)
   for (int32 I = 0; I < DelayedSounds.Num();) {
     if (DelayedSounds[I].DueMs > Now) {
@@ -386,7 +392,11 @@ void AS08FlowGameMode::AudioOnApplied(const FS08Snapshot& Snapshot, const TArray
   }
   // the hand limit discard (DE-024 draft): the short harp gesture once per draft
   const bool bDiscardDraft = CommandUi.Mode == ES09CommandMode::DiscardDraft;
-  if (bDiscardDraft && !bAudioDiscardDraft) Music.Sting(TEXT("STG-HAND-LIMIT"), 1000, Now, Lines);
+  // the draft reopens with every re-apply of the same state (WS push + HTTP refetch): once per 20 s at most
+  if (bDiscardDraft && !bAudioDiscardDraft && Now - AudioHandLimitMs > 20000) {
+    AudioHandLimitMs = Now;
+    Music.Sting(TEXT("STG-HAND-LIMIT"), 1000, Now, Lines);
+  }
   bAudioDiscardDraft = bDiscardDraft;
   WriteCueLines(Lines);
 }
