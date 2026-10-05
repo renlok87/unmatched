@@ -60,7 +60,10 @@
   # attacked - as a defender Medusa's post-combat pending choice can replace the result panel). Gated: the joiner trace must show
   # its own 'S09AUTO attack (' + 'ATTACK done seq=' and the host trace its 'DEFENSE done seq='.
   # Without the switch both plans and all gates are unchanged.
-  [switch]$JoinerAttack
+  [switch]$JoinerAttack,
+  # Extra client arguments for BOTH clients, '+'-separated, as run-phase2-demo -ClientExtraArgs (run C G-LIVE,
+  # 2026-10-05: Marmoreal frames need -ConceptPaste until ENV-U16, AGENTS.md "Board scenes and heroes"). Gates unchanged.
+  [string]$ClientExtraArgs = ''
 )
 
 # W5b-R (t53-thresholds.json shotCaptured): every published frame must carry its pixel provenance line
@@ -331,6 +334,7 @@ function Invoke-CombatDemo {
   if ($ClientPerf) { $common += '-S08Perf' }
   if ($ArtPreviewHeroesV2) { $common += '-ArtPreviewHeroesV2' }
   if ($ArtPreviewDiorama) { $common += '-ArtPreviewDiorama' }
+  foreach ($extra in @($ClientExtraArgs -split '\+' | Where-Object { $_ })) { $common += $extra }
   $HostPlan = if ($JoinerAttack) { 'attack+defend+ownresult' } else { 'attack' }
   $JoinPlan = if ($JoinerAttack) { 'attack+ranged+defend+resolve' } else { 'defend+resolve' }
   Write-Output "combat plans: host=$HostPlan joiner=$JoinPlan"
