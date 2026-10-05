@@ -156,6 +156,7 @@
 | `docs/game-design/audio/03-sound-registry.csv` | 2 | Реестр всех единиц звука |
 | `docs/game-design/audio/04-vo-script.md` | 2 | Реплики героев MVP (оригинальные), правила частоты |
 | `docs/game-design/audio/05-production-plan.md` | 3 | Источники, права, задачи по спринтам, интеграция в CUE и UE |
+| `docs/game-design/audio/06-task-cards.csv` | 3 | Готовые карточки задач: по ним агент генерирует и собирает звук без догадок (добавлено в фазе 3) |
 
 ## 7. Вопросы пользователю (задать в начале фазы 2)
 
