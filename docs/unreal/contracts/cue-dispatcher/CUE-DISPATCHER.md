@@ -124,6 +124,26 @@ K = `s09.Catchup.MaxQueued` (по умолчанию 3), T = `s09.Catchup.MaxLag
 
 Громкости (DE-025 хранит, DE-032 применяет; 02 SD-55): «Общая» — громкость всего вывода процесса, `FAudioDevice::SetTransientPrimaryVolume`; «Окружение» — громкость класса `Ambience` (звук задника SD-51, пока его нет) поверх общей. Mute даёт 0. Изменение (`US08UserSettings::Save` → `OnChanged`, консоль `s08.Settings master=… ambience=…`) применяется сразу: строка `CUE audio … applied=change`, следующий звук идёт с новым `gain`. При общей громкости 0 точки пишут `result=silent reason=muted`. Одновременность (D9) у звука точек — `USoundConcurrency` ассета, когда ассет появится; частота (D8) решается здесь.
 
+### 3.3 Звук игры: банк, шины, музыка, реплики, окружение (AU-S4, 2026-10-05)
+
+Основание — [02-audio-design.md](../../../game-design/audio/02-audio-design.md), итог —
+[07-production-log.md](../../../game-design/audio/07-production-log.md).
+- **Банк.** `sfx.bank` строки — id реестра [03-sound-registry.csv](../../../game-design/audio/03-sound-registry.csv),
+  `sfx.sound` — его первый вариант. Варианты (до 5) выбирает `FS08CueSound` без повтора; запрос может заменить банк
+  (тип удара атакующего, смерть персонажа, стинг героя и исхода) — строка `CUE sound … bank=<id>`. Таблица банка
+  генерируется (`tools/audio/ue_bank.py` → `S08AudioBankData.inl`, `S08VoLinesData.inl`).
+- **Шины.** Громкость звука = общая (громкость устройства) × шина класса: Music 60, SFX 80, UI 80, VO 80, Ambience 60
+  (`CUE audio … music= sfx= ui= vo= subtitles=`). Гейт AU8 считает так же; в старых трассах без полей шин — 100 %.
+- **Точка `cue`.** CUE-005 (добор), 006 (розыгрыш схемы), 008 (объявление), 009 (защита), 010 (переворот, слэм),
+  012 (лечение), 013 (смерть), 014 (способность), 017/018 (связь) — в кадре своего визуального события.
+- **Удары.** Урон 0 — звук блока в кадре контакта (событие `Block` этапа боя). Удары одного кадра — один звук
+  (`CMB-HIT-MULTI`, истощение — `CMB-EXHAUST`), остальные строки `result=silent reason=grouped`.
+- **Слот `sfx` диспетчера** заполняется только `assets_present` фикстуры (как в C++-раннере): звук CUE играет
+  `FS08CueSound`, строки `CUE fx` его не дублируют.
+- **Музыка, реплики, окружение** — свои трассы: `MUSIC state=… theme=… t=… [sting=…]`, `VO event=… speaker=… t=…
+  result=played|skipped line=… prio=… [reason=…]`, `VO subtitle line=… until=…`, `AMB map=… beds=… spots=…`,
+  `AMB spot=…`, `SFX bank=… tag=… class=… t=… sound=… gain=…` (слои и звуки вне CUE).
+
 ## 4. Семантика диспетчера (нормативно)
 
 Правила пронумерованы; эталонная модель `ReferenceDispatcher` исполняет их в этом порядке, фикстуры фиксируют результат.
