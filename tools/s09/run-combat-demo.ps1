@@ -61,6 +61,9 @@
   # its own 'S09AUTO attack (' + 'ATTACK done seq=' and the host trace its 'DEFENSE done seq='.
   # Without the switch both plans and all gates are unchanged.
   [switch]$JoinerAttack,
+  # Run E G-LIVE (DE-026, opt-in): the host plan also plays a scheme card after its attack when one is playable
+  # (S09 plan token 'scheme'), so the joiner sees an opponent scheme in the source-card slot. Gates unchanged.
+  [switch]$HostScheme,
   # Extra client arguments for BOTH clients, '+'-separated, as run-phase2-demo -ClientExtraArgs (run C G-LIVE,
   # 2026-10-05: Marmoreal frames need -ConceptPaste until ENV-U16, AGENTS.md "Board scenes and heroes"). Gates unchanged.
   [string]$ClientExtraArgs = ''
@@ -336,6 +339,7 @@ function Invoke-CombatDemo {
   if ($ArtPreviewDiorama) { $common += '-ArtPreviewDiorama' }
   foreach ($extra in @($ClientExtraArgs -split '\+' | Where-Object { $_ })) { $common += $extra }
   $HostPlan = if ($JoinerAttack) { 'attack+defend+ownresult' } else { 'attack' }
+  if ($HostScheme) { $HostPlan += '+scheme' }
   $JoinPlan = if ($JoinerAttack) { 'attack+ranged+defend+resolve' } else { 'defend+resolve' }
   Write-Output "combat plans: host=$HostPlan joiner=$JoinPlan"
   $hostArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
@@ -833,6 +837,17 @@ function Invoke-CombatDemo {
           $oppFrame = Join-Path $side $leaf
           if (Test-Path -LiteralPath (Join-Path $Script:Staging $oppFrame)) { $publishNames += $oppFrame }
           else { Write-Output "opponent frame: $side has no $leaf" }
+        }
+      }
+      # Run E G-LIVE (S11e): the own-turn banner (DE-023), the hand-limit toast and the discard (DE-024), the
+      # source-card slot per owner (DE-026). Each appears only when the match reaches that moment: published when
+      # written; not gated.
+      foreach ($side in @('host', 'joiner')) {
+        foreach ($leaf in @('s09-turn-banner.png', 's09-hand-limit-hint.png', 's09-discard-open.png',
+            's09-card-slot-opp.png', 's09-card-slot-own.png')) {
+          $runEFrame = Join-Path $side $leaf
+          if (Test-Path -LiteralPath (Join-Path $Script:Staging $runEFrame)) { $publishNames += $runEFrame }
+          else { Write-Output "run E frame: $side has no $leaf" }
         }
       }
     }

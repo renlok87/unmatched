@@ -177,6 +177,11 @@ void AS08FlowGameMode::FeedCardSlot(const FS08Snapshot& Snapshot, const TArray<F
       SlotHeldFighters = FightersBefore;  // the HUD and the board keep these until the effect is due
       SlotHeldCues.Reset();
     }
+    // Run E G-LIVE: one frame of the first card per owner, after its 200 ms fly-in
+    if (bShown && bAutoS09 && !S09ShotDir.IsEmpty()) {
+      float& At = Card.bOpponent ? ShotSlotOppAtElapsed : ShotSlotOwnAtElapsed;
+      if (At < 0.0f) At = Elapsed + 0.45f;
+    }
   }
   if (Hud.bGameOver && CardSlot.IsVisible()) {
     bool bReleased = false;

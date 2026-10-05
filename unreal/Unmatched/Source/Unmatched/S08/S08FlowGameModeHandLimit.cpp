@@ -82,6 +82,8 @@ void AS08FlowGameMode::FeedHandLimitHint(const FS08Snapshot& Snapshot) {
     FS08Trace::Write(FString::Printf(TEXT("HUD-HINT rule=hand-limit show seq=%d hand=%d/%d turn=%s phase=%s blocking=0"),
                                      Snapshot.SequenceNumber, Own->HandCount, Limit,
                                      Hud.bViewerTurn ? TEXT("own") : TEXT("opp"), *Snapshot.Phase));
+    // Run E G-LIVE: one frame of the toast once it is up
+    if (bAutoS09 && !S09ShotDir.IsEmpty() && ShotHintAtElapsed < 0.0f) ShotHintAtElapsed = Elapsed + 0.4f;
   }
   if (!bRuleHints && !bRuleHintOffTraced && !Hud.bGameOver && Own->HandCount >= Limit) {
     bRuleHintOffTraced = true;  // UI-ACC-012 off: one line for the acceptance trace, no toast

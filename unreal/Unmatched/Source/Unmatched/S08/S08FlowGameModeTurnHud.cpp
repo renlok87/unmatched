@@ -131,6 +131,11 @@ void AS08FlowGameMode::FeedTurnHud(const FS08Snapshot& Snapshot) {
           ? FMath::RoundToInt(FS09TurnCue::RingFlashMs)
           : 0,
       FMath::RoundToInt(TurnCue.BannerLengthMs()), MoveMotion.bReducedMotion ? 1 : 0));
+  // Run E G-LIVE: one frame of the first own-turn banner, mid-way through its 600 ms
+  if (bAutoS09 && !S09ShotDir.IsEmpty() && ShotBannerAtElapsed < 0.0f && Event.bOwn && !Event.bInitial &&
+      !Event.bGameOver && TurnCue.BannerLengthMs() > 0.0) {
+    ShotBannerAtElapsed = Elapsed + 0.25f;
+  }
 }
 
 void AS08FlowGameMode::NoteActionChosen(const TCHAR* What) {

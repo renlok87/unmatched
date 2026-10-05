@@ -4028,6 +4028,17 @@ void AS08FlowGameMode::TakeS09Shots() {
     FS08Trace::Write(TEXT("S09AUTO opponent-last-move shot"));
     TakeEvidenceShot(S09ShotDir / TEXT("s09-opponent-last-move.png"));
   }
+  // Run E G-LIVE: the turn banner (DE-023), the hand-limit toast (DE-024), the source-card slot per owner (DE-026)
+  auto TakeOnce = [this](bool& bTaken, float AtElapsed, const TCHAR* Leaf) {
+    if (bTaken || AtElapsed < 0.0f || Elapsed < AtElapsed || FScreenshotRequest::IsScreenshotRequested()) return;
+    bTaken = true;
+    FS08Trace::Write(FString::Printf(TEXT("S09AUTO run-e shot %s"), Leaf));
+    TakeEvidenceShot(S09ShotDir / Leaf);
+  };
+  TakeOnce(bS09ShotBanner, ShotBannerAtElapsed, TEXT("s09-turn-banner.png"));
+  TakeOnce(bS09ShotHint, ShotHintAtElapsed, TEXT("s09-hand-limit-hint.png"));
+  TakeOnce(bS09ShotSlotOpp, ShotSlotOppAtElapsed, TEXT("s09-card-slot-opp.png"));
+  TakeOnce(bS09ShotSlotOwn, ShotSlotOwnAtElapsed, TEXT("s09-card-slot-own.png"));
   if (!bS09ShotHud && ShotHudAtElapsed >= 0.0f && Elapsed >= ShotHudAtElapsed) {
     bS09ShotHud = true;
     TakeEvidenceShot(S09ShotDir / TEXT("s09-hud-after-first-maneuver.png"));

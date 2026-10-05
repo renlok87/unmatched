@@ -537,6 +537,16 @@ private:
   bool bS09ShotOppLast = false;
   float ShotOppMoveAtElapsed = -1.0f;
   float ShotOppLastAtElapsed = -1.0f;
+  // Run E G-LIVE: one frame each of the S11e HUD moments that only a live match shows - the first own-turn banner
+  // (DE-023), the first hand-limit rule toast (DE-024) and the first source-card slot per owner (DE-026).
+  bool bS09ShotBanner = false;
+  bool bS09ShotHint = false;
+  bool bS09ShotSlotOpp = false;
+  bool bS09ShotSlotOwn = false;
+  float ShotBannerAtElapsed = -1.0f;
+  float ShotHintAtElapsed = -1.0f;
+  float ShotSlotOppAtElapsed = -1.0f;
+  float ShotSlotOwnAtElapsed = -1.0f;
   int32 LastSeenTurnCount = -1; // S09 auto: own-turn boundary detection
   // Rate-limited diagnostics (a stranded mandatory head used to emit one
   // trace line per tick - 98k lines / 9.7 MB in the GD-035 capture).
