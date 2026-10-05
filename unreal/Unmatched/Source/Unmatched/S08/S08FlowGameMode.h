@@ -543,6 +543,7 @@ private:
   TArray<FS08BoardFighter> ShownFighters;  // HudFighters() while the staging holds the target
   bool bCombatDamageShownEarly = false;    // the target's damage was shown while the combat was paused
   bool bCombatOutcomeShown = false;        // the HUD was rebuilt for the outcome label of this staging
+  int32 CombatEffectHudKey = -1;           // R-02: effect lines shown / highlighted at the last HUD rebuild
   uint64 CombatSkipFrame = MAX_uint64;     // frame whose click / Space / Enter was a staging skip
   // auto plan tokens: attack | defend | nodefense | resolve | scheme
   TArray<FString> S09CombatPlan;

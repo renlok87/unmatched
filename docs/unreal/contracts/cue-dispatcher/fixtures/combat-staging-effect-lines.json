@@ -1,0 +1,251 @@
+{
+ "schema": "unmatched.cue-fixture/1",
+ "id": "combat-staging-effect-lines",
+ "kind": "scenario",
+ "description": "R-02 (прогон H): бой с двумя сработавшими строками эффекта из журнала сервера (metadata.lastCombat): Merlin атакует King Arthur, на раскрытой карте текст эффекта, защита 4 против атаки 5, урон 1. Раскрытие CUE-010: переворот 620 → чтение 1000 → строка 1 600 → строка 2 прерывается кликом через 280 мс (пропуск: оставшиеся удержания 0, пауза «счёт» не начиналась — 0) → слэм 180 (done CUE-010 ms=2680 hold=1880, удержание итоговое — после пропуска) → LungeAttack → контакт по notify (300 мс) → CUE-011 900. Итог 600 + 3880 = 4480 мс; без пропуска было бы 600 + 800 + 1000 + 1200 + 300 + 300 + 900 = 5100 мс (≈ 3,9 с + 2 × 0,6 с, F-01).",
+ "covers": [
+  "01 F-01 (+600 мс на строку, пропуск кликом)",
+  "R-02 строки эффектов из журнала сервера",
+  "CUE-DISPATCHER §5 stage=effect, §6 C4"
+ ],
+ "events": [
+  {
+   "t": 0,
+   "kind": "cue",
+   "id": "CUE-008",
+   "subject": "merlin",
+   "seq": 60
+  },
+  {
+   "t": 2000,
+   "kind": "combat",
+   "seq": 61,
+   "stage": "start",
+   "fields": {
+    "attacker": "merlin",
+    "target": "arthur",
+    "text": 1,
+    "lines": 2,
+    "damage": 1,
+    "lethal": 0,
+    "shown": 0,
+    "speed": "1.00",
+    "flip": 620,
+    "contact": 300,
+    "src": "notify",
+    "a": 5,
+    "d": 4,
+    "outcome": "win"
+   }
+  },
+  {
+   "t": 2000,
+   "kind": "cue",
+   "id": "CUE-010",
+   "subject": "scene",
+   "seq": 61,
+   "duration_ms": 800,
+   "hold_ms": 1880
+  },
+  {
+   "t": 3620,
+   "kind": "combat",
+   "seq": 61,
+   "stage": "read",
+   "fields": {
+    "ms": 1000,
+    "skipped": 0
+   }
+  },
+  {
+   "t": 4220,
+   "kind": "combat",
+   "seq": 61,
+   "stage": "effect",
+   "fields": {
+    "i": 1,
+    "ms": 600,
+    "skipped": 0
+   }
+  },
+  {
+   "t": 4500,
+   "kind": "combat",
+   "seq": 61,
+   "stage": "skip",
+   "fields": {
+    "src": "click"
+   }
+  },
+  {
+   "t": 4500,
+   "kind": "combat",
+   "seq": 61,
+   "stage": "effect",
+   "fields": {
+    "i": 2,
+    "ms": 280,
+    "skipped": 1
+   }
+  },
+  {
+   "t": 4500,
+   "kind": "combat",
+   "seq": 61,
+   "stage": "slam",
+   "fields": {
+    "a": 5,
+    "d": 4,
+    "outcome": "win"
+   }
+  },
+  {
+   "t": 4680,
+   "kind": "combat",
+   "seq": 61,
+   "stage": "pause",
+   "fields": {
+    "ms": 0,
+    "skipped": 1
+   }
+  },
+  {
+   "t": 4680,
+   "kind": "combat",
+   "seq": 61,
+   "stage": "lunge",
+   "fields": {
+    "attacker": "merlin",
+    "rate": "1.00"
+   }
+  },
+  {
+   "t": 4980,
+   "kind": "combat",
+   "seq": 61,
+   "stage": "contact",
+   "fields": {
+    "offset": 300,
+    "window": 900,
+    "src": "notify"
+   }
+  },
+  {
+   "t": 4980,
+   "kind": "cue",
+   "id": "CUE-011",
+   "subject": "arthur",
+   "seq": 61,
+   "duration_ms": 900
+  },
+  {
+   "t": 4980,
+   "kind": "combat",
+   "seq": 61,
+   "stage": "hit",
+   "fields": {
+    "target": "arthur",
+    "tint": 450
+   }
+  },
+  {
+   "t": 5040,
+   "kind": "combat",
+   "seq": 61,
+   "stage": "minus",
+   "fields": {
+    "amount": 1,
+    "life": 900
+   }
+  },
+  {
+   "t": 5060,
+   "kind": "combat",
+   "seq": 61,
+   "stage": "hp",
+   "fields": {
+    "from": 6,
+    "to": 5
+   }
+  },
+  {
+   "t": 5880,
+   "kind": "combat",
+   "seq": 61,
+   "stage": "end",
+   "fields": {
+    "total": 4480,
+    "skipped": 1,
+    "cut": 0
+   }
+  }
+ ],
+ "expect_trace": [
+  "CUE fx id=CUE-008 subject=merlin seq=60 t=0 vfx=missing sfx=missing clip=none mat=none socket=Weapon reduced=0 result=fallback",
+  "CUE fx done id=CUE-008 subject=merlin seq=60 t=600 ms=600 cut=0",
+  "CUE combat seq=61 stage=start t=2000 attacker=merlin target=arthur text=1 lines=2 damage=1 lethal=0 shown=0 speed=1.00 flip=620 contact=300 src=notify a=5 d=4 outcome=win",
+  "CUE fx id=CUE-010 subject=scene seq=61 t=2000 vfx=none sfx=missing clip=none mat=none socket=- reduced=0 result=fallback",
+  "CUE combat seq=61 stage=read t=3620 ms=1000 skipped=0",
+  "CUE combat seq=61 stage=effect t=4220 i=1 ms=600 skipped=0",
+  "CUE combat seq=61 stage=skip t=4500 src=click",
+  "CUE combat seq=61 stage=effect t=4500 i=2 ms=280 skipped=1",
+  "CUE combat seq=61 stage=slam t=4500 a=5 d=4 outcome=win",
+  "CUE fx done id=CUE-010 subject=scene seq=61 t=4680 ms=2680 cut=0 hold=1880",
+  "CUE combat seq=61 stage=pause t=4680 ms=0 skipped=1",
+  "CUE combat seq=61 stage=lunge t=4680 attacker=merlin rate=1.00",
+  "CUE combat seq=61 stage=contact t=4980 offset=300 window=900 src=notify",
+  "CUE fx id=CUE-011 subject=arthur seq=61 t=4980 vfx=missing sfx=missing clip=AM_KingArthur_HitReact mat=FxFlash socket=Head reduced=0 result=fallback",
+  "CUE combat seq=61 stage=hit t=4980 target=arthur tint=450",
+  "CUE combat seq=61 stage=minus t=5040 amount=1 life=900",
+  "CUE combat seq=61 stage=hp t=5060 from=6 to=5",
+  "CUE fx done id=CUE-011 subject=arthur seq=61 t=5880 ms=900 cut=0",
+  "CUE combat seq=61 stage=end t=5880 total=4480 skipped=1 cut=0"
+ ],
+ "expect_summary": {
+  "presented": 3,
+  "spawned": 0,
+  "fallback": 3,
+  "duplicate": 0,
+  "stale": 0,
+  "done": 3,
+  "unique_triples": 3,
+  "combat_sets": 1,
+  "combat_cut": 0,
+  "combat_skipped": 1,
+  "combat_totals": [
+   4480
+  ]
+ },
+ "staging": {
+  "declare": {
+   "t": 0,
+   "subject": "merlin",
+   "seq": 60
+  },
+  "start_t": 2000,
+  "end_t": 7000,
+  "input": {
+   "seq": 61,
+   "attacker": "merlin",
+   "target": "arthur",
+   "text": true,
+   "lines": 2,
+   "damage": 1,
+   "lethal": false,
+   "shown": false,
+   "hp_before": 6,
+   "hp_after": 5,
+   "contact": 300,
+   "src": "notify",
+   "a": 5,
+   "d": 4,
+   "speed": 1.0
+  },
+  "skips": [
+   {
+    "t": 4500,
+    "src": "click"
+   }
+  ]
+ }
+}

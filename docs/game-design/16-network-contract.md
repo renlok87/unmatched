@@ -127,8 +127,11 @@ Named-события — вспомогательные CUE (анимации/з
 
 - **Где.** `metadata.lastCombat` (тип `LastCombat` в `backend/src/game-engine/models/game-state.model.ts`). Пишет
   `executeResolveCombat` в снимок, который завершил бой, в том числе при `GAME_OVER`; запись живёт до следующего боя.
-  Клиент использует её только при `lastCombat.seq` = `sequenceNumber` применённого снимка. Бой на паузе выбора записи
-  не даёт: она появится в снимке, который бой завершит. В БД — короткий ключ `lcr`; сейвы без него читаются как
+  Клиент (R-02, `FS09LastCombat`) берёт её для боя, который закрыл: `lastCombat.seq` больше seq последнего снимка
+  открытого боя и не больше seq закрывшего снимка, атакующий и цель совпадают; иначе строк эффекта нет. Бой на
+  паузе выбора записи не даёт: она появится в снимке, который бой завершит. Строкой эффекта клиент считает исходы
+  `APPLIED`, `CHOICE`, `MANUAL` (опция CHOOSE_ONE продолжает строку родителя), `hidden` не читает
+  ([CUE-DISPATCHER.md](../unreal/contracts/cue-dispatcher/CUE-DISPATCHER.md) §3.1). В БД — короткий ключ `lcr`; сейвы без него читаются как
   «записи нет».
 - **Поля записи боя.** `n` (номер боя в партии), `seq`, `attackerFighterId`, `targetFighterId`, `attackerPlayerId`,
   `defenderPlayerId`, `attackerCardId`, `defenderCardId?`, `finalAttack`, `finalDefense`, `defenderDamage`,

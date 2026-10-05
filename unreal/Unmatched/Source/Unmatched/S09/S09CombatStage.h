@@ -24,6 +24,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "S09CombatEffectLog.h"
 #include "S09HudModel.h"
 #include "../S08/S08BoardModel.h"
 
@@ -59,7 +60,8 @@ struct UNMATCHED_API FS09CombatStageInput {
   FString AttackerLabel;
   FString TargetLabel;
   bool bHasEffectText = false;  // a revealed card carries effect text (read hold 1000)
-  int32 EffectLines = 0;        // fired effect lines (the snapshot does not carry them yet: 0)
+  int32 EffectLines = 0;        // fired effect lines (R-02: from metadata.lastCombat, S09CombatEffectLog::Lines)
+  TArray<FS09CombatEffectLine> Effects;  // R-02: what the card panels print, index-aligned with the lines (display)
   int32 Damage = 0;             // HP the target lost in this combat (>= 0)
   bool bLethal = false;         // the target fell
   bool bDamageShown = false;    // the damage was already presented while the combat was paused (no second "-N")
@@ -131,6 +133,11 @@ public:
   /** The outcome label lives from the slam to the end (~1.5 s, F-01). */
   bool ShowsOutcome(int64 NowMs) const { return IsActive() && NowMs >= SlamStartMs; }
   bool AttackerWins() const { return Input.Damage > 0; }
+  /** R-02 (F-01): effect lines on the card panels. Line k appears when its 600 ms step starts and stays until the
+   *  end; a skip drops the remaining steps, so every line is on the panel from the skip on (nothing is hidden). */
+  int32 EffectLinesShown(int64 NowMs) const;
+  /** The line whose highlight (400 x speed from its start) runs now, -1 when none. */
+  int32 HighlightedEffectLine(int64 NowMs) const;
 
   // ---- schedule (absolute ms; tests and the adapter) ----
   int64 GetStartMs() const { return StartMs; }
@@ -187,6 +194,7 @@ private:
   int32 HoldTotalMs() const;
   void Reschedule();
   int64 BoundaryTime(uint8 Kind, int32 Index) const;
+  int64 EffectLineStartMs(int32 Index) const;
   FString Prefix(const TCHAR* Stage, int64 TMs) const;
   void Release(ES09CombatEvent Type, int64 AtMs, TArray<FS09CombatStageEvent>& OutEvents);
 };

@@ -1278,10 +1278,21 @@ void AS08FlowGameMode::StartCombatStage(const FS08Snapshot& Closing, const FS08S
   In.AttackerLabel = Attacker->Label;
   In.TargetLabel = TargetAfter->Label;
   In.Reveal = FS09CombatReveal::Derive(Combat, Attacker->OwnerId, Baseline.DiscardPiles, Closing.DiscardPiles);
-  In.bHasEffectText = In.Reveal.HasEffectText();
-  // Fired effect lines are not in the snapshot (the server keeps appliedEffects in the action reply): 0 until a
-  // public field carries them - effectStepMs is implemented and tested (DE-018 journal, tail).
-  In.EffectLines = 0;
+  // R-02 (F-01): the fired effect lines come from the server's public combat log (metadata.lastCombat, R-01) of
+  // this combat - resolved after the baseline, no later than the closing snapshot, between the same fighters. No
+  // record (an older server) or a record of another combat gives 0 lines; `hidden` is never read.
+  FS09LastCombat Log;
+  const bool bHasLog = FS09LastCombat::Read(Closing, Log);
+  const bool bOwnLog = bHasLog && Log.Matches(Baseline.SequenceNumber, Closing.SequenceNumber, Combat.AttackerId,
+                                              Combat.TargetFighterId);
+  if (bOwnLog) In.Effects = S09CombatEffectLog::Lines(Log);
+  In.EffectLines = In.Effects.Num();
+  FS08Trace::Write(S09CombatEffectLog::TraceLine(Closing.SequenceNumber, bHasLog ? &Log : nullptr,
+                                                 bOwnLog ? TEXT("log") : bHasLog ? TEXT("other") : TEXT("none"),
+                                                 In.EffectLines));
+  // A fired line means the revealed card carried an effect: its read hold applies even when the reveal could not
+  // name the card (a reconnect between the baseline and the result).
+  In.bHasEffectText = In.Reveal.HasEffectText() || In.EffectLines > 0;
   In.Damage = Damage;
   In.HpBefore = HpBefore;
   In.HpAfter = TargetAfter->Health;
@@ -1319,6 +1330,16 @@ void AS08FlowGameMode::TickCombatStage() {
   if (bWasActive && CombatStage.IsActive() && !bCombatOutcomeShown && CombatStage.ShowsOutcome(NowMs())) {
     bCombatOutcomeShown = true;
     RefreshHud();
+  }
+  // R-02: one HUD rebuild when an effect line appears or its highlight ends.
+  if (CombatStage.IsActive() && CombatStage.GetInput().Effects.Num() > 0) {
+    const int32 Key = CombatStage.EffectLinesShown(NowMs()) * 64 + CombatStage.HighlightedEffectLine(NowMs()) + 1;
+    if (Key != CombatEffectHudKey) {
+      CombatEffectHudKey = Key;
+      RefreshHud();
+    }
+  } else {
+    CombatEffectHudKey = -1;
   }
 }
 
@@ -1555,6 +1576,42 @@ void AS08FlowGameMode::BuildCombatStageHud() {
         [CardPanel(FString::Printf(TEXT("DEFENSE - %s"), *In.TargetLabel), bFace ? &R.Defense : nullptr,
                    bFace ? FString::Printf(TEXT("DEFENSE %d"), R.Defense.DefenseValue) : FString(), DefenseAccent)];
   }
+  // R-02 (F-01): the fired effect lines under the card that carries them - each appears with its 600 ms step and is
+  // highlighted for its first 400 ms (x speed); the lines stay until the staging ends. Public on both seats.
+  const int32 ShownLines = FMath::Min(CombatStage.EffectLinesShown(Now), In.Effects.Num());
+  const int32 Highlighted = CombatStage.HighlightedEffectLine(Now);
+  auto AddEffectLines = [&](const TSharedPtr<SVerticalBox>& Edge, bool bAttackerSide, const FLinearColor& Accent) {
+    TSharedRef<SVerticalBox> Box = SNew(SVerticalBox);
+    int32 Count = 0;
+    for (int32 K = 0; K < ShownLines; ++K) {
+      const FS09CombatEffectLine& Line = In.Effects[K];
+      if (Line.bAttackerSide != bAttackerSide) continue;
+      const bool bLit = K == Highlighted;
+      const FString Label = Line.CardName.IsEmpty() ? Line.Text : FString::Printf(TEXT("%s: %s"), *Line.CardName,
+                                                                                  *Line.Text);
+      Box->AddSlot().AutoHeight().Padding(0, Count > 0 ? 4 : 0, 0, 0)
+          [SNew(STextBlock).Text(FText::FromString(Label))
+               .Font(FCoreStyle::GetDefaultFontStyle(bLit ? "Bold" : "Regular", 12))
+               .ColorAndOpacity(FSlateColor(bLit ? Accent : FLinearColor(0.9f, 0.9f, 0.92f, 1.0f)))
+               .WrapTextAt(236.0f)];
+      ++Count;
+    }
+    if (Count == 0) return;
+    Edge->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
+        [SNew(SBorder)
+             .BorderImage(FCoreStyle::Get().GetBrush("WhiteBrush"))
+             .BorderBackgroundColor(FSlateColor(FLinearColor(0.02f, 0.025f, 0.05f, 0.92f)))
+             .Padding(12.0f)
+             [SNew(SBox).WidthOverride(260.0f)
+                  [SNew(SVerticalBox) +
+                   SVerticalBox::Slot().AutoHeight().Padding(0, 0, 0, 4)
+                       [SNew(STextBlock).Text(FText::FromString(TEXT("EFFECTS")))
+                            .Font(FCoreStyle::GetDefaultFontStyle("Bold", 11))
+                            .ColorAndOpacity(FSlateColor(Accent))] +
+                   SVerticalBox::Slot().AutoHeight()[Box]]]];
+  };
+  AddEffectLines(CombatEdgeLeft, true, AttackAccent);
+  AddEffectLines(CombatEdgeRight, false, DefenseAccent);
   if (!CombatStage.ShowsOutcome(Now)) return;
   // F-01: the slam "A vs D" and the outcome label from the slam to the end of CUE-011 (~1.5 s).
   const FString Score = FString::Printf(TEXT("%s  vs  %s"),

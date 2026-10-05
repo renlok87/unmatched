@@ -110,6 +110,32 @@ int64 FS09CombatStage::BoundaryTime(uint8 KindByte, int32 Index) const {
   }
 }
 
+int64 FS09CombatStage::EffectLineStartMs(int32 Index) const {
+  int64 T = FlipEndMs + ReadMs;
+  for (int32 I = 0; I < Index && I < EffectMs.Num(); ++I) T += EffectMs[I];
+  return T;
+}
+
+int32 FS09CombatStage::EffectLinesShown(int64 NowMs) const {
+  if (!IsActive()) return 0;
+  int32 Shown = 0;
+  for (int32 I = 0; I < EffectMs.Num(); ++I) {
+    if (NowMs < EffectLineStartMs(I)) break;
+    ++Shown;
+  }
+  return Shown;
+}
+
+int32 FS09CombatStage::HighlightedEffectLine(int64 NowMs) const {
+  if (!IsActive()) return -1;
+  const int32 HighlightMs = Scaled(FS09CombatTiming::EffectHighlightMs);
+  for (int32 I = 0; I < EffectMs.Num(); ++I) {
+    const int64 Start = EffectLineStartMs(I);
+    if (NowMs >= Start && NowMs < Start + FMath::Min(EffectMs[I], HighlightMs)) return I;
+  }
+  return -1;
+}
+
 FString FS09CombatStage::Prefix(const TCHAR* Stage, int64 TMs) const {
   return FString::Printf(TEXT("CUE combat seq=%d stage=%s t=%lld"), Input.Seq, Stage, static_cast<long long>(TMs));
 }

@@ -353,6 +353,65 @@ class CombatStagingTests(unittest.TestCase):
         self.assertEqual(lines[-1], "CUE fx done id=CUE-010 subject=scene seq=3 t=1050 ms=1050 cut=0 hold=250")
 
 
+class CombatEffectLogTests(unittest.TestCase):
+    """R-02: строки эффекта боя из журнала сервера `metadata.lastCombat` — `COMBAT-LOG` и гейт C8/C9
+    (CUE-DISPATCHER.md §3.1, §5, §6)."""
+
+    def trace(self):
+        return list(cc.load_json(cc.FIXTURES / "combat-staging-effect-lines.json")["expect_trace"])
+
+    def with_log(self, lines=2, src="log"):
+        log = ("[2026.10.05-12.00.00:000][  0]LogS08: COMBAT-LOG seq=61 log=61 n=4 entries=3 lines=%d src=%s "
+               "outcomes=APPLIED:2,NO_TARGETS:1" % (lines, src))
+        trace = self.trace()
+        i = next(k for k, l in enumerate(trace) if " stage=start " in l)
+        return trace[:i] + [log] + trace[i:]
+
+    def test_two_lines_from_the_log_pass_and_are_counted(self):
+        # F-01: 600 на строку; пропуск кликом во второй строке режет её, удержание CUE-010 = чтение + строки
+        trace = self.trace()
+        effects = [l for l in trace if " stage=effect " in l]
+        self.assertEqual(len(effects), 2)
+        self.assertIn(" i=1 ms=600 skipped=0", effects[0])
+        self.assertIn(" i=2 ms=280 skipped=1", effects[1])
+        errs, summary = cc.check_trace(self.with_log(), TABLE)
+        self.assertEqual(errs, [])
+        self.assertEqual((summary["combat_logs"], summary["combat_logs_own"], summary["combat_effect_lines"]), (1, 1, 2))
+        self.assertEqual(summary["combat_totals"], [4480])
+
+    def test_lines_must_equal_the_log(self):
+        errs, _ = cc.check_trace(self.with_log(lines=1), TABLE)
+        self.assertIn("C8", {c for c, _ in errs})
+
+    def test_lines_without_an_own_record_are_rejected(self):
+        errs, _ = cc.check_trace(self.with_log(src="other"), TABLE)
+        self.assertIn("C8", {c for c, _ in errs})
+        errs, _ = cc.check_trace(self.with_log(lines=0, src="none")
+                                 + ["COMBAT-LOG seq=70 log=- n=- entries=0 lines=0 src=bogus outcomes=-"], TABLE)
+        self.assertIn("C8", {c for c, _ in errs})
+
+    def test_effect_lines_need_the_read_hold(self):
+        # lines>0 при text=0: клиент обязан включить чтение, раз эффект карты сработал
+        trace = [l.replace(" text=1 ", " text=0 ") for l in self.with_log()]
+        msgs = [m for c, m in cc.check_trace(trace, TABLE)[0] if c == "C8"]
+        self.assertTrue(any("text=0" in m for m in msgs), msgs)
+
+    def test_r02_client_writes_a_log_before_every_staging(self):
+        other = cc.load_json(cc.FIXTURES / "combat-staging-text.json")["expect_trace"]
+        errs, _ = cc.check_trace(self.with_log() + list(other), TABLE)
+        self.assertIn("C8", {c for c, _ in errs})  # постановка seq 31 без COMBAT-LOG при клиенте R-02
+        # трасса до R-02 (нет ни одной строки COMBAT-LOG) — C8 не требует журнала
+        self.assertEqual(cc.check_trace(self.trace(), TABLE)[0], [])
+
+    def test_cli_min_effect_lines(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            log = Path(d) / "trace.txt"
+            log.write_text("\n".join(self.with_log()) + "\n", encoding="utf-8")
+            self.assertEqual(cc.main(["check-trace", str(log), "--min-combat", "1", "--min-effect-lines", "2"]), 0)
+            self.assertEqual(cc.main(["check-trace", str(log), "--min-effect-lines", "3"]), 1)
+
+
 class DeathStageTests(unittest.TestCase):
     """DE-019: смерть по этапам `CUE death …` и экран результата `RESULT screen …` (01 F-09, CUE-DISPATCHER.md §6)."""
 

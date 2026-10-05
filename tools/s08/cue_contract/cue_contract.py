@@ -636,6 +636,9 @@ def check_trace(lines, table):
     c_errors, c_summary = check_combat(lines, starts)
     errors.extend(c_errors)
     summary.update(c_summary)
+    l_errors, l_summary = check_combat_log(lines)
+    errors.extend(l_errors)
+    summary.update(l_summary)
     d_errors, d_summary = check_death(lines)
     errors.extend(d_errors)
     summary.update(d_summary)
@@ -1076,6 +1079,65 @@ def check_combat(lines, cue_starts=()):
     return errors, summary
 
 
+# ----------------------------------------------------------------------------- журнал эффектов боя (R-02)
+COMBAT_LOG_RE = re.compile(r"(COMBAT-LOG seq=.*)$")
+COMBAT_LOG_NEED = ("seq", "log", "n", "entries", "lines", "src", "outcomes")
+COMBAT_LOG_SRC = ("log", "none", "other")
+
+
+def check_combat_log(lines):
+    """Гейт C8 (R-02, CUE-DISPATCHER.md §5–§6): клиент берёт строки эффекта боя из журнала сервера
+    `metadata.lastCombat` и пишет `COMBAT-LOG seq=<закрывший снимок> … lines=<l> src=<log|none|other>` перед
+    постановкой. C8: формат и поля; без своей записи (src≠log) строк 0; `lines` постановки того же seq равно
+    `lines` журнала; строка эффекта бывает только при тексте эффекта (lines>0 → text=1); если клиент пишет
+    COMBAT-LOG (версия R-02), он пишет его перед каждой постановкой. Сводка: `combat_logs`, `combat_logs_own`,
+    `combat_effect_lines` (сумма `lines` завершённых постановок — для --min-effect-lines, C9)."""
+    errors = []
+    logs = {}
+    any_log = False
+    summary = {"combat_logs": 0, "combat_logs_own": 0, "combat_effect_lines": 0}
+    starts = []
+    ends = {}
+    for n, raw in enumerate(lines, 1):
+        m = COMBAT_LOG_RE.search(raw.rstrip("\r\n"))
+        if m:
+            any_log = True
+            f = _fields(m.group(1), 1)
+            missing = [k for k in COMBAT_LOG_NEED if k not in f]
+            if missing or f.get("src") not in COMBAT_LOG_SRC or _int_or_none(f.get("lines")) is None:
+                errors.append(("C8", "строка %d: COMBAT-LOG без полей %s или src=%s" % (n, missing, f.get("src"))))
+                continue
+            summary["combat_logs"] += 1
+            if f["src"] == "log":
+                summary["combat_logs_own"] += 1
+            elif int(f["lines"]) != 0:
+                errors.append(("C8", "строка %d: строк эффекта %s без своей записи боя (src=%s)" % (n, f["lines"], f["src"])))
+            logs[f["seq"]] = f
+            continue
+        c = parse_combat(raw)
+        if c is None:
+            continue
+        if c.get("stage") == "start":
+            starts.append((n, c, logs.get(c.get("seq"))))
+        elif c.get("stage") == "end":
+            ends[c.get("seq")] = c
+    for n, st, log in starts:
+        seq, n_lines = st.get("seq"), _int_or_none(st.get("lines"))
+        if n_lines is None:
+            continue
+        if n_lines > 0 and st.get("text") != "1":
+            errors.append(("C8", "строка %d: seq %s: строк эффекта %d при text=%s" % (n, seq, n_lines, st.get("text"))))
+        if log is None:
+            if any_log:
+                errors.append(("C8", "строка %d: seq %s: постановка без COMBAT-LOG" % (n, seq)))
+        elif int(log["lines"]) != n_lines:
+            errors.append(("C8", "строка %d: seq %s: lines=%d ≠ журнал боя lines=%s" % (n, seq, n_lines, log["lines"])))
+        end = ends.get(seq)
+        if end is not None and end.get("cut", "0") == "0":
+            summary["combat_effect_lines"] += n_lines
+    return errors, summary
+
+
 # ----------------------------------------------------------------------------- смерть и экран результата (DE-019)
 DEATH_RE = re.compile(r"(CUE death\b.*)$")
 RESULT_SCREEN_RE = re.compile(r"(RESULT screen\b.*)$")
@@ -1291,6 +1353,8 @@ def main(argv=None):
                    help="M5: не меньше N строк `MS-CUE move` (живой прогон MS-AT-28/32)")
     c.add_argument("--min-combat", type=int, default=0,
                    help="C7: не меньше N завершённых постановок боя `CUE combat` (живой бой DE-018/DE-031)")
+    c.add_argument("--min-effect-lines", type=int, default=0,
+                   help="C9: не меньше N строк эффекта в завершённых постановках боя (журнал сервера, R-02)")
     c.add_argument("--min-death", type=int, default=0,
                    help="DS6: не меньше N смертей `CUE death` (живая партия до GAME_OVER, DE-019/DE-031)")
     c.add_argument("--min-sound", type=int, default=0,
@@ -1321,6 +1385,8 @@ def main(argv=None):
         errors.append(("M5", "строк MS-CUE %d < %d" % (summary["ms_cue"], a.min_ms_cue)))
     if summary["combat_sets"] < a.min_combat:
         errors.append(("C7", "постановок боя %d < %d" % (summary["combat_sets"], a.min_combat)))
+    if summary["combat_effect_lines"] < a.min_effect_lines:
+        errors.append(("C9", "строк эффекта в боях %d < %d" % (summary["combat_effect_lines"], a.min_effect_lines)))
     if summary["death_sets"] < a.min_death:
         errors.append(("DS6", "смертей %d < %d" % (summary["death_sets"], a.min_death)))
     if summary["sounds"] < a.min_sound:
