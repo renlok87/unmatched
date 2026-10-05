@@ -24,6 +24,8 @@
 #include "../S09/S09ManeuverUi.h"
 #include "../S09/S09MoveInput.h"
 #include "../S09/S09HudPress.h"
+#include "../S09/S09CombatStage.h"
+#include "S08CueDispatcher.h"
 #include "S08FlowGameMode.generated.h"
 
 struct FS08MoveDraftView;
@@ -240,6 +242,28 @@ private:
   bool ConfirmCombat();
   /** Detects the combat-closed transition and freezes LastCombatResult. */
   void TrackCombatResult(const FS08Snapshot& Snapshot, ES08SeqDecision Decision);
+  // ---- DE-018 (W-14) combat staging: the result snapshot is applied at once, its presentation runs the F-01
+  // scale (reveal -> holds -> slam -> pause -> LungeAttack -> contact -> HitReact / "-N" / HP) ----
+  /** Builds the staging input from the last open-combat snapshot and the closing one and starts it. */
+  void StartCombatStage(const FS08Snapshot& Closing, const FS08Snapshot& Baseline, const FS08CombatInfo& Combat,
+                        int32 Damage, int32 HpBefore);
+  /** Emits the due staging boundaries (lines + events) - every tick, and before any other cue is fed. */
+  void TickCombatStage();
+  /** Click / Space / Enter during a staging hold: skips the holds (true = the input was consumed). */
+  bool TryCombatSkip();
+  void RunCombatEvents(const TArray<FS09CombatStageEvent>& Events);
+  void WriteCueLines(const TArray<FString>& Lines);
+  /** CUE-011 pieces outside or inside a staging: the damage number (+ evidence shot scheduling) and the hit. */
+  void PresentDamageNumber(const FString& FighterId, int32 Damage, int32 Seq, float LifeSeconds);
+  void PresentHit(const FString& FighterId, int32 Seq, int32 TintMs);
+  /** Re-derives ShownFighters (HUD view) and, with bSyncBoard, pushes the board view to the board actor. */
+  void RefreshShownFighters(bool bSyncBoard);
+  /** Fighters as the HUD shows them: the staging holds the target's HP until contact + 80 ms. */
+  const TArray<FS08BoardFighter>& HudFighters() const;
+  const FS08BoardFighter* FindShownFighter(const FString& FighterId) const;
+  /** Edge-of-field cards (SD-48 p. 4) and the outcome label of the running staging (RefreshHud). */
+  void BuildCombatStageHud();
+  int64 NowMs() const { return static_cast<int64>(FMath::RoundToDouble(static_cast<double>(Elapsed) * 1000.0)); }
   void RunS09Auto();
   void TakeS09Shots();
   // ---- GD-036 result screen + lobby return ----
@@ -345,6 +369,9 @@ private:
   TSharedPtr<SVerticalBox> HandBox;     // GD-032 own hand strip (exact ids)
   TSharedPtr<SVerticalBox> PanelsBox;   // GD-032 counters + inspector
   TSharedPtr<SVerticalBox> CommandBox;  // GD-033 draft/action panel
+  TSharedPtr<SVerticalBox> CombatEdgeLeft;    // DE-018: attack card at the left edge of the field
+  TSharedPtr<SVerticalBox> CombatEdgeRight;   // DE-018: defense card / cross at the right edge
+  TSharedPtr<SVerticalBox> CombatOutcomeBox;  // DE-018: "A vs D" + outcome label, top centre
   TWeakPtr<STextBlock> ToastHudLine;    // gameplay toast (legacy panel hidden)
   TWeakPtr<class SBorder> ToastHudBorder;
   TSharedPtr<class SConstraintCanvas> HudCanvas; // root of the HUD overlay
@@ -380,9 +407,14 @@ private:
   bool bHasPrevApplied = false;
   FString CombatStartTargetId;
   int32 CombatStartTargetHealth = -1;
-  // Wave 5c-B -ArtPreviewHeroesV2: the attacker's LungeAttack fires once per combat (at COMBAT_RESOLVE, or at
-  // the close when the resolve snapshot was merged away).
-  bool bCombatLungeSent = false;
+  // DE-018: the CUE dispatcher (CUE-008..011 lines, dedupe per seq) and the combat staging. The attacker's
+  // LungeAttack is no longer sent at COMBAT_RESOLVE: the staging plays it after the slam + 300 ms (01 F-03).
+  FS08CueDispatcher CueDispatcher;
+  FS09CombatStage CombatStage;
+  TArray<FS08BoardFighter> ShownFighters;  // HudFighters() while the staging holds the target
+  bool bCombatDamageShownEarly = false;    // the target's damage was shown while the combat was paused
+  bool bCombatOutcomeShown = false;        // the HUD was rebuilt for the outcome label of this staging
+  uint64 CombatSkipFrame = MAX_uint64;     // frame whose click / Space / Enter was a staging skip
   // auto plan tokens: attack | defend | nodefense | resolve | scheme
   TArray<FString> S09CombatPlan;
   bool bS09ShotDefense = false;

@@ -2,6 +2,8 @@
 
 Срез 2026-09-29, волна 4, задача W4-D. **Статус: предложено.** Это спецификация, JSON-схема, таблица данных и тестовые фикстуры без мира. Код движка здесь не пишется: реализация — GD-044 (S11, «Cue subsystem»), ассеты — ART-010 и GD-049.
 
+**DE-018 (2026-10-04, первый срез GD-044):** диспетчер реализован для боевых строк CUE-008…011, 013, 014 — `FS08CueDispatcher` ([S08CueDispatcher.h](../../../../unreal/Unmatched/Source/Unmatched/S08/S08CueDispatcher.h)), постановка боя по §3.1 — `FS09CombatStage` ([S09CombatStage.h](../../../../unreal/Unmatched/Source/Unmatched/S09/S09CombatStage.h)), адаптер — `AS08FlowGameMode`. Остальные строки (наведение, перемещение, начало хода, связь) — по-прежнему GD-044.
+
 Основание: меморандум engine-gate §1 п.8 («FS08CueDispatcher (таблица, трасса `CUE fx … result=`, тесты без мира)») и исследование R3.4 (вариант B: мира-независимый диспетчер по данным). Норматив событий — [07-animation-vfx-audio.csv](../../../game-design/07-animation-vfx-audio.csv) (18 CUE). Сеть и повторы — [08 §6.3](../../../game-design/08-integration-decisions.md). Доступность — [02](../../../game-design/02-ux-ui-spec.md) UI-ACC-005/006. Сокеты — [rig-contract.json](../../../art-pipeline/rig/rig-contract.json) `ue_import.sockets_v2`.
 
 | Файл | Что это |
@@ -9,7 +11,7 @@
 | [cue-table.json](cue-table.json) | данные 18 CUE (`unmatched.cue-table/1`): ассеты, сокет, длительности, поведение; VFX и звуки пока `missing` — это и есть missing-report ART-010; клипы HitReact и DeathSettle есть у всех v2-фигур (DE-003) |
 | [cue-table.schema.json](cue-table.schema.json) | JSON Schema таблицы (draft 2020-12) |
 | [cue-fixture.schema.json](cue-fixture.schema.json) | схема фикстур `unmatched.cue-fixture/1` |
-| [fixtures/](fixtures/) | 8 сценариев (события → точная трасса) и 4 негативные трассы для гейта |
+| [fixtures/](fixtures/) | 12 сценариев (события → точная трасса; 3 из них — постановка боя DE-018 с блоком `staging` для C++) и 5 негативных трасс для гейта |
 | [tools/s08/cue_contract/cue_contract.py](../../../../tools/s08/cue_contract/cue_contract.py) | `validate-table`, `run-fixtures`, `check-trace`: валидатор таблицы, эталонная модель, гейт трассы |
 | [tools/s08/cue_contract/test_cue_contract.py](../../../../tools/s08/cue_contract/test_cue_contract.py) | юнит-тесты валидатора, расписания CUE-007, эталонной модели и гейта |
 
@@ -58,7 +60,7 @@
 
 ### 3.1 Шкала боя, смерти и начала хода (DE-003, 2026-10-04)
 
-Числа — из окончательных решений по живому исследованию DE ([01-decisions.md](../../../game-design/de-footage/task/01-decisions.md) F-01, F-03, F-04, F-07, F-09 и «Резолюция ревью»), основание — строки [timings-live.csv](../../../game-design/de-footage/live-2026-10-04/timings-live.csv). Схема `unmatched.cue-table/1` не допускает удержаний как полей строки CUE, поэтому они записаны здесь. В таблице `duration_ms` CUE-010/011/013 — анимированная часть, она блокирует ввод ≤ 1 с; удержания ниже ввод не блокируют: клик, Space или Enter их пропускают. Реализация в диспетчере, трассе и фикстурах — DE-018 (W-14) и DE-019 (W-16); до неё эталонная модель (§4 D12) считает только `duration_ms`.
+Числа — из окончательных решений по живому исследованию DE ([01-decisions.md](../../../game-design/de-footage/task/01-decisions.md) F-01, F-03, F-04, F-07, F-09 и «Резолюция ревью»), основание — строки [timings-live.csv](../../../game-design/de-footage/live-2026-10-04/timings-live.csv). Схема `unmatched.cue-table/1` не допускает удержаний как полей строки CUE, поэтому они записаны здесь. В таблице `duration_ms` CUE-010/011/013 — анимированная часть, она блокирует ввод ≤ 1 с; удержания ниже ввод не блокируют: клик, Space или Enter их пропускают. Реализация в диспетчере, трассе и фикстурах — DE-018 (W-14) и DE-019 (W-16). DE-018 сделал шкалу боя: удержания живут внутри показа CUE-010 как `hold` (§4 D12), этапы — строки `CUE combat` (§5), гейт — C1–C7 (§6). Этапы смерти — DE-019 (от строки `stage=fall`).
 
 | Параметр | Значение (×1) | Скоростью | Пропуск | Основание |
 | --- | --- | --- | --- | --- |
@@ -108,7 +110,7 @@
 - **D9. Звук: одновременность.** При `max_count` активных звуках этого CUE: `StopOldest` останавливает самый старый (строка `CUE sfx stop … reason=concurrency`), `PreventNew` не играет новый (`sfx=limited`).
 - **D10. Отсутствие ассета.** Если путь не задан или ассет не загрузился, канал получает `missing`, показ получает `result=fallback`, UE-адаптер пишет Warning и выполняет `fallback.behaviour` из 07. Длительность и `done` сохраняются.
 - **D11. Сокращённые анимации.** При включённой UI-ACC-006 длительность `shorten` ≤ `max_ms`, `snap` = 0; в строке `reduced=1`. `keep` не меняется (`reduced=0`).
-- **D12. Длительность.** Показ длится `duration_ms` (или шаг × клетки); при 0 `done` пишется сразу. Звук считается активным на ту же длительность. Удержания боя и этапы смерти §3.1 модель пока не исполняет (DE-018, DE-019).
+- **D12. Длительность.** Показ длится `duration_ms` (или шаг × клетки); при 0 `done` пишется сразу. Звук считается активным на ту же длительность. DE-018: событие может задать свою длину (`duration_ms` — скорость анимации постановки) и **удержание** `hold_ms` — пропускаемое время чтения внутри CUE-010 между переворотом и слэмом. Удержание удлиняет показ, не сокращается reduced motion, строка `done` пишет `hold=<мс>`; блокирующая ввод часть показа — `ms − hold` (G5). Пропуск во время показа укорачивает удержание (`done` переезжает). Этапы смерти §3.1 — DE-019.
 
 ## 5. Трасса
 
@@ -117,13 +119,33 @@
 ```
 CUE fx id=<CUE-NNN> subject=<id> seq=<N|-> t=<ms> vfx=<имя|none|missing> sfx=<имя|none|missing|throttled|limited> clip=<имя|none|missing> mat=<FxFlash|Rim|Fade|none> socket=<Weapon|Head|Root|Base|-> reduced=<0|1> result=<spawned|fallback>
 CUE fx id=<CUE-NNN> subject=<id> seq=<N|-> t=<ms> result=<duplicate|stale>
-CUE fx done id=<CUE-NNN> subject=<id> seq=<N|-> t=<ms> ms=<длительность> cut=<0|replace|jump|interrupt|reconnect>
+CUE fx done id=<CUE-NNN> subject=<id> seq=<N|-> t=<ms> ms=<длительность> cut=<0|replace|jump|interrupt|reconnect> [hold=<мс>]
 CUE sfx stop id=<CUE-NNN> subject=<id> seq=<N|-> t=<ms> reason=concurrency
 CUE reconnect recovered_seq=<R> t=<ms>
 CUE settings reduced_motion=<0|1> t=<ms>
 ```
 
-`имя` — короткое имя ассета (последний сегмент soft path). Строки `CUE damage` и `CUE move` текущего S08 остаются и гейтом игнорируются.
+`имя` — короткое имя ассета (последний сегмент soft path). Строки `CUE damage` и `CUE move` текущего S08 остаются и гейтом игнорируются (урон постановки помечен `staged=contact`: он показывается в кадре контакта).
+
+Постановка боя (DE-018, шкала §3.1). Время `t` — запланированное время этапа на часах клиента (мс), этап пишется в кадре, когда наступил:
+
+```
+CUE combat seq=<n> stage=start t=<ms> attacker=<id> target=<id> text=<0|1> lines=<n> damage=<n> lethal=<0|1> shown=<0|1> speed=<x> flip=<мс> contact=<мс> src=<notify|profile|default> a=<A> d=<D> outcome=<win|hold>
+CUE combat seq=<n> stage=read t=<конец> ms=<факт> skipped=<0|1>          (только при тексте эффекта на раскрытой карте)
+CUE combat seq=<n> stage=effect t=<конец> i=<k> ms=<факт> skipped=<0|1>  (на каждую сработавшую строку)
+CUE combat seq=<n> stage=slam t=<ms> a=<A> d=<D> outcome=<win|hold>       (слэм и метка исхода)
+CUE combat seq=<n> stage=pause t=<конец> ms=<факт> skipped=<0|1>          (пауза «счёт»)
+CUE combat seq=<n> stage=lunge t=<ms> attacker=<id>                       (LungeAttack — вступление CUE-011)
+CUE combat seq=<n> stage=contact t=<ms> offset=<мс> window=<мс> src=<…>  (кадр контакта; window — CUE-011 от контакта)
+CUE combat seq=<n> stage=hit t=<ms> target=<id> tint=<450|550>            (HitReact + заливка)
+CUE combat seq=<n> stage=minus t=<ms> amount=<n> life=<мс>                («−N»)
+CUE combat seq=<n> stage=hp t=<ms> from=<a> to=<b>                        (новое число HP)
+CUE combat seq=<n> stage=fall t=<ms> target=<id>                          (летально: начало DeathSettle, F-09)
+CUE combat seq=<n> stage=skip t=<ms> src=<click|space|enter>
+CUE combat seq=<n> stage=end t=<ms> total=<мс> skipped=<0|1> cut=<0|replace|reconnect|jump>
+```
+
+`total` = CUE-008 (600 × скорость) + (конец − раскрытие) — величина «бой ≈ 3,9 с» из 01 F-01. CUE-010 — `subject=scene`, `done` с `hold=`; CUE-011 — `subject=<цель>`, показ из кадра контакта. Без урона (защита держит) или когда урон уже показан во время паузы боя (`shown=1`) строк `hit`/`minus`/`hp`/`fall` и CUE-011 нет. Пример — фикстура `combat-staging-text`.
 
 Пример (фикстура `attack-interrupt`):
 
@@ -144,7 +166,7 @@ CUE fx done id=CUE-011 subject=medusa seq=51 t=1200 ms=900 cut=0
 | G2 | тройка `(cue, subject, seq)` показана больше одного раза: число `spawned`+`fallback` = числу уникальных троек |
 | G3 | после `CUE reconnect recovered_seq=R` показан CUE с seq ≤ R |
 | G4 | показ без `done`, `done` без показа, `ms` не равно разнице `t`, сокращённая анимация длиннее `max_ms`, `snap` не 0 |
-| G5 | блокирующий ввод CUE длился больше 1000 мс (кроме терминального) |
+| G5 | блокирующий ввод CUE длился больше 1000 мс (кроме терминального); у показа с `hold=` считается `ms − hold` |
 | G6 | звуков одного CUE одновременно больше `max_count` (с учётом `sfx stop`) |
 | G7 | звуки одного CUE чаще `retrigger_ms` |
 | G8 | `result=fallback` не совпадает с наличием `missing` в vfx/sfx/clip |
@@ -152,7 +174,9 @@ CUE fx done id=CUE-011 subject=medusa seq=51 t=1200 ms=900 cut=0
 
 Трассы перемещения `MS-CUE move seq=… fighter=… order=… of=… kind=… steps=… source=… start=… ms=… snapped=… path=…` (MS-T-15, move-selection 04 §9) тот же гейт проверяет отдельно: M1 — формат и поля; M2 — набор строк одного seq (ровно `of` подряд, `order` 0..of−1, бойцы без повторов); M3 — шаги, вид и путь (`place` и `straight` — 1 шаг, в пути steps+1 клеток); M4 — `start`/`ms`/`snapped` по расписанию 04 §6.3 с потолками CUE-007 (±1 мс); M5 — строк меньше `--min-ms-cue N`.
 
-Сводка гейта: `presented`, `spawned`, `fallback`, `duplicate`, `stale`, `done`, `unique_triples`, `ms_cue`, `ms_cue_sets`, `ms_cue_sources`. Для ACC-012 в пакете доказательств записывается строка `CUE_TRACE PASS {…}`.
+Постановку боя `CUE combat …` (DE-018) гейт проверяет по seq: C1 — формат и поля `start`; C2 — ровно одна постановка на seq и один `end` (повтор seq не даёт второго показа, ACC-012); C3 — порядок этапов `start → read → effect → slam → pause → lunge → contact → hit → minus → hp → fall → end` и неубывающее время (`skip` — в любом месте); C4 — удержания: `read` есть тогда и только тогда, когда `text=1`, 1000 мс (меньше — только `skipped=1`), строк `effect` ровно `lines`, каждая 400 × скорость + 200, пауза 300, слэм = раскрытие + `flip` + удержания, `hold` у CUE-010 = удержаниям, пауза от конца слэма, выпад в конце паузы, контакт = выпад + `contact`; C5 — от кадра контакта: `hit` в кадре контакта с заливкой 450 (летально 550), `minus` +60, `hp` +80, `fall` +450 только у летального, CUE-011 с цели из кадра контакта и не дольше постановки, без урона — ни одной из этих строк, `outcome=win` тогда и только тогда, когда урон > 0, конец = контакт + max(`window`, 80, 450 у летального); C6 — `total`. Прерванная постановка (`cut≠0`) проверяется только по C1–C3. C7 — завершённых постановок меньше `--min-combat N` (живой бой).
+
+Сводка гейта: `presented`, `spawned`, `fallback`, `duplicate`, `stale`, `done`, `unique_triples`, `ms_cue`, `ms_cue_sets`, `ms_cue_sources`, `combat_sets`, `combat_cut`, `combat_skipped`, `combat_totals`. Для ACC-012 в пакете доказательств записывается строка `CUE_TRACE PASS {…}`.
 
 ## 7. Фикстуры без мира
 
@@ -168,9 +192,12 @@ CUE fx done id=CUE-011 subject=medusa seq=51 t=1200 ms=900 cut=0
 | `reduced-motion` | D11: урон 900 → 100 мс, перемещение `snap`, наведение `keep` |
 | `attack-interrupt` | D7: объявление атаки (без клипа, F-03) обрывается уроном через 300 мс |
 | `stale-seq-and-move-jump` | D3, D6 (`jump`): новое перемещение той же фигуры, запоздавший seq 59 |
-| `neg-*` (4) | гейт ловит G2, G3, G4+G8, G5+G6 |
+| `combat-staging-text` | DE-018: бой по шкале F-01 — атака без защиты, текст эффекта, 0 строк, урон 2: CUE-010 `ms=1800 hold=1000`, контакт по notify 292, «−N» +60, HP +80, итог 3892 мс ≈ 3,9 с |
+| `combat-staging-lethal-skip` | DE-018: летальный удар по помощнику без текста, пропуск Space в паузе «счёт» (100 мс), заливка 550, `fall` +450, итог 2733 |
+| `combat-staging-defense-holds` | DE-018: урон 0 — выпад без HitReact, «−N» и CUE-011; пропуск кликом в чтении (380 мс), `hold=380` |
+| `neg-*` (5) | гейт ловит G2, G3, G4+G8, G5+G6; постановка боя — C2, C3, C5, C6 (`neg-combat-staging`) |
 
-**Перенос в C++ (GD-044).** Автотесты `S08.CueDispatcher.*` (как 9 тестов `S08.ArtHud`) читают эти JSON, подают события в `FS08CueDispatcher` и сравнивают строки трассы побайтно. Эталонная модель на Python — исполняемая спецификация, её вывод не заменяет C++-тест.
+**Перенос в C++ (DE-018).** `Unmatched.S08.CueDispatcher.Table` сверяет встроенные строки CUE-008…011, 013, 014 с `cue-table.json` поле за полем; `Unmatched.S08.CueDispatcher.Fixtures` прогоняет через `FS08CueDispatcher` каждый сценарий этих строк без блока `staging` (attack-interrupt, dedupe-http-ws, missing-assets-fallback, sfx-concurrency-stop-oldest) и сравнивает трассу побайтно; `Unmatched.S09.CombatStage.Fixtures` строит из блока `staging` ту же постановку через `FS09CombatStage` и сравнивает с `expect_trace` фикстур `combat-staging-*` побайтно. Фикстуры строк вне этого среза (наведение, перемещение, связь) переносятся с GD-044. Эталонная модель на Python — исполняемая спецификация, её вывод не заменяет C++-тест.
 
 ## 8. Эскиз интерфейса (для GD-044, не код)
 

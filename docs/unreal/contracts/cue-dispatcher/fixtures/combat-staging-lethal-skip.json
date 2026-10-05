@@ -1,0 +1,232 @@
+{
+ "schema": "unmatched.cue-fixture/1",
+ "id": "combat-staging-lethal-skip",
+ "kind": "scenario",
+ "description": "Летальный удар по помощнику без текста эффекта (удержания чтения нет): пропуск Space во время паузы «счёт» сокращает её до 100 мс, клип выпада не обрывается. Контакт Medusa — выпуск стрелы (333 мс, notify); заливка 550; «−N» +60; HP +80; падение (начало DeathSettle) +450 — от него DE-019 считает смерть. Итог 600 + 2133 = 2733 мс.",
+ "covers": [
+  "01 F-01 пропуск",
+  "01 F-03 летально 550",
+  "01 F-09 этапы смерти от кадра контакта",
+  "02 SD-06, SD-07"
+ ],
+ "events": [
+  {
+   "t": 0,
+   "kind": "cue",
+   "id": "CUE-008",
+   "subject": "medusa",
+   "seq": 40
+  },
+  {
+   "t": 1000,
+   "kind": "combat",
+   "seq": 41,
+   "stage": "start",
+   "fields": {
+    "attacker": "medusa",
+    "target": "merlin",
+    "text": 0,
+    "lines": 0,
+    "damage": 1,
+    "lethal": 1,
+    "shown": 0,
+    "speed": "1.00",
+    "flip": 620,
+    "contact": 333,
+    "src": "notify",
+    "a": 3,
+    "d": 2,
+    "outcome": "win"
+   }
+  },
+  {
+   "t": 1000,
+   "kind": "cue",
+   "id": "CUE-010",
+   "subject": "scene",
+   "seq": 41,
+   "duration_ms": 800
+  },
+  {
+   "t": 1620,
+   "kind": "combat",
+   "seq": 41,
+   "stage": "slam",
+   "fields": {
+    "a": 3,
+    "d": 2,
+    "outcome": "win"
+   }
+  },
+  {
+   "t": 1900,
+   "kind": "combat",
+   "seq": 41,
+   "stage": "skip",
+   "fields": {
+    "src": "space"
+   }
+  },
+  {
+   "t": 1900,
+   "kind": "combat",
+   "seq": 41,
+   "stage": "pause",
+   "fields": {
+    "ms": 100,
+    "skipped": 1
+   }
+  },
+  {
+   "t": 1900,
+   "kind": "combat",
+   "seq": 41,
+   "stage": "lunge",
+   "fields": {
+    "attacker": "medusa"
+   }
+  },
+  {
+   "t": 2233,
+   "kind": "combat",
+   "seq": 41,
+   "stage": "contact",
+   "fields": {
+    "offset": 333,
+    "window": 900,
+    "src": "notify"
+   }
+  },
+  {
+   "t": 2233,
+   "kind": "cue",
+   "id": "CUE-011",
+   "subject": "merlin",
+   "seq": 41,
+   "duration_ms": 900
+  },
+  {
+   "t": 2233,
+   "kind": "combat",
+   "seq": 41,
+   "stage": "hit",
+   "fields": {
+    "target": "merlin",
+    "tint": 550
+   }
+  },
+  {
+   "t": 2293,
+   "kind": "combat",
+   "seq": 41,
+   "stage": "minus",
+   "fields": {
+    "amount": 1,
+    "life": 900
+   }
+  },
+  {
+   "t": 2313,
+   "kind": "combat",
+   "seq": 41,
+   "stage": "hp",
+   "fields": {
+    "from": 1,
+    "to": 0
+   }
+  },
+  {
+   "t": 2683,
+   "kind": "combat",
+   "seq": 41,
+   "stage": "fall",
+   "fields": {
+    "target": "merlin"
+   }
+  },
+  {
+   "t": 3133,
+   "kind": "combat",
+   "seq": 41,
+   "stage": "end",
+   "fields": {
+    "total": 2733,
+    "skipped": 1,
+    "cut": 0
+   }
+  }
+ ],
+ "expect_trace": [
+  "CUE fx id=CUE-008 subject=medusa seq=40 t=0 vfx=missing sfx=missing clip=none mat=none socket=Weapon reduced=0 result=fallback",
+  "CUE fx done id=CUE-008 subject=medusa seq=40 t=600 ms=600 cut=0",
+  "CUE combat seq=41 stage=start t=1000 attacker=medusa target=merlin text=0 lines=0 damage=1 lethal=1 shown=0 speed=1.00 flip=620 contact=333 src=notify a=3 d=2 outcome=win",
+  "CUE fx id=CUE-010 subject=scene seq=41 t=1000 vfx=none sfx=missing clip=none mat=none socket=- reduced=0 result=fallback",
+  "CUE combat seq=41 stage=slam t=1620 a=3 d=2 outcome=win",
+  "CUE fx done id=CUE-010 subject=scene seq=41 t=1800 ms=800 cut=0",
+  "CUE combat seq=41 stage=skip t=1900 src=space",
+  "CUE combat seq=41 stage=pause t=1900 ms=100 skipped=1",
+  "CUE combat seq=41 stage=lunge t=1900 attacker=medusa",
+  "CUE combat seq=41 stage=contact t=2233 offset=333 window=900 src=notify",
+  "CUE fx id=CUE-011 subject=merlin seq=41 t=2233 vfx=missing sfx=missing clip=AM_Merlin_HitReact mat=FxFlash socket=Head reduced=0 result=fallback",
+  "CUE combat seq=41 stage=hit t=2233 target=merlin tint=550",
+  "CUE combat seq=41 stage=minus t=2293 amount=1 life=900",
+  "CUE combat seq=41 stage=hp t=2313 from=1 to=0",
+  "CUE combat seq=41 stage=fall t=2683 target=merlin",
+  "CUE fx done id=CUE-011 subject=merlin seq=41 t=3133 ms=900 cut=0",
+  "CUE combat seq=41 stage=end t=3133 total=2733 skipped=1 cut=0"
+ ],
+ "expect_summary": {
+  "presented": 3,
+  "spawned": 0,
+  "fallback": 3,
+  "duplicate": 0,
+  "stale": 0,
+  "done": 3,
+  "unique_triples": 3,
+  "ms_cue": 0,
+  "ms_cue_sets": 0,
+  "ms_cue_sources": {
+   "trail": 0,
+   "canonical": 0,
+   "straight": 0
+  },
+  "combat_sets": 1,
+  "combat_cut": 0,
+  "combat_skipped": 1,
+  "combat_totals": [
+   2733
+  ]
+ },
+ "staging": {
+  "declare": {
+   "t": 0,
+   "subject": "medusa",
+   "seq": 40
+  },
+  "start_t": 1000,
+  "end_t": 4000,
+  "input": {
+   "seq": 41,
+   "attacker": "medusa",
+   "target": "merlin",
+   "text": false,
+   "lines": 0,
+   "damage": 1,
+   "lethal": true,
+   "shown": false,
+   "hp_before": 1,
+   "hp_after": 0,
+   "contact": 333,
+   "src": "notify",
+   "a": 3,
+   "d": 2,
+   "speed": 1.0
+  },
+  "skips": [
+   {
+    "t": 1900,
+    "src": "space"
+   }
+  ]
+ }
+}

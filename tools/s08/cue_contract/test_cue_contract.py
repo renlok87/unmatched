@@ -258,5 +258,70 @@ class ModelAndGateTests(unittest.TestCase):
         self.assertIn("G1", codes)
 
 
+
+class CombatStagingTests(unittest.TestCase):
+    """DE-018: постановка боя `CUE combat …` и удержание внутри CUE-010 (CUE-DISPATCHER.md §3.1, §4 D12, §6)."""
+
+    def fixture(self, name):
+        return cc.load_json(cc.FIXTURES / (name + ".json"))
+
+    def test_fight_scale_with_text_is_about_3_9_s(self):
+        # 01 F-01 «Резолюция» п. 1: атака без защиты, текст эффекта на карте, 0 сработавших строк — ≈3,9 с ±10 %
+        errs, summary = cc.check_trace(self.fixture("combat-staging-text")["expect_trace"], TABLE)
+        self.assertEqual(errs, [])
+        self.assertEqual(summary["combat_sets"], 1)
+        total = summary["combat_totals"][0]
+        self.assertTrue(3900 * 0.9 <= total <= 3900 * 1.1, total)
+        self.assertEqual(total, 600 + 800 + 1000 + 300 + 292 + 900)
+
+    def test_dropped_read_hold_is_caught_and_skip_is_counted(self):
+        lines = [l.replace("text=1", "text=0") for l in self.fixture("combat-staging-text")["expect_trace"]
+                 if " stage=read " not in l]
+        errs, _ = cc.check_trace(lines, TABLE)
+        self.assertIn("C4", {c for c, _ in errs})  # чтение убрано, но слэм/hold остались от текста — гейт видит
+        errs, summary = cc.check_trace(self.fixture("combat-staging-lethal-skip")["expect_trace"], TABLE)
+        self.assertEqual(errs, [])
+        self.assertEqual(summary["combat_skipped"], 1)
+
+    def test_hold_does_not_count_as_input_block(self):
+        trace = self.fixture("combat-staging-text")["expect_trace"]
+        done10 = next(l for l in trace if "done id=CUE-010" in l)
+        self.assertIn("ms=1800", done10)
+        self.assertIn("hold=1000", done10)
+        # без hold те же 1800 мс — блокирующий CUE длиннее 1 с (G5)
+        bad = [l.replace(" hold=1000", "") if l is done10 else l for l in trace]
+        self.assertIn("G5", {c for c, _ in cc.check_trace(bad, TABLE)[0]})
+
+    def test_hp_before_contact_and_repeat_seq_are_rejected(self):
+        fx = self.fixture("neg-combat-staging")
+        codes = sorted({c for c, _ in cc.check_trace(fx["trace"], TABLE)[0]})
+        self.assertEqual(codes, sorted(fx["expect_error_codes"]))
+        self.assertIn("C2", codes)
+        self.assertIn("C5", codes)
+
+    def test_defense_holds_has_no_hit(self):
+        trace = self.fixture("combat-staging-defense-holds")["expect_trace"]
+        self.assertFalse([l for l in trace if "id=CUE-011" in l or " stage=hit " in l or " stage=minus " in l])
+        self.assertTrue(any("outcome=hold" in l for l in trace))
+        forged = trace[:-1] + ["CUE combat seq=52 stage=minus t=4532 amount=1 life=900", trace[-1]]
+        self.assertIn("C5", {c for c, _ in cc.check_trace(forged, TABLE)[0]})
+
+    def test_cut_staging_checks_order_only(self):
+        lines = ["CUE combat seq=9 stage=start t=0 attacker=a target=b text=0 lines=0 damage=1 lethal=0 shown=0 "
+                 "speed=1.00 flip=620 contact=292 src=default a=3 d=2 outcome=win",
+                 "CUE combat seq=9 stage=end t=100 total=700 skipped=0 cut=replace"]
+        errs, summary = cc.check_trace(lines, TABLE)
+        self.assertEqual(errs, [])
+        self.assertEqual((summary["combat_sets"], summary["combat_cut"]), (1, 1))
+
+    def test_reference_model_writes_combat_lines_and_hold(self):
+        d = cc.ReferenceDispatcher(TABLE)
+        d.feed({"t": 0, "kind": "combat", "seq": 3, "stage": "start", "fields": {"attacker": "a", "target": "b"}})
+        d.feed({"t": 0, "kind": "cue", "id": "CUE-010", "subject": "scene", "seq": 3, "hold_ms": 250})
+        lines = d.finish()
+        self.assertEqual(lines[0], "CUE combat seq=3 stage=start t=0 attacker=a target=b")
+        self.assertEqual(lines[-1], "CUE fx done id=CUE-010 subject=scene seq=3 t=1050 ms=1050 cut=0 hold=250")
+
+
 if __name__ == "__main__":
     unittest.main()

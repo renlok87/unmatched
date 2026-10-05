@@ -1,0 +1,36 @@
+{
+ "schema": "unmatched.cue-fixture/1",
+ "id": "neg-combat-staging",
+ "kind": "negative-trace",
+ "description": "Постановка боя с нарушениями: новое число HP раньше контакта + 80 (C5), итог не равен CUE-008 + (конец − раскрытие) (C6), вторая постановка того же seq 32 — повтор seq не даёт второй показ (C2).",
+ "covers": [
+  "DE-018 гейт C2, C5, C6",
+  "ACC-012 повтор seq"
+ ],
+ "trace": [
+  "CUE fx id=CUE-008 subject=arthur seq=30 t=0 vfx=missing sfx=missing clip=none mat=none socket=Weapon reduced=0 result=fallback",
+  "CUE fx done id=CUE-008 subject=arthur seq=30 t=600 ms=600 cut=0",
+  "CUE combat seq=31 stage=start t=5000 attacker=arthur target=medusa text=1 lines=0 damage=2 lethal=0 shown=0 speed=1.00 flip=620 contact=292 src=notify a=4 d=0 outcome=win",
+  "CUE fx id=CUE-010 subject=scene seq=31 t=5000 vfx=none sfx=missing clip=none mat=none socket=- reduced=0 result=fallback",
+  "CUE combat seq=31 stage=read t=6620 ms=1000 skipped=0",
+  "CUE combat seq=31 stage=slam t=6620 a=4 d=0 outcome=win",
+  "CUE fx done id=CUE-010 subject=scene seq=31 t=6800 ms=1800 cut=0 hold=1000",
+  "CUE combat seq=31 stage=pause t=7100 ms=300 skipped=0",
+  "CUE combat seq=31 stage=lunge t=7100 attacker=arthur",
+  "CUE combat seq=31 stage=contact t=7392 offset=292 window=900 src=notify",
+  "CUE fx id=CUE-011 subject=medusa seq=31 t=7392 vfx=missing sfx=missing clip=AM_Medusa_HitReact mat=FxFlash socket=Head reduced=0 result=fallback",
+  "CUE combat seq=31 stage=hit t=7392 target=medusa tint=450",
+  "CUE combat seq=31 stage=minus t=7452 amount=2 life=900",
+  "CUE combat seq=31 stage=hp t=7412 from=7 to=5",
+  "CUE fx done id=CUE-011 subject=medusa seq=31 t=8292 ms=900 cut=0",
+  "CUE combat seq=31 stage=end t=8292 total=3300 skipped=0 cut=0",
+  "CUE combat seq=32 stage=start t=9000 attacker=arthur target=medusa text=1 lines=0 damage=2 lethal=0 shown=0 speed=1.00 flip=620 contact=292 src=notify a=4 d=0 outcome=win",
+  "CUE combat seq=32 stage=start t=9100 attacker=arthur target=medusa text=1 lines=0 damage=2 lethal=0 shown=0 speed=1.00 flip=620 contact=292 src=notify a=4 d=0 outcome=win"
+ ],
+ "expect_error_codes": [
+  "C2",
+  "C3",
+  "C5",
+  "C6"
+ ]
+}

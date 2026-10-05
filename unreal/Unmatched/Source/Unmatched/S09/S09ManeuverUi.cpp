@@ -1841,6 +1841,14 @@ bool FS09CommandUi::ToggleDefenseCard(const FString& InstanceId, const FS08Snaps
   return false;
 }
 
+bool FS09CommandUi::HasLegalDefenseCard(const FS08Snapshot& Snapshot,
+                                        const TArray<FS08BoardFighter>& Fighters) const {
+  const FS08BoardFighter* Defender = FindFighter(Fighters, Combat.TargetFighterId);
+  const FString FighterName = Defender ? Defender->Name : FString();
+  const TArray<const TCHAR*> Types = {TEXT("DEFENSE"), TEXT("VERSATILE"), TEXT("UNIVERSAL")};
+  return LegalCardsFor(Snapshot, ViewerId, Types, FighterName).Num() > 0;
+}
+
 bool FS09CommandUi::ConfirmDefense(const FS08Snapshot& Snapshot,
                                    const TArray<FS08BoardFighter>& Fighters,
                                    FS09DefenseCommand& OutCommand,

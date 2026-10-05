@@ -633,6 +633,52 @@ bool AS08FighterActor::ShiftHeroClipClock(float DeltaSeconds) {
   return true;
 }
 
+int32 AS08FighterActor::GetLungeContactMs(FString& OutSource) const {
+  using namespace S08HeroesV2;
+  OutSource = TEXT("default");
+  if (!bHeroV2Visual || !HeroV2Spec) return -1;
+  const UAnimSequenceBase* Lunge = HeroClips.IsValidIndex(static_cast<int32>(EClip::LungeAttack))
+      ? HeroClips[static_cast<int32>(EClip::LungeAttack)].Get() : nullptr;
+  const float Notify = NotifyContactSeconds(Lunge);
+  OutSource = Notify >= 0.0f ? TEXT("notify") : TEXT("profile");
+  return FMath::RoundToInt(ContactSeconds(*HeroV2Spec, Lunge) * 1000.0f);
+}
+
+FString AS08FighterActor::GetHeroClipAssetName(S08HeroesV2::EClip Clip) const {
+  const UAnimSequenceBase* Anim = bHeroV2Visual && HeroClips.IsValidIndex(static_cast<int32>(Clip))
+      ? HeroClips[static_cast<int32>(Clip)].Get() : nullptr;
+  return Anim ? Anim->GetName() : FString();
+}
+
+void AS08FighterActor::PlayHitTint(float Seconds) {
+  if (!bHeroV2Visual || !ArtBody || Seconds <= 0.0f) return;
+  UWorld* World = GetWorld();
+  if (!World) return;
+  HitTintStartSeconds = World->GetTimeSeconds();
+  HitTintSeconds = Seconds;
+  World->GetTimerManager().SetTimer(HitTintTimer, this, &AS08FighterActor::TickHitTint, 1.0f / 60.0f, true);
+  TickHitTint();
+  FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW hit-tint fighter=%s ms=%d"), *Fighter.Id,
+                                   FMath::RoundToInt(Seconds * 1000.0f)));
+}
+
+void AS08FighterActor::TickHitTint() {
+  UWorld* World = GetWorld();
+  if (!World || !ArtBody) return;
+  // 01 F-03 (DE: 467-567 ms, bright for the first ~70 ms): full red for 70 ms, then from 0.65 down to 0 at the end.
+  const float T = static_cast<float>(World->GetTimeSeconds() - HitTintStartSeconds);
+  constexpr float BrightSeconds = 0.07f;
+  float Value = 0.0f;
+  if (T < BrightSeconds) {
+    Value = 1.0f;
+  } else if (T < HitTintSeconds) {
+    Value = 0.65f * (1.0f - (T - BrightSeconds) / FMath::Max(0.01f, HitTintSeconds - BrightSeconds));
+  }
+  HitTintValue = Value;
+  ArtBody->SetCustomPrimitiveDataFloat(S08HeroesV2::HitTintCpdIndex, Value);
+  if (T >= HitTintSeconds) World->GetTimerManager().ClearTimer(HitTintTimer);
+}
+
 void AS08FighterActor::OnHeroClipFinished() {
   NotifyHeroAnimEvent(S08HeroesV2::EEvent::ClipFinished, -1);
 }

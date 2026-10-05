@@ -37,6 +37,10 @@ bool FS09HudFactory::CardFromJson(const TSharedPtr<FJsonValue>& Value,
   ReadValue(TEXT("defenseValue"), OutCard.DefenseValue);
   ReadValue(TEXT("boostValue"), OutCard.BoostValue);
   {
+    const TArray<TSharedPtr<FJsonValue>>* Effects = nullptr;
+    if (Card->TryGetArrayField(TEXT("effects"), Effects) && Effects) OutCard.EffectCount = Effects->Num();
+  }
+  {
     const TSharedPtr<FJsonValue> Boost = Card->TryGetField(TEXT("boostValue"));
     double BoostNumber = 0.0;
     OutCard.bHasBoostValue = Boost.IsValid() && Boost->Type == EJson::Number && Boost->TryGetNumber(BoostNumber) &&
@@ -284,4 +288,121 @@ FString FS09HudModel::SummaryLine() const {
     Line += FString::Printf(TEXT(" pendingDiscard=%d"), PendingDiscard.Count);
   }
   return Line;
+}
+
+// ---- DE-018: combat panel model ----
+
+ES09DefenseSlot S09DefenseSlotState(const FString& Phase, bool bViewerDefender, bool bDraftPicked,
+                                    bool bRevealedNoDefense) {
+  if (bRevealedNoDefense) return ES09DefenseSlot::NoDefense;
+  if (Phase == TEXT("COMBAT_RESOLVE")) return ES09DefenseSlot::CardBack;
+  if (Phase == TEXT("COMBAT") && bViewerDefender && bDraftPicked) return ES09DefenseSlot::CardBack;
+  return ES09DefenseSlot::Shield;
+}
+
+const TCHAR* S09DefenseSlotName(ES09DefenseSlot Slot) {
+  switch (Slot) {
+    case ES09DefenseSlot::CardBack: return TEXT("card-back");
+    case ES09DefenseSlot::NoDefense: return TEXT("no-defense");
+    default: return TEXT("shield");
+  }
+}
+
+bool FS09CombatReveal::HasEffectText() const {
+  auto Has = [](const FS09CardView& Card) { return !Card.bHidden && (!Card.Text.IsEmpty() || Card.EffectCount > 0); };
+  return (bAttackKnown && Has(Attack)) || (bDefenseKnown && Has(Defense));
+}
+
+namespace {
+/** One owner's pile as card views (empty when absent). */
+TArray<FS09CardView> PileCards(const TSharedPtr<FJsonValue>& Piles, const FString& OwnerId) {
+  TArray<FS09CardView> Out;
+  if (!Piles.IsValid() || OwnerId.IsEmpty()) return Out;
+  const TSharedPtr<FJsonObject> Object = Piles->AsObject();
+  if (!Object.IsValid()) return Out;
+  const TArray<TSharedPtr<FJsonValue>>* Entries = PileEntries(Object, OwnerId);
+  if (!Entries) return Out;
+  for (const TSharedPtr<FJsonValue>& Value : *Entries) {
+    FS09CardView Card;
+    if (FS09HudFactory::CardFromJson(Value, Card)) Out.Add(MoveTemp(Card));
+  }
+  return Out;
+}
+
+const FS09CardView* CardById(const TArray<FS09CardView>& Pile, const FString& InstanceId) {
+  if (InstanceId.IsEmpty()) return nullptr;
+  return Pile.FindByPredicate([&InstanceId](const FS09CardView& Card) { return Card.InstanceId == InstanceId; });
+}
+
+/** Indices of the face-down placeholders of a baseline pile, oldest first. */
+TArray<int32> HiddenIndices(const TArray<FS09CardView>& Pile) {
+  TArray<int32> Out;
+  for (int32 I = 0; I < Pile.Num(); ++I) {
+    if (Pile[I].bHidden) Out.Add(I);
+  }
+  return Out;
+}
+
+/** The public face at Index of the closing pile (nullptr when absent or still hidden). */
+const FS09CardView* FaceAt(const TArray<FS09CardView>& Pile, int32 Index) {
+  return Pile.IsValidIndex(Index) && !Pile[Index].bHidden ? &Pile[Index] : nullptr;
+}
+}  // namespace
+
+FS09CombatReveal FS09CombatReveal::Derive(const FS08CombatInfo& Combat, const FString& AttackerOwnerId,
+                                          const TSharedPtr<FJsonValue>& BaselinePiles,
+                                          const TSharedPtr<FJsonValue>& ClosingPiles) {
+  FS09CombatReveal Out;
+  if (!Combat.bPresent) return Out;
+  const TArray<FS09CardView> AttackBase = PileCards(BaselinePiles, AttackerOwnerId);
+  const TArray<FS09CardView> AttackNow = PileCards(ClosingPiles, AttackerOwnerId);
+  const TArray<FS09CardView> DefenseBase = PileCards(BaselinePiles, Combat.DefenderId);
+  const TArray<FS09CardView> DefenseNow = PileCards(ClosingPiles, Combat.DefenderId);
+
+  // Attack card + boosts: by instance id when this seat saw them, else by the placeholder positions.
+  TArray<int32> AttackHidden = HiddenIndices(AttackBase);
+  if (const FS09CardView* Card = Combat.bHasAttackerCard ? CardById(AttackNow, Combat.AttackerCardId) : nullptr) {
+    Out.Attack = *Card;
+    Out.bAttackKnown = true;
+  } else if (AttackHidden.Num() > 0) {
+    if (const FS09CardView* Face = FaceAt(AttackNow, AttackHidden[0])) {
+      Out.Attack = *Face;
+      Out.bAttackKnown = true;
+    }
+    AttackHidden.RemoveAt(0);
+  }
+  for (const FString& BoostId : {Combat.bHasAbilityBoostCardId ? Combat.AbilityBoostCardId : FString(),
+                                 Combat.bHasCardBoostCardId ? Combat.CardBoostCardId : FString()}) {
+    if (const FS09CardView* Card = CardById(AttackNow, BoostId)) Out.Boosts.Add(*Card);
+  }
+  if (Out.Boosts.Num() == 0) {
+    for (const int32 Index : AttackHidden) {
+      if (const FS09CardView* Face = FaceAt(AttackNow, Index)) Out.Boosts.Add(*Face);
+    }
+  }
+  if (Out.bAttackKnown) {
+    int32 Boost = 0;
+    if (Combat.bHasBoostValue) {
+      Boost = Combat.BoostValue;
+    } else {
+      for (const FS09CardView& Card : Out.Boosts) Boost += Card.BoostValue;
+    }
+    Out.AttackValue = Out.Attack.AttackValue + Boost;
+  }
+
+  // Defense card: the defender's own id, else the placeholder the defender's pile held in the baseline.
+  const TArray<int32> DefenseHidden = HiddenIndices(DefenseBase);
+  if (const FS09CardView* Card = Combat.bHasDefenderCard ? CardById(DefenseNow, Combat.DefenderCardId) : nullptr) {
+    Out.Defense = *Card;
+    Out.bDefenseKnown = true;
+  } else if (DefenseHidden.Num() > 0) {
+    if (const FS09CardView* Face = FaceAt(DefenseNow, DefenseHidden.Last())) {
+      Out.Defense = *Face;
+      Out.bDefenseKnown = true;
+    }
+  } else if (!Combat.bHasDefenderCard) {
+    Out.bNoDefense = true;
+  }
+  Out.DefenseValue = Out.bDefenseKnown ? Out.Defense.DefenseValue : Out.bNoDefense ? 0 : -1;
+  return Out;
 }

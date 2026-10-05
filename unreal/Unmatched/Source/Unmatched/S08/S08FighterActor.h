@@ -92,6 +92,16 @@ public:
   float GetHeroV2Scale() const { return bHeroV2Visual ? HeroV2Scale : 0.0f; }
   /** Combat event of this fighter (attack / damage); a no-op unless a v2 figure is shown. */
   void NotifyHeroAnimEvent(S08HeroesV2::EEvent Event, int32 Seq);
+  /** DE-018 (01 F-03): contact frame (ms at x1) of this v2 figure's LungeAttack - the "Contact" AnimNotify (DE-010),
+   *  else the build-profile frame; -1 without a v2 figure. OutSource = notify | profile. */
+  int32 GetLungeContactMs(FString& OutSource) const;
+  /** DE-018 (CUE-011): red hit tint (CPD_HitTint, M_UM_Figure_v2.2) for Seconds - full for the first 70 ms, then
+   *  fading out; a no-op without a v2 figure. A new hit restarts it. */
+  void PlayHitTint(float Seconds);
+  /** Current CPD_HitTint value (0 when idle). */
+  float GetHitTintValue() const { return HitTintValue; }
+  /** Asset name of a loaded v2 clip (AM_<Key>_<Clip>), empty without one. */
+  FString GetHeroClipAssetName(S08HeroesV2::EClip Clip) const;
   /** The death hold (DeathSettle final pose) is running: the defeated figure is still visible. */
   bool IsInDeathHold() const { return bDeathHold; }
   /** Live tune (S08LiveTune.h): position / length of the looping v2 clip that plays (false: no v2 figure, no looping clip). */
@@ -221,6 +231,12 @@ private:
   FString HeroV2TraceKey;
   FTimerHandle HeroClipTimer;
   FTimerHandle DeathHideTimer;
+  // DE-018 hit tint (CPD_HitTint) driven by a short timer while it fades.
+  FTimerHandle HitTintTimer;
+  double HitTintStartSeconds = 0.0;
+  float HitTintSeconds = 0.0f;
+  float HitTintValue = 0.0f;
+  void TickHitTint();
   /** Loads and applies the v2 figure; false (nothing changed) when an asset is missing. */
   bool ApplyHeroV2(const S08HeroesV2::FHeroSpec& Spec, const FVector& CellCenter, USkeletalMesh*& OutMesh);
   void PlayHeroClip(S08HeroesV2::EClip Clip, S08HeroesV2::EEvent Event, int32 Seq);

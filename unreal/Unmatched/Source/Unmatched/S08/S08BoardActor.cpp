@@ -414,7 +414,7 @@ void AS08BoardActor::SetCombatFocus(const FString& AttackerId,
 }
 
 void AS08BoardActor::ShowDamageNumber(const FString& FighterId, int32 Damage,
-                                     int32 SequenceNumber) {
+                                     int32 SequenceNumber, float LifeSeconds) {
   if (!bArtActive || Damage <= 0) return;
   const FS08BoardFighter* Target = Fighters.FindByPredicate(
       [&](const FS08BoardFighter& Fighter) { return Fighter.Id == FighterId; });
@@ -449,12 +449,28 @@ void AS08BoardActor::ShowDamageNumber(const FString& FighterId, int32 Damage,
   Text->SetVisibility(!bScreenLabelMode);
   Number->SetActorLocation(Position);
   Number->SetActorRotation(FRotator(0.0f, 90.0f, 0.0f));
-  Number->SetLifeSpan(0.9f);
+  // DE-018 (01 F-04): 900 ms at speed x1, scaled by the animation speed (CUE-011 "-N").
+  Number->SetLifeSpan(FMath::Max(0.05f, LifeSeconds));
   DamageNumbers.Add(FighterId, Number);
   DamageNumberInfo.Add(FighterId, FIntPoint(Damage, SequenceNumber));
   FS08Trace::Write(FString::Printf(
       TEXT("ARTPREVIEW damage-number fighter=%s amount=%d seq=%d cell=(%d,%d)"),
       *FighterId, Damage, SequenceNumber, Target->X, Target->Y));
+}
+
+int32 AS08BoardActor::GetFighterContactMs(const FString& FighterId, FString& OutSource) const {
+  OutSource = TEXT("default");
+  const AS08FighterActor* Actor = FindFighterActor(FighterId);
+  return Actor ? Actor->GetLungeContactMs(OutSource) : -1;
+}
+
+void AS08BoardActor::PlayFighterHitTint(const FString& FighterId, float Seconds) {
+  if (AS08FighterActor* Actor = FindFighterActor(FighterId)) Actor->PlayHitTint(Seconds);
+}
+
+FString AS08BoardActor::GetFighterClipName(const FString& FighterId, S08HeroesV2::EClip Clip) const {
+  const AS08FighterActor* Actor = FindFighterActor(FighterId);
+  return Actor ? Actor->GetHeroClipAssetName(Clip) : FString();
 }
 
 void AS08BoardActor::ClearChildren() {

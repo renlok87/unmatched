@@ -630,6 +630,9 @@ public:
    *  banner the ATTACKED fighter (combatInfo.targetFighterId) satisfies. */
   bool ToggleDefenseCard(const FString& InstanceId, const FS08Snapshot& Snapshot,
                          const TArray<FS08BoardFighter>& Fighters, FString& OutReason);
+  /** DE-018 (SD-04/SD-16): the defender holds at least one hand card the attacked fighter may defend with -
+   *  otherwise the defense slot reads why.defense.none ("Nothing to defend with"). */
+  bool HasLegalDefenseCard(const FS08Snapshot& Snapshot, const TArray<FS08BoardFighter>& Fighters) const;
   /** bNoDefense=true validates the explicit defender resolve ("no defense");
    *  otherwise the selected card must still be legal. */
   bool ConfirmDefense(const FS08Snapshot& Snapshot, const TArray<FS08BoardFighter>& Fighters,

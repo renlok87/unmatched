@@ -565,18 +565,26 @@ void AS08FlowGameMode::TrackCombatResult(const FS08Snapshot& Snapshot,
   const bool bNowCombat =
       Snapshot.Phase == TEXT("COMBAT") || Snapshot.Phase == TEXT("COMBAT_RESOLVE");
   const FS08Snapshot Baseline = PrevApplied; // copy before the bookkeeping
-  if (Decision == ES08SeqDecision::Apply && !bPrevCombat && bNowCombat) bCombatLungeSent = false;
-  // Wave 5c-B: the attacker lunges when the combat resolves (a no-op without -ArtPreviewHeroesV2).
-  if (Decision == ES08SeqDecision::Apply && Snapshot.Phase == TEXT("COMBAT_RESOLVE") && !bCombatLungeSent &&
-      BoardActor) {
-    FS08CombatInfo Resolving;
-    if (FS08Contracts::CombatInfo(Snapshot, Resolving) && !Resolving.AttackerId.IsEmpty()) {
-      bCombatLungeSent = true;
-      BoardActor->NotifyFighterAnimEvent(Resolving.AttackerId, S08HeroesV2::EEvent::Attack,
-                                         Snapshot.SequenceNumber);
+  // DE-018 (01 F-03): the attacker's LungeAttack no longer starts at COMBAT_RESOLVE - the combat staging plays it
+  // on the result snapshot, after the slam and the 300 ms pause. Here only the CUE lines of the open combat:
+  // CUE-008 (attack declared: aim ring + direction flash, no clip) and CUE-009 (defense played, face down).
+  if (Decision == ES08SeqDecision::Apply && bNowCombat) {
+    FS08CombatInfo Open;
+    if (FS08Contracts::CombatInfo(Snapshot, Open)) {
+      TickCombatStage();  // staging lines first: the CUE trace time never runs backwards (G9)
+      TArray<FString> Lines;
+      if (!bPrevCombat && bHasPrevApplied && Snapshot.Phase == TEXT("COMBAT") && !Open.AttackerId.IsEmpty()) {
+        CueDispatcher.Feed(TEXT("CUE-008"), Open.AttackerId, Snapshot.SequenceNumber, NowMs(), Lines);
+      }
+      if (bHasPrevApplied && PrevApplied.Phase == TEXT("COMBAT") && Snapshot.Phase == TEXT("COMBAT_RESOLVE") &&
+          !Open.TargetFighterId.IsEmpty()) {
+        CueDispatcher.Feed(TEXT("CUE-009"), Open.TargetFighterId, Snapshot.SequenceNumber, NowMs(), Lines);
+      }
+      WriteCueLines(Lines);
     }
   }
   if (Decision == ES08SeqDecision::Apply && !bPrevCombat && bNowCombat) {
+    bCombatDamageShownEarly = false;
     CombatStartTargetId.Reset();
     CombatStartTargetHealth = -1;
     FS08CombatInfo OpeningCombat;
@@ -606,10 +614,6 @@ void AS08FlowGameMode::TrackCombatResult(const FS08Snapshot& Snapshot,
 
   FS08CombatInfo PrevCombat;
   const bool bHadCombat = FS08Contracts::CombatInfo(Baseline, PrevCombat);
-  if (bHadCombat && !bCombatLungeSent && BoardActor && !PrevCombat.AttackerId.IsEmpty()) {
-    BoardActor->NotifyFighterAnimEvent(PrevCombat.AttackerId, S08HeroesV2::EEvent::Attack, Snapshot.SequenceNumber);
-  }
-  bCombatLungeSent = false;
   if (!bHadCombat) {
     CombatStartTargetId.Reset();
     CombatStartTargetHealth = -1;
@@ -632,6 +636,7 @@ void AS08FlowGameMode::TrackCombatResult(const FS08Snapshot& Snapshot,
     }
     break;
   }
+  const int32 StageHpBefore = CombatStartTargetId == PrevCombat.TargetFighterId ? CombatStartTargetHealth : -1;
   CombatStartTargetId.Reset();
   CombatStartTargetHealth = -1;
   LastCombatResult = FS09CombatResult();
@@ -661,6 +666,9 @@ void AS08FlowGameMode::TrackCombatResult(const FS08Snapshot& Snapshot,
   LastCombatResult.ShownAt = Elapsed;
   FS08Trace::Write(FString::Printf(TEXT("COMBAT-RESULT seq=%d damage=%d role=%s"),
                                    Snapshot.SequenceNumber, LastCombatResult.Damage, ResultRole));
+  // DE-018: the result is applied; its presentation is the combat staging (a reconnect without the opening HP has
+  // no known damage and no staging: the snapshot shows the final state, CUE on_reconnect = skip).
+  if (Damage >= 0 && Target) StartCombatStage(Snapshot, Baseline, PrevCombat, Damage, StageHpBefore);
   // W5b-R: a combat whose damage CUE arrived before its combat state (reconnect / merged snapshots): take the combat
   // damage frame if the target's number is still alive and belongs to this combat (<= 2 snapshots before the result).
   if (BoardActor && BoardActor->IsArtActive() && ArtHud.bTagsEnabled && !bS09ShotDamageCombat &&
@@ -774,7 +782,14 @@ void AS08FlowGameMode::SyncBoardFromApplied() {
         FS08Trace::Write(Mapping);
       }
     }
-    BoardActor->SyncFighters(BoardModel, Fighters, ViewerId);
+    // DE-018: the staged target keeps its HP (and, for a lethal blow, its figure) until the contact frame.
+    ShownFighters = Fighters;
+    CombatStage.GetHold().Apply(ShownFighters, /*bBoardView=*/false);
+    {
+      TArray<FS08BoardFighter> BoardView = Fighters;
+      CombatStage.GetHold().Apply(BoardView, /*bBoardView=*/true);
+      BoardActor->SyncFighters(BoardModel, BoardView, ViewerId);
+    }
     SyncCombatFocus();
     // GD-030 six-fighter evidence line: the projection's roster, split into
     // own/enemy for THIS viewer (asserted by the demo driver; the image
@@ -820,6 +835,9 @@ void AS08FlowGameMode::SyncCombatFocus() {
   } else if (CommandUi.Mode == ES09CommandMode::AttackDraft) {
     BoardActor->SetCombatFocus(CommandUi.AttackAttackerId,
                                CommandUi.AttackTargetId);
+  } else if (CombatStage.IsActive()) {
+    // DE-018 (SD-48 p. 3): the focus on the pair is the aim ring and markers, never the camera.
+    BoardActor->SetCombatFocus(CombatStage.GetInput().AttackerId, CombatStage.GetInput().TargetId);
   } else {
     BoardActor->SetCombatFocus(FString(), FString());
   }
@@ -895,7 +913,9 @@ void AS08FlowGameMode::UpdateBoardCamera(float DeltaSeconds) {
     // proposals); every OS event is traced INPUT ... src=os + CAMERA ....
     if (PC->WasInputKeyJustPressed(EKeys::MouseScrollUp)) ApplyWheel(+1, ES08InputSource::Os);
     if (PC->WasInputKeyJustPressed(EKeys::MouseScrollDown)) ApplyWheel(-1, ES08InputSource::Os);
-    if (PC->WasInputKeyJustPressed(EKeys::SpaceBar)) ApplySpace(ES08InputSource::Os);
+    if (PC->WasInputKeyJustPressed(EKeys::SpaceBar) && CombatSkipFrame != GFrameCounter) {
+      ApplySpace(ES08InputSource::Os);
+    }
   }
   // Follow-selection from FollowFromZoom (03 §2: >= 1.2x of the overview; ENV-U9: of the map boards' 2340 uu
   // overview, so their first wheel notch in - the fit, 1872 uu - already follows, as the first notch does on grids).
@@ -956,42 +976,320 @@ void AS08FlowGameMode::HandleCues(const TArray<FS08Cue>& Cues) {
     } else {
       Line = FString::Printf(TEXT("CUE damage %s -%d seq=%d"), *Cue.FighterId, Cue.Damage,
                              Cue.SequenceNumber);
-      if (BoardActor) {
-        BoardActor->ShowDamageNumber(Cue.FighterId, Cue.Damage, Cue.SequenceNumber);
-        // Wave 5c-B: HitReact of a v2 figure (a no-op without -ArtPreviewHeroesV2).
-        if (Cue.Damage > 0) {
-          BoardActor->NotifyFighterAnimEvent(Cue.FighterId, S08HeroesV2::EEvent::Damaged, Cue.SequenceNumber);
-        }
-        if (BoardActor->IsArtActive() && !bS09ShotDamage &&
-            DamageShotAtElapsed < 0.0f && !S09ShotDir.IsEmpty()) {
-          DamageShotAtElapsed = Elapsed + 0.2f;
-        }
-        // W5b-R: the damage number of the first COMBAT (the first damage of a game can be an ability's). The CUE of
-        // a combat usually arrives with the snapshot that already closed it (COMBAT-RESULT is traced first, the
-        // live combat state is gone): the just-closed combat's target within 2 snapshots counts too. A terminal
-        // snapshot (GAME_OVER) is skipped - the result panel owns the screen and the number is not painted.
-        const bool bLiveCombatTarget = CommandUi.Combat.bPresent && CommandUi.Combat.TargetFighterId == Cue.FighterId;
-        const bool bClosedCombatTarget = LastCombatResult.bValid &&
-                                         LastCombatResult.TargetFighterId == Cue.FighterId &&
-                                         FMath::Abs(Cue.SequenceNumber - LastCombatResult.SequenceNumber) <= 2;
-        const bool bTerminal = Hud.bGameOver ||
-                               (Flow.IsValid() && Flow->GetAppliedSnapshot().Phase == TEXT("GAME_OVER"));
-        if (BoardActor->IsArtActive() && ArtHud.bTagsEnabled && !bS09ShotDamageCombat &&
-            DamageCombatShotAtElapsed < 0.0f && !S09ShotDir.IsEmpty() && !bTerminal &&
-            (bLiveCombatTarget || bClosedCombatTarget)) {
-          DamageCombatShotAtElapsed = Elapsed + 0.2f;
-          DamageCombatShotDeadline = Elapsed + 0.8f;
-          FS08Trace::Write(FString::Printf(
-              TEXT("S09AUTO damage-combat scheduled fighter=%s amount=%d seq=%d source=%s combatResultSeq=%d"),
-              *Cue.FighterId, Cue.Damage, Cue.SequenceNumber,
-              bLiveCombatTarget ? TEXT("cue-on-live-combat-target") : TEXT("cue-on-closed-combat-target"),
-              LastCombatResult.bValid ? LastCombatResult.SequenceNumber : -1));
+      // DE-018 (01 F-03): the damage of the staged combat waits for the contact frame of the attacker's lunge -
+      // the staging plays HitReact + tint at the contact, "-N" +60 ms and the HP +80 ms. Any other damage (an
+      // ability, an AFTER COMBAT effect, a combat paused after its damage) is presented at once.
+      const FS09CombatStageInput& Staged = CombatStage.GetInput();
+      const bool bStaged = CombatStage.IsActive() && Staged.Seq == Cue.SequenceNumber &&
+                           Staged.TargetId == Cue.FighterId && !Staged.bDamageShown;
+      if (bStaged) {
+        Line += TEXT(" staged=contact");
+      } else if (BoardActor) {
+        PresentDamageNumber(Cue.FighterId, Cue.Damage, Cue.SequenceNumber, FS09CombatTiming::MinusLifeMs / 1000.0f);
+        if (Cue.Damage > 0) PresentHit(Cue.FighterId, Cue.SequenceNumber, FS09CombatTiming::HitTintMs);
+        if (CommandUi.Combat.bPresent && CommandUi.Combat.TargetFighterId == Cue.FighterId) {
+          bCombatDamageShownEarly = true;  // the closing staging must not show it a second time
         }
       }
     }
     TraceLines.Add(Line);
     FS08Trace::Write(Line);
   }
+}
+
+void AS08FlowGameMode::PresentDamageNumber(const FString& FighterId, int32 Damage, int32 Seq, float LifeSeconds) {
+  if (!BoardActor) return;
+  BoardActor->ShowDamageNumber(FighterId, Damage, Seq, LifeSeconds);
+  if (BoardActor->IsArtActive() && !bS09ShotDamage && DamageShotAtElapsed < 0.0f && !S09ShotDir.IsEmpty()) {
+    DamageShotAtElapsed = Elapsed + 0.2f;
+  }
+  // W5b-R: the damage number of the first COMBAT (the first damage of a game can be an ability's). The CUE of
+  // a combat usually arrives with the snapshot that already closed it (COMBAT-RESULT is traced first, the
+  // live combat state is gone): the just-closed combat's target within 2 snapshots counts too. A terminal
+  // snapshot (GAME_OVER) is skipped - the result panel owns the screen and the number is not painted.
+  // DE-018: a staged number appears at contact + 60 ms; the frame is scheduled from that moment.
+  const bool bLiveCombatTarget = CommandUi.Combat.bPresent && CommandUi.Combat.TargetFighterId == FighterId;
+  const bool bClosedCombatTarget = LastCombatResult.bValid && LastCombatResult.TargetFighterId == FighterId &&
+                                   FMath::Abs(Seq - LastCombatResult.SequenceNumber) <= 2;
+  const bool bTerminal = Hud.bGameOver ||
+                         (Flow.IsValid() && Flow->GetAppliedSnapshot().Phase == TEXT("GAME_OVER"));
+  if (BoardActor->IsArtActive() && ArtHud.bTagsEnabled && !bS09ShotDamageCombat &&
+      DamageCombatShotAtElapsed < 0.0f && !S09ShotDir.IsEmpty() && !bTerminal &&
+      (bLiveCombatTarget || bClosedCombatTarget)) {
+    DamageCombatShotAtElapsed = Elapsed + 0.2f;
+    DamageCombatShotDeadline = Elapsed + 0.8f;
+    FS08Trace::Write(FString::Printf(
+        TEXT("S09AUTO damage-combat scheduled fighter=%s amount=%d seq=%d source=%s combatResultSeq=%d"),
+        *FighterId, Damage, Seq,
+        bLiveCombatTarget ? TEXT("cue-on-live-combat-target") : TEXT("cue-on-closed-combat-target"),
+        LastCombatResult.bValid ? LastCombatResult.SequenceNumber : -1));
+  }
+}
+
+void AS08FlowGameMode::PresentHit(const FString& FighterId, int32 Seq, int32 TintMs) {
+  if (!BoardActor) return;
+  // Wave 5c-B: HitReact of a v2 figure; DE-018: the red hit tint from the same frame (450 ms, lethal 550).
+  BoardActor->NotifyFighterAnimEvent(FighterId, S08HeroesV2::EEvent::Damaged, Seq);
+  BoardActor->PlayFighterHitTint(FighterId, TintMs / 1000.0f);
+}
+
+// ---- DE-018 combat staging ------------------------------------------------
+
+void AS08FlowGameMode::WriteCueLines(const TArray<FString>& Lines) {
+  for (const FString& Line : Lines) FS08Trace::Write(Line);
+}
+
+void AS08FlowGameMode::StartCombatStage(const FS08Snapshot& Closing, const FS08Snapshot& Baseline,
+                                        const FS08CombatInfo& Combat, int32 Damage, int32 HpBefore) {
+  TArray<FS08BoardFighter> Before, After;
+  FS08BoardModel::DecodeFighters(Baseline.Fighters, Before);
+  FS08BoardModel::DecodeFighters(Closing.Fighters, After);
+  auto Find = [](const TArray<FS08BoardFighter>& List, const FString& Id) -> const FS08BoardFighter* {
+    return List.FindByPredicate([&Id](const FS08BoardFighter& F) { return F.Id == Id; });
+  };
+  const FS08BoardFighter* Attacker = Find(After, Combat.AttackerId);
+  if (!Attacker) Attacker = Find(Before, Combat.AttackerId);
+  const FS08BoardFighter* TargetBefore = Find(Before, Combat.TargetFighterId);
+  const FS08BoardFighter* TargetAfter = Find(After, Combat.TargetFighterId);
+  if (!Attacker || !TargetAfter) return;
+  FS09CombatStageInput In;
+  In.Seq = Closing.SequenceNumber;
+  In.AttackerId = Combat.AttackerId;
+  In.TargetId = Combat.TargetFighterId;
+  In.AttackerLabel = Attacker->Label;
+  In.TargetLabel = TargetAfter->Label;
+  In.Reveal = FS09CombatReveal::Derive(Combat, Attacker->OwnerId, Baseline.DiscardPiles, Closing.DiscardPiles);
+  In.bHasEffectText = In.Reveal.HasEffectText();
+  // Fired effect lines are not in the snapshot (the server keeps appliedEffects in the action reply): 0 until a
+  // public field carries them - effectStepMs is implemented and tested (DE-018 journal, tail).
+  In.EffectLines = 0;
+  In.Damage = Damage;
+  In.HpBefore = HpBefore;
+  In.HpAfter = TargetAfter->Health;
+  In.bLethal = Damage > 0 && !TargetAfter->IsAlive();
+  In.bDamageShown = bCombatDamageShownEarly;
+  if (TargetBefore) {
+    In.TargetX = TargetBefore->X;
+    In.TargetY = TargetBefore->Y;
+  }
+  FString Source;
+  const int32 Contact = BoardActor ? BoardActor->GetFighterContactMs(Combat.AttackerId, Source) : -1;
+  In.ContactMs = Contact >= 0 ? Contact : FS09CombatTiming::DefaultContactMs;
+  In.ContactSource = Contact >= 0 ? Source : FString(TEXT("default"));
+  In.SpeedMul = 1.0f;  // the speed setting (UI-ACC-013) arrives with MS-T-16 / DE-025
+  TickCombatStage();
+  TArray<FString> Lines;
+  TArray<FS09CombatStageEvent> Events;
+  const bool bReduced = S08IconMotion::IsReducedMotion();
+  if (bReduced != CueDispatcher.IsReducedMotion()) CueDispatcher.SetReducedMotion(bReduced, NowMs(), Lines);
+  bCombatOutcomeShown = false;
+  CombatStage.Start(In, NowMs(), CueDispatcher, Lines, Events);
+  WriteCueLines(Lines);
+  RunCombatEvents(Events);
+}
+
+void AS08FlowGameMode::TickCombatStage() {
+  TArray<FString> Lines;
+  TArray<FS09CombatStageEvent> Events;
+  const bool bWasActive = CombatStage.IsActive();
+  CombatStage.Tick(NowMs(), CueDispatcher, Lines, Events);
+  CueDispatcher.Advance(NowMs(), Lines);
+  WriteCueLines(Lines);
+  RunCombatEvents(Events);
+  // The outcome label appears with the slam (F-01): one HUD rebuild at that boundary.
+  if (bWasActive && CombatStage.IsActive() && !bCombatOutcomeShown && CombatStage.ShowsOutcome(NowMs())) {
+    bCombatOutcomeShown = true;
+    RefreshHud();
+  }
+}
+
+bool AS08FlowGameMode::TryCombatSkip() {
+  // The result screen owns L / Enter (GD-036): a staging behind it plays out without a skip.
+  if (!CombatStage.IsSkippable(NowMs()) || Hud.bGameOver) return false;
+  auto* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
+  if (!PC || ArtView.IsValid()) return false;
+  // 01 F-01: a click on the field, Space or Enter zero the remaining holds; HUD buttons keep their own action
+  // (a press on a HUD element never reaches the viewport keys).
+  const TCHAR* Source = nullptr;
+  if (PC->WasInputKeyJustPressed(EKeys::LeftMouseButton) && ViewportHasFocus() && !HudPress->IsPressed()) {
+    Source = TEXT("click");
+  } else if (PC->WasInputKeyJustPressed(EKeys::SpaceBar)) {
+    Source = TEXT("space");
+  } else if (PC->WasInputKeyJustPressed(EKeys::Enter)) {
+    Source = TEXT("enter");
+  }
+  if (!Source) return false;
+  TArray<FString> Lines;
+  TArray<FS09CombatStageEvent> Events;
+  const bool bSkipped = CombatStage.Skip(NowMs(), Source, CueDispatcher, Lines, Events);
+  WriteCueLines(Lines);
+  RunCombatEvents(Events);
+  if (bSkipped) {
+    CombatSkipFrame = GFrameCounter;
+    FS08Trace::Write(FString::Printf(TEXT("INPUT combat-skip src=%s seq=%d"), Source, CombatStage.GetSeq()));
+    if (CombatStage.ShowsOutcome(NowMs()) && !bCombatOutcomeShown) {
+      bCombatOutcomeShown = true;
+      RefreshHud();
+    }
+  }
+  return bSkipped;
+}
+
+void AS08FlowGameMode::RunCombatEvents(const TArray<FS09CombatStageEvent>& Events) {
+  const FS09CombatStageInput& In = CombatStage.GetInput();
+  for (const FS09CombatStageEvent& Event : Events) {
+    switch (Event.Type) {
+      case ES09CombatEvent::Lunge:
+        // CUE-011 intro: the attacker's LungeAttack after the slam + the pause "score" (01 F-03).
+        if (BoardActor) BoardActor->NotifyFighterAnimEvent(In.AttackerId, S08HeroesV2::EEvent::Attack, In.Seq);
+        break;
+      case ES09CombatEvent::HitReact:
+        PresentHit(In.TargetId, In.Seq, CombatStage.GetHitTintMs());
+        break;
+      case ES09CombatEvent::Minus:
+        PresentDamageNumber(In.TargetId, In.Damage, In.Seq, CombatStage.MinusLifeMs() / 1000.0f);
+        break;
+      case ES09CombatEvent::Hp:
+      case ES09CombatEvent::Fall:
+        RefreshShownFighters(true);
+        break;
+      case ES09CombatEvent::End:
+        RefreshShownFighters(true);
+        bCombatOutcomeShown = false;
+        RefreshHud();
+        break;
+    }
+  }
+}
+
+const TArray<FS08BoardFighter>& AS08FlowGameMode::HudFighters() const {
+  return CombatStage.GetHold().IsSet() ? ShownFighters : Fighters;
+}
+
+const FS08BoardFighter* AS08FlowGameMode::FindShownFighter(const FString& FighterId) const {
+  if (FighterId.IsEmpty()) return nullptr;
+  return HudFighters().FindByPredicate([&FighterId](const FS08BoardFighter& F) { return F.Id == FighterId; });
+}
+
+void AS08FlowGameMode::RefreshShownFighters(bool bSyncBoard) {
+  const FS09CombatHold& Hold = CombatStage.GetHold();
+  ShownFighters = Fighters;
+  Hold.Apply(ShownFighters, /*bBoardView=*/false);
+  if (!bSyncBoard || !BoardActor || Fighters.Num() == 0) return;
+  TArray<FS08BoardFighter> BoardView = Fighters;
+  Hold.Apply(BoardView, /*bBoardView=*/true);
+  BoardActor->SyncFighters(BoardModel, BoardView, Flow.IsValid() ? Flow->GetUserId() : FString());
+  SyncCombatFocus();
+}
+
+void AS08FlowGameMode::BuildCombatStageHud() {
+  if (!CombatEdgeLeft.IsValid() || !CombatEdgeRight.IsValid() || !CombatOutcomeBox.IsValid()) return;
+  CombatEdgeLeft->ClearChildren();
+  CombatEdgeRight->ClearChildren();
+  CombatOutcomeBox->ClearChildren();
+  const int64 Now = NowMs();
+  if (!Hud.bValid || Hud.bGameOver || !CombatStage.ShowsCards(Now)) return;
+  const FS09CombatStageInput& In = CombatStage.GetInput();
+  const FS09CombatReveal& R = In.Reveal;
+  // One card face: role, name, value, banner and the effect text (public after the reveal, 02 §4.5 / SD-27).
+  auto CardPanel = [](const FString& Header, const FS09CardView* Card, const FString& ValueLine,
+                      const FLinearColor& Accent) -> TSharedRef<SWidget> {
+    TSharedRef<SVerticalBox> Box = SNew(SVerticalBox);
+    Box->AddSlot().AutoHeight().Padding(0, 0, 0, 4)
+        [SNew(STextBlock).Text(FText::FromString(Header))
+             .Font(FCoreStyle::GetDefaultFontStyle("Bold", 13))
+             .ColorAndOpacity(FSlateColor(Accent))];
+    if (Card) {
+      Box->AddSlot().AutoHeight()
+          [SNew(STextBlock).Text(FText::FromString(Card->Name))
+               .Font(FCoreStyle::GetDefaultFontStyle("Bold", 18))
+               .WrapTextAt(236.0f)];
+      Box->AddSlot().AutoHeight().Padding(0, 2)
+          [SNew(STextBlock).Text(FText::FromString(ValueLine))
+               .Font(FCoreStyle::GetDefaultFontStyle("Bold", 16))
+               .ColorAndOpacity(FSlateColor(Accent))];
+      if (!Card->BannerName.IsEmpty()) {
+        Box->AddSlot().AutoHeight()
+            [SNew(STextBlock).Text(FText::FromString(Card->BannerName))
+                 .Font(FCoreStyle::GetDefaultFontStyle("Regular", 12))
+                 .ColorAndOpacity(FSlateColor(FLinearColor(0.75f, 0.75f, 0.8f, 1.0f)))];
+      }
+      if (!Card->Text.IsEmpty()) {
+        Box->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
+            [SNew(STextBlock).Text(FText::FromString(Card->Text))
+                 .Font(FCoreStyle::GetDefaultFontStyle("Regular", 12))
+                 .WrapTextAt(236.0f)];
+      }
+    } else {
+      Box->AddSlot().AutoHeight()
+          [SNew(STextBlock).Text(FText::FromString(TEXT("face-down card")))
+               .Font(FCoreStyle::GetDefaultFontStyle("Italic", 14))];
+    }
+    return SNew(SBorder)
+        .BorderImage(FCoreStyle::Get().GetBrush("WhiteBrush"))
+        .BorderBackgroundColor(FSlateColor(FLinearColor(0.02f, 0.025f, 0.05f, 0.92f)))
+        .Padding(12.0f)
+        [SNew(SBox).WidthOverride(260.0f)[Box]];
+  };
+  const FLinearColor AttackAccent(1.0f, 0.62f, 0.2f, 1.0f);
+  const FLinearColor DefenseAccent(0.45f, 0.75f, 1.0f, 1.0f);
+  const FLinearColor CrossRed(0.92f, 0.12f, 0.1f, 1.0f);
+  const int32 Boost = R.AttackValue >= 0 && R.bAttackKnown ? R.AttackValue - R.Attack.AttackValue : 0;
+  const FString AttackValue = R.bAttackKnown
+                                  ? FString::Printf(TEXT("ATTACK %d%s"), R.Attack.AttackValue,
+                                                    Boost > 0 ? *FString::Printf(TEXT(" + boost %d"), Boost) : TEXT(""))
+                                  : FString();
+  CombatEdgeLeft->AddSlot().AutoHeight()
+      [CardPanel(FString::Printf(TEXT("ATTACK - %s"), *In.AttackerLabel), R.bAttackKnown ? &R.Attack : nullptr,
+                 AttackValue, AttackAccent)];
+  if (R.bNoDefense) {
+    // SD-04: the red cross stamp of "no defense" comes with the reveal.
+    CombatEdgeRight->AddSlot().AutoHeight()
+        [SNew(SBorder)
+             .BorderImage(FCoreStyle::Get().GetBrush("WhiteBrush"))
+             .BorderBackgroundColor(FSlateColor(FLinearColor(0.02f, 0.025f, 0.05f, 0.92f)))
+             .Padding(12.0f)
+             [SNew(SBox).WidthOverride(260.0f)
+                  [SNew(SVerticalBox) +
+                   SVerticalBox::Slot().AutoHeight()
+                       [SNew(STextBlock).Text(FText::FromString(FString::Printf(TEXT("DEFENSE - %s"), *In.TargetLabel)))
+                            .Font(FCoreStyle::GetDefaultFontStyle("Bold", 13))
+                            .ColorAndOpacity(FSlateColor(DefenseAccent))] +
+                   SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Center)
+                       [SNew(STextBlock).Text(FText::FromString(TEXT("X")))
+                            .Font(FCoreStyle::GetDefaultFontStyle("Bold", 54))
+                            .ColorAndOpacity(FSlateColor(CrossRed))] +
+                   SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Center)
+                       [SNew(STextBlock).Text(FText::FromString(TEXT("NO DEFENSE")))
+                            .Font(FCoreStyle::GetDefaultFontStyle("Bold", 16))
+                            .ColorAndOpacity(FSlateColor(CrossRed))]]]];
+  } else {
+    const bool bFace = R.bDefenseKnown;  // both cards turn within the first 320 ms of the flip
+    CombatEdgeRight->AddSlot().AutoHeight()
+        [CardPanel(FString::Printf(TEXT("DEFENSE - %s"), *In.TargetLabel), bFace ? &R.Defense : nullptr,
+                   bFace ? FString::Printf(TEXT("DEFENSE %d"), R.Defense.DefenseValue) : FString(), DefenseAccent)];
+  }
+  if (!CombatStage.ShowsOutcome(Now)) return;
+  // F-01: the slam "A vs D" and the outcome label from the slam to the end of CUE-011 (~1.5 s).
+  const FString Score = FString::Printf(TEXT("%s  vs  %s"),
+                                        R.AttackValue >= 0 ? *FString::Printf(TEXT("A %d"), R.AttackValue) : TEXT("A ?"),
+                                        R.DefenseValue >= 0 ? *FString::Printf(TEXT("D %d"), R.DefenseValue) : TEXT("D ?"));
+  const FString Outcome = CombatStage.AttackerWins()
+                              ? FString::Printf(TEXT("%s WINS - %s -%d"), *In.AttackerLabel, *In.TargetLabel, In.Damage)
+                              : FString(TEXT("DEFENSE HOLDS"));
+  CombatOutcomeBox->AddSlot().AutoHeight()
+      [SNew(SBorder)
+           .BorderImage(FCoreStyle::Get().GetBrush("WhiteBrush"))
+           .BorderBackgroundColor(FSlateColor(FLinearColor(0.02f, 0.025f, 0.05f, 0.9f)))
+           .Padding(FMargin(18.0f, 8.0f))
+           [SNew(SVerticalBox) +
+            SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Center)
+                [SNew(STextBlock).Text(FText::FromString(Score))
+                     .Font(FCoreStyle::GetDefaultFontStyle("Bold", 22))] +
+            SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Center)
+                [SNew(STextBlock).Text(FText::FromString(Outcome))
+                     .Font(FCoreStyle::GetDefaultFontStyle("Bold", 18))
+                     .ColorAndOpacity(FSlateColor(CombatStage.AttackerWins() ? AttackAccent : DefenseAccent))]]];
 }
 
 // ---- TASK-022 input ------------------------------------------------------
@@ -4099,8 +4397,13 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
     const FS09HudPressOutcome Stray = HudPress->Release(NAME_None, GFrameCounter);
     if (Stray.Result == ES09HudPressResult::Refused) HandleHudPressOutcome(Stray, nullptr, nullptr);
   }
-  HandleClick();
-  HandleHudKeys();
+  // DE-018: the combat staging runs on the game clock; a click / Space / Enter during its holds is the skip and
+  // is not handled a second time below (a HUD press keeps its own action).
+  TickCombatStage();
+  if (!TryCombatSkip()) {
+    HandleClick();
+    HandleHudKeys();
+  }
   // Sync the in-flight gate every tick, not only on applied snapshots: a
   // mutation-reply (e.g. a rejected endTurn) can clear Flow's flag AFTER the
   // last apply, and the stale CommandUi copy would block the next command
@@ -4512,6 +4815,11 @@ void AS08FlowGameMode::ClearGameplayHud() {
   bHasPrevApplied = false;
   CombatStartTargetId.Reset();
   CombatStartTargetHealth = -1;
+  CombatStage = FS09CombatStage();
+  CueDispatcher = FS08CueDispatcher();
+  ShownFighters.Reset();
+  bCombatDamageShownEarly = false;
+  bCombatOutcomeShown = false;
   bS09ShotDamage = false;
   DamageShotAtElapsed = -1.0f;
   PreviousOwnHandIds.Reset();
@@ -4595,6 +4903,27 @@ void AS08FlowGameMode::BuildHudWidgets() {
   ArtHud.CommandPanel = CommandPanelBorder;
   ArtHud.SidePanel = SidePanelBorder;
   ArtHud.HandPanel = HandPanelBorder;
+
+  // DE-018 (SD-48 p. 4, accepted by the review): the big combat cards live in the HUD layer at the left and right
+  // edge of the field and the outcome label at the top centre - never over the fighting pair (the camera is fixed).
+  Canvas->AddSlot()
+      .Anchors(FAnchors(0.0f, 0.5f))
+      .Alignment(FVector2D(0.0f, 0.5f))
+      .Offset(FVector2D(24.0f, 0.0f))
+      .AutoSize(true)
+      [SAssignNew(CombatEdgeLeft, SVerticalBox)];
+  Canvas->AddSlot()
+      .Anchors(FAnchors(1.0f, 0.5f))
+      .Alignment(FVector2D(1.0f, 0.5f))
+      .Offset(FVector2D(-24.0f, 0.0f))
+      .AutoSize(true)
+      [SAssignNew(CombatEdgeRight, SVerticalBox)];
+  Canvas->AddSlot()
+      .Anchors(FAnchors(0.5f, 0.0f))
+      .Alignment(FVector2D(0.5f, 0.0f))
+      .Offset(FVector2D(0.0f, 24.0f))
+      .AutoSize(true)
+      [SAssignNew(CombatOutcomeBox, SVerticalBox)];
 
   Canvas->AddSlot()
       .Anchors(FAnchors(0.5f, 1.0f))
@@ -4771,6 +5100,7 @@ void AS08FlowGameMode::RefreshHud() {
   HandBox->ClearChildren();
   PanelsBox->ClearChildren();
   CommandBox->ClearChildren();
+  BuildCombatStageHud();
 
   // Hidden until the match stream is live (login screens stay clean). An
   // authenticated user in the Lobby gets the room ENTRY panel instead - the
@@ -5287,8 +5617,15 @@ void AS08FlowGameMode::RefreshHud() {
                                           : TEXT("EXPIRED - the server resolves")),
                FLinearColor(1.0f, 1.0f, 1.0f, 1.0f));
     // Own committed view only: never the attacker's card/value pre-reveal.
-    AddLine(FString::Printf(TEXT("defense card: %s"),
-                            CommandUi.DefenseCardId.IsEmpty() ? TEXT("-") : TEXT("picked")));
+    // DE-018 (SD-04): the slot in its three states - shield (nothing chosen) / card back (chosen).
+    const ES09DefenseSlot Slot =
+        S09DefenseSlotState(Hud.Phase, true, !CommandUi.DefenseCardId.IsEmpty(), false);
+    AddLine(FString::Printf(TEXT("defense slot: %s"), Slot == ES09DefenseSlot::CardBack
+                                                          ? TEXT("[card back] defense card chosen")
+                                                          : TEXT("[shield] no card chosen")));
+    if (Flow.IsValid() && !CommandUi.HasLegalDefenseCard(Flow->GetAppliedSnapshot(), Fighters)) {
+      AddBigLine(FS09Reason::Make(TEXT("why.defense.none")).Text(), FLinearColor(1.0f, 0.55f, 0.35f, 1.0f));
+    }
     AddLine(TEXT("1-9 picks a defense card; Enter defends; N = NO DEFENSE"));
     CommandBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
         [SNew(SHorizontalBox) +
@@ -5348,11 +5685,11 @@ void AS08FlowGameMode::RefreshHud() {
               ? FString::Printf(TEXT("defense: %s  D%d"),
                                 *CommittedCardLabel(Combat.DefenderCardId),
                                 Combat.DefenseValue)
-              : FString::Printf(
-                    TEXT("defense: NO CARD%s"),
-                    Hud.Phase == TEXT("COMBAT_RESOLVE")
-                        ? TEXT(" (defender committed no defense)")
-                        : TEXT(" (defender has not responded yet)"));
+              // DE-018 (SD-04): COMBAT_RESOLVE exists only after playDefense - for the attacker the defense card
+              // is committed face down (the "no defense" resolve closes the combat straight from COMBAT).
+              : Hud.Phase == TEXT("COMBAT_RESOLVE")
+                    ? FString(TEXT("defense: [card back] committed face down"))
+                    : FString(TEXT("defense: [shield] the defender has not responded yet"));
       if (Combat.bRevealed) {
         AddMarker(GS09RevealText); // pixel-exact #7CFC00 block: the reveal gate
         AddBigLine(TEXT("REVEALED - both committed cards:"), GS09RevealText);
@@ -5425,6 +5762,12 @@ void AS08FlowGameMode::RefreshHud() {
              FMargin(14, 8), FLinearColor::White,
              SNew(STextBlock).Text(FText::FromString(TEXT("RESOLVE COMBAT (R)")))
                   .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14)))];
+  } else if (CommandUi.Mode == ES09CommandMode::PendingChoice && CombatStage.IsActive()) {
+    // DE-018 (07 S11c, CUE-014): an AFTER COMBAT choice opens when the combat staging ends (<= ~4 s, skippable).
+    AddMarker(GS09PendingMarker);
+    AddHeader(TEXT("AFTER COMBAT"), FLinearColor(0.75f, 0.8f, 1.0f, 1.0f));
+    AddLine(FString::Printf(TEXT("next: %s - opens when the combat ends (click / Space / Enter skips)"),
+                            *CommandUi.PendingChoice.Type));
   } else if (CommandUi.Mode == ES09CommandMode::PendingChoice) {
     // GD-035: the server waits on THIS viewer's queue head. A MANDATORY
     // choice renders louder (red header) than any normal HUD/inspector line.
@@ -6396,7 +6739,7 @@ void AS08FlowGameMode::UpdateCombatIcon(bool bActive) {
 void AS08FlowGameMode::UpdatePlate(bool bActive) {
   if (ArtHud.PlateViews.Num() == 0) return;
   const FString Id = bActive ? PlateFighterIdNow() : FString();
-  const FS08BoardFighter* Fighter = FindFighter(Id);
+  const FS08BoardFighter* Fighter = FindShownFighter(Id);  // DE-018: the staged target's HP waits for contact + 80
   const float Ppu = HudPixelsPerUnit();
   FS08ScreenRect Anchor;
   if (!Fighter || !Fighter->IsAlive() || Ppu <= 0.0f || !FigureScreenRect(Id, Anchor)) {
@@ -6576,7 +6919,7 @@ void AS08FlowGameMode::UpdateBoardLabels(bool bActive, const FString& IconTarget
 
   // ---- tag content (pushed on change only, HUD-RULES P2)
   TArray<const FS08BoardFighter*> Alive;
-  for (const FS08BoardFighter& F : Fighters) {
+  for (const FS08BoardFighter& F : HudFighters()) {  // DE-018: the staged target's HP waits for contact + 80
     if (F.IsAlive() && Figures.Contains(F.Id)) Alive.Add(&F);
   }
   FString Signature = FString::Printf(TEXT("%d|%d|%.0fx%.0f|%s|%s|%d|%d|"), bTagsActive ? 1 : 0, bActive ? 1 : 0,

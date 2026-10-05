@@ -8,9 +8,10 @@
 Команды (из корня репозитория):
   python tools/s08/cue_contract/cue_contract.py validate-table [--table P]   схема + семантика + сверка с 07; missing-report
   python tools/s08/cue_contract/cue_contract.py run-fixtures [--dir D]       эталонная модель против expect_trace и гейт
-  python tools/s08/cue_contract/cue_contract.py check-trace <log> [--table P] [--min-ms-cue N]
-                                                                           гейт трассы `CUE fx … result=` и `MS-CUE move …`
-                                                                           (move-selection 04 §9, MS-AT-28) реального лога
+  python tools/s08/cue_contract/cue_contract.py check-trace <log> [--table P] [--min-ms-cue N] [--min-combat N]
+                                                                           гейт трассы `CUE fx … result=`, `MS-CUE move …`
+                                                                           (move-selection 04 §9, MS-AT-28) и постановки боя
+                                                                           `CUE combat …` (DE-018, C1-C6) реального лога
 
 Эталонная модель — исполняемая форма спецификации для фикстур (C++-тесты GD-044 портируют те же
 фикстуры), не код движка. Только stdlib + jsonschema (есть в системном Python).
@@ -249,11 +250,13 @@ class ReferenceDispatcher:
         return short_name(path)
 
     def _duration(self, row, event):
-        if row.get("duration_per_step_ms"):
+        if event.get("duration_ms") is not None:
+            dur = int(event["duration_ms"])  # DE-018: показ с длиной постановки (скорость анимации)
+        elif row.get("duration_per_step_ms"):
             # CUE-007: расписание 04 §6.3 — по всем перемещениям seq (seq_moves + order) или по одному этому
             moves = event.get("seq_moves") or [{"kind": event.get("move_kind", "move"), "steps": int(event.get("steps", 1))}]
             dur = int(round(move_schedule(moves, move_params(row))[int(event.get("order", 0))]["ms"]))
-        else:
+        elif event.get("duration_ms") is None:
             dur = row["duration_ms"] or 0
         rm = row["reduced_motion"]
         reduced = self.reduced and rm["mode"] != "keep"
@@ -262,8 +265,12 @@ class ReferenceDispatcher:
         return dur, reduced
 
     def _done(self, inst, t, cut):
-        self.lines.append("CUE fx done id=%s subject=%s seq=%s t=%d ms=%d cut=%s"
-                          % (inst["id"], inst["subject"], inst["seq"], t, t - inst["start"], cut))
+        line = ("CUE fx done id=%s subject=%s seq=%s t=%d ms=%d cut=%s"
+                % (inst["id"], inst["subject"], inst["seq"], t, t - inst["start"], cut))
+        if inst.get("hold"):
+            # DE-018 (§4 D12): пропускаемое удержание внутри показа; G5 меряет блокировку как ms − hold
+            line += " hold=%d" % min(inst["hold"], t - inst["start"])
+        self.lines.append(line)
 
     def _flush(self, t):
         due = sorted((i for i in self.active if i["end"] <= t), key=lambda i: (i["end"], i["order"]))
@@ -287,6 +294,11 @@ class ReferenceDispatcher:
         self._flush(t)
         kind = event["kind"]
         if kind == "advance":
+            return
+        if kind == "combat":
+            # DE-018: строка постановки боя (CUE-DISPATCHER.md §5) — порядок полей как в событии
+            extra = "".join(" %s=%s" % (k, v) for k, v in (event.get("fields") or {}).items())
+            self.lines.append("CUE combat seq=%d stage=%s t=%d%s" % (int(event["seq"]), event["stage"], t, extra))
             return
         if kind == "settings":
             self.reduced = bool(event["reduced_motion"])
@@ -351,7 +363,7 @@ class ReferenceDispatcher:
                         self.lines.append("CUE sfx stop id=%s subject=%s seq=%s t=%d reason=concurrency"
                                           % (cid, old["subject"], old["seq"], t))
                 if sfx != "limited":
-                    act.append({"subject": subject, "seq": seq_tok, "end": t + dur})
+                    act.append({"subject": subject, "seq": seq_tok, "end": t + dur + int(event.get("hold_ms", 0))})
                     self.sfx_last[cid] = t
         mat = (row.get("material") or {}).get("cpd_param", "none")
         v = row.get("vfx")
@@ -359,8 +371,10 @@ class ReferenceDispatcher:
         result = "fallback" if "missing" in (vfx, sfx, clip) else "spawned"
         self.lines.append(head + " vfx=%s sfx=%s clip=%s mat=%s socket=%s reduced=%d result=%s"
                           % (vfx, sfx, clip, mat, socket, int(reduced), result))
-        inst = {"id": cid, "subject": subject, "seq": seq_tok, "start": t, "end": t + dur, "order": len(self.lines)}
-        if dur == 0:
+        hold = max(0, int(event.get("hold_ms", 0)))
+        inst = {"id": cid, "subject": subject, "seq": seq_tok, "start": t, "end": t + dur + hold, "order": len(self.lines),
+                "hold": hold}
+        if dur + hold == 0:
             self._done(inst, t, "0")
         else:
             self.active.append(inst)
@@ -535,15 +549,21 @@ def check_trace(lines, table):
             ms = int(f.get("ms", "-1"))
             if ms != t - inst["t"] or f.get("cut") not in CUTS:
                 errors.append(("G4", "строка %d: ms/cut не согласованы %s" % (n, key)))
+            # DE-018 (§4 D12): удержание постановки боя пропускается кликом и ввод не блокирует
+            hold = int(f["hold"]) if f.get("hold", "").isdigit() else 0
+            if hold > ms:
+                errors.append(("G4", "строка %d: hold %d > ms %d" % (n, hold, ms)))
+            anim = ms - hold
             row = rows[cid]
             rm = row["reduced_motion"]
-            if inst["reduced"] and rm["mode"] == "shorten" and ms > rm["max_ms"]:
-                errors.append(("G4", "строка %d: сокращённая анимация %d мс > %d" % (n, ms, rm["max_ms"])))
-            if inst["reduced"] and rm["mode"] == "snap" and ms != 0:
-                errors.append(("G4", "строка %d: snap длится %d мс" % (n, ms)))
-            if row["blocks_input"] and ms > MAX_BLOCKING_MS and row["on_new_event"] != "none":
-                errors.append(("G5", "строка %d: блокирующий CUE %s длился %d мс" % (n, cid, ms)))
+            if inst["reduced"] and rm["mode"] == "shorten" and anim > rm["max_ms"]:
+                errors.append(("G4", "строка %d: сокращённая анимация %d мс > %d" % (n, anim, rm["max_ms"])))
+            if inst["reduced"] and rm["mode"] == "snap" and anim != 0:
+                errors.append(("G4", "строка %d: snap длится %d мс" % (n, anim)))
+            if row["blocks_input"] and anim > MAX_BLOCKING_MS and row["on_new_event"] != "none":
+                errors.append(("G5", "строка %d: блокирующий CUE %s длился %d мс" % (n, cid, anim)))
             inst["end"] = t
+            inst["hold"] = hold
             continue
         # CUE fx
         res = f.get("result")
@@ -596,6 +616,187 @@ def check_trace(lines, table):
     ms_errors, ms_summary = check_ms_cue(lines, table)
     errors.extend(ms_errors)
     summary.update(ms_summary)
+    c_errors, c_summary = check_combat(lines, starts)
+    errors.extend(c_errors)
+    summary.update(c_summary)
+    return errors, summary
+
+
+# ----------------------------------------------------------------------------- постановка боя (DE-018)
+COMBAT_RE = re.compile(r"(CUE combat\b.*)$")
+COMBAT_STAGES = ("start", "read", "effect", "slam", "pause", "lunge", "contact", "hit", "minus", "hp", "fall", "end",
+                 "skip")
+COMBAT_RANK = {"start": 0, "read": 1, "effect": 2, "slam": 3, "pause": 4, "lunge": 5, "contact": 6, "hit": 7,
+               "minus": 8, "hp": 9, "fall": 10, "end": 11}
+COMBAT_START_NEED = ("attacker", "target", "text", "lines", "damage", "lethal", "shown", "speed", "flip", "contact",
+                     "src", "a", "d", "outcome")
+COMBAT_MS = {  # 01 F-01 / F-03 / F-04 / F-09 при скорости ×1 (CUE-DISPATCHER.md §3.1)
+    "declare": 600, "read": 1000, "effect_step": 600, "effect_highlight": 400, "pause": 300,
+    "minus": 60, "hp": 80, "fall": 450, "tint": 450, "tint_lethal": 550,
+}
+
+
+def parse_combat(raw):
+    m = COMBAT_RE.search(raw.rstrip("\r\n"))
+    if not m:
+        return None
+    fields = {}
+    for w in m.group(1).split()[2:]:
+        if "=" in w:
+            k, v = w.split("=", 1)
+            fields[k] = v
+    return fields
+
+
+def check_combat(lines, cue_starts=()):
+    """Гейт постановки боя `CUE combat …` (DE-018, CUE-DISPATCHER.md §6): C1 формат; C2 одна постановка на seq;
+    C3 порядок этапов и время; C4 удержания (чтение только при тексте эффекта, 600 на строку, пауза 300, слэм после
+    удержаний, выпад после паузы, контакт = выпад + кадр контакта); C5 от кадра контакта: HitReact и заливка в кадре
+    контакта, «−N» +60, HP +80, падение +450, CUE-011 из кадра контакта, без урона — ни удара, ни «−N»; C6 итог
+    = CUE-008 + (конец − раскрытие). Прерванная постановка (cut≠0) проверяется только по C1–C3."""
+    errors = []
+    by_seq = {}
+    order = []
+    for n, raw in enumerate(lines, 1):
+        f = parse_combat(raw)
+        if f is None:
+            continue
+        seq, stage = f.get("seq"), f.get("stage")
+        t = _int_or_none(f.get("t"))
+        if seq is None or stage not in COMBAT_STAGES or t is None:
+            errors.append(("C1", "строка %d: CUE combat без seq/stage/t или неизвестный этап %s" % (n, stage)))
+            continue
+        f["_n"], f["_t"] = n, t
+        if seq not in by_seq:
+            by_seq[seq] = []
+            order.append(seq)
+        by_seq[seq].append(f)
+    fx = {}
+    done = {}
+    for inst in cue_starts:
+        fx.setdefault(inst["key"], inst)
+    for raw in lines:
+        p = parse_line(raw)
+        if p and p[0] == "CUE fx done":
+            f = p[1]
+            done[(f.get("id"), f.get("subject"), f.get("seq"))] = f
+    summary = {"combat_sets": 0, "combat_cut": 0, "combat_skipped": 0, "combat_totals": []}
+    for seq in order:
+        rows = by_seq[seq]
+        starts = [r for r in rows if r["stage"] == "start"]
+        ends = [r for r in rows if r["stage"] == "end"]
+        if len(starts) != 1 or len(ends) > 1:
+            errors.append(("C2", "seq %s: постановок %d, концов %d (повтор seq не даёт второй показ)" % (seq, len(starts), len(ends))))
+            continue
+        st = starts[0]
+        missing = [k for k in COMBAT_START_NEED if k not in st]
+        if missing:
+            errors.append(("C1", "seq %s: в start нет полей %s" % (seq, missing)))
+            continue
+        if rows[0] is not st:
+            errors.append(("C3", "seq %s: этап до start" % seq))
+        summary["combat_sets"] += 1
+        last_t, last_rank = None, -1
+        for r in rows:
+            if last_t is not None and r["_t"] < last_t:
+                errors.append(("C3", "строка %d: время этапа %d < %d" % (r["_n"], r["_t"], last_t)))
+            last_t = r["_t"]
+            if r["stage"] == "skip":
+                continue
+            rank = COMBAT_RANK[r["stage"]]
+            if rank < last_rank:
+                errors.append(("C3", "строка %d: этап %s после этапа ранга %d" % (r["_n"], r["stage"], last_rank)))
+            last_rank = max(last_rank, rank)
+        if not ends:
+            errors.append(("C2", "seq %s: постановка без end" % seq))
+            continue
+        end = ends[0]
+        if end.get("skipped") == "1":
+            summary["combat_skipped"] += 1
+        if end.get("cut", "0") != "0":
+            summary["combat_cut"] += 1
+            continue
+        stages = {}
+        for r in rows:
+            stages.setdefault(r["stage"], []).append(r)
+        one = lambda name: (stages.get(name) or [None])[0]
+        speed = float(st["speed"])
+        scale = (lambda ms: 0 if speed <= 0 else int(round(ms * speed)))
+        text, n_lines = st["text"] == "1", int(st["lines"])
+        damage, lethal, shown = int(st["damage"]), st["lethal"] == "1", st["shown"] == "1"
+        present = damage > 0 and not shown
+        # C4: удержания и стыки
+        read = one("read")
+        if text != (read is not None):
+            errors.append(("C4", "seq %s: удержание чтения %s при text=%s" % (seq, "есть" if read else "нет", st["text"])))
+        read_ms = int(read["ms"]) if read else 0
+        if read and not (read_ms == COMBAT_MS["read"] or (read.get("skipped") == "1" and 0 <= read_ms <= COMBAT_MS["read"])):
+            errors.append(("C4", "seq %s: чтение %d мс ≠ %d" % (seq, read_ms, COMBAT_MS["read"])))
+        effects = stages.get("effect", [])
+        if len(effects) != n_lines:
+            errors.append(("C4", "seq %s: строк эффекта %d ≠ lines=%d" % (seq, len(effects), n_lines)))
+        step = scale(COMBAT_MS["effect_highlight"]) + COMBAT_MS["effect_step"] - COMBAT_MS["effect_highlight"]
+        eff_ms = 0
+        for e in effects:
+            ms = int(e["ms"])
+            eff_ms += ms
+            if not (ms == step or (e.get("skipped") == "1" and 0 <= ms <= step)):
+                errors.append(("C4", "строка %d: строка эффекта %d мс ≠ %d" % (e["_n"], ms, step)))
+        slam, pause, lunge, contact = one("slam"), one("pause"), one("lunge"), one("contact")
+        if not (slam and pause and lunge and contact):
+            errors.append(("C4", "seq %s: нет slam/pause/lunge/contact" % seq))
+            continue
+        if slam["_t"] != st["_t"] + int(st["flip"]) + read_ms + eff_ms:
+            errors.append(("C4", "seq %s: слэм t=%d ≠ раскрытие + переворот + удержания %d" % (
+                seq, slam["_t"], st["_t"] + int(st["flip"]) + read_ms + eff_ms)))
+        d10 = done.get(("CUE-010", "scene", seq))
+        if d10 is not None:
+            hold = int(d10.get("hold", "0") or 0)
+            if hold != read_ms + eff_ms:
+                errors.append(("C4", "seq %s: hold CUE-010 %d ≠ удержания %d" % (seq, hold, read_ms + eff_ms)))
+            if pause["_t"] - int(pause["ms"]) != int(d10["t"]):
+                errors.append(("C4", "seq %s: пауза «счёт» не от конца слэма (CUE-010 done t=%s)" % (seq, d10["t"])))
+        pause_ms = int(pause["ms"])
+        if not (pause_ms == COMBAT_MS["pause"] or (pause.get("skipped") == "1" and 0 <= pause_ms <= COMBAT_MS["pause"])):
+            errors.append(("C4", "seq %s: пауза «счёт» %d мс ≠ %d" % (seq, pause_ms, COMBAT_MS["pause"])))
+        if lunge["_t"] != pause["_t"]:
+            errors.append(("C4", "seq %s: выпад не в конце паузы" % seq))
+        if contact["_t"] != lunge["_t"] + int(st["contact"]) or contact.get("offset") != st["contact"]:
+            errors.append(("C4", "seq %s: контакт t=%d ≠ выпад + %s" % (seq, contact["_t"], st["contact"])))
+        # C5: от кадра контакта
+        ct = contact["_t"]
+        hit, minus, hp, fall = one("hit"), one("minus"), one("hp"), one("fall")
+        if (st["outcome"] == "win") != (damage > 0):
+            errors.append(("C5", "seq %s: outcome=%s при damage=%d" % (seq, st["outcome"], damage)))
+        if present:
+            tint = COMBAT_MS["tint_lethal"] if lethal else COMBAT_MS["tint"]
+            if not hit or hit["_t"] != ct or int(hit.get("tint", -1)) != tint:
+                errors.append(("C5", "seq %s: HitReact и заливка %d мс не в кадре контакта" % (seq, tint)))
+            if not minus or minus["_t"] - ct != COMBAT_MS["minus"]:
+                errors.append(("C5", "seq %s: «−N» не через %d мс после контакта" % (seq, COMBAT_MS["minus"])))
+            if not hp or hp["_t"] - ct != COMBAT_MS["hp"]:
+                errors.append(("C5", "seq %s: HP не через %d мс после контакта" % (seq, COMBAT_MS["hp"])))
+            if lethal and (not fall or fall["_t"] - ct != COMBAT_MS["fall"]):
+                errors.append(("C5", "seq %s: падение не через %d мс после контакта" % (seq, COMBAT_MS["fall"])))
+            if not lethal and fall:
+                errors.append(("C5", "seq %s: падение при нелетальном ударе" % seq))
+            d11 = fx.get(("CUE-011", st["target"], seq))
+            if d11 is None or d11["t"] != ct:
+                errors.append(("C5", "seq %s: CUE-011 не из кадра контакта" % seq))
+            elif d11.get("end") is not None and d11["end"] > end["_t"]:
+                errors.append(("C5", "seq %s: CUE-011 кончился после конца постановки" % seq))
+        elif hit or minus or hp or fall:
+            errors.append(("C5", "seq %s: удар/«−N»/HP без показанного урона (damage=%d shown=%s)" % (seq, damage, st["shown"])))
+        tail = int(contact.get("window", "0"))
+        if present:
+            tail = max(tail, COMBAT_MS["hp"], COMBAT_MS["fall"] if lethal else 0)
+        if end["_t"] - ct != tail:
+            errors.append(("C5", "seq %s: конец через %d мс после контакта ≠ %d" % (seq, end["_t"] - ct, tail)))
+        # C6: итог шкалы F-01
+        total = scale(COMBAT_MS["declare"]) + end["_t"] - st["_t"]
+        if int(end.get("total", "-1")) != total:
+            errors.append(("C6", "seq %s: total=%s ≠ %d" % (seq, end.get("total"), total)))
+        summary["combat_totals"].append(total)
     return errors, summary
 
 
@@ -649,6 +850,8 @@ def main(argv=None):
     c.add_argument("--table", default=str(TABLE))
     c.add_argument("--min-ms-cue", type=int, default=0,
                    help="M5: не меньше N строк `MS-CUE move` (живой прогон MS-AT-28/32)")
+    c.add_argument("--min-combat", type=int, default=0,
+                   help="C7: не меньше N завершённых постановок боя `CUE combat` (живой бой DE-018/DE-031)")
     a = ap.parse_args(argv)
     table = load_json(a.table)
     if a.cmd == "validate-table":
@@ -673,6 +876,8 @@ def main(argv=None):
     errors, summary = check_trace(lines, table)
     if summary["ms_cue"] < a.min_ms_cue:
         errors.append(("M5", "строк MS-CUE %d < %d" % (summary["ms_cue"], a.min_ms_cue)))
+    if summary["combat_sets"] < a.min_combat:
+        errors.append(("C7", "постановок боя %d < %d" % (summary["combat_sets"], a.min_combat)))
     for code, text in errors:
         print("GATE", code, text)
     print("CUE_TRACE", "PASS" if not errors else "FAIL", json.dumps(summary))

@@ -1,0 +1,190 @@
+{
+ "schema": "unmatched.cue-fixture/1",
+ "id": "combat-staging-defense-holds",
+ "kind": "scenario",
+ "description": "Защита держит (урон 0, F-03): выпад играется, HitReact, заливки, «−N» и CUE-011 нет; метка «защита держит» со слэма до конца окна 900 мс. Пропуск кликом во время чтения: удержание 380 мс вместо 1000, пауза «счёт» 0; CUE-010 done hold=380. Контакт — кадр профиля (292 мс).",
+ "covers": [
+  "01 F-03 урон 0",
+  "02 SD-05 «защита держит»",
+  "01 F-01 пропуск обнуляет удержания"
+ ],
+ "events": [
+  {
+   "t": 0,
+   "kind": "cue",
+   "id": "CUE-008",
+   "subject": "harpy2",
+   "seq": 51
+  },
+  {
+   "t": 3000,
+   "kind": "combat",
+   "seq": 52,
+   "stage": "start",
+   "fields": {
+    "attacker": "harpy2",
+    "target": "arthur",
+    "text": 1,
+    "lines": 0,
+    "damage": 0,
+    "lethal": 0,
+    "shown": 0,
+    "speed": "1.00",
+    "flip": 620,
+    "contact": 292,
+    "src": "profile",
+    "a": 2,
+    "d": 4,
+    "outcome": "hold"
+   }
+  },
+  {
+   "t": 3000,
+   "kind": "cue",
+   "id": "CUE-010",
+   "subject": "scene",
+   "seq": 52,
+   "duration_ms": 800,
+   "hold_ms": 380
+  },
+  {
+   "t": 4000,
+   "kind": "combat",
+   "seq": 52,
+   "stage": "skip",
+   "fields": {
+    "src": "click"
+   }
+  },
+  {
+   "t": 4000,
+   "kind": "combat",
+   "seq": 52,
+   "stage": "read",
+   "fields": {
+    "ms": 380,
+    "skipped": 1
+   }
+  },
+  {
+   "t": 4000,
+   "kind": "combat",
+   "seq": 52,
+   "stage": "slam",
+   "fields": {
+    "a": 2,
+    "d": 4,
+    "outcome": "hold"
+   }
+  },
+  {
+   "t": 4180,
+   "kind": "combat",
+   "seq": 52,
+   "stage": "pause",
+   "fields": {
+    "ms": 0,
+    "skipped": 1
+   }
+  },
+  {
+   "t": 4180,
+   "kind": "combat",
+   "seq": 52,
+   "stage": "lunge",
+   "fields": {
+    "attacker": "harpy2"
+   }
+  },
+  {
+   "t": 4472,
+   "kind": "combat",
+   "seq": 52,
+   "stage": "contact",
+   "fields": {
+    "offset": 292,
+    "window": 900,
+    "src": "profile"
+   }
+  },
+  {
+   "t": 5372,
+   "kind": "combat",
+   "seq": 52,
+   "stage": "end",
+   "fields": {
+    "total": 2972,
+    "skipped": 1,
+    "cut": 0
+   }
+  }
+ ],
+ "expect_trace": [
+  "CUE fx id=CUE-008 subject=harpy2 seq=51 t=0 vfx=missing sfx=missing clip=none mat=none socket=Weapon reduced=0 result=fallback",
+  "CUE fx done id=CUE-008 subject=harpy2 seq=51 t=600 ms=600 cut=0",
+  "CUE combat seq=52 stage=start t=3000 attacker=harpy2 target=arthur text=1 lines=0 damage=0 lethal=0 shown=0 speed=1.00 flip=620 contact=292 src=profile a=2 d=4 outcome=hold",
+  "CUE fx id=CUE-010 subject=scene seq=52 t=3000 vfx=none sfx=missing clip=none mat=none socket=- reduced=0 result=fallback",
+  "CUE combat seq=52 stage=skip t=4000 src=click",
+  "CUE combat seq=52 stage=read t=4000 ms=380 skipped=1",
+  "CUE combat seq=52 stage=slam t=4000 a=2 d=4 outcome=hold",
+  "CUE fx done id=CUE-010 subject=scene seq=52 t=4180 ms=1180 cut=0 hold=380",
+  "CUE combat seq=52 stage=pause t=4180 ms=0 skipped=1",
+  "CUE combat seq=52 stage=lunge t=4180 attacker=harpy2",
+  "CUE combat seq=52 stage=contact t=4472 offset=292 window=900 src=profile",
+  "CUE combat seq=52 stage=end t=5372 total=2972 skipped=1 cut=0"
+ ],
+ "expect_summary": {
+  "presented": 2,
+  "spawned": 0,
+  "fallback": 2,
+  "duplicate": 0,
+  "stale": 0,
+  "done": 2,
+  "unique_triples": 2,
+  "ms_cue": 0,
+  "ms_cue_sets": 0,
+  "ms_cue_sources": {
+   "trail": 0,
+   "canonical": 0,
+   "straight": 0
+  },
+  "combat_sets": 1,
+  "combat_cut": 0,
+  "combat_skipped": 1,
+  "combat_totals": [
+   2972
+  ]
+ },
+ "staging": {
+  "declare": {
+   "t": 0,
+   "subject": "harpy2",
+   "seq": 51
+  },
+  "start_t": 3000,
+  "end_t": 6000,
+  "input": {
+   "seq": 52,
+   "attacker": "harpy2",
+   "target": "arthur",
+   "text": true,
+   "lines": 0,
+   "damage": 0,
+   "lethal": false,
+   "shown": false,
+   "hp_before": 13,
+   "hp_after": 13,
+   "contact": 292,
+   "src": "profile",
+   "a": 2,
+   "d": 4,
+   "speed": 1.0
+  },
+  "skips": [
+   {
+    "t": 4000,
+    "src": "click"
+   }
+  ]
+ }
+}

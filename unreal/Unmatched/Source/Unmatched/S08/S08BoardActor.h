@@ -245,7 +245,14 @@ public:
   /** CUE-011 fallback: one 900ms damage number at the affected cell,
    *  exactly once per (fighter, authoritative seq) - a repeated cue for the
    *  same seq (reapply, reconnect replay) is traced and ignored (T2.2). */
-  void ShowDamageNumber(const FString& FighterId, int32 Damage, int32 SequenceNumber);
+  void ShowDamageNumber(const FString& FighterId, int32 Damage, int32 SequenceNumber, float LifeSeconds = 0.9f);
+  /** DE-018 (01 F-03): contact frame (ms at speed x1) of the fighter's LungeAttack - the "Contact" AnimNotify of the
+   *  clip (DE-010), else the build-profile frame; -1 without a v2 figure. OutSource = notify | profile. */
+  int32 GetFighterContactMs(const FString& FighterId, FString& OutSource) const;
+  /** DE-018 (CUE-011): the red hit tint of a v2 figure (CPD_HitTint) for Seconds from now. */
+  void PlayFighterHitTint(const FString& FighterId, float Seconds);
+  /** Short asset name of a v2 figure's clip (AM_<Key>_<Clip>), empty without one (CUE trace token). */
+  FString GetFighterClipName(const FString& FighterId, S08HeroesV2::EClip Clip) const;
   /** Wave 5c-B heroes v2 (default since ART-DEFAULT): a combat event (attack / damage) of a fighter drives its v2
    *  clip, exactly once per (event, fighter, authoritative seq). A no-op with -S08HeroesLegacy or without a v2 figure. */
   void NotifyFighterAnimEvent(const FString& FighterId, S08HeroesV2::EEvent Event, int32 SequenceNumber);

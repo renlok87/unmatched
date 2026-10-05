@@ -25,7 +25,7 @@
         "required": ["t", "kind"],
         "properties": {
           "t": {"type": "integer", "minimum": 0},
-          "kind": {"enum": ["cue", "reconnect", "settings", "advance"]},
+          "kind": {"enum": ["cue", "reconnect", "settings", "advance", "combat"]},
           "id": {"type": "string", "pattern": "^CUE-[0-9]{3}$"},
           "subject": {"type": "string", "pattern": "^[A-Za-z0-9_:-]+$"},
           "seq": {"type": ["integer", "null"], "minimum": 0},
@@ -37,19 +37,36 @@
             "items": {"type": "object", "required": ["steps"], "additionalProperties": false,
               "properties": {"steps": {"type": "integer", "minimum": 1}, "kind": {"enum": ["move", "place"]}}}},
           "recovered_seq": {"type": "integer", "minimum": 0},
-          "reduced_motion": {"type": "boolean"}
+          "reduced_motion": {"type": "boolean"},
+          "hold_ms": {"type": "integer", "minimum": 0, "description": "DE-018: пропускаемое удержание внутри показа (CUE-010: чтение и строки эффекта); done пишет hold=, G5 меряет ms − hold"},
+          "duration_ms": {"type": "integer", "minimum": 0, "description": "DE-018: длина показа вместо duration_ms строки (скорость анимации постановки боя)"},
+          "stage": {"enum": ["start", "read", "effect", "slam", "pause", "lunge", "contact", "hit", "minus", "hp", "fall", "end", "skip"], "description": "DE-018: этап строки `CUE combat` (kind combat)"},
+          "fields": {"type": "object", "additionalProperties": {"type": ["string", "integer"]}, "description": "DE-018: поля строки `CUE combat` после t, в этом порядке"}
         },
         "allOf": [
           {"if": {"properties": {"kind": {"const": "cue"}}}, "then": {"required": ["id"]}},
           {"if": {"properties": {"kind": {"const": "reconnect"}}}, "then": {"required": ["recovered_seq"]}},
-          {"if": {"properties": {"kind": {"const": "settings"}}}, "then": {"required": ["reduced_motion"]}}
+          {"if": {"properties": {"kind": {"const": "settings"}}}, "then": {"required": ["reduced_motion"]}},
+          {"if": {"properties": {"kind": {"const": "combat"}}}, "then": {"required": ["seq", "stage"]}}
         ]
       }
     },
     "expect_trace": {"type": "array", "items": {"type": "string", "pattern": "^CUE "}},
     "expect_summary": {"type": "object"},
+    "staging": {
+      "type": "object",
+      "description": "DE-018: вход постановки боя для C++-порта (Unmatched.S09.CombatStage.Fixtures): тот же сценарий, что events, но события строит FS09CombatStage. Эталонная модель его не читает.",
+      "required": ["start_t", "end_t", "input"],
+      "properties": {
+        "declare": {"type": "object", "required": ["t", "subject", "seq"]},
+        "start_t": {"type": "integer", "minimum": 0},
+        "end_t": {"type": "integer", "minimum": 0},
+        "input": {"type": "object", "required": ["seq", "attacker", "target"]},
+        "skips": {"type": "array", "items": {"type": "object", "required": ["t", "src"]}}
+      }
+    },
     "trace": {"type": "array", "items": {"type": "string"}},
-    "expect_error_codes": {"type": "array", "items": {"pattern": "^G[1-9]$"}, "minItems": 1}
+    "expect_error_codes": {"type": "array", "items": {"pattern": "^[GMC][1-9]$"}, "minItems": 1}
   },
   "allOf": [
     {"if": {"properties": {"kind": {"const": "scenario"}}}, "then": {"required": ["events", "expect_trace"]}},
