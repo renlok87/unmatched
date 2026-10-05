@@ -14,7 +14,7 @@
 | Реплики героев: Arthur 42, Merlin 17, Medusa 42; крики гарпий 12 × 3 высоты; 3 голосовых слоя эффектов | в игре, субтитры RU/EN | `/Game/Audio/VO/` |
 | SFX: UI 28, карты 13, поле 5, бой 23, смерть 6, эффекты 16 | в игре | `/Game/Audio/{UI,Cards,Board,Combat,Death,FX}/` |
 | Окружение: Marmoreal (постель + 4 вида точек), Sarpedon (5 постелей + 3 вида точек) | в игре | `/Game/Audio/Amb/` |
-| Код UE: шины и громкости, банк, музыкальный директор, директор VO и субтитры, окружение, все звуковые CUE | ветка `feat/audio-ue`, тесты 373/373 | `unreal/Unmatched/Source/Unmatched/S08/` |
+| Код UE: шины и громкости, банк, музыкальный директор, директор VO и субтитры, окружение, все звуковые CUE | ветка `feat/audio-ue`, тесты 378/378 | `unreal/Unmatched/Source/Unmatched/S08/` |
 | Реестр | 175 единиц `in-game`, 3 мотива `done-source`, 6 шаблонов, 3 `none-by-design`, пропусков 0 | 03 |
 | Траты SYNTX | 478 → 210 токенов (≈ 268; план 380–570) | `credits-ledger.json`, 23 записи `AUC-*` |
 
@@ -84,7 +84,7 @@
 - Настройки: `s08.Settings music= sfx= ui= vo= subtitles= describeSounds=` (UI-ACC-007…009, 014…016).
 - Контракт: `cue-table.json` — `sfx.bank` и первый вариант, `status present` у 17 CUE; CUE-001 беззвучен намеренно.
   Гейт `check-trace`: громкость = общая × шина, точка `cue`, `reason=grouped`. pytest 61/61.
-- Тесты UE: `Unmatched.S08.Audio.{Bank,Music,Vo,Ambience,Settings}` + обновлённые CueSound; весь набор Unmatched 373/373.
+- Тесты UE: `Unmatched.S08.Audio.{Bank,Music,Vo,Ambience,Settings}` + обновлённые CueSound; весь набор Unmatched 373/373 (после слияния с прогоном I — 378/378).
 - Импорт: 346 SoundWave (`ue_import_audio.py`), проверка `ue_verify_audio.py`: 0 проблем, 12 петель с `looping`.
 
 ## 6. Что осталось (честно)
@@ -123,5 +123,6 @@
   к звуку он не относится.
 - Доказательства: [`evidence/AUDIO/2026-10-05/`](../evidence/AUDIO/2026-10-05/) — трассы обоих клиентов, манифесты,
   итог `check-trace`, два кадра.
-- После слияния с `fix/admin-panel` (e64a64f9, значки HUD) — сборка, тесты UE 373/373, pytest контрактов 85/85.
-  Пакет упакован один раз заново, перед интеграцией.
+- Интеграция: `feat/audio-ue` слита с `fix/admin-panel` 11f2ff71 (прогон I: вид HUD AB-5…AB-8, очередь кадров,
+  ворота результата). Конфликт один, в `NoteBoardDeaths`: оставлены крест павшего и звуковой хук смерти. Сборка,
+  тесты UE 378/378, pytest контрактов 86/86, пакет упакован один раз перед `safe-integrate`.
