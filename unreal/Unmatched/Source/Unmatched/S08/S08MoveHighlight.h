@@ -142,6 +142,17 @@ struct UNMATCHED_API FS08MoveDraftInput {
   FIntPoint Hover = FIntPoint(-1, -1);
   /** The board draws leader pips (readability "leaderPip"): a hero's space gets S08PlateFlags::LeaderPip. */
   bool bLeaderPips = false;
+  /** MS-T-17 (03 §4.2 V-14 / V-15, MS-P-03): the last move's spaces in the mover's team colour - every start (V-14,
+   *  outline at lastMove.alpha), the path points between (V-15 centre dots) and every end (V-15 solid outline). It is
+   *  merged into any view (observation, draft, pending): the outline channel keeps Threat > LastTo > LastFrom. */
+  struct FLastMove {
+    TArray<FIntPoint> From;
+    TArray<FIntPoint> Dots;
+    TArray<FIntPoint> To;
+    ES08PlateColor Color = ES08PlateColor::TeamP1;
+    bool IsSet() const { return From.Num() > 0 || To.Num() > 0; }
+  };
+  FLastMove LastMove;
   FString Source = TEXT("draft");
 };
 
@@ -214,6 +225,8 @@ inline const TCHAR* const ParamCandRadius = TEXT("CandRadius");
 inline const TCHAR* const ParamCandWidth = TEXT("CandWidth");
 inline const TCHAR* const ParamCandAlpha = TEXT("CandAlpha");
 inline const TCHAR* const ParamLastMoveAlpha = TEXT("LastMoveAlpha");
+/** MS-T-17: the MS-P-03 fade of V-14 / V-15 (1 shown .. 0 gone over 300 ms), set on the outline MID only. */
+inline const TCHAR* const ParamLastMoveFade = TEXT("LastMoveFade");
 /** Vector parameters (linear = FLinearColor::FromSRGBColor of the profile hex). */
 inline const TCHAR* const ParamPlateColor = TEXT("PlateColor");
 inline const TCHAR* const ParamKeylineColor = TEXT("KeylineColor");
@@ -255,6 +268,9 @@ public:
    *  number of instance updates (0 for an unchanged view). */
   int32 ApplyView(const FS08MoveDraftView& View);
   void ClearView() { ApplyView(FS08MoveDraftView()); }
+  /** MS-T-17: the MS-P-03 fade of the last-move outlines (0..1; only the outline MID, only when it changed). */
+  void SetLastMoveFade(float Fade);
+  float GetLastMoveFade() const { return LastMoveFade; }
 
   // ---- inspection (automation, traces) ----
   int32 GetSpaceCount() const { return SpaceCells.Num(); }
@@ -298,4 +314,5 @@ private:
   TArray<TArray<float>> WrittenZ;         // [channel][instance], < -1e5 = hidden
   uint32 AppliedHash = 0;
   int32 BuildCount = 0;
+  float LastMoveFade = 1.0f;
 };

@@ -573,11 +573,23 @@ WS не несут `decks`, и без него счётчик колоды по�
   плашки по ключу черновика (ревизия, режим, полёт, предвыбор, выбранный боец, наведение). Без флага или без материала —
   прежнее кольцо `readability.reach`.
 - **`-BenchMoveDraft`:** формат расширен полем `moveOrder` (`[{fighterId, delta ±1}]`) — сцена 2 строит Conflict сменой
-  порядка; `lastMovement` пока только трассируется как пропущенное (MS-T-17). MS-T-12: блок `pending` (`type` MOVE | PLACE,
+  порядка; MS-T-17: `lastMovement` синтезирует `metadata.lastMovement` бенч-seq (формат 04 §4.3, клетки — id пространств или [x, y], путь кончается на клетке бойца фикстуры; без черновика — MS-S-00), см. «Уточнение MS-T-17» ниже. MS-T-12: блок `pending` (`type` MOVE | PLACE,
   `fighterId`, `value`, `optional`, `targetsOpponent`, `to`) синтезирует `metadata.pendingEffects` зрителя вместо
   `pendingManeuver` — сцена MS-S-12 (V-11/V-12, с `to` — V-04 и путь); с `boostCardId`/`moves`/`moveOrder`/`selected` несовместим. `FS09CommandUi` в `-ArtPreview`
   без сервера работает (проверено прогоном). Абсолютный путь `-BenchFixture` вне `Config/Bench` принимает редакторный
   клиент; упакованный — **не проверено** (сцена худшего случая — MS-T-27).
+- **Уточнение MS-T-17 (2026-10-05, прогон D).**
+  - **Модель.** Чистая модель взгляда соперника — `S09/S09OpponentView.*`, в игре — `S08FlowGameModeOpponent.cpp`.
+  - **Подсветка последнего хода.** Она приходит в вид подложек полем `FS08MoveDraftInput::LastMove`: старты дают
+    LastFrom, концы — LastTo, промежуточные клетки пути — `bPathDot`. Цвет — вид команды ходившего, абсолютный или
+    `-S08TeamColorMode`.
+  - **Слияние.** Подсветка вливается в любой вид: в наблюдение (MS-S-00, источник `last`), в черновик и в pending. При
+    обычном выборе без черновика сохраняется набор досягаемости, как его рисует `ViewFromReachable`.
+  - **Затухание.** Скаляр `LastMoveFade` материала (граф v2, только MID канала контура) умножает оба состояния
+    LastTo/LastFrom. Ключ перерисовки `SyncMovePlates` включает ревизию трекера.
+  - **Флаг.** Без `-S08MovePlates` (до MS-T-27) подсветки на доске нет, а индикатор, лента и стрелка работают.
+  - **Новый след при видимом старом.** Новый след заменяет старый сразу, без 300 мс затухания: альфа одна на все
+    контуры последнего хода, а доска в этот момент и так меняется под новым ходом.
 
 | ID | Требование | Тест |
 |---|---|---|
@@ -801,7 +813,10 @@ ACC-022 1080p p95 ≤ 16,7 мс; демо двух клиентов — по 30 
 | `MS-CUE move seq=<n> fighter=<id> order=<k> of=<n> kind=<move|place> steps=<n> source=<trail|canonical|straight> start=<ms> ms=<n> snapped=<0|1> path=<A>B>…>` | выпуск cue перемещения (MS-T-15), старт анимации (MS-T-16) | `trail=mismatch`; MS-T-16 — `speed=`, `reduced=` |
 | `MS-ANIM skip|jump|snap seq=<n> count=<n>` | пропуск, `jump_to_final`, snap | — |
 | `MS-PERF draft us=<n> view us=<n>` | каждые 60 пересчётов (агрегат p50/p95) | — |
-| `MS-OPP planning=<0|1>` | смена индикатора соперника | — |
+| `MS-OPP planning=<0|1> seq=<n>` | смена индикатора соперника | — |
+| `MS-OPP arrow=<0|1> cell=<CellLabel> x= y= angle= seq=` | стрелка у края экрана к концу пути соперника появилась, сменила цель или пропала (MS-T-17, MS-E-73) | — |
+| `MS-LAST enter|show|fade|off|replace seq=<n>` | подсветка последнего хода (MS-T-17, MS-P-03): след вошёл, показан (`mode=anim|restore`), гаснет (`at=<seq> ms=300`), погас | `player`, `from`, `to` |
+| `MS-LOG seq=<n> moves=<n> truncated=<0|1> text="…"` | строка ленты событий (MS-T-17, 03 §7) | — |
 | `MS-BENCH mismatch id=<id>` | id из `-BenchMoveDraft` нет в bench-фикстуре | — |
 
 `tools/s08/cue_contract/cue_contract.py` (`check-trace`) получает проверку параметра `steps`, источника пути и

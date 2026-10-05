@@ -525,6 +525,7 @@ void AS08FlowGameMode::HandleApplied(const FS08Snapshot& Snapshot, ES08SeqDecisi
         Snapshot.SequenceNumber, static_cast<int32>(CommandUi.Mode),
         CommandUi.Combat.bPresent ? 1 : 0, CommandUi.bHasPendingChoice ? 1 : 0));
     FeedPendingPresentation(Snapshot); // DE-020: skipped-effect notes, modal / compact / toast
+    FeedOpponentView(Snapshot);        // MS-T-17: planning indicator, last-move highlight (MS-P-03), feed
     // GD-036: one RESULT trace line per authoritative seq - an equal-seq
     // merge (WS push + HTTP refetch of the terminal body) never re-logs.
     if (Hud.bGameOver && Snapshot.SequenceNumber != S09ResultTraceSeq) {
@@ -998,6 +999,8 @@ void AS08FlowGameMode::HandleCues(const TArray<FS08Cue>& Cues) {
     FS08Trace::Write(FString::Printf(TEXT("MS-ANIM play seq=%d moves=%d animated=%d speed=%s reduced=%d end=%d"),
                                      Plans[0].Seq, Plans.Num(), Animated, S08Motion::SpeedName(MoveMotion.Speed),
                                      MoveMotion.bReducedMotion ? 1 : 0, FMath::RoundToInt(EndMs)));
+    // MS-T-17: the last-move highlight of this seq appears when its animation ends (MS-P-01 / MS-P-02 -> MS-P-03)
+    if (Animated > 0) LastMoveTracker.OnMoveAnimation(Plans[0].Seq, static_cast<double>(NowMs()) + EndMs);
   }
   for (const FS08Cue& Cue : Cues) {
     FString Line;
@@ -4773,6 +4776,7 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
   if (BoardActor) BoardActor->TickFighterMoves(bBenchMovePose ? BenchMovePoseClockMs : NowMs());
   TryMoveSkip();
   TickDeferredDamage();
+  TickOpponentView();  // MS-T-17: the last-move reveal after the move, its fade, the feed line, the edge arrow
   // DE-018: the combat staging runs on the game clock; a click / Space / Enter during its holds is the skip and
   // is not handled a second time below (a HUD press keeps its own action).
   TickCombatStage();
@@ -5200,6 +5204,13 @@ void AS08FlowGameMode::ClearGameplayHud() {
   PendingStepTraceKey.Reset();
   PendingNoTargetsTraceKey.Reset();
   ResultGate.Reset();
+  // MS-T-17: the opponent view belongs to one game
+  LastMoveTracker.Reset();
+  EventFeed.Reset();
+  bOpponentPlanning = false;
+  bOpponentPlanningKnown = false;
+  EdgeArrowNow = S09OpponentView::FEdgeArrow();
+  EdgeArrowTraceKey.Reset();
   BoardAliveById.Reset();
   FallSeq = -1;
   ShownFighters.Reset();
@@ -5324,6 +5335,7 @@ void AS08FlowGameMode::BuildHudWidgets() {
                [SAssignNew(ToastHudLine, STextBlock)
                     .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14))
                     .ColorAndOpacity(FSlateColor(FLinearColor(1.0f, 0.9f, 0.6f)))]]];
+  BuildOpponentHudWidgets(Canvas);  // MS-T-17: the edge arrow (MS-E-73)
 
   GEngine->GameViewport->AddViewportWidgetContent(Canvas, 1);
 }
@@ -5664,6 +5676,7 @@ void AS08FlowGameMode::RefreshHud() {
                SNew(STextBlock).Text(FText::FromString(Chip))
                     .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14)))];
     }
+    AddEventFeedLines();  // MS-T-17 (03 §7): the three latest maneuver lines over the hand
     HandBox->AddSlot().AutoHeight().Padding(0, 0, 0, 6)
         [SNew(STextBlock)
              .Text(FText::FromString(FString::Printf(
@@ -5689,6 +5702,7 @@ void AS08FlowGameMode::RefreshHud() {
     PanelsBox->AddSlot().AutoHeight()
         [SNew(STextBlock).Text(FText::FromString(PanelLine(TEXT("opponent"), *Opponent)))
              .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14))];
+    AddOpponentPanelLines();  // MS-T-17 (MS-S-11): "Opponent is planning a maneuver" by the opponent's line
   }
   PanelsBox->AddSlot().AutoHeight()
       [SNew(STextBlock)

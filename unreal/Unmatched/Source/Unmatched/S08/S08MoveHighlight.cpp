@@ -196,6 +196,25 @@ FS08MoveDraftView BuildDraftView(const FS08BoardModel& Board, const TArray<FS08B
       }
     }
   }
+  // V-14 / V-15 (MS-T-17): the last move - starts, path points, ends; a space that is both an end and a start (a chain
+  // of moves, a return to the start) is an end (LastTo > LastFrom)
+  if (Input.LastMove.IsSet()) {
+    for (const FIntPoint& C : Input.LastMove.From) {
+      if (FS08PlateView* P = At(C)) Raise(P->Outline, ES08OutlineState::LastFrom);
+    }
+    for (const FIntPoint& C : Input.LastMove.To) {
+      if (FS08PlateView* P = At(C)) Raise(P->Outline, ES08OutlineState::LastTo);
+    }
+    for (const FIntPoint& C : Input.LastMove.Dots) {
+      if (FS08PlateView* P = At(C)) P->bPathDot = true;
+    }
+    for (TPair<uint64, FS08PlateView>& Pair : Spaces) {
+      FS08PlateView& P = Pair.Value;
+      if (P.Outline == ES08OutlineState::LastTo || P.Outline == ES08OutlineState::LastFrom) {
+        P.OutlineColor = Input.LastMove.Color;
+      }
+    }
+  }
   if (FS08PlateView* P = At(Input.Hover)) P->Flags |= S08PlateFlags::Hover;
   FS08MoveDraftView View = Finish(Board, Fighters, Input.bLeaderPips, Spaces, Input.Source);
   View.Hover = Input.Hover;
@@ -386,6 +405,7 @@ void US08MoveHighlightComponent::ApplyStyle(const FS08MoveSelectionSpec& InStyle
     Mid->SetScalarParameterValue(ParamCandWidth, Style.CandidateWidthUU);
     Mid->SetScalarParameterValue(ParamCandAlpha, Style.CandidateAlpha);
     Mid->SetScalarParameterValue(ParamLastMoveAlpha, Style.LastMoveAlpha);
+    Mid->SetScalarParameterValue(ParamLastMoveFade, LastMoveFade);
     // sRGB bytes of the profile -> linear (the W4-B colour rule, FLinearColor::FromSRGBColor)
     Mid->SetVectorParameterValue(ParamPlateColor, FLinearColor::FromSRGBColor(Style.PlateColor));
     Mid->SetVectorParameterValue(ParamKeylineColor, FLinearColor::FromSRGBColor(Style.KeylineColor));
@@ -450,6 +470,16 @@ void US08MoveHighlightComponent::WriteInstance(S08MovePlateSpec::EChannel Channe
   Ism->UpdateInstanceTransform(Instance, FTransform(FRotator::ZeroRotator, Location, FVector(Scale, Scale, bShow ? 1.0f : 0.0f)),
                                false, false, true);
   WrittenZ[C][Instance] = bShow ? Z : -1e6f;
+}
+
+void US08MoveHighlightComponent::SetLastMoveFade(float Fade) {
+  Fade = FMath::Clamp(Fade, 0.0f, 1.0f);
+  if (FMath::IsNearlyEqual(Fade, LastMoveFade, 1.0e-3f)) return;
+  LastMoveFade = Fade;
+  const int32 C = static_cast<int32>(S08MovePlateSpec::EChannel::Outline);
+  if (ChannelMids.IsValidIndex(C) && ChannelMids[C]) {
+    ChannelMids[C]->SetScalarParameterValue(S08MovePlateSpec::ParamLastMoveFade, LastMoveFade);
+  }
 }
 
 int32 US08MoveHighlightComponent::ApplyView(const FS08MoveDraftView& View) {

@@ -286,6 +286,10 @@ public:
   void SetMoveDraftViewProvider(FMoveDraftViewProvider Provider) { MoveDraftViewProvider = MoveTemp(Provider); }
   /** Rebuilds the view of the current selection (a draft operation without a selection change). */
   void RefreshMoveDraftView();
+  /** MS-T-17: the MS-P-03 fade of the last-move outlines V-14 / V-15 (no-op without the plates). */
+  void SetLastMoveFade(float Fade) {
+    if (MoveHighlight) MoveHighlight->SetLastMoveFade(Fade);
+  }
   /** The move-selection style of the active board: the art profile's (root + board override), else the document root,
    *  else the code defaults. */
   FS08MoveSelectionSpec ActiveMoveSelection() const;

@@ -27,6 +27,7 @@
 #include "../S09/S09CombatStage.h"
 #include "../S09/S09DeathStage.h"
 #include "../S09/S09PendingPresent.h"
+#include "../S09/S09OpponentView.h"
 #include "S08CueDispatcher.h"
 #include "S08MoveAnim.h"
 #include "S08FlowGameMode.generated.h"
@@ -607,6 +608,26 @@ private:
   /** Space under the cursor of the plates (MS-T-09 drives it live; the bench fixture's "hover" now). */
   FIntPoint MoveHoverCell = FIntPoint(-1, -1);
   uint32 MovePlatesKey = 0;
+  // ---- MS-T-17 the opponent view (S09OpponentView.h, S08FlowGameModeOpponent.cpp) ----
+  /** An applied snapshot: the planning indicator (MS-S-11, 'MS-OPP planning='), the MS-P-03 tracker and the feed. */
+  void FeedOpponentView(const FS08Snapshot& Snapshot);
+  /** Tick: the reveal after the move animation, the fade, the event-feed line, the edge arrow. */
+  void TickOpponentView();
+  /** V-14 / V-15 of the tracker for the plates (empty when nothing is drawn). */
+  FS08MoveDraftInput::FLastMove LastMovePlateInput() const;
+  /** The edge-arrow slot of the HUD canvas (BuildHudWidgets). */
+  void BuildOpponentHudWidgets(const TSharedRef<SConstraintCanvas>& Canvas);
+  /** The indicator and the feed lines of RefreshHud (side panel / over the hand). */
+  void AddOpponentPanelLines();
+  void AddEventFeedLines();
+  FS09LastMoveTracker LastMoveTracker;
+  FS09EventFeed EventFeed;
+  bool bOpponentPlanning = false;
+  bool bOpponentPlanningKnown = false;
+  S09OpponentView::FEdgeArrow EdgeArrowNow;
+  FString EdgeArrowTraceKey;
+  SConstraintCanvas::FSlot* EdgeArrowSlot = nullptr;
+  TSharedPtr<STextBlock> EdgeArrowGlyph;
   /** One -Bench view's camera: selection + zoom per the view name, traced 'BENCH view=...' (RunRenderBench case 2;
    *  also the live-tune shot). */
   void BenchSetupView(const FString& View, const FString& HeroId);

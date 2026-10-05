@@ -11,6 +11,7 @@
 #include "S08Team.h"
 #include "../S09/S09ManeuverUi.h"
 #include "../S09/S09MoveDraftView.h"
+#include "../S09/S09OpponentView.h"
 #include "Components/InstancedStaticMeshComponent.h"
 #include "Dom/JsonObject.h"
 #include "Dom/JsonValue.h"
@@ -494,6 +495,16 @@ bool FS08MoveHLBenchDraftTest::RunTest(const FString&) {
     const S09MoveDraftBench::FApplyResult R = S09MoveDraftBench::Apply(Fixture, B.Snapshot, B.Board, B.Fighters, B.ViewerId, Ui);
     TestTrue(Name + TEXT(" applies: ") + R.Error, R.bOk);
     AddInfo(R.Summary);
+    if (Fixture.IsTrailOnly()) {
+      // MS-T-17 (MS-AT-30 scenes 3 / 5): only the other side's last move - no draft, its trail on the bench seq
+      TestTrue(Name + TEXT(": no draft"), Ui.Mode == ES09CommandMode::None);
+      FS09LastMovement Trail;
+      TestTrue(Name + TEXT(": lastMovement of the bench seq"),
+               R.bTrail && FS09LastMovement::Read(R.Snapshot.Metadata, Trail) && Trail.Seq == R.Snapshot.SequenceNumber &&
+                   Trail.Moves.Num() == Fixture.LastMovement.Moves.Num() && Trail.Moves.Num() > 0);
+      TestTrue(Name + TEXT(": the opponent's move"), Trail.PlayerId != B.ViewerId);
+      continue;
+    }
     if (Fixture.Pending.bSet) {
       // MS-T-12 (MS-S-12): the pending MOVE / PLACE scene - V-11 / V-12 on the legal spaces, none under the mover,
       // the picked target a destination with the canonical path (MOVE)
@@ -567,10 +578,15 @@ bool FS08MoveHLBenchDraftTest::RunTest(const FString&) {
     TestFalse("unknown field refused",
               S09MoveDraftBench::Parse(TEXT("{\"schema\":\"unmatched.move-draft/1\",\"move\":[]}"), TEXT("x.json"), Fixture, Errors));
     Errors.Reset();
-    TestTrue("reserved fields traced as skipped",
-             S09MoveDraftBench::Parse(TEXT("{\"schema\":\"unmatched.move-draft/1\",\"lastMovement\":{}}"), TEXT("x.json"), Fixture,
-                                      Errors) &&
-                 Fixture.Skipped.Contains(TEXT("lastMovement")));
+    // MS-T-17: lastMovement is a scene field now (S09OpponentViewTests): a move list is required, nothing is skipped
+    TestFalse("lastMovement without moves refused",
+              S09MoveDraftBench::Parse(TEXT("{\"schema\":\"unmatched.move-draft/1\",\"lastMovement\":{}}"), TEXT("x.json"), Fixture,
+                                       Errors));
+    Errors.Reset();
+    TestTrue("lastMovement parsed, not skipped",
+             S09MoveDraftBench::Parse(TEXT("{\"schema\":\"unmatched.move-draft/1\",\"lastMovement\":{\"moves\":[]}}"), TEXT("x.json"),
+                                      Fixture, Errors) &&
+                 Fixture.LastMovement.bSet && Fixture.Skipped.Num() == 0);
   }
   return true;
 }

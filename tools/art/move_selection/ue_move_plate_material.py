@@ -50,13 +50,14 @@ ROOT = "/Game/S08/MoveSelection"
 MATERIAL_NAME = "M_UM_MovePlate"
 MATERIAL_PATH = f"{ROOT}/{MATERIAL_NAME}"
 GRAPH_TAG = "MoveSelectionGraphVersion"
-GRAPH_VERSION = "1"
+GRAPH_VERSION = "2"  # 2: LastMoveFade (MS-T-17, the MS-P-03 fade of V-14 / V-15)
 
 # scalar parameters and their defaults (04 §4.7 numbers; the component overwrites them from the profile)
 SCALARS = {
     "Channel": 1.0, "Shape": 0.0, "HalfUU": 44.0, "RingCenter": 36.0, "RingWidth": 3.5, "Keyline": 1.5,
     "OutlineInner": 39.6, "OutlineOuter": 41.0, "OccClear": 30.0, "PipCutDeg": 15.0, "FillAlpha": 0.18,
     "DashCount": 12.0, "DashDuty": 0.6, "CandRadius": 18.9, "CandWidth": 1.2, "CandAlpha": 0.7, "LastMoveAlpha": 0.6,
+    "LastMoveFade": 1.0,
 }
 # vector parameters (linear; FLinearColor::FromSRGBColor of #F2E9D8, #111317, #D9483F, #DAC576, #5786A8)
 VECTORS = {
@@ -172,7 +173,7 @@ if (Channel < 0.5) {
   float bo = saturate((rho - OutlineInner) / w + 0.5) * saturate((OutlineOuter - rho) / w + 0.5);
   float m = 0.0;
   if (st == 2.0 || st == 3.0) {
-    m = bo * (st == 3.0 ? LastMoveAlpha : 1.0);
+    m = bo * (st == 3.0 ? LastMoveAlpha : 1.0) * LastMoveFade;
     if (colIdx > 1.5 && colIdx < 2.5) {
       float tg = frac(phi * 6.0);
       float dg = min(tg, 1.0 - tg);

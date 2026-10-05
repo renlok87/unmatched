@@ -11,12 +11,18 @@
 //     "scene": "<name>", "selected": "<fighter id>", "hover": "<space id>" | [x, y],
 //     "boostCardId": "<own hand instance id>", "moves": [{"fighterId": "<id>", "to": "<space id>" | [x, y]}],
 //     "moveOrder": [{"fighterId": "<id>", "delta": -1 | 1}],
-//     "lastMovement": {...},                          <- reserved for MS-T-17 (traced as skipped)
+//     "lastMovement": {"playerId": "<id>", "source": "MANEUVER" | "EFFECT", "boost": {"name": "<card>", "value": <n>},
+//                      "moves": [{"fighterId": "<id>", "kind": "MOVE" | "PLACE", "from": <cell>, "path": [<cell>...]}]},
 //     "pending": {"type": "MOVE" | "PLACE", "fighterId": "<id>", "value": <n>, "optional": <bool>,
 //                 "targetsOpponent": <bool>, "to": "<space id>" | [x, y]} }
 // MS-T-12: "pending" synthesises metadata.pendingEffects [{id "bench-pending:<file name>", playerId benchViewerId,
 // type, value (omitted = absent), optional, fighterIds [fighterId], targetsOpponent}] INSTEAD of the pendingManeuver -
 // the MS-S-12 plates V-11 / V-12 (and V-04 + path with "to"); it excludes boostCardId / moves / moveOrder / selected.
+// MS-T-17: "lastMovement" synthesises metadata.lastMovement (04 §4.3) of the bench snapshot's own seq - the last-move
+// highlight V-14 / V-15 restored without an animation (MS-E-102), MS-AT-30 scenes 3 and 5. playerId defaults to the
+// owner of the first moved fighter, source to MANEUVER; every path ends on its fighter's bench space (the trail
+// describes how the figures got where the fixture has them). Alone (no selected / moves / moveOrder / boostCardId /
+// pending) it opens no draft: MS-S-00, the observation of the other side's move.
 #pragma once
 
 #include "CoreMinimal.h"
@@ -73,8 +79,30 @@ struct UNMATCHED_API FFixture {
     FCellRef To;
   };
   FPending Pending;
-  /** Reserved fields present in the file (lastMovement): traced, not applied. */
+  /** MS-T-17: a synthesised metadata.lastMovement of the bench seq. */
+  struct FLastMovement {
+    bool bSet = false;
+    FString PlayerId;  // empty: the owner of the first moved fighter
+    FString Source = TEXT("MANEUVER");
+    bool bBoost = false;
+    FString BoostName;
+    int32 BoostValue = 0;
+    struct FMove {
+      FString FighterId;
+      bool bPlace = false;
+      FCellRef From;
+      TArray<FCellRef> Path;
+    };
+    TArray<FMove> Moves;
+  };
+  FLastMovement LastMovement;
+  /** Reserved fields present in the file: traced, not applied (none since MS-T-17). */
   TArray<FString> Skipped;
+  /** Only the last move: no draft is opened (MS-S-00). */
+  bool IsTrailOnly() const {
+    return LastMovement.bSet && Selected.IsEmpty() && Moves.Num() == 0 && MoveOrder.Num() == 0 && BoostCardId.IsEmpty() &&
+           !Pending.bSet;
+  }
 };
 
 /** Parses an unmatched.move-draft/1 document (structure only; ids are checked by Apply). */
@@ -85,7 +113,8 @@ struct UNMATCHED_API FApplyResult {
   FString MismatchId;  // a fighter / card id the bench fixture does not have
   FString Error;
   FIntPoint Hover = FIntPoint(-1, -1);
-  FS08Snapshot Snapshot;  // the bench snapshot with the synthesised pendingManeuver
+  FS08Snapshot Snapshot;  // the bench snapshot with the synthesised pendingManeuver (and lastMovement)
+  bool bTrail = false;     // MS-T-17: the snapshot carries the synthesised lastMovement of its seq
   /** 'MS-BENCH draft ...' summary line. */
   FString Summary;
 };

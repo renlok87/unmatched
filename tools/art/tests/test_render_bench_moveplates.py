@@ -92,6 +92,17 @@ class MoveDraftFixtures(unittest.TestCase):
                 cells = [m["to"] for m in doc.get("moves", [])] + ([doc["hover"]] if "hover" in doc else [])
                 if pending and "to" in pending:
                     cells.append(pending["to"])
+                trail = doc.get("lastMovement")  # MS-T-17: the other side's last move (MS-AT-30 scenes 3 / 5)
+                if trail:
+                    positions = {x["id"]: (x["position"]["x"], x["position"]["y"]) for x in state["fighters"]}
+                    by_space = {c["spaceId"]: (c["x"], c["y"]) for row in state["boardState"]["cells"] for c in row
+                                if c.get("spaceId")}
+                    self.assertTrue(trail["moves"])
+                    for move in trail["moves"]:
+                        self.assertIn(move["fighterId"], fighters)
+                        cells += [move["from"]] + move["path"]
+                        # the trail ends where the bench fixture has the fighter
+                        self.assertEqual(by_space.get(move["path"][-1]), positions[move["fighterId"]], move)
                 for cell in cells:
                     self.assertIn(cell, spaces)
         self.assertEqual(boards, {"marmoreal-original", "sarpedon-original"})

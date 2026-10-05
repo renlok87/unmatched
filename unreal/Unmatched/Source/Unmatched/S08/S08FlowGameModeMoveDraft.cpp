@@ -11,7 +11,6 @@
 
 bool AS08FlowGameMode::BuildMoveDraftViewFor(const FString& FighterId, const TSet<uint64>& Reachable,
                                              FS08MoveDraftView& OutView) {
-  (void)Reachable;
   const bool bDraft = CommandUi.Mode == ES09CommandMode::ManeuverDraft;
   // MS-S-02 / MS-S-03: the inspection of an own fighter and the pre-draft target before the draw
   const bool bInspect = CommandUi.Mode == ES09CommandMode::None &&
@@ -20,8 +19,31 @@ bool AS08FlowGameMode::BuildMoveDraftViewFor(const FString& FighterId, const TSe
   // MS-S-12: a pending MOVE / PLACE head of this viewer (V-11 / V-12)
   const bool bPending = CommandUi.Mode == ES09CommandMode::PendingChoice && CommandUi.bHasPendingChoice &&
                         (CommandUi.PendingChoice.Type == TEXT("MOVE") || CommandUi.PendingChoice.Type == TEXT("PLACE"));
-  if (!bDraft && !bInspect && !bPending) return false;
+  // MS-T-17: the last move V-14 / V-15 joins every view while MS-P-03 holds it
+  const FS08MoveDraftInput::FLastMove Last = LastMovePlateInput();
+  if (!bDraft && !bInspect && !bPending) {
+    if (!Last.IsSet()) return false;
+    // MS-S-00 (observation) or a plain selection: the last move plus the reachable set as ViewFromReachable draws it
+    FS08MoveDraftInput Input;
+    Input.ViewerId = CommandUi.ViewerId;
+    if (!FighterId.IsEmpty()) {
+      Input.SelectedFighterId = FighterId;
+      for (const FS08BoardFighter& F : Fighters) {
+        if (F.Id == FighterId) Input.SelectedStart = FIntPoint(F.X, F.Y);
+      }
+      for (const uint64 Key : Reachable) {
+        Input.BaseTier.Add(FIntPoint(static_cast<int32>(Key >> 32), static_cast<int32>(Key & 0xFFFFFFFF)));
+      }
+    }
+    Input.LastMove = Last;
+    Input.Hover = MoveHoverCell;
+    Input.bLeaderPips = BoardActor && BoardActor->DrawsLeaderPips();
+    Input.Source = bBenchMoveDraft ? TEXT("bench") : TEXT("last");
+    OutView = S08MoveHighlight::BuildDraftView(BoardModel, Fighters, Input);
+    return true;
+  }
   FS08MoveDraftInput Input = S09MoveDraftView::BuildInput(CommandUi, BoardModel, Fighters);
+  Input.LastMove = Last;
   Input.Hover = MoveHoverCell;
   Input.bLeaderPips = BoardActor && BoardActor->DrawsLeaderPips();
   if (bBenchMoveDraft) Input.Source = TEXT("bench");
@@ -44,6 +66,8 @@ void AS08FlowGameMode::SyncMovePlates() {
   Key = HashCombineFast(Key, GetTypeHash(CommandUi.bPendingCellSet ? FIntPoint(CommandUi.PendingCellX, CommandUi.PendingCellY)
                                                                    : FIntPoint(-1, -1)));
   Key = HashCombineFast(Key, GetTypeHash(MoveHoverCell));
+  // MS-T-17: the last move enters, shows and goes out without a draft operation
+  Key = HashCombineFast(Key, LastMoveTracker.GetRevision());
   if (Key == MovePlatesKey) return;
   MovePlatesKey = Key;
   BoardActor->RefreshMoveDraftView();
@@ -74,6 +98,11 @@ bool AS08FlowGameMode::ApplyBenchMoveDraft(const FS08Snapshot& Snapshot, const F
   bBenchMoveDraft = true;
   MoveHoverCell = Result.Hover;
   FS08Trace::Write(Result.Summary);
+  // MS-T-17 (MS-AT-30 scenes 3 and 5): the synthesised lastMovement of the bench seq is restored without an animation
+  if (Result.bTrail) {
+    FeedOpponentView(Result.Snapshot);
+    TickOpponentView();
+  }
   if (BoardActor) {
     if (CommandUi.IsPendingMovePlace()) {
       BoardActor->SetSelectedFighter(CommandUi.PendingFighterId, CommandUi.PendingCells); // MS-T-12 scene

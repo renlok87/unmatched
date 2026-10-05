@@ -202,8 +202,61 @@ bool Parse(const FString& Text, const FString& FileName, FFixture& Out, TArray<F
       }
     }
   }
-  for (const TCHAR* Reserved : {TEXT("lastMovement")}) {
-    if (Root->HasField(Reserved)) Out.Skipped.Add(Reserved);
+  // MS-T-17: the last move of the other side (MS-AT-30 scenes 3 and 5)
+  if (Root->HasField(TEXT("lastMovement"))) {
+    const TSharedPtr<FJsonObject>* Obj = nullptr;
+    FFixture::FLastMovement& L = Out.LastMovement;
+    const TArray<TSharedPtr<FJsonValue>>* TrailMoves = nullptr;
+    if (!Root->TryGetObjectField(TEXT("lastMovement"), Obj) || !Obj || !(*Obj)->TryGetArrayField(TEXT("moves"), TrailMoves) ||
+        !TrailMoves) {
+      OutErrors.Add(TEXT("lastMovement needs a moves array"));
+    } else {
+      static const TSet<FString> KnownTrail = {TEXT("playerId"), TEXT("source"), TEXT("boost"), TEXT("moves")};
+      for (const TPair<FString, TSharedPtr<FJsonValue>>& Pair : (*Obj)->Values) {
+        if (!KnownTrail.Contains(Pair.Key) && !Pair.Key.StartsWith(TEXT("note"))) {
+          OutErrors.Add(FString::Printf(TEXT("unknown lastMovement field '%s'"), *Pair.Key));
+        }
+      }
+      (*Obj)->TryGetStringField(TEXT("playerId"), L.PlayerId);
+      if ((*Obj)->HasField(TEXT("source"))) {
+        (*Obj)->TryGetStringField(TEXT("source"), L.Source);
+        if (L.Source != TEXT("MANEUVER") && L.Source != TEXT("EFFECT")) {
+          OutErrors.Add(TEXT("lastMovement.source must be MANEUVER | EFFECT"));
+        }
+      }
+      const TSharedPtr<FJsonObject>* Boost = nullptr;
+      if ((*Obj)->TryGetObjectField(TEXT("boost"), Boost) && Boost) {
+        double Value = 0.0;
+        L.bBoost = true;
+        (*Boost)->TryGetStringField(TEXT("name"), L.BoostName);
+        if ((*Boost)->TryGetNumberField(TEXT("value"), Value)) L.BoostValue = FMath::Max(0, static_cast<int32>(Value));
+      }
+      for (const TSharedPtr<FJsonValue>& V : *TrailMoves) {
+        const TSharedPtr<FJsonObject>* M = nullptr;
+        const TArray<TSharedPtr<FJsonValue>>* Path = nullptr;
+        FFixture::FLastMovement::FMove Move;
+        if (!V.IsValid() || !V->TryGetObject(M) || !M || !(*M)->TryGetStringField(TEXT("fighterId"), Move.FighterId) ||
+            Move.FighterId.IsEmpty() || !ReadCell((*M)->TryGetField(TEXT("from")), Move.From) ||
+            !(*M)->TryGetArrayField(TEXT("path"), Path) || !Path || Path->Num() == 0) {
+          OutErrors.Add(TEXT("every lastMovement move needs fighterId, from and a non-empty path (space ids or [x, y])"));
+          continue;
+        }
+        FString Kind;
+        Move.bPlace = (*M)->TryGetStringField(TEXT("kind"), Kind) && Kind == TEXT("PLACE");
+        bool bPath = true;
+        for (const TSharedPtr<FJsonValue>& Step : *Path) {
+          FCellRef Cell;
+          bPath &= ReadCell(Step, Cell);
+          Move.Path.Add(Cell);
+        }
+        if (!bPath || (Move.bPlace && Move.Path.Num() != 1)) {
+          OutErrors.Add(FString::Printf(TEXT("lastMovement move %s: bad path (PLACE: exactly the target)"), *Move.FighterId));
+          continue;
+        }
+        L.Moves.Add(MoveTemp(Move));
+      }
+      L.bSet = true;
+    }
   }
   // MS-T-12: the pending MOVE / PLACE scene (MS-S-12)
   if (Root->HasField(TEXT("pending"))) {
@@ -308,8 +361,134 @@ FApplyResult ApplyPending(const FFixture& Fixture, const FS08Snapshot& Snapshot,
 }
 }  // namespace
 
+namespace {
+/** MS-T-17: metadata.lastMovement (04 §4.3 shape) of the bench seq from the fixture; null with OutError when a cell is
+ *  not a board space or a move does not end on its fighter's bench space. */
+TSharedPtr<FJsonObject> BuildTrail(const FFixture::FLastMovement& L, int32 Seq, const FS08BoardModel& Board,
+                                   const TArray<FS08BoardFighter>& Fighters, FString& OutError) {
+  const TSharedRef<FJsonObject> Trail = MakeShared<FJsonObject>();
+  Trail->SetNumberField(TEXT("seq"), Seq);
+  FString Player = L.PlayerId;
+  TArray<TSharedPtr<FJsonValue>> Moves;
+  auto XY = [](const FIntPoint& C) -> TSharedPtr<FJsonValue> {
+    const TSharedRef<FJsonObject> O = MakeShared<FJsonObject>();
+    O->SetNumberField(TEXT("x"), C.X);
+    O->SetNumberField(TEXT("y"), C.Y);
+    return MakeShared<FJsonValueObject>(O);
+  };
+  for (int32 I = 0; I < L.Moves.Num(); ++I) {
+    const FFixture::FLastMovement::FMove& Move = L.Moves[I];
+    const FS08BoardFighter* F =
+        Fighters.FindByPredicate([&Move](const FS08BoardFighter& X) { return X.Id == Move.FighterId; });
+    FIntPoint From;
+    if (!F || !Move.From.Resolve(Board, From)) {
+      OutError = FString::Printf(TEXT("lastMovement %s: from %s is not a board space"), *Move.FighterId,
+                                 *Move.From.Describe());
+      return nullptr;
+    }
+    if (Player.IsEmpty()) Player = F->OwnerId;
+    TArray<TSharedPtr<FJsonValue>> Path;
+    FIntPoint Last = From;
+    for (const FCellRef& Ref : Move.Path) {
+      if (!Ref.Resolve(Board, Last)) {
+        OutError = FString::Printf(TEXT("lastMovement %s: %s is not a board space"), *Move.FighterId, *Ref.Describe());
+        return nullptr;
+      }
+      Path.Add(XY(Last));
+    }
+    if (Last != FIntPoint(F->X, F->Y)) {
+      OutError = FString::Printf(TEXT("lastMovement %s ends on %s, the fighter stands on %s"), *Move.FighterId,
+                                 *Board.CellLabel(Last.X, Last.Y), *Board.CellLabel(F->X, F->Y));
+      return nullptr;
+    }
+    const TSharedRef<FJsonObject> M = MakeShared<FJsonObject>();
+    M->SetNumberField(TEXT("order"), I);
+    M->SetStringField(TEXT("fighterId"), Move.FighterId);
+    M->SetStringField(TEXT("kind"), Move.bPlace ? TEXT("PLACE") : TEXT("MOVE"));
+    M->SetField(TEXT("from"), XY(From));
+    M->SetArrayField(TEXT("path"), Path);
+    Moves.Add(MakeShared<FJsonValueObject>(M));
+  }
+  if (Player.IsEmpty()) {
+    OutError = TEXT("lastMovement without playerId and without moves");
+    return nullptr;
+  }
+  Trail->SetStringField(TEXT("playerId"), Player);
+  Trail->SetStringField(TEXT("source"), L.Source);
+  Trail->SetStringField(TEXT("sourceRef"), TEXT("bench"));
+  if (L.bBoost && L.Source == TEXT("MANEUVER")) {
+    const TSharedRef<FJsonObject> Boost = MakeShared<FJsonObject>();
+    Boost->SetStringField(TEXT("name"), L.BoostName);
+    Boost->SetNumberField(TEXT("value"), L.BoostValue);
+    Trail->SetObjectField(TEXT("boost"), Boost);
+  } else {
+    Trail->SetField(TEXT("boost"), MakeShared<FJsonValueNull>());
+  }
+  Trail->SetArrayField(TEXT("moves"), Moves);
+  return Trail;
+}
+
+/** In with Trail as its metadata.lastMovement (the rest of the metadata kept). */
+FS08Snapshot WithTrail(const FS08Snapshot& In, const TSharedPtr<FJsonObject>& Trail) {
+  FS08Snapshot Out = In;
+  const TSharedRef<FJsonObject> Meta = MakeShared<FJsonObject>();
+  if (In.Metadata.IsValid() && In.Metadata->Type == EJson::Object && In.Metadata->AsObject().IsValid()) {
+    for (const TPair<FString, TSharedPtr<FJsonValue>>& Pair : In.Metadata->AsObject()->Values) {
+      Meta->SetField(Pair.Key, Pair.Value);
+    }
+  }
+  Meta->SetObjectField(TEXT("lastMovement"), Trail);
+  Out.Metadata = MakeShared<FJsonValueObject>(Meta);
+  return Out;
+}
+
+FApplyResult ApplyDraft(const FFixture& Fixture, const FS08Snapshot& Snapshot, const FS08BoardModel& Board,
+                        const TArray<FS08BoardFighter>& Fighters, const FString& ViewerId, FS09CommandUi& Ui);
+}  // namespace
+
 FApplyResult Apply(const FFixture& Fixture, const FS08Snapshot& Snapshot, const FS08BoardModel& Board,
                    const TArray<FS08BoardFighter>& Fighters, const FString& ViewerId, FS09CommandUi& Ui) {
+  FApplyResult R;
+  for (const FFixture::FLastMovement::FMove& Move : Fixture.LastMovement.Moves) {
+    if (!Fighters.ContainsByPredicate([&Move](const FS08BoardFighter& F) { return F.Id == Move.FighterId; })) {
+      R.MismatchId = Move.FighterId;
+      R.Error = FString::Printf(TEXT("fighter %s is not in the bench fixture"), *Move.FighterId);
+      return R;
+    }
+  }
+  TSharedPtr<FJsonObject> Trail;
+  if (Fixture.LastMovement.bSet) {
+    Trail = BuildTrail(Fixture.LastMovement, Snapshot.SequenceNumber, Board, Fighters, R.Error);
+    if (!Trail.IsValid()) return R;
+  }
+  if (Fixture.IsTrailOnly()) {
+    R.Snapshot = WithTrail(Snapshot, Trail);
+    R.bTrail = true;
+    if (Fixture.Hover.bSet && !Fixture.Hover.Resolve(Board, R.Hover)) {
+      R.Error = FString::Printf(TEXT("hover %s is not a board space"), *Fixture.Hover.Describe());
+      return R;
+    }
+    R.bOk = true;
+    R.Summary = FString::Printf(
+        TEXT("MS-BENCH last file=%s scene=%s board=%s player=%s source=%s moves=%d boost=%s hover=%s"), *Fixture.File,
+        Fixture.Scene.IsEmpty() ? TEXT("-") : *Fixture.Scene, Fixture.Board.IsEmpty() ? TEXT("-") : *Fixture.Board,
+        *Trail->GetStringField(TEXT("playerId")), *Fixture.LastMovement.Source, Fixture.LastMovement.Moves.Num(),
+        Fixture.LastMovement.bBoost ? *FString::FromInt(Fixture.LastMovement.BoostValue) : TEXT("-"),
+        R.Hover.X >= 0 ? *Board.CellLabel(R.Hover.X, R.Hover.Y) : TEXT("-"));
+    return R;
+  }
+  R = ApplyDraft(Fixture, Snapshot, Board, Fighters, ViewerId, Ui);
+  if (R.bOk && Trail.IsValid()) {
+    R.Snapshot = WithTrail(R.Snapshot, Trail);
+    R.bTrail = true;
+    R.Summary += FString::Printf(TEXT(" last=%d"), Fixture.LastMovement.Moves.Num());
+  }
+  return R;
+}
+
+namespace {
+FApplyResult ApplyDraft(const FFixture& Fixture, const FS08Snapshot& Snapshot, const FS08BoardModel& Board,
+                        const TArray<FS08BoardFighter>& Fighters, const FString& ViewerId, FS09CommandUi& Ui) {
   FApplyResult R;
   auto HasFighter = [&Fighters](const FString& Id) {
     return Fighters.ContainsByPredicate([&Id](const FS08BoardFighter& F) { return F.Id == Id; });
@@ -404,5 +583,6 @@ FApplyResult Apply(const FFixture& Fixture, const FS08Snapshot& Snapshot, const 
       Fixture.Skipped.Num() > 0 ? *FString::Join(Fixture.Skipped, TEXT("+")) : TEXT("-"));
   return R;
 }
+}  // namespace
 
 }  // namespace S09MoveDraftBench

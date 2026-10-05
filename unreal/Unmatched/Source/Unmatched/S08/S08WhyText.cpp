@@ -78,6 +78,13 @@ const FRow GRows[] = {
     {TEXT("ms.ability.boost"), TEXT("{fighterName}: add a BOOST to this attack?")},
     {TEXT("ms.btn.boost.attack"), TEXT("Attack with BOOST (Enter)")},
     {TEXT("ms.btn.noboost"), TEXT("Attack without BOOST (N)")},
+    // MS-T-17 (03 §7, §9): the opponent's planning indicator and the event feed
+    {TEXT("ms.opp.planning"), TEXT("Opponent is planning a maneuver")},
+    {TEXT("ms.log.maneuver"), TEXT("{player}: maneuver{boostPart}: {moves}")},
+    {TEXT("ms.log.boost.part"), TEXT(", boost +{n} ({cardName})")},
+    {TEXT("ms.log.move"), TEXT("{fighterName} {from}→{to}")},
+    {TEXT("ms.log.more"), TEXT("and {n} more")},
+    {TEXT("ms.log.stay"), TEXT("no movement")},
 };
 
 const FRow* Find(FName Key) {
