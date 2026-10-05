@@ -96,6 +96,25 @@ class TableTests(unittest.TestCase):
         t = copy.deepcopy(TABLE); del row(t, "CUE-007")["params"]["order_in_seq"]
         self.assertTrue(any("params.order_in_seq" in e for e in cc.validate_table(t)))
 
+    def test_cue007_pose(self):
+        """DE-021 (01 F-02, D-DE-02): поза хода в таблице — без подскока, наклон 10° за 60 мс, разворот 50, доворот 120,
+        возврат в Idle 150, ease выкл; схема и семантика её стерегут (C++ CueTrace сверяет FS08MoveAnimParams с ней)."""
+        r = row(TABLE, "CUE-007")
+        self.assertEqual(cc.move_pose(r), {"hop_height_rel": 0, "travel_lean_deg": 10, "lean_in_ms": 60, "start_turn_ms": 50,
+                                           "turn_ms": 120, "settle_ms": 150, "ease_ends": False})
+        t = copy.deepcopy(TABLE); del row(t, "CUE-007")["pose"]
+        self.assertTrue(any(e.startswith("schema") for e in cc.validate_table(t)))
+        t = copy.deepcopy(TABLE); del row(t, "CUE-007")["pose"]["settle_ms"]
+        self.assertTrue(any(e.startswith("schema") for e in cc.validate_table(t)))
+        t = copy.deepcopy(TABLE); row(t, "CUE-011")["pose"] = copy.deepcopy(r["pose"])  # поза без шаговой длительности
+        self.assertTrue(any(e.startswith("schema") for e in cc.validate_table(t)))
+        t = copy.deepcopy(TABLE); row(t, "CUE-007")["pose"]["hop_height_rel"] = 0.9
+        self.assertTrue(any(e.startswith("schema") for e in cc.validate_table(t)))
+        for key in ("lean_in_ms", "start_turn_ms", "turn_ms"):
+            t = copy.deepcopy(TABLE); row(t, "CUE-007")["pose"][key] = 400
+            errs = cc.validate_table(t)
+            self.assertTrue(any("pose." + key in e and not e.startswith("schema") for e in errs), (key, errs))
+
 
 P = cc.move_params(row(TABLE, "CUE-007"))
 

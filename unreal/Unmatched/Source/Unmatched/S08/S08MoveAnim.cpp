@@ -253,3 +253,30 @@ FQuat FS08MoveAnim::FigureRotation(double YawDeg, double LeanDeg, double MeshYaw
   const FVector Axis = FVector::CrossProduct(FVector::UpVector, Forward).GetSafeNormal();
   return FQuat(Axis, FMath::DegreesToRadians(LeanDeg)) * Yaw;
 }
+
+TArray<FIntPoint> FS08MoveAnim::ReviewPath(const FIntPoint& Dest,
+                                           TFunctionRef<TArray<FIntPoint>(const FIntPoint&)> Neighbours,
+                                           TFunctionRef<bool(const FIntPoint&)> IsFree,
+                                           TFunctionRef<FVector(const FIntPoint&)> CellToWorld) {
+  const FVector DestW = CellToWorld(Dest);
+  TArray<FIntPoint> Best;
+  double BestScore = -1.0;
+  for (const FIntPoint& N1 : Neighbours(Dest)) {
+    if (N1 == Dest || !IsFree(N1)) continue;
+    const FVector Last = (DestW - CellToWorld(N1)).GetSafeNormal2D();
+    if (Last.IsNearlyZero()) continue;
+    // Sideways share of the last edge (the board camera looks along -Y), then how well N2 -> N1 continues it.
+    const double Side = FMath::Abs(Last.X);
+    for (const FIntPoint& N2 : Neighbours(N1)) {
+      if (N2 == Dest || N2 == N1 || !IsFree(N2)) continue;
+      const FVector First = (CellToWorld(N1) - CellToWorld(N2)).GetSafeNormal2D();
+      if (First.IsNearlyZero()) continue;
+      const double Score = Side * 2.0 + FVector::DotProduct(First, Last);
+      if (Score > BestScore + 1e-6) {
+        BestScore = Score;
+        Best = {N2, N1, Dest};
+      }
+    }
+  }
+  return Best;
+}

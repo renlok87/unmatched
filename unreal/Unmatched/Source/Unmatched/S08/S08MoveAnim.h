@@ -108,4 +108,10 @@ struct UNMATCHED_API FS08MoveAnim {
   /** Relative rotation of a figure mesh: yaw (+ MeshYawOffsetDeg: 0 for a rig v2 figure facing +X, -90 for a legacy
    *  mesh facing +Y), leaned LeanDeg forward towards the facing (the top moves along the facing). */
   static FQuat FigureRotation(double YawDeg, double LeanDeg, double MeshYawOffsetDeg);
+  /** DE-021 A/B frames (-BenchMovePose): a two-edge approach [N2, N1, Dest] that ends on Dest - N1 the free neighbour
+   *  of Dest whose last edge runs most sideways to the board camera (largest |dX| share: the lean and the hop read in
+   *  profile), N2 the free neighbour of N1 (not Dest) that continues that line best. Empty when there is none. */
+  static TArray<FIntPoint> ReviewPath(const FIntPoint& Dest, TFunctionRef<TArray<FIntPoint>(const FIntPoint&)> Neighbours,
+                                      TFunctionRef<bool(const FIntPoint&)> IsFree,
+                                      TFunctionRef<FVector(const FIntPoint&)> CellToWorld);
 };

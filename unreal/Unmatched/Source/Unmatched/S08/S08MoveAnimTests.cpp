@@ -5,7 +5,8 @@
 //   Unmatched.S08.MoveAnim.Pose (F-02, SD-20/50) - the pose of a figure along its plan: the same time on every edge
 //     whatever its length, linear inside an edge, no hop by default (the hop is a parameter), lean 10 deg in 60 ms,
 //     start turn <= 50 ms, turn at a vertex 120 ms on the move, back to Idle in 150 ms, ease off by default, Place fade
-//     out / in, a later fighter waits on its start cell, a snapped plan lands at its slot.
+//     out / in, a later fighter waits on its start cell, a snapped plan lands at its slot; the -BenchMovePose review
+//     approach (DE-021).
 //   Unmatched.S08.MoveAnim.Settings (MS-AT-33) - US08UserSettings is a config object in GameUserSettings.ini and leaves
 //     the engine's GameUserSettings class alone (FrameRateLimit 60 kept), the flags override the saved values, the A/B
 //     review parameters.
@@ -281,6 +282,31 @@ bool FS08MoveAnimPoseTest::RunTest(const FString&) {
     const FVector ForwardLegacy = FS08MoveAnim::FigureRotation(Yaw, 0.0, -90.0).RotateVector(FVector::RightVector);
     TestTrue(FString::Printf(TEXT("v2 +X and legacy +Y face the yaw %.0f"), Yaw),
              ForwardV2.Equals(Facing, 0.001) && ForwardLegacy.Equals(Facing, 0.001));
+  }
+  // DE-021 -BenchMovePose: the review approach on a 5 x 5 grid ends on the destination over two free edges, the last
+  // one sideways (+-X) to the board camera, the first continuing it; occupied cells are never on it.
+  {
+    auto Grid = [](const FIntPoint& C) {
+      TArray<FIntPoint> Out;
+      for (const FIntPoint& D : {FIntPoint(1, 0), FIntPoint(-1, 0), FIntPoint(0, 1), FIntPoint(0, -1)}) {
+        const FIntPoint N = C + D;
+        if (N.X >= 0 && N.X < 5 && N.Y >= 0 && N.Y < 5) Out.Add(N);
+      }
+      return Out;
+    };
+    const TArray<FIntPoint> Free = FS08MoveAnim::ReviewPath(FIntPoint(2, 2), Grid, [](const FIntPoint&) { return true; },
+                                                            GridWorld);
+    TestTrue("review path: [N2, N1, dest], straight along X",
+             Free.Num() == 3 && Free[2] == FIntPoint(2, 2) && Free[1].Y == 2 && Free[0].Y == 2 &&
+                 FMath::Abs(Free[0].X - 2) == 2);
+    const TArray<FIntPoint> Blocked = FS08MoveAnim::ReviewPath(
+        FIntPoint(2, 2), Grid,
+        [](const FIntPoint& C) { return C != FIntPoint(1, 2) && C != FIntPoint(3, 2) && C != FIntPoint(4, 2); }, GridWorld);
+    TestTrue("review path avoids occupied cells (sideways edges blocked -> a Y edge)",
+             Blocked.Num() == 3 && Blocked[1].X == 2 && Blocked[1] != FIntPoint(2, 2) &&
+                 !Blocked.Contains(FIntPoint(1, 2)) && !Blocked.Contains(FIntPoint(3, 2)));
+    TestEqual("review path: none when boxed in",
+              FS08MoveAnim::ReviewPath(FIntPoint(0, 0), Grid, [](const FIntPoint&) { return false; }, GridWorld).Num(), 0);
   }
   return true;
 }

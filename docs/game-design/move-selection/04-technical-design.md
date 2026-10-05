@@ -699,6 +699,14 @@ schedule(moves[], p, speed, reducedMotion) -> [{fighterId, startMs, stepDurMs, s
   правили бы игнорируемую секцию. `S08IconMotion::IsReducedMotion` теперь учитывает и сохранённый `bReducedMotion`.
 - **Параметры A/B (DE-028):** `-S08MoveHop=<доля роста>`, `-S08MoveLean=<градусы>`, `-S08MoveEase`; по умолчанию —
   F-02 (подскока нет, наклон 10°, ease выкл).
+- **DE-021 (2026-10-05).** Поза хода записана в `cue-table.json` CUE-007 блоком `pose` (`hop_height_rel` 0,
+  `travel_lean_deg` 10, `lean_in_ms` 60, `start_turn_ms` 50, `turn_ms` 120, `settle_ms` 150, `ease_ends` false); тест
+  `Unmatched.S08.MoveAnim.CueTrace` сверяет с ней умолчания `FS08MoveAnimParams` («код = cue-table»), схема и
+  `cue_contract.py validate-table` её стерегут. Старт в кадре снапшота — `Unmatched.S08.MoveAnim.StartFrame` (один
+  `ApplySnapshot`: синхронизация доски, затем cue; план своей фигуры с 0, через один кадр 60 FPS она уже на ребре).
+  Кадры A/B — bench-флаг `-BenchMovePose=<мс>` (+ `-BenchMovePoseFighter=<id>`): фигура проходит два ребра в свою
+  клетку фикстуры (`FS08MoveAnim::ReviewPath`, последнее ребро — боком к камере) и держится на `<мс>` хода во всех видах;
+  трасса `MS-ANIM bench-pose …`. Кадры — `docs/game-design/evidence/DE-FOOTAGE/de021-ab-2026-10-05/`.
 - **Не сделано здесь.** Встряски V-08 в клиенте нет — `bScreenShake` пока только хранится; пульса подложек нет в
   материале `M_UM_MovePlate` — выключать нечего; переподключение во время хода (`on_reconnect: skip`) — ход доигрывает,
   если клетка в барьерном снапшоте не изменилась (иначе `jump_to_final`); тик шага и пыль — MS-T-18; множитель скорости

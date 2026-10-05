@@ -4,8 +4,10 @@
 //     snapshot (no step limit); otherwise straight from -> to. Order in the seq, PLACE kind, trail
 //     mismatch, a seq gap / barrier frame without cues, two maneuvers in a row, the turn indicator of a
 //     same-seq turn pass. The animation half of MS-AT-25 (jump_to_final, Tomoe cascade, snap) is MS-T-16.
-//   Unmatched.S08.MoveAnim.CueTrace (MS-AT-28 UE half, MS-R-60) - FS08MoveCueParams == cue-table.json
-//     CUE-007, the 04 §6.3 control values, the MS-CUE line format with map-space labels. Every MS-CUE
+//   Unmatched.S08.MoveAnim.StartFrame (DE-021, SD-13, MS-R-22) - one ApplySnapshot gives the board sync, then the cues;
+//     the own fighter's plan starts at 0 and leaves its start cell within one 60 FPS frame.
+//   Unmatched.S08.MoveAnim.CueTrace (MS-AT-28 UE half, MS-R-60) - FS08MoveCueParams and the pose defaults
+//     FS08MoveAnimParams == cue-table.json CUE-007 (DE-021 "code = cue-table"), the 04 §6.3 control values, the MS-CUE line format with map-space labels. Every MS-CUE
 //     line is also logged (LogTemp Display), so `python tools/s08/cue_contract/cue_contract.py
 //     check-trace <automation log>` re-checks steps, path and ms= against the table in Python.
 // Headless: UnrealEditor-Cmd Unmatched.uproject -ExecCmds="Automation RunTests Unmatched.S08.MoveAnim"
@@ -14,6 +16,7 @@
 #include "S08BoardModel.h"
 #include "S08Contracts.h"
 #include "S08FlowController.h"
+#include "S08MoveAnim.h"
 #include "Dom/JsonObject.h"
 #include "Dom/JsonValue.h"
 #include "Misc/AutomationTest.h"
@@ -486,6 +489,27 @@ bool FS08MoveCueTraceTest::RunTest(const FString&) {
       TestEqual("min_step_ms", Field(TEXT("min_step_ms")), P.MinStepMs);
       TestEqual("overlap", Field(TEXT("overlap")), P.Overlap);
       TestEqual("place_ms", Field(TEXT("place_ms")), P.PlaceMs);
+      // DE-021 (W-12; 01 F-02, D-DE-02): the pose defaults of the move ARE the table's CUE-007 pose
+      const TSharedPtr<FJsonObject>* Pose = nullptr;
+      TestTrue("pose block", Row->TryGetObjectField(TEXT("pose"), Pose));
+      if (Pose) {
+        const FS08MoveAnimParams A;
+        auto PoseField = [&Pose](const TCHAR* Name) {
+          double V = -1.0;
+          (*Pose)->TryGetNumberField(Name, V);
+          return V;
+        };
+        bool bEase = true;
+        (*Pose)->TryGetBoolField(TEXT("ease_ends"), bEase);
+        TestEqual("pose.hop_height_rel (D-DE-02: 0)", PoseField(TEXT("hop_height_rel")), A.HopHeightRel);
+        TestEqual("pose.travel_lean_deg", PoseField(TEXT("travel_lean_deg")), A.TravelLeanDeg);
+        TestEqual("pose.lean_in_ms", PoseField(TEXT("lean_in_ms")), A.LeanInMs);
+        TestEqual("pose.start_turn_ms", PoseField(TEXT("start_turn_ms")), A.StartTurnMs);
+        TestEqual("pose.turn_ms", PoseField(TEXT("turn_ms")), A.TurnMs);
+        TestEqual("pose.settle_ms", PoseField(TEXT("settle_ms")), A.SettleMs);
+        TestEqual("pose.ease_ends", bEase, A.bEaseEnds);
+        TestEqual("D-DE-02: no hop by default", A.HopHeightRel, 0.0);
+      }
       const TSharedPtr<FJsonObject>* Params = nullptr;
       TestTrue("params.path and order_in_seq documented",
                Row->TryGetObjectField(TEXT("params"), Params) && (*Params)->HasField(TEXT("path")) &&
@@ -595,6 +619,51 @@ bool FS08MoveCueTraceTest::RunTest(const FString&) {
       TestTrue("fourth snapped at 1944", Cap.CueLines[3].Contains(TEXT("order=3 of=9 kind=move steps=9 source=trail start=1944 ms=0 snapped=1")));
       TestTrue("last snapped at 1944", Cap.CueLines[8].Contains(TEXT("order=8 of=9 kind=move steps=9 source=trail start=1944 ms=0 snapped=1")));
     }
+  }
+  return true;
+}
+
+
+// ---- DE-021 (W-12, SD-13, MS-R-22): the own figure starts in the frame the snapshot is applied ---------------------
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08MoveStartFrameTest, "Unmatched.S08.MoveAnim.StartFrame",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08MoveStartFrameTest::RunTest(const FString&) {
+  using namespace S08MoveCueTest;
+  // The game mode syncs the board on OnApplied and starts the moves on OnCues (HandleCues -> PlayFighterMoves ->
+  // PlayMove samples t = 0 at once). Both must come out of ONE ApplySnapshot call, applied first; the plan of the own
+  // fighter (alone in its seq) starts at 0 and is already off its start cell one 60 FPS frame later.
+  const FString Board = GridBoard(5, 3);
+  FS08FlowController Flow(TEXT("http://invalid"), TEXT("ws://invalid"), Host);
+  TArray<FString> Events;
+  TArray<FS08MovePlan> Plans;
+  auto World = [](const FIntPoint& Cell) { return FVector(Cell.X * 100.0, Cell.Y * 100.0, 0.0); };
+  Flow.OnApplied.AddLambda([&Events](const FS08Snapshot& Applied, ES08SeqDecision) {
+    Events.Add(FString::Printf(TEXT("applied:%d"), Applied.SequenceNumber));
+  });
+  Flow.OnCues.AddLambda([&](const TArray<FS08Cue>& Cues) {
+    Events.Add(FString::Printf(TEXT("cues:%d"), Cues.Num() > 0 ? Cues[0].SequenceNumber : -1));
+    Plans = FS08MoveAnim::BuildPlans(Cues, FS08MotionSettings(), World);
+  });
+  Flow.ApplySnapshot(Snap(10, Board, {{TEXT("h1"), Host, 0, 1}, {TEXT("g1"), Guest, 4, 1}}));
+  Events.Reset();
+  Flow.ApplySnapshot(Snap(11, Board, {{TEXT("h1"), Host, 2, 1}, {TEXT("g1"), Guest, 4, 1}},
+                          TrailMeta(11, {{TEXT("h1"), TEXT("MOVE"), {0, 1}, {{1, 1}, {2, 1}}}})));
+  TestEqual("one apply -> board sync, then the cues (same call, same frame)", FString::Join(Events, TEXT(" ")),
+            TEXT("applied:11 cues:11"));
+  TestEqual("one plan", Plans.Num(), 1);
+  if (Plans.Num() == 1) {
+    const FS08MovePlan& P = Plans[0];
+    const FS08MoveAnimParams A;
+    TestEqual("own fighter", P.FighterId, FString(TEXT("h1")));
+    TestEqual("starts at the snapshot frame (StartMs 0)", P.StartMs, 0.0);
+    TestTrue("280 ms per edge, 2 edges", FMath::IsNearlyEqual(P.StepMs, 280.0, 0.01) && P.Steps == 2);
+    const FS08MovePose At0 = FS08MoveAnim::Sample(P, A, 0.0, 150.0);
+    TestTrue("t = 0: started on the start cell", At0.bStarted && At0.Location.Equals(World({0, 1}), 0.01));
+    const double Frame = 1000.0 / 60.0;
+    const FS08MovePose At1 = FS08MoveAnim::Sample(P, A, Frame, 150.0);
+    TestTrue("one 60 FPS frame later: off the start cell on edge 0 (<= 1 frame, SD-13)",
+             At1.Edge == 0 && At1.Location.X > World({0, 1}).X + 1.0);
+    TestTrue("one frame: slide only, no hop (D-DE-02)", FMath::IsNearlyZero(At1.HopUU) && FMath::IsNearlyZero(At1.Location.Z));
   }
   return true;
 }

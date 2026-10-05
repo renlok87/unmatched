@@ -81,12 +81,13 @@
                    "shake", "fallback", "source_row"],
       "additionalProperties": false,
       "dependentRequired": {
-        "duration_per_step_ms": ["cap_subject_ms", "cap_seq_ms", "min_step_ms", "overlap", "place_ms", "params"],
+        "duration_per_step_ms": ["cap_subject_ms", "cap_seq_ms", "min_step_ms", "overlap", "place_ms", "pose", "params"],
         "cap_subject_ms": ["duration_per_step_ms"],
         "cap_seq_ms": ["duration_per_step_ms"],
         "min_step_ms": ["duration_per_step_ms"],
         "overlap": ["duration_per_step_ms"],
-        "place_ms": ["duration_per_step_ms"]
+        "place_ms": ["duration_per_step_ms"],
+        "pose": ["duration_per_step_ms"]
       },
       "properties": {
         "id": {"type": "string", "pattern": "^CUE-[0-9]{3}$"},
@@ -101,6 +102,18 @@
         "min_step_ms": {"type": "integer", "minimum": 1, "description": "минимальная длительность шага, мс; скоростью не масштабируется"},
         "overlap": {"type": "number", "minimum": 0, "exclusiveMaximum": 1, "description": "доля перекрытия соседних субъектов seq (следующий стартует на (1 - overlap) длительности предыдущего)"},
         "place_ms": {"type": "integer", "minimum": 1, "description": "длительность перехода PLACE (один шаг), мс; масштабируется скоростью"},
+        "pose": {"type": "object", "additionalProperties": false,
+          "required": ["hop_height_rel", "travel_lean_deg", "lean_in_ms", "start_turn_ms", "turn_ms", "settle_ms", "ease_ends"],
+          "description": "поза фигуры на перемещении (CUE-007, move-selection 04 §6.3, DE-021 по 01 F-02); код FS08MoveAnimParams равен этим значениям (UE Unmatched.S08.MoveAnim.CueTrace); скоростью не масштабируется",
+          "properties": {
+            "hop_height_rel": {"type": "number", "minimum": 0, "maximum": 0.5, "description": "высота подскока на ребре в долях роста фигуры; 0 = скольжение (D-DE-02), A/B — 0.08 (-S08MoveHop=)"},
+            "travel_lean_deg": {"type": "number", "minimum": 0, "maximum": 45, "description": "наклон корпуса вперёд по ходу, градусы; 0 = выкл (-S08MoveLean=)"},
+            "lean_in_ms": {"type": "integer", "minimum": 0, "description": "вход наклона от старта хода, мс"},
+            "start_turn_ms": {"type": "integer", "minimum": 0, "description": "разворот к первому ребру, мс (не дольше ребра)"},
+            "turn_ms": {"type": "integer", "minimum": 0, "description": "доворот к следующему ребру на вершине, на ходу без остановки, мс (не дольше ребра)"},
+            "settle_ms": {"type": "integer", "minimum": 0, "description": "возврат в Idle после прибытия: наклон -> 0, ориентация по правилу половины поля, мс"},
+            "ease_ends": {"type": "boolean", "description": "sine-ease на первом и последнем ребре; по умолчанию выкл (02 «Спорно» п. 1, -S08MoveEase)"}
+          }},
         "params": {"type": "object", "minProperties": 1, "additionalProperties": {"type": "string", "minLength": 1},
           "description": "параметры события CUE: имя → смысл (CUE-007: path, order_in_seq, kind, steps, path_source)"},
         "feedback_delay_ms": {"type": "integer", "minimum": 0, "maximum": 200},

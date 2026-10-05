@@ -1036,6 +1036,88 @@ void AS08FlowGameMode::HandleCues(const TArray<FS08Cue>& Cues) {
   }
 }
 
+bool AS08FlowGameMode::ApplyBenchMovePose(const FString& PreferredId, double HoldMs, FString& OutPosedId,
+                                          FString& OutError) {
+  TSet<FIntPoint> Occupied;
+  for (const FS08BoardFighter& F : Fighters) {
+    if (F.IsAlive()) Occupied.Add(FIntPoint(F.X, F.Y));
+  }
+  auto World = [this](const FIntPoint& Cell) { return BoardModel.CellToWorld(Cell.X, Cell.Y); };
+  auto Approach = [&](const FS08BoardFighter& F) {
+    return FS08MoveAnim::ReviewPath(
+        FIntPoint(F.X, F.Y), [this](const FIntPoint& Cell) { return BoardModel.Neighbours(Cell); },
+        [&Occupied](const FIntPoint& Cell) { return !Occupied.Contains(Cell); }, World);
+  };
+  // Candidates: the explicit fighter, else the viewer's hero, the other heroes, then the sidekicks (the Marmoreal
+  // fixture's Medusa stands between two harpies - no free approach - so King Arthur is posed there).
+  FString Wanted;
+  FParse::Value(FCommandLine::Get(), TEXT("BenchMovePoseFighter="), Wanted);
+  TArray<const FS08BoardFighter*> Order;
+  for (const int32 Pass : {0, 1, 2, 3}) {
+    for (const FS08BoardFighter& F : Fighters) {
+      const bool bTake = Pass == 0 ? (!Wanted.IsEmpty() && F.Id == Wanted)
+                       : Pass == 1 ? (Wanted.IsEmpty() && F.Id == PreferredId)
+                       : Pass == 2 ? (Wanted.IsEmpty() && F.bIsHero)
+                                   : Wanted.IsEmpty();
+      if (bTake && F.IsAlive()) Order.AddUnique(&F);
+    }
+  }
+  const FS08BoardFighter* Hero = nullptr;
+  TArray<FIntPoint> Path;
+  for (const FS08BoardFighter* F : Order) {
+    Path = Approach(*F);
+    if (Path.Num() == 3 && BoardActor && BoardActor->FindFighterActor(F->Id)) {
+      Hero = F;
+      break;
+    }
+  }
+  if (!Hero) {
+    OutError = Wanted.IsEmpty() ? FString(TEXT("no fighter with a free two-edge approach"))
+                                : FString::Printf(TEXT("fighter '%s' missing or without a free two-edge approach"), *Wanted);
+    return false;
+  }
+  const FString HeroId = Hero->Id;
+  AS08FighterActor* Actor = BoardActor->FindFighterActor(HeroId);
+  const FIntPoint Dest(Hero->X, Hero->Y);
+  FS08Cue Cue;
+  Cue.Type = ES08CueType::FighterMoved;
+  Cue.FighterId = HeroId;
+  Cue.Path = Path;
+  Cue.FromX = Path[0].X;
+  Cue.FromY = Path[0].Y;
+  Cue.ToX = Dest.X;
+  Cue.ToY = Dest.Y;
+  Cue.Kind = ES08MoveKind::Move;
+  Cue.PathSource = ES08PathSource::Trail;
+  // Speed "normal", no reduced motion: the review frame shows the move itself, whatever the saved settings say.
+  const TArray<FS08MovePlan> Plans = FS08MoveAnim::BuildPlans({Cue}, FS08MotionSettings(), World);
+  if (Plans.Num() != 1 || Plans[0].bSnapped) {
+    OutError = TEXT("the review move did not plan");
+    return false;
+  }
+  // Inside the travel (the settle would end the move): 420 = the middle of the second edge - full lean, hop peak,
+  // the vertex turn (120 ms) done.
+  const double Hold = FMath::Clamp(HoldMs, 1.0, Plans[0].ArriveMs() - 1.0);
+  const int64 Start = NowMs();
+  BoardActor->PlayFighterMoves(Plans, MoveAnimParams, Start);
+  BenchMovePoseClockMs = Start + static_cast<int64>(FMath::RoundToDouble(Hold));
+  BoardActor->TickFighterMoves(BenchMovePoseClockMs);
+  bBenchMovePose = Actor->IsMoving();
+  if (!bBenchMovePose) {
+    OutError = TEXT("the figure did not start its review move");
+    return false;
+  }
+  OutPosedId = HeroId;
+  const FS08MovePose& Pose = Actor->GetMovePose();
+  FS08Trace::Write(FString::Printf(
+      TEXT("MS-ANIM bench-pose hero=%s path=(%d,%d)>(%d,%d)>(%d,%d) hold=%.0f step=%.0f hop=%.3f lean=%.1f ease=%d ")
+          TEXT("edge=%d hopUU=%.1f leanDeg=%.1f yaw=%.1f"),
+      *HeroId, Path[0].X, Path[0].Y, Path[1].X, Path[1].Y, Path[2].X, Path[2].Y, Hold, Plans[0].StepMs,
+      MoveAnimParams.HopHeightRel, MoveAnimParams.TravelLeanDeg, MoveAnimParams.bEaseEnds ? 1 : 0, Pose.Edge, Pose.HopUU,
+      Pose.LeanDeg, Pose.YawDeg));
+  return true;
+}
+
 void AS08FlowGameMode::TickDeferredDamage() {
   if (DeferredDamage.Num() == 0) return;
   const int64 Now = NowMs();
@@ -4687,7 +4769,8 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
     if (Stray.Result == ES09HudPressResult::Refused) HandleHudPressOutcome(Stray, nullptr, nullptr);
   }
   // MS-T-16: the moves advance on the game clock; a skip key lands them this frame, then the due cascade damage.
-  if (BoardActor) BoardActor->TickFighterMoves(NowMs());
+  // DE-021 -BenchMovePose: the bench hero's move is held at its review moment.
+  if (BoardActor) BoardActor->TickFighterMoves(bBenchMovePose ? BenchMovePoseClockMs : NowMs());
   TryMoveSkip();
   TickDeferredDamage();
   // DE-018: the combat staging runs on the game clock; a click / Space / Enter during its holds is the skip and
@@ -8210,6 +8293,16 @@ void AS08FlowGameMode::RunRenderBench() {
         return;
       }
     }
+    // DE-021 (W-12): -BenchMovePose=<ms> holds the viewer's hero <ms> into a move - the A/B frames of hop and lean
+    double MovePoseMs = 0.0;
+    if (FParse::Value(Cmd, TEXT("BenchMovePose="), MovePoseMs) && MovePoseMs > 0.0) {
+      FString MovePoseError, PosedId;
+      if (!ApplyBenchMovePose(B.HeroId, MovePoseMs, PosedId, MovePoseError)) {
+        Finish(FString::Printf(TEXT("BENCH FAILED move-pose: %s"), *MovePoseError));
+        return;
+      }
+      B.HeroId = PosedId;  // the K2 views focus the moving figure
+    }
     FS08Trace::Write(FString::Printf(
         TEXT("BENCH scene fixture=%s board=%dx%d fighters=%d viewer=%s hero=%s art=%d profile=%s views=%s warmup=%.0f settle=%.0f measure=%.0f fps=%.0f profileGpu=%d csv=%d"),
         *FPaths::GetCleanFilename(Fixture), BoardModel.Width, BoardModel.Height, Fighters.Num(),
@@ -8361,6 +8454,8 @@ void AS08FlowGameMode::BenchSetupView(const FString& View, const FString& HeroId
   }
   // MS-T-08: a -BenchMoveDraft scene keeps the draft's selection on the board in every view (the camera focus above
   // only moves the camera)
+  // DE-021 -BenchMovePose: a travelling figure shows no reach plates (the camera still follows the selection)
+  if (bBenchMovePose && BoardActor) BoardActor->SetSelectedFighter(FString(), TSet<uint64>());
   if (bBenchMoveDraft && BoardActor) {
     if (CommandUi.IsPendingMovePlace()) {
       BoardActor->SetSelectedFighter(CommandUi.PendingFighterId, CommandUi.PendingCells); // MS-T-12 pending scene

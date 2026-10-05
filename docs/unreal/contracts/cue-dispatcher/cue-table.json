@@ -1,8 +1,8 @@
 {
  "schema": "unmatched.cue-table/1",
- "revision": "de-003-2026-10-04",
+ "revision": "de-021-2026-10-05",
  "status": "предложено",
- "status_note": "Контракт FS08CueDispatcher (волна 4, W4-D; меморандум engine-gate §1 п.8). Данные 18 CUE из 07-animation-vfx-audio.csv; VFX и звуки пока отсутствуют — таблица служит missing-report ART-010; клипы HitReact и DeathSettle есть у всех 6 v2-фигур (H2Anim, S08HeroesV2), LungeAttack — вступление CUE-011 (DE-003, 2026-10-04: живые данные DE, docs/game-design/de-footage/task/01-decisions.md F-01…F-12). Реализация диспетчера — GD-044, эффекты — GD-049. Не художественная приёмка.",
+ "status_note": "Контракт FS08CueDispatcher (волна 4, W4-D; меморандум engine-gate §1 п.8). Данные 18 CUE из 07-animation-vfx-audio.csv; VFX и звуки пока отсутствуют — таблица служит missing-report ART-010; клипы HitReact и DeathSettle есть у всех 6 v2-фигур (H2Anim, S08HeroesV2), LungeAttack — вступление CUE-011 (DE-003, 2026-10-04: живые данные DE, docs/game-design/de-footage/task/01-decisions.md F-01…F-12). Поза перемещения CUE-007 (`pose`: подскок, наклон, разворот, доворот, возврат в Idle, ease) — DE-021 по 01 F-02. Реализация диспетчера — GD-044, эффекты — GD-049. Не художественная приёмка.",
  "asset_path_rule": "soft object path /Game/...: Niagara — UNiagaraSystem, звук — USoundBase (SoundWave, SoundCue и MetaSoundSource взаимозаменяемы без кода). Пути удерживаются в cook через PrimaryAssetLabel или DirectoriesToAlwaysCook (строки LoadObject кукер не видит — ловушка 5)",
  "sockets_from": "docs/art-pipeline/rig/rig-contract.json ue_import.sockets_v2 (Weapon, Head) + Root/Base актора",
  "cues": [
@@ -348,6 +348,15 @@
    "min_step_ms": 90,
    "overlap": 0.3,
    "place_ms": 240,
+   "pose": {
+    "hop_height_rel": 0,
+    "travel_lean_deg": 10,
+    "lean_in_ms": 60,
+    "start_turn_ms": 50,
+    "turn_ms": 120,
+    "settle_ms": 150,
+    "ease_ends": false
+   },
    "params": {
     "path": "клетки пути со стартом (FS08Cue.Path): след metadata.lastMovement этого seq, если его ход начинается в позиции до снапшота и кончается в позиции снапшота; иначе канонический путь клиента на позициях до снапшота без предела шагов; иначе прямая from→to (move-selection 04 §4.6)",
     "order_in_seq": "порядок бойца среди перемещений seq (FS08Cue.OrderInSeq, 0..n-1): порядок moves[] следа, затем бойцы без следа в порядке fighters[]; расписание 04 §6.3 идёт в этом порядке",

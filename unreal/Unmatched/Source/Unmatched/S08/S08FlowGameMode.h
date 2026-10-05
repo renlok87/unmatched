@@ -596,6 +596,14 @@ private:
    *  reason (a 'MS-BENCH mismatch id=' id, a refused operation) - the bench then takes no frame. */
   bool ApplyBenchMoveDraft(const FS08Snapshot& Snapshot, const FString& Path, FString& OutError);
   bool bBenchMoveDraft = false;
+  /** -BenchMovePose=<ms> (DE-021, W-12 A/B frames for DE-028): a hero plays a two-edge move onto its own fixture cell
+   *  (FS08MoveAnim::ReviewPath) with the -S08MoveHop= / -S08MoveLean= / -S08MoveEase parameters, held <ms> into the
+   *  move for every view (the move clock stays at BenchMovePoseClockMs). The figure: -BenchMovePoseFighter=<id>, else
+   *  the viewer's hero (PreferredId), else the first other hero, else any fighter with a free two-edge approach.
+   *  OutPosedId = that figure (the K2 views focus it); false with the reason. */
+  bool ApplyBenchMovePose(const FString& PreferredId, double HoldMs, FString& OutPosedId, FString& OutError);
+  bool bBenchMovePose = false;
+  int64 BenchMovePoseClockMs = 0;
   /** Space under the cursor of the plates (MS-T-09 drives it live; the bench fixture's "hover" now). */
   FIntPoint MoveHoverCell = FIntPoint(-1, -1);
   uint32 MovePlatesKey = 0;
