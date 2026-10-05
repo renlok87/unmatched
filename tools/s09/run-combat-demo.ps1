@@ -825,6 +825,17 @@ function Invoke-CombatDemo {
         else { Write-Output "result-screen frame: $side has none" }
       }
     }
+    # Run D G-LIVE (move-selection 06 MS-AT-30): the opponent-client frames of the first opponent move - in flight
+    # (MS-T-16 / DE-021) and with its last-move highlight + feed line (MS-T-17 / DE-022). Published when written; not gated.
+    if ($ArtPreview) {
+      foreach ($side in @('host', 'joiner')) {
+        foreach ($leaf in @('s09-opponent-move.png', 's09-opponent-last-move.png')) {
+          $oppFrame = Join-Path $side $leaf
+          if (Test-Path -LiteralPath (Join-Path $Script:Staging $oppFrame)) { $publishNames += $oppFrame }
+          else { Write-Output "opponent frame: $side has no $leaf" }
+        }
+      }
+    }
     if ($RequireShotCaptured) {
       foreach ($name in $publishNames) {
         if ($name -notlike '*.png') { continue }

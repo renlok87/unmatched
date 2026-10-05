@@ -522,6 +522,12 @@ private:
   float ShotDraftAtElapsed = -1.0f;
   float ShotHudAtElapsed = -1.0f;
   float ShotDiscardAtElapsed = -1.0f;
+  // Run D G-LIVE (move-selection 06 MS-AT-30): the opponent-client frames - the first opponent move in flight (its
+  // first plan's mid point, MS-T-16 / DE-021) and its last-move highlight + feed line just after it (MS-T-17).
+  bool bS09ShotOppMove = false;
+  bool bS09ShotOppLast = false;
+  float ShotOppMoveAtElapsed = -1.0f;
+  float ShotOppLastAtElapsed = -1.0f;
   int32 LastSeenTurnCount = -1; // S09 auto: own-turn boundary detection
   // Rate-limited diagnostics (a stranded mandatory head used to emit one
   // trace line per tick - 98k lines / 9.7 MB in the GD-035 capture).

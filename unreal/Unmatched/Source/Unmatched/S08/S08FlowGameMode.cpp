@@ -1001,6 +1001,16 @@ void AS08FlowGameMode::HandleCues(const TArray<FS08Cue>& Cues) {
                                      MoveMotion.bReducedMotion ? 1 : 0, FMath::RoundToInt(EndMs)));
     // MS-T-17: the last-move highlight of this seq appears when its animation ends (MS-P-01 / MS-P-02 -> MS-P-03)
     if (Animated > 0) LastMoveTracker.OnMoveAnimation(Plans[0].Seq, static_cast<double>(NowMs()) + EndMs);
+    // Run D G-LIVE (MS-AT-30): one opponent-client frame of the first opponent move in flight, at its mid point
+    if (Animated > 0 && bAutoS09 && !S09ShotDir.IsEmpty() && ShotOppMoveAtElapsed < 0.0f && !Plans[0].bSnapped) {
+      const FS08BoardFighter* Mover = FindFighter(Plans[0].FighterId);
+      if (Mover && !Mover->OwnerId.IsEmpty() && Mover->OwnerId != ViewerIdNow()) {
+        const double MidMs = 0.5 * (Plans[0].StartMs + Plans[0].ArriveMs());
+        ShotOppMoveAtElapsed = Elapsed + static_cast<float>(MidMs / 1000.0);
+        FS08Trace::Write(FString::Printf(TEXT("S09AUTO opponent-move shot scheduled seq=%d fighter=%s atMs=%d"),
+                                         Plans[0].Seq, *Plans[0].FighterId, FMath::RoundToInt(MidMs)));
+      }
+    }
   }
   for (const FS08Cue& Cue : Cues) {
     FString Line;
@@ -3954,6 +3964,19 @@ void AS08FlowGameMode::TakeS09Shots() {
       Snap.SequenceNumber >= S09FirstConfirmSeq + 1 &&
       FS08Contracts::PendingManeuverId(Snap).IsEmpty()) {
     ShotHudAtElapsed = Elapsed + 1.0f;
+  }
+  // Run D G-LIVE (MS-AT-30): the opponent move in flight, then its last-move highlight + feed line
+  if (!bS09ShotOppMove && ShotOppMoveAtElapsed >= 0.0f && Elapsed >= ShotOppMoveAtElapsed &&
+      !FScreenshotRequest::IsScreenshotRequested()) {
+    bS09ShotOppMove = true;
+    FS08Trace::Write(TEXT("S09AUTO opponent-move shot"));
+    TakeEvidenceShot(S09ShotDir / TEXT("s09-opponent-move.png"));
+  }
+  if (!bS09ShotOppLast && ShotOppLastAtElapsed >= 0.0f && Elapsed >= ShotOppLastAtElapsed &&
+      !FScreenshotRequest::IsScreenshotRequested()) {
+    bS09ShotOppLast = true;
+    FS08Trace::Write(TEXT("S09AUTO opponent-last-move shot"));
+    TakeEvidenceShot(S09ShotDir / TEXT("s09-opponent-last-move.png"));
   }
   if (!bS09ShotHud && ShotHudAtElapsed >= 0.0f && Elapsed >= ShotHudAtElapsed) {
     bS09ShotHud = true;

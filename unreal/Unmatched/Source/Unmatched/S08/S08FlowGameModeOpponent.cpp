@@ -150,6 +150,12 @@ void AS08FlowGameMode::TickOpponentView() {
                                        Entry.bTruncated ? 1 : 0, *Entry.Text));
       RefreshHud();
     }
+    // Run D G-LIVE (MS-AT-30): the highlight + feed frame of the opponent move whose flight frame was scheduled
+    if (bAutoS09 && !S09ShotDir.IsEmpty() && ShotOppMoveAtElapsed >= 0.0f && ShotOppLastAtElapsed < 0.0f &&
+        !Revealed.PlayerId.IsEmpty() && Revealed.PlayerId != ViewerIdNow()) {
+      ShotOppLastAtElapsed = Elapsed + 0.5f;
+      FS08Trace::Write(FString::Printf(TEXT("S09AUTO opponent-last-move shot scheduled seq=%d"), Revealed.Seq));
+    }
   }
   // the callout ends once its move played out (the highlight is up) and the minimum read time passed
   if (bYoursCallout && LastMoveTracker.GetState() != ES09LastMoveState::Waiting &&
