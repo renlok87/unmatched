@@ -3280,6 +3280,9 @@ void AS08FlowGameMode::RunS09Auto() {
       FS08Trace::Write(TEXT("S09AUTO defense shot file never appeared - proceeding WITHOUT the shot"));
       S09ShotDefensePath.Reset();
     }
+    // Run D G-LIVE: a frame requested earlier in this frame (e.g. the damage number) would be replaced by the
+    // defense-window request and never written - the defense waits one frame for it (the window stays open).
+    if (!S09ShotDir.IsEmpty() && !bS09ShotDefense && FScreenshotRequest::IsScreenshotRequested()) return;
     if (HasPlan(TEXT("nodefense"))) {
       if (!S09ShotDir.IsEmpty() && !bS09ShotDefense) {
         bS09ShotDefense = true;
@@ -7099,7 +7102,10 @@ bool AS08FlowGameMode::FigureScreenRect(const FString& FighterId, FS08ScreenRect
   const float Radius = (Actor && Actor->HasArtFigure())
       ? (Fighter->bIsHero ? S08TeamRingSpec::HeroRectRadiusUU : S08TeamRingSpec::SidekickRectRadiusUU)
       : 30.0f;
-  const FVector Base = BoardModel.CellToWorld(Fighter->X, Fighter->Y);
+  // MS-T-16 (run D G-LIVE): a figure in flight carries its plate, tags and icon - the box follows the actor, not the
+  // snapshot cell it is travelling to (the actor sits on CellToWorld of its cell whenever it is not moving).
+  const FVector Base = (Actor && Actor->IsMoving()) ? Actor->GetActorLocation()
+                                                    : BoardModel.CellToWorld(Fighter->X, Fighter->Y);
   TArray<FVector2D> Points;
   for (const float Z : {0.0f, Height}) {
     for (const float Dx : {-Radius, Radius}) {
