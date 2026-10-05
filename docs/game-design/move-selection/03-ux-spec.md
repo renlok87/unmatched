@@ -455,6 +455,10 @@ n = 6/3/6; TL `move_edge`); у DE выпад жетона и «−N» масшт
 6. **Темп.** Камера стоит (MS-R-31). Бойцы соперника идут с перекрытием 30 % (04 §6.3); паузу DE между бойцами ИИ
    1,0–1,08 с (TL `ai_fighters_gap`) не копируем — это темп DE (SD-54 п. 2).
 
+Реализация п. 1–3 и строки «что делать сейчас» (02 SD-31) — DE-022 (2026-10-05, прогон D), подробности — 04
+«Уточнение DE-022». Ключи `ms.opp.phase.turn` (чужой ход, ничего не открыто), `ms.log.effect` и `ms.status.*` заведены
+DE-022 по соглашению 02 SD-31. Карта буста соперника (п. 5, MS-R-78) — DE-026.
+
 | ID | Требование | Тест |
 |---|---|---|
 | MS-R-24 | Сопернику видны: индикатор планирования; после коммита — анимация по тому же пути, что отправил автор; подсветка последнего хода до первого применённого seq > `lastMovement.seq`, в котором изменились позиции бойцов, HP любого бойца или `currentTurnPlayerId` (MS-P-03); строка ленты. Черновик не транслируется | MS-AT-25, MS-AT-26, MS-AT-32 |
@@ -571,7 +575,24 @@ n = 6/3/6; TL `move_edge`); у DE выпад жетона и «−N» масшт
 | `ms.opp.phase.defend` | Соперник защищается | Opponent is defending |
 | `ms.opp.phase.card` | Соперник выбирает карту | Opponent is choosing a card |
 | `ms.opp.phase.ability` | Соперник использует способность | Opponent is using an ability |
+| `ms.opp.phase.turn` | Соперник выбирает действие | Opponent is choosing an action |
 | `ms.opp.moves.yours` | Ваш боец {fighterName}: эффект {cardName} | Your fighter {fighterName}: {cardName} effect |
+| `ms.log.effect` | {player}: эффект {cardName}: {moves} | {player}: {cardName} effect: {moves} |
+| `ms.status.opp` | {player} — {verb} | {player} — {verb} |
+| `ms.status.action` | Выберите действие: манёвр (M), атака (A) или схема (G) | Choose an action: maneuver (M), attack (A) or scheme (G) |
+| `ms.status.end` | Действий не осталось: завершите ход (E) | No actions left: end your turn (E) |
+| `ms.status.fighter` | Выберите бойца, который пойдёт | Choose a fighter to move |
+| `ms.status.space` | Выберите клетку для {fighterName}; Enter — подтвердить манёвр | Choose a space for {fighterName}; Enter confirms the maneuver |
+| `ms.status.attacker` | Выберите атакующего бойца | Choose the attacking fighter |
+| `ms.status.target` | Выберите цель для {fighterName} | Choose a target for {fighterName} |
+| `ms.status.attack.card` | Выберите карту атаки против {target} (1–9) | Choose an attack card against {target} (1–9) |
+| `ms.status.attack.go` | Атакуйте {target} (Enter) | Attack {target} (Enter) |
+| `ms.status.scheme` | Выберите карту схемы и сыграйте её (Enter) | Choose a scheme card and play it (Enter) |
+| `ms.status.defend` | Вас атакуют: выберите карту защиты или «Без защиты» (N) | You are attacked: choose a defense card or No defense (N) |
+| `ms.status.resolve` | Завершите бой (R) | Resolve the combat (R) |
+| `ms.status.discard` | Рука больше предела: сбросьте {n} | Hand over the limit: discard {n} |
+| `ms.status.confirm` | Подтвердите (Enter) | Confirm (Enter) |
+| `ms.status.choice` | Сделайте выбор: {choice} | Make your choice: {choice} |
 | `ms.choice.object` | Выберите, кого переместить | Choose what to move |
 | `ms.choice.target` | Выберите цель (до {n}) | Choose a target (up to {n}) |
 | `ms.pending.opp.turn` | Ваш выбор в ход соперника | Your choice during the opponent's turn |

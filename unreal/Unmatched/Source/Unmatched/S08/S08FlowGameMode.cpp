@@ -5211,6 +5211,17 @@ void AS08FlowGameMode::ClearGameplayHud() {
   bOpponentPlanningKnown = false;
   EdgeArrowNow = S09OpponentView::FEdgeArrow();
   EdgeArrowTraceKey.Reset();
+  // DE-022: the verb, the tracker, the effect sources and the callout belong to one game too
+  OpponentVerbNow = ES09OpponentVerb::None;
+  bOpponentVerbKnown = false;
+  ActionTracker.Reset();
+  EffectSources.Reset();
+  EffectTrailSeq = -1;
+  EffectTrailCard.Reset();
+  EffectTrailYours.Reset();
+  bYoursCallout = false;
+  YoursCalloutText.Reset();
+  TurnStatusTraceKey.Reset();
   BoardAliveById.Reset();
   FallSeq = -1;
   ShownFighters.Reset();
@@ -5676,7 +5687,9 @@ void AS08FlowGameMode::RefreshHud() {
                SNew(STextBlock).Text(FText::FromString(Chip))
                     .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14)))];
     }
+    AddYoursCalloutLine();  // DE-022 (03 §7 п. 3): "Your fighter X: Y effect" while the opponent's effect moves it
     AddEventFeedLines();  // MS-T-17 (03 §7): the three latest maneuver lines over the hand
+    AddTurnStatusLine();  // DE-022 (02 SD-31): the "what to do now" line
     HandBox->AddSlot().AutoHeight().Padding(0, 0, 0, 6)
         [SNew(STextBlock)
              .Text(FText::FromString(FString::Printf(
@@ -5697,6 +5710,7 @@ void AS08FlowGameMode::RefreshHud() {
     PanelsBox->AddSlot().AutoHeight()
         [SNew(STextBlock).Text(FText::FromString(PanelLine(TEXT("you"), *Own)))
              .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14))];
+    AddActionTrackerRow(false);  // DE-022 (01 F-12): own tracker, always
   }
   if (const FS09PlayerPanel* Opponent = Hud.OpponentPanel()) {
     PanelsBox->AddSlot().AutoHeight()

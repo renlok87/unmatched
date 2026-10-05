@@ -41,6 +41,7 @@ bool FS09LastMovement::Read(const TSharedPtr<FJsonValue>& Metadata, FS09LastMove
   if (!FS08Contracts::ReadIntLike(Trail->ToSharedRef(), TEXT("seq"), Out.Seq, bSeq) || !bSeq) return false;
   if (!(*Trail)->TryGetStringField(TEXT("playerId"), Out.PlayerId) || Out.PlayerId.IsEmpty()) return false;
   (*Trail)->TryGetStringField(TEXT("source"), Out.Source);
+  (*Trail)->TryGetStringField(TEXT("sourceRef"), Out.SourceRef);
   const TSharedPtr<FJsonObject>* Boost = nullptr;
   if ((*Trail)->TryGetObjectField(TEXT("boost"), Boost) && Boost && Boost->IsValid()) {
     Out.bBoost = true;
@@ -202,34 +203,43 @@ void FS09LastMoveTracker::Reset() {
 
 // ---------------------------------------------------------------------------------------------------- feed
 
-FS09FeedEntry FS09EventFeed::Describe(const FS09LastMovement& Trail, const FNameOf& PlayerName,
-                                      const FNameOf& FighterName, const FCellName& CellName) {
-  FS09FeedEntry Entry;
-  Entry.Seq = Trail.Seq;
-  Entry.Moves = Trail.Moves.Num();
+namespace {
+/** The ms.log.move list of a trail: Full = every move, Inline = at most MaxInline moves (the first MaxInline - 1 +
+ *  "and N more" beyond it, MS-E-106); no movement -> ms.log.stay. Returns true when Inline is cut. */
+bool MoveLists(const FS09LastMovement& Trail, const FS09EventFeed::FNameOf& FighterName,
+               const FS09EventFeed::FCellName& CellName, int32 MaxInline, FString& Inline, FString& Full) {
   TArray<FString> Moves;
   for (const FS09LastMovement::FMove& Move : Trail.Moves) {
     Moves.Add(Fill(TEXT("ms.log.move"), {{TEXT("fighterName"), FighterName(Move.FighterId)},
                                         {TEXT("from"), CellName(Move.From)},
                                         {TEXT("to"), CellName(Move.Dest())}}));
   }
-  FString Inline;
-  FString Full;
   if (Moves.Num() == 0) {
     Inline = Full = S08WhyText::En(FName(TEXT("ms.log.stay")));
-  } else {
-    Full = FString::Join(Moves, TEXT(", "));
-    if (Moves.Num() > MaxInlineMoves) {
-      // MS-E-106: the first two moves + "and N more" keep the line within two visual lines at 150 %
-      const int32 Shown = MaxInlineMoves - 1;
-      TArray<FString> Head(Moves.GetData(), Shown);
-      Head.Add(S08WhyText::En(FName(TEXT("ms.log.more")), {{TEXT("n"), FString::FromInt(Moves.Num() - Shown)}}));
-      Inline = FString::Join(Head, TEXT(", "));
-      Entry.bTruncated = true;
-    } else {
-      Inline = Full;
-    }
+    return false;
   }
+  Full = FString::Join(Moves, TEXT(", "));
+  if (Moves.Num() <= MaxInline) {
+    Inline = Full;
+    return false;
+  }
+  // MS-E-106: the first two moves + "and N more" keep the line within two visual lines at 150 %
+  const int32 Shown = MaxInline - 1;
+  TArray<FString> Head(Moves.GetData(), Shown);
+  Head.Add(S08WhyText::En(FName(TEXT("ms.log.more")), {{TEXT("n"), FString::FromInt(Moves.Num() - Shown)}}));
+  Inline = FString::Join(Head, TEXT(", "));
+  return true;
+}
+}  // namespace
+
+FS09FeedEntry FS09EventFeed::Describe(const FS09LastMovement& Trail, const FNameOf& PlayerName,
+                                      const FNameOf& FighterName, const FCellName& CellName) {
+  FS09FeedEntry Entry;
+  Entry.Seq = Trail.Seq;
+  Entry.Moves = Trail.Moves.Num();
+  FString Inline;
+  FString Full;
+  Entry.bTruncated = MoveLists(Trail, FighterName, CellName, MaxInlineMoves, Inline, Full);
   const FString BoostPart =
       Trail.bBoost ? Fill(TEXT("ms.log.boost.part"),
                           {{TEXT("n"), FString::FromInt(Trail.BoostValue)},
@@ -251,10 +261,106 @@ bool FS09EventFeed::Add(const FS09LastMovement& Trail, const FNameOf& PlayerName
   return true;
 }
 
+FS09FeedEntry FS09EventFeed::DescribeEffect(const FS09LastMovement& Trail, const FString& CardName,
+                                            const TArray<FString>& YourFighters, const FNameOf& PlayerName,
+                                            const FNameOf& FighterName, const FCellName& CellName) {
+  FS09FeedEntry Entry;
+  Entry.Seq = Trail.Seq;
+  Entry.Moves = Trail.Moves.Num();
+  const FString Card = CardName.IsEmpty() ? FString(TEXT("?")) : CardName;
+  if (YourFighters.Num() > 0) {
+    // 03 §7 п. 3: the opponent's effect moved MY fighter - "Your fighter Merlin: Feint effect" (one per fighter)
+    TArray<FString> Parts;
+    for (const FString& Id : YourFighters) {
+      Parts.Add(Fill(TEXT("ms.opp.moves.yours"), {{TEXT("fighterName"), FighterName(Id)}, {TEXT("cardName"), Card}}));
+    }
+    Entry.Text = Entry.Full = FString::Join(Parts, TEXT("; "));
+    return Entry;
+  }
+  FString Inline;
+  FString Full;
+  Entry.bTruncated = MoveLists(Trail, FighterName, CellName, MaxInlineMoves, Inline, Full);
+  const FString Player = PlayerName(Trail.PlayerId);
+  Entry.Text = Fill(TEXT("ms.log.effect"), {{TEXT("player"), Player}, {TEXT("cardName"), Card}, {TEXT("moves"), Inline}});
+  Entry.Full = Fill(TEXT("ms.log.effect"), {{TEXT("player"), Player}, {TEXT("cardName"), Card}, {TEXT("moves"), Full}});
+  return Entry;
+}
+
+bool FS09EventFeed::AddEffect(const FS09LastMovement& Trail, const FString& CardName,
+                              const TArray<FString>& YourFighters, const FNameOf& PlayerName,
+                              const FNameOf& FighterName, const FCellName& CellName) {
+  if (!Trail.bValid || Trail.Source != TEXT("EFFECT") || Seen.Contains(Trail.Seq)) return false;
+  Seen.Add(Trail.Seq);
+  Lines.Add(DescribeEffect(Trail, CardName, YourFighters, PlayerName, FighterName, CellName));
+  while (Lines.Num() > MaxLines) Lines.RemoveAt(0);
+  ++Revision;
+  return true;
+}
+
 void FS09EventFeed::Reset() {
   Lines.Reset();
   Seen.Reset();
   ++Revision;
+}
+
+// ---------------------------------------------------------------------------------------------------- DE-022
+
+FString FS09ActionTracker::OnApplied(int32 Seq, const FString& TurnPlayerId, int32 TurnCount, int32 ActionsRemaining,
+                                     const FString& ViewerId, double NowMs) {
+  const bool bWasOpponentTurn = bOpponentTurn;
+  const FString Key = FString::Printf(TEXT("%s#%d"), *TurnPlayerId, TurnCount);
+  if (Key != TurnKey) {
+    // a new turn (or the first snapshot seen): every slot free, then the marks this snapshot already carries (a
+    // reconnect mid-turn sees 2 - actionsRemaining spent)
+    TurnKey = Key;
+    TurnSlots = FSlots();
+    LastRemaining = -1;
+    if (ActionsRemaining >= 0) {
+      TurnSlots.Spent = FMath::Clamp(PerTurn - ActionsRemaining, 0, PerTurn);
+      TurnSlots.Slots = FMath::Max(PerTurn, TurnSlots.Spent + ActionsRemaining);
+    }
+  } else if (ActionsRemaining >= 0 && LastRemaining >= 0 && ActionsRemaining != LastRemaining) {
+    if (ActionsRemaining < LastRemaining) {
+      TurnSlots.Spent += LastRemaining - ActionsRemaining;  // an action chosen (beginManeuver / attack / scheme)
+    }
+    // a gained action (GAIN_ACTION, a hero ability) adds a slot; spent ones stay marked
+    TurnSlots.Slots = FMath::Max(PerTurn, TurnSlots.Spent + ActionsRemaining);
+  }
+  if (ActionsRemaining >= 0) LastRemaining = ActionsRemaining;
+  bOwnTurn = !ViewerId.IsEmpty() && TurnPlayerId == ViewerId;
+  bOpponentTurn = !ViewerId.IsEmpty() && !TurnPlayerId.IsEmpty() && TurnPlayerId != ViewerId;
+  if (bOpponentTurn && !bWasOpponentTurn) OpponentSinceMs = NowMs;
+
+  const FSlots O = Own();
+  const FSlots P = Opponent();
+  const FString Trace = FString::Printf(TEXT("own=%d/%d opp=%d/%d oppVisible=%d"), O.Spent, O.Slots, P.Spent, P.Slots,
+                                        bOpponentTurn ? 1 : 0);
+  if (Trace == TraceKey) return FString();
+  TraceKey = Trace;
+  return FString::Printf(TEXT("MS-TRACK %s seq=%d"), *Trace, Seq);
+}
+
+float FS09ActionTracker::OpponentAlpha(double NowMs, bool bReducedMotion) const {
+  if (!bOpponentTurn) return 0.0f;
+  if (bReducedMotion) return 1.0f;
+  return FMath::Clamp(static_cast<float>((NowMs - OpponentSinceMs) / AppearMs), 0.0f, 1.0f);
+}
+
+void FS09EffectSources::Note(const TArray<FS08PendingEffect>& Queue) {
+  for (const FS08PendingEffect& Pending : Queue) {
+    if (Pending.Id.IsEmpty() || Texts.Contains(Pending.Id)) continue;
+    Texts.Add(Pending.Id, Pending.Text);
+    Ids.Add(Pending.Id);
+  }
+  while (Ids.Num() > MaxKept) {
+    Texts.Remove(Ids[0]);
+    Ids.RemoveAt(0);
+  }
+}
+
+FString FS09EffectSources::TextOf(const FString& PendingId) const {
+  const FString* Text = Texts.Find(PendingId);
+  return Text ? *Text : FString();
 }
 
 // ---------------------------------------------------------------------------------------------------- helpers
@@ -313,6 +419,110 @@ FEdgeArrow EdgeArrow(const FVector2D& Target, bool bProjected, const FVector2D& 
   Out.Pos = Centre + D * T;
   Out.AngleDeg = static_cast<float>(FMath::RadiansToDegrees(FMath::Atan2(D.Y, D.X)));
   return Out;
+}
+
+TArray<FS08PendingEffect> PendingQueue(const FS08Snapshot& Snapshot) {
+  TArray<FS08PendingEffect> Out;
+  const TSharedPtr<FJsonObject> Meta =
+      Snapshot.Metadata.IsValid() && Snapshot.Metadata->Type == EJson::Object ? Snapshot.Metadata->AsObject() : nullptr;
+  const TArray<TSharedPtr<FJsonValue>>* Queue = nullptr;
+  if (!Meta.IsValid() || !Meta->TryGetArrayField(TEXT("pendingEffects"), Queue) || !Queue) return Out;
+  for (const TSharedPtr<FJsonValue>& Value : *Queue) {
+    const TSharedPtr<FJsonObject>* Entry = nullptr;
+    if (!Value.IsValid() || !Value->TryGetObject(Entry) || !Entry || !Entry->IsValid()) continue;
+    FS08PendingEffect Pending;
+    (*Entry)->TryGetStringField(TEXT("id"), Pending.Id);
+    (*Entry)->TryGetStringField(TEXT("playerId"), Pending.PlayerId);
+    (*Entry)->TryGetStringField(TEXT("type"), Pending.Type);
+    (*Entry)->TryGetStringField(TEXT("text"), Pending.Text);
+    Out.Add(MoveTemp(Pending));
+  }
+  return Out;
+}
+
+ES09OpponentVerb OpponentVerb(const FS08Snapshot& Snapshot, const FString& ViewerId) {
+  if (ViewerId.IsEmpty() || Snapshot.Phase == TEXT("GAME_OVER")) return ES09OpponentVerb::None;
+  const TSharedPtr<FJsonObject> Meta =
+      Snapshot.Metadata.IsValid() && Snapshot.Metadata->Type == EJson::Object ? Snapshot.Metadata->AsObject() : nullptr;
+  // the head of the queue is the choice the server waits on - whoever owns it is the one acting now
+  const TArray<FS08PendingEffect> Queue = PendingQueue(Snapshot);
+  if (Queue.Num() > 0 && !Queue[0].PlayerId.IsEmpty()) {
+    if (Queue[0].PlayerId == ViewerId) return ES09OpponentVerb::None;
+    const FString& Type = Queue[0].Type;
+    return Type == TEXT("DISCARD_CARDS") || Type == TEXT("BOOST_CHOICE") || Type == TEXT("DECK_TOP_PICK")
+               ? ES09OpponentVerb::Card
+               : ES09OpponentVerb::Ability;
+  }
+  // only the public player ids are read here (TryGet: no parser warnings for the optional combat fields)
+  auto PlayerOf = [&Meta](const TCHAR* Field, const TCHAR* IdField) {
+    const TSharedPtr<FJsonObject>* Object = nullptr;
+    FString Id;
+    if (Meta.IsValid() && Meta->TryGetObjectField(Field, Object) && Object && Object->IsValid()) {
+      if (!(*Object)->TryGetStringField(IdField, Id) || Id.IsEmpty()) Id = TEXT("?");
+    }
+    return Id;
+  };
+  const FString Defender = PlayerOf(TEXT("combatInfo"), TEXT("defenderId"));
+  if (!Defender.IsEmpty() && Defender != TEXT("?")) {
+    return Defender == ViewerId ? ES09OpponentVerb::Attack : ES09OpponentVerb::Defend;
+  }
+  const FString Maneuver = PendingManeuverPlayer(Snapshot);
+  if (!Maneuver.IsEmpty()) return Maneuver != ViewerId ? ES09OpponentVerb::Maneuver : ES09OpponentVerb::None;
+  const FString Discard = PlayerOf(TEXT("pendingHandDiscard"), TEXT("playerId"));
+  if (!Discard.IsEmpty() && Discard != TEXT("?")) {
+    return Discard != ViewerId ? ES09OpponentVerb::Card : ES09OpponentVerb::None;
+  }
+  if (!Snapshot.CurrentTurnPlayerId.IsEmpty() && Snapshot.CurrentTurnPlayerId != ViewerId) return ES09OpponentVerb::Turn;
+  return ES09OpponentVerb::None;
+}
+
+FName VerbKey(ES09OpponentVerb Verb) {
+  switch (Verb) {
+    case ES09OpponentVerb::Turn: return FName(TEXT("ms.opp.phase.turn"));
+    case ES09OpponentVerb::Maneuver: return FName(TEXT("ms.opp.planning"));
+    case ES09OpponentVerb::Attack: return FName(TEXT("ms.opp.phase.attack"));
+    case ES09OpponentVerb::Defend: return FName(TEXT("ms.opp.phase.defend"));
+    case ES09OpponentVerb::Card: return FName(TEXT("ms.opp.phase.card"));
+    case ES09OpponentVerb::Ability: return FName(TEXT("ms.opp.phase.ability"));
+    default: return NAME_None;
+  }
+}
+
+const TCHAR* VerbName(ES09OpponentVerb Verb) {
+  switch (Verb) {
+    case ES09OpponentVerb::Turn: return TEXT("turn");
+    case ES09OpponentVerb::Maneuver: return TEXT("maneuver");
+    case ES09OpponentVerb::Attack: return TEXT("attack");
+    case ES09OpponentVerb::Defend: return TEXT("defend");
+    case ES09OpponentVerb::Card: return TEXT("card");
+    case ES09OpponentVerb::Ability: return TEXT("ability");
+    default: return TEXT("none");
+  }
+}
+
+TArray<FString> YourFightersMoved(const FS09LastMovement& Trail, const FString& ViewerId,
+                                  const TFunction<FString(const FString&)>& OwnerOf) {
+  TArray<FString> Out;
+  if (!Trail.bValid || Trail.Source != TEXT("EFFECT") || ViewerId.IsEmpty() || Trail.PlayerId == ViewerId) return Out;
+  for (const FS09LastMovement::FMove& Move : Trail.Moves) {
+    if (OwnerOf(Move.FighterId) == ViewerId) Out.AddUnique(Move.FighterId);
+  }
+  return Out;
+}
+
+FString EffectCardName(const FString& PendingText, const TArray<FS09CardView>& MoverDiscard) {
+  const FString Needle = PendingText.TrimStartAndEnd();
+  if (!Needle.IsEmpty()) {
+    for (int32 I = MoverDiscard.Num() - 1; I >= 0; --I) {
+      const FS09CardView& Card = MoverDiscard[I];
+      if (!Card.bHidden && !Card.Name.IsEmpty() && Card.Text.Contains(Needle, ESearchCase::IgnoreCase)) return Card.Name;
+    }
+  }
+  for (int32 I = MoverDiscard.Num() - 1; I >= 0; --I) {
+    const FS09CardView& Card = MoverDiscard[I];
+    if (!Card.bHidden && !Card.Name.IsEmpty() && (!Card.Text.IsEmpty() || Card.EffectCount > 0)) return Card.Name;
+  }
+  return FString();
 }
 
 }  // namespace S09OpponentView

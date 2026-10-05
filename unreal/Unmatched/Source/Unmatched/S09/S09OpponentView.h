@@ -14,14 +14,23 @@
 //   - the edge arrow (MS-E-73, MS-R-31): the camera never moves for the opponent's move; an end of the path outside the
 //     viewport gets an arrow at the screen edge pointing at it.
 // The game mode (S08FlowGameMode) feeds it from the applied snapshots and draws it: the plates (S08MoveHighlight
-// FS08MoveDraftInput::LastMove), the HUD lines and the arrow. Phase verb, action tracker, the opponent's effect on my
-// fighter and the BOOSTED card are DE-022 (W-13).
+// FS08MoveDraftInput::LastMove), the HUD lines and the arrow.
+// DE-022 (W-13; 03 §7 "Дополнение по живым данным DE" п. 1-3, MS-R-77; 01 F-12; 02-ux-ui-spec SD-31) adds:
+//   - the opponent's phase verb from the server state (S09OpponentView::OpponentVerb: the head of pendingEffects,
+//     combatInfo, pendingManeuver, pendingHandDiscard, currentTurnPlayerId - never a client guess);
+//   - the action tracker of both players by the snapshot (FS09ActionTracker): own always, the opponent's only in
+//     the opponent's turn - appearing over 150 ms, hidden in one frame at the start of mine;
+//   - the opponent's effect moving MY fighter (an EFFECT trail): the source card (FS09EffectSources: the resolved
+//     pending effect's text matched against the mover's public discard pile) and the line ms.opp.moves.yours while
+//     the move plays along the trail (MS-T-16); the effect lines of the feed.
+// The BOOSTED card of the opponent's maneuver (MS-R-78) is DE-026 (the source-card slot of W-18).
 #pragma once
 
 #include "CoreMinimal.h"
 #include "../S08/S08BoardModel.h"
 #include "../S08/S08Contracts.h"
 #include "../S08/S08MoveHighlight.h"
+#include "S09HudModel.h"
 
 /** metadata.lastMovement (04 §4.3): every public field the opponent view uses. */
 struct UNMATCHED_API FS09LastMovement {
@@ -36,6 +45,7 @@ struct UNMATCHED_API FS09LastMovement {
   int32 Seq = 0;
   FString PlayerId;
   FString Source;  // MANEUVER | EFFECT
+  FString SourceRef;  // MANEUVER: the maneuverId; EFFECT: the id of the resolved pending effect (DE-022)
   bool bBoost = false;
   FString BoostName;
   int32 BoostValue = 0;  // a null printed BOOST counts +0 until MS-T-20 (04 §4.3)
@@ -121,9 +131,18 @@ public:
   /** ms.log.maneuver of a MANEUVER trail: "{player}: maneuver{boostPart}: {moves}"; no movement -> ms.log.stay. */
   static FS09FeedEntry Describe(const FS09LastMovement& Trail, const FNameOf& PlayerName, const FNameOf& FighterName,
                                 const FCellName& CellName);
-  /** Adds the line of a MANEUVER trail once per seq (EFFECT moves are DE-022 lines); false when skipped. */
+  /** Adds the line of a MANEUVER trail once per seq (EFFECT trails: AddEffect); false when skipped. */
   bool Add(const FS09LastMovement& Trail, const FNameOf& PlayerName, const FNameOf& FighterName,
            const FCellName& CellName);
+  /** DE-022: the line of an EFFECT trail. YourFighters (the viewer's fighters an opponent's effect moved, in trail
+   *  order) not empty -> ms.opp.moves.yours per fighter ("Your fighter Merlin: Feint effect"); otherwise
+   *  ms.log.effect "{player}: {cardName} effect: {moves}" (no movement -> ms.log.stay). An unknown card -> "?". */
+  static FS09FeedEntry DescribeEffect(const FS09LastMovement& Trail, const FString& CardName,
+                                      const TArray<FString>& YourFighters, const FNameOf& PlayerName,
+                                      const FNameOf& FighterName, const FCellName& CellName);
+  /** Adds the line of an EFFECT trail once per seq; false when skipped (not an EFFECT trail, seq seen). */
+  bool AddEffect(const FS09LastMovement& Trail, const FString& CardName, const TArray<FString>& YourFighters,
+                 const FNameOf& PlayerName, const FNameOf& FighterName, const FCellName& CellName);
   /** Oldest first, at most MaxLines. */
   const TArray<FS09FeedEntry>& GetLines() const { return Lines; }
   uint32 GetRevision() const { return Revision; }
@@ -133,6 +152,68 @@ private:
   TArray<FS09FeedEntry> Lines;
   TSet<int32> Seen;
   uint32 Revision = 0;
+};
+
+// ---------------------------------------------------------------------------------------------------- DE-022
+
+/** What the opponent is doing now, read from the server state (03 §7 п. 1; ms.opp.phase.*). None: nothing of the
+ *  opponent's is open - my turn, my own choice, the game is over. Turn: the opponent's turn with nothing open yet
+ *  (ms.opp.phase.turn - DE-022's key by the 02 SD-31 convention). */
+enum class ES09OpponentVerb : uint8 { None, Turn, Maneuver, Attack, Defend, Card, Ability };
+
+/** The action tracker of both players (01 F-12; 03 §7 п. 2): slots and spent actions of the turn from
+ *  metadata.actionsRemaining of the applied snapshots - the server spends the action at beginManeuver / attack /
+ *  scheme, so a slot is marked when the action is chosen. Own: always visible (its turn's marks, otherwise every
+ *  slot free - the reset comes in the frame the turn passes); the opponent's: only in the opponent's turn,
+ *  appearing over AppearMs, hidden in the frame my turn starts. */
+class UNMATCHED_API FS09ActionTracker {
+public:
+  /** 01 F-12 "появление 150 мс". */
+  static constexpr double AppearMs = 150.0;
+  /** ACTIONS_PER_TURN of the backend (game-state.model.ts). */
+  static constexpr int32 PerTurn = 2;
+  struct FSlots {
+    int32 Slots = PerTurn;
+    int32 Spent = 0;
+    bool operator==(const FSlots& O) const { return Slots == O.Slots && Spent == O.Spent; }
+  };
+  /** An applied snapshot. ActionsRemaining -1 = unknown (a merge without metadata): the marks stay. Returns the
+   *  'MS-TRACK ...' trace line when anything visible changed ('' otherwise). */
+  FString OnApplied(int32 Seq, const FString& TurnPlayerId, int32 TurnCount, int32 ActionsRemaining,
+                    const FString& ViewerId, double NowMs);
+  FSlots Own() const { return bOwnTurn ? TurnSlots : FSlots(); }
+  FSlots Opponent() const { return bOpponentTurn ? TurnSlots : FSlots(); }
+  bool OpponentVisible() const { return bOpponentTurn; }
+  /** 0 -> 1 over AppearMs from the start of the opponent's turn (1 at once with reduced motion); 0 when hidden. */
+  float OpponentAlpha(double NowMs, bool bReducedMotion) const;
+  void Reset() { *this = FS09ActionTracker(); }
+
+private:
+  FString TurnKey;
+  int32 LastRemaining = -1;
+  bool bOwnTurn = false;
+  bool bOpponentTurn = false;
+  FSlots TurnSlots;  // the active player's marks of this turn
+  double OpponentSinceMs = 0.0;
+  FString TraceKey;
+};
+
+/** The texts of the pending effects seen so far (id -> text): the EFFECT trail names only the id of the resolved
+ *  choice (lastMovement.sourceRef); the card itself is in its owner's public discard pile by then. */
+class UNMATCHED_API FS09EffectSources {
+public:
+  static constexpr int32 MaxKept = 32;
+  void Note(const TArray<FS08PendingEffect>& Queue);
+  /** The text of a pending effect seen before ('' when it was never seen - a seq gap, a reconnect). */
+  FString TextOf(const FString& PendingId) const;
+  void Reset() {
+    Ids.Reset();
+    Texts.Reset();
+  }
+
+private:
+  TArray<FString> Ids;  // oldest first
+  TMap<FString, FString> Texts;
 };
 
 namespace S09OpponentView {
@@ -154,4 +235,25 @@ struct UNMATCHED_API FEdgeArrow {
   float AngleDeg = 0.0f;
 };
 UNMATCHED_API FEdgeArrow EdgeArrow(const FVector2D& Target, bool bProjected, const FVector2D& Viewport, float Margin);
+
+/** DE-022 (03 §7 п. 1): the opponent's verb, in this order - the head of pendingEffects (owned by the opponent:
+ *  DISCARD_CARDS / BOOST_CHOICE / DECK_TOP_PICK -> Card, every other choice -> Ability; owned by me -> None, they
+ *  wait on me), the open combat (I defend -> Attack, they defend -> Defend), the opponent's pendingManeuver ->
+ *  Maneuver, the opponent's pendingHandDiscard -> Card, the opponent's turn -> Turn; None otherwise and at
+ *  GAME_OVER. */
+UNMATCHED_API ES09OpponentVerb OpponentVerb(const FS08Snapshot& Snapshot, const FString& ViewerId);
+/** metadata.pendingEffects with only id / playerId / type / text read (server order; [0] is the head). */
+UNMATCHED_API TArray<FS08PendingEffect> PendingQueue(const FS08Snapshot& Snapshot);
+/** ms.opp.planning / ms.opp.phase.* of a verb (NAME_None for None). */
+UNMATCHED_API FName VerbKey(ES09OpponentVerb Verb);
+UNMATCHED_API const TCHAR* VerbName(ES09OpponentVerb Verb);
+
+/** DE-022 (03 §7 п. 3): the viewer's fighters that an opponent's EFFECT trail moved, in trail order (empty for a
+ *  maneuver, for the viewer's own choice or when only the opponent's fighters moved). OwnerOf: fighter id -> owner. */
+UNMATCHED_API TArray<FString> YourFightersMoved(const FS09LastMovement& Trail, const FString& ViewerId,
+                                                const TFunction<FString(const FString&)>& OwnerOf);
+/** The source card of an EFFECT trail, from public data only: in the mover's discard pile (oldest first, as the
+ *  HUD model delivers it) the newest face-up card whose text contains the resolved pending effect's text; else the
+ *  newest face-up card with effect text; '' when the pile has none. */
+UNMATCHED_API FString EffectCardName(const FString& PendingText, const TArray<FS09CardView>& MoverDiscard);
 }  // namespace S09OpponentView

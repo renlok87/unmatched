@@ -85,6 +85,30 @@ const FRow GRows[] = {
     {TEXT("ms.log.move"), TEXT("{fighterName} {from}→{to}")},
     {TEXT("ms.log.more"), TEXT("and {n} more")},
     {TEXT("ms.log.stay"), TEXT("no movement")},
+    // DE-022 (03 §7 п. 1-3, §9; 02-ux-ui-spec SD-31): the opponent's verb, my fighter moved by their effect, the
+    // effect line of the feed and the "what to do now" line (ms.status.*, ms.opp.phase.turn, ms.log.effect - DE-022)
+    {TEXT("ms.opp.phase.attack"), TEXT("Opponent is attacking")},
+    {TEXT("ms.opp.phase.defend"), TEXT("Opponent is defending")},
+    {TEXT("ms.opp.phase.card"), TEXT("Opponent is choosing a card")},
+    {TEXT("ms.opp.phase.ability"), TEXT("Opponent is using an ability")},
+    {TEXT("ms.opp.phase.turn"), TEXT("Opponent is choosing an action")},
+    {TEXT("ms.opp.moves.yours"), TEXT("Your fighter {fighterName}: {cardName} effect")},
+    {TEXT("ms.log.effect"), TEXT("{player}: {cardName} effect: {moves}")},
+    {TEXT("ms.status.opp"), TEXT("{player} — {verb}")},
+    {TEXT("ms.status.action"), TEXT("Choose an action: maneuver (M), attack (A) or scheme (G)")},
+    {TEXT("ms.status.end"), TEXT("No actions left: end your turn (E)")},
+    {TEXT("ms.status.fighter"), TEXT("Choose a fighter to move")},
+    {TEXT("ms.status.space"), TEXT("Choose a space for {fighterName}; Enter confirms the maneuver")},
+    {TEXT("ms.status.attacker"), TEXT("Choose the attacking fighter")},
+    {TEXT("ms.status.target"), TEXT("Choose a target for {fighterName}")},
+    {TEXT("ms.status.attack.card"), TEXT("Choose an attack card against {target} (1–9)")},
+    {TEXT("ms.status.attack.go"), TEXT("Attack {target} (Enter)")},
+    {TEXT("ms.status.scheme"), TEXT("Choose a scheme card and play it (Enter)")},
+    {TEXT("ms.status.defend"), TEXT("You are attacked: choose a defense card or No defense (N)")},
+    {TEXT("ms.status.resolve"), TEXT("Resolve the combat (R)")},
+    {TEXT("ms.status.discard"), TEXT("Hand over the limit: discard {n}")},
+    {TEXT("ms.status.confirm"), TEXT("Confirm (Enter)")},
+    {TEXT("ms.status.choice"), TEXT("Make your choice: {choice}")},
 };
 
 const FRow* Find(FName Key) {

@@ -28,6 +28,7 @@
 #include "../S09/S09DeathStage.h"
 #include "../S09/S09PendingPresent.h"
 #include "../S09/S09OpponentView.h"
+#include "../S09/S09TurnStatus.h"
 #include "S08CueDispatcher.h"
 #include "S08MoveAnim.h"
 #include "S08FlowGameMode.generated.h"
@@ -628,6 +629,31 @@ private:
   FString EdgeArrowTraceKey;
   SConstraintCanvas::FSlot* EdgeArrowSlot = nullptr;
   TSharedPtr<STextBlock> EdgeArrowGlyph;
+  // ---- DE-022 (W-13): the opponent's verb, the action tracker, my fighter moved by the opponent's effect and the
+  // "what to do now" line (S09OpponentView.h, S09TurnStatus.h, S08FlowGameModeOpponent.cpp) ----
+  /** The tracker row of a side ("actions" + one block per slot, spent = opacity 0.4 as the v3 spend). */
+  void AddActionTrackerRow(bool bOpponent);
+  /** "Your fighter X: Y effect" over the feed while the opponent's effect moves my fighter. */
+  void AddYoursCalloutLine();
+  /** The "what to do now" line over the hand (traced 'MS-STATUS text=' on change). */
+  void AddTurnStatusLine();
+  FS09TurnStatusInput BuildTurnStatusInput() const;
+  /** The hero name of a player (the feed's {player}); "You" / "Opponent" without a hero on the board. */
+  FString PlayerHeroName(const FString& PlayerId) const;
+  FString ViewerIdNow() const;
+  ES09OpponentVerb OpponentVerbNow = ES09OpponentVerb::None;
+  bool bOpponentVerbKnown = false;
+  FS09ActionTracker ActionTracker;
+  FS09EffectSources EffectSources;
+  /** The EFFECT trail of the last applied seq: its source card and my fighters it moved (the feed line at reveal). */
+  int32 EffectTrailSeq = -1;
+  FString EffectTrailCard;
+  TArray<FString> EffectTrailYours;
+  /** The callout of 03 §7 п. 3: from the trail's snapshot until its move animation ended and >= 1000 ms passed. */
+  bool bYoursCallout = false;
+  FString YoursCalloutText;
+  double YoursCalloutSinceMs = 0.0;
+  FString TurnStatusTraceKey;
   /** One -Bench view's camera: selection + zoom per the view name, traced 'BENCH view=...' (RunRenderBench case 2;
    *  also the live-tune shot). */
   void BenchSetupView(const FString& View, const FString& HeroId);
