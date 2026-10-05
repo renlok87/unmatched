@@ -233,7 +233,9 @@ void AS08FlowGameMode::BeginPlay() {
   MoveMotion = S08Motion::Current();
   MoveAnimParams = FS08MoveAnimParams::FromCommandLine(FCommandLine::Get());
   Flow->SetMoveMotion(MoveMotion);
-  FS08Trace::Write(FString::Printf(
+  // run D G-LIVE: the trace file opens further down (FS08Trace::Open) - the line waits in PendingTrace like the other
+  // boot lines; written directly it was lost in every packaged client trace.
+  ArtHud.PendingTrace.Add(FString::Printf(
       TEXT("MS-ANIM settings reduced=%d speed=%s shake=%d saved=%d hop=%.3f lean=%.1f leanIn=%.0f turn=%.0f settle=%.0f ease=%d"),
       MoveMotion.bReducedMotion ? 1 : 0, S08Motion::SpeedName(MoveMotion.Speed), MoveMotion.bScreenShake ? 1 : 0,
       US08UserSettings::Get() ? 1 : 0, MoveAnimParams.HopHeightRel, MoveAnimParams.TravelLeanDeg,
