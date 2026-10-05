@@ -30,6 +30,7 @@
 #include "../S09/S09OpponentView.h"
 #include "../S09/S09TurnStatus.h"
 #include "../S09/S09TurnHud.h"
+#include "../S09/S09HandLimit.h"
 #include "S08CueDispatcher.h"
 #include "S08MoveAnim.h"
 #include "S08TurnPortraitWidget.h"
@@ -684,6 +685,22 @@ private:
   bool bTurnRingAtRest = false;
   FString TurnHudShownKey;
   TSharedPtr<class SBorder> TurnBanner;
+  // ---- DE-024 (W-23; 02 SD-42, SD-43): the hand limit - the one-shot rule toast (UI-ACC-012) over the hand strip and
+  // one discard picker for the limit and an effect's DISCARD_CARDS (S09/S09HandLimit.h, S08FlowGameModeHandLimit.cpp) ----
+  /** The persistent rule toast (built once inside the hand panel, collapsed until shown; a hit-test target only over
+   *  itself, never focusable - keys and board clicks stay with the game). */
+  TSharedRef<SWidget> BuildHandLimitHint();
+  /** An applied snapshot: the toast shows the first time in the match the own hand grows to the limit, closes at the
+   *  end of that turn or GAME_OVER. */
+  void FeedHandLimitHint(const FS08Snapshot& Snapshot);
+  /** A click on the toast closes it for the rest of the match. */
+  void DismissHandLimitHint();
+  void ApplyHandLimitHintVisibility();
+  FS09HandLimitHint HandLimitHint;
+  bool bRuleHints = true;
+  bool bRuleHintOffTraced = false;
+  TSharedPtr<class SBox> HandHintBox;
+  TSharedPtr<class STextBlock> HandHintText;
   /** One -Bench view's camera: selection + zoom per the view name, traced 'BENCH view=...' (RunRenderBench case 2;
    *  also the live-tune shot). */
   void BenchSetupView(const FString& View, const FString& HeroId);

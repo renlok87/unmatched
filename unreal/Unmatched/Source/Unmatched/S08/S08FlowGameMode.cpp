@@ -529,6 +529,7 @@ void AS08FlowGameMode::HandleApplied(const FS08Snapshot& Snapshot, ES08SeqDecisi
     FeedPendingPresentation(Snapshot); // DE-020: skipped-effect notes, modal / compact / toast
     FeedOpponentView(Snapshot);        // MS-T-17: planning indicator, last-move highlight (MS-P-03), feed
     FeedTurnHud(Snapshot);             // DE-023: turn ring + banner, tracker marks of the portraits
+    FeedHandLimitHint(Snapshot);       // DE-024: the one-shot hand limit rule toast (UI-ACC-012)
     // GD-036: one RESULT trace line per authoritative seq - an equal-seq
     // merge (WS push + HTTP refetch of the terminal body) never re-logs.
     if (Hud.bGameOver && Snapshot.SequenceNumber != S09ResultTraceSeq) {
@@ -5349,6 +5350,8 @@ void AS08FlowGameMode::BuildHudWidgets() {
            .BorderBackgroundColor(FSlateColor(FLinearColor(0.012f, 0.016f, 0.035f, 0.88f)))
            .Padding(10.0f)
            [SNew(SVerticalBox) +
+           // DE-024 (SD-42): the persistent rule toast over the hand strip (collapsed until the hand reaches the limit)
+           SVerticalBox::Slot().AutoHeight()[BuildHandLimitHint()] +
            SVerticalBox::Slot().AutoHeight()[SAssignNew(HandBox, SVerticalBox)]]];
   ArtHud.CommandPanel = CommandPanelBorder;
   ArtHud.SidePanel = SidePanelBorder;
@@ -5694,6 +5697,9 @@ void AS08FlowGameMode::RefreshHud() {
   const FS09PlayerPanel* Own = Hud.ViewerPanel();
   if (Own) {
     TSharedRef<SHorizontalBox> Strip = SNew(SHorizontalBox);
+    // DE-024 (SD-43): an open discard (the limit or an effect's DISCARD_CARDS) lights the whole hand - every own card
+    // a candidate, the picked ones marked; the colours stay off the S09 state markers (#FF00FF, #00FFFF ...).
+    const FS09DiscardPick DiscardPick = FS09DiscardPick::From(CommandUi);
     int32 Index = 0;
     for (const FS09CardView& Card : Own->Cards) {
       const int32 I = Index++;
@@ -5718,6 +5724,13 @@ void AS08FlowGameMode::RefreshHud() {
         }
       }
       const bool bSelected = InspectedHandIndex == I;
+      const ES09HandMark DiscardMark = DiscardPick.Mark(Card.InstanceId, Card.bHidden);
+      const FLinearColor ChipTint =
+          DiscardMark == ES09HandMark::Picked      ? FLinearColor(0.50f, 0.16f, 0.12f, 1.0f)
+          : DiscardMark == ES09HandMark::Candidate ? FLinearColor(bSelected ? 0.42f : 0.32f, bSelected ? 0.34f : 0.25f,
+                                                                  bSelected ? 0.16f : 0.10f, 1.0f)
+                                                   : FLinearColor(bSelected ? 0.42f : 0.22f, bSelected ? 0.42f : 0.22f,
+                                                                  bSelected ? 0.42f : 0.22f, 1.0f);
       Strip->AddSlot().AutoWidth().Padding(3)
           [MakeHudPress(
                FName(*(TEXT("hand.") + Card.InstanceId)),
@@ -5726,8 +5739,7 @@ void AS08FlowGameMode::RefreshHud() {
                  HandleHandCardClick(I);
                },
                FMargin(10, 8),
-               FLinearColor(bSelected ? 0.42f : 0.22f, bSelected ? 0.42f : 0.22f,
-                            bSelected ? 0.42f : 0.22f, 1.0f),
+               ChipTint,
                SNew(STextBlock).Text(FText::FromString(Chip))
                     .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14)))];
     }
@@ -5948,10 +5960,9 @@ void AS08FlowGameMode::RefreshHud() {
     AddMarker(GS09DiscardMarker);
     AddHeader(TEXT("MANDATORY DISCARD - HAND OVER LIMIT"),
               FLinearColor(0.6f, 1.0f, 1.0f, 1.0f));
-    AddBigLine(FString::Printf(TEXT("CHOOSE %d CARD%s: selected %d/%d (%d more)"), Need,
-                               Need == 1 ? TEXT("") : TEXT("S"), Have, Need, Need - Have),
-               FLinearColor(1.0f, 1.0f, 1.0f, 1.0f));
-    AddLine(TEXT("click cards or press 1-9 to toggle [DROP]; Enter confirms"));
+    // DE-024 (SD-43 п. 3): the pick lines are FS09DiscardPick's - the same for an effect's DISCARD_CARDS
+    AddBigLine(FS09DiscardPick::From(CommandUi).PickLine(), FLinearColor(1.0f, 1.0f, 1.0f, 1.0f));
+    AddLine(TEXT("click the lit cards or press 1-9 to toggle [DROP]; Enter confirms - no cancel, the turn then passes"));
     CommandBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
         [MakeHudPress(
              FName(TEXT("hud.discard.confirm")),
@@ -6521,9 +6532,10 @@ void AS08FlowGameMode::RefreshHud() {
         (void)StableIndex;
       }
     } else if (PendingType == TEXT("DISCARD_CARDS")) {
-      const int32 Need = Pending.bHasValue ? Pending.Value : 1;
-      AddLine(FString::Printf(TEXT("discard exactly %d of your cards - 1-9 toggles (%d chosen)"),
-                              Need, CommandUi.PendingCardIds.Num()));
+      // DE-024 (SD-43 п. 3): the same pick lines and hand highlight as the end-of-turn discard to the limit
+      const FS09DiscardPick Pick = FS09DiscardPick::From(CommandUi);
+      AddBigLine(Pick.PickLine(), FLinearColor(1.0f, 1.0f, 1.0f, 1.0f));
+      AddLine(TEXT("click the lit cards or press 1-9 to toggle [PICK]; Enter confirms"));
     } else if (PendingType == TEXT("BOOST_CHOICE")) {
       AddLine(FString::Printf(TEXT("boost with exactly 1 hand card (%d chosen) - 1-9 toggles"),
                               CommandUi.PendingCardIds.Num()));

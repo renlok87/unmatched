@@ -109,6 +109,9 @@ const FRow GRows[] = {
     {TEXT("ms.status.discard"), TEXT("Hand over the limit: discard {n}")},
     {TEXT("ms.status.confirm"), TEXT("Confirm (Enter)")},
     {TEXT("ms.status.choice"), TEXT("Make your choice: {choice}")},
+    // DE-024 (W-23; 02 SD-42; 02-ux-ui-spec §4.2): the one-shot rule toast of the hand limit (UI-ACC-012)
+    {TEXT("ms.hint.hand.limit"), TEXT("Hand limit: {n} cards. At the end of your turn, discard down to {n}")},
+    {TEXT("ms.hint.close"), TEXT("Click to close")},
 };
 
 const FRow* Find(FName Key) {

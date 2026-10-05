@@ -593,6 +593,8 @@ DE-022 по соглашению 02 SD-31. Карта буста соперни�
 | `ms.status.discard` | Рука больше предела: сбросьте {n} | Hand over the limit: discard {n} |
 | `ms.status.confirm` | Подтвердите (Enter) | Confirm (Enter) |
 | `ms.status.choice` | Сделайте выбор: {choice} | Make your choice: {choice} |
+| `ms.hint.hand.limit` | Предел руки — {n} карт. В конце хода лишние карты нужно сбросить до {n} | Hand limit: {n} cards. At the end of your turn, discard down to {n} |
+| `ms.hint.close` | Нажмите, чтобы закрыть | Click to close |
 | `ms.choice.object` | Выберите, кого переместить | Choose what to move |
 | `ms.choice.target` | Выберите цель (до {n}) | Choose a target (up to {n}) |
 | `ms.pending.opp.turn` | Ваш выбор в ход соперника | Your choice during the opponent's turn |

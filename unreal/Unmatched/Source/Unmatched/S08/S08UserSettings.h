@@ -11,8 +11,8 @@
 // same ini keeps the engine class untouched.
 //
 // There is no settings screen yet (UI-SCR-PAUSE is not in the client): the ini and the flags -S08ReducedMotion /
-// -S08AnimSpeed=<none|fast|normal|slow> change them; the flags win over the saved values (S08Motion::Resolve). DE-025
-// adds the volumes and UI-ACC-012.
+// -S08AnimSpeed=<none|fast|normal|slow> change them; the flags win over the saved values (S08Motion::Resolve).
+// DE-024 adds UI-ACC-012 "rule hints" (bRuleHints; flag -S08RuleHints=on|off, ResolveRuleHints); DE-025 adds the volumes.
 #pragma once
 
 #include "CoreMinimal.h"
@@ -48,4 +48,14 @@ public:
   /** UI-ACC-005: false turns the V-08 screen shake (CUE-004) off. */
   UPROPERTY(config)
   bool bScreenShake = true;
+
+  /** UI-ACC-012 (DE-024, 02 SD-42): the one-shot rule toasts (the first is the hand limit 7); false = no toasts. */
+  UPROPERTY(config)
+  bool bRuleHints = true;
+
+  /** UI-ACC-012 of this run: -S08RuleHints=on|off (also 1|0, true|false; any case) wins over the saved value; another
+   *  value keeps it. */
+  static bool ResolveRuleHints(bool bSaved, const TCHAR* CommandLine);
+  /** The saved value with the flag of this process applied. */
+  static bool RuleHintsNow();
 };
