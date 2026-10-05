@@ -639,6 +639,9 @@ def check_trace(lines, table):
     l_errors, l_summary = check_combat_log(lines)
     errors.extend(l_errors)
     summary.update(l_summary)
+    k_errors, k_summary = check_catchup(lines)
+    errors.extend(k_errors)
+    summary.update(k_summary)
     d_errors, d_summary = check_death(lines)
     errors.extend(d_errors)
     summary.update(d_summary)
@@ -1135,6 +1138,94 @@ def check_combat_log(lines):
         end = ends.get(seq)
         if end is not None and end.get("cut", "0") == "0":
             summary["combat_effect_lines"] += n_lines
+    return errors, summary
+
+
+# ----------------------------------------------------------------------------- догоняние очереди показа (R-03)
+CATCHUP_RE = re.compile(r"(CATCHUP (?:config|seq=).*)$")
+CATCHUP_NEED = ("seq", "latest", "queued", "lag", "t", "action", "reason", "applied")
+CATCHUP_RULES = {"lag": "hurry", "combat": "hurry", "queue": "cut"}
+
+
+def check_catchup(lines):
+    """Гейт C10 (R-03, CUE-DISPATCHER.md §3.1, §5–§6): постановка боя, отстающая от применённого состояния, догоняет
+    его. `CATCHUP config queued=<K> lagMs=<T>`; `CATCHUP seq=<постановка> latest=<применённый> queued=<n> lag=<мс>
+    t=<ms> action=<hurry|cut> reason=<lag|combat|queue> applied=<0|1>`. C10: формат; `queued` = latest − seq;
+    причина и действие согласованы (lag/combat → hurry, queue → cut); при известном конфиге queue — только при
+    queued > K, lag — только при lag > T; на seq не больше одного hurry и одного cut; hurry с applied=1 — это
+    `stage=skip t=<t> src=catchup` той же постановки, cut с applied=1 — её `stage=end t=<t> … cut=catchup`; и обратно,
+    каждый такой skip и end — от строки CATCHUP. Сводка: `catchup_hurry`, `catchup_cut` (с applied=1)."""
+    errors = []
+    config = None
+    decisions = []
+    skips = {}
+    cut_ends = {}
+    summary = {"catchup_hurry": 0, "catchup_cut": 0}
+    for n, raw in enumerate(lines, 1):
+        m = CATCHUP_RE.search(raw.rstrip("\r\n"))
+        if m:
+            text = m.group(1)
+            if text.startswith("CATCHUP config"):
+                f = _fields(text, 2)
+                k, t = _int_or_none(f.get("queued")), _int_or_none(f.get("lagMs"))
+                if k is None or t is None or k < 0 or t < 0:
+                    errors.append(("C10", "строка %d: CATCHUP config без queued/lagMs" % n))
+                else:
+                    config = (k, t)
+                continue
+            f = _fields(text, 1)
+            missing = [k for k in CATCHUP_NEED if k not in f]
+            nums = {k: _int_or_none(f.get(k)) for k in ("seq", "latest", "queued", "lag", "t")}
+            if (missing or None in nums.values() or f.get("action") not in ("hurry", "cut")
+                    or f.get("reason") not in CATCHUP_RULES or f.get("applied") not in ("0", "1")):
+                errors.append(("C10", "строка %d: CATCHUP без полей %s или с неизвестным значением" % (n, missing)))
+                continue
+            f["_n"], f["_nums"] = n, nums
+            decisions.append(f)
+            continue
+        c = parse_combat(raw)
+        if c is None:
+            continue
+        if c.get("stage") == "skip" and c.get("src") == "catchup":
+            skips.setdefault((c.get("seq"), c.get("t")), n)
+        elif c.get("stage") == "end" and c.get("cut") == "catchup":
+            cut_ends.setdefault((c.get("seq"), c.get("t")), n)
+    seen = set()
+    matched_skips, matched_ends = set(), set()
+    for f in decisions:
+        n, v = f["_n"], f["_nums"]
+        if v["queued"] != v["latest"] - v["seq"] or v["queued"] < 1:
+            errors.append(("C10", "строка %d: queued=%d ≠ latest − seq = %d" % (n, v["queued"], v["latest"] - v["seq"])))
+        if CATCHUP_RULES[f["reason"]] != f["action"]:
+            errors.append(("C10", "строка %d: reason=%s при action=%s" % (n, f["reason"], f["action"])))
+        if config is not None:
+            k, t = config
+            if f["reason"] == "queue" and not (k > 0 and v["queued"] > k):
+                errors.append(("C10", "строка %d: cut по очереди при queued=%d, K=%d" % (n, v["queued"], k)))
+            if f["reason"] == "lag" and not (t > 0 and v["lag"] > t):
+                errors.append(("C10", "строка %d: hurry по отставанию при lag=%d, T=%d" % (n, v["lag"], t)))
+        once = (f["seq"], f["action"])
+        if once in seen:
+            errors.append(("C10", "строка %d: второй %s у постановки seq %s" % (n, f["action"], f["seq"])))
+        seen.add(once)
+        key = (f["seq"], f["t"])
+        if f["applied"] == "1":
+            if f["action"] == "hurry":
+                summary["catchup_hurry"] += 1
+                if key not in skips:
+                    errors.append(("C10", "строка %d: hurry без `stage=skip t=%s src=catchup` seq %s" % (n, f["t"], f["seq"])))
+                matched_skips.add(key)
+            else:
+                summary["catchup_cut"] += 1
+                if key not in cut_ends:
+                    errors.append(("C10", "строка %d: cut без `stage=end t=%s … cut=catchup` seq %s" % (n, f["t"], f["seq"])))
+                matched_ends.add(key)
+    for key, n in sorted(skips.items(), key=lambda x: x[1]):
+        if key not in matched_skips:
+            errors.append(("C10", "строка %d: skip src=catchup без строки CATCHUP hurry (seq %s)" % (n, key[0])))
+    for key, n in sorted(cut_ends.items(), key=lambda x: x[1]):
+        if key not in matched_ends:
+            errors.append(("C10", "строка %d: cut=catchup без строки CATCHUP cut (seq %s)" % (n, key[0])))
     return errors, summary
 
 

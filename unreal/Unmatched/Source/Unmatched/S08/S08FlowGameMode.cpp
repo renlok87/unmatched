@@ -246,6 +246,9 @@ void AS08FlowGameMode::BeginPlay() {
                                             *Settings->Describe(), CombatSpeedMul()));
   }
   InitCueSound();  // DE-032: the CUE sounds and the saved volumes (`CUE audio … applied=start`)
+  // R-03: the catch-up policy of the combat staging (K / T from the CVars s09.Catchup.* or -S09Catchup*=)
+  PresentationCatchup.Configure(FS09CatchupConfig::Current());
+  ArtHud.PendingTrace.Add(PresentationCatchup.GetConfig().TraceLine());
   SettingsChangedHandle = US08UserSettings::OnChanged.AddUObject(this, &AS08FlowGameMode::RefreshMotionSettings);
 
   BuildUi();
@@ -477,6 +480,8 @@ void AS08FlowGameMode::HandleApplied(const FS08Snapshot& Snapshot, ES08SeqDecisi
       AppliedCount, Snapshot.SequenceNumber, static_cast<int32>(Decision),
       Snapshot.Fighters.IsValid() ? 1 : 0, Snapshot.BoardState.IsValid() ? 1 : 0));
   TrackCombatResult(Snapshot, Decision);
+  // R-03: the state is applied at once; a staging that lags behind it catches up (after a new result replaced it)
+  if (Decision == ES08SeqDecision::Apply) RunPresentationCatchup(&Snapshot);
   // DE-026 (01 F-10): the fighters as they stood before this snapshot - an opponent's scheme holds them until its
   // effect is due
   const TArray<FS08BoardFighter> FightersBefore = Fighters;
@@ -1340,6 +1345,40 @@ void AS08FlowGameMode::TickCombatStage() {
     }
   } else {
     CombatEffectHudKey = -1;
+  }
+  RunPresentationCatchup(nullptr);  // R-03: the lag rule on the game clock
+}
+
+void AS08FlowGameMode::RunPresentationCatchup(const FS08Snapshot* Applied) {
+  const int64 Now = NowMs();
+  PresentationCatchup.Track(CombatStage.IsActive() ? CombatStage.GetSeq() : -1, Now);
+  if (PresentationCatchup.GetStagedSeq() < 0) return;
+  FS09CatchupDecision Decision;
+  if (Applied) {
+    const bool bCombatOpen = Applied->Phase == TEXT("COMBAT") || Applied->Phase == TEXT("COMBAT_RESOLVE");
+    Decision = PresentationCatchup.OnApplied(Applied->SequenceNumber, Now, Applied->Phase == TEXT("GAME_OVER"),
+                                             bCombatOpen);
+  } else {
+    Decision = PresentationCatchup.Tick(Now);
+  }
+  if (!Decision.IsSet()) return;
+  TArray<FString> Lines;
+  TArray<FS09CombatStageEvent> Events;
+  bool bApplied = false;
+  if (Decision.Action == ES09CatchupAction::Cut) {
+    // The instant result (the same Cut as a replacing result): the held HP / fall are released now.
+    bApplied = CombatStage.IsActive();
+    CombatStage.Cut(Now, TEXT("catchup"), CueDispatcher, Lines, Events);
+  } else {
+    // The short version: the remaining holds go like a player's skip (F-01); the blow still plays.
+    bApplied = CombatStage.Skip(Now, TEXT("catchup"), CueDispatcher, Lines, Events);
+  }
+  WriteCueLines(Lines);
+  FS08Trace::Write(Decision.TraceLine(Now, bApplied));
+  RunCombatEvents(Events);
+  if (CombatStage.IsActive() && CombatStage.ShowsOutcome(Now) && !bCombatOutcomeShown) {
+    bCombatOutcomeShown = true;
+    RefreshHud();
   }
 }
 

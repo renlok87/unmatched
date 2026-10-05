@@ -17,7 +17,10 @@
 //              shown=<0|1> speed=<x> flip=<ms> contact=<ms> src=<notify|profile|default> a=<A> d=<D> outcome=<win|hold>
 //   CUE combat seq=<n> stage=read|effect|pause t=<end> ms=<actual> skipped=<0|1> [i=<k>]
 //   CUE combat seq=<n> stage=slam t=<ms> | lunge | contact | hit tint=<ms> | minus amount=<n> | hp from=<a> to=<b>
-//              | fall | skip src=<click|space|enter> | end total=<ms> skipped=<0|1> cut=<0|replace|reconnect>
+//              | fall | skip src=<click|space|enter|catchup>
+//              | end total=<ms> skipped=<0|1> cut=<0|replace|reconnect|catchup>
+//   (src=catchup / cut=catchup: R-03, the catch-up policy of S09PresentationCatchup.h - the short version / the
+//   instant result of a staging that lags behind newer applied snapshots)
 //   (the lunge line carries rate=<LungeAttack play rate> since DE-025)
 // and the `CUE fx` lines of CUE-010 (subject=scene, done with hold=) and CUE-011 (subject=target, from contact)
 // through FS08CueDispatcher.

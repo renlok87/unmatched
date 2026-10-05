@@ -412,6 +412,63 @@ class CombatEffectLogTests(unittest.TestCase):
             self.assertEqual(cc.main(["check-trace", str(log), "--min-effect-lines", "3"]), 1)
 
 
+class CatchupTests(unittest.TestCase):
+    """R-03: постановка боя, отстающая от применённого состояния, догоняет его — строки `CATCHUP` и гейт C10
+    (CUE-DISPATCHER.md §3.1, §5, §6)."""
+
+    CONFIG = "CATCHUP config queued=3 lagMs=1500"
+
+    def hurried(self, reason="combat", lag=280, applied="1"):
+        # летальный удар DE-018 с пропуском в паузе: тот же пропуск, но от политики догоняния (src=catchup)
+        trace = [l.replace("src=space", "src=catchup")
+                 for l in cc.load_json(cc.FIXTURES / "combat-staging-lethal-skip.json")["expect_trace"]]
+        return [self.CONFIG] + trace + [
+            "CATCHUP seq=41 latest=42 queued=1 lag=%d t=1900 action=hurry reason=%s applied=%s" % (lag, reason, applied)]
+
+    def cut(self, queued=4, latest=24, end_cut="catchup"):
+        return [self.CONFIG,
+                "CUE combat seq=20 stage=start t=1000 attacker=a target=b text=1 lines=2 damage=2 lethal=0 shown=0 "
+                "speed=1.00 flip=620 contact=292 src=notify a=4 d=0 outcome=win",
+                "CUE combat seq=20 stage=end t=1400 total=1000 skipped=0 cut=%s" % end_cut,
+                "CATCHUP seq=20 latest=%d queued=%d lag=300 t=1400 action=cut reason=queue applied=1" % (latest, queued)]
+
+    def codes(self, lines):
+        return {c for c, _ in cc.check_trace(lines, TABLE)[0]}
+
+    def test_short_version_and_cut_pass_and_are_counted(self):
+        errs, summary = cc.check_trace(self.hurried(), TABLE)
+        self.assertEqual(errs, [])  # C4 видит обычный пропуск: удержания короче только со skipped=1
+        self.assertEqual((summary["catchup_hurry"], summary["catchup_cut"], summary["combat_skipped"]), (1, 0, 1))
+        errs, summary = cc.check_trace(self.cut(), TABLE)
+        self.assertEqual(errs, [])  # cut≠0: C4–C6 не проверяются, как у replace
+        self.assertEqual((summary["catchup_cut"], summary["combat_cut"]), (1, 1))
+
+    def test_lag_reason_needs_lag_over_t(self):
+        self.assertNotIn("C10", self.codes(self.hurried(reason="lag", lag=1501)))
+        self.assertIn("C10", self.codes(self.hurried(reason="lag", lag=1200)))
+
+    def test_queue_reason_needs_more_than_k(self):
+        self.assertIn("C10", self.codes(self.cut(queued=3, latest=23)))
+        self.assertIn("C10", self.codes(self.cut(queued=2, latest=24)))  # queued ≠ latest − seq
+
+    def test_skip_and_cut_need_their_catchup_line_and_back(self):
+        hurried = self.hurried()
+        self.assertIn("C10", self.codes(hurried[:-1]))  # skip src=catchup без строки CATCHUP
+        self.assertIn("C10", self.codes([l for l in hurried if " stage=skip " not in l]))  # CATCHUP без skip
+        self.assertIn("C10", self.codes(self.cut(end_cut="replace")))  # cut без end cut=catchup
+        self.assertIn("C10", self.codes(self.cut()[:-1]))  # end cut=catchup без строки CATCHUP
+        # applied=0: удержания уже кончились, постановка не менялась — skip не нужен
+        self.assertNotIn("C10", self.codes([l.replace("src=catchup", "src=space") for l in self.hurried(applied="0")]))
+
+    def test_format_reason_and_once_per_seq(self):
+        self.assertIn("C10", self.codes([self.CONFIG, "CATCHUP seq=5 latest=6 queued=1 t=10 action=hurry reason=lag applied=1"]))
+        self.assertIn("C10", self.codes(self.hurried()[:-1] + [
+            "CATCHUP seq=41 latest=42 queued=1 lag=280 t=1900 action=cut reason=combat applied=0"]))
+        self.assertIn("C10", self.codes(self.hurried() + [
+            "CATCHUP seq=41 latest=43 queued=2 lag=380 t=2000 action=hurry reason=combat applied=0"]))
+        self.assertIn("C10", self.codes(["CATCHUP config queued=x lagMs=1500"]))
+
+
 class DeathStageTests(unittest.TestCase):
     """DE-019: смерть по этапам `CUE death …` и экран результата `RESULT screen …` (01 F-09, CUE-DISPATCHER.md §6)."""
 

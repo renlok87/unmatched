@@ -25,6 +25,7 @@
 #include "../S09/S09MoveInput.h"
 #include "../S09/S09HudPress.h"
 #include "../S09/S09CombatStage.h"
+#include "../S09/S09PresentationCatchup.h"
 #include "../S09/S09DeathStage.h"
 #include "../S09/S09ResultScreen.h"
 #include "../S09/S09DeckPanel.h"
@@ -274,6 +275,9 @@ private:
   void TickCombatStage();
   /** Click / Space / Enter during a staging hold: skips the holds (true = the input was consumed). */
   bool TryCombatSkip();
+  /** R-03: the catch-up policy of the staging (S09PresentationCatchup.h) - per applied snapshot (Applied) or on the
+   *  game clock (nullptr): a staging lagging behind newer snapshots plays its short version or is cut. */
+  void RunPresentationCatchup(const FS08Snapshot* Applied);
   void RunCombatEvents(const TArray<FS09CombatStageEvent>& Events);
   void WriteCueLines(const TArray<FString>& Lines);
   /** CUE-011 pieces outside or inside a staging: the damage number (+ evidence shot scheduling) and the hit. */
@@ -544,6 +548,7 @@ private:
   bool bCombatDamageShownEarly = false;    // the target's damage was shown while the combat was paused
   bool bCombatOutcomeShown = false;        // the HUD was rebuilt for the outcome label of this staging
   int32 CombatEffectHudKey = -1;           // R-02: effect lines shown / highlighted at the last HUD rebuild
+  FS09PresentationCatchup PresentationCatchup;  // R-03: bounded lag of the staging behind the applied state
   uint64 CombatSkipFrame = MAX_uint64;     // frame whose click / Space / Enter was a staging skip
   // auto plan tokens: attack | defend | nodefense | resolve | scheme
   TArray<FString> S09CombatPlan;
