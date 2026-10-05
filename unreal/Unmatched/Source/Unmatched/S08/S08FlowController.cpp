@@ -1,4 +1,5 @@
 #include "S08FlowController.h"
+#include "S08MoveAnim.h"
 #include "Algo/StableSort.h"
 #include "Dom/JsonObject.h"
 #include "Misc/CommandLine.h"
@@ -1550,10 +1551,14 @@ void FS08FlowController::ComputeCues(int32 Seq, const TSharedPtr<FJsonValue>& Ol
 }
 
 void FS08FlowController::MoveCueTraceLines(const TArray<FS08Cue>& Cues, const FS08BoardModel& Board,
-                                           TArray<FString>& OutLines) {
+                                           TArray<FString>& OutLines, const FS08MotionSettings* Motion) {
   OutLines.Reset();
   TArray<const FS08Cue*> Moves;
-  const TArray<FS08MoveCueTiming> Timing = FS08MoveCueSchedule::ForCues(Cues, Moves);
+  const TArray<FS08MoveCueTiming> Timing = Motion ? FS08MoveAnim::Schedule(Cues, *Motion, Moves)
+                                                  : FS08MoveCueSchedule::ForCues(Cues, Moves);
+  const FString MotionTail = Motion ? FString::Printf(TEXT(" speed=%s reduced=%d"), S08Motion::SpeedName(Motion->Speed),
+                                                      Motion->bReducedMotion ? 1 : 0)
+                                    : FString();
   for (int32 I = 0; I < Moves.Num(); ++I) {
     const FS08Cue& Cue = *Moves[I];
     TArray<FString> Cells;
@@ -1564,7 +1569,7 @@ void FS08FlowController::MoveCueTraceLines(const TArray<FS08Cue>& Cues, const FS
         Cue.Kind == ES08MoveKind::Place ? TEXT("place") : TEXT("move"), Cue.Steps(),
         S08MoveCue::SourceName(Cue.PathSource), FMath::RoundToInt(Timing[I].StartMs),
         FMath::RoundToInt(Timing[I].DurationMs), Timing[I].bSnapped ? 1 : 0, *FString::Join(Cells, TEXT(">")),
-        Cue.bTrailMismatch ? TEXT(" trail=mismatch") : TEXT("")));
+        Cue.bTrailMismatch ? TEXT(" trail=mismatch") : TEXT("")) + MotionTail);
   }
 }
 
@@ -1602,7 +1607,7 @@ ES08SeqDecision FS08FlowController::ApplySnapshot(const FS08Snapshot& Snapshot) 
       CueBoard.Decode(Snapshot.BoardState.IsValid() ? Snapshot.BoardState : Applied.BoardState);
       ComputeCues(Snapshot.SequenceNumber, Applied.Fighters, Snapshot.Fighters, CueBoard, Snapshot.Metadata,
                   Cues);
-      MoveCueTraceLines(Cues, CueBoard, MoveCueLines);
+      MoveCueTraceLines(Cues, CueBoard, MoveCueLines, bMoveMotionSet ? &MoveMotion : nullptr);
     } else if (SeqGuard.HasLocal) {
       Trace(FString::Printf(TEXT("SEQ %d gap from %d: cues suppressed"), Snapshot.SequenceNumber,
                             SeqGuard.Local));

@@ -34,6 +34,7 @@
 #include "S08ArtTuner.h"
 #include "S08ArtView.h"
 #include "S08LiveTune.h"
+#include "S08UserSettings.h"
 #include "Widgets/Input/SEditableTextBox.h"
 #include "Widgets/Input/SButton.h"
 #include "Widgets/Input/SCheckBox.h"
@@ -226,6 +227,17 @@ void AS08FlowGameMode::BeginPlay() {
   // GD-031: every applied/merged snapshot re-renders the authoritative board.
   Flow->OnApplied.AddUObject(this, &AS08FlowGameMode::HandleApplied);
   Flow->OnCues.AddUObject(this, &AS08FlowGameMode::HandleCues);
+  // MS-T-16 (04 §6.3): the motion settings of this run - US08UserSettings overridden by -S08ReducedMotion /
+  // -S08AnimSpeed - drive the move animation and the MS-CUE schedule; -S08MoveHop / -S08MoveLean / -S08MoveEase are the
+  // A/B review parameters (DE-028; defaults = 01 F-02: no hop, lean 10 deg, no ease).
+  MoveMotion = S08Motion::Current();
+  MoveAnimParams = FS08MoveAnimParams::FromCommandLine(FCommandLine::Get());
+  Flow->SetMoveMotion(MoveMotion);
+  FS08Trace::Write(FString::Printf(
+      TEXT("MS-ANIM settings reduced=%d speed=%s shake=%d saved=%d hop=%.3f lean=%.1f leanIn=%.0f turn=%.0f settle=%.0f ease=%d"),
+      MoveMotion.bReducedMotion ? 1 : 0, S08Motion::SpeedName(MoveMotion.Speed), MoveMotion.bScreenShake ? 1 : 0,
+      US08UserSettings::Get() ? 1 : 0, MoveAnimParams.HopHeightRel, MoveAnimParams.TravelLeanDeg,
+      MoveAnimParams.LeanInMs, MoveAnimParams.TurnMs, MoveAnimParams.SettleMs, MoveAnimParams.bEaseEnds ? 1 : 0));
 
   BuildUi();
   // W5b-R: SHOT lines of the HUD layer at the END of the requesting frame (actual visibility + painted geometry) and
@@ -970,6 +982,23 @@ void AS08FlowGameMode::HandleCues(const TArray<FS08Cue>& Cues) {
   // One cue set per authoritative seq (GD-031): the same seq arriving again
   // over the second channel merges silently and never re-fires these.
   bSawCue = true;
+  // MS-T-16 (CUE-007): the moves of this seq start in the frame the snapshot is applied (SD-13, MS-R-22) - the
+  // figures were just synced to their snapshot cells and now travel there from their start cells; damage of the same
+  // seq waits for its target's arrival (MS-E-48).
+  TMap<FString, double> ArriveMs;
+  const TArray<FS08MovePlan> Plans = FS08MoveAnim::BuildPlans(
+      Cues, MoveMotion, [this](const FIntPoint& Cell) { return BoardModel.CellToWorld(Cell.X, Cell.Y); });
+  if (Plans.Num() > 0) {
+    const int32 Animated = BoardActor ? BoardActor->PlayFighterMoves(Plans, MoveAnimParams, NowMs()) : 0;
+    double EndMs = 0.0;
+    for (const FS08MovePlan& Plan : Plans) {
+      ArriveMs.Add(Plan.FighterId, Plan.ArriveMs());
+      EndMs = FMath::Max(EndMs, Plan.EndMs(MoveAnimParams));
+    }
+    FS08Trace::Write(FString::Printf(TEXT("MS-ANIM play seq=%d moves=%d animated=%d speed=%s reduced=%d end=%d"),
+                                     Plans[0].Seq, Plans.Num(), Animated, S08Motion::SpeedName(MoveMotion.Speed),
+                                     MoveMotion.bReducedMotion ? 1 : 0, FMath::RoundToInt(EndMs)));
+  }
   for (const FS08Cue& Cue : Cues) {
     FString Line;
     if (Cue.Type == ES08CueType::FighterMoved) {
@@ -984,19 +1013,60 @@ void AS08FlowGameMode::HandleCues(const TArray<FS08Cue>& Cues) {
       const FS09CombatStageInput& Staged = CombatStage.GetInput();
       const bool bStaged = CombatStage.IsActive() && Staged.Seq == Cue.SequenceNumber &&
                            Staged.TargetId == Cue.FighterId && !Staged.bDamageShown;
+      // Only a target that really travels (a dead or missing figure does not) holds its damage.
+      const AS08FighterActor* Mover = BoardActor ? BoardActor->FindFighterActor(Cue.FighterId) : nullptr;
+      const double* Arrive = Mover && Mover->IsMoving() ? ArriveMs.Find(Cue.FighterId) : nullptr;
       if (bStaged) {
         Line += TEXT(" staged=contact");
+      } else if (BoardActor && Arrive && *Arrive > 0.0) {
+        // MS-E-48 cascade: the hit plays when the moving target arrives (a skip makes it due at once).
+        DeferredDamage.Add({Cue.FighterId, Cue.Damage, Cue.SequenceNumber,
+                            NowMs() + static_cast<int64>(FMath::CeilToDouble(*Arrive))});
+        Line += FString::Printf(TEXT(" after=move ms=%d"), FMath::RoundToInt(*Arrive));
       } else if (BoardActor) {
         PresentDamageNumber(Cue.FighterId, Cue.Damage, Cue.SequenceNumber, FS09CombatTiming::MinusLifeMs / 1000.0f);
         if (Cue.Damage > 0) PresentHit(Cue.FighterId, Cue.SequenceNumber, FS09CombatTiming::HitTintMs);
-        if (CommandUi.Combat.bPresent && CommandUi.Combat.TargetFighterId == Cue.FighterId) {
-          bCombatDamageShownEarly = true;  // the closing staging must not show it a second time
-        }
+      }
+      if (!bStaged && BoardActor && CommandUi.Combat.bPresent && CommandUi.Combat.TargetFighterId == Cue.FighterId) {
+        bCombatDamageShownEarly = true;  // the closing staging must not show it a second time
       }
     }
     TraceLines.Add(Line);
     FS08Trace::Write(Line);
   }
+}
+
+void AS08FlowGameMode::TickDeferredDamage() {
+  if (DeferredDamage.Num() == 0) return;
+  const int64 Now = NowMs();
+  TArray<FDeferredDamage> Due;
+  for (int32 I = 0; I < DeferredDamage.Num();) {
+    if (DeferredDamage[I].DueMs <= Now) {
+      Due.Add(DeferredDamage[I]);
+      DeferredDamage.RemoveAt(I);
+    } else {
+      ++I;
+    }
+  }
+  for (const FDeferredDamage& D : Due) {
+    PresentDamageNumber(D.FighterId, D.Damage, D.Seq, FS09CombatTiming::MinusLifeMs / 1000.0f);
+    if (D.Damage > 0) PresentHit(D.FighterId, D.Seq, FS09CombatTiming::HitTintMs);
+    FS08Trace::Write(FString::Printf(TEXT("MS-ANIM cascade damage fighter=%s seq=%d amount=%d"), *D.FighterId, D.Seq,
+                                     D.Damage));
+  }
+}
+
+void AS08FlowGameMode::TryMoveSkip() {
+  if (!BoardActor || !BoardActor->AnyFighterMoving() || ArtView.IsValid()) return;
+  const APlayerController* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
+  if (!PC) return;
+  const FKey* Pressed =
+      S08Motion::MoveSkipKeys().FindByPredicate([PC](const FKey& Key) { return PC->WasInputKeyJustPressed(Key); });
+  if (!Pressed) return;
+  const int32 Skipped = BoardActor->SkipFighterMoves();
+  for (FDeferredDamage& D : DeferredDamage) D.DueMs = FMath::Min(D.DueMs, NowMs());
+  FS08Trace::Write(FString::Printf(TEXT("MS-ANIM skip key=%s fighters=%d frame=%llu"), *Pressed->ToString(), Skipped,
+                                   static_cast<unsigned long long>(GFrameCounter)));
 }
 
 void AS08FlowGameMode::PresentDamageNumber(const FString& FighterId, int32 Damage, int32 Seq, float LifeSeconds) {
@@ -4616,6 +4686,10 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
     const FS09HudPressOutcome Stray = HudPress->Release(NAME_None, GFrameCounter);
     if (Stray.Result == ES09HudPressResult::Refused) HandleHudPressOutcome(Stray, nullptr, nullptr);
   }
+  // MS-T-16: the moves advance on the game clock; a skip key lands them this frame, then the due cascade damage.
+  if (BoardActor) BoardActor->TickFighterMoves(NowMs());
+  TryMoveSkip();
+  TickDeferredDamage();
   // DE-018: the combat staging runs on the game clock; a click / Space / Enter during its holds is the skip and
   // is not handled a second time below (a HUD press keeps its own action).
   TickCombatStage();

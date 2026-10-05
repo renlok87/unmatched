@@ -28,6 +28,7 @@
 #include "../S09/S09DeathStage.h"
 #include "../S09/S09PendingPresent.h"
 #include "S08CueDispatcher.h"
+#include "S08MoveAnim.h"
 #include "S08FlowGameMode.generated.h"
 
 struct FS08MoveDraftView;
@@ -269,6 +270,12 @@ private:
   /** CUE-011 pieces outside or inside a staging: the damage number (+ evidence shot scheduling) and the hit. */
   void PresentDamageNumber(const FString& FighterId, int32 Damage, int32 Seq, float LifeSeconds);
   void PresentHit(const FString& FighterId, int32 Seq, int32 TintMs);
+  // ---- MS-T-16 move animation (CUE-007, S08MoveAnim.h) ----
+  /** Any key or mouse button but Space and the wheel while a figure travels: every move jumps to its final pose in the
+   *  same frame (MS-E-70 / MS-E-110). The input is not consumed - it acts on the logical (snapshot) state as usual. */
+  void TryMoveSkip();
+  /** Damage cues that wait for the arrival of their moving target (MS-E-48 cascade), presented when due. */
+  void TickDeferredDamage();
   /** Re-derives ShownFighters (HUD view) and, with bSyncBoard, pushes the board view to the board actor. */
   void RefreshShownFighters(bool bSyncBoard);
   /** Fighters as the HUD shows them: the staging holds the target's HP until contact + 80 ms. */
@@ -433,6 +440,17 @@ private:
   // LungeAttack is no longer sent at COMBAT_RESOLVE: the staging plays it after the slam + 300 ms (01 F-03).
   FS08CueDispatcher CueDispatcher;
   FS09CombatStage CombatStage;
+  // MS-T-16: the motion settings (US08UserSettings + flags, read at BeginPlay), the move pose parameters and the
+  // damage cues held until their target arrives.
+  FS08MotionSettings MoveMotion;
+  FS08MoveAnimParams MoveAnimParams;
+  struct FDeferredDamage {
+    FString FighterId;
+    int32 Damage = 0;
+    int32 Seq = 0;
+    int64 DueMs = 0;
+  };
+  TArray<FDeferredDamage> DeferredDamage;
   FS09DeathStage DeathStage;
   FS09ResultGate ResultGate;
   TMap<FString, bool> BoardAliveById;      // DE-019: the board view's alive flags of the last sync

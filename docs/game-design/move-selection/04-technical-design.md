@@ -75,8 +75,8 @@ D-DE-02; R-14 live 2026-10-04): время постоянно на ребро, �
 | `S08/S08MoveHighlight.h/.cpp` (новые) | `US08MoveHighlightComponent`: ISM подложек (4 канала), ISM сегментов пути, точек и наконечников, призраки, бейджи | MS-T-08..MS-T-10 |
 | `S08/S08MoveAnim.h/.cpp` (новые) | чистая функция расписания анимации; интеграция с `AS08FighterActor` | MS-T-16 |
 | `S08/S08FighterActor.h/.cpp` | визуальная позиция отдельно от логической; `PlayMove(points, schedule)`, `SnapToLogical()`; наклон хода, разворот и доворот, возврат в Idle; подскок — параметр, по умолчанию 0 (D-DE-02) | MS-T-16, DE-021 |
-| `S08/S08UserSettings.h/.cpp` (новые) | `US08UserSettings : UGameUserSettings`: `bReducedMotion`, `AnimSpeed`, `bScreenShake` (UI-ACC-005) | MS-T-16 |
-| `unreal/Unmatched/Config/DefaultEngine.ini` | `[/Script/Engine.Engine] GameUserSettingsClassName=/Script/Unmatched.S08UserSettings` | MS-T-16 |
+| `S08/S08UserSettings.h/.cpp` (новые) | `US08UserSettings` — объект конфигурации в `GameUserSettings.ini` (`config=GameUserSettings`, секция `[/Script/Unmatched.S08UserSettings]`): `bReducedMotion`, `AnimSpeed`, `bScreenShake` (UI-ACC-005). Не подкласс `UGameUserSettings` — уточнение MS-T-16 в §6.3 | MS-T-16 |
+| `unreal/Unmatched/Config/DefaultEngine.ini` | не меняется: `GameUserSettingsClassName` не подменяется (уточнение MS-T-16 в §6.3) | MS-T-16 |
 | `S09/S09MoveSelectionTests.cpp`, `S08/S08MoveHighlightTests.cpp`, `S08/S08MoveAnimTests.cpp`, `S08/S08MoveParityTests.cpp` (новые) | автотесты MS-AT-10..29 | по задачам |
 | `unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json` | корневой `moveSelection` и `boards[i].moveSelection` (схема §4.7); старый `readability.reach` остаётся как запасной до удаления | MS-T-08, MS-T-13 |
 | `docs/unreal/contracts/hud/why-reasons.json`, StringTable `ms`/`why` | ключи `why.*`, `ms.*` (03 §8.2, §9); механизм RU/EN и упаковка — MS-T-28 | MS-T-06, MS-T-28 |
@@ -671,6 +671,38 @@ schedule(moves[], p, speed, reducedMotion) -> [{fighterId, startMs, stepDurMs, s
   ini.
 - Полноценный cue-диспетчер GD-044 этим планом не делается: `FS08MoveAnim` реализует только CUE-007 и соблюдает его
   поля контракта, чтобы позже стать обработчиком диспетчера.
+
+Уточнение MS-T-16 (реализация, 2026-10-05; журнал `de-footage/task/runs/D-2026-10-04.md`):
+- **`S08/S08MoveAnim.*`.** `FS08MoveAnim::Schedule` — расписание выше с настройками (`FS08MotionSettings`: reduced motion
+  или скорость «нет» — все snap в 0, иначе `FS08MoveCueSchedule` с множителем); `BuildPlans` — план на бойца (мировые
+  точки пути со стартом, слот seq, покой-разворот на старте и на финише по правилу половины поля); `Sample` — поза в
+  любой момент плана (скольжение по ребру, подскок-параметр, наклон, разворот и доворот, возврат в Idle, PLACE с
+  растворением). Чистые функции, тесты `Unmatched.S08.MoveAnim.Schedule`, `.Pose`.
+- **Фигура.** `AS08FighterActor::PlayMove / TickMove / FinishMove`: двигается сам актор (кольца, свет героя, тень и ярлыки
+  едут с фигурой); логическая позиция — по снапшоту: капсула клика на время хода закреплена на клетке снапшота, база и
+  серый короб клик не ловят (MS-R-53). Поворот и наклон — у меша фигуры (v2 смотрит по +X, кандидат Medusa и блокауты —
+  по +Y). Повторное применение снапшота с той же клеткой ход не прерывает; новая клетка или смерть — `jump_to_final`.
+  PLACE у v2-фигуры — MIC растворения DE-011 в стиле fade (120 + 120 мс), после — MI тела; без MIC — перенос в середине.
+- **Часы и пропуск.** Ходы идут по игровым часам режима (`NowMs`), старт — в кадре применения снапшота (`HandleCues`
+  сразу после синхронизации доски, SD-13). Пропуск — любая клавиша или кнопка мыши, кроме Space и колеса
+  (`S08Motion::SkipsMove`), в том же кадре; ввод не поглощается и работает по логическому состоянию (MS-E-70, MS-E-110).
+- **Каскад MS-E-48.** Урон того же seq по движущемуся бойцу (не постановка боя DE-018) ждёт прибытия цели; строка
+  `CUE damage … after=move ms=<n>`, показ — `MS-ANIM cascade damage …`; пропуск делает его срочным.
+- **Трассы.** `MS-ANIM settings …` (старт), `MS-ANIM play seq= moves= animated= speed= reduced= end=`, `MS-ANIM skip key=
+  fighters= frame=`; строки `MS-CUE` получают хвост ` speed=<none|fast|normal|slow> reduced=<0|1>` и расписание с этими
+  настройками — `cue_contract.py check-trace` их уже понимает.
+- **Настройки — отклонение от плана.** `US08UserSettings` — не подкласс `UGameUserSettings`, а обычный объект
+  конфигурации в том же `GameUserSettings.ini`; `GameUserSettingsClassName` в `DefaultEngine.ini` не меняется. Причина
+  (замер тестом `Unmatched.S08.MoveAnim.Settings`): подкласс читает ключи только из своей секции, и
+  `[/Script/Engine.GameUserSettings] FrameRateLimit=60` (ACC-022, правило 60 FPS из AGENTS.md) у него становится 0 — CDO
+  родителя 60, CDO подкласса 0; так же терялись бы сохранённые разрешения, а скрипты демо (`tools/s09/run-*-demo.ps1`)
+  правили бы игнорируемую секцию. `S08IconMotion::IsReducedMotion` теперь учитывает и сохранённый `bReducedMotion`.
+- **Параметры A/B (DE-028):** `-S08MoveHop=<доля роста>`, `-S08MoveLean=<градусы>`, `-S08MoveEase`; по умолчанию —
+  F-02 (подскока нет, наклон 10°, ease выкл).
+- **Не сделано здесь.** Встряски V-08 в клиенте нет — `bScreenShake` пока только хранится; пульса подложек нет в
+  материале `M_UM_MovePlate` — выключать нечего; переподключение во время хода (`on_reconnect: skip`) — ход доигрывает,
+  если клетка в барьерном снапшоте не изменилась (иначе `jump_to_final`); тик шага и пыль — MS-T-18; множитель скорости
+  в бою — DE-025.
 
 | ID | Требование | Тест |
 |---|---|---|

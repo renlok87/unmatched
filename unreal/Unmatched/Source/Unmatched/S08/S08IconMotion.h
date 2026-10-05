@@ -100,8 +100,8 @@ namespace S08IconMotion {
 UNMATCHED_API float Ease(ES08IconEase Ease, float X);
 /** Value of a key list at local time T; bFromStart keys take Start. */
 UNMATCHED_API float EvalKeys(const TArray<FS08IconKey>& Keys, float T, float Start);
-/** UI-ACC-005/006 reduced motion: CVar s08.ReducedMotion > 0, or the -S08ReducedMotion command-line flag.
- *  MS-T-16 (US08UserSettings) becomes the source of the CVar. */
+/** UI-ACC-005/006 reduced motion: CVar s08.ReducedMotion > 0, the -S08ReducedMotion command-line flag, or the saved
+ *  US08UserSettings::bReducedMotion (MS-T-16, S08Motion::Current). */
 UNMATCHED_API bool IsReducedMotion();
 /** RD-1 (ART-011 accepted by delegation 2026-10-03): the combat target token is the animated v3
  *  `action-attack-token` by default; -S08IconLegacy restores the W5b-R token widget (rollback). The former opt-in

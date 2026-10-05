@@ -1,4 +1,5 @@
 #include "S08IconMotion.h"
+#include "S08MoveAnim.h"
 
 #include "Algo/Sort.h"
 #include "Dom/JsonObject.h"
@@ -260,7 +261,8 @@ float S08IconMotion::EvalKeys(const TArray<FS08IconKey>& Keys, float T, float St
 }
 
 bool S08IconMotion::IsReducedMotion() {
-  return CVarS08ReducedMotion.GetValueOnGameThread() > 0 || FParse::Param(FCommandLine::Get(), TEXT("S08ReducedMotion"));
+  // MS-T-16: the saved US08UserSettings::bReducedMotion joins the CVar and the flag (S08Motion::Current).
+  return CVarS08ReducedMotion.GetValueOnGameThread() > 0 || S08Motion::Current().bReducedMotion;
 }
 
 bool S08IconMotion::UseAnimatedCombatToken(const TCHAR* CommandLine) {

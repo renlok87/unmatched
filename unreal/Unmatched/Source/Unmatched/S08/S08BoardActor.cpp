@@ -468,6 +468,39 @@ void AS08BoardActor::PlayFighterHitTint(const FString& FighterId, float Seconds)
   if (AS08FighterActor* Actor = FindFighterActor(FighterId)) Actor->PlayHitTint(Seconds);
 }
 
+int32 AS08BoardActor::PlayFighterMoves(const TArray<FS08MovePlan>& Plans, const FS08MoveAnimParams& Params,
+                                       int64 NowMs) {
+  int32 Animated = 0;
+  for (const FS08MovePlan& Plan : Plans) {
+    AS08FighterActor* Actor = FindFighterActor(Plan.FighterId);
+    if (!Actor) continue;
+    Actor->PlayMove(Plan, Params, NowMs);
+    if (Actor->IsMoving() && !Plan.bSnapped) ++Animated;
+  }
+  return Animated;
+}
+
+void AS08BoardActor::TickFighterMoves(int64 NowMs) {
+  for (AS08FighterActor* Actor : FighterActors) {
+    if (Actor && Actor->IsMoving()) Actor->TickMove(NowMs);
+  }
+}
+
+int32 AS08BoardActor::SkipFighterMoves() {
+  int32 Skipped = 0;
+  for (AS08FighterActor* Actor : FighterActors) {
+    if (Actor && Actor->FinishMove()) ++Skipped;
+  }
+  return Skipped;
+}
+
+bool AS08BoardActor::AnyFighterMoving() const {
+  for (const AS08FighterActor* Actor : FighterActors) {
+    if (Actor && Actor->IsMoving()) return true;
+  }
+  return false;
+}
+
 bool AS08BoardActor::GetFighterDeathPlan(const FString& FighterId, S08HeroesV2::FDeathPlan& OutPlan,
                                          FString& OutStyle) const {
   const AS08FighterActor* Actor = FindFighterActor(FighterId);

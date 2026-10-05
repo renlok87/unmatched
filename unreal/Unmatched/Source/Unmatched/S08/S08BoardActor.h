@@ -15,6 +15,7 @@
 #include "S08ArtHud.h"
 #include "S08HeroesV2.h"
 #include "S08MoveHighlight.h"
+#include "S08MoveAnim.h"
 #include "S08Render.h"
 #include "S08Team.h"
 #include "S08BoardActor.generated.h"
@@ -251,6 +252,15 @@ public:
   int32 GetFighterContactMs(const FString& FighterId, FString& OutSource) const;
   /** DE-018 (CUE-011): the red hit tint of a v2 figure (CPD_HitTint) for Seconds from now. */
   void PlayFighterHitTint(const FString& FighterId, float Seconds);
+  /** MS-T-16 (CUE-007): starts the moves of one seq at NowMs (the snapshot frame) - one plan per fighter
+   *  (FS08MoveAnim::BuildPlans); returns the number of figures that animate (a snapped plan lands at once). */
+  int32 PlayFighterMoves(const TArray<FS08MovePlan>& Plans, const FS08MoveAnimParams& Params, int64 NowMs);
+  /** Advances every playing move to NowMs (the game mode's tick). */
+  void TickFighterMoves(int64 NowMs);
+  /** Jumps every playing move to its final pose (skip input, MS-E-70); returns how many were playing. */
+  int32 SkipFighterMoves();
+  /** Some figure is still travelling or settling. */
+  bool AnyFighterMoving() const;
   /** DE-019 (01 F-09): the death plan of a dying v2 figure (AS08FighterActor::GetDeathPlan); false when the fighter
    *  plays no death (alive, gone, or a figure that hides at once). */
   bool GetFighterDeathPlan(const FString& FighterId, S08HeroesV2::FDeathPlan& OutPlan, FString& OutStyle) const;

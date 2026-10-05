@@ -8,6 +8,7 @@
 #include "S08BoardModel.h"
 #include "S08HeroesV2.h"
 #include "S08HeroLight.h"
+#include "S08MoveAnim.h"
 #include "S08Team.h"
 #include "TimerManager.h"
 #include "S08FighterActor.generated.h"
@@ -119,6 +120,26 @@ public:
   /** Live tune: moves the looping v2 clip's clock by DeltaSeconds (wrapped into the clip), so a capture shows the pose a
    *  fresh -Bench run shows at the same time since spawn; false when no looping clip plays (nothing changed). */
   bool ShiftHeroClipClock(float DeltaSeconds);
+  // ---- MS-T-16 move animation (S08MoveAnim.h; move-selection 04 §6.3) ----
+  /** Plays a CUE-007 move from NowMs (the seq start, ms on the game clock): the figure stands on the plan's start cell
+   *  until its slot, slides along the path (lean, turns, optional hop), settles to Idle; a Place fades out / in. The
+   *  logical position stays the snapshot's: the click volume is pinned to the destination cell while the figure travels
+   *  (MS-R-53). A move already playing jumps to its final pose first (jump_to_final). */
+  void PlayMove(const FS08MovePlan& Plan, const FS08MoveAnimParams& Params, int64 NowMs);
+  /** Advances the playing move to NowMs; false when no move plays (the last pose was applied and the move ended). */
+  bool TickMove(int64 NowMs);
+  /** Jumps the playing move to its final pose at once (skip, jump_to_final, a new snapshot cell); false when none plays. */
+  bool FinishMove();
+  bool IsMoving() const { return bMoving; }
+  const FS08MovePlan& GetMovePlan() const { return MovePlan; }
+  /** The pose applied last (the final pose once the move ended). */
+  const FS08MovePose& GetMovePose() const { return MovePose; }
+  /** World location of the click volume (the logical cell while a move plays). */
+  FVector GetClickVolumeLocation() const;
+  /** World yaw / lean currently applied to the figure mesh (the v2 body, the Medusa candidate or the blockout). */
+  float GetFigureYawDeg() const { return FacingYawDeg; }
+  float GetFigureLeanDeg() const { return FacingLeanDeg; }
+
   /** Screen-space combat icon mode: the world billboard stays hidden while
    *  the HUD draws the exact-size icon (the trace still reports icon=1). */
   void SetScreenIconMode(bool bScreen);
@@ -292,6 +313,23 @@ private:
   void OnHeroLightPulse();
   /** The figure meshes on channels 0 + 1 while bLit (the pedestal too only when bPedestal), else channel 0 only. */
   void SetHeroLitChannels(bool bLit, bool bPedestal);
+
+  // MS-T-16 move animation state (driven by the game mode's clock through the board actor).
+  bool bMoving = false;
+  FS08MovePlan MovePlan;
+  FS08MoveAnimParams MoveParams;
+  FS08MovePose MovePose;
+  int64 MoveSeqStartMs = 0;
+  FVector LogicalCenter = FVector::ZeroVector;
+  bool bMoveFading = false;          // Place: the body carries the dissolve MIC while it fades
+  float FacingYawDeg = 0.0f;
+  float FacingLeanDeg = 0.0f;
+  /** Applies a pose: actor location, figure yaw + lean, the Place fade; the click volume stays on LogicalCenter. */
+  void ApplyMovePose(const FS08MovePose& Pose);
+  /** Restores the click volume, the collision and the body materials after a move. */
+  void EndMove();
+  /** Figure mesh rotation for a world facing + lean (v2: forward +X; legacy candidate / blockout: forward +Y). */
+  void ApplyFigureFacing(double YawDeg, double LeanDeg);
 
   FS08BoardFighter Fighter;
 };

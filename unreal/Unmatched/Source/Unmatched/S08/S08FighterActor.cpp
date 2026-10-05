@@ -222,6 +222,10 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
   const bool bWasAlive = bHasApplied && Fighter.IsAlive();
   bHasApplied = true;
   Fighter = InFighter;
+  // MS-T-16: a move keeps playing while the snapshot keeps the fighter on its destination; a new cell or a death jumps
+  // it to its final pose first (CUE-007 on_new_event = jump_to_final).
+  if (bMoving && !(Fighter.IsAlive() && CellCenter.Equals(LogicalCenter, 1.0))) FinishMove();
+  LogicalCenter = CellCenter;
   if (bHeroV2Visual && !Fighter.IsAlive() && (bWasAlive || bDeathHold)) {
     if (!bDeathHold && !bDeathDone) BeginHeroDeath();
     if (bDeathHold) return;
@@ -509,6 +513,114 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
     const S08HeroesV2::FClipChoice Choice = S08HeroesV2::NextClip(HeroClip, S08HeroesV2::EEvent::Spawn);
     if (Choice.bRestart) PlayHeroClip(Choice.Clip, S08HeroesV2::EEvent::Spawn, -1);
     ApplyBenchDissolve();
+  }
+  if (bMoving) {
+    // MS-T-16: a re-application during the move (another fighter's snapshot) keeps the travelling pose.
+    ApplyMovePose(MovePose);
+  } else {
+    FacingYawDeg = static_cast<float>(FS08MoveAnim::RestYawDeg(CellCenter));
+    FacingLeanDeg = 0.0f;
+  }
+}
+
+// ---- MS-T-16 move animation ------------------------------------------------
+
+void AS08FighterActor::PlayMove(const FS08MovePlan& Plan, const FS08MoveAnimParams& Params, int64 NowMs) {
+  if (bMoving) FinishMove();  // jump_to_final: the new event of the same figure
+  if (Plan.Points.Num() == 0 || !Fighter.IsAlive() || bDeathHold) return;
+  MovePlan = Plan;
+  MoveParams = Params;
+  MoveSeqStartMs = NowMs;
+  LogicalCenter = Plan.Destination();
+  bMoving = true;
+  if (!bArtFigureVisible) {
+    // The grey mannequin has no sized click capsule: one around the box keeps the click on the logical cell.
+    ClickCapsule->SetCapsuleSize(Fighter.bIsHero ? 30.0f : 25.0f, FMath::Max(30.0f, FigureHeightUU * 0.5f));
+  }
+  ClickCapsule->SetUsingAbsoluteLocation(true);
+  TickMove(NowMs);
+}
+
+bool AS08FighterActor::TickMove(int64 NowMs) {
+  if (!bMoving) return false;
+  const FS08MovePose Pose = FS08MoveAnim::Sample(MovePlan, MoveParams, static_cast<double>(NowMs - MoveSeqStartMs),
+                                                 FigureHeightUU);
+  ApplyMovePose(Pose);
+  if (!Pose.bDone) return true;
+  EndMove();
+  return false;
+}
+
+bool AS08FighterActor::FinishMove() {
+  if (!bMoving) return false;
+  ApplyMovePose(FS08MoveAnim::Sample(MovePlan, MoveParams, MovePlan.EndMs(MoveParams) + 1.0, FigureHeightUU));
+  EndMove();
+  return true;
+}
+
+FVector AS08FighterActor::GetClickVolumeLocation() const {
+  return ClickCapsule ? ClickCapsule->GetComponentLocation() : GetActorLocation();
+}
+
+void AS08FighterActor::ApplyMovePose(const FS08MovePose& Pose) {
+  MovePose = Pose;
+  SetActorLocation(Pose.Location);
+  if (bMoving) {
+    // MS-R-53: the hit test stays on the snapshot's cell - the capsule is pinned there, the travelling base / box
+    // stop catching clicks until the figure arrives.
+    ClickCapsule->SetWorldLocation(LogicalCenter + FVector(0.0f, 0.0f, ClickCapsule->GetUnscaledCapsuleHalfHeight()));
+    ClickCapsule->SetCollisionEnabled(Fighter.IsAlive() ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
+    Base->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    Body->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+  }
+  ApplyFigureFacing(Pose.YawDeg, Pose.LeanDeg);
+  if (MovePlan.Kind == ES08MoveKind::Place && bHeroV2Visual && HeroV2Spec && ArtBody) {
+    // Place (04 §6.3): fade out on the old cell, fade in on the new one - the DE-011 dissolve MIC in its fade style.
+    if (Pose.Fade > 0.0 && !bMoveFading) {
+      if (UMaterialInterface* Mic = LoadObject<UMaterialInterface>(
+              nullptr, *S08HeroesV2::DissolveMaterialPath(*HeroV2Spec, Look))) {
+        for (int32 Slot = 0; Slot < ArtBody->GetNumMaterials(); ++Slot) ArtBody->SetMaterial(Slot, Mic);
+        bMoveFading = true;
+      }
+    }
+    if (bMoveFading) {
+      S08HeroesV2::SetDissolve(ArtBody, ArtBase, static_cast<float>(Pose.Fade), S08HeroesV2::EDissolveStyle::Fade);
+    }
+  }
+}
+
+void AS08FighterActor::EndMove() {
+  bMoving = false;
+  if (bMoveFading) {
+    bMoveFading = false;
+    if (HeroV2Spec && ArtBody) {
+      if (UMaterialInterface* BodyMi = LoadObject<UMaterialInterface>(
+              nullptr, *S08HeroesV2::BodyMaterialPath(*HeroV2Spec, Look))) {
+        for (int32 Slot = 0; Slot < ArtBody->GetNumMaterials(); ++Slot) ArtBody->SetMaterial(Slot, BodyMi);
+      }
+      S08HeroesV2::SetDissolve(ArtBody, ArtBase, 0.0f, S08HeroesV2::EDissolveStyle::Fade);
+    }
+  }
+  ClickCapsule->SetUsingAbsoluteLocation(false);
+  ClickCapsule->SetRelativeLocation(FVector(0.0f, 0.0f, ClickCapsule->GetUnscaledCapsuleHalfHeight()));
+  // The click contract of ApplyFighter: an art figure clicks through its capsule, the grey box through itself.
+  ClickCapsule->SetCollisionEnabled(bArtFigureVisible ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
+  Body->SetCollisionEnabled(bArtFigureVisible ? ECollisionEnabled::NoCollision : ECollisionEnabled::QueryOnly);
+  Base->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+}
+
+void AS08FighterActor::ApplyFigureFacing(double YawDeg, double LeanDeg) {
+  FacingYawDeg = static_cast<float>(YawDeg);
+  FacingLeanDeg = static_cast<float>(LeanDeg);
+  // Rig v2 faces +X (its yaw is the world facing); the Medusa candidate and the ART-003 blockouts face +Y.
+  if (bHeroV2Visual) {
+    ArtBody->SetRelativeRotation(FS08MoveAnim::FigureRotation(YawDeg, LeanDeg, 0.0));
+    ArtBase->SetRelativeRotation(FRotator(0.0, YawDeg, 0.0));
+  } else if (bMedusaVisual) {
+    ArtBody->SetRelativeRotation(FS08MoveAnim::FigureRotation(YawDeg, LeanDeg, -90.0));
+    ArtBase->SetRelativeRotation(FRotator(0.0, YawDeg - 90.0, 0.0));
+  } else if (bBlockoutVisible) {
+    ArtPlaceholder->SetRelativeRotation(FS08MoveAnim::FigureRotation(YawDeg, LeanDeg, -90.0));
   }
 }
 

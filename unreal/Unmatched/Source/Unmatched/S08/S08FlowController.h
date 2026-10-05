@@ -96,6 +96,22 @@ struct UNMATCHED_API FS08MoveCueParams {
   double PlaceMs = 240.0;
 };
 
+/** MS-T-16 (S08MoveAnim.h): the speed / reduced-motion inputs of the CUE-007 schedule. */
+/** UI-ACC-013 animation speed (03 §5): none = every move snaps, fast x0.5, normal x1, slow x1.5. */
+enum class ES08AnimSpeed : uint8 { None, Fast, Normal, Slow };
+
+/** The player's motion settings (US08UserSettings, overridden by the command-line flags). */
+struct UNMATCHED_API FS08MotionSettings {
+  bool bReducedMotion = false;  // UI-ACC-005/006 (-S08ReducedMotion, s08.ReducedMotion)
+  ES08AnimSpeed Speed = ES08AnimSpeed::Normal;  // UI-ACC-013 (-S08AnimSpeed=<none|fast|normal|slow>)
+  bool bScreenShake = true;  // UI-ACC-005 "no shake" = false (V-08 / CUE-004 shake; no shake exists in the client yet)
+  /** Every move snaps (reduced motion or speed none). */
+  bool SnapsMoves() const { return bReducedMotion || Speed == ES08AnimSpeed::None; }
+  bool operator==(const FS08MotionSettings& Other) const {
+    return bReducedMotion == Other.bReducedMotion && Speed == Other.Speed && bScreenShake == Other.bScreenShake;
+  }
+};
+
 /** One move of a seq for the schedule. */
 struct UNMATCHED_API FS08MoveCueInput {
   ES08MoveKind Kind = ES08MoveKind::Move;
@@ -323,9 +339,17 @@ public:
    *   steps=<n> source=<trail|canonical|straight> start=<ms> ms=<ms>
    *   snapped=<0|1> path=<A>B>C>[ trail=mismatch]" - cells as
    *  Board.CellLabel. cue_contract.py check-trace verifies steps, path and
-   *  ms against cue-table.json CUE-007. */
+   *  ms against cue-table.json CUE-007. MS-T-16: with Motion the schedule
+   *  takes its speed / reduced motion (FS08MoveAnim::Schedule) and the line
+   *  ends with " speed=<none|fast|normal|slow> reduced=<0|1>". */
   static void MoveCueTraceLines(const TArray<FS08Cue>& Cues, const FS08BoardModel& Board,
-                                TArray<FString>& OutLines);
+                                TArray<FString>& OutLines, const FS08MotionSettings* Motion = nullptr);
+  /** MS-T-16: the motion settings the client animates with - the MS-CUE lines
+   *  of every applied seq are scheduled and tagged with them from now on. */
+  void SetMoveMotion(const FS08MotionSettings& Motion) {
+    MoveMotion = Motion;
+    bMoveMotionSet = true;
+  }
 
 #if WITH_AUTOMATION_TESTS
   /** Offline harness: attach the state stream against a socket-less
@@ -494,6 +518,9 @@ public:
   }
 
 private:
+  // MS-T-16: motion settings of the MS-CUE trace (unset = the MS-T-15 Normal lines without speed= / reduced=).
+  FS08MotionSettings MoveMotion;
+  bool bMoveMotionSet = false;
   /** Shared executor for the GD-034 combat mutations: in-flight flag, error
    *  broadcast, GameMutationResult parse, ApplySnapshot routing, trace tag.
    *  Traces carry NO card/opponent values (privacy: published logs stay
