@@ -7,7 +7,9 @@
 ## 0. Правила текста
 - **Все тексты оригинальные.** Написаны для этого проекта. Не взяты из Unmatched: Digital Edition, с карт, из книг
   правил, фильмов или книг. Имена легенд (Excalibur, Camelot, Lady of the Lake, Grail) — общественное достояние.
-- Язык — английский, 1–5 слов, до 2 с (победа и поражение — до 3 с). RU — субтитры, EN — субтитры на английском
+- Язык — английский, 1–5 слов, до 2 с; до 3 с — выбор героя, начало партии, низкое HP, гибель помощника, победа и
+  поражение (звучат раз за партию, приоритет 1–2). Без сокращений с апострофом (I'll, we'll): SYNTX вырезает апостроф,
+  и TTS читает «Ill», «Well» (замечено 2026-10-05). RU — субтитры, EN — субтитры на английском
   интерфейсе и сам текст озвучки.
 - **Скрытое не называется.** Реплика защиты — безличная (до раскрытия соперник не знает карту); фирменные реплики
   карт звучат только при раскрытии или резолве.
@@ -39,8 +41,8 @@
 | ARTHUR-MATCH-START-01 | Stand fast. This ground is ours. | Стоять крепко. Эта земля наша. | [firm] |
 | ARTHUR-MATCH-START-02 | For the Table. For the realm. | За Круглый стол. За королевство. | [rousing] |
 | ARTHUR-MATCH-START-03 | Let this be settled with honor. | Решим это с честью. | [measured] |
-| ARTHUR-MATCHUP-MEDUSA-01 | Keep your gaze, gorgon. I'll keep my sword. | Оставь себе свой взгляд, горгона. Мне хватит меча. | [dry] [firm] |
-| ARTHUR-MATCHUP-MEDUSA-02 | Stone or steel. We'll see which breaks. | Камень или сталь — посмотрим, что треснет. | [calm] [confident] |
+| ARTHUR-MATCHUP-MEDUSA-01 | Keep your gaze, gorgon. I will keep my sword. | Оставь себе свой взгляд, горгона. Мне хватит меча. | [dry] [firm] |
+| ARTHUR-MATCHUP-MEDUSA-02 | Stone or steel. We will see which breaks. | Камень или сталь — посмотрим, что треснет. | [calm] [confident] |
 | ARTHUR-TURN-START-01 | Forward. | Вперёд. | [firm] |
 | ARTHUR-TURN-START-02 | My move. | Мой ход. | [calm] |
 | ARTHUR-TURN-START-03 | Steady now. | Спокойно. | [quiet] |
@@ -70,7 +72,7 @@
 | ARTHUR-SCHEME-01 | A king plans ahead. | Король думает наперёд. | [calm] |
 | ARTHUR-SCHEME-02 | Every move has purpose. | У каждого шага есть цель. | [measured] |
 | ARTHUR-IDLE-01 | Nothing to wait for. | Нечего ждать. | [impatient] |
-| ARTHUR-IDLE-02 | The field won't wait forever. | Поле не будет ждать вечно. | [dry] |
+| ARTHUR-IDLE-02 | The field will not wait forever. | Поле не будет ждать вечно. | [dry] |
 | ARTHUR-DEATH-01 | — | — | [defiant cry] [falling] |
 | ARTHUR-VICTORY-01 | Camelot stands. | Камелот стоит. | [proud] [warm] |
 | ARTHUR-VICTORY-02 | Honor is satisfied. | Честь соблюдена. | [calm] [dignified] |
@@ -81,7 +83,7 @@
 
 | ID | EN | RU | Направление |
 |---|---|---|---|
-| MERLIN-MATCH-START-01 | Ah. I've seen how this ends. | А-а. Я видел, чем это кончится. | [amused] [wry] |
+| MERLIN-MATCH-START-01 | Ah. I have seen how this ends. | А-а. Я видел, чем это кончится. | [amused] [wry] |
 | MERLIN-ATTACK-01 | Mind the sparks. | Осторожно, искры. | [playful] |
 | MERLIN-ATTACK-02 | A small lesson. | Маленький урок. | [dry] |
 | MERLIN-ATTACK-03 | Right between the eyes. | Прямо меж глаз. | [mischievously] |
@@ -96,7 +98,7 @@
 | MERLIN-CARD-STORMS-01 | Winds, wake up! | Ветра, проснитесь! | [commanding] [rising] |
 | MERLIN-CARD-STORMS-02 | Hold on to your hats. | Держите шляпы. | [amused] |
 | MERLIN-CARD-SPIRITS-01 | The old dead owe me a favor. | Старые мертвецы мне задолжали. | [low] [ominous] |
-| MERLIN-CARD-BEWILDERMENT-01 | Look again. I'm not there. | Присмотрись. Меня там нет. | [whispers] [teasing] |
+| MERLIN-CARD-BEWILDERMENT-01 | Look again. I am not there. | Присмотрись. Меня там нет. | [whispers] [teasing] |
 | MERLIN-ALLY-LOW-01 | Arthur, step back and breathe! | Артур, назад, отдышись! | [urgent] |
 
 ## 4. Medusa — 42 реплики
@@ -109,7 +111,7 @@
 | MEDUSA-MATCH-START-02 | Turn and face me. | Повернись ко мне. | [commanding] |
 | MEDUSA-MATCH-START-03 | Stone is patient. So am I. | Камень терпелив. Я тоже. | [slow] [menacing] |
 | MEDUSA-MATCHUP-ARTHUR-01 | A king in armor. Armor cracks too. | Король в доспехах. Доспехи тоже трескаются. | [mocking] |
-| MEDUSA-MATCHUP-ARTHUR-02 | Keep your sword, king. I'll keep you. | Держи свой меч, король. А тебя оставлю себе. | [cold] [amused] |
+| MEDUSA-MATCHUP-ARTHUR-02 | Keep your sword, king. I will keep you. | Держи свой меч, король. А тебя оставлю себе. | [cold] [amused] |
 | MEDUSA-TURN-START-01 | My turn. | Мой ход. | [cold] |
 | MEDUSA-TURN-START-02 | So. | Итак. | [hissing] |
 | MEDUSA-TURN-START-03 | Where shall I look? | Куда же мне посмотреть? | [musing] |
@@ -127,7 +129,7 @@
 | MEDUSA-LOW-HP-01 | Not by your hand. | Не от твоей руки. | [strained] [hissing] |
 | MEDUSA-LOW-HP-02 | I have survived worse than you. | Я пережила и худшее. | [strained] [proud] |
 | MEDUSA-ALLY-DOWN-01 | My wings, fallen. | Мои крылья пали. | [cold] [bitter] |
-| MEDUSA-ALLY-DOWN-02 | You'll answer for her. | Ответишь за неё. | [venomous] |
+| MEDUSA-ALLY-DOWN-02 | You will answer for her. | Ответишь за неё. | [venomous] |
 | MEDUSA-ENEMY-DOWN-01 | The old man sleeps. | Старик уснул. | [amused] |
 | MEDUSA-ABILITY-01 | Look. | Смотри. | [whispers] |
 | MEDUSA-ABILITY-02 | Become stone. | Стань камнем. | [slow] [hissing] |
