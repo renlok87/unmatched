@@ -485,6 +485,21 @@ public:
   int32 GetDecksSeq() const { return DecksSeq; }
   int32 GetDiscardPilesSeq() const { return DiscardPilesSeq; }
 
+  /** DE-030 (W-19; 01 F-05): the public deck lists of the match (gameDeckLists - the composition grouped by catalog
+   *  id, no order, no instance id). Static for the whole match: one request per match, no automatic retry; a failed
+   *  answer stays Failed until EnsureDeckLists(true) (the panel's next open). */
+  enum class EDeckListsState : uint8 { None, Loading, Loaded, Failed };
+  void EnsureDeckLists(bool bRetryFailed = false);
+  EDeckListsState GetDeckListsState() const {
+    return DeckListsGameId == Room.GameId ? DeckListsState : EDeckListsState::None;
+  }
+  /** The `data` object of the answer (gameDeckLists array inside); null unless Loaded for the current room. */
+  TSharedPtr<FJsonObject> GetDeckListsData() const {
+    return GetDeckListsState() == EDeckListsState::Loaded ? DeckListsData : nullptr;
+  }
+  /** Bumps on every install/reset - the HUD re-parses only on change. */
+  int32 GetDeckListsRevision() const { return DeckListsRevision; }
+
   /** Lobby freshness via game(id) re-query (named subscriptions have no
    *  snapshot barrier, so they cannot carry room state). */
   void PollRoom();
@@ -712,6 +727,11 @@ private:
   // GD-032: seq of the last body that carried decks/discardPiles (0 = never).
   int32 DecksSeq = 0;
   int32 DiscardPilesSeq = 0;
+  // DE-030: the public deck lists of DeckListsGameId (EnsureDeckLists).
+  EDeckListsState DeckListsState = EDeckListsState::None;
+  FString DeckListsGameId;
+  TSharedPtr<FJsonObject> DeckListsData;
+  int32 DeckListsRevision = 0;
   TArray<FString> CriticalProblems;
   TArray<FS08HeroEntry> Heroes;
   bool bManeuverInFlight = false; // INT-005: one logical command at a time

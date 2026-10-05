@@ -27,6 +27,7 @@
 #include "../S09/S09CombatStage.h"
 #include "../S09/S09DeathStage.h"
 #include "../S09/S09ResultScreen.h"
+#include "../S09/S09DeckPanel.h"
 #include "../S09/S09PendingPresent.h"
 #include "../S09/S09OpponentView.h"
 #include "../S09/S09TurnStatus.h"
@@ -489,6 +490,33 @@ private:
   TSharedPtr<class SBorder> ResultOverlay;
   TSharedPtr<class SBox> ResultPanelBox;
   TSharedPtr<class SBorder> ResultBoardBar;
+  // ---- DE-030 (W-19; 01 F-05; 02 SD-29, SD-41): the deck side panel (S09/S09DeckPanel.h,
+  // S08FlowGameModeDeckPanel.cpp) ----
+  /** The persistent canvas slot of the panel (content by RefreshHud, opacity by TickDeckPanel). */
+  void BuildDeckPanelWidgets(const TSharedRef<class SConstraintCanvas>& Canvas);
+  /** RefreshHud: the auto-close on a new input demand, the deck-list prefetch, the content while visible. */
+  void RefreshDeckPanel();
+  void RebuildDeckPanelContent();
+  void TickDeckPanel();
+  /** K / Shift+K / the side buttons and tabs: open Side, or close it when it is the open one. */
+  void ToggleDeckPanel(ES09DeckSide Side, const TCHAR* Why);
+  void CloseDeckPanel(const TCHAR* Why);
+  /** K, Shift+K and Esc (while open) - true when the key was the panel's. */
+  bool HandleDeckPanelKeys(class APlayerController* PC);
+  /** What asks me for input now (S09DeckPanel::InputDemandKey). */
+  FString DeckDemandKeyNow() const;
+  /** Re-parses the controller's deck lists when their revision changed. */
+  void SyncDeckLists();
+  /** Review tooling (-Bench -BenchDeckPanel=own|opp -BenchDeckLists=<file>): the panel over the bench scene. */
+  bool BenchDeckPanelBegin(const FS08Snapshot& Fixture, const FString& SideName, const FString& ListsPath);
+  FS09DeckPanelView DeckPanel;
+  TArray<FS09DeckList> DeckLists;
+  int32 DeckListsRevision = -1;
+  bool bBenchDeckPanel = false;
+  FString DeckPanelSelected;  // the row showing its card text (read-only)
+  FString DeckModelTraced;
+  TSharedPtr<class SBorder> DeckPanelBorder;
+  TSharedPtr<class SBox> DeckPanelBox;
   TMap<FString, bool> BoardAliveById;      // DE-019: the board view's alive flags of the last sync
   int32 FallSeq = -1;                      // DE-019: seq of the staged fall being released (RunCombatEvents)
   TArray<FS08BoardFighter> ShownFighters;  // HudFighters() while the staging holds the target

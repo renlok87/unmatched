@@ -334,7 +334,9 @@ bool AS08FlowGameMode::CursorOverHud() const {
   float X = 0.0f, Y = 0.0f;
   if (!PC || !PC->GetMousePosition(X, Y)) return false;  // no OS cursor (offscreen): the pick is over the field
   auto Inside = [X, Y](const FS08ScreenRect& R) { return X >= R.X0 && X <= R.X1 && Y >= R.Y0 && Y <= R.Y1; };
-  for (const TWeakPtr<SWidget>& Panel : {ArtHud.CommandPanel, ArtHud.SidePanel}) {
+  // DE-030: the open deck side panel is HUD too
+  for (const TWeakPtr<SWidget>& Panel :
+       {ArtHud.CommandPanel, ArtHud.SidePanel, TWeakPtr<SWidget>(StaticCastSharedPtr<SWidget>(DeckPanelBorder))}) {
     FS08ScreenRect R;
     if (WidgetViewportRect(Panel.Pin(), R) && Inside(R)) return true;
   }

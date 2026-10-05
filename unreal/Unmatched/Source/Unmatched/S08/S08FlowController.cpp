@@ -116,6 +116,52 @@ void FS08FlowController::FetchHeroes() {
                });
 }
 
+// DE-030 (W-19; 01 F-05): the public deck lists of the match - the composition grouped by catalog id (backend
+// GameStateService.publicDeckLists). No instance id, no draw order: the snapshot keeps hiding both (QA-005).
+static const TCHAR* DeckListsQuery =
+    TEXT("query DL($gameId: String!) { gameDeckLists(gameId: $gameId) {")
+    TEXT(" playerId total cards { cardId name nameRu cardType attackValue defenseValue boostValue")
+    TEXT(" bannerName text count } } }");
+
+void FS08FlowController::EnsureDeckLists(bool bRetryFailed) {
+  if (Room.GameId.IsEmpty() || Stage != ES08Stage::Started) return;
+  if (DeckListsGameId == Room.GameId) {
+    if (DeckListsState == EDeckListsState::Loading || DeckListsState == EDeckListsState::Loaded) return;
+    if (DeckListsState == EDeckListsState::Failed && !bRetryFailed) return;
+  }
+  DeckListsGameId = Room.GameId;
+  DeckListsState = EDeckListsState::Loading;
+  DeckListsData.Reset();
+  ++DeckListsRevision;
+  TSharedRef<FJsonObject> Variables = MakeShared<FJsonObject>();
+  Variables->SetStringField(TEXT("gameId"), Room.GameId);
+  const FString GameId = Room.GameId;
+  const int32 Gen = MatchGeneration;
+  Trace(FString::Printf(TEXT("DECKLIST request game=%s"), *GameId));
+  SendHttp(DeckListsQuery, Variables,
+           [this, GameId, Gen](bool bOk, const TArray<FS08GraphQLError>& Errors, TSharedPtr<FJsonObject> Data,
+                               const FString&) {
+             // a left / replaced match: the answer belongs to nobody
+             if (!IsSameMatchRequest(GameId, Gen) || DeckListsGameId != GameId) {
+               Trace(FString::Printf(TEXT("DECKLIST stale answer game=%s ignored"), *GameId));
+               return;
+             }
+             const TArray<TSharedPtr<FJsonValue>>* Lists = nullptr;
+             if (!bOk || !Data.IsValid() || !Data->TryGetArrayField(TEXT("gameDeckLists"), Lists) || !Lists) {
+               DeckListsState = EDeckListsState::Failed;
+               ++DeckListsRevision;
+               Trace(TEXT("DECKLIST failed: ") + (Errors.Num() ? Errors[0].Message : FString(TEXT("no list"))));
+               OnRoom.Broadcast(Room);  // the HUD shows the counts-only panel
+               return;
+             }
+             DeckListsData = Data;
+             DeckListsState = EDeckListsState::Loaded;
+             ++DeckListsRevision;
+             Trace(FString::Printf(TEXT("DECKLIST loaded game=%s lists=%d"), *GameId, Lists->Num()));
+             OnRoom.Broadcast(Room);  // the HUD re-renders the open panel
+           });
+}
+
 void FS08FlowController::SetStage(ES08Stage NewStage) {
   if (Stage == NewStage) return;
   Stage = NewStage;
@@ -569,6 +615,11 @@ void FS08FlowController::TeardownGameStateStream() {
   SeqGuard = FS08SeqGuard();
   DecksSeq = 0;
   DiscardPilesSeq = 0;
+  // DE-030: the deck lists belonged to this match
+  DeckListsState = EDeckListsState::None;
+  DeckListsGameId.Reset();
+  DeckListsData.Reset();
+  ++DeckListsRevision;
   CriticalProblems.Reset();
   Trace(TEXT("STREAM torn down (left match)"));
 }

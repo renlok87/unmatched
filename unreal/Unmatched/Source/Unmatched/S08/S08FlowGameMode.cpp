@@ -2787,6 +2787,9 @@ void AS08FlowGameMode::HandleHudKeys() {
     return;
   }
 
+  // DE-030 (01 F-05): K / Shift+K open the deck side panel; Esc closes it before any draft step
+  if (!bS09Probe && HandleDeckPanelKeys(PC)) return;
+
   // ---- MS-T-07: move-selection keys (03 §3.2) ahead of the older chain:
   // Ctrl+Up/Down before the discard-browser arrows (MS-E-98), Esc by steps with
   // D / I first, Backspace / Ctrl+Z undo, Delete, Tab, B and the MS-S-08
@@ -4878,6 +4881,7 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
   TickCombatStage();
   TickDeathStage();  // DE-019: death lines and the result gate (after the staging released this frame's fall)
   TickResultScreen();  // DE-029: the modal opens with the gate; intro 500 ms, board crossfade 250 ms
+  TickDeckPanel();     // DE-030: the deck side panel - open 80 ms, close 150 ms
   if (!TryCombatSkip() && !TryCardSlotSkip()) {
     HandleClick();
     HandleHudKeys();
@@ -5358,6 +5362,13 @@ void AS08FlowGameMode::ClearGameplayHud() {
   bDiscardBrowserOpen = false;
   DiscardBrowserPile = 0;
   DiscardBrowserIndex = -1;
+  // DE-030: the deck panel and the deck lists belong to one game
+  DeckPanel.Reset();
+  DeckLists.Reset();
+  DeckListsRevision = -1;
+  DeckPanelSelected.Reset();
+  DeckModelTraced.Reset();
+  if (DeckPanelBorder.IsValid()) DeckPanelBorder->SetVisibility(EVisibility::Collapsed);
   InspectedSource = 0;
   bInspecting = false;
   InspectedHandIndex = -1;
@@ -5483,6 +5494,7 @@ void AS08FlowGameMode::BuildHudWidgets() {
   BuildOpponentHudWidgets(Canvas);  // MS-T-17: the edge arrow (MS-E-73)
   BuildTurnHudWidgets(Canvas);      // DE-023: the persistent portraits and the "Your turn" banner
   BuildCardSlotWidgets(Canvas);     // DE-026: the source-card slot under the command panel
+  BuildDeckPanelWidgets(Canvas);    // DE-030: the deck side panel over the side counters
   BuildResultScreenWidgets(Canvas); // DE-029: the result modal and the board-view bar, over every panel
 
   GEngine->GameViewport->AddViewportWidgetContent(Canvas, 1);
@@ -5637,6 +5649,7 @@ void AS08FlowGameMode::RefreshHud() {
   PanelsBox->ClearChildren();
   CommandBox->ClearChildren();
   BuildCombatStageHud();
+  RefreshDeckPanel();  // DE-030: the auto-close on a new input demand, then the content while visible
 
   // Hidden until the match stream is live (login screens stay clean). An
   // authenticated user in the Lobby gets the room ENTRY panel instead - the
@@ -5832,6 +5845,22 @@ void AS08FlowGameMode::RefreshHud() {
                     TEXT("%s DISCARD PILES  (D)"),
                     bDiscardBrowserOpen ? TEXT("HIDE") : TEXT("BROWSE"))))
                 .Font(FCoreStyle::GetDefaultFontStyle("Bold", 12)))];
+  // DE-030 (01 F-05; 02 §4.7): the deck side panel - the whole composition of my deck or the opponent's
+  {
+    auto DeckButton = [this](ES09DeckSide Side, const TCHAR* Id, const TCHAR* Label) -> TSharedRef<SWidget> {
+      const bool bActive = DeckPanel.IsOpen() && DeckPanel.Side() == Side;
+      const float G = bActive ? 0.32f : 0.20f;
+      return MakeHudPress(FName(Id), nullptr, [this, Side]() { ToggleDeckPanel(Side, TEXT("button")); },
+                          FMargin(8, 3), FLinearColor(G, G, G, 1.0f),
+                          SNew(STextBlock).Text(FText::FromString(Label)).Font(FCoreStyle::GetDefaultFontStyle("Bold", 12)));
+    };
+    PanelsBox->AddSlot().AutoHeight().Padding(0, 4, 0, 0)
+        [SNew(SHorizontalBox) +
+         SHorizontalBox::Slot().AutoWidth().Padding(0, 0, 6, 0)
+             [DeckButton(ES09DeckSide::Own, TEXT("hud.deck.own"), TEXT("YOUR DECK  (K)"))] +
+         SHorizontalBox::Slot().AutoWidth()
+             [DeckButton(ES09DeckSide::Opponent, TEXT("hud.deck.opp"), TEXT("OPP DECK  (Shift+K)"))]];
+  }
   if (bDiscardBrowserOpen) {
     for (int32 Pile = 0; Pile < 2; ++Pile) {
       const FS09PlayerPanel* Panel =
@@ -7518,7 +7547,8 @@ void AS08FlowGameMode::UpdatePlate(bool bActive) {
   }
   // run E review: the DE-023 portrait column and the DE-026 card slot are HUD panels for the plate too
   for (const TWeakPtr<SWidget>& Panel : {ArtHud.CommandPanel, ArtHud.SidePanel, ArtHud.HandPanel,
-                                         TWeakPtr<SWidget>(TurnPortraitColumn), TWeakPtr<SWidget>(CardSlotBox)}) {
+                                         TWeakPtr<SWidget>(TurnPortraitColumn), TWeakPtr<SWidget>(CardSlotBox),
+                                         TWeakPtr<SWidget>(StaticCastSharedPtr<SWidget>(DeckPanelBorder))}) {
     FS08ScreenRect R;
     if (WidgetViewportRect(Panel.Pin(), R) && !R.IsEmpty()) In.Soft.Add(R);
   }
@@ -8438,6 +8468,16 @@ void AS08FlowGameMode::RunRenderBench() {
     if (FParse::Value(Cmd, TEXT("BenchResult="), ResultMode) && !ResultMode.IsEmpty()) {
       BenchResultBegin(Snap, ResultMode.Equals(TEXT("board"), ESearchCase::IgnoreCase),
                        FParse::Param(Cmd, TEXT("BenchResultLoser")));
+    }
+    // DE-030 (W-19): -BenchDeckPanel=own|opp -BenchDeckLists=<gameDeckLists answer> - the deck side panel over the
+    // fixture's hands and discard piles on a real map. Review tooling.
+    FString DeckSide, DeckListsPath;
+    if (FParse::Value(Cmd, TEXT("BenchDeckPanel="), DeckSide) && !DeckSide.IsEmpty() &&
+        FParse::Value(Cmd, TEXT("BenchDeckLists="), DeckListsPath) && !DeckListsPath.IsEmpty()) {
+      if (!BenchDeckPanelBegin(Snap, DeckSide, DeckListsPath)) {
+        Finish(FString::Printf(TEXT("BENCH FAILED deck-panel %s"), *FPaths::GetCleanFilename(DeckListsPath)));
+        return;
+      }
     }
     FS08Trace::Write(FString::Printf(
         TEXT("BENCH scene fixture=%s board=%dx%d fighters=%d viewer=%s hero=%s art=%d profile=%s views=%s warmup=%.0f settle=%.0f measure=%.0f fps=%.0f profileGpu=%d csv=%d"),

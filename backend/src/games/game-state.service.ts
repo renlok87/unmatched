@@ -967,6 +967,80 @@ export class GameStateService {
   }
 
   /**
+   * DE-030 (W-19; 01 F-05, D-DE-05; 02 SD-29, SD-41): публичный состав колод обоих игроков.
+   *
+   * Состав героя публичен (каталог, экран выбора героя); скрыты только ПОРЯДОК колоды и рука соперника
+   * (QA-005). Поэтому источник — `decks[*].cards` (весь состав в порядке каталога), а не `drawPile`:
+   * копии сгруппированы по `cardId`, instance-id не выдаются, сортировка — тип, имя, id (не порядок добора).
+   * Ответ не зависит от зрителя и от состояния руки/сброса: метки «в руке» и «в сбросе» клиент ставит сам
+   * по своей руке и публичным `discardPiles`. Отдельный запрос, а не поле снапшота: состав статичен на всю
+   * партию, а сырые проверки проекции (S07) не должны видеть печатные значения в каждом теле состояния.
+   */
+  publicDeckLists(state: GameState): Array<{
+    playerId: string;
+    total: number;
+    cards: Array<{
+      cardId: string;
+      name: string;
+      nameEn: string | null;
+      nameRu: string | null;
+      cardType: string;
+      attackValue: number | null;
+      defenseValue: number | null;
+      boostValue: number | null;
+      bannerName: string | null;
+      text: string | null;
+      count: number;
+    }>;
+  }> {
+    const typeOrder: Record<string, number> = {
+      [CardType.ATTACK]: 0,
+      [CardType.VERSATILE]: 1,
+      [CardType.UNIVERSAL]: 1,
+      [CardType.DEFENSE]: 2,
+      [CardType.SCHEME]: 3,
+    };
+    // GraphQL Int: a printed value that is not a finite number in the row (null, '', 'X') is "no value"
+    const printedValue = (value: unknown): number | null =>
+      typeof value === 'number' && Number.isFinite(value) ? Math.trunc(value) : null;
+    const orderedPlayers = state.players.map((p) => p.userId);
+    for (const userId of Object.keys(state.decks)) {
+      if (!orderedPlayers.includes(userId)) orderedPlayers.push(userId);
+    }
+    return orderedPlayers
+      .filter((userId) => !!state.decks[userId])
+      .map((userId) => {
+        const groups = new Map<string, { card: Card; count: number }>();
+        for (const card of state.decks[userId].cards ?? []) {
+          const key = card.cardId || card.id;
+          const group = groups.get(key);
+          if (group) group.count += 1;
+          else groups.set(key, { card, count: 1 });
+        }
+        const cards = [...groups.entries()].map(([cardId, { card, count }]) => ({
+          cardId,
+          name: card.name,
+          nameEn: card.nameEn ?? null,
+          nameRu: card.nameRu ?? null,
+          cardType: String(card.cardType),
+          attackValue: printedValue(card.attackValue),
+          defenseValue: printedValue(card.defenseValue),
+          boostValue: printedValue(card.boostValue),
+          bannerName: card.bannerName ?? null,
+          text: card.text ?? null,
+          count,
+        }));
+        cards.sort(
+          (a, b) =>
+            (typeOrder[a.cardType] ?? 9) - (typeOrder[b.cardType] ?? 9) ||
+            a.name.localeCompare(b.name) ||
+            a.cardId.localeCompare(b.cardId),
+        );
+        return { playerId: userId, total: cards.reduce((sum, c) => sum + c.count, 0), cards };
+      });
+  }
+
+  /**
    * Создать начальное состояние игры.
    * Только для спеков (сетка 20×20 — тестовая геометрия): живой старт игры строит
    * состояние в GameInitializationService на реальной доске (НД-2).

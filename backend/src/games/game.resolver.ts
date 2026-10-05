@@ -7,7 +7,7 @@ import { GqlAuthGuard } from '../auth/guards/gql-auth.guard';
 import { GqlThrottlerGuard } from './guards/gql-throttler.guard';
 import { Public } from '../common/decorators';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
-import { GameResponse, GameStateResponse, EventsSinceResponse } from './models';
+import { GameResponse, GameStateResponse, EventsSinceResponse, DeckListResponse } from './models';
 import { CreateGameDto, GameFiltersDto, JoinGameDto, GameMode } from './dto';
 import { StanceOptionDto } from './dto/gameplay.dto';
 import { ABILITY_CONFIGS } from '../game-engine/abilities/ability-config';
@@ -101,6 +101,23 @@ export class GameResolver {
       turnCount: filteredState.turnCount,
       updatedAt: filteredState.metadata.lastActionAt,
     };
+  }
+
+  /**
+   * DE-030 (W-19; 01 F-05, D-DE-05; 02 SD-29, SD-41): публичный состав колод обоих игроков партии
+   * для боковой панели «Колода». Только участникам (как gameState). Состав статичен на всю партию —
+   * клиент берёт его один раз; порядок колоды и рука соперника сюда не попадают (QA-005,
+   * GameStateService.publicDeckLists).
+   */
+  @Query(() => [DeckListResponse], { name: 'gameDeckLists' })
+  @UseGuards(GqlAuthGuard)
+  async gameDeckLists(
+    @Args('gameId', { type: () => String }) gameId: string,
+    @CurrentUser() user: any,
+  ): Promise<DeckListResponse[]> {
+    await this.gameService.requireParticipation(gameId, user.id);
+    const state = await this.gameStateService.loadState(gameId);
+    return this.gameStateService.publicDeckLists(state);
   }
 
   /**
