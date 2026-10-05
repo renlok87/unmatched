@@ -1457,9 +1457,11 @@ void AS08FlowGameMode::TickDeathStage() {
     });
     bHeroFallPending = Target && Target->bIsHero;
   }
+  // A death at the snapshot (staged=0) may land while an earlier combat is still staged: the screen waits for it.
+  const int64 StagingEndMs = CombatStage.IsActive() ? CombatStage.GetEndMs() : -1;
   FString Line;
   if (ResultGate.Update(NowMs(), Hud.SequenceNumber, Hud.bGameOver, bHeroFallPending, DeathStage.LatestHeroGoneMs(),
-                        Line)) {
+                        Line, StagingEndMs)) {
     FS08Trace::Write(Line);
     PlayResultSting(Hud.SequenceNumber, NowMs());  // DE-032 (SD-51 p. 5): the sting starts with the screen
     RefreshHud();

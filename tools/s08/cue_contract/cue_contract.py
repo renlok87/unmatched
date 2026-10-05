@@ -1220,9 +1220,17 @@ def check_death(lines):
                 summary["hit_to_screen"].append(t - combat_contact[last[2]])
         else:
             want = go
+        # Ревью IMPL 2026-10-05 (хвост DE-019): смерть вне постановки (staged=0) при ещё играющей постановке
+        # предыдущего seq — экран ждёт её конца; клиент пишет `staging=<ms>` только тогда, когда это сдвинуло due.
+        staging = int(sc["staging"]) if "staging" in sc else None
+        if staging is not None:
+            if staging <= want:
+                errors.append(("DS5", "строка %d: staging=%d не позже due %d — токен лишний" % (sc["_n"], staging, want)))
+            want = min(staging, go + DEATH_MS["max_wait"])
         if due != want:
-            errors.append(("DS5", "строка %d: due=%d ≠ %d (GAME_OVER %d, исчезновение героя + %d)" % (
-                sc["_n"], due, want, go, DEATH_MS["result_after_gone"])))
+            errors.append(("DS5", "строка %d: due=%d ≠ %d (GAME_OVER %d, исчезновение героя + %d%s)" % (
+                sc["_n"], due, want, go, DEATH_MS["result_after_gone"],
+                "" if staging is None else ", постановка до %d" % staging)))
         if not 0 <= t - due <= DEATH_MS["frame_tolerance"]:
             errors.append(("DS5", "строка %d: экран t=%d не в кадр due=%d" % (sc["_n"], t, due)))
         if int(sc["wait"]) != t - go:

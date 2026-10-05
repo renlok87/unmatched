@@ -420,6 +420,22 @@ describe('DE-027 spike: "Play again" with the same line-up (Q-203)', () => {
     expect(heroOf(againStarted, 'ai-bot')).toBe('hero-arthur');
   });
 
+  it('VS_AI: the bot never takes the hero the human picked (review IMPL 2026-10-05, DE-027 tail)', async () => {
+    const { service } = buildService(store);
+
+    // The human takes the strongest hero. Before the fix the bot picked it too and
+    // startGame failed with "Два игрока не могут играть одного героя".
+    const room = await service.createGame({ mode: GameMode.VS_AI }, 'arthur-player');
+    await service.selectHero(room.id, 'arthur-player', 'hero-arthur');
+    await service.toggleReady(room.id, 'arthur-player');
+    const started = await service.startGame(room.id, 'arthur-player');
+
+    expect(started.status).toBe(GameStatus.IN_PROGRESS);
+    expect(heroOf(started, 'arthur-player')).toBe('hero-arthur');
+    // The strongest FREE hero with a deck: Medusa (16), not the deckless 20-health one.
+    expect(heroOf(started, 'ai-bot')).toBe('hero-medusa');
+  });
+
   it('a finished game does not count toward the active-games limit', async () => {
     const { service } = buildService(store);
     for (let i = 0; i < 5; i++) {

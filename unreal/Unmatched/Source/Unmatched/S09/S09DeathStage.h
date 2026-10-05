@@ -98,9 +98,12 @@ public:
 
   void Reset() { *this = FS09ResultGate(); }
   /** One tick: bGameOver = the applied phase is GAME_OVER; bHeroFallPending = a staging holds a lethal blow on a hero
-   *  whose fall has not come yet; HeroGoneMs = FS09DeathStage::LatestHeroGoneMs (-1 none). True on the tick the
-   *  screen opens (OutLine = the RESULT screen trace line). */
-  bool Update(int64 NowMs, int32 Seq, bool bGameOver, bool bHeroFallPending, int64 HeroGoneMs, FString& OutLine);
+   *  whose fall has not come yet; HeroGoneMs = FS09DeathStage::LatestHeroGoneMs (-1 none); StagingEndMs = the end of
+   *  the combat staging still playing (-1 none; review IMPL 2026-10-05: a death at the snapshot - staged=0 - lands
+   *  while the previous combat is still staged, and the screen must not cut that staging). True on the tick the
+   *  screen opens (OutLine = the RESULT screen trace line, "+ staging=<ms>" when the staging held it). */
+  bool Update(int64 NowMs, int32 Seq, bool bGameOver, bool bHeroFallPending, int64 HeroGoneMs, FString& OutLine,
+              int64 StagingEndMs = -1);
   bool IsShown() const { return bShown; }
   bool IsGameOver() const { return GameOverMs >= 0; }
   int64 GetGameOverMs() const { return GameOverMs; }

@@ -825,14 +825,25 @@ export class GameService {
     });
     if (existing) return;
 
-    const heroes = await this.prisma.hero.findMany({
+    const allHeroes = await this.prisma.hero.findMany({
       where: { cards: { some: {} } },
       select: { id: true, health: true },
     });
+    // DE-027 spike (review IMPL 2026-10-05): the human's hero is excluded, otherwise
+    // startGame rejects the room ("Два игрока не могут играть одного героя") whenever
+    // the human picked the strongest hero.
+    const seated = await this.prisma.gamePlayer.findMany({
+      where: { gameId },
+      select: { userId: true, heroId: true },
+    });
+    const taken = new Set(
+      seated.filter((p) => p.userId !== aiUserId && p.heroId).map((p) => p.heroId as string),
+    );
+    const heroes = allHeroes.filter((h) => !taken.has(h.id));
     if (heroes.length === 0) {
       throw new BadRequestException('Нет героев с картами для ИИ-оппонента');
     }
-    // Сильнейший по health; при равенстве — первый (тай-брейк произвольный).
+    // Сильнейший по health среди свободных; при равенстве — первый (тай-брейк произвольный).
     const heroId = heroes.reduce((best, h) => ((h.health ?? 0) > (best.health ?? 0) ? h : best)).id;
 
     await this.prisma.$transaction(async (tx) => {

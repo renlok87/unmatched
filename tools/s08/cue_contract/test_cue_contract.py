@@ -409,6 +409,23 @@ class DeathStageTests(unittest.TestCase):
         self.assertIn("DS4", {c for c, _ in cc.check_trace(lines, TABLE)[0]})
         self.assertIn("DS2", {c for c, _ in cc.check_trace(lines + lines[:1], TABLE)[0]})
 
+    def test_snapshot_death_waits_for_the_staging_still_playing(self):
+        # ревью IMPL 2026-10-05 (хвост DE-019): смерть staged=0 при ещё играющей постановке предыдущего seq —
+        # экран ждёт её конца, клиент пишет staging=<ms>; экран t = staging — PASS
+        lines, gone = self.death(52, "arthur", 5000, hero=True, staged=False)
+        staging = gone + 1000 + 233
+        held = "RESULT screen seq=52 t=%d due=%d gameOver=4900 heroGone=%d wait=%d staging=%d" % (
+            staging, staging, gone, staging - 4900, staging)
+        self.assertEqual(cc.check_trace(lines + [held], TABLE)[0], [])
+        # экран раньше конца постановки при staging — DS5
+        early = "RESULT screen seq=52 t=%d due=%d gameOver=4900 heroGone=%d wait=%d staging=%d" % (
+            gone + 1000, gone + 1000, gone, gone + 1000 - 4900, staging)
+        self.assertIn("DS5", {c for c, _ in cc.check_trace(lines + [early], TABLE)[0]})
+        # токен staging не позже обычного due — лишний, DS5
+        idle = "RESULT screen seq=52 t=%d due=%d gameOver=4900 heroGone=%d wait=%d staging=%d" % (
+            gone + 1000, gone + 1000, gone, gone + 1000 - 4900, gone + 500)
+        self.assertIn("DS5", {c for c, _ in cc.check_trace(lines + [idle], TABLE)[0]})
+
     def test_instant_hide_and_screen_without_hero_death(self):
         # фигура без клипа и MIC (серая доска): исчезает в кадр падения, без строки dissolve
         lines, gone = self.death(70, "f-1-hero", 9000, hero=True, staged=False, settle=0, still=0, dissolve=0)

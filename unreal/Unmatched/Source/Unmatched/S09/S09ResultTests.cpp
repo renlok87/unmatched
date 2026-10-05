@@ -713,6 +713,46 @@ bool FS09DeathStageResultGateTest::RunTest(const FString&) {
     }
     TestEqual("snapshot death: fall + 1675 + 1000", Shown, static_cast<int64>(2000 + 1675 + 1000));
   }
+  // ---- review IMPL 2026-10-05 (DE-019 tail): a hero death at the snapshot while an EARLIER combat is still staged
+  //      (run F, Marmoreal #1: the screen opened 233 ms before that staging's end). The staging finishes first;
+  //      a staging that ends before the due time changes nothing; the cap still wins. ----
+  {
+    FS08CueDispatcher Cues;
+    FS09DeathStage Death;
+    TArray<FString> Lines;
+    Death.Begin(PlanFor(TEXT("arthur"), true, 56, false), 2000, Cues, Lines);
+    const int64 Gone = Death.LatestHeroGoneMs();
+    const int64 PlainDue = Gone + FS09DeathTiming::ResultAfterGoneMs;  // 4675
+    {
+      FS09ResultGate Gate;
+      FString Line;
+      int64 Shown = -1;
+      for (int64 T = 2000; T <= 8000 && Shown < 0; ++T) {
+        if (Gate.Update(T, 56, true, false, Death.LatestHeroGoneMs(), Line, /*StagingEndMs=*/PlainDue + 233)) Shown = T;
+      }
+      TestEqual("staging ends after gone + 1000: the screen waits for its end", Shown, PlainDue + 233);
+      TestTrue("the line names the staging hold", Line.EndsWith(FString::Printf(TEXT(" staging=%lld"), PlainDue + 233)));
+    }
+    {
+      FS09ResultGate Gate;
+      FString Line;
+      int64 Shown = -1;
+      for (int64 T = 2000; T <= 8000 && Shown < 0; ++T) {
+        if (Gate.Update(T, 56, true, false, Death.LatestHeroGoneMs(), Line, /*StagingEndMs=*/PlainDue - 500)) Shown = T;
+      }
+      TestEqual("staging ends before gone + 1000: unchanged", Shown, PlainDue);
+      TestFalse("no staging token when it did not hold", Line.Contains(TEXT("staging=")));
+    }
+    {
+      FS09ResultGate Gate;
+      FString Line;
+      TestFalse("staging beyond the cap: closed at GAME_OVER", Gate.Update(2000, 56, true, false, Gone, Line, 2000 + 20000));
+      TestFalse("staging beyond the cap: closed before the cap",
+                Gate.Update(2000 + FS09ResultGate::MaxWaitMs - 1, 56, true, false, Gone, Line, 2000 + 20000));
+      TestTrue("staging beyond the cap: the cap opens it",
+               Gate.Update(2000 + FS09ResultGate::MaxWaitMs, 56, true, false, Gone, Line, 2000 + 20000));
+    }
+  }
   // ---- the pending fall holds it; the safety cap opens it anyway ----
   {
     FS09ResultGate Gate;

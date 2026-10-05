@@ -299,10 +299,15 @@ function Stop-ThisRunClient([int]$LauncherPid, [string]$LauncherExe, [string]$St
   }
   $lrec = Get-CimInstance Win32_Process -Filter "ProcessId=$LauncherPid" -ErrorAction SilentlyContinue
   if ($lrec) {
-    $liveExe = [System.IO.Path]::GetFullPath([string]$lrec.ExecutablePath)
+    # run F (DE-031): a launcher record without ExecutablePath made GetFullPath("") throw and left the room IN_PROGRESS;
+    # an empty path is "unverified, left running" like any other unattributable record (fail closed), not a crash.
+    $liveExePath = [string]$lrec.ExecutablePath
+    $liveExe = if ($liveExePath) { [System.IO.Path]::GetFullPath($liveExePath) } else { '' }
     $wantExe = [System.IO.Path]::GetFullPath($LauncherExe)
     $lcmd = [string]$lrec.CommandLine
-    if (-not [string]::Equals($liveExe, $wantExe, [System.StringComparison]::OrdinalIgnoreCase)) {
+    if (-not $liveExe) {
+      $unverified += "launcher pid $LauncherPid exposes no ExecutablePath - left running"
+    } elseif (-not [string]::Equals($liveExe, $wantExe, [System.StringComparison]::OrdinalIgnoreCase)) {
       $unverified += "launcher pid $LauncherPid now resolves to '$liveExe', not this run's '$wantExe' - left running"
     } elseif (-not $lcmd -or -not $lcmd.Contains($RunTag)) {
       # pid-reuse guard: same staged exe but not this run's command line
