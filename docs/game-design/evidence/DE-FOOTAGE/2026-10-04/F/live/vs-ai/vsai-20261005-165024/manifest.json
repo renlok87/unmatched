@@ -1,0 +1,137 @@
+{
+    "stamp":  "20261005-165024",
+    "verdict":  "S10/GD-039: one-client packaged VS_AI live acceptance over the authoritative S10 backend - hidden client created a VS_AI room (one human seat in LOBBY, hosted by this run; any foreign join fails), the server bot took the second seat at startGame (row reached IN_PROGRESS with exactly 2 seats: seat 1 username AI Bot, opponentId matching that seat, id cross-checked against userByUsername(AI Bot), and the SAME bot id re-verified on the post-exit FINISHED row), the human driver played attack+scheme while the bot answered, the server-written GAME_OVER rendered a COMPLETE result screen (element markers present, gameplay markers absent), leaveGame returned the client to a CLEAN lobby (panel marker, no in-duel markers, zero bright gameplay-region pixels), the row is authoritative FINISHED with the trace outcome cross-checked against server winnerId (no invented result), never ABORTED, and the driver exited early (measured exit time \u003c RunSeconds) instead of burning the timeout. Frame cap: per-process console command t.MaxFPS 30 (effective FPS NOT measured, no GPU claim; packaged 60 FPS default untouched)",
+    "mode":  "VS_AI",
+    "outcome":  "VICTORY",
+    "winnerHero":  "Medusa",
+    "winnerSeat":  "human",
+    "serverStatuses":  [
+                           "LOBBY",
+                           "IN_PROGRESS",
+                           "FINISHED"
+                       ],
+    "serverRow":  {
+                      "id":  "cmuv6ufqy031rt84msvi3cyys",
+                      "status":  "FINISHED",
+                      "mode":  "VS_AI",
+                      "seats":  2,
+                      "botSeat":  {
+                                      "present":  true,
+                                      "username":  "AI Bot",
+                                      "seatOrder":  1,
+                                      "idMatchesUserByUsername":  true
+                                  },
+                      "winnerIdRedacted":  true,
+                      "endedAt":  "1791201071276"
+                  },
+    "coverage":  {
+                     "attack":  true,
+                     "combatResult":  true,
+                     "scheme":  true
+                 },
+    "convergence":  {
+                        "clientMaxSeq":  102
+                    },
+    "files":  [
+                  {
+                      "name":  "vsai-client.trace.log",
+                      "bytes":  693600,
+                      "sha256":  "6996c21422aede9d63a986c2101fb52da06a906aac4e71b0551c4a78865f50fe"
+                  },
+                  {
+                      "name":  "vsai-client.compact.log",
+                      "bytes":  39323,
+                      "sha256":  "88c4dcb7ee9bc6850a0d00112f693f5dfb84c9889a6855bdf2cc35d217a9b001"
+                  },
+                  {
+                      "name":  "human\\s09-card-slot-opp.png",
+                      "bytes":  1711231,
+                      "sha256":  "fa555389be4a48d2824c6782aa73a11848b6332d369d63805345378094fc6d7c"
+                  },
+                  {
+                      "name":  "human\\s09-card-slot-own.png",
+                      "bytes":  1497897,
+                      "sha256":  "bc1f24a759d50de22364aeee1edfe2ce29da6cc48fc07c84509367953b235f76"
+                  },
+                  {
+                      "name":  "human\\s09-combat-result.png",
+                      "bytes":  1709870,
+                      "sha256":  "6b33bafd145a193690bec0c054da2c68b7ed0e664aa3503050baf49c30dab906"
+                  },
+                  {
+                      "name":  "human\\s09-damage-combat.png",
+                      "bytes":  1717879,
+                      "sha256":  "d42616a2befe2544edf7fbddded8964980dafc76517c5714befccb3831b3c0ac"
+                  },
+                  {
+                      "name":  "human\\s09-damage-number.png",
+                      "bytes":  1727558,
+                      "sha256":  "9bc17df19c50a023bfeff5df8e09860fdf44eefd0bedd9bacdb460a5389afadf"
+                  },
+                  {
+                      "name":  "human\\s09-discard-open.png",
+                      "bytes":  1550538,
+                      "sha256":  "adbd5f371b7e78bdfc6fbb925e5e99debd6daf424654993d4ac5dec9f41eae8b"
+                  },
+                  {
+                      "name":  "human\\s09-hand-limit-hint.png",
+                      "bytes":  1565797,
+                      "sha256":  "1968d389db55f87413b0ca72307fb47e296ceaeb0ba47ef09dffb3babd59e675"
+                  },
+                  {
+                      "name":  "human\\s09-hud-after-first-maneuver.png",
+                      "bytes":  1711122,
+                      "sha256":  "b01a743d700686d54b0526d2078f608da4f6aa563cef276af4ff72d3080c9f89"
+                  },
+                  {
+                      "name":  "human\\s09-lobby-return.png",
+                      "bytes":  31990,
+                      "sha256":  "bf526b0d9c28ee877e039f135efb258730d1b30eb5699fc55f9cb66d59aff616"
+                  },
+                  {
+                      "name":  "human\\s09-maneuver-draft-open.png",
+                      "bytes":  1689629,
+                      "sha256":  "90d6b7c036c981d70eb80faafa2e899222e392ba66ae25a4e0e68b966492539d"
+                  },
+                  {
+                      "name":  "human\\s09-opponent-last-move.png",
+                      "bytes":  1815495,
+                      "sha256":  "780f7c57d1f704924e03f26ffbbb05f2d1f9a5867b9e43d7bd753efea50af344"
+                  },
+                  {
+                      "name":  "human\\s09-opponent-move.png",
+                      "bytes":  1699047,
+                      "sha256":  "92b4d49ca29a7bc3adc55e59cff103a3bb1e86afa8c506304657b3aa28bb2a7d"
+                  },
+                  {
+                      "name":  "human\\s09-pending-BOOST_CHOICE.png",
+                      "bytes":  1728392,
+                      "sha256":  "de273e8c4646a0de5281df400f31b245ad3760b5c4f26d008e9968e938da65f1"
+                  },
+                  {
+                      "name":  "human\\s09-pending-MOVE.png",
+                      "bytes":  1575529,
+                      "sha256":  "168234c83254ca4340dd6435bb44fecc4b3f030e64d5c52fbb75d706177545ec"
+                  },
+                  {
+                      "name":  "human\\s09-pending-TARGET_FIGHTER.png",
+                      "bytes":  1709586,
+                      "sha256":  "d55bf9d0b32d46be7dd4d982bfde3c96986ef9db3f5b2914cd89c62c1b8920bb"
+                  },
+                  {
+                      "name":  "human\\s09-result-board.png",
+                      "bytes":  1830746,
+                      "sha256":  "9215eb09d89fdcdc0c0b3924604ef214d69b8439c4dd92d472d6f63a7876bed1"
+                  },
+                  {
+                      "name":  "human\\s09-result-screen.png",
+                      "bytes":  1084136,
+                      "sha256":  "f27b65c59a695751e31f17cee09c0bdc7f9cd31b3ae7cc565e62c6b9a9524efd"
+                  },
+                  {
+                      "name":  "human\\s09-turn-banner.png",
+                      "bytes":  1704857,
+                      "sha256":  "4575826f56e1be73520423d59befec14d59c2d0aa02c07574651a801cf862fa3"
+                  }
+              ]
+}
