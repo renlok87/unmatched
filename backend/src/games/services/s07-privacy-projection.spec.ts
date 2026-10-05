@@ -133,6 +133,37 @@ describe('S07 GD-025 viewer-aware projection (raw JSON)', () => {
     }
   });
 
+  it('R-01: журнал эффектов боя (metadata.lastCombat) публичен, `hidden` — только владельцу эффекта', async () => {
+    const { service } = makeDeps();
+    const state = await declaredAttackRaw();
+    const defended = await playedDefenseRaw(state);
+    const { executor } = s03Engine();
+    const resolved = await executor.executeResolveCombat({ gameId: 'g1' } as any,
+      { userId: 'b', gameId: 'g1', currentState: defended });
+    expect(resolved.success).toBe(true);
+    const lc = resolved.gameState!.metadata.lastCombat!;
+    expect(lc).toMatchObject({ attackerCardId: 'atk-1', defenderCardId: 'def-1', appliedEffects: [] });
+    const withHidden: GameState = {
+      ...resolved.gameState!,
+      metadata: { ...resolved.gameState!.metadata, lastCombat: { ...lc, appliedEffects: [{
+        i: 0, timing: 'AFTER', side: 'DEFENDER', playerId: 'b',
+        source: { kind: 'CARD', cardId: 'def-1', catalogId: 'cat-def', name: 'Shadow Slip' },
+        effectId: 'e1', kind: 'DRAW_CARD', outcome: 'APPLIED', value: 1, targets: ['b'],
+        hidden: { note: 'owner note', refs: ['b-secret-1'] },
+      }] } },
+    };
+    const rawA = JSON.stringify(service.filterPrivateData(withHidden, 'a'));
+    const rawB = JSON.stringify(service.filterPrivateData(withHidden, 'b'));
+    for (const raw of [rawA, rawB]) {
+      expect(raw).toContain('"lastCombat"');
+      expect(raw).toContain('"kind":"DRAW_CARD"');
+    }
+    expect(rawA).not.toContain('owner note');
+    expect(rawA).not.toContain('b-secret-1');
+    expect(rawB).toContain('owner note');
+    expect(rawB).toContain('b-secret-1');
+  });
+
   it('spectator не получает состояние: isParticipant=false гейтит подписки/журнал', async () => {
     const { service } = makeDeps(['a', 'b']);
     await expect(service.isParticipant('g1', 'z')).resolves.toBe(false);

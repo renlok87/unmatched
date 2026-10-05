@@ -40,6 +40,7 @@ import {
   pruneHeadPendingsWithoutTargets,
   withSkippedEffect,
 } from './pending-targets';
+import { describeEffectSource, type EffectSource } from './combat-effect-log';
 
 /**
  * Результат выполнения одного эффекта
@@ -52,6 +53,8 @@ export interface EffectResult {
   readonly message?: string;
   /** Эффект требует ручного применения (только UNSUPPORTED-семантика) */
   readonly manual?: boolean;
+  /** R-01: who and what fired it — the public combat log is built from it (combat-effect-log.ts) */
+  readonly source?: EffectSource;
 }
 
 export { fighterNameMatches } from './fighter-name';
@@ -304,6 +307,7 @@ export class CardEffectExecutorService {
     playerId: string,
     card?: Card,
     contextOverride?: EffectContext,
+    fromPendingId?: string,
   ): Promise<OnPlayResult> {
     let currentState = applyTerminalState(state);
     const appliedEffects: EffectResult[] = [];
@@ -317,7 +321,7 @@ export class CardEffectExecutorService {
       const context: EffectContext = contextOverride ?? { playerId, card: ctxCard, fighterId: fighter?.id };
       if (!(await this.passesWhen(currentState, effect, context))) continue;
       const pendingBefore = currentState.metadata.pendingEffects?.length ?? 0;
-      const outcome = await this.applyOneEffect(currentState, effect, context);
+      const outcome = await this.applyOneEffect(currentState, effect, context, fromPendingId);
       currentState = applyTerminalState(outcome.state);
       appliedEffects.push(outcome.result);
       if (outcome.manual) manualEffects.push(outcome.manual);
@@ -385,6 +389,20 @@ export class CardEffectExecutorService {
    * from the drain after every resolve/decline).
    */
   private async applyOneEffect(
+    state: GameState,
+    effect: CardEffect,
+    context: EffectContext,
+    fromPendingId?: string,
+  ): Promise<ApplyOutcome> {
+    const outcome = await this.applyOneEffectPruned(state, effect, context);
+    // R-01: every result carries its source, so the combat log needs no guessing.
+    return {
+      ...outcome,
+      result: { ...outcome.result, source: describeEffectSource(state, outcome.state, effect, context, fromPendingId) },
+    };
+  }
+
+  private async applyOneEffectPruned(
     state: GameState,
     effect: CardEffect,
     context: EffectContext,

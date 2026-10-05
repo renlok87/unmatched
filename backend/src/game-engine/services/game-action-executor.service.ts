@@ -57,6 +57,7 @@ import { boardDistance, hasTopology } from '../engine/board-topology';
 import { DeckManagementService } from './deck-management.service';
 import { applyTerminalState } from '../engine/terminal-state';
 import { pruneHeadPendingsWithoutTargets } from '../effects/pending-targets';
+import { buildCombatEffectLog } from '../effects/combat-effect-log';
 import type { CombatResolutionProgress } from '../engine/combat-progress';
 // Residual-импорт engine→games: DTO-классы мутаций (runtime-импорт, но уже не
 // value-критичный цикл — состояние/фазы идут из ../models). Перенос DTO — вне скоупа F3.
@@ -1043,6 +1044,7 @@ export class GameActionExecutorService {
       userId,
       pending.card,
       pending.effectContext,
+      pending.id,
     );
 
     const remainingCount = (pending.chooseCount ?? 1) - 1;
@@ -2830,6 +2832,37 @@ export class GameActionExecutorService {
             newState = await this.advanceTurn(intermediate, userId);
           }
         }
+
+        // R-01 (DE-018 tail, F-01): the public record of this combat — its fired
+        // effects in order with their causes — rides on the snapshot that
+        // resolved it; filterPrivateData drops owner-only details per viewer.
+        newState = {
+          ...newState,
+          metadata: {
+            ...newState.metadata,
+            lastCombat: {
+              n: (currentState.metadata.lastCombat?.n ?? 0) + 1,
+              seq: newState.sequenceNumber,
+              attackerFighterId: attacker.id,
+              targetFighterId: defenderFighter.id,
+              attackerPlayerId: attacker.ownerId,
+              defenderPlayerId: combatInfo.defenderId,
+              attackerCardId: combatInfo.attackerCardId,
+              ...(combatInfo.defenderCardId ? { defenderCardId: combatInfo.defenderCardId } : {}),
+              finalAttack,
+              finalDefense,
+              defenderDamage,
+              attackerWon,
+              attackerCardCancelled: cancelled.attacker,
+              defenderCardCancelled: cancelled.defender,
+              appliedEffects: buildCombatEffectLog([
+                { timing: 'IMMEDIATELY', results: reveal.appliedEffects },
+                { timing: 'DURING', results: calc.appliedEffects },
+                { timing: 'AFTER', results: after.appliedEffects },
+              ], attacker.ownerId, newState),
+            },
+          },
+        };
 
         this.metrics.incrementGameAction('resolveCombat', undefined, 'success');
 

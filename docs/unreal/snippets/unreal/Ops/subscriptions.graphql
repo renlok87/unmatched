@@ -24,6 +24,8 @@
 # decks/discardPiles (ADR §1.1, §5.2 → bDecksStale + рефетч; B8). currentTurnPlayerId: String!
 # (non-null; при null — next{errors} + RefetchState, F24; B7). Эхо подписки может обогнать
 # HTTP-ответ мутации (ADR §1.3 п.8). При переподписке после connection_ack — since = LastSeq.
+# metadata (JSON) несёт и lastCombat — запись последнего боя с журналом эффектов (R-01, 2026-10-05;
+# docs/game-design/16-network-contract.md §5.1); схема не менялась, поле дополнительное.
 subscription GameStateUpdated($gameId: String!, $since: Float) {
   gameStateUpdated(gameId: $gameId, since: $since) {
     gameId

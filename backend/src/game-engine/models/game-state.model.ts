@@ -230,6 +230,92 @@ export interface SkippedEffect {
 /** How many SkippedEffect notes metadata keeps */
 export const SKIPPED_EFFECTS_KEPT = 8;
 
+/** R-01: the combat stage an effect fired in (the card's Immediately / During combat / After combat line). */
+export type CombatEffectTiming = 'IMMEDIATELY' | 'DURING' | 'AFTER';
+
+/**
+ * R-01: what came of a fired effect.
+ *  - APPLIED — changed the state (or a value of the combat);
+ *  - CHOICE — opened a player choice (its result is logged as children, see `parent`);
+ *  - NO_TARGETS — skipped for lack of a legal target (DE-016);
+ *  - MANUAL — not supported by the engine (manualEffects);
+ *  - FAILED — fired but could not be applied.
+ */
+export type CombatEffectOutcome = 'APPLIED' | 'CHOICE' | 'NO_TARGETS' | 'MANUAL' | 'FAILED';
+
+/**
+ * R-01 (RESEARCH-2026-10-05 findings 5–6): one fired effect of a combat, in
+ * the order the server applied it. Only card effects whose condition held are
+ * logged (a cancelled card or a failed `when` fires nothing). Everything but
+ * `hidden` is public: both combat cards are revealed when the combat resolves.
+ */
+export interface CombatEffectLogEntry {
+  /** 0-based order within the combat */
+  readonly i: number;
+  readonly timing: CombatEffectTiming;
+  readonly side: 'ATTACKER' | 'DEFENDER';
+  /** Owner of the effect */
+  readonly playerId: string;
+  /** The card that carries the effect (instance id as in discardPiles, catalog id, name) */
+  readonly source: {
+    readonly kind: 'CARD';
+    readonly cardId: string;
+    readonly catalogId: string;
+    readonly name: string;
+  };
+  /** CardEffect.id */
+  readonly effectId: string;
+  /** EffectType */
+  readonly kind: string;
+  readonly outcome: CombatEffectOutcome;
+  /** Value the effect applied (modifier, damage, cards drawn), when it has one */
+  readonly value?: number;
+  /** Public entities the effect hit: fighter and player ids only */
+  readonly targets: readonly string[];
+  /** Printed effect sentence, when known */
+  readonly text?: string;
+  /** `i` of the entry that caused this one (an option chosen in a CHOOSE_ONE) */
+  readonly parent?: number;
+  /**
+   * Owner-only details: the engine note and any non-public reference (a card
+   * instance id). filterPrivateData drops it for every other viewer — hidden
+   * entities stay opaque, as in a hidden-information dispatcher.
+   */
+  readonly hidden?: {
+    readonly note?: string;
+    readonly refs?: readonly string[];
+  };
+}
+
+/**
+ * R-01 (DE-018 tail, F-01): public record of the last resolved combat, written
+ * by executeResolveCombat when the combat ends (also on GAME_OVER). It lives
+ * until the next combat replaces it: the client stages it only when `seq`
+ * equals the applied snapshot's sequenceNumber. A combat paused for a choice
+ * has no record until it resumes and ends. Stored in the DB under `lcr`;
+ * saves without it read as "no record".
+ */
+export interface LastCombat {
+  /** Monotonic within the game (1, 2, …) */
+  readonly n: number;
+  /** sequenceNumber of the state that resolved the combat */
+  readonly seq: number;
+  readonly attackerFighterId: string;
+  readonly targetFighterId: string;
+  readonly attackerPlayerId: string;
+  readonly defenderPlayerId: string;
+  readonly attackerCardId: string;
+  readonly defenderCardId?: string;
+  readonly finalAttack: number;
+  readonly finalDefense: number;
+  readonly defenderDamage: number;
+  readonly attackerWon: boolean;
+  readonly attackerCardCancelled: boolean;
+  readonly defenderCardCancelled: boolean;
+  /** Fired effects in order; [] when no effect fired */
+  readonly appliedEffects: readonly CombatEffectLogEntry[];
+}
+
 /**
  * Метаданные состояния
  */
@@ -240,6 +326,8 @@ export interface GameStateMetadata {
   readonly lastMovement?: LastMovement;
   /** DE-016: effects skipped for lack of a legal target (see SkippedEffect) */
   readonly skippedEffects?: readonly SkippedEffect[];
+  /** R-01: public record of the last resolved combat and its fired effects (see LastCombat) */
+  readonly lastCombat?: LastCombat;
   /** End-turn effects have completed; selected excess instances must be discarded. */
   readonly pendingHandDiscard?: { readonly id: string; readonly playerId: string; readonly count: number };
   readonly lastActionAt: Date;

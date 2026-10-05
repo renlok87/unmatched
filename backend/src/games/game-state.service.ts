@@ -21,6 +21,7 @@ import type {
   BoardState,
 } from '../game-engine/models';
 import { FighterType, CardType, createEmptyBoardState } from '../game-engine/models';
+import { projectLastCombat } from '../game-engine/effects/combat-effect-log';
 
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -84,6 +85,7 @@ export interface SerializedGameState {
     pte?: GameStateMetadata['pendingTurnEnd']; // GD-018: отложенная передача хода
     lm?: GameStateMetadata['lastMovement']; // MS-T-14: публичный след перемещения (сейвы без поля → «следа нет»)
     se?: GameStateMetadata['skippedEffects']; // DE-016: эффекты, пропущенные без целей (сейвы без поля → «пропусков нет»)
+    lcr?: GameStateMetadata['lastCombat']; // R-01: публичная запись последнего боя и его эффектов (сейвы без поля → «записи нет»)
   };
 }
 
@@ -667,6 +669,8 @@ export class GameStateService {
         lm: state.metadata.lastMovement,
         // DE-016: эффекты, пропущенные без допустимых целей (без поля — undefined)
         se: state.metadata.skippedEffects,
+        // R-01: запись последнего боя с журналом эффектов (без поля — undefined)
+        lcr: state.metadata.lastCombat,
       },
     };
   }
@@ -798,6 +802,8 @@ export class GameStateService {
         lastMovement: data.m.lm,
         // DE-016: сейвы без se → undefined, «пропусков нет»
         skippedEffects: data.m.se,
+        // R-01: сейвы до журнала боя (без lcr) → undefined, «записи нет»
+        lastCombat: data.m.lcr,
       },
     };
   }
@@ -867,6 +873,13 @@ export class GameStateService {
     const publicMetadata = { ...state.metadata };
     delete publicMetadata.combatEffectContinuation;
     delete publicMetadata.combatResolutionProgress;
+
+    // R-01: журнал эффектов последнего боя публичен, кроме `hidden` —
+    // заметки движка и непубличных ссылок (instance id карт); их видит только
+    // владелец эффекта, у остальных записи без `hidden`.
+    if (publicMetadata.lastCombat) {
+      publicMetadata.lastCombat = projectLastCombat(publicMetadata.lastCombat, playerId);
+    }
 
     // S06 (GD-021, Prophecy): карты, снятые с верха колоды в DECK_TOP_PICK,
     // видны ТОЛЬКО владельцу выбора; соперник получает счётчик без личин.

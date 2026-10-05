@@ -110,6 +110,7 @@ Named-события — вспомогательные CUE (анимации/з
 | Публичный сброс (discard) | полностью | полностью | — |
 | Raw persisted/Redis state | никогда не отдаётся | никогда | — |
 | Журнал `eventsSince` `input` | только свои действия | только свои | — |
+| Журнал эффектов боя `metadata.lastCombat` (R-01) | публичная часть; `hidden` — только у своих записей | так же | — |
 
 После reveal обе стороны видят значения и личины обеих карт. Все 8 подписок
 (`gameStateUpdated`, `attackInitiated`, `defensePlayed`, `combatResolved`,
@@ -117,6 +118,36 @@ Named-события — вспомогательные CUE (анимации/з
 `eventsSince` гейтятся участием (`isParticipant` по `gamePlayer`):
 неучастник получает `ForbiddenException` — spectator-режима чтения
 состояния в контракте нет.
+
+### 5.1 Журнал эффектов последнего боя (R-01, 2026-10-05)
+
+Основание — [RESEARCH-2026-10-05.md](de-footage/task/runs/RESEARCH-2026-10-05.md), выводы 5–6: явный журнал «эффект →
+исход» с причинными связями надёжнее, чем восстановление строк по разнице снимков, а скрытое фильтруется на сервере
+для каждого зрителя. Журнал прогона — [H-2026-10-05.md](de-footage/task/runs/H-2026-10-05.md).
+
+- **Где.** `metadata.lastCombat` (тип `LastCombat` в `backend/src/game-engine/models/game-state.model.ts`). Пишет
+  `executeResolveCombat` в снимок, который завершил бой, в том числе при `GAME_OVER`; запись живёт до следующего боя.
+  Клиент использует её только при `lastCombat.seq` = `sequenceNumber` применённого снимка. Бой на паузе выбора записи
+  не даёт: она появится в снимке, который бой завершит. В БД — короткий ключ `lcr`; сейвы без него читаются как
+  «записи нет».
+- **Поля записи боя.** `n` (номер боя в партии), `seq`, `attackerFighterId`, `targetFighterId`, `attackerPlayerId`,
+  `defenderPlayerId`, `attackerCardId`, `defenderCardId?`, `finalAttack`, `finalDefense`, `defenderDamage`,
+  `attackerWon`, `attackerCardCancelled`, `defenderCardCancelled`, `appliedEffects`.
+- **Записи `appliedEffects`** — только сработавшие эффекты карт (условие выполнено, карта не отменена), по порядку
+  применения сервером: `i`, `timing` (`IMMEDIATELY` = ON_REVEAL, `DURING`, `AFTER`), `side` (`ATTACKER` /
+  `DEFENDER`), `playerId` (владелец эффекта), `source` (`kind: CARD`, `cardId` — instance id как в сбросе, `catalogId`,
+  `name`), `effectId`, `kind` (EffectType), `outcome` (`APPLIED`, `CHOICE` — открыл выбор, `NO_TARGETS` — пропущен
+  без целей, `MANUAL`, `FAILED`), `value?`, `targets` (только id бойцов и игроков), `text?` (печатное предложение),
+  `parent?` (`i` записи-причины: выбранная опция CHOOSE_ONE указывает на CHOOSE_ONE). Бой без эффектов — `[]`.
+- **Приватность.** Всё, кроме `hidden`, публично: обе карты боя к резолву вскрыты. `hidden` (`note` — заметка движка,
+  `refs` — непубличные ссылки, например instance id карты) получает только владелец эффекта; `filterPrivateData`
+  убирает его у остальных зрителей (`projectLastCombat`). Скрытые карты в журнале — непрозрачные ссылки, их личины
+  журнал не раскрывает. Тесты: `backend/src/game-engine/effects/r01-combat-effect-log.spec.ts`, случай R-01 в
+  `backend/src/games/services/s07-privacy-projection.spec.ts`.
+- **Совместимость.** Поле дополнительное (§8): GraphQL-схема не меняется — `metadata` идёт строкой JSON и в
+  `gameState`, и в `gameStateUpdated`; старые клиенты поле игнорируют. Ответ мутации `resolveCombat` по-прежнему несёт
+  `appliedEffects` / `combatSummary` для Game Tester.
+- **Не входит.** Способности героев (боевые модификаторы, хуки после боя) в журнал пока не пишутся — CUE-014 / GD-044.
 
 ## 6. Таймауты боя (GD-026 / ACC-010)
 
