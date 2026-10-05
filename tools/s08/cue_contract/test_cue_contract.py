@@ -510,6 +510,28 @@ class SoundGateTests(unittest.TestCase):
         late = [AUDIO_START, snd("CUE-007", "step", 1700, seq="22", subject="arthur", extra="edge=snap due=1500")]
         self.assertIn("AU6", self.codes(late))
 
+    def test_late_frame_after_evidence_shot_is_counted_not_failed(self):
+        # G-LIVE прогона G: снимок доказательств остановил кадр на ~250 мс, первое ребро второй фигуры
+        # прозвучало в первом кадре после снимка (t − due = 154) — счётчик sound_late_shot, не AU6
+        shot = "SHOT captured file=s09-opponent-move.png frame=704 px=1920x1080 sha256=x order=BGRA saved=1"
+        prev = snd("CUE-007", "step", 24588, seq="7", subject="hero", extra="edge=1/1 due=24568")
+        stalled = snd("CUE-007", "step", 24834, seq="7", subject="sk0", extra="edge=1/1 due=24680")
+        errs, summary = cc.check_sound([AUDIO_START, prev, shot, stalled], TABLE)
+        self.assertEqual(errs, [])
+        self.assertEqual(summary["sound_late_shot"], 1)
+        # без снимка — AU6; снимок задолго до due или звук позже первого кадра после снимка — тоже AU6
+        self.assertIn("AU6", self.codes([AUDIO_START, prev, stalled]))
+        early_shot = [AUDIO_START, snd("CUE-007", "step", 20000, seq="6", subject="hero", extra="edge=1/1 due=20000"),
+                      shot, snd("CUE-007", "step", 20040, seq="6", subject="sk0", extra="edge=1/1 due=20040"), stalled]
+        self.assertIn("AU6", self.codes(early_shot))
+        much_later = snd("CUE-007", "step", 24990, seq="7", subject="sk1", extra="edge=1/1 due=24680")
+        self.assertIn("AU6", self.codes([AUDIO_START, prev, shot, stalled, much_later]))
+        # удар постановки в первом кадре после снимка — так же
+        contact = "CUE combat seq=24 stage=contact t=2000 offset=292 window=900 src=notify"
+        hit = snd("CUE-011", "hit", 2180, seq="24", subject="medusa", extra="due=2000")
+        self.assertEqual(self.codes([AUDIO_START, contact, shot, hit]), set())
+        self.assertIn("AU5", self.codes([AUDIO_START, contact, hit]))
+
     def test_result_sting_with_the_screen(self):
         screen = "RESULT screen seq=50 t=9000 due=9000 gameOver=9000 heroGone=- wait=0"
         self.assertIn("AU7", self.codes([AUDIO_START, screen]))

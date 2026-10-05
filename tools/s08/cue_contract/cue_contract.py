@@ -657,6 +657,17 @@ AUDIO_NEED = ("master", "master_mute", "ambience", "ambience_mute", "gain_master
 SOUND_MS = {  # CUE-DISPATCHER.md §3.2: звук против кадра события и кадр против расписания (как DS4/DS5)
     "frame": 17, "frame_tolerance": 100,
 }
+# Окна съёмки доказательств (G-LIVE прогона G): строки с t= на одних часах с `CUE sound` и синхронный снимок.
+SOUND_CLOCK_RE = re.compile(r"\b(?:CUE (?:combat|sound|audio|death)|RESULT screen)\b.*?\bt=(-?\d+)")
+SHOT_CAPTURED_RE = re.compile(r"\bSHOT captured\b")
+
+
+def _shot_stall(windows, due, t):
+    """Опоздание шага или удара больше допуска списывается на снимок доказательств: синхронный снимок
+    (`SHOT captured`) стоит между строкой с t ≤ due + допуск и первой строкой с t после него, а звук — не позже
+    допуска от этой строки (первый кадр после снимка). Звук всё равно в кадре своего визуального события (AU2)."""
+    tol = SOUND_MS["frame_tolerance"]
+    return any(before <= due + tol and after <= t <= after + tol for before, after in windows)
 
 
 def _gain(text):
@@ -677,6 +688,8 @@ def check_sound(lines, table):
     AU8 громкости: строка `CUE audio` до первого звука, gain_* по формуле, gain звука = gain его класса
     (Ambience — gain_ambience, иначе gain_master), silent reason=muted ⇔ gain 0;
     AU9 частота: throttled только внутри retrigger_ms прошлого звука этого CUE, иначе звук играет.
+    Опоздание AU5/AU6 больше допуска в первом кадре после снимка доказательств (`SHOT captured`) — не ошибка,
+    а счётчик `sound_late_shot` (_shot_stall).
     В трассе без `CUE audio` и `CUE sound` (клиент без DE-032) сверки AU3/AU7 с `HUD-TURN` и экраном не делаются."""
     rows = rows_by_id(table)
     errors = []
@@ -691,9 +704,22 @@ def check_sound(lines, table):
     turn_sounds = []
     last_sound = {}  # id -> t прошлого звука (played/fallback)
     summary = {"sounds": 0, "sound_points": {p: 0 for p in SOUND_POINTS}, "sound_fallback": 0, "sound_played": 0,
-               "sound_silent": 0, "sound_throttled": 0, "audio_lines": 0, "sound_dt_max": 0}
+               "sound_silent": 0, "sound_throttled": 0, "audio_lines": 0, "sound_dt_max": 0, "sound_late_shot": 0}
+    shot_windows = []  # (t до снимка, t первой строки после снимка)
+    clock_t = None
+    shot_from = None
     for n, raw in enumerate(lines, 1):
         line = raw.rstrip("\r\n")
+        if SHOT_CAPTURED_RE.search(line):
+            if clock_t is not None and shot_from is None:
+                shot_from = clock_t
+            continue
+        mc = SOUND_CLOCK_RE.search(line)
+        if mc:
+            clock_t = int(mc.group(1))
+            if shot_from is not None:
+                shot_windows.append((shot_from, clock_t))
+                shot_from = None
         cf = parse_combat(line)
         if cf is not None:
             t = _int_or_none(cf.get("t"))
@@ -808,12 +834,16 @@ def check_sound(lines, table):
             # due — только у удара постановки (кадр контакта); удар без постановки (каскад, способность) — в свой кадр
             if due is not None and f["seq"] in contact and due != contact[f["seq"]]:
                 errors.append(("AU5", "строка %d: due=%s ≠ кадр контакта %d" % (n, f.get("due"), contact[f["seq"]])))
-            if due is not None and not 0 <= t - due <= SOUND_MS["frame_tolerance"]:
+            if due is not None and t - due > SOUND_MS["frame_tolerance"] and _shot_stall(shot_windows, due, t):
+                summary["sound_late_shot"] += 1
+            elif due is not None and not 0 <= t - due <= SOUND_MS["frame_tolerance"]:
                 errors.append(("AU5", "строка %d: удар через %d мс после контакта" % (n, t - due)))
         elif point == "step":
             edge = f.get("edge", "")
             st = steps.setdefault(key, {"n": None, "edges": [], "snap": 0, "line": n})
-            if due is None or not 0 <= t - due <= SOUND_MS["frame_tolerance"]:
+            if due is not None and t - due > SOUND_MS["frame_tolerance"] and _shot_stall(shot_windows, due, t):
+                summary["sound_late_shot"] += 1
+            elif due is None or not 0 <= t - due <= SOUND_MS["frame_tolerance"]:
                 errors.append(("AU6", "строка %d: шаг без due или через %s мс после начала ребра" % (
                     n, "-" if due is None else t - due)))
             if edge == "snap":
