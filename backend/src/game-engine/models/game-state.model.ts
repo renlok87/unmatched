@@ -290,8 +290,10 @@ export interface CombatEffectLogEntry {
 /**
  * R-01 (DE-018 tail, F-01): public record of the last resolved combat, written
  * by executeResolveCombat when the combat ends (also on GAME_OVER). It lives
- * until the next combat replaces it: the client stages it only when `seq`
- * equals the applied snapshot's sequenceNumber. A combat paused for a choice
+ * until the next combat replaces it: the client (R-02, FS09LastCombat::Matches)
+ * stages it only for the combat it closed - `seq` after the last snapshot of
+ * the open combat and no later than the closing snapshot (merged snapshots),
+ * between the same fighters. A combat paused for a choice
  * has no record until it resumes and ends. Stored in the DB under `lcr`;
  * saves without it read as "no record".
  */

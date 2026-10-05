@@ -5,7 +5,7 @@
 Beds are synthesised (sea, surf, waterfall, fire, night insects, wind in leaves): rights-clean and loopable by
 construction - each bed is rendered longer than its loop and the overhang is folded into the start (wrapped tail).
 Spots mix synthesis with CC0 Kenney foley (creaks, cloth, metal). Targets (02 §5.3): beds -38 LUFS-I, spots momentary
-max -30 LUFS. Output 48 kHz / 16 bit: beds stereo, spots mono; amb.json lists files and loudness.
+max -30 LUFS. Output 48 kHz / 16 bit: beds stereo, spots stereo with a fixed pan; amb.json lists files and loudness.
 """
 from __future__ import annotations
 
@@ -239,6 +239,23 @@ SPOTS = {
     "AMB-SARPEDON-GULLS": lambda: [gull(f"gull{i}") for i in range(3)],
     "AMB-SARPEDON-CHAIN": lambda: [chain(f"chain{i}") for i in range(2)],
 }
+# Fixed screen positions (the camera does not move, D-10): constant-power pan -1 (left) .. +1 (right). Spots get one
+# pan per variant (lanterns alternate sides); beds get a balance toward their source (the Sarpedon falls, the fires).
+SPOT_PAN = {
+    "AMB-MARMOREAL-GUST": [0.0, -0.3, 0.3, 0.0], "AMB-MARMOREAL-PETALS": [0.2, -0.2, 0.0],
+    "AMB-MARMOREAL-LANTERN": [-0.6, 0.6, -0.4, 0.4], "AMB-MARMOREAL-BIRD": [-0.7, -0.5, 0.6],
+    "AMB-SARPEDON-RIGGING": [0.5, 0.4, 0.6, 0.3], "AMB-SARPEDON-GULLS": [-0.6, 0.7, -0.2],
+    "AMB-SARPEDON-CHAIN": [-0.4, 0.4],
+}
+BED_BALANCE = {"AMB-SARPEDON-FALLS": -0.5, "AMB-SARPEDON-FIRE-FORT": 0.5, "AMB-SARPEDON-FIRE-BRAZIER": -0.4,
+               "AMB-SARPEDON-BANNER": 0.3}
+
+
+def pan_gains(pan: float) -> tuple[float, float]:
+    a = (pan + 1) * np.pi / 4
+    return float(np.cos(a)), float(np.sin(a))
+
+
 BED_TARGET = {"AMB-SARPEDON-FIRE-BRAZIER": -42.0, "AMB-SARPEDON-BANNER": -42.0, "AMB-SARPEDON-FIRE-FORT": -40.0,
               "AMB-SARPEDON-FALLS": -40.0}
 
@@ -257,6 +274,9 @@ def main(argv: list[str]) -> int:
         if args.only and uid not in args.only:
             continue
         x = fn()
+        if uid in BED_BALANCE:
+            gl, gr = pan_gains(BED_BALANCE[uid])
+            x = np.stack([x[0] * gl * np.sqrt(2), x[1] * gr * np.sqrt(2)])
         target = BED_TARGET.get(uid, -38.0)
         loud = lufs(x, SR)
         x = x * 10 ** ((target - loud["I"]) / 20)
@@ -273,7 +293,10 @@ def main(argv: list[str]) -> int:
             v = v / (np.max(np.abs(v)) + 1e-9) * 0.5
             v = sb.limit(v * 10 ** ((-30.0 - sb.momentary_max(v)) / 20))
             name = f"{uid}_{i:02d}.wav"
-            sb.write_wav16(out / name, v)
+            pans = SPOT_PAN.get(uid, [0.0])
+            gl, gr = pan_gains(pans[(i - 1) % len(pans)])
+            write_wav(out / name, np.stack([v * gl * np.sqrt(2), v * gr * np.sqrt(2)]) * 0.89 / max(gl, gr) / np.sqrt(2),
+                      SR, 16)
             files.append({"file": name, "seconds": round(len(v) / SR, 2), "m_max": round(sb.momentary_max(v), 1)})
         rep = {"id": uid, "kind": "spot", "target_m_max": -30.0, "variants": files}
         report.append(rep)
