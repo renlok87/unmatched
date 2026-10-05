@@ -67,6 +67,17 @@ const FRow GRows[] = {
     {TEXT("ms.btn.decline"), TEXT("Decline (X)")},
     {TEXT("ms.place.no.space"), TEXT("No free space. Waiting for the server")},
     {TEXT("ms.choice.object"), TEXT("Choose what to move")},
+    // DE-020 (W-11; 02-ux-ui-spec §4.6, SD-19, SD-28, SD-56): serving the deferred choices
+    {TEXT("ms.choice.target"), TEXT("Choose a target (up to {n})")},
+    {TEXT("ms.pending.opp.turn"), TEXT("Your choice during the opponent's turn")},
+    {TEXT("ms.pending.collapsed"), TEXT("Your choice is waiting: {choice}")},
+    {TEXT("ms.pending.again"), TEXT("Again: {choice}")},
+    {TEXT("ms.pending.remembered"), TEXT("Last time: {choice}")},
+    {TEXT("ms.btn.collapse"), TEXT("Collapse (C)")},
+    {TEXT("ms.btn.expand"), TEXT("Expand (C)")},
+    {TEXT("ms.ability.boost"), TEXT("{fighterName}: add a BOOST to this attack?")},
+    {TEXT("ms.btn.boost.attack"), TEXT("Attack with BOOST (Enter)")},
+    {TEXT("ms.btn.noboost"), TEXT("Attack without BOOST (N)")},
 };
 
 const FRow* Find(FName Key) {

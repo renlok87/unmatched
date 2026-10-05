@@ -2391,6 +2391,14 @@ static const TCHAR* AttackMutation =
     TEXT("              targetId: $targetId }) {")
     TEXT(" state sequenceNumber phase turnCount currentTurnPlayerId } }");
 
+// DE-020 (SD-56): attack with the hero ability boost (AttackInput.abilityBoostCardId, gameplay.dto.ts).
+static const TCHAR* AttackAbilityBoostMutation =
+    TEXT("mutation AB($gameId: String!, $attackerId: String!, $cardId: String!,")
+    TEXT("        $targetId: String!, $abilityBoostCardId: String) {")
+    TEXT(" attack(input: { gameId: $gameId, attackerId: $attackerId, cardId: $cardId,")
+    TEXT("              targetId: $targetId, abilityBoostCardId: $abilityBoostCardId }) {")
+    TEXT(" state sequenceNumber phase turnCount currentTurnPlayerId } }");
+
 static const TCHAR* PlayDefenseMutation =
     TEXT("mutation P($gameId: String!, $cardId: String!) {")
     TEXT(" playDefense(input: { gameId: $gameId, cardId: $cardId }) {")
@@ -2548,6 +2556,23 @@ bool FS08FlowController::Attack(const FString& AttackerFighterId,
   Variables->SetStringField(TEXT("cardId"), CardInstanceId);
   Variables->SetStringField(TEXT("targetId"), TargetFighterId);
   return RunCombatMutation(TEXT("ATTACK"), TEXT("attack"), AttackMutation, Variables);
+}
+
+bool FS08FlowController::Attack(const FString& AttackerFighterId, const FString& CardInstanceId,
+                                const FString& TargetFighterId, const FString& AbilityBoostCardId) {
+  if (AbilityBoostCardId.IsEmpty()) return Attack(AttackerFighterId, CardInstanceId, TargetFighterId);
+  FString Reason;
+  if (!CanIssueGameplayCommand(Reason)) {
+    Trace(TEXT("ATTACK blocked: ") + Reason);
+    return false;
+  }
+  TSharedRef<FJsonObject> Variables = MakeShared<FJsonObject>();
+  Variables->SetStringField(TEXT("gameId"), Room.GameId);
+  Variables->SetStringField(TEXT("attackerId"), AttackerFighterId);
+  Variables->SetStringField(TEXT("cardId"), CardInstanceId);
+  Variables->SetStringField(TEXT("targetId"), TargetFighterId);
+  Variables->SetStringField(TEXT("abilityBoostCardId"), AbilityBoostCardId);
+  return RunCombatMutation(TEXT("ATTACK"), TEXT("attack"), AttackAbilityBoostMutation, Variables);
 }
 
 bool FS08FlowController::PlayDefense(const FString& CardInstanceId) {

@@ -108,6 +108,10 @@ struct UNMATCHED_API FS08BoardFighter {
   // the fighter as dead for blocking and occupying (MS-E-24, MS-E-77).
   bool bDefeated = false;
   FString AttackType;
+  // DE-020 (SD-56): the projection's `heroSlug` (the hero the fighter belongs to - its sidekicks carry the same
+  // slug). The hero ability boost of an attack (King Arthur) is offered by it, as the server's
+  // abilityBoostAllowed decides (HERO fighter of the handler's hero).
+  FString HeroSlug;
   FString Label; // display label: 'Medusa', 'Harpies 2', ...
   // Public fighter effects from the projection (`effects[]`: a string, or an
   // object's type/name/id). Plate status chips only (ART-004 T2.2).

@@ -26,6 +26,7 @@
 #include "../S09/S09HudPress.h"
 #include "../S09/S09CombatStage.h"
 #include "../S09/S09DeathStage.h"
+#include "../S09/S09PendingPresent.h"
 #include "S08CueDispatcher.h"
 #include "S08FlowGameMode.generated.h"
 
@@ -232,6 +233,16 @@ private:
   void ResolveCombatCommand();    // R: resolve (COMBAT_RESOLVE / no-defense)
   void DeclinePendingChoiceCommand(); // X: decline an optional boost choice
   void StayPendingInPlaceCommand();   // MS-T-12: "Stay in place" of a pending MOVE (zero-step resolve)
+  // ---- DE-020 (W-11; SD-10, SD-19, SD-28, SD-56) ----
+  /** After a player's attack pick (click / key): a complete draft goes at once (no confirm), or opens the hero
+   *  ability prompt (King Arthur) - the deferred choice without a timer. */
+  void AfterAttackPick(ES09InputSource Source);
+  /** The ability prompt's "Attack without BOOST" (N / button). */
+  void AttackWithoutAbilityBoostCommand();
+  /** C / the plate / the toast's details: collapse or expand the own pending choice. */
+  void TogglePendingCollapseCommand();
+  /** Skipped-effect notes (toast + CUE-004) and the presentation of the own head, per applied snapshot. */
+  void FeedPendingPresentation(const FS08Snapshot& Snapshot);
   void PlaySchemeCommand();       // G: open/close the EXACT-instance scheme picker
   /** Enter inside the scheme picker: sends the selected EXACT instance or
    *  rejects a stale/dead selection (never substitutes another card). */
@@ -508,6 +519,11 @@ private:
   FString S09AttackRejectTraceKey; // turn already traced as retry-exhausted
   FString S09RevealTraceKey;      // combat target+seq already traced revealed
   FString S09PendingRevealTraceKey;  // same, for the owner PENDING panel's revealed line
+  // DE-020: the deferred-choice service (skipped-effect notes, modal / compact / toast, collapse, memory).
+  FS09SkippedEffectsFeed SkippedEffects;
+  FS09PendingPresenter PendingPresenter;
+  FString PendingStepTraceKey;      // MS-PENDING step=... once per (head, step)
+  FString PendingNoTargetsTraceKey; // MS-REJECT pending.no.targets once per head
   FString S09ResolveBlockedTraceKey; // pending head already traced as blocking resolve
   FString S09ShotBlockedPath;     // resolve window blocked by the other seat's pending
   FString S09BoostHoldKey;        // BOOST_CHOICE head already held for the reveal capture

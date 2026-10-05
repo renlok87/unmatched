@@ -228,6 +228,8 @@ struct UNMATCHED_API FS09AttackCommand {
   FString AttackerFighterId;
   FString CardInstanceId;
   FString TargetFighterId;
+  // DE-020 (SD-56): the hero ability boost (attack mutation abilityBoostCardId, King Arthur) - empty = none.
+  FString AbilityBoostCardId;
 };
 
 /** GD-034 defense intent: card is a viewer-hand DEFENSE/VERSATILE/UNIVERSAL
@@ -635,9 +637,31 @@ public:
    *  whose banner the drafted attacker satisfies. */
   bool ToggleAttackCard(const FString& InstanceId, const FS08Snapshot& Snapshot,
                         const TArray<FS08BoardFighter>& Fighters, FString& OutReason);
+  /** ConfirmAttack carries AbilityBoostCardId only while the ability prompt of THIS draft is open (DE-020). */
   bool ConfirmAttack(const FS08Snapshot& Snapshot, const FS08BoardModel& Board,
                      const TArray<FS08BoardFighter>& Fighters,
                      FS09AttackCommand& OutCommand, FString& OutReason) const;
+
+  // ---- DE-020 (SD-56; 02-ux-ui-spec §4.5, §4.6, §5 S3->S4): the hero ability boost of an own attack ----
+  // An own attack goes as soon as attacker, target and card are picked - no separate confirm. Only an attacker
+  // whose hero ability boosts its attack (server abilityBoostAllowed: King Arthur, the HERO fighter - never Merlin)
+  // first gets the deferred choice "add a BOOST?" in the pending widget, without a timer; declining sends the
+  // attack without a boost.
+  /** Server abilityBoostAllowed mirror: a HERO fighter whose heroSlug names a hero with allowsAttackBoost. */
+  static bool AllowsAbilityBoost(const FS08BoardFighter& Attacker);
+  /** Own hand cards the ability may add: every visible card with a printed BOOST other than the attack card. */
+  TArray<FS09CardView> AttackAbilityBoostCards(const FS08Snapshot& Snapshot) const;
+  /** The drafted attacker allows the ability boost AND the hand holds a card for it - only then the prompt is
+   *  worth asking (no card = nothing to ask, the attack goes). */
+  bool AttackAbilityAvailable(const FS08Snapshot& Snapshot, const TArray<FS08BoardFighter>& Fighters) const;
+  /** Opens the prompt for the current attacker / target / card (any change of them closes it). */
+  void OpenAttackAbilityPrompt();
+  void CloseAttackAbilityPrompt();
+  bool IsAttackAbilityPromptOpen() const;
+  /** Picks / clears the ability boost card while the prompt is open (an AttackAbilityBoostCards instance). */
+  bool ToggleAttackAbilityBoost(const FString& InstanceId, const FS08Snapshot& Snapshot, FString& OutReason);
+  FString AttackAbilityBoostCardId;
+  FString AttackAbilityPromptKey; // "<attacker>|<target>|<card>" the prompt was opened for ('' = closed)
   bool ConfirmAttack(const FS08Snapshot& Snapshot, const TArray<FS08BoardFighter>& Fighters,
                      FS09AttackCommand& OutCommand, FString& OutReason) const {
     return ConfirmAttack(Snapshot, SnapshotBoard, Fighters, OutCommand, OutReason);

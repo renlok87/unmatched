@@ -451,6 +451,9 @@ const TArray<FS09KeyBinding>& FS09MoveInput::Bindings() {
       {TEXT("Ctrl+Up"), TEXT("move earlier"), TEXT("panel button (MS-T-11)"), true, false},
       {TEXT("Ctrl+Down"), TEXT("move later"), TEXT("panel button (MS-T-11)"), true, false},
       {TEXT("E"), TEXT("end turn (after both actions; why.* before - DE-015)"), TEXT(""), false, false},
+      {TEXT("C"), TEXT("collapse / expand the own pending choice (DE-020; never cancels it)"), TEXT(""), false, false},
+      {TEXT("N"), TEXT("attack without the hero ability BOOST (DE-020 prompt; no defense in the defense window)"),
+       TEXT(""), false, false},
   };
   return List;
 }

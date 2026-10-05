@@ -430,6 +430,10 @@ public:
    *  authoritative; local UI gates mirror it). */
   bool Attack(const FString& AttackerFighterId, const FString& CardInstanceId,
               const FString& TargetFighterId);
+  /** DE-020 (SD-56): the same attack with the hero ability boost (abilityBoostCardId - King Arthur; the
+   *  server re-checks the hand and abilityBoostAllowed). An empty id sends the plain attack. */
+  bool Attack(const FString& AttackerFighterId, const FString& CardInstanceId,
+              const FString& TargetFighterId, const FString& AbilityBoostCardId);
   /** playDefense(cardId) - defender-only during COMBAT (server deadline
    *  applies; the local UI blocks an expired window). */
   bool PlayDefense(const FString& CardInstanceId);

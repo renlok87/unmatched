@@ -1823,10 +1823,101 @@ bool FS09CommandUi::ConfirmAttack(const FS08Snapshot& Snapshot, const FS08BoardM
     OutReason = TEXT("drafted card is no longer legal for this attacker");
     return false;
   }
+  // DE-020 (SD-56): the ability boost rides along only with the prompt of THIS draft open, re-derived from the
+  // authoritative hand (server: in hand, not the attack card, the attacker's hero allows it).
+  FString AbilityBoost;
+  if (IsAttackAbilityPromptOpen() && !AttackAbilityBoostCardId.IsEmpty()) {
+    if (!AllowsAbilityBoost(*Attacker)) {
+      OutReason = TEXT("this attacker's ability does not boost the attack");
+      return false;
+    }
+    bool bInHand = false;
+    for (const FS09CardView& Card : AttackAbilityBoostCards(Snapshot)) {
+      if (Card.InstanceId == AttackAbilityBoostCardId) { bInHand = true; break; }
+    }
+    if (!bInHand) {
+      OutReason = TEXT("the ability boost card is no longer in your hand");
+      return false;
+    }
+    AbilityBoost = AttackAbilityBoostCardId;
+  }
   OutCommand.AttackerFighterId = AttackAttackerId;
   OutCommand.CardInstanceId = AttackCardId;
   OutCommand.TargetFighterId = AttackTargetId;
+  OutCommand.AbilityBoostCardId = AbilityBoost;
   return true;
+}
+
+// ---- DE-020 (SD-56): the hero ability boost of an own attack ----
+
+bool FS09CommandUi::AllowsAbilityBoost(const FS08BoardFighter& Attacker) {
+  // Server abilityBoostAllowed: the handler of heroSlug has allowsAttackBoost and the fighter is its HERO
+  // (arthur.handler.ts - the only such hero; Merlin carries the same slug but is a sidekick).
+  static const TCHAR* const BoostHeroes[] = {TEXT("king-arthur")};
+  if (!Attacker.bIsHero || Attacker.HeroSlug.IsEmpty()) return false;
+  for (const TCHAR* Slug : BoostHeroes) {
+    if (Attacker.HeroSlug.Equals(Slug, ESearchCase::CaseSensitive)) return true;
+  }
+  return false;
+}
+
+TArray<FS09CardView> FS09CommandUi::AttackAbilityBoostCards(const FS08Snapshot& Snapshot) const {
+  TArray<FS09CardView> Out;
+  TArray<FS09CardView> Cards;
+  if (!OwnHandCards(Snapshot, ViewerId, Cards)) return Out;
+  for (const FS09CardView& Card : Cards) {
+    // MS-T-05: a card without a printed BOOST is never offered as a boost.
+    if (Card.bHidden || !Card.bHasBoostValue || Card.InstanceId == AttackCardId) continue;
+    Out.Add(Card);
+  }
+  return Out;
+}
+
+bool FS09CommandUi::AttackAbilityAvailable(const FS08Snapshot& Snapshot,
+                                           const TArray<FS08BoardFighter>& Fighters) const {
+  if (Mode != ES09CommandMode::AttackDraft) return false;
+  const FS08BoardFighter* Attacker = FindFighter(Fighters, AttackAttackerId);
+  return Attacker && AllowsAbilityBoost(*Attacker) && AttackAbilityBoostCards(Snapshot).Num() > 0;
+}
+
+void FS09CommandUi::OpenAttackAbilityPrompt() {
+  AttackAbilityPromptKey = AttackAttackerId + TEXT("|") + AttackTargetId + TEXT("|") + AttackCardId;
+  AttackAbilityBoostCardId.Reset();
+}
+
+void FS09CommandUi::CloseAttackAbilityPrompt() {
+  AttackAbilityPromptKey.Reset();
+  AttackAbilityBoostCardId.Reset();
+}
+
+bool FS09CommandUi::IsAttackAbilityPromptOpen() const {
+  return Mode == ES09CommandMode::AttackDraft && !AttackAbilityPromptKey.IsEmpty() &&
+         AttackAbilityPromptKey == AttackAttackerId + TEXT("|") + AttackTargetId + TEXT("|") + AttackCardId;
+}
+
+bool FS09CommandUi::ToggleAttackAbilityBoost(const FString& InstanceId, const FS08Snapshot& Snapshot,
+                                             FString& OutReason) {
+  OutReason.Reset();
+  if (!IsAttackAbilityPromptOpen()) {
+    OutReason = TEXT("no ability boost prompt open");
+    return false;
+  }
+  if (AttackAbilityBoostCardId == InstanceId) {
+    AttackAbilityBoostCardId.Reset();
+    return true;
+  }
+  if (InstanceId == AttackCardId) {
+    OutReason = TEXT("the attack card cannot boost its own attack");
+    return false;
+  }
+  for (const FS09CardView& Card : AttackAbilityBoostCards(Snapshot)) {
+    if (Card.InstanceId == InstanceId) {
+      AttackAbilityBoostCardId = InstanceId;
+      return true;
+    }
+  }
+  OutReason = S08WhyText::En(FName(TEXT("why.boost.no.value")));
+  return false;
 }
 
 bool FS09CommandUi::ToggleDefenseCard(const FString& InstanceId, const FS08Snapshot& Snapshot,

@@ -747,6 +747,7 @@ bool FS08BoardModel::DecodeFighters(const TSharedPtr<FJsonValue>& FightersValue,
     Entry.MovementRaw = Entry.bMovementPresent ? JsNumber(MovementField) : 0.0;
     Entry.bDefeated = JsTruthy(Fighter->TryGetField(TEXT("isDefeated")));
     Entry.AttackType = Fighter->GetStringField(TEXT("attackType"));
+    Fighter->TryGetStringField(TEXT("heroSlug"), Entry.HeroSlug);
     const TArray<TSharedPtr<FJsonValue>>* EffectValues = nullptr;
     if (Fighter->TryGetArrayField(TEXT("effects"), EffectValues) && EffectValues) {
       for (const TSharedPtr<FJsonValue>& Effect : *EffectValues) {

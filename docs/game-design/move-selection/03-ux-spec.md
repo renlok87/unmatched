@@ -574,6 +574,15 @@ n = 6/3/6; TL `move_edge`); у DE выпад жетона и «−N» масшт
 | `ms.opp.moves.yours` | Ваш боец {fighterName}: эффект {cardName} | Your fighter {fighterName}: {cardName} effect |
 | `ms.choice.object` | Выберите, кого переместить | Choose what to move |
 | `ms.choice.target` | Выберите цель (до {n}) | Choose a target (up to {n}) |
+| `ms.pending.opp.turn` | Ваш выбор в ход соперника | Your choice during the opponent's turn |
+| `ms.pending.collapsed` | Ваш выбор ждёт: {choice} | Your choice is waiting: {choice} |
+| `ms.pending.again` | Снова: {choice} | Again: {choice} |
+| `ms.pending.remembered` | В прошлый раз: {choice} | Last time: {choice} |
+| `ms.btn.collapse` | Свернуть (C) | Collapse (C) |
+| `ms.btn.expand` | Развернуть (C) | Expand (C) |
+| `ms.ability.boost` | {fighterName}: добавить BOOST к этой атаке? | {fighterName}: add a BOOST to this attack? |
+| `ms.btn.boost.attack` | Атаковать с BOOST (Enter) | Attack with BOOST (Enter) |
+| `ms.btn.noboost` | Атаковать без BOOST (N) | Attack without BOOST (N) |
 | `ms.log.maneuver` | {player}: манёвр{boostPart}: {moves} | {player}: maneuver{boostPart}: {moves} |
 | `ms.log.boost.part` | , буст +{n} ({cardName}) | , boost +{n} ({cardName}) |
 | `ms.log.move` | {fighterName} {from}→{to} | {fighterName} {from}→{to} |

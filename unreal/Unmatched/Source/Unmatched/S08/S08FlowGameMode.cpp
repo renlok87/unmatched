@@ -512,6 +512,7 @@ void AS08FlowGameMode::HandleApplied(const FS08Snapshot& Snapshot, ES08SeqDecisi
     FS08Trace::Write(FString::Printf(TEXT("MODE seq=%d mode=%d combat=%d pending=%d"),
         Snapshot.SequenceNumber, static_cast<int32>(CommandUi.Mode),
         CommandUi.Combat.bPresent ? 1 : 0, CommandUi.bHasPendingChoice ? 1 : 0));
+    FeedPendingPresentation(Snapshot); // DE-020: skipped-effect notes, modal / compact / toast
     // GD-036: one RESULT trace line per authoritative seq - an equal-seq
     // merge (WS push + HTTP refetch of the terminal body) never re-logs.
     if (Hud.bGameOver && Snapshot.SequenceNumber != S09ResultTraceSeq) {
@@ -1471,8 +1472,9 @@ void AS08FlowGameMode::HandleClick() {
       const FS08BoardFighter& Fighter = FighterActor->GetFighter();
       FString Reason;
       const bool bOwn = Fighter.OwnerId == CommandUi.ViewerId;
-      if (bOwn ? CommandUi.SelectAttacker(Fighter.Id, BoardModel, Fighters, Reason)
-               : CommandUi.SelectTarget(Fighter.Id, BoardModel, Fighters, Reason)) {
+      const bool bPicked = bOwn ? CommandUi.SelectAttacker(Fighter.Id, BoardModel, Fighters, Reason)
+                                : CommandUi.SelectTarget(Fighter.Id, BoardModel, Fighters, Reason);
+      if (bPicked) {
         Toast = FString::Printf(TEXT("attack draft: %s = %s"),
                                 bOwn ? TEXT("attacker") : TEXT("target"), *Fighter.Label);
         if (bOwn) {
@@ -1500,6 +1502,7 @@ void AS08FlowGameMode::HandleClick() {
       }
       ToastUntil = Elapsed + 3.0f;
       RefreshHud();
+      if (bPicked) AfterAttackPick(ES09InputSource::Click); // DE-020 (SD-56): a complete draft goes at once
     }
     return;
   }
@@ -1818,7 +1821,22 @@ void AS08FlowGameMode::HandleHandCardClick(int32 HandIndex, ES09InputSource Sour
   const FS09CardView& Card = Own->Cards[HandIndex];
   if (CommandUi.Mode == ES09CommandMode::AttackDraft) {
     FString Reason;
-    if (CommandUi.ToggleAttackCard(Card.InstanceId, EffectiveSnapshot(), Fighters, Reason)) {
+    if (CommandUi.IsAttackAbilityPromptOpen()) {
+      // DE-020 (SD-56): in the ability prompt the hand picks the hero ability BOOST card, not the attack card.
+      if (CommandUi.ToggleAttackAbilityBoost(Card.InstanceId, EffectiveSnapshot(), Reason)) {
+        const bool bSet = CommandUi.AttackAbilityBoostCardId == Card.InstanceId;
+        Toast = bSet ? TEXT("ability boost card set - Enter attacks") : TEXT("ability boost card cleared");
+        FS08Trace::Write(FString::Printf(TEXT("ATTACK ability.boost card=%s src=%s"), bSet ? TEXT("set") : TEXT("cleared"),
+                                         Source == ES09InputSource::Key ? TEXT("key") : TEXT("click")));
+      } else {
+        Toast = TEXT("ability boost card rejected: ") + Reason;
+      }
+      ToastUntil = Elapsed + 3.0f;
+      RefreshHud();
+      return;
+    }
+    const bool bPicked = CommandUi.ToggleAttackCard(Card.InstanceId, EffectiveSnapshot(), Fighters, Reason);
+    if (bPicked) {
       Toast = FString::Printf(TEXT("attack card %s"),
                               CommandUi.AttackCardId == Card.InstanceId ? TEXT("set") : TEXT("cleared"));
     } else {
@@ -1826,6 +1844,7 @@ void AS08FlowGameMode::HandleHandCardClick(int32 HandIndex, ES09InputSource Sour
     }
     ToastUntil = Elapsed + 3.0f;
     RefreshHud();
+    if (bPicked) AfterAttackPick(Source); // DE-020 (SD-56): a complete draft goes at once
     return;
   }
   if (CommandUi.Mode == ES09CommandMode::CombatDefense) {
@@ -2277,6 +2296,99 @@ void AS08FlowGameMode::StayPendingInPlaceCommand() {
   ConfirmCombat();
 }
 
+// ---- DE-020 (W-11; SD-10, SD-16, SD-19, SD-28, SD-56): serving the deferred choices -------------------------
+
+void AS08FlowGameMode::FeedPendingPresentation(const FS08Snapshot& Snapshot) {
+  // (1) SD-10 / SD-16, 01 F-11: the server skipped an effect without legal targets (DE-016, 04 §4.3.1) - every
+  // new note is explained: toast why.effect.no.targets + CUE-004, for both seats. Entry / reconnect primes the
+  // feed silently (Consume).
+  for (const FS09SkippedEffectNote& Note : SkippedEffects.Consume(Snapshot)) {
+    const FS09Reason Why = Note.Why();
+    FS08Trace::Write(FString::Printf(TEXT("MS-SKIP n=%d seq=%d kind=%s reason=%s own=%d why=%s"), Note.N, Note.Seq,
+                                     Note.Kind.IsEmpty() ? TEXT("-") : *Note.Kind,
+                                     Note.Reason.IsEmpty() ? TEXT("-") : *Note.Reason,
+                                     Note.PlayerId == CommandUi.ViewerId ? 1 : 0, *Why.Key.ToString()));
+    ShowReason(Why, 4.0f); // CUE-004
+  }
+  // (2) SD-19 / SD-28: one presentation per open of an own head; a compact / toast open pre-selects the variant
+  // answered last time where it is still legal (nothing is sent).
+  if (CommandUi.Mode == ES09CommandMode::PendingChoice && CommandUi.bHasPendingChoice) {
+    if (PendingPresenter.Observe(CommandUi.PendingChoice, Snapshot.TurnCount)) {
+      FString Line = PendingPresenter.TraceLine() + TEXT(" type=") + CommandUi.PendingChoice.Type;
+      if (PendingPresenter.Present != ES09PendingPresent::Modal) {
+        if (const FS09PendingVariant* Last = PendingPresenter.Remembered()) {
+          FString Applied;
+          S09ApplyPendingVariant(CommandUi, *Last, Snapshot, BoardModel, Fighters, Applied);
+          Line += FString::Printf(TEXT(" remembered=%s applied=%s"), *Last->Describe().Replace(TEXT(" "), TEXT(",")),
+                                  Applied.IsEmpty() ? TEXT("none") : *Applied.Replace(TEXT(" "), TEXT(",")));
+          if (BoardActor && !CommandUi.PendingFighterId.IsEmpty()) {
+            BoardActor->SetSelectedFighter(CommandUi.PendingFighterId, CommandUi.PendingCells);
+          }
+        }
+      }
+      FS08Trace::Write(Line);
+    }
+    // D-DE-11: never a silent wait - an own head with nothing to pick is named (after DE-016 the server does not
+    // open such heads, so this line is the signal of a server gap).
+    if (S09PendingHasNoTargets(CommandUi, Snapshot, BoardModel, Fighters) &&
+        PendingNoTargetsTraceKey != CommandUi.PendingChoice.Id) {
+      PendingNoTargetsTraceKey = CommandUi.PendingChoice.Id;
+      FS08Trace::Write(FString::Printf(TEXT("MS-REJECT pending.no.targets id=%s type=%s why=why.effect.no.targets"),
+                                       *CommandUi.PendingChoice.Id, *CommandUi.PendingChoice.Type));
+    }
+  } else if (PendingPresenter.IsOpen()) {
+    PendingPresenter.Clear();
+  }
+}
+
+void AS08FlowGameMode::TogglePendingCollapseCommand() {
+  if (CommandUi.Mode != ES09CommandMode::PendingChoice || !PendingPresenter.IsOpen()) return;
+  const ES09PendingPresent Before = PendingPresenter.Present;
+  if (!PendingPresenter.Toggle()) return;
+  FS08Trace::Write(FString::Printf(TEXT("MS-PENDING %s id=%s present=%s"),
+                                   PendingPresenter.bCollapsed                         ? TEXT("collapse")
+                                   : Before == ES09PendingPresent::Toast ? TEXT("details")
+                                                                                       : TEXT("expand"),
+                                   *PendingPresenter.HeadId, S09PendingPresentName(PendingPresenter.Present)));
+  RefreshHud();
+}
+
+void AS08FlowGameMode::AfterAttackPick(ES09InputSource Source) {
+  // SD-56 (02-ux-ui-spec §4.5, §5 S3->S5): the last pick of attacker / target / card IS the commit - the attack
+  // goes without a separate confirm. Only an attacker whose hero ability boosts the attack (King Arthur) first
+  // answers "add a BOOST?" - a deferred choice in the pending widget, without a timer.
+  if (!Flow.IsValid() || CommandUi.Mode != ES09CommandMode::AttackDraft || CommandUi.IsAttackAbilityPromptOpen()) {
+    return;
+  }
+  const FS08Snapshot& Snap = EffectiveSnapshot();
+  FS09AttackCommand Command;
+  FString Reason;
+  if (!CommandUi.ConfirmAttack(Snap, BoardModel, Fighters, Command, Reason)) return; // not complete yet
+  const TCHAR* Src = Source == ES09InputSource::Key ? TEXT("key") : TEXT("click");
+  if (CommandUi.AttackAbilityAvailable(Snap, Fighters)) {
+    CommandUi.OpenAttackAbilityPrompt();
+    FString AttackerName;
+    for (const FS08BoardFighter& Entry : Fighters) {
+      if (Entry.Id == CommandUi.AttackAttackerId) AttackerName = Entry.Label;
+    }
+    FS08Trace::Write(FString::Printf(TEXT("ATTACK ability.prompt attacker=%s cards=%d timer=none src=%s"),
+                                     *CommandUi.AttackAttackerId, CommandUi.AttackAbilityBoostCards(Snap).Num(), Src));
+    Toast = FS09Reason::Make(TEXT("ms.ability.boost")).Arg(TEXT("fighterName"), AttackerName).Text();
+    ToastUntil = Elapsed + 4.0f;
+    RefreshHud();
+    return;
+  }
+  FS08Trace::Write(FString::Printf(TEXT("ATTACK auto src=%s confirm=none"), Src));
+  ConfirmCombat();
+}
+
+void AS08FlowGameMode::AttackWithoutAbilityBoostCommand() {
+  if (!CommandUi.IsAttackAbilityPromptOpen()) return;
+  CommandUi.AttackAbilityBoostCardId.Reset();
+  FS08Trace::Write(TEXT("ATTACK ability.declined"));
+  ConfirmCombat();
+}
+
 void AS08FlowGameMode::PlaySchemeCommand() {
   if (!Flow.IsValid()) return;
   // G toggles: an open picker closes WITHOUT sending anything (the manual
@@ -2358,9 +2470,12 @@ bool AS08FlowGameMode::ConfirmCombat() {
     // controller actually dispatched it - a gate-blocked attack used to log
     // "sent", flip the mode and stall the seat forever at seq1.
     const bool bSent = Flow->Attack(Command.AttackerFighterId, Command.CardInstanceId,
-                                    Command.TargetFighterId);
+                                    Command.TargetFighterId, Command.AbilityBoostCardId);
     if (bSent) {
-      FS08Trace::Write(TEXT("ATTACK sent"));
+      // DE-020 (SD-56): ability= says whether the hero ability boost rode along (never the card identity).
+      FS08Trace::Write(FString::Printf(TEXT("ATTACK sent ability=%s"),
+                                       Command.AbilityBoostCardId.IsEmpty() ? TEXT("none") : TEXT("card")));
+      CommandUi.CloseAttackAbilityPrompt();
       Toast = TEXT("attack sent");
     } else {
       Toast = TEXT("attack not sent - command gate blocked it (see trace)");
@@ -2403,6 +2518,8 @@ bool AS08FlowGameMode::ConfirmCombat() {
       FS08Trace::Write(FString::Printf(TEXT("PEND-RESOLVE sent type=%s stage=%d id=%s"),
                                        *CommandUi.PendingChoice.Type,
                                        CommandUi.PendingChoice.Stage, *Command.EffectId));
+      // DE-020 (SD-19): the answer is what the compact / toast form of this trigger pre-selects next time.
+      PendingPresenter.Remember(CommandUi.PendingChoice, FS09PendingVariant::FromCommand(Command));
       Toast = TEXT("choice sent");
     } else {
       Toast = TEXT("choice not sent - command gate blocked it (see trace)");
@@ -2534,7 +2651,13 @@ void AS08FlowGameMode::HandleHudKeys() {
       BeginAttackDraft();
     }
   } else if (PC->WasInputKeyJustPressed(EKeys::N)) {
-    NoDefenseCommand();
+    if (CommandUi.IsAttackAbilityPromptOpen()) {
+      AttackWithoutAbilityBoostCommand(); // DE-020 (SD-56): "Attack without BOOST"
+    } else {
+      NoDefenseCommand();
+    }
+  } else if (PC->WasInputKeyJustPressed(EKeys::C) && CommandUi.Mode == ES09CommandMode::PendingChoice) {
+    TogglePendingCollapseCommand(); // DE-020 (02-ux-ui-spec §4.6 п. 1): collapse / expand, never cancels
   } else if (PC->WasInputKeyJustPressed(EKeys::R)) {
     ResolveCombatCommand();
   } else if (PC->WasInputKeyJustPressed(EKeys::G)) {
@@ -4915,6 +5038,10 @@ void AS08FlowGameMode::ClearGameplayHud() {
   CombatStage = FS09CombatStage();
   CueDispatcher = FS08CueDispatcher();
   DeathStage = FS09DeathStage();
+  SkippedEffects.Reset();
+  PendingPresenter.Reset();
+  PendingStepTraceKey.Reset();
+  PendingNoTargetsTraceKey.Reset();
   ResultGate.Reset();
   BoardAliveById.Reset();
   FallSeq = -1;
@@ -5614,6 +5741,58 @@ void AS08FlowGameMode::RefreshHud() {
                   .Text(FText::FromString(FString::Printf(
                       TEXT("CONFIRM DISCARD %d/%d (Enter)"), Have, Need)))
                   .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14)))];
+  } else if (CommandUi.Mode == ES09CommandMode::AttackDraft && CommandUi.IsAttackAbilityPromptOpen()) {
+    // DE-020 (SD-56; 02-ux-ui-spec §4.5, §4.6): the hero ability prompt - a deferred choice without a timer in
+    // the pending widget. 1-9 picks the BOOST card, Enter attacks with it, N attacks without, Esc closes the draft.
+    FString AttackerName = TEXT("-");
+    FString TargetName = TEXT("-");
+    for (const FS08BoardFighter& Entry : Fighters) {
+      if (Entry.Id == CommandUi.AttackAttackerId) AttackerName = Entry.Label;
+      if (Entry.Id == CommandUi.AttackTargetId) TargetName = Entry.Label;
+    }
+    FString BoostName = TEXT("-");
+    const TArray<FS09CardView> BoostCards = CommandUi.AttackAbilityBoostCards(EffectiveSnapshot());
+    for (const FS09CardView& Card : BoostCards) {
+      if (Card.InstanceId == CommandUi.AttackAbilityBoostCardId) {
+        BoostName = FString::Printf(TEXT("%s (BOOST %d)"), *Card.Name, Card.BoostValue);
+      }
+    }
+    AddMarker(GS09AttackMarker);
+    AddHeader(TEXT("ABILITY - ") + FS09Reason::Make(TEXT("ms.ability.boost")).Arg(TEXT("fighterName"), AttackerName).Text(),
+              FLinearColor(1.0f, 0.85f, 0.35f, 1.0f));
+    AddLine(FString::Printf(TEXT("attack: %s -> %s   ability boost: %s"), *AttackerName, *TargetName, *BoostName));
+    AddLine(FString::Printf(TEXT("no time limit - 1-9 picks one of %d boost card(s); Enter attacks; N attacks without; Esc closes"),
+                            BoostCards.Num()));
+    CommandBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
+        [SNew(SHorizontalBox) +
+         SHorizontalBox::Slot().AutoWidth().Padding(0, 0, 8, 0)
+             [MakeHudPress(
+                  FName(TEXT("hud.attack.confirm")),
+                  [this]() { return HudBusyReason(); },
+                  [this]() { ConfirmCombat(); },
+                  FMargin(14, 8), FLinearColor::White,
+                  SNew(STextBlock)
+                      .Text(FText::FromString(CommandUi.AttackAbilityBoostCardId.IsEmpty()
+                                                  ? FString(TEXT("ATTACK (Enter)"))
+                                                  : S08WhyText::En(FName(TEXT("ms.btn.boost.attack"))).ToUpper()))
+                      .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14)))] +
+         SHorizontalBox::Slot().AutoWidth().Padding(0, 0, 8, 0)
+             [MakeHudPress(
+                  FName(TEXT("hud.attack.noboost")),
+                  [this]() { return HudBusyReason(); },
+                  [this]() { AttackWithoutAbilityBoostCommand(); },
+                  FMargin(14, 8), FLinearColor::White,
+                  SNew(STextBlock)
+                      .Text(FText::FromString(S08WhyText::En(FName(TEXT("ms.btn.noboost"))).ToUpper()))
+                      .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14)))] +
+         SHorizontalBox::Slot().AutoWidth()
+             [MakeHudPress(
+                  FName(TEXT("hud.attack.close")),
+                  nullptr,
+                  [this]() { CancelDraft(); },
+                  FMargin(14, 8), FLinearColor::White,
+                  SNew(STextBlock).Text(FText::FromString(TEXT("CLOSE DRAFT (Esc)")))
+                       .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14)))]];
   } else if (CommandUi.Mode == ES09CommandMode::AttackDraft) {
     auto FighterLabel = [this](const FString& Id) {
       for (const FS08BoardFighter& Entry : Fighters) {
@@ -5643,7 +5822,7 @@ void AS08FlowGameMode::RefreshHud() {
       }
       AddLine(FString::Printf(TEXT("targets in range: %s"), InRange.IsEmpty() ? TEXT("-") : *InRange));
     }
-    AddLine(TEXT("click an own fighter with an enemy in range (melee: adjacent; ranged: adjacent or same zone), click the enemy, pick 1-9; Enter attacks; A/Esc closes"));
+    AddLine(TEXT("click an own fighter with an enemy in range (melee: adjacent; ranged: adjacent or same zone), click the enemy, pick 1-9; the attack goes with the last pick; A/Esc closes"));
     CommandBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
         [SNew(SHorizontalBox) +
          SHorizontalBox::Slot().AutoWidth().Padding(0, 0, 8, 0)
@@ -5872,20 +6051,112 @@ void AS08FlowGameMode::RefreshHud() {
     AddHeader(TEXT("AFTER COMBAT"), FLinearColor(0.75f, 0.8f, 1.0f, 1.0f));
     AddLine(FString::Printf(TEXT("next: %s - opens when the combat ends (click / Space / Enter skips)"),
                             *CommandUi.PendingChoice.Type));
+  } else if (CommandUi.Mode == ES09CommandMode::PendingChoice && PendingPresenter.IsOpen() &&
+             (PendingPresenter.bCollapsed || PendingPresenter.Present == ES09PendingPresent::Toast)) {
+    // DE-020 (02-ux-ui-spec §4.6 п. 1, п. 6; SD-19, SD-28): the collapsed plate (the board stays visible, a click
+    // or C expands, the choice is NOT cancelled) and the toast of a repeating optional trigger (one row instead
+    // of the modal: Enter uses it with last time's answer pre-selected, X skips, C shows the full choice).
+    const FS08PendingEffect& Pending = CommandUi.PendingChoice;
+    const FString Choice = Pending.Text.IsEmpty() ? Pending.Type : Pending.Text.Left(80);
+    AddMarker(GS09PendingMarker);
+    if (PendingPresenter.bCollapsed) {
+      CommandBox->AddSlot().AutoHeight().Padding(0, 2)
+          [MakeHudPress(
+               FName(TEXT("hud.pending.expand")),
+               nullptr,
+               [this]() { TogglePendingCollapseCommand(); },
+               FMargin(12, 6), FLinearColor(1.0f, 0.85f, 0.4f, 1.0f),
+               SNew(STextBlock)
+                   .Text(FText::FromString(FS09Reason::Make(TEXT("ms.pending.collapsed")).Arg(TEXT("choice"), Pending.Type).Text() +
+                                           TEXT("   ") + S08WhyText::En(FName(TEXT("ms.btn.expand"))).ToUpper()))
+                   .Font(FCoreStyle::GetDefaultFontStyle("Bold", 13)))];
+    } else {
+      AddBigLine(FS09Reason::Make(TEXT("ms.pending.again")).Arg(TEXT("choice"), Choice).Text(),
+                 FLinearColor(1.0f, 1.0f, 0.55f, 1.0f));
+      if (const FS09PendingVariant* Last = PendingPresenter.Remembered()) {
+        AddLine(FS09Reason::Make(TEXT("ms.pending.remembered")).Arg(TEXT("choice"), Last->Describe()).Text());
+      }
+      CommandBox->AddSlot().AutoHeight().Padding(0, 4, 0, 0)
+          [SNew(SHorizontalBox) +
+           SHorizontalBox::Slot().AutoWidth().Padding(0, 0, 8, 0)
+               [MakeHudPress(
+                    FName(TEXT("hud.pending.confirm")),
+                    [this]() { return HudBusyReason(); },
+                    [this]() { ConfirmCombat(); },
+                    FMargin(12, 6), FLinearColor::White,
+                    SNew(STextBlock).Text(FText::FromString(TEXT("CONFIRM (Enter)")))
+                        .Font(FCoreStyle::GetDefaultFontStyle("Bold", 13)))] +
+           SHorizontalBox::Slot().AutoWidth().Padding(0, 0, 8, 0)
+               [MakeHudPress(
+                    FName(TEXT("hud.pending.decline")),
+                    [this]() {
+                      if (HudBusyReason().IsSet()) return HudBusyReason();
+                      return CommandUi.PendingChoice.bOptional ? FS09Reason()
+                                                               : FS09Reason::Make(TEXT("why.choice.required"));
+                    },
+                    [this]() { DeclinePendingChoiceCommand(); },
+                    FMargin(12, 6), FLinearColor::White,
+                    SNew(STextBlock).Text(FText::FromString(TEXT("DECLINE (X)")))
+                        .Font(FCoreStyle::GetDefaultFontStyle("Regular", 13)))] +
+           SHorizontalBox::Slot().AutoWidth()
+               [MakeHudPress(
+                    FName(TEXT("hud.pending.expand")),
+                    nullptr,
+                    [this]() { TogglePendingCollapseCommand(); },
+                    FMargin(12, 6), FLinearColor::White,
+                    SNew(STextBlock).Text(FText::FromString(S08WhyText::En(FName(TEXT("ms.btn.expand"))).ToUpper()))
+                        .Font(FCoreStyle::GetDefaultFontStyle("Regular", 13)))]];
+    }
   } else if (CommandUi.Mode == ES09CommandMode::PendingChoice) {
     // GD-035: the server waits on THIS viewer's queue head. A MANDATORY
     // choice renders louder (red header) than any normal HUD/inspector line.
     const FS08PendingEffect& Pending = CommandUi.PendingChoice;
+    // DE-020 (SD-19): a mandatory choice that comes back every turn is compact - no text / queue lines, last
+    // time's answer pre-selected (FeedPendingPresentation) and named.
+    const bool bCompact = PendingPresenter.IsOpen() && PendingPresenter.Present == ES09PendingPresent::Compact;
     AddMarker(GS09PendingMarker);
     AddHeader(FString::Printf(TEXT("PENDING CHOICE - %s  [%s]"), *Pending.Type,
                               Pending.bOptional ? TEXT("optional - X declines")
+                              : bCompact        ? TEXT("MANDATORY - every turn")
                                                 : TEXT("MANDATORY")),
               Pending.bOptional ? FLinearColor(1.0f, 1.0f, 0.4f, 1.0f)
                                 : FLinearColor(1.0f, 0.35f, 0.35f, 1.0f));
-    if (!Pending.Text.IsEmpty()) AddLine(Pending.Text);
-    if (CommandUi.PendingQueue.Num() > 1) {
-      AddLine(FString::Printf(TEXT("queue: %d choices (this one first)"),
-                              CommandUi.PendingQueue.Num()));
+    if (bCompact) {
+      if (const FS09PendingVariant* Last = PendingPresenter.Remembered()) {
+        AddLine(FS09Reason::Make(TEXT("ms.pending.remembered")).Arg(TEXT("choice"), Last->Describe()).Text() +
+                TEXT(" - Enter repeats"));
+      }
+    } else {
+      if (!Pending.Text.IsEmpty()) AddLine(Pending.Text);
+      if (CommandUi.PendingQueue.Num() > 1) {
+        AddLine(FString::Printf(TEXT("queue: %d choices (this one first)"),
+                                CommandUi.PendingQueue.Num()));
+      }
+    }
+    // DE-020 (MS-R-77; 03 §7 п. 4): "object -> target (up to N)", also in the opponent's turn.
+    if (Flow.IsValid()) {
+      const FS08Snapshot& StepSnap = EffectiveSnapshot();
+      const FS09PendingStep Step = S09DescribePendingStep(CommandUi, StepSnap, BoardModel, Fighters);
+      if (Step.bValid) {
+        if (Step.bOpponentTurn) {
+          AddBigLine(S08WhyText::En(FName(TEXT("ms.pending.opp.turn"))), FLinearColor(1.0f, 0.7f, 0.4f, 1.0f));
+        }
+        AddBigLine(FString::Printf(TEXT("step %d/%d: %s"), Step.Step, Step.Steps, *Step.Prompt.Text()),
+                   FLinearColor(0.8f, 0.88f, 1.0f, 1.0f));
+        const FString StepKey = FString::Printf(TEXT("%s:%d"), *Pending.Id, Step.Step);
+        if (StepKey != PendingStepTraceKey) {
+          PendingStepTraceKey = StepKey;
+          FS08Trace::Write(FString::Printf(TEXT("MS-PENDING step=%s %d/%d n=%d turn=%s id=%s"), Step.StepName(),
+                                           Step.Step, Step.Steps, Step.N, Step.bOpponentTurn ? TEXT("opponent") : TEXT("own"),
+                                           *Pending.Id));
+        }
+      }
+      // D-DE-11 (SD-10, SD-16): no silent wait - nothing to pick is named (MOVE / PLACE: ms.place.no.space below).
+      if (Pending.Type != TEXT("MOVE") && Pending.Type != TEXT("PLACE") &&
+          S09PendingHasNoTargets(CommandUi, StepSnap, BoardModel, Fighters)) {
+        AddBigLine(FS09Reason::Make(TEXT("why.effect.no.targets")).Text() + TEXT(" - waiting for the server"),
+                   FLinearColor(1.0f, 0.55f, 0.35f, 1.0f));
+      }
     }
     // Post-reveal pause (e.g. the owner's BOOST_CHOICE): the committed
     // identities/values are already PUBLIC (both seats render them in the
@@ -5946,7 +6217,7 @@ void AS08FlowGameMode::RefreshHud() {
       if (Prompt.bNoSpace) {
         AddLine(S08WhyText::En(FName(TEXT("ms.place.no.space"))));
       } else if (Prompt.FighterId.IsEmpty()) {
-        AddLine(S08WhyText::En(FName(TEXT("ms.choice.object"))) + TEXT(" - click one of the effect's fighters"));
+        AddLine(TEXT("click one of the effect's fighters (step 1 above)"));
       } else if (!Prompt.bPlace && Prompt.Allowance == 0) {
         AddLine(TEXT("no steps allowed - Stay in place confirms"));
       } else if (!Prompt.bPlace) {
@@ -6094,7 +6365,7 @@ void AS08FlowGameMode::RefreshHud() {
                             .Text(FText::FromString(S08WhyText::En(FName(TEXT("ms.btn.stay"))).ToUpper()))
                             .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14)))
                   : SNullWidget::NullWidget] +
-         SHorizontalBox::Slot().AutoWidth()
+         SHorizontalBox::Slot().AutoWidth().Padding(0, 0, 8, 0)
              [MakeHudPress(
                   FName(TEXT("hud.pending.decline")),
                   [this]() {
@@ -6107,6 +6378,16 @@ void AS08FlowGameMode::RefreshHud() {
                   },
                   FMargin(14, 8), FLinearColor::White,
                   SNew(STextBlock).Text(FText::FromString(TEXT("DECLINE (X)")))
+                       .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14)))] +
+         SHorizontalBox::Slot().AutoWidth()
+             // DE-020 (02-ux-ui-spec §4.6 п. 1, SD-28): collapse to a plate - the board stays visible, the choice
+             // stays open (C / the plate expands it again).
+             [MakeHudPress(
+                  FName(TEXT("hud.pending.collapse")),
+                  nullptr,
+                  [this]() { TogglePendingCollapseCommand(); },
+                  FMargin(14, 8), FLinearColor::White,
+                  SNew(STextBlock).Text(FText::FromString(S08WhyText::En(FName(TEXT("ms.btn.collapse"))).ToUpper()))
                        .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14)))]];
   } else if (CommandUi.bHasPendingChoice) {
     // GD-035: the head belongs to the OPPONENT - their choice, never ours.

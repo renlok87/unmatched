@@ -17,6 +17,8 @@
 
 #include "S09ManeuverUi.h"
 #include "S09HudModel.h"
+#include "S09PendingPresent.h"
+#include "../S08/S08WhyText.h"
 #include "../S08/S08BoardModel.h"
 #include "../S08/S08Contracts.h"
 #include "../S08/S08FlowController.h"
@@ -1151,4 +1153,413 @@ bool FS09PendingDiscardLiveTest::RunTest(const FString&) {
   return true;
 }
 
+// ---- DE-020 (W-11; de-footage/task 02 SD-10, SD-16, SD-19, SD-28, SD-56; 01 F-11): serving the deferred choices
+// Headless run: node tools/s08/run-ue-tests.cjs "Unmatched.S09.PENDING DE-020" <abs log>
+namespace S09De020Test {
+FS08Snapshot WithSkipped(const FS08Snapshot& Snapshot, const TArray<int32>& Ns) {
+  FS08Snapshot Out = Snapshot;
+  const TSharedRef<FJsonObject> Meta = MakeShared<FJsonObject>(*(Snapshot.Metadata->AsObject()));
+  TArray<TSharedPtr<FJsonValue>> Entries;
+  for (const int32 N : Ns) {
+    const TSharedRef<FJsonObject> Entry = MakeShared<FJsonObject>();
+    Entry->SetNumberField(TEXT("n"), N);
+    Entry->SetNumberField(TEXT("seq"), 40 + N);
+    Entry->SetStringField(TEXT("reason"), TEXT("NO_VALID_TARGETS"));
+    Entry->SetStringField(TEXT("playerId"), TEXT("u-host"));
+    Entry->SetStringField(TEXT("effectId"), FString::Printf(TEXT("s1-e%d"), N));
+    Entry->SetStringField(TEXT("kind"), TEXT("PLACE"));
+    Entry->SetStringField(TEXT("text"), TEXT("Place a fighter in any space."));
+    Entries.Add(MakeShared<FJsonValueObject>(Entry));
+  }
+  Entries.Add(MakeShared<FJsonValueString>(TEXT("garbage")));  // malformed entries are skipped
+  const TSharedRef<FJsonObject> NoN = MakeShared<FJsonObject>();
+  NoN->SetStringField(TEXT("reason"), TEXT("NO_VALID_TARGETS"));
+  Entries.Add(MakeShared<FJsonValueObject>(NoN));               // no n: dropped
+  Meta->SetArrayField(TEXT("skippedEffects"), Entries);
+  Out.Metadata = MakeShared<FJsonValueObject>(Meta);
+  return Out;
+}
+
+FS08PendingEffect Head(const TCHAR* Id, const TCHAR* Type, bool bOptional, const TCHAR* Text) {
+  FS08PendingEffect Out;
+  Out.Id = Id;
+  Out.Type = Type;
+  Out.bOptional = bOptional;
+  Out.Text = Text;
+  return Out;
+}
+}  // namespace S09De020Test
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09PendingDe020SkippedTest,
+    "Unmatched.S09.PENDING DE-020 skipped effects: first snapshot primes silently, new n explained once (why.effect.no.targets)",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS09PendingDe020SkippedTest::RunTest(const FString&) {
+  FS08Snapshot Base;
+  if (!LoadS09PendingFixture(TEXT("gd035-move-open-host-view"), Base)) {
+    AddError(TEXT("base fixture not loaded"));
+    return true;
+  }
+  using namespace S09De020Test;
+  TArray<FS09SkippedEffectNote> Notes;
+  TestFalse(TEXT("no field: Parse false (saves without the field = no skips)"),
+            FS09SkippedEffectsFeed::Parse(Base, Notes));
+  const FS08Snapshot Two = WithSkipped(Base, {2, 1});
+  TestTrue(TEXT("field present: Parse true"), FS09SkippedEffectsFeed::Parse(Two, Notes));
+  TestEqual(TEXT("malformed entries / entries without n dropped"), Notes.Num(), 2);
+  TestEqual(TEXT("sorted by n"), Notes.Num() == 2 ? Notes[0].N : -1, 1);
+  TestEqual(TEXT("kind decoded"), Notes.Num() == 2 ? Notes[1].Kind : FString(), FString(TEXT("PLACE")));
+  TestEqual(TEXT("NO_VALID_TARGETS -> why.effect.no.targets"),
+            Notes.Num() == 2 ? Notes[0].Why().Key.ToString() : FString(), FString(TEXT("why.effect.no.targets")));
+  TestTrue(TEXT("the key is in the EN table"), S08WhyText::Has(FName(TEXT("why.effect.no.targets"))));
+
+  // Entry with two old skips: remembered, nothing shown (04 §4.3.1 `n`).
+  FS09SkippedEffectsFeed Feed;
+  TestEqual(TEXT("first snapshot: nothing shown"), Feed.Consume(Two).Num(), 0);
+  TestEqual(TEXT("primed with the largest n"), Feed.LastShownN, 2);
+  TestEqual(TEXT("same body again: nothing"), Feed.Consume(Two).Num(), 0);
+  const TArray<FS09SkippedEffectNote> New = Feed.Consume(WithSkipped(Base, {1, 2, 3, 4}));
+  TestEqual(TEXT("two new notes"), New.Num(), 2);
+  TestEqual(TEXT("oldest first"), New.Num() == 2 ? New[0].N : -1, 3);
+  TestEqual(TEXT("explained once"), Feed.Consume(WithSkipped(Base, {3, 4})).Num(), 0);
+  TestEqual(TEXT("a body without the field shows nothing"), Feed.Consume(Base).Num(), 0);
+
+  // A fresh game (reconnect): primes again, never replays.
+  Feed.Reset();
+  TestEqual(TEXT("after reset the first body primes"), Feed.Consume(WithSkipped(Base, {5})).Num(), 0);
+  TestEqual(TEXT("then n=6 shows"), Feed.Consume(WithSkipped(Base, {5, 6})).Num(), 1);
+  // A first body without skips primes with 0: the first skip of the game is shown.
+  FS09SkippedEffectsFeed Fresh;
+  TestEqual(TEXT("first body without skips"), Fresh.Consume(Base).Num(), 0);
+  TestEqual(TEXT("the first skip of the game is explained"), Fresh.Consume(WithSkipped(Base, {1})).Num(), 1);
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09PendingDe020PresentTest,
+    "Unmatched.S09.PENDING DE-020 presentation: modal first, toast for a repeating optional trigger, compact every turn, collapse, memory",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS09PendingDe020PresentTest::RunTest(const FString&) {
+  using namespace S09De020Test;
+  FS09PendingPresenter P;
+  // Optional trigger (Medusa-like "may deal 1 damage" each turn): first open = modal, then toast.
+  const FS08PendingEffect Opt1 = Head(TEXT("o1"), TEXT("TARGET_FIGHTER"), true, TEXT("You may deal 1 damage."));
+  TestTrue(TEXT("new open"), P.Observe(Opt1, 3));
+  TestEqual(TEXT("first open of an optional trigger: modal"), static_cast<int32>(P.Present),
+            static_cast<int32>(ES09PendingPresent::Modal));
+  TestFalse(TEXT("the same head again is not a new open"), P.Observe(Opt1, 3));
+  TestTrue(TEXT("modal collapses"), P.Collapse());
+  TestTrue(TEXT("collapsed"), P.bCollapsed);
+  TestFalse(TEXT("collapse twice: no change"), P.Collapse());
+  TestTrue(TEXT("toggle expands"), P.Toggle());
+  TestFalse(TEXT("expanded"), P.bCollapsed);
+  FS09PendingVariant Answer;
+  Answer.FighterId = TEXT("f-1-hero");
+  P.Remember(Opt1, Answer);
+  P.Clear();
+  TestFalse(TEXT("cleared: no open"), P.IsOpen());
+  const FS08PendingEffect Opt2 = Head(TEXT("o2"), TEXT("TARGET_FIGHTER"), true, TEXT("You may deal 1 damage."));
+  TestTrue(TEXT("second open"), P.Observe(Opt2, 5));
+  TestEqual(TEXT("repeating optional trigger: toast"), static_cast<int32>(P.Present),
+            static_cast<int32>(ES09PendingPresent::Toast));
+  TestEqual(TEXT("opens before"), P.OpensBefore, 1);
+  TestFalse(TEXT("the toast has no plate"), P.Collapse());
+  TestTrue(TEXT("remembered variant of the signature"), P.Remembered() != nullptr &&
+                                                            P.Remembered()->FighterId == TEXT("f-1-hero"));
+  TestTrue(TEXT("C on the toast opens the full modal"), P.Toggle());
+  TestEqual(TEXT("details: modal"), static_cast<int32>(P.Present), static_cast<int32>(ES09PendingPresent::Modal));
+  TestTrue(TEXT("trace line"), P.TraceLine().StartsWith(TEXT("MS-PENDING present=modal id=o2 opens=1")));
+  // A new open resets the collapse.
+  P.Collapse();
+  const FS08PendingEffect Opt3 = Head(TEXT("o3"), TEXT("TARGET_FIGHTER"), true, TEXT("You may deal 1 damage."));
+  P.Observe(Opt3, 7);
+  TestFalse(TEXT("a new open is never collapsed"), P.bCollapsed);
+
+  // Mandatory every turn: modal, the same turn again = modal (EACH effect), the next turn = compact.
+  const FS08PendingEffect M1 = Head(TEXT("m1"), TEXT("CHOOSE_ONE"), false, TEXT("Choose one: ..."));
+  P.Observe(M1, 3);
+  TestEqual(TEXT("first mandatory open: modal"), static_cast<int32>(P.Present),
+            static_cast<int32>(ES09PendingPresent::Modal));
+  TestTrue(TEXT("no memory yet"), P.Remembered() == nullptr);
+  FS09PendingChoiceCommand Sent;
+  Sent.EffectId = TEXT("m1");
+  Sent.OptionIndex = 7;
+  P.Remember(M1, FS09PendingVariant::FromCommand(Sent));
+  P.Observe(Head(TEXT("m2"), TEXT("CHOOSE_ONE"), false, TEXT("Choose one: ...")), 3);
+  TestEqual(TEXT("same turn again: modal"), static_cast<int32>(P.Present),
+            static_cast<int32>(ES09PendingPresent::Modal));
+  P.Observe(Head(TEXT("m3"), TEXT("CHOOSE_ONE"), false, TEXT("Choose one: ...")), 4);
+  TestEqual(TEXT("next turn: compact"), static_cast<int32>(P.Present),
+            static_cast<int32>(ES09PendingPresent::Compact));
+  TestEqual(TEXT("compact remembers the stable option index"), P.Remembered() ? P.Remembered()->OptionIndex : -1, 7);
+  TestTrue(TEXT("compact collapses too"), P.Collapse());
+  TestEqual(TEXT("variant describe"), FS09PendingVariant::FromCommand(Sent).Describe(), FString(TEXT("option=7")));
+  // Another text = another trigger: modal again.
+  P.Observe(Head(TEXT("x1"), TEXT("CHOOSE_ONE"), false, TEXT("Choose one: other")), 9);
+  TestEqual(TEXT("another signature: modal"), static_cast<int32>(P.Present),
+            static_cast<int32>(ES09PendingPresent::Modal));
+  // A new game forgets.
+  P.Reset();
+  P.Observe(Head(TEXT("m9"), TEXT("CHOOSE_ONE"), false, TEXT("Choose one: ...")), 12);
+  TestEqual(TEXT("reset: modal again"), static_cast<int32>(P.Present), static_cast<int32>(ES09PendingPresent::Modal));
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09PendingDe020StepsTest,
+    "Unmatched.S09.PENDING DE-020 steps and memory: object -> target (up to N) in the opponent's turn, no-target head, remembered variant (synthesized)",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS09PendingDe020StepsTest::RunTest(const FString&) {
+  FS08Snapshot Base;
+  if (!LoadS09PendingFixture(TEXT("gd035-move-open-host-view"), Base)) {
+    AddError(TEXT("base fixture not loaded"));
+    return true;
+  }
+  FString Host, Joiner;
+  PendingViewerIds(Base, Host, Joiner);
+  FS08BoardModel Board;
+  TArray<FS08BoardFighter> Fighters;
+  FS08BoardModel::DecodeFighters(Base.Fighters, Fighters);
+  Board.Decode(Base.BoardState);
+  TArray<FString> OwnAlive;
+  FString EnemyAlive;
+  for (const FS08BoardFighter& Fighter : Fighters) {
+    if (!Fighter.IsAlive()) continue;
+    if (Fighter.OwnerId == Host) {
+      OwnAlive.Add(Fighter.Id);
+    } else if (EnemyAlive.IsEmpty()) {
+      EnemyAlive = Fighter.Id;
+    }
+  }
+  if (OwnAlive.Num() < 2 || EnemyAlive.IsEmpty()) {
+    AddError(TEXT("fixture needs two own living fighters and an enemy"));
+    return true;
+  }
+
+  // ---- MOVE handed to the viewer during the OPPONENT's turn: two steps ----
+  const TSharedRef<FJsonObject> MoveHead = MakeHead(TEXT("de020-move"), Host, TEXT("MOVE"));
+  MoveHead->SetNumberField(TEXT("value"), 2);
+  TArray<TSharedPtr<FJsonValue>> Ids;
+  for (const FString& Id : OwnAlive) Ids.Add(MakeShared<FJsonValueString>(Id));
+  MoveHead->SetArrayField(TEXT("fighterIds"), Ids);
+  FS08Snapshot MoveView = WithPendingHead(Base, MoveHead);
+  MoveView.CurrentTurnPlayerId = Joiner;
+  FS09CommandUi Ui;
+  Ui.ViewerId = Host;
+  Ui.OnSnapshot(MoveView, Board, Fighters);
+  TestEqual(TEXT("MOVE opens for the viewer"), static_cast<int32>(Ui.Mode),
+            static_cast<int32>(ES09CommandMode::PendingChoice));
+  FS09PendingStep Step = S09DescribePendingStep(Ui, MoveView, Board, Fighters);
+  TestTrue(TEXT("step valid"), Step.bValid);
+  TestTrue(TEXT("opponent's turn flagged (MS-R-77)"), Step.bOpponentTurn);
+  TestEqual(TEXT("two steps"), Step.Steps, 2);
+  TestEqual(TEXT("step 1: object"), Step.Step, 1);
+  TestEqual(TEXT("ms.choice.object"), Step.Prompt.Key.ToString(), FString(TEXT("ms.choice.object")));
+  TestEqual(TEXT("step name"), FString(Step.StepName()), FString(TEXT("object")));
+  FString Reason;
+  FString Picked;
+  for (const FString& Id : OwnAlive) {
+    if (Ui.SelectPendingFighter(Id, MoveView, Fighters, Reason) &&
+        !Ui.DescribePendingMovePlace(Board, Fighters).bNoSpace) {
+      Picked = Id;
+      break;
+    }
+  }
+  if (TestFalse(TEXT("a movable fighter picked"), Picked.IsEmpty())) {
+    Step = S09DescribePendingStep(Ui, MoveView, Board, Fighters);
+    TestEqual(TEXT("step 2: target"), Step.Step, 2);
+    TestEqual(TEXT("ms.choice.target"), Step.Prompt.Key.ToString(), FString(TEXT("ms.choice.target")));
+    TestEqual(TEXT("up to N = the allowance"), Step.N, 2);
+    TestEqual(TEXT("EN text"), Step.Prompt.Text(), FString(TEXT("Choose a target (up to 2)")));
+    TestFalse(TEXT("a MOVE with spaces is not a no-target head"), S09PendingHasNoTargets(Ui, MoveView, Board, Fighters));
+  }
+  FS08Snapshot OwnTurn = MoveView;
+  OwnTurn.CurrentTurnPlayerId = Host;
+  TestFalse(TEXT("own turn: not flagged"), S09DescribePendingStep(Ui, OwnTurn, Board, Fighters).bOpponentTurn);
+
+  // ---- TARGET_FIGHTER: one step; an empty / dead target list is a no-target head ----
+  const TSharedRef<FJsonObject> TargetHead = MakeHead(TEXT("de020-target"), Host, TEXT("TARGET_FIGHTER"));
+  TArray<TSharedPtr<FJsonValue>> Targets;
+  Targets.Add(MakeShared<FJsonValueString>(EnemyAlive));
+  TargetHead->SetArrayField(TEXT("targetFighterIds"), Targets);
+  TargetHead->SetBoolField(TEXT("optional"), true);
+  TargetHead->SetStringField(TEXT("text"), TEXT("You may deal 1 damage."));
+  const FS08Snapshot TargetView = WithPendingHead(Base, TargetHead);
+  FS09CommandUi TargetUi;
+  TargetUi.ViewerId = Host;
+  TargetUi.OnSnapshot(TargetView, Board, Fighters);
+  Step = S09DescribePendingStep(TargetUi, TargetView, Board, Fighters);
+  TestTrue(TEXT("TARGET: one step"), Step.bValid && Step.Steps == 1 && Step.Step == 1 && Step.N == 1);
+  TestFalse(TEXT("TARGET with a living target: not empty"),
+            S09PendingHasNoTargets(TargetUi, TargetView, Board, Fighters));
+  const TSharedRef<FJsonObject> EmptyHead = MakeHead(TEXT("de020-empty"), Host, TEXT("TARGET_FIGHTER"));
+  TArray<TSharedPtr<FJsonValue>> Ghost;
+  Ghost.Add(MakeShared<FJsonValueString>(TEXT("no-such-fighter")));
+  EmptyHead->SetArrayField(TEXT("targetFighterIds"), Ghost);
+  const FS08Snapshot EmptyView = WithPendingHead(Base, EmptyHead);
+  FS09CommandUi EmptyUi;
+  EmptyUi.ViewerId = Host;
+  EmptyUi.OnSnapshot(EmptyView, Board, Fighters);
+  TestTrue(TEXT("TARGET without a legal target: named, never a silent wait (D-DE-11)"),
+           S09PendingHasNoTargets(EmptyUi, EmptyView, Board, Fighters));
+  // CHOOSE_ONE has no step line and is never a no-target head.
+  const TSharedRef<FJsonObject> ChooseHead = MakeHead(TEXT("de020-choose"), Host, TEXT("CHOOSE_ONE"));
+  TArray<TSharedPtr<FJsonValue>> Options;
+  for (const int32 Index : {5, 7, 9}) {
+    const TSharedRef<FJsonObject> Option = MakeShared<FJsonObject>();
+    Option->SetNumberField(TEXT("index"), Index);
+    Option->SetStringField(TEXT("label"), FString::Printf(TEXT("Option %d"), Index));
+    Options.Add(MakeShared<FJsonValueObject>(Option));
+  }
+  ChooseHead->SetArrayField(TEXT("options"), Options);
+  const FS08Snapshot ChooseView = WithPendingHead(Base, ChooseHead);
+  FS09CommandUi ChooseUi;
+  ChooseUi.ViewerId = Host;
+  ChooseUi.OnSnapshot(ChooseView, Board, Fighters);
+  TestFalse(TEXT("CHOOSE_ONE: no step line"), S09DescribePendingStep(ChooseUi, ChooseView, Board, Fighters).bValid);
+  TestFalse(TEXT("CHOOSE_ONE: not a no-target head"), S09PendingHasNoTargets(ChooseUi, ChooseView, Board, Fighters));
+
+  // ---- the remembered variant is pre-selected where it is still legal (nothing sent) ----
+  FS09PendingVariant Option7;
+  Option7.OptionIndex = 7;
+  FString Applied;
+  TestTrue(TEXT("CHOOSE_ONE: stable index 7 applied"), S09ApplyPendingVariant(ChooseUi, Option7, ChooseView, Board, Fighters, Applied));
+  TestEqual(TEXT("position of index 7"), ChooseUi.PendingOptionIndex, 1);
+  FS09PendingChoiceCommand Command;
+  TestTrue(TEXT("Enter repeats last time's answer"), ChooseUi.ConfirmPendingChoice(ChooseView, false, Command, Reason));
+  TestEqual(TEXT("payload = the stable index"), Command.OptionIndex, 7);
+  FS09PendingVariant Gone;
+  Gone.OptionIndex = 42;
+  FS09CommandUi ChooseUi2;
+  ChooseUi2.ViewerId = Host;
+  ChooseUi2.OnSnapshot(ChooseView, Board, Fighters);
+  TestFalse(TEXT("an option that no longer exists is not applied"),
+            S09ApplyPendingVariant(ChooseUi2, Gone, ChooseView, Board, Fighters, Applied));
+  TestEqual(TEXT("nothing selected"), ChooseUi2.PendingOptionIndex, -1);
+  FS09PendingVariant Target;
+  Target.FighterId = EnemyAlive;
+  TestTrue(TEXT("TARGET: the remembered fighter applied"),
+           S09ApplyPendingVariant(TargetUi, Target, TargetView, Board, Fighters, Applied));
+  TestTrue(TEXT("TARGET confirm with the remembered fighter"),
+           TargetUi.ConfirmPendingChoice(TargetView, false, Command, Reason) && Command.FighterId == EnemyAlive);
+  FS09PendingVariant Illegal;
+  Illegal.FighterId = OwnAlive[0];  // not in targetFighterIds
+  FS09CommandUi TargetUi2;
+  TargetUi2.ViewerId = Host;
+  TargetUi2.OnSnapshot(TargetView, Board, Fighters);
+  TestFalse(TEXT("an illegal remembered fighter is not applied"),
+            S09ApplyPendingVariant(TargetUi2, Illegal, TargetView, Board, Fighters, Applied));
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09PendingDe020AbilityTest,
+    "Unmatched.S09.PENDING DE-020 attack ability (SD-56): only King Arthur's hero asks, prompt bound to the draft, boost rides on the attack",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS09PendingDe020AbilityTest::RunTest(const FString&) {
+  // The joiner's projection (own hand faces) of the resolve window, turned into the joiner's action phase:
+  // King Arthur (f-1-hero) stands adjacent to Medusa (f-0-hero).
+  FS08Snapshot Snapshot;
+  if (!LoadS09PendingFixture(TEXT("gd034-resolve-window-defender-view"), Snapshot)) {
+    AddError(TEXT("fixture not loaded"));
+    return true;
+  }
+  FString Host, Joiner;
+  PendingViewerIds(Snapshot, Host, Joiner);
+  {
+    const TSharedRef<FJsonObject> Meta = MakeShared<FJsonObject>(*(Snapshot.Metadata->AsObject()));
+    Meta->RemoveField(TEXT("combatInfo"));
+    Meta->RemoveField(TEXT("pendingEffects"));
+    Snapshot.Metadata = MakeShared<FJsonValueObject>(Meta);
+    Snapshot.Phase = TEXT("ACTION_MANEUVER");
+    Snapshot.CurrentTurnPlayerId = Joiner;
+  }
+  FS08BoardModel Board;
+  TArray<FS08BoardFighter> Fighters;
+  FS08BoardModel::DecodeFighters(Snapshot.Fighters, Fighters);
+  Board.Decode(Snapshot.BoardState);
+  FS08BoardFighter* Arthur = nullptr;
+  FS08BoardFighter* Medusa = nullptr;
+  FS08BoardFighter* Merlin = nullptr;
+  for (FS08BoardFighter& Entry : Fighters) {
+    if (Entry.Id == TEXT("f-1-hero")) Arthur = &Entry;
+    if (Entry.Id == TEXT("f-0-hero")) Medusa = &Entry;
+    if (Entry.Id == TEXT("f-1-sk0")) Merlin = &Entry;
+  }
+  if (!Arthur || !Medusa) {
+    AddError(TEXT("Arthur / Medusa not in the fixture"));
+    return true;
+  }
+  // The S09 fixtures predate heroSlug on the wire (game-state.service `sl`): set it as the live projection does.
+  if (Arthur->HeroSlug.IsEmpty()) Arthur->HeroSlug = TEXT("king-arthur");
+  if (Medusa->HeroSlug.IsEmpty()) Medusa->HeroSlug = TEXT("medusa");
+  TestTrue(TEXT("King Arthur's hero boosts his attack"), FS09CommandUi::AllowsAbilityBoost(*Arthur));
+  TestFalse(TEXT("Medusa does not"), FS09CommandUi::AllowsAbilityBoost(*Medusa));
+  if (Merlin) {
+    FS08BoardFighter Sidekick = *Merlin;
+    Sidekick.HeroSlug = TEXT("king-arthur");
+    TestFalse(TEXT("Merlin (sidekick, same slug) never"), FS09CommandUi::AllowsAbilityBoost(Sidekick));
+  }
+  FS08BoardFighter NoSlug = *Arthur;
+  NoSlug.HeroSlug.Reset();
+  TestFalse(TEXT("no heroSlug on the wire: no prompt (the server could not allow it either)"),
+            FS09CommandUi::AllowsAbilityBoost(NoSlug));
+
+  FS09CommandUi Ui;
+  Ui.ViewerId = Joiner;
+  Ui.OnSnapshot(Snapshot, Board, Fighters);
+  Ui.Mode = ES09CommandMode::AttackDraft;  // the player pressed A
+  FString Reason;
+  TestTrue(TEXT("Arthur attacker"), Ui.SelectAttacker(Arthur->Id, Board, Fighters, Reason));
+  TestTrue(TEXT("Medusa target"), Ui.SelectTarget(Medusa->Id, Board, Fighters, Reason));
+  TestFalse(TEXT("prompt closed before it is opened"), Ui.IsAttackAbilityPromptOpen());
+  TestFalse(TEXT("no boost toggle without the prompt"), Ui.ToggleAttackAbilityBoost(TEXT("x"), Snapshot, Reason));
+  FS09PlayerPanel Own;
+  {
+    FS09HudModel Hud;
+    Hud.Build(Snapshot, Joiner, TSet<FString>(), 0, 0);
+    if (Hud.ViewerPanel()) Own = *Hud.ViewerPanel();
+  }
+  for (const FS09CardView& Card : Own.Cards) {
+    if (!Card.bHidden && Ui.ToggleAttackCard(Card.InstanceId, Snapshot, Fighters, Reason) &&
+        Ui.AttackCardId == Card.InstanceId) {
+      break;
+    }
+  }
+  FS09AttackCommand Command;
+  if (!TestTrue(TEXT("a legal attack card for Arthur"), Ui.ConfirmAttack(Snapshot, Board, Fighters, Command, Reason))) {
+    return true;
+  }
+  TestTrue(TEXT("plain confirm: no ability boost"), Command.AbilityBoostCardId.IsEmpty());
+  const TArray<FS09CardView> BoostCards = Ui.AttackAbilityBoostCards(Snapshot);
+  for (const FS09CardView& Card : BoostCards) {
+    TestTrue(TEXT("boost candidates carry a printed BOOST"), Card.bHasBoostValue);
+    TestNotEqual(TEXT("the attack card is never a candidate"), Card.InstanceId, Ui.AttackCardId);
+  }
+  if (BoostCards.Num() == 0) {
+    TestFalse(TEXT("no boost card: no prompt - the attack goes"), Ui.AttackAbilityAvailable(Snapshot, Fighters));
+    return true;
+  }
+  TestTrue(TEXT("Arthur + a boost card: the prompt is offered"), Ui.AttackAbilityAvailable(Snapshot, Fighters));
+  Ui.OpenAttackAbilityPrompt();
+  TestTrue(TEXT("prompt open"), Ui.IsAttackAbilityPromptOpen());
+  TestFalse(TEXT("the attack card cannot boost itself"), Ui.ToggleAttackAbilityBoost(Ui.AttackCardId, Snapshot, Reason));
+  TestTrue(TEXT("boost card picked"), Ui.ToggleAttackAbilityBoost(BoostCards[0].InstanceId, Snapshot, Reason));
+  TestTrue(TEXT("confirm with the prompt open"), Ui.ConfirmAttack(Snapshot, Board, Fighters, Command, Reason));
+  TestEqual(TEXT("abilityBoostCardId rides on the attack"), Command.AbilityBoostCardId, BoostCards[0].InstanceId);
+  TestTrue(TEXT("re-toggle clears"), Ui.ToggleAttackAbilityBoost(BoostCards[0].InstanceId, Snapshot, Reason));
+  TestTrue(TEXT("declined: attack without the boost"),
+           Ui.ConfirmAttack(Snapshot, Board, Fighters, Command, Reason) && Command.AbilityBoostCardId.IsEmpty());
+  // A changed draft closes the prompt: the stale boost never rides on another attack.
+  Ui.ToggleAttackAbilityBoost(BoostCards[0].InstanceId, Snapshot, Reason);
+  Ui.AttackTargetId = TEXT("someone-else");
+  TestFalse(TEXT("another target: the prompt is closed"), Ui.IsAttackAbilityPromptOpen());
+  Ui.AttackTargetId = Medusa->Id;
+  TestTrue(TEXT("back to the same draft: the prompt key matches again"), Ui.IsAttackAbilityPromptOpen());
+  Ui.CloseAttackAbilityPrompt();
+  TestTrue(TEXT("closed prompt: plain attack"),
+           Ui.ConfirmAttack(Snapshot, Board, Fighters, Command, Reason) && Command.AbilityBoostCardId.IsEmpty());
+  TestTrue(TEXT("prompt strings in the EN table"), S08WhyText::Has(FName(TEXT("ms.ability.boost"))) &&
+                                                       S08WhyText::Has(FName(TEXT("ms.btn.noboost"))) &&
+                                                       S08WhyText::Has(FName(TEXT("ms.choice.target"))));
+  return true;
+}
+
 #endif // WITH_AUTOMATION_TESTS
+
