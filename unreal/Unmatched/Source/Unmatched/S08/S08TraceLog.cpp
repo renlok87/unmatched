@@ -10,6 +10,7 @@ bool FS08Trace::bOpen = false;
 bool FS08Trace::bJournal = false;
 TArray<FString> FS08Trace::Journal;
 FString FS08Trace::TeePath;
+FString FS08Trace::Unwritten;
 
 void FS08Trace::Open() {
   if (bOpen) return;
@@ -37,10 +38,17 @@ void FS08Trace::Write(const FString& Line) {
     if (Line.Contains(Marker)) return;
   }
   const FString Stamped = Stamp(Line);
-  FFileHelper::SaveStringToFile(
-      Stamped + LINE_TERMINATOR, *Path,
-      FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM,
-      &IFileManager::Get(), FILEWRITE_Append);
+  // DE-031 (run F G-LIVE): the append shares read access (FILEWRITE_AllowRead) and keeps a failed line for the next
+  // write. Without AllowRead the writer opened the file exclusively, and every append that met a live reader (the
+  // run-duel-demo / run-vs-ai-demo watchdogs read the trace each second) failed and the line was lost - a duel trace
+  // missed 'COMBAT-RESULT' + 'CUE combat ... stage=start' and failed check-trace.
+  Unwritten += Stamped + LINE_TERMINATOR;
+  if (FFileHelper::SaveStringToFile(Unwritten, *Path, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM,
+                                    &IFileManager::Get(), FILEWRITE_Append | FILEWRITE_AllowRead)) {
+    Unwritten.Reset();
+  } else if (Unwritten.Len() > 8 * 1024 * 1024) {
+    Unwritten.Reset();  // the file stays unwritable: bound the memory, the trace has a gap
+  }
   if (bJournal) Journal.Add(Stamped);
   if (!TeePath.IsEmpty()) {
     FFileHelper::SaveStringToFile(Stamped + LINE_TERMINATOR, *TeePath, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM,
@@ -52,6 +60,7 @@ void FS08Trace::Close() {
   if (!bOpen) return;
   Write(TEXT("--- S08 trace close ---"));
   bOpen = false;
+  Unwritten.Reset();
 }
 
 void FS08Trace::SetJournal(bool bOn) {

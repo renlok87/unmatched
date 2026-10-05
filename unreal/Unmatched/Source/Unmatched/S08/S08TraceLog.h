@@ -36,4 +36,6 @@ private:
   static bool bJournal;
   static TArray<FString> Journal;
   static FString TeePath;
+  /** Lines whose append failed (the file was locked) - written before the next line, in order. */
+  static FString Unwritten;
 };
