@@ -26,6 +26,7 @@
 #include "../S09/S09HudPress.h"
 #include "../S09/S09CombatStage.h"
 #include "../S09/S09DeathStage.h"
+#include "../S09/S09ResultScreen.h"
 #include "../S09/S09PendingPresent.h"
 #include "../S09/S09OpponentView.h"
 #include "../S09/S09TurnStatus.h"
@@ -464,6 +465,30 @@ private:
   TArray<FDeferredDamage> DeferredDamage;
   FS09DeathStage DeathStage;
   FS09ResultGate ResultGate;
+  // ---- DE-029 (W-17; 01 F-06, D-DE-06; 02 SD-24, SD-45; 02-ux-ui-spec §2.9): the full-screen result modal and
+  // "посмотреть доску" (S09/S09ResultScreen.h, S08FlowGameModeResult.cpp) ----
+  /** The modal (dim + centred panel) over the whole canvas and the board-view bar; built once with the HUD. */
+  void BuildResultScreenWidgets(const TSharedRef<class SConstraintCanvas>& Canvas);
+  /** RefreshHud on GAME_OVER after the gate: the summary and the panel content (state-driven, idempotent). */
+  void RebuildResultScreen();
+  /** Every frame: opens the view when the gate opens; the intro / crossfade opacity and the hit-test of both layers. */
+  void TickResultScreen();
+  /** "Посмотреть доску" <-> "К итогам" (250 ms crossfade). */
+  void ToggleResultBoard(const TCHAR* Why);
+  /** The keys of the open result screen (02 §2.9); true when a key was taken. */
+  bool HandleResultKeys(class APlayerController* PC);
+  /** DE-029 review tooling (-Bench -BenchResult=results|board [-BenchResultLoser]): the bench fixture turned into the
+   *  server's terminal body of a hero kill (GAME_OVER, winnerId, the loser hero at HP 0) and the result screen opened
+   *  over it - the frame of the modal and of the final board on a real map. No room row: the duration stays unknown. */
+  void BenchResultBegin(const FS08Snapshot& Fixture, bool bBoard, bool bViewerLoses);
+  bool bBenchResult = false;
+  FS08Snapshot BenchResultSnapshot;
+  FS09ResultView ResultView;
+  FS09ResultSummary ResultSummary;
+  FString ResultSummaryTraced;
+  TSharedPtr<class SBorder> ResultOverlay;
+  TSharedPtr<class SBox> ResultPanelBox;
+  TSharedPtr<class SBorder> ResultBoardBar;
   TMap<FString, bool> BoardAliveById;      // DE-019: the board view's alive flags of the last sync
   int32 FallSeq = -1;                      // DE-019: seq of the staged fall being released (RunCombatEvents)
   TArray<FS08BoardFighter> ShownFighters;  // HudFighters() while the staging holds the target

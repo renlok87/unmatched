@@ -157,8 +157,9 @@ void AS08FlowGameMode::NoteActionChosen(const TCHAR* What) {
 void AS08FlowGameMode::TickTurnHud() {
   if (!OwnPortrait || !OpponentPortrait) return;
   const double Now = static_cast<double>(NowMs());
-  // shown with the live match HUD; the result screen (DE-019 gate) takes the whole picture
-  const bool bShow = Hud.bValid && !(Hud.bGameOver && ResultGate.IsShown());
+  // shown with the live match HUD; the result screen (DE-019 gate) takes the whole picture - except its board view
+  // (DE-029, SD-24 p. 1: the final board with the fallen hero's heart), where they fade in with the board bar
+  const bool bShow = Hud.bValid && (!IsResultScreenShown() || ResultView.BoardBarAlpha(static_cast<int64>(Now)) > 0.0f);
   const ESlateVisibility Vis = bShow ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed;
   for (US08TurnPortraitWidget* Portrait : {OwnPortrait.Get(), OpponentPortrait.Get()}) {
     if (Portrait->GetVisibility() != Vis) Portrait->SetVisibility(Vis);
@@ -231,8 +232,9 @@ void AS08FlowGameMode::TickTurnHud() {
   const FString OwnAnim = OwnPortrait->ApplyTracker(Own.Slots, OwnShown, bReset);
   const FString OppAnim = OpponentPortrait->ApplyTracker(Opp.Slots, Opp.Spent, bReset);
   bTrackerResetPending = false;
-  OwnPortrait->SetTrackerOpacity(1.0f);
-  OpponentPortrait->SetTrackerOpacity(ActionTracker.OpponentAlpha(Now, MoveMotion.bReducedMotion));
+  // DE-029: no action is left after GAME_OVER - the final board shows names, HP and the heart, not the trackers
+  OwnPortrait->SetTrackerOpacity(Hud.bGameOver ? 0.0f : 1.0f);
+  OpponentPortrait->SetTrackerOpacity(Hud.bGameOver ? 0.0f : ActionTracker.OpponentAlpha(Now, MoveMotion.bReducedMotion));
   const FString Key = FString::Printf(TEXT("own=%d/%d server=%d local=%d opp=%d/%d oppVisible=%d"), OwnShown, Own.Slots,
                                       Own.Spent, OwnShown > Own.Spent ? 1 : 0, Opp.Spent, Opp.Slots,
                                       ActionTracker.OpponentVisible() ? 1 : 0);

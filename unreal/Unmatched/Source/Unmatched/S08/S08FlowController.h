@@ -32,6 +32,8 @@ struct FS08RoomState {
   FString Mode;
   FString HostId;
   FString BoardId;
+  FString StartedAt;  // DE-029: ISO 8601 from game(id) ('' = not read / null)
+  FString EndedAt;    // set when the row went FINISHED
   TArray<FS08RoomPlayer> Players;
   bool IsHost(const FString& UserId) const { return UserId == HostId; }
 };

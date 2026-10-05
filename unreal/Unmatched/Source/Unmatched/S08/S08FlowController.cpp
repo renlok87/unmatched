@@ -19,9 +19,11 @@ static const TCHAR* MyGamesQuery =
     TEXT(" id code status mode hostId boardId")
     TEXT(" players { userId username heroId isReady seatOrder } } }");
 
+// DE-029: startedAt / endedAt only on the game(id) read - the duration line of the result screen (02 §2.9); the
+// live-room poll that sees the FINISHED row brings endedAt.
 static const TCHAR* GameQuery =
     TEXT("query G($id: String!) { game(id: $id) {")
-    TEXT(" id code status mode hostId boardId")
+    TEXT(" id code status mode hostId boardId startedAt endedAt")
     TEXT(" players { userId username heroId isReady seatOrder } } }");
 
 static const TCHAR* GameByCodeQuery =
@@ -1811,6 +1813,15 @@ void FS08FlowController::ParseRoomFrom(const TSharedPtr<FJsonObject>& Game) {
   NewRoom.Mode = Game->GetStringField(TEXT("mode"));
   NewRoom.HostId = Game->GetStringField(TEXT("hostId"));
   NewRoom.BoardId = Game->GetStringField(TEXT("boardId"));
+  // DE-029: only game(id) asks for the times; a mutation answer of the same room keeps what the last read brought
+  const bool bSameRoom = NewRoom.GameId == Room.GameId;
+  auto Time = [&Game, bSameRoom](const TCHAR* Field, const FString& Kept) {
+    FString Text;
+    if (!Game->HasField(Field)) return bSameRoom ? Kept : FString();
+    return Game->TryGetStringField(Field, Text) ? Text : FString();  // null = not started / not ended
+  };
+  NewRoom.StartedAt = Time(TEXT("startedAt"), Room.StartedAt);
+  NewRoom.EndedAt = Time(TEXT("endedAt"), Room.EndedAt);
   const TArray<TSharedPtr<FJsonValue>>* Players = nullptr;
   if (Game->TryGetArrayField(TEXT("players"), Players) && Players) {
     for (const TSharedPtr<FJsonValue>& Value : *Players) {

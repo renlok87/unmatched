@@ -2777,8 +2777,11 @@ void AS08FlowGameMode::HandleHudKeys() {
   if (!bS09Probe && TerminalScreenOwnsKeys(Flow->GetStage(), Hud.bGameOver,
                                            Flow->IsRoomAborted())) {
     // DE-019: while the hero's death plays out the panel is not up yet - L / Enter wait for it.
-    if ((IsResultScreenShown() || Flow->IsRoomAborted()) &&
-        (PC->WasInputKeyJustPressed(EKeys::L) || PC->WasInputKeyJustPressed(EKeys::Enter))) {
+    // DE-029 (02 §2.9): the result screen routes Enter / Esc / L / V itself (Esc on the board = back to the results).
+    if (IsResultScreenShown()) {
+      HandleResultKeys(PC);
+    } else if (Flow->IsRoomAborted() &&
+               (PC->WasInputKeyJustPressed(EKeys::L) || PC->WasInputKeyJustPressed(EKeys::Enter))) {
       ReturnToLobbyCommand();
     }
     return;
@@ -4874,6 +4877,7 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
   // is not handled a second time below (a HUD press keeps its own action).
   TickCombatStage();
   TickDeathStage();  // DE-019: death lines and the result gate (after the staging released this frame's fall)
+  TickResultScreen();  // DE-029: the modal opens with the gate; intro 500 ms, board crossfade 250 ms
   if (!TryCombatSkip() && !TryCardSlotSkip()) {
     HandleClick();
     HandleHudKeys();
@@ -5298,6 +5302,8 @@ void AS08FlowGameMode::ClearGameplayHud() {
   PendingStepTraceKey.Reset();
   PendingNoTargetsTraceKey.Reset();
   ResultGate.Reset();
+  ResultView.Reset();  // DE-029
+  ResultSummaryTraced.Reset();
   // DE-026: the slot, the held scheme effect and the hand lowering belong to one game
   PlayedCards.Reset();
   CardSlot.Reset();
@@ -5311,7 +5317,10 @@ void AS08FlowGameMode::ClearGameplayHud() {
   bHandPreviewHidden = false;
   bCardSlotQueueOpen = false;
   HandOffsetApplied = 0.0f;
-  if (const TSharedPtr<SWidget> Panel = ArtHud.CommandPanel.Pin()) Panel->SetVisibility(EVisibility::Visible);
+  // DE-029: the result screen collapsed the three gameplay panels
+  for (const TWeakPtr<SWidget>& Panel : {ArtHud.CommandPanel, ArtHud.SidePanel, ArtHud.HandPanel}) {
+    if (const TSharedPtr<SWidget> Widget = Panel.Pin()) Widget->SetVisibility(EVisibility::Visible);
+  }
   if (const TSharedPtr<SWidget> Panel = ArtHud.HandPanel.Pin()) Panel->SetRenderTransform(TOptional<FSlateRenderTransform>());
   // MS-T-17: the opponent view belongs to one game
   LastMoveTracker.Reset();
@@ -5474,6 +5483,7 @@ void AS08FlowGameMode::BuildHudWidgets() {
   BuildOpponentHudWidgets(Canvas);  // MS-T-17: the edge arrow (MS-E-73)
   BuildTurnHudWidgets(Canvas);      // DE-023: the persistent portraits and the "Your turn" banner
   BuildCardSlotWidgets(Canvas);     // DE-026: the source-card slot under the command panel
+  BuildResultScreenWidgets(Canvas); // DE-029: the result modal and the board-view bar, over every panel
 
   GEngine->GameViewport->AddViewportWidgetContent(Canvas, 1);
 }
@@ -5497,18 +5507,9 @@ constexpr FLinearColor GS09ResultMarker(FColor(64, 255, 128, 255));     // #40FF
 // and forbid it in the pre-reveal privacy shot.
 constexpr FLinearColor GS09RevealText(FColor(124, 252, 0, 255));        // #7CFC00
 constexpr FLinearColor GS09PendingMarker(FColor(64, 128, 255, 255));    // #4080FF
-// GD-036: the terminal result screen (#FFD700) - rendered ONLY from the
-// authoritative GAME_OVER snapshot (phase + metadata.winnerId). An aborted
-// room never reaches this render path, so victory and interruption stay
-// visually distinct by construction.
-constexpr FLinearColor GS09ResultScreenMarker(FColor(255, 215, 0, 255)); // #FFD700
-// GD-036 acceptance: one marker per REQUIRED result element (header /
-// outcome / supporting line / button). A capture mid-Slate-paint misses the
-// later elements - the pixel gate can demand the COMPLETE panel, not just a
-// gold presence (the 11:47 host shot carried only the header + outcome).
-constexpr FLinearColor GS09ResultOutcomeMarker(FColor(255, 0, 100, 255));   // #FF0064
-constexpr FLinearColor GS09ResultSupportMarker(FColor(0, 255, 160, 255));   // #00FFA0
-constexpr FLinearColor GS09ResultButtonMarker(FColor(128, 0, 255, 255));    // #8000FF
+// GD-036: the terminal result screen markers (#FFD700 header / #FF0064 outcome / #00FFA0 supporting line / #8000FF
+// button, one per REQUIRED element - the pixel gate demands the COMPLETE panel) live in the DE-029 modal now
+// (S08FlowGameModeResult.cpp, the stripe at the top of the panel); an aborted room never reaches that path.
 // GD-036: the user-facing Lobby entry panel marker (#40C8FF) - gates the
 // lobby-return shot on the CLEAN panel, not on leftover duel artifacts.
 constexpr FLinearColor GS09LobbyPanelMarker(FColor(64, 200, 255, 255));     // #40C8FF
@@ -5655,66 +5656,10 @@ void AS08FlowGameMode::RefreshHud() {
   // DE-019 (01 F-09): GAME_OVER is applied, but the panel waits until the hero's death played out (+1000 ms): the
   // board (and the edge cards of the killing blow) stay the whole picture; no gameplay panel or hand comes back.
   if (Hud.bGameOver && !ResultGate.IsShown()) return;
+  // DE-029 (02 §2.9, SD-45): the full-screen modal over the frozen scene (S08FlowGameModeResult.cpp); the command
+  // panel stays empty and collapsed, "посмотреть доску" crossfades the modal away.
   if (Hud.bGameOver) {
-    if (ResultPanelBuiltAtElapsed < 0.0f) {
-      ResultPanelBuiltAtElapsed = Elapsed; // settle clock for the capture
-    }
-    auto AddMarker = [this](const FLinearColor& Color) {
-      CommandBox->AddSlot().AutoHeight().Padding(0, 0, 0, 4)
-          [SNew(SBox).WidthOverride(220).HeightOverride(14)
-               [SNew(SColorBlock).Color(Color)]];
-    };
-    auto AddHeader = [this](const FString& Text, const FLinearColor& Tint) {
-      CommandBox->AddSlot().AutoHeight().Padding(0, 0, 0, 2)
-          [SNew(STextBlock).Text(FText::FromString(Text))
-               .Font(FCoreStyle::GetDefaultFontStyle("Bold", 16))
-               .ColorAndOpacity(FSlateColor(Tint))];
-    };
-    auto AddLine = [this](const FString& Text) {
-      CommandBox->AddSlot().AutoHeight()
-          [SNew(STextBlock).Text(FText::FromString(Text))
-               .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14))];
-    };
-    auto AddBigLine = [this](const FString& Text, const FLinearColor& Tint) {
-      CommandBox->AddSlot().AutoHeight().Padding(0, 2)
-          [SNew(STextBlock).Text(FText::FromString(Text))
-               .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14))
-               .ColorAndOpacity(FSlateColor(Tint))];
-    };
-    AddMarker(GS09ResultScreenMarker);
-    AddHeader(TEXT("DUEL RESULT"), FLinearColor(1.0f, 0.84f, 0.0f, 1.0f));
-    const FLinearColor OutcomeTint = Hud.bWinnerKnown
-                                         ? (Hud.bViewerWon
-                                                ? FLinearColor(0.35f, 1.0f, 0.45f, 1.0f)
-                                                : FLinearColor(1.0f, 0.45f, 0.45f, 1.0f))
-                                         : FLinearColor(0.8f, 0.8f, 0.85f, 1.0f);
-    AddMarker(GS09ResultOutcomeMarker);
-    AddBigLine(FString::Printf(TEXT("%s%s"), *Hud.OutcomeWord(),
-                               Hud.bWinnerKnown
-                                   ? *FString::Printf(TEXT(" - %s won the duel"),
-                                                      *Hud.WinnerHeroName)
-                                   : Hud.bDraw
-                                         ? TEXT(" - mutual destruction (server verdict)")
-                                         : TEXT(" - outcome unavailable (no server verdict)")),
-               OutcomeTint);
-    AddMarker(GS09ResultSupportMarker);
-    AddLine(FString::Printf(TEXT("seq=%d turnCount=%d - server outcome (GAME_OVER)"),
-                            Hud.SequenceNumber, Hud.TurnCount));
-    AddLine(TEXT("gameplay input is disabled; L or Enter returns you to the lobby"));
-    AddMarker(GS09ResultButtonMarker);
-    CommandBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
-        [MakeHudPress(
-             FName(TEXT("hud.result.lobby")),
-             [this]() { return bS09LobbyReturnSent ? FS09Reason::Make(TEXT("why.syncing")) : FS09Reason(); },
-             [this]() {
-               ReturnToLobbyCommand();
-             },
-             FMargin(14, 8), FLinearColor::White,
-             SNew(STextBlock)
-                  .Text(FText::FromString(bS09LobbyReturnSent
-                                              ? TEXT("RETURNING TO LOBBY...")
-                                              : TEXT("RETURN TO LOBBY (L)")))
-                  .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14)))];
+    RebuildResultScreen();
     return;
   }
 
@@ -8486,6 +8431,13 @@ void AS08FlowGameMode::RunRenderBench() {
       GalleryPortraitsBegin(/*bFromBenchFixture=*/true);
       GalleryPortraitsAt(static_cast<float>(TurnHudMs));
       FS08Trace::Write(FString::Printf(TEXT("BENCH turn-hud at=%.0f portraits=%d"), TurnHudMs, GalleryPortraits.Num()));
+    }
+    // DE-029 (W-17): -BenchResult=results|board - the result screen over the fixture's terminal body on a real map
+    // (the frame of the modal and of the final board); -BenchResultLoser gives the viewer the defeat. Review tooling.
+    FString ResultMode;
+    if (FParse::Value(Cmd, TEXT("BenchResult="), ResultMode) && !ResultMode.IsEmpty()) {
+      BenchResultBegin(Snap, ResultMode.Equals(TEXT("board"), ESearchCase::IgnoreCase),
+                       FParse::Param(Cmd, TEXT("BenchResultLoser")));
     }
     FS08Trace::Write(FString::Printf(
         TEXT("BENCH scene fixture=%s board=%dx%d fighters=%d viewer=%s hero=%s art=%d profile=%s views=%s warmup=%.0f settle=%.0f measure=%.0f fps=%.0f profileGpu=%d csv=%d"),

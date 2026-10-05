@@ -11,11 +11,14 @@
 // from re-sending a scheme whose banner fighter fell (10:41 loop).
 // DE-019 (W-16): death by stages from the contact frame and the result gate (S09DeathStage.h) -
 // Unmatched.S09.DeathStage.Timeline / .ResultGate.
+// DE-029 (W-17): the result screen summary and its view (S09ResultScreen.h) - Unmatched.S09.ResultScreen.Summary /
+// .Duration / .View.
 #if WITH_AUTOMATION_TESTS
 
 #include "S09CombatStage.h"
 #include "S09DeathStage.h"
 #include "S09HudModel.h"
+#include "S09ResultScreen.h"
 #include "S09ManeuverUi.h"
 #include "../S08/S08BoardModel.h"
 #include "../S08/S08Contracts.h"
@@ -721,6 +724,226 @@ bool FS09DeathStageResultGateTest::RunTest(const FString&) {
     Gate.Reset();
     TestFalse("reset: no game over", Gate.IsGameOver() || Gate.IsShown());
   }
+  return true;
+}
+
+// ---------------------------------------------------------------------------------------------------- DE-029
+
+namespace {
+/** Rewrites one array projection entry by entry (the fixture body stays otherwise untouched). */
+TSharedPtr<FJsonValue> MapEntries(const TSharedPtr<FJsonValue>& Array,
+                                  TFunctionRef<void(const TSharedRef<FJsonObject>&)> Edit) {
+  const TArray<TSharedPtr<FJsonValue>>* Entries = nullptr;
+  if (!Array.IsValid() || !Array->TryGetArray(Entries) || !Entries) return Array;
+  TArray<TSharedPtr<FJsonValue>> Out;
+  for (const TSharedPtr<FJsonValue>& Value : *Entries) {
+    const TSharedPtr<FJsonObject>* Object = nullptr;
+    if (!Value.IsValid() || !Value->TryGetObject(Object) || !Object->IsValid()) continue;
+    const TSharedRef<FJsonObject> Copy = MakeShared<FJsonObject>(**Object);
+    Edit(Copy);
+    Out.Add(MakeShared<FJsonValueObject>(Copy));
+  }
+  return MakeShared<FJsonValueArray>(Out);
+}
+
+/** The server's terminal body of a hero kill: the loser's hero at HP 0 and the loser player not alive. */
+FS08Snapshot WithHeroKilled(const FS08Snapshot& Snapshot, const FString& LoserId) {
+  FS08Snapshot Out = Snapshot;
+  Out.Fighters = MapEntries(Out.Fighters, [&LoserId](const TSharedRef<FJsonObject>& F) {
+    if (F->GetStringField(TEXT("ownerId")) == LoserId && F->GetStringField(TEXT("type")) == TEXT("HERO")) {
+      F->SetNumberField(TEXT("health"), 0);
+    }
+  });
+  Out.Players = MapEntries(Out.Players, [&LoserId](const TSharedRef<FJsonObject>& P) {
+    if (P->GetStringField(TEXT("userId")) == LoserId) {
+      P->SetBoolField(TEXT("isAlive"), false);
+      P->SetNumberField(TEXT("health"), 0);
+    }
+  });
+  return Out;
+}
+
+/** Sidekicks first: the winner's harpy stands before Medusa in fighters[] (the s04 case - a harpy struck the last
+ *  blow); the headline must still name the hero. */
+FS08Snapshot WithSidekicksFirst(const FS08Snapshot& Snapshot) {
+  FS08Snapshot Out = Snapshot;
+  const TArray<TSharedPtr<FJsonValue>>* Entries = nullptr;
+  if (!Out.Fighters.IsValid() || !Out.Fighters->TryGetArray(Entries) || !Entries) return Out;
+  TArray<TSharedPtr<FJsonValue>> Sidekicks;
+  TArray<TSharedPtr<FJsonValue>> Heroes;
+  for (const TSharedPtr<FJsonValue>& Value : *Entries) {
+    const TSharedPtr<FJsonObject> F = Value.IsValid() ? Value->AsObject() : nullptr;
+    (F.IsValid() && F->GetStringField(TEXT("type")) == TEXT("HERO") ? Heroes : Sidekicks).Add(Value);
+  }
+  Sidekicks.Append(Heroes);
+  Out.Fighters = MakeShared<FJsonValueArray>(Sidekicks);
+  return Out;
+}
+}  // namespace
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09ResultScreenSummaryTest, "Unmatched.S09.ResultScreen.Summary",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS09ResultScreenSummaryTest::RunTest(const FString&) {
+  FS08Snapshot Base;
+  if (!LoadResultBaseSnapshot(Base)) {
+    AddError(TEXT("base fixture gd035-move-open-host-view not loaded"));
+    return true;
+  }
+  FString First, Second;  // First plays Medusa (+ 3 harpies), Second King Arthur (+ Merlin)
+  if (!FixtureViewerIds(Base, First, Second)) { AddError("players missing"); return true; }
+  const FS08Snapshot Kill = WithSidekicksFirst(WithHeroKilled(WithTerminalState(Base, First), Second));
+  const FString Started = TEXT("2026-10-04T12:00:00.000Z");
+  const FString Ended = TEXT("2026-10-04T12:12:05.400Z");
+
+  // ---- the winner's seat: VICTORY, the headline by the winning HERO (the harpies stand first in fighters[]) ----
+  {
+    FS09HudModel Hud;
+    Hud.Build(Kill, First, TSet<FString>(), Kill.SequenceNumber, Kill.SequenceNumber);
+    const FS09ResultSummary S = FS09ResultSummary::Build(Hud, Kill, Started, Ended);
+    TestTrue("valid on GAME_OVER", S.bValid);
+    TestEqual("outcome", S.Outcome, FString(TEXT("VICTORY")));
+    TestEqual("headline names the hero, not the harpy", S.Headline, FString(TEXT("MEDUSA WINS")));
+    TestEqual("reason: the loser hero's HP", S.ReasonText, FString(TEXT("King Arthur's HP reached 0")));
+    TestTrue("reason kind", S.Reason == ES09ResultReason::HeroHpZero);
+    TestEqual("turn from the snapshot", S.TurnCount, Kill.TurnCount);
+    TestEqual("duration endedAt - startedAt", S.DurationSec, 725);
+    TestEqual("stats line", S.StatsLine(), FString::Printf(TEXT("Turn %d  ·  12:05"), Kill.TurnCount));
+    TestTrue("left = winner = viewer", S.Left.bWinner && S.Left.bViewer && S.Left.PlayerId == First);
+    TestEqual("left hero", S.Left.HeroName, FString(TEXT("Medusa")));
+    TestTrue("left hp", S.Left.bHpKnown && S.Left.Hp == 16 && S.Left.MaxHp == 16);
+    TestFalse("winner is not a silhouette", S.Left.bSilhouette);
+    TestTrue("right = loser silhouette", S.Right.bSilhouette && !S.Right.bWinner && S.Right.PlayerId == Second);
+    TestEqual("right hero", S.Right.HeroName, FString(TEXT("King Arthur")));
+    TestTrue("right hp 0 / 18", S.Right.bHpKnown && S.Right.Hp == 0 && S.Right.MaxHp == 18);
+    TestTrue("trace", S.TraceLine().StartsWith(FString::Printf(
+                          TEXT("RESULT summary outcome=VICTORY winnerHero=Medusa loserHero=King_Arthur reason=hp0 "
+                               "turn=%d duration=725 left=viewer silhouette=1"),
+                          Kill.TurnCount)));
+  }
+  // ---- the loser's seat over the same body: DEFEAT, the winner still left, the viewer is the silhouette ----
+  {
+    FS09HudModel Hud;
+    Hud.Build(Kill, Second, TSet<FString>(), Kill.SequenceNumber, Kill.SequenceNumber);
+    const FS09ResultSummary S = FS09ResultSummary::Build(Hud, Kill, Started, FString());
+    TestEqual("defeat", S.Outcome, FString(TEXT("DEFEAT")));
+    TestEqual("same headline on both seats", S.Headline, FString(TEXT("MEDUSA WINS")));
+    TestTrue("left = opponent winner", S.Left.bWinner && !S.Left.bViewer);
+    TestTrue("right = viewer silhouette", S.Right.bViewer && S.Right.bSilhouette);
+    TestEqual("no endedAt yet: duration unknown", S.DurationSec, -1);
+    TestEqual("stats without duration", S.StatsLine(), FString::Printf(TEXT("Turn %d"), Kill.TurnCount));
+  }
+  // ---- a winner while the loser hero still has HP: the server's verdict, not an invented "HP reached 0" ----
+  {
+    const FS08Snapshot Verdict = WithTerminalState(Base, Second);
+    FS09HudModel Hud;
+    Hud.Build(Verdict, First, TSet<FString>(), Verdict.SequenceNumber, Verdict.SequenceNumber);
+    const FS09ResultSummary S = FS09ResultSummary::Build(Hud, Verdict, Started, Ended);
+    TestEqual("verdict headline", S.Headline, FString(TEXT("KING ARTHUR WINS")));
+    TestTrue("verdict reason", S.Reason == ES09ResultReason::Verdict);
+    TestTrue("the loser is still the silhouette", S.Right.bSilhouette && S.Right.PlayerId == First);
+  }
+  // ---- mutual destruction: no winner, nobody is a silhouette, the viewer stays left ----
+  {
+    const FS08Snapshot Draw = WithAllPlayersDead(WithTerminalState(Base, FString()));
+    FS09HudModel Hud;
+    Hud.Build(Draw, Second, TSet<FString>(), Draw.SequenceNumber, Draw.SequenceNumber);
+    const FS09ResultSummary S = FS09ResultSummary::Build(Hud, Draw, Started, Ended);
+    TestEqual("draw outcome", S.Outcome, FString(TEXT("DRAW")));
+    TestEqual("draw headline", S.Headline, FString(TEXT("MUTUAL DESTRUCTION")));
+    TestTrue("draw reason", S.Reason == ES09ResultReason::Draw);
+    TestTrue("viewer left", S.Left.bViewer && S.Left.PlayerId == Second);
+    TestFalse("no silhouette", S.Left.bSilhouette || S.Right.bSilhouette || S.Left.bWinner || S.Right.bWinner);
+  }
+  // ---- no verdict / a live body ----
+  {
+    const FS08Snapshot NoVerdict = WithTerminalState(Base, FString());
+    FS09HudModel Hud;
+    Hud.Build(NoVerdict, First, TSet<FString>(), NoVerdict.SequenceNumber, NoVerdict.SequenceNumber);
+    const FS09ResultSummary S = FS09ResultSummary::Build(Hud, NoVerdict, Started, Ended);
+    TestTrue("unknown reason", S.Reason == ES09ResultReason::Unknown);
+    TestEqual("unknown headline", S.Headline, FString(TEXT("NO SERVER VERDICT")));
+    FS09HudModel Live;
+    Live.Build(Base, First, TSet<FString>(), Base.SequenceNumber, Base.SequenceNumber);
+    TestFalse("a live body is no result", FS09ResultSummary::Build(Live, Base, Started, Ended).bValid);
+  }
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09ResultScreenDurationTest, "Unmatched.S09.ResultScreen.Duration",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS09ResultScreenDurationTest::RunTest(const FString&) {
+  TestEqual("12:05", FS09ResultSummary::DurationSeconds(TEXT("2026-10-04T12:00:00.000Z"),
+                                                        TEXT("2026-10-04T12:12:05.999Z")), 725);
+  TestEqual("over an hour", FS09ResultSummary::DurationSeconds(TEXT("2026-10-04T23:30:00Z"),
+                                                               TEXT("2026-10-05T00:32:05Z")), 3725);
+  TestEqual("not ended", FS09ResultSummary::DurationSeconds(TEXT("2026-10-04T12:00:00Z"), FString()), -1);
+  TestEqual("not started", FS09ResultSummary::DurationSeconds(FString(), TEXT("2026-10-04T12:00:00Z")), -1);
+  TestEqual("garbage", FS09ResultSummary::DurationSeconds(TEXT("yesterday"), TEXT("2026-10-04T12:00:00Z")), -1);
+  TestEqual("reversed", FS09ResultSummary::DurationSeconds(TEXT("2026-10-04T12:00:10Z"), TEXT("2026-10-04T12:00:00Z")),
+            -1);
+  TestEqual("m:ss", FS09ResultSummary::FormatDuration(725), FString(TEXT("12:05")));
+  TestEqual("0:07", FS09ResultSummary::FormatDuration(7), FString(TEXT("0:07")));
+  TestEqual("h:mm:ss", FS09ResultSummary::FormatDuration(3725), FString(TEXT("1:02:05")));
+  TestEqual("unknown", FS09ResultSummary::FormatDuration(-1), FString(TEXT("-")));
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09ResultScreenViewTest, "Unmatched.S09.ResultScreen.View",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS09ResultScreenViewTest::RunTest(const FString&) {
+  FS09ResultView View;
+  TestFalse("hidden before the gate", View.IsOpen());
+  TestEqual("hidden: no modal", View.ResultsAlpha(0), 0.0f);
+  TestTrue("hidden: keys do nothing", View.OnKey(ES09ResultKey::Enter) == ES09ResultAction::None);
+  TestFalse("hidden: no toggle", View.ToggleBoard(10));
+
+  // ---- the intro: 500 ms fade in (SD-45 p. 3), then exactly 1 - and it never closes by itself (F-06) ----
+  TestTrue("opens", View.Open(1000));
+  TestFalse("second open keeps the mode", View.Open(1100));
+  TestEqual("intro start", View.ResultsAlpha(1000), 0.0f);
+  TestEqual("intro half", View.ResultsAlpha(1250), 0.5f);
+  TestEqual("intro done", View.ResultsAlpha(1000 + FS09ResultView::IntroMs), 1.0f);
+  TestEqual("one minute later still up", View.ResultsAlpha(61000), 1.0f);
+  TestTrue("still the results", View.Mode() == ES09ResultMode::Results);
+  TestEqual("no board bar on the results", View.BoardBarAlpha(61000), 0.0f);
+  TestTrue("results take clicks", View.ResultsHitTestable());
+  // ---- keys on the results (02 §2.9): Enter / Esc / L = lobby, V = board ----
+  TestTrue("Enter lobby", View.OnKey(ES09ResultKey::Enter) == ES09ResultAction::Lobby);
+  TestTrue("Esc lobby", View.OnKey(ES09ResultKey::Escape) == ES09ResultAction::Lobby);
+  TestTrue("L lobby", View.OnKey(ES09ResultKey::L) == ES09ResultAction::Lobby);
+  TestTrue("V board", View.OnKey(ES09ResultKey::V) == ES09ResultAction::ToggleBoard);
+
+  // ---- "view the board": a 250 ms crossfade ----
+  TestTrue("to the board", View.ToggleBoard(70000));
+  TestTrue("board mode", View.IsBoardView());
+  TestFalse("the fading modal takes no clicks", View.ResultsHitTestable());
+  TestEqual("crossfade start", View.ResultsAlpha(70000), 1.0f);
+  TestEqual("crossfade half", View.ResultsAlpha(70125), 0.5f);
+  TestEqual("bar half", View.BoardBarAlpha(70125), 0.5f);
+  TestEqual("crossfade done", View.ResultsAlpha(70000 + FS09ResultView::CrossfadeMs), 0.0f);
+  TestEqual("bar up", View.BoardBarAlpha(70250), 1.0f);
+  TestEqual("the board stays", View.ResultsAlpha(200000), 0.0f);
+  // ---- keys on the board: Esc = back to the results, Enter / L = lobby, V toggles ----
+  TestTrue("board Esc back", View.OnKey(ES09ResultKey::Escape) == ES09ResultAction::ToggleBoard);
+  TestTrue("board Enter lobby", View.OnKey(ES09ResultKey::Enter) == ES09ResultAction::Lobby);
+  TestTrue("board L lobby", View.OnKey(ES09ResultKey::L) == ES09ResultAction::Lobby);
+  TestTrue("board V back", View.OnKey(ES09ResultKey::V) == ES09ResultAction::ToggleBoard);
+
+  // ---- back to the results: the crossfade only, no second intro ----
+  TestTrue("to the results", View.ToggleBoard(300000));
+  TestEqual("back start", View.ResultsAlpha(300000), 0.0f);
+  TestEqual("back done in 250 ms (no 500 ms intro)", View.ResultsAlpha(300000 + FS09ResultView::CrossfadeMs), 1.0f);
+  TestEqual("bar gone", View.BoardBarAlpha(300250), 0.0f);
+  // ---- a toggle mid-fade starts from where the modal stands ----
+  View.ToggleBoard(400000);
+  View.ToggleBoard(400100);  // the modal stood at 0.6
+  TestTrue("mid-fade from 0.6", FMath::IsNearlyEqual(View.ResultsAlpha(400100), 0.6f, 1e-4f));
+  TestEqual("mid-fade done", View.ResultsAlpha(400350), 1.0f);
+  TestEqual("toggles counted", View.Toggles(), 4);
+
+  View.Reset();
+  TestFalse("reset hides", View.IsOpen());
+  TestEqual("reset alpha", View.ResultsAlpha(400350), 0.0f);
   return true;
 }
 
