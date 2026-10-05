@@ -118,9 +118,11 @@ bool FS09ResultGate::Update(int64 NowMs, int32 Seq, bool bGameOver, bool bHeroFa
   if (bShown) return false;
   const int64 Cap = GameOverMs + MaxWaitMs;
   int64 Due = DueMs(bHeroFallPending);
-  // A combat staging still on screen (an earlier seq than the death) finishes first; the cap still wins.
-  const bool bHeldByStaging = Due >= 0 && StagingEndMs > Due;
-  if (bHeldByStaging) Due = StagingEndMs;
+  // A combat staging still on screen (an earlier seq than the death) finishes first; the cap still wins. The end is
+  // remembered: on the tick the staging ends it is no longer active and the caller passes -1.
+  if (StagingEndMs >= 0) HeldStagingEndMs = FMath::Max(HeldStagingEndMs, StagingEndMs);
+  const bool bHeldByStaging = Due >= 0 && HeldStagingEndMs > Due;
+  if (bHeldByStaging) Due = HeldStagingEndMs;
   if (Due < 0 || Due > Cap) Due = Cap;
   if (NowMs < Due) return false;
   bShown = true;
@@ -131,7 +133,7 @@ bool FS09ResultGate::Update(int64 NowMs, int32 Seq, bool bGameOver, bool bHeroFa
                             HeroGoneMs >= 0 ? *FString::Printf(TEXT("%lld"), static_cast<long long>(HeroGoneMs))
                                             : TEXT("-"),
                             static_cast<long long>(NowMs - GameOverMs),
-                            bHeldByStaging ? *FString::Printf(TEXT(" staging=%lld"), static_cast<long long>(StagingEndMs))
+                            bHeldByStaging ? *FString::Printf(TEXT(" staging=%lld"), static_cast<long long>(HeldStagingEndMs))
                                            : TEXT(""));
   return true;
 }
