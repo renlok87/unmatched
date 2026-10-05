@@ -118,3 +118,14 @@ FString S09TurnHud::Monogram(const FString& Name) {
   }
   return Out.IsEmpty() ? FString(TEXT("?")) : Out;
 }
+
+float S09TurnHud::HandPanelLeft(float CanvasWidthSu, float PanelWidthSu, float ObstacleRightSu) {
+  const float Centred = 0.5f * (CanvasWidthSu - PanelWidthSu);
+  if (ObstacleRightSu <= 0.0f) return Centred;
+  return FMath::Max(Centred, ObstacleRightSu + HandGutterSu);
+}
+
+float S09TurnHud::HandStripWrap(float CanvasWidthSu, float ObstacleRightSu, float PanelPaddingSu) {
+  const float Left = ObstacleRightSu > 0.0f ? ObstacleRightSu + HandGutterSu : HandEdgeSu;
+  return FMath::Max(200.0f, CanvasWidthSu - Left - HandEdgeSu - PanelPaddingSu);
+}

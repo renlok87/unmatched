@@ -40,9 +40,12 @@ TSharedRef<SWidget> AS08FlowGameMode::BuildHandLimitHint() {
   return SAssignNew(HandHintBox, SBox)
       .Visibility(EVisibility::Collapsed)
       .Padding(FMargin(0.0f, 0.0f, 0.0f, 6.0f))
+      // run E review (acceptance defect 3): the button sizes to both lines (VAlign fill, its own padding below the
+      // second line) - "Click to close" is never cut by the button's edge
       [SNew(SButton)
            .IsFocusable(false)
-           .ContentPadding(FMargin(12.0f, 6.0f))
+           .VAlign(VAlign_Fill)
+           .ContentPadding(FMargin(12.0f, 6.0f, 12.0f, 8.0f))
            .ButtonColorAndOpacity(HintSrgb(0x5A, 0x46, 0x1E))
            .OnClicked_Lambda([this]() {
              DismissHandLimitHint();
@@ -53,11 +56,11 @@ TSharedRef<SWidget> AS08FlowGameMode::BuildHandLimitHint() {
                 [SAssignNew(HandHintText, STextBlock)
                      .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14))
                      .ColorAndOpacity(FSlateColor(HintSrgb(0xFF, 0xE6, 0xA8)))] +
-            SVerticalBox::Slot().AutoHeight().Padding(0.0f, 2.0f, 0.0f, 0.0f)
+            SVerticalBox::Slot().AutoHeight().Padding(0.0f, 3.0f, 0.0f, 0.0f)
                 [SNew(STextBlock)
                      .Text(FText::FromString(S08WhyText::En(FName(TEXT("ms.hint.close")))))
                      .Font(FCoreStyle::GetDefaultFontStyle("Regular", 12))
-                     .ColorAndOpacity(FSlateColor(HintSrgb(0xD8, 0xD0, 0xBC)))]]];
+                     .ColorAndOpacity(FSlateColor(HintSrgb(0xEC, 0xE4, 0xD0)))]]];
 }
 
 void AS08FlowGameMode::FeedHandLimitHint(const FS08Snapshot& Snapshot) {

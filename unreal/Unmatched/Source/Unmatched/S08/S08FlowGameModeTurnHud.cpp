@@ -77,7 +77,7 @@ void AS08FlowGameMode::BuildTurnHudWidgets(const TSharedRef<SConstraintCanvas>& 
       .Alignment(FVector2D(0.0f, 1.0f))
       .Offset(FMargin(GPortraitEdgeSu, -GPortraitEdgeSu, 0.0f, 0.0f))
       .AutoSize(true)
-      [SNew(SVerticalBox).Visibility(EVisibility::SelfHitTestInvisible) +
+      [SAssignNew(TurnPortraitColumn, SVerticalBox).Visibility(EVisibility::SelfHitTestInvisible) +
        SVerticalBox::Slot().AutoHeight().Padding(0.0f, 0.0f, 0.0f, GPortraitGapSu)[OpponentPortrait->TakeWidget()] +
        SVerticalBox::Slot().AutoHeight()[OwnPortrait->TakeWidget()]];
   // CUE-015: the banner of the own turn start (our decision, 01 F-07) - never a hit-test target
@@ -100,6 +100,14 @@ void AS08FlowGameMode::BuildTurnHudWidgets(const TSharedRef<SConstraintCanvas>& 
   ArtHud.PendingTrace.Add(FString::Printf(TEXT("HUD-TURN config portraits=1 %s ringIcon=%d banner=%d"),
                                           *TurnHudLook.Describe(), OwnPortrait->HasRingIcon() ? 1 : 0,
                                           FMath::RoundToInt(FS09TurnCue::BannerMs)));
+}
+
+float AS08FlowGameMode::HandObstacleRightSu() const {
+  if (!TurnPortraitColumn.IsValid() || !OwnPortrait || OwnPortrait->GetVisibility() == ESlateVisibility::Collapsed) {
+    return 0.0f;
+  }
+  const float Width = TurnPortraitColumn->GetDesiredSize().X;
+  return Width > 0.0f ? GPortraitEdgeSu + Width : 0.0f;
 }
 
 void AS08FlowGameMode::FeedTurnHud(const FS08Snapshot& Snapshot) {
@@ -162,6 +170,24 @@ void AS08FlowGameMode::TickTurnHud() {
     TurnBanner->SetRenderOpacity(Alpha);
   }
   if (!bShow) return;
+  // run E review (acceptance defect 2): where the hand panel stands next to the portrait column
+  if (const TSharedPtr<SWidget> Hand = ArtHud.HandPanel.Pin()) {
+    const float CanvasW = HudCanvas.IsValid() ? HudCanvas->GetCachedGeometry().GetLocalSize().X : 0.0f;
+    const float Column = HandObstacleRightSu();
+    const float PanelW = Hand->GetDesiredSize().X;
+    if (CanvasW > 0.0f && Column > 0.0f && PanelW > 0.0f) {
+      const float Left = S09TurnHud::HandPanelLeft(CanvasW, PanelW, Column);
+      const bool bShifted = Left > 0.5f * (CanvasW - PanelW) + 0.5f;
+      const FString Key = FString::Printf(TEXT("%d|%.0f"), bShifted ? 1 : 0, Column);
+      if (Key != HandLayoutTraceKey) {
+        HandLayoutTraceKey = Key;
+        FS08Trace::Write(FString::Printf(
+            TEXT("HUD-HAND layout left=%.0f panel=%.0f canvas=%.0f columnRight=%.0f gutter=%.0f shifted=%d wrap=%.0f"),
+            Left, PanelW, CanvasW, Column, S09TurnHud::HandGutterSu, bShifted ? 1 : 0,
+            S09TurnHud::HandStripWrap(CanvasW, Column, 20.0f)));
+      }
+    }
+  }
 
   // names, team colours, HP and the heart from the SHOWN fighters (the staging holds the HP to the contact)
   const FString ViewerId = ViewerIdNow();

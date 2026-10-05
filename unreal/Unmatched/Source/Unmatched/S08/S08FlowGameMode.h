@@ -701,6 +701,11 @@ private:
   bool bTurnRingAtRest = false;
   FString TurnHudShownKey;
   TSharedPtr<class SBorder> TurnBanner;
+  /** The bottom-left column of the two portraits (an obstacle of the hand panel and of the fighter plate). */
+  TSharedPtr<class SVerticalBox> TurnPortraitColumn;
+  /** Run E review: the right edge of the portrait column (slate units) while it is shown, else 0. */
+  float HandObstacleRightSu() const;
+  FString HandLayoutTraceKey;
   // ---- DE-024 (W-23; 02 SD-42, SD-43): the hand limit - the one-shot rule toast (UI-ACC-012) over the hand strip and
   // one discard picker for the limit and an effect's DISCARD_CARDS (S09/S09HandLimit.h, S08FlowGameModeHandLimit.cpp) ----
   /** The persistent rule toast (built once inside the hand panel, collapsed until shown; a hit-test target only over

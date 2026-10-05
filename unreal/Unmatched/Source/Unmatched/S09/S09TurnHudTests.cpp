@@ -3,7 +3,9 @@
 //                                   none on the first snapshot / reconnect, none after GAME_OVER), merges change nothing;
 //   Unmatched.S09.TurnHud.Tracker - the own slot is marked at the choice (draft open / sent), given back on cancel, the
 //                                   server marks take over, a refused or lost answer drops the latch, a new turn resets;
-//   Unmatched.S09.TurnHud.Heart   - damage / deplete / heal of the shown hero HP, first sample and other hero silent.
+//   Unmatched.S09.TurnHud.Heart   - damage / deplete / heal of the shown hero HP, first sample and other hero silent;
+//   Unmatched.S09.TurnHud.HandLayout - run E review: the hand panel clears the portrait column (centred while it fits,
+//                                   else pushed right of it; the chips wrap before the right edge).
 #if WITH_AUTOMATION_TESTS
 
 #include "S09TurnHud.h"
@@ -119,6 +121,27 @@ bool FS09TurnHudHeartTest::RunTest(const FString& Parameters) {
   TestEqual(TEXT("monogram two words"), S09TurnHud::Monogram(TEXT("King Arthur")), FString(TEXT("KA")));
   TestEqual(TEXT("monogram one word"), S09TurnHud::Monogram(TEXT("Medusa")), FString(TEXT("M")));
   TestEqual(TEXT("monogram empty"), S09TurnHud::Monogram(TEXT("")), FString(TEXT("?")));
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09TurnHudHandLayoutTest, "Unmatched.S09.TurnHud.HandLayout",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FS09TurnHudHandLayoutTest::RunTest(const FString&) {
+  // 1920 su canvas, the column ends at 24 + 220 = 244 su: the hand may start at 256
+  TestEqual(TEXT("no portraits: centred as before"), S09TurnHud::HandPanelLeft(1920.0f, 1000.0f, 0.0f), 460.0f);
+  TestEqual(TEXT("a narrow hand stays centred"), S09TurnHud::HandPanelLeft(1920.0f, 1000.0f, 244.0f), 460.0f);
+  // the run E frame: 7 long names ~1650 su wide - centred it would start at 135, under the portraits
+  TestEqual(TEXT("a wide hand is pushed right of the column"), S09TurnHud::HandPanelLeft(1920.0f, 1650.0f, 244.0f),
+            256.0f);
+  TestEqual(TEXT("the chips wrap before the right edge"), S09TurnHud::HandStripWrap(1920.0f, 244.0f, 20.0f),
+            1920.0f - 256.0f - 16.0f - 20.0f);
+  TestEqual(TEXT("no portraits: edge to edge"), S09TurnHud::HandStripWrap(1920.0f, 0.0f, 20.0f),
+            1920.0f - 32.0f - 20.0f);
+  TestEqual(TEXT("never below a usable width"), S09TurnHud::HandStripWrap(300.0f, 244.0f, 20.0f), 200.0f);
+  // the panel that fills the room from the column to the right edge ends 16 su before it
+  const float Wrap = S09TurnHud::HandStripWrap(1920.0f, 244.0f, 20.0f);
+  const float Left = S09TurnHud::HandPanelLeft(1920.0f, Wrap + 20.0f, 244.0f);
+  TestEqual(TEXT("a full-width panel ends at the right gap"), Left + Wrap + 20.0f, 1920.0f - 16.0f);
   return true;
 }
 

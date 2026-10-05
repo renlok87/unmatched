@@ -108,4 +108,15 @@ UNMATCHED_API const TCHAR* HeartEventName(ES09HeartEvent Event);
 UNMATCHED_API FName HeartAnim(ES09HeartEvent Event);
 /** "Ab Cd" -> "AC", "Medusa" -> "M": the monogram of the portrait disc (no portrait art yet, ICON-MOTION.md). */
 UNMATCHED_API FString Monogram(const FString& Name);
+
+/** Run E review (acceptance defect 2): the hand panel (the event feed, the status line, "YOUR HAND n/7" and the card
+ *  chips) never slides under the portrait column at the bottom left. Slate units of the HUD canvas. */
+constexpr float HandGutterSu = 12.0f;  // between the portrait column and the hand panel
+constexpr float HandEdgeSu = 16.0f;    // the hand panel's gap to the right screen edge (and the left one, no column)
+/** The hand panel's left edge: centred on the screen while that clears the column (ObstacleRightSu + gutter), else
+ *  pushed right to the column's edge plus the gutter. ObstacleRightSu <= 0 (no portraits): centred, as before. */
+UNMATCHED_API float HandPanelLeft(float CanvasWidthSu, float PanelWidthSu, float ObstacleRightSu);
+/** The width the card chips may take before they wrap to a second row: from the column (or the left edge) to the
+ *  right edge, minus the panel's own horizontal padding. */
+UNMATCHED_API float HandStripWrap(float CanvasWidthSu, float ObstacleRightSu, float PanelPaddingSu);
 }  // namespace S09TurnHud

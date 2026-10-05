@@ -5412,9 +5412,17 @@ void AS08FlowGameMode::BuildHudWidgets() {
                [SNew(SScrollBox) +
                SScrollBox::Slot()[SAssignNew(PanelsBox, SVerticalBox)]]]];
 
+  // Run E review (acceptance defect 2): centred at the bottom while it clears the DE-023 portrait column, else its
+  // left edge sits right of the column (S09TurnHud::HandPanelLeft); the chips wrap before the right edge.
   Canvas->AddSlot()
-      .Anchors(FAnchors(0.5f, 1.0f))
-      .Alignment(FVector2D(0.5f, 1.0f))
+      .Anchors(FAnchors(0.0f, 1.0f))
+      .Alignment(FVector2D(0.0f, 1.0f))
+      .Offset(TAttribute<FMargin>::CreateLambda([this]() {
+        const TSharedPtr<SWidget> Panel = ArtHud.HandPanel.Pin();
+        const float CanvasW = HudCanvas.IsValid() ? HudCanvas->GetCachedGeometry().GetLocalSize().X : 0.0f;
+        const float PanelW = Panel.IsValid() ? Panel->GetDesiredSize().X : 0.0f;
+        return FMargin(S09TurnHud::HandPanelLeft(CanvasW, PanelW, HandObstacleRightSu()), 0.0f, 0.0f, 0.0f);
+      }))
       .AutoSize(true)
       [SAssignNew(HandPanelBorder, SBorder)
            .BorderImage(FCoreStyle::Get().GetBrush("WhiteBrush"))
@@ -5768,7 +5776,11 @@ void AS08FlowGameMode::RefreshHud() {
   // ---- own hand strip (exact instance ids - GD-032) ----
   const FS09PlayerPanel* Own = Hud.ViewerPanel();
   if (Own) {
-    TSharedRef<SHorizontalBox> Strip = SNew(SHorizontalBox);
+    // Run E review: the chips wrap to a second row before they reach the right edge or the portrait column
+    TSharedRef<SWrapBox> Strip = SNew(SWrapBox).PreferredSize(TAttribute<float>::CreateLambda([this]() {
+      const float CanvasW = HudCanvas.IsValid() ? HudCanvas->GetCachedGeometry().GetLocalSize().X : 1920.0f;
+      return S09TurnHud::HandStripWrap(CanvasW > 0.0f ? CanvasW : 1920.0f, HandObstacleRightSu(), 20.0f);
+    }));
     // DE-024 (SD-43): an open discard (the limit or an effect's DISCARD_CARDS) lights the whole hand - every own card
     // a candidate, the picked ones marked; the colours stay off the S09 state markers (#FF00FF, #00FFFF ...).
     const FS09DiscardPick DiscardPick = FS09DiscardPick::From(CommandUi);
@@ -5803,7 +5815,7 @@ void AS08FlowGameMode::RefreshHud() {
                                                                   bSelected ? 0.16f : 0.10f, 1.0f)
                                                    : FLinearColor(bSelected ? 0.42f : 0.22f, bSelected ? 0.42f : 0.22f,
                                                                   bSelected ? 0.42f : 0.22f, 1.0f);
-      Strip->AddSlot().AutoWidth().Padding(3)
+      Strip->AddSlot().Padding(3)
           [MakeHudPress(
                FName(*(TEXT("hand.") + Card.InstanceId)),
                nullptr,
@@ -7559,7 +7571,9 @@ void AS08FlowGameMode::UpdatePlate(bool bActive) {
     }
     if (ArtHud.bIconVisible) In.Soft.Add(ArtHud.IconPlanned);
   }
-  for (const TWeakPtr<SWidget>& Panel : {ArtHud.CommandPanel, ArtHud.SidePanel, ArtHud.HandPanel}) {
+  // run E review: the DE-023 portrait column and the DE-026 card slot are HUD panels for the plate too
+  for (const TWeakPtr<SWidget>& Panel : {ArtHud.CommandPanel, ArtHud.SidePanel, ArtHud.HandPanel,
+                                         TWeakPtr<SWidget>(TurnPortraitColumn), TWeakPtr<SWidget>(CardSlotBox)}) {
     FS08ScreenRect R;
     if (WidgetViewportRect(Panel.Pin(), R) && !R.IsEmpty()) In.Soft.Add(R);
   }
