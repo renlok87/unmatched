@@ -19,7 +19,8 @@
 // broadcasts OnChanged: a running client re-reads the motion settings without a restart (the next move seq and the
 // next combat staging use the new speed). Until the settings screen exists the console command
 //   s08.Settings [speed=<none|fast|normal|slow>] [reduced=0|1] [shake=0|1] [ruleHints=0|1] [master=<0-100>]
-//                [masterMute=0|1] [ambience=<0-100>] [ambienceMute=0|1]
+//                [masterMute=0|1] [ambience=<0-100>] [ambienceMute=0|1] [music=<0-100>] [sfx=<0-100>] [ui=<0-100>]
+//                [vo=<0-100>] [subtitles=0|1] [describeSounds=0|1]   (AU-S4)
 // changes the saved values, saves them and broadcasts OnChanged (no arguments: prints the current values).
 #pragma once
 
@@ -34,13 +35,26 @@ struct UNMATCHED_API FS08AudioSettings {
   bool bMasterMuted = false;
   int32 AmbiencePercent = 60;
   bool bAmbienceMuted = false;
+  // AU-S4 (docs/game-design/audio/02-audio-design.md §5.1; 02-ux-ui-spec UI-ACC-007..009 + the new VO and subtitle
+  // rows UI-ACC-014..016):
+  int32 MusicPercent = 60;        // UI-ACC-007
+  int32 SfxPercent = 80;          // UI-ACC-008 "Эффекты"
+  int32 UiPercent = 80;           // UI-ACC-009 "Интерфейс"
+  int32 VoPercent = 80;           // UI-ACC-014 "Голоса"
+  bool bSubtitles = true;         // UI-ACC-015
+  bool bDescribeSounds = false;   // UI-ACC-016 "Описывать звуки"
   /** The ambience gain 0..1 after the master volume and both mutes (the backdrop sound, SD-51). */
   float AmbienceGain() const;
   /** The master gain 0..1 after its mute. */
   float MasterGain() const;
+  /** The gain 0..1 of a bus WITHOUT master (master is the device volume): Music / SFX / UI / VO / Ambience (with its
+   *  mute); 1 for an unknown class. */
+  float BusGain(const FString& SoundClass) const;
   bool operator==(const FS08AudioSettings& Other) const {
     return MasterPercent == Other.MasterPercent && bMasterMuted == Other.bMasterMuted &&
-           AmbiencePercent == Other.AmbiencePercent && bAmbienceMuted == Other.bAmbienceMuted;
+           AmbiencePercent == Other.AmbiencePercent && bAmbienceMuted == Other.bAmbienceMuted &&
+           MusicPercent == Other.MusicPercent && SfxPercent == Other.SfxPercent && UiPercent == Other.UiPercent &&
+           VoPercent == Other.VoPercent && bSubtitles == Other.bSubtitles && bDescribeSounds == Other.bDescribeSounds;
   }
 };
 
@@ -108,6 +122,27 @@ public:
 
   UPROPERTY(config)
   bool bAmbienceMuted = false;
+
+  /** AU-S4 (02-audio-design §5.1): the bus volumes, percent 0-100 (UI-ACC-007..009, UI-ACC-014). */
+  UPROPERTY(config)
+  int32 MusicVolume = 60;
+
+  UPROPERTY(config)
+  int32 SfxVolume = 80;
+
+  UPROPERTY(config)
+  int32 UiVolume = 80;
+
+  UPROPERTY(config)
+  int32 VoVolume = 80;
+
+  /** UI-ACC-015: VO subtitles (on by default, 02 §3.4). */
+  UPROPERTY(config)
+  bool bSubtitles = true;
+
+  /** UI-ACC-016: describe meaningful wordless sounds in the subtitle line (off by default). */
+  UPROPERTY(config)
+  bool bDescribeSounds = false;
 
   /** UI-ACC-012 of this run: -S08RuleHints=on|off (also 1|0, true|false; any case) wins over the saved value; another
    *  value keeps it. */

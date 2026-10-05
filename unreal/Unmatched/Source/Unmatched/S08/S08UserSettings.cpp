@@ -40,6 +40,15 @@ float FS08AudioSettings::MasterGain() const { return Gain(MasterPercent, bMaster
 
 float FS08AudioSettings::AmbienceGain() const { return MasterGain() * Gain(AmbiencePercent, bAmbienceMuted); }
 
+float FS08AudioSettings::BusGain(const FString& SoundClass) const {
+  if (SoundClass == TEXT("Ambience")) return Gain(AmbiencePercent, bAmbienceMuted);
+  if (SoundClass == TEXT("Music")) return Gain(MusicPercent, false);
+  if (SoundClass == TEXT("SFX")) return Gain(SfxPercent, false);
+  if (SoundClass == TEXT("UI")) return Gain(UiPercent, false);
+  if (SoundClass == TEXT("VO")) return Gain(VoPercent, false);
+  return 1.0f;
+}
+
 US08UserSettings* US08UserSettings::Get() { return GetMutableDefault<US08UserSettings>(); }
 
 void US08UserSettings::SetToDefaults() {
@@ -59,6 +68,12 @@ FS08AudioSettings US08UserSettings::GetSavedAudio() const {
   Out.bMasterMuted = bMasterMuted;
   Out.AmbiencePercent = FMath::Clamp(AmbienceVolume, 0, 100);
   Out.bAmbienceMuted = bAmbienceMuted;
+  Out.MusicPercent = FMath::Clamp(MusicVolume, 0, 100);
+  Out.SfxPercent = FMath::Clamp(SfxVolume, 0, 100);
+  Out.UiPercent = FMath::Clamp(UiVolume, 0, 100);
+  Out.VoPercent = FMath::Clamp(VoVolume, 0, 100);
+  Out.bSubtitles = bSubtitles;
+  Out.bDescribeSounds = bDescribeSounds;
   return Out;
 }
 
@@ -67,6 +82,12 @@ void US08UserSettings::SetSavedAudio(const FS08AudioSettings& Audio) {
   bMasterMuted = Audio.bMasterMuted;
   AmbienceVolume = FMath::Clamp(Audio.AmbiencePercent, 0, 100);
   bAmbienceMuted = Audio.bAmbienceMuted;
+  MusicVolume = FMath::Clamp(Audio.MusicPercent, 0, 100);
+  SfxVolume = FMath::Clamp(Audio.SfxPercent, 0, 100);
+  UiVolume = FMath::Clamp(Audio.UiPercent, 0, 100);
+  VoVolume = FMath::Clamp(Audio.VoPercent, 0, 100);
+  bSubtitles = Audio.bSubtitles;
+  bDescribeSounds = Audio.bDescribeSounds;
 }
 
 FS08AudioSettings US08UserSettings::AudioNow() {
@@ -93,7 +114,8 @@ bool US08UserSettings::ApplySetting(const FString& Name, const FString& Value, F
   static const FBoolSetting Bools[] = {
       {TEXT("reduced"), &US08UserSettings::bReducedMotion}, {TEXT("shake"), &US08UserSettings::bScreenShake},
       {TEXT("ruleHints"), &US08UserSettings::bRuleHints},   {TEXT("masterMute"), &US08UserSettings::bMasterMuted},
-      {TEXT("ambienceMute"), &US08UserSettings::bAmbienceMuted}};
+      {TEXT("ambienceMute"), &US08UserSettings::bAmbienceMuted}, {TEXT("subtitles"), &US08UserSettings::bSubtitles},
+      {TEXT("describeSounds"), &US08UserSettings::bDescribeSounds}};
   for (const FBoolSetting& B : Bools) {
     if (!Name.Equals(B.Name, ESearchCase::IgnoreCase)) continue;
     if (!ParseBool(Value, Flag)) {
@@ -103,12 +125,21 @@ bool US08UserSettings::ApplySetting(const FString& Name, const FString& Value, F
     this->*B.Field = Flag;
     return true;
   }
-  if (Name.Equals(TEXT("master"), ESearchCase::IgnoreCase) || Name.Equals(TEXT("ambience"), ESearchCase::IgnoreCase)) {
+  struct FPercentSetting {
+    const TCHAR* Name;
+    int32 US08UserSettings::*Field;
+  };
+  static const FPercentSetting Percents[] = {
+      {TEXT("master"), &US08UserSettings::MasterVolume}, {TEXT("ambience"), &US08UserSettings::AmbienceVolume},
+      {TEXT("music"), &US08UserSettings::MusicVolume},   {TEXT("sfx"), &US08UserSettings::SfxVolume},
+      {TEXT("ui"), &US08UserSettings::UiVolume},         {TEXT("vo"), &US08UserSettings::VoVolume}};
+  for (const FPercentSetting& P : Percents) {
+    if (!Name.Equals(P.Name, ESearchCase::IgnoreCase)) continue;
     if (!ParsePercent(Value, Percent)) {
-      OutError = FString::Printf(TEXT("%s=%s: 0-100"), *Name, *Value);
+      OutError = FString::Printf(TEXT("%s=%s: 0-100"), P.Name, *Value);
       return false;
     }
-    (Name.Equals(TEXT("master"), ESearchCase::IgnoreCase) ? MasterVolume : AmbienceVolume) = Percent;
+    this->*P.Field = Percent;
     return true;
   }
   OutError = FString::Printf(TEXT("unknown setting %s"), *Name);
@@ -119,10 +150,12 @@ FString US08UserSettings::Describe() const {
   const FS08MotionSettings Motion = GetSavedMotion();
   const FS08AudioSettings Audio = GetSavedAudio();
   return FString::Printf(
-      TEXT("speed=%s reduced=%d shake=%d ruleHints=%d master=%d masterMute=%d ambience=%d ambienceMute=%d"),
+      TEXT("speed=%s reduced=%d shake=%d ruleHints=%d master=%d masterMute=%d ambience=%d ambienceMute=%d music=%d "
+           "sfx=%d ui=%d vo=%d subtitles=%d describeSounds=%d"),
       S08Motion::SpeedName(Motion.Speed), Motion.bReducedMotion ? 1 : 0, Motion.bScreenShake ? 1 : 0,
       bRuleHints ? 1 : 0, Audio.MasterPercent, Audio.bMasterMuted ? 1 : 0, Audio.AmbiencePercent,
-      Audio.bAmbienceMuted ? 1 : 0);
+      Audio.bAmbienceMuted ? 1 : 0, Audio.MusicPercent, Audio.SfxPercent, Audio.UiPercent, Audio.VoPercent,
+      Audio.bSubtitles ? 1 : 0, Audio.bDescribeSounds ? 1 : 0);
 }
 
 namespace {

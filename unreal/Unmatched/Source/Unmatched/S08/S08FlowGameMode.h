@@ -37,6 +37,9 @@
 #include "../S09/S09CardSlot.h"
 #include "S08CueDispatcher.h"
 #include "S08CueSound.h"
+#include "S08MusicDirector.h"
+#include "S08VoDirector.h"
+#include "S08Ambience.h"
 #include "S08MoveAnim.h"
 #include "S08TurnPortraitWidget.h"
 #include "S08FlowGameMode.generated.h"
@@ -144,6 +147,22 @@ struct FS10AbortProofTransitions {
   }
 };
 
+
+/** AU-S4: a one-shot due later (a dissolve after the settle, a VO answer, the result line). */
+struct FS08DelayedSound {
+  int64 DueMs = 0;
+  FString BankId;      // a bank id, or the VO event for SoundClass "VO"
+  FString SoundClass;  // UI / SFX / Music / Ambience / VO
+  FString Tag;         // trace tag, or the VO speaker key
+  bool bAnswer = false;
+};
+
+/** AU-S4: a hit of this frame - hits of one frame are one sound (02-audio-design §4.5). */
+struct FS08PendingHit {
+  FS08SoundRequest Request;
+  int32 Damage = 0;
+  bool bStaged = false;
+};
 
 UCLASS()
 class AS08FlowGameMode : public AGameModeBase {
@@ -473,6 +492,54 @@ private:
   void PlayHitSound(const FString& FighterId, int32 Seq, int64 DueMs);
   void PlayTurnSound(int32 Seq, bool bOwnTurn);
   void PlayResultSting(int32 Seq, int64 ScreenMs);
+  // ---- AU-S4 (S08FlowGameModeAudio.cpp, docs/game-design/audio/02-audio-design.md): the music of the match, the hero
+  // lines with subtitles, the map ambience and the extra CUE sounds (005/006/008/009/010/012/013/014).
+  FS08MusicDirector Music;
+  FS08VoDirector Vo;
+  FS08AmbienceScheduler Ambience;
+  FRandomStream AudioRng;
+  TArray<FS08DelayedSound> DelayedSounds;
+  TArray<FS08PendingHit> PendingHits;
+  TMap<FString, int32> AudioLastHp;
+  TSet<FString> AudioLowHpDone;
+  FString AudioMapKey;
+  FString AudioOwnHeroKey;
+  bool bAudioMatchStarted = false;
+  bool bAudioDiscardDraft = false;
+  bool bVoPlaying = false;
+  bool bIdleOffered = false;
+  int32 AudioIdleCount = 0;
+  int32 AudioOwnTurns = 0;
+  int32 AudioOwnHand = -1;
+  int32 AudioOppHand = -1;
+  int64 AudioLastInputMs = 0;
+  int64 SubtitleUntilMs = 0;
+  TSharedPtr<class SBox> SubtitleBox;
+  TSharedPtr<class STextBlock> SubtitleText;
+  void InitAudioRuntime();
+  void ShutdownAudioRuntime();
+  void TickAudioRuntime();
+  class USoundBase* LoadAudio(const FString& SoftPath);
+  void PlayBankSfx(const FString& BankId, const TCHAR* SoundClass, const TCHAR* Tag, float GainMul = 1.0f);
+  void PlayCueBank(const TCHAR* CueId, const FString& Subject, int32 Seq, const FString& BankId);
+  void DelaySound(int32 InMs, const FString& BankId, const TCHAR* SoundClass, const TCHAR* Tag);
+  void DelaySoundVo(const FString& Event, const FString& Speaker, int32 InMs, bool bAnswer = false);
+  void StartTheme(const FString& Theme);
+  void StartAmbience(const FString& MapKey, TArray<FString>& OutLines);
+  void OfferVoLine(const FString& Event, const FString& SpeakerKey, bool bAnswer = false, int32 HarpyIndex = 1);
+  FString AudioKeyOf(const FString& FighterId, int32* OutHarpyIndex = nullptr) const;
+  FString HeroKeyOfOwner(const FString& OwnerId) const;
+  void AudioOnApplied(const FS08Snapshot& Snapshot, const TArray<FS08BoardFighter>& Before);
+  void AudioOnAttackDeclared(const FString& AttackerId, int32 Seq);
+  void AudioOnDefensePlayed(const FString& TargetId, int32 Seq);
+  void AudioOnCombatEvent(const FS09CombatStageEvent& Event);
+  void AudioOnHit(const FString& FighterId, int32 Seq, int64 DueMs);
+  void AudioOnDeath(const FString& FighterId, bool bHero, int32 Seq, int32 DissolveAtMs);
+  void AudioOnCardSlot(const FS09SlotCard& Card);
+  void AudioOnTurn(bool bOwnTurn);
+  /** CUE-016: the director picks the sting of the own hero and outcome; returns its bank id. */
+  FString AudioOnResult();
+  void NoteAudioInput();
   // MS-T-16: the motion settings (US08UserSettings + flags, read at BeginPlay), the move pose parameters and the
   // damage cues held until their target arrives. DE-025: re-read when the settings are saved (US08UserSettings::
   // OnChanged) - the next move seq and the next combat staging use them, no restart.
@@ -969,6 +1036,15 @@ private:
   // DE-032: the loaded CUE sounds by soft path (null entries = a path that did not load; warned once).
   UPROPERTY()
   TMap<FString, TObjectPtr<UObject>> CueSoundAssets;
+  // AU-S4: the two layers of the theme, the VO voice and the ambience beds.
+  UPROPERTY()
+  TObjectPtr<class UAudioComponent> MusicL1;
+  UPROPERTY()
+  TObjectPtr<class UAudioComponent> MusicL2;
+  UPROPERTY()
+  TObjectPtr<class UAudioComponent> VoAudio;
+  UPROPERTY()
+  TArray<TObjectPtr<class UAudioComponent>> AmbBeds;
   // W4-C: the UMG art HUD widgets (plate, icon) hosted in HudCanvas slots.
   UPROPERTY()
   TArray<TObjectPtr<UUserWidget>> ArtHudWidgets;

@@ -39,6 +39,11 @@ const TCHAR* S09CombatEventName(ES09CombatEvent Event) {
     case ES09CombatEvent::Minus: return TEXT("minus");
     case ES09CombatEvent::Hp: return TEXT("hp");
     case ES09CombatEvent::Fall: return TEXT("fall");
+    case ES09CombatEvent::FlipAttack: return TEXT("flip_attack");
+    case ES09CombatEvent::FlipDefense: return TEXT("flip_defense");
+    case ES09CombatEvent::Effect: return TEXT("effect");
+    case ES09CombatEvent::Slam: return TEXT("slam");
+    case ES09CombatEvent::Block: return TEXT("block");
     default: return TEXT("end");
   }
 }
@@ -211,6 +216,8 @@ bool FS09CombatStage::Start(const FS09CombatStageInput& InInput, int64 NowMs, FS
                                FlipLenMs, ContactOffsetMs, *Input.ContactSource, R.AttackValue, R.DefenseValue,
                                AttackerWins() ? TEXT("win") : TEXT("hold")));
   Cues.Feed(RevealCue, SceneSubject, Input.Seq, StartMs, OutLines, HoldTotalMs(), Scaled(FS09CombatTiming::RevealMs));
+  Release(ES09CombatEvent::FlipAttack, StartMs, OutEvents);                  // AU-S4: the attack card turns now
+  Release(ES09CombatEvent::FlipDefense, StartMs + DefenseFlipMs, OutEvents);  // the defense card ~120 ms later
   Tick(NowMs, Cues, OutLines, OutEvents);
   return true;
 }
@@ -236,6 +243,7 @@ void FS09CombatStage::Tick(int64 NowMs, FS08CueDispatcher& Cues, TArray<FString>
         Phase = ES09CombatStagePhase::Effects;
         OutLines.Add(Prefix(TEXT("effect"), T) + FString::Printf(TEXT(" i=%d ms=%d skipped=%d"), B.Index + 1,
                                                                  EffectMs[B.Index], EffectSkipped[B.Index] ? 1 : 0));
+        Release(ES09CombatEvent::Effect, T, OutEvents);
         break;
       case EBoundary::Slam: {
         Phase = ES09CombatStagePhase::Slam;
@@ -243,6 +251,7 @@ void FS09CombatStage::Tick(int64 NowMs, FS08CueDispatcher& Cues, TArray<FString>
         OutLines.Add(Prefix(TEXT("slam"), T) + FString::Printf(TEXT(" a=%d d=%d outcome=%s"), R.AttackValue,
                                                                R.DefenseValue,
                                                                AttackerWins() ? TEXT("win") : TEXT("hold")));
+        Release(ES09CombatEvent::Slam, T, OutEvents);
         break;
       }
       case EBoundary::SlamEnd:
@@ -268,6 +277,8 @@ void FS09CombatStage::Tick(int64 NowMs, FS08CueDispatcher& Cues, TArray<FString>
           OutLines.Add(Prefix(TEXT("hit"), T) +
                        FString::Printf(TEXT(" target=%s tint=%d"), *Input.TargetId, GetHitTintMs()));
           Release(ES09CombatEvent::HitReact, T, OutEvents);
+        } else if (Input.Damage == 0) {
+          Release(ES09CombatEvent::Block, T, OutEvents);  // AU-S4: damage 0 - the block sound in the contact frame
         }
         break;
       case EBoundary::Minus:

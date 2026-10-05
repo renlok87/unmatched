@@ -78,7 +78,9 @@ struct UNMATCHED_API FS09CombatStageInput {
   FS09CombatReveal Reveal;      // the cards for the edge-of-field HUD layer (SD-48 p. 4)
 };
 
-enum class ES09CombatEvent : uint8 { Lunge, HitReact, Minus, Hp, Fall, End };
+// AU-S4: FlipAttack / FlipDefense (the reveal flips, the defense +120 ms), Effect (a fired effect line), Slam and
+// Block (the contact frame of a combat without damage) - the sound of the staging (02-audio-design §4.5).
+enum class ES09CombatEvent : uint8 { Lunge, HitReact, Minus, Hp, Fall, End, FlipAttack, FlipDefense, Effect, Slam, Block };
 struct UNMATCHED_API FS09CombatStageEvent {
   ES09CombatEvent Type = ES09CombatEvent::End;
   int64 AtMs = 0;

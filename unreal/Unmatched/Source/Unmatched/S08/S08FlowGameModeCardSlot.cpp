@@ -202,6 +202,7 @@ void AS08FlowGameMode::FeedCardSlot(const FS08Snapshot& Snapshot, const TArray<F
     bool bReleased = false;
     const bool bShown = CardSlot.Show(Card, Now, MoveMotion.bReducedMotion, Lines, bReleased);
     Flush();
+    if (bShown) AudioOnCardSlot(Card);  // AU-S4: scheme seal + signature effect + line, boost reveal, discard
     if (bReleased) OnCardSlotReleased(/*bPlayCues=*/true, TEXT("replace"), Snapshot.SequenceNumber);
     if (bShown && CardSlot.HoldsEffect()) {
       SlotHeldFighters = FightersBefore;  // the HUD and the board keep these until the effect is due

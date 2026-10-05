@@ -38,7 +38,7 @@ class TableTests(unittest.TestCase):
         cases = []
         t = copy.deepcopy(TABLE); row(t, "CUE-011")["duration_ms"] = 800; cases.append((t, "duration_ms"))
         t = copy.deepcopy(TABLE); row(t, "CUE-011")["vfx"]["socket"] = "Tail"; cases.append((t, "сокет"))
-        t = copy.deepcopy(TABLE); row(t, "CUE-011")["sfx"]["status"] = "present"; cases.append((t, "present без пути"))
+        t = copy.deepcopy(TABLE); row(t, "CUE-011")["sfx"]["sound"] = None; cases.append((t, "present без пути"))
         t = copy.deepcopy(TABLE); row(t, "CUE-008")["interrupted_by"] = ["CUE-099"]; cases.append((t, "interrupted_by"))
         t = copy.deepcopy(TABLE); r = row(t, "CUE-013"); r["duration_ms"] = 1200; cases.append((t, "P3"))
         t = copy.deepcopy(TABLE); t["cues"] = t["cues"][:-1]; cases.append((t, "07"))
@@ -598,10 +598,35 @@ class SoundGateTests(unittest.TestCase):
         errs, summary = cc.check_trace(self.good(), TABLE)
         self.assertEqual(errs, [])
         self.assertEqual(summary["sounds"], 12)
-        self.assertEqual(summary["sound_points"], {"ui": 4, "hit": 1, "step": 4, "turn": 2, "result": 1})
+        self.assertEqual(summary["sound_points"], {"ui": 4, "hit": 1, "step": 4, "turn": 2, "result": 1, "cue": 0})
         self.assertEqual((summary["sound_fallback"], summary["sound_silent"], summary["sound_throttled"]), (10, 1, 1))
         self.assertEqual(summary["audio_lines"], 2)
         self.assertEqual(summary["sound_dt_max"], 0)
+
+    def test_bus_gains_cue_point_and_grouped_hits(self):
+        """AU-S4: gain = master x bus of the class; the cue point; one sound per frame of hits, the rest grouped."""
+        audio = ("CUE audio master=100 master_mute=0 ambience=60 ambience_mute=0 gain_master=1.00 gain_ambience=0.60 "
+                 "music=60 sfx=80 ui=80 vo=80 subtitles=1 t=0 applied=start")
+        good = [audio,
+                snd("CUE-003", "ui", 1000, gain="0.80"),
+                snd("CUE-008", "cue", 1100, seq="40", subject="arthur", sound="SW_CMB_ATTACK_DECLARE_01", gain="0.80",
+                    result="played"),
+                "CUE combat seq=41 stage=contact t=2000 offset=292 window=900 src=notify",
+                snd("CUE-011", "hit", 2000, seq="41", subject="medusa", sound="SW_CMB_HIT_MULTI_01", gain="0.80",
+                    result="played", extra="bank=CMB-HIT-MULTI due=2000"),
+                snd("CUE-011", "hit", 2000, seq="41", subject="harpy1", sound="none", gain="0.80", result="silent",
+                    extra="bank=CMB-HIT-MULTI due=2000 reason=grouped"),
+                "RESULT screen seq=50 t=9000 due=9000 gameOver=9000 heroGone=- wait=0",
+                snd("CUE-016", "result", 9000, seq="50", sound="SW_STG_WIN_ARTHUR", gain="0.60", result="played",
+                    extra="bank=STG-WIN-ARTHUR")]
+        self.assertEqual(self.codes(good), set())
+        # the old gain (master only) is wrong now for a UI sound at 80 %
+        self.assertIn("AU8", self.codes([audio, snd("CUE-003", "ui", 1000, gain="1.00")]))
+        # a grouped reason outside a hit
+        self.assertIn("AU4", self.codes([audio, snd("CUE-003", "ui", 1000, sound="none", gain="0.80", result="silent",
+                                                    extra="reason=grouped")]))
+        # a trace without the bus fields keeps the old rule (100 %)
+        self.assertEqual(self.codes([AUDIO_START, snd("CUE-003", "ui", 1000, gain="1.00")]), set())
 
     def test_sound_off_the_event_frame(self):
         self.assertIn("AU2", self.codes([AUDIO_START, snd("CUE-003", "ui", 1033, ev=1000)]))

@@ -257,7 +257,9 @@ class ReferenceDispatcher:
         if not spec:
             return "none"
         key = {"vfx": "system", "sfx": "sound", "clip": "sequence"}[channel]
-        path = self.present.get(cid, {}).get(channel) or spec.get(key)
+        # AU-S4: the sound of a CUE is played by FS08CueSound (`CUE sound` lines, banks of the table); the dispatcher's
+        # sfx slot is filled only by a fixture's assets_present - like the C++ fixture resolver (S08CueDispatcherTests)
+        path = self.present.get(cid, {}).get(channel) or (spec.get(key) if channel != "sfx" else None)
         if not path and channel == "clip":
             path = fighter_clip(spec, subject)
         if not path or path in self.unloadable:
@@ -656,7 +658,12 @@ SOUND_RE = re.compile(r"(CUE sound\b.*)$")
 AUDIO_RE = re.compile(r"(CUE audio\b.*)$")
 HUD_TURN_RE = re.compile(r"(HUD-TURN seq=.*)$")
 SOUND_POINTS = {"ui": ("CUE-002", "CUE-003", "CUE-004"), "hit": ("CUE-011",), "step": ("CUE-007",),
-                "turn": ("CUE-015",), "result": ("CUE-016",)}
+                "turn": ("CUE-015",), "result": ("CUE-016",),
+                # AU-S4 (docs/game-design/audio/02-audio-design.md §4): the other CUE sounds in their visual frame
+                "cue": ("CUE-005", "CUE-006", "CUE-008", "CUE-009", "CUE-010", "CUE-012", "CUE-013", "CUE-014",
+                        "CUE-017", "CUE-018")}
+# AU-S4: the bus volumes of `CUE audio` (absent in older traces = 100 %): a sound's gain = master x its bus.
+AUDIO_BUSES = {"Music": "music", "SFX": "sfx", "UI": "ui", "VO": "vo"}
 SOUND_RESULTS = ("played", "fallback", "silent", "throttled")
 SOUND_NEED = ("id", "point", "subject", "seq", "t", "event_t", "dt", "class", "sound", "gain", "result")
 AUDIO_NEED = ("master", "master_mute", "ambience", "ambience_mute", "gain_master", "gain_ambience", "t", "applied")
@@ -692,6 +699,9 @@ def check_sound(lines, table):
     AU6 шаг: один звук на ребро (edge=k/n, все k при отсутствии drop) или один edge=snap, t − due ∈ [0, 100];
     AU7 стинг результата: один на каждый `RESULT screen`, event_t = t экрана;
     AU8 громкости: строка `CUE audio` до первого звука, gain_* по формуле, gain звука = gain его класса
+    (AU-S4: общая × шина класса music/sfx/ui/vo из `CUE audio`; без полей шин — 100 %);
+    точка cue (AU-S4) — CUE-005/006/008/009/010/012/013/014/017/018; удары одного кадра: один звук, остальные
+    `silent reason=grouped`
     (Ambience — gain_ambience, иначе gain_master), silent reason=muted ⇔ gain 0;
     AU9 частота: throttled только внутри retrigger_ms прошлого звука этого CUE, иначе звук играет.
     Опоздание AU5/AU6 больше допуска в первом кадре после снимка доказательств (`SHOT captured`) — не ошибка,
@@ -761,6 +771,9 @@ def check_sound(lines, table):
                 errors.append(("AU8", "строка %d: gain_master/gain_ambience %s/%s ≠ %.2f/%.2f" % (
                     n, f["gain_master"], f["gain_ambience"], g_master, g_amb)))
             gains = {"master": g_master, "ambience": g_amb}
+            for cls, key in AUDIO_BUSES.items():
+                bus = _int_or_none(f.get(key))
+                gains[cls] = g_master * (max(0, min(100, bus)) / 100.0 if bus is not None else 1.0)
             continue
         m = SOUND_RE.search(line)
         if not m:
@@ -802,11 +815,13 @@ def check_sound(lines, table):
         if gains is None:
             errors.append(("AU8", "строка %d: звук до строки CUE audio" % n))
         else:
-            want = gains["ambience"] if f["class"] == "Ambience" else gains["master"]
+            want = gains["ambience"] if f["class"] == "Ambience" else gains.get(f["class"], gains["master"])
             if abs(gain - want) > 0.006:
                 errors.append(("AU8", "строка %d: gain %s ≠ %.2f (класс %s)" % (n, f["gain"], want, f["class"])))
-        if res == "silent" and f.get("reason") not in ("muted", "opponent"):
-            errors.append(("AU4", "строка %d: silent без reason=muted|opponent" % n))
+        if res == "silent" and f.get("reason") not in ("muted", "opponent", "grouped"):
+            errors.append(("AU4", "строка %d: silent без reason=muted|opponent|grouped" % n))
+        if f.get("reason") == "grouped" and point != "hit":
+            errors.append(("AU4", "строка %d: reason=grouped вне точки hit" % n))
         if (res == "silent" and f.get("reason") == "muted" and gain > 0.0) or (
                 res in ("played", "fallback") and gain <= 0.0):
             errors.append(("AU8", "строка %d: result=%s reason=%s при gain %s" % (n, res, f.get("reason"), f["gain"])))

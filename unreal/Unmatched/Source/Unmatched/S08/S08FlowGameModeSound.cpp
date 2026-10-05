@@ -21,17 +21,15 @@
 DEFINE_LOG_CATEGORY_STATIC(LogS08CueSound, Log, All);
 
 void AS08FlowGameMode::InitCueSound() {
-  CueSound.AssetResolver = [this](const FS08SoundRow& Row) -> FString {
-    if (Row.SoundPath.IsEmpty()) return FString();  // cue-table sfx.sound null: the fallback (D10)
-    TObjectPtr<UObject>* Cached = CueSoundAssets.Find(Row.SoundPath);
+  CueSound.AssetResolver = [this](const FString& SoftPath) -> FString {
+    if (SoftPath.IsEmpty()) return FString();  // no bank variant: the fallback (D10)
+    TObjectPtr<UObject>* Cached = CueSoundAssets.Find(SoftPath);
     if (!Cached) {
-      USoundBase* Loaded = LoadObject<USoundBase>(nullptr, *Row.SoundPath);
-      if (!Loaded) {
-        UE_LOG(LogS08CueSound, Warning, TEXT("CUE sound %s: %s did not load - fallback"), *Row.CueId, *Row.SoundPath);
-      }
-      Cached = &CueSoundAssets.Add(Row.SoundPath, Loaded);
+      USoundBase* Loaded = LoadObject<USoundBase>(nullptr, *SoftPath);
+      if (!Loaded) UE_LOG(LogS08CueSound, Warning, TEXT("CUE sound %s did not load - fallback"), *SoftPath);
+      Cached = &CueSoundAssets.Add(SoftPath, Loaded);
     }
-    return *Cached ? S08SoundRows::ShortName(Row.SoundPath) : FString();
+    return *Cached ? S08SoundRows::ShortName(SoftPath) : FString();
   };
   ApplyAudioSettings(true);
 }
@@ -68,6 +66,7 @@ void AS08FlowGameMode::PlayCueSound(const FS08SoundRequest& Request) {
 }
 
 void AS08FlowGameMode::PlayUiSound(const TCHAR* CueId, const FString& Subject) {
+  NoteAudioInput();  // AU-S4: the idle line counts from the last input
   FS08SoundRequest Request;
   Request.Point = ES08SoundPoint::Ui;
   Request.CueId = CueId;
@@ -123,14 +122,9 @@ void AS08FlowGameMode::TickStepSounds() {
 }
 
 void AS08FlowGameMode::PlayHitSound(const FString& FighterId, int32 Seq, int64 DueMs) {
-  FS08SoundRequest Request;
-  Request.Point = ES08SoundPoint::Hit;
-  Request.CueId = TEXT("CUE-011");
-  Request.Subject = FighterId;
-  Request.Seq = Seq;
-  Request.EventMs = NowMs();  // HitReact and the tint start in this frame (PresentHit)
-  Request.DueMs = DueMs;
-  PlayCueSound(Request);
+  // AU-S4: the hit type of the attacker, one "multi" sound for the hits of one frame (TickAudioRuntime), the hurt
+  // lines; HitReact and the tint start in this frame (PresentHit)
+  AudioOnHit(FighterId, Seq, DueMs);
 }
 
 void AS08FlowGameMode::PlayTurnSound(int32 Seq, bool bOwnTurn) {
@@ -141,6 +135,7 @@ void AS08FlowGameMode::PlayTurnSound(int32 Seq, bool bOwnTurn) {
   Request.EventMs = NowMs();  // the banner appears from the apply frame (DE-015)
   Request.bOwnTurn = bOwnTurn;
   PlayCueSound(Request);
+  AudioOnTurn(bOwnTurn);  // AU-S4: the turn-start line (not on the first turn), the idle clock
 }
 
 void AS08FlowGameMode::PlayResultSting(int32 Seq, int64 ScreenMs) {
@@ -149,5 +144,6 @@ void AS08FlowGameMode::PlayResultSting(int32 Seq, int64 ScreenMs) {
   Request.CueId = TEXT("CUE-016");
   Request.Seq = Seq;
   Request.EventMs = ScreenMs;
+  Request.BankId = AudioOnResult();  // AU-S4: the sting of the own hero and outcome; the theme leaves, the lines follow
   PlayCueSound(Request);
 }

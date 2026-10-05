@@ -246,6 +246,7 @@ void AS08FlowGameMode::BeginPlay() {
                                             *Settings->Describe(), CombatSpeedMul()));
   }
   InitCueSound();  // DE-032: the CUE sounds and the saved volumes (`CUE audio … applied=start`)
+  InitAudioRuntime();  // AU-S4: music, VO + subtitles, ambience
   // R-03: the catch-up policy of the combat staging (K / T from the CVars s09.Catchup.* or -S09Catchup*=)
   PresentationCatchup.Configure(FS09CatchupConfig::Current());
   ArtHud.PendingTrace.Add(PresentationCatchup.GetConfig().TraceLine());
@@ -548,6 +549,7 @@ void AS08FlowGameMode::HandleApplied(const FS08Snapshot& Snapshot, ES08SeqDecisi
     FeedTurnHud(Snapshot);             // DE-023: turn ring + banner, tracker marks of the portraits
     FeedHandLimitHint(Snapshot);       // DE-024: the one-shot hand limit rule toast (UI-ACC-012)
     FeedCardSlot(Snapshot, FightersBefore);  // DE-026: the source-card slot; the opponent's scheme holds its effect
+    AudioOnApplied(Snapshot, FightersBefore);  // AU-S4: match start, draws, heals, the hand limit
     // GD-036: one RESULT trace line per authoritative seq - an equal-seq
     // merge (WS push + HTTP refetch of the terminal body) never re-logs.
     if (Hud.bGameOver && Snapshot.SequenceNumber != S09ResultTraceSeq) {
@@ -611,10 +613,12 @@ void AS08FlowGameMode::TrackCombatResult(const FS08Snapshot& Snapshot,
       TArray<FString> Lines;
       if (!bPrevCombat && bHasPrevApplied && Snapshot.Phase == TEXT("COMBAT") && !Open.AttackerId.IsEmpty()) {
         CueDispatcher.Feed(TEXT("CUE-008"), Open.AttackerId, Snapshot.SequenceNumber, NowMs(), Lines);
+        AudioOnAttackDeclared(Open.AttackerId, Snapshot.SequenceNumber);  // AU-S4
       }
       if (bHasPrevApplied && PrevApplied.Phase == TEXT("COMBAT") && Snapshot.Phase == TEXT("COMBAT_RESOLVE") &&
           !Open.TargetFighterId.IsEmpty()) {
         CueDispatcher.Feed(TEXT("CUE-009"), Open.TargetFighterId, Snapshot.SequenceNumber, NowMs(), Lines);
+        AudioOnDefensePlayed(Open.TargetFighterId, Snapshot.SequenceNumber);  // AU-S4
       }
       WriteCueLines(Lines);
     }
@@ -1418,6 +1422,7 @@ bool AS08FlowGameMode::TryCombatSkip() {
 void AS08FlowGameMode::RunCombatEvents(const TArray<FS09CombatStageEvent>& Events) {
   const FS09CombatStageInput& In = CombatStage.GetInput();
   for (const FS09CombatStageEvent& Event : Events) {
+    AudioOnCombatEvent(Event);  // AU-S4: flips, effect bells, slam, lunge whoosh, block, combat end
     switch (Event.Type) {
       case ES09CombatEvent::Lunge:
         // CUE-011 intro: the attacker's LungeAttack after the slam + the pause "score" (01 F-03). DE-025 (SD-49): at
@@ -1447,6 +1452,8 @@ void AS08FlowGameMode::RunCombatEvents(const TArray<FS09CombatStageEvent>& Event
         RefreshShownFighters(true);
         bCombatOutcomeShown = false;
         RefreshHud();
+        break;
+      default:  // AU-S4 sound-only events
         break;
     }
   }
@@ -1498,6 +1505,7 @@ void AS08FlowGameMode::NoteBoardDeaths(const TArray<FS08BoardFighter>& BoardView
         In.Style = Style;
       }
       DeathStage.Begin(In, NowMs(), CueDispatcher, Lines);
+      AudioOnDeath(In.FighterId, In.bHero, In.Seq, In.SettleMs + In.StillMs);  // AU-S4: CUE-013, VO, stings
     }
     BoardAliveById.Add(F.Id, bAlive);
   }
@@ -5022,6 +5030,7 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
   // DE-021 -BenchMovePose: the bench hero's move is held at its review moment.
   if (BoardActor) BoardActor->TickFighterMoves(bBenchMovePose ? BenchMovePoseClockMs : NowMs());
   if (!bBenchMovePose) TickStepSounds();  // DE-032: the step sound in the frame its edge starts
+  TickAudioRuntime();  // AU-S4: hits of the frame, delayed sounds, music gains, VO end, subtitles, ambience
   TryMoveSkip();
   TickDeferredDamage();
   TickOpponentView();  // MS-T-17: the last-move reveal after the move, its fade, the feed line, the edge arrow
@@ -5197,6 +5206,7 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
 }
 
 void AS08FlowGameMode::EndPlay(const EEndPlayReason::Type Reason) {
+  ShutdownAudioRuntime();
   FCoreDelegates::OnEndFrame.Remove(EndFrameHandle);
   US08UserSettings::OnChanged.Remove(SettingsChangedHandle);
   UGameViewportClient::OnScreenshotCaptured().Remove(ScreenshotCapturedHandle);

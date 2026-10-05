@@ -4,7 +4,8 @@
 //                                    chime, the D8 retrigger of CUE-004, a present asset plays;
 //   Unmatched.S08.CueSound.Steps   - one step per edge from the move's start, one landing sound of a snapped move,
 //                                    the drop on a skip / a replaced move;
-//   Unmatched.S08.CueSound.Volumes - `CUE audio` lines and the gains: a change applies to the next sound (no restart).
+//   Unmatched.S08.CueSound.Volumes - `CUE audio` lines and the gains: a change applies to the next sound (no restart);
+//                                    AU-S4: every class has its bus volume (Music 60 / SFX 80 / UI 80 / VO 80).
 #if WITH_AUTOMATION_TESTS
 
 #include "S08CueSound.h"
@@ -63,8 +64,14 @@ bool FS08CueSoundTableTest::RunTest(const FString&) {
     FString Sound;
     const bool bHasSound = (*Sfx)->TryGetStringField(TEXT("sound"), Sound) && !Sound.IsEmpty();
     TestEqual(Row.CueId + TEXT(" sound path"), Row.SoundPath, bHasSound ? Sound : FString());
+    FString Bank;
+    (*Sfx)->TryGetStringField(TEXT("bank"), Bank);
+    TestEqual(Row.CueId + TEXT(" bank"), Row.BankId, Bank);
+    TestTrue(Row.CueId + TEXT(" bank id is in the sound bank"), S08AudioBank::Find(Row.BankId) != nullptr);
   }
-  TestEqual("seven sound rows (ui x3, step, hit, turn, result)", S08SoundRows::All().Num(), 7);
+  // AU-S4: every CUE with a sound (001 is silent by design: no hover sound on the board)
+  TestEqual("seventeen sound rows (002-018)", S08SoundRows::All().Num(), 17);
+  TestTrue("no row for CUE-001", S08SoundRows::Find(TEXT("CUE-001")) == nullptr);
   TestEqual("short name", S08SoundRows::ShortName(TEXT("/Game/Audio/UI/SW_Click.SW_Click")), FString(TEXT("SW_Click")));
   // the ui CUE of a board release
   TestEqual("refused", FString(S08SoundRows::BoardUiCue(true, true, true, true)), FString(TEXT("CUE-004")));
@@ -80,11 +87,12 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08CueSoundPointsTest, "Unmatched.S08.CueSound
 bool FS08CueSoundPointsTest::RunTest(const FString&) {
   using namespace S08CueSoundTest;
   FS08CueSound Sound;
+  Sound.AssetResolver = [](const FString&) -> FString { return FString(); };  // no asset loads: fallback lines
   TArray<FString> Lines;
   Sound.SetAudio(FS08AudioSettings(), 0, true, Lines);
   TestEqual("start line", Lines.Last(),
             FString(TEXT("CUE audio master=100 master_mute=0 ambience=60 ambience_mute=0 gain_master=1.00 "
-                         "gain_ambience=0.60 t=0 applied=start")));
+                         "gain_ambience=0.60 music=60 sfx=80 ui=80 vo=80 subtitles=1 t=0 applied=start")));
   Lines.Reset();
   // ui in the release frame, no asset: a fallback line, nothing to play
   FS08SoundDecision D = Sound.Play(Request(ES08SoundPoint::Ui, TEXT("CUE-003"), TEXT("hud.endturn"), 12, 1000), 1000,
@@ -93,12 +101,12 @@ bool FS08CueSoundPointsTest::RunTest(const FString&) {
   TestTrue("ui is a UI sound", D.bUiSound);
   TestEqual("ui line", Lines.Last(),
             FString(TEXT("CUE sound id=CUE-003 point=ui subject=hud.endturn seq=12 t=1000 event_t=1000 dt=0 class=UI "
-                         "sound=missing gain=1.00 result=fallback")));
+                         "sound=missing gain=0.80 result=fallback")));
   // CUE-004 at most once in 300 ms (D8)
   Sound.Play(Request(ES08SoundPoint::Ui, TEXT("CUE-004"), TEXT(""), 12, 1100), 1100, Lines);
   D = Sound.Play(Request(ES08SoundPoint::Ui, TEXT("CUE-004"), TEXT(""), 12, 1250), 1250, Lines);
   TestTrue("refusal throttled", D.Result == ES08SoundResult::Throttled);
-  TestTrue("throttled line", Lines.Last().EndsWith(TEXT("sound=none gain=1.00 result=throttled")));
+  TestTrue("throttled line", Lines.Last().EndsWith(TEXT("sound=none gain=0.80 result=throttled")));
   D = Sound.Play(Request(ES08SoundPoint::Ui, TEXT("CUE-004"), TEXT(""), 12, 1400), 1400, Lines);
   TestTrue("refusal after 300 ms", D.Result == ES08SoundResult::Fallback);
   // hit in the contact frame: the staged contact boundary is its due
@@ -107,7 +115,7 @@ bool FS08CueSoundPointsTest::RunTest(const FString&) {
   Sound.Play(Hit, 2016, Lines);
   TestEqual("hit line", Lines.Last(),
             FString(TEXT("CUE sound id=CUE-011 point=hit subject=medusa seq=24 t=2016 event_t=2016 dt=0 class=SFX "
-                         "sound=missing gain=1.00 result=fallback due=2000")));
+                         "sound=missing gain=0.80 result=fallback due=2000")));
   // the chime: own turn only; the opponent's turn start is silent
   FS08SoundRequest Turn = Request(ES08SoundPoint::Turn, TEXT("CUE-015"), TEXT(""), 30, 3000);
   Turn.bOwnTurn = false;
@@ -115,7 +123,7 @@ bool FS08CueSoundPointsTest::RunTest(const FString&) {
   TestTrue("opponent turn silent", D.Result == ES08SoundResult::Silent);
   TestEqual("opponent turn line", Lines.Last(),
             FString(TEXT("CUE sound id=CUE-015 point=turn subject=- seq=30 t=3000 event_t=3000 dt=0 class=UI "
-                         "sound=none gain=1.00 result=silent turn=opp reason=opponent")));
+                         "sound=none gain=0.80 result=silent turn=opp reason=opponent")));
   Turn.bOwnTurn = true;
   Turn.Seq = 34;
   Turn.EventMs = 5000;
@@ -131,14 +139,26 @@ bool FS08CueSoundPointsTest::RunTest(const FString&) {
   D = Sound.Play(Request(ES08SoundPoint::Ui, TEXT("CUE-099"), TEXT(""), 1, 9100), 9100, Lines);
   TestTrue("unknown silent", D.Result == ES08SoundResult::Silent);
   TestEqual("unknown writes nothing", Lines.Num(), Before);
-  // a present asset plays at the class gain (master is the device volume)
-  Sound.AssetResolver = [](const FS08SoundRow& Row) -> FString {
-    return Row.CueId == TEXT("CUE-011") ? FString(TEXT("SW_Test_Hit")) : FString();
-  };
+  // a present asset plays at the class gain (master is the device volume); the variant comes from the bank
+  Sound.AssetResolver = [](const FString& Path) -> FString { return S08SoundRows::ShortName(Path); };
   D = Sound.Play(Request(ES08SoundPoint::Hit, TEXT("CUE-011"), TEXT("arthur"), 41, 9200), 9200, Lines);
   TestTrue("asset plays", D.Result == ES08SoundResult::Played);
-  TestEqual("class gain of SFX", D.ClassGain, 1.0f);
-  TestTrue("played line", Lines.Last().Contains(TEXT("sound=SW_Test_Hit gain=1.00 result=played")));
+  TestEqual("class gain of SFX", D.ClassGain, 0.8f);
+  TestTrue("played line", Lines.Last().Contains(TEXT("sound=SW_CMB_HIT_BLADE_0")) &&
+                              Lines.Last().Contains(TEXT("gain=0.80 result=played")));
+  // a request may override the bank (the hit type of the attacker) - traced bank=
+  FS08SoundRequest Arrow = Request(ES08SoundPoint::Hit, TEXT("CUE-011"), TEXT("arthur"), 42, 9300);
+  Arrow.BankId = TEXT("CMB-HIT-ARROW");
+  Sound.Play(Arrow, 9300, Lines);
+  TestTrue("override bank", Lines.Last().Contains(TEXT("sound=SW_CMB_HIT_ARROW_0")) &&
+                                Lines.Last().Contains(TEXT("bank=CMB-HIT-ARROW")));
+  // a grouped hit of the same frame: silent, reason=grouped
+  Sound.Grouped(Request(ES08SoundPoint::Hit, TEXT("CUE-011"), TEXT("merlin"), 42, 9300), 9300, Lines);
+  TestTrue("grouped line", Lines.Last().EndsWith(TEXT("result=silent reason=grouped")));
+  // the generic cue point
+  Sound.Play(Request(ES08SoundPoint::Cue, TEXT("CUE-008"), TEXT("arthur"), 43, 9400), 9400, Lines);
+  TestTrue("cue point line", Lines.Last().Contains(TEXT("point=cue")) &&
+                                 Lines.Last().Contains(TEXT("sound=SW_CMB_ATTACK_DECLARE_0")));
   return true;
 }
 
@@ -146,6 +166,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08CueSoundStepsTest, "Unmatched.S08.CueSound.
                                  EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FS08CueSoundStepsTest::RunTest(const FString&) {
   FS08CueSound Sound;
+  Sound.AssetResolver = [](const FString&) -> FString { return FString(); };  // no asset loads: fallback lines
   // a three-edge move from the seq start (280 ms per edge) and a second fighter's move starting 420 ms later
   Sound.ScheduleSteps(TEXT("arthur"), 20, 1000, 280.0, 3, false);
   Sound.ScheduleSteps(TEXT("merlin"), 20, 1420, 280.0, 1, false);
@@ -191,7 +212,7 @@ bool FS08CueSoundStepsTest::RunTest(const FString&) {
   Sound.Play(Step, 1290, Lines);
   TestEqual("step line", Lines.Last(),
             FString(TEXT("CUE sound id=CUE-007 point=step subject=arthur seq=20 t=1290 event_t=1290 dt=0 class=SFX "
-                         "sound=missing gain=1.00 result=fallback edge=2/3 due=1280")));
+                         "sound=missing gain=0.80 result=fallback edge=2/3 due=1280")));
   // a skip drops every pending step (one line per seq); a replaced move drops only its fighter's
   Sound.ScheduleSteps(TEXT("arthur"), 22, 3000, 280.0, 3, false);
   Sound.ScheduleSteps(TEXT("merlin"), 22, 3000, 280.0, 2, false);
@@ -217,19 +238,21 @@ bool FS08CueSoundVolumesTest::RunTest(const FString&) {
   TestFalse("the same values write nothing", Sound.SetAudio(Audio, 10, false, Lines));
   TestEqual("one line", Lines.Num(), 1);
   Sound.Play(Request(ES08SoundPoint::Ui, TEXT("CUE-003"), TEXT(""), 1, 100), 100, Lines);
-  TestTrue("gain 0.80", Lines.Last().Contains(TEXT("gain=0.80")));
+  TestTrue("gain 0.64 (master 0.8 x UI 0.8)", Lines.Last().Contains(TEXT("gain=0.64")));
   TestEqual("ambience class gain without master", Sound.ClassGain(TEXT("Ambience")), 0.6f);
   TestEqual("ambience effective gain", Sound.EffectiveGain(TEXT("Ambience")), 0.8f * 0.6f);
-  TestEqual("UI class gain", Sound.ClassGain(TEXT("UI")), 1.0f);
+  TestEqual("UI class gain", Sound.ClassGain(TEXT("UI")), 0.8f);
+  TestEqual("Music class gain", Sound.ClassGain(TEXT("Music")), 0.6f);
+  TestEqual("VO class gain", Sound.ClassGain(TEXT("VO")), 0.8f);
   // a saved change applies to the next sound, no restart
   Audio.MasterPercent = 50;
   Audio.bAmbienceMuted = true;
   TestTrue("change applied", Sound.SetAudio(Audio, 200, false, Lines));
   TestEqual("change line", Lines.Last(),
             FString(TEXT("CUE audio master=50 master_mute=0 ambience=60 ambience_mute=1 gain_master=0.50 "
-                         "gain_ambience=0.00 t=200 applied=change")));
+                         "gain_ambience=0.00 music=60 sfx=80 ui=80 vo=80 subtitles=1 t=200 applied=change")));
   Sound.Play(Request(ES08SoundPoint::Hit, TEXT("CUE-011"), TEXT("medusa"), 2, 300), 300, Lines);
-  TestTrue("gain 0.50 after the change", Lines.Last().Contains(TEXT("gain=0.50")));
+  TestTrue("gain 0.40 after the change (master 0.5 x SFX 0.8)", Lines.Last().Contains(TEXT("gain=0.40")));
   TestEqual("muted ambience", Sound.ClassGain(TEXT("Ambience")), 0.0f);
   // master muted: every point is silent (reason=muted), still traced
   Audio.bMasterMuted = true;

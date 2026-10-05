@@ -396,10 +396,12 @@ bool FS08MoveAnimSettingsStoreTest::RunTest(const FString&) {
   TestFalse("master=101 refused", Temp->ApplySetting(TEXT("master"), TEXT("101"), Error));
   TestFalse("master=4.5 refused", Temp->ApplySetting(TEXT("master"), TEXT("4.5"), Error));
   TestFalse("speed=warp refused", Temp->ApplySetting(TEXT("speed"), TEXT("warp"), Error));
-  TestFalse("unknown name refused", Temp->ApplySetting(TEXT("music"), TEXT("50"), Error));
+  TestFalse("unknown name refused", Temp->ApplySetting(TEXT("gamma"), TEXT("50"), Error));
   TestTrue("a refused value changes nothing", Temp->MasterVolume == 80 && Temp->AnimSpeed == TEXT("fast"));
+  // AU-S4: the bus volumes and the subtitle switches follow the DE-025 ones (S08AudioTests.cpp covers them)
   TestEqual("Describe", Temp->Describe(),
-            FString(TEXT("speed=fast reduced=0 shake=1 ruleHints=0 master=80 masterMute=0 ambience=25 ambienceMute=1")));
+            FString(TEXT("speed=fast reduced=0 shake=1 ruleHints=0 master=80 masterMute=0 ambience=25 ambienceMute=1 "
+                         "music=60 sfx=80 ui=80 vo=80 subtitles=1 describeSounds=0")));
   // Gains: the ambience goes through the master volume and both mutes; the ini values are clamped on read.
   FS08AudioSettings Audio = Temp->GetSavedAudio();
   TestTrue("ambience muted -> gain 0", Audio.AmbienceGain() == 0.0f && FMath::IsNearlyEqual(Audio.MasterGain(), 0.8f));

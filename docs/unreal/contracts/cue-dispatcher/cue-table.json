@@ -1,8 +1,8 @@
 {
  "schema": "unmatched.cue-table/1",
- "revision": "de-021-2026-10-05",
+ "revision": "au-s4-2026-10-05",
  "status": "предложено",
- "status_note": "Контракт FS08CueDispatcher (волна 4, W4-D; меморандум engine-gate §1 п.8). Данные 18 CUE из 07-animation-vfx-audio.csv; VFX и звуки пока отсутствуют — таблица служит missing-report ART-010; клипы HitReact и DeathSettle есть у всех 6 v2-фигур (H2Anim, S08HeroesV2), LungeAttack — вступление CUE-011 (DE-003, 2026-10-04: живые данные DE, docs/game-design/de-footage/task/01-decisions.md F-01…F-12). Поза перемещения CUE-007 (`pose`: подскок, наклон, разворот, доворот, возврат в Idle, ease) — DE-021 по 01 F-02. Реализация диспетчера — GD-044, эффекты — GD-049. Не художественная приёмка.",
+ "status_note": "Контракт FS08CueDispatcher (волна 4, W4-D; меморандум engine-gate §1 п.8). Данные 18 CUE из 07-animation-vfx-audio.csv; звуки — банк AU-S4 (docs/game-design/audio/03-sound-registry.csv, tools/audio/ue_bank.py): sfx.sound — первый вариант, sfx.bank — id банка, вариант без повторов выбирает FS08CueSound; VFX пока отсутствуют — таблица служит missing-report ART-010; клипы HitReact и DeathSettle есть у всех 6 v2-фигур (H2Anim, S08HeroesV2), LungeAttack — вступление CUE-011 (DE-003, 2026-10-04: живые данные DE, docs/game-design/de-footage/task/01-decisions.md F-01…F-12). Поза перемещения CUE-007 (`pose`: подскок, наклон, разворот, доворот, возврат в Idle, ease) — DE-021 по 01 F-02. Реализация диспетчера — GD-044, эффекты — GD-049. Не художественная приёмка.",
  "asset_path_rule": "soft object path /Game/...: Niagara — UNiagaraSystem, звук — USoundBase (SoundWave, SoundCue и MetaSoundSource взаимозаменяемы без кода). Пути удерживаются в cook через PrimaryAssetLabel или DirectoriesToAlwaysCook (строки LoadObject кукер не видит — ловушка 5)",
  "sockets_from": "docs/art-pipeline/rig/rig-contract.json ue_import.sockets_v2 (Weapon, Head) + Root/Base актора",
  "cues": [
@@ -20,7 +20,7 @@
    "sfx": {
     "sound": null,
     "status": "missing",
-    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "missing_reason": "намеренно беззвучно (docs/game-design/audio/02-audio-design.md §4.2): наведение на фигурку и клетку без звука, как у DE на поле; явно описанное отсутствие для ART-010",
     "sound_class": "UI",
     "priority": 3,
     "concurrency": {
@@ -68,9 +68,9 @@
    "skippable": true,
    "vfx": null,
    "sfx": {
-    "sound": null,
-    "status": "missing",
-    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound": "/Game/Audio/UI/SW_UI_SELECT_01.SW_UI_SELECT_01",
+    "bank": "UI-SELECT",
+    "status": "present",
     "sound_class": "UI",
     "priority": 2,
     "concurrency": {
@@ -114,9 +114,9 @@
    "skippable": true,
    "vfx": null,
    "sfx": {
-    "sound": null,
-    "status": "missing",
-    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound": "/Game/Audio/UI/SW_UI_CONFIRM_01.SW_UI_CONFIRM_01",
+    "bank": "UI-CONFIRM",
+    "status": "present",
     "sound_class": "UI",
     "priority": 1,
     "concurrency": {
@@ -159,9 +159,9 @@
    "skippable": true,
    "vfx": null,
    "sfx": {
-    "sound": null,
-    "status": "missing",
-    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound": "/Game/Audio/UI/SW_UI_REJECT_01.SW_UI_REJECT_01",
+    "bank": "UI-REJECT",
+    "status": "present",
     "sound_class": "UI",
     "priority": 1,
     "concurrency": {
@@ -205,9 +205,9 @@
    "skippable": true,
    "vfx": null,
    "sfx": {
-    "sound": null,
-    "status": "missing",
-    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound": "/Game/Audio/Cards/SW_CRD_DRAW_01.SW_CRD_DRAW_01",
+    "bank": "CRD-DRAW",
+    "status": "present",
     "sound_class": "SFX",
     "priority": 2,
     "concurrency": {
@@ -260,9 +260,9 @@
     "note": "свечение рамки карты-плоскости"
    },
    "sfx": {
-    "sound": null,
-    "status": "missing",
-    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound": "/Game/Audio/Cards/SW_CRD_PLAY_01.SW_CRD_PLAY_01",
+    "bank": "CRD-PLAY",
+    "status": "present",
     "sound_class": "SFX",
     "priority": 1,
     "concurrency": {
@@ -313,9 +313,9 @@
     "note": "пыль на конечной клетке"
    },
    "sfx": {
-    "sound": null,
-    "status": "missing",
-    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound": "/Game/Audio/Board/SW_BRD_STEP_01.SW_BRD_STEP_01",
+    "bank": "BRD-STEP",
+    "status": "present",
     "sound_class": "SFX",
     "priority": 3,
     "concurrency": {
@@ -387,9 +387,9 @@
     "note": "вспышка направления; рамка цели — маркер SM_Marker_TargetRing; клипа нет — LungeAttack перенесён во вступление CUE-011 (F-03)"
    },
    "sfx": {
-    "sound": null,
-    "status": "missing",
-    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound": "/Game/Audio/Combat/SW_CMB_ATTACK_DECLARE_01.SW_CMB_ATTACK_DECLARE_01",
+    "bank": "CMB-ATTACK-DECLARE",
+    "status": "present",
     "sound_class": "SFX",
     "priority": 1,
     "concurrency": {
@@ -445,9 +445,9 @@
     "note": "мерцание щита"
    },
    "sfx": {
-    "sound": null,
-    "status": "missing",
-    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound": "/Game/Audio/Combat/SW_CMB_DEFENSE_PLAYED_01.SW_CMB_DEFENSE_PLAYED_01",
+    "bank": "CMB-DEFENSE-PLAYED",
+    "status": "present",
     "sound_class": "SFX",
     "priority": 2,
     "concurrency": {
@@ -496,9 +496,9 @@
    "skippable": true,
    "vfx": null,
    "sfx": {
-    "sound": null,
-    "status": "missing",
-    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound": "/Game/Audio/Cards/SW_CRD_FLIP_01.SW_CRD_FLIP_01",
+    "bank": "CRD-FLIP",
+    "status": "present",
     "sound_class": "SFX",
     "priority": 1,
     "concurrency": {
@@ -552,9 +552,9 @@
     "note": "всплеск удара в кадре контакта выпада; цифра «−N» — экранный виджет (контакт +60 мс)"
    },
    "sfx": {
-    "sound": null,
-    "status": "missing",
-    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound": "/Game/Audio/Combat/SW_CMB_HIT_BLADE_01.SW_CMB_HIT_BLADE_01",
+    "bank": "CMB-HIT-BLADE",
+    "status": "present",
     "sound_class": "SFX",
     "priority": 1,
     "concurrency": {
@@ -626,9 +626,9 @@
     "note": "зелёные частицы"
    },
    "sfx": {
-    "sound": null,
-    "status": "missing",
-    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound": "/Game/Audio/Combat/SW_CMB_HEAL_01.SW_CMB_HEAL_01",
+    "bank": "CMB-HEAL",
+    "status": "present",
     "sound_class": "SFX",
     "priority": 2,
     "concurrency": {
@@ -682,9 +682,9 @@
     "note": "«пепел» цвета команды С-11 при растворении (кандидат DE-011; до арт-приёмки — простой fade материала)"
    },
    "sfx": {
-    "sound": null,
-    "status": "missing",
-    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound": "/Game/Audio/Death/SW_DTH_TEMPLATE_01.SW_DTH_TEMPLATE_01",
+    "bank": "DTH-TEMPLATE",
+    "status": "present",
     "sound_class": "SFX",
     "priority": 1,
     "concurrency": {
@@ -750,9 +750,9 @@
     "note": "Arthur — сокет Weapon (weapon_R); Medusa — луч от сокета Head: сокет задаёт строка героя в DataAsset"
    },
    "sfx": {
-    "sound": null,
-    "status": "missing",
-    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound": "/Game/Audio/FX/SW_FX_ARTHUR_BOOST_01.SW_FX_ARTHUR_BOOST_01",
+    "bank": "FX-ARTHUR-BOOST",
+    "status": "present",
     "sound_class": "SFX",
     "priority": 1,
     "concurrency": {
@@ -793,9 +793,9 @@
    "skippable": true,
    "vfx": null,
    "sfx": {
-    "sound": null,
-    "status": "missing",
-    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound": "/Game/Audio/UI/SW_UI_TURN_CHIME_01.SW_UI_TURN_CHIME_01",
+    "bank": "UI-TURN-CHIME",
+    "status": "present",
     "sound_class": "UI",
     "priority": 2,
     "concurrency": {
@@ -839,9 +839,9 @@
    "skippable": true,
    "vfx": null,
    "sfx": {
-    "sound": null,
-    "status": "missing",
-    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound": "/Game/Audio/Stings/SW_STG_WIN.SW_STG_WIN",
+    "bank": "STG-WIN",
+    "status": "present",
     "sound_class": "Music",
     "priority": 1,
     "concurrency": {
@@ -884,9 +884,9 @@
    "skippable": false,
    "vfx": null,
    "sfx": {
-    "sound": null,
-    "status": "missing",
-    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound": "/Game/Audio/UI/SW_UI_NET_LOST_01.SW_UI_NET_LOST_01",
+    "bank": "UI-NET-LOST",
+    "status": "present",
     "sound_class": "UI",
     "priority": 1,
     "concurrency": {
@@ -930,9 +930,9 @@
    "skippable": true,
    "vfx": null,
    "sfx": {
-    "sound": null,
-    "status": "missing",
-    "missing_reason": "ассет не создан: звуки отложены до ART-010/GD-049 (18-third-party: Tabletop SFX pack)",
+    "sound": "/Game/Audio/UI/SW_UI_NET_BACK_01.SW_UI_NET_BACK_01",
+    "bank": "UI-NET-BACK",
+    "status": "present",
     "sound_class": "UI",
     "priority": 2,
     "concurrency": {
