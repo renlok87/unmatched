@@ -1,13 +1,15 @@
 """MS-T-08 (docs/game-design/move-selection 04 §6.1): build M_UM_MovePlate, the material of the move-selection plates.
 
   /Game/S08/MoveSelection/M_UM_MovePlate   unlit, translucent, used with instanced static meshes, no fog, responsive AA.
-      Drawn on the engine plane (100 uu, normal +Z) of every plate instance (US08MoveHighlightComponent, four ISMs:
-      PlateFill, PlateRing, PlateOutline, Glyphs - the "Channel" parameter of each ISM's MID). One Custom node draws the
+      Drawn on the engine plane (100 uu, normal +Z) of every plate instance (US08MoveHighlightComponent: ONE ISM with
+      one MID, four instances per board space - the channels PlateFill, PlateRing, PlateOutline, Glyphs, channel-major;
+      MS-AT-41, run H R-04: one translucency draw and one occlusion query for all plates). One Custom node draws the
       shapes of 03 §4.1 / §4.2 from:
         * the instance-local position (LocalPosition, instance origin) -> q in uu from the space centre (+X / +Y =
           world, the instances are never rotated);
-        * the per-instance custom data 0..5 (S08MovePlateCpd: state, steps / candidate figure scale, chip, glyph index,
-          flags, colour index), passed to the pixel shader through two VertexInterpolators (04 §6.1, R4 §5.1);
+        * the per-instance custom data 0..6 (S08MovePlateCpd: state, steps / candidate figure scale, chip, glyph index,
+          flags, colour index, channel), passed to the pixel shader through three VertexInterpolators (04 §6.1,
+          R4 §5.1) - the "Channel" input of the Custom node is custom data 6, not a parameter (graph version 3);
         * the style parameters (S08MovePlateSpec::Param*, from the profile "moveSelection" block).
       Channel 0 fill (V-01 18 %, V-07 dark 35 %, V-11 10 %), 1 ring (solid V-01, dashed V-02, double V-04, dashed outer
       V-04b, dashed double red V-09, dimmed V-10, 45 deg hatch V-07, dashed ally ring on hover V-06, long dashes
@@ -50,11 +52,14 @@ ROOT = "/Game/S08/MoveSelection"
 MATERIAL_NAME = "M_UM_MovePlate"
 MATERIAL_PATH = f"{ROOT}/{MATERIAL_NAME}"
 GRAPH_TAG = "MoveSelectionGraphVersion"
-GRAPH_VERSION = "2"  # 2: LastMoveFade (MS-T-17, the MS-P-03 fade of V-14 / V-15)
+GRAPH_VERSION = "3"  # 2: LastMoveFade (MS-T-17); 3: Channel = per-instance custom data 6 (MS-AT-41, one ISM)
+# per-instance custom data floats (S08MovePlateSpec::NumCustomData) and the channel slot (S08MovePlateCpd::Channel)
+NUM_CUSTOM_DATA = 7
+CHANNEL_SLOT = 6
 
 # scalar parameters and their defaults (04 §4.7 numbers; the component overwrites them from the profile)
 SCALARS = {
-    "Channel": 1.0, "Shape": 0.0, "HalfUU": 44.0, "RingCenter": 36.0, "RingWidth": 3.5, "Keyline": 1.5,
+    "Shape": 0.0, "HalfUU": 44.0, "RingCenter": 36.0, "RingWidth": 3.5, "Keyline": 1.5,
     "OutlineInner": 39.6, "OutlineOuter": 41.0, "OccClear": 30.0, "PipCutDeg": 15.0, "FillAlpha": 0.18,
     "DashCount": 12.0, "DashDuty": 0.6, "CandRadius": 18.9, "CandWidth": 1.2, "CandAlpha": 0.7, "LastMoveAlpha": 0.6,
     "LastMoveFade": 1.0,
@@ -66,8 +71,8 @@ VECTORS = {
     "TeamP2Color": (0.0953, 0.2384, 0.3916),
 }
 EXPOSURE_PARAM = "ExposureCompensationAlpha"
-# Custom node inputs in this order (A, B = the interpolated per-instance data)
-INPUTS = ["A", "B"] + list(SCALARS) + list(VECTORS)
+# Custom node inputs in this order (A, B, Channel = the interpolated per-instance data)
+INPUTS = ["A", "B", "Channel"] + list(SCALARS) + list(VECTORS)
 
 PLATE_HLSL = r"""
 // q: uu from the space centre (+X / +Y = world); A.zw / B = custom data 0..5 (S08MovePlateCpd)
@@ -222,9 +227,18 @@ def check() -> tuple[dict, list[str]]:
         errors.append(f"material parameter {n} has no S08MovePlateSpec::Param* in {HEADER.name}")
     for n in sorted(names - want):
         errors.append(f"header parameter {n} is not built by this script")
-    if f"{MATERIAL_PATH}.{MATERIAL_NAME}" not in HEADER.read_text(encoding="utf-8"):
+    text = HEADER.read_text(encoding="utf-8")
+    if f"{MATERIAL_PATH}.{MATERIAL_NAME}" not in text:
         errors.append(f"S08MovePlateSpec::MaterialPath is not {MATERIAL_PATH}.{MATERIAL_NAME}")
-    return {"parameters": sorted(want), "header": sorted(names)}, errors
+    # MS-AT-41: the channel is per-instance custom data, the same slot on both sides
+    m = re.search(r"constexpr int32 NumCustomData = (\d+);", text)
+    if not m or int(m.group(1)) != NUM_CUSTOM_DATA:
+        errors.append(f"S08MovePlateSpec::NumCustomData is not {NUM_CUSTOM_DATA}")
+    m = re.search(r"constexpr int32 Channel = (\d+);", text)
+    if not m or int(m.group(1)) != CHANNEL_SLOT:
+        errors.append(f"S08MovePlateCpd::Channel is not {CHANNEL_SLOT}")
+    return {"parameters": sorted(want), "header": sorted(names), "customData": NUM_CUSTOM_DATA,
+            "channelSlot": CHANNEL_SLOT}, errors
 
 
 # ---------------------------------------------------------------------------------------------------- UE
@@ -277,14 +291,14 @@ def build_material(force: bool) -> dict:
         pins.append(ci)
     custom.set_editor_property("inputs", pins)
     custom.set_editor_property("code", PLATE_HLSL)
-    # vertex side: instance-local xy + custom data 0..5 -> two interpolators
+    # vertex side: instance-local xy + custom data 0..6 -> three interpolators
     local = _expr(material, u.MaterialExpressionLocalPosition, -1900, -500)
     xy = _expr(material, u.MaterialExpressionComponentMask, -1700, -500)
     for ch, on in (("r", True), ("g", True), ("b", False), ("a", False)):
         xy.set_editor_property(ch, on)
     _connect(local, "", xy, "")
     cpd = []
-    for i in range(6):
+    for i in range(NUM_CUSTOM_DATA):
         node = _expr(material, u.MaterialExpressionPerInstanceCustomData, -1900, -380 + i * 90)
         node.set_editor_property("data_index", i)
         node.set_editor_property("const_default_value", 0.0)
@@ -302,9 +316,12 @@ def build_material(force: bool) -> dict:
     _connect(a_xy01, "", vi_a, "VS")
     vi_b = _expr(material, u.MaterialExpressionVertexInterpolator, -1200, -150)
     _connect(b_2345, "", vi_b, "VS")
+    vi_c = _expr(material, u.MaterialExpressionVertexInterpolator, -1200, 60)
+    _connect(cpd[CHANNEL_SLOT], "", vi_c, "VS")
     _connect(vi_a, "", custom, "A")
     _connect(vi_b, "", custom, "B")
-    y = 0
+    _connect(vi_c, "", custom, "Channel")
+    y = 160
     for name, value in SCALARS.items():
         node = _expr(material, u.MaterialExpressionScalarParameter, -1200, y)
         node.set_editor_property("parameter_name", name)
@@ -343,9 +360,12 @@ def build_material(force: bool) -> dict:
     missing = [n for n in VECTORS if n not in got["vector"]] + [n for n in SCALARS if n not in got["scalar"]]
     if missing:
         raise RuntimeError(f"{MATERIAL_PATH}: parameters missing after the build: {missing}")
+    if "Channel" in got["scalar"]:
+        raise RuntimeError(f"{MATERIAL_PATH}: Channel is still a parameter (it is custom data {CHANNEL_SLOT})")
     return {"action": action, "path": MATERIAL_PATH, "graphVersion": GRAPH_VERSION, "params": got,
             "expressions": int(mel.get_num_material_expressions(material)), "blend": "translucent", "shading": "unlit",
-            "ismUsage": bool(material.get_editor_property("used_with_instanced_static_meshes")), "settings": settings}
+            "ismUsage": bool(material.get_editor_property("used_with_instanced_static_meshes")), "settings": settings,
+            "customData": NUM_CUSTOM_DATA, "channelSlot": CHANNEL_SLOT}
 
 
 # ---------------------------------------------------------------------------------------------------- entry

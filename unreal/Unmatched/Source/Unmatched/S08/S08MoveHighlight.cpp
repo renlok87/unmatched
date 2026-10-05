@@ -338,25 +338,25 @@ const TCHAR* S08MovePlateSpec::ChannelName(EChannel Channel) {
 
 US08MoveHighlightComponent::US08MoveHighlightComponent() { PrimaryComponentTick.bCanEverTick = false; }
 
-void US08MoveHighlightComponent::EnsureChannels() {
-  if (Channels.Num() == static_cast<int32>(S08MovePlateSpec::EChannel::Count)) return;
-  Channels.Reset();
-  for (int32 C = 0; C < static_cast<int32>(S08MovePlateSpec::EChannel::Count); ++C) {
-    const S08MovePlateSpec::EChannel Channel = static_cast<S08MovePlateSpec::EChannel>(C);
-    UInstancedStaticMeshComponent* Ism =
-        NewObject<UInstancedStaticMeshComponent>(GetOwner() ? static_cast<UObject*>(GetOwner()) : this,
-                                                 FName(FString(TEXT("MoveHL_")) + S08MovePlateSpec::ChannelName(Channel)));
-    Ism->SetupAttachment(this);
-    Ism->SetStaticMesh(PlaneMesh);
-    Ism->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-    Ism->SetNumCustomDataFloats(S08MovePlateSpec::NumCustomData);
-    // translucent layers over each other in a fixed order: fill < ring < outline < glyph (03 §4.1)
-    Ism->SetTranslucentSortPriority(10 + C);
-    Ism->SetCastShadow(false);
-    S08ApplyGameLayerPrimitive(Ism);
-    if (IsRegistered()) Ism->RegisterComponent();
-    Channels.Add(Ism);
-  }
+void US08MoveHighlightComponent::EnsurePlates() {
+  if (Plates) return;
+  // MS-AT-41: ONE primitive for every channel - one translucency draw and one occlusion query (the engine has no
+  // per-component switch for occlusion queries; four ISMs cost +8 draw calls). One material slot (the engine plane has
+  // one section and one LOD), no shadow, no decals, no navigation.
+  Plates = NewObject<UInstancedStaticMeshComponent>(GetOwner() ? static_cast<UObject*>(GetOwner()) : this,
+                                                    FName(TEXT("MoveHL_Plates")));
+  Plates->SetupAttachment(this);
+  Plates->SetStaticMesh(PlaneMesh);
+  Plates->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+  Plates->SetCanEverAffectNavigation(false);
+  Plates->SetNumCustomDataFloats(S08MovePlateSpec::NumCustomData);
+  // the game layer over the board; inside the ISM the layers keep fill < ring < outline < glyph by the channel-major
+  // instance order (a translucent ISM preserves it: FMeshBatchElement::bPreserveInstanceOrder)
+  Plates->SetTranslucentSortPriority(10);
+  Plates->SetCastShadow(false);
+  Plates->SetReceivesDecals(false);
+  S08ApplyGameLayerPrimitive(Plates);
+  if (IsRegistered()) Plates->RegisterComponent();
 }
 
 void US08MoveHighlightComponent::Initialize(UStaticMesh* Plane) {
@@ -364,15 +364,11 @@ void US08MoveHighlightComponent::Initialize(UStaticMesh* Plane) {
   bInitialized = true;
   PlaneMesh = Plane;
   PlateMaterial = LoadObject<UMaterialInterface>(nullptr, S08MovePlateSpec::MaterialPath, nullptr, LOAD_NoWarn);
-  EnsureChannels();
-  ChannelMids.Reset();
+  EnsurePlates();
+  PlateMid = nullptr;
   if (PlateMaterial && PlaneMesh) {
-    for (int32 C = 0; C < Channels.Num(); ++C) {
-      UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(PlateMaterial, this);
-      Mid->SetScalarParameterValue(S08MovePlateSpec::ParamChannel, static_cast<float>(C));
-      Channels[C]->SetMaterial(0, Mid);
-      ChannelMids.Add(Mid);
-    }
+    PlateMid = UMaterialInstanceDynamic::Create(PlateMaterial, this);
+    Plates->SetMaterial(0, PlateMid);
     MaterialName = PlateMaterial->GetName();
     bReady = true;
   }
@@ -387,36 +383,35 @@ void US08MoveHighlightComponent::Initialize(UStaticMesh* Plane) {
 void US08MoveHighlightComponent::ApplyStyle(const FS08MoveSelectionSpec& InStyle) {
   Style = InStyle;
   using namespace S08MovePlateSpec;
-  for (UMaterialInstanceDynamic* Mid : ChannelMids) {
-    if (!Mid) continue;
-    Mid->SetScalarParameterValue(ParamShape, bSquare ? 1.0f : 0.0f);
-    Mid->SetScalarParameterValue(ParamHalfUU, HalfUU);
-    Mid->SetScalarParameterValue(ParamRingCenter, Style.RingCenterUU);
-    Mid->SetScalarParameterValue(ParamRingWidth, Style.RingWidthUU);
-    Mid->SetScalarParameterValue(ParamKeyline, Style.KeylineUU);
-    Mid->SetScalarParameterValue(ParamOutlineInner, Style.OutlineInnerUU);
-    Mid->SetScalarParameterValue(ParamOutlineOuter, Style.OutlineOuterUU);
-    Mid->SetScalarParameterValue(ParamOccClear, Style.OccupiedClearUU);
-    Mid->SetScalarParameterValue(ParamPipCutDeg, Style.PipCutDeg);
-    Mid->SetScalarParameterValue(ParamFillAlpha, Style.FillAlpha);
-    Mid->SetScalarParameterValue(ParamDashCount, static_cast<float>(Style.DashCount));
-    Mid->SetScalarParameterValue(ParamDashDuty, Style.DashDuty);
-    Mid->SetScalarParameterValue(ParamCandRadius, Style.CandidateRadiusUU);
-    Mid->SetScalarParameterValue(ParamCandWidth, Style.CandidateWidthUU);
-    Mid->SetScalarParameterValue(ParamCandAlpha, Style.CandidateAlpha);
-    Mid->SetScalarParameterValue(ParamLastMoveAlpha, Style.LastMoveAlpha);
-    Mid->SetScalarParameterValue(ParamLastMoveFade, LastMoveFade);
-    // sRGB bytes of the profile -> linear (the W4-B colour rule, FLinearColor::FromSRGBColor)
-    Mid->SetVectorParameterValue(ParamPlateColor, FLinearColor::FromSRGBColor(Style.PlateColor));
-    Mid->SetVectorParameterValue(ParamKeylineColor, FLinearColor::FromSRGBColor(Style.KeylineColor));
-    Mid->SetVectorParameterValue(ParamErrorColor, FLinearColor::FromSRGBColor(Style.InvalidColor));
-    Mid->SetVectorParameterValue(ParamTeamP1Color, FLinearColor::FromSRGBColor(TeamP1Screen));
-    Mid->SetVectorParameterValue(ParamTeamP2Color, FLinearColor::FromSRGBColor(TeamP2Screen));
-  }
+  UMaterialInstanceDynamic* Mid = PlateMid;
+  if (!Mid) return;
+  Mid->SetScalarParameterValue(ParamShape, bSquare ? 1.0f : 0.0f);
+  Mid->SetScalarParameterValue(ParamHalfUU, HalfUU);
+  Mid->SetScalarParameterValue(ParamRingCenter, Style.RingCenterUU);
+  Mid->SetScalarParameterValue(ParamRingWidth, Style.RingWidthUU);
+  Mid->SetScalarParameterValue(ParamKeyline, Style.KeylineUU);
+  Mid->SetScalarParameterValue(ParamOutlineInner, Style.OutlineInnerUU);
+  Mid->SetScalarParameterValue(ParamOutlineOuter, Style.OutlineOuterUU);
+  Mid->SetScalarParameterValue(ParamOccClear, Style.OccupiedClearUU);
+  Mid->SetScalarParameterValue(ParamPipCutDeg, Style.PipCutDeg);
+  Mid->SetScalarParameterValue(ParamFillAlpha, Style.FillAlpha);
+  Mid->SetScalarParameterValue(ParamDashCount, static_cast<float>(Style.DashCount));
+  Mid->SetScalarParameterValue(ParamDashDuty, Style.DashDuty);
+  Mid->SetScalarParameterValue(ParamCandRadius, Style.CandidateRadiusUU);
+  Mid->SetScalarParameterValue(ParamCandWidth, Style.CandidateWidthUU);
+  Mid->SetScalarParameterValue(ParamCandAlpha, Style.CandidateAlpha);
+  Mid->SetScalarParameterValue(ParamLastMoveAlpha, Style.LastMoveAlpha);
+  Mid->SetScalarParameterValue(ParamLastMoveFade, LastMoveFade);
+  // sRGB bytes of the profile -> linear (the W4-B colour rule, FLinearColor::FromSRGBColor)
+  Mid->SetVectorParameterValue(ParamPlateColor, FLinearColor::FromSRGBColor(Style.PlateColor));
+  Mid->SetVectorParameterValue(ParamKeylineColor, FLinearColor::FromSRGBColor(Style.KeylineColor));
+  Mid->SetVectorParameterValue(ParamErrorColor, FLinearColor::FromSRGBColor(Style.InvalidColor));
+  Mid->SetVectorParameterValue(ParamTeamP1Color, FLinearColor::FromSRGBColor(TeamP1Screen));
+  Mid->SetVectorParameterValue(ParamTeamP2Color, FLinearColor::FromSRGBColor(TeamP2Screen));
 }
 
 void US08MoveHighlightComponent::BuildForBoard(const FS08BoardModel& InBoard, const FS08MoveSelectionSpec& InStyle) {
-  EnsureChannels();
+  EnsurePlates();
   ++BuildCount;
   Board = InBoard;
   bSquare = !InBoard.bHasTopology;
@@ -429,77 +424,84 @@ void US08MoveHighlightComponent::BuildForBoard(const FS08BoardModel& InBoard, co
       SpaceCells.Add(FIntPoint(X, Y));
     }
   }
-  const int32 NumChannels = Channels.Num();
+  const int32 NumChannels = static_cast<int32>(S08MovePlateSpec::EChannel::Count);
   Written.SetNum(NumChannels);
   WrittenZ.SetNum(NumChannels);
+  Plates->ClearInstances();
+  TArray<FTransform> Hidden;
+  Hidden.Reserve(SpaceCells.Num() * NumChannels);
   for (int32 C = 0; C < NumChannels; ++C) {
-    UInstancedStaticMeshComponent* Ism = Channels[C];
-    Ism->ClearInstances();
-    TArray<FTransform> Hidden;
-    Hidden.Reserve(SpaceCells.Num());
     for (const FIntPoint& Cell : SpaceCells) {
       Hidden.Add(FTransform(FRotator::ZeroRotator, Board.CellToWorld(Cell.X, Cell.Y), FVector::ZeroVector));
     }
-    Ism->AddInstances(Hidden, false);
     Written[C].Init(TArray<float>(), SpaceCells.Num());
-    for (TArray<float>& Data : Written[C]) Data.Init(0.0f, S08MovePlateSpec::NumCustomData);
+    for (TArray<float>& Data : Written[C]) {
+      Data.Init(0.0f, S08MovePlateSpec::NumCustomData);
+      Data[S08MovePlateCpd::Channel] = static_cast<float>(C);
+    }
     WrittenZ[C].Init(-1e6f, SpaceCells.Num());
-    Ism->MarkRenderStateDirty();
   }
+  Plates->AddInstances(Hidden, false);
+  // the channel of every instance is written once here and never changes
+  for (int32 C = 0; C < NumChannels; ++C) {
+    for (int32 I = 0; I < SpaceCells.Num(); ++I) {
+      Plates->SetCustomDataValue(C * SpaceCells.Num() + I, S08MovePlateCpd::Channel, static_cast<float>(C), false);
+    }
+  }
+  Plates->MarkRenderStateDirty();
   AppliedHash = 0;
   ApplyStyle(InStyle);
-  FS08Trace::Write(FString::Printf(TEXT("MS-HL build n=%d spaces=%d channels=%d shape=%s style=%s plate=%s path=%s ready=%d"),
-                                   BuildCount, SpaceCells.Num(), NumChannels, bSquare ? TEXT("square") : TEXT("circle"),
-                                   *Style.Source, *S08ColorHex(Style.PlateColor), *S08ColorHex(Style.PathColor),
-                                   bReady ? 1 : 0));
+  FS08Trace::Write(FString::Printf(TEXT("MS-HL build n=%d spaces=%d channels=%d isms=1 instances=%d shape=%s style=%s plate=%s path=%s ready=%d"),
+                                   BuildCount, SpaceCells.Num(), NumChannels, Plates->GetInstanceCount(),
+                                   bSquare ? TEXT("square") : TEXT("circle"), *Style.Source, *S08ColorHex(Style.PlateColor),
+                                   *S08ColorHex(Style.PathColor), bReady ? 1 : 0));
   FS08Trace::Write(S08MoveHighlight::CheckGeometry(Style).TraceLine(Style.Source));
 }
 
-void US08MoveHighlightComponent::WriteInstance(S08MovePlateSpec::EChannel Channel, int32 Instance,
+void US08MoveHighlightComponent::WriteInstance(S08MovePlateSpec::EChannel Channel, int32 Space,
                                                const float (&Data)[S08MovePlateSpec::NumCustomData], bool bShow,
                                                float Z) {
   const int32 C = static_cast<int32>(Channel);
-  UInstancedStaticMeshComponent* Ism = Channels[C];
+  const int32 Instance = IsmInstance(Channel, Space);
   for (int32 Slot = 0; Slot < S08MovePlateSpec::NumCustomData; ++Slot) {
-    Ism->SetCustomDataValue(Instance, Slot, Data[Slot], false);
-    Written[C][Instance][Slot] = Data[Slot];
+    Plates->SetCustomDataValue(Instance, Slot, Data[Slot], false);
+    Written[C][Space][Slot] = Data[Slot];
   }
-  const FIntPoint Cell = SpaceCells[Instance];
+  const FIntPoint Cell = SpaceCells[Space];
   const float Scale = bShow ? S08MovePlateSpec::HalfUU * 2.0f / 100.0f : 0.0f;
   const FVector Location = Board.CellToWorld(Cell.X, Cell.Y) + FVector(0.0f, 0.0f, Z);
-  Ism->UpdateInstanceTransform(Instance, FTransform(FRotator::ZeroRotator, Location, FVector(Scale, Scale, bShow ? 1.0f : 0.0f)),
-                               false, false, true);
-  WrittenZ[C][Instance] = bShow ? Z : -1e6f;
+  Plates->UpdateInstanceTransform(Instance, FTransform(FRotator::ZeroRotator, Location, FVector(Scale, Scale, bShow ? 1.0f : 0.0f)),
+                                  false, false, true);
+  WrittenZ[C][Space] = bShow ? Z : -1e6f;
 }
 
 void US08MoveHighlightComponent::SetLastMoveFade(float Fade) {
   Fade = FMath::Clamp(Fade, 0.0f, 1.0f);
   if (FMath::IsNearlyEqual(Fade, LastMoveFade, 1.0e-3f)) return;
   LastMoveFade = Fade;
-  const int32 C = static_cast<int32>(S08MovePlateSpec::EChannel::Outline);
-  if (ChannelMids.IsValidIndex(C) && ChannelMids[C]) {
-    ChannelMids[C]->SetScalarParameterValue(S08MovePlateSpec::ParamLastMoveFade, LastMoveFade);
-  }
+  // one MID: only the outline channel reads LastMoveFade (M_UM_MovePlate), the other channels do not change
+  if (PlateMid) PlateMid->SetScalarParameterValue(S08MovePlateSpec::ParamLastMoveFade, LastMoveFade);
 }
 
 int32 US08MoveHighlightComponent::ApplyView(const FS08MoveDraftView& View) {
-  if (Channels.Num() != static_cast<int32>(S08MovePlateSpec::EChannel::Count) || SpaceCells.Num() == 0) return 0;
+  if (!Plates || SpaceCells.Num() == 0) return 0;
   const uint32 Hash = S08MoveHighlight::ViewHash(View);
   if (Hash == AppliedHash && AppliedHash != 0) return 0;
   using S08MovePlateSpec::EChannel;
-  // per instance the wanted data of every channel (an absent space = all None)
-  TArray<const FS08PlateView*> ByInstance;
-  ByInstance.Init(nullptr, SpaceCells.Num());
+  const int32 NumChannels = static_cast<int32>(EChannel::Count);
+  // per space the wanted data of every channel (an absent space = all None)
+  TArray<const FS08PlateView*> BySpace;
+  BySpace.Init(nullptr, SpaceCells.Num());
   for (const FS08PlateView& P : View.Plates) {
-    if (const int32* Index = InstanceByCell.Find(FS08BoardModel::CellKey(P.X, P.Y))) ByInstance[*Index] = &P;
+    if (const int32* Index = InstanceByCell.Find(FS08BoardModel::CellKey(P.X, P.Y))) BySpace[*Index] = &P;
   }
   int32 Updates = 0;
   int32 Shown[4] = {0, 0, 0, 0};
   for (int32 I = 0; I < SpaceCells.Num(); ++I) {
-    const FS08PlateView* P = ByInstance[I];
-    for (int32 C = 0; C < Channels.Num(); ++C) {
+    const FS08PlateView* P = BySpace[I];
+    for (int32 C = 0; C < NumChannels; ++C) {
       const EChannel Channel = static_cast<EChannel>(C);
-      float Data[S08MovePlateSpec::NumCustomData] = {0, 0, 0, 0, 0, 0};
+      float Data[S08MovePlateSpec::NumCustomData] = {0, 0, 0, 0, 0, 0, 0};
       float Z = 0.0f;
       bool bShow = false;
       if (P) {
@@ -549,6 +551,8 @@ int32 US08MoveHighlightComponent::ApplyView(const FS08MoveDraftView& View) {
           for (float& V : Data) V = 0.0f;
         }
       }
+      // the channel slot never changes (BuildForBoard wrote it)
+      Data[S08MovePlateCpd::Channel] = static_cast<float>(C);
       if (bShow) ++Shown[C];
       bool bSame = (bShow ? Z : -1e6f) == WrittenZ[C][I];
       for (int32 Slot = 0; bSame && Slot < S08MovePlateSpec::NumCustomData; ++Slot) {
@@ -559,9 +563,7 @@ int32 US08MoveHighlightComponent::ApplyView(const FS08MoveDraftView& View) {
       ++Updates;
     }
   }
-  if (Updates > 0) {
-    for (UInstancedStaticMeshComponent* Ism : Channels) Ism->MarkRenderStateDirty();
-  }
+  if (Updates > 0) Plates->MarkRenderStateDirty();
   AppliedHash = Hash;
   if (Updates > 0) {
     FS08Trace::Write(FString::Printf(TEXT("MS-HL view source=%s rev=%u plates=%d fill=%d ring=%d outline=%d glyph=%d paths=%d updates=%d hover=%s"),
@@ -572,28 +574,24 @@ int32 US08MoveHighlightComponent::ApplyView(const FS08MoveDraftView& View) {
   return Updates;
 }
 
-const UInstancedStaticMeshComponent* US08MoveHighlightComponent::GetChannel(S08MovePlateSpec::EChannel Channel) const {
-  const int32 C = static_cast<int32>(Channel);
-  return Channels.IsValidIndex(C) ? Channels[C].Get() : nullptr;
-}
-
 int32 US08MoveHighlightComponent::InstanceOf(int32 X, int32 Y) const {
   const int32* Index = InstanceByCell.Find(FS08BoardModel::CellKey(X, Y));
   return Index ? *Index : INDEX_NONE;
 }
 
-float US08MoveHighlightComponent::GetCustomData(S08MovePlateSpec::EChannel Channel, int32 Instance, int32 Slot) const {
+float US08MoveHighlightComponent::GetCustomData(S08MovePlateSpec::EChannel Channel, int32 Space, int32 Slot) const {
   const int32 C = static_cast<int32>(Channel);
-  if (!Written.IsValidIndex(C) || !Written[C].IsValidIndex(Instance) || !Written[C][Instance].IsValidIndex(Slot)) return 0.0f;
-  return Written[C][Instance][Slot];
+  if (!Written.IsValidIndex(C) || !Written[C].IsValidIndex(Space) || !Written[C][Space].IsValidIndex(Slot)) return 0.0f;
+  return Written[C][Space][Slot];
 }
 
-bool US08MoveHighlightComponent::IsInstanceVisible(S08MovePlateSpec::EChannel Channel, int32 Instance) const {
+bool US08MoveHighlightComponent::IsInstanceVisible(S08MovePlateSpec::EChannel Channel, int32 Space) const {
   const int32 C = static_cast<int32>(Channel);
-  const UInstancedStaticMeshComponent* Ism = GetChannel(Channel);
-  if (!Ism || !Ism->IsValidInstance(Instance)) return false;
+  if (!Plates || Space < 0 || Space >= SpaceCells.Num()) return false;
+  const int32 Instance = IsmInstance(Channel, Space);
+  if (!Plates->IsValidInstance(Instance)) return false;
   FTransform T;
-  Ism->GetInstanceTransform(Instance, T, false);
-  return !T.GetScale3D().IsNearlyZero() && WrittenZ.IsValidIndex(C) && WrittenZ[C].IsValidIndex(Instance) &&
-         WrittenZ[C][Instance] > -1e5f;
+  Plates->GetInstanceTransform(Instance, T, false);
+  return !T.GetScale3D().IsNearlyZero() && WrittenZ.IsValidIndex(C) && WrittenZ[C].IsValidIndex(Space) &&
+         WrittenZ[C][Space] > -1e5f;
 }

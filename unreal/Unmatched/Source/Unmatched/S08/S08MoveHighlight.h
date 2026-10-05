@@ -3,13 +3,18 @@
 // What the board shows while a fighter is picked or a maneuver draft is open is one description, FS08MoveDraftView:
 // one record per board space with ONE state per channel (ring / outline / centre dot / glyph), chosen by the
 // priorities of 03 §4.2a. S08MoveHighlight::BuildDraftView makes it from the draft (pure, automation-tested);
-// US08MoveHighlightComponent (owned by AS08BoardActor) draws it with four instanced static meshes created once per
-// board - PlateFill, PlateRing, PlateOutline, Glyphs, one instance per board space each - and a selection, a hover or
-// a boost change only rewrites custom data and transforms of the instances that changed (MS-R-49: no actor and no
-// component is spawned or destroyed). Every instance is the engine plane under M_UM_MovePlate
-// (/Game/S08/MoveSelection, built by tools/art/move_selection/ue_move_plate_material.py): an unlit translucent
-// material that draws the plate shapes from the per-instance custom data (layout S08MovePlateCpd) and the style
-// parameters (S08MovePlateParam, from the profile "moveSelection" block - live tune changes the MIDs only).
+// US08MoveHighlightComponent (owned by AS08BoardActor) draws it with ONE instanced static mesh created once per board
+// with four instances per board space - the channels PlateFill, PlateRing, PlateOutline, Glyphs, channel-major - and a
+// selection, a hover or a boost change only rewrites custom data and transforms of the instances that changed
+// (MS-R-49: no actor and no component is spawned or destroyed). Every instance is the engine plane under one MID of
+// M_UM_MovePlate (/Game/S08/MoveSelection, built by tools/art/move_selection/ue_move_plate_material.py): an unlit
+// translucent material that draws the plate shapes from the per-instance custom data (layout S08MovePlateCpd, the
+// channel included) and the style parameters (S08MovePlateParam, from the profile "moveSelection" block - live tune
+// changes the MID only).
+// MS-AT-41 (run H R-04): one primitive, one material slot, one MID = one translucency draw and one occlusion query
+// for all plates (four ISMs cost +8 draw calls). The layers keep their order fill < ring < outline < glyph because
+// the instances are channel-major and the engine preserves the instance order of a translucent ISM
+// (FMeshBatchElement::bPreserveInstanceOrder).
 //
 // Until the user's art acceptance (MS-T-27) the plates are opt-in: -S08MovePlates. Without the flag the board keeps
 // the old readability ring (AS08BoardActor::SetSelectedFighter), so the reference frames of other sessions do not
@@ -201,14 +206,13 @@ inline const TCHAR* const MaterialPath = TEXT("/Game/S08/MoveSelection/M_UM_Move
 /** Half size of a plate instance (uu): the engine plane (100 uu) at scale 2 x HalfUU / 100 covers the outline (41)
  *  and the square of a grid cell (41) with a margin. */
 constexpr float HalfUU = 44.0f;
-constexpr int32 NumCustomData = 6;
-/** Channel of an ISM ("Channel" parameter of its MID). */
+constexpr int32 NumCustomData = 7;
+/** Channel of an instance (custom data S08MovePlateCpd::Channel; instance = channel x spaces + space). */
 enum class EChannel : uint8 { Fill = 0, Ring = 1, Outline = 2, Glyph = 3, Count = 4 };
 UNMATCHED_API const TCHAR* ChannelName(EChannel Channel);
 /** Height of a channel above the play plane (03 §4.1): fill zFill, ring / outline zRing, glyph 2.0. */
 constexpr float GlyphZ = 2.0f;
-/** Scalar parameters. */
-inline const TCHAR* const ParamChannel = TEXT("Channel");
+/** Scalar parameters (the channel is per-instance custom data since MS-AT-41, not a parameter). */
 inline const TCHAR* const ParamShape = TEXT("Shape");          // 0 = circle (map space), 1 = rounded square (grid)
 inline const TCHAR* const ParamHalfUU = TEXT("HalfUU");
 inline const TCHAR* const ParamRingCenter = TEXT("RingCenter");
@@ -225,7 +229,7 @@ inline const TCHAR* const ParamCandRadius = TEXT("CandRadius");
 inline const TCHAR* const ParamCandWidth = TEXT("CandWidth");
 inline const TCHAR* const ParamCandAlpha = TEXT("CandAlpha");
 inline const TCHAR* const ParamLastMoveAlpha = TEXT("LastMoveAlpha");
-/** MS-T-17: the MS-P-03 fade of V-14 / V-15 (1 shown .. 0 gone over 300 ms), set on the outline MID only. */
+/** MS-T-17: the MS-P-03 fade of V-14 / V-15 (1 shown .. 0 gone over 300 ms); only the outline channel reads it. */
 inline const TCHAR* const ParamLastMoveFade = TEXT("LastMoveFade");
 /** Vector parameters (linear = FLinearColor::FromSRGBColor of the profile hex). */
 inline const TCHAR* const ParamPlateColor = TEXT("PlateColor");
@@ -246,6 +250,7 @@ constexpr int32 Chip = 2;        // +N / +k
 constexpr int32 GlyphIndex = 3;  // atlas index (MS-T-10; 0 now)
 constexpr int32 Flags = 4;       // S08PlateFlags
 constexpr int32 Color = 5;       // ES08PlateColor
+constexpr int32 Channel = 6;     // S08MovePlateSpec::EChannel (MS-AT-41: one ISM for every channel)
 }  // namespace S08MovePlateCpd
 
 UCLASS()
@@ -255,12 +260,12 @@ class UNMATCHED_API US08MoveHighlightComponent : public USceneComponent {
 public:
   US08MoveHighlightComponent();
 
-  /** Creates the four ISMs (once) on Plane and loads M_UM_MovePlate; traces 'MS-HL assets'. A missing material leaves
+  /** Creates the plate ISM (once) on Plane and loads M_UM_MovePlate; traces 'MS-HL assets'. A missing material leaves
    *  the component unready (IsReady false): the board then keeps the old readability ring. */
   void Initialize(UStaticMesh* Plane);
   bool IsReady() const { return bReady; }
-  /** One hidden instance per board space on every channel (a full board rebuild / live-tune reload); applies the style
-   *  to the MIDs and traces 'MS-HL build' and 'MS-HL geom'. */
+  /** One hidden instance per board space and channel (a full board rebuild / live-tune reload); applies the style to
+   *  the MID and traces 'MS-HL build' and 'MS-HL geom'. */
   void BuildForBoard(const FS08BoardModel& Board, const FS08MoveSelectionSpec& Style);
   /** The style only (live tune: MID parameters, no instance touched). */
   void ApplyStyle(const FS08MoveSelectionSpec& Style);
@@ -268,18 +273,23 @@ public:
    *  number of instance updates (0 for an unchanged view). */
   int32 ApplyView(const FS08MoveDraftView& View);
   void ClearView() { ApplyView(FS08MoveDraftView()); }
-  /** MS-T-17: the MS-P-03 fade of the last-move outlines (0..1; only the outline MID, only when it changed). */
+  /** MS-T-17: the MS-P-03 fade of the last-move outlines (0..1; one MID parameter, only when it changed). */
   void SetLastMoveFade(float Fade);
   float GetLastMoveFade() const { return LastMoveFade; }
 
   // ---- inspection (automation, traces) ----
   int32 GetSpaceCount() const { return SpaceCells.Num(); }
-  const UInstancedStaticMeshComponent* GetChannel(S08MovePlateSpec::EChannel Channel) const;
-  /** Instance index of a space (INDEX_NONE off the board / not a space). */
+  /** The one plate ISM (MS-AT-41). */
+  const UInstancedStaticMeshComponent* GetPlates() const { return Plates.Get(); }
+  /** Space index of a space (INDEX_NONE off the board / not a space); ISM instance = IsmInstance(Channel, index). */
   int32 InstanceOf(int32 X, int32 Y) const;
-  /** Custom data value of a channel instance (0 when absent). */
+  /** ISM instance of a channel of a space index (channel-major). */
+  int32 IsmInstance(S08MovePlateSpec::EChannel Channel, int32 Space) const {
+    return static_cast<int32>(Channel) * SpaceCells.Num() + Space;
+  }
+  /** Custom data value of a channel of a space index (0 when absent). */
   float GetCustomData(S08MovePlateSpec::EChannel Channel, int32 Instance, int32 Slot) const;
-  /** True when the channel instance is drawn (non-zero scale). */
+  /** True when the channel of a space index is drawn (non-zero scale). */
   bool IsInstanceVisible(S08MovePlateSpec::EChannel Channel, int32 Instance) const;
   const FS08MoveSelectionSpec& GetStyle() const { return Style; }
   const FString& GetMaterialName() const { return MaterialName; }
@@ -289,14 +299,14 @@ public:
   void SetReadyForTest() { bReady = true; }
 
 private:
-  void EnsureChannels();
+  void EnsurePlates();
   void WriteInstance(S08MovePlateSpec::EChannel Channel, int32 Instance, const float (&Data)[S08MovePlateSpec::NumCustomData],
                      bool bShow, float Z);
 
   UPROPERTY()
-  TArray<TObjectPtr<UInstancedStaticMeshComponent>> Channels;
+  TObjectPtr<UInstancedStaticMeshComponent> Plates;
   UPROPERTY()
-  TArray<TObjectPtr<UMaterialInstanceDynamic>> ChannelMids;
+  TObjectPtr<UMaterialInstanceDynamic> PlateMid;
   UPROPERTY()
   TObjectPtr<UMaterialInterface> PlateMaterial;
   UPROPERTY()
@@ -307,11 +317,11 @@ private:
   FS08MoveSelectionSpec Style;
   bool bSquare = false;
   FS08BoardModel Board;
-  TArray<FIntPoint> SpaceCells;          // instance index -> space
-  TMap<uint64, int32> InstanceByCell;    // FS08BoardModel::CellKey -> instance index
+  TArray<FIntPoint> SpaceCells;          // space index -> space
+  TMap<uint64, int32> InstanceByCell;    // FS08BoardModel::CellKey -> space index
   /** Last written data / visibility / z per channel instance (an unchanged instance is not touched). */
-  TArray<TArray<TArray<float>>> Written;  // [channel][instance][slot]
-  TArray<TArray<float>> WrittenZ;         // [channel][instance], < -1e5 = hidden
+  TArray<TArray<TArray<float>>> Written;  // [channel][space][slot]
+  TArray<TArray<float>> WrittenZ;         // [channel][space], < -1e5 = hidden
   uint32 AppliedHash = 0;
   int32 BuildCount = 0;
   float LastMoveFade = 1.0f;

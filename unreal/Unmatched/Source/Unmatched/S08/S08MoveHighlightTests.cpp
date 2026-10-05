@@ -332,11 +332,33 @@ bool FS08MoveHLIsmStatesTest::RunTest(const FString&) {
     }
   }
   TestEqual("instances per channel = board spaces", HL->GetSpaceCount(), Spaces);
-  for (int32 C = 0; C < static_cast<int32>(EChannel::Count); ++C) {
-    const UInstancedStaticMeshComponent* Ism = HL->GetChannel(static_cast<EChannel>(C));
-    TestTrue(FString::Printf(TEXT("channel %s: %d instances, 6 custom floats"), S08MovePlateSpec::ChannelName(static_cast<EChannel>(C)), Spaces),
-             Ism && Ism->GetInstanceCount() == Spaces && Ism->NumCustomDataFloats == S08MovePlateSpec::NumCustomData);
+  // MS-AT-41 (run H R-04): ONE plate ISM for every channel (one translucency draw, one occlusion query), one material
+  // slot, no shadow; the channel is custom data, channel-major (the translucent ISM keeps the instance order, so the
+  // layers stay fill < ring < outline < glyph)
+  const int32 NumChannels = static_cast<int32>(EChannel::Count);
+  const UInstancedStaticMeshComponent* Ism = HL->GetPlates();
+  if (!TestNotNull("the plate ISM", Ism)) return false;
+  TestTrue(FString::Printf(TEXT("one ISM: %d x %d instances, %d custom floats"), NumChannels, Spaces, S08MovePlateSpec::NumCustomData),
+           Ism->GetInstanceCount() == NumChannels * Spaces && Ism->NumCustomDataFloats == S08MovePlateSpec::NumCustomData);
+  TestEqual("one material slot", Ism->GetNumMaterials(), 1);
+  TestFalse("no shadow", Ism->CastShadow);
+  int32 PlateIsms = 0;
+  for (UActorComponent* Component : Board->GetComponents()) {
+    if (Component && Component->IsA<UInstancedStaticMeshComponent>() && Component->GetName().StartsWith(TEXT("MoveHL_"))) ++PlateIsms;
   }
+  TestEqual("one MoveHL_ primitive on the board", PlateIsms, 1);
+  int32 WrongChannel = 0;
+  for (int32 C = 0; C < NumChannels; ++C) {
+    for (int32 I = 0; I < Spaces; ++I) {
+      const int32 Instance = HL->IsmInstance(static_cast<EChannel>(C), I);
+      const int32 Base = Instance * Ism->NumCustomDataFloats;
+      if (Instance != C * Spaces + I || !Ism->PerInstanceSMCustomData.IsValidIndex(Base + S08MovePlateCpd::Channel) ||
+          FMath::RoundToInt(Ism->PerInstanceSMCustomData[Base + S08MovePlateCpd::Channel]) != C) {
+        ++WrongChannel;
+      }
+    }
+  }
+  TestEqual("channel custom data, channel-major", WrongChannel, 0);
   if (NonSpace.X >= 0) TestEqual("no plate on a lattice cell that is not a space", HL->InstanceOf(NonSpace.X, NonSpace.Y), INDEX_NONE);
   // the draft of the real game, as the game mode feeds it (provider = S09MoveDraftView over FS09CommandUi)
   FS09CommandUi Ui;
