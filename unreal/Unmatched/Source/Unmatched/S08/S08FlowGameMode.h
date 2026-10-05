@@ -609,6 +609,7 @@ private:
   bool bS09ShotDeckOpp = false;
   int32 S09DeckShotStage = 0;  // 0 idle, 1 own open, 2 own shot asked, 3 opp open, 4 done
   int32 S09DeckShotTries = 0;
+  int32 S09DeckShotTurn = -1;  // one attempt per opponent turn (the auto client's turns are short)
   float S09DeckShotAt = -1.0f;
   bool bS09ShotResultBoard = false;
   float ShotResultBoardAtElapsed = -1.0f;

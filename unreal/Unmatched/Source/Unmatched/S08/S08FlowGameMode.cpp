@@ -3492,6 +3492,9 @@ void AS08FlowGameMode::RunS09Auto() {
       const FString ShotKey = FString::Printf(TEXT("%s:%d:%s"), *Type,
                                               CommandUi.PendingChoice.Stage,
                                               *CommandUi.PendingChoice.Mode);
+      // DE-031 (run F G-LIVE): one capture at a time - a second request in the same frame replaced the damage-number
+      // frame asked a tick earlier (its 'SHOT captured ... saved=1' never came and the provenance gate failed)
+      if (!S09PendingShotKeys.Contains(ShotKey) && FScreenshotRequest::IsScreenshotRequested()) return;
       if (!S09PendingShotKeys.Contains(ShotKey)) {
         S09PendingShotKeys.Add(ShotKey);
         FString ShotName = FString::Printf(TEXT("s09-pending-%s"), *Type);

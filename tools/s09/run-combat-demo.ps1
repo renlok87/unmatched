@@ -486,20 +486,26 @@ function Invoke-CombatDemo {
         throw ("capture for {0} is {1}x{2} - expected {3}x{4} (saved GameUserSettings override?)" -f $Who, $Stats.w, $Stats.h, $ShotWidth, $ShotHeight)
       }
     }
+    # DE-031 (run F G-LIVE): an absent marker may still match a few scattered scene pixels - the Sarpedon lit3d fire
+    # (#F14D30) sits inside the defense hue tolerance and failed three result gates with 1 sample (runs E and F). A
+    # drawn marker panel gives >= 200 samples, so 'absent' allows this much scene noise and the gate still separates
+    # every state (the swap controls below keep checking it).
+    $MarkerNoise = 4
     function Test-StateImage($Stats, [string]$State) {
       # Exactly ONE combat marker region may light up, and only the expected
-      # one; every other combat marker must be fully absent frame-wide.
+      # one; every other combat marker must be absent frame-wide (<= $MarkerNoise scene samples).
+      $n = $MarkerNoise
       if ($State -eq 'defense') {
-        return ($Stats.defenseRegion -ge 200 -and $Stats.attackAll -eq 0 -and
-                $Stats.resolveAll -eq 0 -and $Stats.boostAll -eq 0 -and $Stats.resultAll -eq 0)
+        return ($Stats.defenseRegion -ge 200 -and $Stats.attackAll -le $n -and
+                $Stats.resolveAll -le $n -and $Stats.boostAll -le $n -and $Stats.resultAll -le $n)
       }
       if ($State -eq 'resolve') {
-        return ($Stats.resolveRegion -ge 200 -and $Stats.attackAll -eq 0 -and
-                $Stats.defenseAll -eq 0 -and $Stats.boostAll -eq 0 -and $Stats.resultAll -eq 0)
+        return ($Stats.resolveRegion -ge 200 -and $Stats.attackAll -le $n -and
+                $Stats.defenseAll -le $n -and $Stats.boostAll -le $n -and $Stats.resultAll -le $n)
       }
       if ($State -eq 'result') {
-        return ($Stats.resultRegion -ge 200 -and $Stats.attackAll -eq 0 -and
-                $Stats.defenseAll -eq 0 -and $Stats.resolveAll -eq 0 -and $Stats.boostAll -eq 0)
+        return ($Stats.resultRegion -ge 200 -and $Stats.attackAll -le $n -and
+                $Stats.defenseAll -le $n -and $Stats.resolveAll -le $n -and $Stats.boostAll -le $n)
       }
       throw "unknown state: $State"
     }
@@ -722,8 +728,8 @@ function Invoke-CombatDemo {
           throw ("reveal gate failed: revealed capture needs the resolve marker AND reveal pixels (rvl={0} res={1})" -f `
             $revealedStats.revealRegion, $revealedStats.resolveRegion)
         }
-        if ($revealedStats.attackAll -ne 0 -or $revealedStats.defenseAll -ne 0 -or
-            $revealedStats.resultAll -ne 0) {
+        if ($revealedStats.attackAll -gt $MarkerNoise -or $revealedStats.defenseAll -gt $MarkerNoise -or
+            $revealedStats.resultAll -gt $MarkerNoise) {
           throw "reveal gate failed: foreign combat markers present in the revealed shot"
         }
       }

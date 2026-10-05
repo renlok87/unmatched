@@ -432,23 +432,25 @@ void AS08FlowGameMode::TakeS09DeckPanelShots() {
   // Run F G-LIVE (DE-031): the deck panel of a live match. The auto client opens it in the opponent's turn (no input of
   // mine pending) once both public discard piles hold a card and the lists are loaded, frames my deck, switches to the
   // opponent's deck, frames it and leaves the panel open: my next turn (or my defense window) closes it by itself.
-  // An early close before a frame retries on a later opponent turn (at most four attempts).
+  // An early close before a frame retries on a later opponent turn (one attempt per turn, at most six).
   if (!bAutoS09 || S09ShotDir.IsEmpty() || S09DeckShotStage >= 4 || !Flow.IsValid()) return;
   if (FScreenshotRequest::IsScreenshotRequested()) return;
   auto Interrupted = [this](const TCHAR* Why) {
     FS08Trace::Write(FString::Printf(TEXT("S09AUTO deck-panel shots interrupted stage=%d why=%s try=%d"),
                                      S09DeckShotStage, Why, S09DeckShotTries));
-    S09DeckShotStage = S09DeckShotTries >= 4 ? 4 : 0;
+    S09DeckShotStage = S09DeckShotTries >= 6 ? 4 : 0;
   };
   switch (S09DeckShotStage) {
     case 0: {
       const FS09PlayerPanel* Own = Hud.ViewerPanel();
       const FS09PlayerPanel* Opp = Hud.OpponentPanel();
       if (!Hud.bValid || Hud.bGameOver || Hud.bViewerTurn || !Own || !Opp || Own->Discard.Num() == 0 ||
-          Opp->Discard.Num() == 0 || DeckLists.Num() < 2 || DeckPanel.IsOpen() || !DeckDemandKeyNow().IsEmpty()) {
+          Opp->Discard.Num() == 0 || DeckLists.Num() < 2 || DeckPanel.IsOpen() || !DeckDemandKeyNow().IsEmpty() ||
+          Hud.TurnCount == S09DeckShotTurn) {
         return;
       }
       ++S09DeckShotTries;
+      S09DeckShotTurn = Hud.TurnCount;
       const ES09DeckSide Side = bS09ShotDeckOwn ? ES09DeckSide::Opponent : ES09DeckSide::Own;
       FS08Trace::Write(FString::Printf(TEXT("S09AUTO deck-panel open side=%s try=%d discard=%d/%d"),
                                        S09DeckPanel::SideName(Side), S09DeckShotTries, Own->Discard.Num(),
