@@ -215,28 +215,55 @@ void AS08FlowGameMode::TickTurnHud() {
 
 // ------------------------------------------------------------------------------------------------- gallery preview
 
-void AS08FlowGameMode::GalleryPortraitsBegin() {
+void AS08FlowGameMode::GalleryPortraitsBegin(bool bFromBenchFixture) {
   UWorld* World = GetWorld();
   if (!World) return;
   TurnHudLook = FS08TurnHudLook::FromCommandLine(FCommandLine::Get());
   const FS08ArtHudPlateStyle Chips;
   // sample data of the review frame only (the live portraits read the server state)
   struct FSample {
-    const TCHAR* Name;
+    FString Name;
     int32 Hp;
     int32 MaxHp;
     bool bOpponent;
+    int32 Chip;  // FS08ArtHudPlateStyle::TeamChipColor index
   };
-  const FSample Samples[] = {{TEXT("Medusa"), 15, 15, true}, {TEXT("King Arthur"), 16, 18, false}};
+  TArray<FSample> Samples = {{TEXT("Medusa"), 15, 15, true, 1}, {TEXT("King Arthur"), 16, 18, false, 0}};
+  if (bFromBenchFixture) {
+    // DE-028: the bench fixture's heroes - the viewer's below, the other above - in the live team look (TickTurnHud)
+    const FS08BoardFighter* Own = nullptr;
+    const FS08BoardFighter* Opp = nullptr;
+    for (const FS08BoardFighter& F : Fighters) {
+      if (!F.bIsHero) continue;
+      if (F.OwnerId == BenchViewerId) {
+        if (!Own) Own = &F;
+      } else if (!Opp) {
+        Opp = &F;
+      }
+    }
+    auto Chip = [&](const FS08BoardFighter& F, bool bOpponent) {
+      if (!BoardActor) return bOpponent ? 1 : 0;
+      const ES08TeamSlot Look = S08TeamLook(BoardActor->TeamOfFighter(F), F.OwnerId == BenchViewerId,
+                                            static_cast<ES08TeamColorMode>(ArtHud.TeamColorMode));
+      return Look == ES08TeamSlot::P1 ? 0 : 1;
+    };
+    auto Name = [](const FS08BoardFighter& F) { return F.Label.IsEmpty() ? F.Name : F.Label; };
+    if (Own && Opp) {
+      Samples = {{Name(*Opp), Opp->Health, Opp->MaxHealth, true, Chip(*Opp, true)},
+                 {Name(*Own), Own->Health, Own->MaxHealth, false, Chip(*Own, false)}};
+    }
+  }
   // the same column as the live HUD (BuildTurnHudWidgets), above the gallery (z 1000)
   TSharedRef<SVerticalBox> Column = SNew(SVerticalBox).Visibility(EVisibility::SelfHitTestInvisible);
   for (const FSample& S : Samples) {
     US08TurnPortraitWidget* Portrait = CreateWidget<US08TurnPortraitWidget>(World, US08TurnPortraitWidget::StaticClass());
     if (!Portrait) return;
-    Portrait->Setup(S.bOpponent, TurnHudLook, Chips.TeamChipColor(S.bOpponent ? 1 : 0));
+    Portrait->Setup(S.bOpponent, TurnHudLook, Chips.TeamChipColor(S.Chip));
     Portrait->SetHeroName(S.Name);
     Portrait->SetHealth(S.Hp, S.MaxHp);
     Portrait->SetActive(!S.bOpponent);
+    // over the board it is my turn: the opponent's tracker is hidden as in the live HUD (DE-022 / DE-023)
+    if (bFromBenchFixture && S.bOpponent) Portrait->SetTrackerOpacity(0.0f);
     Column->AddSlot().AutoHeight().Padding(0.0f, 0.0f, 0.0f, S.bOpponent ? GPortraitGapSu : 0.0f)[Portrait->TakeWidget()];
     GalleryPortraits.Add(Portrait);
   }
@@ -249,7 +276,10 @@ void AS08FlowGameMode::GalleryPortraitsBegin() {
         .AutoSize(true)[Column];
     GEngine->GameViewport->AddViewportWidgetContent(Canvas, 2000);  // AddToViewport(1000) sits at 1000 + 10
   }
-  FS08Trace::Write(FString::Printf(TEXT("ICONGALLERY portraits=%d %s"), GalleryPortraits.Num(), *TurnHudLook.Describe()));
+  FS08Trace::Write(FString::Printf(TEXT("%s portraits=%d own=%s opp=%s %s"),
+                                   bFromBenchFixture ? TEXT("BENCH turn-hud") : TEXT("ICONGALLERY"), GalleryPortraits.Num(),
+                                   *Samples.Last().Name.Replace(TEXT(" "), TEXT("_")),
+                                   *Samples[0].Name.Replace(TEXT(" "), TEXT("_")), *TurnHudLook.Describe()));
 }
 
 void AS08FlowGameMode::GalleryPortraitsAt(float TMs) {

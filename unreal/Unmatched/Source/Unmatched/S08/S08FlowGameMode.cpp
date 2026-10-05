@@ -8445,6 +8445,15 @@ void AS08FlowGameMode::RunRenderBench() {
       }
       B.HeroId = PosedId;  // the K2 views focus the moving figure
     }
+    // DE-028 (W-28): -BenchTurnHud=<ms> lays the two DE-023 turn portraits (the fixture's heroes, my turn) over the
+    // scene with their clock frozen <ms> after my turn started - the A/B frames of the ring (-S08TurnRingIcon=<id>),
+    // the tracker and the heart (-S08HeartGlow) on a real board. Review tooling only: the live HUD is not built here.
+    double TurnHudMs = -1.0;
+    if (FParse::Value(Cmd, TEXT("BenchTurnHud="), TurnHudMs) && TurnHudMs >= 0.0) {
+      GalleryPortraitsBegin(/*bFromBenchFixture=*/true);
+      GalleryPortraitsAt(static_cast<float>(TurnHudMs));
+      FS08Trace::Write(FString::Printf(TEXT("BENCH turn-hud at=%.0f portraits=%d"), TurnHudMs, GalleryPortraits.Num()));
+    }
     FS08Trace::Write(FString::Printf(
         TEXT("BENCH scene fixture=%s board=%dx%d fighters=%d viewer=%s hero=%s art=%d profile=%s views=%s warmup=%.0f settle=%.0f measure=%.0f fps=%.0f profileGpu=%d csv=%d"),
         *FPaths::GetCleanFilename(Fixture), BoardModel.Width, BoardModel.Height, Fighters.Num(),

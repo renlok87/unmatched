@@ -779,8 +779,10 @@ private:
   bool IconGalleryBegin();
   void IconGalleryTick(float DeltaSeconds);
   /** DE-023 review tooling (-S08IconGallery -S08IconGalleryPortraits): the two turn portraits over the gallery with
-   *  sample data, replayed at the gallery clock (ring appear, a spent slot and the heart damage all start at 0). */
-  void GalleryPortraitsBegin();
+   *  sample data, replayed at the gallery clock (ring appear, a spent slot and the heart damage all start at 0).
+   *  bFromBenchFixture (DE-028, -Bench -BenchTurnHud=<ms>): the names, HP and team colours of the bench fixture's two
+   *  heroes instead of the sample, over the real board - the A/B sheet frames of the ring, the tracker and the heart. */
+  void GalleryPortraitsBegin(bool bFromBenchFixture = false);
   void GalleryPortraitsAt(float TMs);
   bool bIconGallery = false;
   FString IconGalleryShotDir;
