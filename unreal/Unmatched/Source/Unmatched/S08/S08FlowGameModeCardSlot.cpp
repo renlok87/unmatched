@@ -8,8 +8,10 @@
 //     fighters of the previous snapshot (positions, HP, statuses), the cues of its seq wait, my own choice it opened
 //     waits with the command panel collapsed, and the last-move highlight is not revealed. A click on the field,
 //     Space or Enter starts the effect at once ('INPUT slot-skip'); in my own turn the click still reaches the field
-//     (DE-015: input opens with the turn). A newer seq, the end of the game or a reset release the effect without
-//     replaying its cues (the presentation catches up with the snapshot). My own scheme never waits.
+//     (DE-015: input opens with the turn). Run E review: the rest of the same scheme (its pending effects resolved in
+//     the next seqs, a quiet seq) joins the hold; a new action (a maneuver, an attack, another card) or the end of the
+//     game releases it and its held moves still play - joined with the new seq's own moves (one path per fighter);
+//     the card keeps its read time. A reset drops everything. My own scheme never waits.
 //   - The card stays while its effect runs (a move plays, a choice is open) and leaves - a scheme in one frame, a boost
 //     or a discard with a 250 ms fade.
 //   - SD-26: while a cell or a target is picked on the board and the cursor is not over the HUD, the hand panel slides
@@ -156,23 +158,50 @@ void AS08FlowGameMode::RebuildCardSlotWidget() {
 void AS08FlowGameMode::FeedCardSlot(const FS08Snapshot& Snapshot, const TArray<FS08BoardFighter>& FightersBefore) {
   const int64 Now = NowMs();
   TArray<FString> Lines;
-  // a newer seq while the opponent's scheme waits: its effect is the past now - the presentation catches up
-  if (CardSlot.ReleaseForSeq(Snapshot.SequenceNumber, Now, Lines)) {
+  auto Flush = [&Lines]() {
     for (const FString& Line : Lines) FS08Trace::Write(Line);
     Lines.Reset();
-    OnCardSlotReleased(/*bPlayCues=*/false, TEXT("newseq"));
-  }
+  };
+  const bool bPrevQueueOpen = bCardSlotQueueOpen;
   const TArray<FS08PendingEffect> Queue = S09OpponentView::PendingQueue(Snapshot);
   bCardSlotQueueOpen = Queue.Num() > 0;
   FS09LastMovement Trail;
   FS09LastMovement::Read(Snapshot.Metadata, Trail);
   FS09SlotCard Card;
-  if (PlayedCards.OnApplied(Hud, Queue, Trail, ViewerIdNow(), Card)) {
+  const bool bCard = PlayedCards.OnApplied(Hud, Queue, Trail, ViewerIdNow(), Card);
+  // Run E review (DE-026): a newer seq while the opponent's scheme waits. The rest of that scheme (its pending
+  // effects resolved one seq at a time - the VS_AI bot publishes them with no pause - or a quiet seq) joins the hold;
+  // a new action (a maneuver, an attack, another card) starts the held effect now and its moves play with the new
+  // seq's own (never dropped).
+  if (CardSlot.HoldsEffect() && !CardSlot.InChain(Snapshot.SequenceNumber)) {
+    FS09SchemeChainStep Step;
+    Step.OwnerId = CardSlot.GetCard().OwnerId;
+    Step.Seq = Snapshot.SequenceNumber;
+    Step.bCombat = FS09PlayedCardWatch::IsCombatPhase(Snapshot.Phase);
+    Step.bNewCard = bCard && Card.Ribbon != ES09SlotRibbon::Discarded;
+    Step.bPrevQueueOpen = bPrevQueueOpen;
+    Step.bFightersChanged = FightersBefore.Num() != Fighters.Num();
+    for (const FS08BoardFighter& After : Fighters) {
+      if (Step.bFightersChanged) break;
+      const FS08BoardFighter* Before = FightersBefore.FindByPredicate(
+          [&After](const FS08BoardFighter& Entry) { return Entry.Id == After.Id; });
+      Step.bFightersChanged = !Before || Before->X != After.X || Before->Y != After.Y ||
+                              Before->Health != After.Health || Before->bDefeated != After.bDefeated;
+    }
+    Step.Trail = Trail;
+    if (const TCHAR* Why = S09SchemeChainContinues(Step)) {
+      CardSlot.ContinueChain(Snapshot.SequenceNumber, Why, Lines);
+      Flush();
+    } else if (CardSlot.ReleaseForSeq(Snapshot.SequenceNumber, Now, Lines)) {
+      Flush();
+      OnCardSlotReleased(/*bPlayCues=*/true, TEXT("newseq"), Snapshot.SequenceNumber);
+    }
+  }
+  if (bCard) {
     bool bReleased = false;
     const bool bShown = CardSlot.Show(Card, Now, MoveMotion.bReducedMotion, Lines, bReleased);
-    for (const FString& Line : Lines) FS08Trace::Write(Line);
-    Lines.Reset();
-    if (bReleased) OnCardSlotReleased(/*bPlayCues=*/false, TEXT("replace"));
+    Flush();
+    if (bReleased) OnCardSlotReleased(/*bPlayCues=*/true, TEXT("replace"), Snapshot.SequenceNumber);
     if (bShown && CardSlot.HoldsEffect()) {
       SlotHeldFighters = FightersBefore;  // the HUD and the board keep these until the effect is due
       SlotHeldCues.Reset();
@@ -186,16 +215,44 @@ void AS08FlowGameMode::FeedCardSlot(const FS08Snapshot& Snapshot, const TArray<F
   if (Hud.bGameOver && CardSlot.IsVisible()) {
     bool bReleased = false;
     CardSlot.Cut(Now, TEXT("gameover"), Lines, bReleased);
-    for (const FString& Line : Lines) FS08Trace::Write(Line);
-    if (bReleased) OnCardSlotReleased(/*bPlayCues=*/false, TEXT("gameover"));
+    Flush();
+    // the game is over: the held moves and damage still play under the result (nothing of the board is lost)
+    if (bReleased) OnCardSlotReleased(/*bPlayCues=*/true, TEXT("gameover"), Snapshot.SequenceNumber);
   }
 }
 
 bool AS08FlowGameMode::HoldCardSlotCues(const TArray<FS08Cue>& Cues) {
-  if (!CardSlot.HoldsEffect() || Cues.Num() == 0 || Cues[0].SequenceNumber != CardSlot.HeldSeq()) return false;
+  if (Cues.Num() == 0 || !CardSlot.InChain(Cues[0].SequenceNumber)) return false;
   SlotHeldCues.Append(Cues);
-  FS08Trace::Write(FString::Printf(TEXT("HUD-SLOT cues held seq=%d n=%d"), CardSlot.HeldSeq(), Cues.Num()));
+  FS08Trace::Write(FString::Printf(TEXT("HUD-SLOT cues held seq=%d of=%d n=%d total=%d"), Cues[0].SequenceNumber,
+                                   CardSlot.HeldSeq(), Cues.Num(), SlotHeldCues.Num()));
   return true;
+}
+
+bool AS08FlowGameMode::TakeCardSlotCarry(const TArray<FS08Cue>& Cues, TArray<FS08Cue>& OutJoined) {
+  if (SlotCarryCues.Num() == 0) return false;
+  if (Cues.Num() == 0 || Cues[0].SequenceNumber != SlotCarrySeq) {
+    FlushCardSlotCarry();  // another seq: the carried moves play on their own first
+    return false;
+  }
+  TArray<FS08Cue> All = MoveTemp(SlotCarryCues);
+  SlotCarryCues.Reset();
+  SlotCarrySeq = -1;
+  const int32 Carried = All.Num();
+  All.Append(Cues);
+  OutJoined = S09MergeHeldCues(All);
+  FS08Trace::Write(FString::Printf(TEXT("HUD-SLOT cues joined seq=%d carried=%d new=%d play=%d"),
+                                   Cues[0].SequenceNumber, Carried, Cues.Num(), OutJoined.Num()));
+  return true;
+}
+
+void AS08FlowGameMode::FlushCardSlotCarry() {
+  if (SlotCarryCues.Num() == 0) return;
+  TArray<FS08Cue> Carry = S09MergeHeldCues(SlotCarryCues);
+  FS08Trace::Write(FString::Printf(TEXT("HUD-SLOT cues flushed seq=%d n=%d"), SlotCarrySeq, Carry.Num()));
+  SlotCarryCues.Reset();
+  SlotCarrySeq = -1;
+  HandleCues(Carry);
 }
 
 void AS08FlowGameMode::ApplyCardSlotHold(TArray<FS08BoardFighter>& View) const {
@@ -212,7 +269,7 @@ void AS08FlowGameMode::ApplyCardSlotHold(TArray<FS08BoardFighter>& View) const {
   }
 }
 
-void AS08FlowGameMode::OnCardSlotReleased(bool bPlayCues, const TCHAR* Why) {
+void AS08FlowGameMode::OnCardSlotReleased(bool bPlayCues, const TCHAR* Why, int32 CarryToSeq) {
   SlotHeldFighters.Reset();
   TArray<FS08Cue> Cues = MoveTemp(SlotHeldCues);
   SlotHeldCues.Reset();
@@ -223,9 +280,19 @@ void AS08FlowGameMode::OnCardSlotReleased(bool bPlayCues, const TCHAR* Why) {
   }
   RefreshShownFighters(/*bSyncBoard=*/true);  // the board and the HUD go to the snapshot
   if (Cues.Num() > 0) {
-    FS08Trace::Write(FString::Printf(TEXT("HUD-SLOT cues %s seq=%d n=%d why=%s"), bPlayCues ? TEXT("play") : TEXT("dropped"),
-                                     Cues[0].SequenceNumber, Cues.Num(), Why));
-    if (bPlayCues) HandleCues(Cues);  // the moves start from the frame of the release (CUE-007)
+    const bool bCarry = bPlayCues && CarryToSeq >= 0;
+    const FString CarryNote = bCarry ? FString::Printf(TEXT(" carry=%d"), CarryToSeq) : FString();
+    FS08Trace::Write(FString::Printf(TEXT("HUD-SLOT cues %s seq=%d n=%d why=%s%s"),
+                                     bPlayCues ? TEXT("play") : TEXT("dropped"), Cues[0].SequenceNumber, Cues.Num(), Why,
+                                     *CarryNote));
+    if (bCarry) {
+      // released inside the apply of a newer seq: its own cues come right after - the held moves are joined with
+      // them (one path per fighter), or play alone from the next frame if it brings none
+      SlotCarryCues.Append(Cues);
+      SlotCarrySeq = CarryToSeq;
+    } else if (bPlayCues) {
+      HandleCues(S09MergeHeldCues(Cues));  // the moves start from the frame of the release (CUE-007)
+    }
   }
   RefreshHud();
 }
@@ -282,6 +349,7 @@ bool AS08FlowGameMode::CursorOverHud() const {
 void AS08FlowGameMode::TickCardSlot() {
   const int64 Now = NowMs();
   const bool bReduced = MoveMotion.bReducedMotion;
+  FlushCardSlotCarry();  // the newer seq that released a held scheme brought no cues of its own
   // ---- the slot: the effect runs while a move plays or a choice is open
   {
     const bool bBusy = (BoardActor && BoardActor->AnyFighterMoving()) || bCardSlotQueueOpen;

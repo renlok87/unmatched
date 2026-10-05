@@ -730,13 +730,18 @@ private:
   /** A click / Space / Enter during the hold of the opponent's scheme starts its effect. True when the input is
    *  consumed (the hold hides my own choice it opened, or the skip happened in the opponent's turn). */
   bool TryCardSlotSkip();
-  /** HandleCues: the cues of the held seq wait for the release (true = held). */
+  /** HandleCues: the cues of the held seq and of its continuations wait for the release (true = held). */
   bool HoldCardSlotCues(const TArray<FS08Cue>& Cues);
+  /** HandleCues: the held moves released by this newer seq join its own cues (true, OutJoined = the set to play). */
+  bool TakeCardSlotCarry(const TArray<FS08Cue>& Cues, TArray<FS08Cue>& OutJoined);
+  /** The carried held moves play alone (the newer seq brought no cues, or other cues came first). */
+  void FlushCardSlotCarry();
   /** The fighters as they stood before the held opponent's scheme (HUD view and board view). */
   void ApplyCardSlotHold(TArray<FS08BoardFighter>& View) const;
   /** The held effect starts: the board and the HUD go to the snapshot, the held cues play (bPlayCues) or are
-   *  dropped (a newer seq / a cut catches up with the snapshot). */
-  void OnCardSlotReleased(bool bPlayCues, const TCHAR* Why);
+   *  dropped. CarryToSeq >= 0: released inside the apply of that newer seq - the held moves wait for its cues and
+   *  play joined with them (run E review: never dropped). */
+  void OnCardSlotReleased(bool bPlayCues, const TCHAR* Why, int32 CarryToSeq = -1);
   void RebuildCardSlotWidget();
   /** The OS cursor is over a HUD panel (the lowered hand counts with its raised rectangle). False without a cursor. */
   bool CursorOverHud() const;
@@ -745,6 +750,8 @@ private:
   FS09HandLower HandLower;
   TArray<FS08BoardFighter> SlotHeldFighters;
   TArray<FS08Cue> SlotHeldCues;
+  TArray<FS08Cue> SlotCarryCues;  // released held moves waiting for the cues of SlotCarrySeq (same frame)
+  int32 SlotCarrySeq = -1;
   uint32 CardSlotBuiltRevision = MAX_uint32;
   bool bCardSlotHidesChoice = false;
   bool bHandPreviewHidden = false;

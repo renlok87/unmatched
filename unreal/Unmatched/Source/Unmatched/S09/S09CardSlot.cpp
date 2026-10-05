@@ -1,6 +1,8 @@
 // DE-026 (W-18): the hand and the played cards - see S09CardSlot.h.
 #include "S09CardSlot.h"
 
+#include "Algo/StableSort.h"
+
 // ---------------------------------------------------------------------------------------------------- hand (SD-26)
 
 const TCHAR* S09BoardPickName(ES09BoardPick Pick) {
@@ -226,6 +228,7 @@ bool FS09SourceSlot::Show(const FS09SlotCard& InCard, int64 NowMs, bool bReduced
   }
   if (IsVisible()) Off(NowMs, TEXT("replace"), OutLines);
   Card = InCard;
+  ChainSeqs.Reset();
   bReduced = bReducedMotion;
   StartMs = NowMs;
   ArriveMs = NowMs + (bReduced ? 0 : FlyMs);
@@ -247,10 +250,12 @@ bool FS09SourceSlot::Show(const FS09SlotCard& InCard, int64 NowMs, bool bReduced
 void FS09SourceSlot::Release(int64 NowMs, const TCHAR* How, TArray<FString>& OutLines) {
   if (!bHolding) return;
   bHolding = false;
-  OutLines.Add(FString::Printf(TEXT("HUD-SLOT effect seq=%d release=%s afterArrive=%d"), Card.Seq, How,
-                               static_cast<int32>(FMath::Max<int64>(0, NowMs - ArriveMs))));
-  // the effect starts: the card stays while it runs (no new minimum)
-  MinEndMs = FMath::Min(MinEndMs, NowMs);
+  OutLines.Add(FString::Printf(TEXT("HUD-SLOT effect seq=%d release=%s afterArrive=%d chain=%d"), Card.Seq, How,
+                               static_cast<int32>(FMath::Max<int64>(0, NowMs - ArriveMs)), 1 + ChainSeqs.Num()));
+  ChainSeqs.Reset();
+  // the effect starts: the card stays while it runs. A skip (click / Space / Enter) ends the read at once; a newer
+  // action that cut the hold (run E review) does not - the card keeps its read time (arrival + 1500 ms)
+  if (FCString::Strcmp(How, TEXT("newseq")) != 0) MinEndMs = FMath::Min(MinEndMs, NowMs);
   if (State == ES09SlotState::Hold) State = ES09SlotState::Show;
 }
 
@@ -260,6 +265,7 @@ void FS09SourceSlot::Off(int64 NowMs, const TCHAR* Reason, TArray<FString>& OutL
                                S09SlotRibbonName(Card.Ribbon), static_cast<int32>(NowMs - StartMs), Reason));
   State = ES09SlotState::Idle;
   bHolding = false;
+  ChainSeqs.Reset();
   ++Revision;
 }
 
@@ -304,8 +310,16 @@ void FS09SourceSlot::Cut(int64 NowMs, const TCHAR* Reason, TArray<FString>& OutL
 }
 
 bool FS09SourceSlot::ReleaseForSeq(int32 Seq, int64 NowMs, TArray<FString>& OutLines) {
-  if (!bHolding || Seq == Card.Seq) return false;
+  if (!bHolding || InChain(Seq)) return false;
   Release(NowMs, TEXT("newseq"), OutLines);
+  return true;
+}
+
+bool FS09SourceSlot::ContinueChain(int32 Seq, const TCHAR* Why, TArray<FString>& OutLines) {
+  if (!bHolding || InChain(Seq)) return false;
+  ChainSeqs.Add(Seq);
+  OutLines.Add(FString::Printf(TEXT("HUD-SLOT chain seq=%d add=%d n=%d why=%s"), Card.Seq, Seq, 1 + ChainSeqs.Num(),
+                               Why));
   return true;
 }
 
@@ -320,4 +334,76 @@ float FS09SourceSlot::Alpha(int64 NowMs) const {
   if (State == ES09SlotState::Idle) return 0.0f;
   if (State != ES09SlotState::Fade) return 1.0f;
   return FMath::Clamp(1.0f - static_cast<float>(NowMs - FadeStartMs) / static_cast<float>(FadeMs), 0.0f, 1.0f);
+}
+
+// ---------------------------------------------------------------------------------------------------- scheme chain
+
+const TCHAR* S09SchemeChainContinues(const FS09SchemeChainStep& Step) {
+  if (Step.bCombat || Step.bNewCard) return nullptr;  // an attack, another scheme, a boosted maneuver
+  const bool bTrailOfSeq = Step.Trail.bValid && Step.Trail.Seq == Step.Seq;
+  if (bTrailOfSeq && Step.Trail.Source == TEXT("MANEUVER")) return nullptr;  // a maneuver is a new action
+  if (bTrailOfSeq && Step.Trail.Source == TEXT("EFFECT") && Step.Trail.PlayerId == Step.OwnerId) return TEXT("effect");
+  if (Step.bPrevQueueOpen) return TEXT("choice");  // no new action is legal while an effect is pending
+  if (!Step.bFightersChanged) return TEXT("quiet");
+  return nullptr;
+}
+
+TArray<FS08Cue> S09MergeHeldCues(const TArray<FS08Cue>& Cues) {
+  bool bOneSeq = true;
+  int32 LastSeq = Cues.Num() > 0 ? Cues[0].SequenceNumber : 0;
+  for (const FS08Cue& Cue : Cues) {
+    if (Cue.SequenceNumber != Cues[0].SequenceNumber) bOneSeq = false;
+    LastSeq = FMath::Max(LastSeq, Cue.SequenceNumber);
+  }
+  if (bOneSeq) return Cues;
+  // the moves in play order: seq, then the order inside the seq
+  TArray<const FS08Cue*> Moves;
+  for (const FS08Cue& Cue : Cues) {
+    if (Cue.Type == ES08CueType::FighterMoved) Moves.Add(&Cue);
+  }
+  Algo::StableSort(Moves, [](const FS08Cue* A, const FS08Cue* B) {
+    return A->SequenceNumber != B->SequenceNumber ? A->SequenceNumber < B->SequenceNumber
+                                                  : A->OrderInSeq < B->OrderInSeq;
+  });
+  auto CellsOf = [](const FS08Cue& Cue) {
+    return Cue.Path.Num() >= 2 ? Cue.Path
+                               : TArray<FIntPoint>{FIntPoint(Cue.FromX, Cue.FromY), FIntPoint(Cue.ToX, Cue.ToY)};
+  };
+  TArray<FS08Cue> Merged;  // one per fighter, in the order the fighters first moved
+  for (const FS08Cue* Move : Moves) {
+    FS08Cue* Into = Merged.FindByPredicate([Move](const FS08Cue& C) { return C.FighterId == Move->FighterId; });
+    if (!Into) {
+      FS08Cue First = *Move;
+      First.Path = CellsOf(*Move);
+      Merged.Add(MoveTemp(First));
+      continue;
+    }
+    const TArray<FIntPoint> Next = CellsOf(*Move);
+    const bool bJoin = Into->Kind == ES08MoveKind::Move && Move->Kind == ES08MoveKind::Move && Into->Path.Num() > 0 &&
+                       Next.Num() > 0 && Into->Path.Last() == Next[0];
+    if (bJoin) {
+      for (int32 I = 1; I < Next.Num(); ++I) Into->Path.Add(Next[I]);
+    } else {
+      Into->Kind = ES08MoveKind::Place;  // a gap or a transfer: one fade from the first start to the last end
+      Into->Path = {Into->Path.Num() > 0 ? Into->Path[0] : FIntPoint(Into->FromX, Into->FromY), Next.Last()};
+    }
+    Into->ToX = Move->ToX;
+    Into->ToY = Move->ToY;
+    Into->PathSource = Move->PathSource;
+    Into->bTrailMismatch = Into->bTrailMismatch || Move->bTrailMismatch;
+  }
+  TArray<FS08Cue> Out;
+  for (int32 I = 0; I < Merged.Num(); ++I) {
+    Merged[I].OrderInSeq = I;
+    Merged[I].SequenceNumber = LastSeq;
+    if (Merged[I].Path.Num() > 0) {
+      Merged[I].FromX = Merged[I].Path[0].X;
+      Merged[I].FromY = Merged[I].Path[0].Y;
+    }
+    Out.Add(MoveTemp(Merged[I]));
+  }
+  for (const FS08Cue& Cue : Cues) {
+    if (Cue.Type != ES08CueType::FighterMoved) Out.Add(Cue);  // damage: as it came (its own seq)
+  }
+  return Out;
 }

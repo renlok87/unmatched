@@ -995,12 +995,18 @@ void AS08FlowGameMode::UpdateBoardCamera(float DeltaSeconds) {
   }
 }
 
-void AS08FlowGameMode::HandleCues(const TArray<FS08Cue>& Cues) {
+void AS08FlowGameMode::HandleCues(const TArray<FS08Cue>& InCues) {
   // One cue set per authoritative seq (GD-031): the same seq arriving again
   // over the second channel merges silently and never re-fires these.
   bSawCue = true;
   // DE-026 (01 F-10): the effect of the opponent's scheme waits for the end of its hold (or the skip)
-  if (HoldCardSlotCues(Cues)) return;
+  if (HoldCardSlotCues(InCues)) {
+    FlushCardSlotCarry();  // a new scheme replaced a held one: the old one's moves play now
+    return;
+  }
+  // Run E review: the held moves of a scheme this seq released play joined with its own (one path per fighter)
+  TArray<FS08Cue> Joined;
+  const TArray<FS08Cue>& Cues = TakeCardSlotCarry(InCues, Joined) ? Joined : InCues;
   // MS-T-16 (CUE-007): the moves of this seq start in the frame the snapshot is applied (SD-13, MS-R-22) - the
   // figures were just synced to their snapshot cells and now travel there from their start cells; damage of the same
   // seq waits for its target's arrival (MS-E-48).
@@ -5298,6 +5304,8 @@ void AS08FlowGameMode::ClearGameplayHud() {
   HandLower.Reset();
   SlotHeldFighters.Reset();
   SlotHeldCues.Reset();
+  SlotCarryCues.Reset();
+  SlotCarrySeq = -1;
   CardSlotBuiltRevision = MAX_uint32;
   bCardSlotHidesChoice = false;
   bHandPreviewHidden = false;

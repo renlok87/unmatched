@@ -129,9 +129,18 @@ public:
   bool Skip(int64 NowMs, const TCHAR* Source, TArray<FString>& OutLines);
   /** Ends the card now (a reconnect, the end of the game, a reset), releasing a held effect (bOutReleased). */
   void Cut(int64 NowMs, const TCHAR* Reason, TArray<FString>& OutLines, bool& bOutReleased);
-  /** A new seq arrives while the effect is held: the held effect starts now; the card itself stays (its show goes
-   *  on). True when something was released. */
+  /** A new seq arrives while the effect is held and is NOT the rest of the same scheme (S09SchemeChainContinues):
+   *  the held effect starts now; the card itself stays at least until its read time (arrival + 1500) is over.
+   *  A seq of the chain (the held one, a continuation) never releases. True when something was released. */
   bool ReleaseForSeq(int32 Seq, int64 NowMs, TArray<FString>& OutLines);
+  /** Run E review (DE-026): a later seq is the rest of the held scheme (its pending effects resolved, a quiet seq):
+   *  the hold goes on, the seq joins the chain - its snapshot and cues wait with the held ones until the hold's
+   *  time or a skip. Writes 'HUD-SLOT chain seq=<held> add=<seq> n=<chain> why=<why>'. False when nothing is held
+   *  or the seq is already in the chain. */
+  bool ContinueChain(int32 Seq, const TCHAR* Why, TArray<FString>& OutLines);
+  /** The seq is the held one or one of its continuations (its cues are held too). */
+  bool InChain(int32 Seq) const { return bHolding && (Seq == Card.Seq || ChainSeqs.Contains(Seq)); }
+  int32 ChainLength() const { return bHolding ? 1 + ChainSeqs.Num() : 0; }
 
   /** The opponent's scheme waits: the snapshot's effect is not presented yet. */
   bool HoldsEffect() const { return bHolding; }
@@ -164,4 +173,32 @@ private:
   int64 MinEndMs = 0;
   int64 FadeStartMs = 0;
   uint32 Revision = 0;
+  TArray<int32> ChainSeqs;  // the continuations of the held scheme (run E review)
 };
+
+// ---------------------------------------------------------------------------------------------------- scheme chain
+
+/** Run E review (DE-026 major): a scheme rarely ends in its own seq. Its pending effects (Winged Frenzy: one MOVE per
+ *  harpy) are resolved in the next seqs (lastMovement source=EFFECT), and the VS_AI bot publishes them with no pause.
+ *  What one new seq is, relative to the held opponent's scheme. */
+struct UNMATCHED_API FS09SchemeChainStep {
+  FString OwnerId;               // the owner of the held scheme
+  int32 Seq = 0;                 // the new snapshot
+  bool bCombat = false;          // the new snapshot is COMBAT / COMBAT_RESOLVE (an attack is a new action)
+  bool bNewCard = false;         // the watch put a new SCHEME / BOOSTED card into the slot (a new action)
+  bool bPrevQueueOpen = false;   // the previous applied snapshot had an open pending effect (the scheme's choices)
+  bool bFightersChanged = true;  // positions / HP / defeat of any fighter differ from the previous snapshot
+  FS09LastMovement Trail;        // metadata.lastMovement of the new snapshot
+};
+
+/** The reason the seq is the rest of the held scheme - "effect" (an EFFECT trail of this seq by the owner),
+ *  "choice" (it answers a pending effect open before it), "quiet" (no fighter changed: a draw, the turn passing) -
+ *  or nullptr: a new action (a maneuver trail of this seq, a combat, a new slot card, a fighter change with no open
+ *  effect), which releases the hold and plays its held moves. */
+UNMATCHED_API const TCHAR* S09SchemeChainContinues(const FS09SchemeChainStep& Step);
+
+/** The held cues of several seqs played as one set (the hold's release): one move cue per fighter - its paths joined
+ *  in seq order (a gap or a PLACE among them makes it one PLACE from the first start to the last end), numbered in
+ *  the order the fighters first moved, carrying the newest seq; damage cues kept as they are. A set of one seq is
+ *  returned unchanged. */
+UNMATCHED_API TArray<FS08Cue> S09MergeHeldCues(const TArray<FS08Cue>& Cues);

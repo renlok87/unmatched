@@ -715,4 +715,154 @@ bool FS09HandLowerTest::RunTest(const FString&) {
   TestTrue("pick ends: up", !Hand.Update(ES09BoardPick::None, false, 650.0).IsEmpty() && !Hand.IsLowered());
   return true;
 }
+
+// ---------------------------------------------------------------------------------------------------- run E review
+// DE-026 major: the rest of a scheme comes in later seqs (Winged Frenzy: one EFFECT seq per harpy, the VS_AI bot
+// publishes them with no pause). They join the hold; a new action releases it and its moves still play.
+namespace {
+FS08Cue MoveCue(int32 Seq, const TCHAR* Fighter, std::initializer_list<FIntPoint> Path, int32 Order = 0,
+                ES08MoveKind Kind = ES08MoveKind::Move) {
+  FS08Cue Cue;
+  Cue.Type = ES08CueType::FighterMoved;
+  Cue.SequenceNumber = Seq;
+  Cue.FighterId = Fighter;
+  Cue.Path = TArray<FIntPoint>(Path);
+  Cue.FromX = Cue.Path[0].X;
+  Cue.FromY = Cue.Path[0].Y;
+  Cue.ToX = Cue.Path.Last().X;
+  Cue.ToY = Cue.Path.Last().Y;
+  Cue.OrderInSeq = Order;
+  Cue.Kind = Kind;
+  return Cue;
+}
+
+FS08Cue DamageCue(int32 Seq, const TCHAR* Fighter, int32 Damage) {
+  FS08Cue Cue;
+  Cue.Type = ES08CueType::FighterDamaged;
+  Cue.SequenceNumber = Seq;
+  Cue.FighterId = Fighter;
+  Cue.Damage = Damage;
+  return Cue;
+}
+}  // namespace
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09SlotChainTest,
+    "Unmatched.S09.SCHEME.Slot chain: the rest of the opponent's scheme keeps the hold; a new action releases it",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS09SlotChainTest::RunTest(const FString&) {
+  // the Sarpedon G-LIVE case: scheme seq 4, its EFFECT seqs 5..7 within ~1.1 s - the hold runs its full 1500 ms
+  FS09SourceSlot Slot;
+  TArray<FString> Lines;
+  bool bReleased = false;
+  Slot.Show(MakeSlot(ES09SlotRibbon::Scheme, true, 4), 0, false, Lines, bReleased);
+  Lines.Reset();
+  TestTrue("seq 5 joins", Slot.ContinueChain(5, TEXT("effect"), Lines));
+  TestTrue("chain line", LinesContain(Lines, TEXT("HUD-SLOT chain seq=4 add=5 n=2 why=effect")));
+  TestTrue("seq 5 is in the chain", Slot.InChain(5));
+  TestFalse("a seq of the chain never releases", Slot.ReleaseForSeq(5, 900, Lines));
+  TestFalse("a same-seq merge does not join twice", Slot.ContinueChain(5, TEXT("effect"), Lines));
+  TestTrue("seq 6 joins", Slot.ContinueChain(6, TEXT("effect"), Lines));
+  TestTrue("seq 7 joins", Slot.ContinueChain(7, TEXT("choice"), Lines));
+  TestEqual("chain of four", Slot.ChainLength(), 4);
+  TestFalse("not a later seq", Slot.InChain(8));
+  Slot.Tick(1699, false, Lines, bReleased);
+  TestTrue("still held 1499 ms after arrival", Slot.HoldsEffect() && !bReleased);
+  Lines.Reset();
+  Slot.Tick(1700, false, Lines, bReleased);
+  TestTrue("released at 1500 ms", bReleased);
+  TestTrue("the whole chain at once",
+           LinesContain(Lines, TEXT("HUD-SLOT effect seq=4 release=time afterArrive=1500 chain=4")));
+  TestFalse("the chain is over", Slot.InChain(5));
+  TestFalse("nothing to chain without a hold", Slot.ContinueChain(9, TEXT("effect"), Lines));
+
+  // a new action cuts the hold: the effect starts, but the card keeps its read time (arrival + 1500)
+  FS09SourceSlot Cut;
+  Cut.Show(MakeSlot(ES09SlotRibbon::Scheme, true, 10), 0, false, Lines, bReleased);
+  Cut.ContinueChain(11, TEXT("effect"), Lines);
+  Lines.Reset();
+  TestTrue("a maneuver seq releases", Cut.ReleaseForSeq(12, 300, Lines));
+  TestTrue("release=newseq with the chain", LinesContain(Lines, TEXT("release=newseq afterArrive=100 chain=2")));
+  Cut.Tick(1000, false, Lines, bReleased);
+  TestTrue("the card is still read", Cut.IsVisible());
+  Cut.Tick(1700, false, Lines, bReleased);
+  TestFalse("leaves after its read time", Cut.IsVisible());
+  // a skip still ends the read at once
+  FS09SourceSlot Skip;
+  Skip.Show(MakeSlot(ES09SlotRibbon::Scheme, true, 20), 0, false, Lines, bReleased);
+  Skip.ContinueChain(21, TEXT("effect"), Lines);
+  TestTrue("skip", Skip.Skip(500, TEXT("space"), Lines));
+  Skip.Tick(516, false, Lines, bReleased);
+  TestFalse("a skipped card leaves with its effect", Skip.IsVisible());
+
+  // what one new seq is
+  FS09SchemeChainStep Step;
+  Step.OwnerId = GuestId;
+  Step.Seq = 5;
+  Step.Trail.bValid = true;
+  Step.Trail.Seq = 5;
+  Step.Trail.PlayerId = GuestId;
+  Step.Trail.Source = TEXT("EFFECT");
+  auto Why = [](const FS09SchemeChainStep& In) {
+    const TCHAR* Reason = S09SchemeChainContinues(In);
+    return FString(Reason ? Reason : TEXT("new"));
+  };
+  TestEqual("an EFFECT seq of the owner", Why(Step), FString(TEXT("effect")));
+  FS09SchemeChainStep Maneuver = Step;
+  Maneuver.Trail.Source = TEXT("MANEUVER");
+  Maneuver.bPrevQueueOpen = true;
+  TestEqual("a maneuver is a new action", Why(Maneuver), FString(TEXT("new")));
+  FS09SchemeChainStep Combat = Step;
+  Combat.bCombat = true;
+  TestEqual("an attack is a new action", Why(Combat), FString(TEXT("new")));
+  FS09SchemeChainStep Card = Step;
+  Card.bNewCard = true;
+  TestEqual("another card is a new action", Why(Card), FString(TEXT("new")));
+  FS09SchemeChainStep Answer = Step;
+  Answer.Trail.Seq = 4;  // the trail of an older seq: this one moved nobody along a trail
+  Answer.bPrevQueueOpen = true;
+  TestEqual("it answers the scheme's open choice", Why(Answer), FString(TEXT("choice")));
+  FS09SchemeChainStep Quiet = Answer;
+  Quiet.bPrevQueueOpen = false;
+  Quiet.bFightersChanged = false;
+  TestEqual("nothing changed on the board (a draw, the turn passing)", Why(Quiet), FString(TEXT("quiet")));
+  FS09SchemeChainStep Moved = Quiet;
+  Moved.bFightersChanged = true;
+  TestEqual("a board change with nothing open is new", Why(Moved), FString(TEXT("new")));
+  FS09SchemeChainStep Other = Step;
+  Other.Trail.PlayerId = HostId;
+  TestEqual("an EFFECT trail of the other player with nothing open is new", Why(Other), FString(TEXT("new")));
+
+  // the held cues of the chain play as one set: one path per fighter, newest seq, damage kept
+  const TArray<FS08Cue> One = {MoveCue(5, TEXT("h1"), {{0, 0}, {1, 0}}), DamageCue(5, TEXT("m1"), 1)};
+  const TArray<FS08Cue> Same = S09MergeHeldCues(One);
+  TestTrue("one seq: unchanged", Same.Num() == 2 && Same[0].Path.Num() == 2 && Same[0].SequenceNumber == 5);
+  const TArray<FS08Cue> Chain = {
+      MoveCue(5, TEXT("h1"), {{0, 0}, {1, 0}, {2, 0}}),
+      MoveCue(6, TEXT("h2"), {{5, 5}, {5, 6}}, 1),
+      MoveCue(6, TEXT("h1"), {{2, 0}, {2, 1}}, 0),
+      DamageCue(6, TEXT("m1"), 2),
+  };
+  const TArray<FS08Cue> Joined = S09MergeHeldCues(Chain);
+  TestEqual("two moves and the damage", Joined.Num(), 3);
+  if (Joined.Num() == 3) {
+    TestEqual("h1 first", Joined[0].FighterId, FString(TEXT("h1")));
+    TestEqual("h1 joined path", Joined[0].Path.Num(), 4);
+    TestTrue("h1 from its first start to its last end",
+             Joined[0].FromX == 0 && Joined[0].FromY == 0 && Joined[0].ToX == 2 && Joined[0].ToY == 1);
+    TestTrue("h1 still walks", Joined[0].Kind == ES08MoveKind::Move);
+    TestEqual("h1 order 0", Joined[0].OrderInSeq, 0);
+    TestEqual("h2 order 1", Joined[1].OrderInSeq, 1);
+    TestEqual("newest seq", Joined[1].SequenceNumber, 6);
+    TestTrue("damage kept", Joined[2].Type == ES08CueType::FighterDamaged && Joined[2].Damage == 2);
+    TestEqual("h1 plays 3 steps", Joined[0].Steps(), 3);
+  }
+  TArray<FS08Cue> WithPlace = Chain;
+  WithPlace.Add(MoveCue(7, TEXT("h1"), {{2, 1}, {4, 4}}, 0, ES08MoveKind::Place));
+  const TArray<FS08Cue> Placed = S09MergeHeldCues(WithPlace);
+  TestTrue("a PLACE in the chain makes one transfer",
+           Placed.Num() == 3 && Placed[0].Kind == ES08MoveKind::Place && Placed[0].Path.Num() == 2 &&
+               Placed[0].Path[0] == FIntPoint(0, 0) && Placed[0].Path[1] == FIntPoint(4, 4) &&
+               Placed[0].SequenceNumber == 7);
+  return true;
+}
 #endif
