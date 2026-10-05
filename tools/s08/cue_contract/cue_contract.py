@@ -332,8 +332,10 @@ class ReferenceDispatcher:
                 self.lines.append(head + " result=duplicate")
                 return
             self.seen.add(key)
+            # staged: CUE постановки (контакт DE-018, падение DE-019) идёт с seq своего боя после более новых
+            # снапшотов — D3 к нему не применяется, D2 и D4 применяются (прогон C G-LIVE, 2026-10-05)
             if (self.recovered_seq is not None and seq <= self.recovered_seq) or (
-                    self.high_water is not None and seq < self.high_water):
+                    not event.get("staged") and self.high_water is not None and seq < self.high_water):
                 self.lines.append(head + " result=stale")
                 return
             self.high_water = seq if self.high_water is None else max(self.high_water, seq)

@@ -152,7 +152,7 @@ int32 FS08CueDispatcher::ShowDurationMs(const FString& CueId, int32 DurationMs) 
 }
 
 ES08CueResult FS08CueDispatcher::Feed(const FString& CueId, const FString& InSubject, int32 Seq, int64 TMs,
-                                      TArray<FString>& OutLines, int32 HoldMs, int32 DurationMs) {
+                                      TArray<FString>& OutLines, int32 HoldMs, int32 DurationMs, bool bStaged) {
   const FS08CueRow* RowPtr = S08CueRows::Find(Rows, CueId);
   if (!RowPtr) return ES08CueResult::Stale;
   const FS08CueRow Row = *RowPtr;
@@ -173,8 +173,10 @@ ES08CueResult FS08CueDispatcher::Feed(const FString& CueId, const FString& InSub
       return ES08CueResult::Duplicate;
     }
     Seen.Add(Key);
-    // D3/D4: older than what was shown, or covered by a reconnect.
-    if ((RecoveredSeq != MIN_int32 && Seq <= RecoveredSeq) || (HighWater != MIN_int32 && Seq < HighWater)) {
+    // D3/D4: older than what was shown, or covered by a reconnect. A staged cue (DE-018 contact, DE-019 fall) keeps its
+    // combat's seq on purpose and plays after newer snapshots: D3 does not apply to it (run C G-LIVE, 2026-10-05).
+    if ((RecoveredSeq != MIN_int32 && Seq <= RecoveredSeq) ||
+        (!bStaged && HighWater != MIN_int32 && Seq < HighWater)) {
       OutLines.Add(Head + TEXT(" result=stale"));
       return ES08CueResult::Stale;
     }

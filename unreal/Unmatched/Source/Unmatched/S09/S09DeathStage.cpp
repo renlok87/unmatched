@@ -45,7 +45,7 @@ bool FS09DeathStage::Begin(const FS09DeathInput& In, int64 NowMs, FS08CueDispatc
                                *In.FighterId, In.bHero ? 1 : 0, In.bStaged ? 1 : 0, E.In.SettleMs, E.In.StillMs,
                                E.In.DissolveMs, *E.In.Style, static_cast<long long>(E.GoneMs)));
   // CUE-013 from the fall: DeathSettle (the row's 950 = clip 875 + start), subject = the fallen fighter.
-  Cues.Feed(DeathCue, In.FighterId, In.Seq, NowMs, OutLines);
+  Cues.Feed(DeathCue, In.FighterId, In.Seq, NowMs, OutLines, 0, -1, In.bStaged);
   Entries.Add(E);
   Tick(NowMs, OutLines);
   return true;

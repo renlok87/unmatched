@@ -64,9 +64,11 @@ public:
   void OnReconnect(int32 RecoveredSeq, int64 TMs, TArray<FString>& OutLines);
   /** D1-D11: one cue event at TMs (non-decreasing). Seq < 0 = no seq (local cues; a server cue needs one).
    *  DurationMs < 0 = the row's duration; HoldMs > 0 lengthens the show by a skippable hold (DE-018). An unknown
-   *  cue id writes nothing and returns Stale. */
+   *  cue id writes nothing and returns Stale. bStaged: a cue a staging plays later at its own combat's seq (CUE-011
+   *  from the contact frame, CUE-013 from a staged fall) - newer snapshots applied meanwhile do not make it stale
+   *  (no D3); D2 and D4 still apply. */
   ES08CueResult Feed(const FString& CueId, const FString& Subject, int32 Seq, int64 TMs, TArray<FString>& OutLines,
-                     int32 HoldMs = 0, int32 DurationMs = -1);
+                     int32 HoldMs = 0, int32 DurationMs = -1, bool bStaged = false);
   /** DE-018: the staging skipped (part of) the hold of an active show; its done moves to start + duration + hold.
    *  False when no such show is active. */
   bool SetHold(const FString& CueId, const FString& Subject, int32 Seq, int32 HoldMs);

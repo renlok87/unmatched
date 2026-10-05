@@ -1,0 +1,96 @@
+{
+ "schema": "unmatched.cue-fixture/1",
+ "id": "staged-hit-after-newer-seq",
+ "kind": "scenario",
+ "description": "Прогон C G-LIVE (2026-10-05): бой seq 24 ставится (CUE-010 с удержанием чтения 1000), а следующий ход уже объявил атаку (CUE-008 seq 28, CUE-009 seq 29). CUE-011 постановки из кадра контакта идёт с seq 24 и staged — показывается, а не stale; его повтор — duplicate; обычный CUE-011 со старым seq 25 — stale; после реконнекта R=30 staged CUE-013 seq 29 — stale (D4).",
+ "covers": [
+  "D3 staged",
+  "D2",
+  "D4",
+  "DE-018 W-14 кадр контакта",
+  "DE-019 W-16 падение"
+ ],
+ "events": [
+  {
+   "t": 0,
+   "kind": "cue",
+   "id": "CUE-010",
+   "subject": "scene",
+   "seq": 24,
+   "hold_ms": 1000
+  },
+  {
+   "t": 1600,
+   "kind": "cue",
+   "id": "CUE-008",
+   "subject": "f-0-hero",
+   "seq": 28
+  },
+  {
+   "t": 1700,
+   "kind": "cue",
+   "id": "CUE-009",
+   "subject": "f-1-hero",
+   "seq": 29
+  },
+  {
+   "t": 2433,
+   "kind": "cue",
+   "id": "CUE-011",
+   "subject": "f-0-hero",
+   "seq": 24,
+   "staged": true
+  },
+  {
+   "t": 2440,
+   "kind": "cue",
+   "id": "CUE-011",
+   "subject": "f-0-hero",
+   "seq": 24,
+   "staged": true
+  },
+  {
+   "t": 2450,
+   "kind": "cue",
+   "id": "CUE-011",
+   "subject": "f-1-hero",
+   "seq": 25
+  },
+  {
+   "t": 3400,
+   "kind": "reconnect",
+   "recovered_seq": 30
+  },
+  {
+   "t": 3500,
+   "kind": "cue",
+   "id": "CUE-013",
+   "subject": "f-1-hero",
+   "seq": 29,
+   "staged": true
+  }
+ ],
+ "expect_trace": [
+  "CUE fx id=CUE-010 subject=scene seq=24 t=0 vfx=none sfx=missing clip=none mat=none socket=- reduced=0 result=fallback",
+  "CUE fx id=CUE-008 subject=f-0-hero seq=28 t=1600 vfx=missing sfx=missing clip=none mat=none socket=Weapon reduced=0 result=fallback",
+  "CUE fx done id=CUE-008 subject=f-0-hero seq=28 t=1700 ms=100 cut=interrupt",
+  "CUE fx id=CUE-009 subject=f-1-hero seq=29 t=1700 vfx=missing sfx=missing clip=none mat=FxFlash socket=Head reduced=0 result=fallback",
+  "CUE fx done id=CUE-010 subject=scene seq=24 t=1800 ms=1800 cut=0 hold=1000",
+  "CUE fx done id=CUE-009 subject=f-1-hero seq=29 t=2200 ms=500 cut=0",
+  "CUE fx id=CUE-011 subject=f-0-hero seq=24 t=2433 vfx=missing sfx=missing clip=missing mat=FxFlash socket=Head reduced=0 result=fallback",
+  "CUE fx id=CUE-011 subject=f-0-hero seq=24 t=2440 result=duplicate",
+  "CUE fx id=CUE-011 subject=f-1-hero seq=25 t=2450 result=stale",
+  "CUE fx done id=CUE-011 subject=f-0-hero seq=24 t=3333 ms=900 cut=0",
+  "CUE reconnect recovered_seq=30 t=3400",
+  "CUE fx id=CUE-013 subject=f-1-hero seq=29 t=3500 result=stale"
+ ],
+ "expect_summary": {
+  "presented": 4,
+  "spawned": 0,
+  "fallback": 4,
+  "duplicate": 1,
+  "stale": 2,
+  "done": 4,
+  "unique_triples": 4
+ }
+}

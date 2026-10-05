@@ -223,8 +223,10 @@ bool FS08CueDispatcherFixturesTest::RunTest(const FString&) {
         E->TryGetNumberField(TEXT("duration_ms"), Duration);
         FString Subject;
         E->TryGetStringField(TEXT("subject"), Subject);
+        bool bStaged = false;
+        E->TryGetBoolField(TEXT("staged"), bStaged);
         Cues.Feed(E->GetStringField(TEXT("id")), Subject, static_cast<int32>(Seq), T, Lines, static_cast<int32>(Hold),
-                  static_cast<int32>(Duration));
+                  static_cast<int32>(Duration), bStaged);
       }
     }
     Cues.Finish(Lines);
@@ -275,6 +277,24 @@ bool FS08CueDispatcherHoldTest::RunTest(const FString&) {
     TestTrue("repeat is a duplicate",
              Cues.Feed(TEXT("CUE-011"), TEXT("f-1-hero"), 31, 40, Lines) == ES08CueResult::Duplicate);
     TestTrue("older seq is stale", Cues.Feed(TEXT("CUE-011"), TEXT("f-0-hero"), 30, 50, Lines) == ES08CueResult::Stale);
+  }
+  // D3 and the staging (run C G-LIVE 2026-10-05): the next attack (seq 28/29) lands while the combat of seq 24 is
+  // staged; its contact CUE-011 still shows at seq 24, a repeat of it stays a duplicate, a reconnect still covers it.
+  {
+    FS08CueDispatcher Cues;
+    TArray<FString> Lines;
+    Cues.Feed(TEXT("CUE-010"), TEXT("scene"), 24, 0, Lines, 1000);
+    Cues.Feed(TEXT("CUE-008"), TEXT("f-0-hero"), 28, 1600, Lines);
+    Cues.Feed(TEXT("CUE-009"), TEXT("f-1-hero"), 29, 1700, Lines);
+    TestTrue("staged CUE-011 after newer seqs is shown",
+             Cues.Feed(TEXT("CUE-011"), TEXT("f-0-hero"), 24, 2433, Lines, 0, -1, true) == ES08CueResult::Fallback);
+    TestTrue("staged repeat is a duplicate",
+             Cues.Feed(TEXT("CUE-011"), TEXT("f-0-hero"), 24, 2440, Lines, 0, -1, true) == ES08CueResult::Duplicate);
+    TestTrue("unstaged older seq is still stale",
+             Cues.Feed(TEXT("CUE-011"), TEXT("f-1-hero"), 25, 2450, Lines) == ES08CueResult::Stale);
+    Cues.OnReconnect(30, 2500, Lines);
+    TestTrue("staged cue under a reconnect is stale",
+             Cues.Feed(TEXT("CUE-013"), TEXT("f-1-hero"), 29, 2600, Lines, 0, -1, true) == ES08CueResult::Stale);
   }
   // D11: reduced motion shortens the animation part only.
   {

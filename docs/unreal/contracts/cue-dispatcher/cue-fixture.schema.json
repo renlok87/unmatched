@@ -39,6 +39,7 @@
           "recovered_seq": {"type": "integer", "minimum": 0},
           "reduced_motion": {"type": "boolean"},
           "hold_ms": {"type": "integer", "minimum": 0, "description": "DE-018: пропускаемое удержание внутри показа (CUE-010: чтение и строки эффекта); done пишет hold=, G5 меряет ms − hold"},
+          "staged": {"type": "boolean", "description": "CUE постановки (CUE-011 из кадра контакта, CUE-013 из падения боя) с seq своего боя: D3 не применяется, D2 и D4 применяются"},
           "duration_ms": {"type": "integer", "minimum": 0, "description": "DE-018: длина показа вместо duration_ms строки (скорость анимации постановки боя)"},
           "stage": {"enum": ["start", "read", "effect", "slam", "pause", "lunge", "contact", "hit", "minus", "hp", "fall", "end", "skip"], "description": "DE-018: этап строки `CUE combat` (kind combat)"},
           "fields": {"type": "object", "additionalProperties": {"type": ["string", "integer"]}, "description": "DE-018: поля строки `CUE combat` после t, в этом порядке"}

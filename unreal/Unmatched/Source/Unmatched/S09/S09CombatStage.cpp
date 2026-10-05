@@ -235,7 +235,7 @@ void FS09CombatStage::Tick(int64 NowMs, FS08CueDispatcher& Cues, TArray<FString>
         if (bPresentDamage) {
           // CUE-011 runs from the contact frame (01 "Резолюция" п. 4); LungeAttack was its intro.
           Cues.Feed(DamageCue, Input.TargetId, Input.Seq, T, OutLines, 0,
-                    HitWindowAt(Input.SpeedMul, GetHitTintMs()));
+                    HitWindowAt(Input.SpeedMul, GetHitTintMs()), /*bStaged=*/true);
           OutLines.Add(Prefix(TEXT("hit"), T) +
                        FString::Printf(TEXT(" target=%s tint=%d"), *Input.TargetId, GetHitTintMs()));
           Release(ES09CombatEvent::HitReact, T, OutEvents);
