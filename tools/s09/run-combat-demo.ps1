@@ -816,6 +816,15 @@ function Invoke-CombatDemo {
         else { Write-Output "damage-combat frame: $side has none (no damage CUE on the combat target while its number was painted)" }
       }
     }
+    # Run C G-LIVE (DE-019): with -RequireGameOver the result-screen frame of each seat is evidence too (the screen comes
+    # after the dead hero is gone + 1000 ms); published when the seat wrote it.
+    if ($RequireGameOver) {
+      foreach ($side in @('host', 'joiner')) {
+        $resultScreen = Join-Path $side 's09-result-screen.png'
+        if (Test-Path -LiteralPath (Join-Path $Script:Staging $resultScreen)) { $publishNames += $resultScreen }
+        else { Write-Output "result-screen frame: $side has none" }
+      }
+    }
     if ($RequireShotCaptured) {
       foreach ($name in $publishNames) {
         if ($name -notlike '*.png') { continue }
