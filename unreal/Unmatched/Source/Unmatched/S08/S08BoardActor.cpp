@@ -468,6 +468,12 @@ void AS08BoardActor::PlayFighterHitTint(const FString& FighterId, float Seconds)
   if (AS08FighterActor* Actor = FindFighterActor(FighterId)) Actor->PlayHitTint(Seconds);
 }
 
+bool AS08BoardActor::GetFighterDeathPlan(const FString& FighterId, S08HeroesV2::FDeathPlan& OutPlan,
+                                         FString& OutStyle) const {
+  const AS08FighterActor* Actor = FindFighterActor(FighterId);
+  return Actor && Actor->GetDeathPlan(OutPlan, OutStyle);
+}
+
 FString AS08BoardActor::GetFighterClipName(const FString& FighterId, S08HeroesV2::EClip Clip) const {
   const AS08FighterActor* Actor = FindFighterActor(FighterId);
   return Actor ? Actor->GetHeroClipAssetName(Clip) : FString();

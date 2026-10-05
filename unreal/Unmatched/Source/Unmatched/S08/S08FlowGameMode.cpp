@@ -789,6 +789,7 @@ void AS08FlowGameMode::SyncBoardFromApplied() {
       TArray<FS08BoardFighter> BoardView = Fighters;
       CombatStage.GetHold().Apply(BoardView, /*bBoardView=*/true);
       BoardActor->SyncFighters(BoardModel, BoardView, ViewerId);
+      NoteBoardDeaths(BoardView);
     }
     SyncCombatFocus();
     // GD-030 six-fighter evidence line: the projection's roster, split into
@@ -1104,8 +1105,9 @@ void AS08FlowGameMode::TickCombatStage() {
 }
 
 bool AS08FlowGameMode::TryCombatSkip() {
-  // The result screen owns L / Enter (GD-036): a staging behind it plays out without a skip.
-  if (!CombatStage.IsSkippable(NowMs()) || Hud.bGameOver) return false;
+  // The result screen owns L / Enter (GD-036): a staging behind it plays out without a skip. DE-019: until the
+  // screen shows (the hero's death plays out first) the staging of the killing blow can still be skipped.
+  if (!CombatStage.IsSkippable(NowMs()) || IsResultScreenShown()) return false;
   auto* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
   if (!PC || ArtView.IsValid()) return false;
   // 01 F-01: a click on the field, Space or Enter zero the remaining holds; HUD buttons keep their own action
@@ -1150,8 +1152,14 @@ void AS08FlowGameMode::RunCombatEvents(const TArray<FS09CombatStageEvent>& Event
         PresentDamageNumber(In.TargetId, In.Damage, In.Seq, CombatStage.MinusLifeMs() / 1000.0f);
         break;
       case ES09CombatEvent::Hp:
-      case ES09CombatEvent::Fall:
         RefreshShownFighters(true);
+        break;
+      case ES09CombatEvent::Fall:
+        // DE-019: the figure falls now (contact + 450); NoteBoardDeaths stages its death under the combat's seq. A
+        // fall released by a cut (Cut: the staging is already over, no `stage=fall` line) is a death at the snapshot.
+        FallSeq = CombatStage.IsActive() ? In.Seq : -1;
+        RefreshShownFighters(true);
+        FallSeq = -1;
         break;
       case ES09CombatEvent::End:
         RefreshShownFighters(true);
@@ -1179,7 +1187,58 @@ void AS08FlowGameMode::RefreshShownFighters(bool bSyncBoard) {
   TArray<FS08BoardFighter> BoardView = Fighters;
   Hold.Apply(BoardView, /*bBoardView=*/true);
   BoardActor->SyncFighters(BoardModel, BoardView, Flow.IsValid() ? Flow->GetUserId() : FString());
+  NoteBoardDeaths(BoardView);
   SyncCombatFocus();
+}
+
+void AS08FlowGameMode::NoteBoardDeaths(const TArray<FS08BoardFighter>& BoardView) {
+  // DE-019 (01 F-09): a staged lethal blow releases the figure at contact + 450 (the Fall event); any other death
+  // (an ability, an AFTER COMBAT effect, a combat whose staging was cut) falls in the frame of its snapshot. The
+  // figure actor plays its own death; here the schedule is traced and the hero's gone time feeds the result gate.
+  TArray<FString> Lines;
+  for (const FS08BoardFighter& F : BoardView) {
+    const bool bAlive = F.IsAlive();
+    const bool* Was = BoardAliveById.Find(F.Id);
+    if (Was && *Was && !bAlive && !DeathStage.IsStaged(F.Id)) {
+      FS09DeathInput In;
+      In.FighterId = F.Id;
+      In.bHero = F.bIsHero;
+      In.bStaged = FallSeq >= 0 && CombatStage.GetInput().TargetId == F.Id;
+      In.Seq = In.bStaged ? FallSeq : (Flow.IsValid() ? Flow->GetAppliedSnapshot().SequenceNumber : -1);
+      S08HeroesV2::FDeathPlan Plan;
+      FString Style;
+      if (BoardActor && BoardActor->GetFighterDeathPlan(F.Id, Plan, Style)) {
+        In.SettleMs = FMath::RoundToInt(Plan.SettleSeconds * 1000.0f);
+        In.StillMs = FMath::RoundToInt(Plan.StillSeconds * 1000.0f);
+        In.DissolveMs = FMath::RoundToInt(Plan.DissolveSeconds * 1000.0f);
+        In.Style = Style;
+      }
+      DeathStage.Begin(In, NowMs(), CueDispatcher, Lines);
+    }
+    BoardAliveById.Add(F.Id, bAlive);
+  }
+  WriteCueLines(Lines);
+}
+
+void AS08FlowGameMode::TickDeathStage() {
+  TArray<FString> Lines;
+  DeathStage.Tick(NowMs(), Lines);
+  WriteCueLines(Lines);
+  // A staged lethal blow on a hero holds the screen until its fall (the gone time is known from then on).
+  bool bHeroFallPending = false;
+  const FS09CombatStageInput& In = CombatStage.GetInput();
+  if (CombatStage.IsActive() && In.bLethal && CombatStage.GetHold().bAliveHeld) {
+    const FS08BoardFighter* Target = Fighters.FindByPredicate([&In](const FS08BoardFighter& F) {
+      return F.Id == In.TargetId;
+    });
+    bHeroFallPending = Target && Target->bIsHero;
+  }
+  FString Line;
+  if (ResultGate.Update(NowMs(), Hud.SequenceNumber, Hud.bGameOver, bHeroFallPending, DeathStage.LatestHeroGoneMs(),
+                        Line)) {
+    FS08Trace::Write(Line);
+    RefreshHud();
+  }
 }
 
 void AS08FlowGameMode::BuildCombatStageHud() {
@@ -1188,7 +1247,7 @@ void AS08FlowGameMode::BuildCombatStageHud() {
   CombatEdgeRight->ClearChildren();
   CombatOutcomeBox->ClearChildren();
   const int64 Now = NowMs();
-  if (!Hud.bValid || Hud.bGameOver || !CombatStage.ShowsCards(Now)) return;
+  if (!Hud.bValid || IsResultScreenShown() || !CombatStage.ShowsCards(Now)) return;
   const FS09CombatStageInput& In = CombatStage.GetInput();
   const FS09CombatReveal& R = In.Reveal;
   // One card face: role, name, value, banner and the effect text (public after the reveal, 02 §4.5 / SD-27).
@@ -2383,8 +2442,9 @@ void AS08FlowGameMode::HandleHudKeys() {
   // action (lobby return), exactly as both panels promise.
   if (!bS09Probe && TerminalScreenOwnsKeys(Flow->GetStage(), Hud.bGameOver,
                                            Flow->IsRoomAborted())) {
-    if (PC->WasInputKeyJustPressed(EKeys::L) ||
-        PC->WasInputKeyJustPressed(EKeys::Enter)) {
+    // DE-019: while the hero's death plays out the panel is not up yet - L / Enter wait for it.
+    if ((IsResultScreenShown() || Flow->IsRoomAborted()) &&
+        (PC->WasInputKeyJustPressed(EKeys::L) || PC->WasInputKeyJustPressed(EKeys::Enter))) {
       ReturnToLobbyCommand();
     }
     return;
@@ -2642,6 +2702,8 @@ void AS08FlowGameMode::DriveS09ResultFlow() {
   // Bounded result-screen capture, one leaveGame, bounded lobby shot, then an
   // EARLY exit - the 10:37 run idled ~300s at a terminal state; once the
   // result/lobby evidence is complete there is nothing left to wait for.
+  // DE-019: the result screen comes after the hero's death (gone + 1000 ms) - nothing to capture or leave before.
+  if (!bS09LobbyReturnSent && Hud.bGameOver && !ResultGate.IsShown()) return;
   if (!bS09ShotResultScreen) {
     if (S09ShotDir.IsEmpty()) {
       // No evidence dir: skip straight to the lobby return.
@@ -4434,6 +4496,7 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
   // DE-018: the combat staging runs on the game clock; a click / Space / Enter during its holds is the skip and
   // is not handled a second time below (a HUD press keeps its own action).
   TickCombatStage();
+  TickDeathStage();  // DE-019: death lines and the result gate (after the staging released this frame's fall)
   if (!TryCombatSkip()) {
     HandleClick();
     HandleHudKeys();
@@ -4851,6 +4914,10 @@ void AS08FlowGameMode::ClearGameplayHud() {
   CombatStartTargetHealth = -1;
   CombatStage = FS09CombatStage();
   CueDispatcher = FS08CueDispatcher();
+  DeathStage = FS09DeathStage();
+  ResultGate.Reset();
+  BoardAliveById.Reset();
+  FallSeq = -1;
   ShownFighters.Reset();
   bCombatDamageShownEarly = false;
   bCombatOutcomeShown = false;
@@ -5151,6 +5218,9 @@ void AS08FlowGameMode::RefreshHud() {
   // dead on GAME_OVER - OnSnapshot cleared the drafts, the command gates
   // reject gameplay, board clicks are ignored). Strictly state-driven: a
   // same-seq merge rebuilds the identical panel and cannot double-present. ----
+  // DE-019 (01 F-09): GAME_OVER is applied, but the panel waits until the hero's death played out (+1000 ms): the
+  // board (and the edge cards of the killing blow) stay the whole picture; no gameplay panel or hand comes back.
+  if (Hud.bGameOver && !ResultGate.IsShown()) return;
   if (Hud.bGameOver) {
     if (ResultPanelBuiltAtElapsed < 0.0f) {
       ResultPanelBuiltAtElapsed = Elapsed; // settle clock for the capture
@@ -6675,7 +6745,7 @@ void AS08FlowGameMode::UpdateHover() {
 void AS08FlowGameMode::UpdateArtHud(float DeltaSeconds) {
   const bool bBoard = BoardActor && BoardActor->IsArtActive() && Flow.IsValid() &&
                       Flow->GetStage() == ES08Stage::Started;
-  const bool bActive = ArtHud.bEnabled && bBoard && !Hud.bGameOver;
+  const bool bActive = ArtHud.bEnabled && bBoard && !IsResultScreenShown();
   if (bBoard && !ArtHud.bConfigTraced && CameraZoom.IsReady()) {
     ArtHud.bConfigTraced = true;
     FS08Trace::Write(FString::Printf(TEXT("HUD art layer plate=%d iconSize=%d iconTexture=%d iconProbe=%d plan=%d"),
@@ -6957,7 +7027,7 @@ void AS08FlowGameMode::UpdateBoardLabels(bool bActive, const FString& IconTarget
   const float Ppu = HudPixelsPerUnit();
   const bool bBoard = BoardActor && BoardActor->IsArtActive() && Flow.IsValid() &&
                       Flow->GetStage() == ES08Stage::Started && Ppu > 0.0f;
-  const bool bTagsActive = ArtHud.bTagsEnabled && bBoard && !Hud.bGameOver;
+  const bool bTagsActive = ArtHud.bTagsEnabled && bBoard && !IsResultScreenShown();
   // ENV-MAPS P4: map-image boards whose profile has readability.labelPlates draw the tags on the board plate (dark
   // semi-opaque rounded plate, team-colour outline) and keep a hard gap between stacked tags; grids never do.
   const bool bBoardPlates = bTagsActive && BoardActor->UsesLabelPlates();

@@ -441,6 +441,30 @@ bool FS08HeroesV2ActorTest::RunTest(const FString&) {
       Actor->NotifyHeroAnimEvent(EEvent::Damaged, 12);
       Actor->ApplyFighter(Dead, FVector(-9999.0, -9999.0, 0.0), C.Look == ES08TeamSlot::P1, true);
       TestEqual(FString::Printf(TEXT("%s final pose holds"), C.Name), FString(ClipName(Actor->GetHeroClip())), FString(TEXT("DeathSettle")));
+      // DE-019 (01 F-09): DeathSettle 875 -> still (hero 300, sidekick 0) -> dissolve (500 / 400) on the DE-011 MIC
+      // -> hidden; the old grey-slice hold (DeathSettle + 2.0 s, instant hide) is gone.
+      FDeathPlan Plan;
+      FString Style;
+      if (TestTrue(FString::Printf(TEXT("%s death plan while dying"), C.Name), Actor->GetDeathPlan(Plan, Style))) {
+        TestEqual(FString::Printf(TEXT("%s settle = DeathSettle"), C.Name), FMath::RoundToInt(Plan.SettleSeconds * 1000.0f), 875);
+        TestEqual(FString::Printf(TEXT("%s still"), C.Name), FMath::RoundToInt(Plan.StillSeconds * 1000.0f), Spec->bHero ? 300 : 0);
+        TestEqual(FString::Printf(TEXT("%s dissolve"), C.Name), FMath::RoundToInt(Plan.DissolveSeconds * 1000.0f),
+                  Spec->bHero ? 500 : 400);
+        TestEqual(FString::Printf(TEXT("%s gone from the fall"), C.Name), FMath::RoundToInt(Plan.GoneSeconds() * 1000.0f),
+                  Spec->bHero ? 1675 : 1275);
+        TestEqual(FString::Printf(TEXT("%s default style fade"), C.Name), Style, FString(TEXT("fade")));
+      }
+      const float DissolveStart = Plan.DissolveStartSeconds();
+      Actor->AdvanceDeathForTest(DissolveStart - 0.01f);
+      TestTrue(FString::Printf(TEXT("%s still: no dissolve yet"), C.Name), !Actor->IsDissolving() && !Actor->IsHidden());
+      Actor->AdvanceDeathForTest(DissolveStart + 0.5f * Plan.DissolveSeconds);
+      TestTrue(FString::Printf(TEXT("%s dissolving half way"), C.Name),
+               Actor->IsDissolving() && FMath::IsNearlyEqual(Actor->GetDissolveProgress(), 0.5f, 1e-3f) && !Actor->IsHidden());
+      TestTrue(FString::Printf(TEXT("%s body on the dissolve MIC"), C.Name),
+               Skel->GetMaterial(0) && Skel->GetMaterial(0)->GetPathName().StartsWith(DissolveMaterialPath(*Spec, C.Look)));
+      Actor->AdvanceDeathForTest(Plan.GoneSeconds());
+      TestTrue(FString::Printf(TEXT("%s gone: hidden, death over"), C.Name),
+               Actor->IsHidden() && !Actor->IsInDeathHold() && !Actor->IsDissolving() && !Actor->GetDeathPlan(Plan, Style));
       Actor->Destroy();
     }
     // An unmapped hero keeps the legacy grey mannequin path.

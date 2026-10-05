@@ -50,9 +50,23 @@ UNMATCHED_API void ResetFlagOverrideForTest();
  *  (anim-v2-decisions (6) wrote "-90"; the sign is +90 - proven by FS08HeroesV2FacingTest.) */
 constexpr float FacingYawOffsetDeg = 90.0f;
 
-/** After DeathSettle ends the final pose is held this long, then the defeated fighter is hidden
- *  like every other defeated fighter (grey slice: instant hide). */
-constexpr float DeathHoldSeconds = 2.0f;
+// ---- DE-019 (W-16, 01 F-09): death by stages from the contact frame, one scheme for all six v2 figures.
+//   HitReact + red tint 0-450 (the combat staging, S09CombatStage.h) -> DeathSettle 450-1325 (the clip, 875 ms) ->
+//   still (hero 300, sidekick 0) -> dissolve (hero 500, sidekick 400; DE-011 below) -> gone (hero ~2125, sidekick
+//   ~1725 from the contact). The old grey-slice hold (DeathSettle + 2.0 s, then an instant hide) is gone.
+/** After DeathSettle ends the final pose stays still this long before the dissolve: hero 0.3 s, sidekick 0. */
+constexpr float DeathStillSecondsHero = 0.3f;
+constexpr float DeathStillSecondsSidekick = 0.0f;
+/** The death plan of one figure from its fall (the start of DeathSettle), in seconds. Settle = the DeathSettle play
+ *  length (0 without the clip); Dissolve = 0 when the dissolve MIC is missing (cue-table CUE-013 fallback: the figure
+ *  hides at once when the still ends). */
+struct FDeathPlan {
+  float SettleSeconds = 0.0f;
+  float StillSeconds = 0.0f;
+  float DissolveSeconds = 0.0f;
+  float DissolveStartSeconds() const { return SettleSeconds + StillSeconds; }
+  float GoneSeconds() const { return SettleSeconds + StillSeconds + DissolveSeconds; }
+};
 
 enum class EClip : uint8 { None, Idle, LungeAttack, HitReact, DeathSettle };
 constexpr int32 ClipCount = 5;
@@ -162,6 +176,20 @@ constexpr int32 PedestalFadeCpdIndex = 11;
 constexpr float DissolveSecondsHero = 0.5f;
 constexpr float DissolveSecondsSidekick = 0.4f;
 inline float DissolveSeconds(const FHeroSpec& Spec) { return Spec.bHero ? DissolveSecondsHero : DissolveSecondsSidekick; }
+inline float DeathStillSeconds(const FHeroSpec& Spec) {
+  return Spec.bHero ? DeathStillSecondsHero : DeathStillSecondsSidekick;
+}
+/** DE-019: the plan of a v2 figure (F-09). SettleSeconds = the loaded DeathSettle length (0 without the clip),
+ *  bDissolveMaterial = the dissolve MIC loaded. */
+inline FDeathPlan MakeDeathPlan(const FHeroSpec& Spec, float SettleSeconds, bool bDissolveMaterial) {
+  FDeathPlan Plan;
+  Plan.SettleSeconds = FMath::Max(0.0f, SettleSeconds);
+  Plan.StillSeconds = DeathStillSeconds(Spec);
+  Plan.DissolveSeconds = bDissolveMaterial ? DissolveSeconds(Spec) : 0.0f;
+  return Plan;
+}
+/** Dissolve progress 0..1 at T seconds after the fall (0 before the dissolve, 1 once the figure is gone). */
+UNMATCHED_API float DissolveProgressAt(const FDeathPlan& Plan, float SecondsSinceFall);
 
 /** Fade = screen-space dither that TSR resolves into a smooth fade: the default and the reduced-motion style.
  *  Ash = the figure burns away from the feet up with a team-colour (C-11) glowing front: a candidate for the A/B
@@ -182,5 +210,11 @@ UNMATCHED_API FString DissolveMaterialPath(const FHeroSpec& Spec, ES08TeamSlot L
  *  compiled and nothing changes). */
 UNMATCHED_API void SetDissolve(UPrimitiveComponent* Body, UPrimitiveComponent* Pedestal, float Progress,
                                EDissolveStyle Style);
+
+/** DE-019 G-COST bench (render_bench.py *-dissolve-* variants): -Bench -BenchDissolve=<progress 0..1> freezes every
+ *  living v2 figure at that dissolve progress (the dissolve MIC, style by DissolveStyle()) - a worst case of six
+ *  dissolving figures for the pass cost. Negative = off (no -Bench, no -BenchDissolve, or an unparsable value). */
+inline const TCHAR* const BenchDissolveParamName = TEXT("BenchDissolve=");
+UNMATCHED_API float BenchDissolveProgress();
 
 }  // namespace S08HeroesV2

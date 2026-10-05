@@ -25,6 +25,7 @@
 #include "../S09/S09MoveInput.h"
 #include "../S09/S09HudPress.h"
 #include "../S09/S09CombatStage.h"
+#include "../S09/S09DeathStage.h"
 #include "S08CueDispatcher.h"
 #include "S08FlowGameMode.generated.h"
 
@@ -264,6 +265,15 @@ private:
   const FS08BoardFighter* FindShownFighter(const FString& FighterId) const;
   /** Edge-of-field cards (SD-48 p. 4) and the outcome label of the running staging (RefreshHud). */
   void BuildCombatStageHud();
+  // ---- DE-019 death by stages and the result gate (S09DeathStage.h) ----
+  /** After a board sync: every fighter that was alive on the board and is not any more falls now - its death is
+   *  staged with the figure's own plan (the CUE death trace, CUE-013). */
+  void NoteBoardDeaths(const TArray<FS08BoardFighter>& BoardView);
+  /** Death lines due now and the result gate; the tick the result screen opens rebuilds the HUD. */
+  void TickDeathStage();
+  /** The result screen (GD-036 panel) is shown: GAME_OVER is applied AND the gate opened (the hero's death played
+   *  out + 1000 ms). Before that the GAME_OVER state is applied but presented as the board. */
+  bool IsResultScreenShown() const { return Hud.bGameOver && ResultGate.IsShown(); }
   int64 NowMs() const { return static_cast<int64>(FMath::RoundToDouble(static_cast<double>(Elapsed) * 1000.0)); }
   void RunS09Auto();
   void TakeS09Shots();
@@ -412,6 +422,10 @@ private:
   // LungeAttack is no longer sent at COMBAT_RESOLVE: the staging plays it after the slam + 300 ms (01 F-03).
   FS08CueDispatcher CueDispatcher;
   FS09CombatStage CombatStage;
+  FS09DeathStage DeathStage;
+  FS09ResultGate ResultGate;
+  TMap<FString, bool> BoardAliveById;      // DE-019: the board view's alive flags of the last sync
+  int32 FallSeq = -1;                      // DE-019: seq of the staged fall being released (RunCombatEvents)
   TArray<FS08BoardFighter> ShownFighters;  // HudFighters() while the staging holds the target
   bool bCombatDamageShownEarly = false;    // the target's damage was shown while the combat was paused
   bool bCombatOutcomeShown = false;        // the HUD was rebuilt for the outcome label of this staging

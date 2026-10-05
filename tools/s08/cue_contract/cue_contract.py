@@ -9,9 +9,12 @@
   python tools/s08/cue_contract/cue_contract.py validate-table [--table P]   схема + семантика + сверка с 07; missing-report
   python tools/s08/cue_contract/cue_contract.py run-fixtures [--dir D]       эталонная модель против expect_trace и гейт
   python tools/s08/cue_contract/cue_contract.py check-trace <log> [--table P] [--min-ms-cue N] [--min-combat N]
+                                                             [--min-death N]
                                                                            гейт трассы `CUE fx … result=`, `MS-CUE move …`
-                                                                           (move-selection 04 §9, MS-AT-28) и постановки боя
-                                                                           `CUE combat …` (DE-018, C1-C6) реального лога
+                                                                           (move-selection 04 §9, MS-AT-28), постановки боя
+                                                                           `CUE combat …` (DE-018, C1-C6) и смерти
+                                                                           `CUE death …` / `RESULT screen …` (DE-019, DS1-DS5)
+                                                                           реального лога
 
 Эталонная модель — исполняемая форма спецификации для фикстур (C++-тесты GD-044 портируют те же
 фикстуры), не код движка. Только stdlib + jsonschema (есть в системном Python).
@@ -619,6 +622,9 @@ def check_trace(lines, table):
     c_errors, c_summary = check_combat(lines, starts)
     errors.extend(c_errors)
     summary.update(c_summary)
+    d_errors, d_summary = check_death(lines)
+    errors.extend(d_errors)
+    summary.update(d_summary)
     return errors, summary
 
 
@@ -800,6 +806,161 @@ def check_combat(lines, cue_starts=()):
     return errors, summary
 
 
+# ----------------------------------------------------------------------------- смерть и экран результата (DE-019)
+DEATH_RE = re.compile(r"(CUE death\b.*)$")
+RESULT_SCREEN_RE = re.compile(r"(RESULT screen\b.*)$")
+DEATH_STAGES = ("fall", "mark", "dissolve", "gone")
+DEATH_FALL_NEED = ("fighter", "hero", "staged", "settle", "still", "dissolve", "style", "gone")
+RESULT_NEED = ("seq", "t", "due", "gameOver", "heroGone", "wait")
+DEATH_MS = {  # 01 F-09 при скорости ×1 (CUE-DISPATCHER.md §3.1): от кадра контакта
+    "fall": 450, "settle": 875, "mark": 1100, "still_hero": 300, "still_sidekick": 0,
+    "dissolve_hero": 500, "dissolve_sidekick": 400, "result_after_gone": 1000, "max_wait": 10000,
+    "frame_tolerance": 100,  # падение смерти против этапа fall постановки и экран против due: кадр-два на 30 FPS
+}
+
+
+def _fields(text, skip):
+    out = {}
+    for w in text.split()[skip:]:
+        if "=" in w:
+            k, v = w.split("=", 1)
+            out[k] = v
+    return out
+
+
+def check_death(lines):
+    """Гейт смерти `CUE death …` и экрана результата `RESULT screen …` (DE-019, CUE-DISPATCHER.md §6): DS1 формат;
+    DS2 одна смерть на (seq, боец) и все её этапы; DS3 этапы F-09 от падения (метка +650 = контакт + 1100,
+    растворение = падение + оседание + неподвижно, исчезновение = + растворение; v2-фигура: оседание 875, неподвижно
+    300 у героя и 0 у помощника, растворение 500 / 400 или 0 со style=none); DS4 падение постановки (`staged=1`) —
+    в кадр этапа `fall` её `CUE combat` (≤ 100 мс); DS5 экран результата не раньше исчезновения героя + 1000 мс
+    (без смерти героя — сразу после GAME_OVER), due по правилу, показ не позже due + 100 мс."""
+    errors = []
+    deaths = {}
+    order = []
+    screens = []
+    combat_fall = {}
+    combat_contact = {}
+    for n, raw in enumerate(lines, 1):
+        line = raw.rstrip("\r\n")
+        cf = parse_combat(line)
+        if cf is not None and cf.get("stage") in ("fall", "contact"):
+            t = _int_or_none(cf.get("t"))
+            if t is not None and cf.get("stage") == "fall":
+                combat_fall[(cf.get("seq"), cf.get("target"))] = t
+            elif t is not None:
+                combat_contact[cf.get("seq")] = t
+            continue
+        m = DEATH_RE.search(line)
+        if m:
+            f = _fields(m.group(1), 2)
+            seq, stage, fighter = f.get("seq"), f.get("stage"), f.get("fighter")
+            t = _int_or_none(f.get("t"))
+            if seq is None or stage not in DEATH_STAGES or t is None or not fighter:
+                errors.append(("DS1", "строка %d: CUE death без seq/stage/t/fighter или неизвестный этап %s" % (n, stage)))
+                continue
+            f["_n"], f["_t"] = n, t
+            key = (seq, fighter)
+            if key not in deaths:
+                deaths[key] = []
+                order.append(key)
+            deaths[key].append(f)
+            continue
+        m = RESULT_SCREEN_RE.search(line)
+        if m:
+            f = _fields(m.group(1), 2)
+            missing = [k for k in RESULT_NEED if k not in f]
+            if missing:
+                errors.append(("DS1", "строка %d: RESULT screen без полей %s" % (n, missing)))
+                continue
+            f["_n"] = n
+            screens.append(f)
+    summary = {"death_sets": 0, "death_heroes": 0, "result_screens": len(screens), "hit_to_screen": []}
+    hero_gone = []  # (fall_t, gone_t, seq)
+    for key in order:
+        rows = deaths[key]
+        seq, fighter = key
+        falls = [r for r in rows if r["stage"] == "fall"]
+        if len(falls) != 1:
+            errors.append(("DS2", "%s/%s: падений %d (одна смерть на бойца)" % (seq, fighter, len(falls))))
+            continue
+        fall = falls[0]
+        missing = [k for k in DEATH_FALL_NEED if k not in fall]
+        if missing:
+            errors.append(("DS1", "%s/%s: в fall нет полей %s" % (seq, fighter, missing)))
+            continue
+        if rows[0] is not fall:
+            errors.append(("DS2", "%s/%s: этап до fall" % (seq, fighter)))
+        by = {}
+        for r in rows:
+            by.setdefault(r["stage"], []).append(r)
+        if any(len(v) > 1 for v in by.values()):
+            errors.append(("DS2", "%s/%s: этап повторён" % (seq, fighter)))
+        if "mark" not in by or "gone" not in by:
+            errors.append(("DS2", "%s/%s: нет mark или gone" % (seq, fighter)))
+            continue
+        summary["death_sets"] += 1
+        ft = fall["_t"]
+        hero = fall["hero"] == "1"
+        settle, still, dissolve = int(fall["settle"]), int(fall["still"]), int(fall["dissolve"])
+        gone_t = ft + settle + still + dissolve
+        if int(fall["gone"]) != gone_t:
+            errors.append(("DS3", "%s/%s: gone=%s ≠ падение + %d" % (seq, fighter, fall["gone"], settle + still + dissolve)))
+        mark = by["mark"][0]
+        if mark["_t"] - ft != DEATH_MS["mark"] - DEATH_MS["fall"]:
+            errors.append(("DS3", "%s/%s: метка через %d мс после падения ≠ %d" % (
+                seq, fighter, mark["_t"] - ft, DEATH_MS["mark"] - DEATH_MS["fall"])))
+        if by["gone"][0]["_t"] != gone_t:
+            errors.append(("DS3", "%s/%s: исчезновение t=%d ≠ %d" % (seq, fighter, by["gone"][0]["_t"], gone_t)))
+        if (dissolve > 0) != ("dissolve" in by):
+            errors.append(("DS3", "%s/%s: строка dissolve %s при dissolve=%d" % (
+                seq, fighter, "есть" if "dissolve" in by else "нет", dissolve)))
+        elif dissolve > 0 and by["dissolve"][0]["_t"] != ft + settle + still:
+            errors.append(("DS3", "%s/%s: растворение не после оседания и неподвижности" % (seq, fighter)))
+        if (dissolve == 0) != (fall["style"] == "none"):
+            errors.append(("DS3", "%s/%s: style=%s при dissolve=%d" % (seq, fighter, fall["style"], dissolve)))
+        if settle > 0:  # v2-фигура с клипом DeathSettle: таблица F-09
+            want_still = DEATH_MS["still_hero"] if hero else DEATH_MS["still_sidekick"]
+            want_dissolve = DEATH_MS["dissolve_hero"] if hero else DEATH_MS["dissolve_sidekick"]
+            if settle != DEATH_MS["settle"] or still != want_still or dissolve not in (0, want_dissolve):
+                errors.append(("DS3", "%s/%s: план %d/%d/%d ≠ F-09 %d/%d/%d (%s)" % (
+                    seq, fighter, settle, still, dissolve, DEATH_MS["settle"], want_still, want_dissolve,
+                    "герой" if hero else "помощник")))
+        if fall["staged"] == "1":
+            cft = combat_fall.get((seq, fighter))
+            if cft is None:
+                errors.append(("DS4", "%s/%s: staged=1 без этапа fall постановки" % (seq, fighter)))
+            elif not 0 <= ft - cft <= DEATH_MS["frame_tolerance"]:
+                errors.append(("DS4", "%s/%s: падение через %d мс после этапа fall постановки" % (seq, fighter, ft - cft)))
+        if hero:
+            summary["death_heroes"] += 1
+            hero_gone.append((ft, gone_t, seq, fall["staged"] == "1"))
+    prev_screen_t = None
+    for sc in screens:
+        t, due, go = int(sc["t"]), int(sc["due"]), int(sc["gameOver"])
+        lo = prev_screen_t if prev_screen_t is not None else -1
+        own = [h for h in hero_gone if lo < h[0] <= t]
+        if own:
+            gone = max(h[1] for h in own)
+            want = min(max(go, gone + DEATH_MS["result_after_gone"]), go + DEATH_MS["max_wait"])
+            if sc["heroGone"] != str(gone):
+                errors.append(("DS5", "строка %d: heroGone=%s ≠ исчезновение героя %d" % (sc["_n"], sc["heroGone"], gone)))
+            last = max(own, key=lambda h: h[1])
+            if last[3] and last[2] in combat_contact:
+                summary["hit_to_screen"].append(t - combat_contact[last[2]])
+        else:
+            want = go
+        if due != want:
+            errors.append(("DS5", "строка %d: due=%d ≠ %d (GAME_OVER %d, исчезновение героя + %d)" % (
+                sc["_n"], due, want, go, DEATH_MS["result_after_gone"])))
+        if not 0 <= t - due <= DEATH_MS["frame_tolerance"]:
+            errors.append(("DS5", "строка %d: экран t=%d не в кадр due=%d" % (sc["_n"], t, due)))
+        if int(sc["wait"]) != t - go:
+            errors.append(("DS5", "строка %d: wait=%s ≠ t − gameOver" % (sc["_n"], sc["wait"])))
+        prev_screen_t = t
+    return errors, summary
+
+
 # ----------------------------------------------------------------------------- фикстуры
 def run_fixtures(table, fixture_dir=FIXTURES, schema_path=FIXTURE_SCHEMA):
     import jsonschema
@@ -852,6 +1013,8 @@ def main(argv=None):
                    help="M5: не меньше N строк `MS-CUE move` (живой прогон MS-AT-28/32)")
     c.add_argument("--min-combat", type=int, default=0,
                    help="C7: не меньше N завершённых постановок боя `CUE combat` (живой бой DE-018/DE-031)")
+    c.add_argument("--min-death", type=int, default=0,
+                   help="DS6: не меньше N смертей `CUE death` (живая партия до GAME_OVER, DE-019/DE-031)")
     a = ap.parse_args(argv)
     table = load_json(a.table)
     if a.cmd == "validate-table":
@@ -878,6 +1041,8 @@ def main(argv=None):
         errors.append(("M5", "строк MS-CUE %d < %d" % (summary["ms_cue"], a.min_ms_cue)))
     if summary["combat_sets"] < a.min_combat:
         errors.append(("C7", "постановок боя %d < %d" % (summary["combat_sets"], a.min_combat)))
+    if summary["death_sets"] < a.min_death:
+        errors.append(("DS6", "смертей %d < %d" % (summary["death_sets"], a.min_death)))
     for code, text in errors:
         print("GATE", code, text)
     print("CUE_TRACE", "PASS" if not errors else "FAIL", json.dumps(summary))

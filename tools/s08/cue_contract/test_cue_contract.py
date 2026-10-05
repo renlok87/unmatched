@@ -323,5 +323,71 @@ class CombatStagingTests(unittest.TestCase):
         self.assertEqual(lines[-1], "CUE fx done id=CUE-010 subject=scene seq=3 t=1050 ms=1050 cut=0 hold=250")
 
 
+class DeathStageTests(unittest.TestCase):
+    """DE-019: смерть по этапам `CUE death …` и экран результата `RESULT screen …` (01 F-09, CUE-DISPATCHER.md §6)."""
+
+    def staged(self):
+        # летальный удар Medusa по Merlin (контакт 2233, этап fall 2683) из фикстуры DE-018
+        return list(cc.load_json(cc.FIXTURES / "combat-staging-lethal-skip.json")["expect_trace"])
+
+    @staticmethod
+    def death(seq, fighter, fall, hero, staged, settle=875, still=None, dissolve=None, style="fade"):
+        still = (300 if hero else 0) if still is None else still
+        dissolve = (500 if hero else 400) if dissolve is None else dissolve
+        style = "none" if dissolve == 0 else style
+        gone = fall + settle + still + dissolve
+        lines = ["CUE death seq=%d stage=fall t=%d fighter=%s hero=%d staged=%d settle=%d still=%d dissolve=%d style=%s gone=%d"
+                 % (seq, fall, fighter, int(hero), int(staged), settle, still, dissolve, style, gone),
+                 "CUE death seq=%d stage=mark t=%d fighter=%s heart=dark" % (seq, fall + 650, fighter)]
+        if dissolve:
+            lines.append("CUE death seq=%d stage=dissolve t=%d fighter=%s ms=%d style=%s"
+                         % (seq, fall + settle + still, fighter, dissolve, style))
+        lines.append("CUE death seq=%d stage=gone t=%d fighter=%s" % (seq, gone, fighter))
+        lines.sort(key=lambda l: int(l.split(" t=")[1].split()[0]))
+        return lines, gone
+
+    def test_sidekick_death_from_the_staged_fall(self):
+        lines, gone = self.death(41, "merlin", 2683 + 17, hero=False, staged=True)
+        errs, summary = cc.check_trace(self.staged() + lines, TABLE)
+        self.assertEqual(errs, [])
+        self.assertEqual((summary["death_sets"], summary["death_heroes"]), (1, 0))
+        self.assertEqual(gone - 2233, 1725 + 17)  # помощник ≈1725 мс от контакта (+ кадр запуска)
+
+    def test_hero_death_and_result_screen_3_1_s(self):
+        trace = [l.replace("target=merlin", "target=arthur").replace("subject=merlin", "subject=arthur")
+                 for l in self.staged()]
+        lines, gone = self.death(41, "arthur", 2683, hero=True, staged=True)
+        self.assertEqual(gone - 2233, 2125)
+        screen = "RESULT screen seq=41 t=%d due=%d gameOver=1000 heroGone=%d wait=%d" % (
+            gone + 1000 + 16, gone + 1000, gone, gone + 1016 - 1000)
+        errs, summary = cc.check_trace(trace + lines + [screen], TABLE)
+        self.assertEqual(errs, [])
+        self.assertEqual(summary["result_screens"], 1)
+        self.assertEqual(summary["hit_to_screen"], [3125 + 16])
+
+    def test_old_hold_early_screen_and_unstaged_fall_are_caught(self):
+        # старое удержание 2,0 с вместо 300 мс — DS3
+        lines, _ = self.death(41, "merlin", 2683, hero=False, staged=True, still=2000)
+        self.assertIn("DS3", {c for c, _ in cc.check_trace(self.staged() + lines, TABLE)[0]})
+        # экран раньше исчезновения героя + 1000 — DS5
+        lines, gone = self.death(52, "arthur", 5000, hero=True, staged=False)
+        early = "RESULT screen seq=52 t=%d due=%d gameOver=4900 heroGone=%d wait=%d" % (gone + 200, gone + 200, gone,
+                                                                                        gone + 200 - 4900)
+        self.assertIn("DS5", {c for c, _ in cc.check_trace(lines + [early], TABLE)[0]})
+        # staged=1 без этапа fall постановки — DS4; второе падение того же бойца — DS2
+        lines, _ = self.death(60, "harpy1", 7000, hero=False, staged=True)
+        self.assertIn("DS4", {c for c, _ in cc.check_trace(lines, TABLE)[0]})
+        self.assertIn("DS2", {c for c, _ in cc.check_trace(lines + lines[:1], TABLE)[0]})
+
+    def test_instant_hide_and_screen_without_hero_death(self):
+        # фигура без клипа и MIC (серая доска): исчезает в кадр падения, без строки dissolve
+        lines, gone = self.death(70, "f-1-hero", 9000, hero=True, staged=False, settle=0, still=0, dissolve=0)
+        self.assertEqual(gone, 9000)
+        screen = "RESULT screen seq=70 t=10000 due=10000 gameOver=9000 heroGone=9000 wait=1000"
+        self.assertEqual(cc.check_trace(lines + [screen], TABLE)[0], [])
+        # GAME_OVER без смерти героя (например, после реконнекта): экран сразу
+        self.assertEqual(cc.check_trace(["RESULT screen seq=3 t=500 due=500 gameOver=500 heroGone=- wait=0"], TABLE)[0], [])
+
+
 if __name__ == "__main__":
     unittest.main()

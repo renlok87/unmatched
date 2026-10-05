@@ -251,6 +251,9 @@ public:
   int32 GetFighterContactMs(const FString& FighterId, FString& OutSource) const;
   /** DE-018 (CUE-011): the red hit tint of a v2 figure (CPD_HitTint) for Seconds from now. */
   void PlayFighterHitTint(const FString& FighterId, float Seconds);
+  /** DE-019 (01 F-09): the death plan of a dying v2 figure (AS08FighterActor::GetDeathPlan); false when the fighter
+   *  plays no death (alive, gone, or a figure that hides at once). */
+  bool GetFighterDeathPlan(const FString& FighterId, S08HeroesV2::FDeathPlan& OutPlan, FString& OutStyle) const;
   /** Short asset name of a v2 figure's clip (AM_<Key>_<Clip>), empty without one (CUE trace token). */
   FString GetFighterClipName(const FString& FighterId, S08HeroesV2::EClip Clip) const;
   /** Wave 5c-B heroes v2 (default since ART-DEFAULT): a combat event (attack / damage) of a fighter drives its v2

@@ -217,8 +217,8 @@ bool AS08FighterActor::LoadTeamRingAssets() {
 void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
                                     const FVector& CellCenter, bool bOwn,
                                     bool bArtPreview, bool bTopologyBoard) {
-  // Wave 5c-B: a v2 figure that was alive plays DeathSettle on the spot and holds the final pose
-  // (DeathHoldSeconds) before the usual hide; the defeated fighter's cell (X = -1) is not used.
+  // Wave 5c-B / DE-019: a v2 figure that was alive plays its death on the spot - DeathSettle, the still and the
+  // dissolve (01 F-09) - before the usual hide; the defeated fighter's cell (X = -1) is not used.
   const bool bWasAlive = bHasApplied && Fighter.IsAlive();
   bHasApplied = true;
   Fighter = InFighter;
@@ -501,13 +501,32 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
 
   ApplyLabelVisibility();
 
-  // Death (isDefeated/health<=0): instant hide, no animations (grey slice). A v2 figure first plays
-  // DeathSettle (early return above) and reaches this line after its hold.
+  // Death (isDefeated/health<=0): instant hide, no animations (grey slice). A v2 figure first plays its death
+  // (early return above: DeathSettle, still, dissolve - DE-019) and reaches this line once it is gone.
   SetActorHiddenInGame(!Fighter.IsAlive());
   SetActorEnableCollision(Fighter.IsAlive());
   if (bHeroV2 && Fighter.IsAlive()) {
     const S08HeroesV2::FClipChoice Choice = S08HeroesV2::NextClip(HeroClip, S08HeroesV2::EEvent::Spawn);
     if (Choice.bRestart) PlayHeroClip(Choice.Clip, S08HeroesV2::EEvent::Spawn, -1);
+    ApplyBenchDissolve();
+  }
+}
+
+void AS08FighterActor::ApplyBenchDissolve() {
+  using namespace S08HeroesV2;
+  const float Progress = BenchDissolveProgress();
+  if (Progress < 0.0f || !HeroV2Spec || !ArtBody) return;
+  const FString Path = DissolveMaterialPath(*HeroV2Spec, Look);
+  UMaterialInterface* Mic = LoadObject<UMaterialInterface>(nullptr, *Path);
+  if (Mic) {
+    for (int32 Slot = 0; Slot < ArtBody->GetNumMaterials(); ++Slot) ArtBody->SetMaterial(Slot, Mic);
+    SetDissolve(ArtBody, ArtBase, Progress, DissolveStyle());
+  }
+  if (!bBenchDissolveTraced) {
+    bBenchDissolveTraced = true;
+    FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW dissolve bench fighter=%s progress=%.2f style=%s mi=%s"),
+                                     *Fighter.Id, Progress, DissolveStyleName(DissolveStyle()),
+                                     Mic ? *Mic->GetName() : TEXT("missing")));
   }
 }
 
@@ -686,7 +705,7 @@ void AS08FighterActor::OnHeroClipFinished() {
 void AS08FighterActor::BeginHeroDeath() {
   using namespace S08HeroesV2;
   // The figure stays where it fell: labels, selection / combat markers and the click volume go at once;
-  // the pedestal and the team ring stay under the settling figure until the hold ends.
+  // the pedestal and the team ring stay under the settling figure until it is gone.
   bDeathHold = true;
   SetActorEnableCollision(false);
   bIsSelected = false;
@@ -699,25 +718,106 @@ void AS08FighterActor::BeginHeroDeath() {
   TargetIcon->SetVisibility(false);
   NotifyHeroAnimEvent(EEvent::Defeated, -1);
   RefreshHeroLightState();  // ENV-MAPS P9: a defeated fighter's hero light goes (DefeatedMul) as the figure falls
+  // DE-019 (01 F-09): DeathSettle -> still (hero 0.3 s, sidekick 0) -> dissolve (hero 0.5 s, sidekick 0.4 s; DE-011
+  // MIC, fade by default, ash only with -S08DissolveAsh) -> hidden. A missing MIC hides the figure when the still ends.
   const UAnimSequenceBase* Anim = HeroClips.IsValidIndex(static_cast<int32>(EClip::DeathSettle))
       ? HeroClips[static_cast<int32>(EClip::DeathSettle)].Get() : nullptr;
-  const float Hold = (Anim ? Anim->GetPlayLength() : 0.0f) + DeathHoldSeconds;
-  if (UWorld* World = GetWorld()) {
-    World->GetTimerManager().SetTimer(DeathHideTimer, this, &AS08FighterActor::OnDeathHoldFinished, Hold, false);
+  const FString MicPath = HeroV2Spec ? DissolveMaterialPath(*HeroV2Spec, Look) : FString();
+  DissolveMaterial = MicPath.IsEmpty() ? nullptr : LoadObject<UMaterialInterface>(nullptr, *MicPath);
+  if (HeroV2Spec) {
+    DeathPlan = MakeDeathPlan(*HeroV2Spec, Anim ? Anim->GetPlayLength() : 0.0f, DissolveMaterial != nullptr);
+  } else {
+    DeathPlan = FDeathPlan();
+    DeathPlan.SettleSeconds = Anim ? Anim->GetPlayLength() : 0.0f;
   }
-  FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW anim fighter=%s death hold=%.3f"), *Fighter.Id, Hold));
+  DeathStyle = DissolveStyle();
+  bDissolving = false;
+  DissolveValue = 0.0f;
+  UWorld* World = GetWorld();
+  DeathFallSeconds = World ? World->GetTimeSeconds() : 0.0;
+  FS08Trace::Write(FString::Printf(
+      TEXT("ARTPREVIEW anim fighter=%s death hold=%.3f settle=%.3f still=%.3f dissolve=%.3f style=%s mi=%s"),
+      *Fighter.Id, DeathPlan.GoneSeconds(), DeathPlan.SettleSeconds, DeathPlan.StillSeconds,
+      DeathPlan.DissolveSeconds, DissolveMaterial ? DissolveStyleName(DeathStyle) : TEXT("none"),
+      DissolveMaterial ? *DissolveMaterial->GetName() : TEXT("missing")));
+  const float StillEnd = DeathPlan.DissolveStartSeconds();
+  if (World && StillEnd > 0.0f) {
+    World->GetTimerManager().SetTimer(DeathHideTimer, this, &AS08FighterActor::OnDeathStillFinished, StillEnd, false);
+  } else if (World) {
+    OnDeathStillFinished();
+  }
+}
+
+bool AS08FighterActor::GetDeathPlan(S08HeroesV2::FDeathPlan& OutPlan, FString& OutStyle) const {
+  if (!bDeathHold) return false;
+  OutPlan = DeathPlan;
+  OutStyle = DissolveMaterial ? S08HeroesV2::DissolveStyleName(DeathStyle) : TEXT("none");
+  return true;
+}
+
+void AS08FighterActor::OnDeathStillFinished() {
+  using namespace S08HeroesV2;
+  if (!bDeathHold) return;
+  if (DeathPlan.DissolveSeconds <= 0.0f || !DissolveMaterial || !ArtBody) {
+    // cue-table CUE-013 fallback: no dissolve material - the figure hides when the still ends.
+    FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW anim fighter=%s death dissolve=missing fallback=hide"),
+                                     *Fighter.Id));
+    OnDeathHoldFinished();
+    return;
+  }
+  // The dissolve MIC is a child of the body MI (DE-011): the look is identical at progress 0, then the figure
+  // dissolves; the pedestal greys out with the same progress (CPD_Fade) and goes with the figure.
+  for (int32 Slot = 0; Slot < ArtBody->GetNumMaterials(); ++Slot) ArtBody->SetMaterial(Slot, DissolveMaterial);
+  bDissolving = true;
+  DissolveValue = 0.0f;
+  SetDissolve(ArtBody, ArtBase, 0.0f, DeathStyle);
+  FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW anim fighter=%s death dissolve ms=%d style=%s mi=%s"), *Fighter.Id,
+                                   FMath::RoundToInt(DeathPlan.DissolveSeconds * 1000.0f),
+                                   DissolveStyleName(DeathStyle), *DissolveMaterial->GetName()));
+  if (UWorld* World = GetWorld()) {
+    World->GetTimerManager().SetTimer(DissolveTimer, this, &AS08FighterActor::TickDissolve, 1.0f / 60.0f, true);
+  }
+}
+
+void AS08FighterActor::TickDissolve() {
+  UWorld* World = GetWorld();
+  if (!World) return;
+  StepDissolve(static_cast<float>(World->GetTimeSeconds() - DeathFallSeconds));
+}
+
+void AS08FighterActor::StepDissolve(float SecondsSinceFall) {
+  if (!bDissolving) return;
+  DissolveValue = S08HeroesV2::DissolveProgressAt(DeathPlan, SecondsSinceFall);
+  S08HeroesV2::SetDissolve(ArtBody, ArtBase, DissolveValue, DeathStyle);
+  if (DissolveValue >= 1.0f) OnDeathHoldFinished();
+}
+
+void AS08FighterActor::AdvanceDeathForTest(float SecondsSinceFall) {
+  if (!bDeathHold) return;
+  if (!bDissolving && SecondsSinceFall >= DeathPlan.DissolveStartSeconds()) {
+    if (UWorld* World = GetWorld()) World->GetTimerManager().ClearTimer(DeathHideTimer);
+    OnDeathStillFinished();
+  }
+  StepDissolve(SecondsSinceFall);
 }
 
 void AS08FighterActor::OnDeathHoldFinished() {
+  UWorld* World = GetWorld();
+  if (World) {
+    World->GetTimerManager().ClearTimer(DissolveTimer);
+    World->GetTimerManager().ClearTimer(DeathHideTimer);
+  }
+  const double AfterFall = World ? World->GetTimeSeconds() - DeathFallSeconds : 0.0;
   bDeathHold = false;
   bDeathDone = true;
+  bDissolving = false;
   if (!Fighter.IsAlive()) {
     SetActorHiddenInGame(true);
     SetActorEnableCollision(false);
   }
   RefreshHeroLightState();
-  FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW anim fighter=%s death hidden=%d"), *Fighter.Id,
-                                   Fighter.IsAlive() ? 0 : 1));
+  FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW anim fighter=%s death hidden=%d afterFall=%.3f plan=%.3f"),
+                                   *Fighter.Id, Fighter.IsAlive() ? 0 : 1, AfterFall, DeathPlan.GoneSeconds()));
 }
 
 void AS08FighterActor::SetScreenIconMode(bool bScreen) {

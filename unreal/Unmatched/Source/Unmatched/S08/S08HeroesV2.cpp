@@ -189,6 +189,21 @@ FString DissolveMaterialPath(const FHeroSpec& Spec, ES08TeamSlot Look) {
                          S08TeamSlotName(Look));
 }
 
+float DissolveProgressAt(const FDeathPlan& Plan, float SecondsSinceFall) {
+  const float T = SecondsSinceFall - Plan.DissolveStartSeconds();
+  if (T <= 0.0f) return 0.0f;
+  // A float sum of the stages must not leave the figure at 0.99999 forever: the last microseconds count as gone.
+  if (Plan.DissolveSeconds <= 0.0f || T >= Plan.DissolveSeconds - KINDA_SMALL_NUMBER) return 1.0f;
+  return FMath::Clamp(T / Plan.DissolveSeconds, 0.0f, 1.0f);
+}
+
+float BenchDissolveProgress() {
+  const TCHAR* Cmd = FCommandLine::Get();
+  float Progress = -1.0f;
+  if (!FParse::Param(Cmd, TEXT("Bench")) || !FParse::Value(Cmd, BenchDissolveParamName, Progress)) return -1.0f;
+  return Progress < 0.0f ? -1.0f : FMath::Min(Progress, 1.0f);
+}
+
 void SetDissolve(UPrimitiveComponent* Body, UPrimitiveComponent* Pedestal, float Progress, EDissolveStyle Style) {
   const float P = FMath::Clamp(Progress, 0.0f, 1.0f);
   if (Body) {

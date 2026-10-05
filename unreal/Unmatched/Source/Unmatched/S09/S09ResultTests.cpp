@@ -9,12 +9,18 @@
 // death on the terminal snapshot (model + controller gates + seq-guard
 // dedupe), and the scheme banner legality mirror that keeps the auto driver
 // from re-sending a scheme whose banner fighter fell (10:41 loop).
+// DE-019 (W-16): death by stages from the contact frame and the result gate (S09DeathStage.h) -
+// Unmatched.S09.DeathStage.Timeline / .ResultGate.
 #if WITH_AUTOMATION_TESTS
 
+#include "S09CombatStage.h"
+#include "S09DeathStage.h"
 #include "S09HudModel.h"
 #include "S09ManeuverUi.h"
 #include "../S08/S08BoardModel.h"
 #include "../S08/S08Contracts.h"
+#include "../S08/S08CueDispatcher.h"
+#include "../S08/S08HeroesV2.h"
 #include "../S08/S08FlowController.h"
 #include "Dom/JsonObject.h"
 #include "Serialization/JsonSerializer.h"
@@ -454,6 +460,267 @@ bool FS09SchemeBannerLegalityTest::RunTest(const FString&) {
   Revived[1].Health = 4;
   TestTrue("revived banner fighter makes the scheme playable",
            FS09CommandUi::SchemePlayableByLivingFighters(MakeCard(TEXT("Merlin")), Revived, Me));
+  return true;
+}
+
+// ---- DE-019 (W-16; 01 F-09, D-DE-09; CUE-DISPATCHER.md §3.1): death by stages and the result gate ----
+namespace S09DeathTest {
+FS09CombatStageInput LethalInput(const FString& Target) {
+  FS09CombatStageInput In;
+  In.Seq = 40;
+  In.AttackerId = TEXT("arthur");
+  In.TargetId = Target;
+  In.bHasEffectText = true;
+  In.Damage = 2;
+  In.HpBefore = 2;
+  In.HpAfter = 0;
+  In.bLethal = true;
+  In.TargetX = 3;
+  In.TargetY = 4;
+  In.ContactMs = 292;
+  In.ContactSource = TEXT("notify");
+  In.Reveal.AttackValue = 4;
+  In.Reveal.DefenseValue = 0;
+  In.Reveal.bNoDefense = true;
+  return In;
+}
+
+/** The v2 plan of a hero / sidekick with its clip and dissolve MIC (ms). */
+FS09DeathInput PlanFor(const FString& Id, bool bHero, int32 Seq, bool bStaged) {
+  FS09DeathInput D;
+  D.FighterId = Id;
+  D.bHero = bHero;
+  D.Seq = Seq;
+  D.bStaged = bStaged;
+  D.SettleMs = FS09DeathTiming::SettleMs;
+  D.StillMs = bHero ? FS09DeathTiming::StillHeroMs : FS09DeathTiming::StillSidekickMs;
+  D.DissolveMs = bHero ? FS09DeathTiming::DissolveHeroMs : FS09DeathTiming::DissolveSidekickMs;
+  D.Style = TEXT("fade");
+  return D;
+}
+
+/** A staged lethal blow, then the death and the result gate on a 1 ms clock - the game mode's order per frame:
+ *  staging Tick + Advance, the Fall event stages the death, death Tick, gate Update. */
+struct FRun {
+  FS08CueDispatcher Cues;
+  FS09CombatStage Stage;
+  FS09DeathStage Death;
+  FS09ResultGate Gate;
+  TArray<FString> Lines;
+  int64 ContactMs = -1;
+  int64 FallMs = -1;
+  int64 ScreenMs = -1;
+};
+void Run(FRun& R, const FS09CombatStageInput& In, bool bHero, bool bGameOver, int64 EndMs = 20000) {
+  TArray<FS09CombatStageEvent> Events;
+  R.Stage.Start(In, 1000, R.Cues, R.Lines, Events);
+  for (int64 T = 1000; T <= EndMs; ++T) {
+    Events.Reset();
+    R.Stage.Tick(T, R.Cues, R.Lines, Events);
+    R.Cues.Advance(T, R.Lines);
+    for (const FS09CombatStageEvent& E : Events) {
+      if (E.Type == ES09CombatEvent::HitReact) R.ContactMs = E.AtMs;
+      if (E.Type == ES09CombatEvent::Fall) {
+        R.FallMs = T;
+        R.Death.Begin(PlanFor(In.TargetId, bHero, In.Seq, true), T, R.Cues, R.Lines);
+      }
+    }
+    R.Death.Tick(T, R.Lines);
+    const bool bPending = R.Stage.IsActive() && In.bLethal && bHero && R.Stage.GetHold().bAliveHeld;
+    FString Line;
+    if (R.Gate.Update(T, In.Seq, bGameOver, bPending, R.Death.LatestHeroGoneMs(), Line)) {
+      R.ScreenMs = T;
+      R.Lines.Add(Line);
+    }
+  }
+  R.Cues.Finish(R.Lines);
+}
+
+int64 StageT(const TArray<FString>& Lines, const FString& Needle) {
+  for (const FString& L : Lines) {
+    if (!L.Contains(Needle)) continue;
+    const int32 At = L.Find(TEXT(" t="));
+    if (At != INDEX_NONE) return FCString::Atoi64(*L.Mid(At + 3));
+  }
+  return -1;
+}
+}  // namespace S09DeathTest
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09DeathStageTimelineTest, "Unmatched.S09.DeathStage.Timeline",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS09DeathStageTimelineTest::RunTest(const FString&) {
+  using namespace S09DeathTest;
+  // ---- the F-09 table from the contact frame ----
+  TestEqual("hero gone 2125 ms after the contact", FS09DeathTiming::GoneAfterContactMs(true), 2125);
+  TestEqual("sidekick gone 1725 ms after the contact", FS09DeathTiming::GoneAfterContactMs(false), 1725);
+  TestEqual("mark 650 ms after the fall (contact + 1100)", FS09DeathTiming::MarkAfterFallMs, 650);
+  {
+    FRun R;
+    Run(R, LethalInput(TEXT("medusa")), /*bHero=*/true, /*bGameOver=*/false);
+    TestTrue("contact frame seen", R.ContactMs > 0);
+    TestEqual("hero: fall = contact + 450", R.FallMs - R.ContactMs, static_cast<int64>(450));
+    TestEqual("hero: mark = contact + 1100", StageT(R.Lines, TEXT("stage=mark")) - R.ContactMs, static_cast<int64>(1100));
+    TestEqual("hero: dissolve = contact + 1625 (settle 875 + still 300)",
+              StageT(R.Lines, TEXT("stage=dissolve")) - R.ContactMs, static_cast<int64>(1625));
+    TestEqual("hero: gone = contact + 2125", StageT(R.Lines, TEXT("stage=gone")) - R.ContactMs, static_cast<int64>(2125));
+    TestEqual("hero: scheduled gone", R.Death.GoneMs(TEXT("medusa")) - R.ContactMs, static_cast<int64>(2125));
+    TestTrue("fall line carries the plan",
+             R.Lines.ContainsByPredicate([](const FString& L) {
+               return L.StartsWith(TEXT("CUE death seq=40 stage=fall")) &&
+                      L.Contains(TEXT(" fighter=medusa hero=1 staged=1 settle=875 still=300 dissolve=500 style=fade"));
+             }));
+    TestTrue("the combat fall and the death fall are one frame",
+             StageT(R.Lines, TEXT("CUE combat seq=40 stage=fall")) == StageT(R.Lines, TEXT("CUE death seq=40 stage=fall")));
+    // CUE-013 from the fall: DeathSettle, the row's 950 ms (blocks input <= 1 s)
+    TestEqual("CUE-013 show from the fall", StageT(R.Lines, TEXT("CUE fx id=CUE-013 subject=medusa")), R.FallMs);
+    TestTrue("CUE-013 done after 950 ms", R.Lines.ContainsByPredicate([&R](const FString& L) {
+      return L == FString::Printf(TEXT("CUE fx done id=CUE-013 subject=medusa seq=40 t=%lld ms=950 cut=0"), R.FallMs + 950);
+    }));
+    TestTrue("heart alive before the mark",
+             R.Death.HeartState(TEXT("medusa"), R.ContactMs + 1099) == ES09HeartState::Alive);
+    TestTrue("heart dark at the mark (no accepted cross glyph)",
+             R.Death.HeartState(TEXT("medusa"), R.ContactMs + 1100) == ES09HeartState::Dark);
+    TestEqual("no game over, no screen", R.ScreenMs, static_cast<int64>(-1));
+  }
+  {
+    FRun R;
+    Run(R, LethalInput(TEXT("harpy2")), /*bHero=*/false, /*bGameOver=*/false);
+    TestEqual("sidekick: gone = contact + 1725", StageT(R.Lines, TEXT("stage=gone")) - R.ContactMs, static_cast<int64>(1725));
+    TestEqual("sidekick: dissolve right after DeathSettle (still 0)",
+              StageT(R.Lines, TEXT("stage=dissolve")) - R.ContactMs, static_cast<int64>(1325));
+    TestEqual("sidekick death is not a hero gone time", R.Death.LatestHeroGoneMs(), static_cast<int64>(-1));
+  }
+  // ---- a figure that hides at once (grey slice / no MIC, no clip): gone in the fall frame, no dissolve line ----
+  {
+    FS08CueDispatcher Cues;
+    FS09DeathStage Death;
+    TArray<FString> Lines;
+    FS09DeathInput D;
+    D.FighterId = TEXT("f-1-hero");
+    D.bHero = true;
+    D.Seq = 12;
+    TestTrue("begins", Death.Begin(D, 500, Cues, Lines));
+    TestFalse("one death per fighter", Death.Begin(D, 600, Cues, Lines));
+    TestEqual("instant: gone = fall", Death.GoneMs(TEXT("f-1-hero")), static_cast<int64>(500));
+    TestEqual("instant: gone line in the fall frame", StageT(Lines, TEXT("stage=gone")), static_cast<int64>(500));
+    TestFalse("instant: no dissolve line",
+              Lines.ContainsByPredicate([](const FString& L) { return L.Contains(TEXT("stage=dissolve")); }));
+    TestTrue("instant: style none", Lines.ContainsByPredicate([](const FString& L) {
+      return L.Contains(TEXT("stage=fall")) && L.Contains(TEXT(" style=none gone=500"));
+    }));
+    Death.Tick(1150, Lines);
+    TestEqual("instant: mark still at fall + 650", StageT(Lines, TEXT("stage=mark")), static_cast<int64>(1150));
+  }
+  // ---- the figure actor's plan (S08HeroesV2) gives the same numbers ----
+  {
+    using namespace S08HeroesV2;
+    const FHeroSpec* Arthur = Find(true, true, TEXT("King Arthur"));
+    const FHeroSpec* Merlin = Find(true, true, TEXT("Merlin"));
+    if (TestNotNull("Arthur spec", Arthur) && TestNotNull("Merlin spec", Merlin)) {
+      const float Settle = ExpectedClipSeconds(*Arthur, EClip::DeathSettle);
+      const FDeathPlan H = MakeDeathPlan(*Arthur, Settle, true);
+      const FDeathPlan S = MakeDeathPlan(*Merlin, Settle, true);
+      TestEqual("hero plan gone from the fall (ms)", FMath::RoundToInt(H.GoneSeconds() * 1000.0f),
+                FS09DeathTiming::GoneAfterContactMs(true) - FS09DeathTiming::FallAfterContactMs);
+      TestEqual("sidekick plan gone from the fall (ms)", FMath::RoundToInt(S.GoneSeconds() * 1000.0f),
+                FS09DeathTiming::GoneAfterContactMs(false) - FS09DeathTiming::FallAfterContactMs);
+      TestEqual("settle = DeathSettle clip (ms)", FMath::RoundToInt(Settle * 1000.0f), FS09DeathTiming::SettleMs);
+      const FDeathPlan NoMic = MakeDeathPlan(*Arthur, Settle, false);
+      TestEqual("no MIC: no dissolve", NoMic.DissolveSeconds, 0.0f);
+      TestEqual("progress 0 while still", DissolveProgressAt(H, 1.1f), 0.0f);
+      TestTrue("progress half way", FMath::IsNearlyEqual(DissolveProgressAt(H, 1.175f + 0.25f), 0.5f, 1e-3f));
+      TestEqual("progress 1 when gone", DissolveProgressAt(H, 1.675f), 1.0f);
+      TestEqual("no MIC: progress jumps to 1 at the still end", DissolveProgressAt(NoMic, 1.18f), 1.0f);
+    }
+  }
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09DeathStageResultGateTest, "Unmatched.S09.DeathStage.ResultGate",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS09DeathStageResultGateTest::RunTest(const FString&) {
+  using namespace S09DeathTest;
+  // ---- the killing blow on a hero: GAME_OVER arrives with the result snapshot, the screen waits ----
+  {
+    FRun R;
+    Run(R, LethalInput(TEXT("medusa")), /*bHero=*/true, /*bGameOver=*/true);
+    TestEqual("hit -> screen = 2125 + 1000 = 3125 ms (~3.1 s)", R.ScreenMs - R.ContactMs, static_cast<int64>(3125));
+    TestEqual("screen = hero gone + 1000", R.ScreenMs - R.Death.LatestHeroGoneMs(), static_cast<int64>(1000));
+    TestTrue("RESULT screen line", R.Lines.ContainsByPredicate([&R](const FString& L) {
+      return L == FString::Printf(TEXT("RESULT screen seq=40 t=%lld due=%lld gameOver=1000 heroGone=%lld wait=%lld"),
+                                  R.ScreenMs, R.ScreenMs, R.Death.LatestHeroGoneMs(), R.ScreenMs - 1000);
+    }));
+    int32 Screens = 0;
+    for (const FString& L : R.Lines) Screens += L.StartsWith(TEXT("RESULT screen")) ? 1 : 0;
+    TestEqual("the outcome is shown once", Screens, 1);
+    TestTrue("stays shown", R.Gate.IsShown());
+  }
+  // ---- a skip in the read hold moves the contact - and the screen with it ----
+  {
+    FRun R;
+    TArray<FS09CombatStageEvent> Events;
+    const FS09CombatStageInput In = LethalInput(TEXT("medusa"));
+    R.Stage.Start(In, 0, R.Cues, R.Lines, Events);
+    for (int64 T = 0; T <= 12000; ++T) {
+      Events.Reset();
+      R.Stage.Tick(T, R.Cues, R.Lines, Events);
+      R.Cues.Advance(T, R.Lines);
+      if (T == 800) R.Stage.Skip(T, TEXT("space"), R.Cues, R.Lines, Events);
+      for (const FS09CombatStageEvent& E : Events) {
+        if (E.Type == ES09CombatEvent::HitReact) R.ContactMs = E.AtMs;
+        if (E.Type == ES09CombatEvent::Fall) R.Death.Begin(PlanFor(In.TargetId, true, In.Seq, true), T, R.Cues, R.Lines);
+      }
+      R.Death.Tick(T, R.Lines);
+      FString Line;
+      if (R.Gate.Update(T, In.Seq, true, R.Stage.IsActive() && R.Stage.GetHold().bAliveHeld, R.Death.LatestHeroGoneMs(),
+                        Line)) {
+        R.ScreenMs = T;
+      }
+    }
+    TestEqual("skipped staging: still contact + 3125", R.ScreenMs - R.ContactMs, static_cast<int64>(3125));
+  }
+  // ---- a sidekick's death never holds the screen (and never ends the game by itself) ----
+  {
+    FS09ResultGate Gate;
+    FString Line;
+    TestFalse("no game over: closed", Gate.Update(100, 7, false, false, -1, Line));
+    TestTrue("game over without a hero death: at once", Gate.Update(200, 8, true, false, -1, Line));
+    TestEqual("at once: due = game over", Gate.GetShownMs(), static_cast<int64>(200));
+    TestTrue("line", Line.StartsWith(TEXT("RESULT screen seq=8 t=200 due=200 gameOver=200 heroGone=- wait=0")));
+    TestFalse("opens once", Gate.Update(300, 8, true, false, -1, Line));
+  }
+  // ---- a hero gone long before GAME_OVER (the terminal body came later): at once ----
+  {
+    FS09ResultGate Gate;
+    FString Line;
+    Gate.Update(100, 9, false, false, 1200, Line);
+    TestTrue("late GAME_OVER after gone + 1000: at once", Gate.Update(5000, 10, true, false, 1200, Line));
+  }
+  // ---- a hero death at the snapshot (no staging: an ability, a cut staging) ----
+  {
+    FS08CueDispatcher Cues;
+    FS09DeathStage Death;
+    FS09ResultGate Gate;
+    TArray<FString> Lines;
+    Death.Begin(PlanFor(TEXT("arthur"), true, 55, false), 2000, Cues, Lines);
+    FString Line;
+    int64 Shown = -1;
+    for (int64 T = 2000; T <= 8000 && Shown < 0; ++T) {
+      if (Gate.Update(T, 55, true, false, Death.LatestHeroGoneMs(), Line)) Shown = T;
+    }
+    TestEqual("snapshot death: fall + 1675 + 1000", Shown, static_cast<int64>(2000 + 1675 + 1000));
+  }
+  // ---- the pending fall holds it; the safety cap opens it anyway ----
+  {
+    FS09ResultGate Gate;
+    FString Line;
+    TestFalse("pending fall: closed", Gate.Update(0, 3, true, true, -1, Line));
+    TestEqual("pending: no due", Gate.DueMs(true), static_cast<int64>(-1));
+    TestFalse("still pending at 9999", Gate.Update(FS09ResultGate::MaxWaitMs - 1, 3, true, true, -1, Line));
+    TestTrue("cap opens at game over + 10 s", Gate.Update(FS09ResultGate::MaxWaitMs, 3, true, true, -1, Line));
+    Gate.Reset();
+    TestFalse("reset: no game over", Gate.IsGameOver() || Gate.IsShown());
+  }
   return true;
 }
 

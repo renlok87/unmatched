@@ -102,8 +102,18 @@ public:
   float GetHitTintValue() const { return HitTintValue; }
   /** Asset name of a loaded v2 clip (AM_<Key>_<Clip>), empty without one. */
   FString GetHeroClipAssetName(S08HeroesV2::EClip Clip) const;
-  /** The death hold (DeathSettle final pose) is running: the defeated figure is still visible. */
+  /** The death (DeathSettle, still, dissolve) is running: the defeated figure is still visible. */
   bool IsInDeathHold() const { return bDeathHold; }
+  /** DE-019 (01 F-09): the death plan of a dying v2 figure, from its fall (the start of DeathSettle); false when no
+   *  death runs (alive, not a v2 figure - the grey slice hides at once -, or already gone). OutStyle = fade / ash,
+   *  "none" when the dissolve MIC is missing. */
+  bool GetDeathPlan(S08HeroesV2::FDeathPlan& OutPlan, FString& OutStyle) const;
+  /** The dissolve runs (the body carries the dissolve MIC); its current progress 0..1. */
+  bool IsDissolving() const { return bDissolving; }
+  float GetDissolveProgress() const { return DissolveValue; }
+  /** Automation only (no ticking world): plays the death to SecondsSinceFall - the dissolve starts / ends as the
+   *  timers would. */
+  void AdvanceDeathForTest(float SecondsSinceFall);
   /** Live tune (S08LiveTune.h): position / length of the looping v2 clip that plays (false: no v2 figure, no looping clip). */
   bool GetHeroClipTime(float& OutPosition, float& OutLength) const;
   /** Live tune: moves the looping v2 clip's clock by DeltaSeconds (wrapped into the clip), so a capture shows the pose a
@@ -231,6 +241,21 @@ private:
   FString HeroV2TraceKey;
   FTimerHandle HeroClipTimer;
   FTimerHandle DeathHideTimer;
+  // DE-019: the death plan, its start (world seconds) and the dissolve (MIC swap + CPD progress by a short timer).
+  S08HeroesV2::FDeathPlan DeathPlan;
+  S08HeroesV2::EDissolveStyle DeathStyle = S08HeroesV2::EDissolveStyle::Fade;
+  double DeathFallSeconds = 0.0;
+  bool bDissolving = false;
+  float DissolveValue = 0.0f;
+  bool bBenchDissolveTraced = false;
+  UPROPERTY()
+  TObjectPtr<UMaterialInterface> DissolveMaterial;
+  FTimerHandle DissolveTimer;
+  void OnDeathStillFinished();
+  void TickDissolve();
+  void StepDissolve(float SecondsSinceFall);
+  /** -Bench -BenchDissolve=<p> (G-COST): a living v2 figure frozen at that dissolve progress. */
+  void ApplyBenchDissolve();
   // DE-018 hit tint (CPD_HitTint) driven by a short timer while it fades.
   FTimerHandle HitTintTimer;
   double HitTintStartSeconds = 0.0;
