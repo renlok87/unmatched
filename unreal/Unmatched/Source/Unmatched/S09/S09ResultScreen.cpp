@@ -112,11 +112,25 @@ FS09ResultSummary FS09ResultSummary::Build(const FS09HudModel& Hud, const FS08Sn
   return Out;
 }
 
+namespace {
+/** One instant of the game row: ISO 8601, or the epoch milliseconds the backend's GraphQL Date scalar actually sends
+ *  (DE-031 live: "startedAt":1791197331439 - a number, not a string). */
+bool ParseInstant(const FString& Text, FDateTime& Out) {
+  if (Text.IsEmpty()) return false;
+  if (Text.IsNumeric() && !Text.Contains(TEXT("-"))) {
+    const double Ms = FCString::Atod(*Text);
+    if (Ms <= 0.0) return false;
+    Out = FDateTime(1970, 1, 1) + FTimespan::FromMilliseconds(Ms);
+    return true;
+  }
+  return FDateTime::ParseIso8601(*Text, Out);
+}
+}  // namespace
+
 int32 FS09ResultSummary::DurationSeconds(const FString& StartedAt, const FString& EndedAt) {
   FDateTime Start;
   FDateTime End;
-  if (StartedAt.IsEmpty() || EndedAt.IsEmpty() || !FDateTime::ParseIso8601(*StartedAt, Start) ||
-      !FDateTime::ParseIso8601(*EndedAt, End) || End < Start) {
+  if (!ParseInstant(StartedAt, Start) || !ParseInstant(EndedAt, End) || End < Start) {
     return -1;
   }
   return static_cast<int32>(FMath::Min<double>((End - Start).GetTotalSeconds(), static_cast<double>(MAX_int32)));

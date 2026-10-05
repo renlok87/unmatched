@@ -879,12 +879,35 @@ bool FS09ResultScreenDurationTest::RunTest(const FString&) {
   TestEqual("not ended", FS09ResultSummary::DurationSeconds(TEXT("2026-10-04T12:00:00Z"), FString()), -1);
   TestEqual("not started", FS09ResultSummary::DurationSeconds(FString(), TEXT("2026-10-04T12:00:00Z")), -1);
   TestEqual("garbage", FS09ResultSummary::DurationSeconds(TEXT("yesterday"), TEXT("2026-10-04T12:00:00Z")), -1);
+  // DE-031 live: the backend's Date scalar sends epoch milliseconds (game(id) startedAt / endedAt as JSON numbers)
+  TestEqual("epoch ms (live game row)", FS09ResultSummary::DurationSeconds(TEXT("1791197331439"), TEXT("1791197358802")),
+            27);
+  TestEqual("epoch ms, 12:05", FS09ResultSummary::DurationSeconds(TEXT("1791196800000"), TEXT("1791197525000")), 725);
+  TestEqual("epoch ms mixed with ISO", FS09ResultSummary::DurationSeconds(TEXT("1791196800000"),
+                                                                          TEXT("2026-10-05T10:52:05Z")), 725);
+  TestEqual("zero epoch", FS09ResultSummary::DurationSeconds(TEXT("0"), TEXT("1791197358802")), -1);
   TestEqual("reversed", FS09ResultSummary::DurationSeconds(TEXT("2026-10-04T12:00:10Z"), TEXT("2026-10-04T12:00:00Z")),
             -1);
   TestEqual("m:ss", FS09ResultSummary::FormatDuration(725), FString(TEXT("12:05")));
   TestEqual("0:07", FS09ResultSummary::FormatDuration(7), FString(TEXT("0:07")));
   TestEqual("h:mm:ss", FS09ResultSummary::FormatDuration(3725), FString(TEXT("1:02:05")));
   TestEqual("unknown", FS09ResultSummary::FormatDuration(-1), FString(TEXT("-")));
+  {
+    // the room poll as the live server answers it: game(id) with the Date scalar as epoch-ms numbers
+    FS08FlowController Flow(TEXT("http://test.invalid"), TEXT("ws://test.invalid"), TEXT("p-host"));
+    Flow.SetRoomForTest(TEXT("g-1"), ES08Stage::Room);
+    Flow.QueueHttpResultForTest(
+        true, {}, /*bDeferDelivery=*/true,
+        TEXT("{\"data\":{\"game\":{\"id\":\"g-1\",\"code\":\"AAA111\",\"status\":\"FINISHED\",")
+        TEXT("\"mode\":\"ONE_V_ONE\",\"hostId\":\"p-host\",\"boardId\":\"b-1\",")
+        TEXT("\"startedAt\":1791197331439,\"endedAt\":1791197358802,\"players\":[]}}}"));
+    Flow.PollRoom();
+    Flow.DeliverQueuedHttpForTest();
+    TestEqual("room keeps the numeric startedAt", Flow.GetRoom().StartedAt, FString(TEXT("1791197331439")));
+    TestEqual("room keeps the numeric endedAt", Flow.GetRoom().EndedAt, FString(TEXT("1791197358802")));
+    TestEqual("... and the result screen gets its duration",
+              FS09ResultSummary::DurationSeconds(Flow.GetRoom().StartedAt, Flow.GetRoom().EndedAt), 27);
+  }
   return true;
 }
 

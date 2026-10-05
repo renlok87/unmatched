@@ -1869,6 +1869,9 @@ void FS08FlowController::ParseRoomFrom(const TSharedPtr<FJsonObject>& Game) {
   auto Time = [&Game, bSameRoom](const TCHAR* Field, const FString& Kept) {
     FString Text;
     if (!Game->HasField(Field)) return bSameRoom ? Kept : FString();
+    // the backend's Date scalar is epoch milliseconds (a JSON number); an ISO string is accepted too
+    double Ms = 0.0;
+    if (Game->TryGetNumberField(Field, Ms)) return FString::Printf(TEXT("%.0f"), Ms);
     return Game->TryGetStringField(Field, Text) ? Text : FString();  // null = not started / not ended
   };
   NewRoom.StartedAt = Time(TEXT("startedAt"), Room.StartedAt);
