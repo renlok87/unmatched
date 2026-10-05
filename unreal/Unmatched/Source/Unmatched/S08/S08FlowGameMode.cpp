@@ -4761,10 +4761,48 @@ void AS08FlowGameMode::RunAutoManeuver() {
   ManeuverStartSeq = Snap.SequenceNumber;
 }
 
+bool AS08FlowGameMode::IsEvidenceCaptureBusy() const {
+  return FScreenshotRequest::IsScreenshotRequested() || !ArtHud.PendingCapturePath.IsEmpty();
+}
+
 void AS08FlowGameMode::TakeEvidenceShot(const FString& InPath) {
   auto* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
   if (!PC) return;
   bShotTaken = true;
+  const FString BasePath = InPath.IsEmpty() ? AutoShotPath : InPath;
+  // I-03 (D-1 of run H): only the FScreenshotRequest path holds one engine-wide request; the slate capture and the
+  // path-less diagnostics run at once.
+  const bool bRequestCapture = !BasePath.IsEmpty() && !(S09ShotMode == TEXT("slate") && HudCanvas.IsValid());
+  if (bRequestCapture) {
+    const bool bBusy = IsEvidenceCaptureBusy();
+    const bool bSameFrame = EvidenceShotQueue.IssuedThisFrame(GFrameCounter);
+    const int32 Ahead = EvidenceShotQueue.Num();
+    if (!EvidenceShotQueue.Admit(BasePath, GFrameCounter, bBusy)) {
+      FS08Trace::Write(FString::Printf(TEXT("SHOT queued file=%s frame=%llu ahead=%d reason=%s"),
+                                       *FPaths::GetCleanFilename(BasePath),
+                                       static_cast<unsigned long long>(GFrameCounter), Ahead,
+                                       Ahead > 0 ? TEXT("order") : bSameFrame ? TEXT("same-frame") : TEXT("in-flight")));
+      return;
+    }
+  }
+  CaptureEvidenceShot(BasePath);
+}
+
+void AS08FlowGameMode::DrainEvidenceShotQueue() {
+  if (EvidenceShotQueue.Num() == 0) return;
+  if (!GetWorld() || !GetWorld()->GetFirstPlayerController()) return;
+  FS08ShotQueue::FEntry Entry;
+  if (!EvidenceShotQueue.PopReady(GFrameCounter, IsEvidenceCaptureBusy(), Entry)) return;
+  FS08Trace::Write(FString::Printf(TEXT("SHOT dequeued file=%s frame=%llu queuedFrame=%llu left=%d"),
+                                   *FPaths::GetCleanFilename(Entry.Path),
+                                   static_cast<unsigned long long>(GFrameCounter),
+                                   static_cast<unsigned long long>(Entry.QueuedFrame), EvidenceShotQueue.Num()));
+  CaptureEvidenceShot(Entry.Path);
+}
+
+void AS08FlowGameMode::CaptureEvidenceShot(const FString& BasePath) {
+  auto* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
+  if (!PC) return;
   // Diagnostics: what the renderer actually sees at this moment.
   {
     FVector2D ViewportSize(0.0, 0.0);
@@ -4848,7 +4886,6 @@ void AS08FlowGameMode::TakeEvidenceShot(const FString& InPath) {
   // composites the viewport + Slate UI (UE 5.8 UnrealClient.h). "slate" mode
   // renders the HUD canvas widget alone through the Slate renderer for the
   // offscreen fallback probe.
-  const FString BasePath = InPath.IsEmpty() ? AutoShotPath : InPath;
   if (BasePath.IsEmpty()) return;
   if (S09ShotMode == TEXT("slate") && HudCanvas.IsValid()) {
     TArray<FColor> Pixels;
@@ -4885,6 +4922,7 @@ void AS08FlowGameMode::TakeEvidenceShot(const FString& InPath) {
 void AS08FlowGameMode::Tick(float DeltaSeconds) {
   Super::Tick(DeltaSeconds);
   Elapsed += DeltaSeconds;
+  DrainEvidenceShotQueue(); // I-03: a queued evidence shot goes out before this frame asks for new ones
   if (bIconGallery) {
     IconGalleryTick(DeltaSeconds);
     return;

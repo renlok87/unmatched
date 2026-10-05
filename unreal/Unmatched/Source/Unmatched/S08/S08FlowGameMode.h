@@ -38,6 +38,7 @@
 #include "S08CueDispatcher.h"
 #include "S08CueSound.h"
 #include "S08MoveAnim.h"
+#include "S08ShotQueue.h"
 #include "S08TurnPortraitWidget.h"
 #include "S08FlowGameMode.generated.h"
 
@@ -348,7 +349,15 @@ private:
   }
   // ---- demo drive ----
   void RunAutoManeuver();
+  /** Evidence PNG (InPath empty = AutoShotPath). I-03 (D-1 of run H): at most one FScreenshotRequest per frame - a
+   *  shot asked while one is in flight (or after another one this frame) waits in EvidenceShotQueue and is captured in
+   *  a following frame under its own name ("SHOT queued" / "SHOT dequeued"); the SHOT ctx / RENDER / fighter lines are
+   *  written when the request really leaves. */
   void TakeEvidenceShot(const FString& InPath);
+  void CaptureEvidenceShot(const FString& BasePath);
+  /** Start of Tick: lets the oldest queued evidence shot out when no capture is in flight and none left this frame. */
+  void DrainEvidenceShotQueue();
+  bool IsEvidenceCaptureBusy() const;
   // ---- ART-004 stage 3 T2.2: art HUD (plate, compact labels, exact-size
   // combat icon), zoom config and INPUT/CAMERA/PLATE/SHOT traces ----
   void BuildArtHudWidgets(const TSharedRef<SConstraintCanvas>& Canvas);
@@ -1029,6 +1038,7 @@ private:
   bool bAutoCreate = false;
   bool bAutoManeuver = false;
   bool bShotTaken = false;
+  FS08ShotQueue EvidenceShotQueue; // I-03: one FScreenshotRequest per frame, FIFO
   bool bAutoManeuverDone = false;
   bool bSawCue = false; // joiner evidence shot trigger: an authoritative event arrived
   FString AutoEmail, AutoPassword, AutoCode, AutoHeroId, AutoShotPath;
