@@ -39,6 +39,7 @@ struct FCommandLineScope {
   }
   static void ResetOverrides() {
     S08ArtLook::ResetOverrideForTest();
+    S08ArtLook::ResetMarkersOverrideForTest();
     S08HeroesV2::ResetFlagOverrideForTest();
     S08Diorama::ResetFlagOverrideForTest();
     S08EnvLayout::ResetOptOutOverrideForTest();
@@ -266,6 +267,52 @@ bool FS08ArtLookActorTest::RunTest(const FString&) {
   }
   GEngine->DestroyWorldContext(World);
   World->DestroyWorld(false);
+  return true;
+}
+
+// VS-1 HB-01 (04-hud-spec §5.2 step H0a, ВР-35): the -S09Markers debug layer of the S09/S10 gates - the flag is parsed
+// from the real command line, the default of the step holds, the ARTLOOK line carries markers=0|1, the flag is not an
+// alias and changes nothing of the art look.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08ArtLookMarkersFlagTest,
+    "Unmatched.S08.ArtLook.MarkersFlag the gate debug layer: S09Markers parsed, the step default and the markers field of ARTLOOK",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08ArtLookMarkersFlagTest::RunTest(const FString&) {
+  using namespace S08ArtLookTest;
+  if (FParse::Param(FCommandLine::Get(), S08ArtLook::MarkersFlagName)) {
+    AddError(TEXT("the test run itself carries -S09Markers: start it without the flag"));
+    return true;
+  }
+  TestEqual("debug layer flag", FString(S08ArtLook::MarkersFlagName), FString(TEXT("S09Markers")));
+  TestTrue("rule: -S09Markers draws the debug layer", S08ArtLook::DecideMarkers(true));
+  // step H0a: the layer stays on without the flag - the player's view does not change yet (HB-02 turns it off)
+  TestTrue("H0a: the default is on", S08ArtLook::MarkersDefault);
+  TestTrue("rule: H0a without the flag - on", S08ArtLook::DecideMarkers(false));
+  {
+    FCommandLineScope Cmd(TEXT(""));
+    TestTrue("no flag: H0a default on", S08ArtLook::S08Markers());
+    const FString Line = S08ArtLook::TraceLine();
+    AddInfo(Line);
+    TestTrue(FString::Printf(TEXT("no flag traced markers=1: %s"), *Line), Line.Contains(TEXT(" markers=1 aliases=-")));
+  }
+  {
+    FCommandLineScope Cmd(TEXT("-S09Markers"));
+    TestTrue("-S09Markers: the debug layer", S08ArtLook::S08Markers());
+    const FString Line = S08ArtLook::TraceLine();
+    TestTrue(FString::Printf(TEXT("-S09Markers traced markers=1, not an alias: %s"), *Line),
+             Line.Contains(TEXT(" markers=1 aliases=-")) && !Line.Contains(TEXT("-S09Markers")));
+    TestTrue("-S09Markers: the art look does not change",
+             S08ArtLook::Enabled() && !S08ArtLook::ReviewTooling() && S08HeroesV2::FlagEnabled() &&
+                 S08Diorama::FlagEnabled() && Line.StartsWith(TEXT("ARTLOOK art=1 source=default heroes=v2 tray=on ")));
+  }
+  {
+    FCommandLineScope Cmd(TEXT("-S09Markers"));
+    S08ArtLook::SetMarkersOverrideForTest(false);
+    TestFalse("override off wins over the flag", S08ArtLook::S08Markers());
+    TestTrue("override off traced", S08ArtLook::TraceLine().Contains(TEXT(" markers=0 ")));
+    S08ArtLook::SetMarkersOverrideForTest(true);
+    TestTrue("override on", S08ArtLook::S08Markers());
+  }
+  TestTrue("the scope reset the override", S08ArtLook::S08Markers() == S08ArtLook::MarkersDefault);
   return true;
 }
 

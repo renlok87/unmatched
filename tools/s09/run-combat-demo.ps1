@@ -333,7 +333,8 @@ function Invoke-CombatDemo {
   $Script:ThisRunGameCode = $null
 
   $common = @("-windowed", "-resx=$ShotWidth", "-resy=$ShotHeight", "-RenderOffScreen", "log=GrepLog",
-    "-ForceAbandonSequences", "-S08Api=$Api", "-S09ShotMode=$ShotMode", "-ExecCmds=t.MaxFPS $ClientFps")
+    "-ForceAbandonSequences", "-S08Api=$Api", "-S09ShotMode=$ShotMode", "-ExecCmds=t.MaxFPS $ClientFps",
+    "-S09Markers")  # HB-01: the marker pixel gates below need the debug layer (04-hud-spec s5.3)
   if ($ArtPreview) { $common += '-ArtPreview' }
   if ($FullHd) { $common += '-ForceRes' }
   if ($MedusaVariantExplicit) { $common += "-ArtPreviewMedusaVariant=$ArtPreviewMedusaVariant" }

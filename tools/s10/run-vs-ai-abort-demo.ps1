@@ -690,7 +690,8 @@ function Invoke-AbortDemo {
     "-ForceAbandonSequences", "-S08Api=$Api", "-S09ShotMode=$ShotMode",
     "-S08Auto", "-S08Create", "-S08Mode=VS_AI", "-S08HeroId=$heroId",
     "-S08Trace=$trace", "-S09Flow", "-S09Combat=attack+scheme",
-    "-S09ShotDir=$shots", "-S10AbortProof", "-S08ExitAfter=$RunSeconds")
+    "-S09ShotDir=$shots", "-S10AbortProof", "-S08ExitAfter=$RunSeconds",
+    "-S09Markers")  # HB-01: the #FF6414 / #FFD700 marker gates need the debug layer (04-hud-spec s5.3)
 
   $proc = $null
   $Published = $false

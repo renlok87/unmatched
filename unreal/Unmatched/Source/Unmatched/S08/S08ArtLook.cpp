@@ -13,6 +13,8 @@ namespace S08ArtLook {
 namespace {
 // -1 = read the command line, 0/1 = automation override.
 int32 GOverride = -1;
+// -1 = read the command line, 0/1 = automation override of the -S09Markers debug layer.
+int32 GMarkersOverride = -1;
 }  // namespace
 
 bool Enabled() {
@@ -25,6 +27,15 @@ bool ReviewTooling() { return FParse::Param(FCommandLine::Get(), ReviewFlagName)
 void SetOverrideForTest(bool bEnabled) { GOverride = bEnabled ? 1 : 0; }
 
 void ResetOverrideForTest() { GOverride = -1; }
+
+bool S08Markers() {
+  if (GMarkersOverride >= 0) return GMarkersOverride == 1;
+  return DecideMarkers(FParse::Param(FCommandLine::Get(), MarkersFlagName));
+}
+
+void SetMarkersOverrideForTest(bool bOn) { GMarkersOverride = bOn ? 1 : 0; }
+
+void ResetMarkersOverrideForTest() { GMarkersOverride = -1; }
 
 FString TraceLine() {
   const TCHAR* Cmd = FCommandLine::Get();
@@ -56,8 +67,8 @@ FString TraceLine() {
   // Run I (AB-5..AB-8): the turn HUD look of the portraits and the combat panel (S08TurnPortraitWidget.h)
   const FString HudLook = FS08TurnHudLook::ArtLookField(Cmd);
   return FString::Printf(
-      TEXT("ARTLOOK art=%d source=%s heroes=%s tray=%s env=%s review=%d legacyRender=%d aliases=%s %s%s"), bArt ? 1 : 0,
-      Source, *Heroes, *Tray, *Env, ReviewTooling() ? 1 : 0, S08LegacyRender() ? 1 : 0,
+      TEXT("ARTLOOK art=%d source=%s heroes=%s tray=%s env=%s review=%d legacyRender=%d markers=%d aliases=%s %s%s"),
+      bArt ? 1 : 0, Source, *Heroes, *Tray, *Env, ReviewTooling() ? 1 : 0, S08LegacyRender() ? 1 : 0, S08Markers() ? 1 : 0,
       Aliases.Num() ? *FString::Join(Aliases, TEXT(",")) : TEXT("-"), *HudLook,
       bArt ? TEXT("") : TEXT(" (grey board: no art profile, figures, tray or art HUD layer)"));
 }

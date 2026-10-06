@@ -37,6 +37,12 @@
 //
 // The trace tags of the art path stay 'ARTPREVIEW ...' (every gate script and tool reads them); one 'ARTLOOK ...' line
 // per board actor states the effective look and the flags it came from.
+//
+// VS-1 HB-01 (docs/game-design/visual/04-hud-spec.md §5.1, §5.2 step H0a; ВР-35): -S09Markers is the debug layer of the
+// S09/S10 gates - the pixel markers of the command panel (AddMarker), the result stripe, the seq/phase and
+// you:/opponent: lines, the command echo and AUTO toasts, the "UNMATCHED S08 grey flow" title, the F10 operator panel.
+// Every tools/s09/run-*.ps1 and tools/s10/run-*.ps1 passes it explicitly. Step H0a keeps the layer ON by default
+// (MarkersDefault, nothing changes for the player); step H0b (HB-02) turns the default off.
 #pragma once
 
 #include "CoreMinimal.h"
@@ -60,8 +66,20 @@ UNMATCHED_API bool ReviewTooling();
 UNMATCHED_API void SetOverrideForTest(bool bEnabled);
 UNMATCHED_API void ResetOverrideForTest();
 
+/** -S09Markers: the debug layer of the S09/S10 gates (see the file comment). */
+inline const TCHAR* const MarkersFlagName = TEXT("S09Markers");
+/** The debug layer without the flag: step H0a (HB-01) keeps it on; step H0b (HB-02) makes it opt-in. */
+inline constexpr bool MarkersDefault = true;
+/** World-free rule: the debug layer with -S09Markers, otherwise MarkersDefault. */
+constexpr bool DecideMarkers(bool bMarkersFlag) { return bMarkersFlag || MarkersDefault; }
+/** True when the gate debug layer is drawn: -S09Markers on the command line, or MarkersDefault (or the test override). */
+UNMATCHED_API bool S08Markers();
+/** Automation tests only: force the debug layer on/off (Reset -> read the command line again). */
+UNMATCHED_API void SetMarkersOverrideForTest(bool bOn);
+UNMATCHED_API void ResetMarkersOverrideForTest();
+
 /** 'ARTLOOK art=1|0 source=default|S08GreyBoard|override heroes=v2|legacy(..) tray=on|legacy(..)|off env=on|off(..)
- *   review=0|1 legacyRender=0|1 aliases=<-ArtPreviewHeroesV2,-ArtPreviewDiorama,-S08HeartGlow or ->
+ *   review=0|1 legacyRender=0|1 markers=0|1 aliases=<-ArtPreviewHeroesV2,-ArtPreviewDiorama,-S08HeartGlow or ->
  *   hud=ring:<id>|legacy(..),glow:on|legacy(..),tracker:de|legacy(..),cross:on|legacy(..)' - the effective look of
  *   this run (the hud field: FS08TurnHudLook::ArtLookField). */
 UNMATCHED_API FString TraceLine();

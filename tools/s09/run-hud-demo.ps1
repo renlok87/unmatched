@@ -228,7 +228,8 @@ function Invoke-HudDemo {
   $Script:ThisRunGameCode = $null
 
   $common = @("-windowed", "-resx=1280", "-resy=720", "-RenderOffScreen", "log=GrepLog",
-    "-ForceAbandonSequences", "-S08Api=$Api", "-S09ShotMode=$ShotMode", "-S08GreyBoard")
+    "-ForceAbandonSequences", "-S08Api=$Api", "-S09ShotMode=$ShotMode", "-S08GreyBoard",
+    "-S09Markers")  # HB-01: the grey Slate stand keeps the debug layer (04-hud-spec s5.3, VR-36)
   $hostArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
     "-S08Auto", "-S08Create", "-S08BoardId=$BoardId", "-S08HeroId=$heroA", "-S08Trace=$hostTrace",
     "-S09Flow", "-S09ShotDir=$hostShots", "-S08ExitAfter=$RunSeconds")

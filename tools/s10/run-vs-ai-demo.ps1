@@ -761,7 +761,8 @@ function Invoke-VsAiDemo {
   # NOT claimed (no measured FPS/frame-time data exists).
   $common = @("-windowed", "-resx=1280", "-resy=720", "-RenderOffScreen",
     "-ExecCmds=`"t.MaxFPS 30`"", "log=GrepLog",
-    "-ForceAbandonSequences", "-S08Api=$Api", "-S09ShotMode=$ShotMode")
+    "-ForceAbandonSequences", "-S08Api=$Api", "-S09ShotMode=$ShotMode",
+    "-S09Markers")  # HB-01: the marker pixel gates below need the debug layer (04-hud-spec s5.3)
   $clientArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
     "-S08Auto", "-S08Create", "-S08Mode=VS_AI", "-S08HeroId=$heroId",
     "-S08Trace=$trace", "-S09Flow", "-S09Combat=attack+scheme",

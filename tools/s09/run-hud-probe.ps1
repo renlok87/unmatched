@@ -69,7 +69,9 @@ $psi.UseShellExecute = $false
 $psi.CreateNoWindow = $true
 $psi.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
 $renderArgs = if ($OffScreen) { "-RenderOffScreen" } else { "" }
+# HB-01: -S09Markers - the marker pixel gates below need the debug layer (04-hud-spec s5.3)
 $psi.Arguments = "/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode -windowed -resx=1280 -resy=720 $renderArgs log=GrepLog -ForceAbandonSequences " +
+  "-S09Markers " +
   "-S08Fixtures=`"$Fixtures`" -S09HudProbe=`"$Dir`" -S08Trace=`"$Trace`""
 $proc = [System.Diagnostics.Process]::Start($psi)
 Write-Output "probe pid=$($proc.Id)"
