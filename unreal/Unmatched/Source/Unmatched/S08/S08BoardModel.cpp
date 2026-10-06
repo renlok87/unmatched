@@ -775,22 +775,27 @@ bool FS08BoardModel::DecodeFighters(const TSharedPtr<FJsonValue>& FightersValue,
     OutFighters.Add(MoveTemp(Entry));
   }
 
-  // Same-name numbering keyed by stable id (TASK-021: three Harpies stay
-  // distinguishable even if the server reorders the array between updates).
+  // Same-name numbering (TASK-021: three Harpies stay distinguishable). The
+  // server keeps every fighter in its seat order for the whole game (a defeated
+  // one stays with isDefeated), so the order is the order of the hero's
+  // sidekicks[] - the harpy number 1..3 of 02 §6.5 / ВР-72 that the panel, the
+  // tag and the stand all read from this label (VS-2 CP-12). Counted per owner:
+  // a mirror match (both Medusa) numbers each side 1..3, never 4..6.
+  auto NameKey = [](const FS08BoardFighter& F) { return F.OwnerId + TEXT("|") + F.Name; };
   TMap<FString, int32> NameCounts;
   TMap<FString, int32> NameTotals;
   for (const FS08BoardFighter& Fighter : OutFighters) {
-    const int32* Total = NameTotals.Find(Fighter.Name);
-    NameTotals.Add(Fighter.Name, Total ? *Total + 1 : 1);
+    const int32* Total = NameTotals.Find(NameKey(Fighter));
+    NameTotals.Add(NameKey(Fighter), Total ? *Total + 1 : 1);
   }
   for (FS08BoardFighter& Fighter : OutFighters) {
-    const int32 Total = NameTotals.FindRef(Fighter.Name);
+    const int32 Total = NameTotals.FindRef(NameKey(Fighter));
     if (Total <= 1) {
       Fighter.Label = Fighter.Name;
       continue;
     }
-    const int32 Index = NameCounts.FindRef(Fighter.Name) + 1;
-    NameCounts.Add(Fighter.Name, Index);
+    const int32 Index = NameCounts.FindRef(NameKey(Fighter)) + 1;
+    NameCounts.Add(NameKey(Fighter), Index);
     Fighter.Label = FString::Printf(TEXT("%s %d"), *Fighter.Name, Index);
   }
   return OutFighters.Num() > 0;

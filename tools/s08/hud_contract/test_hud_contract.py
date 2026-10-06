@@ -91,6 +91,26 @@ def test_check_trace_portrait_cp08():
     assert len(errors) == 2 and "1.6" in errors[0] and "monogram" in errors[1]
 
 
+def test_check_trace_portrait_sidekicks_cp10_12():
+    """VS-2 CP-10 / CP-12: the sidekick mini portraits - Merlin and the harpies n=1..3 in PANEL, the ROOM disc 40 su
+    without a number; a harpy in PANEL without n (or n=4 of a mirror match) fails (ВР-72)."""
+    reg = hc.registry_portrait_keys()
+    tex = "tex=/Game/S08/UI/Portraits/T_Portrait_medusa_harpies.T_Portrait_medusa_harpies"
+    ok = ["UMGALLERY panel own own PORTRAIT id=king-arthur/merlin tex=/Game/S08/UI/Portraits/T_Portrait_king_arthur_merlin."
+          "T_Portrait_king_arthur_merlin su=32.0 px=32.0 scale=0.362 show=panel side=own state=avatar capped=0"]
+    ok += ["PORTRAIT id=medusa/harpies %s su=32.0 px=48.0 scale=0.543 show=panel side=opp state=avatar capped=0 n=%d"
+           % (tex, i) for i in (1, 2, 3)]
+    ok += ["PORTRAIT id=medusa/harpies %s su=40.0 px=120.0 scale=1.359 show=room side=own state=avatar capped=0" % tex,
+           "PORTRAIT id=medusa tex=/Game/x su=160.0 px=480.0 scale=1.600 show=loading side=own state=avatar capped=1"]
+    errors, _ = hc.check_widget_trace(ok, set(), registry=reg)
+    assert errors == []
+    bad = ["PORTRAIT id=medusa/harpies %s su=32.0 px=32.0 scale=0.362 show=panel side=own state=avatar capped=0" % tex,
+           "PORTRAIT id=medusa/harpies %s su=32.0 px=32.0 scale=0.362 show=panel side=opp state=avatar capped=0 n=4"
+           % tex]
+    errors, _ = hc.check_widget_trace(bad, set(), registry=reg)
+    assert len(errors) == 2 and all("ВР-72" in e for e in errors)
+
+
 def test_check_trace_topstrip_hb14_16(tmp_path):
     """VS-2 HB-14...HB-16: the UI-IDs of 04 §7.1 are known to check-trace and their states come from its list."""
     spec04 = hc.SPEC04.read_text(encoding="utf-8")

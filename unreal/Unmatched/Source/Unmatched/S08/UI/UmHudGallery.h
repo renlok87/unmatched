@@ -14,6 +14,9 @@
 //                                  PANEL-OPP (opp, wait, ai, fallen) and OPP-HAND (3 / 5 / 10 backs, stale deck) at the
 //                                  class sizes of the window; page 1 - own Medusa (harpies) vs King Arthur, page 2 -
 //                                  own King Arthur (Merlin) vs Medusa; class S adds the sidekick tooltip (review only).
+//                                  Page 3 - VS-2 CP-09...CP-12: the four portraits in every show size (32...160 su) in
+//                                  the accepted CP-07 crop, fallen / loser, the fallback, the harpy badges 1-3; the trace
+//                                  'UMGALLERY portrait <cell> PORTRAIT ...' (check-trace gates it).
 // Trace: 'UMGALLERY skins page=<p>/<n> rows=<r> pxPerSu=<x> x2=0|1 textures=<k>/29' and
 //        'UMGALLERY buttons variants=3 states=7 pxPerSu=<x> <variant>.<state>: <DescribeState>'.
 #pragma once
@@ -70,13 +73,16 @@ class UNMATCHED_API UUmPanelsGalleryWidget : public UUserWidget {
 
  public:
   virtual bool Initialize() override;
-  /** Builds page Page (0: Medusa own, 1: King Arthur own) for a canvas of CanvasSu at PxPerSu; returns trace lines. */
+  /** Builds page Page (0: Medusa own, 1: King Arthur own, 2: the portrait sizes CP-09...CP-12) for a canvas of CanvasSu
+   *  at PxPerSu; returns trace lines. */
   TArray<FString> Build(int32 Page, const FVector2D& CanvasSu, float PxPerSu);
 
  private:
+  TArray<FString> BuildPortraits(const FVector2D& CanvasSu, float PxPerSu);
   UPROPERTY() TObjectPtr<UBorder> Background;
   UPROPERTY() TObjectPtr<UVerticalBox> Rows;
   UPROPERTY() TArray<TObjectPtr<UUserWidget>> Blocks;
+  UPROPERTY() TArray<TObjectPtr<UObject>> KeepAlive;  // the MIDs of the portrait sheet
 };
 
 UCLASS()

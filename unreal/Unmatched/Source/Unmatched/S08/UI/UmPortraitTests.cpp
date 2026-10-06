@@ -90,12 +90,12 @@ bool FUmPortraitFallbackTest::RunTest(const FString&) {
   }
   TestEqual(TEXT("hero fallback = monogram"), UmPortrait::FallbackText(TEXT("king-arthur"), TEXT("King Arthur")), FString(TEXT("KA")));
   if (const FUmCardMediaEntry* Ka = UmPortrait::Find(TEXT("king-arthur"))) {
-    // disc (0.49, 0.43, 0.60) of 800 px in a 1024 pad: uv 0.78125
+    // the accepted CP-07 disc (0.49, 0.39, 0.54) of 800 px in a 1024 pad: uv 0.78125 (CP-09)
     const FVector4 R = UmPortrait::UvRect(*Ka);
     TestTrue(FString::Printf(TEXT("king-arthur UV rect (%.4f, %.4f, %.4f, %.4f)"), R.X, R.Y, R.Z, R.W),
-             FMath::IsNearlyEqual(R.X, 0.19 * 0.78125, 1e-4) && FMath::IsNearlyEqual(R.Y, 0.13 * 0.78125, 1e-4) &&
-                 FMath::IsNearlyEqual(R.Z, 0.79 * 0.78125, 1e-4) && FMath::IsNearlyEqual(R.W, 0.73 * 0.78125, 1e-4));
-    TestEqual(TEXT("king-arthur source circle 480 px"), UmPortrait::SourceCirclePx(*Ka), 480.0f);
+             FMath::IsNearlyEqual(R.X, 0.22 * 0.78125, 1e-4) && FMath::IsNearlyEqual(R.Y, 0.12 * 0.78125, 1e-4) &&
+                 FMath::IsNearlyEqual(R.Z, 0.76 * 0.78125, 1e-4) && FMath::IsNearlyEqual(R.W, 0.66 * 0.78125, 1e-4));
+    TestTrue(TEXT("king-arthur source circle 432 px"), FMath::IsNearlyEqual(UmPortrait::SourceCirclePx(*Ka), 432.0f, 1e-3f));
   }
 
   FWorld W(TEXT("UmPortraitFallback"));
@@ -159,7 +159,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmPortraitCapTest, "Unmatched.S08.Hud.Portrait
                                  EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FUmPortraitCapTest::RunTest(const FString&) {
   using namespace UmPortraitTest;
-  // ВР-CP04 at 1440p 150 % (DPI 1.333 x 1.5 = 2 px per su): Merlin's circle is 0.75 x 128 = 96 px
+  // ВР-CP04 at 1440p 150 % (DPI 1.333 x 1.5 = 2 px per su): the pure rule on a 96 px circle (the ВР-CP01 start)
   TestEqual(TEXT("panel 42 su of Merlin at 2 px/su: no cap"), UmPortrait::CappedSu(42.0f, 96.0f, 2.0f), 42.0f);
   TestTrue(TEXT("loading 160 su of Merlin at 2 px/su: 1.6 x 96 / 2 = 76.8 su"),
            FMath::IsNearlyEqual(UmPortrait::CappedSu(160.0f, 96.0f, 2.0f), 76.8f, 1e-3f));
@@ -174,17 +174,19 @@ bool FUmPortraitCapTest::RunTest(const FString&) {
   P->SetPortrait(TEXT("king-arthur/merlin"));
   TestTrue(TEXT("merlin avatar"), P->IsAvatarShown());
   TestEqual(TEXT("1440p 150 %: 42 su"), P->GetCircleSu(), 42.0f);
+  // the accepted CP-07 crop (CP-10): Merlin's circle is 0.69 x 128 = 88.32 px -> 84 / 88.32
   const FString Line = P->PortraitShotLine();
-  TestTrue(FString::Printf(TEXT("trace scale 0.875 (%s)"), *Line), Line.Contains(TEXT("scale=0.875")));
-  // 4K at 200 % (4 px per su): 1.6 x 96 / 4 = 38.4 su, the rest is padding
+  TestTrue(FString::Printf(TEXT("trace scale 0.951 (%s)"), *Line), Line.Contains(TEXT("scale=0.951")) && Line.Contains(TEXT("capped=0")));
+  // 4K at 200 % (4 px per su): 1.6 x 88.32 / 4 = 35.33 su, the rest is padding
   US08TurnPortraitWidget* Q = CreateWidget<US08TurnPortraitWidget>(W.World, US08TurnPortraitWidget::StaticClass());
   if (!TestNotNull(TEXT("portrait 4K"), Q)) return false;
   Q->SetPortraitLegacyForTest(0);
   Q->SetPxPerSuForTest(4.0f);
   Q->SetPortrait(TEXT("king-arthur/merlin"));
-  TestTrue(FString::Printf(TEXT("4K 200 %%: capped to 38.4 su (got %.2f)"), Q->GetCircleSu()),
-           FMath::IsNearlyEqual(Q->GetCircleSu(), 38.4f, 1e-3f));
-  TestTrue(TEXT("4K trace scale 1.600"), Q->PortraitShotLine().Contains(TEXT("scale=1.600")));
+  TestTrue(FString::Printf(TEXT("4K 200 %%: capped to 35.33 su (got %.2f)"), Q->GetCircleSu()),
+           FMath::IsNearlyEqual(Q->GetCircleSu(), 35.328f, 1e-3f));
+  TestTrue(TEXT("4K trace scale 1.600 capped=1"),
+           Q->PortraitShotLine().Contains(TEXT("scale=1.600")) && Q->PortraitShotLine().Contains(TEXT("capped=1")));
   return true;
 }
 

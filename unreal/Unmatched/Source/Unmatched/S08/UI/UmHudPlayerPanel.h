@@ -33,6 +33,7 @@
 #include "../../S09/S09HudPress.h"
 #include "../S08ArtHud.h"
 #include "../S08ArtHudWidgets.h"
+#include "UmPortrait.h"
 #include "UmHudPlayerPanel.generated.h"
 
 class UBorder;
@@ -151,6 +152,11 @@ class UNMATCHED_API UUmHudPlayerPanel : public UUserWidget {
   void SetPress(FName InId, const TSharedPtr<FS09HudPressArbiter>& InArbiter, const FS09OnHudPressOutcome& InOnOutcome);
   /** 'SHOT widget id=UI-HUD-PANEL-LOC|OPP state=.. bbox=<Rect> ... hero=.. hp=.. sidekicks=.. tracker=.. ring=..'. */
   void CollectShotLines(TArray<FString>& Out, const FS08ScreenRect& Rect) const;
+  /** VS-2 CP-10 / CP-12: one PORTRAIT line per sidekick mini portrait of the L row ('id=king-arthur/merlin',
+   *  'id=medusa/harpies .. n=1..3', show=panel); class S shows none (the tooltip). */
+  void CollectPortraitLines(TArray<FString>& Out) const;
+  /** The mini portraits as built (the row order). */
+  const TArray<FUmPortraitShown>& GetMiniPortraits() const { return MiniShown; }
   /** Tests / the gallery: the pulse clock (seconds; < 0 = the platform clock) and reduced motion (-1 = the setting). */
   void SetClockForTest(TFunction<double()> InClock) { Clock = MoveTemp(InClock); }
   void SetReducedForTest(int32 InReduced) { ReducedOverride = InReduced; }
@@ -210,4 +216,5 @@ class UNMATCHED_API UUmHudPlayerPanel : public UUserWidget {
   FS09OnHudPressOutcome OnOutcome;
   UPROPERTY(Transient) TObjectPtr<UWidget> SidekickTip;
   UPROPERTY(Transient) TArray<TObjectPtr<UObject>> KeepAlive;  // the MIDs of the mini portraits
+  TArray<FUmPortraitShown> MiniShown;  // CP-10 / CP-12: what each mini portrait shows (the PORTRAIT lines)
 };

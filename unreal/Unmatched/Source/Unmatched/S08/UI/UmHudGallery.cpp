@@ -9,6 +9,7 @@
 #include "UmHudTop.h"
 #include "UmHudOppHand.h"
 #include "UmHudPlayerPanel.h"
+#include "UmPortrait.h"
 #include "../S08ArtHudStyle.h"
 #include "../S08TurnPortraitWidget.h"
 #include "Misc/CommandLine.h"
@@ -21,6 +22,8 @@
 #include "Components/GridPanel.h"
 #include "Components/GridSlot.h"
 #include "Components/Image.h"
+#include "Components/Overlay.h"
+#include "Components/OverlaySlot.h"
 #include "Components/SizeBox.h"
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
@@ -342,6 +345,8 @@ TArray<FString> UUmPanelsGalleryWidget::Build(int32 Page, const FVector2D& Canva
   if (!Rows) return Lines;
   Rows->ClearChildren();
   Blocks.Reset();
+  KeepAlive.Reset();
+  if (Page == 2) return BuildPortraits(CanvasSu, PxPerSu);
   const FUmHudLayout Layout = FUmHudLayout::Compute(CanvasSu, PxPerSu, nullptr);
   const bool bS = Layout.bClassS;
   const FBox2D LocRect = Layout.Rect(EUmHudBlock::PanelLoc);
@@ -427,6 +432,12 @@ TArray<FString> UUmPanelsGalleryWidget::Build(int32 Page, const FVector2D& Canva
     TArray<FString> Shot;
     P->CollectShotLines(Shot, FS08ScreenRect());
     Lines.Add(FString::Printf(TEXT("UMGALLERY panel %s %s"), Label, Shot.Num() ? *Shot[0] : TEXT("-")));
+    // CP-09...CP-12: the hero circle and the sidekick mini portraits of this panel (ВР-CP10)
+    const TCHAR* SideName = Side == EUmPanelSide::Own ? TEXT("own") : TEXT("opp");
+    Lines.Add(FString::Printf(TEXT("UMGALLERY panel %s %s %s"), SideName, Label, *P->Portrait->PortraitShotLine(TEXT("panel"))));
+    TArray<FString> Minis;
+    P->CollectPortraitLines(Minis);
+    for (const FString& M2 : Minis) Lines.Add(FString::Printf(TEXT("UMGALLERY panel %s %s %s"), SideName, Label, *M2));
     return P;
   };
   auto None = [](UUmHudPlayerPanel&, FUmPlayerPanelModel&) {};
@@ -513,6 +524,116 @@ TArray<FString> UUmPanelsGalleryWidget::Build(int32 Page, const FVector2D& Canva
                                     "opphand=%.0fx%.0f perRow=%d %s"),
                                Page + 1, *Own.Name.Replace(TEXT(" "), TEXT("_")), bS ? TEXT("S") : TEXT("L"), CanvasSu.X,
                                CanvasSu.Y, PxPerSu, PanelSize.X, PanelSize.Y, HandSize.X, HandSize.Y, PerRow, *Look.Describe()),
+               0);
+  return Lines;
+}
+
+// ------------------------------------------------------------------------- VS-2 CP-09...CP-12: the portrait sizes
+
+TArray<FString> UUmPanelsGalleryWidget::BuildPortraits(const FVector2D& CanvasSu, float PxPerSu) {
+  // one row per character: every show size of 02 §6.4 / 04 §1.4-§1.10 in the circle of the accepted CP-07 crop (the
+  // registry disc), the states (fallen, loser) and the fallback; the harpies with their badges 1-3 (ВР-72). The real
+  // M_UmPortraitDisc at the window's px per su - a sheet at 720p / 1080p / 2160p is the x0.67 / x1 / x2 sheet of the
+  // cards; at 2160p 150 % (x3) the ВР-CP04 cap shows (capped=1). Review only (editor -game), not acceptance frames.
+  TArray<FString> Lines;
+  struct FCellDef {
+    float Su;
+    EUmPortraitState State;
+    const TCHAR* Show;
+    const TCHAR* Caption;
+    int32 Number;  // the harpy's badge / fallback digit
+    bool bNoPng;   // the fallback (drawn as if the PNG were missing)
+    bool bBadge;
+  };
+  struct FRowDef {
+    const TCHAR* Title;
+    FName Key;
+    const TCHAR* Name;
+    TArray<FCellDef> Cells;
+  };
+  const EUmPortraitState A = EUmPortraitState::Avatar, F = EUmPortraitState::Fallen, L = EUmPortraitState::Loser;
+  const TArray<FCellDef> HeroCells = {
+      {32.0f, A, TEXT("lobby"), TEXT("32 lobby"), 0, false, false},
+      {64.0f, A, TEXT("panel"), TEXT("64 S"), 0, false, false},
+      {80.0f, A, TEXT("panel"), TEXT("80 panel"), 0, false, false},
+      {120.0f, A, TEXT("room"), TEXT("120 room"), 0, false, false},
+      {160.0f, A, TEXT("loading"), TEXT("160 load"), 0, false, false},
+      {120.0f, L, TEXT("result"), TEXT("120 loser"), 0, false, false},
+      {80.0f, F, TEXT("panel"), TEXT("80 fallen"), 0, false, false},
+      {80.0f, A, TEXT("panel"), TEXT("80 no PNG"), 0, true, false}};
+  const TArray<FRowDef> RowDefs = {
+      {TEXT("CP-09 King Arthur"), FName(TEXT("king-arthur")), TEXT("King Arthur"), HeroCells},
+      {TEXT("CP-11 Medusa"), FName(TEXT("medusa")), TEXT("Medusa"), HeroCells},
+      {TEXT("CP-10 Merlin"), FName(TEXT("king-arthur/merlin")), TEXT("Merlin"),
+       {{32.0f, A, TEXT("panel"), TEXT("32"), 0, false, false},
+        {40.0f, A, TEXT("room"), TEXT("40 room"), 0, false, false},
+        {32.0f, F, TEXT("panel"), TEXT("32 fallen"), 0, false, false},
+        {40.0f, F, TEXT("room"), TEXT("40 fallen"), 0, false, false},
+        {32.0f, A, TEXT("panel"), TEXT("32 no PNG"), 0, true, false}}},
+      {TEXT("CP-12 Harpies"), FName(TEXT("medusa/harpies")), TEXT("Harpies"),
+       {{32.0f, A, TEXT("panel"), TEXT("1"), 1, false, true},
+        {32.0f, A, TEXT("panel"), TEXT("2"), 2, false, true},
+        {32.0f, A, TEXT("panel"), TEXT("3"), 3, false, true},
+        {32.0f, F, TEXT("panel"), TEXT("2 fallen"), 2, false, true},
+        {40.0f, A, TEXT("room"), TEXT("40 room"), 0, false, false},
+        {40.0f, F, TEXT("room"), TEXT("40 fallen"), 0, false, false},
+        {32.0f, A, TEXT("panel"), TEXT("no PNG 1"), 1, true, false},
+        {32.0f, A, TEXT("panel"), TEXT("no PNG 2"), 2, true, false},
+        {32.0f, A, TEXT("panel"), TEXT("no PNG 3"), 3, true, false}}},
+  };
+  for (const FRowDef& R : RowDefs) {
+    UHorizontalBox* Row = WidgetTree->ConstructWidget<UHorizontalBox>(UHorizontalBox::StaticClass());
+    if (UVerticalBoxSlot* RS = Rows->AddChildToVerticalBox(Row)) RS->SetPadding(FMargin(0.0f, 0.0f, 0.0f, 16.0f));
+    USizeBox* TitleBox = WidgetTree->ConstructWidget<USizeBox>(USizeBox::StaticClass());
+    TitleBox->SetWidthOverride(150.0f);
+    TitleBox->SetContent(UmGalText(*WidgetTree, R.Title, TEXT("card.navy")));
+    if (UHorizontalBoxSlot* TS = Row->AddChildToHorizontalBox(TitleBox)) TS->SetVerticalAlignment(VAlign_Top);
+    for (const FCellDef& C : R.Cells) {
+      UVerticalBox* Box = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass());
+      Box->AddChildToVerticalBox(UmGalText(*WidgetTree, C.Caption, TEXT("card.navy")));
+      FUmPortraitDiscSpec Spec;
+      Spec.Key = R.Key;
+      Spec.Name = R.Name;
+      Spec.Number = C.Number;
+      Spec.ShowSu = C.Su;
+      Spec.PxPerSu = PxPerSu;
+      Spec.State = C.State;
+      Spec.bLegacy = C.bNoPng;  // the fallback look without the PNG (and without a Warning: the sheet asks for it)
+      FUmPortraitShown Shown;
+      UWidget* Content = UmPortrait::MakeDisc(*WidgetTree, this, Spec, Shown, KeepAlive);
+      if (C.bNoPng) Shown.Tex = TEXT("monogram-sheet");
+      if (C.bBadge && Shown.IsAvatar()) {
+        // the panel's placement (CX-09, UUmHudPlayerPanel::RebuildSidekicks): the badge at (+21, +20)
+        USizeBox* StackBox = WidgetTree->ConstructWidget<USizeBox>(USizeBox::StaticClass());
+        StackBox->SetWidthOverride(C.Su + 3.0f);
+        StackBox->SetHeightOverride(C.Su + 2.0f);
+        UOverlay* Stack = WidgetTree->ConstructWidget<UOverlay>(UOverlay::StaticClass());
+        StackBox->SetContent(Stack);
+        if (UOverlaySlot* P = Stack->AddChildToOverlay(Content)) {
+          P->SetHorizontalAlignment(HAlign_Left);
+          P->SetVerticalAlignment(VAlign_Top);
+        }
+        if (UOverlaySlot* X = Stack->AddChildToOverlay(UmPortrait::MakeNumberBadge(*WidgetTree, C.Number))) {
+          X->SetHorizontalAlignment(HAlign_Left);
+          X->SetVerticalAlignment(VAlign_Top);
+          X->SetPadding(FMargin(21.0f, 20.0f, 0.0f, 0.0f));
+        }
+        Content = StackBox;
+      }
+      if (UVerticalBoxSlot* DS = Box->AddChildToVerticalBox(Content)) {
+        DS->SetPadding(FMargin(0.0f, 4.0f, 0.0f, 0.0f));
+        DS->SetHorizontalAlignment(HAlign_Left);  // the circle at its own size under a wider caption
+      }
+      if (UHorizontalBoxSlot* S = Row->AddChildToHorizontalBox(Box)) {
+        S->SetPadding(FMargin(0.0f, 0.0f, 16.0f, 0.0f));
+        S->SetVerticalAlignment(VAlign_Top);
+      }
+      Lines.Add(FString::Printf(TEXT("UMGALLERY portrait %s %s"), *FString(C.Caption).Replace(TEXT(" "), TEXT("_")),
+                                *Shown.Line(C.Show, TEXT("own"))));
+    }
+  }
+  Lines.Insert(FString::Printf(TEXT("UMGALLERY portraits page=3 canvas=%.0fx%.0f pxPerSu=%.3f rows=%d"), CanvasSu.X,
+                               CanvasSu.Y, PxPerSu, RowDefs.Num()),
                0);
   return Lines;
 }

@@ -529,7 +529,7 @@ void AS08FlowGameMode::UmGalleryBegin(int32 SizePx) {
     if (bPanels) {
       UUmPanelsGalleryWidget* Sheet = CreateWidget<UUmPanelsGalleryWidget>(Self->GetWorld(), UUmPanelsGalleryWidget::StaticClass());
       if (!Sheet) return;
-      for (const FString& Line : Sheet->Build(FMath::Clamp(PanelsPage, 1, 2) - 1, Viewport / PxPerSu, PxPerSu)) FS08Trace::Write(Line);
+      for (const FString& Line : Sheet->Build(FMath::Clamp(PanelsPage, 1, 3) - 1, Viewport / PxPerSu, PxPerSu)) FS08Trace::Write(Line);  // 3: CP-09...12
       Sheet->AddToViewport(1001);
       Self->UmGallery = Sheet;
       return;

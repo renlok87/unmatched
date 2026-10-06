@@ -413,7 +413,7 @@ void US08TurnPortraitWidget::NativeTick(const FGeometry& MyGeometry, float InDel
 FString US08TurnPortraitWidget::PortraitShotLine(const TCHAR* Show) const {
   const FString Tex = bAvatarShown ? AvatarPath : (PortraitLegacy() ? FString(TEXT("legacy")) : FString(TEXT("monogram")));
   return UmPortrait::TraceLine(PortraitKey, Tex, CircleSu, AppliedPxPerSu, SrcCirclePx, Show,
-                               bOpponent ? TEXT("opp") : TEXT("own"), PortraitState);
+                               bOpponent ? TEXT("opp") : TEXT("own"), PortraitState, DiscWindowSu);
 }
 
 void US08TurnPortraitWidget::Setup(bool bInOpponent, const FS08TurnHudLook& InLook, const FLinearColor& TeamColor) {

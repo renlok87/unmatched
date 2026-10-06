@@ -68,7 +68,38 @@ def test_backs_and_portraits():
     for p in ports.values():
         cx, cy, d = p["disc"]
         assert 0 < cx < 1 and 0 < cy < 1 and 0 < d <= 1
-    assert ports["portrait:king-arthur"]["disc"] == [0.49, 0.43, 0.60]  # ВР-CP01 until CP-07
+    # CP-09...CP-12: the accepted CP-07 crops (variant B) replace the ВР-CP01 start numbers
+    assert ports["portrait:king-arthur"]["disc"] == [0.49, 0.39, 0.54]
+    assert ports["portrait:medusa"]["disc"] == [0.44, 0.29, 0.5]
+    assert ports["portrait:king-arthur:merlin"]["disc"] == [0.5, 0.48, 0.69]
+    assert ports["portrait:medusa:harpies"]["disc"] == [0.5, 0.48, 0.69]
+    assert all(p["discSource"] == M.CROPS_SOURCE for p in ports.values())
+
+
+def test_discs_are_the_cp07_crops():
+    """CP-09...CP-12: every registry disc is the CP-07 portrait-crops.json record (cx, cy, d), nothing else."""
+    crops = json.loads(M.CROPS.read_text(encoding="utf-8"))
+    assert set(crops) == {"king-arthur", "medusa", "king-arthur/merlin", "medusa/harpies"}
+    ports = {e["key"]: e for e in ENTRIES if e["kind"] == "portrait"}
+    for key, c in crops.items():
+        assert ports["portrait:" + key.replace("/", ":")]["disc"] == [c["cx"], c["cy"], c["d"]], key
+    # the source circle in px and the magnification of the CP-09...CP-12 rows at 1080p 100 % (1 px per su)
+    src_px = {k: ports[k]["src"][0] * ports[k]["disc"][2] for k in ports}
+    assert abs(src_px["portrait:king-arthur"] - 432.0) < 1e-6      # 0.54 x 800
+    assert abs(src_px["portrait:medusa"] - 201.0) < 1e-6           # 0.50 x 402
+    assert abs(src_px["portrait:medusa:harpies"] - 88.32) < 1e-6   # 0.69 x 128
+    # the baked hero-colour ring of the sidekick avatars starts at radius 50 of 64 px (ВР-CP02): the circle stays inside
+    for k in ("portrait:king-arthur:merlin", "portrait:medusa:harpies"):
+        cx, cy, d = ports[k]["disc"]
+        assert (max(abs(cx - 0.5), abs(cy - 0.5)) + d / 2) * 128 < 50.0, k
+
+
+def test_missing_crops_keep_the_start_numbers(tmp_path):
+    items = M.plan_from_convert_report()
+    reg = M.build_registry(items, crops=M.load_crops(tmp_path / "none.json"))
+    ports = {e["key"]: e for e in reg["entries"] if e["kind"] == "portrait"}
+    assert ports["portrait:king-arthur"]["disc"] == [0.49, 0.43, 0.60]
+    assert "CP-07" not in reg["decisions"]
 
 
 def test_paths_only_under_cooked_s08_ui():

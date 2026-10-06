@@ -197,7 +197,10 @@ void FUmPanels::Tick(const FUmPanelsTick& T) {
 
 void FUmPanels::CollectShotLines(TArray<FString>& Out, TFunctionRef<FS08ScreenRect(UWidget*)> RectOf) const {
   for (const UUmHudPlayerPanel* P : {Loc.Get(), Opp.Get()}) {
-    if (P && UmGameHudSlots::ShownByProperty(P)) P->CollectShotLines(Out, RectOf(P->Panel.Get()));
+    if (P && UmGameHudSlots::ShownByProperty(P)) {
+      P->CollectShotLines(Out, RectOf(P->Panel.Get()));
+      P->CollectPortraitLines(Out);  // VS-2 CP-10 / CP-12: the sidekick mini portraits (ВР-CP10)
+    }
   }
   if (const UUmHudOppHand* H = OppHand.Get()) {
     if (UmGameHudSlots::ShownByProperty(H)) H->CollectShotLines(Out, RectOf(H->Panel.Get()));

@@ -8,7 +8,8 @@
   python tools/s08/hud_contract/hud_contract.py check-trace <log> [--width 1920 --height 1080]
                                                                     гейт строк `SHOT widget id=… bbox=… geom=painted`,
                                                                     `HUD-LAYOUT` и `PORTRAIT` (CP-08: scale ≤ 1,6, нет
-                                                                    монограммы при ключе из реестра)
+                                                                    монограммы при ключе из реестра; CP-12: у гарпии в
+                                                                    панели номер n=1…3, ВР-72)
 
 Только stdlib. Код выхода: 0 — ошибок нет, 1 — есть ошибки.
 """
@@ -275,6 +276,9 @@ def check_portrait_line(n, line, registry):
         errors.append("строка %d: PORTRAIT scale=%r" % (n, f.get("scale")))
     if f.get("tex") == "monogram" and f.get("id") in registry:
         errors.append("строка %d: PORTRAIT id=%s tex=monogram, а аватар есть в реестре (ВР-CP10)" % (n, f["id"]))
+    if f.get("id", "").endswith("/harpies") and f.get("show") == "panel" and f.get("n") not in ("1", "2", "3"):
+        # VS-2 CP-12: the harpy's mini portrait in PANEL carries its number 1..3 (02 §6.5, ВР-72) - no letter, no 4..6
+        errors.append("строка %d: PORTRAIT id=%s show=panel без номера n=1…3 (ВР-72), n=%s" % (n, f["id"], f.get("n")))
     return errors
 
 

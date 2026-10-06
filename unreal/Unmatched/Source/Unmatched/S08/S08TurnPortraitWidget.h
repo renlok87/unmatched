@@ -120,8 +120,10 @@ public:
   /** avatar / fallen (saturation 0) / loser (saturation 0 + opacity 0.6 over 400 ms; reduced motion and !bAnimate -
    *  at once). */
   void SetPortraitState(EUmPortraitState State, bool bAnimate = true);
-  /** 'PORTRAIT id=.. tex=.. su=.. px=.. scale=.. show=<Show> side=own|opp state=..'. */
+  /** 'PORTRAIT id=.. tex=.. su=.. px=.. scale=.. show=<Show> side=own|opp state=.. capped=0|1'. */
   FString PortraitShotLine(const TCHAR* Show = TEXT("panel")) const;
+  /** -S08PortraitLegacy (or the test override): the team disc + monogram; the panel's mini portraits follow it. */
+  bool IsPortraitLegacy() const { return PortraitLegacy(); }
   FName GetPortraitKey() const { return PortraitKey; }
   bool IsAvatarShown() const { return bAvatarShown; }
   /** The circle su shown (the ВР-CP04 cap applied) and the monogram text (fallback / legacy). */

@@ -22,7 +22,9 @@ address_x / address_y TA_CLAMP.
 
 Registry: unreal/Unmatched/Config/Cards/S08CardMedia.json (in git, no pixels; read by UI/UmCardMedia.h, staged by
 Unmatched.Build.cs): per entry key, kind, lang (cards), object path, src, pad, uv = src / pad, sha256 of the PNG; portraits
-also disc [cx, cy, d] in fractions of the source side - the ВР-CP01 starting numbers until CP-07 is reviewed.
+also disc [cx, cy, d] in fractions of the source side - the accepted CP-07 crops (variant B,
+art/imagegen/portrait-crop-v1-codex/portrait-crops.json, accepted by delegation 165c3be7; CP-09...CP-12), the ВР-CP01
+starting numbers only while that file is missing.
 Report: art/cards-v1/ue-import-report.json - asset path, source sha256, the final settings read back from the asset,
 platform size, mips, resource size.
 
@@ -71,7 +73,9 @@ ROOT_PORTRAITS = "/Game/S08/UI/Portraits"
 SHA_TAG = "CardMediaSourceSha256"
 PAD_COLOR = (0x06, 0x16, 0x23, 0)  # card.navy #061623, alpha 0
 # ВР-CP01 (by delegation, CP-07 row): starting portrait circles (centre x, centre y, diameter) in fractions of the source
-# side; CP-07 replaces them after its review (portrait-crops.json).
+# side; the accepted CP-07 crops (portrait-crops.json, CP-09...CP-12) replace them.
+CROPS = REPO / "art/imagegen/portrait-crop-v1-codex/portrait-crops.json"
+CROPS_SOURCE = "CP-07 B (portrait-crop-v1, accepted by delegation 165c3be7)"
 DISC_START = {
     "portrait:king-arthur": [0.49, 0.43, 0.60],
     "portrait:medusa": [0.44, 0.33, 0.56],
@@ -144,7 +148,23 @@ def plan_from_convert_report(path: Path = CONVERT_REPORT) -> list[dict]:
     return items
 
 
-def build_registry(items: list[dict]) -> dict:
+def load_crops(path: Path = CROPS) -> dict:
+    """CP-07 portrait-crops.json {"king-arthur": {cx, cy, d}, "king-arthur/merlin": ...} -> {registry key: [cx, cy, d]};
+    {} when the file is missing (the ВР-CP01 start numbers stay)."""
+    if not path.is_file():
+        return {}
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    out = {}
+    for key, c in raw.items():
+        disc = [float(c["cx"]), float(c["cy"]), float(c["d"])]
+        if not (0 < disc[0] < 1 and 0 < disc[1] < 1 and 0 < disc[2] <= 1):
+            raise RuntimeError(f"{path}: {key}: disc {disc} out of (0, 1)")
+        out["portrait:" + key.replace("/", ":")] = disc
+    return out
+
+
+def build_registry(items: list[dict], crops: dict | None = None) -> dict:
+    crops = load_crops() if crops is None else crops
     entries = []
     for i in items:
         e = {"key": i["key"], "kind": i["kind"]}
@@ -154,17 +174,22 @@ def build_registry(items: list[dict]) -> dict:
                   "uv": [round(i["src"][0] / i["pad"][0], 6), round(i["src"][1] / i["pad"][1], 6)],
                   "sha256": i["sha256"]})
         if i["kind"] == "portrait":
-            e["disc"] = DISC_START[i["key"]]
-            e["discSource"] = "ВР-CP01 (start; CP-07 replaces after review)"
+            if i["key"] in crops:
+                e["disc"] = crops[i["key"]]
+                e["discSource"] = CROPS_SOURCE
+            else:
+                e["disc"] = DISC_START[i["key"]]
+                e["discSource"] = "ВР-CP01 (start; CP-07 replaces after review)"
         entries.append(e)
     return {
         "schema": REGISTRY_SCHEMA,
         "card": "CP-02",
         "generatedBy": "tools/art/cards/ue_import_card_media.py (from art/cards-v1/media-convert-report.json)",
-        "decisions": ["INT-014", "ВР-CP01", "ВР-CP03", "ВР-CP07", "ВР-CP08", "ВР-51"],
+        "decisions": ["INT-014", "ВР-CP01", "ВР-CP03", "ВР-CP07", "ВР-CP08", "ВР-51"] + (["CP-07"] if crops else []),
         "note": ("key -> texture; uv = src / pad: the source pixels sit in the top-left of the padded texture "
                  "(padding #061623 alpha 0); cards: lang ru = RU build, en = EN build (ВР-51); portraits: disc "
-                 "[cx, cy, d] in fractions of the source side. Textures are gitignored (GAP-019 / ENV-U3)."),
+                 "[cx, cy, d] in fractions of the source side (discSource: the accepted CP-07 crop or the ВР-CP01 "
+                 "start). Textures are gitignored (GAP-019 / ENV-U3)."),
         "settings": SETTINGS_DOC,
         "counts": {k: sum(1 for e in entries if e["kind"] == k) for k in ("card", "back", "portrait")},
         "entries": entries,

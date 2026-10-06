@@ -2,6 +2,7 @@
 #include "UmHudPlayerPanel.h"
 
 #include "../S08AnimatedIconWidget.h"
+#include "../S08ArtLook.h"
 #include "../S08IconMotion.h"
 #include "../S08TurnPortraitWidget.h"
 #include "UmCardMedia.h"
@@ -335,46 +336,25 @@ void UUmHudPlayerPanel::ApplyGeometry() {
 // ------------------------------------------------------------------------------------------------- model
 
 UWidget* UUmHudPlayerPanel::MakeMiniPortrait(const FUmSidekickView& S) {
-  const UUmHudTheme& Theme = UUmHudTheme::Get();
-  USizeBox* Box = WidgetTree->ConstructWidget<USizeBox>(USizeBox::StaticClass());
-  Box->SetWidthOverride(UmHudPanel::SidekickSu);
-  Box->SetHeightOverride(UmHudPanel::SidekickSu);
-  const FUmCardMediaEntry* Entry = UmPortrait::Find(S.Key);
-  UTexture2D* Tex = Entry ? UmCardMedia::LoadTexture(*Entry) : nullptr;
-  UMaterialInterface* Mat =
-      Tex ? LoadObject<UMaterialInterface>(nullptr, UmPortrait::MaterialPath, nullptr, LOAD_NoWarn | LOAD_Quiet) : nullptr;
-  if (Tex && Mat) {
-    UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(Mat, this);
-    UmPortrait::SetupDiscMid(*Mid, *Entry, Tex, UmHudPanel::SidekickSu);
-    // 04 §2.2: a fallen sidekick - saturation 0, the plate stays
-    Mid->SetScalarParameterValue(UmPortrait::ParamDesaturation, S.bFallen ? 1.0f : 0.0f);
-    Mid->SetScalarParameterValue(UmPortrait::ParamOpacity, 1.0f);
-    KeepAlive.Add(Mid);
-    UImage* Image = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass());
-    FSlateBrush Brush;
-    Brush.SetResourceObject(Mid);
-    Brush.ImageSize = FVector2D(UmHudPanel::SidekickSu, UmHudPanel::SidekickSu);
-    Image->SetBrush(Brush);
-    Box->SetContent(Image);
-    return Box;
-  }
-  // 02 §6.4: the monogram only as the fallback (CP-08; a harpy is its number, never "H")
-  UE_LOG(LogTemp, Warning, TEXT("PORTRAIT fallback id=%s reason=%s show=sidekick"), *S.Key.ToString(),
-         !Entry ? TEXT("no-registry-entry") : TEXT("texture-missing"));
-  UOverlay* Stack = WidgetTree->ConstructWidget<UOverlay>(UOverlay::StaticClass());
-  UImage* Disc = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass());
-  Disc->SetBrush(UmDiscBrush(Theme.Color(TEXT("card.navy")), UmHudPanel::SidekickSu));
-  Stack->AddChildToOverlay(Disc);
-  UTextBlock* Mono = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
-  Mono->SetFont(Theme.Font(TEXT("type.tag")));
-  Mono->SetColorAndOpacity(FSlateColor(Theme.Color(TEXT("text.primary"))));
-  Mono->SetText(FText::FromString(UmPortrait::FallbackText(S.Key, S.Name, S.Number)));
-  if (UOverlaySlot* MonoSlot = Stack->AddChildToOverlay(Mono)) {
-    MonoSlot->SetHorizontalAlignment(HAlign_Center);
-    MonoSlot->SetVerticalAlignment(VAlign_Center);
-  }
-  Box->SetContent(Stack);
-  return Box;
+  // VS-2 CP-10 / CP-12: the sidekick's avatar in the circle of the accepted CP-07 crop (one picture for the three
+  // harpies), saturation 0 when fallen (04 §2.2: the plate stays); no PNG -> the monogram / the harpy's digit;
+  // -S08PortraitLegacy -> the fallback as the hero's circle (ВР-CP08)
+  FUmPortraitDiscSpec Spec;
+  Spec.Key = S.Key;
+  Spec.Name = S.Name;
+  Spec.Number = S.Number;
+  Spec.ShowSu = UmHudPanel::SidekickSu;
+  Spec.PxPerSu = Model.PxPerSu;
+  Spec.State = S.bFallen ? EUmPortraitState::Fallen : EUmPortraitState::Avatar;
+  Spec.bLegacy = Portrait ? Portrait->IsPortraitLegacy() : !S08ArtLook::PortraitAvatars();
+  FUmPortraitShown& Shown = MiniShown.AddDefaulted_GetRef();
+  return UmPortrait::MakeDisc(*WidgetTree, this, Spec, Shown, KeepAlive);
+}
+
+void UUmHudPlayerPanel::CollectPortraitLines(TArray<FString>& Out) const {
+  if (!UmGameHudSlots::ShownByProperty(this) || !bHasModel || Model.bClassS) return;
+  const TCHAR* SideName = Side == EUmPanelSide::Opp ? TEXT("opp") : TEXT("own");
+  for (const FUmPortraitShown& Shown : MiniShown) Out.Add(Shown.Line(TEXT("panel"), SideName));
 }
 
 UWidget* UUmHudPlayerPanel::MakeFallenHeart() {
@@ -391,6 +371,7 @@ void UUmHudPlayerPanel::RebuildSidekicks() {
   SidekickItems = 0;
   TooltipRows = 0;
   KeepAlive.Reset();
+  MiniShown.Reset();
   if (SidekickRow) SidekickRow->ClearChildren();
   SidekickTip = nullptr;
   SetToolTip(nullptr);
@@ -413,22 +394,14 @@ void UUmHudPlayerPanel::RebuildSidekicks() {
           P->SetHorizontalAlignment(HAlign_Left);
           P->SetVerticalAlignment(VAlign_Top);
         }
-        UOverlay* Index = WidgetTree->ConstructWidget<UOverlay>(UOverlay::StaticClass());
-        UImage* Disc = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass());
-        Disc->SetBrush(UmDiscBrush(Theme.Color(TEXT("card.navy")), UmHudPanel::IndexDiscSu));
-        Index->AddChildToOverlay(Disc);
-        UTextBlock* Digit = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
-        Digit->SetFont(Theme.Font(TEXT("type.tag")));
-        Digit->SetColorAndOpacity(FSlateColor(Theme.Color(TEXT("card.cream"))));
-        Digit->SetText(FText::AsNumber(S.Number));
-        if (UOverlaySlot* D = Index->AddChildToOverlay(Digit)) {
-          D->SetHorizontalAlignment(HAlign_Center);
-          D->SetVerticalAlignment(VAlign_Center);
-        }
-        if (UOverlaySlot* X = Stack->AddChildToOverlay(Index)) {
-          X->SetHorizontalAlignment(HAlign_Left);
-          X->SetVerticalAlignment(VAlign_Top);
-          X->SetPadding(FMargin(21.0f, 20.0f, 0.0f, 0.0f));
+        // CP-12 / 02 §6.5: the number badge (card.navy 14 su + mark.keyline, the digit card.cream as runtime text) on
+        // the avatar; the fallback circle is the digit itself (ВР-CP09) - no second digit (ВР-VS2-66)
+        if (MiniShown.Num() && MiniShown.Last().IsAvatar()) {
+          if (UOverlaySlot* X = Stack->AddChildToOverlay(UmPortrait::MakeNumberBadge(*WidgetTree, S.Number))) {
+            X->SetHorizontalAlignment(HAlign_Left);
+            X->SetVerticalAlignment(VAlign_Top);
+            X->SetPadding(FMargin(21.0f, 20.0f, 0.0f, 0.0f));  // CX-09: the lower right corner, over the circle's edge
+          }
         }
         Column->AddChildToVerticalBox(StackBox);
         UTextBlock* Hp = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
