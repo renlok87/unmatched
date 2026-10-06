@@ -75,7 +75,13 @@
   # S08FlowGameMode.cpp "GD-034 combat plan"), e.g. -JoinPlanOverride 'attack+abilityboost+scheme+storms+defend+resolve'
   # -HostPlanOverride 'attack+defend+feint+slowdefense+ownresult'. Empty keeps the plans below. Gates unchanged.
   [string]$HostPlanOverride = '',
-  [string]$JoinPlanOverride = ''
+  [string]$JoinPlanOverride = '',
+  # VS-1 HB-02 exit frames (opt-in, docs/game-design/visual/05-production-plan.md §3 VS-1): both clients run WITHOUT
+  # -S09Markers, the player's default view since HB-02. The state-marker and reveal-marker gates need the debug layer,
+  # so they are replaced by the inverse gate: both traces carry 'ARTLOOK ... markers=0' and the defense/resolve/result
+  # shots show none of the combat marker hues (<= the scene-noise allowance). Not a GD-034 acceptance run: the gate
+  # run keeps -S09Markers. Every other gate (board, heroes v2, render reference, GAME_OVER, traces) is unchanged.
+  [switch]$PlayerView
 )
 
 # W5b-R (t53-thresholds.json shotCaptured): every published frame must carry its pixel provenance line
@@ -338,8 +344,9 @@ function Invoke-CombatDemo {
   $Script:ThisRunGameCode = $null
 
   $common = @("-windowed", "-resx=$ShotWidth", "-resy=$ShotHeight", "-RenderOffScreen", "log=GrepLog",
-    "-ForceAbandonSequences", "-S08Api=$Api", "-S09ShotMode=$ShotMode", "-ExecCmds=t.MaxFPS $ClientFps",
-    "-S09Markers")  # HB-01: the marker pixel gates below need the debug layer (04-hud-spec s5.3)
+    "-ForceAbandonSequences", "-S08Api=$Api", "-S09ShotMode=$ShotMode", "-ExecCmds=t.MaxFPS $ClientFps")
+  # HB-01: the marker pixel gates below need the debug layer (04-hud-spec s5.3); -PlayerView shoots the default view
+  if (-not $PlayerView) { $common += '-S09Markers' }
   if ($ArtPreview) { $common += '-ArtPreview' }
   if ($FullHd) { $common += '-ForceRes' }
   if ($MedusaVariantExplicit) { $common += "-ArtPreviewMedusaVariant=$ArtPreviewMedusaVariant" }
@@ -536,7 +543,30 @@ function Invoke-CombatDemo {
       $resolveStats.resolveRegion, $resolveStats.defenseAll, $resolveStats.resultAll,
       $joinResultStats.resultRegion, $joinResultStats.resolveAll, $joinResultStats.defenseAll,
       $hostResultStats.resultRegion, $hostResultStats.resolveAll, $hostResultStats.defenseAll)
-    if ($ShotMode -ne 'request') {
+    if ($PlayerView) {
+      # HB-02 inverse gate: no debug layer in the player's view - ARTLOOK markers=0 on both clients and none of the
+      # combat marker hues in the state shots (the reveal block hue is skipped: the revealed value text keeps it).
+      foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
+        $look = Select-String -LiteralPath $pair[1] -Pattern 'ARTLOOK .* markers=(\d)' | Select-Object -Last 1
+        if (-not $look -or $look.Matches[0].Groups[1].Value -ne '0') {
+          throw "player view: $($pair[0]) trace has no 'ARTLOOK ... markers=0': $(if ($look) { $look.Line } else { 'no ARTLOOK line' })"
+        }
+      }
+      foreach ($entry in @(@('joiner/defense', $defenseStats), @('joiner/resolve', $resolveStats),
+                           @('joiner/result', $joinResultStats), @('host/result', $hostResultStats))) {
+        $s = $entry[1]
+        foreach ($hue in @('attack', 'defense', 'resolve', 'boost', 'result')) {
+          if ($s[$hue + 'All'] -gt $MarkerNoise) {
+            throw ("player view: {0} shot shows the {1} gate marker hue ({2} samples > {3})" -f $entry[0], $hue, $s[$hue + 'All'], $MarkerNoise)
+          }
+        }
+      }
+      # GD-033 privacy holds in the player's view too: the revealed value text appears only after the server reveal.
+      if ($defenseStats.revealAll -ne 0 -or $resolveStats.revealAll -ne 0) {
+        throw ("privacy gate failed: pre-reveal shots show reveal pixels (defense={0} resolve={1})" -f $defenseStats.revealAll, $resolveStats.revealAll)
+      }
+      Write-Output 'player view: ARTLOOK markers=0 on both clients, no combat marker hue in the defense/resolve/result shots'
+    } elseif ($ShotMode -ne 'request') {
       Write-Output "WARN ShotMode=$ShotMode renders the HUD widget only - state gates skipped (P1 acceptance requires 'request')"
     } else {
       if (-not (Test-StateImage $defenseStats 'defense')) {
@@ -733,7 +763,7 @@ function Invoke-CombatDemo {
       if (-not (Test-Path -LiteralPath $RevealShot)) {
         throw "reveal proof FAILED: trace shows the revealed shot was taken but the file is missing: $RevealShot"
       }
-      if ($ShotMode -eq 'request') {
+      if ($ShotMode -eq 'request' -and -not $PlayerView) {
         $revealedStats = Get-MarkerStats $RevealShot
         Assert-Dimensions $revealedStats 'joiner/revealed'
         Write-Output ("reveal markers joiner: resolve(res={0}) reveal(rvl={1} def={2} rst={3})" -f `
@@ -747,7 +777,7 @@ function Invoke-CombatDemo {
           throw "reveal gate failed: foreign combat markers present in the revealed shot"
         }
       }
-      $RevealProof = 'present: pre-reveal privacy gates passed (zero reveal pixels) and the revealed shot carries the #7CFC00 reveal block + resolve marker'
+      $RevealProof = if ($PlayerView) { 'present (player view): pre-reveal privacy gates passed (zero reveal pixels); the revealed shot is published, its marker gate needs -S09Markers' } else { 'present: pre-reveal privacy gates passed (zero reveal pixels) and the revealed shot carries the #7CFC00 reveal block + resolve marker' }
     } else {
       Write-Output "WARN: no reveal pause this run - reveal proof not captured (honest absence, recorded in manifest)"
     }
@@ -915,7 +945,8 @@ function Invoke-CombatDemo {
     }
     $manifest = [ordered]@{
       stamp   = $Stamp
-      verdict = "GD-034 P1: live attack->defense->resolve two-client demo, defense/resolve/result state-marker shots at exact ${ShotWidth}x${ShotHeight} with swap/negative controls, role-gated traces, privacy-clean logs, seq convergence; artPreview=$([bool]$ArtPreview); clientFpsCap=$ClientFps"
+      verdict = if ($PlayerView) { "VS-1 HB-02 player view: live attack->defense->resolve two-client demo WITHOUT -S09Markers at exact ${ShotWidth}x${ShotHeight} - ARTLOOK markers=0, no combat marker hue in the state shots, privacy-clean, role-gated traces, seq convergence (the GD-034 marker gates need -S09Markers); artPreview=$([bool]$ArtPreview); clientFpsCap=$ClientFps" } else { "GD-034 P1: live attack->defense->resolve two-client demo, defense/resolve/result state-marker shots at exact ${ShotWidth}x${ShotHeight} with swap/negative controls, role-gated traces, privacy-clean logs, seq convergence; artPreview=$([bool]$ArtPreview); clientFpsCap=$ClientFps" }
+      playerView = [bool]$PlayerView
       artBoard = if ($ArtBoard) { [ordered]@{ boardId = $ArtPreviewBoardId; profile = $ArtBoard.id; size = $ArtBoardSize; light = $ArtBoard.light; artFixture = [bool]$ArtBoard.artFixture } } else { $null }
       artPreviewFlags = [ordered]@{ medusaVariant = $(if ($MedusaVariantExplicit) { $ArtPreviewMedusaVariant } else { '(default)' }); selectOwnHero = [bool]$ArtPreviewSelectOwnHero; focusZoom = $ArtPreviewFocusZoom; shotAfter = $ArtPreviewShotAfter; heroesV2 = [bool]$ArtPreviewHeroesV2; diorama = [bool]$ArtPreviewDiorama }
       heroesV2Anim = $HeroesV2Anim
