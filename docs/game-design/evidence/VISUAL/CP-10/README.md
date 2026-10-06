@@ -35,3 +35,11 @@ px=… scale=… show=panel side=own|opp state=avatar|fallen capped=0` (без `
 - Кадр A на Marmoreal original (Arthur, свой ход, Merlin жив) и кадр с павшим Merlin на Sarpedon original, 1080p и
   720p 100 %, `-Bench` с RENDER, шесть фигур v2; ROOM 1080p — с экраном ROOM (SC). Трасса `PORTRAIT
   id=king-arthur/merlin scale ≤ 1,25`.
+
+## Кадры VS-2 (2026-10-07, упаковка `230b2b0d`)
+
+Кадры выхода и гейты — [VS-2](../VS-2/README.md). Прогоны `run-combat-demo -PlayerView -S08ExitShots` на Marmoreal original (`-ConceptPaste` до EN-13) и Sarpedon original, шесть фигур v2, 1080p 75 / 100 / 150 %, 720p 100 / 150 %; vs-ai `-PlayerView`. Листы цвет / серый / дейтеранопия — `sheet-0*.png` (`sheet.py`, вырезки по трассовым bbox). Все кадры и листы открыты (Read).
+
+- **Решение:** художественно принято, по делегированию (2026-10-07).
+- Merlin — мини 32 su рядом с именем и «7/7». Красная мантия узнаётся на 720p; в сером — по силуэту колпака.
+- Кадр павшего Merlin в этой упаковке не встретился: Merlin в партиях выжил.

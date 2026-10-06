@@ -81,3 +81,12 @@ HB-14; спецификация — 04 §2.1, §4.3, §7.1, ВР-H17; макет
   `UI-HUD-TOP idle`, `UI-HUD-CONN online`; `syncing` и `lost` — прогон через `tools/s10/drop-graphql-reply-proxy.cjs`;
   TOP не пересекает `FIELD`; цвет и серый.
 - Звуки `UI-NET-LOST` / `UI-NET-BACK` при смене связи — не в «do» карточки, отдельно.
+
+## Кадры VS-2 (2026-10-07, упаковка `230b2b0d`)
+
+Кадры выхода и гейты — [VS-2](../VS-2/README.md). Прогоны `run-combat-demo -PlayerView -S08ExitShots` на Marmoreal original (`-ConceptPaste` до EN-13) и Sarpedon original, шесть фигур v2, 1080p 75 / 100 / 150 %, 720p 100 / 150 %; vs-ai `-PlayerView`. Листы цвет / серый / дейтеранопия — `sheet-0*.png` (`sheet.py`, вырезки по трассовым bbox). Все кадры и листы открыты (Read).
+
+- **Решение:** художественно принято, по делегированию (2026-10-07) — состояния `idle` / `online` на обеих досках и всех холстах.
+- TOP: плашка, связь и «Ход n», класс S с кнопкой «Журнал». В сером и при дейтеранопии читается. TOP не пересекает FIELD: `overlapField=0`. Командная Slate-панель больше не лежит под TOP (ВР-VS2-73).
+- G-WIDGET: `UI-HUD-TOP idle` и `UI-HUD-CONN online` есть во всех прогонах, ошибок 0. `lost` встретилось только в трассе vs-ai-abort.
+- **Не снято:** `syncing` / `lost` через `drop-graphql-reply-proxy.cjs` (VS-2, «Открыто», п. 4).

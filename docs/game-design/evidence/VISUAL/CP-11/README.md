@@ -31,3 +31,10 @@ VS-2, шаг B3, 2026-10-06, ветка `feat/visual-vs2`. Карточка — 
 - PANEL-LOC Medusa на Sarpedon original (свой ход) и PANEL-OPP Medusa на Marmoreal original (ход соперника), 1080p и
   720p 100 %, `-Bench` с RENDER, шесть фигур v2. GAMEOVER (победа и поражение Medusa) 1080p, ROOM и загрузка 1080p и
   720p — с экранами (SC, H15). Трасса `PORTRAIT id=medusa scale ≤ 1,6`.
+
+## Кадры VS-2 (2026-10-07, упаковка `230b2b0d`)
+
+Кадры выхода и гейты — [VS-2](../VS-2/README.md). Прогоны `run-combat-demo -PlayerView -S08ExitShots` на Marmoreal original (`-ConceptPaste` до EN-13) и Sarpedon original, шесть фигур v2, 1080p 75 / 100 / 150 %, 720p 100 / 150 %; vs-ai `-PlayerView`. Листы цвет / серый / дейтеранопия — `sheet-0*.png` (`sheet.py`, вырезки по трассовым bbox). Все кадры и листы открыты (Read).
+
+- **Решение:** художественно принято, по делегированию (2026-10-07).
+- Medusa в PANEL-LOC и PANEL-OPP на обеих досках. Светлые глаза и змеи читаются и на 720p 100 % (кольцо 64 su).

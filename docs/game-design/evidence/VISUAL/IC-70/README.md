@@ -116,3 +116,11 @@ python art/imagegen/hud-icons-v3/_tools/compare_ue_gallery.py <dir> [--reduced] 
 - UE `Unmatched.S08.IconMotion.*` — 11/11 (Load, Golden, Reduced, Textures, Widget, Semantics, CombatView, DefaultToken,
   TurnPortrait, TurnHudRollbacks, GalleryIds).
 - pytest `tools/s08/hud_contract` — 62 passed.
+
+## Кадры VS-2 (2026-10-07, упаковка `230b2b0d`)
+
+- **G-ICON на упаковке** (`StagedBuilds/Windows/Unmatched.exe`, ВР-VS2-39 закрыт).
+  - normal: \|Δ\| 0,026, новые id — 0,011 (худший `action-end-turn` 0,028);
+  - reduced: 0,009 и 0,003;
+  - трасса перечисляет все 45 id.
+  Числа совпали с прогоном A3 в editor `-game`. Открыты 12 PNG галереи и оба листа сравнения. Данные — `VS-2/data/gicon-compare-*.json`.
