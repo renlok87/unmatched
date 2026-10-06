@@ -1,0 +1,141 @@
+{
+  "task": "AN-22",
+  "sources": [
+    "docs/game-design/visual/06-tasks/prompts/AN-22.codex.md",
+    "docs/game-design/visual/02-visual-design.md sections 8.3,8.4,9.2"
+  ],
+  "trigger": "CUE-007 / state.fighter_moved",
+  "start": "snapshot application frame",
+  "duration_per_edge_ms": 280,
+  "edge_count": 2,
+  "arrival_ms": 560,
+  "idle_restored_ms": 710,
+  "ease": {
+    "formula": "min(80 * T / 280, T / 2)",
+    "first_edge": {
+      "Ein": 80,
+      "Eout": 0,
+      "k": 0.004166666666666667
+    },
+    "second_edge": {
+      "Ein": 0,
+      "Eout": 80,
+      "k": 0.004166666666666667
+    },
+    "single_edge": {
+      "Ein": 80,
+      "Eout": 80,
+      "k": 0.005,
+      "ease_in_ms": [
+        0,
+        80
+      ],
+      "ease_out_ms": [
+        200,
+        280
+      ]
+    },
+    "speed_variants": [
+      {
+        "duration_multiplier": 0.5,
+        "T": 140,
+        "E": 40,
+        "arrival": 280
+      },
+      {
+        "duration_multiplier": 1,
+        "T": 280,
+        "E": 80,
+        "arrival": 560
+      },
+      {
+        "duration_multiplier": 1.5,
+        "T": 420,
+        "E": 120,
+        "arrival": 840
+      }
+    ]
+  },
+  "phases": [
+    {
+      "name": "ease-in",
+      "ms": [
+        0,
+        80
+      ]
+    },
+    {
+      "name": "linear",
+      "ms": [
+        80,
+        480
+      ]
+    },
+    {
+      "name": "ease-out",
+      "ms": [
+        480,
+        560
+      ]
+    },
+    {
+      "name": "settle",
+      "ms": [
+        560,
+        710
+      ]
+    }
+  ],
+  "turns": {
+    "start_max_ms": 50,
+    "vertex_start_ms": 280,
+    "vertex_duration_ms": 120,
+    "vertex_end_ms": 400,
+    "settle_ms": [
+      560,
+      710
+    ]
+  },
+  "lean": {
+    "max_degrees": 10,
+    "in_ms": 60,
+    "out_ms": 150,
+    "pivot": "original base center",
+    "base_flat": true,
+    "hop": 0
+  },
+  "dust": {
+    "cue": "CUE-007",
+    "ms": [
+      560,
+      860
+    ],
+    "duration_ms": 300,
+    "cell": "end only",
+    "flat_discs_shown": 4,
+    "flat_discs_allowed": [
+      3,
+      5
+    ]
+  },
+  "snap": {
+    "modes": [
+      "reduced motion",
+      "none"
+    ],
+    "arrival_ms": 0,
+    "turn_ms": 0,
+    "lean": 0
+  },
+  "caps": {
+    "min_step_ms": 90,
+    "fighter_ms": 1400,
+    "sequence_ms": 2400,
+    "binding_in_this_example": false
+  },
+  "reference_fps": 24,
+  "frame_duration_exact_ms": 41.666666666666664,
+  "rounded_tolerance_ms": 42,
+  "combat_events_on_sheet": false,
+  "yaw": "diagram only; glyphs are side projections"
+}

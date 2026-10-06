@@ -833,11 +833,47 @@
       "result_path": "art/imagegen/fx-arc-codex/",
       "status": "ok",
       "note": "CX-20 fix1 (единственный корректирующий прогон); 2026-10-06 21:54-22:05 +05:00 (~11 мин); серп v3: полоса растёт внутрь, W_max 14,17 px при s=0,78, 8,85 px при s=0,5, хвост 4 px, ядро по вогнутой кромке при W>=10; игровые листы на Arthur (H=69 px, ячейка 100/67 px на 1080p/720p, полоса на 720p 3,77-4,17 px в кадрах 3-8); verification.json с ключами 07 §1.2; опись репозитория перенесена в scraped-data/derived/fx-arc-codex/audit/; 131 проверка PASS, manifest 127/127; ревью Claude: accept по делегированию (ВР-VS2-FX31-01…08)"
+    },
+    {
+      "date": "2026-10-07T01:27:00+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle)",
+      "template": "T-CODEX-ANIMSHEET",
+      "task_id": "AN-22",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a112dd-45d8-7de2-8910-1732cff820cb",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/AN-22.codex.md",
+      "result_path": "art/imagegen/anim-move-sheet-codex/",
+      "status": "ok",
+      "note": "CX-24 прогон 1; 2026-10-07 01:17-01:27 +05:00 (~10 мин); процедурный лист шага 1920x1080: две дорожки (King Arthur, Harpy) по 6 поз из левых тайлов Idle, наклон 10° вокруг центра основания, график s(t) ease/linear, пыль 560-860, полосы x0,5/x1/x1,5 и snap; генераций image_gen 0; 26+ проверок PASS, source_unchanged 1509 файлов; ревью Claude: fix-needed — нет manifest-sha256.json и prompts/, verification.json без ключей 07 §1.2 (exports, palette, gray, sizes, acceptance), на листе нет ключа стрелок facing -> fix1"
+    },
+    {
+      "date": "2026-10-07T01:39:00+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle)",
+      "template": "T-CODEX-ANIMSHEET",
+      "task_id": "AN-22",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a112e9-7df1-7111-94c0-3d370969aa8b",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/AN-22.fix1.codex.md",
+      "result_path": "art/imagegen/anim-move-sheet-codex/",
+      "status": "ok",
+      "note": "CX-24 fix1 (единственный корректирующий прогон); 2026-10-07 01:31-01:39 +05:00 (~8 мин); manifest-sha256.json вместо manifest.json, prompts/AN-22-prompts.json, verification.json с ключами 07 §1.2 (exports, palette 0, gray, sizes, acceptance 8/8), 1280x720 отрисован нативно (960x540 удалён), ключ стрелок facing в строке легенды; мастер вне легенды пиксельно тот же; наклон по пикселям 10,34°/10,78°; ревью Claude: accept по делегированию (ВР-VS3-AN22-01)"
     }
   ],
   "totals": {
     "syntx_spent": 0,
     "tripo_spent": 0,
-    "codex_packages": 42
+    "codex_packages": 44
   }
 }

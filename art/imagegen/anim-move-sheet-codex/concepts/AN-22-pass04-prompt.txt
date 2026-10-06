@@ -1,0 +1,69 @@
+Task AN-22 fix1 - corrective run for the package art/imagegen/anim-move-sheet-codex/ (CX-24).
+First read docs/game-design/visual/06-tasks/prompts/AN-22.codex.md (the base task: package contract, timing,
+keyframes, palette, acceptance), then the package README.md, verification.json, _tools/build_step_sheet.py and
+_tools/verify_package.py. Everything in the base task still applies unless this file says otherwise. The review
+accepted the sheet itself: the layout, the two lanes, the six poses and their 10 deg lean, the time bars, the s(t)
+graph, the dust row, the speed lanes, the reduced lane, every number and the README number table. Change only what
+the three points below need; the drawing stays pixel-identical except for the legend line of Fix 3.
+
+Package contract (unchanged).
+- Write ONLY inside art/imagegen/anim-move-sheet-codex/ and scraped-data/derived/anim-move-sheet-codex/. Nothing else
+  on disk changes. No git commands at all. Do not open, edit or build anything under unreal/. No image generation.
+- Do not edit art/imagegen/hud-icons-v3/ or other packages under art/imagegen/ (other sessions may write other
+  packages during your run; they are not inputs and not yours - do not report them as your changes).
+- Do not re-capture source-hashes-before.json; re-check the input and hud-icons-v3 hashes against it at the end.
+- Before changing anything, write fix1-before.json in the package folder: sha256 of every current file of the package
+  (vector/, comparison/, concepts/, manifest.json, verification.json, README.md). Keep concepts/ passes 01-03
+  unchanged; save the new final as concepts/AN-22-step-sheet-pass04.png with its prompt file and add a
+  generation-records.json entry (key AN-22/fix1-pass04, selected true; pass03 becomes selected false).
+
+Fix 1 - package files of the contract (07 §1.1).
+- manifest-sha256.json: sha256 and byte size of every file in the package folder and in
+  scraped-data/derived/anim-move-sheet-codex/, except itself; it is written last, after README.md and
+  verification.json. It replaces manifest.json: delete manifest.json and point verification.output_manifest and
+  README to the new name.
+- prompts/: prompts/AN-22-prompts.json maps a key to the verbatim text: "AN-22/task" = the Task text of AN-22.codex.md,
+  "AN-22/fix1" = the Task text of this file, and one key per concepts pass (pass01-pass04) with the exact prompt text of
+  that pass. The concepts/*-prompt.txt files may stay.
+
+Fix 2 - verification.json in the 07 §1.2 format. Keep every existing key; add:
+- exports: for every PNG in vector/ and comparison/: path, size, mode (RGBA), margin_px (smallest distance from any
+  pixel that differs from the background #061623 - or its grey value - to the canvas edge), touches_edge (bool).
+- palette: for the colour master: the share of opaque pixels farther than dE76 3 from every token of the card
+  (#061623, #F9EBDB, #111317, #F2EDE4, #B9B2A6, #F2C14E, #FFC857), with anti-aliased edge pixels excluded (a pixel is an
+  edge pixel when its 3x3 neighbourhood is not one colour); the share must be 0; write the count of edge pixels
+  excluded and the tokens with their pixel counts.
+- gray: for every colour file its Rec.709 grey pair; and the pairs that must stay apart in grey, with the measurement:
+  ease curve vs linear legacy curve (solid vs dashed: number of dash gaps along the dashed curve, none along the solid
+  one), the x1 lane vs the x0.5 and x1.5 lanes (luma difference of the bar fill), the EASE-IN / EASE-OUT bars vs the
+  linear bar (luma difference); a pair passes with a luma difference >= 20 or a shape difference that you name.
+- sizes: master 1920x1080 and the working copy 1280x720 are present. 07 §5.2 forbids downscaling the master for a
+  working size: render the 1280x720 colour and grey copies natively from the same drawing code at that size (the
+  builder already draws at an internal SCALE; set the scale so the canvas is 1280x720), not by resizing the master.
+  Drop the 960x540 copies (an overview size is not a working size of this sheet) or render them natively too; write
+  which. Record downscaled_from_master: false for every working copy.
+- acceptance: one record {passed, measured, expected, note} for each line of the card acceptance:
+  1) phases sum to 560 ms to the arrival and 710 ms with the settle (tolerance 42 ms);
+  2) s(80 ms) = 1/6 of the first edge;
+  3) no stop at the vertex (smallest speed between 80 and 480 ms, measured on the timing contract);
+  4) lean 10 deg visible on the silhouettes: measure it on the rendered master (the axis angle of each leaned pose
+     minus the axis angle of the idle pose of the same lane, from the drawn pixels, not from the transform matrix;
+     tolerance 1 deg) and no hop (the base line y of all twelve poses equal);
+  5) no pose with the back to the camera (the facing arrows of all twelve poses within 90 deg of the camera direction,
+     idle poses within 45 deg);
+  6) every number has its source in README: list every number drawn on the sheet (from text-bounds.json) and the README
+     row that gives its source; unmatched numbers = 0;
+  7) colour and grayscale sheets exist (master and 1280x720);
+  8) verification.json has source_unchanged true and outside_folder [].
+
+Fix 3 - the facing arrows have no key on the sheet. Under each pose a grey arrow and a yellow arrow show the camera
+axis and the facing, but the sheet never says which is which; the legend line «Камера вниз · idle ≤ 45° · ход к цели ·
+спиной — никогда» does not name the arrows. Replace that line (same place, y about 660-675, same 16 px Roboto Regular
+#B9B2A6, it must not touch the Harpy arrows above or the graph frame below) with a key that draws the two arrow
+samples inline: «[grey arrow] ось камеры (камера внизу) · [yellow arrow] куда смотрит фигура · покой ≤ 45° от оси
+камеры · спиной к камере — никогда». The arrow samples use the same stroke, colour and head as the pose arrows. If the
+line does not fit between x 1000 and 1870, start it at x 260 (the graph left edge) instead. No other drawing changes.
+
+After the fixes: open (view) the new colour and grey master and the native 1280x720 colour and grey copies yourself,
+update verification.visual_review, run verify_package.py, then write manifest-sha256.json last. In README add a
+section «Исправления fix1» (what changed, before -> after) and keep the status «предложено».
