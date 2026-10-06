@@ -1,0 +1,86 @@
+{
+  "schema": "unmatched.visual-credits-ledger/1",
+  "title": "Журнал трат визуального чата (фаза 3)",
+  "created": "2026-10-06",
+  "owner": "визуальный чат; схема — docs/game-design/visual/07-prompt-templates.md §4; план и правила записи — docs/game-design/visual/05-production-plan.md §5",
+  "status": "пустой: трат нет",
+  "writer": {
+    "rule": "Запись — сразу после каждой траты, до следующей (07 §4.1). Трат без карточки 06-tasks нет. balance_before — всегда свежий get-balance или баланс в UI Tripo, без id аккаунта. Ручная правка — только с пометкой в note.",
+    "script": "tools/art/visual/ledger.py add / check (05 ВР-PL13: пишется в VS-1, шаг 0; до него трат SYNTX нет)"
+  },
+  "limits": {
+    "syntx": {
+      "tokens": 300,
+      "until": "2026-10-28",
+      "source": "ВР-04",
+      "stopBalance": 20,
+      "balanceAtDecision": {
+        "value": 478,
+        "date": "2026-10-05",
+        "source": "ВР-04"
+      },
+      "perRun": {
+        "image": 8,
+        "video": 10,
+        "upscale": 12,
+        "source": "ВР-PR04"
+      },
+      "visualCap": 54,
+      "visualCapSource": "ВР-PL10: без нового решения визуал тратит не больше 54 токенов; ожидаемо 24 (EN-03)"
+    },
+    "tripo": {
+      "credits": 3000,
+      "until": "2026-10-28",
+      "source": "ВР-04",
+      "plannedMvp": 0,
+      "note": "ростер после MVP вне объёма (ВР-18)"
+    },
+    "codex": {
+      "unit": "пакет",
+      "note": "подписка, токены не считаются; строка на пакет: units «пакет, N генераций image_gen», cost и балансы null"
+    },
+    "purchases": "нет: кредиты, подписки и паки не покупаются (ВР-04)"
+  },
+  "balances": [
+    {
+      "service": "SYNTX",
+      "date": "2026-10-05",
+      "balance": 478,
+      "source": "ВР-04"
+    },
+    {
+      "service": "SYNTX",
+      "date": "2026-10-06",
+      "balance": 210.131,
+      "source": "07-prompt-templates.md §2.2 (get-balance)"
+    },
+    {
+      "service": "SYNTX",
+      "date": "2026-10-06T05:40:10+05:00",
+      "balance": 173.771,
+      "source": "старый журнал s3-baseline, последняя строка (AUC-V05, аудио-чат)"
+    }
+  ],
+  "sharedBalance": "Баланс SYNTX общий с аудио-чатом. Разрыв между balance_after прошлой строки и balance_before новой — чужая трата; её здесь не записываем (07 §4.1).",
+  "olderLedgers": [
+    {
+      "path": "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json",
+      "schema": "unmatched.credits-ledger/1",
+      "what": "общая история SYNTX и Tripo до 2026-10-05, видео-референсы героев, звук (AUC-*); пишут tools/art/syntx_video_refs/ledger_append.py и tools/audio/ledger.py",
+      "rule": "визуальный чат туда не пишет и его не заменяет (ВР-PR06)"
+    },
+    {
+      "path": "docs/art-pipeline/evidence/ENV-MAPS/credits-ledger-env.json",
+      "schema": "unmatched.credits-ledger-slice/1",
+      "what": "Tripo трека ENV-MAPS",
+      "rule": "визуальный чат туда не пишет (ВР-PR06)"
+    }
+  ],
+  "providerTerms": [],
+  "entries": [],
+  "totals": {
+    "syntx_spent": 0,
+    "tripo_spent": 0,
+    "codex_packages": 0
+  }
+}
