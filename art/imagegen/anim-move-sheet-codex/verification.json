@@ -1,0 +1,2358 @@
+{
+  "task": "AN-22",
+  "status": "предложено",
+  "source_unchanged": true,
+  "changed_sources": [],
+  "source_files_checked": 1509,
+  "hud_tree_files_checked": 1499,
+  "outside_folder": [],
+  "outside_folder_scope": "Writes performed by this task, confined by an audit hook to package and permitted derived folder. No audit of other sessions.",
+  "checks": {
+    "input_card_hashes_match": true,
+    "arrival_560_ms": true,
+    "settle_710_ms": true,
+    "phases_sum_560_ms": true,
+    "phases_with_settle_sum_710_ms": true,
+    "s40_first_edge_1_24": true,
+    "s80_first_edge_1_6": true,
+    "no_stop_at_vertex": true,
+    "ease_out_start_480_ms": true,
+    "single_edge_k_1_200": true,
+    "single_edge_endpoints": true,
+    "single_edge_ease_out_200_ms": true,
+    "scaled_ease_edges": true,
+    "speed_arrivals_280_560_840_ms": true,
+    "lean_reaches_10_deg_in_60_ms": true,
+    "ground_hop_0": true,
+    "dust_duration_300_ms": true,
+    "master_1920_1080_RGBA": true,
+    "palette_values_exact": true,
+    "snapshot_unchanged": true,
+    "all_text_inside_canvas": true,
+    "silhouettes_from_side_tiles_only": true,
+    "no_back_view_used": true,
+    "idle_facing_diagram_le_45_degrees": true,
+    "source_unchanged": true,
+    "comparison_working_sizes_Rec709_exact": true,
+    "pixel_identical_outside_legend": true,
+    "palette_off_token_share_zero": true,
+    "native_working_size": true,
+    "eight_acceptance_records_pass": true,
+    "gray_distinctions_pass": true,
+    "exports_have_margin": true
+  },
+  "all_automated_checks_pass": true,
+  "comparison_files": [
+    {
+      "color": "comparison\\AN-22-step-sheet-color.png",
+      "gray": "comparison\\AN-22-step-sheet-gray.png",
+      "size": [
+        1920,
+        1080
+      ],
+      "RGBA": true,
+      "Rec709_exact": true
+    },
+    {
+      "color": "comparison\\AN-22-step-sheet-color-1280x720.png",
+      "gray": "comparison\\AN-22-step-sheet-gray-1280x720.png",
+      "size": [
+        1280,
+        720
+      ],
+      "RGBA": true,
+      "Rec709_exact": true
+    }
+  ],
+  "limitations": [
+    {
+      "kind": "projection",
+      "text": "Left-tile silhouettes are side-view analytical glyphs, not synthesized three-quarter renders. Camera-relative yaw is communicated by adjacent facing diagrams; real 3D turn appearance cannot be established from one side tile."
+    },
+    {
+      "kind": "source",
+      "text": "Supplied neutral Blender sheets contain bone annotations. Silhouettes are threshold-traced with annotation masking and small-gap closure; no original hero texture or scan is included in package images."
+    },
+    {
+      "kind": "scope",
+      "text": "No runtime animation, full path scheduling or Unreal acceptance is tested; this deliverable is a static procedural timing proposal."
+    }
+  ],
+  "unmet_requirements": [],
+  "visual_review": {
+    "status": "passed",
+    "method": "Opened and inspected new color/Rec.709 masters and both native 1280x720 exports with view_image; final pass04.",
+    "images": [
+      "vector/AN-22-step-sheet.png",
+      "comparison/AN-22-step-sheet-gray.png",
+      "comparison/AN-22-step-sheet-color-1280x720.png",
+      "comparison/AN-22-step-sheet-gray-1280x720.png"
+    ],
+    "checks": {
+      "silhouettes_identifiable": true,
+      "source_background_removed": true,
+      "bone_overlay_removed": true,
+      "bases_flat_and_grounded": true,
+      "lean_visible": true,
+      "camera_facing_rule_diagrams_visible": true,
+      "no_back_view": true,
+      "dust_end_cell_timing": true,
+      "text_readable_master": true,
+      "color_grayscale_line_types_distinct": true,
+      "arrow_legend_samples_identified": true,
+      "legend_clear_of_harpy_arrows_and_graph": true,
+      "native_working_copies_inspected": true,
+      "accepted_drawing_preserved_except_legend": true
+    },
+    "working_size_limit": "Native 1280x720 preserves readable labels with coarser thin contours; 960x540 dropped.",
+    "source_proofs": [
+      "scraped-data/derived/anim-move-sheet-codex/KingArthur-trace-proof.png",
+      "scraped-data/derived/anim-move-sheet-codex/Harpy-trace-proof.png"
+    ]
+  },
+  "generation": {
+    "image_generation_calls": 0,
+    "character_generation": false,
+    "method": "scripted source tracing and procedural drawing"
+  },
+  "processes_started_in_background": [],
+  "numeric_samples": {
+    "0": {
+      "s": 0.0,
+      "v_edges_per_ms": 0.0,
+      "lean_degrees": 0.0
+    },
+    "40": {
+      "s": 0.041666666666666664,
+      "v_edges_per_ms": 0.0020833333333333333,
+      "lean_degrees": 6.666666666666667
+    },
+    "50": {
+      "s": 0.06510416666666667,
+      "v_edges_per_ms": 0.002604166666666667,
+      "lean_degrees": 8.333333333333334
+    },
+    "60": {
+      "s": 0.09375,
+      "v_edges_per_ms": 0.003125,
+      "lean_degrees": 10.0
+    },
+    "80": {
+      "s": 0.16666666666666666,
+      "v_edges_per_ms": 0.004166666666666667,
+      "lean_degrees": 10.0
+    },
+    "280": {
+      "s": 1.0,
+      "v_edges_per_ms": 0.004166666666666667,
+      "lean_degrees": 10.0
+    },
+    "400": {
+      "s": 1.5,
+      "v_edges_per_ms": 0.004166666666666667,
+      "lean_degrees": 10.0
+    },
+    "480": {
+      "s": 1.8333333333333335,
+      "v_edges_per_ms": 0.004166666666666667,
+      "lean_degrees": 10.0
+    },
+    "560": {
+      "s": 2.0,
+      "v_edges_per_ms": 0.0,
+      "lean_degrees": 10.0
+    },
+    "710": {
+      "s": 2.0,
+      "v_edges_per_ms": 0.0,
+      "lean_degrees": 0
+    },
+    "860": {
+      "s": 2.0,
+      "v_edges_per_ms": 0.0,
+      "lean_degrees": 0
+    }
+  },
+  "ground_contract": {
+    "hop": 0,
+    "pedestal_rotation_degrees": 0,
+    "pedestal_ground_y": {
+      "KingArthur": 455,
+      "Harpy": 620
+    }
+  },
+  "silhouette_transform": {
+    "method": "reflected side mask, rigid rotation around original base center; pedestal drawn separately flat; cropped at ground support",
+    "max_rotation_degrees": 10
+  },
+  "reviewed_final_sha256": "c6f840e8a05b8cf39c22178b2d5a008be14e290aa513a570d429b74313e65d28",
+  "failures_resolved": [
+    {
+      "pass": 1,
+      "issue": "Arthur root annotation fragment above head",
+      "resolution": "wider color classification"
+    },
+    {
+      "pass": 2,
+      "issue": "Harpy wing split by post-threshold bone erasure",
+      "resolution": "nearest unobscured source-pixel reconstruction before thresholding in pass 3"
+    }
+  ],
+  "readme": "README.md",
+  "independent_verification": "independent-verification.json",
+  "independent_checks_summary": {
+    "checks": 59,
+    "all_pass": true
+  },
+  "output_manifest": "manifest-sha256.json",
+  "fix1": {
+    "compared_with": "concepts/AN-22-step-sheet-pass03.png",
+    "changed_pixels": 13485,
+    "difference_bounds_xyxy": [
+      261,
+      657,
+      1436,
+      681
+    ],
+    "allowed_legend_strip_y": [
+      657,
+      681
+    ],
+    "outside_legend_changed_pixels": 0,
+    "concepts_01_03_unchanged": true,
+    "source_hashes_before_unchanged": true
+  },
+  "exports": [
+    {
+      "path": "vector/AN-22-step-sheet.png",
+      "size": [
+        1920,
+        1080
+      ],
+      "mode": "RGBA",
+      "margin_px": 12,
+      "touches_edge": false
+    },
+    {
+      "path": "comparison/AN-22-step-sheet-color-1280x720.png",
+      "size": [
+        1280,
+        720
+      ],
+      "mode": "RGBA",
+      "margin_px": 8,
+      "touches_edge": false
+    },
+    {
+      "path": "comparison/AN-22-step-sheet-color.png",
+      "size": [
+        1920,
+        1080
+      ],
+      "mode": "RGBA",
+      "margin_px": 12,
+      "touches_edge": false
+    },
+    {
+      "path": "comparison/AN-22-step-sheet-gray-1280x720.png",
+      "size": [
+        1280,
+        720
+      ],
+      "mode": "RGBA",
+      "margin_px": 8,
+      "touches_edge": false
+    },
+    {
+      "path": "comparison/AN-22-step-sheet-gray.png",
+      "size": [
+        1920,
+        1080
+      ],
+      "mode": "RGBA",
+      "margin_px": 12,
+      "touches_edge": false
+    }
+  ],
+  "palette": {
+    "method": "CIELAB D65, sRGB decoding, dE76; opaque only; exclude nonuniform 3x3 RGBA neighbourhoods",
+    "threshold_dE76": 3,
+    "opaque_pixels": 2073600,
+    "edge_pixels_excluded": 456240,
+    "eligible_pixels": 1617360,
+    "off_palette_pixels": 0,
+    "off_palette_share": 0.0,
+    "tokens": [
+      {
+        "hex": "#061623",
+        "pixel_count": 1618719,
+        "eligible_pixel_count": 1530419
+      },
+      {
+        "hex": "#F9EBDB",
+        "pixel_count": 55375,
+        "eligible_pixel_count": 45798
+      },
+      {
+        "hex": "#111317",
+        "pixel_count": 225,
+        "eligible_pixel_count": 0
+      },
+      {
+        "hex": "#F2EDE4",
+        "pixel_count": 456,
+        "eligible_pixel_count": 12
+      },
+      {
+        "hex": "#B9B2A6",
+        "pixel_count": 31889,
+        "eligible_pixel_count": 26229
+      },
+      {
+        "hex": "#F2C14E",
+        "pixel_count": 18523,
+        "eligible_pixel_count": 14902
+      },
+      {
+        "hex": "#FFC857",
+        "pixel_count": 6,
+        "eligible_pixel_count": 0
+      }
+    ]
+  },
+  "gray": {
+    "method": "Rec.709 encoded RGB: round(.2126R+.7152G+.0722B), preserve alpha",
+    "pairs": [
+      {
+        "color": "vector/AN-22-step-sheet.png",
+        "gray": "comparison/AN-22-step-sheet-gray.png",
+        "Rec709_exact": true,
+        "passed": true
+      },
+      {
+        "color": "comparison/AN-22-step-sheet-color-1280x720.png",
+        "gray": "comparison/AN-22-step-sheet-gray-1280x720.png",
+        "Rec709_exact": true,
+        "passed": true
+      },
+      {
+        "color": "comparison/AN-22-step-sheet-color.png",
+        "gray": "comparison/AN-22-step-sheet-gray.png",
+        "Rec709_exact": true,
+        "passed": true
+      }
+    ],
+    "distinguishable_pairs": [
+      {
+        "pair": "ease curve / linear legacy curve",
+        "shape_difference": "solid / dashed",
+        "dash_gaps": 34,
+        "solid_gaps": 0,
+        "sample_windows": [
+          {
+            "time_ms": [
+              32,
+              199
+            ],
+            "gap_runs_samples": [
+              3,
+              3,
+              3,
+              2,
+              2,
+              2,
+              2,
+              3,
+              3,
+              2,
+              3,
+              2,
+              3,
+              2,
+              2,
+              2
+            ]
+          },
+          {
+            "time_ms": [
+              361,
+              528
+            ],
+            "gap_runs_samples": [
+              2,
+              2,
+              3,
+              2,
+              3,
+              3,
+              3,
+              2,
+              2,
+              2,
+              2,
+              3,
+              3,
+              3,
+              2,
+              3,
+              3,
+              3
+            ]
+          }
+        ],
+        "method": "Read rendered grey pixels along analytic centreline: dash band luma 100..190 in radius 1; solid luma 195 +/-12 in radius 4. Ignore occluded/overlapping portions; count >=2 consecutive missing samples",
+        "passed": true
+      },
+      {
+        "pair": "x1 / x0.5",
+        "sample_pixels": [
+          [
+            300,
+            932
+          ],
+          [
+            300,
+            895
+          ]
+        ],
+        "fill_luma": [
+          195,
+          179
+        ],
+        "luma_difference": 16,
+        "minimum": 20,
+        "passed": true,
+        "shape_difference": "different bar lengths and vertex/arrival positions on the shared time axis",
+        "bar_fill_spans_px": [
+          [
+            509,
+            508
+          ],
+          [
+            251,
+            251
+          ]
+        ]
+      },
+      {
+        "pair": "x1 / x1.5",
+        "sample_pixels": [
+          [
+            300,
+            932
+          ],
+          [
+            300,
+            969
+          ]
+        ],
+        "fill_luma": [
+          195,
+          179
+        ],
+        "luma_difference": 16,
+        "minimum": 20,
+        "passed": true,
+        "shape_difference": "different bar lengths and vertex/arrival positions on the shared time axis",
+        "bar_fill_spans_px": [
+          [
+            509,
+            508
+          ],
+          [
+            767,
+            766
+          ]
+        ]
+      },
+      {
+        "pair": "EASE-IN / linear",
+        "sample_pixels": [
+          [
+            310,
+            196
+          ],
+          [
+            600,
+            196
+          ]
+        ],
+        "fill_luma": [
+          195,
+          237
+        ],
+        "luma_difference": 42,
+        "minimum": 20,
+        "passed": true
+      },
+      {
+        "pair": "EASE-OUT / linear",
+        "sample_pixels": [
+          [
+            1200,
+            196
+          ],
+          [
+            600,
+            196
+          ]
+        ],
+        "fill_luma": [
+          195,
+          237
+        ],
+        "luma_difference": 42,
+        "minimum": 20,
+        "passed": true
+      }
+    ]
+  },
+  "sizes": {
+    "master": {
+      "size": [
+        1920,
+        1080
+      ],
+      "present": true
+    },
+    "working": [
+      {
+        "size": [
+          1280,
+          720
+        ],
+        "color": "comparison/AN-22-step-sheet-color-1280x720.png",
+        "gray": "comparison/AN-22-step-sheet-gray-1280x720.png",
+        "render_scale": 0.6666666666666666,
+        "canvas_size": [
+          1280,
+          720
+        ],
+        "downscaled_from_master": false,
+        "method": "Fresh Canvas, same build(), SCALE=2/3; no resize of master or native canvas"
+      }
+    ],
+    "overview_960x540": "dropped (not a working size)"
+  },
+  "acceptance": {
+    "1_phases": {
+      "passed": true,
+      "measured": {
+        "arrival_ms": 560,
+        "with_settle_ms": 710
+      },
+      "expected": {
+        "arrival_ms": 560,
+        "with_settle_ms": 710,
+        "tolerance_ms": 42
+      },
+      "note": "Durations are parallel with turning/lean; sum timing-contract phases."
+    },
+    "2_s80": {
+      "passed": true,
+      "measured": 0.16666666666666666,
+      "expected": "1/6 first edge",
+      "note": "Closed-form ease-in on the contract."
+    },
+    "3_vertex": {
+      "passed": true,
+      "measured": {
+        "smallest_speed_80_480_edges_per_ms": 0.004166666666666667,
+        "vertex_before": 0.004166666666666667,
+        "vertex_after": 0.004166666666666667
+      },
+      "expected": ">0, continuous",
+      "note": "Both contract edges have constant middle speed over 80..480 ms."
+    },
+    "4_lean_no_hop": {
+      "passed": true,
+      "measured": {
+        "poses": [
+          {
+            "hero": "KingArthur",
+            "time_ms": 0,
+            "body_cream_pixels": 1964,
+            "axis_degrees_from_vertical": -5.672329005781443,
+            "idle_axis_degrees": -5.672329005781443,
+            "relative_lean_degrees": 0.0,
+            "expected_lean_degrees": 0,
+            "pedestal_bottom_cream_y": 451,
+            "baseline_y": 456,
+            "baseline_raster_present": true,
+            "camera_relative_facing_degrees": 45.0,
+            "facing_ridge_pixels": [
+              [
+                5,
+                5.0
+              ],
+              [
+                6,
+                6.0
+              ],
+              [
+                7,
+                7.0
+              ],
+              [
+                8,
+                8.0
+              ],
+              [
+                9,
+                9.0
+              ],
+              [
+                10,
+                10.0
+              ],
+              [
+                11,
+                11.0
+              ],
+              [
+                12,
+                12.0
+              ]
+            ],
+            "idle": true
+          },
+          {
+            "hero": "KingArthur",
+            "time_ms": 60,
+            "body_cream_pixels": 1928,
+            "axis_degrees_from_vertical": 4.666240259491828,
+            "idle_axis_degrees": -5.672329005781443,
+            "relative_lean_degrees": 10.338569265273271,
+            "expected_lean_degrees": 10,
+            "pedestal_bottom_cream_y": 451,
+            "baseline_y": 456,
+            "baseline_raster_present": true,
+            "camera_relative_facing_degrees": 90.0,
+            "facing_ridge_pixels": [
+              [
+                5,
+                0.0
+              ],
+              [
+                6,
+                0.0
+              ],
+              [
+                7,
+                0.0
+              ],
+              [
+                8,
+                0.0
+              ],
+              [
+                9,
+                0.0
+              ],
+              [
+                10,
+                0.0
+              ],
+              [
+                11,
+                0.0
+              ],
+              [
+                12,
+                0.0
+              ]
+            ],
+            "idle": false
+          },
+          {
+            "hero": "KingArthur",
+            "time_ms": 280,
+            "body_cream_pixels": 1928,
+            "axis_degrees_from_vertical": 4.666240259491828,
+            "idle_axis_degrees": -5.672329005781443,
+            "relative_lean_degrees": 10.338569265273271,
+            "expected_lean_degrees": 10,
+            "pedestal_bottom_cream_y": 451,
+            "baseline_y": 456,
+            "baseline_raster_present": true,
+            "camera_relative_facing_degrees": 90.0,
+            "facing_ridge_pixels": [
+              [
+                5,
+                0.0
+              ],
+              [
+                6,
+                0.0
+              ],
+              [
+                7,
+                0.0
+              ],
+              [
+                8,
+                0.0
+              ],
+              [
+                9,
+                0.0
+              ],
+              [
+                10,
+                0.0
+              ],
+              [
+                11,
+                0.0
+              ],
+              [
+                12,
+                0.0
+              ]
+            ],
+            "idle": false
+          },
+          {
+            "hero": "KingArthur",
+            "time_ms": 480,
+            "body_cream_pixels": 1928,
+            "axis_degrees_from_vertical": 4.666240259491828,
+            "idle_axis_degrees": -5.672329005781443,
+            "relative_lean_degrees": 10.338569265273271,
+            "expected_lean_degrees": 10,
+            "pedestal_bottom_cream_y": 451,
+            "baseline_y": 456,
+            "baseline_raster_present": true,
+            "camera_relative_facing_degrees": 45.0,
+            "facing_ridge_pixels": [
+              [
+                5,
+                5.0
+              ],
+              [
+                6,
+                6.0
+              ],
+              [
+                7,
+                7.0
+              ],
+              [
+                8,
+                8.0
+              ],
+              [
+                9,
+                9.0
+              ],
+              [
+                10,
+                10.0
+              ],
+              [
+                11,
+                11.0
+              ],
+              [
+                12,
+                12.0
+              ]
+            ],
+            "idle": false
+          },
+          {
+            "hero": "KingArthur",
+            "time_ms": 560,
+            "body_cream_pixels": 1928,
+            "axis_degrees_from_vertical": 4.666240259491828,
+            "idle_axis_degrees": -5.672329005781443,
+            "relative_lean_degrees": 10.338569265273271,
+            "expected_lean_degrees": 10,
+            "pedestal_bottom_cream_y": 451,
+            "baseline_y": 456,
+            "baseline_raster_present": true,
+            "camera_relative_facing_degrees": 45.0,
+            "facing_ridge_pixels": [
+              [
+                5,
+                5.0
+              ],
+              [
+                6,
+                6.0
+              ],
+              [
+                7,
+                7.0
+              ],
+              [
+                8,
+                8.0
+              ],
+              [
+                9,
+                9.0
+              ],
+              [
+                10,
+                10.0
+              ],
+              [
+                11,
+                11.0
+              ],
+              [
+                12,
+                12.0
+              ]
+            ],
+            "idle": false
+          },
+          {
+            "hero": "KingArthur",
+            "time_ms": 710,
+            "body_cream_pixels": 1964,
+            "axis_degrees_from_vertical": -5.672329005781443,
+            "idle_axis_degrees": -5.672329005781443,
+            "relative_lean_degrees": 0.0,
+            "expected_lean_degrees": 0,
+            "pedestal_bottom_cream_y": 451,
+            "baseline_y": 456,
+            "baseline_raster_present": true,
+            "camera_relative_facing_degrees": 45.0,
+            "facing_ridge_pixels": [
+              [
+                5,
+                5.0
+              ],
+              [
+                6,
+                6.0
+              ],
+              [
+                7,
+                7.0
+              ],
+              [
+                8,
+                8.0
+              ],
+              [
+                9,
+                9.0
+              ],
+              [
+                10,
+                10.0
+              ],
+              [
+                11,
+                11.0
+              ],
+              [
+                12,
+                12.0
+              ]
+            ],
+            "idle": true
+          },
+          {
+            "hero": "Harpy",
+            "time_ms": 0,
+            "body_cream_pixels": 4318,
+            "axis_degrees_from_vertical": 55.262483017661445,
+            "idle_axis_degrees": 55.262483017661445,
+            "relative_lean_degrees": 0.0,
+            "expected_lean_degrees": 0,
+            "pedestal_bottom_cream_y": 616,
+            "baseline_y": 621,
+            "baseline_raster_present": true,
+            "camera_relative_facing_degrees": 45.0,
+            "facing_ridge_pixels": [
+              [
+                5,
+                5.0
+              ],
+              [
+                6,
+                6.0
+              ],
+              [
+                7,
+                7.0
+              ],
+              [
+                8,
+                8.0
+              ],
+              [
+                9,
+                9.0
+              ],
+              [
+                10,
+                10.0
+              ],
+              [
+                11,
+                11.0
+              ],
+              [
+                12,
+                12.0
+              ]
+            ],
+            "idle": true
+          },
+          {
+            "hero": "Harpy",
+            "time_ms": 60,
+            "body_cream_pixels": 4299,
+            "axis_degrees_from_vertical": 66.04357618562831,
+            "idle_axis_degrees": 55.262483017661445,
+            "relative_lean_degrees": 10.781093167966866,
+            "expected_lean_degrees": 10,
+            "pedestal_bottom_cream_y": 616,
+            "baseline_y": 621,
+            "baseline_raster_present": true,
+            "camera_relative_facing_degrees": 90.0,
+            "facing_ridge_pixels": [
+              [
+                5,
+                0.0
+              ],
+              [
+                6,
+                0.0
+              ],
+              [
+                7,
+                0.0
+              ],
+              [
+                8,
+                0.0
+              ],
+              [
+                9,
+                0.0
+              ],
+              [
+                10,
+                0.0
+              ],
+              [
+                11,
+                0.0
+              ],
+              [
+                12,
+                0.0
+              ]
+            ],
+            "idle": false
+          },
+          {
+            "hero": "Harpy",
+            "time_ms": 280,
+            "body_cream_pixels": 4299,
+            "axis_degrees_from_vertical": 66.04357618562831,
+            "idle_axis_degrees": 55.262483017661445,
+            "relative_lean_degrees": 10.781093167966866,
+            "expected_lean_degrees": 10,
+            "pedestal_bottom_cream_y": 616,
+            "baseline_y": 621,
+            "baseline_raster_present": true,
+            "camera_relative_facing_degrees": 90.0,
+            "facing_ridge_pixels": [
+              [
+                5,
+                0.0
+              ],
+              [
+                6,
+                0.0
+              ],
+              [
+                7,
+                0.0
+              ],
+              [
+                8,
+                0.0
+              ],
+              [
+                9,
+                0.0
+              ],
+              [
+                10,
+                0.0
+              ],
+              [
+                11,
+                0.0
+              ],
+              [
+                12,
+                0.0
+              ]
+            ],
+            "idle": false
+          },
+          {
+            "hero": "Harpy",
+            "time_ms": 480,
+            "body_cream_pixels": 4299,
+            "axis_degrees_from_vertical": 66.04357618562831,
+            "idle_axis_degrees": 55.262483017661445,
+            "relative_lean_degrees": 10.781093167966866,
+            "expected_lean_degrees": 10,
+            "pedestal_bottom_cream_y": 616,
+            "baseline_y": 621,
+            "baseline_raster_present": true,
+            "camera_relative_facing_degrees": 45.0,
+            "facing_ridge_pixels": [
+              [
+                5,
+                5.0
+              ],
+              [
+                6,
+                6.0
+              ],
+              [
+                7,
+                7.0
+              ],
+              [
+                8,
+                8.0
+              ],
+              [
+                9,
+                9.0
+              ],
+              [
+                10,
+                10.0
+              ],
+              [
+                11,
+                11.0
+              ],
+              [
+                12,
+                12.0
+              ]
+            ],
+            "idle": false
+          },
+          {
+            "hero": "Harpy",
+            "time_ms": 560,
+            "body_cream_pixels": 4299,
+            "axis_degrees_from_vertical": 66.04357618562831,
+            "idle_axis_degrees": 55.262483017661445,
+            "relative_lean_degrees": 10.781093167966866,
+            "expected_lean_degrees": 10,
+            "pedestal_bottom_cream_y": 616,
+            "baseline_y": 621,
+            "baseline_raster_present": true,
+            "camera_relative_facing_degrees": 45.0,
+            "facing_ridge_pixels": [
+              [
+                5,
+                5.0
+              ],
+              [
+                6,
+                6.0
+              ],
+              [
+                7,
+                7.0
+              ],
+              [
+                8,
+                8.0
+              ],
+              [
+                9,
+                9.0
+              ],
+              [
+                10,
+                10.0
+              ],
+              [
+                11,
+                11.0
+              ],
+              [
+                12,
+                12.0
+              ]
+            ],
+            "idle": false
+          },
+          {
+            "hero": "Harpy",
+            "time_ms": 710,
+            "body_cream_pixels": 4318,
+            "axis_degrees_from_vertical": 55.262483017661445,
+            "idle_axis_degrees": 55.262483017661445,
+            "relative_lean_degrees": 0.0,
+            "expected_lean_degrees": 0,
+            "pedestal_bottom_cream_y": 616,
+            "baseline_y": 621,
+            "baseline_raster_present": true,
+            "camera_relative_facing_degrees": 45.0,
+            "facing_ridge_pixels": [
+              [
+                5,
+                5.0
+              ],
+              [
+                6,
+                6.0
+              ],
+              [
+                7,
+                7.0
+              ],
+              [
+                8,
+                8.0
+              ],
+              [
+                9,
+                9.0
+              ],
+              [
+                10,
+                10.0
+              ],
+              [
+                11,
+                11.0
+              ],
+              [
+                12,
+                12.0
+              ]
+            ],
+            "idle": true
+          }
+        ],
+        "ground_y_by_lane": {
+          "KingArthur": 456,
+          "Harpy": 621
+        }
+      },
+      "expected": "10 degrees +/-1; 0 idle; six equal base lines per lane",
+      "note": "PCA of exact cream body pixels, same crop per lane; subtract rendered idle axis, never transform matrices. Two separate lanes have distinct sheet y positions; each lane has zero vertical movement."
+    },
+    "5_facing": {
+      "passed": true,
+      "measured": [
+        {
+          "hero": "KingArthur",
+          "time_ms": 0,
+          "yaw_degrees": 45.0,
+          "ridge_pixels": [
+            [
+              5,
+              5.0
+            ],
+            [
+              6,
+              6.0
+            ],
+            [
+              7,
+              7.0
+            ],
+            [
+              8,
+              8.0
+            ],
+            [
+              9,
+              9.0
+            ],
+            [
+              10,
+              10.0
+            ],
+            [
+              11,
+              11.0
+            ],
+            [
+              12,
+              12.0
+            ]
+          ],
+          "idle": true
+        },
+        {
+          "hero": "KingArthur",
+          "time_ms": 60,
+          "yaw_degrees": 90.0,
+          "ridge_pixels": [
+            [
+              5,
+              0.0
+            ],
+            [
+              6,
+              0.0
+            ],
+            [
+              7,
+              0.0
+            ],
+            [
+              8,
+              0.0
+            ],
+            [
+              9,
+              0.0
+            ],
+            [
+              10,
+              0.0
+            ],
+            [
+              11,
+              0.0
+            ],
+            [
+              12,
+              0.0
+            ]
+          ],
+          "idle": false
+        },
+        {
+          "hero": "KingArthur",
+          "time_ms": 280,
+          "yaw_degrees": 90.0,
+          "ridge_pixels": [
+            [
+              5,
+              0.0
+            ],
+            [
+              6,
+              0.0
+            ],
+            [
+              7,
+              0.0
+            ],
+            [
+              8,
+              0.0
+            ],
+            [
+              9,
+              0.0
+            ],
+            [
+              10,
+              0.0
+            ],
+            [
+              11,
+              0.0
+            ],
+            [
+              12,
+              0.0
+            ]
+          ],
+          "idle": false
+        },
+        {
+          "hero": "KingArthur",
+          "time_ms": 480,
+          "yaw_degrees": 45.0,
+          "ridge_pixels": [
+            [
+              5,
+              5.0
+            ],
+            [
+              6,
+              6.0
+            ],
+            [
+              7,
+              7.0
+            ],
+            [
+              8,
+              8.0
+            ],
+            [
+              9,
+              9.0
+            ],
+            [
+              10,
+              10.0
+            ],
+            [
+              11,
+              11.0
+            ],
+            [
+              12,
+              12.0
+            ]
+          ],
+          "idle": false
+        },
+        {
+          "hero": "KingArthur",
+          "time_ms": 560,
+          "yaw_degrees": 45.0,
+          "ridge_pixels": [
+            [
+              5,
+              5.0
+            ],
+            [
+              6,
+              6.0
+            ],
+            [
+              7,
+              7.0
+            ],
+            [
+              8,
+              8.0
+            ],
+            [
+              9,
+              9.0
+            ],
+            [
+              10,
+              10.0
+            ],
+            [
+              11,
+              11.0
+            ],
+            [
+              12,
+              12.0
+            ]
+          ],
+          "idle": false
+        },
+        {
+          "hero": "KingArthur",
+          "time_ms": 710,
+          "yaw_degrees": 45.0,
+          "ridge_pixels": [
+            [
+              5,
+              5.0
+            ],
+            [
+              6,
+              6.0
+            ],
+            [
+              7,
+              7.0
+            ],
+            [
+              8,
+              8.0
+            ],
+            [
+              9,
+              9.0
+            ],
+            [
+              10,
+              10.0
+            ],
+            [
+              11,
+              11.0
+            ],
+            [
+              12,
+              12.0
+            ]
+          ],
+          "idle": true
+        },
+        {
+          "hero": "Harpy",
+          "time_ms": 0,
+          "yaw_degrees": 45.0,
+          "ridge_pixels": [
+            [
+              5,
+              5.0
+            ],
+            [
+              6,
+              6.0
+            ],
+            [
+              7,
+              7.0
+            ],
+            [
+              8,
+              8.0
+            ],
+            [
+              9,
+              9.0
+            ],
+            [
+              10,
+              10.0
+            ],
+            [
+              11,
+              11.0
+            ],
+            [
+              12,
+              12.0
+            ]
+          ],
+          "idle": true
+        },
+        {
+          "hero": "Harpy",
+          "time_ms": 60,
+          "yaw_degrees": 90.0,
+          "ridge_pixels": [
+            [
+              5,
+              0.0
+            ],
+            [
+              6,
+              0.0
+            ],
+            [
+              7,
+              0.0
+            ],
+            [
+              8,
+              0.0
+            ],
+            [
+              9,
+              0.0
+            ],
+            [
+              10,
+              0.0
+            ],
+            [
+              11,
+              0.0
+            ],
+            [
+              12,
+              0.0
+            ]
+          ],
+          "idle": false
+        },
+        {
+          "hero": "Harpy",
+          "time_ms": 280,
+          "yaw_degrees": 90.0,
+          "ridge_pixels": [
+            [
+              5,
+              0.0
+            ],
+            [
+              6,
+              0.0
+            ],
+            [
+              7,
+              0.0
+            ],
+            [
+              8,
+              0.0
+            ],
+            [
+              9,
+              0.0
+            ],
+            [
+              10,
+              0.0
+            ],
+            [
+              11,
+              0.0
+            ],
+            [
+              12,
+              0.0
+            ]
+          ],
+          "idle": false
+        },
+        {
+          "hero": "Harpy",
+          "time_ms": 480,
+          "yaw_degrees": 45.0,
+          "ridge_pixels": [
+            [
+              5,
+              5.0
+            ],
+            [
+              6,
+              6.0
+            ],
+            [
+              7,
+              7.0
+            ],
+            [
+              8,
+              8.0
+            ],
+            [
+              9,
+              9.0
+            ],
+            [
+              10,
+              10.0
+            ],
+            [
+              11,
+              11.0
+            ],
+            [
+              12,
+              12.0
+            ]
+          ],
+          "idle": false
+        },
+        {
+          "hero": "Harpy",
+          "time_ms": 560,
+          "yaw_degrees": 45.0,
+          "ridge_pixels": [
+            [
+              5,
+              5.0
+            ],
+            [
+              6,
+              6.0
+            ],
+            [
+              7,
+              7.0
+            ],
+            [
+              8,
+              8.0
+            ],
+            [
+              9,
+              9.0
+            ],
+            [
+              10,
+              10.0
+            ],
+            [
+              11,
+              11.0
+            ],
+            [
+              12,
+              12.0
+            ]
+          ],
+          "idle": false
+        },
+        {
+          "hero": "Harpy",
+          "time_ms": 710,
+          "yaw_degrees": 45.0,
+          "ridge_pixels": [
+            [
+              5,
+              5.0
+            ],
+            [
+              6,
+              6.0
+            ],
+            [
+              7,
+              7.0
+            ],
+            [
+              8,
+              8.0
+            ],
+            [
+              9,
+              9.0
+            ],
+            [
+              10,
+              10.0
+            ],
+            [
+              11,
+              11.0
+            ],
+            [
+              12,
+              12.0
+            ]
+          ],
+          "idle": true
+        }
+      ],
+      "expected": {
+        "all_max_degrees": 90,
+        "idle_max_degrees": 45
+      },
+      "note": "Median slope of rendered yellow chroma ridge before arrowhead; grey camera shaft points down. Side-projection limitation retained."
+    },
+    "6_number_sources": {
+      "passed": true,
+      "measured": {
+        "readme_section": "Источник каждого числа на листе",
+        "rows": [
+          {
+            "row": 1,
+            "label": "AN-22; CUE-007",
+            "source": "Идентификаторы задания и события из AN-22. Это не числовые параметры движения."
+          },
+          {
+            "row": 2,
+            "label": "0 мс; скорость 0; наклон 0°; подскок 0",
+            "source": "AN-22 Keyframes; VD §8.3: старт, остановка в конце, восстановленный Idle, отсутствие подскока. Для reduced / «Нет» конечная клетка применяется в 0 мс."
+          },
+          {
+            "row": 3,
+            "label": "40 мс; 1/24 первого ребра",
+            "source": "AN-22 Keyframes. Проверка: `(1/240) × 40² / (2 × 80) = 1/24`."
+          },
+          {
+            "row": 4,
+            "label": "≤ 50 мс",
+            "source": "AN-22 Timing и VD §8.3: завершение начального поворота. Полоса занимает 0–50 мс."
+          },
+          {
+            "row": 5,
+            "label": "60 мс; 10°",
+            "source": "AN-22 Timing/Keyframes и VD §8.3: наклон достигнут к 60 мс."
+          },
+          {
+            "row": 6,
+            "label": "80 мс; 1/6 первого ребра",
+            "source": "AN-22 Keyframes и VD §8.3: конец ease-in. `(1/240) × 80 / 2 = 1/6`."
+          },
+          {
+            "row": 7,
+            "label": "1/240 ребра/мс",
+            "source": "AN-22 Timing/Keyframes: `k = 1 / (280 − 80/2)`. Скорость перед вершиной и после неё одна и та же, положительная."
+          },
+          {
+            "row": 8,
+            "label": "280 мс",
+            "source": "AN-22 и VD §8.3: постоянное время ребра при ×1; вершина после первого ребра. Также прибытие по двум рёбрам при ×0,5."
+          },
+          {
+            "row": 9,
+            "label": "120 мс",
+            "source": "AN-22 и VD §8.3: доворот на вершине без остановки. Полоса 280–400 мс; 400 = 280 + 120, отдельная новая длительность не вводится."
+          },
+          {
+            "row": 10,
+            "label": "480 мс",
+            "source": "AN-22 Keyframes: начало ease-out; `560 − 80`."
+          },
+          {
+            "row": 11,
+            "label": "560 мс",
+            "source": "AN-22 Keyframes: прибытие и начало пыли; `280 × 2`."
+          },
+          {
+            "row": 12,
+            "label": "150 мс",
+            "source": "AN-22 Timing и VD §8.3: возвращение наклона к нулю и facing к Idle после прибытия."
+          },
+          {
+            "row": 13,
+            "label": "710 мс",
+            "source": "AN-22 Keyframes: конец settle; `560 + 150`."
+          },
+          {
+            "row": 14,
+            "label": "≤ 45°",
+            "source": "VD §8.3: Idle вполоборота относительно камеры."
+          },
+          {
+            "row": 15,
+            "label": "0, 1, 2 по вертикали s(t)",
+            "source": "AN-22: движение по двум рёбрам. Положение дано в единицах ребра: старт, вершина, конец."
+          },
+          {
+            "row": 16,
+            "label": "300 мс; 560–860 мс; 860 мс",
+            "source": "AN-22 Specific и VD §9.2: пыль только на конечной клетке, `860 = 560 + 300`."
+          },
+          {
+            "row": 17,
+            "label": "×0,5; 140 мс/ребро; прибытие 280 мс",
+            "source": "AN-22 Timing: `280 × 0,5 = 140`, два ребра дают `140 × 2 = 280`. Это множитель длительности, не частоты движения."
+          },
+          {
+            "row": 18,
+            "label": "×1; 280 мс/ребро; прибытие 560 мс",
+            "source": "AN-22 Timing: базовая скорость; два ребра."
+          },
+          {
+            "row": 19,
+            "label": "×1,5; 420 мс/ребро; прибытие 840 мс",
+            "source": "AN-22 Timing: `280 × 1,5 = 420`, два ребра дают `420 × 2 = 840`."
+          },
+          {
+            "row": 20,
+            "label": "≥ 90 мс; 1400 мс; 2400 мс",
+            "source": "AN-22 Timing и VD §8.3: минимальная длительность шага, потолок на бойца и на последовательность. На данном пути потолки не срабатывают."
+          },
+          {
+            "row": 21,
+            "label": "24 fps; один кадр; 42 мс",
+            "source": "VD §8.4 и AN-22 Acceptance: `1000/24 ≈ 41,67 мс`, округлённый допуск 42 мс. Сам шаг процедурный, поэтому точки времени не округлены до кадров."
+          }
+        ],
+        "drawn_numbers": [
+          {
+            "text_bounds_index": 0,
+            "text": "AN-22 / ШАГ ПО ДВУМ РЁБРАМ",
+            "number": "22",
+            "readme_row": 1,
+            "readme_row_label": "AN-22; CUE-007",
+            "source": "Идентификаторы задания и события из AN-22. Это не числовые параметры движения."
+          },
+          {
+            "text_bounds_index": 1,
+            "text": "CUE-007 · state.fighter_moved · старт на кадре применения снапшота",
+            "number": "007",
+            "readme_row": 1,
+            "readme_row_label": "AN-22; CUE-007",
+            "source": "Идентификаторы задания и события из AN-22. Это не числовые параметры движения."
+          },
+          {
+            "text_bounds_index": 4,
+            "text": "0",
+            "number": "0",
+            "readme_row": 15,
+            "readme_row_label": "0, 1, 2 по вертикали s(t)",
+            "source": "AN-22: движение по двум рёбрам. Положение дано в единицах ребра: старт, вершина, конец."
+          },
+          {
+            "text_bounds_index": 5,
+            "text": "80",
+            "number": "80",
+            "readme_row": 6,
+            "readme_row_label": "80 мс; 1/6 первого ребра",
+            "source": "AN-22 Keyframes и VD §8.3: конец ease-in. `(1/240) × 80 / 2 = 1/6`."
+          },
+          {
+            "text_bounds_index": 6,
+            "text": "280",
+            "number": "280",
+            "readme_row": 8,
+            "readme_row_label": "280 мс",
+            "source": "AN-22 и VD §8.3: постоянное время ребра при ×1; вершина после первого ребра. Также прибытие по двум рёбрам при ×0,5."
+          },
+          {
+            "text_bounds_index": 7,
+            "text": "480",
+            "number": "480",
+            "readme_row": 10,
+            "readme_row_label": "480 мс",
+            "source": "AN-22 Keyframes: начало ease-out; `560 − 80`."
+          },
+          {
+            "text_bounds_index": 8,
+            "text": "560",
+            "number": "560",
+            "readme_row": 11,
+            "readme_row_label": "560 мс",
+            "source": "AN-22 Keyframes: прибытие и начало пыли; `280 × 2`."
+          },
+          {
+            "text_bounds_index": 9,
+            "text": "710",
+            "number": "710",
+            "readme_row": 13,
+            "readme_row_label": "710 мс",
+            "source": "AN-22 Keyframes: конец settle; `560 + 150`."
+          },
+          {
+            "text_bounds_index": 10,
+            "text": "860",
+            "number": "860",
+            "readme_row": 16,
+            "readme_row_label": "300 мс; 560–860 мс; 860 мс",
+            "source": "AN-22 Specific и VD §9.2: пыль только на конечной клетке, `860 = 560 + 300`."
+          },
+          {
+            "text_bounds_index": 15,
+            "text": "IDLE · 150 мс",
+            "number": "150",
+            "readme_row": 12,
+            "readme_row_label": "150 мс",
+            "source": "AN-22 Timing и VD §8.3: возвращение наклона к нулю и facing к Idle после прибытия."
+          },
+          {
+            "text_bounds_index": 17,
+            "text": "≤ 50 мс",
+            "number": "50",
+            "readme_row": 4,
+            "readme_row_label": "≤ 50 мс",
+            "source": "AN-22 Timing и VD §8.3: завершение начального поворота. Полоса занимает 0–50 мс."
+          },
+          {
+            "text_bounds_index": 18,
+            "text": "120 мс на ходу",
+            "number": "120",
+            "readme_row": 9,
+            "readme_row_label": "120 мс",
+            "source": "AN-22 и VD §8.3: доворот на вершине без остановки. Полоса 280–400 мс; 400 = 280 + 120, отдельная новая длительность не вводится."
+          },
+          {
+            "text_bounds_index": 19,
+            "text": "idle к камере · 150 мс",
+            "number": "150",
+            "readme_row": 12,
+            "readme_row_label": "150 мс",
+            "source": "AN-22 Timing и VD §8.3: возвращение наклона к нулю и facing к Idle после прибытия."
+          },
+          {
+            "text_bounds_index": 21,
+            "text": "наклон до 0",
+            "number": "0",
+            "readme_row": 2,
+            "readme_row_label": "0 мс; скорость 0; наклон 0°; подскок 0",
+            "source": "AN-22 Keyframes; VD §8.3: старт, остановка в конце, восстановленный Idle, отсутствие подскока. Для reduced / «Нет» конечная клетка применяется в 0 мс."
+          },
+          {
+            "text_bounds_index": 22,
+            "text": "10° за 60 мс · подскок 0",
+            "number": "10",
+            "readme_row": 5,
+            "readme_row_label": "60 мс; 10°",
+            "source": "AN-22 Timing/Keyframes и VD §8.3: наклон достигнут к 60 мс."
+          },
+          {
+            "text_bounds_index": 22,
+            "text": "10° за 60 мс · подскок 0",
+            "number": "60",
+            "readme_row": 5,
+            "readme_row_label": "60 мс; 10°",
+            "source": "AN-22 Timing/Keyframes и VD §8.3: наклон достигнут к 60 мс."
+          },
+          {
+            "text_bounds_index": 22,
+            "text": "10° за 60 мс · подскок 0",
+            "number": "0",
+            "readme_row": 2,
+            "readme_row_label": "0 мс; скорость 0; наклон 0°; подскок 0",
+            "source": "AN-22 Keyframes; VD §8.3: старт, остановка в конце, восстановленный Idle, отсутствие подскока. Для reduced / «Нет» конечная клетка применяется в 0 мс."
+          },
+          {
+            "text_bounds_index": 25,
+            "text": "0 мс",
+            "number": "0",
+            "readme_row": 2,
+            "readme_row_label": "0 мс; скорость 0; наклон 0°; подскок 0",
+            "source": "AN-22 Keyframes; VD §8.3: старт, остановка в конце, восстановленный Idle, отсутствие подскока. Для reduced / «Нет» конечная клетка применяется в 0 мс."
+          },
+          {
+            "text_bounds_index": 27,
+            "text": "60 мс",
+            "number": "60",
+            "readme_row": 5,
+            "readme_row_label": "60 мс; 10°",
+            "source": "AN-22 Timing/Keyframes и VD §8.3: наклон достигнут к 60 мс."
+          },
+          {
+            "text_bounds_index": 29,
+            "text": "280 мс",
+            "number": "280",
+            "readme_row": 8,
+            "readme_row_label": "280 мс",
+            "source": "AN-22 и VD §8.3: постоянное время ребра при ×1; вершина после первого ребра. Также прибытие по двум рёбрам при ×0,5."
+          },
+          {
+            "text_bounds_index": 31,
+            "text": "480 мс",
+            "number": "480",
+            "readme_row": 10,
+            "readme_row_label": "480 мс",
+            "source": "AN-22 Keyframes: начало ease-out; `560 − 80`."
+          },
+          {
+            "text_bounds_index": 33,
+            "text": "560 мс",
+            "number": "560",
+            "readme_row": 11,
+            "readme_row_label": "560 мс",
+            "source": "AN-22 Keyframes: прибытие и начало пыли; `280 × 2`."
+          },
+          {
+            "text_bounds_index": 35,
+            "text": "710 мс",
+            "number": "710",
+            "readme_row": 13,
+            "readme_row_label": "710 мс",
+            "source": "AN-22 Keyframes: конец settle; `560 + 150`."
+          },
+          {
+            "text_bounds_index": 41,
+            "text": "0°",
+            "number": "0",
+            "readme_row": 2,
+            "readme_row_label": "0 мс; скорость 0; наклон 0°; подскок 0",
+            "source": "AN-22 Keyframes; VD §8.3: старт, остановка в конце, восстановленный Idle, отсутствие подскока. Для reduced / «Нет» конечная клетка применяется в 0 мс."
+          },
+          {
+            "text_bounds_index": 42,
+            "text": "10°",
+            "number": "10",
+            "readme_row": 5,
+            "readme_row_label": "60 мс; 10°",
+            "source": "AN-22 Timing/Keyframes и VD §8.3: наклон достигнут к 60 мс."
+          },
+          {
+            "text_bounds_index": 43,
+            "text": "10°",
+            "number": "10",
+            "readme_row": 5,
+            "readme_row_label": "60 мс; 10°",
+            "source": "AN-22 Timing/Keyframes и VD §8.3: наклон достигнут к 60 мс."
+          },
+          {
+            "text_bounds_index": 44,
+            "text": "10°",
+            "number": "10",
+            "readme_row": 5,
+            "readme_row_label": "60 мс; 10°",
+            "source": "AN-22 Timing/Keyframes и VD §8.3: наклон достигнут к 60 мс."
+          },
+          {
+            "text_bounds_index": 45,
+            "text": "10°",
+            "number": "10",
+            "readme_row": 5,
+            "readme_row_label": "60 мс; 10°",
+            "source": "AN-22 Timing/Keyframes и VD §8.3: наклон достигнут к 60 мс."
+          },
+          {
+            "text_bounds_index": 46,
+            "text": "0°",
+            "number": "0",
+            "readme_row": 2,
+            "readme_row_label": "0 мс; скорость 0; наклон 0°; подскок 0",
+            "source": "AN-22 Keyframes; VD §8.3: старт, остановка в конце, восстановленный Idle, отсутствие подскока. Для reduced / «Нет» конечная клетка применяется в 0 мс."
+          },
+          {
+            "text_bounds_index": 47,
+            "text": "0°",
+            "number": "0",
+            "readme_row": 2,
+            "readme_row_label": "0 мс; скорость 0; наклон 0°; подскок 0",
+            "source": "AN-22 Keyframes; VD §8.3: старт, остановка в конце, восстановленный Idle, отсутствие подскока. Для reduced / «Нет» конечная клетка применяется в 0 мс."
+          },
+          {
+            "text_bounds_index": 48,
+            "text": "10°",
+            "number": "10",
+            "readme_row": 5,
+            "readme_row_label": "60 мс; 10°",
+            "source": "AN-22 Timing/Keyframes и VD §8.3: наклон достигнут к 60 мс."
+          },
+          {
+            "text_bounds_index": 49,
+            "text": "10°",
+            "number": "10",
+            "readme_row": 5,
+            "readme_row_label": "60 мс; 10°",
+            "source": "AN-22 Timing/Keyframes и VD §8.3: наклон достигнут к 60 мс."
+          },
+          {
+            "text_bounds_index": 50,
+            "text": "10°",
+            "number": "10",
+            "readme_row": 5,
+            "readme_row_label": "60 мс; 10°",
+            "source": "AN-22 Timing/Keyframes и VD §8.3: наклон достигнут к 60 мс."
+          },
+          {
+            "text_bounds_index": 51,
+            "text": "10°",
+            "number": "10",
+            "readme_row": 5,
+            "readme_row_label": "60 мс; 10°",
+            "source": "AN-22 Timing/Keyframes и VD §8.3: наклон достигнут к 60 мс."
+          },
+          {
+            "text_bounds_index": 52,
+            "text": "0°",
+            "number": "0",
+            "readme_row": 2,
+            "readme_row_label": "0 мс; скорость 0; наклон 0°; подскок 0",
+            "source": "AN-22 Keyframes; VD §8.3: старт, остановка в конце, восстановленный Idle, отсутствие подскока. Для reduced / «Нет» конечная клетка применяется в 0 мс."
+          },
+          {
+            "text_bounds_index": 54,
+            "text": "куда смотрит фигура · покой ≤ 45° от оси камеры · спиной к камере — никогда",
+            "number": "45",
+            "readme_row": 14,
+            "readme_row_label": "≤ 45°",
+            "source": "VD §8.3: Idle вполоборота относительно камеры."
+          },
+          {
+            "text_bounds_index": 57,
+            "text": "40 мс: 1/24",
+            "number": "40",
+            "readme_row": 3,
+            "readme_row_label": "40 мс; 1/24 первого ребра",
+            "source": "AN-22 Keyframes. Проверка: `(1/240) × 40² / (2 × 80) = 1/24`."
+          },
+          {
+            "text_bounds_index": 57,
+            "text": "40 мс: 1/24",
+            "number": "1/24",
+            "readme_row": 3,
+            "readme_row_label": "40 мс; 1/24 первого ребра",
+            "source": "AN-22 Keyframes. Проверка: `(1/240) × 40² / (2 × 80) = 1/24`."
+          },
+          {
+            "text_bounds_index": 58,
+            "text": "80 мс: 1/6",
+            "number": "80",
+            "readme_row": 6,
+            "readme_row_label": "80 мс; 1/6 первого ребра",
+            "source": "AN-22 Keyframes и VD §8.3: конец ease-in. `(1/240) × 80 / 2 = 1/6`."
+          },
+          {
+            "text_bounds_index": 58,
+            "text": "80 мс: 1/6",
+            "number": "1/6",
+            "readme_row": 6,
+            "readme_row_label": "80 мс; 1/6 первого ребра",
+            "source": "AN-22 Keyframes и VD §8.3: конец ease-in. `(1/240) × 80 / 2 = 1/6`."
+          },
+          {
+            "text_bounds_index": 59,
+            "text": "0",
+            "number": "0",
+            "readme_row": 15,
+            "readme_row_label": "0, 1, 2 по вертикали s(t)",
+            "source": "AN-22: движение по двум рёбрам. Положение дано в единицах ребра: старт, вершина, конец."
+          },
+          {
+            "text_bounds_index": 60,
+            "text": "1",
+            "number": "1",
+            "readme_row": 15,
+            "readme_row_label": "0, 1, 2 по вертикали s(t)",
+            "source": "AN-22: движение по двум рёбрам. Положение дано в единицах ребра: старт, вершина, конец."
+          },
+          {
+            "text_bounds_index": 61,
+            "text": "2",
+            "number": "2",
+            "readme_row": 15,
+            "readme_row_label": "0, 1, 2 по вертикали s(t)",
+            "source": "AN-22: движение по двум рёбрам. Положение дано в единицах ребра: старт, вершина, конец."
+          },
+          {
+            "text_bounds_index": 62,
+            "text": "0",
+            "number": "0",
+            "readme_row": 15,
+            "readme_row_label": "0, 1, 2 по вертикали s(t)",
+            "source": "AN-22: движение по двум рёбрам. Положение дано в единицах ребра: старт, вершина, конец."
+          },
+          {
+            "text_bounds_index": 63,
+            "text": "80",
+            "number": "80",
+            "readme_row": 6,
+            "readme_row_label": "80 мс; 1/6 первого ребра",
+            "source": "AN-22 Keyframes и VD §8.3: конец ease-in. `(1/240) × 80 / 2 = 1/6`."
+          },
+          {
+            "text_bounds_index": 64,
+            "text": "280",
+            "number": "280",
+            "readme_row": 8,
+            "readme_row_label": "280 мс",
+            "source": "AN-22 и VD §8.3: постоянное время ребра при ×1; вершина после первого ребра. Также прибытие по двум рёбрам при ×0,5."
+          },
+          {
+            "text_bounds_index": 65,
+            "text": "480",
+            "number": "480",
+            "readme_row": 10,
+            "readme_row_label": "480 мс",
+            "source": "AN-22 Keyframes: начало ease-out; `560 − 80`."
+          },
+          {
+            "text_bounds_index": 66,
+            "text": "560",
+            "number": "560",
+            "readme_row": 11,
+            "readme_row_label": "560 мс",
+            "source": "AN-22 Keyframes: прибытие и начало пыли; `280 × 2`."
+          },
+          {
+            "text_bounds_index": 67,
+            "text": "710",
+            "number": "710",
+            "readme_row": 13,
+            "readme_row_label": "710 мс",
+            "source": "AN-22 Keyframes: конец settle; `560 + 150`."
+          },
+          {
+            "text_bounds_index": 68,
+            "text": "860",
+            "number": "860",
+            "readme_row": 16,
+            "readme_row_label": "300 мс; 560–860 мс; 860 мс",
+            "source": "AN-22 Specific и VD §9.2: пыль только на конечной клетке, `860 = 560 + 300`."
+          },
+          {
+            "text_bounds_index": 71,
+            "text": "на вершине: v = 1/240 ребра/мс",
+            "number": "1/240",
+            "readme_row": 7,
+            "readme_row_label": "1/240 ребра/мс",
+            "source": "AN-22 Timing/Keyframes: `k = 1 / (280 − 80/2)`. Скорость перед вершиной и после неё одна и та же, положительная."
+          },
+          {
+            "text_bounds_index": 72,
+            "text": "в конце: v = 0",
+            "number": "0",
+            "readme_row": 2,
+            "readme_row_label": "0 мс; скорость 0; наклон 0°; подскок 0",
+            "source": "AN-22 Keyframes; VD §8.3: старт, остановка в конце, восстановленный Idle, отсутствие подскока. Для reduced / «Нет» конечная клетка применяется в 0 мс."
+          },
+          {
+            "text_bounds_index": 73,
+            "text": "CUE-007 / ПЫЛЬ",
+            "number": "007",
+            "readme_row": 1,
+            "readme_row_label": "AN-22; CUE-007",
+            "source": "Идентификаторы задания и события из AN-22. Это не числовые параметры движения."
+          },
+          {
+            "text_bounds_index": 74,
+            "text": "560–860 мс · 300 мс · конечная клетка",
+            "number": "560",
+            "readme_row": 11,
+            "readme_row_label": "560 мс",
+            "source": "AN-22 Keyframes: прибытие и начало пыли; `280 × 2`."
+          },
+          {
+            "text_bounds_index": 74,
+            "text": "560–860 мс · 300 мс · конечная клетка",
+            "number": "860",
+            "readme_row": 16,
+            "readme_row_label": "300 мс; 560–860 мс; 860 мс",
+            "source": "AN-22 Specific и VD §9.2: пыль только на конечной клетке, `860 = 560 + 300`."
+          },
+          {
+            "text_bounds_index": 74,
+            "text": "560–860 мс · 300 мс · конечная клетка",
+            "number": "300",
+            "readme_row": 16,
+            "readme_row_label": "300 мс; 560–860 мс; 860 мс",
+            "source": "AN-22 Specific и VD §9.2: пыль только на конечной клетке, `860 = 560 + 300`."
+          },
+          {
+            "text_bounds_index": 75,
+            "text": "×0,5 · 140 мс/ребро",
+            "number": "0,5",
+            "readme_row": 17,
+            "readme_row_label": "×0,5; 140 мс/ребро; прибытие 280 мс",
+            "source": "AN-22 Timing: `280 × 0,5 = 140`, два ребра дают `140 × 2 = 280`. Это множитель длительности, не частоты движения."
+          },
+          {
+            "text_bounds_index": 75,
+            "text": "×0,5 · 140 мс/ребро",
+            "number": "140",
+            "readme_row": 17,
+            "readme_row_label": "×0,5; 140 мс/ребро; прибытие 280 мс",
+            "source": "AN-22 Timing: `280 × 0,5 = 140`, два ребра дают `140 × 2 = 280`. Это множитель длительности, не частоты движения."
+          },
+          {
+            "text_bounds_index": 76,
+            "text": "прибытие 280 мс",
+            "number": "280",
+            "readme_row": 8,
+            "readme_row_label": "280 мс",
+            "source": "AN-22 и VD §8.3: постоянное время ребра при ×1; вершина после первого ребра. Также прибытие по двум рёбрам при ×0,5."
+          },
+          {
+            "text_bounds_index": 77,
+            "text": "×1 · 280 мс/ребро",
+            "number": "1",
+            "readme_row": 18,
+            "readme_row_label": "×1; 280 мс/ребро; прибытие 560 мс",
+            "source": "AN-22 Timing: базовая скорость; два ребра."
+          },
+          {
+            "text_bounds_index": 77,
+            "text": "×1 · 280 мс/ребро",
+            "number": "280",
+            "readme_row": 8,
+            "readme_row_label": "280 мс",
+            "source": "AN-22 и VD §8.3: постоянное время ребра при ×1; вершина после первого ребра. Также прибытие по двум рёбрам при ×0,5."
+          },
+          {
+            "text_bounds_index": 78,
+            "text": "прибытие 560 мс",
+            "number": "560",
+            "readme_row": 11,
+            "readme_row_label": "560 мс",
+            "source": "AN-22 Keyframes: прибытие и начало пыли; `280 × 2`."
+          },
+          {
+            "text_bounds_index": 79,
+            "text": "×1,5 · 420 мс/ребро",
+            "number": "1,5",
+            "readme_row": 19,
+            "readme_row_label": "×1,5; 420 мс/ребро; прибытие 840 мс",
+            "source": "AN-22 Timing: `280 × 1,5 = 420`, два ребра дают `420 × 2 = 840`."
+          },
+          {
+            "text_bounds_index": 79,
+            "text": "×1,5 · 420 мс/ребро",
+            "number": "420",
+            "readme_row": 19,
+            "readme_row_label": "×1,5; 420 мс/ребро; прибытие 840 мс",
+            "source": "AN-22 Timing: `280 × 1,5 = 420`, два ребра дают `420 × 2 = 840`."
+          },
+          {
+            "text_bounds_index": 80,
+            "text": "прибытие 840 мс",
+            "number": "840",
+            "readme_row": 19,
+            "readme_row_label": "×1,5; 420 мс/ребро; прибытие 840 мс",
+            "source": "AN-22 Timing: `280 × 1,5 = 420`, два ребра дают `420 × 2 = 840`."
+          },
+          {
+            "text_bounds_index": 82,
+            "text": "snap в конечную клетку в 0 мс · поворот мгновенный · без наклона",
+            "number": "0",
+            "readme_row": 2,
+            "readme_row_label": "0 мс; скорость 0; наклон 0°; подскок 0",
+            "source": "AN-22 Keyframes; VD §8.3: старт, остановка в конце, восстановленный Idle, отсутствие подскока. Для reduced / «Нет» конечная клетка применяется в 0 мс."
+          },
+          {
+            "text_bounds_index": 83,
+            "text": "Шаг ≥ 90 мс · лимит бойца 1400 мс · seq 2400 мс",
+            "number": "90",
+            "readme_row": 20,
+            "readme_row_label": "≥ 90 мс; 1400 мс; 2400 мс",
+            "source": "AN-22 Timing и VD §8.3: минимальная длительность шага, потолок на бойца и на последовательность. На данном пути потолки не срабатывают."
+          },
+          {
+            "text_bounds_index": 83,
+            "text": "Шаг ≥ 90 мс · лимит бойца 1400 мс · seq 2400 мс",
+            "number": "1400",
+            "readme_row": 20,
+            "readme_row_label": "≥ 90 мс; 1400 мс; 2400 мс",
+            "source": "AN-22 Timing и VD §8.3: минимальная длительность шага, потолок на бойца и на последовательность. На данном пути потолки не срабатывают."
+          },
+          {
+            "text_bounds_index": 83,
+            "text": "Шаг ≥ 90 мс · лимит бойца 1400 мс · seq 2400 мс",
+            "number": "2400",
+            "readme_row": 20,
+            "readme_row_label": "≥ 90 мс; 1400 мс; 2400 мс",
+            "source": "AN-22 Timing и VD §8.3: минимальная длительность шага, потолок на бойца и на последовательность. На данном пути потолки не срабатывают."
+          },
+          {
+            "text_bounds_index": 84,
+            "text": "Процедурный ход · сетка клипов 24 fps · допуск одного кадра 42 мс",
+            "number": "24",
+            "readme_row": 21,
+            "readme_row_label": "24 fps; один кадр; 42 мс",
+            "source": "VD §8.4 и AN-22 Acceptance: `1000/24 ≈ 41,67 мс`, округлённый допуск 42 мс. Сам шаг процедурный, поэтому точки времени не округлены до кадров."
+          },
+          {
+            "text_bounds_index": 84,
+            "text": "Процедурный ход · сетка клипов 24 fps · допуск одного кадра 42 мс",
+            "number": "42",
+            "readme_row": 21,
+            "readme_row_label": "24 fps; один кадр; 42 мс",
+            "source": "VD §8.4 и AN-22 Acceptance: `1000/24 ≈ 41,67 мс`, округлённый допуск 42 мс. Сам шаг процедурный, поэтому точки времени не округлены до кадров."
+          }
+        ],
+        "unmatched_numbers": 0
+      },
+      "expected": {
+        "unmatched_numbers": 0
+      },
+      "note": "Every numeric occurrence in text-bounds.json mapped to a literal README source row."
+    },
+    "7_color_gray": {
+      "passed": true,
+      "measured": [
+        "vector/AN-22-step-sheet.png",
+        "comparison/AN-22-step-sheet-gray.png",
+        "comparison/AN-22-step-sheet-color-1280x720.png",
+        "comparison/AN-22-step-sheet-gray-1280x720.png"
+      ],
+      "expected": "Master and native 1280x720 color/Rec.709 RGBA",
+      "note": "Every colour export has an exact grey pair."
+    },
+    "8_scope_sources": {
+      "passed": true,
+      "measured": {
+        "source_unchanged": true,
+        "outside_folder": []
+      },
+      "expected": {
+        "source_unchanged": true,
+        "outside_folder": []
+      },
+      "note": "Reread original source-hashes-before.json; audited writes confined to allowed folders."
+    }
+  }
+}

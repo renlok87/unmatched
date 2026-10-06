@@ -424,3 +424,309 @@ SX-01 (T-SYNTX-IMG-BANANA, banana3 2K). Его запускает Claude отд�
     границы, с затуханием наружу не меньше 96 px. Раздельные поправки по сторонам не годятся: они дали ступени в углах;
   - приёмка та же (ВР-VS2-EN.6…8).
 - **Журнал.** В `credits-ledger.json` две строки Codex: прогон 1 (failed, 0 генераций) и fix1 (4 генерации). SYNTX 0.
+
+## SX-01 — запасной путь EN-02: banana3 2K и сборка Claude (2026-10-07)
+
+**Итог: принято, по делегированию** (ревью Claude, единственный проход; пользователь 2026-10-06: «Все решения
+принимай»). Пакет SX-01 заменяет отклонённый CX-17 (ВР-VS2-EN.9). Генерацию и сборку делал Claude, Codex в SX-01 не
+участвовал. Задание — [EN-02.syntx.txt](../../../docs/game-design/visual/06-tasks/prompts/EN-02.syntx.txt)
+(`3a367295`, повтор `1d9dc614`). Скрипт — [_tools/sx01.py](_tools/sx01.py).
+
+**Вход** — один файл, только наш (ВР-PR08): `sx01/SX01-input-2340x1317.png` (sha256 `27bc91ec…bf32`). Это принятая
+плита EN-01 `marmoreal-clean.png` в [334, 188, 1672, 941] на холсте 2340×1317. Полоса достройки и поле карты залиты
+`#808080`. C0, иллюстрация карты, кадры DE и отклонённые кандидаты CX-17 в SYNTX не загружались. Запись входа —
+[_tools/sx01-input.json](_tools/sx01-input.json).
+
+**Генерации** (SYNTX `banana` / `banana3`, `image_size 2K`, `aspect_ratio 16:9`, `n 1`, по 3 токена; бюджет карточки 6 использован полностью):
+
+| Прогон | Задача SYNTX | Ответ | Вердикт |
+|---|---|---|---|
+| r1 | `4f01a848-ba95-4793-8eb4-52d9b976ab46` | JPEG 2752×1536, sha256 `d6e90a2a…bdec4` | отклонён: диск луны в облаках слева сверху; два симметричных моста с балюстрадами уходят с острова влево и вправо (новые сооружения, зеркальная композиция); низ светлее нижней полосы оригинала |
+| r2 | `345e03a8-e19d-4442-81d2-c38a331c29aa` | JPEG 2752×1536, sha256 `440012b3…4ba0` | **принят** после сборки r2b |
+
+Сырые ответы — `C:/tmp/visual-syntx/EN-02/raw/`, копии без ретуши — `scraped-data/derived/env-u16-marmoreal-codex/sx01/SX01-r{1,2}-raw.jpg`.
+Повтор r2 отличается от r1 только промптом: он прямо запрещает луну, мосты и дорожки, а дымку внизу просит темнеть к
+краю кадра. Записи генераций — `generation-records.json`, ключ `EN-02-SX01`.
+
+**Сборка r2b** (ВР-VS2-EN.10 и решения ниже):
+1. Один проход на весь холст, без тайлов.
+2. Регистрация ответа на холст. Масштаб и сдвиг подобраны по NCC яркости на области оригинала (без поля и кромки 16 px):
+   масштаб 0,850291 / 0,850777, сдвиг (0; 4,25) px, NCC 0,799 → 0,866. Затем локальная подгонка вдоль старой границы:
+   146 окон 64×48 px, сдвиг не больше 1,06 px, плавное поле, затухание 128 px (ВР-VS3-EN02-03).
+3. Оригинал вклеен побайтно: sha256 RGB-байтов кропа `2306d466…48bd` равен EN-01.
+4. Шов — одно гладкое 2D-поле: мембрана Лапласа в линейном свете. Граничное значение — точная разность «оригинал −
+   генерация» на крайнем кольце оригинала, на краю холста 0. Затухание наружу 188 px сверху и снизу, 334 px слева и
+   справа. CG сошёлся, относительная невязка 1e-6. Поправок по сторонам нет.
+5. Затемнение к краю — только снаружи оригинала, в линейном свете, smoothstep по каждой стороне: множитель на краю
+   0,85 слева, справа и сверху, 0,5 снизу (ВР-VS3-EN02-04).
+6. Вариант с фонарями: `lit = clean × (1 − m) + C0 × m`, где m — маска фонарей EN-01 / 255 (ВР-VS2-EN.8). Изменено
+   334 395 px, все внутри маски; в ядрах m = 255 lit равен C0; поле `#808080` в обоих вариантах.
+
+**Числа** (подробно — [_tools/sx01-r2b-proof.json](_tools/sx01-r2b-proof.json); r1 и r2 —
+[_tools/sx01-r1-proof.json](_tools/sx01-r1-proof.json), [_tools/sx01-r2-proof.json](_tools/sx01-r2-proof.json).
+r1 и r2 собраны первой версией скрипта: кольцо сглажено σ 1,5 px, без локальной подгонки и без затемнения.)
+
+| Сторона | G(0)/медиана без поправки | r1 | r2 | **r2b (итог)** | Порог |
+|---|---:|---:|---:|---:|---:|
+| left | 1,75 | 1,32 | 1,07 | **0,98** | ≤ 1,5 |
+| right | 1,88 | 1,07 | 1,31 | **1,19** | ≤ 1,5 |
+| top | 2,33 | 1,49 | 1,62 ✗ | **1,36** | ≤ 1,5 |
+| bottom | 3,50 | 0,79 | 1,01 | **0,94** | ≤ 1,5 |
+
+Профили G(d) r2b без пика на d = 0. Отражение (NCC полосы с зеркальной полосой оригинала): максимум 0,674, порог 0,8.
+Растяжки нет: across/along от 0,96 до 1,07, флаг стоит ниже 0,3. Край темнее оригинала у всех четырёх сторон: средний
+Y крайних 32 px равен 4,62 / 2,11 / 6,54 / 1,95 против 10,94 / 5,56 / 14,28 / 1,99 у оригинала. Воды нет (осмотр).
+Размер 2340×1317.
+
+**Что я открыл** (Read PNG, `scraped-data/derived/env-u16-marmoreal-codex/sx01/comparison/`):
+- `sx01-r1-K1x065-clean-colour`, `sx01-r1-edge-top-{1,2}-2x-colour` и сырой r1;
+- `sx01-r2-K1x065-clean-outlined-colour`, сырой r2, кропы 3× правого шва и верхних сегментов r2 и r2b;
+- `sx01-r2b-K1x065-clean-{colour,gray}`, `sx01-r2b-K1x065-lit-colour`, `sx01-r2b-gradient-colour`,
+  `sx01-r2b-edge-{left,right,top,bottom}-{1,2}-2x-colour`, `sx01-r2b-edge-right-2-2x-gray`,
+  `sx01-r2b-corner-tr-2x-colour`, `sx01-r2b-corner-bl-2x-gray`, `sx01-r2b-lit-diff-colour`.
+
+На кадре K1 ×0,65 (весь прямоугольник B, ВР-VS2-EN.6) рамки оригинала не видно ни в цвете, ни в сером, ступеней в
+углах нет. Остров парит отдельно, вокруг ночное небо, облака и силуэты сосен. Колоннада продолжена вверх до карниза и
+верхнего яруса колонн. Обрыв уходит в тёмную дымку.
+
+**Остатки** (на приёмку не влияют, записаны для EN-03 и EN-07):
+- правый шов на y 764–828: сегмент 64 px с отношением 7,0, только для осмотра (ВР-VS2-EN.7). Под кроной сакуры
+  синий фон оригинала встречает чёрно-зелёную тень генерации. На 2–3× виден короткий вертикальный перепад оттенка, в
+  сером его не видно;
+- у правой сакуры за швом цветки мельче и плотнее, чем в оригинале: смена фактуры видна на 2×, на 1× почти нет;
+- ствол левой сакуры внизу кончается обломком над облаками;
+- справа от правой сакуры — тёмно-зелёная дымка (продолжение тени листвы оригинала);
+- в достройке мелкий шум JPEG-ответа (видно на 2× в тёмном небе); EN-03 проверяет «пластиковый» шум отдельно.
+
+**Решения по делегированию (ВР-VS3-EN02-…):**
+- **ВР-VS3-EN02-01** — вход SX-01 — один холст 2340×1317, полоса достройки залита `#808080`, как поле. Промпт
+  различает «серую полосу по краям — дописать» и «серый прямоугольник в деревянной раме — не трогать». Ответ 2752×1536
+  регистрируется на холст скриптом: масштаб и сдвиг по NCC области оригинала.
+- **ВР-VS3-EN02-02** — r1 отклонён: диск луны и мосты — новые ориентиры, запрещённые колонкой `dont`; мосты
+  симметричны. Повтор r2 — тот же вход и настройки, промпт с явными запретами. Это последний прогон бюджета: 6 из 6
+  токенов.
+- **ВР-VS3-EN02-03** — к сборке ВР-VS2-EN.10 добавлена локальная геометрическая подгонка генерации вдоль старой границы
+  (≤ 1,06 px, плавное поле, затухание 128 px) и точная граница мембраны (без сглаживания кольца). С ними верх проходит:
+  1,62 → 1,36. Это геометрия и одно гладкое поле тона, а не поправки по сторонам.
+- **ВР-VS3-EN02-04** — затемнение краёв по сторонам: 0,85 слева, справа и сверху, 0,5 снизу, в линейном свете, только
+  снаружи оригинала, плавно через углы. Дымка генерации внизу светлее нижней полосы оригинала. Карточка требует
+  «края темнеют к границе кадра».
+- **ВР-VS3-EN02-05** — верхний ярус колонн над карнизом — продолжение существующей колоннады, а не новый ориентир:
+  башен, арок-ориентиров и статуй нет. Остатки выше приняты с записью, вердикт — принято.
+- **ВР-VS3-EN02-06** — отклонённые кандидаты CX-17 перенесены, а не удалены:
+  `scraped-data/derived/env-u16-marmoreal-codex/history/cx17-rejected/` (sha256 `00666584…` и `268927cb…`). Итог SX-01
+  занял канонические имена `marmoreal-clean-ext.png` (`92146f4e…106c`) и `marmoreal-lit-ext.png` (`7fcf2159…7624`) — входы
+  EN-03. Запись — [_tools/sx01-promote.json](_tools/sx01-promote.json).
+
+**Траты.** SYNTX 6 токенов (2 × 3): баланс 173,771 → 170,771 → 167,771 (свежий `get-balance` до и после каждого
+прогона). Строки `credits-ledger.json` и строка `providerTerms` Google (Gemini API Additional Terms, проверено 2026-10-07)
+записаны до первой траты. Коммерческих прав не заявляем.
+
+Воспроизведение сборки без новых генераций:
+
+```powershell
+python -B art/imagegen/env-u16-marmoreal-codex/_tools/sx01.py prepare
+python -B art/imagegen/env-u16-marmoreal-codex/_tools/sx01.py build scraped-data/derived/env-u16-marmoreal-codex/sx01/SX01-r2-raw.jpg --tag r2b --darken 0.85,0.85,0.85,0.5
+python -B art/imagegen/env-u16-marmoreal-codex/_tools/sx01.py sheets --tag r2b
+```
+
+## EN-03 (SX-02) — детализация ×2: план Б, Lanczos-3 без ИИ (2026-10-07)
+
+**Итог: технически импортировано, план Б, по делегированию.** Запуск Magnific отменён правилом цены, поэтому ×2
+сделан классическим ресемплингом. Новой детали нет: это не «детализация», а честное увеличение. Задание —
+[EN-03.syntx.txt](../../../docs/game-design/visual/06-tasks/prompts/EN-03.syntx.txt) (`f7a14559`). Скрипт —
+[_tools/sx02_planb.py](_tools/sx02_planb.py), числа — [_tools/sx02-planb-check.json](_tools/sx02-planb-check.json).
+
+- **Почему план Б (ВР-VS3-EN03-01).** Ответ `get-model-info` для `magnific` / `precision_v2` при реальном размере
+  2340×1317 и `scale_factor 2x` — 18 токенов (для `precision_v1` тоже 18; 12 стоит только 2048×1152). Карточка
+  (колонка `do`, п. 3) и ВР-PR04 (апскейл ≤ 12 за прогон) требуют отмены; `ledger.py check` ответил «cancel the run».
+  Баланс был 167,771, так что правило баланса (< 44, ВР-PL10) не сработало. Обход отклонён: вход 2048×1152 по
+  12 токенов дал бы 1,75 текселя ИИ-детали на пиксель C0 и противоречит правилу «цена при реальном размере»; тайлы
+  2048×1152 стоили бы 48 токенов на два входа, больше бюджета 24. SYNTX на EN-03 — 0 токенов, строки трат нет: трат
+  не было. Строка `providerTerms` Magnific не нужна, её пишут до первой траты.
+- **Как.** `lanczos_sample` из `tools/art/concept_paste/cp_bake.py`, тот же ресемплинг, что у запекания: Lanczos-3,
+  sRGB 0…1, центры текселей i + 0,5, кромка — clamp, веса нормированы. ×2: 2340×1317 → 4680×2634, `conceptRectPx`
+  [668, 376, 3344, 1882].
+- **Результат** (`scraped-data/derived/env-u16-marmoreal-codex/`, вне git):
+  - `marmoreal-extended-2x.png` из clean-ext: sha256 `df4fd262…458f`;
+  - `marmoreal-lit-extended-2x.png` из lit-ext: sha256 `6b983786…f96e`.
+- **Самопроверка.**
+  - SSIM яркости после обратного уменьшения 2×2 к входу — 0,99845 и 0,99845 (порог ≥ 0,95).
+  - Поле: ядро поля ×2 без кромки 6 px (1 676 426 px) — ровно `#808080`, std 0 (порог ≤ 2).
+- **Что я открыл:** `comparison/ext2x-planb-lit-K2-crops-colour` и `comparison/ext2x-planb-clean-K2-crops-gray` —
+  4 фонаря, 2 бра, края обеих сакур, слева «источник ×2 nearest», справа «Lanczos ×2», 100 %.
+  - Новых предметов, текста и «пластикового» шума нет.
+  - В lit-варианте фонари и бра целы; в clean их нет, тумбы целы. Свет двери нарисован, как в EN-01.
+  - Картинка мягче источника на ×2: деталей ИИ нет.
+- **Последствие.** На K2 ×2,5 плита вокруг поля будет мягче, чем у Sarpedon (там ×2 Magnific). EN-07 и EN-15
+  оценивают читаемость K2 на этой плите. Если её не хватит — новое решение о Magnific (18 токенов за вход, выше
+  ВР-PR04) или о другом апскейлере, отдельной строкой бюджета.
+
+
+## EN-04 — маски анимации и слой фонарей ×2 (2026-10-07)
+
+**Статус: предложено.** Пять 8-битных масок L и два RGBA PNG 4680×2634 построены скриптом из проверенных плит EN-03 (SX-02, план Б). Генераций 0, бюджет 0. Исходная живопись не изменена. Скриптовые проверки пройдены; буквальное требование центроида портала из glow невыполнимо на этих входах и явно отмечено ниже.
+
+**Рекомендация.** Единственный итоговый вариант EN-04-MASKS-03: чистая плита + слой фонарей с управлением через R glow; G — движение цветков, B — огибающая дымки, A — область появления лепестков. Первый процедурный проход отклонён из-за небольших розовых бликов на коре в HSV-выборке; во втором добавлены явные исключения стволов и основных ветвей, в третьем их контуры расширены после осмотра крупных кропов. Листы — диагностические наложения, яркость дымки на них не является рекомендуемой игровой интенсивностью.
+
+| Файл в derived-папке | Назначение |
+|---|---|
+| [marmoreal-mask-lantern-alpha.png](../../../scraped-data/derived/env-u16-marmoreal-codex/marmoreal-mask-lantern-alpha.png) | головы, бра и тёплые пятна; исходная маска ×2, feather 8 plate px |
+| [marmoreal-mask-lantern-glow.png](../../../scraped-data/derived/env-u16-marmoreal-codex/marmoreal-mask-lantern-glow.png) | положительная линейная Rec.709 разность lit−clean × alpha, нормирована по максимуму; дверь 0 |
+| [marmoreal-mask-sakura.png](../../../scraped-data/derived/env-u16-marmoreal-codex/marmoreal-mask-sakura.png) | HSV 300…350°, saturation ≥0,25, cherry-w/e и боковое продолжение; древесина исключена; feather 12 px |
+| [marmoreal-mask-mist.png](../../../scraped-data/derived/env-u16-marmoreal-codex/marmoreal-mask-mist.png) | треугольная вертикальная полоса у подножия front-cliff и в нижнем outpaint |
+| [marmoreal-mask-petals.png](../../../scraped-data/derived/env-u16-marmoreal-codex/marmoreal-mask-petals.png) | точная grayscale dilation сакуры диском 24 px, защита повторена |
+| [marmoreal-lanterns-2x.png](../../../scraped-data/derived/env-u16-marmoreal-codex/marmoreal-lanterns-2x.png) | lit RGB, alpha = lantern-alpha; RGB сохранён даже при alpha 0 |
+| [marmoreal-anim-2x.png](../../../scraped-data/derived/env-u16-marmoreal-codex/marmoreal-anim-2x.png) | RGBA = lantern-glow / sakura / mist / petals |
+
+**Малые решения и координаты.** C0→concept: ×1672/1920; concept→plate: ×2 +(668,376). EN-01 field-mask уже содержит расширение поля на 2%; второй раз 2% не добавлял. Для 40 px у подножия рамки консервативно защищена вся деревянная рамка EN-01 [(387,208),(1278,208),(1366,765),(305,765)] concept px плюс евклидово расширение 40 plate px. Отдельно защищены 40 px по всем четырём краям плиты. Размытие/дилатация выполняются до повторного обнуления защиты. Cherry-полигоны продолжаются горизонтально в боковой outpaint; границы остаются из paste.json. Feather сакуры — Gaussian σ=4, обрезанный 12 px, с повторным ограничением цветовым пигментом и woody-исключениями: края не закрашивают тёмные ветви. B: ramp y=2161→2353→2593, боковой feather внутрь 32 px, только продолженный трапецоид front-cliff. Это огибающая, не готовая текстура дымки.
+
+**Якоря.** [lanterns.json](lanterns.json) содержит все семь требуемых ID, plate/concept/C0 центры и радиусы C0. Шесть центров — центроиды glow внутри вручную ограниченного стекла; радиус покрывает весь принадлежащий прибору ненулевой glow. Для прозрачности записаны также центроиды полных световых пятен. Окружность ±4 C0 px вокруг каждого из шести центров целиком лежит внутри измеренной области стекла. Число offset_from_glass_bbox_centre — справочное: яркостный центроид не обязан совпадать с геометрическим центром bbox. Медианы чистой плиты под ненулевой сакурой и дымкой записаны как sRGB_u8, sRGB_0_1 и hex; цвета взяты из живописи, правило фиксированных токенов для плит не применяется.
+
+**Ограничение портала.** В EN-01 дверь намеренно оставлена светящейся и в clean, и в lit. Её glow-маска равна нулю; центроид нулевой разности не определён, а портал не имеет фонарного стекла. Для седьмой записи дан неподвижный якорь — центроид ярчайших 20% тёплых пикселей lit в области светильника портала; `animated=false`, `glow_weight=0`, дверь не включена в R. Поэтому `strict_literal_acceptance_pass=false`; никакой ложной полной приёмки нет. Требование «все семь PNG нулевые на поле» применяется к маскам/каналам anim/alpha фонарного слоя: его RGB обязан оставаться точным lit RGB.
+
+**Проверка.** [verification.json](verification.json), секция EN-04; отдельная копия [_tools/en04-verification.json](_tools/en04-verification.json). Скриптовых условий: 77, не пройдено: 0. Все семь PNG проверены после сохранения, включая IHDR bit depth, режимы и точные каналы. Пиксельные счётчики на поле+2%, у рамки+40 px и внешней границы+40 px равны 0; дверь/R, древесные cores/G и выход за cliff/B — 0. Маска не является математическим семантическим доказательством для каждого мазка ветви; поэтому дополнительно открыты крупные PNG крон и записан непосредственный визуальный осмотр. K1 — плоский full-B framing по контракту пакета, K2 — кропы ×2,5; игровых снимков/камеры Unreal эта задача не создаёт.
+
+| Маска | Этап + PNG, с общей подготовкой |
+|---|---:|
+| lantern-alpha | 1.801 с (лимит 60 с) |
+| lantern-glow | 2.620 с (лимит 60 с) |
+| sakura | 2.982 с (лимит 60 с) |
+| mist | 2.264 с (лимит 60 с) |
+| petals | 2.936 с (лимит 60 с) |
+
+**Листы.** Цвет и серый Rec.709 `.2126 R + .7152 G + .0722 B` в кодированном sRGB. В полноразмерных листах каждое изображение имеет мастер 4680×2634; рабочие листы содержат по шесть панелей указанного размера. Маски накладываются как opacity = mask/255 ×0,5.
+
+| Лист | Цвет | Серый |
+|---|---|---|
+| Рабочий 1521×856 | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-working-1521x856-colour.png) | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-working-1521x856-gray.png) |
+| Рабочий 1170×659 | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-working-1170x659-colour.png) | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-working-1170x659-gray.png) |
+| K1 ×0,65, full B | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-K1x065-colour.png) | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-K1x065-gray.png) |
+| Все семь K2 | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-K2-all-colour.png) | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-K2-all-gray.png) |
+| Сакура слева, 100% | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-detail-sakura-w-colour.png) | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-detail-sakura-w-gray.png) |
+| Сакура справа, 100% | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-detail-sakura-e-colour.png) | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-detail-sakura-e-gray.png) |
+| Подножие скалы, 100% | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-detail-mist-foot-colour.png) | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-detail-mist-foot-gray.png) |
+| Исключения древесины | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-woody-exclusions-colour.png) | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-woody-exclusions-gray.png) |
+| Защищённые области | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-protected-colour.png) | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-protected-gray.png) |
+| lantern-alpha master | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-lantern-alpha-master-colour.png) | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-lantern-alpha-master-gray.png) |
+| lantern-glow master | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-lantern-glow-master-colour.png) | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-lantern-glow-master-gray.png) |
+| sakura master | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-sakura-master-colour.png) | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-sakura-master-gray.png) |
+| mist master | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-mist-master-colour.png) | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-mist-master-gray.png) |
+| petals master | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-petals-master-colour.png) | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-petals-master-gray.png) |
+| lantern-nw K2 | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-K2-lantern-nw-colour.png) | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-K2-lantern-nw-gray.png) |
+| lantern-ne K2 | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-K2-lantern-ne-colour.png) | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-K2-lantern-ne-gray.png) |
+| lantern-w K2 | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-K2-lantern-w-colour.png) | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-K2-lantern-w-gray.png) |
+| lantern-e K2 | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-K2-lantern-e-colour.png) | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-K2-lantern-e-gray.png) |
+| sconce-door-w K2 | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-K2-sconce-door-w-colour.png) | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-K2-sconce-door-w-gray.png) |
+| sconce-door-e K2 | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-K2-sconce-door-e-colour.png) | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-K2-sconce-door-e-gray.png) |
+| portal K2 | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-K2-portal-colour.png) | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-K2-portal-gray.png) |
+
+**Сохранность.** [source-hashes-before.json](source-hashes-before.json) и неизменяемый [en04-baseline.json](en04-baseline.json) фиксируют входы и все 1499 файлов HUD до работы. После работы входы и дерево HUD неизменны. Требуемый снимок HUD-генератора заменён точной копией текущего draw_icons.py; прежний снимок сохранён побайтно в history/en04-before-draw_icons_v3_snapshot.py. Другие прежние скрипты, изображения, prompts и история не менялись. Старые README/отчёты/журнал/manifest сохранены в history/en04-before-*; README дописан, JSON-отчёты расширены EN-04, прежние секции не переписаны. Git/MCP/Unreal — 0. Записи только в двух разрешённых папках. Постоянных процессов нет.
+
+Воспроизведение без генераций:
+
+```powershell
+python -X utf8 -B art/imagegen/env-u16-marmoreal-codex/_tools/build_masks.py build
+python -X utf8 -B art/imagegen/env-u16-marmoreal-codex/_tools/build_masks.py sheets
+python -X utf8 -B art/imagegen/env-u16-marmoreal-codex/_tools/build_masks.py verify
+python -X utf8 -B art/imagegen/env-u16-marmoreal-codex/_tools/finish_en04.py docs
+python -X utf8 -B art/imagegen/env-u16-marmoreal-codex/_tools/build_masks.py verify
+python -X utf8 -B art/imagegen/env-u16-marmoreal-codex/_tools/finish_en04.py manifest
+```
+
+
+## EN-04 fix1 (2026-10-07)
+
+**Статус: предложено.** Корректирующий прогон CX-21 fix1 выполнен без генераций. Рекомендую исправленную связную маску крон вместо пигментной маски первого прогона: она сохраняет цельные области для UV-ветра.
+
+**ВР-VS3-EN04-01 — связные кроны.** В sRGB чистой плиты выбран HSV 265–350°, S ≥ 0,20, V ≥ 0,15 только внутри cherry-w/e и прежнего бокового продолжения. Далее: точное бинарное замыкание диском 24 plate px, заливка дыр, удаление компонент <400 px². Из огибающей вычтены прежние исключения древесины и защита. Затем Gaussian σ=4 с радиусом 12 px; древесина, защита и границы cherry снова обнулены. Повторного ограничения пигментом нет. Небо в диапазоне 200–255° не входит в выборку.
+
+**Локальное решение после осмотра.** Расширенные кропы 100% показали сиреневый блик на восточном каменном столбике: он проходит тот же HSV, но не относится к кроне. Добавлено отдельное геометрическое исключение статичного камня `STATIC_STONE_PLATE` (plate px, точный полигон в verification.json), до Gaussian и повторно как hard 0. Прежние woody-полигоны и защита не изменены. Огибающая E для покрытия по-прежнему измеряется до всех исключений. На статичном столбике G: 0 px.
+
+Огибающая E до исключения древесины: **749,495 px**; маска ≥128 покрывает **649,822 px = 86.7013%** (порог ≥85%). Компонент ≥128: **9**; две крупнейшие занимают **594,286 px = 91.2907%** площади (порог ≥90%). Связность проверена по четырём соседям. На woody cores, вне cherry/продолжения и в защите: **0 / 0 / 0 px**.
+
+Пересобраны sakura, petals (точная grayscale-дилатация диском 24 px с повторной защитой), G/A в anim, медиана sakura в lanterns.json и листы сравнения. Размер всех семи финальных PNG — 4680×2634, 8 bit; пять масок L, два файла RGBA. Время sakura с общей подготовкой: 7.510 с; petals: 3.614 с, каждый ≤60 с.
+
+**Сохранённые результаты.** lantern-alpha, lantern-glow, mist и marmoreal-lanterns-2x совпадают с первым прогоном по SHA-256. R и B в anim побайтно равны прежним значениям: изменённых пикселей 0/0, SHA-256 значений каждого канала совпадает. Все семь якорей (включая неподвижный портал), медиана mist, полигоны древесины и код защиты сохранены. Поле +2%, вся нарисованная рама +40 px и внешний край 40 px: все маски, RGBA anim и alpha фонарей имеют 0 ненулевых значений. RGB фонарного слоя по контракту остаётся RGB lit-плиты.
+
+**ВР-VS3-EN04-02 — портал принят.** Якорь — прежний центроид ярчайших тёплых пикселей двери; `animated=false`, `glow_weight=0`, R двери 0. По ВР-EN.3 нарисованная дверь не мерцает и стекла у неё нет. Строка 3 приёмки выполнена с этим решением; прежнее `literal_unmet` хранится только как история. Старая секция EN-04 выше оставлена побайтно и описывает именно прогон 1; её ограничение портала и пигментный алгоритм отменены настоящим fix1.
+
+**ВР-VS3-EN04-03 — отчёт.** Секция EN-04 в [verification.json](verification.json) дополнена `source_unchanged`, `exports` (все 7 PNG и все masks-листы), `palette`, `gray`, `sizes`, `outside_folder`, `acceptance` по строкам 1–5. Входы: 12; файлы HUD v3: 1499; изменённых 0. Прежние секции EN-01/EN-02/EN-02_SX01/EN-03_SX02_planB и вся история en04-* сохранены. Записей вне двух папок пакета нет. Все пять актуальных строк приёмки пройдены; это предложение для ревью, а не внедрение в игру.
+
+**Листы после fix1** (цвет и Rec.709 gray, мастер без уменьшения):
+
+| Лист | Цвет | Серый |
+|---|---|---|
+| Sakura, master 4680×2634 | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-sakura-master-colour.png) | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-sakura-master-gray.png) |
+| Petals, master 4680×2634 | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-petals-master-colour.png) | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-petals-master-gray.png) |
+| Рабочий 1521×856 | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-working-1521x856-colour.png) | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-working-1521x856-gray.png) |
+| Рабочий 1170×659 | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-working-1170x659-colour.png) | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-working-1170x659-gray.png) |
+| Sakura-w, 100% | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-detail-sakura-w-colour.png) | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-detail-sakura-w-gray.png) |
+| Sakura-e, 100% | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-detail-sakura-e-colour.png) | [PNG](../../../scraped-data/derived/env-u16-marmoreal-codex/comparison/masks-detail-sakura-e-gray.png) |
+
+**Осмотр и ограничения.** Цветные и серые листы открыты непосредственно: вместо пятен видны цельные огибающие, основная древесина и защита чёрные; небо свободно от маски. Не заявляется семантическое доказательство каждого мелкого нарисованного сучка. K1/K2 остаются кадрированием/кропами плиты, без Unreal. Параметрическая маска дымки не является финальной интенсивностью FX. Ограничения первого прогона и его файлы сохранены в `history/en04-fix1-before-*`.
+
+Воспроизведение (без изменения прежних разделов README):
+
+```powershell
+python -X utf8 -B art/imagegen/env-u16-marmoreal-codex/_tools/build_masks.py build
+python -X utf8 -B art/imagegen/env-u16-marmoreal-codex/_tools/build_masks.py sheets
+# Непосредственно открыть PNG; актуализировать _tools/en04-visual-review.json.
+python -X utf8 -B art/imagegen/env-u16-marmoreal-codex/_tools/build_masks.py verify
+python -X utf8 -B art/imagegen/env-u16-marmoreal-codex/_tools/finish_en04.py docs
+python -X utf8 -B art/imagegen/env-u16-marmoreal-codex/_tools/build_masks.py verify
+python -X utf8 -B art/imagegen/env-u16-marmoreal-codex/_tools/finish_en04.py manifest
+```
+
+## Ревью 2026-10-07 — Claude (CX-21: прогон 1 + одна корректировка fix1, единственный проход, по делегированию)
+
+**Итог: принято, по делегированию** (пользователь 2026-10-06: «Все решения принимай»). Маски EN-04 — входы EN-07
+(запекание `T_Marmoreal_ConceptAnim`, слой фонарей в PlateA/PlateB) и EN-08…EN-12.
+
+- **Рамки задачи.**
+  - `git status` основной копии: Codex менял только `art/imagegen/env-u16-marmoreal-codex/` и
+    `scraped-data/derived/env-u16-marmoreal-codex/` (вне git). Прочие изменения за время прогонов — `anim-death-sheet`,
+    `sc21…sc23`, задания AN-30 и SC-* — принадлежат параллельным сессиям.
+  - Разбор `codex.jsonl` обоих прогонов: правки файлов только в `_tools/`, ни одной команды git, обращений к `unreal/`
+    и вызовов MCP нет. Индекс пуст, `git log` пакетом не менялся. `outside_folder: []`.
+  - Входы (12) и дерево `hud-icons-v3` (1499 файлов) не изменились. Снимок `draw_icons_v3_snapshot.py` заменён точной
+    копией текущего `draw_icons.py` по договору пакета; прежний лежит в `history/`.
+  - `manifest-sha256.json`: 441 запись, мой пересчёт совпал полностью. Начало README побайтно равно состоянию до прогона.
+- **Прогон 1** (01:55–02:13, 0 генераций). Вердикт — fix-needed:
+  - маска сакуры — пятна пигмента: 18 % огибающей кроны, 245 компонент. Тон 300–350° не попадает в сиреневые в лунном
+    свете кроны (260–300°), и ветер рвал бы крону по пятнам;
+  - секция EN-04 в `verification.json` не в формате 07 §1.2.
+
+  Решения ВР-VS3-EN04-01…03 записаны в карточку и в задание
+  [EN-04.fix1.codex.md](../../../docs/game-design/visual/06-tasks/prompts/EN-04.fix1.codex.md) (`1b6fc008`).
+- **fix1** (02:16–02:30, 0 генераций).
+  - Сакура: огибающая покрыта на 86,7 %, на две крупнейшие компоненты приходится 91,3 % площади, всего компонент 9.
+  - На стволах и основных ветвях 0, вне полигонов cherry 0.
+  - Каналы R и B `marmoreal-anim-2x.png` побайтно равны прогону 1. Лепестки, медиана sRGB сакуры в `lanterns.json` и
+    листы пересобраны.
+  - В `verification.json` есть ключи 07 §1.2, строки приёмки 1–5 пройдены. Защита (поле + 2 %, рама + 40 px, край
+    40 px) — 0 у всех масок и каналов.
+- **Что я открыл** (`scraped-data/derived/env-u16-marmoreal-codex/comparison/`):
+  - после прогона 1: `masks-K1x065-colour`, `masks-working-1521x856-colour`, `masks-detail-sakura-w-colour`,
+    `masks-detail-sakura-e-colour`, `masks-sakura-master-gray`, `masks-K2-all-colour`, `masks-detail-mist-foot-colour`,
+    `masks-protected-colour`, `masks-woody-exclusions-colour`;
+  - после fix1: `masks-detail-sakura-w-colour`, `masks-detail-sakura-e-gray`, `masks-working-1170x659-gray`,
+    `masks-lantern-glow-master-gray`.
+- **Что видно.**
+  - Центры шести фонарей и бра лежат на стекле, допуск ±4 C0 px с запасом.
+  - R светит только в четырёх фонарях, двух бра и их пятнах; дверь 0.
+  - G закрывает кроны целиком, стволы оставлены.
+  - B — полоса у подножия обрыва и в нижней достройке, только под островом.
+  - Лепестки — кроны плюс 24 px.
+  - В сером кромки крон гладкие.
+- **ВР-VS3-EN04-02** (принято): `portal` в `lanterns.json` — неподвижный якорь. Это центроид ярчайших тёплых пикселей
+  двери, `animated=false`, glow 0: дверь нарисована, не мерцает (ВР-EN.3) и стекла не имеет.
+- **Остатки (ВР-VS3-EN04-04, по делегированию).**
+  - Вырезы древесины внутри крон и граница защиты в G — жёсткий 0, так требует правило fix1 (п. d): около 5,9 тыс. пар
+    пикселей со ступенью ≥ 128.
+  - Полигоны древесины грубые: у верхушки левого ствола прямоугольный вырез, ветви — прямые полосы.
+  - В материале EN-09 амплитуда качания у вырезов должна быть малой. Если на кадрах EN-07/EN-09 виден разрыв — смягчить
+    G у вырезов на ≥ 4 px при запекании или выборкой в материале. Маску заново не рисуем.
+  - Дымка B есть только под островом, у боковых облаков её нет; нужна ли она там — решает EN-12.
+  - `lantern-alpha` несёт мягкое свечение маски EN-01 (≈ 11 % плиты ненулевые), как принято в EN-01.
+- **Траты.** Две строки Codex в `credits-ledger.json`: прогон 1 и fix1, 0 генераций image_gen. SYNTX 0.

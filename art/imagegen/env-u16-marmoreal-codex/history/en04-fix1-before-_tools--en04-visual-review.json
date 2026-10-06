@@ -1,0 +1,45 @@
+{
+  "task": "EN-04",
+  "recipe": "EN-04-MASKS-03",
+  "status": "reviewed, proposed",
+  "reviewer": "Codex; direct local view_image inspection",
+  "reviewed_utc": "2026-10-06T21:10:51.046785+00:00",
+  "viewed_final_sheets": {
+    "masks-detail-sakura-w-colour.png": "3563cf8195a648600c15ae0aeafea78fa731cae5ac28bce44f70976596ffb6cb",
+    "masks-detail-sakura-e-colour.png": "de178677d33d376f2d973608167f58312d42124c24e8d86b801cb9f60688fc0c",
+    "masks-working-1521x856-colour.png": "2feec129e59c1507ba3d93d076e0c08da49d9492c07c1a0e4e75dc6a04870722",
+    "masks-working-1170x659-gray.png": "c915c9437a5e9678f5971884adc3508ff81e067a2cafaca08c128b84e70e5d13",
+    "masks-K2-lantern-e-colour.png": "21968a47724873093a993a56157566f84ee32d80e7d497317dc4661322c8f926",
+    "masks-lantern-alpha-master-colour.png": "c6a7ae1787e866d33b246bb5a110e27a9893672266c5f94694c067b04a9e3b65",
+    "masks-lantern-glow-master-gray.png": "09681e4ed5ce34962bdc75ecc582745ed015235ecd2b286b0c1ebc2d31614442",
+    "masks-sakura-master-colour.png": "8e1cf5aab6ba31915788a10b9a9bbedf1d38cca65c69e6fb63c4f4f8b8a5f390",
+    "masks-mist-master-gray.png": "782b8d6a109a84252002e1cc78c03b6b3ff4038a06e8fd28289584d3227e6257",
+    "masks-petals-master-colour.png": "c7d0864c14e45ad95d49b18b3195b6475888f0748a3b05ee2a6f2ba91f852e27",
+    "masks-K2-all-colour.png": "052f2f6d02cdacd2aeaff6355b263ad6b701fd5c36cddfc00f8b3771790a371d",
+    "masks-K2-all-gray.png": "e3a1e300119448d7ef5cbe46480ed896e3550e4091f98d5dee7ffbf39cee9eac",
+    "masks-detail-mist-foot-gray.png": "cf0788f4361c2ca64597502f0fa37719aab3f1becfd09fe9eb869931c86e4fca",
+    "masks-K1x065-colour.png": "945b9ea7832873d3f2dd1c8d474c09dc9001fd371c04bb87850ab8e608213f05",
+    "masks-protected-colour.png": "55d877071b41897390ead2ed3c45609347da1a042fa746f10de9d8b4cf80fb31"
+  },
+  "observations": {
+    "six_centres_on_glass": true,
+    "portal_anchor_on_retained_warm_emitter": true,
+    "portal_R_zero": true,
+    "sakura_on_blossom_pigment": true,
+    "visible_main_trunks_and_primary_branches_excluded": true,
+    "field_and_frame_free_of_overlays": true,
+    "mist_at_front_cliff_foot_and_lower_outpaint": true,
+    "mist_is_a_geometric_envelope_not_final_FX_intensity": true,
+    "petals_extend_around_selected_blossoms": true
+  },
+  "limitations": [
+    "A semantic label for every tiny painted twig is not available; HSV plus explicit woody cores and crop inspection are the evidence.",
+    "The portal has no glow difference and is not lantern glass. Its fallback anchor is static; literal seven glass/glow-centroid acceptance cannot pass.",
+    "K1 is image-plane framing, K2 is a crop; there is no live game render."
+  ],
+  "iteration_history": [
+    "01: pigment-only selection included reflected pink bark highlights.",
+    "02: woody centre paths removed the cores but crop inspection showed some contour highlights.",
+    "03: widened trunk/primary-branch exclusion; re-opened final crown crops and all six emitters plus portal."
+  ]
+}

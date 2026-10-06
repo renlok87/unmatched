@@ -1,0 +1,52 @@
+{
+  "task": "AN-30",
+  "prompt_key": "AN-30 / T-CODEX-ANIMSHEET / anim-death-sheet",
+  "prompt_file": "docs/game-design/visual/06-tasks/prompts/AN-30.codex.md",
+  "prompt_file_sha256": "f5622ab05c3332b9652e8b1f3dcef7203f5e53e27a28e13c112d0fa140420877",
+  "card_prompt_sha256": "2d01812f4c3e3dbce473f9a5a8d9050f264edb9561ef076a02485fd8a15d928f",
+  "generations": [],
+  "procedural_studies": [
+    {
+      "prompt_key": "AN-30.TRACE.01",
+      "file": "concepts/tracing-study.png",
+      "exact_instruction": "Compare q34/front f13/f21: background difference >16, broad hue rig removal dilated 4, closing 7, fill holes. Unretouched failed trial: sword erased."
+    },
+    {
+      "prompt_key": "AN-30.TRACE.02",
+      "file": "concepts/tracing-local-closing-study.png",
+      "exact_instruction": "Compare f13 q34 local closing: rig dilation 1/2/3 and closing size radius*2+5, no global hole fill. Unretouched failed trial: exterior rig remains."
+    },
+    {
+      "prompt_key": "AN-30.TRACE.03",
+      "file": "concepts/tracing-density-study.png",
+      "exact_instruction": "Compare f13 q34 density-gated rig reconstruction at .40/.50/.60 with 25px neighborhood; hole repair under 300px. Unretouched trial: body gaps."
+    },
+    {
+      "prompt_key": "AN-30.TRACE.04",
+      "file": "concepts/tracing-density-refinement.png",
+      "exact_instruction": "Compare f13 q34 density-gated reconstruction at .20/.25/.30; hole repair under 800px. Unretouched failed trial: sword/background gap filled."
+    },
+    {
+      "prompt_key": "AN-30.TRACE.05",
+      "file": "concepts/tracing-final-method.png",
+      "exact_instruction": "Compare f13 q34 source vs density>.25 rig reconstruction; fill closed holes only where raw background-difference mask has original foreground. Unretouched candidate before <120px speckle cleanup."
+    }
+  ],
+  "reason": "No image generation of characters. concepts/ holds unretouched procedural segmentation studies from supplied renders, each with its exact processing instruction.",
+  "corrective_runs": [
+    {
+      "id": "AN-30/fix1",
+      "card_id": "AN-30",
+      "prompt_key": "AN-30/fix1",
+      "tool": "procedural Pillow / existing trace masks",
+      "mode": "corrective procedural redraw",
+      "original_path": "concepts/AN-30-death-sheet-fix1-unretouched.png",
+      "saved_path": "vector/AN-30-death-sheet.png",
+      "sha256": "16da8202e87448e384468a33e54e36ee4aa63aea25419adab9a717d1621b26a4",
+      "selected": true,
+      "date": "2026-10-07",
+      "image_generations": 0,
+      "exact_prompt": "Task AN-30 fix1 - corrective run for the package art/imagegen/anim-death-sheet-codex/ (CX-26).\nFirst read docs/game-design/visual/06-tasks/prompts/AN-30.codex.md (the base task: package contract, timing,\nkeyframes, palette, acceptance), then the package README.md, DESIGN.md, verification.json and\n_tools/draw_death_sheet.py. Everything in the base task still applies unless this file says otherwise. The review\naccepted: the common axis and the two lanes (hero 0-2125 with HitReact 450, DeathSettle 875, still 300, ash 500;\nsidekick 0-1725 with ash 400), the clip ticks f00/f03/f13/f21, the eight traced poses of King Arthur and the Harpy\n(no kneeling), the CUE row (contact, flash 70, -N +60, HP +80, heart cross 1100, result 3125, hero only), the 40 ember\ndots, «skip не обрывает», «без колен». Change only what the five points below need.\n\nPackage contract (unchanged).\n- Write ONLY inside art/imagegen/anim-death-sheet-codex/ and scraped-data/derived/anim-death-sheet-codex/. Nothing else\n  on disk changes. No git commands at all. Do not open, edit or build anything under unreal/. No image generation.\n- Do not edit art/imagegen/hud-icons-v3/ or other packages under art/imagegen/ (other sessions may write other\n  packages during your run; they are not inputs and not yours - do not report them as your changes).\n- Do not re-capture source-hashes-before.json; re-check the input and hud-icons-v3 hashes against it at the end.\n- Before changing anything, write fix1-before.json in the package folder: sha256 of every current file of the package.\n  Keep concepts/ unchanged; save the new master unretouched as concepts/AN-30-death-sheet-fix1-unretouched.png and log\n  it in generation-records.json (key AN-30/fix1, selected true).\n\nFix 1 - package files of the contract (07 §1.1).\n- manifest-sha256.json: sha256 and byte size of every file in the package folder and in\n  scraped-data/derived/anim-death-sheet-codex/ (if it exists), except itself; written last, after README.md and\n  verification.json. It replaces manifest.json: delete manifest.json and fix every reference to it.\n- prompts/: prompts/AN-30-prompts.json maps a key to the verbatim text: \"AN-30/task\" = the Task text of AN-30.codex.md,\n  \"AN-30/fix1\" = the Task text of this file.\n\nFix 2 - verification.json in the 07 §1.2 format. Keep every existing key; add:\n- exports: for every PNG in vector/ and comparison/: path, size, mode (RGBA), margin_px (smallest distance from any\n  pixel that differs from the background - or its grey value - to the canvas edge), touches_edge (bool).\n- palette: for the colour master: the share of opaque pixels farther than dE76 3 from every token of the card\n  (#061623, #F9EBDB, #FAF8F2, #111317, #F2EDE4, #B9B2A6, #FFB45C, #E8C06A, #5A7F9F), anti-aliased edge pixels excluded (a\n  pixel whose 3x3 neighbourhood is not one colour); the share must be 0; write the excluded count and the pixel count\n  per token. The reduced-motion fade states (Fix 5) are opacity over #061623: list their composited colours under\n  palette.derived with the opacity, they are not off-token.\n- gray: every colour file with its Rec.709 grey pair; and the pairs that must stay apart in grey, with the measurement:\n  the ash front band vs the hero ash (P1) and vs the sidekick ash (P2) (after Fix 3), the hero lane vs the sidekick lane,\n  the ash bar vs the fade bar of the reduced lanes (Fix 5); a pair passes with a luma difference >= 20 or a shape\n  difference that you name.\n- sizes: master 1920x1080 and the working copy 1280x720 present, each drawn natively (downscaled_from_master false); the\n  960x540 copies may stay as an overview, say so.\n- acceptance: one record {passed, measured, expected, note} per line of the card acceptance:\n  1) the hero lane ends at 2125 ms and the sidekick lane at 1725 ms (tolerance 42 ms), measured in px on the master;\n  2) the heart cross at 1100 ms and the result screen at 3125 ms are marked;\n  3) only the front colour #FFB45C and the team colours are used for the ash (pixel counts inside the dissolve states);\n  4) at most 40 ember dots (count the drawn dots);\n  5) the reduced-motion lane is a plain fade (no front band, no embers in it);\n  6) no kneeling pose;\n  7) every number has its source in README (every number drawn on the sheet matched to a README row; unmatched 0);\n  8) colour and grayscale sheets exist; verification.json has source_unchanged true and outside_folder [].\n\nFix 3 - the ash front is invisible on King Arthur. On the P1 states the front band #FFB45C touches the ash #E8C06A:\ntwo warm yellows with almost the same luma, so the band does not read in colour and disappears in grey (the Harpy\nband on #5A7F9F reads). The card says «фронт и пепел различимы в сером». In all four dissolve states (both lanes, 35 %\nand 70 %) and in the ash-vs-fade sheet:\n- the front band is a flat strip 6 px tall at the master along the cut line;\n- a 2 px #111317 line separates the band from the ash above it, and the same 2 px #111317 line closes the band below;\n- the remaining ash keeps the 2 px #111317 keyline around its silhouette like the other poses;\n- no gradient, no glow, no new colour. Measure in grey: band vs ash separated by the keyline on both lanes.\n\nFix 4 - the speed row contradicts UI-ACC-013 (new decision ВР-VS3-AN30-01, по делегированию; write it in README «Мелкие\nрешения» and source it to docs/game-design/02-ux-ui-spec.md UI-ACC-013 and docs/game-design/de-footage/task/\n03-work-items.md W-24). Today «СКОРОСТЬ КЛИПОВ» draws ×0,5 as the longest bar (README: duration = 1 / speed) and\nproposes «Нет» = clips at ×1 with a fade instead of ash. In this project the speed is a duration multiplier (×0,5 =\nfaster: AN-22 140 ms per edge, AN-26 play rate 2), and UI-ACC-013 lists exactly what it scales: the step, PLACE, the\nLungeAttack clip and «−N»; the HitReact tint and the combat holds are not scaled. ВР-VS3-AN30-01: the speed setting\ndoes not change death (CUE-013): HitReact, DeathSettle, the still, the ash dissolve, the heart cross at 1100 and the\nresult at 3125 are the same at ×0,5 / ×1 / ×1,5 / «Нет»; ash stays ash at every speed (fade only under reduced motion\nor -S08DissolveFade, ВР-13); only «−N» (CUE-011) follows the speed: 900 × speed, i.e. 450 / 900 / 1350 ms (02 §9.2\nCUE-011), and at «Нет» it holds 450 ms (UI-ACC-013). Replace the row: title «СКОРОСТЬ (UI-ACC-013)», four labels\n×0,5 / ×1 / ×1,5 / «Нет», for each a thin bar of the hero death 0-2125 ms on the common axis (identical in all four),\nand a short «−N» bar from +60 ms with its length (450 / 900 / 1350 / 450 ms) in a distinct shape; one line of text:\n«смерть не масштабируется скоростью; меняется только «−N»». If the four lanes do not fit, take the vertical space from\nthe reduced-motion row (Fix 5) and the footer, not from the poses.\n\nFix 5 - the reduced-motion variant is three 20 px icons, not a lane. Draw a reduced-motion lane for the hero on the\ncommon axis: HitReact 450, DeathSettle 875, still 300 as in the hero lane, then «fade · 500» (1625-2125) as an outlined\nbar in #B9B2A6 instead of «ash · 500», gone at 2125, no embers; label «REDUCED MOTION · fade без угольков». The three\nsmall icons may stay next to the label if they fit. In the ash-vs-fade sheet fix the title «KINGARTHUR» -> «KING ARTHUR».\n\nAlso: the labels «gone · 2125», «gone · 1725», «+1000 result» and «без result» are crossed by the thin lane lines;\nkeep every label at least 4 px clear of every line. No other drawing changes.\n\nAfter the fixes: open (view) the new colour and grey master, the 1280x720 colour and grey copies and the ash-vs-fade\nsheet yourself, crop and view the dissolve states at x2, update verification.visual_review, run verify_package.py, then\nwrite manifest-sha256.json last. In README add a section «Исправления fix1» (what changed, before -> after), replace\nthe «SPEED-NONE» proposal by ВР-VS3-AN30-01 and keep the status «предложено»."
+    }
+  ]
+}
