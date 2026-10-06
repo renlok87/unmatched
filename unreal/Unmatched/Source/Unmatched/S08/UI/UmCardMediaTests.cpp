@@ -13,6 +13,7 @@
 #include "UmCardMedia.h"
 
 #include "../S08ArtLook.h"
+#include "../S08HudTokens.generated.h"
 #include "Engine/Texture2D.h"
 #include "Misc/App.h"
 #include "Misc/AutomationTest.h"
@@ -181,8 +182,10 @@ bool FUmCardMediaAssetsTest::RunTest(const FString&) {
     FTextureCompilingManager::Get().FinishCompilation({static_cast<UTexture*>(T)});
 #endif
 #if WITH_EDITORONLY_DATA
+    // panel.bg #061623 with alpha 0, from the token header (G-TOKENS: no colour literal in S08/UI)
+    const FColor PadColor(S08HudTokens::Color_PanelBg.R, S08HudTokens::Color_PanelBg.G, S08HudTokens::Color_PanelBg.B, 0);
     TestTrue(Id + TEXT(": PAD_TO_POWER_OF_TWO, padding #061623 a0"),
-             T->PowerOfTwoMode == ETexturePowerOfTwoSetting::PadToPowerOfTwo && T->PaddingColor == FColor(6, 22, 35, 0));
+             T->PowerOfTwoMode == ETexturePowerOfTwoSetting::PadToPowerOfTwo && T->PaddingColor == PadColor);
     TestTrue(Id + TEXT(": simple-average mips"), T->MipGenSettings == TMGS_SimpleAverage);
 #endif
     TestTrue(Id + TEXT(": trilinear, UI group, sRGB, BC7, never stream"),

@@ -5,7 +5,9 @@
 // In the editor the game localization is shown through the game-localization preview (the packaged game reads
 // [Internationalization] Culture=ru of DefaultGame.ini); the test restores the editor culture state at the end.
 //   node tools/s08/run-ue-tests.cjs Unmatched.S08.Hud.Strings <log>
-#if WITH_AUTOMATION_TESTS
+// Editor-only: FTextLocalizationManager::Enable/DisableGameLocalizationPreview exist only WITH_EDITOR, and the test runs
+// in EditorContext; without the guard the Development game target (packaging) does not compile.
+#if WITH_AUTOMATION_TESTS && WITH_EDITOR
 
 #include "UmText.h"
 #include "Dom/JsonObject.h"
@@ -166,4 +168,4 @@ bool FUmTextKeysTest::RunTest(const FString&) {
   return true;
 }
 
-#endif  // WITH_AUTOMATION_TESTS
+#endif  // WITH_AUTOMATION_TESTS && WITH_EDITOR
