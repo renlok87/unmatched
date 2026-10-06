@@ -9,6 +9,8 @@
 #include "S08ArtHudWidgets.h"
 #include "S08Team.h"
 #include "UI/S08HudDebug.h"
+#include "UI/UmHudScale.h"
+#include "UI/UmTeamChip.h"
 #include "Blueprint/UserWidget.h"
 #include "Misc/CoreDelegates.h"
 #include "Camera/CameraActor.h"
@@ -7225,25 +7227,19 @@ void AS08FlowGameMode::BuildArtHudWidgets(const TSharedRef<SConstraintCanvas>& C
     const FString Path = Texture ? TokenPath : ConceptPath;
     if (!Texture) Texture = LoadObject<UTexture2D>(nullptr, *ConceptPath);
     ArtHud.IconTexturePath = Texture ? Path : FString(TEXT("none"));
-    // W5b-R D-3: team shape chips (circle P1 / hexagon P2), 12 px exact-size, tinted by the chip colour.
-    bool bChips = !S08LegacyRender();
-    for (int32 I = 0; I < 2 && bChips; ++I) {
-      UTexture2D* Chip = LoadObject<UTexture2D>(nullptr, I == 0
-          ? TEXT("/Game/ArtTests/ARTMarkers/Textures/T_UI_TeamShape_Circle_12")
-          : TEXT("/Game/ArtTests/ARTMarkers/Textures/T_UI_TeamShape_Hex_12"));
-      if (!Chip) {
-        bChips = false;
-        break;
-      }
-      ArtHudAssets.Add(Chip);
-      FSlateBrush& Brush = I == 0 ? ArtHud.ChipCircleBrush : ArtHud.ChipHexBrush;
-      Brush.SetResourceObject(Chip);
-      Brush.ImageSize = FVector2D(12.0, 12.0);
-      Brush.DrawAs = ESlateBrushDrawType::Image;
-      Brush.Tiling = ESlateBrushTileType::NoTile;
+    // W5b-R D-3, VS-2 IC-44 / IC-45: team shape chips (circle P1 / hexagon P2) tinted by the chip colour - the v3
+    // team-chip export for the carrier's chip su (UI/UmTeamChip.h), -S08IconLegacy the mvp-v1 12 px chips.
+    const UmTeamChip::FUmTeamChipBrushes Chips =
+        UmTeamChip::Load(FS08ArtHudTagStyle().ChipSu, UmHudScale::Current().PxPerSu(), FCommandLine::Get());
+    const bool bChips = !S08LegacyRender() && Chips.bReady;
+    if (bChips) {
+      for (UTexture2D* Chip : Chips.Textures) ArtHudAssets.Add(Chip);
+      ArtHud.ChipCircleBrush = Chips.Brushes[0];
+      ArtHud.ChipHexBrush = Chips.Brushes[1];
     }
     ArtHud.bChipBrushes = bChips;
-    ArtHud.PendingTrace.Add(FString::Printf(TEXT("HUD team chips ready=%d mode=%s tagNames=%s"), bChips ? 1 : 0,
+    ArtHud.PendingTrace.Add(FString::Printf(TEXT("HUD team chips ready=%d %s mode=%s tagNames=%s"), bChips ? 1 : 0,
+                                            *Chips.TraceFields(),
                                             S08TeamColorModeName(static_cast<ES08TeamColorMode>(ArtHud.TeamColorMode)),
                                             ArtHud.bTagNamesAll ? TEXT("all") : TEXT("rule")));
     ArtHud.bIconTextureReady = Texture != nullptr;

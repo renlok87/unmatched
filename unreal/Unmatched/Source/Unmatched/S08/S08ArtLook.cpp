@@ -7,6 +7,7 @@
 #include "S08Render.h"
 #include "S08TurnPortraitWidget.h"
 #include "UI/UmHudScale.h"
+#include "UI/UmTeamChip.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
 
@@ -83,12 +84,14 @@ FString TraceLine() {
   const FString Dpi = UmHudScale::ArtLookField(Cmd);
   // VS-1 CP-02: the real avatars / card scans or their rollbacks (ВР-CP08).
   const FString CardMedia = CardMediaField(Cmd);
+  // VS-2 IC-44 / IC-45: the v3 team chips or the -S08IconLegacy mvp-v1 chips.
+  const FString Chips = UmTeamChip::ArtLookField(Cmd);
   // VS-2 HB-06: the UMG HUD root or the -S08SlateHud rollback (whole / block list).
   const FString HudImpl = SlateHudBlocks().ImplField();
   return FString::Printf(
-      TEXT("ARTLOOK art=%d source=%s heroes=%s tray=%s env=%s review=%d legacyRender=%d markers=%d aliases=%s %s %s %s hudImpl=%s%s"),
+      TEXT("ARTLOOK art=%d source=%s heroes=%s tray=%s env=%s review=%d legacyRender=%d markers=%d aliases=%s %s %s %s %s hudImpl=%s%s"),
       bArt ? 1 : 0, Source, *Heroes, *Tray, *Env, ReviewTooling() ? 1 : 0, S08LegacyRender() ? 1 : 0, S08Markers() ? 1 : 0,
-      Aliases.Num() ? *FString::Join(Aliases, TEXT(",")) : TEXT("-"), *HudLook, *Dpi, *CardMedia, *HudImpl,
+      Aliases.Num() ? *FString::Join(Aliases, TEXT(",")) : TEXT("-"), *HudLook, *Dpi, *CardMedia, *Chips, *HudImpl,
       bArt ? TEXT("") : TEXT(" (grey board: no art profile, figures, tray or art HUD layer)"));
 }
 
