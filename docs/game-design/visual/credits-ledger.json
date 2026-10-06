@@ -239,11 +239,47 @@
       "result_path": "art/imagegen/hud-skins-v1-codex/",
       "status": "ok",
       "note": "CX-02r (fix1, корректирующий прогон); 2026-10-06 11:47-11:58 +05:00 (~11 мин); процедурно, 58 PNG скинов + 29 мастеров + 110 листов; кромки замкнуты, disabled главной 6,60:1 (text.primary), курсоры убраны (IC-58…IC-61), флажок 24 su без растяжения; scraped-data/derived/hud-skins-v1-codex 614 -> 113 МБ (старые прогоны и курсоры перенесены в C:/tmp/visual/CX-02r/pruned/); README/visual-review восстановлены из лога CX-02; verification: source_unchanged true, outside_folder [], 450/450 серых пар, palette 0; acceptance_pass false только из-за формулировки карточки (ВР-VS2-HB08-06); ревью Claude: accept по делегированию"
+    },
+    {
+      "date": "2026-10-06T11:51:38+05:00",
+      "service": "Codex",
+      "model": "gpt-6.1-sol (codex.exe exec, high) + image_gen",
+      "template": "T-CODEX-ENVPLATE",
+      "task_id": "EN-01",
+      "units": "пакет, 1 генерация image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a10ffb-709f-7f31-91af-2722c8ca8de6",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/EN-01.fix1.codex.md",
+      "result_path": "art/imagegen/env-u16-marmoreal-codex/",
+      "status": "ok",
+      "note": "CX-07r fix1 (доработка); 11:51:38-12:00:47 +05:00 (~9 мин); 1 image edit (SW, кроп 192 px), SYNTX 0; плита: призрак SW снят, шов расширенной растушёвкой (7 ячеек), маска фонарей пересобрана (m>=128 9,2 % вместо 27 %); метрика ВР-VS2-EN.1; acceptance 5 не пройдена (ядра бра срезаны растушёвкой remove-mask, 425 px); ревью Claude: fix-needed (призраки NW/NE при подъёме яркости, ядра бра) -> fix2"
+    },
+    {
+      "date": "2026-10-06T12:05:41+05:00",
+      "service": "Codex",
+      "model": "gpt-6.1-sol (codex.exe exec, high) + image_gen",
+      "template": "T-CODEX-ENVPLATE",
+      "task_id": "EN-01",
+      "units": "пакет, 2 генерации image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a11008-4da1-7df1-94e5-550d5466ee3a",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/EN-01.fix2.codex.md",
+      "result_path": "art/imagegen/env-u16-marmoreal-codex/",
+      "status": "ok",
+      "note": "CX-07r fix2 (единственная корректировка); 12:05:41-12:18:04 +05:00 (~12 мин); 2 image edit (NW, NE; SE осмотрен, не правился), SYNTX 0; ядра бра 255 внутри support; acceptance 6/6; ревью Claude: принято по делегированию; ремонт кодировки README/visual-review-r3.json (PowerShell -> python заменил кириллицу на ?) сделан Claude из журнала codex-fix1.jsonl; 3 PNG кэша imagegen перенесены в C:/tmp/visual/CX-07r/stray/"
     }
   ],
   "totals": {
     "syntx_spent": 0,
     "tripo_spent": 0,
-    "codex_packages": 9
+    "codex_packages": 11
   }
 }

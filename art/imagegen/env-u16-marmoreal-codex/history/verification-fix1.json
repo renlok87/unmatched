@@ -1,103 +1,126 @@
 {
   "task": "EN-01",
-  "run": "CX-07r fix2",
+  "run": "CX-07r fix1",
   "status": "предложено",
   "outside_folder": [],
   "palette": "not applicable: plate colours come from the painting",
   "changed_pixels_outside_remove_mask": 0,
   "field_all_808080": true,
   "changes_vs_previous_plate": {
-    "reference": "fix1 plate; comparison/fix2-before-clean.png",
-    "total": 3922,
-    "nw": 2062,
-    "ne": 1860,
-    "se": 0,
-    "elsewhere": 0,
-    "SW_unchanged": true
+    "total": 23837,
+    "fix_mask": 5102,
+    "seam_cells": 18735,
+    "elsewhere": 0
   },
   "lantern_mask": {
     "nonzero_share": 0.22328696947663332,
-    "share_ge_128": 0.09166289552496835,
-    "alpha_weighted_mean": 0.6918443394340754,
-    "global_mean_alpha": 0.101936878814698,
-    "mean_alpha_levels": 25.993904097747993,
+    "share_ge_128": 0.09156056623057014,
+    "alpha_weighted_mean": 0.6909965883743626,
+    "global_mean_alpha": 0.10181257071825368,
+    "mean_alpha_levels": 25.96220553315469,
     "max_4_neighbour_step_outside_core_edges": 43,
-    "core_polygons_all_255": true,
-    "dilated_cores_all_255": true,
-    "core_clipped_pixels": 0,
+    "core_polygons_all_255": false,
+    "dilated_cores_all_255": false,
+    "core_clipped_pixels": 425,
     "per_core": [
       {
         "spot": "nw",
         "polygon_pixels": 3704,
-        "polygon_pixels_in_support": 3704,
-        "polygon_pixels_below_255_in_support": 0,
-        "dilated_pixels_below_255_in_support": 0,
-        "lit_pixels_different_from_C0": 0
+        "polygon_pixels_below_255": 0,
+        "dilated_pixels_below_255": 0,
+        "lit_pixels_different_from_C0": 0,
+        "clipped_bounds": null,
+        "remove_values_at_clipped_pixels": []
       },
       {
         "spot": "ne",
         "polygon_pixels": 4266,
-        "polygon_pixels_in_support": 4266,
-        "polygon_pixels_below_255_in_support": 0,
-        "dilated_pixels_below_255_in_support": 0,
-        "lit_pixels_different_from_C0": 0
+        "polygon_pixels_below_255": 0,
+        "dilated_pixels_below_255": 0,
+        "lit_pixels_different_from_C0": 0,
+        "clipped_bounds": null,
+        "remove_values_at_clipped_pixels": []
       },
       {
         "spot": "sw",
         "polygon_pixels": 5416,
-        "polygon_pixels_in_support": 5416,
-        "polygon_pixels_below_255_in_support": 0,
-        "dilated_pixels_below_255_in_support": 0,
-        "lit_pixels_different_from_C0": 0
+        "polygon_pixels_below_255": 0,
+        "dilated_pixels_below_255": 0,
+        "lit_pixels_different_from_C0": 0,
+        "clipped_bounds": null,
+        "remove_values_at_clipped_pixels": []
       },
       {
         "spot": "se",
         "polygon_pixels": 5574,
-        "polygon_pixels_in_support": 5574,
-        "polygon_pixels_below_255_in_support": 0,
-        "dilated_pixels_below_255_in_support": 0,
-        "lit_pixels_different_from_C0": 0
+        "polygon_pixels_below_255": 0,
+        "dilated_pixels_below_255": 0,
+        "lit_pixels_different_from_C0": 0,
+        "clipped_bounds": null,
+        "remove_values_at_clipped_pixels": []
       },
       {
         "spot": "door-w",
         "polygon_pixels": 891,
-        "polygon_pixels_in_support": 891,
-        "polygon_pixels_below_255_in_support": 0,
-        "dilated_pixels_below_255_in_support": 0,
-        "lit_pixels_different_from_C0": 0
+        "polygon_pixels_below_255": 37,
+        "dilated_pixels_below_255": 130,
+        "lit_pixels_different_from_C0": 37,
+        "clipped_bounds": [
+          777,
+          45,
+          800,
+          53
+        ],
+        "remove_values_at_clipped_pixels": [
+          128,
+          170,
+          212
+        ]
       },
       {
         "spot": "door-e",
         "polygon_pixels": 794,
-        "polygon_pixels_in_support": 791,
-        "polygon_pixels_below_255_in_support": 0,
-        "dilated_pixels_below_255_in_support": 0,
-        "lit_pixels_different_from_C0": 0
+        "polygon_pixels_below_255": 171,
+        "dilated_pixels_below_255": 295,
+        "lit_pixels_different_from_C0": 168,
+        "clipped_bounds": [
+          866,
+          0,
+          871,
+          55
+        ],
+        "remove_values_at_clipped_pixels": [
+          0,
+          42,
+          85,
+          128,
+          170,
+          212
+        ]
       }
     ],
     "zero_outside_remove_support": true,
     "zero_on_field": true,
     "zero_beyond_radius": true,
     "radius_convention": "union of each light own radius; overlapping lights retained",
-    "step_core_exclusion": "pairs touching dilated cores or their 2.5 px Euclidean soft edge; includes support boundary immediately next to a core",
-    "core_pixels_outside_support": 39,
-    "core_condition": "255 only where remove>0; outside support m=0 and clean=C0"
+    "step_core_exclusion": "dilated cores plus their exact 2.5 px distance-field soft edge",
+    "constraint_conflict": "Complete sconce bracket polygons overlap frozen remove-mask feather and protected door boundary. The mandated min(core/glow, remove/255) clips them; full 255 cores cannot be asserted. Polygons were not shrunk to conceal this."
   },
   "lit_check": {
-    "cores_equal_C0_exactly": true,
+    "cores_equal_C0_exactly": false,
     "per_light": [
       {
         "spot": "nw",
         "radius_px": 96,
-        "mean_dE76": 5.8886615861859015,
-        "plate_alone_mean_dE76": 26.906661290900754,
+        "mean_dE76": 5.8901625022610435,
+        "plate_alone_mean_dE76": 26.837581147856632,
         "passed": true
       },
       {
         "spot": "ne",
         "radius_px": 96,
-        "mean_dE76": 5.934556707676374,
-        "plate_alone_mean_dE76": 30.94929112520615,
+        "mean_dE76": 5.93502781687874,
+        "plate_alone_mean_dE76": 30.89008212806309,
         "passed": true
       },
       {
@@ -117,34 +140,32 @@
       {
         "spot": "door-w",
         "radius_px": 96,
-        "mean_dE76": 0.5483875774519607,
+        "mean_dE76": 0.6289561421086126,
         "plate_alone_mean_dE76": 5.946512895736485,
         "passed": true
       },
       {
         "spot": "door-e",
         "radius_px": 96,
-        "mean_dE76": 0.7400396913118589,
+        "mean_dE76": 0.8113253772011286,
         "plate_alone_mean_dE76": 6.811561306402888,
         "passed": true
       }
-    ],
-    "polygon_cores_equal_C0_exactly": true,
-    "core_condition": "checked inside and outside support, including 2 px dilation"
+    ]
   },
   "R1": [
     {
       "spot": "nw",
-      "spot_median_Lstar": 12.054695451508442,
-      "ring_median_Lstar": 21.619117131807446,
-      "signed_delta": -9.564421680299004,
+      "spot_median_Lstar": 11.717808570162136,
+      "ring_median_Lstar": 21.562663240639143,
+      "signed_delta": -9.844854670477007,
       "passed": true
     },
     {
       "spot": "ne",
-      "spot_median_Lstar": 6.747489894194613,
-      "ring_median_Lstar": 23.40164404120811,
-      "signed_delta": -16.6541541470135,
+      "spot_median_Lstar": 12.624032254849983,
+      "ring_median_Lstar": 23.391523464127282,
+      "signed_delta": -10.7674912092773,
       "passed": true
     },
     {
@@ -2585,9 +2606,9 @@
           "y": 128,
           "inner_pixels": 212,
           "outer_pixels": 207,
-          "s": 0.0,
+          "s": 0.5196680519146515,
           "source_delta": 8.112618438513561,
-          "plate_delta": 8.112618438513561,
+          "plate_delta": 7.592950386598909,
           "protected_outer_share": 0.0,
           "exempt": false,
           "status": "pass"
@@ -2684,9 +2705,9 @@
           "y": 128,
           "inner_pixels": 237,
           "outer_pixels": 265,
-          "s": 0.11328758839453457,
+          "s": 2.3027629300820394,
           "source_delta": 15.415144212863652,
-          "plate_delta": 15.528431801258186,
+          "plate_delta": 17.71790714294569,
           "protected_outer_share": 0.0,
           "exempt": false,
           "status": "pass"
@@ -3083,12 +3104,12 @@
           "y": 160,
           "inner_pixels": 211,
           "outer_pixels": 207,
-          "s": 0.18531096471292585,
+          "s": 5.841713616064794,
           "source_delta": 3.5518332199979596,
-          "plate_delta": 3.7371441847108855,
+          "plate_delta": -2.2898803960668346,
           "protected_outer_share": 0.0,
           "exempt": false,
-          "status": "pass"
+          "status": "fail"
         },
         {
           "x": 1152,
@@ -3179,9 +3200,9 @@
           "y": 160,
           "inner_pixels": 429,
           "outer_pixels": 248,
-          "s": 0.12261921292087052,
+          "s": 1.0482581165690803,
           "source_delta": 4.048610386052825,
-          "plate_delta": 4.171229598973696,
+          "plate_delta": 5.096868502621906,
           "protected_outer_share": 0.0,
           "exempt": false,
           "status": "pass"
@@ -3191,12 +3212,12 @@
           "y": 160,
           "inner_pixels": 162,
           "outer_pixels": 218,
-          "s": 0.6354349971586828,
+          "s": 4.791755900439707,
           "source_delta": 19.1345584319157,
-          "plate_delta": 19.769993429074383,
+          "plate_delta": 23.926314332355407,
           "protected_outer_share": 0.0,
           "exempt": false,
-          "status": "pass"
+          "status": "fail"
         },
         {
           "x": 1504,
@@ -3590,9 +3611,9 @@
           "y": 192,
           "inner_pixels": 101,
           "outer_pixels": 150,
-          "s": 0.023702966035635598,
+          "s": 3.3721095351618544,
           "source_delta": 13.423681251964851,
-          "plate_delta": 13.399978285929215,
+          "plate_delta": 10.051571716802997,
           "protected_outer_share": 0.19333333333333333,
           "exempt": false,
           "status": "pass"
@@ -3602,9 +3623,9 @@
           "y": 192,
           "inner_pixels": 192,
           "outer_pixels": 192,
-          "s": 0.2007253185836575,
+          "s": 3.3257561305930636,
           "source_delta": 10.67441891295481,
-          "plate_delta": 10.473693594371152,
+          "plate_delta": 7.348662782361746,
           "protected_outer_share": 0.984375,
           "exempt": true,
           "status": "exempt"
@@ -3695,9 +3716,9 @@
           "y": 192,
           "inner_pixels": 382,
           "outer_pixels": 97,
-          "s": 0.029246808613958564,
+          "s": 0.3731224750233739,
           "source_delta": 1.8734081635655055,
-          "plate_delta": 1.902654972179464,
+          "plate_delta": 1.5002856885421316,
           "protected_outer_share": 0.0,
           "exempt": false,
           "status": "pass"
@@ -3707,9 +3728,9 @@
           "y": 192,
           "inner_pixels": 277,
           "outer_pixels": 275,
-          "s": 0.6053092207443598,
+          "s": 1.7562839027878283,
           "source_delta": -14.64836425265596,
-          "plate_delta": -15.253673473400319,
+          "plate_delta": -12.892080349868131,
           "protected_outer_share": 0.0,
           "exempt": false,
           "status": "pass"
@@ -4664,9 +4685,9 @@
           "y": 256,
           "inner_pixels": 192,
           "outer_pixels": 192,
-          "s": 0.5034726092854349,
+          "s": 5.25490065034082,
           "source_delta": -0.7836656346391138,
-          "plate_delta": -1.2871382439245487,
+          "plate_delta": -6.038566284979934,
           "protected_outer_share": 1.0,
           "exempt": true,
           "status": "exempt"
@@ -5162,12 +5183,12 @@
           "y": 288,
           "inner_pixels": 206,
           "outer_pixels": 204,
-          "s": 0.06002426489495605,
+          "s": 5.4483654039547496,
           "source_delta": 12.815214230052666,
-          "plate_delta": 12.875238494947622,
+          "plate_delta": 7.366848826097916,
           "protected_outer_share": 0.47549019607843135,
           "exempt": false,
-          "status": "pass"
+          "status": "fail"
         },
         {
           "x": 1312,
@@ -5660,9 +5681,9 @@
           "y": 320,
           "inner_pixels": 46,
           "outer_pixels": 132,
-          "s": 0.05739518542123534,
+          "s": 2.0185477616761887,
           "source_delta": -0.44894962758615264,
-          "plate_delta": -0.506344813007388,
+          "plate_delta": -2.4674973892623413,
           "protected_outer_share": 0.0,
           "exempt": false,
           "status": "pass"
@@ -5672,9 +5693,9 @@
           "y": 320,
           "inner_pixels": 160,
           "outer_pixels": 75,
-          "s": 0.26050867441634296,
+          "s": 3.5316211600441534,
           "source_delta": -0.5932317270596741,
-          "plate_delta": -0.853740401476017,
+          "plate_delta": -4.1248528871038275,
           "protected_outer_share": 0.0,
           "exempt": false,
           "status": "pass"
@@ -10742,9 +10763,9 @@
           "y": 672,
           "inner_pixels": 427,
           "outer_pixels": 323,
-          "s": 0.0,
+          "s": 0.8447527137652138,
           "source_delta": -5.059593877299644,
-          "plate_delta": -5.059593877299644,
+          "plate_delta": -4.21484116353443,
           "protected_outer_share": 0.0,
           "exempt": false,
           "status": "pass"
@@ -10754,12 +10775,12 @@
           "y": 672,
           "inner_pixels": 158,
           "outer_pixels": 40,
-          "s": 0.2886572828466072,
+          "s": 4.256102330221665,
           "source_delta": 6.590580897057048,
-          "plate_delta": 6.8792381799036555,
+          "plate_delta": 10.846683227278714,
           "protected_outer_share": 0.0,
           "exempt": false,
-          "status": "pass"
+          "status": "fail"
         },
         {
           "x": 160,
@@ -11249,9 +11270,9 @@
           "y": 704,
           "inner_pixels": 366,
           "outer_pixels": 185,
-          "s": 0.19570612301758672,
+          "s": 2.5742305032010364,
           "source_delta": 1.2078617660166806,
-          "plate_delta": 1.4035678890342673,
+          "plate_delta": 3.782092269217717,
           "protected_outer_share": 0.0,
           "exempt": false,
           "status": "pass"
@@ -11261,12 +11282,12 @@
           "y": 704,
           "inner_pixels": 135,
           "outer_pixels": 94,
-          "s": 0.0,
+          "s": 4.176572037180009,
           "source_delta": 16.510991115686664,
-          "plate_delta": 16.510991115686664,
+          "plate_delta": 20.687563152866673,
           "protected_outer_share": 0.0,
           "exempt": false,
-          "status": "pass"
+          "status": "fail"
         },
         {
           "x": 192,
@@ -11744,9 +11765,9 @@
           "y": 736,
           "inner_pixels": 316,
           "outer_pixels": 341,
-          "s": 0.0,
+          "s": 0.8144473383830828,
           "source_delta": -0.41257711179818735,
-          "plate_delta": -0.41257711179818735,
+          "plate_delta": 0.40187022658489546,
           "protected_outer_share": 0.0,
           "exempt": false,
           "status": "pass"
@@ -11756,9 +11777,9 @@
           "y": 736,
           "inner_pixels": 183,
           "outer_pixels": 375,
-          "s": 0.13894289423272,
+          "s": 3.228745471307569,
           "source_delta": 5.275387940843736,
-          "plate_delta": 5.414330835076456,
+          "plate_delta": 8.504133412151305,
           "protected_outer_share": 0.0,
           "exempt": false,
           "status": "pass"
@@ -12590,9 +12611,9 @@
           "y": 768,
           "inner_pixels": 251,
           "outer_pixels": 199,
-          "s": 0.09255621343405807,
+          "s": 2.697264336179245,
           "source_delta": -5.643936002047802,
-          "plate_delta": -5.73649221548186,
+          "plate_delta": -8.341200338227047,
           "protected_outer_share": 0.0,
           "exempt": false,
           "status": "pass"
@@ -13094,33 +13115,33 @@
           "y": 800,
           "inner_pixels": 127,
           "outer_pixels": 180,
-          "s": 0.09171041856471618,
+          "s": 4.732712786439947,
           "source_delta": 8.620187651554062,
-          "plate_delta": 8.528477232989346,
+          "plate_delta": 3.8874748651141147,
           "protected_outer_share": 0.0,
           "exempt": false,
-          "status": "pass"
+          "status": "fail"
         },
         {
           "x": 1344,
           "y": 800,
           "inner_pixels": 206,
           "outer_pixels": 206,
-          "s": 0.16133927195125608,
+          "s": 6.437643896487948,
           "source_delta": -34.57219178778458,
-          "plate_delta": -34.73353105973584,
+          "plate_delta": -41.00983568427253,
           "protected_outer_share": 0.0,
           "exempt": false,
-          "status": "pass"
+          "status": "fail"
         },
         {
           "x": 1376,
           "y": 800,
           "inner_pixels": 208,
           "outer_pixels": 206,
-          "s": 0.0,
+          "s": 0.47992958162102184,
           "source_delta": -0.7410336713179166,
-          "plate_delta": -0.7410336713179166,
+          "plate_delta": -1.2209632529389385,
           "protected_outer_share": 0.0,
           "exempt": false,
           "status": "pass"
@@ -15122,9 +15143,94 @@
         }
       ],
       "measured_cells": 183,
-      "s_le_4_share": 0.9508196721311475,
-      "non_exempt_failures": [],
-      "passed": true
+      "s_le_4_share": 0.907103825136612,
+      "non_exempt_failures": [
+        {
+          "x": 1120,
+          "y": 160,
+          "inner_pixels": 211,
+          "outer_pixels": 207,
+          "s": 5.841713616064794,
+          "source_delta": 3.5518332199979596,
+          "plate_delta": -2.2898803960668346,
+          "protected_outer_share": 0.0,
+          "exempt": false,
+          "status": "fail"
+        },
+        {
+          "x": 1472,
+          "y": 160,
+          "inner_pixels": 162,
+          "outer_pixels": 218,
+          "s": 4.791755900439707,
+          "source_delta": 19.1345584319157,
+          "plate_delta": 23.926314332355407,
+          "protected_outer_share": 0.0,
+          "exempt": false,
+          "status": "fail"
+        },
+        {
+          "x": 1280,
+          "y": 288,
+          "inner_pixels": 206,
+          "outer_pixels": 204,
+          "s": 5.4483654039547496,
+          "source_delta": 12.815214230052666,
+          "plate_delta": 7.366848826097916,
+          "protected_outer_share": 0.47549019607843135,
+          "exempt": false,
+          "status": "fail"
+        },
+        {
+          "x": 128,
+          "y": 672,
+          "inner_pixels": 158,
+          "outer_pixels": 40,
+          "s": 4.256102330221665,
+          "source_delta": 6.590580897057048,
+          "plate_delta": 10.846683227278714,
+          "protected_outer_share": 0.0,
+          "exempt": false,
+          "status": "fail"
+        },
+        {
+          "x": 160,
+          "y": 704,
+          "inner_pixels": 135,
+          "outer_pixels": 94,
+          "s": 4.176572037180009,
+          "source_delta": 16.510991115686664,
+          "plate_delta": 20.687563152866673,
+          "protected_outer_share": 0.0,
+          "exempt": false,
+          "status": "fail"
+        },
+        {
+          "x": 1312,
+          "y": 800,
+          "inner_pixels": 127,
+          "outer_pixels": 180,
+          "s": 4.732712786439947,
+          "source_delta": 8.620187651554062,
+          "plate_delta": 3.8874748651141147,
+          "protected_outer_share": 0.0,
+          "exempt": false,
+          "status": "fail"
+        },
+        {
+          "x": 1344,
+          "y": 800,
+          "inner_pixels": 206,
+          "outer_pixels": 206,
+          "s": 6.437643896487948,
+          "source_delta": -34.57219178778458,
+          "plate_delta": -41.00983568427253,
+          "protected_outer_share": 0.0,
+          "exempt": false,
+          "status": "fail"
+        }
+      ],
+      "passed": false
     },
     "after": {
       "cells": [
@@ -29999,12 +30105,12 @@
     "per_spot": [
       {
         "spot": "nw",
-        "absolute_delta": 9.564421680299004,
+        "absolute_delta": 9.844854670477007,
         "legacy_passed": false
       },
       {
         "spot": "ne",
-        "absolute_delta": 16.6541541470135,
+        "absolute_delta": 10.7674912092773,
         "legacy_passed": false
       },
       {
@@ -30071,22 +30177,7 @@
       "warm_pixels": 511
     }
   },
-  "edit_review": {
-    "nw": {
-      "passed": true,
-      "note": "Opened unretouched raw at source size: peaked roof, box frame and central stem replaced with dark recess, vines and blossoms; no replacement lantern or new object. Paste only the recorded polygon; preserve columns and cap from fix1."
-    },
-    "ne": {
-      "passed": true,
-      "note": "Opened unretouched raw: no roof, vertical frame posts or hook; recess and thin blossom vines continuous. Columns and stone cap remain outside the composite polygon."
-    },
-    "se": {
-      "passed": true,
-      "generation": false,
-      "inspection": "4x Lanczos, RGB brightness multiplied by 2.5 before scaling",
-      "note": "Only layered blue-green leaves, pink blossoms and irregular diagonal branches above the flat pedestal; no peaked roof with curled corners, paired frame posts, finial or hook. Retain fix1 pixels."
-    }
-  },
+  "source_unchanged": true,
   "frozen_unchanged": {
     "art/imagegen/env-u16-marmoreal-codex/_tools/build_plate.py": {
       "before": {
@@ -30132,17 +30223,6 @@
       },
       "unchanged": true
     },
-    "art/imagegen/env-u16-marmoreal-codex/_tools/rework_r3.py": {
-      "before": {
-        "sha256": "65089b75c9dfe3b00094fca0f6aca23c5270e3485519af97fa4a3316487a162d",
-        "bytes": 30542
-      },
-      "after": {
-        "sha256": "65089b75c9dfe3b00094fca0f6aca23c5270e3485519af97fa4a3316487a162d",
-        "bytes": 30542
-      },
-      "unchanged": true
-    },
     "art/imagegen/env-u16-marmoreal-codex/_tools/verify_package.py": {
       "before": {
         "sha256": "35ab9195564dfe4abc2aed47ca4bef83573cad8ff0ef8a99698319308eaff48e",
@@ -30151,39 +30231,6 @@
       "after": {
         "sha256": "35ab9195564dfe4abc2aed47ca4bef83573cad8ff0ef8a99698319308eaff48e",
         "bytes": 4268
-      },
-      "unchanged": true
-    },
-    "art/imagegen/env-u16-marmoreal-codex/fix1-baseline.json": {
-      "before": {
-        "sha256": "83c3ee68032cd67ab1e0ced6371fd20bf7aaba076c2a068a26fe5405933090d7",
-        "bytes": 275595
-      },
-      "after": {
-        "sha256": "83c3ee68032cd67ab1e0ced6371fd20bf7aaba076c2a068a26fe5405933090d7",
-        "bytes": 275595
-      },
-      "unchanged": true
-    },
-    "art/imagegen/env-u16-marmoreal-codex/history/manifest-sha256-cx07.json": {
-      "before": {
-        "sha256": "f92edb14adfc36032a85d0743e1c8ee3d9ec41133985d5ef139c9ece2688f50a",
-        "bytes": 10274
-      },
-      "after": {
-        "sha256": "f92edb14adfc36032a85d0743e1c8ee3d9ec41133985d5ef139c9ece2688f50a",
-        "bytes": 10274
-      },
-      "unchanged": true
-    },
-    "art/imagegen/env-u16-marmoreal-codex/history/verification-cx07.json": {
-      "before": {
-        "sha256": "de4dd9f8d89c73be9886a1b8ca3efb647c323178da30129c7219a0247daab7f6",
-        "bytes": 164938
-      },
-      "after": {
-        "sha256": "de4dd9f8d89c73be9886a1b8ca3efb647c323178da30129c7219a0247daab7f6",
-        "bytes": 164938
       },
       "unchanged": true
     },
@@ -30228,17 +30275,6 @@
       "after": {
         "sha256": "bbb427dcabd3b640bfa2c8bbd96f3f84869d2c19272dbd1585456b8a83707073",
         "bytes": 2381
-      },
-      "unchanged": true
-    },
-    "art/imagegen/env-u16-marmoreal-codex/prompts/EN-01-R3-sw-1.txt": {
-      "before": {
-        "sha256": "8145f45b1c99d40d71a061e51c5d242d9c7177566bc5ed72f6210172ecd662ee",
-        "bytes": 921
-      },
-      "after": {
-        "sha256": "8145f45b1c99d40d71a061e51c5d242d9c7177566bc5ed72f6210172ecd662ee",
-        "bytes": 921
       },
       "unchanged": true
     },
@@ -39218,17 +39254,6 @@
       },
       "unchanged": true
     },
-    "scraped-data/derived/env-u16-marmoreal-codex/comparison/painted-frame-protection.png": {
-      "before": {
-        "sha256": "93d8afde1e7a3c873fa3b7d6b5e83336247db629d98127129a3a39454cad873d",
-        "bytes": 3706
-      },
-      "after": {
-        "sha256": "93d8afde1e7a3c873fa3b7d6b5e83336247db629d98127129a3a39454cad873d",
-        "bytes": 3706
-      },
-      "unchanged": true
-    },
     "scraped-data/derived/env-u16-marmoreal-codex/concepts/EN-01-A-R1-composite.png": {
       "before": {
         "sha256": "30a66192967ba5544825c96b42e8f0313918ffb7ff72744b97bc5f6f6847225d",
@@ -39328,28 +39353,6 @@
       },
       "unchanged": true
     },
-    "scraped-data/derived/env-u16-marmoreal-codex/concepts/EN-01-R3-sw-1-input.png": {
-      "before": {
-        "sha256": "96cda5a3e4474c004cb91e2a379611d549e5a91f8230b62f01c197f75787e013",
-        "bytes": 956718
-      },
-      "after": {
-        "sha256": "96cda5a3e4474c004cb91e2a379611d549e5a91f8230b62f01c197f75787e013",
-        "bytes": 956718
-      },
-      "unchanged": true
-    },
-    "scraped-data/derived/env-u16-marmoreal-codex/concepts/EN-01-R3-sw-1-raw.png": {
-      "before": {
-        "sha256": "3d37d8f1963ea5b86734645c606d90d1fa34bd16847e1a08710647c4a3ddfb9b",
-        "bytes": 2031445
-      },
-      "after": {
-        "sha256": "3d37d8f1963ea5b86734645c606d90d1fa34bd16847e1a08710647c4a3ddfb9b",
-        "bytes": 2031445
-      },
-      "unchanged": true
-    },
     "scraped-data/derived/env-u16-marmoreal-codex/concepts/marmoreal-input-field-neutral.png": {
       "before": {
         "sha256": "6463de7168737784d8c030e0237187beee550b0fac32ac5132f75162c74af467",
@@ -39428,7 +39431,6 @@
       "unchanged": true
     }
   },
-  "source_unchanged": true,
   "generations": {
     "budget": 4,
     "provider": "built-in image_gen",
@@ -39535,63 +39537,21 @@
         "tool_managed_source": "C:/Users/ren/.codex/generated_images/01a10ffb-709f-7f31-91af-2722c8ca8de6/exec-3806cf83-2825-4b22-afb8-93c7682f839e.png",
         "submitted_prompt_sha256": "8145f45b1c99d40d71a061e51c5d242d9c7177566bc5ed72f6210172ecd662ee",
         "submitted_prompt_normalization": "exact UTF-8 file text"
-      },
-      {
-        "variant": "R3-nw-1",
-        "run": "CX-07r fix2",
-        "prompt_key": "EN-01-R3-nw-1",
-        "prompt_file": "art/imagegen/env-u16-marmoreal-codex/prompts/EN-01-R3-nw-1.txt",
-        "prompt_sha256": "21a6bd856463d81417408bf6c33788abbb5a94f0a60582f5b1b25bb2da32a3be",
-        "input": "scraped-data/derived/env-u16-marmoreal-codex/concepts/EN-01-R3-nw-1-input.png",
-        "input_sha256": "5de342a63a035fe5167cd8f8c8e097fe8f9b8a9f57e14b7714f7c1642020730e",
-        "raw_file": "scraped-data/derived/env-u16-marmoreal-codex/concepts/EN-01-R3-nw-1-raw.png",
-        "raw_sha256": "4b7bed7257e4d5afbead13002650f0d0cd9aee01336392f0e04b6f2cdb63a1be",
-        "raw_size": [
-          1254,
-          1254
-        ],
-        "crop_box": [
-          328,
-          0,
-          520,
-          192
-        ],
-        "retouched": false,
-        "tool_managed_source": "C:/Users/ren/.codex/generated_images/01a11008-4da1-7df1-94e5-550d5466ee3a/exec-70eba656-f91e-4b45-b7a0-3f24b024926b.png",
-        "submitted_prompt_sha256": "21a6bd856463d81417408bf6c33788abbb5a94f0a60582f5b1b25bb2da32a3be",
-        "submitted_prompt_normalization": "exact UTF-8 file text"
-      },
-      {
-        "variant": "R3-ne-1",
-        "run": "CX-07r fix2",
-        "prompt_key": "EN-01-R3-ne-1",
-        "prompt_file": "art/imagegen/env-u16-marmoreal-codex/prompts/EN-01-R3-ne-1.txt",
-        "prompt_sha256": "3e3a38d2bce4de99c1f2e8174d0a54b4fab1d3b1ab259c0e8ca6a02f39ab541c",
-        "input": "scraped-data/derived/env-u16-marmoreal-codex/concepts/EN-01-R3-ne-1-input.png",
-        "input_sha256": "189f86fe113146f971608eebd7cc0ec9a8c0b1c387df504a1ce9487e274ed0cd",
-        "raw_file": "scraped-data/derived/env-u16-marmoreal-codex/concepts/EN-01-R3-ne-1-raw.png",
-        "raw_sha256": "64e74884c42ba8e97983cc2ff5ddfed865ab4527ac206df23e7c627262efcf77",
-        "raw_size": [
-          1254,
-          1254
-        ],
-        "crop_box": [
-          1149,
-          0,
-          1341,
-          192
-        ],
-        "retouched": false,
-        "tool_managed_source": "C:/Users/ren/.codex/generated_images/01a11008-4da1-7df1-94e5-550d5466ee3a/exec-c23c14e9-2488-4556-b615-9d3ed454856d.png",
-        "submitted_prompt_sha256": "3e3a38d2bce4de99c1f2e8174d0a54b4fab1d3b1ab259c0e8ca6a02f39ab541c",
-        "submitted_prompt_normalization": "exact UTF-8 file text"
       }
     ],
-    "rework_budget": 4,
-    "rework_generations": 3,
-    "fix2_budget": 3,
-    "fix2_generations": 2
+    "rework_budget": 2,
+    "rework_generations": 1
   },
+  "budget": {
+    "original": 4,
+    "original_used": 4,
+    "rework": 2,
+    "rework_used": 1,
+    "SYNTX": 0
+  },
+  "tool_cache_outside_repo": [
+    "C:/Users/ren/.codex/generated_images/01a10ffb-709f-7f31-91af-2722c8ca8de6/exec-3806cf83-2825-4b22-afb8-93c7682f839e.png"
+  ],
   "generation_records_append_only": true,
   "generation_hash_checks": [
     {
@@ -39623,381 +39583,8 @@
       "raw": true,
       "input": true,
       "prompt": true
-    },
-    {
-      "variant": "R3-nw-1",
-      "raw": true,
-      "input": true,
-      "prompt": true
-    },
-    {
-      "variant": "R3-ne-1",
-      "raw": true,
-      "input": true,
-      "prompt": true
     }
   ],
-  "budget": {
-    "original": 4,
-    "original_used": 4,
-    "rework": 4,
-    "rework_used": 3,
-    "fix2": 3,
-    "fix2_used": 2,
-    "SYNTX": 0,
-    "one_edit_per_spot_no_retry": true
-  },
-  "tool_cache_outside_repo": [
-    "C:/Users/ren/.codex/generated_images/01a10ffb-709f-7f31-91af-2722c8ca8de6/exec-3806cf83-2825-4b22-afb8-93c7682f839e.png",
-    "C:/Users/ren/.codex/generated_images/01a11008-4da1-7df1-94e5-550d5466ee3a/exec-70eba656-f91e-4b45-b7a0-3f24b024926b.png",
-    "C:/Users/ren/.codex/generated_images/01a11008-4da1-7df1-94e5-550d5466ee3a/exec-c23c14e9-2488-4556-b615-9d3ed454856d.png"
-  ],
-  "tool_source_readback": [
-    {
-      "variant": "R3-sw-1",
-      "source_byte_identical_to_raw": true
-    },
-    {
-      "variant": "R3-nw-1",
-      "source_byte_identical_to_raw": true
-    },
-    {
-      "variant": "R3-ne-1",
-      "source_byte_identical_to_raw": true
-    }
-  ],
-  "reproducibility": {
-    "run": "CX-07r fix2",
-    "command": "python -B art/imagegen/env-u16-marmoreal-codex/_tools/rework_fix2.py build",
-    "generations_used_for_rebuild": 0,
-    "files": {
-      "art/imagegen/env-u16-marmoreal-codex/_tools/mask-spec.json": {
-        "before": "b928d6edd6748aeb4f5ae888287b846a1182bc07e08042c0837988d8133d5c10",
-        "after": "b928d6edd6748aeb4f5ae888287b846a1182bc07e08042c0837988d8133d5c10",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/08-diff-outside-remove-mask.png": {
-        "before": "f6d127f7ab94aef3a2fa266038db5cd27099548df5f582743d9f900bb0d49886",
-        "after": "f6d127f7ab94aef3a2fa266038db5cd27099548df5f582743d9f900bb0d49886",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/fix2-ne-fix-mask.png": {
-        "before": "9ee972205afe71092e1de64ecc4719c7e252d8af6c1e31b4fd28a6d673246630",
-        "after": "9ee972205afe71092e1de64ecc4719c7e252d8af6c1e31b4fd28a6d673246630",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/fix2-nw-fix-mask.png": {
-        "before": "a18786d452a079ec7bb2365c369f6b11410f0bf9676e3b4e0ca386afdf170dff",
-        "after": "a18786d452a079ec7bb2365c369f6b11410f0bf9676e3b4e0ca386afdf170dff",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-composite-alpha.png": {
-        "before": "0e6bfb9c152313bddbbedf5ddeac0047e112320c059df25223bb7c4f59829957",
-        "after": "0e6bfb9c152313bddbbedf5ddeac0047e112320c059df25223bb7c4f59829957",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-core-detail-door.png": {
-        "before": "12a78035e0a334dcc87c35a3cd409252b251ef0a6da943ff026be5f501cd26d1",
-        "after": "12a78035e0a334dcc87c35a3cd409252b251ef0a6da943ff026be5f501cd26d1",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-core-detail-ne.png": {
-        "before": "4de60848a8bef85febdd3a83b5d4d8971c6e84815cdb122c047dd5c93b12887d",
-        "after": "4de60848a8bef85febdd3a83b5d4d8971c6e84815cdb122c047dd5c93b12887d",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-core-detail-nw.png": {
-        "before": "943fd09c060a6be493d6dcb09b61194ec1d6e1ad0374aa3050a8fdc664ce262a",
-        "after": "943fd09c060a6be493d6dcb09b61194ec1d6e1ad0374aa3050a8fdc664ce262a",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-core-detail-se.png": {
-        "before": "c3d8346291d9fae39577c4e767a8e90c6f4b32b12985e7c9b348cb2eeca60269",
-        "after": "c3d8346291d9fae39577c4e767a8e90c6f4b32b12985e7c9b348cb2eeca60269",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-core-detail-sw.png": {
-        "before": "490798ac3db989ae73ecd0602a8a6686c3ba89c134270152a765a2291e9292f2",
-        "after": "490798ac3db989ae73ecd0602a8a6686c3ba89c134270152a765a2291e9292f2",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-diff-vs-previous.png": {
-        "before": "94de2fbb56c1d5e1194b9c5eb65c1e2a52e909ab16581ab55154e3e1c749e79f",
-        "after": "94de2fbb56c1d5e1194b9c5eb65c1e2a52e909ab16581ab55154e3e1c749e79f",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-fix-mask.png": {
-        "before": "e111b090d5aa7ff7ebf0261682b9816c21864c00ad59a7e8faed2821decc39d1",
-        "after": "e111b090d5aa7ff7ebf0261682b9816c21864c00ad59a7e8faed2821decc39d1",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-full-colour.png": {
-        "before": "4e0762300aaeba915661cff4f3c5cdbfab09552a9ef5cb78134e55e84dc2944e",
-        "after": "4e0762300aaeba915661cff4f3c5cdbfab09552a9ef5cb78134e55e84dc2944e",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-full-gray.png": {
-        "before": "165a404013ece6ac3efcc42879f8ffecfb3c3b452dfed6a3bbe32b315f7e1cd9",
-        "after": "165a404013ece6ac3efcc42879f8ffecfb3c3b452dfed6a3bbe32b315f7e1cd9",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-inspection-cores-colour.png": {
-        "before": "8c39c42512ac47aa6e86438bacb8ad22d5ee492ec69d7f075ea565e7ed783a7f",
-        "after": "8c39c42512ac47aa6e86438bacb8ad22d5ee492ec69d7f075ea565e7ed783a7f",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-inspection-cores-gray.png": {
-        "before": "3892b7f132d586677a3852e8170e167106935a5a9164f35c470f01f68319e648",
-        "after": "3892b7f132d586677a3852e8170e167106935a5a9164f35c470f01f68319e648",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-2x-nearest-colour.png": {
-        "before": "46de856dd83a13a72e482b18efc7ebcbcc2d8a7d21e19ffd3a6ad18ae03100aa",
-        "after": "46de856dd83a13a72e482b18efc7ebcbcc2d8a7d21e19ffd3a6ad18ae03100aa",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-2x-nearest-gray.png": {
-        "before": "6e72b59561169bbea6f95e095002ad836f204837d421a2d320824845b6540e70",
-        "after": "6e72b59561169bbea6f95e095002ad836f204837d421a2d320824845b6540e70",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-4x-boost-colour.png": {
-        "before": "84073405416a7e5d31be32065ef2148061fb87ed496930a6b9951a136fc3991d",
-        "after": "84073405416a7e5d31be32065ef2148061fb87ed496930a6b9951a136fc3991d",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-4x-boost-gray.png": {
-        "before": "532e4ae1a993383a2d6ad2601bd6822a550ef59a35733db67bff89502ab64f61",
-        "after": "532e4ae1a993383a2d6ad2601bd6822a550ef59a35733db67bff89502ab64f61",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-4x-colour.png": {
-        "before": "f00874363cc0c0c484a8cede4b8ce4c03f7acd9c124ce93d56c284165c27730d",
-        "after": "f00874363cc0c0c484a8cede4b8ce4c03f7acd9c124ce93d56c284165c27730d",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-4x-gray.png": {
-        "before": "51116e94cf6eebca3d4f283f6d86ad028ae7265e44651925ce974710d3a2a2a9",
-        "after": "51116e94cf6eebca3d4f283f6d86ad028ae7265e44651925ce974710d3a2a2a9",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lantern-mask-colour.png": {
-        "before": "40e813c21b85e7c7e57e40d48edbe94117f685e6494277468fa9f77b82d90cae",
-        "after": "40e813c21b85e7c7e57e40d48edbe94117f685e6494277468fa9f77b82d90cae",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lantern-mask-gray.png": {
-        "before": "9adc07bce0406bbeb68326e07a51b7e7a16777235f88b29e04a39b918043985f",
-        "after": "9adc07bce0406bbeb68326e07a51b7e7a16777235f88b29e04a39b918043985f",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lit-full-gray.png": {
-        "before": "1473466a1b116ae580f996f3484f97630f7fe7473c6bd2a9ebb33248d5aa2b9f",
-        "after": "1473466a1b116ae580f996f3484f97630f7fe7473c6bd2a9ebb33248d5aa2b9f",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lit-full.png": {
-        "before": "33d86721a741b2380d6fc5ac7b417bd175b7081fdbbc1277ce687d040036e97e",
-        "after": "33d86721a741b2380d6fc5ac7b417bd175b7081fdbbc1277ce687d040036e97e",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lit-K2-six-colour.png": {
-        "before": "addd88fa1bc061020230cd6c91a0a36de0c69dcf77144506e39a6523a920096c",
-        "after": "addd88fa1bc061020230cd6c91a0a36de0c69dcf77144506e39a6523a920096c",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lit-K2-six-gray.png": {
-        "before": "acad2c4597718ec44af51d66d548596db541dd43e8b1bbb73e9f97c3cce7f407",
-        "after": "acad2c4597718ec44af51d66d548596db541dd43e8b1bbb73e9f97c3cce7f407",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-old-lantern-mask.png": {
-        "before": "c453d2e0667623fbad37a1b35d54f56be2900cea0854de3ce0db6658b3783622",
-        "after": "c453d2e0667623fbad37a1b35d54f56be2900cea0854de3ce0db6658b3783622",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-sconce-core-clipping-colour.png": {
-        "before": "bbbbf196b6c8a1ca47c8bd5501b94495f3280a2339e7c4d96c997b457f673418",
-        "after": "bbbbf196b6c8a1ca47c8bd5501b94495f3280a2339e7c4d96c997b457f673418",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-sconce-core-clipping-gray.png": {
-        "before": "eefb568815e85bf46838d2aa3944d374dd6ff5587a321dcf84fcf0210e0ef95b",
-        "after": "eefb568815e85bf46838d2aa3944d374dd6ff5587a321dcf84fcf0210e0ef95b",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1120-160-colour.png": {
-        "before": "f2921d26dd7ae92f7ebc9c87087778156e52f3f38257bcf69af481285ceeae37",
-        "after": "f2921d26dd7ae92f7ebc9c87087778156e52f3f38257bcf69af481285ceeae37",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1120-160-gray.png": {
-        "before": "7b673d175a293f518a58ab195e5b82ecf9f8c4d0868cafa2c25535f244de73ef",
-        "after": "7b673d175a293f518a58ab195e5b82ecf9f8c4d0868cafa2c25535f244de73ef",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-128-672-colour.png": {
-        "before": "156b9f7705ebc45e247b5707890f50eecee371fbcb896fa6a3935ad74d79f070",
-        "after": "156b9f7705ebc45e247b5707890f50eecee371fbcb896fa6a3935ad74d79f070",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-128-672-gray.png": {
-        "before": "5be620eaaae6e54046cd2a83039512ee5744be5fec67f410dfda3a8c2b8b514c",
-        "after": "5be620eaaae6e54046cd2a83039512ee5744be5fec67f410dfda3a8c2b8b514c",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1280-288-colour.png": {
-        "before": "ff0c572e000d8661676aad0b56b00d4bf80e79bdc542e7d503df45e93ab68b07",
-        "after": "ff0c572e000d8661676aad0b56b00d4bf80e79bdc542e7d503df45e93ab68b07",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1280-288-gray.png": {
-        "before": "a5da73e86935de842d309dea19d43bc23ca4c0f8b1e384d9efccda4b213d1ed7",
-        "after": "a5da73e86935de842d309dea19d43bc23ca4c0f8b1e384d9efccda4b213d1ed7",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1312-800-colour.png": {
-        "before": "8842d4aac539b5d4bbde5cac0d9694090067b2bb76c3c3f6ef26791cea621772",
-        "after": "8842d4aac539b5d4bbde5cac0d9694090067b2bb76c3c3f6ef26791cea621772",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1312-800-gray.png": {
-        "before": "1be46f0677666f302d8a3d432a49ef0fc686bbf48435aea155e995f4f1d0c882",
-        "after": "1be46f0677666f302d8a3d432a49ef0fc686bbf48435aea155e995f4f1d0c882",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1344-800-colour.png": {
-        "before": "c84eef9450edf13d9d3c6698f90ae1d80cc60ea8f0c75a516e828b93b7a6d1f8",
-        "after": "c84eef9450edf13d9d3c6698f90ae1d80cc60ea8f0c75a516e828b93b7a6d1f8",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1344-800-gray.png": {
-        "before": "0ee2eb2ccbced366b406e350ab3e5f3d3f50df8db4f032625dec5b51382b7ce5",
-        "after": "0ee2eb2ccbced366b406e350ab3e5f3d3f50df8db4f032625dec5b51382b7ce5",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1472-160-colour.png": {
-        "before": "4472a6ed2d9a63e64d8cb1dd9e74ca3022365be4bf6e4dff19ba0b5de3f9a995",
-        "after": "4472a6ed2d9a63e64d8cb1dd9e74ca3022365be4bf6e4dff19ba0b5de3f9a995",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1472-160-gray.png": {
-        "before": "16cdfdee3308f3e0badc438c7ae45727e92fc101c74671d64703798e3aa34ece",
-        "after": "16cdfdee3308f3e0badc438c7ae45727e92fc101c74671d64703798e3aa34ece",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-160-704-colour.png": {
-        "before": "16e773dbcc57226b071c0677af9a86d4ccf1d16414f1385445310aec28e69429",
-        "after": "16e773dbcc57226b071c0677af9a86d4ccf1d16414f1385445310aec28e69429",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-160-704-gray.png": {
-        "before": "bb6cdea1469e1557dff9b6722761d51c78bd71519c039a3fe501fcca19687653",
-        "after": "bb6cdea1469e1557dff9b6722761d51c78bd71519c039a3fe501fcca19687653",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-map-colour.png": {
-        "before": "ee836d6931556d64d9e9048f69cb186352fd9311a8a139c437e8e59b5b70043f",
-        "after": "ee836d6931556d64d9e9048f69cb186352fd9311a8a139c437e8e59b5b70043f",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-map-gray.png": {
-        "before": "2d57a48f60e9fe1c519e07e9ee2b3ce538c5cfa84a89c02bbcb6933fcbefdaf1",
-        "after": "2d57a48f60e9fe1c519e07e9ee2b3ce538c5cfa84a89c02bbcb6933fcbefdaf1",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-working-1087x612-colour.png": {
-        "before": "380c1a202c4ae5423f7f0143b875087dd26cfd90cd1cef8afa36911eabc14b87",
-        "after": "380c1a202c4ae5423f7f0143b875087dd26cfd90cd1cef8afa36911eabc14b87",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-working-1087x612-gray.png": {
-        "before": "66e4d11976141d78f894a7b38db3ca6c35b26fd887ea02ac31fc4cac3d6ece8c",
-        "after": "66e4d11976141d78f894a7b38db3ca6c35b26fd887ea02ac31fc4cac3d6ece8c",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-working-836x471-colour.png": {
-        "before": "a045f6af292d6b4cd3fc8e431396dbff8b7146e3ecfd4056146dbd2a11ca762c",
-        "after": "a045f6af292d6b4cd3fc8e431396dbff8b7146e3ecfd4056146dbd2a11ca762c",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-working-836x471-gray.png": {
-        "before": "5bfde160a25e85e4a0a761ba605e671fb3e5e2f3595c9b12e4bf800053cece30",
-        "after": "5bfde160a25e85e4a0a761ba605e671fb3e5e2f3595c9b12e4bf800053cece30",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/marmoreal-clean.png": {
-        "before": "7225b4d3ff7b639c649e1432b26bdf14c55cc2ed8621df5253dc1aaaa95ec40a",
-        "after": "7225b4d3ff7b639c649e1432b26bdf14c55cc2ed8621df5253dc1aaaa95ec40a",
-        "identical": true
-      },
-      "scraped-data/derived/env-u16-marmoreal-codex/marmoreal-lantern-mask.png": {
-        "before": "a4a16677684fb384c9339b677e910647d73c773b517c74729293f05bcd08ad62",
-        "after": "a4a16677684fb384c9339b677e910647d73c773b517c74729293f05bcd08ad62",
-        "identical": true
-      }
-    },
-    "passed": true,
-    "script_sha256": "77ac80ca714d2daa46454f6290937bbce4e4488eea952c93e6995db2ea3a9ab3"
-  },
-  "independent_readback": {
-    "checks": {
-      "fixed_task_hashes_match": true,
-      "plate_RGB_1672x941": true,
-      "mask_L_1672x941": true,
-      "field_all_808080": true,
-      "outside_remove_zero": true,
-      "elsewhere_unchanged": true,
-      "SW_unchanged": true,
-      "SE_unchanged": true,
-      "fixes_inside_support": true,
-      "SW_fix_region_unchanged": true,
-      "seam_feather_unchanged": true,
-      "core_polygons_unchanged": true,
-      "painted_frame_unchanged": true,
-      "door_interior_unchanged": true,
-      "cores_255_inside_support": true,
-      "lit_cores_equal_C0_inside_and_outside_support": true,
-      "lit_sheet_matches_formula": true,
-      "glow_capped_outside_core_soft_edges": true,
-      "mask_zero_outside_support": true,
-      "outside_diff_black": true,
-      "old_mask_backup_byte_identical": true,
-      "old_plate_backup_byte_identical": true,
-      "README_original_bytes_unchanged": true,
-      "history_verification_byte_identical": true,
-      "history_manifest_byte_identical": true,
-      "generations_intact": true,
-      "generation_budget": true,
-      "package_under_5_MB": true,
-      "Rec709_gray_sheets": true,
-      "R4_readback": true,
-      "reproducible_current_script": true
-    },
-    "gray_checks": {
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-full-gray.png": true,
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-inspection-cores-gray.png": true,
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-2x-nearest-gray.png": true,
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-4x-boost-gray.png": true,
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-4x-gray.png": true,
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lantern-mask-gray.png": true,
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lit-K2-six-gray.png": true,
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-sconce-core-clipping-gray.png": true,
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1120-160-gray.png": true,
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-128-672-gray.png": true,
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1280-288-gray.png": true,
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1312-800-gray.png": true,
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1344-800-gray.png": true,
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1472-160-gray.png": true,
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-160-704-gray.png": true,
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-map-gray.png": true,
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-working-1087x612-gray.png": true,
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-working-836x471-gray.png": true,
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lit-full-gray.png": true
-    },
-    "package_bytes": 3480250,
-    "passed": true
-  },
   "exports": {
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/08-diff-outside-remove-mask.png": {
       "size": [
@@ -40006,62 +39593,6 @@
       ],
       "mode": "L",
       "sha256": "f6d127f7ab94aef3a2fa266038db5cd27099548df5f582743d9f900bb0d49886"
-    },
-    "scraped-data/derived/env-u16-marmoreal-codex/comparison/fix2-before-clean.png": {
-      "size": [
-        1672,
-        941
-      ],
-      "mode": "RGB",
-      "sha256": "c117712bf249d85ba36e55951a7f85ff998a42c40c632bcea558e37123034677"
-    },
-    "scraped-data/derived/env-u16-marmoreal-codex/comparison/fix2-before-lantern-mask.png": {
-      "size": [
-        1672,
-        941
-      ],
-      "mode": "L",
-      "sha256": "1c002be4c50c3b7415d2fa06946df51d1395c54b61191d8e4c60e77501dd8d77"
-    },
-    "scraped-data/derived/env-u16-marmoreal-codex/comparison/fix2-inspection-boost-colour.png": {
-      "size": [
-        960,
-        3048
-      ],
-      "mode": "RGB",
-      "sha256": "db6851a92aa5cb48bf7623bfeaca291f3912ee56a9eb8c0bc73d27c6fe6173e4"
-    },
-    "scraped-data/derived/env-u16-marmoreal-codex/comparison/fix2-ne-fix-mask.png": {
-      "size": [
-        1672,
-        941
-      ],
-      "mode": "L",
-      "sha256": "9ee972205afe71092e1de64ecc4719c7e252d8af6c1e31b4fd28a6d673246630"
-    },
-    "scraped-data/derived/env-u16-marmoreal-codex/comparison/fix2-ne-polygon-inspection.png": {
-      "size": [
-        768,
-        768
-      ],
-      "mode": "RGB",
-      "sha256": "535189b54c381a605e42eead4362c15e1e70ee66024e46d2e28dbb5be74e9678"
-    },
-    "scraped-data/derived/env-u16-marmoreal-codex/comparison/fix2-nw-fix-mask.png": {
-      "size": [
-        1672,
-        941
-      ],
-      "mode": "L",
-      "sha256": "a18786d452a079ec7bb2365c369f6b11410f0bf9676e3b4e0ca386afdf170dff"
-    },
-    "scraped-data/derived/env-u16-marmoreal-codex/comparison/fix2-nw-polygon-inspection.png": {
-      "size": [
-        768,
-        768
-      ],
-      "mode": "RGB",
-      "sha256": "bf85704bbc79e3914ce0949070a560e192e624800ba3aa30b1ab568340d885ad"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-composite-alpha.png": {
       "size": [
@@ -40117,7 +39648,7 @@
         941
       ],
       "mode": "L",
-      "sha256": "94de2fbb56c1d5e1194b9c5eb65c1e2a52e909ab16581ab55154e3e1c749e79f"
+      "sha256": "81e2960c3195dedf6c47540e6c00976fbbd0bbcf131806c46c60e7d5f85a4d93"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-fix-mask.png": {
       "size": [
@@ -40125,7 +39656,7 @@
         941
       ],
       "mode": "L",
-      "sha256": "e111b090d5aa7ff7ebf0261682b9816c21864c00ad59a7e8faed2821decc39d1"
+      "sha256": "440248b9d67c3bcdcfb5d80c73df75263edaec554c03e6af79be1bb77c9cfa9f"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-full-colour.png": {
       "size": [
@@ -40133,7 +39664,7 @@
         969
       ],
       "mode": "RGB",
-      "sha256": "4e0762300aaeba915661cff4f3c5cdbfab09552a9ef5cb78134e55e84dc2944e"
+      "sha256": "d5de949ae172a0448dd833dd7b4e41f94995d24320046dff40d3c107f68248a3"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-full-gray.png": {
       "size": [
@@ -40141,7 +39672,7 @@
         969
       ],
       "mode": "RGB",
-      "sha256": "165a404013ece6ac3efcc42879f8ffecfb3c3b452dfed6a3bbe32b315f7e1cd9"
+      "sha256": "bec3da73afe52f20b12feed56152969eb3a67f497527e0e0328a5b8fe7ae2fef"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-inspection-cores-colour.png": {
       "size": [
@@ -40149,7 +39680,7 @@
         3048
       ],
       "mode": "RGB",
-      "sha256": "8c39c42512ac47aa6e86438bacb8ad22d5ee492ec69d7f075ea565e7ed783a7f"
+      "sha256": "1abf9a144af41d5576fa99c1d88e09ca4369857072a02e49439794a20d3ad40c"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-inspection-cores-gray.png": {
       "size": [
@@ -40157,7 +39688,7 @@
         3048
       ],
       "mode": "RGB",
-      "sha256": "3892b7f132d586677a3852e8170e167106935a5a9164f35c470f01f68319e648"
+      "sha256": "b8229e733bd6815dd9db11d1694ed597f74eab28141b5c8cca6b03caf7de7897"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-2x-nearest-colour.png": {
       "size": [
@@ -40165,7 +39696,7 @@
         1608
       ],
       "mode": "RGB",
-      "sha256": "46de856dd83a13a72e482b18efc7ebcbcc2d8a7d21e19ffd3a6ad18ae03100aa"
+      "sha256": "2828b5f34b69ddb164085192d239f58c87ba9b48e551f3e3653381d6059e4037"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-2x-nearest-gray.png": {
       "size": [
@@ -40173,23 +39704,7 @@
         1608
       ],
       "mode": "RGB",
-      "sha256": "6e72b59561169bbea6f95e095002ad836f204837d421a2d320824845b6540e70"
-    },
-    "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-4x-boost-colour.png": {
-      "size": [
-        1440,
-        3048
-      ],
-      "mode": "RGB",
-      "sha256": "84073405416a7e5d31be32065ef2148061fb87ed496930a6b9951a136fc3991d"
-    },
-    "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-4x-boost-gray.png": {
-      "size": [
-        1440,
-        3048
-      ],
-      "mode": "RGB",
-      "sha256": "532e4ae1a993383a2d6ad2601bd6822a550ef59a35733db67bff89502ab64f61"
+      "sha256": "14d935711625e0c565d032e6b4a0c7eec2a2e1da4c6b213742aa725d9e581859"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-4x-colour.png": {
       "size": [
@@ -40197,7 +39712,7 @@
         3048
       ],
       "mode": "RGB",
-      "sha256": "f00874363cc0c0c484a8cede4b8ce4c03f7acd9c124ce93d56c284165c27730d"
+      "sha256": "7044f9c503b30219bc7024816360650fcea1ca876859bdb74fba268031475302"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-4x-gray.png": {
       "size": [
@@ -40205,7 +39720,7 @@
         3048
       ],
       "mode": "RGB",
-      "sha256": "51116e94cf6eebca3d4f283f6d86ad028ae7265e44651925ce974710d3a2a2a9"
+      "sha256": "d4244a3ed199916d41eee529a150fa4497299e8fcc73078e87ad82df57edea5a"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lantern-mask-colour.png": {
       "size": [
@@ -40213,7 +39728,7 @@
         969
       ],
       "mode": "RGB",
-      "sha256": "40e813c21b85e7c7e57e40d48edbe94117f685e6494277468fa9f77b82d90cae"
+      "sha256": "bc14182f388783cba2744888cbfc51ace8c8b551ffc2649a41e23ad6017b4a82"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lantern-mask-gray.png": {
       "size": [
@@ -40221,7 +39736,7 @@
         969
       ],
       "mode": "RGB",
-      "sha256": "9adc07bce0406bbeb68326e07a51b7e7a16777235f88b29e04a39b918043985f"
+      "sha256": "19b24702433a44120f3d025d0141a15f56b7dab090424b0cb1ed24b466c60fa8"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lit-full-gray.png": {
       "size": [
@@ -40229,7 +39744,7 @@
         941
       ],
       "mode": "RGB",
-      "sha256": "1473466a1b116ae580f996f3484f97630f7fe7473c6bd2a9ebb33248d5aa2b9f"
+      "sha256": "75642fbfc9fd0ec4f5944c1f1785ec4d84310815c574d3775c800efce68cd361"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lit-full.png": {
       "size": [
@@ -40237,7 +39752,7 @@
         941
       ],
       "mode": "RGB",
-      "sha256": "33d86721a741b2380d6fc5ac7b417bd175b7081fdbbc1277ce687d040036e97e"
+      "sha256": "fe188537f285e2c2c3e7dcacd4a38431ed6a4343f1331dff9f63e059f8d249d1"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lit-K2-six-colour.png": {
       "size": [
@@ -40245,7 +39760,7 @@
         1608
       ],
       "mode": "RGB",
-      "sha256": "addd88fa1bc061020230cd6c91a0a36de0c69dcf77144506e39a6523a920096c"
+      "sha256": "526781c1b81db6ac8e420dba8c0d1af17ea46152201e895a41a2feffcb001538"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lit-K2-six-gray.png": {
       "size": [
@@ -40253,7 +39768,7 @@
         1608
       ],
       "mode": "RGB",
-      "sha256": "acad2c4597718ec44af51d66d548596db541dd43e8b1bbb73e9f97c3cce7f407"
+      "sha256": "c938f3c690a17b08f577a6b5197315e9049078ef7cee15cca8cdd6e3dc313a43"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-old-lantern-mask.png": {
       "size": [
@@ -40269,7 +39784,7 @@
         616
       ],
       "mode": "RGB",
-      "sha256": "bbbbf196b6c8a1ca47c8bd5501b94495f3280a2339e7c4d96c997b457f673418"
+      "sha256": "e9264d9094cee3bf9d10ead8bc30622153cf751ad567df0ba069c541fe8432ef"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-sconce-core-clipping-gray.png": {
       "size": [
@@ -40277,7 +39792,7 @@
         616
       ],
       "mode": "RGB",
-      "sha256": "eefb568815e85bf46838d2aa3944d374dd6ff5587a321dcf84fcf0210e0ef95b"
+      "sha256": "e6553a691311dd83a53a3753df856963d174875becc9a1102b41f074ed9b283c"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1120-160-colour.png": {
       "size": [
@@ -40285,7 +39800,7 @@
         220
       ],
       "mode": "RGB",
-      "sha256": "f2921d26dd7ae92f7ebc9c87087778156e52f3f38257bcf69af481285ceeae37"
+      "sha256": "67362829fbbcf0d889d4d3022304e9bb9bb824bc8794ffd05e748c34fbf27d4d"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1120-160-gray.png": {
       "size": [
@@ -40293,7 +39808,7 @@
         220
       ],
       "mode": "RGB",
-      "sha256": "7b673d175a293f518a58ab195e5b82ecf9f8c4d0868cafa2c25535f244de73ef"
+      "sha256": "a099502b742a973b0bf6c62904e6708deaea900e3f72099f38a9eafcf6e998f8"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-128-672-colour.png": {
       "size": [
@@ -40301,7 +39816,7 @@
         220
       ],
       "mode": "RGB",
-      "sha256": "156b9f7705ebc45e247b5707890f50eecee371fbcb896fa6a3935ad74d79f070"
+      "sha256": "c7436478159c776dee461fec10df607e5096b750e47e97e353a9d7c28f9b16f8"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-128-672-gray.png": {
       "size": [
@@ -40309,7 +39824,7 @@
         220
       ],
       "mode": "RGB",
-      "sha256": "5be620eaaae6e54046cd2a83039512ee5744be5fec67f410dfda3a8c2b8b514c"
+      "sha256": "e0031cf78f76ae8c60858800a4413bbe72ad9c2125346646a61c50b42c896ec0"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1280-288-colour.png": {
       "size": [
@@ -40317,7 +39832,7 @@
         220
       ],
       "mode": "RGB",
-      "sha256": "ff0c572e000d8661676aad0b56b00d4bf80e79bdc542e7d503df45e93ab68b07"
+      "sha256": "ce06e3a0dc3d3a0c8514db1ec5f074acf35a4962c1e7b638b3ff18dea8382083"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1280-288-gray.png": {
       "size": [
@@ -40325,7 +39840,7 @@
         220
       ],
       "mode": "RGB",
-      "sha256": "a5da73e86935de842d309dea19d43bc23ca4c0f8b1e384d9efccda4b213d1ed7"
+      "sha256": "47b99b1f14dc662b3237fbc633db92ce09b729f16bbd30f49e524e5dd1748d8d"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1312-800-colour.png": {
       "size": [
@@ -40333,7 +39848,7 @@
         220
       ],
       "mode": "RGB",
-      "sha256": "8842d4aac539b5d4bbde5cac0d9694090067b2bb76c3c3f6ef26791cea621772"
+      "sha256": "49e1b21e37fc940296aaf2d24158393c1d98cc5669eacb953e0e88655aea4aca"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1312-800-gray.png": {
       "size": [
@@ -40341,7 +39856,7 @@
         220
       ],
       "mode": "RGB",
-      "sha256": "1be46f0677666f302d8a3d432a49ef0fc686bbf48435aea155e995f4f1d0c882"
+      "sha256": "f246fbf9622d44aeaf96b08db85e08e17356091fb0e42097c776e4eed30c1835"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1344-800-colour.png": {
       "size": [
@@ -40349,7 +39864,7 @@
         220
       ],
       "mode": "RGB",
-      "sha256": "c84eef9450edf13d9d3c6698f90ae1d80cc60ea8f0c75a516e828b93b7a6d1f8"
+      "sha256": "2a77cf24ef00ab70154641fbc074d37415990ffa7a95e33504d6bdd9bf19dce2"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1344-800-gray.png": {
       "size": [
@@ -40357,7 +39872,7 @@
         220
       ],
       "mode": "RGB",
-      "sha256": "0ee2eb2ccbced366b406e350ab3e5f3d3f50df8db4f032625dec5b51382b7ce5"
+      "sha256": "5cabbc6be491c7c882615200aa1e830653edad056c9037db58d3907a17c206e8"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1472-160-colour.png": {
       "size": [
@@ -40365,7 +39880,7 @@
         220
       ],
       "mode": "RGB",
-      "sha256": "4472a6ed2d9a63e64d8cb1dd9e74ca3022365be4bf6e4dff19ba0b5de3f9a995"
+      "sha256": "8b815c4230b4952be385c718fdcd8bb18d86eff071e6e7044f82d6eee9dee241"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1472-160-gray.png": {
       "size": [
@@ -40373,7 +39888,7 @@
         220
       ],
       "mode": "RGB",
-      "sha256": "16cdfdee3308f3e0badc438c7ae45727e92fc101c74671d64703798e3aa34ece"
+      "sha256": "505e1f78a224ffac725169369b2bfe3e5511d8d407f46568c3756af3a71ef62f"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-160-704-colour.png": {
       "size": [
@@ -40381,7 +39896,7 @@
         220
       ],
       "mode": "RGB",
-      "sha256": "16e773dbcc57226b071c0677af9a86d4ccf1d16414f1385445310aec28e69429"
+      "sha256": "b9971dd2b017da2c0dc3605508278bf33f05f474593f418fcf7d16a3de0b5959"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-160-704-gray.png": {
       "size": [
@@ -40389,7 +39904,7 @@
         220
       ],
       "mode": "RGB",
-      "sha256": "bb6cdea1469e1557dff9b6722761d51c78bd71519c039a3fe501fcca19687653"
+      "sha256": "d73ba32992b3c9ee8c6b25494f7dd0f0aa4cc68bd22e0f7d7af783dbfa18db68"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-map-colour.png": {
       "size": [
@@ -40397,7 +39912,7 @@
         969
       ],
       "mode": "RGB",
-      "sha256": "ee836d6931556d64d9e9048f69cb186352fd9311a8a139c437e8e59b5b70043f"
+      "sha256": "7028a47c55670e745c0bd1898dfceb5002bd839caf054477a9c04f5eaab222bc"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-map-gray.png": {
       "size": [
@@ -40405,7 +39920,7 @@
         969
       ],
       "mode": "RGB",
-      "sha256": "2d57a48f60e9fe1c519e07e9ee2b3ce538c5cfa84a89c02bbcb6933fcbefdaf1"
+      "sha256": "c47678ec7b8a6e99fa71eb5ac513afb3970321fa8e9cdd001299644772c65c48"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-working-1087x612-colour.png": {
       "size": [
@@ -40413,7 +39928,7 @@
         640
       ],
       "mode": "RGB",
-      "sha256": "380c1a202c4ae5423f7f0143b875087dd26cfd90cd1cef8afa36911eabc14b87"
+      "sha256": "3bbf6f685cfa2f197ec81ad646a51ccbed6bfd1d89f00d06a0589b4a5eb1e712"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-working-1087x612-gray.png": {
       "size": [
@@ -40421,7 +39936,7 @@
         640
       ],
       "mode": "RGB",
-      "sha256": "66e4d11976141d78f894a7b38db3ca6c35b26fd887ea02ac31fc4cac3d6ece8c"
+      "sha256": "ac3be38f9b9345e1efd3ac6911af44ab9ef819f5190bf6d5750fa9d9f4bc8e0b"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-working-836x471-colour.png": {
       "size": [
@@ -40429,7 +39944,7 @@
         499
       ],
       "mode": "RGB",
-      "sha256": "a045f6af292d6b4cd3fc8e431396dbff8b7146e3ecfd4056146dbd2a11ca762c"
+      "sha256": "0e44675ad299441d66df3ff6e8ed88e89f8f7ef33253f022aa13c2a9fa8e84af"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-working-836x471-gray.png": {
       "size": [
@@ -40437,39 +39952,7 @@
         499
       ],
       "mode": "RGB",
-      "sha256": "5bfde160a25e85e4a0a761ba605e671fb3e5e2f3595c9b12e4bf800053cece30"
-    },
-    "scraped-data/derived/env-u16-marmoreal-codex/concepts/EN-01-R3-ne-1-input.png": {
-      "size": [
-        1024,
-        1024
-      ],
-      "mode": "RGB",
-      "sha256": "189f86fe113146f971608eebd7cc0ec9a8c0b1c387df504a1ce9487e274ed0cd"
-    },
-    "scraped-data/derived/env-u16-marmoreal-codex/concepts/EN-01-R3-ne-1-raw.png": {
-      "size": [
-        1254,
-        1254
-      ],
-      "mode": "RGB",
-      "sha256": "64e74884c42ba8e97983cc2ff5ddfed865ab4527ac206df23e7c627262efcf77"
-    },
-    "scraped-data/derived/env-u16-marmoreal-codex/concepts/EN-01-R3-nw-1-input.png": {
-      "size": [
-        1024,
-        1024
-      ],
-      "mode": "RGB",
-      "sha256": "5de342a63a035fe5167cd8f8c8e097fe8f9b8a9f57e14b7714f7c1642020730e"
-    },
-    "scraped-data/derived/env-u16-marmoreal-codex/concepts/EN-01-R3-nw-1-raw.png": {
-      "size": [
-        1254,
-        1254
-      ],
-      "mode": "RGB",
-      "sha256": "4b7bed7257e4d5afbead13002650f0d0cd9aee01336392f0e04b6f2cdb63a1be"
+      "sha256": "0e1983c0dac13ca3899d2f2a53b5dde9742074b368abc3fe822b9ffbdc02d5e3"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/concepts/EN-01-R3-sw-1-input.png": {
       "size": [
@@ -40493,7 +39976,7 @@
         941
       ],
       "mode": "RGB",
-      "sha256": "7225b4d3ff7b639c649e1432b26bdf14c55cc2ed8621df5253dc1aaaa95ec40a"
+      "sha256": "c117712bf249d85ba36e55951a7f85ff998a42c40c632bcea558e37123034677"
     },
     "scraped-data/derived/env-u16-marmoreal-codex/marmoreal-lantern-mask.png": {
       "size": [
@@ -40501,14 +39984,13 @@
         941
       ],
       "mode": "L",
-      "sha256": "a4a16677684fb384c9339b677e910647d73c773b517c74729293f05bcd08ad62"
+      "sha256": "1c002be4c50c3b7415d2fa06946df51d1395c54b61191d8e4c60e77501dd8d77"
     }
   },
   "gray": [
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-full-gray.png",
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-inspection-cores-gray.png",
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-2x-nearest-gray.png",
-    "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-4x-boost-gray.png",
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-4x-gray.png",
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lantern-mask-gray.png",
     "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lit-full-gray.png",
@@ -40552,408 +40034,309 @@
   "visual_review": {
     "performed": true,
     "date": "2026-10-06",
-    "run": "CX-07r fix2",
-    "method": "Opened each of the 47 current r3 PNGs with view_image, including colour and Rec.709 gray; opened boosted K2 at brightness x2.5, normal 4x Lanczos, 2x nearest, all seven seam-cell pairs, source-core diagnostics, masks, lit sheets and black outside diff. Also opened both edit inputs, both unretouched raws, final deliverables and final polygon diagnostics. This file records the inspection, it does not automate it.",
-    "inspected_images": {
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/08-diff-outside-remove-mask.png": "f6d127f7ab94aef3a2fa266038db5cd27099548df5f582743d9f900bb0d49886",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/fix2-inspection-boost-colour.png": "db6851a92aa5cb48bf7623bfeaca291f3912ee56a9eb8c0bc73d27c6fe6173e4",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/fix2-ne-fix-mask.png": "9ee972205afe71092e1de64ecc4719c7e252d8af6c1e31b4fd28a6d673246630",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/fix2-ne-polygon-inspection.png": "535189b54c381a605e42eead4362c15e1e70ee66024e46d2e28dbb5be74e9678",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/fix2-nw-fix-mask.png": "a18786d452a079ec7bb2365c369f6b11410f0bf9676e3b4e0ca386afdf170dff",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/fix2-nw-polygon-inspection.png": "bf85704bbc79e3914ce0949070a560e192e624800ba3aa30b1ab568340d885ad",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-composite-alpha.png": "0e6bfb9c152313bddbbedf5ddeac0047e112320c059df25223bb7c4f59829957",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-core-detail-door.png": "12a78035e0a334dcc87c35a3cd409252b251ef0a6da943ff026be5f501cd26d1",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-core-detail-ne.png": "4de60848a8bef85febdd3a83b5d4d8971c6e84815cdb122c047dd5c93b12887d",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-core-detail-nw.png": "943fd09c060a6be493d6dcb09b61194ec1d6e1ad0374aa3050a8fdc664ce262a",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-core-detail-se.png": "c3d8346291d9fae39577c4e767a8e90c6f4b32b12985e7c9b348cb2eeca60269",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-core-detail-sw.png": "490798ac3db989ae73ecd0602a8a6686c3ba89c134270152a765a2291e9292f2",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-diff-vs-previous.png": "94de2fbb56c1d5e1194b9c5eb65c1e2a52e909ab16581ab55154e3e1c749e79f",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-fix-mask.png": "e111b090d5aa7ff7ebf0261682b9816c21864c00ad59a7e8faed2821decc39d1",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-full-colour.png": "4e0762300aaeba915661cff4f3c5cdbfab09552a9ef5cb78134e55e84dc2944e",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-full-gray.png": "165a404013ece6ac3efcc42879f8ffecfb3c3b452dfed6a3bbe32b315f7e1cd9",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-inspection-cores-colour.png": "8c39c42512ac47aa6e86438bacb8ad22d5ee492ec69d7f075ea565e7ed783a7f",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-inspection-cores-gray.png": "3892b7f132d586677a3852e8170e167106935a5a9164f35c470f01f68319e648",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-2x-nearest-colour.png": "46de856dd83a13a72e482b18efc7ebcbcc2d8a7d21e19ffd3a6ad18ae03100aa",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-2x-nearest-gray.png": "6e72b59561169bbea6f95e095002ad836f204837d421a2d320824845b6540e70",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-4x-boost-colour.png": "84073405416a7e5d31be32065ef2148061fb87ed496930a6b9951a136fc3991d",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-4x-boost-gray.png": "532e4ae1a993383a2d6ad2601bd6822a550ef59a35733db67bff89502ab64f61",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-4x-colour.png": "f00874363cc0c0c484a8cede4b8ce4c03f7acd9c124ce93d56c284165c27730d",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-4x-gray.png": "51116e94cf6eebca3d4f283f6d86ad028ae7265e44651925ce974710d3a2a2a9",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lantern-mask-colour.png": "40e813c21b85e7c7e57e40d48edbe94117f685e6494277468fa9f77b82d90cae",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lantern-mask-gray.png": "9adc07bce0406bbeb68326e07a51b7e7a16777235f88b29e04a39b918043985f",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lit-full-gray.png": "1473466a1b116ae580f996f3484f97630f7fe7473c6bd2a9ebb33248d5aa2b9f",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lit-full.png": "33d86721a741b2380d6fc5ac7b417bd175b7081fdbbc1277ce687d040036e97e",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lit-K2-six-colour.png": "addd88fa1bc061020230cd6c91a0a36de0c69dcf77144506e39a6523a920096c",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lit-K2-six-gray.png": "acad2c4597718ec44af51d66d548596db541dd43e8b1bbb73e9f97c3cce7f407",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-old-lantern-mask.png": "c453d2e0667623fbad37a1b35d54f56be2900cea0854de3ce0db6658b3783622",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-sconce-core-clipping-colour.png": "bbbbf196b6c8a1ca47c8bd5501b94495f3280a2339e7c4d96c997b457f673418",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-sconce-core-clipping-gray.png": "eefb568815e85bf46838d2aa3944d374dd6ff5587a321dcf84fcf0210e0ef95b",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1120-160-colour.png": "f2921d26dd7ae92f7ebc9c87087778156e52f3f38257bcf69af481285ceeae37",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1120-160-gray.png": "7b673d175a293f518a58ab195e5b82ecf9f8c4d0868cafa2c25535f244de73ef",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-128-672-colour.png": "156b9f7705ebc45e247b5707890f50eecee371fbcb896fa6a3935ad74d79f070",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-128-672-gray.png": "5be620eaaae6e54046cd2a83039512ee5744be5fec67f410dfda3a8c2b8b514c",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1280-288-colour.png": "ff0c572e000d8661676aad0b56b00d4bf80e79bdc542e7d503df45e93ab68b07",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1280-288-gray.png": "a5da73e86935de842d309dea19d43bc23ca4c0f8b1e384d9efccda4b213d1ed7",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1312-800-colour.png": "8842d4aac539b5d4bbde5cac0d9694090067b2bb76c3c3f6ef26791cea621772",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1312-800-gray.png": "1be46f0677666f302d8a3d432a49ef0fc686bbf48435aea155e995f4f1d0c882",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1344-800-colour.png": "c84eef9450edf13d9d3c6698f90ae1d80cc60ea8f0c75a516e828b93b7a6d1f8",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1344-800-gray.png": "0ee2eb2ccbced366b406e350ab3e5f3d3f50df8db4f032625dec5b51382b7ce5",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1472-160-colour.png": "4472a6ed2d9a63e64d8cb1dd9e74ca3022365be4bf6e4dff19ba0b5de3f9a995",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1472-160-gray.png": "16cdfdee3308f3e0badc438c7ae45727e92fc101c74671d64703798e3aa34ece",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-160-704-colour.png": "16e773dbcc57226b071c0677af9a86d4ccf1d16414f1385445310aec28e69429",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-160-704-gray.png": "bb6cdea1469e1557dff9b6722761d51c78bd71519c039a3fe501fcca19687653",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-map-colour.png": "ee836d6931556d64d9e9048f69cb186352fd9311a8a139c437e8e59b5b70043f",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-map-gray.png": "2d57a48f60e9fe1c519e07e9ee2b3ce538c5cfa84a89c02bbcb6933fcbefdaf1",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-working-1087x612-colour.png": "380c1a202c4ae5423f7f0143b875087dd26cfd90cd1cef8afa36911eabc14b87",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-working-1087x612-gray.png": "66e4d11976141d78f894a7b38db3ca6c35b26fd887ea02ac31fc4cac3d6ece8c",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-working-836x471-colour.png": "a045f6af292d6b4cd3fc8e431396dbff8b7146e3ecfd4056146dbd2a11ca762c",
-      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-working-836x471-gray.png": "5bfde160a25e85e4a0a761ba605e671fb3e5e2f3595c9b12e4bf800053cece30",
-      "scraped-data/derived/env-u16-marmoreal-codex/concepts/EN-01-R3-ne-1-input.png": "189f86fe113146f971608eebd7cc0ec9a8c0b1c387df504a1ce9487e274ed0cd",
-      "scraped-data/derived/env-u16-marmoreal-codex/concepts/EN-01-R3-ne-1-raw.png": "64e74884c42ba8e97983cc2ff5ddfed865ab4527ac206df23e7c627262efcf77",
-      "scraped-data/derived/env-u16-marmoreal-codex/concepts/EN-01-R3-nw-1-input.png": "5de342a63a035fe5167cd8f8c8e097fe8f9b8a9f57e14b7714f7c1642020730e",
-      "scraped-data/derived/env-u16-marmoreal-codex/concepts/EN-01-R3-nw-1-raw.png": "4b7bed7257e4d5afbead13002650f0d0cd9aee01336392f0e04b6f2cdb63a1be",
-      "scraped-data/derived/env-u16-marmoreal-codex/marmoreal-clean.png": "7225b4d3ff7b639c649e1432b26bdf14c55cc2ed8621df5253dc1aaaa95ec40a",
-      "scraped-data/derived/env-u16-marmoreal-codex/marmoreal-lantern-mask.png": "a4a16677684fb384c9339b677e910647d73c773b517c74729293f05bcd08ad62"
-    },
-    "r3_images_count": 47,
+    "method": "Opened every r3 PNG with view_image, including colour/Rec.709 gray, 4x Lanczos and 2x nearest; inspected C0 source cores at 4x and the unretouched imagegen result.",
+    "inspected_images": [
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-composite-alpha.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-core-detail-door.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-core-detail-ne.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-core-detail-nw.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-core-detail-se.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-core-detail-sw.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-diff-vs-previous.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-fix-mask.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-full-colour.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-full-gray.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-inspection-cores-colour.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-inspection-cores-gray.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-2x-nearest-colour.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-2x-nearest-gray.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-4x-colour.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-4x-gray.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lantern-mask-colour.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lantern-mask-gray.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lit-full-gray.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lit-full.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lit-K2-six-colour.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lit-K2-six-gray.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-old-lantern-mask.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-sconce-core-clipping-colour.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-sconce-core-clipping-gray.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1120-160-colour.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1120-160-gray.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-128-672-colour.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-128-672-gray.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1280-288-colour.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1280-288-gray.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1312-800-colour.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1312-800-gray.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1344-800-colour.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1344-800-gray.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1472-160-colour.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1472-160-gray.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-160-704-colour.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-160-704-gray.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-map-colour.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-map-gray.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-working-1087x612-colour.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-working-1087x612-gray.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-working-836x471-colour.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-working-836x471-gray.png",
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/08-diff-outside-remove-mask.png"
+    ],
     "silhouettes_removed": true,
-    "boosted_silhouettes_removed": true,
     "pedestals_intact": true,
-    "no_new_objects_water_figures_text": true,
     "K2_no_visible_boundary": true,
+    "no_new_objects_water_figures_text": true,
     "gray_readable": true,
-    "gray_notes": "Плоские светлые крышки и тела четырёх тумб, ритм балюстрады и мраморных колонн читаются на полном, рабочих и K2 серых листах. Ниши остаются тёмными; новая заделка не выглядит светлой кляксой.",
+    "gray_notes": "? ????? K2 ? ????? ?????? ?????? ? ???? ????, ?????????? ? ????????? ????????. ???? SW ?????? ?????, ?????? ??? ?????? ?? ????????? ???????, ?? ??????? ????????.",
     "lit_no_double_edges": true,
-    "notes": "На NW/NE вместо коробки, крыши с завитыми углами и парных стоек видны тёмная ниша и тонкие ветви с розовыми цветками. Повышенная яркость показывает фон без узнаваемого фонаря; видимого шва вставки нет. SW принятую заделку сохраняет. В SE видны широкие листья и диагональные ветви, без крыши, стоек или крюка; генерация не нужна. У бра показана тёмная дверная ниша без пламени. Крышки и колонны взяты из fix1. В lit фонари и бра восстановлены с единственным контуром; мягкий свет затухает без ступенчатой кромки. Тёплые ступени у двери и блики вне support сохранены по ВР-VS2-EN.2. Вода, фигуры, текст и новые предметы не добавлены."
+    "notes": [
+      "SW: ?????, ???????? ? ?????? ???? ???????? ???????? ???????; ?????? ????? ? ?????????? ??????? ????????? ??????????. NW/NE/SE: ???????? ???????? ??????? ???, ??????? ?????????????? image edits ?? ????????.",
+      "? ???? ?????? ?????? ??????? ???????? ? ??????? ???? ????? ? C0. ? SE ??? support ???????? ???????? ?????? ????, ??? ??????????? ??????????.",
+      "? ????? ????? ??? ??????? ???????? ????? ???????? ????? ???????? ? ??????? ??????????? ????????; ???????? ???????????? ???????????? ?????????, ??????? ??? ???? ??????????? ?? ???????.",
+      "Lit: ?????? ? ??? ???????????? ? ??????? ??????????; ??????? ??????? ????? ??? ????? ? ??????? ?? ????. ?????? lit ????????? ????? ???? ? ?????? ?????? ?????.",
+      "????? sconce-core-clipping ?????????? ??????????? ???????????? remove-mask ?? ??????????? ???. ?????????????? 255 ?? ???? ???????? ?????? ???? ?? ??????????; ?????? ??????? ?? ?????????.",
+      "Diff ??? remove-mask ????????? ??????; diff ? ?????????? ????? ???????? ?????? SW ? ???? ???????? ??????????? ??? ???."
+    ]
   },
-  "visual_review_current": true,
   "acceptance": [
     {
-      "line": "1) verification.json: source_unchanged true, outside_folder [], diff вне remove-mask = 0 px; marmoreal-field-mask.png и marmoreal-remove-mask.png побайтно прежние.",
+      "line": "1) Sources, scope, frozen masks, outside diff",
       "passed": true,
       "measured": {
         "source_unchanged": true,
-        "frozen_unchanged": true,
         "outside_folder": [],
         "outside_diff": 0,
-        "elsewhere": 0
+        "elsewhere": 0,
+        "independent_readback": {
+          "plate_RGB_1672x941": true,
+          "mask_L_1672x941": true,
+          "field_all_808080": true,
+          "outside_remove_zero": true,
+          "elsewhere_unchanged": true,
+          "fix_inside_support": true,
+          "painted_frame_unchanged": true,
+          "door_interior_unchanged": true,
+          "mask_not_above_remove": true,
+          "mask_zero_on_field": true,
+          "outside_diff_black": true,
+          "old_mask_backup_byte_identical": true,
+          "README_original_bytes_unchanged": true,
+          "fixed_task_hashes_match": true,
+          "generations_intact": true,
+          "Rec709_gray_sheets": true
+        }
       },
-      "expected": "sources and frozen byte-identical; outside and elsewhere 0; all readbacks pass",
+      "expected": "sources/frozen byte-identical; no writes outside roots; outside/elsewhere = 0",
       "note": ""
     },
     {
-      "line": "2) Read PNG листов: 4 фонаря и 2 бра убраны без силуэтов (K2 4× и с подъёмом яркости ×2,5), тумбы целы, тёплых пятен нет, кроме света двери и остатков вне remove-mask по ВР-VS2-EN.2; поле #808080; воды нет.",
+      "line": "2) Six lights removed, pedestals, warm exceptions, gray field, no water",
       "passed": true,
       "measured": {
         "performed": true,
         "date": "2026-10-06",
-        "run": "CX-07r fix2",
-        "method": "Opened each of the 47 current r3 PNGs with view_image, including colour and Rec.709 gray; opened boosted K2 at brightness x2.5, normal 4x Lanczos, 2x nearest, all seven seam-cell pairs, source-core diagnostics, masks, lit sheets and black outside diff. Also opened both edit inputs, both unretouched raws, final deliverables and final polygon diagnostics. This file records the inspection, it does not automate it.",
-        "inspected_images": {
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/08-diff-outside-remove-mask.png": "f6d127f7ab94aef3a2fa266038db5cd27099548df5f582743d9f900bb0d49886",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/fix2-inspection-boost-colour.png": "db6851a92aa5cb48bf7623bfeaca291f3912ee56a9eb8c0bc73d27c6fe6173e4",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/fix2-ne-fix-mask.png": "9ee972205afe71092e1de64ecc4719c7e252d8af6c1e31b4fd28a6d673246630",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/fix2-ne-polygon-inspection.png": "535189b54c381a605e42eead4362c15e1e70ee66024e46d2e28dbb5be74e9678",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/fix2-nw-fix-mask.png": "a18786d452a079ec7bb2365c369f6b11410f0bf9676e3b4e0ca386afdf170dff",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/fix2-nw-polygon-inspection.png": "bf85704bbc79e3914ce0949070a560e192e624800ba3aa30b1ab568340d885ad",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-composite-alpha.png": "0e6bfb9c152313bddbbedf5ddeac0047e112320c059df25223bb7c4f59829957",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-core-detail-door.png": "12a78035e0a334dcc87c35a3cd409252b251ef0a6da943ff026be5f501cd26d1",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-core-detail-ne.png": "4de60848a8bef85febdd3a83b5d4d8971c6e84815cdb122c047dd5c93b12887d",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-core-detail-nw.png": "943fd09c060a6be493d6dcb09b61194ec1d6e1ad0374aa3050a8fdc664ce262a",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-core-detail-se.png": "c3d8346291d9fae39577c4e767a8e90c6f4b32b12985e7c9b348cb2eeca60269",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-core-detail-sw.png": "490798ac3db989ae73ecd0602a8a6686c3ba89c134270152a765a2291e9292f2",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-diff-vs-previous.png": "94de2fbb56c1d5e1194b9c5eb65c1e2a52e909ab16581ab55154e3e1c749e79f",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-fix-mask.png": "e111b090d5aa7ff7ebf0261682b9816c21864c00ad59a7e8faed2821decc39d1",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-full-colour.png": "4e0762300aaeba915661cff4f3c5cdbfab09552a9ef5cb78134e55e84dc2944e",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-full-gray.png": "165a404013ece6ac3efcc42879f8ffecfb3c3b452dfed6a3bbe32b315f7e1cd9",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-inspection-cores-colour.png": "8c39c42512ac47aa6e86438bacb8ad22d5ee492ec69d7f075ea565e7ed783a7f",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-inspection-cores-gray.png": "3892b7f132d586677a3852e8170e167106935a5a9164f35c470f01f68319e648",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-2x-nearest-colour.png": "46de856dd83a13a72e482b18efc7ebcbcc2d8a7d21e19ffd3a6ad18ae03100aa",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-2x-nearest-gray.png": "6e72b59561169bbea6f95e095002ad836f204837d421a2d320824845b6540e70",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-4x-boost-colour.png": "84073405416a7e5d31be32065ef2148061fb87ed496930a6b9951a136fc3991d",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-4x-boost-gray.png": "532e4ae1a993383a2d6ad2601bd6822a550ef59a35733db67bff89502ab64f61",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-4x-colour.png": "f00874363cc0c0c484a8cede4b8ce4c03f7acd9c124ce93d56c284165c27730d",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-4x-gray.png": "51116e94cf6eebca3d4f283f6d86ad028ae7265e44651925ce974710d3a2a2a9",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lantern-mask-colour.png": "40e813c21b85e7c7e57e40d48edbe94117f685e6494277468fa9f77b82d90cae",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lantern-mask-gray.png": "9adc07bce0406bbeb68326e07a51b7e7a16777235f88b29e04a39b918043985f",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lit-full-gray.png": "1473466a1b116ae580f996f3484f97630f7fe7473c6bd2a9ebb33248d5aa2b9f",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lit-full.png": "33d86721a741b2380d6fc5ac7b417bd175b7081fdbbc1277ce687d040036e97e",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lit-K2-six-colour.png": "addd88fa1bc061020230cd6c91a0a36de0c69dcf77144506e39a6523a920096c",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lit-K2-six-gray.png": "acad2c4597718ec44af51d66d548596db541dd43e8b1bbb73e9f97c3cce7f407",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-old-lantern-mask.png": "c453d2e0667623fbad37a1b35d54f56be2900cea0854de3ce0db6658b3783622",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-sconce-core-clipping-colour.png": "bbbbf196b6c8a1ca47c8bd5501b94495f3280a2339e7c4d96c997b457f673418",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-sconce-core-clipping-gray.png": "eefb568815e85bf46838d2aa3944d374dd6ff5587a321dcf84fcf0210e0ef95b",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1120-160-colour.png": "f2921d26dd7ae92f7ebc9c87087778156e52f3f38257bcf69af481285ceeae37",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1120-160-gray.png": "7b673d175a293f518a58ab195e5b82ecf9f8c4d0868cafa2c25535f244de73ef",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-128-672-colour.png": "156b9f7705ebc45e247b5707890f50eecee371fbcb896fa6a3935ad74d79f070",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-128-672-gray.png": "5be620eaaae6e54046cd2a83039512ee5744be5fec67f410dfda3a8c2b8b514c",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1280-288-colour.png": "ff0c572e000d8661676aad0b56b00d4bf80e79bdc542e7d503df45e93ab68b07",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1280-288-gray.png": "a5da73e86935de842d309dea19d43bc23ca4c0f8b1e384d9efccda4b213d1ed7",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1312-800-colour.png": "8842d4aac539b5d4bbde5cac0d9694090067b2bb76c3c3f6ef26791cea621772",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1312-800-gray.png": "1be46f0677666f302d8a3d432a49ef0fc686bbf48435aea155e995f4f1d0c882",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1344-800-colour.png": "c84eef9450edf13d9d3c6698f90ae1d80cc60ea8f0c75a516e828b93b7a6d1f8",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1344-800-gray.png": "0ee2eb2ccbced366b406e350ab3e5f3d3f50df8db4f032625dec5b51382b7ce5",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1472-160-colour.png": "4472a6ed2d9a63e64d8cb1dd9e74ca3022365be4bf6e4dff19ba0b5de3f9a995",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1472-160-gray.png": "16cdfdee3308f3e0badc438c7ae45727e92fc101c74671d64703798e3aa34ece",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-160-704-colour.png": "16e773dbcc57226b071c0677af9a86d4ccf1d16414f1385445310aec28e69429",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-160-704-gray.png": "bb6cdea1469e1557dff9b6722761d51c78bd71519c039a3fe501fcca19687653",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-map-colour.png": "ee836d6931556d64d9e9048f69cb186352fd9311a8a139c437e8e59b5b70043f",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-map-gray.png": "2d57a48f60e9fe1c519e07e9ee2b3ce538c5cfa84a89c02bbcb6933fcbefdaf1",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-working-1087x612-colour.png": "380c1a202c4ae5423f7f0143b875087dd26cfd90cd1cef8afa36911eabc14b87",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-working-1087x612-gray.png": "66e4d11976141d78f894a7b38db3ca6c35b26fd887ea02ac31fc4cac3d6ece8c",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-working-836x471-colour.png": "a045f6af292d6b4cd3fc8e431396dbff8b7146e3ecfd4056146dbd2a11ca762c",
-          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-working-836x471-gray.png": "5bfde160a25e85e4a0a761ba605e671fb3e5e2f3595c9b12e4bf800053cece30",
-          "scraped-data/derived/env-u16-marmoreal-codex/concepts/EN-01-R3-ne-1-input.png": "189f86fe113146f971608eebd7cc0ec9a8c0b1c387df504a1ce9487e274ed0cd",
-          "scraped-data/derived/env-u16-marmoreal-codex/concepts/EN-01-R3-ne-1-raw.png": "64e74884c42ba8e97983cc2ff5ddfed865ab4527ac206df23e7c627262efcf77",
-          "scraped-data/derived/env-u16-marmoreal-codex/concepts/EN-01-R3-nw-1-input.png": "5de342a63a035fe5167cd8f8c8e097fe8f9b8a9f57e14b7714f7c1642020730e",
-          "scraped-data/derived/env-u16-marmoreal-codex/concepts/EN-01-R3-nw-1-raw.png": "4b7bed7257e4d5afbead13002650f0d0cd9aee01336392f0e04b6f2cdb63a1be",
-          "scraped-data/derived/env-u16-marmoreal-codex/marmoreal-clean.png": "7225b4d3ff7b639c649e1432b26bdf14c55cc2ed8621df5253dc1aaaa95ec40a",
-          "scraped-data/derived/env-u16-marmoreal-codex/marmoreal-lantern-mask.png": "a4a16677684fb384c9339b677e910647d73c773b517c74729293f05bcd08ad62"
-        },
-        "r3_images_count": 47,
+        "method": "Opened every r3 PNG with view_image, including colour/Rec.709 gray, 4x Lanczos and 2x nearest; inspected C0 source cores at 4x and the unretouched imagegen result.",
+        "inspected_images": [
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-composite-alpha.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-core-detail-door.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-core-detail-ne.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-core-detail-nw.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-core-detail-se.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-core-detail-sw.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-diff-vs-previous.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-fix-mask.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-full-colour.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-full-gray.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-inspection-cores-colour.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-inspection-cores-gray.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-2x-nearest-colour.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-2x-nearest-gray.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-4x-colour.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-4x-gray.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lantern-mask-colour.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lantern-mask-gray.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lit-full-gray.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lit-full.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lit-K2-six-colour.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lit-K2-six-gray.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-old-lantern-mask.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-sconce-core-clipping-colour.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-sconce-core-clipping-gray.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1120-160-colour.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1120-160-gray.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-128-672-colour.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-128-672-gray.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1280-288-colour.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1280-288-gray.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1312-800-colour.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1312-800-gray.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1344-800-colour.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1344-800-gray.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1472-160-colour.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1472-160-gray.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-160-704-colour.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-160-704-gray.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-map-colour.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-map-gray.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-working-1087x612-colour.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-working-1087x612-gray.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-working-836x471-colour.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-working-836x471-gray.png",
+          "scraped-data/derived/env-u16-marmoreal-codex/comparison/08-diff-outside-remove-mask.png"
+        ],
         "silhouettes_removed": true,
-        "boosted_silhouettes_removed": true,
         "pedestals_intact": true,
-        "no_new_objects_water_figures_text": true,
         "K2_no_visible_boundary": true,
+        "no_new_objects_water_figures_text": true,
         "gray_readable": true,
-        "gray_notes": "Плоские светлые крышки и тела четырёх тумб, ритм балюстрады и мраморных колонн читаются на полном, рабочих и K2 серых листах. Ниши остаются тёмными; новая заделка не выглядит светлой кляксой.",
+        "gray_notes": "? ????? K2 ? ????? ?????? ?????? ? ???? ????, ?????????? ? ????????? ????????. ???? SW ?????? ?????, ?????? ??? ?????? ?? ????????? ???????, ?? ??????? ????????.",
         "lit_no_double_edges": true,
-        "notes": "На NW/NE вместо коробки, крыши с завитыми углами и парных стоек видны тёмная ниша и тонкие ветви с розовыми цветками. Повышенная яркость показывает фон без узнаваемого фонаря; видимого шва вставки нет. SW принятую заделку сохраняет. В SE видны широкие листья и диагональные ветви, без крыши, стоек или крюка; генерация не нужна. У бра показана тёмная дверная ниша без пламени. Крышки и колонны взяты из fix1. В lit фонари и бра восстановлены с единственным контуром; мягкий свет затухает без ступенчатой кромки. Тёплые ступени у двери и блики вне support сохранены по ВР-VS2-EN.2. Вода, фигуры, текст и новые предметы не добавлены."
+        "notes": [
+          "SW: ?????, ???????? ? ?????? ???? ???????? ???????? ???????; ?????? ????? ? ?????????? ??????? ????????? ??????????. NW/NE/SE: ???????? ???????? ??????? ???, ??????? ?????????????? image edits ?? ????????.",
+          "? ???? ?????? ?????? ??????? ???????? ? ??????? ???? ????? ? C0. ? SE ??? support ???????? ???????? ?????? ????, ??? ??????????? ??????????.",
+          "? ????? ????? ??? ??????? ???????? ????? ???????? ????? ???????? ? ??????? ??????????? ????????; ???????? ???????????? ???????????? ?????????, ??????? ??? ???? ??????????? ?? ???????.",
+          "Lit: ?????? ? ??? ???????????? ? ??????? ??????????; ??????? ??????? ????? ??? ????? ? ??????? ?? ????. ?????? lit ????????? ????? ???? ? ?????? ?????? ?????.",
+          "????? sconce-core-clipping ?????????? ??????????? ???????????? remove-mask ?? ??????????? ???. ?????????????? 255 ?? ???? ???????? ?????? ???? ?? ??????????; ?????? ??????? ?? ?????????.",
+          "Diff ??? remove-mask ????????? ??????; diff ? ?????????? ????? ???????? ?????? SW ? ???? ???????? ??????????? ??? ???."
+        ]
       },
-      "expected": "no silhouette at normal and x2.5 brightness 4x; intact pedestals; field #808080; warm residual outside support retained",
+      "expected": "Read every PNG; field #808080; residual warm outside support allowed by ВР-VS2-EN.2",
       "note": ""
     },
     {
-      "line": "3) R1–R4 из readability пройдены (ВР-VS2-EN.1); лист K2 4× без видимой границы.",
+      "line": "3) R1-R4 and K2 without visible boundary",
       "passed": true,
       "measured": {
-        "R1": [
-          {
-            "spot": "nw",
-            "spot_median_Lstar": 12.054695451508442,
-            "ring_median_Lstar": 21.619117131807446,
-            "signed_delta": -9.564421680299004,
-            "passed": true
-          },
-          {
-            "spot": "ne",
-            "spot_median_Lstar": 6.747489894194613,
-            "ring_median_Lstar": 23.40164404120811,
-            "signed_delta": -16.6541541470135,
-            "passed": true
-          },
-          {
-            "spot": "sw",
-            "spot_median_Lstar": 3.3257149311206824,
-            "ring_median_Lstar": 24.806668232908883,
-            "signed_delta": -21.4809533017882,
-            "passed": true
-          },
-          {
-            "spot": "se",
-            "spot_median_Lstar": 2.860519019533175,
-            "ring_median_Lstar": 27.766332048312144,
-            "signed_delta": -24.90581302877897,
-            "passed": true
-          },
-          {
-            "spot": "door-w",
-            "spot_median_Lstar": 10.509335163863058,
-            "ring_median_Lstar": 32.69917520368458,
-            "signed_delta": -22.189840039821526,
-            "passed": true
-          },
-          {
-            "spot": "door-e",
-            "spot_median_Lstar": 11.702657559415613,
-            "ring_median_Lstar": 28.767113682335243,
-            "signed_delta": -17.06445612291963,
-            "passed": true
-          }
-        ],
-        "R2": [
-          {
-            "spot": "nw",
-            "hot_pixels": 0,
-            "measured_pixels": 437,
-            "passed": true
-          },
-          {
-            "spot": "ne",
-            "hot_pixels": 0,
-            "measured_pixels": 437,
-            "passed": true
-          },
-          {
-            "spot": "sw",
-            "hot_pixels": 0,
-            "measured_pixels": 437,
-            "passed": true
-          },
-          {
-            "spot": "se",
-            "hot_pixels": 0,
-            "measured_pixels": 437,
-            "passed": true
-          },
-          {
-            "spot": "door-w",
-            "hot_pixels": 0,
-            "measured_pixels": 415,
-            "passed": true
-          },
-          {
-            "spot": "door-e",
-            "hot_pixels": 0,
-            "measured_pixels": 322,
-            "passed": true
-          }
-        ],
-        "R3": [
-          {
-            "spot": "nw",
-            "warm_pixels": 8,
-            "measured_pixels": 28233,
-            "share": 0.0002833563560372614,
-            "passed": true
-          },
-          {
-            "spot": "ne",
-            "warm_pixels": 1,
-            "measured_pixels": 28544,
-            "share": 3.5033632286995515e-05,
-            "passed": true
-          },
-          {
-            "spot": "sw",
-            "warm_pixels": 36,
-            "measured_pixels": 27536,
-            "share": 0.0013073794305636258,
-            "passed": true
-          },
-          {
-            "spot": "se",
-            "warm_pixels": 21,
-            "measured_pixels": 28913,
-            "share": 0.0007263168816795213,
-            "passed": true
-          },
-          {
-            "spot": "door-w",
-            "warm_pixels": 0,
-            "measured_pixels": 1688,
-            "share": 0.0,
-            "passed": true
-          },
-          {
-            "spot": "door-e",
-            "warm_pixels": 0,
-            "measured_pixels": 1616,
-            "share": 0.0,
-            "passed": true
-          }
-        ],
+        "R1": true,
+        "R2": true,
+        "R3": true,
         "R4_share": 0.9508196721311475,
         "R4_non_exempt_failures": 0
       },
-      "expected": "R1 spot<=ring+4; R2=0; R3<=1%; R4>=95%, all non-exempt<=4; no visible K2 boundary",
+      "expected": "R1 <= ring+4; R2 = 0; R3 <=1%; R4 >=95%, all non-exempt <=4; K2 no visible boundary",
       "note": ""
     },
     {
-      "line": "4) Серый лист: тумбы и балюстрады различимы.",
+      "line": "4) Gray sheet: pedestals and balustrades readable",
       "passed": true,
-      "measured": "Плоские светлые крышки и тела четырёх тумб, ритм балюстрады и мраморных колонн читаются на полном, рабочих и K2 серых листах. Ниши остаются тёмными; новая заделка не выглядит светлой кляксой.",
-      "expected": "pedestals, balustrades and colonnade readable on Rec.709 gray",
+      "measured": "? ????? K2 ? ????? ?????? ?????? ? ???? ????, ?????????? ? ????????? ????????. ???? SW ?????? ?????, ?????? ??? ?????? ?? ????????? ???????, ?? ??????? ????????.",
+      "expected": "Read gray sheets",
       "note": ""
     },
     {
-      "line": "5) marmoreal-lantern-mask.png: ядра фонарей и бра 255 везде, где remove-mask > 0 (растушёвка remove-mask ядро не срезает; вне remove-mask плита равна C0), ноль вне remove-mask, на поле и дальше 260 px от фонаря (130 px от бра), край без ступенек, площадь с альфой ≥ 128 ≤ 10 % кадра; плита + C0 по этой маске показывает фонари и их свет без двойных контуров (ВР-VS2-EN.3).",
-      "passed": true,
+      "line": "5) Lantern mask and lit overlay",
+      "passed": false,
       "measured": {
         "mask": {
           "nonzero_share": 0.22328696947663332,
-          "share_ge_128": 0.09166289552496835,
-          "alpha_weighted_mean": 0.6918443394340754,
-          "global_mean_alpha": 0.101936878814698,
-          "mean_alpha_levels": 25.993904097747993,
+          "share_ge_128": 0.09156056623057014,
+          "alpha_weighted_mean": 0.6909965883743626,
+          "global_mean_alpha": 0.10181257071825368,
+          "mean_alpha_levels": 25.96220553315469,
           "max_4_neighbour_step_outside_core_edges": 43,
-          "core_polygons_all_255": true,
-          "dilated_cores_all_255": true,
-          "core_clipped_pixels": 0,
+          "core_polygons_all_255": false,
+          "dilated_cores_all_255": false,
+          "core_clipped_pixels": 425,
           "per_core": [
             {
               "spot": "nw",
               "polygon_pixels": 3704,
-              "polygon_pixels_in_support": 3704,
-              "polygon_pixels_below_255_in_support": 0,
-              "dilated_pixels_below_255_in_support": 0,
-              "lit_pixels_different_from_C0": 0
+              "polygon_pixels_below_255": 0,
+              "dilated_pixels_below_255": 0,
+              "lit_pixels_different_from_C0": 0,
+              "clipped_bounds": null,
+              "remove_values_at_clipped_pixels": []
             },
             {
               "spot": "ne",
               "polygon_pixels": 4266,
-              "polygon_pixels_in_support": 4266,
-              "polygon_pixels_below_255_in_support": 0,
-              "dilated_pixels_below_255_in_support": 0,
-              "lit_pixels_different_from_C0": 0
+              "polygon_pixels_below_255": 0,
+              "dilated_pixels_below_255": 0,
+              "lit_pixels_different_from_C0": 0,
+              "clipped_bounds": null,
+              "remove_values_at_clipped_pixels": []
             },
             {
               "spot": "sw",
               "polygon_pixels": 5416,
-              "polygon_pixels_in_support": 5416,
-              "polygon_pixels_below_255_in_support": 0,
-              "dilated_pixels_below_255_in_support": 0,
-              "lit_pixels_different_from_C0": 0
+              "polygon_pixels_below_255": 0,
+              "dilated_pixels_below_255": 0,
+              "lit_pixels_different_from_C0": 0,
+              "clipped_bounds": null,
+              "remove_values_at_clipped_pixels": []
             },
             {
               "spot": "se",
               "polygon_pixels": 5574,
-              "polygon_pixels_in_support": 5574,
-              "polygon_pixels_below_255_in_support": 0,
-              "dilated_pixels_below_255_in_support": 0,
-              "lit_pixels_different_from_C0": 0
+              "polygon_pixels_below_255": 0,
+              "dilated_pixels_below_255": 0,
+              "lit_pixels_different_from_C0": 0,
+              "clipped_bounds": null,
+              "remove_values_at_clipped_pixels": []
             },
             {
               "spot": "door-w",
               "polygon_pixels": 891,
-              "polygon_pixels_in_support": 891,
-              "polygon_pixels_below_255_in_support": 0,
-              "dilated_pixels_below_255_in_support": 0,
-              "lit_pixels_different_from_C0": 0
+              "polygon_pixels_below_255": 37,
+              "dilated_pixels_below_255": 130,
+              "lit_pixels_different_from_C0": 37,
+              "clipped_bounds": [
+                777,
+                45,
+                800,
+                53
+              ],
+              "remove_values_at_clipped_pixels": [
+                128,
+                170,
+                212
+              ]
             },
             {
               "spot": "door-e",
               "polygon_pixels": 794,
-              "polygon_pixels_in_support": 791,
-              "polygon_pixels_below_255_in_support": 0,
-              "dilated_pixels_below_255_in_support": 0,
-              "lit_pixels_different_from_C0": 0
+              "polygon_pixels_below_255": 171,
+              "dilated_pixels_below_255": 295,
+              "lit_pixels_different_from_C0": 168,
+              "clipped_bounds": [
+                866,
+                0,
+                871,
+                55
+              ],
+              "remove_values_at_clipped_pixels": [
+                0,
+                42,
+                85,
+                128,
+                170,
+                212
+              ]
             }
           ],
           "zero_outside_remove_support": true,
           "zero_on_field": true,
           "zero_beyond_radius": true,
           "radius_convention": "union of each light own radius; overlapping lights retained",
-          "step_core_exclusion": "pairs touching dilated cores or their 2.5 px Euclidean soft edge; includes support boundary immediately next to a core",
-          "core_pixels_outside_support": 39,
-          "core_condition": "255 only where remove>0; outside support m=0 and clean=C0"
+          "step_core_exclusion": "dilated cores plus their exact 2.5 px distance-field soft edge",
+          "constraint_conflict": "Complete sconce bracket polygons overlap frozen remove-mask feather and protected door boundary. The mandated min(core/glow, remove/255) clips them; full 255 cores cannot be asserted. Polygons were not shrunk to conceal this."
         },
         "lit_check": {
-          "cores_equal_C0_exactly": true,
+          "cores_equal_C0_exactly": false,
           "per_light": [
             {
               "spot": "nw",
               "radius_px": 96,
-              "mean_dE76": 5.8886615861859015,
-              "plate_alone_mean_dE76": 26.906661290900754,
+              "mean_dE76": 5.8901625022610435,
+              "plate_alone_mean_dE76": 26.837581147856632,
               "passed": true
             },
             {
               "spot": "ne",
               "radius_px": 96,
-              "mean_dE76": 5.934556707676374,
-              "plate_alone_mean_dE76": 30.94929112520615,
+              "mean_dE76": 5.93502781687874,
+              "plate_alone_mean_dE76": 30.89008212806309,
               "passed": true
             },
             {
@@ -40973,28 +40356,26 @@
             {
               "spot": "door-w",
               "radius_px": 96,
-              "mean_dE76": 0.5483875774519607,
+              "mean_dE76": 0.6289561421086126,
               "plate_alone_mean_dE76": 5.946512895736485,
               "passed": true
             },
             {
               "spot": "door-e",
               "radius_px": 96,
-              "mean_dE76": 0.7400396913118589,
+              "mean_dE76": 0.8113253772011286,
               "plate_alone_mean_dE76": 6.811561306402888,
               "passed": true
             }
-          ],
-          "polygon_cores_equal_C0_exactly": true,
-          "core_condition": "checked inside and outside support, including 2 px dilation"
+          ]
         },
         "no_double_edges": true
       },
-      "expected": "cores 255 where remove>0; lit=C0 on all cores; zeros outside support/field/radius; >=128<=10%; noncore step<=48; mean dE76<=8 per light; no double edges",
-      "note": "pairs touching dilated cores or their 2.5 px Euclidean soft edge; includes support boundary immediately next to a core"
+      "expected": "cores 255, zeros outside support/field/radius, >=128 share <=10%, max noncore step <=48, dE76 <=8 each, no double edges",
+      "note": "Complete sconce bracket polygons overlap frozen remove-mask feather and protected door boundary. The mandated min(core/glow, remove/255) clips them; full 255 cores cannot be asserted. Polygons were not shrunk to conceal this."
     },
     {
-      "line": "6) git status: изменены только art/imagegen/env-u16-marmoreal-codex/**.",
+      "line": "6) Changed paths restricted to package (images in authorized derived root)",
       "passed": true,
       "measured": {
         "agent_written_roots": [
@@ -41003,10 +40384,206 @@
         ],
         "git_commands": 0
       },
-      "expected": "writes only within two authorized roots",
-      "note": "User and corrective task prohibit every git command, so git status was not run. Images are in the explicitly authorized derived root; tool-managed CODEX_HOME cache is listed separately, never edited or deleted."
+      "expected": "two authorized roots; git status prohibited by user",
+      "note": "Scope is enforced by write targets and frozen hashes; no git command used. Tool cache explicitly permitted by fix1."
     }
   ],
-  "acceptance_pass": true,
-  "limits": []
+  "acceptance_pass": false,
+  "limits": [
+    {
+      "line": "5) Lantern mask and lit overlay",
+      "measured": {
+        "mask": {
+          "nonzero_share": 0.22328696947663332,
+          "share_ge_128": 0.09156056623057014,
+          "alpha_weighted_mean": 0.6909965883743626,
+          "global_mean_alpha": 0.10181257071825368,
+          "mean_alpha_levels": 25.96220553315469,
+          "max_4_neighbour_step_outside_core_edges": 43,
+          "core_polygons_all_255": false,
+          "dilated_cores_all_255": false,
+          "core_clipped_pixels": 425,
+          "per_core": [
+            {
+              "spot": "nw",
+              "polygon_pixels": 3704,
+              "polygon_pixels_below_255": 0,
+              "dilated_pixels_below_255": 0,
+              "lit_pixels_different_from_C0": 0,
+              "clipped_bounds": null,
+              "remove_values_at_clipped_pixels": []
+            },
+            {
+              "spot": "ne",
+              "polygon_pixels": 4266,
+              "polygon_pixels_below_255": 0,
+              "dilated_pixels_below_255": 0,
+              "lit_pixels_different_from_C0": 0,
+              "clipped_bounds": null,
+              "remove_values_at_clipped_pixels": []
+            },
+            {
+              "spot": "sw",
+              "polygon_pixels": 5416,
+              "polygon_pixels_below_255": 0,
+              "dilated_pixels_below_255": 0,
+              "lit_pixels_different_from_C0": 0,
+              "clipped_bounds": null,
+              "remove_values_at_clipped_pixels": []
+            },
+            {
+              "spot": "se",
+              "polygon_pixels": 5574,
+              "polygon_pixels_below_255": 0,
+              "dilated_pixels_below_255": 0,
+              "lit_pixels_different_from_C0": 0,
+              "clipped_bounds": null,
+              "remove_values_at_clipped_pixels": []
+            },
+            {
+              "spot": "door-w",
+              "polygon_pixels": 891,
+              "polygon_pixels_below_255": 37,
+              "dilated_pixels_below_255": 130,
+              "lit_pixels_different_from_C0": 37,
+              "clipped_bounds": [
+                777,
+                45,
+                800,
+                53
+              ],
+              "remove_values_at_clipped_pixels": [
+                128,
+                170,
+                212
+              ]
+            },
+            {
+              "spot": "door-e",
+              "polygon_pixels": 794,
+              "polygon_pixels_below_255": 171,
+              "dilated_pixels_below_255": 295,
+              "lit_pixels_different_from_C0": 168,
+              "clipped_bounds": [
+                866,
+                0,
+                871,
+                55
+              ],
+              "remove_values_at_clipped_pixels": [
+                0,
+                42,
+                85,
+                128,
+                170,
+                212
+              ]
+            }
+          ],
+          "zero_outside_remove_support": true,
+          "zero_on_field": true,
+          "zero_beyond_radius": true,
+          "radius_convention": "union of each light own radius; overlapping lights retained",
+          "step_core_exclusion": "dilated cores plus their exact 2.5 px distance-field soft edge",
+          "constraint_conflict": "Complete sconce bracket polygons overlap frozen remove-mask feather and protected door boundary. The mandated min(core/glow, remove/255) clips them; full 255 cores cannot be asserted. Polygons were not shrunk to conceal this."
+        },
+        "lit_check": {
+          "cores_equal_C0_exactly": false,
+          "per_light": [
+            {
+              "spot": "nw",
+              "radius_px": 96,
+              "mean_dE76": 5.8901625022610435,
+              "plate_alone_mean_dE76": 26.837581147856632,
+              "passed": true
+            },
+            {
+              "spot": "ne",
+              "radius_px": 96,
+              "mean_dE76": 5.93502781687874,
+              "plate_alone_mean_dE76": 30.89008212806309,
+              "passed": true
+            },
+            {
+              "spot": "sw",
+              "radius_px": 96,
+              "mean_dE76": 5.008559553134827,
+              "plate_alone_mean_dE76": 35.90733888218916,
+              "passed": true
+            },
+            {
+              "spot": "se",
+              "radius_px": 96,
+              "mean_dE76": 4.872615812973165,
+              "plate_alone_mean_dE76": 39.89126827268162,
+              "passed": true
+            },
+            {
+              "spot": "door-w",
+              "radius_px": 96,
+              "mean_dE76": 0.6289561421086126,
+              "plate_alone_mean_dE76": 5.946512895736485,
+              "passed": true
+            },
+            {
+              "spot": "door-e",
+              "radius_px": 96,
+              "mean_dE76": 0.8113253772011286,
+              "plate_alone_mean_dE76": 6.811561306402888,
+              "passed": true
+            }
+          ]
+        },
+        "no_double_edges": true
+      },
+      "expected": "cores 255, zeros outside support/field/radius, >=128 share <=10%, max noncore step <=48, dE76 <=8 each, no double edges",
+      "note": "Complete sconce bracket polygons overlap frozen remove-mask feather and protected door boundary. The mandated min(core/glow, remove/255) clips them; full 255 cores cannot be asserted. Polygons were not shrunk to conceal this."
+    }
+  ],
+  "independent_readback": {
+    "checks": {
+      "plate_RGB_1672x941": true,
+      "mask_L_1672x941": true,
+      "field_all_808080": true,
+      "outside_remove_zero": true,
+      "elsewhere_unchanged": true,
+      "fix_inside_support": true,
+      "painted_frame_unchanged": true,
+      "door_interior_unchanged": true,
+      "mask_not_above_remove": true,
+      "mask_zero_on_field": true,
+      "outside_diff_black": true,
+      "old_mask_backup_byte_identical": true,
+      "README_original_bytes_unchanged": true,
+      "fixed_task_hashes_match": true,
+      "generations_intact": true,
+      "Rec709_gray_sheets": true
+    },
+    "gray_checks": {
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-full-gray.png": true,
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-inspection-cores-gray.png": true,
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-2x-nearest-gray.png": true,
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-K2-six-4x-gray.png": true,
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lantern-mask-gray.png": true,
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-lit-K2-six-gray.png": true,
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-sconce-core-clipping-gray.png": true,
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1120-160-gray.png": true,
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-128-672-gray.png": true,
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1280-288-gray.png": true,
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1312-800-gray.png": true,
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1344-800-gray.png": true,
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-1472-160-gray.png": true,
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-cell-160-704-gray.png": true,
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-seam-map-gray.png": true,
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-working-1087x612-gray.png": true,
+      "scraped-data/derived/env-u16-marmoreal-codex/comparison/r3-working-836x471-gray.png": true
+    },
+    "passed": true
+  },
+  "tool_source_readback": [
+    {
+      "variant": "R3-sw-1",
+      "source_byte_identical_to_raw": true
+    }
+  ]
 }
