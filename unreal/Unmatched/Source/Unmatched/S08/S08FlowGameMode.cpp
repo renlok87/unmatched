@@ -1,5 +1,6 @@
 #include "S08FlowGameMode.h"
 #include "S08BoardActor.h"
+#include "S08Facing.h"
 #include "S08FighterActor.h"
 #include "S08ArtLook.h"
 #include "S08Render.h"
@@ -1038,7 +1039,10 @@ void AS08FlowGameMode::HandleCues(const TArray<FS08Cue>& InCues) {
   // seq waits for its target's arrival (MS-E-48).
   TMap<FString, double> ArriveMs;
   const TArray<FS08MovePlan> Plans = FS08MoveAnim::BuildPlans(
-      Cues, MoveMotion, [this](const FIntPoint& Cell) { return BoardModel.CellToWorld(Cell.X, Cell.Y); });
+      Cues, MoveMotion, [this](const FIntPoint& Cell) { return BoardModel.CellToWorld(Cell.X, Cell.Y); },
+      [this](const FVector& Pos) {  // AN-23 (ВР-06): the rest facing of the plan ends (the settle turns to it)
+        return BoardActor ? BoardActor->RestYawAt(Pos) : FS08MoveAnim::RestYawDeg(Pos);
+      });
   if (Plans.Num() > 0) {
     const int32 Animated = BoardActor ? BoardActor->PlayFighterMoves(Plans, MoveAnimParams, NowMs()) : 0;
     if (BoardActor) ScheduleStepSounds(Plans);  // DE-032: one step per edge; the first ones play in this frame
@@ -1155,7 +1159,11 @@ bool AS08FlowGameMode::ApplyBenchMovePose(const FString& PreferredId, double Hol
   Cue.Kind = ES08MoveKind::Move;
   Cue.PathSource = ES08PathSource::Trail;
   // Speed "normal", no reduced motion: the review frame shows the move itself, whatever the saved settings say.
-  const TArray<FS08MovePlan> Plans = FS08MoveAnim::BuildPlans({Cue}, FS08MotionSettings(), World);
+  const TArray<FS08MovePlan> Plans = FS08MoveAnim::BuildPlans(
+      {Cue}, FS08MotionSettings(), World,
+      [this](const FVector& Pos) {  // AN-23 (ВР-06): the review move settles to the v1 rest facing too
+        return BoardActor ? BoardActor->RestYawAt(Pos) : FS08MoveAnim::RestYawDeg(Pos);
+      });
   if (Plans.Num() != 1 || Plans[0].bSnapped) {
     OutError = TEXT("the review move did not plan");
     return false;
@@ -1444,6 +1452,21 @@ void AS08FlowGameMode::RunCombatEvents(const TArray<FS09CombatStageEvent>& Event
   for (const FS09CombatStageEvent& Event : Events) {
     AudioOnCombatEvent(Event);  // AU-S4: flips, effect bells, slam, lunge whoosh, block, combat end
     switch (Event.Type) {
+      case ES09CombatEvent::Face: {
+        // AN-24 (ВР-06): the attacker turns to the target over the remaining face window; a skipped pause puts the
+        // turn with the clip's first 120 ms; Cut / catch-up never reach this event. Speed "none" snaps it at once.
+        if (BoardActor) {
+          AS08FighterActor* Attacker = BoardActor->FindFighterActor(In.AttackerId);
+          const AS08FighterActor* Target = BoardActor->FindFighterActor(In.TargetId);
+          if (Attacker && Target) {
+            const int64 Gap = CombatStage.GetLungeMs() - Event.AtMs;
+            const double Ms = Gap <= 0 ? S08Facing::AttackTurnMs
+                                       : FMath::Min(static_cast<double>(Gap), S08Facing::AttackTurnMs);
+            Attacker->PlayFaceTarget(In.TargetId, Target->GetActorLocation(), Ms);
+          }
+        }
+        break;
+      }
       case ES09CombatEvent::Lunge:
         // CUE-011 intro: the attacker's LungeAttack after the slam + the pause "score" (01 F-03). DE-025 (SD-49): at
         // the animation speed (play rate 1 / speed); speed "none" plays no clip - the contact is this frame.

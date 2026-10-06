@@ -3,6 +3,9 @@
 #include "S08ArtHud.h"
 #include "S08ArtLook.h"
 #include "S08ArtPreviewMedusa.h"
+#include "S08BoardActor.h"
+#include "S08Facing.h"
+#include "S08IconMotion.h"
 #include "S08Render.h"
 #include "S08TraceLog.h"
 #include "Camera/PlayerCameraManager.h"
@@ -519,10 +522,97 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
   if (bMoving) {
     // MS-T-16: a re-application during the move (another fighter's snapshot) keeps the travelling pose.
     ApplyMovePose(MovePose);
-  } else {
+  } else if (S08Facing::LegacyRequested()) {
+    // The legacy half-field reset of every apply; AN-23 (ВР-06) keeps the current angle instead - the board actor's
+    // ApplyRestFacing right after decides (and the fresh spawn turns from the legacy initial angle of ApplyHeroV2).
     FacingYawDeg = static_cast<float>(FS08MoveAnim::RestYawDeg(CellCenter));
     FacingLeanDeg = 0.0f;
   }
+}
+
+// ---- AN-23 (ВР-06): the rest facing ---------------------------------------------------------------------------
+
+void AS08FighterActor::ApplyRestFacing(const TCHAR* Src, bool bLegacy, const FVector& CameraPos, bool bHasEnemy,
+                                       const FVector& NearestEnemyPos, const FString& EnemyId) {
+  const TCHAR* Event = bRestFacingApplied ? Src : TEXT("spawn");  // the first apply of a figure is its spawn
+  bRestFacingApplied = true;
+  UWorld* World = GetWorld();
+  if (bLegacy) {
+    if (World) World->GetTimerManager().ClearTimer(FacingTurnTimer);
+    FacingYawDeg = static_cast<float>(FS08MoveAnim::RestYawDeg(GetActorLocation()));
+    FacingLeanDeg = 0.0f;
+    ApplyFigureFacing(FacingYawDeg, 0.0);
+    return;
+  }
+  // The move plan owns the facing until the move ends; a one-shot clip (AN-24: the lunge holds the target angle, the
+  // return comes at its end) and the dead (ВР-06 states) never take a rest turn.
+  if (bMoving || bDeathHold || !Fighter.IsAlive()) return;
+  if (HeroClip == S08HeroesV2::EClip::LungeAttack || HeroClip == S08HeroesV2::EClip::HitReact) return;
+  const double Want =
+      S08Facing::RestYaw(GetActorLocation(), CameraPos, bHasEnemy, NearestEnemyPos, FacingYawDeg);
+  if (FMath::Abs(FMath::FindDeltaAngleDegrees(FacingYawDeg, Want)) < 0.05) return;  // the dead band / no enemy kept it
+  const double Cam = S08Facing::YawToward(GetActorLocation(), CameraPos);
+  FS08Trace::Write(FString::Printf(
+      TEXT("FACING fighter=%s src=%s rest=%.0f cam=%.0f off=%.0f enemy=%s"), *Fighter.Id, Event, Want, Cam,
+      FMath::Abs(FMath::FindDeltaAngleDegrees(Cam, Want)), bHasEnemy ? *EnemyId : TEXT("none")));
+  if (!World) {
+    ApplyFigureFacing(Want, 0.0);
+    return;
+  }
+  StartFacingTurn(Want, S08Facing::ReturnMs);
+}
+
+void AS08FighterActor::StartFacingTurn(double WantYawDeg, double Ms) {
+  FacingTurnFromDeg = FacingYawDeg;
+  FacingTurnToDeg = WantYawDeg;
+  FacingTurnMs = FMath::Max(0.0, Ms);
+  // Reduced motion / speed "none" snap every turn (ВР-06 states).
+  if (!GetWorld() || FacingTurnMs <= 0.0 || S08IconMotion::IsReducedMotion() ||
+      S08Motion::Current().SnapsMoves()) {
+    if (UWorld* World = GetWorld()) World->GetTimerManager().ClearTimer(FacingTurnTimer);
+    ApplyFigureFacing(WantYawDeg, 0.0);
+    return;
+  }
+  FacingTurnStartSeconds = GetWorld()->GetTimeSeconds();
+  GetWorld()->GetTimerManager().SetTimer(FacingTurnTimer, this, &AS08FighterActor::TickFacingTurn, 1.0f / 60.0f, true);
+}
+
+void AS08FighterActor::PlayFaceTarget(const FString& TargetId, const FVector& TargetWorldPos, double Ms) {
+  if (S08Facing::LegacyRequested() || !Fighter.IsAlive() || bDeathHold) return;
+  const UWorld* World = GetWorld();
+  const APlayerController* PC = World ? World->GetFirstPlayerController() : nullptr;
+  const APlayerCameraManager* Cam = PC ? PC->PlayerCameraManager : nullptr;
+  const FVector CameraPos = Cam ? Cam->GetCameraLocation() : FVector(0.0, 10000.0, 2000.0);
+  const double Axis = S08Facing::YawToward(GetActorLocation(), CameraPos);
+  const double ToTarget = S08Facing::YawToward(GetActorLocation(), TargetWorldPos);
+  const bool bClamped = FMath::Abs(FMath::FindDeltaAngleDegrees(Axis, ToTarget)) > S08Facing::AttackMaxOffDeg;
+  const double Want = S08Facing::AttackYaw(GetActorLocation(), TargetWorldPos, CameraPos);
+  FS08Trace::Write(FString::Printf(
+      TEXT("FACING fighter=%s src=attack yaw=%.0f target=%s clamped=%d"), *Fighter.Id, Want, *TargetId,
+      bClamped ? 1 : 0));
+  StartFacingTurn(Want, Ms);
+}
+
+void AS08FighterActor::ReturnToRestFacing(double WantYawDeg, double Ms) {
+  if (S08Facing::LegacyRequested() || bDeathHold || !Fighter.IsAlive()) return;
+  // AN-25: the dead band never holds the return - it always reaches the rest angle.
+  FS08Trace::Write(FString::Printf(
+      TEXT("FACING fighter=%s src=attack-return from=%.0f rest=%.0f ms=%.0f"), *Fighter.Id, FacingYawDeg, WantYawDeg,
+      S08Facing::ReturnMs));
+  StartFacingTurn(WantYawDeg, Ms);
+}
+
+void AS08FighterActor::TickFacingTurn() {
+  UWorld* World = GetWorld();
+  if (!World) return;
+  if (bMoving || bDeathHold) {
+    World->GetTimerManager().ClearTimer(FacingTurnTimer);
+    return;
+  }
+  const double Alpha = FMath::Clamp(
+      (World->GetTimeSeconds() - FacingTurnStartSeconds) * 1000.0 / FMath::Max(1e-9, FacingTurnMs), 0.0, 1.0);
+  ApplyFigureFacing(S08Facing::TurnYawAt(FacingTurnFromDeg, FacingTurnToDeg, Alpha), 0.0);
+  if (Alpha >= 1.0) World->GetTimerManager().ClearTimer(FacingTurnTimer);
 }
 
 // ---- MS-T-16 move animation ------------------------------------------------
@@ -530,6 +620,7 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
 void AS08FighterActor::PlayMove(const FS08MovePlan& Plan, const FS08MoveAnimParams& Params, int64 NowMs) {
   if (bMoving) FinishMove();  // jump_to_final: the new event of the same figure
   if (Plan.Points.Num() == 0 || !Fighter.IsAlive() || bDeathHold) return;
+  if (UWorld* World = GetWorld()) World->GetTimerManager().ClearTimer(FacingTurnTimer);  // AN-23: the plan owns the facing
   MovePlan = Plan;
   MoveParams = Params;
   MoveSeqStartMs = NowMs;
@@ -851,7 +942,14 @@ void AS08FighterActor::TickHitTint() {
 }
 
 void AS08FighterActor::OnHeroClipFinished() {
-  NotifyHeroAnimEvent(S08HeroesV2::EEvent::ClipFinished, -1);
+  const S08HeroesV2::EClip Ended = HeroClip;
+  NotifyHeroAnimEvent(S08HeroesV2::EEvent::ClipFinished, -1);  // back to Idle
+  // AN-25 (ВР-06): the attacker returns to its rest angle when the one-shot clip ends (HitReact too: the attacker of
+  // an effect's counter-damage returns after its flinch). The board actor owns the camera / enemy context.
+  if ((Ended == S08HeroesV2::EClip::LungeAttack || Ended == S08HeroesV2::EClip::HitReact) &&
+      !S08Facing::LegacyRequested() && Fighter.IsAlive() && !bDeathHold && !bMoving) {
+    if (AS08BoardActor* Board = Cast<AS08BoardActor>(GetOwner())) Board->FighterReturnToRest(Fighter.Id);
+  }
 }
 
 void AS08FighterActor::BeginHeroDeath() {

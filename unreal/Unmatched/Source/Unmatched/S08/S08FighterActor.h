@@ -149,6 +149,23 @@ public:
   /** World yaw / lean currently applied to the figure mesh (the v2 body, the Medusa candidate or the blockout). */
   float GetFigureYawDeg() const { return FacingYawDeg; }
   float GetFigureLeanDeg() const { return FacingLeanDeg; }
+  /** AN-23 (ВР-06): the rest facing of a standing figure. bLegacy applies the half-field rule at once and traces
+   *  nothing; else the wanted angle (S08Facing::RestYaw: three-quarter to CameraPos, offset to the nearest living
+   *  enemy) is reached over 150 ms on the shortest arc (instant under reduced motion / speed "none"), traced
+   *  'FACING fighter=.. src=.. rest=.. cam=.. off=.. enemy=..' when a turn starts. The first apply of a figure is
+   *  traced src=spawn whatever Src says. Skipped while a move plays (the plan owns the facing until it ends) and for
+   *  a dead figure (ВР-06: death never turns). */
+  void ApplyRestFacing(const TCHAR* Src, bool bLegacy, const FVector& CameraPos, bool bHasEnemy,
+                       const FVector& NearestEnemyPos, const FString& EnemyId);
+  /** AN-24 (ВР-06): the attacker turns to face TargetWorldPos over Ms (the remaining face window): the direction to
+   *  the target clamped to +-90 deg from the camera axis (S08Facing::AttackYaw, ВР-AN02 - never the back), holding
+   *  the angle through the following LungeAttack. Instant under reduced motion / speed "none" or Ms <= 0; a no-op
+   *  with -S08FacingLegacy. Traced 'FACING fighter=.. src=attack yaw=.. target=.. clamped=0|1'. */
+  void PlayFaceTarget(const FString& TargetId, const FVector& TargetWorldPos, double Ms);
+  /** AN-25 (ВР-06): back to the rest angle after a lunge / HitReact - the wanted angle comes from the caller (the
+   *  board actor's camera + enemies); the dead band never holds it (the return always reaches the rest angle).
+   *  Traced 'FACING fighter=.. src=attack-return from=.. rest=.. ms=150'. */
+  void ReturnToRestFacing(double WantYawDeg, double Ms);
 
   /** Screen-space combat icon mode: the world billboard stays hidden while
    *  the HUD draws the exact-size icon (the trace still reports icon=1). */
@@ -340,6 +357,17 @@ private:
   void EndMove();
   /** Figure mesh rotation for a world facing + lean (v2: forward +X; legacy candidate / blockout: forward +Y). */
   void ApplyFigureFacing(double YawDeg, double LeanDeg);
+  // AN-23 (ВР-06): the rest-facing turn (150 ms, shortest arc) driven by a short timer while it blends; AN-24's
+  // face turn and AN-25's return reuse it (FacingTurnMs tells which length).
+  FTimerHandle FacingTurnTimer;
+  double FacingTurnFromDeg = 0.0;
+  double FacingTurnToDeg = 0.0;
+  double FacingTurnMs = 0.0;
+  double FacingTurnStartSeconds = 0.0;
+  bool bRestFacingApplied = false;
+  void TickFacingTurn();
+  /** Starts the blend to WantYawDeg over Ms (instant under reduced motion / speed "none" or Ms <= 0). */
+  void StartFacingTurn(double WantYawDeg, double Ms);
 
   FS08BoardFighter Fighter;
 };

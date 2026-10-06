@@ -261,6 +261,22 @@ public:
   int32 SkipFighterMoves();
   /** Some figure is still travelling or settling. */
   bool AnyFighterMoving() const;
+  // ---- AN-23 (ВР-06): the rest facing of the figures (S08Facing.h) ----
+  /** The rest facing (world yaw) of the figure standing at WorldPos - v1: three-quarter to the local camera with the
+   *  offset to the nearest living enemy; the half-field rule with -S08FacingLegacy. The plan builder's RestYawAt. */
+  double RestYawAt(const FVector& WorldPos) const;
+  /** (Re)applies the rest facing of one figure: the camera and the nearest living enemy of its owner; Src labels the
+   *  FACING trace (snapshot / move - the actor itself upgrades its first apply to spawn). */
+  void ApplyFighterRestFacing(AS08FighterActor* Actor, const TCHAR* Src);
+  /** The local player camera location (the K1 camera of a -Bench run); the +Y board side when there is none yet. */
+  FVector LocalCameraLocation() const;
+  /** The living figure that stands on WorldPos (within half a cell), or nullptr. */
+  AS08FighterActor* FigureActorAt(const FVector& WorldPos) const;
+  /** The nearest living enemy (another owner) of Me by XY distance, or nullptr. */
+  AS08FighterActor* NearestEnemyOf(const AS08FighterActor* Me) const;
+  /** AN-25 (ВР-06): the attacker's return to its rest angle after its LungeAttack / HitReact ended - RestYaw on the
+   *  current positions (a dead target switches to the nearest living enemy), the dead band never holds it. */
+  void FighterReturnToRest(const FString& FighterId);
   /** DE-019 (01 F-09): the death plan of a dying v2 figure (AS08FighterActor::GetDeathPlan); false when the fighter
    *  plays no death (alive, gone, or a figure that hides at once). */
   bool GetFighterDeathPlan(const FString& FighterId, S08HeroesV2::FDeathPlan& OutPlan, FString& OutStyle) const;
