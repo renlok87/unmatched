@@ -70,7 +70,12 @@
   # AU-S5 (docs/game-design/audio/07-production-log.md §9, opt-in): each client records its whole audio output from the
   # match start to the result + 8 s into <dir>/host.wav and <dir>/joiner.wav (-S08AudioRecord) for the loudness pass
   # (tools/audio/mix_check.py). Gates unchanged.
-  [string]$AudioRecordDir = ''
+  [string]$AudioRecordDir = '',
+  # AU-S6 (07-production-log §10, opt-in): replace the computed -S09Combat plans ('+'-separated tokens, see
+  # S08FlowGameMode.cpp "GD-034 combat plan"), e.g. -JoinPlanOverride 'attack+abilityboost+scheme+storms+defend+resolve'
+  # -HostPlanOverride 'attack+defend+feint+slowdefense+ownresult'. Empty keeps the plans below. Gates unchanged.
+  [string]$HostPlanOverride = '',
+  [string]$JoinPlanOverride = ''
 )
 
 # W5b-R (t53-thresholds.json shotCaptured): every published frame must carry its pixel provenance line
@@ -346,6 +351,8 @@ function Invoke-CombatDemo {
   $HostPlan = if ($JoinerAttack) { 'attack+defend+ownresult' } else { 'attack' }
   if ($HostScheme) { $HostPlan += '+scheme' }
   $JoinPlan = if ($JoinerAttack) { 'attack+ranged+defend+resolve' } else { 'defend+resolve' }
+  if ($HostPlanOverride) { $HostPlan = $HostPlanOverride }
+  if ($JoinPlanOverride) { $JoinPlan = $JoinPlanOverride }
   Write-Output "combat plans: host=$HostPlan joiner=$JoinPlan"
   $hostArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
     "-S08Auto", "-S08Create", "-S08HeroId=$heroA", "-S08Trace=$hostTrace",
@@ -769,7 +776,10 @@ function Invoke-CombatDemo {
     foreach ($t in @(@('host', $hostText), @('joiner', $joinText))) {
       foreach ($line in ($t[1] -split "`r?`n")) {
         if ($line -match $pendAnswer) { continue }
-        if ($line -match '(ATTACK|DEFENSE|RESOLVE|SCHEME) sent .*card') {
+        # AU-S6: 'ATTACK sent ability=card|none' (DE-020) only says whether an ability boost went with the attack -
+        # no identity; the token is cut before the check (the first live Arthur ability-boost run tripped on it).
+        $checked = $line -replace ' ability=(card|none)', ''
+        if ($checked -match '(ATTACK|DEFENSE|RESOLVE|SCHEME) sent .*card') {
           throw "$($t[0]) trace appears to log card identities with a combat command"
         }
       }

@@ -187,6 +187,17 @@ public:
    *  gameplay key handler. Pure, unit-testable without a world. */
   static bool TerminalScreenOwnsKeys(ES08Stage Stage, bool bGameOver, bool bRoomAborted);
 
+  // ---- AU-S6 (docs/game-design/audio/08-screen-audio-hooks.md): the sound API of the screens and modals
+  /** A sound of a screen or modal by its bank id (UI bus; STG-* on the music bus). Unknown id: a trace line, silence. */
+  UFUNCTION(BlueprintCallable, Category = "Unmatched|Audio")
+  void PlayScreenSound(FName BankId);
+  /** The pause screen is open: the music ducks -10 dB while it stays open. */
+  UFUNCTION(BlueprintCallable, Category = "Unmatched|Audio")
+  void SetAudioPaused(bool bPaused);
+  /** The hero confirmed in the room: its select sting (STG-SELECT-<HERO>) when the bank has one. */
+  UFUNCTION(BlueprintCallable, Category = "Unmatched|Audio")
+  void PlayHeroSelectSting(const FString& HeroName);
+
 private:
   void BuildUi();
   void RefreshUi();
@@ -581,6 +592,11 @@ private:
   FString AudioInspectedId;
   FString AudioBoostCardId;
   uint64 AudioNoTargetFrame = 0;
+  // AU-S6: the live stream of the match - lost for 1.5 s plays CUE-017 and ducks the music, back plays CUE-018
+  bool bAudioStreamSeenReady = false;
+  bool bAudioNetLost = false;
+  int64 AudioStreamDownSinceMs = -1;
+  int64 AudioRoomCountGoMs = MIN_int64 / 2;  // the countdown screen played the start (SC-18)
   /** BRD-CANDIDATES: a maneuver draft opened with more than one figure to move (once per pendingManeuver.id). */
   void AudioOnDraftOpen(const FString& ManeuverId, int32 Movable);
   /** BRD-PUSH: the enemy figures an EFFECT trail of this seq moved (their step sounds get the push whistle). */
@@ -606,6 +622,8 @@ private:
   bool bAudioBoostFizzle = false;    // the staged combat cancelled the attack card with its boost
   FString AudioRecordFile;
   bool bAudioRecording = false;
+  bool bS09SlowDefenseDone = false;    // AU-S6 'slowdefense': the held first defense went
+  bool bS09SlowDefenseTraced = false;
   int64 AudioRecordStopMs = -1;
   float AudioRecordPrevUnfocused = 0.0f;
   // MS-T-16: the motion settings (US08UserSettings + flags, read at BeginPlay), the move pose parameters and the

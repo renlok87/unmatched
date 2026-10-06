@@ -721,7 +721,8 @@ SOUND_MS = {  # CUE-DISPATCHER.md §3.2: звук против кадра соб
 }
 # Окна съёмки доказательств (G-LIVE прогона G): строки с t= на одних часах с `CUE sound` и синхронный снимок.
 SOUND_CLOCK_RE = re.compile(r"\b(?:CUE (?:combat|sound|audio|death)|RESULT screen)\b.*?\bt=(-?\d+)")
-SHOT_CAPTURED_RE = re.compile(r"\bSHOT captured\b")
+# AU-S6: the late-shot queue of run I ends a capture with `SHOT late end` - it stalls the frame the same way
+SHOT_CAPTURED_RE = re.compile(r"\bSHOT (?:captured|late end)\b")
 
 
 def _shot_stall(windows, due, t):
@@ -770,9 +771,10 @@ def check_sound(lines, table):
     last_sound = {}  # id -> t прошлого звука (played/fallback)
     summary = {"sounds": 0, "sound_points": {p: 0 for p in SOUND_POINTS}, "sound_fallback": 0, "sound_played": 0,
                "sound_silent": 0, "sound_throttled": 0, "audio_lines": 0, "sound_dt_max": 0, "sound_late_shot": 0}
-    shot_windows = []  # (t до снимка, t первой строки после снимка)
+    shot_windows = []  # (t до снимка, t первой и второй строки со временем после снимка)
     clock_t = None
     shot_from = None
+    shot_first = None
     for n, raw in enumerate(lines, 1):
         line = raw.rstrip("\r\n")
         if SHOT_CAPTURED_RE.search(line):
@@ -782,9 +784,17 @@ def check_sound(lines, table):
         mc = SOUND_CLOCK_RE.search(line)
         if mc:
             clock_t = int(mc.group(1))
+            # AU-S6: the late-shot queue of run I writes the lines of the shot's own frame AFTER the capture, and the
+            # stall then shows in the frame after it - the window covers the first two clock values after the shot
             if shot_from is not None:
-                shot_windows.append((shot_from, clock_t))
-                shot_from = None
+                if shot_first is None:
+                    shot_first = clock_t
+                    shot_windows.append((shot_from, clock_t))
+                elif clock_t > shot_first:
+                    # the frame right after the shot's own frame, only when it follows as a capture stall (≤ 1 s)
+                    if clock_t - shot_first <= 1000:
+                        shot_windows.append((shot_first, clock_t))
+                    shot_from = shot_first = None
         cf = parse_combat(line)
         if cf is not None:
             t = _int_or_none(cf.get("t"))

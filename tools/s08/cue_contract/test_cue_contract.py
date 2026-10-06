@@ -754,6 +754,19 @@ class SoundGateTests(unittest.TestCase):
         hit = snd("CUE-011", "hit", 2180, seq="24", subject="medusa", extra="due=2000")
         self.assertEqual(self.codes([AUDIO_START, contact, shot, hit]), set())
         self.assertIn("AU5", self.codes([AUDIO_START, contact, hit]))
+        # AU-S6: the late-shot queue of run I - lines of the shot's own frame follow the capture (same t), the
+        # stall shows in the next frame; `SHOT late end` closes a capture the same way
+        same_frame = snd("CUE-010", "cue", 24588, seq="7", subject="card.attack")
+        errs, summary = cc.check_sound([AUDIO_START, prev, shot, same_frame, stalled], TABLE)
+        self.assertEqual(errs, [])
+        self.assertEqual(summary["sound_late_shot"], 1)
+        late_end = "SHOT late end file=s09-no-defense-stamp.png frame=1585"
+        errs, summary = cc.check_sound([AUDIO_START, prev, late_end, same_frame, stalled], TABLE)
+        self.assertEqual(errs, [])
+        self.assertEqual(summary["sound_late_shot"], 1)
+        # still AU6 without a shot, or with the sound later than the first frame after it
+        self.assertIn("AU6", self.codes([AUDIO_START, prev, same_frame, stalled]))
+        self.assertIn("AU6", self.codes([AUDIO_START, prev, late_end, same_frame, stalled, much_later]))
 
     def test_result_sting_with_the_screen(self):
         screen = "RESULT screen seq=50 t=9000 due=9000 gameOver=9000 heroGone=- wait=0"

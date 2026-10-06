@@ -158,6 +158,11 @@ K = `s09.Catchup.MaxQueued` (по умолчанию 3), T = `s09.Catchup.MaxLag
   `US08MixLimiterPreset` (подъём +5 дБ, предпросмотровый лимитер −1,5 dBFS); строка
   `AUDIO-MIX limiter ceiling=… lookahead=… makeup=…`. Запись микса включает `-S08AudioRecord=<wav>`; в трассе
   `AUDIO-REC start|stop …`. Гейт этих строк не проверяет.
+- **AU-S6 (2026-10-06).** CUE-017 / CUE-018 подаёт клиент: поток партии не готов дольше 1,5 с / снова готов
+  (`IsStreamReady()`), с приглушением музыки. Звук экранов вызывается функциями `PlayScreenSound`, `SetAudioPaused`
+  и `PlayHeroSelectSting` ([08-screen-audio-hooks.md](../../../game-design/audio/08-screen-audio-hooks.md)).
+  Гейт AU5/AU6 прощает опоздание в первых двух кадрах после снимка доказательств (`SHOT captured`, `SHOT late end`),
+  если второй кадр идёт не позже чем через 1 с; такие случаи считает `sound_late_shot`.
 
 ## 4. Семантика диспетчера (нормативно)
 

@@ -334,6 +334,15 @@ void AS08FlowGameMode::BeginPlay() {
   //             sidekicks maneuver to a zone-only (shared zone, no link) spot
   //   ownresult (opt-in, ENV-MAPS P5a) the combat-result shot only for a combat
   //             this seat attacked
+  //   abilityboost (opt-in, AU-S6) attackers whose hero ability boosts the attack
+  //             (King Arthur) go first, never wait for a may-boost card, and add
+  //             the first ability boost card - the live check of FX-ARTHUR-BOOST
+  //   feint     (opt-in, AU-S6) the defense picks Feint when it is legal - it
+  //             cancels the attack card with its boost (FX-ARTHUR-BOOST-FIZZLE)
+  //   slowdefense (opt-in, AU-S6) the first defense waits until 3.5 s are left of
+  //             the server window (UI-TIMER-WARN / UI-TIMER-TICK)
+  //   storms    (opt-in, AU-S6) the scheme pick prefers Command the Storms (it
+  //             moves the opposing fighters: BRD-PUSH)
   {
     FString Plan;
     FParse::Value(FCommandLine::Get(), TEXT("S09Combat="), Plan);
@@ -1309,6 +1318,9 @@ void AS08FlowGameMode::StartCombatStage(const FS08Snapshot& Closing, const FS08S
   // AU-S5: the attack card was cancelled with Arthur's boost on it - the boost fizzles at the slam
   bAudioBoostFizzle = bOwnLog && Log.bAttackerCardCancelled && In.Reveal.Boosts.Num() > 0 &&
                       AudioKeyOf(Combat.AttackerId) == TEXT("ARTHUR");
+  FS08Trace::Write(FString::Printf(TEXT("AUDIO combat seq=%d boosts=%d cancelled=%d own=%d fizzle=%d"),
+                                   Closing.SequenceNumber, In.Reveal.Boosts.Num(), Log.bAttackerCardCancelled ? 1 : 0,
+                                   bOwnLog ? 1 : 0, bAudioBoostFizzle ? 1 : 0));
   In.Damage = Damage;
   In.HpBefore = HpBefore;
   In.HpAfter = TargetAfter->Health;
@@ -3545,12 +3557,37 @@ void AS08FlowGameMode::RunS09Auto() {
         TakeEvidenceShot(S09ShotDefensePath);
         return;
       }
+      // AU-S6 'slowdefense': the first defense holds until the last seconds of the server window
+      if (HasPlan(TEXT("slowdefense")) && !bS09SlowDefenseDone && CommandUi.Combat.bHasTimeoutAt) {
+        const double Left = CommandUi.Combat.SecondsUntilDeadline();
+        if (Left > 3.5) {
+          if (!bS09SlowDefenseTraced) {
+            bS09SlowDefenseTraced = true;
+            FS08Trace::Write(FString::Printf(TEXT("S09AUTO defense held for the deadline (%.0fs left)"), Left));
+          }
+          return;
+        }
+        bS09SlowDefenseDone = true;
+        FS08Trace::Write(FString::Printf(TEXT("S09AUTO defense released at %.1fs left"), Left));
+      }
       // First legal defense card for the attacked fighter.
       const FS09PlayerPanel* Own = Hud.ViewerPanel();
       if (!Own) return;
       bool bPicked = false;
       FString Reason;
+      // AU-S6 'feint': Feint first when it is legal (it cancels the attack card and its boost)
+      if (HasPlan(TEXT("feint"))) {
+        for (const FS09CardView& Card : Own->Cards) {
+          if (!Card.bHidden && Card.Name == TEXT("Feint") &&
+              CommandUi.ToggleDefenseCard(Card.InstanceId, Snap, Fighters, Reason)) {
+            bPicked = true;
+            FS08Trace::Write(TEXT("S09AUTO defense card picked (Feint)"));
+            break;
+          }
+        }
+      }
       for (const FS09CardView& Card : Own->Cards) {
+        if (bPicked) break;
         if (!Card.bHidden &&
             CommandUi.ToggleDefenseCard(Card.InstanceId, Snap, Fighters, Reason)) {
           bPicked = true;
@@ -3694,8 +3731,18 @@ void AS08FlowGameMode::RunS09Auto() {
       if ((Type == TEXT("MOVE") || Type == TEXT("PLACE")) && LegalFighters.Num() > 0) {
         for (const FString& FighterId : LegalFighters) {
           if (!CommandUi.SelectPendingFighter(FighterId, Snap, Fighters, Reason)) continue;
-          const TSet<uint64> Cells =
+          const TSet<uint64> CellSet =
               CommandUi.ComputePendingCells(Snap, BoardModel, Fighters);
+          TArray<uint64> Cells = CellSet.Array();
+          if (HasPlan(TEXT("storms"))) {
+            // AU-S6: a real move (the forced move of an enemy figure is the BRD-PUSH proof) - cells away first
+            const FS08BoardFighter* Me =
+                Fighters.FindByPredicate([&FighterId](const FS08BoardFighter& F) { return F.Id == FighterId; });
+            if (Me) {
+              const uint64 Here = FS08BoardModel::CellKey(Me->X, Me->Y);
+              Cells.StableSort([Here](const uint64& A, const uint64& B) { return A != Here && B == Here; });
+            }
+          }
           for (const uint64& Key : Cells) {
             const int32 X = static_cast<int32>(Key >> 32);
             const int32 Y = static_cast<int32>(Key & 0xFFFFFFFF);
@@ -3878,8 +3925,20 @@ void AS08FlowGameMode::RunS09Auto() {
       // ENV-MAPS P5a opt-in 'ranged' token: zone-only picks go first (the
       // joiner's Merlin proof); without it the order is the old loop's.
       const bool bPreferRanged = HasPlan(TEXT("ranged"));
-      const TArray<FS09CommandUi::FAutoAttackPick> Picks =
+      TArray<FS09CommandUi::FAutoAttackPick> Picks =
           FS09CommandUi::AutoAttackPicks(BoardModel, Fighters, CommandUi.ViewerId, bPreferRanged);
+      const bool bAbilityBoostPlan = HasPlan(TEXT("abilityboost"));
+      if (bAbilityBoostPlan) {
+        // AU-S6: the attackers whose hero ability boosts the attack go first (the order is otherwise kept)
+        auto Boosts = [this](const FS09CommandUi::FAutoAttackPick& P) {
+          const FS08BoardFighter* F =
+              Fighters.FindByPredicate([&P](const FS08BoardFighter& E) { return E.Id == P.AttackerId; });
+          return F && FS09CommandUi::AllowsAbilityBoost(*F);
+        };
+        Picks.StableSort([&Boosts](const FS09CommandUi::FAutoAttackPick& A, const FS09CommandUi::FAutoAttackPick& B) {
+          return Boosts(A) && !Boosts(B);
+        });
+      }
       for (const FS09CommandUi::FAutoAttackPick& Pick : Picks) {
         const FS08BoardFighter* Candidate = Fighters.FindByPredicate(
             [&Pick](const FS08BoardFighter& F) { return F.Id == Pick.AttackerId; });
@@ -3924,7 +3983,7 @@ void AS08FlowGameMode::RunS09Auto() {
       // 'ranged' plan token: a zone-only (ranged) attack is the proof itself
       // and is never parked for a may-boost card.
       const bool bRangedProofPick = bPreferRanged && bChosenZoneTarget && Chosen;
-      if (!bChoseMayBoost && !bRangedProofPick && !bS09ShotResolveRevealed && OwnTurnIndex < 8 &&
+      if (!bChoseMayBoost && !bRangedProofPick && !bAbilityBoostPlan && !bS09ShotResolveRevealed && OwnTurnIndex < 8 &&
           Elapsed < 150.0f) {
         // The GD-033 reveal proof needs a may-boost attack (the server pauses
         // after THAT reveal). While no such card is in hand, close the draft
@@ -3946,6 +4005,17 @@ void AS08FlowGameMode::RunS09Auto() {
         FS08Trace::Write(FString::Printf(
             TEXT("S09AUTO attack (attacker=%s target-set card-set)"),
             *CommandUi.AttackAttackerId));
+        // AU-S6 'abilityboost': answer the ability prompt with the first boost card (the manual path asks the player)
+        if (bAbilityBoostPlan && CommandUi.AttackAbilityAvailable(Snap, Fighters)) {
+          CommandUi.OpenAttackAbilityPrompt();
+          const TArray<FS09CardView> BoostCards = CommandUi.AttackAbilityBoostCards(Snap);
+          FString BoostWhy;
+          if (BoostCards.Num() && CommandUi.ToggleAttackAbilityBoost(BoostCards[0].InstanceId, Snap, BoostWhy)) {
+            FS08Trace::Write(TEXT("S09AUTO attack ability boost added"));
+          } else {
+            FS08Trace::Write(FString::Printf(TEXT("S09AUTO attack ability boost not added (%s)"), *BoostWhy));
+          }
+        }
         if (!ConfirmCombat()) {
           // Gate closed between the pre-entry check and the confirm (e.g. the
           // stream died mid-pick): back out of the draft and retry later
@@ -3985,7 +4055,11 @@ void AS08FlowGameMode::RunS09Auto() {
                                                            CommandUi.ViewerId)) {
           continue;
         }
-        if (Card.Name == TEXT("Restless Spirits")) {
+        if (HasPlan(TEXT("storms")) && Card.Name == TEXT("Command the Storms")) {  // AU-S6: BRD-PUSH
+          Fallback = &Card;
+          break;
+        }
+        if (Card.Name == TEXT("Restless Spirits") && !HasPlan(TEXT("storms"))) {
           Fallback = &Card;
           break;
         }
