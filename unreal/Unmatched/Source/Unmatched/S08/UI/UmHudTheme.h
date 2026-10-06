@@ -23,6 +23,13 @@
 
 class UTexture2D;
 
+namespace UmHudTheme {
+/** VS-2 HB-15 (ВР-VS2-41): Slate draws FSlateFontInfo::Size as points at 96 DPI (FontConstants::RenderDPI), the type.*
+ *  tokens are the em in su (02 §3.3) - Font() hands out Su x 72 / 96 points, the em then measures Su su. */
+inline constexpr float PointsPerSu = 72.0f / 96.0f;
+inline float PointsFromSu(float Su) { return Su * PointsPerSu; }
+}  // namespace UmHudTheme
+
 UCLASS(BlueprintType)
 class UNMATCHED_API UUmHudTheme : public UDataAsset {
   GENERATED_BODY()

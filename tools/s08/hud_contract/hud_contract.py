@@ -28,6 +28,8 @@ HUD = REPO / "docs/unreal/contracts/hud"
 TOKENS = HUD / "hud-style-tokens.json"
 WHY = HUD / "why-reasons.json"
 SPEC02 = REPO / "docs/game-design/02-ux-ui-spec.md"
+# VS-2 HB-14...HB-16 (04 §4.5, §7.1): the new UI-IDs of the HUD spec and the states each may trace
+SPEC04 = REPO / "docs/game-design/visual/04-hud-spec.md"
 HEADER = codegen.HEADER
 UI_SRC = REPO / "unreal/Unmatched/Source/Unmatched/S08/UI"
 STATUSES = ("предложено", "измерено", "технически импортировано", "художественно принято")
@@ -64,6 +66,53 @@ def hex_to_linear(hexstr):
 
 def ui_ids_from_02(text):
     return set(UI_ID_RE.findall(text))
+
+
+ID_CELL_RE = re.compile(r"^`(UI-(?:HUD|SCR)-[A-Z]+(?:-[A-Z]+)*)`$")
+
+
+def _table_cells(line):
+    """A markdown row -> its cells; a '|' inside backticks (`own|opp`, `mode=<a|b>`) stays in its cell."""
+    masked = re.sub(r"`[^`]*`", lambda m: m.group(0).replace("|", "\x00"), line.strip())
+    return [c.replace("\x00", "|").strip() for c in masked.strip("|").split("|")]
+
+
+def _state_rule(token):
+    """`idle` -> exact; `count=<n>` -> count=<digits>; `mode=<maneuver|attack|scheme>` -> one of the names."""
+    if "<" not in token:
+        return re.compile(re.escape(token) + r"$")
+    pattern = ""
+    for part in re.split(r"(<[^>]*>)", token):
+        if part.startswith("<") and part.endswith(">"):
+            inner = part[1:-1]
+            pattern += r"\d+" if inner == "n" else "(?:" + "|".join(re.escape(x) for x in inner.split("|")) + ")"
+        else:
+            pattern += re.escape(part)
+    return re.compile(pattern + r"$")
+
+
+def ui_states_from_04(text):
+    """04 §7.1 'Гейты SHOT widget': {UI-ID: [state rules]} for the rows that list their states in backticks (the
+    screens row 'по §1' and the world layer have none). A token with '|' inside <...> is one pattern."""
+    if "### 7.1" not in text:
+        return {}
+    section = text.split("### 7.1", 1)[1].split("### 7.2", 1)[0]
+    out = {}
+    for line in section.splitlines():
+        if not line.strip().startswith("|"):
+            continue
+        cells = _table_cells(line)
+        m = ID_CELL_RE.match(cells[0]) if len(cells) >= 3 else None
+        if not m:
+            continue
+        tokens = re.findall(r"`([^`]+)`", cells[2])
+        if tokens:
+            out[m.group(1)] = [_state_rule(t) for t in tokens]
+    return out
+
+
+def state_allowed(rules, state):
+    return any(r.match(state) for r in rules)
 
 
 def validate_tokens(tokens):
@@ -229,9 +278,11 @@ def check_portrait_line(n, line, registry):
     return errors
 
 
-def check_widget_trace(lines, known_ids, width=1920, height=1080, registry=None):
+def check_widget_trace(lines, known_ids, width=1920, height=1080, registry=None, states=None):
     """Правило 3: гейт по трассе геометрии виджета, не по пикселям. Невидимая часть (visible=0, например
-    сравнительный Slate-двойник или скрытая иконка в поздней строке W5b-R) может быть unpainted."""
+    сравнительный Slate-двойник или скрытая иконка в поздней строке W5b-R) может быть unpainted. states (04 §7.1,
+    ui_states_from_04): у блока из таблицы состояние должно быть из её списка."""
+    states = states or {}
     errors, seen = [], 0
     ids = set(known_ids) | ART_HUD_IDS
     registry = registry_portrait_keys() if registry is None else registry
@@ -264,6 +315,8 @@ def check_widget_trace(lines, known_ids, width=1920, height=1080, registry=None)
                 errors.append("строка %d: нет поля %s" % (n, k))
         if "id" in f and f["id"] not in ids:
             errors.append("строка %d: неизвестный UI-ID %s" % (n, f["id"]))
+        if f.get("id") in states and "state" in f and not state_allowed(states[f["id"]], f["state"]):
+            errors.append("строка %d: %s state=%s не из списка 04 §7.1" % (n, f["id"], f["state"]))
         if f.get("visible") == "0":
             continue
         if f.get("geom") != "painted":
@@ -302,7 +355,9 @@ def main(argv=None):
             print("%-20s %s -> linear %s alpha %.2f" % (name, hexstr, hex_to_linear(hexstr), alpha))
         return 0
     lines = Path(a.log).read_text(encoding="utf-8", errors="replace").splitlines()
-    errors, seen = check_widget_trace(lines, ui_ids_from_02(spec02), a.width, a.height)
+    spec04 = SPEC04.read_text(encoding="utf-8") if SPEC04.exists() else ""
+    errors, seen = check_widget_trace(lines, ui_ids_from_02(spec02) | ui_ids_from_02(spec04), a.width, a.height,
+                                      states=ui_states_from_04(spec04))
     for e in errors:
         print("GATE", e)
     print("HUD_TRACE", "PASS" if not errors and seen else "FAIL", "widget_lines", seen)

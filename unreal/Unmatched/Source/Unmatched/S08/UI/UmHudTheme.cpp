@@ -106,7 +106,9 @@ FSlateFontInfo UUmHudTheme::Font(FName Token) const {
     WarnMissing(TEXT("type"), Token);
   }
   // Empty FontObject: the typeface of the default Slate composite font (Roboto, Engine/Content/Slate/Fonts).
-  return FSlateFontInfo(FCoreStyle::GetDefaultFont(), Size, Typeface);
+  // VS-2 HB-15 (ВР-VS2-41): a type.* token is the em in su (02 §3.3: type.banner 36 su = 36 px at 1080p), Slate
+  // renders FSlateFontInfo::Size in points at FontConstants::RenderDPI 96 (24 -> 32 px) - the point size is su x 72/96.
+  return FSlateFontInfo(FCoreStyle::GetDefaultFont(), UmHudTheme::PointsFromSu(Size), Typeface);
 }
 
 float UUmHudTheme::SpaceSu(FName Token) const {

@@ -293,7 +293,8 @@ bool FUmHudRootLayoutTest::RunTest(const FString&) {
     RectIs(*this, L, EUmHudBlock::Decks, 1128, 600, 136, 48, W);
     RectIs(*this, L, EUmHudBlock::Actions, 1048, 656, 216, 48, W);
     RectIs(*this, L, EUmHudBlock::DeckPanel, 964, 168, 300, 424, W);
-    RectIs(*this, L, EUmHudBlock::Status, 340, 16, 600, 40, W);
+    RectIs(*this, L, EUmHudBlock::Status, 340, 16, 600, 48, W);  // VS-2 HB-15: one-line capsule 48 su
+    RectIs(*this, L, EUmHudBlock::Banner, 430, 72, 420, 64, W);  // VS-2 HB-16 (ВР-VS2-45): under STATUS
     TestFalse(TEXT("S: no LOG rect"), L.HasRect(EUmHudBlock::Log));
   }
   // ---- FIELD: the real bench states through the K1 camera vs the 04 §1.6 measurement (+-15 px at 1080p) ----
@@ -335,6 +336,11 @@ bool FUmHudRootLayoutTest::RunTest(const FString&) {
                L.HandVisibleSu >= 48.0f && L.HandVisibleSu <= 208.0f);
       TestTrue(FString::Printf(TEXT("%s %s: the hand caption starts under FIELD"), B.Name, C.Name),
                L.Rect(EUmHudBlock::HandCaption).Min.Y >= Su.Max.Y);
+      // VS-2 HB-16 (ВР-VS2-45): the banner crosses neither the cells nor the one-line STATUS in any class
+      const FBox2D Banner = L.Rect(EUmHudBlock::Banner);
+      TestTrue(FString::Printf(TEXT("%s %s: banner y %.0f..%.0f over FIELD %.1f, under STATUS %.0f"), B.Name, C.Name,
+                               Banner.Min.Y, Banner.Max.Y, Su.Min.Y, L.Rect(EUmHudBlock::Status).Max.Y),
+               Banner.Max.Y <= Su.Min.Y && Banner.Min.Y >= L.Rect(EUmHudBlock::Status).Max.Y);
     }
   }
   // ---- the measured FIELD itself (04 §1.6) in the layout: overlap 0, hand 200 su on Marmoreal 1080p ----

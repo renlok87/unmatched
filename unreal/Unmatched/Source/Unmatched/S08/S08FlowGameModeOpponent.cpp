@@ -386,11 +386,13 @@ void AS08FlowGameMode::AddTurnStatusLine() {
   if (!HandBox.IsValid()) return;
   // 02-ux-ui-spec SD-31: one line "what to do now" in every state; it does not empty while a figure moves (CUE-007
   // blocks_input: no)
-  const FString Text = S09TurnStatus::Text(BuildTurnStatusInput());
+  const FS09TurnStatusInput StatusIn = BuildTurnStatusInput();
+  const FString Text = S09TurnStatus::Text(StatusIn);
   if (Text != TurnStatusTraceKey) {
     FS08Trace::Write(FString::Printf(TEXT("MS-STATUS seq=%d text=\"%s\""), Hud.SequenceNumber, *Text));
     TurnStatusTraceKey = Text;
   }
+  if (ApplyUmHudStatus(StatusIn)) return;  // VS-2 HB-15: the UMG STATUS (-S08SlateHud=status keeps this Slate line)
   if (Text.IsEmpty()) return;
   HandBox->AddSlot().AutoHeight().Padding(0, 2, 0, 6)
       [SNew(STextBlock)

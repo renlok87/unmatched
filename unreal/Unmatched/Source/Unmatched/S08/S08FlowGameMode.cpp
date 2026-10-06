@@ -6677,7 +6677,7 @@ void AS08FlowGameMode::RefreshHud() {
   } else if (CommandUi.Mode == ES09CommandMode::PendingChoice && CombatStage.IsActive()) {
     // DE-018 (07 S11c, CUE-014): an AFTER COMBAT choice opens when the combat staging ends (<= ~4 s, skippable).
     AddMarker(GS09PendingMarker);
-    AddHeader(TEXT("AFTER COMBAT"), FLinearColor(0.75f, 0.8f, 1.0f, 1.0f));
+    if (UmHudBlockOnSlate(TEXT("status"))) AddHeader(TEXT("AFTER COMBAT"), FLinearColor(0.75f, 0.8f, 1.0f, 1.0f));  // VS-2 HB-15
     AddLine(FString::Printf(TEXT("next: %s - opens when the combat ends (click / Space / Enter skips)"),
                             *CommandUi.PendingChoice.Type));
   } else if (CommandUi.Mode == ES09CommandMode::PendingChoice && PendingPresenter.IsOpen() &&
@@ -7065,7 +7065,7 @@ void AS08FlowGameMode::RefreshHud() {
                   SNew(STextBlock).Text(FText::FromString(TEXT("END TURN (E)")))
                        .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14)))]];
   } else {
-    AddHeader(TEXT("OPPONENT'S TURN"), FLinearColor(1.0f, 0.8f, 0.6f, 1.0f));
+    if (UmHudBlockOnSlate(TEXT("status"))) AddHeader(TEXT("OPPONENT'S TURN"), FLinearColor(1.0f, 0.8f, 0.6f, 1.0f));  // VS-2 HB-15
     if (Flow.IsValid() && Flow->IsBotActing()) {
       // S10/GD-039: the waiting indicator follows the AUTHORITATIVE turn
       // owner (applied snapshot), never a fixed timer.

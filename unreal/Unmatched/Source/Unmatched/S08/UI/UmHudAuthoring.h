@@ -6,6 +6,10 @@
 //   /Game/S08/UI/Common/WBP_UmButton     UUmButton
 //   /Game/S08/UI/Common/WBP_UmCursor     UUmCursor   (VS-2 HB-12)
 //   /Game/S08/UI/Common/WBP_UmPortrait   US08TurnPortraitWidget (VS-2 CP-08)
+//   /Game/S08/UI/Common/WBP_UmConnectionBadge  UUmConnectionBadge  (VS-2 HB-14)
+//   /Game/S08/UI/Hud/WBP_UI_HUD_TOP      UUmHudTop        (VS-2 HB-14)
+//   /Game/S08/UI/Hud/WBP_UI_HUD_STATUS   UUmHudStatusLine (VS-2 HB-15)
+//   /Game/S08/UI/Hud/WBP_UI_HUD_BANNER   UUmHudBanner     (VS-2 HB-16)
 // Called from UE Python: tools/s08/hud_contract/ue_author_um_hud.py (UnrealEditor-Cmd -run=pythonscript).
 #pragma once
 

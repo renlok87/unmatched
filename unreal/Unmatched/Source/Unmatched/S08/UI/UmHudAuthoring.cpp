@@ -3,6 +3,10 @@
 
 #include "../S08ArtHudAuthoring.h"
 #include "UmButton.h"
+#include "UmConnectionBadge.h"
+#include "UmHudBanner.h"
+#include "UmHudStatusLine.h"
+#include "UmHudTop.h"
 #include "UmCursor.h"
 #include "UmPortrait.h"
 #include "../S08TurnPortraitWidget.h"
@@ -37,6 +41,15 @@ FString UUmHudAuthoringLibrary::AuthorUmHudWidgetBlueprints(bool bOverwrite) {
       [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) {
         return US08TurnPortraitWidget::BuildDefaultTree(Tree, Attach, Error);
       });
+  // VS-2 HB-14...HB-16: the chip before TOP (TOP nests WBP_UmButton and WBP_UmConnectionBadge when they exist)
+  One(UUmConnectionBadge::WidgetBlueprintPath, UUmConnectionBadge::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmConnectionBadge::BuildDefaultTree(Tree, Attach, Error); });
+  One(UUmHudTop::WidgetBlueprintPath, UUmHudTop::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmHudTop::BuildDefaultTree(Tree, Attach, Error); });
+  One(UUmHudStatusLine::WidgetBlueprintPath, UUmHudStatusLine::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmHudStatusLine::BuildDefaultTree(Tree, Attach, Error); });
+  One(UUmHudBanner::WidgetBlueprintPath, UUmHudBanner::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmHudBanner::BuildDefaultTree(Tree, Attach, Error); });
   Report->SetArrayField(TEXT("assets"), Assets);
   FString Out;
   const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&Out);

@@ -89,3 +89,31 @@ def test_check_trace_portrait_cp08():
            "PORTRAIT id=medusa tex=monogram su=42.0 px=42.0 scale=0.000 show=panel side=opp state=avatar"]
     errors, _ = hc.check_widget_trace(bad, set(), registry=reg)
     assert len(errors) == 2 and "1.6" in errors[0] and "monogram" in errors[1]
+
+
+def test_check_trace_topstrip_hb14_16(tmp_path):
+    """VS-2 HB-14...HB-16: the UI-IDs of 04 §7.1 are known to check-trace and their states come from its list."""
+    spec04 = hc.SPEC04.read_text(encoding="utf-8")
+    ids = hc.ui_ids_from_02(SPEC02) | hc.ui_ids_from_02(spec04)
+    states = hc.ui_states_from_04(spec04)
+    assert {"UI-HUD-TOP", "UI-HUD-CONN", "UI-HUD-STATUS", "UI-HUD-BANNER"} <= ids
+    assert [r.pattern for r in states["UI-HUD-CONN"]] == ["online$", "syncing$", "lost$"]
+    assert len(states["UI-HUD-STATUS"]) == 6 and len(states["UI-HUD-COMBAT-EDGE"]) == 5
+    head = "SHOT widget id=%s impl=umg state=%s fighter=none bbox=(24,24,276,68) geom=painted visible=1 twin=0 source=x"
+    ok = [head % ("UI-HUD-TOP", "idle") + " turn=3 class=L menu=glyph log=0",
+          head % ("UI-HUD-CONN", "lost") + " icon=resource-connection-lost anim=appear_from_online",
+          head % ("UI-HUD-STATUS", "defend") + " key=ms.status.defend lines=2 size=24 ellipsis=0 keys=- width=600",
+          head % ("UI-HUD-BANNER", "shown") + " alpha=1.00",
+          head % ("UI-HUD-ACTIONS", "mode=attack"),
+          head % ("UI-HUD-OPP-HAND", "count=5")]
+    assert hc.check_widget_trace(ok, ids, states=states) == ([], 6)
+    bad = [head % ("UI-HUD-CONN", "offline"), head % ("UI-HUD-STATUS", "maneuver"),
+           head % ("UI-HUD-OPP-HAND", "count=x"), head % ("UI-HUD-ACTIONS", "mode=move")]
+    errors, _ = hc.check_widget_trace(bad, ids, states=states)
+    assert len([e for e in errors if "04 §7.1" in e]) == 4
+    # the CLI reads 04: a log with the new ids passes
+    log = tmp_path / "Unmatched.log"
+    log.write_text("\n".join(ok) + "\n", encoding="utf-8")
+    assert hc.main(["check-trace", str(log)]) == 0
+    log.write_text(head % ("UI-HUD-TOP", "busy") + "\n", encoding="utf-8")
+    assert hc.main(["check-trace", str(log)]) == 1

@@ -5,6 +5,7 @@
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Components/SizeBox.h"
+#include "Misc/PackageName.h"
 
 const TCHAR* const UUmGameHud::WidgetBlueprintPath = TEXT("/Game/S08/UI/Hud/WBP_UI_SCR_GAME");
 
@@ -85,6 +86,26 @@ FName SlotKey(EUmGameSlot Slot) {
     default: return NAME_None;
   }
 }
+
+UClass* WbpOrNative(UClass* Native, const TCHAR* Package) {
+  const FString Path(Package);
+  if (Native && FPackageName::DoesPackageExist(Path)) {
+    const FString ClassPath = Path + TEXT(".") + FPackageName::GetShortName(Path) + TEXT("_C");
+    if (UClass* Wbp = LoadClass<UObject>(nullptr, *ClassPath, nullptr, LOAD_NoWarn | LOAD_Quiet)) {
+      if (Wbp->IsChildOf(Native)) return Wbp;
+    }
+  }
+  return Native;
+}
+
+bool HeightFollowsBlock(EUmGameSlot Slot) { return Slot == EUmGameSlot::Status; }
+
+bool ShownByProperty(const UWidget* Widget) {
+  if (!Widget || Widget->GetRenderOpacity() <= 0.0f) return false;
+  const ESlateVisibility V = Widget->GetVisibility();
+  return V == ESlateVisibility::Visible || V == ESlateVisibility::HitTestInvisible ||
+         V == ESlateVisibility::SelfHitTestInvisible;
+}
 }  // namespace UmGameHudSlots
 
 bool UUmGameHud::BuildDefaultTree(UWidgetTree& Tree, FS08AttachWidget Attach, FString* OutError) {
@@ -153,6 +174,14 @@ USizeBox* UUmGameHud::GetSlot(EUmGameSlot Which) const {
   return I >= 0 && I < UmGameSlotCount ? Slots[I].Get() : nullptr;
 }
 
+bool UUmGameHud::SetBlock(EUmGameSlot Which, UWidget* Block) {
+  USizeBox* Box = GetSlot(Which);
+  if (!Box || !Block) return false;
+  if (Box->GetContent() == Block) return true;
+  Box->SetContent(Block);
+  return Box->GetContent() == Block;
+}
+
 bool UUmGameHud::HasAllParts(FString* OutMissing) const {
   TArray<FString> Missing;
   if (!Canvas) Missing.Add(TEXT("Canvas"));
@@ -176,14 +205,20 @@ void UUmGameHud::ApplyLayout(const FUmHudLayout& InLayout, const TArray<FName>& 
       continue;
     }
     const FVector2D Size = Rect.Max - Rect.Min;
+    // VS-2 HB-15: STATUS keeps the rect's width (it centres its capsule) and takes the capsule's height (48 / 78 su)
+    const bool bAutoHeight = Box->GetContent() && UmGameHudSlots::HeightFollowsBlock(Which);
     Box->SetWidthOverride(static_cast<float>(Size.X));
-    Box->SetHeightOverride(static_cast<float>(Size.Y));
+    if (bAutoHeight) {
+      Box->ClearHeightOverride();
+    } else {
+      Box->SetHeightOverride(static_cast<float>(Size.Y));
+    }
     // an empty slot never takes the mouse; a block that moves in sets its own visibility on its content
     Box->SetVisibility(Box->GetContent() ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::HitTestInvisible);
     if (UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(Box->Slot)) {
       CanvasSlot->SetAnchors(FAnchors(0.0f, 0.0f));
       CanvasSlot->SetAlignment(FVector2D::ZeroVector);
-      CanvasSlot->SetAutoSize(false);
+      CanvasSlot->SetAutoSize(bAutoHeight);
       CanvasSlot->SetPosition(Rect.Min);
       CanvasSlot->SetSize(Size);
     }

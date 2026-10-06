@@ -58,6 +58,11 @@ struct UNMATCHED_API FUmButtonModel {
   bool bFocused = false;
   /** 48 (primary, modal) / 40 (panels) / 32 (chips); 0 = the variant default (Normal 40, Primary 48, Disc 72). */
   float HeightSu = 0.0f;
+  /** VS-2 HB-14: minimum width (su); 0 = the variant default (120, disc 80). The TOP buttons are squares 44 / 40. */
+  float MinWidthSu = 0.0f;
+  /** VS-2 HB-14 (CX-08): no body at rest - the button sits inside its block's plate (TOP «≡», «Журнал»); hover,
+   *  pressed, disabled, selected and busy still draw their skin, focus its ring. Normal variant only. */
+  bool bFlat = false;
 };
 
 namespace UmButton {

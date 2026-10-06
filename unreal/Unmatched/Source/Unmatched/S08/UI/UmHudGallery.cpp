@@ -3,6 +3,12 @@
 
 #include "../S08HudTokens.generated.h"
 #include "UmButton.h"
+#include "UmHudBanner.h"
+#include "UmHudLayout.h"
+#include "UmHudStatusLine.h"
+#include "UmHudTop.h"
+#include "Components/HorizontalBox.h"
+#include "Components/HorizontalBoxSlot.h"
 #include "UmHudTheme.h"
 #include "UmText.h"
 #include "Blueprint/WidgetTree.h"
@@ -180,6 +186,130 @@ TArray<FString> UUmButtonGalleryWidget::Build(const FVector2D& CanvasSu, int32 O
   }
   Lines.Insert(FString::Printf(TEXT("UMGALLERY buttons variants=%d states=%d perLine=%d canvas=%.0fx%.0f page=%d"),
                                Shown, UE_ARRAY_COUNT(States), PerLine, CanvasSu.X, CanvasSu.Y, OnlyVariant),
+               0);
+  return Lines;
+}
+
+// ------------------------------------------------------------------------------- VS-2 HB-14...HB-16: the top strip
+
+bool UUmTopStripGalleryWidget::Initialize() {
+  const bool bFirst = Super::Initialize();
+  if (bFirst && WidgetTree && !WidgetTree->RootWidget) {
+    const UUmHudTheme& Theme = UUmHudTheme::Get();
+    Background = WidgetTree->ConstructWidget<UBorder>(UBorder::StaticClass(), TEXT("Background"));
+    Background->SetBrushColor(Theme.Color(TEXT("fx.dust")));  // a neutral mid tone under the navy plates
+    Background->SetPadding(FMargin(UmGalMarginSu));
+    Background->SetHorizontalAlignment(HAlign_Left);
+    Background->SetVerticalAlignment(VAlign_Top);
+    Rows = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass(), TEXT("Rows"));
+    Background->SetContent(Rows);
+    WidgetTree->RootWidget = Background;
+  }
+  return bFirst;
+}
+
+TArray<FString> UUmTopStripGalleryWidget::Build(const FVector2D& CanvasSu, float PxPerSu) {
+  TArray<FString> Lines;
+  if (!Rows) return Lines;
+  Rows->ClearChildren();
+  Blocks.Reset();
+  const FUmHudLayout Layout = FUmHudLayout::Compute(CanvasSu, PxPerSu, nullptr);
+  const FBox2D TopRect = Layout.Rect(EUmHudBlock::Top);
+  const FBox2D StatusRect = Layout.Rect(EUmHudBlock::Status);
+  const FBox2D BannerRect = Layout.Rect(EUmHudBlock::Banner);
+  auto Sized = [this](UWidget* Content, const FBox2D& Rect, bool bAutoHeight) {
+    USizeBox* Box = WidgetTree->ConstructWidget<USizeBox>(USizeBox::StaticClass());
+    Box->SetWidthOverride(static_cast<float>(Rect.Max.X - Rect.Min.X));
+    if (!bAutoHeight) Box->SetHeightOverride(static_cast<float>(Rect.Max.Y - Rect.Min.Y));
+    Box->SetContent(Content);
+    return Box;
+  };
+  auto AddRow = [this](UWidget* W) {
+    if (UVerticalBoxSlot* RowSlot = Rows->AddChildToVerticalBox(W)) {
+      RowSlot->SetPadding(FMargin(0.0f, 0.0f, 0.0f, 8.0f));
+      RowSlot->SetHorizontalAlignment(HAlign_Left);
+    }
+  };
+  // ---- TOP: online, syncing, lost side by side (the same turn) ----
+  UHorizontalBox* TopRow = WidgetTree->ConstructWidget<UHorizontalBox>(UHorizontalBox::StaticClass());
+  const EUmConnState Conns[] = {EUmConnState::Online, EUmConnState::Syncing, EUmConnState::Lost};
+  for (const EUmConnState C : Conns) {
+    UUmHudTop* Top = CreateWidget<UUmHudTop>(this, UUmHudTop::WidgetClass());
+    if (!Top) continue;
+    FUmTopModel M;
+    M.TurnCount = 7;
+    M.Conn = C;
+    M.bClassS = Layout.bClassS;
+    M.PxPerSu = PxPerSu;
+    Top->ApplyModel(M);
+    if (UHorizontalBoxSlot* S = TopRow->AddChildToHorizontalBox(Sized(Top, TopRect, false))) S->SetPadding(FMargin(0.0f, 0.0f, 16.0f, 0.0f));
+    Blocks.Add(Top);
+    Lines.Add(FString::Printf(TEXT("UMGALLERY top conn=%s class=%s source=%s menu=%s"), UmConnection::StateName(C),
+                              Layout.bClassS ? TEXT("S") : TEXT("L"), *Top->SourceName(),
+                              Top->HasMenuGlyph() ? TEXT("glyph") : TEXT("word")));
+  }
+  AddRow(TopRow);
+  // ---- STATUS: the six SHOT states (the first with the key chips of UI-ACC-017) ----
+  struct FCase {
+    const TCHAR* Name;
+    FS09TurnStatusInput In;
+    bool bKeys;
+  };
+  TArray<FCase> Cases;
+  {
+    FS09TurnStatusInput In;
+    In.bViewerTurn = true;
+    In.ActionsRemaining = 2;
+    Cases.Add({TEXT("own+keys"), In, true});
+    FS09TurnStatusInput Opp;
+    Opp.OpponentVerb = ES09OpponentVerb::Turn;
+    Opp.OpponentName = TEXT("King Arthur");
+    Cases.Add({TEXT("opp"), Opp, false});
+    FS09TurnStatusInput Defend;
+    Defend.Mode = ES09CommandMode::CombatDefense;
+    Cases.Add({TEXT("defend"), Defend, false});
+    FS09TurnStatusInput Discard = In;
+    Discard.Mode = ES09CommandMode::DiscardDraft;
+    Discard.DiscardNeed = 2;
+    Cases.Add({TEXT("discard"), Discard, false});
+    FS09TurnStatusInput Choice = In;
+    Choice.Mode = ES09CommandMode::PendingChoice;
+    Choice.PendingPrompt = FS09Reason::Make(TEXT("ms.status.choice")).Arg(TEXT("choice"), TEXT("Можете усилить эту атаку."));
+    Cases.Add({TEXT("choice"), Choice, false});
+    FS09TurnStatusInput Sync = In;
+    Sync.bSyncing = true;
+    Cases.Add({TEXT("sync"), Sync, false});
+  }
+  for (const FCase& C : Cases) {
+    UUmHudStatusLine* Status = CreateWidget<UUmHudStatusLine>(this, UUmHudStatusLine::WidgetClass());
+    if (!Status) continue;
+    FUmStatusFrame Frame;
+    Frame.MaxWidthSu = static_cast<float>(StatusRect.Max.X - StatusRect.Min.X);
+    Frame.PxPerSu = PxPerSu;
+    Frame.bKeyHints = C.bKeys;
+    Status->SetFrame(Frame);
+    Status->ApplyModel(C.In);
+    AddRow(Sized(Status, StatusRect, true));
+    Blocks.Add(Status);
+    Lines.Add(FString::Printf(TEXT("UMGALLERY status %s state=%s key=%s lines=%d size=%.0f width=%.0f height=%.0f"), C.Name,
+                              UmHudStatus::StateName(Status->GetState()), *Status->GetLineKey().ToString(),
+                              Status->GetFit().Lines, Status->GetFit().SizeSu, Status->GetBodySizeSu().X,
+                              Status->GetBodySizeSu().Y));
+  }
+  // ---- BANNER at alpha 1 (an own turn 300 ms in) ----
+  if (UUmHudBanner* Banner = CreateWidget<UUmHudBanner>(this, UUmHudBanner::WidgetClass())) {
+    FS09TurnCue Cue;
+    Cue.OnApplied(TEXT("them"), 1, TEXT("me"), false, 0.0, false);
+    Cue.OnApplied(TEXT("me"), 2, TEXT("me"), false, 1000.0, false);
+    Banner->SetPxPerSu(PxPerSu);
+    Banner->ApplyModel(Cue, 1300.0);
+    AddRow(Sized(Banner, BannerRect, false));
+    Blocks.Add(Banner);
+    Lines.Add(FString::Printf(TEXT("UMGALLERY banner alpha=%.2f source=%s"), Banner->GetAlpha(), *Banner->SourceName()));
+  }
+  Lines.Insert(FString::Printf(TEXT("UMGALLERY topstrip class=%s canvas=%.0fx%.0f pxPerSu=%.3f statusW=%.0f"),
+                               Layout.bClassS ? TEXT("S") : TEXT("L"), CanvasSu.X, CanvasSu.Y, PxPerSu,
+                               StatusRect.Max.X - StatusRect.Min.X),
                0);
   return Lines;
 }

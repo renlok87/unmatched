@@ -173,7 +173,7 @@ void AS08FlowGameMode::TickTurnHud() {
   for (US08TurnPortraitWidget* Portrait : {OwnPortrait.Get(), OpponentPortrait.Get()}) {
     if (Portrait->GetVisibility() != Vis) Portrait->SetVisibility(Vis);
   }
-  if (TurnBanner.IsValid()) {
+  if (TurnBanner.IsValid() && UmHudBlockOnSlate(TEXT("banner"))) {  // VS-2 HB-16: UUmHudBanner unless rolled back
     const float Alpha = bShow ? TurnCue.BannerAlpha(Now) : 0.0f;
     const EVisibility BannerVis = Alpha > 0.0f ? EVisibility::HitTestInvisible : EVisibility::Collapsed;
     if (TurnBanner->GetVisibility() != BannerVis) TurnBanner->SetVisibility(BannerVis);

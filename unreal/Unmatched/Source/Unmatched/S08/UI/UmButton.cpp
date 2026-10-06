@@ -266,7 +266,8 @@ void UUmButton::ApplyModel(const FUmButtonModel& InModel) {
                      Model.Reason.Key == InModel.Reason.Key && Model.Reason.Args.OrderIndependentCompareEqual(InModel.Reason.Args) &&
                      Model.bSelected == InModel.bSelected && Model.bBusy == InModel.bBusy &&
                      Model.KeyHint.EqualTo(InModel.KeyHint) && Model.bFocused == InModel.bFocused &&
-                     Model.HeightSu == InModel.HeightSu;
+                     Model.HeightSu == InModel.HeightSu && Model.MinWidthSu == InModel.MinWidthSu &&
+                     Model.bFlat == InModel.bFlat;
   if (bSame) return;
   const bool bWasSelected = bHasModel && Model.bSelected;
   Model = InModel;
@@ -275,9 +276,11 @@ void UUmButton::ApplyModel(const FUmButtonModel& InModel) {
   const bool bDisc = Model.Variant == EUmButtonVariant::Disc;
   if (Box) {
     Box->SetHeightOverride(Model.HeightSu > 0.0f ? Model.HeightSu : UmButton::DefaultHeightSu(Model.Variant));
-    Box->SetMinDesiredWidth(UmButton::MinWidthSu(Model.Variant));
+    Box->SetMinDesiredWidth(Model.MinWidthSu > 0.0f ? Model.MinWidthSu : UmButton::MinWidthSu(Model.Variant));
   }
-  if (Body) Body->SetPadding(bDisc ? FMargin(0.0f) : FMargin(Theme.SpaceSu(TEXT("space.m")), 0.0f));
+  // an icon-only button (no label: the TOP squares) centres its glyph without the side padding
+  const bool bIconOnly = Model.Label.IsEmpty() && !Model.IconName.IsNone();
+  if (Body) Body->SetPadding(bDisc || bIconOnly ? FMargin(0.0f) : FMargin(Theme.SpaceSu(TEXT("space.m")), 0.0f));
   // the text: type.button caps (disc: type.tag caps under the disc); busy reads "Отправлено…" (V-10)
   if (Label) {
     const FText Text = Model.bBusy ? UmText::Get(EUmTable::Hud, TEXT("hud.btn.sent")) : Model.Label;
@@ -334,6 +337,9 @@ void UUmButton::Restyle() {
       const FName Token = UmButton::DiscUnderlayToken(State);
       const FLinearColor Fill = Token.IsNone() ? FLinearColor::Transparent : Theme.Color(Token);
       Body->SetBrush(FSlateRoundedBoxBrush(Fill, Theme.RadiusSu(TEXT("radius.l"))));
+    } else if (Model.bFlat && Model.Variant == EUmButtonVariant::Normal &&
+               (State == EUmButtonState::Normal || State == EUmButtonState::Focus)) {
+      Body->SetBrush(FSlateNoResource());  // VS-2 HB-14: at rest the plate of the block shows through
     } else if (const FSlateBrush* Skin = Theme.SkinFor(UmButton::SkinKey(Model.Variant, State), PxPerSu)) {
       Body->SetBrush(*Skin);
     }

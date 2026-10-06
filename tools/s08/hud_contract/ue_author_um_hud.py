@@ -9,6 +9,11 @@ their C++ bases (UUmHudAuthoringLibrary -> BuildDefaultTree of each class), in t
   /Game/S08/UI/Common/WBP_UmCursor    parent UmCursor    parts Box, Image (VS-2 HB-12)
   /Game/S08/UI/Common/WBP_UmPortrait  parent S08TurnPortraitWidget  parts Panel, Avatar, DiscBox, Disc, AvatarImage,
                                       MonogramText, NameText, StatusText, Stats, HpText, TrackerRow (VS-2 CP-08)
+  /Game/S08/UI/Common/WBP_UmConnectionBadge  parent UmConnectionBadge  parts Box, Icon, FallbackText (VS-2 HB-14)
+  /Game/S08/UI/Hud/WBP_UI_HUD_TOP     parent UmHudTop    parts Plate, Row, MenuButton, Conn, TurnText, LogButton (HB-14)
+  /Game/S08/UI/Hud/WBP_UI_HUD_STATUS  parent UmHudStatusLine  parts Frame, BodyBox, Body, Row, PulseDot, StatusText,
+                                      KeyChip, KeyRow, KeyBox0..2, Key0..2, KeyText0..2 (VS-2 HB-15)
+  /Game/S08/UI/Hud/WBP_UI_HUD_BANNER  parent UmHudBanner parts Plate, Text (VS-2 HB-16)
 
 A widget tree is not reachable from Python, so the C++ library builds it (the same function the class uses without a
 WBP) and this script re-loads every asset, checks the parent class, writes the report (env UM_HUD_WBP_REPORT, default
@@ -33,6 +38,10 @@ ASSETS = {
     "/Game/S08/UI/Common/WBP_UmButton": "UmButton",
     "/Game/S08/UI/Common/WBP_UmCursor": "UmCursor",
     "/Game/S08/UI/Common/WBP_UmPortrait": "S08TurnPortraitWidget",
+    "/Game/S08/UI/Common/WBP_UmConnectionBadge": "UmConnectionBadge",
+    "/Game/S08/UI/Hud/WBP_UI_HUD_TOP": "UmHudTop",
+    "/Game/S08/UI/Hud/WBP_UI_HUD_STATUS": "UmHudStatusLine",
+    "/Game/S08/UI/Hud/WBP_UI_HUD_BANNER": "UmHudBanner",
 }
 
 

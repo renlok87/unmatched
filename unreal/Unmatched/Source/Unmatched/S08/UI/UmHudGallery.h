@@ -6,6 +6,9 @@
 //   -S08IconGalleryButtons[=<n>]   HB-11: UUmButton - 3 variants x 7 states (normal, hover, pressed, disabled, focus,
 //                                  selected, busy) with real HUD strings (ST_Hud), the disabled ones with their why.*;
 //                                  =1 / =2 / =3: only the normal / primary / disc variant (a page for 720p 150 %).
+//   -S08IconGalleryTopStrip        VS-2 HB-14...HB-16: TOP (online / syncing / lost), STATUS in its six SHOT states (with
+//                                  the key chips on the first row) at the STATUS width of the window's class, the
+//                                  banner at alpha 1 - the real blocks at their layout sizes on fx.dust (review only).
 // Trace: 'UMGALLERY skins page=<p>/<n> rows=<r> pxPerSu=<x> x2=0|1 textures=<k>/29' and
 //        'UMGALLERY buttons variants=3 states=7 pxPerSu=<x> <variant>.<state>: <DescribeState>'.
 #pragma once
@@ -49,4 +52,24 @@ class UNMATCHED_API UUmButtonGalleryWidget : public UUserWidget {
   UPROPERTY() TObjectPtr<UBorder> Background;
   UPROPERTY() TObjectPtr<UGridPanel> Grid;
   UPROPERTY() TArray<TObjectPtr<UUmButton>> Buttons;
+};
+
+class UUmHudTop;
+class UUmHudStatusLine;
+class UUmHudBanner;
+class UVerticalBox;
+
+UCLASS()
+class UNMATCHED_API UUmTopStripGalleryWidget : public UUserWidget {
+  GENERATED_BODY()
+
+ public:
+  virtual bool Initialize() override;
+  /** Builds the sheet for a canvas of CanvasSu at PxPerSu (the layout class picks the sizes); returns trace lines. */
+  TArray<FString> Build(const FVector2D& CanvasSu, float PxPerSu);
+
+ private:
+  UPROPERTY() TObjectPtr<UBorder> Background;
+  UPROPERTY() TObjectPtr<UVerticalBox> Rows;
+  UPROPERTY() TArray<TObjectPtr<UUserWidget>> Blocks;
 };

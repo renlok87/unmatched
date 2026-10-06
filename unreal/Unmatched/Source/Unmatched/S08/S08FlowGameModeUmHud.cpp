@@ -18,6 +18,9 @@
 //                through or under it) - UmHudDeckPanelLayering;
 //       sub/toast the subtitle in a panel.bg capsule, stacked under the toasts over the hand, moving to the top strip
 //                when it would cross a figure, its tag or the plate (ВР-H06, 04 §2.12-§2.13) - TickUmHud.
+//   - VS-2 HB-14...HB-16 (S08/UI/UmTopStrip.h): TOP + CONN, STATUS and the banner - built with the root, framed with
+//     the layout, ticked here (turn, link, banner alpha); STATUS takes the line of AddTurnStatusLine (rollback
+//     -S08SlateHud=top|status|banner).
 #include "S08FlowGameMode.h"
 
 #include "S08AnimatedIconWidget.h"
@@ -32,6 +35,7 @@
 #include "UI/UmHudRoot.h"
 #include "UI/UmHudScale.h"
 #include "UI/UmHudTheme.h"
+#include "UI/UmTopStrip.h"
 #include "Brushes/SlateRoundedBoxBrush.h"
 #include "Engine/Engine.h"
 #include "Engine/GameViewportClient.h"
@@ -73,6 +77,8 @@ struct FUmHudRuntime {
   float HandCapSu = -1.0f;
   // VS-2 HB-12: the board half of the software cursor (UmCursor.h)
   FUmBoardCursor BoardCursor;
+  // VS-2 HB-14...HB-16: TOP + CONN, STATUS, the banner
+  FUmTopStrip TopStrip;
 };
 
 namespace {
@@ -133,6 +139,7 @@ void AS08FlowGameMode::BuildUmHud() {
   const bool bCursors = !R.Blocks.IsSlate(FName(TEXT("cursor"))) && UmHudRoot->InstallCursors(&CursorSource);
   ArtHud.PendingTrace.Add(FString::Printf(TEXT("HUD-CURSOR installed=%d impl=%s source=%s"), bCursors ? 1 : 0,
                                           bCursors ? TEXT("software") : TEXT("system"), bCursors ? *CursorSource : TEXT("-")));
+  BuildUmTopStrip();  // VS-2 HB-14...HB-16: before the layout (the STATUS slot sizes to its block)
   RefreshUmHudLayout();
 }
 
@@ -188,6 +195,13 @@ void AS08FlowGameMode::RefreshUmHudLayout() {
   if (UmHudRoot) {
     if (UUmGameHud* Game = UmHudRoot->GetGameHud()) Game->ApplyLayout(R.Layout, R.Blocks.Blocks, R.Blocks.bAll);
   }
+  // VS-2 HB-14...HB-16: class, scale and the STATUS width of the top strip
+  FUmTopStripFrame StripFrame;
+  StripFrame.bClassS = R.Layout.bClassS;
+  StripFrame.PxPerSu = R.Layout.PxPerSu;
+  const FBox2D StatusRect = R.Layout.Rect(EUmHudBlock::Status);
+  StripFrame.StatusMaxWidthSu = StatusRect.bIsValid ? static_cast<float>(StatusRect.Max.X - StatusRect.Min.X) : 600.0f;
+  R.TopStrip.SetFrame(StripFrame);
   const FString Line = R.Layout.TraceLine(FIntPoint(FMath::RoundToInt(Viewport.X), FMath::RoundToInt(Viewport.Y)));
   if (Line != R.LastLayoutLine) {
     R.LastLayoutLine = Line;
@@ -264,6 +278,7 @@ void AS08FlowGameMode::TickUmHud() {
     UmHudRoot->TickCursors(HudBusyReason().IsSet(), FPlatformTime::Seconds());
   }
   if (!UmHud.IsValid() || !UmHud->bLayout || !UmHud->Blocks.UmgRoot()) return;
+  TickUmTopStrip();  // VS-2 HB-14...HB-16
   FUmHudRuntime& R = *UmHud;
   const float PxPerSu = HudPixelsPerUnit() > 0.0f ? HudPixelsPerUnit() : R.Layout.PxPerSu;
   // ---- the top of the hand actually drawn (the Slate panel, its SD-26 offset included): the stack stays over it ----
@@ -349,6 +364,14 @@ void AS08FlowGameMode::WriteUmHudShotLines() {
     }
   }
   if (!R.LastStackLine.IsEmpty()) FS08Trace::Write(R.LastStackLine);
+  // VS-2 HB-14...HB-16: UI-HUD-TOP, UI-HUD-CONN, UI-HUD-STATUS, UI-HUD-BANNER (the drawn plate / chip / capsule)
+  TArray<FString> StripLines;
+  R.TopStrip.CollectShotLines(StripLines, [this](UWidget* W) {
+    FS08ScreenRect Rect;
+    if (W) WidgetViewportRect(W->GetCachedWidget(), Rect);
+    return Rect;
+  });
+  for (const FString& L : StripLines) FS08Trace::Write(L);
   // VS-2 HB-12: the cursor Slate drew for this frame (or the system cursor of the rollback)
   const APlayerController* CursorPC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
   FS08Trace::Write(UmHudRoot && UmHudRoot->HasCursors()
@@ -360,19 +383,63 @@ void AS08FlowGameMode::WriteUmHudShotLines() {
   }
 }
 
+void AS08FlowGameMode::BuildUmTopStrip() {
+  UUmGameHud* Game = UmHudRoot ? UmHudRoot->GetGameHud() : nullptr;
+  if (!UmHud.IsValid() || !Game) return;
+  TWeakObjectPtr<AS08FlowGameMode> WeakThis(this);
+  const TArray<FString> Lines = UmHud->TopStrip.Build(
+      *Game, UmHud->Blocks, HudPress, [WeakThis](const FS09HudPressOutcome& Outcome, const TCHAR* What) {
+        AS08FlowGameMode* Self = WeakThis.Get();
+        const FString Which(What);
+        if (Self) Self->HandleHudPressOutcome(Outcome, TFunction<FS09Reason()>(), [WeakThis, Which]() {
+          if (AS08FlowGameMode* S = WeakThis.Get()) S->HandleUmTopPress(*Which);
+        });
+      });
+  ArtHud.PendingTrace.Append(Lines);
+}
+
+void AS08FlowGameMode::TickUmTopStrip() {
+  FUmTopStripTick T;
+  // with the live match HUD, like the portraits; the result screen takes the whole picture
+  T.bShow = Hud.bValid && !IsResultScreenShown();
+  T.TurnCount = Hud.TurnCount;
+  const bool bStarted = Flow.IsValid() && Flow->GetStage() == ES08Stage::Started;
+  T.bStreamReady = !bStarted || Flow->IsStreamReady();
+  T.bManeuverSlow = bStarted && Flow->IsCommandSlow();
+  T.bInFlight = HudBusyReason().IsSet();
+  T.bRecovering = bStarted && Flow->IsAwaitingStateRecovery();
+  T.NowSeconds = FPlatformTime::Seconds();
+  T.Cue = &TurnCue;
+  T.CueNowMs = static_cast<double>(NowMs());
+  const FString ConnLine = UmHud->TopStrip.Tick(T);
+  if (!ConnLine.IsEmpty() && bStarted) FS08Trace::Write(FString::Printf(TEXT("%s seq=%d"), *ConnLine, Hud.SequenceNumber));
+}
+
+bool AS08FlowGameMode::ApplyUmHudStatus(const FS09TurnStatusInput& In) {
+  return UmHud.IsValid() && !UmHudBlockOnSlate(TEXT("status")) && UmHud->TopStrip.ApplyStatus(In);
+}
+
+void AS08FlowGameMode::HandleUmTopPress(const TCHAR* What) {
+  // ВР-VS2-44: «≡» is Esc without a selection -> PAUSE (SC-24, step H16), «Журнал» the LOG list of class S (H11);
+  // until those screens exist the press is answered (CUE-003 in HandleHudPressOutcome) and traced
+  FS08Trace::Write(FString::Printf(TEXT("HUD-TOP press=%s target=%s pending=1"), What,
+                                   FCString::Strcmp(What, TEXT("menu")) == 0 ? TEXT("UI-SCR-PAUSE") : TEXT("UI-HUD-LOG")));
+}
+
 void AS08FlowGameMode::UmGalleryBegin(int32 SizePx) {
   const TCHAR* Cmd = FCommandLine::Get();
   int32 Page = 0;
   const bool bSkins = FParse::Param(Cmd, TEXT("S08IconGallerySkins")) || FParse::Value(Cmd, TEXT("S08IconGallerySkins="), Page);
   int32 Variant = 0;
   const bool bButtons = FParse::Param(Cmd, TEXT("S08IconGalleryButtons")) || FParse::Value(Cmd, TEXT("S08IconGalleryButtons="), Variant);
-  if (!bSkins && !bButtons) return;
+  const bool bTopStrip = FParse::Param(Cmd, TEXT("S08IconGalleryTopStrip"));  // VS-2 HB-14...HB-16
+  if (!bSkins && !bButtons && !bTopStrip) return;
   if (IconGallery) IconGallery->SetVisibility(ESlateVisibility::Collapsed);  // the sheet takes the screen
   // the canvas of the sheet: the applied HUD scale (BeginPlay may run before the first window apply - the sheet is
   // built again on every OnUiScaleChanged, which also covers a window or UI-scale change)
   const int32 PageIndex = FMath::Max(0, Page - 1);
   TWeakObjectPtr<AS08FlowGameMode> WeakThis(this);
-  auto Build = [WeakThis, bSkins, PageIndex, Variant, SizePx]() {
+  auto Build = [WeakThis, bSkins, bTopStrip, PageIndex, Variant, SizePx]() {
     AS08FlowGameMode* Self = WeakThis.Get();
     if (!Self || !Self->GetWorld()) return;
     FVector2D Viewport(1920.0, 1080.0);
@@ -380,6 +447,14 @@ void AS08FlowGameMode::UmGalleryBegin(int32 SizePx) {
     const FUmHudScaleState& Scale = UmHudScale::Current();
     const float PxPerSu = Scale.Window.X > 0 ? Scale.PxPerSu() : 1.0f;
     if (Self->UmGallery) Self->UmGallery->RemoveFromParent();
+    if (bTopStrip) {
+      UUmTopStripGalleryWidget* Sheet = CreateWidget<UUmTopStripGalleryWidget>(Self->GetWorld(), UUmTopStripGalleryWidget::StaticClass());
+      if (!Sheet) return;
+      for (const FString& Line : Sheet->Build(Viewport / PxPerSu, PxPerSu)) FS08Trace::Write(Line);
+      Sheet->AddToViewport(1001);
+      Self->UmGallery = Sheet;
+      return;
+    }
     if (bSkins) {
       UUmSkinGalleryWidget* Sheet = CreateWidget<UUmSkinGalleryWidget>(Self->GetWorld(), UUmSkinGalleryWidget::StaticClass());
       if (!Sheet) return;

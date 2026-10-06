@@ -135,9 +135,12 @@ FUmHudLayout FUmHudLayout::Compute(const FVector2D& InCanvasSu, float InPxPerSu,
     CardMaxH = 166.0f;
     HandGapRight = HandGapRightSSu;
     Set(EUmHudBlock::Top, UmLayoutBox(M, M, 236.0f, 40.0f));
-    Set(EUmHudBlock::Status, UmLayoutBox(0.5f * (W - 600.0f), M, 600.0f, 40.0f));
+    // VS-2 HB-15 (CX-08, ВР-VS2-HB13-05): the one-line capsule is 48 su in S too (24 su text); two lines grow to 78
+    Set(EUmHudBlock::Status, UmLayoutBox(0.5f * (W - 600.0f), M, 600.0f, 48.0f));
     Set(EUmHudBlock::Center, UmLayoutBox(0.5f * (W - 560.0f), 64.0f, 560.0f, 360.0f));
-    Set(EUmHudBlock::Banner, UmLayoutBox(0.5f * (W - 420.0f), 112.0f, 420.0f, 64.0f));
+    // VS-2 HB-16 (ВР-VS2-45, CX-08 review): in S the banner sits right under the one-line STATUS (16 + 48 + 8 = y 72) -
+    // at y 112 / 144 it covers the top row of cells (FIELD starts at ~153 su at 720p 150 %, ~172 su at 1080p 150 %)
+    Set(EUmHudBlock::Banner, UmLayoutBox(0.5f * (W - 420.0f), M + 48.0f + GapSu, 420.0f, 64.0f));
     Set(EUmHudBlock::SourceSlot, UmLayoutBox(M, 64.0f, 120.0f, 166.0f));
     Set(EUmHudBlock::CombatL, UmLayoutBox(M, 240.0f, 150.0f, 232.0f));
     Set(EUmHudBlock::CombatR, UmLayoutBox(W - M - 150.0f, 240.0f, 150.0f, 232.0f));

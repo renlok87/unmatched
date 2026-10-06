@@ -1173,6 +1173,12 @@ private:
   float UmHudHandLowerCap(float OffsetSu) const;
   FMargin UmHudToastOffset() const;
   void UmGalleryBegin(int32 SizePx);
+  // VS-2 HB-14...HB-16: TOP + CONN, STATUS and the banner (S08/UI/UmHudTop, UmHudStatusLine, UmHudBanner)
+  void BuildUmTopStrip();
+  void TickUmTopStrip();
+  /** The UMG STATUS took the line (false: -S08SlateHud=status, the Slate text in the hand panel stays). */
+  bool ApplyUmHudStatus(const FS09TurnStatusInput& In);
+  void HandleUmTopPress(const TCHAR* What);
   UPROPERTY()
   TObjectPtr<class UUmHudRoot> UmHudRoot;
   UPROPERTY()
