@@ -27,8 +27,10 @@ class IconMotionContractTests(unittest.TestCase):
         self.assertEqual(CONTRACT.read_bytes(), CONFIG.read_bytes(), "запустить motion_contract.py: копия в Config/ устарела")
 
     def test_all_23_icons_with_appear_and_leave(self):
-        """23 принятых значка v3, 4 принятых DE-012 (`accepted_de012`, 2026-10-05) и кандидат DE-012 (`candidates`)."""
-        self.assertEqual(len(self.c["order"]) - len(self.c.get("candidates", [])) - len(self.c.get("accepted_de012", [])), 23)
+        """23 принятых значка v3, 4 принятых DE-012 (`accepted_de012`, 2026-10-05), кандидат DE-012 (`candidates`) и
+        принятые VR44 (`accepted_vr44`, VS-2 A2)."""
+        self.assertEqual(len(self.c["order"]) - len(self.c.get("candidates", [])) - len(self.c.get("accepted_de012", []))
+                         - len(self.c.get("accepted_vr44", [])), 23)
         self.assertEqual(set(self.c["order"]), set(self.c["icons"]))
         for icon, d in self.c["icons"].items():
             self.assertIn("appear", d["anims"], icon)
@@ -189,7 +191,8 @@ class IconMotionCandidatesTests(unittest.TestCase):
     def test_candidates_listed_in_order(self):
         self.assertEqual(self.c["candidates"], CANDIDATES)
         self.assertEqual(self.c["accepted_de012"], ACCEPTED_DE012)
-        self.assertEqual(self.c["order"][-len(DE012):], DE012)
+        self.assertEqual(self.c["order"][23:23 + len(DE012)], DE012)          # после 23 v3, до принятых VR44
+        self.assertEqual(self.c["order"][23 + len(DE012):], self.c.get("accepted_vr44", []))
         self.assertFalse(set(CANDIDATES) & set(ACCEPTED_DE012))
 
     def test_candidates_are_gallery_only(self):

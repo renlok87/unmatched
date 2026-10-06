@@ -47,7 +47,10 @@ SHEET_SIZES = (48, 32, 24, 16)
 ACCEPT_SIZES = (18, 24, 32, 48)
 ACCEPT_L6_SIZES = (16, 21)
 L6_BADGES = ("state-boost", "state-enemy", "state-hint", "state-threat", "marker-status", "marker-status-p1",
-             "marker-status-p2")
+             "marker-status-p2", "badge-order", "badge-order-p2", "badge-refuse", "badge-conflict")
+# VS-2 A2: свои размеры листа приёмки — чипы команд ещё 9 и 12 (EXTRA_SIZES, ВР-78), курсоры — 24 / 32 / 48 / 64
+ACCEPT_OWN = {"team-chip-p1": (9, 12, 18, 24, 32, 48), "team-chip-p2": (9, 12, 18, 24, 32, 48),
+              "cursor-default": (24, 32, 48, 64), "cursor-unavailable": (24, 32, 48, 64), "cursor-busy": (24, 32, 48, 64)}
 
 # ------------------------------------------------------------------------------------------------ палитра по ролям
 TOKENS = {
@@ -1272,6 +1275,359 @@ def draw_marker_action_slot_de(ctx, sp: Spec, layer=None):
         fill(ctx, C["dim"], 0.35)
 
 
+# ------------------------------------------------------------------------------------------------ набор VR44 (VS-2 A2)
+# Строки IC-38…IC-61 (06-tasks/icons.csv; 02 §5.5 ВР-44), по делегированию. Финал рисует этот движок по числам карточек
+# (Codex форм не рисовал); где числа карточки не сходятся с геометрией, записано решение ВР-VS2-NN (README набора v3,
+# раздел VR44). Принятые 27 значков и их файлы не меняются (sha1 в manifest.json).
+BADGE_W = 24.0            # лента бейджа порядка у клетки (IC-38): 24 × 30 u, x 4…28, y 1…31, вырез 0,28 w = 6,72 u
+BADGE_BLOCK = 0.32        # блок команды — 0,32 высоты тела от кромки до апекса выреза (ВР-VS2-13)
+BADGE_CAP = (10.5, 9.5)   # runtime-цифра font.card cap: один / два знака (ВР-VS2-13: 13 / 11 из карточки поле не вмещает)
+BADGE_DIGIT_DY = 0.25     # центр цифры — середина поля + 0,25 u: при 24 px зазор до блока ≥ 0,5 px, низ выше апекса
+BANG_BADGE = (2.75, 5.75, 1.5, 2.75)   # «!» конфликта: планка w × h, зазор, точка (ВР-VS2-14: 9,5 / 1,75 поле не вмещает)
+BANG_WARNING = (2.75, 9.0, 1.75, 2.75)  # «!» предупреждения (IC-47): планка y 11…20, точка y 21,75…24,5
+WARNING_TRI = ((16.0, 3.5), (29.0, 27.5), (3.0, 27.5))   # треугольник state-warning (ВР-66, ВР-IC16)
+CHIP_BODY_R = 13.0        # чип P1: круг тела r 13 u, keyline снаружи до 14 (ВР-78)
+CHIP_HEX_R = 14.0         # чип P2: описанный радиус тела (площадь −4 % к кругу P1), вершины на 0°, 60° … 300°
+CHIP_HEX_CORNER = 0.5
+STEP_TRI = ((16.0, 11.0), (22.0, 18.5), (10.0, 18.5))    # ▲ ui-step: основание 12, высота 7,5, центр масс (16; 16)
+# Курсоры (IC-58…IC-61, ВР-IC11): u = px при 32; keyline 2 u снаружи, стык miter с лимитом 2 (остриё срезается).
+CURSOR_ARROW = ((3.0, 3.0), (3.0, 24.0), (8.0, 19.0), (11.75, 27.5), (15.25, 26.0), (11.5, 17.5), (18.5, 17.5))
+CURSOR_KEYLINE = 2.0
+CURSOR_SIZES = (24, 32, 48, 64)   # экспорты курсоров для UE (HB-12): DPI 0,75 / ×1 / 150 % / ×2
+CURSOR_BUSY_FRAMES = ((0, 0.0), (2, 0.0), (4, 0.0), (6, 0.0), (6, 90.0), (7, 0.0), (9, 0.0), (11, 0.0))  # (_sent_frames, °)
+CURSOR_BUSY_SCALE = 1.2   # песочные часы state-sent ×1,2 (высота 21 u)
+
+
+def ribbon_sil_px(sp: Spec, w, notch=0.28):
+    """Лента VR44 (бейдж порядка, ленты слота): силуэт ribbon_sil, но вертикальные бока на пиксельных колонках
+    (симметрично относительно центра холста) — при 16–21 px бока не мылятся; вырез — от номинальной ширины."""
+    x0 = sp.snap(U / 2 - w / 2)
+    x1 = U - x0
+    y0, y1 = sp.M, U - sp.M
+    return Poly([(x0, y0), (x1, y0), (x1, y1), (U / 2, y1 - notch * w), (x0, y1)], [0.75, 0.75, 0.4, 0.0, 0.4])
+
+
+def badge_geom(sp: Spec):
+    """Лента бейджа: силуэт, верх тела (u), апекс внутреннего тела (офсет полигона), низ блока (снэп), центр поля."""
+    sil = ribbon_sil_px(sp, BADGE_W)
+    top_in = sp.M + sp.KE
+    apex_in = _offset_poly(sil.pts, sp.KE)[3][1]
+    block_bot = sp.snap(top_in + BADGE_BLOCK * (apex_in - top_in))
+    return sil, top_in, apex_in, block_bot, (block_bot + apex_in) / 2
+
+
+def draw_badge_order(ctx, sp: Spec, team=None, text=None, layer=None):
+    """Бейдж порядка хода у клетки (IC-38, ВР-IC04/06): лента 24 × 30 u как marker-status (верх r 0,75, хвосты r 0,4,
+    вырез 0,28 w, апекс внутренних слоёв — офсет полигона), блок команды 0,32 тела с плоским низом (в мастере цвет
+    команды, слой team — белая маска, UMG красит), тело navy. Поле цифры — от блока до апекса тела; цифра cap 10,5 u
+    (9,5 u при двух знаках) с центром на середине поля + 0,25 u (ВР-VS2-13)."""
+    sil, top_in, apex_in, block_bot, fc = badge_geom(sp)
+    fc += BADGE_DIGIT_DY
+    if layer in (None, "body"):
+        token(ctx, sil, sp)
+    if layer in (None, "team"):
+        ctx.save()
+        sil.path(ctx, sp.KE)
+        ctx.clip()
+        ctx.rectangle(0, 0, U, block_bot)
+        fill(ctx, C["white"] if layer == "team" else (team or C["white"]))
+        ctx.restore()
+    if text:
+        cap = BADGE_CAP[0] if len(text) == 1 else BADGE_CAP[1]
+        text_path(ctx, text, cap, U / 2, fc, tracking=-0.15 if len(text) > 1 else 0)
+        fill(ctx, C["glyph"])
+
+
+def g_bang(ctx, sp: Spec, bang, col, keyline=True):
+    """«!»: планка w × h с прямыми концами, зазор, точка-квадрат; всё со снэпом (detail 0: планка и точка ≥ 2 px,
+    зазор ≥ 1 px); keyline K вокруг каждой части (при detail 0 нет — поле узкое)."""
+    w, h, gap, dot = bang
+    mn = 2 if sp.detail == 0 else 1
+    bw, bh, g, d = sp.pxu(w, mn), sp.pxu(h, mn), sp.pxu(gap), sp.pxu(dot, mn)
+    y0 = sp.sy(-(bh + g + d) / 2)
+    parts = [(sp.sx(-bw / 2), y0, bw, bh), (sp.sx(-d / 2), y0 + bh + g, d, d)]
+    if keyline and sp.detail >= 1:
+        for x, y, pw, ph in parts:
+            ctx.rectangle(x - sp.K, y - sp.K, pw + 2 * sp.K, ph + 2 * sp.K)
+            fill(ctx, C["keyline"])
+    for x, y, pw, ph in parts:
+        ctx.rectangle(x, y, pw, ph)
+        fill(ctx, col)
+
+
+def draw_badge_conflict(ctx, sp: Spec, team=None, layer=None):
+    """Конфликт хода V-09 (IC-41, ВР-IC05): геометрия и блок команды badge-order, в поле цифры — «!» state.error;
+    keyline у «!» нет (ВР-VS2-14: на теле navy он не виден, 1,1 : 1, а при 48 px наезжал на блок команды); слои body /
+    team общие с badge-order, свой слой glyph. Лента не красная (И-3)."""
+    if layer in (None, "body", "team"):
+        draw_badge_order(ctx, sp, team=team, layer=layer)
+    if layer in (None, "glyph"):
+        fc = badge_geom(sp)[4]
+        glyph(ctx, sp, U / 2, fc, lambda: g_bang(ctx, sp, BANG_BADGE, C["error"], keyline=False))
+
+
+def draw_badge_refuse(ctx, sp: Spec, layer=None):
+    """Отказ V-08 (IC-40): плашка shape.state_badge (тело navy) и X state.error в боксе глифа — полуразмах 6,75 u,
+    штрих 3 u (detail 0 ≥ 2 px), прямые концы, keyline офсетом (при detail 0 нет). Плашка не красная (И-3)."""
+    if layer in (None, "body"):
+        token(ctx, sq_sil(sp), sp)
+    if layer in (None, "glyph"):
+        w = sp.pxu(3.0, mn=2 if sp.detail == 0 else 1)
+        # detail 0 (16, 18 px): без keyline — тело 10–12 px, keyline X выходил на кремовую кромку (на navy он не виден)
+        glyph(ctx, sp, 16.0, 16.0, lambda: g_x(ctx, sp, half=6.75, w=w, col=C["error"], keyline=sp.detail >= 1))
+
+
+def g_chevrons(ctx, sp: Spec, n=2, w=2.25, arm=5.5, depth=4.75, step=4.75):
+    """Двойной шеврон «»» вправо: осевые линии (x, ∓arm) → (x + depth, 0), между остриём первого и спинкой второго —
+    шаг step (бокс осевых линий 2 depth + step = 14,25 × 11 u, как в карточке IC-42: две отдельные «галочки»), штрих w,
+    стык miter, концы плоские; бокс по факту штриха — по центру. detail 0 — один шеврон штрихом ≥ 2 px."""
+    lw = sp.pxu(w, mn=2 if sp.detail == 0 else 1)
+    n = 1 if sp.detail == 0 else n
+
+    def path(dx):
+        ctx.new_path()
+        for i in range(n):
+            x = dx + i * (depth + step)
+            ctx.move_to(x, -arm)
+            ctx.line_to(x + depth, 0.0)
+            ctx.line_to(x, arm)
+
+    ctx.set_line_width(lw)
+    ctx.set_line_join(cairo.LINE_JOIN_MITER)
+    ctx.set_miter_limit(10)
+    ctx.set_line_cap(cairo.LINE_CAP_BUTT)
+    path(0.0)
+    x0, _, x1, _ = ctx.stroke_extents()
+    path(-(x0 + x1) / 2)
+    ctx.stroke()
+
+
+def draw_badge_ally(ctx, sp: Spec, layer=None):
+    """Союзник проходим V-06 (IC-42): плашка shape.state_badge (тело navy), глиф — двойной шеврон «сквозь» card.glyph."""
+    _state(ctx, sp, g_chevrons, layer=layer)
+
+
+def draw_badge_attack_from(ctx, sp: Spec, text=None, layer=None):
+    """«Отсюда можно атаковать: N» (IC-43): плашка shape.title_plate как state-hint (слот, линейка, поле числа), в слоте
+    — звезда-взрыв g_burst action-attack R 7,75 card.glyph; число — runtime font.card cap 14 u."""
+    _plate(ctx, sp, g_burst, text=text, layer=layer, R=7.75)
+
+
+def draw_team_chip(ctx, sp: Spec, slot=0, tint=None):
+    """Чип команды (IC-44 / IC-45, ВР-78): голый жетон — круг тела r 13 u (P1) или шестигранник с описанным радиусом
+    14 u, вершинами на 0°, 60° … 300° от +X, углами r 0,5 u (P2), keyline 1 u снаружи; тело белое (UMG умножает на цвет
+    команды, И-5), в мастере-превью — цвет команды. При мелких размерах оба жетона уменьшаются одним множителем, чтобы
+    keyline 1 px и поле 1 px вошли в холст; плоские грани шестигранника — на пиксельных рядах."""
+    ext = CHIP_HEX_R - CHIP_HEX_CORNER / math.sin(math.pi / 3) + CHIP_HEX_CORNER    # крайняя точка тела P2
+    s = min(1.0, (U / 2 - sp.M - sp.K) / ext)
+    body = tint or C["white"]
+    if slot == 0:
+        r = CHIP_BODY_R * s
+        circle(ctx, U / 2, U / 2, r + sp.K)
+        fill(ctx, C["keyline"])
+        circle(ctx, U / 2, U / 2, r)
+        fill(ctx, body)
+        return
+    apothem = U / 2 - sp.snap(U / 2 - CHIP_HEX_R * s * math.sin(math.pi / 3))
+    R = apothem / math.sin(math.pi / 3)
+    pts = [(U / 2 + R * math.cos(math.radians(a)), U / 2 + R * math.sin(math.radians(a))) for a in range(0, 360, 60)]
+    sil = Poly(pts, [CHIP_HEX_CORNER] * 6)
+    sil.path(ctx, -sp.K)
+    fill(ctx, C["keyline"])
+    sil.path(ctx, 0)
+    fill(ctx, body)
+
+
+def draw_state_warning(ctx, sp: Spec):
+    """Предупреждение (IC-47, ВР-66, ВР-IC16): треугольник вершиной вверх (16; 3,5), (29; 27,5), (3; 27,5), скругление
+    1 u; keyline 1 u снаружи, кромка card.cream 1,25 u внутрь, тело state.warning; «!» card.navy по оси x = 16.
+    Основание снэпнуто к пиксельному ряду (keyline снизу — целый ряд)."""
+    (ax, ay), (bx, by), (cx_, _) = WARNING_TRI
+    base = sp.snap(by + sp.K) - sp.K
+    sil = Poly([(ax, ay), (bx, base), (cx_, base)], [1.0, 1.0, 1.0])
+    sil.path(ctx, -sp.K)
+    fill(ctx, C["keyline"])
+    sil.path(ctx, 0)
+    fill(ctx, C["edge"])
+    sil.path(ctx, sp.E)
+    fill(ctx, C["warning"])
+    w, h, gap, dot = BANG_WARNING
+    glyph(ctx, sp, 16.0, 11.0 + (h + gap + dot) / 2, lambda: g_bang(ctx, sp, BANG_WARNING, C["body"], keyline=False))
+
+
+def draw_marker_slot(ctx, sp: Spec, kind="scheme"):
+    """Лента слота карты-источника (IC-50 / IC-51, ВР-IC12): геометрия marker-status (20,6 × 30 u, вырез 0,28 w) без
+    блока команды; scheme — тело card.type.scheme, молния action-scheme ×0,8 card.navy; boost — тело navy, белое
+    кольцо card.glyph r 3,5…5,25 u (язык диска BOOST). Центр глифа — центр поля (кромка…апекс) −0,3 u."""
+    w = 20.6
+    token(ctx, ribbon_sil_px(sp, w), sp, body=C["scheme"] if kind == "scheme" else C["body"])
+    cy = ((sp.M + sp.KE) + (U - sp.M - 0.28 * w)) / 2 - 0.3
+    if kind == "scheme":
+        glyph(ctx, sp, U / 2, cy, lambda: g_bolt(ctx, sp, s=0.8), col=C["body"])
+        return
+
+    def ring():
+        r = 5.25
+        circle(ctx, 0, 0, r)
+        ctx.fill()
+        circle(ctx, 0, 0, r - sp.ring)
+        clear(ctx)
+
+    glyph(ctx, sp, U / 2, cy, ring)
+
+
+def g_menu(ctx, sp: Spec):
+    """«≡»: три прямые планки 16 × 2,25 u, зазоры 3,5 u, плоские концы, keyline K вокруг каждой; detail 0 — планки и
+    зазоры ≥ 2 px. Белая маска (UMG красит)."""
+    mn = 2 if sp.detail == 0 else 1
+    h, g = sp.pxu(2.25, mn), sp.pxu(3.5, mn)
+    y0 = sp.sy(-(3 * h + 2 * g) / 2)
+    x0, x1 = sp.sx(-8.0), sp.sx(8.0)
+    bars = [(x0, y0 + i * (h + g), x1 - x0, h) for i in range(3)]
+    for x, y, bw, bh in bars:
+        ctx.rectangle(x - sp.K, y - sp.K, bw + 2 * sp.K, bh + 2 * sp.K)
+        fill(ctx, C["keyline"])
+    for x, y, bw, bh in bars:
+        ctx.rectangle(x, y, bw, bh)
+        fill(ctx, C["white"])
+
+
+def draw_ui_menu(ctx, sp: Spec):
+    glyph(ctx, sp, 16.0, 16.0, lambda: g_menu(ctx, sp))
+
+
+def draw_ui_close(ctx, sp: Spec):
+    """«×» закрыть (IC-54): две планки W крестом под 45°, полуразмах 6 u, плоские концы, keyline офсетом; белая маска,
+    никогда не красный и без плашки (И-3, И-10)."""
+    glyph(ctx, sp, 16.0, 16.0, lambda: g_x(ctx, sp, half=6.0, w=sp.W, col=C["white"]))
+
+
+def draw_ui_step(ctx, sp: Spec):
+    """«▲» выбора числа (IC-56): треугольник вершиной вверх, основание 12 u, высота 7,5 u, центр масс (16; 16),
+    скругление 0,75 u, keyline 1 u снаружи; белая маска; «▼» — поворот 180° в UMG. Основание без снэпа (ВР-VS2-17):
+    центр масс тела на (16; 16) при любом размере, поворот на 180° его не сдвигает."""
+    sil = Poly(STEP_TRI, [0.75, 0.75, 0.75])
+    sil.path(ctx, -sp.K)
+    fill(ctx, C["keyline"])
+    sil.path(ctx, 0)
+    fill(ctx, C["white"])
+
+
+def _cursor_outline(ctx, sp: Spec, pts):
+    """Курсор: тело card.glyph и keyline mark.keyline CURSOR_KEYLINE u снаружи — заливка + штрих 2 K одной фигурой
+    (стык miter, лимит 2: острое остриё срезается и не выходит за поле)."""
+    k2 = sp.pxu(CURSOR_KEYLINE)
+    ctx.set_line_join(cairo.LINE_JOIN_MITER)
+    ctx.set_miter_limit(2.0)
+    poly(ctx, pts)
+    rgb(ctx, C["keyline"])
+    ctx.set_line_width(2 * k2)
+    ctx.stroke_preserve()
+    ctx.fill()
+    poly(ctx, pts)
+    fill(ctx, C["glyph"])
+
+
+def draw_cursor_default(ctx, sp: Spec):
+    """Обычный курсор (IC-58, ВР-IC11, ВР-46): стрелка CURSOR_ARROW, тело card.glyph, keyline 2 u, без тени."""
+    _cursor_outline(ctx, sp, CURSOR_ARROW)
+
+
+def draw_cursor_unavailable(ctx, sp: Spec):
+    """Недоступно (IC-60): cursor-default и малый X state.error — центр (23; 23) u, полуразмах 4,25 u, штрих 2,5 u,
+    keyline 2 u; X в нижнем правом поле, остриё стрелки свободно; красный только у знака (И-3)."""
+    _cursor_outline(ctx, sp, CURSOR_ARROW)
+    k2 = sp.pxu(CURSOR_KEYLINE)
+    w = sp.pxu(2.5)
+    L = 4.25 * math.sqrt(2)
+    ctx.save()
+    ctx.translate(23.0, 23.0)
+    for pass_, col in ((0, C["keyline"]), (1, C["error"])):
+        g = k2 if pass_ == 0 else 0.0
+        for s_ in (1, -1):
+            ctx.save()
+            ctx.rotate(s_ * math.pi / 4)
+            ctx.rectangle(-L - g, -w / 2 - g, 2 * L + 2 * g, w + 2 * g)
+            fill(ctx, col)
+            ctx.restore()
+    ctx.restore()
+
+
+def _hourglass_shell(ctx, sp: Spec, angle=0.0):
+    """Силуэт песочных часов g_hourglass (планки + колба без вырезов) — подложка keyline курсора «занято»."""
+    ctx.save()
+    ctx.rotate(angle)
+    snap = sp.sy if abs(angle) < 1e-6 else (lambda y: y)
+    bw, ch = 6.5, 0.5
+    y_out = snap(8.75)
+    y_in = y_out - sp.pxu(1.5)
+    for sgn in (-1, 1):
+        a, b = (y_in, y_out) if sgn > 0 else (-y_out, -y_in)
+        poly(ctx, [(-bw + ch, a), (bw - ch, a), (bw, a + ch), (bw, b - ch), (bw - ch, b), (-bw + ch, b),
+                   (-bw, b - ch), (-bw, a + ch)])
+    hw0, wst = 6.0, 2.3
+    if sp.detail == 0:
+        wst = max(wst, 1.0 / sp.k)
+    poly(ctx, [(-hw0, -y_in - 0.3), (hw0, -y_in - 0.3), (wst, 0), (hw0, y_in + 0.3), (-hw0, y_in + 0.3), (-wst, 0)])
+    ctx.restore()
+
+
+def draw_cursor_busy(ctx, sp: Spec, frame=0):
+    """Занято (IC-61): песочные часы state-sent без плашки ×1,2 (высота 21 u) по центру (16; 16), keyline 2 u; кадр
+    frame из CURSOR_BUSY_FRAMES (кадры _sent_frames(), f04 — повёрнутый на 90°, середина переворота). Глиф рисуется
+    в своей сетке Spec(size × 1,2): толщины и горизонтальные кромки ложатся на пиксели холста; «воздух» колбы —
+    keyline (тёмный)."""
+    idx, deg = CURSOR_BUSY_FRAMES[frame]
+    kw = _sent_frames()[idx]
+    s = CURSOR_BUSY_SCALE
+    g = Spec(sp.size * s)
+    g.detail = sp.detail
+    g.ox = g.oy = (U / 2) / s
+    top, bottom, stream = kw["top"], kw["bottom"], kw["stream"]
+    if sp.detail == 0:
+        top, bottom, stream = 1.0, 1.0, False
+    angle = math.radians(deg)
+    k2 = sp.pxu(CURSOR_KEYLINE) / s
+    ctx.save()
+    ctx.translate(U / 2, U / 2)
+    ctx.scale(s, s)
+    ctx.set_line_join(cairo.LINE_JOIN_ROUND)   # силуэт из нескольких фигур: miter давал «уши» на фасках планок
+    _hourglass_shell(ctx, g, angle)
+    rgb(ctx, C["keyline"])
+    ctx.set_line_width(2 * k2)
+    ctx.stroke_preserve()
+    ctx.fill()
+    ctx.push_group()
+    rgb(ctx, C["glyph"])
+    g_hourglass(ctx, g, top=top, bottom=bottom, angle=angle, stream=stream)
+    ctx.pop_group_to_source()
+    ctx.paint()
+    ctx.restore()
+
+
+def cursor_hotspot(name, size):
+    """Горячая точка курсора в px размера size (начало сверху слева): у стрелок — середина среза острия внешней кромки
+    (keyline снаружи, лимит miter 2), сдвинутая внутрь до первого пикселя с α ≥ 128; у «занято» — центр холста."""
+    if name == "cursor-busy":
+        return [size // 2, size // 2]
+    sp = Spec(size)
+    k2 = sp.pxu(CURSOR_KEYLINE)
+    (tx, ty), (_, by), (sx_, sy_) = CURSOR_ARROW[0], CURSOR_ARROW[1], CURSOR_ARROW[-1]
+    # внешние нормали двух рёбер у острия: левое (вертикаль) — (−1, 0); ребро к (18,5; 17,5) — наружу вверх-вправо
+    dx, dy = sx_ - tx, sy_ - ty
+    L = math.hypot(dx, dy)
+    n2 = (dy / L, -dx / L)
+    p1, p2 = (tx - k2, ty), (tx + k2 * n2[0], ty + k2 * n2[1])
+    mx, my = (p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2
+    im = np.asarray(render(name, size))[..., 3]
+    bis = ((0 + dx / L) / 2, (1 + dy / L) / 2)        # биссектриса внутрь от острия
+    for t in np.arange(0.0, 4.0, 0.05):
+        x, y = int(math.floor((mx + bis[0] * t) * sp.k)), int(math.floor((my + bis[1] * t) * sp.k))
+        if 0 <= x < size and 0 <= y < size and im[y, x] >= 128:
+            return [x, y]
+    raise RuntimeError(f"{name}-{size}: hotspot not found")
+
+
 # id → (функция, kwargs, широкий?)
 ICONS = {
     "state-boost": (draw_state_boost, {}, False),
@@ -1323,7 +1679,33 @@ CANDIDATES = {
 # После ревью id переходит в ACCEPTED_VR44 и встаёт в ORDER_ACCEPTED после DE_ACCEPTED (листы принятого набора); в
 # контракте движения — список `accepted_vr44`. Курсоры (IC-58…IC-61) рисуются здесь же, но в UE их импортирует HB-12.
 CANDIDATES_VR44: dict = {}
-ACCEPTED_VR44: dict = {}
+# VS-2 A2 (IC-38…IC-61): строки приняты по делегированию после поштучного ревью листов (ВР-42, ВР-60; README набора,
+# раздел VR44). Курсоры — в наборе движка и на листах, но не в контракте движения и не в IconsV3 (HB-12).
+ACCEPTED_VR44: dict = {
+    "badge-order": (draw_badge_order, {"team": C["team1"]}, False),
+    "badge-refuse": (draw_badge_refuse, {}, False),
+    "badge-conflict": (draw_badge_conflict, {"team": C["team1"]}, False),
+    "badge-ally": (draw_badge_ally, {}, False),
+    "badge-attack-from": (draw_badge_attack_from, {}, True),
+    "team-chip-p1": (draw_team_chip, {"slot": 0}, False),
+    "team-chip-p2": (draw_team_chip, {"slot": 1}, False),
+    "state-warning": (draw_state_warning, {}, False),
+    "marker-slot-scheme": (draw_marker_slot, {"kind": "scheme"}, False),
+    "marker-slot-boost": (draw_marker_slot, {"kind": "boost"}, False),
+    "ui-menu": (draw_ui_menu, {}, False),
+    "ui-close": (draw_ui_close, {}, False),
+    "ui-step": (draw_ui_step, {}, False),
+    "cursor-default": (draw_cursor_default, {}, False),
+    "cursor-unavailable": (draw_cursor_unavailable, {}, False),
+    "cursor-busy": (draw_cursor_busy, {}, False),
+}
+# варианты id набора VR44 (как marker-status-p2): та же геометрия, для листов, галереи и запасного вида без тона
+VARIANTS_VR44 = {
+    "badge-order-p2": (draw_badge_order, {"team": C["team2"]}, False),
+}
+CURSORS = tuple(n for n in ACCEPTED_VR44 if n.startswith("cursor-"))
+# мастер-превью отличается от текстуры размеров (И-5): тело чипа в текстуре белое, в мастере — цвет команды
+MASTER_KW = {"team-chip-p1": {"tint": C["team1"]}, "team-chip-p2": {"tint": C["team2"]}}
 LAYERS = {
     "action-attack": ("body", "glyph"),
     "action-defense": ("body", "glyph"),
@@ -1345,6 +1727,13 @@ LAYERS = {
     "marker-turn-ring-team": ("rim", "flash"),
     "resource-hp-fallen": ("heart", "cross"),
     "marker-action-slot-de": ("ring",),
+    # набор VR44 (VS-2 A2): слои для UMG (тело, блок команды — белая маска, глиф); у конфликта тело и блок — слои
+    # badge-order (контракт: src badge-order_body / _team)
+    "badge-order": ("body", "team"),
+    "badge-conflict": ("glyph",),
+    "badge-refuse": ("body", "glyph"),
+    "badge-ally": ("body", "glyph"),
+    "badge-attack-from": ("body", "glyph"),
 }
 # Флипбуки слоёв для движения (контракт icon-motion.json: src «<id>_<layer>#» → файлы <id>_<layer>_fNN):
 # песок часов state-sent — 12 кадров цикла 1500 мс (кадры 0–6 пересыпание за 550 мс, 7–11 после переворота).
@@ -1361,17 +1750,23 @@ def _sent_frames():
 
 FLIPBOOKS = {("state-sent", "glyph"): _sent_frames(),
              ("marker-turn-ring", "flash"): [{"frame": i} for i in range(RING_FLASH_FRAMES)]}
-ALL = list(ICONS) + list(VARIANTS) + list(DE_ACCEPTED) + list(CANDIDATES) + list(ACCEPTED_VR44) + list(CANDIDATES_VR44)
+ALL = (list(ICONS) + list(VARIANTS) + list(DE_ACCEPTED) + list(CANDIDATES) + list(ACCEPTED_VR44) + list(VARIANTS_VR44)
+       + list(CANDIDATES_VR44))
 ORDER23 = [k for k in ICONS if k != "action-attack-token-glyphmask"]
 # 27 принятых: 23 v3 (2026-10-03) + 4 DE-012 (2026-10-05); затем принятые VR44 (IC-33)
 ORDER_ACCEPTED = ORDER23 + list(DE_ACCEPTED) + list(ACCEPTED_VR44)
 EXAMPLE = {"state-boost": {"text": "+2"}, "state-hint": {"text": "1"}, "state-threat": {"text": "3"},
            "marker-status": {"text": "1", "team": C["team1"]}, "marker-status-p1": {"text": "1"},
-           "marker-status-p2": {"text": "2"}, "resource-hp-full": {"text": "17"}, "resource-hp-full-enemy": {"text": "16"}}
+           "marker-status-p2": {"text": "2"}, "resource-hp-full": {"text": "17"}, "resource-hp-full-enemy": {"text": "16"},
+           # VR44: образцы runtime-текста и превью тона (в текстуре тело чипа белое)
+           "badge-order": {"text": "1"}, "badge-order-p2": {"text": "2"}, "badge-attack-from": {"text": "2"},
+           "team-chip-p1": {"tint": C["team1"]}, "team-chip-p2": {"tint": C["team2"]}}
+# цифр нет ниже этого размера (STYLE §3.2; бейдж порядка — < 24 px только лента и блок, IC-38)
+TEXT_MIN_PX = {"badge-order": 24, "badge-order-p2": 24, "badge-attack-from": 24}
 
 
 def _entry(name):
-    for table in (ICONS, VARIANTS, DE_ACCEPTED, CANDIDATES, ACCEPTED_VR44, CANDIDATES_VR44):
+    for table in (ICONS, VARIANTS, DE_ACCEPTED, CANDIDATES, ACCEPTED_VR44, VARIANTS_VR44, CANDIDATES_VR44):
         if name in table:
             return table[name]
     raise KeyError(name)
@@ -1430,7 +1825,7 @@ def render(name: str, size: int, **kw) -> Image.Image:
 def render_example(name, size):
     """Образец для листов; при detail 0 (≤ 20 px) число не рисуется (STYLE-v3 §3.2) — и на листе тоже (ART-011 Д-4)."""
     kw = dict(EXAMPLE.get(name, {}))
-    if Spec(size).detail == 0:
+    if Spec(size).detail == 0 or size < TEXT_MIN_PX.get(name, 0):
         kw.pop("text", None)
     return render(name, size, **kw)
 
@@ -1687,6 +2082,86 @@ def sheet_de012(path):
     return path
 
 
+def vr44_items():
+    """Лист набора VR44 (VS-2 A2): (подпись, f(size) → RGBA, широкий?) — принятые VR44, варианты, кадр f04 курсора
+    «занято» и кандидаты; образцы цифр и тон чипов — как на остальных листах (render_example)."""
+    items = []
+    for n in list(ACCEPTED_VR44) + list(VARIANTS_VR44):
+        items.append((n, (lambda n: lambda s: render_example(n, s))(n), is_wide(n)))
+        if n == "badge-order":
+            items.append(("badge-order · слой team × team.p2 (UMG)",
+                          lambda s: _over(render("badge-order", s, layer="body"),
+                                          _tinted(render("badge-order", s, layer="team"), C["team2"])), False))
+        if n == "cursor-busy":
+            items.append(("cursor-busy · f04 (переворот 90°)", lambda s: render("cursor-busy", s, frame=4), False))
+    for n in CANDIDATES_VR44:
+        items.append((f"КАНДИДАТ {n}", (lambda n: lambda s: render_example(n, s))(n), is_wide(n)))
+    return items
+
+
+VR44_SHEET_SIZES = (48, 32, 24, 18, 16)
+
+
+def sheet_vr44(path):
+    """Мастер 1024 (×0,25) | 48 / 32 / 24 / 18 / 16 цвет | серый | ×4 nearest 32 / 24 / 18 — на панели tag.background."""
+    items = vr44_items()
+    name_w, mcell = 300, 256
+    row_h = mcell + 24
+    sizes_w = sum(2 * s + 18 for s in VR44_SHEET_SIZES) + 20
+    x4_w = sum(4 * (2 * s + 4) + 12 for s in (32, 24, 18)) + 20
+    W = name_w + 2 * mcell + 30 + 2 * sizes_w + x4_w + 20
+    H = 60 + len(items) * row_h
+    sheet = Image.new("RGBA", (W, H), SHEET_BG)
+    paste(sheet, label(W, 40, "VR44 (VS-2 A2) — принято по делегированию 2026-10-06: мастер 1024 (×0,25) | 48 / 32 / 24 / 18 / 16 px цвет | серый | ×4 nearest 32 / 24 / 18 — на панели tag.background; цифры — образец runtime-текста", 17), 0, 8)
+    for r, (title, fn, wide) in enumerate(items):
+        y = 60 + r * row_h
+        paste(sheet, label(name_w, 44, title, 12), 0, y + 8)
+        m = fn(MASTER)
+        m = m.resize(((2 if wide else 1) * mcell, mcell), Image.LANCZOS)
+        paste(sheet, on_bg(m, PANEL, 0), name_w, y)
+        x = name_w + 2 * mcell + 30
+        for mode in ("colour", "grey"):
+            for sz in VR44_SHEET_SIZES:
+                im = on_bg(fn(sz), PANEL, 4)
+                paste(sheet, grey(im) if mode == "grey" else im, x, y + 8)
+                x += 2 * sz + 18
+            x += 20
+        for sz in (32, 24, 18):
+            big = xN(on_bg(fn(sz), PANEL, 2), 4)
+            paste(sheet, big, x, y + 8)
+            x += 4 * (2 * sz + 4) + 12
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    sheet.convert("RGB").save(path)
+    return path
+
+
+def cursor_frames_and_hotspots(names, dirs):
+    """Курсоры (IC-58…IC-61): кадры «занято» layers/cursor-busy_fNN-<px>.png (CURSOR_SIZES) и cursor-hotspots.json —
+    горячая точка каждого размера sizes_of(id) в px (начало сверху слева)."""
+    cur = [n for n in CURSORS if n in names]
+    if not cur:
+        return
+    if "cursor-busy" in cur:
+        for fi in range(len(CURSOR_BUSY_FRAMES)):
+            for sz in CURSOR_SIZES:
+                render("cursor-busy", sz, frame=fi).save(os.path.join(dirs["layers"], f"cursor-busy_f{fi:02d}-{sz}.png"))
+    path = os.path.join(ROOT, "cursor-hotspots.json")
+    data = {"tool": "art/imagegen/hud-icons-v3/_tools/draw_icons.py", "origin": "top-left, px of each size",
+            "ue_sizes": list(CURSOR_SIZES),
+            "rule": "стрелки — середина среза острия внешней кромки (keyline 2 u, miter 2), первый пиксель α ≥ 128; "
+                    "cursor-busy — центр (16; 16) u", "cursors": {}}
+    if os.path.exists(path):
+        with open(path, encoding="utf-8") as f:
+            data["cursors"] = json.load(f).get("cursors", {})
+    for n in cur:
+        data["cursors"][n] = {str(sz): cursor_hotspot(n, sz) for sz in sizes_of(n)}
+        if n == "cursor-busy":
+            data["cursors"][n]["frames"] = [{"index": i, "angle": a} for i, a in CURSOR_BUSY_FRAMES]
+    with open(path, "w", encoding="utf-8", newline="\n") as f:
+        json.dump(data, f, ensure_ascii=False, indent=1)
+        f.write("\n")
+
+
 # ------------------------------------------------------------------------------------------------ лист приёмки (IC-33)
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(ROOT)))
 ACCEPT_BGS = (("card.navy", TOKENS["card.navy"]), ("card.cream", TOKENS["card.cream"]), ("board grey", "#808080"))
@@ -1705,6 +2180,8 @@ def _visual_sheet():
 
 def accept_sizes(name):
     """Рабочие размеры листа приёмки: 18/24/32/48, у бейджей L6 ещё 16 и 21."""
+    if name in ACCEPT_OWN:
+        return ACCEPT_OWN[name]
     extra = ACCEPT_L6_SIZES if name in L6_BADGES else ()
     return tuple(sorted(set(ACCEPT_SIZES) | set(extra)))
 
@@ -1779,7 +2256,7 @@ def build(names=None, review_dir=None):
         manifest["extra_sizes"] = extra
     audits = {}
     for n in names:
-        im = render(n, MASTER)
+        im = render(n, MASTER, **MASTER_KW.get(n, {}))
         p = os.path.join(dirs["masters"], f"{n}.png")
         im.save(p)
         audits[n] = audit(n, im)
@@ -1794,7 +2271,8 @@ def build(names=None, review_dir=None):
                 for s in sizes_of(n):
                     render(n, s, layer=layer, **kw).save(os.path.join(dirs["layers"], f"{n}_{layer}_f{fi:02d}-{s}.png"))
         print("ok", n, im.size, audits[n].get("margin_px"), "body%", audits[n].get("glyph_area_pct_of_body"), "seam", audits[n].get("seam_px"))
-    show = [n for n in ORDER_ACCEPTED if n in names] + [n for n in ("action-attack-token-glyphmask",) + tuple(VARIANTS) if n in names]
+    show = [n for n in ORDER_ACCEPTED if n in names] + [n for n in ("action-attack-token-glyphmask",) + tuple(VARIANTS)
+                                                         + tuple(VARIANTS_VR44) if n in names]
     sheet_masters(show, os.path.join(dirs["sheets"], "sheet-masters.png"))
     sheet_sizes(show, os.path.join(dirs["sheets"], "sheet-sizes.png"))
     sheet_context_panel([n for n in ORDER_ACCEPTED if n in names] + [v for v in ("resource-hp-full-enemy",) if v in names],
@@ -1804,6 +2282,9 @@ def build(names=None, review_dir=None):
     vr44 = [n for n in CANDIDATES_VR44 if n in names]
     if vr44:  # IC-33: кандидаты VR44 — свой лист приёмки, не листы принятого набора
         sheets_accept(vr44, os.path.join(dirs["sheets"], "vr44"))
+    cursor_frames_and_hotspots(names, dirs)
+    if all(n in names for n in list(ACCEPTED_VR44) + list(VARIANTS_VR44) + list(CANDIDATES_VR44)):
+        sheet_vr44(os.path.join(dirs["sheets"], "vr44", "sheet-vr44.png"))  # VS-2 A2: строка каждой карточки
     with open(os.path.join(dirs["sheets"], "audit.json"), "w", encoding="utf-8") as f:
         json.dump(audits, f, ensure_ascii=False, indent=1)
     for d in ("masters", "sizes", "layers"):

@@ -1,10 +1,13 @@
 // HUD icon motion v3 automation tests (docs/unreal/contracts/hud/ICON-MOTION-PLAN.md, phase C):
 //   Load    - Config/S08IconMotion.json parses: 23 v3 icons + 5 DE-012 records (4 accepted 2026-10-05, the team ring
-//             a candidate), appear/leave each, the fallen heart on its own blackened layer, revision = the golden file's;
+//             a candidate) + 13 accepted VR44 records (VS-2 A2, IC-38...IC-56), appear/leave each, the fallen heart on
+//             its own blackened layer, the conflict badge on the order badge's body and team layers, revision = the
+//             golden file's;
 //   Golden  - FS08IconAnimator replays every icon's demo script (normal and reduced) and matches the Python
 //             reference poses docs/unreal/contracts/hud/icon-motion-golden.json (8 props + pivot, 1e-3);
 //   Reduced - s08.ReducedMotion drives S08IconMotion::IsReducedMotion;
-//   Textures- every layer texture of the contract exists at 24/32/48/64 px with the exact size and no mips;
+//   Textures- every layer and variant texture of the contract exists at its `ue_sizes` (18/24/32/36/48/64; the L6
+//             badges also 16/21) with the exact size (2:1 plates by canvas) and no mips;
 //   Widget  - US08AnimatedIconWidget builds one image per layer and applies the evaluator's pose;
 //   Semantics - events over the base (review 2026-10-03): leave after hold fades, tap after hover returns to it,
 //             a future appear is invisible, equal start time -> the later command wins;
@@ -82,8 +85,29 @@ bool FS08IconMotionLoadTest::RunTest(const FString& Parameters) {
   // 23 accepted v3 icons + 5 DE-012 records: the warm turn ring, the fallen heart, the X stamp and the DE tracker slot
   // accepted by the user on 2026-10-05 (contract `accepted_de012`, Codex forms), the team-tint ring still a candidate
   // (gallery only; contract `candidates`).
-  TestEqual(TEXT("28 icons in order"), Lib.Order.Num(), 28);
-  TestEqual(TEXT("28 icon definitions"), Lib.Icons.Num(), 28);
+  // VS-2 A2 (2026-10-06): 13 VR44 records accepted by delegation (contract `accepted_vr44`, IC-38...IC-56; the cursors
+  // IC-58...IC-61 are not in the motion contract - HB-12 imports them).
+  TestEqual(TEXT("41 icons in order"), Lib.Order.Num(), 41);
+  TestEqual(TEXT("41 icon definitions"), Lib.Icons.Num(), 41);
+  for (const TCHAR* Vr44 : {TEXT("badge-order"), TEXT("badge-refuse"), TEXT("badge-conflict"), TEXT("badge-ally"),
+                            TEXT("badge-attack-from"), TEXT("team-chip-p1"), TEXT("team-chip-p2"), TEXT("state-warning"),
+                            TEXT("marker-slot-scheme"), TEXT("marker-slot-boost"), TEXT("ui-menu"), TEXT("ui-close"),
+                            TEXT("ui-step")}) {
+    TestNotNull(*FString::Printf(TEXT("VR44 %s defined"), Vr44), Lib.Find(Vr44));
+  }
+  if (const FS08IconMotionDef* Conflict = Lib.Find(TEXT("badge-conflict"))) {
+    // ВР-IC05: the conflict badge shares the order badge's body and team block; only the "!" is its own layer.
+    TestEqual(TEXT("conflict layers"), Conflict->Layers.Num(), 3);
+    if (Conflict->Layers.Num() == 3) {
+      TestEqual(TEXT("conflict body src"), Conflict->Layers[0].Src, FString(TEXT("badge-order_body")));
+      TestTrue(TEXT("conflict team tinted"), Conflict->Layers[1].bTintTeam);
+      TestEqual(TEXT("conflict glyph src"), Conflict->Layers[2].Src, FString(TEXT("badge-conflict_glyph")));
+    }
+  }
+  if (const FS08IconMotionDef* From = Lib.Find(TEXT("badge-attack-from"))) {
+    TestEqual(TEXT("attack-from is a 2:1 plate"), From->CanvasU.X, 64.0);
+  }
+  TestNotNull(TEXT("variant badge-order-p2 resolves"), Lib.Find(TEXT("badge-order-p2")));
   for (const TCHAR* De012 : {TEXT("marker-turn-ring"), TEXT("marker-turn-ring-team"), TEXT("resource-hp-fallen"),
                              TEXT("marker-x-stamp"), TEXT("marker-action-slot-de")}) {
     TestNotNull(*FString::Printf(TEXT("DE-012 %s defined"), De012), Lib.Find(De012));
@@ -217,11 +241,18 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08IconMotionTexturesTest, "Unmatched.S08.Icon
 bool FS08IconMotionTexturesTest::RunTest(const FString& Parameters) {
   FS08IconMotionLibrary Lib;
   if (!TestTrue(TEXT("contract loads"), Lib.LoadFile(FS08IconMotionLibrary::DefaultPath()))) return false;
-  TSet<FString> Names;
-  for (const auto& Pair : Lib.Icons) Names.Append(S08LayerTextureNames(Pair.Value));
-  Names.Add(TEXT("resource-hp-full-enemy"));
+  // name -> 2:1 plate (canvas 64 u); variants take their base icon's canvas (VS-2 A2: by the contract, not by name)
+  TMap<FString, bool> Names;
+  for (const auto& Pair : Lib.Icons) {
+    for (const FString& N : S08LayerTextureNames(Pair.Value)) Names.Add(N, Pair.Value.CanvasU.X > 32.0);
+  }
+  for (const auto& Pair : Lib.Variants) {
+    const FS08IconMotionDef* Base = Lib.Find(Pair.Value);
+    Names.Add(Pair.Key.ToString(), Base && Base->CanvasU.X > 32.0);
+  }
   int32 Checked = 0;
-  for (const FString& N : Names) {
+  for (const auto& NameWide : Names) {
+    const FString& N = NameWide.Key;
     FString Src = N;
     int32 Frame = 0;
     int32 Hash = INDEX_NONE;
@@ -229,12 +260,17 @@ bool FS08IconMotionTexturesTest::RunTest(const FString& Parameters) {
       Src = N.Left(Hash + 1);
       Frame = FCString::Atoi(*N.Mid(Hash + 1));
     }
-    for (const int32 Px : {24, 32, 48, 64}) {
+    // IC-33: 18 / 36 for every record; VS-2 A2: the L6 badges at the cell also 16 / 21 (contract ue_sizes)
+    TArray<int32> Sizes = {18, 24, 32, 36, 48, 64};
+    if (N.StartsWith(TEXT("badge-order")) || N.StartsWith(TEXT("badge-refuse")) || N.StartsWith(TEXT("badge-conflict"))) {
+      Sizes.Append({16, 21});
+    }
+    for (const int32 Px : Sizes) {
       const FString Path = S08IconMotion::TextureObjectPath(Src, Frame, Px);
       UTexture2D* Tex = LoadObject<UTexture2D>(nullptr, *Path);
       if (!TestNotNull(*FString::Printf(TEXT("texture %s"), *Path), Tex)) continue;
       ++Checked;
-      const bool bWide = Src.StartsWith(TEXT("state-hint")) || Src.StartsWith(TEXT("state-threat"));
+      const bool bWide = NameWide.Value;
       // Source (imported) size: -nullrhi has no built platform data, so GetSizeX() would be 0.
       const FIntPoint Imported = Tex->GetImportedSize();
       TestEqual(*FString::Printf(TEXT("%s width"), *Path), Imported.X, bWide ? 2 * Px : Px);

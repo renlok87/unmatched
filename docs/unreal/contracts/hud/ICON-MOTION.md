@@ -124,8 +124,36 @@
 | `marker-action-slot-de` | slot_pulse | loop | 770 | 0 | ring.opacity; ring.scale — трекер DE (01 F-12, принят 2026-10-05, AB-7): пульс текущего слота, пока выбирается действие; reduced — обод без пульса | статично |
 | `marker-action-slot-de` | fill | event (hold) | 300 | 200 | body.opacity; glyph.opacity; glyph.scale; ring.opacity — трекер DE: «потрачено = заполнено значком типа» 0,4 → 1 за 300 мс в момент выбора (слои принятых action-<тип>; в галерее атака) | body.opacity; glyph.opacity; ring.opacity 100 мс |
 | `marker-action-slot-de` | unfill | event (hold) | 150 | — | body.opacity; glyph.opacity; ring.opacity — трекер DE: Undo — слот снова пуст (01 F-12) | body.opacity; glyph.opacity; ring.opacity 100 мс |
+| `badge-order` | appear | enter | 220 | — | all.opacity; all.scale_y — бейдж порядка у клетки (IC-38, V-04): лента разворачивается сверху вниз | all.opacity 100 мс |
+| `badge-order` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
+| `badge-order` | tap | event | 150 | 50 | all.scale — смена номера (цифру рисует игра, font.card cap 10,5 u, 9,5 u при двух знаках; центр — середина поля + 0,25 u) | статично |
+| `badge-refuse` | appear | enter | 200 | 120 | body.opacity; glyph.opacity; glyph.scale — отказ V-08 (IC-40, CUE-004): плашка проявляется за 120, X «штампуется» как marker-x-stamp (удар 120); игра ставит leave через 230 мс от старта — всего 350 = motion.refuse.ms; без тряски | all.opacity 100 мс |
+| `badge-refuse` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
+| `badge-conflict` | appear | enter | 220 | — | all.opacity; all.scale_y — конфликт хода V-09 (IC-41): лента с «!» разворачивается сверху вниз; держится, пока статус Conflict; без мигания | all.opacity 100 мс |
+| `badge-conflict` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
+| `badge-ally` | appear | enter | 180 | — | all.opacity; all.scale — союзник проходим V-06 (IC-42): при наведении «кладут на стол» | all.opacity 100 мс |
+| `badge-ally` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
+| `badge-attack-from` | appear | enter | 200 | — | all.opacity; all.scale_x — «отсюда можно атаковать: N» (IC-43): плашка растёт слева | all.opacity 100 мс |
+| `badge-attack-from` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
+| `badge-attack-from` | tap | event | 150 | 50 | all.scale — смена числа (число рисует игра, font.card cap 14 u) | статично |
+| `team-chip-p1` | appear | enter | 180 | — | all.opacity; all.scale — «кладут на стол»: 0,80 → 1,04 → 1,00; кадр 0 не пустой (opacity 0,15); чип команды P1 (IC-44): статичен; тело — белая маска, тон даёт UMG (И-5) | all.opacity 100 мс |
+| `team-chip-p1` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
+| `team-chip-p2` | appear | enter | 180 | — | all.opacity; all.scale — «кладут на стол»: 0,80 → 1,04 → 1,00; кадр 0 не пустой (opacity 0,15); чип команды P2 (IC-45): статичен; тело — белая маска, тон даёт UMG (И-5) | all.opacity 100 мс |
+| `team-chip-p2` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
+| `state-warning` | appear | enter | 180 | — | all.opacity; all.scale — «кладут на стол»: 0,80 → 1,04 → 1,00; кадр 0 не пустой (opacity 0,15); предупреждение (IC-47): без цикла и мигания | all.opacity 100 мс |
+| `state-warning` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
+| `marker-slot-scheme` | appear | enter | 220 | — | all.opacity; all.scale_y — лента слота «схема» (IC-50): появляется с картой, держится до её ухода | all.opacity 100 мс |
+| `marker-slot-scheme` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
+| `marker-slot-boost` | appear | enter | 220 | — | all.opacity; all.scale_y — лента слота BOOST (IC-51): держится ≥ 1000 мс (SD-54) | all.opacity 100 мс |
+| `marker-slot-boost` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
+| `ui-menu` | appear | enter | 180 | — | all.opacity; all.scale — «кладут на стол»: 0,80 → 1,04 → 1,00; кадр 0 не пустой (opacity 0,15); глиф кнопки меню (IC-53): состояния даёт UUmButton | all.opacity 100 мс |
+| `ui-menu` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
+| `ui-close` | appear | enter | 180 | — | all.opacity; all.scale — «кладут на стол»: 0,80 → 1,04 → 1,00; кадр 0 не пустой (opacity 0,15); глиф «×» закрыть (IC-54): состояния даёт UUmButton | all.opacity 100 мс |
+| `ui-close` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
+| `ui-step` | appear | enter | 180 | — | all.opacity; all.scale — «кладут на стол»: 0,80 → 1,04 → 1,00; кадр 0 не пустой (opacity 0,15); глиф «▲» (IC-56; «▼» — RenderTransform 180° в UMG): состояния даёт UUmButton | all.opacity 100 мс |
+| `ui-step` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
 
-Варианты того же id играют анимации основного значка: `resource-hp-full-enemy` → `resource-hp-full`, `marker-status-p1` → `marker-status`, `marker-status-p2` → `marker-status`.
+Варианты того же id играют анимации основного значка: `resource-hp-full-enemy` → `resource-hp-full`, `marker-status-p1` → `marker-status`, `marker-status-p2` → `marker-status`, `badge-order-p2` → `badge-order`.
 
 <!-- ручной раздел: motion_contract.py сохраняет всё ниже этой строки -->
 
