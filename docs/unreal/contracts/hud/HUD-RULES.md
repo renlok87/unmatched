@@ -12,6 +12,7 @@
 | [tools/s08/hud_contract/test_hud_contract.py](../../../../tools/s08/hud_contract/test_hud_contract.py) | 5 юнит-тестов |
 | [tools/s08/hud_contract/hud_tokens_codegen.py](../../../../tools/s08/hud_contract/hud_tokens_codegen.py) | VS-1 HB-03 (ВР-77): JSON токенов → `unreal/Unmatched/Source/Unmatched/S08/S08HudTokens.generated.h` (namespace `S08HudTokens`, алиасы раскрыты, `kTokensJsonSha256`); `validate` падает «header stale» |
 | [tools/s08/hud_contract/hud_theme_import.py](../../../../tools/s08/hud_contract/hud_theme_import.py) | VS-1 HB-04: тот же JSON → `/Game/S08/UI/Theme/DA_UmHudTheme` (`UUmHudTheme`, `Source/Unmatched/S08/UI/UmHudTheme.h`): цвета через `FromSRGBColor`, шрифты, отступы, радиусы, длительности, 29 кистей-фолбэков скинов (ВР-HB06), sha256 JSON; ассет — `git add -f` (П9) |
+| [st-hud.csv](st-hud.csv), [st-screens.csv](st-screens.csv), [st-ms.csv](st-ms.csv), [tools/s08/hud_contract/hud_strings_build.py](../../../../tools/s08/hud_contract/hud_strings_build.py) | VS-1 HB-05: строки RU/EN (Key, SourceString EN, ru, ref) → StringTable `/Game/UI/Localization/ST_Hud`, `ST_Screens`, `ST_Ms`, `ST_Why` и цель локализации `Game` (`Config/Localization/Game.ini`, `Content/Localization/Game/{en,ru}/Game.locres`); `check` — все ключи 04, 0 дублей, plural RU; `st-ms.csv` = 03 §9 + дельта ВР-H09; код — `UmText::Get/Format` (`Source/Unmatched/S08/UI/UmText.h`) |
 
 ## 0. Что уже есть (факт, R3.0)
 

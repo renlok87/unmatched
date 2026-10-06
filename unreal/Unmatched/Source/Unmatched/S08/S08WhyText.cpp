@@ -50,6 +50,15 @@ const FRow GRows[] = {
     {TEXT("why.scheme.none"), TEXT("Pick a scheme card first")},
     {TEXT("why.choice.required"), TEXT("This choice is mandatory")},
     {TEXT("why.deadline.passed"), TEXT("Time is up — the server resolves")},
+    // VS-1 HB-05: the screen reasons of visual/04-hud-spec.md §6.1
+    {TEXT("why.login.fields"), TEXT("Enter your email and password")},
+    {TEXT("why.code.length"), TEXT("Enter 6 characters")},
+    {TEXT("why.room.started"), TEXT("The game has already started")},
+    {TEXT("why.room.full"), TEXT("The room is full")},
+    {TEXT("why.hero.taken"), TEXT("Taken by the opponent")},
+    {TEXT("why.room.not.ready"), TEXT("The opponent is not ready")},
+    {TEXT("why.room.no.hero"), TEXT("Choose a hero")},
+    {TEXT("why.room.board.locked"), TEXT("The board is chosen when the room is created")},
     // ---- ms.* (03 §9) ----
     {TEXT("ms.begin.already"), TEXT("Maneuver already begun — Enter confirms")},
     {TEXT("ms.begin.exhaustion"),
