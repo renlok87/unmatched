@@ -37,7 +37,8 @@ class TableTests(unittest.TestCase):
     def test_semantic_errors_detected(self):
         cases = []
         t = copy.deepcopy(TABLE); row(t, "CUE-011")["duration_ms"] = 800; cases.append((t, "duration_ms"))
-        t = copy.deepcopy(TABLE); row(t, "CUE-011")["vfx"]["socket"] = "Tail"; cases.append((t, "сокет"))
+        t = copy.deepcopy(TABLE); row(t, "CUE-012")["vfx"]["socket"] = "Tail"; cases.append((t, "не из контракта рига"))
+        t = copy.deepcopy(TABLE); row(t, "CUE-011")["vfx"]["socket"] = "Head"; cases.append((t, "attach world с сокетом"))
         t = copy.deepcopy(TABLE); row(t, "CUE-011")["sfx"]["sound"] = None; cases.append((t, "present без пути"))
         t = copy.deepcopy(TABLE); row(t, "CUE-008")["interrupted_by"] = ["CUE-099"]; cases.append((t, "interrupted_by"))
         t = copy.deepcopy(TABLE); r = row(t, "CUE-013"); r["duration_ms"] = 1200; cases.append((t, "P3"))
@@ -54,6 +55,70 @@ class TableTests(unittest.TestCase):
         for bad, needle in cases:
             errs = cc.validate_table(bad)
             self.assertTrue(any(needle in e for e in errs), (needle, errs))
+
+    def test_fx01_decided_look(self):
+        """FX-01 (ВР-19…ВР-24, ВР-74): ревизия fx-p4-2026-10 — системы, сокеты и каналы решённого вида."""
+        self.assertEqual(TABLE["revision"], "fx-p4-2026-10")
+        for cid in ("CUE-005", "CUE-006", "CUE-009", "CUE-010"):          # HUD или обод фигуры: VFX нет (FX-11/12/17/18)
+            self.assertIsNone(row(TABLE, cid)["vfx"], cid)
+        self.assertNotIn("CUE-006", {m[0] for m in cc.missing_report(TABLE)})   # FX-12: missing-report его не перечисляет
+        self.assertEqual(row(TABLE, "CUE-006")["fallback"]["behaviour"], "рамка без вспышки")
+        self.assertEqual((row(TABLE, "CUE-009")["material"]["cpd_param"], row(TABLE, "CUE-009")["material"]["cpd_indices"]),
+                         ("Rim", [9, 10]))                                  # ВР-23
+        self.assertEqual(row(TABLE, "CUE-003")["marker"], {"material": "M_UM_MovePlate"})
+        want = {"CUE-007": ("NS_FX_Dust", "world", None, "FX-13"), "CUE-008": ("NS_FX_AttackChevrons", "world", None, "FX-16"),
+                "CUE-011": ("NS_FX_HitStar", "world", None, "FX-21"), "CUE-012": ("NS_FX_HealMotes", "socket", "Base", "FX-24"),
+                "CUE-013": ("NS_FX_AshEmbers", "world", None, "FX-26"), "CUE-014": (None, "socket", "Weapon", "FX-28")}
+        for cid, (system, attach, socket, fx_row) in want.items():
+            v = row(TABLE, cid)["vfx"]
+            self.assertEqual((cc.short_name(v["system"]) if v["system"] else None, v["attach"], v["socket"], v["fx_row"]),
+                             (system, attach, socket, fx_row), cid)
+            self.assertEqual(v["status"], "missing", cid)                  # ассетов систем ещё нет в Content
+            self.assertIn(fx_row, v["missing_reason"], cid)
+        self.assertEqual(row(TABLE, "CUE-016")["postprocess"]["profile_delta"]["defeat"]["saturation_mul"], 0.8)
+        self.assertEqual(row(TABLE, "CUE-017")["postprocess"]["fx_row"], "FX-35")
+
+    def test_fx01_rows_reference_vfx_tasks(self):
+        """Каждая строка с vfx ссылается на строку vfx.csv; причина missing называет её; ссылки проверяет validate-table."""
+        tasks = cc.vfx_task_ids()
+        if not tasks:
+            self.skipTest("нет docs/game-design/visual/06-tasks/vfx.csv")
+        for c in TABLE["cues"]:
+            if c["vfx"]:
+                self.assertIn(c["vfx"]["fx_row"], tasks, c["id"])
+        t = copy.deepcopy(TABLE); row(t, "CUE-007")["vfx"]["fx_row"] = "FX-99"
+        self.assertTrue(any("FX-99" in e for e in cc.validate_table(t)))
+        t = copy.deepcopy(TABLE); row(t, "CUE-007")["vfx"]["missing_reason"] = "ассет не создан"
+        self.assertTrue(any("не называет строку FX-13" in e for e in cc.validate_table(t)))
+        t = copy.deepcopy(TABLE); del row(t, "CUE-007")["vfx"]["fx_row"]
+        self.assertTrue(any(e.startswith("schema") for e in cc.validate_table(t)))
+
+    def test_fx01_old_words_are_gone(self):
+        """Приёмка FX-01: в таблице и 07 нет «луч», «зелёные частицы», «M_HighlightGameLayer», «встряска»."""
+        self.assertEqual(cc.forbidden_words("Medusa — луч от сокета Head"), ["луч"])
+        self.assertEqual(cc.forbidden_words("микро-встряска курсора"), ["встряска"])
+        self.assertEqual(cc.forbidden_words("зелёные частицы + «+N»"), ["зелёные частицы"])
+        self.assertEqual(cc.forbidden_words("луча нет (ВР-22); в лучшем случае"), [])
+        import json as _json
+        self.assertEqual(cc.forbidden_words(_json.dumps(TABLE, ensure_ascii=False)), [])
+        import csv as _csv
+        with open(cc.CSV07, encoding="utf-8") as f:
+            text = " | ".join(" | ".join(r.values()) for r in _csv.DictReader(f))
+        self.assertEqual(cc.forbidden_words(text), [])
+        t = copy.deepcopy(TABLE); row(t, "CUE-014")["vfx"]["note"] = "Medusa — луч от сокета Head"
+        self.assertTrue(any("луч" in e for e in cc.validate_table(t)))
+
+    def test_fx01_planned_system_is_not_present(self):
+        """Плановый путь системы при status missing не делает показ spawned; present — только существующий ассет."""
+        d = cc.ReferenceDispatcher(TABLE)
+        self.assertEqual(d._asset("CUE-011", "vfx"), "missing")
+        self.assertEqual(cc.ReferenceDispatcher(TABLE, {"CUE-011": {"vfx": "/Game/T/NS_Test_Hit.NS_Test_Hit"}})._asset("CUE-011", "vfx"),
+                         "NS_Test_Hit")
+        if cc.CONTENT_DIR.is_dir():
+            t = copy.deepcopy(TABLE); v = row(t, "CUE-011")["vfx"]; v["status"] = "present"; del v["missing_reason"]
+            self.assertTrue(any("present, но нет ассета" in e for e in cc.validate_table(t)))
+        t = copy.deepcopy(TABLE); row(t, "CUE-013")["clip"].update(status="missing", missing_reason="нет")
+        self.assertTrue(any("путь задан" in e for e in cc.validate_table(t)))   # у клипа путь при missing — ошибка
 
     def test_clip_by_fighter(self):
         """DE-003: клип своей роли у каждого скелета (FHeroSpec.Key); субъект трассы находит свой клип."""
@@ -272,7 +337,7 @@ class ModelAndGateTests(unittest.TestCase):
 
     def test_every_presented_line_has_all_fields(self):
         fx = cc.load_json(cc.FIXTURES / "reconnect-no-replay.json")
-        broken = [l.replace(" socket=Head", "") if "result=spawned" in l else l for l in fx["expect_trace"]]
+        broken = [l.replace(" socket=-", "") if "result=spawned" in l else l for l in fx["expect_trace"]]
         codes = {c for c, _ in cc.check_trace(broken, TABLE)[0]}
         self.assertIn("G1", codes)
 

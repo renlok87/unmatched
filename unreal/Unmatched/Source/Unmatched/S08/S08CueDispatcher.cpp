@@ -33,25 +33,33 @@ FS08CueRow MakeRow(const TCHAR* Id, int32 DurationMs, bool bBlocks, ES08CueOnNew
 const TArray<FS08CueRow>& S08CueRows::Combat() {
   static const TArray<FS08CueRow> Rows = [] {
     TArray<FS08CueRow> Out;
-    // CUE-008 attack declared: aim ring + direction flash, NO clip (01 F-03); cut by the next combat cue.
+    // VS-1 FX-01 (cue-table fx-p4-2026-10; 02-visual-design.md §9.2, ВР-19..ВР-24, ВР-74): sockets and material channels of
+    // the decided look. The systems (NS_FX_*) are planned paths with status missing until FX-13..FX-32 make them, so
+    // every vfx channel of these rows still traces vfx=missing.
+    // CUE-008 attack declared: target arcs + three chevrons ON THE GROUND (NS_FX_AttackChevrons, world, no socket), NO clip
+    // (01 F-03); cut by the next combat cue.
     Out.Add(MakeRow(TEXT("CUE-008"), 600, true, ES08CueOnNew::Interrupt, false,
-                    {TEXT("CUE-009"), TEXT("CUE-010"), TEXT("CUE-011"), TEXT("CUE-013")}, true, true, TEXT("Weapon"), 0,
+                    {TEXT("CUE-009"), TEXT("CUE-010"), TEXT("CUE-011"), TEXT("CUE-013")}, true, false, TEXT(""), 0,
                     TEXT(""), TEXT("none")));
-    // CUE-009 defense played: shield flicker on the defender (FxFlash).
-    Out.Add(MakeRow(TEXT("CUE-009"), 500, false, ES08CueOnNew::Replace, false, {}, true, true, TEXT("Head"), 0,
-                    TEXT(""), TEXT("FxFlash")));
+    // CUE-009 defense played: a cream rim pulse on the defender (CPD Rim 9-10, ВР-23), no vfx.
+    Out.Add(MakeRow(TEXT("CUE-009"), 500, false, ES08CueOnNew::Replace, false, {}, false, false, TEXT(""), 0,
+                    TEXT(""), TEXT("Rim")));
     // CUE-010 reveal and score: a HUD scene cue (no vfx, no clip); holds of the staging live inside it (§3.1).
     FS08CueRow Reveal = MakeRow(TEXT("CUE-010"), 800, true, ES08CueOnNew::Replace, true, {}, false, false, TEXT(""), 0,
                                 TEXT(""), TEXT("none"));
     Reveal.Subject = TEXT("scene");
     Out.Add(Reveal);
-    // CUE-011 damage: HitReact + hit tint from the contact frame; 900 ms from contact; two hit sounds at most.
-    Out.Add(MakeRow(TEXT("CUE-011"), 900, true, ES08CueOnNew::Replace, false, {}, true, true, TEXT("Head"), 2,
+    // CUE-011 damage: HitReact + white FxFlash 70 ms and the cream rim from the contact frame (ВР-20; the red tint only with
+    // -S08HitTintLegacy); the hit star at the contact point in the world (NS_FX_HitStar, FX-21 - not on the Head socket,
+    // the star does not follow the HitReact); 900 ms from contact; two hit sounds at most.
+    Out.Add(MakeRow(TEXT("CUE-011"), 900, true, ES08CueOnNew::Replace, false, {}, true, false, TEXT(""), 2,
                     TEXT("HitReact"), TEXT("FxFlash")));
-    // CUE-013 death: DeathSettle + fade; a new death of the same figure jumps to the final pose.
+    // CUE-013 death: DeathSettle + the ash dissolve with team embers (NS_FX_AshEmbers, world; -S08DissolveFade = fade); a
+    // new death of the same figure jumps to the final pose.
     Out.Add(MakeRow(TEXT("CUE-013"), 950, true, ES08CueOnNew::JumpToFinal, false, {}, true, false, TEXT(""), 0,
                     TEXT("DeathSettle"), TEXT("Fade")));
-    // CUE-014 hero ability (AFTER COMBAT steps): Weapon socket by default (GD-044 per-hero socket open).
+    // CUE-014 hero ability (AFTER COMBAT steps): Weapon socket by default; the socket and system per hero are a field of
+    // the hero (FX-28: KingArthur Weapon NS_FX_ArthurArc, Medusa Root NS_FX_MedusaVortex - ВР-22).
     Out.Add(MakeRow(TEXT("CUE-014"), 800, true, ES08CueOnNew::Replace, false, {}, true, true, TEXT("Weapon"), 0,
                     TEXT(""), TEXT("none")));
     return Out;

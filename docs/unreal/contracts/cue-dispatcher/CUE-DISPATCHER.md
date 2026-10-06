@@ -10,7 +10,7 @@
 
 | Файл | Что это |
 | --- | --- |
-| [cue-table.json](cue-table.json) | данные 18 CUE (`unmatched.cue-table/1`): ассеты, сокет, длительности, поведение; VFX и звуки пока `missing` — это и есть missing-report ART-010; клипы HitReact и DeathSettle есть у всех v2-фигур (DE-003) |
+| [cue-table.json](cue-table.json) | данные 18 CUE (`unmatched.cue-table/1`): ассеты, сокет, длительности, поведение; системы VFX — плановые пути `/Game/S08/FX/**` со `status: missing`, пока их не сделают строки FX (ревизия `fx-p4-2026-10`, FX-01) — это и есть missing-report ART-010; клипы HitReact и DeathSettle есть у всех v2-фигур (DE-003) |
 | [cue-table.schema.json](cue-table.schema.json) | JSON Schema таблицы (draft 2020-12) |
 | [cue-fixture.schema.json](cue-fixture.schema.json) | схема фикстур `unmatched.cue-fixture/1` |
 | [fixtures/](fixtures/) | 12 сценариев (события → точная трасса; 3 из них — постановка боя DE-018 с блоком `staging` для C++) и 5 негативных трасс для гейта |
@@ -41,11 +41,11 @@
 | `cap_subject_ms`, `cap_seq_ms`, `min_step_ms`, `overlap`, `place_ms`, `params` | только у CUE-007 (MS-T-15): потолки расписания перемещения [move-selection 04 §6.3](../../../game-design/move-selection/04-technical-design.md) — 1400 мс на бойца, 2400 мс на seq, шаг ≥ 90 мс, перекрытие 30 %, PLACE 240 мс; `params` описывает поля события (`path`, `order_in_seq`, `kind`, `steps`, `path_source`). Длительность показа = расписание по всем перемещениям seq |
 | `pose` | только у CUE-007 (DE-021, 01 F-02): поза фигуры на ходу — `hop_height_rel` 0 (подскока нет, D-DE-02; A/B 0.08), `travel_lean_deg` 10 за `lean_in_ms` 60, `start_turn_ms` 50, `turn_ms` 120 (доворот на вершине без остановки), `settle_ms` 150 (возврат в Idle), `ease_ends` false; скоростью не масштабируется. Умолчания `FS08MoveAnimParams` равны этим значениям (UE `Unmatched.S08.MoveAnim.CueTrace`) |
 | `feedback_delay_ms`, `blocks_input`, `skippable` | из 07; блокировка ввода ≤ 1000 мс, кроме терминального CUE-016 |
-| `vfx` | Niagara: `system` (soft path) или `status: missing` + `missing_reason`; `attach` `socket`/`world`, `socket` (`Weapon`, `Head`, `Root`, `Base`); `sim: cpu`, `deterministic: true`, `prewarm: true` |
+| `vfx` | Niagara: `system` (soft path); пока ассета нет — `status: missing` + `missing_reason` «ассет не создан: FX-xx», а `system` несёт плановый путь (FX-01); `fx_row` — строка [vfx.csv](../../../game-design/visual/06-tasks/vfx.csv), которая делает систему; `attach` `socket`/`world`, `socket` (`Weapon`, `Head`, `Root`, `Base`; при `world` — `null`); `sim: cpu`, `deterministic: true`, `prewarm: true`. Вид — [02 §9.2](../../../game-design/visual/02-visual-design.md): пыль CUE-007, шевроны на земле CUE-008, звезда у точки контакта CUE-011 (мир, не `Head`), точки лечения от `Base` CUE-012, угольки «пепла» CUE-013, по герою CUE-014 (FX-28); у CUE-005, 006, 009, 010 VFX нет (HUD или обод фигуры) |
 | `sfx` | `sound` — **USoundBase** (SoundWave, SoundCue и MetaSoundSource взаимозаменяемы без правки кода); `sound_class` UI/SFX/Music; `priority` 1–3; `concurrency` → USoundConcurrency (`max_count` = MaxCount, `resolution` StopOldest/PreventNew, `retrigger_ms` = RetriggerTime) |
 | `clip` | роль клипа драйвера анимации (`LungeAttack`, `HitReact`, `DeathSettle`); путь AnimSequence (`sequence`) или клип у каждого скелета (`sequence_by_fighter`: `FHeroSpec.Key` → путь, DE-003), или `missing`; `null` — клипа у CUE нет (CUE-008, F-03). Валидатор проверяет, что `.uasset` каждого пути есть в `Content` |
-| `material` | параметр Custom Primitive Data мастера `M_UM_Figure`: `FxFlash` (5–8), `Rim` (9–10), `Fade` (11) — раскладка меморандума §1 п.4 |
-| `ui`, `marker`, `postprocess` | виджет HUD, маркер игрового слоя, дельта профиля света (CUE-016/017) |
+| `material` | параметр Custom Primitive Data мастера `M_UM_Figure`: `FxFlash` (5–8), `Rim` (9–10), `Fade` (11) — раскладка меморандума §1 п.4. FX-01: обод `Rim` — наведение CUE-001 (`fx.rim` 0,6) и защита CUE-009 (импульс 300 мс, ВР-23); CUE-011 — белая вспышка `FxFlash` 70 мс и обод (`note`), красная заливка только с `-S08HitTintLegacy` (ВР-20) |
+| `ui`, `marker`, `postprocess` | виджет HUD (CUE-006 — UMG-вспышка рамки, ВР-74), маркер игрового слоя (CUE-003 — `M_UM_MovePlate`), постпроцесс: грейд CUE-016 по FX-34 (`profile_delta`, ВР-24) и насыщенность × 0,7 CUE-017 с возвратом в CUE-018 (FX-35, FX-36) |
 | `on_new_event` | `replace`, `cascade` (CUE-005), `jump_to_final` (CUE-007, CUE-013), `interrupt` (CUE-008), `none` (терминальный CUE-016, длящийся CUE-017) |
 | `replace_scope` | `cue` — новый показ обрывает любой активный показ этого CUE (наведение, выбор, баннер); `subject` — только у того же бойца |
 | `interrupted_by` | какие CUE обрывают этот (CUE-008 обрывают 009/010/011/013) |
@@ -59,6 +59,7 @@
 - Пути — soft object path `/Game/…`. Строки `LoadObject` кукер не видит (ловушка 5): папки эффектов удерживаются в cook через PrimaryAssetLabel или `+DirectoriesToAlwaysCook`. Будущий `UPrimaryDataAsset` импортируется из этой таблицы скриптом (JSON — источник правды, как профиль света).
 - Niagara: CPU-симуляция; пул компонентов (`ENCPoolMethod::AutoRelease`); один `UNiagaraEffectType` с бюджетами и CullReaction; `bDeterminism` + `RandomSeed` на System и Emitter, чтобы кадры доказательств повторялись; прогрев всех систем таблицы при загрузке матча. На DX12 (решение пользователя 2026-09-28, [журнал](../../../game-design/decisions/2026-09-29-render-ui-user-decisions.md)) доступен PSO precaching, но прогрев остаётся обязательным: первый показ не должен давать хитч на машинах без кэша PSO.
 - VFX никогда не единственный носитель информации: урон дублируется цифрой (виджет) и HP в HUD.
+- `status: present` ставится только на ассет, который есть в `Content` (`validate-table` проверяет `.uasset`); плановый путь при `missing` показ не меняет — `vfx=missing`, `result=fallback`. Слова старого вида («луч», «зелёные частицы», `M_HighlightGameLayer`, «встряска») в таблицу и 07 не возвращаются — их тоже ловит `validate-table` (FX-01).
 - Звук: SoundClass Master → UI / SFX / Music (ползунки UI-ACC-007..009); окно без фокуса уже заглушено движком (`[Audio] UnfocusedVolumeMultiplier=0.0`), что совпадает с UI-ACC-011.
 
 ### 3.1 Шкала боя, смерти и начала хода (DE-003, 2026-10-04)
@@ -246,9 +247,9 @@ CUE sound drop point=step seq=<N> fighter=<id|*> t=<ms> count=<n> reason=<skip|r
 Пример (фикстура `attack-interrupt`):
 
 ```
-CUE fx id=CUE-008 subject=arthur seq=50 t=0 vfx=NS_Test_Flash sfx=SW_Test_Attack clip=none mat=none socket=Weapon reduced=0 result=spawned
+CUE fx id=CUE-008 subject=arthur seq=50 t=0 vfx=NS_Test_Flash sfx=SW_Test_Attack clip=none mat=none socket=- reduced=0 result=spawned
 CUE fx done id=CUE-008 subject=arthur seq=50 t=300 ms=300 cut=interrupt
-CUE fx id=CUE-011 subject=medusa seq=51 t=300 vfx=NS_Test_Hit sfx=SW_Test_Hit clip=AS_Test_HitReact mat=FxFlash socket=Head reduced=0 result=spawned
+CUE fx id=CUE-011 subject=medusa seq=51 t=300 vfx=NS_Test_Hit sfx=SW_Test_Hit clip=AS_Test_HitReact mat=FxFlash socket=- reduced=0 result=spawned
 CUE fx done id=CUE-011 subject=medusa seq=51 t=1200 ms=900 cut=0
 ```
 
@@ -311,7 +312,7 @@ CUE fx done id=CUE-011 subject=medusa seq=51 t=1200 ms=900 cut=0
 
 ## 9. Открытые вопросы
 
-1. Стиль VFX (AD-OPEN-34) и библиотека ART-010 — ассеты таблицы остаются `missing` до них.
+1. ~~Стиль VFX (AD-OPEN-34) и библиотека ART-010 — ассеты таблицы остаются `missing` до них.~~ Закрыто ВР-19 (стиль «печатный», [02 §9.1](../../../game-design/visual/02-visual-design.md)) и FX-01: системы — плановые пути `/Game/S08/FX/**` со `status: missing`, пока их не сделают строки FX-13…FX-32 (`fx_row`).
 2. Длительности HitReact (0,4 с в 04 против 0,9 с CUE-011) и DeathSettle (0,9 против ≤ 0,95 с) — таблица берёт 07; при изменении 07 валидатор покажет расхождение. Закрыто DE-003: CUE-011 = 900 мс от кадра контакта, внутри — клип HitReact 417 мс и заливка 450 / 550 мс (§3.1).
-3. CUE-014 у Medusa: луч от сокета `Head` к цели, у Arthur — свечение `Weapon`. Сейчас строка задаёт `Weapon`; сокет по герою — поле DataAsset героя (GD-044).
+3. ~~CUE-014: сокет по герою.~~ Закрыто ВР-22 и FX-01: Medusa — вихрь каменных колец на модели (сокет `Root`, `NS_FX_MedusaVortex`), без направленного эффекта к цели; Arthur — золотая дуга у меча (`Weapon`, `NS_FX_ArthurArc`). Строка задаёт `Weapon` по умолчанию, сокет и система — поле героя (FX-28).
 4. Бюджет: худший набор 2×CUE-011 + 013 + 007 + 014 — ΔGPU ≤ 1 мс по ProfileGPU (bench fx/ui меморандума §2). На DX12 + Lumen эмиссивные частицы могут попадать в Lumen-сцену: проверить на bench, при необходимости исключить эффекты из непрямого освещения.

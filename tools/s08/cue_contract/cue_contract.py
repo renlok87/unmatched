@@ -39,6 +39,17 @@ FIXTURES = CONTRACT_DIR / "fixtures"
 CSV07 = REPO / "docs/game-design/07-animation-vfx-audio.csv"
 RIG_CONTRACT = REPO / "docs/art-pipeline/rig/rig-contract.json"
 CONTENT_DIR = REPO / "unreal/Unmatched/Content"  # /Game/… → Content/….uasset (проверка путей клипов)
+# FX-01 (VS-1): строки VFX, которые делают ассеты систем таблицы (vfx.fx_row, postprocess.fx_row)
+VFX_TASKS = REPO / "docs/game-design/visual/06-tasks/vfx.csv"
+# FX-01 приёмка: слова старого вида (ВР-19…ВР-23, ВР-FX07) не возвращаются ни в таблицу, ни в 07. «луч» — целым словом
+# («луча нет» в CUE-014 и «лучше», «случай» не задевает); «встряска» — с окончаниями.
+FORBIDDEN_WORDS = (
+    (re.compile(r"(?<!\w)луч(?!\w)", re.IGNORECASE), "луч"),
+    (re.compile(r"зел[её]ные частицы", re.IGNORECASE), "зелёные частицы"),
+    (re.compile(r"M_HighlightGameLayer"), "M_HighlightGameLayer"),
+    (re.compile(r"(?<!\w)встряск\w*", re.IGNORECASE), "встряска"),
+)
+FX_ROW_RE = re.compile(r"\bFX-[0-9]{2}\b")
 
 RESULTS_PRESENTED = ("spawned", "fallback")
 RESULTS = RESULTS_PRESENTED + ("duplicate", "stale")
@@ -132,7 +143,21 @@ def move_schedule(moves, params, mul=1.0, reduced=False):
     return out
 
 
-def validate_table(table, schema=None, csv07=CSV07, rig_contract=RIG_CONTRACT, content_dir=CONTENT_DIR):
+def forbidden_words(text):
+    """Слова старого вида VFX в тексте (FX-01): список найденных."""
+    return [name for rx, name in FORBIDDEN_WORDS if rx.search(text or "")]
+
+
+def vfx_task_ids(path=VFX_TASKS):
+    """id строк vfx.csv (пустое множество, если файла нет — проверка ссылок тогда пропускается)."""
+    if not path or not Path(path).exists():
+        return set()
+    with open(path, encoding="utf-8-sig") as f:
+        return {r["id"] for r in csv.DictReader(f)}
+
+
+def validate_table(table, schema=None, csv07=CSV07, rig_contract=RIG_CONTRACT, content_dir=CONTENT_DIR,
+                   vfx_tasks=VFX_TASKS):
     """Список ошибок таблицы: JSON Schema, затем семантика и сверка с 07."""
     import jsonschema
 
@@ -157,6 +182,9 @@ def validate_table(table, schema=None, csv07=CSV07, rig_contract=RIG_CONTRACT, c
     if rig_contract and Path(rig_contract).exists():
         rc = load_json(rig_contract)
         sockets |= {s["name"] for s in rc.get("ue_import", {}).get("sockets_v2", rc.get("ue_import", {}).get("sockets", []))}
+    tasks = vfx_task_ids(vfx_tasks)
+    for word in forbidden_words(table.get("status_note", "")):
+        errors.append("status_note: слово старого вида «%s» (FX-01)" % word)
     for cid, c in rows.items():
         r = ref.get(cid)
         if r:
@@ -199,8 +227,13 @@ def validate_table(table, schema=None, csv07=CSV07, rig_contract=RIG_CONTRACT, c
             path = a.get(key) or a.get("sequence_by_fighter")
             if a["status"] == "present" and not path:
                 errors.append("%s: %s.status present без пути %s" % (cid, ch, key))
-            if a["status"] == "missing" and path:
+            # FX-01: vfx.system при missing — плановый путь системы (ассет делает строка fx_row); у звука и клипа путь
+            # при missing по-прежнему ошибка
+            if a["status"] == "missing" and path and ch != "vfx":
                 errors.append("%s: %s.status missing, но путь задан" % (cid, ch))
+            if ch == "vfx" and a["status"] == "present" and path and content_dir and Path(content_dir).is_dir():
+                if not content_file(path, content_dir).is_file():
+                    errors.append("%s: vfx.status present, но нет ассета %s (FX-01: present только у существующего)" % (cid, path))
             if content_dir and Path(content_dir).is_dir():
                 for fighter, soft in (a.get("sequence_by_fighter") or {}).items():
                     if not content_file(soft, content_dir).is_file():
@@ -208,6 +241,20 @@ def validate_table(table, schema=None, csv07=CSV07, rig_contract=RIG_CONTRACT, c
         v = c.get("vfx")
         if v and v["attach"] == "socket" and v["socket"] not in sockets:
             errors.append("%s: сокет %s не из контракта рига (%s)" % (cid, v["socket"], sorted(sockets)))
+        if v and v["attach"] == "world" and v.get("socket"):
+            errors.append("%s: vfx.attach world с сокетом %s" % (cid, v["socket"]))
+        # FX-01: строка с vfx ссылается на строку vfx.csv, которая делает систему; причина missing называет её
+        for block_name, block in (("vfx", v), ("postprocess", c.get("postprocess"))):
+            fx_ref = (block or {}).get("fx_row")
+            if fx_ref is not None and tasks and fx_ref not in tasks:
+                errors.append("%s: %s.fx_row %s нет в %s" % (cid, block_name, fx_ref, Path(vfx_tasks).name))
+        if v and v["status"] == "missing" and v["fx_row"] not in FX_ROW_RE.findall(v.get("missing_reason", "")):
+            errors.append("%s: vfx.missing_reason не называет строку %s" % (cid, v["fx_row"]))
+        for word in forbidden_words(json.dumps(c, ensure_ascii=False)):
+            errors.append("%s: слово старого вида «%s» (FX-01)" % (cid, word))
+        if r:
+            for word in forbidden_words(" | ".join(x or "" for x in r.values())):
+                errors.append("%s: в 07 слово старого вида «%s» (FX-01)" % (cid, word))
         if (c.get("clip") or (v and v["attach"] == "socket")) and c["subject"] != "fighter":
             errors.append("%s: клип или сокет требуют subject=fighter" % cid)
         for other in c["interrupted_by"]:
@@ -259,7 +306,9 @@ class ReferenceDispatcher:
         key = {"vfx": "system", "sfx": "sound", "clip": "sequence"}[channel]
         # AU-S4: the sound of a CUE is played by FS08CueSound (`CUE sound` lines, banks of the table); the dispatcher's
         # sfx slot is filled only by a fixture's assets_present - like the C++ fixture resolver (S08CueDispatcherTests)
-        path = self.present.get(cid, {}).get(channel) or (spec.get(key) if channel != "sfx" else None)
+        # FX-01: vfx.system при status missing — плановый путь (ассета ещё нет), показ остаётся fallback
+        planned = channel == "vfx" and spec.get("status") != "present"
+        path = self.present.get(cid, {}).get(channel) or (spec.get(key) if channel != "sfx" and not planned else None)
         if not path and channel == "clip":
             path = fighter_clip(spec, subject)
         if not path or path in self.unloadable:

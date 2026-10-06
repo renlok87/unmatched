@@ -1,8 +1,8 @@
 {
  "schema": "unmatched.cue-table/1",
- "revision": "au-s4-2026-10-05",
+ "revision": "fx-p4-2026-10",
  "status": "предложено",
- "status_note": "Контракт FS08CueDispatcher (волна 4, W4-D; меморандум engine-gate §1 п.8). Данные 18 CUE из 07-animation-vfx-audio.csv; звуки — банк AU-S4 (docs/game-design/audio/03-sound-registry.csv, tools/audio/ue_bank.py): sfx.sound — первый вариант, sfx.bank — id банка, вариант без повторов выбирает FS08CueSound; VFX пока отсутствуют — таблица служит missing-report ART-010; клипы HitReact и DeathSettle есть у всех 6 v2-фигур (H2Anim, S08HeroesV2), LungeAttack — вступление CUE-011 (DE-003, 2026-10-04: живые данные DE, docs/game-design/de-footage/task/01-decisions.md F-01…F-12). Поза перемещения CUE-007 (`pose`: подскок, наклон, разворот, доворот, возврат в Idle, ease) — DE-021 по 01 F-02. Реализация диспетчера — GD-044, эффекты — GD-049. Не художественная приёмка.",
+ "status_note": "Контракт FS08CueDispatcher (волна 4, W4-D; меморандум engine-gate §1 п.8). Данные 18 CUE из 07-animation-vfx-audio.csv; звуки — банк AU-S4 (docs/game-design/audio/03-sound-registry.csv, tools/audio/ue_bank.py): sfx.sound — первый вариант, sfx.bank — id банка, вариант без повторов выбирает FS08CueSound; клипы HitReact и DeathSettle есть у всех 6 v2-фигур (H2Anim, S08HeroesV2), LungeAttack — вступление CUE-011 (DE-003, 2026-10-04: живые данные DE, docs/game-design/de-footage/task/01-decisions.md F-01…F-12). Поза перемещения CUE-007 (`pose`) — DE-021 по 01 F-02. Ревизия fx-p4-2026-10 (VS-1, карточка FX-01; решения ВР-19…ВР-24, ВР-74, ВР-FX07 — docs/game-design/visual/02-visual-design.md §9): блоки vfx, material и postprocess описывают решённый вид. vfx.system — плановый путь системы Niagara; пока ассета нет в Content, status missing и missing_reason «ассет не создан: FX-xx» (missing-report ART-010), fx_row — строка docs/game-design/visual/06-tasks/vfx.csv, которая делает ассет. CUE-005, CUE-006, CUE-009, CUE-010 — без VFX (HUD или обод фигуры). Длительности, задержки, поведение и блок sfx не менялись. Реализация диспетчера — GD-044, эффекты — FX-02…FX-37. Не художественная приёмка.",
  "asset_path_rule": "soft object path /Game/...: Niagara — UNiagaraSystem, звук — USoundBase (SoundWave, SoundCue и MetaSoundSource взаимозаменяемы без кода). Пути удерживаются в cook через PrimaryAssetLabel или DirectoriesToAlwaysCook (строки LoadObject кукер не видит — ловушка 5)",
  "sockets_from": "docs/art-pipeline/rig/rig-contract.json ue_import.sockets_v2 (Weapon, Head) + Root/Base актора",
  "cues": [
@@ -35,7 +35,8 @@
     "cpd_indices": [
      9,
      10
-    ]
+    ],
+    "note": "кремовый обод fx.rim 0,6, CPD Rim 9–10 (FX-06)"
    },
    "ui": {
     "widget": "UI-CURSOR"
@@ -129,7 +130,7 @@
    "material": null,
    "ui": null,
    "marker": {
-    "material": "M_HighlightGameLayer"
+    "material": "M_UM_MovePlate"
    },
    "postprocess": null,
    "on_new_event": "replace",
@@ -248,17 +249,7 @@
    "feedback_delay_ms": 100,
    "blocks_input": false,
    "skippable": true,
-   "vfx": {
-    "system": null,
-    "status": "missing",
-    "missing_reason": "ассет не создан: ART-010 (библиотека VFX) не выполнен, стиль VFX открыт (AD-OPEN-34)",
-    "attach": "world",
-    "socket": null,
-    "sim": "cpu",
-    "deterministic": true,
-    "prewarm": true,
-    "note": "свечение рамки карты-плоскости"
-   },
+   "vfx": null,
    "sfx": {
     "sound": "/Game/Audio/Cards/SW_CRD_PLAY_01.SW_CRD_PLAY_01",
     "bank": "CRD-PLAY",
@@ -273,7 +264,11 @@
    },
    "clip": null,
    "material": null,
-   "ui": null,
+   "ui": {
+    "widget": "UI-HUD-SLOT",
+    "element": "рамка сыгранной карты: кромка fx.flash 2 su → panel.edge 1 su за 500 мс (UUmCardWidget, CP-21)",
+    "note": "UMG-вспышка рамки (ВР-74)"
+   },
    "marker": null,
    "postprocess": null,
    "on_new_event": "replace",
@@ -286,7 +281,7 @@
    },
    "shake": null,
    "fallback": {
-    "behaviour": "рамка UI-CARD-FRAME в HUD вместо 3D-карты",
+    "behaviour": "рамка без вспышки",
     "log": "Warning"
    },
    "source_row": "docs/game-design/07-animation-vfx-audio.csv#CUE-006"
@@ -302,15 +297,16 @@
    "blocks_input": false,
    "skippable": true,
    "vfx": {
-    "system": null,
+    "system": "/Game/S08/FX/Board/NS_FX_Dust.NS_FX_Dust",
     "status": "missing",
-    "missing_reason": "ассет не создан: ART-010 (библиотека VFX) не выполнен, стиль VFX открыт (AD-OPEN-34)",
+    "missing_reason": "ассет не создан: FX-13",
     "attach": "world",
     "socket": null,
     "sim": "cpu",
     "deterministic": true,
     "prewarm": true,
-    "note": "пыль на конечной клетке"
+    "note": "пыль на конечной клетке: 3–5 плоских дисков fx.dust, 300 мс от посадки (ВР-74); reduced motion и скорость «Нет» — без пыли",
+    "fx_row": "FX-13"
    },
    "sfx": {
     "sound": "/Game/Audio/Board/SW_BRD_STEP_01.SW_BRD_STEP_01",
@@ -376,15 +372,16 @@
    "blocks_input": true,
    "skippable": true,
    "vfx": {
-    "system": null,
+    "system": "/Game/S08/FX/Board/NS_FX_AttackChevrons.NS_FX_AttackChevrons",
     "status": "missing",
-    "missing_reason": "ассет не создан: ART-010 (библиотека VFX) не выполнен, стиль VFX открыт (AD-OPEN-34)",
-    "attach": "socket",
-    "socket": "Weapon",
+    "missing_reason": "ассет не создан: FX-16",
+    "attach": "world",
+    "socket": null,
     "sim": "cpu",
     "deterministic": true,
     "prewarm": true,
-    "note": "вспышка направления; рамка цели — маркер SM_Marker_TargetRing; клипа нет — LungeAttack перенесён во вступление CUE-011 (F-03)"
+    "note": "три шеврона; дуги цели board.target (FX-15); клипа нет — LungeAttack во вступлении CUE-011 (F-03)",
+    "fx_row": "FX-16"
    },
    "sfx": {
     "sound": "/Game/Audio/Combat/SW_CMB_ATTACK_DECLARE_01.SW_CMB_ATTACK_DECLARE_01",
@@ -433,17 +430,7 @@
    "feedback_delay_ms": 150,
    "blocks_input": false,
    "skippable": true,
-   "vfx": {
-    "system": null,
-    "status": "missing",
-    "missing_reason": "ассет не создан: ART-010 (библиотека VFX) не выполнен, стиль VFX открыт (AD-OPEN-34)",
-    "attach": "socket",
-    "socket": "Head",
-    "sim": "cpu",
-    "deterministic": true,
-    "prewarm": true,
-    "note": "мерцание щита"
-   },
+   "vfx": null,
    "sfx": {
     "sound": "/Game/Audio/Combat/SW_CMB_DEFENSE_PLAYED_01.SW_CMB_DEFENSE_PLAYED_01",
     "bank": "CMB-DEFENSE-PLAYED",
@@ -458,13 +445,12 @@
    },
    "clip": null,
    "material": {
-    "cpd_param": "FxFlash",
+    "cpd_param": "Rim",
     "cpd_indices": [
-     5,
-     6,
-     7,
-     8
-    ]
+     9,
+     10
+    ],
+    "note": "кремовый импульс обода fx.rim 300 мс внутри показа 500 мс (ВР-23, FX-17)"
    },
    "ui": null,
    "marker": null,
@@ -541,15 +527,16 @@
    "blocks_input": true,
    "skippable": true,
    "vfx": {
-    "system": null,
+    "system": "/Game/S08/FX/Combat/NS_FX_HitStar.NS_FX_HitStar",
     "status": "missing",
-    "missing_reason": "ассет не создан: ART-010 (библиотека VFX) не выполнен, стиль VFX открыт (AD-OPEN-34)",
-    "attach": "socket",
-    "socket": "Head",
+    "missing_reason": "ассет не создан: FX-21",
+    "attach": "world",
+    "socket": null,
     "sim": "cpu",
     "deterministic": true,
     "prewarm": true,
-    "note": "всплеск удара в кадре контакта выпада; цифра «−N» — экранный виджет (контакт +60 мс)"
+    "note": "звезда-всплеск fx.impact у точки контакта (FX-21): центр капсулы цели на 0,6 высоты фигуры, на 0,4 радиуса к атакующему; C+70…C+340; красная заливка — только -S08HitTintLegacy",
+    "fx_row": "FX-21"
    },
    "sfx": {
     "sound": "/Game/Audio/Combat/SW_CMB_HIT_BLADE_01.SW_CMB_HIT_BLADE_01",
@@ -581,7 +568,8 @@
      6,
      7,
      8
-    ]
+    ],
+    "note": "белая вспышка FxFlash 70 мс, затем кремовый обод Rim 9–10 300 мс (ВР-20, FX-19)"
    },
    "ui": {
     "widget": "UI-HUD-BOARD",
@@ -615,15 +603,16 @@
    "blocks_input": false,
    "skippable": true,
    "vfx": {
-    "system": null,
+    "system": "/Game/S08/FX/Combat/NS_FX_HealMotes.NS_FX_HealMotes",
     "status": "missing",
-    "missing_reason": "ассет не создан: ART-010 (библиотека VFX) не выполнен, стиль VFX открыт (AD-OPEN-34)",
+    "missing_reason": "ассет не создан: FX-24",
     "attach": "socket",
-    "socket": "Head",
+    "socket": "Base",
     "sim": "cpu",
     "deterministic": true,
     "prewarm": true,
-    "note": "зелёные частицы"
+    "note": "3–5 точек fx.heal поднимаются от подставки, 600 мс; «+N» — экранный виджет (ВР-21, ВР-67)",
+    "fx_row": "FX-24"
    },
    "sfx": {
     "sound": "/Game/Audio/Combat/SW_CMB_HEAL_01.SW_CMB_HEAL_01",
@@ -671,15 +660,16 @@
    "blocks_input": true,
    "skippable": true,
    "vfx": {
-    "system": null,
+    "system": "/Game/S08/FX/Combat/NS_FX_AshEmbers.NS_FX_AshEmbers",
     "status": "missing",
-    "missing_reason": "ассет не создан: ART-010 (библиотека VFX) не выполнен, стиль VFX открыт (AD-OPEN-34)",
+    "missing_reason": "ассет не создан: FX-26",
     "attach": "world",
     "socket": null,
     "sim": "cpu",
     "deterministic": true,
     "prewarm": true,
-    "note": "«пепел» цвета команды С-11 при растворении (кандидат DE-011; до арт-приёмки — простой fade материала)"
+    "note": "пепел по умолчанию, откат -S08DissolveFade: угольки цвета команды ≤ 40, 600 мс от старта растворения (ВР-13)",
+    "fx_row": "FX-26"
    },
    "sfx": {
     "sound": "/Game/Audio/Death/SW_DTH_TEMPLATE_01.SW_DTH_TEMPLATE_01",
@@ -741,13 +731,14 @@
    "vfx": {
     "system": null,
     "status": "missing",
-    "missing_reason": "ассет не создан: ART-010 (библиотека VFX) не выполнен, стиль VFX открыт (AD-OPEN-34)",
+    "missing_reason": "ассет не создан: FX-32 (NS_FX_ArthurArc), FX-30 (NS_FX_MedusaVortex); поле героя — FX-28",
     "attach": "socket",
     "socket": "Weapon",
     "sim": "cpu",
     "deterministic": true,
     "prewarm": true,
-    "note": "Arthur — сокет Weapon (weapon_R); Medusa — луч от сокета Head: сокет задаёт строка героя в DataAsset"
+    "note": "сокет и система — поле героя (FX-28): KingArthur Weapon NS_FX_ArthurArc, Medusa Root NS_FX_MedusaVortex, луча нет (ВР-22); строка задаёт сокет по умолчанию Weapon",
+    "fx_row": "FX-28"
    },
    "sfx": {
     "sound": "/Game/Audio/FX/SW_FX_ARTHUR_BOOST_01.SW_FX_ARTHUR_BOOST_01",
@@ -855,7 +846,24 @@
    "ui": null,
    "marker": null,
    "postprocess": {
-    "profile_delta": "CUE-016 victory|defeat (light-profile)"
+    "profile_delta": {
+     "victory": {
+      "white_temp": 5900,
+      "vignette_add": 0.25
+     },
+     "defeat": {
+      "white_temp": 7300,
+      "saturation_mul": 0.8,
+      "vignette_add": 0.25
+     }
+    },
+    "base": {
+     "white_temp": 6500,
+     "vignette": 0.4
+    },
+    "blend_ms": 500,
+    "note": "S08CuePostProcess (FX-34, ВР-24, ВР-FX08): UPostProcessComponent без границ, приоритет выше профиля доски; виньетка = базовая + 0,25; старт от `CUE death stage=gone` героя или `RESULT screen`; грейд держится до выхода из партии; откат -S08FxLegacy",
+    "fx_row": "FX-34"
    },
    "on_new_event": "none",
    "replace_scope": "cue",
@@ -902,7 +910,9 @@
    },
    "marker": null,
    "postprocess": {
-    "desaturation": 0.3
+    "desaturation": 0.3,
+    "note": "насыщенность сцены × 0,7 за 1 кадр, держится до CUE-018 (FX-35, ВР-FX09); возврат за 300 мс внутри показа CUE-018 (FX-36); с грейдом CUE-016 — × 0,8 × 0,7",
+    "fx_row": "FX-35"
    },
    "on_new_event": "none",
    "replace_scope": "subject",
