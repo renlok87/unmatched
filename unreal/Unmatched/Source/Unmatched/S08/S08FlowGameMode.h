@@ -937,6 +937,9 @@ private:
   // banner (S09/S09TurnHud.h, S08/S08TurnPortraitWidget.h, S08FlowGameModeTurnHud.cpp) ----
   /** Builds the two portraits (bottom-left column: the opponent above, mine below) and the banner; art look only. */
   void BuildTurnHudWidgets(const TSharedRef<SConstraintCanvas>& Canvas);
+  /** VS-3 (VS-2 review): the UMG root failed without -S08SlateHud - the Slate portrait column after all (UmSlatePortraits.h). */
+  void BuildTurnPortraitFallback(const TCHAR* Reason);
+  TWeakPtr<SConstraintCanvas> TurnHudCanvas;
   /** An applied snapshot: the turn cue (ring, banner), the tracker's server marks and turn reset. */
   void FeedTurnHud(const FS08Snapshot& Snapshot);
   /** Every frame: names / HP / heart events from the HUD fighters, the tracker marks (local choice), the opponent

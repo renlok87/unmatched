@@ -148,6 +148,7 @@ void AS08FlowGameMode::BuildUmHud() {
   UmHudRoot = UUmHudRoot::Create(World, &R.Source);
   if (!UmHudRoot) {
     ArtHud.PendingTrace.Add(TEXT("HUD-ROOT impl=umg created=0 reason=create-failed"));
+    BuildTurnPortraitFallback(TEXT("umg-root-failed"));  // VS-3 (VS-2 review): the portraits never vanish
     return;
   }
   // 04 §1: the HUD layer (the Slate HUD canvas is in the same layer until its blocks move in)
