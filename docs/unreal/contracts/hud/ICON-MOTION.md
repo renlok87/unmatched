@@ -152,6 +152,20 @@
 | `ui-close` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
 | `ui-step` | appear | enter | 180 | — | all.opacity; all.scale — «кладут на стол»: 0,80 → 1,04 → 1,00; кадр 0 не пустой (opacity 0,15); глиф «▲» (IC-56; «▼» — RenderTransform 180° в UMG): состояния даёт UUmButton | all.opacity 100 мс |
 | `ui-step` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
+| `action-end-turn` | appear | enter | 180 | — | all.opacity; all.scale — диск «Конец хода» (IC-46, ВР-IC09): как action-attack, без spend / restore — «пас» не бывает (SD-44) | all.opacity 100 мс |
+| `action-end-turn` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
+| `action-end-turn` | hover_in | event (hold) | 150 | — | all.scale — наведение: 1,06 | статично |
+| `action-end-turn` | hover_out | event (hold) | 150 | — | all.scale — уход курсора: 1,00 | статично |
+| `action-end-turn` | press | event (hold) | 80 | — | all.scale — нажатие: 0,96 | статично |
+| `action-end-turn` | release | event (hold) | 80 | — | all.scale — отпускание: обратно к 1,06 | статично |
+| `action-end-turn` | select | event | 200 | 70 | glyph.scale — действие выбрано: импульс глифа от текущего масштаба и обратно | статично |
+| `action-end-turn` | tap | event | 150 | 50 | all.scale — смена числа на значке (цифру рисует игра): от текущего масштаба к 0,94 и обратно к нему же | статично |
+| `card-drop` | appear | enter | 180 | — | all.opacity; all.scale — карта отмечена к сбросу по лимиту руки (IC-48, 02 §6.3): «кладут на стол»; leave — отметка снята | all.opacity 100 мс |
+| `card-drop` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
+| `marker-slot-discard` | appear | enter | 220 | — | all.opacity; all.scale_y — лента слота «сброс» (IC-52): появляется с картой, держится, пока карта в слоте | all.opacity 100 мс |
+| `marker-slot-discard` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
+| `ui-log` | appear | enter | 180 | — | all.opacity; all.scale — «кладут на стол»: 0,80 → 1,04 → 1,00; кадр 0 не пустой (opacity 0,15); глиф кнопки «Журнал» (IC-55, класс S): своего движения нет, состояния даёт UUmButton | all.opacity 100 мс |
+| `ui-log` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
 
 Варианты того же id играют анимации основного значка: `resource-hp-full-enemy` → `resource-hp-full`, `marker-status-p1` → `marker-status`, `marker-status-p2` → `marker-status`, `badge-order-p2` → `badge-order`.
 

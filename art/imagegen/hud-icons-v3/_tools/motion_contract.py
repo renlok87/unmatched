@@ -500,6 +500,24 @@ ACCEPTED_VR44_ICONS: dict = {
     "ui-menu": static_icon("ui-menu", "глиф кнопки меню (IC-53): состояния даёт UUmButton"),
     "ui-close": static_icon("ui-close", "глиф «×» закрыть (IC-54): состояния даёт UUmButton"),
     "ui-step": static_icon("ui-step", "глиф «▲» (IC-56; «▼» — RenderTransform 180° в UMG): состояния даёт UUmButton"),
+    # VS-2 A3 (IC-46, IC-48, IC-52, IC-55; формы Codex IC-36 вектор A, приняты по делегированию 2026-10-06)
+    "action-end-turn": {
+        "canvas_u": [32, 32], "layers": [layer("body", "action-end-turn_body"), layer("glyph", "action-end-turn_glyph")],
+        "anims": dict({"appear": dict(APPEAR, note="диск «Конец хода» (IC-46, ВР-IC09): как action-attack, без spend / restore — «пас» не бывает (SD-44)"),
+                       "leave": LEAVE}, **{k: v for k, v in ACTION_EVENTS.items() if k not in ("spend", "restore")}),
+        "demo": [["appear"], ["wait", 300], ["hover_in"], ["wait", 250], ["press"], ["wait", 120], ["release"],
+                 ["select"], ["wait", 300], ["hover_out"], ["wait", 300], ["leave"]]},
+    "card-drop": {
+        "canvas_u": [32, 32], "layers": [layer("body", "card-drop_body"), layer("glyph", "card-drop_glyph")],
+        "anims": {"appear": dict(APPEAR, note="карта отмечена к сбросу по лимиту руки (IC-48, 02 §6.3): «кладут на стол»; leave — отметка снята"),
+                  "leave": LEAVE},
+        "demo": [["appear"], ["wait", 800], ["leave"]]},
+    "marker-slot-discard": {
+        "canvas_u": [32, 32], "layers": [layer("icon", "marker-slot-discard")],
+        "anims": {"appear": dict(RIBBON_APPEAR, note="лента слота «сброс» (IC-52): появляется с картой, держится, пока карта в слоте"),
+                  "leave": LEAVE},
+        "demo": [["appear"], ["wait", 900], ["leave"]]},
+    "ui-log": static_icon("ui-log", "глиф кнопки «Журнал» (IC-55, класс S): своего движения нет, состояния даёт UUmButton"),
 }
 ICONS.update(ACCEPTED_VR44_ICONS)
 ACCEPTED_VR44 = list(ACCEPTED_VR44_ICONS)
@@ -529,7 +547,8 @@ def contract():
         # 2026-10-05: арт-приёмка DE-012 — четыре записи в `accepted_de012`, сердце павшего на слое fallen_heart
         # 2026-10-06: IC-33 — `ue_sizes` у каждой записи (экспорты 18 / 36 под DPI и масштаб UI), список `accepted_vr44`
         # 2026-10-06 (VS-2 A2): 13 записей `accepted_vr44` (IC-38…IC-56), вариант badge-order-p2, бейджи L6 с 16 / 21
-        "revision": "icon-motion-2026-10-06-vr44",
+        # 2026-10-06 (VS-2 A3): ещё 4 записи — action-end-turn, card-drop, marker-slot-discard, ui-log (формы Codex IC-36)
+        "revision": "icon-motion-2026-10-06-vr44-a3",
         "status": "предложено",
         "source": "docs/unreal/contracts/hud/ICON-MOTION-PLAN.md; art/imagegen/hud-icons-v3/STYLE-v3.md §7; генератор art/imagegen/hud-icons-v3/_tools/motion_contract.py",
         "units": {"t": "ms", "canvas": "u (32 u = сторона значка; плашки 64 × 32)", "tx/ty": "u", "rotate": "градусы по часовой",
@@ -549,7 +568,7 @@ def contract():
         "candidates": CANDIDATES,
         "candidates_note": "кандидаты DE-012 до арт-приёмки пользователя (кольцо цвета команды — AB-5 выбрал тёплое): только галерея -S08IconGallery, HUD их не использует",
         "accepted_vr44": ACCEPTED_VR44,
-        "accepted_vr44_note": "IC-33 (ВР-IC14): принятые после ревью строки значки набора VR44 (02 §5.5); кандидаты VR44 в контракт не входят; VS-2 A2 (2026-10-06): IC-38…IC-56 приняты по делегированию (листы docs/game-design/evidence/VISUAL/IC-NN/), курсоры IC-58…IC-61 — вне контракта (HB-12)",
+        "accepted_vr44_note": "IC-33 (ВР-IC14): принятые после ревью строки значки набора VR44 (02 §5.5); кандидаты VR44 в контракт не входят; VS-2 A2 (2026-10-06): IC-38…IC-56 приняты по делегированию (листы docs/game-design/evidence/VISUAL/IC-NN/), курсоры IC-58…IC-61 — вне контракта (HB-12); VS-2 A3 (2026-10-06): IC-46, IC-48, IC-52, IC-55 — формы Codex IC-36 (вектор A), по делегированию",
         "ue_sizes_note": "IC-33 (02 §3.2 ВР-62, §5.3): экранные размеры текстур записи в UE (T_IV3_<id>_<px>, без mip); 18 и 36 — значок 24 su при DPI 0,75 и при 150 %; варианты берут набор основного значка",
         "order": ORDER,
         "icons": {k: dict(ICONS[k], ue_sizes=list(UE_SIZES.get(k, UE_SIZES_DEFAULT))) for k in ORDER},

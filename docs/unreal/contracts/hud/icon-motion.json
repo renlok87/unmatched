@@ -1,6 +1,6 @@
 {
  "schema": "unmatched.icon-motion/1",
- "revision": "icon-motion-2026-10-06-vr44",
+ "revision": "icon-motion-2026-10-06-vr44-a3",
  "status": "предложено",
  "source": "docs/unreal/contracts/hud/ICON-MOTION-PLAN.md; art/imagegen/hud-icons-v3/STYLE-v3.md §7; генератор art/imagegen/hud-icons-v3/_tools/motion_contract.py",
  "units": {
@@ -67,9 +67,13 @@
   "marker-slot-boost",
   "ui-menu",
   "ui-close",
-  "ui-step"
+  "ui-step",
+  "action-end-turn",
+  "card-drop",
+  "marker-slot-discard",
+  "ui-log"
  ],
- "accepted_vr44_note": "IC-33 (ВР-IC14): принятые после ревью строки значки набора VR44 (02 §5.5); кандидаты VR44 в контракт не входят; VS-2 A2 (2026-10-06): IC-38…IC-56 приняты по делегированию (листы docs/game-design/evidence/VISUAL/IC-NN/), курсоры IC-58…IC-61 — вне контракта (HB-12)",
+ "accepted_vr44_note": "IC-33 (ВР-IC14): принятые после ревью строки значки набора VR44 (02 §5.5); кандидаты VR44 в контракт не входят; VS-2 A2 (2026-10-06): IC-38…IC-56 приняты по делегированию (листы docs/game-design/evidence/VISUAL/IC-NN/), курсоры IC-58…IC-61 — вне контракта (HB-12); VS-2 A3 (2026-10-06): IC-46, IC-48, IC-52, IC-55 — формы Codex IC-36 (вектор A), по делегированию",
  "ue_sizes_note": "IC-33 (02 §3.2 ВР-62, §5.3): экранные размеры текстур записи в UE (T_IV3_<id>_<px>, без mip); 18 и 36 — значок 24 su при DPI 0,75 и при 150 %; варианты берут набор основного значка",
  "order": [
   "state-boost",
@@ -112,7 +116,11 @@
   "marker-slot-boost",
   "ui-menu",
   "ui-close",
-  "ui-step"
+  "ui-step",
+  "action-end-turn",
+  "card-drop",
+  "marker-slot-discard",
+  "ui-log"
  ],
  "icons": {
   "state-boost": {
@@ -10115,6 +10123,876 @@
       ]
      },
      "note": "«кладут на стол»: 0,80 → 1,04 → 1,00; кадр 0 не пустой (opacity 0,15); глиф «▲» (IC-56; «▼» — RenderTransform 180° в UMG): состояния даёт UUmButton"
+    },
+    "leave": {
+     "kind": "exit",
+     "duration_ms": 120,
+     "beat_ms": null,
+     "tracks": [
+      {
+       "target": "all",
+       "prop": "opacity",
+       "keys": [
+        [
+         0,
+         null,
+         "ease_in_quad"
+        ],
+        [
+         120,
+         0.0,
+         "constant"
+        ]
+       ]
+      },
+      {
+       "target": "all",
+       "prop": "scale",
+       "keys": [
+        [
+         0,
+         null,
+         "ease_in_quad"
+        ],
+        [
+         120,
+         0.92,
+         "constant"
+        ]
+       ]
+      }
+     ],
+     "reduced": {
+      "duration_ms": 100,
+      "tracks": [
+       {
+        "target": "all",
+        "prop": "opacity",
+        "keys": [
+         [
+          0,
+          null,
+          "linear"
+         ],
+         [
+          100,
+          0.0,
+          "constant"
+         ]
+        ]
+       }
+      ]
+     },
+     "note": "opacity → 0, scale → 0,92"
+    }
+   },
+   "demo": [
+    [
+     "appear"
+    ],
+    [
+     "wait",
+     800
+    ],
+    [
+     "leave"
+    ]
+   ],
+   "ue_sizes": [
+    18,
+    24,
+    32,
+    36,
+    48,
+    64
+   ]
+  },
+  "action-end-turn": {
+   "canvas_u": [
+    32,
+    32
+   ],
+   "layers": [
+    {
+     "id": "body",
+     "src": "action-end-turn_body"
+    },
+    {
+     "id": "glyph",
+     "src": "action-end-turn_glyph"
+    }
+   ],
+   "anims": {
+    "appear": {
+     "kind": "enter",
+     "duration_ms": 180,
+     "beat_ms": null,
+     "tracks": [
+      {
+       "target": "all",
+       "prop": "scale",
+       "keys": [
+        [
+         0,
+         0.8,
+         "ease_out_cubic"
+        ],
+        [
+         72,
+         1.04,
+         "ease_in_out_cubic"
+        ],
+        [
+         180,
+         1.0,
+         "constant"
+        ]
+       ]
+      },
+      {
+       "target": "all",
+       "prop": "opacity",
+       "keys": [
+        [
+         0,
+         0.15,
+         "ease_out_quad"
+        ],
+        [
+         120,
+         1.0,
+         "constant"
+        ]
+       ]
+      }
+     ],
+     "reduced": {
+      "duration_ms": 100,
+      "tracks": [
+       {
+        "target": "all",
+        "prop": "opacity",
+        "keys": [
+         [
+          0,
+          0.0,
+          "linear"
+         ],
+         [
+          100,
+          1.0,
+          "constant"
+         ]
+        ]
+       }
+      ]
+     },
+     "note": "диск «Конец хода» (IC-46, ВР-IC09): как action-attack, без spend / restore — «пас» не бывает (SD-44)"
+    },
+    "leave": {
+     "kind": "exit",
+     "duration_ms": 120,
+     "beat_ms": null,
+     "tracks": [
+      {
+       "target": "all",
+       "prop": "opacity",
+       "keys": [
+        [
+         0,
+         null,
+         "ease_in_quad"
+        ],
+        [
+         120,
+         0.0,
+         "constant"
+        ]
+       ]
+      },
+      {
+       "target": "all",
+       "prop": "scale",
+       "keys": [
+        [
+         0,
+         null,
+         "ease_in_quad"
+        ],
+        [
+         120,
+         0.92,
+         "constant"
+        ]
+       ]
+      }
+     ],
+     "reduced": {
+      "duration_ms": 100,
+      "tracks": [
+       {
+        "target": "all",
+        "prop": "opacity",
+        "keys": [
+         [
+          0,
+          null,
+          "linear"
+         ],
+         [
+          100,
+          0.0,
+          "constant"
+         ]
+        ]
+       }
+      ]
+     },
+     "note": "opacity → 0, scale → 0,92"
+    },
+    "hover_in": {
+     "kind": "event",
+     "hold": true,
+     "duration_ms": 150,
+     "beat_ms": null,
+     "tracks": [
+      {
+       "target": "all",
+       "prop": "scale",
+       "keys": [
+        [
+         0,
+         null,
+         "ease_out_cubic"
+        ],
+        [
+         150,
+         1.06,
+         "constant"
+        ]
+       ]
+      }
+     ],
+     "reduced": {
+      "duration_ms": 0,
+      "tracks": []
+     },
+     "note": "наведение: 1,06"
+    },
+    "hover_out": {
+     "kind": "event",
+     "hold": true,
+     "duration_ms": 150,
+     "beat_ms": null,
+     "tracks": [
+      {
+       "target": "all",
+       "prop": "scale",
+       "keys": [
+        [
+         0,
+         null,
+         "ease_out_cubic"
+        ],
+        [
+         150,
+         1.0,
+         "constant"
+        ]
+       ]
+      }
+     ],
+     "reduced": {
+      "duration_ms": 0,
+      "tracks": []
+     },
+     "note": "уход курсора: 1,00"
+    },
+    "press": {
+     "kind": "event",
+     "hold": true,
+     "duration_ms": 80,
+     "beat_ms": null,
+     "tracks": [
+      {
+       "target": "all",
+       "prop": "scale",
+       "keys": [
+        [
+         0,
+         null,
+         "ease_out_cubic"
+        ],
+        [
+         80,
+         0.96,
+         "constant"
+        ]
+       ]
+      }
+     ],
+     "reduced": {
+      "duration_ms": 0,
+      "tracks": []
+     },
+     "note": "нажатие: 0,96"
+    },
+    "release": {
+     "kind": "event",
+     "hold": true,
+     "duration_ms": 80,
+     "beat_ms": null,
+     "tracks": [
+      {
+       "target": "all",
+       "prop": "scale",
+       "keys": [
+        [
+         0,
+         null,
+         "ease_out_cubic"
+        ],
+        [
+         80,
+         1.06,
+         "constant"
+        ]
+       ]
+      }
+     ],
+     "reduced": {
+      "duration_ms": 0,
+      "tracks": []
+     },
+     "note": "отпускание: обратно к 1,06"
+    },
+    "select": {
+     "kind": "event",
+     "duration_ms": 200,
+     "beat_ms": 70,
+     "tracks": [
+      {
+       "target": "glyph",
+       "prop": "scale",
+       "keys": [
+        [
+         0,
+         null,
+         "ease_out_quad"
+        ],
+        [
+         70,
+         1.12,
+         "ease_out_cubic"
+        ],
+        [
+         200,
+         null,
+         "constant"
+        ]
+       ]
+      }
+     ],
+     "reduced": {
+      "duration_ms": 0,
+      "tracks": []
+     },
+     "note": "действие выбрано: импульс глифа от текущего масштаба и обратно"
+    },
+    "tap": {
+     "kind": "event",
+     "duration_ms": 150,
+     "beat_ms": 50,
+     "tracks": [
+      {
+       "target": "all",
+       "prop": "scale",
+       "keys": [
+        [
+         0,
+         null,
+         "ease_out_quad"
+        ],
+        [
+         50,
+         0.94,
+         "ease_out_cubic"
+        ],
+        [
+         150,
+         null,
+         "constant"
+        ]
+       ]
+      }
+     ],
+     "reduced": {
+      "duration_ms": 0,
+      "tracks": []
+     },
+     "note": "смена числа на значке (цифру рисует игра): от текущего масштаба к 0,94 и обратно к нему же"
+    }
+   },
+   "demo": [
+    [
+     "appear"
+    ],
+    [
+     "wait",
+     300
+    ],
+    [
+     "hover_in"
+    ],
+    [
+     "wait",
+     250
+    ],
+    [
+     "press"
+    ],
+    [
+     "wait",
+     120
+    ],
+    [
+     "release"
+    ],
+    [
+     "select"
+    ],
+    [
+     "wait",
+     300
+    ],
+    [
+     "hover_out"
+    ],
+    [
+     "wait",
+     300
+    ],
+    [
+     "leave"
+    ]
+   ],
+   "ue_sizes": [
+    18,
+    24,
+    32,
+    36,
+    48,
+    64
+   ]
+  },
+  "card-drop": {
+   "canvas_u": [
+    32,
+    32
+   ],
+   "layers": [
+    {
+     "id": "body",
+     "src": "card-drop_body"
+    },
+    {
+     "id": "glyph",
+     "src": "card-drop_glyph"
+    }
+   ],
+   "anims": {
+    "appear": {
+     "kind": "enter",
+     "duration_ms": 180,
+     "beat_ms": null,
+     "tracks": [
+      {
+       "target": "all",
+       "prop": "scale",
+       "keys": [
+        [
+         0,
+         0.8,
+         "ease_out_cubic"
+        ],
+        [
+         72,
+         1.04,
+         "ease_in_out_cubic"
+        ],
+        [
+         180,
+         1.0,
+         "constant"
+        ]
+       ]
+      },
+      {
+       "target": "all",
+       "prop": "opacity",
+       "keys": [
+        [
+         0,
+         0.15,
+         "ease_out_quad"
+        ],
+        [
+         120,
+         1.0,
+         "constant"
+        ]
+       ]
+      }
+     ],
+     "reduced": {
+      "duration_ms": 100,
+      "tracks": [
+       {
+        "target": "all",
+        "prop": "opacity",
+        "keys": [
+         [
+          0,
+          0.0,
+          "linear"
+         ],
+         [
+          100,
+          1.0,
+          "constant"
+         ]
+        ]
+       }
+      ]
+     },
+     "note": "карта отмечена к сбросу по лимиту руки (IC-48, 02 §6.3): «кладут на стол»; leave — отметка снята"
+    },
+    "leave": {
+     "kind": "exit",
+     "duration_ms": 120,
+     "beat_ms": null,
+     "tracks": [
+      {
+       "target": "all",
+       "prop": "opacity",
+       "keys": [
+        [
+         0,
+         null,
+         "ease_in_quad"
+        ],
+        [
+         120,
+         0.0,
+         "constant"
+        ]
+       ]
+      },
+      {
+       "target": "all",
+       "prop": "scale",
+       "keys": [
+        [
+         0,
+         null,
+         "ease_in_quad"
+        ],
+        [
+         120,
+         0.92,
+         "constant"
+        ]
+       ]
+      }
+     ],
+     "reduced": {
+      "duration_ms": 100,
+      "tracks": [
+       {
+        "target": "all",
+        "prop": "opacity",
+        "keys": [
+         [
+          0,
+          null,
+          "linear"
+         ],
+         [
+          100,
+          0.0,
+          "constant"
+         ]
+        ]
+       }
+      ]
+     },
+     "note": "opacity → 0, scale → 0,92"
+    }
+   },
+   "demo": [
+    [
+     "appear"
+    ],
+    [
+     "wait",
+     800
+    ],
+    [
+     "leave"
+    ]
+   ],
+   "ue_sizes": [
+    18,
+    24,
+    32,
+    36,
+    48,
+    64
+   ]
+  },
+  "marker-slot-discard": {
+   "canvas_u": [
+    32,
+    32
+   ],
+   "layers": [
+    {
+     "id": "icon",
+     "src": "marker-slot-discard"
+    }
+   ],
+   "anims": {
+    "appear": {
+     "kind": "enter",
+     "duration_ms": 220,
+     "beat_ms": null,
+     "tracks": [
+      {
+       "target": "all",
+       "prop": "scale_y",
+       "keys": [
+        [
+         0,
+         0.1,
+         "ease_out_cubic"
+        ],
+        [
+         220,
+         1.0,
+         "constant"
+        ]
+       ]
+      },
+      {
+       "target": "all",
+       "prop": "opacity",
+       "keys": [
+        [
+         0,
+         0.15,
+         "ease_out_quad"
+        ],
+        [
+         100,
+         1.0,
+         "constant"
+        ]
+       ]
+      }
+     ],
+     "pivot_u": {
+      "all": [
+       16,
+       1
+      ]
+     },
+     "reduced": {
+      "duration_ms": 100,
+      "tracks": [
+       {
+        "target": "all",
+        "prop": "opacity",
+        "keys": [
+         [
+          0,
+          0.0,
+          "linear"
+         ],
+         [
+          100,
+          1.0,
+          "constant"
+         ]
+        ]
+       }
+      ]
+     },
+     "note": "лента слота «сброс» (IC-52): появляется с картой, держится, пока карта в слоте"
+    },
+    "leave": {
+     "kind": "exit",
+     "duration_ms": 120,
+     "beat_ms": null,
+     "tracks": [
+      {
+       "target": "all",
+       "prop": "opacity",
+       "keys": [
+        [
+         0,
+         null,
+         "ease_in_quad"
+        ],
+        [
+         120,
+         0.0,
+         "constant"
+        ]
+       ]
+      },
+      {
+       "target": "all",
+       "prop": "scale",
+       "keys": [
+        [
+         0,
+         null,
+         "ease_in_quad"
+        ],
+        [
+         120,
+         0.92,
+         "constant"
+        ]
+       ]
+      }
+     ],
+     "reduced": {
+      "duration_ms": 100,
+      "tracks": [
+       {
+        "target": "all",
+        "prop": "opacity",
+        "keys": [
+         [
+          0,
+          null,
+          "linear"
+         ],
+         [
+          100,
+          0.0,
+          "constant"
+         ]
+        ]
+       }
+      ]
+     },
+     "note": "opacity → 0, scale → 0,92"
+    }
+   },
+   "demo": [
+    [
+     "appear"
+    ],
+    [
+     "wait",
+     900
+    ],
+    [
+     "leave"
+    ]
+   ],
+   "ue_sizes": [
+    18,
+    24,
+    32,
+    36,
+    48,
+    64
+   ]
+  },
+  "ui-log": {
+   "canvas_u": [
+    32,
+    32
+   ],
+   "layers": [
+    {
+     "id": "icon",
+     "src": "ui-log",
+     "pivot_u": [
+      16,
+      16
+     ]
+    }
+   ],
+   "anims": {
+    "appear": {
+     "kind": "enter",
+     "duration_ms": 180,
+     "beat_ms": null,
+     "tracks": [
+      {
+       "target": "all",
+       "prop": "scale",
+       "keys": [
+        [
+         0,
+         0.8,
+         "ease_out_cubic"
+        ],
+        [
+         72,
+         1.04,
+         "ease_in_out_cubic"
+        ],
+        [
+         180,
+         1.0,
+         "constant"
+        ]
+       ]
+      },
+      {
+       "target": "all",
+       "prop": "opacity",
+       "keys": [
+        [
+         0,
+         0.15,
+         "ease_out_quad"
+        ],
+        [
+         120,
+         1.0,
+         "constant"
+        ]
+       ]
+      }
+     ],
+     "reduced": {
+      "duration_ms": 100,
+      "tracks": [
+       {
+        "target": "all",
+        "prop": "opacity",
+        "keys": [
+         [
+          0,
+          0.0,
+          "linear"
+         ],
+         [
+          100,
+          1.0,
+          "constant"
+         ]
+        ]
+       }
+      ]
+     },
+     "note": "«кладут на стол»: 0,80 → 1,04 → 1,00; кадр 0 не пустой (opacity 0,15); глиф кнопки «Журнал» (IC-55, класс S): своего движения нет, состояния даёт UUmButton"
     },
     "leave": {
      "kind": "exit",

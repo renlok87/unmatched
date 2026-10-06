@@ -50,7 +50,8 @@ L6_BADGES = ("state-boost", "state-enemy", "state-hint", "state-threat", "marker
              "marker-status-p2", "badge-order", "badge-order-p2", "badge-refuse", "badge-conflict")
 # VS-2 A2: свои размеры листа приёмки — чипы команд ещё 9 и 12 (EXTRA_SIZES, ВР-78), курсоры — 24 / 32 / 48 / 64
 ACCEPT_OWN = {"team-chip-p1": (9, 12, 18, 24, 32, 48), "team-chip-p2": (9, 12, 18, 24, 32, 48),
-              "cursor-default": (24, 32, 48, 64), "cursor-unavailable": (24, 32, 48, 64), "cursor-busy": (24, 32, 48, 64)}
+              "cursor-default": (24, 32, 48, 64), "cursor-unavailable": (24, 32, 48, 64), "cursor-busy": (24, 32, 48, 64),
+              "cursor-pointer": (24, 32, 48, 64)}
 
 # ------------------------------------------------------------------------------------------------ палитра по ролям
 TOKENS = {
@@ -1456,14 +1457,19 @@ def draw_state_warning(ctx, sp: Spec):
 
 
 def draw_marker_slot(ctx, sp: Spec, kind="scheme"):
-    """Лента слота карты-источника (IC-50 / IC-51, ВР-IC12): геометрия marker-status (20,6 × 30 u, вырез 0,28 w) без
-    блока команды; scheme — тело card.type.scheme, молния action-scheme ×0,8 card.navy; boost — тело navy, белое
-    кольцо card.glyph r 3,5…5,25 u (язык диска BOOST). Центр глифа — центр поля (кромка…апекс) −0,3 u."""
+    """Лента слота карты-источника (IC-50 / IC-51 / IC-52, ВР-IC12): геометрия marker-status (20,6 × 30 u, вырез
+    0,28 w) без блока команды; scheme — тело card.type.scheme, молния action-scheme ×0,8 card.navy; boost — тело navy,
+    белое кольцо card.glyph r 3,5…5,25 u (язык диска BOOST); discard — тело text.secondary, глиф card-drop ×0,8
+    card.navy. Центр глифа — центр поля (кромка…апекс) −0,3 u."""
     w = 20.6
-    token(ctx, ribbon_sil_px(sp, w), sp, body=C["scheme"] if kind == "scheme" else C["body"])
+    body = {"scheme": C["scheme"], "discard": C["dim"]}.get(kind, C["body"])
+    token(ctx, ribbon_sil_px(sp, w), sp, body=body)
     cy = ((sp.M + sp.KE) + (U - sp.M - 0.28 * w)) / 2 - 0.3
     if kind == "scheme":
         glyph(ctx, sp, U / 2, cy, lambda: g_bolt(ctx, sp, s=0.8), col=C["body"])
+        return
+    if kind == "discard":
+        glyph(ctx, sp, U / 2, cy, lambda: g_card_drop_slot(ctx, sp, C["body"]), col=C["body"])
         return
 
     def ring():
@@ -1610,6 +1616,8 @@ def cursor_hotspot(name, size):
     (keyline снаружи, лимит miter 2), сдвинутая внутрь до первого пикселя с α ≥ 128; у «занято» — центр холста."""
     if name == "cursor-busy":
         return [size // 2, size // 2]
+    if name == "cursor-pointer":
+        return pointer_hotspot(size)
     sp = Spec(size)
     k2 = sp.pxu(CURSOR_KEYLINE)
     (tx, ty), (_, by), (sx_, sy_) = CURSOR_ARROW[0], CURSOR_ARROW[1], CURSOR_ARROW[-1]
@@ -1626,6 +1634,133 @@ def cursor_hotspot(name, size):
         if 0 <= x < size and 0 <= y < size and im[y, x] >= 128:
             return [x, y]
     raise RuntimeError(f"{name}-{size}: hotspot not found")
+
+
+# ------------------------------------------------------------------------------------------------ VR44, VS-2 шаг A3
+# Строки IC-46, IC-48, IC-55, IC-59 — формы Codex IC-36, вектор A (art/imagegen/hud-icons-vr44-codex/README.md, принят
+# по делегированию: end-turn и card-drop — ревью VS-1, log и pointer — доработка fix1, ВР-VS2-01, ВР-VS2-02). Числа
+# перенесены один в один из _tools/draw_candidates.py пакета; альфа экспорта совпадает побайтно с vector/<px>/<name>.png
+# (pytest test_vr44_forms_match_codex_proposal). Этап «точной палитры» Codex не переносится (ВР-VS2-23): внутренние
+# AA-стыки — как у остальных значков v3 (диск конца хода стоит в ряду ACTIONS рядом с action-*). IC-52 — лента слота
+# с глифом card-drop ×0,8.
+END_TURN_SHAFT = (-8.0, -1.25)          # древко x от … до (u, локально от центра (16; 16)); ширина W
+END_TURN_HEAD = ((-1.25, -3.5), (3.25, 0.0), (-1.25, 3.5))   # наконечник: основание 7 u, длина 4,5 u
+END_TURN_BAR = (4.75, -6.0, 2.25, 12.0)  # стоп-черта x, y, w, h (зазор острие–черта 1,5 u до снэпа)
+CARD_DROP_ARROW = (-9.5, -4.5, 3.5, -0.5)   # древко: верх, основание наконечника, полуширина основания, остриё (y)
+CARD_DROP_SLABS = (1.5, 15.0, 3.0, 3.5, 1.0)  # стопка: y первой плашки, ширина, высота, скос, зазор (две плашки)
+LOG_ROWS = (8.375, 2.75, 1.5, 11.0, 4.5)  # журнал: x маркера, сторона маркера, зазор, длина строки, шаг строк (u)
+POINTER_HAND = ((7, 2), (15, 2), (15, 11), (20, 11), (20, 13), (24, 13), (24, 15), (28, 15), (28, 27), (25, 30),
+                (11, 30), (8, 27), (8, 25), (5, 22), (3, 22), (3, 17), (7, 17))   # абсолютные u, радиусы 0 (fix1)
+POINTER_HOTSPOT_U = (11, 2)             # середина верхнего торца пальца (ВР-VS2-02)
+SLOT_DISCARD_SCALE = 0.8                # глиф card-drop в ленте слота (IC-52, ВР-IC12)
+
+
+def _cx_poly(ctx, sp: Spec, pts, col=None):
+    """Многоугольник глифа: вершины снэпнуты к пикселям в абсолютных u (sp.sx / sp.sy), как polygon() пакета Codex."""
+    poly(ctx, [(sp.sx(x), sp.sy(y)) for x, y in pts])
+    fill(ctx, col or C["glyph"])
+
+
+def g_end_turn(ctx, sp: Spec, col=None):
+    """«→|» конца хода (IC-46, вектор A IC-36): древко и наконечник — один замкнутый полигон (без шва), стоп-черта
+    2,25 × 12 u; бокс 15 × 12 u."""
+    top = sp.sy(-sp.W / 2)
+    bot = top + sp.W
+    (x0, x1), ((hx0, hy0), (tx, ty), (_, hy1)) = END_TURN_SHAFT, END_TURN_HEAD
+    _cx_poly(ctx, sp, [(x0, top), (x1, top), (hx0, hy0), (tx, ty), (hx0, hy1), (x1, bot), (x0, bot)], col)
+    bx, by, bw, bh = END_TURN_BAR
+    ctx.rectangle(sp.sx(bx), sp.sy(by), sp.pxu(bw), sp.pxu(bh))
+    fill(ctx, col or C["glyph"])
+
+
+def draw_action_end_turn(ctx, sp: Spec, layer=None):
+    """Диск «Конец хода» (IC-46, ВР-IC09): семейство shape.action_disc — keyline, кремовое кольцо, тело navy (не жёлтое
+    и не красное: жёлтое — тело главной кнопки); глиф «→|» card.glyph. Слои body / glyph для UMG и движения."""
+    _action(ctx, sp, lambda c, s: g_end_turn(c, s), C["body"], layer=layer)
+
+
+def g_card_drop(ctx, sp: Spec, col=None):
+    """«В сброс» (IC-48, вектор A IC-36): стрелка вниз (древко W, наконечник 7 × 4 u) над стопкой из двух скошенных
+    плашек 15 × 3 u (скос 3,5 u, зазор 1 px, язык resource-card); без лотка и коробки; detail 0 — плашки по 1 px."""
+    top, base, hw, tip = CARD_DROP_ARROW
+    left = sp.sx(-sp.W / 2)
+    right = left + sp.W
+    _cx_poly(ctx, sp, [(left, top), (right, top), (right, base), (hw, base), (0, tip), (-hw, base), (left, base)], col)
+    y0, w, h_u, skew, gap_u = CARD_DROP_SLABS
+    h = sp.pxu(h_u) if sp.detail else 1 / sp.k
+    gap = sp.pxu(gap_u)
+    y = sp.sy(y0)
+    for i in range(2):
+        yi = y + i * (h + gap)
+        _cx_poly(ctx, sp, [(-w / 2 + skew, yi), (w / 2, yi), (w / 2 - skew, yi + h), (-w / 2, yi + h)], col)
+
+
+def draw_card_drop(ctx, sp: Spec, layer=None):
+    """Карта уйдёт в сброс (IC-48, ВР-IC13): плашка shape.state_badge (тело navy) — слой body, глиф card-drop — слой
+    glyph."""
+    _state(ctx, sp, g_card_drop, layer=layer)
+
+
+def _log_rects(sp: Spec):
+    """Строки журнала в абсолютных u: целочисленный шаг рядов (fix1 Codex: независимый снэп слеплял маркеры при 21 px);
+    detail 0 — две строки с центрами px(13), px(19)."""
+    mx, msz, gap, lw, pitch = LOG_ROWS
+    xpx, bpx, gpx, c, p = sp.px(mx), sp.px(msz), sp.px(gap), sp.px(16), sp.px(pitch)
+    centers = [sp.px(13), sp.px(19)] if sp.detail == 0 else [c - p, c, c + p]
+    for cy in centers:
+        yield xpx / sp.k, (cy - bpx // 2) / sp.k, bpx / sp.k, bpx / sp.k
+        yield (xpx + bpx + gpx) / sp.k, (cy - sp.px(2.25) // 2) / sp.k, sp.pxu(lw), sp.W
+
+
+def draw_ui_log(ctx, sp: Spec):
+    """Глиф «Журнал» (IC-55, ВР-IC10 + ВР-VS2-01): диск-пипс как у конца хода (keyline r 14–15 u, крем r 12,75–14 u,
+    navy), белая печать — три строки 11 × 2,25 u с квадратными маркерами 2,75 u, без своего keyline (границу несёт диск).
+    Не «≡» (ui-menu) и не стопка (resource-card)."""
+    token(ctx, disc_sil(sp), sp)
+
+    def rows():
+        for x, y, w, h in _log_rects(sp):
+            ctx.rectangle(x - 16, y - 16, w, h)
+        fill(ctx, C["glyph"])
+
+    glyph(ctx, sp, 16, 16, rows)
+
+
+def draw_cursor_pointer(ctx, sp: Spec):
+    """Указатель (IC-59, ВР-IC11 + ВР-VS2-02): плоская рука, указательный палец вертикально вверх слева (торец 8 u),
+    три ступени согнутых пальцев справа, большой палец слева, плоское запястье; keyline mark.keyline 2 u — офсет внутрь
+    того же силуэта (тело card.glyph), радиусы 0, без кольца и тени. Горячая точка — середина торца (11; 2) u."""
+    pts = [(sp.snap(x), sp.snap(y)) for x, y in POINTER_HAND]
+    sil = Poly(pts, [0] * len(pts))
+    sil.path(ctx)
+    fill(ctx, C["keyline"])
+    sil.path(ctx, sp.pxu(CURSOR_KEYLINE))
+    fill(ctx, C["glyph"])
+
+
+def pointer_hotspot(size):
+    """Горячая точка указателя (как verification.json пакета IC-36): первый ряд торца пальца, где есть α = 255; x —
+    середина непрозрачного отрезка этого ряда floor((xmin + xmax + 1) / 2). 24 → (8, 2), 32 → (11, 2), 48 → (17, 3),
+    64 → (22, 4)."""
+    a = np.asarray(render("cursor-pointer", size))[..., 3]
+    for y in range(size):
+        xs = np.where(a[y] == 255)[0]
+        if len(xs):
+            return [int((xs.min() + xs.max() + 1) // 2), int(y)]
+    raise RuntimeError(f"cursor-pointer-{size}: hotspot not found")
+
+
+def g_card_drop_slot(ctx, sp: Spec, col):
+    """Глиф card-drop ×0,8 для ленты слота: своя сетка Spec(size × 0,8) (как глиф cursor-busy), чтобы толщины, зазор
+    стопки и горизонтальные кромки ложились на пиксели холста."""
+    s = SLOT_DISCARD_SCALE
+    g = Spec(sp.size * s)
+    g.detail = sp.detail
+    g.ox, g.oy = sp.ox / s, sp.oy / s
+    ctx.save()
+    ctx.scale(s, s)
+    g_card_drop(ctx, g, col=col)
+    ctx.restore()
 
 
 # id → (функция, kwargs, широкий?)
@@ -1698,6 +1833,12 @@ ACCEPTED_VR44: dict = {
     "cursor-default": (draw_cursor_default, {}, False),
     "cursor-unavailable": (draw_cursor_unavailable, {}, False),
     "cursor-busy": (draw_cursor_busy, {}, False),
+    # VS-2 A3: формы Codex IC-36 (вектор A) — IC-46, IC-48, IC-55, IC-59; IC-52 — лента слота «в сброс»
+    "action-end-turn": (draw_action_end_turn, {}, False),
+    "card-drop": (draw_card_drop, {}, False),
+    "ui-log": (draw_ui_log, {}, False),
+    "cursor-pointer": (draw_cursor_pointer, {}, False),
+    "marker-slot-discard": (draw_marker_slot, {"kind": "discard"}, False),
 }
 # варианты id набора VR44 (как marker-status-p2): та же геометрия, для листов, галереи и запасного вида без тона
 VARIANTS_VR44 = {
@@ -1734,6 +1875,9 @@ LAYERS = {
     "badge-refuse": ("body", "glyph"),
     "badge-ally": ("body", "glyph"),
     "badge-attack-from": ("body", "glyph"),
+    # VS-2 A3: диск конца хода и плашка «в сброс» — слои для UUmButton / UUmCardWidget и движения (select, appear)
+    "action-end-turn": ("body", "glyph"),
+    "card-drop": ("body", "glyph"),
 }
 # Флипбуки слоёв для движения (контракт icon-motion.json: src «<id>_<layer>#» → файлы <id>_<layer>_fNN):
 # песок часов state-sent — 12 кадров цикла 1500 мс (кадры 0–6 пересыпание за 550 мс, 7–11 после переворота).
@@ -2112,7 +2256,7 @@ def sheet_vr44(path):
     W = name_w + 2 * mcell + 30 + 2 * sizes_w + x4_w + 20
     H = 60 + len(items) * row_h
     sheet = Image.new("RGBA", (W, H), SHEET_BG)
-    paste(sheet, label(W, 40, "VR44 (VS-2 A2) — принято по делегированию 2026-10-06: мастер 1024 (×0,25) | 48 / 32 / 24 / 18 / 16 px цвет | серый | ×4 nearest 32 / 24 / 18 — на панели tag.background; цифры — образец runtime-текста", 17), 0, 8)
+    paste(sheet, label(W, 40, "VR44 (VS-2 A2, A3) — принято по делегированию 2026-10-06 (A3: формы Codex IC-36 и лента «сброс»): мастер 1024 (×0,25) | 48 / 32 / 24 / 18 / 16 px цвет | серый | ×4 nearest 32 / 24 / 18 — на панели tag.background; цифры — образец runtime-текста", 17), 0, 8)
     for r, (title, fn, wide) in enumerate(items):
         y = 60 + r * row_h
         paste(sheet, label(name_w, 44, title, 12), 0, y + 8)
@@ -2149,7 +2293,8 @@ def cursor_frames_and_hotspots(names, dirs):
     data = {"tool": "art/imagegen/hud-icons-v3/_tools/draw_icons.py", "origin": "top-left, px of each size",
             "ue_sizes": list(CURSOR_SIZES),
             "rule": "стрелки — середина среза острия внешней кромки (keyline 2 u, miter 2), первый пиксель α ≥ 128; "
-                    "cursor-busy — центр (16; 16) u", "cursors": {}}
+                    "cursor-busy — центр (16; 16) u; cursor-pointer — середина верхнего торца пальца (11; 2) u: первый "
+                    "ряд с α = 255, x = floor((xmin + xmax + 1) / 2) (IC-36 fix1, ВР-VS2-02)", "cursors": {}}
     if os.path.exists(path):
         with open(path, encoding="utf-8") as f:
             data["cursors"] = json.load(f).get("cursors", {})

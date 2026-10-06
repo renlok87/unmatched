@@ -87,13 +87,22 @@ bool FS08IconMotionLoadTest::RunTest(const FString& Parameters) {
   // (gallery only; contract `candidates`).
   // VS-2 A2 (2026-10-06): 13 VR44 records accepted by delegation (contract `accepted_vr44`, IC-38...IC-56; the cursors
   // IC-58...IC-61 are not in the motion contract - HB-12 imports them).
-  TestEqual(TEXT("41 icons in order"), Lib.Order.Num(), 41);
-  TestEqual(TEXT("41 icon definitions"), Lib.Icons.Num(), 41);
+  // VS-2 A3: 4 more VR44 records with the Codex IC-36 forms (IC-46 end turn, IC-48 card drop, IC-52 slot discard ribbon,
+  // IC-55 log glyph).
+  TestEqual(TEXT("45 icons in order"), Lib.Order.Num(), 45);
+  TestEqual(TEXT("45 icon definitions"), Lib.Icons.Num(), 45);
   for (const TCHAR* Vr44 : {TEXT("badge-order"), TEXT("badge-refuse"), TEXT("badge-conflict"), TEXT("badge-ally"),
                             TEXT("badge-attack-from"), TEXT("team-chip-p1"), TEXT("team-chip-p2"), TEXT("state-warning"),
                             TEXT("marker-slot-scheme"), TEXT("marker-slot-boost"), TEXT("ui-menu"), TEXT("ui-close"),
-                            TEXT("ui-step")}) {
+                            TEXT("ui-step"), TEXT("action-end-turn"), TEXT("card-drop"), TEXT("marker-slot-discard"),
+                            TEXT("ui-log")}) {
     TestNotNull(*FString::Printf(TEXT("VR44 %s defined"), Vr44), Lib.Find(Vr44));
+  }
+  if (const FS08IconMotionDef* EndTurn = Lib.Find(TEXT("action-end-turn"))) {
+    // IC-46: the action disc events without spend / restore (a turn has no "pass" action, SD-44).
+    TestNotNull(TEXT("end turn select"), EndTurn->FindAnim(TEXT("select")));
+    TestNull(TEXT("end turn has no spend"), EndTurn->FindAnim(TEXT("spend")));
+    TestEqual(TEXT("end turn layers"), EndTurn->Layers.Num(), 2);
   }
   if (const FS08IconMotionDef* Conflict = Lib.Find(TEXT("badge-conflict"))) {
     // ВР-IC05: the conflict badge shares the order badge's body and team block; only the "!" is its own layer.

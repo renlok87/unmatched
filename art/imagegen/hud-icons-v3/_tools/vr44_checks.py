@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Листы проверок набора VR44 (VS-2 A2, карточки IC-38…IC-61) — пункты acceptance сверх листа приёмки:
+"""Листы проверок набора VR44 (VS-2 A2, карточки IC-38…IC-61; шаг A3 — IC-46, IC-48, IC-52, IC-55, IC-59, флаг --a3) — пункты acceptance сверх листа приёмки:
 соседи в сером, цифры, зоны досок, ×8 чипов, «▼» = «▲» на 180°, курсоры на светлом и тёмном, кадры «занято».
 
     python art/imagegen/hud-icons-v3/_tools/vr44_checks.py [docs/game-design/evidence/VISUAL]
@@ -274,6 +274,220 @@ def checks_cursor(cid, name, out):
     return files, meas
 
 
+# VS-2 A3: формы Codex IC-36 (вектор A) и лента слота «сброс»
+CARDS_A3 = {"IC-46": "action-end-turn", "IC-48": "card-drop", "IC-52": "marker-slot-discard", "IC-55": "ui-log",
+            "IC-59": "cursor-pointer"}
+YELLOW = "#F2C14E"   # turn.flash.yellow — тело главной кнопки (02 §4.3)
+SCANS = os.path.join(REPO, "scraped-data", "derived", "ue-media-v1", "cards")   # вне git (CP-01)
+OFFGIT = os.path.join(REPO, "scraped-data", "derived", "visual-evidence")     # листы со сканами — вне git (ВР-CP12)
+
+
+def _lin(c):
+    c = np.asarray(c, dtype=np.float64) / 255.0
+    return np.where(c <= 0.04045, c / 12.92, ((c + 0.055) / 1.055) ** 2.4)
+
+
+def contrast(a, b):
+    """Отношение контраста WCAG двух sRGB-цветов (hex)."""
+    la, lb = [float(_lin(rgba(x)[:3]) @ np.array([0.2126, 0.7152, 0.0722])) for x in (a, b)]
+    hi, lo = max(la, lb), min(la, lb)
+    return round((hi + 0.05) / (lo + 0.05), 2)
+
+
+def scale_about(im, k, opacity=1.0):
+    """Состояние кнопки на листе: масштаб k вокруг центра (билинейно, как UMG RenderTransform) и прозрачность."""
+    w = max(1, round(im.width * k))
+    sc = im.resize((w, w), Image.BILINEAR)
+    if w <= im.width:
+        out = Image.new("RGBA", im.size, (0, 0, 0, 0))
+        out.alpha_composite(sc, ((im.width - w) // 2, (im.height - w) // 2))
+    else:
+        o = (w - im.width) // 2
+        out = sc.crop((o, o, o + im.width, o + im.height))
+    if opacity < 1.0:
+        a = np.asarray(out).copy()
+        a[..., 3] = (a[..., 3] * opacity).astype(np.uint8)
+        out = Image.fromarray(a, "RGBA")
+    return out
+
+
+def _padded(im, pad):
+    c = Image.new("RGBA", (im.width + 2 * pad, im.height + 2 * pad), (0, 0, 0, 0))
+    c.alpha_composite(im, (pad, pad))
+    return c
+
+
+def checks_end_turn(cid, name, out):
+    from PIL import ImageDraw
+    rows = []
+    for bg, bname in ((YELLOW, "тело главной кнопки turn.flash.yellow"), (NAVY, "panel.bg")):
+        ims = [cell(ex(name, s), bg, 4) for s in (24, 32, 36, 48)]
+        rows.append((f"{bname} {bg} · цвет", ims))
+        rows.append(("серый", [grey(i) for i in ims]))
+    files = [compose(f"{cid} {name}: диск на теле главной кнопки и на panel.bg, 24 / 32 / 36 / 48 px ×4",
+                     rows, os.path.join(out, "check-button.png"))]
+    srows = []
+    for s in (32, 48):
+        pad = max(4, s // 6)
+        base = D.render(name, s)
+        sel = D._over(D.render(name, s, layer="body"), scale_about(D.render(name, s, layer="glyph"), 1.12))
+        states = [("normal", _padded(base, pad)), ("hover 1,06", _padded(scale_about(base, 1.06), pad)),
+                  ("pressed 0,96", _padded(scale_about(base, 0.96), pad)),
+                  ("disabled 0,4", _padded(scale_about(base, 1.0, 0.4), pad)),
+                  ("selected: глиф 1,12 (пик импульса)", _padded(sel, pad))]
+        foc = _padded(base, pad)
+        ring = Image.new("RGBA", foc.size, (0, 0, 0, 0))
+        su = s / 48.0                       # диск 48 su
+        wr = max(1, round(2 * su))
+        r2 = s / 2 + 2 * su + wr / 2
+        c0 = pad + s / 2
+        ImageDraw.Draw(ring).ellipse((c0 - r2, c0 - r2, c0 + r2, c0 + r2), outline=rgba("#FAF8F2"), width=wr)
+        ring.alpha_composite(foc)
+        states.append(("focus: кольцо card.glyph 2 su, зазор 2 su", ring))
+        for bg in (YELLOW, NAVY):
+            ims = [D.xN(Image.alpha_composite(Image.new("RGBA", im.size, rgba(bg)), im), 3) for _, im in states]
+            srows.append((f"{s} px ×3 · {bg}", ims))
+            srows.append(("серый", [grey(i) for i in ims]))
+    files.append(compose(f"{cid}: строка состояний 02 §4.3 — normal | hover 1,06 | pressed 0,96 | disabled 0,4 | selected | focus",
+                         srows, os.path.join(out, "check-states.png")))
+    files.append(compose(f"{cid}: в сером рядом с state-boost и пипсами action-* (тела 94–200), 24 / 32 / 48 px ×4",
+                         neighbours([name, "state-boost", "action-attack", "action-defense", "action-maneuver",
+                                     "action-scheme"], (24, 32, 48), colour=False),
+                         os.path.join(out, "check-neighbours.png")))
+    meas = {"contrast": {"glyph_on_navy": contrast("#FAF8F2", NAVY), "navy_disc_on_yellow": contrast(NAVY, YELLOW),
+                         "keyline_on_yellow": contrast("#111317", YELLOW),
+                         "cream_ring_on_panel_bg": contrast("#F9EBDB", NAVY)},
+            "body_grey": {n: mean_grey(D.render(n, 32, layer="body")) for n in
+                          (name, "action-attack", "action-defense", "action-maneuver", "action-scheme")},
+            "state_boost_grey": mean_grey(D.render("state-boost", 32))}
+    return files, meas
+
+
+def _scan(hero, card, lang="en"):
+    p = os.path.join(SCANS, hero, f"{card}.{lang}.png")
+    return Image.open(p).convert("RGBA") if os.path.exists(p) else None
+
+
+def _on_card(scan, icon, card_px, pos):
+    """Скан карты, вписанный в card_px, со значком в точке pos (доли ширины / высоты, центр значка)."""
+    w, h = card_px
+    c = scan.resize((w, h), Image.LANCZOS)
+    x, y = round(pos[0] * w - icon.width / 2), round(pos[1] * h - icon.height / 2)
+    c.alpha_composite(icon, (max(0, min(w - icon.width, x)), max(0, min(h - icon.height, y))))
+    return c
+
+
+SCAN_CARDS = (("medusa", "gaze-of-stone"), ("medusa", "dash"), ("king-arthur", "excalibur"), ("king-arthur", "feint"))
+SCAN_POS = (("справа сверху", (0.88, 0.09)), ("справа снизу", (0.88, 0.92)), ("центр", (0.5, 0.5)))
+
+
+def scan_rows(name, sizes):
+    """Значок 24 su на скане карты руки 150 × 208 su (px/su = size / 24) в трёх точках; яркость скана под значком."""
+    rows, meas = [], {}
+    for hero, card in SCAN_CARDS:
+        scan = _scan(hero, card)
+        if scan is None:
+            continue
+        for s in sizes:
+            k = s / 24.0
+            card_px = (round(150 * k), round(208 * k))
+            small = np.asarray(scan.resize(card_px, Image.LANCZOS)).astype(np.float64)
+            ims = []
+            for pname, pos in SCAN_POS:
+                ims.append(D.xN(_on_card(scan, D.render(name, s), card_px, pos), 2))
+                cx, cy = round(pos[0] * card_px[0]), round(pos[1] * card_px[1])
+                r = s // 2 + 2
+                patch = small[max(0, cy - r):cy + r, max(0, cx - r):cx + r, :3]
+                meas.setdefault(f"{hero}:{card}", {})[f"{pname}@{s}"] = round(float(
+                    (patch @ np.array([0.2126, 0.7152, 0.0722])).mean()), 1)
+            rows.append((f"{hero} / {card} @ {s} px ×2 · " + " | ".join(p for p, _ in SCAN_POS), ims))
+            rows.append(("серый", [grey(i) for i in ims]))
+    return rows, meas
+
+
+def _offgit_rel(off, offfiles):
+    return [os.path.relpath(os.path.join(off, f), REPO).replace(os.sep, "/") for f in offfiles]
+
+
+def checks_card_drop(cid, name, out):
+    files = [compose(f"{cid} {name}: рядом с state-pending-place (тело 91, эллипс) и resource-card (стопка), 18 / 24 / 32 px ×4",
+                     neighbours([name, "state-pending-place", "resource-card"], (18, 24, 32)),
+                     os.path.join(out, "check-neighbours.png"))]
+    rows, scan_luma = scan_rows(name, (18, 24, 36))
+    off = os.path.join(OFFGIT, cid)
+    offfiles = [compose(f"{cid} {name}: на светлых и тёмных сканах руки Medusa и King Arthur (вне git), 18 / 24 / 36 px",
+                        rows, os.path.join(off, "check-scans.png"))] if rows else []
+    meas = {"body_grey": {n: mean_grey(D.render(n, 32, layer="body")) for n in (name, "state-pending-place")},
+            "scan_patch_luma": scan_luma, "keyline_vs_cream_edge": contrast("#111317", "#F9EBDB"),
+            "offgit_files": _offgit_rel(off, offfiles)}
+    return files, meas
+
+
+def checks_slot_a3(cid, name, out):
+    files = [compose(f"{cid}: три ленты слота рядом (схема, BOOST, сброс), цвет и серый, 18 / 24 / 32 / 48 px ×4",
+                     neighbours(["marker-slot-scheme", "marker-slot-boost", name], (18, 24, 32, 48)),
+                     os.path.join(out, "check-neighbours.png"))]
+    rows = []
+    for hero, card in SCAN_CARDS:
+        scan = _scan(hero, card)
+        if scan is None:
+            continue
+        for s in (24, 32):
+            k = s / 32.0                  # лента 32 su на рамке карты 150 × 208 su
+            card_px = (round(150 * k), round(208 * k))
+            ims = [D.xN(_on_card(scan, D.render(n, s), card_px, (0.86, 0.11)), 2)
+                   for n in ("marker-slot-scheme", "marker-slot-boost", name)]
+            rows.append((f"{hero} / {card} @ {s} px ×2 · справа сверху · схема | BOOST | сброс", ims))
+    off = os.path.join(OFFGIT, cid)
+    offfiles = [compose(f"{cid}: ленты слота справа сверху на рамке карты (вне git)", rows,
+                        os.path.join(off, "check-scans.png"))] if rows else []
+    meas = {"body_grey": {n: mean_grey(D.render(n, 32)) for n in ("marker-slot-scheme", "marker-slot-boost", name)},
+            "contrast": {"navy_glyph_on_text_secondary": contrast(NAVY, "#B9B2A6")},
+            "offgit_files": _offgit_rel(off, offfiles)}
+    return files, meas
+
+
+def checks_log(cid, name, out):
+    files = [compose(f"{cid}: ui-log рядом с ui-menu и resource-card при 18 и 24 px (×4), цвет и серый",
+                     neighbours([name, "ui-menu", "resource-card"], (18, 24)), os.path.join(out, "check-neighbours.png")),
+             compose(f"{cid}: ui-log рядом с action-end-turn и state-boost (общий диск), 24 / 32 / 48 px ×4, серый",
+                     neighbours([name, "action-end-turn", "state-boost"], (24, 32, 48), colour=False),
+                     os.path.join(out, "check-discs.png"))]
+    meas = {f"rows_{s}px": len(list(D._log_rects(D.Spec(s)))) // 2 for s in (16, 18, 21, 24, 32, 48)}
+    return files, meas
+
+
+def checks_pointer(cid, name, out):
+    files, meas = checks_cursor(cid, name, out)
+    files.append(compose(f"{cid}: указатель рядом с cursor-default и cursor-unavailable, серый, 24 / 32 / 48 px ×4",
+                         neighbours([name, "cursor-default", "cursor-unavailable"], (24, 32, 48),
+                                    bgs=("#DEDEE0", NAVY, GREY), colour=False),
+                         os.path.join(out, "check-neighbours.png")))
+    return files, meas
+
+
+def run_a3(root, only=None):
+    report = {}
+    for cid, name in CARDS_A3.items():
+        if only and cid not in only:
+            continue
+        out = os.path.join(root, cid)
+        fn = {"action-end-turn": checks_end_turn, "card-drop": checks_card_drop, "marker-slot-discard": checks_slot_a3,
+              "ui-log": checks_log, "cursor-pointer": checks_pointer}[name]
+        files, meas = fn(cid, name, out)
+        audit = json.load(open(os.path.join(D.ROOT, "sheets", "audit.json"), encoding="utf-8")).get(name, {})
+        data = {"id": name, "card": cid, "tool": "art/imagegen/hud-icons-v3/_tools/vr44_checks.py --a3", "files": files,
+                "audit_master": {k: audit.get(k) for k in ("margin_px", "seam_px", "glyph_area_pct_of_body",
+                                                         "alpha_centroid_u", "lr_symmetry_mean_abs")},
+                "measures": meas}
+        with open(os.path.join(out, "checks.json"), "w", encoding="utf-8", newline="\n") as f:
+            json.dump(data, f, ensure_ascii=False, indent=1)
+            f.write("\n")
+        report[cid] = files
+        print(cid, name, files)
+    return report
+
+
 def run(root):
     report = {}
     for cid, name in CARDS.items():
@@ -324,4 +538,12 @@ def run(root):
 
 
 if __name__ == "__main__":
-    run(sys.argv[1] if len(sys.argv) > 1 else os.path.join(REPO, "docs", "game-design", "evidence", "VISUAL"))
+    # --a3 [IC-NN,…]: листы шага A3 (IC-46, IC-48, IC-52, IC-55, IC-59); без флага — листы шага A2
+    argv = sys.argv[1:]
+    root = os.path.join(REPO, "docs", "game-design", "evidence", "VISUAL")
+    if "--a3" in argv:
+        i = argv.index("--a3")
+        only = argv[i + 1].split(",") if len(argv) > i + 1 and argv[i + 1].startswith("IC-") else None
+        run_a3(root, only)
+    else:
+        run(argv[0] if argv else root)

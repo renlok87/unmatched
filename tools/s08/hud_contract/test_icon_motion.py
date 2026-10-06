@@ -235,6 +235,33 @@ class IconMotionCandidatesTests(unittest.TestCase):
                 pa, pb = a[..., :3] * a[..., 3:] / 255, b[..., :3] * b[..., 3:] / 255
                 self.assertLess(np.abs(pa - pb).max(), 1.0, (name, size))
 
+    def test_vr44_forms_match_codex_proposal(self):
+        """VS-2 A3 (IC-46, IC-48, IC-55, IC-59): формы Codex IC-36, вектор A (art/imagegen/hud-icons-vr44-codex/vector,
+        принят по делегированию; log и pointer — fix1) перенесены один в один: альфа экспорта v3 побайтно равна альфе
+        Codex на 1024 / 16 / 21 / 24 / 32 / 48 / 64 / 96, а цвет совпадает после назначения ближайшего токена (этап
+        «точной палитры» Codex не переносится — ВР-VS2-23: внутренние AA-стыки как у остальных значков v3). Горячая точка
+        указателя — та же, что в verification.json пакета."""
+        import numpy as np
+        from PIL import Image
+        codex = REPO / "art" / "imagegen" / "hud-icons-vr44-codex" / "vector"
+        tokens = {"#061623": "navy", "#F9EBDB": "cream", "#FAF8F2": "glyph", "#111317": "keyline"}
+        pal = np.array([[int(h[i:i + 2], 16) for i in (1, 3, 5)] for h in tokens])
+        for ours, theirs, roles in (("action-end-turn", "end-turn", pal), ("card-drop", "card-drop", pal),
+                                    ("ui-log", "log", pal), ("cursor-pointer", "pointer", pal[[3, 2]])):
+            for size in (1024, 16, 21, 24, 32, 48, 64, 96):
+                path = ICONS_V3 / ("masters" if size == 1024 else "sizes") / (
+                    f"{ours}.png" if size == 1024 else f"{ours}-{size}.png")
+                a = np.asarray(Image.open(path).convert("RGBA")).astype(int)
+                b = np.asarray(Image.open(codex / str(size) / f"{theirs}.png").convert("RGBA")).astype(int)
+                self.assertEqual(a.shape, b.shape, (ours, size))
+                self.assertEqual(np.abs(a[..., 3] - b[..., 3]).max(), 0, (ours, size))
+                near = roles[((a[..., None, :3] - roles[None, None]) ** 2).sum(-1).argmin(-1)]
+                seen = a[..., 3] > 0
+                self.assertEqual(np.abs(near - b[..., :3])[seen].max(), 0, (ours, size))
+        hot = json.loads((ICONS_V3 / "cursor-hotspots.json").read_text(encoding="utf-8"))["cursors"]["cursor-pointer"]
+        self.assertEqual({k: hot[k] for k in ("24", "32", "48", "64")},
+                         {"24": [8, 2], "32": [11, 2], "48": [17, 3], "64": [22, 4]})
+
     def test_turn_ring_flash_1000_then_smoulder(self):
         for icon in ("marker-turn-ring", "marker-turn-ring-team"):
             a = self.icons[icon]["anims"]["appear"]
