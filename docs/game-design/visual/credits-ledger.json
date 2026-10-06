@@ -295,6 +295,24 @@
       "note": "CX-03r run 1 (fix1); 2026-10-06 11:49-12:24 +05:00 (~35 мин); 100 макетов + серые в scraped-data/derived/hud-world-v1-codex/ (вне git); ревью Claude: fix-needed (чип 24 su наезжает на полосу HP и диск гарпии, «−1»/«+4» не у своих фигур, «пример» оторван, плашки без привязки, пакет 46 МБ > 30, следы подписей) → один корректирующий прогон fix2"
     },
     {
+      "date": "2026-10-06T12:27:21+05:00",
+      "service": "Codex",
+      "model": "gpt-6.1-sol (codex.exe exec, high)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "HB-07",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a10ff9-12c5-7b72-bc67-f17fbe8e3f75",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/HB-07.codex.md",
+      "result_path": "art/imagegen/hud-composition-v1-codex/",
+      "status": "ok",
+      "note": "CX-01r v2 (переделка CX-01 после ревью VS-1); 2026-10-06 11:49-12:27 +05:00 (~38 мин); карточка HB-07 исправлена: фон Marmoreal — нарисованный задник -ConceptPaste (aeafe8f2), требования R1-R10; 24 макета + 24 серых в scraped-data/derived/hud-composition-v1-codex/ (вне git), пакет 20 МБ; acceptance: всё прошло, кроме edges_and_icons_contrast (кромка к соседним пикселям сцены — вне пары 02 §3.5); ревью Claude: fix-needed (дубль «Ждём защиту…» в STATUS атакующего, диски трекера касаются HP в классе S, ширина STATUS не по тексту, строка контраста кромки не по 02 §3.5) -> fix1"
+    },
+    {
       "date": "2026-10-06T12:44:50+05:00",
       "service": "Codex",
       "model": "codex-cli 0.160.1 (codex.exe exec, app bundle)",
@@ -311,11 +329,29 @@
       "result_path": "art/imagegen/hud-world-v1-codex/",
       "status": "ok",
       "note": "CX-03r run 2 (fix2, единственная корректировка); 2026-10-06 12:28-12:40 +05:00 (~12 мин); пакет 6,6 МБ, 100 макетов + серые в scraped-data/derived/hud-world-v1-codex/ (вне git), аудиты области записи — derived/audit/; приёмка карточки 5/5; ревью Claude: принято по делегированию (остаток ВР-VS2-HB44-07: привязка плашки/«+4» в тесных группах — в рантайм HB-46/FX-22)"
+    },
+    {
+      "date": "2026-10-06T12:44:30+05:00",
+      "service": "Codex",
+      "model": "gpt-6.1-sol (codex.exe exec, high)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "HB-07",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a11021-d05d-7bf2-a42c-f038627feebc",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/HB-07.fix1.codex.md",
+      "result_path": "art/imagegen/hud-composition-v1-codex/",
+      "status": "ok",
+      "note": "CX-01r fix1 (единственный корректирующий прогон); 2026-10-06 12:33-12:44 +05:00 (~11 мин); STATUS атакующего = why.wait.defender, зазор HP-трекеры в S ≥9,8 su, ширина STATUS по тексту, контраст кромки по паре 02 §3.5; verifier PASS, failed_acceptance []; ревью Claude: принято по делегированию"
     }
   ],
   "totals": {
     "syntx_spent": 0,
     "tripo_spent": 0,
-    "codex_packages": 13
+    "codex_packages": 15
   }
 }
