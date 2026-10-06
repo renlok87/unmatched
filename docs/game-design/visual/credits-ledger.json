@@ -275,11 +275,47 @@
       "result_path": "art/imagegen/env-u16-marmoreal-codex/",
       "status": "ok",
       "note": "CX-07r fix2 (единственная корректировка); 12:05:41-12:18:04 +05:00 (~12 мин); 2 image edit (NW, NE; SE осмотрен, не правился), SYNTX 0; ядра бра 255 внутри support; acceptance 6/6; ревью Claude: принято по делегированию; ремонт кодировки README/visual-review-r3.json (PowerShell -> python заменил кириллицу на ?) сделан Claude из журнала codex-fix1.jsonl; 3 PNG кэша imagegen перенесены в C:/tmp/visual/CX-07r/stray/"
+    },
+    {
+      "date": "2026-10-06T12:28:11+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "HB-44",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a10ff9-3df8-7781-bb02-d737b743bb9a",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/HB-44.fix1.codex.md",
+      "result_path": "art/imagegen/hud-world-v1-codex/",
+      "status": "ok",
+      "note": "CX-03r run 1 (fix1); 2026-10-06 11:49-12:24 +05:00 (~35 мин); 100 макетов + серые в scraped-data/derived/hud-world-v1-codex/ (вне git); ревью Claude: fix-needed (чип 24 su наезжает на полосу HP и диск гарпии, «−1»/«+4» не у своих фигур, «пример» оторван, плашки без привязки, пакет 46 МБ > 30, следы подписей) → один корректирующий прогон fix2"
+    },
+    {
+      "date": "2026-10-06T12:44:50+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "HB-44",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a1101d-0c96-7021-a41a-4c0256898b1d",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/HB-44.fix2.codex.md",
+      "result_path": "art/imagegen/hud-world-v1-codex/",
+      "status": "ok",
+      "note": "CX-03r run 2 (fix2, единственная корректировка); 2026-10-06 12:28-12:40 +05:00 (~12 мин); пакет 6,6 МБ, 100 макетов + серые в scraped-data/derived/hud-world-v1-codex/ (вне git), аудиты области записи — derived/audit/; приёмка карточки 5/5; ревью Claude: принято по делегированию (остаток ВР-VS2-HB44-07: привязка плашки/«+4» в тесных группах — в рантайм HB-46/FX-22)"
     }
   ],
   "totals": {
     "syntx_spent": 0,
     "tripo_spent": 0,
-    "codex_packages": 11
+    "codex_packages": 13
   }
 }

@@ -1,0 +1,126 @@
+{
+  "actors": {
+    "medusa": {
+      "name": "Medusa",
+      "hero": true,
+      "team": 1,
+      "attack": "range",
+      "startHealth": 16,
+      "digit": null
+    },
+    "arthur": {
+      "name": "King Arthur",
+      "hero": true,
+      "team": 2,
+      "attack": "melee",
+      "startHealth": 18,
+      "digit": null
+    },
+    "harpy1": {
+      "name": "Harpies",
+      "hero": false,
+      "team": 1,
+      "attack": "melee",
+      "startHealth": 1,
+      "digit": 1
+    },
+    "harpy2": {
+      "name": "Harpies",
+      "hero": false,
+      "team": 1,
+      "attack": "melee",
+      "startHealth": 1,
+      "digit": 2
+    },
+    "harpy3": {
+      "name": "Harpies",
+      "hero": false,
+      "team": 1,
+      "attack": "melee",
+      "startHealth": 1,
+      "digit": 3
+    },
+    "merlin": {
+      "name": "Merlin",
+      "hero": false,
+      "team": 2,
+      "attack": "range",
+      "startHealth": 7,
+      "digit": null
+    }
+  },
+  "run_I": {
+    "medusa": 14,
+    "arthur": 17
+  },
+  "heal_example": {
+    "card": "The Holy Grail",
+    "effectAfter": " If King Arthur has 4 or less health but is not defeated, set his health to 8.",
+    "before": 4,
+    "after": 8,
+    "delta": 4
+  },
+  "localized_names_missing": [],
+  "trace_path": "docs/game-design/evidence/DE-FOOTAGE/2026-10-05/I/marmoreal/combat-20261005-235827/combat-client-host.trace.txt",
+  "decode": "SvelteKit devalue reference indices, nodes[2].data",
+  "ru_names": {
+    "medusa": "Медуза",
+    "arthur": "Король Артур",
+    "merlin": "Мерлин",
+    "harpy1": "Гарпия 1",
+    "harpy2": "Гарпия 2",
+    "harpy3": "Гарпия 3"
+  },
+  "damage": {
+    "attacker": "merlin",
+    "target": "medusa",
+    "value": 1,
+    "source": "run I: Merlin WINS - Medusa -1"
+  },
+  "harpy_client_order": {
+    "f-0-hero": "medusa",
+    "f-0-sk0": "harpy1",
+    "f-0-sk1": "harpy2",
+    "f-0-sk2": "harpy3",
+    "f-1-hero": "arthur",
+    "f-1-sk0": "merlin"
+  },
+  "strings": {
+    "hud.plate.role.hero_ranged": {
+      "ru": "ГЕРОЙ · ДАЛЬНИЙ",
+      "en": "HERO · RANGED"
+    },
+    "hud.plate.role.hero_melee": {
+      "ru": "ГЕРОЙ · БЛИЖНИЙ",
+      "en": "HERO · MELEE"
+    },
+    "hud.plate.role.sidekick_ranged": {
+      "ru": "ПОМОЩНИК · ДАЛЬНИЙ",
+      "en": "SIDEKICK · RANGED"
+    },
+    "hud.plate.role.sidekick_melee": {
+      "ru": "ПОМОЩНИК · БЛИЖНИЙ",
+      "en": "SIDEKICK · MELEE"
+    },
+    "hud.plate.side.own": {
+      "ru": "ВАШ",
+      "en": "YOURS"
+    },
+    "hud.plate.side.opponent": {
+      "ru": "СОПЕРНИК",
+      "en": "OPPONENT"
+    },
+    "hud.plate.target": {
+      "ru": "ЦЕЛЬ",
+      "en": "TARGET"
+    },
+    "hud.number.example": {
+      "ru": "пример",
+      "en": "example"
+    },
+    "hud.plate.harpy_name": {
+      "ru": "Гарпия {number}",
+      "en": "Harpy {number}"
+    }
+  }
+}
