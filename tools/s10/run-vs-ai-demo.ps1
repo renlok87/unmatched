@@ -6,6 +6,14 @@ param(
   [string]$ShotMode = "request",
   [string]$EnvFile = "",
   [string]$HeroName = "Medusa",
+  # VS-2 exit frames (opt-in, docs/game-design/visual/05-production-plan.md s3 VS-2, set B "AI thinking"): -PlayerView
+  # runs the client WITHOUT -S09Markers (the player's default view since HB-02). The result / lobby element-marker gates
+  # need that debug layer and are skipped (reported in the output and the manifest); every other gate is unchanged.
+  # Not a GD-039 acceptance run - the gate run keeps the markers. -FullHd: 1920x1080 instead of 1280x720.
+  # -ClientExtraArgs: extra client arguments, '+'-separated (e.g. '-S08ExitShots+-S08UiScale=150+-S08BoardId=<id>').
+  [switch]$PlayerView,
+  [switch]$FullHd,
+  [string]$ClientExtraArgs = '',
   # Fail fast when the one client is subscribed but no fresh
   # 'SNAPSHOT applied seq=' line appears for this many seconds (the server bot
   # drives the opponent seat, so a dead stream still means a stalled demo).
@@ -535,7 +543,7 @@ function Set-StagedResolution([string]$ExePath, [int]$W, [int]$H) {
   [System.IO.File]::WriteAllLines($gs, $lines)
   Write-Output "staged GameUserSettings -> ${W}x${H} (windowed, no FrameRateLimit - cap is per-process t.MaxFPS): $gs"
 }
-Set-StagedResolution $Exe 1280 720
+if ($FullHd) { Set-StagedResolution $Exe 1920 1080 } else { Set-StagedResolution $Exe 1280 720 }
 
 $Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 $Script:CleanupFailure = $null
@@ -759,14 +767,16 @@ function Invoke-VsAiDemo {
   # t.MaxFPS 30 is a per-process console-command cap for this hidden demo
   # client; the packaged 60 FPS default is untouched and effective FPS is
   # NOT claimed (no measured FPS/frame-time data exists).
-  $common = @("-windowed", "-resx=1280", "-resy=720", "-RenderOffScreen",
+  $resX = if ($FullHd) { 1920 } else { 1280 }
+  $resY = if ($FullHd) { 1080 } else { 720 }
+  $common = @("-windowed", "-resx=$resX", "-resy=$resY", "-RenderOffScreen",
     "-ExecCmds=`"t.MaxFPS 30`"", "log=GrepLog",
-    "-ForceAbandonSequences", "-S08Api=$Api", "-S09ShotMode=$ShotMode",
-    "-S09Markers")  # HB-01: the marker pixel gates below need the debug layer (04-hud-spec s5.3)
+    "-ForceAbandonSequences", "-S08Api=$Api", "-S09ShotMode=$ShotMode")
+  if (-not $PlayerView) { $common += "-S09Markers" }  # HB-01: the marker pixel gates below need the debug layer (04-hud-spec s5.3)
   $clientArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
     "-S08Auto", "-S08Create", "-S08Mode=VS_AI", "-S08HeroId=$heroId",
     "-S08Trace=$trace", "-S09Flow", "-S09Combat=attack+scheme",
-    "-S09ShotDir=$shots", "-S08ExitAfter=$RunSeconds")
+    "-S09ShotDir=$shots", "-S08ExitAfter=$RunSeconds") + @($ClientExtraArgs -split '\+' | Where-Object { $_ })
 
   $proc = $null
   $Published = $false
@@ -1050,7 +1060,9 @@ function Invoke-VsAiDemo {
     $lobbyShot = Assert-FreshShot (Join-Path $shots 's09-lobby-return.png') $clientStartUtc 'lobby-return'
     Write-Output ("result shot={0}B lobby shot={1}B" -f $resultShot.Length, $lobbyShot.Length)
 
-    if ($ShotMode -eq 'request') {
+    if ($PlayerView) {
+      Write-Output 'PlayerView: result / lobby element-marker gates skipped (the client ran without -S09Markers); not a GD-039 acceptance run'
+    } elseif ($ShotMode -eq 'request') {
       # unreachable after the top-level guard, kept as defense in depth
       Add-Type -AssemblyName System.Drawing
       $Markers = @(
@@ -1201,6 +1213,7 @@ function Invoke-VsAiDemo {
       if (-not (Test-Path -LiteralPath (Join-Path $RunDir $name))) { throw "run dir incomplete after publish: $name" }
     }
     $verdict = 'S10/GD-039: one-client packaged VS_AI live acceptance over the authoritative S10 backend - hidden client created a VS_AI room (one human seat in LOBBY, hosted by this run; any foreign join fails), the server bot took the second seat at startGame (row reached IN_PROGRESS with exactly 2 seats: seat 1 username AI Bot, opponentId matching that seat, id cross-checked against userByUsername(AI Bot), and the SAME bot id re-verified on the post-exit FINISHED row), the human driver played attack+scheme while the bot answered, the server-written GAME_OVER rendered a COMPLETE result screen (element markers present, gameplay markers absent), leaveGame returned the client to a CLEAN lobby (panel marker, no in-duel markers, zero bright gameplay-region pixels), the row is authoritative FINISHED with the trace outcome cross-checked against server winnerId (no invented result), never ABORTED, and the driver exited early (measured exit time < RunSeconds) instead of burning the timeout. Frame cap: per-process console command t.MaxFPS 30 (effective FPS NOT measured, no GPU claim; packaged 60 FPS default untouched)'
+    if ($PlayerView) { $verdict = "VS-2 player view (no -S09Markers, result/lobby marker gates skipped; extra client args '$ClientExtraArgs', ${resX}x${resY}) - " + $verdict }
     $manifest = [ordered]@{
       stamp          = $Stamp
       verdict        = $verdict

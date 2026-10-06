@@ -1184,6 +1184,9 @@ private:
   void TickUmPanels();
   /** The right edge of PANEL-LOC (su) for the hand obstacle; -1 when the panels are on the Slate path. */
   float UmHudPanelLocRightSu() const;
+  // VS-2 exit frames (opt-in -S08ExitShots): own / opponent turn start + 0.5 s and + 3 s
+  void NoteUmExitShotsTurn(bool bOwn, bool bInitial, bool bGameOver);
+  void TickUmExitShots();
   UPROPERTY()
   TObjectPtr<class UUmHudRoot> UmHudRoot;
   UPROPERTY()

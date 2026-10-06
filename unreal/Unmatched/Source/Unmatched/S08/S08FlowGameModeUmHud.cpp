@@ -24,6 +24,11 @@
 //   - VS-2 HB-18...HB-21 (S08/UI/UmHudPanels.h): PANEL-LOC, PANEL-OPP (ВР-01 diagonal) and OPP-HAND - built with the
 //     root (their portraits become OwnPortrait / OpponentPortrait), framed with the layout, fed per frame from the shown
 //     fighters; a click opens the deck panel of the side (rollback -S08SlateHud=panels|opphand).
+//   - VS-2 exit frames (05-production-plan §3 VS-2, opt-in -S08ExitShots with -S09Flow and -S09ShotDir): the first
+//     non-initial own turn and the first non-initial opponent turn each get two frames, + 0.5 s and + 3 s after the
+//     turn start - set A (own turn at rest) and set B (the opponent's turn while it thinks). At that own turn start
+//     the auto plan holds 3.4 s (S09SchemeQuietUntil), so the own + 3 s frame is still the idle turn and the other
+//     client's + 3 s frame still shows the opponent thinking. Files s09-exit-{own,opp}-t{0.5,3.0}.png, trace EXITSHOT.
 #include "S08FlowGameMode.h"
 
 #include "S08AnimatedIconWidget.h"
@@ -86,6 +91,12 @@ struct FUmHudRuntime {
   FUmTopStrip TopStrip;
   // VS-2 HB-18...HB-21: PANEL-LOC, PANEL-OPP, OPP-HAND
   FUmPanels Panels;
+  // VS-2 exit frames (-S08ExitShots): -1 not read yet / 0 off / 1 on; turn start (Elapsed) of the first non-initial own
+  // and opponent turn (-1 none yet); the frames taken (bits own 0.5, own 3.0, opp 0.5, opp 3.0)
+  int32 ExitShots = -1;
+  float ExitOwnAt = -1.0f;
+  float ExitOppAt = -1.0f;
+  uint32 ExitTaken = 0;
 };
 
 namespace {
@@ -272,7 +283,44 @@ void AS08FlowGameMode::UmHudDeckPanelLayering(float DeckAlpha) {
   if (CombatEdgeRight->GetVisibility() != Want) CombatEdgeRight->SetVisibility(Want);
 }
 
+void AS08FlowGameMode::NoteUmExitShotsTurn(bool bOwn, bool bInitial, bool bGameOver) {
+  if (!UmHud.IsValid() || !bAutoS09 || S09ShotDir.IsEmpty() || bInitial || bGameOver) return;
+  FUmHudRuntime& R = *UmHud;
+  if (R.ExitShots < 0) R.ExitShots = FParse::Param(FCommandLine::Get(), TEXT("S08ExitShots")) ? 1 : 0;
+  float& At = bOwn ? R.ExitOwnAt : R.ExitOppAt;
+  if (R.ExitShots == 0 || At >= 0.0f) return;  // only the first turn of each side
+  At = Elapsed;
+  // the own turn stays at rest past its + 3 s frame (the other client sees the opponent thinking as long)
+  if (bOwn) S09SchemeQuietUntil = FMath::Max(S09SchemeQuietUntil, Elapsed + 3.4f);
+  FS08Trace::Write(FString::Printf(TEXT("EXITSHOT turn=%s seq=%d at=%.2f hold=%s"), bOwn ? TEXT("own") : TEXT("opp"),
+                                   Flow.IsValid() ? Flow->GetAppliedSnapshot().SequenceNumber : -1, Elapsed,
+                                   bOwn ? TEXT("3.4") : TEXT("0")));
+}
+
+void AS08FlowGameMode::TickUmExitShots() {
+  if (!UmHud.IsValid() || UmHud->ExitShots != 1 || S09ShotDir.IsEmpty()) return;
+  FUmHudRuntime& R = *UmHud;
+  struct FPlanned {
+    bool bOwn;
+    float Dt;
+    const TCHAR* Leaf;
+  };
+  static const FPlanned Plan[] = {{true, 0.5f, TEXT("s09-exit-own-t0.5.png")},
+                                  {true, 3.0f, TEXT("s09-exit-own-t3.0.png")},
+                                  {false, 0.5f, TEXT("s09-exit-opp-t0.5.png")},
+                                  {false, 3.0f, TEXT("s09-exit-opp-t3.0.png")}};
+  for (int32 I = 0; I < UE_ARRAY_COUNT(Plan); ++I) {
+    const float At = Plan[I].bOwn ? R.ExitOwnAt : R.ExitOppAt;
+    if ((R.ExitTaken & (1u << I)) || At < 0.0f || Elapsed < At + Plan[I].Dt) continue;
+    R.ExitTaken |= 1u << I;
+    FS08Trace::Write(FString::Printf(TEXT("EXITSHOT shot %s dt=%.2f"), Plan[I].Leaf, Elapsed - At));
+    TakeEvidenceShot(S09ShotDir / Plan[I].Leaf);  // the evidence queue orders it after a shot in flight
+    break;
+  }
+}
+
 void AS08FlowGameMode::TickUmHud() {
+  TickUmExitShots();  // VS-2 exit frames (-S08ExitShots)
   // VS-2 HB-12: Hand over an own figure or a lit cell (picked when the pointer moved), the busy loop while in flight
   if (UmHud.IsValid() && UmHudRoot && UmHudRoot->HasCursors()) {
     APlayerController* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;

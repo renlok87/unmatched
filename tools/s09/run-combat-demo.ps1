@@ -913,6 +913,11 @@ function Invoke-CombatDemo {
           if (Test-Path -LiteralPath (Join-Path $Script:Staging $runFFrame)) { $publishNames += $runFFrame }
           else { Write-Output "run F frame: $side has no $leaf" }
         }
+        # VS-2 exit frames (opt-in client flag -S08ExitShots through -ClientExtraArgs, 05-production-plan s3 VS-2): the
+        # own / opponent turn start + 0.5 s and + 3 s; published when written; not gated.
+        foreach ($exitFrame in @(Get-ChildItem -LiteralPath (Join-Path $Script:Staging $side) -Filter 's09-exit-*.png' -ErrorAction SilentlyContinue | Sort-Object Name)) {
+          $publishNames += (Join-Path $side $exitFrame.Name)
+        }
       }
     }
     if ($RequireShotCaptured) {

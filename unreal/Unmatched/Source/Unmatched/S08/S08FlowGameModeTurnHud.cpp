@@ -163,6 +163,7 @@ void AS08FlowGameMode::FeedTurnHud(const FS08Snapshot& Snapshot) {
       !Event.bGameOver && TurnCue.BannerLengthMs() > 0.0) {
     ShotBannerAtElapsed = Elapsed + 0.25f;
   }
+  NoteUmExitShotsTurn(Event.bOwn, Event.bInitial, Event.bGameOver);  // VS-2 exit frames (-S08ExitShots)
 }
 
 void AS08FlowGameMode::NoteActionChosen(const TCHAR* What) {
