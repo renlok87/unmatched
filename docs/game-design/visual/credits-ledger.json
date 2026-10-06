@@ -419,11 +419,47 @@
       "result_path": "art/imagegen/hud-panels-v1-codex/",
       "status": "ok",
       "note": "CX-09 fix1 (единственный корректирующий прогон); 2026-10-06 13:16-13:29 +05:00 (~13 мин); PANEL-OPP зеркален полностью (HP, помощники, трекер), в классе S sidekick-fallen — подсказка над PANEL-LOC со строками hud.panel.sidekick («Harpies 1 0/1», «Merlin 0/7»), Sarpedon King Arthur 18/18 (урон 17/18, лечение 17→18), точка ИИ 8 su, README/verification в UTF-8; пакет 7,1 МБ, 74 макета + 74 серых; verifier PASS, manifest 203/203; ревью Claude: принято по делегированию"
+    },
+    {
+      "date": "2026-10-06T13:19:30+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "HB-22",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a11039-e5f2-7043-8707-5f9351246e29",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/HB-22.codex.md",
+      "result_path": "art/imagegen/hud-hand-v1-codex/",
+      "status": "ok",
+      "note": "CX-10 run 1; 2026-10-06 12:59-13:19 +05:00 (~20 мин); карточка HB-22 исправлена до прогона (ВР-VS2-HB22-01…08): фон Marmoreal — нарисованный задник -ConceptPaste (aeafe8f2), геометрия руки принятого HB-07, рамка CP-13, card-drop IC-36; 96 макетов + 96 серых + EN-проверка в scraped-data/derived/hud-hand-v1-codex/ (вне git), пакет 7,4 МБ; verifier PASS кроме шага веера 63,7 su на 720p 150 %; ревью Claude: fix-needed (карта буста в boost-attack — разный размер и место на каждом холсте, подпись «Рука n/max» меняет форму и место по состояниям, подсказка why закрывает подпись на Sarpedon) -> fix1"
+    },
+    {
+      "date": "2026-10-06T13:49:10+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "HB-22",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a1105d-f378-7ab3-9ec3-19327e7b8d6b",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/HB-22.fix1.codex.md",
+      "result_path": "art/imagegen/hud-hand-v1-codex/",
+      "status": "ok",
+      "note": "CX-10 fix1 (единственный корректирующий прогон); 2026-10-06 13:39-13:49 +05:00 (~10 мин); буст в boost-attack — одна стопка за COMBAT-L (230×319 / 150×208, сдвиг 40/32 su, чип +3 сверху), подпись «Рука n/max» — короткая плашка слева во всех состояниях, подсказка why на Sarpedon не закрывает подпись; 96 макетов + 96 серых + EN пересобраны; verifier PASS кроме шага веера 63,7 su на 720p 150 % (ВР-VS2-HB22-09); manifest 256/256; ревью Claude: принято по делегированию"
     }
   ],
   "totals": {
     "syntx_spent": 0,
     "tripo_spent": 0,
-    "codex_packages": 19
+    "codex_packages": 21
   }
 }
