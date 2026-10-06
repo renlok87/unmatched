@@ -8807,8 +8807,10 @@ void AS08FlowGameMode::RunRenderBench() {
     }
     // AN-17 (ВР-17): -BenchClipPose=<Clip>@<f1>,<f2>[;<Clip>@...] - every living v2 figure frozen at each pose x view.
     // A bad list (or an unknown -BenchClipPoseFighter) is traced and the bench runs without poses, exactly as before.
+    // The list is comma-separated, so the value must not stop at a separator (FParse::Value would cut it at ',').
     FString ClipPoseText;
-    if (FParse::Value(Cmd, S08HeroesV2::BenchClipPoseParamName, ClipPoseText) &&
+    if (FParse::Value(Cmd, S08HeroesV2::BenchClipPoseParamName, ClipPoseText,
+                      /*bShouldStopOnSeparator=*/false) &&
         !ClipPoseText.TrimStartAndEnd().IsEmpty()) {
       FString ClipPoseError;
       if (!S08HeroesV2::ParseBenchClipPoses(ClipPoseText, B.Poses, ClipPoseError)) {
