@@ -843,6 +843,24 @@
       "note": "CX-20 fix1 (единственный корректирующий прогон); 2026-10-06 21:54-22:05 +05:00 (~11 мин); серп v3: полоса растёт внутрь, W_max 14,17 px при s=0,78, 8,85 px при s=0,5, хвост 4 px, ядро по вогнутой кромке при W>=10; игровые листы на Arthur (H=69 px, ячейка 100/67 px на 1080p/720p, полоса на 720p 3,77-4,17 px в кадрах 3-8); verification.json с ключами 07 §1.2; опись репозитория перенесена в scraped-data/derived/fx-arc-codex/audit/; 131 проверка PASS, manifest 127/127; ревью Claude: accept по делегированию (ВР-VS2-FX31-01…08)"
     },
     {
+      "date": "2026-10-07T01:22:46+05:00",
+      "service": "SYNTX",
+      "model": "banana/banana3 2K",
+      "template": "T-SYNTX-IMG-BANANA",
+      "task_id": "EN-02",
+      "units": "1 image edit (outpaint), 2K 16:9, n 1",
+      "quoted": 3,
+      "cost": 3.0,
+      "balance_before": 173.771,
+      "balance_after": 170.771,
+      "service_task_id": "4f01a848-ba95-4793-8eb4-52d9b976ab46",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/EN-02.syntx.txt",
+      "result_path": "scraped-data/derived/env-u16-marmoreal-codex/sx01/SX01-r1-raw.jpg",
+      "status": "ok",
+      "note": "SX-01 run 1 (r1); output JPEG 2752x1536; raw copy C:/tmp/visual-syntx/EN-02/raw/SX01-r1-raw.jpg; verdict in the EN-02 card row"
+    },
+    {
       "date": "2026-10-07T01:27:00+05:00",
       "service": "Codex",
       "model": "codex-cli 0.160.1 (codex.exe exec, app bundle)",
@@ -859,6 +877,42 @@
       "result_path": "art/imagegen/anim-move-sheet-codex/",
       "status": "ok",
       "note": "CX-24 прогон 1; 2026-10-07 01:17-01:27 +05:00 (~10 мин); процедурный лист шага 1920x1080: две дорожки (King Arthur, Harpy) по 6 поз из левых тайлов Idle, наклон 10° вокруг центра основания, график s(t) ease/linear, пыль 560-860, полосы x0,5/x1/x1,5 и snap; генераций image_gen 0; 26+ проверок PASS, source_unchanged 1509 файлов; ревью Claude: fix-needed — нет manifest-sha256.json и prompts/, verification.json без ключей 07 §1.2 (exports, palette, gray, sizes, acceptance), на листе нет ключа стрелок facing -> fix1"
+    },
+    {
+      "date": "2026-10-07T01:30:51+05:00",
+      "service": "SYNTX",
+      "model": "banana/banana3 2K",
+      "template": "T-SYNTX-IMG-BANANA",
+      "task_id": "EN-02",
+      "units": "1 image edit (outpaint), 2K 16:9, n 1",
+      "quoted": 3,
+      "cost": 3.0,
+      "balance_before": 170.771,
+      "balance_after": 167.771,
+      "service_task_id": "345e03a8-e19d-4442-81d2-c38a331c29aa",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/EN-02.syntx.txt",
+      "result_path": "scraped-data/derived/env-u16-marmoreal-codex/sx01/SX01-r2-raw.jpg",
+      "status": "ok",
+      "note": "SX-01 run 2 (r2, retry 1, last run of the card budget 2 x 3); prompt section 'Retry 1 (r2)'; output JPEG 2752x1536; raw copy C:/tmp/visual-syntx/EN-02/raw/SX01-r2-raw.jpg; verdict in the EN-02 card row"
+    },
+    {
+      "date": "2026-10-07T01:29:05+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "SC-01",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a112dd-03e9-7f53-8245-4bc0b5f28b21",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/SC-01.codex.md",
+      "result_path": "art/imagegen/sc01-screen-base-codex/",
+      "status": "ok",
+      "note": "CX-22 прогон 1; 2026-10-07 01:17-01:29 +05:00 (~12 мин); библиотека screen_mockup_base.py, базовая модаль 640x360 su на Marmoreal P7 и Sarpedon P10 при 1080p/720p x 100/150 %, листы кнопок, компонентов и overlay в цвете и сером; генераций 0; ревью Claude: fix-needed — «уточнить» в заголовке, тексте, чипе и поле модали при наличии реальных строк 04/ST_Screens, свои признаки состояний (подчёркивание, линия, замок, галочка) вместо принятых скинов HB-08, образец selected у главной кнопки, подпись фона по-английски и на Sarpedon, verification.json без ключей 07 §1.2, копии входов 1,6 МБ в _tools/ -> fix1 (ВР-VS3-SC01-01…09)"
     },
     {
       "date": "2026-10-07T01:39:00+05:00",
@@ -879,45 +933,27 @@
       "note": "CX-24 fix1 (единственный корректирующий прогон); 2026-10-07 01:31-01:39 +05:00 (~8 мин); manifest-sha256.json вместо manifest.json, prompts/AN-22-prompts.json, verification.json с ключами 07 §1.2 (exports, palette 0, gray, sizes, acceptance 8/8), 1280x720 отрисован нативно (960x540 удалён), ключ стрелок facing в строке легенды; мастер вне легенды пиксельно тот же; наклон по пикселям 10,34°/10,78°; ревью Claude: accept по делегированию (ВР-VS3-AN22-01)"
     },
     {
-      "date": "2026-10-07T01:22:46+05:00",
-      "service": "SYNTX",
-      "model": "banana/banana3 2K",
-      "template": "T-SYNTX-IMG-BANANA",
-      "task_id": "EN-02",
-      "units": "1 image edit (outpaint), 2K 16:9, n 1",
-      "quoted": 3,
-      "cost": 3.0,
-      "balance_before": 173.771,
-      "balance_after": 170.771,
-      "service_task_id": "4f01a848-ba95-4793-8eb4-52d9b976ab46",
+      "date": "2026-10-07T01:48:31+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "SC-01",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a112ee-47f5-7562-a431-ed6665bf08f6",
       "seed": null,
-      "prompt_file": "docs/game-design/visual/06-tasks/prompts/EN-02.syntx.txt",
-      "result_path": "scraped-data/derived/env-u16-marmoreal-codex/sx01/SX01-r1-raw.jpg",
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/SC-01.fix1.codex.md",
+      "result_path": "art/imagegen/sc01-screen-base-codex/",
       "status": "ok",
-      "note": "SX-01 run 1 (r1); output JPEG 2752x1536; raw copy C:/tmp/visual-syntx/EN-02/raw/SX01-r1-raw.jpg; verdict in the EN-02 card row"
-    },
-    {
-      "date": "2026-10-07T01:30:51+05:00",
-      "service": "SYNTX",
-      "model": "banana/banana3 2K",
-      "template": "T-SYNTX-IMG-BANANA",
-      "task_id": "EN-02",
-      "units": "1 image edit (outpaint), 2K 16:9, n 1",
-      "quoted": 3,
-      "cost": 3.0,
-      "balance_before": 170.771,
-      "balance_after": 167.771,
-      "service_task_id": "345e03a8-e19d-4442-81d2-c38a331c29aa",
-      "seed": null,
-      "prompt_file": "docs/game-design/visual/06-tasks/prompts/EN-02.syntx.txt",
-      "result_path": "scraped-data/derived/env-u16-marmoreal-codex/sx01/SX01-r2-raw.jpg",
-      "status": "ok",
-      "note": "SX-01 run 2 (r2, retry 1, last run of the card budget 2 x 3); prompt section 'Retry 1 (r2)'; output JPEG 2752x1536; raw copy C:/tmp/visual-syntx/EN-02/raw/SX01-r2-raw.jpg; verdict in the EN-02 card row"
+      "note": "CX-22 fix1 (единственный корректирующий прогон); 2026-10-07 01:36-01:48 +05:00 (~12 мин); модаль = образец UUmConfirmDialog «Покинуть партию» / «Партия прервётся для обоих игроков» / «Отмена» + «Да» из ST_Screens и SC-01.do; библиотека рисует скинами HB-08 (x1 при <=1,0 px/su, x2 выше), свои признаки состояний убраны; disabled — реальные пары why.code.length и why.login.fields; selected у главной запрещён API; подпись фона по-русски только на Marmoreal; копии входов вынесены в scraped-data/derived; verification.json с ключами 07 §1.2, outside_folder [], source_unchanged true; manifest 98/98; генераций 0; ревью Claude: accept по делегированию (ВР-VS3-SC01-01…10), граница модали к заднику под вуалью ниже 3:1 записана (ВР-VS3-SC01-10)"
     }
   ],
   "totals": {
     "syntx_spent": 6.0,
     "tripo_spent": 0,
-    "codex_packages": 44
+    "codex_packages": 46
   }
 }
