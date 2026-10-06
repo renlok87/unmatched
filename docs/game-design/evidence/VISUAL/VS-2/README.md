@@ -297,7 +297,7 @@
   `tools/art/tests/test_hud_skins_import.py`, `tools/art/cards` — 165 passed; `hud_contract.py validate` PASS. Логи UE:
   `C:/tmp/visual/VS2-frames/ue-tests-full-4.log` — 418 Success, 0 Fail, EXIT CODE 0 (после последней правки кода
   `230b2b0d`). Штамп упаковки `230b2b0d`, `sourceHash 02e3ea36…`.
-- **Кадры открыты ревьюером (Read), 11 кадров выхода:** `pv-marm-720-150` host own +3 и joiner opp +0,5;
+- **Кадры открыты ревьюером (Read), 12 кадров выхода:** `pv-marm-720-150` host own +3 и joiner opp +0,5;
   `pv-sarp-720-150` host own +0,5 и joiner opp +3; `pv-sarp-1080-100` host own +3 и joiner opp +0,5;
   `pv-marm-1080-100-slate` host own +3; `vsaipv-sarp-720` own +0,5; `pv-marm-1080-75` joiner own +3;
   `pv-marm-720-100` host opp +3; `pv-marm-1080-150` joiner own +0,5; `pv-sarp-1080-75` host opp +0,5. Доски настоящие,
