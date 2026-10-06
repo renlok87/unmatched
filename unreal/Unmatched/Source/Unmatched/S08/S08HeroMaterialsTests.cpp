@@ -1,8 +1,8 @@
 // AN-32 (ВР-16) automation tests of the heroMaterials block of the map light profile (S08BoardArt.h) and its way
 // onto the figures (AS08FighterActor::ApplyHeroMaterials; the Art Tuner scope "heroMaterials"):
 //   Unmatched.S08.HeroMaterials.Parse - the block decodes: looks P1 / P2 / *, neutral defaults for absent fields.
-//   Unmatched.S08.HeroMaterials.Validate - a bad class / gain / spec / look drops only that hero's entry with an
-//     error (the profile and the other heroes stay).
+//   Unmatched.S08.HeroMaterials.Validate - a bad class / gain / spec / look, an unknown field or hero key and a
+//     non-number drop that hero's whole entry with an error (the profile and the other heroes stay).
 //   Unmatched.S08.HeroMaterials.Apply - a non-neutral fix wraps the v2 body slots in MIDs carrying the values; a
 //     neutral fix / nullptr unwraps them back to the plain MI; -S08HeroMatFixLegacy ignores the block.
 //   Unmatched.S08.ArtTuner.HeroMaterials - the registry rows (Config/ArtTuner/S08ArtTunerParams.json) point into
@@ -64,7 +64,7 @@ FS08BoardFighter Harpy() {
 }  // namespace
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08HeroMaterialsParseTest,
-    "Unmatched.S08.HeroMaterials.Parse the block decodes - looks P1/P2/*, neutral defaults (AN-32, BP-16)",
+    "Unmatched.S08.HeroMaterials.Parse the block decodes - looks P1/P2/*, neutral defaults (AN-32, VR-16)",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FS08HeroMaterialsParseTest::RunTest(const FString&) {
   FS08BoardArtData Data;
@@ -89,7 +89,7 @@ bool FS08HeroMaterialsParseTest::RunTest(const FString&) {
 }
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08HeroMaterialsValidateTest,
-    "Unmatched.S08.HeroMaterials.Validate bad values drop only that hero entry with an error (AN-32, BP-16)",
+    "Unmatched.S08.HeroMaterials.Validate bad values drop only that hero entry with an error (AN-32, VR-16)",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FS08HeroMaterialsValidateTest::RunTest(const FString&) {
   auto Check = [this](const FString& Name, const FString& Block, const TCHAR* ErrorPart, int32 WantHeroes) {
@@ -105,21 +105,44 @@ bool FS08HeroMaterialsValidateTest::RunTest(const FString&) {
   };
   Check(TEXT("class over 15"),
         TEXT("\"heroMaterials\": { \"Medusa\": { \"*\": { \"FixClassA\": 16 } }, \"Merlin\": { \"*\": { \"FixGainA\": 0.9 } } }"),
-        TEXT("heroMaterials.Medusa.* out of range: FixClassA"), 1);
+        TEXT("heroMaterials.Medusa.*: FixClassA out of range"), 1);
   Check(TEXT("gain under 0.5"),
         TEXT("\"heroMaterials\": { \"Medusa\": { \"*\": { \"FixGainA\": 0.4 } }, \"Merlin\": { \"*\": { \"FixGainA\": 0.9 } } }"),
-        TEXT("heroMaterials.Medusa.* out of range: FixGainA"), 1);
+        TEXT("heroMaterials.Medusa.*: FixGainA out of range"), 1);
   Check(TEXT("spec over 0.3"),
         TEXT("\"heroMaterials\": { \"Medusa\": { \"*\": { \"FixSpecA\": 0.4 } }, \"Merlin\": { \"*\": { \"FixGainA\": 0.9 } } }"),
-        TEXT("heroMaterials.Medusa.* out of range: FixSpecA"), 1);
+        TEXT("heroMaterials.Medusa.*: FixSpecA out of range"), 1);
   Check(TEXT("unknown look key"),
         TEXT("\"heroMaterials\": { \"Medusa\": { \"P9\": { \"FixGainA\": 0.9 } }, \"Merlin\": { \"*\": { \"FixGainA\": 0.9 } } }"),
         TEXT("heroMaterials.Medusa.P9"), 1);
+  // M3 (Z-1 review): an unknown Fix field name, an unknown hero key and a non-number each drop that hero's entry.
+  Check(TEXT("unknown field"),
+        TEXT("\"heroMaterials\": { \"Medusa\": { \"*\": { \"FixGainC\": 1.1 } }, \"Merlin\": { \"*\": { \"FixGainA\": 0.9 } } }"),
+        TEXT("heroMaterials.Medusa.*: unknown field FixGainC"), 1);
+  Check(TEXT("unknown hero key"),
+        TEXT("\"heroMaterials\": { \"Zeus\": { \"*\": { \"FixGainA\": 1.1 } }, \"Merlin\": { \"*\": { \"FixGainA\": 0.9 } } }"),
+        TEXT("heroMaterials.Zeus: unknown hero key"), 1);
+  Check(TEXT("not a number"),
+        TEXT("\"heroMaterials\": { \"Medusa\": { \"*\": { \"FixGainA\": \"bright\" } }, \"Merlin\": { \"*\": { \"FixGainA\": 0.9 } } }"),
+        TEXT("heroMaterials.Medusa.*: FixGainA is not a number"), 1);
+  // One bad look drops the hero's whole entry (its good look too), the other heroes stay.
+  Check(TEXT("one bad look drops the hero"),
+        TEXT("\"heroMaterials\": { \"Medusa\": { \"P1\": { \"FixGainA\": 1.1 }, \"P2\": { \"FixSpecA\": 0.9 } }, \"Merlin\": { \"*\": { \"FixGainA\": 0.9 } } }"),
+        TEXT("heroMaterials.Medusa.P2: FixSpecA out of range"), 1);
+  {
+    FS08BoardArtData Data;
+    TArray<FString> Errors;
+    Data.ParseJson(Doc(TEXT("\"heroMaterials\": { \"Medusa\": { \"P1\": { \"FixGainA\": 1.1 }, \"P2\": { \"FixSpecA\": 0.9 } } }")), Errors);
+    if (const FS08LightProfile* L = Data.Lights.Find(TEXT("L"))) {
+      TestTrue("the dropped hero is neutral on both looks", L->HeroMaterialFix(TEXT("Medusa"), TEXT("P1")).IsNeutral() &&
+                                                                 L->HeroMaterialFix(TEXT("Medusa"), TEXT("P2")).IsNeutral());
+    }
+  }
   return true;
 }
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08HeroMaterialsApplyTest,
-    "Unmatched.S08.HeroMaterials.Apply the fix wraps the v2 body slots in MIDs; neutral unwraps (AN-32, BP-16)",
+    "Unmatched.S08.HeroMaterials.Apply the fix wraps the v2 body slots in MIDs; neutral unwraps (AN-32, VR-16)",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FS08HeroMaterialsApplyTest::RunTest(const FString&) {
   UWorld* World = UWorld::CreateWorld(EWorldType::Game, false, TEXT("S08HeroMaterialsWorld"));
@@ -175,7 +198,7 @@ bool FS08HeroMaterialsApplyTest::RunTest(const FString&) {
 }
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08ArtTunerHeroMaterialsTest,
-    "Unmatched.S08.ArtTuner.HeroMaterials the registry rows point into lightProfiles heroMaterials (AN-32, BP-16)",
+    "Unmatched.S08.ArtTuner.HeroMaterials the registry rows point into lightProfiles heroMaterials (AN-32, VR-16)",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FS08ArtTunerHeroMaterialsTest::RunTest(const FString&) {
   ES08TunerScope Scope = ES08TunerScope::None;
