@@ -599,11 +599,65 @@
       "result_path": "art/imagegen/portrait-crop-v1-codex/",
       "status": "ok",
       "note": "CX-16 fix1 (единственный корректирующий прогон); 2026-10-06 15:37-15:46 +05:00 (~9 мин); verification.json в формате 07 §1.2 (exports, palette 0, gray 384 пары, sizes, acceptance 6/6), строки x3 (2160p 150 %): 24 расчётные, 10 превышений, подписи ring/увеличение на рабочих листах, отступ подписей overlay 6 px; кропы B и edge-маски не менялись; verifier 316 проверок, 0 ошибок; ревью Claude: accept (по делегированию), ВР-VS2-CP-10"
+    },
+    {
+      "date": "2026-10-06T15:53:00+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "HB-38",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a110c6-f354-7372-ad3d-4158ed778e53",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/HB-38.codex.md",
+      "result_path": "art/imagegen/hud-feed-v1-codex/",
+      "status": "ok",
+      "note": "CX-14 run 1; 2026-10-06 15:33-15:53 +05:00 (~20 мин); карточка HB-38 исправлена до прогона (ВР-VS2-HB38-01…17): фон Marmoreal — нарисованный задник -ConceptPaste (aeafe8f2), база HB-07/HB-13/HB-22/HB-29/HB-34/CP-13/HB-08, 8 состояний × 2 доски × 4 холста; 64 макета + 64 серых + EN-проверка в scraped-data/derived/hud-feed-v1-codex/ (вне git), пакет 22,9 МБ; verifier: combat_zero FAIL (7 из 8 боевых overlay — группа двух тостов и субтитра, маска клеток); ревью Claude: fix-needed (стрелка → не рисуется в строках журнала — нет глифа в Roboto, overlay-листы залиты отвергнутыми попытками, правило препятствий в бою ВР-VS2-HB38-18, EN-проверка со смешанным языком) -> fix1"
+    },
+    {
+      "date": "2026-10-06T15:47:41+05:00",
+      "service": "Codex",
+      "model": "codex exec (ChatGPT app, codex.exe 5ea220ae)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "HB-42",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a110c6-1376-7ab3-92d5-dd97bd1fb2dd",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/HB-42.codex.md",
+      "result_path": "art/imagegen/hud-actions-v1-codex/",
+      "status": "ok",
+      "note": "CX-15 прогон 1; 2026-10-06 15:32-15:47 +05:00 (~15 мин); 16 состояний × 2 доски × 4 холста: 128 + 128 серых, EN-проверка, полосы, контактные и overlay-листы (308 PNG), пакет 5,2 МБ; workflow остановился на лимите до ревью; ревью Claude (продолжение): fix-needed — «КОНЕЦ ХОДА» не помещался в ячейку 80 su (на 720p за краем на 1 px), базовые линии подписей в ряду расходились до 3 px -> fix1"
+    },
+    {
+      "date": "2026-10-06T20:27:52+05:00",
+      "service": "Codex",
+      "model": "codex exec (ChatGPT app, codex.exe 5ea220ae)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "HB-42",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a111c8-02e5-7c23-bc08-2639e03fd406",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/HB-42.fix1.codex.md",
+      "result_path": "art/imagegen/hud-actions-v1-codex/",
+      "status": "ok",
+      "note": "CX-15 fix1 (единственный корректирующий прогон); 2026-10-06 20:14-20:27 +05:00 (~13 мин); класс L 78/78/78/86 su, общая базовая линия подписей y + 67 su, учёт замеров по ВР-VS2-HB42-14…18; класс S без изменений (0 px); finalize --check PASS, manifest 324/324; ревью Claude: принято по делегированию (ВР-VS2-HB42-12…20)"
     }
   ],
   "totals": {
     "syntx_spent": 0,
     "tripo_spent": 0,
-    "codex_packages": 29
+    "codex_packages": 32
   }
 }
