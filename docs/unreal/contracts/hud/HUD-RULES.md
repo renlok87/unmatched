@@ -10,6 +10,7 @@
 | [why-reasons.json](why-reasons.json) | коды причин недоступности `why.*` с текстами RU/EN для StringTable `ST_Why` |
 | [tools/s08/hud_contract/hud_contract.py](../../../../tools/s08/hud_contract/hud_contract.py) | `validate` (токены, `why.*` против 02 §4.2), `linear` (hex → linear), `check-trace` (гейт `SHOT widget`) |
 | [tools/s08/hud_contract/test_hud_contract.py](../../../../tools/s08/hud_contract/test_hud_contract.py) | 5 юнит-тестов |
+| [tools/s08/hud_contract/hud_tokens_codegen.py](../../../../tools/s08/hud_contract/hud_tokens_codegen.py) | VS-1 HB-03 (ВР-77): JSON токенов → `unreal/Unmatched/Source/Unmatched/S08/S08HudTokens.generated.h` (namespace `S08HudTokens`, алиасы раскрыты, `kTokensJsonSha256`); `validate` падает «header stale» |
 
 ## 0. Что уже есть (факт, R3.0)
 

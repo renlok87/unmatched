@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Проверки правил HUD (docs/unreal/contracts/hud/HUD-RULES.md) без движка.
 
-  python tools/s08/hud_contract/hud_contract.py validate            токены стиля + коды why.* против 02 §4.2
+  python tools/s08/hud_contract/hud_contract.py validate            G-TOKENS: токены стиля, свежесть S08HudTokens.generated.h
+                                                                    (ВР-77), нет литералов цвета в S08/UI; коды why.* против 02 §4.2
   python tools/s08/hud_contract/hud_contract.py linear              таблица hex sRGB -> linear (как FLinearColor::FromSRGBColor)
   python tools/s08/hud_contract/hud_contract.py check-trace <log> [--width 1920 --height 1080]
                                                                     гейт строк `SHOT widget id=… bbox=… geom=painted`
@@ -16,13 +17,21 @@ import re
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import hud_tokens_codegen as codegen  # noqa: E402
+
 REPO = Path(__file__).resolve().parents[3]
 HUD = REPO / "docs/unreal/contracts/hud"
 TOKENS = HUD / "hud-style-tokens.json"
 WHY = HUD / "why-reasons.json"
 SPEC02 = REPO / "docs/game-design/02-ux-ui-spec.md"
+HEADER = codegen.HEADER
+UI_SRC = REPO / "unreal/Unmatched/Source/Unmatched/S08/UI"
 STATUSES = ("предложено", "измерено", "технически импортировано", "художественно принято")
 HEX_RE = re.compile(r"^#[0-9A-Fa-f]{6}$")
+# G-TOKENS (02 §13.5): colour literals in the new HUD code (S08/UI) - the values come from S08HudTokens / UUmHudTheme.
+COLOR_LITERAL_RE = re.compile(r"\bFColor(?:\s+\w+)?\s*[({]\s*(?:0x)?\d|\bFLinearColor(?:\s+\w+)?\s*[({]\s*[-\d.]"
+                              r"|FromHex\s*\(\s*TEXT\s*\(\s*\"#?[0-9A-Fa-f]{6}")
 UI_ID_RE = re.compile(r"\bUI-(?:HUD|SCR)-[A-Z]+(?:-[A-Z]+)*\b")
 WHY_02_RE = re.compile(r"`(why\.[a-z.]+)`")
 SHOT_RE = re.compile(r"SHOT widget (.*)$")
@@ -52,20 +61,57 @@ def validate_tokens(tokens):
     errors = []
     if tokens.get("schema") != "unmatched.hud-style-tokens/1":
         errors.append("tokens: schema")
-    for group in ("colors", "typography", "spacing", "radii", "icons", "motion"):
+    for group in ("colors", "typography", "spacing", "radii", "icons", "motion", "opacity", "skins"):
         if group not in tokens:
-            errors.append("tokens: нет группы %s" % group)
+            if group not in ("opacity", "skins"):  # opacity / skins: optional groups (VS-1 HB-03 / HB-04)
+                errors.append("tokens: нет группы %s" % group)
             continue
         for name, tok in tokens[group].items():
             if tok.get("status") not in STATUSES:
                 errors.append("%s.%s: status" % (group, name))
             if not tok.get("source"):
                 errors.append("%s.%s: нет source" % (group, name))
-            if group == "colors" and not HEX_RE.match(tok.get("hex", "")):
-                errors.append("%s.%s: hex %r" % (group, name, tok.get("hex")))
+            if group == "colors":
+                if "alias" not in tok and not HEX_RE.match(tok.get("hex", "")):
+                    errors.append("%s.%s: hex %r" % (group, name, tok.get("hex")))
+                try:
+                    codegen.resolve_color(tokens["colors"], name)  # alias chain, alpha, hex == resolved alias
+                except codegen.TokenError as e:
+                    errors.append(str(e))
             if group in ("spacing", "radii", "icons") or (group == "typography" and "px" in tok):
                 if not isinstance(tok.get("px"), int) or tok["px"] <= 0:
                     errors.append("%s.%s: px" % (group, name))
+            if group == "typography" and name.startswith("type."):
+                if not isinstance(tok.get("su"), int) or tok["su"] <= 0:
+                    errors.append("%s.%s: su" % (group, name))
+                if tok.get("face") not in codegen.FACES:
+                    errors.append("%s.%s: face %r" % (group, name, tok.get("face")))
+            if group == "opacity" and not (isinstance(tok.get("value"), (int, float)) and 0 <= tok["value"] <= 1):
+                errors.append("%s.%s: value" % (group, name))
+            if group == "skins":
+                try:
+                    codegen.resolve_skin(tokens, name)
+                except (codegen.TokenError, KeyError, TypeError, ValueError) as e:
+                    errors.append("skins.%s: %s" % (name, e))
+    if not errors:
+        try:
+            codegen.collect(tokens)  # the same checks the generator runs (type.*, motion, identifier clashes)
+            codegen.render(tokens, "0" * 64)
+        except codegen.TokenError as e:
+            errors.append(str(e))
+    return errors
+
+
+def literal_errors(src_dir=UI_SRC):
+    """G-TOKENS: no colour literal in the new HUD code; values come from S08HudTokens.generated.h / the theme."""
+    errors = []
+    for path in sorted(Path(src_dir).rglob("*")):
+        if path.suffix not in (".h", ".cpp") or path.name.endswith(".generated.h"):
+            continue
+        for n, line in enumerate(path.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
+            code = line.split("//", 1)[0]
+            if COLOR_LITERAL_RE.search(code):
+                errors.append("литерал цвета %s:%d: %s" % (path.relative_to(REPO).as_posix(), n, line.strip()))
     return errors
 
 
@@ -154,14 +200,17 @@ def main(argv=None):
     a = ap.parse_args(argv)
     spec02 = SPEC02.read_text(encoding="utf-8")
     if a.cmd == "validate":
-        errors = validate_tokens(load(TOKENS)) + validate_why(load(WHY), spec02)
+        errors = (validate_tokens(load(TOKENS)) + codegen.header_errors(TOKENS, HEADER) + literal_errors()
+                  + validate_why(load(WHY), spec02))
         for e in errors:
             print("ERROR", e)
         print("HUD_CONTRACT", "PASS" if not errors else "FAIL")
         return 0 if not errors else 1
     if a.cmd == "linear":
-        for name, tok in load(TOKENS)["colors"].items():
-            print("%-16s %s -> linear %s" % (name, tok["hex"], hex_to_linear(tok["hex"])))
+        colors = load(TOKENS)["colors"]
+        for name in colors:
+            hexstr, alpha = codegen.resolve_color(colors, name)
+            print("%-20s %s -> linear %s alpha %.2f" % (name, hexstr, hex_to_linear(hexstr), alpha))
         return 0
     lines = Path(a.log).read_text(encoding="utf-8", errors="replace").splitlines()
     errors, seen = check_widget_trace(lines, ui_ids_from_02(spec02), a.width, a.height)
