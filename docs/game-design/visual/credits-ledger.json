@@ -347,11 +347,65 @@
       "result_path": "art/imagegen/hud-composition-v1-codex/",
       "status": "ok",
       "note": "CX-01r fix1 (единственный корректирующий прогон); 2026-10-06 12:33-12:44 +05:00 (~11 мин); STATUS атакующего = why.wait.defender, зазор HP-трекеры в S ≥9,8 su, ширина STATUS по тексту, контраст кромки по паре 02 §3.5; verifier PASS, failed_acceptance []; ревью Claude: принято по делегированию"
+    },
+    {
+      "date": "2026-10-06T13:06:56+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "HB-13",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a11037-846a-7a90-b7b6-5b8d8a1a6b72",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/HB-13.codex.md",
+      "result_path": "art/imagegen/hud-topstrip-v1-codex/",
+      "status": "ok",
+      "note": "CX-08 run 1; 2026-10-06 12:57-13:07 +05:00 (~10 мин); карточка HB-13 исправлена до прогона: фон Marmoreal — нарисованный задник -ConceptPaste (aeafe8f2, ВР-VS2-01), имена из БД (ВР-VS2-02), база — принятый HB-07, строки HB-05; 15 состояний x 2 доски x 4 холста = 120 макетов + 120 серых в scraped-data/derived/hud-topstrip-v1-codex/ (вне git), пакет 17 МБ; verifier PASS; ревью Claude: fix-needed (номер хода в ход соперника не по трассе, перенос строки защиты разрывает «Без защиты» и тесный интерлиньяж, точка-пульс 6 su, баннер не по центру) -> fix1"
+    },
+    {
+      "date": "2026-10-06T13:10:15+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "HB-17",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a11035-f5f9-75c0-acd9-0d544417383b",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/HB-17.codex.md",
+      "result_path": "art/imagegen/hud-panels-v1-codex/",
+      "status": "ok",
+      "note": "CX-09 run 1; 2026-10-06 12:55-13:10 +05:00 (~15 мин); карточка HB-17 исправлена до прогона: фон Marmoreal — нарисованный задник -ConceptPaste (aeafe8f2, ВР-VS2-01), прямоугольники принятого CX-01r, имена из БД (ВР-VS2-02), без «уточнить» на макете; 74 макета + 74 серых, 12 листов состояний, листы кольца в scraped-data/derived/hud-panels-v1-codex/ (вне git), пакет 4,9 МБ; verifier PASS; ревью Claude: fix-needed (PANEL-OPP зеркален наполовину, в классе S sidekick-fallen сердце поверх аватара и подпись «1:0/1» не по StringTable, Sarpedon King Arthur 17/18 вместо 18/18 run I, точка-пульс ~4 su, README/verification с «????» и без пробелов) -> fix1"
+    },
+    {
+      "date": "2026-10-06T13:22:55+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "HB-13",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a11046-e415-7882-ae1d-825930c4081a",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/HB-13.fix1.codex.md",
+      "result_path": "art/imagegen/hud-topstrip-v1-codex/",
+      "status": "ok",
+      "note": "CX-08 fix1 (единственный корректирующий прогон); 2026-10-06 13:14-13:23 +05:00 (~9 мин); номер хода по интервалу HUD-TURN и S09AUTO активного клиента, перенос защиты без разрыва «Без защиты», шаг строк 30 su, капсула S 74->78 su, точка-пульс 6->10 su, баннер по центру ink; 120 макетов + 120 серых пересобраны; verifier PASS, 24/24 acceptance; ревью Claude: принято по делегированию"
     }
   ],
   "totals": {
     "syntx_spent": 0,
     "tripo_spent": 0,
-    "codex_packages": 15
+    "codex_packages": 18
   }
 }
