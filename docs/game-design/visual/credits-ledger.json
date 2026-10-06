@@ -491,11 +491,65 @@
       "result_path": "art/imagegen/hud-decks-v1-codex/",
       "status": "ok",
       "note": "CX-11 fix1 (единственный корректирующий прогон); 2026-10-06 14:45-14:54 +05:00 (~9 мин); панель 720p L 340 -> 336 su (D8 61 -> 0 px²), заголовок рвётся только после « · », фишки L 156/124 su (EN 144/136) с отступами 8 su, вкладки через 8 su, имена 16 su на общей базовой линии; 56 + 56 серых + EN пересобраны; verify_package --check PASS, manifest 179/179; ревью Claude: принято по делегированию (ВР-VS2-HB26-08…13)"
+    },
+    {
+      "date": "2026-10-06T14:50:00+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "HB-34",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a11086-cef3-7232-bf1a-3745ffaba72f",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/HB-34.codex.md",
+      "result_path": "art/imagegen/hud-pending-v1-codex/",
+      "status": "ok",
+      "note": "CX-13 run 1; 2026-10-06 14:23-14:50 +05:00 (~27 мин); карточка HB-34 исправлена до прогона (ВР-VS2-HB34-01…12): фон Marmoreal — нарисованный задник -ConceptPaste (aeafe8f2), база HB-07/HB-13/HB-22/CP-13/HB-08, 18 состояний × 2 доски × 4 холста, без «уточнить» на финалах; 144 макета + 144 серых + EN-проверка в scraped-data/derived/hud-pending-v1-codex/ (вне git); verifier: P9 (компакт класса S на 720p 150 %, чип +3 над TOP), P12 (линия удержания 1,55:1), P13 (СХЕМА/СБРОС 19,3 luma) — FAIL; ревью Claude: fix-needed (клавиша S вместо G, кнопки не капсом, отметка PICK не видна в сером, ORDER, компакт S, BOOST-компакт, ширина серого компакта, чип, лента СБРОС и владелец) -> fix1"
+    },
+    {
+      "date": "2026-10-06T14:38:13+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "HB-29",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a11086-ab04-77f1-8c35-c6426eceff84",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/HB-29.codex.md",
+      "result_path": "art/imagegen/hud-combat-v1-codex/",
+      "status": "ok",
+      "note": "CX-12 run 1; 2026-10-06 14:23-14:38 +05:00 (~15 мин); карточка HB-29 исправлена до прогона (ВР-VS2-HB29-01…10): фон Marmoreal — нарисованный задник -ConceptPaste (aeafe8f2), геометрия боя принятого HB-07, CP-13, кнопки HB-08, капсула и чип HB-44, три боя прогона I; 84 макета + 84 серых + 2 шкалы в scraped-data/derived/hud-combat-v1-codex/ (вне git), пакет 11 МБ; verifier: C2/C7 (кнопки ниже на 28 su на Marmoreal 1080p 100 %), C3 (зазор рубашки 4 su), кромка disabled HB-08 2,38:1 — FAIL; ревью Claude: fix-needed (CENTER slam/hit 160 su с пустой полосой, «ещё n» не чип, STATUS рвёт «Без защиты» в классе S) -> fix1"
+    },
+    {
+      "date": "2026-10-06T14:56:39+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "HB-29",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a11098-d5b6-7812-992e-880c45606c0a",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/HB-29.fix1.codex.md",
+      "result_path": "art/imagegen/hud-combat-v1-codex/",
+      "status": "ok",
+      "note": "CX-12 fix1 (единственный корректирующий прогон); 2026-10-06 14:43-14:56 +05:00 (~13 мин); CENTER slam/hit/holds по содержимому (135-153 su) с обеими строками A, «ещё n» — чип panel.bg.inset, STATUS защитника = HB-13 (кавычки не рвутся); три лимита — accepted_exceptions ВР-VS2-HB29-11…13; 84 + 84 серых + шкалы пересобраны; verify_outputs PASS, manifest 222/222; ревью Claude: принято по делегированию (ВР-VS2-HB29-11…15)"
     }
   ],
   "totals": {
     "syntx_spent": 0,
     "tripo_spent": 0,
-    "codex_packages": 23
+    "codex_packages": 26
   }
 }
