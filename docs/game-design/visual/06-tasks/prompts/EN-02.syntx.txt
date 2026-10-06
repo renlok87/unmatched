@@ -49,3 +49,24 @@ Keep composition, perspective, palette, painterly brush texture and lighting of 
 No new objects, no characters, no text, no water, no moon disc, no new towers, arches or statues. Forbidden: copying or imitating pixels, assets, splash art, logos, card text or fonts of any commercial digital edition of a board game; brush-stroke banners and ink splatter; invented game data (card names, numbers, hero names, HP, boards, spaces); text, letters or numbers baked into textures; red fills; any element on screen that carries meaning only by colour.
 Output the whole canvas in the same 16:9 framing as the input image.
 ```
+
+## Retry 1 (r2) - the last run of the card budget (2 × 3 tokens)
+
+Why (review of r1 by Claude, 2026-10-07, by delegation): run r1 (task 4f01a848…, 3 tokens) keeps the painting and the
+seam field passes on all four sides (G(0)/median 1.32 / 1.07 / 1.49 / 0.79), but the extension breaks the card:
+a moon disc in the upper-left clouds (card `dont`: no moon disc); two symmetric balustraded bridges leading off the
+island at the left and right (new structures, mirrored composition; card `dont`: no landmarks, no mirrored
+architecture); the bottom haze is lighter than the original's bottom band (card `readability`: edges darken toward the
+frame). The retry keeps the same input, settings and assembly; only the prompt below changes (the three defects are
+named; the rest is the template text of the first run).
+
+```text
+Edit the first image only. It is a painted night backdrop around a board game table area. The painting must continue past its current edges, so that when the camera zooms out the borders show painting, not a stretched edge.
+Change only: the flat mid-grey border band that surrounds the painting on all four sides (334 px on the left and right, 188 px at the top and bottom) is empty canvas. Paint it by extending the painting outward seamlessly: same perspective, same palette, same painterly texture, terrain continues naturally, darker toward the frame edges, no new landmarks, no water.
+Above: continue the existing marble colonnade upward to its cornice, then a dark night sky with heavy dark clouds. The sky has no moon, no moon disc and no bright spot.
+Left and right: the garden is a floating island that ends at its own rock edge. Beyond that edge there is only open night air: dark clouds, dark blue haze and faint distant pine silhouettes. Only the existing cherry tree crowns and the existing balustrades finish naturally at the island's edge. No bridges, no walkways, no stairs, no new balustrades or terraces leading away from the island.
+Below: continue the rock cliff of the floating garden downward until it fades into dark blue night haze. The haze grows darker toward the bottom edge of the frame; it is air, never sea or water.
+Do not repeat or mirror the architecture. Keep composition, perspective, palette, painterly brush texture and lighting of the original painting. Cold blue-grey moonlight from the left, warm small lantern pools only where they already exist and are listed: the extended edges carry cold moonlight only and no warm pools; the only warm light is the glow inside the open palace door. Keep the existing painting exactly where it is: do not move, resize, crop or repaint it. The grey rectangle inside the dark wooden frame in the centre is a placeholder: leave it exactly grey and untouched.
+No new objects, no characters, no text, no water, no moon disc, no new towers, arches or statues. Forbidden: copying or imitating pixels, assets, splash art, logos, card text or fonts of any commercial digital edition of a board game; brush-stroke banners and ink splatter; invented game data (card names, numbers, hero names, HP, boards, spaces); text, letters or numbers baked into textures; red fills; any element on screen that carries meaning only by colour.
+Output the whole canvas in the same 16:9 framing as the input image.
+```
