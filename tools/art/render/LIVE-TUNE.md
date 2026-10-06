@@ -131,3 +131,56 @@ Live-кадры одной сессии используют одну и ту ж
 
 Замер 2026-10-03 (editor `-game`, Sarpedon): `tune` трёх строк — 10 мс на команду, применение 1–4 мс; материалы
 острова / корабля / листвы — 1,1 мс. `reload` переносит значения тюнера на перечитанный документ.
+
+## env_gates — гейты окружения в git (EN-05, 2026-10-06)
+
+`tools/art/render/env_gates.py` — гейты G1/G2/G4–G7, критерии P10 и лист приёмки. Логика перенесена из
+`C:/tmp/envmaps-research/{p5c,p7,p9}/tune` и `p10/tools` без изменений; источники и их sha256 — в шапке файла
+(решение по делегированию ВР-EN.7: C:/tmp — только история). Кадры концепта и плиты в git не кладутся (ENV-U3): концепт
+передаётся аргументом `--concept`.
+
+```
+python tools/art/render/env_gates.py --check                                   # синтетика, ~1–2 с
+python tools/art/render/env_gates.py gates <run> --concept <concept.png> [--off <run>] [--g6-exclude lantern-deck-se=x,y;x,y;x,y] --json out.json
+python tools/art/render/env_gates.py crit <run> --concept <concept.png> --gates  # критерии P10 + G4 / G5 / G6
+python tools/art/render/env_gates.py edge <K1.png>                               # прямая кромка, ROI 560–1360 × 900–1080
+python tools/art/render/env_gates.py ssim-ship <a.png> <b.png> --concept <concept.png>
+python tools/art/render/env_gates.py cannons <C0.png>
+python tools/art/render/env_gates.py streams <C0.png> [--roi 640,885,1000,1040]  # светлые полосы водопада
+python tools/art/render/env_gates.py fire <K1.png> [--roi x0,y0,x1,y1] [--min-sat 0]
+python tools/art/render/env_gates.py sheet <a.png> <b.png> --out <sheet.png> [--crop x0,y0,x1,y1] [--label ...]
+python -m pytest tools/art/tests/test_env_gates.py -q
+```
+
+`<run>` — папка с `bench-<вид>-1920x1080.png` и трассой `bench.trace.log` или `bench.trace.txt` (в git `*.log`
+игнорируется). Карта G5 — из трассы или `--map`.
+
+Проверка переноса (2026-10-06) на кадрах P10 из git (`docs/game-design/evidence/ENV-MAPS/p10-sarpedon-rework-2026-10-03/sarpedon-packaged/`):
+
+| Замер | README P10 | env_gates |
+|---|---|---|
+| кромка K1 | 20 px | 20 px (строка 1059) |
+| G5 K1: карта Y / ΔE зон / тёплых / кольцо | 104,9 / 25,33 / 0,126 / 33,6 | 104,9 / 25,329 (blue-purple) / 0,126 / 33,6 |
+| с концептом: SSIM корабля / тело водопада ΔE76 / форт ΔE76 | 0,442 / 3,84 / 5,93 | 0,4419 / 3,84 / 5,93 |
+| G4 SSIM ¼ / медиана ΔE пятен; G6 фонарей ≥ 0,8 | 0,490 / 5,52; 4 из 6 | 0,4897 / 5,52; 4 из 6 |
+| G7 водопад live (P10 `runs/i2-live`) | 29,3 / 23,5 % | 29,26 / 23,45 % |
+
+Все выходы `crit.py`, `gates.py` и `g7.py` на тех же кадрах совпали с новыми значение в значение (сравнение разобранного JSON). Полный прогон
+`crit --gates` на трёх кадрах — 4 с.
+
+**N_concept = 3** (нужно EN-19): `streams` на `concept-registered-H.png` (C0) в ROI каскада 640–1000 × 885–1040
+(= ROI F4 из `fixes.py`) даёт 3 полосы: x 656 (61 px), 786 (100 px), 925 (33 px). На ROI тела 660–980 × 870–1000 и
+600–1000 × 930–1060 — тоже 3. Кадр P10 packaged C0 в ROI каскада — 2 полосы.
+
+Новые замеры (определения — в шапке `env_gates.py`):
+- `streams`: среднее Y по столбцу ≥ 1,4 × медианы ROI — светлый столбец. Две светлые серии — одна полоса, пока между ними
+  нет столбца ≤ 0,8 × медианы. Полоса засчитывается при ширине ≥ 10 px.
+- `fire`: маска V ≥ 0,85 и тон 10–45°, наибольшая связная область. Считаются высота, h/w, языки (пики верхней кромки с
+  выступом ≥ max(2 px, 0,1 высоты)) и доля красного (тон < 15° среди ярких тёплых пикселей рамки).
+  - По умолчанию ROI — мировые коробки `fire-fort` / `fire-brazier` из G7, спроецированные камерой кадра.
+  - Ограничение: маска карточки берёт и освещённые огнём поверхности с V ≥ 0,85. На P10 K1 в неё попала стена форта:
+    высота 119 px, h/w 1,35, 2 языка. У жаровни: 97 px, 1,29, 1 язык. Насыщенность их не разделяет (`--min-sat 0.6` даёт
+    те же числа), поэтому EN-22 сужает ROI до пламени.
+- `sheet`: цвет / серый Rec.709 / дейтеранопия Machado 2009 (тяжесть 1,0) — преобразования `tools/art/visual/sheet.py`.
+- G6 `--g6-exclude`: полигон в пикселях кадра вычитается из маски свечения фонаря в кадре игры и в концепте
+  (ВР-EN.10, грань ящика под `lantern-deck-se`). Сам полигон подбирает EN-21; без параметра числа G6 прежние.
