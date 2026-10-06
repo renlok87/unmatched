@@ -2,7 +2,11 @@
 #include "UmPortrait.h"
 
 #include "UmCardMedia.h"
+#include "UmHudTheme.h"
+#include "../S08HudTokens.generated.h"
 #include "../../S09/S09TurnHud.h"
+#include "Engine/Texture2D.h"
+#include "Materials/MaterialInstanceDynamic.h"
 
 namespace UmPortrait {
 FString SlugOf(const FString& Name) {
@@ -61,6 +65,20 @@ const TCHAR* StateName(EUmPortraitState State) {
     case EUmPortraitState::Loser: return TEXT("loser");
     default: return TEXT("avatar");
   }
+}
+
+void SetupDiscMid(UMaterialInstanceDynamic& Mid, const FUmCardMediaEntry& Entry, UTexture2D* Tex, float CircleSu) {
+  const UUmHudTheme& Theme = UUmHudTheme::Get();
+  Mid.SetTextureParameterValue(ParamAvatar, Tex);
+  const FVector4 R = UvRect(Entry);
+  Mid.SetVectorParameterValue(ParamUvRect, FLinearColor(R.X, R.Y, R.Z, R.W));
+  FLinearColor Edge = Theme.Color(TEXT("panel.edge"));
+  Edge.A = S08HudTokens::Alpha_PanelEdge;  // the rim keeps the token's alpha over panel.bg (4.0 : 1)
+  Mid.SetVectorParameterValue(ParamEdgeColor, Edge);
+  Mid.SetVectorParameterValue(ParamKeylineColor, Theme.Color(TEXT("mark.keyline")));
+  Mid.SetVectorParameterValue(ParamFillColor, Theme.Color(TEXT("card.navy")));
+  Mid.SetScalarParameterValue(ParamEdgeFrac, EdgeSu / FMath::Max(CircleSu, 1.0f));
+  Mid.SetScalarParameterValue(ParamKeylineFrac, KeylineSu / FMath::Max(CircleSu, 1.0f));
 }
 
 FString TraceLine(FName Key, const FString& Texture, float Su, float PxPerSu, float SrcCirclePx, const TCHAR* Show,

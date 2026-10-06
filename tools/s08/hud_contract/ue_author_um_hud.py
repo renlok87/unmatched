@@ -14,6 +14,10 @@ their C++ bases (UUmHudAuthoringLibrary -> BuildDefaultTree of each class), in t
   /Game/S08/UI/Hud/WBP_UI_HUD_STATUS  parent UmHudStatusLine  parts Frame, BodyBox, Body, Row, PulseDot, StatusText,
                                       KeyChip, KeyRow, KeyBox0..2, Key0..2, KeyText0..2 (VS-2 HB-15)
   /Game/S08/UI/Hud/WBP_UI_HUD_BANNER  parent UmHudBanner parts Plate, Text (VS-2 HB-16)
+  /Game/S08/UI/Hud/WBP_UI_HUD_PANEL_LOC  parent UmHudPlayerPanel  parts Panel, Canvas, Portrait (WBP_UmPortrait), NameText,
+                                      StatusRow, PulseDot, StatusText, HpRow, HeartIcon, HpText, TrackerRow, SidekickRow
+                                      (VS-2 HB-18); WBP_UI_HUD_PANEL_OPP the same, mirrored (HB-20)
+  /Game/S08/UI/Hud/WBP_UI_HUD_OPP_HAND  parent UmHudOppHand  parts Panel, Column, Backs, Caption (VS-2 HB-21)
 
 A widget tree is not reachable from Python, so the C++ library builds it (the same function the class uses without a
 WBP) and this script re-loads every asset, checks the parent class, writes the report (env UM_HUD_WBP_REPORT, default
@@ -42,6 +46,9 @@ ASSETS = {
     "/Game/S08/UI/Hud/WBP_UI_HUD_TOP": "UmHudTop",
     "/Game/S08/UI/Hud/WBP_UI_HUD_STATUS": "UmHudStatusLine",
     "/Game/S08/UI/Hud/WBP_UI_HUD_BANNER": "UmHudBanner",
+    "/Game/S08/UI/Hud/WBP_UI_HUD_PANEL_LOC": "UmHudPlayerPanel",
+    "/Game/S08/UI/Hud/WBP_UI_HUD_PANEL_OPP": "UmHudPlayerPanel",
+    "/Game/S08/UI/Hud/WBP_UI_HUD_OPP_HAND": "UmHudOppHand",
 }
 
 

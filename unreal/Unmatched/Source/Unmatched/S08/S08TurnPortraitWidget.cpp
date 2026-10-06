@@ -29,18 +29,12 @@
 #include "Misc/Parse.h"
 
 namespace {
-FLinearColor S08PortraitSrgb(uint8 R, uint8 G, uint8 B, float A = 1.0f) {
-  FLinearColor C = FLinearColor::FromSRGBColor(FColor(R, G, B));
-  C.A = A;
-  return C;
-}
-/** tag.background #161A28 (the HUD panel of the gallery and the tags), a little transparent over the backdrop. */
-const FLinearColor GPortraitPanel = S08PortraitSrgb(0x16, 0x1A, 0x28, 0.88f);
-/** tag.text #F2ECDE. */
-const FLinearColor GPortraitText = S08PortraitSrgb(0xF2, 0xEC, 0xDE);
-/** turn.flash.yellow #F2C14E (STYLE-v3 §11) - the "your turn" accent; dim grey for "waiting". */
-const FLinearColor GPortraitActive = S08PortraitSrgb(0xF2, 0xC1, 0x4E);
-const FLinearColor GPortraitIdle = S08PortraitSrgb(0x9A, 0x9E, 0xAC);
+// VS-2 HB-18 (hud.csv HB-18 п. 3): the colours from UUmHudTheme, no literal - the plate panel.bg (ВР-61; was #161A28
+// 0.88), the text text.primary, the "your turn" accent turn.flash.yellow (STYLE-v3 §11), "waiting" text.secondary
+FLinearColor PortraitPanelColor() { return UUmHudTheme::Get().Color(TEXT("panel.bg")); }
+FLinearColor PortraitTextColor() { return UUmHudTheme::Get().Color(TEXT("text.primary")); }
+FLinearColor PortraitActiveColor() { return UUmHudTheme::Get().Color(TEXT("turn.flash.yellow")); }
+FLinearColor PortraitIdleColor() { return UUmHudTheme::Get().Color(TEXT("text.secondary")); }
 /** Ring / tracker / heart texture sizes: exact-size v3 textures (24 / 32 / 48 / 64 px only). */
 constexpr int32 GRingTexturePx = 64;
 constexpr int32 GSmallTexturePx = 24;
@@ -134,7 +128,7 @@ bool US08TurnPortraitWidget::BuildDefaultTree(UWidgetTree& Tree, FS08AttachWidge
     return false;
   };
   UBorder* PanelW = PortraitMake<UBorder>(Tree, TEXT("Panel"));
-  PanelW->SetBrushColor(GPortraitPanel);
+  PanelW->SetBrushColor(PortraitPanelColor());
   PanelW->SetPadding(FMargin(8.0f, 6.0f, 12.0f, 6.0f));
   PanelW->SetVisibility(ESlateVisibility::HitTestInvisible);  // never takes a click from the board or the HUD
   if (!Attach(PanelW, nullptr)) return Fail(TEXT("Panel"));
@@ -172,7 +166,7 @@ bool US08TurnPortraitWidget::BuildDefaultTree(UWidgetTree& Tree, FS08AttachWidge
   PortraitAlign(AvatarImageW, HAlign_Fill, VAlign_Fill);
   UTextBlock* Mono = PortraitMake<UTextBlock>(Tree, TEXT("MonogramText"));
   Mono->SetFont(PortraitFont(S08ArtHudFonts::CardTypeface, 18));
-  Mono->SetColorAndOpacity(FSlateColor(GPortraitPanel.CopyWithNewOpacity(1.0f)));
+  Mono->SetColorAndOpacity(FSlateColor(PortraitPanelColor().CopyWithNewOpacity(1.0f)));
   Mono->SetJustification(ETextJustify::Center);
   if (!Attach(Mono, AvatarW)) return Fail(TEXT("MonogramText"));
   PortraitAlign(Mono, HAlign_Center, VAlign_Center);
@@ -182,18 +176,18 @@ bool US08TurnPortraitWidget::BuildDefaultTree(UWidgetTree& Tree, FS08AttachWidge
   if (UHorizontalBoxSlot* ColumnSlot = Cast<UHorizontalBoxSlot>(Column->Slot)) ColumnSlot->SetVerticalAlignment(VAlign_Center);
   UTextBlock* Name = PortraitMake<UTextBlock>(Tree, TEXT("NameText"));
   Name->SetFont(PortraitFont(TEXT("Bold"), 15));
-  Name->SetColorAndOpacity(FSlateColor(GPortraitText));
+  Name->SetColorAndOpacity(FSlateColor(PortraitTextColor()));
   if (!Attach(Name, Column)) return Fail(TEXT("NameText"));
   UTextBlock* Status = PortraitMake<UTextBlock>(Tree, TEXT("StatusText"));
   Status->SetFont(PortraitFont(S08ArtHudFonts::CardTypeface, 12));
-  Status->SetColorAndOpacity(FSlateColor(GPortraitIdle));
+  Status->SetColorAndOpacity(FSlateColor(PortraitIdleColor()));
   if (!Attach(Status, Column)) return Fail(TEXT("StatusText"));
   UHorizontalBox* StatsW = PortraitMake<UHorizontalBox>(Tree, TEXT("Stats"));
   if (!Attach(StatsW, Column)) return Fail(TEXT("Stats"));
   if (UVerticalBoxSlot* StatsSlot = Cast<UVerticalBoxSlot>(StatsW->Slot)) StatsSlot->SetPadding(FMargin(0.0f, 2.0f, 0.0f, 0.0f));
   UTextBlock* Hp = PortraitMake<UTextBlock>(Tree, TEXT("HpText"));
   Hp->SetFont(PortraitFont(S08ArtHudFonts::CardTypeface, 14));
-  Hp->SetColorAndOpacity(FSlateColor(GPortraitText));
+  Hp->SetColorAndOpacity(FSlateColor(PortraitTextColor()));
   if (!Attach(Hp, StatsW)) return Fail(TEXT("HpText"));
   if (UHorizontalBoxSlot* HpSlot = Cast<UHorizontalBoxSlot>(Hp->Slot)) {
     HpSlot->SetVerticalAlignment(VAlign_Center);
@@ -242,6 +236,11 @@ bool US08TurnPortraitWidget::Initialize() {
   if (NameText) NameText->SetFont(PortraitFont(TEXT("Bold"), 15));
   if (StatusText) StatusText->SetFont(PortraitFont(S08ArtHudFonts::CardTypeface, 12));
   if (HpText) HpText->SetFont(PortraitFont(S08ArtHudFonts::CardTypeface, 14));
+  // VS-2 HB-18: the theme colours again too - an authored WBP_UmPortrait keeps the colours of its authoring
+  if (Panel) Panel->SetBrushColor(PortraitPanelColor());
+  if (NameText) NameText->SetColorAndOpacity(FSlateColor(PortraitTextColor()));
+  if (HpText) HpText->SetColorAndOpacity(FSlateColor(PortraitTextColor()));
+  if (StatusText) StatusText->SetColorAndOpacity(FSlateColor(PortraitIdleColor()));
   // the heart: an animated v3 icon added in code, before the hp text
   if (Stats && !HeartIcon) {
     HeartIcon = CreateWidget<US08AnimatedIconWidget>(this, US08AnimatedIconWidget::StaticClass());
@@ -328,23 +327,14 @@ void US08TurnPortraitWidget::ApplyPortraitLook() {
   }
   AppliedPxPerSu = PxPerSuNow();
   SrcCirclePx = Entry ? UmPortrait::SourceCirclePx(*Entry) : 0.0f;
-  CircleSu = bAvatarShown ? UmPortrait::CappedSu(DiscSu, SrcCirclePx, AppliedPxPerSu) : DiscSu;
+  CircleSu = bAvatarShown ? UmPortrait::CappedSu(DiscWindowSu, SrcCirclePx, AppliedPxPerSu) : DiscWindowSu;
   if (DiscBox) {
     DiscBox->SetWidthOverride(CircleSu);
     DiscBox->SetHeightOverride(CircleSu);
   }
   if (bAvatarShown) {
     if (!AvatarMid || AvatarMid->Parent != Mat) AvatarMid = UMaterialInstanceDynamic::Create(Mat, this);
-    AvatarMid->SetTextureParameterValue(UmPortrait::ParamAvatar, Tex);
-    const FVector4 R = UmPortrait::UvRect(*Entry);
-    AvatarMid->SetVectorParameterValue(UmPortrait::ParamUvRect, FLinearColor(R.X, R.Y, R.Z, R.W));
-    FLinearColor Edge = Theme.Color(TEXT("panel.edge"));
-    Edge.A = S08HudTokens::Alpha_PanelEdge;  // the rim keeps the token's alpha over panel.bg (4.0 : 1)
-    AvatarMid->SetVectorParameterValue(UmPortrait::ParamEdgeColor, Edge);
-    AvatarMid->SetVectorParameterValue(UmPortrait::ParamKeylineColor, Theme.Color(TEXT("mark.keyline")));
-    AvatarMid->SetVectorParameterValue(UmPortrait::ParamFillColor, Theme.Color(TEXT("card.navy")));
-    AvatarMid->SetScalarParameterValue(UmPortrait::ParamEdgeFrac, UmPortrait::EdgeSu / FMath::Max(CircleSu, 1.0f));
-    AvatarMid->SetScalarParameterValue(UmPortrait::ParamKeylineFrac, UmPortrait::KeylineSu / FMath::Max(CircleSu, 1.0f));
+    UmPortrait::SetupDiscMid(*AvatarMid, *Entry, Tex, CircleSu);
     FSlateBrush Brush;
     Brush.SetResourceObject(AvatarMid);
     Brush.ImageSize = FVector2D(CircleSu, CircleSu);
@@ -368,7 +358,7 @@ void US08TurnPortraitWidget::ApplyPortraitLook() {
       MonogramText->SetText(FText::FromString(GetMonogram()));
       if (bLegacy) {
         MonogramText->SetFont(PortraitFont(S08ArtHudFonts::CardTypeface, 18));
-        MonogramText->SetColorAndOpacity(FSlateColor(GPortraitPanel.CopyWithNewOpacity(1.0f)));
+        MonogramText->SetColorAndOpacity(FSlateColor(PortraitPanelColor().CopyWithNewOpacity(1.0f)));
       } else {
         MonogramText->SetFont(Theme.Font(TEXT("type.heading")));
         MonogramText->SetColorAndOpacity(FSlateColor(Theme.Color(TEXT("text.primary"))));
@@ -432,10 +422,11 @@ void US08TurnPortraitWidget::Setup(bool bInOpponent, const FS08TurnHudLook& InLo
   if (HeartIcon) HeartIcon->SetLayerHidden(TEXT("glow"), !Look.bHeartGlow);
   if (!Look.RingIcon.IsNone() && Avatar && !RingIcon) {
     RingIcon = CreateWidget<US08AnimatedIconWidget>(this, US08AnimatedIconWidget::StaticClass());
-    if (RingIcon && RingIcon->SetIcon(Look.RingIcon, RingSu, GRingTexturePx)) {
+    if (RingIcon && RingIcon->SetIcon(Look.RingIcon, RingWindowSu, GRingTexturePx)) {
       UOverlaySlot* RingSlot = Avatar->AddChildToOverlay(RingIcon);
       RingSlot->SetHorizontalAlignment(HAlign_Center);
       RingSlot->SetVerticalAlignment(VAlign_Center);
+      if (RingSmoulder > 0.0f) RingIcon->SetLayerRestOpacity(TEXT("rim"), RingSmoulder);
     } else {
       RingIcon = nullptr;
     }
@@ -480,7 +471,7 @@ void US08TurnPortraitWidget::SetActive(bool bInActive) {
   // 02-ux-ui-spec §4.3: the accent "your turn" / "opponent's turn" - the text carries it, not the colour alone
   const TCHAR* Text = bActive ? (bOpponent ? TEXT("THEIR TURN") : TEXT("YOUR TURN")) : TEXT("waiting");
   StatusText->SetText(FText::FromString(Text));
-  StatusText->SetColorAndOpacity(FSlateColor(bActive ? GPortraitActive : GPortraitIdle));
+  StatusText->SetColorAndOpacity(FSlateColor(bActive ? PortraitActiveColor() : PortraitIdleColor()));
 }
 
 bool US08TurnPortraitWidget::PlayHeart(FName Anim) { return HeartIcon && !Anim.IsNone() && HeartIcon->PlayAnim(Anim); }
@@ -540,10 +531,12 @@ FString US08TurnPortraitWidget::ApplyTracker(int32 Slots, int32 Shown, bool bRes
     }
     while (TrackerIcons.Num() < Slots) {
       US08AnimatedIconWidget* Icon = CreateWidget<US08AnimatedIconWidget>(this, US08AnimatedIconWidget::StaticClass());
-      if (!Icon || !Icon->SetIcon(Look.TrackerIcon(), TrackerIconSu, GTrackerTexturePx)) break;
+      if (!Icon || !Icon->SetIcon(Look.TrackerIcon(), TrackerSlotSu, GTrackerTexturePx)) break;
+      if (bPanelMode) Icon->SetDisplaySizeSu(TrackerSlotSu);  // VS-2 HB-23: the export for su x DPI x UI scale
       UHorizontalBoxSlot* IconSlot = TrackerRow->AddChildToHorizontalBox(Icon);
       IconSlot->SetVerticalAlignment(VAlign_Center);
-      IconSlot->SetPadding(FMargin(1.0f, 0.0f));
+      // CX-09: the panel's slots 4 su apart (L 260 / 296 of 32 su, S 176 / 204 of 24 su)
+      IconSlot->SetPadding(bPanelMode ? FMargin(TrackerIcons.Num() > 0 ? 4.0f : 0.0f, 0.0f, 0.0f, 0.0f) : FMargin(1.0f, 0.0f));
       TrackerIcons.Add(Icon);
       TrackerFill.Add(NAME_None);
       const int32 I = TrackerIcons.Num() - 1;
@@ -589,6 +582,7 @@ bool US08TurnPortraitWidget::SetHeartFallen(bool bFallen, bool bAtRest) {
       bHeartFallen = false;
       return false;
     }
+    if (bPanelMode) HeartIcon->SetDisplaySizeSu(SmallIconSu);
     if (bAtRest) {
       HeartIcon->ShowAtRest();
     } else {
@@ -596,9 +590,75 @@ bool US08TurnPortraitWidget::SetHeartFallen(bool bFallen, bool bAtRest) {
     }
   } else {
     HeartIcon->SetIcon(TEXT("resource-hp-full"), SmallIconSu, GSmallTexturePx);
+    if (bPanelMode) HeartIcon->SetDisplaySizeSu(SmallIconSu);
     HeartIcon->ShowAtRest();
   }
   return true;
+}
+
+// ------------------------------------------------------------------------------------------------- VS-2 HB-18 / HB-19
+
+void US08TurnPortraitWidget::AttachToPanel(UHorizontalBox* TrackerHost, US08AnimatedIconWidget* Heart) {
+  if (bPanelMode) return;
+  bPanelMode = true;
+  // the circle only: no plate of its own (the panel's T_Skin_Panel is under it), no text column
+  if (Panel) {
+    Panel->SetBrushColor(FLinearColor::Transparent);
+    Panel->SetPadding(FMargin(0.0f));
+  }
+  if (WidgetTree) {
+    if (UWidget* Column = WidgetTree->FindWidget(FName(TEXT("Column")))) Column->SetVisibility(ESlateVisibility::Collapsed);
+    if (UWidget* AvatarBox = WidgetTree->FindWidget(FName(TEXT("AvatarBox")))) {
+      if (UHorizontalBoxSlot* AvatarSlot = Cast<UHorizontalBoxSlot>(AvatarBox->Slot)) AvatarSlot->SetPadding(FMargin(0.0f));
+    }
+  }
+  // the tracker icons go into the panel's row (none exist before the first ApplyTracker)
+  if (TrackerHost && TrackerHost != TrackerRow) {
+    for (US08AnimatedIconWidget* Icon : TrackerIcons) {
+      if (!Icon) continue;
+      Icon->RemoveFromParent();
+      if (UHorizontalBoxSlot* IconSlot = TrackerHost->AddChildToHorizontalBox(Icon)) IconSlot->SetVerticalAlignment(VAlign_Center);
+    }
+    TrackerRow = TrackerHost;
+  }
+  // the heart is the panel's HeartIcon from now on (PlayHeart, SetHeartFallen, the glow of AB-6)
+  if (Heart && Heart != HeartIcon) {
+    if (HeartIcon) HeartIcon->RemoveFromParent();
+    HeartIcon = Heart;
+    if (HeartIcon->SetIcon(TEXT("resource-hp-full"), SmallIconSu, GSmallTexturePx)) {
+      HeartIcon->SetDisplaySizeSu(SmallIconSu);
+      HeartIcon->SetLayerHidden(TEXT("glow"), !Look.bHeartGlow);
+      HeartIcon->ShowAtRest();
+    }
+  }
+}
+
+void US08TurnPortraitWidget::SetPanelGeometry(float InRingSu, float InDiscSu, float InTrackerSu) {
+  const bool bSame = FMath::IsNearlyEqual(InRingSu, RingWindowSu) && FMath::IsNearlyEqual(InDiscSu, DiscWindowSu) &&
+                     FMath::IsNearlyEqual(InTrackerSu, TrackerSlotSu);
+  RingWindowSu = InRingSu;
+  DiscWindowSu = InDiscSu;
+  TrackerSlotSu = InTrackerSu;
+  if (bSame && bPortraitApplied) return;
+  if (WidgetTree) {
+    if (USizeBox* AvatarBox = Cast<USizeBox>(WidgetTree->FindWidget(FName(TEXT("AvatarBox"))))) {
+      AvatarBox->SetWidthOverride(RingWindowSu);
+      AvatarBox->SetHeightOverride(RingWindowSu);
+    }
+  }
+  // same icon again: the animator keeps its state, the images take the new size
+  if (RingIcon) RingIcon->SetIcon(RingIcon->GetIconId(), RingWindowSu, GRingTexturePx);
+  for (US08AnimatedIconWidget* Icon : TrackerIcons) {
+    if (!Icon) continue;
+    Icon->SetIcon(Icon->GetIconId(), TrackerSlotSu, GTrackerTexturePx);
+    if (bPanelMode) Icon->SetDisplaySizeSu(TrackerSlotSu);
+  }
+  ApplyPortraitLook();
+}
+
+void US08TurnPortraitWidget::SetRingSmoulder(float Rest) {
+  RingSmoulder = Rest;
+  if (RingIcon) RingIcon->SetLayerRestOpacity(TEXT("rim"), Rest);
 }
 
 void US08TurnPortraitWidget::SetClockOverrideMs(float Ms) {

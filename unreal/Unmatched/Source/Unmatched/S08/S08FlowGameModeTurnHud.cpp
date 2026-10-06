@@ -19,6 +19,9 @@
 //     heart mark of the hero's death (DE-019, contact + 1100) the heart becomes resource-hp-fallen and its cross
 //     stamps in (AB-8; rollback -S08CrossLegacy - the emptied heart stays).
 // Off the art look (-S08GreyBoard, the S09 HUD harness) nothing is built and the DE-022 Slate tracker rows stay.
+// VS-2 HB-18 / HB-20: the portraits are the circles of the UMG panels PANEL-LOC (left-bottom) and PANEL-OPP (right-top,
+// ВР-01) - BuildUmPanels (S08FlowGameModeUmHud.cpp) hands them over; the Slate column below is the rollback
+// -S08SlateHud=panels (or the whole -S08SlateHud).
 // Trace: 'HUD-TURN config ...', 'HUD-TURN seq=... turn=own|opp ...', 'HUD-TRACK ...', 'HUD-HEART ...' (fallen:
 // 'HUD-HEART side=... hero=... anim=fallen glyph=cross played=1').
 #include "S08FlowGameMode.h"
@@ -64,27 +67,31 @@ void AS08FlowGameMode::BuildTurnHudWidgets(const TSharedRef<SConstraintCanvas>& 
   }
   TurnHudLook = FS08TurnHudLook::FromCommandLine(FCommandLine::Get());
   const FS08ArtHudPlateStyle Chips;
-  OpponentPortrait = US08TurnPortraitWidget::Create(World);  // VS-2 CP-08: WBP_UmPortrait when imported
-  OwnPortrait = US08TurnPortraitWidget::Create(World);
-  if (!OpponentPortrait || !OwnPortrait) {
-    OpponentPortrait = OwnPortrait = nullptr;
-    ArtHud.PendingTrace.Add(TEXT("HUD-TURN config portraits=0 reason=create-failed"));
-    return;
+  // VS-2 HB-18 / HB-20: the UMG panels own the portraits (BuildUmPanels writes the HUD-TURN config line)
+  const bool bUmgPanels = !S08ArtLook::SlateHudBlocks().IsSlate(FName(TEXT("panels")));
+  if (!bUmgPanels) {
+    OpponentPortrait = US08TurnPortraitWidget::Create(World);  // VS-2 CP-08: WBP_UmPortrait when imported
+    OwnPortrait = US08TurnPortraitWidget::Create(World);
+    if (!OpponentPortrait || !OwnPortrait) {
+      OpponentPortrait = OwnPortrait = nullptr;
+      ArtHud.PendingTrace.Add(TEXT("HUD-TURN config portraits=0 reason=create-failed"));
+      return;
+    }
+    OpponentPortrait->Setup(true, TurnHudLook, Chips.TeamChipColor(1));
+    OwnPortrait->Setup(false, TurnHudLook, Chips.TeamChipColor(0));
+    for (US08TurnPortraitWidget* Portrait : {OpponentPortrait.Get(), OwnPortrait.Get()}) {
+      Portrait->SetVisibility(ESlateVisibility::Collapsed);  // shown with the live match HUD (TickTurnHud)
+      Portrait->SetTrackerOpacity(Portrait->IsOpponent() ? 0.0f : 1.0f);
+    }
+    Canvas->AddSlot()
+        .Anchors(FAnchors(0.0f, 1.0f))
+        .Alignment(FVector2D(0.0f, 1.0f))
+        .Offset(FMargin(GPortraitEdgeSu, -GPortraitEdgeSu, 0.0f, 0.0f))
+        .AutoSize(true)
+        [SAssignNew(TurnPortraitColumn, SVerticalBox).Visibility(EVisibility::SelfHitTestInvisible) +
+         SVerticalBox::Slot().AutoHeight().Padding(0.0f, 0.0f, 0.0f, GPortraitGapSu)[OpponentPortrait->TakeWidget()] +
+         SVerticalBox::Slot().AutoHeight()[OwnPortrait->TakeWidget()]];
   }
-  OpponentPortrait->Setup(true, TurnHudLook, Chips.TeamChipColor(1));
-  OwnPortrait->Setup(false, TurnHudLook, Chips.TeamChipColor(0));
-  for (US08TurnPortraitWidget* Portrait : {OpponentPortrait.Get(), OwnPortrait.Get()}) {
-    Portrait->SetVisibility(ESlateVisibility::Collapsed);  // shown with the live match HUD (TickTurnHud)
-    Portrait->SetTrackerOpacity(Portrait->IsOpponent() ? 0.0f : 1.0f);
-  }
-  Canvas->AddSlot()
-      .Anchors(FAnchors(0.0f, 1.0f))
-      .Alignment(FVector2D(0.0f, 1.0f))
-      .Offset(FMargin(GPortraitEdgeSu, -GPortraitEdgeSu, 0.0f, 0.0f))
-      .AutoSize(true)
-      [SAssignNew(TurnPortraitColumn, SVerticalBox).Visibility(EVisibility::SelfHitTestInvisible) +
-       SVerticalBox::Slot().AutoHeight().Padding(0.0f, 0.0f, 0.0f, GPortraitGapSu)[OpponentPortrait->TakeWidget()] +
-       SVerticalBox::Slot().AutoHeight()[OwnPortrait->TakeWidget()]];
   // CUE-015: the banner of the own turn start (our decision, 01 F-07) - never a hit-test target
   Canvas->AddSlot()
       .Anchors(FAnchors(0.5f, 0.0f))
@@ -102,12 +109,16 @@ void AS08FlowGameMode::BuildTurnHudWidgets(const TSharedRef<SConstraintCanvas>& 
                 .ColorAndOpacity(FSlateColor(BannerSrgb(0xF2, 0xC1, 0x4E)))  // turn.flash.yellow
                 .ShadowOffset(FVector2D(1.0f, 1.0f))
                 .ShadowColorAndOpacity(FLinearColor(0.0f, 0.0f, 0.0f, 0.85f))]];
+  if (bUmgPanels) return;
   ArtHud.PendingTrace.Add(FString::Printf(TEXT("HUD-TURN config portraits=1 %s ringIcon=%d banner=%d"),
                                           *TurnHudLook.Describe(), OwnPortrait->HasRingIcon() ? 1 : 0,
                                           FMath::RoundToInt(FS09TurnCue::BannerMs)));
 }
 
 float AS08FlowGameMode::HandObstacleRightSu() const {
+  // VS-2 HB-20: in the left column only PANEL-LOC remains (the opponent's panel is top-right, ВР-01)
+  const float PanelRight = UmHudPanelLocRightSu();
+  if (PanelRight >= 0.0f) return PanelRight;
   if (!TurnPortraitColumn.IsValid() || !OwnPortrait || OwnPortrait->GetVisibility() == ESlateVisibility::Collapsed) {
     return 0.0f;
   }

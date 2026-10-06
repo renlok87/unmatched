@@ -254,7 +254,8 @@ void AS08FlowGameMode::AddOpponentPanelLines() {
   if (!TurnHudTrackers()) AddActionTrackerRow(true);  // DE-022 (01 F-12): only in the opponent's turn (DE-023: portrait)
   // DE-022 (03 §7 п. 1): the verb from the server state - "Opponent is planning a maneuver" (MS-S-11) is one of them
   const FName Key = S09OpponentView::VerbKey(OpponentVerbNow);
-  if (Key.IsNone()) return;
+  // VS-2 HB-20: the verb is in STATUS and «ИИ думает» on PANEL-OPP - this Slate line only with -S08SlateHud=panels
+  if (Key.IsNone() || !UmHudBlockOnSlate(TEXT("panels"))) return;
   // 03 §6: a 1 Hz pulse, none with reduced motion (the indicator is our online decision, DE has none - §7 p. 1)
   PanelsBox->AddSlot().AutoHeight().Padding(0, 2, 0, 2)
       [SNew(STextBlock)

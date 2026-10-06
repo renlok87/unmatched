@@ -1179,6 +1179,11 @@ private:
   /** The UMG STATUS took the line (false: -S08SlateHud=status, the Slate text in the hand panel stays). */
   bool ApplyUmHudStatus(const FS09TurnStatusInput& In);
   void HandleUmTopPress(const TCHAR* What);
+  // VS-2 HB-18...HB-21: PANEL-LOC, PANEL-OPP, OPP-HAND (S08/UI/UmHudPanels.h)
+  void BuildUmPanels();
+  void TickUmPanels();
+  /** The right edge of PANEL-LOC (su) for the hand obstacle; -1 when the panels are on the Slate path. */
+  float UmHudPanelLocRightSu() const;
   UPROPERTY()
   TObjectPtr<class UUmHudRoot> UmHudRoot;
   UPROPERTY()

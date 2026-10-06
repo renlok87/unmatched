@@ -21,9 +21,13 @@
 //   - VS-2 HB-14...HB-16 (S08/UI/UmTopStrip.h): TOP + CONN, STATUS and the banner - built with the root, framed with
 //     the layout, ticked here (turn, link, banner alpha); STATUS takes the line of AddTurnStatusLine (rollback
 //     -S08SlateHud=top|status|banner).
+//   - VS-2 HB-18...HB-21 (S08/UI/UmHudPanels.h): PANEL-LOC, PANEL-OPP (ВР-01 diagonal) and OPP-HAND - built with the
+//     root (their portraits become OwnPortrait / OpponentPortrait), framed with the layout, fed per frame from the shown
+//     fighters; a click opens the deck panel of the side (rollback -S08SlateHud=panels|opphand).
 #include "S08FlowGameMode.h"
 
 #include "S08AnimatedIconWidget.h"
+#include "S08ArtHudStyle.h"
 #include "S08ArtLook.h"
 #include "S08BoardActor.h"
 #include "S08TraceLog.h"
@@ -32,6 +36,7 @@
 #include "UI/UmGameHud.h"
 #include "UI/UmHudGallery.h"
 #include "UI/UmHudLayout.h"
+#include "UI/UmHudPanels.h"
 #include "UI/UmHudRoot.h"
 #include "UI/UmHudScale.h"
 #include "UI/UmHudTheme.h"
@@ -79,6 +84,8 @@ struct FUmHudRuntime {
   FUmBoardCursor BoardCursor;
   // VS-2 HB-14...HB-16: TOP + CONN, STATUS, the banner
   FUmTopStrip TopStrip;
+  // VS-2 HB-18...HB-21: PANEL-LOC, PANEL-OPP, OPP-HAND
+  FUmPanels Panels;
 };
 
 namespace {
@@ -140,6 +147,7 @@ void AS08FlowGameMode::BuildUmHud() {
   ArtHud.PendingTrace.Add(FString::Printf(TEXT("HUD-CURSOR installed=%d impl=%s source=%s"), bCursors ? 1 : 0,
                                           bCursors ? TEXT("software") : TEXT("system"), bCursors ? *CursorSource : TEXT("-")));
   BuildUmTopStrip();  // VS-2 HB-14...HB-16: before the layout (the STATUS slot sizes to its block)
+  BuildUmPanels();    // VS-2 HB-18...HB-21
   RefreshUmHudLayout();
 }
 
@@ -202,6 +210,9 @@ void AS08FlowGameMode::RefreshUmHudLayout() {
   const FBox2D StatusRect = R.Layout.Rect(EUmHudBlock::Status);
   StripFrame.StatusMaxWidthSu = StatusRect.bIsValid ? static_cast<float>(StatusRect.Max.X - StatusRect.Min.X) : 600.0f;
   R.TopStrip.SetFrame(StripFrame);
+  const FBox2D OppHandRect = R.Layout.Rect(EUmHudBlock::OppHand);  // VS-2 HB-18...HB-21
+  R.Panels.SetFrame(R.Layout.bClassS, R.Layout.PxPerSu,
+                    OppHandRect.bIsValid ? static_cast<float>(OppHandRect.Max.X - OppHandRect.Min.X) : 0.0f);
   const FString Line = R.Layout.TraceLine(FIntPoint(FMath::RoundToInt(Viewport.X), FMath::RoundToInt(Viewport.Y)));
   if (Line != R.LastLayoutLine) {
     R.LastLayoutLine = Line;
@@ -279,6 +290,7 @@ void AS08FlowGameMode::TickUmHud() {
   }
   if (!UmHud.IsValid() || !UmHud->bLayout || !UmHud->Blocks.UmgRoot()) return;
   TickUmTopStrip();  // VS-2 HB-14...HB-16
+  TickUmPanels();    // VS-2 HB-18...HB-21
   FUmHudRuntime& R = *UmHud;
   const float PxPerSu = HudPixelsPerUnit() > 0.0f ? HudPixelsPerUnit() : R.Layout.PxPerSu;
   // ---- the top of the hand actually drawn (the Slate panel, its SD-26 offset included): the stack stays over it ----
@@ -372,6 +384,13 @@ void AS08FlowGameMode::WriteUmHudShotLines() {
     return Rect;
   });
   for (const FString& L : StripLines) FS08Trace::Write(L);
+  TArray<FString> PanelLines;  // VS-2 HB-18...HB-21: UI-HUD-PANEL-LOC, UI-HUD-PANEL-OPP, UI-HUD-OPP-HAND
+  R.Panels.CollectShotLines(PanelLines, [this](UWidget* W) {
+    FS08ScreenRect Rect;
+    if (W) WidgetViewportRect(W->GetCachedWidget(), Rect);
+    return Rect;
+  });
+  for (const FString& L : PanelLines) FS08Trace::Write(L);
   // VS-2 HB-12: the cursor Slate drew for this frame (or the system cursor of the rollback)
   const APlayerController* CursorPC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
   FS08Trace::Write(UmHudRoot && UmHudRoot->HasCursors()
@@ -396,6 +415,64 @@ void AS08FlowGameMode::BuildUmTopStrip() {
         });
       });
   ArtHud.PendingTrace.Append(Lines);
+}
+
+void AS08FlowGameMode::BuildUmPanels() {
+  UUmGameHud* Game = UmHudRoot ? UmHudRoot->GetGameHud() : nullptr;
+  if (!UmHud.IsValid() || !Game || !S08ArtLook::Enabled()) return;
+  const FS08ArtHudPlateStyle Chips;
+  TWeakObjectPtr<AS08FlowGameMode> WeakThis(this);
+  ArtHud.PendingTrace.Append(UmHud->Panels.Build(
+      *Game, UmHud->Blocks, TurnHudLook, Chips.TeamChipColor(0), Chips.TeamChipColor(1), HudPress,
+      [WeakThis](const FS09HudPressOutcome& Outcome, const TCHAR* Which) {
+        const bool bOpp = FCString::Strcmp(Which, TEXT("opp")) == 0;
+        if (AS08FlowGameMode* Self = WeakThis.Get()) Self->HandleHudPressOutcome(Outcome, TFunction<FS09Reason()>(), [WeakThis, bOpp]() {
+          // 04 §2.2 / §2.3: a click on a panel (or the opponent's backs) opens the deck panel of its side (HB-28 later)
+          if (AS08FlowGameMode* S = WeakThis.Get()) S->ToggleDeckPanel(bOpp ? ES09DeckSide::Opponent : ES09DeckSide::Own, TEXT("panel"));
+        });
+      },
+      [WeakThis]() {
+        FS09CardView Hidden;  // 04 §2.3: the backs never open a face - the inspector says "Скрытая информация"
+        Hidden.bHidden = true;
+        Hidden.CardId = TEXT("hidden");
+        if (AS08FlowGameMode* Self = WeakThis.Get()) Self->InspectCard(Hidden);
+      }));
+  if (!UmHud->Panels.PanelsOnUmg()) return;
+  OwnPortrait = UmHud->Panels.GetLoc()->Portrait;
+  OpponentPortrait = UmHud->Panels.GetOpp()->Portrait;
+  ArtHud.PendingTrace.Add(FString::Printf(TEXT("HUD-TURN config portraits=1 %s ringIcon=%d banner=%d panels=umg"),
+                                          *TurnHudLook.Describe(), OwnPortrait->HasRingIcon() ? 1 : 0,
+                                          FMath::RoundToInt(FS09TurnCue::BannerMs)));
+}
+
+void AS08FlowGameMode::TickUmPanels() {
+  FUmPanelsTick T;
+  // with the live match HUD; the result screen keeps them only in its board view (TickTurnHud's rule)
+  const int64 Now = static_cast<int64>(NowMs());
+  T.bShow = Hud.bValid && (!IsResultScreenShown() || ResultView.BoardBarAlpha(Now) > 0.0f);
+  T.Own = Hud.ViewerPanel();
+  T.Opp = Hud.OpponentPanel();
+  T.Fighters = &HudFighters();
+  T.OwnHeroName = T.Own ? PlayerHeroName(T.Own->PlayerId) : FString();
+  T.OppHeroName = T.Opp ? PlayerHeroName(T.Opp->PlayerId) : FString();
+  T.bViewerTurn = Hud.bViewerTurn;
+  T.bGameOver = Hud.bGameOver;
+  T.bBotActing = Flow.IsValid() && Flow->IsBotActing();
+  // the mark of the death stage (contact + 1100), or a fighter shown dead that no stage holds (a join mid-game)
+  T.IsCrossed = [this, Now](const FString& Id) {
+    if (DeathStage.HeartState(Id, Now) != ES09HeartState::Alive) return true;
+    const FS08BoardFighter* F = HudFighters().FindByPredicate([&Id](const FS08BoardFighter& X) { return X.Id == Id; });
+    return F && F->Health <= 0 && !DeathStage.IsStaged(Id);
+  };
+  UmHud->Panels.Tick(T);
+}
+
+float AS08FlowGameMode::UmHudPanelLocRightSu() const {
+  // -1: the panels are not UMG (the Slate column rule); 0: PANEL-LOC is hidden; else its right edge (su)
+  if (!UmHud.IsValid() || !UmHud->Panels.PanelsOnUmg()) return -1.0f;
+  const UUmHudPlayerPanel* Loc = UmHud->Panels.GetLoc();
+  const FBox2D Rect = UmHud->Layout.Rect(EUmHudBlock::PanelLoc);
+  return Loc && UmGameHudSlots::ShownByProperty(Loc) && Rect.bIsValid ? static_cast<float>(Rect.Max.X) : 0.0f;
 }
 
 void AS08FlowGameMode::TickUmTopStrip() {
@@ -433,13 +510,15 @@ void AS08FlowGameMode::UmGalleryBegin(int32 SizePx) {
   int32 Variant = 0;
   const bool bButtons = FParse::Param(Cmd, TEXT("S08IconGalleryButtons")) || FParse::Value(Cmd, TEXT("S08IconGalleryButtons="), Variant);
   const bool bTopStrip = FParse::Param(Cmd, TEXT("S08IconGalleryTopStrip"));  // VS-2 HB-14...HB-16
-  if (!bSkins && !bButtons && !bTopStrip) return;
+  int32 PanelsPage = 1;  // VS-2 HB-18...HB-21
+  const bool bPanels = FParse::Param(Cmd, TEXT("S08IconGalleryPanels")) || FParse::Value(Cmd, TEXT("S08IconGalleryPanels="), PanelsPage);
+  if (!bSkins && !bButtons && !bTopStrip && !bPanels) return;
   if (IconGallery) IconGallery->SetVisibility(ESlateVisibility::Collapsed);  // the sheet takes the screen
   // the canvas of the sheet: the applied HUD scale (BeginPlay may run before the first window apply - the sheet is
   // built again on every OnUiScaleChanged, which also covers a window or UI-scale change)
   const int32 PageIndex = FMath::Max(0, Page - 1);
   TWeakObjectPtr<AS08FlowGameMode> WeakThis(this);
-  auto Build = [WeakThis, bSkins, bTopStrip, PageIndex, Variant, SizePx]() {
+  auto Build = [WeakThis, bSkins, bTopStrip, bPanels, PanelsPage, PageIndex, Variant, SizePx]() {
     AS08FlowGameMode* Self = WeakThis.Get();
     if (!Self || !Self->GetWorld()) return;
     FVector2D Viewport(1920.0, 1080.0);
@@ -447,6 +526,14 @@ void AS08FlowGameMode::UmGalleryBegin(int32 SizePx) {
     const FUmHudScaleState& Scale = UmHudScale::Current();
     const float PxPerSu = Scale.Window.X > 0 ? Scale.PxPerSu() : 1.0f;
     if (Self->UmGallery) Self->UmGallery->RemoveFromParent();
+    if (bPanels) {
+      UUmPanelsGalleryWidget* Sheet = CreateWidget<UUmPanelsGalleryWidget>(Self->GetWorld(), UUmPanelsGalleryWidget::StaticClass());
+      if (!Sheet) return;
+      for (const FString& Line : Sheet->Build(FMath::Clamp(PanelsPage, 1, 2) - 1, Viewport / PxPerSu, PxPerSu)) FS08Trace::Write(Line);
+      Sheet->AddToViewport(1001);
+      Self->UmGallery = Sheet;
+      return;
+    }
     if (bTopStrip) {
       UUmTopStripGalleryWidget* Sheet = CreateWidget<UUmTopStripGalleryWidget>(Self->GetWorld(), UUmTopStripGalleryWidget::StaticClass());
       if (!Sheet) return;

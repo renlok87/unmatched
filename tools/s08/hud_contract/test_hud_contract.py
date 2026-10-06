@@ -117,3 +117,23 @@ def test_check_trace_topstrip_hb14_16(tmp_path):
     assert hc.main(["check-trace", str(log)]) == 0
     log.write_text(head % ("UI-HUD-TOP", "busy") + "\n", encoding="utf-8")
     assert hc.main(["check-trace", str(log)]) == 1
+
+
+def test_check_trace_panels_hb18_21(tmp_path):
+    """VS-2 HB-18...HB-21: PANEL-LOC / PANEL-OPP / OPP-HAND lines of the client pass check-trace with the states of 04 §7.1."""
+    spec04 = hc.SPEC04.read_text(encoding="utf-8")
+    ids = hc.ui_ids_from_02(SPEC02) | hc.ui_ids_from_02(spec04)
+    states = hc.ui_states_from_04(spec04)
+    assert {"UI-HUD-PANEL-LOC", "UI-HUD-PANEL-OPP", "UI-HUD-OPP-HAND"} <= ids
+    head = "SHOT widget id=%s impl=umg state=%s fighter=none bbox=(24,920,364,1056) geom=painted visible=1 twin=0 source=x"
+    extra = " hero=Medusa hp=14/16 sidekicks=3 fallen=0 tracker=1/2 ring=1 avatar=1 class=L smoulder=0.35"
+    ok = [head % ("UI-HUD-PANEL-LOC", s) + extra for s in ("own", "wait", "fallen")]
+    ok += [head % ("UI-HUD-PANEL-OPP", s) + extra for s in ("opp", "wait", "fallen", "ai")]
+    ok += [head % ("UI-HUD-OPP-HAND", "count=12") + " deck=23 discard=2 stale=1 step=20.7 width=300 fan=276.0 back=T_x"]
+    assert hc.check_widget_trace(ok, ids, states=states) == ([], 8)
+    bad = [head % ("UI-HUD-PANEL-LOC", "ai"), head % ("UI-HUD-PANEL-OPP", "own"), head % ("UI-HUD-OPP-HAND", "count=")]
+    errors, _ = hc.check_widget_trace(bad, ids, states=states)
+    assert len([e for e in errors if "04 §7.1" in e]) == 3
+    log = tmp_path / "Unmatched.log"
+    log.write_text("\n".join(ok) + "\n", encoding="utf-8")
+    assert hc.main(["check-trace", str(log)]) == 0

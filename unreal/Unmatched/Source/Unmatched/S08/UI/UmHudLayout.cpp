@@ -148,7 +148,8 @@ FUmHudLayout FUmHudLayout::Compute(const FVector2D& InCanvasSu, float InPxPerSu,
     const FBox2D PanelLoc = UmLayoutBox(M, H - M - 96.0f, 240.0f, 96.0f);
     Set(EUmHudBlock::PanelLoc, PanelLoc);
     Set(EUmHudBlock::PanelOpp, UmLayoutBox(W - M - 240.0f, M, 240.0f, 96.0f));
-    Set(EUmHudBlock::OppHand, UmLayoutBox(W - M - 220.0f, M + 96.0f + GapSu, 220.0f, 87.0f));
+    // VS-2 HB-21 (CX-09 delta of CX-01r): 104 su - the 48 x 67 backs whole + the 14 su caption with its bottom pad
+    Set(EUmHudBlock::OppHand, UmLayoutBox(W - M - 220.0f, M + 96.0f + GapSu, 220.0f, 104.0f));
     const FBox2D Actions = UmLayoutBox(W - M - 216.0f, H - M - 48.0f, 216.0f, 48.0f);
     Set(EUmHudBlock::Actions, Actions);
     const FBox2D Decks = UmLayoutBox(W - M - 136.0f, Actions.Min.Y - GapSu - 48.0f, 136.0f, 48.0f);

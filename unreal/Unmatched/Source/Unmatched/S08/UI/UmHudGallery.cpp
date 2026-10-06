@@ -7,6 +7,11 @@
 #include "UmHudLayout.h"
 #include "UmHudStatusLine.h"
 #include "UmHudTop.h"
+#include "UmHudOppHand.h"
+#include "UmHudPlayerPanel.h"
+#include "../S08ArtHudStyle.h"
+#include "../S08TurnPortraitWidget.h"
+#include "Misc/CommandLine.h"
 #include "Components/HorizontalBox.h"
 #include "Components/HorizontalBoxSlot.h"
 #include "UmHudTheme.h"
@@ -310,6 +315,204 @@ TArray<FString> UUmTopStripGalleryWidget::Build(const FVector2D& CanvasSu, float
   Lines.Insert(FString::Printf(TEXT("UMGALLERY topstrip class=%s canvas=%.0fx%.0f pxPerSu=%.3f statusW=%.0f"),
                                Layout.bClassS ? TEXT("S") : TEXT("L"), CanvasSu.X, CanvasSu.Y, PxPerSu,
                                StatusRect.Max.X - StatusRect.Min.X),
+               0);
+  return Lines;
+}
+
+// ------------------------------------------------------------------------------- VS-2 HB-18...HB-21: the panels
+
+bool UUmPanelsGalleryWidget::Initialize() {
+  const bool bFirst = Super::Initialize();
+  if (bFirst && WidgetTree && !WidgetTree->RootWidget) {
+    const UUmHudTheme& Theme = UUmHudTheme::Get();
+    Background = WidgetTree->ConstructWidget<UBorder>(UBorder::StaticClass(), TEXT("Background"));
+    Background->SetBrushColor(Theme.Color(TEXT("fx.dust")));  // a neutral mid tone under the navy plates
+    Background->SetPadding(FMargin(16.0f));
+    Background->SetHorizontalAlignment(HAlign_Left);
+    Background->SetVerticalAlignment(VAlign_Top);
+    Rows = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass(), TEXT("Rows"));
+    Background->SetContent(Rows);
+    WidgetTree->RootWidget = Background;
+  }
+  return bFirst;
+}
+
+TArray<FString> UUmPanelsGalleryWidget::Build(int32 Page, const FVector2D& CanvasSu, float PxPerSu) {
+  TArray<FString> Lines;
+  if (!Rows) return Lines;
+  Rows->ClearChildren();
+  Blocks.Reset();
+  const FUmHudLayout Layout = FUmHudLayout::Compute(CanvasSu, PxPerSu, nullptr);
+  const bool bS = Layout.bClassS;
+  const FBox2D LocRect = Layout.Rect(EUmHudBlock::PanelLoc);
+  const FBox2D OppHandRect = Layout.Rect(EUmHudBlock::OppHand);
+  const FVector2D PanelSize = LocRect.Max - LocRect.Min;
+  const FVector2D HandSize = OppHandRect.Max - OppHandRect.Min;
+  const FS08TurnHudLook Look = FS08TurnHudLook::FromCommandLine(FCommandLine::Get());
+  const FS08ArtHudPlateStyle Chips;
+  const bool bMedusaOwn = Page == 0;
+  // the run I numbers of CX-09 (facts.json; the fallen / 0 HP / 3 and 10 backs / ≈ are states of the sheet)
+  struct FHero {
+    FString Name;
+    FName Key;
+    int32 Hp;
+    int32 MaxHp;
+    TArray<FUmSidekickView> Sidekicks;
+  };
+  FHero Medusa{TEXT("Medusa"), FName(TEXT("medusa")), 14, 16, {}};
+  for (int32 I = 1; I <= 3; ++I) {
+    FUmSidekickView S;
+    S.Id = FString::Printf(TEXT("h%d"), I);
+    S.Name = FString::Printf(TEXT("Harpies %d"), I);
+    S.Key = FName(TEXT("medusa/harpies"));
+    S.Number = I;
+    S.Hp = 1;
+    S.MaxHp = 1;
+    Medusa.Sidekicks.Add(S);
+  }
+  FHero Arthur{TEXT("King Arthur"), FName(TEXT("king-arthur")), 17, 18, {}};
+  {
+    FUmSidekickView S;
+    S.Id = TEXT("m");
+    S.Name = TEXT("Merlin");
+    S.Key = FName(TEXT("king-arthur/merlin"));
+    S.Hp = 7;
+    S.MaxHp = 7;
+    Arthur.Sidekicks.Add(S);
+  }
+  const FHero& Own = bMedusaOwn ? Medusa : Arthur;
+  const FHero& Opp = bMedusaOwn ? Arthur : Medusa;
+  const int32 PerRow = FMath::Max(1, static_cast<int32>((CanvasSu.X - 32.0) / (PanelSize.X + 12.0)));
+  UHorizontalBox* Row = nullptr;
+  int32 InRow = 0;
+  auto Cell = [&](UWidget* Content, const FVector2D& Size, const FString& Label) {
+    if (!Row || InRow >= PerRow) {
+      Row = WidgetTree->ConstructWidget<UHorizontalBox>(UHorizontalBox::StaticClass());
+      if (UVerticalBoxSlot* RS = Rows->AddChildToVerticalBox(Row)) RS->SetPadding(FMargin(0.0f, 0.0f, 0.0f, 6.0f));
+      InRow = 0;
+    }
+    UVerticalBox* Box = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass());
+    Box->AddChildToVerticalBox(UmGalText(*WidgetTree, Label, TEXT("card.navy")));
+    USizeBox* Sized = WidgetTree->ConstructWidget<USizeBox>(USizeBox::StaticClass());
+    Sized->SetWidthOverride(static_cast<float>(Size.X));
+    Sized->SetHeightOverride(static_cast<float>(Size.Y));
+    Sized->SetContent(Content);
+    Box->AddChildToVerticalBox(Sized);
+    if (UHorizontalBoxSlot* S = Row->AddChildToHorizontalBox(Box)) S->SetPadding(FMargin(0.0f, 0.0f, 12.0f, 0.0f));
+    ++InRow;
+  };
+  auto Panel = [&](EUmPanelSide Side, const FHero& H, EUmPanelState State, const TCHAR* Label,
+                   TFunctionRef<void(UUmHudPlayerPanel&, FUmPlayerPanelModel&)> Tweak) {
+    UUmHudPlayerPanel* P = CreateWidget<UUmHudPlayerPanel>(this, UUmHudPlayerPanel::WidgetClass(Side));
+    if (!P) return (UUmHudPlayerPanel*)nullptr;
+    P->Setup(Side, Look, Chips.TeamChipColor(Side == EUmPanelSide::Own ? 0 : 1));
+    P->SetClockForTest([]() { return 0.0; });
+    FUmPlayerPanelModel M;
+    M.HeroName = H.Name;
+    M.bHasHp = true;
+    M.Hp = H.Hp;
+    M.MaxHp = H.MaxHp;
+    M.State = State;
+    M.Sidekicks = H.Sidekicks;
+    M.bClassS = bS;
+    M.PxPerSu = PxPerSu;
+    P->Portrait->SetPortrait(H.Key);
+    P->Portrait->ApplyTracker(2, 0, true);
+    if (Side == EUmPanelSide::Opp) P->Portrait->SetTrackerOpacity(State == EUmPanelState::Opp || State == EUmPanelState::Ai ? 1.0f : 0.0f);
+    if (State == EUmPanelState::Own || State == EUmPanelState::Opp || State == EUmPanelState::Ai) P->Portrait->PlayRing(true);
+    Tweak(*P, M);
+    P->ApplyModel(M);
+    Cell(P, PanelSize, FString::Printf(TEXT("%s %s"), Side == EUmPanelSide::Own ? TEXT("loc") : TEXT("opp"), Label));
+    Blocks.Add(P);
+    TArray<FString> Shot;
+    P->CollectShotLines(Shot, FS08ScreenRect());
+    Lines.Add(FString::Printf(TEXT("UMGALLERY panel %s %s"), Label, Shot.Num() ? *Shot[0] : TEXT("-")));
+    return P;
+  };
+  auto None = [](UUmHudPlayerPanel&, FUmPlayerPanelModel&) {};
+  // ---- PANEL-LOC ----
+  Panel(EUmPanelSide::Own, Own, EUmPanelState::Own, TEXT("own-start+300"), [](UUmHudPlayerPanel& P, FUmPlayerPanelModel&) {
+    P.Portrait->SetClockOverrideMs(0.0f);
+    P.Portrait->PlayRing(false);
+    P.Portrait->SetClockOverrideMs(300.0f);
+  });
+  Panel(EUmPanelSide::Own, Own, EUmPanelState::Own, TEXT("own"), None);
+  Panel(EUmPanelSide::Own, Own, EUmPanelState::Wait, TEXT("wait"), None);
+  Panel(EUmPanelSide::Own, Own, EUmPanelState::Own, TEXT("action-filled-2"), [bMedusaOwn](UUmHudPlayerPanel& P, FUmPlayerPanelModel&) {
+    const FName Type(bMedusaOwn ? TEXT("maneuver") : TEXT("attack"));
+    P.Portrait->SetClockOverrideMs(0.0f);
+    P.Portrait->ApplyTracker(2, 2, false, {Type, Type});
+    P.Portrait->SetClockOverrideMs(400.0f);
+  });
+  Panel(EUmPanelSide::Own, Own, EUmPanelState::Own, TEXT("damage+320"), [](UUmHudPlayerPanel& P, FUmPlayerPanelModel& M) {
+    M.Hp -= 1;
+    P.Portrait->SetClockOverrideMs(0.0f);
+    P.Portrait->PlayHeart(TEXT("damage"));
+    P.Portrait->SetClockOverrideMs(320.0f);
+  });
+  Panel(EUmPanelSide::Own, Own, EUmPanelState::Fallen, TEXT("fallen"), [](UUmHudPlayerPanel& P, FUmPlayerPanelModel& M) {
+    M.Hp = 0;
+    P.Portrait->SetHeartFallen(true, true);
+  });
+  UUmHudPlayerPanel* SidekickFallen =
+      Panel(EUmPanelSide::Own, Own, EUmPanelState::Own, TEXT("sidekick-fallen"), [](UUmHudPlayerPanel&, FUmPlayerPanelModel& M) {
+        if (M.Sidekicks.Num()) {
+          M.Sidekicks[0].bFallen = true;
+          M.Sidekicks[0].Hp = 0;
+        }
+      });
+  Panel(EUmPanelSide::Own, Own, EUmPanelState::Own, TEXT("no-avatar"), [](UUmHudPlayerPanel& P, FUmPlayerPanelModel&) {
+    P.Portrait->SetPortrait(NAME_None);  // the monogram fallback (CP-08)
+  });
+  if (bS && SidekickFallen && SidekickFallen->GetSidekickTooltip()) {
+    // class S: the sidekicks live in the panel's tooltip (ВР-VS2-CX09-06) - shown here as a cell of its own
+    UWidget* Tip = SidekickFallen->GetSidekickTooltip();
+    SidekickFallen->SetToolTip(nullptr);
+    Cell(Tip, FVector2D(180.0, 48.0 + 22.0 * FMath::Max(0, SidekickFallen->GetTooltipRows() - 1)), TEXT("S tooltip"));
+  }
+  Row = nullptr;
+  // ---- PANEL-OPP ----
+  Panel(EUmPanelSide::Opp, Opp, EUmPanelState::Opp, TEXT("opp"), [bMedusaOwn](UUmHudPlayerPanel& P, FUmPlayerPanelModel&) {
+    const FName Type(bMedusaOwn ? TEXT("attack") : TEXT("maneuver"));
+    P.Portrait->ApplyTracker(2, 1, true, {Type});
+  });
+  Panel(EUmPanelSide::Opp, Opp, EUmPanelState::Wait, TEXT("wait"), None);
+  Panel(EUmPanelSide::Opp, Opp, EUmPanelState::Ai, TEXT("ai"), None);
+  Panel(EUmPanelSide::Opp, Opp, EUmPanelState::Fallen, TEXT("fallen"), [](UUmHudPlayerPanel& P, FUmPlayerPanelModel& M) {
+    M.Hp = 0;
+    P.Portrait->SetHeartFallen(true, true);
+  });
+  Row = nullptr;
+  // ---- OPP-HAND: the opponent's backs ----
+  struct FHand {
+    const TCHAR* Label;
+    int32 Count;
+    bool bStale;
+  };
+  const FHand Hands[] = {{TEXT("3"), 3, false}, {TEXT("5"), 5, false}, {TEXT("10"), 10, false}, {TEXT("stale"), 5, true}};
+  for (const FHand& H : Hands) {
+    UUmHudOppHand* Hand = CreateWidget<UUmHudOppHand>(this, UUmHudOppHand::WidgetClass());
+    if (!Hand) continue;
+    Hand->SetClockForTest([]() { return 0.0; });
+    FUmOppHandModel M;
+    M.HandCount = H.Count;
+    M.DeckCount = bMedusaOwn ? 24 : 23;
+    M.DiscardCount = bMedusaOwn ? 1 : 2;
+    M.bDeckStale = H.bStale;
+    M.HeroSlug = Opp.Key.ToString();
+    M.WidthSu = static_cast<float>(HandSize.X);
+    M.PxPerSu = PxPerSu;
+    Hand->ApplyModel(M);
+    Cell(Hand, HandSize, FString::Printf(TEXT("opphand %s"), H.Label));
+    Blocks.Add(Hand);
+    TArray<FString> Shot;
+    Hand->CollectShotLines(Shot, FS08ScreenRect());
+    Lines.Add(FString::Printf(TEXT("UMGALLERY opphand %s %s"), H.Label, Shot.Num() ? *Shot[0] : TEXT("-")));
+  }
+  Lines.Insert(FString::Printf(TEXT("UMGALLERY panels page=%d own=%s class=%s canvas=%.0fx%.0f pxPerSu=%.3f panel=%.0fx%.0f "
+                                    "opphand=%.0fx%.0f perRow=%d %s"),
+                               Page + 1, *Own.Name.Replace(TEXT(" "), TEXT("_")), bS ? TEXT("S") : TEXT("L"), CanvasSu.X,
+                               CanvasSu.Y, PxPerSu, PanelSize.X, PanelSize.Y, HandSize.X, HandSize.Y, PerRow, *Look.Describe()),
                0);
   return Lines;
 }

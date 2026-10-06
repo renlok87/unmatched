@@ -62,6 +62,14 @@ public:
    *  candidate layer until the user's art acceptance). Survives SetIcon of the same icon. */
   void SetLayerHidden(FName LayerId, bool bHidden);
   bool IsLayerHidden(FName LayerId) const { return HiddenLayers.Contains(LayerId); }
+  /** VS-2 HB-19 (ВР-43): the layer's opacity track scaled so that its contract rest becomes RestOpacity (the theme's
+   *  ring.smoulder of the turn ring's rim: 0.35 = the contract, 0.55 in class S) - the keys and eases are the
+   *  contract's, only the level moves; <= 0 drops the override. Survives SetIcon of the same icon. */
+  void SetLayerRestOpacity(FName LayerId, float RestOpacity);
+  /** The contract rest opacity of a layer (1 for no such layer). */
+  float GetContractRestOpacity(FName LayerId) const;
+  /** The scale SetLayerRestOpacity applies to a layer (1 = the contract). */
+  float GetLayerOpacityScale(FName LayerId) const;
   /** Run I (AB-7): draw a single-frame layer from another contract texture src (the DE tracker slot fills its
    *  body / glyph layers with action-<type>_body / _glyph). Survives SetIcon of the same icon; a new icon drops it.
    *  False = no such layer, a flipbook layer, or the texture is missing (the layer keeps its texture). */
@@ -115,6 +123,7 @@ private:
   FLinearColor TeamTint = FLinearColor::White;
   TSet<FName> HiddenLayers;
   TMap<FName, FString> LayerSources;  // SetLayerSource overrides (layer id -> src)
+  TMap<FName, float> LayerOpacityScale;  // SetLayerRestOpacity (layer id -> scale of the opacity track)
 };
 
 /** Backend-less gallery: every contract icon in a grid on the HUD panel colour, each looping its demo script

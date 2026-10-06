@@ -19,6 +19,8 @@
 #include "CoreMinimal.h"
 
 struct FUmCardMediaEntry;
+class UMaterialInstanceDynamic;
+class UTexture2D;
 
 enum class EUmPortraitState : uint8 { Avatar, Fallen, Loser };
 
@@ -58,6 +60,9 @@ UNMATCHED_API float SourceCirclePx(const FUmCardMediaEntry& Entry);
 UNMATCHED_API FVector4 UvRect(const FUmCardMediaEntry& Entry);
 /** ВР-CP04: the circle su shown for a show size (su) at DPI x UI scale (px per su). */
 UNMATCHED_API float CappedSu(float ShowSu, float SrcCirclePx, float PxPerSu);
+/** The M_UmPortraitDisc parameters of a circle of CircleSu: the avatar, its UV rectangle, our rim (panel.edge at the
+ *  token alpha, mark.keyline), the card.navy fill (VS-2 HB-18: the panel's sidekick mini portraits share it). */
+UNMATCHED_API void SetupDiscMid(UMaterialInstanceDynamic& Mid, const FUmCardMediaEntry& Entry, UTexture2D* Tex, float CircleSu);
 UNMATCHED_API float Desaturation(EUmPortraitState State);
 UNMATCHED_API float Opacity(EUmPortraitState State);
 UNMATCHED_API const TCHAR* StateName(EUmPortraitState State);

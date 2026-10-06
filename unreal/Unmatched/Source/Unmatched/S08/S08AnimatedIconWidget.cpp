@@ -185,6 +185,32 @@ void US08AnimatedIconWidget::SetReducedMotion(bool bInReduced) {
   bDirty = true;
 }
 
+float US08AnimatedIconWidget::GetContractRestOpacity(FName LayerId) const {
+  if (!Def) return 1.0f;
+  for (const FS08IconLayer& Layer : Def->Layers) {
+    if (Layer.Id == LayerId) return Layer.Rest[static_cast<int32>(ES08IconProp::Opacity)];
+  }
+  return 1.0f;
+}
+
+float US08AnimatedIconWidget::GetLayerOpacityScale(FName LayerId) const {
+  const float* Scale = LayerOpacityScale.Find(LayerId);
+  return Scale ? *Scale : 1.0f;
+}
+
+void US08AnimatedIconWidget::SetLayerRestOpacity(FName LayerId, float RestOpacity) {
+  const float Contract = GetContractRestOpacity(LayerId);
+  const float Scale = RestOpacity > 0.0f && Contract > 0.0f ? RestOpacity / Contract : 1.0f;
+  if (FMath::IsNearlyEqual(Scale, GetLayerOpacityScale(LayerId), 1.0e-4f)) return;
+  if (FMath::IsNearlyEqual(Scale, 1.0f, 1.0e-4f)) {
+    LayerOpacityScale.Remove(LayerId);
+  } else {
+    LayerOpacityScale.Add(LayerId, Scale);
+  }
+  bDirty = true;
+  ApplyPose(GetClockMs());
+}
+
 void US08AnimatedIconWidget::SetLayerHidden(FName LayerId, bool bHidden) {
   const bool bChanged = bHidden ? !HiddenLayers.Contains(LayerId) : HiddenLayers.Contains(LayerId);
   if (bHidden) {
@@ -260,7 +286,11 @@ void US08AnimatedIconWidget::ApplyPose(float TMs) {
   for (int32 L = 0; L < LayerImages.Num(); ++L) {
     const FS08IconTargetPose& P = LastPose.Targets[L + 1];
     UImage* Image = LayerImages[L];
-    const float Opacity = HiddenLayers.Contains(Def->Layers[L].Id) ? 0.0f : P.Get(ES08IconProp::Opacity);
+    const FName LayerId = Def->Layers[L].Id;
+    const float* Scale = LayerOpacityScale.Find(LayerId);
+    const float Opacity = HiddenLayers.Contains(LayerId)
+                              ? 0.0f
+                              : FMath::Min(1.0f, P.Get(ES08IconProp::Opacity) * (Scale ? *Scale : 1.0f));
     ApplyIfChanged(*Image, ToWidgetTransform(P, SuPerU), P.PivotU / Canvas, Opacity);
     const int32 Frame = FMath::FloorToInt(P.Get(ES08IconProp::Frame) + 1.0e-4f);
     if (LayerFrameCount[L] > 1 && Frame != CurrentFrame[L]) {

@@ -32,6 +32,14 @@
 // team-colour disc and the monogram stay only for the fallback (no key / no PNG: a card.navy disc, a Warning) and the
 // rollback -S08PortraitLegacy. The tree is BuildDefaultTree (also the source of WBP_UmPortrait); the animated icons
 // (ring, heart, tracker) are added in code. SetPortrait takes the hero slug; SetHeroName falls back to the name's slug.
+//
+// VS-2 HB-18 / HB-19 (hud.csv; 04 §2.2, §2.3, §4.3): inside UUmHudPlayerPanel (UI/UmHudPlayerPanel.h) the portrait is
+// the circle only - AttachToPanel collapses its own plate and text column, moves the heart into the panel's HeartIcon
+// and puts the tracker icons into the panel's TrackerRow; the logic of the ring (AB-5), the tracker (AB-7), the heart
+// glow (AB-6) and the cross (AB-8) stays here, the look does not change. SetPanelGeometry sizes the ring window, the
+// circle and the tracker slots of the class (L 104 / 80 / 32 su, S 80 / 64 / 24 su, CX-09); SetRingSmoulder sets the
+// rest of the rim (theme ring.smoulder / ring.smoulder.s, ВР-43). Colours of the plate and the status (the rollback
+// column, -S08SlateHud=panels) come from UUmHudTheme.
 #pragma once
 
 #include "CoreMinimal.h"
@@ -171,6 +179,19 @@ public:
   void SetClockOverrideMs(float Ms);
   const FS08TurnHudLook& GetLook() const { return Look; }
 
+  // ---- VS-2 HB-18 / HB-19: the circle of a UUmHudPlayerPanel ----
+  /** Once, before Setup: the own plate and text column collapse; Heart (the panel's HeartIcon) becomes the heart of
+   *  PlayHeart / SetHeartFallen, TrackerHost (the panel's TrackerRow) receives the tracker icons. */
+  void AttachToPanel(UHorizontalBox* TrackerHost, US08AnimatedIconWidget* Heart);
+  bool IsPanelMode() const { return bPanelMode; }
+  /** The class sizes in a panel: ring window, circle, tracker slot (su). Existing icons resize in place. */
+  void SetPanelGeometry(float InRingSu, float InDiscSu, float InTrackerSu);
+  float GetRingWindowSu() const { return RingWindowSu; }
+  float GetTrackerSlotSu() const { return TrackerSlotSu; }
+  /** ВР-43: the rest of the smouldering rim (the contract's 0.35 scales its rim track; <= 0 = the contract). */
+  void SetRingSmoulder(float Rest);
+  float GetRingSmoulder() const { return RingSmoulder; }
+
   // ---- the tree (04 §4.3: BindWidget names; RingIcon / HeartIcon / tracker icons are added in code) ----
   UPROPERTY(BlueprintReadOnly, Category = "Um HUD", meta = (BindWidget)) TObjectPtr<UBorder> Panel;
   UPROPERTY(BlueprintReadOnly, Category = "Um HUD", meta = (BindWidget)) TObjectPtr<UOverlay> Avatar;
@@ -218,6 +239,12 @@ private:
   FString LastPortraitLine;
 
   FS08TurnHudLook Look;
+  // VS-2 HB-18 / HB-19: the panel mode and the class sizes (the column of the rollback keeps the constants)
+  bool bPanelMode = false;
+  float RingWindowSu = RingSu;
+  float DiscWindowSu = DiscSu;
+  float TrackerSlotSu = TrackerIconSu;
+  float RingSmoulder = 0.0f;
   bool bOpponent = false;
   bool bActive = false;
   bool bRingShown = false;

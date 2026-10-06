@@ -5,6 +5,8 @@
 #include "UmButton.h"
 #include "UmConnectionBadge.h"
 #include "UmHudBanner.h"
+#include "UmHudOppHand.h"
+#include "UmHudPlayerPanel.h"
 #include "UmHudStatusLine.h"
 #include "UmHudTop.h"
 #include "UmCursor.h"
@@ -50,6 +52,17 @@ FString UUmHudAuthoringLibrary::AuthorUmHudWidgetBlueprints(bool bOverwrite) {
       [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmHudStatusLine::BuildDefaultTree(Tree, Attach, Error); });
   One(UUmHudBanner::WidgetBlueprintPath, UUmHudBanner::StaticClass(),
       [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmHudBanner::BuildDefaultTree(Tree, Attach, Error); });
+  // VS-2 HB-18...HB-21: after WBP_UmPortrait (the panels nest it); one class, two mirrored trees
+  One(UUmHudPlayerPanel::LocBlueprintPath, UUmHudPlayerPanel::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) {
+        return UUmHudPlayerPanel::BuildDefaultTree(Tree, Attach, EUmPanelSide::Own, Error);
+      });
+  One(UUmHudPlayerPanel::OppBlueprintPath, UUmHudPlayerPanel::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) {
+        return UUmHudPlayerPanel::BuildDefaultTree(Tree, Attach, EUmPanelSide::Opp, Error);
+      });
+  One(UUmHudOppHand::WidgetBlueprintPath, UUmHudOppHand::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmHudOppHand::BuildDefaultTree(Tree, Attach, Error); });
   Report->SetArrayField(TEXT("assets"), Assets);
   FString Out;
   const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&Out);

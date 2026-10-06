@@ -9,7 +9,7 @@
 namespace S08HudTokens {
 
 /** sha256 of hud-style-tokens.json (CRLF -> LF) this header was generated from. */
-inline constexpr const TCHAR* kTokensJsonSha256 = TEXT("701f3b5ab6b4e45dbec1a662de1ecc7ee371b892060f1c87a080912eaffd8012");
+inline constexpr const TCHAR* kTokensJsonSha256 = TEXT("176abf0e64e3d4d27cf8ab2da4ae13ed2d9726f772b105eba17fc97de0bae55f");
 
 // ---- colours (60) ----
 inline constexpr FColor Color_AccentWarm = FColor(0xFF, 0xB4, 0x5C, 0xFF);  // accent.warm #FFB45C
@@ -73,11 +73,13 @@ inline constexpr FColor Color_ZonePurple = FColor(0x8A, 0x56, 0xC6, 0xFF);  // z
 inline constexpr FColor Color_ZoneRed = FColor(0xD9, 0x48, 0x3F, 0xFF);  // zone.red #D9483F
 inline constexpr FColor Color_ZoneYellow = FColor(0xE0, 0xB2, 0x3C, 0xFF);  // zone.yellow #E0B23C
 
-// ---- alpha (5): colour tokens with an alpha field + the opacity group ----
+// ---- alpha (7): colour tokens with an alpha field + the opacity group ----
 inline constexpr float Alpha_PanelBg = 0.92f;  // panel.bg
 inline constexpr float Alpha_PanelDivider = 0.16f;  // panel.divider
 inline constexpr float Alpha_PanelEdge = 0.45f;  // panel.edge
 inline constexpr float Alpha_PanelVeil = 0.6f;  // panel.veil
+inline constexpr float Alpha_RingSmoulder = 0.35f;  // ring.smoulder
+inline constexpr float Alpha_RingSmoulderS = 0.55f;  // ring.smoulder.s
 inline constexpr float Alpha_StateDisabledOpacity = 0.4f;  // state.disabled.opacity
 
 // ---- type scale (9), su at 1080p / 100 %; face = typeface of the default Slate composite font ----
@@ -224,6 +226,8 @@ inline constexpr FScalarToken kAlphas[] = {
     {TEXT("panel.divider"), 0.16f},
     {TEXT("panel.edge"), 0.45f},
     {TEXT("panel.veil"), 0.6f},
+    {TEXT("ring.smoulder"), 0.35f},
+    {TEXT("ring.smoulder.s"), 0.55f},
     {TEXT("state.disabled.opacity"), 0.4f},
 };
 inline constexpr FTypeToken kTypes[] = {

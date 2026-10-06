@@ -9,6 +9,11 @@
 //   -S08IconGalleryTopStrip        VS-2 HB-14...HB-16: TOP (online / syncing / lost), STATUS in its six SHOT states (with
 //                                  the key chips on the first row) at the STATUS width of the window's class, the
 //                                  banner at alpha 1 - the real blocks at their layout sizes on fx.dust (review only).
+//   -S08IconGalleryPanels[=<page>] VS-2 HB-18...HB-21: PANEL-LOC in its states (start of the turn +300 ms, smouldering,
+//                                  wait, two filled slots, damage with the glow, fallen, a fallen sidekick, no avatar),
+//                                  PANEL-OPP (opp, wait, ai, fallen) and OPP-HAND (3 / 5 / 10 backs, stale deck) at the
+//                                  class sizes of the window; page 1 - own Medusa (harpies) vs King Arthur, page 2 -
+//                                  own King Arthur (Merlin) vs Medusa; class S adds the sidekick tooltip (review only).
 // Trace: 'UMGALLERY skins page=<p>/<n> rows=<r> pxPerSu=<x> x2=0|1 textures=<k>/29' and
 //        'UMGALLERY buttons variants=3 states=7 pxPerSu=<x> <variant>.<state>: <DescribeState>'.
 #pragma once
@@ -58,6 +63,21 @@ class UUmHudTop;
 class UUmHudStatusLine;
 class UUmHudBanner;
 class UVerticalBox;
+
+UCLASS()
+class UNMATCHED_API UUmPanelsGalleryWidget : public UUserWidget {
+  GENERATED_BODY()
+
+ public:
+  virtual bool Initialize() override;
+  /** Builds page Page (0: Medusa own, 1: King Arthur own) for a canvas of CanvasSu at PxPerSu; returns trace lines. */
+  TArray<FString> Build(int32 Page, const FVector2D& CanvasSu, float PxPerSu);
+
+ private:
+  UPROPERTY() TObjectPtr<UBorder> Background;
+  UPROPERTY() TObjectPtr<UVerticalBox> Rows;
+  UPROPERTY() TArray<TObjectPtr<UUserWidget>> Blocks;
+};
 
 UCLASS()
 class UNMATCHED_API UUmTopStripGalleryWidget : public UUserWidget {
