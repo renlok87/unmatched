@@ -10,6 +10,9 @@
 #include "Components/UniformGridPanel.h"
 #include "Components/UniformGridSlot.h"
 #include "Engine/Texture2D.h"
+#include "Misc/CommandLine.h"
+#include "S08TraceLog.h"
+#include "UI/UmHudScale.h"
 
 namespace {
 FLinearColor S08Srgb(uint8 R, uint8 G, uint8 B, float A = 1.0f) {
@@ -116,6 +119,48 @@ bool US08AnimatedIconWidget::SetIcon(FName InIconId, float InSizeSu, int32 InTex
   bDirty = true;
   ApplyPose(GetClockMs());
   return true;
+}
+
+void US08AnimatedIconWidget::SetDisplaySizeSu(float InSu) {
+  DisplaySizeSu = FMath::Max(InSu, 1.0f);
+  if (!ScaleChangedHandle.IsValid()) {
+    ScaleChangedHandle = UmHudScale::OnUiScaleChanged().AddUObject(this, &US08AnimatedIconWidget::HandleUiScaleChanged);
+  }
+  PickDisplayTexture();
+}
+
+void US08AnimatedIconWidget::HandleUiScaleChanged(const FUmHudScaleState& /*State*/) {
+  if (DisplaySizeSu > 0.0f) PickDisplayTexture();
+}
+
+void US08AnimatedIconWidget::PickDisplayTexture() {
+  if (!Def || DisplaySizeSu <= 0.0f) return;
+  const bool bLegacy = S08IconMotion::IconSizeLegacy(FCommandLine::Get());
+  const float PxPerSu = PxPerSuOverride > 0.0f ? PxPerSuOverride : UmHudScale::Current().PxPerSu();
+  bool bClamped = false;
+  const int32 Wanted = S08IconMotion::ExportSizePx(DisplaySizeSu, bLegacy ? 1.0f : PxPerSu, &bClamped);
+  if (bClamped) {
+    UE_LOG(LogTemp, Warning, TEXT("S08 icon %s: %.0f su x %.3f needs more than the largest export - 64 is used"),
+           *IconId.ToString(), DisplaySizeSu, PxPerSu);
+  }
+  if (Wanted == TexturePx && FMath::IsNearlyEqual(SizeSu, DisplaySizeSu)) return;
+  // same icon: SetIcon keeps the animation state and rebuilds only the images at the new texture size
+  SetIcon(IconId, DisplaySizeSu, Wanted);
+  const FString Src = Def->Layers.Num() ? Def->Layers[0].Src : IconId.ToString();
+  const FString Path = S08IconMotion::TextureObjectPath(Src, 0, Wanted);
+  FString Asset;
+  Path.Split(TEXT("."), nullptr, &Asset);
+  FS08Trace::Write(FString::Printf(TEXT("ICON size su=%.0f px=%.1f tex=%s icon=%s dpiScale=%.3f legacy=%d clamped=%d"),
+                                   DisplaySizeSu, DisplaySizeSu * (bLegacy ? 1.0f : PxPerSu), *Asset,
+                                   *IconId.ToString(), PxPerSu, bLegacy ? 1 : 0, bClamped ? 1 : 0));
+}
+
+void US08AnimatedIconWidget::BeginDestroy() {
+  if (ScaleChangedHandle.IsValid()) {
+    UmHudScale::OnUiScaleChanged().Remove(ScaleChangedHandle);
+    ScaleChangedHandle.Reset();
+  }
+  Super::BeginDestroy();
 }
 
 bool US08AnimatedIconWidget::PlayAnim(FName Anim) { return PlayAnimAt(Anim, GetClockMs()); }
@@ -283,7 +328,9 @@ int32 US08IconGalleryWidget::Build(float InSizeSu, int32 InTexturePx, bool bInRe
     US08AnimatedIconWidget* Icon = CreateWidget<US08AnimatedIconWidget>(this, US08AnimatedIconWidget::StaticClass());
     Icon->SetReducedMotion(bReduced);
     Icon->SetExternallyDriven(true);  // EvaluateAt applies every pose (and is what the perf sample measures)
-    Icon->SetIcon(Id, InSizeSu, InTexturePx);
+    // VS-2 HB-23: InTexturePx <= 0 = by display size (the export for su x DPI x UI scale, traced 'ICON size')
+    Icon->SetIcon(Id, InSizeSu, InTexturePx > 0 ? InTexturePx : S08IconMotion::ExportSizePx(InSizeSu, 1.0f));
+    if (InTexturePx <= 0) Icon->SetDisplaySizeSu(InSizeSu);
     Icon->SetTeamTint(FLinearColor::FromSRGBColor(FColor(0xDA, 0xC5, 0x76)));  // team.p1.screen (reference demo)
     UOverlaySlot* IconSlot = Ov->AddChildToOverlay(Icon);
     IconSlot->SetHorizontalAlignment(HAlign_Center);

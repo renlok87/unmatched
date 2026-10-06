@@ -109,6 +109,16 @@ UNMATCHED_API bool IsReducedMotion();
 UNMATCHED_API bool UseAnimatedCombatToken(const TCHAR* CommandLine);
 /** /Game/S08/UI/IconsV3/T_IV3_<src with '-' -> '_'>[_fNN]_<size>.T_IV3_... (tools/art/icons_v3_import.py). */
 UNMATCHED_API FString TextureObjectPath(const FString& Src, int32 Frame, int32 SizePx);
+/** VS-2 HB-23 (IC-33; 02 §5.3, И-9): the UE exports of every v3 icon (icons_v3_import.py SIZES_DEFAULT = the contract
+ *  `ue_sizes`): 18 and 36 are the 24 su icon at DPI 0.75 and at 150 %. */
+inline constexpr int32 UeExportSizes[] = {18, 24, 32, 36, 48, 64};
+/** The export drawn for an icon of Su at PxPerSu (DPI x UI scale): the smallest export >= Su x PxPerSu (0.05 px
+ *  tolerance: 24 x 0.75 = 18 picks 18); none big enough -> 64 and bOutClamped (the caller logs one Warning). The 1024
+ *  master is never scaled down at runtime. */
+UNMATCHED_API int32 ExportSizePx(float Su, float PxPerSu, bool* bOutClamped = nullptr);
+/** -S08IconLegacy (the rollback of the v3 token, RD-1) also restores the pre-HB-23 size rule: the export for Su itself,
+ *  whatever the DPI and UI scale. */
+UNMATCHED_API bool IconSizeLegacy(const TCHAR* CommandLine);
 /** Gallery / reference demo script: (t, command) pairs and the total length (icon_motion.demo_schedule). */
 UNMATCHED_API void DemoSchedule(const FS08IconMotionDef& Def, bool bReduced, TArray<TPair<float, FName>>& Out,
                                 float& OutTotalMs);

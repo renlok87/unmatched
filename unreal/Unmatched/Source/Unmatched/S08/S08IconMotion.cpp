@@ -276,6 +276,20 @@ FString S08IconMotion::TextureObjectPath(const FString& Src, int32 Frame, int32 
   return FString::Printf(TEXT("/Game/S08/UI/IconsV3/%s.%s"), *Asset, *Asset);
 }
 
+int32 S08IconMotion::ExportSizePx(float Su, float PxPerSu, bool* bOutClamped) {
+  const float Px = Su * (PxPerSu > 0.0f ? PxPerSu : 1.0f);
+  if (bOutClamped) *bOutClamped = false;
+  for (const int32 Size : UeExportSizes) {
+    if (static_cast<float>(Size) + 0.05f >= Px) return Size;
+  }
+  if (bOutClamped) *bOutClamped = true;
+  return UeExportSizes[UE_ARRAY_COUNT(UeExportSizes) - 1];
+}
+
+bool S08IconMotion::IconSizeLegacy(const TCHAR* CommandLine) {
+  return CommandLine && FParse::Param(CommandLine, TEXT("S08IconLegacy"));
+}
+
 void S08IconMotion::DemoSchedule(const FS08IconMotionDef& Def, bool bReduced, TArray<TPair<float, FName>>& Out,
                                  float& OutTotalMs) {
   Out.Reset();

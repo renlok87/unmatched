@@ -949,6 +949,7 @@ void AS08FlowGameMode::SetupCameraForBoard() {
   } else {
     BoardCamera->SetActorLocationAndRotation(Location, FRotator(-55.0f, -90.0f, 0.0f));
   }
+  UpdateUmHudField(Location, FRotator(-55.0f, -90.0f, 0.0f), Hfov);  // VS-2 HB-06: FIELD of this K1 camera (ВР-H02)
   const FString Line = FString::Printf(TEXT("CAMERA dist=%.0f loc=(%.0f,%.0f,%.0f) pitch=-55 yaw=-90"),
                                        Distance, Location.X, Location.Y, Location.Z);
   TraceLines.Add(Line);
@@ -4975,6 +4976,7 @@ void AS08FlowGameMode::CaptureEvidenceShot(const FString& BasePath) {
     // docs/art-pipeline/qa010/README.md "Новая трасса"). W5b-R: the icon / widget / tag / damage lines moved to the
     // END of this frame (WriteArtHudLateLines) - they report what the capture really contains.
     WriteArtHudShotLines();
+    WriteUmHudShotLines();  // VS-2 HB-06: HUD-LAYOUT (class, canvas, FIELD, overlap) + SHOT widget id=UI-SCR-GAME
   }
   // UI-INCLUSIVE evidence capture (GD-032/033): the old SceneCapture and
   // HighResShot paths render the 3D scene only - Slate HUD widgets never
@@ -5192,6 +5194,7 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
   TickDeathStage();  // DE-019: death lines and the result gate (after the staging released this frame's fall)
   TickResultScreen();  // DE-029: the modal opens with the gate; intro 500 ms, board crossfade 250 ms
   TickDeckPanel();     // DE-030: the deck side panel - open 80 ms, close 150 ms
+  TickUmHud();         // VS-2 HB-06: the H2 layout fixes of the Slate blocks (toast / subtitle stack)
   if (!TryCombatSkip() && !TryCardSlotSkip()) {
     HandleClick();
     HandleHudKeys();
@@ -5357,6 +5360,7 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
 }
 
 void AS08FlowGameMode::EndPlay(const EEndPlayReason::Type Reason) {
+  if (UmHud.IsValid()) HandleUmHudEndPlay();  // VS-2 HB-06: the scale listener of the HUD root
   ShutdownAudioRuntime();
   FCoreDelegates::OnEndFrame.Remove(EndFrameHandle);
   US08UserSettings::OnChanged.Remove(SettingsChangedHandle);
@@ -5779,13 +5783,13 @@ void AS08FlowGameMode::BuildHudWidgets() {
       .Alignment(FVector2D(0.0f, 0.5f))
       .Offset(FVector2D(24.0f, 0.0f))
       .AutoSize(true)
-      [SAssignNew(CombatEdgeLeft, SVerticalBox)];
+      [UmHudWrapEdge(SAssignNew(CombatEdgeLeft, SVerticalBox), true)];  // VS-2 HB-06: kept out of FIELD
   Canvas->AddSlot()
       .Anchors(FAnchors(1.0f, 0.5f))
       .Alignment(FVector2D(1.0f, 0.5f))
       .Offset(FVector2D(-24.0f, 0.0f))
       .AutoSize(true)
-      [SAssignNew(CombatEdgeRight, SVerticalBox)];
+      [UmHudWrapEdge(SAssignNew(CombatEdgeRight, SVerticalBox), false)];
   Canvas->AddSlot()
       .Anchors(FAnchors(0.5f, 0.0f))
       .Alignment(FVector2D(0.5f, 0.0f))
@@ -5796,7 +5800,7 @@ void AS08FlowGameMode::BuildHudWidgets() {
   Canvas->AddSlot()
       .Anchors(FAnchors(0.5f, 1.0f))
       .Alignment(FVector2D(0.5f, 1.0f))
-      .Offset(FVector2D(0.0f, -150.0f))
+      .Offset(TAttribute<FMargin>::CreateLambda([this]() { return UmHudToastOffset(); }))  // VS-2: the stack (ВР-H06)
       .AutoSize(true)
       [SAssignNew(ToastHudBorder, SBorder)
            .BorderImage(FCoreStyle::Get().GetBrush("WhiteBrush"))
@@ -5814,6 +5818,7 @@ void AS08FlowGameMode::BuildHudWidgets() {
   BuildResultScreenWidgets(Canvas); // DE-029: the result modal and the board-view bar, over every panel
 
   GEngine->GameViewport->AddViewportWidgetContent(Canvas, 1);
+  BuildUmHud();  // VS-2 HB-06: the UMG HUD root (S08FlowGameModeUmHud.cpp; rollback -S08SlateHud)
 }
 
 namespace {

@@ -39,6 +39,9 @@
 //   -S08PortraitLegacy  the portraits as before: the team-colour disc + monogram (traced portraits=legacy(..)).
 //   -S08CardArtLegacy   the card face is the 02 §6.1 fallback without the scan, the back the card.navy plate with the
 //                       resource-card icon (traced cards=legacy(..)).
+//   VS-2 HB-06 (04 §5.1, ВР-H15): the UMG HUD root (UI/UmHudRoot.h) and its layout are the default;
+//   -S08SlateHud        the whole HUD as before the step (traced hudImpl=slate); -S08SlateHud=<key>,.. only those
+//                       blocks (hudImpl=slate:<keys>).
 // -ArtPreviewHeroesV2 / -ArtPreviewDiorama stay accepted as no-op aliases (scripts pass them).
 //
 // The trace tags of the art path stay 'ARTPREVIEW ...' (every gate script and tool reads them); one 'ARTLOOK ...' line
@@ -97,11 +100,44 @@ UNMATCHED_API bool CardArt();
 /** The ARTLOOK fields of CP-02: "portraits=avatar|legacy(-S08PortraitLegacy) cards=art|legacy(-S08CardArtLegacy)". */
 UNMATCHED_API FString CardMediaField(const TCHAR* CommandLine);
 
+/** VS-2 HB-06 (04 §5.1, ВР-36, ВР-H15, ВР-HB01): the UMG HUD root is the default; -S08SlateHud rolls the whole HUD back
+ *  to the Slate path of before the step (no root, no layout fixes), -S08SlateHud=<key>,<key> only the named blocks
+ *  (regression hunt). Keys of the match HUD (04 §4.2 / §2): SlateHudKeys; the screens add their own (inspect, ...).
+ *  tag, plate, damage = the world layer as before (12/11 su, #161A28, "H1", "-N" 18) - that is today's look until H12,
+ *  the existing -ArtHudImpl=slate is a separate switch and does not change. */
+inline const TCHAR* const SlateHudFlagName = TEXT("S08SlateHud");
+/** The block keys -S08SlateHud=<list> knows (unknown keys are kept and reported, never fatal). */
+inline const TCHAR* const SlateHudKeys[] = {
+    TEXT("top"),   TEXT("status"),  TEXT("banner"), TEXT("panels"), TEXT("opphand"), TEXT("hand"),  TEXT("decks"),
+    TEXT("deckpanel"), TEXT("actions"), TEXT("combat"), TEXT("pending"), TEXT("slot"), TEXT("log"), TEXT("toast"),
+    TEXT("sub"),   TEXT("tag"),     TEXT("plate"),  TEXT("damage"), TEXT("cursor"), TEXT("inspect")};
+/** What -S08SlateHud asked for: nothing (UMG root, every block on the new path), everything, or a block list. */
+struct UNMATCHED_API FS08SlateHudBlocks {
+  bool bAll = false;
+  TArray<FName> Blocks;    // lower case, in command-line order, no duplicates
+  TArray<FName> Unknown;   // keys not in SlateHudKeys (still honoured - a screen may own them)
+  /** True when Key is drawn by the old Slate path (the whole HUD rolled back, or Key listed). */
+  bool IsSlate(FName Key) const { return bAll || Blocks.Contains(Key); }
+  /** The UMG root is built (anything but the whole-HUD rollback). */
+  bool UmgRoot() const { return !bAll; }
+  /** 'umg', 'slate' or 'slate:<key>,<key>' (ARTLOOK hudImpl=, 04 §4.5). */
+  FString ImplField() const;
+};
+/** World-free parse of one command line: '-S08SlateHud' / '-S08SlateHud=' -> all; '-S08SlateHud=hand,decks' -> list. */
+UNMATCHED_API FS08SlateHudBlocks ParseSlateHud(const TCHAR* CommandLine);
+/** This process's -S08SlateHud (read per call from the command line, or the test override); the grey board
+ *  (-S08GreyBoard, the S09 stand run-hud-demo) is always the whole Slate HUD (ВР-36). */
+UNMATCHED_API FS08SlateHudBlocks SlateHudBlocks();
+/** Automation tests only: force a -S08SlateHud value ("" = umg, "*" = all, "a,b" = list); Reset reads the command line. */
+UNMATCHED_API void SetSlateHudOverrideForTest(const FString& Value);
+UNMATCHED_API void ResetSlateHudOverrideForTest();
+
 /** 'ARTLOOK art=1|0 source=default|S08GreyBoard|override heroes=v2|legacy(..) tray=on|legacy(..)|off env=on|off(..)
  *   review=0|1 legacyRender=0|1 markers=0|1 aliases=<-ArtPreviewHeroesV2,-ArtPreviewDiorama,-S08HeartGlow or ->
  *   hud=ring:<id>|legacy(..),glow:on|legacy(..),tracker:de|legacy(..),cross:on|legacy(..) dpi=project|legacy(..)
- *   portraits=avatar|legacy(..) cards=art|legacy(..)' - the effective look of this run (the hud field:
- *   FS08TurnHudLook::ArtLookField; dpi: UmHudScale::ArtLookField, HB-09; portraits / cards: CardMediaField, CP-02). */
+ *   portraits=avatar|legacy(..) cards=art|legacy(..) hudImpl=umg|slate[:<list>]' - the effective look of this run (the
+ *   hud field: FS08TurnHudLook::ArtLookField; dpi: UmHudScale::ArtLookField, HB-09; portraits / cards: CardMediaField,
+ *   CP-02; hudImpl: FS08SlateHudBlocks::ImplField, HB-06). */
 UNMATCHED_API FString TraceLine();
 
 }  // namespace S08ArtLook

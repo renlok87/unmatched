@@ -44,8 +44,14 @@ bool AS08FlowGameMode::IconGalleryBegin() {
   IconGallery = CreateWidget<US08IconGalleryWidget>(GetWorld(), US08IconGalleryWidget::StaticClass());
   // -S08IconGalleryNoLabels: no id captions (the perf A/B then measures the icons and their panels only).
   const bool bLabels = !FParse::Param(Cmd, TEXT("S08IconGalleryNoLabels"));
-  const int32 Count = IconGallery ? IconGallery->Build(static_cast<float>(SizePx), SizePx, bReduced, 6, bLabels) : 0;
+  // VS-2 HB-23: -S08IconGallerySu=<su> - every icon by its display size (the export for su x DPI x UI scale)
+  float DisplaySu = 0.0f;
+  const bool bBySu = FParse::Value(Cmd, TEXT("S08IconGallerySu="), DisplaySu) && DisplaySu > 0.0f;
+  const int32 Count = IconGallery ? IconGallery->Build(bBySu ? DisplaySu : static_cast<float>(SizePx), bBySu ? 0 : SizePx,
+                                                       bReduced, 6, bLabels)
+                                  : 0;
   if (IconGallery) IconGallery->AddToViewport(1000);
+  UmGalleryBegin(SizePx);  // VS-2 HB-10 / HB-11: -S08IconGallerySkins[=<page>], -S08IconGalleryButtons
   if (FParse::Param(Cmd, TEXT("S08IconGalleryPortraits"))) GalleryPortraitsBegin();  // DE-023 review tooling
   if (IconGallery && IconGalleryTimes.Num() > 0 && !IconGalleryShotDir.IsEmpty()) {
     IconGallery->SetClockOverrideMs(IconGalleryTimes[0]);

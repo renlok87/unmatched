@@ -57,6 +57,19 @@ class HudContractTests(unittest.TestCase):
         self.assertTrue(any("вне кадра" in e for e in errs))
         self.assertTrue(any("state" in e for e in errs))
 
+    def test_layout_trace_gate(self):
+        # VS-2 HB-06: HUD-LAYOUT once per shot frame; overlapField of the persistent blocks must be 0
+        ids = hc.ui_ids_from_02(SPEC02)
+        good = ["2026.10.06 HUD-LAYOUT class=L canvas=1920x1080 scale=1.000 field=(466,258,995,599) overlapField=0 "
+                "window=1920x1080 hand=376..1540 handVisible=193 crossing=-"]
+        self.assertEqual(hc.check_widget_trace(good, ids), ([], 0))
+        bad = ["HUD-LAYOUT class=S canvas=1138x640 scale=1.125 field=(223,153,690,361) overlapField=796 crossing=opphand",
+               "HUD-LAYOUT class=X canvas=1x1 scale=1 overlapField=0"]
+        errs, _ = hc.check_widget_trace(bad, ids)
+        self.assertTrue(any("overlapField=796" in e and "opphand" in e for e in errs))
+        self.assertTrue(any("class=X" in e for e in errs))
+        self.assertTrue(any("без поля field" in e for e in errs))
+
 
 if __name__ == "__main__":
     unittest.main()

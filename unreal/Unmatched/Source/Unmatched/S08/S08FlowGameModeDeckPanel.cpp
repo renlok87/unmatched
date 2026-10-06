@@ -395,6 +395,7 @@ void AS08FlowGameMode::TickDeckPanel() {
       if (Current != Want) Side->SetVisibility(Want);
     }
   }
+  UmHudDeckPanelLayering(Alpha);  // VS-2 HB-06: the right combat edge under the panel fades with the counters
 }
 
 bool AS08FlowGameMode::BenchDeckPanelBegin(const FS08Snapshot& Fixture, const FString& SideName, const FString& ListsPath) {

@@ -21,6 +21,7 @@ class UTextBlock;
 class UTexture2D;
 class UUniformGridPanel;
 class UBorder;
+struct FUmHudScaleState;
 
 UCLASS()
 class UNMATCHED_API US08AnimatedIconWidget : public UUserWidget {
@@ -32,6 +33,16 @@ public:
   /** Icon from the motion contract (variants resolve to their base). SizeSu = icon side in slate units
    *  (32 u canvas); TexturePx = exact-size texture to sample (24 / 32 / 48 / 64). false = unknown icon. */
   bool SetIcon(FName IconId, float InSizeSu, int32 InTexturePx);
+  /** VS-2 HB-23 (02 §5.3, И-9; IC-33): the icon side in su; the texture is the export for su x DPI x UI scale
+   *  (S08IconMotion::ExportSizePx: 24 su at 720p -> 18, at 1080p 150 % -> 36; 32 su at 150 % -> 48), re-picked on
+   *  UmHudScale::OnUiScaleChanged - an event, no tick; only the needed size is loaded. Call after SetIcon (any
+   *  TexturePx there); -S08IconLegacy keeps the texture of the su itself. Trace (on a change):
+   *  'ICON size su=<x> px=<y> tex=<asset> icon=<id> dpiScale=<px per su> legacy=0|1 clamped=0|1'. */
+  void SetDisplaySizeSu(float InSu);
+  float GetDisplaySizeSu() const { return DisplaySizeSu; }
+  int32 GetTexturePx() const { return TexturePx; }
+  /** The px per su the last pick used (tests force it; 0 = UmHudScale::Current()). */
+  void SetPxPerSuOverrideForTest(float InPxPerSu) { PxPerSuOverride = InPxPerSu; }
   /** Plays a contract animation at the widget clock. */
   bool PlayAnim(FName Anim);
   /** Plays at an explicit time (gallery replay, tests). */
@@ -72,8 +83,15 @@ public:
 
 protected:
   virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+  virtual void BeginDestroy() override;
 
 private:
+  void PickDisplayTexture();
+  void HandleUiScaleChanged(const FUmHudScaleState& State);
+  float DisplaySizeSu = 0.0f;
+  float PxPerSuOverride = 0.0f;
+  FDelegateHandle ScaleChangedHandle;
+
   UPROPERTY() TObjectPtr<USizeBox> Box;
   UPROPERTY() TObjectPtr<UOverlay> Stage;
   UPROPERTY() TArray<TObjectPtr<UImage>> LayerImages;
@@ -107,7 +125,8 @@ class UNMATCHED_API US08IconGalleryWidget : public UUserWidget {
 
 public:
   virtual bool Initialize() override;
-  /** Builds the grid; SizeSu = icon side, TexturePx = texture size. Returns the icon count. */
+  /** Builds the grid; SizeSu = icon side, TexturePx = texture size (<= 0: by display size, HB-23). Returns the icon
+   *  count. */
   int32 Build(float InSizeSu, int32 InTexturePx, bool bInReduced, int32 Columns = 6, bool bLabels = true);
   /** >= 0 freezes the gallery clock (shots); < 0 = real time. */
   void SetClockOverrideMs(float Ms) { ClockOverrideMs = Ms; }

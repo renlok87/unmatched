@@ -36,6 +36,8 @@ COLOR_LITERAL_RE = re.compile(r"\bFColor(?:\s+\w+)?\s*[({]\s*(?:0x)?\d|\bFLinear
 UI_ID_RE = re.compile(r"\bUI-(?:HUD|SCR)-[A-Z]+(?:-[A-Z]+)*\b")
 WHY_02_RE = re.compile(r"`(why\.[a-z.]+)`")
 SHOT_RE = re.compile(r"SHOT widget (.*)$")
+# VS-2 HB-06 (04 §1.6, §4.5, §7.1): one line per shot frame - persistent blocks x FIELD must be 0 (overlapField)
+LAYOUT_RE = re.compile(r"HUD-LAYOUT (.*)$")
 ARG_RE = re.compile(r"\{([A-Za-z_][A-Za-z0-9_]*)\}")
 
 
@@ -171,6 +173,13 @@ ART_HUD_IDS = {"plate", "plate.marker", "plate.name", "plate.team", "plate.hpbar
                "board.tag.bar", "board.tag.chip", "board.damage", "board.damage.text"}
 
 
+def parse_layout(line):
+    m = LAYOUT_RE.search(line.rstrip("\r\n"))
+    if not m:
+        return None
+    return dict(w.split("=", 1) for w in m.group(1).split() if "=" in w)
+
+
 def parse_bbox(value):
     """'x,y,w,h' (формат HUD-RULES П4) или '(x0,y0,x1,y1)' (строки арт-слоя) -> (x, y, w, h)."""
     v = value.strip()
@@ -187,6 +196,21 @@ def check_widget_trace(lines, known_ids, width=1920, height=1080):
     errors, seen = [], 0
     ids = set(known_ids) | ART_HUD_IDS
     for n, line in enumerate(lines, 1):
+        lay = parse_layout(line)
+        if lay is not None:
+            # VS-2 HB-06: the persistent blocks keep out of FIELD (04 §1.6, D-10 W5b-R); "crossing" names them
+            for k in ("class", "canvas", "field", "overlapField"):
+                if k not in lay:
+                    errors.append("строка %d: HUD-LAYOUT без поля %s" % (n, k))
+            try:
+                if float(lay.get("overlapField", "0")) > 0.0:
+                    errors.append("строка %d: HUD-LAYOUT overlapField=%s (блоки %s пересекают FIELD)"
+                                  % (n, lay["overlapField"], lay.get("crossing", "?")))
+            except ValueError:
+                errors.append("строка %d: HUD-LAYOUT overlapField=%r" % (n, lay.get("overlapField")))
+            if lay.get("class") not in ("L", "S"):
+                errors.append("строка %d: HUD-LAYOUT class=%s" % (n, lay.get("class")))
+            continue
         f = parse_shot_widget(line)
         if f is None:
             continue

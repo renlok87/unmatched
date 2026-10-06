@@ -1158,6 +1158,26 @@ private:
   UPROPERTY()
   TObjectPtr<class US08AnimatedIconWidget> NoDefenseStamp;
   FString NoDefenseStampKey;
+  // ---- VS-2 HB-06: the UMG HUD root, its layout / FIELD and the H2 layout fixes of the Slate blocks
+  // (S08FlowGameModeUmHud.cpp; rollback -S08SlateHud[=<blocks>]) ----
+  void BuildUmHud();
+  void UpdateUmHudField(const FVector& CameraLocation, const FRotator& CameraRotation, float HFovDeg);
+  void RefreshUmHudLayout();
+  void HandleUmHudScaleChanged(const struct FUmHudScaleState& State);
+  void HandleUmHudEndPlay();
+  void WriteUmHudShotLines();
+  void TickUmHud();
+  void UmHudDeckPanelLayering(float DeckAlpha);
+  bool UmHudBlockOnSlate(const TCHAR* Key) const;
+  TSharedRef<SWidget> UmHudWrapEdge(const TSharedRef<SWidget>& Edge, bool bLeft);
+  float UmHudHandLowerCap(float OffsetSu) const;
+  FMargin UmHudToastOffset() const;
+  void UmGalleryBegin(int32 SizePx);
+  UPROPERTY()
+  TObjectPtr<class UUmHudRoot> UmHudRoot;
+  UPROPERTY()
+  TObjectPtr<UUserWidget> UmGallery;
+  TSharedPtr<struct FUmHudRuntime> UmHud;
 
   FS08BoardModel BoardModel;
   TArray<FS08BoardFighter> Fighters;
