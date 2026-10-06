@@ -1,0 +1,43 @@
+{
+  "size": [
+    2340,
+    1317
+  ],
+  "concept_rect_xywh": [
+    334,
+    188,
+    1672,
+    941
+  ],
+  "margins_ltrb": [
+    334,
+    188,
+    334,
+    188
+  ],
+  "mask_white_means": "outpaint permitted",
+  "prompt_key": "EN-02-OUTPAINT-01",
+  "prompt_sha256": "ffc2a3678ee7649d9dd476ec730b62045804aa0506fa19c5ae67cb7fd8a4d480",
+  "input": "scraped-data/derived/env-u16-marmoreal-codex/concepts/EN-02-outpaint-input.png",
+  "input_sha256": "8ee27fa4748ab4eb86522e6169cd2bee3a2710aefcb1088372ed68bd55685539",
+  "C0_usage": "lit composite only; never supplied to outpainting",
+  "lantern_feather": {
+    "px": 6,
+    "direction": "inward",
+    "formula": "alpha=(m/255)*clip(distance(m>0)/6,0,1)"
+  },
+  "raw_policy": "Archive every generation unchanged in concepts; exact prompt/input hashes in generation-records.json.",
+  "tile_fallback": "At most 1536px per tile, >=64px overlap; paste original after every pass; log each pass. Not attempted.",
+  "failure_policy": "After two perspective/seam failures stop; Claude owns banana3/2K fallback.",
+  "working_sizes": [
+    [
+      1521,
+      856
+    ],
+    [
+      1170,
+      659
+    ]
+  ],
+  "K1": "Image-space x0.65 proxy only; no Unreal reads or true camera verification."
+}

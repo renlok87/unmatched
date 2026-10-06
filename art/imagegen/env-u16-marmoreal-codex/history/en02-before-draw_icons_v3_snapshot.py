@@ -5,12 +5,9 @@
     python draw_icons.py                 # пересобирает всё: masters/, sizes/, layers/, sheets/, manifest.json, audit.json
     python draw_icons.py --review DIR    # дополнительно листы со сканами карт и кадрами DE в DIR (вне репозитория)
     python draw_icons.py --only state-boost,action-attack   # подмножество (для отладки)
-    python draw_icons.py --sheet accept state-boost,action-attack DIR   # IC-33: лист приёмки (цвет / серый Rec.709 /
-                                         # дейтеранопия на card.navy, card.cream, #808080; мастер и 18/24/32/48 ×4)
 
 Единицы: холст 32 u × 32 u (плашки 64 × 32 u), мастер 1024 px → 1 u = 32 px. Каждый размер рендерится из вектора:
 толщины слоёв (keyline K, кромка E, штрих W, кольцо) снэпятся к целым пикселям, прямые границы тел ложатся на пиксель,
-размеры SIZES — набор экспортов под масштаб UI и DPI (18 / 36 / 72 — IC-33), без mip и без даунскейла мастера,
 уровень детализации глифа зависит от размера (Spec.detail); глифы не масштабируются контекстом — их горизонтальные
 кромки снэпятся в абсолютных координатах (Spec.sx/sy), составные фигуры собираются заливкой + вырезом без клипа.
 Цифры в текстуры не печатаются — только на листах.
@@ -36,18 +33,8 @@ FONT_RG = "C:/Program Files/Epic Games/UE_5.8/Engine/Content/Slate/Fonts/Roboto-
 
 U = 32            # единиц на сторону
 MASTER = 1024     # px мастера
-# IC-33 (ВР-62, ВР-IC14; 02 §3.2, §5.3): набор экспортов под масштаб вместо mip — 18 и 36 = значок 24 su при DPI 0,75
-# (720p) и при 150 %, 72 = значок 48 su при 150 %. Прежние размеры и их PNG побайтно те же, новые — только новые файлы.
-SIZES = (16, 18, 21, 24, 32, 36, 48, 64, 72, 96)
-# Размеры сверх SIZES у отдельных id (ВР-78): чип команды в HUD — 24 su, экспорты 9 и 12 px только для листа проверки.
-EXTRA_SIZES = {"team-chip-p1": (9, 12), "team-chip-p2": (9, 12)}
+SIZES = (16, 21, 24, 32, 48, 64, 96)
 SHEET_SIZES = (48, 32, 24, 16)
-# Лист приёмки --sheet accept (02 §13.2): рабочие размеры, ×4 nearest; бейджи слоя L6 (clamp 16…32 px, HUD-AND-ICONS
-# §1.7) ещё 16 и 21.
-ACCEPT_SIZES = (18, 24, 32, 48)
-ACCEPT_L6_SIZES = (16, 21)
-L6_BADGES = ("state-boost", "state-enemy", "state-hint", "state-threat", "marker-status", "marker-status-p1",
-             "marker-status-p2")
 
 # ------------------------------------------------------------------------------------------------ палитра по ролям
 TOKENS = {
@@ -62,9 +49,6 @@ TOKENS = {
     "state.pending": "#0D7A89",
     # набор DE-012 (STYLE-v3.md §11, принят пользователем 2026-10-05): тёплые тона вспышки кольца хода
     "turn.flash.yellow": "#F2C14E", "turn.flash.orange": "#E8812C",
-    # IC-33 для строк VR44 (значения — hud-style-tokens.json, 02 §2.4 ВР-66 и §2.6 ВР-67; сверку держит pytest
-    # test_draw_icons_new_roles_match_style_tokens): state.warning — алиас turn.flash.orange
-    "state.warning": "#E8812C", "fx.heal": "#8CE69A",
 }
 ROLE = {
     "body": "card.navy",            # тело жетонов состояния, плашек, ленты, тёмных ресурсов
@@ -86,9 +70,6 @@ ROLE = {
     "ring.orange": "turn.flash.orange",   # тлеющее кольцо хода; кольцо текущего слота трекера (вариант DE)
     "ring.red": "card.type.attack",       # конец вспышки — красный игры, не state.error (правило ДНК 7)
     "hp.glow": "card.type.attack",        # ореол сердца при уроне: плоская полоса за keyline, без градиента
-    # IC-33 (ВР-IC03): роли значков VR44
-    "warning": "state.warning",           # знак «!» предупреждения (ВР-66: алиас turn.flash.orange)
-    "heal": "fx.heal",                    # «+» лечения (ВР-67)
 }
 
 
@@ -1318,12 +1299,6 @@ DE_ACCEPTED = {
 CANDIDATES = {
     "marker-turn-ring-team": (draw_marker_turn_ring, {"team": True}, False),
 }
-# IC-33 (ВР-IC14, по делегированию): набор VR44 (02 §5.5) — строки IC-34, IC-38…IC-69 добавляют id сюда.
-# До ревью строки id — в CANDIDATES_VR44: мастер, размеры, слои и свой лист sheets/vr44/, но не листы принятого набора.
-# После ревью id переходит в ACCEPTED_VR44 и встаёт в ORDER_ACCEPTED после DE_ACCEPTED (листы принятого набора); в
-# контракте движения — список `accepted_vr44`. Курсоры (IC-58…IC-61) рисуются здесь же, но в UE их импортирует HB-12.
-CANDIDATES_VR44: dict = {}
-ACCEPTED_VR44: dict = {}
 LAYERS = {
     "action-attack": ("body", "glyph"),
     "action-defense": ("body", "glyph"),
@@ -1361,25 +1336,16 @@ def _sent_frames():
 
 FLIPBOOKS = {("state-sent", "glyph"): _sent_frames(),
              ("marker-turn-ring", "flash"): [{"frame": i} for i in range(RING_FLASH_FRAMES)]}
-ALL = list(ICONS) + list(VARIANTS) + list(DE_ACCEPTED) + list(CANDIDATES) + list(ACCEPTED_VR44) + list(CANDIDATES_VR44)
+ALL = list(ICONS) + list(VARIANTS) + list(DE_ACCEPTED) + list(CANDIDATES)
 ORDER23 = [k for k in ICONS if k != "action-attack-token-glyphmask"]
-# 27 принятых: 23 v3 (2026-10-03) + 4 DE-012 (2026-10-05); затем принятые VR44 (IC-33)
-ORDER_ACCEPTED = ORDER23 + list(DE_ACCEPTED) + list(ACCEPTED_VR44)
+ORDER_ACCEPTED = ORDER23 + list(DE_ACCEPTED)       # 27 принятых: 23 v3 (2026-10-03) + 4 DE-012 (2026-10-05)
 EXAMPLE = {"state-boost": {"text": "+2"}, "state-hint": {"text": "1"}, "state-threat": {"text": "3"},
            "marker-status": {"text": "1", "team": C["team1"]}, "marker-status-p1": {"text": "1"},
            "marker-status-p2": {"text": "2"}, "resource-hp-full": {"text": "17"}, "resource-hp-full-enemy": {"text": "16"}}
 
 
 def _entry(name):
-    for table in (ICONS, VARIANTS, DE_ACCEPTED, CANDIDATES, ACCEPTED_VR44, CANDIDATES_VR44):
-        if name in table:
-            return table[name]
-    raise KeyError(name)
-
-
-def sizes_of(name):
-    """Экспортные размеры id: SIZES и его EXTRA_SIZES (по возрастанию)."""
-    return tuple(sorted(set(SIZES) | set(EXTRA_SIZES.get(name, ()))))
+    return ICONS.get(name) or VARIANTS.get(name) or DE_ACCEPTED.get(name) or CANDIDATES[name]
 
 
 def is_wide(name):
@@ -1687,86 +1653,6 @@ def sheet_de012(path):
     return path
 
 
-# ------------------------------------------------------------------------------------------------ лист приёмки (IC-33)
-REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(ROOT)))
-ACCEPT_BGS = (("card.navy", TOKENS["card.navy"]), ("card.cream", TOKENS["card.cream"]), ("board grey", "#808080"))
-
-
-def _visual_sheet():
-    """Цветовые преобразования листов цикла (tools/art/visual/sheet.py): серый Rec.709 и дейтеранопия Machado 2009
-    (severity 1,0, линейный sRGB) — один источник для всех листов приёмки."""
-    import importlib.util
-    path = os.path.join(REPO_ROOT, "tools", "art", "visual", "sheet.py")
-    spec = importlib.util.spec_from_file_location("visual_sheet", path)
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    return mod
-
-
-def accept_sizes(name):
-    """Рабочие размеры листа приёмки: 18/24/32/48, у бейджей L6 ещё 16 и 21."""
-    extra = ACCEPT_L6_SIZES if name in L6_BADGES else ()
-    return tuple(sorted(set(ACCEPT_SIZES) | set(extra)))
-
-
-def sheet_accept(name, path, vs=None):
-    """Лист приёмки одного id (02 §13.2): мастер 1024 (×0,25 на листе) и рабочие размеры из вектора ×4 nearest; строки —
-    цвет | серый Rec.709 | дейтеранопия на каждом из фонов card.navy, card.cream, #808080."""
-    vs = vs or _visual_sheet()
-    wide = is_wide(name)
-    sizes = accept_sizes(name)
-    master = render_example(name, MASTER)  # образцы цифр — только на листах (числа в текстуры не печатаются)
-    mview = master.resize((256 * (2 if wide else 1), 256), Image.LANCZOS)
-    smalls = [(s, xN(render_example(name, s), 4)) for s in sizes]
-    name_w, pad, row_h = 300, 16, 256 + 16
-    W = name_w + mview.width + pad + sum(im.width + pad for _, im in smalls) + pad
-    W = max(W, 1100)
-    H = 84 + 24 + len(vs.MODES) * len(ACCEPT_BGS) * (row_h + 8)
-    sheet = Image.new("RGBA", (W, H), SHEET_BG)
-    paste(sheet, label(W, 30, f"{name} — лист приёмки (IC-33, 02 §13.2): мастер 1024 (×0,25) | " +
-                       " / ".join(f"{s}" for s in sizes) + " px из вектора ×4 nearest", 15), 0, 6)
-    paste(sheet, label(W, 26, "цвет | серый Rec.709 | дейтеранопия (Machado 2009, severity 1,0) на card.navy, card.cream, "
-                       "#808080; числа — образец runtime-текста, при ≤ 20 px не рисуются", 13), 0, 38)
-    x = name_w + mview.width + pad
-    for s, im in smalls:
-        paste(sheet, label(im.width, 20, f"{s} px", 12, align="center"), x, 80)
-        x += im.width + pad
-    y = 108
-    for mode in vs.MODES:
-        for bg_name, bg_hex in ACCEPT_BGS:
-            bg = tuple(int(bg_hex[i:i + 2], 16) for i in (1, 3, 5)) + (255,)
-            row = Image.new("RGBA", (W - name_w, row_h), bg)
-            paste(row, mview, 0, (row_h - mview.height) // 2)
-            x = mview.width + pad
-            for _, im in smalls:
-                paste(row, im, x, (row_h - im.height) // 2)
-                x += im.width + pad
-            row = vs.apply_mode(row, mode).convert("RGBA")
-            paste(sheet, label(name_w, 44, f"{mode} · {bg_name}", 13), 0, y + row_h // 2 - 22)
-            paste(sheet, row, name_w, y)
-            y += row_h + 8
-    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
-    sheet.convert("RGB").save(path)
-    return {"id": name, "file": os.path.basename(path), "sizes": list(sizes), "modes": list(vs.MODES),
-            "backgrounds": [f"{n} {h}" for n, h in ACCEPT_BGS], "wide": wide}
-
-
-def sheets_accept(names, out_dir):
-    """--sheet accept: accept-<id>.png на каждый id и accept.json (что на листах)."""
-    vs = _visual_sheet()
-    out = []
-    for n in names:
-        _entry(n)  # неизвестный id — KeyError до записи файлов
-    for n in names:
-        out.append(sheet_accept(n, os.path.join(out_dir, f"accept-{n}.png"), vs))
-        print("sheet", out[-1]["file"], out[-1]["sizes"])
-    with open(os.path.join(out_dir, "accept.json"), "w", encoding="utf-8", newline="\n") as f:
-        json.dump({"tool": "art/imagegen/hud-icons-v3/_tools/draw_icons.py --sheet accept", "gray": "Rec.709 luma",
-                   "deuteranopia": "Machado, Oliveira, Fernandes 2009, severity 1.0, linear RGB", "sheets": out},
-                  f, ensure_ascii=False, indent=1)
-    return out
-
-
 # ------------------------------------------------------------------------------------------------ сборка
 def build(names=None, review_dir=None):
     names = names or ALL
@@ -1774,24 +1660,21 @@ def build(names=None, review_dir=None):
     for d in dirs.values():
         os.makedirs(d, exist_ok=True)
     manifest = {"revision": "hud-icons-v3", "unit_px": MASTER // U, "sizes": list(SIZES), "files": {}}
-    extra = {n: list(EXTRA_SIZES[n]) for n in names if n in EXTRA_SIZES}
-    if extra:
-        manifest["extra_sizes"] = extra
     audits = {}
     for n in names:
         im = render(n, MASTER)
         p = os.path.join(dirs["masters"], f"{n}.png")
         im.save(p)
         audits[n] = audit(n, im)
-        for s in sizes_of(n):
+        for s in SIZES:
             render(n, s).save(os.path.join(dirs["sizes"], f"{n}-{s}.png"))
         for layer in LAYERS.get(n, ()):
             render(n, MASTER, layer=layer).save(os.path.join(dirs["layers"], f"{n}_{layer}.png"))
-            for s in sizes_of(n):
+            for s in SIZES:
                 render(n, s, layer=layer).save(os.path.join(dirs["layers"], f"{n}_{layer}-{s}.png"))
             for fi, kw in enumerate(FLIPBOOKS.get((n, layer), ())):
                 render(n, MASTER, layer=layer, **kw).save(os.path.join(dirs["layers"], f"{n}_{layer}_f{fi:02d}.png"))
-                for s in sizes_of(n):
+                for s in SIZES:
                     render(n, s, layer=layer, **kw).save(os.path.join(dirs["layers"], f"{n}_{layer}_f{fi:02d}-{s}.png"))
         print("ok", n, im.size, audits[n].get("margin_px"), "body%", audits[n].get("glyph_area_pct_of_body"), "seam", audits[n].get("seam_px"))
     show = [n for n in ORDER_ACCEPTED if n in names] + [n for n in ("action-attack-token-glyphmask",) + tuple(VARIANTS) if n in names]
@@ -1801,9 +1684,6 @@ def build(names=None, review_dir=None):
                         os.path.join(dirs["sheets"], "sheet-context-panel.png"))
     if all(n in names for n in list(DE_ACCEPTED) + list(CANDIDATES)):
         sheet_de012(os.path.join(dirs["sheets"], "de012", "sheet-de012.png"))
-    vr44 = [n for n in CANDIDATES_VR44 if n in names]
-    if vr44:  # IC-33: кандидаты VR44 — свой лист приёмки, не листы принятого набора
-        sheets_accept(vr44, os.path.join(dirs["sheets"], "vr44"))
     with open(os.path.join(dirs["sheets"], "audit.json"), "w", encoding="utf-8") as f:
         json.dump(audits, f, ensure_ascii=False, indent=1)
     for d in ("masters", "sizes", "layers"):
@@ -1820,14 +1700,6 @@ def build(names=None, review_dir=None):
 
 if __name__ == "__main__":
     args = sys.argv[1:]
-    if "--sheet" in args:
-        # IC-33: python draw_icons.py --sheet accept <id>[,<id>...] <dir>  — только листы, ничего в репозитории не пишет
-        i = args.index("--sheet")
-        if len(args) < i + 4 or args[i + 1] != "accept":
-            sys.exit("usage: draw_icons.py --sheet accept <id>[,<id>...] <dir>")
-        os.makedirs(args[i + 3], exist_ok=True)
-        sheets_accept([x for x in args[i + 2].split(",") if x], args[i + 3])
-        sys.exit(0)
     only = None
     review = None
     if "--only" in args:

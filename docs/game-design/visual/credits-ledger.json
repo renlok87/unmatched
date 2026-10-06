@@ -779,11 +779,29 @@
       "result_path": "art/imagegen/fx-hitstar-codex/",
       "status": "ok",
       "note": "CX-18 fix1 (единственный корректирующий прогон); 2026-10-06 21:27-21:35 +05:00 (~8 мин); вариант C: кремовая кромка 8 px внутри силуэта, keyline 8 px снаружи, R_L 94,4, впадины 0,37 R_L асимметрично ±24°/±12°, кадр 1 с keyline; тело в длинных лучах до 0,60-0,63 R_L, 10/10 лучей видимы на navy при 36 и 27 px, рост F0<F1<F2; README: mipmaps ON; verify 76 проверок PASS, manifest 42/42; ревью Claude: accept (по делегированию)"
+    },
+    {
+      "date": "2026-10-06T21:37:43+05:00",
+      "service": "Codex",
+      "model": "codex exec (ChatGPT app, codex.exe 5ea220ae)",
+      "template": "T-CODEX-ENVPLATE",
+      "task_id": "EN-02",
+      "units": "пакет, 4 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a11209-f2e1-7331-88a4-abf36fe343ff",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/EN-02.fix1.codex.md",
+      "result_path": "art/imagegen/env-u16-marmoreal-codex/",
+      "status": "ok",
+      "note": "CX-17 fix1 (единственный корректирующий прогон); 2026-10-06 21:26-21:37 +05:00 (~11 мин); 4 генерации встроенного image_gen из 6 (ВР-VS2-EN.5; копии в CODEX_HOME в tool_cache_outside_repo), SYNTX 0; две полные попытки по 2 тайла 1536x1317, вклейка оригинала побайтно, lit по ВР-VS2-EN.8, поле #808080; шов G(0)/медиана 1,85/2,64/2,34/3,12 (попытка 1) и 2,10/1,96/2,72/2,54 (попытка 2) при пороге 1,5 -> стоп по правилу двух неудач; ревью Claude: отклонено (ВР-VS2-EN.9), запасной путь SX-01 T-SYNTX-IMG-BANANA со сборкой по ВР-VS2-EN.10"
     }
   ],
   "totals": {
     "syntx_spent": 0,
     "tripo_spent": 0,
-    "codex_packages": 39
+    "codex_packages": 40
   }
 }
