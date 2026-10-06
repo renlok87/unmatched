@@ -1186,6 +1186,8 @@ private:
   float UmHudPanelLocRightSu() const;
   // VS-2 exit frames (opt-in -S08ExitShots): own / opponent turn start + 0.5 s and + 3 s
   void NoteUmExitShotsTurn(bool bOwn, bool bInitial, bool bGameOver);
+  /** ВР-VS2-77: the late SHOT lines of the VS-2 blocks first shown in the shot frame. */
+  void WriteUmHudLateLines();
   void TickUmExitShots();
   UPROPERTY()
   TObjectPtr<class UUmHudRoot> UmHudRoot;

@@ -36,7 +36,11 @@
 //                 gate layer it is collapsed while it shows only those buttons (the panels, K / Shift+K and D open the
 //                 same); the open browser or inspector shows it - UmHudDeckPanelLayering (rollback -S08SlateHud=panels);
 //       ВР-VS2-73 the Slate command panel starts under TOP while TOP is shown (it lay under the plate) - TickUmHud
-//                 (rollback -S08SlateHud=top); ВР-VS2-75 an empty command panel is not drawn (opacity 0).
+//                 (rollback -S08SlateHud=top); ВР-VS2-75 an empty command panel is not drawn (opacity 0);
+//       ВР-VS2-77 a VS-2 block shown for the first time in the shot frame has no cached geometry yet (the banner on
+//                 the turn start: bbox 0 / unpainted, yet the PNG shows it): its SHOT line moves to the late block of
+//                 the same file (WriteUmHudLateLines, after the capture) with the painted geometry; the early block
+//                 writes 'SHOT widget-late id=<id> reason=first-frame'.
 #include "S08FlowGameMode.h"
 
 #include "S08AnimatedIconWidget.h"
@@ -109,6 +113,8 @@ struct FUmHudRuntime {
   // ВР-VS2-72 / -73: the Slate side panel collapsed here; the command panel's shift under TOP (su, traced on a change)
   bool bSideCollapsed = false;
   float CommandShiftSu = 0.0f;
+  // ВР-VS2-77: the ids whose SHOT line waits for the late block of the current shot
+  TSet<FString> LateIds;
 };
 
 namespace {
@@ -314,6 +320,25 @@ void AS08FlowGameMode::UmHudDeckPanelLayering(float DeckAlpha) {
   if (CombatEdgeRight->GetVisibility() != Want) CombatEdgeRight->SetVisibility(Want);
 }
 
+void AS08FlowGameMode::WriteUmHudLateLines() {
+  // ВР-VS2-77: inside 'SHOT late begin/end' of the file - the deferred blocks with the geometry painted this frame
+  if (!UmHud.IsValid() || UmHud->LateIds.Num() == 0) return;
+  FUmHudRuntime& R = *UmHud;
+  TArray<FString> Lines;
+  auto RectOf = [this](UWidget* W) {
+    FS08ScreenRect Rect;
+    if (W) WidgetViewportRect(W->GetCachedWidget(), Rect);
+    return Rect;
+  };
+  R.TopStrip.CollectShotLines(Lines, RectOf);
+  R.Panels.CollectShotLines(Lines, RectOf);
+  for (const FString& L : Lines) {
+    FString Id;
+    if (FParse::Value(*L, TEXT("id="), Id) && R.LateIds.Contains(Id)) FS08Trace::Write(L);
+  }
+  R.LateIds.Reset();
+}
+
 void AS08FlowGameMode::NoteUmExitShotsTurn(bool bOwn, bool bInitial, bool bGameOver) {
   if (!UmHud.IsValid() || !bAutoS09 || S09ShotDir.IsEmpty() || bInitial || bGameOver) return;
   FUmHudRuntime& R = *UmHud;
@@ -476,14 +501,25 @@ void AS08FlowGameMode::WriteUmHudShotLines() {
     if (W) WidgetViewportRect(W->GetCachedWidget(), Rect);
     return Rect;
   });
-  for (const FString& L : StripLines) FS08Trace::Write(L);
   TArray<FString> PanelLines;  // VS-2 HB-18...HB-21: UI-HUD-PANEL-LOC, UI-HUD-PANEL-OPP, UI-HUD-OPP-HAND
   R.Panels.CollectShotLines(PanelLines, [this](UWidget* W) {
     FS08ScreenRect Rect;
     if (W) WidgetViewportRect(W->GetCachedWidget(), Rect);
     return Rect;
   });
-  for (const FString& L : PanelLines) FS08Trace::Write(L);
+  // ВР-VS2-77: a block first shown in this frame has no geometry yet - its line waits for the late block
+  R.LateIds.Reset();
+  for (const TArray<FString>* Group : {&StripLines, &PanelLines}) {
+    for (const FString& L : *Group) {
+      FString Id;
+      if (L.Contains(TEXT(" geom=unpainted visible=1 ")) && FParse::Value(*L, TEXT("id="), Id) && Id.StartsWith(TEXT("UI-HUD-"))) {
+        R.LateIds.Add(Id);
+        FS08Trace::Write(FString::Printf(TEXT("SHOT widget-late id=%s reason=first-frame"), *Id));
+      } else {
+        FS08Trace::Write(L);
+      }
+    }
+  }
   // VS-2 HB-12: the cursor Slate drew for this frame (or the system cursor of the rollback)
   const APlayerController* CursorPC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
   FS08Trace::Write(UmHudRoot && UmHudRoot->HasCursors()

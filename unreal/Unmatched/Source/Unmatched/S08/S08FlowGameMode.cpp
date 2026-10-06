@@ -8280,6 +8280,7 @@ void AS08FlowGameMode::WriteArtHudLateLines(const FString& File, uint64 RequestF
       }
     }
     WriteArtHudWidgetLines(FString(), /*bLate=*/true);
+    WriteUmHudLateLines();  // VS-2 ВР-VS2-77: blocks first shown in the shot frame, painted geometry
     // screen tags
     for (const FS08ArtHudRuntime::FTagSlot& T : ArtHud.Tags) {
       if (!T.Widget || T.FighterId.IsEmpty()) continue;

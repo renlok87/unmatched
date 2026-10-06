@@ -773,6 +773,7 @@ function Invoke-VsAiDemo {
     "-ExecCmds=`"t.MaxFPS 30`"", "log=GrepLog",
     "-ForceAbandonSequences", "-S08Api=$Api", "-S09ShotMode=$ShotMode")
   if (-not $PlayerView) { $common += "-S09Markers" }  # HB-01: the marker pixel gates below need the debug layer (04-hud-spec s5.3)
+  if ($FullHd) { $common += '-ForceRes' }  # as run-combat-demo -FullHd: without it the hidden window stays 888x500
   $clientArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
     "-S08Auto", "-S08Create", "-S08Mode=VS_AI", "-S08HeroId=$heroId",
     "-S08Trace=$trace", "-S09Flow", "-S09Combat=attack+scheme",
