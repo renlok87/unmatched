@@ -455,11 +455,47 @@
       "result_path": "art/imagegen/hud-hand-v1-codex/",
       "status": "ok",
       "note": "CX-10 fix1 (единственный корректирующий прогон); 2026-10-06 13:39-13:49 +05:00 (~10 мин); буст в boost-attack — одна стопка за COMBAT-L (230×319 / 150×208, сдвиг 40/32 su, чип +3 сверху), подпись «Рука n/max» — короткая плашка слева во всех состояниях, подсказка why на Sarpedon не закрывает подпись; 96 макетов + 96 серых + EN пересобраны; verifier PASS кроме шага веера 63,7 su на 720p 150 % (ВР-VS2-HB22-09); manifest 256/256; ревью Claude: принято по делегированию"
+    },
+    {
+      "date": "2026-10-06T14:40:00+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "HB-26",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a11086-10f0-7871-aac6-4a9808d36a57",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/HB-26.codex.md",
+      "result_path": "art/imagegen/hud-decks-v1-codex/",
+      "status": "ok",
+      "note": "CX-11 run 1; 2026-10-06 14:23-14:40 +05:00 (~17 мин); карточка HB-26 исправлена до прогона (ВР-VS2-HB26-01…07): фон Marmoreal — нарисованный задник -ConceptPaste (aeafe8f2), один момент прогона I на доску, геометрия от принятых HB-07 и HB-08, D1-D14; 56 макетов + 56 серых + EN-проверка в scraped-data/derived/hud-decks-v1-codex/ (вне git); verifier: D8 FAIL (Sarpedon 720p 100 %: 61 px² с запасом масок клеток); ревью Claude: fix-needed (D8, перенос заголовка внутри «King Arthur», отступы фишек, зазор вкладок, базовая линия имён 16 su) -> fix1"
+    },
+    {
+      "date": "2026-10-06T14:54:00+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "HB-26",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a1109a-1285-7db2-9fa5-5a65666889a4",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/HB-26.fix1.codex.md",
+      "result_path": "art/imagegen/hud-decks-v1-codex/",
+      "status": "ok",
+      "note": "CX-11 fix1 (единственный корректирующий прогон); 2026-10-06 14:45-14:54 +05:00 (~9 мин); панель 720p L 340 -> 336 su (D8 61 -> 0 px²), заголовок рвётся только после « · », фишки L 156/124 su (EN 144/136) с отступами 8 su, вкладки через 8 su, имена 16 su на общей базовой линии; 56 + 56 серых + EN пересобраны; verify_package --check PASS, manifest 179/179; ревью Claude: принято по делегированию (ВР-VS2-HB26-08…13)"
     }
   ],
   "totals": {
     "syntx_spent": 0,
     "tripo_spent": 0,
-    "codex_packages": 21
+    "codex_packages": 23
   }
 }
