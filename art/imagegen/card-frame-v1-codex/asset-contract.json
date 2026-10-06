@@ -1,0 +1,5280 @@
+{
+  "prompt_key": "CP-13-procedural-v1",
+  "tokens": {
+    "card.navy": "#061623",
+    "card.cream": "#F9EBDB",
+    "state.pending": "#0D7A89",
+    "turn.flash.orange": "#E8812C",
+    "card.glyph": "#FAF8F2",
+    "mark.keyline": "#111317"
+  },
+  "assets": {
+    "vector/card-frame-idle-x1.png": {
+      "size_px": [
+        460,
+        640
+      ],
+      "logical_frame_su": [
+        460,
+        640
+      ],
+      "density": 1,
+      "state": "idle",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "nine_slice_uv": [
+        0.02391304347826087,
+        0.0171875,
+        0.02391304347826087,
+        0.0171875
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        452,
+        632
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 0.45
+    },
+    "vector/card-frame-hover-x1.png": {
+      "size_px": [
+        460,
+        640
+      ],
+      "logical_frame_su": [
+        460,
+        640
+      ],
+      "density": 1,
+      "state": "hover",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "nine_slice_uv": [
+        0.02391304347826087,
+        0.0171875,
+        0.02391304347826087,
+        0.0171875
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        452,
+        632
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/card-frame-selected-x1.png": {
+      "size_px": [
+        460,
+        640
+      ],
+      "logical_frame_su": [
+        460,
+        640
+      ],
+      "density": 1,
+      "state": "selected",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.02826086956521739,
+        0.0203125,
+        0.02826086956521739,
+        0.0203125
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        452,
+        632
+      ],
+      "layer": "frame",
+      "edge_su": 3,
+      "edge_alpha": 1
+    },
+    "vector/card-frame-warning-x1.png": {
+      "size_px": [
+        460,
+        640
+      ],
+      "logical_frame_su": [
+        460,
+        640
+      ],
+      "density": 1,
+      "state": "warning",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "nine_slice_uv": [
+        0.02608695652173913,
+        0.01875,
+        0.02608695652173913,
+        0.01875
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        452,
+        632
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/card-frame-flash-x1.png": {
+      "size_px": [
+        460,
+        640
+      ],
+      "logical_frame_su": [
+        460,
+        640
+      ],
+      "density": 1,
+      "state": "flash",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "nine_slice_uv": [
+        0.02608695652173913,
+        0.01875,
+        0.02608695652173913,
+        0.01875
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        452,
+        632
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/card-frame-focus-x1.png": {
+      "size_px": [
+        468,
+        648
+      ],
+      "logical_frame_su": [
+        460,
+        640
+      ],
+      "density": 1,
+      "state": "focus",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.027777777777777776,
+        0.020061728395061727,
+        0.027777777777777776,
+        0.020061728395061727
+      ],
+      "frame_origin_px": [
+        4,
+        4
+      ],
+      "window_px": null,
+      "layer": "focus-only",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/card-frame-mini-idle-x1.png": {
+      "size_px": [
+        48,
+        67
+      ],
+      "logical_frame_su": [
+        48,
+        67
+      ],
+      "density": 1,
+      "state": "mini-idle",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "nine_slice_uv": [
+        0.14583333333333334,
+        0.1044776119402985,
+        0.14583333333333334,
+        0.1044776119402985
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        2,
+        2,
+        44,
+        63
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 0.45
+    },
+    "vector/card-frame-new-dot-x1.png": {
+      "size_px": [
+        10,
+        10
+      ],
+      "density": 1,
+      "layer": "new-marker-only",
+      "nine_slice_px": [
+        5,
+        5,
+        5,
+        5
+      ],
+      "nine_slice_uv": [
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ],
+      "stretch": false
+    },
+    "vector/sizes/hand/card-frame-idle-x1.png": {
+      "size_px": [
+        150,
+        208
+      ],
+      "logical_frame_su": [
+        150,
+        208
+      ],
+      "density": 1,
+      "state": "idle",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "nine_slice_uv": [
+        0.07333333333333333,
+        0.052884615384615384,
+        0.07333333333333333,
+        0.052884615384615384
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        142,
+        200
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 0.45
+    },
+    "vector/sizes/hand/card-frame-hover-x1.png": {
+      "size_px": [
+        150,
+        208
+      ],
+      "logical_frame_su": [
+        150,
+        208
+      ],
+      "density": 1,
+      "state": "hover",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "nine_slice_uv": [
+        0.07333333333333333,
+        0.052884615384615384,
+        0.07333333333333333,
+        0.052884615384615384
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        142,
+        200
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/hand/card-frame-selected-x1.png": {
+      "size_px": [
+        150,
+        208
+      ],
+      "logical_frame_su": [
+        150,
+        208
+      ],
+      "density": 1,
+      "state": "selected",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.08666666666666667,
+        0.0625,
+        0.08666666666666667,
+        0.0625
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        142,
+        200
+      ],
+      "layer": "frame",
+      "edge_su": 3,
+      "edge_alpha": 1
+    },
+    "vector/sizes/hand/card-frame-warning-x1.png": {
+      "size_px": [
+        150,
+        208
+      ],
+      "logical_frame_su": [
+        150,
+        208
+      ],
+      "density": 1,
+      "state": "warning",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "nine_slice_uv": [
+        0.08,
+        0.057692307692307696,
+        0.08,
+        0.057692307692307696
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        142,
+        200
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/hand/card-frame-flash-x1.png": {
+      "size_px": [
+        150,
+        208
+      ],
+      "logical_frame_su": [
+        150,
+        208
+      ],
+      "density": 1,
+      "state": "flash",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "nine_slice_uv": [
+        0.08,
+        0.057692307692307696,
+        0.08,
+        0.057692307692307696
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        142,
+        200
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/hand/card-frame-focus-x1.png": {
+      "size_px": [
+        158,
+        216
+      ],
+      "logical_frame_su": [
+        150,
+        208
+      ],
+      "density": 1,
+      "state": "focus",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.08227848101265822,
+        0.06018518518518518,
+        0.08227848101265822,
+        0.06018518518518518
+      ],
+      "frame_origin_px": [
+        4,
+        4
+      ],
+      "window_px": null,
+      "layer": "focus-only",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/hover/card-frame-idle-x1.png": {
+      "size_px": [
+        225,
+        312
+      ],
+      "logical_frame_su": [
+        225,
+        312
+      ],
+      "density": 1,
+      "state": "idle",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "nine_slice_uv": [
+        0.04888888888888889,
+        0.035256410256410256,
+        0.04888888888888889,
+        0.035256410256410256
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        217,
+        304
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 0.45
+    },
+    "vector/sizes/hover/card-frame-hover-x1.png": {
+      "size_px": [
+        225,
+        312
+      ],
+      "logical_frame_su": [
+        225,
+        312
+      ],
+      "density": 1,
+      "state": "hover",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "nine_slice_uv": [
+        0.04888888888888889,
+        0.035256410256410256,
+        0.04888888888888889,
+        0.035256410256410256
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        217,
+        304
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/hover/card-frame-selected-x1.png": {
+      "size_px": [
+        225,
+        312
+      ],
+      "logical_frame_su": [
+        225,
+        312
+      ],
+      "density": 1,
+      "state": "selected",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.057777777777777775,
+        0.041666666666666664,
+        0.057777777777777775,
+        0.041666666666666664
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        217,
+        304
+      ],
+      "layer": "frame",
+      "edge_su": 3,
+      "edge_alpha": 1
+    },
+    "vector/sizes/hover/card-frame-warning-x1.png": {
+      "size_px": [
+        225,
+        312
+      ],
+      "logical_frame_su": [
+        225,
+        312
+      ],
+      "density": 1,
+      "state": "warning",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "nine_slice_uv": [
+        0.05333333333333334,
+        0.038461538461538464,
+        0.05333333333333334,
+        0.038461538461538464
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        217,
+        304
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/hover/card-frame-flash-x1.png": {
+      "size_px": [
+        225,
+        312
+      ],
+      "logical_frame_su": [
+        225,
+        312
+      ],
+      "density": 1,
+      "state": "flash",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "nine_slice_uv": [
+        0.05333333333333334,
+        0.038461538461538464,
+        0.05333333333333334,
+        0.038461538461538464
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        217,
+        304
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/hover/card-frame-focus-x1.png": {
+      "size_px": [
+        233,
+        320
+      ],
+      "logical_frame_su": [
+        225,
+        312
+      ],
+      "density": 1,
+      "state": "focus",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.055793991416309016,
+        0.040625,
+        0.055793991416309016,
+        0.040625
+      ],
+      "frame_origin_px": [
+        4,
+        4
+      ],
+      "window_px": null,
+      "layer": "focus-only",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/combat/card-frame-idle-x1.png": {
+      "size_px": [
+        230,
+        319
+      ],
+      "logical_frame_su": [
+        230,
+        319
+      ],
+      "density": 1,
+      "state": "idle",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "nine_slice_uv": [
+        0.04782608695652174,
+        0.034482758620689655,
+        0.04782608695652174,
+        0.034482758620689655
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        222,
+        311
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 0.45
+    },
+    "vector/sizes/combat/card-frame-hover-x1.png": {
+      "size_px": [
+        230,
+        319
+      ],
+      "logical_frame_su": [
+        230,
+        319
+      ],
+      "density": 1,
+      "state": "hover",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "nine_slice_uv": [
+        0.04782608695652174,
+        0.034482758620689655,
+        0.04782608695652174,
+        0.034482758620689655
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        222,
+        311
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/combat/card-frame-selected-x1.png": {
+      "size_px": [
+        230,
+        319
+      ],
+      "logical_frame_su": [
+        230,
+        319
+      ],
+      "density": 1,
+      "state": "selected",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.05652173913043478,
+        0.04075235109717868,
+        0.05652173913043478,
+        0.04075235109717868
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        222,
+        311
+      ],
+      "layer": "frame",
+      "edge_su": 3,
+      "edge_alpha": 1
+    },
+    "vector/sizes/combat/card-frame-warning-x1.png": {
+      "size_px": [
+        230,
+        319
+      ],
+      "logical_frame_su": [
+        230,
+        319
+      ],
+      "density": 1,
+      "state": "warning",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "nine_slice_uv": [
+        0.05217391304347826,
+        0.03761755485893417,
+        0.05217391304347826,
+        0.03761755485893417
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        222,
+        311
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/combat/card-frame-flash-x1.png": {
+      "size_px": [
+        230,
+        319
+      ],
+      "logical_frame_su": [
+        230,
+        319
+      ],
+      "density": 1,
+      "state": "flash",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "nine_slice_uv": [
+        0.05217391304347826,
+        0.03761755485893417,
+        0.05217391304347826,
+        0.03761755485893417
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        222,
+        311
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/combat/card-frame-focus-x1.png": {
+      "size_px": [
+        238,
+        327
+      ],
+      "logical_frame_su": [
+        230,
+        319
+      ],
+      "density": 1,
+      "state": "focus",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.0546218487394958,
+        0.039755351681957186,
+        0.0546218487394958,
+        0.039755351681957186
+      ],
+      "frame_origin_px": [
+        4,
+        4
+      ],
+      "window_px": null,
+      "layer": "focus-only",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/source-slot/card-frame-idle-x1.png": {
+      "size_px": [
+        190,
+        264
+      ],
+      "logical_frame_su": [
+        190,
+        264
+      ],
+      "density": 1,
+      "state": "idle",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "nine_slice_uv": [
+        0.05789473684210526,
+        0.041666666666666664,
+        0.05789473684210526,
+        0.041666666666666664
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        182,
+        256
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 0.45
+    },
+    "vector/sizes/source-slot/card-frame-hover-x1.png": {
+      "size_px": [
+        190,
+        264
+      ],
+      "logical_frame_su": [
+        190,
+        264
+      ],
+      "density": 1,
+      "state": "hover",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "nine_slice_uv": [
+        0.05789473684210526,
+        0.041666666666666664,
+        0.05789473684210526,
+        0.041666666666666664
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        182,
+        256
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/source-slot/card-frame-selected-x1.png": {
+      "size_px": [
+        190,
+        264
+      ],
+      "logical_frame_su": [
+        190,
+        264
+      ],
+      "density": 1,
+      "state": "selected",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.06842105263157895,
+        0.04924242424242424,
+        0.06842105263157895,
+        0.04924242424242424
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        182,
+        256
+      ],
+      "layer": "frame",
+      "edge_su": 3,
+      "edge_alpha": 1
+    },
+    "vector/sizes/source-slot/card-frame-warning-x1.png": {
+      "size_px": [
+        190,
+        264
+      ],
+      "logical_frame_su": [
+        190,
+        264
+      ],
+      "density": 1,
+      "state": "warning",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "nine_slice_uv": [
+        0.06315789473684211,
+        0.045454545454545456,
+        0.06315789473684211,
+        0.045454545454545456
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        182,
+        256
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/source-slot/card-frame-flash-x1.png": {
+      "size_px": [
+        190,
+        264
+      ],
+      "logical_frame_su": [
+        190,
+        264
+      ],
+      "density": 1,
+      "state": "flash",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "nine_slice_uv": [
+        0.06315789473684211,
+        0.045454545454545456,
+        0.06315789473684211,
+        0.045454545454545456
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        182,
+        256
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/source-slot/card-frame-focus-x1.png": {
+      "size_px": [
+        198,
+        272
+      ],
+      "logical_frame_su": [
+        190,
+        264
+      ],
+      "density": 1,
+      "state": "focus",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.06565656565656566,
+        0.04779411764705882,
+        0.06565656565656566,
+        0.04779411764705882
+      ],
+      "frame_origin_px": [
+        4,
+        4
+      ],
+      "window_px": null,
+      "layer": "focus-only",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/inspector-ru/card-frame-idle-x1.png": {
+      "size_px": [
+        460,
+        640
+      ],
+      "logical_frame_su": [
+        460,
+        640
+      ],
+      "density": 1,
+      "state": "idle",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "nine_slice_uv": [
+        0.02391304347826087,
+        0.0171875,
+        0.02391304347826087,
+        0.0171875
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        452,
+        632
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 0.45
+    },
+    "vector/sizes/inspector-ru/card-frame-hover-x1.png": {
+      "size_px": [
+        460,
+        640
+      ],
+      "logical_frame_su": [
+        460,
+        640
+      ],
+      "density": 1,
+      "state": "hover",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "nine_slice_uv": [
+        0.02391304347826087,
+        0.0171875,
+        0.02391304347826087,
+        0.0171875
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        452,
+        632
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/inspector-ru/card-frame-selected-x1.png": {
+      "size_px": [
+        460,
+        640
+      ],
+      "logical_frame_su": [
+        460,
+        640
+      ],
+      "density": 1,
+      "state": "selected",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.02826086956521739,
+        0.0203125,
+        0.02826086956521739,
+        0.0203125
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        452,
+        632
+      ],
+      "layer": "frame",
+      "edge_su": 3,
+      "edge_alpha": 1
+    },
+    "vector/sizes/inspector-ru/card-frame-warning-x1.png": {
+      "size_px": [
+        460,
+        640
+      ],
+      "logical_frame_su": [
+        460,
+        640
+      ],
+      "density": 1,
+      "state": "warning",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "nine_slice_uv": [
+        0.02608695652173913,
+        0.01875,
+        0.02608695652173913,
+        0.01875
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        452,
+        632
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/inspector-ru/card-frame-flash-x1.png": {
+      "size_px": [
+        460,
+        640
+      ],
+      "logical_frame_su": [
+        460,
+        640
+      ],
+      "density": 1,
+      "state": "flash",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "nine_slice_uv": [
+        0.02608695652173913,
+        0.01875,
+        0.02608695652173913,
+        0.01875
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        452,
+        632
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/inspector-ru/card-frame-focus-x1.png": {
+      "size_px": [
+        468,
+        648
+      ],
+      "logical_frame_su": [
+        460,
+        640
+      ],
+      "density": 1,
+      "state": "focus",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.027777777777777776,
+        0.020061728395061727,
+        0.027777777777777776,
+        0.020061728395061727
+      ],
+      "frame_origin_px": [
+        4,
+        4
+      ],
+      "window_px": null,
+      "layer": "focus-only",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/inspector-en/card-frame-idle-x1.png": {
+      "size_px": [
+        408,
+        566
+      ],
+      "logical_frame_su": [
+        408,
+        566
+      ],
+      "density": 1,
+      "state": "idle",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "nine_slice_uv": [
+        0.02696078431372549,
+        0.019434628975265017,
+        0.02696078431372549,
+        0.019434628975265017
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        400,
+        558
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 0.45
+    },
+    "vector/sizes/inspector-en/card-frame-hover-x1.png": {
+      "size_px": [
+        408,
+        566
+      ],
+      "logical_frame_su": [
+        408,
+        566
+      ],
+      "density": 1,
+      "state": "hover",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "nine_slice_uv": [
+        0.02696078431372549,
+        0.019434628975265017,
+        0.02696078431372549,
+        0.019434628975265017
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        400,
+        558
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/inspector-en/card-frame-selected-x1.png": {
+      "size_px": [
+        408,
+        566
+      ],
+      "logical_frame_su": [
+        408,
+        566
+      ],
+      "density": 1,
+      "state": "selected",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.031862745098039214,
+        0.022968197879858657,
+        0.031862745098039214,
+        0.022968197879858657
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        400,
+        558
+      ],
+      "layer": "frame",
+      "edge_su": 3,
+      "edge_alpha": 1
+    },
+    "vector/sizes/inspector-en/card-frame-warning-x1.png": {
+      "size_px": [
+        408,
+        566
+      ],
+      "logical_frame_su": [
+        408,
+        566
+      ],
+      "density": 1,
+      "state": "warning",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "nine_slice_uv": [
+        0.029411764705882353,
+        0.02120141342756184,
+        0.029411764705882353,
+        0.02120141342756184
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        400,
+        558
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/inspector-en/card-frame-flash-x1.png": {
+      "size_px": [
+        408,
+        566
+      ],
+      "logical_frame_su": [
+        408,
+        566
+      ],
+      "density": 1,
+      "state": "flash",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "nine_slice_uv": [
+        0.029411764705882353,
+        0.02120141342756184,
+        0.029411764705882353,
+        0.02120141342756184
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        400,
+        558
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/inspector-en/card-frame-focus-x1.png": {
+      "size_px": [
+        416,
+        574
+      ],
+      "logical_frame_su": [
+        408,
+        566
+      ],
+      "density": 1,
+      "state": "focus",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.03125,
+        0.02264808362369338,
+        0.03125,
+        0.02264808362369338
+      ],
+      "frame_origin_px": [
+        4,
+        4
+      ],
+      "window_px": null,
+      "layer": "focus-only",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/class-s-hand/card-frame-idle-x1.png": {
+      "size_px": [
+        120,
+        166
+      ],
+      "logical_frame_su": [
+        120,
+        166
+      ],
+      "density": 1,
+      "state": "idle",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "nine_slice_uv": [
+        0.09166666666666666,
+        0.06626506024096386,
+        0.09166666666666666,
+        0.06626506024096386
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        112,
+        158
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 0.45
+    },
+    "vector/sizes/class-s-hand/card-frame-hover-x1.png": {
+      "size_px": [
+        120,
+        166
+      ],
+      "logical_frame_su": [
+        120,
+        166
+      ],
+      "density": 1,
+      "state": "hover",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "nine_slice_uv": [
+        0.09166666666666666,
+        0.06626506024096386,
+        0.09166666666666666,
+        0.06626506024096386
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        112,
+        158
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/class-s-hand/card-frame-selected-x1.png": {
+      "size_px": [
+        120,
+        166
+      ],
+      "logical_frame_su": [
+        120,
+        166
+      ],
+      "density": 1,
+      "state": "selected",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.10833333333333334,
+        0.0783132530120482,
+        0.10833333333333334,
+        0.0783132530120482
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        112,
+        158
+      ],
+      "layer": "frame",
+      "edge_su": 3,
+      "edge_alpha": 1
+    },
+    "vector/sizes/class-s-hand/card-frame-warning-x1.png": {
+      "size_px": [
+        120,
+        166
+      ],
+      "logical_frame_su": [
+        120,
+        166
+      ],
+      "density": 1,
+      "state": "warning",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "nine_slice_uv": [
+        0.1,
+        0.07228915662650602,
+        0.1,
+        0.07228915662650602
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        112,
+        158
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/class-s-hand/card-frame-flash-x1.png": {
+      "size_px": [
+        120,
+        166
+      ],
+      "logical_frame_su": [
+        120,
+        166
+      ],
+      "density": 1,
+      "state": "flash",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "nine_slice_uv": [
+        0.1,
+        0.07228915662650602,
+        0.1,
+        0.07228915662650602
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        112,
+        158
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/class-s-hand/card-frame-focus-x1.png": {
+      "size_px": [
+        128,
+        174
+      ],
+      "logical_frame_su": [
+        120,
+        166
+      ],
+      "density": 1,
+      "state": "focus",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.1015625,
+        0.07471264367816093,
+        0.1015625,
+        0.07471264367816093
+      ],
+      "frame_origin_px": [
+        4,
+        4
+      ],
+      "window_px": null,
+      "layer": "focus-only",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/opponent-back/card-frame-idle-x1.png": {
+      "size_px": [
+        48,
+        67
+      ],
+      "logical_frame_su": [
+        48,
+        67
+      ],
+      "density": 1,
+      "state": "idle",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "nine_slice_uv": [
+        0.14583333333333334,
+        0.1044776119402985,
+        0.14583333333333334,
+        0.1044776119402985
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        2,
+        2,
+        44,
+        63
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 0.45
+    },
+    "vector/sizes/opponent-back/card-frame-hover-x1.png": {
+      "size_px": [
+        48,
+        67
+      ],
+      "logical_frame_su": [
+        48,
+        67
+      ],
+      "density": 1,
+      "state": "hover",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "nine_slice_uv": [
+        0.14583333333333334,
+        0.1044776119402985,
+        0.14583333333333334,
+        0.1044776119402985
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        2,
+        2,
+        44,
+        63
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/opponent-back/card-frame-selected-x1.png": {
+      "size_px": [
+        48,
+        67
+      ],
+      "logical_frame_su": [
+        48,
+        67
+      ],
+      "density": 1,
+      "state": "selected",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "nine_slice_uv": [
+        0.14583333333333334,
+        0.1044776119402985,
+        0.14583333333333334,
+        0.1044776119402985
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        2,
+        2,
+        44,
+        63
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/opponent-back/card-frame-warning-x1.png": {
+      "size_px": [
+        48,
+        67
+      ],
+      "logical_frame_su": [
+        48,
+        67
+      ],
+      "density": 1,
+      "state": "warning",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "nine_slice_uv": [
+        0.14583333333333334,
+        0.1044776119402985,
+        0.14583333333333334,
+        0.1044776119402985
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        2,
+        2,
+        44,
+        63
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/opponent-back/card-frame-flash-x1.png": {
+      "size_px": [
+        48,
+        67
+      ],
+      "logical_frame_su": [
+        48,
+        67
+      ],
+      "density": 1,
+      "state": "flash",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "nine_slice_uv": [
+        0.14583333333333334,
+        0.1044776119402985,
+        0.14583333333333334,
+        0.1044776119402985
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        2,
+        2,
+        44,
+        63
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/opponent-back/card-frame-focus-x1.png": {
+      "size_px": [
+        56,
+        75
+      ],
+      "logical_frame_su": [
+        48,
+        67
+      ],
+      "density": 1,
+      "state": "focus",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        9,
+        9,
+        9,
+        9
+      ],
+      "nine_slice_uv": [
+        0.16071428571428573,
+        0.12,
+        0.16071428571428573,
+        0.12
+      ],
+      "frame_origin_px": [
+        4,
+        4
+      ],
+      "window_px": null,
+      "layer": "focus-only",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/deck-chip/card-frame-idle-x1.png": {
+      "size_px": [
+        32,
+        45
+      ],
+      "logical_frame_su": [
+        32,
+        45
+      ],
+      "density": 1,
+      "state": "idle",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "nine_slice_uv": [
+        0.21875,
+        0.15555555555555556,
+        0.21875,
+        0.15555555555555556
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        2,
+        2,
+        28,
+        41
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 0.45
+    },
+    "vector/sizes/deck-chip/card-frame-hover-x1.png": {
+      "size_px": [
+        32,
+        45
+      ],
+      "logical_frame_su": [
+        32,
+        45
+      ],
+      "density": 1,
+      "state": "hover",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "nine_slice_uv": [
+        0.21875,
+        0.15555555555555556,
+        0.21875,
+        0.15555555555555556
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        2,
+        2,
+        28,
+        41
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/deck-chip/card-frame-selected-x1.png": {
+      "size_px": [
+        32,
+        45
+      ],
+      "logical_frame_su": [
+        32,
+        45
+      ],
+      "density": 1,
+      "state": "selected",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "nine_slice_uv": [
+        0.21875,
+        0.15555555555555556,
+        0.21875,
+        0.15555555555555556
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        2,
+        2,
+        28,
+        41
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/deck-chip/card-frame-warning-x1.png": {
+      "size_px": [
+        32,
+        45
+      ],
+      "logical_frame_su": [
+        32,
+        45
+      ],
+      "density": 1,
+      "state": "warning",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "nine_slice_uv": [
+        0.21875,
+        0.15555555555555556,
+        0.21875,
+        0.15555555555555556
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        2,
+        2,
+        28,
+        41
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/deck-chip/card-frame-flash-x1.png": {
+      "size_px": [
+        32,
+        45
+      ],
+      "logical_frame_su": [
+        32,
+        45
+      ],
+      "density": 1,
+      "state": "flash",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "nine_slice_uv": [
+        0.21875,
+        0.15555555555555556,
+        0.21875,
+        0.15555555555555556
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        2,
+        2,
+        28,
+        41
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/deck-chip/card-frame-focus-x1.png": {
+      "size_px": [
+        40,
+        53
+      ],
+      "logical_frame_su": [
+        32,
+        45
+      ],
+      "density": 1,
+      "state": "focus",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        9,
+        9,
+        9,
+        9
+      ],
+      "nine_slice_uv": [
+        0.225,
+        0.16981132075471697,
+        0.225,
+        0.16981132075471697
+      ],
+      "frame_origin_px": [
+        4,
+        4
+      ],
+      "window_px": null,
+      "layer": "focus-only",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/discard-chip/card-frame-idle-x1.png": {
+      "size_px": [
+        32,
+        45
+      ],
+      "logical_frame_su": [
+        32,
+        45
+      ],
+      "density": 1,
+      "state": "idle",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "nine_slice_uv": [
+        0.21875,
+        0.15555555555555556,
+        0.21875,
+        0.15555555555555556
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        2,
+        2,
+        28,
+        41
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 0.45
+    },
+    "vector/sizes/discard-chip/card-frame-hover-x1.png": {
+      "size_px": [
+        32,
+        45
+      ],
+      "logical_frame_su": [
+        32,
+        45
+      ],
+      "density": 1,
+      "state": "hover",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "nine_slice_uv": [
+        0.21875,
+        0.15555555555555556,
+        0.21875,
+        0.15555555555555556
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        2,
+        2,
+        28,
+        41
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/discard-chip/card-frame-selected-x1.png": {
+      "size_px": [
+        32,
+        45
+      ],
+      "logical_frame_su": [
+        32,
+        45
+      ],
+      "density": 1,
+      "state": "selected",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "nine_slice_uv": [
+        0.21875,
+        0.15555555555555556,
+        0.21875,
+        0.15555555555555556
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        2,
+        2,
+        28,
+        41
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/discard-chip/card-frame-warning-x1.png": {
+      "size_px": [
+        32,
+        45
+      ],
+      "logical_frame_su": [
+        32,
+        45
+      ],
+      "density": 1,
+      "state": "warning",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "nine_slice_uv": [
+        0.21875,
+        0.15555555555555556,
+        0.21875,
+        0.15555555555555556
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        2,
+        2,
+        28,
+        41
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/discard-chip/card-frame-flash-x1.png": {
+      "size_px": [
+        32,
+        45
+      ],
+      "logical_frame_su": [
+        32,
+        45
+      ],
+      "density": 1,
+      "state": "flash",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "nine_slice_uv": [
+        0.21875,
+        0.15555555555555556,
+        0.21875,
+        0.15555555555555556
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        2,
+        2,
+        28,
+        41
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/discard-chip/card-frame-focus-x1.png": {
+      "size_px": [
+        40,
+        53
+      ],
+      "logical_frame_su": [
+        32,
+        45
+      ],
+      "density": 1,
+      "state": "focus",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        9,
+        9,
+        9,
+        9
+      ],
+      "nine_slice_uv": [
+        0.225,
+        0.16981132075471697,
+        0.225,
+        0.16981132075471697
+      ],
+      "frame_origin_px": [
+        4,
+        4
+      ],
+      "window_px": null,
+      "layer": "focus-only",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/card-frame-idle-x2.png": {
+      "size_px": [
+        920,
+        1280
+      ],
+      "logical_frame_su": [
+        460,
+        640
+      ],
+      "density": 2,
+      "state": "idle",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "nine_slice_uv": [
+        0.02282608695652174,
+        0.01640625,
+        0.02282608695652174,
+        0.01640625
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        904,
+        1264
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 0.45
+    },
+    "vector/card-frame-hover-x2.png": {
+      "size_px": [
+        920,
+        1280
+      ],
+      "logical_frame_su": [
+        460,
+        640
+      ],
+      "density": 2,
+      "state": "hover",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "nine_slice_uv": [
+        0.02282608695652174,
+        0.01640625,
+        0.02282608695652174,
+        0.01640625
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        904,
+        1264
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/card-frame-selected-x2.png": {
+      "size_px": [
+        920,
+        1280
+      ],
+      "logical_frame_su": [
+        460,
+        640
+      ],
+      "density": 2,
+      "state": "selected",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "nine_slice_uv": [
+        0.02717391304347826,
+        0.01953125,
+        0.02717391304347826,
+        0.01953125
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        904,
+        1264
+      ],
+      "layer": "frame",
+      "edge_su": 3,
+      "edge_alpha": 1
+    },
+    "vector/card-frame-warning-x2.png": {
+      "size_px": [
+        920,
+        1280
+      ],
+      "logical_frame_su": [
+        460,
+        640
+      ],
+      "density": 2,
+      "state": "warning",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "nine_slice_uv": [
+        0.025,
+        0.01796875,
+        0.025,
+        0.01796875
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        904,
+        1264
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/card-frame-flash-x2.png": {
+      "size_px": [
+        920,
+        1280
+      ],
+      "logical_frame_su": [
+        460,
+        640
+      ],
+      "density": 2,
+      "state": "flash",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "nine_slice_uv": [
+        0.025,
+        0.01796875,
+        0.025,
+        0.01796875
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        904,
+        1264
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/card-frame-focus-x2.png": {
+      "size_px": [
+        936,
+        1296
+      ],
+      "logical_frame_su": [
+        460,
+        640
+      ],
+      "density": 2,
+      "state": "focus",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "nine_slice_uv": [
+        0.026709401709401708,
+        0.019290123456790122,
+        0.026709401709401708,
+        0.019290123456790122
+      ],
+      "frame_origin_px": [
+        8,
+        8
+      ],
+      "window_px": null,
+      "layer": "focus-only",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/card-frame-mini-idle-x2.png": {
+      "size_px": [
+        96,
+        134
+      ],
+      "logical_frame_su": [
+        48,
+        67
+      ],
+      "density": 2,
+      "state": "mini-idle",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.13541666666666666,
+        0.09701492537313433,
+        0.13541666666666666,
+        0.09701492537313433
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        88,
+        126
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 0.45
+    },
+    "vector/card-frame-new-dot-x2.png": {
+      "size_px": [
+        20,
+        20
+      ],
+      "density": 2,
+      "layer": "new-marker-only",
+      "nine_slice_px": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "nine_slice_uv": [
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ],
+      "stretch": false
+    },
+    "vector/sizes/hand/card-frame-idle-x2.png": {
+      "size_px": [
+        300,
+        416
+      ],
+      "logical_frame_su": [
+        150,
+        208
+      ],
+      "density": 2,
+      "state": "idle",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "nine_slice_uv": [
+        0.07,
+        0.05048076923076923,
+        0.07,
+        0.05048076923076923
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        284,
+        400
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 0.45
+    },
+    "vector/sizes/hand/card-frame-hover-x2.png": {
+      "size_px": [
+        300,
+        416
+      ],
+      "logical_frame_su": [
+        150,
+        208
+      ],
+      "density": 2,
+      "state": "hover",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "nine_slice_uv": [
+        0.07,
+        0.05048076923076923,
+        0.07,
+        0.05048076923076923
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        284,
+        400
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/hand/card-frame-selected-x2.png": {
+      "size_px": [
+        300,
+        416
+      ],
+      "logical_frame_su": [
+        150,
+        208
+      ],
+      "density": 2,
+      "state": "selected",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "nine_slice_uv": [
+        0.08333333333333333,
+        0.06009615384615385,
+        0.08333333333333333,
+        0.06009615384615385
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        284,
+        400
+      ],
+      "layer": "frame",
+      "edge_su": 3,
+      "edge_alpha": 1
+    },
+    "vector/sizes/hand/card-frame-warning-x2.png": {
+      "size_px": [
+        300,
+        416
+      ],
+      "logical_frame_su": [
+        150,
+        208
+      ],
+      "density": 2,
+      "state": "warning",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "nine_slice_uv": [
+        0.07666666666666666,
+        0.055288461538461536,
+        0.07666666666666666,
+        0.055288461538461536
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        284,
+        400
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/hand/card-frame-flash-x2.png": {
+      "size_px": [
+        300,
+        416
+      ],
+      "logical_frame_su": [
+        150,
+        208
+      ],
+      "density": 2,
+      "state": "flash",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "nine_slice_uv": [
+        0.07666666666666666,
+        0.055288461538461536,
+        0.07666666666666666,
+        0.055288461538461536
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        284,
+        400
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/hand/card-frame-focus-x2.png": {
+      "size_px": [
+        316,
+        432
+      ],
+      "logical_frame_su": [
+        150,
+        208
+      ],
+      "density": 2,
+      "state": "focus",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "nine_slice_uv": [
+        0.07911392405063292,
+        0.05787037037037037,
+        0.07911392405063292,
+        0.05787037037037037
+      ],
+      "frame_origin_px": [
+        8,
+        8
+      ],
+      "window_px": null,
+      "layer": "focus-only",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/hover/card-frame-idle-x2.png": {
+      "size_px": [
+        450,
+        624
+      ],
+      "logical_frame_su": [
+        225,
+        312
+      ],
+      "density": 2,
+      "state": "idle",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "nine_slice_uv": [
+        0.04666666666666667,
+        0.03365384615384615,
+        0.04666666666666667,
+        0.03365384615384615
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        434,
+        608
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 0.45
+    },
+    "vector/sizes/hover/card-frame-hover-x2.png": {
+      "size_px": [
+        450,
+        624
+      ],
+      "logical_frame_su": [
+        225,
+        312
+      ],
+      "density": 2,
+      "state": "hover",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "nine_slice_uv": [
+        0.04666666666666667,
+        0.03365384615384615,
+        0.04666666666666667,
+        0.03365384615384615
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        434,
+        608
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/hover/card-frame-selected-x2.png": {
+      "size_px": [
+        450,
+        624
+      ],
+      "logical_frame_su": [
+        225,
+        312
+      ],
+      "density": 2,
+      "state": "selected",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "nine_slice_uv": [
+        0.05555555555555555,
+        0.04006410256410257,
+        0.05555555555555555,
+        0.04006410256410257
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        434,
+        608
+      ],
+      "layer": "frame",
+      "edge_su": 3,
+      "edge_alpha": 1
+    },
+    "vector/sizes/hover/card-frame-warning-x2.png": {
+      "size_px": [
+        450,
+        624
+      ],
+      "logical_frame_su": [
+        225,
+        312
+      ],
+      "density": 2,
+      "state": "warning",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "nine_slice_uv": [
+        0.051111111111111114,
+        0.03685897435897436,
+        0.051111111111111114,
+        0.03685897435897436
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        434,
+        608
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/hover/card-frame-flash-x2.png": {
+      "size_px": [
+        450,
+        624
+      ],
+      "logical_frame_su": [
+        225,
+        312
+      ],
+      "density": 2,
+      "state": "flash",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "nine_slice_uv": [
+        0.051111111111111114,
+        0.03685897435897436,
+        0.051111111111111114,
+        0.03685897435897436
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        434,
+        608
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/hover/card-frame-focus-x2.png": {
+      "size_px": [
+        466,
+        640
+      ],
+      "logical_frame_su": [
+        225,
+        312
+      ],
+      "density": 2,
+      "state": "focus",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "nine_slice_uv": [
+        0.0536480686695279,
+        0.0390625,
+        0.0536480686695279,
+        0.0390625
+      ],
+      "frame_origin_px": [
+        8,
+        8
+      ],
+      "window_px": null,
+      "layer": "focus-only",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/combat/card-frame-idle-x2.png": {
+      "size_px": [
+        460,
+        638
+      ],
+      "logical_frame_su": [
+        230,
+        319
+      ],
+      "density": 2,
+      "state": "idle",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "nine_slice_uv": [
+        0.04565217391304348,
+        0.032915360501567396,
+        0.04565217391304348,
+        0.032915360501567396
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        444,
+        622
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 0.45
+    },
+    "vector/sizes/combat/card-frame-hover-x2.png": {
+      "size_px": [
+        460,
+        638
+      ],
+      "logical_frame_su": [
+        230,
+        319
+      ],
+      "density": 2,
+      "state": "hover",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "nine_slice_uv": [
+        0.04565217391304348,
+        0.032915360501567396,
+        0.04565217391304348,
+        0.032915360501567396
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        444,
+        622
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/combat/card-frame-selected-x2.png": {
+      "size_px": [
+        460,
+        638
+      ],
+      "logical_frame_su": [
+        230,
+        319
+      ],
+      "density": 2,
+      "state": "selected",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "nine_slice_uv": [
+        0.05434782608695652,
+        0.03918495297805643,
+        0.05434782608695652,
+        0.03918495297805643
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        444,
+        622
+      ],
+      "layer": "frame",
+      "edge_su": 3,
+      "edge_alpha": 1
+    },
+    "vector/sizes/combat/card-frame-warning-x2.png": {
+      "size_px": [
+        460,
+        638
+      ],
+      "logical_frame_su": [
+        230,
+        319
+      ],
+      "density": 2,
+      "state": "warning",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "nine_slice_uv": [
+        0.05,
+        0.03605015673981191,
+        0.05,
+        0.03605015673981191
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        444,
+        622
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/combat/card-frame-flash-x2.png": {
+      "size_px": [
+        460,
+        638
+      ],
+      "logical_frame_su": [
+        230,
+        319
+      ],
+      "density": 2,
+      "state": "flash",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "nine_slice_uv": [
+        0.05,
+        0.03605015673981191,
+        0.05,
+        0.03605015673981191
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        444,
+        622
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/combat/card-frame-focus-x2.png": {
+      "size_px": [
+        476,
+        654
+      ],
+      "logical_frame_su": [
+        230,
+        319
+      ],
+      "density": 2,
+      "state": "focus",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "nine_slice_uv": [
+        0.052521008403361345,
+        0.0382262996941896,
+        0.052521008403361345,
+        0.0382262996941896
+      ],
+      "frame_origin_px": [
+        8,
+        8
+      ],
+      "window_px": null,
+      "layer": "focus-only",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/source-slot/card-frame-idle-x2.png": {
+      "size_px": [
+        380,
+        528
+      ],
+      "logical_frame_su": [
+        190,
+        264
+      ],
+      "density": 2,
+      "state": "idle",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "nine_slice_uv": [
+        0.05526315789473684,
+        0.03977272727272727,
+        0.05526315789473684,
+        0.03977272727272727
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        364,
+        512
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 0.45
+    },
+    "vector/sizes/source-slot/card-frame-hover-x2.png": {
+      "size_px": [
+        380,
+        528
+      ],
+      "logical_frame_su": [
+        190,
+        264
+      ],
+      "density": 2,
+      "state": "hover",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "nine_slice_uv": [
+        0.05526315789473684,
+        0.03977272727272727,
+        0.05526315789473684,
+        0.03977272727272727
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        364,
+        512
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/source-slot/card-frame-selected-x2.png": {
+      "size_px": [
+        380,
+        528
+      ],
+      "logical_frame_su": [
+        190,
+        264
+      ],
+      "density": 2,
+      "state": "selected",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "nine_slice_uv": [
+        0.06578947368421052,
+        0.04734848484848485,
+        0.06578947368421052,
+        0.04734848484848485
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        364,
+        512
+      ],
+      "layer": "frame",
+      "edge_su": 3,
+      "edge_alpha": 1
+    },
+    "vector/sizes/source-slot/card-frame-warning-x2.png": {
+      "size_px": [
+        380,
+        528
+      ],
+      "logical_frame_su": [
+        190,
+        264
+      ],
+      "density": 2,
+      "state": "warning",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "nine_slice_uv": [
+        0.060526315789473685,
+        0.043560606060606064,
+        0.060526315789473685,
+        0.043560606060606064
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        364,
+        512
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/source-slot/card-frame-flash-x2.png": {
+      "size_px": [
+        380,
+        528
+      ],
+      "logical_frame_su": [
+        190,
+        264
+      ],
+      "density": 2,
+      "state": "flash",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "nine_slice_uv": [
+        0.060526315789473685,
+        0.043560606060606064,
+        0.060526315789473685,
+        0.043560606060606064
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        364,
+        512
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/source-slot/card-frame-focus-x2.png": {
+      "size_px": [
+        396,
+        544
+      ],
+      "logical_frame_su": [
+        190,
+        264
+      ],
+      "density": 2,
+      "state": "focus",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "nine_slice_uv": [
+        0.06313131313131314,
+        0.04595588235294118,
+        0.06313131313131314,
+        0.04595588235294118
+      ],
+      "frame_origin_px": [
+        8,
+        8
+      ],
+      "window_px": null,
+      "layer": "focus-only",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/inspector-ru/card-frame-idle-x2.png": {
+      "size_px": [
+        920,
+        1280
+      ],
+      "logical_frame_su": [
+        460,
+        640
+      ],
+      "density": 2,
+      "state": "idle",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "nine_slice_uv": [
+        0.02282608695652174,
+        0.01640625,
+        0.02282608695652174,
+        0.01640625
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        904,
+        1264
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 0.45
+    },
+    "vector/sizes/inspector-ru/card-frame-hover-x2.png": {
+      "size_px": [
+        920,
+        1280
+      ],
+      "logical_frame_su": [
+        460,
+        640
+      ],
+      "density": 2,
+      "state": "hover",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "nine_slice_uv": [
+        0.02282608695652174,
+        0.01640625,
+        0.02282608695652174,
+        0.01640625
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        904,
+        1264
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/inspector-ru/card-frame-selected-x2.png": {
+      "size_px": [
+        920,
+        1280
+      ],
+      "logical_frame_su": [
+        460,
+        640
+      ],
+      "density": 2,
+      "state": "selected",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "nine_slice_uv": [
+        0.02717391304347826,
+        0.01953125,
+        0.02717391304347826,
+        0.01953125
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        904,
+        1264
+      ],
+      "layer": "frame",
+      "edge_su": 3,
+      "edge_alpha": 1
+    },
+    "vector/sizes/inspector-ru/card-frame-warning-x2.png": {
+      "size_px": [
+        920,
+        1280
+      ],
+      "logical_frame_su": [
+        460,
+        640
+      ],
+      "density": 2,
+      "state": "warning",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "nine_slice_uv": [
+        0.025,
+        0.01796875,
+        0.025,
+        0.01796875
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        904,
+        1264
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/inspector-ru/card-frame-flash-x2.png": {
+      "size_px": [
+        920,
+        1280
+      ],
+      "logical_frame_su": [
+        460,
+        640
+      ],
+      "density": 2,
+      "state": "flash",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "nine_slice_uv": [
+        0.025,
+        0.01796875,
+        0.025,
+        0.01796875
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        904,
+        1264
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/inspector-ru/card-frame-focus-x2.png": {
+      "size_px": [
+        936,
+        1296
+      ],
+      "logical_frame_su": [
+        460,
+        640
+      ],
+      "density": 2,
+      "state": "focus",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "nine_slice_uv": [
+        0.026709401709401708,
+        0.019290123456790122,
+        0.026709401709401708,
+        0.019290123456790122
+      ],
+      "frame_origin_px": [
+        8,
+        8
+      ],
+      "window_px": null,
+      "layer": "focus-only",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/inspector-en/card-frame-idle-x2.png": {
+      "size_px": [
+        816,
+        1132
+      ],
+      "logical_frame_su": [
+        408,
+        566
+      ],
+      "density": 2,
+      "state": "idle",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "nine_slice_uv": [
+        0.025735294117647058,
+        0.018551236749116608,
+        0.025735294117647058,
+        0.018551236749116608
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        800,
+        1116
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 0.45
+    },
+    "vector/sizes/inspector-en/card-frame-hover-x2.png": {
+      "size_px": [
+        816,
+        1132
+      ],
+      "logical_frame_su": [
+        408,
+        566
+      ],
+      "density": 2,
+      "state": "hover",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "nine_slice_uv": [
+        0.025735294117647058,
+        0.018551236749116608,
+        0.025735294117647058,
+        0.018551236749116608
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        800,
+        1116
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/inspector-en/card-frame-selected-x2.png": {
+      "size_px": [
+        816,
+        1132
+      ],
+      "logical_frame_su": [
+        408,
+        566
+      ],
+      "density": 2,
+      "state": "selected",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "nine_slice_uv": [
+        0.030637254901960783,
+        0.022084805653710248,
+        0.030637254901960783,
+        0.022084805653710248
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        800,
+        1116
+      ],
+      "layer": "frame",
+      "edge_su": 3,
+      "edge_alpha": 1
+    },
+    "vector/sizes/inspector-en/card-frame-warning-x2.png": {
+      "size_px": [
+        816,
+        1132
+      ],
+      "logical_frame_su": [
+        408,
+        566
+      ],
+      "density": 2,
+      "state": "warning",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "nine_slice_uv": [
+        0.028186274509803922,
+        0.020318021201413426,
+        0.028186274509803922,
+        0.020318021201413426
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        800,
+        1116
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/inspector-en/card-frame-flash-x2.png": {
+      "size_px": [
+        816,
+        1132
+      ],
+      "logical_frame_su": [
+        408,
+        566
+      ],
+      "density": 2,
+      "state": "flash",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "nine_slice_uv": [
+        0.028186274509803922,
+        0.020318021201413426,
+        0.028186274509803922,
+        0.020318021201413426
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        800,
+        1116
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/inspector-en/card-frame-focus-x2.png": {
+      "size_px": [
+        832,
+        1148
+      ],
+      "logical_frame_su": [
+        408,
+        566
+      ],
+      "density": 2,
+      "state": "focus",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "nine_slice_uv": [
+        0.030048076923076924,
+        0.02177700348432056,
+        0.030048076923076924,
+        0.02177700348432056
+      ],
+      "frame_origin_px": [
+        8,
+        8
+      ],
+      "window_px": null,
+      "layer": "focus-only",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/class-s-hand/card-frame-idle-x2.png": {
+      "size_px": [
+        240,
+        332
+      ],
+      "logical_frame_su": [
+        120,
+        166
+      ],
+      "density": 2,
+      "state": "idle",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "nine_slice_uv": [
+        0.0875,
+        0.06325301204819277,
+        0.0875,
+        0.06325301204819277
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        224,
+        316
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 0.45
+    },
+    "vector/sizes/class-s-hand/card-frame-hover-x2.png": {
+      "size_px": [
+        240,
+        332
+      ],
+      "logical_frame_su": [
+        120,
+        166
+      ],
+      "density": 2,
+      "state": "hover",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "nine_slice_uv": [
+        0.0875,
+        0.06325301204819277,
+        0.0875,
+        0.06325301204819277
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        224,
+        316
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/class-s-hand/card-frame-selected-x2.png": {
+      "size_px": [
+        240,
+        332
+      ],
+      "logical_frame_su": [
+        120,
+        166
+      ],
+      "density": 2,
+      "state": "selected",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "nine_slice_uv": [
+        0.10416666666666667,
+        0.07530120481927711,
+        0.10416666666666667,
+        0.07530120481927711
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        224,
+        316
+      ],
+      "layer": "frame",
+      "edge_su": 3,
+      "edge_alpha": 1
+    },
+    "vector/sizes/class-s-hand/card-frame-warning-x2.png": {
+      "size_px": [
+        240,
+        332
+      ],
+      "logical_frame_su": [
+        120,
+        166
+      ],
+      "density": 2,
+      "state": "warning",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "nine_slice_uv": [
+        0.09583333333333334,
+        0.06927710843373494,
+        0.09583333333333334,
+        0.06927710843373494
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        224,
+        316
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/class-s-hand/card-frame-flash-x2.png": {
+      "size_px": [
+        240,
+        332
+      ],
+      "logical_frame_su": [
+        120,
+        166
+      ],
+      "density": 2,
+      "state": "flash",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "nine_slice_uv": [
+        0.09583333333333334,
+        0.06927710843373494,
+        0.09583333333333334,
+        0.06927710843373494
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        8,
+        8,
+        224,
+        316
+      ],
+      "layer": "frame",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/class-s-hand/card-frame-focus-x2.png": {
+      "size_px": [
+        256,
+        348
+      ],
+      "logical_frame_su": [
+        120,
+        166
+      ],
+      "density": 2,
+      "state": "focus",
+      "radius_su": 8,
+      "band_su": 4,
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "nine_slice_uv": [
+        0.09765625,
+        0.07183908045977011,
+        0.09765625,
+        0.07183908045977011
+      ],
+      "frame_origin_px": [
+        8,
+        8
+      ],
+      "window_px": null,
+      "layer": "focus-only",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/opponent-back/card-frame-idle-x2.png": {
+      "size_px": [
+        96,
+        134
+      ],
+      "logical_frame_su": [
+        48,
+        67
+      ],
+      "density": 2,
+      "state": "idle",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.13541666666666666,
+        0.09701492537313433,
+        0.13541666666666666,
+        0.09701492537313433
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        88,
+        126
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 0.45
+    },
+    "vector/sizes/opponent-back/card-frame-hover-x2.png": {
+      "size_px": [
+        96,
+        134
+      ],
+      "logical_frame_su": [
+        48,
+        67
+      ],
+      "density": 2,
+      "state": "hover",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.13541666666666666,
+        0.09701492537313433,
+        0.13541666666666666,
+        0.09701492537313433
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        88,
+        126
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/opponent-back/card-frame-selected-x2.png": {
+      "size_px": [
+        96,
+        134
+      ],
+      "logical_frame_su": [
+        48,
+        67
+      ],
+      "density": 2,
+      "state": "selected",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.13541666666666666,
+        0.09701492537313433,
+        0.13541666666666666,
+        0.09701492537313433
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        88,
+        126
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/opponent-back/card-frame-warning-x2.png": {
+      "size_px": [
+        96,
+        134
+      ],
+      "logical_frame_su": [
+        48,
+        67
+      ],
+      "density": 2,
+      "state": "warning",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.13541666666666666,
+        0.09701492537313433,
+        0.13541666666666666,
+        0.09701492537313433
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        88,
+        126
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/opponent-back/card-frame-flash-x2.png": {
+      "size_px": [
+        96,
+        134
+      ],
+      "logical_frame_su": [
+        48,
+        67
+      ],
+      "density": 2,
+      "state": "flash",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.13541666666666666,
+        0.09701492537313433,
+        0.13541666666666666,
+        0.09701492537313433
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        88,
+        126
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/opponent-back/card-frame-focus-x2.png": {
+      "size_px": [
+        112,
+        150
+      ],
+      "logical_frame_su": [
+        48,
+        67
+      ],
+      "density": 2,
+      "state": "focus",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        17,
+        17,
+        17,
+        17
+      ],
+      "nine_slice_uv": [
+        0.15178571428571427,
+        0.11333333333333333,
+        0.15178571428571427,
+        0.11333333333333333
+      ],
+      "frame_origin_px": [
+        8,
+        8
+      ],
+      "window_px": null,
+      "layer": "focus-only",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/deck-chip/card-frame-idle-x2.png": {
+      "size_px": [
+        64,
+        90
+      ],
+      "logical_frame_su": [
+        32,
+        45
+      ],
+      "density": 2,
+      "state": "idle",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.203125,
+        0.14444444444444443,
+        0.203125,
+        0.14444444444444443
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        56,
+        82
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 0.45
+    },
+    "vector/sizes/deck-chip/card-frame-hover-x2.png": {
+      "size_px": [
+        64,
+        90
+      ],
+      "logical_frame_su": [
+        32,
+        45
+      ],
+      "density": 2,
+      "state": "hover",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.203125,
+        0.14444444444444443,
+        0.203125,
+        0.14444444444444443
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        56,
+        82
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/deck-chip/card-frame-selected-x2.png": {
+      "size_px": [
+        64,
+        90
+      ],
+      "logical_frame_su": [
+        32,
+        45
+      ],
+      "density": 2,
+      "state": "selected",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.203125,
+        0.14444444444444443,
+        0.203125,
+        0.14444444444444443
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        56,
+        82
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/deck-chip/card-frame-warning-x2.png": {
+      "size_px": [
+        64,
+        90
+      ],
+      "logical_frame_su": [
+        32,
+        45
+      ],
+      "density": 2,
+      "state": "warning",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.203125,
+        0.14444444444444443,
+        0.203125,
+        0.14444444444444443
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        56,
+        82
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/deck-chip/card-frame-flash-x2.png": {
+      "size_px": [
+        64,
+        90
+      ],
+      "logical_frame_su": [
+        32,
+        45
+      ],
+      "density": 2,
+      "state": "flash",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.203125,
+        0.14444444444444443,
+        0.203125,
+        0.14444444444444443
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        56,
+        82
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/deck-chip/card-frame-focus-x2.png": {
+      "size_px": [
+        80,
+        106
+      ],
+      "logical_frame_su": [
+        32,
+        45
+      ],
+      "density": 2,
+      "state": "focus",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        17,
+        17,
+        17,
+        17
+      ],
+      "nine_slice_uv": [
+        0.2125,
+        0.16037735849056603,
+        0.2125,
+        0.16037735849056603
+      ],
+      "frame_origin_px": [
+        8,
+        8
+      ],
+      "window_px": null,
+      "layer": "focus-only",
+      "edge_su": 2,
+      "edge_alpha": 1
+    },
+    "vector/sizes/discard-chip/card-frame-idle-x2.png": {
+      "size_px": [
+        64,
+        90
+      ],
+      "logical_frame_su": [
+        32,
+        45
+      ],
+      "density": 2,
+      "state": "idle",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.203125,
+        0.14444444444444443,
+        0.203125,
+        0.14444444444444443
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        56,
+        82
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 0.45
+    },
+    "vector/sizes/discard-chip/card-frame-hover-x2.png": {
+      "size_px": [
+        64,
+        90
+      ],
+      "logical_frame_su": [
+        32,
+        45
+      ],
+      "density": 2,
+      "state": "hover",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.203125,
+        0.14444444444444443,
+        0.203125,
+        0.14444444444444443
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        56,
+        82
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/discard-chip/card-frame-selected-x2.png": {
+      "size_px": [
+        64,
+        90
+      ],
+      "logical_frame_su": [
+        32,
+        45
+      ],
+      "density": 2,
+      "state": "selected",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.203125,
+        0.14444444444444443,
+        0.203125,
+        0.14444444444444443
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        56,
+        82
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/discard-chip/card-frame-warning-x2.png": {
+      "size_px": [
+        64,
+        90
+      ],
+      "logical_frame_su": [
+        32,
+        45
+      ],
+      "density": 2,
+      "state": "warning",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.203125,
+        0.14444444444444443,
+        0.203125,
+        0.14444444444444443
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        56,
+        82
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/discard-chip/card-frame-flash-x2.png": {
+      "size_px": [
+        64,
+        90
+      ],
+      "logical_frame_su": [
+        32,
+        45
+      ],
+      "density": 2,
+      "state": "flash",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "nine_slice_uv": [
+        0.203125,
+        0.14444444444444443,
+        0.203125,
+        0.14444444444444443
+      ],
+      "frame_origin_px": [
+        0,
+        0
+      ],
+      "window_px": [
+        4,
+        4,
+        56,
+        82
+      ],
+      "layer": "frame",
+      "edge_su": 1,
+      "edge_alpha": 1
+    },
+    "vector/sizes/discard-chip/card-frame-focus-x2.png": {
+      "size_px": [
+        80,
+        106
+      ],
+      "logical_frame_su": [
+        32,
+        45
+      ],
+      "density": 2,
+      "state": "focus",
+      "radius_su": 4,
+      "band_su": 2,
+      "nine_slice_px": [
+        17,
+        17,
+        17,
+        17
+      ],
+      "nine_slice_uv": [
+        0.2125,
+        0.16037735849056603,
+        0.2125,
+        0.16037735849056603
+      ],
+      "frame_origin_px": [
+        8,
+        8
+      ],
+      "window_px": null,
+      "layer": "focus-only",
+      "edge_su": 2,
+      "edge_alpha": 1
+    }
+  },
+  "states": [
+    "idle",
+    "hover",
+    "selected",
+    "warning",
+    "flash",
+    "focus",
+    "mini-idle",
+    "playable",
+    "not-playable",
+    "new"
+  ],
+  "displays": {
+    "hand": [
+      150,
+      208,
+      4,
+      8
+    ],
+    "hover": [
+      225,
+      312,
+      4,
+      8
+    ],
+    "combat": [
+      230,
+      319,
+      4,
+      8
+    ],
+    "source-slot": [
+      190,
+      264,
+      4,
+      8
+    ],
+    "inspector-ru": [
+      460,
+      640,
+      4,
+      8
+    ],
+    "inspector-en": [
+      408,
+      566,
+      4,
+      8
+    ],
+    "class-s-hand": [
+      120,
+      166,
+      4,
+      8
+    ],
+    "opponent-back": [
+      48,
+      67,
+      2,
+      4
+    ],
+    "deck-chip": [
+      32,
+      45,
+      2,
+      4
+    ],
+    "discard-chip": [
+      32,
+      45,
+      2,
+      4
+    ]
+  },
+  "state_lift_su": {
+    "hover": -24,
+    "selected": -32,
+    "warning": 16
+  },
+  "flash": {
+    "cue": "CUE-006",
+    "duration_ms": 500,
+    "start": "flash",
+    "end": "idle",
+    "method": "linear crossfade between independently authored layers",
+    "reduced_motion": "one static flash then idle"
+  },
+  "not_playable": {
+    "scan_saturation_multiplier": 0.4,
+    "scan_opacity": 0.7,
+    "preview_only": true
+  },
+  "new": {
+    "dot_diameter_su": 8,
+    "keyline_su": 1,
+    "position": "outside top-right, no scan overlap",
+    "expiry": "first hover or 10 seconds",
+    "layer_file": "vector/card-frame-new-dot-x1.png"
+  },
+  "nine_slice": {
+    "units": "physical pixels",
+    "corner_formula": "(radius_su + edge_su + keyline_su) * density + 1 px",
+    "focus_corner_formula": "(radius_su + gap_su + ring_su) * density + 1 px",
+    "centre": "transparent",
+    "stretch_edges": false
+  },
+  "density_note": "x2 is texture density, not 2x logical layout size; su remains unchanged.",
+  "mini_edge_policy": "selected/warning/flash clamp to 1 su inside 2 su band; full edge width impossible without covering scan",
+  "class_s_policy": "120x166 frame derived from the explicitly required 112x158 viewport; radius.l kept at 8 su"
+}

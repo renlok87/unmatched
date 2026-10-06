@@ -1,0 +1,2009 @@
+{
+  "task": "CP-13",
+  "status": "предложено",
+  "source_unchanged": true,
+  "outside_folder": [],
+  "all_acceptance_met": false,
+  "implementation_checks_passed": true,
+  "failed_or_conflicting_requirements": [
+    "nominal_frame_window_matches_scan_aspect_within_one_px",
+    "contain_gap_at_most_one_su_per_side",
+    "backs_strict_cover_by_height",
+    "all_display_aspects_exactly_0_721",
+    "four_grayscale_states_differ_by_edge_width_alone",
+    "mini_selected_warning_flash_keep_full_edge_width"
+  ],
+  "checks": {
+    "source_unchanged": {
+      "passed": true,
+      "detail": {
+        "changed": [],
+        "added": [],
+        "files": 2394
+      }
+    },
+    "generator_snapshot_byte_identical": {
+      "passed": true,
+      "detail": null
+    },
+    "palette": {
+      "passed": true,
+      "detail": {
+        "opaque_pixels_outside_dE76_3": 0,
+        "method": "Every opaque pixel equals an exact token; this implies dE76=0. Only alpha<255 excluded."
+      }
+    },
+    "transparent_windows_and_state_geometry": {
+      "passed": true,
+      "detail": {
+        "assets_measured": 136
+      }
+    },
+    "focus_ring_gap_and_no_overlap": {
+      "passed": true,
+      "detail": {
+        "gap_su": 2,
+        "ring_su": 2,
+        "all_sizes_and_densities": true
+      }
+    },
+    "all_states_displays_densities": {
+      "passed": true,
+      "detail": {
+        "colour_sheets": 200,
+        "gray_sheets": 200
+      }
+    },
+    "real_card_provenance_and_four_types_each_hero_ru_en": {
+      "passed": true,
+      "detail": {
+        "cards": [
+          "king-arthur:excalibur",
+          "king-arthur:prophecy",
+          "king-arthur:skirmish",
+          "king-arthur:the-holy-grail",
+          "medusa:gaze-of-stone",
+          "medusa:hiss-and-slither",
+          "medusa:snipe",
+          "medusa:winged-frenzy"
+        ],
+        "scan_files": 16,
+        "original_back_files": 2
+      }
+    },
+    "every_sheet_has_all_real_cards_and_both_backs": {
+      "passed": true,
+      "detail": []
+    },
+    "real_scan_and_back_pixels_match_sources": {
+      "passed": true,
+      "detail": {
+        "mismatched_sample_pixels": 0,
+        "sampled_pixels": 4358680,
+        "method": "Deterministic >=31x31 pixel lattice per source in every colour sheet, independently resized from originals; includes preview saturation and opacity."
+      }
+    },
+    "rec709_grayscale": {
+      "passed": true,
+      "detail": {
+        "wrong_pixels": 0,
+        "formula": "round(0.2126R + 0.7152G + 0.0722B)"
+      }
+    },
+    "scan_contain_no_crop_aspect_within_one_px": {
+      "passed": true,
+      "detail": {
+        "max_aspect_error_px": 0.303724928366762
+      }
+    },
+    "ru_no_enlargement_1080p_100pct_outside_inspector": {
+      "passed": true,
+      "detail": {
+        "max_scale": 0.7738693467336684,
+        "x2": "texture density, su unchanged"
+      }
+    },
+    "inspector_at_most_1_6": {
+      "passed": true,
+      "detail": {
+        "max_logical_scale": 1.6
+      }
+    },
+    "back_crop_at_most_1_4pct": {
+      "passed": true,
+      "detail": {
+        "max_total_crop": 0.013020833333333334
+      }
+    },
+    "nominal_frame_window_matches_scan_aspect_within_one_px": {
+      "passed": false,
+      "detail": {
+        "max_error_px": 3.7386934673367023,
+        "reason": "Exact prescribed viewports differ from RU/EN source aspects. Actual fitted scans pass their separate aspect check."
+      }
+    },
+    "contain_gap_at_most_one_su_per_side": {
+      "passed": false,
+      "detail": {
+        "max_gap_su": 2.5,
+        "reason": "Prescribed viewports plus contain produce larger letterboxing."
+      }
+    },
+    "backs_strict_cover_by_height": {
+      "passed": false,
+      "detail": {
+        "required_total_crop_range": [
+          0.019003882915173298,
+          0.06542174796747968
+        ],
+        "reason": "Strict height cover conflicts with the 1.4% crop budget. Centred budget-limited crop then contain preserves logos."
+      }
+    },
+    "all_display_aspects_exactly_0_721": {
+      "passed": false,
+      "detail": {
+        "aspects": {
+          "hand": 0.7211538461538461,
+          "hover": 0.7211538461538461,
+          "combat": 0.7210031347962382,
+          "source-slot": 0.7196969696969697,
+          "inspector-ru": 0.71875,
+          "inspector-en": 0.7208480565371025,
+          "class-s-hand": 0.7228915662650602,
+          "opponent-back": 0.7164179104477612,
+          "deck-chip": 0.7111111111111111,
+          "discard-chip": 0.7111111111111111
+        },
+        "reason": "Exact prescribed integer dimensions take precedence."
+      }
+    },
+    "four_grayscale_states_differ_by_edge_width_alone": {
+      "passed": false,
+      "detail": {
+        "widths_su": {
+          "idle": 1,
+          "selected": 3,
+          "warning": 2,
+          "flash": 2
+        },
+        "reason": "Warning and flash both explicitly require 2 su; grayscale luminance differentiates them instead."
+      }
+    },
+    "mini_selected_warning_flash_keep_full_edge_width": {
+      "passed": false,
+      "detail": {
+        "available_edge_su": 1,
+        "requested_edge_su": {
+          "selected": 3,
+          "warning": 2,
+          "flash": 2
+        },
+        "reason": "2 su band includes 1 su keyline. Full state edges would overlap scan. Mini previews use 1 su; distinct widths exist at regular sizes."
+      }
+    },
+    "four_grayscale_states_visually_distinct": {
+      "passed": true,
+      "detail": {
+        "idle": [
+          18.864,
+          117.528,
+          19.537,
+          19.537
+        ],
+        "selected": [
+          18.864,
+          99.91,
+          99.91,
+          99.91
+        ],
+        "warning": [
+          18.864,
+          144.761,
+          144.761,
+          19.537
+        ],
+        "flash": [
+          18.864,
+          247.992,
+          247.992,
+          19.537
+        ]
+      }
+    },
+    "no_image_generation": {
+      "passed": true,
+      "detail": null
+    },
+    "scan_bearing_outputs_in_derived_only": {
+      "passed": true,
+      "detail": {
+        "package_png": 144,
+        "derived_png": 404,
+        "unexpected_package_png": [],
+        "unexpected_derived_png": [],
+        "proof": "Every package frame is independently measured as exact procedural tokens with transparent aperture; remaining package images are the eight declared scan-free overlays. Real source entries exist exclusively in derived sheets."
+      }
+    },
+    "outside_folder": {
+      "passed": true,
+      "detail": {
+        "guarded_generator": true,
+        "guarded_verifier": true,
+        "scope": "Operations of this task; concurrent sessions are outside the audit scope."
+      }
+    }
+  },
+  "assets": {
+    "vector/card-frame-idle-x1.png": {
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "size_px": [
+        460,
+        640
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/card-frame-hover-x1.png": {
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "size_px": [
+        460,
+        640
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/card-frame-selected-x1.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        460,
+        640
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/card-frame-warning-x1.png": {
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "size_px": [
+        460,
+        640
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/card-frame-flash-x1.png": {
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "size_px": [
+        460,
+        640
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/card-frame-focus-x1.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        468,
+        648
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/card-frame-mini-idle-x1.png": {
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "size_px": [
+        48,
+        67
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/card-frame-new-dot-x1.png": {
+      "nine_slice_px": [
+        5,
+        5,
+        5,
+        5
+      ],
+      "size_px": [
+        10,
+        10
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/hand/card-frame-idle-x1.png": {
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "size_px": [
+        150,
+        208
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/hand/card-frame-hover-x1.png": {
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "size_px": [
+        150,
+        208
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/hand/card-frame-selected-x1.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        150,
+        208
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/hand/card-frame-warning-x1.png": {
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "size_px": [
+        150,
+        208
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/hand/card-frame-flash-x1.png": {
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "size_px": [
+        150,
+        208
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/hand/card-frame-focus-x1.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        158,
+        216
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/hover/card-frame-idle-x1.png": {
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "size_px": [
+        225,
+        312
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/hover/card-frame-hover-x1.png": {
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "size_px": [
+        225,
+        312
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/hover/card-frame-selected-x1.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        225,
+        312
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/hover/card-frame-warning-x1.png": {
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "size_px": [
+        225,
+        312
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/hover/card-frame-flash-x1.png": {
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "size_px": [
+        225,
+        312
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/hover/card-frame-focus-x1.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        233,
+        320
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/combat/card-frame-idle-x1.png": {
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "size_px": [
+        230,
+        319
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/combat/card-frame-hover-x1.png": {
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "size_px": [
+        230,
+        319
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/combat/card-frame-selected-x1.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        230,
+        319
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/combat/card-frame-warning-x1.png": {
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "size_px": [
+        230,
+        319
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/combat/card-frame-flash-x1.png": {
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "size_px": [
+        230,
+        319
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/combat/card-frame-focus-x1.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        238,
+        327
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/source-slot/card-frame-idle-x1.png": {
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "size_px": [
+        190,
+        264
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/source-slot/card-frame-hover-x1.png": {
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "size_px": [
+        190,
+        264
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/source-slot/card-frame-selected-x1.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        190,
+        264
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/source-slot/card-frame-warning-x1.png": {
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "size_px": [
+        190,
+        264
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/source-slot/card-frame-flash-x1.png": {
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "size_px": [
+        190,
+        264
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/source-slot/card-frame-focus-x1.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        198,
+        272
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/inspector-ru/card-frame-idle-x1.png": {
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "size_px": [
+        460,
+        640
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/inspector-ru/card-frame-hover-x1.png": {
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "size_px": [
+        460,
+        640
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/inspector-ru/card-frame-selected-x1.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        460,
+        640
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/inspector-ru/card-frame-warning-x1.png": {
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "size_px": [
+        460,
+        640
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/inspector-ru/card-frame-flash-x1.png": {
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "size_px": [
+        460,
+        640
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/inspector-ru/card-frame-focus-x1.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        468,
+        648
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/inspector-en/card-frame-idle-x1.png": {
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "size_px": [
+        408,
+        566
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/inspector-en/card-frame-hover-x1.png": {
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "size_px": [
+        408,
+        566
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/inspector-en/card-frame-selected-x1.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        408,
+        566
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/inspector-en/card-frame-warning-x1.png": {
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "size_px": [
+        408,
+        566
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/inspector-en/card-frame-flash-x1.png": {
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "size_px": [
+        408,
+        566
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/inspector-en/card-frame-focus-x1.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        416,
+        574
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/class-s-hand/card-frame-idle-x1.png": {
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "size_px": [
+        120,
+        166
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/class-s-hand/card-frame-hover-x1.png": {
+      "nine_slice_px": [
+        11,
+        11,
+        11,
+        11
+      ],
+      "size_px": [
+        120,
+        166
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/class-s-hand/card-frame-selected-x1.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        120,
+        166
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/class-s-hand/card-frame-warning-x1.png": {
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "size_px": [
+        120,
+        166
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/class-s-hand/card-frame-flash-x1.png": {
+      "nine_slice_px": [
+        12,
+        12,
+        12,
+        12
+      ],
+      "size_px": [
+        120,
+        166
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/class-s-hand/card-frame-focus-x1.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        128,
+        174
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/opponent-back/card-frame-idle-x1.png": {
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "size_px": [
+        48,
+        67
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/opponent-back/card-frame-hover-x1.png": {
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "size_px": [
+        48,
+        67
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/opponent-back/card-frame-selected-x1.png": {
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "size_px": [
+        48,
+        67
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/opponent-back/card-frame-warning-x1.png": {
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "size_px": [
+        48,
+        67
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/opponent-back/card-frame-flash-x1.png": {
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "size_px": [
+        48,
+        67
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/opponent-back/card-frame-focus-x1.png": {
+      "nine_slice_px": [
+        9,
+        9,
+        9,
+        9
+      ],
+      "size_px": [
+        56,
+        75
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/deck-chip/card-frame-idle-x1.png": {
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "size_px": [
+        32,
+        45
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/deck-chip/card-frame-hover-x1.png": {
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "size_px": [
+        32,
+        45
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/deck-chip/card-frame-selected-x1.png": {
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "size_px": [
+        32,
+        45
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/deck-chip/card-frame-warning-x1.png": {
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "size_px": [
+        32,
+        45
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/deck-chip/card-frame-flash-x1.png": {
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "size_px": [
+        32,
+        45
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/deck-chip/card-frame-focus-x1.png": {
+      "nine_slice_px": [
+        9,
+        9,
+        9,
+        9
+      ],
+      "size_px": [
+        40,
+        53
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/discard-chip/card-frame-idle-x1.png": {
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "size_px": [
+        32,
+        45
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/discard-chip/card-frame-hover-x1.png": {
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "size_px": [
+        32,
+        45
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/discard-chip/card-frame-selected-x1.png": {
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "size_px": [
+        32,
+        45
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/discard-chip/card-frame-warning-x1.png": {
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "size_px": [
+        32,
+        45
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/discard-chip/card-frame-flash-x1.png": {
+      "nine_slice_px": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "size_px": [
+        32,
+        45
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/discard-chip/card-frame-focus-x1.png": {
+      "nine_slice_px": [
+        9,
+        9,
+        9,
+        9
+      ],
+      "size_px": [
+        40,
+        53
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/card-frame-idle-x2.png": {
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "size_px": [
+        920,
+        1280
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/card-frame-hover-x2.png": {
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "size_px": [
+        920,
+        1280
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/card-frame-selected-x2.png": {
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "size_px": [
+        920,
+        1280
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/card-frame-warning-x2.png": {
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "size_px": [
+        920,
+        1280
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/card-frame-flash-x2.png": {
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "size_px": [
+        920,
+        1280
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/card-frame-focus-x2.png": {
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "size_px": [
+        936,
+        1296
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/card-frame-mini-idle-x2.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        96,
+        134
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/card-frame-new-dot-x2.png": {
+      "nine_slice_px": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "size_px": [
+        20,
+        20
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/hand/card-frame-idle-x2.png": {
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "size_px": [
+        300,
+        416
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/hand/card-frame-hover-x2.png": {
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "size_px": [
+        300,
+        416
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/hand/card-frame-selected-x2.png": {
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "size_px": [
+        300,
+        416
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/hand/card-frame-warning-x2.png": {
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "size_px": [
+        300,
+        416
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/hand/card-frame-flash-x2.png": {
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "size_px": [
+        300,
+        416
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/hand/card-frame-focus-x2.png": {
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "size_px": [
+        316,
+        432
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/hover/card-frame-idle-x2.png": {
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "size_px": [
+        450,
+        624
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/hover/card-frame-hover-x2.png": {
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "size_px": [
+        450,
+        624
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/hover/card-frame-selected-x2.png": {
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "size_px": [
+        450,
+        624
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/hover/card-frame-warning-x2.png": {
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "size_px": [
+        450,
+        624
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/hover/card-frame-flash-x2.png": {
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "size_px": [
+        450,
+        624
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/hover/card-frame-focus-x2.png": {
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "size_px": [
+        466,
+        640
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/combat/card-frame-idle-x2.png": {
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "size_px": [
+        460,
+        638
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/combat/card-frame-hover-x2.png": {
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "size_px": [
+        460,
+        638
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/combat/card-frame-selected-x2.png": {
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "size_px": [
+        460,
+        638
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/combat/card-frame-warning-x2.png": {
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "size_px": [
+        460,
+        638
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/combat/card-frame-flash-x2.png": {
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "size_px": [
+        460,
+        638
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/combat/card-frame-focus-x2.png": {
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "size_px": [
+        476,
+        654
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/source-slot/card-frame-idle-x2.png": {
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "size_px": [
+        380,
+        528
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/source-slot/card-frame-hover-x2.png": {
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "size_px": [
+        380,
+        528
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/source-slot/card-frame-selected-x2.png": {
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "size_px": [
+        380,
+        528
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/source-slot/card-frame-warning-x2.png": {
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "size_px": [
+        380,
+        528
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/source-slot/card-frame-flash-x2.png": {
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "size_px": [
+        380,
+        528
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/source-slot/card-frame-focus-x2.png": {
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "size_px": [
+        396,
+        544
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/inspector-ru/card-frame-idle-x2.png": {
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "size_px": [
+        920,
+        1280
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/inspector-ru/card-frame-hover-x2.png": {
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "size_px": [
+        920,
+        1280
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/inspector-ru/card-frame-selected-x2.png": {
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "size_px": [
+        920,
+        1280
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/inspector-ru/card-frame-warning-x2.png": {
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "size_px": [
+        920,
+        1280
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/inspector-ru/card-frame-flash-x2.png": {
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "size_px": [
+        920,
+        1280
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/inspector-ru/card-frame-focus-x2.png": {
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "size_px": [
+        936,
+        1296
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/inspector-en/card-frame-idle-x2.png": {
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "size_px": [
+        816,
+        1132
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/inspector-en/card-frame-hover-x2.png": {
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "size_px": [
+        816,
+        1132
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/inspector-en/card-frame-selected-x2.png": {
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "size_px": [
+        816,
+        1132
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/inspector-en/card-frame-warning-x2.png": {
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "size_px": [
+        816,
+        1132
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/inspector-en/card-frame-flash-x2.png": {
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "size_px": [
+        816,
+        1132
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/inspector-en/card-frame-focus-x2.png": {
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "size_px": [
+        832,
+        1148
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/class-s-hand/card-frame-idle-x2.png": {
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "size_px": [
+        240,
+        332
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/class-s-hand/card-frame-hover-x2.png": {
+      "nine_slice_px": [
+        21,
+        21,
+        21,
+        21
+      ],
+      "size_px": [
+        240,
+        332
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/class-s-hand/card-frame-selected-x2.png": {
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "size_px": [
+        240,
+        332
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/class-s-hand/card-frame-warning-x2.png": {
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "size_px": [
+        240,
+        332
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/class-s-hand/card-frame-flash-x2.png": {
+      "nine_slice_px": [
+        23,
+        23,
+        23,
+        23
+      ],
+      "size_px": [
+        240,
+        332
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/class-s-hand/card-frame-focus-x2.png": {
+      "nine_slice_px": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "size_px": [
+        256,
+        348
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/opponent-back/card-frame-idle-x2.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        96,
+        134
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/opponent-back/card-frame-hover-x2.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        96,
+        134
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/opponent-back/card-frame-selected-x2.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        96,
+        134
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/opponent-back/card-frame-warning-x2.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        96,
+        134
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/opponent-back/card-frame-flash-x2.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        96,
+        134
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/opponent-back/card-frame-focus-x2.png": {
+      "nine_slice_px": [
+        17,
+        17,
+        17,
+        17
+      ],
+      "size_px": [
+        112,
+        150
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/deck-chip/card-frame-idle-x2.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        64,
+        90
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/deck-chip/card-frame-hover-x2.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        64,
+        90
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/deck-chip/card-frame-selected-x2.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        64,
+        90
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/deck-chip/card-frame-warning-x2.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        64,
+        90
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/deck-chip/card-frame-flash-x2.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        64,
+        90
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/deck-chip/card-frame-focus-x2.png": {
+      "nine_slice_px": [
+        17,
+        17,
+        17,
+        17
+      ],
+      "size_px": [
+        80,
+        106
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/discard-chip/card-frame-idle-x2.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        64,
+        90
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/discard-chip/card-frame-hover-x2.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        64,
+        90
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/discard-chip/card-frame-selected-x2.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        64,
+        90
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/discard-chip/card-frame-warning-x2.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        64,
+        90
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/discard-chip/card-frame-flash-x2.png": {
+      "nine_slice_px": [
+        13,
+        13,
+        13,
+        13
+      ],
+      "size_px": [
+        64,
+        90
+      ],
+      "opaque_pixels_outside_palette": 0
+    },
+    "vector/sizes/discard-chip/card-frame-focus-x2.png": {
+      "nine_slice_px": [
+        17,
+        17,
+        17,
+        17
+      ],
+      "size_px": [
+        80,
+        106
+      ],
+      "opaque_pixels_outside_palette": 0
+    }
+  },
+  "verification_duration_seconds": 53.97,
+  "runtime_animation_verified": false,
+  "runtime_note": "Static procedural package only. No Unreal opened. 500 ms cue and lift offsets specified, not tested in engine."
+}
