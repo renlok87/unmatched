@@ -29,6 +29,14 @@
 //     turn start - set A (own turn at rest) and set B (the opponent's turn while it thinks). At that own turn start
 //     the auto plan holds 3.4 s (S09SchemeQuietUntil), so the own + 3 s frame is still the idle turn and the other
 //     client's + 3 s frame still shows the opponent thinking. Files s09-exit-{own,opp}-t{0.5,3.0}.png, trace EXITSHOT.
+//   - VS-2 exit-frame fixes (the frames showed the new UMG blocks over the Slate blocks that stay until VS-3 / VS-4):
+//       ВР-VS2-71 PANEL-OPP and OPP-HAND fade out under the open deck panel (and the open discard browser) -
+//                 UmHudDeckPanelLayering;
+//       ВР-VS2-72 the Slate side panel (BROWSE DISCARD PILES / YOUR DECK / OPP DECK) lay under PANEL-OPP: without the
+//                 gate layer it is collapsed while it shows only those buttons (the panels, K / Shift+K and D open the
+//                 same); the open browser or inspector shows it - UmHudDeckPanelLayering (rollback -S08SlateHud=panels);
+//       ВР-VS2-73 the Slate command panel starts under TOP while TOP is shown (it lay under the plate) - TickUmHud
+//                 (rollback -S08SlateHud=top).
 #include "S08FlowGameMode.h"
 
 #include "S08AnimatedIconWidget.h"
@@ -45,6 +53,7 @@
 #include "UI/UmHudRoot.h"
 #include "UI/UmHudScale.h"
 #include "UI/UmHudTheme.h"
+#include "UI/UmHudTop.h"
 #include "UI/UmTopStrip.h"
 #include "Brushes/SlateRoundedBoxBrush.h"
 #include "Engine/Engine.h"
@@ -97,6 +106,9 @@ struct FUmHudRuntime {
   float ExitOwnAt = -1.0f;
   float ExitOppAt = -1.0f;
   uint32 ExitTaken = 0;
+  // ВР-VS2-72 / -73: the Slate side panel collapsed here; the command panel's shift under TOP (su, traced on a change)
+  bool bSideCollapsed = false;
+  float CommandShiftSu = 0.0f;
 };
 
 namespace {
@@ -275,6 +287,25 @@ FMargin AS08FlowGameMode::UmHudToastOffset() const {
 }
 
 void AS08FlowGameMode::UmHudDeckPanelLayering(float DeckAlpha) {
+  // ВР-VS2-71 / -72 (VS-2 exit frames): PANEL-OPP and OPP-HAND at the top right, the deck panel and the Slate side panel
+  if (UmHud.IsValid() && UmHud->Panels.PanelsOnUmg()) {
+    FUmHudRuntime& R = *UmHud;
+    const bool bSideOpen = bDiscardBrowserOpen || bInspecting;
+    // the gate layer (-S09Markers) keeps the side panel and its debug lines as they were
+    if (const TSharedPtr<SWidget> Side = S08ArtLook::S08Markers() ? nullptr : ArtHud.SidePanel.Pin()) {
+      if (!bSideOpen && Side->GetVisibility() != EVisibility::Collapsed) {
+        Side->SetVisibility(EVisibility::Collapsed);
+        R.bSideCollapsed = true;
+      } else if (bSideOpen && R.bSideCollapsed) {
+        Side->SetVisibility(EVisibility::Visible);
+        R.bSideCollapsed = false;
+      }
+    }
+    const float Keep = 1.0f - (bSideOpen ? 1.0f : FMath::Clamp(DeckAlpha, 0.0f, 1.0f));
+    for (UWidget* W : {static_cast<UWidget*>(R.Panels.GetOpp()), static_cast<UWidget*>(R.Panels.GetOppHand())}) {
+      if (W && !FMath::IsNearlyEqual(W->GetRenderOpacity(), Keep, 1.0e-3f)) W->SetRenderOpacity(Keep);
+    }
+  }
   // deckpanel: what lies under the open deck panel at the right edge fades out with it (the side counters already
   // do): the right combat edge - a read-only panel never shows a block through it or under its short bottom edge
   if (!CombatEdgeRight.IsValid() || UmHudBlockOnSlate(TEXT("deckpanel"))) return;
@@ -340,6 +371,17 @@ void AS08FlowGameMode::TickUmHud() {
   TickUmTopStrip();  // VS-2 HB-14...HB-16
   TickUmPanels();    // VS-2 HB-18...HB-21
   FUmHudRuntime& R = *UmHud;
+  // ВР-VS2-73: the Slate command panel (top left until ACTIONS / CENTER, VS-4) starts 8 su under TOP while TOP is shown
+  if (const TSharedPtr<SWidget> Cmd = ArtHud.CommandPanel.Pin()) {
+    const UUmHudTop* TopW = R.TopStrip.GetTop();
+    const float Shift = (TopW && TopW->IsVisible()) ? static_cast<float>(R.Layout.Rect(EUmHudBlock::Top).Max.Y) + 8.0f : 0.0f;
+    if (!FMath::IsNearlyEqual(Shift, R.CommandShiftSu, 0.5f)) {
+      R.CommandShiftSu = Shift;
+      Cmd->SetRenderTransform(Shift > 0.0f ? TOptional<FSlateRenderTransform>(FSlateRenderTransform(FVector2f(0.0f, Shift)))
+                                           : TOptional<FSlateRenderTransform>());
+      FS08Trace::Write(FString::Printf(TEXT("HUD-CMD shift=%.0f top=%d"), Shift, Shift > 0.0f ? 1 : 0));
+    }
+  }
   const float PxPerSu = HudPixelsPerUnit() > 0.0f ? HudPixelsPerUnit() : R.Layout.PxPerSu;
   // ---- the top of the hand actually drawn (the Slate panel, its SD-26 offset included): the stack stays over it ----
   float HandTopSu = -1.0f;

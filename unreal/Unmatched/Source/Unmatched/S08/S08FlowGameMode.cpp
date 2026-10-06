@@ -7031,10 +7031,11 @@ void AS08FlowGameMode::RefreshHud() {
     }
     AddLine(TEXT("the server blocks further actions until the queue drains"));
   } else if (Hud.bViewerTurn) {
-    AddHeader(TEXT("YOUR TURN"), FLinearColor(0.7f, 1.0f, 0.7f, 1.0f));
-    AddLine(FString::Printf(TEXT("actions left: %d   phase: %s"),
-                            FMath::Max(0, Hud.ActionsRemaining), *Hud.Phase));
-    AddLine(TEXT("M begin maneuver  |  A attack draft  |  G scheme picker  |  E end turn"));
+    if (UmHudBlockOnSlate(TEXT("status"))) {  // VS-2 ВР-VS2-74: the UMG STATUS and PANEL-LOC say it (as HB-15)
+      AddHeader(TEXT("YOUR TURN"), FLinearColor(0.7f, 1.0f, 0.7f, 1.0f));
+      AddLine(FString::Printf(TEXT("actions left: %d   phase: %s"), FMath::Max(0, Hud.ActionsRemaining), *Hud.Phase));
+      AddLine(TEXT("M begin maneuver  |  A attack draft  |  G scheme picker  |  E end turn"));
+    }
     CommandBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
         [SNew(SHorizontalBox) +
          SHorizontalBox::Slot().AutoWidth().Padding(0, 0, 8, 0)
