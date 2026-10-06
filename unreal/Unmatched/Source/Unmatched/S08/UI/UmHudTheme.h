@@ -59,6 +59,13 @@ class UNMATCHED_API UUmHudTheme : public UDataAsset {
   /** HB-10: the x2 textures of the 9-slice skins (same keys as Skins; empty before the import). */
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Um HUD Theme")
   TMap<FName, FSlateBrush> SkinsX2;
+  /** VS-3 CP-14: the card frame skins card.frame.idle / .hover / .selected / .warning / .flash / .focus / .mini / .new
+   *  (the CP-13 package art/imagegen/card-frame-v1-codex, tools/art/cards/ue_import_card_media.py --frames) - kept apart
+   *  from the 29 token Skins of HB-08 (ВР-VS3-03); x1 here, x2 in CardFramesX2. */
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Um HUD Theme")
+  TMap<FName, FSlateBrush> CardFrames;
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Um HUD Theme")
+  TMap<FName, FSlateBrush> CardFramesX2;
   /** sha256 of hud-style-tokens.json the asset was imported from (hud_contract.py validate compares it). */
   UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Um HUD Theme")
   FString TokensJsonSha256;
@@ -87,6 +94,11 @@ class UNMATCHED_API UUmHudTheme : public UDataAsset {
   /** True when Key is a 9-slice PNG skin (HB-10 imported), not the ВР-HB06 fallback. */
   bool HasTextureSkin(FName Key) const;
   static constexpr float SkinX2MinPxPerSu = 1.5f;
+  /** VS-3 CP-14: the card frame skins card.frame.* switch to their x2 texture earlier - at DPI x UI scale >= 1.333
+   *  (cards-portraits.csv CP-14 p. 3: the frame edge is 1 su, the x1 PNG would be magnified 1.33x and soften). */
+  static constexpr float CardFrameX2MinPxPerSu = 1.333f;
+  /** The card.frame.* skin for this px per su (x2 from CardFrameX2MinPxPerSu); nullptr before the CP-14 import. */
+  const FSlateBrush* CardFrameFor(FName Key, float PxPerSu) const;
 
   // ---- import (UE Python: tools/s08/hud_contract/hud_theme_import.py; FillFromHeader uses the same calls) ----
   UFUNCTION(BlueprintCallable, Category = "Um HUD Theme|Import")
@@ -114,6 +126,10 @@ class UNMATCHED_API UUmHudTheme : public UDataAsset {
    *  the files: a -nullrhi commandlet has no texture resource to ask); margins are the slice-margins.json pixels of each
    *  file (converted to fractions of that file here); bNineSlice false = DrawAs Image (stretch 'none': the checkbox).
    *  ImageSize = the x1 size in su. False on a missing texture or a zero size. */
+  /** VS-3 CP-14: a card frame (CardFrames / CardFramesX2) - the same brush rules as ImportTextureSkin. */
+  UFUNCTION(BlueprintCallable, Category = "Um HUD Theme|Import")
+  bool ImportCardFrame(FName Key, UTexture2D* X1, UTexture2D* X2, FVector2D SizePxX1, FVector2D SizePxX2,
+                       FMargin MarginPxX1, FMargin MarginPxX2, bool bNineSlice);
   UFUNCTION(BlueprintCallable, Category = "Um HUD Theme|Import")
   bool ImportTextureSkin(FName Key, UTexture2D* X1, UTexture2D* X2, FVector2D SizePxX1, FVector2D SizePxX2,
                          FMargin MarginPxX1, FMargin MarginPxX2, bool bNineSlice);

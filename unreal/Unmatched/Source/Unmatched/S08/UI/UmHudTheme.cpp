@@ -148,6 +148,14 @@ const FSlateBrush* UUmHudTheme::SkinFor(FName Key, float PxPerSu) const {
   return Skin(Key);
 }
 
+const FSlateBrush* UUmHudTheme::CardFrameFor(FName Key, float PxPerSu) const {
+  // no Warning: before the CP-14 import the card widget draws its rounded fallback frame
+  if (PxPerSu >= CardFrameX2MinPxPerSu) {
+    if (const FSlateBrush* X2 = CardFramesX2.Find(Key)) return X2;
+  }
+  return CardFrames.Find(Key);
+}
+
 bool UUmHudTheme::HasTextureSkin(FName Key) const {
   const FSlateBrush* Found = Skins.Find(Key);
   return Found && Found->GetResourceObject() != nullptr;
@@ -181,6 +189,21 @@ bool UUmHudTheme::ImportTextureSkin(FName Key, UTexture2D* X1, UTexture2D* X2, F
   return true;
 }
 
+bool UUmHudTheme::ImportCardFrame(FName Key, UTexture2D* X1, UTexture2D* X2, FVector2D SizePxX1, FVector2D SizePxX2,
+                                  FMargin MarginPxX1, FMargin MarginPxX2, bool bNineSlice) {
+  // the brush rules of ImportTextureSkin, into the card frame maps (ВР-VS3-03)
+  TMap<FName, FSlateBrush> SavedSkins = Skins;
+  TMap<FName, FSlateBrush> SavedX2 = SkinsX2;
+  const bool bOk = ImportTextureSkin(Key, X1, X2, SizePxX1, SizePxX2, MarginPxX1, MarginPxX2, bNineSlice);
+  if (bOk) {
+    CardFrames.Add(Key, Skins.FindChecked(Key));
+    CardFramesX2.Add(Key, SkinsX2.FindChecked(Key));
+  }
+  Skins = MoveTemp(SavedSkins);
+  SkinsX2 = MoveTemp(SavedX2);
+  return bOk;
+}
+
 void UUmHudTheme::ImportReset() {
   Colors.Reset();
   Alphas.Reset();
@@ -190,6 +213,8 @@ void UUmHudTheme::ImportReset() {
   MotionMs.Reset();
   Skins.Reset();
   SkinsX2.Reset();
+  CardFrames.Reset();
+  CardFramesX2.Reset();
   TokensJsonSha256.Reset();
 }
 

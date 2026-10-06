@@ -82,11 +82,15 @@ def main() -> None:
     sys.path.insert(0, str(HERE.parents[1] / "art"))
     import hud_skins_import as skins  # noqa: E402
     texture_skins = skins.bind_theme(theme)
+    # VS-3 CP-14: the card frames (tools/art/cards/ue_import_card_media.py --frames) likewise; 0 before their import
+    sys.path.insert(0, str(HERE.parents[1] / "art" / "cards"))
+    import ue_import_card_media as card_media  # noqa: E402
+    card_frames = card_media.bind_frames(theme)
     if not u.EditorAssetLibrary.save_loaded_asset(theme, only_if_is_dirty=False):
         raise RuntimeError("could not save %s" % ASSET_PATH)
-    log("saved %s colors=%d alphas=%d type=%d space=%d radius=%d motion=%d skins=%d textureSkins=%d sha256=%s"
-        % (ASSET_PATH, len(c["colors"]), len(c["alphas"]), len(c["types"]), len(c["space"]), len(c["radius"]),
-           len(c["motion"]), len(c["skins"]), texture_skins, sha))
+    log("saved %s colors=%d alphas=%d type=%d space=%d radius=%d motion=%d skins=%d textureSkins=%d cardFrames=%d "
+        "sha256=%s" % (ASSET_PATH, len(c["colors"]), len(c["alphas"]), len(c["types"]), len(c["space"]),
+                       len(c["radius"]), len(c["motion"]), len(c["skins"]), texture_skins, card_frames, sha))
 
 
 if __name__ == "__main__":
