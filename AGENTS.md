@@ -262,9 +262,13 @@ memory. A change that contradicts it needs the user's explicit word first.
 - **Look before you report.** Before reporting any live run, demo, package or acceptance, open the shot yourself
   (Read the PNG). Check against this section: the board is a real map, the backdrop is right for that map, and
   all six figures are the v2 models. Trace lines alone are not enough.
-- **Still open, decided by the user, not by default:**
-  - figure facing (ART-012; unfinished draft on branch `wip/art012-facing-2026-10-04`, not integrated);
-  - HUD name plates over the figures.
+- **Decided by delegation on 2026-10-06.** The user's words: «Не знаю. Делай сам, меня это не касается. Все решения
+  принимай». The record is `docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md`:
+  - figure facing (ART-012) is ВР-06: idle three-quarter to the camera, turn to the target for the attack, never back
+    to the camera. The old draft `wip/art012-facing-2026-10-04` is not used;
+  - HUD name plates over the figures are ВР-07: no permanent name plates, the name only on hover or selection,
+    harpies carry the digit 1–3.
 - **Known gap at 2026-10-04.** Since `0f2bdb9a`, Marmoreal shows the 3D P5c surroundings by default, which
-  violates the backdrop rule above. Fixing it (ENV-U16) is the next Unreal task. The user stopped all Unreal work
-  on 2026-10-04, so do not start it without the user's go-ahead.
+  violates the backdrop rule above. Fixing it (ENV-U16) belongs to the visual chat (`docs/game-design/visual/`),
+  which has the user's Unreal go-ahead of 2026-10-05 and works in a worktree. After the fix, 3D P5c with the T2b
+  tray is reachable only through the rollback flag `-NoConceptPaste` (ВР-56).
