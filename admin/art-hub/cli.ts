@@ -31,6 +31,11 @@ function main(argv: string[]) {
           c.videoRefs?.cues.reduce((n, q) => n + q.takes.filter((t) => t.video).length, 0) ?? 0
         }, слотов ${c.clips?.slots.length ?? 0}`,
     ),
+    `  звук: ${data.audio.registry.units.length} единиц реестра (${data.audio.registry.byStatus.map((s) => `${s.status} ${s.count}`).join(', ') || '—'}), реплик ${
+      data.audio.vo.total
+    }, SoundWave в UE ${data.audio.ue.soundWaves}, микс ${data.audio.mix.latest ? `${data.audio.mix.latest.date} (${data.audio.mix.latest.rows.length} замера)` : '—'}, AUC-* ${
+      data.audio.spends.spent
+    } ${data.audio.spends.unit}`,
   ];
   console.log(lines.join('\n'));
   if (data.warnings.length) console.log(`предупреждения:\n  ${data.warnings.join('\n  ')}`);

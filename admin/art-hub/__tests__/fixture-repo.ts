@@ -416,3 +416,87 @@ export function addOverviewFixtures(repo: FixtureRepo): void {
   write(`${ml}/evidence/v2/master/um-sheet-wall.jpg`, png);
   write(`${ml}/evidence/v2/master/probe.json`, '{}');
 }
+
+/** 230-character note: the hub cuts it to 200. */
+export const AUDIO_LONG_NOTE = `${'длинная заметка '.repeat(14)}конец`;
+
+/**
+ * Adds the game-audio track (docs/game-design/audio, evidence/AUDIO, UE
+ * SoundWaves, AUC-* ledger entries) to a fixture repo.
+ */
+export function addAudioFixtures(repo: FixtureRepo): void {
+  const { write } = repo;
+  const json = (rel: string, v: unknown) => write(rel, JSON.stringify(v, null, 2));
+  const read = (rel: string) => JSON.parse(fs.readFileSync(path.join(repo.root, ...rel.split('/')), 'utf8')) as Record<string, any>;
+  const audio = 'docs/game-design/audio';
+
+  write(`${audio}/00-AUDIO-BRIEF.md`, '# Звук: бриф\n\nДата: 2026-01-03. Статус: принято.\n\n## 1. Цель\n\n## 2. Объём\n');
+  write(`${audio}/START-PROMPT.md`, '# Промпт чата (не документ)\n');
+  write(
+    `${audio}/03-sound-registry.csv`,
+    [
+      'id,category,name_ru,event_or_cue,trigger,duration_ms,variations,bus,priority,concurrency,loop,scope,owner,source_plan,license,status,file,de013_role,notes',
+      `VO-HERO-ATTACK,vo,Герой: атака,CUE-020,атака,800,2,VO,2,1,нет,MVP,Hero,elevenlabs,SYNTX,in-game,/Game/Audio/VO/Hero/SW_VO_HERO_ATTACK_*,,${AUDIO_LONG_NOTE}`,
+      'VO-HERO-ATTACK-BIG,vo,Герой: сильная атака,CUE-020,атака ≥ 4,900,1,VO,2,1,нет,MVP,Hero,elevenlabs,SYNTX,in-game,/Game/Audio/VO/Hero/SW_VO_HERO_ATTACK_BIG_*,,',
+      'FX-HERO-SLASH,fx,Удар героя,CUE-014,способность,600,1,SFX,3,1,нет,MVP,-,kenney,CC0,in-game,/Game/Audio/FX/SW_FX_HERO_SLASH,,',
+      'FX-GLARE,fx,Взгляд,CUE-015,способность,700,1,SFX,3,1,нет,MVP,Hero,synth,своё,in-game,/Game/Audio/FX/SW_FX_GLARE,,ассета нет',
+      'UI-BTN-HOVER,ui,Наведение на кнопку,-,hover,80,2,UI,5,1,нет,MVP,-,kenney,CC0,in-bank,/Game/Audio/UI/SW_UI_BTN_HOVER_*,,"AU-S5: не звучит, нет события ""hover"""',
+      'CMB-HIT-BLUNT,combat,Удар дробящий,-,-,-,-,SFX,3,1,нет,framework,-,-,-,template,,,',
+      'MOT-DUEL,motif,Мотив дуэли,-,-,-,-,-,-,-,нет,MVP,-,midi,своё,done-source,C:/tmp/audio-src/sketches/MOT-DUEL.mid|.wav (вне git),,',
+      'UI-BRD-HOVER,ui,Наведение на клетку,-,-,-,-,-,-,-,нет,MVP,-,-,-,none-by-design,,,нет по замыслу',
+    ].join('\n'),
+  );
+  write(`${audio}/06-task-cards.csv`, 'id,title\nAUC-V01,реплики\n');
+  write(
+    `${audio}/04-vo-script.md`,
+    [
+      '# 04 — Реплики',
+      '',
+      '## 2. Hero — 3 реплики',
+      '',
+      '| ID | EN (текст озвучки) | RU (субтитр) | Направление |',
+      '|---|---|---|---|',
+      '| HERO-ATTACK-01 | Go! | Вперёд! | [firm] |',
+      '| HERO-ATTACK-02 | For the realm. | За королевство. | [rousing] |',
+      '| HERO-DEATH-01 | — | — | [groan] |',
+      '| HERO-ATTACK-01 | Go! | Вперёд! | [firm] |',
+      '',
+      '## 5. Гарпии',
+      '',
+      '| ID | Что | Направление |',
+      '|---|---|---|',
+      '| HARPY-ATTACK-01…03 | визг | короткий |',
+      '| HARPY-RETURN-01 | восходящий визг | 0,6 с |',
+      '',
+    ].join('\n'),
+  );
+  write(
+    `${audio}/07-production-log.md`,
+    '# 07 — Журнал производства\n\nДата: 2026-01-04.\n\n## 0. Итог\n\n| Слой | Статус | Где |\n|---|---|---|\n| Реплики | **в игре** | `/Game/Audio/VO/` |\n\n## 1. Решения\n',
+  );
+
+  const ev = 'docs/game-design/evidence/AUDIO';
+  write(`${ev}/2026-01-03/arena-host.trace.log`, 'trace');
+  write(`${ev}/2026-01-04/arena-host-frame.png`, Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 7]));
+  const targets = { I: '-20.0 ±2.0', TP_max: -1.0 };
+  json(`${ev}/2026-01-04/arena-host-mix.json`, { I: -19.8, LRA: 7, TP: -1.5, S_max: -16.8, near_peak_share: 0.6, seconds: 60.5, file: 'host.wav', correction_db: 0, ok_I: true, ok_TP: true, targets });
+  json(`${ev}/2026-01-04/arena-joiner-mix.json`, { I: -23.1, TP: -2, S_max: -19, seconds: 58, ok_I: false, ok_TP: true, targets });
+  write(`${ev}/2026-01-04/broken-host-mix.json`, '{ "I": -20, ');
+
+  const ue = 'unreal/Unmatched/Content/Audio';
+  write(`${ue}/VO/Hero/SW_VO_HERO_ATTACK_01.uasset`, 'sw');
+  write(`${ue}/VO/Hero/SW_VO_HERO_ATTACK_02.uasset`, 'sw');
+  write(`${ue}/VO/Hero/SW_VO_HERO_ATTACK_BIG_01.uasset`, 'sw');
+  write(`${ue}/FX/SW_FX_HERO_SLASH_01.uasset`, 'sw');
+  write(`${ue}/UI/SW_UI_BTN_HOVER_01.uasset`, 'sw');
+  write(`${ue}/Combat/SW_CMB_HIT_BLUNT_01.uasset`, 'sw');
+
+  const ledgerRel = 'docs/art-pipeline/evidence/baseline/credits-ledger.json';
+  const ledger = read(ledgerRel);
+  ledger.syntx.window.entries.push(
+    { time: '2026-01-02T10:00:00+05:00', asset: 'VO-HERO-ATTACK', cue: 'AUC-V01', op: 'tts (ElevenLabs v3)', model: 'ElevenLabs v3', delta: -2.5, balanceBefore: 86.5, balanceAfter: 84, ref: 'C:/tmp/audio-src/syntx-runs/AUC-V01/' },
+    { time: '2026-01-02T11:00:00+05:00', asset: 'MUS-MENU', cue: 'AUC-M01', op: 'music (Suno)', delta: -10, balanceBefore: 84, balanceAfter: 74, ref: 'C:/tmp/audio-src/syntx-runs/AUC-M01/' },
+    { time: '2026-01-02T11:05:00+05:00', asset: 'MUS-MENU', cue: 'AUC-M01', op: 'возврат за сбой', delta: 1, balanceBefore: 74, balanceAfter: 75 },
+  );
+  json(ledgerRel, ledger);
+}

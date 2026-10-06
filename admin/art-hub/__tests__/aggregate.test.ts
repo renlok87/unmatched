@@ -200,6 +200,7 @@ describe('aggregate on a fixture repo', () => {
       expect(d.characters).toEqual([]);
       expect(d.props).toEqual([]);
       expect(d.warnings.join(' ')).toMatch(/asset-registry\.json/);
+      expect(d.audio).toMatchObject({ docs: [], tables: [], registry: { units: [] }, vo: { total: 0 }, ue: { found: null } });
     } finally {
       fs.rmSync(empty, { recursive: true, force: true });
     }

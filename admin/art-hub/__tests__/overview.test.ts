@@ -3,9 +3,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { ArtHubAggregator, aggregate } from '../aggregate';
+import { parseVoScript, uePatternRe } from '../audio';
 import { heroSlug, latestLayerOf, newestDate } from '../overview';
 import type { ArtHubData, AssetPage, LayerView } from '../types';
-import { HERO, addOverviewFixtures, makeFixtureRepo, type FixtureRepo } from './fixture-repo';
+import { AUDIO_LONG_NOTE, HERO, addAudioFixtures, addOverviewFixtures, makeFixtureRepo, type FixtureRepo } from './fixture-repo';
 
 const REAL_REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 
@@ -44,6 +45,192 @@ describe('overview helpers', () => {
   it('maps asset ids to concept folder slugs', () => {
     expect(heroSlug('ASSET-KING-ARTHUR-001')).toBe('king-arthur');
     expect(heroSlug('ASSET-MEDUSA-001')).toBe('medusa');
+  });
+
+  it('counts VO lines per fighter: text rows, wordless rows, cry ranges', () => {
+    const md = [
+      '| ARTHUR-ATTACK-01 | For Camelot! | За Камелот! | [firm] |',
+      '| ARTHUR-HURT-01 | — | — | [grunts] |',
+      '| King Arthur | голос | пробы |',
+      '| HARPY-ATTACK-01…03 | визг | коротко |',
+      '| HARPY-HURT-01..02 | клёкот | 0,2 с |',
+      '| HARPY-RETURN-01 | визг | 0,6 с |',
+    ].join('\r\n');
+    expect(parseVoScript(md)).toEqual([
+      { fighter: 'ARTHUR', lines: 2, wordless: 1 },
+      { fighter: 'HARPY', lines: 6, wordless: 6 },
+    ]);
+  });
+
+  it('turns registry UE paths into asset patterns', () => {
+    const star = uePatternRe('/Game/Audio/VO/Arthur/SW_VO_ARTHUR_ATTACK_*')!;
+    expect(star.test('unreal/Unmatched/Content/Audio/VO/Arthur/SW_VO_ARTHUR_ATTACK_03.uasset')).toBe(true);
+    expect(star.test('unreal/Unmatched/Content/Audio/VO/Arthur/sub/SW_VO_ARTHUR_ATTACK_03.uasset')).toBe(false);
+    const exact = uePatternRe('/Game/Audio/UI/SW_UI_TOAST')!;
+    expect(['SW_UI_TOAST', 'SW_UI_TOAST_01', 'SW_UI_TOAST_GO_01'].map((n) => exact.test(`unreal/Unmatched/Content/Audio/UI/${n}.uasset`))).toEqual([true, true, false]);
+    expect(uePatternRe('C:/tmp/audio-src/MOT-DUEL.mid')).toBeUndefined();
+    expect(uePatternRe(undefined)).toBeUndefined();
+  });
+});
+
+describe('audio section on a fixture repo', () => {
+  let repo: FixtureRepo;
+  let data: ArtHubData;
+
+  beforeAll(() => {
+    repo = makeFixtureRepo();
+    addAudioFixtures(repo);
+    data = aggregate(repo.root);
+  });
+  afterAll(() => repo.cleanup());
+
+  it('counts registry units by status and category, matches UE SoundWaves', () => {
+    const r = data.audio.registry;
+    expect(r.file).toMatchObject({ exists: true, servable: true });
+    expect(r.error).toBeUndefined();
+    expect(r.byStatus).toEqual([
+      { status: 'in-game', count: 4 },
+      { status: 'in-bank', count: 1 },
+      { status: 'done-source', count: 1 },
+      { status: 'template', count: 1 },
+      { status: 'none-by-design', count: 1 },
+    ]);
+    expect(r.byCategory.map((c) => [c.category, c.count])).toEqual([
+      ['fx', 2],
+      ['ui', 2],
+      ['vo', 2],
+      ['combat', 1],
+      ['motif', 1],
+    ]);
+    const byId = new Map(r.units.map((u) => [u.id, u]));
+    // each asset counts once, for the most specific pattern; a name without * takes its _NN variants
+    expect(['VO-HERO-ATTACK', 'VO-HERO-ATTACK-BIG', 'FX-HERO-SLASH', 'FX-GLARE', 'UI-BTN-HOVER', 'CMB-HIT-BLUNT', 'MOT-DUEL'].map((id) => byId.get(id)!.ueAssets)).toEqual([
+      2, 1, 1, 0, 1, undefined, undefined,
+    ]);
+    expect(r.missingInUe).toEqual(['FX-GLARE']);
+    expect(byId.get('UI-BTN-HOVER')).toMatchObject({ status: 'in-bank', owner: undefined, notes: 'AU-S5: не звучит, нет события "hover"' });
+    expect(byId.get('MOT-DUEL')!.file).toBe('C:/tmp/audio-src/sketches/MOT-DUEL.mid|.wav (вне git)');
+    const note = byId.get('VO-HERO-ATTACK')!.notes!;
+    expect(AUDIO_LONG_NOTE.length).toBeGreaterThan(200);
+    expect(note).toHaveLength(200);
+    expect(note.endsWith('…')).toBe(true);
+    const ue = data.audio.ue;
+    expect(ue).toMatchObject({ found: true, soundWaves: 6, unregistered: ['unreal/Unmatched/Content/Audio/Combat/SW_CMB_HIT_BLUNT_01.uasset'] });
+    expect(ue.byFolder).toEqual([
+      { folder: 'Combat', count: 1 },
+      { folder: 'FX', count: 1 },
+      { folder: 'UI', count: 1 },
+      { folder: 'VO/Hero', count: 3 },
+    ]);
+  });
+
+  it('reads VO counts, the 07 summary, docs and tables', () => {
+    const a = data.audio;
+    expect(a.vo).toMatchObject({ total: 7, wordless: 5 });
+    expect(a.vo.fighters).toEqual([
+      { fighter: 'HERO', lines: 3, wordless: 1 },
+      { fighter: 'HARPY', lines: 4, wordless: 4 },
+    ]);
+    expect(a.vo.script.servable).toBe(true);
+    expect(a.summary?.rows).toEqual([
+      ['Слой', 'Статус', 'Где'],
+      ['Реплики', 'в игре', '/Game/Audio/VO/'],
+    ]);
+    expect(a.docs.map((d) => [d.file.path.split('/').pop(), d.title])).toEqual([
+      ['00-AUDIO-BRIEF.md', 'Звук: бриф'],
+      ['04-vo-script.md', '04 — Реплики'],
+      ['07-production-log.md', '07 — Журнал производства'],
+    ]);
+    expect(a.docs[0]).toMatchObject({ date: '2026-01-03', headings: ['1. Цель', '2. Объём'] });
+    expect(a.docs.every((d) => d.file.servable)).toBe(true);
+    expect(a.tables.map((t) => [t.path.split('/').pop(), t.role, t.servable])).toEqual([
+      ['03-sound-registry.csv', 'реестр единиц звука', true],
+      ['06-task-cards.csv', 'карточки задач производства', true],
+    ]);
+    const src = data.pipelineHealth.sources.find((s) => s.path === 'docs/game-design/audio/03-sound-registry.csv');
+    expect(src).toMatchObject({ exists: true });
+  });
+
+  it('shows the newest mix evidence; a half-written mix json is a warning', () => {
+    const mix = data.audio.mix;
+    expect(mix.folders.map((f) => [f.date, f.fileCount, f.mixCount])).toEqual([
+      ['2026-01-04', 4, 3],
+      ['2026-01-03', 1, 0],
+    ]);
+    const latest = mix.latest!;
+    expect(latest.date).toBe('2026-01-04');
+    expect(latest.rows.map((r) => [r.map, r.client, r.I, r.TP, r.sMax, r.seconds, r.okI, r.okTP, r.error])).toEqual([
+      ['arena', 'host', -19.8, -1.5, -16.8, 60.5, true, true, undefined],
+      ['arena', 'joiner', -23.1, -2, -19, 58, false, true, undefined],
+      ['broken', 'host', undefined, undefined, undefined, undefined, undefined, undefined, 'не разобран'],
+    ]);
+    expect(latest.targets).toEqual({ I: '-20.0 ±2.0', TP_max: '-1' });
+    expect(latest.files[0]).toMatchObject({ kind: 'image', servable: true });
+    expect(data.warnings.join('\n')).toMatch(/broken-host-mix\.json/);
+  });
+
+  it('sums AUC-* spends and takes them out of the unattributed list', () => {
+    const s = data.audio.spends;
+    expect(s.entries.map((e) => e.cue)).toEqual(['AUC-V01', 'AUC-M01', 'AUC-M01']);
+    expect(s).toMatchObject({ unit: 'токены SYNTX', spent: 12.5, refunds: 1, balanceStart: 86.5, balanceEnd: 75 });
+    expect(s.ledger?.path).toBe('docs/art-pipeline/evidence/baseline/credits-ledger.json');
+    expect(data.credits.unattributed.map((e) => e.op)).toEqual(['Неизвестная трата']);
+    expect(page(data, HERO).credits.syntxSpent).toBe(13.5);
+  });
+
+  it('adds the character units and VO lines to the «Звуки» tab', () => {
+    const s = page(data, HERO).sounds!;
+    expect(s.units.map((u) => [u.id, u.via])).toEqual([
+      ['VO-HERO-ATTACK', 'владелец (owner)'],
+      ['VO-HERO-ATTACK-BIG', 'владелец (owner)'],
+      ['FX-HERO-SLASH', 'ключ в id'],
+      ['FX-GLARE', 'владелец (owner)'],
+    ]);
+    expect(s.vo).toMatchObject({ fighter: 'HERO', lines: 3, wordless: 1 });
+    expect(s.registry?.exists).toBe(true);
+    // the file scan and the CUE table stay
+    expect(s.files.map((f) => f.path)).toContain('unreal/Unmatched/Content/Audio/VO/Hero/SW_VO_HERO_ATTACK_01.uasset');
+    expect(s.cues.map((c) => c.cueId)).toEqual(['CUE-017', 'CUE-014']);
+    const stub = page(data, 'ASSET-NEW-001').sounds!;
+    expect([stub.units, stub.vo]).toEqual([[], undefined]);
+  });
+
+  it('rebuilds when new mix evidence appears (audio files are part of the fingerprint)', () => {
+    const agg = new ArtHubAggregator(repo.root);
+    const first = agg.get();
+    expect(agg.get().fingerprint).toBe(first.fingerprint);
+    const rel = 'docs/game-design/evidence/AUDIO/2026-01-05/arena-host-mix.json';
+    repo.write(rel, JSON.stringify({ I: -20.1, TP: -1.2, ok_I: true, ok_TP: true }));
+    const second = agg.get();
+    expect(second.fingerprint).not.toBe(first.fingerprint);
+    expect(second.audio.mix.latest?.date).toBe('2026-01-05');
+    expect(second.audio.mix.latest?.rows.map((r) => r.I)).toEqual([-20.1]);
+    // audio files stay out of the art «recent files»
+    expect(second.pipelineHealth.recentFiles.some((f) => /^docs\/game-design\/(audio|evidence\/AUDIO)\//.test(f.path))).toBe(false);
+    fs.rmSync(path.join(repo.root, 'docs', 'game-design', 'evidence', 'AUDIO', '2026-01-05'), { recursive: true, force: true });
+  });
+});
+
+describe('audio section without audio files', () => {
+  let repo: FixtureRepo;
+
+  beforeAll(() => {
+    repo = makeFixtureRepo();
+  });
+  afterAll(() => repo.cleanup());
+
+  it('gives an empty section and no warnings', () => {
+    const d = aggregate(repo.root);
+    const a = d.audio;
+    expect(a.registry).toMatchObject({ units: [], byStatus: [], missingInUe: [] });
+    expect(a.registry.file.exists).toBe(false);
+    expect(a.vo).toMatchObject({ total: 0, fighters: [] });
+    expect([a.mix.latest, a.mix.folders, a.docs, a.tables, a.summary]).toEqual([undefined, [], [], [], undefined]);
+    expect(a.ue).toMatchObject({ found: false, soundWaves: 0, unregistered: [] });
+    expect(a.spends).toMatchObject({ spent: 0, entries: [] });
+    expect(d.warnings.join('\n')).not.toMatch(/audio|звук/i);
+    expect(d.pipelineHealth.sources.find((s) => s.path.endsWith('03-sound-registry.csv'))?.error).toBe('нет файла');
+    expect(page(d, HERO).sounds).toMatchObject({ units: [], vo: undefined });
   });
 });
 
@@ -219,5 +406,34 @@ describe('overview sections on the real repo', () => {
     expect(d.materials.sets.length).toBeGreaterThan(0);
     expect(d.decisions.length).toBeGreaterThan(0);
     expect(d.decisions.every((x) => x.file.servable)).toBe(true);
+  });
+
+  const hasAudio = fs.existsSync(path.join(REAL_REPO, 'docs', 'game-design', 'audio', '03-sound-registry.csv'));
+
+  it.skipIf(!hasAudio)('builds the audio section: registry, VO, mix evidence, spends, character units', () => {
+    const d = aggregate(REAL_REPO);
+    const a = d.audio;
+    expect(a.registry.units.length).toBeGreaterThan(100);
+    expect(a.registry.byStatus.find((s) => s.status === 'in-game')?.count).toBeGreaterThan(100);
+    expect(a.registry.byStatus.reduce((n, s) => n + s.count, 0)).toBe(a.registry.units.length);
+    expect(a.vo.fighters.map((f) => f.fighter)).toEqual(expect.arrayContaining(['ARTHUR', 'MERLIN', 'MEDUSA', 'HARPY']));
+    expect(a.vo.total).toBeGreaterThan(100);
+    expect(a.docs.length).toBeGreaterThanOrEqual(6);
+    expect(a.docs.every((x) => x.file.servable)).toBe(true);
+    expect(a.summary?.rows.length).toBeGreaterThan(2);
+    const latest = a.mix.latest!;
+    expect(latest.rows.length).toBeGreaterThanOrEqual(4);
+    expect(latest.rows.every((r) => r.I !== undefined && r.TP !== undefined && !r.error)).toBe(true);
+    expect(latest.targets?.I).toBeTruthy();
+    expect(a.spends.entries.length).toBeGreaterThan(0);
+    expect(a.spends.spent).toBeGreaterThan(0);
+    expect(d.credits.unattributed.some((e) => /^AUC-/.test(e.cue ?? ''))).toBe(false);
+    if (a.ue.found) expect(a.ue.soundWaves).toBeGreaterThan(100);
+    for (const id of ['ASSET-MEDUSA-001', 'ASSET-KING-ARTHUR-001', 'ASSET-MERLIN-001', 'ASSET-HARPY-001']) {
+      const s = page(d, id).sounds!;
+      expect(s.units.length).toBeGreaterThan(5);
+      expect(s.vo?.lines).toBeGreaterThan(5);
+    }
+    expect(d.warnings.filter((w) => /audio|AUDIO|звук/.test(w))).toEqual([]);
   });
 });

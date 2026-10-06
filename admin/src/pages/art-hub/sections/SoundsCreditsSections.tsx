@@ -2,12 +2,74 @@ import React from 'react';
 import { Alert, Card, Col, Empty, List, Row, Space, Statistic, Table, Tag, Typography } from 'antd';
 import type { CreditsSection, LedgerEntry, SoundSection } from '../../../../art-hub/types';
 import { fileUrl } from '../api';
-import { FileActions, FilePath, StatusTag } from '../components/common';
+import { AUDIO_STATUS, AudioStatusTag, AudioUnitsTable } from '../components/AudioUnits';
+import { FileActions, FilePath, StatusTag, useArtHubUi } from '../components/common';
 
 const { Text } = Typography;
 
+/** Units of 03-sound-registry.csv and VO lines of 04 that belong to the character. */
+const CharacterAudioCard: React.FC<{ sounds: SoundSection }> = ({ sounds }) => {
+  const ui = useArtHubUi();
+  const units = sounds.units ?? [];
+  const counts = new Map<string, number>();
+  for (const u of units) counts.set(u.status, (counts.get(u.status) ?? 0) + 1);
+  const order = Object.keys(AUDIO_STATUS);
+  const rank = (s: string) => (order.indexOf(s) + 1 || 99);
+  return (
+    <Card
+      size="small"
+      title={`Единицы реестра звука (${units.length})`}
+      extra={
+        <Space size={4}>
+          <Text type="secondary" style={{ fontSize: 12 }}>{sounds.registry?.path ?? 'docs/game-design/audio/03-sound-registry.csv'}</Text>
+          <a onClick={() => ui.openPage('audio')}>раздел «Звук»</a>
+        </Space>
+      }
+    >
+      <Space direction="vertical" size={8} style={{ width: '100%' }}>
+        <Space wrap size={[8, 4]}>
+          {[...counts.entries()]
+            .sort((a, b) => rank(a[0]) - rank(b[0]))
+            .map(([status, count]) => (
+              <AudioStatusTag key={status} status={status} count={count} />
+            ))}
+          {sounds.vo ? (
+            <Text>
+              Реплик в 04 ({sounds.vo.fighter}): <Text strong>{sounds.vo.lines}</Text>, без слов {sounds.vo.wordless}
+            </Text>
+          ) : (
+            <Text type="secondary">реплик в 04 нет</Text>
+          )}
+          {sounds.vo?.script ? (
+            <Space size={2}>
+              <Text type="secondary" style={{ fontSize: 12 }}>04:</Text>
+              <FileActions file={sounds.vo.script} title="реплики 04" />
+            </Space>
+          ) : null}
+          {sounds.vo?.log?.exists ? (
+            <Space size={2}>
+              <Text type="secondary" style={{ fontSize: 12 }}>07:</Text>
+              <FileActions file={sounds.vo.log} title="журнал производства 07" />
+            </Space>
+          ) : null}
+        </Space>
+        {sounds.registry && sounds.registry.exists === false ? (
+          <Alert type="info" showIcon message={`Реестра звука нет: ${sounds.registry.path}`} />
+        ) : (
+          <AudioUnitsTable units={units} showVia pageSize={20} />
+        )}
+        <Text type="secondary" style={{ fontSize: 12 }}>
+          Единица относится к персонажу по колонке owner или по ключу персонажа в id (VO-ARTHUR-…, DTH-MEDUSA). UE — число SoundWave по пути
+          колонки file (только подсчёт).
+        </Text>
+      </Space>
+    </Card>
+  );
+};
+
 export const SoundsSection: React.FC<{ sounds: SoundSection }> = ({ sounds }) => (
   <Space direction="vertical" size={16} style={{ width: '100%' }}>
+    <CharacterAudioCard sounds={sounds} />
     {sounds.files.length === 0 ? (
       <Alert
         type="info"

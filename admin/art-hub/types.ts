@@ -356,6 +356,126 @@ export interface SoundSection {
   cues: SoundCue[];
   cueSource?: FileRef;
   searchedRoots: string[];
+  /** units of docs/game-design/audio/03-sound-registry.csv that belong to the character (owner column or key in the id) */
+  units: CharacterAudioUnit[];
+  /** 03-sound-registry.csv (missing → exists: false) */
+  registry?: FileRef;
+  /** the character's lines in 04-vo-script.md (undefined = no lines for this fighter) */
+  vo?: { fighter: string; lines: number; wordless: number; script?: FileRef; log?: FileRef };
+}
+
+// ------------------------------------------------------------------ audio (docs/game-design/audio)
+
+export interface AudioUnitView {
+  id: string;
+  category: string;
+  nameRu?: string;
+  event?: string;
+  trigger?: string;
+  bus?: string;
+  priority?: string;
+  loop?: string;
+  scope?: string;
+  /** owner column: Arthur / Medusa / Marmoreal / … («-» → undefined) */
+  owner?: string;
+  sourcePlan?: string;
+  license?: string;
+  /** registry status, verbatim: in-game / in-bank / template / done-source / none-by-design */
+  status: string;
+  /** `file` column verbatim (UE path or pattern /Game/Audio/…/SW_*_*, or a path outside git) */
+  file?: string;
+  /**
+   * SoundWave assets in unreal/Unmatched/Content that match `file` (only counted, never served);
+   * undefined = `file` is not a /Game/ path or the UE project is not found.
+   */
+  ueAssets?: number;
+  /** notes column, cut to ~200 characters */
+  notes?: string;
+}
+
+export interface CharacterAudioUnit extends AudioUnitView {
+  /** how the unit was attributed to the character: owner column or the character key in the id */
+  via: string;
+}
+
+export interface AudioVoFighter {
+  /** first token of the line id: ARTHUR, MERLIN, MEDUSA, HARPY… */
+  fighter: string;
+  lines: number;
+  /** lines without words (EN «—», or cries in a table without a text column) */
+  wordless: number;
+}
+
+export interface AudioMixRow {
+  map: string;
+  /** host / joiner (from <map>-<client>-mix.json) */
+  client: string;
+  file: FileRef;
+  I?: number;
+  LRA?: number;
+  TP?: number;
+  sMax?: number;
+  nearPeakShare?: number;
+  seconds?: number;
+  correctionDb?: number;
+  okI?: boolean;
+  okTP?: boolean;
+  /** the json could not be parsed */
+  error?: string;
+}
+
+export interface AudioEvidenceFolder {
+  /** folder name under docs/game-design/evidence/AUDIO/ (a date) */
+  date: string;
+  dir: string;
+  fileCount: number;
+  mixCount: number;
+}
+
+export interface AudioOverview {
+  root: string;
+  docs: DocView[];
+  /** 03-sound-registry.csv, 06-task-cards.csv and other tables of the audio folder */
+  tables: FileRef[];
+  registry: {
+    file: FileRef;
+    error?: string;
+    units: AudioUnitView[];
+    byStatus: { status: string; count: number }[];
+    byCategory: { category: string; count: number }[];
+    /** units with a /Game/ path and status in-game / in-bank but no matching SoundWave in UE */
+    missingInUe: string[];
+  };
+  /** «## 0. Итог» table of 07-production-log.md (first row = header) */
+  summary?: { file: FileRef; rows: string[][] };
+  vo: { script: FileRef; log: FileRef; total: number; wordless: number; fighters: AudioVoFighter[] };
+  ue: {
+    contentRoot: string;
+    /** null = UE project not found */
+    found: boolean | null;
+    soundWaves: number;
+    /** SoundWaves not covered by any `file` path of the registry (e.g. templates without a path), first 100 */
+    unregistered: string[];
+    byFolder: { folder: string; count: number }[];
+  };
+  mix: {
+    evidenceRoot: string;
+    /** newest evidence folder with *-mix.json */
+    latest?: AudioEvidenceFolder & { rows: AudioMixRow[]; targets?: Record<string, string>; files: FileRef[] };
+    /** all evidence folders, newest first */
+    folders: AudioEvidenceFolder[];
+  };
+  spends: {
+    ledger?: FileRef;
+    unit: string;
+    /** sum of −Δ over AUC-* entries with Δ < 0 */
+    spent: number;
+    /** sum of Δ > 0 (refunds) */
+    refunds: number;
+    balanceStart?: number;
+    balanceEnd?: number;
+    entries: LedgerEntry[];
+  };
 }
 
 export interface LedgerEntry {
@@ -660,6 +780,8 @@ export interface ArtHubData {
   plan: PlanView;
   lookdev: LookdevOverview;
   materials: MaterialLibraryView;
+  /** game audio: docs/game-design/audio, evidence/AUDIO, AUC-* spends, UE SoundWaves */
+  audio: AudioOverview;
   decisions: DecisionView[];
   warnings: string[];
 }

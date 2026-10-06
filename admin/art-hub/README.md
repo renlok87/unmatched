@@ -4,7 +4,7 @@
 look-dev, риг, скелетные клипы, видео-референсы, конвейер «видео → скелет», звуки и
 кредиты по каждому персонажу (Medusa, King Arthur, Merlin, Harpy ×3) и по
 пропсам/окружению, плюс обзорные разделы: «Состояние пайплайна», «План и задачи»,
-«Look-dev и концепты», «Библиотека материалов», «Решения».
+«Look-dev и концепты», «Библиотека материалов», «Звук», «Решения».
 Только чтение: хаб ничего не пишет в данные пайплайна и не повышает статусы.
 
 ## Разделы (меню «Обзор»)
@@ -15,9 +15,12 @@ look-dev, риг, скелетные клипы, видео-референсы, 
 | План и задачи (`plan`) | `docs/art-pipeline/plan-status.json` (`unmatched-plan-status/v1`, пишет трек plan) | волны, задачи с фильтрами по треку/статусу, арт-статус, доказательства (раскрываются в таблицу файлов), следующий шаг/блокер. Пока файла нет — заглушка. Проверки: арт-статус вне словаря, «художественно принято» без акта `docs/game-design/evidence/(ART\|GD)-…/*.md`, отсутствующие файлы доказательств. Пути вне репо (`C:/tmp/…`) — только текст |
 | Look-dev и концепты (`lookdev`) | `art/imagegen/hero-quality-v1/<герой>/`, `docs/art-pipeline/<герой>-lookdev*.md`, `art/pipeline-candidates/<ASSET>/<run>/review/<итерация>/*-lookdev-sheet-*`, `…/preview/{ld_sheet_*,compare-ld-*,ld_concept_zones_*}`, листы `docs/art-pipeline/evidence/<…герой…>/*sheet*` | концепт (front/side/back + prompts.md), отчёты look-dev (заголовок, строка «Дата/Статус», разделы), листы «концепт \| UE» по прогонам и итерациям, свежие первыми |
 | Библиотека материалов (`materials`) | `docs/art-pipeline/material-library/{*.md,um-material-presets-v1.json,sources.json,evidence/}`, `art/material-library/v1/{tiles,preview/tiles-sheet.png}` | классы и расширения (образец цвета из `typicalLinear`, metallic/roughness/shading), CC0-наборы с лицензиями (не-CC0 → предупреждение), процедурные классы, тайлы, кадры доказательств |
+| Звук (`audio`) | `docs/game-design/audio/` (документы `NN-*.md`, `03-sound-registry.csv`, `04-vo-script.md`, «## 0. Итог» из 07), `docs/game-design/evidence/AUDIO/<дата>/*-mix.json`, записи `AUC-*` журнала кредитов, имена `SW_*.uasset` из скана звуков | единицы реестра по статусам (`in-bank` = ассет в UE, триггера нет — причина в заметке) и категориям, таблица с фильтрами (заметка ≤ 200 знаков) и числом SoundWave по колонке `file`; реплики по бойцам (всего / без слов, голоса — ссылкой на 04/07); последний замер микса «карта × клиент» (I, TP, S max, флаги, цели) и папки по датам; траты `AUC-*` (они больше не «не отнесённые»); документы 00…07. Нет файлов — пустое состояние, недописанный `*-mix.json` — предупреждение |
 | Решения (`decisions`) | `docs/game-design/decisions/*.md` | заголовок, дата из имени файла, разделы `##`, абзац «Происхождение» |
 
-На странице персонажа добавлены вкладки **«UE-слои»** и **«Look-dev и концепт»**. Статус в
+На странице персонажа добавлены вкладки **«UE-слои»** и **«Look-dev и концепт»**; на вкладке **«Звуки»** —
+единицы реестра звука персонажа (по колонке `owner` или по ключу персонажа в id: `VO-ARTHUR-…`, `DTH-MEDUSA`;
+ключ — `character` из clip-manifest, иначе последнее слово имени) и число его реплик в 04. Статус в
 навигации и в шапке — статус **самого свежего слоя** записи (дата из имени слоя/путей: run id
 `20260929-…` или ISO-дата; при равенстве — более поздний в `layers[]`); статус самой записи
 реестра показан рядом («запись: …») и не меняется.
@@ -55,6 +58,7 @@ npm run art-hub:snapshot -- --out <файл>
 | --- | --- |
 | `aggregate.ts` | Агрегатор (Node, без БД): собирает `ArtHubData` из файлов репо. Кэш по mtime/size: JSON разбирается заново только при изменении файла, результат целиком переиспользуется, пока отпечаток отслеживаемых файлов не изменился (в отпечаток входит и дерево `unreal/Unmatched/Content/PipelineCandidates/*/*` — mtime каталогов двух уровней) |
 | `overview.ts` | Обзорные разделы: план, look-dev и концепты, библиотека материалов, решения, UE-слои героя, свежий слой. Упоминания UE-путей ищутся одним проходом; результат по каждому файлу кэшируется по mtime (`FileCache.derive`) |
+| `audio.ts` | Раздел «Звук» (`buildAudio`) и звук персонажа (`audioForCharacter`). Файлы `docs/game-design/audio` и `evidence/AUDIO` обходятся отдельно от `watched` (не попадают в «свежие файлы» арт-пайплайна), но входят в отпечаток кэша |
 | `types.ts` | Модель данных, общая для агрегатора и страницы (без Node-импортов) |
 | `fs-utils.ts` | Обход каталогов (без symlink), кэши JSON/текста/sha256, CSV, разбор markdown (акты, таблицы) |
 | `path-guard.ts` | Белый список путей, защита от traversal, MIME, разбор `Range` |
@@ -76,6 +80,7 @@ npm run art-hub:snapshot -- --out <файл>
 
 `art/`, `docs/art-pipeline/`, `docs/game-design/evidence/`,
 `docs/game-design/decisions/*.md` (только markdown — прочие файлы там 403),
+`docs/game-design/audio/*.{md,csv}` (документы звука и реестр; прочие файлы там 403),
 `blender/<ASSET>/{preview,export,textures,variants,tripo-source}/`.
 Концепты (`art/imagegen/…`), библиотека материалов и `plan-status.json` уже внутри `art/` и
 `docs/art-pipeline/` — отдельного расширения не требуют. Прочие файлы `docs/game-design/`
@@ -105,6 +110,7 @@ symlink/junction, чей реальный путь выходит из спис�
 | `docs/game-design/07-animation-vfx-audio.csv` | запланированные звуковые CUE (по CUE слотов клипа и по упоминанию персонажа) |
 | `docs/art-pipeline/plan-status.json` | раздел «План и задачи» (см. выше) |
 | `docs/game-design/decisions/*.md` | раздел «Решения» (отслеживаются в отпечатке кэша) |
+| `docs/game-design/audio/`, `docs/game-design/evidence/AUDIO/` | раздел «Звук» и звук персонажа (см. выше; отслеживаются в отпечатке кэша) |
 | `unreal/Unmatched/Content/PipelineCandidates/<Folder>/<Layer>/` | только наличие папки и число `.uasset` для вкладки «UE-слои» |
 | `art/`, `public/`, `src/`, `scraped-data/`, `unreal/Unmatched/Content`, `docs/art-pipeline` | поиск аудиофайлов персонажа (wav/mp3/ogg/flac/m4a/aac/opus; SoundWave-uasset в папках audio/sound/sfx) |
 

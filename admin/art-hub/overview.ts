@@ -84,7 +84,7 @@ function isOutsideRepo(p: string): boolean {
 }
 
 /** FileRef for a repo path, or a text-only ref for a path outside the repo. */
-function refOrText(h: OverviewHelpers, p: string, role?: string): FileRef {
+export function refOrText(h: OverviewHelpers, p: string, role?: string): FileRef {
   if (isOutsideRepo(p)) return { path: p.replace(/\\/g, '/'), root: 'repo', kind: kindFromPath(p), exists: null, servable: false, role: role ?? 'вне репозитория' };
   return h.makeRef(p, { role });
 }
@@ -128,7 +128,7 @@ export function latestLayerOf(layers: LayerView[], entryId: string, entryStatus:
 
 // ---------------------------------------------------------------- docs
 
-function docView(h: OverviewHelpers, rel: string, role?: string): DocView {
+export function docView(h: OverviewHelpers, rel: string, role?: string): DocView {
   const file = h.makeRef(rel, { role });
   const text = file.exists ? h.cache.readText(abs(h, rel), 64 * 1024) : undefined;
   const headings: string[] = [];

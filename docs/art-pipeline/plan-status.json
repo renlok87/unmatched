@@ -1,7 +1,7 @@
 {
   "schema": "unmatched-plan-status/v1",
-  "generated": "2026-10-03T23:58:34Z",
-  "head": "d37ae1fe8de6de6afa1e1ce06e56650804afc586",
+  "generated": "2026-10-06T08:30:00Z",
+  "head": "ada584c9087065481f9850d2627ab51b6055b59a",
   "sources": [
     {
       "id": "handover",
@@ -107,6 +107,11 @@
       "id": "git-1004a",
       "path": "git log 03506cca..d37ae1fe",
       "title": "коммиты 2026-10-03/04: подбор хода MS-T-04…07 и веха M1, только настоящие доски, раннер T4.3 на Marmoreal"
+    },
+    {
+      "id": "audio",
+      "path": "docs/game-design/audio/00-AUDIO-BRIEF.md",
+      "title": "Бриф звука игры (AU): опись, дизайн, реестр, сценарий реплик, план производства; журнал — 07-production-log.md"
     }
   ],
   "tasks": [
@@ -2313,6 +2318,143 @@
       "assets": [],
       "updated": "2026-10-03T23:58:34Z",
       "note": "Бэкенд cdc896bd/a809114f/a0275581/e58d8e09: доска по умолчанию Marmoreal, без подстановки 20×20, 3 строки удалены после выгрузки, стенды пересобраны; jest 1950/1950. UE и скрипты ea09b99c/284e6e52/f859f04b/d37ae1fe: профили rev 21 только карты, демо по умолчанию на Marmoreal; UE 246/246, pytest 570; упаковка f859f04b; оба демо без аргумента доски прошли на Marmoreal."
+    },
+    {
+      "id": "AU-DESIGN",
+      "title": "Звук: опись, дизайн-документ, реестр звуков, сценарий реплик (EN, короткие выкрики), план производства и карточки задач",
+      "track": "art",
+      "source": "audio",
+      "status": "done",
+      "art_status": "предложено",
+      "evidence": [
+        "docs/game-design/audio/01-inventory.md",
+        "docs/game-design/audio/02-audio-design.md",
+        "docs/game-design/audio/03-sound-registry.csv",
+        "docs/game-design/audio/04-vo-script.md",
+        "docs/game-design/audio/05-production-plan.md",
+        "docs/game-design/audio/06-task-cards.csv"
+      ],
+      "next": null,
+      "blocker": null,
+      "assets": [],
+      "updated": "2026-10-06T08:30:00Z",
+      "note": "Коммиты 9d1253c2, a416110d, 08fd47fb. Решения пользователя по §7 брифа: EN-выкрики, MVP-контент + каркас, всё генерируется через SYNTX, камерный оркестр с колоритом карт."
+    },
+    {
+      "id": "AU-PROD",
+      "title": "Звук: производство — музыка (Suno V6 cover своих MIDI-скетчей, 2 слоя), стинги, реплики ElevenLabs v3, SFX Kenney CC0 + синтез, окружение",
+      "track": "art",
+      "source": "audio",
+      "status": "done",
+      "art_status": "измерено",
+      "evidence": [
+        "docs/game-design/audio/07-production-log.md",
+        "docs/art-pipeline/CREDITS-audio.md",
+        "docs/art-pipeline/evidence/s3-baseline-2026-09-28/credits-ledger.json",
+        "tools/audio/sketch.py",
+        "tools/audio/vo_process.py",
+        "tools/audio/sfx_build.py"
+      ],
+      "next": null,
+      "blocker": null,
+      "assets": [],
+      "updated": "2026-10-06T08:30:00Z",
+      "note": "Решения Р-1…Р-8 приняты по делегированию («Сам все утверди и сделай», 2026-10-05). Выбор по метрикам (хрома, темп, громкость), прослушивание человеком не проводилось. Траты SYNTX 478 → 173,8."
+    },
+    {
+      "id": "AU-UE",
+      "title": "Звук в UE (AU-S4): банк 346 SoundWave, шины, музыкальный директор, реплики с субтитрами, окружение, все звуковые CUE; живая приёмка на Marmoreal и Sarpedon",
+      "track": "tech",
+      "source": "audio",
+      "status": "done",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/game-design/audio/07-production-log.md",
+        "docs/unreal/contracts/cue-dispatcher/CUE-DISPATCHER.md",
+        "docs/unreal/contracts/cue-dispatcher/cue-table.json",
+        "docs/game-design/evidence/AUDIO/2026-10-05/check-trace.txt",
+        "docs/game-design/evidence/AUDIO/2026-10-05/marmoreal-host-combat-result.png",
+        "docs/game-design/evidence/AUDIO/2026-10-05/sarpedon-host-subtitle.png"
+      ],
+      "next": null,
+      "blocker": null,
+      "assets": [],
+      "updated": "2026-10-06T08:30:00Z",
+      "note": "Интеграция d73d504c (safe-integrate после прогона I). Гейт check-trace PASS, 0 ошибок на 4 трассах."
+    },
+    {
+      "id": "AU-RECAST",
+      "title": "Перекастинг голоса Артура: грубый тяжёлый британский голос воина (Jayce — Grim вместо Cassius), 42 реплики заново",
+      "track": "art",
+      "source": "audio",
+      "status": "done",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/game-design/audio/07-production-log.md",
+        "docs/game-design/audio/04-vo-script.md",
+        "unreal/Unmatched/Licenses/THIRD_PARTY_NOTICES.txt"
+      ],
+      "next": null,
+      "blocker": null,
+      "assets": [],
+      "updated": "2026-10-06T08:30:00Z",
+      "note": "Запрос пользователя 2026-10-06; кастинг 3 голосов по метрикам YIN (07 §8), c5e7a971; 36,4 токена."
+    },
+    {
+      "id": "AU-S5",
+      "title": "Звук AU-S5: подключение оставшихся звуков (взгляд Medusa, буст Arthur, толчок, кандидаты, таймер, комната, панели…), запись микса из клиента, шина микса −20 LUFS-I с лимитером",
+      "track": "tech",
+      "source": "audio",
+      "status": "done",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/game-design/audio/07-production-log.md",
+        "docs/game-design/audio/02-audio-design.md",
+        "tools/audio/mix_check.py",
+        "docs/game-design/evidence/AUDIO/2026-10-06/mix-steps.txt",
+        "docs/game-design/evidence/AUDIO/2026-10-06/marmoreal-host-mix.json",
+        "docs/game-design/evidence/AUDIO/2026-10-06/sarpedon-host-mix.json",
+        "docs/game-design/evidence/AUDIO/2026-10-06/sarpedon-host-deck-panel.png"
+      ],
+      "next": null,
+      "blocker": null,
+      "assets": [],
+      "updated": "2026-10-06T08:30:00Z",
+      "note": "Коммиты d490af39, c3e6f1d8, ada584c9. Итог: −19,1…−20,9 LUFS-I, true peak −1,5 dBTP на обеих картах; тесты UE 380/380; 13 единиц in-bank (нет экрана или сигнала)."
+    },
+    {
+      "id": "AU-LISTEN",
+      "title": "Звук: прослушивание и приёмка на слух пользователем (сессии G-ART 1–8 плана производства)",
+      "track": "art",
+      "source": "audio",
+      "status": "open",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/game-design/audio/05-production-plan.md",
+        "docs/game-design/audio/07-production-log.md"
+      ],
+      "next": "Пользователь слушает C:/tmp/audio-review/index.html и записи боёв C:/tmp/au-live/aus5g-*; правки уровня — флаг -S08MixMakeupDb.",
+      "blocker": null,
+      "assets": [],
+      "updated": "2026-10-06T08:30:00Z",
+      "note": "Художественной приёмки нет: всё выбрано по метрикам."
+    },
+    {
+      "id": "AU-INBANK",
+      "title": "Звук: 13 единиц в банке без триггера — логотип, пауза, выбор героя, настройки, отсчёт комнаты, тасовка, тосты, общие кнопки, смена значения",
+      "track": "tech",
+      "source": "audio",
+      "status": "open",
+      "art_status": null,
+      "evidence": [
+        "docs/game-design/audio/03-sound-registry.csv",
+        "docs/game-design/audio/07-production-log.md"
+      ],
+      "next": "Подключить, когда появятся экраны (логотип, пауза, выбор героя, настройки) и вид эффекта в строке боя (CRD-VALUE-CHANGE).",
+      "blocker": null,
+      "assets": [],
+      "updated": "2026-10-06T08:30:00Z",
+      "note": "Статус in-bank и причина записаны в реестре."
     }
   ],
   "waves": [
@@ -2581,6 +2723,20 @@
         "T4.3",
         "MOVE-SEL-M1",
         "REAL-BOARDS"
+      ]
+    },
+    {
+      "id": "AUDIO",
+      "title": "Звук игры (2026-10-05…06): дизайн, производство через SYNTX, UE-интеграция и живая приёмка, перекастинг Артура, подключение оставшихся звуков и шина микса; открыто: прослушивание пользователем и 13 звуков без экрана",
+      "status": "in_progress",
+      "tasks": [
+        "AU-DESIGN",
+        "AU-PROD",
+        "AU-UE",
+        "AU-RECAST",
+        "AU-S5",
+        "AU-LISTEN",
+        "AU-INBANK"
       ]
     }
   ],

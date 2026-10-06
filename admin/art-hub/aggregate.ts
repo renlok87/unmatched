@@ -15,6 +15,7 @@
  *   blender/<ASSET>/{preview,export,textures,variants,tripo-source}
  *   docs/game-design/07-animation-vfx-audio.csv         — planned sound cues
  * Overview sections (plan, look-dev, material library, decisions, UE layers): see overview.ts.
+ * Audio section (docs/game-design/audio, evidence/AUDIO, AUC-* spends): see audio.ts.
  */
 import crypto from 'node:crypto';
 import fs from 'node:fs';
@@ -36,6 +37,7 @@ import {
   walkFiles,
   type WalkEntry,
 } from './fs-utils';
+import { AUDIO_SOURCES, audioForCharacter, audioRoots, buildAudio } from './audio';
 import {
   OVERVIEW_SOURCES,
   buildDecisions,
@@ -53,6 +55,7 @@ import { isAllowedRelPath } from './path-guard';
 import type {
   ActView,
   ArtHubData,
+  AudioOverview,
   AssetPage,
   ClipSection,
   ClipSlotView,
@@ -626,9 +629,11 @@ export class ArtHubAggregator {
     this.cache.beginRun();
     const started = Date.now();
     const watched = this.walkWatched();
+    const audioFiles = this.walkAudio();
     const sounds = this.scanSounds();
     const fp = crypto.createHash('sha1');
     for (const f of watched) fp.update(`${f.rel}\0${f.mtimeMs}\0${f.bytes}\n`);
+    for (const f of audioFiles) fp.update(`A${f.rel}\0${f.mtimeMs}\0${f.bytes}\n`);
     for (const s of sounds) fp.update(`S${s}\n`);
     const cueSt = this.cache.stat(path.join(this.repoRoot, ...SOURCES.cueTable.split('/')));
     fp.update(`C${cueSt.mtimeMs ?? 0}:${cueSt.bytes ?? 0}`);
@@ -638,7 +643,7 @@ export class ArtHubAggregator {
     if (this.last && this.last.fingerprint === fingerprint) {
       return { ...this.last.data, checkedAt: new Date().toISOString() } as ArtHubData;
     }
-    const data = build(this.repoRoot, this.cache, watched, sounds, this.opts, fingerprint, started);
+    const data = build(this.repoRoot, this.cache, watched, audioFiles, sounds, this.opts, fingerprint, started);
     this.last = { fingerprint, data };
     return data;
   }
@@ -656,6 +661,14 @@ export class ArtHubAggregator {
       for (const sub of BLENDER_SUBDIRS) out.push(...walkFiles(root, `blender/${asset}/${sub}`));
     }
     return out.filter((f) => !f.rel.endsWith('.pyc'));
+  }
+
+  /**
+   * Audio docs and evidence (docs/game-design/audio, docs/game-design/evidence/AUDIO). Kept apart from
+   * `watched` (recent files, mentions, evidence attribution stay art-only) but part of the fingerprint.
+   */
+  private walkAudio(): WalkEntry[] {
+    return audioRoots().flatMap((r) => walkFiles(this.repoRoot, r));
   }
 
   /** Paths of audio files in the sound roots (names only; no stat of every file). */
@@ -696,6 +709,7 @@ function build(
   repoRoot: string,
   cache: FileCache,
   watched: WalkEntry[],
+  audioFiles: WalkEntry[],
   soundFiles: string[],
   opts: AggregateOptions,
   fingerprint: string,
@@ -986,6 +1000,19 @@ function build(
   };
   const mentionIndex = buildMentionIndex(overviewHelpers);
 
+  // ---- audio (overview section + per-character units); AUC-* spends are explained there
+  const audio: AudioOverview = buildAudio(overviewHelpers, {
+    files: audioFiles,
+    soundFiles,
+    ledgerRel,
+    ledgerEntries,
+    syntxUnit: asStr(asObj(ledger?.syntx).unit),
+  });
+  for (const e of audio.spends.entries) attributed.add(e);
+  trackSource(ctx, AUDIO_SOURCES.registry, audio.registry.file.exists ? audio.registry.error : 'нет файла');
+  trackSource(ctx, AUDIO_SOURCES.voScript, audio.vo.script.exists ? undefined : 'нет файла');
+  trackSource(ctx, AUDIO_SOURCES.productionLog, audio.vo.log.exists ? undefined : 'нет файла');
+
   // ---- per page sections
   for (const b of builds.values()) {
     const page = b.page;
@@ -1068,7 +1095,7 @@ function build(
       page.clips = buildClips(ctx, b, clips, vocab, clipManifest, validationSummary);
       page.videoRefs = buildVideoRefs(ctx, b, refManifests, ledgerEntries);
       page.videoToMotion = buildV2M(ctx, b, v2mText, vocab);
-      page.sounds = buildSounds(ctx, b, soundFiles, cueRows);
+      page.sounds = buildSounds(ctx, b, soundFiles, cueRows, audio);
     }
     page.credits = buildPageCredits(b, ledgerEntries, attributed);
     page.latestLayer = latestLayerOf(page.layers, page.id, page.status);
@@ -1130,6 +1157,7 @@ function build(
     plan,
     lookdev,
     materials,
+    audio,
     decisions,
     warnings: ctx.warnings,
   };
@@ -1827,7 +1855,7 @@ function buildV2M(ctx: Ctx, b: PageBuild, doc: string | undefined, vocab: Vocabu
 
 // ---------------------------------------------------------------- sounds
 
-function buildSounds(ctx: Ctx, b: PageBuild, soundFiles: string[], cueRows: Record<string, string>[]): SoundSection {
+function buildSounds(ctx: Ctx, b: PageBuild, soundFiles: string[], cueRows: Record<string, string>[], audio: AudioOverview): SoundSection {
   const id = b.page.id.toLowerCase();
   const key = (b.charKey ?? b.page.shortName).toLowerCase();
   const prefix = b.page.cuePrefix ? `${b.page.cuePrefix.toLowerCase()}-` : undefined;
@@ -1854,6 +1882,7 @@ function buildSounds(ctx: Ctx, b: PageBuild, soundFiles: string[], cueRows: Reco
     cues,
     cueSource: makeRef(ctx, SOURCES.cueTable, { role: 'таблица CUE 07' }),
     searchedRoots: SOUND_SCAN_ROOTS,
+    ...audioForCharacter(audio, b.charKey ?? b.page.shortName),
   };
 }
 

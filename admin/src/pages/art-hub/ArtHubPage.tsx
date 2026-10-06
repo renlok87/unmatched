@@ -1,18 +1,19 @@
 /**
  * «Арт-хаб»: read-only dashboard over the art pipeline files of the repo
  * (models, rig, skeletal clips, video references, video→skeleton, sounds,
- * credits). Data comes from the dev-only Vite plugin (admin/art-hub).
+ * credits) and the game-audio track. Data comes from the dev-only Vite plugin (admin/art-hub).
  */
 import React, { Suspense, useCallback, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Alert, Badge, Button, Card, Col, Empty, Menu, Modal, Result, Row, Space, Spin, Switch, Tabs, Tag, Tooltip, Typography } from 'antd';
 import type { MenuProps } from 'antd';
-import { BgColorsOutlined, BookOutlined, DashboardOutlined, EyeOutlined, ProjectOutlined, ReloadOutlined } from '@ant-design/icons';
+import { BgColorsOutlined, BookOutlined, DashboardOutlined, EyeOutlined, ProjectOutlined, ReloadOutlined, SoundOutlined } from '@ant-design/icons';
 import type { ArtHubData, AssetPage, FileRef, LookdevHeroView } from '../../../art-hub/types';
 import { IS_DEV, useArtHubData } from './api';
 import { ArtHubUiContext, StageTag, StatusTag, type ArtHubUi } from './components/common';
 import { TextPreview } from './components/TextPreview';
 import { formatTime, timeAgo } from './format';
+import { AudioSection } from './sections/AudioSection';
 import { ClipsSection } from './sections/ClipsSection';
 import { DecisionsSection } from './sections/DecisionsSection';
 import { HeroLookdev, LookdevSection } from './sections/LookdevSection';
@@ -36,6 +37,7 @@ const OVERVIEW: { key: string; label: string; icon: React.ReactNode }[] = [
   { key: 'plan', label: 'План и задачи', icon: <ProjectOutlined /> },
   { key: 'lookdev', label: 'Look-dev и концепты', icon: <EyeOutlined /> },
   { key: 'materials', label: 'Библиотека материалов', icon: <BgColorsOutlined /> },
+  { key: 'audio', label: 'Звук', icon: <SoundOutlined /> },
   { key: 'decisions', label: 'Решения', icon: <BookOutlined /> },
 ];
 
@@ -78,6 +80,8 @@ const OverviewView: React.FC<{ item: string; data: ArtHubData }> = ({ item, data
       return <LookdevSection lookdev={data.lookdev} />;
     case 'materials':
       return <MaterialsSection materials={data.materials} />;
+    case 'audio':
+      return <AudioSection audio={data.audio} />;
     case 'decisions':
       return <DecisionsSection decisions={data.decisions} />;
     default:
@@ -239,8 +243,8 @@ export const ArtHubPage: React.FC = () => {
             Арт-хаб
           </Title>
           <Text type="secondary">
-            Живое отражение файлов арт-пайплайна: план, модели, UE-слои, look-dev, материалы, риг, клипы, видео-референсы, звуки, кредиты,
-            решения. Только чтение.
+            Живое отражение файлов арт-пайплайна: план, модели, UE-слои, look-dev, материалы, риг, клипы, видео-референсы, звук (реестр,
+            реплики, микс), кредиты, решения. Только чтение.
           </Text>
         </Col>
         <Col>

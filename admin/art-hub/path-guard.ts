@@ -13,12 +13,20 @@ import path from 'node:path';
 /**
  * Whitelisted roots (repo-relative, POSIX). Keep in sync with README.md.
  * `docs/game-design/decisions/` — decision logs (markdown only, see ALLOWED_EXT_BY_PREFIX).
+ * `docs/game-design/audio/` — audio docs 00…07 and the sound registry (markdown and csv only).
  */
-export const ALLOWED_PREFIXES = ['art/', 'docs/art-pipeline/', 'docs/game-design/evidence/', 'docs/game-design/decisions/'] as const;
+export const ALLOWED_PREFIXES = [
+  'art/',
+  'docs/art-pipeline/',
+  'docs/game-design/evidence/',
+  'docs/game-design/decisions/',
+  'docs/game-design/audio/',
+] as const;
 
 /** Prefixes that serve only the listed extensions (everything else under them → 403). */
 const ALLOWED_EXT_BY_PREFIX: Record<string, RegExp> = {
   'docs/game-design/decisions/': /\.md$/i,
+  'docs/game-design/audio/': /\.(md|csv)$/i,
 };
 
 /** blender/<ASSET>/<subdir>/… — only these subdirectories of blender asset folders are served. */
