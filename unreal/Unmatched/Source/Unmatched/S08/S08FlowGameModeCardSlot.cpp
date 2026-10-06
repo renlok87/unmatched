@@ -392,7 +392,8 @@ void AS08FlowGameMode::TickCardSlot() {
       Hud.bValid && !Hud.bGameOver ? S09BoardPickOf(CommandUi, Hud.bViewerTurn) : ES09BoardPick::None;
   const FString HandLine = HandLower.Update(Pick, Pick != ES09BoardPick::None && CursorOverHud(), static_cast<double>(Now));
   if (!HandLine.IsEmpty()) FS08Trace::Write(FString::Printf(TEXT("%s seq=%d"), *HandLine, Hud.SequenceNumber));
-  const float Offset = HandLower.OffsetSu(static_cast<double>(Now), bReduced);
+  // VS-2 HB-06: capped so that 48 su of the row stay visible (04 §2.6; the Slate strip is shorter than the 60 su)
+  const float Offset = UmHudHandLowerCap(HandLower.OffsetSu(static_cast<double>(Now), bReduced));
   if (!FMath::IsNearlyEqual(Offset, HandOffsetApplied, 0.05f)) {
     HandOffsetApplied = Offset;
     if (const TSharedPtr<SWidget> Hand = ArtHud.HandPanel.Pin()) {

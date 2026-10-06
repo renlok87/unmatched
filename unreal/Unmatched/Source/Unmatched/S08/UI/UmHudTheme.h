@@ -7,7 +7,9 @@
 //   - Type: typeface + size of the default Slate composite font (Roboto Bold Condensed / Regular, Engine/Content/Slate/
 //     Fonts); FontObject stays empty and Font() fills the composite font at use;
 //   - Space / Radius (su) and MotionMs (ms) as floats;
-//   - Skins: 29 FSlateRoundedBoxBrush fallbacks under the HB-08 names (ВР-HB06), HB-10 swaps in the 9-slice PNG.
+//   - Skins: 29 FSlateRoundedBoxBrush fallbacks under the HB-08 names (ВР-HB06); VS-2 HB-10 swaps in the 9-slice PNG
+//     (tools/art/hud_skins_import.py: Skins = the x1 texture, SkinsX2 = the x2 one, Margin from slice-margins.json);
+//     SkinFor() picks x2 at DPI x UI scale >= 1.5.
 // Without the asset (fresh worktree, missing cook) Get() builds the same maps from S08HudTokens.generated.h and logs
 // one Warning; the Slate rollback -S08SlateHud does not read the theme at all.
 #pragma once
@@ -16,7 +18,17 @@
 #include "Engine/DataAsset.h"
 #include "Fonts/SlateFontInfo.h"
 #include "Styling/SlateBrush.h"
+#include "Layout/Margin.h"
 #include "UmHudTheme.generated.h"
+
+class UTexture2D;
+
+namespace UmHudTheme {
+/** VS-2 HB-15 (ВР-VS2-41): Slate draws FSlateFontInfo::Size as points at 96 DPI (FontConstants::RenderDPI), the type.*
+ *  tokens are the em in su (02 §3.3) - Font() hands out Su x 72 / 96 points, the em then measures Su su. */
+inline constexpr float PointsPerSu = 72.0f / 96.0f;
+inline float PointsFromSu(float Su) { return Su * PointsPerSu; }
+}  // namespace UmHudTheme
 
 UCLASS(BlueprintType)
 class UNMATCHED_API UUmHudTheme : public UDataAsset {
@@ -44,6 +56,9 @@ class UNMATCHED_API UUmHudTheme : public UDataAsset {
   /** 9-slice skins (HB-08 / HB-10) by key: panel, panel.inset, modal, btn.normal … input.error. */
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Um HUD Theme")
   TMap<FName, FSlateBrush> Skins;
+  /** HB-10: the x2 textures of the 9-slice skins (same keys as Skins; empty before the import). */
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Um HUD Theme")
+  TMap<FName, FSlateBrush> SkinsX2;
   /** sha256 of hud-style-tokens.json the asset was imported from (hud_contract.py validate compares it). */
   UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Um HUD Theme")
   FString TokensJsonSha256;
@@ -66,6 +81,12 @@ class UNMATCHED_API UUmHudTheme : public UDataAsset {
   float Ms(FName Token) const;
   float Alpha(FName Token) const;
   const FSlateBrush* Skin(FName Key) const;
+  /** HB-10: the skin for this px per su - the x2 texture at DPI x UI scale >= SkinX2MinPxPerSu (150 %, 1440p), else
+   *  x1 (or the rounded fallback before the import). */
+  const FSlateBrush* SkinFor(FName Key, float PxPerSu) const;
+  /** True when Key is a 9-slice PNG skin (HB-10 imported), not the ВР-HB06 fallback. */
+  bool HasTextureSkin(FName Key) const;
+  static constexpr float SkinX2MinPxPerSu = 1.5f;
 
   // ---- import (UE Python: tools/s08/hud_contract/hud_theme_import.py; FillFromHeader uses the same calls) ----
   UFUNCTION(BlueprintCallable, Category = "Um HUD Theme|Import")
@@ -89,6 +110,13 @@ class UNMATCHED_API UUmHudTheme : public UDataAsset {
                          float EdgeSu, float RadiusSu, bool bHalfHeight);
   UFUNCTION(BlueprintCallable, Category = "Um HUD Theme|Import")
   void ImportTokensSha(const FString& Sha256);
+  /** HB-10: a 9-slice skin from the x1 / x2 textures. SizePx* = the PNG pixel sizes (the importer reads them from
+   *  the files: a -nullrhi commandlet has no texture resource to ask); margins are the slice-margins.json pixels of each
+   *  file (converted to fractions of that file here); bNineSlice false = DrawAs Image (stretch 'none': the checkbox).
+   *  ImageSize = the x1 size in su. False on a missing texture or a zero size. */
+  UFUNCTION(BlueprintCallable, Category = "Um HUD Theme|Import")
+  bool ImportTextureSkin(FName Key, UTexture2D* X1, UTexture2D* X2, FVector2D SizePxX1, FVector2D SizePxX2,
+                         FMargin MarginPxX1, FMargin MarginPxX2, bool bNineSlice);
 
  private:
   void SetColor(FName Token, const FColor& Srgb, float InAlpha);

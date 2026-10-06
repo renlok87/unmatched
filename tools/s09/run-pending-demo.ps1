@@ -380,7 +380,42 @@ function Invoke-PendingDemo {
       # BOOST_CHOICE opens post-reveal: its owner shot MUST show the already-
       # public committed combat (#8040FF). Every OTHER pending shot is a
       # pre-reveal head and must show NONE of the reveal artifacts (#7CFC00
-      # text, #8040FF line, #FF40B0 blocked) - the flag-driven privacy gate.
+      # text, #8040FF line, #FF40B0 blocked) - the flag-driven privacy gate -
+      # UNLESS the client proves the head opened after the reveal (VS-2, VS-1
+      # README item 4): a head of COMBAT_RESOLVE after a won combat (MOVE "If you
+      # won the combat, choose one of the fighters...") whose owner panel traced
+      # "PENDING panel revealed" for the snapshot of the shot; the non-owner's
+      # resolve window traces "RESOLVE panel revealed" the same way. Then the
+      # reveal line / text are legitimate (and REQUIRED, as for BOOST_CHOICE);
+      # without that proof the gate stays strict.
+      function Get-ShotRevealContext([string]$TraceText, [string]$ShotName, [string]$RevealNeedle) {
+        $lines = $TraceText -split "`r?`n"
+        $req = -1
+        for ($i = 0; $i -lt $lines.Count; $i++) {
+          if ($lines[$i].Contains("SHOT request file=$ShotName ")) { $req = $i; break }
+        }
+        if ($req -lt 0) {
+          for ($i = 0; $i -lt $lines.Count; $i++) {
+            if ($lines[$i].Contains("SHOT captured file=$ShotName ")) { $req = $i; break }
+          }
+        }
+        $ctx = @{ found = ($req -ge 0); seq = -1; phase = ''; revealed = $false; postReveal = $false }
+        if ($req -lt 0) { return $ctx }
+        # the snapshot of the shot, and the first line of that seq's run (a re-applied seq traces no second reveal line)
+        $from = 0
+        for ($i = $req; $i -ge 0; $i--) {
+          if ($lines[$i] -match 'SNAPSHOT applied seq=(\d+) phase=([A-Z_]+)') {
+            $seq = [int]$Matches[1]
+            if ($ctx.seq -lt 0) { $ctx.seq = $seq; $ctx.phase = $Matches[2] }
+            elseif ($seq -ne $ctx.seq) { $from = $i + 1; break }
+          }
+        }
+        for ($i = $from; $i -le $req; $i++) {
+          if ($lines[$i].Contains($RevealNeedle)) { $ctx.revealed = $true; break }
+        }
+        $ctx.postReveal = $ctx.revealed -and $ctx.phase -eq 'COMBAT_RESOLVE'
+        return $ctx
+      }
       $boostShots = @($pendingShots | Where-Object { $_.Name -eq 's09-pending-BOOST_CHOICE.png' })
       if ($boostShots.Count -eq 0) {
         throw "no s09-pending-BOOST_CHOICE.png this run - cannot verify the owner reveal-pause panel"
@@ -393,25 +428,36 @@ function Invoke-PendingDemo {
       foreach ($shot in $pendingShots) {
         if ($shot.Name -eq 's09-pending-BOOST_CHOICE.png') { continue }
         $s = Get-MarkerStats $shot.FullName
+        $traceText = if ($shot.FullName.StartsWith($hostShots)) { $hostText } else { $joinText }
+        $ctx = Get-ShotRevealContext $traceText $shot.Name 'PENDING panel revealed'
+        if ($ctx.postReveal) {
+          if ($s.reveallineAll -lt 10 -or $s.blockedAll -ne 0) {
+            throw ("post-reveal pending shot {0} (seq={1} phase={2}): revealed-combat line missing or blocked marker shown (revealline={3} blocked={4})" -f $shot.Name, $ctx.seq, $ctx.phase, $s.reveallineAll, $s.blockedAll)
+          }
+          Write-Output ("post-reveal pending shot accepted: {0} (seq={1} phase={2} revealline={3} revealtext={4})" -f $shot.Name, $ctx.seq, $ctx.phase, $s.reveallineAll, $s.revealtextAll)
+          continue
+        }
         if ($s.revealtextAll -ne 0 -or $s.reveallineAll -ne 0 -or $s.blockedAll -ne 0) {
-          throw ("pre-reveal privacy violation in {0}: revealtext={1} revealline={2} blocked={3}" -f $shot.Name, $s.revealtextAll, $s.reveallineAll, $s.blockedAll)
+          throw ("pre-reveal privacy violation in {0} (seq={1} phase={2} traced={3}): revealtext={4} revealline={5} blocked={6}" -f $shot.Name, $ctx.seq, $ctx.phase, $ctx.found, $s.revealtextAll, $s.reveallineAll, $s.blockedAll)
         }
       }
-      Write-Output "pre-reveal privacy: non-BOOST_CHOICE pending shots show zero reveal/blocked markers"
+      Write-Output "pre-reveal privacy: every pre-reveal pending shot shows zero reveal/blocked markers"
       $blockedShots = @(Get-ChildItem -LiteralPath $hostShots, $joinShots -Filter 's09-resolve-blocked-*.png' -ErrorAction SilentlyContinue)
       foreach ($shot in $blockedShots) {
         $s = Get-MarkerStats $shot.FullName
         if ($s.blockedAll -lt 10) {
           throw ("blocked resolve shot missing #FF40B0 (blocked={0}): {1}" -f $s.blockedAll, $shot.Name)
         }
-        if ($shot.Name -like '*BOOST_CHOICE*') {
+        $traceText = if ($shot.FullName.StartsWith($hostShots)) { $hostText } else { $joinText }
+        $ctx = Get-ShotRevealContext $traceText $shot.Name 'RESOLVE panel revealed'
+        if ($shot.Name -like '*BOOST_CHOICE*' -or $ctx.postReveal) {
           if ($s.revealtextAll -lt 10) {
-            throw ("post-reveal blocked shot missing the revealed combat text #7CFC00 (revealtext={0}): {1}" -f $s.revealtextAll, $shot.Name)
+            throw ("post-reveal blocked shot missing the revealed combat text #7CFC00 (revealtext={0} seq={1} phase={2}): {3}" -f $s.revealtextAll, $ctx.seq, $ctx.phase, $shot.Name)
           }
         } elseif ($s.revealtextAll -ne 0) {
-          throw ("pre-reveal privacy violation in blocked shot {0}: revealtext={1}" -f $shot.Name, $s.revealtextAll)
+          throw ("pre-reveal privacy violation in blocked shot {0}: revealtext={1} seq={2} phase={3}" -f $shot.Name, $s.revealtextAll, $ctx.seq, $ctx.phase)
         }
-        Write-Output ("blocked resolve shot verified: {0} (blocked={1} revealtext={2})" -f $shot.Name, $s.blockedAll, $s.revealtextAll)
+        Write-Output ("blocked resolve shot verified: {0} (blocked={1} revealtext={2} postReveal={3})" -f $shot.Name, $s.blockedAll, $s.revealtextAll, $ctx.postReveal)
       }
     } else {
       Write-Output "WARN ShotMode=$ShotMode - pixel state gates skipped"

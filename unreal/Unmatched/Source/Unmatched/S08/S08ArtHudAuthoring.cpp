@@ -110,6 +110,18 @@ TSharedRef<FJsonObject> S08AuthorOne(const FString& Folder, const FString& Name,
 #endif
 }  // namespace
 
+TSharedRef<FJsonObject> S08AuthorWidgetBlueprint(const FString& Folder, const FString& Name, UClass* Parent,
+                                                 TFunctionRef<bool(UWidgetTree&, FS08AttachWidget, FString*)> Build,
+                                                 bool bOverwrite) {
+#if WITH_EDITOR
+  return S08AuthorOne(Folder, Name, Parent, Build, bOverwrite);
+#else
+  TSharedRef<FJsonObject> R = MakeShared<FJsonObject>();
+  R->SetStringField(TEXT("error"), TEXT("editor only"));
+  return R;
+#endif
+}
+
 FString US08ArtHudAuthoringLibrary::AuthorArtHudWidgetBlueprints(const FString& Folder, bool bOverwrite) {
   TSharedRef<FJsonObject> Report = MakeShared<FJsonObject>();
   Report->SetStringField(TEXT("schema"), TEXT("unmatched.w4c-art-hud-wbp/1"));

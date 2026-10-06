@@ -9,6 +9,7 @@
 #include "S08Render.h"
 #include "S08TurnPortraitWidget.h"
 #include "UI/UmHudScale.h"
+#include "UI/UmTeamChip.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
 
@@ -87,6 +88,10 @@ FString TraceLine() {
   const FString Dpi = UmHudScale::ArtLookField(Cmd);
   // VS-1 CP-02: the real avatars / card scans or their rollbacks (ВР-CP08).
   const FString CardMedia = CardMediaField(Cmd);
+  // VS-2 IC-44 / IC-45: the v3 team chips or the -S08IconLegacy mvp-v1 chips.
+  const FString Chips = UmTeamChip::ArtLookField(Cmd);
+  // VS-2 HB-06: the UMG HUD root or the -S08SlateHud rollback (whole / block list).
+  const FString HudImpl = SlateHudBlocks().ImplField();
   // AN-21 (ВР-12): the move ease of the ends (80 ms) with its rollback
   const FS08MoveAnimParams MoveParams = FS08MoveAnimParams::FromCommandLine(Cmd);
   const FString MoveEase = MoveParams.bEaseEnds ? FString::Printf(TEXT("ease%.0f"), MoveParams.EaseMs)
@@ -105,10 +110,80 @@ FString TraceLine() {
                               ? FString::Printf(TEXT("legacy(-%s)"), S08HeroesV2::HeroMatFixLegacyFlagName)
                               : FString(TEXT("on"));
   return FString::Printf(
-      TEXT("ARTLOOK art=%d source=%s heroes=%s tray=%s env=%s review=%d legacyRender=%d markers=%d aliases=%s %s %s %s move=%s facing=%s baseDigit=%s heroMat=%s%s"),
+      TEXT("ARTLOOK art=%d source=%s heroes=%s tray=%s env=%s review=%d legacyRender=%d markers=%d aliases=%s %s %s %s %s hudImpl=%s move=%s facing=%s baseDigit=%s heroMat=%s%s"),
       bArt ? 1 : 0, Source, *Heroes, *Tray, *Env, ReviewTooling() ? 1 : 0, S08LegacyRender() ? 1 : 0, S08Markers() ? 1 : 0,
-      Aliases.Num() ? *FString::Join(Aliases, TEXT(",")) : TEXT("-"), *HudLook, *Dpi, *CardMedia, *MoveEase, *Facing,
-      *BaseDigit, *HeroMat, bArt ? TEXT("") : TEXT(" (grey board: no art profile, figures, tray or art HUD layer)"));
+      Aliases.Num() ? *FString::Join(Aliases, TEXT(",")) : TEXT("-"), *HudLook, *Dpi, *CardMedia, *Chips, *HudImpl,
+      *MoveEase, *Facing, *BaseDigit, *HeroMat,
+      bArt ? TEXT("") : TEXT(" (grey board: no art profile, figures, tray or art HUD layer)"));
+}
+
+FString FS08SlateHudBlocks::ImplField() const {
+  if (bAll) return TEXT("slate");
+  if (Blocks.Num() == 0) return TEXT("umg");
+  TArray<FString> Names;
+  for (const FName& B : Blocks) Names.Add(B.ToString());
+  return TEXT("slate:") + FString::Join(Names, TEXT(","));
+}
+
+FS08SlateHudBlocks ParseSlateHud(const TCHAR* CommandLine) {
+  FS08SlateHudBlocks Out;
+  if (!CommandLine) return Out;
+  // The flag itself: '-S08SlateHud' alone (FParse::Param) or with '=' (an empty value = the whole HUD).
+  FString Value;
+  const FString ValueKey = FString(SlateHudFlagName) + TEXT("=");
+  const FString Token = FString(TEXT("-")) + ValueKey;
+  const TCHAR* At = FCString::Strifind(CommandLine, *Token);
+  if (!At) {
+    Out.bAll = FParse::Param(CommandLine, SlateHudFlagName);
+    return Out;
+  }
+  // the raw value up to the next blank (FParse::Value skips the blank of an empty value and takes the next flag)
+  const TCHAR* Cursor = At + Token.Len();
+  const bool bQuoted = *Cursor == TEXT('"');
+  if (bQuoted) ++Cursor;
+  while (*Cursor && (bQuoted ? *Cursor != TEXT('"') : !FChar::IsWhitespace(*Cursor))) Value.AppendChar(*Cursor++);
+  Value.TrimStartAndEndInline();
+  TArray<FString> Parts;
+  Value.ParseIntoArray(Parts, TEXT(","), true);
+  for (FString& Part : Parts) {
+    Part.TrimStartAndEndInline();
+    if (Part.IsEmpty()) continue;
+    const FName Key(*Part.ToLower());
+    if (Out.Blocks.Contains(Key)) continue;
+    Out.Blocks.Add(Key);
+    bool bKnown = false;
+    for (const TCHAR* Known : SlateHudKeys) bKnown |= Key == FName(Known);
+    if (!bKnown) Out.Unknown.Add(Key);
+  }
+  if (Out.Blocks.Num() == 0) Out.bAll = true;  // '-S08SlateHud=' with nothing = the whole HUD
+  return Out;
+}
+
+namespace {
+bool GSlateHudOverride = false;
+FString GSlateHudOverrideValue;
+}  // namespace
+
+FS08SlateHudBlocks SlateHudBlocks() {
+  if (GSlateHudOverride) {
+    if (GSlateHudOverrideValue.IsEmpty()) return FS08SlateHudBlocks();
+    if (GSlateHudOverrideValue == TEXT("*")) return ParseSlateHud(*FString::Printf(TEXT("-%s"), SlateHudFlagName));
+    return ParseSlateHud(*FString::Printf(TEXT("-%s=%s"), SlateHudFlagName, *GSlateHudOverrideValue));
+  }
+  // ВР-36 / ВР-VS2-12: the grey board (-S08GreyBoard: the S09 logic stand run-hud-demo) keeps the whole HUD on Slate
+  FS08SlateHudBlocks Out = ParseSlateHud(FCommandLine::Get());
+  if (!Enabled()) Out.bAll = true;
+  return Out;
+}
+
+void SetSlateHudOverrideForTest(const FString& Value) {
+  GSlateHudOverride = true;
+  GSlateHudOverrideValue = Value;
+}
+
+void ResetSlateHudOverrideForTest() {
+  GSlateHudOverride = false;
+  GSlateHudOverrideValue.Reset();
 }
 
 }  // namespace S08ArtLook

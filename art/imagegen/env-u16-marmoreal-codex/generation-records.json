@@ -348,5 +348,106 @@
     ],
     "stop_reason": "Two complete attempts failed seam/perspective criteria. No further generation per task; Claude owns T-SYNTX-IMG-BANANA fallback.",
     "run1_fields_note": "provider_checks and built_in_excluded_reason retain run1 history; overridden by fix1 authorization."
+  },
+  "EN-02-SX01": {
+    "card": "EN-02",
+    "package": "SX-01",
+    "template": "T-SYNTX-IMG-BANANA",
+    "budget_tokens": 6,
+    "generations": [
+      {
+        "prompt_key": "SX01-r1",
+        "prompt_file": "docs/game-design/visual/06-tasks/prompts/EN-02.syntx.txt",
+        "prompt_section": "Prompt",
+        "input": "scraped-data/derived/env-u16-marmoreal-codex/sx01/SX01-input-2340x1317.png",
+        "input_sha256": "27bc91ec5680746a56bab16be2bbfdd5ad12d761d965561155218b663c7fbf32",
+        "raw_file": "scraped-data/derived/env-u16-marmoreal-codex/sx01/SX01-r1-raw.jpg",
+        "raw_sha256": "d6e90a2a2d5e66c8a1738339ce6063baf21fca57924be7994140829838bbdec4",
+        "raw_size": [
+          2752,
+          1536
+        ],
+        "raw_format": "JPEG",
+        "retouched": false,
+        "provider": "SYNTX banana/banana3 (Nano Banana 2), image_size 2K, aspect_ratio 16:9, n 1",
+        "service_task_id": "4f01a848-ba95-4793-8eb4-52d9b976ab46",
+        "cost_tokens": 3,
+        "run": "SX-01 (Claude)",
+        "raw_copy_outside_repo": "C:/tmp/visual-syntx/EN-02/raw/SX01-r1-raw.jpg",
+        "verdict": "rejected: moon disc, two symmetric balustraded bridges, lighter bottom haze (ВР-VS3-EN02-02)"
+      },
+      {
+        "prompt_key": "SX01-r2",
+        "prompt_file": "docs/game-design/visual/06-tasks/prompts/EN-02.syntx.txt",
+        "prompt_section": "Retry 1 (r2)",
+        "input": "scraped-data/derived/env-u16-marmoreal-codex/sx01/SX01-input-2340x1317.png",
+        "input_sha256": "27bc91ec5680746a56bab16be2bbfdd5ad12d761d965561155218b663c7fbf32",
+        "raw_file": "scraped-data/derived/env-u16-marmoreal-codex/sx01/SX01-r2-raw.jpg",
+        "raw_sha256": "440012b3ee849548a8b8358a06c71c210a84d226a6ff7aba1a675a7955154ba0",
+        "raw_size": [
+          2752,
+          1536
+        ],
+        "raw_format": "JPEG",
+        "retouched": false,
+        "provider": "SYNTX banana/banana3 (Nano Banana 2), image_size 2K, aspect_ratio 16:9, n 1",
+        "service_task_id": "345e03a8-e19d-4442-81d2-c38a331c29aa",
+        "cost_tokens": 3,
+        "run": "SX-01 (Claude)",
+        "raw_copy_outside_repo": "C:/tmp/visual-syntx/EN-02/raw/SX01-r2-raw.jpg",
+        "verdict": "accepted after assembly r2b (ВР-VS3-EN02-03...05)"
+      }
+    ],
+    "attempted_generations": 2,
+    "status": "accepted_by_delegation",
+    "selected": "SX01-r2 assembled as r2b",
+    "assembly": "art/imagegen/env-u16-marmoreal-codex/_tools/sx01.py build --tag r2b --darken 0.85,0.85,0.85,0.5 (proof _tools/sx01-r2b-proof.json)",
+    "outputs": {
+      "scraped-data/derived/env-u16-marmoreal-codex/marmoreal-clean-ext.png": "92146f4e96d645351f3ca6ea2972a4792f95df670db0bbe7d677f9fb1928106c",
+      "scraped-data/derived/env-u16-marmoreal-codex/marmoreal-lit-ext.png": "7fcf21593074c639c04e0adf5be6d06efed65b7611059f294575d9774db27624"
+    },
+    "author": "Claude (SX-01 is not a Codex run)"
+  },
+  "EN-04": {
+    "task": "EN-04",
+    "status": "предложено",
+    "budget": 0,
+    "generation_count": 0,
+    "generations": [],
+    "prompt_keys": [],
+    "reason": "No image generation is permitted or used; all outputs are procedural.",
+    "procedural_recipe_key": "EN-04-MASKS-03",
+    "script": "_tools/build_masks.py",
+    "build_record": "_tools/en04-build.json",
+    "attempts": [
+      {
+        "key": "EN-04-MASKS-01",
+        "generations": 0,
+        "result": "HSV selected some reflected pink bark highlights; add woody-core exclusion."
+      },
+      {
+        "key": "EN-04-MASKS-02",
+        "generations": 0,
+        "result": "Explicit woody cores excluded; crop review required wider trunk contours."
+      },
+      {
+        "key": "EN-04-MASKS-03",
+        "generations": 0,
+        "result": "Trunk and primary-branch exclusion widened; final script checks and PNG review."
+      }
+    ],
+    "fix1": {
+      "task": "EN-04 fix1",
+      "status": "предложено",
+      "recipe": "EN-04-FIX1",
+      "generations": 0,
+      "MCP_calls": 0,
+      "decisions": [
+        "ВР-VS3-EN04-01",
+        "ВР-VS3-EN04-02",
+        "ВР-VS3-EN04-03"
+      ],
+      "result": "Coherent crown envelopes replace pigment speckles; five revised acceptance lines passed."
+    }
   }
 }

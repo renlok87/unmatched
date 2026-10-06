@@ -380,8 +380,9 @@ public:
   }
 
   /** Decodes the fighters projection into grey-board fighters; same-name
-   *  fighters get numbered labels ('Harpies' x3 -> 'Harpies 1/2/3') per
-   *  TASK-021, keyed by stable fighter id (never by array order). Also reads
+   *  fighters of one owner get numbered labels ('Harpies' x3 -> 'Harpies
+   *  1/2/3') per TASK-021 in the server's seat order (= sidekicks[], fixed for
+   *  the game: defeated fighters stay in the array; VS-2 CP-12). Also reads
    *  the raw `movement` (JsNumber) and `isDefeated` (MS-T-03). */
   static bool DecodeFighters(const TSharedPtr<FJsonValue>& FightersValue,
                              TArray<FS08BoardFighter>& OutFighters);

@@ -2,9 +2,20 @@
 
 #include "S08AnimatedIconWidget.h"
 #include "S08ArtHudStyle.h"
+#include "S08ArtLook.h"
+#include "S08HudTokens.generated.h"
 #include "S08IconMotion.h"
+#include "S08TraceLog.h"
+#include "UI/UmCardMedia.h"
+#include "UI/UmHudScale.h"
+#include "UI/UmHudTheme.h"
 #include "../S09/S09TurnHud.h"
 #include "Blueprint/WidgetTree.h"
+#include "Engine/Texture2D.h"
+#include "Engine/World.h"
+#include "HAL/PlatformTime.h"
+#include "Materials/MaterialInstanceDynamic.h"
+#include "Misc/PackageName.h"
 #include "Components/Border.h"
 #include "Components/HorizontalBox.h"
 #include "Components/HorizontalBoxSlot.h"
@@ -18,18 +29,12 @@
 #include "Misc/Parse.h"
 
 namespace {
-FLinearColor S08PortraitSrgb(uint8 R, uint8 G, uint8 B, float A = 1.0f) {
-  FLinearColor C = FLinearColor::FromSRGBColor(FColor(R, G, B));
-  C.A = A;
-  return C;
-}
-/** tag.background #161A28 (the HUD panel of the gallery and the tags), a little transparent over the backdrop. */
-const FLinearColor GPortraitPanel = S08PortraitSrgb(0x16, 0x1A, 0x28, 0.88f);
-/** tag.text #F2ECDE. */
-const FLinearColor GPortraitText = S08PortraitSrgb(0xF2, 0xEC, 0xDE);
-/** turn.flash.yellow #F2C14E (STYLE-v3 §11) - the "your turn" accent; dim grey for "waiting". */
-const FLinearColor GPortraitActive = S08PortraitSrgb(0xF2, 0xC1, 0x4E);
-const FLinearColor GPortraitIdle = S08PortraitSrgb(0x9A, 0x9E, 0xAC);
+// VS-2 HB-18 (hud.csv HB-18 п. 3): the colours from UUmHudTheme, no literal - the plate panel.bg (ВР-61; was #161A28
+// 0.88), the text text.primary, the "your turn" accent turn.flash.yellow (STYLE-v3 §11), "waiting" text.secondary
+FLinearColor PortraitPanelColor() { return UUmHudTheme::Get().Color(TEXT("panel.bg")); }
+FLinearColor PortraitTextColor() { return UUmHudTheme::Get().Color(TEXT("text.primary")); }
+FLinearColor PortraitActiveColor() { return UUmHudTheme::Get().Color(TEXT("turn.flash.yellow")); }
+FLinearColor PortraitIdleColor() { return UUmHudTheme::Get().Color(TEXT("text.secondary")); }
 /** Ring / tracker / heart texture sizes: exact-size v3 textures (24 / 32 / 48 / 64 px only). */
 constexpr int32 GRingTexturePx = 64;
 constexpr int32 GSmallTexturePx = 24;
@@ -98,78 +103,317 @@ FString FS08TurnHudLook::ArtLookField(const TCHAR* CommandLine) {
 
 // ------------------------------------------------------------------------------------------------- widget
 
-bool US08TurnPortraitWidget::Initialize() {
-  const bool bFirst = Super::Initialize();
-  if (!bFirst || !WidgetTree || WidgetTree->RootWidget) return bFirst;
-  Panel = WidgetTree->ConstructWidget<UBorder>(UBorder::StaticClass(), TEXT("Panel"));
-  Panel->SetBrushColor(GPortraitPanel);
-  Panel->SetPadding(FMargin(8.0f, 6.0f, 12.0f, 6.0f));
-  Panel->SetVisibility(ESlateVisibility::HitTestInvisible);  // never takes a click from the board or the HUD
-  WidgetTree->RootWidget = Panel;
+namespace {
+template <typename T>
+T* PortraitMake(UWidgetTree& Tree, const TCHAR* Name) {
+  return Tree.ConstructWidget<T>(T::StaticClass(), FName(Name));
+}
 
-  UHorizontalBox* Row = WidgetTree->ConstructWidget<UHorizontalBox>(UHorizontalBox::StaticClass(), TEXT("Row"));
-  Panel->SetContent(Row);
+template <typename T>
+T* PortraitFind(UWidgetTree* Tree, const TCHAR* Name) {
+  return Tree ? Cast<T>(Tree->FindWidget(FName(Name))) : nullptr;
+}
 
-  // avatar: the ring canvas (64 su), the round disc (window 21 u of 32) centred under it
-  USizeBox* AvatarBox = WidgetTree->ConstructWidget<USizeBox>(USizeBox::StaticClass(), TEXT("AvatarBox"));
+void PortraitAlign(UWidget* Widget, EHorizontalAlignment H, EVerticalAlignment V) {
+  if (UOverlaySlot* OSlot = Cast<UOverlaySlot>(Widget->Slot)) {
+    OSlot->SetHorizontalAlignment(H);
+    OSlot->SetVerticalAlignment(V);
+  }
+}
+}  // namespace
+
+bool US08TurnPortraitWidget::BuildDefaultTree(UWidgetTree& Tree, FS08AttachWidget Attach, FString* OutError) {
+  auto Fail = [OutError](const TCHAR* What) {
+    if (OutError) *OutError = FString::Printf(TEXT("attach failed: %s"), What);
+    return false;
+  };
+  UBorder* PanelW = PortraitMake<UBorder>(Tree, TEXT("Panel"));
+  PanelW->SetBrushColor(PortraitPanelColor());
+  PanelW->SetPadding(FMargin(8.0f, 6.0f, 12.0f, 6.0f));
+  PanelW->SetVisibility(ESlateVisibility::HitTestInvisible);  // never takes a click from the board or the HUD
+  if (!Attach(PanelW, nullptr)) return Fail(TEXT("Panel"));
+  UHorizontalBox* Row = PortraitMake<UHorizontalBox>(Tree, TEXT("Row"));
+  if (!Attach(Row, PanelW)) return Fail(TEXT("Row"));
+
+  // avatar: the ring canvas (64 su), the round circle (window 21 u of 32) centred under it
+  USizeBox* AvatarBox = PortraitMake<USizeBox>(Tree, TEXT("AvatarBox"));
   AvatarBox->SetWidthOverride(RingSu);
   AvatarBox->SetHeightOverride(RingSu);
-  Avatar = WidgetTree->ConstructWidget<UOverlay>(UOverlay::StaticClass(), TEXT("Avatar"));
-  AvatarBox->AddChild(Avatar);
-  USizeBox* DiscBox = WidgetTree->ConstructWidget<USizeBox>(USizeBox::StaticClass(), TEXT("DiscBox"));
-  DiscBox->SetWidthOverride(DiscSu);
-  DiscBox->SetHeightOverride(DiscSu);
-  Disc = WidgetTree->ConstructWidget<UImage>(UImage::StaticClass(), TEXT("Disc"));
+  if (!Attach(AvatarBox, Row)) return Fail(TEXT("AvatarBox"));
+  if (UHorizontalBoxSlot* AvatarSlot = Cast<UHorizontalBoxSlot>(AvatarBox->Slot)) {
+    AvatarSlot->SetVerticalAlignment(VAlign_Center);
+    AvatarSlot->SetPadding(FMargin(0.0f, 0.0f, 8.0f, 0.0f));
+  }
+  UOverlay* AvatarW = PortraitMake<UOverlay>(Tree, TEXT("Avatar"));
+  if (!Attach(AvatarW, AvatarBox)) return Fail(TEXT("Avatar"));
+  USizeBox* DiscBoxW = PortraitMake<USizeBox>(Tree, TEXT("DiscBox"));
+  DiscBoxW->SetWidthOverride(DiscSu);
+  DiscBoxW->SetHeightOverride(DiscSu);
+  if (!Attach(DiscBoxW, AvatarW)) return Fail(TEXT("DiscBox"));
+  PortraitAlign(DiscBoxW, HAlign_Center, VAlign_Center);
+  UOverlay* Stack = PortraitMake<UOverlay>(Tree, TEXT("DiscStack"));
+  if (!Attach(Stack, DiscBoxW)) return Fail(TEXT("DiscStack"));
+  UImage* DiscW = PortraitMake<UImage>(Tree, TEXT("Disc"));
   FSlateBrush Round;
   Round.DrawAs = ESlateBrushDrawType::RoundedBox;  // default outline settings: half-height radius = a circle
   Round.ImageSize = FVector2D(DiscSu, DiscSu);
-  Disc->SetBrush(Round);
-  DiscBox->AddChild(Disc);
-  UOverlaySlot* DiscSlot = Avatar->AddChildToOverlay(DiscBox);
-  DiscSlot->SetHorizontalAlignment(HAlign_Center);
-  DiscSlot->SetVerticalAlignment(VAlign_Center);
-  MonogramText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("Monogram"));
-  MonogramText->SetFont(PortraitFont(S08ArtHudFonts::CardTypeface, 18));
-  MonogramText->SetColorAndOpacity(FSlateColor(GPortraitPanel.CopyWithNewOpacity(1.0f)));
-  MonogramText->SetJustification(ETextJustify::Center);
-  UOverlaySlot* MonoSlot = Avatar->AddChildToOverlay(MonogramText);
-  MonoSlot->SetHorizontalAlignment(HAlign_Center);
-  MonoSlot->SetVerticalAlignment(VAlign_Center);
-  UHorizontalBoxSlot* AvatarSlot = Row->AddChildToHorizontalBox(AvatarBox);
-  AvatarSlot->SetVerticalAlignment(VAlign_Center);
-  AvatarSlot->SetPadding(FMargin(0.0f, 0.0f, 8.0f, 0.0f));
+  DiscW->SetBrush(Round);
+  if (!Attach(DiscW, Stack)) return Fail(TEXT("Disc"));
+  PortraitAlign(DiscW, HAlign_Fill, VAlign_Fill);
+  UImage* AvatarImageW = PortraitMake<UImage>(Tree, TEXT("AvatarImage"));
+  AvatarImageW->SetVisibility(ESlateVisibility::Collapsed);  // until a registry PNG is applied (CP-08)
+  if (!Attach(AvatarImageW, Stack)) return Fail(TEXT("AvatarImage"));
+  PortraitAlign(AvatarImageW, HAlign_Fill, VAlign_Fill);
+  UTextBlock* Mono = PortraitMake<UTextBlock>(Tree, TEXT("MonogramText"));
+  Mono->SetFont(PortraitFont(S08ArtHudFonts::CardTypeface, 18));
+  Mono->SetColorAndOpacity(FSlateColor(PortraitPanelColor().CopyWithNewOpacity(1.0f)));
+  Mono->SetJustification(ETextJustify::Center);
+  if (!Attach(Mono, AvatarW)) return Fail(TEXT("MonogramText"));
+  PortraitAlign(Mono, HAlign_Center, VAlign_Center);
 
-  UVerticalBox* Column = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass(), TEXT("Column"));
-  UHorizontalBoxSlot* ColumnSlot = Row->AddChildToHorizontalBox(Column);
-  ColumnSlot->SetVerticalAlignment(VAlign_Center);
-  NameText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("Name"));
-  NameText->SetFont(PortraitFont(TEXT("Bold"), 15));
-  NameText->SetColorAndOpacity(FSlateColor(GPortraitText));
-  Column->AddChildToVerticalBox(NameText);
-  StatusText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("Status"));
-  StatusText->SetFont(PortraitFont(S08ArtHudFonts::CardTypeface, 12));
-  StatusText->SetColorAndOpacity(FSlateColor(GPortraitIdle));
-  Column->AddChildToVerticalBox(StatusText);
-
-  UHorizontalBox* Stats = WidgetTree->ConstructWidget<UHorizontalBox>(UHorizontalBox::StaticClass(), TEXT("Stats"));
-  UVerticalBoxSlot* StatsSlot = Column->AddChildToVerticalBox(Stats);
-  StatsSlot->SetPadding(FMargin(0.0f, 2.0f, 0.0f, 0.0f));
-  HeartIcon = CreateWidget<US08AnimatedIconWidget>(this, US08AnimatedIconWidget::StaticClass());
-  if (HeartIcon && HeartIcon->SetIcon(TEXT("resource-hp-full"), SmallIconSu, GSmallTexturePx)) {
-    HeartIcon->ShowAtRest();
-    UHorizontalBoxSlot* HeartSlot = Stats->AddChildToHorizontalBox(HeartIcon);
-    HeartSlot->SetVerticalAlignment(VAlign_Center);
+  UVerticalBox* Column = PortraitMake<UVerticalBox>(Tree, TEXT("Column"));
+  if (!Attach(Column, Row)) return Fail(TEXT("Column"));
+  if (UHorizontalBoxSlot* ColumnSlot = Cast<UHorizontalBoxSlot>(Column->Slot)) ColumnSlot->SetVerticalAlignment(VAlign_Center);
+  UTextBlock* Name = PortraitMake<UTextBlock>(Tree, TEXT("NameText"));
+  Name->SetFont(PortraitFont(TEXT("Bold"), 15));
+  Name->SetColorAndOpacity(FSlateColor(PortraitTextColor()));
+  if (!Attach(Name, Column)) return Fail(TEXT("NameText"));
+  UTextBlock* Status = PortraitMake<UTextBlock>(Tree, TEXT("StatusText"));
+  Status->SetFont(PortraitFont(S08ArtHudFonts::CardTypeface, 12));
+  Status->SetColorAndOpacity(FSlateColor(PortraitIdleColor()));
+  if (!Attach(Status, Column)) return Fail(TEXT("StatusText"));
+  UHorizontalBox* StatsW = PortraitMake<UHorizontalBox>(Tree, TEXT("Stats"));
+  if (!Attach(StatsW, Column)) return Fail(TEXT("Stats"));
+  if (UVerticalBoxSlot* StatsSlot = Cast<UVerticalBoxSlot>(StatsW->Slot)) StatsSlot->SetPadding(FMargin(0.0f, 2.0f, 0.0f, 0.0f));
+  UTextBlock* Hp = PortraitMake<UTextBlock>(Tree, TEXT("HpText"));
+  Hp->SetFont(PortraitFont(S08ArtHudFonts::CardTypeface, 14));
+  Hp->SetColorAndOpacity(FSlateColor(PortraitTextColor()));
+  if (!Attach(Hp, StatsW)) return Fail(TEXT("HpText"));
+  if (UHorizontalBoxSlot* HpSlot = Cast<UHorizontalBoxSlot>(Hp->Slot)) {
+    HpSlot->SetVerticalAlignment(VAlign_Center);
+    HpSlot->SetPadding(FMargin(3.0f, 0.0f, 12.0f, 0.0f));
   }
-  HpText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("Hp"));
-  HpText->SetFont(PortraitFont(S08ArtHudFonts::CardTypeface, 14));
-  HpText->SetColorAndOpacity(FSlateColor(GPortraitText));
-  UHorizontalBoxSlot* HpSlot = Stats->AddChildToHorizontalBox(HpText);
-  HpSlot->SetVerticalAlignment(VAlign_Center);
-  HpSlot->SetPadding(FMargin(3.0f, 0.0f, 12.0f, 0.0f));
-  TrackerRow = WidgetTree->ConstructWidget<UHorizontalBox>(UHorizontalBox::StaticClass(), TEXT("Tracker"));
-  UHorizontalBoxSlot* TrackerSlot = Stats->AddChildToHorizontalBox(TrackerRow);
-  TrackerSlot->SetVerticalAlignment(VAlign_Center);
+  UHorizontalBox* Tracker = PortraitMake<UHorizontalBox>(Tree, TEXT("TrackerRow"));
+  if (!Attach(Tracker, StatsW)) return Fail(TEXT("TrackerRow"));
+  if (UHorizontalBoxSlot* TrackerSlot = Cast<UHorizontalBoxSlot>(Tracker->Slot)) TrackerSlot->SetVerticalAlignment(VAlign_Center);
+  return true;
+}
+
+void US08TurnPortraitWidget::BindParts() {
+  UWidgetTree* Tree = WidgetTree;
+  if (!Panel) Panel = PortraitFind<UBorder>(Tree, TEXT("Panel"));
+  if (!Avatar) Avatar = PortraitFind<UOverlay>(Tree, TEXT("Avatar"));
+  if (!DiscBox) DiscBox = PortraitFind<USizeBox>(Tree, TEXT("DiscBox"));
+  if (!Disc) Disc = PortraitFind<UImage>(Tree, TEXT("Disc"));
+  if (!AvatarImage) AvatarImage = PortraitFind<UImage>(Tree, TEXT("AvatarImage"));
+  if (!MonogramText) MonogramText = PortraitFind<UTextBlock>(Tree, TEXT("MonogramText"));
+  if (!NameText) NameText = PortraitFind<UTextBlock>(Tree, TEXT("NameText"));
+  if (!StatusText) StatusText = PortraitFind<UTextBlock>(Tree, TEXT("StatusText"));
+  if (!Stats) Stats = PortraitFind<UHorizontalBox>(Tree, TEXT("Stats"));
+  if (!HpText) HpText = PortraitFind<UTextBlock>(Tree, TEXT("HpText"));
+  if (!TrackerRow) TrackerRow = PortraitFind<UHorizontalBox>(Tree, TEXT("TrackerRow"));
+}
+
+bool US08TurnPortraitWidget::Initialize() {
+  const bool bFirst = Super::Initialize();
+  if (!bFirst || !WidgetTree) return bFirst;
+  if (!WidgetTree->RootWidget) {
+    FString Error;
+    UWidgetTree* Tree = WidgetTree;
+    bCodeDefaultTree = BuildDefaultTree(*Tree, [Tree](UWidget* Child, UPanelWidget* Parent) {
+      if (!Parent) {
+        Tree->RootWidget = Child;
+        return true;
+      }
+      return Parent->AddChild(Child) != nullptr;
+    }, &Error);
+    if (!bCodeDefaultTree) UE_LOG(LogTemp, Error, TEXT("PORTRAIT default tree: %s"), *Error);
+  }
+  BindParts();
+  if (Panel) Panel->SetVisibility(ESlateVisibility::HitTestInvisible);
+  // the fonts again at runtime: an FCoreStyle font (a composite font held in code) does not survive the WBP's
+  // serialization - WBP_UmPortrait would draw tofu otherwise
+  if (NameText) NameText->SetFont(PortraitFont(TEXT("Bold"), 15));
+  if (StatusText) StatusText->SetFont(PortraitFont(S08ArtHudFonts::CardTypeface, 12));
+  if (HpText) HpText->SetFont(PortraitFont(S08ArtHudFonts::CardTypeface, 14));
+  // VS-2 HB-18: the theme colours again too - an authored WBP_UmPortrait keeps the colours of its authoring
+  if (Panel) Panel->SetBrushColor(PortraitPanelColor());
+  if (NameText) NameText->SetColorAndOpacity(FSlateColor(PortraitTextColor()));
+  if (HpText) HpText->SetColorAndOpacity(FSlateColor(PortraitTextColor()));
+  if (StatusText) StatusText->SetColorAndOpacity(FSlateColor(PortraitIdleColor()));
+  // the heart: an animated v3 icon added in code, before the hp text
+  if (Stats && !HeartIcon) {
+    HeartIcon = CreateWidget<US08AnimatedIconWidget>(this, US08AnimatedIconWidget::StaticClass());
+    if (HeartIcon && HeartIcon->SetIcon(TEXT("resource-hp-full"), SmallIconSu, GSmallTexturePx)) {
+      HeartIcon->ShowAtRest();
+      Stats->InsertChildAt(0, HeartIcon);
+      if (UHorizontalBoxSlot* HeartSlot = Cast<UHorizontalBoxSlot>(HeartIcon->Slot)) HeartSlot->SetVerticalAlignment(VAlign_Center);
+    } else {
+      HeartIcon = nullptr;
+    }
+  }
+  ApplyPortraitLook();
   return bFirst;
+}
+
+US08TurnPortraitWidget* US08TurnPortraitWidget::Create(UWorld* World, FString* OutSource) {
+  if (!World) return nullptr;
+  UClass* Class = US08TurnPortraitWidget::StaticClass();
+  FString Source = TEXT("code-default");
+  const FString Package = UmPortrait::WidgetBlueprintPath;
+  if (FPackageName::DoesPackageExist(Package)) {
+    const FString ClassPath = Package + TEXT(".") + FPackageName::GetShortName(Package) + TEXT("_C");
+    if (UClass* Wbp = LoadClass<US08TurnPortraitWidget>(nullptr, *ClassPath, nullptr, LOAD_NoWarn | LOAD_Quiet)) {
+      Class = Wbp;
+      Source = Package;
+    }
+  }
+  if (OutSource) *OutSource = Source;
+  return CreateWidget<US08TurnPortraitWidget>(World, Class);
+}
+
+bool US08TurnPortraitWidget::HasAllParts(FString* OutMissing) const {
+  TArray<FString> Missing;
+  if (!Panel) Missing.Add(TEXT("Panel"));
+  if (!Avatar) Missing.Add(TEXT("Avatar"));
+  if (!DiscBox) Missing.Add(TEXT("DiscBox"));
+  if (!Disc) Missing.Add(TEXT("Disc"));
+  if (!AvatarImage) Missing.Add(TEXT("AvatarImage"));
+  if (!MonogramText) Missing.Add(TEXT("MonogramText"));
+  if (!NameText) Missing.Add(TEXT("NameText"));
+  if (!StatusText) Missing.Add(TEXT("StatusText"));
+  if (!Stats) Missing.Add(TEXT("Stats"));
+  if (!HpText) Missing.Add(TEXT("HpText"));
+  if (!TrackerRow) Missing.Add(TEXT("TrackerRow"));
+  if (OutMissing) *OutMissing = FString::Join(Missing, TEXT(","));
+  return Missing.Num() == 0;
+}
+
+// ------------------------------------------------------------------------------------------------- portrait (CP-08)
+
+bool US08TurnPortraitWidget::PortraitLegacy() const {
+  return LegacyOverride >= 0 ? LegacyOverride == 1 : !S08ArtLook::PortraitAvatars();
+}
+
+float US08TurnPortraitWidget::PxPerSuNow() const {
+  if (PxPerSuOverride > 0.0f) return PxPerSuOverride;
+  const FUmHudScaleState& Scale = UmHudScale::Current();
+  return Scale.Window.X > 0 ? Scale.PxPerSu() : 1.0f;
+}
+
+FString US08TurnPortraitWidget::GetMonogram() const { return UmPortrait::FallbackText(PortraitKey, HeroName, PortraitSidekick); }
+
+void US08TurnPortraitWidget::SetPortrait(FName Key, int32 SidekickNumber) {
+  bPortraitKeyExplicit = true;
+  if (bPortraitApplied && Key == PortraitKey && SidekickNumber == PortraitSidekick) return;
+  PortraitKey = Key;
+  PortraitSidekick = SidekickNumber;
+  ApplyPortraitLook();
+}
+
+void US08TurnPortraitWidget::ApplyPortraitLook() {
+  const UUmHudTheme& Theme = UUmHudTheme::Get();
+  const bool bLegacy = PortraitLegacy();
+  const FUmCardMediaEntry* Entry = bLegacy ? nullptr : UmPortrait::Find(PortraitKey);
+  UTexture2D* Tex = Entry ? UmCardMedia::LoadTexture(*Entry) : nullptr;
+  UMaterialInterface* Mat =
+      Tex ? LoadObject<UMaterialInterface>(nullptr, UmPortrait::MaterialPath, nullptr, LOAD_NoWarn | LOAD_Quiet) : nullptr;
+  bAvatarShown = Tex && Mat && AvatarImage;
+  if (!bLegacy && !bAvatarShown && !PortraitKey.IsNone() && !WarnedKeys.Contains(PortraitKey)) {
+    // 02 §6.4: the monogram is only the fallback, and it says so in the log
+    WarnedKeys.Add(PortraitKey);
+    UE_LOG(LogTemp, Warning, TEXT("PORTRAIT fallback id=%s reason=%s"), *PortraitKey.ToString(),
+           !Entry ? TEXT("no-registry-entry") : !Tex ? TEXT("texture-missing") : !Mat ? TEXT("material-missing") : TEXT("no-image"));
+  }
+  AppliedPxPerSu = PxPerSuNow();
+  SrcCirclePx = Entry ? UmPortrait::SourceCirclePx(*Entry) : 0.0f;
+  CircleSu = bAvatarShown ? UmPortrait::CappedSu(DiscWindowSu, SrcCirclePx, AppliedPxPerSu) : DiscWindowSu;
+  if (DiscBox) {
+    DiscBox->SetWidthOverride(CircleSu);
+    DiscBox->SetHeightOverride(CircleSu);
+  }
+  if (bAvatarShown) {
+    if (!AvatarMid || AvatarMid->Parent != Mat) AvatarMid = UMaterialInstanceDynamic::Create(Mat, this);
+    UmPortrait::SetupDiscMid(*AvatarMid, *Entry, Tex, CircleSu);
+    FSlateBrush Brush;
+    Brush.SetResourceObject(AvatarMid);
+    Brush.ImageSize = FVector2D(CircleSu, CircleSu);
+    AvatarImage->SetBrush(Brush);
+    AvatarImage->SetVisibility(ESlateVisibility::HitTestInvisible);
+    AvatarTexture = Tex;
+    AvatarPath = Entry->ObjectPath;
+    if (Disc) Disc->SetVisibility(ESlateVisibility::Collapsed);
+    if (MonogramText) MonogramText->SetVisibility(ESlateVisibility::Collapsed);
+  } else {
+    if (AvatarImage) AvatarImage->SetVisibility(ESlateVisibility::Collapsed);
+    AvatarTexture = nullptr;
+    AvatarPath.Reset();
+    if (Disc) {
+      Disc->SetVisibility(ESlateVisibility::HitTestInvisible);
+      // the fallback disc is card.navy (no team colour on a portrait, 02 §6.4); the rollback keeps the team disc
+      Disc->SetColorAndOpacity(bLegacy ? LastTeamColor : Theme.Color(TEXT("card.navy")));
+    }
+    if (MonogramText) {
+      MonogramText->SetVisibility(ESlateVisibility::HitTestInvisible);
+      MonogramText->SetText(FText::FromString(GetMonogram()));
+      if (bLegacy) {
+        MonogramText->SetFont(PortraitFont(S08ArtHudFonts::CardTypeface, 18));
+        MonogramText->SetColorAndOpacity(FSlateColor(PortraitPanelColor().CopyWithNewOpacity(1.0f)));
+      } else {
+        MonogramText->SetFont(Theme.Font(TEXT("type.heading")));
+        MonogramText->SetColorAndOpacity(FSlateColor(Theme.Color(TEXT("text.primary"))));
+      }
+    }
+  }
+  ApplyStateParams();
+  const bool bChanged = !bPortraitApplied || PortraitShotLine() != LastPortraitLine;
+  bPortraitApplied = true;
+  if (bChanged) {
+    LastPortraitLine = PortraitShotLine();
+    if (FS08Trace::IsOpen()) FS08Trace::Write(LastPortraitLine);
+  }
+}
+
+void US08TurnPortraitWidget::SetPortraitState(EUmPortraitState State, bool bAnimate) {
+  if (State == PortraitState) return;
+  const bool bFade = bAnimate && State == EUmPortraitState::Loser && !S08IconMotion::IsReducedMotion();
+  PortraitState = State;
+  StateStart = bFade ? FPlatformTime::Seconds() : -1.0;
+  ApplyStateParams();
+}
+
+void US08TurnPortraitWidget::ApplyStateParams() {
+  float Desat = UmPortrait::Desaturation(PortraitState);
+  float Op = UmPortrait::Opacity(PortraitState);
+  if (StateStart >= 0.0) {
+    // 04 §1.10: saturation 1 -> 0 and opacity 1 -> 0.6 over 400 ms, with the modal's entry
+    const float T = static_cast<float>((FPlatformTime::Seconds() - StateStart) * 1000.0 / UmPortrait::LoserMs);
+    if (T < 1.0f) {
+      Desat = FMath::Lerp(0.0f, Desat, T);
+      Op = FMath::Lerp(1.0f, Op, T);
+    } else {
+      StateStart = -1.0;
+    }
+  }
+  if (AvatarMid) {
+    AvatarMid->SetScalarParameterValue(UmPortrait::ParamDesaturation, Desat);
+    AvatarMid->SetScalarParameterValue(UmPortrait::ParamOpacity, Op);
+  }
+  if (Disc) Disc->SetRenderOpacity(Op);
+  if (MonogramText) MonogramText->SetRenderOpacity(Op);
+}
+
+void US08TurnPortraitWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime) {
+  Super::NativeTick(MyGeometry, InDeltaTime);
+  if (StateStart >= 0.0) ApplyStateParams();
+  // the ВР-CP04 cap follows a window / UI-scale change (no work otherwise)
+  if (bPortraitApplied && bAvatarShown && !FMath::IsNearlyEqual(PxPerSuNow(), AppliedPxPerSu, 1.0e-3f)) ApplyPortraitLook();
+}
+
+FString US08TurnPortraitWidget::PortraitShotLine(const TCHAR* Show) const {
+  const FString Tex = bAvatarShown ? AvatarPath : (PortraitLegacy() ? FString(TEXT("legacy")) : FString(TEXT("monogram")));
+  return UmPortrait::TraceLine(PortraitKey, Tex, CircleSu, AppliedPxPerSu, SrcCirclePx, Show,
+                               bOpponent ? TEXT("opp") : TEXT("own"), PortraitState, DiscWindowSu);
 }
 
 void US08TurnPortraitWidget::Setup(bool bInOpponent, const FS08TurnHudLook& InLook, const FLinearColor& TeamColor) {
@@ -178,10 +422,11 @@ void US08TurnPortraitWidget::Setup(bool bInOpponent, const FS08TurnHudLook& InLo
   if (HeartIcon) HeartIcon->SetLayerHidden(TEXT("glow"), !Look.bHeartGlow);
   if (!Look.RingIcon.IsNone() && Avatar && !RingIcon) {
     RingIcon = CreateWidget<US08AnimatedIconWidget>(this, US08AnimatedIconWidget::StaticClass());
-    if (RingIcon && RingIcon->SetIcon(Look.RingIcon, RingSu, GRingTexturePx)) {
+    if (RingIcon && RingIcon->SetIcon(Look.RingIcon, RingWindowSu, GRingTexturePx)) {
       UOverlaySlot* RingSlot = Avatar->AddChildToOverlay(RingIcon);
       RingSlot->SetHorizontalAlignment(HAlign_Center);
       RingSlot->SetVerticalAlignment(VAlign_Center);
+      if (RingSmoulder > 0.0f) RingIcon->SetLayerRestOpacity(TEXT("rim"), RingSmoulder);
     } else {
       RingIcon = nullptr;
     }
@@ -195,7 +440,8 @@ void US08TurnPortraitWidget::SetTeamColor(const FLinearColor& TeamColor) {
   if (bTeamColorSet && TeamColor.Equals(LastTeamColor)) return;
   bTeamColorSet = true;
   LastTeamColor = TeamColor;
-  if (Disc) Disc->SetColorAndOpacity(TeamColor);
+  // CP-08: the team colour is the rollback's disc only (-S08PortraitLegacy); the avatar and the fallback have none
+  if (Disc && PortraitLegacy()) Disc->SetColorAndOpacity(TeamColor);
   if (RingIcon) RingIcon->SetTeamTint(TeamColor);  // the team variant of the ring (tint: team layers only)
 }
 
@@ -203,7 +449,12 @@ void US08TurnPortraitWidget::SetHeroName(const FString& Name) {
   if (Name == HeroName) return;
   HeroName = Name;
   if (NameText) NameText->SetText(FText::FromString(Name));  // hero name: server data
-  if (MonogramText) MonogramText->SetText(FText::FromString(S09TurnHud::Monogram(Name)));
+  // CP-08: without an explicit key (SetPortrait from the hero slug) the name's slug picks the portrait
+  if (!bPortraitKeyExplicit) {
+    const FString Slug = UmPortrait::SlugOf(Name);
+    PortraitKey = Slug.IsEmpty() ? FName(NAME_None) : FName(*Slug);
+  }
+  ApplyPortraitLook();
 }
 
 void US08TurnPortraitWidget::SetHealth(int32 Health, int32 MaxHealth) {
@@ -220,7 +471,7 @@ void US08TurnPortraitWidget::SetActive(bool bInActive) {
   // 02-ux-ui-spec §4.3: the accent "your turn" / "opponent's turn" - the text carries it, not the colour alone
   const TCHAR* Text = bActive ? (bOpponent ? TEXT("THEIR TURN") : TEXT("YOUR TURN")) : TEXT("waiting");
   StatusText->SetText(FText::FromString(Text));
-  StatusText->SetColorAndOpacity(FSlateColor(bActive ? GPortraitActive : GPortraitIdle));
+  StatusText->SetColorAndOpacity(FSlateColor(bActive ? PortraitActiveColor() : PortraitIdleColor()));
 }
 
 bool US08TurnPortraitWidget::PlayHeart(FName Anim) { return HeartIcon && !Anim.IsNone() && HeartIcon->PlayAnim(Anim); }
@@ -280,10 +531,12 @@ FString US08TurnPortraitWidget::ApplyTracker(int32 Slots, int32 Shown, bool bRes
     }
     while (TrackerIcons.Num() < Slots) {
       US08AnimatedIconWidget* Icon = CreateWidget<US08AnimatedIconWidget>(this, US08AnimatedIconWidget::StaticClass());
-      if (!Icon || !Icon->SetIcon(Look.TrackerIcon(), TrackerIconSu, GTrackerTexturePx)) break;
+      if (!Icon || !Icon->SetIcon(Look.TrackerIcon(), TrackerSlotSu, GTrackerTexturePx)) break;
+      if (bPanelMode) Icon->SetDisplaySizeSu(TrackerSlotSu);  // VS-2 HB-23: the export for su x DPI x UI scale
       UHorizontalBoxSlot* IconSlot = TrackerRow->AddChildToHorizontalBox(Icon);
       IconSlot->SetVerticalAlignment(VAlign_Center);
-      IconSlot->SetPadding(FMargin(1.0f, 0.0f));
+      // CX-09: the panel's slots 4 su apart (L 260 / 296 of 32 su, S 176 / 204 of 24 su)
+      IconSlot->SetPadding(bPanelMode ? FMargin(TrackerIcons.Num() > 0 ? 4.0f : 0.0f, 0.0f, 0.0f, 0.0f) : FMargin(1.0f, 0.0f));
       TrackerIcons.Add(Icon);
       TrackerFill.Add(NAME_None);
       const int32 I = TrackerIcons.Num() - 1;
@@ -322,12 +575,14 @@ FString US08TurnPortraitWidget::GetTrackerFill(int32 Index) const {
 bool US08TurnPortraitWidget::SetHeartFallen(bool bFallen, bool bAtRest) {
   if (!HeartIcon || !Look.bCrossGlyphs || bFallen == bHeartFallen) return false;
   bHeartFallen = bFallen;
+  SetPortraitState(bFallen ? EUmPortraitState::Fallen : EUmPortraitState::Avatar, false);  // CP-08: saturation 0
   if (bFallen) {
     // AB-8 (SD-38, the Codex form): the blackened heart, the small cross stamps in (appear 200 ms)
     if (!HeartIcon->SetIcon(FS08TurnHudLook::FallenHeartIcon, SmallIconSu, GSmallTexturePx)) {
       bHeartFallen = false;
       return false;
     }
+    if (bPanelMode) HeartIcon->SetDisplaySizeSu(SmallIconSu);
     if (bAtRest) {
       HeartIcon->ShowAtRest();
     } else {
@@ -335,9 +590,75 @@ bool US08TurnPortraitWidget::SetHeartFallen(bool bFallen, bool bAtRest) {
     }
   } else {
     HeartIcon->SetIcon(TEXT("resource-hp-full"), SmallIconSu, GSmallTexturePx);
+    if (bPanelMode) HeartIcon->SetDisplaySizeSu(SmallIconSu);
     HeartIcon->ShowAtRest();
   }
   return true;
+}
+
+// ------------------------------------------------------------------------------------------------- VS-2 HB-18 / HB-19
+
+void US08TurnPortraitWidget::AttachToPanel(UHorizontalBox* TrackerHost, US08AnimatedIconWidget* Heart) {
+  if (bPanelMode) return;
+  bPanelMode = true;
+  // the circle only: no plate of its own (the panel's T_Skin_Panel is under it), no text column
+  if (Panel) {
+    Panel->SetBrushColor(FLinearColor::Transparent);
+    Panel->SetPadding(FMargin(0.0f));
+  }
+  if (WidgetTree) {
+    if (UWidget* Column = WidgetTree->FindWidget(FName(TEXT("Column")))) Column->SetVisibility(ESlateVisibility::Collapsed);
+    if (UWidget* AvatarBox = WidgetTree->FindWidget(FName(TEXT("AvatarBox")))) {
+      if (UHorizontalBoxSlot* AvatarSlot = Cast<UHorizontalBoxSlot>(AvatarBox->Slot)) AvatarSlot->SetPadding(FMargin(0.0f));
+    }
+  }
+  // the tracker icons go into the panel's row (none exist before the first ApplyTracker)
+  if (TrackerHost && TrackerHost != TrackerRow) {
+    for (US08AnimatedIconWidget* Icon : TrackerIcons) {
+      if (!Icon) continue;
+      Icon->RemoveFromParent();
+      if (UHorizontalBoxSlot* IconSlot = TrackerHost->AddChildToHorizontalBox(Icon)) IconSlot->SetVerticalAlignment(VAlign_Center);
+    }
+    TrackerRow = TrackerHost;
+  }
+  // the heart is the panel's HeartIcon from now on (PlayHeart, SetHeartFallen, the glow of AB-6)
+  if (Heart && Heart != HeartIcon) {
+    if (HeartIcon) HeartIcon->RemoveFromParent();
+    HeartIcon = Heart;
+    if (HeartIcon->SetIcon(TEXT("resource-hp-full"), SmallIconSu, GSmallTexturePx)) {
+      HeartIcon->SetDisplaySizeSu(SmallIconSu);
+      HeartIcon->SetLayerHidden(TEXT("glow"), !Look.bHeartGlow);
+      HeartIcon->ShowAtRest();
+    }
+  }
+}
+
+void US08TurnPortraitWidget::SetPanelGeometry(float InRingSu, float InDiscSu, float InTrackerSu) {
+  const bool bSame = FMath::IsNearlyEqual(InRingSu, RingWindowSu) && FMath::IsNearlyEqual(InDiscSu, DiscWindowSu) &&
+                     FMath::IsNearlyEqual(InTrackerSu, TrackerSlotSu);
+  RingWindowSu = InRingSu;
+  DiscWindowSu = InDiscSu;
+  TrackerSlotSu = InTrackerSu;
+  if (bSame && bPortraitApplied) return;
+  if (WidgetTree) {
+    if (USizeBox* AvatarBox = Cast<USizeBox>(WidgetTree->FindWidget(FName(TEXT("AvatarBox"))))) {
+      AvatarBox->SetWidthOverride(RingWindowSu);
+      AvatarBox->SetHeightOverride(RingWindowSu);
+    }
+  }
+  // same icon again: the animator keeps its state, the images take the new size
+  if (RingIcon) RingIcon->SetIcon(RingIcon->GetIconId(), RingWindowSu, GRingTexturePx);
+  for (US08AnimatedIconWidget* Icon : TrackerIcons) {
+    if (!Icon) continue;
+    Icon->SetIcon(Icon->GetIconId(), TrackerSlotSu, GTrackerTexturePx);
+    if (bPanelMode) Icon->SetDisplaySizeSu(TrackerSlotSu);
+  }
+  ApplyPortraitLook();
+}
+
+void US08TurnPortraitWidget::SetRingSmoulder(float Rest) {
+  RingSmoulder = Rest;
+  if (RingIcon) RingIcon->SetLayerRestOpacity(TEXT("rim"), Rest);
 }
 
 void US08TurnPortraitWidget::SetClockOverrideMs(float Ms) {

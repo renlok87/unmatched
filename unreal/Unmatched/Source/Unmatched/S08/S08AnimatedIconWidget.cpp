@@ -10,6 +10,9 @@
 #include "Components/UniformGridPanel.h"
 #include "Components/UniformGridSlot.h"
 #include "Engine/Texture2D.h"
+#include "Misc/CommandLine.h"
+#include "S08TraceLog.h"
+#include "UI/UmHudScale.h"
 
 namespace {
 FLinearColor S08Srgb(uint8 R, uint8 G, uint8 B, float A = 1.0f) {
@@ -118,6 +121,48 @@ bool US08AnimatedIconWidget::SetIcon(FName InIconId, float InSizeSu, int32 InTex
   return true;
 }
 
+void US08AnimatedIconWidget::SetDisplaySizeSu(float InSu) {
+  DisplaySizeSu = FMath::Max(InSu, 1.0f);
+  if (!ScaleChangedHandle.IsValid()) {
+    ScaleChangedHandle = UmHudScale::OnUiScaleChanged().AddUObject(this, &US08AnimatedIconWidget::HandleUiScaleChanged);
+  }
+  PickDisplayTexture();
+}
+
+void US08AnimatedIconWidget::HandleUiScaleChanged(const FUmHudScaleState& /*State*/) {
+  if (DisplaySizeSu > 0.0f) PickDisplayTexture();
+}
+
+void US08AnimatedIconWidget::PickDisplayTexture() {
+  if (!Def || DisplaySizeSu <= 0.0f) return;
+  const bool bLegacy = S08IconMotion::IconSizeLegacy(FCommandLine::Get());
+  const float PxPerSu = PxPerSuOverride > 0.0f ? PxPerSuOverride : UmHudScale::Current().PxPerSu();
+  bool bClamped = false;
+  const int32 Wanted = S08IconMotion::ExportSizePx(DisplaySizeSu, bLegacy ? 1.0f : PxPerSu, &bClamped);
+  if (bClamped) {
+    UE_LOG(LogTemp, Warning, TEXT("S08 icon %s: %.0f su x %.3f needs more than the largest export - 64 is used"),
+           *IconId.ToString(), DisplaySizeSu, PxPerSu);
+  }
+  if (Wanted == TexturePx && FMath::IsNearlyEqual(SizeSu, DisplaySizeSu)) return;
+  // same icon: SetIcon keeps the animation state and rebuilds only the images at the new texture size
+  SetIcon(IconId, DisplaySizeSu, Wanted);
+  const FString Src = Def->Layers.Num() ? Def->Layers[0].Src : IconId.ToString();
+  const FString Path = S08IconMotion::TextureObjectPath(Src, 0, Wanted);
+  FString Asset;
+  Path.Split(TEXT("."), nullptr, &Asset);
+  FS08Trace::Write(FString::Printf(TEXT("ICON size su=%.0f px=%.1f tex=%s icon=%s dpiScale=%.3f legacy=%d clamped=%d"),
+                                   DisplaySizeSu, DisplaySizeSu * (bLegacy ? 1.0f : PxPerSu), *Asset,
+                                   *IconId.ToString(), PxPerSu, bLegacy ? 1 : 0, bClamped ? 1 : 0));
+}
+
+void US08AnimatedIconWidget::BeginDestroy() {
+  if (ScaleChangedHandle.IsValid()) {
+    UmHudScale::OnUiScaleChanged().Remove(ScaleChangedHandle);
+    ScaleChangedHandle.Reset();
+  }
+  Super::BeginDestroy();
+}
+
 bool US08AnimatedIconWidget::PlayAnim(FName Anim) { return PlayAnimAt(Anim, GetClockMs()); }
 
 bool US08AnimatedIconWidget::PlayAnimAt(FName Anim, float TMs) {
@@ -138,6 +183,32 @@ void US08AnimatedIconWidget::SetReducedMotion(bool bInReduced) {
   bReduced = bInReduced;
   Animator.Init(Def, bReduced);
   bDirty = true;
+}
+
+float US08AnimatedIconWidget::GetContractRestOpacity(FName LayerId) const {
+  if (!Def) return 1.0f;
+  for (const FS08IconLayer& Layer : Def->Layers) {
+    if (Layer.Id == LayerId) return Layer.Rest[static_cast<int32>(ES08IconProp::Opacity)];
+  }
+  return 1.0f;
+}
+
+float US08AnimatedIconWidget::GetLayerOpacityScale(FName LayerId) const {
+  const float* Scale = LayerOpacityScale.Find(LayerId);
+  return Scale ? *Scale : 1.0f;
+}
+
+void US08AnimatedIconWidget::SetLayerRestOpacity(FName LayerId, float RestOpacity) {
+  const float Contract = GetContractRestOpacity(LayerId);
+  const float Scale = RestOpacity > 0.0f && Contract > 0.0f ? RestOpacity / Contract : 1.0f;
+  if (FMath::IsNearlyEqual(Scale, GetLayerOpacityScale(LayerId), 1.0e-4f)) return;
+  if (FMath::IsNearlyEqual(Scale, 1.0f, 1.0e-4f)) {
+    LayerOpacityScale.Remove(LayerId);
+  } else {
+    LayerOpacityScale.Add(LayerId, Scale);
+  }
+  bDirty = true;
+  ApplyPose(GetClockMs());
 }
 
 void US08AnimatedIconWidget::SetLayerHidden(FName LayerId, bool bHidden) {
@@ -215,7 +286,11 @@ void US08AnimatedIconWidget::ApplyPose(float TMs) {
   for (int32 L = 0; L < LayerImages.Num(); ++L) {
     const FS08IconTargetPose& P = LastPose.Targets[L + 1];
     UImage* Image = LayerImages[L];
-    const float Opacity = HiddenLayers.Contains(Def->Layers[L].Id) ? 0.0f : P.Get(ES08IconProp::Opacity);
+    const FName LayerId = Def->Layers[L].Id;
+    const float* Scale = LayerOpacityScale.Find(LayerId);
+    const float Opacity = HiddenLayers.Contains(LayerId)
+                              ? 0.0f
+                              : FMath::Min(1.0f, P.Get(ES08IconProp::Opacity) * (Scale ? *Scale : 1.0f));
     ApplyIfChanged(*Image, ToWidgetTransform(P, SuPerU), P.PivotU / Canvas, Opacity);
     const int32 Frame = FMath::FloorToInt(P.Get(ES08IconProp::Frame) + 1.0e-4f);
     if (LayerFrameCount[L] > 1 && Frame != CurrentFrame[L]) {
@@ -251,7 +326,7 @@ bool US08IconGalleryWidget::Initialize() {
     Background->SetHorizontalAlignment(HAlign_Center);
     Background->SetVerticalAlignment(VAlign_Center);
     Grid = WidgetTree->ConstructWidget<UUniformGridPanel>(UUniformGridPanel::StaticClass(), TEXT("Grid"));
-    Grid->SetSlotPadding(FMargin(6.0f));
+    Grid->SetSlotPadding(FMargin(SlotPaddingSu));
     Background->SetContent(Grid);
     WidgetTree->RootWidget = Background;
   }
@@ -266,7 +341,7 @@ int32 US08IconGalleryWidget::Build(float InSizeSu, int32 InTexturePx, bool bInRe
   Scripts.Reset();
   const FS08IconMotionLibrary& Lib = FS08IconMotionLibrary::Get();
   const float Pad = FMath::RoundToFloat(0.25f * InSizeSu);
-  const FVector2D Cell(FMath::Max(2.0f * InSizeSu + 2.0f * Pad, 168.0f), InSizeSu + 2.0f * Pad + 34.0f);
+  const FVector2D Cell = CellSizeSu(InSizeSu);
   int32 Index = 0;
   for (const FName Id : Lib.Order) {
     const FS08IconMotionDef* Def = Lib.Find(Id);
@@ -283,7 +358,9 @@ int32 US08IconGalleryWidget::Build(float InSizeSu, int32 InTexturePx, bool bInRe
     US08AnimatedIconWidget* Icon = CreateWidget<US08AnimatedIconWidget>(this, US08AnimatedIconWidget::StaticClass());
     Icon->SetReducedMotion(bReduced);
     Icon->SetExternallyDriven(true);  // EvaluateAt applies every pose (and is what the perf sample measures)
-    Icon->SetIcon(Id, InSizeSu, InTexturePx);
+    // VS-2 HB-23: InTexturePx <= 0 = by display size (the export for su x DPI x UI scale, traced 'ICON size')
+    Icon->SetIcon(Id, InSizeSu, InTexturePx > 0 ? InTexturePx : S08IconMotion::ExportSizePx(InSizeSu, 1.0f));
+    if (InTexturePx <= 0) Icon->SetDisplaySizeSu(InSizeSu);
     Icon->SetTeamTint(FLinearColor::FromSRGBColor(FColor(0xDA, 0xC5, 0x76)));  // team.p1.screen (reference demo)
     UOverlaySlot* IconSlot = Ov->AddChildToOverlay(Icon);
     IconSlot->SetHorizontalAlignment(HAlign_Center);
@@ -339,6 +416,25 @@ void US08IconGalleryWidget::NativeTick(const FGeometry& MyGeometry, float InDelt
   const double T0 = FPlatformTime::Seconds();
   EvaluateAt(GetClockMs());
   EvalSamples.Add(static_cast<float>((FPlatformTime::Seconds() - T0) * 1000.0));
+}
+
+FVector2D US08IconGalleryWidget::CellSizeSu(float SizeSu) {
+  const float Pad = FMath::RoundToFloat(0.25f * SizeSu);
+  return FVector2D(FMath::Max(2.0f * SizeSu + 2.0f * Pad, 168.0f), SizeSu + 2.0f * Pad + 34.0f);
+}
+
+int32 US08IconGalleryWidget::ColumnsToFit(int32 Count, float SizeSu, float CanvasHeightSu) {
+  const float RowSu = CellSizeSu(SizeSu).Y + 2.0f * SlotPaddingSu;
+  const int32 Rows = FMath::Max(1, FMath::FloorToInt(CanvasHeightSu / RowSu));
+  return FMath::Max(6, FMath::DivideAndRoundUp(FMath::Max(Count, 1), Rows));
+}
+
+FString US08IconGalleryWidget::IdList() const {
+  TArray<FString> Ids;
+  for (const US08AnimatedIconWidget* Icon : Icons) {
+    if (Icon) Ids.Add(Icon->GetIconId().ToString());
+  }
+  return FString::Join(Ids, TEXT(","));
 }
 
 FString US08IconGalleryWidget::PerfSummary() const {

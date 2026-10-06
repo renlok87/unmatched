@@ -69,8 +69,41 @@ def affine(pose, pivot_u, px_per_u):
                      [0, 0, 1.0]])
 
 
-def compose(anim, pp, size):
-    """Кадр значка (RGBA) размера size по позе pp."""
+def _srgb_to_lin(v):
+    v = v / 255.0
+    return np.where(v <= 0.04045, v / 12.92, ((v + 0.055) / 1.055) ** 2.4)
+
+
+def _lin_to_srgb(v):
+    v = np.clip(v, 0.0, 1.0)
+    return np.where(v <= 0.0031308, v * 12.92, 1.055 * v ** (1 / 2.4) - 0.055) * 255.0
+
+
+def _snap_quad(Mx, tw, th):
+    """Slate: у осевого преобразования (масштаб и сдвиг, без поворота) углы квада текстуры стоят на целых пикселях."""
+    x0, y0 = Mx[0, 2], Mx[1, 2]
+    x1, y1 = Mx[0, 0] * tw + x0, Mx[1, 1] * th + y0
+    X0, Y0, X1, Y1 = round(x0), round(y0), round(x1), round(y1)
+    return np.array([[(X1 - X0) / tw, 0, X0], [0, (Y1 - Y0) / th, Y0], [0, 0, 1.0]])
+
+
+def _transform_linear(tex, wh, inv):
+    """Билинейная выборка sRGB-текстуры в линейном свете (так GPU читает sRGB-текстуру), альфа прямая."""
+    a = np.asarray(tex).astype(np.float64)
+    chans = [_srgb_to_lin(a[..., i]) for i in range(3)] + [a[..., 3] / 255.0]
+    out = [np.asarray(Image.fromarray(ch.astype(np.float32), "F").transform(wh, Image.AFFINE, data=inv,
+                                                                             resample=Image.BILINEAR)).astype(np.float64)
+           for ch in chans]
+    rgba = np.dstack([_lin_to_srgb(out[0]), _lin_to_srgb(out[1]), _lin_to_srgb(out[2]), out[3] * 255.0])
+    return Image.fromarray(np.clip(np.rint(rgba), 0, 255).astype(np.uint8), "RGBA")
+
+
+def compose(anim, pp, size, raster="ref"):
+    """Кадр значка (RGBA) размера size по позе pp.
+
+    raster="ref" — растр листов и GIF: билинейная выборка в sRGB, квад без снапа. raster="ue" — растр Slate
+    (VS-2 IC-70, ВР-VS2-37): углы осевого квада на целых пикселях и выборка sRGB-текстуры в линейном свете; смешение
+    слоёв, как и в "ref", в sRGB. По нему галерея UE совпадает с эталоном до ≈ 0,03 средней |Δ| на любом масштабе."""
     cw, ch = anim.d["canvas_u"]
     k = size / 32.0
     pad = round(0.25 * size)                  # как в UE: трансформ рисует за границей виджета (клип выключен)
@@ -92,8 +125,14 @@ def compose(anim, pp, size):
         Mx = A_all @ affine(lp, anim.pivot_of(l["id"], pivots), k)
         if abs(np.linalg.det(Mx[:2, :2])) < 1e-6:      # масштаб 0 — слоя не видно (так же в UE)
             continue
+        if raster == "ue" and abs(Mx[0, 1]) < 1e-9 and abs(Mx[1, 0]) < 1e-9:
+            Mx = _snap_quad(Mx, tex.width, tex.height)
         inv = np.linalg.inv(Mx)
-        im = tex.transform((W, H), Image.AFFINE, data=tuple(inv[:2].ravel()), resample=Image.BILINEAR)
+        identity = np.allclose(Mx[:2, :2], np.eye(2)) and np.allclose(Mx[:2, 2], np.round(Mx[:2, 2]))
+        if raster == "ue" and not identity:
+            im = _transform_linear(tex, (W, H), tuple(inv[:2].ravel()))
+        else:
+            im = tex.transform((W, H), Image.AFFINE, data=tuple(inv[:2].ravel()), resample=Image.BILINEAR)
         if op < 1.0:
             im.putalpha(im.getchannel("A").point(lambda v, o=op: int(v * o + 0.5)))
         out.alpha_composite(im)

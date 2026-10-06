@@ -2,6 +2,7 @@
 
 #include "../S08HudTokens.generated.h"
 #include "Brushes/SlateRoundedBoxBrush.h"
+#include "Engine/Texture2D.h"
 #include "HAL/PlatformTime.h"
 #include "Misc/PackageName.h"
 #include "Styling/CoreStyle.h"
@@ -105,7 +106,9 @@ FSlateFontInfo UUmHudTheme::Font(FName Token) const {
     WarnMissing(TEXT("type"), Token);
   }
   // Empty FontObject: the typeface of the default Slate composite font (Roboto, Engine/Content/Slate/Fonts).
-  return FSlateFontInfo(FCoreStyle::GetDefaultFont(), Size, Typeface);
+  // VS-2 HB-15 (ВР-VS2-41): a type.* token is the em in su (02 §3.3: type.banner 36 su = 36 px at 1080p), Slate
+  // renders FSlateFontInfo::Size in points at FontConstants::RenderDPI 96 (24 -> 32 px) - the point size is su x 72/96.
+  return FSlateFontInfo(FCoreStyle::GetDefaultFont(), UmHudTheme::PointsFromSu(Size), Typeface);
 }
 
 float UUmHudTheme::SpaceSu(FName Token) const {
@@ -138,6 +141,46 @@ const FSlateBrush* UUmHudTheme::Skin(FName Key) const {
   return Found;
 }
 
+const FSlateBrush* UUmHudTheme::SkinFor(FName Key, float PxPerSu) const {
+  if (PxPerSu >= SkinX2MinPxPerSu) {
+    if (const FSlateBrush* X2 = SkinsX2.Find(Key)) return X2;
+  }
+  return Skin(Key);
+}
+
+bool UUmHudTheme::HasTextureSkin(FName Key) const {
+  const FSlateBrush* Found = Skins.Find(Key);
+  return Found && Found->GetResourceObject() != nullptr;
+}
+
+bool UUmHudTheme::ImportTextureSkin(FName Key, UTexture2D* X1, UTexture2D* X2, FVector2D SizePxX1, FVector2D SizePxX2,
+                                    FMargin MarginPxX1, FMargin MarginPxX2, bool bNineSlice) {
+  if (!X1 || !X2) {
+    UE_LOG(LogUmHudTheme, Error, TEXT("UMHUDTHEME import: skin '%s' texture missing (x1=%d x2=%d)"), *Key.ToString(),
+           X1 ? 1 : 0, X2 ? 1 : 0);
+    return false;
+  }
+  const FVector2D Size1 = SizePxX1;
+  const FVector2D Size2 = SizePxX2;
+  if (Size1.X <= 0 || Size1.Y <= 0 || Size2.X <= 0 || Size2.Y <= 0) return false;
+  // Box margins are fractions of the image; each file keeps its own pixels (x2 Panel 15 px of 132 = 7.5 su).
+  auto Fractions = [](const FMargin& Px, const FVector2D& Size) {
+    return FMargin(Px.Left / Size.X, Px.Top / Size.Y, Px.Right / Size.X, Px.Bottom / Size.Y);
+  };
+  auto Make = [&](UTexture2D* Tex, const FMargin& Margin) {
+    FSlateBrush Brush;
+    Brush.SetResourceObject(Tex);
+    Brush.ImageSize = Size1;  // su: the x1 pixels (x2 draws the same su with twice the pixels)
+    Brush.DrawAs = bNineSlice ? ESlateBrushDrawType::Box : ESlateBrushDrawType::Image;
+    Brush.Margin = bNineSlice ? Margin : FMargin(0.0f);
+    Brush.TintColor = FSlateColor(FLinearColor::White);
+    return Brush;
+  };
+  Skins.Add(Key, Make(X1, Fractions(MarginPxX1, Size1)));
+  SkinsX2.Add(Key, Make(X2, Fractions(MarginPxX2, Size2)));
+  return true;
+}
+
 void UUmHudTheme::ImportReset() {
   Colors.Reset();
   Alphas.Reset();
@@ -146,6 +189,7 @@ void UUmHudTheme::ImportReset() {
   Radius.Reset();
   MotionMs.Reset();
   Skins.Reset();
+  SkinsX2.Reset();
   TokensJsonSha256.Reset();
 }
 

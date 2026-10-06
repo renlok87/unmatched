@@ -21,6 +21,7 @@ class UTextBlock;
 class UTexture2D;
 class UUniformGridPanel;
 class UBorder;
+struct FUmHudScaleState;
 
 UCLASS()
 class UNMATCHED_API US08AnimatedIconWidget : public UUserWidget {
@@ -32,6 +33,16 @@ public:
   /** Icon from the motion contract (variants resolve to their base). SizeSu = icon side in slate units
    *  (32 u canvas); TexturePx = exact-size texture to sample (24 / 32 / 48 / 64). false = unknown icon. */
   bool SetIcon(FName IconId, float InSizeSu, int32 InTexturePx);
+  /** VS-2 HB-23 (02 §5.3, И-9; IC-33): the icon side in su; the texture is the export for su x DPI x UI scale
+   *  (S08IconMotion::ExportSizePx: 24 su at 720p -> 18, at 1080p 150 % -> 36; 32 su at 150 % -> 48), re-picked on
+   *  UmHudScale::OnUiScaleChanged - an event, no tick; only the needed size is loaded. Call after SetIcon (any
+   *  TexturePx there); -S08IconLegacy keeps the texture of the su itself. Trace (on a change):
+   *  'ICON size su=<x> px=<y> tex=<asset> icon=<id> dpiScale=<px per su> legacy=0|1 clamped=0|1'. */
+  void SetDisplaySizeSu(float InSu);
+  float GetDisplaySizeSu() const { return DisplaySizeSu; }
+  int32 GetTexturePx() const { return TexturePx; }
+  /** The px per su the last pick used (tests force it; 0 = UmHudScale::Current()). */
+  void SetPxPerSuOverrideForTest(float InPxPerSu) { PxPerSuOverride = InPxPerSu; }
   /** Plays a contract animation at the widget clock. */
   bool PlayAnim(FName Anim);
   /** Plays at an explicit time (gallery replay, tests). */
@@ -51,6 +62,14 @@ public:
    *  candidate layer until the user's art acceptance). Survives SetIcon of the same icon. */
   void SetLayerHidden(FName LayerId, bool bHidden);
   bool IsLayerHidden(FName LayerId) const { return HiddenLayers.Contains(LayerId); }
+  /** VS-2 HB-19 (ВР-43): the layer's opacity track scaled so that its contract rest becomes RestOpacity (the theme's
+   *  ring.smoulder of the turn ring's rim: 0.35 = the contract, 0.55 in class S) - the keys and eases are the
+   *  contract's, only the level moves; <= 0 drops the override. Survives SetIcon of the same icon. */
+  void SetLayerRestOpacity(FName LayerId, float RestOpacity);
+  /** The contract rest opacity of a layer (1 for no such layer). */
+  float GetContractRestOpacity(FName LayerId) const;
+  /** The scale SetLayerRestOpacity applies to a layer (1 = the contract). */
+  float GetLayerOpacityScale(FName LayerId) const;
   /** Run I (AB-7): draw a single-frame layer from another contract texture src (the DE tracker slot fills its
    *  body / glyph layers with action-<type>_body / _glyph). Survives SetIcon of the same icon; a new icon drops it.
    *  False = no such layer, a flipbook layer, or the texture is missing (the layer keeps its texture). */
@@ -72,8 +91,15 @@ public:
 
 protected:
   virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+  virtual void BeginDestroy() override;
 
 private:
+  void PickDisplayTexture();
+  void HandleUiScaleChanged(const FUmHudScaleState& State);
+  float DisplaySizeSu = 0.0f;
+  float PxPerSuOverride = 0.0f;
+  FDelegateHandle ScaleChangedHandle;
+
   UPROPERTY() TObjectPtr<USizeBox> Box;
   UPROPERTY() TObjectPtr<UOverlay> Stage;
   UPROPERTY() TArray<TObjectPtr<UImage>> LayerImages;
@@ -97,6 +123,7 @@ private:
   FLinearColor TeamTint = FLinearColor::White;
   TSet<FName> HiddenLayers;
   TMap<FName, FString> LayerSources;  // SetLayerSource overrides (layer id -> src)
+  TMap<FName, float> LayerOpacityScale;  // SetLayerRestOpacity (layer id -> scale of the opacity track)
 };
 
 /** Backend-less gallery: every contract icon in a grid on the HUD panel colour, each looping its demo script
@@ -107,7 +134,8 @@ class UNMATCHED_API US08IconGalleryWidget : public UUserWidget {
 
 public:
   virtual bool Initialize() override;
-  /** Builds the grid; SizeSu = icon side, TexturePx = texture size. Returns the icon count. */
+  /** Builds the grid; SizeSu = icon side, TexturePx = texture size (<= 0: by display size, HB-23). Returns the icon
+   *  count. */
   int32 Build(float InSizeSu, int32 InTexturePx, bool bInReduced, int32 Columns = 6, bool bLabels = true);
   /** >= 0 freezes the gallery clock (shots); < 0 = real time. */
   void SetClockOverrideMs(float Ms) { ClockOverrideMs = Ms; }
@@ -116,6 +144,15 @@ public:
   void EvaluateAt(float TMs);
   int32 GetIconCount() const { return Icons.Num(); }
   US08AnimatedIconWidget* GetIcon(int32 Index) const { return Icons.IsValidIndex(Index) ? Icons[Index] : nullptr; }
+  /** VS-2 IC-70: the ids of the built grid in grid order, comma separated (trace `ICONGALLERY ids`). */
+  FString IdList() const;
+  /** Cell of one icon (su): side 2:1 wide enough for the plates, the icon + 0.25 side padding + the id caption. */
+  static FVector2D CellSizeSu(float SizeSu);
+  /** VS-2 IC-70: columns (>= 6) so that every row fits CanvasHeightSu. A grid taller than the canvas squeezes its
+   *  rows: the fixed cell is centred in a shorter slot at a half-pixel offset and the caption rises into the icon,
+   *  and every scaled pose then differs from the reference by the resampling of that offset (G-ICON). */
+  static int32 ColumnsToFit(int32 Count, float SizeSu, float CanvasHeightSu);
+  static constexpr float SlotPaddingSu = 6.0f;
   static constexpr float PauseMs = 400.0f;
   /** Cost of EvaluateAt (all icons: replay + pose + render transforms) per frame since Build: "avg p95 max frames". */
   FString PerfSummary() const;

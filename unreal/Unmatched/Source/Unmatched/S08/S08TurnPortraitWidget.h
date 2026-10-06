@@ -26,18 +26,36 @@
 //   - fallen (AB-8): at the heart mark of the hero's death (contact + 1100, DE-019) the heart becomes resource-hp-fallen
 //     and its small cross stamps in (appear); -S08CrossLegacy keeps the emptied heart of the deplete (the "dark" heart).
 //     The same flag rolls back the marker-x-stamp of "no defense" in the combat panel (S08FlowGameMode).
+//
+// VS-2 CP-08 (cards-portraits.csv CP-08; 04 §4.3 WBP_UmPortrait; UI/UmPortrait.h): the avatar of the registry in the
+// circle (UImage AvatarImage with a MID of M_UmPortraitDisc: our rim, the turn ring outside, no team colour); the
+// team-colour disc and the monogram stay only for the fallback (no key / no PNG: a card.navy disc, a Warning) and the
+// rollback -S08PortraitLegacy. The tree is BuildDefaultTree (also the source of WBP_UmPortrait); the animated icons
+// (ring, heart, tracker) are added in code. SetPortrait takes the hero slug; SetHeroName falls back to the name's slug.
+//
+// VS-2 HB-18 / HB-19 (hud.csv; 04 §2.2, §2.3, §4.3): inside UUmHudPlayerPanel (UI/UmHudPlayerPanel.h) the portrait is
+// the circle only - AttachToPanel collapses its own plate and text column, moves the heart into the panel's HeartIcon
+// and puts the tracker icons into the panel's TrackerRow; the logic of the ring (AB-5), the tracker (AB-7), the heart
+// glow (AB-6) and the cross (AB-8) stays here, the look does not change. SetPanelGeometry sizes the ring window, the
+// circle and the tracker slots of the class (L 104 / 80 / 32 su, S 80 / 64 / 24 su, CX-09); SetRingSmoulder sets the
+// rest of the rim (theme ring.smoulder / ring.smoulder.s, ВР-43). Colours of the plate and the status (the rollback
+// column, -S08SlateHud=panels) come from UUmHudTheme.
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "S08ArtHudWidgets.h"
+#include "UI/UmPortrait.h"
 #include "S08TurnPortraitWidget.generated.h"
 
 class UBorder;
 class UHorizontalBox;
 class UImage;
+class UMaterialInstanceDynamic;
 class UOverlay;
 class USizeBox;
 class UTextBlock;
+class UTexture2D;
 class US08AnimatedIconWidget;
 
 /** The look options of the turn HUD (command line; traced 'HUD-TURN config ...' and in the ARTLOOK line). */
@@ -88,6 +106,35 @@ public:
   static constexpr float TrackerIconSu = 32.0f;
 
   virtual bool Initialize() override;
+  /** VS-2 CP-08: Panel > Row > [AvatarBox > Avatar > (DiscBox > DiscStack > Disc, AvatarImage) + MonogramText] +
+   *  [Column > NameText, StatusText, Stats > HpText, TrackerRow] - names = BindWidget names; the WBP is authored from it. */
+  static bool BuildDefaultTree(UWidgetTree& Tree, FS08AttachWidget Attach, FString* OutError = nullptr);
+  /** WBP_UmPortrait's class when the asset exists, else the native class (OutSource: the WBP path or "code-default"). */
+  static US08TurnPortraitWidget* Create(UWorld* World, FString* OutSource = nullptr);
+  bool HasAllParts(FString* OutMissing = nullptr) const;
+  bool UsesCodeDefaultTree() const { return bCodeDefaultTree; }
+
+  /** CP-08: the registry key of the circle ("king-arthur", "medusa/harpies"; NAME_None = monogram); SidekickNumber is
+   *  the harpy's 1..3 for the fallback digit. Same key again = no work (П2). */
+  void SetPortrait(FName Key, int32 SidekickNumber = 0);
+  /** avatar / fallen (saturation 0) / loser (saturation 0 + opacity 0.6 over 400 ms; reduced motion and !bAnimate -
+   *  at once). */
+  void SetPortraitState(EUmPortraitState State, bool bAnimate = true);
+  /** 'PORTRAIT id=.. tex=.. su=.. px=.. scale=.. show=<Show> side=own|opp state=.. capped=0|1'. */
+  FString PortraitShotLine(const TCHAR* Show = TEXT("panel")) const;
+  /** -S08PortraitLegacy (or the test override): the team disc + monogram; the panel's mini portraits follow it. */
+  bool IsPortraitLegacy() const { return PortraitLegacy(); }
+  FName GetPortraitKey() const { return PortraitKey; }
+  bool IsAvatarShown() const { return bAvatarShown; }
+  /** The circle su shown (the ВР-CP04 cap applied) and the monogram text (fallback / legacy). */
+  float GetCircleSu() const { return CircleSu; }
+  FString GetMonogram() const;
+  const UTexture2D* GetAvatarTexture() const { return AvatarTexture; }
+  UMaterialInstanceDynamic* GetAvatarMaterial() const { return AvatarMid; }
+  EUmPortraitState GetPortraitState() const { return PortraitState; }
+  /** Tests: px per su instead of UmHudScale::Current() (the 1440p 150 % cap), and the legacy flag. */
+  void SetPxPerSuForTest(float PxPerSu) { PxPerSuOverride = PxPerSu; }
+  void SetPortraitLegacyForTest(int32 Legacy) { LegacyOverride = Legacy; }
 
   /** Once after creation: side, look, team colour (the C-11 chip colour of the hero's team look). */
   void Setup(bool bInOpponent, const FS08TurnHudLook& InLook, const FLinearColor& TeamColor);
@@ -134,20 +181,72 @@ public:
   void SetClockOverrideMs(float Ms);
   const FS08TurnHudLook& GetLook() const { return Look; }
 
+  // ---- VS-2 HB-18 / HB-19: the circle of a UUmHudPlayerPanel ----
+  /** Once, before Setup: the own plate and text column collapse; Heart (the panel's HeartIcon) becomes the heart of
+   *  PlayHeart / SetHeartFallen, TrackerHost (the panel's TrackerRow) receives the tracker icons. */
+  void AttachToPanel(UHorizontalBox* TrackerHost, US08AnimatedIconWidget* Heart);
+  bool IsPanelMode() const { return bPanelMode; }
+  /** The class sizes in a panel: ring window, circle, tracker slot (su). Existing icons resize in place. */
+  void SetPanelGeometry(float InRingSu, float InDiscSu, float InTrackerSu);
+  float GetRingWindowSu() const { return RingWindowSu; }
+  float GetTrackerSlotSu() const { return TrackerSlotSu; }
+  /** ВР-43: the rest of the smouldering rim (the contract's 0.35 scales its rim track; <= 0 = the contract). */
+  void SetRingSmoulder(float Rest);
+  float GetRingSmoulder() const { return RingSmoulder; }
+
+  // ---- the tree (04 §4.3: BindWidget names; RingIcon / HeartIcon / tracker icons are added in code) ----
+  UPROPERTY(BlueprintReadOnly, Category = "Um HUD", meta = (BindWidget)) TObjectPtr<UBorder> Panel;
+  UPROPERTY(BlueprintReadOnly, Category = "Um HUD", meta = (BindWidget)) TObjectPtr<UOverlay> Avatar;
+  UPROPERTY(BlueprintReadOnly, Category = "Um HUD", meta = (BindWidget)) TObjectPtr<USizeBox> DiscBox;
+  UPROPERTY(BlueprintReadOnly, Category = "Um HUD", meta = (BindWidget)) TObjectPtr<UImage> Disc;
+  UPROPERTY(BlueprintReadOnly, Category = "Um HUD", meta = (BindWidget)) TObjectPtr<UImage> AvatarImage;
+  UPROPERTY(BlueprintReadOnly, Category = "Um HUD", meta = (BindWidget)) TObjectPtr<UTextBlock> MonogramText;
+  UPROPERTY(BlueprintReadOnly, Category = "Um HUD", meta = (BindWidget)) TObjectPtr<UTextBlock> NameText;
+  UPROPERTY(BlueprintReadOnly, Category = "Um HUD", meta = (BindWidget)) TObjectPtr<UTextBlock> StatusText;
+  UPROPERTY(BlueprintReadOnly, Category = "Um HUD", meta = (BindWidget)) TObjectPtr<UHorizontalBox> Stats;
+  UPROPERTY(BlueprintReadOnly, Category = "Um HUD", meta = (BindWidget)) TObjectPtr<UTextBlock> HpText;
+  UPROPERTY(BlueprintReadOnly, Category = "Um HUD", meta = (BindWidget)) TObjectPtr<UHorizontalBox> TrackerRow;
+
+protected:
+  virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+
 private:
-  UPROPERTY() TObjectPtr<UBorder> Panel;
-  UPROPERTY() TObjectPtr<UImage> Disc;
-  UPROPERTY() TObjectPtr<UTextBlock> MonogramText;
-  UPROPERTY() TObjectPtr<UTextBlock> NameText;
-  UPROPERTY() TObjectPtr<UTextBlock> StatusText;
-  UPROPERTY() TObjectPtr<UTextBlock> HpText;
-  UPROPERTY() TObjectPtr<UHorizontalBox> TrackerRow;
+  void BindParts();
+  void ApplyPortraitLook();
+  void ApplyStateParams();
+  bool PortraitLegacy() const;
+  float PxPerSuNow() const;
+
   UPROPERTY() TObjectPtr<US08AnimatedIconWidget> RingIcon;
   UPROPERTY() TObjectPtr<US08AnimatedIconWidget> HeartIcon;
   UPROPERTY() TArray<TObjectPtr<US08AnimatedIconWidget>> TrackerIcons;
-  UPROPERTY() TObjectPtr<UOverlay> Avatar;
+  UPROPERTY(Transient) TObjectPtr<UMaterialInstanceDynamic> AvatarMid;
+  UPROPERTY(Transient) TObjectPtr<UTexture2D> AvatarTexture;
+  bool bCodeDefaultTree = false;
+  FName PortraitKey;
+  bool bPortraitKeyExplicit = false;
+  int32 PortraitSidekick = 0;
+  bool bPortraitApplied = false;
+  bool bAvatarShown = false;
+  float CircleSu = 0.0f;
+  float SrcCirclePx = 0.0f;
+  float AppliedPxPerSu = 0.0f;
+  FString AvatarPath;
+  EUmPortraitState PortraitState = EUmPortraitState::Avatar;
+  float StateFrom = 1.0f;     // the loser fade: opacity 1 -> 0.6, desaturation 0 -> 1 over LoserMs
+  double StateStart = -1.0;
+  float PxPerSuOverride = 0.0f;
+  int32 LegacyOverride = -1;
+  TSet<FName> WarnedKeys;
+  FString LastPortraitLine;
 
   FS08TurnHudLook Look;
+  // VS-2 HB-18 / HB-19: the panel mode and the class sizes (the column of the rollback keeps the constants)
+  bool bPanelMode = false;
+  float RingWindowSu = RingSu;
+  float DiscWindowSu = DiscSu;
+  float TrackerSlotSu = TrackerIconSu;
+  float RingSmoulder = 0.0f;
   bool bOpponent = false;
   bool bActive = false;
   bool bRingShown = false;

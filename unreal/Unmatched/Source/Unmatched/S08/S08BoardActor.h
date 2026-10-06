@@ -303,6 +303,8 @@ public:
    *  SetMoveDraftViewProvider), else from Reachable (S08MoveHighlight::ViewFromReachable); no actor is spawned. */
   void SetSelectedFighter(const FString& FighterId, const TSet<uint64>& Reachable);
   void ClearSelection();
+  /** VS-2 HB-12: the cell is lit by the current selection (reachable / move plates) - the pointer cursor over it. */
+  bool IsCellHighlighted(const FIntPoint& Cell) const { return ReachableCells.Contains(FS08BoardModel::CellKey(Cell.X, Cell.Y)); }
   // ---- MS-T-08 move plates (S08MoveHighlight.h) ----
   /** True when the plates draw the highlights: -S08MovePlates, M_UM_MovePlate loaded and a board built. */
   bool UsesMovePlates() const;

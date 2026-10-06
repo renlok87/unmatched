@@ -55,6 +55,8 @@ public class Unmatched : ModuleRules {
     // VS-1 CP-02 (UI/UmCardMedia.h): the key registry of the card scans / backs / portraits (key -> object path, uv,
     // disc), written by tools/art/cards/ue_import_card_media.py; the textures themselves are cooked from /Game/S08.
     RuntimeDependencies.Add("$(ProjectDir)/Config/Cards/S08CardMedia.json", StagedFileType.UFS);
+    // VS-2 HB-12: the hot spots of the software cursors (UUmCursor reads them; tools/art/hud_skins_import.py --cursors)
+    RuntimeDependencies.Add("$(ProjectDir)/Config/Cursors/S08CursorHotspots.json", StagedFileType.UFS);
     // HI-07 and docs/game-design/18 (THIRD_PARTY_NOTICES registry): the notices and license texts of the
     // third-party components the client ships (Roboto, Apache 2.0) - a loose file next to the game, not in the pak.
     RuntimeDependencies.Add("$(ProjectDir)/Licenses/THIRD_PARTY_NOTICES.txt", StagedFileType.NonUFS);

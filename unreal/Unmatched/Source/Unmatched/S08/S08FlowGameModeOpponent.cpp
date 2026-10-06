@@ -254,7 +254,8 @@ void AS08FlowGameMode::AddOpponentPanelLines() {
   if (!TurnHudTrackers()) AddActionTrackerRow(true);  // DE-022 (01 F-12): only in the opponent's turn (DE-023: portrait)
   // DE-022 (03 §7 п. 1): the verb from the server state - "Opponent is planning a maneuver" (MS-S-11) is one of them
   const FName Key = S09OpponentView::VerbKey(OpponentVerbNow);
-  if (Key.IsNone()) return;
+  // VS-2 HB-20: the verb is in STATUS and «ИИ думает» on PANEL-OPP - this Slate line only with -S08SlateHud=panels
+  if (Key.IsNone() || !UmHudBlockOnSlate(TEXT("panels"))) return;
   // 03 §6: a 1 Hz pulse, none with reduced motion (the indicator is our online decision, DE has none - §7 p. 1)
   PanelsBox->AddSlot().AutoHeight().Padding(0, 2, 0, 2)
       [SNew(STextBlock)
@@ -386,11 +387,13 @@ void AS08FlowGameMode::AddTurnStatusLine() {
   if (!HandBox.IsValid()) return;
   // 02-ux-ui-spec SD-31: one line "what to do now" in every state; it does not empty while a figure moves (CUE-007
   // blocks_input: no)
-  const FString Text = S09TurnStatus::Text(BuildTurnStatusInput());
+  const FS09TurnStatusInput StatusIn = BuildTurnStatusInput();
+  const FString Text = S09TurnStatus::Text(StatusIn);
   if (Text != TurnStatusTraceKey) {
     FS08Trace::Write(FString::Printf(TEXT("MS-STATUS seq=%d text=\"%s\""), Hud.SequenceNumber, *Text));
     TurnStatusTraceKey = Text;
   }
+  if (ApplyUmHudStatus(StatusIn)) return;  // VS-2 HB-15: the UMG STATUS (-S08SlateHud=status keeps this Slate line)
   if (Text.IsEmpty()) return;
   HandBox->AddSlot().AutoHeight().Padding(0, 2, 0, 6)
       [SNew(STextBlock)

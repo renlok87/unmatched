@@ -27,8 +27,10 @@ class IconMotionContractTests(unittest.TestCase):
         self.assertEqual(CONTRACT.read_bytes(), CONFIG.read_bytes(), "запустить motion_contract.py: копия в Config/ устарела")
 
     def test_all_23_icons_with_appear_and_leave(self):
-        """23 принятых значка v3, 4 принятых DE-012 (`accepted_de012`, 2026-10-05) и кандидат DE-012 (`candidates`)."""
-        self.assertEqual(len(self.c["order"]) - len(self.c.get("candidates", [])) - len(self.c.get("accepted_de012", [])), 23)
+        """23 принятых значка v3, 4 принятых DE-012 (`accepted_de012`, 2026-10-05), кандидат DE-012 (`candidates`) и
+        принятые VR44 (`accepted_vr44`, VS-2 A2)."""
+        self.assertEqual(len(self.c["order"]) - len(self.c.get("candidates", [])) - len(self.c.get("accepted_de012", []))
+                         - len(self.c.get("accepted_vr44", [])), 23)
         self.assertEqual(set(self.c["order"]), set(self.c["icons"]))
         for icon, d in self.c["icons"].items():
             self.assertIn("appear", d["anims"], icon)
@@ -189,7 +191,8 @@ class IconMotionCandidatesTests(unittest.TestCase):
     def test_candidates_listed_in_order(self):
         self.assertEqual(self.c["candidates"], CANDIDATES)
         self.assertEqual(self.c["accepted_de012"], ACCEPTED_DE012)
-        self.assertEqual(self.c["order"][-len(DE012):], DE012)
+        self.assertEqual(self.c["order"][23:23 + len(DE012)], DE012)          # после 23 v3, до принятых VR44
+        self.assertEqual(self.c["order"][23 + len(DE012):], self.c.get("accepted_vr44", []))
         self.assertFalse(set(CANDIDATES) & set(ACCEPTED_DE012))
 
     def test_candidates_are_gallery_only(self):
@@ -231,6 +234,33 @@ class IconMotionCandidatesTests(unittest.TestCase):
                 self.assertEqual(np.abs(a[..., 3] - b[..., 3]).max(), 0, (name, size))
                 pa, pb = a[..., :3] * a[..., 3:] / 255, b[..., :3] * b[..., 3:] / 255
                 self.assertLess(np.abs(pa - pb).max(), 1.0, (name, size))
+
+    def test_vr44_forms_match_codex_proposal(self):
+        """VS-2 A3 (IC-46, IC-48, IC-55, IC-59): формы Codex IC-36, вектор A (art/imagegen/hud-icons-vr44-codex/vector,
+        принят по делегированию; log и pointer — fix1) перенесены один в один: альфа экспорта v3 побайтно равна альфе
+        Codex на 1024 / 16 / 21 / 24 / 32 / 48 / 64 / 96, а цвет совпадает после назначения ближайшего токена (этап
+        «точной палитры» Codex не переносится — ВР-VS2-23: внутренние AA-стыки как у остальных значков v3). Горячая точка
+        указателя — та же, что в verification.json пакета."""
+        import numpy as np
+        from PIL import Image
+        codex = REPO / "art" / "imagegen" / "hud-icons-vr44-codex" / "vector"
+        tokens = {"#061623": "navy", "#F9EBDB": "cream", "#FAF8F2": "glyph", "#111317": "keyline"}
+        pal = np.array([[int(h[i:i + 2], 16) for i in (1, 3, 5)] for h in tokens])
+        for ours, theirs, roles in (("action-end-turn", "end-turn", pal), ("card-drop", "card-drop", pal),
+                                    ("ui-log", "log", pal), ("cursor-pointer", "pointer", pal[[3, 2]])):
+            for size in (1024, 16, 21, 24, 32, 48, 64, 96):
+                path = ICONS_V3 / ("masters" if size == 1024 else "sizes") / (
+                    f"{ours}.png" if size == 1024 else f"{ours}-{size}.png")
+                a = np.asarray(Image.open(path).convert("RGBA")).astype(int)
+                b = np.asarray(Image.open(codex / str(size) / f"{theirs}.png").convert("RGBA")).astype(int)
+                self.assertEqual(a.shape, b.shape, (ours, size))
+                self.assertEqual(np.abs(a[..., 3] - b[..., 3]).max(), 0, (ours, size))
+                near = roles[((a[..., None, :3] - roles[None, None]) ** 2).sum(-1).argmin(-1)]
+                seen = a[..., 3] > 0
+                self.assertEqual(np.abs(near - b[..., :3])[seen].max(), 0, (ours, size))
+        hot = json.loads((ICONS_V3 / "cursor-hotspots.json").read_text(encoding="utf-8"))["cursors"]["cursor-pointer"]
+        self.assertEqual({k: hot[k] for k in ("24", "32", "48", "64")},
+                         {"24": [8, 2], "32": [11, 2], "48": [17, 3], "64": [22, 4]})
 
     def test_turn_ring_flash_1000_then_smoulder(self):
         for icon in ("marker-turn-ring", "marker-turn-ring-team"):
@@ -333,6 +363,86 @@ class IconMotionSemanticsTests(unittest.TestCase):
         a.play("release", 500)
         a.play("hover_out", 500)
         self.assertAlmostEqual(self.pose(a, 700)[0]["all"]["scale"], 1.0, 4)
+
+
+class GalleryRasterTests(unittest.TestCase):
+    """VS-2 IC-70 (ВР-VS2-37): эталон G-ICON растрируется как Slate (raster="ue": углы осевого квада на целых
+    пикселях, выборка sRGB-текстуры в линейном свете); на покое он совпадает с растром листов (raster="ref")."""
+
+    @classmethod
+    def setUpClass(cls):
+        try:
+            import motion as MO  # noqa: F401  (draw_icons: pycairo)
+        except ImportError as e:  # pragma: no cover
+            raise unittest.SkipTest(f"motion.py: {e}")
+        cls.MO = MO
+        cls.c = M.load_contract(str(CONTRACT))
+
+    def pose_at(self, icon, anim, t_ms):
+        a = M.Animator(self.c, icon)
+        a.play("appear", 0)
+        a.play(anim, 400)
+        pp, vis = a.pose(400 + t_ms)
+        self.assertTrue(vis)
+        return a, pp
+
+    def test_rest_pose_is_the_same_in_both_rasters(self):
+        import numpy as np
+        a = M.Animator(self.c, "action-end-turn")
+        a.play("appear", 0)
+        pp, _ = a.pose(400)
+        self.assertAlmostEqual(pp["pose"]["all"]["scale"], 1.0, 6)
+        ref = np.asarray(self.MO.compose(a, pp, 64, raster="ref"))
+        ue = np.asarray(self.MO.compose(a, pp, 64, raster="ue"))
+        self.assertTrue(np.array_equal(ref, ue))
+
+    def test_ue_raster_snaps_the_scaled_quad_to_pixels(self):
+        import numpy as np
+        a, pp = self.pose_at("action-attack", "hover_in", 250)  # hover 1,06: квад 64 px -> 67,8 px
+        self.assertGreater(pp["pose"]["all"]["scale"], 1.03)
+        ue = np.asarray(self.MO.compose(a, pp, 64, raster="ue")).astype(int)
+        ref = np.asarray(self.MO.compose(a, pp, 64, raster="ref")).astype(int)
+        self.assertGreater(np.abs(ue - ref).sum(), 0)
+        k = pp["pose"]["all"]["scale"]
+        Mx = self.MO._snap_quad(np.array([[k, 0, 16 + 32 * (1 - k)], [0, k, 16 + 32 * (1 - k)], [0, 0, 1.0]]), 64, 64)
+        for v in (Mx[0, 2], Mx[0, 0] * 64 + Mx[0, 2]):
+            self.assertEqual(v, round(v))
+
+    def test_linear_light_filter_brightens_a_dark_to_light_edge(self):
+        import numpy as np
+        from PIL import Image
+        tex = Image.new("RGBA", (2, 1), (0, 0, 0, 255))
+        tex.putpixel((1, 0), (255, 255, 255, 255))
+        inv = (0.5, 0, -0.25, 0, 1, 0)  # 4 px из 2 текселей: середина — смесь 50/50
+        lin = np.asarray(self.MO._transform_linear(tex, (4, 1), inv))[0, :, 0].tolist()
+        gam = np.asarray(tex.transform((4, 1), Image.AFFINE, data=inv, resample=Image.BILINEAR))[0, :, 0].tolist()
+        self.assertGreater(lin[1] + lin[2], gam[1] + gam[2])
+
+
+class GalleryCompareSummaryTests(unittest.TestCase):
+    """compare_ue_gallery.summarize: средние по новым id и сверка трассы ICONGALLERY ids со списками контракта."""
+
+    def test_trace_lists_every_contract_id(self):
+        import tempfile
+        try:
+            import compare_ue_gallery as G
+        except ImportError as e:  # pragma: no cover
+            raise unittest.SkipTest(f"compare_ue_gallery.py: {e}")
+        c = M.load_contract(str(CONTRACT))
+        metrics = {i: {"0": {"mean": 0.1, "p99": 1, "max": 2, "local_ms": 0.0}} for i in c["order"]}
+        with tempfile.TemporaryDirectory() as d:
+            ids = ",".join(c["order"])
+            with open(os.path.join(d, "gallery.trace.log"), "w", encoding="utf-8") as fh:
+                fh.write(f"2026.10.06-15.17.43 ICONGALLERY ids n={len(c['order'])} columns=7 list={ids}\n")
+            s = G.summarize(c, metrics, d)
+            self.assertTrue(s["trace_ok"])
+            self.assertEqual(s["new_pairs"], len(c["accepted_vr44"]))
+            self.assertAlmostEqual(s["new_mean"], 0.1, 6)
+            with open(os.path.join(d, "gallery.trace.log"), "w", encoding="utf-8") as fh:
+                fh.write("ICONGALLERY ids n=1 columns=7 list=state-boost\n")
+            s = G.summarize(c, metrics, d)
+            self.assertFalse(s["trace_ok"])
+            self.assertIn("ui-log", s["trace_missing"])
 
 
 if __name__ == "__main__":

@@ -1,10 +1,13 @@
 // HUD icon motion v3 automation tests (docs/unreal/contracts/hud/ICON-MOTION-PLAN.md, phase C):
 //   Load    - Config/S08IconMotion.json parses: 23 v3 icons + 5 DE-012 records (4 accepted 2026-10-05, the team ring
-//             a candidate), appear/leave each, the fallen heart on its own blackened layer, revision = the golden file's;
+//             a candidate) + 13 accepted VR44 records (VS-2 A2, IC-38...IC-56), appear/leave each, the fallen heart on
+//             its own blackened layer, the conflict badge on the order badge's body and team layers, revision = the
+//             golden file's;
 //   Golden  - FS08IconAnimator replays every icon's demo script (normal and reduced) and matches the Python
 //             reference poses docs/unreal/contracts/hud/icon-motion-golden.json (8 props + pivot, 1e-3);
 //   Reduced - s08.ReducedMotion drives S08IconMotion::IsReducedMotion;
-//   Textures- every layer texture of the contract exists at 24/32/48/64 px with the exact size and no mips;
+//   Textures- every layer and variant texture of the contract exists at its `ue_sizes` (18/24/32/36/48/64; the L6
+//             badges also 16/21) with the exact size (2:1 plates by canvas) and no mips;
 //   Widget  - US08AnimatedIconWidget builds one image per layer and applies the evaluator's pose;
 //   Semantics - events over the base (review 2026-10-03): leave after hold fades, tap after hover returns to it,
 //             a future appear is invisible, equal start time -> the later command wins;
@@ -17,6 +20,8 @@
 //   TurnHudRollbacks - run I: each rollback flag restores its old part (-S08TurnRingLegacy no ring, -S08HeartGlowLegacy
 //             no halo, -S08TrackerLegacy the v3 slots spend / gain, -S08CrossLegacy no fallen glyph), the ring choice
 //             of -S08TurnRingIcon, the trace fields (HUD-TURN config, ARTLOOK hud=...).
+//   GalleryIds - VS-2 IC-70: the -S08IconGallery grid = contract order, its rows fit the 1080 su canvas, and its
+//             `ICONGALLERY ids` list names every id of accepted_vr44, accepted_de012 and candidates.
 // Headless:
 //   UnrealEditor-Cmd.exe Unmatched.uproject -ExecCmds="Automation RunTests Unmatched.S08.IconMotion; Quit"
 //     -unattended -nosplash -nullrhi
@@ -82,8 +87,38 @@ bool FS08IconMotionLoadTest::RunTest(const FString& Parameters) {
   // 23 accepted v3 icons + 5 DE-012 records: the warm turn ring, the fallen heart, the X stamp and the DE tracker slot
   // accepted by the user on 2026-10-05 (contract `accepted_de012`, Codex forms), the team-tint ring still a candidate
   // (gallery only; contract `candidates`).
-  TestEqual(TEXT("28 icons in order"), Lib.Order.Num(), 28);
-  TestEqual(TEXT("28 icon definitions"), Lib.Icons.Num(), 28);
+  // VS-2 A2 (2026-10-06): 13 VR44 records accepted by delegation (contract `accepted_vr44`, IC-38...IC-56; the cursors
+  // IC-58...IC-61 are not in the motion contract - HB-12 imports them).
+  // VS-2 A3: 4 more VR44 records with the Codex IC-36 forms (IC-46 end turn, IC-48 card drop, IC-52 slot discard ribbon,
+  // IC-55 log glyph).
+  TestEqual(TEXT("45 icons in order"), Lib.Order.Num(), 45);
+  TestEqual(TEXT("45 icon definitions"), Lib.Icons.Num(), 45);
+  for (const TCHAR* Vr44 : {TEXT("badge-order"), TEXT("badge-refuse"), TEXT("badge-conflict"), TEXT("badge-ally"),
+                            TEXT("badge-attack-from"), TEXT("team-chip-p1"), TEXT("team-chip-p2"), TEXT("state-warning"),
+                            TEXT("marker-slot-scheme"), TEXT("marker-slot-boost"), TEXT("ui-menu"), TEXT("ui-close"),
+                            TEXT("ui-step"), TEXT("action-end-turn"), TEXT("card-drop"), TEXT("marker-slot-discard"),
+                            TEXT("ui-log")}) {
+    TestNotNull(*FString::Printf(TEXT("VR44 %s defined"), Vr44), Lib.Find(Vr44));
+  }
+  if (const FS08IconMotionDef* EndTurn = Lib.Find(TEXT("action-end-turn"))) {
+    // IC-46: the action disc events without spend / restore (a turn has no "pass" action, SD-44).
+    TestNotNull(TEXT("end turn select"), EndTurn->FindAnim(TEXT("select")));
+    TestNull(TEXT("end turn has no spend"), EndTurn->FindAnim(TEXT("spend")));
+    TestEqual(TEXT("end turn layers"), EndTurn->Layers.Num(), 2);
+  }
+  if (const FS08IconMotionDef* Conflict = Lib.Find(TEXT("badge-conflict"))) {
+    // ВР-IC05: the conflict badge shares the order badge's body and team block; only the "!" is its own layer.
+    TestEqual(TEXT("conflict layers"), Conflict->Layers.Num(), 3);
+    if (Conflict->Layers.Num() == 3) {
+      TestEqual(TEXT("conflict body src"), Conflict->Layers[0].Src, FString(TEXT("badge-order_body")));
+      TestTrue(TEXT("conflict team tinted"), Conflict->Layers[1].bTintTeam);
+      TestEqual(TEXT("conflict glyph src"), Conflict->Layers[2].Src, FString(TEXT("badge-conflict_glyph")));
+    }
+  }
+  if (const FS08IconMotionDef* From = Lib.Find(TEXT("badge-attack-from"))) {
+    TestEqual(TEXT("attack-from is a 2:1 plate"), From->CanvasU.X, 64.0);
+  }
+  TestNotNull(TEXT("variant badge-order-p2 resolves"), Lib.Find(TEXT("badge-order-p2")));
   for (const TCHAR* De012 : {TEXT("marker-turn-ring"), TEXT("marker-turn-ring-team"), TEXT("resource-hp-fallen"),
                              TEXT("marker-x-stamp"), TEXT("marker-action-slot-de")}) {
     TestNotNull(*FString::Printf(TEXT("DE-012 %s defined"), De012), Lib.Find(De012));
@@ -217,11 +252,18 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08IconMotionTexturesTest, "Unmatched.S08.Icon
 bool FS08IconMotionTexturesTest::RunTest(const FString& Parameters) {
   FS08IconMotionLibrary Lib;
   if (!TestTrue(TEXT("contract loads"), Lib.LoadFile(FS08IconMotionLibrary::DefaultPath()))) return false;
-  TSet<FString> Names;
-  for (const auto& Pair : Lib.Icons) Names.Append(S08LayerTextureNames(Pair.Value));
-  Names.Add(TEXT("resource-hp-full-enemy"));
+  // name -> 2:1 plate (canvas 64 u); variants take their base icon's canvas (VS-2 A2: by the contract, not by name)
+  TMap<FString, bool> Names;
+  for (const auto& Pair : Lib.Icons) {
+    for (const FString& N : S08LayerTextureNames(Pair.Value)) Names.Add(N, Pair.Value.CanvasU.X > 32.0);
+  }
+  for (const auto& Pair : Lib.Variants) {
+    const FS08IconMotionDef* Base = Lib.Find(Pair.Value);
+    Names.Add(Pair.Key.ToString(), Base && Base->CanvasU.X > 32.0);
+  }
   int32 Checked = 0;
-  for (const FString& N : Names) {
+  for (const auto& NameWide : Names) {
+    const FString& N = NameWide.Key;
     FString Src = N;
     int32 Frame = 0;
     int32 Hash = INDEX_NONE;
@@ -229,12 +271,17 @@ bool FS08IconMotionTexturesTest::RunTest(const FString& Parameters) {
       Src = N.Left(Hash + 1);
       Frame = FCString::Atoi(*N.Mid(Hash + 1));
     }
-    for (const int32 Px : {24, 32, 48, 64}) {
+    // IC-33: 18 / 36 for every record; VS-2 A2: the L6 badges at the cell also 16 / 21 (contract ue_sizes)
+    TArray<int32> Sizes = {18, 24, 32, 36, 48, 64};
+    if (N.StartsWith(TEXT("badge-order")) || N.StartsWith(TEXT("badge-refuse")) || N.StartsWith(TEXT("badge-conflict"))) {
+      Sizes.Append({16, 21});
+    }
+    for (const int32 Px : Sizes) {
       const FString Path = S08IconMotion::TextureObjectPath(Src, Frame, Px);
       UTexture2D* Tex = LoadObject<UTexture2D>(nullptr, *Path);
       if (!TestNotNull(*FString::Printf(TEXT("texture %s"), *Path), Tex)) continue;
       ++Checked;
-      const bool bWide = Src.StartsWith(TEXT("state-hint")) || Src.StartsWith(TEXT("state-threat"));
+      const bool bWide = NameWide.Value;
       // Source (imported) size: -nullrhi has no built platform data, so GetSizeX() would be 0.
       const FIntPoint Imported = Tex->GetImportedSize();
       TestEqual(*FString::Printf(TEXT("%s width"), *Path), Imported.X, bWide ? 2 * Px : Px);
@@ -661,6 +708,53 @@ bool FS08IconMotionTurnHudRollbacksTest::RunTest(const FString& Parameters) {
                 TEXT("-S08TurnRingLegacy -S08HeartGlowLegacy -S08TrackerLegacy -S08CrossLegacy"))
                 .Describe(),
             FString(TEXT("ring=none heartGlow=0 tracker=v3 cross=0")));
+  return true;
+}
+
+// VS-2 IC-70: the -S08IconGallery grid holds every contract icon in `order`, and the trace line `ICONGALLERY ids`
+// (US08IconGalleryWidget::IdList) names each id of the contract lists accepted_vr44, accepted_de012 and candidates.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08IconMotionGalleryIdsTest, "Unmatched.S08.IconMotion.GalleryIds",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FS08IconMotionGalleryIdsTest::RunTest(const FString& Parameters) {
+  FString Text;
+  if (!TestTrue(TEXT("contract file"), FFileHelper::LoadFileToString(Text, *FS08IconMotionLibrary::DefaultPath()))) {
+    return false;
+  }
+  TSharedPtr<FJsonObject> Root;
+  const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Text);
+  if (!TestTrue(TEXT("contract parses"), FJsonSerializer::Deserialize(Reader, Root) && Root.IsValid())) return false;
+  FS08IconTestWorld W(TEXT("S08IconMotionGalleryIdsTest"));
+  if (!TestNotNull(TEXT("test world"), W.World)) return false;
+  US08IconGalleryWidget* Gallery = CreateWidget<US08IconGalleryWidget>(W.World, US08IconGalleryWidget::StaticClass());
+  if (!TestNotNull(TEXT("gallery widget"), Gallery)) return false;
+  const FS08IconMotionLibrary& Lib = FS08IconMotionLibrary::Get();
+  // Rows fit the 1080 su canvas: 45 icons at 64 su -> 7 columns x 7 rows (6 columns would squeeze 8 rows into 1080 su
+  // and centre each 130 su cell half a pixel off); 28 icons (run I) keep the 6 columns.
+  const int32 Columns = US08IconGalleryWidget::ColumnsToFit(Lib.Order.Num(), 64.0f, 1080.0f);
+  TestEqual(TEXT("cell 64 su"), US08IconGalleryWidget::CellSizeSu(64.0f), FVector2D(168.0, 130.0));
+  TestEqual(TEXT("45 icons -> 7 columns"), US08IconGalleryWidget::ColumnsToFit(45, 64.0f, 1080.0f), 7);
+  TestEqual(TEXT("28 icons -> 6 columns"), US08IconGalleryWidget::ColumnsToFit(28, 64.0f, 1080.0f), 6);
+  const int32 Rows = FMath::DivideAndRoundUp(Lib.Order.Num(), Columns);
+  TestTrue(TEXT("rows fit 1080 su"),
+           Rows * (US08IconGalleryWidget::CellSizeSu(64.0f).Y + 2.0f * US08IconGalleryWidget::SlotPaddingSu) <= 1080.0f);
+  const int32 Count = Gallery->Build(64.0f, 64, /*bInReduced=*/false, Columns, /*bLabels=*/true);
+  TestEqual(TEXT("gallery = contract order"), Count, Lib.Order.Num());
+  TArray<FString> Ids;
+  Gallery->IdList().ParseIntoArray(Ids, TEXT(","), true);
+  TestEqual(TEXT("IdList count"), Ids.Num(), Count);
+  for (int32 I = 0; I < FMath::Min(Ids.Num(), Lib.Order.Num()); ++I) {
+    TestEqual(*FString::Printf(TEXT("grid %d in contract order"), I), Ids[I], Lib.Order[I].ToString());
+  }
+  int32 Listed = 0;
+  for (const TCHAR* List : {TEXT("accepted_vr44"), TEXT("accepted_de012"), TEXT("candidates")}) {
+    const TArray<TSharedPtr<FJsonValue>>* Values = nullptr;
+    if (!TestTrue(*FString::Printf(TEXT("%s present"), List), Root->TryGetArrayField(List, Values) && Values)) continue;
+    for (const TSharedPtr<FJsonValue>& V : *Values) {
+      TestTrue(*FString::Printf(TEXT("%s %s in the gallery trace"), List, *V->AsString()), Ids.Contains(V->AsString()));
+      ++Listed;
+    }
+  }
+  TestEqual(TEXT("17 VR44 + 4 DE-012 + 1 candidate"), Listed, 22);
   return true;
 }
 

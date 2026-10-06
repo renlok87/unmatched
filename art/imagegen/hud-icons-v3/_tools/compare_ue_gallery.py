@@ -3,12 +3,18 @@
 """Галерея UE (-S08IconGallery) против эталона Python: те же значки в те же моменты.
 
     python art/imagegen/hud-icons-v3/_tools/compare_ue_gallery.py <dir with icon-gallery-<mode>-<t>.png> [--reduced]
-        [--size 64] [--out <sheet.png>] [--json <metrics.json>]
+        [--size 64] [--out <sheet.png>] [--json <metrics.json>] [--raster ue|ref]
 
 Ячейки находятся по цвету панели tag.background в снимке, значок вырезается так же, как его раскладывает
 US08IconGalleryWidget (сверху по центру, поле 0,25 стороны), эталон — motion.compose() в момент
 t_local = t mod (длина сценария + 400 мс). Метрика — средняя и 99-перцентиль |Δ| по каналам (0..255) в окне
 значка; лист — «UE | эталон | |Δ|×4» по каждому значку и моменту.
+
+--raster (VS-2 IC-70, ВР-VS2-37): ue (по умолчанию) — эталон растрируется как Slate (углы осевого квада на целых
+пикселях, выборка sRGB-текстуры в линейном свете, motion.compose(raster="ue")); ref — прежний растр листов (билинейно
+в sRGB, без снапа; им считан G-ICON прогона I = 0,384). В compare.json — summary: средняя по всем парам, по новым id
+(контракт accepted_vr44) и по каждому id, и сверка строки трассы `ICONGALLERY ids` (gallery.trace.log) со списками
+контракта accepted_vr44 / accepted_de012 / candidates.
 """
 from __future__ import annotations
 
@@ -44,7 +50,7 @@ def cells(img):
     return boxes
 
 
-def reference(c, icon, reduced, t, size):
+def reference(c, icon, reduced, t, size, raster="ue"):
     sched, total = M.demo_schedule(c, icon, reduced)
     local = t % (total + PAUSE_MS)
     a = M.Animator(c, icon, reduced)
@@ -53,7 +59,31 @@ def reference(c, icon, reduced, t, size):
             break
         a.play(op, tc)
     pp, vis = a.pose(local)
-    return MO.compose(a, pp, size) if vis else None, local
+    return MO.compose(a, pp, size, raster=raster) if vis else None, local
+
+
+def summarize(c, metrics, src):
+    """Средние по всем парам, по новым id (accepted_vr44) и по id; сверка трассы ICONGALLERY ids со списками контракта."""
+    per = {i: round(float(np.mean([m["mean"] for m in v.values()])), 3) for i, v in metrics.items()}
+    allm = [m["mean"] for v in metrics.values() for m in v.values()]
+    new = [i for i in c.get("accepted_vr44", []) if i in metrics]
+    newm = [m["mean"] for i in new for m in metrics[i].values()]
+    listed, missing = None, None
+    trace = os.path.join(src, "gallery.trace.log")
+    if os.path.exists(trace):
+        with open(trace, encoding="utf-8", errors="replace") as fh:
+            for line in fh:
+                if "ICONGALLERY ids " in line and " list=" in line:
+                    listed = line.strip().split(" list=", 1)[1].split(",")
+        if listed is not None:
+            want = c.get("accepted_vr44", []) + c.get("accepted_de012", []) + c.get("candidates", [])
+            missing = [i for i in want if i not in listed]
+    worst_new = max(new, key=lambda i: per[i]) if new else None
+    return {"pairs": len(allm), "mean": round(float(np.mean(allm)), 3) if allm else None,
+            "new_ids": new, "new_pairs": len(newm), "new_mean": round(float(np.mean(newm)), 3) if newm else None,
+            "new_max_id": [worst_new, per.get(worst_new)] if worst_new else None,
+            "per_id": per, "trace_ids": len(listed) if listed is not None else None,
+            "trace_missing": missing, "trace_ok": (missing == []) if missing is not None else None}
 
 
 def main():
@@ -63,6 +93,7 @@ def main():
     size = int(args[args.index("--size") + 1]) if "--size" in args else 64
     out = args[args.index("--out") + 1] if "--out" in args else os.path.join(src, "compare.png")
     jout = args[args.index("--json") + 1] if "--json" in args else os.path.join(src, "compare.json")
+    raster = args[args.index("--raster") + 1] if "--raster" in args else "ue"
     c = M.load_contract()
     shots = sorted((int(m.group(1)), f) for f in os.listdir(src) if (m := re.match(r"icon-gallery-\w+-(\d+)\.png$", f)))
     pad = round(0.25 * size)
@@ -74,7 +105,7 @@ def main():
             print(f"{f}: found {len(boxes)} cells, expected {len(c['order'])}")
             continue
         for (y, x, h, w), icon in zip(boxes, c["order"]):
-            ref, local = reference(c, icon, reduced, t, size)
+            ref, local = reference(c, icon, reduced, t, size, raster)
             wide = c["icons"][icon]["canvas_u"][0] > 32
             iw, ih = (2 * size if wide else size) + 2 * pad, size + 2 * pad
             # US08IconGalleryWidget: icon top padding = pad, horizontally centred; compose() adds pad around the canvas
@@ -95,11 +126,15 @@ def main():
             m = {"mean": round(float(d.mean()), 3), "p99": int(np.percentile(d, 99)), "max": int(d.max()), "local_ms": round(local, 1)}
             metrics.setdefault(icon, {})[str(t)] = m
             rows.append((icon, t, ue, rf, Image.fromarray(np.clip(np.abs(ue_a - rf_a) * 4, 0, 255).astype(np.uint8))))
+    summary = summarize(c, metrics, src)
     with open(jout, "w", encoding="utf-8") as fh:
-        json.dump({"src": src, "reduced": reduced, "size": size, "metrics": metrics}, fh, ensure_ascii=False, indent=1)
+        json.dump({"src": src, "reduced": reduced, "size": size, "raster": raster, "summary": summary, "metrics": metrics},
+                  fh, ensure_ascii=False, indent=1)
     worst = sorted(((m["p99"], m["mean"], i, t) for i, v in metrics.items() for t, m in v.items()), reverse=True)[:8]
     allm = [m["mean"] for v in metrics.values() for m in v.values()]
-    print(f"pairs={len(allm)} mean|d|={np.mean(allm):.3f} worst p99: {worst}")
+    print(f"pairs={len(allm)} mean|d|={np.mean(allm):.3f} raster={raster} worst p99: {worst}")
+    print(f"new ids (accepted_vr44): pairs={summary['new_pairs']} mean|d|={summary['new_mean']} "
+          f"max id={summary['new_max_id']} trace lists all ids={summary['trace_ok']}")
     # лист: по 4 момента на значок
     pick = sorted({t for _, t, *_ in rows})
     pick = [pick[i] for i in np.linspace(0, len(pick) - 1, min(4, len(pick))).round().astype(int)]
@@ -108,7 +143,8 @@ def main():
     ch = max(r[2].height for r in rows) + 22
     W, H = 220 + len(pick) * cw, 40 + len(c["order"]) * ch
     sheet = Image.new("RGB", (W, H), D.SHEET_BG[:3])
-    sheet.paste(D.label(W, 30, f"UE | эталон | |Δ|×4 — {'reduced' if reduced else 'normal'}, {size} px; моменты {pick} мс", 14).convert("RGB"), (0, 4))
+    sheet.paste(D.label(W, 30, f"UE | эталон | |Δ|×4 — {'reduced' if reduced else 'normal'}, {size} px, растр {raster}; "
+                        f"моменты {pick} мс", 14).convert("RGB"), (0, 4))
     for r, icon in enumerate(c["order"]):
         y = 40 + r * ch
         sheet.paste(D.label(210, 20, icon, 12).convert("RGB"), (4, y + ch // 2 - 10))

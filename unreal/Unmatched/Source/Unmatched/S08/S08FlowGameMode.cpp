@@ -9,6 +9,8 @@
 #include "S08ArtHudWidgets.h"
 #include "S08Team.h"
 #include "UI/S08HudDebug.h"
+#include "UI/UmHudScale.h"
+#include "UI/UmTeamChip.h"
 #include "Blueprint/UserWidget.h"
 #include "Misc/CoreDelegates.h"
 #include "Camera/CameraActor.h"
@@ -951,6 +953,7 @@ void AS08FlowGameMode::SetupCameraForBoard() {
   } else {
     BoardCamera->SetActorLocationAndRotation(Location, FRotator(-55.0f, -90.0f, 0.0f));
   }
+  UpdateUmHudField(Location, FRotator(-55.0f, -90.0f, 0.0f), Hfov);  // VS-2 HB-06: FIELD of this K1 camera (ВР-H02)
   const FString Line = FString::Printf(TEXT("CAMERA dist=%.0f loc=(%.0f,%.0f,%.0f) pitch=-55 yaw=-90"),
                                        Distance, Location.X, Location.Y, Location.Z);
   TraceLines.Add(Line);
@@ -2419,6 +2422,8 @@ TSharedRef<SWidget> AS08FlowGameMode::MakeHudPress(FName Id, TFunction<FS09Reaso
         HandleHudPressOutcome(Outcome, Blocked, Action);
       }),
       Padding, Tint, bDimmed, Label);
+  // VS-2 HB-12: the pointer over a pressable element, "denied" over a blocked one (04 §3.2; -S08SlateHud=cursor: none)
+  if (!UmHudBlockOnSlate(TEXT("cursor"))) Element->SetCursor(TOptional<EMouseCursor::Type>(bDimmed ? EMouseCursor::SlashedCircle : EMouseCursor::Hand));
   HudPressWidgets.Add(Id, Element); // the newest instance of the id (flag step 'hudendturn')
   return Element;
 }
@@ -4978,6 +4983,7 @@ void AS08FlowGameMode::CaptureEvidenceShot(const FString& BasePath) {
     // docs/art-pipeline/qa010/README.md "Новая трасса"). W5b-R: the icon / widget / tag / damage lines moved to the
     // END of this frame (WriteArtHudLateLines) - they report what the capture really contains.
     WriteArtHudShotLines();
+    WriteUmHudShotLines();  // VS-2 HB-06: HUD-LAYOUT (class, canvas, FIELD, overlap) + SHOT widget id=UI-SCR-GAME
   }
   // UI-INCLUSIVE evidence capture (GD-032/033): the old SceneCapture and
   // HighResShot paths render the 3D scene only - Slate HUD widgets never
@@ -5195,6 +5201,7 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
   TickDeathStage();  // DE-019: death lines and the result gate (after the staging released this frame's fall)
   TickResultScreen();  // DE-029: the modal opens with the gate; intro 500 ms, board crossfade 250 ms
   TickDeckPanel();     // DE-030: the deck side panel - open 80 ms, close 150 ms
+  TickUmHud();         // VS-2 HB-06: the H2 layout fixes of the Slate blocks (toast / subtitle stack)
   if (!TryCombatSkip() && !TryCardSlotSkip()) {
     HandleClick();
     HandleHudKeys();
@@ -5360,6 +5367,7 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
 }
 
 void AS08FlowGameMode::EndPlay(const EEndPlayReason::Type Reason) {
+  if (UmHud.IsValid()) HandleUmHudEndPlay();  // VS-2 HB-06: the scale listener of the HUD root
   ShutdownAudioRuntime();
   FCoreDelegates::OnEndFrame.Remove(EndFrameHandle);
   US08UserSettings::OnChanged.Remove(SettingsChangedHandle);
@@ -5782,13 +5790,13 @@ void AS08FlowGameMode::BuildHudWidgets() {
       .Alignment(FVector2D(0.0f, 0.5f))
       .Offset(FVector2D(24.0f, 0.0f))
       .AutoSize(true)
-      [SAssignNew(CombatEdgeLeft, SVerticalBox)];
+      [UmHudWrapEdge(SAssignNew(CombatEdgeLeft, SVerticalBox), true)];  // VS-2 HB-06: kept out of FIELD
   Canvas->AddSlot()
       .Anchors(FAnchors(1.0f, 0.5f))
       .Alignment(FVector2D(1.0f, 0.5f))
       .Offset(FVector2D(-24.0f, 0.0f))
       .AutoSize(true)
-      [SAssignNew(CombatEdgeRight, SVerticalBox)];
+      [UmHudWrapEdge(SAssignNew(CombatEdgeRight, SVerticalBox), false)];
   Canvas->AddSlot()
       .Anchors(FAnchors(0.5f, 0.0f))
       .Alignment(FVector2D(0.5f, 0.0f))
@@ -5799,7 +5807,7 @@ void AS08FlowGameMode::BuildHudWidgets() {
   Canvas->AddSlot()
       .Anchors(FAnchors(0.5f, 1.0f))
       .Alignment(FVector2D(0.5f, 1.0f))
-      .Offset(FVector2D(0.0f, -150.0f))
+      .Offset(TAttribute<FMargin>::CreateLambda([this]() { return UmHudToastOffset(); }))  // VS-2: the stack (ВР-H06)
       .AutoSize(true)
       [SAssignNew(ToastHudBorder, SBorder)
            .BorderImage(FCoreStyle::Get().GetBrush("WhiteBrush"))
@@ -5817,6 +5825,7 @@ void AS08FlowGameMode::BuildHudWidgets() {
   BuildResultScreenWidgets(Canvas); // DE-029: the result modal and the board-view bar, over every panel
 
   GEngine->GameViewport->AddViewportWidgetContent(Canvas, 1);
+  BuildUmHud();  // VS-2 HB-06: the UMG HUD root (S08FlowGameModeUmHud.cpp; rollback -S08SlateHud)
 }
 
 namespace {
@@ -6671,7 +6680,7 @@ void AS08FlowGameMode::RefreshHud() {
   } else if (CommandUi.Mode == ES09CommandMode::PendingChoice && CombatStage.IsActive()) {
     // DE-018 (07 S11c, CUE-014): an AFTER COMBAT choice opens when the combat staging ends (<= ~4 s, skippable).
     AddMarker(GS09PendingMarker);
-    AddHeader(TEXT("AFTER COMBAT"), FLinearColor(0.75f, 0.8f, 1.0f, 1.0f));
+    if (UmHudBlockOnSlate(TEXT("status"))) AddHeader(TEXT("AFTER COMBAT"), FLinearColor(0.75f, 0.8f, 1.0f, 1.0f));  // VS-2 HB-15
     AddLine(FString::Printf(TEXT("next: %s - opens when the combat ends (click / Space / Enter skips)"),
                             *CommandUi.PendingChoice.Type));
   } else if (CommandUi.Mode == ES09CommandMode::PendingChoice && PendingPresenter.IsOpen() &&
@@ -7025,10 +7034,11 @@ void AS08FlowGameMode::RefreshHud() {
     }
     AddLine(TEXT("the server blocks further actions until the queue drains"));
   } else if (Hud.bViewerTurn) {
-    AddHeader(TEXT("YOUR TURN"), FLinearColor(0.7f, 1.0f, 0.7f, 1.0f));
-    AddLine(FString::Printf(TEXT("actions left: %d   phase: %s"),
-                            FMath::Max(0, Hud.ActionsRemaining), *Hud.Phase));
-    AddLine(TEXT("M begin maneuver  |  A attack draft  |  G scheme picker  |  E end turn"));
+    if (UmHudBlockOnSlate(TEXT("status"))) {  // VS-2 ВР-VS2-74: the UMG STATUS and PANEL-LOC say it (as HB-15)
+      AddHeader(TEXT("YOUR TURN"), FLinearColor(0.7f, 1.0f, 0.7f, 1.0f));
+      AddLine(FString::Printf(TEXT("actions left: %d   phase: %s"), FMath::Max(0, Hud.ActionsRemaining), *Hud.Phase));
+      AddLine(TEXT("M begin maneuver  |  A attack draft  |  G scheme picker  |  E end turn"));
+    }
     CommandBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
         [SNew(SHorizontalBox) +
          SHorizontalBox::Slot().AutoWidth().Padding(0, 0, 8, 0)
@@ -7059,7 +7069,7 @@ void AS08FlowGameMode::RefreshHud() {
                   SNew(STextBlock).Text(FText::FromString(TEXT("END TURN (E)")))
                        .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14)))]];
   } else {
-    AddHeader(TEXT("OPPONENT'S TURN"), FLinearColor(1.0f, 0.8f, 0.6f, 1.0f));
+    if (UmHudBlockOnSlate(TEXT("status"))) AddHeader(TEXT("OPPONENT'S TURN"), FLinearColor(1.0f, 0.8f, 0.6f, 1.0f));  // VS-2 HB-15
     if (Flow.IsValid() && Flow->IsBotActing()) {
       // S10/GD-039: the waiting indicator follows the AUTHORITATIVE turn
       // owner (applied snapshot), never a fixed timer.
@@ -7223,25 +7233,19 @@ void AS08FlowGameMode::BuildArtHudWidgets(const TSharedRef<SConstraintCanvas>& C
     const FString Path = Texture ? TokenPath : ConceptPath;
     if (!Texture) Texture = LoadObject<UTexture2D>(nullptr, *ConceptPath);
     ArtHud.IconTexturePath = Texture ? Path : FString(TEXT("none"));
-    // W5b-R D-3: team shape chips (circle P1 / hexagon P2), 12 px exact-size, tinted by the chip colour.
-    bool bChips = !S08LegacyRender();
-    for (int32 I = 0; I < 2 && bChips; ++I) {
-      UTexture2D* Chip = LoadObject<UTexture2D>(nullptr, I == 0
-          ? TEXT("/Game/ArtTests/ARTMarkers/Textures/T_UI_TeamShape_Circle_12")
-          : TEXT("/Game/ArtTests/ARTMarkers/Textures/T_UI_TeamShape_Hex_12"));
-      if (!Chip) {
-        bChips = false;
-        break;
-      }
-      ArtHudAssets.Add(Chip);
-      FSlateBrush& Brush = I == 0 ? ArtHud.ChipCircleBrush : ArtHud.ChipHexBrush;
-      Brush.SetResourceObject(Chip);
-      Brush.ImageSize = FVector2D(12.0, 12.0);
-      Brush.DrawAs = ESlateBrushDrawType::Image;
-      Brush.Tiling = ESlateBrushTileType::NoTile;
+    // W5b-R D-3, VS-2 IC-44 / IC-45: team shape chips (circle P1 / hexagon P2) tinted by the chip colour - the v3
+    // team-chip export for the carrier's chip su (UI/UmTeamChip.h), -S08IconLegacy the mvp-v1 12 px chips.
+    const UmTeamChip::FUmTeamChipBrushes Chips =
+        UmTeamChip::Load(FS08ArtHudTagStyle().ChipSu, UmHudScale::Current().PxPerSu(), FCommandLine::Get());
+    const bool bChips = !S08LegacyRender() && Chips.bReady;
+    if (bChips) {
+      for (UTexture2D* Chip : Chips.Textures) ArtHudAssets.Add(Chip);
+      ArtHud.ChipCircleBrush = Chips.Brushes[0];
+      ArtHud.ChipHexBrush = Chips.Brushes[1];
     }
     ArtHud.bChipBrushes = bChips;
-    ArtHud.PendingTrace.Add(FString::Printf(TEXT("HUD team chips ready=%d mode=%s tagNames=%s"), bChips ? 1 : 0,
+    ArtHud.PendingTrace.Add(FString::Printf(TEXT("HUD team chips ready=%d %s mode=%s tagNames=%s"), bChips ? 1 : 0,
+                                            *Chips.TraceFields(),
                                             S08TeamColorModeName(static_cast<ES08TeamColorMode>(ArtHud.TeamColorMode)),
                                             ArtHud.bTagNamesAll ? TEXT("all") : TEXT("rule")));
     ArtHud.bIconTextureReady = Texture != nullptr;
@@ -8279,6 +8283,7 @@ void AS08FlowGameMode::WriteArtHudLateLines(const FString& File, uint64 RequestF
       }
     }
     WriteArtHudWidgetLines(FString(), /*bLate=*/true);
+    WriteUmHudLateLines();  // VS-2 ВР-VS2-77: blocks first shown in the shot frame, painted geometry
     // screen tags
     for (const FS08ArtHudRuntime::FTagSlot& T : ArtHud.Tags) {
       if (!T.Widget || T.FighterId.IsEmpty()) continue;

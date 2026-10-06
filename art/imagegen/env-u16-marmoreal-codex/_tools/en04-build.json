@@ -1,0 +1,39 @@
+{
+  "shared_setup_seconds": 1.62421790001099,
+  "timings": {
+    "lantern-alpha": {
+      "mask_and_png_seconds": 0.4644,
+      "with_shared_setup_seconds": 2.0886
+    },
+    "lantern-glow": {
+      "mask_and_png_seconds": 2.0084,
+      "with_shared_setup_seconds": 3.6326
+    },
+    "sakura": {
+      "mask_and_png_seconds": 5.886,
+      "with_shared_setup_seconds": 7.5102
+    },
+    "mist": {
+      "mask_and_png_seconds": 2.0163,
+      "with_shared_setup_seconds": 3.6406
+    },
+    "petals": {
+      "mask_and_png_seconds": 1.9893,
+      "with_shared_setup_seconds": 3.6136
+    }
+  },
+  "glow_normalisation_peak_linear_Y": 1.0,
+  "mist_ramp_plate_y": [
+    2161.0,
+    2353.0,
+    2593
+  ],
+  "algorithms": {
+    "alpha": "bilinear x2 + Gaussian sigma 8/3 truncate 3; protected regions and portal zero",
+    "glow": "max(linear709(lit)-linear709(clean),0)*alpha; within EN-01 light support; peak normalised",
+    "sakura": "clean sRGB HSV hue265..350 saturation>=.20 value>=.15 in continued cherry zones; exact disc24 closing, fill holes, discard components<400; subtract unchanged woody/protection and local static stone; Gaussian sigma4 truncate3; hard zero woody/protection/stone/outside cherry, no pigment reclip",
+    "mist": "continued front-cliff; triangular vertical ramp; inward side feather32",
+    "petals": "exact uint8 grayscale disk dilation radius24, protected regions reapplied"
+  },
+  "generations": 0
+}

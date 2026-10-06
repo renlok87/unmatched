@@ -62,6 +62,8 @@ void CheckHeaderValues(FAutomationTestBase& Test, const UUmHudTheme& Theme, cons
     const FSlateBrush* Brush = Theme.Skins.Find(S.Name);
     Test.TestTrue(FString::Printf(TEXT("%s: skin %s present"), What, S.Name), Brush != nullptr);
     if (!Brush) continue;
+    // VS-2 HB-10: an imported 9-slice PNG replaces the ВР-HB06 rounded brush (Unmatched.S08.Hud.Theme.Skins checks it)
+    if (Brush->GetResourceObject()) continue;
     Test.TestTrue(FString::Printf(TEXT("%s: skin %s is a rounded box"), What, S.Name),
                   Brush->DrawAs == ESlateBrushDrawType::RoundedBox);
     FLinearColor Fill = FLinearColor::FromSRGBColor(S.Fill);

@@ -14,7 +14,18 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "S08ArtHudWidgets.h"
 #include "S08ArtHudAuthoring.generated.h"
+
+class FJsonObject;
+class UWidgetTree;
+
+/** VS-2 HB-06: one widget blueprint Folder/Name with parent class Parent, its tree built by Build (the class's
+ *  BuildDefaultTree), compiled and saved - the shared step of this library and UUmHudAuthoringLibrary. The report
+ *  object: asset, parentClass, widgets, compileStatus, file, saved, result, generatedClass (or error). Editor only. */
+UNMATCHED_API TSharedRef<FJsonObject> S08AuthorWidgetBlueprint(
+    const FString& Folder, const FString& Name, UClass* Parent,
+    TFunctionRef<bool(UWidgetTree&, FS08AttachWidget, FString*)> Build, bool bOverwrite);
 
 UCLASS()
 class UNMATCHED_API US08ArtHudAuthoringLibrary : public UBlueprintFunctionLibrary {

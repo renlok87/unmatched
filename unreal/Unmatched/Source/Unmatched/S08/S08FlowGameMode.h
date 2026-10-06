@@ -1178,6 +1178,42 @@ private:
   UPROPERTY()
   TObjectPtr<class US08AnimatedIconWidget> NoDefenseStamp;
   FString NoDefenseStampKey;
+  // ---- VS-2 HB-06: the UMG HUD root, its layout / FIELD and the H2 layout fixes of the Slate blocks
+  // (S08FlowGameModeUmHud.cpp; rollback -S08SlateHud[=<blocks>]) ----
+  void BuildUmHud();
+  void UpdateUmHudField(const FVector& CameraLocation, const FRotator& CameraRotation, float HFovDeg);
+  void RefreshUmHudLayout();
+  void HandleUmHudScaleChanged(const struct FUmHudScaleState& State);
+  void HandleUmHudEndPlay();
+  void WriteUmHudShotLines();
+  void TickUmHud();
+  void UmHudDeckPanelLayering(float DeckAlpha);
+  bool UmHudBlockOnSlate(const TCHAR* Key) const;
+  TSharedRef<SWidget> UmHudWrapEdge(const TSharedRef<SWidget>& Edge, bool bLeft);
+  float UmHudHandLowerCap(float OffsetSu) const;
+  FMargin UmHudToastOffset() const;
+  void UmGalleryBegin(int32 SizePx);
+  // VS-2 HB-14...HB-16: TOP + CONN, STATUS and the banner (S08/UI/UmHudTop, UmHudStatusLine, UmHudBanner)
+  void BuildUmTopStrip();
+  void TickUmTopStrip();
+  /** The UMG STATUS took the line (false: -S08SlateHud=status, the Slate text in the hand panel stays). */
+  bool ApplyUmHudStatus(const FS09TurnStatusInput& In);
+  void HandleUmTopPress(const TCHAR* What);
+  // VS-2 HB-18...HB-21: PANEL-LOC, PANEL-OPP, OPP-HAND (S08/UI/UmHudPanels.h)
+  void BuildUmPanels();
+  void TickUmPanels();
+  /** The right edge of PANEL-LOC (su) for the hand obstacle; -1 when the panels are on the Slate path. */
+  float UmHudPanelLocRightSu() const;
+  // VS-2 exit frames (opt-in -S08ExitShots): own / opponent turn start + 0.5 s and + 3 s
+  void NoteUmExitShotsTurn(bool bOwn, bool bInitial, bool bGameOver);
+  /** ВР-VS2-77: the late SHOT lines of the VS-2 blocks first shown in the shot frame. */
+  void WriteUmHudLateLines();
+  void TickUmExitShots();
+  UPROPERTY()
+  TObjectPtr<class UUmHudRoot> UmHudRoot;
+  UPROPERTY()
+  TObjectPtr<UUserWidget> UmGallery;
+  TSharedPtr<struct FUmHudRuntime> UmHud;
 
   FS08BoardModel BoardModel;
   TArray<FS08BoardFighter> Fighters;
