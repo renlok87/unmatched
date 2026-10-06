@@ -142,10 +142,14 @@ FUmCardFit Fit(const FVector2D& ShowSu, float Band, const FIntPoint& Src, float 
   return F;
 }
 
-float HoverScaleFor(const FUmCardFit& Base, float Cap) {
-  if (Base.Scale <= 0.0f) return HoverScale;
-  return FMath::Clamp(Cap / Base.Scale, 1.0f, HoverScale);
+float HoverScaleFor(const FUmCardFit& Base, float Cap, float MaxScale) {
+  if (Base.Scale <= 0.0f) return MaxScale;
+  return FMath::Clamp(Cap / Base.Scale, 1.0f, MaxScale);
 }
+
+float HoverScaleOf(EUmCardShow Show) { return Show == EUmCardShow::ClassSHand ? HoverScaleClassS : HoverScale; }
+
+float ChipSuFor(float PxPerSu) { return PxPerSu > 0.0f && PxPerSu < 1.0f - 1.0e-4f ? ChipSmallDpiSu : ChipSu; }
 
 FName FrameKey(bool bMini, bool bWarning, bool bSelected, bool bHover) {
   if (bMini) return FName(TEXT("card.frame.mini"));  // ВР-VS2-CP-06: the mini displays are mini-idle only
@@ -702,6 +706,63 @@ void UUmCardWidget::ApplyLayout() {
     Spinner->SetVisibility(bLoading ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
     if (bLoading && !bWas) Spinner->PlayAnim(TEXT("cycle"));
   }
+  // HB-25 (IC-34 П-2): the "+N" disc keeps >= 21 px on screen - 32 su below 1 px per su; 8 su of it on the frame
+  // (ВР-VS3-09) or right-aligned 4 su over the top edge (the attack boost, ВР-VS2-HB22-11)
+  const float Chip = ChipSuFor(Px);
+  if (!FMath::IsNearlyEqual(Chip, ChipSuNow) || (BoostIcon && !FMath::IsNearlyEqual(BoostIcon->GetDisplaySizeSu(), Chip))) {
+    ChipSuNow = Chip;
+    if (BoostIcon) BoostIcon->SetDisplaySizeSu(Chip);
+    if (BoostText) {
+      FSlateFontInfo Font = UUmHudTheme::Get().Font(TEXT("type.tag"));
+      Font.Size = UmHudTheme::PointsFromSu(12.0f * Chip / ChipSu);
+      BoostText->SetFont(Font);
+    }
+  }
+  if (BoostChip) {
+    if (UOverlaySlot* S = Cast<UOverlaySlot>(BoostChip->Slot)) {
+      S->SetHorizontalAlignment(bChipRightAbove ? HAlign_Right : HAlign_Center);
+      S->SetPadding(FMargin(0.0f, bChipRightAbove ? -(ChipSuNow + ChipGapAboveSu) : -(ChipSuNow - ChipOnFrameSu), 0.0f, 0.0f));
+    }
+  }
+}
+
+void UUmCardWidget::SetChipRightAbove(bool bOn) {
+  if (bOn == bChipRightAbove) return;
+  bChipRightAbove = bOn;
+  ApplyLayout();
+}
+
+void UUmCardWidget::SetOwnerOffset(const FVector2D& Su, float DurMs) {
+  if (FMath::IsNearlyEqual(OffsetXTween.To, static_cast<float>(Su.X), 0.01f) &&
+      FMath::IsNearlyEqual(OffsetYTween.To, static_cast<float>(Su.Y), 0.01f)) {
+    return;
+  }
+  const double Now = NowMs();
+  const float Ms = IsReduced() ? 0.0f : FMath::Max(0.0f, DurMs);
+  StartTween(OffsetXTween, TweenValue(OffsetXTween, Now, true), static_cast<float>(Su.X), Ms);
+  StartTween(OffsetYTween, TweenValue(OffsetYTween, Now, true), static_cast<float>(Su.Y), Ms);
+  Step();
+}
+
+void UUmCardWidget::StartOwnerOffset(const FVector2D& From, const FVector2D& To, float DurMs, double DelayMs) {
+  const float Ms = IsReduced() ? 0.0f : FMath::Max(0.0f, DurMs);
+  StartTween(OffsetXTween, static_cast<float>(From.X), static_cast<float>(To.X), Ms);
+  StartTween(OffsetYTween, static_cast<float>(From.Y), static_cast<float>(To.Y), Ms);
+  if (Ms > 0.0f && DelayMs > 0.0) {
+    OffsetXTween.StartMs += DelayMs;
+    OffsetYTween.StartMs += DelayMs;
+  }
+  Step();
+}
+
+void UUmCardWidget::SetVisualHitTest(bool bOn) {
+  // the drawn card (Card, under its render transform) registers in the hit test grid: the press, the hover and the
+  // inspector reach the widget from the raised preview too; its layers stay hit-test invisible (Box and Stack only let
+  // the pointer through to it)
+  const ESlateVisibility Path = bOn ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::HitTestInvisible;
+  if (Box) Box->SetVisibility(Path);
+  if (UWidget* Stack = WidgetTree ? WidgetTree->FindWidget(FName(TEXT("Stack"))) : nullptr) Stack->SetVisibility(Path);
+  if (Card) Card->SetVisibility(bOn ? ESlateVisibility::Visible : ESlateVisibility::HitTestInvisible);
 }
 
 void UUmCardWidget::ApplyFrame() {
@@ -766,8 +827,9 @@ void UUmCardWidget::SetPlayable(bool bInPlayable, const FS09Reason& InReason) {
 }
 
 FText UUmCardWidget::GetWhyText() const {
-  if (bPlayable) return FText::GetEmpty();
-  const FS09Reason R = Reason.IsSet() ? Reason : FS09Reason::Make(TEXT("why.syncing"));
+  // HB-24 (ВР-VS3-19): an unplayable card without an exact why.* key shows no tooltip
+  if (bPlayable || !Reason.IsSet()) return FText::GetEmpty();
+  const FS09Reason& R = Reason;
   FFormatNamedArguments Args;
   for (const TPair<FString, FString>& A : R.Args) Args.Add(A.Key, FText::FromString(A.Value));
   return Args.Num() ? UmText::Format(EUmTable::Why, R.Key.ToString(), Args) : UmText::Get(EUmTable::Why, R.Key.ToString());
@@ -791,7 +853,8 @@ void UUmCardWidget::SetHover(bool bOn) {
   // CP-17: scale 1.5 over hover.ms ease-out-quad (pivot bottom centre), at most the 1.6 cap; reduced - no tween; the
   // lowered hand (SD-26) and the mini displays show no preview
   const bool bPreview = bOn && !bLowered && !UmCardWidget::IsMini(StateModel.Show);
-  const float Target = bPreview ? UmCardWidget::HoverScaleFor(FitNow) : 1.0f;
+  const float Target =
+      bPreview ? UmCardWidget::HoverScaleFor(FitNow, UmCardWidget::CapScale, UmCardWidget::HoverScaleOf(StateModel.Show)) : 1.0f;
   StartTween(ScaleTween, ScaleNow, Target, IsReduced() ? 0.0f : UUmHudTheme::Get().Ms(TEXT("hover.ms")));
   ApplyFrame();
   Step();
@@ -815,7 +878,8 @@ void UUmCardWidget::SetLowered(bool bOn) {
   bLowered = bOn;
   if (bHover) {
     const bool bPreview = !bLowered && !UmCardWidget::IsMini(StateModel.Show);
-    StartTween(ScaleTween, ScaleNow, bPreview ? UmCardWidget::HoverScaleFor(FitNow) : 1.0f,
+    StartTween(ScaleTween, ScaleNow,
+               bPreview ? UmCardWidget::HoverScaleFor(FitNow, UmCardWidget::CapScale, UmCardWidget::HoverScaleOf(StateModel.Show)) : 1.0f,
                IsReduced() ? 0.0f : UUmHudTheme::Get().Ms(TEXT("hover.ms")));
     ApplyFrame();
   }
@@ -935,7 +999,7 @@ bool UUmCardWidget::IsAnimating() const {
   const double Now = NowMs();
   auto Within = [Now](double Start, double Ms) { return Start >= 0.0 && Now < Start + Ms + 1.0; };
   return ScaleTween.IsRunning(Now) || DesatTween.IsRunning(Now) || ShiftTween.IsRunning(Now) ||
-         FocusTween.IsRunning(Now) || FlipStartMs >= 0.0 || Within(NewStartMs, 180.0) || Within(NewLeaveMs, 120.0) ||
+         FocusTween.IsRunning(Now) || OffsetXTween.IsRunning(Now) || OffsetYTween.IsRunning(Now) || FlipStartMs >= 0.0 || Within(NewStartMs, 180.0) || Within(NewLeaveMs, 120.0) ||
          Within(ChipStartMs, 180.0) || Within(ChipLeaveMs, 120.0) || Within(DropStartMs, 180.0) ||
          Within(DropLeaveMs, 120.0) || Within(FlashStartMs, UmCardWidget::FlashMs) || bLoading;
 }
@@ -961,6 +1025,7 @@ void UUmCardWidget::Step() {
   }
   ScaleNow = TweenValue(ScaleTween, Now, true);
   ShiftNow = TweenValue(ShiftTween, Now, true);
+  OwnerOffsetNow = FVector2D(TweenValue(OffsetXTween, Now, true), TweenValue(OffsetYTween, Now, true));
   const float D = TweenValue(DesatTween, Now, false);
   DesatNow = D * UnplayableDesaturation;
   FaceOpacityNow = FMath::Lerp(1.0f, UnplayableOpacity, D) * FaceFade;
@@ -971,7 +1036,8 @@ void UUmCardWidget::Step() {
     Face->SetRenderOpacity(FaceOpacityNow);
   }
   if (Card) {
-    const FWidgetTransform Want(FVector2D(0.0, ShiftNow), FVector2D(ScaleNow * ScaleXNow, ScaleNow), FVector2D::ZeroVector, 0.0f);
+    const FWidgetTransform Want(FVector2D(OwnerOffsetNow.X, ShiftNow + OwnerOffsetNow.Y), FVector2D(ScaleNow * ScaleXNow, ScaleNow),
+                                FVector2D::ZeroVector, 0.0f);
     const FWidgetTransform& Have = Card->GetRenderTransform();
     if (!Have.Translation.Equals(Want.Translation, 1.0e-3) || !Have.Scale.Equals(Want.Scale, 1.0e-4)) Card->SetRenderTransform(Want);
   }
@@ -1097,6 +1163,12 @@ FReply UUmCardWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const
 }
 
 FReply UUmCardWidget::NativeOnMouseButtonDoubleClick(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) {
+  if (OnDoubleClick && InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton) {
+    // HB-24 (UI-INP-003): the double click plays the card - the owner decides; no second press (its release is a
+    // release without a press: nothing)
+    OnDoubleClick();
+    return FReply::Handled();
+  }
   return NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 }
 
@@ -1106,12 +1178,16 @@ FReply UUmCardWidget::NativeOnMouseButtonUp(const FGeometry& InGeometry, const F
     return FReply::Handled();
   }
   if (InMouseEvent.GetEffectingButton() != EKeys::LeftMouseButton || !Arbiter.IsValid()) return FReply::Unhandled();
-  const bool bOver = InGeometry.IsUnderLocation(InMouseEvent.GetScreenSpacePosition());
+  // the drawn card counts too (HB-24: the raised preview of the hand, SetVisualHitTest)
+  const FVector2D At = InMouseEvent.GetScreenSpacePosition();
+  const bool bOver = InGeometry.IsUnderLocation(At) ||
+                     (Card && Card->GetVisibility() == ESlateVisibility::Visible && Card->GetCachedGeometry().IsUnderLocation(At));
   const FS09HudPressOutcome Outcome = Arbiter->Release(bOver ? PressId : NAME_None, Arbiter->Now());
   if (Outcome.Result == ES09HudPressResult::Act || Outcome.Result == ES09HudPressResult::Refused) {
     // UI-INP-011: the answer in the frame of the release - an unplayable card is a refusal with its why.* (CUE-004)
+    // HB-24 (ВР-VS3-19): without an exact why.* key the press goes on to the owner (the game logic answers it)
     FS09Reason Blocked;
-    if (!bPlayable) Blocked = Reason.IsSet() ? Reason : FS09Reason::Make(TEXT("why.syncing"));
+    if (!bPlayable && Reason.IsSet()) Blocked = Reason;
     OnOutcome.ExecuteIfBound(FS09HudPressArbiter::Decide(Outcome, Blocked));
   }
   return FReply::Handled().ReleaseMouseCapture();

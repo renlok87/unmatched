@@ -36,6 +36,13 @@
 //   input     the press on the release through FS09HudPressArbiter (UI-INP-011): an unplayable card answers Refused with
 //             its why.*; the right button calls the owner's inspector; the pointer enter / leave go to the owner (it lifts
 //             the card and orders it over the neighbours, HAND). Cursor: Hand, SlashedCircle when unplayable (HB-12).
+//   owner     VS-3 HB-24 / HB-25 (HAND, ВР-VS3-17...): SetOwnerOffset moves the drawn card (hover lift, selected raise,
+//             draw flight) without moving its hit rectangle; SetVisualHitTest makes the drawn card take the pointer too
+//             (the raised preview is clickable, the rest slot stays - no hover flicker); class S hover reaches 225 x 312
+//             (x 1.875, ВР-VS2-HB22-03); an unplayable card WITHOUT an exact why.* key (a type mismatch, ВР-VS3-19) shows
+//             no tooltip and its press goes on to the owner (the game logic answers); a double click goes to the owner
+//             (UI-INP-003) instead of a second press; the boost chip is 32 su when DPI x UI scale < 1 (IC-34 П-2) and can
+//             sit right-aligned over the top edge (the attack boost, ВР-VS2-HB22-11).
 //   pool      the owner keeps the widgets (04 §4.1): ApplyModel never rebuilds the tree, only brushes and parameters.
 //   rollback  -S08CardArtLegacy (ВР-CP08): the fallback face always, the card.navy plate with resource-card 24 su instead
 //             of the back (ARTLOOK cards=legacy(..)); blocks -S08SlateHud=hand,combat,slot,inspect keep the Slate path.
@@ -125,6 +132,10 @@ inline constexpr int32 BackCropPx = 5;             // ВР-VS2-CP-03: 5 px a sid
 inline constexpr float UnplayableDesaturation = 0.6f;
 inline constexpr float UnplayableOpacity = 0.7f;
 inline constexpr float HoverScale = 1.5f;          // 150 x 208 -> 225 x 312
+inline constexpr float HoverScaleClassS = 1.875f;  // 120 x 166 -> 225 x 311 (ВР-VS2-HB22-03: 225 x 312 on every canvas)
+inline constexpr float ChipSmallDpiSu = 32.0f;     // IC-34 П-2: >= 21 px on screen below 1 px per su (32 su recommended)
+inline constexpr float ChipOnFrameSu = 8.0f;       // the chip keeps 8 su on the frame (ВР-VS3-09)
+inline constexpr float ChipGapAboveSu = 4.0f;      // the right-aligned chip over the top edge (ВР-VS2-HB22-11)
 inline constexpr float DiscardShiftSu = 16.0f;
 inline constexpr float NewDotSu = 10.0f;           // 8 su card.glyph + 1 su keyline a side
 inline constexpr float NewDotCentreInsetSu = 10.0f;
@@ -156,8 +167,12 @@ UNMATCHED_API FIntPoint DrawnSrcPx(const FUmCardMediaEntry& Entry);
 UNMATCHED_API FVector4 UvRect(const FUmCardMediaEntry& Entry);
 /** Contain of SrcPx into the window of ShowSu (band BandSu) at PxPerSu, the card shrunk by the ВР-CP04 cap. */
 UNMATCHED_API FUmCardFit Fit(const FVector2D& ShowSu, float Band, const FIntPoint& SrcPx, float PxPerSu, float Cap = CapScale);
-/** The hover scale for a base fit: 1.5, or less when the hovered scan would pass the cap (CP-17). */
-UNMATCHED_API float HoverScaleFor(const FUmCardFit& Base, float Cap = CapScale);
+/** The hover scale for a base fit: MaxScale (1.5), or less when the hovered scan would pass the cap (CP-17). */
+UNMATCHED_API float HoverScaleFor(const FUmCardFit& Base, float Cap = CapScale, float MaxScale = HoverScale);
+/** The hover scale of a display before the cap: class S hand 1.875 (225 x 312), every other 1.5 (HB-24). */
+UNMATCHED_API float HoverScaleOf(EUmCardShow Show);
+/** The boost chip side (su) at DPI x UI scale PxPerSu: 32 below 1.0 (IC-34 П-2: the number needs >= 21 px), else 24. */
+UNMATCHED_API float ChipSuFor(float PxPerSu);
 /** Theme skin key of the base frame: warning > selected > hover > idle (mini: card.frame.mini only). The CUE-006 flash
  *  is its own layer (card.frame.flash) over this frame. */
 UNMATCHED_API FName FrameKey(bool bMini, bool bWarning, bool bSelected, bool bHover);
@@ -219,9 +234,25 @@ class UNMATCHED_API UUmCardWidget : public UUserWidget {
   /** The boost chip: N >= 0 "+N", HiddenBoost = the chip without a number, NoBoostChip = none. Appears after a running
    *  flip (CP-18: 150 - 330 ms). */
   void SetBoostChip(int32 N);
+  /** HB-25 (ВР-VS2-HB22-11): the chip right-aligned 4 su over the top edge (the attack boost behind its attack card)
+   *  instead of the top centre. */
+  void SetChipRightAbove(bool bOn);
+  bool IsChipRightAbove() const { return bChipRightAbove; }
+  float GetChipSu() const { return ChipSuNow; }
   // ---- CP-19 ----
   void SetDiscardCandidate(bool bOn);
   void SetMarkedForDiscard(bool bOn);
+  // ---- HB-24 / HB-25: the owner (HAND) ----
+  /** Moves the drawn card by Su (the hover lift, the selected raise, the draw flight, the boost flight) over DurMs
+   *  (ease out quad; 0 = at once). The hit rectangle of the widget stays where its slot is. */
+  void SetOwnerOffset(const FVector2D& Su, float DurMs);
+  /** Starts the owner offset at From and runs it to To (the draw flight from the deck chip). */
+  void StartOwnerOffset(const FVector2D& From, const FVector2D& To, float DurMs, double DelayMs = 0.0);
+  FVector2D GetOwnerOffset() const { return OwnerOffsetNow; }
+  FVector2D GetOwnerOffsetTarget() const { return FVector2D(OffsetXTween.To, OffsetYTween.To); }
+  /** The drawn card takes the pointer too (the raised preview of the hand is clickable and keeps the hover). */
+  void SetVisualHitTest(bool bOn);
+  void SetOnDoubleClick(TFunction<void()> In) { OnDoubleClick = MoveTemp(In); }
   // ---- CP-20 ----
   /** The flip on the spot (scaleX, pivot centre): to the face (Face = the revealed card, set at the edge frame) or to
    *  the back. SpeedMul is the combat speed (0 = instant, 0.5 fast, 1, 1.5 slow). */
@@ -387,6 +418,12 @@ class UNMATCHED_API UUmCardWidget : public UUserWidget {
   FTween DesatTween;       // 0..1 of the unplayable look
   FTween ShiftTween;       // discard shift su
   FTween FocusTween;       // focus ring opacity
+  FTween OffsetXTween = {-1.0, 0.0f, 0.0f, 0.0f};  // HB-24 owner offset (su)
+  FTween OffsetYTween = {-1.0, 0.0f, 0.0f, 0.0f};
+  FVector2D OwnerOffsetNow = FVector2D::ZeroVector;
+  bool bChipRightAbove = false;
+  float ChipSuNow = UmCardWidget::ChipSu;
+  TFunction<void()> OnDoubleClick;
   double NewStartMs = -1.0;
   double NewLeaveMs = -1.0;
   double ChipStartMs = -1.0;

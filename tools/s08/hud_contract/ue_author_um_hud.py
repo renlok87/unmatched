@@ -20,6 +20,9 @@ their C++ bases (UUmHudAuthoringLibrary -> BuildDefaultTree of each class), in t
   /Game/S08/UI/Hud/WBP_UI_HUD_OPP_HAND  parent UmHudOppHand  parts Panel, Column, Backs, Caption (VS-2 HB-21)
   /Game/S08/UI/Common/WBP_UmCard       parent UmCardWidget  parts Box, Card, Layers, Underlay, Face, Frame, FlashLayer,
                                       FocusRing, NewDot, BoostChip, BoostText (+ optional icons / fallback) (VS-3 CP-15)
+  /Game/S08/UI/Hud/WBP_UI_HUD_HAND     parent UmHudHand     parts Row, CountPlate, CountBox, CountText, WhyPlate, WhyBox,
+                                      WhyText, BoostRibbon, RibbonRow, RibbonIcon, RibbonText (VS-3 HB-24; the cards are
+                                      pooled WBP_UmCard instances made at run time)
 
 A widget tree is not reachable from Python, so the C++ library builds it (the same function the class uses without a
 WBP) and this script re-loads every asset, checks the parent class, writes the report (env UM_HUD_WBP_REPORT, default
@@ -52,6 +55,7 @@ ASSETS = {
     "/Game/S08/UI/Hud/WBP_UI_HUD_PANEL_OPP": "UmHudPlayerPanel",
     "/Game/S08/UI/Hud/WBP_UI_HUD_OPP_HAND": "UmHudOppHand",
     "/Game/S08/UI/Common/WBP_UmCard": "UmCardWidget",
+    "/Game/S08/UI/Hud/WBP_UI_HUD_HAND": "UmHudHand",
 }
 
 

@@ -5974,6 +5974,7 @@ void AS08FlowGameMode::RefreshHud() {
   HandBox->ClearChildren();
   PanelsBox->ClearChildren();
   CommandBox->ClearChildren();
+  const bool bUmHand = RefreshUmHand();  // VS-3 HB-24 / HB-25: the UMG hand (-S08SlateHud=hand keeps the chips below)
   BuildCombatStageHud();
   RefreshDeckPanel();  // DE-030: the auto-close on a new input demand, then the content while visible
 
@@ -6070,7 +6071,8 @@ void AS08FlowGameMode::RefreshHud() {
     // a candidate, the picked ones marked; the colours stay off the S09 state markers (#FF00FF, #00FFFF ...).
     const FS09DiscardPick DiscardPick = FS09DiscardPick::From(CommandUi);
     int32 Index = 0;
-    for (const FS09CardView& Card : Own->Cards) {
+    static const TArray<FS09CardView> NoChips;  // VS-3 HB-24: the UMG hand draws the cards
+    for (const FS09CardView& Card : (bUmHand ? NoChips : Own->Cards)) {
       const int32 I = Index++;
       FString Chip;
       if (Card.bHidden) {
@@ -6115,13 +6117,13 @@ void AS08FlowGameMode::RefreshHud() {
     AddYoursCalloutLine();  // DE-022 (03 §7 п. 3): "Your fighter X: Y effect" while the opponent's effect moves it
     AddEventFeedLines();  // MS-T-17 (03 §7): the three latest maneuver lines over the hand
     AddTurnStatusLine();  // DE-022 (02 SD-31): the "what to do now" line
-    HandBox->AddSlot().AutoHeight().Padding(0, 0, 0, 6)
+    if (!bUmHand) HandBox->AddSlot().AutoHeight().Padding(0, 0, 0, 6)
         [SNew(STextBlock)
              .Text(FText::FromString(FString::Printf(
                  TEXT("YOUR HAND  %d/%d   [1-9 inspect | boost/drop while a draft is open]"),
                  Own->HandCount, Own->HandMaxSize)))
              .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14))];
-    HandBox->AddSlot().AutoHeight()[Strip];
+    if (!bUmHand) HandBox->AddSlot().AutoHeight()[Strip];
   }
 
   // ---- counters + inspector (GD-032: opponent hand is a COUNT, never faces) ----

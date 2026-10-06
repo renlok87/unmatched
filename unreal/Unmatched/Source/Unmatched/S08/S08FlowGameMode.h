@@ -1189,6 +1189,16 @@ private:
   void TickUmPanels();
   /** The right edge of PANEL-LOC (su) for the hand obstacle; -1 when the panels are on the Slate path. */
   float UmHudPanelLocRightSu() const;
+  // VS-3 HB-24 / HB-25: HAND (S08/UI/UmHudHand.h; rollback -S08SlateHud=hand)
+  void BuildUmHand();
+  /** Feeds the UMG hand from the applied snapshot and the command state; false = the Slate chips draw the hand. */
+  bool RefreshUmHand();
+  bool UmHandOnUmg() const;
+  void HandleUmHandPress(const FS09HudPressOutcome& Outcome, const FString& InstanceId);
+  void HandleUmHandPlay(const FString& InstanceId);
+  void HandleUmHandInspect(const FString& InstanceId);
+  /** The pointer (viewport px) is over the UMG hand (its resting rows, raised): the SD-26 lowering waits. */
+  bool UmHudCursorOverHand(float X, float Y) const;
   // VS-2 exit frames (opt-in -S08ExitShots): own / opponent turn start + 0.5 s and + 3 s
   void NoteUmExitShotsTurn(bool bOwn, bool bInitial, bool bGameOver);
   /** ВР-VS2-77: the late SHOT lines of the VS-2 blocks first shown in the shot frame. */

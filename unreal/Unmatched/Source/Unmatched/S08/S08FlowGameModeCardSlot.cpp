@@ -347,7 +347,7 @@ bool AS08FlowGameMode::CursorOverHud() const {
     if (HandLower.IsLowered()) Hand.Y0 -= 2.0f * FS09HandLower::LowerSu;
     if (Inside(Hand)) return true;
   }
-  return false;
+  return UmHudCursorOverHand(X, Y);  // VS-3 HB-24: the UMG hand (its resting rows)
 }
 
 void AS08FlowGameMode::TickCardSlot() {
@@ -392,6 +392,7 @@ void AS08FlowGameMode::TickCardSlot() {
       Hud.bValid && !Hud.bGameOver ? S09BoardPickOf(CommandUi, Hud.bViewerTurn) : ES09BoardPick::None;
   const FString HandLine = HandLower.Update(Pick, Pick != ES09BoardPick::None && CursorOverHud(), static_cast<double>(Now));
   if (!HandLine.IsEmpty()) FS08Trace::Write(FString::Printf(TEXT("%s seq=%d"), *HandLine, Hud.SequenceNumber));
+  if (!HandLine.IsEmpty()) RefreshUmHand();  // VS-3 HB-24: the UMG hand goes down / up by itself (SD-26)
   // VS-2 HB-06: capped so that 48 su of the row stay visible (04 §2.6; the Slate strip is shorter than the 60 su)
   const float Offset = UmHudHandLowerCap(HandLower.OffsetSu(static_cast<double>(Now), bReduced));
   if (!FMath::IsNearlyEqual(Offset, HandOffsetApplied, 0.05f)) {

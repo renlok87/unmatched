@@ -6,6 +6,7 @@
 #include "UmCardWidget.h"
 #include "UmConnectionBadge.h"
 #include "UmHudBanner.h"
+#include "UmHudHand.h"
 #include "UmHudOppHand.h"
 #include "UmHudPlayerPanel.h"
 #include "UmHudStatusLine.h"
@@ -67,6 +68,9 @@ FString UUmHudAuthoringLibrary::AuthorUmHudWidgetBlueprints(bool bOverwrite) {
   // VS-3 CP-15: the card of every display (hand, combat, slot, inspector, decks, OPP-HAND)
   One(UUmCardWidget::WidgetBlueprintPath, UUmCardWidget::StaticClass(),
       [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmCardWidget::BuildDefaultTree(Tree, Attach, Error); });
+  // VS-3 HB-24 / HB-25: the hand (its cards are pooled WBP_UmCard instances made at run time)
+  One(UUmHudHand::WidgetBlueprintPath, UUmHudHand::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmHudHand::BuildDefaultTree(Tree, Attach, Error); });
   Report->SetArrayField(TEXT("assets"), Assets);
   FString Out;
   const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&Out);

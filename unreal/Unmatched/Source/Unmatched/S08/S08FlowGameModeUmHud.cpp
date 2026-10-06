@@ -41,6 +41,11 @@
 //                 the turn start: bbox 0 / unpainted, yet the PNG shows it): its SHOT line moves to the late block of
 //                 the same file (WriteUmHudLateLines, after the capture) with the painted geometry; the early block
 //                 writes 'SHOT widget-late id=<id> reason=first-frame'.
+//   - VS-3 HB-24 / HB-25 (S08/UI/UmHudHand.h): HAND - built with the root (rollback -S08SlateHud=hand), framed with the
+//     layout, fed by RefreshHud (RefreshUmHand: the applied snapshot + the command state) and by a flip of the SD-26
+//     lowering; a card press is the old hand.<instance> action (HandleHandCardClick by the current position). The
+//     Slate hand panel keeps only its lines (the rule toast, the event feed, the callout) and sits over the UMG hand
+//     caption, transparent while empty (ВР-VS3-22).
 #include "S08FlowGameMode.h"
 
 #include "S08AnimatedIconWidget.h"
@@ -52,7 +57,9 @@
 #include "UI/UmCardGallery.h"
 #include "UI/UmCursor.h"
 #include "UI/UmGameHud.h"
+#include "UI/UmHandGallery.h"
 #include "UI/UmHudGallery.h"
+#include "UI/UmHudHand.h"
 #include "UI/UmHudLayout.h"
 #include "UI/UmHudPanels.h"
 #include "UI/UmHudRoot.h"
@@ -116,6 +123,11 @@ struct FUmHudRuntime {
   float CommandShiftSu = 0.0f;
   // ВР-VS2-77: the ids whose SHOT line waits for the late block of the current shot
   TSet<FString> LateIds;
+  // VS-3 HB-24 / HB-25: the UMG hand (owned by the GAME screen's widget tree), the own hero slug last seen, the lift of
+  // the Slate hand panel over the UMG hand caption (su)
+  TWeakObjectPtr<UUmHudHand> Hand;
+  FString HandHeroSlug;
+  float SlateHandLiftSu = 0.0f;
 };
 
 namespace {
@@ -179,6 +191,7 @@ void AS08FlowGameMode::BuildUmHud() {
                                           bCursors ? TEXT("software") : TEXT("system"), bCursors ? *CursorSource : TEXT("-")));
   BuildUmTopStrip();  // VS-2 HB-14...HB-16: before the layout (the STATUS slot sizes to its block)
   BuildUmPanels();    // VS-2 HB-18...HB-21
+  BuildUmHand();      // VS-3 HB-24 / HB-25
   RefreshUmHudLayout();
 }
 
@@ -244,6 +257,8 @@ void AS08FlowGameMode::RefreshUmHudLayout() {
   const FBox2D OppHandRect = R.Layout.Rect(EUmHudBlock::OppHand);  // VS-2 HB-18...HB-21
   R.Panels.SetFrame(R.Layout.bClassS, R.Layout.PxPerSu,
                     OppHandRect.bIsValid ? static_cast<float>(OppHandRect.Max.X - OppHandRect.Min.X) : 0.0f);
+  R.SlateHandLiftSu = R.Layout.HandVisibleSu + 22.0f + 8.0f;  // VS-3 HB-24 (ВР-VS3-22)
+  if (UUmHudHand* Hand = R.Hand.Get()) Hand->SetFrame(FUmHandFrame::FromLayout(R.Layout, CombatSpeedMul()));
   const FString Line = R.Layout.TraceLine(FIntPoint(FMath::RoundToInt(Viewport.X), FMath::RoundToInt(Viewport.Y)));
   if (Line != R.LastLayoutLine) {
     R.LastLayoutLine = Line;
@@ -269,6 +284,9 @@ TSharedRef<SWidget> AS08FlowGameMode::UmHudWrapEdge(const TSharedRef<SWidget>& E
 }
 
 float AS08FlowGameMode::UmHudHandLowerCap(float OffsetSu) const {
+  // VS-3 HB-24 (ВР-VS3-22): the UMG hand goes down by itself; the Slate panel keeps only its lines and sits 8 su over
+  // the UMG hand caption
+  if (UmHandOnUmg()) return -UmHud->SlateHandLiftSu;
   if (OffsetSu <= 0.0f || UmHudBlockOnSlate(TEXT("hand")) || !HandBox.IsValid()) return OffsetSu;
   // 04 §2.6 (SD-26): the lowered hand keeps 48 su of its row visible. The row of the Slate hand is the strip of text
   // chips (the last child of HandBox) plus the panel padding under it (10 su, BuildHudWidgets).
@@ -416,8 +434,22 @@ void AS08FlowGameMode::TickUmHud() {
   // ---- the top of the hand actually drawn (the Slate panel, its SD-26 offset included): the stack stays over it ----
   float HandTopSu = -1.0f;
   {
+    // VS-3 HB-24 (ВР-VS3-22): with the UMG hand the Slate panel holds only lines - transparent while it has none
+    const TSharedPtr<SWidget> HandPanel = ArtHud.HandPanel.Pin();
+    const bool bUmHand = UmHandOnUmg();
+    if (bUmHand) {
+      const FBox2D Caption = R.Layout.Rect(EUmHudBlock::HandCaption);
+      if (Caption.bIsValid) HandTopSu = static_cast<float>(Caption.Min.Y);
+    }
+    const bool bEmpty = bUmHand && HandPanel.IsValid() && HandBox.IsValid() && HandBox->NumSlots() == 0 &&
+                        HandPanel->GetDesiredSize().Y <= 21.0f;
+    if (bUmHand && HandPanel.IsValid() && !FMath::IsNearlyEqual(HandPanel->GetRenderOpacity(), bEmpty ? 0.0f : 1.0f)) {
+      HandPanel->SetRenderOpacity(bEmpty ? 0.0f : 1.0f);
+    }
     FS08ScreenRect Panel;
-    if (WidgetViewportRect(ArtHud.HandPanel.Pin(), Panel) && !Panel.IsEmpty()) HandTopSu = Panel.Y0 / PxPerSu;
+    if (!bEmpty && WidgetViewportRect(HandPanel, Panel) && !Panel.IsEmpty()) {
+      HandTopSu = HandTopSu >= 0.0f ? FMath::Min(HandTopSu, Panel.Y0 / PxPerSu) : Panel.Y0 / PxPerSu;
+    }
   }
   // ---- the toast / subtitle stack (ВР-H06) ----
   const bool bSub = SubtitleBox.IsValid() && SubtitleText.IsValid() && SubtitleBox->GetVisibility() != EVisibility::Collapsed &&
@@ -503,6 +535,12 @@ void AS08FlowGameMode::WriteUmHudShotLines() {
     if (W) WidgetViewportRect(W->GetCachedWidget(), Rect);
     return Rect;
   });
+  // VS-3 HB-24 / HB-25: UI-HUD-HAND and one HUD-HAND line per card (no key, no name)
+  if (const UUmHudHand* Hand = R.Hand.Get()) {
+    TArray<FString> HandLines;
+    Hand->CollectShotLines(HandLines);
+    for (const FString& L : HandLines) FS08Trace::Write(L);
+  }
   TArray<FString> PanelLines;  // VS-2 HB-18...HB-21: UI-HUD-PANEL-LOC, UI-HUD-PANEL-OPP, UI-HUD-OPP-HAND
   R.Panels.CollectShotLines(PanelLines, [this](UWidget* W) {
     FS08ScreenRect Rect;
@@ -645,13 +683,16 @@ void AS08FlowGameMode::UmGalleryBegin(int32 SizePx) {
   const bool bPanels = FParse::Param(Cmd, TEXT("S08IconGalleryPanels")) || FParse::Value(Cmd, TEXT("S08IconGalleryPanels="), PanelsPage);
   int32 CardsPage = 1;  // VS-3 CP-03...CP-20 (UI/UmCardGallery.h)
   const bool bCards = FParse::Param(Cmd, TEXT("S08IconGalleryCards")) || FParse::Value(Cmd, TEXT("S08IconGalleryCards="), CardsPage);
-  if (!bSkins && !bButtons && !bTopStrip && !bPanels && !bCards) return;
+  FString HandBoard;  // VS-3 HB-24 / HB-25 (UI/UmHandGallery.h): -S08IconGalleryHand=marmoreal|sarpedon
+  const bool bHand = FParse::Value(Cmd, TEXT("S08IconGalleryHand="), HandBoard);
+  if (!bSkins && !bButtons && !bTopStrip && !bPanels && !bCards && !bHand) return;
   if (IconGallery) IconGallery->SetVisibility(ESlateVisibility::Collapsed);  // the sheet takes the screen
   // the canvas of the sheet: the applied HUD scale (BeginPlay may run before the first window apply - the sheet is
   // built again on every OnUiScaleChanged, which also covers a window or UI-scale change)
   const int32 PageIndex = FMath::Max(0, Page - 1);
   TWeakObjectPtr<AS08FlowGameMode> WeakThis(this);
-  auto Build = [WeakThis, bSkins, bTopStrip, bPanels, PanelsPage, PageIndex, Variant, SizePx, bCards, CardsPage]() {
+  auto Build = [WeakThis, bSkins, bTopStrip, bPanels, PanelsPage, PageIndex, Variant, SizePx, bCards, CardsPage, bHand,
+                HandBoard]() {
     AS08FlowGameMode* Self = WeakThis.Get();
     if (!Self || !Self->GetWorld()) return;
     FVector2D Viewport(1920.0, 1080.0);
@@ -659,6 +700,14 @@ void AS08FlowGameMode::UmGalleryBegin(int32 SizePx) {
     const FUmHudScaleState& Scale = UmHudScale::Current();
     const float PxPerSu = Scale.Window.X > 0 ? Scale.PxPerSu() : 1.0f;
     if (Self->UmGallery) Self->UmGallery->RemoveFromParent();
+    if (bHand) {
+      UUmHandGalleryWidget* Sheet = CreateWidget<UUmHandGalleryWidget>(Self->GetWorld(), UUmHandGalleryWidget::StaticClass());
+      if (!Sheet) return;
+      for (const FString& Line : Sheet->Build(HandBoard, Viewport / PxPerSu, PxPerSu)) FS08Trace::Write(Line);
+      Sheet->AddToViewport(1001);
+      Self->UmGallery = Sheet;
+      return;
+    }
     if (bCards) {
       UUmCardsGalleryWidget* Sheet = CreateWidget<UUmCardsGalleryWidget>(Self->GetWorld(), UUmCardsGalleryWidget::StaticClass());
       if (!Sheet) return;
@@ -707,4 +756,129 @@ void AS08FlowGameMode::UmGalleryAt(float TMs) {
   if (UUmCardsGalleryWidget* Cards = Cast<UUmCardsGalleryWidget>(UmGallery)) {
     for (const FString& Line : Cards->SetClockMs(TMs)) FS08Trace::Write(Line);
   }
+  // VS-3 HB-24 / HB-25: the hand sheet - one state per second of the gallery clock
+  if (UUmHandGalleryWidget* HandSheet = Cast<UUmHandGalleryWidget>(UmGallery)) {
+    for (const FString& Line : HandSheet->SetClockMs(TMs)) FS08Trace::Write(Line);
+  }
+}
+
+// ------------------------------------------------------------------------------------------------ VS-3 HB-24 / HB-25
+
+void AS08FlowGameMode::BuildUmHand() {
+  UUmGameHud* Game = UmHudRoot ? UmHudRoot->GetGameHud() : nullptr;
+  if (!UmHud.IsValid() || !Game) return;
+  if (UmHud->Blocks.IsSlate(FName(TEXT("hand")))) {
+    ArtHud.PendingTrace.Add(TEXT("HUD-HAND-UMG impl=slate reason=-S08SlateHud=hand"));
+    return;
+  }
+  UUmHudHand* Hand = CreateWidget<UUmHudHand>(Game, UUmHudHand::WidgetClass());
+  if (!Hand || !Game->SetBlock(EUmGameSlot::Hand, Hand)) {
+    ArtHud.PendingTrace.Add(TEXT("HUD-HAND-UMG impl=umg created=0 reason=create-failed"));
+    return;
+  }
+  UmHud->Hand = Hand;
+  TWeakObjectPtr<AS08FlowGameMode> WeakThis(this);
+  Hand->SetInput(
+      HudPress,
+      [WeakThis](const FS09HudPressOutcome& Outcome, const FString& Id) {
+        if (AS08FlowGameMode* Self = WeakThis.Get()) Self->HandleUmHandPress(Outcome, Id);
+      },
+      [WeakThis](const FString& Id) {
+        if (AS08FlowGameMode* Self = WeakThis.Get()) Self->HandleUmHandInspect(Id);
+      },
+      [WeakThis](const FString& Id) {
+        if (AS08FlowGameMode* Self = WeakThis.Get()) Self->HandleUmHandPlay(Id);
+      });
+  Hand->SetVisibility(ESlateVisibility::Collapsed);  // RefreshUmHand shows it with the live match HUD
+  FString Missing;
+  ArtHud.PendingTrace.Add(FString::Printf(TEXT("HUD-HAND-UMG impl=umg created=1 source=%s parts=%d missing=%s"),
+                                          *Hand->SourceName(), Hand->HasAllParts(&Missing) ? 1 : 0,
+                                          Missing.IsEmpty() ? TEXT("-") : *Missing));
+}
+
+bool AS08FlowGameMode::UmHandOnUmg() const { return UmHud.IsValid() && UmHud->Hand.IsValid(); }
+
+bool AS08FlowGameMode::RefreshUmHand() {
+  if (!UmHandOnUmg()) return false;
+  FUmHudRuntime& R = *UmHud;
+  const FS09PlayerPanel* Own = Hud.ViewerPanel();
+  // the own hero slug: the scan keys heroSlug:cardSlug and the back (kept when the hero leaves the projection)
+  if (Own) {
+    for (const FS08BoardFighter& F : Fighters) {
+      if (F.OwnerId != Own->PlayerId || F.HeroSlug.IsEmpty()) continue;
+      R.HandHeroSlug = F.HeroSlug;
+      if (F.bIsHero) break;
+    }
+  }
+  UmHudHand::FGatherIn In;
+  In.Own = Own;
+  In.Ui = &CommandUi;
+  In.Fighters = &Fighters;
+  In.ViewerId = ViewerIdNow();
+  In.InspectedIndex = bInspecting && InspectedSource == 0 ? InspectedHandIndex : -1;
+  In.bLowered = HandLower.IsLowered();
+  In.bStartHand = Hud.TurnCount <= 1;
+  In.HeroSlug = R.HandHeroSlug;
+  FUmHandModel Model = UmHudHand::Gather(In);
+  // the live match HUD only (the result screen, an aborted room and the lobby have no hand)
+  const bool bAborted = Flow.IsValid() && Flow->GetStage() == ES08Stage::Started && Flow->IsRoomAborted();
+  Model.bShow = Model.bShow && Hud.bValid && !Hud.bGameOver && !bAborted && Own != nullptr;
+  R.Hand->ApplyModel(Model);
+  return true;
+}
+
+void AS08FlowGameMode::HandleUmHandPress(const FS09HudPressOutcome& Outcome, const FString& InstanceId) {
+  TWeakObjectPtr<AS08FlowGameMode> WeakThis(this);
+  // DE-014 / UI-INP-011: the old hand.<instance> action - the card by its CURRENT position (a snapshot may have moved it)
+  HandleHudPressOutcome(Outcome, TFunction<FS09Reason()>(), [WeakThis, InstanceId]() {
+    AS08FlowGameMode* Self = WeakThis.Get();
+    const FS09PlayerPanel* Own = Self ? Self->Hud.ViewerPanel() : nullptr;
+    if (!Own) return;
+    const int32 Index = Own->Cards.IndexOfByPredicate([&InstanceId](const FS09CardView& C) { return C.InstanceId == InstanceId; });
+    if (Index == INDEX_NONE) {
+      Self->ShowReason(FS09Reason::Make(TEXT("why.state.changed")), 3.0f);
+      return;
+    }
+    Self->HandleHandCardClick(Index, ES09InputSource::Click);
+  });
+}
+
+void AS08FlowGameMode::HandleUmHandPlay(const FString& InstanceId) {
+  // UI-INP-003: the double click plays - its first click already selected the card; the scheme and the defense card
+  // then go as with Enter (an attack goes on its own once complete, DE-020)
+  const FS09PlayerPanel* Own = Hud.ViewerPanel();
+  if (!Own) return;
+  const int32 Index = Own->Cards.IndexOfByPredicate([&InstanceId](const FS09CardView& C) { return C.InstanceId == InstanceId; });
+  if (Index == INDEX_NONE) return;
+  const bool bScheme = CommandUi.Mode == ES09CommandMode::SchemeChoice;
+  const bool bDefense = CommandUi.Mode == ES09CommandMode::CombatDefense;
+  if (!bScheme && !bDefense) return;
+  const FString& Selected = bScheme ? CommandUi.SchemeCardId : CommandUi.DefenseCardId;
+  if (Selected != InstanceId) HandleHandCardClick(Index, ES09InputSource::Click);
+  FS08Trace::Write(FString::Printf(TEXT("HUD-HAND play=%s index=%d"), bScheme ? TEXT("scheme") : TEXT("defense"), Index));
+  if ((bScheme ? CommandUi.SchemeCardId : CommandUi.DefenseCardId) == InstanceId) ConfirmCombat();
+}
+
+void AS08FlowGameMode::HandleUmHandInspect(const FString& InstanceId) {
+  const FS09PlayerPanel* Own = Hud.ViewerPanel();
+  if (!Own) return;
+  const int32 Index = Own->Cards.IndexOfByPredicate([&InstanceId](const FS09CardView& C) { return C.InstanceId == InstanceId; });
+  if (Index == INDEX_NONE) return;
+  // 04 §2.6: the right button opens the inspector on the card (the Slate inspector until H13)
+  InspectCard(Own->Cards[Index]);
+  InspectedHandIndex = Index;
+  DiscardBrowserIndex = -1;
+  InspectedSource = 0;
+  RefreshHud();
+}
+
+bool AS08FlowGameMode::UmHudCursorOverHand(float X, float Y) const {
+  if (!UmHandOnUmg() || !UmHud->bLayout) return false;
+  const UUmHudHand* Hand = UmHud->Hand.Get();
+  if (!UmGameHudSlots::ShownByProperty(Hand) || Hand->GetRow().CardPos.Num() == 0) return false;
+  // the resting row (the raise of a selected card included), not the lowered one: no flicker at its top edge
+  const UmHudHand::FRow& Row = Hand->GetRow();
+  const float Px = UmHud->Layout.PxPerSu > 0.0f ? UmHud->Layout.PxPerSu : 1.0f;
+  const float Top = (Row.CardTopSu - UmHudHand::CaptionSu) * Px;
+  return X >= Row.LeftSu * Px && X <= Row.RightSu * Px && Y >= Top;
 }
