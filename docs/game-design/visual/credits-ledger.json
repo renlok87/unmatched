@@ -76,7 +76,15 @@
       "rule": "визуальный чат туда не пишет (ВР-PR06)"
     }
   ],
-  "providerTerms": [],
+  "providerTerms": [
+    {
+      "service": "SYNTX",
+      "model": "Nano Banana 2 (Google Gemini image; SYNTX banana/banana3) - Gemini API Additional Terms of Service, last modified 2026-04-28",
+      "url": "https://ai.google.dev/gemini-api/terms",
+      "checked": "2026-10-07",
+      "ledgerModel": "banana/banana3"
+    }
+  ],
   "entries": [
     {
       "date": "2026-10-06T08:33:08+05:00",
@@ -869,10 +877,46 @@
       "result_path": "art/imagegen/anim-move-sheet-codex/",
       "status": "ok",
       "note": "CX-24 fix1 (единственный корректирующий прогон); 2026-10-07 01:31-01:39 +05:00 (~8 мин); manifest-sha256.json вместо manifest.json, prompts/AN-22-prompts.json, verification.json с ключами 07 §1.2 (exports, palette 0, gray, sizes, acceptance 8/8), 1280x720 отрисован нативно (960x540 удалён), ключ стрелок facing в строке легенды; мастер вне легенды пиксельно тот же; наклон по пикселям 10,34°/10,78°; ревью Claude: accept по делегированию (ВР-VS3-AN22-01)"
+    },
+    {
+      "date": "2026-10-07T01:22:46+05:00",
+      "service": "SYNTX",
+      "model": "banana/banana3 2K",
+      "template": "T-SYNTX-IMG-BANANA",
+      "task_id": "EN-02",
+      "units": "1 image edit (outpaint), 2K 16:9, n 1",
+      "quoted": 3,
+      "cost": 3.0,
+      "balance_before": 173.771,
+      "balance_after": 170.771,
+      "service_task_id": "4f01a848-ba95-4793-8eb4-52d9b976ab46",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/EN-02.syntx.txt",
+      "result_path": "scraped-data/derived/env-u16-marmoreal-codex/sx01/SX01-r1-raw.jpg",
+      "status": "ok",
+      "note": "SX-01 run 1 (r1); output JPEG 2752x1536; raw copy C:/tmp/visual-syntx/EN-02/raw/SX01-r1-raw.jpg; verdict in the EN-02 card row"
+    },
+    {
+      "date": "2026-10-07T01:30:51+05:00",
+      "service": "SYNTX",
+      "model": "banana/banana3 2K",
+      "template": "T-SYNTX-IMG-BANANA",
+      "task_id": "EN-02",
+      "units": "1 image edit (outpaint), 2K 16:9, n 1",
+      "quoted": 3,
+      "cost": 3.0,
+      "balance_before": 170.771,
+      "balance_after": 167.771,
+      "service_task_id": "345e03a8-e19d-4442-81d2-c38a331c29aa",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/EN-02.syntx.txt",
+      "result_path": "scraped-data/derived/env-u16-marmoreal-codex/sx01/SX01-r2-raw.jpg",
+      "status": "ok",
+      "note": "SX-01 run 2 (r2, retry 1, last run of the card budget 2 x 3); prompt section 'Retry 1 (r2)'; output JPEG 2752x1536; raw copy C:/tmp/visual-syntx/EN-02/raw/SX01-r2-raw.jpg; verdict in the EN-02 card row"
     }
   ],
   "totals": {
-    "syntx_spent": 0,
+    "syntx_spent": 6.0,
     "tripo_spent": 0,
     "codex_packages": 44
   }
