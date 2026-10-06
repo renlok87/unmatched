@@ -797,11 +797,47 @@
       "result_path": "art/imagegen/env-u16-marmoreal-codex/",
       "status": "ok",
       "note": "CX-17 fix1 (единственный корректирующий прогон); 2026-10-06 21:26-21:37 +05:00 (~11 мин); 4 генерации встроенного image_gen из 6 (ВР-VS2-EN.5; копии в CODEX_HOME в tool_cache_outside_repo), SYNTX 0; две полные попытки по 2 тайла 1536x1317, вклейка оригинала побайтно, lit по ВР-VS2-EN.8, поле #808080; шов G(0)/медиана 1,85/2,64/2,34/3,12 (попытка 1) и 2,10/1,96/2,72/2,54 (попытка 2) при пороге 1,5 -> стоп по правилу двух неудач; ревью Claude: отклонено (ВР-VS2-EN.9), запасной путь SX-01 T-SYNTX-IMG-BANANA со сборкой по ВР-VS2-EN.10"
+    },
+    {
+      "date": "2026-10-06T21:50:00+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle)",
+      "template": "T-CODEX-VFX",
+      "task_id": "FX-31",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a11218-632d-7c00-9660-75a3e8201f88",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/FX-31.codex.md",
+      "result_path": "art/imagegen/fx-arc-codex/",
+      "status": "ok",
+      "note": "CX-20 прогон 1; 2026-10-06 21:42-21:50 +05:00 (~8 мин); процедурный флипбук 12 кадров 4x4 (ячейки 12-15 пусты), маска R/G/B + превью, листы navy/доска 256/48/36 цвет+серый, полоса времени, постеры к.0/к.5; генераций image_gen 0 (разведка опциональна); 74 проверки PASS, manifest 73; ревью Claude: fix-needed — линия постоянной ширины с круглыми концами вместо серпа (полоса 8,85 px ~2 px на 720p), листы с доской 1:1 и на Medusa (14/16), а не на Arthur, verification.json без ключей 07 §1.2, инвентарь репозитория 6 МБ в _tools/ -> fix1"
+    },
+    {
+      "date": "2026-10-06T22:05:31+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle)",
+      "template": "T-CODEX-VFX",
+      "task_id": "FX-31",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a11223-8235-7350-885f-c9c43ed6be59",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/FX-31.fix1.codex.md",
+      "result_path": "art/imagegen/fx-arc-codex/",
+      "status": "ok",
+      "note": "CX-20 fix1 (единственный корректирующий прогон); 2026-10-06 21:54-22:05 +05:00 (~11 мин); серп v3: полоса растёт внутрь, W_max 14,17 px при s=0,78, 8,85 px при s=0,5, хвост 4 px, ядро по вогнутой кромке при W>=10; игровые листы на Arthur (H=69 px, ячейка 100/67 px на 1080p/720p, полоса на 720p 3,77-4,17 px в кадрах 3-8); verification.json с ключами 07 §1.2; опись репозитория перенесена в scraped-data/derived/fx-arc-codex/audit/; 131 проверка PASS, manifest 127/127; ревью Claude: accept по делегированию (ВР-VS2-FX31-01…08)"
     }
   ],
   "totals": {
     "syntx_spent": 0,
     "tripo_spent": 0,
-    "codex_packages": 40
+    "codex_packages": 42
   }
 }

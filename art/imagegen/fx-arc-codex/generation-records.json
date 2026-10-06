@@ -1,0 +1,66 @@
+{
+  "schema": "fx31-generation-records/1",
+  "image_generation_used": false,
+  "records": [],
+  "concepts": [],
+  "reason": "Optional A/B image generation omitted: the brief fixes geometry and exact palette.",
+  "procedural_records": [
+    {
+      "kind": "procedural",
+      "prompt_key": "FX-31/task/final-procedural-v1",
+      "prompt_registry": "prompts.json",
+      "unretouched": true,
+      "outputs": [
+        {
+          "path": "concepts/procedural-v1-unretouched-T_FX_ArthurArc_4x4-preview.png",
+          "sha256": "32bb4e832768b31ad122fe4c8a80a39569a652c54a3f96b51dc36e03c845bb1a"
+        },
+        {
+          "path": "concepts/procedural-v1-unretouched-T_FX_ArthurArc_4x4.png",
+          "sha256": "6aab4684e51d9c91213b9ba7924b9219880ad3bcfb62cb420df29b7937e89812"
+        }
+      ],
+      "selected": false
+    },
+    {
+      "kind": "procedural",
+      "prompt_key": "FX-31/task/final-procedural-v2",
+      "prompt_registry": "prompts.json",
+      "unretouched": true,
+      "outputs": [
+        {
+          "path": "concepts/procedural-v2-unretouched-T_FX_ArthurArc_4x4-preview.png",
+          "sha256": "576f768ef98b7818e638ae45b44e069b056eed56a31411a9e84300fda2d901ae"
+        },
+        {
+          "path": "concepts/procedural-v2-unretouched-T_FX_ArthurArc_4x4.png",
+          "sha256": "7ef877de65ff81a26d6af61545b08230af6024fc7fa696ae0b0385176d703d5a"
+        }
+      ],
+      "selected": false
+    },
+    {
+      "kind": "procedural",
+      "prompt_key": "FX-31/task/fix1-procedural-v3",
+      "prompt_registry": "prompts.json",
+      "selected": true,
+      "unretouched": true,
+      "outputs": [
+        {
+          "path": "concepts/procedural-v3-unretouched-T_FX_ArthurArc_4x4-preview.png",
+          "sha256": "4cd08af519a79afd3990861d1815dc799f9c28f6c621475a8d533400cbf0c2bc"
+        },
+        {
+          "path": "concepts/procedural-v3-unretouched-T_FX_ArthurArc_4x4.png",
+          "sha256": "515cf46be8523ab3e957dc4ca91ed042c5d3cd256b0d472e0c73df3f5b20940a"
+        }
+      ]
+    }
+  ],
+  "procedural_generation": {
+    "prompt_key": "FX-31/task/fix1-procedural-v3",
+    "source_prompt": "docs/game-design/visual/06-tasks/prompts/FX-31.fix1.codex.md",
+    "parameters": "vector/frame-parameters.json",
+    "generator": "_tools/build_arc.py"
+  }
+}
