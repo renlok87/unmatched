@@ -10,6 +10,8 @@ public:
   static void Open();
   static void Write(const FString& Line);
   static void Close();
+  /** VS-1 HB-09: true between Open and Close - a line computed before the game mode opened the trace waits for it. */
+  static bool IsOpen() { return bOpen; }
 
   // ---- ENV-MAPS live tune (S08LiveTune.h): off unless -ArtLiveTune armed it; a run without the flag never touches
   // the journal or a tee (no memory, no extra file, the trace bytes unchanged) ----

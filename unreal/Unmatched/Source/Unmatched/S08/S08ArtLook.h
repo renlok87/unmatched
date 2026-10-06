@@ -33,6 +33,8 @@
 //   -S08TrackerLegacy   the v3 tracker slots resource-action-full (AB-7: the DE slots filled with the action type).
 //   -S08CrossLegacy     the dark heart of a fallen hero and the text X of "no defense" (AB-8: resource-hp-fallen at the
 //                       heart mark, marker-x-stamp in the combat panel).
+//   VS-1 HB-09 (02-visual-design.md §13.3; ВР-62): -S08DpiLegacy - the engine DPI curve (720 -> 0.666) instead of the
+//                       project one (720 -> 0.75): UI/UmHudScale.h; traced as dpi=legacy(-S08DpiLegacy).
 // -ArtPreviewHeroesV2 / -ArtPreviewDiorama stay accepted as no-op aliases (scripts pass them).
 //
 // The trace tags of the art path stay 'ARTPREVIEW ...' (every gate script and tool reads them); one 'ARTLOOK ...' line
@@ -80,8 +82,8 @@ UNMATCHED_API void ResetMarkersOverrideForTest();
 
 /** 'ARTLOOK art=1|0 source=default|S08GreyBoard|override heroes=v2|legacy(..) tray=on|legacy(..)|off env=on|off(..)
  *   review=0|1 legacyRender=0|1 markers=0|1 aliases=<-ArtPreviewHeroesV2,-ArtPreviewDiorama,-S08HeartGlow or ->
- *   hud=ring:<id>|legacy(..),glow:on|legacy(..),tracker:de|legacy(..),cross:on|legacy(..)' - the effective look of
- *   this run (the hud field: FS08TurnHudLook::ArtLookField). */
+ *   hud=ring:<id>|legacy(..),glow:on|legacy(..),tracker:de|legacy(..),cross:on|legacy(..) dpi=project|legacy(..)' - the
+ *   effective look of this run (the hud field: FS08TurnHudLook::ArtLookField; dpi: UmHudScale::ArtLookField, HB-09). */
 UNMATCHED_API FString TraceLine();
 
 }  // namespace S08ArtLook

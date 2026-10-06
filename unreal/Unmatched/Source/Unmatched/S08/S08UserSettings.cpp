@@ -55,6 +55,17 @@ void US08UserSettings::SetToDefaults() {
   SetSavedMotion(FS08MotionSettings());
   bRuleHints = true;
   SetSavedAudio(FS08AudioSettings());
+  UiScalePercent = 100;
+}
+
+int32 US08UserSettings::ClampUiScalePercent(int32 Percent) {
+  // HB-09 (UI-ACC-001): 75..150 in steps of 5.
+  const int32 Clamped = FMath::Clamp(Percent, 75, 150);
+  return FMath::Clamp(((Clamped + 2) / 5) * 5, 75, 150);
+}
+
+FString US08UserSettings::DescribeUi() const {
+  return FString::Printf(TEXT("uiScale=%d"), GetSavedUiScalePercent());
 }
 
 void US08UserSettings::Save() {
@@ -105,6 +116,17 @@ bool US08UserSettings::ApplySetting(const FString& Name, const FString& Value, F
       return false;
     }
     AnimSpeed = S08Motion::SpeedName(Speed);
+    return true;
+  }
+  if (Name.Equals(TEXT("uiScale"), ESearchCase::IgnoreCase)) {
+    // HB-09 (UI-ACC-001): 75-150 in steps of 5, nothing else.
+    const FString T = Value.TrimStartAndEnd();
+    const int32 Scale = T.IsNumeric() && !T.Contains(TEXT(".")) ? FCString::Atoi(*T) : -1;
+    if (Scale < 75 || Scale > 150 || Scale % 5 != 0) {
+      OutError = FString::Printf(TEXT("uiScale=%s: 75-150, step 5"), *Value);
+      return false;
+    }
+    UiScalePercent = Scale;
     return true;
   }
   struct FBoolSetting {
@@ -163,7 +185,8 @@ namespace {
 FAutoConsoleCommand GS08SettingsCommand(
     TEXT("s08.Settings"),
     TEXT("DE-025: s08.Settings [speed=none|fast|normal|slow] [reduced=0|1] [shake=0|1] [ruleHints=0|1] "
-         "[master=0-100] [masterMute=0|1] [ambience=0-100] [ambienceMute=0|1] - saves to GameUserSettings.ini and "
+         "[master=0-100] [masterMute=0|1] [ambience=0-100] [ambienceMute=0|1] [uiScale=75-150] - saves to "
+         "GameUserSettings.ini and "
          "applies without a restart (the -S08AnimSpeed / -S08ReducedMotion / -S08RuleHints flags still win)"),
     FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& Args) {
       US08UserSettings* Settings = US08UserSettings::Get();
@@ -187,7 +210,8 @@ FAutoConsoleCommand GS08SettingsCommand(
         }
         Settings->Save();
       }
-      UE_LOG(LogTemp, Display, TEXT("s08.Settings %s%s"), *Settings->Describe(), Args.Num() > 0 ? TEXT(" (saved)") : TEXT(""));
+      UE_LOG(LogTemp, Display, TEXT("s08.Settings %s %s%s"), *Settings->Describe(), *Settings->DescribeUi(),
+             Args.Num() > 0 ? TEXT(" (saved)") : TEXT(""));
     }));
 }  // namespace
 

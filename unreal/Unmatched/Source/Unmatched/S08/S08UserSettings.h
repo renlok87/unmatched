@@ -13,6 +13,7 @@
 // There is no settings screen yet (UI-SCR-PAUSE is not in the client): the ini and the flags -S08ReducedMotion /
 // -S08AnimSpeed=<none|fast|normal|slow> change them; the flags win over the saved values (S08Motion::Resolve).
 // DE-024 adds UI-ACC-012 "rule hints" (bRuleHints; flag -S08RuleHints=on|off, ResolveRuleHints).
+// VS-1 HB-09 adds UI-ACC-001 "UI scale" (UiScalePercent, 75-150 %, console uiScale=; applied by S08/UI/UmHudScale.h).
 //
 // DE-025 (W-24; 02 SD-49, SD-55): the volumes "master" and "ambience" with their mutes are stored here (no UI-ACC rows
 // yet - they come with the settings screen GD-047 and the backdrop sound SD-51; DE-032 applies them, AudioNow). Save
@@ -78,7 +79,7 @@ public:
   static void NotifyChanged() { OnChanged.Broadcast(); }
 
   /** Sets one value by its console name (speed, reduced, shake, ruleHints, master, masterMute, ambience,
-   *  ambienceMute); false and an error text for an unknown name or a bad value (nothing changed then). */
+   *  ambienceMute, ..., uiScale); false and an error text for an unknown name or a bad value (nothing changed then). */
   bool ApplySetting(const FString& Name, const FString& Value, FString& OutError);
   /** The values as one trace token list: "speed=normal reduced=0 shake=1 ruleHints=1 master=100 ...". */
   FString Describe() const;
@@ -143,6 +144,20 @@ public:
   /** UI-ACC-016: describe meaningful wordless sounds in the subtitle line (off by default). */
   UPROPERTY(config)
   bool bDescribeSounds = false;
+
+  /** VS-1 HB-09, UI-ACC-001 (04-hud-spec §1.8 PAUSE "Интерфейс", §3.6; 02 §3.2, ВР-62): the player UI scale in percent,
+   *  75-150 in steps of 5, 100 by default. Stored as set; S08/UI/UmHudScale.cpp applies it as ApplicationScale on top of
+   *  the DPI curve and raises it to 100 % while the short side of the window is under 1080. The PAUSE screen only shows
+   *  the slider and calls Save when it is released; console: s08.Settings uiScale=<75-150>. */
+  UPROPERTY(config)
+  int32 UiScalePercent = 100;
+
+  /** 75..150, rounded to the nearest step of 5 (an ini value out of range reads clamped). */
+  static int32 ClampUiScalePercent(int32 Percent);
+  /** The saved UI scale, clamped (ClampUiScalePercent). */
+  int32 GetSavedUiScalePercent() const { return ClampUiScalePercent(UiScalePercent); }
+  /** "uiScale=<percent>" - kept out of Describe, whose exact text other tests pin. */
+  FString DescribeUi() const;
 
   /** UI-ACC-012 of this run: -S08RuleHints=on|off (also 1|0, true|false; any case) wins over the saved value; another
    *  value keeps it. */
