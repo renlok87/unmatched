@@ -653,11 +653,47 @@
       "result_path": "art/imagegen/hud-actions-v1-codex/",
       "status": "ok",
       "note": "CX-15 fix1 (единственный корректирующий прогон); 2026-10-06 20:14-20:27 +05:00 (~13 мин); класс L 78/78/78/86 su, общая базовая линия подписей y + 67 su, учёт замеров по ВР-VS2-HB42-14…18; класс S без изменений (0 px); finalize --check PASS, manifest 324/324; ревью Claude: принято по делегированию (ВР-VS2-HB42-12…20)"
+    },
+    {
+      "date": "2026-10-06T20:56:07+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "HB-38",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a111cc-b36a-7a62-b615-98645436e782",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/HB-38.fix1.codex.md",
+      "result_path": "art/imagegen/hud-feed-v1-codex/",
+      "status": "failed",
+      "note": "CX-14 fix1, попытка 1; 2026-10-06 20:19-20:56 +05:00; модель выродилась: после ошибки инструмента (missing field target) финальное сообщение — 35,8 тыс. токенов бессвязного текста, 0 изменённых файлов, пакет не тронут; по делегированию (ВР-VS2-HB38-19) повторён тот же корректирующий прогон один раз — это не второй цикл ревью"
+    },
+    {
+      "date": "2026-10-06T21:07:30+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "HB-38",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a111ee-b60d-78b1-801d-2abd0de58db6",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/HB-38.fix1.codex.md",
+      "result_path": "art/imagegen/hud-feed-v1-codex/",
+      "status": "ok",
+      "note": "CX-14 fix1 (единственный корректирующий прогон, повтор вырожденной попытки 1 — ВР-VS2-HB38-19); 2026-10-06 20:57-21:07 +05:00 (~10 мин); 4 правки ревью: стрелка → через посимвольный DroidSansFallback (missing_glyphs 0), overlay-листы — первая попытка фазы + последний шаг вверх и линия минимума, бой — клетки не препятствие (ВР-VS2-HB38-18): combat_zero 8/8, EN-проверка — базовый HUD на EN; 64 + 64 серых + EN пересобраны, пакет 28,7 МБ; audit_feed PASS, manifest 200/200; ревью Claude: accept (по делегированию)"
     }
   ],
   "totals": {
     "syntx_spent": 0,
     "tripo_spent": 0,
-    "codex_packages": 32
+    "codex_packages": 34
   }
 }
