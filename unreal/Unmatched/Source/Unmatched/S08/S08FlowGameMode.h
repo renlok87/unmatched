@@ -885,6 +885,9 @@ private:
   bool ApplyBenchMovePose(const FString& PreferredId, double HoldMs, FString& OutPosedId, FString& OutError);
   bool bBenchMovePose = false;
   int64 BenchMovePoseClockMs = 0;
+  /** AN-17 (ВР-17): 'ARTPREVIEW figrect fighter=<id> view=<view> x y w h' per living v2 figure of a -BenchClipPose
+   *  view - the screen rectangle of the figure with its pedestal (the component bounds, projected). */
+  void BenchTraceFigRects(const FString& View);
   /** Space under the cursor of the plates (MS-T-09 drives it live; the bench fixture's "hover" now). */
   FIntPoint MoveHoverCell = FIntPoint(-1, -1);
   uint32 MovePlatesKey = 0;

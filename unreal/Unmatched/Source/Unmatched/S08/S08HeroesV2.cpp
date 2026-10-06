@@ -204,6 +204,70 @@ float BenchDissolveProgress() {
   return Progress < 0.0f ? -1.0f : FMath::Min(Progress, 1.0f);
 }
 
+bool ParseBenchClipPoses(const FString& Text, TArray<FBenchClipPoseSpec>& Out, FString& OutError) {
+  Out.Reset();
+  OutError.Reset();
+  const FString Trimmed = Text.TrimStartAndEnd();
+  if (Trimmed.IsEmpty()) {
+    OutError = TEXT("empty list");
+    return false;
+  }
+  TArray<FString> Blocks;
+  Trimmed.ParseIntoArray(Blocks, TEXT(";"), true);
+  for (const FString& Block : Blocks) {
+    const int32 At = Block.Find(TEXT("@"));
+    if (At <= 0 || At == Block.Len() - 1) {
+      OutError = FString::Printf(TEXT("'%s' is not <Clip>@<frames>"), *Block);
+      Out.Reset();
+      return false;
+    }
+    const FString ClipName = Block.Left(At).TrimStartAndEnd();
+    EClip Clip = EClip::None;
+    for (const EClip Candidate : {EClip::Idle, EClip::LungeAttack, EClip::HitReact, EClip::DeathSettle}) {
+      if (ClipName.Equals(S08HeroesV2::ClipName(Candidate), ESearchCase::IgnoreCase)) Clip = Candidate;
+    }
+    if (Clip == EClip::None) {
+      OutError = FString::Printf(TEXT("unknown clip '%s'"), *ClipName);
+      Out.Reset();
+      return false;
+    }
+    TArray<FString> Frames;
+    Block.Mid(At + 1).ParseIntoArray(Frames, TEXT(","), true);
+    if (Frames.Num() == 0) {
+      OutError = FString::Printf(TEXT("clip '%s' has no frames"), *ClipName);
+      Out.Reset();
+      return false;
+    }
+    for (const FString& Frame : Frames) {
+      FBenchClipPoseSpec Spec;
+      Spec.Clip = Clip;
+      const FString Token = Frame.TrimStartAndEnd();
+      bool bOk = false;
+      if (Token.StartsWith(TEXT("q"), ESearchCase::IgnoreCase) && Token.Len() > 1) {
+        Spec.bQuarter = true;
+        Spec.Value = FCString::Atoi(*Token.Mid(1));
+        bOk = Token.Mid(1).IsNumeric() && Spec.Value >= 0 && Spec.Value <= 100;
+      } else {
+        Spec.bQuarter = false;
+        Spec.Value = FCString::Atoi(*Token);
+        bOk = Token.IsNumeric() && Spec.Value >= 0;
+      }
+      if (!bOk) {
+        OutError = FString::Printf(TEXT("bad frame '%s' of clip '%s'"), *Token, *ClipName);
+        Out.Reset();
+        return false;
+      }
+      Out.Add(Spec);
+    }
+  }
+  return Out.Num() > 0;
+}
+
+double BenchClipPoseSeconds(const FBenchClipPoseSpec& Spec, double ClipSeconds) {
+  const double Len = FMath::Max(0.0, ClipSeconds);
+  return FMath::Clamp(Spec.bQuarter ? Len * Spec.Value / 100.0 : Spec.Value / ClipFps, 0.0, Len);
+}
+
 void SetDissolve(UPrimitiveComponent* Body, UPrimitiveComponent* Pedestal, float Progress, EDissolveStyle Style) {
   const float P = FMath::Clamp(Progress, 0.0f, 1.0f);
   if (Body) {

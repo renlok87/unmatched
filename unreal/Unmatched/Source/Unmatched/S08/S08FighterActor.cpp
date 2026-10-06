@@ -16,6 +16,8 @@
 #include "Engine/Texture2D.h"
 #include "Components/TextRenderComponent.h"
 #include "Animation/AnimSequenceBase.h"
+#include "Animation/AnimSingleNodeInstance.h"
+#include "Animation/AnimSequence.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
 #include "Materials/MaterialInterface.h"
@@ -768,6 +770,38 @@ bool AS08FighterActor::ShiftHeroClipClock(float DeltaSeconds) {
   if (P < 0.0f) P += Length;
   ArtBody->SetPosition(P, /*bFireNotifies=*/false);
   return true;
+}
+
+bool AS08FighterActor::BenchHoldClipPose(const S08HeroesV2::FBenchClipPoseSpec& Spec, double& OutT, double& OutLen,
+                                         double& OutRootDeltaUU) {
+  using namespace S08HeroesV2;
+  OutT = OutLen = OutRootDeltaUU = 0.0;
+  if (!bHeroV2Visual || !ArtBody) return false;
+  UAnimSequenceBase* Anim = HeroClips.IsValidIndex(static_cast<int32>(Spec.Clip))
+      ? HeroClips[static_cast<int32>(Spec.Clip)].Get() : nullptr;
+  if (!Anim) return false;
+  PlayHeroClip(Spec.Clip, EEvent::Spawn, -1);  // the trace event only; the pose overrides the Idle phase below
+  const double Len = Anim->GetPlayLength();
+  const double T = BenchClipPoseSeconds(Spec, Len);
+  if (UAnimSingleNodeInstance* Node = ArtBody->GetSingleNodeInstance()) {
+    Node->SetPlaying(false);
+    Node->SetPosition(static_cast<float>(T), false);
+  }
+  if (UWorld* World = GetWorld()) World->GetTimerManager().ClearTimer(HeroClipTimer);
+  if (const UAnimSequence* Sequence = Cast<UAnimSequence>(Anim)) {
+    OutRootDeltaUU = Sequence->ExtractRootMotionFromRange(0.0, T, FAnimExtractContext()).GetTranslation().Size();
+  }
+  OutT = T;
+  OutLen = Len;
+  return true;
+}
+
+FBox AS08FighterActor::GetV2FigureBox() const {
+  FBox Out(ForceInit);
+  if (!bHeroV2Visual) return Out;
+  if (ArtBody) Out += ArtBody->Bounds.GetBox();
+  if (ArtBase) Out += ArtBase->Bounds.GetBox();
+  return Out;
 }
 
 int32 AS08FighterActor::GetLungeContactMs(FString& OutSource) const {

@@ -231,17 +231,18 @@ void AS08FlowGameMode::BeginPlay() {
   Flow->OnCues.AddUObject(this, &AS08FlowGameMode::HandleCues);
   // MS-T-16 (04 §6.3): the motion settings of this run - US08UserSettings overridden by -S08ReducedMotion /
   // -S08AnimSpeed - drive the move animation and the MS-CUE schedule; -S08MoveHop / -S08MoveLean / -S08MoveEase are the
-  // A/B review parameters (DE-028; defaults = 01 F-02: no hop, lean 10 deg, no ease).
+  // A/B review parameters (DE-028; defaults = 01 F-02 + AN-21 ВР-12: no hop, lean 10 deg, ease 80 ms on the ends).
   MoveMotion = S08Motion::Current();
   MoveAnimParams = FS08MoveAnimParams::FromCommandLine(FCommandLine::Get());
   Flow->SetMoveMotion(MoveMotion);
   // run D G-LIVE: the trace file opens further down (FS08Trace::Open) - the line waits in PendingTrace like the other
   // boot lines; written directly it was lost in every packaged client trace.
   ArtHud.PendingTrace.Add(FString::Printf(
-      TEXT("MS-ANIM settings reduced=%d speed=%s shake=%d saved=%d hop=%.3f lean=%.1f leanIn=%.0f turn=%.0f settle=%.0f ease=%d"),
+      TEXT("MS-ANIM settings reduced=%d speed=%s shake=%d saved=%d hop=%.3f lean=%.1f leanIn=%.0f turn=%.0f settle=%.0f ease=%d easeMs=%.0f"),
       MoveMotion.bReducedMotion ? 1 : 0, S08Motion::SpeedName(MoveMotion.Speed), MoveMotion.bScreenShake ? 1 : 0,
       US08UserSettings::Get() ? 1 : 0, MoveAnimParams.HopHeightRel, MoveAnimParams.TravelLeanDeg,
-      MoveAnimParams.LeanInMs, MoveAnimParams.TurnMs, MoveAnimParams.SettleMs, MoveAnimParams.bEaseEnds ? 1 : 0));
+      MoveAnimParams.LeanInMs, MoveAnimParams.TurnMs, MoveAnimParams.SettleMs, MoveAnimParams.bEaseEnds ? 1 : 0,
+      MoveAnimParams.EaseMs));
   // DE-025: the stored settings (UI-ACC-012/013, the volumes - DE-032 applies them) and the combat speed of this run.
   if (const US08UserSettings* Settings = US08UserSettings::Get()) {
     ArtHud.PendingTrace.Add(FString::Printf(TEXT("SETTINGS saved %s combatSpeed=%.2f audioApplied=1"),
@@ -8678,6 +8679,10 @@ struct FS08BenchState {
   float StepStart = 0.0f;
   bool bSettleLogged = false;
   TArray<float> FrameMs, GpuMs, GameMs, RenderMs;
+  // AN-17 (ВР-17): -BenchClipPose - the pose stand, the outer loop over Poses x Views
+  bool bClipPose = false;
+  TArray<S08HeroesV2::FBenchClipPoseSpec> Poses;
+  int32 Pose = 0;
 };
 FS08BenchState GS08Bench;
 
@@ -8777,6 +8782,48 @@ void AS08FlowGameMode::RunRenderBench() {
       }
       B.HeroId = PosedId;  // the K2 views focus the moving figure
     }
+    // AN-17 (ВР-17): -BenchClipPose=<Clip>@<f1>,<f2>[;<Clip>@...] - every living v2 figure frozen at each pose x view.
+    // A bad list (or an unknown -BenchClipPoseFighter) is traced and the bench runs without poses, exactly as before.
+    FString ClipPoseText;
+    if (FParse::Value(Cmd, S08HeroesV2::BenchClipPoseParamName, ClipPoseText) &&
+        !ClipPoseText.TrimStartAndEnd().IsEmpty()) {
+      FString ClipPoseError;
+      if (!S08HeroesV2::ParseBenchClipPoses(ClipPoseText, B.Poses, ClipPoseError)) {
+        B.Poses.Reset();
+        FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW clippose error=%s"), *ClipPoseError));
+      } else {
+        FString WantedFighter;
+        FParse::Value(Cmd, S08HeroesV2::BenchClipPoseFighterParamName, WantedFighter);
+        if (!WantedFighter.IsEmpty()) {
+          // <KingArthur|Merlin|Medusa|Harpy|id> (Harpy = the first harpy): the K2 views focus this fighter
+          FString Resolved;
+          for (const FS08BoardFighter& F : Fighters) {
+            if (F.Id.Equals(WantedFighter, ESearchCase::IgnoreCase)) Resolved = F.Id;
+          }
+          for (const S08HeroesV2::FHeroSpec& Spec : S08HeroesV2::Specs()) {
+            if (!Resolved.IsEmpty() || !WantedFighter.Equals(Spec.Key, ESearchCase::IgnoreCase)) continue;
+            for (const FS08BoardFighter& F : Fighters) {
+              if (F.IsAlive() && F.Name.Equals(Spec.FighterName, ESearchCase::IgnoreCase)) {
+                Resolved = F.Id;
+                break;
+              }
+            }
+          }
+          if (Resolved.IsEmpty()) {
+            B.Poses.Reset();
+            FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW clippose error=fighter '%s' not on this board"),
+                                             *WantedFighter));
+          } else {
+            B.HeroId = Resolved;
+          }
+        }
+        if (B.Poses.Num() > 0) {
+          B.bClipPose = true;
+          FS08Trace::Write(FString::Printf(TEXT("BENCH clip-pose poses=%d views=%d fighter=%s"), B.Poses.Num(),
+                                           B.Views.Num(), *B.HeroId));
+        }
+      }
+    }
     // DE-028 (W-28): -BenchTurnHud=<ms> lays the two DE-023 turn portraits (the fixture's heroes, my turn) over the
     // scene with their clock frozen <ms> after my turn started - the A/B frames of the ring (-S08TurnRingIcon=<id>),
     // the tracker and the heart (-S08HeartGlow) on a real board. Review tooling only: the live HUD is not built here.
@@ -8832,7 +8879,7 @@ void AS08FlowGameMode::RunRenderBench() {
     case 1:  // warm-up (shader/PSO caches, Lumen surface cache and history)
       if (Elapsed < B.NextAt) return;
       FS08Trace::Write(FString::Printf(TEXT("BENCH warmup done elapsed=%.1f"), Elapsed));
-      B.Step = 2;
+      B.Step = B.bClipPose ? 7 : 2;  // AN-17: the pose stand applies its first pose before the first view
       return;
     case 2: {  // view setup
       BenchSetupView(View, B.HeroId);
@@ -8887,7 +8934,18 @@ void AS08FlowGameMode::RunRenderBench() {
                                        CameraZoom.Current, CameraZoom.Target,
                                        FMath::IsNearlyEqual(CameraZoom.Current, CameraZoom.Target, 0.05f) ? 1 : 0,
                                        *CameraZoom.CurrentFocus.ToCompactString()));
-      B.ShotPath = FPaths::Combine(B.OutDir, S08LiveTune::ShotFileName(View));
+      if (B.bClipPose) {
+        // AN-17: bench-<view>-<clip>-f<NN>|-q<pct>-1920x1080.png, one figrect per figure at the shot frame
+        const S08HeroesV2::FBenchClipPoseSpec& Spec = B.Poses[B.Pose];
+        const FString Token = Spec.bQuarter
+            ? FString::Printf(TEXT("q%d"), Spec.Value)
+            : FString::Printf(TEXT("f%02d"), Spec.Value);
+        B.ShotPath = FPaths::Combine(B.OutDir, FString::Printf(TEXT("bench-%s-%s-%s-1920x1080.png"), *View,
+                                                               S08HeroesV2::ClipName(Spec.Clip), *Token));
+        BenchTraceFigRects(View);
+      } else {
+        B.ShotPath = FPaths::Combine(B.OutDir, S08LiveTune::ShotFileName(View));
+      }
       TakeEvidenceShot(B.ShotPath);
       B.NextAt = Elapsed + 15.0f;
       B.Step = 6;
@@ -8901,10 +8959,70 @@ void AS08FlowGameMode::RunRenderBench() {
         B.Step = 2;
         return;
       }
-      Finish(FString::Printf(TEXT("BENCH done views=%d elapsed=%.1f"), B.Views.Num(), Elapsed));
+      if (B.bClipPose && B.Pose + 1 < B.Poses.Num()) {  // AN-17: the next pose over the same views
+        ++B.Pose;
+        B.View = 0;
+        B.Step = 7;
+        return;
+      }
+      Finish(FString::Printf(TEXT("BENCH done views=%d%s elapsed=%.1f"), B.Views.Num(),
+                             B.bClipPose ? *FString::Printf(TEXT(" poses=%d"), B.Poses.Num()) : TEXT(""),
+                             Elapsed));
       return;
+    case 7: {  // AN-17 (ВР-17): -BenchClipPose - every living v2 figure holds pose B.Pose (frozen) for all its views
+      const S08HeroesV2::FBenchClipPoseSpec& Spec = B.Poses[B.Pose];
+      int32 Posed = 0;
+      if (BoardActor) {
+        for (const FS08BoardFighter& F : Fighters) {
+          AS08FighterActor* Actor = BoardActor->FindFighterActor(F.Id);
+          if (!Actor || !Actor->IsHeroV2() || !F.IsAlive()) continue;
+          double T = 0.0, Len = 0.0, RootDeltaUU = 0.0;
+          if (!Actor->BenchHoldClipPose(Spec, T, Len, RootDeltaUU)) continue;
+          ++Posed;
+          FS08Trace::Write(FString::Printf(
+              TEXT("ARTPREVIEW clippose fighter=%s clip=%s frame=%d t=%.3f len=%.3f rootDeltaUU=%.2f"), *F.Id,
+              S08HeroesV2::ClipName(Spec.Clip), FMath::RoundToInt(T * S08HeroesV2::ClipFps), T, Len, RootDeltaUU));
+        }
+      }
+      FS08Trace::Write(FString::Printf(TEXT("BENCH clip-pose pose=%d/%d clip=%s posed=%d"), B.Pose + 1, B.Poses.Num(),
+                                       S08HeroesV2::ClipName(Spec.Clip), Posed));
+      B.Step = 2;
+      return;
+    }
     default:
       return;
+  }
+}
+
+void AS08FlowGameMode::BenchTraceFigRects(const FString& View) {
+  const APlayerController* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
+  if (!PC || !BoardActor) return;
+  for (const FS08BoardFighter& F : Fighters) {
+    const AS08FighterActor* Actor = BoardActor->FindFighterActor(F.Id);
+    if (!Actor || !Actor->IsHeroV2()) continue;
+    const FBox Box = Actor->GetV2FigureBox();
+    if (!Box.IsValid) continue;
+    FVector2D Min(TNumericLimits<float>::Max(), TNumericLimits<float>::Max());
+    FVector2D Max(TNumericLimits<float>::Lowest(), TNumericLimits<float>::Lowest());
+    bool bAny = false;
+    for (int32 CX = 0; CX < 2; ++CX) {
+      for (int32 CY = 0; CY < 2; ++CY) {
+        for (int32 CZ = 0; CZ < 2; ++CZ) {
+          const FVector Corner(CX ? Box.Max.X : Box.Min.X, CY ? Box.Max.Y : Box.Min.Y, CZ ? Box.Max.Z : Box.Min.Z);
+          FVector2D Pixel(0.0f, 0.0f);
+          if (PC->ProjectWorldLocationToScreen(Corner, Pixel, /*bPlayerViewportRelative=*/false)) {
+            bAny = true;
+            Min = Min.ComponentMin(Pixel);
+            Max = Max.ComponentMax(Pixel);
+          }
+        }
+      }
+    }
+    if (!bAny) continue;
+    FS08Trace::Write(FString::Printf(
+        TEXT("ARTPREVIEW figrect fighter=%s view=%s x=%d y=%d w=%d h=%d"), *F.Id, *View,
+        FMath::RoundToInt(Min.X), FMath::RoundToInt(Min.Y), FMath::RoundToInt(Max.X - Min.X),
+        FMath::RoundToInt(Max.Y - Min.Y)));
   }
 }
 

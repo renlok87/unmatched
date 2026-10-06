@@ -217,4 +217,25 @@ UNMATCHED_API void SetDissolve(UPrimitiveComponent* Body, UPrimitiveComponent* P
 inline const TCHAR* const BenchDissolveParamName = TEXT("BenchDissolve=");
 UNMATCHED_API float BenchDissolveProgress();
 
+// ---- AN-17 (ВР-17): the clip-pose stand -Bench -BenchClipPose=<Clip>@<f1>,<f2>[;<Clip>@...] ----
+// Review tooling only (no game-path effect): the bench walks every pose x every -BenchViews view with every living v2
+// figure frozen at that pose (SetPosition + SetPlaying(false)), so any frame of any D-11 clip can be sheeted on the
+// real maps. A frame is a plain number (frame at ClipFps) or "q<pct>" - a percent of the clip length, resolved per
+// hero (the Idle lengths differ; the q25 frame is 15 on Arthur's 2.5 s and 18 on Merlin's 3.0 s).
+inline const TCHAR* const BenchClipPoseParamName = TEXT("BenchClipPose=");
+/** -BenchClipPoseFighter=<KingArthur|Merlin|Medusa|Harpy|id> (Harpy = the first harpy): the K2 views focus this
+ *  fighter, like -BenchMovePoseFighter; without the parameter the bench's own hero. */
+inline const TCHAR* const BenchClipPoseFighterParamName = TEXT("BenchClipPoseFighter=");
+/** One pose of the parsed list, still unresolved (q resolves against the hero's clip length). */
+struct FBenchClipPoseSpec {
+  EClip Clip = EClip::None;
+  bool bQuarter = false;  // q<pct> (a percent of the clip) instead of a frame number
+  int32 Value = 0;        // frame index at ClipFps, or the percent 0..100
+};
+/** Parses "<Clip>@<f1>,<f2>[;<Clip>@...]": Clip in Idle | LungeAttack | HitReact | DeathSettle, frames >= 0,
+ *  q percents 0..100. False (OutError, Out empty) on any other token - the bench then runs without poses. */
+UNMATCHED_API bool ParseBenchClipPoses(const FString& Text, TArray<FBenchClipPoseSpec>& Out, FString& OutError);
+/** The pose time (s) of a spec against one figure's clip length: frame / ClipFps, or pct% of the clip. */
+UNMATCHED_API double BenchClipPoseSeconds(const FBenchClipPoseSpec& Spec, double ClipSeconds);
+
 }  // namespace S08HeroesV2

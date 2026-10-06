@@ -691,4 +691,70 @@ bool FS08HeroesV2DissolveTest::RunTest(const FString&) {
   return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08HeroesV2BenchClipPoseTest,
+    "Unmatched.S08.HeroesV2.BenchClipPose -BenchClipPose list parser and q resolution (AN-17, BP-17)",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08HeroesV2BenchClipPoseTest::RunTest(const FString&) {
+  using namespace S08HeroesV2;
+  // The AN-18 list: the Idle quarters, the LungeAttack / HitReact / DeathSettle key frames.
+  const FString Good = TEXT("Idle@q0,q25,q50,q75;LungeAttack@0,2,3,4,5,6,7,8,9,10,11,12,14;HitReact@0,2,4,5,7,8,10;")
+                       TEXT("DeathSettle@0,3,6,7,8,9,12,13,16,17,21");
+  TArray<FBenchClipPoseSpec> Poses;
+  FString Error;
+  TestTrue("the AN-18 pose list parses", ParseBenchClipPoses(Good, Poses, Error));
+  TestEqual("35 poses", Poses.Num(), 35);
+  if (Poses.Num() == 35) {
+    TestEqual("pose 0 = Idle q0", static_cast<int32>(Poses[0].Clip), static_cast<int32>(EClip::Idle));
+    TestTrue("pose 1 is a quarter", Poses[1].bQuarter);
+    TestEqual("pose 1 = q25", Poses[1].Value, 25);
+    TestEqual("pose 4 = LungeAttack", static_cast<int32>(Poses[4].Clip), static_cast<int32>(EClip::LungeAttack));
+    TestFalse("pose 4 is a frame number", Poses[4].bQuarter);
+    TestEqual("LungeAttack k.7", Poses[10].Value, 7);
+    TestEqual("the last pose = DeathSettle k.21", Poses[34].Value, 21);
+  }
+  // Clip names are case-insensitive; one pose per clip block is fine.
+  TArray<FBenchClipPoseSpec> One;
+  TestTrue("case-insensitive clip", ParseBenchClipPoses(TEXT("lungeattack@7"), One, Error));
+  TestEqual("one pose", One.Num(), 1);
+  // Errors: every one empties the list (the bench then runs without poses).
+  auto Bad = [&](const TCHAR* Text, const TCHAR* What) {
+    TArray<FBenchClipPoseSpec> Out;
+    FString Err;
+    TestFalse(FString::Printf(TEXT("rejected: %s"), What), ParseBenchClipPoses(Text, Out, Err));
+    TestTrue(FString::Printf(TEXT("error text of %s"), What), !Err.IsEmpty());
+    TestEqual(FString::Printf(TEXT("empty after %s"), What), Out.Num(), 0);
+  };
+  Bad(TEXT(""), TEXT("empty"));
+  Bad(TEXT("Idle@"), TEXT("no frames"));
+  Bad(TEXT("Teleport@1"), TEXT("unknown clip"));
+  Bad(TEXT("Idle@q101"), TEXT("q over 100"));
+  Bad(TEXT("Idle@-2"), TEXT("negative frame"));
+  Bad(TEXT("Idle@2,x"), TEXT("bad frame token"));
+  Bad(TEXT("Idle@1;Nope@2"), TEXT("bad second block"));
+  Bad(TEXT("Idle"), TEXT("no @"));
+  // q resolves against the hero's clip length: the Idle lengths 2.0 / 2.333 / 2.5 / 3.0 s (frames 48 / 56 / 60 / 72).
+  FBenchClipPoseSpec Q;
+  Q.Clip = EClip::Idle;
+  Q.bQuarter = true;
+  Q.Value = 25;
+  const double Epsilon = 1e-4;
+  struct FLen { double Seconds; int32 Frame25; };
+  const TArray<FLen> Lengths = {{2.0, 12}, {56.0 / 24.0, 14}, {2.5, 15}, {3.0, 18}};
+  for (const FLen& L : Lengths) {
+    const double T = BenchClipPoseSeconds(Q, L.Seconds);
+    TestTrue(FString::Printf(TEXT("q25 of %.3f s = a quarter"), L.Seconds),
+             FMath::Abs(T - 0.25 * L.Seconds) < Epsilon);
+    TestEqual(FString::Printf(TEXT("q25 frame of %.3f s"), L.Seconds), FMath::RoundToInt(T * ClipFps), L.Frame25);
+  }
+  // A plain frame is frame / 24; beyond the clip it clamps to the clip end (a pose never loops).
+  FBenchClipPoseSpec F;
+  F.Clip = EClip::LungeAttack;
+  F.Value = 7;
+  TestTrue("frame 7 = 7/24 s", FMath::Abs(BenchClipPoseSeconds(F, 14.0 / 24.0) - 7.0 / 24.0) < Epsilon);
+  F.Value = 99;
+  TestTrue("frame 99 of a 21-frame clip clamps to its length",
+           FMath::Abs(BenchClipPoseSeconds(F, 21.0 / 24.0) - 21.0 / 24.0) < Epsilon);
+  return true;
+}
+
 #endif  // WITH_AUTOMATION_TESTS

@@ -121,6 +121,15 @@ public:
   /** Live tune: moves the looping v2 clip's clock by DeltaSeconds (wrapped into the clip), so a capture shows the pose a
    *  fresh -Bench run shows at the same time since spawn; false when no looping clip plays (nothing changed). */
   bool ShiftHeroClipClock(float DeltaSeconds);
+  /** AN-17 (ВР-17): -Bench -BenchClipPose review stand - holds this living v2 figure at the pose of Spec (a frame at
+   *  ClipFps or q<pct> of the clip): PlayHeroClip, then SetPosition + SetPlaying(false) (play rate 0), the finish
+   *  timer cleared so nothing returns it to Idle. OutT / OutLen = the resolved pose time and the clip length (s),
+   *  OutRootDeltaUU = the root-motion translation from frame 0 to the pose (the figure must not slide, GD-058 Р-20).
+   *  False without a v2 figure or the clip. */
+  bool BenchHoldClipPose(const S08HeroesV2::FBenchClipPoseSpec& Spec, double& OutT, double& OutLen,
+                         double& OutRootDeltaUU);
+  /** AN-17: the world box of the visible v2 figure with its pedestal (ArtBody + ArtBase bounds; invalid without). */
+  FBox GetV2FigureBox() const;
   // ---- MS-T-16 move animation (S08MoveAnim.h; move-selection 04 §6.3) ----
   /** Plays a CUE-007 move from NowMs (the seq start, ms on the game clock): the figure stands on the plan's start cell
    *  until its slot, slides along the path (lean, turns, optional hop), settles to Idle; a Place fades out / in. The
