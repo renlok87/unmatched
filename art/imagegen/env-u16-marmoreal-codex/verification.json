@@ -2987,5 +2987,84 @@
     }
   ],
   "stop_reason": "Two complete attempts failed seam/perspective criteria. No further generation per task; Claude owns T-SYNTX-IMG-BANANA fallback.",
-  "recommended_default_variant": "clean-ext after a successful replacement outpaint; current candidates not recommended for game"
+  "recommended_default_variant": "clean-ext after a successful replacement outpaint; current candidates not recommended for game",
+  "EN-02_SX01": {
+    "note": "Added by Claude 2026-10-07; the keys above are the CX-17 record (rejected, ВР-VS2-EN.9) and are unchanged.",
+    "run": "SX-01 r2 assembled as r2b",
+    "status": "принято по делегированию",
+    "proof": "_tools/sx01-r2b-proof.json",
+    "size": [
+      2340,
+      1317
+    ],
+    "original_byte_identical": true,
+    "original_crop_sha256_rgb": "2306d4661309c4d0f7855457d21fff09c32bea9bda3cfe75e7936fd05a0d48bd",
+    "field_808080": [
+      true,
+      true
+    ],
+    "lit_changes_only_inside_mask": true,
+    "lit_core_equals_C0": true,
+    "seam_ratio": {
+      "left": 0.9786224684068225,
+      "right": 1.1881162458263952,
+      "top": 1.3572547705905056,
+      "bottom": 0.9436211262424576
+    },
+    "seam_passed": true,
+    "mirror_max": {
+      "left": 0.3621629709829972,
+      "right": 0.3359327490179906,
+      "top": 0.6744316095005476,
+      "bottom": 0.43710915975739895
+    },
+    "edge_darker": {
+      "left": true,
+      "right": true,
+      "top": true,
+      "bottom": true
+    },
+    "outside_folder": [],
+    "syntx_tokens": 6
+  },
+  "EN-03_SX02_planB": {
+    "note": "Added by Claude 2026-10-07 (card EN-03 do item 4: SSIM and field check in verification.json).",
+    "status": "технически импортировано, план Б (без ИИ)",
+    "check": "_tools/sx02-planb-check.json",
+    "why": "ВР-VS3-EN03-01: get-model-info magnific/precision_v2 width 2340 height 1317 scale_factor 2x = 18 tokens > 12 (ВР-PR04, card EN-03 do item 3); ledger.py check: 'cancel the run'",
+    "method": "classic Lanczos-3 x2 (tools/art/concept_paste/cp_bake.py lanczos_sample, sRGB 0..1, texel centres i + 0.5, edge clamp, normalised weights, clip 0..1, round to 8 bit); no AI, no new detail",
+    "outputs": {
+      "scraped-data/derived/env-u16-marmoreal-codex/marmoreal-extended-2x.png": {
+        "sha256": "df4fd262190b882f2541be2f5a134b10e6bfc96e90e9b7b26939d9d8860c458f",
+        "size": [
+          4680,
+          2634
+        ],
+        "ssim_back_to_input_luma": 0.9984492373923598,
+        "ssim_passed": true,
+        "field_std_levels_per_channel": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "field_flat_passed": true
+      },
+      "scraped-data/derived/env-u16-marmoreal-codex/marmoreal-lit-extended-2x.png": {
+        "sha256": "6b98378647351aecbdf9a7ce4e3efebe31fb5a94187b4c15581b7006ddebf96e",
+        "size": [
+          4680,
+          2634
+        ],
+        "ssim_back_to_input_luma": 0.9984462159852003,
+        "ssim_passed": true,
+        "field_std_levels_per_channel": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "field_flat_passed": true
+      }
+    },
+    "syntx_tokens": 0
+  }
 }

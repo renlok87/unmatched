@@ -529,3 +529,35 @@ python -B art/imagegen/env-u16-marmoreal-codex/_tools/sx01.py prepare
 python -B art/imagegen/env-u16-marmoreal-codex/_tools/sx01.py build scraped-data/derived/env-u16-marmoreal-codex/sx01/SX01-r2-raw.jpg --tag r2b --darken 0.85,0.85,0.85,0.5
 python -B art/imagegen/env-u16-marmoreal-codex/_tools/sx01.py sheets --tag r2b
 ```
+
+## EN-03 (SX-02) — детализация ×2: план Б, Lanczos-3 без ИИ (2026-10-07)
+
+**Итог: технически импортировано, план Б, по делегированию.** Запуск Magnific отменён правилом цены, поэтому ×2
+сделан классическим ресемплингом. Новой детали нет: это не «детализация», а честное увеличение. Задание —
+[EN-03.syntx.txt](../../../docs/game-design/visual/06-tasks/prompts/EN-03.syntx.txt) (`f7a14559`). Скрипт —
+[_tools/sx02_planb.py](_tools/sx02_planb.py), числа — [_tools/sx02-planb-check.json](_tools/sx02-planb-check.json).
+
+- **Почему план Б (ВР-VS3-EN03-01).** Ответ `get-model-info` для `magnific` / `precision_v2` при реальном размере
+  2340×1317 и `scale_factor 2x` — 18 токенов (для `precision_v1` тоже 18; 12 стоит только 2048×1152). Карточка
+  (колонка `do`, п. 3) и ВР-PR04 (апскейл ≤ 12 за прогон) требуют отмены; `ledger.py check` ответил «cancel the run».
+  Баланс был 167,771, так что правило баланса (< 44, ВР-PL10) не сработало. Обход отклонён: вход 2048×1152 по
+  12 токенов дал бы 1,75 текселя ИИ-детали на пиксель C0 и противоречит правилу «цена при реальном размере»; тайлы
+  2048×1152 стоили бы 48 токенов на два входа, больше бюджета 24. SYNTX на EN-03 — 0 токенов, строки трат нет: трат
+  не было. Строка `providerTerms` Magnific не нужна, её пишут до первой траты.
+- **Как.** `lanczos_sample` из `tools/art/concept_paste/cp_bake.py`, тот же ресемплинг, что у запекания: Lanczos-3,
+  sRGB 0…1, центры текселей i + 0,5, кромка — clamp, веса нормированы. ×2: 2340×1317 → 4680×2634, `conceptRectPx`
+  [668, 376, 3344, 1882].
+- **Результат** (`scraped-data/derived/env-u16-marmoreal-codex/`, вне git):
+  - `marmoreal-extended-2x.png` из clean-ext: sha256 `df4fd262…458f`;
+  - `marmoreal-lit-extended-2x.png` из lit-ext: sha256 `6b983786…f96e`.
+- **Самопроверка.**
+  - SSIM яркости после обратного уменьшения 2×2 к входу — 0,99845 и 0,99845 (порог ≥ 0,95).
+  - Поле: ядро поля ×2 без кромки 6 px (1 676 426 px) — ровно `#808080`, std 0 (порог ≤ 2).
+- **Что я открыл:** `comparison/ext2x-planb-lit-K2-crops-colour` и `comparison/ext2x-planb-clean-K2-crops-gray` —
+  4 фонаря, 2 бра, края обеих сакур, слева «источник ×2 nearest», справа «Lanczos ×2», 100 %.
+  - Новых предметов, текста и «пластикового» шума нет.
+  - В lit-варианте фонари и бра целы; в clean их нет, тумбы целы. Свет двери нарисован, как в EN-01.
+  - Картинка мягче источника на ×2: деталей ИИ нет.
+- **Последствие.** На K2 ×2,5 плита вокруг поля будет мягче, чем у Sarpedon (там ×2 Magnific). EN-07 и EN-15
+  оценивают читаемость K2 на этой плите. Если её не хватит — новое решение о Magnific (18 токенов за вход, выше
+  ВР-PR04) или о другом апскейлере, отдельной строкой бюджета.
