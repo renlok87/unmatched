@@ -14,6 +14,7 @@
 #include "S08EnvLayout.h"
 #include "S08FighterActor.h"
 #include "S08HeroesV2.h"
+#include "S08MoveAnim.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "Misc/AutomationTest.h"
@@ -107,6 +108,17 @@ bool FS08ArtLookDefaultTest::RunTest(const FString&) {
     // run I (AB-5..AB-8, 2026-10-05): the accepted turn HUD look is in the line
     TestTrue(FString::Printf(TEXT("default hud look traced: %s"), *Line),
              Line.Contains(TEXT(" hud=ring:marker-turn-ring,glow:on,tracker:de,cross:on")));
+    // AN-21 (ВР-12): the move ease of the ends is in the line (80 ms)
+    TestTrue(FString::Printf(TEXT("default move ease traced: %s"), *Line),
+             Line.Contains(TEXT(" move=ease80")));
+  }
+  // 2c) AN-21 (ВР-12): -S08MoveEaseLegacy rolls the ease back, -S08MoveEase stays a no-op alias of the default
+  {
+    FCommandLineScope Cmd(TEXT("-S08MoveEaseLegacy"));
+    TestTrue("move ease legacy traced", S08ArtLook::TraceLine().Contains(TEXT(" move=legacy(-S08MoveEaseLegacy)")));
+    TestFalse("params: legacy flag off", FS08MoveAnimParams::FromCommandLine(TEXT("-S08MoveEaseLegacy")).bEaseEnds);
+    TestTrue("params: the -S08MoveEase alias keeps the default on",
+             FS08MoveAnimParams::FromCommandLine(TEXT("-S08MoveEase")).bEaseEnds);
   }
   // 2) the former opt-in flags are accepted and change nothing
   {

@@ -4,6 +4,7 @@
 #include "S08Diorama.h"
 #include "S08EnvLayout.h"
 #include "S08HeroesV2.h"
+#include "S08MoveAnim.h"
 #include "S08Render.h"
 #include "S08TurnPortraitWidget.h"
 #include "UI/UmHudScale.h"
@@ -77,16 +78,22 @@ FString TraceLine() {
   // On the grey board the figure / tray choice is not consulted (no art board): the fields still say what an art board
   // of this run would show.
   if (FParse::Param(Cmd, TEXT("S08HeartGlow"))) Aliases.Add(TEXT("-S08HeartGlow"));  // run I: the glow is the default
+  // AN-21 (ВР-12): -S08MoveEase is a no-op alias of the now-default move ease
+  if (FParse::Param(Cmd, TEXT("S08MoveEase"))) Aliases.Add(TEXT("-S08MoveEase"));
   // Run I (AB-5..AB-8): the turn HUD look of the portraits and the combat panel (S08TurnPortraitWidget.h)
   const FString HudLook = FS08TurnHudLook::ArtLookField(Cmd);
   // VS-1 HB-09: the DPI curve of this run (project ВР-62 or the -S08DpiLegacy rollback).
   const FString Dpi = UmHudScale::ArtLookField(Cmd);
   // VS-1 CP-02: the real avatars / card scans or their rollbacks (ВР-CP08).
   const FString CardMedia = CardMediaField(Cmd);
+  // AN-21 (ВР-12): the move ease of the ends (80 ms) with its rollback
+  const FS08MoveAnimParams MoveParams = FS08MoveAnimParams::FromCommandLine(Cmd);
+  const FString MoveEase = MoveParams.bEaseEnds ? FString::Printf(TEXT("ease%.0f"), MoveParams.EaseMs)
+                                               : FString(TEXT("legacy(-S08MoveEaseLegacy)"));
   return FString::Printf(
-      TEXT("ARTLOOK art=%d source=%s heroes=%s tray=%s env=%s review=%d legacyRender=%d markers=%d aliases=%s %s %s %s%s"),
+      TEXT("ARTLOOK art=%d source=%s heroes=%s tray=%s env=%s review=%d legacyRender=%d markers=%d aliases=%s %s %s %s move=%s%s"),
       bArt ? 1 : 0, Source, *Heroes, *Tray, *Env, ReviewTooling() ? 1 : 0, S08LegacyRender() ? 1 : 0, S08Markers() ? 1 : 0,
-      Aliases.Num() ? *FString::Join(Aliases, TEXT(",")) : TEXT("-"), *HudLook, *Dpi, *CardMedia,
+      Aliases.Num() ? *FString::Join(Aliases, TEXT(",")) : TEXT("-"), *HudLook, *Dpi, *CardMedia, *MoveEase,
       bArt ? TEXT("") : TEXT(" (grey board: no art profile, figures, tray or art HUD layer)"));
 }
 

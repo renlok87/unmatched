@@ -46,9 +46,11 @@ struct UNMATCHED_API FS08MoveAnimParams {
   double LeanInMs = 60.0;      // lean in from the move start
   double StartTurnMs = 50.0;   // turn to the first edge (<= one edge)
   double TurnMs = 120.0;       // turn to the next edge at a vertex, on the move (<= one edge)
-  double SettleMs = 150.0;     // back to Idle after the arrival: lean -> 0, facing -> the half-field rule
-  bool bEaseEnds = false;      // sine ease on the first / last edge (off by default)
-  /** Review overrides for the A/B sheet (DE-028): -S08MoveHop=<rel>, -S08MoveLean=<deg>, -S08MoveEase. */
+  double SettleMs = 150.0;     // back to Idle after the arrival: lean -> 0, facing -> the rest rule
+  bool bEaseEnds = true;       // AN-21 (ВР-12): ease-in on the first edge and ease-out on the last (default on)
+  double EaseMs = 80.0;        // AN-21: the ease window at x1 (ms); an edge of T ms gets E = min(EaseMs x T / 280, T / 2)
+  /** Review overrides for the A/B sheet (DE-028): -S08MoveHop=<rel>, -S08MoveLean=<deg>, -S08MoveEase (a no-op alias
+   *  of the now-default ease). Rollback: -S08MoveEaseLegacy = the linear ends before ВР-12. */
   static FS08MoveAnimParams FromCommandLine(const TCHAR* CommandLine);
 };
 

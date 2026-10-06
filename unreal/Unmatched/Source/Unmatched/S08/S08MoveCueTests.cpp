@@ -661,8 +661,10 @@ bool FS08MoveStartFrameTest::RunTest(const FString&) {
     TestTrue("t = 0: started on the start cell", At0.bStarted && At0.Location.Equals(World({0, 1}), 0.01));
     const double Frame = 1000.0 / 60.0;
     const FS08MovePose At1 = FS08MoveAnim::Sample(P, A, Frame, 150.0);
+    // AN-21 (ВР-12): the first edge eases in - one 60 FPS frame covers s(16.7) = 0.72 uu of the 100 uu edge
+    // (the linear pose moved 5.95); the move still starts in the snapshot frame (SD-13).
     TestTrue("one 60 FPS frame later: off the start cell on edge 0 (<= 1 frame, SD-13)",
-             At1.Edge == 0 && At1.Location.X > World({0, 1}).X + 1.0);
+             At1.Edge == 0 && At1.Location.X > World({0, 1}).X + 0.5);
     TestTrue("one frame: slide only, no hop (D-DE-02)", FMath::IsNearlyZero(At1.HopUU) && FMath::IsNearlyZero(At1.Location.Z));
   }
   return true;

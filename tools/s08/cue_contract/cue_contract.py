@@ -96,7 +96,9 @@ def _num(text):
 
 # ----------------------------------------------------------------------------- CUE-007: расписание перемещения
 MOVE_PARAM_KEYS = ("duration_per_step_ms", "cap_subject_ms", "cap_seq_ms", "min_step_ms", "overlap", "place_ms")
-MOVE_POSE_KEYS = ("hop_height_rel", "travel_lean_deg", "lean_in_ms", "start_turn_ms", "turn_ms", "settle_ms", "ease_ends")
+# AN-21 (BP-12): ease_ms — окно ease-in/ease-out на концах пути (E = min(ease_ms x T / 280, T / 2) в C++)
+MOVE_POSE_KEYS = ("hop_height_rel", "travel_lean_deg", "lean_in_ms", "start_turn_ms", "turn_ms", "settle_ms",
+                  "ease_ends", "ease_ms")
 SPEED_MUL = {"fast": 0.5, "normal": 1.0, "slow": 1.5}
 MS_CUE_SOURCES = ("trail", "canonical", "straight")
 MS_CUE_KINDS = ("move", "place")
@@ -108,7 +110,8 @@ def move_params(row):
 
 
 def move_pose(row):
-    """Поза фигуры на перемещении (04 §6.3, DE-021 по 01 F-02) из строки CUE-007; C++ FS08MoveAnimParams — те же значения."""
+    """Поза фигуры на перемещении (04 §6.3, DE-021 по 01 F-02; AN-21 — ease концов) из строки CUE-007;
+    C++ FS08MoveAnimParams — те же значения."""
     return {k: row["pose"][k] for k in MOVE_POSE_KEYS}
 
 
@@ -213,10 +216,13 @@ def validate_table(table, schema=None, csv07=CSV07, rig_contract=RIG_CONTRACT, c
                 if name not in c["params"]:
                     errors.append("%s: params.%s не описан" % (cid, name))
             # DE-021 (01 F-02): поза хода — вход наклона, разворот и доворот укладываются в одно ребро (C++ режет по ребру)
+            # AN-21 (BP-12): окно ease концов пути тоже в пределах ребра (C++ жмёт E = min(ease_ms x T / 280, T / 2))
             pose = c["pose"]
-            for name in ("lean_in_ms", "start_turn_ms", "turn_ms"):
+            for name in ("lean_in_ms", "start_turn_ms", "turn_ms", "ease_ms"):
                 if pose[name] > p["duration_per_step_ms"]:
                     errors.append("%s: pose.%s %s > duration_per_step_ms %s" % (cid, name, pose[name], p["duration_per_step_ms"]))
+            if pose["ease_ms"] < 0:
+                errors.append("%s: pose.ease_ms %s < 0" % (cid, pose["ease_ms"]))
         dur = c["duration_ms"] or 0
         if c["blocks_input"] and dur > MAX_BLOCKING_MS and c["on_new_event"] != "none":
             errors.append("%s: блокирует ввод %d мс > %d (P3) и не терминальный" % (cid, dur, MAX_BLOCKING_MS))
