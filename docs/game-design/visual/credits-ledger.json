@@ -949,11 +949,47 @@
       "result_path": "art/imagegen/sc01-screen-base-codex/",
       "status": "ok",
       "note": "CX-22 fix1 (единственный корректирующий прогон); 2026-10-07 01:36-01:48 +05:00 (~12 мин); модаль = образец UUmConfirmDialog «Покинуть партию» / «Партия прервётся для обоих игроков» / «Отмена» + «Да» из ST_Screens и SC-01.do; библиотека рисует скинами HB-08 (x1 при <=1,0 px/su, x2 выше), свои признаки состояний убраны; disabled — реальные пары why.code.length и why.login.fields; selected у главной запрещён API; подпись фона по-русски только на Marmoreal; копии входов вынесены в scraped-data/derived; verification.json с ключами 07 §1.2, outside_folder [], source_unchanged true; manifest 98/98; генераций 0; ревью Claude: accept по делегированию (ВР-VS3-SC01-01…10), граница модали к заднику под вуалью ниже 3:1 записана (ВР-VS3-SC01-10)"
+    },
+    {
+      "date": "2026-10-07T01:50:30+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle)",
+      "template": "T-CODEX-ANIMSHEET",
+      "task_id": "AN-26",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a112f4-dbd0-7890-baaf-ba87ec2499f8",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/AN-26.codex.md",
+      "result_path": "art/imagegen/anim-facing-sheet-codex/",
+      "status": "ok",
+      "note": "CX-25 прогон 1; 2026-10-07 01:43-01:50 +05:00 (~7 мин); процедурный лист поворота 1920x1080: ось -300…733 мс, 5 поз (Arthur Idle q34, Lunge к.0 и к.7, Medusa к.8, возврат), план камеры с клином ±45° и пределом ±90°, перечёркнутая схема спины, CUE и полосы скорости; генераций image_gen 0; 36 проверок PASS, source_unchanged 1512 файлов; ревью Claude: fix-needed — нет manifest-sha256.json и prompts/, verification.json без ключей 07 §1.2, мёртвая зона — дуга 10° r 54 px (не видна, не по AN-23 ±10°), подписи ±45° на линии полукруга -> fix1"
+    },
+    {
+      "date": "2026-10-07T02:05:24+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle)",
+      "template": "T-CODEX-ANIMSHEET",
+      "task_id": "AN-26",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a112fe-40b0-72f1-b11d-d1fb8b34b53f",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/AN-26.fix1.codex.md",
+      "result_path": "art/imagegen/anim-facing-sheet-codex/",
+      "status": "ok",
+      "note": "CX-25 fix1 (единственный корректирующий прогон); 2026-10-07 01:53-02:05 +05:00 (~12 мин); manifest-sha256.json вместо package-manifest.json, prompts/AN-26-prompts.json, verification.json с ключами 07 §1.2 (exports, palette 0, gray 5 пар, sizes, acceptance 8/8); мёртвая зона — сектор текущего угла ±10° (AN-23), стрелка покоя 90 px, подписи ±45°/враг/цель вынесены с линий (≥ 4 px); вне панели плана 0 изменённых пикселей; ревью Claude: accept по делегированию"
     }
   ],
   "totals": {
     "syntx_spent": 6.0,
     "tripo_spent": 0,
-    "codex_packages": 46
+    "codex_packages": 48
   }
 }

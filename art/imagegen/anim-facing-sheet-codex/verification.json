@@ -1,0 +1,1718 @@
+{
+  "task": "AN-26",
+  "status": "предложено",
+  "verified_at": "2026-10-06T21:04:25.352216+00:00",
+  "source_unchanged": true,
+  "outside_folder": [],
+  "changed_inputs": [],
+  "source_files_checked": 1512,
+  "hud_files_checked": 1499,
+  "source_hashes_after": "source-hashes-after.json",
+  "checks": {
+    "hud_snapshot_byte_identical": true,
+    "no_layout_outside_canvas": true,
+    "concept_unretouched": true,
+    "no_character_image_generation": true,
+    "all_masks_have_render_provenance": true,
+    "exact_tokens": true,
+    "1920_rgba_png": true,
+    "1920_opaque": true,
+    "1920_color_comparison_identical": true,
+    "1920_rec709_exact": true,
+    "1920_red_only_forbidden_X": true,
+    "1280_rgba_png": true,
+    "1280_opaque": true,
+    "1280_color_comparison_identical": true,
+    "1280_rec709_exact": true,
+    "1280_red_only_forbidden_X": true,
+    "960_rgba_png": true,
+    "960_opaque": true,
+    "960_color_comparison_identical": true,
+    "960_rec709_exact": true,
+    "960_red_only_forbidden_X": true,
+    "base_timing": true,
+    "shared_axis": true,
+    "speed_unscaled_turn_return": true,
+    "speed_scaled_clip_contacts": true,
+    "speed_rate_rounding": true,
+    "reduced_and_none_instant": true,
+    "cue_timing": true,
+    "plan_angles": true,
+    "speed_contacts_rendered_on_axis": true,
+    "cue_circle_718_position": true,
+    "cue_circle_782_position": true,
+    "cue_circle_814_position": true,
+    "exact_prompt_key": true,
+    "named_render_hashes_match_card": true,
+    "no_bytecode_in_package": true,
+    "fix1_immutable_files": true,
+    "fix1_outside_plan_pixel_identical": true,
+    "fix1_tracing_proof_rgb_unchanged": true,
+    "fix1_plan_labels_clear": true,
+    "fix1_pixel_angles": true,
+    "fix1_palette_de76": true,
+    "fix1_all_exports_rgba": true,
+    "fix1_gray_pairs": true,
+    "fix1_prompts_verbatim": true,
+    "fix1_B_selected": true,
+    "fix1_acceptance": true
+  },
+  "automated_checks_pass": true,
+  "images": [
+    {
+      "color": "vector/AN-26-facing-sheet.png",
+      "gray": "comparison/AN-26-facing-sheet-gray.png",
+      "size": [
+        1920,
+        1080
+      ],
+      "color_sha256": "92e1405a77e5967499da36009a03a05ca4b2fe3f71ce7fb2bde8f9a75f99ee55",
+      "gray_sha256": "12ff5f5e85725659aa4b770ba9d480a9eedffeee00a9e0dc4e2ea59c10c3959a"
+    },
+    {
+      "color": "vector/AN-26-facing-sheet-1280x720.png",
+      "gray": "comparison/AN-26-facing-sheet-gray-1280x720.png",
+      "size": [
+        1280,
+        720
+      ],
+      "color_sha256": "f9b55f6ee31a16a66b9611a9f20dc5d6b356cad877637c1fe8624471679a4415",
+      "gray_sha256": "5970bee40e7d04d90bbebc34dbe300602626609418a64ca433f20a784ca11585"
+    },
+    {
+      "color": "vector/AN-26-facing-sheet-960x540.png",
+      "gray": "comparison/AN-26-facing-sheet-gray-960x540.png",
+      "size": [
+        960,
+        540
+      ],
+      "color_sha256": "ae033f72db4775d0e6d4c3bd8c77751c3e92003aeb7a35fba06c52dc1620cb40",
+      "gray_sha256": "bd7ab57bf50bb344819a638930a47dcde6b1f14891deb71e42bbd7e79fa3bdbc"
+    }
+  ],
+  "limitations": [
+    {
+      "id": "back-render-unavailable",
+      "severity": "documented_source_limit",
+      "requirement": "Forbidden back-view example",
+      "actual": "Clearly labelled schematic using a traced idle contour and cape line; not a real rear render.",
+      "reason": "No rear tile in the authorized inputs; no AI character generation and no Unreal access allowed.",
+      "fix1_review": "Labelled schematic explicitly accepted by corrective task; unchanged."
+    },
+    {
+      "id": "harpy-contact-source-conflict",
+      "severity": "source_conflict",
+      "actual": "Task AN-26 frame 7 / 292 ms followed; visual design section 8.4 says frames 7-9."
+    },
+    {
+      "id": "540p-secondary-text",
+      "severity": "readability",
+      "actual": "Overview size; secondary text is small. Recommend master or 720p."
+    },
+    {
+      "id": "scope-of-outside-folder-audit",
+      "severity": "audit_scope",
+      "actual": "Task writes constrained to package and reviewed command history. No global scan of Unreal, Git or independently edited files."
+    }
+  ],
+  "unmet_requirements": [],
+  "visual_review": {
+    "reviewer": "Codex",
+    "method": "Personally opened final PNGs with view_image; no MCP",
+    "run": "AN-26/fix1",
+    "reviewed": [
+      "vector/AN-26-facing-sheet.png",
+      "comparison/AN-26-facing-sheet-gray.png",
+      "comparison/AN-26-facing-sheet-color-1280x720.png",
+      "comparison/AN-26-facing-sheet-gray-1280x720.png",
+      "concepts/review/AN-26-plan-fix1-color-x2.png",
+      "concepts/review/AN-26-plan-fix1-gray-x2.png"
+    ],
+    "findings": "Cream dead-band sector and its central idle arrow remain visible in color and gray. Enemy is inside the band. Labels are clear of strokes; one-line AN-23 explanation fits. Five accepted traced poses, timeline, CUE, speed lanes and crossed-out schematic preserved. 720p main information readable; new rule line is small but fits; 540p retained as overview.",
+    "previous_review": {
+      "reviewer": "Codex",
+      "method": "Locally opened PNGs with view_image; no MCP",
+      "reviewed": [
+        "master color",
+        "master grayscale",
+        "720p color",
+        "720p grayscale",
+        "540p color",
+        "540p grayscale",
+        "tracing proof"
+      ],
+      "findings": "Five render-derived poses, shared metric axis, correct bounds, readable main information, gray shape coding; secondary 540p text small."
+    }
+  },
+  "execution": {
+    "git_commands": 0,
+    "mcp_calls": 0,
+    "unreal_project_reads_writes_or_launches": 0,
+    "background_processes_started": 0,
+    "scraped_data_writes": 0
+  },
+  "exports": [
+    {
+      "path": "comparison/AN-26-facing-sheet-color-1280x720.png",
+      "size": [
+        1280,
+        720
+      ],
+      "mode": "RGBA",
+      "background_rgb": [
+        6,
+        22,
+        35
+      ],
+      "margin_px": 5,
+      "touches_edge": false
+    },
+    {
+      "path": "comparison/AN-26-facing-sheet-color-960x540.png",
+      "size": [
+        960,
+        540
+      ],
+      "mode": "RGBA",
+      "background_rgb": [
+        6,
+        22,
+        35
+      ],
+      "margin_px": 3,
+      "touches_edge": false
+    },
+    {
+      "path": "comparison/AN-26-facing-sheet-color.png",
+      "size": [
+        1920,
+        1080
+      ],
+      "mode": "RGBA",
+      "background_rgb": [
+        6,
+        22,
+        35
+      ],
+      "margin_px": 8,
+      "touches_edge": false
+    },
+    {
+      "path": "comparison/AN-26-facing-sheet-gray-1280x720.png",
+      "size": [
+        1280,
+        720
+      ],
+      "mode": "RGBA",
+      "background_rgb": [
+        20,
+        20,
+        20
+      ],
+      "margin_px": 6,
+      "touches_edge": false
+    },
+    {
+      "path": "comparison/AN-26-facing-sheet-gray-960x540.png",
+      "size": [
+        960,
+        540
+      ],
+      "mode": "RGBA",
+      "background_rgb": [
+        20,
+        20,
+        20
+      ],
+      "margin_px": 3,
+      "touches_edge": false
+    },
+    {
+      "path": "comparison/AN-26-facing-sheet-gray.png",
+      "size": [
+        1920,
+        1080
+      ],
+      "mode": "RGBA",
+      "background_rgb": [
+        20,
+        20,
+        20
+      ],
+      "margin_px": 8,
+      "touches_edge": false
+    },
+    {
+      "path": "comparison/AN-26-tracing-proof-gray.png",
+      "size": [
+        1680,
+        840
+      ],
+      "mode": "RGBA",
+      "background_rgb": [
+        20,
+        20,
+        20
+      ],
+      "margin_px": 0,
+      "touches_edge": true
+    },
+    {
+      "path": "comparison/AN-26-tracing-proof.png",
+      "size": [
+        1680,
+        840
+      ],
+      "mode": "RGBA",
+      "background_rgb": [
+        6,
+        22,
+        35
+      ],
+      "margin_px": 0,
+      "touches_edge": true
+    },
+    {
+      "path": "vector/AN-26-facing-sheet-1280x720.png",
+      "size": [
+        1280,
+        720
+      ],
+      "mode": "RGBA",
+      "background_rgb": [
+        6,
+        22,
+        35
+      ],
+      "margin_px": 5,
+      "touches_edge": false
+    },
+    {
+      "path": "vector/AN-26-facing-sheet-960x540.png",
+      "size": [
+        960,
+        540
+      ],
+      "mode": "RGBA",
+      "background_rgb": [
+        6,
+        22,
+        35
+      ],
+      "margin_px": 3,
+      "touches_edge": false
+    },
+    {
+      "path": "vector/AN-26-facing-sheet.png",
+      "size": [
+        1920,
+        1080
+      ],
+      "mode": "RGBA",
+      "background_rgb": [
+        6,
+        22,
+        35
+      ],
+      "margin_px": 8,
+      "touches_edge": false
+    }
+  ],
+  "palette": {
+    "color_master": "vector/AN-26-facing-sheet.png",
+    "metric": "CIE76, sRGB D65",
+    "threshold_de76": 3,
+    "opaque_pixels": 2073600,
+    "excluded_count": 432704,
+    "evaluated_pixels": 1640896,
+    "outside_count": 0,
+    "outside_share": 0.0,
+    "pixel_count_per_token": {
+      "card.navy": 1582436,
+      "card.cream": 45833,
+      "mark.keyline": 0,
+      "text.secondary": 179,
+      "turn.flash.yellow": 12393,
+      "state.error": 3,
+      "text.primary": 52
+    },
+    "exclusion": "3x3 neighbourhood not a single RGB colour; no broad colour-distance exclusion",
+    "passed": true
+  },
+  "gray": {
+    "formula": "round(0.2126 R + 0.7152 G + 0.0722 B); alpha unchanged",
+    "files": [
+      {
+        "color": "comparison/AN-26-facing-sheet-color-1280x720.png",
+        "gray": "comparison/AN-26-facing-sheet-gray-1280x720.png",
+        "rec709_exact": true
+      },
+      {
+        "color": "comparison/AN-26-facing-sheet-color-960x540.png",
+        "gray": "comparison/AN-26-facing-sheet-gray-960x540.png",
+        "rec709_exact": true
+      },
+      {
+        "color": "comparison/AN-26-facing-sheet-color.png",
+        "gray": "comparison/AN-26-facing-sheet-gray.png",
+        "rec709_exact": true
+      },
+      {
+        "color": "comparison/AN-26-tracing-proof.png",
+        "gray": "comparison/AN-26-tracing-proof-gray.png",
+        "rec709_exact": true
+      },
+      {
+        "color": "vector/AN-26-facing-sheet-1280x720.png",
+        "gray": "comparison/AN-26-facing-sheet-gray-1280x720.png",
+        "rec709_exact": true
+      },
+      {
+        "color": "vector/AN-26-facing-sheet-960x540.png",
+        "gray": "comparison/AN-26-facing-sheet-gray-960x540.png",
+        "rec709_exact": true
+      },
+      {
+        "color": "vector/AN-26-facing-sheet.png",
+        "gray": "comparison/AN-26-facing-sheet-gray.png",
+        "rec709_exact": true
+      }
+    ],
+    "distinguishable_pairs": [
+      {
+        "pair": "idle wedge vs 90° limit",
+        "tokens": [
+          "turn.flash.yellow",
+          "text.secondary"
+        ],
+        "luma": [
+          195,
+          179
+        ],
+        "luma_difference": 16,
+        "shape_difference": "r115 thick arc vs r155 thin semicircle",
+        "passed": true
+      },
+      {
+        "pair": "dead band vs idle wedge",
+        "tokens": [
+          "card.cream",
+          "turn.flash.yellow"
+        ],
+        "luma": [
+          237,
+          195
+        ],
+        "luma_difference": 42,
+        "shape_difference": "two radials plus r100 arc vs open r115 arc",
+        "passed": true
+      },
+      {
+        "pair": "120 ms turn vs LungeAttack",
+        "tokens": [
+          "turn.flash.yellow",
+          "card.cream"
+        ],
+        "luma": [
+          195,
+          237
+        ],
+        "luma_difference": 42,
+        "shape_difference": "filled bar vs hollow outlined bar",
+        "passed": true
+      },
+      {
+        "pair": "150 ms return vs LungeAttack",
+        "tokens": [
+          "turn.flash.yellow",
+          "card.cream"
+        ],
+        "luma": [
+          195,
+          237
+        ],
+        "luma_difference": 42,
+        "shape_difference": "filled bar vs hollow outlined bar",
+        "passed": true
+      },
+      {
+        "pair": "Arthur / Harpy vs Merlin / Medusa contact",
+        "tokens": [
+          "turn.flash.yellow",
+          "card.cream"
+        ],
+        "luma": [
+          195,
+          237
+        ],
+        "luma_difference": 42,
+        "shape_difference": "circle vs diamond",
+        "passed": true
+      }
+    ]
+  },
+  "sizes": [
+    {
+      "size": [
+        1920,
+        1080
+      ],
+      "color": "vector/AN-26-facing-sheet.png",
+      "gray": "comparison/AN-26-facing-sheet-gray.png",
+      "present": true,
+      "drawn_natively": true,
+      "downscaled_from_master": false,
+      "purpose": "master",
+      "method": "Canvas created at this size with 2x antialias buffer, no master resize"
+    },
+    {
+      "size": [
+        1280,
+        720
+      ],
+      "color": "vector/AN-26-facing-sheet-1280x720.png",
+      "gray": "comparison/AN-26-facing-sheet-gray-1280x720.png",
+      "present": true,
+      "drawn_natively": true,
+      "downscaled_from_master": false,
+      "purpose": "working copy",
+      "method": "Canvas created at this size with 2x antialias buffer, no master resize"
+    },
+    {
+      "size": [
+        960,
+        540
+      ],
+      "color": "vector/AN-26-facing-sheet-960x540.png",
+      "gray": "comparison/AN-26-facing-sheet-gray-960x540.png",
+      "present": true,
+      "drawn_natively": true,
+      "downscaled_from_master": false,
+      "purpose": "overview",
+      "method": "Canvas created at this size with 2x antialias buffer, no master resize"
+    }
+  ],
+  "acceptance": {
+    "1_shared_axis_and_timing": {
+      "passed": true,
+      "measured": {
+        "axis_ms": [
+          -300,
+          1025
+        ],
+        "axis_px": [
+          250,
+          1405
+        ],
+        "px_per_ms": 0.8716981132075472,
+        "turn_120_ms": {
+          "start_px": 407,
+          "end_px": 510,
+          "raster_span_px": 103,
+          "axis_start_px": 406.90566037735846,
+          "axis_end_px": 511.50943396226415,
+          "axis_length_px": 104.6037735849057,
+          "endpoint_max_error_px": 1.5094339622641542
+        },
+        "return_150_ms": {
+          "start_px": 1020,
+          "end_px": 1150,
+          "raster_span_px": 130,
+          "axis_start_px": 1019.7094339622641,
+          "axis_end_px": 1150.4641509433964,
+          "axis_length_px": 130.75471698113222,
+          "endpoint_max_error_px": 0.464150943396362
+        },
+        "lunge_583_ms": {
+          "start_px": 512,
+          "end_px": 1018,
+          "raster_span_px": 506,
+          "axis_length_px": 508.2,
+          "endpoint_max_error_px": 1.7094339622641428
+        },
+        "contacts": [
+          {
+            "ms": 292,
+            "measured_center_px": 765.5,
+            "axis_px": 766.045283018868,
+            "error_px": 0.5452830188679627
+          },
+          {
+            "ms": 333,
+            "measured_center_px": 801.5,
+            "axis_px": 801.7849056603774,
+            "error_px": 0.2849056603773761
+          }
+        ],
+        "raster_endpoint_tolerance_px": 2,
+        "method": "Token-specific raster strokes; cream vertical outline endpoints; 2 px tolerance accounts for 2 px inset outlines and native antialiasing"
+      },
+      "expected": "120 / 150 / 583 ms; contacts 292 / 333 ms on one axis",
+      "note": "Bar ends and contact centres measured from the master pixels; rounded-ms card timing retained."
+    },
+    "2_plan_angles": {
+      "passed": true,
+      "measured": {
+        "center_px": [
+          1665,
+          424
+        ],
+        "drawn_angles_from_pixels": {
+          "idle_left": {
+            "degrees": -45.0,
+            "sample_pixels": 14
+          },
+          "idle_right": {
+            "degrees": 44.9797,
+            "sample_pixels": 92
+          },
+          "attack_left": {
+            "degrees": -90.0235,
+            "sample_pixels": 121
+          },
+          "attack_right": {
+            "degrees": 90.0,
+            "sample_pixels": 61
+          },
+          "band_left": {
+            "degrees": -43.6589,
+            "sample_pixels": 56
+          },
+          "band_right": {
+            "degrees": -23.6866,
+            "sample_pixels": 45
+          },
+          "idle_yaw": {
+            "degrees": -33.6814,
+            "sample_pixels": 84
+          }
+        },
+        "expected_angles_deg": {
+          "idle_left": -45,
+          "idle_right": 45,
+          "attack_left": -90,
+          "attack_right": 90,
+          "band_left": -43.690067525979785,
+          "band_right": -23.690067525979785,
+          "idle_yaw": -33.690067525979785
+        },
+        "tolerance_deg": 1,
+        "dead_band_total_width_deg": 19.9723,
+        "dead_band_offsets_from_idle_deg": [
+          -9.9775,
+          9.9948
+        ],
+        "measurement_note": "Left idle radial measured at r23–29 before the dead-band stroke; other radials measured over longer unobstructed segments. All samples are pixels of the final master.",
+        "nearest_enemy_yaw_deg": -40.383647906448985,
+        "nearest_enemy_difference_deg": 6.6935803804692,
+        "nearest_enemy_inside_band": true,
+        "passed": true
+      },
+      "expected": "idle ±45°, dead band current yaw ±10°, attack ±90°, angle error ≤1°",
+      "note": "Pixel fits on both radial boundaries. Dead-band full opening is 20°; threshold is 10° to either side."
+    },
+    "3_no_back_view": {
+      "passed": true,
+      "measured": {
+        "pose_count": 5,
+        "trace_records": [
+          {
+            "id": "KingArthur-Idle-f00-q34",
+            "source": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2anim/preview/KingArthur-Idle-blender-sheet.jpg",
+            "bones": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2anim/preview/frames/KingArthur-Idle-bones2d.json",
+            "tile": "f00 q34",
+            "tile_index": 2,
+            "crop_xyxy": [
+              840,
+              0,
+              1260,
+              420
+            ],
+            "mask_bbox": [
+              122,
+              53,
+              294,
+              399
+            ],
+            "overlay_pixels_removed": 6529,
+            "foreground_pixels": 37098,
+            "method": "bones2d-supported chromatic overlay removal; nearest valid pixel reconstruction; background difference; closing; component filtering; hole filling",
+            "back_view": false
+          },
+          {
+            "id": "KingArthur-LungeAttack-f00-left",
+            "source": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2anim/preview/KingArthur-LungeAttack-blender-sheet.jpg",
+            "bones": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2anim/preview/frames/KingArthur-LungeAttack-bones2d.json",
+            "tile": "f00 left",
+            "tile_index": 1,
+            "crop_xyxy": [
+              420,
+              0,
+              840,
+              420
+            ],
+            "mask_bbox": [
+              187,
+              55,
+              356,
+              399
+            ],
+            "overlay_pixels_removed": 5507,
+            "foreground_pixels": 26107,
+            "method": "bones2d-supported chromatic overlay removal; nearest valid pixel reconstruction; background difference; closing; component filtering; hole filling",
+            "back_view": false
+          },
+          {
+            "id": "KingArthur-LungeAttack-f07-left",
+            "source": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2anim/preview/KingArthur-LungeAttack-blender-sheet.jpg",
+            "bones": "art/pipeline-candidates/ASSET-KING-ARTHUR-001/20260929-h2anim/preview/frames/KingArthur-LungeAttack-bones2d.json",
+            "tile": "f07 left",
+            "tile_index": 10,
+            "crop_xyxy": [
+              840,
+              840,
+              1260,
+              1260
+            ],
+            "mask_bbox": [
+              61,
+              84,
+              356,
+              405
+            ],
+            "overlay_pixels_removed": 6194,
+            "foreground_pixels": 29615,
+            "method": "bones2d-supported chromatic overlay removal; nearest valid pixel reconstruction; background difference; closing; component filtering; hole filling",
+            "back_view": false
+          },
+          {
+            "id": "Medusa-LungeAttack-f08-q34",
+            "source": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2anim/preview/Medusa-LungeAttack-blender-sheet.jpg",
+            "bones": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2anim/preview/frames/Medusa-LungeAttack-bones2d.json",
+            "tile": "f08 q34",
+            "tile_index": 14,
+            "crop_xyxy": [
+              840,
+              1260,
+              1260,
+              1680
+            ],
+            "mask_bbox": [
+              134,
+              54,
+              304,
+              400
+            ],
+            "overlay_pixels_removed": 6236,
+            "foreground_pixels": 26937,
+            "method": "bones2d-supported chromatic overlay removal; nearest valid pixel reconstruction; background difference; closing; component filtering; hole filling",
+            "back_view": false
+          }
+        ],
+        "outside_panel": [
+          {
+            "size": [
+              1920,
+              1080
+            ],
+            "plan_panel_px": [
+              1470,
+              154,
+              1872,
+              625
+            ],
+            "changed_pixels": 12712,
+            "outside_plan_changed_pixels": 0,
+            "outside_plan_pixel_identical": true,
+            "gray_outside_plan_changed_pixels": 0,
+            "gray_outside_plan_pixel_identical": true,
+            "baseline": "concepts/AN-26-concept-A-unretouched.png"
+          },
+          {
+            "size": [
+              1280,
+              720
+            ],
+            "plan_panel_px": [
+              980,
+              102,
+              1248,
+              417
+            ],
+            "changed_pixels": 6933,
+            "outside_plan_changed_pixels": 0,
+            "outside_plan_pixel_identical": true,
+            "gray_outside_plan_changed_pixels": 0,
+            "gray_outside_plan_pixel_identical": true,
+            "baseline": "concepts/fix1-baseline/AN-26-facing-sheet-1280x720.png"
+          },
+          {
+            "size": [
+              960,
+              540
+            ],
+            "plan_panel_px": [
+              735,
+              77,
+              936,
+              313
+            ],
+            "changed_pixels": 4610,
+            "outside_plan_changed_pixels": 0,
+            "outside_plan_pixel_identical": true,
+            "gray_outside_plan_changed_pixels": 0,
+            "gray_outside_plan_pixel_identical": true,
+            "baseline": "concepts/fix1-baseline/AN-26-facing-sheet-960x540.png"
+          }
+        ],
+        "only_crossed_out_back": "labelled schematic"
+      },
+      "expected": "Five accepted front/side traced poses; back only in crossed-out example",
+      "note": "fix1 review explicitly accepted this schematic; no new rear render claimed."
+    },
+    "4_speed_fixed_turn_return": {
+      "passed": true,
+      "measured": [
+        {
+          "factor": 0.5,
+          "turn": {
+            "start_px": 407,
+            "end_px": 510,
+            "raster_span_px": 103,
+            "axis_start_px": 406.90566037735846,
+            "axis_end_px": 511.50943396226415,
+            "axis_length_px": 104.6037735849057,
+            "endpoint_max_error_px": 1.5094339622641542
+          },
+          "return": {
+            "start_px": 766,
+            "end_px": 896,
+            "raster_span_px": 130,
+            "axis_start_px": 765.6094339622641,
+            "axis_end_px": 896.3641509433962,
+            "axis_length_px": 130.7547169811321,
+            "endpoint_max_error_px": 0.39056603773587995
+          }
+        },
+        {
+          "factor": 1,
+          "turn": {
+            "start_px": 407,
+            "end_px": 510,
+            "raster_span_px": 103,
+            "axis_start_px": 406.90566037735846,
+            "axis_end_px": 511.50943396226415,
+            "axis_length_px": 104.6037735849057,
+            "endpoint_max_error_px": 1.5094339622641542
+          },
+          "return": {
+            "start_px": 1020,
+            "end_px": 1150,
+            "raster_span_px": 130,
+            "axis_start_px": 1019.7094339622641,
+            "axis_end_px": 1150.4641509433964,
+            "axis_length_px": 130.75471698113222,
+            "endpoint_max_error_px": 0.464150943396362
+          }
+        },
+        {
+          "factor": 1.5,
+          "turn": {
+            "start_px": 407,
+            "end_px": 510,
+            "raster_span_px": 103,
+            "axis_start_px": 406.90566037735846,
+            "axis_end_px": 511.50943396226415,
+            "axis_length_px": 104.6037735849057,
+            "endpoint_max_error_px": 1.5094339622641542
+          },
+          "return": {
+            "start_px": 1274,
+            "end_px": 1404,
+            "raster_span_px": 130,
+            "axis_start_px": 1273.8094339622642,
+            "axis_end_px": 1404.5641509433963,
+            "axis_length_px": 130.7547169811321,
+            "endpoint_max_error_px": 0.564150943396271
+          }
+        }
+      ],
+      "expected": "same turn 104.603774 px and return 130.754717 px in all lanes",
+      "note": "Equal geometric lengths on the common axis. Actual raster spans differ by at most 1 px from subpixel sampling; endpoint measurements and errors are reported, without editing accepted lanes."
+    },
+    "5_reduced_instant": {
+      "passed": true,
+      "measured": {
+        "turn_center_px": 512,
+        "return_center_px": 1020,
+        "turn_tick_present": true,
+        "return_tick_present": true,
+        "duration_ms": 0,
+        "model": {
+          "turn_ms": 0,
+          "return_ms": 0,
+          "clip": [
+            0,
+            583
+          ]
+        }
+      },
+      "expected": "instantaneous turn / return; no finite-duration turn bars",
+      "note": "Two vertical event ticks on the rendered lane."
+    },
+    "6_all_numbers_sourced": {
+      "passed": true,
+      "measured": {
+        "numbers": [
+          {
+            "text": "AN-26",
+            "number": "26",
+            "xy": [
+              1872,
+              43
+            ],
+            "readme_row": "Идентификатор AN-26 — метаданные карточки"
+          },
+          {
+            "text": "−300",
+            "number": "−300",
+            "xy": [
+              250.0,
+              157
+            ],
+            "readme_row": "| −300 мс, 300 мс | T, Keyframes / Timing: начало неизменяемой паузы счёта после slam; D §9.2, CUE-010 |"
+          },
+          {
+            "text": "−120",
+            "number": "−120",
+            "xy": [
+              406.90566037735846,
+              157
+            ],
+            "readme_row": "| −120 мс, 120 мс | T, Keyframes / Timing: событие `face`, начало и длительность поворота; D §8.3 |"
+          },
+          {
+            "text": "0",
+            "number": "0",
+            "xy": [
+              511.50943396226415,
+              157
+            ],
+            "readme_row": "| 0 мс, кадр 0 | T, Keyframes / Specific: начало LungeAttack; заданный Idle `f00 q34` |"
+          },
+          {
+            "text": "292",
+            "number": "292",
+            "xy": [
+              766.045283018868,
+              157
+            ],
+            "readme_row": "| 292 мс, кадр 7 | T, Timing: контакт Arthur / Harpy; D §8.4 подтверждает Arthur |"
+          },
+          {
+            "text": "333",
+            "number": "333",
+            "xy": [
+              801.7849056603774,
+              174
+            ],
+            "readme_row": "| 333 мс, кадр 8 | T, Timing: контакт Merlin / Medusa; D §8.4, выпуск стрелы Medusa |"
+          },
+          {
+            "text": "583",
+            "number": "583",
+            "xy": [
+              1019.7094339622641,
+              157
+            ],
+            "readme_row": "| 583 мс, 14 кадров, 24 fps | T, Timing: конец выпада; D §8.4 подтверждает длительность и fps |"
+          },
+          {
+            "text": "733",
+            "number": "733",
+            "xy": [
+              1150.4641509433964,
+              157
+            ],
+            "readme_row": "| 733 мс | T, Keyframes: idle восстановлен; это заданный конец возврата |"
+          },
+          {
+            "text": "Счёт · 300 мс",
+            "number": "300",
+            "xy": [
+              380.7547169811321,
+              215
+            ],
+            "readme_row": "| −300 мс, 300 мс | T, Keyframes / Timing: начало неизменяемой паузы счёта после slam; D §9.2, CUE-010 |"
+          },
+          {
+            "text": "120 мс",
+            "number": "120",
+            "xy": [
+              459.2075471698113,
+              255
+            ],
+            "readme_row": "| −120 мс, 120 мс | T, Keyframes / Timing: событие `face`, начало и длительность поворота; D §8.3 |"
+          },
+          {
+            "text": "LungeAttack · 583 мс",
+            "number": "583",
+            "xy": [
+              765.6094339622641,
+              255
+            ],
+            "readme_row": "| 583 мс, 14 кадров, 24 fps | T, Timing: конец выпада; D §8.4 подтверждает длительность и fps |"
+          },
+          {
+            "text": "150 мс",
+            "number": "150",
+            "xy": [
+              1085.0867924528302,
+              255
+            ],
+            "readme_row": "| 150 мс | T, Timing / Keyframes: возврат после клипа и интерполяция изменившегося idle yaw; D §8.3 |"
+          },
+          {
+            "text": "КАДРЫ · 24 fps",
+            "number": "24",
+            "xy": [
+              48,
+              298
+            ],
+            "readme_row": "| 583 мс, 14 кадров, 24 fps | T, Timing: конец выпада; D §8.4 подтверждает длительность и fps |"
+          },
+          {
+            "text": "0",
+            "number": "0",
+            "xy": [
+              511.50943396226415,
+              304
+            ],
+            "readme_row": "| 0 мс, кадр 0 | T, Keyframes / Specific: начало LungeAttack; заданный Idle `f00 q34` |"
+          },
+          {
+            "text": "7",
+            "number": "7",
+            "xy": [
+              766.045283018868,
+              304
+            ],
+            "readme_row": "| 292 мс, кадр 7 | T, Timing: контакт Arthur / Harpy; D §8.4 подтверждает Arthur |"
+          },
+          {
+            "text": "8",
+            "number": "8",
+            "xy": [
+              801.7849056603774,
+              304
+            ],
+            "readme_row": "| 333 мс, кадр 8 | T, Timing: контакт Merlin / Medusa; D §8.4, выпуск стрелы Medusa |"
+          },
+          {
+            "text": "14",
+            "number": "14",
+            "xy": [
+              1019.7094339622641,
+              304
+            ],
+            "readme_row": "| 583 мс, 14 кадров, 24 fps | T, Timing: конец выпада; D §8.4 подтверждает длительность и fps |"
+          },
+          {
+            "text": "−300 мс · Idle · к. 0",
+            "number": "−300",
+            "xy": [
+              175,
+              636
+            ],
+            "readme_row": "| −300 мс, 300 мс | T, Keyframes / Timing: начало неизменяемой паузы счёта после slam; D §9.2, CUE-010 |"
+          },
+          {
+            "text": "−300 мс · Idle · к. 0",
+            "number": "0",
+            "xy": [
+              175,
+              636
+            ],
+            "readme_row": "| 0 мс, кадр 0 | T, Keyframes / Specific: начало LungeAttack; заданный Idle `f00 q34` |"
+          },
+          {
+            "text": "0 мс · Lunge · к. 0",
+            "number": "0",
+            "xy": [
+              432,
+              636
+            ],
+            "readme_row": "| 0 мс, кадр 0 | T, Keyframes / Specific: начало LungeAttack; заданный Idle `f00 q34` |"
+          },
+          {
+            "text": "0 мс · Lunge · к. 0",
+            "number": "0",
+            "xy": [
+              432,
+              636
+            ],
+            "readme_row": "| 0 мс, кадр 0 | T, Keyframes / Specific: начало LungeAttack; заданный Idle `f00 q34` |"
+          },
+          {
+            "text": "292 мс · Arthur · к. 7",
+            "number": "292",
+            "xy": [
+              689,
+              636
+            ],
+            "readme_row": "| 292 мс, кадр 7 | T, Timing: контакт Arthur / Harpy; D §8.4 подтверждает Arthur |"
+          },
+          {
+            "text": "292 мс · Arthur · к. 7",
+            "number": "7",
+            "xy": [
+              689,
+              636
+            ],
+            "readme_row": "| 292 мс, кадр 7 | T, Timing: контакт Arthur / Harpy; D §8.4 подтверждает Arthur |"
+          },
+          {
+            "text": "333 мс · Medusa · к. 8",
+            "number": "333",
+            "xy": [
+              946,
+              636
+            ],
+            "readme_row": "| 333 мс, кадр 8 | T, Timing: контакт Merlin / Medusa; D §8.4, выпуск стрелы Medusa |"
+          },
+          {
+            "text": "333 мс · Medusa · к. 8",
+            "number": "8",
+            "xy": [
+              946,
+              636
+            ],
+            "readme_row": "| 333 мс, кадр 8 | T, Timing: контакт Merlin / Medusa; D §8.4, выпуск стрелы Medusa |"
+          },
+          {
+            "text": "733 мс · Idle · к. 0",
+            "number": "733",
+            "xy": [
+              1203,
+              636
+            ],
+            "readme_row": "| 733 мс | T, Keyframes: idle восстановлен; это заданный конец возврата |"
+          },
+          {
+            "text": "733 мс · Idle · к. 0",
+            "number": "0",
+            "xy": [
+              1203,
+              636
+            ],
+            "readme_row": "| 0 мс, кадр 0 | T, Keyframes / Specific: начало LungeAttack; заданный Idle `f00 q34` |"
+          },
+          {
+            "text": "Flash · 70 мс",
+            "number": "70",
+            "xy": [
+              48,
+              741
+            ],
+            "readme_row": "| 70 мс (flash) | T, Sheet layout; D §9.2, CUE-011: длительность вспышки от контакта, не масштабируется |"
+          },
+          {
+            "text": "Урон · +60 мс",
+            "number": "+60",
+            "xy": [
+              48,
+              773
+            ],
+            "readme_row": "| +60 мс (урон) | T, Sheet layout; D §9.2, CUE-011: появление числа после контакта |"
+          },
+          {
+            "text": "HP · +80 мс",
+            "number": "+80",
+            "xy": [
+              48,
+              805
+            ],
+            "readme_row": "| 80 мс (ease) | T, Sheet layout; D §8.3, ВР-12: каждый конец пути |"
+          },
+          {
+            "text": "×0.5  / rate 2",
+            "number": "×0.5",
+            "xy": [
+              48,
+              869
+            ],
+            "readme_row": "| ×0.5 / ×1 / ×1.5 | T, Timing: множитель длительности выпада; D §9.2, DE-025 |"
+          },
+          {
+            "text": "×0.5  / rate 2",
+            "number": "2",
+            "xy": [
+              48,
+              869
+            ],
+            "readme_row": "| rate 2 / 1 / 0.67 | T, Timing: соответствующий play rate; `0.67` — округлённое представление `2/3` |"
+          },
+          {
+            "text": "×1  / rate 1",
+            "number": "×1",
+            "xy": [
+              48,
+              910
+            ],
+            "readme_row": "| ×0.5 / ×1 / ×1.5 | T, Timing: множитель длительности выпада; D §9.2, DE-025 |"
+          },
+          {
+            "text": "×1  / rate 1",
+            "number": "1",
+            "xy": [
+              48,
+              910
+            ],
+            "readme_row": "| ×0.5 / ×1 / ×1.5 | T, Timing: множитель длительности выпада; D §9.2, DE-025 |"
+          },
+          {
+            "text": "×1.5  / rate 0.67",
+            "number": "×1.5",
+            "xy": [
+              48,
+              951
+            ],
+            "readme_row": "| ×0.5 / ×1 / ×1.5 | T, Timing: множитель длительности выпада; D §9.2, DE-025 |"
+          },
+          {
+            "text": "×1.5  / rate 0.67",
+            "number": "0.67",
+            "xy": [
+              48,
+              951
+            ],
+            "readme_row": "| rate 2 / 1 / 0.67 | T, Timing: соответствующий play rate; `0.67` — округлённое представление `2/3` |"
+          },
+          {
+            "text": "Покой пересчитывается: snapshot / конец хода / конец атаки; изменение yaw — короткая дуга за 150 мс.",
+            "number": "150",
+            "xy": [
+              48,
+              1051
+            ],
+            "readme_row": "| 150 мс | T, Timing / Keyframes: возврат после клипа и интерполяция изменившегося idle yaw; D §8.3 |"
+          },
+          {
+            "text": "−45°",
+            "number": "−45",
+            "xy": [
+              1490,
+              287
+            ],
+            "readme_row": "| −45°, +45°, ±45° | T, Timing / Specific: предел idle yaw относительно оси камеры; D §8.3 |"
+          },
+          {
+            "text": "+45°",
+            "number": "+45",
+            "xy": [
+              1795,
+              285
+            ],
+            "readme_row": "| −45°, +45°, ±45° | T, Timing / Specific: предел idle yaw относительно оси камеры; D §8.3 |"
+          },
+          {
+            "text": "−90°",
+            "number": "−90",
+            "xy": [
+              1495,
+              437
+            ],
+            "readme_row": "| −90°, +90°, ±90° | T, Timing / Specific: предел атаки относительно оси камеры |"
+          },
+          {
+            "text": "+90°",
+            "number": "+90",
+            "xy": [
+              1790,
+              437
+            ],
+            "readme_row": "| −90°, +90°, ±90° | T, Timing / Specific: предел атаки относительно оси камеры |"
+          },
+          {
+            "text": "мёртвая зона ±10°",
+            "number": "±10",
+            "xy": [
+              1685,
+              464
+            ],
+            "readme_row": "| 10° (dead band) | T, Timing / Specific: мёртвая зона для idle yaw |"
+          },
+          {
+            "text": "в пределах ±45°; dead band 10°.",
+            "number": "±45",
+            "xy": [
+              1482,
+              515
+            ],
+            "readme_row": "| −45°, +45°, ±45° | T, Timing / Specific: предел idle yaw относительно оси камеры; D §8.3 |"
+          },
+          {
+            "text": "в пределах ±45°; dead band 10°.",
+            "number": "10",
+            "xy": [
+              1482,
+              515
+            ],
+            "readme_row": "| 10° (dead band) | T, Timing / Specific: мёртвая зона для idle yaw |"
+          },
+          {
+            "text": "Атака: к цели, предел ±90°.",
+            "number": "±90",
+            "xy": [
+              1482,
+              550
+            ],
+            "readme_row": "| −90°, +90°, ±90° | T, Timing / Specific: предел атаки относительно оси камеры |"
+          },
+          {
+            "text": "меньше 10° от текущего угла — угол не меняется (AN-23)",
+            "number": "10",
+            "xy": [
+              1482,
+              607
+            ],
+            "readme_row": "| 10° (dead band) | T, Timing / Specific: мёртвая зона для idle yaw |"
+          },
+          {
+            "text": "меньше 10° от текущего угла — угол не меняется (AN-23)",
+            "number": "23",
+            "xy": [
+              1482,
+              607
+            ],
+            "readme_row": "| ±10°, меньше 10°, AN-23 | [`anim.csv`, строка AN-23, колонки timing и do](../../../docs/game-design/visual/06-tasks/anim.csv): сравнение нового и текущего yaw; при разнице <10° угол не меняется, при ≥10° меняется за 150 мс. ±10° показывает порог по обе стороны текущего направления; AN-23 — идентификатор источника. Корректирующее задание уточняет изображение зоны. |"
+          },
+          {
+            "text": "Наклон 10° · без подскока",
+            "number": "10",
+            "xy": [
+              1482,
+              918
+            ],
+            "readme_row": "| 10° (dead band) | T, Timing / Specific: мёртвая зона для idle yaw |"
+          },
+          {
+            "text": "Ease по 80 мс на концах пути",
+            "number": "80",
+            "xy": [
+              1482,
+              951
+            ],
+            "readme_row": "| 80 мс (ease) | T, Sheet layout; D §8.3, ВР-12: каждый конец пути |"
+          }
+        ],
+        "unmatched": [],
+        "unmatched_count": 0
+      },
+      "expected": "Every drawn number matches a README source row; unmatched 0",
+      "note": "Coordinates distinguish duplicate occurrences; AN-23 and AN-26 are card identifiers."
+    },
+    "7_color_gray_sizes": {
+      "passed": true,
+      "measured": [
+        {
+          "size": [
+            1920,
+            1080
+          ],
+          "color": "vector/AN-26-facing-sheet.png",
+          "gray": "comparison/AN-26-facing-sheet-gray.png",
+          "present": true,
+          "drawn_natively": true,
+          "downscaled_from_master": false,
+          "purpose": "master",
+          "method": "Canvas created at this size with 2x antialias buffer, no master resize"
+        },
+        {
+          "size": [
+            1280,
+            720
+          ],
+          "color": "vector/AN-26-facing-sheet-1280x720.png",
+          "gray": "comparison/AN-26-facing-sheet-gray-1280x720.png",
+          "present": true,
+          "drawn_natively": true,
+          "downscaled_from_master": false,
+          "purpose": "working copy",
+          "method": "Canvas created at this size with 2x antialias buffer, no master resize"
+        },
+        {
+          "size": [
+            960,
+            540
+          ],
+          "color": "vector/AN-26-facing-sheet-960x540.png",
+          "gray": "comparison/AN-26-facing-sheet-gray-960x540.png",
+          "present": true,
+          "drawn_natively": true,
+          "downscaled_from_master": false,
+          "purpose": "overview",
+          "method": "Canvas created at this size with 2x antialias buffer, no master resize"
+        }
+      ],
+      "expected": "Native master 1920×1080 and working 1280×720, colour and exact Rec.709 gray",
+      "note": "960×540 is an overview, also natively drawn."
+    },
+    "8_source_and_scope": {
+      "passed": true,
+      "measured": {
+        "source_unchanged": true,
+        "outside_folder": [],
+        "checked_files": 1512
+      },
+      "expected": "source_unchanged true; outside_folder []",
+      "note": "Original source-hashes-before.json retained; full HUD hash audit rerun."
+    }
+  },
+  "fix1": {
+    "immutable_files": {
+      "_tools/draw_icons_v3_snapshot.py": true,
+      "concepts/AN-26-concept-A-unretouched.png": true,
+      "concepts/KingArthur-Idle-f00-q34-source-tile.png": true,
+      "concepts/KingArthur-LungeAttack-f00-left-source-tile.png": true,
+      "concepts/KingArthur-LungeAttack-f07-left-source-tile.png": true,
+      "concepts/Medusa-LungeAttack-f08-q34-source-tile.png": true,
+      "prompt.txt": true,
+      "silhouettes/KingArthur-Idle-f00-q34-mask.png": true,
+      "silhouettes/KingArthur-LungeAttack-f00-left-mask.png": true,
+      "silhouettes/KingArthur-LungeAttack-f07-left-mask.png": true,
+      "silhouettes/Medusa-LungeAttack-f08-q34-mask.png": true,
+      "silhouettes/tracing-records.json": true,
+      "source-hashes-before.json": true,
+      "timing-model.json": true
+    },
+    "outside_plan": [
+      {
+        "size": [
+          1920,
+          1080
+        ],
+        "plan_panel_px": [
+          1470,
+          154,
+          1872,
+          625
+        ],
+        "changed_pixels": 12712,
+        "outside_plan_changed_pixels": 0,
+        "outside_plan_pixel_identical": true,
+        "gray_outside_plan_changed_pixels": 0,
+        "gray_outside_plan_pixel_identical": true,
+        "baseline": "concepts/AN-26-concept-A-unretouched.png"
+      },
+      {
+        "size": [
+          1280,
+          720
+        ],
+        "plan_panel_px": [
+          980,
+          102,
+          1248,
+          417
+        ],
+        "changed_pixels": 6933,
+        "outside_plan_changed_pixels": 0,
+        "outside_plan_pixel_identical": true,
+        "gray_outside_plan_changed_pixels": 0,
+        "gray_outside_plan_pixel_identical": true,
+        "baseline": "concepts/fix1-baseline/AN-26-facing-sheet-1280x720.png"
+      },
+      {
+        "size": [
+          960,
+          540
+        ],
+        "plan_panel_px": [
+          735,
+          77,
+          936,
+          313
+        ],
+        "changed_pixels": 4610,
+        "outside_plan_changed_pixels": 0,
+        "outside_plan_pixel_identical": true,
+        "gray_outside_plan_changed_pixels": 0,
+        "gray_outside_plan_pixel_identical": true,
+        "baseline": "concepts/fix1-baseline/AN-26-facing-sheet-960x540.png"
+      }
+    ],
+    "plan_label_clearance": [
+      {
+        "size": [
+          1920,
+          1080
+        ],
+        "label": "КАМЕРА КЛИЕНТА",
+        "minimum_clearance_px": 14.0,
+        "passed": true
+      },
+      {
+        "size": [
+          1920,
+          1080
+        ],
+        "label": "−45°",
+        "minimum_clearance_px": 14.0,
+        "passed": true
+      },
+      {
+        "size": [
+          1920,
+          1080
+        ],
+        "label": "+45°",
+        "minimum_clearance_px": 23.345,
+        "passed": true
+      },
+      {
+        "size": [
+          1920,
+          1080
+        ],
+        "label": "−90°",
+        "minimum_clearance_px": 8.0,
+        "passed": true
+      },
+      {
+        "size": [
+          1920,
+          1080
+        ],
+        "label": "+90°",
+        "minimum_clearance_px": 7.0,
+        "passed": true
+      },
+      {
+        "size": [
+          1920,
+          1080
+        ],
+        "label": "враг",
+        "minimum_clearance_px": 21.932,
+        "passed": true
+      },
+      {
+        "size": [
+          1920,
+          1080
+        ],
+        "label": "цель",
+        "minimum_clearance_px": 12.042,
+        "passed": true
+      },
+      {
+        "size": [
+          1920,
+          1080
+        ],
+        "label": "мёртвая зона ±10°",
+        "minimum_clearance_px": 9.0,
+        "passed": true
+      },
+      {
+        "size": [
+          1280,
+          720
+        ],
+        "label": "КАМЕРА КЛИЕНТА",
+        "minimum_clearance_px": 7.0,
+        "passed": true
+      },
+      {
+        "size": [
+          1280,
+          720
+        ],
+        "label": "−45°",
+        "minimum_clearance_px": 8.0,
+        "passed": true
+      },
+      {
+        "size": [
+          1280,
+          720
+        ],
+        "label": "+45°",
+        "minimum_clearance_px": 14.142,
+        "passed": true
+      },
+      {
+        "size": [
+          1280,
+          720
+        ],
+        "label": "−90°",
+        "minimum_clearance_px": 4.0,
+        "passed": true
+      },
+      {
+        "size": [
+          1280,
+          720
+        ],
+        "label": "+90°",
+        "minimum_clearance_px": 4.0,
+        "passed": true
+      },
+      {
+        "size": [
+          1280,
+          720
+        ],
+        "label": "враг",
+        "minimum_clearance_px": 13.416,
+        "passed": true
+      },
+      {
+        "size": [
+          1280,
+          720
+        ],
+        "label": "цель",
+        "minimum_clearance_px": 7.071,
+        "passed": true
+      },
+      {
+        "size": [
+          1280,
+          720
+        ],
+        "label": "мёртвая зона ±10°",
+        "minimum_clearance_px": 4.0,
+        "passed": true
+      }
+    ],
+    "geometry": {
+      "center_px": [
+        1665,
+        424
+      ],
+      "drawn_angles_from_pixels": {
+        "idle_left": {
+          "degrees": -45.0,
+          "sample_pixels": 14
+        },
+        "idle_right": {
+          "degrees": 44.9797,
+          "sample_pixels": 92
+        },
+        "attack_left": {
+          "degrees": -90.0235,
+          "sample_pixels": 121
+        },
+        "attack_right": {
+          "degrees": 90.0,
+          "sample_pixels": 61
+        },
+        "band_left": {
+          "degrees": -43.6589,
+          "sample_pixels": 56
+        },
+        "band_right": {
+          "degrees": -23.6866,
+          "sample_pixels": 45
+        },
+        "idle_yaw": {
+          "degrees": -33.6814,
+          "sample_pixels": 84
+        }
+      },
+      "expected_angles_deg": {
+        "idle_left": -45,
+        "idle_right": 45,
+        "attack_left": -90,
+        "attack_right": 90,
+        "band_left": -43.690067525979785,
+        "band_right": -23.690067525979785,
+        "idle_yaw": -33.690067525979785
+      },
+      "tolerance_deg": 1,
+      "dead_band_total_width_deg": 19.9723,
+      "dead_band_offsets_from_idle_deg": [
+        -9.9775,
+        9.9948
+      ],
+      "measurement_note": "Left idle radial measured at r23–29 before the dead-band stroke; other radials measured over longer unobstructed segments. All samples are pixels of the final master.",
+      "nearest_enemy_yaw_deg": -40.383647906448985,
+      "nearest_enemy_difference_deg": 6.6935803804692,
+      "nearest_enemy_inside_band": true,
+      "passed": true
+    },
+    "native_speed_lane_raster_measurements": [
+      {
+        "factor": 0.5,
+        "turn": {
+          "start_px": 407,
+          "end_px": 510,
+          "raster_span_px": 103,
+          "axis_start_px": 406.90566037735846,
+          "axis_end_px": 511.50943396226415,
+          "axis_length_px": 104.6037735849057,
+          "endpoint_max_error_px": 1.5094339622641542
+        },
+        "return": {
+          "start_px": 766,
+          "end_px": 896,
+          "raster_span_px": 130,
+          "axis_start_px": 765.6094339622641,
+          "axis_end_px": 896.3641509433962,
+          "axis_length_px": 130.7547169811321,
+          "endpoint_max_error_px": 0.39056603773587995
+        }
+      },
+      {
+        "factor": 1,
+        "turn": {
+          "start_px": 407,
+          "end_px": 510,
+          "raster_span_px": 103,
+          "axis_start_px": 406.90566037735846,
+          "axis_end_px": 511.50943396226415,
+          "axis_length_px": 104.6037735849057,
+          "endpoint_max_error_px": 1.5094339622641542
+        },
+        "return": {
+          "start_px": 1020,
+          "end_px": 1150,
+          "raster_span_px": 130,
+          "axis_start_px": 1019.7094339622641,
+          "axis_end_px": 1150.4641509433964,
+          "axis_length_px": 130.75471698113222,
+          "endpoint_max_error_px": 0.464150943396362
+        }
+      },
+      {
+        "factor": 1.5,
+        "turn": {
+          "start_px": 407,
+          "end_px": 510,
+          "raster_span_px": 103,
+          "axis_start_px": 406.90566037735846,
+          "axis_end_px": 511.50943396226415,
+          "axis_length_px": 104.6037735849057,
+          "endpoint_max_error_px": 1.5094339622641542
+        },
+        "return": {
+          "start_px": 1274,
+          "end_px": 1404,
+          "raster_span_px": 130,
+          "axis_start_px": 1273.8094339622642,
+          "axis_end_px": 1404.5641509433963,
+          "axis_length_px": 130.7547169811321,
+          "endpoint_max_error_px": 0.564150943396271
+        }
+      }
+    ],
+    "prompt_map_verbatim": true,
+    "selected_variant": "AN-26/fix1-B",
+    "reference_snapshot": "fix1-before.json",
+    "image_generations": 0,
+    "tracing_proof_rgb_unchanged": true
+  }
+}
