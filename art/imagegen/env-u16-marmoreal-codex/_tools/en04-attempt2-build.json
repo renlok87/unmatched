@@ -1,0 +1,39 @@
+{
+  "shared_setup_seconds": 1.658876900008181,
+  "timings": {
+    "lantern-alpha": {
+      "mask_and_png_seconds": 0.5239,
+      "with_shared_setup_seconds": 2.1828
+    },
+    "lantern-glow": {
+      "mask_and_png_seconds": 2.0949,
+      "with_shared_setup_seconds": 3.7538
+    },
+    "sakura": {
+      "mask_and_png_seconds": 2.2782,
+      "with_shared_setup_seconds": 3.937
+    },
+    "mist": {
+      "mask_and_png_seconds": 1.9244,
+      "with_shared_setup_seconds": 3.5832
+    },
+    "petals": {
+      "mask_and_png_seconds": 2.8242,
+      "with_shared_setup_seconds": 4.4831
+    }
+  },
+  "glow_normalisation_peak_linear_Y": 1.0,
+  "mist_ramp_plate_y": [
+    2161.0,
+    2353.0,
+    2593
+  ],
+  "algorithms": {
+    "alpha": "bilinear x2 + Gaussian sigma 8/3 truncate 3; protected regions and portal zero",
+    "glow": "max(linear709(lit)-linear709(clean),0)*alpha; within EN-01 light support; peak normalised",
+    "sakura": "clean HSV hue 300..350 saturation>=.25 in continued cherry zones; explicit woody cores removed; Gaussian sigma4 truncate3, reclip to pigment",
+    "mist": "continued front-cliff; triangular vertical ramp; inward side feather32",
+    "petals": "exact uint8 grayscale disk dilation radius24, protected regions reapplied"
+  },
+  "generations": 0
+}
