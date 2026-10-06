@@ -8,6 +8,7 @@
 #include "S08AnimatedIconWidget.h"
 #include "S08ArtHudWidgets.h"
 #include "S08Team.h"
+#include "UI/S08HudDebug.h"
 #include "Blueprint/UserWidget.h"
 #include "Misc/CoreDelegates.h"
 #include "Camera/CameraActor.h"
@@ -2920,7 +2921,7 @@ void AS08FlowGameMode::HandleHudKeys() {
 
   // Art Tuner: Shift+F10 is the tuner panel (ArtTunerTick), F10 alone the debug overlay
   const bool bTunerKey = bArtTunerFlag && (PC->IsInputKeyDown(EKeys::LeftShift) || PC->IsInputKeyDown(EKeys::RightShift));
-  if (PC->WasInputKeyJustPressed(EKeys::F10) && !bTunerKey) {
+  if (PC->WasInputKeyJustPressed(EKeys::F10) && !bTunerKey && S08ArtLook::S08Markers()) {  // HB-02: -S09Markers only
     // Operator-only debug overlay (login/lobby/trace panel) during gameplay.
     bDebugPanelForced = !bDebugPanelForced;
     RefreshUi();
@@ -5297,7 +5298,8 @@ void AS08FlowGameMode::BuildUi() {
   TSharedRef<SVerticalBox> Root = SNew(SVerticalBox);
   Root->AddSlot().AutoHeight()
       [SNew(STextBlock).Text(FText::FromString(TEXT("UNMATCHED S08 grey flow (GD-028..031)")))
-           .Font(FCoreStyle::GetDefaultFontStyle("Bold", 16))];
+           .Font(FCoreStyle::GetDefaultFontStyle("Bold", 16))
+           .Visibility(S08HudDebug::Visibility())];  // HB-02: the title only with -S09Markers
 
   Root->AddSlot().AutoHeight()[SNew(SSeparator)];
   Root->AddSlot().AutoHeight()[SAssignNew(StatusLine, STextBlock)];
@@ -5785,9 +5787,10 @@ void AS08FlowGameMode::BuildLobbyPanel() {
   // GD-036: the post-duel Lobby for an authenticated user. The legacy
   // grey-flow form (login + room code + traces) stays behind F10 as the
   // operator overlay; the user-facing panel offers room entry only.
-  CommandBox->AddSlot().AutoHeight().Padding(0, 0, 0, 4)
-      [SNew(SBox).WidthOverride(220).HeightOverride(14)
-           [SNew(SColorBlock).Color(GS09LobbyPanelMarker)]];
+  if (S08ArtLook::S08Markers()) {  // HB-02: the gate marker only with -S09Markers
+    CommandBox->AddSlot().AutoHeight().Padding(0, 0, 0, 4)
+        [SNew(SBox).WidthOverride(220).HeightOverride(14)[SNew(SColorBlock).Color(GS09LobbyPanelMarker)]];
+  }
   CommandBox->AddSlot().AutoHeight().Padding(0, 0, 0, 2)
       // Title tint stays well outside +/-16 of every marker color: a gold
       // tint (255,214,0) collided with the #FFD700 result-header gate.
@@ -5922,9 +5925,10 @@ void AS08FlowGameMode::RefreshHud() {
   // the controller gates already block gameplay input, and the leave action
   // remains the only live exit. Rendered above every draft/waiting state. ----
   if (Flow.IsValid() && Flow->GetStage() == ES08Stage::Started && Flow->IsRoomAborted()) {
-    CommandBox->AddSlot().AutoHeight().Padding(0, 0, 0, 4)
-        [SNew(SBox).WidthOverride(220).HeightOverride(14)
-             [SNew(SColorBlock).Color(GS10InterruptMarker)]];
+    if (S08ArtLook::S08Markers()) {  // HB-02: the gate marker only with -S09Markers
+      CommandBox->AddSlot().AutoHeight().Padding(0, 0, 0, 4)
+          [SNew(SBox).WidthOverride(220).HeightOverride(14)[SNew(SColorBlock).Color(GS10InterruptMarker)]];
+    }
     CommandBox->AddSlot().AutoHeight().Padding(0, 0, 0, 2)
         [SNew(STextBlock).Text(FText::FromString(TEXT("MATCH INTERRUPTED")))
              .Font(FCoreStyle::GetDefaultFontStyle("Bold", 16))
@@ -6044,19 +6048,20 @@ void AS08FlowGameMode::RefreshHud() {
                            Panel.DeckCount, Panel.bDeckCountStale ? TEXT("~") : TEXT(""),
                            Panel.Discard.Num());
   };
+  const bool bDebugLines = S08ArtLook::S08Markers();  // HB-02 (VR-H16): you:/opponent:/seq= lines only with -S09Markers
   if (Own) {
-    PanelsBox->AddSlot().AutoHeight()
+    if (bDebugLines) PanelsBox->AddSlot().AutoHeight()
         [SNew(STextBlock).Text(FText::FromString(PanelLine(TEXT("you"), *Own)))
              .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14))];
     if (!TurnHudTrackers()) AddActionTrackerRow(false);  // DE-022 (01 F-12): own tracker, always (DE-023: the portrait)
   }
   if (const FS09PlayerPanel* Opponent = Hud.OpponentPanel()) {
-    PanelsBox->AddSlot().AutoHeight()
+    if (bDebugLines) PanelsBox->AddSlot().AutoHeight()
         [SNew(STextBlock).Text(FText::FromString(PanelLine(TEXT("opponent"), *Opponent)))
              .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14))];
     AddOpponentPanelLines();  // MS-T-17 (MS-S-11): "Opponent is planning a maneuver" by the opponent's line
   }
-  PanelsBox->AddSlot().AutoHeight()
+  if (bDebugLines) PanelsBox->AddSlot().AutoHeight()
       [SNew(STextBlock)
            .Text(FText::FromString(FString::Printf(
                TEXT("seq=%d phase=%s turn=%s actions=%d"),
@@ -6192,6 +6197,7 @@ void AS08FlowGameMode::RefreshHud() {
   const bool bDraft = CommandUi.Mode == ES09CommandMode::ManeuverDraft;
   const bool bDiscard = CommandUi.Mode == ES09CommandMode::DiscardDraft;
   auto AddMarker = [this](const FLinearColor& Color) {
+    if (!S08ArtLook::S08Markers()) return;  // HB-02 (VR-35): the pixel gate markers only with -S09Markers
     CommandBox->AddSlot().AutoHeight().Padding(0, 0, 0, 4)
         [SNew(SBox).WidthOverride(220).HeightOverride(14)
              [SNew(SColorBlock).Color(Color)]];
@@ -6982,19 +6988,22 @@ void AS08FlowGameMode::RefreshHud() {
       // owner (applied snapshot), never a fixed timer.
       AddLine(TEXT("VS_AI: the server bot is acting - waiting for its move"));
     }
-    AddLine(FString::Printf(TEXT("seq=%d - waiting for the authoritative stream"),
-                            Hud.SequenceNumber));
+    if (S08ArtLook::S08Markers()) {  // HB-02: the seq= line only with -S09Markers
+      AddLine(FString::Printf(TEXT("seq=%d - waiting for the authoritative stream"), Hud.SequenceNumber));
+    }
   }
 }
 
 void AS08FlowGameMode::RefreshUi() {
   UpdateLegacyRootVisibility();
+  // HB-02: the command echo and AUTO toasts only with -S09Markers; a toast without text is not drawn at all
+  const FString ShownToast = S08HudDebug::PlayerToast(Toast);
   if (ToastHudLine.IsValid()) {
-    ToastHudLine.Pin()->SetText(FText::FromString(Toast));
+    ToastHudLine.Pin()->SetText(FText::FromString(ShownToast));
   }
   if (ToastHudBorder.IsValid()) {
     ToastHudBorder.Pin()->SetVisibility(
-        Toast.IsEmpty() ? EVisibility::Collapsed : EVisibility::Visible);
+        ShownToast.IsEmpty() ? EVisibility::Collapsed : EVisibility::Visible);
   }
   if (StatusLine.IsValid()) {
     const TCHAR* Names[] = {TEXT("BOOT"), TEXT("LOGIN done"), TEXT("LOBBY"), TEXT("ROOM"),

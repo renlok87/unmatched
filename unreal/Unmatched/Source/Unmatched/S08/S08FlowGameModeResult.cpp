@@ -10,10 +10,12 @@
 //     portraits come back (the fallen hero's heart), the gameplay panels stay collapsed, input stays dead (GD-036).
 //   - The GD-036 pixel-gate markers (#FFD700 / #FF0064 / #00FFA0 / #8000FF, one per required element) are the thin
 //     stripe at the top of the panel: tools/s09/run-duel-demo.ps1 and tools/s10/run-vs-ai-demo.ps1 keep gating them.
+//     HB-02 (04-hud-spec s5.2 H0b, VR-35): the stripe is drawn only with -S09Markers (the gates pass it).
 // Trace: 'RESULT summary ...' (once per distinct summary) and 'RESULT view ...' (S09/S09ResultScreen.h).
 #include "S08FlowGameMode.h"
 
 #include "S08ArtHudStyle.h"
+#include "S08ArtLook.h"
 #include "S08BoardActor.h"
 #include "S08Team.h"
 #include "S08TraceLog.h"
@@ -32,6 +34,7 @@
 #include "Widgets/Layout/SBox.h"
 #include "Widgets/Layout/SConstraintCanvas.h"
 #include "Widgets/SBoxPanel.h"
+#include "Widgets/SNullWidget.h"
 #include "Widgets/SOverlay.h"
 #include "Widgets/Text/STextBlock.h"
 
@@ -68,6 +71,7 @@ const FSlateBrush* DiscBrush(bool bOuter) {
 FSlateFontInfo CardFont(int32 Size) { return FS08ArtHudFontToken(S08ArtHudFonts::CardTypeface, Size).Resolve(); }
 
 TSharedRef<SWidget> MarkerStripe() {
+  if (!S08ArtLook::S08Markers()) return SNullWidget::NullWidget;  // HB-02: the gate stripe only with -S09Markers
   TSharedRef<SHorizontalBox> Row = SNew(SHorizontalBox);
   for (const FLinearColor& Color : {GResultScreenMarker, GResultOutcomeMarker, GResultSupportMarker, GResultButtonMarker}) {
     Row->AddSlot().AutoWidth()[SNew(SBox).WidthOverride(GMarkerW).HeightOverride(GMarkerH)[SNew(SColorBlock).Color(Color)]];
@@ -190,7 +194,8 @@ void AS08FlowGameMode::RebuildResultScreen() {
                .BorderBackgroundColor(FSlateColor(Srgb(0x0B, 0x0E, 0x18, 0.96f)))
                .Padding(FMargin(32.0f, 20.0f, 32.0f, 24.0f))
                [SNew(SVerticalBox) +
-                SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Center).Padding(0.0f, 0.0f, 0.0f, 14.0f)[MarkerStripe()] +
+                SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Center)
+                    .Padding(0.0f, 0.0f, 0.0f, S08ArtLook::S08Markers() ? 14.0f : 0.0f)[MarkerStripe()] +
                 SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Center)
                     [SNew(STextBlock).Text(FText::FromString(ResultSummary.Outcome)).Font(CardFont(48))
                          .ColorAndOpacity(FSlateColor(OutcomeTint))

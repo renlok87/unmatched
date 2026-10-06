@@ -270,9 +270,9 @@ bool FS08ArtLookActorTest::RunTest(const FString&) {
   return true;
 }
 
-// VS-1 HB-01 (04-hud-spec §5.2 step H0a, ВР-35): the -S09Markers debug layer of the S09/S10 gates - the flag is parsed
-// from the real command line, the default of the step holds, the ARTLOOK line carries markers=0|1, the flag is not an
-// alias and changes nothing of the art look.
+// VS-1 HB-01 / HB-02 (04-hud-spec §5.2 steps H0a / H0b, ВР-35): the -S09Markers debug layer of the S09/S10 gates - the
+// flag is parsed from the real command line, the layer is OFF by default since H0b (HB-02), the ARTLOOK line carries
+// markers=0|1, the flag is not an alias and changes nothing of the art look.
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08ArtLookMarkersFlagTest,
     "Unmatched.S08.ArtLook.MarkersFlag the gate debug layer: S09Markers parsed, the step default and the markers field of ARTLOOK",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
@@ -284,15 +284,15 @@ bool FS08ArtLookMarkersFlagTest::RunTest(const FString&) {
   }
   TestEqual("debug layer flag", FString(S08ArtLook::MarkersFlagName), FString(TEXT("S09Markers")));
   TestTrue("rule: -S09Markers draws the debug layer", S08ArtLook::DecideMarkers(true));
-  // step H0a: the layer stays on without the flag - the player's view does not change yet (HB-02 turns it off)
-  TestTrue("H0a: the default is on", S08ArtLook::MarkersDefault);
-  TestTrue("rule: H0a without the flag - on", S08ArtLook::DecideMarkers(false));
+  // step H0b (HB-02): without the flag the player sees no debug layer
+  TestFalse("H0b: the default is off", S08ArtLook::MarkersDefault);
+  TestFalse("rule: H0b without the flag - off", S08ArtLook::DecideMarkers(false));
   {
     FCommandLineScope Cmd(TEXT(""));
-    TestTrue("no flag: H0a default on", S08ArtLook::S08Markers());
+    TestFalse("no flag: H0b default off", S08ArtLook::S08Markers());
     const FString Line = S08ArtLook::TraceLine();
     AddInfo(Line);
-    TestTrue(FString::Printf(TEXT("no flag traced markers=1: %s"), *Line), Line.Contains(TEXT(" markers=1 aliases=-")));
+    TestTrue(FString::Printf(TEXT("no flag traced markers=0: %s"), *Line), Line.Contains(TEXT(" markers=0 aliases=-")));
   }
   {
     FCommandLineScope Cmd(TEXT("-S09Markers"));
@@ -312,7 +312,13 @@ bool FS08ArtLookMarkersFlagTest::RunTest(const FString&) {
     S08ArtLook::SetMarkersOverrideForTest(true);
     TestTrue("override on", S08ArtLook::S08Markers());
   }
-  TestTrue("the scope reset the override", S08ArtLook::S08Markers() == S08ArtLook::MarkersDefault);
+  {
+    FCommandLineScope Cmd(TEXT(""));
+    S08ArtLook::SetMarkersOverrideForTest(true);
+    TestTrue("override on without the flag", S08ArtLook::S08Markers());
+    TestTrue("override on traced", S08ArtLook::TraceLine().Contains(TEXT(" markers=1 ")));
+  }
+  TestFalse("the scope reset the override: off again", S08ArtLook::S08Markers());
   return true;
 }
 
