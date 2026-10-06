@@ -706,11 +706,15 @@ void AS08FlowGameMode::NoteAudioInput() { AudioLastInputMs = NowMs(); }
 void AS08FlowGameMode::AudioOnStage(ES08Stage OldStage, ES08Stage NewStage) {
   TArray<FString> Lines;
   if (OldStage == ES08Stage::Started && NewStage != ES08Stage::Started) StopAudioRecording(TEXT("leave"));
-  if (OldStage == ES08Stage::Room && NewStage == ES08Stage::Started) {
-    PlayBankSfx(TEXT("UI-ROOM-COUNT-GO"), TEXT("UI"), TEXT("room"));  // the match begins (no countdown in the room)
+  // the match begins: the host's countdown screen (SC-18) plays UI-ROOM-COUNT-GO itself at its end; the guest has no
+  // countdown - the start sounds here unless the screen played it just before
+  if (OldStage == ES08Stage::Room && NewStage == ES08Stage::Started && NowMs() - AudioRoomCountGoMs > 8000) {
+    PlayBankSfx(TEXT("UI-ROOM-COUNT-GO"), TEXT("UI"), TEXT("room"));
   }
-  // the menu theme outside the match: the lobby full, the room quiet (no drums) while the players get ready
-  if (!bBench && (NewStage == ES08Stage::Lobby || NewStage == ES08Stage::Room) && OldStage != NewStage) {
+  // the menu theme outside the match from the end of BOOT on (visual SC-03): the login and the lobby full, the room
+  // quiet (no drums) while the players get ready
+  if (!bBench && (NewStage == ES08Stage::Login || NewStage == ES08Stage::Lobby || NewStage == ES08Stage::Room) &&
+      OldStage != NewStage) {
     Music.Menu(NowMs(), NewStage == ES08Stage::Room, Lines);
   }
   if (OldStage == ES08Stage::Login || OldStage == ES08Stage::Boot) {
@@ -952,6 +956,7 @@ void AS08FlowGameMode::PlayScreenSound(FName BankId) {
     FS08Trace::Write(FString::Printf(TEXT("AUDIO-SCREEN unknown bank=%s"), *Id));
     return;
   }
+  if (Id == TEXT("UI-ROOM-COUNT-GO")) AudioRoomCountGoMs = NowMs();  // the stage change does not repeat it
   PlayBankSfx(Id, Id.StartsWith(TEXT("STG-")) ? TEXT("Music") : TEXT("UI"), TEXT("screen"));
 }
 

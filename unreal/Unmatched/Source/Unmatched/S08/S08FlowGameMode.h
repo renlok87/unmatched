@@ -596,6 +596,7 @@ private:
   bool bAudioStreamSeenReady = false;
   bool bAudioNetLost = false;
   int64 AudioStreamDownSinceMs = -1;
+  int64 AudioRoomCountGoMs = MIN_int64 / 2;  // the countdown screen played the start (SC-18)
   /** BRD-CANDIDATES: a maneuver draft opened with more than one figure to move (once per pendingManeuver.id). */
   void AudioOnDraftOpen(const FString& ManeuverId, int32 Movable);
   /** BRD-PUSH: the enemy figures an EFFECT trail of this seq moved (their step sounds get the push whistle). */
