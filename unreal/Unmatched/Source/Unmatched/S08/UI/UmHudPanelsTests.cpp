@@ -58,7 +58,9 @@ struct FRu {
   FRu() {
     FInternationalization::Get().BackupCultureState(Snapshot);
     FInternationalization::Get().SetCurrentLanguageAndLocale(TEXT("ru"));
+#if WITH_EDITOR  // the preview API exists only WITH_EDITOR; the game target reads Culture=ru itself
     FTextLocalizationManager::Get().EnableGameLocalizationPreview(TEXT("ru"));
+#endif
     FTextLocalizationManager::Get().WaitForAsyncTasks();
   }
   ~FRu() { FInternationalization::Get().RestoreCultureState(Snapshot); }
