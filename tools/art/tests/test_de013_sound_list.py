@@ -45,10 +45,18 @@ class SoundListTest(unittest.TestCase):
     def test_cli_check_passes(self):
         self.assertEqual(D.main(["check"]), 0)
 
-    def test_nothing_acquired_yet(self):
-        # DE-013 is a list only: no downloads and no imports until ART-010 / DE-032.
+    def test_nothing_acquired_from_the_list(self):
+        # DE-013 is a list only: nothing from it was downloaded. The game sounds were generated instead (AU-PROD,
+        # docs/game-design/audio/07-production-log.md) and imported by AU-UE, so a CUE is either present with a
+        # /Game/Audio sound or missing with a reason.
         self.assertTrue(all(s["acquired"] is False for s in self.data["sounds"]))
-        self.assertTrue(all(c["sfx"]["status"] == "missing" for c in self.cue_table["cues"]))
+        for cue in self.cue_table["cues"]:
+            sfx = cue["sfx"]
+            if sfx["status"] == "present":
+                self.assertTrue(str(sfx["sound"]).startswith("/Game/Audio/"), cue["id"])
+            else:
+                self.assertEqual(sfx["status"], "missing", cue["id"])
+                self.assertTrue(sfx.get("missing_reason"), cue["id"])
 
     def test_every_primary_is_a_free_download(self):
         sources = {s["id"]: s for s in self.data["sources"]}

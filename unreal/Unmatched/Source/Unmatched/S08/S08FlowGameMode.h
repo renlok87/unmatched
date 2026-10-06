@@ -569,6 +569,7 @@ private:
    *  login success / failure plays its UI sound. */
   void AudioOnStage(ES08Stage OldStage, ES08Stage NewStage);
   void ResetAudioMatch();
+  void StopMatchVoice(const TCHAR* Reason);
   /** FX-GAZE-REQUEST: an own Medusa gaze head opened (it sounds once the combat staging is over). */
   void AudioOnPendingOpen(const FString& HeadId);
   /** The own pending head was answered: FX-GAZE-BEAM (CUE-014) when the gaze was used, FX-GAZE-DECLINE when declined. */

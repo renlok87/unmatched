@@ -149,7 +149,7 @@ void AS08FlowGameMode::InitAudioRuntime() {
                                                               .ShadowOffset(FVector2D(1.5f, 1.5f))
                                                               .ShadowColorAndOpacity(FLinearColor(0, 0, 0, 0.85f))
                                                               .Justification(ETextJustify::Center)
-                                                              .AutoWrapText(true)];
+                                                              .WrapTextAt(900.0f)];
     GEngine->GameViewport->AddViewportWidgetContent(SubtitleBox.ToSharedRef(), 40);
   }
 }
@@ -705,7 +705,10 @@ void AS08FlowGameMode::NoteAudioInput() { AudioLastInputMs = NowMs(); }
 
 void AS08FlowGameMode::AudioOnStage(ES08Stage OldStage, ES08Stage NewStage) {
   TArray<FString> Lines;
-  if (OldStage == ES08Stage::Started && NewStage != ES08Stage::Started) StopAudioRecording(TEXT("leave"));
+  if (OldStage == ES08Stage::Started && NewStage != ES08Stage::Started) {
+    StopAudioRecording(TEXT("leave"));
+    StopMatchVoice(TEXT("leave"));
+  }
   // the match begins: the host's countdown screen (SC-18) plays UI-ROOM-COUNT-GO itself at its end; the guest has no
   // countdown - the start sounds here unless the screen played it just before
   if (OldStage == ES08Stage::Room && NewStage == ES08Stage::Started && NowMs() - AudioRoomCountGoMs > 8000) {
@@ -725,6 +728,25 @@ void AS08FlowGameMode::AudioOnStage(ES08Stage OldStage, ES08Stage NewStage) {
     if (NewStage == ES08Stage::Failed) PlayBankSfx(TEXT("UI-LOGIN-ERR"), TEXT("UI"), TEXT("login"));
   }
   WriteCueLines(Lines);
+}
+
+void AS08FlowGameMode::StopMatchVoice(const TCHAR* Reason) {
+  // the match is left (the result screen -> the lobby): its line, its subtitle and its queued sounds end with it
+  const int64 Now = NowMs();
+  const int32 Dropped = DelayedSounds.Num();
+  DelayedSounds.Reset();
+  PendingHits.Reset();
+  const bool bWasPlaying = bVoPlaying;
+  if (VoAudio) VoAudio->Stop();
+  if (bVoPlaying) {
+    bVoPlaying = false;
+    Vo.Finished(Now);
+    Music.SetVoActive(false, Now);
+  }
+  if (SubtitleBox.IsValid()) SubtitleBox->SetVisibility(EVisibility::Collapsed);
+  SubtitleUntilMs = 0;
+  FS08Trace::Write(FString::Printf(TEXT("VO stop reason=%s playing=%d dropped=%d t=%lld"), Reason, bWasPlaying ? 1 : 0,
+                                   Dropped, static_cast<long long>(Now)));
 }
 
 void AS08FlowGameMode::ResetAudioMatch() {

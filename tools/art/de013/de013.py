@@ -4,8 +4,9 @@
     python tools/art/de013/de013.py table      # print the role -> primary source table (for CREDITS-audio.md)
 
 The list lives in docs/art-pipeline/audio/de013-sound-list.json, the human-readable credits in
-docs/art-pipeline/CREDITS-audio.md. The importer (ART-010 / DE-032, GD-049) takes the files from here; until then
-every CUE keeps sfx.status = missing in docs/unreal/contracts/cue-dispatcher/cue-table.json.
+docs/art-pipeline/CREDITS-audio.md. Nothing from the list was downloaded: the game sounds were generated instead
+(AU-PROD, docs/game-design/audio/07-production-log.md), and AU-UE set the CUE statuses in
+docs/unreal/contracts/cue-dispatcher/cue-table.json.
 
 Rules checked (07 A04 exit criterion "every sound has a licence and a source", backlog DE-013 acceptance):
 - every sound names a primary source and every source has a licence, a licence URL and an http(s) source URL;
