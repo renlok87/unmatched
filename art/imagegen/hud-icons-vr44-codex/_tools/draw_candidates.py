@@ -9,7 +9,7 @@ import draw_icons_v3_snapshot as v3
 
 PALETTE = ['#061623','#F9EBDB','#FAF8F2','#111317']
 SIZES = [1024,16,21,24,32,48,64,96]
-HOTSPOT_U = (8,3)
+HOTSPOT_U = (11,2)
 
 def polygon(ctx, sp, pts, col=None):
     v3.poly(ctx, [(sp.sx(x),sp.sy(y)) for x,y in pts])
@@ -46,22 +46,29 @@ def draw_card_drop(ctx,sp):
     v3.glyph(ctx,sp,16,16,lambda:g_card_drop(ctx,sp))
 
 def log_rects(sp):
-    x=sp.snap(8.375); bw=sp.pxu(2.75); gap=sp.pxu(1.5)
-    for cy in [11.5,16,20.5]:
-        yield (x,sp.snap(cy-bw/2),bw,bw)
-        yield (x+bw+gap,sp.snap(cy-sp.W/2),sp.pxu(11),sp.W)
+    xpx=sp.px(8.375); bwpx=sp.px(2.75); gap=sp.px(1.5)
+    center=sp.px(16); pitch=sp.px(4.5)
+    centers=([sp.px(13),sp.px(19)] if sp.detail == 0 else [center-pitch,center,center+pitch])
+    # Integer pixel arithmetic avoids half-pixel float ties collapsing the last
+    # bullet gap at 21 px. Same snapped pitch for both bullets and lines.
+    for cy in centers:
+        yield (xpx/sp.k,(cy-bwpx//2)/sp.k,bwpx/sp.k,bwpx/sp.k)
+        yield ((xpx+bwpx+gap)/sp.k,(cy-sp.px(2.25)//2)/sp.k,sp.pxu(11),sp.W)
 
-def draw_log(ctx,sp):
-    boxes=list(log_rects(sp))
-    for x,y,w,h in boxes:
-        ctx.rectangle(x-sp.K,y-sp.K,w+2*sp.K,h+2*sp.K)
-    v3.fill(ctx,v3.C['keyline'])
-    for x,y,w,h in boxes: ctx.rectangle(x,y,w,h)
+def g_log(ctx,sp):
+    # Absolute snapping, translated by glyph(); no per-line keyline or seam.
+    for x,y,w,h in log_rects(sp): ctx.rectangle(x-16,y-16,w,h)
     v3.fill(ctx,v3.C['glyph'])
 
-HAND = [(5,3),(11,3),(17,13),(17,10),(21,10),(22,13),(25,14),
-        (27,18),(27,24),(23,29),(15,29),(9,25),(4,19),(4,16),
-        (7,15),(12,20),(10,15)]
+def draw_log(ctx,sp):
+    v3.token(ctx,v3.disc_sil(sp),sp)
+    v3.glyph(ctx,sp,16,16,lambda:g_log(ctx,sp))
+
+# Prototype upper hand retained. Long/oblique wrist edges become short 45-degree
+# chamfers (3*sqrt(2) u each); all other edges are horizontal or vertical.
+HAND = [(7,2),(15,2),(15,11),(20,11),(20,13),(24,13),(24,15),
+        (28,15),(28,27),(25,30),(11,30),(8,27),(8,25),(5,22),
+        (3,22),(3,17),(7,17)]
 
 def draw_pointer(ctx,sp):
     # Offset of one silhouette; cursor keyline is the explicit 2-u exception.
@@ -113,7 +120,17 @@ def render(name,size):
     elif name=='menu': draw_menu(ctx,sp)
     elif name=='plain-arrow': draw_arrow(ctx,sp)
     else: return v3.render(name,size)
-    return exact_palette(v3.to_pil(surf))
+    im=v3.to_pil(surf)
+    if name=='pointer':
+        # The cursor has two roles only. Quantize Cairo's inner AA samples
+        # against those roles before the unchanged shared palette stage.
+        a=np.array(im)
+        tones=np.array([[17,19,23],[250,248,242]],dtype=np.int32)
+        rgb=a[...,:3].astype(np.int32)
+        ix=((rgb[:,:,None,:]-tones[None,None,:,:])**2).sum(3).argmin(2)
+        a[...,:3]=tones[ix]
+        im=Image.fromarray(a,'RGBA')
+    return exact_palette(im)
 
 def gray(im):
     a=np.array(im.convert('RGBA'))
@@ -127,7 +144,9 @@ def features(size):
     return {'W_px':sp.px(2.25),'keyline_px':sp.px(1),
             'edge_px':sp.px(1.25),'cursor_keyline_px':sp.px(2),
             'log_bullet_px':sp.px(2.75),'log_bullet_line_gap_px':sp.px(1.5),
-            'log_line_vertical_gap_px':min(round((boxes[i+2][1]-(boxes[i][1]+boxes[i][3]))*sp.k) for i in [1,3]),
+            'log_line_vertical_gap_px':min(round((boxes[i+2][1]-(boxes[i][1]+boxes[i][3]))*sp.k) for i in range(1,len(boxes)-2,2)),
+            'log_bullet_vertical_gap_px':min(round((boxes[i+2][1]-(boxes[i][1]+boxes[i][3]))*sp.k) for i in range(0,len(boxes)-2,2)),
+            'log_rows':len(boxes)//2,
             'end_turn_tip_bar_gap_px':round((sp.snap(20.75)-sp.snap(19.25))*sp.k),
             'card_stack_gap_px':sp.px(1),'card_stack_plate_px':sp.px(3) if sp.detail else 1,
             'optional_pointer_crease':False}

@@ -17,7 +17,12 @@
     "comparison/log-1024-color.png",
     "comparison/pointer-1024-gray.png"
   ],
-  "recommended_variants": {"end-turn": "vector A", "card-drop": "vector A", "log": "vector A", "pointer": "vector A"},
+  "recommended_variants": {
+    "end-turn": "vector A",
+    "card-drop": "vector A",
+    "log": "vector A",
+    "pointer": "vector A"
+  },
   "working_sizes": {
     "24": "Стоп-черта отделена от стрелки; две скошенные карты видны; три квадратных маркера отличают журнал; рука различается с обычной стрелкой. На креме keyline держит контур.",
     "32": "Все четыре формы и их отрицательные промежутки различимы на трёх фонах, в том числе в сером.",
@@ -32,5 +37,75 @@
     "pointer A помещён генератором в круглый медальон, хотя нужен курсор. Медальон сохранён в оригинале и полностью отсутствует в векторе.",
     "На пересобранном фоне у части концептов остаются следы тональной неоднородности и сглаженной внешней границы; это недостаток review-only извлечения фона, а не финального вектора."
   ],
-  "verdict": "Векторные формы предложены для ревью Claude; runtime-проверка и арт-приёмка в этой задаче не заявлены."
+  "verdict": "Векторные формы предложены для ревью Claude; runtime-проверка и арт-приёмка в этой задаче не заявлены.",
+  "fix1": {
+    "plan": "CX-04r",
+    "complete": true,
+    "reviewed_at": "2026-10-06T06:51:32.050252+00:00",
+    "review_method": "Opened PNGs with view_image. Focus sheets read actual saved 24/32/48 RGBA and gray exports, composite all three backgrounds, and enlarge exactly x4 nearest. Also opened all six A/B/vector working sheets, four new master comparison sheets, both master exports in colour and gray, both overviews, both neighbour sheets and all-export audit. Old base review is historical.",
+    "opened_sheets": [
+      "comparison/fix1-log-24-32-48-x4.png",
+      "comparison/fix1-pointer-24-32-48-x4.png",
+      "comparison/compare-24-color.png",
+      "comparison/compare-24-gray.png",
+      "comparison/compare-32-color.png",
+      "comparison/compare-32-gray.png",
+      "comparison/compare-48-color.png",
+      "comparison/compare-48-gray.png",
+      "comparison/log-1024-color.png",
+      "comparison/log-1024-gray.png",
+      "comparison/pointer-1024-color.png",
+      "comparison/pointer-1024-gray.png",
+      "comparison/vector-overview-color.png",
+      "comparison/vector-overview-gray.png",
+      "comparison/neighbours-gray-navy-compact.png",
+      "comparison/neighbours-gray-18-24-32.png",
+      "comparison/export-audit-all-64.png",
+      "vector/1024/log.png",
+      "vector/1024/log-gray.png",
+      "vector/1024/pointer.png",
+      "vector/1024/pointer-gray.png"
+    ],
+    "opened_sha256": {
+      "comparison/fix1-log-24-32-48-x4.png": "f6483e0f8a0a28994f8f1c86c4e2ff279e22e59f35a8cbacbe142f62c2f14984",
+      "comparison/fix1-pointer-24-32-48-x4.png": "12a9ada4238f5e7e6e4207278824a3b81b4929c40547e99cc0447d845e155a0e",
+      "comparison/compare-24-color.png": "c06c608144326c3aa186a6015f9c187af01510c581ab23046061e0f98a15b1d1",
+      "comparison/compare-24-gray.png": "9cab128d8dad61ae577761e2dda9a722fd2ea845cf87f9672f5d225e8c518d19",
+      "comparison/compare-32-color.png": "9b22dcdd2c36acf5506a8ab9f804bad096d8a4d1d9f8eeb7312d0499fb839c1b",
+      "comparison/compare-32-gray.png": "35ffa85436567a6d20b40f5efa38362382c243ea511cfaad224ad863c6ef2bb2",
+      "comparison/compare-48-color.png": "e216286bf0dbff2a6a777b529337d99acde6b3222c52af640d3960e6c0db5f6d",
+      "comparison/compare-48-gray.png": "4cfb152681c0c12c314bb4773187c11dbb91b50cc86a902f043102a7b75e37a7",
+      "comparison/log-1024-color.png": "849365dc6d8dc49555d9e2f97ec2ce5d05ecd9e8b6e39084a20dc44690d41038",
+      "comparison/log-1024-gray.png": "0de3df6753f9bd304465c930aa61a27c49cd037df0b1a13a4077a3cf2715fd25",
+      "comparison/pointer-1024-color.png": "da03a90c7e3d187b07e860bde76f6d987adbdb63edbae7a54fb60836f53cd98c",
+      "comparison/pointer-1024-gray.png": "705adc1074c5965339496fd7b201989151f18c44cf8f55a75340a292f4af3275",
+      "comparison/vector-overview-color.png": "cfff2756d63d07670d288e75725c7bb507a62b65433d0c1eeedc464e7e7ea9c3",
+      "comparison/vector-overview-gray.png": "e55a19fa837bab690c3f1dd8c456e5b13d6e1e8ab522b69fc41962383d277040",
+      "comparison/neighbours-gray-navy-compact.png": "1954eefbf27e8b311c0bf52ffc39dc62974a583d10de3e6ee2ea85dfcb8825c2",
+      "comparison/neighbours-gray-18-24-32.png": "2be0801c3b44417c14732a0006dd605a677b27568f0aa2afc911ed270fc937eb",
+      "comparison/export-audit-all-64.png": "0539ada2e6d71229a3b83ccd5f6d20dc73df4a618e1055302cd7a43db572c89d",
+      "vector/1024/log.png": "6370dbf7e38cfa207da694fea7b38383665a452061f50ea8af0ca52dd7c78f19",
+      "vector/1024/log-gray.png": "2b4db74dfd2f0a2fa05bfe8ce256c004af14af79d9aa8df7daf76b0665c9751c",
+      "vector/1024/pointer.png": "0a3d47267ae82c4985c2c48d38b05d7197336e0a937c4fe71756b9ec53d86047",
+      "vector/1024/pointer-gray.png": "6944c8dc912dced6836e81e41386998c0a7ecd10f82ccb0ab6e833b3266bf75a"
+    },
+    "working_sizes": {
+      "24": "Журнал: три маркера и три строки на диске, чистые промежутки, контур виден на cream и gray. Рука: вертикальный палец, ступени справа и выступ большого пальца слева, белый палец 2 px. Всё открыто в цвете и сером на navy/cream/#808080 при nearest ×4.",
+      "32": "Журнал: та же дисковая семья, маркеры отделены от строк, визуально отличается от end-turn и BOOST по ядру. Рука имеет белый палец 4 px, без острого вытянутого диагонального кончика; читается указателем на трёх фонах и в сером.",
+      "48": "Журнал: шесть раздельных белых частей, navy между ними без keyline-швов. Рука: ясный вертикальный палец, три ступени, короткие скосы запястья, без прорези-отверстия; на cream внешняя граница сохраняется.",
+      "16_21": "16 px — диагностический: журнал упрощён до двух строк, печать близка к кольцу; рука грубее. На 21 px три маркера и строки раздельны после исправления целочисленного шага."
+    },
+    "masters": "1024 masters and colour/gray comparison sheets opened. Log has the end-turn disc and no outlines around print. Pointer outer edges are orthogonal/short 45-degree chamfers; inner concave corners round naturally under the unchanged Poly.path offset, not a separately added detail.",
+    "gray_neighbours": "Журнал отличим от resource-card, menu, end-turn и state-boost на 18/24/32 px; pointer отличим от plain-arrow. Ядро диска проверяется отдельно от общего кольца.",
+    "failed_attempts": [
+      "Независимый снэп центров сливал два маркера на 21 px; исправлен шаг в целых пикселях.",
+      "Первый вариант машинного выделения маркеров ошибочно относил строки к маркерам; классификация исправлена по правой границе маркера.",
+      "Общая палитра назначала части сглаженных границ руки cream/navy; курсор квантуется к двум своим тонам до неизменённого exact_palette."
+    ],
+    "image_generations": 0,
+    "status": "предложено",
+    "verdict": "Корректирующий пакет предложен для ревью Claude. Все рабочие образцы осмотрены; приёмка и runtime-перенос остаются следующими задачами.",
+    "final_palette_review": "After cursor two-tone quantization, reopened all 16 changed PNGs (focus, six working comparisons, two pointer master sheets, two overviews, two neighbour sheets, export audit and pointer colour/gray master). Shape and alpha unchanged; all backgrounds and grayscale remain readable.",
+    "external_input_issue": "02-visual-design.md changed since step 0 without any write to it from this run. Immutable baseline retained; source_unchanged must honestly fail. Protected package files and v3 remain unchanged."
+  }
 }

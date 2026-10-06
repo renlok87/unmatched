@@ -2,6 +2,8 @@
 import sys
 sys.dont_write_bytecode=True
 import json
+import hashlib
+from io import BytesIO
 from pathlib import Path
 import numpy as np
 from scipy import ndimage
@@ -11,10 +13,15 @@ import draw_candidates as d
 PKG=Path(__file__).resolve().parents[1]
 BGS=[('navy','#061623'),('cream','#F9EBDB'),('board-gray','#808080')]
 FONT=ImageFont.truetype('C:/Windows/Fonts/arial.ttf',18)
+PROTECTED=json.loads((PKG/'fix1-baseline.json').read_text(encoding='utf-8'))['protected_package_files']
 
 def save(im,path):
     target=(PKG/path).resolve()
     assert target.is_relative_to(PKG)
+    if target.relative_to(PKG).as_posix() in PROTECTED:
+        buf=BytesIO(); im.save(buf,format='PNG')
+        assert hashlib.sha256(buf.getvalue()).hexdigest()==PROTECTED[target.relative_to(PKG).as_posix()]
+        return  # Accepted files are checked but never rewritten.
     target.parent.mkdir(parents=True,exist_ok=True)
     im.save(target)
 
@@ -68,7 +75,7 @@ def working(size,gray=False):
 GROUPS={
  'end-turn':['end-turn','state-boost','action-attack','action-defense','action-maneuver','action-scheme'],
  'card-drop':['card-drop','state-pending-place'],
- 'log':['log','resource-card','menu'],
+ 'log':['log','resource-card','menu','end-turn','state-boost'],
  'pointer':['pointer','plain-arrow'],
 }
 
@@ -109,17 +116,34 @@ def vector_overview():
     save(out,'comparison/vector-overview-color.png')
     save(d.gray(out),'comparison/vector-overview-gray.png')
 
+def fix1_focus():
+    # Actual saved PNGs, at exactly x4 nearest; each of the 36 required samples.
+    for name in ['log','pointer']:
+        out=Image.new('RGBA',(1320,750),'#20232A'); draw=ImageDraw.Draw(out)
+        for bi,(bgn,bg) in enumerate(BGS):
+            for gi,isgray in enumerate([False,True]):
+                for si,size in enumerate([24,32,48]):
+                    x=(gi*3+si)*220; y=bi*250
+                    draw.text((x+8,y+8),f'{name} {size}px {"gray" if isgray else "color"}',font=FONT,fill='white')
+                    draw.text((x+8,y+32),bgn,font=FONT,fill='white')
+                    suffix='-gray' if isgray else ''
+                    asset=Image.open(PKG/f'vector/{size}/{name}{suffix}.png').convert('RGBA')
+                    im=panel(asset,size,bg,isgray)
+                    out.alpha_composite(im.resize((size*4,size*4),Image.Resampling.NEAREST),(x+8,y+56))
+        save(out,f'comparison/fix1-{name}-24-32-48-x4.png')
+
 def main():
     for size in d.SIZES:
         for name in d.CANDIDATES:
             im=d.render(name,size)
             save(im,f'vector/{size}/{name}.png')
             save(d.gray(im),f'vector/{size}/{name}-gray.png')
-    vector_overview();neighbours()
+    vector_overview();neighbours();fix1_focus()
     if all((PKG/'concepts'/f'{n}-{v}.png').exists() for n in d.CANDIDATES for v in 'AB'):
         audit_contacts()
         for name in d.CANDIDATES:
-            for gray in [False,True]: masters(name,gray)
+            if name in ['log','pointer']:
+                for gray in [False,True]: masters(name,gray)
         for size in [24,32,48]:
             for gray in [False,True]: working(size,gray)
         print('64 exports, all concept/vector sheets and neighbours built')

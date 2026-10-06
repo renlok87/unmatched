@@ -203,11 +203,29 @@
       "result_path": "art/imagegen/env-u16-marmoreal-codex/",
       "status": "ok",
       "note": "CX-07; 2026-10-06 09:03:25-09:13:21 +05:00 (~10 мин); 4 image edit (A, B, A-R1, A-R2), выбран A, SYNTX 0; пакет 15 файлов 504 КБ без картинок, 33 PNG в scraped-data/derived/env-u16-marmoreal-codex/ (вне git); verification: source_unchanged true (819 файлов), 0 px вне remove-mask, поле #808080, acceptance_pass false (|dL*| 9,7-25,0 на 6 местах при пороге 4 - метрика некорректна: на C0 те же 30-50, шов на границе маски = базе C0; тёплые блики на защищённой раме); 4 копии image_gen из ~/.codex/generated_images перенесены в C:/tmp/visual/CX-07/stray/; ревью Claude: clean fix-needed (призрак крыши фонаря SW, тёплые блики рамы/мостовой у SE), field- и remove-mask accept, lantern-mask fix-needed (28 % кадра, деревья целиком, ромбовидные края); не закоммичено"
+    },
+    {
+      "date": "2026-10-06T11:54:37+05:00",
+      "service": "Codex",
+      "model": "codex.exe exec (codex-cli 0.160.1)",
+      "template": "T-CODEX-2D",
+      "task_id": "IC-36",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a10ff3-22ed-7c33-bd8b-fcf77c36c7e5",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/IC-36.fix1.codex.md",
+      "result_path": "art/imagegen/hud-icons-vr44-codex/",
+      "status": "ok",
+      "note": "CX-04r: корректирующий прогон fix1 (один), 2026-10-06 11:42-11:52 +05:00; log на диске-пипсе (ВР-VS2-01), pointer — вертикальный палец (ВР-VS2-02); end-turn/card-drop и 54 защищённых файла побайтно те же; verification: outside_folder [], palette 0, 99 серых пар; source_unchanged false из-за параллельного коммита CP-13 95dc94e2 в 02-visual-design.md (не Codex); ревью Claude: accept по делегированию"
     }
   ],
   "totals": {
     "syntx_spent": 0,
     "tripo_spent": 0,
-    "codex_packages": 7
+    "codex_packages": 8
   }
 }
