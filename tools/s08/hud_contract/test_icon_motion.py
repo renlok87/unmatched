@@ -81,6 +81,64 @@ class IconMotionContractTests(unittest.TestCase):
                     for s in UE_SIZES:
                         self.assertTrue((ICONS_V3 / sub / f"{n}-{s}.png").exists(), f"{sub}/{n}-{s}.png")
 
+    def test_accepted_vr44_have_appear_and_leave(self):
+        """IC-33: принятые значки VR44 (`accepted_vr44`) — записи контракта в `order` с appear (enter) и leave (exit);
+        не пересекаются с DE-012 и кандидатами."""
+        self.assertIn("accepted_vr44", self.c)
+        vr44 = self.c["accepted_vr44"]
+        self.assertEqual(len(vr44), len(set(vr44)))
+        self.assertFalse(set(vr44) & (set(self.c.get("candidates", [])) | set(self.c.get("accepted_de012", []))))
+        for icon in vr44:
+            self.assertIn(icon, self.c["order"], icon)
+            anims = self.c["icons"][icon]["anims"]
+            self.assertEqual(anims["appear"]["kind"], "enter", icon)
+            self.assertEqual(anims["leave"]["kind"], "exit", icon)
+
+    def test_ue_sizes_textures_exist(self):
+        """IC-33 (02 §3.2 ВР-62, §5.3): у каждой записи `ue_sizes` с 18 и 36 (24 su при DPI 0,75 и при 150 %); PNG
+        значка, его слоёв и вариантов есть на каждом размере и нарисованы этим размером (из вектора, не даунскейл)."""
+        from PIL import Image
+        variants_of = {}
+        for v, base in self.c.get("variants", {}).items():
+            variants_of.setdefault(base, []).append(v)
+        for icon, d in self.c["icons"].items():
+            sizes = d.get("ue_sizes")
+            self.assertIsNotNone(sizes, icon)
+            self.assertEqual(sizes, sorted(set(sizes)), icon)
+            self.assertTrue({18, 24, 32, 36, 48, 64} <= set(sizes), (icon, sizes))
+            names = [icon] + variants_of.get(icon, [])
+            for l in d["layers"]:
+                names += [f"{l['src'][:-1]}_f{i:02d}" for i in range(l["frames"])] if l["src"].endswith("#") else [l["src"]]
+            for n in sorted(set(names)):
+                sub = "layers" if "_" in n else "sizes"
+                for s in sizes:
+                    p = ICONS_V3 / sub / f"{n}-{s}.png"
+                    self.assertTrue(p.exists(), f"{sub}/{n}-{s}.png")
+                    with Image.open(p) as im:
+                        self.assertEqual(im.height, s, p.name)
+                        self.assertIn(im.width, (s, 2 * s), p.name)
+
+    def test_scale_exports_and_new_roles(self):
+        """IC-33: движок пишет 18 / 36 / 72 у всех id набора (manifest — sha1 каждого файла); роли warning и heal — токены
+        hud-style-tokens.json (ВР-66 алиас turn.flash.orange, ВР-67 fx.heal)."""
+        try:
+            import draw_icons as D  # noqa: E402  (pycairo)
+        except ImportError as e:  # pragma: no cover
+            self.skipTest(f"draw_icons.py: {e}")
+        self.assertTrue({18, 36, 72} <= set(D.SIZES))
+        manifest = json.loads((ICONS_V3 / "manifest.json").read_text(encoding="utf-8"))
+        self.assertEqual(manifest["sizes"], list(D.SIZES))
+        for n in D.ALL:
+            for s in D.sizes_of(n):
+                self.assertIn(f"sizes/{n}-{s}.png", manifest["files"], (n, s))
+        tokens = json.loads((REPO / "docs" / "unreal" / "contracts" / "hud" / "hud-style-tokens.json").read_text(encoding="utf-8"))
+        for role, token in (("warning", "state.warning"), ("heal", "fx.heal")):
+            self.assertEqual(D.ROLE[role], token)
+            self.assertEqual(D.TOKENS[token].upper(), tokens["colors"][token]["hex"].upper(), token)
+        self.assertEqual(tokens["colors"]["state.warning"].get("alias"), "turn.flash.orange")
+        self.assertEqual(D.ORDER_ACCEPTED[:27], D.ORDER23 + list(D.DE_ACCEPTED))     # VR44 — только после DE-012
+        self.assertFalse(set(D.CANDIDATES_VR44) & set(D.ORDER_ACCEPTED))              # кандидаты — не на листах принятых
+
     def test_golden_is_current_and_deterministic(self):
         stored = json.loads(GOLDEN.read_text(encoding="utf-8"))
         fresh = json.loads(json.dumps(M.golden(self.c), separators=(",", ":")))

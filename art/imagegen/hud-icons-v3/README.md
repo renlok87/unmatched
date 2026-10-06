@@ -28,14 +28,18 @@ python art/imagegen/hud-icons-v3/_tools/draw_icons.py
 - `python art/imagegen/hud-icons-v3/_tools/motion.py` — листы кадров и GIF в `sheets/motion/`;
 - `python art/imagegen/hud-icons-v3/_tools/compare_v2_v3.py` — лист «было → стало»;
 - `--review DIR` у `draw_icons.py` — листы на картах местности и рядом с кадрами Digital Edition. Их пишем только вне
-  репозитория (ENV-U3).
+  репозитория (ENV-U3);
+- `--sheet accept <id>[,<id>…] DIR` у `draw_icons.py` (IC-33) — лист приёмки каждого id (02 §13.2): мастер и 18 / 24 /
+  32 / 48 px ×4 nearest (бейджи L6 ещё 16 и 21), цвет, серый Rec.709 и дейтеранопия (Machado 2009) на `card.navy`,
+  `card.cream` и #808080; плюс `accept.json`. Новые id набора VR44 до ревью — в `CANDIDATES_VR44` (свой лист
+  `sheets/vr44/`), после ревью — в `ACCEPTED_VR44` (листы принятого набора, контракт `accepted_vr44`).
 
 ## Файлы
 
 | Что | Где |
 |---|---|
 | Мастера 1024 px (плашки 2048 × 1024), прозрачное поле ≥ 1 u | `masters/<id>.png` |
-| Размеры из вектора с привязкой к пикселям | `sizes/<id>-{16,21,24,32,48,64,96}.png` |
+| Размеры из вектора с привязкой к пикселям | `sizes/<id>-{16,18,21,24,32,36,48,64,72,96}.png`; 18 / 36 / 72 — экспорты под DPI 0,75 и масштаб 150 % (IC-33, ВР-62); `EXTRA_SIZES` — свои размеры id (чип команды 9 и 12, ВР-78) |
 | Слои для анимации (тело, глиф, блок команды) | `layers/<id>_{body,glyph,team}[-size].png` |
 | Варианты того же id | `resource-hp-full-enemy` (чужое сердце), `marker-status-p1` / `-p2` (превью цвета команды) |
 | Листы | `sheets/sheet-masters.png`, `sheet-sizes.png`, `sheet-context-panel.png`, `compare-v2-v3.png` |

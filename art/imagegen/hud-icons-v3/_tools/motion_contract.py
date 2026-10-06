@@ -426,11 +426,23 @@ ICONS.update(CANDIDATE_ICONS)
 CANDIDATES = ["marker-turn-ring-team"]
 ACCEPTED_DE012 = [k for k in CANDIDATE_ICONS if k not in CANDIDATES]
 
+# IC-33 (ВР-IC14): принятые значки набора VR44 (02 §5.5) — строки IC-34, IC-38…IC-69 после ревью добавляют сюда записи
+# (порядок `order`: после DE-012); кандидаты VR44 до ревью в контракт не входят — только мастера, размеры и лист
+# sheets/vr44/ движка draw_icons.py.
+ACCEPTED_VR44_ICONS: dict = {}
+ICONS.update(ACCEPTED_VR44_ICONS)
+ACCEPTED_VR44 = list(ACCEPTED_VR44_ICONS)
+# IC-33 (02 §3.2 ВР-62, §5.3): экранные размеры текстур записи в UE — набор экспортов под DPI и масштаб UI вместо mip:
+# 18 = 24 su при DPI 0,75 (720p), 36 = 24 su при 150 %; 24 / 32 / 48 / 64 — как раньше. Размер текстуры по экранным px
+# выбирает виджет (S08IconMotion::TextureObjectPath(Src, Frame, SizePx)); импорт — tools/art/icons_v3_import.py.
+UE_SIZES_DEFAULT = (18, 24, 32, 36, 48, 64)
+UE_SIZES = {}  # id → свой набор, если отличается от UE_SIZES_DEFAULT
+
 ORDER = ["state-boost", "state-enemy", "state-sent", "state-pending-move", "state-pending-place", "state-hint",
          "state-threat", "state-immobilized", "action-attack", "action-attack-token", "action-defense", "action-maneuver",
          "action-scheme", "marker-status", "loader-spinner", "resource-action-full", "resource-action-empty",
          "resource-card", "resource-connection-online", "resource-connection-reconnecting", "resource-connection-lost",
-         "resource-hp-full", "resource-hp-empty"] + list(CANDIDATE_ICONS)
+         "resource-hp-full", "resource-hp-empty"] + list(CANDIDATE_ICONS) + ACCEPTED_VR44
 VARIANT_OF = {"resource-hp-full-enemy": "resource-hp-full", "marker-status-p1": "marker-status", "marker-status-p2": "marker-status"}
 
 
@@ -440,7 +452,8 @@ def contract():
         "schema": "unmatched.icon-motion/1",
         # 2026-10-04: DE-012 — кандидаты набора DE (`candidates`), damage сердца 1000 мс с ореолом glow
         # 2026-10-05: арт-приёмка DE-012 — четыре записи в `accepted_de012`, сердце павшего на слое fallen_heart
-        "revision": "icon-motion-2026-10-05",
+        # 2026-10-06: IC-33 — `ue_sizes` у каждой записи (экспорты 18 / 36 под DPI и масштаб UI), список `accepted_vr44`
+        "revision": "icon-motion-2026-10-06",
         "status": "предложено",
         "source": "docs/unreal/contracts/hud/ICON-MOTION-PLAN.md; art/imagegen/hud-icons-v3/STYLE-v3.md §7; генератор art/imagegen/hud-icons-v3/_tools/motion_contract.py",
         "units": {"t": "ms", "canvas": "u (32 u = сторона значка; плашки 64 × 32)", "tx/ty": "u", "rotate": "градусы по часовой",
@@ -459,8 +472,11 @@ def contract():
         "accepted_de012_note": "набор DE-012, принят пользователем 2026-10-05 (AB-5 тёплое кольцо, AB-7 трекер DE, AB-8 сердце павшего и штамп в форме Codex): принятый арт — по умолчанию, флаги только откатывают (AGENTS.md)",
         "candidates": CANDIDATES,
         "candidates_note": "кандидаты DE-012 до арт-приёмки пользователя (кольцо цвета команды — AB-5 выбрал тёплое): только галерея -S08IconGallery, HUD их не использует",
+        "accepted_vr44": ACCEPTED_VR44,
+        "accepted_vr44_note": "IC-33 (ВР-IC14): принятые после ревью строки значки набора VR44 (02 §5.5); кандидаты VR44 в контракт не входят",
+        "ue_sizes_note": "IC-33 (02 §3.2 ВР-62, §5.3): экранные размеры текстур записи в UE (T_IV3_<id>_<px>, без mip); 18 и 36 — значок 24 su при DPI 0,75 и при 150 %; варианты берут набор основного значка",
         "order": ORDER,
-        "icons": {k: ICONS[k] for k in ORDER},
+        "icons": {k: dict(ICONS[k], ue_sizes=list(UE_SIZES.get(k, UE_SIZES_DEFAULT))) for k in ORDER},
     }
 
 

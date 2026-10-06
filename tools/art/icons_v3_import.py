@@ -6,7 +6,12 @@ Runs inside the editor:
   UnrealEditor-Cmd unreal/Unmatched/Unmatched.uproject -run=pythonscript -script=<this file> -unattended -nullrhi
 
 Sources: art/imagegen/hud-icons-v3/{sizes,layers}/<name>-<px>.png rendered from vector at each size (no downscale).
-Names: T_IV3_<name with '-' -> '_'>_<px> (S08IconMotion::TextureObjectPath). Sizes 24/32/48/64 px.
+Names: T_IV3_<name with '-' -> '_'>_<px> (S08IconMotion::TextureObjectPath). IC-33: the sizes of a texture are the
+`ue_sizes` of its contract record (default 18/24/32/36/48/64 - 18 and 36 are the 24 su icon at DPI 0.75 and at 150 %,
+02 §3.2 / §5.3); a variant takes its base icon's sizes, a layer its icon's. Names: `order` + `accepted_vr44` + variants +
+layers. Cursors (cursor-*, IC-58…IC-61) are not imported here - HB-12 imports them under /Game/S08/UI/Cursors.
+Partial runs: ICONS_V3_ONLY=<id>,<id> (those icons and their layers) and ICONS_V3_SIZES=<px>,<px> (those sizes); every
+other texture keeps its report entry, whose source must still match.
 Settings as the existing exact-size HUD icons (tools/art/art004_hud_icon_import.py): UserInterface2D (BGRA, no
 compression), no mipmaps, TEXTUREGROUP_UI, sRGB, bilinear, never stream. Idempotent (replace_existing).
 Report: art/imagegen/hud-icons-v3/ue-import-report.json (source sha256 per texture).
@@ -27,20 +32,41 @@ ICONS = ROOT / "art/imagegen/hud-icons-v3"
 CONTRACT = ROOT / "docs/unreal/contracts/hud/icon-motion.json"
 DEST = "/Game/S08/UI/IconsV3"
 REPORT = ICONS / "ue-import-report.json"
-SIZES = (24, 32, 48, 64)
+SIZES_DEFAULT = (18, 24, 32, 36, 48, 64)  # a record without `ue_sizes` (motion_contract.py UE_SIZES_DEFAULT)
+
+
+def is_cursor(name: str) -> bool:
+    return name.startswith("cursor-")
+
+
+def texture_plan() -> dict[str, tuple[int, ...]]:
+    """Texture name -> sizes (IC-33): `ue_sizes` of the record; variants take the base, layers their icon."""
+    c = json.loads(CONTRACT.read_text(encoding="utf-8"))
+    icons = c["icons"]
+    plan: dict[str, set[int]] = {}
+
+    def sizes(icon: str) -> tuple[int, ...]:
+        return tuple(icons.get(icon, {}).get("ue_sizes", SIZES_DEFAULT))
+
+    def add(name: str, px: tuple[int, ...]) -> None:
+        if not is_cursor(name):
+            plan.setdefault(name, set()).update(px)
+
+    for icon in list(c["order"]) + list(c.get("accepted_vr44", [])):
+        add(icon, sizes(icon))
+    for variant, base in c.get("variants", {}).items():
+        add(variant, sizes(base))
+    for icon, d in icons.items():
+        for layer in d["layers"]:
+            src = layer["src"]
+            names = [f"{src[:-1]}_f{i:02d}" for i in range(layer["frames"])] if src.endswith("#") else [src]
+            for n in names:
+                add(n, sizes(icon))
+    return {n: tuple(sorted(px)) for n, px in sorted(plan.items())}
 
 
 def texture_names() -> list[str]:
-    c = json.loads(CONTRACT.read_text(encoding="utf-8"))
-    names = set(c["order"]) | set(c.get("variants", {}))
-    for d in c["icons"].values():
-        for layer in d["layers"]:
-            src = layer["src"]
-            if src.endswith("#"):
-                names.update(f"{src[:-1]}_f{i:02d}" for i in range(layer["frames"]))
-            else:
-                names.add(src)
-    return sorted(names)
+    return list(texture_plan())
 
 
 def png_size(data: bytes) -> tuple[int, int, int]:
@@ -55,21 +81,28 @@ def main() -> None:
     # ICONS_V3_ONLY=<id>,<id>: re-import only these icons (and their layers); every other texture keeps its report
     # entry, which must still match its source (a changed source that is not re-imported fails the run).
     only = {x.strip() for x in os.environ.get("ICONS_V3_ONLY", "").split(",") if x.strip()}
+    # IC-33: ICONS_V3_SIZES=18,36 imports only the new sizes; the existing 24/32/48/64 assets stay untouched.
+    only_sizes = {int(x) for x in os.environ.get("ICONS_V3_SIZES", "").split(",") if x.strip()}
     previous = {}
-    if only and REPORT.exists():
+    if (only or only_sizes) and REPORT.exists():
         previous = {e["asset"]: e for e in json.loads(REPORT.read_text(encoding="utf-8"))["textures"]}
     entries = []
-    for name in texture_names():
+    all_sizes: set[int] = set()
+    reimported = 0
+    for name, sizes in texture_plan().items():
         sub = "layers" if "_" in name else "sizes"
-        for size in SIZES:
+        all_sizes.update(sizes)
+        for size in sizes:
             source = ICONS / sub / f"{name}-{size}.png"
             data = source.read_bytes()
-            if only and name.split("_")[0] not in only:
+            if (only and name.split("_")[0] not in only) or (only_sizes and size not in only_sizes):
                 old = previous.get(f"{DEST}/T_IV3_{name.replace('-', '_')}_{size}")
                 if not old or old["sourceSha256"] != hashlib.sha256(data).hexdigest():
-                    raise RuntimeError(f"{source.name}: source changed but not in ICONS_V3_ONLY")
+                    raise RuntimeError(f"{source.name}: source changed (or never imported) but not in "
+                                       f"ICONS_V3_ONLY / ICONS_V3_SIZES")
                 entries.append(old)
                 continue
+            reimported += 1
             width, height, color_type = png_size(data)
             if height != size or width not in (size, 2 * size) or color_type != 6:
                 raise RuntimeError(f"{source.name}: expected {size}px RGBA, got {width}x{height} type={color_type}")
@@ -102,13 +135,15 @@ def main() -> None:
         "schema": "unmatched.icons-v3-import/1",
         "status": "технически импортировано (значки v3 — ПРЕДЛОЖЕНИЕ до арт-приёмки)",
         "dest": DEST,
-        "sizes": list(SIZES),
+        "sizes": sorted(all_sizes),
         "settings": {"compression": "TC_EDITOR_ICON", "mipGen": "TMGS_NO_MIPMAPS", "lodGroup": "TEXTUREGROUP_UI",
                      "srgb": True, "filter": "TF_BILINEAR", "neverStream": True},
         "count": len(entries),
         "textures": entries,
     }, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
-    u.log(f"ICONS_V3_IMPORT_PASS textures={len(entries)} reimported={'all' if not only else ','.join(sorted(only))} dest={DEST}")
+    scope = "all" if not (only or only_sizes) else ",".join(sorted(only) or ["*"]) + "@" + ",".join(
+        str(s) for s in sorted(only_sizes) or ["*"])
+    u.log(f"ICONS_V3_IMPORT_PASS textures={len(entries)} imported={reimported} reimported={scope} dest={DEST}")
 
 
 main()
