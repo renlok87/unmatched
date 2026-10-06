@@ -36,7 +36,7 @@
 //                 gate layer it is collapsed while it shows only those buttons (the panels, K / Shift+K and D open the
 //                 same); the open browser or inspector shows it - UmHudDeckPanelLayering (rollback -S08SlateHud=panels);
 //       ВР-VS2-73 the Slate command panel starts under TOP while TOP is shown (it lay under the plate) - TickUmHud
-//                 (rollback -S08SlateHud=top).
+//                 (rollback -S08SlateHud=top); ВР-VS2-75 an empty command panel is not drawn (opacity 0).
 #include "S08FlowGameMode.h"
 
 #include "S08AnimatedIconWidget.h"
@@ -381,6 +381,9 @@ void AS08FlowGameMode::TickUmHud() {
                                            : TOptional<FSlateRenderTransform>());
       FS08Trace::Write(FString::Printf(TEXT("HUD-CMD shift=%.0f top=%d"), Shift, Shift > 0.0f ? 1 : 0));
     }
+    // ВР-VS2-75: an empty command panel (the opponent's turn without a choice) drew a 20 su navy square at the edge
+    const float CmdOpacity = (CommandBox.IsValid() && CommandBox->NumSlots() == 0) ? 0.0f : 1.0f;
+    if (!FMath::IsNearlyEqual(Cmd->GetRenderOpacity(), CmdOpacity)) Cmd->SetRenderOpacity(CmdOpacity);
   }
   const float PxPerSu = HudPixelsPerUnit() > 0.0f ? HudPixelsPerUnit() : R.Layout.PxPerSu;
   // ---- the top of the hand actually drawn (the Slate panel, its SD-26 offset included): the stack stays over it ----
