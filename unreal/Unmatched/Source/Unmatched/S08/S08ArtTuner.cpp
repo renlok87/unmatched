@@ -38,7 +38,7 @@ const FScopeName GScopeNames[] = {
     {ES08TunerScope::HeroLight, TEXT("heroLight")},       {ES08TunerScope::ProfileLights, TEXT("profileLights")},
     {ES08TunerScope::MapGrade, TEXT("mapGrade")},         {ES08TunerScope::ConceptLights, TEXT("conceptLights")},
     {ES08TunerScope::Materials, TEXT("materials")},       {ES08TunerScope::Rebuild, TEXT("rebuild")},
-    {ES08TunerScope::HeroMaterials, TEXT("heroMaterials")},  // AN-32 (BP-16)
+    {ES08TunerScope::HeroMaterials, TEXT("heroMaterials")},  // AN-32 (ВР-16)
 };
 
 bool TunerReadObject(const FString& Text, TSharedPtr<FJsonObject>& Out, bool bNumbersAsText) {

@@ -11,12 +11,14 @@
 
 ## Что сделано (карта AN-17)
 
-Стенд поз в packaged `-Bench`: `-BenchClipPose=<Hero>/<Clip>@<frames>` ставит каждую фигуру в точный кадр клипа
+Стенд поз в packaged `-Bench`: `-BenchClipPose=<Clip>@<f1>,<f2>[;<Clip>@...]` (кадр — номер при 24 fps или `q<pct>`;
+фокус K2 — `-BenchClipPoseFighter=<KingArthur|Merlin|Medusa|Harpy|id>`) ставит каждую живую v2-фигуру в точный кадр клипа
 (`S08HeroesV2::ParseBenchClipPoses`), новая ступень 7 стенда (`AS08FlowGameMode::RunRenderBench`) проигрывает
 список кадров, снимок `bench-<view>-<clip>-f<NN>-1920x1080.png`, трассы `ARTPREVIEW clippose fighter=.. clip=..
 frame=.. t=.. len=.. rootDeltaUU=..` и `ARTPREVIEW figrect fighter=.. view=.. x= y= w= h=`. Список через запятую
-читается с `bShouldStopOnSeparator=false` (первый прогон терял всё после первой запятой — исправлено, коммит
-`0f712a5e`-серії, см. Z-1 README).
+читается с `bShouldStopOnSeparator=false` (первый прогон терял всё после первой запятой — исправлено коммитом
+`6923bc81`, см. Z-1 README). С ревью 2026-10-07 код стенда живёт в `S08FlowGameModeFigures.cpp` (ВР-Z1R-01), в
+`S08FlowGameMode.cpp` — только вызовы.
 
 ## Состав листа (02 §13.2)
 

@@ -96,7 +96,7 @@ def _num(text):
 
 # ----------------------------------------------------------------------------- CUE-007: расписание перемещения
 MOVE_PARAM_KEYS = ("duration_per_step_ms", "cap_subject_ms", "cap_seq_ms", "min_step_ms", "overlap", "place_ms")
-# AN-21 (BP-12): ease_ms — окно ease-in/ease-out на концах пути (E = min(ease_ms x T / 280, T / 2) в C++)
+# AN-21 (ВР-12): ease_ms — окно ease-in/ease-out на концах пути (E = min(ease_ms x T / 280, T / 2) в C++)
 MOVE_POSE_KEYS = ("hop_height_rel", "travel_lean_deg", "lean_in_ms", "start_turn_ms", "turn_ms", "settle_ms",
                   "ease_ends", "ease_ms")
 SPEED_MUL = {"fast": 0.5, "normal": 1.0, "slow": 1.5}
@@ -216,7 +216,7 @@ def validate_table(table, schema=None, csv07=CSV07, rig_contract=RIG_CONTRACT, c
                 if name not in c["params"]:
                     errors.append("%s: params.%s не описан" % (cid, name))
             # DE-021 (01 F-02): поза хода — вход наклона, разворот и доворот укладываются в одно ребро (C++ режет по ребру)
-            # AN-21 (BP-12): окно ease концов пути тоже в пределах ребра (C++ жмёт E = min(ease_ms x T / 280, T / 2))
+            # AN-21 (ВР-12): окно ease концов пути тоже в пределах ребра (C++ жмёт E = min(ease_ms x T / 280, T / 2))
             pose = c["pose"]
             for name in ("lean_in_ms", "start_turn_ms", "turn_ms", "ease_ms"):
                 if pose[name] > p["duration_per_step_ms"]:
@@ -1114,7 +1114,7 @@ def check_combat(lines, cue_starts=()):
             errors.append(("C4", "seq %s: пауза «счёт» %d мс ≠ %d" % (seq, pause_ms, COMBAT_MS["pause"])))
         if lunge["_t"] != pause["_t"]:
             errors.append(("C4", "seq %s: выпад не в конце паузы" % seq))
-        # AN-24 (BP-06): доворот к цели — face необязателен (Cut / догон / скорость «Нет» его не играют),
+        # AN-24 (ВР-06): доворот к цели — face необязателен (Cut / догон / скорость «Нет» его не играют),
         # не больше одного на seq, всегда до выпада; без пропуска паузы интервал face -> lunge 120 ±42 мс
         faces = stages.get("face", [])
         if len(faces) > 1:

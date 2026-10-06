@@ -1,4 +1,4 @@
-"""AN-32 (BP-16): rebuild M_UM_Figure_v2 as v2.4 - the Fix group of the look tuning.
+"""AN-32 (ВР-16): rebuild M_UM_Figure_v2 as v2.4 - the Fix group of the look tuning.
 
     python tools/art/hero/figure_master_v24_apply.py          # rebuild the master in place, saved, report C:/tmp/an32
 

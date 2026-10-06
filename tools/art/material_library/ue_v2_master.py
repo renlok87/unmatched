@@ -42,7 +42,7 @@ CORE_INPUTS = ["MatIDTex", "LUTTex", "DetN", "DetRMH", "UV0", "UV1", "UseUV1", "
                "ORMh", "DyeMask", "Edge", "Team", "TeamDye", "TeamDyeGain", "RoughMin", "RoughMax", "DetailStrength",
                "WearStrength", "SheenStrength", "AOToBC", "Saturation", "ValueLift", "DebugView", "MatIDOverride",
                "BakeFromLUT", "UseAccent", "TeamDyeCeiling",
-               # AN-32 (BP-16): the look-tuning fixes - one MatID class per slot, gain on its BaseColor,
+               # AN-32 (ВР-16): the look-tuning fixes - one MatID class per slot, gain on its BaseColor,
                # a specular delta; neutral (class -1 / gain 1 / spec 0) compiles the v2.3 output exactly
                "FixClassA", "FixGainA", "FixSpecA", "FixClassB", "FixGainB", "FixSpecB"]
 CORE_OUTPUTS = [("Rough", "CMOT_FLOAT1"), ("Metal", "CMOT_FLOAT1"), ("Spec", "CMOT_FLOAT1"), ("AO", "CMOT_FLOAT1"),
