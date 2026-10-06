@@ -977,14 +977,14 @@ def check_sound(lines, table):
 
 # ----------------------------------------------------------------------------- постановка боя (DE-018)
 COMBAT_RE = re.compile(r"(CUE combat\b.*)$")
-COMBAT_STAGES = ("start", "read", "effect", "slam", "pause", "lunge", "contact", "hit", "minus", "hp", "fall", "end",
-                 "skip")
-COMBAT_RANK = {"start": 0, "read": 1, "effect": 2, "slam": 3, "pause": 4, "lunge": 5, "contact": 6, "hit": 7,
-               "minus": 8, "hp": 9, "fall": 10, "end": 11}
+COMBAT_STAGES = ("start", "read", "effect", "slam", "face", "pause", "lunge", "contact", "hit", "minus", "hp", "fall",
+                 "end", "skip")
+COMBAT_RANK = {"start": 0, "read": 1, "effect": 2, "slam": 3, "face": 4, "pause": 5, "lunge": 6, "contact": 7,
+               "hit": 8, "minus": 9, "hp": 10, "fall": 11, "end": 12}
 COMBAT_START_NEED = ("attacker", "target", "text", "lines", "damage", "lethal", "shown", "speed", "flip", "contact",
                      "src", "a", "d", "outcome")
 COMBAT_MS = {  # 01 F-01 / F-03 / F-04 / F-09 при скорости ×1 (CUE-DISPATCHER.md §3.1)
-    "declare": 600, "read": 1000, "effect_step": 600, "effect_highlight": 400, "pause": 300,
+    "declare": 600, "read": 1000, "effect_step": 600, "effect_highlight": 400, "pause": 300, "face": 120,
     "minus": 60, "hp": 80, "fall": 450, "tint": 450, "tint_lethal": 550, "minus_life": 900,
 }
 
@@ -1114,6 +1114,19 @@ def check_combat(lines, cue_starts=()):
             errors.append(("C4", "seq %s: пауза «счёт» %d мс ≠ %d" % (seq, pause_ms, COMBAT_MS["pause"])))
         if lunge["_t"] != pause["_t"]:
             errors.append(("C4", "seq %s: выпад не в конце паузы" % seq))
+        # AN-24 (BP-06): доворот к цели — face необязателен (Cut / догон / скорость «Нет» его не играют),
+        # не больше одного на seq, всегда до выпада; без пропуска паузы интервал face -> lunge 120 ±42 мс
+        faces = stages.get("face", [])
+        if len(faces) > 1:
+            errors.append(("C4", "seq %s: доворотов face %d > 1" % (seq, len(faces))))
+        for fc in faces:
+            if fc["_t"] > lunge["_t"]:
+                errors.append(("C4", "строка %d: face после выпада" % fc["_n"]))
+            elif pause.get("skipped") != "1":
+                gap = lunge["_t"] - fc["_t"]
+                if not (COMBAT_MS["face"] - 42 <= gap <= COMBAT_MS["face"] + 42):
+                    errors.append(("C4", "seq %s: face за %d мс до выпада, ждём %d ±42" % (
+                        seq, gap, COMBAT_MS["face"])))
         # DE-025 (SD-49): play rate LungeAttack = 1 / скорость, при «Нет» клипа нет (0); поле rate= — с DE-025
         if "rate" in lunge:
             want_rate = 0.0 if speed <= 0 else 1.0 / speed

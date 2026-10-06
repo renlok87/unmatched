@@ -9,7 +9,7 @@ const TCHAR* const DamageCue = TEXT("CUE-011");
 const TCHAR* const SceneSubject = TEXT("scene");
 
 /** The fixed boundary order of one staging (derived from the input). */
-enum class EBoundary : uint8 { Read, Effect, Slam, SlamEnd, Pause, Contact, Minus, Hp, Fall, End };
+enum class EBoundary : uint8 { Read, Effect, Slam, SlamEnd, Face, Pause, Contact, Minus, Hp, Fall, End };
 struct FBoundary {
   EBoundary Kind;
   int32 Index;
@@ -20,6 +20,7 @@ TArray<FBoundary> BoundaryOrder(const FS09CombatStageInput& In) {
   for (int32 I = 0; I < In.EffectLines; ++I) Out.Add({EBoundary::Effect, I});
   Out.Add({EBoundary::Slam, 0});
   Out.Add({EBoundary::SlamEnd, 0});
+  Out.Add({EBoundary::Face, 0});   // AN-24 (ВР-06): the attacker turns to the target inside the pause
   Out.Add({EBoundary::Pause, 0});
   Out.Add({EBoundary::Contact, 0});
   if (In.Damage > 0 && !In.bDamageShown) {
@@ -44,6 +45,7 @@ const TCHAR* S09CombatEventName(ES09CombatEvent Event) {
     case ES09CombatEvent::Effect: return TEXT("effect");
     case ES09CombatEvent::Slam: return TEXT("slam");
     case ES09CombatEvent::Block: return TEXT("block");
+    case ES09CombatEvent::Face: return TEXT("face");
     default: return TEXT("end");
   }
 }
@@ -87,6 +89,9 @@ void FS09CombatStage::Reschedule() {
   SlamStartMs = FlipEndMs + HoldTotalMs();
   SlamEndMs = SlamStartMs + SlamLenMs;
   PauseEndMs = SlamEndMs + PauseMs;
+  // AN-24 (ВР-06): the turn starts 120 ms before the lunge, never inside the slam; a skipped pause releases the
+  // face together with the lunge - the turn then runs with the first 120 ms of the clip (never backwards in time).
+  FaceAtMs = bPauseSkipped ? PauseEndMs : FMath::Max(SlamEndMs, PauseEndMs - FS09CombatTiming::FaceTurnMs);
   ContactAtMs = PauseEndMs + ContactOffsetMs;
   int32 Tail = HitWindowMs;
   if (Input.Damage > 0 && !Input.bDamageShown) {
@@ -106,6 +111,7 @@ int64 FS09CombatStage::BoundaryTime(uint8 KindByte, int32 Index) const {
     }
     case EBoundary::Slam: return SlamStartMs;
     case EBoundary::SlamEnd: return SlamEndMs;
+    case EBoundary::Face: return FaceAtMs;
     case EBoundary::Pause: return PauseEndMs;
     case EBoundary::Contact: return ContactAtMs;
     case EBoundary::Minus: return ContactAtMs + FS09CombatTiming::MinusDelayMs;
@@ -257,6 +263,14 @@ void FS09CombatStage::Tick(int64 NowMs, FS08CueDispatcher& Cues, TArray<FString>
       case EBoundary::SlamEnd:
         // The CUE-010 done line came out of Advance above (its end = slam end, the holds included).
         Phase = ES09CombatStagePhase::Pause;
+        break;
+      case EBoundary::Face:
+        // AN-24 (ВР-06): the attacker turns to the target (the adapter plays it on the figure); with the pause
+        // skipped it fires in the lunge's tick - the turn runs with the clip's first 120 ms.
+        OutLines.Add(Prefix(TEXT("face"), T) + FString::Printf(TEXT(" ms=%d lunge=%lld"),
+                                                               FS09CombatTiming::FaceTurnMs,
+                                                               static_cast<long long>(PauseEndMs - T)));
+        Release(ES09CombatEvent::Face, T, OutEvents);
         break;
       case EBoundary::Pause:
         Phase = ES09CombatStagePhase::Lunge;

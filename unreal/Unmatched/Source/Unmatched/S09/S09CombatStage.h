@@ -44,6 +44,7 @@ struct UNMATCHED_API FS09CombatTiming {
   static constexpr int32 EffectStepMs = 600;       // combat.effectStepMs = highlight + 200
   static constexpr int32 EffectHighlightMs = 400;
   static constexpr int32 SlamToLungeMs = 300;      // combat.slamToLungeMs
+  static constexpr int32 FaceTurnMs = 120;         // AN-24 (ВР-06): the attacker turns to the target before the lunge
   static constexpr int32 HitWindowMs = 900;        // CUE-011 duration from the contact frame
   static constexpr int32 HitTintMs = 450;
   static constexpr int32 HitTintLethalMs = 550;
@@ -80,7 +81,9 @@ struct UNMATCHED_API FS09CombatStageInput {
 
 // AU-S4: FlipAttack / FlipDefense (the reveal flips, the defense +120 ms), Effect (a fired effect line), Slam and
 // Block (the contact frame of a combat without damage) - the sound of the staging (02-audio-design §4.5).
-enum class ES09CombatEvent : uint8 { Lunge, HitReact, Minus, Hp, Fall, End, FlipAttack, FlipDefense, Effect, Slam, Block };
+// AN-24 (ВР-06): Face - the attacker's turn to the target 120 ms before the lunge (inside the pause "score").
+enum class ES09CombatEvent : uint8 { Lunge, HitReact, Minus, Hp, Fall, End, FlipAttack, FlipDefense, Effect, Slam,
+                                     Block, Face };
 struct UNMATCHED_API FS09CombatStageEvent {
   ES09CombatEvent Type = ES09CombatEvent::End;
   int64 AtMs = 0;
@@ -150,6 +153,9 @@ public:
   int64 GetLungeMs() const { return PauseEndMs; }
   int64 GetContactMs() const { return ContactAtMs; }
   int64 GetEndMs() const { return EndMs; }
+  /** AN-24 (ВР-06): the Face event fires here (max(SlamEnd, lunge - 120)); with the pause skipped it equals the
+   *  lunge time - the turn then runs with the first 120 ms of the clip. */
+  int64 GetFaceMs() const { return FaceAtMs; }
   /** Total combat time of the F-01 scale: CUE-008 (declare) + reveal..end. */
   int64 TotalMs() const { return Scaled(FS09CombatTiming::DeclareMs) + (EndMs - StartMs); }
   int32 GetHitTintMs() const {
@@ -189,6 +195,7 @@ private:
   int64 FlipEndMs = 0;
   int64 SlamStartMs = 0;
   int64 SlamEndMs = 0;
+  int64 FaceAtMs = 0;            // AN-24: the attacker's turn to the target, max(SlamEndMs, PauseEndMs - FaceTurnMs)
   int64 PauseEndMs = 0;          // = lunge start
   int64 ContactAtMs = 0;
   int64 EndMs = 0;

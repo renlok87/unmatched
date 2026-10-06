@@ -103,6 +103,16 @@
    "t": 4680,
    "kind": "combat",
    "seq": 61,
+   "stage": "face",
+   "fields": {
+    "ms": 120,
+    "lunge": 0
+   }
+  },
+  {
+   "t": 4680,
+   "kind": "combat",
+   "seq": 61,
    "stage": "pause",
    "fields": {
     "ms": 0,
@@ -191,6 +201,7 @@
   "CUE combat seq=61 stage=effect t=4500 i=2 ms=280 skipped=1",
   "CUE combat seq=61 stage=slam t=4500 a=5 d=4 outcome=win",
   "CUE fx done id=CUE-010 subject=scene seq=61 t=4680 ms=2680 cut=0 hold=1880",
+  "CUE combat seq=61 stage=face t=4680 ms=120 lunge=0",
   "CUE combat seq=61 stage=pause t=4680 ms=0 skipped=1",
   "CUE combat seq=61 stage=lunge t=4680 attacker=merlin rate=1.00",
   "CUE combat seq=61 stage=contact t=4980 offset=300 window=900 src=notify",

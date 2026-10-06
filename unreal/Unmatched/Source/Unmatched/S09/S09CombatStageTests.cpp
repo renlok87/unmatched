@@ -210,6 +210,24 @@ bool FS09CombatStageTimelineTest::RunTest(const FString&) {
     RunToEnd(Run, BaseInput(false, 2));
     TestEqual("without effect text: 2892 ms", Run.Stage.TotalMs(), static_cast<int64>(2892));
   }
+  // ---- AN-24 (ВР-06): the Face turn to the target 120 ms before the lunge, inside the pause "score" ----
+  {
+    FRun Run;
+    RunToEnd(Run, BaseInput(true, 2));
+    TestEqual("face = lunge - 120", EventAt(Run.Events, ES09CombatEvent::Face),
+              EventAt(Run.Events, ES09CombatEvent::Lunge) - 120);
+    TestEqual("GetFaceMs = the lunge - 120", Run.Stage.GetFaceMs(), Run.Stage.GetLungeMs() - 120);
+    bool bFaceLine = false;
+    for (const FString& L : Run.Lines) bFaceLine |= L.Contains(TEXT(" stage=face ")) && L.Contains(TEXT(" ms=120"));
+    TestTrue("the face line is traced with its window", bFaceLine);
+  }
+  {
+    // A skip drops the pause: the face fires together with the lunge (the turn runs with the clip's first 120 ms).
+    FRun Run;
+    RunToEnd(Run, BaseInput(true, 2), 1000, /*SkipAt=*/2000);
+    TestEqual("after the skip: face together with the lunge", EventAt(Run.Events, ES09CombatEvent::Face),
+              Run.Stage.GetLungeMs());
+  }
   {
     FRun Run;
     FS09CombatStageInput In = BaseInput(true, 2);

@@ -71,6 +71,16 @@
    "t": 1900,
    "kind": "combat",
    "seq": 41,
+   "stage": "face",
+   "fields": {
+    "ms": 120,
+    "lunge": 0
+   }
+  },
+  {
+   "t": 1900,
+   "kind": "combat",
+   "seq": 41,
    "stage": "pause",
    "fields": {
     "ms": 100,
@@ -165,6 +175,7 @@
   "CUE combat seq=41 stage=slam t=1620 a=3 d=2 outcome=win",
   "CUE fx done id=CUE-010 subject=scene seq=41 t=1800 ms=800 cut=0",
   "CUE combat seq=41 stage=skip t=1900 src=space",
+  "CUE combat seq=41 stage=face t=1900 ms=120 lunge=0",
   "CUE combat seq=41 stage=pause t=1900 ms=100 skipped=1",
   "CUE combat seq=41 stage=lunge t=1900 attacker=medusa rate=1.00",
   "CUE combat seq=41 stage=contact t=2233 offset=333 window=900 src=notify",
