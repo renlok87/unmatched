@@ -1,6 +1,7 @@
 #include "S08HeroesV2.h"
 
 #include "S08ArtPreviewMedusa.h"
+#include "S08BoardModel.h"
 #include "S08IconMotion.h"
 #include "Animation/AnimSequenceBase.h"
 #include "Components/PrimitiveComponent.h"
@@ -267,6 +268,21 @@ double BenchClipPoseSeconds(const FBenchClipPoseSpec& Spec, double ClipSeconds) 
   const double Len = FMath::Max(0.0, ClipSeconds);
   return FMath::Clamp(Spec.bQuarter ? Len * Spec.Value / 100.0 : Spec.Value / ClipFps, 0.0, Len);
 }
+
+int32 HarpyNumber(const FS08BoardFighter& Fighter) {
+  int32 Number = 1;
+  for (int32 I = Fighter.Label.Len() - 1; I >= 0; --I) {
+    if (FChar::IsDigit(Fighter.Label[I])) {
+      Number = FChar::ConvertCharDigitToInt(Fighter.Label[I]);
+      break;
+    }
+  }
+  return FMath::Clamp(Number, 1, 3);
+}
+
+FString BaseDigitMaterialPath() { return TEXT("/Game/UM/Materials/v2/M_UM_BaseDigit"); }
+
+FString BaseDigitFontFacePath() { return TEXT("/Game/UM/Fonts/F_UM_RobotoBoldCondensed"); }
 
 void SetDissolve(UPrimitiveComponent* Body, UPrimitiveComponent* Pedestal, float Progress, EDissolveStyle Style) {
   const float P = FMath::Clamp(Progress, 0.0f, 1.0f);

@@ -114,6 +114,9 @@ bool FS08ArtLookDefaultTest::RunTest(const FString&) {
     // AN-23 (ВР-06): the rest facing rule (three-quarter to the camera) is in the line
     TestTrue(FString::Printf(TEXT("default facing traced: %s"), *Line),
              Line.Contains(TEXT(" facing=v1")));
+    // AN-31 (ВР-07, ВР-72): the harpy base digit is in the line
+    TestTrue(FString::Printf(TEXT("default base digit traced: %s"), *Line),
+             Line.Contains(TEXT(" baseDigit=on")));
   }
   // 2c) AN-21 (ВР-12): -S08MoveEaseLegacy rolls the ease back, -S08MoveEase stays a no-op alias of the default
   {

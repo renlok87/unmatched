@@ -95,11 +95,15 @@ FString TraceLine() {
   const FString Facing = S08Facing::LegacyRequested()
                              ? FString::Printf(TEXT("legacy(-%s)"), S08Facing::LegacyFlagName)
                              : FString(TEXT("v1"));
+  // AN-31 (ВР-07, ВР-72): the harpy number on the base with its rollback
+  const FString BaseDigit = FParse::Param(Cmd, S08HeroesV2::BaseDigitLegacyFlagName)
+                                ? FString::Printf(TEXT("legacy(-%s)"), S08HeroesV2::BaseDigitLegacyFlagName)
+                                : FString(TEXT("on"));
   return FString::Printf(
-      TEXT("ARTLOOK art=%d source=%s heroes=%s tray=%s env=%s review=%d legacyRender=%d markers=%d aliases=%s %s %s %s move=%s facing=%s%s"),
+      TEXT("ARTLOOK art=%d source=%s heroes=%s tray=%s env=%s review=%d legacyRender=%d markers=%d aliases=%s %s %s %s move=%s facing=%s baseDigit=%s%s"),
       bArt ? 1 : 0, Source, *Heroes, *Tray, *Env, ReviewTooling() ? 1 : 0, S08LegacyRender() ? 1 : 0, S08Markers() ? 1 : 0,
       Aliases.Num() ? *FString::Join(Aliases, TEXT(",")) : TEXT("-"), *HudLook, *Dpi, *CardMedia, *MoveEase, *Facing,
-      bArt ? TEXT("") : TEXT(" (grey board: no art profile, figures, tray or art HUD layer)"));
+      *BaseDigit, bArt ? TEXT("") : TEXT(" (grey board: no art profile, figures, tray or art HUD layer)"));
 }
 
 }  // namespace S08ArtLook

@@ -130,6 +130,15 @@ public:
                          double& OutRootDeltaUU);
   /** AN-17: the world box of the visible v2 figure with its pedestal (ArtBody + ArtBase bounds; invalid without). */
   FBox GetV2FigureBox() const;
+  // ---- AN-31 (ВР-07, ВР-72): the harpy number 1..3 on the base ----
+  /** The digit components (never null; visibility is the state - see UpdateBaseDigit). */
+  UStaticMeshComponent* GetBaseDigitDisc() const { return BaseDigitDisc; }
+  UTextRenderComponent* GetBaseDigitText() const { return BaseDigitText; }
+  /** AN-31: the navy disc with the cream number on the pedestal's top edge nearest the camera (ВР-AN08 sizes from
+   *  the pedestal mesh bounds; the components ride the actor, never the figure's rotation). Shown on living v2
+   *  harpies only - hidden with -S08BaseDigitLegacy, on other figures, during a Place transfer and from the death
+   *  dissolve on; repositioned by every apply / move end. Traced once per figure 'ARTPREVIEW basedigit ...'. */
+  void UpdateBaseDigit();
   // ---- MS-T-16 move animation (S08MoveAnim.h; move-selection 04 §6.3) ----
   /** Plays a CUE-007 move from NowMs (the seq start, ms on the game clock): the figure stands on the plan's start cell
    *  until its slot, slides along the path (lean, turns, optional hop), settles to Idle; a Place fades out / in. The
@@ -238,6 +247,15 @@ private:
 
   UPROPERTY()
   TObjectPtr<UStaticMeshComponent> ArtPlaceholder;
+
+  // AN-31 (ВР-07, ВР-72): the harpy base digit - a flat disc + a text render on the pedestal's camera-side edge.
+  UPROPERTY()
+  TObjectPtr<UStaticMeshComponent> BaseDigitDisc;
+  UPROPERTY()
+  TObjectPtr<UTextRenderComponent> BaseDigitText;
+  UPROPERTY()
+  TObjectPtr<UMaterialInstanceDynamic> BaseDigitMid;
+  bool bBaseDigitTraced = false;
 
   // ART-004 T2.2: click volume matching the visible art figure. The candidate
   // skeletal meshes carry no physics asset, and the hidden 120-uu grey Body

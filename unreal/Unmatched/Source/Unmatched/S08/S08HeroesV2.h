@@ -24,6 +24,7 @@
 
 class UAnimSequenceBase;
 class UPrimitiveComponent;
+struct FS08BoardFighter;
 
 namespace S08HeroesV2 {
 
@@ -237,5 +238,17 @@ struct FBenchClipPoseSpec {
 UNMATCHED_API bool ParseBenchClipPoses(const FString& Text, TArray<FBenchClipPoseSpec>& Out, FString& OutError);
 /** The pose time (s) of a spec against one figure's clip length: frame / ClipFps, or pct% of the clip. */
 UNMATCHED_API double BenchClipPoseSeconds(const FBenchClipPoseSpec& Spec, double ClipSeconds);
+
+// ---- AN-31 (ВР-07, ВР-72): the harpy number on the base ----
+/** The harpy's number 1..3: the last digit of the label (GD-030; Р-09 of GD-058), 1 without one - the same digit as
+ *  the HUD tag and the audio key (AudioKeyOf). */
+UNMATCHED_API int32 HarpyNumber(const FS08BoardFighter& Fighter);
+/** Rollback: -S08BaseDigitLegacy - no disc / digit on the harpy base. */
+inline const TCHAR* const BaseDigitLegacyFlagName = TEXT("S08BaseDigitLegacy");
+/** /Game/UM/Materials/v2/M_UM_BaseDigit (Unlit, VectorParameter "Color"; tools/art/hero/base_digit_import.py). */
+UNMATCHED_API FString BaseDigitMaterialPath();
+/** /Game/UM/Fonts/F_UM_RobotoBoldCondensed - the imported Slate Roboto Bold Condensed payload (ВР-Z1: the font the
+ *  text renders with is a transient runtime UFont over this face; UE 5.8 has no offline font importer any more). */
+UNMATCHED_API FString BaseDigitFontFacePath();
 
 }  // namespace S08HeroesV2

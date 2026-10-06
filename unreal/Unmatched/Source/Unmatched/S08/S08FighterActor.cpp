@@ -17,6 +17,8 @@
 #include "Engine/SkeletalMesh.h"
 #include "Engine/StaticMesh.h"
 #include "Engine/Texture2D.h"
+#include "Engine/Font.h"
+#include "Engine/FontFace.h"
 #include "Components/TextRenderComponent.h"
 #include "Animation/AnimSequenceBase.h"
 #include "Animation/AnimSingleNodeInstance.h"
@@ -38,6 +40,24 @@ UMaterialInterface* LoadSolidMaterial() {
   return LoadObject<UMaterialInterface>(nullptr, TEXT("/Engine/BasicShapes/BasicShapeMaterial"));
 }
 
+// AN-31 (ВР-72): the digit font - a transient runtime UFont over the imported Roboto Bold Condensed FontFace
+// (ВР-Z1: UE 5.8 removed the offline font importer and its composite structs are not exposed to editor python,
+// so the "_Offline" font of the card is this runtime composite; the payload cooks with the FontFace).
+UFont* S08BaseDigitFont() {
+  static UFont* Font = [] {
+    UFontFace* Face = LoadObject<UFontFace>(nullptr, TEXT("/Game/UM/Fonts/F_UM_RobotoBoldCondensed"));
+    if (!Face) return (UFont*)nullptr;
+    UFont* F = NewObject<UFont>(GetTransientPackage(), TEXT("F_UM_RobotoBoldCondensed_Offline"));
+    F->FontCacheType = EFontCacheType::Runtime;
+PRAGMA_DISABLE_DEPRECATION_WARNINGS
+    FTypefaceEntry& Entry = F->CompositeFont.DefaultTypeface.Fonts.AddDefaulted_GetRef();
+    Entry.Name = TEXT("Default");
+    Entry.Font = FFontData(Face);
+PRAGMA_ENABLE_DEPRECATION_WARNINGS
+    return F;
+  }();
+  return Font;
+}
 // Stage 3 T5.2 ("MI Medusa identical by hash on every board"): sha256 of what
 // the loaded (cooked) material carries - its path, its parent path and every
 // scalar/vector/texture parameter override, sorted by name. The same pak gives
@@ -133,6 +153,20 @@ AS08FighterActor::AS08FighterActor() {
   ArtPlaceholder->SetCollisionEnabled(ECollisionEnabled::NoCollision);
   ArtPlaceholder->SetVisibility(false);
 
+  // AN-31 (ВР-07, ВР-72): the harpy base digit - attached to the actor, not ArtBase, so it never rotates with the
+  // figure; the placement towards the camera is recomputed by UpdateBaseDigit.
+  BaseDigitDisc = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BaseDigitDisc"));
+  BaseDigitDisc->SetupAttachment(RootComponent);
+  BaseDigitDisc->SetStaticMesh(Cylinder);
+  BaseDigitDisc->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+  BaseDigitDisc->SetVisibility(false);
+
+  BaseDigitText = CreateDefaultSubobject<UTextRenderComponent>(TEXT("BaseDigitText"));
+  BaseDigitText->SetupAttachment(RootComponent);
+  BaseDigitText->SetHorizontalAlignment(EHTA_Center);
+  BaseDigitText->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+  BaseDigitText->SetVisibility(false);
+
   // ART-004 T2.2: visibility-channel click volume of an art figure. Enabled
   // only while an art figure replaces the grey Body box (ApplyFighter).
   ClickCapsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("ClickCapsule"));
@@ -189,7 +223,9 @@ void AS08FighterActor::BeginPlay() {
                                          static_cast<UPrimitiveComponent*>(Label.Get()),
                                          static_cast<UPrimitiveComponent*>(HpLabel.Get()),
                                          static_cast<UPrimitiveComponent*>(TargetIcon.Get()),
-                                         static_cast<UPrimitiveComponent*>(TeamRing.Get())}) {
+                                         static_cast<UPrimitiveComponent*>(TeamRing.Get()),
+                                         static_cast<UPrimitiveComponent*>(BaseDigitDisc.Get()),
+                                         static_cast<UPrimitiveComponent*>(BaseDigitText.Get())}) {
     S08ApplyGameLayerPrimitive(GameLayer);
   }
   // Text faces the camera (+Y side, camera yaw -90 looks along -Y).
@@ -528,6 +564,7 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
     FacingYawDeg = static_cast<float>(FS08MoveAnim::RestYawDeg(CellCenter));
     FacingLeanDeg = 0.0f;
   }
+  UpdateBaseDigit();  // AN-31: the harpy digit rides the apply (spawn / snapshot), placed towards the camera
 }
 
 // ---- AN-23 (ВР-06): the rest facing ---------------------------------------------------------------------------
@@ -632,6 +669,7 @@ void AS08FighterActor::PlayMove(const FS08MovePlan& Plan, const FS08MoveAnimPara
   }
   ClickCapsule->SetUsingAbsoluteLocation(true);
   TickMove(NowMs);
+  UpdateBaseDigit();  // AN-31: a Place transfer hides the digit for the fade
 }
 
 bool AS08FighterActor::TickMove(int64 NowMs) {
@@ -700,6 +738,7 @@ void AS08FighterActor::EndMove() {
   ClickCapsule->SetCollisionEnabled(bArtFigureVisible ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
   Body->SetCollisionEnabled(bArtFigureVisible ? ECollisionEnabled::NoCollision : ECollisionEnabled::QueryOnly);
   Base->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+  UpdateBaseDigit();  // AN-31: the arrival re-places the digit on the camera side
 }
 
 void AS08FighterActor::ApplyFigureFacing(double YawDeg, double LeanDeg) {
@@ -895,6 +934,68 @@ FBox AS08FighterActor::GetV2FigureBox() const {
   return Out;
 }
 
+// ---- AN-31 (ВР-07, ВР-72): the harpy number on the base ---------------------------------------------------------
+
+void AS08FighterActor::UpdateBaseDigit() {
+  const bool bHarpy = bHeroV2Visual && HeroV2Spec && FCString::Strcmp(HeroV2Spec->Key, TEXT("Harpy")) == 0;
+  const bool bShow = bHarpy && !FParse::Param(FCommandLine::Get(), S08HeroesV2::BaseDigitLegacyFlagName) &&
+                     Fighter.IsAlive() && !bDeathHold && !bDissolving && !bMoveFading;
+  if (!bShow || !ArtBase) {
+    if (BaseDigitDisc) BaseDigitDisc->SetVisibility(false);
+    if (BaseDigitText) BaseDigitText->SetVisibility(false);
+    return;
+  }
+  // ВР-AN08: the pedestal's top face radius and top height come from the pedestal mesh bounds (world, scaled).
+  const FBoxSphereBounds Bounds = ArtBase->Bounds;
+  const float TopZ = static_cast<float>(Bounds.Origin.Z + Bounds.BoxExtent.Z);
+  const float RadiusUU = 0.5f * (Bounds.BoxExtent.X + Bounds.BoxExtent.Y);
+  if (RadiusUU <= 1.0f) return;
+  // The disc sits at 0.7 radius towards the local player camera (the K1 camera of a -Bench run).
+  const UWorld* World = GetWorld();
+  const APlayerController* PC = World ? World->GetFirstPlayerController() : nullptr;
+  const APlayerCameraManager* Cam = PC ? PC->PlayerCameraManager : nullptr;
+  const FVector CameraPos = Cam ? Cam->GetCameraLocation() : FVector(0.0, 10000.0, 2000.0);
+  FVector Dir(CameraPos.X - GetActorLocation().X, CameraPos.Y - GetActorLocation().Y, 0.0);
+  if (!Dir.Normalize()) Dir = FVector(0.0, 1.0, 0.0);
+  const float DiscDiameter = RadiusUU;  // 0.5 x the top-face diameter
+  FVector DiscCenter = GetActorLocation() + Dir * (0.7f * RadiusUU);
+  DiscCenter.Z = TopZ + 0.1f;
+  // The disc: the engine cylinder is 100 uu across - scale to the digit size, 0.01 in Z = a 1 uu flat plate.
+  if (!BaseDigitMid) {
+    if (UMaterialInterface* BaseDigitMi = LoadObject<UMaterialInterface>(nullptr,
+                                                                         *S08HeroesV2::BaseDigitMaterialPath())) {
+      BaseDigitMid = UMaterialInstanceDynamic::Create(BaseDigitMi, this);
+    }
+  }
+  if (!BaseDigitMid) return;  // the material asset missing in this build - no digit (fallback, traced by nothing)
+  BaseDigitMid->SetVectorParameterValue(TEXT("Color"), FLinearColor::FromSRGBColor(FColor(0x06, 0x16, 0x23)));
+  BaseDigitDisc->SetMaterial(0, BaseDigitMid);
+  const float DiscScale = DiscDiameter / 100.0f;
+  BaseDigitDisc->SetRelativeScale3D(FVector(DiscScale, DiscScale, 0.01f));
+  BaseDigitDisc->SetWorldLocation(DiscCenter);
+  BaseDigitDisc->SetVisibility(true);
+  // The digit: card.cream, its height 0.6 x the disc diameter, flat on the top face with its top away from the
+  // camera (readable from the camera side); ВР-72's "decal" is this mesh sticker + runtime text, not UDecalComponent.
+  if (UFont* DigitFont = S08BaseDigitFont()) {
+    const int32 Number = S08HeroesV2::HarpyNumber(Fighter);
+    BaseDigitText->SetText(FText::AsNumber(Number));
+    BaseDigitText->SetTextRenderColor(FColor(0xF9, 0xEB, 0xDB));  // card.cream
+    BaseDigitText->SetWorldSize(0.6f * DiscDiameter);
+    BaseDigitText->SetFont(DigitFont);
+    BaseDigitText->SetWorldRotation(FRotationMatrix::MakeFromZY(-Dir, FVector::UpVector).Rotator());
+    BaseDigitText->SetWorldLocation(DiscCenter + FVector(0.0f, 0.0f, 0.6f));
+    BaseDigitText->SetVisibility(true);
+  } else {
+    BaseDigitText->SetVisibility(false);  // the font face asset missing - the disc stays, the number not
+  }
+  if (!bBaseDigitTraced) {
+    bBaseDigitTraced = true;
+    FS08Trace::Write(FString::Printf(
+        TEXT("ARTPREVIEW basedigit fighter=%s n=%d discUU=%.1f capUU=%.1f"), *Fighter.Id,
+        S08HeroesV2::HarpyNumber(Fighter), DiscDiameter, 0.6f * DiscDiameter));
+  }
+}
+
 int32 AS08FighterActor::GetLungeContactMs(FString& OutSource) const {
   using namespace S08HeroesV2;
   OutSource = TEXT("default");
@@ -1021,6 +1122,7 @@ void AS08FighterActor::OnDeathStillFinished() {
   bDissolving = true;
   DissolveValue = 0.0f;
   SetDissolve(ArtBody, ArtBase, 0.0f, DeathStyle);
+  UpdateBaseDigit();  // AN-31: the digit hides from the start of the dissolve
   FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW anim fighter=%s death dissolve ms=%d style=%s mi=%s"), *Fighter.Id,
                                    FMath::RoundToInt(DeathPlan.DissolveSeconds * 1000.0f),
                                    DissolveStyleName(DeathStyle), *DissolveMaterial->GetName()));

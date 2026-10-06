@@ -16,6 +16,7 @@
 #include "Animation/Skeleton.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/TextRenderComponent.h"
 #include "Engine/Engine.h"
 #include "Engine/SkeletalMesh.h"
 #include "Engine/StaticMesh.h"
@@ -28,6 +29,7 @@
 #include "Materials/MaterialExpressionStaticSwitchParameter.h"
 #include "Materials/MaterialExpressionVectorParameter.h"
 #include "Misc/AutomationTest.h"
+#include "Misc/CommandLine.h"
 #include "Misc/Paths.h"
 
 namespace S08HeroesV2Test {
@@ -754,6 +756,87 @@ bool FS08HeroesV2BenchClipPoseTest::RunTest(const FString&) {
   F.Value = 99;
   TestTrue("frame 99 of a 21-frame clip clamps to its length",
            FMath::Abs(BenchClipPoseSeconds(F, 21.0 / 24.0) - 21.0 / 24.0) < Epsilon);
+  return true;
+}
+
+namespace {
+/** AN-31: a fighter row with a label. */
+FS08BoardFighter LabeledFighter(const TCHAR* Name, const TCHAR* Label) {
+  FS08BoardFighter F;
+  F.Id = FString(TEXT("f-")) + Label;
+  F.OwnerId = TEXT("owner");
+  F.Name = Name;
+  F.Label = Label;
+  F.bIsHero = false;
+  F.Health = 8;
+  F.MaxHealth = 8;
+  F.X = 1;
+  F.Y = 1;
+  return F;
+}
+/** The run's command line plus Extra while in scope (a local copy of the ArtLook test helper). */
+struct FCommandLineScope {
+  FString Saved;
+  explicit FCommandLineScope(const TCHAR* Extra) : Saved(FCommandLine::Get()) {
+    FCommandLine::Set(*(Saved + TEXT(" ") + Extra));
+  }
+  ~FCommandLineScope() { FCommandLine::Set(*Saved); }
+};
+}  // namespace
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08HeroesV2HarpyNumberTest,
+    "Unmatched.S08.HeroesV2.HarpyNumber the harpy digit 1..3 - the last label digit, 1 without one (AN-31, BP-07/72)",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08HeroesV2HarpyNumberTest::RunTest(const FString&) {
+  using namespace S08HeroesV2;
+  // The number: the last digit of the label, 1 without one, clamped to 1..3 (GD-030, Р-09).
+  TestEqual("Harpies 1", HarpyNumber(LabeledFighter(TEXT("Harpies"), TEXT("Harpies 1"))), 1);
+  TestEqual("Harpies 2", HarpyNumber(LabeledFighter(TEXT("Harpies"), TEXT("Harpies 2"))), 2);
+  TestEqual("Harpies 3", HarpyNumber(LabeledFighter(TEXT("Harpies"), TEXT("Harpies 3"))), 3);
+  TestEqual("no digit: 1", HarpyNumber(LabeledFighter(TEXT("Harpies"), TEXT("Harpies"))), 1);
+  TestEqual("a digit past 3 clamps to 3", HarpyNumber(LabeledFighter(TEXT("Harpies"), TEXT("Harpies 7"))), 3);
+  TestEqual("a 0 digit clamps to 1", HarpyNumber(LabeledFighter(TEXT("Harpies"), TEXT("Harpies 0"))), 1);
+  TestEqual("the FIRST digit does not matter - the LAST one wins",
+            HarpyNumber(LabeledFighter(TEXT("Harpies"), TEXT("3rd harpy of 2"))), 2);
+  TestEqual("a non-harpy also resolves (the caller decides)", HarpyNumber(LabeledFighter(TEXT("Medusa"), TEXT("Medusa"))), 1);
+  // The actor: the digit components show on a living v2 harpy only, hidden with the rollback flag and on other
+  // figures (the text carries the number).
+  UWorld* World = UWorld::CreateWorld(EWorldType::Game, false, TEXT("S08HarpyNumberWorld"));
+  if (!World) {
+    AddError(TEXT("could not create a test world"));
+    return true;
+  }
+  FWorldContext& Context = GEngine->CreateNewWorldContext(EWorldType::Game);
+  Context.SetCurrentWorld(World);
+  auto Apply = [&](const FS08BoardFighter& F, AS08FighterActor*& OutActor) {
+    OutActor = World->SpawnActor<AS08FighterActor>(AS08FighterActor::StaticClass(), FVector(0, -400, 0),
+                                                   FRotator::ZeroRotator);
+    OutActor->SetTeam(ES08TeamSlot::P1, ES08TeamSlot::P1, ES08TeamColorMode::Absolute);
+    OutActor->ApplyFighter(F, FVector(0, -400, 0), true, true);
+  };
+  AS08FighterActor* Harpy = nullptr;
+  Apply(LabeledFighter(TEXT("Harpies"), TEXT("Harpies 2")), Harpy);
+  if (Harpy && !Harpy->IsHeroV2()) {
+    AddWarning(TEXT("v2 harpy assets missing in this checkout - the actor half of the test is skipped"));
+  } else if (Harpy) {
+    TestTrue("the disc shows on a living v2 harpy", Harpy->GetBaseDigitDisc()->IsVisible());
+    TestTrue("the digit shows", Harpy->GetBaseDigitText()->IsVisible());
+    TestEqual("the digit text is the label number", Harpy->GetBaseDigitText()->Text.ToString(), FString(TEXT("2")));
+    const FCommandLineScope Legacy(TEXT("-S08BaseDigitLegacy"));
+    Harpy->UpdateBaseDigit();
+    TestTrue("the rollback flag hides both components",
+             !Harpy->GetBaseDigitDisc()->IsVisible() && !Harpy->GetBaseDigitText()->IsVisible());
+  }
+  AS08FighterActor* Arthur = nullptr;
+  Apply(LabeledFighter(TEXT("King Arthur"), TEXT("King Arthur")), Arthur);
+  if (Arthur && Arthur->IsHeroV2()) {
+    TestTrue("no disc on a non-harpy", !Arthur->GetBaseDigitDisc()->IsVisible());
+    TestTrue("no digit on a non-harpy", !Arthur->GetBaseDigitText()->IsVisible());
+  }
+  if (Harpy) Harpy->Destroy();
+  if (Arthur) Arthur->Destroy();
+  GEngine->DestroyWorldContext(World);
+  World->DestroyWorld(false);
   return true;
 }
 
