@@ -17,6 +17,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/TextRenderComponent.h"
+#include "Engine/Font.h"
 #include "Engine/Engine.h"
 #include "Engine/SkeletalMesh.h"
 #include "Engine/StaticMesh.h"
@@ -694,7 +695,7 @@ bool FS08HeroesV2DissolveTest::RunTest(const FString&) {
 }
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08HeroesV2BenchClipPoseTest,
-    "Unmatched.S08.HeroesV2.BenchClipPose -BenchClipPose list parser and q resolution (AN-17, BP-17)",
+    "Unmatched.S08.HeroesV2.BenchClipPose -BenchClipPose list parser and q resolution (AN-17, VR-17)",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FS08HeroesV2BenchClipPoseTest::RunTest(const FString&) {
   using namespace S08HeroesV2;
@@ -785,7 +786,7 @@ struct FCommandLineScope {
 }  // namespace
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08HeroesV2HarpyNumberTest,
-    "Unmatched.S08.HeroesV2.HarpyNumber the harpy digit 1..3 - the last label digit, 1 without one (AN-31, BP-07/72)",
+    "Unmatched.S08.HeroesV2.HarpyNumber the harpy digit 1..3 - the last label digit, 1 without one (AN-31, VR-07/72)",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FS08HeroesV2HarpyNumberTest::RunTest(const FString&) {
   using namespace S08HeroesV2;
@@ -835,6 +836,137 @@ bool FS08HeroesV2HarpyNumberTest::RunTest(const FString&) {
   }
   if (Harpy) Harpy->Destroy();
   if (Arthur) Arthur->Destroy();
+  GEngine->DestroyWorldContext(World);
+  World->DestroyWorld(false);
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08HeroesV2BaseDigitPlacementTest,
+    "Unmatched.S08.HeroesV2.BaseDigitPlacement flat upright digit on the camera side inside the pedestal top (AN-31, VR-Z1R-03)",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08HeroesV2BaseDigitPlacementTest::RunTest(const FString&) {
+  using namespace S08HeroesV2;
+  // The harpy pedestal: top radius 11 uu (the v2 pedestal x the sidekick scale), its top at z 4.
+  const float R = 11.0f;
+  const float TopZ = 4.0f;
+  struct FCase {
+    FVector Pedestal;
+    FVector Camera;
+    double RestOffDeg;  // the figure's rest facing relative to the camera axis
+  };
+  const TArray<FCase> Cases = {
+      {FVector(0, 0, 0), FVector(0, 1342, 1917), 30.0},        // K1 camera, the rest turned +30 to an enemy
+      {FVector(-340, -34, 0), FVector(0, 1342, 1917), -45.0},  // left of the board, the rest at -45
+      {FVector(300, 250, 0), FVector(-340, 870, 1200), 0.0},   // a K2 focus camera, the rest on the axis
+      {FVector(120, -280, 0), FVector(120, 600, 800), 12.0}};
+  for (int32 I = 0; I < Cases.Num(); ++I) {
+    const FCase& C = Cases[I];
+    FVector Axis(C.Camera.X - C.Pedestal.X, C.Camera.Y - C.Pedestal.Y, 0.0);
+    Axis.Normalize();
+    const double AxisYaw = FMath::RadiansToDegrees(FMath::Atan2(Axis.Y, Axis.X));
+    const FBaseDigitPlacement P = BaseDigitPlacement(C.Pedestal, TopZ, R, C.Camera, AxisYaw + C.RestOffDeg);
+    const FString Tag = FString::Printf(TEXT("case %d"), I);
+    // Sizes: the disc 0.5 x the top diameter (= R), the digit em 0.9 x the disc (cap 0.721 em).
+    TestTrue(Tag + TEXT(": disc diameter = 0.5 x the top diameter"), FMath::IsNearlyEqual(P.DiscDiameterUU, R, 1e-3f));
+    TestTrue(Tag + TEXT(": cap = 0.9 x disc x the Roboto digit height"),
+             FMath::IsNearlyEqual(P.CapUU, 0.9f * R * RobotoDigitPerEm, 1e-3f));
+    TestTrue(Tag + TEXT(": the cap reads at K2x1.6 (>= 7 uu)"), P.CapUU >= 7.0f);
+    // The disc stays inside the pedestal top: centre distance + disc radius <= R.
+    const double Reach = FVector2D(P.DiscCenter - C.Pedestal).Size() + 0.5 * P.DiscDiameterUU;
+    TestTrue(FString::Printf(TEXT("%s: the disc inside the top (%.2f <= %.2f)"), *Tag, Reach, R), Reach <= R + 1e-3);
+    // On the camera side, 60 deg off the axis, on the side the signed turn names (ВР-Z1R-03: -60 = towards the rest
+    // offset - the mirrored side of the wing rule).
+    FVector Dir = P.DiscCenter - C.Pedestal;
+    Dir.Z = 0.0;
+    Dir.Normalize();
+    TestTrue(Tag + TEXT(": the disc on the camera side (60 deg off the axis)"),
+             FMath::IsNearlyEqual(FVector::DotProduct(Dir, Axis), 0.5, 1e-3));
+    const double DiscYawOff = FMath::FindDeltaAngleDegrees(AxisYaw, FMath::RadiansToDegrees(FMath::Atan2(Dir.Y, Dir.X)));
+    const double WantOff = (C.RestOffDeg >= 0.0 ? -1.0 : 1.0) * BaseDigitSideTurnDeg;
+    TestTrue(FString::Printf(TEXT("%s: the disc on the signed side (%.1f, want %.1f, rest offset %.1f)"), *Tag,
+                             DiscYawOff, WantOff, C.RestOffDeg),
+             FMath::IsNearlyEqual(DiscYawOff, WantOff, 0.1));
+    TestTrue(Tag + TEXT(": -60 = towards the rest offset"), C.RestOffDeg >= 0.0 ? DiscYawOff > 0.0 : DiscYawOff < 0.0);
+    // The plate: flat, its bottom 0.1 above the top; the text 0.3 above the plate's top (no z-fight).
+    TestTrue(Tag + TEXT(": plate bottom above the top"),
+             P.DiscCenter.Z - 0.5 * BaseDigitDiscThicknessUU >= TopZ + 0.1 - 1e-3);
+    TestTrue(Tag + TEXT(": the text >= 0.3 uu above the plate"),
+             P.TextLocation.Z >= P.DiscCenter.Z + 0.5 * BaseDigitDiscThicknessUU + 0.3 - 1e-3);
+    TestTrue(Tag + TEXT(": the text centred on the disc"), FVector2D(P.TextLocation - P.DiscCenter).Size() < 1e-3);
+    // The text lies flat (its normal - local X - is +Z) with the glyph top (local Z) away from the camera, and it is
+    // not mirrored: the text runs along local -Y, which must be the camera's screen right (Up ^ forward).
+    const FRotationMatrix M(P.TextRotation);
+    const FVector Normal = M.GetUnitAxis(EAxis::X);
+    const FVector GlyphUp = M.GetUnitAxis(EAxis::Z);
+    const FVector TextRight = -M.GetUnitAxis(EAxis::Y);
+    const FVector CameraRight = FVector::CrossProduct(FVector::UpVector, -Axis).GetSafeNormal();
+    TestTrue(FString::Printf(TEXT("%s: the text face normal . Z = %.4f > 0.99"), *Tag, Normal.Z), Normal.Z > 0.99);
+    TestTrue(Tag + TEXT(": the glyph top away from the camera"), FVector::DotProduct(GlyphUp, -Axis) > 0.99);
+    TestTrue(Tag + TEXT(": not mirrored (the text runs to the camera's right)"),
+             FVector::DotProduct(TextRight, CameraRight) > 0.99);
+  }
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08HeroesV2BaseDigitStatesTest,
+    "Unmatched.S08.HeroesV2.BaseDigitStates the digit hides for a Place transfer and from the death dissolve (AN-31, VR-Z1R-03)",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08HeroesV2BaseDigitStatesTest::RunTest(const FString&) {
+  using namespace S08HeroesV2;
+  UWorld* World = UWorld::CreateWorld(EWorldType::Game, false, TEXT("S08BaseDigitStatesWorld"));
+  if (!World) {
+    AddError(TEXT("could not create a test world"));
+    return true;
+  }
+  FWorldContext& Context = GEngine->CreateNewWorldContext(EWorldType::Game);
+  Context.SetCurrentWorld(World);
+  const FVector Cell(0, -400, 0);
+  AS08FighterActor* Harpy = World->SpawnActor<AS08FighterActor>(AS08FighterActor::StaticClass(), Cell, FRotator::ZeroRotator);
+  FS08BoardFighter F = LabeledFighter(TEXT("Harpies"), TEXT("Harpies 3"));
+  Harpy->SetTeam(ES08TeamSlot::P1, ES08TeamSlot::P1, ES08TeamColorMode::Absolute);
+  Harpy->ApplyFighter(F, Cell, true, true);
+  if (!Harpy->IsHeroV2()) {
+    AddWarning(TEXT("v2 harpy assets missing in this checkout - the digit states test is skipped"));
+  } else {
+    auto Shown = [Harpy]() { return Harpy->GetBaseDigitDisc()->IsVisible() && Harpy->GetBaseDigitText()->IsVisible(); };
+    auto Hidden = [Harpy]() { return !Harpy->GetBaseDigitDisc()->IsVisible() && !Harpy->GetBaseDigitText()->IsVisible(); };
+    TestTrue("a living harpy shows the disc and the digit", Shown());
+    TestTrue("the digit is drawable (the offline font and the digit material are in this build)",
+             Harpy->IsBaseDigitDrawable());
+    TestEqual("the digit is the label number", Harpy->GetBaseDigitText()->Text.ToString(), FString(TEXT("3")));
+    TestTrue("the digit face is flat (normal . Z > 0.99)",
+             Harpy->GetBaseDigitText()->GetComponentTransform().GetUnitAxis(EAxis::X).Z > 0.99);
+    const UFont* Font = Harpy->GetBaseDigitText()->Font;
+    TestTrue("the digit font is offline (TextRender draws no runtime font)",
+             Font && Font->FontCacheType == EFontCacheType::Offline);
+    // A Place transfer hides it for the whole transfer; the arrival shows it again.
+    FS08MovePlan Place;
+    Place.FighterId = F.Id;
+    Place.Kind = ES08MoveKind::Place;
+    Place.Points = {Cell, Cell + FVector(200, 0, 0)};
+    Place.StepMs = 500.0;
+    Place.Steps = 1;
+    Harpy->PlayMove(Place, FS08MoveAnimParams(), 0);
+    TestTrue("Place: moving", Harpy->IsMoving());
+    TestTrue("Place: the digit hidden from the start of the transfer", Hidden());
+    Harpy->TickMove(250);
+    TestTrue("Place: still hidden half way", Hidden());
+    Harpy->FinishMove();
+    TestTrue("Place: shown again on arrival", Shown());
+    // The death: still shown while DeathSettle plays, hidden from the start of the dissolve (sidekick: right after
+    // DeathSettle, 01 F-09).
+    FS08BoardFighter Dead = F;
+    Dead.Health = 0;
+    Harpy->ApplyFighter(Dead, Cell + FVector(200, 0, 0), true, true);
+    FDeathPlan Plan;
+    FString Style;
+    if (TestTrue("the harpy dies", Harpy->GetDeathPlan(Plan, Style))) {
+      Harpy->AdvanceDeathForTest(Plan.DissolveStartSeconds() + 0.01f);
+      TestTrue("death: the dissolve runs", Harpy->IsDissolving());
+      TestTrue("death: the digit hidden from the dissolve on", Hidden());
+    }
+  }
+  Harpy->Destroy();
   GEngine->DestroyWorldContext(World);
   World->DestroyWorld(false);
   return true;

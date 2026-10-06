@@ -18,7 +18,6 @@
 #include "Engine/StaticMesh.h"
 #include "Engine/Texture2D.h"
 #include "Engine/Font.h"
-#include "Engine/FontFace.h"
 #include "Components/TextRenderComponent.h"
 #include "Animation/AnimSequenceBase.h"
 #include "Animation/AnimSingleNodeInstance.h"
@@ -40,23 +39,13 @@ UMaterialInterface* LoadSolidMaterial() {
   return LoadObject<UMaterialInterface>(nullptr, TEXT("/Engine/BasicShapes/BasicShapeMaterial"));
 }
 
-// AN-31 (ВР-72): the digit font - a transient runtime UFont over the imported Roboto Bold Condensed FontFace
-// (ВР-Z1: UE 5.8 removed the offline font importer and its composite structs are not exposed to editor python,
-// so the "_Offline" font of the card is this runtime composite; the payload cooks with the FontFace).
+// AN-31 (ВР-72, ВР-Z1R-03): the digit font - the OFFLINE (texture-page) Roboto Bold Condensed digits 0-9
+// (tools/art/hero/base_digit_import.py). UTextRenderComponent draws offline fonts only: a runtime-cached font never
+// reaches its scene proxy (FTextRenderSceneProxy::CreateRenderThreadResources returns early), which is why the
+// first Z-1 digit (a transient runtime UFont over the FontFace) was never drawn.
 UFont* S08BaseDigitFont() {
-  static UFont* Font = [] {
-    UFontFace* Face = LoadObject<UFontFace>(nullptr, TEXT("/Game/UM/Fonts/F_UM_RobotoBoldCondensed"));
-    if (!Face) return (UFont*)nullptr;
-    UFont* F = NewObject<UFont>(GetTransientPackage(), TEXT("F_UM_RobotoBoldCondensed_Offline"));
-    F->FontCacheType = EFontCacheType::Runtime;
-PRAGMA_DISABLE_DEPRECATION_WARNINGS
-    FTypefaceEntry& Entry = F->CompositeFont.DefaultTypeface.Fonts.AddDefaulted_GetRef();
-    Entry.Name = TEXT("Default");
-    Entry.Font = FFontData(Face);
-PRAGMA_ENABLE_DEPRECATION_WARNINGS
-    return F;
-  }();
-  return Font;
+  UFont* Font = LoadObject<UFont>(nullptr, *S08HeroesV2::BaseDigitFontPath(), nullptr, LOAD_NoWarn);
+  return Font && Font->FontCacheType == EFontCacheType::Offline && Font->Textures.Num() > 0 ? Font : nullptr;
 }
 // Stage 3 T5.2 ("MI Medusa identical by hash on every board"): sha256 of what
 // the loaded (cooked) material carries - its path, its parent path and every
@@ -93,7 +82,9 @@ FString S08MaterialDigest(const UMaterialInterface* Material, FString& OutParent
 } // namespace
 
 AS08FighterActor::AS08FighterActor() {
-  PrimaryActorTick.bCanEverTick = false;
+  // AN-23 (ВР-06, F6): the actor ticks only while a facing turn blends (StartFacingTurn enables it, the end disables).
+  PrimaryActorTick.bCanEverTick = true;
+  PrimaryActorTick.bStartWithTickEnabled = false;
   RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 
   static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeFinder(
@@ -164,6 +155,7 @@ AS08FighterActor::AS08FighterActor() {
   BaseDigitText = CreateDefaultSubobject<UTextRenderComponent>(TEXT("BaseDigitText"));
   BaseDigitText->SetupAttachment(RootComponent);
   BaseDigitText->SetHorizontalAlignment(EHTA_Center);
+  BaseDigitText->SetVerticalAlignment(EVRTA_TextCenter);
   BaseDigitText->SetCollisionEnabled(ECollisionEnabled::NoCollision);
   BaseDigitText->SetVisibility(false);
 
@@ -560,7 +552,15 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
     ApplyMovePose(MovePose);
   } else if (S08Facing::LegacyRequested()) {
     // The legacy half-field reset of every apply; AN-23 (ВР-06) keeps the current angle instead - the board actor's
-    // ApplyRestFacing right after decides (and the fresh spawn turns from the legacy initial angle of ApplyHeroV2).
+    // ApplyRestFacing right after decides.
+    FacingYawDeg = static_cast<float>(FS08MoveAnim::RestYawDeg(CellCenter));
+    FacingLeanDeg = 0.0f;
+  } else if (bRestFacingApplied) {
+    // F1 (Z-1 review): ApplyHeroV2 / the legacy visuals reset the mesh yaw to the half-field rule on every snapshot;
+    // the v1 facing (or the turn blending towards it) is re-applied so a snapshot never shows the old rule.
+    ApplyFigureFacing(FacingYawDeg, FacingLeanDeg);
+  } else {
+    // Before the first rest facing the figure shows the half-field angle ApplyHeroV2 set: the turn starts there.
     FacingYawDeg = static_cast<float>(FS08MoveAnim::RestYawDeg(CellCenter));
     FacingLeanDeg = 0.0f;
   }
@@ -571,85 +571,137 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
 
 void AS08FighterActor::ApplyRestFacing(const TCHAR* Src, bool bLegacy, const FVector& CameraPos, bool bHasEnemy,
                                        const FVector& NearestEnemyPos, const FString& EnemyId) {
-  const TCHAR* Event = bRestFacingApplied ? Src : TEXT("spawn");  // the first apply of a figure is its spawn
-  bRestFacingApplied = true;
-  UWorld* World = GetWorld();
   if (bLegacy) {
-    if (World) World->GetTimerManager().ClearTimer(FacingTurnTimer);
+    StopFacingTurn();
+    bRestFacingApplied = true;
+    bFaceHold = bFacePending = false;
     FacingYawDeg = static_cast<float>(FS08MoveAnim::RestYawDeg(GetActorLocation()));
     FacingLeanDeg = 0.0f;
     ApplyFigureFacing(FacingYawDeg, 0.0);
     return;
   }
-  // The move plan owns the facing until the move ends; a one-shot clip (AN-24: the lunge holds the target angle, the
-  // return comes at its end) and the dead (ВР-06 states) never take a rest turn.
-  if (bMoving || bDeathHold || !Fighter.IsAlive()) return;
+  // The move plan owns the facing until the move ends; the attack holds the target angle until its return (AN-24 /
+  // AN-25), and the dead never turn (ВР-06 states).
+  if (bMoving || bDeathHold || !Fighter.IsAlive() || bFaceHold) return;
   if (HeroClip == S08HeroesV2::EClip::LungeAttack || HeroClip == S08HeroesV2::EClip::HitReact) return;
-  const double Want =
-      S08Facing::RestYaw(GetActorLocation(), CameraPos, bHasEnemy, NearestEnemyPos, FacingYawDeg);
-  if (FMath::Abs(FMath::FindDeltaAngleDegrees(FacingYawDeg, Want)) < 0.05) return;  // the dead band / no enemy kept it
+  const bool bSpawn = !bRestFacingApplied;
+  bRestFacingApplied = true;
   const double Cam = S08Facing::YawToward(GetActorLocation(), CameraPos);
-  FS08Trace::Write(FString::Printf(
-      TEXT("FACING fighter=%s src=%s rest=%.0f cam=%.0f off=%.0f enemy=%s"), *Fighter.Id, Event, Want, Cam,
-      FMath::Abs(FMath::FindDeltaAngleDegrees(Cam, Want)), bHasEnemy ? *EnemyId : TEXT("none")));
-  if (!World) {
-    ApplyFigureFacing(Want, 0.0);
-    return;
+  // A spawn without a living enemy faces the camera axis (the card); later snapshots without one keep the angle.
+  const double Want = !bHasEnemy && bSpawn
+      ? Cam
+      : S08Facing::RestYaw(GetActorLocation(), CameraPos, bHasEnemy, NearestEnemyPos, FacingYawDeg);
+  DigitRestYawDeg = Want;
+  bDigitRestYawSet = true;
+  const double Change = FMath::Abs(FMath::FindDeltaAngleDegrees(FacingYawDeg, Want));
+  if (!bSpawn && Change < S08Facing::MinTurnDeg) {
+    UpdateBaseDigit();
+    return;  // the dead band / no enemy kept the angle: no turn, no trace (F4)
   }
-  StartFacingTurn(Want, S08Facing::ReturnMs);
+  FS08Trace::Write(FString::Printf(
+      TEXT("FACING fighter=%s src=%s from=%.0f rest=%.0f cam=%.0f off=%.0f enemy=%s"), *Fighter.Id,
+      bSpawn ? TEXT("spawn") : Src, FacingYawDeg, Want, Cam, FMath::Abs(FMath::FindDeltaAngleDegrees(Cam, Want)),
+      bHasEnemy ? *EnemyId : TEXT("none")));
+  if (Change >= S08Facing::MinTurnDeg) StartFacingTurn(Want, S08Facing::ReturnMs);
+  UpdateBaseDigit();  // the digit sits on the side away from the new rest offset
 }
 
 void AS08FighterActor::StartFacingTurn(double WantYawDeg, double Ms) {
   FacingTurnFromDeg = FacingYawDeg;
   FacingTurnToDeg = WantYawDeg;
   FacingTurnMs = FMath::Max(0.0, Ms);
+  FacingTurnElapsedMs = 0.0;
   // Reduced motion / speed "none" snap every turn (ВР-06 states).
-  if (!GetWorld() || FacingTurnMs <= 0.0 || S08IconMotion::IsReducedMotion() ||
-      S08Motion::Current().SnapsMoves()) {
-    if (UWorld* World = GetWorld()) World->GetTimerManager().ClearTimer(FacingTurnTimer);
+  if (!GetWorld() || FacingTurnMs <= 0.0 || S08IconMotion::IsReducedMotion() || S08Motion::Current().SnapsMoves()) {
+    StopFacingTurn();
     ApplyFigureFacing(WantYawDeg, 0.0);
     return;
   }
-  FacingTurnStartSeconds = GetWorld()->GetTimeSeconds();
-  GetWorld()->GetTimerManager().SetTimer(FacingTurnTimer, this, &AS08FighterActor::TickFacingTurn, 1.0f / 60.0f, true);
+  bFacingTurning = true;
+  SetActorTickEnabled(true);  // F6: the frame tick drives the blend (no fixed-rate timer)
 }
 
-void AS08FighterActor::PlayFaceTarget(const FString& TargetId, const FVector& TargetWorldPos, double Ms) {
-  if (S08Facing::LegacyRequested() || !Fighter.IsAlive() || bDeathHold) return;
-  const UWorld* World = GetWorld();
-  const APlayerController* PC = World ? World->GetFirstPlayerController() : nullptr;
-  const APlayerCameraManager* Cam = PC ? PC->PlayerCameraManager : nullptr;
-  const FVector CameraPos = Cam ? Cam->GetCameraLocation() : FVector(0.0, 10000.0, 2000.0);
+void AS08FighterActor::StopFacingTurn() {
+  bFacingTurning = false;
+  if (IsActorTickEnabled()) SetActorTickEnabled(false);
+}
+
+void AS08FighterActor::Tick(float DeltaSeconds) {
+  Super::Tick(DeltaSeconds);
+  AdvanceFacingTurn(DeltaSeconds);
+}
+
+void AS08FighterActor::AdvanceFacingTurn(float DeltaSeconds) {
+  if (!bFacingTurning) {
+    StopFacingTurn();
+    return;
+  }
+  if (bMoving || bDeathHold) {  // the move plan / the death own the figure now
+    StopFacingTurn();
+    return;
+  }
+  FacingTurnElapsedMs += FMath::Max(0.0, static_cast<double>(DeltaSeconds)) * 1000.0;
+  const double Alpha = FMath::Clamp(FacingTurnElapsedMs / FMath::Max(1e-9, FacingTurnMs), 0.0, 1.0);
+  ApplyFigureFacing(S08Facing::TurnYawAt(FacingTurnFromDeg, FacingTurnToDeg, Alpha), 0.0);
+  if (Alpha >= 1.0) StopFacingTurn();
+}
+
+float AS08FighterActor::GetShownFigureYawDeg() const {
+  if (bHeroV2Visual && ArtBody) return static_cast<float>(ArtBody->GetRelativeRotation().Yaw);
+  if (bMedusaVisual && ArtBody) return static_cast<float>(ArtBody->GetRelativeRotation().Yaw + 90.0);
+  if (bBlockoutVisible && ArtPlaceholder) return static_cast<float>(ArtPlaceholder->GetRelativeRotation().Yaw + 90.0);
+  return FacingYawDeg;
+}
+
+void AS08FighterActor::PlayFaceTarget(const FString& TargetId, const FVector& TargetWorldPos, double Ms, int64 NowMs,
+                                      bool bSnapAtLunge) {
+  if (S08Facing::LegacyRequested() || !Fighter.IsAlive() || bDeathHold || bMoving) return;
+  const FVector CameraPos = AS08BoardActor::ViewCameraLocation(GetWorld());
   const double Axis = S08Facing::YawToward(GetActorLocation(), CameraPos);
   const double ToTarget = S08Facing::YawToward(GetActorLocation(), TargetWorldPos);
   const bool bClamped = FMath::Abs(FMath::FindDeltaAngleDegrees(Axis, ToTarget)) > S08Facing::AttackMaxOffDeg;
   const double Want = S08Facing::AttackYaw(GetActorLocation(), TargetWorldPos, CameraPos);
-  FS08Trace::Write(FString::Printf(
-      TEXT("FACING fighter=%s src=attack yaw=%.0f target=%s clamped=%d"), *Fighter.Id, Want, *TargetId,
-      bClamped ? 1 : 0));
+  bFaceHold = true;  // the rest facing of later snapshots waits for the return (AN-25)
+  const FString Line = FString::Printf(
+      TEXT("FACING fighter=%s src=attack t=%lld from=%.0f yaw=%.0f target=%s clamped=%d"), *Fighter.Id,
+      static_cast<long long>(NowMs), FacingYawDeg, Want, *TargetId, bClamped ? 1 : 0);
+  if (bSnapAtLunge || S08IconMotion::IsReducedMotion() || S08Motion::Current().SnapsMoves()) {
+    // ВР-Z1R-05: reduced motion / speed "none" - no turn inside the pause; the angle snaps in the Lunge frame.
+    StopFacingTurn();
+    bFacePending = true;
+    FacePendingYawDeg = Want;
+    FacePendingTrace = Line;
+    return;
+  }
+  bFacePending = false;
+  FS08Trace::Write(Line + FString::Printf(TEXT(" ms=%.0f"), Ms));
   StartFacingTurn(Want, Ms);
 }
 
-void AS08FighterActor::ReturnToRestFacing(double WantYawDeg, double Ms) {
-  if (S08Facing::LegacyRequested() || bDeathHold || !Fighter.IsAlive()) return;
-  // AN-25: the dead band never holds the return - it always reaches the rest angle.
-  FS08Trace::Write(FString::Printf(
-      TEXT("FACING fighter=%s src=attack-return from=%.0f rest=%.0f ms=%.0f"), *Fighter.Id, FacingYawDeg, WantYawDeg,
-      S08Facing::ReturnMs));
-  StartFacingTurn(WantYawDeg, Ms);
+void AS08FighterActor::CommitFaceTarget(int64 NowMs) {
+  if (!bFacePending) return;
+  bFacePending = false;
+  if (!Fighter.IsAlive() || bDeathHold || bMoving) return;
+  FS08Trace::Write(FacePendingTrace + FString::Printf(TEXT(" ms=0 snap=lunge lungeT=%lld"),
+                                                      static_cast<long long>(NowMs)));
+  StopFacingTurn();
+  ApplyFigureFacing(FacePendingYawDeg, 0.0);
 }
 
-void AS08FighterActor::TickFacingTurn() {
-  UWorld* World = GetWorld();
-  if (!World) return;
-  if (bMoving || bDeathHold) {
-    World->GetTimerManager().ClearTimer(FacingTurnTimer);
-    return;
-  }
-  const double Alpha = FMath::Clamp(
-      (World->GetTimeSeconds() - FacingTurnStartSeconds) * 1000.0 / FMath::Max(1e-9, FacingTurnMs), 0.0, 1.0);
-  ApplyFigureFacing(S08Facing::TurnYawAt(FacingTurnFromDeg, FacingTurnToDeg, Alpha), 0.0);
-  if (Alpha >= 1.0) World->GetTimerManager().ClearTimer(FacingTurnTimer);
+void AS08FighterActor::ReturnToRestFacing(const TCHAR* Src, double WantYawDeg, double Ms, int64 NowMs) {
+  bFaceHold = false;
+  bFacePending = false;
+  if (S08Facing::LegacyRequested() || bDeathHold || !Fighter.IsAlive() || bMoving) return;
+  DigitRestYawDeg = WantYawDeg;
+  bDigitRestYawSet = true;
+  // AN-25: the dead band never holds the return - it always reaches the rest angle; F4: a change under
+  // MinTurnDeg (a HitReact of a figure that never turned) is no turn and no line.
+  if (FMath::Abs(FMath::FindDeltaAngleDegrees(FacingYawDeg, WantYawDeg)) < S08Facing::MinTurnDeg) return;
+  FS08Trace::Write(FString::Printf(
+      TEXT("FACING fighter=%s src=%s t=%lld from=%.0f rest=%.0f ms=%.0f"), *Fighter.Id, Src,
+      static_cast<long long>(NowMs), FacingYawDeg, WantYawDeg, Ms));
+  StartFacingTurn(WantYawDeg, Ms);
+  UpdateBaseDigit();
 }
 
 // ---- MS-T-16 move animation ------------------------------------------------
@@ -657,7 +709,8 @@ void AS08FighterActor::TickFacingTurn() {
 void AS08FighterActor::PlayMove(const FS08MovePlan& Plan, const FS08MoveAnimParams& Params, int64 NowMs) {
   if (bMoving) FinishMove();  // jump_to_final: the new event of the same figure
   if (Plan.Points.Num() == 0 || !Fighter.IsAlive() || bDeathHold) return;
-  if (UWorld* World = GetWorld()) World->GetTimerManager().ClearTimer(FacingTurnTimer);  // AN-23: the plan owns the facing
+  StopFacingTurn();  // AN-23: the plan owns the facing (an attack hold or a deferred snap ends with the move)
+  bFaceHold = bFacePending = false;
   MovePlan = Plan;
   MoveParams = Params;
   MoveSeqStartMs = NowMs;
@@ -669,7 +722,7 @@ void AS08FighterActor::PlayMove(const FS08MovePlan& Plan, const FS08MoveAnimPara
   }
   ClickCapsule->SetUsingAbsoluteLocation(true);
   TickMove(NowMs);
-  UpdateBaseDigit();  // AN-31: a Place transfer hides the digit for the fade
+  UpdateBaseDigit();  // AN-31: a Place transfer hides the digit for the whole transfer (D3)
 }
 
 bool AS08FighterActor::TickMove(int64 NowMs) {
@@ -942,61 +995,75 @@ FBox AS08FighterActor::GetV2FigureBox() const {
 
 void AS08FighterActor::UpdateBaseDigit() {
   const bool bHarpy = bHeroV2Visual && HeroV2Spec && FCString::Strcmp(HeroV2Spec->Key, TEXT("Harpy")) == 0;
+  // D3: hidden for the whole Place transfer (the fade-out, the jump, the fade-in), not only while the MIC fades.
+  const bool bPlacing = bMoving && MovePlan.Kind == ES08MoveKind::Place;
   const bool bShow = bHarpy && !FParse::Param(FCommandLine::Get(), S08HeroesV2::BaseDigitLegacyFlagName) &&
-                     Fighter.IsAlive() && !bDeathHold && !bDissolving && !bMoveFading;
-  if (!bShow || !ArtBase) {
+                     Fighter.IsAlive() && !bDeathHold && !bDissolving && !bMoveFading && !bPlacing;
+  bBaseDigitDrawable = false;
+  const UStaticMesh* PedestalMesh = ArtBase ? ArtBase->GetStaticMesh() : nullptr;
+  if (!bShow || !PedestalMesh) {
     if (BaseDigitDisc) BaseDigitDisc->SetVisibility(false);
     if (BaseDigitText) BaseDigitText->SetVisibility(false);
     return;
   }
-  // ВР-AN08: the pedestal's top face radius and top height come from the pedestal mesh bounds (world, scaled).
-  const FBoxSphereBounds Bounds = ArtBase->Bounds;
-  const float TopZ = static_cast<float>(Bounds.Origin.Z + Bounds.BoxExtent.Z);
-  const float RadiusUU = 0.5f * (Bounds.BoxExtent.X + Bounds.BoxExtent.Y);
+  // The pedestal's top face from its mesh bounds x the component scale - rotation-free (the world AABB of a turned
+  // pedestal would grow), measured where the pedestal stands (the actor; the plate rides the actor).
+  const FBoxSphereBounds Local = PedestalMesh->GetBounds();
+  const FVector Scale = ArtBase->GetComponentScale();
+  const FVector Centre = ArtBase->GetComponentLocation();
+  const float TopZ = static_cast<float>(Centre.Z + (Local.Origin.Z + Local.BoxExtent.Z) * Scale.Z);
+  const float RadiusUU = static_cast<float>(0.5 * (Local.BoxExtent.X * Scale.X + Local.BoxExtent.Y * Scale.Y));
   if (RadiusUU <= 1.0f) return;
-  // The disc sits at 0.7 radius towards the local player camera (the K1 camera of a -Bench run).
-  const UWorld* World = GetWorld();
-  const APlayerController* PC = World ? World->GetFirstPlayerController() : nullptr;
-  const APlayerCameraManager* Cam = PC ? PC->PlayerCameraManager : nullptr;
-  const FVector CameraPos = Cam ? Cam->GetCameraLocation() : FVector(0.0, 10000.0, 2000.0);
-  FVector Dir(CameraPos.X - GetActorLocation().X, CameraPos.Y - GetActorLocation().Y, 0.0);
-  if (!Dir.Normalize()) Dir = FVector(0.0, 1.0, 0.0);
-  const float DiscDiameter = RadiusUU;  // 0.5 x the top-face diameter
-  FVector DiscCenter = GetActorLocation() + Dir * (0.7f * RadiusUU);
-  DiscCenter.Z = TopZ + 0.1f;
-  // The disc: the engine cylinder is 100 uu across - scale to the digit size, 0.01 in Z = a 1 uu flat plate.
+  // ВР-Z1R-04: the view camera (the BoardCamera view target), not the camera manager's cached POV.
+  const FVector CameraPos = AS08BoardActor::ViewCameraLocation(GetWorld());
+  const double RestYaw = bDigitRestYawSet ? DigitRestYawDeg : static_cast<double>(FacingYawDeg);
+  const float TurnDeg = S08HeroesV2::BaseDigitTurnDeg();
+  const S08HeroesV2::FBaseDigitPlacement P =
+      S08HeroesV2::BaseDigitPlacement(Centre, TopZ, RadiusUU, CameraPos, RestYaw, TurnDeg);
   if (!BaseDigitMid) {
-    if (UMaterialInterface* BaseDigitMi = LoadObject<UMaterialInterface>(nullptr,
-                                                                         *S08HeroesV2::BaseDigitMaterialPath())) {
-      BaseDigitMid = UMaterialInstanceDynamic::Create(BaseDigitMi, this);
+    if (UMaterialInterface* DiscMaterial = LoadObject<UMaterialInterface>(nullptr,
+                                                                          *S08HeroesV2::BaseDigitMaterialPath())) {
+      BaseDigitMid = UMaterialInstanceDynamic::Create(DiscMaterial, this);
     }
   }
   if (!BaseDigitMid) return;  // the material asset missing in this build - no digit (fallback, traced by nothing)
-  BaseDigitMid->SetVectorParameterValue(TEXT("Color"), FLinearColor::FromSRGBColor(FColor(0x06, 0x16, 0x23)));
+  BaseDigitMid->SetVectorParameterValue(TEXT("Color"), FLinearColor::FromSRGBColor(FColor(0x06, 0x16, 0x23)));  // card.navy
   BaseDigitDisc->SetMaterial(0, BaseDigitMid);
-  const float DiscScale = DiscDiameter / 100.0f;
-  BaseDigitDisc->SetRelativeScale3D(FVector(DiscScale, DiscScale, 0.01f));
-  BaseDigitDisc->SetWorldLocation(DiscCenter);
+  BaseDigitDisc->SetWorldScale3D(P.DiscScale);
+  BaseDigitDisc->SetWorldLocationAndRotation(P.DiscCenter, FRotator::ZeroRotator);
   BaseDigitDisc->SetVisibility(true);
-  // The digit: card.cream, its height 0.6 x the disc diameter, flat on the top face with its top away from the
-  // camera (readable from the camera side); ВР-72's "decal" is this mesh sticker + runtime text, not UDecalComponent.
-  if (UFont* DigitFont = S08BaseDigitFont()) {
-    const int32 Number = S08HeroesV2::HarpyNumber(Fighter);
-    BaseDigitText->SetText(FText::AsNumber(Number));
-    BaseDigitText->SetTextRenderColor(FColor(0xF9, 0xEB, 0xDB));  // card.cream
-    BaseDigitText->SetWorldSize(0.6f * DiscDiameter);
-    BaseDigitText->SetFont(DigitFont);
-    BaseDigitText->SetWorldRotation(FRotationMatrix::MakeFromZY(-Dir, FVector::UpVector).Rotator());
-    BaseDigitText->SetWorldLocation(DiscCenter + FVector(0.0f, 0.0f, 0.6f));
-    BaseDigitText->SetVisibility(true);
-  } else {
-    BaseDigitText->SetVisibility(false);  // the font face asset missing - the disc stays, the number not
+  // The digit: runtime text (И-7) in the offline Roboto Bold Condensed, unlit card.cream, flat on the plate.
+  UFont* DigitFont = S08BaseDigitFont();
+  if (DigitFont && !BaseDigitTextMid) {
+    if (UMaterialInterface* TextMaterial = LoadObject<UMaterialInterface>(nullptr,
+                                                                          *S08HeroesV2::BaseDigitTextMaterialPath())) {
+      BaseDigitTextMid = UMaterialInstanceDynamic::Create(TextMaterial, this);
+      BaseDigitTextMid->SetVectorParameterValue(TEXT("Color"),
+                                                FLinearColor::FromSRGBColor(FColor(0xF9, 0xEB, 0xDB)));  // card.cream
+    }
   }
-  if (!bBaseDigitTraced) {
-    bBaseDigitTraced = true;
+  const int32 Number = S08HeroesV2::HarpyNumber(Fighter);
+  if (DigitFont && BaseDigitTextMid) {
+    if (BaseDigitText->Font != DigitFont) BaseDigitText->SetFont(DigitFont);
+    if (BaseDigitText->TextMaterial != BaseDigitTextMid) BaseDigitText->SetTextMaterial(BaseDigitTextMid);
+    BaseDigitText->SetText(FText::AsNumber(Number));
+    BaseDigitText->SetTextRenderColor(FColor(0xF9, 0xEB, 0xDB));  // card.cream (the material reads its own token)
+    BaseDigitText->SetWorldSize(P.TextWorldSizeUU);
+    BaseDigitText->SetWorldLocationAndRotation(P.TextLocation, P.TextRotation);
+    BaseDigitText->SetVisibility(true);
+    bBaseDigitDrawable = true;
+  } else {
+    BaseDigitText->SetVisibility(false);  // the offline font / text material missing - the disc stays, the number not
+  }
+  // One line per change of the number / side (the spawn, then the rest facing that decides the side).
+  const FString TraceKey = FString::Printf(TEXT("%d|%d|%d"), Number, P.Side, bBaseDigitDrawable ? 1 : 0);
+  if (TraceKey != BaseDigitTraceKey) {
+    BaseDigitTraceKey = TraceKey;
     FS08Trace::Write(FString::Printf(
-        TEXT("ARTPREVIEW basedigit fighter=%s n=%d discUU=%.1f capUU=%.1f"), *Fighter.Id,
-        S08HeroesV2::HarpyNumber(Fighter), DiscDiameter, 0.6f * DiscDiameter));
+        TEXT("ARTPREVIEW basedigit fighter=%s n=%d discUU=%.1f capUU=%.1f topRadiusUU=%.1f side=%d turn=%.0f ")
+            TEXT("drawable=%d font=%s"),
+        *Fighter.Id, Number, P.DiscDiameterUU, P.CapUU, RadiusUU, P.Side, TurnDeg, bBaseDigitDrawable ? 1 : 0,
+        DigitFont ? *DigitFont->GetName() : TEXT("missing")));
   }
 }
 
@@ -1045,7 +1112,14 @@ void AS08FighterActor::ApplyHeroMaterialMids() {
   for (int32 Slot = 0; Slot < Slots; ++Slot) {
     UMaterialInterface* Current = ArtBody->GetMaterial(Slot);
     UMaterialInstanceDynamic* Mid = HeroMaterialMids[Slot].Get();
-    if (Mid && Current != Mid) Mid = nullptr;  // the slot was swapped underneath (dissolve / Place / restore)
+    if (Mid && Current != Mid) {
+      if (Mid->Parent == Current) {
+        // M4: ApplyHeroV2 re-sets the body MI on every snapshot - the cached MID over that same MI goes back on.
+        ArtBody->SetMaterial(Slot, Mid);
+      } else {
+        Mid = nullptr;  // the slot was swapped to another material (dissolve / Place): a MID over the new one
+      }
+    }
     if (!Mid && Current) {
       Mid = UMaterialInstanceDynamic::Create(Current, this);
       HeroMaterialMids[Slot] = Mid;
@@ -1110,11 +1184,15 @@ void AS08FighterActor::TickHitTint() {
 void AS08FighterActor::OnHeroClipFinished() {
   const S08HeroesV2::EClip Ended = HeroClip;
   NotifyHeroAnimEvent(S08HeroesV2::EEvent::ClipFinished, -1);  // back to Idle
-  // AN-25 (ВР-06): the attacker returns to its rest angle when the one-shot clip ends (HitReact too: the attacker of
-  // an effect's counter-damage returns after its flinch). The board actor owns the camera / enemy context.
+  // AN-25 (ВР-06): the attacker returns to its rest angle when the one-shot clip ends (src=attack-return); a HitReact
+  // end returns too (src=hit-return: the attacker of an effect's counter-damage after its flinch - a target that never
+  // turned is no change, so no line). The board actor owns the camera / enemy context.
   if ((Ended == S08HeroesV2::EClip::LungeAttack || Ended == S08HeroesV2::EClip::HitReact) &&
       !S08Facing::LegacyRequested() && Fighter.IsAlive() && !bDeathHold && !bMoving) {
-    if (AS08BoardActor* Board = Cast<AS08BoardActor>(GetOwner())) Board->FighterReturnToRest(Fighter.Id);
+    if (AS08BoardActor* Board = Cast<AS08BoardActor>(GetOwner())) {
+      Board->FighterReturnToRest(Fighter.Id,
+                                 Ended == S08HeroesV2::EClip::LungeAttack ? TEXT("attack-return") : TEXT("hit-return"));
+    }
   }
 }
 
@@ -1123,6 +1201,8 @@ void AS08FighterActor::BeginHeroDeath() {
   // The figure stays where it fell: labels, selection / combat markers and the click volume go at once;
   // the pedestal and the team ring stay under the settling figure until it is gone.
   bDeathHold = true;
+  StopFacingTurn();  // ВР-06: death never turns (the fall keeps the angle it had)
+  bFaceHold = bFacePending = false;
   SetActorEnableCollision(false);
   bIsSelected = false;
   bIsCombatAttacker = false;

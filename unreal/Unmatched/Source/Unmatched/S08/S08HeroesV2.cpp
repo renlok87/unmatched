@@ -282,7 +282,43 @@ int32 HarpyNumber(const FS08BoardFighter& Fighter) {
 
 FString BaseDigitMaterialPath() { return TEXT("/Game/UM/Materials/v2/M_UM_BaseDigit"); }
 
-FString BaseDigitFontFacePath() { return TEXT("/Game/UM/Fonts/F_UM_RobotoBoldCondensed"); }
+FString BaseDigitTextMaterialPath() { return TEXT("/Game/UM/Materials/v2/M_UM_BaseDigitText"); }
+
+FString BaseDigitFontPath() { return TEXT("/Game/UM/Fonts/F_UM_RobotoBoldCondensed_Offline"); }
+
+float BaseDigitTurnDeg() {
+  float Turn = BaseDigitSideTurnDeg;
+  if (FParse::Value(FCommandLine::Get(), BaseDigitTurnParamName, Turn)) Turn = FMath::Clamp(Turn, -90.0f, 90.0f);
+  return Turn;
+}
+
+FBaseDigitPlacement BaseDigitPlacement(const FVector& PedestalCenter, float TopZ, float TopRadiusUU,
+                                       const FVector& CameraPos, double RestYawDeg, float TurnDeg) {
+  FBaseDigitPlacement Out;
+  const float R = FMath::Max(0.0f, TopRadiusUU);
+  Out.DiscDiameterUU = BaseDigitDiscOfTopDiameter * 2.0f * R;
+  // The camera axis (pedestal -> camera, XY) and the side away from the figure's rest offset.
+  FVector Axis(CameraPos.X - PedestalCenter.X, CameraPos.Y - PedestalCenter.Y, 0.0);
+  if (!Axis.Normalize()) Axis = FVector(0.0, 1.0, 0.0);
+  const double AxisYaw = FMath::RadiansToDegrees(FMath::Atan2(Axis.Y, Axis.X));
+  const double Off = FMath::FindDeltaAngleDegrees(AxisYaw, RestYawDeg);
+  Out.Side = Off >= 0.0 ? -1 : 1;
+  const double PlaceYaw = FMath::DegreesToRadians(AxisYaw + Out.Side * TurnDeg);
+  const FVector Dir(FMath::Cos(PlaceYaw), FMath::Sin(PlaceYaw), 0.0);
+  const FVector Centre2D(PedestalCenter.X, PedestalCenter.Y, 0.0);
+  const FVector OnTop = Centre2D + Dir * (BaseDigitCentreOfRadius * R);
+  Out.DiscCenter = FVector(OnTop.X, OnTop.Y, TopZ + BaseDigitDiscLiftUU + 0.5f * BaseDigitDiscThicknessUU);
+  const float Xy = Out.DiscDiameterUU / 100.0f;  // the engine cylinder: 100 uu across, 100 uu tall
+  Out.DiscScale = FVector(Xy, Xy, BaseDigitDiscThicknessUU / 100.0f);
+  // The digit: flat (its normal +Z), the glyph top away from the camera so it reads upright from the camera side,
+  // centred on the disc, lifted clear of the plate's top (no z-fight).
+  const float Em = BaseDigitEmOfDisc * Out.DiscDiameterUU;
+  Out.TextWorldSizeUU = Em * RobotoCellPerEm;
+  Out.CapUU = Em * RobotoDigitPerEm;
+  Out.TextRotation = FRotationMatrix::MakeFromXZ(FVector::UpVector, -Axis).Rotator();
+  Out.TextLocation = FVector(OnTop.X, OnTop.Y, TopZ + BaseDigitDiscLiftUU + BaseDigitDiscThicknessUU + BaseDigitTextLiftUU);
+  return Out;
+}
 
 void SetDissolve(UPrimitiveComponent* Body, UPrimitiveComponent* Pedestal, float Progress, EDissolveStyle Style) {
   const float P = FMath::Clamp(Progress, 0.0f, 1.0f);

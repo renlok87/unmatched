@@ -134,11 +134,17 @@ public:
   /** The digit components (never null; visibility is the state - see UpdateBaseDigit). */
   UStaticMeshComponent* GetBaseDigitDisc() const { return BaseDigitDisc; }
   UTextRenderComponent* GetBaseDigitText() const { return BaseDigitText; }
-  /** AN-31: the navy disc with the cream number on the pedestal's top edge nearest the camera (ВР-AN08 sizes from
-   *  the pedestal mesh bounds; the components ride the actor, never the figure's rotation). Shown on living v2
-   *  harpies only - hidden with -S08BaseDigitLegacy, on other figures, during a Place transfer and from the death
-   *  dissolve on; repositioned by every apply / move end. Traced once per figure 'ARTPREVIEW basedigit ...'. */
+  /** AN-31 (ВР-Z1R-03): the navy disc with the cream number flat on the pedestal's top face, on the camera side
+   *  turned 60 deg towards the figure's rest offset (S08HeroesV2::BaseDigitSideTurnDeg - the mirrored side of the
+   *  wing rule: the near wing covered the other one; clear of the talons); sizes from the pedestal mesh bounds
+   *  (disc 0.5 x the top-face diameter, centre at 0.48 R, digit em 0.9 x the disc, top of the glyph away from the
+   *  camera, unlit tokens); the components ride the actor, never the figure's rotation. Shown on living v2 harpies
+   *  only - hidden with -S08BaseDigitLegacy, on other figures, for a whole Place transfer and from the death
+   *  dissolve on; re-placed by every apply / rest facing / move end. Traced once per figure
+   *  'ARTPREVIEW basedigit fighter=.. n=.. discUU=.. capUU=.. side=..'. */
   void UpdateBaseDigit();
+  /** AN-31: the base digit's text is in place and drawable (an offline font, the digit material). */
+  bool IsBaseDigitDrawable() const { return bBaseDigitDrawable; }
   // ---- AN-32 (ВР-16): the heroMaterials Fix of the map light profile ----
   /** Stores the hero's fix (nullptr / neutral / -S08HeroMatFixLegacy = the plain MI, no MID) and wraps the body
    *  slots in MIDs that carry the Fix values; re-applied whenever a slot's material is swapped (the dissolve MIC,
@@ -166,20 +172,36 @@ public:
   /** AN-23 (ВР-06): the rest facing of a standing figure. bLegacy applies the half-field rule at once and traces
    *  nothing; else the wanted angle (S08Facing::RestYaw: three-quarter to CameraPos, offset to the nearest living
    *  enemy) is reached over 150 ms on the shortest arc (instant under reduced motion / speed "none"), traced
-   *  'FACING fighter=.. src=.. rest=.. cam=.. off=.. enemy=..' when a turn starts. The first apply of a figure is
-   *  traced src=spawn whatever Src says. Skipped while a move plays (the plan owns the facing until it ends) and for
-   *  a dead figure (ВР-06: death never turns). */
+   *  'FACING fighter=.. src=.. rest=.. cam=.. off=.. enemy=..' when a turn of at least S08Facing::MinTurnDeg starts.
+   *  The first apply of a living figure is its spawn: traced src=spawn always (ВР-Z1R-04), facing the camera axis
+   *  when no living enemy is there yet (the card). Skipped while a move plays (the plan owns the facing until it
+   *  ends), while an attack holds the target angle (AN-24 / AN-25) and for a dead figure (ВР-06: death never turns). */
   void ApplyRestFacing(const TCHAR* Src, bool bLegacy, const FVector& CameraPos, bool bHasEnemy,
                        const FVector& NearestEnemyPos, const FString& EnemyId);
   /** AN-24 (ВР-06): the attacker turns to face TargetWorldPos over Ms (the remaining face window): the direction to
    *  the target clamped to +-90 deg from the camera axis (S08Facing::AttackYaw, ВР-AN02 - never the back), holding
-   *  the angle through the following LungeAttack. Instant under reduced motion / speed "none" or Ms <= 0; a no-op
-   *  with -S08FacingLegacy. Traced 'FACING fighter=.. src=attack yaw=.. target=.. clamped=0|1'. */
-  void PlayFaceTarget(const FString& TargetId, const FVector& TargetWorldPos, double Ms);
-  /** AN-25 (ВР-06): back to the rest angle after a lunge / HitReact - the wanted angle comes from the caller (the
-   *  board actor's camera + enemies); the dead band never holds it (the return always reaches the rest angle).
-   *  Traced 'FACING fighter=.. src=attack-return from=.. rest=.. ms=150'. */
-  void ReturnToRestFacing(double WantYawDeg, double Ms);
+   *  the angle through the following LungeAttack until the AN-25 return. NowMs = the game (CUE) clock of the event.
+   *  bSnapAtLunge (speed "none") or reduced motion: no turn now - the angle snaps in the Lunge frame
+   *  (CommitFaceTarget, ВР-Z1R-05). A no-op with -S08FacingLegacy. Traced
+   *  'FACING fighter=.. src=attack t=.. from=.. yaw=.. target=.. clamped=0|1 ms=..'. */
+  void PlayFaceTarget(const FString& TargetId, const FVector& TargetWorldPos, double Ms, int64 NowMs,
+                      bool bSnapAtLunge);
+  /** AN-24: the Lunge frame - a face turn deferred by reduced motion / speed "none" snaps now (traced ms=0). */
+  void CommitFaceTarget(int64 NowMs);
+  /** AN-25 (ВР-06): back to the rest angle after a lunge (src=attack-return) or a HitReact (src=hit-return) - the
+   *  wanted angle comes from the caller (the board actor's camera + enemies); the dead band never holds it (the
+   *  return always reaches the rest angle). Ends the attack hold. No turn and no trace under S08Facing::MinTurnDeg.
+   *  Traced 'FACING fighter=.. src=attack-return|hit-return t=.. from=.. rest=.. ms=150'. */
+  void ReturnToRestFacing(const TCHAR* Src, double WantYawDeg, double Ms, int64 NowMs);
+  /** AN-24 / AN-25: the attacker holds its target angle (from the Face event until its return). */
+  bool IsHoldingAttackFacing() const { return bFaceHold; }
+  /** A facing turn (rest, attack or return) is still blending. */
+  bool IsFacingTurning() const { return bFacingTurning; }
+  /** Automation / frame tick: advances a facing turn by DeltaSeconds (the actor tick calls it while a turn blends). */
+  void AdvanceFacingTurn(float DeltaSeconds);
+  /** The world yaw of the v2 mesh as shown (ArtBody relative yaw; the figure yaw of the other visuals). */
+  float GetShownFigureYawDeg() const;
+  virtual void Tick(float DeltaSeconds) override;
 
   /** Screen-space combat icon mode: the world billboard stays hidden while
    *  the HUD draws the exact-size icon (the trace still reports icon=1). */
@@ -260,7 +282,10 @@ private:
   TObjectPtr<UTextRenderComponent> BaseDigitText;
   UPROPERTY()
   TObjectPtr<UMaterialInstanceDynamic> BaseDigitMid;
-  bool bBaseDigitTraced = false;
+  UPROPERTY()
+  TObjectPtr<UMaterialInstanceDynamic> BaseDigitTextMid;
+  FString BaseDigitTraceKey;
+  bool bBaseDigitDrawable = false;
   // AN-32 (ВР-16): the heroMaterials Fix over per-slot MIDs of the v2 body (neutral = the plain MI).
   int32 HeroMatClassA = -1;
   float HeroMatGainA = 1.0f;
@@ -392,17 +417,26 @@ private:
   void EndMove();
   /** Figure mesh rotation for a world facing + lean (v2: forward +X; legacy candidate / blockout: forward +Y). */
   void ApplyFigureFacing(double YawDeg, double LeanDeg);
-  // AN-23 (ВР-06): the rest-facing turn (150 ms, shortest arc) driven by a short timer while it blends; AN-24's
-  // face turn and AN-25's return reuse it (FacingTurnMs tells which length).
-  FTimerHandle FacingTurnTimer;
+  // AN-23 (ВР-06): the rest-facing turn (150 ms, shortest arc), driven by the actor's frame tick while it blends
+  // (F6: never a fixed-rate timer); AN-24's face turn and AN-25's return reuse it (FacingTurnMs tells which length).
   double FacingTurnFromDeg = 0.0;
   double FacingTurnToDeg = 0.0;
   double FacingTurnMs = 0.0;
-  double FacingTurnStartSeconds = 0.0;
+  double FacingTurnElapsedMs = 0.0;
+  bool bFacingTurning = false;
   bool bRestFacingApplied = false;
-  void TickFacingTurn();
+  // AN-24: the attacker holds the target angle from the Face event to its return; a snap deferred to the Lunge frame.
+  bool bFaceHold = false;
+  bool bFacePending = false;
+  double FacePendingYawDeg = 0.0;
+  FString FacePendingTrace;
+  // AN-31: the rest angle the base digit is placed against (the side away from the figure's rest offset).
+  double DigitRestYawDeg = 0.0;
+  bool bDigitRestYawSet = false;
   /** Starts the blend to WantYawDeg over Ms (instant under reduced motion / speed "none" or Ms <= 0). */
   void StartFacingTurn(double WantYawDeg, double Ms);
+  /** Stops a running facing turn where it is. */
+  void StopFacingTurn();
 
   FS08BoardFighter Fighter;
 };

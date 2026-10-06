@@ -262,21 +262,29 @@ public:
   /** Some figure is still travelling or settling. */
   bool AnyFighterMoving() const;
   // ---- AN-23 (ВР-06): the rest facing of the figures (S08Facing.h) ----
-  /** The rest facing (world yaw) of the figure standing at WorldPos - v1: three-quarter to the local camera with the
-   *  offset to the nearest living enemy; the half-field rule with -S08FacingLegacy. The plan builder's RestYawAt. */
-  double RestYawAt(const FVector& WorldPos) const;
+  /** The v1 rest facing (world yaw) of Me standing at WorldPos: three-quarter to the view camera with the offset to
+   *  the nearest living enemy of Me from there, no dead band (a plan end, a return); the camera axis without an
+   *  enemy; the half-field rule with -S08FacingLegacy. PlayFighterMoves sets the plan ends with it. */
+  double RestYawFor(const AS08FighterActor* Me, const FVector& WorldPos) const;
   /** (Re)applies the rest facing of one figure: the camera and the nearest living enemy of its owner; Src labels the
    *  FACING trace (snapshot / move - the actor itself upgrades its first apply to spawn). */
   void ApplyFighterRestFacing(AS08FighterActor* Actor, const TCHAR* Src);
-  /** The local player camera location (the K1 camera of a -Bench run); the +Y board side when there is none yet. */
+  /** ВР-Z1R-04: the one camera helper of the figures (facing, the base digit) - the player's view target (the flow game
+   *  mode's BoardCamera camera component), else the camera manager, else the +Y board side (no player: automation). */
+  static FVector ViewCameraLocation(const UWorld* World);
+  /** ViewCameraLocation of this board's world (the K1 camera of a -Bench run at spawn). */
   FVector LocalCameraLocation() const;
-  /** The living figure that stands on WorldPos (within half a cell), or nullptr. */
-  AS08FighterActor* FigureActorAt(const FVector& WorldPos) const;
-  /** The nearest living enemy (another owner) of Me by XY distance, or nullptr. */
+  /** The nearest living enemy (another owner, not dying) of Me by XY distance, or nullptr. */
   AS08FighterActor* NearestEnemyOf(const AS08FighterActor* Me) const;
-  /** AN-25 (ВР-06): the attacker's return to its rest angle after its LungeAttack / HitReact ended - RestYaw on the
-   *  current positions (a dead target switches to the nearest living enemy), the dead band never holds it. */
-  void FighterReturnToRest(const FString& FighterId);
+  /** The nearest living enemy of Me measured from WorldPos (Me's destination), or nullptr. */
+  AS08FighterActor* NearestEnemyFrom(const AS08FighterActor* Me, const FVector& WorldPos) const;
+  /** AN-25 (ВР-06): the return to the rest angle after a LungeAttack (Src attack-return) / HitReact (hit-return)
+   *  ended - RestYawFor on the current positions (a dead target switches to the nearest living enemy), the dead band
+   *  never holds it; traced with the game clock. */
+  void FighterReturnToRest(const FString& FighterId, const TCHAR* Src);
+  /** F4: the game (CUE) clock of the FACING traces - the flow game mode's NowMs; the world time without one. */
+  void SetGameClock(TFunction<int64()> Clock) { GameClock = MoveTemp(Clock); }
+  int64 GameNowMs() const;
   /** AN-32 (ВР-16): pushes the active light profile's "heroMaterials" Fix to every living v2 figure (their body
    *  slots wrap in MIDs); the Art Tuner scope "heroMaterials" (no rebuild, live tune). Traces one board line. */
   void UpdateHeroMaterials();
@@ -618,7 +626,8 @@ private:
   int32 HeroLightCount = 0;
   int32 HeroLightLayersPerFigure = 0;
   FString HeroLightTraceKey;
-  FString HeroMaterialsTraceKey;  // AN-32 (BP-16): the heroMaterials board trace
+  FString HeroMaterialsTraceKey;  // AN-32 (ВР-16): the heroMaterials board trace
+  TFunction<int64()> GameClock;   // F4: the FACING trace clock (SetGameClock)
 
   // ---- MS-T-08 move plates ----
   UPROPERTY()

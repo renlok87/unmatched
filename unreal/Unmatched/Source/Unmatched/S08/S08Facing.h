@@ -26,6 +26,9 @@ constexpr double AttackMaxOffDeg = 90.0;
 constexpr double AttackTurnMs = 120.0;
 /** AN-23 / AN-25: a rest turn (spawn / snapshot / move end / after a lunge), ms. */
 constexpr double ReturnMs = 150.0;
+/** ВР-Z1R-05 (review F4): a rest / return change under this is no turn and no FACING line (the spawn line is always
+ *  written). */
+constexpr double MinTurnDeg = 0.5;
 /** Rollback of this table: -S08FacingLegacy = the half-field rule of before ВР-06, no FACING traces. */
 inline const TCHAR* const LegacyFlagName = TEXT("S08FacingLegacy");
 
