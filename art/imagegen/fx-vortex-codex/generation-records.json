@@ -1,0 +1,47 @@
+{
+  "task": "FX-29",
+  "image_generation_used": false,
+  "optional_ai_exploration": "omitted",
+  "generations": [
+    {
+      "prompt_key": "FX-29/procedural/v0-12deg",
+      "exact_prompt_source": "docs/game-design/visual/06-tasks/prompts/FX-29.codex.md#Task",
+      "exact_prompt_source_sha256": "55dc3924acf4d6e0713854062022b36296082591f51c8cbe5ad753a2b169cb08",
+      "method": "deterministic geometry; original 12degree exploration reconstructed from numeric parameters without retouching",
+      "provenance_limit": "First export was overwritten during iteration; this is a deterministic reconstruction, not a preserved original file.",
+      "parameters_override": {
+        "terminal_arc_width_degrees": 12
+      },
+      "unretouched": [
+        "concepts/procedural-v0-12deg-mask-unretouched.png",
+        "concepts/procedural-v0-12deg-colour-unretouched.png"
+      ]
+    },
+    {
+      "prompt_key": "FX-29/procedural/v1",
+      "exact_prompt_source": "docs/game-design/visual/06-tasks/prompts/FX-29.codex.md#Task",
+      "exact_prompt_source_sha256": "55dc3924acf4d6e0713854062022b36296082591f51c8cbe5ad753a2b169cb08",
+      "method": "deterministic numerical geometry; no raster art input to textures",
+      "script": "_tools/build_vortex.py",
+      "parameters": "parameters.json",
+      "unretouched": [
+        "concepts/procedural-v1-mask-unretouched.png",
+        "concepts/procedural-v1-colour-unretouched.png",
+        "concepts/procedural-v1-four-step-unretouched.png"
+      ]
+    },
+    {
+      "prompt_key": "FX-29/procedural/v2",
+      "exact_prompt_source": "docs/game-design/visual/06-tasks/prompts/FX-29.fix1.codex.md#Task",
+      "exact_prompt_source_sha256": "e7e10bb4ef53b05bbc609703da2a53cf6628031bad168f90d149c34da54cc008",
+      "method": "deterministic corrective geometry; zero image generations",
+      "script": "_tools/build_vortex.py",
+      "parameters": "parameters.json",
+      "unretouched": [
+        "concepts/procedural-v2-mask-unretouched.png",
+        "concepts/procedural-v2-colour-unretouched.png",
+        "concepts/procedural-v2-four-step-unretouched.png"
+      ]
+    }
+  ]
+}

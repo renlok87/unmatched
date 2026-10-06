@@ -1,0 +1,61 @@
+{
+  "cue": "CUE-011",
+  "delay_from_contact_ms": 70,
+  "lifetime_ms": 270,
+  "fps": 30,
+  "loop": false,
+  "interpolate_frames": false,
+  "time_domain": "unscaled real-time",
+  "runtime_rule": "if elapsed_ms >= 270: hidden; otherwise frame=min(7,floor(elapsed_ms*30/1000))",
+  "frame_intervals_ms": [
+    {
+      "frame": 0,
+      "start": 0,
+      "end": 33.333333333333336
+    },
+    {
+      "frame": 1,
+      "start": 33.333333333333336,
+      "end": 66.66666666666667
+    },
+    {
+      "frame": 2,
+      "start": 66.66666666666667,
+      "end": 100
+    },
+    {
+      "frame": 3,
+      "start": 100,
+      "end": 133.33333333333334
+    },
+    {
+      "frame": 4,
+      "start": 133.33333333333334,
+      "end": 166.66666666666666
+    },
+    {
+      "frame": 5,
+      "start": 166.66666666666666,
+      "end": 200
+    },
+    {
+      "frame": 6,
+      "start": 200,
+      "end": 233.33333333333334
+    },
+    {
+      "frame": 7,
+      "start": 233.33333333333334,
+      "end": 270
+    }
+  ],
+  "poster": 0,
+  "reduced_motion_poster": 2,
+  "reduced_motion_rule": "frame 2, held 270 ms, no scaling animation; hide at endpoint",
+  "max_simultaneous_sprites_assumed": 4,
+  "system_sprite_ceiling": 64,
+  "mask_decode": "weights=texture.rgb / max(sum(texture.rgb),epsilon); colour=weights.r*impact+weights.g*rim+weights.b*keyline; opacity=texture.a",
+  "sampler": "clamp, mipmaps ON, no frame interpolation; half-texel inset within each atlas cell; empty margin isolates cells through 32 px mip; FX-21 confirms in UE",
+  "colour_space": "mask linear (sRGB off); preview sRGB; alpha straight; tint pass unlit",
+  "rgb_bleed_mask": "not encoded: conflicts with A=max(R,G,B); preview RGB bleed=4 px"
+}
