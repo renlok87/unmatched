@@ -1,0 +1,101 @@
+{
+  "task": "FX-20",
+  "optional_image_generation": "skipped",
+  "reason": "Final geometry is fully specified; procedural raster is reproducible and enforces exact tokens.",
+  "image_generations": [],
+  "prompt_keys": [
+    "FX-20/FINAL/procedural-A",
+    "FX-20/FINAL/procedural-B",
+    "FX-20/FIX1/procedural-C"
+  ],
+  "generations": [
+    {
+      "prompt_key": "FX-20/FINAL/procedural-A",
+      "type": "procedural",
+      "unretouched": true,
+      "script": "concepts/variant-A-builder.py",
+      "script_sha256": "4fbcb37a6eec31c80c6435735e0cae564ae90a68f55059efb4a83ebfde57a020",
+      "outputs": [
+        "concepts/variant-A-mask.png",
+        "concepts/variant-A-preview.png"
+      ],
+      "geometry": {
+        "radius": 102.4,
+        "valley_ratio": 0.34,
+        "centre": [
+          128,
+          128
+        ],
+        "rim": 8,
+        "keyline": 8
+      },
+      "result": "rejected: cream/body too small; frame0 polar ray test failed at 36 px",
+      "output_sha256": {
+        "concepts/variant-A-mask.png": "8b3b81aa044de84c40f0661fcbcbaa25e1b70863479e7d428e8fdce42cb17b46",
+        "concepts/variant-A-preview.png": "d3a704e740472a72c6e4da4099b789b9b928ac8a40ee413bd0cf87ec6a60d973"
+      }
+    },
+    {
+      "prompt_key": "FX-20/FINAL/procedural-B",
+      "type": "procedural",
+      "unretouched": true,
+      "script": "_tools/build_hitstar.py",
+      "script_sha256": "0e135c0e2114da4c29a306670fc3717e5a48b05fb83515b89bbe55e54ee6de80",
+      "outputs": [
+        "concepts/variant-B-mask.png",
+        "concepts/variant-B-preview.png"
+      ],
+      "geometry": {
+        "radius": 102.4,
+        "valley_ratio": 0.43,
+        "centre": [
+          129.0,
+          129.0
+        ],
+        "rim": 8.0,
+        "keyline": 8.0
+      },
+      "result": "first run / rejected by CX-18: inner keyline consumes warm long rays",
+      "output_sha256": {
+        "concepts/variant-B-mask.png": "ec1b47a330f3022b5bf84bb3e8ab12d185ddc83e998f55c9409862b94710695f",
+        "concepts/variant-B-preview.png": "975e6f13219c48df1605a17ec00b4715df1888d4e5f25251371310416b84abd7"
+      },
+      "historical_script_revision": true
+    },
+    {
+      "prompt_key": "FX-20/FIX1/procedural-C",
+      "type": "procedural",
+      "unretouched": true,
+      "script": "_tools/build_hitstar.py",
+      "script_sha256": "1a619fa461b3fc42e01eef461f7fffffb16117341e30a2b0b0563db646da7792",
+      "outputs": [
+        "concepts/variant-C-mask.png",
+        "concepts/variant-C-preview.png"
+      ],
+      "output_sha256": {
+        "concepts/variant-C-mask.png": "2c2947ece67599a7d9777972617738feadbfee66af533a1b016ce2b77473415e",
+        "concepts/variant-C-preview.png": "afa3761492e4fe2c360f7f90b920284d196270cf412504072ff0f4d0bb3653b7"
+      },
+      "geometry": {
+        "long_radius_px": 94.4,
+        "outer_keyline_radius_px": 102.4,
+        "short_tip_ratio": 0.55,
+        "valley_ratio": 0.37,
+        "long_valley_degrees": 24,
+        "short_valley_degrees": 12,
+        "centre": [
+          129.0,
+          129.0
+        ],
+        "rim_inside_px": 8.0,
+        "keyline_outside_px": 8.0
+      },
+      "result": "recommended / CX-18 corrective geometry"
+    }
+  ],
+  "task_prompt_sha256": "b326863ef706706f5e97c4b7cbddda542ef4cc3fe5b9bfb5974aae8fabbb05fb",
+  "snapshot_sha256": "f6d5522d92db0cab030d052037e058c50462c45e1351968951c997801de35354",
+  "final_atlas": "vector/T_FX_HitStar_4x2.png",
+  "fix1_prompt_sha256": "e7db00584fa8e44c9ec16da1efa6395cdaf8cd89e7712acf26c40d7110111868",
+  "historical_script_note": "B script_sha256 identifies the original builder revision; it is not overwritten with C source hash. Frozen output hashes preserve the first-run images."
+}
