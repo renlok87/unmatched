@@ -279,3 +279,37 @@
 - Вне git: `C:/tmp/visual/VS2-frames/`. Там прогоны (`runs/`, ранние — `runs-*`), логи, скрипты (`run-vs2.ps1`,
   `run-list.ps1`, `gwidget.py`, `make_sheets.py`, `build_cards.py`, `measure_caption.py`, `overlap.py`), полные кадры
   и вырезки блоков (`crops/`).
+
+## Ревью VS-2 (единственный проход, 2026-10-07, по делегированию)
+
+Один ревьюер, арт и объём вместе (полномочие пользователя 2026-10-06 «Все решения принимай»).
+
+- **Объём ветки** (`git log fix/admin-panel..HEAD`, полный дифф): все изменения относятся к карточкам VS-2 (HB-06,
+  HB-10/11/12/23, HB-14…16, HB-18…21, IC-34, IC-38…61, IC-70, CP-08…12, правка гейта pending `72fc9c69`) или к их
+  доказательствам. Горячие файлы: `S08FlowGameMode.cpp` +31 / −26 (точки подключения под `UmHudBlockOnSlate`),
+  `S08FlowGameModeTurnHud.cpp` +35 / −22 (Slate-столбец портретов только при откате `panels`), остальное — в
+  `S08FlowGameModeUmHud.cpp` и `UI/`. Текстуры сканов и аватаров в git нет (`S08CardMedia.json`: «Textures are
+  gitignored»); листы доказательств — кадры нашего клиента (02 §0, ВР-48).
+- **Откаты:** `-S08SlateHud[=top|status|banner|panels|cursor]` (разбор `ParseSlateHud`, кадры `-slate`),
+  `-S08PortraitLegacy` (`UmPortrait`, `UmHudPlayerPanel`), `-S08IconLegacy` (`S08IconMotion`, `UmTeamChip`) — в коде и
+  тестах `Unmatched.S08.Hud.*`. Принятый арт включён по умолчанию.
+- **Проверки повторены ревьюером:** pytest `tools/s08/hud_contract`, `tools/s08/cue_contract`,
+  `tools/art/tests/test_hud_skins_import.py`, `tools/art/cards` — 165 passed; `hud_contract.py validate` PASS. Логи UE:
+  `C:/tmp/visual/VS2-frames/ue-tests-full-4.log` — 418 Success, 0 Fail, EXIT CODE 0 (после последней правки кода
+  `230b2b0d`). Штамп упаковки `230b2b0d`, `sourceHash 02e3ea36…`.
+- **Кадры открыты ревьюером (Read), 11 кадров выхода:** `pv-marm-720-150` host own +3 и joiner opp +0,5;
+  `pv-sarp-720-150` host own +0,5 и joiner opp +3; `pv-sarp-1080-100` host own +3 и joiner opp +0,5;
+  `pv-marm-1080-100-slate` host own +3; `vsaipv-sarp-720` own +0,5; `pv-marm-1080-75` joiner own +3;
+  `pv-marm-720-100` host opp +3; `pv-marm-1080-150` joiner own +0,5; `pv-sarp-1080-75` host opp +0,5. Доски настоящие,
+  задник верный (Marmoreal — `-ConceptPaste`, Sarpedon — lit3d), в партиях Medusa — King Arthur шесть фигур v2, слоя
+  отладки нет. Подтверждены пункты «Открыто» 2, 3, 8, 9 (STATUS над шапкой панели колоды на 720p 150 %, баннер на
+  Slate-итоге боя, английские Slate-блоки).
+- **Вердикт:** HB-06, HB-10, HB-11, HB-14…16, HB-18…21, HB-23, CP-08…12, IC-34, IC-38…61, IC-70 — приняты, по
+  делегированию. HB-12 — технически импортировано (кадров наведения нет). IC-46/48/52/55/59 — приняты как формы, кадр
+  K1 ждёт HB-43.
+- **Замечание на VS-3 (не блокер):** если `UUmHudRoot::Create` вернёт `nullptr` без `-S08SlateHud`, Slate-столбец
+  портретов не строится (`BuildTurnHudWidgets` решает по флагу, а не по факту создания корня), и портретов не будет
+  вовсе. Проверка: строить Slate-столбец при `HUD-ROOT created=0`.
+- **ВР-VS2-81** (по делегированию): для карточек-пакетов (HB-07, 08, 13, 17, 22, 26, 29, 34, 38, 42, 44, IC-36, CP-07,
+  EN-01, FX-20/29/31) листы overlay в `comparison/` пакета и раздел ревью в его README заменяют отдельную папку
+  `evidence/VISUAL/<id>/`. Статусы этих карточек поправлены в основной копии (`86ad1b55`).
