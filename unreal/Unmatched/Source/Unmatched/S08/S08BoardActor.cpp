@@ -8,6 +8,7 @@
 #include "S08MapBackdrop.h"
 #include "S08Render.h"
 #include "S08TraceLog.h"
+#include "UI/UmCardMedia.h"
 #include "S08Contracts.h"
 #include "Dom/JsonObject.h"
 #include "HAL/FileManager.h"
@@ -157,6 +158,8 @@ void AS08BoardActor::BeginPlay() {
   // v2 figures, the tray and the light - is the default of every run (it used to need -ArtPreview, which is now the
   // review tooling only); -S08GreyBoard keeps the grey board. One line states the effective look of the run.
   FS08Trace::Write(S08ArtLook::TraceLine());
+  // VS-1 CP-02 review tooling: -ArtPreviewCardMediaProbe loads every card / back / portrait texture of the registry once.
+  if (UmCardMedia::ProbeRequested(FCommandLine::Get())) FS08Trace::Write(UmCardMedia::ProbeLine());
   if (!S08ArtLook::Enabled()) return;
   // Wave 5c-B: the diorama tray (default; -S08DioramaLegacy: none) - hidden until an art profile is active.
   EnsureDioramaTray(true);

@@ -35,6 +35,10 @@
 //                       heart mark, marker-x-stamp in the combat panel).
 //   VS-1 HB-09 (02-visual-design.md §13.3; ВР-62): -S08DpiLegacy - the engine DPI curve (720 -> 0.666) instead of the
 //                       project one (720 -> 0.75): UI/UmHudScale.h; traced as dpi=legacy(-S08DpiLegacy).
+//   VS-1 CP-02 (ВР-CP08, 02 §6.1 / §6.4): the real avatars and card scans (UI/UmCardMedia.h registry) are the default;
+//   -S08PortraitLegacy  the portraits as before: the team-colour disc + monogram (traced portraits=legacy(..)).
+//   -S08CardArtLegacy   the card face is the 02 §6.1 fallback without the scan, the back the card.navy plate with the
+//                       resource-card icon (traced cards=legacy(..)).
 // -ArtPreviewHeroesV2 / -ArtPreviewDiorama stay accepted as no-op aliases (scripts pass them).
 //
 // The trace tags of the art path stay 'ARTPREVIEW ...' (every gate script and tool reads them); one 'ARTLOOK ...' line
@@ -80,10 +84,24 @@ UNMATCHED_API bool S08Markers();
 UNMATCHED_API void SetMarkersOverrideForTest(bool bOn);
 UNMATCHED_API void ResetMarkersOverrideForTest();
 
+/** -S08PortraitLegacy: the portraits fall back to the team disc + monogram (VS-1 CP-02, ВР-CP08). */
+inline const TCHAR* const PortraitLegacyFlagName = TEXT("S08PortraitLegacy");
+/** -S08CardArtLegacy: the card faces / backs fall back to the 02 §6.1 plate without the scan (VS-1 CP-02, ВР-CP08). */
+inline const TCHAR* const CardArtLegacyFlagName = TEXT("S08CardArtLegacy");
+/** World-free rule of both: the accepted media unless the rollback flag is on the command line. */
+constexpr bool DecideCardMedia(bool bLegacyFlag) { return !bLegacyFlag; }
+/** True unless -S08PortraitLegacy: portraits show the hero / sidekick avatar textures (registry UI/UmCardMedia.h). */
+UNMATCHED_API bool PortraitAvatars();
+/** True unless -S08CardArtLegacy: card faces show the scan, backs the original card back. */
+UNMATCHED_API bool CardArt();
+/** The ARTLOOK fields of CP-02: "portraits=avatar|legacy(-S08PortraitLegacy) cards=art|legacy(-S08CardArtLegacy)". */
+UNMATCHED_API FString CardMediaField(const TCHAR* CommandLine);
+
 /** 'ARTLOOK art=1|0 source=default|S08GreyBoard|override heroes=v2|legacy(..) tray=on|legacy(..)|off env=on|off(..)
  *   review=0|1 legacyRender=0|1 markers=0|1 aliases=<-ArtPreviewHeroesV2,-ArtPreviewDiorama,-S08HeartGlow or ->
- *   hud=ring:<id>|legacy(..),glow:on|legacy(..),tracker:de|legacy(..),cross:on|legacy(..) dpi=project|legacy(..)' - the
- *   effective look of this run (the hud field: FS08TurnHudLook::ArtLookField; dpi: UmHudScale::ArtLookField, HB-09). */
+ *   hud=ring:<id>|legacy(..),glow:on|legacy(..),tracker:de|legacy(..),cross:on|legacy(..) dpi=project|legacy(..)
+ *   portraits=avatar|legacy(..) cards=art|legacy(..)' - the effective look of this run (the hud field:
+ *   FS08TurnHudLook::ArtLookField; dpi: UmHudScale::ArtLookField, HB-09; portraits / cards: CardMediaField, CP-02). */
 UNMATCHED_API FString TraceLine();
 
 }  // namespace S08ArtLook

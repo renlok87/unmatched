@@ -38,6 +38,18 @@ void SetMarkersOverrideForTest(bool bOn) { GMarkersOverride = bOn ? 1 : 0; }
 
 void ResetMarkersOverrideForTest() { GMarkersOverride = -1; }
 
+bool PortraitAvatars() { return DecideCardMedia(FParse::Param(FCommandLine::Get(), PortraitLegacyFlagName)); }
+
+bool CardArt() { return DecideCardMedia(FParse::Param(FCommandLine::Get(), CardArtLegacyFlagName)); }
+
+FString CardMediaField(const TCHAR* CommandLine) {
+  const bool bPortraitLegacy = CommandLine && FParse::Param(CommandLine, PortraitLegacyFlagName);
+  const bool bCardLegacy = CommandLine && FParse::Param(CommandLine, CardArtLegacyFlagName);
+  return FString::Printf(TEXT("portraits=%s cards=%s"),
+                         DecideCardMedia(bPortraitLegacy) ? TEXT("avatar") : *FString::Printf(TEXT("legacy(-%s)"), PortraitLegacyFlagName),
+                         DecideCardMedia(bCardLegacy) ? TEXT("art") : *FString::Printf(TEXT("legacy(-%s)"), CardArtLegacyFlagName));
+}
+
 FString TraceLine() {
   const TCHAR* Cmd = FCommandLine::Get();
   const bool bArt = Enabled();
@@ -69,10 +81,12 @@ FString TraceLine() {
   const FString HudLook = FS08TurnHudLook::ArtLookField(Cmd);
   // VS-1 HB-09: the DPI curve of this run (project ВР-62 or the -S08DpiLegacy rollback).
   const FString Dpi = UmHudScale::ArtLookField(Cmd);
+  // VS-1 CP-02: the real avatars / card scans or their rollbacks (ВР-CP08).
+  const FString CardMedia = CardMediaField(Cmd);
   return FString::Printf(
-      TEXT("ARTLOOK art=%d source=%s heroes=%s tray=%s env=%s review=%d legacyRender=%d markers=%d aliases=%s %s %s%s"),
+      TEXT("ARTLOOK art=%d source=%s heroes=%s tray=%s env=%s review=%d legacyRender=%d markers=%d aliases=%s %s %s %s%s"),
       bArt ? 1 : 0, Source, *Heroes, *Tray, *Env, ReviewTooling() ? 1 : 0, S08LegacyRender() ? 1 : 0, S08Markers() ? 1 : 0,
-      Aliases.Num() ? *FString::Join(Aliases, TEXT(",")) : TEXT("-"), *HudLook, *Dpi,
+      Aliases.Num() ? *FString::Join(Aliases, TEXT(",")) : TEXT("-"), *HudLook, *Dpi, *CardMedia,
       bArt ? TEXT("") : TEXT(" (grey board: no art profile, figures, tray or art HUD layer)"));
 }
 
