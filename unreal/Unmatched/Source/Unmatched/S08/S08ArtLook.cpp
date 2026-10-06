@@ -3,6 +3,7 @@
 #include "S08ArtPreviewMedusa.h"
 #include "S08Diorama.h"
 #include "S08EnvLayout.h"
+#include "S08Facing.h"
 #include "S08HeroesV2.h"
 #include "S08MoveAnim.h"
 #include "S08Render.h"
@@ -90,10 +91,14 @@ FString TraceLine() {
   const FS08MoveAnimParams MoveParams = FS08MoveAnimParams::FromCommandLine(Cmd);
   const FString MoveEase = MoveParams.bEaseEnds ? FString::Printf(TEXT("ease%.0f"), MoveParams.EaseMs)
                                                : FString(TEXT("legacy(-S08MoveEaseLegacy)"));
+  // AN-23 (ВР-06): the rest facing rule (three-quarter to the camera) with its rollback
+  const FString Facing = S08Facing::LegacyRequested()
+                             ? FString::Printf(TEXT("legacy(-%s)"), S08Facing::LegacyFlagName)
+                             : FString(TEXT("v1"));
   return FString::Printf(
-      TEXT("ARTLOOK art=%d source=%s heroes=%s tray=%s env=%s review=%d legacyRender=%d markers=%d aliases=%s %s %s %s move=%s%s"),
+      TEXT("ARTLOOK art=%d source=%s heroes=%s tray=%s env=%s review=%d legacyRender=%d markers=%d aliases=%s %s %s %s move=%s facing=%s%s"),
       bArt ? 1 : 0, Source, *Heroes, *Tray, *Env, ReviewTooling() ? 1 : 0, S08LegacyRender() ? 1 : 0, S08Markers() ? 1 : 0,
-      Aliases.Num() ? *FString::Join(Aliases, TEXT(",")) : TEXT("-"), *HudLook, *Dpi, *CardMedia, *MoveEase,
+      Aliases.Num() ? *FString::Join(Aliases, TEXT(",")) : TEXT("-"), *HudLook, *Dpi, *CardMedia, *MoveEase, *Facing,
       bArt ? TEXT("") : TEXT(" (grey board: no art profile, figures, tray or art HUD layer)"));
 }
 

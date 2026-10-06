@@ -100,9 +100,10 @@ UNMATCHED_API FString CardMediaField(const TCHAR* CommandLine);
 /** 'ARTLOOK art=1|0 source=default|S08GreyBoard|override heroes=v2|legacy(..) tray=on|legacy(..)|off env=on|off(..)
  *   review=0|1 legacyRender=0|1 markers=0|1 aliases=<-ArtPreviewHeroesV2,-ArtPreviewDiorama,-S08HeartGlow or ->
  *   hud=ring:<id>|legacy(..),glow:on|legacy(..),tracker:de|legacy(..),cross:on|legacy(..) dpi=project|legacy(..)
- *   portraits=avatar|legacy(..) cards=art|legacy(..) move=ease80|legacy(-S08MoveEaseLegacy)' - the effective look of
- *   this run (the hud field: FS08TurnHudLook::ArtLookField; dpi: UmHudScale::ArtLookField, HB-09; portraits / cards:
- *   CardMediaField, CP-02; move: the AN-21 ВР-12 ease of the move ends). */
+ *   portraits=avatar|legacy(..) cards=art|legacy(..) move=ease80|legacy(-S08MoveEaseLegacy)
+ *   facing=v1|legacy(-S08FacingLegacy)' - the effective look of this run (the hud field: FS08TurnHudLook::ArtLookField;
+ *   dpi: UmHudScale::ArtLookField, HB-09; portraits / cards: CardMediaField, CP-02; move: the AN-21 ВР-12 ease of the
+ *   move ends; facing: the AN-23 ВР-06 rest facing rule). */
 UNMATCHED_API FString TraceLine();
 
 }  // namespace S08ArtLook

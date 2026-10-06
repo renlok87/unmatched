@@ -66,8 +66,8 @@ struct UNMATCHED_API FS08MovePlan {
   double StepMs = 0.0;         // per edge (Place: the whole transfer); 0 when snapped
   int32 Steps = 1;
   bool bSnapped = false;       // reduced motion, speed none, or past the seq cap: jumps to the end at StartMs
-  double StartRestYawDeg = 0.0;  // facing (world forward yaw) on the start cell - the half-field rule
-  double EndRestYawDeg = 0.0;    // facing on the destination cell
+  double StartRestYawDeg = 0.0;  // facing (world forward yaw) on the start cell - the builder's rest rule
+  double EndRestYawDeg = 0.0;    // facing on the destination cell (AN-23: S08Facing via the board actor)
   double DurationMs() const { return bSnapped ? 0.0 : StepMs * Steps; }
   /** The arrival (end of the travel) from the seq start: the cascade point of a damage cue (MS-E-48). */
   double ArriveMs() const { return StartMs + DurationMs(); }
@@ -95,7 +95,14 @@ struct UNMATCHED_API FS08MoveAnim {
   static TArray<FS08MoveCueTiming> Schedule(const TArray<FS08Cue>& Cues, const FS08MotionSettings& Motion,
                                             TArray<const FS08Cue*>& OutMovesInOrder,
                                             const FS08MoveCueParams& Params = FS08MoveCueParams());
-  /** One plan per FighterMoved cue (OrderInSeq order); CellToWorld maps a board cell to its world centre. */
+  /** One plan per FighterMoved cue (OrderInSeq order); CellToWorld maps a board cell to its world centre; RestYawAt
+   *  gives the rest facing (world yaw) of a figure standing at a world position - AN-23 (ВР-06): the caller's rule
+   *  (camera + nearest enemy, S08Facing) or the legacy half-field one below. */
+  static TArray<FS08MovePlan> BuildPlans(const TArray<FS08Cue>& Cues, const FS08MotionSettings& Motion,
+                                         TFunctionRef<FVector(const FIntPoint&)> CellToWorld,
+                                         TFunctionRef<double(const FVector&)> RestYawAt,
+                                         const FS08MoveCueParams& Params = FS08MoveCueParams());
+  /** BuildPlans with the legacy half-field rest facing (FS08MoveAnim::RestYawDeg). */
   static TArray<FS08MovePlan> BuildPlans(const TArray<FS08Cue>& Cues, const FS08MotionSettings& Motion,
                                          TFunctionRef<FVector(const FIntPoint&)> CellToWorld,
                                          const FS08MoveCueParams& Params = FS08MoveCueParams());

@@ -277,6 +277,16 @@ bool FS08MoveAnimPoseTest::RunTest(const FString&) {
   TestTrue("settle turns to the far side's rest facing (270)",
            NearYaw(FS08MoveAnim::Sample(Far, Default, 280.0 + 75.0, H).YawDeg, -45.0) &&
                NearYaw(FS08MoveAnim::Sample(Far, Default, 280.0 + 150.0, H).YawDeg, 270.0));
+  // AN-23 (ВР-06): BuildPlans takes the rest-facing rule from the caller (S08Facing through the board actor) - the
+  // plan ends carry it and the settle of the move reaches it.
+  {
+    const TArray<FS08Cue> RestCues = {MoveCue(TEXT("f"), 0, {{0, 2}, {1, 2}})};
+    const TArray<FS08MovePlan> Custom = FS08MoveAnim::BuildPlans(
+        RestCues, FS08MotionSettings(), GridWorld, [](const FVector&) { return 33.0; });
+    TestEqual("the plan ends carry the caller's rest facing", static_cast<int32>(Custom[0].EndRestYawDeg), 33);
+    TestTrue("the pose after the settle faces the caller's rest angle",
+             NearYaw(FS08MoveAnim::Sample(Custom[0], Default, 280.0 + 150.0, H).YawDeg, 33.0));
+  }
   // Ease vs legacy: the eased first edge starts slower than the linear one.
   TestTrue("ease on: slower start on the first edge than the legacy linear pose",
            FS08MoveAnim::Sample(P, Default, 70.0, H).Location.X < FS08MoveAnim::Sample(P, Linear, 70.0, H).Location.X - 1.0);

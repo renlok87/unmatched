@@ -118,6 +118,7 @@ double FS08MoveAnim::TravelYawDeg(const FVector& From, const FVector& To) {
 
 TArray<FS08MovePlan> FS08MoveAnim::BuildPlans(const TArray<FS08Cue>& Cues, const FS08MotionSettings& Motion,
                                               TFunctionRef<FVector(const FIntPoint&)> CellToWorld,
+                                              TFunctionRef<double(const FVector&)> RestYawAt,
                                               const FS08MoveCueParams& Params) {
   TArray<const FS08Cue*> Moves;
   const TArray<FS08MoveCueTiming> Timing = Schedule(Cues, Motion, Moves, Params);
@@ -138,11 +139,19 @@ TArray<FS08MovePlan> FS08MoveAnim::BuildPlans(const TArray<FS08Cue>& Cues, const
     Plan.StartMs = Timing[I].StartMs;
     Plan.StepMs = Timing[I].StepMs;
     Plan.bSnapped = Timing[I].bSnapped;
-    Plan.StartRestYawDeg = RestYawDeg(Plan.Points[0]);
-    Plan.EndRestYawDeg = RestYawDeg(Plan.Points.Last());
+    // AN-23 (ВР-06): the rest facing comes from the caller's rule (the move settles to it over SettleMs).
+    Plan.StartRestYawDeg = RestYawAt(Plan.Points[0]);
+    Plan.EndRestYawDeg = RestYawAt(Plan.Points.Last());
     Plans.Add(MoveTemp(Plan));
   }
   return Plans;
+}
+
+TArray<FS08MovePlan> FS08MoveAnim::BuildPlans(const TArray<FS08Cue>& Cues, const FS08MotionSettings& Motion,
+                                              TFunctionRef<FVector(const FIntPoint&)> CellToWorld,
+                                              const FS08MoveCueParams& Params) {
+  return BuildPlans(Cues, Motion, CellToWorld,
+                    [](const FVector& CellWorld) { return RestYawDeg(CellWorld); }, Params);
 }
 
 namespace {

@@ -111,6 +111,9 @@ bool FS08ArtLookDefaultTest::RunTest(const FString&) {
     // AN-21 (ВР-12): the move ease of the ends is in the line (80 ms)
     TestTrue(FString::Printf(TEXT("default move ease traced: %s"), *Line),
              Line.Contains(TEXT(" move=ease80")));
+    // AN-23 (ВР-06): the rest facing rule (three-quarter to the camera) is in the line
+    TestTrue(FString::Printf(TEXT("default facing traced: %s"), *Line),
+             Line.Contains(TEXT(" facing=v1")));
   }
   // 2c) AN-21 (ВР-12): -S08MoveEaseLegacy rolls the ease back, -S08MoveEase stays a no-op alias of the default
   {
@@ -119,6 +122,12 @@ bool FS08ArtLookDefaultTest::RunTest(const FString&) {
     TestFalse("params: legacy flag off", FS08MoveAnimParams::FromCommandLine(TEXT("-S08MoveEaseLegacy")).bEaseEnds);
     TestTrue("params: the -S08MoveEase alias keeps the default on",
              FS08MoveAnimParams::FromCommandLine(TEXT("-S08MoveEase")).bEaseEnds);
+  }
+  // 2d) AN-23 (ВР-06): -S08FacingLegacy rolls the rest facing back to the half-field rule
+  {
+    FCommandLineScope Cmd(TEXT("-S08FacingLegacy"));
+    TestTrue("facing legacy traced",
+             S08ArtLook::TraceLine().Contains(TEXT(" facing=legacy(-S08FacingLegacy)")));
   }
   // 2) the former opt-in flags are accepted and change nothing
   {
