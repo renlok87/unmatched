@@ -41,7 +41,10 @@ LUMA = (0.2126, 0.7152, 0.0722)
 CORE_INPUTS = ["MatIDTex", "LUTTex", "DetN", "DetRMH", "UV0", "UV1", "UseUV1", "P", "N0", "LocalUnitM", "BCh", "Nh",
                "ORMh", "DyeMask", "Edge", "Team", "TeamDye", "TeamDyeGain", "RoughMin", "RoughMax", "DetailStrength",
                "WearStrength", "SheenStrength", "AOToBC", "Saturation", "ValueLift", "DebugView", "MatIDOverride",
-               "BakeFromLUT", "UseAccent", "TeamDyeCeiling"]
+               "BakeFromLUT", "UseAccent", "TeamDyeCeiling",
+               # AN-32 (BP-16): the look-tuning fixes - one MatID class per slot, gain on its BaseColor,
+               # a specular delta; neutral (class -1 / gain 1 / spec 0) compiles the v2.3 output exactly
+               "FixClassA", "FixGainA", "FixSpecA", "FixClassB", "FixGainB", "FixSpecB"]
 CORE_OUTPUTS = [("Rough", "CMOT_FLOAT1"), ("Metal", "CMOT_FLOAT1"), ("Spec", "CMOT_FLOAT1"), ("AO", "CMOT_FLOAT1"),
                 ("NormalTS", "CMOT_FLOAT3"), ("Cloth", "CMOT_FLOAT1"), ("Fuzz", "CMOT_FLOAT3"),
                 ("IsCloth", "CMOT_FLOAT1"), ("DebugE", "CMOT_FLOAT3")]
@@ -70,6 +73,18 @@ V2_CPD = {"HitTint": {"index": 12, "size": 1,
           "DissolveStyle": {"index": 14, "size": 1,
                             "meaning": "DE-011: 0 = simple fade (default, reduced motion), 1 = team-colour ash "
                                        "(candidate until the A/B sheet DE-028)"}}
+# AN-32 (ВР-16): the Fix group of M_UM_Figure_v2 v2.4 - one MatID class per slot (0..15, -1 = off), a BaseColor
+# gain (0.5..1.5, 1 = neutral) and a specular delta (-0.3..0.3, 0 = neutral) applied by live tune / the map light
+# profile (S08ArtBoardProfiles lightProfiles.<id>.heroMaterials) over a MID; the class is picked by the same MatID
+# decode that selects the LUT row.
+FIX_SCALARS = [
+    ("FixClassA", -1.0, "Fix", "class of slot A (MatID 0..15, -1 = off)"),
+    ("FixGainA", 1.0, "Fix", "slot A BaseColor gain (1 = neutral)"),
+    ("FixSpecA", 0.0, "Fix", "slot A specular delta (0 = neutral)"),
+    ("FixClassB", -1.0, "Fix", "class of slot B (MatID 0..15, -1 = off)"),
+    ("FixGainB", 1.0, "Fix", "slot B BaseColor gain (1 = neutral)"),
+    ("FixSpecB", 0.0, "Fix", "slot B specular delta (0 = neutral)"),
+]
 # DE-010 hit tint knobs (Cue group, MI-overridable): colour linear, albedo weight at HitTint 1, emissive (display units)
 HIT_TINT_COLOR = [0.85, 0.03, 0.02, 1.0]
 HIT_TINT_STRENGTH = 0.7
@@ -212,6 +227,8 @@ def figure_v2_graph(spec: dict) -> Graph:
         scalar(g, nid, name, p[name]["default"], group, col)
     for name, default, group, _ in V2_SCALARS:
         scalar(g, "p_" + name, name, default, group, col)
+    for name, default, group, _ in FIX_SCALARS:  # AN-32 (ВР-16): the Fix group of live tune
+        scalar(g, "p_" + name, name, default, group, col)
     # hero normal strength (v1: lerp(flat, N, NormalStrength))
     g.add("flat_n", "Constant3Vector", {"constant": rgba([0.0, 0.0, 1.0, 0.0])}, 1)
     g.add("n_str", "LinearInterpolate", {}, 2)
@@ -239,7 +256,10 @@ def figure_v2_graph(spec: dict) -> Graph:
              "AOToBC": ("p_ao2bc", ""), "Saturation": ("p_sat", ""), "ValueLift": ("p_lift", ""),
              "DebugView": ("p_DebugView", ""), "MatIDOverride": ("p_DebugMatIDOverride", ""),
              "BakeFromLUT": ("p_DebugBakeFromLUT", ""), "UseAccent": ("sw_dyef", ""),
-             "TeamDyeCeiling": ("p_TeamDyeCeiling", "")}
+             "TeamDyeCeiling": ("p_TeamDyeCeiling", ""),
+             # AN-32 (ВР-16): the Fix group
+             "FixClassA": ("p_FixClassA", ""), "FixGainA": ("p_FixGainA", ""), "FixSpecA": ("p_FixSpecA", ""),
+             "FixClassB": ("p_FixClassB", ""), "FixGainB": ("p_FixGainB", ""), "FixSpecB": ("p_FixSpecB", "")}
     for inp in CORE_INPUTS:
         src, out = wires[inp]
         g.link(src, out, "core", inp)

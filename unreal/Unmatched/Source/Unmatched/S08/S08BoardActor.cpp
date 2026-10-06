@@ -582,6 +582,24 @@ void AS08BoardActor::FighterReturnToRest(const FString& FighterId) {
   Actor->ReturnToRestFacing(Want, S08Facing::ReturnMs);
 }
 
+void AS08BoardActor::UpdateHeroMaterials() {
+  const FS08LightProfile* Light = bArtActive ? ArtData.LightFor(ActiveProfile) : nullptr;
+  int32 Fixed = 0;
+  for (AS08FighterActor* Actor : FighterActors) {
+    if (!Actor || !Actor->IsHeroV2() || !Actor->GetHeroV2Spec()) continue;
+    const FS08HeroMaterialFix* Fix =
+        Light ? &Light->HeroMaterialFix(Actor->GetHeroV2Spec()->Key, S08TeamSlotName(Actor->GetLook())) : nullptr;
+    Actor->ApplyHeroMaterials(Fix);
+    Fixed += Fix && !Fix->IsNeutral() ? 1 : 0;
+  }
+  const FString Key = FString::Printf(TEXT("%s|%d"), Light ? *Light->Id : TEXT("-"), Fixed);
+  if (Key == HeroMaterialsTraceKey) return;
+  HeroMaterialsTraceKey = Key;
+  FS08Trace::Write(FString::Printf(
+      TEXT("ARTPREVIEW heroMat board profile=%s heroes=%d mids=%d"), Light ? *Light->Id : TEXT("-"), Fixed,
+      FParse::Param(FCommandLine::Get(), S08HeroesV2::HeroMatFixLegacyFlagName) ? 0 : Fixed));
+}
+
 bool AS08BoardActor::AnyFighterMoving() const {
   for (const AS08FighterActor* Actor : FighterActors) {
     if (Actor && Actor->IsMoving()) return true;
@@ -1514,6 +1532,7 @@ bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
   }
   // ENV-MAPS P9: a profile change re-rigs the fighters already on the board (SyncFighters does it for new ones)
   if (FighterActors.Num() > 0) UpdateHeroLights();
+  if (FighterActors.Num() > 0) UpdateHeroMaterials();  // AN-32 (BP-16)
   // ENV-MAPS: the map-image surface draws no zone marks (the zones are the painted ones); on grids this is
   // bArtActive as before.
   const bool bZoneMarks = bArtActive && !bMapImageActive;
@@ -1803,6 +1822,8 @@ void AS08BoardActor::SyncFighters(const FS08BoardModel& Board,
   }
   // ENV-MAPS P9: the per-figure hero light of the active light profile (channel 1, figures only), within the board budget
   UpdateHeroLights();
+  // AN-32 (BP-16): the light profile's heroMaterials Fix onto the figures' body MIDs
+  UpdateHeroMaterials();
   // ART-004 T2.2 six-copies review: one summary once every fighter applied.
   if (bArtActive && S08ArtPreviewAllMedusa() && !bAllMedusaSummaryTraced && FighterActors.Num() > 0) {
     bAllMedusaSummaryTraced = true;

@@ -99,11 +99,16 @@ FString TraceLine() {
   const FString BaseDigit = FParse::Param(Cmd, S08HeroesV2::BaseDigitLegacyFlagName)
                                 ? FString::Printf(TEXT("legacy(-%s)"), S08HeroesV2::BaseDigitLegacyFlagName)
                                 : FString(TEXT("on"));
+  // AN-32 (ВР-16): the heroMaterials Fix of the light profile with its rollback ("on" states the mechanism; the
+  // applied heroes are counted in the 'ARTPREVIEW heroMat board' line - the profile loads after this line)
+  const FString HeroMat = FParse::Param(Cmd, S08HeroesV2::HeroMatFixLegacyFlagName)
+                              ? FString::Printf(TEXT("legacy(-%s)"), S08HeroesV2::HeroMatFixLegacyFlagName)
+                              : FString(TEXT("on"));
   return FString::Printf(
-      TEXT("ARTLOOK art=%d source=%s heroes=%s tray=%s env=%s review=%d legacyRender=%d markers=%d aliases=%s %s %s %s move=%s facing=%s baseDigit=%s%s"),
+      TEXT("ARTLOOK art=%d source=%s heroes=%s tray=%s env=%s review=%d legacyRender=%d markers=%d aliases=%s %s %s %s move=%s facing=%s baseDigit=%s heroMat=%s%s"),
       bArt ? 1 : 0, Source, *Heroes, *Tray, *Env, ReviewTooling() ? 1 : 0, S08LegacyRender() ? 1 : 0, S08Markers() ? 1 : 0,
       Aliases.Num() ? *FString::Join(Aliases, TEXT(",")) : TEXT("-"), *HudLook, *Dpi, *CardMedia, *MoveEase, *Facing,
-      *BaseDigit, bArt ? TEXT("") : TEXT(" (grey board: no art profile, figures, tray or art HUD layer)"));
+      *BaseDigit, *HeroMat, bArt ? TEXT("") : TEXT(" (grey board: no art profile, figures, tray or art HUD layer)"));
 }
 
 }  // namespace S08ArtLook

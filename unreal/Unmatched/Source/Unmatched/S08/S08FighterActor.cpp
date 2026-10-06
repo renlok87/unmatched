@@ -711,6 +711,7 @@ void AS08FighterActor::ApplyMovePose(const FS08MovePose& Pose) {
       if (UMaterialInterface* Mic = LoadObject<UMaterialInterface>(
               nullptr, *S08HeroesV2::DissolveMaterialPath(*HeroV2Spec, Look))) {
         for (int32 Slot = 0; Slot < ArtBody->GetNumMaterials(); ++Slot) ArtBody->SetMaterial(Slot, Mic);
+        ApplyHeroMaterialMids();  // AN-32: the fix rides the Place fade MIC too
         bMoveFading = true;
       }
     }
@@ -730,6 +731,7 @@ void AS08FighterActor::EndMove() {
         for (int32 Slot = 0; Slot < ArtBody->GetNumMaterials(); ++Slot) ArtBody->SetMaterial(Slot, BodyMi);
       }
       S08HeroesV2::SetDissolve(ArtBody, ArtBase, 0.0f, S08HeroesV2::EDissolveStyle::Fade);
+      ApplyHeroMaterialMids();  // AN-32: the body MI is back
     }
   }
   ClickCapsule->SetUsingAbsoluteLocation(false);
@@ -764,6 +766,7 @@ void AS08FighterActor::ApplyBenchDissolve() {
   UMaterialInterface* Mic = LoadObject<UMaterialInterface>(nullptr, *Path);
   if (Mic) {
     for (int32 Slot = 0; Slot < ArtBody->GetNumMaterials(); ++Slot) ArtBody->SetMaterial(Slot, Mic);
+    ApplyHeroMaterialMids();  // AN-32: the fix rides the dissolve MIC too
     SetDissolve(ArtBody, ArtBase, Progress, DissolveStyle());
   }
   if (!bBenchDissolveTraced) {
@@ -823,6 +826,7 @@ bool AS08FighterActor::ApplyHeroV2(const S08HeroesV2::FHeroSpec& Spec, const FVe
   ArtBase->SetStaticMesh(Pedestal);
   for (int32 Slot = 0; Slot < ArtBody->GetNumMaterials(); ++Slot) ArtBody->SetMaterial(Slot, BodyMi);
   for (int32 Slot = 0; Slot < ArtBase->GetNumMaterials(); ++Slot) ArtBase->SetMaterial(Slot, BaseMi);
+  ApplyHeroMaterialMids();  // AN-32: re-wrap the fresh slots with the profile fix
   // Rig v2 faces +X: the legacy 0/180 yaw plus FacingYawOffsetDeg keeps the legacy world facing (+Y / -Y).
   ArtBody->SetRelativeRotation(FRotator(0.0f, HeroV2Yaw, 0.0f));
   ArtBase->SetRelativeRotation(FRotator(0.0f, HeroV2Yaw, 0.0f));
@@ -996,6 +1000,67 @@ void AS08FighterActor::UpdateBaseDigit() {
   }
 }
 
+// ---- AN-32 (ВР-16): the heroMaterials Fix of the light profile ----------------------------------------------
+
+void AS08FighterActor::ApplyHeroMaterials(const FS08HeroMaterialFix* Fix) {
+  const bool bLegacy = FParse::Param(FCommandLine::Get(), S08HeroesV2::HeroMatFixLegacyFlagName);
+  bHasHeroMaterialFix = Fix != nullptr && !Fix->IsNeutral() && !bLegacy;
+  if (bHasHeroMaterialFix) {
+    HeroMatClassA = Fix->ClassA;
+    HeroMatGainA = Fix->GainA;
+    HeroMatSpecA = Fix->SpecA;
+    HeroMatClassB = Fix->ClassB;
+    HeroMatGainB = Fix->GainB;
+    HeroMatSpecB = Fix->SpecB;
+  }
+  ApplyHeroMaterialMids();
+  if (bHeroMatTraced || !bHeroV2Visual || !HeroV2Spec) return;
+  bHeroMatTraced = true;
+  const FString Sides = bHasHeroMaterialFix
+      ? FString::Printf(TEXT("A=%d/%.2f/%.2f B=%d/%.2f/%.2f"), HeroMatClassA, HeroMatGainA, HeroMatSpecA,
+                        HeroMatClassB, HeroMatGainB, HeroMatSpecB)
+      : FString(TEXT("A=none B=none"));
+  FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW heroMat fighter=%s hero=%s look=%s %s"), *Fighter.Id,
+                                   HeroV2Spec->Key, S08TeamSlotName(Look), *Sides));
+}
+
+void AS08FighterActor::ApplyHeroMaterialMids() {
+  if (!bHeroV2Visual || !ArtBody) {
+    HeroMaterialMids.Reset();
+    return;
+  }
+  const int32 Slots = ArtBody->GetNumMaterials();
+  if (!bHasHeroMaterialFix) {
+    // Neutral: the plain material of every slot exactly - unwrap our MIDs where they still sit on a slot.
+    if (HeroMaterialMids.Num() > 0) {
+      for (int32 Slot = 0; Slot < Slots && Slot < HeroMaterialMids.Num(); ++Slot) {
+        UMaterialInstanceDynamic* Mid = HeroMaterialMids[Slot].Get();
+        if (Mid && ArtBody->GetMaterial(Slot) == Mid && Mid->Parent) ArtBody->SetMaterial(Slot, Mid->Parent);
+      }
+      HeroMaterialMids.Reset();
+    }
+    return;
+  }
+  HeroMaterialMids.SetNum(Slots);
+  for (int32 Slot = 0; Slot < Slots; ++Slot) {
+    UMaterialInterface* Current = ArtBody->GetMaterial(Slot);
+    UMaterialInstanceDynamic* Mid = HeroMaterialMids[Slot].Get();
+    if (Mid && Current != Mid) Mid = nullptr;  // the slot was swapped underneath (dissolve / Place / restore)
+    if (!Mid && Current) {
+      Mid = UMaterialInstanceDynamic::Create(Current, this);
+      HeroMaterialMids[Slot] = Mid;
+      ArtBody->SetMaterial(Slot, Mid);
+    }
+    if (!Mid) continue;
+    Mid->SetScalarParameterValue(TEXT("FixClassA"), static_cast<float>(HeroMatClassA));
+    Mid->SetScalarParameterValue(TEXT("FixGainA"), HeroMatGainA);
+    Mid->SetScalarParameterValue(TEXT("FixSpecA"), HeroMatSpecA);
+    Mid->SetScalarParameterValue(TEXT("FixClassB"), static_cast<float>(HeroMatClassB));
+    Mid->SetScalarParameterValue(TEXT("FixGainB"), HeroMatGainB);
+    Mid->SetScalarParameterValue(TEXT("FixSpecB"), HeroMatSpecB);
+  }
+}
+
 int32 AS08FighterActor::GetLungeContactMs(FString& OutSource) const {
   using namespace S08HeroesV2;
   OutSource = TEXT("default");
@@ -1119,6 +1184,7 @@ void AS08FighterActor::OnDeathStillFinished() {
   // The dissolve MIC is a child of the body MI (DE-011): the look is identical at progress 0, then the figure
   // dissolves; the pedestal greys out with the same progress (CPD_Fade) and goes with the figure.
   for (int32 Slot = 0; Slot < ArtBody->GetNumMaterials(); ++Slot) ArtBody->SetMaterial(Slot, DissolveMaterial);
+  ApplyHeroMaterialMids();  // AN-32: the fix rides the dissolve MIC too
   bDissolving = true;
   DissolveValue = 0.0f;
   SetDissolve(ArtBody, ArtBase, 0.0f, DeathStyle);

@@ -154,6 +154,70 @@ bool ParseLight(const FString& ProfileId, const TSharedPtr<FJsonObject>& Object,
 // W4-A (engine gate memo §1 items 1 and 3): units, SkyLight, fixed exposure
 // and the key CSM of a light profile. Every block is validated; a broken
 // block makes the whole profile invalid (never a silent default).
+/** AN-32 (ВР-16): the "heroMaterials" block of a light profile - {"<HeroKey>": {"<P1|P2|*>": {FixClassA..FixSpecB}}}.
+ *  Values validated (class -1..15, gain 0.5..1.5, spec -0.3..0.3); a bad hero key or value drops only that hero's
+ *  entry with an error (the rest of the profile stays, per the card). */
+void ParseHeroMaterials(const FString& ProfileId, const TSharedPtr<FJsonObject>& Obj,
+                        TMap<FString, TMap<FString, FS08HeroMaterialFix>>& Out, TArray<FString>& Errors) {
+  Out.Reset();
+  const TSharedPtr<FJsonObject>* Heroes = nullptr;
+  if (!Obj->TryGetObjectField(TEXT("heroMaterials"), Heroes) || !Heroes) return;
+  static const TSet<FString> KnownLooks = {TEXT("P1"), TEXT("P2"), TEXT("*")};
+  for (const TPair<FString, TSharedPtr<FJsonValue>>& Hero : (*Heroes)->Values) {
+    const TSharedPtr<FJsonObject>* Looks = nullptr;
+    if (!Hero.Value.IsValid() || !Hero.Value->TryGetObject(Looks) || !Looks) {
+      Errors.Add(FString::Printf(TEXT("light profile %s: heroMaterials.%s must be an object of looks"),
+                                 *ProfileId, *Hero.Key));
+      continue;
+    }
+    TMap<FString, FS08HeroMaterialFix> HeroFixes;
+    bool bHeroOk = true;
+    for (const TPair<FString, TSharedPtr<FJsonValue>>& Look : (*Looks)->Values) {
+      const TSharedPtr<FJsonObject>* FixObj = nullptr;
+      if (!KnownLooks.Contains(Look.Key) || !Look.Value.IsValid() || !Look.Value->TryGetObject(FixObj) || !FixObj) {
+        Errors.Add(FString::Printf(TEXT("light profile %s: heroMaterials.%s.%s must be P1 | P2 | * with an object"),
+                                   *ProfileId, *Hero.Key, *Look.Key));
+        bHeroOk = false;
+        continue;
+      }
+      FS08HeroMaterialFix Fix;
+      auto Int = [&](const TCHAR* Name, int32& OutValue) {
+        double Value = 0.0;
+        if ((*FixObj)->TryGetNumberField(Name, Value)) OutValue = FMath::RoundToInt(Value);  // absent = neutral
+      };
+      auto Float = [&](const TCHAR* Name, float& OutValue) {
+        double Value = 0.0;
+        if ((*FixObj)->TryGetNumberField(Name, Value)) OutValue = static_cast<float>(Value);
+      };
+      Int(TEXT("FixClassA"), Fix.ClassA);
+      Float(TEXT("FixGainA"), Fix.GainA);
+      Float(TEXT("FixSpecA"), Fix.SpecA);
+      Int(TEXT("FixClassB"), Fix.ClassB);
+      Float(TEXT("FixGainB"), Fix.GainB);
+      Float(TEXT("FixSpecB"), Fix.SpecB);
+      if ((Fix.ClassA < -1 || Fix.ClassA > 15) || (Fix.ClassB < -1 || Fix.ClassB > 15) ||
+          Fix.GainA < 0.5f || Fix.GainA > 1.5f || Fix.GainB < 0.5f || Fix.GainB > 1.5f ||
+          Fix.SpecA < -0.3f || Fix.SpecA > 0.3f || Fix.SpecB < -0.3f || Fix.SpecB > 0.3f) {
+        FString Bad;
+        auto Note = [&Bad](bool bFailed, const TCHAR* Name) { if (bFailed) Bad += FString(TEXT(" ")) + Name; };
+        Note(Fix.ClassA < -1 || Fix.ClassA > 15, TEXT("FixClassA"));
+        Note(Fix.GainA < 0.5f || Fix.GainA > 1.5f, TEXT("FixGainA"));
+        Note(Fix.SpecA < -0.3f || Fix.SpecA > 0.3f, TEXT("FixSpecA"));
+        Note(Fix.ClassB < -1 || Fix.ClassB > 15, TEXT("FixClassB"));
+        Note(Fix.GainB < 0.5f || Fix.GainB > 1.5f, TEXT("FixGainB"));
+        Note(Fix.SpecB < -0.3f || Fix.SpecB > 0.3f, TEXT("FixSpecB"));
+        Errors.Add(FString::Printf(
+            TEXT("light profile %s: heroMaterials.%s.%s out of range:%s (FixClass -1..15, FixGain 0.5..1.5, "
+                 "FixSpec -0.3..0.3)"),
+            *ProfileId, *Hero.Key, *Look.Key, *Bad));
+        continue;
+      }
+      HeroFixes.Add(Look.Key, Fix);
+    }
+    if (bHeroOk && HeroFixes.Num() > 0) Out.Add(Hero.Key, MoveTemp(HeroFixes));
+  }
+}
+
 bool ParseRenderBlocks(const FString& ProfileId, const TSharedPtr<FJsonObject>& Obj, FS08LightProfile& Profile,
                        TArray<FString>& Errors) {
   bool bOk = true;
@@ -1074,6 +1138,8 @@ bool FS08BoardArtData::ParseJson(const FString& Text, TArray<FString>& OutErrors
       if (!ParseRenderBlocks(Pair.Key, *Obj, Profile, OutErrors)) continue;
       // ENV-MAPS P9: a broken "heroLight" block drops the profile (a board pointing at it then fails the document)
       if (!S08HeroLight::Parse(Pair.Key, *Obj, Profile.HeroLight, OutErrors)) continue;
+      // AN-32 (ВР-16): the "heroMaterials" block (a bad hero entry drops only itself; the error is traced)
+      ParseHeroMaterials(Pair.Key, *Obj, Profile.HeroMaterials, OutErrors);
       FString Reason;
       if (!Profile.BudgetOk(Reason)) {
         OutErrors.Add(FString::Printf(TEXT("light profile %s over budget: %s"), *Pair.Key, *Reason));
@@ -1273,6 +1339,15 @@ FS08ZoneStyle FS08BoardArtData::StyleFor(const FString& Key) const {
 
 const FS08LightProfile* FS08BoardArtData::LightFor(const FS08BoardArtProfile& Profile) const {
   return Lights.Find(Profile.LightId);
+}
+
+const FS08HeroMaterialFix& FS08LightProfile::HeroMaterialFix(const FString& HeroKey, const FString& Look) const {
+  static const FS08HeroMaterialFix Neutral;
+  if (const TMap<FString, FS08HeroMaterialFix>* Looks = HeroMaterials.Find(HeroKey)) {
+    if (const FS08HeroMaterialFix* Own = Looks->Find(Look)) return *Own;
+    if (const FS08HeroMaterialFix* Any = Looks->Find(TEXT("*"))) return *Any;
+  }
+  return Neutral;
 }
 
 const FS08BoardArtProfile* FS08BoardArtData::Select(const FS08BoardModel& Board, const FString& BoardId,

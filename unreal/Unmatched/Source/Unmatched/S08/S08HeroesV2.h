@@ -251,4 +251,8 @@ UNMATCHED_API FString BaseDigitMaterialPath();
  *  text renders with is a transient runtime UFont over this face; UE 5.8 has no offline font importer any more). */
 UNMATCHED_API FString BaseDigitFontFacePath();
 
+// ---- AN-32 (ВР-16): the heroMaterials Fix group of the map light profile ----
+/** Rollback: -S08HeroMatFixLegacy - the light profile's "heroMaterials" block is ignored (the plain hero MIs). */
+inline const TCHAR* const HeroMatFixLegacyFlagName = TEXT("S08HeroMatFixLegacy");
+
 }  // namespace S08HeroesV2

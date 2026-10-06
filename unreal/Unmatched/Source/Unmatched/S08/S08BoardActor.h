@@ -277,6 +277,9 @@ public:
   /** AN-25 (ВР-06): the attacker's return to its rest angle after its LungeAttack / HitReact ended - RestYaw on the
    *  current positions (a dead target switches to the nearest living enemy), the dead band never holds it. */
   void FighterReturnToRest(const FString& FighterId);
+  /** AN-32 (ВР-16): pushes the active light profile's "heroMaterials" Fix to every living v2 figure (their body
+   *  slots wrap in MIDs); the Art Tuner scope "heroMaterials" (no rebuild, live tune). Traces one board line. */
+  void UpdateHeroMaterials();
   /** DE-019 (01 F-09): the death plan of a dying v2 figure (AS08FighterActor::GetDeathPlan); false when the fighter
    *  plays no death (alive, gone, or a figure that hides at once). */
   bool GetFighterDeathPlan(const FString& FighterId, S08HeroesV2::FDeathPlan& OutPlan, FString& OutStyle) const;
@@ -615,6 +618,7 @@ private:
   int32 HeroLightCount = 0;
   int32 HeroLightLayersPerFigure = 0;
   FString HeroLightTraceKey;
+  FString HeroMaterialsTraceKey;  // AN-32 (BP-16): the heroMaterials board trace
 
   // ---- MS-T-08 move plates ----
   UPROPERTY()

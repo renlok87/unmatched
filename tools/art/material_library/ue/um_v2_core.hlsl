@@ -4,6 +4,7 @@
 //         P N0 (pre-skinned local position/normal through vertex interpolators), LocalUnitM, BCh Nh ORMh DyeMask Edge,
 //         Team TeamDye TeamDyeGain RoughMin RoughMax DetailStrength WearStrength SheenStrength AOToBC Saturation
 //         ValueLift DebugView MatIDOverride BakeFromLUT UseAccent TeamDyeCeiling
+//         FixClassA FixGainA FixSpecA FixClassB FixGainB FixSpecB (AN-32, ВР-16: per-class gain / specular)
 // Outputs (inout) Rough Metal Spec AO NormalTS Cloth Fuzz IsCloth DebugE
 // Class 0 (legacy bake) repeats the v1 M_UM_Figure graph exactly: BC (TeamMask dye), ORM, hero normal.
 // v2.1 (LDV-12): static switch UseTeamAccent. On (UseAccent = 1, DyeMask = TeamAccentTexture.R): the dye weight is the
@@ -175,6 +176,20 @@ bc *= lerp(1.0, ORMh.r, AOToBC);
 float yk = dot(bc, LUMA);
 bc = lerp(yk.xxx, bc, Saturation);
 bc = lerp(bc, float3(1.0, 1.0, 1.0), ValueLift);
+
+// ---- AN-32 (ВР-16): per-class fixes of the look tuning (Fix*, class by the same MatID decode that picks the LUT
+// row). Neutral (class -1 / gain 1 / spec 0) changes nothing: the branches never fire and bc *= 1.0 is exact.
+[unroll] for (int fix = 0; fix < 2; ++fix)
+{
+    const float cls = fix == 0 ? FixClassA : FixClassB;
+    const float gain = fix == 0 ? FixGainA : FixGainB;
+    const float spec = fix == 0 ? FixSpecA : FixSpecB;
+    [branch] if (cls >= 0.0 && id == int(cls + 0.5))
+    {
+        bc *= gain;
+        Spec = saturate(Spec + spec);
+    }
+}
 
 // ---- cloth sheen (Fuzz Color) from the final albedo: intensity x tint x sqrt(Y)  (README section 4)
 if (IsCloth > 0.5)

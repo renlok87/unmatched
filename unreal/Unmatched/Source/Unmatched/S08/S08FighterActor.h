@@ -139,6 +139,11 @@ public:
    *  harpies only - hidden with -S08BaseDigitLegacy, on other figures, during a Place transfer and from the death
    *  dissolve on; repositioned by every apply / move end. Traced once per figure 'ARTPREVIEW basedigit ...'. */
   void UpdateBaseDigit();
+  // ---- AN-32 (ВР-16): the heroMaterials Fix of the map light profile ----
+  /** Stores the hero's fix (nullptr / neutral / -S08HeroMatFixLegacy = the plain MI, no MID) and wraps the body
+   *  slots in MIDs that carry the Fix values; re-applied whenever a slot's material is swapped (the dissolve MIC,
+   *  a Place transfer, the body MI back). Traced once 'ARTPREVIEW heroMat fighter=.. hero=.. look=..'. */
+  void ApplyHeroMaterials(const struct FS08HeroMaterialFix* Fix);
   // ---- MS-T-16 move animation (S08MoveAnim.h; move-selection 04 §6.3) ----
   /** Plays a CUE-007 move from NowMs (the seq start, ms on the game clock): the figure stands on the plan's start cell
    *  until its slot, slides along the path (lean, turns, optional hop), settles to Idle; a Place fades out / in. The
@@ -256,6 +261,18 @@ private:
   UPROPERTY()
   TObjectPtr<UMaterialInstanceDynamic> BaseDigitMid;
   bool bBaseDigitTraced = false;
+  // AN-32 (ВР-16): the heroMaterials Fix over per-slot MIDs of the v2 body (neutral = the plain MI).
+  int32 HeroMatClassA = -1;
+  float HeroMatGainA = 1.0f;
+  float HeroMatSpecA = 0.0f;
+  int32 HeroMatClassB = -1;
+  float HeroMatGainB = 1.0f;
+  float HeroMatSpecB = 0.0f;
+  bool bHasHeroMaterialFix = false;
+  bool bHeroMatTraced = false;
+  UPROPERTY()
+  TArray<TObjectPtr<UMaterialInstanceDynamic>> HeroMaterialMids;
+  void ApplyHeroMaterialMids();
 
   // ART-004 T2.2: click volume matching the visible art figure. The candidate
   // skeletal meshes carry no physics asset, and the hidden 120-uu grey Body
