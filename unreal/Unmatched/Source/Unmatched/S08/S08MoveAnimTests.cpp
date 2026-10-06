@@ -2,11 +2,12 @@
 //   Unmatched.S08.MoveAnim.Schedule (MS-AT-24) - the seq schedule with the motion settings: the 04 §6.3 control values
 //     at every speed, reduced motion / speed none snap at 0, the plans (world points, rest facings), the MS-CUE line
 //     with speed= / reduced=, the skip keys (any key or mouse button but Space and the wheel).
-//   Unmatched.S08.MoveAnim.Pose (F-02, SD-20/50) - the pose of a figure along its plan: the same time on every edge
-//     whatever its length, linear inside an edge, no hop by default (the hop is a parameter), lean 10 deg in 60 ms,
-//     start turn <= 50 ms, turn at a vertex 120 ms on the move, back to Idle in 150 ms, ease off by default, Place fade
-//     out / in, a later fighter waits on its start cell, a snapped plan lands at its slot; the -BenchMovePose review
-//     approach (DE-021).
+//   Unmatched.S08.MoveAnim.Pose (F-02, SD-20/50; AN-21 ВР-12) - the pose of a figure along its plan: the same time on
+//     every edge whatever its length, linear inside an edge (-S08MoveEaseLegacy), the ease profile of the ends by
+//     default (80 ms, trapezoid speed, ВР-AN05: s(40) = 1/24, s(80) = 1/6, k = 1/240 / 1/200, arrival unchanged), no
+//     hop by default (the hop is a parameter), lean 10 deg in 60 ms, start turn <= 50 ms, turn at a vertex 120 ms on
+//     the move, back to Idle in 150 ms, Place fade out / in, a later fighter waits on its start cell, a snapped plan
+//     lands at its slot; the -BenchMovePose review approach (DE-021).
 //   Unmatched.S08.MoveAnim.Settings (MS-AT-33) - US08UserSettings is a config object in GameUserSettings.ini and leaves
 //     the engine's GameUserSettings class alone (FrameRateLimit 60 kept), the flags override the saved values, the A/B
 //     review parameters.
@@ -201,21 +202,51 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08MoveAnimPoseTest, "Unmatched.S08.MoveAnim.P
 bool FS08MoveAnimPoseTest::RunTest(const FString&) {
   using namespace S08MoveAnimTest;
   const FS08MoveAnimParams Default;
-  TestTrue("defaults = 01 F-02: hop 0, lean 10 in 60, start turn 50, turn 120, settle 150, no ease",
+  TestTrue("defaults = 01 F-02 + AN-21: hop 0, lean 10 in 60, start turn 50, turn 120, settle 150, ease 80 on",
            Default.HopHeightRel == 0.0 && Default.TravelLeanDeg == 10.0 && Default.LeanInMs == 60.0 &&
-               Default.StartTurnMs == 50.0 && Default.TurnMs == 120.0 && Default.SettleMs == 150.0 && !Default.bEaseEnds);
+               Default.StartTurnMs == 50.0 && Default.TurnMs == 120.0 && Default.SettleMs == 150.0 &&
+               Default.bEaseEnds && Near(Default.EaseMs, 80.0, 1e-9));
+  FS08MoveAnimParams Linear = Default;
+  Linear.bEaseEnds = false;  // -S08MoveEaseLegacy: the pose before ВР-12
   // A short edge (100 uu along +X) then a long one (300 uu along +Y): the same 280 ms each (SD-50 p. 1).
   const FS08MovePlan P = Plan({FVector(0, -400, 0), FVector(100, -400, 0), FVector(100, -100, 0)}, 280.0);
   const double H = 55.0;
   const FS08MovePose AtVertex = FS08MoveAnim::Sample(P, Default, 280.0, H);
   TestTrue("t = 280: on the vertex after the short edge", AtVertex.Location.Equals(FVector(100, -400, 0), 0.01));
-  const FS08MovePose MidShort = FS08MoveAnim::Sample(P, Default, 140.0, H);
-  const FS08MovePose MidLong = FS08MoveAnim::Sample(P, Default, 420.0, H);
-  TestTrue("linear inside an edge: half of each edge at half its time",
+  const FS08MovePose MidShort = FS08MoveAnim::Sample(P, Linear, 140.0, H);
+  const FS08MovePose MidLong = FS08MoveAnim::Sample(P, Linear, 420.0, H);
+  TestTrue("linear inside an edge (legacy): half of each edge at half its time",
            MidShort.Location.Equals(FVector(50, -400, 0), 0.01) && MidLong.Location.Equals(FVector(100, -250, 0), 0.01));
   TestTrue("no hop by default (D-DE-02): z = 0 mid-edge", Near(MidShort.Location.Z, 0.0) && Near(MidShort.HopUU, 0.0));
-  TestTrue("arrives at 560 on the destination", FS08MoveAnim::Sample(P, Default, 560.0, H).Location.Equals(
-                                                    FVector(100, -100, 0), 0.01));
+  TestTrue("arrives at 560 on the destination (ease changes no timing)",
+           FS08MoveAnim::Sample(P, Default, 560.0, H).Location.Equals(FVector(100, -100, 0), 0.01));
+  // AN-21 (ВР-12): the ease of the ends. The first edge eases in over E = min(80 x 280/280, 280/2) = 80 ms with
+  // k = 1 / (1 - 80/280 / 2) = 1/240 of the edge per ms: s(40) = 40^2 / (480 x 40)... = 1/24 of the edge,
+  // s(80) = 1/6, then the linear 1/240 per ms; the speed is continuous at 80 (ВР-AN05 profile).
+  TestTrue("ease: s(40) = 1/24 of the first edge (linear was 1/7)",
+           Near(FS08MoveAnim::Sample(P, Default, 40.0, H).Location.X, 100.0 / 24.0, 0.01));
+  TestTrue("ease: s(80) = 1/6 of the first edge",
+           Near(FS08MoveAnim::Sample(P, Default, 80.0, H).Location.X, 100.0 / 6.0, 0.01));
+  const double EaseBefore = FS08MoveAnim::Sample(P, Default, 79.9, H).Location.X;
+  const double EaseAt = FS08MoveAnim::Sample(P, Default, 80.0, H).Location.X;
+  const double EaseAfter = FS08MoveAnim::Sample(P, Default, 80.1, H).Location.X;
+  TestTrue("ease: the speed is continuous at the end of the ease-in (the same step over +-0.1 ms)",
+           Near(EaseAt - EaseBefore, EaseAfter - EaseAt, 0.005));
+  TestTrue("ease: the linear run is 1/240 of the edge per ms (100 -> 200 ms)",
+           Near(FS08MoveAnim::Sample(P, Default, 200.0, H).Location.X - FS08MoveAnim::Sample(P, Default, 100.0, H).Location.X,
+                100.0 * 100.0 / 240.0, 0.01));
+  // One edge: E in = E out = 80 -> k = 1 / (280 - 80) = 1/200 of the edge per ms in the middle.
+  const FS08MovePlan One = Plan({FVector(0, -400, 0), FVector(100, -400, 0)}, 280.0);
+  TestTrue("one edge: the linear run is 1/200 of the edge per ms (130 -> 150 ms)",
+           Near(FS08MoveAnim::Sample(One, Default, 150.0, H).Location.X - FS08MoveAnim::Sample(One, Default, 130.0, H).Location.X,
+                100.0 * 20.0 / 200.0, 0.01));
+  TestTrue("one edge: eases out to exactly the destination at 280",
+           FS08MoveAnim::Sample(One, Default, 280.0, H).Location.Equals(FVector(100, -400, 0), 0.01));
+  // The legacy flag of the A/B command line: the linear pose again.
+  const FS08MoveAnimParams LegacyCmd = FS08MoveAnimParams::FromCommandLine(TEXT("-S08MoveEaseLegacy"));
+  TestTrue("legacy flag: the linear pose (1/7 of the edge at 40 ms)",
+           !LegacyCmd.bEaseEnds &&
+               Near(FS08MoveAnim::Sample(P, LegacyCmd, 40.0, H).Location.X, 100.0 * 40.0 / 280.0, 0.01));
   // Hop is a parameter (A/B 0.08 of the figure height): sin(pi t) per edge.
   FS08MoveAnimParams Hop = Default;
   Hop.HopHeightRel = 0.08;
@@ -246,11 +277,19 @@ bool FS08MoveAnimPoseTest::RunTest(const FString&) {
   TestTrue("settle turns to the far side's rest facing (270)",
            NearYaw(FS08MoveAnim::Sample(Far, Default, 280.0 + 75.0, H).YawDeg, -45.0) &&
                NearYaw(FS08MoveAnim::Sample(Far, Default, 280.0 + 150.0, H).YawDeg, 270.0));
-  // Ease: off by default (linear), a parameter on the first / last edge.
-  FS08MoveAnimParams Ease = Default;
-  Ease.bEaseEnds = true;
-  TestTrue("ease on: slower start on the first edge",
-           FS08MoveAnim::Sample(P, Ease, 70.0, H).Location.X < FS08MoveAnim::Sample(P, Default, 70.0, H).Location.X - 1.0);
+  // AN-23 (ВР-06): BuildPlans takes the rest-facing rule from the caller (S08Facing through the board actor) - the
+  // plan ends carry it and the settle of the move reaches it.
+  {
+    const TArray<FS08Cue> RestCues = {MoveCue(TEXT("f"), 0, {{0, 2}, {1, 2}})};
+    const TArray<FS08MovePlan> Custom = FS08MoveAnim::BuildPlans(
+        RestCues, FS08MotionSettings(), GridWorld, [](const FVector&) { return 33.0; });
+    TestEqual("the plan ends carry the caller's rest facing", static_cast<int32>(Custom[0].EndRestYawDeg), 33);
+    TestTrue("the pose after the settle faces the caller's rest angle",
+             NearYaw(FS08MoveAnim::Sample(Custom[0], Default, 280.0 + 150.0, H).YawDeg, 33.0));
+  }
+  // Ease vs legacy: the eased first edge starts slower than the linear one.
+  TestTrue("ease on: slower start on the first edge than the legacy linear pose",
+           FS08MoveAnim::Sample(P, Default, 70.0, H).Location.X < FS08MoveAnim::Sample(P, Linear, 70.0, H).Location.X - 1.0);
   // A later fighter waits on its start cell; a snapped plan lands at its slot.
   const FS08MovePlan Later = Plan({FVector(0, -400, 0), FVector(100, -400, 0)}, 280.0, 392.0);
   const FS08MovePose Waiting = FS08MoveAnim::Sample(Later, Default, 200.0, H);
@@ -362,11 +401,15 @@ bool FS08MoveAnimSettingsTest::RunTest(const FString&) {
   TestTrue("multipliers 0 / 0.5 / 1 / 1.5",
            S08Motion::SpeedMul(ES08AnimSpeed::None) == 0.0 && S08Motion::SpeedMul(ES08AnimSpeed::Fast) == 0.5 &&
                S08Motion::SpeedMul(ES08AnimSpeed::Normal) == 1.0 && S08Motion::SpeedMul(ES08AnimSpeed::Slow) == 1.5);
-  // A/B review parameters (DE-028): hop 0 / 0.08, lean 0 / 10, ease.
+  // A/B review parameters (DE-028): hop 0 / 0.08, lean 0 / 10, ease on (AN-21 ВР-12: the default, -S08MoveEase an alias).
   const FS08MoveAnimParams AB = FS08MoveAnimParams::FromCommandLine(TEXT("-S08MoveHop=0.08 -S08MoveLean=0 -S08MoveEase"));
-  TestTrue("A/B flags: hop 0.08, lean 0, ease on", Near(AB.HopHeightRel, 0.08, 1e-6) && AB.TravelLeanDeg == 0.0 && AB.bEaseEnds);
+  TestTrue("A/B flags: hop 0.08, lean 0, ease on",
+           Near(AB.HopHeightRel, 0.08, 1e-6) && AB.TravelLeanDeg == 0.0 && AB.bEaseEnds && Near(AB.EaseMs, 80.0, 1e-9));
   const FS08MoveAnimParams None = FS08MoveAnimParams::FromCommandLine(TEXT("-game"));
-  TestTrue("no A/B flags: the accepted defaults", None.HopHeightRel == 0.0 && None.TravelLeanDeg == 10.0 && !None.bEaseEnds);
+  TestTrue("no A/B flags: the accepted defaults (ease on since AN-21 ВР-12)",
+           None.HopHeightRel == 0.0 && None.TravelLeanDeg == 10.0 && None.bEaseEnds && Near(None.EaseMs, 80.0, 1e-9));
+  TestFalse("-S08MoveEaseLegacy: the linear ends of before ВР-12",
+            FS08MoveAnimParams::FromCommandLine(TEXT("-S08MoveEaseLegacy")).bEaseEnds);
   // Reduced motion takes the hop and the lean away with the whole move: a snapped plan has no travelling pose.
   FS08MoveAnimParams HopLean = AB;
   HopLean.TravelLeanDeg = 10.0;
@@ -483,7 +526,9 @@ bool FS08MoveAnimActorTest::RunTest(const FString&) {
     TestTrue(Tag + TEXT(": the click volume stays on the snapshot cell (MS-R-53)"),
              FVector2D(Actor->GetClickVolumeLocation()).Equals(FVector2D(To), 0.01));
     Actor->TickMove(1000 + 140);
-    TestTrue(Tag + TEXT(": half of the first edge at 140 ms"), Actor->GetActorLocation().Equals(FVector(50, -400, 0), 0.01));
+    // AN-21 (ВР-12): the first edge eases in - s(140) = 5/12 of it (the linear pose was 1/2).
+    TestTrue(Tag + TEXT(": eased s(140) = 5/12 of the first edge"),
+             Actor->GetActorLocation().Equals(FVector(100.0 * 5.0 / 12.0, -400, 0), 0.01));
     if (bArt) {
       TestTrue(Tag + TEXT(": faces the travel direction (+X, yaw 0) and leans 10 deg"),
                NearYaw(Actor->GetFigureYawDeg(), 0.0) && Near(Actor->GetFigureLeanDeg(), 10.0));
@@ -496,7 +541,7 @@ bool FS08MoveAnimActorTest::RunTest(const FString&) {
     // Another snapshot keeps the fighter on the same cell: the move goes on.
     Actor->ApplyFighter(AtTo, To, true, bArt);
     TestTrue(Tag + TEXT(": re-application with the same cell keeps the travelling pose"),
-             Actor->IsMoving() && Actor->GetActorLocation().Equals(FVector(50, -400, 0), 0.01));
+             Actor->IsMoving() && Actor->GetActorLocation().Equals(FVector(100.0 * 5.0 / 12.0, -400, 0), 0.01));
     Actor->TickMove(1000 + 560 + 150);
     TestFalse(Tag + TEXT(": done after the arrival + Idle settle"), Actor->IsMoving());
     TestTrue(Tag + TEXT(": on the destination"), Actor->GetActorLocation().Equals(To, 0.01));

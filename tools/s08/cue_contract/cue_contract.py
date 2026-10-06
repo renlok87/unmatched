@@ -96,7 +96,9 @@ def _num(text):
 
 # ----------------------------------------------------------------------------- CUE-007: расписание перемещения
 MOVE_PARAM_KEYS = ("duration_per_step_ms", "cap_subject_ms", "cap_seq_ms", "min_step_ms", "overlap", "place_ms")
-MOVE_POSE_KEYS = ("hop_height_rel", "travel_lean_deg", "lean_in_ms", "start_turn_ms", "turn_ms", "settle_ms", "ease_ends")
+# AN-21 (ВР-12): ease_ms — окно ease-in/ease-out на концах пути (E = min(ease_ms x T / 280, T / 2) в C++)
+MOVE_POSE_KEYS = ("hop_height_rel", "travel_lean_deg", "lean_in_ms", "start_turn_ms", "turn_ms", "settle_ms",
+                  "ease_ends", "ease_ms")
 SPEED_MUL = {"fast": 0.5, "normal": 1.0, "slow": 1.5}
 MS_CUE_SOURCES = ("trail", "canonical", "straight")
 MS_CUE_KINDS = ("move", "place")
@@ -108,7 +110,8 @@ def move_params(row):
 
 
 def move_pose(row):
-    """Поза фигуры на перемещении (04 §6.3, DE-021 по 01 F-02) из строки CUE-007; C++ FS08MoveAnimParams — те же значения."""
+    """Поза фигуры на перемещении (04 §6.3, DE-021 по 01 F-02; AN-21 — ease концов) из строки CUE-007;
+    C++ FS08MoveAnimParams — те же значения."""
     return {k: row["pose"][k] for k in MOVE_POSE_KEYS}
 
 
@@ -213,10 +216,13 @@ def validate_table(table, schema=None, csv07=CSV07, rig_contract=RIG_CONTRACT, c
                 if name not in c["params"]:
                     errors.append("%s: params.%s не описан" % (cid, name))
             # DE-021 (01 F-02): поза хода — вход наклона, разворот и доворот укладываются в одно ребро (C++ режет по ребру)
+            # AN-21 (ВР-12): окно ease концов пути тоже в пределах ребра (C++ жмёт E = min(ease_ms x T / 280, T / 2))
             pose = c["pose"]
-            for name in ("lean_in_ms", "start_turn_ms", "turn_ms"):
+            for name in ("lean_in_ms", "start_turn_ms", "turn_ms", "ease_ms"):
                 if pose[name] > p["duration_per_step_ms"]:
                     errors.append("%s: pose.%s %s > duration_per_step_ms %s" % (cid, name, pose[name], p["duration_per_step_ms"]))
+            if pose["ease_ms"] < 0:
+                errors.append("%s: pose.ease_ms %s < 0" % (cid, pose["ease_ms"]))
         dur = c["duration_ms"] or 0
         if c["blocks_input"] and dur > MAX_BLOCKING_MS and c["on_new_event"] != "none":
             errors.append("%s: блокирует ввод %d мс > %d (P3) и не терминальный" % (cid, dur, MAX_BLOCKING_MS))
@@ -971,14 +977,14 @@ def check_sound(lines, table):
 
 # ----------------------------------------------------------------------------- постановка боя (DE-018)
 COMBAT_RE = re.compile(r"(CUE combat\b.*)$")
-COMBAT_STAGES = ("start", "read", "effect", "slam", "pause", "lunge", "contact", "hit", "minus", "hp", "fall", "end",
-                 "skip")
-COMBAT_RANK = {"start": 0, "read": 1, "effect": 2, "slam": 3, "pause": 4, "lunge": 5, "contact": 6, "hit": 7,
-               "minus": 8, "hp": 9, "fall": 10, "end": 11}
+COMBAT_STAGES = ("start", "read", "effect", "slam", "face", "pause", "lunge", "contact", "hit", "minus", "hp", "fall",
+                 "end", "skip")
+COMBAT_RANK = {"start": 0, "read": 1, "effect": 2, "slam": 3, "face": 4, "pause": 5, "lunge": 6, "contact": 7,
+               "hit": 8, "minus": 9, "hp": 10, "fall": 11, "end": 12}
 COMBAT_START_NEED = ("attacker", "target", "text", "lines", "damage", "lethal", "shown", "speed", "flip", "contact",
                      "src", "a", "d", "outcome")
 COMBAT_MS = {  # 01 F-01 / F-03 / F-04 / F-09 при скорости ×1 (CUE-DISPATCHER.md §3.1)
-    "declare": 600, "read": 1000, "effect_step": 600, "effect_highlight": 400, "pause": 300,
+    "declare": 600, "read": 1000, "effect_step": 600, "effect_highlight": 400, "pause": 300, "face": 120,
     "minus": 60, "hp": 80, "fall": 450, "tint": 450, "tint_lethal": 550, "minus_life": 900,
 }
 
@@ -1108,6 +1114,19 @@ def check_combat(lines, cue_starts=()):
             errors.append(("C4", "seq %s: пауза «счёт» %d мс ≠ %d" % (seq, pause_ms, COMBAT_MS["pause"])))
         if lunge["_t"] != pause["_t"]:
             errors.append(("C4", "seq %s: выпад не в конце паузы" % seq))
+        # AN-24 (ВР-06): доворот к цели — face необязателен (Cut / догон / скорость «Нет» его не играют),
+        # не больше одного на seq, всегда до выпада; без пропуска паузы интервал face -> lunge 120 ±42 мс
+        faces = stages.get("face", [])
+        if len(faces) > 1:
+            errors.append(("C4", "seq %s: доворотов face %d > 1" % (seq, len(faces))))
+        for fc in faces:
+            if fc["_t"] > lunge["_t"]:
+                errors.append(("C4", "строка %d: face после выпада" % fc["_n"]))
+            elif pause.get("skipped") != "1":
+                gap = lunge["_t"] - fc["_t"]
+                if not (COMBAT_MS["face"] - 42 <= gap <= COMBAT_MS["face"] + 42):
+                    errors.append(("C4", "seq %s: face за %d мс до выпада, ждём %d ±42" % (
+                        seq, gap, COMBAT_MS["face"])))
         # DE-025 (SD-49): play rate LungeAttack = 1 / скорость, при «Нет» клипа нет (0); поле rate= — с DE-025
         if "rate" in lunge:
             want_rate = 0.0 if speed <= 0 else 1.0 / speed

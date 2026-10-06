@@ -40,6 +40,7 @@ enum class ES08TunerScope : uint8 {
   MapGrade = 1 << 2,       // the map plane MID
   ConceptLights = 1 << 3,  // the lit3d point lights (+ their flicker base)
   Materials = 1 << 4,      // the lit3d material overrides (MIDs)
+  HeroMaterials = 1 << 6,  // AN-32 (ВР-16): the heroMaterials Fix of the figures' body MIDs
   Rebuild = 1 << 5,        // a full board rebuild (throttled)
 };
 ENUM_CLASS_FLAGS(ES08TunerScope);

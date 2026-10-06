@@ -15,6 +15,8 @@
 // when the attack card is cancelled), the push of an enemy figure, the move candidates, the placement cascade, the
 // defense deadline beeps, the menu theme and the login sounds; -S08AudioRecord writes the client's output for the
 // loudness pass.
+#include "S08HeroesV2.h"
+
 #include "AudioDeviceManager.h"
 #include "AudioMixerDevice.h"
 #include "Components/AudioComponent.h"
@@ -329,14 +331,7 @@ FString AS08FlowGameMode::AudioKeyOf(const FString& FighterId, int32* OutHarpyIn
   if (!F) return FString();
   const FString Key = S08AudioBank::CharacterKey(F->Name.IsEmpty() ? F->Label : F->Name);
   if (OutHarpyIndex && Key == TEXT("HARPY")) {
-    int32 Index = 1;
-    for (int32 I = F->Label.Len() - 1; I >= 0; --I) {
-      if (FChar::IsDigit(F->Label[I])) {
-        Index = FChar::ConvertCharDigitToInt(F->Label[I]);
-        break;
-      }
-    }
-    *OutHarpyIndex = FMath::Clamp(Index, 1, 3);
+    *OutHarpyIndex = S08HeroesV2::HarpyNumber(*F);  // AN-31: one number rule - the tag, the disc and the audio key
   }
   return Key;
 }

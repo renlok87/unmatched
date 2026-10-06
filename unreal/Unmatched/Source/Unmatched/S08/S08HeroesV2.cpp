@@ -1,6 +1,7 @@
 #include "S08HeroesV2.h"
 
 #include "S08ArtPreviewMedusa.h"
+#include "S08BoardModel.h"
 #include "S08IconMotion.h"
 #include "Animation/AnimSequenceBase.h"
 #include "Components/PrimitiveComponent.h"
@@ -202,6 +203,121 @@ float BenchDissolveProgress() {
   float Progress = -1.0f;
   if (!FParse::Param(Cmd, TEXT("Bench")) || !FParse::Value(Cmd, BenchDissolveParamName, Progress)) return -1.0f;
   return Progress < 0.0f ? -1.0f : FMath::Min(Progress, 1.0f);
+}
+
+bool ParseBenchClipPoses(const FString& Text, TArray<FBenchClipPoseSpec>& Out, FString& OutError) {
+  Out.Reset();
+  OutError.Reset();
+  const FString Trimmed = Text.TrimStartAndEnd();
+  if (Trimmed.IsEmpty()) {
+    OutError = TEXT("empty list");
+    return false;
+  }
+  TArray<FString> Blocks;
+  Trimmed.ParseIntoArray(Blocks, TEXT(";"), true);
+  for (const FString& Block : Blocks) {
+    const int32 At = Block.Find(TEXT("@"));
+    if (At <= 0 || At == Block.Len() - 1) {
+      OutError = FString::Printf(TEXT("'%s' is not <Clip>@<frames>"), *Block);
+      Out.Reset();
+      return false;
+    }
+    const FString ClipName = Block.Left(At).TrimStartAndEnd();
+    EClip Clip = EClip::None;
+    for (const EClip Candidate : {EClip::Idle, EClip::LungeAttack, EClip::HitReact, EClip::DeathSettle}) {
+      if (ClipName.Equals(S08HeroesV2::ClipName(Candidate), ESearchCase::IgnoreCase)) Clip = Candidate;
+    }
+    if (Clip == EClip::None) {
+      OutError = FString::Printf(TEXT("unknown clip '%s'"), *ClipName);
+      Out.Reset();
+      return false;
+    }
+    TArray<FString> Frames;
+    Block.Mid(At + 1).ParseIntoArray(Frames, TEXT(","), true);
+    if (Frames.Num() == 0) {
+      OutError = FString::Printf(TEXT("clip '%s' has no frames"), *ClipName);
+      Out.Reset();
+      return false;
+    }
+    for (const FString& Frame : Frames) {
+      FBenchClipPoseSpec Spec;
+      Spec.Clip = Clip;
+      const FString Token = Frame.TrimStartAndEnd();
+      bool bOk = false;
+      if (Token.StartsWith(TEXT("q"), ESearchCase::IgnoreCase) && Token.Len() > 1) {
+        Spec.bQuarter = true;
+        Spec.Value = FCString::Atoi(*Token.Mid(1));
+        bOk = Token.Mid(1).IsNumeric() && Spec.Value >= 0 && Spec.Value <= 100;
+      } else {
+        Spec.bQuarter = false;
+        Spec.Value = FCString::Atoi(*Token);
+        bOk = Token.IsNumeric() && Spec.Value >= 0;
+      }
+      if (!bOk) {
+        OutError = FString::Printf(TEXT("bad frame '%s' of clip '%s'"), *Token, *ClipName);
+        Out.Reset();
+        return false;
+      }
+      Out.Add(Spec);
+    }
+  }
+  return Out.Num() > 0;
+}
+
+double BenchClipPoseSeconds(const FBenchClipPoseSpec& Spec, double ClipSeconds) {
+  const double Len = FMath::Max(0.0, ClipSeconds);
+  return FMath::Clamp(Spec.bQuarter ? Len * Spec.Value / 100.0 : Spec.Value / ClipFps, 0.0, Len);
+}
+
+int32 HarpyNumber(const FS08BoardFighter& Fighter) {
+  int32 Number = 1;
+  for (int32 I = Fighter.Label.Len() - 1; I >= 0; --I) {
+    if (FChar::IsDigit(Fighter.Label[I])) {
+      Number = FChar::ConvertCharDigitToInt(Fighter.Label[I]);
+      break;
+    }
+  }
+  return FMath::Clamp(Number, 1, 3);
+}
+
+FString BaseDigitMaterialPath() { return TEXT("/Game/UM/Materials/v2/M_UM_BaseDigit"); }
+
+FString BaseDigitTextMaterialPath() { return TEXT("/Game/UM/Materials/v2/M_UM_BaseDigitText"); }
+
+FString BaseDigitFontPath() { return TEXT("/Game/UM/Fonts/F_UM_RobotoBoldCondensed_Offline"); }
+
+float BaseDigitTurnDeg() {
+  float Turn = BaseDigitSideTurnDeg;
+  if (FParse::Value(FCommandLine::Get(), BaseDigitTurnParamName, Turn)) Turn = FMath::Clamp(Turn, -90.0f, 90.0f);
+  return Turn;
+}
+
+FBaseDigitPlacement BaseDigitPlacement(const FVector& PedestalCenter, float TopZ, float TopRadiusUU,
+                                       const FVector& CameraPos, double RestYawDeg, float TurnDeg) {
+  FBaseDigitPlacement Out;
+  const float R = FMath::Max(0.0f, TopRadiusUU);
+  Out.DiscDiameterUU = BaseDigitDiscOfTopDiameter * 2.0f * R;
+  // The camera axis (pedestal -> camera, XY) and the side away from the figure's rest offset.
+  FVector Axis(CameraPos.X - PedestalCenter.X, CameraPos.Y - PedestalCenter.Y, 0.0);
+  if (!Axis.Normalize()) Axis = FVector(0.0, 1.0, 0.0);
+  const double AxisYaw = FMath::RadiansToDegrees(FMath::Atan2(Axis.Y, Axis.X));
+  const double Off = FMath::FindDeltaAngleDegrees(AxisYaw, RestYawDeg);
+  Out.Side = Off >= 0.0 ? -1 : 1;
+  const double PlaceYaw = FMath::DegreesToRadians(AxisYaw + Out.Side * TurnDeg);
+  const FVector Dir(FMath::Cos(PlaceYaw), FMath::Sin(PlaceYaw), 0.0);
+  const FVector Centre2D(PedestalCenter.X, PedestalCenter.Y, 0.0);
+  const FVector OnTop = Centre2D + Dir * (BaseDigitCentreOfRadius * R);
+  Out.DiscCenter = FVector(OnTop.X, OnTop.Y, TopZ + BaseDigitDiscLiftUU + 0.5f * BaseDigitDiscThicknessUU);
+  const float Xy = Out.DiscDiameterUU / 100.0f;  // the engine cylinder: 100 uu across, 100 uu tall
+  Out.DiscScale = FVector(Xy, Xy, BaseDigitDiscThicknessUU / 100.0f);
+  // The digit: flat (its normal +Z), the glyph top away from the camera so it reads upright from the camera side,
+  // centred on the disc, lifted clear of the plate's top (no z-fight).
+  const float Em = BaseDigitEmOfDisc * Out.DiscDiameterUU;
+  Out.TextWorldSizeUU = Em * RobotoCellPerEm;
+  Out.CapUU = Em * RobotoDigitPerEm;
+  Out.TextRotation = FRotationMatrix::MakeFromXZ(FVector::UpVector, -Axis).Rotator();
+  Out.TextLocation = FVector(OnTop.X, OnTop.Y, TopZ + BaseDigitDiscLiftUU + BaseDigitDiscThicknessUU + BaseDigitTextLiftUU);
+  return Out;
 }
 
 void SetDissolve(UPrimitiveComponent* Body, UPrimitiveComponent* Pedestal, float Progress, EDissolveStyle Style) {

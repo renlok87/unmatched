@@ -12,10 +12,13 @@
 #include "S08BoardModel.h"
 #include "S08ContactAnimNotify.h"
 #include "S08FighterActor.h"
+#include "UI/UmHudPanels.h"
 #include "Animation/AnimSequenceBase.h"
 #include "Animation/Skeleton.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/TextRenderComponent.h"
+#include "Engine/Font.h"
 #include "Engine/Engine.h"
 #include "Engine/SkeletalMesh.h"
 #include "Engine/StaticMesh.h"
@@ -28,6 +31,7 @@
 #include "Materials/MaterialExpressionStaticSwitchParameter.h"
 #include "Materials/MaterialExpressionVectorParameter.h"
 #include "Misc/AutomationTest.h"
+#include "Misc/CommandLine.h"
 #include "Misc/Paths.h"
 
 namespace S08HeroesV2Test {
@@ -688,6 +692,291 @@ bool FS08HeroesV2DissolveTest::RunTest(const FString&) {
   SetDissolve(BodyComp, nullptr, 0.25f, EDissolveStyle::Fade);
   TestEqual("progress 0.25", BodyComp->GetCustomPrimitiveData().Data[DissolveCpdIndex], 0.25f);
   TestEqual("style fade = 0", BodyComp->GetCustomPrimitiveData().Data[DissolveStyleCpdIndex], 0.0f);
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08HeroesV2BenchClipPoseTest,
+    "Unmatched.S08.HeroesV2.BenchClipPose -BenchClipPose list parser and q resolution (AN-17, VR-17)",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08HeroesV2BenchClipPoseTest::RunTest(const FString&) {
+  using namespace S08HeroesV2;
+  // The AN-18 list: the Idle quarters, the LungeAttack / HitReact / DeathSettle key frames.
+  const FString Good = TEXT("Idle@q0,q25,q50,q75;LungeAttack@0,2,3,4,5,6,7,8,9,10,11,12,14;HitReact@0,2,4,5,7,8,10;")
+                       TEXT("DeathSettle@0,3,6,7,8,9,12,13,16,17,21");
+  TArray<FBenchClipPoseSpec> Poses;
+  FString Error;
+  TestTrue("the AN-18 pose list parses", ParseBenchClipPoses(Good, Poses, Error));
+  TestEqual("35 poses", Poses.Num(), 35);
+  if (Poses.Num() == 35) {
+    TestEqual("pose 0 = Idle q0", static_cast<int32>(Poses[0].Clip), static_cast<int32>(EClip::Idle));
+    TestTrue("pose 1 is a quarter", Poses[1].bQuarter);
+    TestEqual("pose 1 = q25", Poses[1].Value, 25);
+    TestEqual("pose 4 = LungeAttack", static_cast<int32>(Poses[4].Clip), static_cast<int32>(EClip::LungeAttack));
+    TestFalse("pose 4 is a frame number", Poses[4].bQuarter);
+    TestEqual("LungeAttack k.7", Poses[10].Value, 7);
+    TestEqual("the last pose = DeathSettle k.21", Poses[34].Value, 21);
+  }
+  // Clip names are case-insensitive; one pose per clip block is fine.
+  TArray<FBenchClipPoseSpec> One;
+  TestTrue("case-insensitive clip", ParseBenchClipPoses(TEXT("lungeattack@7"), One, Error));
+  TestEqual("one pose", One.Num(), 1);
+  // Errors: every one empties the list (the bench then runs without poses).
+  auto Bad = [&](const TCHAR* Text, const TCHAR* What) {
+    TArray<FBenchClipPoseSpec> Out;
+    FString Err;
+    TestFalse(FString::Printf(TEXT("rejected: %s"), What), ParseBenchClipPoses(Text, Out, Err));
+    TestTrue(FString::Printf(TEXT("error text of %s"), What), !Err.IsEmpty());
+    TestEqual(FString::Printf(TEXT("empty after %s"), What), Out.Num(), 0);
+  };
+  Bad(TEXT(""), TEXT("empty"));
+  Bad(TEXT("Idle@"), TEXT("no frames"));
+  Bad(TEXT("Teleport@1"), TEXT("unknown clip"));
+  Bad(TEXT("Idle@q101"), TEXT("q over 100"));
+  Bad(TEXT("Idle@-2"), TEXT("negative frame"));
+  Bad(TEXT("Idle@2,x"), TEXT("bad frame token"));
+  Bad(TEXT("Idle@1;Nope@2"), TEXT("bad second block"));
+  Bad(TEXT("Idle"), TEXT("no @"));
+  // q resolves against the hero's clip length: the Idle lengths 2.0 / 2.333 / 2.5 / 3.0 s (frames 48 / 56 / 60 / 72).
+  FBenchClipPoseSpec Q;
+  Q.Clip = EClip::Idle;
+  Q.bQuarter = true;
+  Q.Value = 25;
+  const double Epsilon = 1e-4;
+  struct FLen { double Seconds; int32 Frame25; };
+  const TArray<FLen> Lengths = {{2.0, 12}, {56.0 / 24.0, 14}, {2.5, 15}, {3.0, 18}};
+  for (const FLen& L : Lengths) {
+    const double T = BenchClipPoseSeconds(Q, L.Seconds);
+    TestTrue(FString::Printf(TEXT("q25 of %.3f s = a quarter"), L.Seconds),
+             FMath::Abs(T - 0.25 * L.Seconds) < Epsilon);
+    TestEqual(FString::Printf(TEXT("q25 frame of %.3f s"), L.Seconds), FMath::RoundToInt(T * ClipFps), L.Frame25);
+  }
+  // A plain frame is frame / 24; beyond the clip it clamps to the clip end (a pose never loops).
+  FBenchClipPoseSpec F;
+  F.Clip = EClip::LungeAttack;
+  F.Value = 7;
+  TestTrue("frame 7 = 7/24 s", FMath::Abs(BenchClipPoseSeconds(F, 14.0 / 24.0) - 7.0 / 24.0) < Epsilon);
+  F.Value = 99;
+  TestTrue("frame 99 of a 21-frame clip clamps to its length",
+           FMath::Abs(BenchClipPoseSeconds(F, 21.0 / 24.0) - 21.0 / 24.0) < Epsilon);
+  return true;
+}
+
+namespace {
+/** AN-31: a fighter row with a label. */
+FS08BoardFighter LabeledFighter(const TCHAR* Name, const TCHAR* Label) {
+  FS08BoardFighter F;
+  F.Id = FString(TEXT("f-")) + Label;
+  F.OwnerId = TEXT("owner");
+  F.Name = Name;
+  F.Label = Label;
+  F.bIsHero = false;
+  F.Health = 8;
+  F.MaxHealth = 8;
+  F.X = 1;
+  F.Y = 1;
+  return F;
+}
+/** The run's command line plus Extra while in scope (a local copy of the ArtLook test helper). */
+struct FCommandLineScope {
+  FString Saved;
+  explicit FCommandLineScope(const TCHAR* Extra) : Saved(FCommandLine::Get()) {
+    FCommandLine::Set(*(Saved + TEXT(" ") + Extra));
+  }
+  ~FCommandLineScope() { FCommandLine::Set(*Saved); }
+};
+}  // namespace
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08HeroesV2HarpyNumberTest,
+    "Unmatched.S08.HeroesV2.HarpyNumber the harpy digit 1..3 - the last label digit, 1 without one (AN-31, VR-07/72)",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08HeroesV2HarpyNumberTest::RunTest(const FString&) {
+  using namespace S08HeroesV2;
+  // The number: the last digit of the label, 1 without one, clamped to 1..3 (GD-030, Р-09).
+  TestEqual("Harpies 1", HarpyNumber(LabeledFighter(TEXT("Harpies"), TEXT("Harpies 1"))), 1);
+  TestEqual("Harpies 2", HarpyNumber(LabeledFighter(TEXT("Harpies"), TEXT("Harpies 2"))), 2);
+  TestEqual("Harpies 3", HarpyNumber(LabeledFighter(TEXT("Harpies"), TEXT("Harpies 3"))), 3);
+  TestEqual("no digit: 1", HarpyNumber(LabeledFighter(TEXT("Harpies"), TEXT("Harpies"))), 1);
+  TestEqual("a digit past 3 clamps to 3", HarpyNumber(LabeledFighter(TEXT("Harpies"), TEXT("Harpies 7"))), 3);
+  TestEqual("a 0 digit clamps to 1", HarpyNumber(LabeledFighter(TEXT("Harpies"), TEXT("Harpies 0"))), 1);
+  TestEqual("the FIRST digit does not matter - the LAST one wins",
+            HarpyNumber(LabeledFighter(TEXT("Harpies"), TEXT("3rd harpy of 2"))), 2);
+  TestEqual("a non-harpy also resolves (the caller decides)", HarpyNumber(LabeledFighter(TEXT("Medusa"), TEXT("Medusa"))), 1);
+  // The base digit and the HUD portrait badge (VS-2 CP-12, UmHudPanel::SidekickNumber) give the same number to the
+  // three harpies (ВР-07: one number in the tag, the badge, the base and the audio key). Without a digit they differ
+  // by design (the badge shows none: 0; the base falls back to 1) - a label always carries it in a game.
+  for (const TCHAR* Label : {TEXT("Harpies 1"), TEXT("Harpies 2"), TEXT("Harpies 3")}) {
+    TestEqual(FString::Printf(TEXT("%s: base digit = HUD badge"), Label),
+              HarpyNumber(LabeledFighter(TEXT("Harpies"), Label)), UmHudPanel::SidekickNumber(Label));
+  }
+  // The actor: the digit components show on a living v2 harpy only, hidden with the rollback flag and on other
+  // figures (the text carries the number).
+  UWorld* World = UWorld::CreateWorld(EWorldType::Game, false, TEXT("S08HarpyNumberWorld"));
+  if (!World) {
+    AddError(TEXT("could not create a test world"));
+    return true;
+  }
+  FWorldContext& Context = GEngine->CreateNewWorldContext(EWorldType::Game);
+  Context.SetCurrentWorld(World);
+  auto Apply = [&](const FS08BoardFighter& F, AS08FighterActor*& OutActor) {
+    OutActor = World->SpawnActor<AS08FighterActor>(AS08FighterActor::StaticClass(), FVector(0, -400, 0),
+                                                   FRotator::ZeroRotator);
+    OutActor->SetTeam(ES08TeamSlot::P1, ES08TeamSlot::P1, ES08TeamColorMode::Absolute);
+    OutActor->ApplyFighter(F, FVector(0, -400, 0), true, true);
+  };
+  AS08FighterActor* Harpy = nullptr;
+  Apply(LabeledFighter(TEXT("Harpies"), TEXT("Harpies 2")), Harpy);
+  if (Harpy && !Harpy->IsHeroV2()) {
+    AddWarning(TEXT("v2 harpy assets missing in this checkout - the actor half of the test is skipped"));
+  } else if (Harpy) {
+    TestTrue("the disc shows on a living v2 harpy", Harpy->GetBaseDigitDisc()->IsVisible());
+    TestTrue("the digit shows", Harpy->GetBaseDigitText()->IsVisible());
+    TestEqual("the digit text is the label number", Harpy->GetBaseDigitText()->Text.ToString(), FString(TEXT("2")));
+    const FCommandLineScope Legacy(TEXT("-S08BaseDigitLegacy"));
+    Harpy->UpdateBaseDigit();
+    TestTrue("the rollback flag hides both components",
+             !Harpy->GetBaseDigitDisc()->IsVisible() && !Harpy->GetBaseDigitText()->IsVisible());
+  }
+  AS08FighterActor* Arthur = nullptr;
+  Apply(LabeledFighter(TEXT("King Arthur"), TEXT("King Arthur")), Arthur);
+  if (Arthur && Arthur->IsHeroV2()) {
+    TestTrue("no disc on a non-harpy", !Arthur->GetBaseDigitDisc()->IsVisible());
+    TestTrue("no digit on a non-harpy", !Arthur->GetBaseDigitText()->IsVisible());
+  }
+  if (Harpy) Harpy->Destroy();
+  if (Arthur) Arthur->Destroy();
+  GEngine->DestroyWorldContext(World);
+  World->DestroyWorld(false);
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08HeroesV2BaseDigitPlacementTest,
+    "Unmatched.S08.HeroesV2.BaseDigitPlacement flat upright digit on the camera side inside the pedestal top (AN-31, VR-Z1R-03)",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08HeroesV2BaseDigitPlacementTest::RunTest(const FString&) {
+  using namespace S08HeroesV2;
+  // The harpy pedestal: top radius 11 uu (the v2 pedestal x the sidekick scale), its top at z 4.
+  const float R = 11.0f;
+  const float TopZ = 4.0f;
+  struct FCase {
+    FVector Pedestal;
+    FVector Camera;
+    double RestOffDeg;  // the figure's rest facing relative to the camera axis
+  };
+  const TArray<FCase> Cases = {
+      {FVector(0, 0, 0), FVector(0, 1342, 1917), 30.0},        // K1 camera, the rest turned +30 to an enemy
+      {FVector(-340, -34, 0), FVector(0, 1342, 1917), -45.0},  // left of the board, the rest at -45
+      {FVector(300, 250, 0), FVector(-340, 870, 1200), 0.0},   // a K2 focus camera, the rest on the axis
+      {FVector(120, -280, 0), FVector(120, 600, 800), 12.0}};
+  for (int32 I = 0; I < Cases.Num(); ++I) {
+    const FCase& C = Cases[I];
+    FVector Axis(C.Camera.X - C.Pedestal.X, C.Camera.Y - C.Pedestal.Y, 0.0);
+    Axis.Normalize();
+    const double AxisYaw = FMath::RadiansToDegrees(FMath::Atan2(Axis.Y, Axis.X));
+    const FBaseDigitPlacement P = BaseDigitPlacement(C.Pedestal, TopZ, R, C.Camera, AxisYaw + C.RestOffDeg);
+    const FString Tag = FString::Printf(TEXT("case %d"), I);
+    // Sizes: the disc 0.5 x the top diameter (= R), the digit em 0.9 x the disc (cap 0.721 em).
+    TestTrue(Tag + TEXT(": disc diameter = 0.5 x the top diameter"), FMath::IsNearlyEqual(P.DiscDiameterUU, R, 1e-3f));
+    TestTrue(Tag + TEXT(": cap = 0.9 x disc x the Roboto digit height"),
+             FMath::IsNearlyEqual(P.CapUU, 0.9f * R * RobotoDigitPerEm, 1e-3f));
+    TestTrue(Tag + TEXT(": the cap reads at K2x1.6 (>= 7 uu)"), P.CapUU >= 7.0f);
+    // The disc stays inside the pedestal top: centre distance + disc radius <= R.
+    const double Reach = FVector2D(P.DiscCenter - C.Pedestal).Size() + 0.5 * P.DiscDiameterUU;
+    TestTrue(FString::Printf(TEXT("%s: the disc inside the top (%.2f <= %.2f)"), *Tag, Reach, R), Reach <= R + 1e-3);
+    // On the camera side, 60 deg off the axis, on the side the signed turn names (ВР-Z1R-03: -60 = towards the rest
+    // offset - the mirrored side of the wing rule).
+    FVector Dir = P.DiscCenter - C.Pedestal;
+    Dir.Z = 0.0;
+    Dir.Normalize();
+    TestTrue(Tag + TEXT(": the disc on the camera side (60 deg off the axis)"),
+             FMath::IsNearlyEqual(FVector::DotProduct(Dir, Axis), 0.5, 1e-3));
+    const double DiscYawOff = FMath::FindDeltaAngleDegrees(AxisYaw, FMath::RadiansToDegrees(FMath::Atan2(Dir.Y, Dir.X)));
+    const double WantOff = (C.RestOffDeg >= 0.0 ? -1.0 : 1.0) * BaseDigitSideTurnDeg;
+    TestTrue(FString::Printf(TEXT("%s: the disc on the signed side (%.1f, want %.1f, rest offset %.1f)"), *Tag,
+                             DiscYawOff, WantOff, C.RestOffDeg),
+             FMath::IsNearlyEqual(DiscYawOff, WantOff, 0.1));
+    TestTrue(Tag + TEXT(": -60 = towards the rest offset"), C.RestOffDeg >= 0.0 ? DiscYawOff > 0.0 : DiscYawOff < 0.0);
+    // The plate: flat, its bottom 0.1 above the top; the text 0.3 above the plate's top (no z-fight).
+    TestTrue(Tag + TEXT(": plate bottom above the top"),
+             P.DiscCenter.Z - 0.5 * BaseDigitDiscThicknessUU >= TopZ + 0.1 - 1e-3);
+    TestTrue(Tag + TEXT(": the text >= 0.3 uu above the plate"),
+             P.TextLocation.Z >= P.DiscCenter.Z + 0.5 * BaseDigitDiscThicknessUU + 0.3 - 1e-3);
+    TestTrue(Tag + TEXT(": the text centred on the disc"), FVector2D(P.TextLocation - P.DiscCenter).Size() < 1e-3);
+    // The text lies flat (its normal - local X - is +Z) with the glyph top (local Z) away from the camera, and it is
+    // not mirrored: the text runs along local -Y, which must be the camera's screen right (Up ^ forward).
+    const FRotationMatrix M(P.TextRotation);
+    const FVector Normal = M.GetUnitAxis(EAxis::X);
+    const FVector GlyphUp = M.GetUnitAxis(EAxis::Z);
+    const FVector TextRight = -M.GetUnitAxis(EAxis::Y);
+    const FVector CameraRight = FVector::CrossProduct(FVector::UpVector, -Axis).GetSafeNormal();
+    TestTrue(FString::Printf(TEXT("%s: the text face normal . Z = %.4f > 0.99"), *Tag, Normal.Z), Normal.Z > 0.99);
+    TestTrue(Tag + TEXT(": the glyph top away from the camera"), FVector::DotProduct(GlyphUp, -Axis) > 0.99);
+    TestTrue(Tag + TEXT(": not mirrored (the text runs to the camera's right)"),
+             FVector::DotProduct(TextRight, CameraRight) > 0.99);
+  }
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08HeroesV2BaseDigitStatesTest,
+    "Unmatched.S08.HeroesV2.BaseDigitStates the digit hides for a Place transfer and from the death dissolve (AN-31, VR-Z1R-03)",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08HeroesV2BaseDigitStatesTest::RunTest(const FString&) {
+  using namespace S08HeroesV2;
+  UWorld* World = UWorld::CreateWorld(EWorldType::Game, false, TEXT("S08BaseDigitStatesWorld"));
+  if (!World) {
+    AddError(TEXT("could not create a test world"));
+    return true;
+  }
+  FWorldContext& Context = GEngine->CreateNewWorldContext(EWorldType::Game);
+  Context.SetCurrentWorld(World);
+  const FVector Cell(0, -400, 0);
+  AS08FighterActor* Harpy = World->SpawnActor<AS08FighterActor>(AS08FighterActor::StaticClass(), Cell, FRotator::ZeroRotator);
+  FS08BoardFighter F = LabeledFighter(TEXT("Harpies"), TEXT("Harpies 3"));
+  Harpy->SetTeam(ES08TeamSlot::P1, ES08TeamSlot::P1, ES08TeamColorMode::Absolute);
+  Harpy->ApplyFighter(F, Cell, true, true);
+  if (!Harpy->IsHeroV2()) {
+    AddWarning(TEXT("v2 harpy assets missing in this checkout - the digit states test is skipped"));
+  } else {
+    auto Shown = [Harpy]() { return Harpy->GetBaseDigitDisc()->IsVisible() && Harpy->GetBaseDigitText()->IsVisible(); };
+    auto Hidden = [Harpy]() { return !Harpy->GetBaseDigitDisc()->IsVisible() && !Harpy->GetBaseDigitText()->IsVisible(); };
+    TestTrue("a living harpy shows the disc and the digit", Shown());
+    TestTrue("the digit is drawable (the offline font and the digit material are in this build)",
+             Harpy->IsBaseDigitDrawable());
+    TestEqual("the digit is the label number", Harpy->GetBaseDigitText()->Text.ToString(), FString(TEXT("3")));
+    TestTrue("the digit face is flat (normal . Z > 0.99)",
+             Harpy->GetBaseDigitText()->GetComponentTransform().GetUnitAxis(EAxis::X).Z > 0.99);
+    const UFont* Font = Harpy->GetBaseDigitText()->Font;
+    TestTrue("the digit font is offline (TextRender draws no runtime font)",
+             Font && Font->FontCacheType == EFontCacheType::Offline);
+    // A Place transfer hides it for the whole transfer; the arrival shows it again.
+    FS08MovePlan Place;
+    Place.FighterId = F.Id;
+    Place.Kind = ES08MoveKind::Place;
+    Place.Points = {Cell, Cell + FVector(200, 0, 0)};
+    Place.StepMs = 500.0;
+    Place.Steps = 1;
+    Harpy->PlayMove(Place, FS08MoveAnimParams(), 0);
+    TestTrue("Place: moving", Harpy->IsMoving());
+    TestTrue("Place: the digit hidden from the start of the transfer", Hidden());
+    Harpy->TickMove(250);
+    TestTrue("Place: still hidden half way", Hidden());
+    Harpy->FinishMove();
+    TestTrue("Place: shown again on arrival", Shown());
+    // The death: still shown while DeathSettle plays, hidden from the start of the dissolve (sidekick: right after
+    // DeathSettle, 01 F-09).
+    FS08BoardFighter Dead = F;
+    Dead.Health = 0;
+    Harpy->ApplyFighter(Dead, Cell + FVector(200, 0, 0), true, true);
+    FDeathPlan Plan;
+    FString Style;
+    if (TestTrue("the harpy dies", Harpy->GetDeathPlan(Plan, Style))) {
+      Harpy->AdvanceDeathForTest(Plan.DissolveStartSeconds() + 0.01f);
+      TestTrue("death: the dissolve runs", Harpy->IsDissolving());
+      TestTrue("death: the digit hidden from the dissolve on", Hidden());
+    }
+  }
+  Harpy->Destroy();
+  GEngine->DestroyWorldContext(World);
+  World->DestroyWorld(false);
   return true;
 }
 

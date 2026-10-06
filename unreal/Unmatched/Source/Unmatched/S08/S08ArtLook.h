@@ -135,10 +135,14 @@ UNMATCHED_API void ResetSlateHudOverrideForTest();
 /** 'ARTLOOK art=1|0 source=default|S08GreyBoard|override heroes=v2|legacy(..) tray=on|legacy(..)|off env=on|off(..)
  *   review=0|1 legacyRender=0|1 markers=0|1 aliases=<-ArtPreviewHeroesV2,-ArtPreviewDiorama,-S08HeartGlow or ->
  *   hud=ring:<id>|legacy(..),glow:on|legacy(..),tracker:de|legacy(..),cross:on|legacy(..) dpi=project|legacy(..)
- *   portraits=avatar|legacy(..) cards=art|legacy(..) chips=v3|legacy(..) hudImpl=umg|slate[:<list>]' - the effective look
- *   of this run (the
- *   hud field: FS08TurnHudLook::ArtLookField; dpi: UmHudScale::ArtLookField, HB-09; portraits / cards: CardMediaField,
- *   CP-02; chips: UmTeamChip::ArtLookField, IC-44 / IC-45; hudImpl: FS08SlateHudBlocks::ImplField, HB-06). */
+ *   portraits=avatar|legacy(..) cards=art|legacy(..) chips=v3|legacy(..) hudImpl=umg|slate[:<list>]
+ *   move=ease80|legacy(-S08MoveEaseLegacy) facing=v1|legacy(-S08FacingLegacy) baseDigit=on|legacy(-S08BaseDigitLegacy)
+ *   heroMat=on|legacy(-S08HeroMatFixLegacy)' - the effective look of this run (the hud field:
+ *   FS08TurnHudLook::ArtLookField; dpi: UmHudScale::ArtLookField, HB-09; portraits / cards: CardMediaField, CP-02;
+ *   chips: UmTeamChip::ArtLookField, IC-44 / IC-45; hudImpl: FS08SlateHudBlocks::ImplField, HB-06; move: the AN-21
+ *   ВР-12 ease of the move ends; facing: the AN-23 ВР-06 rest facing rule; baseDigit: the AN-31 ВР-07/72 harpy number
+ *   on the base; heroMat: the AN-32 ВР-16 heroMaterials Fix of the light profile - "on" states the mechanism, the
+ *   applied heroes are counted by 'ARTPREVIEW heroMat board'). */
 UNMATCHED_API FString TraceLine();
 
 }  // namespace S08ArtLook

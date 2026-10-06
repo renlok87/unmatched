@@ -14,6 +14,7 @@
 #include "S08EnvLayout.h"
 #include "S08FighterActor.h"
 #include "S08HeroesV2.h"
+#include "S08MoveAnim.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "Misc/AutomationTest.h"
@@ -107,6 +108,48 @@ bool FS08ArtLookDefaultTest::RunTest(const FString&) {
     // run I (AB-5..AB-8, 2026-10-05): the accepted turn HUD look is in the line
     TestTrue(FString::Printf(TEXT("default hud look traced: %s"), *Line),
              Line.Contains(TEXT(" hud=ring:marker-turn-ring,glow:on,tracker:de,cross:on")));
+    // AN-21 (ВР-12): the move ease of the ends is in the line (80 ms)
+    TestTrue(FString::Printf(TEXT("default move ease traced: %s"), *Line),
+             Line.Contains(TEXT(" move=ease80")));
+    // AN-23 (ВР-06): the rest facing rule (three-quarter to the camera) is in the line
+    TestTrue(FString::Printf(TEXT("default facing traced: %s"), *Line),
+             Line.Contains(TEXT(" facing=v1")));
+    // AN-31 (ВР-07, ВР-72): the harpy base digit is in the line
+    TestTrue(FString::Printf(TEXT("default base digit traced: %s"), *Line),
+             Line.Contains(TEXT(" baseDigit=on")));
+    // AN-32 (ВР-16): the heroMaterials Fix mechanism is in the line
+    TestTrue(FString::Printf(TEXT("default hero materials traced: %s"), *Line),
+             Line.Contains(TEXT(" heroMat=on")));
+  }
+  // 2c) AN-21 (ВР-12): -S08MoveEaseLegacy rolls the ease back, -S08MoveEase stays a no-op alias of the default
+  {
+    FCommandLineScope Cmd(TEXT("-S08MoveEaseLegacy"));
+    TestTrue("move ease legacy traced", S08ArtLook::TraceLine().Contains(TEXT(" move=legacy(-S08MoveEaseLegacy)")));
+    TestFalse("params: legacy flag off", FS08MoveAnimParams::FromCommandLine(TEXT("-S08MoveEaseLegacy")).bEaseEnds);
+    TestTrue("params: the -S08MoveEase alias keeps the default on",
+             FS08MoveAnimParams::FromCommandLine(TEXT("-S08MoveEase")).bEaseEnds);
+  }
+  // 2d) AN-23 (ВР-06): -S08FacingLegacy rolls the rest facing back to the half-field rule
+  {
+    FCommandLineScope Cmd(TEXT("-S08FacingLegacy"));
+    TestTrue("facing legacy traced",
+             S08ArtLook::TraceLine().Contains(TEXT(" facing=legacy(-S08FacingLegacy)")));
+  }
+  // 2e) AN-31 (ВР-07/72): -S08BaseDigitLegacy rolls the harpy base digit back (no disc, no number)
+  {
+    FCommandLineScope Cmd(TEXT("-S08BaseDigitLegacy"));
+    const FString Line = S08ArtLook::TraceLine();
+    TestTrue(FString::Printf(TEXT("base digit legacy traced: %s"), *Line),
+             Line.Contains(TEXT(" baseDigit=legacy(-S08BaseDigitLegacy)")));
+    TestTrue("the other new fields stay on", Line.Contains(TEXT(" facing=v1")) && Line.Contains(TEXT(" heroMat=on")));
+  }
+  // 2f) AN-32 (ВР-16): -S08HeroMatFixLegacy ignores the light profile's heroMaterials block
+  {
+    FCommandLineScope Cmd(TEXT("-S08HeroMatFixLegacy"));
+    const FString Line = S08ArtLook::TraceLine();
+    TestTrue(FString::Printf(TEXT("hero materials legacy traced: %s"), *Line),
+             Line.Contains(TEXT(" heroMat=legacy(-S08HeroMatFixLegacy)")));
+    TestTrue("the base digit stays on", Line.Contains(TEXT(" baseDigit=on")));
   }
   // 2) the former opt-in flags are accepted and change nothing
   {

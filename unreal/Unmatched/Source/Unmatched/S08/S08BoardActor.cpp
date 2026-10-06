@@ -3,6 +3,7 @@
 #include "S08ArtLook.h"
 #include "S08ArtPreviewMedusa.h"
 #include "S08Diorama.h"
+#include "S08Facing.h"
 #include "S08FighterActor.h"
 #include "S08LiveTune.h"
 #include "S08MapBackdrop.h"
@@ -10,6 +11,10 @@
 #include "S08TraceLog.h"
 #include "UI/UmCardMedia.h"
 #include "S08Contracts.h"
+#include "Camera/CameraActor.h"
+#include "Camera/CameraComponent.h"
+#include "Camera/PlayerCameraManager.h"
+#include "GameFramework/PlayerController.h"
 #include "Dom/JsonObject.h"
 #include "HAL/FileManager.h"
 #include "Misc/FileHelper.h"
@@ -473,10 +478,19 @@ void AS08BoardActor::PlayFighterHitTint(const FString& FighterId, float Seconds)
 
 int32 AS08BoardActor::PlayFighterMoves(const TArray<FS08MovePlan>& Plans, const FS08MoveAnimParams& Params,
                                        int64 NowMs) {
+  const bool bLegacyFacing = S08Facing::LegacyRequested();
   int32 Animated = 0;
-  for (const FS08MovePlan& Plan : Plans) {
-    AS08FighterActor* Actor = FindFighterActor(Plan.FighterId);
+  for (const FS08MovePlan& InPlan : Plans) {
+    AS08FighterActor* Actor = FindFighterActor(InPlan.FighterId);
     if (!Actor) continue;
+    FS08MovePlan Plan = InPlan;
+    if (!bLegacyFacing) {
+      // AN-23 (ВР-06; review F7): the plan turns from the angle the figure shows and settles to its v1 rest angle on
+      // the destination - the camera axis + the offset to the nearest living enemy there, no dead band (a plan end
+      // has no current angle to keep). The builder only knew the cells, not the figure.
+      Plan.StartRestYawDeg = Actor->GetFigureYawDeg();
+      Plan.EndRestYawDeg = RestYawFor(Actor, Plan.Destination());
+    }
     Actor->PlayMove(Plan, Params, NowMs);
     if (Actor->IsMoving() && !Plan.bSnapped) ++Animated;
   }
@@ -485,16 +499,116 @@ int32 AS08BoardActor::PlayFighterMoves(const TArray<FS08MovePlan>& Plans, const 
 
 void AS08BoardActor::TickFighterMoves(int64 NowMs) {
   for (AS08FighterActor* Actor : FighterActors) {
-    if (Actor && Actor->IsMoving()) Actor->TickMove(NowMs);
+    if (!Actor || !Actor->IsMoving()) continue;
+    Actor->TickMove(NowMs);
+    // AN-23 (ВР-06): the move ended - restate the rest angle on the post-move enemies (the plan settled to the
+    // pre-move ones; the dead band keeps it when nothing changed).
+    if (!Actor->IsMoving()) ApplyFighterRestFacing(Actor, TEXT("move"));
   }
 }
 
 int32 AS08BoardActor::SkipFighterMoves() {
   int32 Skipped = 0;
   for (AS08FighterActor* Actor : FighterActors) {
-    if (Actor && Actor->FinishMove()) ++Skipped;
+    if (!Actor) continue;
+    if (Actor->FinishMove()) {
+      ++Skipped;
+      ApplyFighterRestFacing(Actor, TEXT("move"));  // AN-23 (ВР-06): the skip lands the move
+    }
   }
   return Skipped;
+}
+
+// ---- AN-23 (ВР-06): the rest facing ---------------------------------------------------------------------------
+
+FVector AS08BoardActor::ViewCameraLocation(const UWorld* World) {
+  const APlayerController* PC = World ? World->GetFirstPlayerController() : nullptr;
+  if (PC) {
+    // ВР-Z1R-04: the view target itself - the flow game mode's BoardCamera (its camera component). The camera
+    // manager's cached POV is stale until its next update: a board spawns in the frame of SetViewTarget, and the
+    // Z-1 bench traced cam=-136 / -160 against the K1 camera at (0, 1342, 1917).
+    if (const ACameraActor* CameraActor = Cast<ACameraActor>(PC->GetViewTarget())) {
+      if (const UCameraComponent* Camera = CameraActor->GetCameraComponent()) return Camera->GetComponentLocation();
+      return CameraActor->GetActorLocation();
+    }
+    if (PC->PlayerCameraManager) return PC->PlayerCameraManager->GetCameraLocation();
+  }
+  return FVector(0.0, 10000.0, 2000.0);  // no player yet (automation): the +Y board side, as the K1 camera
+}
+
+FVector AS08BoardActor::LocalCameraLocation() const { return ViewCameraLocation(GetWorld()); }
+
+int64 AS08BoardActor::GameNowMs() const {
+  if (GameClock) return GameClock();
+  const UWorld* World = GetWorld();
+  return World ? static_cast<int64>(FMath::RoundToDouble(World->GetTimeSeconds() * 1000.0)) : 0;
+}
+
+AS08FighterActor* AS08BoardActor::NearestEnemyOf(const AS08FighterActor* Me) const {
+  return Me ? NearestEnemyFrom(Me, Me->GetActorLocation()) : nullptr;
+}
+
+AS08FighterActor* AS08BoardActor::NearestEnemyFrom(const AS08FighterActor* Me, const FVector& WorldPos) const {
+  if (!Me) return nullptr;
+  AS08FighterActor* Best = nullptr;
+  double BestDist = TNumericLimits<double>::Max();
+  for (AS08FighterActor* Actor : FighterActors) {
+    if (!Actor || Actor == Me) continue;
+    const FS08BoardFighter& Other = Actor->GetFighter();
+    if (!Other.IsAlive() || Actor->IsInDeathHold() || Other.OwnerId == Me->GetFighter().OwnerId) continue;
+    const double Dist = FVector2D(Actor->GetActorLocation() - WorldPos).Size();
+    if (Dist < BestDist) {
+      BestDist = Dist;
+      Best = Actor;
+    }
+  }
+  return Best;
+}
+
+double AS08BoardActor::RestYawFor(const AS08FighterActor* Me, const FVector& WorldPos) const {
+  if (S08Facing::LegacyRequested()) return FS08MoveAnim::RestYawDeg(WorldPos);
+  const FVector Cam = LocalCameraLocation();
+  const AS08FighterActor* Enemy = NearestEnemyFrom(Me, WorldPos);
+  if (!Enemy) return S08Facing::YawToward(WorldPos, Cam);  // no living enemy: face the camera
+  return S08Facing::RestYaw(WorldPos, Cam, true, Enemy->GetActorLocation(), /*CurrentYawDeg=*/0.0,
+                            /*bApplyDeadBand=*/false);
+}
+
+void AS08BoardActor::ApplyFighterRestFacing(AS08FighterActor* Actor, const TCHAR* Src) {
+  if (!Actor) return;
+  const bool bLegacy = S08Facing::LegacyRequested();
+  const FVector Cam = LocalCameraLocation();
+  AS08FighterActor* Enemy = bLegacy ? nullptr : NearestEnemyOf(Actor);
+  Actor->ApplyRestFacing(Src, bLegacy, Cam, Enemy != nullptr,
+                         Enemy ? Enemy->GetActorLocation() : FVector::ZeroVector,
+                         Enemy ? Enemy->GetFighterId() : FString());
+}
+
+void AS08BoardActor::FighterReturnToRest(const FString& FighterId, const TCHAR* Src) {
+  if (S08Facing::LegacyRequested()) return;
+  AS08FighterActor* Actor = FindFighterActor(FighterId);
+  if (!Actor || !Actor->GetFighter().IsAlive() || Actor->IsInDeathHold() || Actor->IsMoving()) return;
+  // AN-25: the dead band never holds the return; a dead target switches to the nearest living enemy; none - the
+  // camera axis (ВР-06).
+  Actor->ReturnToRestFacing(Src, RestYawFor(Actor, Actor->GetActorLocation()), S08Facing::ReturnMs, GameNowMs());
+}
+
+void AS08BoardActor::UpdateHeroMaterials() {
+  const FS08LightProfile* Light = bArtActive ? ArtData.LightFor(ActiveProfile) : nullptr;
+  int32 Fixed = 0;
+  for (AS08FighterActor* Actor : FighterActors) {
+    if (!Actor || !Actor->IsHeroV2() || !Actor->GetHeroV2Spec()) continue;
+    const FS08HeroMaterialFix* Fix =
+        Light ? &Light->HeroMaterialFix(Actor->GetHeroV2Spec()->Key, S08TeamSlotName(Actor->GetLook())) : nullptr;
+    Actor->ApplyHeroMaterials(Fix);
+    Fixed += Fix && !Fix->IsNeutral() ? 1 : 0;
+  }
+  const FString Key = FString::Printf(TEXT("%s|%d"), Light ? *Light->Id : TEXT("-"), Fixed);
+  if (Key == HeroMaterialsTraceKey) return;
+  HeroMaterialsTraceKey = Key;
+  FS08Trace::Write(FString::Printf(
+      TEXT("ARTPREVIEW heroMat board profile=%s heroes=%d mids=%d"), Light ? *Light->Id : TEXT("-"), Fixed,
+      FParse::Param(FCommandLine::Get(), S08HeroesV2::HeroMatFixLegacyFlagName) ? 0 : Fixed));
 }
 
 bool AS08BoardActor::AnyFighterMoving() const {
@@ -1429,6 +1543,7 @@ bool AS08BoardActor::Rebuild(const FS08BoardModel& Board) {
   }
   // ENV-MAPS P9: a profile change re-rigs the fighters already on the board (SyncFighters does it for new ones)
   if (FighterActors.Num() > 0) UpdateHeroLights();
+  if (FighterActors.Num() > 0) UpdateHeroMaterials();  // AN-32 (ВР-16)
   // ENV-MAPS: the map-image surface draws no zone marks (the zones are the painted ones); on grids this is
   // bArtActive as before.
   const bool bZoneMarks = bArtActive && !bMapImageActive;
@@ -1713,8 +1828,16 @@ void AS08BoardActor::SyncFighters(const FS08BoardModel& Board,
       ApplyFighterReadability(Actor, Fighter, S08TeamLook(Team, bOwn, TeamColorMode));
     }
   }
+  // AN-23 (ВР-06; ВР-Z1R-04): the rest facing once every actor of the snapshot exists - in the spawn loop the first
+  // team saw no enemy yet. Three-quarter to the camera, offset to the nearest living enemy; the actor upgrades its
+  // first apply to src=spawn (always traced); -S08FacingLegacy keeps the half-field rule at once.
+  for (const FS08BoardFighter& Fighter : Fighters) {
+    if (AS08FighterActor* Actor = FindFighterActor(Fighter.Id)) ApplyFighterRestFacing(Actor, TEXT("snapshot"));
+  }
   // ENV-MAPS P9: the per-figure hero light of the active light profile (channel 1, figures only), within the board budget
   UpdateHeroLights();
+  // AN-32 (ВР-16): the light profile's heroMaterials Fix onto the figures' body MIDs
+  UpdateHeroMaterials();
   // ART-004 T2.2 six-copies review: one summary once every fighter applied.
   if (bArtActive && S08ArtPreviewAllMedusa() && !bAllMedusaSummaryTraced && FighterActors.Num() > 0) {
     bAllMedusaSummaryTraced = true;

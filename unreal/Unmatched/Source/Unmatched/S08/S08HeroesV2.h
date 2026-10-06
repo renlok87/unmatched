@@ -24,6 +24,7 @@
 
 class UAnimSequenceBase;
 class UPrimitiveComponent;
+struct FS08BoardFighter;
 
 namespace S08HeroesV2 {
 
@@ -216,5 +217,84 @@ UNMATCHED_API void SetDissolve(UPrimitiveComponent* Body, UPrimitiveComponent* P
  *  dissolving figures for the pass cost. Negative = off (no -Bench, no -BenchDissolve, or an unparsable value). */
 inline const TCHAR* const BenchDissolveParamName = TEXT("BenchDissolve=");
 UNMATCHED_API float BenchDissolveProgress();
+
+// ---- AN-17 (ВР-17): the clip-pose stand -Bench -BenchClipPose=<Clip>@<f1>,<f2>[;<Clip>@...] ----
+// Review tooling only (no game-path effect): the bench walks every pose x every -BenchViews view with every living v2
+// figure frozen at that pose (SetPosition + SetPlaying(false)), so any frame of any D-11 clip can be sheeted on the
+// real maps. A frame is a plain number (frame at ClipFps) or "q<pct>" - a percent of the clip length, resolved per
+// hero (the Idle lengths differ; the q25 frame is 15 on Arthur's 2.5 s and 18 on Merlin's 3.0 s).
+inline const TCHAR* const BenchClipPoseParamName = TEXT("BenchClipPose=");
+/** -BenchClipPoseFighter=<KingArthur|Merlin|Medusa|Harpy|id> (Harpy = the first harpy): the K2 views focus this
+ *  fighter, like -BenchMovePoseFighter; without the parameter the bench's own hero. */
+inline const TCHAR* const BenchClipPoseFighterParamName = TEXT("BenchClipPoseFighter=");
+/** One pose of the parsed list, still unresolved (q resolves against the hero's clip length). */
+struct FBenchClipPoseSpec {
+  EClip Clip = EClip::None;
+  bool bQuarter = false;  // q<pct> (a percent of the clip) instead of a frame number
+  int32 Value = 0;        // frame index at ClipFps, or the percent 0..100
+};
+/** Parses "<Clip>@<f1>,<f2>[;<Clip>@...]": Clip in Idle | LungeAttack | HitReact | DeathSettle, frames >= 0,
+ *  q percents 0..100. False (OutError, Out empty) on any other token - the bench then runs without poses. */
+UNMATCHED_API bool ParseBenchClipPoses(const FString& Text, TArray<FBenchClipPoseSpec>& Out, FString& OutError);
+/** The pose time (s) of a spec against one figure's clip length: frame / ClipFps, or pct% of the clip. */
+UNMATCHED_API double BenchClipPoseSeconds(const FBenchClipPoseSpec& Spec, double ClipSeconds);
+
+// ---- AN-31 (ВР-07, ВР-72): the harpy number on the base ----
+/** The harpy's number 1..3: the last digit of the label (GD-030; Р-09 of GD-058), 1 without one - the same digit as
+ *  the HUD tag and the audio key (AudioKeyOf). */
+UNMATCHED_API int32 HarpyNumber(const FS08BoardFighter& Fighter);
+/** Rollback: -S08BaseDigitLegacy - no disc / digit on the harpy base. */
+inline const TCHAR* const BaseDigitLegacyFlagName = TEXT("S08BaseDigitLegacy");
+/** /Game/UM/Materials/v2/M_UM_BaseDigit - the disc: Unlit, opaque, EyeAdaptationInverse(VectorParameter "Color") on
+ *  the emissive (the game-layer rule: the token lands on screen whatever the exposure); base_digit_import.py. */
+UNMATCHED_API FString BaseDigitMaterialPath();
+/** /Game/UM/Materials/v2/M_UM_BaseDigitText - the digit: Unlit, masked, FontSampleParameter "Font" (its alpha = the
+ *  opacity mask), EyeAdaptationInverse(VectorParameter "Color") on the emissive (base_digit_import.py). */
+UNMATCHED_API FString BaseDigitTextMaterialPath();
+/** /Game/UM/Fonts/F_UM_RobotoBoldCondensed_Offline - the OFFLINE (texture-page, distance-field) font of the digits
+ *  0-9, Roboto Bold Condensed (font.card, Apache 2.0) imported by UTrueTypeFontFactory (base_digit_import.py,
+ *  ВР-Z1R-03). UTextRenderComponent draws only offline fonts - a runtime-cached one never renders. */
+UNMATCHED_API FString BaseDigitFontPath();
+/** Roboto Bold Condensed metrics (hhea/OS2, 2048 units per em): the GDI cell (winAscent + winDescent = the offline
+ *  font's char height, i.e. the TextRender WorldSize) and the digit height, per em. */
+constexpr float RobotoCellPerEm = 2458.0f / 2048.0f;
+constexpr float RobotoDigitPerEm = 1477.0f / 2048.0f;
+/** ВР-Z1R-03 (по делегированию) geometry of the base digit (the ВР-AN08 one overhung the pedestal, sat under the
+ *  talons and gave a ~6 px digit): disc 0.5 x the top-face diameter, its centre 0.48 R from the pedestal centre on
+ *  the camera axis turned 60 deg (the front side, clear of the talons), digit em 0.9 x the disc, centred, flat, the
+ *  glyph top away from the camera. The turn is signed against the figure's rest offset: +60 = away from it, -60 = the
+ *  mirrored side, towards it. ВР-Z1R-03's wing rule chose -60: at +60 the near wing covered > 25 % of the disc in
+ *  the K2 crops (A/B C:/tmp/visual/Z-1/ab-turn*, 2026-10-07), at -60 all six digits read on both maps. */
+constexpr float BaseDigitDiscOfTopDiameter = 0.5f;
+constexpr float BaseDigitCentreOfRadius = 0.48f;
+constexpr float BaseDigitSideTurnDeg = -60.0f;
+constexpr float BaseDigitEmOfDisc = 0.9f;
+constexpr float BaseDigitDiscThicknessUU = 0.4f;  // the disc plate (the engine cylinder scaled flat)
+constexpr float BaseDigitDiscLiftUU = 0.1f;       // the plate's bottom above the pedestal top
+constexpr float BaseDigitTextLiftUU = 0.3f;       // the text above the plate's top
+/** Review A/B only: -S08BaseDigitTurn=<deg> overrides BaseDigitSideTurnDeg (-90..90; negative = the mirrored side of
+ *  the wing rule of ВР-Z1R-03, 0 = on the camera axis). */
+inline const TCHAR* const BaseDigitTurnParamName = TEXT("S08BaseDigitTurn=");
+UNMATCHED_API float BaseDigitTurnDeg();
+/** Where the disc and the digit go - world-free (automation-tested). */
+struct FBaseDigitPlacement {
+  FVector DiscCenter = FVector::ZeroVector;  // world
+  FVector DiscScale = FVector::OneVector;    // of the 100 uu engine cylinder
+  float DiscDiameterUU = 0.0f;
+  FVector TextLocation = FVector::ZeroVector;  // world
+  FRotator TextRotation = FRotator::ZeroRotator;  // world: local X (the text normal) = +Z, local Z (glyph up) = away
+  float TextWorldSizeUU = 0.0f;               // UTextRenderComponent WorldSize (= the font cell)
+  float CapUU = 0.0f;                         // the digit height
+  int32 Side = 1;                             // the turn of the place from the camera axis: +1 / -1
+};
+/** PedestalCenter: the pedestal axis (world XY; Z ignored), TopZ / TopRadiusUU: its top face, CameraPos: the view
+ *  camera, RestYawDeg: the figure's rest facing (world yaw). */
+UNMATCHED_API FBaseDigitPlacement BaseDigitPlacement(const FVector& PedestalCenter, float TopZ, float TopRadiusUU,
+                                                     const FVector& CameraPos, double RestYawDeg,
+                                                     float TurnDeg = BaseDigitSideTurnDeg);
+
+// ---- AN-32 (ВР-16): the heroMaterials Fix group of the map light profile ----
+/** Rollback: -S08HeroMatFixLegacy - the light profile's "heroMaterials" block is ignored (the plain hero MIs). */
+inline const TCHAR* const HeroMatFixLegacyFlagName = TEXT("S08HeroMatFixLegacy");
 
 }  // namespace S08HeroesV2

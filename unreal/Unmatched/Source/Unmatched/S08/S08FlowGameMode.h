@@ -47,6 +47,9 @@
 #include "S08FlowGameMode.generated.h"
 
 struct FS08MoveDraftView;
+namespace S08HeroesV2 {
+struct FBenchClipPoseSpec;
+}
 
 class SEditableTextBox;
 class SConstraintCanvas;
@@ -885,6 +888,23 @@ private:
   bool ApplyBenchMovePose(const FString& PreferredId, double HoldMs, FString& OutPosedId, FString& OutError);
   bool bBenchMovePose = false;
   int64 BenchMovePoseClockMs = 0;
+  // ---- Z-1 figures (S08FlowGameModeFigures.cpp, ВР-Z1R-01): the clip-pose stand and the facing adapters ----
+  /** AN-17 (ВР-17): -BenchClipPose=<Clip>@<f1>,<f2>[;<Clip>@...] (+ -BenchClipPoseFighter=<key|id>, which sets
+   *  InOutHeroId for the K2 views) of Cmd; true with at least one pose. A bad list is traced and gives no poses. */
+  bool BenchParseClipPoses(const TCHAR* Cmd, TArray<S08HeroesV2::FBenchClipPoseSpec>& OutPoses, FString& InOutHeroId,
+                           int32 ViewCount);
+  /** AN-17: every living v2 figure holds Spec (frozen); traced per figure + one summary; returns the posed count. */
+  int32 BenchHoldClipPoses(const S08HeroesV2::FBenchClipPoseSpec& Spec, int32 PoseNumber, int32 PoseCount);
+  /** AN-17: bench-<view>-<clip>-f<NN>|-q<pct>-1920x1080.png. */
+  static FString BenchClipPoseShotName(const FString& View, const S08HeroesV2::FBenchClipPoseSpec& Spec);
+  /** AN-17 (ВР-17): 'ARTPREVIEW figrect fighter=<id> view=<view> x y w h' per living v2 figure of a -BenchClipPose
+   *  view - the screen rectangle of the figure with its pedestal (the component bounds, projected). */
+  void BenchTraceFigRects(const FString& View);
+  /** AN-24 / AN-25 (ВР-06): the figure side of one combat staging event - Face turns the attacker to the target,
+   *  Lunge commits a deferred snap (reduced motion / speed "none"), End returns an attacker that played no clip. */
+  void FiguresOnCombatEvent(const FS09CombatStageEvent& Event);
+  /** F4: hands the game clock (NowMs) to a freshly spawned board actor for the FACING traces. */
+  void FiguresAttachBoard();
   /** Space under the cursor of the plates (MS-T-09 drives it live; the bench fixture's "hover" now). */
   FIntPoint MoveHoverCell = FIntPoint(-1, -1);
   uint32 MovePlatesKey = 0;

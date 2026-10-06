@@ -298,6 +298,21 @@ struct UNMATCHED_API FS08MapGradeSpec {
   }
 };
 
+/** AN-32 (ВР-16): one hero's Fix values of a light profile's "heroMaterials" block - the Fix group of
+ *  M_UM_Figure_v2 v2.4 driven over a MID (S08ArtBoardProfiles.json lightProfiles.<id>.heroMaterials). Neutral
+ *  defaults change nothing: the figure keeps its MI exactly (no MID is created). */
+struct UNMATCHED_API FS08HeroMaterialFix {
+  int32 ClassA = -1;     // MatID class 0..15, -1 = off
+  float GainA = 1.0f;    // BaseColor gain of the class
+  float SpecA = 0.0f;    // specular delta
+  int32 ClassB = -1;
+  float GainB = 1.0f;
+  float SpecB = 0.0f;
+  bool IsNeutral() const {
+    return ClassA < 0 && ClassB < 0 && GainA == 1.0f && GainB == 1.0f && SpecA == 0.0f && SpecB == 0.0f;
+  }
+};
+
 struct UNMATCHED_API FS08LightProfile {
   FString Id;
   bool bHasDirectional = false;
@@ -317,6 +332,10 @@ struct UNMATCHED_API FS08LightProfile {
   /** ENV-MAPS P9 (docs/art-pipeline/ENV-HERO-LIGHT.md, S08HeroLight.h): the optional per-figure "heroLight" rig (lighting
    *  channel 1, figures only); a separate category outside the 1 key + <= 6 points budget below. */
   FS08HeroLightSpec HeroLight;
+  /** AN-32 (ВР-16): the "heroMaterials" block - hero key -> look ("P1" / "P2" / "*") -> the Fix values. */
+  TMap<FString, TMap<FString, FS08HeroMaterialFix>> HeroMaterials;
+  /** The fix of a hero for a look: the look's own entry, else "*", else the neutral default. */
+  const FS08HeroMaterialFix& HeroMaterialFix(const FString& HeroKey, const FString& Look) const;
   /** 1 directional with shadow + <= 6 points without shadows. */
   bool BudgetOk(FString& OutReason) const;
 };

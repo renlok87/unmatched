@@ -3,7 +3,9 @@
 #include "S08ArtPreviewMedusa.h"
 #include "S08Diorama.h"
 #include "S08EnvLayout.h"
+#include "S08Facing.h"
 #include "S08HeroesV2.h"
+#include "S08MoveAnim.h"
 #include "S08Render.h"
 #include "S08TurnPortraitWidget.h"
 #include "UI/UmHudScale.h"
@@ -78,6 +80,8 @@ FString TraceLine() {
   // On the grey board the figure / tray choice is not consulted (no art board): the fields still say what an art board
   // of this run would show.
   if (FParse::Param(Cmd, TEXT("S08HeartGlow"))) Aliases.Add(TEXT("-S08HeartGlow"));  // run I: the glow is the default
+  // AN-21 (ВР-12): -S08MoveEase is a no-op alias of the now-default move ease
+  if (FParse::Param(Cmd, TEXT("S08MoveEase"))) Aliases.Add(TEXT("-S08MoveEase"));
   // Run I (AB-5..AB-8): the turn HUD look of the portraits and the combat panel (S08TurnPortraitWidget.h)
   const FString HudLook = FS08TurnHudLook::ArtLookField(Cmd);
   // VS-1 HB-09: the DPI curve of this run (project ВР-62 or the -S08DpiLegacy rollback).
@@ -88,10 +92,28 @@ FString TraceLine() {
   const FString Chips = UmTeamChip::ArtLookField(Cmd);
   // VS-2 HB-06: the UMG HUD root or the -S08SlateHud rollback (whole / block list).
   const FString HudImpl = SlateHudBlocks().ImplField();
+  // AN-21 (ВР-12): the move ease of the ends (80 ms) with its rollback
+  const FS08MoveAnimParams MoveParams = FS08MoveAnimParams::FromCommandLine(Cmd);
+  const FString MoveEase = MoveParams.bEaseEnds ? FString::Printf(TEXT("ease%.0f"), MoveParams.EaseMs)
+                                               : FString(TEXT("legacy(-S08MoveEaseLegacy)"));
+  // AN-23 (ВР-06): the rest facing rule (three-quarter to the camera) with its rollback
+  const FString Facing = S08Facing::LegacyRequested()
+                             ? FString::Printf(TEXT("legacy(-%s)"), S08Facing::LegacyFlagName)
+                             : FString(TEXT("v1"));
+  // AN-31 (ВР-07, ВР-72): the harpy number on the base with its rollback
+  const FString BaseDigit = FParse::Param(Cmd, S08HeroesV2::BaseDigitLegacyFlagName)
+                                ? FString::Printf(TEXT("legacy(-%s)"), S08HeroesV2::BaseDigitLegacyFlagName)
+                                : FString(TEXT("on"));
+  // AN-32 (ВР-16): the heroMaterials Fix of the light profile with its rollback ("on" states the mechanism; the
+  // applied heroes are counted in the 'ARTPREVIEW heroMat board' line - the profile loads after this line)
+  const FString HeroMat = FParse::Param(Cmd, S08HeroesV2::HeroMatFixLegacyFlagName)
+                              ? FString::Printf(TEXT("legacy(-%s)"), S08HeroesV2::HeroMatFixLegacyFlagName)
+                              : FString(TEXT("on"));
   return FString::Printf(
-      TEXT("ARTLOOK art=%d source=%s heroes=%s tray=%s env=%s review=%d legacyRender=%d markers=%d aliases=%s %s %s %s %s hudImpl=%s%s"),
+      TEXT("ARTLOOK art=%d source=%s heroes=%s tray=%s env=%s review=%d legacyRender=%d markers=%d aliases=%s %s %s %s %s hudImpl=%s move=%s facing=%s baseDigit=%s heroMat=%s%s"),
       bArt ? 1 : 0, Source, *Heroes, *Tray, *Env, ReviewTooling() ? 1 : 0, S08LegacyRender() ? 1 : 0, S08Markers() ? 1 : 0,
       Aliases.Num() ? *FString::Join(Aliases, TEXT(",")) : TEXT("-"), *HudLook, *Dpi, *CardMedia, *Chips, *HudImpl,
+      *MoveEase, *Facing, *BaseDigit, *HeroMat,
       bArt ? TEXT("") : TEXT(" (grey board: no art profile, figures, tray or art HUD layer)"));
 }
 

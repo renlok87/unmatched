@@ -75,7 +75,9 @@ FS08MoveAnimParams FS08MoveAnimParams::FromCommandLine(const TCHAR* CommandLine)
   double Value = 0.0;
   if (FParse::Value(CommandLine, TEXT("S08MoveHop="), Value)) Out.HopHeightRel = FMath::Clamp(Value, 0.0, 0.5);
   if (FParse::Value(CommandLine, TEXT("S08MoveLean="), Value)) Out.TravelLeanDeg = FMath::Clamp(Value, 0.0, 45.0);
-  if (FParse::Param(CommandLine, TEXT("S08MoveEase"))) Out.bEaseEnds = true;
+  // AN-21 (ВР-12): the ease is the default; -S08MoveEaseLegacy rolls back to the linear ends; -S08MoveEase keeps the
+  // old A/B spelling as a no-op alias (recorded in the ARTLOOK aliases).
+  if (FParse::Param(CommandLine, TEXT("S08MoveEaseLegacy"))) Out.bEaseEnds = false;
   return Out;
 }
 
@@ -116,6 +118,7 @@ double FS08MoveAnim::TravelYawDeg(const FVector& From, const FVector& To) {
 
 TArray<FS08MovePlan> FS08MoveAnim::BuildPlans(const TArray<FS08Cue>& Cues, const FS08MotionSettings& Motion,
                                               TFunctionRef<FVector(const FIntPoint&)> CellToWorld,
+                                              TFunctionRef<double(const FVector&)> RestYawAt,
                                               const FS08MoveCueParams& Params) {
   TArray<const FS08Cue*> Moves;
   const TArray<FS08MoveCueTiming> Timing = Schedule(Cues, Motion, Moves, Params);
@@ -136,22 +139,38 @@ TArray<FS08MovePlan> FS08MoveAnim::BuildPlans(const TArray<FS08Cue>& Cues, const
     Plan.StartMs = Timing[I].StartMs;
     Plan.StepMs = Timing[I].StepMs;
     Plan.bSnapped = Timing[I].bSnapped;
-    Plan.StartRestYawDeg = RestYawDeg(Plan.Points[0]);
-    Plan.EndRestYawDeg = RestYawDeg(Plan.Points.Last());
+    // AN-23 (ВР-06): the rest facing comes from the caller's rule (the move settles to it over SettleMs).
+    Plan.StartRestYawDeg = RestYawAt(Plan.Points[0]);
+    Plan.EndRestYawDeg = RestYawAt(Plan.Points.Last());
     Plans.Add(MoveTemp(Plan));
   }
   return Plans;
+}
+
+TArray<FS08MovePlan> FS08MoveAnim::BuildPlans(const TArray<FS08Cue>& Cues, const FS08MotionSettings& Motion,
+                                              TFunctionRef<FVector(const FIntPoint&)> CellToWorld,
+                                              const FS08MoveCueParams& Params) {
+  return BuildPlans(Cues, Motion, CellToWorld,
+                    [](const FVector& CellWorld) { return RestYawDeg(CellWorld); }, Params);
 }
 
 namespace {
 double BlendYaw(double From, double To, double Alpha) {
   return From + FMath::FindDeltaAngleDegrees(From, To) * FMath::Clamp(Alpha, 0.0, 1.0);
 }
-double EaseEdge(double U, bool bFirst, bool bLast) {
-  if (bFirst && bLast) return 0.5 - 0.5 * FMath::Cos(UE_DOUBLE_PI * U);  // in-out
-  if (bFirst) return 1.0 - FMath::Cos(0.5 * UE_DOUBLE_PI * U);         // in
-  if (bLast) return FMath::Sin(0.5 * UE_DOUBLE_PI * U);                 // out
-  return U;
+/** AN-21 (ВР-12, ВР-AN05): a trapezoid speed profile over one edge - a quadratic ease-in for the first EinU of it, a
+ *  linear run between, a quadratic ease-out for the last EoutU (EinU / EoutU are fractions of the edge, 0 = off).
+ *  The speed is continuous at both joins, the covered fraction is exactly 0..1, so the edge duration and the arrival
+ *  time do not change. k normalises the area: k = 1 / (1 - EinU/2 - EoutU/2). */
+double EaseProfile(double U, double EinU, double EoutU) {
+  const double Uc = FMath::Clamp(U, 0.0, 1.0);
+  if (EinU <= 0.0 && EoutU <= 0.0) return Uc;
+  const double A = FMath::Clamp(EinU, 0.0, 0.5);
+  const double B = FMath::Clamp(EoutU, 0.0, 0.5);
+  const double k = 1.0 / FMath::Max(1e-9, 1.0 - 0.5 * A - 0.5 * B);
+  if (A > 0.0 && Uc < A) return k * Uc * Uc / (2.0 * A);
+  if (B > 0.0 && Uc > 1.0 - B) return 1.0 - k * (1.0 - Uc) * (1.0 - Uc) / (2.0 * B);
+  return k * (Uc - 0.5 * A);
 }
 }  // namespace
 
@@ -212,7 +231,13 @@ FS08MovePose FS08MoveAnim::Sample(const FS08MovePlan& Plan, const FS08MoveAnimPa
     const int32 E = FMath::Clamp(FMath::FloorToInt32(T / Step), 0, Edges - 1);
     const double Local = T - E * Step;
     const double U = FMath::Clamp(Local / Step, 0.0, 1.0);
-    const double UPos = Params.bEaseEnds ? EaseEdge(U, E == 0, E == Edges - 1) : U;
+    // AN-21 (ВР-12): ease only the ends of the whole path - an ease-in on the first edge, an ease-out on the last
+    // one; every middle edge stays linear. The window scales with the edge: E = min(EaseMs x T / 280, T / 2).
+    double UPos = U;
+    if (Params.bEaseEnds) {
+      const double EaseWinMs = FMath::Clamp(FMath::Max(0.0, Params.EaseMs) * Step / 280.0, 0.0, 0.5 * Step);
+      UPos = EaseProfile(U, E == 0 ? EaseWinMs / Step : 0.0, E == Edges - 1 ? EaseWinMs / Step : 0.0);
+    }
     const FVector& A = Plan.Points[FMath::Min(E, Plan.Points.Num() - 1)];
     const FVector& B = Plan.Points[FMath::Min(E + 1, Plan.Points.Num() - 1)];
     Pose.Location = FMath::Lerp(A, B, UPos);

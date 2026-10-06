@@ -41,6 +41,10 @@ bool AS08BoardActor::ApplyTunedArtData(const FS08BoardArtData& Data, uint8 Scope
       UpdateHeroLights();
       Done.Add(TEXT("heroLight"));
     }
+    if (EnumHasAnyFlags(S, ES08TunerScope::HeroMaterials)) {  // AN-32 (ВР-16): live tune, no rebuild
+      UpdateHeroMaterials();
+      Done.Add(TEXT("heroMaterials"));
+    }
     if (EnumHasAnyFlags(S, ES08TunerScope::ProfileLights)) {
       ApplyTunedLights(*Light);
       Done.Add(TEXT("profileLights"));
