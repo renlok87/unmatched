@@ -471,6 +471,8 @@ void AS08FlowGameMode::AudioOnAttackDeclared(const FString& AttackerId, int32 Se
   // AU-S5 CUE-014: Arthur's ability boost - the attacker knows it now; the defender hears it at the reveal (the boost
   // card id is stripped from its combat info)
   bAudioBoostDeclared = bAbilityBoost && Key == TEXT("ARTHUR");
+  FS08Trace::Write(FString::Printf(TEXT("AUDIO attack seq=%d key=%s abilityBoost=%d"), Seq, Key.IsEmpty() ? TEXT("-") : *Key,
+                                   bAbilityBoost ? 1 : 0));
   if (bAudioBoostDeclared) PlayCueBank(TEXT("CUE-014"), AttackerId, Seq, TEXT("FX-ARTHUR-BOOST"));
   OfferVoLine(TEXT("ATTACK"), Key, false, Harpy);
 }
@@ -744,6 +746,9 @@ void AS08FlowGameMode::ResetAudioMatch() {
   bAudioBoostFizzle = false;
   AudioPlaceSteps.Reset();
   AudioBoostCardId.Reset();
+  bAudioStreamSeenReady = false;
+  bAudioNetLost = false;
+  AudioStreamDownSinceMs = -1;
 }
 
 void AS08FlowGameMode::AudioOnPendingOpen(const FString& HeadId) {
@@ -914,4 +919,48 @@ void AS08FlowGameMode::TickAudioWatchers() {
     PlayBankSfx(TEXT("CRD-BOOST-PLACE"), TEXT("SFX"), TEXT("boost"));
   }
   AudioBoostCardId = CommandUi.BoostCardId;
+  // the live stream of the match (the reconnect banner keys off the same state): lost for 1.5 s / back
+  if (Flow.IsValid() && Flow->GetStage() == ES08Stage::Started && bAudioMatchStarted && !bBench) {
+    const int64 Now = NowMs();
+    const bool bReady = Flow->IsStreamReady();
+    if (bReady) {
+      bAudioStreamSeenReady = true;
+      AudioStreamDownSinceMs = -1;
+      if (bAudioNetLost) {
+        bAudioNetLost = false;
+        TArray<FString> Lines;
+        Music.SetDisconnected(false, Now, Lines);
+        WriteCueLines(Lines);
+        PlayCueBank(TEXT("CUE-018"), TEXT("net"), Hud.SequenceNumber, FString());
+      }
+    } else if (bAudioStreamSeenReady && !bAudioNetLost) {
+      if (AudioStreamDownSinceMs < 0) AudioStreamDownSinceMs = Now;
+      if (Now - AudioStreamDownSinceMs >= 1500) {
+        bAudioNetLost = true;
+        TArray<FString> Lines;
+        Music.SetDisconnected(true, Now, Lines);
+        WriteCueLines(Lines);
+        PlayCueBank(TEXT("CUE-017"), TEXT("net"), Hud.SequenceNumber, FString());
+      }
+    }
+  }
+}
+
+void AS08FlowGameMode::PlayScreenSound(FName BankId) {
+  const FString Id = BankId.ToString();
+  if (!S08AudioBank::Find(Id)) {
+    FS08Trace::Write(FString::Printf(TEXT("AUDIO-SCREEN unknown bank=%s"), *Id));
+    return;
+  }
+  PlayBankSfx(Id, Id.StartsWith(TEXT("STG-")) ? TEXT("Music") : TEXT("UI"), TEXT("screen"));
+}
+
+void AS08FlowGameMode::SetAudioPaused(bool bPaused) {
+  Music.SetPaused(bPaused, NowMs());
+  FS08Trace::Write(FString::Printf(TEXT("MUSIC pause=%d t=%lld"), bPaused ? 1 : 0, static_cast<long long>(NowMs())));
+}
+
+void AS08FlowGameMode::PlayHeroSelectSting(const FString& HeroName) {
+  const FString Bank = FString::Printf(TEXT("STG-SELECT-%s"), *S08AudioBank::CharacterKey(HeroName));
+  if (S08AudioBank::Find(Bank)) PlayBankSfx(Bank, TEXT("Music"), TEXT("select"));
 }
