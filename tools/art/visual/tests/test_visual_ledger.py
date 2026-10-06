@@ -30,8 +30,13 @@ def root(tmp_path):
     (r / "docs/game-design/visual/07-prompt-templates.md").write_text(
         "T-SYNTX-UPSCALE T-SYNTX-IMG-BANANA T-CODEX-2D\n", encoding="utf-8")
     (r / "docs/game-design/visual/06-tasks/prompts/EN-03.syntx.txt").write_text("x", encoding="utf-8")
-    # the real ledger as the starting point: real limits, empty rows
+    # the real ledger as the starting point: real limits, but its rows cleared (the live ledger fills up)
     shutil.copyfile(repo_root() / LEDGER_REL, r / LEDGER_REL)
+    live = json.loads((r / LEDGER_REL).read_text(encoding="utf-8"))
+    live["entries"] = []
+    live["providerTerms"] = []
+    live["totals"] = ledger.compute_totals([])
+    (r / LEDGER_REL).write_text(json.dumps(live, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return r
 
 
