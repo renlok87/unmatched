@@ -49,6 +49,7 @@ struct UNMATCHED_API FS09LastCombat {
   FString DefenderPlayerId;
   int32 DefenderDamage = 0;
   bool bAttackerWon = false;
+  bool bAttackerCardCancelled = false;  // AU-S5: the attack card's effects (and its boost) were cancelled
   TArray<FS09CombatEffectEntry> Entries;
 
   /** Decodes metadata.lastCombat. False when the field is absent or malformed (no seq / fighters) - "no record"

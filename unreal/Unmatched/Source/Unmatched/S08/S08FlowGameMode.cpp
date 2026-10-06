@@ -521,6 +521,7 @@ void AS08FlowGameMode::HandleApplied(const FS08Snapshot& Snapshot, ES08SeqDecisi
         FS08Trace::Write(TEXT("DRAFT-OPEN draw committed (resume instead of begin)"));
         // MS-R-02: the pre-draft target found no path with the new hand.
         if (CommandUi.LastReason.Key == FName(TEXT("why.predraft.lost"))) ShowReason(CommandUi.LastReason, 4.0f);
+        AudioOnDraftOpen(CommandUi.PendingManeuverId, CommandUi.MovableFighterIds(Fighters).Num());  // AU-S5
       }
     }
     const bool bExhaustionWasOpen = MoveInput.bExhaustionOpen;
@@ -613,7 +614,7 @@ void AS08FlowGameMode::TrackCombatResult(const FS08Snapshot& Snapshot,
       TArray<FString> Lines;
       if (!bPrevCombat && bHasPrevApplied && Snapshot.Phase == TEXT("COMBAT") && !Open.AttackerId.IsEmpty()) {
         CueDispatcher.Feed(TEXT("CUE-008"), Open.AttackerId, Snapshot.SequenceNumber, NowMs(), Lines);
-        AudioOnAttackDeclared(Open.AttackerId, Snapshot.SequenceNumber);  // AU-S4
+        AudioOnAttackDeclared(Open.AttackerId, Snapshot.SequenceNumber, Open.bHasAbilityBoostCardId);  // AU-S4/S5
       }
       if (bHasPrevApplied && PrevApplied.Phase == TEXT("COMBAT") && Snapshot.Phase == TEXT("COMBAT_RESOLVE") &&
           !Open.TargetFighterId.IsEmpty()) {
@@ -1302,6 +1303,9 @@ void AS08FlowGameMode::StartCombatStage(const FS08Snapshot& Closing, const FS08S
   // A fired line means the revealed card carried an effect: its read hold applies even when the reveal could not
   // name the card (a reconnect between the baseline and the result).
   In.bHasEffectText = In.Reveal.HasEffectText() || In.EffectLines > 0;
+  // AU-S5: the attack card was cancelled with Arthur's boost on it - the boost fizzles at the slam
+  bAudioBoostFizzle = bOwnLog && Log.bAttackerCardCancelled && In.Reveal.Boosts.Num() > 0 &&
+                      AudioKeyOf(Combat.AttackerId) == TEXT("ARTHUR");
   In.Damage = Damage;
   In.HpBefore = HpBefore;
   In.HpAfter = TargetAfter->Health;
@@ -2633,6 +2637,7 @@ void AS08FlowGameMode::DeclinePendingChoiceCommand() {
   if (Flow->DeclinePendingEffect(Command.EffectId)) {
     FS08Trace::Write(FString::Printf(TEXT("PEND-DECLINE sent type=%s"),
                                      *CommandUi.PendingChoice.Type));
+    AudioOnPendingAnswered(CommandUi.PendingChoice.Id, FString(), false);  // AU-S5
     Toast = FString::Printf(TEXT("%s declined"), *CommandUi.PendingChoice.Type);
   } else {
     Toast = TEXT("decline not sent - command gate blocked it (see trace)");
@@ -2675,6 +2680,7 @@ void AS08FlowGameMode::FeedPendingPresentation(const FS08Snapshot& Snapshot) {
   // answered last time where it is still legal (nothing is sent).
   if (CommandUi.Mode == ES09CommandMode::PendingChoice && CommandUi.bHasPendingChoice) {
     if (PendingPresenter.Observe(CommandUi.PendingChoice, Snapshot.TurnCount)) {
+      AudioOnPendingOpen(CommandUi.PendingChoice.Id);  // AU-S5: Medusa's gaze head
       FString Line = PendingPresenter.TraceLine() + TEXT(" type=") + CommandUi.PendingChoice.Type;
       if (PendingPresenter.Present != ES09PendingPresent::Modal) {
         if (const FS09PendingVariant* Last = PendingPresenter.Remembered()) {
@@ -2883,6 +2889,7 @@ bool AS08FlowGameMode::ConfirmCombat() {
                                        CommandUi.PendingChoice.Stage, *Command.EffectId));
       // DE-020 (SD-19): the answer is what the compact / toast form of this trigger pre-selects next time.
       PendingPresenter.Remember(CommandUi.PendingChoice, FS09PendingVariant::FromCommand(Command));
+      AudioOnPendingAnswered(CommandUi.PendingChoice.Id, Command.FighterId, true);  // AU-S5
       Toast = TEXT("choice sent");
     } else {
       Toast = TEXT("choice not sent - command gate blocked it (see trace)");
@@ -5128,6 +5135,7 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
     if (HudTickAccumulator >= 0.25f) {
       HudTickAccumulator = 0.0f;
       RefreshHud();
+      AudioTickDeadline();  // AU-S5: the defense deadline beeps
     }
   }
   if (ToastUntil > 0.0f && Elapsed > ToastUntil) {
@@ -5460,6 +5468,7 @@ void AS08FlowGameMode::UpdateLegacyRootVisibility() {
 }
 
 void AS08FlowGameMode::OnStageChanged(ES08Stage OldStage, ES08Stage NewStage) {
+  AudioOnStage(OldStage, NewStage);  // AU-S5: the menu theme, the login sounds, the end of a mix recording
   // Entering Started: a fresh match must not inherit the previous duel's
   // result-drive state (the RESULT trace dedupe would swallow the new game's
   // first matching seq, and a spent leave/shot flags pair would skip the

@@ -40,6 +40,7 @@
 #include "S08MusicDirector.h"
 #include "S08VoDirector.h"
 #include "S08Ambience.h"
+#include "S08AudioCues.h"
 #include "S08MoveAnim.h"
 #include "S08ShotQueue.h"
 #include "S08TurnPortraitWidget.h"
@@ -513,6 +514,7 @@ private:
   TSet<FString> AudioLowHpDone;
   FString AudioMapKey;
   FString AudioOwnHeroKey;
+  FString AudioMatchGameId;
   bool bAudioMatchStarted = false;
   bool bAudioDiscardDraft = false;
   bool bVoPlaying = false;
@@ -541,7 +543,7 @@ private:
   FString AudioKeyOf(const FString& FighterId, int32* OutHarpyIndex = nullptr) const;
   FString HeroKeyOfOwner(const FString& OwnerId) const;
   void AudioOnApplied(const FS08Snapshot& Snapshot, const TArray<FS08BoardFighter>& Before);
-  void AudioOnAttackDeclared(const FString& AttackerId, int32 Seq);
+  void AudioOnAttackDeclared(const FString& AttackerId, int32 Seq, bool bAbilityBoost = false);
   void AudioOnDefensePlayed(const FString& TargetId, int32 Seq);
   void AudioOnCombatEvent(const FS09CombatStageEvent& Event);
   void AudioOnHit(const FString& FighterId, int32 Seq, int64 DueMs);
@@ -551,6 +553,35 @@ private:
   /** CUE-016: the director picks the sting of the own hero and outcome; returns its bank id. */
   FString AudioOnResult();
   void NoteAudioInput();
+  // ---- AU-S5 (07-production-log §9): the sounds wired after AU-S4 and the mix recording
+  /** The flow stage changed: a fresh match resets the per-match audio; the lobby / room plays the menu theme; the
+   *  login success / failure plays its UI sound. */
+  void AudioOnStage(ES08Stage OldStage, ES08Stage NewStage);
+  void ResetAudioMatch();
+  /** FX-GAZE-REQUEST: an own Medusa gaze head opened (it sounds once the combat staging is over). */
+  void AudioOnPendingOpen(const FString& HeadId);
+  /** The own pending head was answered: FX-GAZE-BEAM (CUE-014) when the gaze was used, FX-GAZE-DECLINE when declined. */
+  void AudioOnPendingAnswered(const FString& HeadId, const FString& FighterId, bool bUsed);
+  /** BRD-CANDIDATES: a maneuver draft opened with more than one figure to move (once per pendingManeuver.id). */
+  void AudioOnDraftOpen(const FString& ManeuverId, int32 Movable);
+  /** BRD-PUSH: the enemy figures an EFFECT trail of this seq moved (their step sounds get the push whistle). */
+  void AudioOnEffectTrail(int32 Seq, const TArray<FString>& Pushed);
+  /** UI-TIMER-*: the own defense window deadline (called with the HUD refresh, 4 times a second). */
+  void AudioTickDeadline();
+  /** -S08AudioRecord=<file.wav>: the whole output of this client from the match start to the result + 8 s (or the
+   *  exit from the match), written synchronously as a 16-bit WAV for the loudness pass (tools/audio/mix_check.py). */
+  void StartAudioRecording();
+  void StopAudioRecording(const TCHAR* Why);
+  FS08DeadlineBeeper DeadlineBeeper;
+  FString AudioGazeHeadId;
+  bool bAudioGazeRequestDue = false;
+  FString AudioDraftManeuverId;
+  TMap<int32, TArray<FString>> AudioPushBySeq;
+  bool bAudioBoostDeclared = false;  // the local attacker heard FX-ARTHUR-BOOST at the declaration of this combat
+  bool bAudioBoostFizzle = false;    // the staged combat cancelled the attack card with its boost
+  FString AudioRecordFile;
+  bool bAudioRecording = false;
+  int64 AudioRecordStopMs = -1;
   // MS-T-16: the motion settings (US08UserSettings + flags, read at BeginPlay), the move pose parameters and the
   // damage cues held until their target arrives. DE-025: re-read when the settings are saved (US08UserSettings::
   // OnChanged) - the next move seq and the next combat staging use them, no restart.

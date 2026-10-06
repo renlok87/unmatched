@@ -104,6 +104,10 @@ void AS08FlowGameMode::FeedOpponentView(const FS08Snapshot& Snapshot) {
       const FS08BoardFighter* F = Decoded.FindByPredicate([&Id](const FS08BoardFighter& E) { return E.Id == Id; });
       return F ? F->OwnerId : FString();
     });
+    AudioOnEffectTrail(Trail.Seq, S08AudioCues::PushedFighters(Trail, [&Decoded](const FString& Id) {  // AU-S5
+      const FS08BoardFighter* F = Decoded.FindByPredicate([&Id](const FS08BoardFighter& E) { return E.Id == Id; });
+      return F ? F->OwnerId : FString();
+    }));
     if (EffectTrailYours.Num() > 0) {
       auto FighterName = [&Decoded](const FString& Id) -> FString {
         const FS08BoardFighter* F = Decoded.FindByPredicate([&Id](const FS08BoardFighter& E) { return E.Id == Id; });

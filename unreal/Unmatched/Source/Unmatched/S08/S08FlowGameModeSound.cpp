@@ -98,6 +98,10 @@ void AS08FlowGameMode::ScheduleStepSounds(const TArray<FS08MovePlan>& Plans) {
     CueSound.DropSteps(Now, TEXT("replace"), Lines, Plan.FighterId);
     CueSound.ScheduleSteps(Plan.FighterId, Plan.Seq, Now + static_cast<int64>(FMath::RoundToDouble(Plan.StartMs)),
                            Plan.StepMs, Plan.Steps, Plan.bSnapped);
+    // AU-S5 BRD-PUSH: an enemy figure moved by a card effect - the pulling whistle over its first step
+    if (TArray<FString>* Pushed = AudioPushBySeq.Find(Plan.Seq); Pushed && Pushed->Remove(Plan.FighterId) > 0) {
+      DelaySound(FMath::Max(0, FMath::RoundToInt(Plan.StartMs)), TEXT("BRD-PUSH"), TEXT("SFX"), TEXT("push"));
+    }
   }
   WriteCueLines(Lines);
   TickStepSounds();  // the edges that start now (the first move of the seq) sound in this frame

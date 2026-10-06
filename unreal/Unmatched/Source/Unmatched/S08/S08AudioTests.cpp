@@ -6,11 +6,15 @@
 //   Unmatched.S08.Audio.Vo        - one voice, priorities and interrupt, the 3 s gap, cooldowns, once-per-match,
 //                                   harpy pitch versions, no repeat;
 //   Unmatched.S08.Audio.Ambience  - plans per map, the spot schedule (seeded), followers, the map key of a board;
-//   Unmatched.S08.Audio.Settings  - the bus volumes and the subtitle switches (console names, gains, defaults).
+//   Unmatched.S08.Audio.Settings  - the bus volumes and the subtitle switches (console names, gains, defaults);
+//   Unmatched.S08.Audio.Cues      - AU-S5: the deadline beeps, the push of an enemy figure, Medusa's gaze head,
+//                                   the placement cascade.
 #if WITH_AUTOMATION_TESTS
 
 #include "Misc/AutomationTest.h"
+#include "../S09/S09OpponentView.h"
 #include "S08Ambience.h"
+#include "S08AudioCues.h"
 #include "S08AudioBank.h"
 #include "S08MusicDirector.h"
 #include "S08UserSettings.h"
@@ -224,6 +228,51 @@ bool FS08AudioSettingsTest::RunTest(const FString&) {
   TestEqual("vo stored", Saved.VoPercent, 0);
   TestFalse("subtitles stored", Saved.bSubtitles);
   TestTrue("describe has the buses", S->Describe().Contains(TEXT("music=35 sfx=80 ui=80 vo=0 subtitles=0")));
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08AudioCuesTest, "Unmatched.S08.Audio.Cues",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FS08AudioCuesTest::RunTest(const FString& Parameters) {
+  // the deadline: WARN once at <= 10 s, TICK on 5..1 once each, nothing after expiry, a new key starts over
+  FS08DeadlineBeeper Beeper;
+  TestEqual("30 s: nothing", Beeper.Feed(TEXT("d1"), 29.8), FString());
+  TestEqual("10 s: warn", Beeper.Feed(TEXT("d1"), 9.9), FString(TEXT("UI-TIMER-WARN")));
+  TestEqual("warn once", Beeper.Feed(TEXT("d1"), 9.6), FString());
+  TestEqual("5 s: tick", Beeper.Feed(TEXT("d1"), 4.9), FString(TEXT("UI-TIMER-TICK")));
+  TestEqual("same second: no repeat", Beeper.Feed(TEXT("d1"), 4.3), FString());
+  TestEqual("4 s: tick", Beeper.Feed(TEXT("d1"), 3.95), FString(TEXT("UI-TIMER-TICK")));
+  TestEqual("a skipped second ticks once", Beeper.Feed(TEXT("d1"), 1.5), FString(TEXT("UI-TIMER-TICK")));
+  TestEqual("expired: silent", Beeper.Feed(TEXT("d1"), -0.2), FString());
+  TestEqual("a new deadline warns again", Beeper.Feed(TEXT("d2"), 8.0), FString(TEXT("UI-TIMER-WARN")));
+  FS08DeadlineBeeper Late;
+  TestEqual("a late join in the last seconds ticks", Late.Feed(TEXT("d3"), 2.2), FString(TEXT("UI-TIMER-TICK")));
+  TestEqual("and never warns after", Late.Feed(TEXT("d3"), 2.1), FString());
+
+  // the push: an EFFECT trail moving a figure of another player; a maneuver or an own figure is a plain step
+  FS09LastMovement Trail;
+  Trail.bValid = true;
+  Trail.PlayerId = TEXT("p1");
+  Trail.Source = TEXT("EFFECT");
+  Trail.Moves.AddDefaulted_GetRef().FighterId = TEXT("enemy");
+  Trail.Moves.AddDefaulted_GetRef().FighterId = TEXT("own");
+  Trail.Moves.AddDefaulted_GetRef().FighterId = TEXT("unknown");
+  auto OwnerOf = [](const FString& Id) -> FString {
+    return Id == TEXT("enemy") ? TEXT("p2") : Id == TEXT("own") ? TEXT("p1") : FString();
+  };
+  const TArray<FString> Pushed = S08AudioCues::PushedFighters(Trail, OwnerOf);
+  TestTrue("only the enemy figure is pushed", Pushed.Num() == 1 && Pushed[0] == TEXT("enemy"));
+  Trail.Source = TEXT("MANEUVER");
+  TestEqual("a maneuver pushes nobody", S08AudioCues::PushedFighters(Trail, OwnerOf).Num(), 0);
+  Trail.Source = TEXT("EFFECT");
+  Trail.bValid = false;
+  TestEqual("no trail, no push", S08AudioCues::PushedFighters(Trail, OwnerOf).Num(), 0);
+
+  // Medusa's gaze head and the placement cascade
+  TestTrue("gaze head", S08AudioCues::IsMedusaGazeHead(TEXT("ability-medusa-target-p3")));
+  TestFalse("another head", S08AudioCues::IsMedusaGazeHead(TEXT("card-effect-17")));
+  const TArray<int32> Setup = S08AudioCues::SetupDelays(8);
+  TestTrue("at most 6 placements, 140 ms apart", Setup.Num() == 6 && Setup[0] == 300 && Setup[5] == 1000);
   return true;
 }
 

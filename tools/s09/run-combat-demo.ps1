@@ -66,7 +66,11 @@
   [switch]$HostScheme,
   # Extra client arguments for BOTH clients, '+'-separated, as run-phase2-demo -ClientExtraArgs (run C G-LIVE,
   # 2026-10-05: Marmoreal frames need -ConceptPaste until ENV-U16, AGENTS.md "Board scenes and heroes"). Gates unchanged.
-  [string]$ClientExtraArgs = ''
+  [string]$ClientExtraArgs = '',
+  # AU-S5 (docs/game-design/audio/07-production-log.md §9, opt-in): each client records its whole audio output from the
+  # match start to the result + 8 s into <dir>/host.wav and <dir>/joiner.wav (-S08AudioRecord) for the loudness pass
+  # (tools/audio/mix_check.py). Gates unchanged.
+  [string]$AudioRecordDir = ''
 )
 
 # W5b-R (t53-thresholds.json shotCaptured): every published frame must carry its pixel provenance line
@@ -346,6 +350,7 @@ function Invoke-CombatDemo {
     "-S08Auto", "-S08Create", "-S08HeroId=$heroA", "-S08Trace=$hostTrace",
     "-S09Flow", "-S09Combat=$HostPlan", "-S09ShotDir=$hostShots", "-S08ExitAfter=$RunSeconds")
   if ($ArtPreviewBoardId) { $hostArgs += "-ArtPreviewBoardId=$ArtPreviewBoardId" }
+  if ($AudioRecordDir) { $hostArgs += ('-S08AudioRecord=' + (Join-Path $AudioRecordDir 'host.wav')) }
   if ($ArtPreviewShotAfter -gt 0) { $hostArgs += "-ArtPreviewShotAfter=$ArtPreviewShotAfter" }
   if ($ArtPreviewSelectOwnHero) { $hostArgs += '-ArtPreviewSelectOwnHero' }
   if ($ArtPreviewFocusZoom -gt 0) {
@@ -354,6 +359,7 @@ function Invoke-CombatDemo {
   $joinArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
     "-S08Auto", "-S08HeroId=$heroB", "-S08Trace=$joinTrace",
     "-S09Flow", "-S09Combat=$JoinPlan", "-S09ShotDir=$joinShots", "-S08ExitAfter=$RunSeconds")
+  if ($AudioRecordDir) { $joinArgs += ('-S08AudioRecord=' + (Join-Path $AudioRecordDir 'joiner.wav')) }
 
   $hostProc = $null
   $joinProc = $null

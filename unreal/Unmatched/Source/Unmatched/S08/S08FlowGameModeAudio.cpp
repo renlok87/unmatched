@@ -11,6 +11,12 @@
 // Music: both layers of a theme start in the same frame (sample-aligned), the director moves their gains. VO: one
 // component, subtitles in a Slate line at the bottom centre (UI-ACC-015). Ambience: looping beds + scheduled spots,
 // silent in -Bench (the env FX are frozen there).
+// AU-S5 (07-production-log §9): Medusa's gaze head (request / beam / decline), Arthur's ability boost (and its fizzle
+// when the attack card is cancelled), the push of an enemy figure, the move candidates, the placement cascade, the
+// defense deadline beeps, the menu theme and the login sounds; -S08AudioRecord writes the client's output for the
+// loudness pass.
+#include "AudioDeviceManager.h"
+#include "AudioMixerDevice.h"
 #include "Components/AudioComponent.h"
 #include "Engine/Engine.h"
 #include "Engine/GameViewportClient.h"
@@ -18,9 +24,13 @@
 #include "Internationalization/Culture.h"
 #include "Internationalization/Internationalization.h"
 #include "Kismet/GameplayStatics.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
+#include "Misc/Paths.h"
 #include "S08BoardActor.h"
 #include "S08FlowGameMode.h"
 #include "S08TraceLog.h"
+#include "Sound/SampleBufferIO.h"
 #include "Sound/SoundBase.h"
 #include "Widgets/Layout/SBox.h"
 #include "Widgets/SBoxPanel.h"
@@ -114,6 +124,7 @@ void AS08FlowGameMode::DelaySound(int32 InMs, const FString& BankId, const TCHAR
 // ---------------------------------------------------------------- runtime
 
 void AS08FlowGameMode::InitAudioRuntime() {
+  FParse::Value(FCommandLine::Get(), TEXT("S08AudioRecord="), AudioRecordFile);
   const int32 Seed = 0x5EED;
   Vo.NewMatch(Seed);
   AudioRng.Initialize(Seed);
@@ -134,6 +145,7 @@ void AS08FlowGameMode::InitAudioRuntime() {
 }
 
 void AS08FlowGameMode::ShutdownAudioRuntime() {
+  StopAudioRecording(TEXT("end"));
   if (GEngine && GEngine->GameViewport && SubtitleBox.IsValid()) {
     GEngine->GameViewport->RemoveViewportWidgetContent(SubtitleBox.ToSharedRef());
   }
@@ -197,6 +209,12 @@ void AS08FlowGameMode::TickAudioRuntime() {
       PlayBankSfx(D.BankId, *D.SoundClass, *D.Tag);
     }
   }
+  // AU-S5: the gaze request waits for the end of a combat staging (the head opens "after combat")
+  if (bAudioGazeRequestDue && !CombatStage.IsActive()) {
+    bAudioGazeRequestDue = false;
+    PlayBankSfx(TEXT("FX-GAZE-REQUEST"), TEXT("SFX"), TEXT("gaze"));
+  }
+  if (bAudioRecording && AudioRecordStopMs > 0 && Now >= AudioRecordStopMs) StopAudioRecording(TEXT("result"));
   // music
   const FS08MusicMix Mix = Music.Mix(Now);
   if (Mix.bThemeChanged) StartTheme(Mix.Theme);
@@ -324,6 +342,9 @@ void AS08FlowGameMode::AudioOnApplied(const FS08Snapshot& Snapshot, const TArray
   const int64 Now = NowMs();
   TArray<FString> Lines;
   const FString Viewer = ViewerIdNow();
+  // a new game in the same process (back to the lobby, another room): the per-match audio starts over
+  const FString GameId = Flow.IsValid() ? Flow->GetRoom().GameId : FString();
+  if (bAudioMatchStarted && !GameId.IsEmpty() && GameId != AudioMatchGameId) ResetAudioMatch();
   // match start: the first applied board with both heroes
   if (!bAudioMatchStarted && Fighters.Num() && !Viewer.IsEmpty()) {
     AudioOwnHeroKey = HeroKeyOfOwner(Viewer);
@@ -333,6 +354,7 @@ void AS08FlowGameMode::AudioOnApplied(const FS08Snapshot& Snapshot, const TArray
     }
     if (!AudioOwnHeroKey.IsEmpty()) {
       bAudioMatchStarted = true;
+      AudioMatchGameId = GameId;
       const FString Board = BoardActor && !BoardActor->GetArtProfileId().IsEmpty() ? BoardActor->GetArtProfileId()
                             : Flow.IsValid()                                       ? Flow->GetRoom().BoardId
                                                                                    : FString();
@@ -341,6 +363,13 @@ void AS08FlowGameMode::AudioOnApplied(const FS08Snapshot& Snapshot, const TArray
       if (!bBench) {
         Music.StartMatch(AudioMapKey.IsEmpty() ? TEXT("MARMOREAL") : AudioMapKey, Now, Lines);
         StartAmbience(AudioMapKey, Lines);
+        StartAudioRecording();
+        // BRD-SETUP: the figures take their cells - one placement sound each (a re-entry mid-match stays quiet)
+        if (Snapshot.TurnCount <= 1) {
+          for (const int32 Ms : S08AudioCues::SetupDelays(Fighters.Num())) {
+            DelaySound(Ms, TEXT("BRD-SETUP"), TEXT("SFX"), TEXT("setup"));
+          }
+        }
       }
       const FString Matchup = OppKey.IsEmpty() ? FString() : FString::Printf(TEXT("MATCHUP-%s"), *OppKey);
       const bool bMatchup = !Matchup.IsEmpty() && AudioRng.FRand() < 0.5f &&
@@ -420,13 +449,17 @@ void AS08FlowGameMode::StartAmbience(const FString& MapKey, TArray<FString>& Out
   }
 }
 
-void AS08FlowGameMode::AudioOnAttackDeclared(const FString& AttackerId, int32 Seq) {
+void AS08FlowGameMode::AudioOnAttackDeclared(const FString& AttackerId, int32 Seq, bool bAbilityBoost) {
   TArray<FString> Lines;
   Music.CombatBegin(NowMs(), Lines);
   WriteCueLines(Lines);
   PlayCueBank(TEXT("CUE-008"), AttackerId, Seq, FString());
   int32 Harpy = 1;
   const FString Key = AudioKeyOf(AttackerId, &Harpy);
+  // AU-S5 CUE-014: Arthur's ability boost - the attacker knows it now; the defender hears it at the reveal (the boost
+  // card id is stripped from its combat info)
+  bAudioBoostDeclared = bAbilityBoost && Key == TEXT("ARTHUR");
+  if (bAudioBoostDeclared) PlayCueBank(TEXT("CUE-014"), AttackerId, Seq, TEXT("FX-ARTHUR-BOOST"));
   OfferVoLine(TEXT("ATTACK"), Key, false, Harpy);
 }
 
@@ -443,6 +476,10 @@ void AS08FlowGameMode::AudioOnCombatEvent(const FS09CombatStageEvent& Event) {
   switch (Event.Type) {
     case ES09CombatEvent::FlipAttack:
       PlayCueBank(TEXT("CUE-010"), TEXT("card.attack"), In.Seq, TEXT("CRD-FLIP"));
+      if (!bAudioBoostDeclared && R.Boosts.Num() > 0 && AudioKeyOf(In.AttackerId) == TEXT("ARTHUR")) {
+        PlayCueBank(TEXT("CUE-014"), In.AttackerId, In.Seq, TEXT("FX-ARTHUR-BOOST"));
+      }
+      bAudioBoostDeclared = false;
       break;
     case ES09CombatEvent::FlipDefense:
       PlayCueBank(TEXT("CUE-010"), TEXT("card.defense"), In.Seq,
@@ -453,6 +490,10 @@ void AS08FlowGameMode::AudioOnCombatEvent(const FS09CombatStageEvent& Event) {
       break;
     case ES09CombatEvent::Slam: {
       PlayCueBank(TEXT("CUE-010"), TEXT("slam"), In.Seq, TEXT("CMB-SLAM"));
+      if (bAudioBoostFizzle) {  // the attack card was cancelled: its boost goes out without effect
+        bAudioBoostFizzle = false;
+        PlayBankSfx(TEXT("FX-ARTHUR-BOOST-FIZZLE"), TEXT("SFX"), TEXT("fizzle"));
+      }
       // signature cards speak from the reveal on (public)
       if (R.bAttackKnown) {
         if (const FSignatureCard* S = FindSignature(R.Attack.Name); S && *S->Speaker) {
@@ -640,7 +681,127 @@ FString AS08FlowGameMode::AudioOnResult() {
   if (Outcome != ES08MatchOutcome::Aborted) {
     DelaySoundVo(Outcome == ES08MatchOutcome::Win ? TEXT("VICTORY") : TEXT("DEFEAT"), AudioOwnHeroKey, 3900);
   }
+  if (bAudioRecording) AudioRecordStopMs = NowMs() + 8000;  // the sting, the theme and the last line are in
   return Sting;
 }
 
 void AS08FlowGameMode::NoteAudioInput() { AudioLastInputMs = NowMs(); }
+
+// ---------------------------------------------------------------- AU-S5
+
+void AS08FlowGameMode::AudioOnStage(ES08Stage OldStage, ES08Stage NewStage) {
+  TArray<FString> Lines;
+  if (OldStage == ES08Stage::Started && NewStage != ES08Stage::Started) StopAudioRecording(TEXT("leave"));
+  // the menu theme outside the match: the lobby full, the room quiet (no drums) while the players get ready
+  if (!bBench && (NewStage == ES08Stage::Lobby || NewStage == ES08Stage::Room) && OldStage != NewStage) {
+    Music.Menu(NowMs(), NewStage == ES08Stage::Room, Lines);
+  }
+  if (OldStage == ES08Stage::Login || OldStage == ES08Stage::Boot) {
+    if (NewStage == ES08Stage::Lobby) PlayBankSfx(TEXT("UI-LOGIN-OK"), TEXT("UI"), TEXT("login"));
+    if (NewStage == ES08Stage::Failed) PlayBankSfx(TEXT("UI-LOGIN-ERR"), TEXT("UI"), TEXT("login"));
+  }
+  WriteCueLines(Lines);
+}
+
+void AS08FlowGameMode::ResetAudioMatch() {
+  bAudioMatchStarted = false;
+  AudioMatchGameId.Reset();
+  AudioOwnTurns = 0;
+  AudioOwnHand = -1;
+  AudioOppHand = -1;
+  AudioLastHp.Reset();
+  AudioLowHpDone.Reset();
+  bIdleOffered = false;
+  AudioIdleCount = 0;
+  bAudioDiscardDraft = false;
+  AudioHandLimitMs = MIN_int64 / 2;
+  PendingHits.Reset();
+  DelayedSounds.Reset();
+  DeadlineBeeper.Reset();
+  AudioGazeHeadId.Reset();
+  bAudioGazeRequestDue = false;
+  AudioDraftManeuverId.Reset();
+  AudioPushBySeq.Reset();
+  bAudioBoostDeclared = false;
+  bAudioBoostFizzle = false;
+}
+
+void AS08FlowGameMode::AudioOnPendingOpen(const FString& HeadId) {
+  // the presenter's Observe already gates the reopen of one head (the server reuses the id every turn)
+  if (!S08AudioCues::IsMedusaGazeHead(HeadId)) return;
+  AudioGazeHeadId = HeadId;
+  bAudioGazeRequestDue = true;
+}
+
+void AS08FlowGameMode::AudioOnPendingAnswered(const FString& HeadId, const FString& FighterId, bool bUsed) {
+  if (!S08AudioCues::IsMedusaGazeHead(HeadId)) return;
+  bAudioGazeRequestDue = false;
+  AudioGazeHeadId.Reset();
+  if (bUsed) {
+    PlayCueBank(TEXT("CUE-014"), FighterId.IsEmpty() ? HeadId : FighterId,
+                Flow.IsValid() ? Flow->GetAppliedSnapshot().SequenceNumber : -1, TEXT("FX-GAZE-BEAM"));
+  } else {
+    PlayBankSfx(TEXT("FX-GAZE-DECLINE"), TEXT("SFX"), TEXT("gaze"));
+  }
+}
+
+void AS08FlowGameMode::AudioOnDraftOpen(const FString& ManeuverId, int32 Movable) {
+  if (Movable < 2 || ManeuverId.IsEmpty() || ManeuverId == AudioDraftManeuverId) return;
+  AudioDraftManeuverId = ManeuverId;
+  PlayBankSfx(TEXT("BRD-CANDIDATES"), TEXT("SFX"), TEXT("candidates"));
+}
+
+void AS08FlowGameMode::AudioOnEffectTrail(int32 Seq, const TArray<FString>& Pushed) {
+  if (!Pushed.Num()) return;
+  AudioPushBySeq.Add(Seq, Pushed);
+  for (auto It = AudioPushBySeq.CreateIterator(); It; ++It) {
+    if (It.Key() < Seq - 16) It.RemoveCurrent();  // a held scheme releases its moves a few seqs later at most
+  }
+}
+
+void AS08FlowGameMode::AudioTickDeadline() {
+  if (CommandUi.Mode != ES09CommandMode::CombatDefense || !CommandUi.Combat.bHasTimeoutAt) return;
+  const FString Bank =
+      DeadlineBeeper.Feed(CommandUi.Combat.TimeoutAt.ToIso8601(), CommandUi.Combat.SecondsUntilDeadline());
+  if (!Bank.IsEmpty()) PlayBankSfx(Bank, TEXT("UI"), TEXT("timer"));
+}
+
+void AS08FlowGameMode::StartAudioRecording() {
+  if (AudioRecordFile.IsEmpty() || bAudioRecording) return;
+  Audio::FMixerDevice* Mixer = FAudioDeviceManager::GetAudioMixerDeviceFromWorldContext(this);
+  if (!Mixer) {
+    FS08Trace::Write(TEXT("AUDIO-REC unavailable (no audio mixer device)"));
+    return;
+  }
+  Mixer->StartRecording(nullptr, 900.0f);  // the main submix: everything this client plays, after the master volume
+  bAudioRecording = true;
+  AudioRecordStopMs = -1;
+  FS08Trace::Write(FString::Printf(TEXT("AUDIO-REC start t=%lld file=%s master=%.2f"), static_cast<long long>(NowMs()),
+                                   *AudioRecordFile, CueSound.GetAudio().MasterGain()));
+}
+
+void AS08FlowGameMode::StopAudioRecording(const TCHAR* Why) {
+  if (!bAudioRecording) return;
+  bAudioRecording = false;
+  AudioRecordStopMs = -1;
+  Audio::FMixerDevice* Mixer = FAudioDeviceManager::GetAudioMixerDeviceFromWorldContext(this);
+  if (!Mixer) return;
+  float Channels = 0.0f;
+  float Rate = 0.0f;
+  Audio::FAlignedFloatBuffer& Recorded = Mixer->StopRecording(nullptr, Channels, Rate);
+  if (Recorded.Num() == 0 || Channels < 1.0f || Rate <= 0.0f) {
+    FS08Trace::Write(FString::Printf(TEXT("AUDIO-REC stop why=%s ok=0 (no data)"), Why));
+    return;
+  }
+  const double Seconds = Recorded.Num() / (static_cast<double>(Channels) * Rate);
+  // written now, on the game thread: an automated client may exit right after the match
+  Audio::TSampleBuffer<int16> Samples(Recorded, FMath::RoundToInt(Channels), FMath::RoundToInt(Rate));
+  Audio::FSoundWavePCMWriter Writer;
+  FString Written;
+  const bool bOk = Writer.SynchronouslyWriteToWavFile(Samples, FPaths::GetBaseFilename(AudioRecordFile),
+                                                      FPaths::GetPath(AudioRecordFile), &Written);
+  FS08Trace::Write(FString::Printf(
+      TEXT("AUDIO-REC stop why=%s ok=%d t=%lld seconds=%.1f channels=%d rate=%d master=%.2f file=%s"), Why, bOk ? 1 : 0,
+      static_cast<long long>(NowMs()), Seconds, FMath::RoundToInt(Channels), FMath::RoundToInt(Rate),
+      CueSound.GetAudio().MasterGain(), Written.IsEmpty() ? *AudioRecordFile : *Written));
+}

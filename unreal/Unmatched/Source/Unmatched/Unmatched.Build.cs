@@ -26,6 +26,9 @@ public class Unmatched : ModuleRules {
     // (S08EnvLayout.cpp SpawnFx) and the editor-only S08EnvFxAuthoring.cpp tunes the derived systems under
     // /Game/EnvKit/FX (tools/art/env_kit/ue_import_fab_fx.py). Niagara is an engine plugin enabled by default.
     PrivateDependencyModuleNames.Add("Niagara");
+    // AU-S5: -S08AudioRecord records the main submix of the client (Audio::FMixerDevice::StartRecording) and writes it
+    // as a WAV (Audio::FSoundWavePCMWriter, TSampleBuffer from SignalProcessing) for the loudness pass.
+    PrivateDependencyModuleNames.AddRange(new string[] { "AudioMixer", "AudioMixerCore", "SignalProcessing" });
     // ART-005 / stage 3 T3.2: the -ArtPreview board profiles (zone palette and
     // glyphs per zone key, light profiles, board matches) are data read at
     // runtime from <Project>/Config/ArtBoards; staged into the pak (UFS) so

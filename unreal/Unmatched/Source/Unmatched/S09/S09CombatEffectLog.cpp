@@ -40,6 +40,7 @@ bool FS09LastCombat::Read(const FS08Snapshot& Snapshot, FS09LastCombat& Out) {
   Record->TryGetStringField(TEXT("defenderPlayerId"), Out.DefenderPlayerId);
   ReadInt(Record, TEXT("defenderDamage"), Out.DefenderDamage);
   Record->TryGetBoolField(TEXT("attackerWon"), Out.bAttackerWon);
+  Record->TryGetBoolField(TEXT("attackerCardCancelled"), Out.bAttackerCardCancelled);
   const TArray<TSharedPtr<FJsonValue>>* Values = nullptr;
   if (!Record->TryGetArrayField(TEXT("appliedEffects"), Values) || !Values) return true;
   for (const TSharedPtr<FJsonValue>& Value : *Values) {
