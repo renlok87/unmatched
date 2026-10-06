@@ -11,6 +11,7 @@
 | [tools/s08/hud_contract/hud_contract.py](../../../../tools/s08/hud_contract/hud_contract.py) | `validate` (токены, `why.*` против 02 §4.2), `linear` (hex → linear), `check-trace` (гейт `SHOT widget`) |
 | [tools/s08/hud_contract/test_hud_contract.py](../../../../tools/s08/hud_contract/test_hud_contract.py) | 5 юнит-тестов |
 | [tools/s08/hud_contract/hud_tokens_codegen.py](../../../../tools/s08/hud_contract/hud_tokens_codegen.py) | VS-1 HB-03 (ВР-77): JSON токенов → `unreal/Unmatched/Source/Unmatched/S08/S08HudTokens.generated.h` (namespace `S08HudTokens`, алиасы раскрыты, `kTokensJsonSha256`); `validate` падает «header stale» |
+| [tools/s08/hud_contract/hud_theme_import.py](../../../../tools/s08/hud_contract/hud_theme_import.py) | VS-1 HB-04: тот же JSON → `/Game/S08/UI/Theme/DA_UmHudTheme` (`UUmHudTheme`, `Source/Unmatched/S08/UI/UmHudTheme.h`): цвета через `FromSRGBColor`, шрифты, отступы, радиусы, длительности, 29 кистей-фолбэков скинов (ВР-HB06), sha256 JSON; ассет — `git add -f` (П9) |
 
 ## 0. Что уже есть (факт, R3.0)
 

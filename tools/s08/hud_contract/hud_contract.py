@@ -2,7 +2,8 @@
 """Проверки правил HUD (docs/unreal/contracts/hud/HUD-RULES.md) без движка.
 
   python tools/s08/hud_contract/hud_contract.py validate            G-TOKENS: токены стиля, свежесть S08HudTokens.generated.h
-                                                                    (ВР-77), нет литералов цвета в S08/UI; коды why.* против 02 §4.2
+                                                                    (ВР-77) и DA_UmHudTheme (sha256 JSON в ассете, HB-04), нет
+                                                                    литералов цвета в S08/UI; коды why.* против 02 §4.2
   python tools/s08/hud_contract/hud_contract.py linear              таблица hex sRGB -> linear (как FLinearColor::FromSRGBColor)
   python tools/s08/hud_contract/hud_contract.py check-trace <log> [--width 1920 --height 1080]
                                                                     гейт строк `SHOT widget id=… bbox=… geom=painted`
@@ -100,6 +101,26 @@ def validate_tokens(tokens):
         except codegen.TokenError as e:
             errors.append(str(e))
     return errors
+
+
+THEME_ASSET = REPO / "unreal/Unmatched/Content/S08/UI/Theme/DA_UmHudTheme.uasset"
+SHA_IN_ASSET_RE = re.compile(rb"[0-9a-f]{64}")
+
+
+def theme_asset_errors(asset=None, tokens=TOKENS):
+    """HB-04: DA_UmHudTheme was imported from this exact JSON. UUmHudTheme::TokensJsonSha256 is an ASCII FString in the
+    package export data, so its 64 hex digits are found in the .uasset bytes (no engine needed)."""
+    asset = Path(asset or THEME_ASSET)
+    want = codegen.json_sha256(tokens)
+    if not asset.exists():
+        shown = asset.relative_to(REPO).as_posix() if asset.is_relative_to(REPO) else str(asset)
+        return ["theme stale: %s нет — запустите tools/s08/hud_contract/hud_theme_import.py (UE Python) и git add -f"
+                % shown]
+    found = {m.group(0).decode("ascii") for m in SHA_IN_ASSET_RE.finditer(asset.read_bytes())}
+    if want not in found:
+        return ["theme stale: %s импортирован не из текущего hud-style-tokens.json (sha256 %s… нет в ассете) — запустите"
+                " hud_theme_import.py" % (asset.name, want[:12])]
+    return []
 
 
 def literal_errors(src_dir=UI_SRC):
@@ -200,8 +221,8 @@ def main(argv=None):
     a = ap.parse_args(argv)
     spec02 = SPEC02.read_text(encoding="utf-8")
     if a.cmd == "validate":
-        errors = (validate_tokens(load(TOKENS)) + codegen.header_errors(TOKENS, HEADER) + literal_errors()
-                  + validate_why(load(WHY), spec02))
+        errors = (validate_tokens(load(TOKENS)) + codegen.header_errors(TOKENS, HEADER) + theme_asset_errors()
+                  + literal_errors() + validate_why(load(WHY), spec02))
         for e in errors:
             print("ERROR", e)
         print("HUD_CONTRACT", "PASS" if not errors else "FAIL")

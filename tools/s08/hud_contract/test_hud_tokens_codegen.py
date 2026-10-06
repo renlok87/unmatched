@@ -140,6 +140,17 @@ class StaleHeaderTests(unittest.TestCase):
         self.assertEqual(cg.header_errors(), [])
         self.assertEqual(hc.literal_errors(), [])
 
+    def test_theme_asset_sha(self):
+        # HB-04: DA_UmHudTheme stores sha256 of the JSON; validate finds it in the .uasset bytes
+        self.assertEqual(hc.theme_asset_errors(), [])
+        with tempfile.TemporaryDirectory() as tmp:
+            fake = Path(tmp) / "DA_UmHudTheme.uasset"
+            self.assertIn("theme stale", hc.theme_asset_errors(fake)[0])  # missing
+            fake.write_bytes(b"\x00junk" + cg.json_sha256().encode("ascii") + b"\x00")
+            self.assertEqual(hc.theme_asset_errors(fake), [])
+            fake.write_bytes(b"\x00junk" + ("0" * 64).encode("ascii") + b"\x00")
+            self.assertIn("theme stale", hc.theme_asset_errors(fake)[0])  # imported from another JSON
+
     def test_literal_scan_catches_colour_literals(self):
         with tempfile.TemporaryDirectory() as tmp:
             src = Path(tmp) / "UI"
