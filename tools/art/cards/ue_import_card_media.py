@@ -48,7 +48,7 @@ VS-3 CP-14 (--frames): the card frame of the accepted CP-13 package art/imagegen
   margins are the package's verification.json nine_slice_px of each file (corner = radius + edge + keyline + 1 px, <= 13
   px at x1); they go into DA_UmHudTheme.CardFrames / CardFramesX2 under card.frame.idle / .hover / .selected / .warning /
   .flash / .focus / .mini / .new (ВР-VS3-03: apart from the 29 token Skins; the new dot DrawAs Image), ImageSize = the x1
-  pixels in su; UUmHudTheme::CardFrameFor takes x2 at DPI x UI scale >= 1.333. hud_theme_import.py calls bind_frames()
+  pixels in su; UUmHudTheme::CardFrameFor takes x2 at DPI x UI scale >= 2.0 (ВР-VS3-16). hud_theme_import.py calls bind_frames()
   after it refills the theme. Report art/cards-v1/card-frame-import-report.json.
 
 VS-3 CP-03 / CP-04 (ВР-CP16): the report also lists the RU names of the 27 cards - the data (the backend content of the
@@ -517,7 +517,7 @@ def main_frames() -> int:
         "theme": THEME,
         "themeMaps": "CardFrames / CardFramesX2 (ВР-VS3-03)",
         "settings": FRAME_SETTINGS_DOC,
-        "x2FromPxPerSu": 1.333,
+        "x2FromPxPerSu": 2.0,
         "count": imported,
         "frames": [{"key": e["key"], "state": e["state"], "nineSlice": e["nineSlice"],
                     "textures": [{"scale": s, "asset": f"{FRAME_DEST}/{e['assets'][s]}", "source": e["files"][s],

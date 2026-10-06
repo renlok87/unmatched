@@ -12,7 +12,7 @@
 //                                           card keeps no face (QA-005).
 //   Unmatched.S08.Hud.Card.Material  CP-14  M_UmCardFace: UI domain, translucent, Face / UVRect / Desaturation / Opacity,
 //                                           Rec.709 weights; UVRect cuts the padding; the card.frame.* skins x1 / x2 with
-//                                           the CP-13 9-slice margins, x2 from 1.333 px per su.
+//                                           the CP-13 9-slice margins, x2 from 2.0 px per su (ВР-VS3-16).
 //   Unmatched.S08.Hud.Card.States    CP-16  unplayable (0.6 / 0.7 over 150 ms, the frame unchanged, cursor, why.*), new
 //                                           (the dot 0 / 72 / 120 / 180 ms, leave 120 ms), reduced motion.
 //   Unmatched.S08.Hud.Card.Hover     CP-17  hover 1.5 over 150 ms (pivot bottom centre), selected 3 su, focus ring 100 ms,
@@ -421,8 +421,9 @@ bool FUmCardMaterialTest::RunTest(const FString&) {
     TestTrue(FString::Printf(TEXT("%s: image size %s su"), F.Key, *F.Size.ToString()), X1->ImageSize.Equals(F.Size) && X2->ImageSize.Equals(F.Size));
     TestTrue(FString::Printf(TEXT("%s: x1 margin %d px"), F.Key, F.M1), Near(X1->Margin.Left * F.Size.X, F.M1, 1e-3) && Near(X1->Margin.Top * F.Size.Y, F.M1, 1e-3));
     TestTrue(FString::Printf(TEXT("%s: x2 margin %d px"), F.Key, F.M2), Near(X2->Margin.Left * 2.0 * F.Size.X, F.M2, 1e-3));
-    TestTrue(FString::Printf(TEXT("%s: x2 from 1.333 px per su"), F.Key),
-             Theme->CardFrameFor(F.Key, 1.333f) == X2 && Theme->CardFrameFor(F.Key, 1.0f) == X1 && Theme->CardFrameFor(F.Key, 0.75f) == X1);
+    TestTrue(FString::Printf(TEXT("%s: x2 from 2.0 px per su, x1 below (ВР-VS3-16)"), F.Key),
+             Theme->CardFrameFor(F.Key, 2.0f) == X2 && Theme->CardFrameFor(F.Key, 1.5f) == X1 &&
+                 Theme->CardFrameFor(F.Key, 1.0f) == X1 && Theme->CardFrameFor(F.Key, 0.75f) == X1);
     TestTrue(FString::Printf(TEXT("%s: corner <= 13 px at x1"), F.Key), F.M1 <= 13);
   }
   const FSlateBrush* Dot = Theme->CardFrames.Find(TEXT("card.frame.new"));

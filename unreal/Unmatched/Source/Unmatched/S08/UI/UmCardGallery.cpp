@@ -235,7 +235,7 @@ TArray<FString> UUmCardsGalleryWidget::Build(int32 Page, const FVector2D& Canvas
         if (K == 1) C->SetFrameOverrideForSheet(TEXT("card.frame.hover"));  // the edge without the 1.5 scale
         if (K == 2) C->SetSelected(true);
         if (K == 3) C->SetDiscardCandidate(true);
-        if (K == 4) C->PlayFlash();
+        if (K == 4) C->SetFrameOverrideForSheet(TEXT("card.frame.flash"));  // the flash edge held (CUE-006 fades it: page 16)
         if (K == 5) C->SetFocus(true);
       }
     }

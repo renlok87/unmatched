@@ -94,9 +94,11 @@ class UNMATCHED_API UUmHudTheme : public UDataAsset {
   /** True when Key is a 9-slice PNG skin (HB-10 imported), not the ВР-HB06 fallback. */
   bool HasTextureSkin(FName Key) const;
   static constexpr float SkinX2MinPxPerSu = 1.5f;
-  /** VS-3 CP-14: the card frame skins card.frame.* switch to their x2 texture earlier - at DPI x UI scale >= 1.333
-   *  (cards-portraits.csv CP-14 p. 3: the frame edge is 1 su, the x1 PNG would be magnified 1.33x and soften). */
-  static constexpr float CardFrameX2MinPxPerSu = 1.333f;
+  /** VS-3 CP-14 (ВР-VS3-16, refines CP-14 p. 3 "x2 from 1.333"): the card frame skins card.frame.* take their x2 texture
+   *  from DPI x UI scale >= 2.0, where it maps 1 : 1 or larger. Below, the x2 PNG would be minified (1.5 px per su =
+   *  0.75 of its texels, no mips by CP-14): the 0.45 cream arc of the idle corner sampled unevenly into a bright spot
+   *  (gallery frames C:/tmp/visual/VS3-U1/cmp-150-x2-vs-x1*.png); the x1 PNG magnified 1.5x stays uniform. */
+  static constexpr float CardFrameX2MinPxPerSu = 2.0f;
   /** The card.frame.* skin for this px per su (x2 from CardFrameX2MinPxPerSu); nullptr before the CP-14 import. */
   const FSlateBrush* CardFrameFor(FName Key, float PxPerSu) const;
 
