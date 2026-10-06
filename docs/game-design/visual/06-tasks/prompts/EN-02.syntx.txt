@@ -1,0 +1,51 @@
+# EN-02 - SYNTX task (SX-01, fallback of CX-17)
+
+Filled by Claude by hand from 07-prompt-templates.md §2.5 (T-SYNTX-IMG-BANANA): the card's `prompt` column carries the
+Codex template (T-CODEX-ENVPLATE), and the fallback is set by the card itself (column `do`, item 5) and by
+ВР-VS2-EN.9…10 (CX-17 rejected twice on the seam). The header is provenance only; the text sent to the generator is
+the section **Prompt** below, verbatim.
+
+| field | value |
+|---|---|
+| id | EN-02 (package SX-01, 05 §2) |
+| title | Плита Marmoreal: достройка краёв на 20 % и вариант «с фонарями» |
+| date | 2026-10-07 |
+| template | T-SYNTX-IMG-BANANA (07 §2.5) |
+| service | SYNTX `ai_name banana`, `model_type banana3` (Nano Banana 2), `image_size 2K`, `aspect_ratio 16:9`, `n 1` |
+| price | 3 tokens per run (get-model-info 2026-10-07, image_size 2K); budget of the card: ≤ 6 tokens (2 runs) |
+| limits | ВР-PR04 (image ≤ 8 per run), ВР-PL10 (visual cap 54), stop at balance < 20 |
+| set | env-u16-marmoreal (images only in `scraped-data/derived/env-u16-marmoreal-codex/sx01/`, outside git) |
+| raw responses | `C:/tmp/visual-syntx/EN-02/raw/` (outside the repository: account id and private URLs) |
+
+## Input (one image, ours only; ВР-PR08)
+
+| file | sha256 | what |
+|---|---|---|
+| `scraped-data/derived/env-u16-marmoreal-codex/sx01/SX01-input-2340x1317.png` | 27bc91ec5680746a56bab16be2bbfdd5ad12d761d965561155218b663c7fbf32 | canvas 2340×1317: the accepted EN-01 clean plate `marmoreal-clean.png` (sha256 7225b4d3…c40a) at [334, 188, 1672, 941]; the outpaint band and the board field are flat `#808080` |
+
+Not uploaded: the concept C0, the board illustration, DE frames, the rejected CX-17 candidates
+(`marmoreal-clean-ext.png`, `marmoreal-lit-ext.png`).
+
+## Assembly after the run (ВР-VS2-EN.10, by script `art/imagegen/env-u16-marmoreal-codex/_tools/sx01.py`)
+
+1. One pass over the whole canvas (no tiles), so the corners do not come from different passes.
+2. The raw output is registered to the canvas (scale and translation fitted on the original area), resampled to
+   2340×1317, and the original 1672×941 is pasted back byte-exact.
+3. Seam: ONE smooth 2D correction field outside the original: a membrane (Laplace) solution with the difference
+   original − generation (linear light) on the original's outermost ring as the boundary value and 0 at the canvas
+   edge; decay outward 188 px (top, bottom) and 334 px (left, right), ≥ 96 px. No per-side corrections.
+4. lit-ext = clean-ext × (1 − m) + C0 × m inside the original rect, m = `marmoreal-lantern-mask.png` / 255
+   (ВР-VS2-EN.8), no second feather.
+5. Acceptance as the card (ВР-VS2-EN.6…8): size 2340×1317; original byte-identical; G(0) ≤ 1.5 × median G(d) on all
+   four sides; no stretched streaks, no mirrored architecture, no water, no new landmarks; edges darker toward the
+   frame; lit differs from clean only inside the lantern mask; field `#808080`.
+
+## Prompt
+
+```text
+Edit the first image only. It is a painted night backdrop around a board game table area. The painting must continue past its current edges, so that when the camera zooms out the borders show painting, not a stretched edge.
+Change only: the flat mid-grey border band that surrounds the painting on all four sides (334 px on the left and right, 188 px at the top and bottom) is empty canvas. Paint it by extending the painting outward seamlessly: same perspective, same palette, same painterly texture, terrain continues naturally, darker toward the frame edges, no new landmarks, no water. Above, continue the existing marble colonnade upward to its cornice and then the night sky with dark clouds. At the sides, continue the existing marble colonnade, the balustrades and the blossoming cherry trees. Below, continue the rock cliff of the floating garden, falling away into dark blue night haze; the haze is air and clouds, never sea or water. Do not repeat or mirror the architecture.
+Keep composition, perspective, palette, painterly brush texture and lighting of the original painting. Cold blue-grey moonlight from the left, warm small lantern pools only where they already exist and are listed: the extended edges carry cold moonlight only and no warm pools; the only warm light is the glow inside the open palace door. Keep the existing painting exactly where it is: do not move, resize, crop or repaint it. The grey rectangle inside the dark wooden frame in the centre is a placeholder: leave it exactly grey and untouched.
+No new objects, no characters, no text, no water, no moon disc, no new towers, arches or statues. Forbidden: copying or imitating pixels, assets, splash art, logos, card text or fonts of any commercial digital edition of a board game; brush-stroke banners and ink splatter; invented game data (card names, numbers, hero names, HP, boards, spaces); text, letters or numbers baked into textures; red fills; any element on screen that carries meaning only by colour.
+Output the whole canvas in the same 16:9 framing as the input image.
+```
