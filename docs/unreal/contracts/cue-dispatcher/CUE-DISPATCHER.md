@@ -143,6 +143,20 @@ K = `s09.Catchup.MaxQueued` (по умолчанию 3), T = `s09.Catchup.MaxLag
 - **Музыка, реплики, окружение** — свои трассы: `MUSIC state=… theme=… t=… [sting=…]`, `VO event=… speaker=… t=…
   result=played|skipped line=… prio=… [reason=…]`, `VO subtitle line=… until=…`, `AMB map=… beds=… spots=…`,
   `AMB spot=…`, `SFX bank=… tag=… class=… t=… sound=… gain=…` (слои и звуки вне CUE).
+- **AU-S5 (2026-10-06).** CUE-014 (способность) звучит в точке `cue`. Буст Arthur — `FX-ARTHUR-BOOST`: у атакующего
+  при объявлении, у защитника при раскрытии. Луч Medusa — `FX-GAZE-BEAM` при выборе цели взгляда. Остальные новые
+  звуки — строки `SFX bank=…`:
+  - запрос и отказ взгляда;
+  - угасание буста;
+  - толчок, кандидаты, расстановка;
+  - таймер защиты;
+  - вход, комната, панели, инспектор, слот буста;
+  - возвращение гарпии, «нет цели», голосовые слои эффектов.
+
+  Перемещение `kind=place` звучит `BRD-PLACE` (банк строки CUE-007 заменён). Главный сабмикс несёт шину микса
+  `US08MixLimiterPreset` (подъём +5 дБ, предпросмотровый лимитер −1,5 dBFS); строка
+  `AUDIO-MIX limiter ceiling=… lookahead=… makeup=…`. Запись микса включает `-S08AudioRecord=<wav>`; в трассе
+  `AUDIO-REC start|stop …`. Гейт этих строк не проверяет.
 
 ## 4. Семантика диспетчера (нормативно)
 
