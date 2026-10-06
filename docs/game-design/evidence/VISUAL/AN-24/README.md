@@ -1,70 +1,79 @@
 # AN-24 — лист приёмки
 
-Лист собран `tools/art/visual/sheet.py` 2026-10-07 по 02-visual-design.md §13.2.
+Лист собран `tools/art/visual/sheet.py` 2026-10-07 по 02-visual-design.md §13.2 (переснят после ревью Z-1).
 
-**Решение:** художественно принято, по делегированию (2026-10-06, ВР-06)
-**Дата решения:** 2026-10-06
-**Ревью:** ZCode (Z-1), один проход, арт и рамки задачи вместе (02 §13.3)
+**Решение:** художественно принято, по делегированию (2026-10-07, ВР-06; пометка ZCode от 2026-10-06 снята
+ВР-Z1R-06 и выставлена заново после проверки на слитом пакете)
+**Дата решения:** 2026-10-07
+**Ревью:** визуальный чат, ревью Z-1 + один проход по кадрам (02 §13.3)
 **Флаг отката:** `-S08FacingLegacy` (общий с AN-23; ARTLOOK `facing=`)
 
-## Что проверено (карта AN-24 — живой бой, обе карты)
+## Что исправлено после ревью
 
-`tools/s09/run-combat-demo.ps1 -ArtPreview -ArtPreviewBoardId <доска> -JoinerAttack -PlayerView`
-(Marmoreal `c121b47f8d6eb28daccb76d05` + `-ClientExtraArgs '-ConceptPaste'`; Sarpedon
-`c7fa64a26c29a0835f2383e63`), packaged-клиенты (stamp `f8903fb9`), 30 FPS/клиент, High preset.
+- F3 / ВР-Z1R-04: угол атаки считается от камеры view target (BoardCamera), не от устаревшего POV.
+- F4: `FACING src=attack` несёт `t=<мс игры>` (часы CUE), `from=` и `ms=`; поворот держится до возврата AN-25
+  (снапшоты между Face и возвратом его больше не сбивают).
+- F5 / ВР-Z1R-05: reduced motion и скорость «Нет» — поворота в паузе нет, угол встаёт в кадре Lunge
+  (`CommitFaceTarget`, строка `… ms=0 snap=lunge lungeT=<t>`); без клипа (скорость «Нет») возврат идёт с концом
+  постановки (событие End).
+- H1 / ВР-Z1R-01: адаптер Face живёт в `S08FlowGameModeFigures.cpp` (`FiguresOnCombatEvent`), в
+  `S08FlowGameMode.cpp` — одна строка вызова.
+
+## Что проверено — живой бой на слитом пакете (stamp `45a3c4e9`, VS-2 UMG HUD + Z-1)
+
+`tools/s09/run-combat-demo.ps1 -ArtPreview -ArtPreviewBoardId <доска> -JoinerAttack -PlayerView`, Marmoreal
+original `c121b47f8d6eb28daccb76d05` (+`-ClientExtraArgs '-ConceptPaste'`) и Sarpedon original
+`c7fa64a26c29a0835f2383e63`, два packaged-клиента по 30 FPS, High. Гейты демо зелёные: offReference=0
+(20+18 и 19+18 снимков), сходимость seq 64/64 и 54/54, GAME_OVER → результат → лобби.
 
 ### stage=face за 120 мс до lunge
 
-- Marmoreal (host-трейс): `stage=face t=54244 ms=120 lunge=120` → `stage=lunge t=54364` — ровно 120 мс;
-  ещё 3 боя с пропущенной паузой: `face t=… ms=120 lunge=0` + `stage=pause ms=0 skipped=1` — поворот идёт
-  одновременно с первыми 120 мс клипа (правило карточки «после пропуска паузы»).
-- Sarpedon: `face … lunge=120` один, `lunge=0` + `skipped=1` три.
-- Атакующие: f-1-sk0 (Мерлин, включая дальние — ranged picks=4/8), f-1-hero (Артур), f-0-hero (Медуза);
-  поворот и выпад есть и при уроне 0 (defenses=7/4).
+- Без пропуска паузы: Marmoreal seq 64 `face t=46063` → `lunge t=46183` (120 мс), Sarpedon seq 54 `face t=37506` →
+  `lunge t=37626` (120 мс). Остальные бои — с пропущенной паузой (`face … lunge=0` + `pause skipped=1`): поворот
+  идёт вместе с первыми 120 мс клипа (правило карточки). Бои, срезанные догоном (`cut=catchup`), поворота не
+  играют — по карточке.
+- `cue_contract.py check-trace` — PASS на всех четырёх трейсах (host и joiner × 2 карты).
 
 ### FACING src=attack
 
-- `FACING fighter=f-0-hero src=attack yaw=118 target=f-1-hero clamped=0` — угол на цель, кламп не нужен;
-  4 строки src=attack на каждой карте, `clamped=1` не потребовался (углы в ±90° от оси камеры).
-- Длина боя F-01 не выросла: `combat_totals [2592, 3933]` — 120 мс внутри существующей паузы «счёт».
+| карта | атакующий → цель | yaw | clamped | строк |
+|---|---|---|---|---|
+| Marmoreal | f-0-hero (Медуза) → f-1-hero | −1…0 (от покоя 40) | 0 | 4 на клиент |
+| Sarpedon | f-0-hero → f-1-hero | 5 (от покоя 50) | 1 (цель за 90° от оси камеры) | 2 на клиент |
+| Sarpedon | f-1-sk0 (Мерлин, дальний) → f-0-hero | 107 (= покой, поворот 0°) | 0 | 1 на клиент |
 
-### Глазами (Read PNG, кадр урона)
+Угол — `S08Facing::AttackYaw`: направление на цель, при `clamped=1` — ровно 90° от оси камеры (тест
+`Unmatched.S08.Facing.Attack`). Атаки Артура и гарпий в этих прогонах не выпали (план демо выбирает «первую
+законную пару», атаки Мерлина на Marmoreal срезаны догоном) — механизм атакер-агностичен
+(`Unmatched.S08.Facing.Actor`); токена «атакует гарпия» в планах `-HostPlanOverride/-JoinPlanOverride` нет.
 
-`s09-damage-combat.png` (обе карты): атакующий (Медуза) в выпаде, корпус направлен на цель, лицо/профиль
-виден камере; спиной никто; задник по карте (вклейка / lit3d-остров), шесть фигур v2, маркеров нет (-PlayerView).
+### Глазами (Read PNG)
 
-### G-CUE и гейты
+Кадр урона обеих карт (листы 1–2): Медуза после выпада, Артур с красным hit-tint, лицо или профиль атакующего
+виден камере; спиной никто; UMG HUD VS-2 на месте (портреты, бейджи гарпий 1–3, журнал, рука); задник по карте
+(Marmoreal — вклейка, Sarpedon — lit3d), шесть фигур v2.
 
-`cue_contract.py check-trace` — PASS на всех 4 трейсах (host+joiner × 2 карты); `combat_cut=10,
-catchup_hurry=8` — контракт допускает; offReference=0 (22-23 и 19-20 снимков), сходимость seq.
+### Бюджет
+
+120 мс внутри существующей паузы «счёт»: длина боя не выросла (`combat_totals [4533]` — летальный бой с падением,
+как до Z-1). ≤ 0,01 мс GT: трансформ актора на тике, только пока идёт поворот.
 
 ## Состав листа
 
 | № | Пункт | Файлы | Есть |
 |---|---|---|---|
-| 2 | Цвет, серый, дейтеранопия | `sheet-01..03` | да |
-| 3 | Обе настоящие доски, packaged | листы 1–2 бои Marmoreal/Sarpedon, 3 ход | да |
-| 6 | Трассы | `CUE combat stage=face`, `FACING src=attack`, RENDER | да |
+| 2 | Цвет, серый, дейтеранопия | `sheet-01..02` | да |
+| 3 | Обе настоящие доски, packaged, живой бой | 1 Marmoreal, 2 Sarpedon (кадр урона) | да |
+| 6 | Трассы | `CUE combat stage=face`, `FACING src=attack t=`, RENDER | да |
 | 7 | README | этот файл | да |
 
 ## Входы
 
-| файл | размер | sha256 |
-|---|---|---|
-| `C:/tmp/visual/AN-24/demo-marmoreal/combat-20261007-020752/host/s09-damage-combat.png` | 1280×720 | cda4d28f238be67dee1cf286f7f26c0f581f1a0df1cddb4465d822b601d4899b |
-| `C:/tmp/visual/AN-24/demo-sarpedon/combat-20261007-020923/host/s09-damage-combat.png` | 1280×720 | b5edf9ec32cad187a62ee78bd909687a87262f32a8751669ed3c7d0e4670a9fd |
-| `C:/tmp/visual/AN-24/demo-marmoreal/combat-20261007-020752/host/s09-opponent-move.png` | 1280×720 | e04f152842e993ece5dd2ae075eb845fca5c2e5c4954f01c0d5675a077a1a729 |
-
-Прогоны: `C:/tmp/visual/AN-24/demo-marmoreal/combat-20261007-020752/`,
-`C:/tmp/visual/AN-24/demo-sarpedon/combat-20261007-020923/`.
-
-## Замеры
-
-- Бюджет 120 мс внутри паузы: `combat_totals [2592, 3933]` (F-01 ≈ 3,9 с не выросло); ≤ 0,01 мс GT
-  (поворот — трансформ актора по событию).
-- Контраст / ΔE76 / ΔGPU: не применяется.
+Прогоны: `C:/tmp/visual/Z-1/demo-marmoreal/combat-20261007-035418/`,
+`C:/tmp/visual/Z-1/demo-sarpedon/combat-20261007-035523/` (трейсы host/joiner, manifest.json, PNG); сводка
+`C:/tmp/visual/Z-1/live-facing.json`.
 
 ## Что не прошло
 
-- Ничего по критериям. ГМ-оговорка: кадр «контакта» взят из кадра урона демо (t=hit), отдельного
-  contact-кадра демо не снимает — поза выпада на нём видна (см. лист 1–2).
+- Отдельного кадра «контакт» демо не снимает — используется кадр урона (как у ZCode).
+- Атака гарпии вживую не выпала (см. выше) — остаётся хвостом до следующего живого прогона с подходящим планом.
