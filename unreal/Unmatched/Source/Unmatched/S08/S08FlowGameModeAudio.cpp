@@ -24,6 +24,7 @@
 #include "Internationalization/Culture.h"
 #include "Internationalization/Internationalization.h"
 #include "Kismet/GameplayStatics.h"
+#include "Misc/App.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
 #include "Misc/Paths.h"
@@ -31,6 +32,8 @@
 #include "S08FlowGameMode.h"
 #include "S08TraceLog.h"
 #include "Sound/SampleBufferIO.h"
+#include "S08MixLimiter.h"
+#include "AudioMixerBlueprintLibrary.h"
 #include "Sound/SoundBase.h"
 #include "Widgets/Layout/SBox.h"
 #include "Widgets/SBoxPanel.h"
@@ -99,6 +102,12 @@ void AS08FlowGameMode::PlayBankSfx(const FString& BankId, const TCHAR* SoundClas
                                    Sound ? *S08SoundRows::ShortName(Path) : TEXT("missing"),
                                    CueSound.GetAudio().MasterGain() * Gain));
   if (Sound && Gain > 0.0f) UGameplayStatics::PlaySound2D(this, Sound, Gain, 1.0f, 0.0f, nullptr, nullptr, false);
+  // AU-S5: an effect with a voice layer (the hiss, the prophecy whisper, the gaze whisper) plays it with the effect,
+  // on the voice bus
+  if (BankId.StartsWith(TEXT("FX-")) && !BankId.EndsWith(TEXT("-VOICE"))) {
+    const FString Layer = BankId + TEXT("-VOICE");
+    if (S08AudioBank::Find(Layer)) PlayBankSfx(Layer, TEXT("VO"), TEXT("voice"));
+  }
 }
 
 void AS08FlowGameMode::PlayCueBank(const TCHAR* CueId, const FString& Subject, int32 Seq, const FString& BankId) {
@@ -125,6 +134,7 @@ void AS08FlowGameMode::DelaySound(int32 InMs, const FString& BankId, const TCHAR
 
 void AS08FlowGameMode::InitAudioRuntime() {
   FParse::Value(FCommandLine::Get(), TEXT("S08AudioRecord="), AudioRecordFile);
+  InstallMasterLimiter();
   const int32 Seed = 0x5EED;
   Vo.NewMatch(Seed);
   AudioRng.Initialize(Seed);
@@ -146,6 +156,7 @@ void AS08FlowGameMode::InitAudioRuntime() {
 
 void AS08FlowGameMode::ShutdownAudioRuntime() {
   StopAudioRecording(TEXT("end"));
+  RemoveMasterLimiter();
   if (GEngine && GEngine->GameViewport && SubtitleBox.IsValid()) {
     GEngine->GameViewport->RemoveViewportWidgetContent(SubtitleBox.ToSharedRef());
   }
@@ -215,6 +226,7 @@ void AS08FlowGameMode::TickAudioRuntime() {
     PlayBankSfx(TEXT("FX-GAZE-REQUEST"), TEXT("SFX"), TEXT("gaze"));
   }
   if (bAudioRecording && AudioRecordStopMs > 0 && Now >= AudioRecordStopMs) StopAudioRecording(TEXT("result"));
+  TickAudioWatchers();
   // music
   const FS08MusicMix Mix = Music.Mix(Now);
   if (Mix.bThemeChanged) StartTheme(Mix.Theme);
@@ -412,7 +424,7 @@ void AS08FlowGameMode::AudioOnApplied(const FS08Snapshot& Snapshot, const TArray
   for (const FS08BoardFighter& After : Fighters) {
     const FS08BoardFighter* B =
         Before.FindByPredicate([&After](const FS08BoardFighter& E) { return E.Id == After.Id; });
-    if (B && After.Health > B->Health && !After.bDefeated) {
+    if (B && After.Health > B->Health && !After.bDefeated && !B->bDefeated && B->Health > 0) {  // a revive is no heal
       const bool bGrail = After.Health == 8 && B->Health <= 4 && AudioKeyOf(After.Id) == TEXT("ARTHUR");
       PlayCueBank(TEXT("CUE-012"), After.Id, Snapshot.SequenceNumber,
                   bGrail ? TEXT("CMB-HEAL-GRAIL") : TEXT("CMB-HEAL"));
@@ -692,12 +704,18 @@ void AS08FlowGameMode::NoteAudioInput() { AudioLastInputMs = NowMs(); }
 void AS08FlowGameMode::AudioOnStage(ES08Stage OldStage, ES08Stage NewStage) {
   TArray<FString> Lines;
   if (OldStage == ES08Stage::Started && NewStage != ES08Stage::Started) StopAudioRecording(TEXT("leave"));
+  if (OldStage == ES08Stage::Room && NewStage == ES08Stage::Started) {
+    PlayBankSfx(TEXT("UI-ROOM-COUNT-GO"), TEXT("UI"), TEXT("room"));  // the match begins (no countdown in the room)
+  }
   // the menu theme outside the match: the lobby full, the room quiet (no drums) while the players get ready
   if (!bBench && (NewStage == ES08Stage::Lobby || NewStage == ES08Stage::Room) && OldStage != NewStage) {
     Music.Menu(NowMs(), NewStage == ES08Stage::Room, Lines);
   }
   if (OldStage == ES08Stage::Login || OldStage == ES08Stage::Boot) {
-    if (NewStage == ES08Stage::Lobby) PlayBankSfx(TEXT("UI-LOGIN-OK"), TEXT("UI"), TEXT("login"));
+    // an automated client goes straight to its room: any stage after the sign-in is its success
+    if (NewStage == ES08Stage::Lobby || NewStage == ES08Stage::Room || NewStage == ES08Stage::Started) {
+      PlayBankSfx(TEXT("UI-LOGIN-OK"), TEXT("UI"), TEXT("login"));
+    }
     if (NewStage == ES08Stage::Failed) PlayBankSfx(TEXT("UI-LOGIN-ERR"), TEXT("UI"), TEXT("login"));
   }
   WriteCueLines(Lines);
@@ -724,6 +742,8 @@ void AS08FlowGameMode::ResetAudioMatch() {
   AudioPushBySeq.Reset();
   bAudioBoostDeclared = false;
   bAudioBoostFizzle = false;
+  AudioPlaceSteps.Reset();
+  AudioBoostCardId.Reset();
 }
 
 void AS08FlowGameMode::AudioOnPendingOpen(const FString& HeadId) {
@@ -733,7 +753,10 @@ void AS08FlowGameMode::AudioOnPendingOpen(const FString& HeadId) {
   bAudioGazeRequestDue = true;
 }
 
-void AS08FlowGameMode::AudioOnPendingAnswered(const FString& HeadId, const FString& FighterId, bool bUsed) {
+void AS08FlowGameMode::AudioOnPendingAnswered(const FString& HeadId, const FString& FighterId, bool bUsed,
+                                              const FString& Type) {
+  // a card made this player discard (DISCARD_CARDS): the cards leave the hand with the forced-discard sweep
+  if (bUsed && Type == TEXT("DISCARD_CARDS")) PlayBankSfx(TEXT("CRD-FORCED-DISCARD"), TEXT("SFX"), TEXT("discard"));
   if (!S08AudioCues::IsMedusaGazeHead(HeadId)) return;
   bAudioGazeRequestDue = false;
   AudioGazeHeadId.Reset();
@@ -773,6 +796,13 @@ void AS08FlowGameMode::StartAudioRecording() {
     FS08Trace::Write(TEXT("AUDIO-REC unavailable (no audio mixer device)"));
     return;
   }
+  // An automated client runs unfocused, and the engine mutes an unfocused app before the mix
+  // (UnfocusedVolumeMultiplier=0): the recording would be silence. The recording client keeps its volume and silences
+  // its speakers at the main submix's output gain instead - the submix records its buffer before that gain.
+  AudioRecordPrevUnfocused = FApp::GetUnfocusedVolumeMultiplier();
+  FApp::SetUnfocusedVolumeMultiplier(1.0f);
+  FApp::SetVolumeMultiplier(1.0f);
+  Mixer->SetSubmixOutputVolume(&Mixer->GetMainSubmixObject(), 0.0f);
   Mixer->StartRecording(nullptr, 900.0f);  // the main submix: everything this client plays, after the master volume
   bAudioRecording = true;
   AudioRecordStopMs = -1;
@@ -789,6 +819,8 @@ void AS08FlowGameMode::StopAudioRecording(const TCHAR* Why) {
   float Channels = 0.0f;
   float Rate = 0.0f;
   Audio::FAlignedFloatBuffer& Recorded = Mixer->StopRecording(nullptr, Channels, Rate);
+  Mixer->SetSubmixOutputVolume(&Mixer->GetMainSubmixObject(), 1.0f);
+  FApp::SetUnfocusedVolumeMultiplier(AudioRecordPrevUnfocused);
   if (Recorded.Num() == 0 || Channels < 1.0f || Rate <= 0.0f) {
     FS08Trace::Write(FString::Printf(TEXT("AUDIO-REC stop why=%s ok=0 (no data)"), Why));
     return;
@@ -804,4 +836,82 @@ void AS08FlowGameMode::StopAudioRecording(const TCHAR* Why) {
       TEXT("AUDIO-REC stop why=%s ok=%d t=%lld seconds=%.1f channels=%d rate=%d master=%.2f file=%s"), Why, bOk ? 1 : 0,
       static_cast<long long>(NowMs()), Seconds, FMath::RoundToInt(Channels), FMath::RoundToInt(Rate),
       CueSound.GetAudio().MasterGain(), Written.IsEmpty() ? *AudioRecordFile : *Written));
+}
+
+namespace {
+// AU-S5 (07 §9): the make-up gain of the mix bus. A recorded match at the default volumes measured -24.9..-25.7 LUFS-I
+// without it (target -20 ±2); FS08PeakLimiter keeps every sample under -1.5 dBFS.
+constexpr float GS08MixMakeupDb = 5.0f;
+}  // namespace
+
+void AS08FlowGameMode::InstallMasterLimiter() {
+  if (MasterLimiter) return;
+  if (FParse::Param(FCommandLine::Get(), TEXT("S08MixLegacy"))) {
+    ArtHud.PendingTrace.Add(TEXT("AUDIO-MIX legacy (no limiter, no make-up)"));
+    return;
+  }
+  FS08MixLimiterSettings Settings;
+  Settings.MakeupDb = GS08MixMakeupDb;
+  FParse::Value(FCommandLine::Get(), TEXT("S08MixMakeupDb="), Settings.MakeupDb);
+  Settings.MakeupDb = FMath::Clamp(Settings.MakeupDb, -12.0f, 12.0f);
+  Settings.CeilingDb = -1.5f;  // the sample ceiling; the true peak stays <= -1 dBTP
+  US08MixLimiterPreset* Preset = NewObject<US08MixLimiterPreset>(this);
+  Preset->Settings = Settings;
+  Preset->SetSettings(Settings);
+  UAudioMixerBlueprintLibrary::AddMasterSubmixEffect(this, Preset);
+  Preset->SetSettings(Settings);  // the registered instance picks the settings up on the next audio block as well
+  MasterLimiter = Preset;
+  ArtHud.PendingTrace.Add(FString::Printf(TEXT("AUDIO-MIX limiter ceiling=%.1f lookahead=%.0f makeup=%.1f"),
+                                          Settings.CeilingDb, Settings.LookaheadMs, Settings.MakeupDb));
+}
+
+void AS08FlowGameMode::RemoveMasterLimiter() {
+  if (!MasterLimiter) return;
+  UAudioMixerBlueprintLibrary::RemoveMasterSubmixEffect(this, MasterLimiter);
+  MasterLimiter = nullptr;
+}
+
+void AS08FlowGameMode::AudioOnRoom(const FS08RoomState& Room) {
+  const FString Viewer = Flow.IsValid() ? Flow->GetUserId() : FString();
+  for (const FString& Bank : S08AudioCues::RoomSounds(AudioRoom, Room, Viewer)) PlayBankSfx(Bank, TEXT("UI"), TEXT("room"));
+  AudioRoom = Room;
+}
+
+void AS08FlowGameMode::AudioOnRevive(const FString& FighterId) {
+  if (AudioKeyOf(FighterId) == TEXT("HARPY")) PlayBankSfx(TEXT("FX-HARPY-RETURN"), TEXT("SFX"), TEXT("revive"));
+}
+
+void AS08FlowGameMode::AudioOnSkippedEffect() {
+  if (AudioNoTargetFrame == GFrameCounter) return;
+  AudioNoTargetFrame = GFrameCounter;
+  PlayBankSfx(TEXT("FX-NO-TARGET"), TEXT("SFX"), TEXT("no-target"));
+}
+
+void AS08FlowGameMode::AudioNotePlace(const FString& FighterId, int32 Seq) {
+  AudioPlaceSteps.Add(FString::Printf(TEXT("%s|%d"), *FighterId, Seq));
+}
+
+void AS08FlowGameMode::TickAudioWatchers() {
+  // panels: the deck lists (K / Shift+K) and the discard browser (D)
+  const bool bDeck = DeckPanel.IsOpen();
+  if (bDeck != bAudioDeckPanelOpen) PlayBankSfx(bDeck ? TEXT("UI-PANEL-OPEN") : TEXT("UI-PANEL-CLOSE"), TEXT("UI"), TEXT("panel"));
+  bAudioDeckPanelOpen = bDeck;
+  if (bDiscardBrowserOpen != bAudioDiscardOpen) {
+    PlayBankSfx(bDiscardBrowserOpen ? TEXT("UI-PANEL-OPEN") : TEXT("UI-PANEL-CLOSE"), TEXT("UI"), TEXT("panel"));
+  }
+  bAudioDiscardOpen = bDiscardBrowserOpen;
+  // the card inspector: open, then a page per other card
+  if (bInspecting && !bAudioInspecting) {
+    PlayBankSfx(TEXT("CRD-INSPECT-OPEN"), TEXT("SFX"), TEXT("inspect"));
+  } else if (bInspecting && InspectedCard.InstanceId != AudioInspectedId) {
+    PlayBankSfx(TEXT("CRD-INSPECT-PAGE"), TEXT("SFX"), TEXT("inspect"));
+  }
+  bAudioInspecting = bInspecting;
+  AudioInspectedId = bInspecting ? InspectedCard.InstanceId : FString();
+  // the boost slot of an open maneuver draft: a card put in by the player (a snapshot re-baselines it silently)
+  if (CommandUi.Mode == ES09CommandMode::ManeuverDraft && !CommandUi.BoostCardId.IsEmpty() &&
+      CommandUi.BoostCardId != AudioBoostCardId) {
+    PlayBankSfx(TEXT("CRD-BOOST-PLACE"), TEXT("SFX"), TEXT("boost"));
+  }
+  AudioBoostCardId = CommandUi.BoostCardId;
 }

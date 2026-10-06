@@ -173,6 +173,7 @@ void AS08FlowGameMode::BeginPlay() {
     RefreshUi();
   });
   Flow->OnRoom.AddLambda([this](const FS08RoomState& Room) {
+    AudioOnRoom(Room);  // AU-S5: create / join / leave / ready
     RefreshUi();
     // S10/GD-040: a terminal room row while the match is LIVE re-renders the
     // HUD even without a fresh snapshot - the interruption screen (ABORTED)
@@ -524,6 +525,7 @@ void AS08FlowGameMode::HandleApplied(const FS08Snapshot& Snapshot, ES08SeqDecisi
         AudioOnDraftOpen(CommandUi.PendingManeuverId, CommandUi.MovableFighterIds(Fighters).Num());  // AU-S5
       }
     }
+    AudioBoostCardId = CommandUi.BoostCardId;  // AU-S5: a snapshot restores / drops the boost silently
     const bool bExhaustionWasOpen = MoveInput.bExhaustionOpen;
     MoveInput.OnSnapshot(CommandUi, Snapshot);
     if (bExhaustionWasOpen && !MoveInput.bExhaustionOpen) {
@@ -1494,6 +1496,7 @@ void AS08FlowGameMode::NoteBoardDeaths(const TArray<FS08BoardFighter>& BoardView
   for (const FS08BoardFighter& F : BoardView) {
     const bool bAlive = F.IsAlive();
     const bool* Was = BoardAliveById.Find(F.Id);
+    if (Was && !*Was && bAlive) AudioOnRevive(F.Id);  // AU-S5: a harpy returns
     if (Was && *Was && !bAlive && !DeathStage.IsStaged(F.Id)) {
       FS09DeathInput In;
       In.FighterId = F.Id;
@@ -2675,6 +2678,7 @@ void AS08FlowGameMode::FeedPendingPresentation(const FS08Snapshot& Snapshot) {
                                      Note.Reason.IsEmpty() ? TEXT("-") : *Note.Reason,
                                      Note.PlayerId == CommandUi.ViewerId ? 1 : 0, *Why.Key.ToString()));
     ShowReason(Why, 4.0f); // CUE-004
+    AudioOnSkippedEffect();  // AU-S5: FX-NO-TARGET
   }
   // (2) SD-19 / SD-28: one presentation per open of an own head; a compact / toast open pre-selects the variant
   // answered last time where it is still legal (nothing is sent).
@@ -2889,7 +2893,7 @@ bool AS08FlowGameMode::ConfirmCombat() {
                                        CommandUi.PendingChoice.Stage, *Command.EffectId));
       // DE-020 (SD-19): the answer is what the compact / toast form of this trigger pre-selects next time.
       PendingPresenter.Remember(CommandUi.PendingChoice, FS09PendingVariant::FromCommand(Command));
-      AudioOnPendingAnswered(CommandUi.PendingChoice.Id, Command.FighterId, true);  // AU-S5
+      AudioOnPendingAnswered(CommandUi.PendingChoice.Id, Command.FighterId, true, CommandUi.PendingChoice.Type);  // AU-S5
       Toast = TEXT("choice sent");
     } else {
       Toast = TEXT("choice not sent - command gate blocked it (see trace)");

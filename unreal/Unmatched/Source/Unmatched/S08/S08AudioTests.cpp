@@ -8,13 +8,16 @@
 //   Unmatched.S08.Audio.Ambience  - plans per map, the spot schedule (seeded), followers, the map key of a board;
 //   Unmatched.S08.Audio.Settings  - the bus volumes and the subtitle switches (console names, gains, defaults);
 //   Unmatched.S08.Audio.Cues      - AU-S5: the deadline beeps, the push of an enemy figure, Medusa's gaze head,
-//                                   the placement cascade.
+//                                   the placement cascade;
+//   Unmatched.S08.Audio.Limiter   - AU-S5: the mix bus never passes the ceiling, the bed keeps the make-up.
 #if WITH_AUTOMATION_TESTS
 
 #include "Misc/AutomationTest.h"
 #include "../S09/S09OpponentView.h"
 #include "S08Ambience.h"
 #include "S08AudioCues.h"
+#include "S08FlowController.h"
+#include "S08MixLimiter.h"
 #include "S08AudioBank.h"
 #include "S08MusicDirector.h"
 #include "S08UserSettings.h"
@@ -273,6 +276,59 @@ bool FS08AudioCuesTest::RunTest(const FString& Parameters) {
   TestFalse("another head", S08AudioCues::IsMedusaGazeHead(TEXT("card-effect-17")));
   const TArray<int32> Setup = S08AudioCues::SetupDelays(8);
   TestTrue("at most 6 placements, 140 ms apart", Setup.Num() == 6 && Setup[0] == 300 && Setup[5] == 1000);
+
+  // the room: a new room for its host alone creates, a viewer who joins hears the join; then join / ready / leave
+  // of the other player, nothing on a repeated answer
+  FS08RoomState Empty, Room;
+  Room.GameId = TEXT("g1");
+  Room.HostId = TEXT("me");
+  Room.Players.AddDefaulted_GetRef().UserId = TEXT("me");
+  TestTrue("create", S08AudioCues::RoomSounds(Empty, Room, TEXT("me")) == TArray<FString>{TEXT("UI-ROOM-CREATE")});
+  TestTrue("a room without the viewer is silent", S08AudioCues::RoomSounds(Empty, Room, TEXT("other")).Num() == 0);
+  FS08RoomState Two = Room;
+  Two.Players.AddDefaulted_GetRef().UserId = TEXT("other");
+  TestTrue("the other joins", S08AudioCues::RoomSounds(Room, Two, TEXT("me")) == TArray<FString>{TEXT("UI-ROOM-JOIN")});
+  TestTrue("the joiner itself", S08AudioCues::RoomSounds(Empty, Two, TEXT("other")) == TArray<FString>{TEXT("UI-ROOM-JOIN")});
+  FS08RoomState Ready = Two;
+  Ready.Players[1].bIsReady = true;
+  TestTrue("ready", S08AudioCues::RoomSounds(Two, Ready, TEXT("me")) == TArray<FString>{TEXT("UI-ROOM-READY")});
+  TestEqual("a repeated answer is silent", S08AudioCues::RoomSounds(Ready, Ready, TEXT("me")).Num(), 0);
+  TestTrue("the other leaves", S08AudioCues::RoomSounds(Ready, Room, TEXT("me")) == TArray<FString>{TEXT("UI-ROOM-LEAVE")});
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08AudioLimiterTest, "Unmatched.S08.Audio.Limiter",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FS08AudioLimiterTest::RunTest(const FString& Parameters) {
+  // the mix bus: +5 dB make-up, a 2 ms transient at full scale stays under the -1.5 dBFS ceiling, a quiet bed passes
+  // with the make-up only, and the output is the input delayed by the look-ahead
+  FS08PeakLimiter L;
+  L.Init(2, 48000.0f, -1.5f, 5.0f, 5.0f, 120.0f);
+  const int32 Frames = 48000;
+  TArray<float> In, Out;
+  In.SetNumZeroed(Frames * 2);
+  Out.SetNumZeroed(Frames * 2);
+  for (int32 I = 0; I < Frames; ++I) {
+    const float Bed = 0.1f * FMath::Sin(I * 0.05f);
+    const float Spike = (I >= 24000 && I < 24096) ? 0.9f * FMath::Sin(I * 0.7f) : 0.0f;
+    In[I * 2] = Bed + Spike;
+    In[I * 2 + 1] = Bed - Spike;
+  }
+  for (int32 Block = 0; Block < Frames; Block += 1024) {
+    const int32 N = FMath::Min(1024, Frames - Block);
+    L.Process(In.GetData() + Block * 2, Out.GetData() + Block * 2, N);
+  }
+  float Peak = 0.0f;
+  for (const float V : Out) Peak = FMath::Max(Peak, FMath::Abs(V));
+  const float Ceiling = FMath::Pow(10.0f, -1.5f / 20.0f);
+  TestTrue(TEXT("no sample over the ceiling"), Peak <= Ceiling + 1e-6f);
+  TestTrue(TEXT("the transient was limited"), L.MinGain() < 0.6f);
+  const int32 Delay = 240;  // 5 ms at 48 kHz
+  const float Makeup = FMath::Pow(10.0f, 5.0f / 20.0f);
+  TestTrue(TEXT("the bed before the transient: make-up only, delayed by the look-ahead"),
+           FMath::IsNearlyEqual(Out[(12000 + Delay) * 2], In[12000 * 2] * Makeup, 1e-4f));
+  TestTrue(TEXT("the bed recovers after the release"),
+           FMath::IsNearlyEqual(Out[(47000 + Delay) * 2], In[47000 * 2] * Makeup, 5e-3f));
   return true;
 }
 

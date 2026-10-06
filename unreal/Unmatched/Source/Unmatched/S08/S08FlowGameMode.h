@@ -561,7 +561,26 @@ private:
   /** FX-GAZE-REQUEST: an own Medusa gaze head opened (it sounds once the combat staging is over). */
   void AudioOnPendingOpen(const FString& HeadId);
   /** The own pending head was answered: FX-GAZE-BEAM (CUE-014) when the gaze was used, FX-GAZE-DECLINE when declined. */
-  void AudioOnPendingAnswered(const FString& HeadId, const FString& FighterId, bool bUsed);
+  void AudioOnPendingAnswered(const FString& HeadId, const FString& FighterId, bool bUsed,
+                              const FString& Type = FString());
+  /** UI-ROOM-*: a room answer (create / join / leave / ready). */
+  void AudioOnRoom(const FS08RoomState& Room);
+  /** FX-HARPY-RETURN: a defeated figure is back on the board (Medusa's harpies return). */
+  void AudioOnRevive(const FString& FighterId);
+  /** FX-NO-TARGET: an effect had nothing to target (skipped-effect note), once per frame. */
+  void AudioOnSkippedEffect();
+  /** CUE-007 kind=place: the move of this figure and seq is a placement (BRD-PLACE instead of a step). */
+  void AudioNotePlace(const FString& FighterId, int32 Seq);
+  /** The panel / inspector / boost-slot watchers of the frame (UI-PANEL-*, CRD-INSPECT-*, CRD-BOOST-PLACE). */
+  void TickAudioWatchers();
+  FS08RoomState AudioRoom;
+  TSet<FString> AudioPlaceSteps;
+  bool bAudioDeckPanelOpen = false;
+  bool bAudioDiscardOpen = false;
+  bool bAudioInspecting = false;
+  FString AudioInspectedId;
+  FString AudioBoostCardId;
+  uint64 AudioNoTargetFrame = 0;
   /** BRD-CANDIDATES: a maneuver draft opened with more than one figure to move (once per pendingManeuver.id). */
   void AudioOnDraftOpen(const FString& ManeuverId, int32 Movable);
   /** BRD-PUSH: the enemy figures an EFFECT trail of this seq moved (their step sounds get the push whistle). */
@@ -569,8 +588,14 @@ private:
   /** UI-TIMER-*: the own defense window deadline (called with the HUD refresh, 4 times a second). */
   void AudioTickDeadline();
   /** -S08AudioRecord=<file.wav>: the whole output of this client from the match start to the result + 8 s (or the
-   *  exit from the match), written synchronously as a 16-bit WAV for the loudness pass (tools/audio/mix_check.py). */
+   *  exit from the match), written synchronously as a 16-bit WAV for the loudness pass (tools/audio/mix_check.py).
+   *  While it records, the client's speakers are silent (main submix output 0, recorded before that gain). */
   void StartAudioRecording();
+  /** The mix bus (02 §5.3): US08MixLimiterPreset on the main submix - the make-up gain that brings a match at the
+   *  default volumes to -20 LUFS-I (measured AU-S5, 07 §9) and a look-ahead peak limiter at -1.5 dBFS.
+   *  -S08MixMakeupDb=<dB> overrides the gain for a tuning run; -S08MixLegacy (rollback) leaves the main submix bare. */
+  void InstallMasterLimiter();
+  void RemoveMasterLimiter();
   void StopAudioRecording(const TCHAR* Why);
   FS08DeadlineBeeper DeadlineBeeper;
   FString AudioGazeHeadId;
@@ -582,6 +607,7 @@ private:
   FString AudioRecordFile;
   bool bAudioRecording = false;
   int64 AudioRecordStopMs = -1;
+  float AudioRecordPrevUnfocused = 0.0f;
   // MS-T-16: the motion settings (US08UserSettings + flags, read at BeginPlay), the move pose parameters and the
   // damage cues held until their target arrives. DE-025: re-read when the settings are saved (US08UserSettings::
   // OnChanged) - the next move seq and the next combat staging use them, no restart.
@@ -1092,6 +1118,9 @@ private:
   TObjectPtr<class UAudioComponent> VoAudio;
   UPROPERTY()
   TArray<TObjectPtr<class UAudioComponent>> AmbBeds;
+  // AU-S5: the limiter with the make-up gain on the main submix (null with -S08MixLegacy).
+  UPROPERTY()
+  TObjectPtr<class USoundEffectSubmixPreset> MasterLimiter;
   // W4-C: the UMG art HUD widgets (plate, icon) hosted in HudCanvas slots.
   UPROPERTY()
   TArray<TObjectPtr<UUserWidget>> ArtHudWidgets;

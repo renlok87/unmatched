@@ -98,6 +98,7 @@ void AS08FlowGameMode::ScheduleStepSounds(const TArray<FS08MovePlan>& Plans) {
     CueSound.DropSteps(Now, TEXT("replace"), Lines, Plan.FighterId);
     CueSound.ScheduleSteps(Plan.FighterId, Plan.Seq, Now + static_cast<int64>(FMath::RoundToDouble(Plan.StartMs)),
                            Plan.StepMs, Plan.Steps, Plan.bSnapped);
+    if (Plan.Kind == ES08MoveKind::Place) AudioNotePlace(Plan.FighterId, Plan.Seq);  // AU-S5: BRD-PLACE
     // AU-S5 BRD-PUSH: an enemy figure moved by a card effect - the pulling whistle over its first step
     if (TArray<FString>* Pushed = AudioPushBySeq.Find(Plan.Seq); Pushed && Pushed->Remove(Plan.FighterId) > 0) {
       DelaySound(FMath::Max(0, FMath::RoundToInt(Plan.StartMs)), TEXT("BRD-PUSH"), TEXT("SFX"), TEXT("push"));
@@ -121,6 +122,10 @@ void AS08FlowGameMode::TickStepSounds() {
     Request.Edge = Step.Edge;
     Request.Edges = Step.Edges;
     Request.DueMs = Step.DueMs;
+    // AU-S5: a placement (Bewilderment, Winged Frenzy) dissolves and appears - the place sound, not a footstep
+    if (AudioPlaceSteps.Remove(FString::Printf(TEXT("%s|%d"), *Step.FighterId, Step.Seq)) > 0) {
+      Request.BankId = TEXT("BRD-PLACE");
+    }
     PlayCueSound(Request);
   }
 }

@@ -1,6 +1,7 @@
 #include "S08AudioCues.h"
 
 #include "../S09/S09OpponentView.h"
+#include "S08FlowController.h"
 
 bool S08AudioCues::IsMedusaGazeHead(const FString& HeadId) {
   return HeadId.StartsWith(TEXT("ability-medusa-target"), ESearchCase::IgnoreCase);
@@ -20,6 +21,29 @@ TArray<FString> S08AudioCues::PushedFighters(const FS09LastMovement& Trail,
 TArray<int32> S08AudioCues::SetupDelays(int32 Figures, int32 FirstMs) {
   TArray<int32> Out;
   for (int32 I = 0; I < FMath::Min(Figures, 6); ++I) Out.Add(FirstMs + I * 140);
+  return Out;
+}
+
+TArray<FString> S08AudioCues::RoomSounds(const FS08RoomState& Before, const FS08RoomState& After,
+                                         const FString& Viewer) {
+  TArray<FString> Out;
+  if (After.GameId.IsEmpty()) return Out;
+  auto Find = [](const FS08RoomState& Room, const FString& Id) {
+    return Room.Players.FindByPredicate([&Id](const FS08RoomPlayer& P) { return P.UserId == Id; });
+  };
+  if (Before.GameId != After.GameId) {
+    if (!Find(After, Viewer)) return Out;
+    Out.Add(After.IsHost(Viewer) && After.Players.Num() <= 1 ? TEXT("UI-ROOM-CREATE") : TEXT("UI-ROOM-JOIN"));
+    return Out;
+  }
+  for (const FS08RoomPlayer& P : After.Players) {
+    const FS08RoomPlayer* Was = Find(Before, P.UserId);
+    if (!Was && P.UserId != Viewer) Out.Add(TEXT("UI-ROOM-JOIN"));
+    if (Was && !Was->bIsReady && P.bIsReady) Out.Add(TEXT("UI-ROOM-READY"));
+  }
+  for (const FS08RoomPlayer& P : Before.Players) {
+    if (!Find(After, P.UserId) && P.UserId != Viewer) Out.Add(TEXT("UI-ROOM-LEAVE"));
+  }
   return Out;
 }
 

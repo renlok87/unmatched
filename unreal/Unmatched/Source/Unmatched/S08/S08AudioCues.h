@@ -6,6 +6,7 @@
 #include "CoreMinimal.h"
 
 struct FS09LastMovement;
+struct FS08RoomState;
 
 namespace S08AudioCues {
 /** Medusa's start-of-turn ability head: the server opens it as `ability-medusa-target-p<N>` (TARGET_FIGHTER,
@@ -19,6 +20,11 @@ UNMATCHED_API TArray<FString> PushedFighters(const FS09LastMovement& Trail,
 
 /** BRD-SETUP: the delays of the placement sounds at the match start, one per figure, at most 6, 140 ms apart. */
 UNMATCHED_API TArray<int32> SetupDelays(int32 Figures, int32 FirstMs = 300);
+
+/** UI-ROOM-*: the sounds of a room answer against the previous one (the answers repeat every 3 s). A new room: CREATE
+ *  for its host alone in it, JOIN for the viewer who joined. The same room: JOIN / LEAVE for another player who
+ *  appears / leaves, READY for a ready mark that turns on. */
+UNMATCHED_API TArray<FString> RoomSounds(const FS08RoomState& Before, const FS08RoomState& After, const FString& Viewer);
 }  // namespace S08AudioCues
 
 /** UI-TIMER-WARN / UI-TIMER-TICK of a server deadline: WARN once when 10 s or less are left, TICK on each whole second
