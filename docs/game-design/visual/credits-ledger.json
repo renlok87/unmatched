@@ -1003,11 +1003,47 @@
       "result_path": "art/imagegen/env-u16-marmoreal-codex/",
       "status": "ok",
       "note": "CX-21 прогон 1; 2026-10-07 01:55-02:13 +05:00 (~18 мин); 0 генераций; 5 масок L + 2 RGBA 4680x2634 из плит EN-03 (план Б), lanterns.json (7 записей, portal - неподвижный якорь), 42 листа, 77 скриптовых проверок PASS; ревью Claude: fix-needed - маска сакуры пятнами (18 % огибающей, 245 пятен; тон 300-350 мимо сиреневых крон 260-300), секция EN-04 в verification.json не в формате 07 §1.2 -> fix1 (ВР-VS3-EN04-01...03)"
+    },
+    {
+      "date": "2026-10-07T02:19:14+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle)",
+      "template": "T-CODEX-ANIMSHEET",
+      "task_id": "AN-30",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a1130b-2886-7ba0-9d00-b48527cdc69a",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/AN-30.codex.md",
+      "result_path": "art/imagegen/anim-death-sheet-codex/",
+      "status": "ok",
+      "note": "CX-26 прогон 1; 2026-10-07 02:07-02:19 +05:00 (~12 мин); процедурный лист смерти 1920x1080: ось 0…3125 мс, дорожки King Arthur (P1, исчезновение 2125) и Harpy (P2, 1725), 8 поз DeathSettle к.0/3/13/21 из наших рендеров v2, состояния пепла 35/70 %, 40 угольков, CUE-ряд, лист ash-vs-fade; генераций image_gen 0; source_unchanged; ревью Claude: fix-needed — нет manifest-sha256.json и prompts/, verification.json без ключей 07 §1.2, фронт #FFB45C на пепле P1 #E8C06A не виден (и в сером), ряд скорости обратный (×0,5 длиннее) и «Нет» = fade против UI-ACC-013, reduced — значки вместо дорожки, подписи gone на линиях -> fix1 (ВР-VS3-AN30-01)"
+    },
+    {
+      "date": "2026-10-07T02:28:53+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle)",
+      "template": "T-CODEX-ANIMSHEET",
+      "task_id": "AN-30",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a11318-b842-7cd1-85db-f91ac1c1b452",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/AN-30.fix1.codex.md",
+      "result_path": "art/imagegen/anim-death-sheet-codex/",
+      "status": "ok",
+      "note": "CX-26 fix1 (единственный корректирующий прогон); 2026-10-07 02:22-02:29 +05:00 (~7 мин); manifest-sha256.json вместо manifest.json, prompts/AN-30-prompts.json, verification.json с ключами 07 §1.2 (exports, palette 0, gray, sizes, acceptance 8/8); фронт пепла — полоса 6 px между линиями #111317 2 px (в сером читается на P1 и P2); ряд скорости по ВР-VS3-AN30-01 (смерть не масштабируется, только «−N» 450/900/1350/450); дорожка reduced motion с fade 500; подписи gone вне линий; ревью Claude: accept по делегированию (ВР-VS3-AN30-01, -02)"
     }
   ],
   "totals": {
     "syntx_spent": 6.0,
     "tripo_spent": 0,
-    "codex_packages": 49
+    "codex_packages": 51
   }
 }
