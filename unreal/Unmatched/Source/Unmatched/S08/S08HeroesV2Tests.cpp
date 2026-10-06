@@ -12,6 +12,7 @@
 #include "S08BoardModel.h"
 #include "S08ContactAnimNotify.h"
 #include "S08FighterActor.h"
+#include "UI/UmHudPanels.h"
 #include "Animation/AnimSequenceBase.h"
 #include "Animation/Skeleton.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -800,6 +801,13 @@ bool FS08HeroesV2HarpyNumberTest::RunTest(const FString&) {
   TestEqual("the FIRST digit does not matter - the LAST one wins",
             HarpyNumber(LabeledFighter(TEXT("Harpies"), TEXT("3rd harpy of 2"))), 2);
   TestEqual("a non-harpy also resolves (the caller decides)", HarpyNumber(LabeledFighter(TEXT("Medusa"), TEXT("Medusa"))), 1);
+  // The base digit and the HUD portrait badge (VS-2 CP-12, UmHudPanel::SidekickNumber) give the same number to the
+  // three harpies (ВР-07: one number in the tag, the badge, the base and the audio key). Without a digit they differ
+  // by design (the badge shows none: 0; the base falls back to 1) - a label always carries it in a game.
+  for (const TCHAR* Label : {TEXT("Harpies 1"), TEXT("Harpies 2"), TEXT("Harpies 3")}) {
+    TestEqual(FString::Printf(TEXT("%s: base digit = HUD badge"), Label),
+              HarpyNumber(LabeledFighter(TEXT("Harpies"), Label)), UmHudPanel::SidekickNumber(Label));
+  }
   // The actor: the digit components show on a living v2 harpy only, hidden with the rollback flag and on other
   // figures (the text carries the number).
   UWorld* World = UWorld::CreateWorld(EWorldType::Game, false, TEXT("S08HarpyNumberWorld"));
