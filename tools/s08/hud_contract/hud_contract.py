@@ -9,7 +9,9 @@
                                                                     гейт строк `SHOT widget id=… bbox=… geom=painted`,
                                                                     `HUD-LAYOUT` и `PORTRAIT` (CP-08: scale ≤ 1,6, нет
                                                                     монограммы при ключе из реестра; CP-12: у гарпии в
-                                                                    панели номер n=1…3, ВР-72)
+                                                                    панели номер n=1…3, ВР-72) и `CARD-ART` (VS-3 CP-15:
+                                                                    scale ≤ 1,6; lang=fallback при ключе из реестра — ошибка,
+                                                                    кроме tex=legacy отката -S08CardArtLegacy)
 
 Только stdlib. Код выхода: 0 — ошибок нет, 1 — есть ошибки.
 """
@@ -48,6 +50,10 @@ ARG_RE = re.compile(r"\{([A-Za-z_][A-Za-z0-9_]*)\}")
 PORTRAIT_RE = re.compile(r"PORTRAIT (id=.*)$")
 PORTRAIT_CAP = 1.6
 CARD_MEDIA = REPO / "unreal/Unmatched/Config/Cards/S08CardMedia.json"
+# VS-3 CP-15 (ВР-CP10, ВР-CP04): the card art - scale <= 1.6, no fallback face for a key the registry has
+CARD_ART_RE = re.compile(r"CARD-ART (key=.*)$")
+CARD_ART_FIELDS = ("key", "lang", "tex", "show", "su", "px", "scale", "capped", "state")
+CARD_LANGS = ("ru", "en", "back", "fallback")
 
 
 def load(path):
@@ -259,6 +265,40 @@ def registry_portrait_keys(path=CARD_MEDIA):
     return out
 
 
+def registry_card_keys(path=CARD_MEDIA):
+    """Card keys (heroSlug:cardSlug) and back keys (back:<hero>) of the registry."""
+    try:
+        entries = load(path)["entries"]
+    except (OSError, ValueError, KeyError):
+        return set()
+    return {e["key"] for e in entries if e.get("kind") in ("card", "back") and e.get("key")}
+
+
+def check_card_art_line(n, line, registry):
+    """VS-3 CP-15: one 'CARD-ART key=.. lang=.. tex=.. show=.. su=.. px=.. scale=.. capped=.. state=..' line -> errors
+    (None when the line is not a CARD-ART line)."""
+    m = CARD_ART_RE.search(line.rstrip("\r\n"))
+    if not m:
+        return None
+    f = dict(w.split("=", 1) for w in m.group(1).split() if "=" in w)
+    errors = []
+    for k in CARD_ART_FIELDS:
+        if k not in f:
+            errors.append("строка %d: CARD-ART без поля %s" % (n, k))
+    if f.get("lang") not in CARD_LANGS:
+        errors.append("строка %d: CARD-ART lang=%s" % (n, f.get("lang")))
+    try:
+        if float(f.get("scale", "0")) > PORTRAIT_CAP + 1e-6:
+            errors.append("строка %d: CARD-ART key=%s scale=%s > %.1f (ВР-CP04)" % (n, f.get("key"), f["scale"], PORTRAIT_CAP))
+    except ValueError:
+        errors.append("строка %d: CARD-ART scale=%r" % (n, f.get("scale")))
+    if f.get("capped") not in ("0", "1"):
+        errors.append("строка %d: CARD-ART capped=%s" % (n, f.get("capped")))
+    if f.get("lang") == "fallback" and f.get("tex") != "legacy" and f.get("key") in registry:
+        errors.append("строка %d: CARD-ART key=%s lang=fallback, а скан есть в реестре (ВР-CP10)" % (n, f["key"]))
+    return errors
+
+
 def check_portrait_line(n, line, registry):
     """VS-2 CP-08: one 'PORTRAIT id=.. tex=.. su=.. px=.. scale=.. show=..' line -> errors."""
     m = PORTRAIT_RE.search(line.rstrip("\r\n"))
@@ -282,7 +322,7 @@ def check_portrait_line(n, line, registry):
     return errors
 
 
-def check_widget_trace(lines, known_ids, width=1920, height=1080, registry=None, states=None):
+def check_widget_trace(lines, known_ids, width=1920, height=1080, registry=None, states=None, card_registry=None):
     """Правило 3: гейт по трассе геометрии виджета, не по пикселям. Невидимая часть (visible=0, например
     сравнительный Slate-двойник или скрытая иконка в поздней строке W5b-R) может быть unpainted. states (04 §7.1,
     ui_states_from_04): у блока из таблицы состояние должно быть из её списка."""
@@ -290,7 +330,12 @@ def check_widget_trace(lines, known_ids, width=1920, height=1080, registry=None,
     errors, seen = [], 0
     ids = set(known_ids) | ART_HUD_IDS
     registry = registry_portrait_keys() if registry is None else registry
+    cards = registry_card_keys() if card_registry is None else card_registry
     for n, line in enumerate(lines, 1):
+        art = check_card_art_line(n, line, cards)
+        if art is not None:
+            errors += art
+            continue
         por = check_portrait_line(n, line, registry)
         if por is not None:
             errors += por

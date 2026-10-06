@@ -1176,6 +1176,8 @@ private:
   float UmHudHandLowerCap(float OffsetSu) const;
   FMargin UmHudToastOffset() const;
   void UmGalleryBegin(int32 SizePx);
+  /** VS-3: the gallery clock reaches the card sheets (-S08IconGalleryCards). */
+  void UmGalleryAt(float TMs);
   // VS-2 HB-14...HB-16: TOP + CONN, STATUS and the banner (S08/UI/UmHudTop, UmHudStatusLine, UmHudBanner)
   void BuildUmTopStrip();
   void TickUmTopStrip();

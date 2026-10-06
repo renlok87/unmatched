@@ -49,6 +49,7 @@
 #include "S08BoardActor.h"
 #include "S08TraceLog.h"
 #include "S08TurnPortraitWidget.h"
+#include "UI/UmCardGallery.h"
 #include "UI/UmCursor.h"
 #include "UI/UmGameHud.h"
 #include "UI/UmHudGallery.h"
@@ -642,13 +643,15 @@ void AS08FlowGameMode::UmGalleryBegin(int32 SizePx) {
   const bool bTopStrip = FParse::Param(Cmd, TEXT("S08IconGalleryTopStrip"));  // VS-2 HB-14...HB-16
   int32 PanelsPage = 1;  // VS-2 HB-18...HB-21
   const bool bPanels = FParse::Param(Cmd, TEXT("S08IconGalleryPanels")) || FParse::Value(Cmd, TEXT("S08IconGalleryPanels="), PanelsPage);
-  if (!bSkins && !bButtons && !bTopStrip && !bPanels) return;
+  int32 CardsPage = 1;  // VS-3 CP-03...CP-20 (UI/UmCardGallery.h)
+  const bool bCards = FParse::Param(Cmd, TEXT("S08IconGalleryCards")) || FParse::Value(Cmd, TEXT("S08IconGalleryCards="), CardsPage);
+  if (!bSkins && !bButtons && !bTopStrip && !bPanels && !bCards) return;
   if (IconGallery) IconGallery->SetVisibility(ESlateVisibility::Collapsed);  // the sheet takes the screen
   // the canvas of the sheet: the applied HUD scale (BeginPlay may run before the first window apply - the sheet is
   // built again on every OnUiScaleChanged, which also covers a window or UI-scale change)
   const int32 PageIndex = FMath::Max(0, Page - 1);
   TWeakObjectPtr<AS08FlowGameMode> WeakThis(this);
-  auto Build = [WeakThis, bSkins, bTopStrip, bPanels, PanelsPage, PageIndex, Variant, SizePx]() {
+  auto Build = [WeakThis, bSkins, bTopStrip, bPanels, PanelsPage, PageIndex, Variant, SizePx, bCards, CardsPage]() {
     AS08FlowGameMode* Self = WeakThis.Get();
     if (!Self || !Self->GetWorld()) return;
     FVector2D Viewport(1920.0, 1080.0);
@@ -656,6 +659,14 @@ void AS08FlowGameMode::UmGalleryBegin(int32 SizePx) {
     const FUmHudScaleState& Scale = UmHudScale::Current();
     const float PxPerSu = Scale.Window.X > 0 ? Scale.PxPerSu() : 1.0f;
     if (Self->UmGallery) Self->UmGallery->RemoveFromParent();
+    if (bCards) {
+      UUmCardsGalleryWidget* Sheet = CreateWidget<UUmCardsGalleryWidget>(Self->GetWorld(), UUmCardsGalleryWidget::StaticClass());
+      if (!Sheet) return;
+      for (const FString& Line : Sheet->Build(CardsPage, Viewport / PxPerSu, PxPerSu)) FS08Trace::Write(Line);
+      Sheet->AddToViewport(1001);
+      Self->UmGallery = Sheet;
+      return;
+    }
     if (bPanels) {
       UUmPanelsGalleryWidget* Sheet = CreateWidget<UUmPanelsGalleryWidget>(Self->GetWorld(), UUmPanelsGalleryWidget::StaticClass());
       if (!Sheet) return;
@@ -689,4 +700,11 @@ void AS08FlowGameMode::UmGalleryBegin(int32 SizePx) {
   };
   Build();
   UmHudScale::OnUiScaleChanged().AddWeakLambda(this, [Build](const FUmHudScaleState&) { Build(); });
+}
+
+void AS08FlowGameMode::UmGalleryAt(float TMs) {
+  // VS-3: the card sheets freeze every card at the gallery time (motion sheets of CP-16...CP-20)
+  if (UUmCardsGalleryWidget* Cards = Cast<UUmCardsGalleryWidget>(UmGallery)) {
+    for (const FString& Line : Cards->SetClockMs(TMs)) FS08Trace::Write(Line);
+  }
 }

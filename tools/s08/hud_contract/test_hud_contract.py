@@ -111,6 +111,37 @@ def test_check_trace_portrait_sidekicks_cp10_12():
     assert len(errors) == 2 and all("ВР-72" in e for e in errors)
 
 
+def test_check_trace_card_art_cp15():
+    """VS-3 CP-15 (ВР-CP10, ВР-CP04): CARD-ART lines - scale <= 1.6, no fallback face for a key the registry has (the
+    -S08CardArtLegacy rollback tex=legacy excepted), the back key, the fields."""
+    reg = hc.registry_card_keys()
+    assert {"king-arthur:excalibur", "medusa:gaze-of-stone", "back:king-arthur", "back:medusa"} <= reg
+    assert len([k for k in reg if not k.startswith("back:")]) == 27
+    tex = "tex=/Game/S08/UI/Cards/king_arthur/T_Card_king_arthur_excalibur_RU.T_Card_king_arthur_excalibur_RU"
+    ok = ["CARD-ART key=king-arthur:excalibur lang=ru %s show=hand su=150x208 px=142x197 scale=0.495 capped=0 "
+          "state=idle chip=0" % tex,
+          "UMGALLERY card p14.hover t=0 CARD-ART key=king-arthur:excalibur lang=ru %s show=inspector su=440x612 "
+          "px=889x1233 scale=1.600 capped=1 state=hover+selected chip=0" % tex,
+          "CARD-ART key=back:medusa lang=back tex=/Game/S08/UI/CardBacks/T_CardBack_medusa.T_CardBack_medusa "
+          "show=mini-48x67 su=48x67 px=44x61 scale=0.058 capped=0 state=back+boost chip=1",
+          "CARD-ART key=king-arthur:excalibur lang=fallback tex=legacy show=hand su=150x208 px=0x0 scale=0.000 "
+          "capped=0 state=idle chip=0",
+          "CARD-ART key=t-rex:bite lang=fallback tex=fallback show=hand su=150x208 px=0x0 scale=0.000 capped=0 "
+          "state=idle chip=0"]
+    errors, _ = hc.check_widget_trace(ok, set(), card_registry=reg)
+    assert errors == []
+    bad = ["CARD-ART key=king-arthur:excalibur lang=ru %s show=inspector su=460x640 px=905x1256 scale=1.750 capped=0 "
+           "state=idle chip=0" % tex,
+           "CARD-ART key=medusa:snipe lang=fallback tex=fallback show=hand su=150x208 px=0x0 scale=0.000 capped=0 "
+           "state=idle chip=0",
+           "CARD-ART key=medusa:snipe lang=de tex=x show=hand su=150x208 px=0x0 scale=0.000 capped=2 state=idle chip=0",
+           "CARD-ART key=medusa:snipe lang=ru"]
+    errors, _ = hc.check_widget_trace(bad, set(), card_registry=reg)
+    assert any("1.6" in e for e in errors) and any("ВР-CP10" in e for e in errors)
+    assert any("lang=de" in e for e in errors) and any("capped=2" in e for e in errors)
+    assert any("без поля scale" in e for e in errors)
+
+
 def test_check_trace_topstrip_hb14_16(tmp_path):
     """VS-2 HB-14...HB-16: the UI-IDs of 04 §7.1 are known to check-trace and their states come from its list."""
     spec04 = hc.SPEC04.read_text(encoding="utf-8")
