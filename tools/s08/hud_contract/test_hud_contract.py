@@ -73,3 +73,19 @@ class HudContractTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_check_trace_portrait_cp08():
+    """VS-2 CP-08 (ВР-CP10): PORTRAIT lines - scale <= 1.6, no monogram for a key the registry has."""
+    reg = hc.registry_portrait_keys()
+    assert {"king-arthur", "medusa", "king-arthur/merlin", "medusa/harpies"} <= reg
+    ok = ["PORTRAIT id=king-arthur tex=/Game/S08/UI/Portraits/T_Portrait_king_arthur.T_Portrait_king_arthur su=42.0 "
+          "px=84.0 scale=0.175 show=panel side=own state=avatar",
+          "PORTRAIT id=none tex=monogram su=42.0 px=42.0 scale=0.000 show=panel side=own state=avatar",
+          "PORTRAIT id=king-arthur/merlin tex=/Game/x su=38.4 px=153.6 scale=1.600 show=panel side=own state=avatar"]
+    errors, _ = hc.check_widget_trace(ok, set(), registry=reg)
+    assert errors == []
+    bad = ["PORTRAIT id=king-arthur/merlin tex=/Game/x su=42.0 px=168.0 scale=1.750 show=panel side=own state=avatar",
+           "PORTRAIT id=medusa tex=monogram su=42.0 px=42.0 scale=0.000 show=panel side=opp state=avatar"]
+    errors, _ = hc.check_widget_trace(bad, set(), registry=reg)
+    assert len(errors) == 2 and "1.6" in errors[0] and "monogram" in errors[1]

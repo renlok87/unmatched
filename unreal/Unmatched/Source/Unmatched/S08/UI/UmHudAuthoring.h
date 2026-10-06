@@ -5,6 +5,7 @@
 //   /Game/S08/UI/Hud/WBP_UI_SCR_GAME     UUmGameHud
 //   /Game/S08/UI/Common/WBP_UmButton     UUmButton
 //   /Game/S08/UI/Common/WBP_UmCursor     UUmCursor   (VS-2 HB-12)
+//   /Game/S08/UI/Common/WBP_UmPortrait   US08TurnPortraitWidget (VS-2 CP-08)
 // Called from UE Python: tools/s08/hud_contract/ue_author_um_hud.py (UnrealEditor-Cmd -run=pythonscript).
 #pragma once
 

@@ -7,6 +7,8 @@ their C++ bases (UUmHudAuthoringLibrary -> BuildDefaultTree of each class), in t
   /Game/S08/UI/Hud/WBP_UI_SCR_GAME    parent UmGameHud   parts Canvas + 18 block slots (04 §4.2)
   /Game/S08/UI/Common/WBP_UmButton    parent UmButton    parts Box, Body, Content, Icon, Label, KeyChip, KeyText, FocusRing
   /Game/S08/UI/Common/WBP_UmCursor    parent UmCursor    parts Box, Image (VS-2 HB-12)
+  /Game/S08/UI/Common/WBP_UmPortrait  parent S08TurnPortraitWidget  parts Panel, Avatar, DiscBox, Disc, AvatarImage,
+                                      MonogramText, NameText, StatusText, Stats, HpText, TrackerRow (VS-2 CP-08)
 
 A widget tree is not reachable from Python, so the C++ library builds it (the same function the class uses without a
 WBP) and this script re-loads every asset, checks the parent class, writes the report (env UM_HUD_WBP_REPORT, default
@@ -30,6 +32,7 @@ ASSETS = {
     "/Game/S08/UI/Hud/WBP_UI_SCR_GAME": "UmGameHud",
     "/Game/S08/UI/Common/WBP_UmButton": "UmButton",
     "/Game/S08/UI/Common/WBP_UmCursor": "UmCursor",
+    "/Game/S08/UI/Common/WBP_UmPortrait": "S08TurnPortraitWidget",
 }
 
 

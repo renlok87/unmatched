@@ -24,6 +24,7 @@
 #include "S08ArtLook.h"
 #include "S08BoardActor.h"
 #include "S08TraceLog.h"
+#include "S08TurnPortraitWidget.h"
 #include "UI/UmCursor.h"
 #include "UI/UmGameHud.h"
 #include "UI/UmHudGallery.h"
@@ -353,6 +354,10 @@ void AS08FlowGameMode::WriteUmHudShotLines() {
   FS08Trace::Write(UmHudRoot && UmHudRoot->HasCursors()
                        ? UmHudRoot->CursorShotLine(CursorPC ? CursorPC->CurrentMouseCursor.GetValue() : EMouseCursor::Default)
                        : UmCursor::SystemShotLine(TEXT("-S08SlateHud=cursor")));
+  // VS-2 CP-08: the portrait circles of PANEL-LOC / PANEL-OPP (ВР-CP10; check-trace: scale <= 1.6, no monogram)
+  for (const US08TurnPortraitWidget* Portrait : {OwnPortrait.Get(), OpponentPortrait.Get()}) {
+    if (Portrait && Portrait->IsVisible()) FS08Trace::Write(Portrait->PortraitShotLine(TEXT("panel")));
+  }
 }
 
 void AS08FlowGameMode::UmGalleryBegin(int32 SizePx) {

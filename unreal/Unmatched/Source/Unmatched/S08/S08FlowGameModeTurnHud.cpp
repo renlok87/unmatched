@@ -64,8 +64,8 @@ void AS08FlowGameMode::BuildTurnHudWidgets(const TSharedRef<SConstraintCanvas>& 
   }
   TurnHudLook = FS08TurnHudLook::FromCommandLine(FCommandLine::Get());
   const FS08ArtHudPlateStyle Chips;
-  OpponentPortrait = CreateWidget<US08TurnPortraitWidget>(World, US08TurnPortraitWidget::StaticClass());
-  OwnPortrait = CreateWidget<US08TurnPortraitWidget>(World, US08TurnPortraitWidget::StaticClass());
+  OpponentPortrait = US08TurnPortraitWidget::Create(World);  // VS-2 CP-08: WBP_UmPortrait when imported
+  OwnPortrait = US08TurnPortraitWidget::Create(World);
   if (!OpponentPortrait || !OwnPortrait) {
     OpponentPortrait = OwnPortrait = nullptr;
     ArtHud.PendingTrace.Add(TEXT("HUD-TURN config portraits=0 reason=create-failed"));
@@ -212,6 +212,7 @@ void AS08FlowGameMode::TickTurnHud() {
       }
     }
     Portrait->SetHeroName(PlayerHeroName(Panel->PlayerId));
+    if (Hero && !Hero->HeroSlug.IsEmpty()) Portrait->SetPortrait(FName(*Hero->HeroSlug));  // VS-2 CP-08: the avatar
     // AB-8 (DE-019, SD-38): the heart mark of the hero's death - the fallen heart with its cross; a new game (the
     // death stage reset) brings the full heart back. The fallen hero may be gone from the fighters by now.
     const FString HeroId = Hero ? Hero->Id : Heart.GetHeroId();
@@ -320,7 +321,7 @@ void AS08FlowGameMode::GalleryPortraitsBegin(bool bFromBenchFixture) {
   // the same column as the live HUD (BuildTurnHudWidgets), above the gallery (z 1000)
   TSharedRef<SVerticalBox> Column = SNew(SVerticalBox).Visibility(EVisibility::SelfHitTestInvisible);
   for (const FSample& S : Samples) {
-    US08TurnPortraitWidget* Portrait = CreateWidget<US08TurnPortraitWidget>(World, US08TurnPortraitWidget::StaticClass());
+    US08TurnPortraitWidget* Portrait = US08TurnPortraitWidget::Create(World);
     if (!Portrait) return;
     Portrait->Setup(S.bOpponent, TurnHudLook, Chips.TeamChipColor(S.Chip));
     Portrait->SetHeroName(S.Name);

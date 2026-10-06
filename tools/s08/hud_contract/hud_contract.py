@@ -6,7 +6,9 @@
                                                                     литералов цвета в S08/UI; коды why.* против 02 §4.2
   python tools/s08/hud_contract/hud_contract.py linear              таблица hex sRGB -> linear (как FLinearColor::FromSRGBColor)
   python tools/s08/hud_contract/hud_contract.py check-trace <log> [--width 1920 --height 1080]
-                                                                    гейт строк `SHOT widget id=… bbox=… geom=painted`
+                                                                    гейт строк `SHOT widget id=… bbox=… geom=painted`,
+                                                                    `HUD-LAYOUT` и `PORTRAIT` (CP-08: scale ≤ 1,6, нет
+                                                                    монограммы при ключе из реестра)
 
 Только stdlib. Код выхода: 0 — ошибок нет, 1 — есть ошибки.
 """
@@ -39,6 +41,10 @@ SHOT_RE = re.compile(r"SHOT widget (.*)$")
 # VS-2 HB-06 (04 §1.6, §4.5, §7.1): one line per shot frame - persistent blocks x FIELD must be 0 (overlapField)
 LAYOUT_RE = re.compile(r"HUD-LAYOUT (.*)$")
 ARG_RE = re.compile(r"\{([A-Za-z_][A-Za-z0-9_]*)\}")
+# VS-2 CP-08 (ВР-CP10, ВР-CP04): the portrait circle - scale <= 1.6, no monogram for a key the registry has
+PORTRAIT_RE = re.compile(r"PORTRAIT (id=.*)$")
+PORTRAIT_CAP = 1.6
+CARD_MEDIA = REPO / "unreal/Unmatched/Config/Cards/S08CardMedia.json"
 
 
 def load(path):
@@ -190,12 +196,50 @@ def parse_bbox(value):
     return x, y, w, h
 
 
-def check_widget_trace(lines, known_ids, width=1920, height=1080):
+def registry_portrait_keys(path=CARD_MEDIA):
+    """Portrait keys of the registry as the client names them: 'king-arthur', 'king-arthur/merlin'."""
+    try:
+        entries = load(path)["entries"]
+    except (OSError, ValueError, KeyError):
+        return set()
+    out = set()
+    for e in entries:
+        if e.get("kind") == "portrait" and e.get("key", "").startswith("portrait:"):
+            out.add("/".join(e["key"].split(":")[1:]))
+    return out
+
+
+def check_portrait_line(n, line, registry):
+    """VS-2 CP-08: one 'PORTRAIT id=.. tex=.. su=.. px=.. scale=.. show=..' line -> errors."""
+    m = PORTRAIT_RE.search(line.rstrip("\r\n"))
+    if not m:
+        return None
+    f = dict(w.split("=", 1) for w in m.group(1).split() if "=" in w)
+    errors = []
+    for k in ("id", "tex", "su", "px", "scale", "show"):
+        if k not in f:
+            errors.append("строка %d: PORTRAIT без поля %s" % (n, k))
+    try:
+        if float(f.get("scale", "0")) > PORTRAIT_CAP + 1e-6:
+            errors.append("строка %d: PORTRAIT id=%s scale=%s > %.1f (ВР-CP04)" % (n, f.get("id"), f["scale"], PORTRAIT_CAP))
+    except ValueError:
+        errors.append("строка %d: PORTRAIT scale=%r" % (n, f.get("scale")))
+    if f.get("tex") == "monogram" and f.get("id") in registry:
+        errors.append("строка %d: PORTRAIT id=%s tex=monogram, а аватар есть в реестре (ВР-CP10)" % (n, f["id"]))
+    return errors
+
+
+def check_widget_trace(lines, known_ids, width=1920, height=1080, registry=None):
     """Правило 3: гейт по трассе геометрии виджета, не по пикселям. Невидимая часть (visible=0, например
     сравнительный Slate-двойник или скрытая иконка в поздней строке W5b-R) может быть unpainted."""
     errors, seen = [], 0
     ids = set(known_ids) | ART_HUD_IDS
+    registry = registry_portrait_keys() if registry is None else registry
     for n, line in enumerate(lines, 1):
+        por = check_portrait_line(n, line, registry)
+        if por is not None:
+            errors += por
+            continue
         lay = parse_layout(line)
         if lay is not None:
             # VS-2 HB-06: the persistent blocks keep out of FIELD (04 §1.6, D-10 W5b-R); "crossing" names them
