@@ -1,0 +1,18 @@
+{
+  "task": "IC-37",
+  "status": "предложено",
+  "method": "Visual inspection of all original A/B generations and color/grayscale comparison sheets; final geometry evaluated separately at 24, 32 and 48 px",
+  "refinements_used": 0,
+  "decisions": {
+    "gray": {"recommended": "A", "reason": "Сплошной квадрат сохраняет простую самостоятельную форму; B добавляет мелкую деталь без нового смысла.", "observed_deviation": "B имеет скошенный угол вместо прямоугольной выемки; A имеет слишком большие радиусы плашки. Финал берёт геометрию плашки из v3."},
+    "green": {"recommended": "A", "reason": "Один наклонный лист сохраняет направленность на 24 px; росток B требует стебля и развилки двух листьев.", "observed_deviation": "A добавил стебель и клиновидную жилку; в векторе стебля нет, жилка постоянной ширины удаляется на малых размерах."},
+    "blue": {"recommended": "A", "reason": "Две одинаковые волны дают повторяющуюся форму; гребень волны B значительно сложнее и конкурирует с язычком пламени.", "observed_deviation": "Сгенерированные концы волн округлены и слегка заужены; вектор использует плоские концы и один снэпнутый вес W."},
+    "violet": {"recommended": "A", "reason": "Один полумесяц читается без дополнительной точки B; точка могла бы сближать знак с yellow.", "observed_deviation": "В A/B нет строгого геометрического офсета окружностей; финал задаёт два радиуса и сдвиг числами."},
+    "purple": {"recommended": "A", "reason": "Одна арка с квадратным проёмом остаётся цельной. В B два дополнительных внутренних края ухудшают чтение при уменьшении.", "observed_deviation": "B стал двумя вложенными арками вместо двухступенчатой арки; исходная генерация сохранена, вариант не рекомендован."},
+    "red": {"recommended": "A", "reason": "Форма с одним внутренним вырезом имеет характерный огненный контур. Вектор полностью убирает внутреннюю деталь на 24/32 px; два языка B не несут отдельного смысла.", "observed_deviation": "A трактует внутренний язычок открытой прорезью и добавляет острые изгибы; вектор упрощает их до одного выреза на крупных размерах."},
+    "brown": {"recommended": "A", "reason": "Трапеция имеет широкий плоский верх; два перекрывающихся округлых холма B добавляют внутреннюю разделительную линию и сближают знак с группой точек.", "observed_deviation": "B добавил заметную разделительную keyline между холмами; финал A состоит из одной трапеции."},
+    "yellow": {"recommended": "A", "reason": "Три отдельные точки в треугольном расположении соответствуют карточке и отличаются от типографического многоточия B.", "observed_deviation": "Размер и расстояние точек ImageGen не привязаны к пиксельной сетке; вектор уменьшает радиус до 1.5 u, чтобы keyline не соединялись на 24 px."}
+  },
+  "raw_concept_style_limits": "ImageGen originals have nonuniform flat fills and variable corner radii; original pixels are preserved. Exact tokens, dimensions, pixel snapping and absence of print texture are guaranteed only for the procedural vector exports.",
+  "art_acceptance": "Package proposal only; no integration or acceptance of runtime art is claimed"
+}

@@ -1,0 +1,36 @@
+{
+  "task": "IC-36",
+  "status": "предложено",
+  "complete": true,
+  "review_method": "PNG opened with view_image: eight raw concepts on a contact sheet, all 64 exports on an audit sheet, master comparison sheets, working-size sheets and grayscale neighbours. Master cells are 1024 pixels; the audit contact alone uses a master thumbnail.",
+  "opened_sheets": [
+    "comparison/concepts-unretouched-contact.png",
+    "comparison/export-audit-all-64.png",
+    "comparison/vector-first-check.png",
+    "comparison/vector-overview-color.png",
+    "comparison/neighbours-gray-navy-compact.png",
+    "comparison/compare-24-color.png",
+    "comparison/compare-32-gray.png",
+    "comparison/compare-48-color.png",
+    "comparison/end-turn-1024-color.png",
+    "comparison/card-drop-1024-gray.png",
+    "comparison/log-1024-color.png",
+    "comparison/pointer-1024-gray.png"
+  ],
+  "recommended_variants": {"end-turn": "vector A", "card-drop": "vector A", "log": "vector A", "pointer": "vector A"},
+  "working_sizes": {
+    "24": "Стоп-черта отделена от стрелки; две скошенные карты видны; три квадратных маркера отличают журнал; рука различается с обычной стрелкой. На креме keyline держит контур.",
+    "32": "Все четыре формы и их отрицательные промежутки различимы на трёх фонах, в том числе в сером.",
+    "48": "Геометрия читается свободнее; декоративная прорезь ладони убрана, поскольку выглядела отверстием.",
+    "16_21": "Диагностические размеры: на 16 px огрубляются скосы стопки и пальцы; основной HUD рекомендован от 24 px."
+  },
+  "concept_failures": [
+    "Во всех исходных концептах есть слабая неоднородность navy; hex и идеально плоский фон не гарантированы.",
+    "card-drop A изображает плашки как ромбические пластины вместо v3-параллелограммов; вектор исправляет форму по resource-card.",
+    "card-drop B добавляет не заказанную отдельно изогнутую стрелку, округлые края стопки и контур карты; это перегружает малый размер.",
+    "log A и B показаны генератором вместе с тёмной круглой кнопкой; финальный вектор содержит только голый глиф и keyline.",
+    "pointer A помещён генератором в круглый медальон, хотя нужен курсор. Медальон сохранён в оригинале и полностью отсутствует в векторе.",
+    "На пересобранном фоне у части концептов остаются следы тональной неоднородности и сглаженной внешней границы; это недостаток review-only извлечения фона, а не финального вектора."
+  ],
+  "verdict": "Векторные формы предложены для ревью Claude; runtime-проверка и арт-приёмка в этой задаче не заявлены."
+}
