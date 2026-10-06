@@ -296,7 +296,7 @@ bool US08IconGalleryWidget::Initialize() {
     Background->SetHorizontalAlignment(HAlign_Center);
     Background->SetVerticalAlignment(VAlign_Center);
     Grid = WidgetTree->ConstructWidget<UUniformGridPanel>(UUniformGridPanel::StaticClass(), TEXT("Grid"));
-    Grid->SetSlotPadding(FMargin(6.0f));
+    Grid->SetSlotPadding(FMargin(SlotPaddingSu));
     Background->SetContent(Grid);
     WidgetTree->RootWidget = Background;
   }
@@ -311,7 +311,7 @@ int32 US08IconGalleryWidget::Build(float InSizeSu, int32 InTexturePx, bool bInRe
   Scripts.Reset();
   const FS08IconMotionLibrary& Lib = FS08IconMotionLibrary::Get();
   const float Pad = FMath::RoundToFloat(0.25f * InSizeSu);
-  const FVector2D Cell(FMath::Max(2.0f * InSizeSu + 2.0f * Pad, 168.0f), InSizeSu + 2.0f * Pad + 34.0f);
+  const FVector2D Cell = CellSizeSu(InSizeSu);
   int32 Index = 0;
   for (const FName Id : Lib.Order) {
     const FS08IconMotionDef* Def = Lib.Find(Id);
@@ -386,6 +386,25 @@ void US08IconGalleryWidget::NativeTick(const FGeometry& MyGeometry, float InDelt
   const double T0 = FPlatformTime::Seconds();
   EvaluateAt(GetClockMs());
   EvalSamples.Add(static_cast<float>((FPlatformTime::Seconds() - T0) * 1000.0));
+}
+
+FVector2D US08IconGalleryWidget::CellSizeSu(float SizeSu) {
+  const float Pad = FMath::RoundToFloat(0.25f * SizeSu);
+  return FVector2D(FMath::Max(2.0f * SizeSu + 2.0f * Pad, 168.0f), SizeSu + 2.0f * Pad + 34.0f);
+}
+
+int32 US08IconGalleryWidget::ColumnsToFit(int32 Count, float SizeSu, float CanvasHeightSu) {
+  const float RowSu = CellSizeSu(SizeSu).Y + 2.0f * SlotPaddingSu;
+  const int32 Rows = FMath::Max(1, FMath::FloorToInt(CanvasHeightSu / RowSu));
+  return FMath::Max(6, FMath::DivideAndRoundUp(FMath::Max(Count, 1), Rows));
+}
+
+FString US08IconGalleryWidget::IdList() const {
+  TArray<FString> Ids;
+  for (const US08AnimatedIconWidget* Icon : Icons) {
+    if (Icon) Ids.Add(Icon->GetIconId().ToString());
+  }
+  return FString::Join(Ids, TEXT(","));
 }
 
 FString US08IconGalleryWidget::PerfSummary() const {

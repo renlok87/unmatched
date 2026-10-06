@@ -47,9 +47,11 @@ bool AS08FlowGameMode::IconGalleryBegin() {
   // VS-2 HB-23: -S08IconGallerySu=<su> - every icon by its display size (the export for su x DPI x UI scale)
   float DisplaySu = 0.0f;
   const bool bBySu = FParse::Value(Cmd, TEXT("S08IconGallerySu="), DisplaySu) && DisplaySu > 0.0f;
-  const int32 Count = IconGallery ? IconGallery->Build(bBySu ? DisplaySu : static_cast<float>(SizePx), bBySu ? 0 : SizePx,
-                                                       bReduced, 6, bLabels)
-                                  : 0;
+  const float CellSu = bBySu ? DisplaySu : static_cast<float>(SizePx);
+  // VS-2 IC-70: every row inside the 1080 su canvas (45 icons at 64 su: 7 columns; 6 columns squeezed the 8 rows
+  // and set every icon half a pixel off)
+  const int32 Columns = US08IconGalleryWidget::ColumnsToFit(Lib.Order.Num(), CellSu, 1080.0f);
+  const int32 Count = IconGallery ? IconGallery->Build(CellSu, bBySu ? 0 : SizePx, bReduced, Columns, bLabels) : 0;
   if (IconGallery) IconGallery->AddToViewport(1000);
   UmGalleryBegin(SizePx);  // VS-2 HB-10 / HB-11: -S08IconGallerySkins[=<page>], -S08IconGalleryButtons
   if (FParse::Param(Cmd, TEXT("S08IconGalleryPortraits"))) GalleryPortraitsBegin();  // DE-023 review tooling
@@ -62,6 +64,11 @@ bool AS08FlowGameMode::IconGalleryBegin() {
       TEXT("ICONGALLERY start icons=%d size=%d reduced=%d contract=%s loaded=%d shots=%s times=%d"), Count, SizePx,
       bReduced ? 1 : 0, *Lib.Revision, Lib.bLoaded ? 1 : 0,
       IconGalleryShotDir.IsEmpty() ? TEXT("none") : *IconGalleryShotDir, IconGalleryTimes.Num()));
+  // VS-2 IC-70: every gallery id in grid order (G-ICON checks the new contract ids against this line).
+  if (IconGallery) {
+    FS08Trace::Write(
+        FString::Printf(TEXT("ICONGALLERY ids n=%d columns=%d list=%s"), Count, Columns, *IconGallery->IdList()));
+  }
   return true;
 }
 

@@ -365,5 +365,85 @@ class IconMotionSemanticsTests(unittest.TestCase):
         self.assertAlmostEqual(self.pose(a, 700)[0]["all"]["scale"], 1.0, 4)
 
 
+class GalleryRasterTests(unittest.TestCase):
+    """VS-2 IC-70 (ВР-VS2-37): эталон G-ICON растрируется как Slate (raster="ue": углы осевого квада на целых
+    пикселях, выборка sRGB-текстуры в линейном свете); на покое он совпадает с растром листов (raster="ref")."""
+
+    @classmethod
+    def setUpClass(cls):
+        try:
+            import motion as MO  # noqa: F401  (draw_icons: pycairo)
+        except ImportError as e:  # pragma: no cover
+            raise unittest.SkipTest(f"motion.py: {e}")
+        cls.MO = MO
+        cls.c = M.load_contract(str(CONTRACT))
+
+    def pose_at(self, icon, anim, t_ms):
+        a = M.Animator(self.c, icon)
+        a.play("appear", 0)
+        a.play(anim, 400)
+        pp, vis = a.pose(400 + t_ms)
+        self.assertTrue(vis)
+        return a, pp
+
+    def test_rest_pose_is_the_same_in_both_rasters(self):
+        import numpy as np
+        a = M.Animator(self.c, "action-end-turn")
+        a.play("appear", 0)
+        pp, _ = a.pose(400)
+        self.assertAlmostEqual(pp["pose"]["all"]["scale"], 1.0, 6)
+        ref = np.asarray(self.MO.compose(a, pp, 64, raster="ref"))
+        ue = np.asarray(self.MO.compose(a, pp, 64, raster="ue"))
+        self.assertTrue(np.array_equal(ref, ue))
+
+    def test_ue_raster_snaps_the_scaled_quad_to_pixels(self):
+        import numpy as np
+        a, pp = self.pose_at("action-attack", "hover_in", 250)  # hover 1,06: квад 64 px -> 67,8 px
+        self.assertGreater(pp["pose"]["all"]["scale"], 1.03)
+        ue = np.asarray(self.MO.compose(a, pp, 64, raster="ue")).astype(int)
+        ref = np.asarray(self.MO.compose(a, pp, 64, raster="ref")).astype(int)
+        self.assertGreater(np.abs(ue - ref).sum(), 0)
+        k = pp["pose"]["all"]["scale"]
+        Mx = self.MO._snap_quad(np.array([[k, 0, 16 + 32 * (1 - k)], [0, k, 16 + 32 * (1 - k)], [0, 0, 1.0]]), 64, 64)
+        for v in (Mx[0, 2], Mx[0, 0] * 64 + Mx[0, 2]):
+            self.assertEqual(v, round(v))
+
+    def test_linear_light_filter_brightens_a_dark_to_light_edge(self):
+        import numpy as np
+        from PIL import Image
+        tex = Image.new("RGBA", (2, 1), (0, 0, 0, 255))
+        tex.putpixel((1, 0), (255, 255, 255, 255))
+        inv = (0.5, 0, -0.25, 0, 1, 0)  # 4 px из 2 текселей: середина — смесь 50/50
+        lin = np.asarray(self.MO._transform_linear(tex, (4, 1), inv))[0, :, 0].tolist()
+        gam = np.asarray(tex.transform((4, 1), Image.AFFINE, data=inv, resample=Image.BILINEAR))[0, :, 0].tolist()
+        self.assertGreater(lin[1] + lin[2], gam[1] + gam[2])
+
+
+class GalleryCompareSummaryTests(unittest.TestCase):
+    """compare_ue_gallery.summarize: средние по новым id и сверка трассы ICONGALLERY ids со списками контракта."""
+
+    def test_trace_lists_every_contract_id(self):
+        import tempfile
+        try:
+            import compare_ue_gallery as G
+        except ImportError as e:  # pragma: no cover
+            raise unittest.SkipTest(f"compare_ue_gallery.py: {e}")
+        c = M.load_contract(str(CONTRACT))
+        metrics = {i: {"0": {"mean": 0.1, "p99": 1, "max": 2, "local_ms": 0.0}} for i in c["order"]}
+        with tempfile.TemporaryDirectory() as d:
+            ids = ",".join(c["order"])
+            with open(os.path.join(d, "gallery.trace.log"), "w", encoding="utf-8") as fh:
+                fh.write(f"2026.10.06-15.17.43 ICONGALLERY ids n={len(c['order'])} columns=7 list={ids}\n")
+            s = G.summarize(c, metrics, d)
+            self.assertTrue(s["trace_ok"])
+            self.assertEqual(s["new_pairs"], len(c["accepted_vr44"]))
+            self.assertAlmostEqual(s["new_mean"], 0.1, 6)
+            with open(os.path.join(d, "gallery.trace.log"), "w", encoding="utf-8") as fh:
+                fh.write("ICONGALLERY ids n=1 columns=7 list=state-boost\n")
+            s = G.summarize(c, metrics, d)
+            self.assertFalse(s["trace_ok"])
+            self.assertIn("ui-log", s["trace_missing"])
+
+
 if __name__ == "__main__":
     unittest.main()

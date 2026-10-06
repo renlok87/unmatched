@@ -135,6 +135,15 @@ public:
   void EvaluateAt(float TMs);
   int32 GetIconCount() const { return Icons.Num(); }
   US08AnimatedIconWidget* GetIcon(int32 Index) const { return Icons.IsValidIndex(Index) ? Icons[Index] : nullptr; }
+  /** VS-2 IC-70: the ids of the built grid in grid order, comma separated (trace `ICONGALLERY ids`). */
+  FString IdList() const;
+  /** Cell of one icon (su): side 2:1 wide enough for the plates, the icon + 0.25 side padding + the id caption. */
+  static FVector2D CellSizeSu(float SizeSu);
+  /** VS-2 IC-70: columns (>= 6) so that every row fits CanvasHeightSu. A grid taller than the canvas squeezes its
+   *  rows: the fixed cell is centred in a shorter slot at a half-pixel offset and the caption rises into the icon,
+   *  and every scaled pose then differs from the reference by the resampling of that offset (G-ICON). */
+  static int32 ColumnsToFit(int32 Count, float SizeSu, float CanvasHeightSu);
+  static constexpr float SlotPaddingSu = 6.0f;
   static constexpr float PauseMs = 400.0f;
   /** Cost of EvaluateAt (all icons: replay + pose + render transforms) per frame since Build: "avg p95 max frames". */
   FString PerfSummary() const;

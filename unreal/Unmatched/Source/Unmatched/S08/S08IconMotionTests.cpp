@@ -20,6 +20,8 @@
 //   TurnHudRollbacks - run I: each rollback flag restores its old part (-S08TurnRingLegacy no ring, -S08HeartGlowLegacy
 //             no halo, -S08TrackerLegacy the v3 slots spend / gain, -S08CrossLegacy no fallen glyph), the ring choice
 //             of -S08TurnRingIcon, the trace fields (HUD-TURN config, ARTLOOK hud=...).
+//   GalleryIds - VS-2 IC-70: the -S08IconGallery grid = contract order, its rows fit the 1080 su canvas, and its
+//             `ICONGALLERY ids` list names every id of accepted_vr44, accepted_de012 and candidates.
 // Headless:
 //   UnrealEditor-Cmd.exe Unmatched.uproject -ExecCmds="Automation RunTests Unmatched.S08.IconMotion; Quit"
 //     -unattended -nosplash -nullrhi
@@ -706,6 +708,53 @@ bool FS08IconMotionTurnHudRollbacksTest::RunTest(const FString& Parameters) {
                 TEXT("-S08TurnRingLegacy -S08HeartGlowLegacy -S08TrackerLegacy -S08CrossLegacy"))
                 .Describe(),
             FString(TEXT("ring=none heartGlow=0 tracker=v3 cross=0")));
+  return true;
+}
+
+// VS-2 IC-70: the -S08IconGallery grid holds every contract icon in `order`, and the trace line `ICONGALLERY ids`
+// (US08IconGalleryWidget::IdList) names each id of the contract lists accepted_vr44, accepted_de012 and candidates.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08IconMotionGalleryIdsTest, "Unmatched.S08.IconMotion.GalleryIds",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FS08IconMotionGalleryIdsTest::RunTest(const FString& Parameters) {
+  FString Text;
+  if (!TestTrue(TEXT("contract file"), FFileHelper::LoadFileToString(Text, *FS08IconMotionLibrary::DefaultPath()))) {
+    return false;
+  }
+  TSharedPtr<FJsonObject> Root;
+  const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Text);
+  if (!TestTrue(TEXT("contract parses"), FJsonSerializer::Deserialize(Reader, Root) && Root.IsValid())) return false;
+  FS08IconTestWorld W(TEXT("S08IconMotionGalleryIdsTest"));
+  if (!TestNotNull(TEXT("test world"), W.World)) return false;
+  US08IconGalleryWidget* Gallery = CreateWidget<US08IconGalleryWidget>(W.World, US08IconGalleryWidget::StaticClass());
+  if (!TestNotNull(TEXT("gallery widget"), Gallery)) return false;
+  const FS08IconMotionLibrary& Lib = FS08IconMotionLibrary::Get();
+  // Rows fit the 1080 su canvas: 45 icons at 64 su -> 7 columns x 7 rows (6 columns would squeeze 8 rows into 1080 su
+  // and centre each 130 su cell half a pixel off); 28 icons (run I) keep the 6 columns.
+  const int32 Columns = US08IconGalleryWidget::ColumnsToFit(Lib.Order.Num(), 64.0f, 1080.0f);
+  TestEqual(TEXT("cell 64 su"), US08IconGalleryWidget::CellSizeSu(64.0f), FVector2D(168.0, 130.0));
+  TestEqual(TEXT("45 icons -> 7 columns"), US08IconGalleryWidget::ColumnsToFit(45, 64.0f, 1080.0f), 7);
+  TestEqual(TEXT("28 icons -> 6 columns"), US08IconGalleryWidget::ColumnsToFit(28, 64.0f, 1080.0f), 6);
+  const int32 Rows = FMath::DivideAndRoundUp(Lib.Order.Num(), Columns);
+  TestTrue(TEXT("rows fit 1080 su"),
+           Rows * (US08IconGalleryWidget::CellSizeSu(64.0f).Y + 2.0f * US08IconGalleryWidget::SlotPaddingSu) <= 1080.0f);
+  const int32 Count = Gallery->Build(64.0f, 64, /*bInReduced=*/false, Columns, /*bLabels=*/true);
+  TestEqual(TEXT("gallery = contract order"), Count, Lib.Order.Num());
+  TArray<FString> Ids;
+  Gallery->IdList().ParseIntoArray(Ids, TEXT(","), true);
+  TestEqual(TEXT("IdList count"), Ids.Num(), Count);
+  for (int32 I = 0; I < FMath::Min(Ids.Num(), Lib.Order.Num()); ++I) {
+    TestEqual(*FString::Printf(TEXT("grid %d in contract order"), I), Ids[I], Lib.Order[I].ToString());
+  }
+  int32 Listed = 0;
+  for (const TCHAR* List : {TEXT("accepted_vr44"), TEXT("accepted_de012"), TEXT("candidates")}) {
+    const TArray<TSharedPtr<FJsonValue>>* Values = nullptr;
+    if (!TestTrue(*FString::Printf(TEXT("%s present"), List), Root->TryGetArrayField(List, Values) && Values)) continue;
+    for (const TSharedPtr<FJsonValue>& V : *Values) {
+      TestTrue(*FString::Printf(TEXT("%s %s in the gallery trace"), List, *V->AsString()), Ids.Contains(V->AsString()));
+      ++Listed;
+    }
+  }
+  TestEqual(TEXT("17 VR44 + 4 DE-012 + 1 candidate"), Listed, 22);
   return true;
 }
 
