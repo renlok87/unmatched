@@ -22,7 +22,9 @@
 
 #include "S08AnimatedIconWidget.h"
 #include "S08ArtLook.h"
+#include "S08BoardActor.h"
 #include "S08TraceLog.h"
+#include "UI/UmCursor.h"
 #include "UI/UmGameHud.h"
 #include "UI/UmHudGallery.h"
 #include "UI/UmHudLayout.h"
@@ -34,6 +36,7 @@
 #include "Engine/GameViewportClient.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
+#include "HAL/PlatformTime.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
 #include "Widgets/Layout/SBorder.h"
@@ -67,6 +70,8 @@ struct FUmHudRuntime {
   FString LastStackLine;
   // the SD-26 lowering cap of the hand (traced on a change)
   float HandCapSu = -1.0f;
+  // VS-2 HB-12: the board half of the software cursor (UmCursor.h)
+  FUmBoardCursor BoardCursor;
 };
 
 namespace {
@@ -122,6 +127,11 @@ void AS08FlowGameMode::BuildUmHud() {
       bRootParts ? 1 : 0, bGameParts ? 1 : 0,
       (RootMissing + GameMissing).IsEmpty() ? TEXT("-") : *(RootMissing + TEXT(" ") + GameMissing),
       R.Blocks.Blocks.Num() ? *R.Blocks.ImplField() : TEXT("-"), Unknown.Num() ? *FString::Join(Unknown, TEXT(",")) : TEXT("-")));
+  // VS-2 HB-12: the software cursors (04 §3.2); -S08SlateHud=cursor keeps the system cursor
+  FString CursorSource;
+  const bool bCursors = !R.Blocks.IsSlate(FName(TEXT("cursor"))) && UmHudRoot->InstallCursors(&CursorSource);
+  ArtHud.PendingTrace.Add(FString::Printf(TEXT("HUD-CURSOR installed=%d impl=%s source=%s"), bCursors ? 1 : 0,
+                                          bCursors ? TEXT("software") : TEXT("system"), bCursors ? *CursorSource : TEXT("-")));
   RefreshUmHudLayout();
 }
 
@@ -132,6 +142,7 @@ void AS08FlowGameMode::HandleUmHudEndPlay() {
     UmHudScale::OnUiScaleChanged().Remove(UmHud->ScaleHandle);
     UmHud->ScaleHandle.Reset();
   }
+  if (UmHudRoot) UmHudRoot->UninstallCursors();  // VS-2 HB-12
   if (UmHudRoot) UmHudRoot->RemoveFromParent();
 }
 
@@ -236,6 +247,21 @@ void AS08FlowGameMode::UmHudDeckPanelLayering(float DeckAlpha) {
 }
 
 void AS08FlowGameMode::TickUmHud() {
+  // VS-2 HB-12: Hand over an own figure or a lit cell (picked when the pointer moved), the busy loop while in flight
+  if (UmHud.IsValid() && UmHudRoot && UmHudRoot->HasCursors()) {
+    APlayerController* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
+    float MX = -1.0f, MY = -1.0f;
+    if (PC && BoardActor && PC->GetMousePosition(MX, MY) && UmHud->BoardCursor.NeedsPick(FVector2D(MX, MY), GFrameCounter)) {
+      FIntPoint Cell(-1, -1);
+      FString FighterId;
+      PickBoardUnderCursor(PC, Cell, FighterId);
+      const FS08BoardFighter* F = Fighters.FindByPredicate([&FighterId](const FS08BoardFighter& X) { return X.Id == FighterId; });
+      const bool bOwn = F && !F->OwnerId.IsEmpty() && F->OwnerId == ViewerIdNow();
+      PC->CurrentMouseCursor =
+          UmHud->BoardCursor.Store(FVector2D(MX, MY), GFrameCounter, bOwn, Cell.X >= 0 && BoardActor->IsCellHighlighted(Cell));
+    }
+    UmHudRoot->TickCursors(HudBusyReason().IsSet(), FPlatformTime::Seconds());
+  }
   if (!UmHud.IsValid() || !UmHud->bLayout || !UmHud->Blocks.UmgRoot()) return;
   FUmHudRuntime& R = *UmHud;
   const float PxPerSu = HudPixelsPerUnit() > 0.0f ? HudPixelsPerUnit() : R.Layout.PxPerSu;
@@ -322,6 +348,11 @@ void AS08FlowGameMode::WriteUmHudShotLines() {
     }
   }
   if (!R.LastStackLine.IsEmpty()) FS08Trace::Write(R.LastStackLine);
+  // VS-2 HB-12: the cursor Slate drew for this frame (or the system cursor of the rollback)
+  const APlayerController* CursorPC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
+  FS08Trace::Write(UmHudRoot && UmHudRoot->HasCursors()
+                       ? UmHudRoot->CursorShotLine(CursorPC ? CursorPC->CurrentMouseCursor.GetValue() : EMouseCursor::Default)
+                       : UmCursor::SystemShotLine(TEXT("-S08SlateHud=cursor")));
 }
 
 void AS08FlowGameMode::UmGalleryBegin(int32 SizePx) {

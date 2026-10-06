@@ -56,3 +56,24 @@ def test_check_plan_flags_a_wrong_x2():
     entries = hs.plan()
     entries[0]["sizes"]["x2"] = [entries[0]["sizes"]["x1"][0] * 3, entries[0]["sizes"]["x1"][1] * 3]
     assert any("not twice" in e for e in hs.check_plan(entries))
+
+
+# ---- VS-2 HB-12: the software cursors (--cursors) ----------------------------------------------------------------------
+def test_cursor_plan_names_and_hotspots():
+    entries = hs.cursor_plan()
+    assert len(entries) == 44  # default, pointer, denied x 4 sizes + busy 8 frames x 4 sizes
+    names = {e["name"] for e in entries}
+    for want in ("T_Cursor_Default", "T_Cursor_Pointer_24", "T_Cursor_Denied_48", "T_Cursor_Pointer_x2",
+                 "T_Cursor_Busy_00", "T_Cursor_Busy_07_x2"):
+        assert want in names
+    pointer = {e["px"]: e["hotspot"] for e in entries if e["state"] == "Pointer"}
+    assert pointer == {24: [8, 2], 32: [11, 2], 48: [17, 3], 64: [22, 4]}  # IC-36 fix1 fingertip (11, 2) u
+    busy = {e["px"]: e["hotspot"] for e in entries if e["state"] == "Busy"}
+    assert busy == {24: [12, 12], 32: [16, 16], 48: [24, 24], 64: [32, 32]}
+
+
+def test_cursor_config_copy_is_current():
+    """unreal/Unmatched/Config/Cursors/S08CursorHotspots.json (read by UUmCursor) = the plan of cursor-hotspots.json."""
+    import json
+    on_disk = json.loads(hs.CURSOR_HOTSPOTS_CONFIG.read_text(encoding="utf-8"))
+    assert on_disk == hs.cursor_hotspots_config(hs.cursor_plan())

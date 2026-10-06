@@ -3,6 +3,7 @@
 
 #include "../S08ArtHudAuthoring.h"
 #include "UmButton.h"
+#include "UmCursor.h"
 #include "UmGameHud.h"
 #include "UmHudRoot.h"
 #include "Dom/JsonObject.h"
@@ -28,6 +29,8 @@ FString UUmHudAuthoringLibrary::AuthorUmHudWidgetBlueprints(bool bOverwrite) {
       [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmGameHud::BuildDefaultTree(Tree, Attach, Error); });
   One(UUmButton::WidgetBlueprintPath, UUmButton::StaticClass(),
       [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmButton::BuildDefaultTree(Tree, Attach, Error); });
+  One(UUmCursor::WidgetBlueprintPath, UUmCursor::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmCursor::BuildDefaultTree(Tree, Attach, Error); });
   Report->SetArrayField(TEXT("assets"), Assets);
   FString Out;
   const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&Out);

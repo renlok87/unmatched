@@ -341,6 +341,9 @@ void UUmButton::Restyle() {
   if (Label) Label->SetColorAndOpacity(FSlateColor(Theme.Color(UmButton::TextColorToken(Model.Variant, State))));
   if (KeyText) KeyText->SetColorAndOpacity(FSlateColor(Theme.Color(bOff ? TEXT("text.secondary") : TEXT("text.primary"))));
   if (Icon) Icon->SetRenderOpacity(bOff ? Theme.Alpha(TEXT("state.disabled.opacity")) : 1.0f);
+  // VS-2 HB-12 (04 §3.2): the pointer over a pressable button, "denied" over a disabled one (with its why.*); while a
+  // command is in flight every registered cursor shows the hourglass anyway (UUmHudRoot::TickCursors)
+  SetCursor(State == EUmButtonState::Disabled ? EMouseCursor::SlashedCircle : EMouseCursor::Hand);
   if (FocusRing) {
     const bool bRing = Model.bFocused;
     if (bRing) {

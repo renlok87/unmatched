@@ -2419,6 +2419,8 @@ TSharedRef<SWidget> AS08FlowGameMode::MakeHudPress(FName Id, TFunction<FS09Reaso
         HandleHudPressOutcome(Outcome, Blocked, Action);
       }),
       Padding, Tint, bDimmed, Label);
+  // VS-2 HB-12: the pointer over a pressable element, "denied" over a blocked one (04 §3.2; -S08SlateHud=cursor: none)
+  if (!UmHudBlockOnSlate(TEXT("cursor"))) Element->SetCursor(TOptional<EMouseCursor::Type>(bDimmed ? EMouseCursor::SlashedCircle : EMouseCursor::Hand));
   HudPressWidgets.Add(Id, Element); // the newest instance of the id (flag step 'hudendturn')
   return Element;
 }

@@ -17,6 +17,15 @@ picked by UUmHudTheme::SkinFor at DPI x UI scale >= 1.5. The card.frame.* keys (
 hud_theme_import.py calls bind_theme() after it refills the theme, so a token re-import keeps the PNG skins.
 Report: art/imagegen/hud-skins-v1-codex/ue-import-report.json (source sha256, asset, size, margins per texture).
 Stdlib + unreal (lazy): the planning half is importable by pytest (tools/art/tests/test_hud_skins_import.py).
+
+--cursors (VS-2 HB-12; IC-58...IC-61 ue_target, 04 §3.2, ВР-VS2-27): the software cursors of the v3 set instead -
+  -script="<repo>/tools/art/hud_skins_import.py --cursors". Sources art/imagegen/hud-icons-v3/sizes/cursor-<id>-<px>.png
+  (default, pointer, unavailable) and layers/cursor-busy_fNN-<px>.png (8 frames), px 24 / 32 / 48 / 64 (the vector
+  exports, CURSOR_SIZES of draw_icons.py). Assets /Game/S08/UI/Cursors/T_Cursor_<State>[_NN]<suffix>: State Default,
+  Pointer, Denied, Busy (NN = frame); suffix "" = 32 px (x1), "_x2" = 64, "_24" = DPI 0.75, "_48" = 150 %. Same
+  texture settings as the skins. Hot spots (px per size) come from art/imagegen/hud-icons-v3/cursor-hotspots.json and
+  go into the report art/imagegen/hud-icons-v3/cursor-import-report.json - UUmCursor reads the same JSON at runtime
+  (Config/Cursors/S08CursorHotspots.json, a copy) so the widget and the report never disagree.
 """
 
 from __future__ import annotations
@@ -114,6 +123,118 @@ def check_plan(entries: list[dict]) -> list[str]:
     return errors
 
 
+# ---- VS-2 HB-12: software cursors ----------------------------------------------------------------------------------
+ICONS_V3 = ROOT / "art/imagegen/hud-icons-v3"
+HOTSPOTS = ICONS_V3 / "cursor-hotspots.json"
+CURSOR_REPORT = ICONS_V3 / "cursor-import-report.json"
+CURSOR_HOTSPOTS_CONFIG = ROOT / "unreal/Unmatched/Config/Cursors/S08CursorHotspots.json"
+CURSOR_DEST = "/Game/S08/UI/Cursors"
+CURSOR_SIZES = (24, 32, 48, 64)
+CURSOR_SUFFIX = {24: "_24", 32: "", 48: "_48", 64: "_x2"}
+# icon id of the v3 set -> state name of the asset (IC-58 Default, IC-59 Pointer, IC-60 Denied, IC-61 Busy)
+CURSOR_STATES = {"cursor-default": "Default", "cursor-pointer": "Pointer", "cursor-unavailable": "Denied",
+                 "cursor-busy": "Busy"}
+CURSOR_BUSY_FRAMES = 8
+
+
+def cursor_plan(icons: Path = ICONS_V3) -> list[dict]:
+    """One entry per cursor texture: asset name, source file, px, frame (busy) and the hot spot of that size."""
+    hot = json.loads((icons / "cursor-hotspots.json").read_text(encoding="utf-8"))["cursors"]
+    out = []
+    for cid, state in CURSOR_STATES.items():
+        if cid not in hot:
+            raise RuntimeError(f"cursor-hotspots.json: no entry for {cid}")
+        frames = range(CURSOR_BUSY_FRAMES) if cid == "cursor-busy" else (None,)
+        for frame in frames:
+            for px in CURSOR_SIZES:
+                if frame is None:
+                    src = icons / "sizes" / f"{cid}-{px}.png"
+                    name = f"T_Cursor_{state}{CURSOR_SUFFIX[px]}"
+                else:
+                    src = icons / "layers" / f"{cid}_f{frame:02d}-{px}.png"
+                    name = f"T_Cursor_{state}_{frame:02d}{CURSOR_SUFFIX[px]}"
+                if not src.exists():
+                    raise RuntimeError(f"{src}: missing - run art/imagegen/hud-icons-v3/_tools/draw_icons.py")
+                data = src.read_bytes()
+                w, h = png_size(data)
+                if (w, h) != (px, px):
+                    raise RuntimeError(f"{src}: {w}x{h}, expected {px}x{px}")
+                spot = hot[cid].get(str(px))
+                if not (isinstance(spot, list) and len(spot) == 2 and 0 <= spot[0] < px and 0 <= spot[1] < px):
+                    raise RuntimeError(f"cursor-hotspots.json: {cid} {px}: bad hot spot {spot}")
+                out.append({"id": cid, "state": state, "frame": frame, "px": px, "name": name,
+                            "file": src.relative_to(ROOT).as_posix() if src.is_relative_to(ROOT) else str(src),
+                            "sha256": hashlib.sha256(data).hexdigest(), "hotspot": spot})
+    return out
+
+
+def cursor_hotspots_config(entries: list[dict]) -> dict:
+    """The runtime copy UUmCursor reads: state -> px -> [x, y] (the busy frames share the centre)."""
+    states: dict = {}
+    for e in entries:
+        states.setdefault(e["state"], {})[str(e["px"])] = e["hotspot"]
+    return {"schema": "unmatched.cursor-hotspots/1",
+            "source": "art/imagegen/hud-icons-v3/cursor-hotspots.json (draw_icons.py); written by "
+                      "tools/art/hud_skins_import.py --cursors",
+            "dest": CURSOR_DEST, "sizes": list(CURSOR_SIZES),
+            "suffix": {str(k): v for k, v in CURSOR_SUFFIX.items()}, "busyFrames": CURSOR_BUSY_FRAMES,
+            "states": states}
+
+
+def write_cursor_config(entries: list[dict], path: Path = CURSOR_HOTSPOTS_CONFIG) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(cursor_hotspots_config(entries), ensure_ascii=False, indent=1) + "\n", encoding="utf-8",
+                    newline="\n")
+
+
+def import_cursors(entries: list[dict]) -> int:
+    import unreal as u
+
+    tools = u.AssetToolsHelpers.get_asset_tools()
+    for e in entries:
+        task = u.AssetImportTask()
+        task.filename = str(ROOT / e["file"])
+        task.destination_path = CURSOR_DEST
+        task.destination_name = e["name"]
+        task.automated = True
+        task.replace_existing = True
+        task.save = False
+        tools.import_asset_tasks([task])
+        asset = u.load_asset(f"{CURSOR_DEST}/{e['name']}")
+        if not asset or not isinstance(asset, u.Texture2D):
+            raise RuntimeError(f"{e['name']}: not imported as Texture2D")
+        asset.set_editor_property("compression_settings", u.TextureCompressionSettings.TC_EDITOR_ICON)
+        asset.set_editor_property("mip_gen_settings", u.TextureMipGenSettings.TMGS_NO_MIPMAPS)
+        asset.set_editor_property("lod_group", u.TextureGroup.TEXTUREGROUP_UI)
+        asset.set_editor_property("srgb", True)
+        asset.set_editor_property("filter", u.TextureFilter.TF_NEAREST)
+        asset.set_editor_property("never_stream", True)
+        if not u.EditorAssetLibrary.save_loaded_asset(asset, only_if_is_dirty=False):
+            raise RuntimeError(f"{e['name']}: save failed")
+    return len(entries)
+
+
+def main_cursors() -> None:
+    import unreal as u
+
+    entries = cursor_plan()
+    count = import_cursors(entries)
+    write_cursor_config(entries)
+    report = {
+        "schema": "unmatched.cursor-import/1",
+        "status": "технически импортировано (курсоры IC-58…IC-61 приняты по делегированию; вид в UE — HB-12)",
+        "dest": CURSOR_DEST,
+        "settings": {"compression": "TC_EDITOR_ICON (UserInterface2D)", "mipGen": "TMGS_NO_MIPMAPS",
+                     "lodGroup": "TEXTUREGROUP_UI", "srgb": True, "filter": "TF_NEAREST", "neverStream": True},
+        "suffix": {str(k): v for k, v in CURSOR_SUFFIX.items()},
+        "count": count,
+        "textures": [{"asset": f"{CURSOR_DEST}/{e['name']}", "id": e["id"], "frame": e["frame"], "px": e["px"],
+                      "source": e["file"], "sourceSha256": e["sha256"], "hotspotPx": e["hotspot"]} for e in entries],
+    }
+    CURSOR_REPORT.write_text(json.dumps(report, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
+    u.log(f"HUD_CURSORS_IMPORT_PASS textures={count} dest={CURSOR_DEST}")
+
+
 def bind_theme(theme, entries: list[dict] | None = None) -> int:
     """Binds the imported textures into a loaded UUmHudTheme (no save). Returns the skins bound (0 = not imported)."""
     import unreal as u
@@ -202,7 +323,10 @@ def main() -> None:
 
 if __name__ == "__main__":
     try:
-        main()
+        if "--cursors" in sys.argv[1:]:
+            main_cursors()
+        else:
+            main()
     except Exception as exc:  # noqa: BLE001 - the commandlet must report a failure in the log
         import unreal as _u
 

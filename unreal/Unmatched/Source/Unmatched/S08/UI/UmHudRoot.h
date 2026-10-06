@@ -17,6 +17,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "GenericPlatform/ICursor.h"
 #include "../S08ArtHudWidgets.h"
 #include "UmHudLayout.h"
 #include "UmHudRoot.generated.h"
@@ -26,6 +27,7 @@ class UNamedSlot;
 class UOverlay;
 class USizeBox;
 class UWidgetSwitcher;
+class UUmCursor;
 class UUmGameHud;
 
 UCLASS(Blueprintable, BlueprintType)
@@ -55,8 +57,26 @@ class UNMATCHED_API UUmHudRoot : public UUserWidget {
   UPROPERTY(BlueprintReadOnly, Category = "Um HUD", meta = (BindWidget))
   TObjectPtr<UNamedSlot> Reconnect;
 
+  // ---- VS-2 HB-12: software cursors (04 §3.2; §4.2 UUmCursor under the root; UmCursor.h) ----
+  /** One UUmCursor (WBP_UmCursor or the code tree) per UmCursor::RegisteredTypes(), registered on the game viewport
+   *  (UGameViewportClient::SetSoftwareCursorWidget). The caller skips it with -S08SlateHud=cursor (system cursor). */
+  bool InstallCursors(FString* OutSource = nullptr);
+  /** Unregisters the cursor widgets (end of play). */
+  void UninstallCursors();
+  bool HasCursors() const { return Cursors.Num() > 0; }
+  /** Per frame: Busy (a command in flight) overrides the three shapes; the texture size follows DPI x UI scale; the
+   *  busy loop frame comes from NowSeconds (frame 0 with reduced motion). */
+  void TickCursors(bool bBusy, double NowSeconds);
+  /** 'HUD-CURSOR state=default|pointer|denied|busy|none ...' - the shape Slate drew in the last frames. */
+  FString CursorShotLine(EMouseCursor::Type GameCursor) const;
+  const TArray<TObjectPtr<UUmCursor>>& GetCursors() const { return Cursors; }
+
  private:
   UPROPERTY()
   TObjectPtr<UUmGameHud> GameHud;
+  UPROPERTY()
+  TArray<TObjectPtr<UUmCursor>> Cursors;
+  FString CursorSource;
+  double BusySince = -1.0;
   bool bCodeDefaultTree = false;
 };
