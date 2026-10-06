@@ -1,6 +1,7 @@
 """Local listening page for the user's acceptance by ear (G-ART, 05-production-plan §2.6).
 
     python tools/audio/review_page.py --final C:/tmp/audio-src/final --out C:/tmp/audio-review/index.html
+           [--casting C:/tmp/audio-src/vo/recast/casting --casting-old C:/tmp/audio-src/final/vo-v1-cassius]
 
 One page with a player per finished sound: music layers (L1, L2, full loop), stings, VO lines with their EN / RU
 text, SFX by category, ambience. The audio stays outside git; the page links the files by absolute file:// URLs.
@@ -41,6 +42,8 @@ def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--final", required=True)
     ap.add_argument("--out", required=True)
+    ap.add_argument("--casting", help="vo_batch casting output (<label>/<take>/<take>.mp3): one row per voice")
+    ap.add_argument("--casting-old", help="finals of the previous voice, for the same probe lines")
     args = ap.parse_args(argv)
     final = Path(args.final)
     parts = ["<!doctype html><html lang='ru'><head><meta charset='utf-8'>"
@@ -48,6 +51,18 @@ def main(argv: list[str]) -> int:
              f"<style>{CSS}</style></head><body><main><h1>Звук Unmatched — прослушивание</h1>"
              "<p class='note'>AU-S4, 2026-10-05. Выбор сделан агентом по метрикам (07-production-log.md); "
              "приёмка на слух — ваша. Файлы лежат вне git, в C:/tmp/audio-src/final.</p>"]
+    if args.casting:
+        parts.append("<h2>Кастинг голоса Артура (2026-10-06)</h2><p class='note'>Выбран Jayce — Grim (07 §8). "
+                     "Те же пробные строки другими голосами — для сравнения на слух.</p>")
+        for label in sorted(Path(args.casting).iterdir()):
+            files = sorted(label.glob("*/*.mp3"))
+            if files:
+                parts.append(f"<h3>{html.escape(label.name.split('_', 1)[-1])}</h3><div class='grid'>"
+                             + "".join(item(f, f.stem) for f in files) + "</div>")
+        if args.casting_old:
+            probes = sorted({f.parent.name.split("_t")[0][3:].replace("_", "-") for f in Path(args.casting).glob("*/*/*.mp3")})
+            old = [Path(args.casting_old) / f"{p}.wav" for p in probes if (Path(args.casting_old) / f"{p}.wav").exists()]
+            parts.append("<h3>cassius (прежний голос)</h3><div class='grid'>" + "".join(item(f, f.stem) for f in old) + "</div>")
     parts.append("<h2>Музыка: слои и петли</h2><div class='grid'>")
     for f in sorted((final / "music").glob("*-[Lf]*[0-9a-z].wav")):
         if f.stem.endswith("_16"):

@@ -12,6 +12,9 @@
 (колонка `de013_role`). Музыка, стинги и голоса — генерация через SYNTX, окружение — собственный синтез. Итог —
 [07-production-log.md](../game-design/audio/07-production-log.md). Атрибуция — `unreal/Unmatched/Licenses/THIRD_PARTY_NOTICES.txt`.
 
+**Обновление 2026-10-06.** Голос Артура заменён по запросу пользователя: Cassius → Jayce — Grim
+(ElevenLabs Voice Library, через SYNTX), все 42 реплики перегенерированы; см. 07-production-log.md §8.
+
 **Состояние на 2026-10-04.**
 - Ни один звук не скачан и не импортирован, покупок нет.
 - У всех CUE в `docs/unreal/contracts/cue-dispatcher/cue-table.json` остаётся `sfx.status = missing`.

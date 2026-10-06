@@ -25,6 +25,14 @@ NODE = REPO / "tools/audio/syntx_audio.cjs"
 CHAT = "419ed456-fc88-4394-8772-aee6ac51437b"
 VO_CHATS = ["a7cabbe8-ace4-4b98-b687-ad449cab9552", "c3809b84-27fe-47fb-b207-d1b923e5cabc",
             "f8ffb644-4012-48ff-85df-d13f1bc299a9"]
+# Wordless efforts: ElevenLabs v3 returns no audio for a tag alone, so the generation text carries the sound itself
+# (no subtitle: the script line stays without EN text).
+EFFORT_SOUND = {
+    "ARTHUR-HURT-01": "Hngh!", "ARTHUR-HURT-02": "Hhah!", "ARTHUR-HURT-03": "Ahhh...", "ARTHUR-DEATH-01": "Aaarrgh!",
+    "MERLIN-HURT-01": "Ah!", "MERLIN-HURT-02": "Hmph!", "MERLIN-DEATH-01": "Ohhh...",
+    "MEDUSA-HURT-01": "Hsss-ah!", "MEDUSA-HURT-02": "Hah!", "MEDUSA-HURT-03": "Grrah!",
+    "MEDUSA-DEATH-01": "Hsssssss... ahh...",
+}
 ROW = re.compile(r"^\| ((?:ARTHUR|MERLIN|MEDUSA)-[A-Z-]+-\d\d) \| (.*?) \| (.*?) \| (.*?) \|$")
 
 
@@ -38,7 +46,7 @@ def lines() -> list[dict]:
         en = "" if en.strip() == "—" else en.strip()
         tags = " ".join(re.findall(r"\[[^\]]+\]", direction))
         out.append({"id": lid, "fighter": lid.split("-")[0], "en": en, "ru": "" if ru.strip() == "—" else ru.strip(),
-                    "tags": tags, "text": (tags + " " + en).strip() if en else tags})
+                    "tags": tags, "text": (tags + " " + (en or EFFORT_SOUND.get(lid, ""))).strip()})
     return out
 
 

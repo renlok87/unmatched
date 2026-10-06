@@ -5,7 +5,7 @@
 
 For every line of 04-vo-script.md the takes (VO_<ID>_t<k>.mp3) are scored: speech within its limit (2 s; 3 s for
 select / match start / matchup / low HP / ally down / victory / defeat), no inner pause over 0.6 s, no clipping;
-the best one is trimmed (-45 dB), inner pauses longer than 350 ms are shortened to 350 ms, a high-pass at 80 Hz and a
+the best one is trimmed (-45 dB by 10 ms RMS windows), inner pauses longer than 350 ms are shortened to 350 ms, a high-pass at 80 Hz and a
 gentle compressor are applied, a line still over its limit is sped up (pitch kept,
 at most x1.2), and it is normalised to -19 LUFS-I with true peak <= -3 dBTP. Harpy cries get three
 pitch versions (-2, 0, +2 semitones: harpy 1, 2, 3). FX voice layers are finished the same way at -24 LUFS.
@@ -94,8 +94,18 @@ def tempo(x: np.ndarray, factor: float) -> np.ndarray:
         return np.frombuffer(dst.read_bytes(), np.float32).astype(np.float64)
 
 
+def trim_rms(x: np.ndarray, top_db: float = 45, win_s: float = 0.01) -> np.ndarray:
+    """Trim leading/trailing silence by 10 ms RMS windows: a lone click in a silent tail must not keep the tail."""
+    win = max(1, int(win_s * SR))
+    env = envelope_db(x, win)
+    idx = np.where(env > env.max() - top_db)[0]
+    return x[idx[0] * win: (idx[-1] + 1) * win] if len(idx) else x
+
+
 def finish(x: np.ndarray, target: float, limit: float = 0.0) -> tuple[np.ndarray, dict]:
-    x = sb.trim(x, 45)
+    # sample trim as before; the RMS trim only where a stray click kept a silent tail (> 100 ms more)
+    a, b = sb.trim(x, 45), trim_rms(x, 45)
+    x = b if len(a) - len(b) > 0.1 * SR else a
     x = shorten_pauses(x)
     if limit and len(x) / SR > limit:
         x = tempo(x, min(1.2, len(x) / SR / limit))

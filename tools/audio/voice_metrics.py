@@ -3,7 +3,8 @@
     python tools/audio/voice_metrics.py <file|dir> [...] [--json out.json]
 
 Per file: duration, speech span (first to last frame above -40 dB of the peak), longest inner pause, median F0 of
-voiced frames (autocorrelation, 60-500 Hz) and its spread, integrated loudness, true peak, and flags:
+voiced frames (autocorrelation, 60-500 Hz) and its spread, the median harmonics-to-noise ratio of voiced frames
+(hnr_db; lower = rougher, raspier voice), integrated loudness, true peak, and flags:
 too_long (> 2.0 s speech; victory/defeat lines get 3.0 s), long_pause (> 0.6 s inside the line), clipped.
 """
 from __future__ import annotations
@@ -23,7 +24,8 @@ from analyze import decode, ebur128  # noqa: E402
 SR = 22050
 
 
-def f0_track(x: np.ndarray, sr: int = SR) -> np.ndarray:
+def f0_track(x: np.ndarray, sr: int = SR, peaks: list | None = None) -> np.ndarray:
+    """F0 per frame (nan when unvoiced); voiced frames append their normalized autocorrelation peak to peaks."""
     n, hop = 1024, 256
     frames = np.lib.stride_tricks.sliding_window_view(x, n)[::hop]
     out = []
@@ -38,6 +40,8 @@ def f0_track(x: np.ndarray, sr: int = SR) -> np.ndarray:
         ac /= ac[0]
         lag = lo + int(np.argmax(ac[lo:hi]))
         out.append(sr / lag if ac[lag] > 0.45 else np.nan)
+        if ac[lag] > 0.45 and peaks is not None:
+            peaks.append(min(float(ac[lag]), 0.999))
     return np.array(out)
 
 
@@ -53,14 +57,17 @@ def metrics(path: Path) -> dict:
     for v in on[idx[0]: idx[-1] + 1] if len(idx) else []:
         run = 0 if v else run + 1
         gaps.append(run)
-    f0 = f0_track(x)
+    peaks: list = []
+    f0 = f0_track(x, peaks=peaks)
     f0 = f0[~np.isnan(f0)]
+    r = np.array(peaks)
     loud = ebur128(str(path))
     limit = 3.0 if re.search(r"VICTORY|DEFEAT", path.name) else 2.0
     return {"file": path.name, "dir": path.parent.name, "seconds": round(len(x) / SR, 2), "speech_s": round(float(span), 2),
             "max_pause_s": round(float(max(gaps or [0])) / 100, 2),
             "f0_median": round(float(np.median(f0)), 1) if len(f0) else None,
             "f0_iqr": round(float(np.subtract(*np.percentile(f0, [75, 25]))), 1) if len(f0) > 4 else None,
+            "hnr_db": round(float(np.median(10 * np.log10(r / (1 - r)))), 1) if len(r) else None,
             "I": loud["I"], "TP": loud["TP"],
             "too_long": bool(span > limit), "long_pause": bool(max(gaps or [0]) / 100 > 0.6),
             "clipped": bool(loud["TP"] > -0.1)}
