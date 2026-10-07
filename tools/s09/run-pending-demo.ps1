@@ -4,7 +4,21 @@ param(
   [string]$EvidenceDir = "",
   [int]$RunSeconds = 300,
   [string]$ShotMode = "request",
-  [string]$EnvFile = ""
+  [string]$EnvFile = "",
+  # VS-4 HB-48 (docs/game-design/visual/04-hud-spec.md s5.3): the rollback of the gate - both clients get -S09Markers and
+  # the GD-035 marker pixel gates run as before (the choice is the Slate panel then). Without it (the default since
+  # HB-48) every pending shot is gated by its UI-HUD-PENDING line (kind = the head type, an own view), every blocked
+  # resolve shot by the opponent's choice (UI-HUD-PENDING state=opp or STATUS opp / sync), with swap controls and the
+  # privacy rules over both traces (tools/s09/HudShotGate.ps1).
+  [switch]$S09Markers,
+  # VS-4 HB-49 set D (04 s7.2, all opt-in): 1920x1080 instead of 1280x720; the per-process frame cap (AGENTS.md: two
+  # clients at 30 FPS each; 0 = none); extra client arguments for BOTH clients, '+'-separated (e.g. '-ConceptPaste+
+  # -S08UiScale=150+-S08ExitShots'); the board row of the room (-S08BoardId on the host, verified on the game row; empty
+  # = the backend default board).
+  [switch]$FullHd,
+  [int]$ClientFps = 30,
+  [string]$ClientExtraArgs = '',
+  [string]$BoardId = ''
 )
 # GD-035 two-client packaged PENDING-CHOICE demo against the S09 worktree-local
 # backend. Both clients also play scheme cards, so viewer-owned queue heads
@@ -26,6 +40,8 @@ param(
 # host-ownership-validated abort of THIS run's game, fresh-shot checks.
 $ErrorActionPreference = 'Stop'
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
+. (Join-Path $PSScriptRoot 'HudShotGate.ps1')  # VS-4 HB-48
+if ($BoardId -and $BoardId -cnotmatch '^c[a-z0-9]{24}$') { throw "BoardId '$BoardId' is not a Board row id (cuid)" }
 if (-not $Exe) { $Exe = Join-Path $RepoRoot 'unreal\Unmatched\Saved\StagedBuilds\Windows\Unmatched.exe' }
 if (-not $EvidenceDir) { $EvidenceDir = Join-Path $RepoRoot 'docs\game-design\evidence\S09\run' }
 
@@ -56,7 +72,9 @@ function Set-StagedResolution([string]$ExePath, [int]$W, [int]$H) {
   [System.IO.File]::WriteAllLines($gs, $lines)
   Write-Output "staged GameUserSettings -> ${W}x${H} (windowed): $gs"
 }
-Set-StagedResolution $Exe 1280 720
+$ShotWidth = if ($FullHd) { 1920 } else { 1280 }
+$ShotHeight = if ($FullHd) { 1080 } else { 720 }
+Set-StagedResolution $Exe $ShotWidth $ShotHeight
 
 $Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 $Script:CleanupFailure = $null
@@ -216,12 +234,17 @@ function Invoke-PendingDemo {
   $Script:ThisRunGameId = $null
   $Script:ThisRunGameCode = $null
 
-  $common = @("-windowed", "-resx=1280", "-resy=720", "-RenderOffScreen", "log=GrepLog",
-    "-ForceAbandonSequences", "-S08Api=$Api", "-S09ShotMode=$ShotMode",
-    "-S09Markers")  # HB-01: the marker pixel gates below need the debug layer (04-hud-spec s5.3)
+  $common = @("-windowed", "-resx=$ShotWidth", "-resy=$ShotHeight", "-RenderOffScreen", "log=GrepLog",
+    "-ForceAbandonSequences", "-S08Api=$Api", "-S09ShotMode=$ShotMode")
+  # HB-01 / VS-4 HB-48: only the marker gate rollback draws the debug layer; the default gates read SHOT widget
+  if ($S09Markers) { $common += '-S09Markers' }
+  if ($ClientFps -gt 0) { $common += "-ExecCmds=t.MaxFPS $ClientFps" }
+  if ($FullHd) { $common += '-ForceRes' }
+  foreach ($extra in @($ClientExtraArgs -split '\+' | Where-Object { $_ })) { $common += $extra }
   $hostArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
     "-S08Auto", "-S08Create", "-S08HeroId=$heroA", "-S08Trace=$hostTrace",
     "-S09Flow", "-S09Combat=attack+scheme", "-S09ShotDir=$hostShots", "-S08ExitAfter=$RunSeconds")
+  if ($BoardId) { $hostArgs += "-S08BoardId=$BoardId" }
   $joinArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
     "-S08Auto", "-S08HeroId=$heroB", "-S08Trace=$joinTrace",
     "-S09Flow", "-S09Combat=defend+resolve+scheme", "-S09ShotDir=$joinShots", "-S08ExitAfter=$RunSeconds")
@@ -262,6 +285,16 @@ function Invoke-PendingDemo {
     }
     if (-not $code) { throw "no room code found in host trace" }
     Write-Output "room created by this run (code redacted from output; id=$Script:ThisRunGameId)"
+    if ($BoardId) {
+      $loginBody = @{ query = 'mutation L($input: LoginDto!) { login(input: $input) { accessToken } }'; variables = @{ input = @{ email = $AccountA.email; password = $AccountA.password } } } | ConvertTo-Json -Depth 5
+      $login = Invoke-RestMethod -Uri $Api -Method Post -ContentType 'application/json' -Body $loginBody
+      Assert-GqlOk $login 'board host login'
+      $lookup = @{ query = 'query G($id: String!) { game(id: $id) { id boardId } }'; variables = @{ id = $Script:ThisRunGameId } } | ConvertTo-Json -Depth 5
+      $game = Invoke-RestMethod -Uri $Api -Method Post -ContentType 'application/json' -Headers @{ authorization = "Bearer $($login.data.login.accessToken)" } -Body $lookup
+      Assert-GqlOk $game 'board lookup'
+      if ($game.data.game.boardId -cne $BoardId) { throw "created room has boardId=$($game.data.game.boardId), expected $BoardId" }
+      Write-Output "boardId verified against the authoritative game row: $BoardId"
+    }
 
     $joinStartUtc = [DateTime]::UtcNow
     $joinProc = Start-S09Client $joinArgs $AccountB.email $AccountB.password $code
@@ -366,7 +399,35 @@ function Invoke-PendingDemo {
               ($pendingStats.w -eq 1920 -and $pendingStats.h -eq 1080))) {
       throw ("pending shot is {0}x{1} - NOT 1280x720/1920x1080" -f $pendingStats.w, $pendingStats.h)
     }
-    if ($ShotMode -eq 'request') {
+    $ShotGateLines = @()
+    if (-not $S09Markers) {
+      # ---- VS-4 HB-48 SHOT widget gates: the owner's choice window by its head type, the other seat's wait ----
+      $boostShots = @($pendingShots | Where-Object { $_.Name -eq 's09-pending-BOOST_CHOICE.png' })
+      if ($boostShots.Count -eq 0) {
+        throw "no s09-pending-BOOST_CHOICE.png this run - cannot verify the owner reveal-pause window"
+      }
+      $blockedShots = @(Get-ChildItem -LiteralPath $hostShots, $joinShots -Filter 's09-resolve-blocked-*.png' -ErrorAction SilentlyContinue)
+      foreach ($pair in @(@('host', $hostShots, $hostTrace), @('joiner', $joinShots, $joinTrace))) {
+        $rules = @()
+        foreach ($shot in @($pendingShots | Where-Object { $_.FullName.StartsWith($pair[1]) })) {
+          if ($shot.Name -notmatch '^s09-pending-([A-Z_]+)') { throw "unexpected pending shot name $($shot.Name)" }
+          $rules += ("{0}: need UI-HUD-PENDING kind={1} state=modal|compact|collapsed|toast" -f $shot.Name, $Matches[1])
+        }
+        foreach ($shot in @($blockedShots | Where-Object { $_.FullName.StartsWith($pair[1]) })) {
+          $rules += ("{0}: need UI-HUD-PENDING state=opp || UI-HUD-STATUS state=opp|sync" -f $shot.Name)
+        }
+        $ShotGateLines += Assert-HudShotGate -TracePath $pair[2] -Who $pair[0] -Privacy -Rules $rules
+        # swap controls: an own window rule never passes a blocked (other seat's) shot, and the reverse
+        foreach ($shot in @($blockedShots | Where-Object { $_.FullName.StartsWith($pair[1]) })) {
+          $ShotGateLines += Assert-HudShotGateFails $pair[2] ("{0}: need UI-HUD-PENDING state=modal|compact|collapsed|toast" -f $shot.Name) "$($pair[0]) blocked shot as an own choice"
+        }
+        foreach ($shot in @($pendingShots | Where-Object { $_.FullName.StartsWith($pair[1]) })) {
+          $ShotGateLines += Assert-HudShotGateFails $pair[2] ("{0}: need UI-HUD-PENDING state=opp" -f $shot.Name) "$($pair[0]) own choice shot as the opponent's wait"
+        }
+      }
+      foreach ($l in $ShotGateLines) { Write-Output $l }
+      Write-Output ("SHOT widget gates (HB-48): {0} pending shot(s) by kind, {1} blocked shot(s), privacy - PASS" -f $pendingShots.Count, $blockedShots.Count)
+    } elseif ($ShotMode -eq 'request') {
       if ($pendingStats.pendingRegion -lt 200) {
         throw ("pending shot failed the pending-marker gate (pending={0})" -f $pendingStats.pendingRegion)
       }
@@ -565,6 +626,11 @@ function Invoke-PendingDemo {
       $who = if ($shot.FullName.StartsWith($hostShots)) { 'host' } else { 'joiner' }
       $publishNames += ($who + '\' + $shot.Name)
     }
+    # VS-4 HB-49 set D: the exit frames of -S08ExitShots (in -ClientExtraArgs) - published when written, not gated
+    foreach ($shot in @(Get-ChildItem -LiteralPath $hostShots, $joinShots -Filter 's09-exit-*.png' -ErrorAction SilentlyContinue | Sort-Object Name)) {
+      $who = if ($shot.FullName.StartsWith($hostShots)) { 'host' } else { 'joiner' }
+      $publishNames += ($who + '\' + $shot.Name)
+    }
     $RunDir = Join-Path $EvidenceDir ("pending-" + $Stamp)
     if (Test-Path -LiteralPath $RunDir) { throw "run dir already exists: $RunDir" }
     New-Item -ItemType Directory -Path $RunDir | Out-Null
@@ -589,7 +655,11 @@ function Invoke-PendingDemo {
     # (stuck mandatory / bounded-hold / sent-without-done) the run must NOT
     # claim that every observed head was answered.
     $verdict = if ($openTypes.Count -eq 0 -and $unresolvedHeads -eq 0) {
-      'GD-035 P1: live two-client pending-choice demo - viewer-owned queue heads opened over the authoritative server and were answered via resolvePendingEffect/declinePendingEffect; first-head UI shot gated on the pending marker #4080FF with all other state markers absent; privacy-clean traces; seq convergence'
+      if ($S09Markers) {
+        'GD-035 P1: live two-client pending-choice demo - viewer-owned queue heads opened over the authoritative server and were answered via resolvePendingEffect/declinePendingEffect; first-head UI shot gated on the pending marker #4080FF with all other state markers absent; privacy-clean traces; seq convergence'
+      } else {
+        'GD-035 P1 / VS-4 HB-48: live two-client pending-choice demo WITHOUT -S09Markers - viewer-owned queue heads opened over the authoritative server and were answered via resolvePendingEffect/declinePendingEffect; every pending shot gated on its UI-HUD-PENDING line (kind, own view), every blocked shot on the opponent''s wait, swap controls, privacy rules over both traces; seq convergence'
+      }
     } else {
       $openKinds = @()
       if ($openTypes.Count -gt 0) { $openKinds += ("open/stuck types: " + ($openTypes -join ',')) }
@@ -605,6 +675,11 @@ function Invoke-PendingDemo {
       gapNote       = 'gapObserved = open/stuck head types (mandatory with no legal pick, or bounded-hold after repeated rejected answers); sent-without-done counts sit in the verdict. Reported as-is, never client-side faked.'
       chooseSpaceStages = $csPairs
       resolvedOtherTypes = $otherResolvedTypes
+      gateMode      = if ($S09Markers) { 'markers' } else { 'shot-widget' }
+      shotGate      = @($ShotGateLines)
+      board         = if ($BoardId) { $BoardId } else { '(backend default)' }
+      canvas        = "${ShotWidth}x${ShotHeight}"
+      clientExtraArgs = $ClientExtraArgs
       files         = @()
     }
     function Get-Sha256Hex([string]$Path) {

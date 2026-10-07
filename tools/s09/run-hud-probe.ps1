@@ -1,7 +1,13 @@
 param(
   [string]$Exe = "",
   [int]$TimeoutSeconds = 120,
-  [bool]$OffScreen = $true
+  [bool]$OffScreen = $true,
+  # VS-4 HB-48 (docs/game-design/visual/04-hud-spec.md s5.3): the rollback of the gate - the client gets -S09Markers and
+  # the #FF00FF / #00FFFF marker pixel gates run as before. Without it (the default since HB-48) the three shots are
+  # gated by their SHOT widget lines (tools/s09/HudShotGate.ps1): board-only - no UI-HUD block visible; maneuver draft
+  # - UI-HUD-ACTIONS state=mode=maneuver, no discard; discard - UI-HUD-HAND / UI-HUD-STATUS state=discard, no maneuver
+  # draft; the board-only control and both swapped pairs must fail.
+  [switch]$S09Markers
 )
 # Backend-less packaged HUD probe (GD-032/033 P1): hidden client renders
 # 1) a board-only negative control (HUD hidden),
@@ -20,6 +26,7 @@ param(
 #     asserted explicitly.
 $ErrorActionPreference = 'Stop'
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
+. (Join-Path $PSScriptRoot 'HudShotGate.ps1')  # VS-4 HB-48
 if (-not $Exe) { $Exe = Join-Path $RepoRoot 'unreal\Unmatched\Saved\StagedBuilds\Windows\Unmatched.exe' }
 $Fixtures = Join-Path $RepoRoot 'docs\game-design\evidence\S08\fixtures'
 if (-not (Test-Path -LiteralPath $Exe)) { throw "packaged exe not found: $Exe" }
@@ -69,9 +76,10 @@ $psi.UseShellExecute = $false
 $psi.CreateNoWindow = $true
 $psi.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
 $renderArgs = if ($OffScreen) { "-RenderOffScreen" } else { "" }
-# HB-01: -S09Markers - the marker pixel gates below need the debug layer (04-hud-spec s5.3)
+# HB-01 / VS-4 HB-48: -S09Markers only for the marker gate rollback (04-hud-spec s5.3)
+$markersArg = if ($S09Markers) { "-S09Markers " } else { "" }
 $psi.Arguments = "/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode -windowed -resx=1280 -resy=720 $renderArgs log=GrepLog -ForceAbandonSequences " +
-  "-S09Markers " +
+  $markersArg +
   "-S08Fixtures=`"$Fixtures`" -S09HudProbe=`"$Dir`" -S08Trace=`"$Trace`""
 $proc = [System.Diagnostics.Process]::Start($psi)
 Write-Output "probe pid=$($proc.Id)"
@@ -99,7 +107,32 @@ if ($text -match 'mouse-click path: MANUAL-OPEN') {
   Write-Output 'trace gate ok: keyboard SLATE-PASS; mouse path marked MANUAL-OPEN'
 }
 
-# --- image gates -------------------------------------------------------------
+# --- VS-4 HB-48 SHOT widget gates (default) -------------------------------------
+if (-not $S09Markers) {
+  $look = Select-String -LiteralPath $Trace -Pattern 'ARTLOOK .* markers=(\d)' | Select-Object -Last 1
+  if (-not $look -or $look.Matches[0].Groups[1].Value -ne '0') { throw "probe trace has no 'ARTLOOK ... markers=0' (debug layer on without -S09Markers?)" }
+  $board = 's09-probe-board-only.png: deny UI-HUD-*'
+  $maneuver = 's09-probe-maneuver-draft.png: need UI-HUD-ACTIONS state=mode=maneuver; deny UI-HUD-HAND state=discard; deny UI-HUD-STATUS state=discard'
+  $discard = 's09-probe-discard-open.png: need UI-HUD-HAND state=discard; need UI-HUD-STATUS state=discard; deny UI-HUD-ACTIONS state=mode=maneuver'
+  foreach ($l in (Assert-HudShotGate -TracePath $Trace -Who probe -Privacy -Rules @($board, $maneuver, $discard))) { Write-Output $l }
+  # negative controls: the board-only frame and both swapped pairs MUST fail
+  $swap = @(
+    @('s09-probe-board-only.png', $maneuver), @('s09-probe-board-only.png', $discard),
+    @('s09-probe-discard-open.png', $maneuver), @('s09-probe-maneuver-draft.png', $discard))
+  foreach ($s in $swap) {
+    $rule = $s[0] + ':' + $s[1].Split(':', 2)[1]
+    Write-Output (Assert-HudShotGateFails $Trace $rule ("{0} as '{1}'" -f $s[0], $s[1].Split(':', 2)[0]))
+  }
+  Write-Output 'negative controls ok: board-only and both swapped pairs fail the SHOT widget rules'
+  foreach ($name in @('s09-probe-board-only.png', 's09-probe-maneuver-draft.png', 's09-probe-discard-open.png')) {
+    $p = Join-Path $Dir $name
+    if (-not (Test-Path -LiteralPath $p) -or (Get-Item -LiteralPath $p).Length -lt 10KB) { throw "probe shot missing or too small: $p" }
+  }
+  Write-Output "PROBE PASS (SHOT widget, HB-48; staging kept for inspection): $Dir"
+  return
+}
+
+# --- image gates (-S09Markers rollback) ------------------------------------------
 Add-Type -AssemblyName System.Drawing
 
 function Get-MarkerStats([string]$Path) {

@@ -691,7 +691,8 @@ function Invoke-AbortDemo {
     "-S08Auto", "-S08Create", "-S08Mode=VS_AI", "-S08HeroId=$heroId",
     "-S08Trace=$trace", "-S09Flow", "-S09Combat=attack+scheme",
     "-S09ShotDir=$shots", "-S10AbortProof", "-S08ExitAfter=$RunSeconds",
-    "-S09Markers")  # HB-01: the #FF6414 / #FFD700 marker gates need the debug layer (04-hud-spec s5.3)
+    "-S09Markers")  # HB-01: the #FF6414 / #FFD700 marker gates need the debug layer (04-hud-spec s5.3); VS-4 HB-48: kept
+                    # until the ABORTED screen moves to UMG (VS-7, UI-SCR-ABORTED), then 'SHOT widget id=UI-SCR-ABORTED'
 
   $proc = $null
   $Published = $false

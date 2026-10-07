@@ -14,6 +14,15 @@
                                                                     кроме tex=legacy отката -S08CardArtLegacy); VS-3 HB-30:
                                                                     UI-HUD-COMBAT-EDGE fighter=opp face=1 только в
                                                                     state=reveal (приватность до раскрытия)
+  python tools/s08/hud_contract/hud_contract.py check-shots <log> --rule "<file>: need <id> k=v|v2 ...; deny <id> k=v"
+                                   [--rule ...] [--privacy]
+                                                                    VS-4 HB-48 (04 §5.3): гейт кадра по строкам `SHOT widget`
+                                                                    блока этого кадра (строки перед последним `SHOT request
+                                                                    file=<file>`): need — видимая нарисованная строка с этим
+                                                                    id и полями (`A || B` — любая из двух), deny — видимой
+                                                                    такой строки нет; --privacy — правила приватности по всей
+                                                                    трассе (лицо карты соперника только в state=reveal,
+                                                                    скрытый инспектор без значений)
 
 Только stdlib. Код выхода: 0 — ошибок нет, 1 — есть ошибки.
 """
@@ -326,6 +335,169 @@ def check_portrait_line(n, line, registry):
     return errors
 
 
+def privacy_line_errors(f):
+    """Privacy rules of one parsed `SHOT widget` line (empty list = clean).
+    VS-3 HB-30 (04 §2.7, 05 §3 VS-3): the opponent's combat card shows its face only from state=reveal.
+    VS-4 HB-49 (SC-22, 04 §1.7): the hidden inspector carries no value of the card - its face is the back, no language
+    switch, no copies line, no grid."""
+    errors = []
+    if f.get("id") == "UI-HUD-COMBAT-EDGE" and f.get("fighter") == "opp" and f.get("face") == "1" and f.get("state") != "reveal":
+        errors.append("приватность — лицо карты соперника (face=1) до state=reveal (state=%s)" % f.get("state"))
+    if f.get("id") == "UI-SCR-INSPECT" and f.get("state") == "hidden":
+        leaks = [k for k, ok in (("face", ("back", "-")), ("lang", ("0",)), ("copies", ("0",)), ("grid", ("0",)))
+                 if k in f and f[k] not in ok]
+        if leaks:
+            errors.append("приватность — скрытый инспектор показывает значения (%s)"
+                          % ", ".join("%s=%s" % (k, f[k]) for k in leaks))
+    return errors
+
+
+# VS-4 HB-48 (04 §5.3): the s09 / s10 gates check each evidence shot by the `SHOT widget` lines the client wrote for it,
+# not by the debug marker colours (-S09Markers stays the rollback of the old pixel gates).
+SHOT_REQUEST_RE = re.compile(r"SHOT request file=(\S+)")
+SHOT_BOUNDARY_RE = re.compile(r"SHOT (?:captured|late end) file=")
+HUD_IMPL_RE = re.compile(r"ARTLOOK .*?hudImpl=(\S+)")
+
+
+def shot_block(lines, name):
+    """The `SHOT widget` lines (parsed) of one shot: the lines before the LAST 'SHOT request file=<name>' back to the
+    end of the previous shot ('SHOT captured' / 'SHOT late end'), then the first late block of the same file ('SHOT late
+    begin file=<name>' ... 'SHOT late end file=<name>': the geometry of the captured frame, ВР-VS2-77 - a block first
+    shown in the shot frame writes its painted line there). None when the trace never requested the file."""
+    at = None
+    for i in range(len(lines) - 1, -1, -1):
+        m = SHOT_REQUEST_RE.search(lines[i])
+        if m and m.group(1) == name:
+            at = i
+            break
+    if at is None:
+        return None
+    out = []
+    for k in range(at - 1, max(-1, at - 3000), -1):
+        if SHOT_BOUNDARY_RE.search(lines[k]):
+            break
+        f = parse_shot_widget(lines[k])
+        if f is not None:
+            out.append(f)
+    out.reverse()
+    begin, end = "SHOT late begin file=%s " % name, "SHOT late end file=%s" % name
+    k = at + 1
+    while k < min(len(lines), at + 6000) and begin not in lines[k]:
+        k += 1
+    if k >= min(len(lines), at + 6000):
+        return out
+    for k in range(k + 1, min(len(lines), k + 4000)):
+        if end in lines[k]:
+            break
+        f = parse_shot_widget(lines[k])
+        if f is not None:
+            f["late"] = "1"
+            out.append(f)
+    return out
+
+
+def parse_matcher(text):
+    """'UI-HUD-COMBAT-EDGE fighter=opp state=back|shield face=0' -> (id, {field: [values]}); an id ending in '*' is a
+    prefix ('UI-HUD-*'). A state value may itself hold '=' ('state=mode=maneuver', 'state=count=3')."""
+    tokens = text.split()
+    if not tokens:
+        raise ValueError("пустое правило")
+    fields = {}
+    for t in tokens[1:]:
+        if "=" not in t:
+            raise ValueError("поле без '=': %r" % t)
+        k, v = t.split("=", 1)
+        fields[k] = v.split("|")
+    return tokens[0], fields
+
+
+def matcher_hits(block, matcher, painted):
+    """Lines of the block that match: the id, every field, visible=1 (and geom=painted for a 'need')."""
+    want_id, fields = matcher
+    hits = []
+    for f in block:
+        fid = f.get("id", "")
+        if not (fid == want_id or (want_id.endswith("*") and fid.startswith(want_id[:-1]))):
+            continue
+        if f.get("visible") != "1" or (painted and f.get("geom") != "painted"):
+            continue
+        if all(f.get(k) in vals for k, vals in fields.items()):
+            hits.append(f)
+    return hits
+
+
+def parse_rule(text):
+    """'<file>: need A k=v; deny B k=v; need C || D' -> (file, [(kind, [matchers])])."""
+    if ":" not in text:
+        raise ValueError("правило без '<файл>:' — %r" % text)
+    name, body = text.split(":", 1)
+    clauses = []
+    for part in body.split(";"):
+        part = part.strip()
+        if not part:
+            continue
+        kind, _, rest = part.partition(" ")
+        if kind not in ("need", "deny"):
+            raise ValueError("ожидается need / deny: %r" % part)
+        clauses.append((kind, [parse_matcher(alt) for alt in rest.split("||")]))
+    if not clauses:
+        raise ValueError("правило без условий: %r" % text)
+    return name.strip(), clauses
+
+
+def _describe(matcher):
+    want_id, fields = matcher
+    return " ".join([want_id] + ["%s=%s" % (k, "|".join(v)) for k, v in fields.items()])
+
+
+def check_shot_rule(lines, rule, hud_impl=None):
+    """One rule against its shot's block -> list of failure reasons (empty = PASS). A missing UMG block is named with
+    its likely cause: the -S08SlateHud rollback (the Slate path keeps the old -S09Markers pixel gates)."""
+    name, clauses = rule
+    block = shot_block(lines, name)
+    if block is None:
+        return ["нет кадра: в трассе нет 'SHOT request file=%s'" % name]
+    reasons = []
+    for kind, alts in clauses:
+        if kind == "need":
+            if any(matcher_hits(block, m, True) for m in alts):
+                continue
+            seen = [f for f in block if any(f.get("id") == m[0] for m in alts)]
+            if not seen:
+                why = ("в блоке кадра нет строки SHOT widget id=%s — блок UMG не нарисован"
+                       % " / ".join(m[0] for m in alts))
+                if hud_impl and hud_impl.startswith("slate"):
+                    why += " (ARTLOOK hudImpl=%s: откат -S08SlateHud; путь Slate проверяется гейтом с -S09Markers)" % hud_impl
+                reasons.append(why)
+            else:
+                got = "; ".join("state=%s fighter=%s visible=%s geom=%s" % (f.get("state"), f.get("fighter"),
+                                                                           f.get("visible"), f.get("geom")) for f in seen)
+                reasons.append("нужно %s — в блоке: %s" % (" || ".join(_describe(m) for m in alts), got))
+        else:
+            for m in alts:
+                for f in matcher_hits(block, m, False):
+                    reasons.append("запрещено %s — в блоке: state=%s fighter=%s" % (_describe(m), f.get("state"),
+                                                                                    f.get("fighter")))
+    return reasons
+
+
+def check_shots(lines, rules, privacy=False):
+    """VS-4 HB-48: every rule of every shot -> (results [(file, reasons)], privacy errors)."""
+    hud_impl = None
+    for line in lines:
+        m = HUD_IMPL_RE.search(line)
+        if m:
+            hud_impl = m.group(1)
+    results = [(rule[0], check_shot_rule(lines, rule, hud_impl)) for rule in rules]
+    priv = []
+    if privacy:
+        for n, line in enumerate(lines, 1):
+            f = parse_shot_widget(line)
+            if f is not None:
+                priv += ["строка %d: %s" % (n, e) for e in privacy_line_errors(f)]
+    return results, priv
+
+
 def check_widget_trace(lines, known_ids, width=1920, height=1080, registry=None, states=None, card_registry=None):
     """Правило 3: гейт по трассе геометрии виджета, не по пикселям. Невидимая часть (visible=0, например
     сравнительный Slate-двойник или скрытая иконка в поздней строке W5b-R) может быть unpainted. states (04 §7.1,
@@ -379,9 +551,7 @@ def check_widget_trace(lines, known_ids, width=1920, height=1080, registry=None,
             errors.append("строка %d: неизвестный UI-ID %s" % (n, f["id"]))
         if f.get("id") in states and "state" in f and not state_allowed(states[f["id"]], f["state"]):
             errors.append("строка %d: %s state=%s не из списка 04 §7.1" % (n, f["id"], f["state"]))
-        # VS-3 HB-30 (04 §2.7, 05 §3 VS-3 «приватность»): the opponent's combat card shows its face only from state=reveal
-        if f.get("id") == "UI-HUD-COMBAT-EDGE" and f.get("fighter") == "opp" and f.get("face") == "1" and f.get("state") != "reveal":
-            errors.append("строка %d: приватность — лицо карты соперника (face=1) до state=reveal (state=%s)" % (n, f.get("state")))
+        errors += ["строка %d: %s" % (n, e) for e in privacy_line_errors(f)]
         if f.get("visible") == "0":
             continue
         if f.get("geom") != "painted":
@@ -404,7 +574,30 @@ def main(argv=None):
     c.add_argument("log")
     c.add_argument("--width", type=int, default=1920)
     c.add_argument("--height", type=int, default=1080)
+    s = sub.add_parser("check-shots")
+    s.add_argument("log")
+    s.add_argument("--rule", action="append", default=[])
+    s.add_argument("--privacy", action="store_true")
+    s.add_argument("--report", help="also write the SHOTGATE lines to this UTF-8 file (the PowerShell gates read it)")
     a = ap.parse_args(argv)
+    if a.cmd == "check-shots":
+        try:
+            rules = [parse_rule(r) for r in a.rule]
+        except ValueError as e:
+            print("SHOTGATE ERROR правило:", e)
+            return 2
+        lines = Path(a.log).read_text(encoding="utf-8", errors="replace").splitlines()
+        results, priv = check_shots(lines, rules, a.privacy)
+        out = ["SHOTGATE %s %s%s" % (name, "PASS" if not reasons else "FAIL", "" if not reasons else ": " + " | ".join(reasons))
+               for name, reasons in results]
+        out += ["SHOTGATE privacy FAIL: %s" % e for e in priv]
+        ok = all(not r for _, r in results) and not priv and bool(rules or a.privacy)
+        out.append("HUD_SHOTS %s rules %d privacy %s" % ("PASS" if ok else "FAIL", len(rules), "on" if a.privacy else "off"))
+        for line in out:
+            print(line)
+        if a.report:
+            Path(a.report).write_text("\n".join(out) + "\n", encoding="utf-8")
+        return 0 if ok else 1
     spec02 = SPEC02.read_text(encoding="utf-8")
     if a.cmd == "validate":
         errors = (validate_tokens(load(TOKENS)) + codegen.header_errors(TOKENS, HEADER) + theme_asset_errors()

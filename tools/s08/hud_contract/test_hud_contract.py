@@ -224,3 +224,110 @@ def test_check_trace_combat_privacy_hb30():
     assert len([e for e in errors if "приватность" in e]) == 2
     errors, _ = hc.check_widget_trace([edge % ("leave", "own", "0"), centre % "outcome"], ids, states=states)
     assert len([e for e in errors if "04 §7.1" in e]) == 2
+
+
+def test_check_trace_vs4_blocks_hb48():
+    """VS-4 HB-48 (04 §7.1): the UI-IDs of the VS-4 blocks are known with their states - PENDING, SLOT, LOG, TOAST, SUB,
+    ACTIONS - and a state outside the list fails."""
+    spec04 = hc.SPEC04.read_text(encoding="utf-8")
+    ids = hc.ui_ids_from_02(SPEC02) | hc.ui_ids_from_02(spec04)
+    states = hc.ui_states_from_04(spec04)
+    want = {"UI-HUD-PENDING": ["modal", "compact", "collapsed", "toast", "opp"],
+            "UI-HUD-SLOT": ["fly", "hold", "show", "fade"], "UI-HUD-LOG": ["lines=6", "hidden"],
+            "UI-HUD-TOAST": ["bottom", "top"], "UI-HUD-SUB": ["shown"],
+            "UI-HUD-ACTIONS": ["own", "opp", "mode=maneuver", "mode=attack", "mode=scheme"]}
+    head = "SHOT widget id=%s impl=umg state=%s fighter=none bbox=(600,80,1320,140) geom=painted visible=1 twin=0 source=x"
+    ok = [head % (i, s) for i, ss in want.items() for s in ss]
+    assert set(want) <= ids and set(want) <= set(states)
+    assert hc.check_widget_trace(ok, ids, states=states) == ([], len(ok))
+    bad = [head % ("UI-HUD-PENDING", "open"), head % ("UI-HUD-SLOT", "gone"), head % ("UI-HUD-LOG", "lines=x"),
+           head % ("UI-HUD-TOAST", "middle"), head % ("UI-HUD-ACTIONS", "mode=move")]
+    errors, _ = hc.check_widget_trace(bad, ids, states=states)
+    assert len([e for e in errors if "04 §7.1" in e]) == 5
+
+
+def test_check_trace_inspector_privacy_hb49():
+    """VS-4 SC-22 / HB-49: the hidden inspector line carries no value of the card (back face, no language switch, no
+    copies, no grid); the own card and the deck mode may."""
+    insp = ("SHOT widget id=UI-SCR-INSPECT impl=umg state=%s fighter=none bbox=(534,196,1386,884) geom=painted visible=1 "
+            "twin=0 source=x modal=1 class=L alpha=1.00 mode=%s source=opphand face=%s cap=0.000 grid=%s first=0 "
+            "copies=%s lang=%s primary=0")
+    ok = [insp % ("hidden", "hidden", "back", "0", "0", "0"), insp % ("own", "own", "ru", "0", "0", "1"),
+          insp % ("deck", "deck", "-", "11", "30", "0")]
+    assert [e for e in hc.check_widget_trace(ok, {"UI-SCR-INSPECT"})[0] if "приватность" in e] == []
+    bad = [insp % ("hidden", "hidden", "ru", "0", "0", "0"), insp % ("hidden", "hidden", "back", "0", "2", "1")]
+    errors, _ = hc.check_widget_trace(bad, {"UI-SCR-INSPECT"})
+    assert len([e for e in errors if "скрытый инспектор" in e]) == 2
+
+
+SHOT_TRACE = """\
+x ARTLOOK art=1 markers=0 hudImpl=%(impl)s
+x SHOT captured file=s09-a.png frame=1
+x SHOT widget id=UI-HUD-STATUS impl=umg state=defend fighter=none bbox=(656,24,1264,72) geom=painted visible=1 twin=0 source=x
+x SHOT widget id=UI-HUD-COMBAT-EDGE impl=umg state=back fighter=opp bbox=(1666,360,1896,711) geom=painted visible=1 twin=0 source=x role=attack face=0
+x SHOT widget id=UI-HUD-DECKPANEL impl=umg state=own fighter=none bbox=(0,0,0,0) geom=unpainted visible=0 twin=0 source=x
+x SHOT widget id=UI-HUD-ACTIONS impl=umg state=mode=maneuver fighter=none bbox=(788,976,1132,1048) geom=painted visible=1 twin=0 source=x
+x SHOT request file=s09-combat-defense-open.png frame=2
+x SHOT captured file=s09-combat-defense-open.png frame=2
+x SHOT widget id=UI-HUD-STATUS impl=umg state=opp fighter=none bbox=(656,24,1264,72) geom=painted visible=1 twin=0 source=x
+x SHOT widget id=UI-HUD-COMBAT-EDGE impl=umg state=reveal fighter=opp bbox=(1666,360,1896,711) geom=painted visible=1 twin=0 source=x role=attack face=1
+x SHOT widget id=UI-HUD-COMBAT-EDGE impl=umg state=reveal fighter=own bbox=(24,360,254,711) geom=painted visible=1 twin=0 source=x role=defense face=1
+x SHOT request file=s09-combat-resolve-revealed.png frame=3
+"""
+
+
+def test_check_shots_hb48(tmp_path):
+    """VS-4 HB-48: need / deny / '||' against the block of one shot; a swapped rule fails; a missing shot and a missing
+    UMG block are named, the -S08SlateHud rollback with its hudImpl; the CLI returns 0 / 1."""
+    lines = (SHOT_TRACE % {"impl": "umg"}).splitlines()
+    defense = hc.parse_rule("s09-combat-defense-open.png: need UI-HUD-STATUS state=defend; "
+                            "need UI-HUD-COMBAT-EDGE fighter=opp state=back|shield|chosen face=0; "
+                            "deny UI-HUD-COMBAT-EDGE state=reveal; need UI-HUD-ACTIONS state=mode=maneuver")
+    reveal = hc.parse_rule("s09-combat-resolve-revealed.png: need UI-HUD-COMBAT-EDGE fighter=opp state=reveal; "
+                           "need UI-HUD-STATUS state=sync || UI-HUD-STATUS state=opp; deny UI-HUD-DECKPANEL")
+    results, priv = hc.check_shots(lines, [defense, reveal], privacy=True)
+    assert results == [("s09-combat-defense-open.png", []), ("s09-combat-resolve-revealed.png", [])] and priv == []
+    # swap controls: the defense rule on the reveal shot and the reveal rule on the defense shot fail
+    swapped = [("s09-combat-resolve-revealed.png", defense[1]), ("s09-combat-defense-open.png", reveal[1])]
+    results, _ = hc.check_shots(lines, swapped)
+    assert all(reasons for _, reasons in results)
+    assert any("запрещено UI-HUD-COMBAT-EDGE state=reveal" in r for r in results[0][1])
+    # an unpainted / hidden line does not satisfy a need; a missing block names the rollback
+    results, _ = hc.check_shots(lines, [hc.parse_rule("s09-combat-defense-open.png: need UI-HUD-DECKPANEL")])
+    assert "visible=0" in results[0][1][0]
+    slate = (SHOT_TRACE % {"impl": "slate:combat"}).replace("UI-HUD-COMBAT-EDGE", "UI-HUD-XEDGE").splitlines()
+    results, _ = hc.check_shots(slate, [defense])
+    assert any("блок UMG не нарисован" in r and "-S08SlateHud" in r and "-S09Markers" in r for r in results[0][1])
+    results, _ = hc.check_shots(lines, [hc.parse_rule("s09-nope.png: need UI-HUD-STATUS")])
+    assert "нет кадра" in results[0][1][0]
+    # prefix ids; privacy over the whole trace
+    results, _ = hc.check_shots(lines, [hc.parse_rule("s09-combat-defense-open.png: deny UI-HUD-*")])
+    assert len(results[0][1]) == 3
+    leak = lines + ["x SHOT widget id=UI-HUD-COMBAT-EDGE impl=umg state=chosen fighter=opp bbox=(1,1,2,2) geom=painted "
+                    "visible=1 twin=0 source=x face=1"]
+    assert len(hc.check_shots(leak, [], privacy=True)[1]) == 1
+    log = tmp_path / "t.log"
+    log.write_text(SHOT_TRACE % {"impl": "umg"}, encoding="utf-8")
+    rule = ("s09-combat-defense-open.png: need UI-HUD-STATUS state=defend; deny UI-HUD-COMBAT-EDGE state=reveal")
+    assert hc.main(["check-shots", str(log), "--rule", rule, "--privacy"]) == 0
+    assert hc.main(["check-shots", str(log), "--rule", rule.replace("defend", "opp")]) == 1
+    assert hc.main(["check-shots", str(log), "--rule", "no colon here"]) == 2
+
+
+def test_check_shots_late_block_hb48():
+    """VS-4 HB-48: a block first shown in the shot frame writes its painted line in the late block of the same file
+    (ВР-VS2-77) - the need is met there; the late block of ANOTHER file is not read."""
+    lines = ["x SHOT captured file=s09-a.png frame=1",
+             "x SHOT widget id=UI-HUD-PENDING impl=umg state=compact fighter=none bbox=(0,0,0,0) geom=unpainted visible=1 twin=0 source=x kind=MOVE",
+             "x SHOT request file=s09-pending-MOVE.png frame=2",
+             "x SHOT captured file=s09-pending-MOVE.png frame=2",
+             "x SHOT late begin file=s09-pending-MOVE.png frame=2 requestFrame=2",
+             "x SHOT widget id=UI-HUD-PENDING impl=umg state=compact fighter=none bbox=(600,80,1320,140) geom=painted visible=1 twin=0 source=x kind=MOVE",
+             "x SHOT late end file=s09-pending-MOVE.png frame=2",
+             "x SHOT request file=s09-b.png frame=9",
+             "x SHOT late begin file=s09-b.png frame=9 requestFrame=9",
+             "x SHOT late end file=s09-b.png frame=9"]
+    rule = hc.parse_rule("s09-pending-MOVE.png: need UI-HUD-PENDING kind=MOVE state=compact|modal")
+    assert hc.check_shots(lines, [rule]) == ([("s09-pending-MOVE.png", [])], [])
+    other = hc.parse_rule("s09-b.png: need UI-HUD-PENDING kind=MOVE")
+    assert hc.check_shots(lines, [other])[0][0][1]

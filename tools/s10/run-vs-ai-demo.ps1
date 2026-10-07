@@ -774,7 +774,9 @@ function Invoke-VsAiDemo {
   $common = @("-windowed", "-resx=$resX", "-resy=$resY", "-RenderOffScreen",
     "-ExecCmds=`"t.MaxFPS 30`"", "log=GrepLog",
     "-ForceAbandonSequences", "-S08Api=$Api", "-S09ShotMode=$ShotMode")
-  if (-not $PlayerView) { $common += "-S09Markers" }  # HB-01: the marker pixel gates below need the debug layer (04-hud-spec s5.3)
+  # HB-01: the marker pixel gates below need the debug layer (04-hud-spec s5.3). VS-4 HB-48: they stay on -S09Markers
+  # until the GAMEOVER screen moves to UMG (VS-7, screens.csv UI-SCR-GAMEOVER); then 'SHOT widget id=UI-SCR-GAMEOVER'.
+  if (-not $PlayerView) { $common += "-S09Markers" }
   if ($FullHd) { $common += '-ForceRes' }  # as run-combat-demo -FullHd: without it the hidden window stays 888x500
   $clientArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
     "-S08Auto", "-S08Create", "-S08Mode=VS_AI", "-S08HeroId=$heroId",

@@ -84,7 +84,15 @@
   # so they are replaced by the inverse gate: both traces carry 'ARTLOOK ... markers=0' and the defense/resolve/result
   # shots show none of the combat marker hues (<= the scene-noise allowance). Not a GD-034 acceptance run: the gate
   # run keeps -S09Markers. Every other gate (board, heroes v2, render reference, GAME_OVER, traces) is unchanged.
-  [switch]$PlayerView
+  # VS-4 HB-48: the default run has no -S09Markers either (the gates below read the SHOT widget lines); -PlayerView now
+  # only marks the exit-frame runs in the manifest.
+  [switch]$PlayerView,
+  # VS-4 HB-48 (docs/game-design/visual/04-hud-spec.md s5.3): the rollback of the gate - both clients get -S09Markers
+  # (the debug layer) and the GD-034 marker pixel gates run as before. Without it (the default since HB-48) the
+  # defense / resolve / result / reveal shots are gated by their 'SHOT widget' lines (tools/s09/HudShotGate.ps1,
+  # hud_contract.py check-shots) plus the privacy rules over both traces, and the debug-layer hues must be absent.
+  # A block rolled back to Slate (-S08SlateHud=combat in -ClientExtraArgs) fails the default gate with that reason.
+  [switch]$S09Markers
 )
 
 # W5b-R (t53-thresholds.json shotCaptured): every published frame must carry its pixel provenance line
@@ -120,6 +128,8 @@ function Assert-ShotCaptured([string]$TracePath, [string]$Name, [string]$Who) {
 # checks, seq convergence between both clients.
 $ErrorActionPreference = 'Stop'
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
+. (Join-Path $PSScriptRoot 'HudShotGate.ps1')  # VS-4 HB-48
+if ($S09Markers -and $PlayerView) { throw '-S09Markers (the marker gate rollback) and -PlayerView (the player view frames) exclude each other' }
 # --- T3.2 art-board flag guards (before any process or network call) ---
 $MedusaVariantExplicit = $PSBoundParameters.ContainsKey('ArtPreviewMedusaVariant')
 if (($ArtPreviewBoardId -or $MedusaVariantExplicit -or $ArtPreviewSelectOwnHero -or $ArtPreviewFocusZoom -gt 0 -or
@@ -348,8 +358,8 @@ function Invoke-CombatDemo {
 
   $common = @("-windowed", "-resx=$ShotWidth", "-resy=$ShotHeight", "-RenderOffScreen", "log=GrepLog",
     "-ForceAbandonSequences", "-S08Api=$Api", "-S09ShotMode=$ShotMode", "-ExecCmds=t.MaxFPS $ClientFps")
-  # HB-01: the marker pixel gates below need the debug layer (04-hud-spec s5.3); -PlayerView shoots the default view
-  if (-not $PlayerView) { $common += '-S09Markers' }
+  # HB-01 / VS-4 HB-48: only the marker gate rollback (-S09Markers) draws the debug layer; the default gates read SHOT widget
+  if ($S09Markers) { $common += '-S09Markers' }
   if ($ArtPreview) { $common += '-ArtPreview' }
   if ($FullHd) { $common += '-ForceRes' }
   if ($MedusaVariantExplicit) { $common += "-ArtPreviewMedusaVariant=$ArtPreviewMedusaVariant" }
@@ -483,7 +493,8 @@ function Invoke-CombatDemo {
       for ($k = $at - 1; $k -ge [Math]::Max(0, $at - 800); $k--) {
         $l = $lines[$k]
         if ($l -match 'SHOT (captured|late end) file=') { break }
-        $m = [regex]::Match($l, 'SHOT widget id=(UI-HUD-HAND|UI-HUD-COMBAT-EDGE|UI-HUD-DECKS|UI-HUD-OPP-HAND|UI-HUD-DECKPANEL) impl=umg .*?bbox=\((-?\d+),(-?\d+),(-?\d+),(-?\d+)\) geom=painted visible=1')
+        # VS-4: the source-card slot, the choice window and the inspector draw card scans too
+        $m = [regex]::Match($l, 'SHOT widget id=(UI-HUD-HAND|UI-HUD-COMBAT-EDGE|UI-HUD-DECKS|UI-HUD-OPP-HAND|UI-HUD-DECKPANEL|UI-HUD-SLOT|UI-HUD-PENDING|UI-SCR-INSPECT) impl=umg .*?bbox=\((-?\d+),(-?\d+),(-?\d+),(-?\d+)\) geom=painted visible=1')
         if ($m.Success) { $rects += ,@(([int]$m.Groups[2].Value - 2), ([int]$m.Groups[3].Value - 2), ([int]$m.Groups[4].Value + 2), ([int]$m.Groups[5].Value + 2)) }
         # ВР-VS3-72: a leaving combat card paints outside its edge's rect
         $p = [regex]::Match($l, 'HUD-EDGE-PAINT .*?painted=\((-?\d+),(-?\d+),(-?\d+),(-?\d+)\)')
@@ -597,7 +608,8 @@ function Invoke-CombatDemo {
       $resolveStats.resolveRegion, $resolveStats.defenseAll, $resolveStats.resultAll,
       $joinResultStats.resultRegion, $joinResultStats.resolveAll, $joinResultStats.defenseAll,
       $hostResultStats.resultRegion, $hostResultStats.resolveAll, $hostResultStats.defenseAll)
-    if ($PlayerView) {
+    $ShotGateLines = @()
+    if (-not $S09Markers) {
       # HB-02 inverse gate: no debug layer in the player's view - ARTLOOK markers=0 on both clients and none of the
       # combat marker hues in the state shots (the reveal block hue is skipped: the revealed value text keeps it).
       foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
@@ -620,6 +632,37 @@ function Invoke-CombatDemo {
         throw ("privacy gate failed: pre-reveal shots show reveal pixels (defense={0} resolve={1})" -f $defenseStats.revealAll, $resolveStats.revealAll)
       }
       Write-Output 'player view: ARTLOOK markers=0 on both clients, no combat marker hue in the defense/resolve/result shots'
+      # VS-4 HB-48 SHOT widget gates (04 s5.3): the defender's window, the closed window before the reveal, the result
+      # with the combat still on the edges; privacy over both traces (the opponent's card face only in state=reveal, the
+      # hidden inspector without values). Defense-open may still show the previous combat's reveal while it stages, so
+      # its pre-reveal privacy is the face rule; the resolve window must show no reveal at all.
+      $ShotGateLines += Assert-HudShotGate -TracePath $joinTrace -Who joiner -Privacy -Rules @(
+        's09-combat-defense-open.png: need UI-HUD-STATUS state=defend; need UI-HUD-COMBAT-EDGE fighter=opp',
+        's09-combat-resolve-window.png: need UI-HUD-COMBAT-EDGE fighter=opp; deny UI-HUD-COMBAT-EDGE state=reveal; deny UI-HUD-STATUS state=defend',
+        's09-combat-result.png: need UI-HUD-COMBAT-EDGE fighter=own || UI-HUD-COMBAT-EDGE fighter=opp; deny UI-HUD-STATUS state=defend')
+      $ShotGateLines += Assert-HudShotGate -TracePath $hostTrace -Who host -Privacy -Rules @(
+        's09-combat-result.png: need UI-HUD-COMBAT-EDGE fighter=own || UI-HUD-COMBAT-EDGE fighter=opp; deny UI-HUD-STATUS state=defend')
+      # swap controls: a foreign shot never passes the defender's window rule
+      $ShotGateLines += Assert-HudShotGateFails $joinTrace 's09-combat-resolve-window.png: need UI-HUD-STATUS state=defend' 'joiner resolve-window as the defense window'
+      $ShotGateLines += Assert-HudShotGateFails $joinTrace 's09-combat-result.png: need UI-HUD-STATUS state=defend' 'joiner result as the defense window'
+      $ShotGateLines += Assert-HudShotGateFails $hostTrace 's09-combat-result.png: need UI-HUD-STATUS state=defend' 'host result as the defense window'
+      # the result reached the UMG combat centre: the COMBAT-RESULT seq of the result shot is staged by HUD-COMBAT
+      foreach ($pair in @(@('host', $hostTrace), @('joiner', $joinTrace))) {
+        $lines = [System.IO.File]::ReadAllLines($pair[1])
+        $shotAt = -1
+        for ($k = $lines.Length - 1; $k -ge 0; $k--) { if ($lines[$k] -match 'SHOT request file=s09-combat-result\.png ') { $shotAt = $k; break } }
+        $resultSeq = $null; $resultAt = -1
+        for ($k = $shotAt; $k -ge 0; $k--) { if ($lines[$k] -match 'COMBAT-RESULT seq=(\d+) ') { $resultSeq = $Matches[1]; $resultAt = $k; break } }
+        if ($shotAt -lt 0 -or -not $resultSeq) { throw "$($pair[0]): no COMBAT-RESULT before s09-combat-result.png" }
+        $staged = $false
+        for ($k = $resultAt; $k -lt $lines.Length; $k++) {
+          if ($lines[$k] -match ('HUD-COMBAT center=(read|effects|slam|hit) seq=' + $resultSeq + ' ')) { $staged = $true; break }
+        }
+        if (-not $staged) { throw "$($pair[0]): COMBAT-RESULT seq=$resultSeq never reached the UMG combat centre (no HUD-COMBAT center=read|effects|slam|hit seq=$resultSeq) - -S08SlateHud=combatcenter? the Slate path is gated with -S09Markers" }
+        $ShotGateLines += "$($pair[0]) combat centre staged the result seq=$resultSeq"
+      }
+      foreach ($l in $ShotGateLines) { Write-Output $l }
+      Write-Output 'SHOT widget gates (HB-48): defense window, closed window before the reveal, result on the edges and in the centre, privacy - PASS'
     } elseif ($ShotMode -ne 'request') {
       Write-Output "WARN ShotMode=$ShotMode renders the HUD widget only - state gates skipped (P1 acceptance requires 'request')"
     } else {
@@ -817,7 +860,13 @@ function Invoke-CombatDemo {
       if (-not (Test-Path -LiteralPath $RevealShot)) {
         throw "reveal proof FAILED: trace shows the revealed shot was taken but the file is missing: $RevealShot"
       }
-      if ($ShotMode -eq 'request' -and -not $PlayerView) {
+      if (-not $S09Markers) {
+        # VS-4 HB-48: the revealed shot shows the reveal on a combat edge (SHOT widget), never a marker
+        $ShotGateLines += Assert-HudShotGate -TracePath $joinTrace -Who joiner -Rules @(
+          's09-combat-resolve-revealed.png: need UI-HUD-COMBAT-EDGE state=reveal')
+        $ShotGateLines += Assert-HudShotGateFails $joinTrace 's09-combat-resolve-revealed.png: deny UI-HUD-COMBAT-EDGE state=reveal' 'joiner revealed shot as a pre-reveal shot'
+        Write-Output 'reveal proof (HB-48): UI-HUD-COMBAT-EDGE state=reveal in the revealed shot'
+      } elseif ($ShotMode -eq 'request') {
         $revealedStats = Get-MarkerStats $RevealShot (Get-CardArtRects $joinTrace 's09-combat-resolve-revealed.png')  # VS-3 ВР-VS3-71
         Assert-Dimensions $revealedStats 'joiner/revealed'
         Write-Output ("reveal markers joiner: resolve(res={0}) reveal(rvl={1} def={2} rst={3})" -f `
@@ -831,7 +880,7 @@ function Invoke-CombatDemo {
           throw "reveal gate failed: foreign combat markers present in the revealed shot"
         }
       }
-      $RevealProof = if ($PlayerView) { 'present (player view): pre-reveal privacy gates passed (zero reveal pixels); the revealed shot is published, its marker gate needs -S09Markers' } else { 'present: pre-reveal privacy gates passed (zero reveal pixels) and the revealed shot carries the #7CFC00 reveal block + resolve marker' }
+      $RevealProof = if (-not $S09Markers) { 'present (HB-48 SHOT widget): no reveal before it, the face rule over both traces, and the revealed shot shows UI-HUD-COMBAT-EDGE state=reveal' } else { 'present: pre-reveal privacy gates passed (zero reveal pixels) and the revealed shot carries the #7CFC00 reveal block + resolve marker' }
     } else {
       Write-Output "WARN: no reveal pause this run - reveal proof not captured (honest absence, recorded in manifest)"
     }
@@ -1010,8 +1059,10 @@ function Invoke-CombatDemo {
     }
     $manifest = [ordered]@{
       stamp   = $Stamp
-      verdict = if ($PlayerView) { "VS-1 HB-02 player view: live attack->defense->resolve two-client demo WITHOUT -S09Markers at exact ${ShotWidth}x${ShotHeight} - ARTLOOK markers=0, no combat marker hue in the state shots, privacy-clean, role-gated traces, seq convergence (the GD-034 marker gates need -S09Markers); artPreview=$([bool]$ArtPreview); clientFpsCap=$ClientFps" } else { "GD-034 P1: live attack->defense->resolve two-client demo, defense/resolve/result state-marker shots at exact ${ShotWidth}x${ShotHeight} with swap/negative controls, role-gated traces, privacy-clean logs, seq convergence; artPreview=$([bool]$ArtPreview); clientFpsCap=$ClientFps" }
+      verdict = if (-not $S09Markers) { "VS-4 HB-48 SHOT widget gates$(if ($PlayerView) { ' (player view frames)' }): live attack->defense->resolve two-client demo WITHOUT -S09Markers at exact ${ShotWidth}x${ShotHeight} - defense window / pre-reveal resolve window / result on the combat edges and centre / reveal by their SHOT widget lines with swap controls, privacy rules over both traces, ARTLOOK markers=0 and no marker hue, role-gated traces, seq convergence; artPreview=$([bool]$ArtPreview); clientFpsCap=$ClientFps" } elseif ($PlayerView) { "VS-1 HB-02 player view: live attack->defense->resolve two-client demo WITHOUT -S09Markers at exact ${ShotWidth}x${ShotHeight} - ARTLOOK markers=0, no combat marker hue in the state shots, privacy-clean, role-gated traces, seq convergence (the GD-034 marker gates need -S09Markers); artPreview=$([bool]$ArtPreview); clientFpsCap=$ClientFps" } else { "GD-034 P1: live attack->defense->resolve two-client demo, defense/resolve/result state-marker shots at exact ${ShotWidth}x${ShotHeight} with swap/negative controls, role-gated traces, privacy-clean logs, seq convergence; artPreview=$([bool]$ArtPreview); clientFpsCap=$ClientFps" }
       playerView = [bool]$PlayerView
+      gateMode = if ($S09Markers) { 'markers' } else { 'shot-widget' }
+      shotGate = @($ShotGateLines)
       artBoard = if ($ArtBoard) { [ordered]@{ boardId = $ArtPreviewBoardId; profile = $ArtBoard.id; size = $ArtBoardSize; light = $ArtBoard.light; artFixture = [bool]$ArtBoard.artFixture } } else { $null }
       artPreviewFlags = [ordered]@{ medusaVariant = $(if ($MedusaVariantExplicit) { $ArtPreviewMedusaVariant } else { '(default)' }); selectOwnHero = [bool]$ArtPreviewSelectOwnHero; focusZoom = $ArtPreviewFocusZoom; shotAfter = $ArtPreviewShotAfter; heroesV2 = [bool]$ArtPreviewHeroesV2; diorama = [bool]$ArtPreviewDiorama }
       heroesV2Anim = $HeroesV2Anim

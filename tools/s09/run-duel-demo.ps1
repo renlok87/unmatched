@@ -12,7 +12,18 @@ param(
   # Script-level probe of the per-seat watchdog logic only (no clients, no
   # exe, no credentials): runs synthetic trace states and exits non-zero on a
   # wrong verdict.
-  [switch]$ProbeWatchdog
+  [switch]$ProbeWatchdog,
+  # VS-4 HB-48 (docs/game-design/visual/04-hud-spec.md s5.3): the rollback of the gate - both clients get -S09Markers
+  # and the result / lobby marker pixel gates run as before. Without it (the default since HB-48) the result screen is
+  # gated by the trace (RESULT summary + 'RESULT view mode=results' before the shot) and its SHOT widget lines
+  # (UI-SCR-GAME state=over, no gameplay block of the HUD visible), the lobby shot by SHOT widget (no UI-HUD block
+  # visible) - the GAMEOVER and LOBBY screens are still Slate until VS-7 (screens.csv) - plus the privacy rules over both
+  # traces; the bright gameplay-region gate of the lobby shot stays in both modes.
+  [switch]$S09Markers,
+  # VS-4 HB-48 (opt-in): the board row of the room (-S08BoardId on the host, verified on the game row; empty = the
+  # backend default board, Marmoreal original) and extra client arguments for BOTH clients, '+'-separated.
+  [string]$BoardId = '',
+  [string]$ClientExtraArgs = ''
 )
 # GD-036 two-client packaged FULL-DUEL demo against the S09 worktree-local
 # backend. Both clients play the whole duel through the S09AUTO driver
@@ -46,6 +57,8 @@ param(
 # abort of THIS run's game (only when the duel did NOT finish on its own).
 $ErrorActionPreference = 'Stop'
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
+. (Join-Path $PSScriptRoot 'HudShotGate.ps1')  # VS-4 HB-48
+if ($BoardId -and $BoardId -cnotmatch '^c[a-z0-9]{24}$') { throw "BoardId '$BoardId' is not a Board row id (cuid)" }
 if (-not $Exe) { $Exe = Join-Path $RepoRoot 'unreal\Unmatched\Saved\StagedBuilds\Windows\Unmatched.exe' }
 if (-not $EvidenceDir) { $EvidenceDir = Join-Path $RepoRoot 'docs\game-design\evidence\S09\run' }
 
@@ -407,11 +420,14 @@ function Invoke-DuelDemo {
   # no measured FPS/frame-time data exists. DefaultGameUserSettings stays 60.
   $common = @("-windowed", "-resx=1280", "-resy=720", "-RenderOffScreen",
     "-ExecCmds=`"t.MaxFPS 30`"", "log=GrepLog",
-    "-ForceAbandonSequences", "-S08Api=$Api", "-S09ShotMode=$ShotMode",
-    "-S09Markers")  # HB-01: the marker pixel gates below need the debug layer (04-hud-spec s5.3)
+    "-ForceAbandonSequences", "-S08Api=$Api", "-S09ShotMode=$ShotMode")
+  # HB-01 / VS-4 HB-48: only the marker gate rollback draws the debug layer; the default gates read SHOT widget + trace
+  if ($S09Markers) { $common += '-S09Markers' }
+  foreach ($extra in @($ClientExtraArgs -split '\+' | Where-Object { $_ })) { $common += $extra }
   $hostArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
     "-S08Auto", "-S08Create", "-S08HeroId=$heroA", "-S08Trace=$hostTrace",
     "-S09Flow", "-S09Combat=attack+scheme", "-S09ShotDir=$hostShots", "-S08ExitAfter=$RunSeconds")
+  if ($BoardId) { $hostArgs += "-S08BoardId=$BoardId" }
   $joinArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
     "-S08Auto", "-S08HeroId=$heroB", "-S08Trace=$joinTrace",
     "-S09Flow", "-S09Combat=defend+resolve+scheme", "-S09ShotDir=$joinShots", "-S08ExitAfter=$RunSeconds")
@@ -668,7 +684,35 @@ function Invoke-DuelDemo {
     Write-Output ("result shots: host={0}B joiner={1}B; lobby shots: host={2}B joiner={3}B" -f `
       $hostResultShot.Length, $joinResultShot.Length, $hostLobbyShot.Length, $joinLobbyShot.Length)
 
-    if ($ShotMode -eq 'request') {
+    $ShotGateLines = @()
+    if (-not $S09Markers) {
+      # ---- VS-4 HB-48: the result screen and the lobby by trace + SHOT widget (GAMEOVER / LOBBY are Slate until VS-7) ----
+      foreach ($pair in @(@('host', $hostTrace, $hostResultShot.FullName), @('joiner', $joinTrace, $joinResultShot.FullName))) {
+        $lines = [System.IO.File]::ReadAllLines($pair[1])
+        $shotAt = -1
+        for ($k = $lines.Length - 1; $k -ge 0; $k--) { if ($lines[$k] -match 'SHOT request file=s09-result-screen\.png ') { $shotAt = $k; break } }
+        if ($shotAt -lt 0) { throw "$($pair[0]) trace never requested s09-result-screen.png" }
+        $summary = $null; $view = $null
+        for ($k = $shotAt; $k -ge 0; $k--) {
+          if (-not $view -and $lines[$k] -match 'RESULT view mode=(\w+) ') { $view = $Matches[1] }
+          if (-not $summary -and $lines[$k] -match 'RESULT summary outcome=(VICTORY|DEFEAT) ') { $summary = $Matches[1] }
+          if ($view -and $summary) { break }
+        }
+        if ($view -ne 'results') { throw "$($pair[0]) result shot: the last RESULT view before it is '$view', not the results screen" }
+        if (-not $summary) { throw "$($pair[0]) result shot: no 'RESULT summary outcome=VICTORY|DEFEAT' before it" }
+        $s = Get-MarkerStats $pair[2]
+        if (-not (($s.w -eq 1280 -and $s.h -eq 720) -or ($s.w -eq 1920 -and $s.h -eq 1080))) {
+          throw ("{0} result shot is {1}x{2} - NOT 1280x720/1920x1080" -f $pair[0], $s.w, $s.h)
+        }
+        $ShotGateLines += "$($pair[0]) result screen: RESULT summary outcome=$summary, RESULT view mode=results before the shot"
+        $ShotGateLines += Assert-HudShotGate -TracePath $pair[1] -Who $pair[0] -Privacy -Rules @(
+          's09-result-screen.png: need UI-SCR-GAME state=over; deny UI-HUD-PENDING; deny UI-HUD-COMBAT-EDGE; deny UI-HUD-ACTIONS; deny UI-HUD-HAND',
+          's09-lobby-return.png: deny UI-HUD-*')
+        $ShotGateLines += Assert-HudShotGateFails $pair[1] 's09-lobby-return.png: need UI-SCR-GAME state=over' "$($pair[0]) lobby shot as the result screen"
+      }
+      foreach ($l in $ShotGateLines) { Write-Output $l }
+    }
+    if ($ShotMode -eq 'request' -and $S09Markers) {
       # Result screen: the COMPLETE panel on both seats - one marker per
       # REQUIRED element (header #FFD700, outcome, supporting line, button).
       # A capture caught mid-Slate-paint misses the later elements (the
@@ -693,7 +737,9 @@ function Invoke-DuelDemo {
         Write-Output ("{0} result shot markers: header={1} outcome={2} support={3} button={4} (gameplay markers all-zero)" -f `
           $pair[0], $s.resultscreenAll, $s.resultoutcomeAll, $s.resultsupportAll, $s.resultbuttonAll)
       }
-      # Lobby shots: the CLEAN user-facing lobby panel present (lobbypanel
+    }
+    if ($ShotMode -eq 'request') {
+      # Lobby shots: the CLEAN user-facing lobby panel present (lobbypanel (-S09Markers only, VS-4 HB-48)
       # marker) and EVERY in-duel marker gone - result, combat, drafts; the
       # stale runtime board/fighters are torn down at the stage change.
       # PLUS the VISUAL gameplay-region gate: marker-only checks missed the
@@ -728,11 +774,11 @@ function Invoke-DuelDemo {
       }
       foreach ($pair in @(@('host', $hostLobbyShot.FullName), @('joiner', $joinLobbyShot.FullName))) {
         $s = Get-MarkerStats $pair[1]
-        if ($s.lobbypanelAll -lt 100) {
+        if ($S09Markers -and $s.lobbypanelAll -lt 100) {
           throw ("{0} lobby shot missing the clean lobby entry panel (lobbypanel={1})" -f $pair[0], $s.lobbypanelAll)
         }
         foreach ($duel in @('resultscreen', 'resultoutcome', 'resultsupport', 'resultbutton', 'pending', 'attack', 'defense', 'resolve', 'maneuver', 'discard')) {
-          if ($s[$duel + 'All'] -ne 0) {
+          if ($S09Markers -and $s[$duel + 'All'] -ne 0) {
             throw ("{0} lobby shot still shows an in-duel marker: {1}={2}" -f $pair[0], $duel, $s[$duel + 'All'])
           }
         }
