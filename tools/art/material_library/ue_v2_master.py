@@ -161,6 +161,38 @@ def binop(g, nid, cls, a, b, col, a_out="", b_out="", props=None):
     return nid
 
 
+def _fx_grade() -> dict:
+    """The measured tone-curve fit of the board profiles (conceptPaste.grade, identical on Marmoreal and Sarpedon):
+    FxGradeScale = fitScale, FxGradePow = 1 / fitPower (the paste convention)."""
+    profiles = json.loads((REPO / "unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json").read_text(
+        encoding="utf-8"))
+    for board in profiles.get("boards", []):
+        grade = (board.get("conceptPaste") or {}).get("grade") or {}
+        if "fitScale" in grade:
+            return {"scale": [round(k, 6) for k in grade["fitScale"]],
+                    "pow": [round(1.0 / k, 6) for k in grade["fitPower"]]}
+    return {"scale": [1.0, 1.0, 1.0], "pow": [1.0, 1.0, 1.0]}
+
+
+FX_GRADE = _fx_grade()
+# the flash (display rgb, a = 1) + the rim (display colour x edge mask): each inverted through the tone-curve fit
+# per AP1 channel, then summed (the masks never overlap in a frame; 0 -> 0)
+FX_INV_TONE_HLSL = """const float3x3 S2A = float3x3(0.613097, 0.339523, 0.047379, 0.070194, 0.916354, 0.013452, 0.020616, 0.109570, 0.869815);
+const float3x3 A2S = float3x3(1.704859, -0.621715, -0.083299, -0.130078, 1.140734, -0.010560, -0.023964, -0.128975, 1.153013);
+float3 o = 0;
+float3 cs[2] = {Flash, RimC * saturate(RimM)};
+for (int i = 0; i < 2; ++i) {
+  float3 tl = max(mul(S2A, saturate(cs[i])), 0.0);
+  float3 y = min(pow(tl, GP), 0.98);
+  float3 qa = 2.51 - y * 2.43;
+  float3 qb = 0.03 - y * 0.59;
+  float3 qc = -y * 0.14;
+  float3 x = (-qb + sqrt(max(qb * qb - 4.0 * qa * qc, 0.0))) / (2.0 * qa);
+  o += max(mul(A2S, x / 0.6 * GS), 0.0);
+}
+return o;"""
+
+
 def figure_v2_graph(spec: dict) -> Graph:
     p = spec["parameters"]
     cpd = spec["custom_primitive_data"]
@@ -269,25 +301,62 @@ def figure_v2_graph(spec: dict) -> Graph:
     scalar(g, "cpd_rimw", "CPD_RimWidth", 0.0, "", 5, cpd=cpd["RimWidth"]["index"])
     scalar(g, "cpd_fade", "CPD_Fade", 0.0, "", 5, cpd=cpd["Fade"]["index"])
     vector(g, "p_rimcol", "RimColor", p["RimColor"]["default_linear"], "Cue", 5)
-    binop(g, "flash", "Multiply", "cpd_flash", "cpd_flash", 6, "RGB", "A")
+    # FX-05 (the Z-2 review fix 7, ВР-Z2R-08 по делегированию): the rim is a hard cream EDGE along the silhouette
+    # and it REPLACES the lit albedo there (base x (1 - m)), the flash likewise covers the albedo by a x FlashCover:
+    # added on top of the lit figure the Z-2 rim washed whole facets to white (ΔE76 51-55 to card.cream) and the
+    # flash stopped at mean luma 0.82. The edge mask: 1 - N.V of the smooth VERTEX normal (no normal-map detail),
+    # a step at lerp(RimEdgeNarrow, RimEdgeWide, RimWidth) softened over RimEdgeSoft; CPD 0 = the neutral figure.
+    binop(g, "flash_rgb", "Multiply", "cpd_flash", "cpd_flash", 6, "RGB", "A")
+    scalar(g, "p_flashgain", "FlashGain", 0.82, "Cue", 5, sort=13)
+    scalar(g, "p_flashcover", "FlashCover", 1.0, "Cue", 5, sort=14)
+    binop(g, "flash", "Multiply", "flash_rgb", "p_flashgain", 7)
     g.add("rimw_sat", "Saturate", {}, 6)
     g.link("cpd_rimw", "", "rimw_sat", "")
-    g.add("rim_exp", "LinearInterpolate", {"const_a": 8.0, "const_b": 1.0}, 7)
-    g.link("rimw_sat", "", "rim_exp", "Alpha")
-    g.add("fresnel", "Fresnel", {"base_reflect_fraction": 0.0, "exponent": 5.0}, 8)
-    g.link("rim_exp", "", "fresnel", "ExponentIn")
-    binop(g, "rim_c", "Multiply", "p_rimcol", "fresnel", 9, "RGB", "")
-    binop(g, "rim", "Multiply", "rim_c", "cpd_rim", 10)
-    binop(g, "em_sum", "Add", "flash", "rim", 11)
-    # FX-05 (VS-6 Z-2, ВР-Z2-11): the flash / rim emissive rides the display-unit EyeAdaptationInverse
-    # convention of the hit tint (the raw linear emissive lands ~0.55 through the fixed ACES exposure; the
-    # EAI input is the DISPLAY value - fx.flash 0.95 reads on screen as the token, < the 1.5 card ceiling).
-    # EAI(0) = 0, so the neutral figure compiles bit for bit as before.
-    g.add("fx_alpha", "Constant", {"r": 1.0}, 11)
-    g.add("fx_eai", "EyeAdaptationInverse", {}, 12)
-    g.link("em_sum", "", "fx_eai", "LightValueInput")
-    g.link("fx_alpha", "", "fx_eai", "AlphaInput")
-    binop(g, "emissive", "Multiply", "fx_eai", "p_emi", 12)
+    scalar(g, "p_rimnarrow", "RimEdgeNarrow", 0.62, "Cue", 5, sort=15)
+    scalar(g, "p_rimwide", "RimEdgeWide", 0.42, "Cue", 5, sort=16)
+    scalar(g, "p_rimsoft", "RimEdgeSoft", 0.08, "Cue", 5, sort=17)
+    g.add("rim_t", "LinearInterpolate", {}, 7)
+    g.link("p_rimnarrow", "", "rim_t", "A")
+    g.link("p_rimwide", "", "rim_t", "B")
+    g.link("rimw_sat", "", "rim_t", "Alpha")
+    g.add("rim_nrm", "VertexNormalWS", {}, 7)
+    g.add("fresnel", "Fresnel", {"base_reflect_fraction": 0.0, "exponent": 1.0}, 8)
+    g.link("rim_nrm", "", "fresnel", "Normal")
+    # the intensity narrows the band (a full-colour cream edge that grows with the ramp; below 0.25 it fades out):
+    # the hover 0.6 is a thinner cream edge, not a dimmer one (ВР-Z2R-08)
+    scalar(g, "p_rimnarrowi", "RimIntensityNarrow", 0.15, "Cue", 5, sort=20)
+    g.add("rim_inv", "OneMinus", {}, 7)
+    g.link("cpd_rim", "", "rim_inv", "")
+    binop(g, "rim_shift", "Multiply", "rim_inv", "p_rimnarrowi", 7)
+    binop(g, "rim_t2", "Add", "rim_t", "rim_shift", 8)
+    binop(g, "rim_d", "Subtract", "fresnel", "rim_t2", 8)
+    binop(g, "rim_q", "Divide", "rim_d", "p_rimsoft", 9)
+    g.add("rim_s", "Saturate", {}, 9)
+    g.link("rim_q", "", "rim_s", "")
+    binop(g, "rim_g4", "Multiply", "cpd_rim", None, 9, props={"const_b": 4.0})
+    g.add("rim_gate", "Saturate", {}, 9)
+    g.link("rim_g4", "", "rim_gate", "")
+    binop(g, "rim_m", "Multiply", "rim_s", "rim_gate", 10)
+    # the albedo cover of both channels (0 with both channels at 0)
+    binop(g, "flash_cov", "Multiply", "cpd_flash", "p_flashcover", 10, "A", "")
+    binop(g, "fx_cover", "Max", "rim_m", "flash_cov", 11)
+    g.add("fx_keep", "OneMinus", {}, 11)
+    g.link("fx_cover", "", "fx_keep", "")
+    # FX-05 (the Z-2 review, ВР-Z2R-11 по делегированию): the flash / rim colours are DISPLAY targets (fx.flash,
+    # fx.rim = card.cream); the emissive that shows them is the inverse of the engine tone curve - the same measured
+    # fit as M_ConceptPaste / M_FX_Print (FxGradeScale = fitScale, FxGradePow = 1 / fitPower of the board profiles,
+    # inverted per AP1 channel, ВР-Z2R-09). The Z-2 display-unit EyeAdaptationInverse path only undid the exposure:
+    # the tone curve still pulled the cream rim to ~(204,198,192) and the flash to mean luma 0.82. 0 in -> 0 out.
+    vector(g, "p_fxgs", "FxGradeScale", list(FX_GRADE["scale"]) + [0.0], "Cue", 5, sort=18)
+    vector(g, "p_fxgp", "FxGradePow", list(FX_GRADE["pow"]) + [0.0], "Cue", 5, sort=19)
+    g.add("fx_inv", "Custom", {"code": FX_INV_TONE_HLSL, "description": "UM_V2_FxInvTone",
+                               "output_type": "CMOT_FLOAT3", "inputs": ["Flash", "RimC", "RimM", "GS", "GP"]}, 12)
+    g.link("flash", "", "fx_inv", "Flash")
+    g.link("p_rimcol", "RGB", "fx_inv", "RimC")
+    g.link("rim_m", "", "fx_inv", "RimM")
+    g.link("p_fxgs", "RGB", "fx_inv", "GS")
+    g.link("p_fxgp", "RGB", "fx_inv", "GP")
+    binop(g, "emissive", "Multiply", "fx_inv", "p_emi", 12)
     g.add("dbg_alpha", "Constant", {"r": 1.0}, 11)
     g.add("dbg_eai", "EyeAdaptationInverse", {}, 12)
     g.link("core", "DebugE", "dbg_eai", "LightValueInput")
@@ -296,10 +365,11 @@ def figure_v2_graph(spec: dict) -> Graph:
     g.add("lum_fade", "Constant3Vector", {"constant": rgba(list(LUMA) + [0.0])}, 9)
     binop(g, "fade_l", "DotProduct", "core", "lum_fade", 10, "return", "")
     binop(g, "fade_t", "Multiply", "fade_l", None, 11, props={"const_b": float(spec["fade"]["value"])})
-    g.add("base_final", "LinearInterpolate", {}, 12)
-    g.link("core", "return", "base_final", "A")
-    g.link("fade_t", "", "base_final", "B")
-    g.link("cpd_fade", "", "base_final", "Alpha")
+    g.add("base_fade", "LinearInterpolate", {}, 12)
+    g.link("core", "return", "base_fade", "A")
+    g.link("fade_t", "", "base_fade", "B")
+    g.link("cpd_fade", "", "base_fade", "Alpha")
+    binop(g, "base_final", "Multiply", "base_fade", "fx_keep", 12)
     # ---- hit tint (v2.2, DE-010): CPD 12, after the fade; HitTint 0 -> lerp(x, c, 0) = x and + 0 emissive
     scalar(g, "cpd_hit", "CPD_HitTint", 0.0, "", 5, cpd=V2_CPD["HitTint"]["index"])
     vector(g, "p_hitcol", "HitTintColor", HIT_TINT_COLOR, "Cue", 5, sort=10)

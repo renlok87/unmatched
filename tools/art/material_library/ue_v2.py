@@ -7,6 +7,8 @@
     python tools/art/material_library/ue_v2.py accent  --report <dir> --phase baseline|after  # v2.1 UseTeamAccent test
     python tools/art/material_library/ue_v2.py v1check --report <dir> [--v1-baseline <report>]  # v1 unchanged
     python tools/art/material_library/ue_v2.py stats   --report <dir>  # statistics v1 vs v2 (read-only)
+    ... --headless   the same task scripts through UnrealEditor-Cmd -ExecutePythonScript (no live editor, no MCP,
+                     no editor lock) on THIS checkout's project - a worktree rebuilds its own master (Z-2 review)
 
 Rules (task LD-master, 2026-09-29): only /Game/UM/Materials/v2/ is written; the v1 masters (/Game/UM/Materials/M_UM_*)
 and their textures are read-only references; the editor is shared (never restarted, other packages never saved).
@@ -74,6 +76,38 @@ def now() -> str:
     return dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()
 
 
+class HeadlessUe:
+    """--headless: run_task through UnrealEditor-Cmd -ExecutePythonScript="ue_py/_run.py <args.json>" on the
+    project of this checkout (the task scripts are the same; errors come back as {"error": ...})."""
+
+    def run_task(self, script, out_json, timeout=600, **args):
+        import os
+        import subprocess
+        here = REPO / "tools" / "tripo-pipeline" / "review" / "ue_py" / "_run.py"
+        out_json = os.path.abspath(out_json)
+        payload = dict(args, script=os.path.abspath(script).replace("\\", "/"), out=out_json.replace("\\", "/"))
+        args_path = out_json + ".args.json"
+        with open(args_path, "w", encoding="utf-8") as handle:
+            json.dump(payload, handle, indent=1)
+        if os.path.exists(out_json):
+            os.remove(out_json)
+        engine = Path(os.environ.get("UE_ROOT", r"C:\Program Files\Epic Games\UE_5.8"))
+        cmd = [str(engine / "Engine" / "Binaries" / "Win64" / "UnrealEditor-Cmd.exe"),
+               str(REPO / "unreal" / "Unmatched" / "Unmatched.uproject"),
+               '-ExecutePythonScript=%s %s' % (here.as_posix(), args_path.replace("\\", "/")),
+               "-unattended", "-nosplash", "-RenderOffScreen", "-DisablePlugins=Tripo3DUEBridge",
+               "-abslog=%s" % (out_json + ".log")]
+        proc = subprocess.run(cmd, timeout=timeout, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                              stderr=subprocess.DEVNULL, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+        if not os.path.exists(out_json):
+            raise SystemExit("headless task %s: no report (exit %s), log %s.log" % (script, proc.returncode, out_json))
+        data = json.load(open(out_json, encoding="utf-8"))
+        if isinstance(data, dict) and data.get("error"):
+            raise SystemExit("headless task %s failed: %s\n%s" % (script, data["error"],
+                                                                     data.get("traceback", "")[-2000:]))
+        return data
+
+
 def task(ue: Ue, script: str, out_dir: Path, timeout=900, **kw):
     return ue.run_task(str(HERE / "ue" / script), str(out_dir / "_task.json"), timeout=timeout, **kw)
 
@@ -124,6 +158,8 @@ def main() -> int:
                     help="accent: one short part (ue_v2_accent.py); summary merges the part reports (no editor)")
     ap.add_argument("--calib-from", help="accent hero-*: the wall part report with the DebugView 1 calibration")
     ap.add_argument("--frames", default="C:/tmp/ldc-m/frames", help="accent: lossless frames (outside the repository)")
+    ap.add_argument("--headless", action="store_true",
+                    help="UnrealEditor-Cmd on this checkout's project instead of the live editor (no MCP, no lock)")
     ap.add_argument("--only", nargs="+", help="import: only these assets (names, e.g. T_UM_Test_AccentHalf); the others "
                                               "are not re-imported (their packages stay byte-identical)")
     a = ap.parse_args()
@@ -133,6 +169,9 @@ def main() -> int:
     if a.command == "accent" and a.phase == "summary":
         from ue_v2_accent import summary
         res = summary(out, a)
+        lock = None
+    elif a.headless:
+        res = run_command(a, out)
         lock = None
     else:
         # every editor step runs under the shared editor lock (ue_lock.py, orchestrator rule 2026-09-30)
@@ -150,7 +189,7 @@ def main() -> int:
 
 
 def run_command(a, out: Path) -> dict:
-    ue = Ue()
+    ue = HeadlessUe() if getattr(a, "headless", False) else Ue()
     if a.command == "import":
         res = cmd_import(ue, out, a)
     elif a.command == "v1check":
