@@ -81,6 +81,7 @@
 #include "UI/UmHudHand.h"
 #include "UI/UmHudLayout.h"
 #include "UI/UmHudPanels.h"
+#include "UI/UmHudPerf.h"
 #include "UI/UmHudRoot.h"
 #include "UI/UmHudScale.h"
 #include "UI/UmHudStatusLine.h"
@@ -88,6 +89,8 @@
 #include "UI/UmHudTop.h"
 #include "UI/UmTopStrip.h"
 #include "Brushes/SlateRoundedBoxBrush.h"
+#include "DynamicRHI.h"
+#include "RenderTimer.h"
 #include "Dom/JsonObject.h"
 #include "Engine/Engine.h"
 #include "Engine/GameViewportClient.h"
@@ -158,6 +161,27 @@ struct FUmHudRuntime {
   // VS-3 SC-01: -S08ScreenShots (-1 not read yet / 0 off / 1 on) and the UI-SCR-* id-state keys already framed
   int32 ScreenShots = -1;
   TSet<FString> ScreenShotKeys;
+  // VS-3 exit frames (-S08ExitShots, sets A and C): the hover of the own exit turn; the held conditions (leaf -> since
+  // when true, Elapsed) and the frames taken; the auto attack / defense holds for their frames
+  float ExitHoverAt = -1.0f;
+  FString ExitHoverPath;
+  bool bExitHoverDone = false;
+  TMap<FString, float> ExitSince;
+  TSet<FString> ExitDone;
+  float ExitAttackHoldAt = -1.0f;
+  float ExitAttackAskedAt = -1.0f;
+  FString ExitAttackPath;
+  bool bExitAttackDone = false;
+  float ExitDefenseHoldAt = -1.0f;
+  float ExitDefenseSince = -1.0f;
+  float ExitDefenseAskedAt = -1.0f;
+  FString ExitDefensePath;
+  bool bExitDefenseDone = false;
+  // VS-3 HUD budget (-S08HudPerf, HUD-RULES П8): -1 not read / 0 off / 1 measuring / 2 finished
+  int32 Perf = -1;
+  float PerfStartAt = -1.0f;
+  bool bPerfShown = true;
+  FUmHudPerfMeter PerfMeter;
   double TimerDeadlineSec = 0.0;
   float TimerWindowSec = 30.0f;
   float BannerShiftSu = 0.0f;
@@ -233,6 +257,7 @@ void AS08FlowGameMode::BuildUmHud() {
 void AS08FlowGameMode::HandleUmHudScaleChanged(const FUmHudScaleState& /*State*/) { RefreshUmHudLayout(); }
 
 void AS08FlowGameMode::HandleUmHudEndPlay() {
+  FinishUmHudPerf(TEXT("end-play"));  // VS-3 -S08HudPerf: the summary of a match that did not end
   if (UmHud.IsValid() && UmHud->ScaleHandle.IsValid()) {
     UmHudScale::OnUiScaleChanged().Remove(UmHud->ScaleHandle);
     UmHud->ScaleHandle.Reset();
@@ -423,22 +448,29 @@ void AS08FlowGameMode::WriteUmHudLateLines() {
   R.LateIds.Reset();
 }
 
-void AS08FlowGameMode::NoteUmExitShotsTurn(bool bOwn, bool bInitial, bool bGameOver) {
-  if (!UmHud.IsValid() || !bAutoS09 || S09ShotDir.IsEmpty() || bInitial || bGameOver) return;
+bool AS08FlowGameMode::UmExitShotsOn() {
+  if (!UmHud.IsValid() || !bAutoS09 || S09ShotDir.IsEmpty()) return false;
   FUmHudRuntime& R = *UmHud;
   if (R.ExitShots < 0) R.ExitShots = FParse::Param(FCommandLine::Get(), TEXT("S08ExitShots")) ? 1 : 0;
+  return R.ExitShots == 1;
+}
+
+void AS08FlowGameMode::NoteUmExitShotsTurn(bool bOwn, bool bInitial, bool bGameOver) {
+  if (bInitial || bGameOver || !UmExitShotsOn()) return;
+  FUmHudRuntime& R = *UmHud;
   float& At = bOwn ? R.ExitOwnAt : R.ExitOppAt;
-  if (R.ExitShots == 0 || At >= 0.0f) return;  // only the first turn of each side
+  if (At >= 0.0f) return;  // only the first turn of each side
   At = Elapsed;
-  // the own turn stays at rest past its + 3 s frame (the other client sees the opponent thinking as long)
-  if (bOwn) S09SchemeQuietUntil = FMath::Max(S09SchemeQuietUntil, Elapsed + 3.4f);
+  // the own turn stays at rest past its + 3 s frame and the VS-3 hover frame (+ 3.4 s hover, + 3.9 s frame); the other
+  // client sees the opponent thinking as long
+  if (bOwn) S09SchemeQuietUntil = FMath::Max(S09SchemeQuietUntil, Elapsed + 5.0f);
   FS08Trace::Write(FString::Printf(TEXT("EXITSHOT turn=%s seq=%d at=%.2f hold=%s"), bOwn ? TEXT("own") : TEXT("opp"),
                                    Flow.IsValid() ? Flow->GetAppliedSnapshot().SequenceNumber : -1, Elapsed,
-                                   bOwn ? TEXT("3.4") : TEXT("0")));
+                                   bOwn ? TEXT("5.0") : TEXT("0")));
 }
 
 void AS08FlowGameMode::TickUmExitShots() {
-  if (!UmHud.IsValid() || UmHud->ExitShots != 1 || S09ShotDir.IsEmpty()) return;
+  if (!UmExitShotsOn()) return;
   FUmHudRuntime& R = *UmHud;
   struct FPlanned {
     bool bOwn;
@@ -455,12 +487,248 @@ void AS08FlowGameMode::TickUmExitShots() {
     R.ExitTaken |= 1u << I;
     FS08Trace::Write(FString::Printf(TEXT("EXITSHOT shot %s dt=%.2f"), Plan[I].Leaf, Elapsed - At));
     TakeEvidenceShot(S09ShotDir / Plan[I].Leaf);  // the evidence queue orders it after a shot in flight
-    break;
+    return;
+  }
+  TickUmExitShotsVs3();
+}
+
+// ------------------------------------------------------------------------------------------------ VS-3 exit frames
+// 05-production-plan §3 VS-3 (opt-in -S08ExitShots with -S09Flow and -S09ShotDir, ВР-VS3-68...): set A - the hover of
+// a hand card at the own exit turn, the attack selected (the auto attack's draft held for its frame), the hand of 3 / 7
+// / 9 cards; set C - the defense window on both clients (the defender's window held for its frame, the attacker's
+// «Ждём защиту…»), the reveal, the no-defense stamp, the last 10 s of the timer. Files s09-exit-*.png (published by
+// run-combat-demo with the VS-2 ones), trace 'EXITSHOT ...' with the states the frame shows (no card names).
+
+namespace {
+const TCHAR* UmExitEdgeState(const UUmHudCombatEdge* E) {
+  return E && E->GetModel().bShow ? UmHudCombatEdge::StateName(E->GetModel().State) : TEXT("-");
+}
+}  // namespace
+
+void AS08FlowGameMode::TickUmExitShotsVs3() {
+  FUmHudRuntime& R = *UmHud;
+  if (!Hud.bValid || Hud.bGameOver || IsResultScreenShown()) return;
+  UUmHudHand* Hand = R.Hand.Get();
+  const bool bHandShown = Hand && Hand->GetModel().bShow;
+  const int32 HandN = bHandShown ? Hand->GetModel().RowCount() : -1;
+  const FString HandState = bHandShown ? Hand->StateName() : FString(TEXT("-"));
+  const UUmHudCombatEdge* EOwn = R.Combat.GetEdge(EUmEdgeSide::Own);
+  const UUmHudCombatEdge* EOpp = R.Combat.GetEdge(EUmEdgeSide::Opp);
+  const UUmHudCombatCenter* Center = R.Combat.GetCenter();
+  const FString States = FString::Printf(
+      TEXT("hand=%d/%s edges=%s/%s center=%s turn=%s seq=%d"), HandN, *HandState, UmExitEdgeState(EOwn),
+      UmExitEdgeState(EOpp),
+      Center && UmGameHudSlots::ShownByProperty(Center) ? UmHudCombatCenter::StateName(Center->GetModel().State) : TEXT("-"),
+      Hud.bViewerTurn ? TEXT("own") : TEXT("opp"), Hud.SequenceNumber);
+  // ---- set A: the hover of the own exit turn (+ 3.4 s the middle card of the resting row, its frame + 0.5 s) ----
+  if (!R.bExitHoverDone && R.ExitOwnAt >= 0.0f && Hand) {
+    if (R.ExitHoverAt < 0.0f) {
+      if (Elapsed >= R.ExitOwnAt + 3.4f) {
+        TArray<int32> Rows;
+        for (int32 I = 0; I < Hand->GetModel().Cards.Num(); ++I) {
+          if (Hand->RestRectSu(I).bIsValid) Rows.Add(I);
+        }
+        if (Rows.Num() == 0 || HandState != TEXT("rest")) {
+          R.bExitHoverDone = true;
+          FS08Trace::Write(FString::Printf(TEXT("EXITSHOT hover skipped %s"), *States));
+        } else {
+          // the pointer's path: a point in the middle card's strip of the resting row (HoverAtSu, 04 §2.6)
+          const int32 Pick = Rows[Rows.Num() / 2];
+          Hand->HoverAtSu(Hand->RestRectSu(Pick).GetCenter());
+          if (Hand->GetHoverIndex() != Pick) Hand->SetHoverIndex(Pick);
+          R.ExitHoverAt = Elapsed;
+          FS08Trace::Write(FString::Printf(TEXT("EXITSHOT hover card=%d of %d"), Rows.IndexOfByKey(Pick), Rows.Num()));
+        }
+      }
+    } else if (R.ExitHoverPath.IsEmpty()) {
+      if (Elapsed >= R.ExitHoverAt + 0.5f && !IsEvidenceCaptureBusy()) {
+        R.ExitHoverPath = S09ShotDir / TEXT("s09-exit-hand-hover.png");
+        FS08Trace::Write(FString::Printf(TEXT("EXITSHOT shot s09-exit-hand-hover.png %s"), *States));
+        TakeEvidenceShot(R.ExitHoverPath);
+        return;
+      }
+    } else if (FPaths::FileExists(R.ExitHoverPath) || Elapsed >= R.ExitHoverAt + 3.0f) {
+      Hand->ClearHover();
+      R.bExitHoverDone = true;
+      FS08Trace::Write(TEXT("EXITSHOT hover cleared"));
+    }
+  }
+  // ---- the held conditions: a frame once the state has held long enough (its animations landed) ----
+  const auto Open = [](const UUmHudCombatEdge* E) {
+    const EUmEdgeState S = E && E->GetModel().bShow ? E->GetModel().State : EUmEdgeState::Hidden;
+    return S == EUmEdgeState::Back || S == EUmEdgeState::Shield || S == EUmEdgeState::Chosen;
+  };
+  const auto Is = [](const UUmHudCombatEdge* E, EUmEdgeState S) { return E && E->GetModel().bShow && E->GetModel().State == S; };
+  const bool bReveal = (Is(EOwn, EUmEdgeState::Reveal) || Is(EOpp, EUmEdgeState::Reveal)) && !Open(EOwn) && !Open(EOpp);
+  const bool bWait = Center && UmGameHudSlots::ShownByProperty(Center) && Center->GetModel().State == EUmCenterState::Wait;
+  struct FCond {
+    const TCHAR* Leaf;
+    bool bNow;
+    float HoldSec;
+  };
+  const FCond Conds[] = {
+      {TEXT("s09-exit-hand-n3.png"), HandN == 3 && HandState == TEXT("rest"), 0.8f},
+      {TEXT("s09-exit-hand-n7.png"), HandN == 7 && HandState == TEXT("rest"), 0.8f},
+      {TEXT("s09-exit-hand-n9.png"), HandN == 9 && (HandState == TEXT("rest") || HandState == TEXT("discard")), 0.6f},
+      {TEXT("s09-exit-defense-wait.png"), bWait, 0.8f},
+      {TEXT("s09-exit-defense-warn.png"), Is(EOwn, EUmEdgeState::Shield) && EOwn->GetTimerState() == EUmTimerState::Warning, 0.6f},
+      {TEXT("s09-exit-reveal.png"), bReveal, 0.9f},
+      {TEXT("s09-exit-nodefense.png"), Is(EOwn, EUmEdgeState::NoDefense) || Is(EOpp, EUmEdgeState::NoDefense), 0.6f},
+  };
+  for (const FCond& C : Conds) {
+    const FString Leaf(C.Leaf);
+    if (R.ExitDone.Contains(Leaf)) continue;
+    if (!C.bNow) {
+      R.ExitSince.Remove(Leaf);
+      continue;
+    }
+    const float* Since = R.ExitSince.Find(Leaf);
+    if (!Since) {
+      R.ExitSince.Add(Leaf, Elapsed);
+      continue;
+    }
+    if (Elapsed - *Since < C.HoldSec || IsEvidenceCaptureBusy()) continue;
+    R.ExitDone.Add(Leaf);
+    FS08Trace::Write(FString::Printf(TEXT("EXITSHOT shot %s held=%.2f %s"), C.Leaf, Elapsed - *Since, *States));
+    TakeEvidenceShot(S09ShotDir / Leaf);
+    return;  // one request per frame
   }
 }
 
+bool AS08FlowGameMode::HoldUmExitAttack() {
+  // set A «выбрана атака»: the auto attack's complete draft (attacker, target, card - the card raised in the hand) stays
+  // until its frame is written; ResumeUmExitAttack sends it (the first own attack of the run only)
+  if (!UmExitShotsOn() || UmHud->bExitAttackDone) return false;
+  FUmHudRuntime& R = *UmHud;
+  if (R.ExitAttackHoldAt < 0.0f) {
+    R.ExitAttackHoldAt = Elapsed;
+    FS08Trace::Write(FString::Printf(TEXT("EXITSHOT hold attack seq=%d"), Hud.SequenceNumber));
+    RefreshHud();  // the hand shows the selected attack card
+  }
+  return true;
+}
+
+void AS08FlowGameMode::ResumeUmExitAttack() {
+  if (!UmHud.IsValid() || UmHud->ExitAttackHoldAt < 0.0f || UmHud->bExitAttackDone) return;
+  FUmHudRuntime& R = *UmHud;
+  if (R.ExitAttackPath.IsEmpty()) {
+    if (Elapsed < R.ExitAttackHoldAt + 0.6f || IsEvidenceCaptureBusy()) {
+      if (Elapsed < R.ExitAttackHoldAt + 8.0f) return;
+    } else {
+      R.ExitAttackPath = S09ShotDir / TEXT("s09-exit-attack-selected.png");
+      R.ExitAttackAskedAt = Elapsed;
+      const UUmHudHand* Hand = R.Hand.Get();
+      FS08Trace::Write(FString::Printf(TEXT("EXITSHOT shot s09-exit-attack-selected.png hand=%s seq=%d"),
+                                       Hand ? *Hand->StateName() : TEXT("-"), Hud.SequenceNumber));
+      TakeEvidenceShot(R.ExitAttackPath);
+      return;
+    }
+  } else if (!FPaths::FileExists(R.ExitAttackPath) && Elapsed < R.ExitAttackAskedAt + 6.0f) {
+    return;
+  }
+  R.bExitAttackDone = true;
+  FS08Trace::Write(FString::Printf(TEXT("EXITSHOT release attack written=%d"),
+                                   !R.ExitAttackPath.IsEmpty() && FPaths::FileExists(R.ExitAttackPath) ? 1 : 0));
+  if (!ConfirmCombat()) {
+    // as the auto attack itself: the gate closed meanwhile - back out of the draft, retry later
+    CommandUi.Mode = ES09CommandMode::None;
+    CommandUi.AttackAttackerId.Reset();
+    CommandUi.AttackTargetId.Reset();
+    CommandUi.AttackCardId.Reset();
+    NextCommandAt = Elapsed + 1.0f;
+  }
+}
+
+bool AS08FlowGameMode::HoldUmExitDefense() {
+  // set C «окно защиты»: the defender's first window stays open (slot «Карта не выбрана», the timer, the two buttons)
+  // until its frame is written - also the attacker's «Ждём защиту…» holds as long
+  if (!UmExitShotsOn() || UmHud->bExitDefenseDone) return false;
+  FUmHudRuntime& R = *UmHud;
+  if (R.ExitDefenseHoldAt < 0.0f) {
+    R.ExitDefenseHoldAt = Elapsed;
+    FS08Trace::Write(FString::Printf(TEXT("EXITSHOT hold defense seq=%d"), Hud.SequenceNumber));
+  }
+  if (R.ExitDefensePath.IsEmpty()) {
+    // the UMG window is drawn after the 600 ms declare (ВР-VS3-59); the Slate rollback draws its block at once
+    const UUmHudCombatEdge* Own = R.Combat.GetEdge(EUmEdgeSide::Own);
+    const bool bWindow = !UmCombatOnUmg() || (Own && Own->GetModel().bShow && Own->GetModel().State == EUmEdgeState::Shield &&
+                                              Own->GetTimerState() != EUmTimerState::Off);
+    if (!bWindow) {
+      R.ExitDefenseSince = -1.0f;
+    } else if (R.ExitDefenseSince < 0.0f) {
+      R.ExitDefenseSince = Elapsed;
+    }
+    if (R.ExitDefenseSince >= 0.0f && Elapsed >= R.ExitDefenseSince + 0.8f && !IsEvidenceCaptureBusy()) {
+      R.ExitDefensePath = S09ShotDir / TEXT("s09-exit-defense-window.png");
+      R.ExitDefenseAskedAt = Elapsed;
+      FS08Trace::Write(FString::Printf(TEXT("EXITSHOT shot s09-exit-defense-window.png edge=%s timer=%s seq=%d"),
+                                       UmExitEdgeState(Own),
+                                       Own ? UmHudCombatEdge::TimerStateName(Own->GetTimerState()) : TEXT("-"),
+                                       Hud.SequenceNumber));
+      TakeEvidenceShot(R.ExitDefensePath);
+      return true;
+    }
+    if (Elapsed < R.ExitDefenseHoldAt + 6.0f) return true;
+    FS08Trace::Write(TEXT("EXITSHOT defense window never drawn - released WITHOUT the frame"));
+    R.bExitDefenseDone = true;
+    return false;
+  }
+  if (!FPaths::FileExists(R.ExitDefensePath) && Elapsed < R.ExitDefenseAskedAt + 4.0f) return true;
+  R.bExitDefenseDone = true;
+  FS08Trace::Write(TEXT("EXITSHOT release defense"));
+  return false;
+}
+
+// ------------------------------------------------------------------------------------------------ VS-3 HUD budget
+
+void AS08FlowGameMode::TickUmHudPerf() {
+  // HUD-RULES П8 (opt-in -S08HudPerf, UI/UmHudPerf.h): the UMG HUD root collapsed / shown in alternating blocks
+  if (!UmHud.IsValid() || !UmHudRoot) return;
+  FUmHudRuntime& R = *UmHud;
+  if (R.Perf < 0) {
+    R.Perf = FParse::Param(FCommandLine::Get(), TEXT("S08HudPerf")) ? 1 : 0;
+    int32 Block = 90;
+    FParse::Value(FCommandLine::Get(), TEXT("S08HudPerfBlock="), Block);
+    R.PerfMeter.BlockFrames = FMath::Clamp(Block, 20, 600);
+  }
+  if (R.Perf != 1) return;
+  const bool bAborted = Flow.IsValid() && Flow->GetStage() == ES08Stage::Started && Flow->IsRoomAborted();
+  const bool bLive = Hud.bValid && !Hud.bGameOver && !bAborted && !IsResultScreenShown();
+  if (!bLive) {
+    if (R.PerfStartAt >= 0.0f && (Hud.bGameOver || bAborted || IsResultScreenShown())) FinishUmHudPerf(TEXT("match-end"));
+    return;
+  }
+  if (R.PerfStartAt < 0.0f) {
+    R.PerfStartAt = Elapsed + 8.0f;  // the start hand, the camera and the first snapshots settle
+    FS08Trace::Write(FString::Printf(TEXT("HUDPERF start at=%.1f block=%d skip=%d root=umg"), R.PerfStartAt,
+                                     R.PerfMeter.BlockFrames, R.PerfMeter.SkipFrames));
+    return;
+  }
+  if (Elapsed < R.PerfStartAt) return;
+  const bool bPause = IsEvidenceCaptureBusy() || EvidenceShotQueue.Num() > 0;
+  TArray<FString> Lines;
+  const bool bShow = R.PerfMeter.Step(static_cast<float>(FPlatformTime::ToMilliseconds(GGameThreadTime)),
+                                      static_cast<float>(FPlatformTime::ToMilliseconds(RHIGetGPUFrameCycles())), bPause,
+                                      Lines);
+  for (const FString& L : Lines) FS08Trace::Write(L);
+  if (bShow != R.bPerfShown) {
+    R.bPerfShown = bShow;
+    UmHudRoot->SetVisibility(bShow ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
+  }
+}
+
+void AS08FlowGameMode::FinishUmHudPerf(const TCHAR* Why) {
+  if (!UmHud.IsValid() || UmHud->Perf != 1) return;
+  FUmHudRuntime& R = *UmHud;
+  R.Perf = 2;
+  if (UmHudRoot && !R.bPerfShown) UmHudRoot->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+  R.bPerfShown = true;
+  FS08Trace::Write(R.PerfMeter.Summary(Why));
+}
+
 void AS08FlowGameMode::TickUmHud() {
-  TickUmExitShots();  // VS-2 exit frames (-S08ExitShots)
+  TickUmHudPerf();    // VS-3 HUD budget (-S08HudPerf)
+  TickUmExitShots();  // VS-2 / VS-3 exit frames (-S08ExitShots)
   TickUmScreenShots();  // VS-3 SC-01 (-S08ScreenShots)
   // VS-2 HB-12: Hand over an own figure or a lit cell (picked when the pointer moved), the busy loop while in flight
   if (UmHud.IsValid() && UmHudRoot && UmHudRoot->HasCursors()) {

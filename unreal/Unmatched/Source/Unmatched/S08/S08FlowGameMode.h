@@ -1248,6 +1248,16 @@ private:
   /** ВР-VS2-77: the late SHOT lines of the VS-2 blocks first shown in the shot frame. */
   void WriteUmHudLateLines();
   void TickUmExitShots();
+  // VS-3 exit frames (opt-in -S08ExitShots, 05 §3 VS-3 sets A and C): the hover, the hand of 3 / 7 / 9, the attack
+  // selected, the defense window on both clients, the reveal, the stamp; the auto attack / defense hold for their frames
+  bool UmExitShotsOn();
+  void TickUmExitShotsVs3();
+  bool HoldUmExitAttack();
+  void ResumeUmExitAttack();
+  bool HoldUmExitDefense();
+  // VS-3 HUD budget (opt-in -S08HudPerf, HUD-RULES П8, UI/UmHudPerf.h): the UMG root collapsed / shown in blocks
+  void TickUmHudPerf();
+  void FinishUmHudPerf(const TCHAR* Why);
   UPROPERTY()
   TObjectPtr<class UUmHudRoot> UmHudRoot;
   UPROPERTY()

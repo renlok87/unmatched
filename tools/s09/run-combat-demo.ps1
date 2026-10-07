@@ -922,6 +922,12 @@ function Invoke-CombatDemo {
         foreach ($exitFrame in @(Get-ChildItem -LiteralPath (Join-Path $Script:Staging $side) -Filter 's09-exit-*.png' -ErrorAction SilentlyContinue | Sort-Object Name)) {
           $publishNames += (Join-Path $side $exitFrame.Name)
         }
+        # VS-3 SC-01 (ВР-SC14, -ScreenShots): the UI-SCR-<id>-<state>.png frames of the client; published when written
+        if ($ScreenShots) {
+          foreach ($scrFrame in @(Get-ChildItem -LiteralPath (Join-Path $Script:Staging $side) -Filter 'UI-SCR-*.png' -ErrorAction SilentlyContinue | Sort-Object Name)) {
+            $publishNames += (Join-Path $side $scrFrame.Name)
+          }
+        }
       }
     }
     if ($RequireShotCaptured) {

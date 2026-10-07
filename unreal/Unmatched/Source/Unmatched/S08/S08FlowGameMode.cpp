@@ -3577,6 +3577,7 @@ void AS08FlowGameMode::RunS09Auto() {
         TakeEvidenceShot(S09ShotDefensePath);
         return;
       }
+      if (HoldUmExitDefense()) return;  // VS-3 exit frame «окно защиты» (-S08ExitShots)
       // AU-S6 'slowdefense': the first defense holds until the last seconds of the server window
       if (HasPlan(TEXT("slowdefense")) && !bS09SlowDefenseDone && CommandUi.Combat.bHasTimeoutAt) {
         const double Left = CommandUi.Combat.SecondsUntilDeadline();
@@ -4036,6 +4037,7 @@ void AS08FlowGameMode::RunS09Auto() {
             FS08Trace::Write(FString::Printf(TEXT("S09AUTO attack ability boost not added (%s)"), *BoostWhy));
           }
         }
+        if (HoldUmExitAttack()) return;  // VS-3 exit frame «выбрана атака» (-S08ExitShots): ResumeUmExitAttack sends it
         if (!ConfirmCombat()) {
           // Gate closed between the pre-entry check and the confirm (e.g. the
           // stream died mid-pick): back out of the draft and retry later
@@ -4055,7 +4057,10 @@ void AS08FlowGameMode::RunS09Auto() {
       }
     }
   }
-  if (CommandUi.Mode == ES09CommandMode::AttackDraft) return;
+  if (CommandUi.Mode == ES09CommandMode::AttackDraft) {
+    ResumeUmExitAttack();  // VS-3 exit frames: the held draft goes once its frame is written
+    return;
+  }
   // scheme plan: one scheme card in the next own action phase. Prefer a
   // MULTI-STAGE scheme (Restless Spirits: the CHOOSE_SPACE stage1->stage2
   // pair the pending evidence needs) - purely a pick order among equally
