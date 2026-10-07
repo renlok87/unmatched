@@ -109,3 +109,45 @@ discards 1 card.», «deal 1 damage to an opposing fighter in Medusa's zone»), 
 7. **validate_registry.py** падает и в основной копии на `art/um-materials/um-masters.json` (sha256) — не связано с
    этим шагом; в worktree добавляются ошибки отсутствующих игнорируемых GLB / PNG.
 8. Данные: RU-тексты карт и имена героев (бэкенд), «ИИ думает» не снимается (бот ходит быстрее кадра).
+
+## Ревью VS-5 (один проход, арт + объём; 2026-10-08, по делегированию)
+
+- **Объём:** 21 коммит `fix/admin-panel..0a09c9b6` (243 файла) — всё относится к EN-06…EN-18, AN-36 и остаткам VS-4
+  (HB-49 / E4). AGENTS.md — только флаг `-NoConceptPaste` в списке откатов и замена записи «Known gap» на «ENV-U16
+  fixed». Горячие файлы малы: `S08BoardActor.cpp` +19, `S08FlowGameMode.cpp` +8, `S08FlowGameModeUmHud.cpp` +31.
+- **Вид по умолчанию:** `marmoreal-original.conceptPaste` default on / mode paste / offVariant p5c; в слое концепта
+  `props.add` пуст — поверх нарисованного задника 3D-моделей не добавлено (только Niagara: лепестки, светлячки). Профиль
+  Sarpedon не менялся; `manifest.sarpedon.json` — только хеш `cp_bake.py`; `cp_bake check sarpedon` ok.
+- **Откаты:** `-NoConceptPaste` (тесты ResolveMode + `ARTLOOK p5c(flag-off)`, packaged-кадр отката), `-NoHeroLight`,
+  ключи `-S08SlateHud` — покрыты UE-тестами; полный прогон S08/S09/S10 520/521 (единственный отказ исправлен, 10/10),
+  финальные наборы 162/162 — логи `C:/tmp/visual/E5/logs/` проверены.
+- **Повтор ревьюером:** pytest `tools/art/tests` 593 passed / 4 skipped, `tools/s08/hud_contract` 74 passed;
+  `cp_bake check marmoreal|sarpedon`, `cp_layout --check`, `live_tune --check`, `env_gates --check` — ok.
+- **Штамп:** `Saved/StagedBuilds/Windows/BuildStamp.json` commit `b68e21b4`, sourceHash `7af75f21…` = хеш исходников
+  ветки на `0a09c9b6` (после `b68e21b4` менялись только docs).
+- **Правило доказательств (ВР-VS4-01):** 65 новых изображений в `docs/` — кадры доски / окружения без HUD, листы и
+  полосы движения; кадры HUD со сканами и аватарами — вне git (17 файлов, хеши индекса
+  `ENV-U16/data/visual-evidence-index.json` совпали).
+- **Кадры открыты ревьюером (31):** bench K1, K1×0,65, K2×1,6, K2×2,5 по умолчанию; откат `-NoConceptPaste` K1; Sarpedon
+  K1 и GD-058 K2×1,6; лист ENV-U16 (цвет); полосы мерцания, лепестков, ветра 0,4, reduced motion; крупный план P9c;
+  HUD A / C на нарисованном Marmoreal (own-t3.0 1080p, attack-selected, окно защиты 720p 150 %, «Завершить бой»),
+  CONN syncing, MOVE, T. Rex, LEET. Заявления README подтверждены, в том числе FAIL: лепестки на полосе не видны,
+  мерцание едва заметно, разница P9b / P9c на глаз не видна (D1).
+- **Уточнения:** строк `ARTLOOK … backdrop=paste(default)` в трассах прогонов гейтов — 18 (в таблице выше «16»);
+  Sarpedon `lit3d(default)` — 7.
+- **Замечания (в VS-6, не блокеры):**
+  1. Свет героев P9c (`lightProfiles.marmoreal-night.heroLight`) общий для вклейки и отката `-NoConceptPaste` — откат
+     P5c тоже получает P9c. Откат касается задника, но это не записано; записать или развести профили.
+  2. Кадр `conn-syncing` в начале партии: поле доски — низкий мип (крупные блоки) под вуалью синхронизации; проверить
+     стриминг текстур плиты в первые секунды.
+  3. Кадры `-Bench` (и крупные планы P9c) несут старые подписи над фигурами («Harpies 1 1/1», «Medusa 16/16») —
+     по ВР-07 постоянных табличек имён нет; проверить слой подписей в режиме bench.
+  4. Кадры HUD вне git лежат в `scraped-data` worktree: после интеграции скопировать `VS-5-E5/` и `HB-49-E4/` в
+     `scraped-data/derived/visual-evidence/` основной копии (индексы ссылаются на путь «относительно копии»).
+  5. Объём доказательств в git: ~16 PNG по 3,6–4 МБ (кадры live / P9c); новые кадры такого типа — JPEG.
+- **Интеграция:** сухой прогон `safe-integrate.sh feat/visual-vs5` из основной копии — PREFLIGHT OK (fast-forward, ветка
+  содержит `3548255a`). `safe-integrate` не видит игнорируемые файлы: перед `--apply` сохранить игнорируемые
+  `M_ConceptPaste.uasset`, `T_Marmoreal_ConceptPlateA/B.uasset` основной копии в `C:/tmp/visual-backup/2026-10-08/`.
+- **Вердикт:** EN-06, EN-07, EN-10, EN-11, EN-12, EN-13, EN-15, EN-17, EN-18, остатки VS-4 — PASS (по делегированию);
+  EN-08 — PASS с частичным п. 2; EN-09 — FAIL (видимость); AN-36 + EN-14 — PASS кроме D1; EN-16 — технически PASS,
+  художественно не принято. Ветка готова к интеграции.
