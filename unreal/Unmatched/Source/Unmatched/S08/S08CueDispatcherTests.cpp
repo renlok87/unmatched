@@ -118,7 +118,7 @@ bool FS08CueDispatcherTableTest::RunTest(const FString&) {
       default: return TEXT("replace");
     }
   };
-  TestEqual("six combat rows", S08CueRows::Combat().Num(), 6);
+  TestEqual("seven cue rows (CUE-001 + the six combat rows)", S08CueRows::Combat().Num(), 7);
   for (const FS08CueRow& Row : S08CueRows::Combat()) {
     const TSharedPtr<FJsonObject>* JsonPtr = ById.Find(Row.Id);
     TestTrue(Row.Id + TEXT(" in the table"), JsonPtr != nullptr);
