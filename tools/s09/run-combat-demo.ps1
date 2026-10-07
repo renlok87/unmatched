@@ -65,7 +65,7 @@
   # (S09 plan token 'scheme'), so the joiner sees an opponent scheme in the source-card slot. Gates unchanged.
   [switch]$HostScheme,
   # Extra client arguments for BOTH clients, '+'-separated, as run-phase2-demo -ClientExtraArgs (run C G-LIVE,
-  # 2026-10-05: Marmoreal frames need -ConceptPaste until ENV-U16, AGENTS.md "Board scenes and heroes"). Gates unchanged.
+  # since EN-13 the painted Marmoreal backdrop is the default; -NoConceptPaste rolls it back, AGENTS.md "Board scenes and heroes"). Gates unchanged.
   [string]$ClientExtraArgs = '',
   # VS-3 SC-01 (ВР-SC14): -S08ScreenShots on both clients - one evidence frame per new 'SHOT widget id=UI-SCR-* state=<s>'
   # (<UI-ID>-<state>.png in the shot directory of each client)

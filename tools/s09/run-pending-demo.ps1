@@ -12,7 +12,7 @@ param(
   # privacy rules over both traces (tools/s09/HudShotGate.ps1).
   [switch]$S09Markers,
   # VS-4 HB-49 set D (04 s7.2, all opt-in): 1920x1080 instead of 1280x720; the per-process frame cap (AGENTS.md: two
-  # clients at 30 FPS each; 0 = none); extra client arguments for BOTH clients, '+'-separated (e.g. '-ConceptPaste+
+  # clients at 30 FPS each; 0 = none); extra client arguments for BOTH clients, '+'-separated (e.g. '-NoConceptPaste+
   # -S08UiScale=150+-S08ExitShots'); the board row of the room (-S08BoardId on the host, verified on the game row; empty
   # = the backend default board).
   [switch]$FullHd,

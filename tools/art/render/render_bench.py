@@ -453,7 +453,7 @@ def run_one(variant: str, rdir: Path, a) -> dict:
         notes = {**notes, "benchFixture": a.bench_fixture}
     if a.client_args:
         # DE-031 (run F G-LIVE): extra client flags on top of the variant - the Marmoreal painted backdrop
-        # (-ConceptPaste, IMPL p. 3 while ENV-U16 is open) or a review overlay (-BenchTurnHud=<ms>), '+'-separated
+        # (-NoConceptPaste: the 3D P5c rollback since EN-13) or a review overlay (-BenchTurnHud=<ms>), '+'-separated
         extra = [x for x in a.client_args.split("+") if x]
         cmd.extend(extra)
         notes = {**notes, "clientArgs": extra}
@@ -722,7 +722,7 @@ def main(argv=None) -> int:
                         "<board>-<scene>.json; its benchFixture must match --bench-fixture)")
     r.add_argument("--name", default="", help="output directory name under --out (default: the variant)")
     r.add_argument("--client-args", default="",
-                   help="extra client flags, '+'-separated (e.g. -ConceptPaste+-BenchTurnHud=400), recorded in notes")
+                   help="extra client flags, '+'-separated (e.g. -NoConceptPaste+-BenchTurnHud=400), recorded in notes")
     s = sub.add_parser("summarize")
     s.add_argument("--out", required=True)
     s.add_argument("variant_dirs", nargs="+")
