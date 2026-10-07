@@ -43,6 +43,7 @@
 #include "UmHudSubtitle.h"
 #include "UmHudTheme.h"
 #include "UmText.h"
+#include "UmTextFit.h"
 #include "UmToast.h"
 #include "UmToastStack.h"
 
@@ -858,6 +859,74 @@ bool FUmHudPendingDiscardTest::RunTest(const FString&) {
   // IC-34 П-2: a glyph with a number (the «+N» chip of a BOOST candidate) >= 21 px - 32 su below 1 px per su, else 24
   TestTrue(TEXT("+N chip: 720p 100 % 32 su x 0.75 = 24 px >= 21"), UmCardWidget::ChipSuFor(0.75f) * 0.75f >= 21.0f);
   TestTrue(TEXT("+N chip: 1080p 100 % 24 su = 24 px"), UmCardWidget::ChipSuFor(1.0f) >= 21.0f);
+  return true;
+}
+
+// ------------------------------------------------------------------------------------- VS-5 E4: the log's short row
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmHudLogShortRowTest,
+    "Unmatched.S08.Hud.Log.ShortRow a long move line steps down to its moves, then to the first move - the row never ends before the arrow",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FUmHudLogShortRowTest::RunTest(const FString&) {
+  using namespace UmFeedTest;
+  FWorld W(TEXT("UmHudLogShortRow"));
+  if (!TestNotNull(TEXT("world"), W.World)) return false;
+  FRu Ru;
+  // HB-49 frame: «Medusa: манёвр: Harpies 1 M0…» - the player, a boost and two moves do not fit 240 su
+  FS09LastMovement T;
+  T.bValid = true;
+  T.Seq = 9;
+  T.PlayerId = TEXT("p1");
+  T.Source = TEXT("MANEUVER");
+  T.bBoost = true;
+  T.BoostValue = 2;
+  T.BoostName = TEXT("Рывок");
+  for (int32 I = 0; I < 2; ++I) {
+    FS09LastMovement::FMove M;
+    M.FighterId = FString::Printf(TEXT("h%d"), I + 1);
+    M.From = FIntPoint(4 + 2 * I, 0);
+    M.Path = {FIntPoint(5 + 2 * I, 0)};
+    T.Moves.Add(M);
+  }
+  auto Player = [](const FString&) { return FString(TEXT("Medusa")); };
+  auto Fighter = [](const FString& Id) { return Id == TEXT("h1") ? FString(TEXT("Harpies 1")) : FString(TEXT("Harpies 2")); };
+  auto Cell = [](const FIntPoint& C) { return FString::Printf(TEXT("M%02d"), C.X); };
+  FText Text, Full;
+  TArray<FText> Shorter;
+  UmHudLog::DescribeTrail(T, FString(), {}, Player, Fighter, Cell, Text, Full, &Shorter);
+  AddInfo(TEXT("text: ") + Text.ToString());
+  if (!TestEqual(TEXT("two shorter forms"), Shorter.Num(), 2)) return false;
+  TestEqual(TEXT("the moves alone"), Shorter[0].ToString(), FString(TEXT("Harpies 1 M04→M05, Harpies 2 M06→M07")));
+  TestEqual(TEXT("the first move + «и ещё 1»"), Shorter[1].ToString(), FString(TEXT("Harpies 1 M04→M05, и ещё 1")));
+  FUmLogEntry E;
+  E.Seq = 9;
+  E.Text = Text;
+  E.Full = Full;
+  E.Shorter = Shorter;
+  auto Fake = [](const FText& X) { return 8.0f * X.ToString().Len(); };
+  TestTrue(TEXT("a wide row keeps the full line"), UmHudLog::PickRowText(E, 1000.0f, Fake).EqualTo(Text));
+  TestTrue(TEXT("320 su: the moves alone"), UmHudLog::PickRowText(E, 320.0f, Fake).EqualTo(Shorter[0]));
+  TestTrue(TEXT("240 su: the first move"), UmHudLog::PickRowText(E, 240.0f, Fake).EqualTo(Shorter[1]));
+  TestTrue(TEXT("nothing fits: the shortest, with its arrow"), UmHudLog::PickRowText(E, 40.0f, Fake).ToString().Contains(TEXT("→")));
+  // a stay has no arrow and no shorter form
+  FS09LastMovement S = T;
+  S.Moves.Reset();
+  S.bBoost = false;
+  UmHudLog::DescribeTrail(S, FString(), {}, Player, Fighter, Cell, Text, Full, &Shorter);
+  TestEqual(TEXT("«без движения»: no shorter form"), Shorter.Num(), 0);
+  // the widget at 1080p (300 su column): what the row draws fits the text width and shows «→»
+  UUmHudLog* Log = CreateWidget<UUmHudLog>(W.World, UUmHudLog::StaticClass());
+  if (!TestNotNull(TEXT("log"), Log)) return false;
+  FUmLogFrame F;
+  F.SizeSu = FVector2D(300.0, 200.0);
+  Log->SetFrame(F);
+  Log->Push(E, 1000.0);
+  const FText Shown = Log->GetRowShownText(0);
+  const float Width = UmTextFit::WidthSu(Shown, TEXT("type.body"));
+  AddInfo(FString::Printf(TEXT("row: «%s» %.1f su of %.1f"), *Shown.ToString(), Width, Log->RowTextWidthSu()));
+  TestTrue(TEXT("the row shows the arrow"), Shown.ToString().Contains(TEXT("→")));
+  TestTrue(TEXT("the shown text fits the row (Slate font measure)"), Width >= 0.0f && Width <= Log->RowTextWidthSu());
+  TestTrue(TEXT("the tooltip keeps every move"), Log->GetRowTooltip(0).ToString().Contains(TEXT("Harpies 2 M06→M07")));
   return true;
 }
 

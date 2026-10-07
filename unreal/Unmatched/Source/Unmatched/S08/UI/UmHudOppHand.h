@@ -95,6 +95,8 @@ class UNMATCHED_API UUmHudOppHand : public UUserWidget {
   /** Steps the slide / fade now (the tick does it per frame). */
   void Step();
   float GetBackOpacity(int32 Index) const;
+  /** VS-5 E4 (LEET class S): the caption's type - type.caption, type.tag when that line is wider than the row. */
+  FName GetCaptionToken() const { return CaptionToken; }
 
   UPROPERTY(BlueprintReadOnly, Category = "Um HUD", meta = (BindWidget)) TObjectPtr<UBorder> Panel;
   UPROPERTY(BlueprintReadOnly, Category = "Um HUD", meta = (BindWidget)) TObjectPtr<UHorizontalBox> Backs;
@@ -127,6 +129,7 @@ class UNMATCHED_API UUmHudOppHand : public UUserWidget {
   TFunction<void()> OnInspect;
   FString BackSlugLoaded;
   bool bWarned = false;
+  FName CaptionToken = FName(TEXT("type.caption"));
   UPROPERTY(Transient) TObjectPtr<UTexture2D> BackTexture;
   UPROPERTY(Transient) TArray<TObjectPtr<UWidget>> Pool;
 };

@@ -88,6 +88,11 @@ struct UNMATCHED_API FUmCombatEdgeModel {
   FS09Reason DefendWhy;     // unset = enabled
   FS09Reason NoDefenseWhy;  // unset = enabled
   bool bTimer = false;
+  /** VS-5 E4 (VS-4 «Открыто» п. 2): the resolve window of a participant - one primary «Завершить бой» (hud.combat.resolve,
+   *  R / Enter) at the defend button's place instead of the English Slate «RESOLVE COMBAT (R)»; ResolveWhy unset =
+   *  enabled (a command in flight, the pending queue: why.wait.opponent.choice). */
+  bool bResolve = false;
+  FS09Reason ResolveWhy;
   /** The deadline on the FPlatformTime clock (s) and the length of the window (s) - the bar is left / window. */
   double DeadlineSec = 0.0;
   float WindowSec = 30.0f;

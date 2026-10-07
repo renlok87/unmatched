@@ -655,4 +655,26 @@ bool FS08ArtHudUmgWbpTest::RunTest(const FString&) {
   return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08ArtHudUmgHudBlocksTest,
+    "Unmatched.S08.ArtHudUmg.HudBlocks VS-5 E4 a tag at the left board edge keeps out of the UMG blocks drawn there (the combat edge card)",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08ArtHudUmgHudBlocksTest::RunTest(const FString&) {
+  using namespace S08ArtHud;
+  // HB-49 (Sarpedon 720p 150 %): harpy 3 at the left edge, the own combat edge card (UMG) over x 18..187
+  const FVector2D Viewport(1280.0, 720.0);
+  const FVector2D Size(161.0, 45.0);
+  const FS08ScreenRect Harpy(150.0f, 300.0f, 195.0f, 352.0f);
+  const TArray<FS08ScreenRect> Others = {FS08ScreenRect(329.0f, 232.0f, 374.0f, 284.0f)};
+  const FS08ScreenRect Edge(18.0f, 270.0f, 187.0f, 554.0f);
+  const FLabelPlacementResult Before = ChooseLabelRect(MakeTagPlacementInput(Viewport, Size, Harpy, Others, {}));
+  AddInfo(FString::Printf(TEXT("without the HUD block: %s %s"), *Before.Candidate, *FormatRect(Before.Rect)));
+  TestTrue(TEXT("the old placement lay under the edge card"), Before.Rect.IntersectionArea(Edge) > 0.0);
+  // the hook (UpdateBoardLabels): the drawn UMG blocks are hard obstacles of every tag
+  const FLabelPlacementResult After = ChooseLabelRect(MakeTagPlacementInput(Viewport, Size, Harpy, Others, {Edge}));
+  AddInfo(FString::Printf(TEXT("with the HUD block: %s %s bound=%d"), *After.Candidate, *FormatRect(After.Rect), After.bBound ? 1 : 0));
+  TestTrue(TEXT("the tag keeps out of the edge card"), After.Rect.IntersectionArea(Edge) <= 0.5);
+  TestFalse(TEXT("placed"), After.Rect.IsEmpty());
+  return true;
+}
+
 #endif  // WITH_AUTOMATION_TESTS

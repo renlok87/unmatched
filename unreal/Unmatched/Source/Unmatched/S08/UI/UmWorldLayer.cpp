@@ -303,9 +303,9 @@ bool UUmWorldPlate::Initialize() {
   using namespace UmWorldLayer;
   UWidgetTree& Tree = *WidgetTree;
   const UUmHudTheme& Theme = UUmHudTheme::Get();
-  USizeBox* Box = UmWlMake<USizeBox>(Tree, TEXT("Box"));
+  Box = UmWlMake<USizeBox>(Tree, TEXT("Box"));
   Box->SetWidthOverride(PlateWSu);
-  Box->SetHeightOverride(PlateHSu);
+  Box->SetHeightOverride(PlateHeightSu(false));  // VS-5 E4: the chip row only with «ЦЕЛЬ» (ApplyModel)
   Tree.RootWidget = Box;
   Panel = UmWlMake<UBorder>(Tree, TEXT("Panel"));
   Panel->SetBrush(FSlateRoundedBoxBrush(Theme.Color(TEXT("panel.bg")), Theme.RadiusSu(TEXT("radius.m")), Theme.Color(TEXT("panel.edge")), 1.0f));
@@ -368,6 +368,7 @@ void UUmWorldPlate::ApplyModel(const FUmWorldPlateModel& InModel) {
   if (SideLabel) SideLabel->SetText(Model.Side);
   if (TargetLabel) TargetLabel->SetText(UmWorldLayer::TargetText());
   if (TargetChip) TargetChip->SetVisibility(Model.bTarget ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
+  if (Box) Box->SetHeightOverride(UmWorldLayer::PlateHeightSu(Model.bTarget));  // VS-5 E4: no empty lower part
   if (Chip) {
     if (bChips) Chip->SetBrush(ChipBrushes[Model.TeamSlot ? 1 : 0]);
     Chip->SetColorAndOpacity(Theme.Color(Model.TeamSlot ? TEXT("team.p2.screen") : TEXT("team.p1.screen")));

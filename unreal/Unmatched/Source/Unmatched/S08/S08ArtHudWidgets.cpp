@@ -281,7 +281,7 @@ void US08ArtPlateWidget::SetV2(bool bOn) {
     PlateBackground->SetContent(V2Plate);
     PlateBackground->SetBrushColor(FLinearColor::Transparent);  // the V2 panel paints its own body
     PlateBackground->SetPadding(FMargin(0.0f));
-    Style.SizeSu = FVector2D(UmWorldLayer::PlateWSu, UmWorldLayer::PlateHSu);
+    Style.SizeSu = FVector2D(UmWorldLayer::PlateWSu, UmWorldLayer::PlateHeightSu(false));
   } else {
     bV2 = false;  // before ApplyStyle: the legacy body colour comes back
     PlateBackground->SetContent(LegacyContent);
@@ -313,6 +313,8 @@ void US08ArtPlateWidget::ApplyTexts(const FS08PlateTexts& Texts) {
     M.TeamSlot = Texts.TeamSlot;
     M.bTarget = Texts.bTarget;
     V2Plate->ApplyModel(M);
+    // VS-5 E4: the placement takes the plate as drawn - 110 su, 144 with «ЦЕЛЬ»
+    Style.SizeSu = FVector2D(UmWorldLayer::PlateWSu, UmWorldLayer::PlateHeightSu(M.bTarget));
   }
   bOwn = Texts.bOwn;
   TeamSlot = Texts.TeamSlot;

@@ -25,6 +25,7 @@
 #include "Components/VerticalBox.h"
 #include "Components/VerticalBoxSlot.h"
 #include "HAL/PlatformTime.h"
+#include "UmTextFit.h"
 #include "Materials/MaterialInstanceDynamic.h"
 
 const TCHAR* const UUmHudPlayerPanel::LocBlueprintPath = TEXT("/Game/S08/UI/Hud/WBP_UI_HUD_PANEL_LOC");
@@ -290,7 +291,7 @@ void UUmHudPlayerPanel::ApplyFonts() {
   const UUmHudTheme& Theme = UUmHudTheme::Get();
   if (NameText) NameText->SetFont(Theme.Font(UmHudPanel::NameFontToken(Model.HeroName)));
   if (StatusText) StatusText->SetFont(Theme.Font(TEXT("type.tag")));
-  if (HpText) HpText->SetFont(Theme.Font(TEXT("type.button")));
+  if (HpText) HpText->SetFont(Theme.Font(HpToken));  // VS-5 E4: the fitted HP type (type.button by default)
 }
 
 void UUmHudPlayerPanel::Setup(EUmPanelSide InSide, const FS08TurnHudLook& Look, const FLinearColor& TeamColor) {
@@ -528,7 +529,10 @@ void UUmHudPlayerPanel::ApplyModel(const FUmPlayerPanelModel& InModel) {
   }
   if (HpText && (bFirst || Old.Hp != Model.Hp || Old.MaxHp != Model.MaxHp || Old.bHasHp != Model.bHasHp)) {
     HpText->SetText(Model.bHasHp ? UmHudPanel::HpText(Model.Hp, Model.MaxHp) : FText::GetEmpty());
+    HpFitSlots = -1;  // VS-5 E4: fitted again below
   }
+  if (bFirst || Old.bClassS != Model.bClassS) HpFitSlots = -1;
+  FitHpText();
   if (bFirst || Old.Sidekicks != Model.Sidekicks || Old.bClassS != Model.bClassS || Old.PxPerSu != Model.PxPerSu) {
     RebuildSidekicks();
   }
@@ -547,6 +551,46 @@ float UUmHudPlayerPanel::GetDotOpacity() const { return PulseDot ? PulseDot->Get
 void UUmHudPlayerPanel::NativeTick(const FGeometry& MyGeometry, float InDeltaTime) {
   Super::NativeTick(MyGeometry, InDeltaTime);
   StepMotion();
+  FitHpText();  // VS-5 E4: only when the tracker gained / lost a slot (an int compare otherwise)
+}
+
+float UUmHudPlayerPanel::HpRoomSu() const {
+  // CX-09: own - the heart from TextX, the number 4 su after it, the tracker right-aligned at TrackerX; the opponent's
+  // mirrored (the row right-aligned at TextX, the tracker from TrackerX); the slots 4 su apart; 4 su between the two
+  const UmHudPanel::FGeom G = UmHudPanel::Geometry(Model.bClassS, Side);
+  const int32 Slots = TrackerRow ? TrackerRow->GetChildrenCount() : 0;
+  const float TrackerW = Slots > 0 ? Slots * G.TrackerSu + (Slots - 1) * 4.0f : 0.0f;
+  const float Lead = UmHudPanel::HeartSu + 4.0f;
+  return Side == EUmPanelSide::Opp ? (G.TextX - Lead) - (G.TrackerX + TrackerW) - 4.0f
+                                   : (G.TrackerX - TrackerW) - (G.TextX + Lead) - 4.0f;
+}
+
+void UUmHudPlayerPanel::FitHpText() {
+  if (!HpText) return;
+  const int32 Slots = TrackerRow ? TrackerRow->GetChildrenCount() : 0;
+  if (Slots == HpFitSlots) return;
+  HpFitSlots = Slots;
+  const float Room = HpRoomSu();
+  const FName Token = UmTextFit::PickToken(HpText->GetText(), Room, {FName(TEXT("type.button")), FName(TEXT("type.tag"))});
+  if (Token != HpToken) {
+    HpToken = Token;
+    HpText->SetFont(UUmHudTheme::Get().Font(HpToken));
+  }
+  // still wider in type.tag (the pseudo-locale «‡«16»/«16»‡»): the row stops 4 su before the tracker, «…» at its end
+  const float Width = UmTextFit::WidthSu(HpText->GetText(), HpToken);
+  const bool bClamp = Width > Room && Room > 0.0f;
+  if (bClamp != bHpClamped) {
+    bHpClamped = bClamp;
+    HpText->SetTextOverflowPolicy(bClamp ? ETextOverflowPolicy::Ellipsis : ETextOverflowPolicy::Clip);
+    HpText->SetClipping(bClamp ? EWidgetClipping::ClipToBounds : EWidgetClipping::Inherit);
+    if (UHorizontalBoxSlot* S = Cast<UHorizontalBoxSlot>(HpText->Slot)) {
+      S->SetSize(FSlateChildSize(bClamp ? ESlateSizeRule::Fill : ESlateSizeRule::Automatic));
+    }
+  }
+  if (UCanvasPanelSlot* RowSlot = HpRow ? Cast<UCanvasPanelSlot>(HpRow->Slot) : nullptr) {
+    RowSlot->SetAutoSize(!bClamp);
+    if (bClamp) RowSlot->SetSize(FVector2D(UmHudPanel::HeartSu + 4.0f + Room, 28.0f));
+  }
 }
 
 void UUmHudPlayerPanel::ApplyStatus(EUmPanelState State) {

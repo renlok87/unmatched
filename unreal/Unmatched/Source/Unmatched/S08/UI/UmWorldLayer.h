@@ -67,6 +67,10 @@ inline constexpr float GapSu = 6.0f;
 inline constexpr float BarGapSu = 8.0f;
 inline constexpr float PlateWSu = 268.0f;
 inline constexpr float PlateHSu = 144.0f;
+/** VS-5 E4 (VS-4 «Открыто» п. 9): without the «ЦЕЛЬ» chip the plate ends under the HP row (10 + name 31 + 6 + role 19 +
+ *  8 + row 24 + 10 = 108 su, 2 su spare) - no empty lower part; the chip row (8 + 26) makes the 144 of HB-44. */
+inline constexpr float PlateHNoTargetSu = 110.0f;
+inline float PlateHeightSu(bool bTarget) { return bTarget ? PlateHSu : PlateHNoTargetSu; }
 inline constexpr float PlatePadSu = 16.0f;
 /** -S08SlateHud=tag / =plate are the rollbacks; anything else draws the H12 look. */
 UNMATCHED_API bool TagV2();
@@ -149,6 +153,7 @@ class UNMATCHED_API UUmWorldPlate : public UUserWidget {
   void SetReducedForTest(int32 InReduced) { ReducedOverride = InReduced; }
   void TickForTest() { StepFade(); }
 
+  UPROPERTY() TObjectPtr<USizeBox> Box;
   UPROPERTY() TObjectPtr<UBorder> Panel;
   UPROPERTY() TObjectPtr<UTextBlock> NameLabel;
   UPROPERTY() TObjectPtr<UTextBlock> RoleLabel;

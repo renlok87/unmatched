@@ -1346,6 +1346,11 @@ private:
   // VS-3 HUD budget (opt-in -S08HudPerf, HUD-RULES П8, UI/UmHudPerf.h): the UMG root collapsed / shown in blocks
   void TickUmHudPerf();
   void FinishUmHudPerf(const TCHAR* Why);
+  // VS-5 E4 (VS-4 «Открыто» пп. 2, 3, 5; S08FlowGameModeUmHudVs5.cpp): the Slate command panel / reconnect line give
+  // their block to UMG by default (Block: draft | scheme | resolve | reconnect; -S09Markers / -S08SlateHud keep them);
+  // the drawn UMG blocks in px (TickUmFeed) - the world tags and the plate keep out of them
+  bool UmHudOwnsSlateBlock(const TCHAR* Block) const;
+  TArray<FS08ScreenRect> UmHudBlocksPx;
   UPROPERTY()
   TObjectPtr<class UUmHudRoot> UmHudRoot;
   UPROPERTY()

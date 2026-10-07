@@ -179,7 +179,21 @@ bool FUmWorldPlateHoverOnlyTest::RunTest(const FString&) {
   if (TestNotNull(TEXT("the host border PlateBackground"), Host)) {
     TestEqual(TEXT("V2: the host border paints no body after construct (alpha 0)"), Host->GetBrushColor().A, 0.0f);
   }
-  TestEqual(TEXT("the placement takes 268 x 144 su"), Plate->GetPlateSizeSu(), FVector2D(268.0, 144.0));
+  // VS-5 E4 (VS-4 «Открыто» п. 9): 268 x 110 su without «ЦЕЛЬ» (no empty lower part), 268 x 144 with it
+  TestEqual(TEXT("the placement takes 268 x 110 su before a target"), Plate->GetPlateSizeSu(), FVector2D(268.0, 110.0));
+  {
+    FS08PlateTexts T;
+    T.bOwn = false;
+    UmWorldLayer::FillPlateTexts(T, Fighter(TEXT("king-arthur"), true, TEXT("King Arthur"), 17, 18, TEXT("MELEE")), false, true);
+    Plate->ApplyTexts(T);
+    TestEqual(TEXT("the target plate: 268 x 144 su"), Plate->GetPlateSizeSu(), FVector2D(268.0, 144.0));
+    TestTrue(TEXT("the target plate box: 144 su"), V2->Box && FMath::IsNearlyEqual(V2->Box->GetHeightOverride(), 144.0f));
+    T.bTarget = false;
+    UmWorldLayer::FillPlateTexts(T, Fighter(TEXT("king-arthur"), true, TEXT("King Arthur"), 17, 18, TEXT("MELEE")), false, false);
+    Plate->ApplyTexts(T);
+    TestEqual(TEXT("no target again: 268 x 110 su"), Plate->GetPlateSizeSu(), FVector2D(268.0, 110.0));
+    TestTrue(TEXT("no target: the box 110 su"), V2->Box && FMath::IsNearlyEqual(V2->Box->GetHeightOverride(), 110.0f));
+  }
   const bool bRu = UmCardMedia::PreferredLang() != TEXT("en");
   struct FCase {
     FS08BoardFighter F;

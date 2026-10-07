@@ -187,6 +187,10 @@ void FUmCombatBlocks::Gather(const FUmCombatInput& In, const FString& InKey, FUm
     } else {
       DefenseM.State = EUmEdgeState::Chosen;  // CUE-009: committed face down
     }
+    if (In.bResolvePhase && In.bResolveButton && (bViewerAttacker || bViewerDefender)) {
+      OutOwn.bResolve = true;  // VS-5 E4: «Завершить бой» on the viewer's own edge (any participant resolves)
+      OutOwn.ResolveWhy = In.ResolveWhy;
+    }
   }
   // CUE-008: the declare shows the attacker's card and its ribbon only (the slot and the window follow)
   if (bDeclaring && !bStaged && !In.bResolvePhase) {
@@ -252,9 +256,23 @@ FString FUmCombatBlocks::KeyFor(const FUmCombatInput& In) {
   return FString();
 }
 
-TArray<FString> FUmCombatBlocks::Refresh(const FUmCombatInput& In) {
+TArray<FString> FUmCombatBlocks::Refresh(const FUmCombatInput& InRaw) {
   TArray<FString> Trace;
-  if (!In.Layout) return Trace;
+  if (!InRaw.Layout) return Trace;
+  // VS-5 E4 (VS-4 «Открыто» п. 2): a new combat opens while the last one is still staged - the open combat (its defense
+  // window and timer) takes the edges at once; the staging keeps running for the board, only the HUD lets it go (the
+  // Slate defense window drew over it before)
+  FUmCombatInput Yield;
+  const bool bYield = InRaw.bOpen && UmCombatStaged(InRaw);
+  if (bYield) {
+    Yield = InRaw;
+    Yield.Stage = nullptr;
+  }
+  const FUmCombatInput& In = bYield ? Yield : InRaw;
+  if (bYield != bStageYield) {
+    bStageYield = bYield;
+    if (bYield) Trace.Add(FString::Printf(TEXT("HUD-COMBAT stage-yield staged=%d open=%d"), InRaw.Stage->GetSeq(), InRaw.AppliedSeq));
+  }
   const FUmHudLayout& L = *In.Layout;
   const bool bStaged = In.bLive && UmCombatStaged(In);
   const FString NewKey = KeyFor(In);

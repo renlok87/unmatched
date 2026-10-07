@@ -770,4 +770,99 @@ bool FUmCombatCenterStageTest::RunTest(const FString& Parameters) {
   return true;
 }
 
+// ------------------------------------------------------------------- VS-5 E4: the resolve button, the stage yield
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmCombatResolveButtonTest, "Unmatched.S08.Hud.CombatEdge.Resolve",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FUmCombatResolveButtonTest::RunTest(const FString& Parameters) {
+  FRu Ru;
+  FWorld W(TEXT("UmCombatResolve"));
+  if (!TestNotNull(TEXT("world"), W.World)) return false;
+  const FUmHudLayout L = Layout1080();
+  // the resolve window (COMBAT_RESOLVE): the button only when the game mode gives the window to UMG
+  for (const TCHAR* Viewer : {TEXT("p-medusa"), TEXT("p-arthur")}) {
+    FUmCombatInput In = OpenA(L, Viewer, /*bResolve=*/true);
+    FUmCombatEdgeModel Own, Opp;
+    FUmCombatCenterModel C;
+    FUmCombatBlocks::Gather(In, TEXT("c8"), Own, Opp, C);
+    TestFalse(FString::Printf(TEXT("%s: no button without the hand-over"), Viewer), Own.bResolve || Opp.bResolve);
+    In.bResolveButton = true;
+    FUmCombatBlocks::Gather(In, TEXT("c8"), Own, Opp, C);
+    TestTrue(FString::Printf(TEXT("%s: «Завершить бой» on the own edge (any participant resolves)"), Viewer), Own.bResolve && !Opp.bResolve);
+    TestFalse(TEXT("enabled"), Own.ResolveWhy.IsSet());
+  }
+  FUmCombatInput Spect = OpenA(L, TEXT("p-watcher"), true);
+  Spect.bResolveButton = true;
+  {
+    FUmCombatEdgeModel Own, Opp;
+    FUmCombatCenterModel C;
+    FUmCombatBlocks::Gather(Spect, TEXT("c8"), Own, Opp, C);
+    TestFalse(TEXT("a spectator: no button"), Own.bResolve || Opp.bResolve);
+  }
+  // the defense window is never a resolve window
+  FUmCombatInput Def = OpenA(L, TEXT("p-medusa"), false);
+  Def.bResolveButton = true;
+  {
+    FUmCombatEdgeModel Own, Opp;
+    FUmCombatCenterModel C;
+    FUmCombatBlocks::Gather(Def, TEXT("c8"), Own, Opp, C);
+    TestFalse(TEXT("the defense window: the defend buttons, no resolve"), Own.bResolve);
+  }
+  // the widget: one primary button at the defend place; a pending choice refuses it with its reason
+  FUmCombatInput In = OpenA(L, TEXT("p-medusa"), true);
+  In.bResolveButton = true;
+  In.ResolveWhy = FS09Reason::Make(TEXT("why.wait.opponent.choice"));
+  FUmCombatEdgeModel Own, Opp;
+  FUmCombatCenterModel C;
+  FUmCombatBlocks::Gather(In, TEXT("c8"), Own, Opp, C);
+  UUmHudCombatEdge* E = MakeEdge(W.World, EUmEdgeSide::Own, L);
+  if (!TestNotNull(TEXT("edge"), E)) return false;
+  E->ApplyModel(Own);
+  E->Step();
+  TestTrue(TEXT("the button shown"), E->DefendButton && E->DefendButton->GetVisibility() != ESlateVisibility::Collapsed);
+  TestTrue(TEXT("«Без защиты» hidden"), E->NoDefenseButton && E->NoDefenseButton->GetVisibility() == ESlateVisibility::Collapsed);
+  TestEqual(TEXT("label hud.combat.resolve"), E->DefendButton->GetModel().Label.ToString(),
+            UmText::Get(EUmTable::Hud, TEXT("hud.combat.resolve")).ToString());
+  TestEqual(TEXT("RU «Завершить бой»"), E->DefendButton->GetModel().Label.ToString(), FString(TEXT("Завершить бой")));
+  TestTrue(TEXT("primary"), E->DefendButton->GetModel().Variant == EUmButtonVariant::Primary);
+  TestFalse(TEXT("refused while the pending choice blocks"), E->DefendButton->GetModel().bEnabled);
+  TArray<FString> Lines;
+  E->CollectShotLines(Lines);
+  TestTrue(TEXT("SHOT defend=resolve-off:why.wait.opponent.choice"),
+           Lines.Num() == 1 && Lines[0].Contains(TEXT("defend=resolve-off:why.wait.opponent.choice")));
+  TestTrue(TEXT("the drawn rect takes the button"), E->DrawnRectSu().Max.Y >= L.Rect(EUmHudBlock::Defend).Min.Y);
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmCombatStageYieldTest, "Unmatched.S08.Hud.Combat.StageYield",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FUmCombatStageYieldTest::RunTest(const FString& Parameters) {
+  FRu Ru;
+  FWorld W(TEXT("UmCombatStageYield"));
+  if (!TestNotNull(TEXT("world"), W.World)) return false;
+  UUmGameHud* Game = CreateWidget<UUmGameHud>(W.World, UUmGameHud::StaticClass());
+  if (!TestNotNull(TEXT("game"), Game)) return false;
+  FUmCombatBlocks Blocks;
+  Blocks.Build(*Game, S08ArtLook::FS08SlateHudBlocks(), MakeShared<FS09HudPressArbiter>(), FUmCombatBlocks::FCallbacks());
+  if (!TestTrue(TEXT("the blocks built"), Blocks.EdgesOnUmg())) return false;
+  const FUmHudLayout L = Layout1080();
+  FStageA S;  // the last combat is still staged
+  FUmCombatInput In = OpenA(L, TEXT("p-medusa"));  // a new combat opens: Medusa is attacked again
+  In.Stage = &S.Stage;
+  In.AppliedSeq = 12;
+  In.NowMs = S.Start + 10;
+  In.DeclareMs = 0.0f;
+  In.bHasLegalDefense = true;
+  S.At(In.NowMs);
+  if (!TestTrue(TEXT("the staging runs"), S.Stage.IsActive())) return false;
+  const TArray<FString> Trace = Blocks.Refresh(In);
+  TestTrue(TEXT("HUD-COMBAT stage-yield"), Trace.ContainsByPredicate([](const FString& X) { return X.StartsWith(TEXT("HUD-COMBAT stage-yield staged=10 open=12")); }));
+  TestTrue(TEXT("the UMG edge draws the new defense window (no Slate window)"), Blocks.DrawsDefenseWindow());
+  const UUmHudCombatEdge* Own = Blocks.GetEdge(EUmEdgeSide::Own);
+  TestTrue(TEXT("the own (defender) edge: the shield and the defend buttons"), Own && Own->GetModel().bButtons &&
+                                                                                  Own->GetModel().State == EUmEdgeState::Shield);
+  TestEqual(TEXT("the new combat's key"), Blocks.GetKey(), FString(TEXT("c12")));
+  return true;
+}
+
 #endif  // WITH_AUTOMATION_TESTS

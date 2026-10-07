@@ -6079,7 +6079,7 @@ void AS08FlowGameMode::RefreshHud() {
 
   // ---- GD-037 (ACC-012): reconnect / lost-response recovery overlay. Input
   // is already locked by the controller gates; the banner states WHY. ----
-  if (Flow.IsValid() &&
+  if (Flow.IsValid() && !UmHudOwnsSlateBlock(TEXT("reconnect")) &&  // VS-5 E4: CONN says it (HB-14)
       (Flow->IsAwaitingStateRecovery() ||
        (Flow->GetStage() == ES08Stage::Started && !Flow->IsStreamReady()))) {
     CommandBox->AddSlot().AutoHeight().Padding(0, 0, 0, 6)
@@ -6504,6 +6504,7 @@ void AS08FlowGameMode::RefreshHud() {
       AddLine(FString::Printf(TEXT("targets in range: %s"), InRange.IsEmpty() ? TEXT("-") : *InRange));
     }
     AddLine(TEXT("click an own fighter with an enemy in range (melee: adjacent; ranged: adjacent or same zone), click the enemy, pick 1-9; the attack goes with the last pick; A/Esc closes"));
+    if (!UmHudOwnsSlateBlock(TEXT("draft")))  // VS-5 E4: ACTIONS «Атака» / Esc close it, the attack goes by itself
     CommandBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
         [SNew(SHorizontalBox) +
          SHorizontalBox::Slot().AutoWidth().Padding(0, 0, 8, 0)
@@ -6540,11 +6541,13 @@ void AS08FlowGameMode::RefreshHud() {
       if (Selected == TEXT("-")) Selected = TEXT("(selection stale - pick again)");
     }
     AddMarker(GS09SchemeMarker);
+    bQuietLines = UmHudOwnsSlateBlock(TEXT("scheme"));  // VS-5 E4: the UMG hand, ACTIONS «Схема» and STATUS say it
     AddHeader(TEXT("SCHEME CHOICE - PLAY ONE SCHEME CARD"),
               FLinearColor(0.72f, 0.35f, 1.0f, 1.0f));
     AddBigLine(FString::Printf(TEXT("selected: %s"), *Selected),
                FLinearColor(1.0f, 1.0f, 1.0f, 1.0f));
     AddLine(TEXT("click a scheme card or press 1-9; Enter plays THAT EXACT card; G or Esc cancels"));
+    if (!bQuietLines)
     CommandBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
         [SNew(SHorizontalBox) +
          SHorizontalBox::Slot().AutoWidth().Padding(0, 0, 8, 0)
@@ -6713,6 +6716,7 @@ void AS08FlowGameMode::RefreshHud() {
     } else {
       AddLine(TEXT("R resolves the combat (any participant); the attacker cannot close the defense window"));
     }
+    if (!UmHudOwnsSlateBlock(TEXT("resolve")))  // VS-5 E4: the own combat edge's «Завершить бой» (R / Enter)
     CommandBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
         [MakeHudPress(
              FName(TEXT("hud.combat.resolve")),
@@ -7943,6 +7947,7 @@ void AS08FlowGameMode::UpdatePlate(bool bActive) {
     FS08ScreenRect R;
     if (WidgetViewportRect(Panel.Pin(), R) && !R.IsEmpty()) In.Soft.Add(R);
   }
+  In.Soft.Append(UmHudBlocksPx);  // VS-5 E4 (VS-4 «Открыто» п. 5): the drawn UMG blocks too (TickUmFeed)
   // The search only reruns when an input moved by a pixel (camera tween,
   // selection, figures, HUD panels); otherwise the last placement stands.
   FString Signature = FString::Printf(TEXT("%s|%s|%.0fx%.0f|%d|"), *Id, *S08ArtHud::FormatRect(Anchor),
@@ -8022,6 +8027,7 @@ void AS08FlowGameMode::UpdateBoardLabels(bool bActive, const FString& IconTarget
     FS08ScreenRect R;
     if (WidgetViewportRect(Panel.Pin(), R) && !R.IsEmpty()) Panels.Add(R);
   }
+  Panels.Append(UmHudBlocksPx);  // VS-5 E4 (VS-4 «Открыто» п. 5): the tags never slide under a drawn UMG block
   const FString ViewerId = Flow.IsValid() ? Flow->GetUserId() : FString();
   const bool bK2 = CameraZoom.IsReady() &&
                    CameraZoom.ZoomOf(CameraZoom.Current) >= CameraZoom.Config.FollowFromZoom - 0.01f;

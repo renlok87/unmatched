@@ -32,6 +32,8 @@
 #include "UmCardGallery.h"
 #include "UmCardMedia.h"
 #include "UmCardWidget.h"
+#include "UmHudTheme.h"
+#include "UmTextFit.h"
 #include "UmHudScale.h"
 #include "UmHudTheme.h"
 #include "UmText.h"
@@ -753,6 +755,52 @@ bool FUmCardPressTest::RunTest(const FString&) {
   }
   TestEqual(TEXT("unplayable: every press refused (0 silent)"), Refused, N);
   TestTrue(TEXT("unplayable: with its why"), LastWhy == FName(TEXT("why.not.your.turn")));
+  return true;
+}
+
+// --------------------------------------------------------------------------------- VS-5 E4: the text-only card title
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmCardTitleFitTest,
+    "Unmatched.S08.Hud.Card.TitleFit the text-only face title steps down a type until it wraps into 3 lines inside the card",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FUmCardTitleFitTest::RunTest(const FString&) {
+  using namespace UmCardTest;
+  // the rule with a fixed advance per character (heading 12, button 10, body 8, tag 7 su)
+  const FString Title(TEXT("When Dinosaurs Ruled the Earth"));
+  auto Per = [](FName T) {
+    return T == FName(TEXT("type.heading")) ? 12.0f : T == FName(TEXT("type.button")) ? 10.0f : T == FName(TEXT("type.body")) ? 8.0f : 7.0f;
+  };
+  auto Fake = [&Per](const FString& S, FName T) { return Per(T) * S.Len(); };
+  TestEqual(TEXT("button at 100 su: 4 lines"), UmCardWidget::WrapLines(Title, 100.0f, [](const FString& S) { return 10.0f * S.Len(); }), 4);
+  TestEqual(TEXT("a word wider than the line: overflow"), UmCardWidget::WrapLines(Title, 100.0f, [](const FString& S) { return 12.0f * S.Len(); }), MAX_int32);
+  const TArray<FName> Tokens = {FName(TEXT("type.heading")), FName(TEXT("type.button")), FName(TEXT("type.body")), FName(TEXT("type.tag"))};
+  TestEqual(TEXT("100 su, 3 lines: type.tag"), UmCardWidget::FitTitleToken(Title, 100.0f, 3, Tokens, Fake), FName(TEXT("type.tag")));
+  TestEqual(TEXT("a short title keeps the first"), UmCardWidget::FitTitleToken(TEXT("Feint"), 100.0f, 3, Tokens, Fake), FName(TEXT("type.heading")));
+  // the slot card of the HB-49 frame (190 x 264, T. Rex has no scans): the face draws the title inside the card
+  FWorld W(TEXT("UmCardTitleFit"));
+  if (!TestNotNull(TEXT("world"), W.World)) return false;
+  AddExpectedMessagePlain(TEXT("CARD-ART fallback key="), ELogVerbosity::Warning, EAutomationExpectedMessageFlags::Contains, 0);
+  UUmCardWidget* C = Make(W.World);
+  if (!TestNotNull(TEXT("card"), C)) return false;
+  FS09CardView Rex;
+  Rex.Name = Title;
+  Rex.CardType = TEXT("SCHEME");
+  C->ApplyModel(Rex, State(EUmCardShow::Slot, TEXT("t-rex"), TEXT("en")));
+  TestEqual(TEXT("no scan: the text face"), C->GetFace(), EUmCardFace::Fallback);
+  if (!TestNotNull(TEXT("the title"), C->FallbackName.Get())) return false;
+  const float Width = 190.0f - 2.0f * (UmCardWidget::BandSu + 6.0f);
+  const FSlateFontInfo Font = C->FallbackName->GetFont();
+  FName Picked = NAME_None;
+  for (const FName& T : Tokens) {
+    if (UUmHudTheme::Get().Font(T).Size == Font.Size && UUmHudTheme::Get().Font(T).TypefaceFontName == Font.TypefaceFontName) Picked = T;
+  }
+  const int32 Lines = UmCardWidget::WrapLines(Title, Width, [&Picked](const FString& S) { return UmTextFit::WidthSu(FText::FromString(S), Picked); });
+  AddInfo(FString::Printf(TEXT("slot title: %s, %d line(s) in %.0f su"), *Picked.ToString(), Lines, Width));
+  const int32 ButtonLines = UmCardWidget::WrapLines(Title, Width, [](const FString& S) { return UmTextFit::WidthSu(FText::FromString(S), TEXT("type.button")); });
+  TestTrue(TEXT("type.button only while it wraps into 3 lines"), ButtonLines <= 3 || Picked != FName(TEXT("type.button")));
+  TestTrue(TEXT("the title wraps (a WBP may not keep the flag)"), C->FallbackName->GetAutoWrapText());
+  TestTrue(TEXT("<= 3 lines inside the card"), Lines <= 3);
+  TestTrue(TEXT("clipped to the card"), C->FallbackName->GetClipping() == EWidgetClipping::ClipToBounds);
   return true;
 }
 

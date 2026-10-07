@@ -168,6 +168,13 @@ class UNMATCHED_API UUmHudPlayerPanel : public UUserWidget {
   int32 GetSidekickItems() const { return SidekickItems; }
   int32 GetTooltipRows() const { return TooltipRows; }
   UWidget* GetSidekickTooltip() const { return SidekickTip; }
+  /** VS-5 E4 (VS-4 «Открыто» п. 10, LEET class S): the HP number's type - type.button, type.tag when the line would reach
+   *  the action tracker (4 su apart from it); the room between the heart and the tracker's slots (su). */
+  FName GetHpToken() const { return HpToken; }
+  bool IsHpClamped() const { return bHpClamped; }
+  float HpRoomSu() const;
+  void FitHpText();
+  void RefitHpForTest() { HpFitSlots = -1; FitHpText(); }
 
   UPROPERTY(BlueprintReadOnly, Category = "Um HUD", meta = (BindWidget)) TObjectPtr<UBorder> Panel;
   UPROPERTY(BlueprintReadOnly, Category = "Um HUD", meta = (BindWidget)) TObjectPtr<UCanvasPanel> Canvas;
@@ -209,6 +216,9 @@ class UNMATCHED_API UUmHudPlayerPanel : public UUserWidget {
   int32 TooltipRows = 0;
   double PulseStart = 0.0;
   double StatusFadeStart = -1.0;  // the old status word fading out (120 ms), then the new one
+  FName HpToken = FName(TEXT("type.button"));
+  int32 HpFitSlots = -1;  // the tracker slots the HP was fitted to (a GAIN_ACTION adds one)
+  bool bHpClamped = false;  // the HP row ends at the room with «…»
   int32 ReducedOverride = -1;
   TFunction<double()> Clock;
   FName PressId;

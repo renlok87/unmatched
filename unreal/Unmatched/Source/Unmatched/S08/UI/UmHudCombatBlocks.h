@@ -73,6 +73,9 @@ struct UNMATCHED_API FUmCombatInput {
   /** CUE-008 (04 §2.7): the declare shows only the attacker's card for this long after a new combat opens; < 0 = 600 x
    *  SpeedMul (the review sheet sets it while its animations run at speed 0). */
   float DeclareMs = -1.0f;
+  /** VS-5 E4: the resolve window is the UMG edge's (the Slate «RESOLVE COMBAT (R)» gives way) and its reason. */
+  bool bResolveButton = false;
+  FS09Reason ResolveWhy;
 };
 
 class UNMATCHED_API FUmCombatBlocks {
@@ -120,5 +123,6 @@ class UNMATCHED_API FUmCombatBlocks {
   bool bWasStaged = false;
   int32 StagedSeq = -1;
   bool bDefenseWindowShown = false;
+  bool bStageYield = false;  // VS-5 E4: an open combat over a running staging
   FString LastCenterLine;
 };

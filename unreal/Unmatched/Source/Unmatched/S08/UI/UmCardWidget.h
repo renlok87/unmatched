@@ -192,6 +192,13 @@ UNMATCHED_API float LeaveOpacity(float TMs);
 UNMATCHED_API float FlipScaleX(float TMs, float TotalMs);
 /** When the defense card starts its flip after the attack card's (FS09CombatTiming::DefenseFlipDelayMs x speed). */
 UNMATCHED_API float DefenseFlipDelayMs(float SpeedMul);
+/** VS-5 E4 (VS-4 «Открыто» п. 7): the lines Text takes wrapped at word boundaries in WidthSu (Measure: su of a string);
+ *  a word wider than WidthSu alone counts as an overflow (returns MAX_int32). */
+UNMATCHED_API int32 WrapLines(const FString& Text, float WidthSu, TFunctionRef<float(const FString&)> Measure);
+/** VS-5 E4: the first of Tokens (largest first) in which the title wraps into <= MaxLines inside WidthSu; else the last.
+ *  Measure(text, token) gives the su width of a text in a type token. */
+UNMATCHED_API FName FitTitleToken(const FString& Name, float WidthSu, int32 MaxLines, const TArray<FName>& Tokens,
+                                  TFunctionRef<float(const FString&, FName)> Measure);
 /** VS-4 CP-21: the length of the CUE-006 flash - 500 ms x the UI-ACC-013 speed (0 «Нет»: no flash), reduced 100 ms. */
 UNMATCHED_API float PlayedFlashMs(float SpeedScale, bool bReduced);
 /** CP-21 keyframes: opacity 1 at 0 ms, 0 at DurMs, linear; 0 outside. */

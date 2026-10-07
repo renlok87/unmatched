@@ -1365,9 +1365,11 @@ bool FS09PendingDe020StepsTest::RunTest(const FString&) {
   if (TestFalse(TEXT("a movable fighter picked"), Picked.IsEmpty())) {
     Step = S09DescribePendingStep(Ui, MoveView, Board, Fighters);
     TestEqual(TEXT("step 2: target"), Step.Step, 2);
-    TestEqual(TEXT("ms.choice.target"), Step.Prompt.Key.ToString(), FString(TEXT("ms.choice.target")));
+    // VS-5 E4 (ВР-VS5-36): the second step of MOVE / PLACE picks a space - ms.status.space {fighterName}
+    TestEqual(TEXT("ms.status.space"), Step.Prompt.Key.ToString(), FString(TEXT("ms.status.space")));
     TestEqual(TEXT("up to N = the allowance"), Step.N, 2);
-    TestEqual(TEXT("EN text"), Step.Prompt.Text(), FString(TEXT("Choose a target (up to 2)")));
+    TestTrue(TEXT("EN text: «Choose a space for {fighter}»"), Step.Prompt.Text().StartsWith(TEXT("Choose a space for ")));
+    TestEqual(TEXT("still the target step"), FString(Step.StepName()), FString(TEXT("target")));
     TestFalse(TEXT("a MOVE with spaces is not a no-target head"), S09PendingHasNoTargets(Ui, MoveView, Board, Fighters));
   }
   FS08Snapshot OwnTurn = MoveView;

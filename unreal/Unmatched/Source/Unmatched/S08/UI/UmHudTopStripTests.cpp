@@ -598,4 +598,37 @@ bool FUmHudBannerAlphaTest::RunTest(const FString&) {
   return true;
 }
 
+// ---------------------------------------------------------------------------------- VS-5 E4: CONN at the match start
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmHudConnMatchStartTest,
+    "Unmatched.S08.Hud.Conn.MatchStart the lobby does not latch ready - a match starts syncing, a drop after ready is lost, the next match starts again",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FUmHudConnMatchStartTest::RunTest(const FString&) {
+  FUmTopStrip Strip;
+  FUmTopStripTick T;
+  T.NowSeconds = 10.0;
+  // the lobby / the room: no stream yet, "ready" by definition (the old rule latched wasReady here)
+  T.bStarted = false;
+  T.bStreamReady = true;
+  Strip.Tick(T);
+  // startGame: the subscription is on its way - syncing, not lost (VS-4 «Открыто» п. 4, the RECONNECTING flash)
+  T.bStarted = true;
+  T.bStreamReady = false;
+  const FString Start = Strip.Tick(T);
+  TestTrue(TEXT("the match start: syncing ready=0 wasReady=0 - ") + Start, Start.StartsWith(TEXT("HUD-CONN state=syncing ready=0 wasReady=0")));
+  TestTrue(TEXT("syncing"), Strip.GetConn() == EUmConnState::Syncing);
+  T.bStreamReady = true;
+  TestTrue(TEXT("subscribed: online"), Strip.Tick(T).StartsWith(TEXT("HUD-CONN state=online")));
+  T.bStreamReady = false;
+  TestTrue(TEXT("a drop after ready: lost"), Strip.Tick(T).StartsWith(TEXT("HUD-CONN state=lost ready=0 wasReady=1")));
+  // the result / the lobby, then the next match: its start is syncing again
+  T.bStarted = false;
+  T.bStreamReady = true;
+  Strip.Tick(T);
+  T.bStarted = true;
+  T.bStreamReady = false;
+  TestTrue(TEXT("the next match starts syncing"), Strip.Tick(T).StartsWith(TEXT("HUD-CONN state=syncing")));
+  return true;
+}
+
 #endif  // WITH_AUTOMATION_TESTS

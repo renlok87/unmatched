@@ -14,6 +14,9 @@
 #include "Components/SizeBox.h"
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
+#include "Fonts/FontMeasure.h"
+#include "Framework/Application/SlateApplication.h"
+#include "Rendering/SlateRenderer.h"
 #include "Styling/SlateTypes.h"
 
 const TCHAR* const UUmHudLog::WidgetBlueprintPath = TEXT("/Game/S08/UI/Hud/WBP_UI_HUD_LOG");
@@ -44,7 +47,7 @@ FText Ms(const TCHAR* Key, const TMap<FString, FString>& In) {
 
 /** ms.log.move per move (Full = all, Inline = MaxInlineMoves - 1 + «и ещё N» beyond); ms.log.stay without moves. */
 void Moves(const FS09LastMovement& Trail, const FS09EventFeed::FNameOf& FighterName, const FS09EventFeed::FCellName& CellName,
-           FString& Inline, FString& Full) {
+           FString& Inline, FString& Full, FString* First = nullptr) {
   TArray<FString> Parts;
   for (const FS09LastMovement::FMove& Move : Trail.Moves) {
     Parts.Add(Ms(TEXT("ms.log.move"), {{TEXT("fighterName"), FighterName(Move.FighterId)},
@@ -57,6 +60,12 @@ void Moves(const FS09LastMovement& Trail, const FS09EventFeed::FNameOf& FighterN
     return;
   }
   Full = FString::Join(Parts, TEXT(", "));
+  // VS-5 E4: the first move alone (+ «и ещё N») - the shortest row form
+  if (First) {
+    *First = Parts.Num() > 1
+                 ? Parts[0] + TEXT(", ") + Ms(TEXT("ms.log.more"), {{TEXT("n"), FString::FromInt(Parts.Num() - 1)}}).ToString()
+                 : Parts[0];
+  }
   const int32 Max = FS09EventFeed::MaxInlineMoves;
   if (Parts.Num() <= Max) {
     Inline = Full;
@@ -70,7 +79,8 @@ void Moves(const FS09LastMovement& Trail, const FS09EventFeed::FNameOf& FighterN
 
 void DescribeTrail(const FS09LastMovement& Trail, const FString& CardName, const TArray<FString>& YourFighters,
                    const FS09EventFeed::FNameOf& PlayerName, const FS09EventFeed::FNameOf& FighterName,
-                   const FS09EventFeed::FCellName& CellName, FText& OutText, FText& OutFull) {
+                   const FS09EventFeed::FCellName& CellName, FText& OutText, FText& OutFull, TArray<FText>* OutShorter) {
+  if (OutShorter) OutShorter->Reset();
   const FString Player = PlayerName(Trail.PlayerId);
   const bool bEffect = Trail.Source == TEXT("EFFECT");
   const FString Card = CardName.IsEmpty() ? FString(TEXT("?")) : CardName;
@@ -83,8 +93,14 @@ void DescribeTrail(const FS09LastMovement& Trail, const FString& CardName, const
     OutText = OutFull = FText::FromString(FString::Join(Parts, TEXT("; ")));
     return;
   }
-  FString Inline, Full;
-  Moves(Trail, FighterName, CellName, Inline, Full);
+  FString Inline, Full, First;
+  Moves(Trail, FighterName, CellName, Inline, Full, &First);
+  if (OutShorter && Trail.Moves.Num() > 0) {
+    // VS-5 E4 (HB-39): the moves without the player and the card (the stripe names the side, the tooltip keeps all),
+    // then the first move alone
+    OutShorter->Add(FText::FromString(Inline));
+    if (First != Inline) OutShorter->Add(FText::FromString(First));
+  }
   if (bEffect) {
     OutText = Ms(TEXT("ms.log.effect"), {{TEXT("player"), Player}, {TEXT("cardName"), Card}, {TEXT("moves"), Inline}});
     OutFull = Ms(TEXT("ms.log.effect"), {{TEXT("player"), Player}, {TEXT("cardName"), Card}, {TEXT("moves"), Full}});
@@ -96,6 +112,14 @@ void DescribeTrail(const FS09LastMovement& Trail, const FString& CardName, const
                                      : FString();
   OutText = Ms(TEXT("ms.log.maneuver"), {{TEXT("player"), Player}, {TEXT("boostPart"), Boost}, {TEXT("moves"), Inline}});
   OutFull = Ms(TEXT("ms.log.maneuver"), {{TEXT("player"), Player}, {TEXT("boostPart"), Boost}, {TEXT("moves"), Full}});
+}
+
+FText PickRowText(const FUmLogEntry& Entry, float WidthSu, TFunctionRef<float(const FText&)> Measure) {
+  if (Entry.Shorter.Num() == 0 || Measure(Entry.Text) <= WidthSu) return Entry.Text;
+  for (const FText& S : Entry.Shorter) {
+    if (Measure(S) <= WidthSu) return S;
+  }
+  return Entry.Shorter.Last();
 }
 }  // namespace UmHudLog
 
@@ -302,7 +326,7 @@ void UUmHudLog::RestyleRows() {
       RowTurns[I]->SetText(E.Turn > 0 ? UmHudLog::TurnText(E.Turn) : FText::GetEmpty());
     }
     if (RowTexts[I]) {
-      RowTexts[I]->SetText(E.Text);
+      RowTexts[I]->SetText(GetRowShownText(I));  // VS-5 E4: a shorter form when the line does not fit (HB-39)
       RowTexts[I]->SetToolTipText(E.Full.IsEmpty() ? E.Text : E.Full);
       RowTexts[I]->SetColorAndOpacity(FSlateColor(Theme.Color(GetRowColorToken(I))));
     }
@@ -319,6 +343,23 @@ FLinearColor UUmHudLog::GetStripeColor(int32 I) const {
 }
 
 FText UUmHudLog::GetRowText(int32 I) const { return Rows.IsValidIndex(I) ? Rows[I].Entry.Text : FText::GetEmpty(); }
+
+float UUmHudLog::RowTextWidthSu() const {
+  const float W = static_cast<float>(Frame.SizeSu.X);
+  return FMath::Max(40.0f, W - (UmHudLog::TextXSu + UmHudLog::TurnXSu) - (Frame.bClassS ? 12.0f : 0.0f));
+}
+
+FText UUmHudLog::GetRowShownText(int32 I) const {
+  if (!Rows.IsValidIndex(I)) return FText::GetEmpty();
+  const FUmLogEntry& E = Rows[I].Entry;
+  if (E.Shorter.Num() == 0 || !FSlateApplication::IsInitialized() || !FSlateApplication::Get().GetRenderer()) return E.Text;
+  // the width with the font the row draws (the theme's composite font with the «→» fallback, 04 §2.10)
+  const FSlateFontInfo Font = UUmHudTheme::Get().Font(TEXT("type.body"));
+  const TSharedRef<FSlateFontMeasure> Measure = FSlateApplication::Get().GetRenderer()->GetFontMeasureService();
+  return UmHudLog::PickRowText(E, RowTextWidthSu(), [&Measure, &Font](const FText& T) {
+    return static_cast<float>(Measure->Measure(T, Font, 1.0f).X);
+  });
+}
 
 FText UUmHudLog::GetRowTooltip(int32 I) const {
   return RowTexts.IsValidIndex(I) && RowTexts[I] ? RowTexts[I]->GetToolTipText() : FText::GetEmpty();

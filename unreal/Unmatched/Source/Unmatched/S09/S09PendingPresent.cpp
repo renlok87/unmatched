@@ -194,7 +194,8 @@ FS09PendingStep S09DescribePendingStep(const FS09CommandUi& Ui, const FS08Snapsh
     } else {
       Out.Step = 2;
       Out.N = Prompt.bPlace ? 1 : Prompt.Allowance;
-      Out.Prompt = FS09Reason::Make(TEXT("ms.choice.target")).Arg(TEXT("n"), Out.N);
+      // VS-5 E4 (VS-4 «Открыто» п. 9): the second step picks a space, not a target - ms.status.space (ВР-VS5-36)
+      Out.Prompt = FS09Reason::Make(TEXT("ms.status.space")).Arg(TEXT("fighterName"), Prompt.FighterLabel);
     }
     return Out;
   }

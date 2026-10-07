@@ -22,6 +22,7 @@
 #include "UmHudOppHand.h"
 #include "UmHudPanels.h"
 #include "UmHudPlayerPanel.h"
+#include "UmTextFit.h"
 #include "UmHudTheme.h"
 #include "UmText.h"
 #include "../S08AnimatedIconWidget.h"
@@ -558,6 +559,68 @@ bool FUmHudOppHandFanTest::RunTest(const FString&) {
   TestTrue(TEXT("SHOT: UI-HUD-OPP-HAND state=count=12"),
            Lines.Num() == 1 && Lines[0].StartsWith(TEXT("SHOT widget id=UI-HUD-OPP-HAND impl=umg state=count=12 ")) &&
                ShotLineOk(Lines[0]));
+  return true;
+}
+
+// --------------------------------------------------------------------------------------- VS-5 E4: LEET in class S
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmHudPanelsLeetFitTest,
+    "Unmatched.S08.Hud.PlayerPanel.LeetFit class S HP steps down to type.tag before the tracker, the opponent hand caption fits its row",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FUmHudPanelsLeetFitTest::RunTest(const FString&) {
+  using namespace UmPanelsTest;
+  FWorld W(TEXT("UmPanelsLeetFit"));
+  if (!TestNotNull(TEXT("test world"), W.World)) return false;
+  FRu Ru;
+  for (const EUmPanelSide Side : {EUmPanelSide::Own, EUmPanelSide::Opp}) {
+    const TCHAR* SideName = Side == EUmPanelSide::Own ? TEXT("own") : TEXT("opp");
+    UUmHudPlayerPanel* P = Make(W.World, Side);
+    if (!TestNotNull(TEXT("panel"), P)) return false;
+    P->SetReducedForTest(1);
+    P->Portrait->ApplyTracker(2, 0, true);
+    P->ApplyModel(Model(TEXT("Medusa"), 16, 16, EUmPanelState::Own, true));
+    P->RefitHpForTest();
+    const float Room = P->HpRoomSu();
+    AddInfo(FString::Printf(TEXT("%s S: room %.1f su, «%s» %.1f su in type.button"), SideName, Room,
+                            *P->HpText->GetText().ToString(), UmTextFit::WidthSu(P->HpText->GetText(), TEXT("type.button"))));
+    TestTrue(FString::Printf(TEXT("%s S: the room between the heart and two slots is ~50 su"), SideName), Room > 40.0f && Room < 60.0f);
+    TestEqual(FString::Printf(TEXT("%s S RU: «16/16» keeps type.button"), SideName), P->GetHpToken(), FName(TEXT("type.button")));
+    // the pseudo-locale (-LEET) wraps every table string in ‡…‡ with wider letters: the number steps down to type.tag
+    P->HpText->SetText(FText::FromString(TEXT("‡16/16‡")));
+    P->RefitHpForTest();
+    TestEqual(FString::Printf(TEXT("%s S LEET: type.tag"), SideName), P->GetHpToken(), FName(TEXT("type.tag")));
+    const float Tag = UmTextFit::WidthSu(P->HpText->GetText(), TEXT("type.tag"));
+    TestTrue(FString::Printf(TEXT("%s S LEET: %.1f su <= the room %.1f"), SideName, Tag, Room), Tag >= 0.0f && Tag <= Room);
+    // the pseudo-locale as the LEET run drew it («‡«16»/«16»‡»): wider than the room even in type.tag - the row ends
+    // 4 su before the tracker with «…»
+    P->HpText->SetText(FText::FromString(TEXT("‡«16»/«16»‡")));
+    P->RefitHpForTest();
+    TestTrue(FString::Printf(TEXT("%s S LEET run line: clamped with an ellipsis"), SideName),
+             P->IsHpClamped() && P->HpText->GetClipping() == EWidgetClipping::ClipToBounds);
+    P->HpText->SetText(FText::FromString(TEXT("‡16/16‡")));
+    P->RefitHpForTest();
+    TestFalse(FString::Printf(TEXT("%s S: a line that fits is not clamped"), SideName), P->IsHpClamped());
+    // a third slot (GAIN_ACTION) narrows the room: fitted again on the next tick
+    P->Portrait->ApplyTracker(3, 0, true);
+    P->FitHpText();
+    TestTrue(FString::Printf(TEXT("%s S: three slots - the room shrinks by 28 su"), SideName), FMath::IsNearlyEqual(P->HpRoomSu(), Room - 28.0f, 0.5f));
+  }
+  // OPP-HAND: the caption of a narrow row takes type.tag (condensed), ends with «…» if still wider, the tooltip is all
+  UUmHudOppHand* H = CreateWidget<UUmHudOppHand>(W.World, UUmHudOppHand::StaticClass());
+  if (!TestNotNull(TEXT("opp hand"), H)) return false;
+  FUmOppHandModel M;
+  M.HandCount = 7;
+  M.DeckCount = 16;
+  M.DiscardCount = 7;
+  M.WidthSu = 300.0f;
+  H->ApplyModel(M);
+  TestEqual(TEXT("300 su: type.caption"), H->GetCaptionToken(), FName(TEXT("type.caption")));
+  M.WidthSu = 2.0f * UmHudOppHand::PadSu + UmTextFit::WidthSu(H->Caption->GetText(), TEXT("type.caption")) - 4.0f;
+  H->ApplyModel(M);
+  TestEqual(TEXT("a row 4 su narrower than the caption: type.tag"), H->GetCaptionToken(), FName(TEXT("type.tag")));
+  TestTrue(TEXT("the caption keeps its line in the row: ellipsis, clipped"),
+           H->Caption->GetClipping() == EWidgetClipping::ClipToBounds);
+  TestEqual(TEXT("the tooltip is the whole caption"), H->Caption->GetToolTipText().ToString(), H->Caption->GetText().ToString());
   return true;
 }
 

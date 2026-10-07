@@ -33,6 +33,7 @@ bool FUmCombatEdgeModel::operator==(const FUmCombatEdgeModel& O) const {
          FighterName == O.FighterName && TeamSlot == O.TeamSlot && HeroSlug == O.HeroSlug && bSameCard && bFace == O.bFace &&
          FlipDelayMs == O.FlipDelayMs && Boost == O.Boost && bButtons == O.bButtons && DefendWhy.Key == O.DefendWhy.Key &&
          NoDefenseWhy.Key == O.NoDefenseWhy.Key && bTimer == O.bTimer && DeadlineSec == O.DeadlineSec &&
+         bResolve == O.bResolve && ResolveWhy.Key == O.ResolveWhy.Key &&
          WindowSec == O.WindowSec;
 }
 
@@ -407,6 +408,8 @@ FBox2D UUmHudCombatEdge::DrawnRectSu() const {
   if (Model.bButtons) {
     if (Frame.DefendSu.bIsValid) R += Frame.DefendSu;
     if (Frame.NoDefenseSu.bIsValid) R += Frame.NoDefenseSu;
+  } else if (Model.bResolve && Frame.DefendSu.bIsValid) {
+    R += Frame.DefendSu;  // VS-5 E4: «Завершить бой»
   }
   return R;
 }
@@ -631,8 +634,24 @@ void UUmHudCombatEdge::ApplyContent(const FUmCombatEdgeModel* Old) {
 
 void UUmHudCombatEdge::ApplyButtons() {
   const bool bOn = Model.bShow && Model.bButtons;
-  UmEdgeShow(DefendButton, bOn, ESlateVisibility::Visible);
+  const bool bResolveOn = Model.bShow && !Model.bButtons && Model.bResolve;  // VS-5 E4
+  UmEdgeShow(DefendButton, bOn || bResolveOn, ESlateVisibility::Visible);
   UmEdgeShow(NoDefenseButton, bOn, ESlateVisibility::Visible);
+  if (bResolveOn && DefendButton) {
+    // the resolve window: one primary button at the defend place; its press is the owner's OnDefend -> ConfirmCombat,
+    // which resolves in COMBAT_RESOLVE (the same as R / Enter)
+    const float H = Frame.bClassS ? 40.0f : 48.0f;
+    FUmButtonModel B;
+    B.Variant = EUmButtonVariant::Primary;
+    B.Label = UmText::Get(EUmTable::Hud, TEXT("hud.combat.resolve"));
+    B.Reason = Model.ResolveWhy;
+    B.bEnabled = !B.Reason.IsSet();
+    B.HeightSu = H;
+    B.MinWidthSu = static_cast<float>(Frame.DefendSu.Max.X - Frame.DefendSu.Min.X);
+    DefendButton->ApplyModel(B);
+    UmEdgePlace(DefendButton, FVector2D(Frame.DefendSu.Min) - Frame.OriginSu, FVector2D(B.MinWidthSu, H), 6);
+    return;
+  }
   if (!bOn) return;
   const bool bS = Frame.bClassS;
   const float H = bS ? 40.0f : 48.0f;
@@ -843,6 +862,9 @@ void UUmHudCombatEdge::CollectShotLines(TArray<FString>& Out) const {
   const FVector2D CardWH = CardSize(Frame.bClassS);
   const FBox2D Rib = RibbonRectSu();
   FString Defend = TEXT("-");
+  if (Model.bResolve && !Model.bButtons) {
+    Defend = Model.ResolveWhy.IsSet() ? FString::Printf(TEXT("resolve-off:%s"), *Model.ResolveWhy.Key.ToString()) : FString(TEXT("resolve"));
+  }
   if (Model.bButtons) {
     const FS09Reason Why = TimerNow == EUmTimerState::Expired ? FS09Reason::Make(TEXT("why.deadline.passed")) : Model.DefendWhy;
     Defend = Why.IsSet() ? FString::Printf(TEXT("off:%s"), *Why.Key.ToString()) : FString(TEXT("on"));

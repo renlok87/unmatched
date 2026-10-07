@@ -76,7 +76,9 @@ void FUmTopStrip::SetFrame(const FUmTopStripFrame& InFrame) {
 }
 
 FUmConnInput FUmTopStrip::ConnInput(const FUmTopStripTick& T) {
-  if (T.bStreamReady) bWasReady = true;
+  // VS-5 E4 (HB-14): only a ready stream of the running match latches; a new match starts again (syncing until ready)
+  if (!T.bStarted) bWasReady = false;
+  if (T.bStarted && T.bStreamReady) bWasReady = true;
   if (!T.bInFlight) {
     InFlightSince = -1.0;
   } else if (InFlightSince < 0.0) {

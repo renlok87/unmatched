@@ -49,6 +49,10 @@ struct UNMATCHED_API FUmLogEntry {
   int32 TeamSlot = 0;
   FText Text;  // the inline moves (MS-E-106: the first two + «и ещё N»)
   FText Full;  // every move (the tooltip)
+  /** VS-5 E4 (VS-4 «Открыто» п. 4, HB-39): shorter forms of Text, tried in order when Text does not fit the row - the
+   *  moves without the player (the stripe names the side), then the first move + «и ещё N»; the row never ends before the
+   *  first «→». */
+  TArray<FText> Shorter;
   /** The card of an effect / a boost when the public piles name it (the click opens the inspector). */
   FString CardId;
 };
@@ -88,7 +92,10 @@ UNMATCHED_API FText TurnText(int32 Turn);
  *  ms.log.stay, ms.log.more, ms.log.boost.part) - the structure of FS09EventFeed::Describe / DescribeEffect. */
 UNMATCHED_API void DescribeTrail(const FS09LastMovement& Trail, const FString& CardName, const TArray<FString>& YourFighters,
                                  const FS09EventFeed::FNameOf& PlayerName, const FS09EventFeed::FNameOf& FighterName,
-                                 const FS09EventFeed::FCellName& CellName, FText& OutText, FText& OutFull);
+                                 const FS09EventFeed::FCellName& CellName, FText& OutText, FText& OutFull,
+                                 TArray<FText>* OutShorter = nullptr);
+/** VS-5 E4: the first of Text, Shorter... whose width (Measure, su) fits WidthSu; else the last (shortest) one. */
+UNMATCHED_API FText PickRowText(const FUmLogEntry& Entry, float WidthSu, TFunctionRef<float(const FText&)> Measure);
 }  // namespace UmHudLog
 
 UCLASS(Blueprintable, BlueprintType)
@@ -129,6 +136,10 @@ class UNMATCHED_API UUmHudLog : public UUserWidget {
   /** Scrolls by Rows rows (tests: the player reading; < 0 = up). */
   void ScrollRowsForTest(float RowsBy);
   FText GetRowText(int32 I) const;
+  /** VS-5 E4: the text the row draws (Text or a shorter form that fits). */
+  FText GetRowShownText(int32 I) const;
+  /** The width of the row text (su). */
+  float RowTextWidthSu() const;
   FText GetRowTooltip(int32 I) const;
   FName GetRowColorToken(int32 I) const;
   FLinearColor GetStripeColor(int32 I) const;

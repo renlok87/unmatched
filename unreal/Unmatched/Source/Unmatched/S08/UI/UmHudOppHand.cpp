@@ -1,6 +1,8 @@
 // VS-2 HB-21: OPP-HAND - see UmHudOppHand.h.
 #include "UmHudOppHand.h"
 
+#include "UmTextFit.h"
+
 #include "../S08AnimatedIconWidget.h"
 #include "../S08IconMotion.h"
 #include "UmCardMedia.h"
@@ -109,6 +111,13 @@ bool UUmHudOppHand::Initialize() {
     Caption = UmOppFind<UTextBlock>(WidgetTree, TEXT("Caption"));
     // the theme font is the default composite font: a WBP does not keep it
     if (Caption) Caption->SetFont(UUmHudTheme::Get().Font(TEXT("type.caption")));
+    if (Caption) {
+      // VS-5 E4 (VS-4 «Открыто» п. 10, LEET class S): the caption never runs past the panel - the row's width, «…» at
+      // its end (the full line is the tooltip), after the narrower type.tag (ApplyModel)
+      if (UVerticalBoxSlot* S = Cast<UVerticalBoxSlot>(Caption->Slot)) S->SetHorizontalAlignment(HAlign_Fill);
+      Caption->SetTextOverflowPolicy(ETextOverflowPolicy::Ellipsis);
+      Caption->SetClipping(EWidgetClipping::ClipToBounds);
+    }
     if (Backs) {
       // the row is as high as a back with no card in it
       Backs->SetVisibility(ESlateVisibility::HitTestInvisible);
@@ -231,7 +240,17 @@ void UUmHudOppHand::ApplyModel(const FUmOppHandModel& InModel) {
   }
   Target = NewTarget;
   Shown = FMath::Max(Shown, NewTarget);
-  if (Caption) Caption->SetText(UmHudOppHand::Caption(Model));
+  if (Caption) {
+    const FText Text = UmHudOppHand::Caption(Model);
+    Caption->SetText(Text);
+    Caption->SetToolTipText(Text);
+    const FName Token = UmTextFit::PickToken(Text, Model.WidthSu - 2.0f * UmHudOppHand::PadSu,
+                                             {FName(TEXT("type.caption")), FName(TEXT("type.tag"))});
+    if (Token != CaptionToken) {
+      CaptionToken = Token;
+      Caption->SetFont(UUmHudTheme::Get().Font(CaptionToken));
+    }
+  }
   LayoutBacks();
 }
 

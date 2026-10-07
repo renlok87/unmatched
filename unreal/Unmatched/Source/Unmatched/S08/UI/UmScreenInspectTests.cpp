@@ -494,4 +494,58 @@ bool FUmDeckRowMarksFitTest::RunTest(const FString& Parameters) {
   return true;
 }
 
+// ------------------------------------------------------------------- VS-5 E4: the inspector's «×», n 24 clicks
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmInspectCloseClicksTest, "Unmatched.S08.Hud.Screens.Inspect.CloseClicks",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FUmInspectCloseClicksTest::RunTest(const FString& Parameters) {
+  FRu Ru;
+  FWorld W(TEXT("UmInspectCloseClicks"));
+  if (!TestNotNull(TEXT("world"), W.World)) return false;
+  FMatch M;
+  UUmScreenInspect* S = Make(W.World);
+  if (!TestNotNull(TEXT("inspector"), S)) return false;
+  TSharedPtr<FS09HudPressArbiter> Arbiter = MakeShared<FS09HudPressArbiter>();
+  uint64 Frame = 3000;
+  Arbiter->SetFrameClock([&Frame]() { return Frame; });
+  TArray<FString> Closes;
+  UUmScreenInspect::FInput In;
+  In.OnClose = [&Closes](const TCHAR* Why) { Closes.Add(Why); };
+  S->SetInput(Arbiter, MoveTemp(In));
+  S->ApplyCanvas(FVector2D(1920.0, 1080.0), false, 1.0f);
+  const FUmInspectModel Own = UmInspect::FromCard(M.Own.Cards[0], EUmInspectSource::Hand, M.C);
+  const FGeometry Geo = FGeometry::MakeRoot(FVector2D(32.0, 32.0), FSlateLayoutTransform());
+  const FVector2D Centre(16.0, 16.0);
+  auto Left = [](const FVector2D& At, bool bDown) {
+    TSet<FKey> Pressed;
+    if (bDown) Pressed.Add(EKeys::LeftMouseButton);
+    return FPointerEvent(0, At, At, Pressed, EKeys::LeftMouseButton, 0.0f, FModifierKeysState());
+  };
+  const int32 N = 24;
+  int32 Lost = 0;
+  for (int32 I = 0; I < N; ++I) {
+    S->SetSheetClockMs(10000.0 + 1000.0 * I);
+    S->Open(Own);
+    if (!S->IsShown()) {
+      ++Lost;
+      continue;
+    }
+    const int32 Before = Closes.Num();
+    // holds of 0 and 3 frames; a snapshot re-applies the model while «×» is held
+    const int32 Hold = (I % 2) ? 3 : 0;
+    S->CloseButton->NativeOnMouseButtonDown(Geo, Left(Centre, true));
+    for (int32 F = 0; F < Hold; ++F) {
+      ++Frame;
+      Arbiter->NoteRebuild();
+      S->ApplyModel(Own);
+    }
+    S->CloseButton->NativeOnMouseButtonUp(Geo, Left(Centre, false));
+    ++Frame;
+    if (Closes.Num() != Before + 1 || Closes.Last() != TEXT("button") || S->IsShown()) ++Lost;
+  }
+  TestEqual(TEXT("n 24: every click closes once, 0 lost"), Lost, 0);
+  TestEqual(TEXT("24 closes, all by the button"), Closes.Num(), N);
+  return true;
+}
+
 #endif  // WITH_AUTOMATION_TESTS

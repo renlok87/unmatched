@@ -26,6 +26,9 @@
 #include "Engine/AssetManager.h"
 #include "Engine/StreamableManager.h"
 #include "Engine/Texture2D.h"
+#include "Fonts/FontMeasure.h"
+#include "Framework/Application/SlateApplication.h"
+#include "Rendering/SlateRenderer.h"
 #include "HAL/PlatformTime.h"
 #include "Internationalization/Internationalization.h"
 #include "Materials/MaterialInstanceDynamic.h"
@@ -644,6 +647,36 @@ void UUmCardWidget::SetFaceTexture(UTexture2D* Tex) {
   Face->SetBrush(Brush);
 }
 
+namespace UmCardWidget {
+int32 WrapLines(const FString& Text, float WidthSu, TFunctionRef<float(const FString&)> Measure) {
+  TArray<FString> Words;
+  Text.ParseIntoArrayWS(Words);
+  if (Words.Num() == 0) return 0;
+  int32 Lines = 1;
+  FString Line;
+  for (const FString& W : Words) {
+    if (Measure(W) > WidthSu) return MAX_int32;  // one word does not fit at all
+    const FString Next = Line.IsEmpty() ? W : Line + TEXT(" ") + W;
+    if (Measure(Next) <= WidthSu) {
+      Line = Next;
+    } else {
+      ++Lines;
+      Line = W;
+    }
+  }
+  return Lines;
+}
+
+FName FitTitleToken(const FString& Name, float WidthSu, int32 MaxLines, const TArray<FName>& Tokens,
+                    TFunctionRef<float(const FString&, FName)> Measure) {
+  if (Tokens.Num() == 0) return NAME_None;
+  for (const FName& T : Tokens) {
+    if (WrapLines(Name, WidthSu, [&Measure, &T](const FString& S) { return Measure(S, T); }) <= MaxLines) return T;
+  }
+  return Tokens.Last();
+}
+}  // namespace UmCardWidget
+
 void UUmCardWidget::ApplyFallbackContent() {
   const UUmHudTheme& Theme = UUmHudTheme::Get();
   const bool bRuBuild = (StateModel.Lang.IsEmpty() ? UmCardMedia::PreferredLang() : StateModel.Lang.ToLower()) != TEXT("en");
@@ -653,7 +686,22 @@ void UUmCardWidget::ApplyFallbackContent() {
   const FString Name = bRuBuild && !bRuMissing ? CardModel.NameRu : CardModel.Name;
   const FVector2D ShowSu = UmCardWidget::ShowSize(StateModel.Show, !bRuBuild);
   if (FallbackName) {
-    FallbackName->SetFont(Theme.Font(ShowSu.X >= 200.0 ? TEXT("type.heading") : TEXT("type.button")));
+    // VS-5 E4 (VS-4 «Открыто» п. 7, T. Rex «When Dinosaurs Ruled the Earth» in the slot): the title steps down a type
+    // until it wraps into 3 lines inside the card (the band + 6 su a side); it never draws past the frame
+    TArray<FName> Tokens;
+    if (ShowSu.X >= 200.0) Tokens.Add(FName(TEXT("type.heading")));
+    Tokens.Append({FName(TEXT("type.button")), FName(TEXT("type.body")), FName(TEXT("type.tag"))});
+    const float WidthSu = static_cast<float>(ShowSu.X) - 2.0f * (UmCardWidget::BandSu + 6.0f);
+    FName Token = Tokens[0];
+    if (FSlateApplication::IsInitialized() && FSlateApplication::Get().GetRenderer()) {
+      const TSharedRef<FSlateFontMeasure> Measure = FSlateApplication::Get().GetRenderer()->GetFontMeasureService();
+      Token = UmCardWidget::FitTitleToken(Name, WidthSu, 3, Tokens, [&Measure, &Theme](const FString& S, FName T) {
+        return static_cast<float>(Measure->Measure(S, Theme.Font(T), 1.0f).X);
+      });
+    }
+    FallbackName->SetFont(Theme.Font(Token));
+    FallbackName->SetAutoWrapText(true);  // a WBP may not keep the flag of the code tree
+    FallbackName->SetClipping(EWidgetClipping::ClipToBounds);
     FallbackName->SetText(FText::FromString(Name));
   }
   if (FallbackLang) {

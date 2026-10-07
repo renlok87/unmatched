@@ -44,6 +44,9 @@ struct UNMATCHED_API FUmTopStripTick {
   bool bManeuverSlow = false;  // IsCommandSlow
   bool bInFlight = false;      // any command in flight (HudBusyReason)
   bool bRecovering = false;    // IsAwaitingStateRecovery
+  /** VS-5 E4 (HB-14): the match is running (ES08Stage::Started). Off it the stream is "ready" by definition and must not
+   *  count as "ready once": the first subscription of a match is syncing, a drop after it is lost. */
+  bool bStarted = true;
   double NowSeconds = 0.0;
   // the banner
   const FS09TurnCue* Cue = nullptr;

@@ -341,11 +341,12 @@ void AS08FlowGameMode::BuildUmHud() {
   const bool bGameParts = Game && Game->HasAllParts(&GameMissing);
   ArtHud.PendingTrace.Add(FString::Printf(
       TEXT("HUD-ROOT impl=umg created=1 root=%s game=%s parts=%d/%d missing=%s layer=1 input=GameAndUI slate=%s "
-           "unknown=%s"),
+           "unknown=%s cache=%d"),
       *R.Source, Game ? (Game->UsesCodeDefaultTree() ? TEXT("code-default") : *Game->GetClass()->GetPathName()) : TEXT("none"),
       bRootParts ? 1 : 0, bGameParts ? 1 : 0,
       (RootMissing + GameMissing).IsEmpty() ? TEXT("-") : *(RootMissing + TEXT(" ") + GameMissing),
-      R.Blocks.Blocks.Num() ? *R.Blocks.ImplField() : TEXT("-"), Unknown.Num() ? *FString::Join(Unknown, TEXT(",")) : TEXT("-")));
+      R.Blocks.Blocks.Num() ? *R.Blocks.ImplField() : TEXT("-"), Unknown.Num() ? *FString::Join(Unknown, TEXT(",")) : TEXT("-"),
+      UmHudRoot->GetGameCache() ? 1 : 0));  // VS-5 E4: the invalidation box around GAME (rollback -S08HudNoCache)
   // VS-2 HB-12: the software cursors (04 §3.2); -S08SlateHud=cursor keeps the system cursor
   FString CursorSource;
   const bool bCursors = !R.Blocks.IsSlate(FName(TEXT("cursor"))) && UmHudRoot->InstallCursors(&CursorSource);
@@ -642,6 +643,11 @@ void AS08FlowGameMode::TickUmExitShots() {
   for (int32 I = 0; I < UE_ARRAY_COUNT(Plan); ++I) {
     const float At = Plan[I].bOwn ? R.ExitOwnAt : R.ExitOppAt;
     if ((R.ExitTaken & (1u << I)) || At < 0.0f || Elapsed < At + Plan[I].Dt) continue;
+    if (Hud.bValid && (Hud.bGameOver || Hud.bViewerTurn != Plan[I].bOwn)) {  // VS-5 E4: the turn passed (or the match)
+      FS08Trace::Write(FString::Printf(TEXT("EXITSHOT skip %s turn-changed dt=%.2f"), Plan[I].Leaf, Elapsed - At));
+      (Plan[I].bOwn ? R.ExitOwnAt : R.ExitOppAt) = -1.0f;
+      continue;
+    }
     R.ExitTaken |= 1u << I;
     FS08Trace::Write(FString::Printf(TEXT("EXITSHOT shot %s dt=%.2f"), Plan[I].Leaf, Elapsed - At));
     TakeEvidenceShot(S09ShotDir / Plan[I].Leaf);  // the evidence queue orders it after a shot in flight
@@ -905,7 +911,7 @@ void AS08FlowGameMode::TickUmExitShotsVs4() {
     float HoldSec;
   };
   const FCond Conds[] = {
-      {TEXT("s09-exit-conn-syncing.png"), Conn == EUmConnState::Syncing, 0.4f},
+      {TEXT("s09-exit-conn-syncing.png"), Conn == EUmConnState::Syncing, 0.1f},  // VS-5 E4: the match start's subscription
       {TEXT("s09-exit-conn-lost.png"), Conn == EUmConnState::Lost && Flow->GetAppliedSnapshot().SequenceNumber > 0, 0.1f},
       {TEXT("s09-exit-banner-combat.png"), Banner && Banner->GetAlpha() > 0.9f && bCenter && R.BannerShiftSu > 0.0f, 0.1f},
   };
@@ -1350,6 +1356,7 @@ void AS08FlowGameMode::TickUmTopStrip() {
   T.TurnCount = Hud.TurnCount;
   const bool bStarted = Flow.IsValid() && Flow->GetStage() == ES08Stage::Started;
   T.bStreamReady = !bStarted || Flow->IsStreamReady();
+  T.bStarted = bStarted;  // VS-5 E4: wasReady latches in the match only (the start is syncing, not lost)
   T.bManeuverSlow = bStarted && Flow->IsCommandSlow();
   T.bInFlight = HudBusyReason().IsSet();
   T.bRecovering = bStarted && Flow->IsAwaitingStateRecovery();
@@ -1982,6 +1989,9 @@ void AS08FlowGameMode::RefreshUmCombat() {
   if (const UUmHudStatusLine* Status = R.TopStrip.GetStatus()) {
     if (Status->IsShown()) In.StatusBottomSu = static_cast<float>(R.Layout.Rect(EUmHudBlock::Status).Min.Y) + Status->GetBodySizeSu().Y;
   }
+  // VS-5 E4 (VS-4 «Открыто» п. 2): the resolve window's button on the own edge (the Slate one gives way)
+  In.bResolveButton = In.bOpen && In.bResolvePhase && CommandUi.Mode == ES09CommandMode::CombatResolve && UmHudOwnsSlateBlock(TEXT("resolve"));
+  In.ResolveWhy = HudBusyReason().IsSet() ? HudBusyReason() : CommandUi.PendingQueue.Num() > 0 ? FS09Reason::Make(TEXT("why.wait.opponent.choice")) : FS09Reason();
   for (const FString& Line : R.Combat.Refresh(In)) {
     FS08Trace::Write(Line);
     // run I acceptance (AB-8): the auto client frames the first no-defense stamp once its 200 ms appear has landed
@@ -1992,8 +2002,13 @@ void AS08FlowGameMode::RefreshUmCombat() {
   // ВР-VS3-56: the turn banner never lies over the combat centre - it moves 8 su under the shown panel
   if (UUmHudBanner* Banner = R.TopStrip.GetBanner()) {
     const UUmHudCombatCenter* Center = R.Combat.GetCenter();
-    const FBox2D Panel = Center && UmGameHudSlots::ShownByProperty(Center) ? Center->PanelRectSu() : FBox2D(ForceInit);
+    FBox2D Panel = Center && UmGameHudSlots::ShownByProperty(Center) ? Center->PanelRectSu() : FBox2D(ForceInit);
     const FBox2D BannerRect = R.Layout.Rect(EUmHudBlock::Banner);
+    // VS-5 E4: an open choice under STATUS (the compact / modal of PENDING) takes the banner under it the same way
+    const UUmHudPending* PendingW = R.Pending.Get();
+    const FBox2D PendingRect = PendingW && UmGameHudSlots::ShownByProperty(PendingW) && PendingW->GetModel().View != EUmPendingView::Toast
+                                   ? PendingW->PanelRectSu() : FBox2D(ForceInit);
+    if (PendingRect.bIsValid && BannerRect.bIsValid && PendingRect.Intersect(BannerRect) && (!Panel.bIsValid || PendingRect.Max.Y > Panel.Max.Y)) Panel = PendingRect;
     float Shift = 0.0f;
     if (Panel.bIsValid && BannerRect.bIsValid && Panel.Intersect(BannerRect)) {
       Shift = static_cast<float>(Panel.Max.Y + 8.0 - BannerRect.Min.Y);
@@ -2522,6 +2537,12 @@ void AS08FlowGameMode::TickUmFeed() {
     }
   }
   for (const FString& Line : R.Feed.Refresh(In)) FS08Trace::Write(Line);
+  // VS-5 E4 (VS-4 «Открыто» п. 5): the same blocks are the world tags' and the plate's obstacles (px)
+  UmHudBlocksPx.Reset();
+  for (const FBox2D& B : In.Blocks) {
+    UmHudBlocksPx.Add(FS08ScreenRect(static_cast<float>(B.Min.X) * PxPerSu, static_cast<float>(B.Min.Y) * PxPerSu,
+                                     static_cast<float>(B.Max.X) * PxPerSu, static_cast<float>(B.Max.Y) * PxPerSu));
+  }
   // HB-36: the pending trigger toast follows the stack's placement
   const FBox2D PendingRect = R.Feed.PendingToastRect();
   if (PendingRect.bIsValid != R.PendingToastRect.bIsValid || (PendingRect.bIsValid && !(PendingRect == R.PendingToastRect))) {
@@ -2577,7 +2598,7 @@ void AS08FlowGameMode::UmHudLogTrail(const FS09LastMovement& Trail, const FStrin
         const FS08BoardFighter* F = FindFighter(Id);
         return F ? (F->Label.IsEmpty() ? F->Name : F->Label) : Id;
       },
-      [this](const FIntPoint& Cell) { return BoardModel.CellLabel(Cell.X, Cell.Y); }, E.Text, E.Full);
+      [this](const FIntPoint& Cell) { return BoardModel.CellLabel(Cell.X, Cell.Y); }, E.Text, E.Full, &E.Shorter);
   R.Feed.PushLog(E, static_cast<double>(NowMs()));
   FS08Trace::Write(FString::Printf(TEXT("HUD-LOG add seq=%d turn=%d team=%d card=%d total=%d"), E.Seq, E.Turn, E.TeamSlot,
                                    E.CardId.IsEmpty() ? 0 : 1, R.Feed.GetLog() ? R.Feed.GetLog()->Num() : 0));
