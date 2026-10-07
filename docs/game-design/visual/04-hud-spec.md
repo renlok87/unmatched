@@ -1247,6 +1247,13 @@ SHOT widget id=<UI-ID> impl=umg|slate state=<состояние> fighter=<id|non
 | UE `Unmatched.S09.HudPress.*` | Slate-кнопки | + синтетические клики по `UUmButton` и `UUmCardWidget`: удержание 0 и 50 мс, n ≥ 20, 0 потерь (UI-INP-011) |
 | `hud_contract.py validate` | токены, `why.*` | + заголовок и тема свежие, ID блоков из §7.1 |
 
+Дельта VS-4 HB-48 (2026-10-07, по делегированию, ВР-VS4-74…81): переведены `run-combat-demo`, `run-pending-demo`,
+`run-duel-demo`, `run-hud-probe` — правила кадра `hud_contract.py check-shots` (`need` / `deny` по блоку `SHOT widget`
+кадра, ранний и поздний блок) и `--privacy`; ключ скрипта `-S09Markers` — откат на прежние пиксельные гейты. У дуэли
+экран результата и лобби — по трассе `RESULT` и `UI-SCR-GAME state=over`, пока GAMEOVER и LOBBY на Slate.
+`run-vs-ai-demo`, `run-vs-ai-abort-demo` — с `-S09Markers` до UMG-экранов GAMEOVER / ABORTED (VS-7), `run-hud-demo` — без
+изменений. Лист — `docs/game-design/evidence/VISUAL/HB-48/`.
+
 ## 6. Локализация
 
 ### 6.1 Таблицы

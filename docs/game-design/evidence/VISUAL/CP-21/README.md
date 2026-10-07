@@ -37,3 +37,9 @@ reduced shorten 100); F-10; ВР-73, ВР-74.
 
 - Кадры своей схемы и схемы соперника в слоте на Marmoreal (`-ConceptPaste`) и Sarpedon original, 1080p 100 %, packaged
   `-Bench` с `RENDER`, шесть фигур v2, и G-CUE «500 ± 1 кадр» на них — шаг «Кадры».
+
+## Кадры выхода VS-4 (HB-49, упаковка `5a74a81e`, 2026-10-07)
+
+Живые партии приёмочной упаковки, Marmoreal original (`-ConceptPaste` до EN-13, пометка) и Sarpedon original, шесть фигур v2, слоя отладки нет; прогоны, гейты и листы — [HB-49](../HB-49/README.md) (картинки со сканами и доской — вне git, `scraped-data/derived/visual-evidence/HB-49/`, ВР-VS4-01).
+
+Вспышка сыгранной карты: строки G-CUE `CUE fx id=CUE-006 subject=card` во всех трассах; G-CUE PASS (кроме трёх AU5 после кадра доказательств, ВР-VS3-78). Отдельного кадра вспышки нет (500 мс между кадрами).
