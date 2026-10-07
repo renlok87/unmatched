@@ -1325,6 +1325,11 @@ private:
   bool HoldUmExitAttack();
   void ResumeUmExitAttack();
   bool HoldUmExitDefense();
+  // VS-4 exit frames (opt-in -S08ExitShots, HB-49 sets D and the VS-2 leftovers): the own pending head collapsed, the
+  // software cursor over a hand card and a button (HB-12), the link states syncing / lost (HB-14), the turn banner
+  // under the combat centre
+  void TickUmExitShotsVs4();
+  bool HoldUmExitPending();
   // VS-3 HUD budget (opt-in -S08HudPerf, HUD-RULES П8, UI/UmHudPerf.h): the UMG root collapsed / shown in blocks
   void TickUmHudPerf();
   void FinishUmHudPerf(const TCHAR* Why);

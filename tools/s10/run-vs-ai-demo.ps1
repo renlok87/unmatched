@@ -16,6 +16,9 @@ param(
   [string]$ClientExtraArgs = '',
   # VS-3 SC-01 (ВР-SC14): -S08ScreenShots - one evidence frame per new 'SHOT widget id=UI-SCR-* state=<s>'
   [switch]$ScreenShots,
+  # VS-4 HB-49 (opt-in): the per-process frame cap of the one client; 0 = none (the HUD budget is measured uncapped with
+  # ONE client, -ClientExtraArgs '-S08HudPerf', 05 §3 VS-4). Default 30 as before.
+  [int]$ClientFps = 30,
   # Fail fast when the one client is subscribed but no fresh
   # 'SNAPSHOT applied seq=' line appears for this many seconds (the server bot
   # drives the opponent seat, so a dead stream still means a stalled demo).
@@ -772,7 +775,7 @@ function Invoke-VsAiDemo {
   $resX = if ($FullHd) { 1920 } else { 1280 }
   $resY = if ($FullHd) { 1080 } else { 720 }
   $common = @("-windowed", "-resx=$resX", "-resy=$resY", "-RenderOffScreen",
-    "-ExecCmds=`"t.MaxFPS 30`"", "log=GrepLog",
+    "-ExecCmds=`"t.MaxFPS $ClientFps`"", "log=GrepLog",
     "-ForceAbandonSequences", "-S08Api=$Api", "-S09ShotMode=$ShotMode")
   # HB-01: the marker pixel gates below need the debug layer (04-hud-spec s5.3). VS-4 HB-48: they stay on -S09Markers
   # until the GAMEOVER screen moves to UMG (VS-7, screens.csv UI-SCR-GAMEOVER); then 'SHOT widget id=UI-SCR-GAMEOVER'.

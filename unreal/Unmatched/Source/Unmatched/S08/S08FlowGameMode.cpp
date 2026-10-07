@@ -3742,6 +3742,7 @@ void AS08FlowGameMode::RunS09Auto() {
       FS08Trace::Write(TEXT("S09AUTO pending shot file never appeared - proceeding WITHOUT the shot"));
       S09ShotPendingPath.Reset();
     }
+    if (HoldUmExitPending()) return;  // VS-4 exit frame «свёрнуто» (-S08ExitShots, set D)
     if (Type == TEXT("BOOST_CHOICE")) {
       // GD-033: hold the boost answer a few seconds - an instant reply closes
       // the post-reveal pause before the OTHER seat's reveal capture frame

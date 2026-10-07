@@ -133,6 +133,8 @@
 #include "Engine/Engine.h"
 #include "Engine/GameViewportClient.h"
 #include "Engine/World.h"
+#include "Framework/Application/SlateApplication.h"
+#include "Framework/Application/SlateUser.h"
 #include "GameFramework/PlayerController.h"
 #include "HAL/PlatformTime.h"
 #include "Input/Events.h"
@@ -228,6 +230,17 @@ struct FUmHudRuntime {
   float ExitDefenseAskedAt = -1.0f;
   FString ExitDefensePath;
   bool bExitDefenseDone = false;
+  // VS-4 exit frames (HB-49): the pending head collapsed (0 idle, 1 collapsed, 2 framed, 3 expanded, 4 done); the cursor
+  // steps over a hand card and a button (0 wait, 1 over the card, 2 card framed, 3 over the button, 4 button framed,
+  // 5 done) on the own turn after the hover frame, through Slate's faux cursor (never the OS pointer)
+  int32 ExitPendingStep = 0;
+  float ExitPendingAt = -1.0f;
+  FString ExitPendingPath;
+  int32 ExitCursorStep = 0;
+  float ExitCursorAt = -1.0f;
+  float ExitCursorTurnAt = -1.0f;
+  FString ExitCursorPath;
+  bool bExitCursorFaux = false;
   // VS-3 HUD budget (-S08HudPerf, HUD-RULES П8): -1 not read / 0 off / 1 measuring / 2 finished
   int32 Perf = -1;
   float PerfStartAt = -1.0f;
@@ -585,6 +598,13 @@ void AS08FlowGameMode::NoteUmExitShotsTurn(bool bOwn, bool bInitial, bool bGameO
   NoteUmInspectShotsTurn(bOwn, bInitial, bGameOver);  // VS-4 V4 evidence (-S08InspectShots)
   if (bInitial || bGameOver || !UmExitShotsOn()) return;
   FUmHudRuntime& R = *UmHud;
+  // VS-4 HB-12 cursor frames: the first own turn after the hover frame, its auto plan held 4.5 s for them
+  if (bOwn && R.bExitHoverDone && R.ExitCursorStep == 0 && R.ExitCursorTurnAt < 0.0f) {
+    R.ExitCursorTurnAt = Elapsed;
+    S09SchemeQuietUntil = FMath::Max(S09SchemeQuietUntil, Elapsed + 4.5f);
+    FS08Trace::Write(FString::Printf(TEXT("EXITSHOT cursor turn seq=%d at=%.2f hold=4.5"),
+                                     Flow.IsValid() ? Flow->GetAppliedSnapshot().SequenceNumber : -1, Elapsed));
+  }
   float& At = bOwn ? R.ExitOwnAt : R.ExitOppAt;
   // VS-3 set A hover (ВР-VS3-73): tried at the first own turn + 3.4 s; a turn whose start still shows the last combat
   // (or a choice) passes it on to the next own turn, which holds its auto plan 2.6 s for it
@@ -738,6 +758,175 @@ void AS08FlowGameMode::TickUmExitShotsVs3() {
     FS08Trace::Write(FString::Printf(TEXT("EXITSHOT shot %s held=%.2f %s"), C.Leaf, Elapsed - *Since, *States));
     TakeEvidenceShot(S09ShotDir / Leaf);
     return;  // one request per frame
+  }
+  TickUmExitShotsVs4();
+}
+
+// ------------------------------------------------------------------------------------------------ VS-4 exit frames
+// HB-49 (04 §7.2 set D) and the VS-2 leftovers of 05 §3 VS-4: the own pending head collapsed (HoldUmExitPending, from
+// the auto answer), the software cursor of HB-12 over a hand card and over the end-turn button (Slate's faux cursor:
+// the OS pointer never moves), the link badge of HB-14 in syncing / lost (a slow command, a dropped stream - see
+// tools/s10/delay-graphql-query-proxy.cjs), the turn banner under a shown combat centre (ВР-VS3-56). Files
+// s09-exit-*.png, trace 'EXITSHOT ...'.
+
+namespace {
+/** Moves Slate's cursor user to the centre of W (absolute desktop space) as a synthetic pointer move. */
+bool UmExitPointAt(const UWidget* W, FVector2D& OutAbs) {
+  if (!W || !FSlateApplication::IsInitialized()) return false;
+  const TSharedPtr<SWidget> Slate = W->GetCachedWidget();
+  if (!Slate.IsValid() || Slate->GetCachedGeometry().GetLocalSize().IsNearlyZero()) return false;
+  const FGeometry& Geo = Slate->GetCachedGeometry();
+  OutAbs = FVector2D(Geo.GetAbsolutePositionAtCoordinates(FVector2f(0.5f, 0.5f)));
+  FSlateApplication& App = FSlateApplication::Get();
+  const TSharedPtr<FSlateUser> User = App.GetCursorUser();
+  if (!User.IsValid()) return false;
+  const FVector2D Last = FVector2D(User->GetCursorPosition());
+  User->SetCursorPosition(OutAbs);
+  App.ProcessMouseMoveEvent(FPointerEvent(App.GetUserIndexForMouse(), FSlateApplication::CursorPointerIndex,
+                                          FVector2f(OutAbs), FVector2f(Last), TSet<FKey>(), EKeys::Invalid, 0.0f,
+                                          FModifierKeysState()),
+                            false);
+  App.QueryCursor();
+  return true;
+}
+}  // namespace
+
+bool AS08FlowGameMode::HoldUmExitPending() {
+  // set D «свёрнуто»: the first own head shown as a compact / modal UMG window - collapse (as the key C), frame,
+  // expand, then the auto answer goes on
+  if (!UmExitShotsOn() || !UmPendingOwnsCommandPanel()) return false;
+  FUmHudRuntime& R = *UmHud;
+  if (R.ExitPendingStep >= 4) return false;
+  const UUmHudPending* Pending = R.Pending.Get();
+  const EUmPendingView View = Pending ? Pending->GetModel().View : EUmPendingView::Hidden;
+  switch (R.ExitPendingStep) {
+    case 0:
+      if (View != EUmPendingView::Compact && View != EUmPendingView::Modal) return false;
+      TogglePendingCollapseCommand();
+      R.ExitPendingStep = 1;
+      R.ExitPendingAt = Elapsed;
+      FS08Trace::Write(FString::Printf(TEXT("EXITSHOT pending collapse from=%s seq=%d"), UmHudPending::ViewName(View),
+                                       Hud.SequenceNumber));
+      return true;
+    case 1:
+      if (Elapsed < R.ExitPendingAt + 0.6f || IsEvidenceCaptureBusy()) {
+        if (Elapsed < R.ExitPendingAt + 6.0f) return true;
+      }
+      R.ExitPendingPath = S09ShotDir / TEXT("s09-exit-pending-collapsed.png");
+      R.ExitPendingAt = Elapsed;
+      R.ExitPendingStep = 2;
+      FS08Trace::Write(FString::Printf(TEXT("EXITSHOT shot s09-exit-pending-collapsed.png view=%s seq=%d"),
+                                       UmHudPending::ViewName(View), Hud.SequenceNumber));
+      TakeEvidenceShot(R.ExitPendingPath);
+      return true;
+    case 2:
+      if (!FPaths::FileExists(R.ExitPendingPath) && Elapsed < R.ExitPendingAt + 4.0f) return true;
+      if (View == EUmPendingView::Collapsed) TogglePendingCollapseCommand();
+      R.ExitPendingStep = 3;
+      R.ExitPendingAt = Elapsed;
+      return true;
+    default:
+      if (Elapsed < R.ExitPendingAt + 0.4f) return true;
+      R.ExitPendingStep = 4;
+      FS08Trace::Write(FString::Printf(TEXT("EXITSHOT release pending view=%s"), UmHudPending::ViewName(View)));
+      return false;
+  }
+}
+
+void AS08FlowGameMode::TickUmExitShotsVs4() {
+  FUmHudRuntime& R = *UmHud;
+  // ---- HB-12 cursor: a hand card (pointer) and the end-turn button (pointer / denied) ----
+  if (R.ExitCursorTurnAt >= 0.0f && R.ExitCursorStep < 5 && FSlateApplication::IsInitialized()) {
+    UUmHudHand* Hand = R.Hand.Get();
+    const UUmHudActions* Actions = R.Actions.Get();
+    const auto Restore = [&R]() {
+      if (R.bExitCursorFaux) FSlateApplication::Get().UsePlatformCursorForCursorUser(true);
+      R.bExitCursorFaux = false;
+    };
+    const auto Line = [this]() {
+      APlayerController* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
+      return UmHudRoot ? UmHudRoot->CursorShotLine(PC ? PC->CurrentMouseCursor.GetValue() : EMouseCursor::Default)
+                       : FString(TEXT("-"));
+    };
+    if (R.ExitCursorStep == 0 || R.ExitCursorStep == 2) {
+      const bool bFirst = R.ExitCursorStep == 0;
+      if (bFirst && Elapsed < R.ExitCursorTurnAt + 1.0f) return;
+      if (!bFirst && !FPaths::FileExists(R.ExitCursorPath) && Elapsed < R.ExitCursorAt + 4.0f) return;
+      const UWidget* Target = nullptr;
+      if (bFirst && Hand && Hud.bViewerTurn && Hand->GetModel().bShow && Hand->StateName() == TEXT("rest")) {
+        const TArray<FUmHandCardModel>& Cards = Hand->GetModel().Cards;
+        if (Cards.Num() > 0) Target = Hand->FindCard(Cards[Cards.Num() / 2].Card.InstanceId);
+      } else if (!bFirst && Actions) {
+        Target = Actions->GetButton(EUmActionKey::EndTurn);
+      }
+      if (!R.bExitCursorFaux) {
+        FSlateApplication::Get().UsePlatformCursorForCursorUser(false);  // Slate's faux cursor: the OS pointer stays
+        R.bExitCursorFaux = true;
+      }
+      FVector2D Abs;
+      if (!UmExitPointAt(Target, Abs)) {
+        if (Elapsed < R.ExitCursorTurnAt + 3.0f) return;
+        FS08Trace::Write(FString::Printf(TEXT("EXITSHOT cursor %s target missing - skipped"), bFirst ? TEXT("card") : TEXT("button")));
+        Restore();
+        R.ExitCursorStep = 5;
+        return;
+      }
+      R.ExitCursorStep = bFirst ? 1 : 3;
+      R.ExitCursorAt = Elapsed;
+      FS08Trace::Write(FString::Printf(TEXT("EXITSHOT cursor at=%s abs=(%.0f,%.0f)"), bFirst ? TEXT("card") : TEXT("button"),
+                                       Abs.X, Abs.Y));
+      return;
+    }
+    if (R.ExitCursorStep == 1 || R.ExitCursorStep == 3) {
+      if (Elapsed < R.ExitCursorAt + 0.5f || IsEvidenceCaptureBusy()) return;
+      const TCHAR* Leaf = R.ExitCursorStep == 1 ? TEXT("s09-exit-cursor-card.png") : TEXT("s09-exit-cursor-button.png");
+      R.ExitCursorPath = S09ShotDir / Leaf;
+      R.ExitCursorAt = Elapsed;
+      ++R.ExitCursorStep;
+      FS08Trace::Write(FString::Printf(TEXT("EXITSHOT shot %s %s"), Leaf, *Line()));
+      TakeEvidenceShot(R.ExitCursorPath);
+      return;
+    }
+    if (R.ExitCursorStep == 4 && (FPaths::FileExists(R.ExitCursorPath) || Elapsed >= R.ExitCursorAt + 4.0f)) {
+      Restore();
+      R.ExitCursorStep = 5;
+      FS08Trace::Write(TEXT("EXITSHOT cursor done"));
+    }
+  }
+  if (!Hud.bValid || Hud.bGameOver || IsResultScreenShown() || !Flow.IsValid()) return;
+  // ---- HB-14 link states and the banner under the combat centre: held conditions ----
+  const EUmConnState Conn = R.TopStrip.GetConn();
+  const UUmHudBanner* Banner = R.TopStrip.GetBanner();
+  const UUmHudCombatCenter* Center = R.Combat.GetCenter();
+  const bool bCenter = Center && UmGameHudSlots::ShownByProperty(Center);
+  struct FCond {
+    const TCHAR* Leaf;
+    bool bNow;
+    float HoldSec;
+  };
+  const FCond Conds[] = {
+      {TEXT("s09-exit-conn-syncing.png"), Conn == EUmConnState::Syncing, 0.4f},
+      {TEXT("s09-exit-conn-lost.png"), Conn == EUmConnState::Lost && Flow->GetAppliedSnapshot().SequenceNumber > 0, 0.1f},
+      {TEXT("s09-exit-banner-combat.png"), Banner && Banner->GetAlpha() > 0.9f && bCenter && R.BannerShiftSu > 0.0f, 0.1f},
+  };
+  for (const FCond& C : Conds) {
+    const FString Leaf(C.Leaf);
+    if (R.ExitDone.Contains(Leaf)) continue;
+    if (!C.bNow) {
+      R.ExitSince.Remove(Leaf);
+      continue;
+    }
+    const float* Since = R.ExitSince.Find(Leaf);
+    if (!Since) {
+      R.ExitSince.Add(Leaf, Elapsed);
+      continue;
+    }
+    if (Elapsed - *Since < C.HoldSec || IsEvidenceCaptureBusy()) continue;
+    R.ExitDone.Add(Leaf);
+    FS08Trace::Write(FString::Printf(TEXT("EXITSHOT shot %s held=%.2f conn=%s bannerShift=%.0f seq=%d"), C.Leaf,
+                                     Elapsed - *Since, UmConnection::StateName(Conn), R.BannerShiftSu, Hud.SequenceNumber));
+    TakeEvidenceShot(S09ShotDir / Leaf);
+    return;
   }
 }
 
