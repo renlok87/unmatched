@@ -1,0 +1,1097 @@
+{
+  "units": "su",
+  "canvases": {
+    "1080p-100": {
+      "error": {
+        "LoadingPanel": {
+          "rect_su": [
+            648.0,
+            257.0,
+            624,
+            566
+          ],
+          "kind": "screen",
+          "skin": "Modal",
+          "alpha": 1.0
+        },
+        "ErrorIcon": {
+          "rect_su": [
+            786.0,
+            281.0,
+            48,
+            48
+          ],
+          "kind": "screen",
+          "icon": "resource-connection-lost",
+          "source": "art/imagegen/hud-icons-v3/sizes/resource-connection-lost-48.png"
+        },
+        "StageText": {
+          "rect_su": [
+            846.0,
+            281.0,
+            308.25,
+            48
+          ],
+          "kind": "screen",
+          "text": "Не удаётся подключиться",
+          "role": "type.title",
+          "source": {
+            "file": "docs/unreal/contracts/hud/st-screens.csv",
+            "key": "screens.loading.error",
+            "column": "ru"
+          }
+        },
+        "LeftCard": {
+          "rect_su": [
+            672.0,
+            353.0,
+            240,
+            320
+          ],
+          "kind": "screen",
+          "skin": "PanelInset",
+          "alpha": 1.0
+        },
+        "LeftCard.Portrait": {
+          "rect_su": [
+            712.0,
+            398.0,
+            160,
+            160
+          ],
+          "kind": "screen",
+          "crop_key": "medusa",
+          "variant": "B",
+          "team_ring": false,
+          "source": "scraped-data/derived/ue-media-v1/avatars/medusa.png"
+        },
+        "LeftCard.NameText": {
+          "rect_su": [
+            688.0,
+            574.0,
+            208,
+            30
+          ],
+          "kind": "screen",
+          "text": "Medusa",
+          "role": "type.heading",
+          "source": {
+            "file": "scraped-data/derived/sc20-loading-error-codex/inputs/heroes.json",
+            "key": "adminHero.cmq7d7b4000r8wi74tzd1jmxv.answer.data.adminHero.nameRu"
+          }
+        },
+        "LeftCard.NickText": {
+          "rect_su": [
+            688.0,
+            608.0,
+            208,
+            20
+          ],
+          "kind": "screen",
+          "text": "ProGamer",
+          "role": "type.caption",
+          "source": {
+            "file": "scraped-data/derived/sc20-loading-error-codex/inputs/room-state.json",
+            "key": "steps.started.request.answer.data.startGame.players[0].username",
+            "seed_line": 34
+          }
+        },
+        "RightCard": {
+          "rect_su": [
+            1008.0,
+            353.0,
+            240,
+            320
+          ],
+          "kind": "screen",
+          "skin": "PanelInset",
+          "alpha": 1.0
+        },
+        "RightCard.Portrait": {
+          "rect_su": [
+            1048.0,
+            398.0,
+            160,
+            160
+          ],
+          "kind": "screen",
+          "crop_key": "king-arthur",
+          "variant": "B",
+          "team_ring": false,
+          "source": "scraped-data/derived/ue-media-v1/avatars/king-arthur.png"
+        },
+        "RightCard.NameText": {
+          "rect_su": [
+            1024.0,
+            574.0,
+            208,
+            30
+          ],
+          "kind": "screen",
+          "text": "King Arthur",
+          "role": "type.heading",
+          "source": {
+            "file": "scraped-data/derived/sc20-loading-error-codex/inputs/heroes.json",
+            "key": "adminHero.cmq7d7b1000njwi74a536w55r.answer.data.adminHero.nameRu"
+          }
+        },
+        "RightCard.NickText": {
+          "rect_su": [
+            1024.0,
+            608.0,
+            208,
+            20
+          ],
+          "kind": "screen",
+          "text": "Veteran",
+          "role": "type.caption",
+          "source": {
+            "file": "scraped-data/derived/sc20-loading-error-codex/inputs/room-state.json",
+            "key": "steps.started.request.answer.data.startGame.players[1].username",
+            "seed_line": 44
+          }
+        },
+        "VersusText": {
+          "rect_su": [
+            912.0,
+            498.0,
+            96,
+            30
+          ],
+          "kind": "screen",
+          "text": "против",
+          "role": "type.heading",
+          "source": {
+            "file": "docs/unreal/contracts/hud/st-screens.csv",
+            "key": "screens.loading.versus",
+            "column": "ru"
+          }
+        },
+        "BoardText": {
+          "rect_su": [
+            672.0,
+            697.0,
+            576,
+            30
+          ],
+          "kind": "screen",
+          "text": "Marmoreal · original map",
+          "role": "type.heading",
+          "source": {
+            "file": "scraped-data/derived/sc20-loading-error-codex/inputs/all-boards.json",
+            "key": "adminBoard.c121b47f8d6eb28daccb76d05.answer.data.adminBoard.name"
+          }
+        },
+        "LobbyButton": {
+          "rect_su": [
+            784.0,
+            751.0,
+            168,
+            48
+          ],
+          "kind": "screen",
+          "skin": "Btn_Normal",
+          "primary": false,
+          "state": "normal"
+        },
+        "LobbyButton.Label": {
+          "rect_su": [
+            784.0,
+            751.0,
+            168,
+            48
+          ],
+          "kind": "screen",
+          "text": "В ЛОББИ",
+          "role": "type.button",
+          "source": {
+            "file": "docs/unreal/contracts/hud/st-screens.csv",
+            "keys": [
+              "screens.result.lobby",
+              "screens.aborted.lobby"
+            ],
+            "column": "ru",
+            "proposed_key": "common.btn.lobby"
+          }
+        },
+        "RetryButton": {
+          "rect_su": [
+            968.0,
+            751.0,
+            168,
+            48
+          ],
+          "kind": "screen",
+          "skin": "BtnPrimary_Normal",
+          "primary": true,
+          "state": "normal"
+        },
+        "RetryButton.Label": {
+          "rect_su": [
+            968.0,
+            751.0,
+            168,
+            48
+          ],
+          "kind": "screen",
+          "text": "ПОВТОРИТЬ",
+          "role": "type.button",
+          "source": {
+            "file": "docs/unreal/contracts/hud/st-screens.csv",
+            "key": "common.btn.retry",
+            "column": "ru"
+          }
+        },
+        "CaptionPanel": {
+          "rect_su": [
+            24,
+            1020.0,
+            292.75,
+            36
+          ],
+          "kind": "screen",
+          "skin": "Modal",
+          "alpha": 1.0
+        },
+        "CaptionPanel.Text1": {
+          "rect_su": [
+            36,
+            1026.0,
+            268.75,
+            18
+          ],
+          "kind": "screen",
+          "text": "фон-заглушка: в игре фигур нет (ВР-75)",
+          "role": "type.caption",
+          "source": {
+            "file": "docs/game-design/visual/06-tasks/prompts/SC-19-series.codex.md",
+            "key": "ВР-VS5-SC19-06 / ВР-75"
+          }
+        }
+      }
+    },
+    "1080p-150": {
+      "error": {
+        "LoadingPanel": {
+          "rect_su": [
+            328.0,
+            77.0,
+            624,
+            566
+          ],
+          "kind": "screen",
+          "skin": "Modal",
+          "alpha": 1.0
+        },
+        "ErrorIcon": {
+          "rect_su": [
+            466.0,
+            101.0,
+            48,
+            48
+          ],
+          "kind": "screen",
+          "icon": "resource-connection-lost",
+          "source": "art/imagegen/hud-icons-v3/sizes/resource-connection-lost-72.png"
+        },
+        "StageText": {
+          "rect_su": [
+            526.0,
+            101.0,
+            308.25,
+            48
+          ],
+          "kind": "screen",
+          "text": "Не удаётся подключиться",
+          "role": "type.title",
+          "source": {
+            "file": "docs/unreal/contracts/hud/st-screens.csv",
+            "key": "screens.loading.error",
+            "column": "ru"
+          }
+        },
+        "LeftCard": {
+          "rect_su": [
+            352.0,
+            173.0,
+            240,
+            320
+          ],
+          "kind": "screen",
+          "skin": "PanelInset",
+          "alpha": 1.0
+        },
+        "LeftCard.Portrait": {
+          "rect_su": [
+            392.0,
+            218.0,
+            160,
+            160
+          ],
+          "kind": "screen",
+          "crop_key": "medusa",
+          "variant": "B",
+          "team_ring": false,
+          "source": "scraped-data/derived/ue-media-v1/avatars/medusa.png"
+        },
+        "LeftCard.NameText": {
+          "rect_su": [
+            368.0,
+            394.0,
+            208,
+            30
+          ],
+          "kind": "screen",
+          "text": "Medusa",
+          "role": "type.heading",
+          "source": {
+            "file": "scraped-data/derived/sc20-loading-error-codex/inputs/heroes.json",
+            "key": "adminHero.cmq7d7b4000r8wi74tzd1jmxv.answer.data.adminHero.nameRu"
+          }
+        },
+        "LeftCard.NickText": {
+          "rect_su": [
+            368.0,
+            428.0,
+            208,
+            20
+          ],
+          "kind": "screen",
+          "text": "ProGamer",
+          "role": "type.caption",
+          "source": {
+            "file": "scraped-data/derived/sc20-loading-error-codex/inputs/room-state.json",
+            "key": "steps.started.request.answer.data.startGame.players[0].username",
+            "seed_line": 34
+          }
+        },
+        "RightCard": {
+          "rect_su": [
+            688.0,
+            173.0,
+            240,
+            320
+          ],
+          "kind": "screen",
+          "skin": "PanelInset",
+          "alpha": 1.0
+        },
+        "RightCard.Portrait": {
+          "rect_su": [
+            728.0,
+            218.0,
+            160,
+            160
+          ],
+          "kind": "screen",
+          "crop_key": "king-arthur",
+          "variant": "B",
+          "team_ring": false,
+          "source": "scraped-data/derived/ue-media-v1/avatars/king-arthur.png"
+        },
+        "RightCard.NameText": {
+          "rect_su": [
+            704.0,
+            394.0,
+            208,
+            30
+          ],
+          "kind": "screen",
+          "text": "King Arthur",
+          "role": "type.heading",
+          "source": {
+            "file": "scraped-data/derived/sc20-loading-error-codex/inputs/heroes.json",
+            "key": "adminHero.cmq7d7b1000njwi74a536w55r.answer.data.adminHero.nameRu"
+          }
+        },
+        "RightCard.NickText": {
+          "rect_su": [
+            704.0,
+            428.0,
+            208,
+            20
+          ],
+          "kind": "screen",
+          "text": "Veteran",
+          "role": "type.caption",
+          "source": {
+            "file": "scraped-data/derived/sc20-loading-error-codex/inputs/room-state.json",
+            "key": "steps.started.request.answer.data.startGame.players[1].username",
+            "seed_line": 44
+          }
+        },
+        "VersusText": {
+          "rect_su": [
+            592.0,
+            318.0,
+            96,
+            30
+          ],
+          "kind": "screen",
+          "text": "против",
+          "role": "type.heading",
+          "source": {
+            "file": "docs/unreal/contracts/hud/st-screens.csv",
+            "key": "screens.loading.versus",
+            "column": "ru"
+          }
+        },
+        "BoardText": {
+          "rect_su": [
+            352.0,
+            517.0,
+            576,
+            30
+          ],
+          "kind": "screen",
+          "text": "Marmoreal · original map",
+          "role": "type.heading",
+          "source": {
+            "file": "scraped-data/derived/sc20-loading-error-codex/inputs/all-boards.json",
+            "key": "adminBoard.c121b47f8d6eb28daccb76d05.answer.data.adminBoard.name"
+          }
+        },
+        "LobbyButton": {
+          "rect_su": [
+            464.0,
+            571.0,
+            168,
+            48
+          ],
+          "kind": "screen",
+          "skin": "Btn_Normal",
+          "primary": false,
+          "state": "normal"
+        },
+        "LobbyButton.Label": {
+          "rect_su": [
+            464.0,
+            571.0,
+            168,
+            48
+          ],
+          "kind": "screen",
+          "text": "В ЛОББИ",
+          "role": "type.button",
+          "source": {
+            "file": "docs/unreal/contracts/hud/st-screens.csv",
+            "keys": [
+              "screens.result.lobby",
+              "screens.aborted.lobby"
+            ],
+            "column": "ru",
+            "proposed_key": "common.btn.lobby"
+          }
+        },
+        "RetryButton": {
+          "rect_su": [
+            648.0,
+            571.0,
+            168,
+            48
+          ],
+          "kind": "screen",
+          "skin": "BtnPrimary_Normal",
+          "primary": true,
+          "state": "normal"
+        },
+        "RetryButton.Label": {
+          "rect_su": [
+            648.0,
+            571.0,
+            168,
+            48
+          ],
+          "kind": "screen",
+          "text": "ПОВТОРИТЬ",
+          "role": "type.button",
+          "source": {
+            "file": "docs/unreal/contracts/hud/st-screens.csv",
+            "key": "common.btn.retry",
+            "column": "ru"
+          }
+        },
+        "CaptionPanel": {
+          "rect_su": [
+            16,
+            668.0,
+            292.75,
+            36
+          ],
+          "kind": "screen",
+          "skin": "Modal",
+          "alpha": 1.0
+        },
+        "CaptionPanel.Text1": {
+          "rect_su": [
+            28,
+            674.0,
+            268.75,
+            18
+          ],
+          "kind": "screen",
+          "text": "фон-заглушка: в игре фигур нет (ВР-75)",
+          "role": "type.caption",
+          "source": {
+            "file": "docs/game-design/visual/06-tasks/prompts/SC-19-series.codex.md",
+            "key": "ВР-VS5-SC19-06 / ВР-75"
+          }
+        }
+      }
+    },
+    "720p-100": {
+      "error": {
+        "LoadingPanel": {
+          "rect_su": [
+            541.3333333333334,
+            197.0,
+            624,
+            566
+          ],
+          "kind": "screen",
+          "skin": "Modal",
+          "alpha": 1.0
+        },
+        "ErrorIcon": {
+          "rect_su": [
+            679.3333333333334,
+            221.0,
+            48,
+            48
+          ],
+          "kind": "screen",
+          "icon": "resource-connection-lost",
+          "source": "art/imagegen/hud-icons-v3/sizes/resource-connection-lost-36.png"
+        },
+        "StageText": {
+          "rect_su": [
+            739.3333333333334,
+            221.0,
+            308.25,
+            48
+          ],
+          "kind": "screen",
+          "text": "Не удаётся подключиться",
+          "role": "type.title",
+          "source": {
+            "file": "docs/unreal/contracts/hud/st-screens.csv",
+            "key": "screens.loading.error",
+            "column": "ru"
+          }
+        },
+        "LeftCard": {
+          "rect_su": [
+            565.3333333333334,
+            293.0,
+            240,
+            320
+          ],
+          "kind": "screen",
+          "skin": "PanelInset",
+          "alpha": 1.0
+        },
+        "LeftCard.Portrait": {
+          "rect_su": [
+            605.3333333333334,
+            338.0,
+            160,
+            160
+          ],
+          "kind": "screen",
+          "crop_key": "medusa",
+          "variant": "B",
+          "team_ring": false,
+          "source": "scraped-data/derived/ue-media-v1/avatars/medusa.png"
+        },
+        "LeftCard.NameText": {
+          "rect_su": [
+            581.3333333333334,
+            514.0,
+            208,
+            30
+          ],
+          "kind": "screen",
+          "text": "Medusa",
+          "role": "type.heading",
+          "source": {
+            "file": "scraped-data/derived/sc20-loading-error-codex/inputs/heroes.json",
+            "key": "adminHero.cmq7d7b4000r8wi74tzd1jmxv.answer.data.adminHero.nameRu"
+          }
+        },
+        "LeftCard.NickText": {
+          "rect_su": [
+            581.3333333333334,
+            548.0,
+            208,
+            20
+          ],
+          "kind": "screen",
+          "text": "ProGamer",
+          "role": "type.caption",
+          "source": {
+            "file": "scraped-data/derived/sc20-loading-error-codex/inputs/room-state.json",
+            "key": "steps.started.request.answer.data.startGame.players[0].username",
+            "seed_line": 34
+          }
+        },
+        "RightCard": {
+          "rect_su": [
+            901.3333333333334,
+            293.0,
+            240,
+            320
+          ],
+          "kind": "screen",
+          "skin": "PanelInset",
+          "alpha": 1.0
+        },
+        "RightCard.Portrait": {
+          "rect_su": [
+            941.3333333333334,
+            338.0,
+            160,
+            160
+          ],
+          "kind": "screen",
+          "crop_key": "king-arthur",
+          "variant": "B",
+          "team_ring": false,
+          "source": "scraped-data/derived/ue-media-v1/avatars/king-arthur.png"
+        },
+        "RightCard.NameText": {
+          "rect_su": [
+            917.3333333333334,
+            514.0,
+            208,
+            30
+          ],
+          "kind": "screen",
+          "text": "King Arthur",
+          "role": "type.heading",
+          "source": {
+            "file": "scraped-data/derived/sc20-loading-error-codex/inputs/heroes.json",
+            "key": "adminHero.cmq7d7b1000njwi74a536w55r.answer.data.adminHero.nameRu"
+          }
+        },
+        "RightCard.NickText": {
+          "rect_su": [
+            917.3333333333334,
+            548.0,
+            208,
+            20
+          ],
+          "kind": "screen",
+          "text": "Veteran",
+          "role": "type.caption",
+          "source": {
+            "file": "scraped-data/derived/sc20-loading-error-codex/inputs/room-state.json",
+            "key": "steps.started.request.answer.data.startGame.players[1].username",
+            "seed_line": 44
+          }
+        },
+        "VersusText": {
+          "rect_su": [
+            805.3333333333334,
+            438.0,
+            96,
+            30
+          ],
+          "kind": "screen",
+          "text": "против",
+          "role": "type.heading",
+          "source": {
+            "file": "docs/unreal/contracts/hud/st-screens.csv",
+            "key": "screens.loading.versus",
+            "column": "ru"
+          }
+        },
+        "BoardText": {
+          "rect_su": [
+            565.3333333333334,
+            637.0,
+            576,
+            30
+          ],
+          "kind": "screen",
+          "text": "Marmoreal · original map",
+          "role": "type.heading",
+          "source": {
+            "file": "scraped-data/derived/sc20-loading-error-codex/inputs/all-boards.json",
+            "key": "adminBoard.c121b47f8d6eb28daccb76d05.answer.data.adminBoard.name"
+          }
+        },
+        "LobbyButton": {
+          "rect_su": [
+            677.3333333333334,
+            691.0,
+            168,
+            48
+          ],
+          "kind": "screen",
+          "skin": "Btn_Normal",
+          "primary": false,
+          "state": "normal"
+        },
+        "LobbyButton.Label": {
+          "rect_su": [
+            677.3333333333334,
+            691.0,
+            168,
+            48
+          ],
+          "kind": "screen",
+          "text": "В ЛОББИ",
+          "role": "type.button",
+          "source": {
+            "file": "docs/unreal/contracts/hud/st-screens.csv",
+            "keys": [
+              "screens.result.lobby",
+              "screens.aborted.lobby"
+            ],
+            "column": "ru",
+            "proposed_key": "common.btn.lobby"
+          }
+        },
+        "RetryButton": {
+          "rect_su": [
+            861.3333333333334,
+            691.0,
+            168,
+            48
+          ],
+          "kind": "screen",
+          "skin": "BtnPrimary_Normal",
+          "primary": true,
+          "state": "normal"
+        },
+        "RetryButton.Label": {
+          "rect_su": [
+            861.3333333333334,
+            691.0,
+            168,
+            48
+          ],
+          "kind": "screen",
+          "text": "ПОВТОРИТЬ",
+          "role": "type.button",
+          "source": {
+            "file": "docs/unreal/contracts/hud/st-screens.csv",
+            "key": "common.btn.retry",
+            "column": "ru"
+          }
+        },
+        "CaptionPanel": {
+          "rect_su": [
+            24,
+            900.0,
+            292.75,
+            36
+          ],
+          "kind": "screen",
+          "skin": "Modal",
+          "alpha": 1.0
+        },
+        "CaptionPanel.Text1": {
+          "rect_su": [
+            36,
+            906.0,
+            268.75,
+            18
+          ],
+          "kind": "screen",
+          "text": "фон-заглушка: в игре фигур нет (ВР-75)",
+          "role": "type.caption",
+          "source": {
+            "file": "docs/game-design/visual/06-tasks/prompts/SC-19-series.codex.md",
+            "key": "ВР-VS5-SC19-06 / ВР-75"
+          }
+        }
+      }
+    },
+    "720p-150": {
+      "error": {
+        "LoadingPanel": {
+          "rect_su": [
+            256.8888888888889,
+            37.0,
+            624,
+            566
+          ],
+          "kind": "screen",
+          "skin": "Modal",
+          "alpha": 1.0
+        },
+        "ErrorIcon": {
+          "rect_su": [
+            394.8888888888889,
+            61.0,
+            48,
+            48
+          ],
+          "kind": "screen",
+          "icon": "resource-connection-lost",
+          "source": "art/imagegen/hud-icons-v3/_tools/draw_icons.py"
+        },
+        "StageText": {
+          "rect_su": [
+            454.8888888888889,
+            61.0,
+            308.25,
+            48
+          ],
+          "kind": "screen",
+          "text": "Не удаётся подключиться",
+          "role": "type.title",
+          "source": {
+            "file": "docs/unreal/contracts/hud/st-screens.csv",
+            "key": "screens.loading.error",
+            "column": "ru"
+          }
+        },
+        "LeftCard": {
+          "rect_su": [
+            280.8888888888889,
+            133.0,
+            240,
+            320
+          ],
+          "kind": "screen",
+          "skin": "PanelInset",
+          "alpha": 1.0
+        },
+        "LeftCard.Portrait": {
+          "rect_su": [
+            320.8888888888889,
+            178.0,
+            160,
+            160
+          ],
+          "kind": "screen",
+          "crop_key": "medusa",
+          "variant": "B",
+          "team_ring": false,
+          "source": "scraped-data/derived/ue-media-v1/avatars/medusa.png"
+        },
+        "LeftCard.NameText": {
+          "rect_su": [
+            296.8888888888889,
+            354.0,
+            208,
+            30
+          ],
+          "kind": "screen",
+          "text": "Medusa",
+          "role": "type.heading",
+          "source": {
+            "file": "scraped-data/derived/sc20-loading-error-codex/inputs/heroes.json",
+            "key": "adminHero.cmq7d7b4000r8wi74tzd1jmxv.answer.data.adminHero.nameRu"
+          }
+        },
+        "LeftCard.NickText": {
+          "rect_su": [
+            296.8888888888889,
+            388.0,
+            208,
+            20
+          ],
+          "kind": "screen",
+          "text": "ProGamer",
+          "role": "type.caption",
+          "source": {
+            "file": "scraped-data/derived/sc20-loading-error-codex/inputs/room-state.json",
+            "key": "steps.started.request.answer.data.startGame.players[0].username",
+            "seed_line": 34
+          }
+        },
+        "RightCard": {
+          "rect_su": [
+            616.8888888888889,
+            133.0,
+            240,
+            320
+          ],
+          "kind": "screen",
+          "skin": "PanelInset",
+          "alpha": 1.0
+        },
+        "RightCard.Portrait": {
+          "rect_su": [
+            656.8888888888889,
+            178.0,
+            160,
+            160
+          ],
+          "kind": "screen",
+          "crop_key": "king-arthur",
+          "variant": "B",
+          "team_ring": false,
+          "source": "scraped-data/derived/ue-media-v1/avatars/king-arthur.png"
+        },
+        "RightCard.NameText": {
+          "rect_su": [
+            632.8888888888889,
+            354.0,
+            208,
+            30
+          ],
+          "kind": "screen",
+          "text": "King Arthur",
+          "role": "type.heading",
+          "source": {
+            "file": "scraped-data/derived/sc20-loading-error-codex/inputs/heroes.json",
+            "key": "adminHero.cmq7d7b1000njwi74a536w55r.answer.data.adminHero.nameRu"
+          }
+        },
+        "RightCard.NickText": {
+          "rect_su": [
+            632.8888888888889,
+            388.0,
+            208,
+            20
+          ],
+          "kind": "screen",
+          "text": "Veteran",
+          "role": "type.caption",
+          "source": {
+            "file": "scraped-data/derived/sc20-loading-error-codex/inputs/room-state.json",
+            "key": "steps.started.request.answer.data.startGame.players[1].username",
+            "seed_line": 44
+          }
+        },
+        "VersusText": {
+          "rect_su": [
+            520.8888888888889,
+            278.0,
+            96,
+            30
+          ],
+          "kind": "screen",
+          "text": "против",
+          "role": "type.heading",
+          "source": {
+            "file": "docs/unreal/contracts/hud/st-screens.csv",
+            "key": "screens.loading.versus",
+            "column": "ru"
+          }
+        },
+        "BoardText": {
+          "rect_su": [
+            280.8888888888889,
+            477.0,
+            576,
+            30
+          ],
+          "kind": "screen",
+          "text": "Marmoreal · original map",
+          "role": "type.heading",
+          "source": {
+            "file": "scraped-data/derived/sc20-loading-error-codex/inputs/all-boards.json",
+            "key": "adminBoard.c121b47f8d6eb28daccb76d05.answer.data.adminBoard.name"
+          }
+        },
+        "LobbyButton": {
+          "rect_su": [
+            392.8888888888889,
+            531.0,
+            168,
+            48
+          ],
+          "kind": "screen",
+          "skin": "Btn_Normal",
+          "primary": false,
+          "state": "normal"
+        },
+        "LobbyButton.Label": {
+          "rect_su": [
+            392.8888888888889,
+            531.0,
+            168,
+            48
+          ],
+          "kind": "screen",
+          "text": "В ЛОББИ",
+          "role": "type.button",
+          "source": {
+            "file": "docs/unreal/contracts/hud/st-screens.csv",
+            "keys": [
+              "screens.result.lobby",
+              "screens.aborted.lobby"
+            ],
+            "column": "ru",
+            "proposed_key": "common.btn.lobby"
+          }
+        },
+        "RetryButton": {
+          "rect_su": [
+            576.8888888888889,
+            531.0,
+            168,
+            48
+          ],
+          "kind": "screen",
+          "skin": "BtnPrimary_Normal",
+          "primary": true,
+          "state": "normal"
+        },
+        "RetryButton.Label": {
+          "rect_su": [
+            576.8888888888889,
+            531.0,
+            168,
+            48
+          ],
+          "kind": "screen",
+          "text": "ПОВТОРИТЬ",
+          "role": "type.button",
+          "source": {
+            "file": "docs/unreal/contracts/hud/st-screens.csv",
+            "key": "common.btn.retry",
+            "column": "ru"
+          }
+        },
+        "CaptionPanel": {
+          "rect_su": [
+            16,
+            570.0,
+            213.5,
+            54
+          ],
+          "kind": "screen",
+          "skin": "Modal",
+          "alpha": 1.0
+        },
+        "CaptionPanel.Text1": {
+          "rect_su": [
+            28,
+            576.0,
+            189.5,
+            18
+          ],
+          "kind": "screen",
+          "text": "фон-заглушка: в игре фигур",
+          "role": "type.caption",
+          "source": {
+            "file": "docs/game-design/visual/06-tasks/prompts/SC-19-series.codex.md",
+            "key": "ВР-VS5-SC19-06 / ВР-75"
+          }
+        },
+        "CaptionPanel.Text2": {
+          "rect_su": [
+            28,
+            594.0,
+            189.5,
+            18
+          ],
+          "kind": "screen",
+          "text": "нет (ВР-75)",
+          "role": "type.caption",
+          "source": {
+            "file": "docs/game-design/visual/06-tasks/prompts/SC-19-series.codex.md",
+            "key": "ВР-VS5-SC19-06 / ВР-75"
+          }
+        }
+      }
+    }
+  },
+  "BindWidget_names": true
+}
