@@ -537,11 +537,124 @@ def run(root):
     return report
 
 
+# ------------------------------------------------------------------------------------------------ VS-4 V3: значки зон
+# IC-62…IC-69: лист 8 ключей рядом (24 и 32 px ×4, цвет и серый — пункт acceptance «попарно различимы»), лист каждого
+# ключа на фонах кадров (светлое пространство Marmoreal, красная палуба Sarpedon, panel.bg), ×8 при 24 px, замеры:
+# контраст глифа к диску и диска к плашке по профилю доски, попарные расстояния глифов в сером.
+CARDS_ZONES = {f"IC-{62 + i}": k for i, k in enumerate(D.ZONE_KEYS)}
+ZONE_BGS = {"light space": "#DEDEE0", "red deck": "#A43839", "panel.bg": NAVY}  # светлое пространство Marmoreal, палуба Sarpedon
+
+
+def zone_variants(key):
+    """[(доска, id, диск)]: мастер — цвет кадра Marmoreal, вариант -sarpedon — если ключ есть на Sarpedon."""
+    out = [("Marmoreal", f"zone-{key}", D.ZONE_DISC["marmoreal"][key])]
+    if key in D.ZONE_DISC["sarpedon"]:
+        out.append(("Sarpedon", f"zone-{key}-sarpedon", D.ZONE_DISC["sarpedon"][key]))
+    return out
+
+
+def zone_pairs(size):
+    """Попарные расстояния 8 глифов при size px: пиксели, где бинарные маски (альфа ≥ 128) различаются, и доля от
+    объединения; и средняя |Δ серого| цельных значков (диск Marmoreal) по окну диска."""
+    masks = {k: D.zone_glyph_alpha(k, size) >= 128 for k in D.ZONE_KEYS}
+    greys = {k: np.asarray(grey(D.render(f"zone-{k}", size)))[..., 0].astype(float) for k in D.ZONE_KEYS}
+    yy, xx = np.mgrid[:size, :size]
+    win = (xx + 0.5 - size / 2) ** 2 + (yy + 0.5 - size / 2) ** 2 <= (size * 11.0 / 32) ** 2
+    pairs = []
+    keys = list(D.ZONE_KEYS)
+    for i, a in enumerate(keys):
+        for b in keys[i + 1:]:
+            diff = int((masks[a] ^ masks[b]).sum())
+            union = int((masks[a] | masks[b]).sum())
+            pairs.append({"a": a, "b": b, "glyph_px_diff": diff, "glyph_diff_of_union": round(diff / max(union, 1), 3),
+                          "grey_mean_abs_diff": round(float(np.abs(greys[a] - greys[b])[win].mean()), 1)})
+    return pairs
+
+
+def checks_zone_keys(out):
+    """Лист 8 ключей рядом: цвет диска кадра и серый Rec.709, 24 и 32 px ×4; второй блок — варианты Sarpedon."""
+    rows = []
+    for s in (24, 32):
+        ims = [cell(D.render(f"zone-{k}", s), NAVY, 4) for k in D.ZONE_KEYS]
+        rows.append((f"Marmoreal · colour @ {s} px ×4", ims))
+        rows.append((f"Marmoreal · grey @ {s} px ×4", [grey(i) for i in ims]))
+    sk = [k for k in D.ZONE_KEYS if k in D.ZONE_DISC["sarpedon"]]
+    for s in (24, 32):
+        ims = [cell(D.render(f"zone-{k}-sarpedon", s), NAVY, 4) for k in sk]
+        rows.append((f"Sarpedon · colour @ {s} px ×4", ims))
+        rows.append((f"Sarpedon · grey @ {s} px ×4", [grey(i) for i in ims]))
+    title = "IC-62…IC-69: 8 ключей рядом — " + ", ".join(D.ZONE_KEYS) + " (Sarpedon: " + ", ".join(sk) + ")"
+    return compose(title, rows, os.path.join(out, "check-zone-keys.png"))
+
+
+def checks_zone(cid, key, out):
+    files, meas = [], {"key": key, "boards": {}}
+    rows = []
+    for board, name, disc in zone_variants(key):
+        ink = D.zone_ink(disc)
+        meas["boards"][board] = {"id": name, "disc": disc, "ink": ink,
+                                 "ink_to_disc": contrast(ink, disc), "disc_to_navy_plate": contrast(disc, NAVY),
+                                 "other_ink_to_disc": contrast(
+                                     D.TOKENS["card.glyph"] if ink == D.TOKENS["card.navy"] else D.TOKENS["card.navy"],
+                                     disc)}
+        for bname, bg in ZONE_BGS.items():
+            ims = [cell(D.render(name, s), bg, 4) for s in (24, 32, 48)]
+            rows.append((f"{board} {disc} · {bname} · colour", ims))
+            rows.append((f"{board} · {bname} · grey", [grey(i) for i in ims]))
+    files.append(compose(f"{cid} zone-{key}: на фонах кадров (светлое пространство Marmoreal #DEDEE0, палуба Sarpedon "
+                         f"#A43839, panel.bg), 24 / 32 / 48 px ×4, цвет и серый", rows,
+                         os.path.join(out, "check-zone-context.png")))
+    rows = []
+    for board, name, disc in zone_variants(key):
+        im = cell(D.render(name, 24), NAVY, 8, pad=1)
+        rows.append((f"{board} @ 24 px ×8 · colour | grey", [im, grey(im)]))
+    gl = D.zone_glyph_alpha(key, 24)
+    g = Image.fromarray(np.dstack([np.full_like(gl, 255)] * 3 + [gl]), "RGBA")
+    rows.append(("glyph mask @ 24 px ×8", [cell(g, NAVY, 8, pad=1)]))
+    files.append(compose(f"{cid} zone-{key}: 24 px ×8 — форма глифа на рабочем размере", rows,
+                         os.path.join(out, "check-zone-24x8.png")))
+    alpha24 = D.zone_glyph_alpha(key, 24)
+    meas["glyph_px_24"] = int((alpha24 >= 128).sum())
+    meas["glyph_px_32"] = int((D.zone_glyph_alpha(key, 32) >= 128).sum())
+    return files, meas
+
+
+def run_zones(root):
+    report = {}
+    shared = checks_zone_keys(os.path.join(root, "IC-62"))
+    pairs = {s: zone_pairs(s) for s in (24, 32)}
+    for cid, key in CARDS_ZONES.items():
+        out = os.path.join(root, cid)
+        files, meas = checks_zone(cid, key, out)
+        meas["pairs"] = {str(s): [p for p in ps if key in (p["a"], p["b"])] for s, ps in pairs.items()}
+        meas["pairs_min"] = {str(s): min((p for p in ps if key in (p["a"], p["b"])), key=lambda p: p["glyph_px_diff"])
+                             for s, ps in pairs.items()}
+        meas["shared_sheet"] = f"IC-62/{shared}"
+        audit = {}
+        for _, name, _ in zone_variants(key):
+            a = json.load(open(os.path.join(D.ROOT, "sheets", "audit.json"), encoding="utf-8")).get(name, {})
+            audit[name] = {k: a.get(k) for k in ("margin_px", "seam_px", "glyph_area_pct_of_body", "alpha_centroid_u",
+                                                  "lr_symmetry_mean_abs")}
+        data = {"id": f"zone-{key}", "card": cid, "tool": "art/imagegen/hud-icons-v3/_tools/vr44_checks.py --v3zones",
+                "files": files + ([shared] if cid == "IC-62" else []), "audit_master": audit, "measures": meas}
+        with open(os.path.join(out, "checks.json"), "w", encoding="utf-8", newline="\n") as f:
+            json.dump(data, f, ensure_ascii=False, indent=1)
+            f.write("\n")
+        report[cid] = files
+        print(cid, key, files, meas["boards"], meas["pairs_min"])
+    allmin = {s: min(ps, key=lambda p: p["glyph_px_diff"]) for s, ps in pairs.items()}
+    print("pairs min", allmin)
+    return report
+
+
 if __name__ == "__main__":
-    # --a3 [IC-NN,…]: листы шага A3 (IC-46, IC-48, IC-52, IC-55, IC-59); без флага — листы шага A2
+    # --a3 [IC-NN,…]: листы шага A3 (IC-46, IC-48, IC-52, IC-55, IC-59); --v3zones: листы IC-62…IC-69 (VS-4 V3);
+    # без флага — листы шага A2
     argv = sys.argv[1:]
     root = os.path.join(REPO, "docs", "game-design", "evidence", "VISUAL")
-    if "--a3" in argv:
+    if "--v3zones" in argv:
+        run_zones(root)
+    elif "--a3" in argv:
         i = argv.index("--a3")
         only = argv[i + 1].split(",") if len(argv) > i + 1 and argv[i + 1].startswith("IC-") else None
         run_a3(root, only)

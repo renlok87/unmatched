@@ -582,6 +582,10 @@ struct UNMATCHED_API FS08BoardArtProfile {
   /** MS-T-08: the move-selection style of this board - the root "moveSelection" with this board's override applied
    *  (Source "board" when the profile has its own block). */
   FS08MoveSelectionSpec MoveSelection;
+  /** VS-4 V3 (IC-62...IC-69, FX-38; 02 §7.4, ВР-32, ВР-68): optional "zoneIconSrgb" {zone key: "#RRGGBB"} - the disc
+   *  colour of the zone icon at a hovered space, the measured colours of the run I frames (never the pale topology hex);
+   *  a key without an entry shows no icon. Live tune reloads it with the profile. */
+  TMap<FName, FColor> ZoneIconSrgb;
 };
 
 /** Counts of one decoded board (what the art and the trace describe). */

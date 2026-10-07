@@ -1763,6 +1763,179 @@ def g_card_drop_slot(ctx, sp: Spec, col):
     ctx.restore()
 
 
+# ------------------------------------------------------------------------------------------------ VR44, VS-4 шаг V3
+# Строки IC-62…IC-69 (ВР-IC07) — значки зон у клетки: формы принятого предложения Codex IC-37 (вариант A каждого ключа,
+# art/imagegen/zone-icons-codex/README.md, ревью VS-1 по делегированию), числа перенесены один в один (абсолютные u,
+# снэп каждой координаты; вырезы листа и пламени — только при detail 2). Плашка shape.state_badge (30 u, r 1,5 u, keyline
+# 1 u, кромка card.cream 1,25 u, тело card.navy), диск r 11 u с ободком card.cream 0,5 u (r 11…11,5), глиф в боксе 13 u.
+# Слои: _body — плашка с ободком и прозрачным окном диска; _disc — белая маска диска (тон даёт UMG из профиля доски,
+# boards[].zoneIconSrgb); _glyph — белая маска глифа с keyline mark.keyline ровно 1 px наружу (расширение маски 3 × 3,
+# как в пакете). Отличия от пакета (ВР-VS4-50, -51): сглаживание движка (ANTIALIAS_BEST, как у остальных значков v3;
+# пакет рисовал без сглаживания ради «точной палитры» — тот этап не переносится, как ВР-VS2-23), и диск слоя _disc
+# заходит под кремовый ободок (r 11 + 0,5 u), чтобы сглаженный край окна не просвечивал (в цельном значке ободок его
+# закрывает, вид тот же). Цвет диска мастера и размеров — замер кадров I Marmoreal (02 §7.4), варианты -sarpedon —
+# Sarpedon; глиф — card.navy или card.glyph, у кого контраст к диску выше (02 §7.4, ВР-68).
+ZONE_KEYS = ("gray", "green", "blue", "violet", "purple", "red", "brown", "yellow")
+ZONE_DISC = {
+    "marmoreal": dict(zip(ZONE_KEYS, ("#DEDEE0", "#5EA66F", "#4E84A1", "#9187A9", "#904A80", "#D39BA5", "#9A6D5D",
+                                      "#D5BD8A"))),
+    "sarpedon": {"green": "#2F8564", "blue": "#90AABB", "yellow": "#DCC88E", "red": "#A43839", "purple": "#B182A2",
+                 "brown": "#8C6034"},
+}
+ZONE_DISC_R = 11.0        # диск у клетки, u (ободок card.cream 0,5 u снаружи)
+ZONE_PLATE_R = 1.5        # радиус плашки, u
+
+
+def _lum(hexv):
+    c = np.array([int(hexv[i:i + 2], 16) for i in (1, 3, 5)], float) / 255
+    c = np.where(c <= 0.04045, c / 12.92, ((c + 0.055) / 1.055) ** 2.4)
+    return float(c @ [0.2126, 0.7152, 0.0722])
+
+
+def zone_contrast(a, b):
+    x, y = sorted((_lum(a), _lum(b)))
+    return (y + 0.05) / (x + 0.05)
+
+
+def zone_ink(disc_hex):
+    """Цвет глифа на диске: card.navy или card.glyph — у кого контраст к диску выше (рантайм — то же правило)."""
+    return max((TOKENS["card.navy"], TOKENS["card.glyph"]), key=lambda c: zone_contrast(c, disc_hex))
+
+
+def _zpath(ctx, sp: Spec, cmds):
+    """Путь пакета IC-37: каждая координата снэпается в абсолютных u."""
+    for cmd, pts in cmds:
+        pts = [sp.snap(n) for n in pts]
+        {"M": ctx.move_to, "L": ctx.line_to, "C": ctx.curve_to}[cmd](*pts)
+    ctx.close_path()
+
+
+def _zrect(ctx, sp: Spec, x, y, w, h):
+    x0, y0, x1, y1 = map(sp.snap, (x, y, x + w, y + h))
+    ctx.rectangle(x0, y0, x1 - x0, y1 - y0)
+
+
+def zg_gray(ctx, sp: Spec):
+    _zrect(ctx, sp, 11.75, 11.75, 8.5, 8.5)
+    fill(ctx, C["white"])
+
+
+def zg_green(ctx, sp: Spec):
+    _zpath(ctx, sp, [("M", [11.5, 20.5]), ("C", [11.5, 14.5, 14.5, 11.5, 20.5, 11.5]), ("C", [20.5, 17.5, 17.5, 20.5, 11.5, 20.5])])
+    fill(ctx, C["white"])
+    if sp.detail > 1:
+        ctx.move_to(sp.snap(13), sp.snap(19))
+        ctx.line_to(sp.snap(19), sp.snap(13))
+        ctx.save()
+        ctx.set_line_width(sp.pxu(1.5))
+        ctx.set_line_cap(cairo.LINE_CAP_BUTT)
+        ctx.set_operator(cairo.OPERATOR_CLEAR)
+        ctx.stroke()
+        ctx.restore()
+
+
+def zg_blue(ctx, sp: Spec):
+    w = sp.W
+    for cy in (12, 20):
+        _zpath(ctx, sp, [("M", [10.5, cy - w / 2]), ("C", [12.3, cy - w / 2 - .75, 14.2, cy - w / 2 - .75, 16, cy - w / 2]),
+                         ("C", [17.8, cy - w / 2 + .75, 19.7, cy - w / 2 + .75, 21.5, cy - w / 2]), ("L", [21.5, cy + w / 2]),
+                         ("C", [19.7, cy + w / 2 + .75, 17.8, cy + w / 2 + .75, 16, cy + w / 2]),
+                         ("C", [14.2, cy + w / 2 - .75, 12.3, cy + w / 2 - .75, 10.5, cy + w / 2])])
+        fill(ctx, C["white"])
+
+
+def zg_violet(ctx, sp: Spec):
+    circle(ctx, sp.snap(17.25), sp.snap(16), sp.snap(5.25))
+    fill(ctx, C["white"])
+    circle(ctx, sp.snap(19.75), sp.snap(16), sp.snap(4.5))
+    clear(ctx)
+
+
+def zg_purple(ctx, sp: Spec):
+    _zpath(ctx, sp, [("M", [11, 21]), ("L", [11, 16]), ("C", [11, 9.333333, 21, 9.333333, 21, 16]), ("L", [21, 21])])
+    fill(ctx, C["white"])
+    _zrect(ctx, sp, 13.75, 15.25, 4.5, 7)
+    clear(ctx)
+
+
+def zg_red(ctx, sp: Spec):
+    _zpath(ctx, sp, [("M", [16.8, 9.5]), ("C", [16.4, 12.15, 14.1, 12.55, 13.3, 14.45]), ("C", [10.9, 17.85, 13.2, 20, 16, 20]),
+                     ("C", [19.5, 20, 21.1, 17.45, 18.7, 14.15]), ("C", [18.9, 16.05, 17.1, 16.35, 17.2, 14.35]),
+                     ("C", [17.3, 12.65, 16.7, 10.95, 16.8, 9.5])])
+    fill(ctx, C["white"])
+    if sp.detail > 1:
+        _zpath(ctx, sp, [("M", [16.2, 15.35]), ("C", [16.1, 16.35, 14.8, 16.85, 14.8, 17.75]),
+                         ("C", [14.8, 19.55, 17.5, 19.55, 17.5, 17.75]), ("C", [17.5, 17.05, 16.8, 16.15, 16.2, 15.35])])
+        clear(ctx)
+
+
+def zg_brown(ctx, sp: Spec):
+    p = [(10, 19.5), (13.25, 12.5), (18.75, 12.5), (22, 19.5)]
+    Poly([(sp.snap(x), sp.snap(y)) for x, y in p], [0, sp.pxu(1), sp.pxu(1), 0]).path(ctx)
+    fill(ctx, C["white"])
+
+
+def zg_yellow(ctx, sp: Spec):
+    for x, y in [(16, 12.5), (12.5, 18.562178), (19.5, 18.562178)]:
+        circle(ctx, sp.snap(x), sp.snap(y), sp.pxu(1.5))
+    fill(ctx, C["white"])
+
+
+ZONE_GLYPHS = dict(zip(ZONE_KEYS, (zg_gray, zg_green, zg_blue, zg_violet, zg_purple, zg_red, zg_brown, zg_yellow)))
+
+
+def zone_glyph_alpha(key, size):
+    """Альфа белой маски глифа ключа на холсте size × size (сглаживание движка), uint8."""
+    sp = Spec(size)
+    surf, c2 = surface(size, size)
+    c2.scale(sp.k, sp.k)
+    ZONE_GLYPHS[key](c2, sp)
+    surf.flush()
+    stride = surf.get_stride()
+    buf = np.frombuffer(surf.get_data(), dtype=np.uint8).reshape(size, stride)[:, : size * 4].reshape(size, size, 4)
+    return buf[..., 3].copy()
+
+
+def _paint_alpha(ctx, alpha, col):
+    """Заливка цветом col по маске alpha в пикселях холста (без масштаба контекста)."""
+    h, w = alpha.shape
+    stride = cairo.ImageSurface.format_stride_for_width(cairo.FORMAT_A8, w)
+    buf = np.zeros((h, stride), np.uint8)
+    buf[:, :w] = alpha
+    ms = cairo.ImageSurface.create_for_data(memoryview(buf), cairo.FORMAT_A8, w, h, stride)
+    ctx.save()
+    ctx.identity_matrix()
+    rgb(ctx, col)
+    ctx.mask_surface(ms, 0, 0)
+    ctx.restore()
+    ms.finish()
+
+
+def draw_zone(ctx, sp: Spec, key="gray", layer=None, disc=None):
+    """Значок зоны у клетки (IC-62…IC-69): диск цвета зоны в окне плашки, глиф ключа с keyline 1 px. layer: body / disc /
+    glyph — слои UMG (диск и глиф — белые маски, тон даёт игра); None — цельный значок (диск цветом кадра Marmoreal или
+    disc, глиф — цвет правила контраста)."""
+    disc_hex = disc or ZONE_DISC["marmoreal"][key]
+    ring_r = sp.snap(ZONE_DISC_R) + sp.rim
+    if layer in (None, "disc"):
+        circle(ctx, U / 2, U / 2, ring_r)  # под ободок: сглаженный край окна плашки не просвечивает (ВР-VS4-51)
+        fill(ctx, C["white"] if layer == "disc" else hx(disc_hex))
+    if layer in (None, "body"):
+        ctx.push_group()
+        token(ctx, rect_sil(sp.M, sp.M, U - 2 * sp.M, U - 2 * sp.M, sp.pxu(ZONE_PLATE_R)), sp)
+        circle(ctx, U / 2, U / 2, ring_r)
+        fill(ctx, C["edge"])
+        circle(ctx, U / 2, U / 2, sp.snap(ZONE_DISC_R))
+        clear(ctx)
+        ctx.pop_group_to_source()
+        ctx.paint()
+    if layer in (None, "glyph"):
+        from scipy import ndimage
+        a = zone_glyph_alpha(key, sp.size)
+        _paint_alpha(ctx, ndimage.grey_dilation(a, size=(3, 3)), C["keyline"])   # keyline ровно 1 px наружу
+        _paint_alpha(ctx, a, C["white"] if layer == "glyph" else hx(zone_ink(disc_hex)))
+
+
 # id → (функция, kwargs, широкий?)
 ICONS = {
     "state-boost": (draw_state_boost, {}, False),
@@ -1839,10 +2012,15 @@ ACCEPTED_VR44: dict = {
     "ui-log": (draw_ui_log, {}, False),
     "cursor-pointer": (draw_cursor_pointer, {}, False),
     "marker-slot-discard": (draw_marker_slot, {"kind": "discard"}, False),
+    # VS-4 V3: значки зон у клетки IC-62…IC-69 (формы Codex IC-37, вариант A; ВР-VS4-50, -51)
+    **{f"zone-{k}": (draw_zone, {"key": k}, False) for k in ZONE_KEYS},
 }
 # варианты id набора VR44 (как marker-status-p2): та же геометрия, для листов, галереи и запасного вида без тона
 VARIANTS_VR44 = {
     "badge-order-p2": (draw_badge_order, {"team": C["team2"]}, False),
+    # VS-4 V3: диски зон цветом кадров Sarpedon (у Sarpedon нет ключей gray и violet)
+    **{f"zone-{k}-sarpedon": (draw_zone, {"key": k, "disc": ZONE_DISC["sarpedon"][k]}, False) for k in ZONE_KEYS
+       if k in ZONE_DISC["sarpedon"]},
 }
 CURSORS = tuple(n for n in ACCEPTED_VR44 if n.startswith("cursor-"))
 # мастер-превью отличается от текстуры размеров (И-5): тело чипа в текстуре белое, в мастере — цвет команды
@@ -1878,6 +2056,9 @@ LAYERS = {
     # VS-2 A3: диск конца хода и плашка «в сброс» — слои для UUmButton / UUmCardWidget и движения (select, appear)
     "action-end-turn": ("body", "glyph"),
     "card-drop": ("body", "glyph"),
+    # VS-4 V3: значки зон — плашка и диск общие (слои zone-gray), глиф у каждого ключа свой
+    "zone-gray": ("body", "disc", "glyph"),
+    **{f"zone-{k}": ("glyph",) for k in ZONE_KEYS if k != "gray"},
 }
 # Флипбуки слоёв для движения (контракт icon-motion.json: src «<id>_<layer>#» → файлы <id>_<layer>_fNN):
 # песок часов state-sent — 12 кадров цикла 1500 мс (кадры 0–6 пересыпание за 550 мс, 7–11 после переворота).

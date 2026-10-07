@@ -64,6 +64,9 @@ struct FS08IconLayer {
   FVector2D PivotU = FVector2D::ZeroVector;
   float Rest[S08IconPropCount] = {1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f};
   bool bTintTeam = false;
+  /** The contract's `tint` key (team / zone / ink; NAME_None = none): US08AnimatedIconWidget::SetTint colours every
+   *  layer of a key (VS-4 V3: the zone icons' disc and glyph, IC-62...IC-69). */
+  FName TintKey;
 };
 
 struct FS08IconDemoStep {

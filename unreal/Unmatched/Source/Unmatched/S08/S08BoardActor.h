@@ -48,6 +48,12 @@ public:
   void SetRoomBoardId(const FString& BoardId) { RoomBoardId = BoardId; }
   /** Active -ArtPreview board profile id (empty = grey board). */
   const FString& GetArtProfileId() const { return ActiveProfile.Id; }
+  /** VS-4 V3 (FX-38): the zone icon disc colour of a zone key from the active profile (false: no art profile / no entry). */
+  bool GetZoneIconSrgb(FName Key, FColor& Out) const {
+    const FColor* C = bArtActive ? ActiveProfile.ZoneIconSrgb.Find(Key) : nullptr;
+    if (C) Out = *C;
+    return C != nullptr;
+  }
   /** W4-A: light units / SkyLight / exposure / profile sha actually applied
    *  (input of the RENDER fingerprint line of every SHOT). */
   const FS08AppliedRender& GetAppliedRender() const { return AppliedRender; }

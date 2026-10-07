@@ -1322,6 +1322,27 @@ bool FS08BoardArtData::ParseJson(const FString& Text, TArray<FString>& OutErrors
           continue;
         }
       }
+      // VS-4 V3 (IC-62...IC-69, FX-38): optional zone icon disc colours {key: "#RRGGBB"}, any surface
+      if ((*Obj)->HasField(TEXT("zoneIconSrgb"))) {
+        const TSharedPtr<FJsonObject>* Block = nullptr;
+        if (!(*Obj)->TryGetObjectField(TEXT("zoneIconSrgb"), Block) || !Block || !Block->IsValid()) {
+          OutErrors.Add(FString::Printf(TEXT("board %s: zoneIconSrgb must be an object"), *B.Id));
+          continue;
+        }
+        bool bZoneOk = true;
+        for (const TPair<FString, TSharedPtr<FJsonValue>>& Pair : (*Block)->Values) {
+          FString Hex;
+          bool bDigits = Pair.Value.IsValid() && Pair.Value->TryGetString(Hex) && Hex.Len() == 7 && Hex[0] == TEXT('#');
+          for (int32 I = 1; bDigits && I < Hex.Len(); ++I) bDigits = FChar::IsHexDigit(Hex[I]);
+          if (!bDigits) {
+            OutErrors.Add(FString::Printf(TEXT("board %s: zoneIconSrgb.%s must be \"#RRGGBB\""), *B.Id, *Pair.Key));
+            bZoneOk = false;
+            break;
+          }
+          B.ZoneIconSrgb.Add(FName(*Pair.Key), FColor::FromHex(Hex));
+        }
+        if (!bZoneOk) continue;
+      }
       const TSharedPtr<FJsonObject>* Expect = nullptr;
       if ((*Obj)->TryGetObjectField(TEXT("expect"), Expect) && Expect) {
         auto ReadInt = [&](const TCHAR* Field, int32& Out) {

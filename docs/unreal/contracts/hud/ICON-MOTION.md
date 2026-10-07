@@ -166,6 +166,22 @@
 | `marker-slot-discard` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
 | `ui-log` | appear | enter | 180 | — | all.opacity; all.scale — «кладут на стол»: 0,80 → 1,04 → 1,00; кадр 0 не пустой (opacity 0,15); глиф кнопки «Журнал» (IC-55, класс S): своего движения нет, состояния даёт UUmButton | all.opacity 100 мс |
 | `ui-log` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
+| `zone-gray` | appear | enter | 180 | — | all.opacity; all.scale — значок зоны «gray» (квадрат, IC-62) у клетки при наведении (FX-38, ВР-32): «кладут на стол»; смена клетки — leave старой и appear новой в одном кадре | all.opacity 100 мс |
+| `zone-gray` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
+| `zone-green` | appear | enter | 180 | — | all.opacity; all.scale — значок зоны «green» (лист, IC-63) у клетки при наведении (FX-38, ВР-32): «кладут на стол»; смена клетки — leave старой и appear новой в одном кадре | all.opacity 100 мс |
+| `zone-green` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
+| `zone-blue` | appear | enter | 180 | — | all.opacity; all.scale — значок зоны «blue» (волна, IC-64) у клетки при наведении (FX-38, ВР-32): «кладут на стол»; смена клетки — leave старой и appear новой в одном кадре | all.opacity 100 мс |
+| `zone-blue` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
+| `zone-violet` | appear | enter | 180 | — | all.opacity; all.scale — значок зоны «violet» (полумесяц, IC-65) у клетки при наведении (FX-38, ВР-32): «кладут на стол»; смена клетки — leave старой и appear новой в одном кадре | all.opacity 100 мс |
+| `zone-violet` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
+| `zone-purple` | appear | enter | 180 | — | all.opacity; all.scale — значок зоны «purple» (арка, IC-66) у клетки при наведении (FX-38, ВР-32): «кладут на стол»; смена клетки — leave старой и appear новой в одном кадре | all.opacity 100 мс |
+| `zone-purple` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
+| `zone-red` | appear | enter | 180 | — | all.opacity; all.scale — значок зоны «red» (пламя, IC-67) у клетки при наведении (FX-38, ВР-32): «кладут на стол»; смена клетки — leave старой и appear новой в одном кадре | all.opacity 100 мс |
+| `zone-red` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
+| `zone-brown` | appear | enter | 180 | — | all.opacity; all.scale — значок зоны «brown» (холм, IC-68) у клетки при наведении (FX-38, ВР-32): «кладут на стол»; смена клетки — leave старой и appear новой в одном кадре | all.opacity 100 мс |
+| `zone-brown` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
+| `zone-yellow` | appear | enter | 180 | — | all.opacity; all.scale — значок зоны «yellow» (три точки, IC-69) у клетки при наведении (FX-38, ВР-32): «кладут на стол»; смена клетки — leave старой и appear новой в одном кадре | all.opacity 100 мс |
+| `zone-yellow` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
 
 Варианты того же id играют анимации основного значка: `resource-hp-full-enemy` → `resource-hp-full`, `marker-status-p1` → `marker-status`, `marker-status-p2` → `marker-status`, `badge-order-p2` → `badge-order`.
 

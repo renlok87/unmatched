@@ -109,6 +109,9 @@ bool US08AnimatedIconWidget::SetIcon(FName InIconId, float InSizeSu, int32 InTex
     Brush.DrawAs = ESlateBrushDrawType::Image;
     Image->SetBrush(Brush);
     if (Layer.bTintTeam) Image->SetColorAndOpacity(TeamTint);
+    if (const FLinearColor* KeyTint = Layer.TintKey.IsNone() ? nullptr : TintByKey.Find(Layer.TintKey)) {
+      Image->SetColorAndOpacity(*KeyTint);
+    }
     UOverlaySlot* LayerSlot = Stage->AddChildToOverlay(Image);
     LayerSlot->SetHorizontalAlignment(HAlign_Fill);
     LayerSlot->SetVerticalAlignment(VAlign_Fill);
@@ -176,6 +179,18 @@ void US08AnimatedIconWidget::SetTeamTint(const FLinearColor& Tint) {
   if (!Def) return;
   for (int32 L = 0; L < Def->Layers.Num() && L < LayerImages.Num(); ++L) {
     if (Def->Layers[L].bTintTeam) LayerImages[L]->SetColorAndOpacity(TeamTint);
+  }
+}
+
+void US08AnimatedIconWidget::SetTint(FName Key, const FLinearColor& Tint) {
+  if (Key == FName(TEXT("team"))) {
+    SetTeamTint(Tint);
+    return;
+  }
+  TintByKey.Add(Key, Tint);
+  if (!Def) return;
+  for (int32 L = 0; L < Def->Layers.Num() && L < LayerImages.Num(); ++L) {
+    if (Def->Layers[L].TintKey == Key) LayerImages[L]->SetColorAndOpacity(Tint);
   }
 }
 

@@ -128,6 +128,7 @@ bool ParseIcon(FName Icon, const TSharedPtr<FJsonObject>& Obj, FS08IconMotionDef
     Layer.bHasPivot = ReadVec2(L->TryGetField(TEXT("pivot_u")), Layer.PivotU);
     FString Tint;
     Layer.bTintTeam = L->TryGetStringField(TEXT("tint"), Tint) && Tint == TEXT("team");
+    if (!Tint.IsEmpty()) Layer.TintKey = FName(*Tint);
     const TSharedPtr<FJsonObject>* Rest = nullptr;
     if (L->TryGetObjectField(TEXT("rest"), Rest)) {
       for (const auto& Pair : (*Rest)->Values) {

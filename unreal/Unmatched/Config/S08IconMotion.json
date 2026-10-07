@@ -1,6 +1,6 @@
 {
  "schema": "unmatched.icon-motion/1",
- "revision": "icon-motion-2026-10-06-vr44-a3",
+ "revision": "icon-motion-2026-10-07-vr44-zones",
  "status": "предложено",
  "source": "docs/unreal/contracts/hud/ICON-MOTION-PLAN.md; art/imagegen/hud-icons-v3/STYLE-v3.md §7; генератор art/imagegen/hud-icons-v3/_tools/motion_contract.py",
  "units": {
@@ -71,9 +71,17 @@
   "action-end-turn",
   "card-drop",
   "marker-slot-discard",
-  "ui-log"
+  "ui-log",
+  "zone-gray",
+  "zone-green",
+  "zone-blue",
+  "zone-violet",
+  "zone-purple",
+  "zone-red",
+  "zone-brown",
+  "zone-yellow"
  ],
- "accepted_vr44_note": "IC-33 (ВР-IC14): принятые после ревью строки значки набора VR44 (02 §5.5); кандидаты VR44 в контракт не входят; VS-2 A2 (2026-10-06): IC-38…IC-56 приняты по делегированию (листы docs/game-design/evidence/VISUAL/IC-NN/), курсоры IC-58…IC-61 — вне контракта (HB-12); VS-2 A3 (2026-10-06): IC-46, IC-48, IC-52, IC-55 — формы Codex IC-36 (вектор A), по делегированию",
+ "accepted_vr44_note": "IC-33 (ВР-IC14): принятые после ревью строки значки набора VR44 (02 §5.5); кандидаты VR44 в контракт не входят; VS-2 A2 (2026-10-06): IC-38…IC-56 приняты по делегированию (листы docs/game-design/evidence/VISUAL/IC-NN/), курсоры IC-58…IC-61 — вне контракта (HB-12); VS-2 A3 (2026-10-06): IC-46, IC-48, IC-52, IC-55 — формы Codex IC-36 (вектор A), по делегированию; VS-4 V3 (2026-10-07): IC-62…IC-69 значки зон — формы Codex IC-37 (вариант A), по делегированию; tint zone — диск цветом профиля доски, tint ink — глиф card.navy / card.glyph по контрасту",
  "ue_sizes_note": "IC-33 (02 §3.2 ВР-62, §5.3): экранные размеры текстур записи в UE (T_IV3_<id>_<px>, без mip); 18 и 36 — значок 24 su при DPI 0,75 и при 150 %; варианты берут набор основного значка",
  "order": [
   "state-boost",
@@ -120,7 +128,15 @@
   "action-end-turn",
   "card-drop",
   "marker-slot-discard",
-  "ui-log"
+  "ui-log",
+  "zone-gray",
+  "zone-green",
+  "zone-blue",
+  "zone-violet",
+  "zone-purple",
+  "zone-red",
+  "zone-brown",
+  "zone-yellow"
  ],
  "icons": {
   "state-boost": {
@@ -11070,6 +11086,1366 @@
    ],
    "ue_sizes": [
     18,
+    24,
+    32,
+    36,
+    48,
+    64
+   ]
+  },
+  "zone-gray": {
+   "canvas_u": [
+    32,
+    32
+   ],
+   "layers": [
+    {
+     "id": "body",
+     "src": "zone-gray_body"
+    },
+    {
+     "id": "disc",
+     "src": "zone-gray_disc",
+     "tint": "zone"
+    },
+    {
+     "id": "glyph",
+     "src": "zone-gray_glyph",
+     "tint": "ink"
+    }
+   ],
+   "anims": {
+    "appear": {
+     "kind": "enter",
+     "duration_ms": 180,
+     "beat_ms": null,
+     "tracks": [
+      {
+       "target": "all",
+       "prop": "scale",
+       "keys": [
+        [
+         0,
+         0.8,
+         "ease_out_cubic"
+        ],
+        [
+         72,
+         1.04,
+         "ease_in_out_cubic"
+        ],
+        [
+         180,
+         1.0,
+         "constant"
+        ]
+       ]
+      },
+      {
+       "target": "all",
+       "prop": "opacity",
+       "keys": [
+        [
+         0,
+         0.15,
+         "ease_out_quad"
+        ],
+        [
+         120,
+         1.0,
+         "constant"
+        ]
+       ]
+      }
+     ],
+     "reduced": {
+      "duration_ms": 100,
+      "tracks": [
+       {
+        "target": "all",
+        "prop": "opacity",
+        "keys": [
+         [
+          0,
+          0.0,
+          "linear"
+         ],
+         [
+          100,
+          1.0,
+          "constant"
+         ]
+        ]
+       }
+      ]
+     },
+     "note": "значок зоны «gray» (квадрат, IC-62) у клетки при наведении (FX-38, ВР-32): «кладут на стол»; смена клетки — leave старой и appear новой в одном кадре"
+    },
+    "leave": {
+     "kind": "exit",
+     "duration_ms": 120,
+     "beat_ms": null,
+     "tracks": [
+      {
+       "target": "all",
+       "prop": "opacity",
+       "keys": [
+        [
+         0,
+         null,
+         "ease_in_quad"
+        ],
+        [
+         120,
+         0.0,
+         "constant"
+        ]
+       ]
+      },
+      {
+       "target": "all",
+       "prop": "scale",
+       "keys": [
+        [
+         0,
+         null,
+         "ease_in_quad"
+        ],
+        [
+         120,
+         0.92,
+         "constant"
+        ]
+       ]
+      }
+     ],
+     "reduced": {
+      "duration_ms": 100,
+      "tracks": [
+       {
+        "target": "all",
+        "prop": "opacity",
+        "keys": [
+         [
+          0,
+          null,
+          "linear"
+         ],
+         [
+          100,
+          0.0,
+          "constant"
+         ]
+        ]
+       }
+      ]
+     },
+     "note": "opacity → 0, scale → 0,92"
+    }
+   },
+   "demo": [
+    [
+     "appear"
+    ],
+    [
+     "wait",
+     800
+    ],
+    [
+     "leave"
+    ]
+   ],
+   "ue_sizes": [
+    24,
+    32,
+    36,
+    48,
+    64
+   ]
+  },
+  "zone-green": {
+   "canvas_u": [
+    32,
+    32
+   ],
+   "layers": [
+    {
+     "id": "body",
+     "src": "zone-gray_body"
+    },
+    {
+     "id": "disc",
+     "src": "zone-gray_disc",
+     "tint": "zone"
+    },
+    {
+     "id": "glyph",
+     "src": "zone-green_glyph",
+     "tint": "ink"
+    }
+   ],
+   "anims": {
+    "appear": {
+     "kind": "enter",
+     "duration_ms": 180,
+     "beat_ms": null,
+     "tracks": [
+      {
+       "target": "all",
+       "prop": "scale",
+       "keys": [
+        [
+         0,
+         0.8,
+         "ease_out_cubic"
+        ],
+        [
+         72,
+         1.04,
+         "ease_in_out_cubic"
+        ],
+        [
+         180,
+         1.0,
+         "constant"
+        ]
+       ]
+      },
+      {
+       "target": "all",
+       "prop": "opacity",
+       "keys": [
+        [
+         0,
+         0.15,
+         "ease_out_quad"
+        ],
+        [
+         120,
+         1.0,
+         "constant"
+        ]
+       ]
+      }
+     ],
+     "reduced": {
+      "duration_ms": 100,
+      "tracks": [
+       {
+        "target": "all",
+        "prop": "opacity",
+        "keys": [
+         [
+          0,
+          0.0,
+          "linear"
+         ],
+         [
+          100,
+          1.0,
+          "constant"
+         ]
+        ]
+       }
+      ]
+     },
+     "note": "значок зоны «green» (лист, IC-63) у клетки при наведении (FX-38, ВР-32): «кладут на стол»; смена клетки — leave старой и appear новой в одном кадре"
+    },
+    "leave": {
+     "kind": "exit",
+     "duration_ms": 120,
+     "beat_ms": null,
+     "tracks": [
+      {
+       "target": "all",
+       "prop": "opacity",
+       "keys": [
+        [
+         0,
+         null,
+         "ease_in_quad"
+        ],
+        [
+         120,
+         0.0,
+         "constant"
+        ]
+       ]
+      },
+      {
+       "target": "all",
+       "prop": "scale",
+       "keys": [
+        [
+         0,
+         null,
+         "ease_in_quad"
+        ],
+        [
+         120,
+         0.92,
+         "constant"
+        ]
+       ]
+      }
+     ],
+     "reduced": {
+      "duration_ms": 100,
+      "tracks": [
+       {
+        "target": "all",
+        "prop": "opacity",
+        "keys": [
+         [
+          0,
+          null,
+          "linear"
+         ],
+         [
+          100,
+          0.0,
+          "constant"
+         ]
+        ]
+       }
+      ]
+     },
+     "note": "opacity → 0, scale → 0,92"
+    }
+   },
+   "demo": [
+    [
+     "appear"
+    ],
+    [
+     "wait",
+     800
+    ],
+    [
+     "leave"
+    ]
+   ],
+   "ue_sizes": [
+    24,
+    32,
+    36,
+    48,
+    64
+   ]
+  },
+  "zone-blue": {
+   "canvas_u": [
+    32,
+    32
+   ],
+   "layers": [
+    {
+     "id": "body",
+     "src": "zone-gray_body"
+    },
+    {
+     "id": "disc",
+     "src": "zone-gray_disc",
+     "tint": "zone"
+    },
+    {
+     "id": "glyph",
+     "src": "zone-blue_glyph",
+     "tint": "ink"
+    }
+   ],
+   "anims": {
+    "appear": {
+     "kind": "enter",
+     "duration_ms": 180,
+     "beat_ms": null,
+     "tracks": [
+      {
+       "target": "all",
+       "prop": "scale",
+       "keys": [
+        [
+         0,
+         0.8,
+         "ease_out_cubic"
+        ],
+        [
+         72,
+         1.04,
+         "ease_in_out_cubic"
+        ],
+        [
+         180,
+         1.0,
+         "constant"
+        ]
+       ]
+      },
+      {
+       "target": "all",
+       "prop": "opacity",
+       "keys": [
+        [
+         0,
+         0.15,
+         "ease_out_quad"
+        ],
+        [
+         120,
+         1.0,
+         "constant"
+        ]
+       ]
+      }
+     ],
+     "reduced": {
+      "duration_ms": 100,
+      "tracks": [
+       {
+        "target": "all",
+        "prop": "opacity",
+        "keys": [
+         [
+          0,
+          0.0,
+          "linear"
+         ],
+         [
+          100,
+          1.0,
+          "constant"
+         ]
+        ]
+       }
+      ]
+     },
+     "note": "значок зоны «blue» (волна, IC-64) у клетки при наведении (FX-38, ВР-32): «кладут на стол»; смена клетки — leave старой и appear новой в одном кадре"
+    },
+    "leave": {
+     "kind": "exit",
+     "duration_ms": 120,
+     "beat_ms": null,
+     "tracks": [
+      {
+       "target": "all",
+       "prop": "opacity",
+       "keys": [
+        [
+         0,
+         null,
+         "ease_in_quad"
+        ],
+        [
+         120,
+         0.0,
+         "constant"
+        ]
+       ]
+      },
+      {
+       "target": "all",
+       "prop": "scale",
+       "keys": [
+        [
+         0,
+         null,
+         "ease_in_quad"
+        ],
+        [
+         120,
+         0.92,
+         "constant"
+        ]
+       ]
+      }
+     ],
+     "reduced": {
+      "duration_ms": 100,
+      "tracks": [
+       {
+        "target": "all",
+        "prop": "opacity",
+        "keys": [
+         [
+          0,
+          null,
+          "linear"
+         ],
+         [
+          100,
+          0.0,
+          "constant"
+         ]
+        ]
+       }
+      ]
+     },
+     "note": "opacity → 0, scale → 0,92"
+    }
+   },
+   "demo": [
+    [
+     "appear"
+    ],
+    [
+     "wait",
+     800
+    ],
+    [
+     "leave"
+    ]
+   ],
+   "ue_sizes": [
+    24,
+    32,
+    36,
+    48,
+    64
+   ]
+  },
+  "zone-violet": {
+   "canvas_u": [
+    32,
+    32
+   ],
+   "layers": [
+    {
+     "id": "body",
+     "src": "zone-gray_body"
+    },
+    {
+     "id": "disc",
+     "src": "zone-gray_disc",
+     "tint": "zone"
+    },
+    {
+     "id": "glyph",
+     "src": "zone-violet_glyph",
+     "tint": "ink"
+    }
+   ],
+   "anims": {
+    "appear": {
+     "kind": "enter",
+     "duration_ms": 180,
+     "beat_ms": null,
+     "tracks": [
+      {
+       "target": "all",
+       "prop": "scale",
+       "keys": [
+        [
+         0,
+         0.8,
+         "ease_out_cubic"
+        ],
+        [
+         72,
+         1.04,
+         "ease_in_out_cubic"
+        ],
+        [
+         180,
+         1.0,
+         "constant"
+        ]
+       ]
+      },
+      {
+       "target": "all",
+       "prop": "opacity",
+       "keys": [
+        [
+         0,
+         0.15,
+         "ease_out_quad"
+        ],
+        [
+         120,
+         1.0,
+         "constant"
+        ]
+       ]
+      }
+     ],
+     "reduced": {
+      "duration_ms": 100,
+      "tracks": [
+       {
+        "target": "all",
+        "prop": "opacity",
+        "keys": [
+         [
+          0,
+          0.0,
+          "linear"
+         ],
+         [
+          100,
+          1.0,
+          "constant"
+         ]
+        ]
+       }
+      ]
+     },
+     "note": "значок зоны «violet» (полумесяц, IC-65) у клетки при наведении (FX-38, ВР-32): «кладут на стол»; смена клетки — leave старой и appear новой в одном кадре"
+    },
+    "leave": {
+     "kind": "exit",
+     "duration_ms": 120,
+     "beat_ms": null,
+     "tracks": [
+      {
+       "target": "all",
+       "prop": "opacity",
+       "keys": [
+        [
+         0,
+         null,
+         "ease_in_quad"
+        ],
+        [
+         120,
+         0.0,
+         "constant"
+        ]
+       ]
+      },
+      {
+       "target": "all",
+       "prop": "scale",
+       "keys": [
+        [
+         0,
+         null,
+         "ease_in_quad"
+        ],
+        [
+         120,
+         0.92,
+         "constant"
+        ]
+       ]
+      }
+     ],
+     "reduced": {
+      "duration_ms": 100,
+      "tracks": [
+       {
+        "target": "all",
+        "prop": "opacity",
+        "keys": [
+         [
+          0,
+          null,
+          "linear"
+         ],
+         [
+          100,
+          0.0,
+          "constant"
+         ]
+        ]
+       }
+      ]
+     },
+     "note": "opacity → 0, scale → 0,92"
+    }
+   },
+   "demo": [
+    [
+     "appear"
+    ],
+    [
+     "wait",
+     800
+    ],
+    [
+     "leave"
+    ]
+   ],
+   "ue_sizes": [
+    24,
+    32,
+    36,
+    48,
+    64
+   ]
+  },
+  "zone-purple": {
+   "canvas_u": [
+    32,
+    32
+   ],
+   "layers": [
+    {
+     "id": "body",
+     "src": "zone-gray_body"
+    },
+    {
+     "id": "disc",
+     "src": "zone-gray_disc",
+     "tint": "zone"
+    },
+    {
+     "id": "glyph",
+     "src": "zone-purple_glyph",
+     "tint": "ink"
+    }
+   ],
+   "anims": {
+    "appear": {
+     "kind": "enter",
+     "duration_ms": 180,
+     "beat_ms": null,
+     "tracks": [
+      {
+       "target": "all",
+       "prop": "scale",
+       "keys": [
+        [
+         0,
+         0.8,
+         "ease_out_cubic"
+        ],
+        [
+         72,
+         1.04,
+         "ease_in_out_cubic"
+        ],
+        [
+         180,
+         1.0,
+         "constant"
+        ]
+       ]
+      },
+      {
+       "target": "all",
+       "prop": "opacity",
+       "keys": [
+        [
+         0,
+         0.15,
+         "ease_out_quad"
+        ],
+        [
+         120,
+         1.0,
+         "constant"
+        ]
+       ]
+      }
+     ],
+     "reduced": {
+      "duration_ms": 100,
+      "tracks": [
+       {
+        "target": "all",
+        "prop": "opacity",
+        "keys": [
+         [
+          0,
+          0.0,
+          "linear"
+         ],
+         [
+          100,
+          1.0,
+          "constant"
+         ]
+        ]
+       }
+      ]
+     },
+     "note": "значок зоны «purple» (арка, IC-66) у клетки при наведении (FX-38, ВР-32): «кладут на стол»; смена клетки — leave старой и appear новой в одном кадре"
+    },
+    "leave": {
+     "kind": "exit",
+     "duration_ms": 120,
+     "beat_ms": null,
+     "tracks": [
+      {
+       "target": "all",
+       "prop": "opacity",
+       "keys": [
+        [
+         0,
+         null,
+         "ease_in_quad"
+        ],
+        [
+         120,
+         0.0,
+         "constant"
+        ]
+       ]
+      },
+      {
+       "target": "all",
+       "prop": "scale",
+       "keys": [
+        [
+         0,
+         null,
+         "ease_in_quad"
+        ],
+        [
+         120,
+         0.92,
+         "constant"
+        ]
+       ]
+      }
+     ],
+     "reduced": {
+      "duration_ms": 100,
+      "tracks": [
+       {
+        "target": "all",
+        "prop": "opacity",
+        "keys": [
+         [
+          0,
+          null,
+          "linear"
+         ],
+         [
+          100,
+          0.0,
+          "constant"
+         ]
+        ]
+       }
+      ]
+     },
+     "note": "opacity → 0, scale → 0,92"
+    }
+   },
+   "demo": [
+    [
+     "appear"
+    ],
+    [
+     "wait",
+     800
+    ],
+    [
+     "leave"
+    ]
+   ],
+   "ue_sizes": [
+    24,
+    32,
+    36,
+    48,
+    64
+   ]
+  },
+  "zone-red": {
+   "canvas_u": [
+    32,
+    32
+   ],
+   "layers": [
+    {
+     "id": "body",
+     "src": "zone-gray_body"
+    },
+    {
+     "id": "disc",
+     "src": "zone-gray_disc",
+     "tint": "zone"
+    },
+    {
+     "id": "glyph",
+     "src": "zone-red_glyph",
+     "tint": "ink"
+    }
+   ],
+   "anims": {
+    "appear": {
+     "kind": "enter",
+     "duration_ms": 180,
+     "beat_ms": null,
+     "tracks": [
+      {
+       "target": "all",
+       "prop": "scale",
+       "keys": [
+        [
+         0,
+         0.8,
+         "ease_out_cubic"
+        ],
+        [
+         72,
+         1.04,
+         "ease_in_out_cubic"
+        ],
+        [
+         180,
+         1.0,
+         "constant"
+        ]
+       ]
+      },
+      {
+       "target": "all",
+       "prop": "opacity",
+       "keys": [
+        [
+         0,
+         0.15,
+         "ease_out_quad"
+        ],
+        [
+         120,
+         1.0,
+         "constant"
+        ]
+       ]
+      }
+     ],
+     "reduced": {
+      "duration_ms": 100,
+      "tracks": [
+       {
+        "target": "all",
+        "prop": "opacity",
+        "keys": [
+         [
+          0,
+          0.0,
+          "linear"
+         ],
+         [
+          100,
+          1.0,
+          "constant"
+         ]
+        ]
+       }
+      ]
+     },
+     "note": "значок зоны «red» (пламя, IC-67) у клетки при наведении (FX-38, ВР-32): «кладут на стол»; смена клетки — leave старой и appear новой в одном кадре"
+    },
+    "leave": {
+     "kind": "exit",
+     "duration_ms": 120,
+     "beat_ms": null,
+     "tracks": [
+      {
+       "target": "all",
+       "prop": "opacity",
+       "keys": [
+        [
+         0,
+         null,
+         "ease_in_quad"
+        ],
+        [
+         120,
+         0.0,
+         "constant"
+        ]
+       ]
+      },
+      {
+       "target": "all",
+       "prop": "scale",
+       "keys": [
+        [
+         0,
+         null,
+         "ease_in_quad"
+        ],
+        [
+         120,
+         0.92,
+         "constant"
+        ]
+       ]
+      }
+     ],
+     "reduced": {
+      "duration_ms": 100,
+      "tracks": [
+       {
+        "target": "all",
+        "prop": "opacity",
+        "keys": [
+         [
+          0,
+          null,
+          "linear"
+         ],
+         [
+          100,
+          0.0,
+          "constant"
+         ]
+        ]
+       }
+      ]
+     },
+     "note": "opacity → 0, scale → 0,92"
+    }
+   },
+   "demo": [
+    [
+     "appear"
+    ],
+    [
+     "wait",
+     800
+    ],
+    [
+     "leave"
+    ]
+   ],
+   "ue_sizes": [
+    24,
+    32,
+    36,
+    48,
+    64
+   ]
+  },
+  "zone-brown": {
+   "canvas_u": [
+    32,
+    32
+   ],
+   "layers": [
+    {
+     "id": "body",
+     "src": "zone-gray_body"
+    },
+    {
+     "id": "disc",
+     "src": "zone-gray_disc",
+     "tint": "zone"
+    },
+    {
+     "id": "glyph",
+     "src": "zone-brown_glyph",
+     "tint": "ink"
+    }
+   ],
+   "anims": {
+    "appear": {
+     "kind": "enter",
+     "duration_ms": 180,
+     "beat_ms": null,
+     "tracks": [
+      {
+       "target": "all",
+       "prop": "scale",
+       "keys": [
+        [
+         0,
+         0.8,
+         "ease_out_cubic"
+        ],
+        [
+         72,
+         1.04,
+         "ease_in_out_cubic"
+        ],
+        [
+         180,
+         1.0,
+         "constant"
+        ]
+       ]
+      },
+      {
+       "target": "all",
+       "prop": "opacity",
+       "keys": [
+        [
+         0,
+         0.15,
+         "ease_out_quad"
+        ],
+        [
+         120,
+         1.0,
+         "constant"
+        ]
+       ]
+      }
+     ],
+     "reduced": {
+      "duration_ms": 100,
+      "tracks": [
+       {
+        "target": "all",
+        "prop": "opacity",
+        "keys": [
+         [
+          0,
+          0.0,
+          "linear"
+         ],
+         [
+          100,
+          1.0,
+          "constant"
+         ]
+        ]
+       }
+      ]
+     },
+     "note": "значок зоны «brown» (холм, IC-68) у клетки при наведении (FX-38, ВР-32): «кладут на стол»; смена клетки — leave старой и appear новой в одном кадре"
+    },
+    "leave": {
+     "kind": "exit",
+     "duration_ms": 120,
+     "beat_ms": null,
+     "tracks": [
+      {
+       "target": "all",
+       "prop": "opacity",
+       "keys": [
+        [
+         0,
+         null,
+         "ease_in_quad"
+        ],
+        [
+         120,
+         0.0,
+         "constant"
+        ]
+       ]
+      },
+      {
+       "target": "all",
+       "prop": "scale",
+       "keys": [
+        [
+         0,
+         null,
+         "ease_in_quad"
+        ],
+        [
+         120,
+         0.92,
+         "constant"
+        ]
+       ]
+      }
+     ],
+     "reduced": {
+      "duration_ms": 100,
+      "tracks": [
+       {
+        "target": "all",
+        "prop": "opacity",
+        "keys": [
+         [
+          0,
+          null,
+          "linear"
+         ],
+         [
+          100,
+          0.0,
+          "constant"
+         ]
+        ]
+       }
+      ]
+     },
+     "note": "opacity → 0, scale → 0,92"
+    }
+   },
+   "demo": [
+    [
+     "appear"
+    ],
+    [
+     "wait",
+     800
+    ],
+    [
+     "leave"
+    ]
+   ],
+   "ue_sizes": [
+    24,
+    32,
+    36,
+    48,
+    64
+   ]
+  },
+  "zone-yellow": {
+   "canvas_u": [
+    32,
+    32
+   ],
+   "layers": [
+    {
+     "id": "body",
+     "src": "zone-gray_body"
+    },
+    {
+     "id": "disc",
+     "src": "zone-gray_disc",
+     "tint": "zone"
+    },
+    {
+     "id": "glyph",
+     "src": "zone-yellow_glyph",
+     "tint": "ink"
+    }
+   ],
+   "anims": {
+    "appear": {
+     "kind": "enter",
+     "duration_ms": 180,
+     "beat_ms": null,
+     "tracks": [
+      {
+       "target": "all",
+       "prop": "scale",
+       "keys": [
+        [
+         0,
+         0.8,
+         "ease_out_cubic"
+        ],
+        [
+         72,
+         1.04,
+         "ease_in_out_cubic"
+        ],
+        [
+         180,
+         1.0,
+         "constant"
+        ]
+       ]
+      },
+      {
+       "target": "all",
+       "prop": "opacity",
+       "keys": [
+        [
+         0,
+         0.15,
+         "ease_out_quad"
+        ],
+        [
+         120,
+         1.0,
+         "constant"
+        ]
+       ]
+      }
+     ],
+     "reduced": {
+      "duration_ms": 100,
+      "tracks": [
+       {
+        "target": "all",
+        "prop": "opacity",
+        "keys": [
+         [
+          0,
+          0.0,
+          "linear"
+         ],
+         [
+          100,
+          1.0,
+          "constant"
+         ]
+        ]
+       }
+      ]
+     },
+     "note": "значок зоны «yellow» (три точки, IC-69) у клетки при наведении (FX-38, ВР-32): «кладут на стол»; смена клетки — leave старой и appear новой в одном кадре"
+    },
+    "leave": {
+     "kind": "exit",
+     "duration_ms": 120,
+     "beat_ms": null,
+     "tracks": [
+      {
+       "target": "all",
+       "prop": "opacity",
+       "keys": [
+        [
+         0,
+         null,
+         "ease_in_quad"
+        ],
+        [
+         120,
+         0.0,
+         "constant"
+        ]
+       ]
+      },
+      {
+       "target": "all",
+       "prop": "scale",
+       "keys": [
+        [
+         0,
+         null,
+         "ease_in_quad"
+        ],
+        [
+         120,
+         0.92,
+         "constant"
+        ]
+       ]
+      }
+     ],
+     "reduced": {
+      "duration_ms": 100,
+      "tracks": [
+       {
+        "target": "all",
+        "prop": "opacity",
+        "keys": [
+         [
+          0,
+          null,
+          "linear"
+         ],
+         [
+          100,
+          0.0,
+          "constant"
+         ]
+        ]
+       }
+      ]
+     },
+     "note": "opacity → 0, scale → 0,92"
+    }
+   },
+   "demo": [
+    [
+     "appear"
+    ],
+    [
+     "wait",
+     800
+    ],
+    [
+     "leave"
+    ]
+   ],
+   "ue_sizes": [
     24,
     32,
     36,

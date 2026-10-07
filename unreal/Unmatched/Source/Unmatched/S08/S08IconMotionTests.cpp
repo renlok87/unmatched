@@ -91,8 +91,21 @@ bool FS08IconMotionLoadTest::RunTest(const FString& Parameters) {
   // IC-58...IC-61 are not in the motion contract - HB-12 imports them).
   // VS-2 A3: 4 more VR44 records with the Codex IC-36 forms (IC-46 end turn, IC-48 card drop, IC-52 slot discard ribbon,
   // IC-55 log glyph).
-  TestEqual(TEXT("45 icons in order"), Lib.Order.Num(), 45);
-  TestEqual(TEXT("45 icon definitions"), Lib.Icons.Num(), 45);
+  // VS-4 V3: 8 zone icons (IC-62...IC-69, Codex IC-37 forms): body / disc / glyph, the disc tint "zone", the glyph "ink".
+  TestEqual(TEXT("53 icons in order"), Lib.Order.Num(), 53);
+  TestEqual(TEXT("53 icon definitions"), Lib.Icons.Num(), 53);
+  for (const TCHAR* Zone : {TEXT("zone-gray"), TEXT("zone-green"), TEXT("zone-blue"), TEXT("zone-violet"), TEXT("zone-purple"),
+                            TEXT("zone-red"), TEXT("zone-brown"), TEXT("zone-yellow")}) {
+    const FS08IconMotionDef* Z = Lib.Find(FName(Zone));
+    if (!TestNotNull(FString::Printf(TEXT("%s defined"), Zone), Z)) continue;
+    TestEqual(FString::Printf(TEXT("%s: 3 layers"), Zone), Z->Layers.Num(), 3);
+    if (Z->Layers.Num() == 3) {
+      TestTrue(FString::Printf(TEXT("%s: shared plate and disc, own glyph, tints zone / ink"), Zone),
+               Z->Layers[0].Src == TEXT("zone-gray_body") && Z->Layers[1].Src == TEXT("zone-gray_disc") &&
+                   Z->Layers[1].TintKey == FName(TEXT("zone")) && Z->Layers[2].TintKey == FName(TEXT("ink")) &&
+                   Z->Layers[2].Src == FString(Zone) + TEXT("_glyph"));
+    }
+  }
   for (const TCHAR* Vr44 : {TEXT("badge-order"), TEXT("badge-refuse"), TEXT("badge-conflict"), TEXT("badge-ally"),
                             TEXT("badge-attack-from"), TEXT("team-chip-p1"), TEXT("team-chip-p2"), TEXT("state-warning"),
                             TEXT("marker-slot-scheme"), TEXT("marker-slot-boost"), TEXT("ui-menu"), TEXT("ui-close"),
@@ -276,6 +289,8 @@ bool FS08IconMotionTexturesTest::RunTest(const FString& Parameters) {
     if (N.StartsWith(TEXT("badge-order")) || N.StartsWith(TEXT("badge-refuse")) || N.StartsWith(TEXT("badge-conflict"))) {
       Sizes.Append({16, 21});
     }
+    // VS-4 V3: the zone icons only from 24 px (IC-62...IC-69 ue_sizes 24 / 32 / 36 / 48 / 64)
+    if (N.StartsWith(TEXT("zone-"))) Sizes = {24, 32, 36, 48, 64};
     for (const int32 Px : Sizes) {
       const FString Path = S08IconMotion::TextureObjectPath(Src, Frame, Px);
       UTexture2D* Tex = LoadObject<UTexture2D>(nullptr, *Path);
@@ -754,7 +769,7 @@ bool FS08IconMotionGalleryIdsTest::RunTest(const FString& Parameters) {
       ++Listed;
     }
   }
-  TestEqual(TEXT("17 VR44 + 4 DE-012 + 1 candidate"), Listed, 22);
+  TestEqual(TEXT("25 VR44 (VS-4 V3: + 8 zone icons) + 4 DE-012 + 1 candidate"), Listed, 30);
   return true;
 }
 

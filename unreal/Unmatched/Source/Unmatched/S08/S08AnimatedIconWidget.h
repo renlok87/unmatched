@@ -48,6 +48,9 @@ public:
   /** Plays at an explicit time (gallery replay, tests). */
   bool PlayAnimAt(FName Anim, float TMs);
   void SetTeamTint(const FLinearColor& Tint);
+  /** VS-4 V3: the colour of every layer whose contract `tint` is Key (team = SetTeamTint; zone / ink - the zone icons'
+   *  disc and glyph, FX-38). Survives SetIcon. */
+  void SetTint(FName Key, const FLinearColor& Tint);
   /** Re-initialises the animator (the icon becomes hidden until the next appear). */
   void SetReducedMotion(bool bInReduced);
   bool IsReducedMotion() const { return bReduced; }
@@ -121,6 +124,7 @@ private:
   bool bWasMoving = false;
   bool bExternal = false;
   FLinearColor TeamTint = FLinearColor::White;
+  TMap<FName, FLinearColor> TintByKey;  // SetTint (contract tint key -> colour)
   TSet<FName> HiddenLayers;
   TMap<FName, FString> LayerSources;  // SetLayerSource overrides (layer id -> src)
   TMap<FName, float> LayerOpacityScale;  // SetLayerRestOpacity (layer id -> scale of the opacity track)

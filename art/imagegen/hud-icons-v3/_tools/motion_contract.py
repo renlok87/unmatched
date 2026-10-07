@@ -519,6 +519,26 @@ ACCEPTED_VR44_ICONS: dict = {
         "demo": [["appear"], ["wait", 900], ["leave"]]},
     "ui-log": static_icon("ui-log", "глиф кнопки «Журнал» (IC-55, класс S): своего движения нет, состояния даёт UUmButton"),
 }
+# VS-4 V3 (IC-62…IC-69, формы Codex IC-37 вариант A, приняты по делегированию 2026-10-07): значок зоны у клетки — плашка
+# и диск общие (слои zone-gray), глиф свой; тон диска (`tint` zone) — boards[].zoneIconSrgb профиля доски, тон глифа
+# (`tint` ink) — card.navy или card.glyph по контрасту к диску (02 §7.4, ВР-68); движение — стандарт набора.
+ZONE_NAMES = {"gray": "квадрат", "green": "лист", "blue": "волна", "violet": "полумесяц", "purple": "арка",
+              "red": "пламя", "brown": "холм", "yellow": "три точки"}
+ZONE_IC = {"gray": 62, "green": 63, "blue": 64, "violet": 65, "purple": 66, "red": 67, "brown": 68, "yellow": 69}
+
+
+def zone_icon(key):
+    return {"canvas_u": [32, 32],
+            "layers": [layer("body", "zone-gray_body"), layer("disc", "zone-gray_disc", tint="zone"),
+                       layer("glyph", f"zone-{key}_glyph", tint="ink")],
+            "anims": {"appear": dict(APPEAR, note=f"значок зоны «{key}» ({ZONE_NAMES[key]}, IC-{ZONE_IC[key]}) у клетки при "
+                                                  "наведении (FX-38, ВР-32): «кладут на стол»; смена клетки — leave старой и "
+                                                  "appear новой в одном кадре"),
+                      "leave": LEAVE},
+            "demo": [["appear"], ["wait", 800], ["leave"]]}
+
+
+ACCEPTED_VR44_ICONS.update({f"zone-{k}": zone_icon(k) for k in ZONE_NAMES})
 ICONS.update(ACCEPTED_VR44_ICONS)
 ACCEPTED_VR44 = list(ACCEPTED_VR44_ICONS)
 # IC-33 (02 §3.2 ВР-62, §5.3): экранные размеры текстур записи в UE — набор экспортов под DPI и масштаб UI вместо mip:
@@ -529,6 +549,8 @@ UE_SIZES_DEFAULT = (18, 24, 32, 36, 48, 64)
 # набор по умолчанию (24 su при DPI 0,75…2,0 и галерея 64 px; 9 и 12 px — только лист проверки, ВР-78, ВР-VS2-15).
 L6_UE_SIZES = (16, 18, 21, 24, 32, 36, 48, 64)
 UE_SIZES = {"badge-order": L6_UE_SIZES, "badge-refuse": L6_UE_SIZES, "badge-conflict": L6_UE_SIZES}
+# VS-4 V3: значки зон — от 24 px (ниже 24 их нет, остаётся старший канал L6; 16 px нет, ВР-42), IC-62…IC-69 ue_sizes
+UE_SIZES.update({f"zone-{k}": (24, 32, 36, 48, 64) for k in ZONE_NAMES})
 
 ORDER = ["state-boost", "state-enemy", "state-sent", "state-pending-move", "state-pending-place", "state-hint",
          "state-threat", "state-immobilized", "action-attack", "action-attack-token", "action-defense", "action-maneuver",
@@ -548,7 +570,8 @@ def contract():
         # 2026-10-06: IC-33 — `ue_sizes` у каждой записи (экспорты 18 / 36 под DPI и масштаб UI), список `accepted_vr44`
         # 2026-10-06 (VS-2 A2): 13 записей `accepted_vr44` (IC-38…IC-56), вариант badge-order-p2, бейджи L6 с 16 / 21
         # 2026-10-06 (VS-2 A3): ещё 4 записи — action-end-turn, card-drop, marker-slot-discard, ui-log (формы Codex IC-36)
-        "revision": "icon-motion-2026-10-06-vr44-a3",
+        # 2026-10-07 (VS-4 V3): 8 значков зон zone-<ключ> (IC-62…IC-69, формы Codex IC-37), слои tint zone / ink
+        "revision": "icon-motion-2026-10-07-vr44-zones",
         "status": "предложено",
         "source": "docs/unreal/contracts/hud/ICON-MOTION-PLAN.md; art/imagegen/hud-icons-v3/STYLE-v3.md §7; генератор art/imagegen/hud-icons-v3/_tools/motion_contract.py",
         "units": {"t": "ms", "canvas": "u (32 u = сторона значка; плашки 64 × 32)", "tx/ty": "u", "rotate": "градусы по часовой",
@@ -568,7 +591,7 @@ def contract():
         "candidates": CANDIDATES,
         "candidates_note": "кандидаты DE-012 до арт-приёмки пользователя (кольцо цвета команды — AB-5 выбрал тёплое): только галерея -S08IconGallery, HUD их не использует",
         "accepted_vr44": ACCEPTED_VR44,
-        "accepted_vr44_note": "IC-33 (ВР-IC14): принятые после ревью строки значки набора VR44 (02 §5.5); кандидаты VR44 в контракт не входят; VS-2 A2 (2026-10-06): IC-38…IC-56 приняты по делегированию (листы docs/game-design/evidence/VISUAL/IC-NN/), курсоры IC-58…IC-61 — вне контракта (HB-12); VS-2 A3 (2026-10-06): IC-46, IC-48, IC-52, IC-55 — формы Codex IC-36 (вектор A), по делегированию",
+        "accepted_vr44_note": "IC-33 (ВР-IC14): принятые после ревью строки значки набора VR44 (02 §5.5); кандидаты VR44 в контракт не входят; VS-2 A2 (2026-10-06): IC-38…IC-56 приняты по делегированию (листы docs/game-design/evidence/VISUAL/IC-NN/), курсоры IC-58…IC-61 — вне контракта (HB-12); VS-2 A3 (2026-10-06): IC-46, IC-48, IC-52, IC-55 — формы Codex IC-36 (вектор A), по делегированию; VS-4 V3 (2026-10-07): IC-62…IC-69 значки зон — формы Codex IC-37 (вариант A), по делегированию; tint zone — диск цветом профиля доски, tint ink — глиф card.navy / card.glyph по контрасту",
         "ue_sizes_note": "IC-33 (02 §3.2 ВР-62, §5.3): экранные размеры текстур записи в UE (T_IV3_<id>_<px>, без mip); 18 и 36 — значок 24 su при DPI 0,75 и при 150 %; варианты берут набор основного значка",
         "order": ORDER,
         "icons": {k: dict(ICONS[k], ue_sizes=list(UE_SIZES.get(k, UE_SIZES_DEFAULT))) for k in ORDER},

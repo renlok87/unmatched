@@ -107,7 +107,9 @@ class IconMotionContractTests(unittest.TestCase):
             sizes = d.get("ue_sizes")
             self.assertIsNotNone(sizes, icon)
             self.assertEqual(sizes, sorted(set(sizes)), icon)
-            self.assertTrue({18, 24, 32, 36, 48, 64} <= set(sizes), (icon, sizes))
+            # VS-4 V3: the zone icons only from 24 px (below 24 the L6 channel stays without them, IC-62...IC-69)
+            need = {24, 32, 36, 48, 64} if icon.startswith("zone-") else {18, 24, 32, 36, 48, 64}
+            self.assertTrue(need <= set(sizes), (icon, sizes))
             names = [icon] + variants_of.get(icon, [])
             for l in d["layers"]:
                 names += [f"{l['src'][:-1]}_f{i:02d}" for i in range(l["frames"])] if l["src"].endswith("#") else [l["src"]]
@@ -261,6 +263,52 @@ class IconMotionCandidatesTests(unittest.TestCase):
         hot = json.loads((ICONS_V3 / "cursor-hotspots.json").read_text(encoding="utf-8"))["cursors"]["cursor-pointer"]
         self.assertEqual({k: hot[k] for k in ("24", "32", "48", "64")},
                          {"24": [8, 2], "32": [11, 2], "48": [17, 3], "64": [22, 4]})
+
+    def test_zone_forms_match_codex_proposal(self):
+        """VS-4 V3 (IC-62…IC-69): формы Codex IC-37, вариант A (art/imagegen/zone-icons-codex/vector, принят по
+        делегированию) перенесены один в один: бинарная альфа (≥ 128) экспорта v3 и слоя _glyph равна альфе пакета на
+        1024 / 16 / 21 / 24 / 32 / 48 / 64 / 96 (пакет рисовал без сглаживания, движок — со сглаживанием набора v3,
+        ВР-VS4-50); цвет глифа цельного значка — правило контраста к замеренному диску (navy / card.glyph), как в пакете;
+        слои _disc и _body общие (zone-gray), диск заходит под ободок (ВР-VS4-51)."""
+        import numpy as np
+        from PIL import Image
+        from scipy import ndimage
+        codex = REPO / "art" / "imagegen" / "zone-icons-codex" / "vector"
+        keys = ("gray", "green", "blue", "violet", "purple", "red", "brown", "yellow")
+        for key in keys:
+            for size in (1024, 16, 21, 24, 32, 48, 64, 96):
+                full = ICONS_V3 / ("masters" if size == 1024 else "sizes") / (
+                    f"zone-{key}.png" if size == 1024 else f"zone-{key}-{size}.png")
+                a = np.asarray(Image.open(full).convert("RGBA")).astype(int)
+                b = np.asarray(Image.open(codex / str(size) / f"zone-{key}.png").convert("RGBA")).astype(int)
+                self.assertEqual(a.shape, b.shape, (key, size))
+                self.assertEqual(((a[..., 3] >= 128) != (b[..., 3] >= 128)).sum(), 0, (key, size))
+                glyph = ICONS_V3 / "layers" / (f"zone-{key}_glyph.png" if size == 1024 else f"zone-{key}_glyph-{size}.png")
+                ga = np.asarray(Image.open(glyph).convert("RGBA")).astype(int)[..., 3] >= 128
+                gb = np.asarray(Image.open(codex / str(size) / f"zone-{key}_glyph.png").convert("RGBA")).astype(int)[..., 3] >= 128
+                # the glyph mask alone: AA vs the aliased package differ only on the 1 px boundary band (16 px is a
+                # boundary export, not a HUD size - ВР-42: the violet crescent's horn moves by a pixel there)
+                band = ndimage.binary_dilation(gb) & ~ndimage.binary_erosion(gb)
+                if size != 16:
+                    self.assertEqual(((ga != gb) & ~band).sum(), 0, (key, size, "glyph"))
+                # the ink of the full icon: the glyph pixels inside the keyline are the contrast-rule colour
+                ink = {"gray": "#061623", "green": "#061623", "blue": "#061623", "violet": "#061623", "purple": "#FAF8F2",
+                       "red": "#061623", "brown": "#FAF8F2", "yellow": "#061623"}[key]
+                want = np.array([int(ink[i:i + 2], 16) for i in (1, 3, 5)])
+                core = ndimage.binary_erosion((b[..., 3] == 255) & (np.abs(b[..., :3] - want).sum(-1) == 0), iterations=2)
+                if size >= 24 and core.any():
+                    self.assertLessEqual(np.abs(a[..., :3][core] - want).max(), 2, (key, size, "ink"))
+        layers = ICONS_V3 / "layers"
+        for f in ("zone-gray_body.png", "zone-gray_disc.png", "zone-gray_body-24.png", "zone-gray_disc-24.png"):
+            self.assertTrue((layers / f).exists(), f)
+        self.assertFalse((layers / "zone-green_body.png").exists(), "plate and disc are shared (zone-gray)")
+        zone = {k: self.icons[f"zone-{k}"] for k in keys}
+        for k, d in zone.items():
+            src = {l["id"]: (l["src"], l.get("tint")) for l in d["layers"]}
+            self.assertEqual(src, {"body": ("zone-gray_body", None), "disc": ("zone-gray_disc", "zone"),
+                                   "glyph": (f"zone-{k}_glyph", "ink")}, k)
+            self.assertEqual(d["ue_sizes"], [24, 32, 36, 48, 64], k)
+            self.assertEqual((d["anims"]["appear"]["duration_ms"], d["anims"]["leave"]["duration_ms"]), (180, 120), k)
 
     def test_turn_ring_flash_1000_then_smoulder(self):
         for icon in ("marker-turn-ring", "marker-turn-ring-team"):
