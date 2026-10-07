@@ -1178,6 +1178,19 @@ private:
   UPROPERTY()
   TObjectPtr<class US08AnimatedIconWidget> NoDefenseStamp;
   FString NoDefenseStampKey;
+  // ---- VS-6 Z-2 FX base (S08/Fx/S08CueFxSpawner.h, the adapter in S08FlowGameModeFx.cpp) ----
+  /** FX-03: the registry spawner (prewarm, spawn, grade) of the combat VFX base. */
+  UPROPERTY()
+  TObjectPtr<class US08CueFxSpawnerComponent> CueFxSpawner;
+  /** FX-03: prewarm + the dispatcher's vfx / clip / sfx asset resolver + the profile grade; once per board. */
+  void S08FxBoardReady();
+  /** FX-06: the hover moved between figures (or left): the CUE-001 row + the rim of FX-05. */
+  void S08FxHoverChanged(const FString& NewId, const FString& OldId);
+  /** FX-17: CUE-009 defense played - the cream rim pulse on the defender (ВР-23). */
+  void S08FxDefensePlayed(const FString& DefenderId);
+  /** Z-2: -BenchFx=<mode> - a deterministic FX state for the bench views (the FX-02 placard; the rim / flash
+   *  channel frames of FX-06/17/19 written straight to CPD, the curves stay in the unit tests and the demo). */
+  void S08FxBenchStep(const FString& Spec);
   // ---- VS-2 HB-06: the UMG HUD root, its layout / FIELD and the H2 layout fixes of the Slate blocks
   // (S08FlowGameModeUmHud.cpp; rollback -S08SlateHud[=<blocks>]) ----
   void BuildUmHud();
