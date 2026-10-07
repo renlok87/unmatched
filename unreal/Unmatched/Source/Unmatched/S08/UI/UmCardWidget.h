@@ -57,6 +57,7 @@
 #include "../../S09/S09HudModel.h"
 #include "../../S09/S09HudPress.h"
 #include "../S08ArtHudWidgets.h"
+#include "UmSpinner.h"
 #include "UObject/SoftObjectPath.h"
 #include "UmCardWidget.generated.h"
 
@@ -376,6 +377,8 @@ class UNMATCHED_API UUmCardWidget : public UUserWidget {
   void DoSwap();
   void StartFlip(bool bToFace, float DurMs);
   void ApplyLayout();
+  /** HB-47: the loader-spinner after 300 ms of loading (FUmDelayedShow), hidden at once when the scan is there. */
+  void ApplySpinner();
   void ApplyFrame();
   void ApplyFallbackContent();
   void ApplyCursor();
@@ -395,6 +398,7 @@ class UNMATCHED_API UUmCardWidget : public UUserWidget {
   FIntPoint SrcPx = FIntPoint::ZeroValue;
   FVector4 FaceUv = FVector4(0.0, 0.0, 1.0, 1.0);
   bool bLoading = false;
+  FUmDelayedShow SpinnerDelay;
   bool bWarnedFallback = false;
   FUmCardFit FitNow;
   FName FrameKeyNow;

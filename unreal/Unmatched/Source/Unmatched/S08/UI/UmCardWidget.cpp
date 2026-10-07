@@ -564,9 +564,12 @@ void UUmCardWidget::LoadFace(const FUmCardMediaEntry& Entry) {
     SetFaceTexture(Tex);
     return;
   }
-  // CP-15: the texture streams in; the frame and loader-spinner 32 su until it is there
+  // CP-15: the texture streams in; the frame and loader-spinner 32 su until it is there (HB-47: the spinner only after
+  // 300 ms of waiting, 04 §3.3 - a scan that arrives sooner never shows it)
   FaceTexture = nullptr;
   bLoading = true;
+  SpinnerDelay.End();
+  SpinnerDelay.Begin(NowMs());
   LoadingPath = Path;
   TWeakObjectPtr<UUmCardWidget> WeakThis(this);
   LoadHandle = UAssetManager::GetStreamableManager().RequestAsyncLoad(Path, FStreamableDelegate::CreateLambda([WeakThis]() {
@@ -701,11 +704,7 @@ void UUmCardWidget::ApplyLayout() {
     if (bFallback) ApplyFallbackContent();
     Fallback->SetVisibility(bFallback ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
   }
-  if (Spinner) {
-    const bool bWas = Spinner->GetVisibility() != ESlateVisibility::Collapsed;
-    Spinner->SetVisibility(bLoading ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
-    if (bLoading && !bWas) Spinner->PlayAnim(TEXT("cycle"));
-  }
+  ApplySpinner();
   // HB-25 (IC-34 П-2): the "+N" disc keeps >= 21 px on screen - 32 su below 1 px per su; 8 su of it on the frame
   // (ВР-VS3-09) or right-aligned 4 su over the top edge (the attack boost, ВР-VS2-HB22-11)
   const float Chip = ChipSuFor(Px);
@@ -1004,10 +1003,22 @@ bool UUmCardWidget::IsAnimating() const {
          Within(DropLeaveMs, 120.0) || Within(FlashStartMs, UmCardWidget::FlashMs) || bLoading;
 }
 
+void UUmCardWidget::ApplySpinner() {
+  // VS-3 HB-47 (04 §3.3): the scan's loader-spinner 32 su shows after 300 ms of loading, hides at once when ready
+  if (!bLoading) SpinnerDelay.End();
+  if (!Spinner) return;
+  const bool bWant = bLoading && SpinnerDelay.IsShown(NowMs());
+  const bool bWas = Spinner->GetVisibility() != ESlateVisibility::Collapsed;
+  if (bWant == bWas) return;
+  Spinner->SetVisibility(bWant ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
+  if (bWant) Spinner->PlayAnim(TEXT("cycle"));
+}
+
 void UUmCardWidget::Step() {
   using namespace UmCardWidget;
   const double Now = NowMs();
   const bool bReduced = IsReduced();
+  if (bLoading) ApplySpinner();
   // the flip (CP-18 / CP-20)
   ScaleXNow = 1.0f;
   float FaceFade = 1.0f;
