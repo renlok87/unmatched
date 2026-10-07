@@ -41,6 +41,9 @@ public:
 
   /** How many registry systems the prewarm loaded (the test's check). */
   int32 GetPrewarmedCount() const { return Prewarmed.Num(); }
+  /** The grade of the active profile (FX-02: the quads of the bench placard take it as a MID override). */
+  const FLinearColor& GetGradeScale() const { return GradeScale; }
+  const FLinearColor& GetGradePow() const { return GradePow; }
 
 private:
   UPROPERTY(Transient)

@@ -170,6 +170,13 @@ void AS08FlowGameMode::S08FxBenchStep(const FString& Spec) {
       Quad->SetWorldScale3D(FVector(0.32f));  // 100 uu plane x 0.32 = 32 uu quad
       Quad->SetCollisionEnabled(ECollisionEnabled::NoCollision);
       Quad->RegisterComponentWithWorld(World);
+      // the runtime grade of the active profile (the placard quads are not Niagara - a plain MID override)
+      if (CueFxSpawner) {
+        if (UMaterialInstanceDynamic* Mid = Quad->CreateAndSetMaterialInstanceDynamic(0)) {
+          Mid->SetVectorParameterValue(TEXT("GradeScale"), CueFxSpawner->GetGradeScale());
+          Mid->SetVectorParameterValue(TEXT("GradePow"), CueFxSpawner->GetGradePow());
+        }
+      }
       ++Quads;
     }
     FS08Trace::Write(FString::Printf(TEXT("FX bench placard sdf=%d"), Quads));
