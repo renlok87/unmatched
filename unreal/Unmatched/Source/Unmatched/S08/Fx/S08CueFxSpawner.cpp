@@ -13,6 +13,7 @@
 bool US08CueFxSpawnerComponent::Prewarm() {
   UWorld* World = GetWorld();
   if (!World) return false;
+  bPrewarmDone = true;
   const double T0 = FPlatformTime::Seconds();
   Prewarmed.Reset();
   TSet<FString> Distinct;
@@ -61,7 +62,8 @@ UNiagaraComponent* US08CueFxSpawnerComponent::Spawn(const FString& CueId, const 
                                                                ENCPoolMethod::AutoRelease);
   }
   if (Component) {
-    Component->SetFloatParameter(TEXT("RandomSeed"), static_cast<float>(S08CueFx::SeedOf(E->System)));
+    // FX-04: the seed lives in the system asset (RandomSeed = CRC32 of the name, fx_audit.py); a "RandomSeed" user
+    // parameter would do nothing on a system without one, so none is written here (the Z-2 review, fix 8).
     // ВР-Z2-06: GradeScale / GradePow land as user-vector overrides - a system that does not read them runs
     // the neutral plain inverse ACES of M_FX_Print's defaults (what the paste shows without a fit)
     Component->SetColorParameter(TEXT("GradeScale"), GradeScale);
@@ -82,7 +84,6 @@ UNiagaraComponent* US08CueFxSpawnerComponent::SpawnSystem(const FString& SystemP
       World, System, Transform.GetLocation(), Transform.Rotator(), Transform.GetScale3D(),
       /*bAutoDestroy=*/true, /*bAutoActivate=*/true, ENCPoolMethod::AutoRelease);
   if (Component) {
-    Component->SetFloatParameter(TEXT("RandomSeed"), static_cast<float>(S08CueFx::SeedOf(SystemPath)));
     Component->SetColorParameter(TEXT("GradeScale"), GradeScale);
     Component->SetColorParameter(TEXT("GradePow"), GradePow);
   }

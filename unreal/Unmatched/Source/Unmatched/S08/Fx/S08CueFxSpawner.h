@@ -39,6 +39,9 @@ public:
   /** The grade of the active board profile for the systems that expose GradeScale / GradePow (FX grade line). */
   void SetGrade(const FLinearColor& Scale, const FLinearColor& Pow, const TCHAR* Source);
 
+  /** Prewarm ran on this component (once per spawner, i.e. once per game mode - the Z-2 review: a process-wide
+   *  static left a second game mode's spawner without its prewarmed systems). */
+  bool HasPrewarmed() const { return bPrewarmDone; }
   /** How many registry systems the prewarm loaded (the test's check). */
   int32 GetPrewarmedCount() const { return Prewarmed.Num(); }
   /** The grade of the active profile (FX-02: the quads of the bench placard take it as a MID override). */
@@ -48,6 +51,7 @@ public:
 private:
   UPROPERTY(Transient)
   TArray<TObjectPtr<UNiagaraSystem>> Prewarmed;
+  bool bPrewarmDone = false;
   FLinearColor GradeScale = FLinearColor(1.0f, 1.0f, 1.0f, 0.0f);
   FLinearColor GradePow = FLinearColor(1.0f, 1.0f, 1.0f, 0.0f);
 };
