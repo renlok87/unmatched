@@ -96,8 +96,9 @@ if (SdfShape < 0.5) {
   t = (abs(p.x) + abs(p.y)) * 2.0;
 } else {
   // chevron: the signed distance to the V centre line y = 0.25 - 0.9|x| (opening up), band-normalized
-  float line = p.y + 0.25 - 0.9 * abs(p.x);
-  t = abs(line) * (1.0 / sqrt(1.0 + 0.81)) * 4.0;
+  // ("line" is a modifier keyword in SM6 HLSL - the local is "vline")
+  float vline = p.y + 0.25 - 0.9 * abs(p.x);
+  t = abs(vline) * (1.0 / sqrt(1.0 + 0.81)) * 4.0;
 }
 float ew = max(EdgeWidth, 1e-3);
 float kw = max(KeylineWidth, 1e-3);

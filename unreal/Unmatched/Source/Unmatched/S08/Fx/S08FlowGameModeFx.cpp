@@ -8,6 +8,7 @@
 // sound row's asset loads.
 #include "../S08FlowGameMode.h"
 
+#include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "Sound/SoundBase.h"
 #include "../S08BoardActor.h"
@@ -145,18 +146,22 @@ void AS08FlowGameMode::S08FxBenchStep(const FString& Spec) {
     const FVector Centre = BoardActor->GetActorLocation();
     const float Spacing = 46.0f;
     if (CueFxSpawner) {
-      CueFxSpawner->SpawnSystem(TEXT("/Game/S08/FX/Systems/NS_FX_PlacardStar"),
-                                FTransform(FRotator(0.0f, 90.0f, 0.0f), Centre + FVector(1.5f * Spacing, 0.0f, 22.0f)));
+      UNiagaraComponent* Star = CueFxSpawner->SpawnSystem(
+          TEXT("/Game/S08/FX/Systems/NS_FX_PlacardStar"),
+          FTransform(FRotator(0.0f, 90.0f, 0.0f), Centre + FVector(1.5f * Spacing, 0.0f, 22.0f)));
+      const bool bStarOk = Star && Star->IsRegistered();
+      FS08Trace::Write(FString::Printf(TEXT("FX bench placard star=%s"), bStarOk ? TEXT("registered") : TEXT("failed")));
     }
-    static const TCHAR* const Quads[] = {TEXT("MI_FX_PlacardDisk"), TEXT("MI_FX_PlacardDiamond"),
-                                         TEXT("MI_FX_PlacardChevron")};
+    static const TCHAR* const QuadMis[] = {TEXT("MI_FX_PlacardDisk"), TEXT("MI_FX_PlacardDiamond"),
+                                          TEXT("MI_FX_PlacardChevron")};
+    int32 Quads = 0;
     for (int32 I = 0; I < 3; ++I) {
-      const FString MiPath = FString::Printf(TEXT("/Game/S08/FX/Materials/%s.%s"), Quads[I], Quads[I]);
+      const FString MiPath = FString::Printf(TEXT("/Game/S08/FX/Materials/%s.%s"), QuadMis[I], QuadMis[I]);
       UMaterialInterface* Mi = LoadObject<UMaterialInterface>(nullptr, *MiPath);
       if (!Mi) continue;
       UStaticMesh* Plane = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Plane.Plane"));
       if (!Plane) continue;
-      UStaticMeshComponent* Quad = NewObject<UStaticMeshComponent>(this);
+      UStaticMeshComponent* Quad = NewObject<UStaticMeshComponent>(BoardActor);
       Quad->SetStaticMesh(Plane);
       Quad->SetMaterial(0, Mi);
       Quad->SetWorldLocation(Centre + FVector((I - 1) * Spacing, 0.0f, 22.0f));
@@ -165,8 +170,9 @@ void AS08FlowGameMode::S08FxBenchStep(const FString& Spec) {
       Quad->SetWorldScale3D(FVector(0.32f));  // 100 uu plane x 0.32 = 32 uu quad
       Quad->SetCollisionEnabled(ECollisionEnabled::NoCollision);
       Quad->RegisterComponentWithWorld(World);
+      ++Quads;
     }
-    FS08Trace::Write(TEXT("FX bench placard star=NS_FX_PlacardStar sdf=3"));
+    FS08Trace::Write(FString::Printf(TEXT("FX bench placard sdf=%d"), Quads));
     return;
   }
   if (Mode == TEXT("hover")) {
