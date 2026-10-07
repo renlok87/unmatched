@@ -36,6 +36,17 @@ const TArray<FS08CueRow>& S08CueRows::Combat() {
     // VS-1 FX-01 (cue-table fx-p4-2026-10; 02-visual-design.md §9.2, ВР-19..ВР-24, ВР-74): sockets and material channels of
     // the decided look. The systems (NS_FX_*) are planned paths with status missing until FX-13..FX-32 make them, so
     // every vfx channel of these rows still traces vfx=missing.
+    // FX-06 (VS-6 Z-2): CUE-001 hover rim - LOCAL (no seq, no D2 dedupe: the contour may re-trigger), replace per
+    // cue so the rim jumps to the next figure at once, reduced keep, the hover tick throttled to 1 / 150 ms; the
+    // material channel Rim of FX-05, no vfx, no sound (02-audio-design §4.2: the field is silent like DE).
+    FS08CueRow Hover = MakeRow(TEXT("CUE-001"), 150, false, ES08CueOnNew::Replace, true, {}, false, false, TEXT(""), 1,
+                               TEXT(""), TEXT("Rim"));
+    Hover.bServer = false;
+    Hover.Subject = TEXT("target");
+    Hover.Reduced = ES08CueReduced::Keep;
+    Hover.ReducedMaxMs = 0;
+    Hover.SfxRetriggerMs = 150;
+    Out.Add(Hover);
     // CUE-008 attack declared: target arcs + three chevrons ON THE GROUND (NS_FX_AttackChevrons, world, no socket), NO clip
     // (01 F-03); cut by the next combat cue.
     Out.Add(MakeRow(TEXT("CUE-008"), 600, true, ES08CueOnNew::Interrupt, false,

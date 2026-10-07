@@ -10,6 +10,7 @@
 #include "S08ArtPreviewMedusa.h"
 #include "S08BoardActor.h"
 #include "S08BoardModel.h"
+#include "Fx/S08CueFx.h"
 #include "S08Diorama.h"
 #include "S08EnvLayout.h"
 #include "S08FighterActor.h"
@@ -120,6 +121,9 @@ bool FS08ArtLookDefaultTest::RunTest(const FString&) {
     // AN-32 (ВР-16): the heroMaterials Fix mechanism is in the line
     TestTrue(FString::Printf(TEXT("default hero materials traced: %s"), *Line),
              Line.Contains(TEXT(" heroMat=on")));
+    // VS-6 Z-2: the FX base and the hit look are in the line (ВР-FX02 / ВР-20)
+    TestTrue(FString::Printf(TEXT("default fx traced: %s"), *Line),
+             Line.Contains(TEXT(" fx=on")) && Line.Contains(TEXT(" hitFx=flash")));
   }
   // 2c) AN-21 (ВР-12): -S08MoveEaseLegacy rolls the ease back, -S08MoveEase stays a no-op alias of the default
   {
@@ -150,6 +154,20 @@ bool FS08ArtLookDefaultTest::RunTest(const FString&) {
     TestTrue(FString::Printf(TEXT("hero materials legacy traced: %s"), *Line),
              Line.Contains(TEXT(" heroMat=legacy(-S08HeroMatFixLegacy)")));
     TestTrue("the base digit stays on", Line.Contains(TEXT(" baseDigit=on")));
+  }
+  // 2g) VS-6 Z-2: -S08FxLegacy / -S08HitTintLegacy roll the FX base / the hit look back
+  {
+    FCommandLineScope Cmd(TEXT("-S08FxLegacy"));
+    TestTrue("fx legacy traced", S08ArtLook::TraceLine().Contains(TEXT(" fx=legacy(-S08FxLegacy)")));
+    TestFalse("fx disabled by the flag", S08CueFx::FxEnabled());
+  }
+  {
+    FCommandLineScope Cmd(TEXT("-S08HitTintLegacy"));
+    const FString Line = S08ArtLook::TraceLine();
+    TestTrue(FString::Printf(TEXT("hit tint legacy traced: %s"), *Line),
+             Line.Contains(TEXT(" hitFx=legacy(-S08HitTintLegacy)")) && Line.Contains(TEXT(" fx=on")));
+    TestTrue("hit tint legacy on", S08CueFx::HitTintLegacy());
+    TestTrue("fx stays on", S08CueFx::FxEnabled());
   }
   // 2) the former opt-in flags are accepted and change nothing
   {

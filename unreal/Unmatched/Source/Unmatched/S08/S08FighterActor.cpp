@@ -5,6 +5,7 @@
 #include "S08ArtPreviewMedusa.h"
 #include "S08BoardActor.h"
 #include "S08Facing.h"
+#include "Fx/S08CueFx.h"
 #include "S08IconMotion.h"
 #include "S08Render.h"
 #include "S08TraceLog.h"
@@ -1163,6 +1164,37 @@ void AS08FighterActor::PlayHitTint(float Seconds) {
   FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW hit-tint fighter=%s ms=%d"), *Fighter.Id,
                                    FMath::RoundToInt(Seconds * 1000.0f)));
 }
+
+// ---- Z-2 FX-05/06/17/19: one-line entry points; the channels live in Fx/S08FigureFxChannels (ВР-Z2R-01)
+bool AS08FighterActor::BindFx() {
+  if (!bHeroV2Visual || !ArtBody) return false;
+  FxChannels.Bind(this, ArtBody, Fighter.Id);
+  return true;
+}
+
+void AS08FighterActor::SetFxBenchChannels(float FlashA, float RimIntensity, float RimWidth) {
+  if (!BindFx()) return;
+  FxChannels.SetStatic(FlashA, RimIntensity, RimWidth);
+  FS08Trace::Write(FString::Printf(TEXT("FX bench channels fighter=%s flash=%.2f rim=%.2f width=%.2f"),
+                                   *Fighter.Id, FlashA, RimIntensity, RimWidth));
+}
+
+void AS08FighterActor::PlayHitFx(float WindowSeconds, bool bDamage) {
+  // FX-19 (ВР-20): the red fill of before with -S08HitTintLegacy, and with -S08FxLegacy (the full rollback)
+  if (S08CueFx::HitTintLegacy() || !S08CueFx::FxEnabled()) {
+    PlayHitTint(WindowSeconds);
+    FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW hit-fx fighter=%s flash=0 rim=0 legacy=1"), *Fighter.Id));
+    return;
+  }
+  if (WindowSeconds > 0.0f && BindFx()) FxChannels.PlayHit(bDamage);
+}
+
+void AS08FighterActor::PlayFlash(float Ms) { if (BindFx()) FxChannels.PlayFlash(Ms); }
+void AS08FighterActor::PlayRimPulse(const S08FigureFx::FRimPulse& Pulse) { if (BindFx()) FxChannels.PlayRim(Pulse); }
+void AS08FighterActor::PlayRim(float TotalMs, float Peak, float Width, double RampInMs, double RampOutMs, bool bHold) {
+  PlayRimPulse(S08FigureFx::FRimPulse{TotalMs, Peak, Width, RampInMs, RampOutMs, bHold, 0.0});
+}
+void AS08FighterActor::StopRim(double OutMs) { if (BindFx()) FxChannels.StopRim(OutMs); }
 
 void AS08FighterActor::TickHitTint() {
   UWorld* World = GetWorld();

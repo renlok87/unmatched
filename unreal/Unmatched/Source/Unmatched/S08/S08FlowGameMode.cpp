@@ -635,6 +635,7 @@ void AS08FlowGameMode::TrackCombatResult(const FS08Snapshot& Snapshot,
       if (bHasPrevApplied && PrevApplied.Phase == TEXT("COMBAT") && Snapshot.Phase == TEXT("COMBAT_RESOLVE") &&
           !Open.TargetFighterId.IsEmpty()) {
         CueDispatcher.Feed(TEXT("CUE-009"), Open.TargetFighterId, Snapshot.SequenceNumber, NowMs(), Lines);
+        S08FxDefensePlayed(Open.TargetFighterId);  // Z-2 FX-17: the cream rim pulse on the defender (ВР-23)
         AudioOnDefensePlayed(Open.TargetFighterId, Snapshot.SequenceNumber);  // AU-S4
       }
       WriteCueLines(Lines);
@@ -773,6 +774,7 @@ void AS08FlowGameMode::SyncBoardFromApplied() {
             return BuildMoveDraftViewFor(FighterId, Reachable, OutView);
           });
       FiguresAttachBoard();  // Z-1: the board's game clock for the FACING traces (S08FlowGameModeFigures.cpp)
+      S08FxBoardReady();     // Z-2 FX-03: the FX prewarm, the CUE asset resolver and the profile grade
       BoardActor->Rebuild(BoardModel);
       SetupCameraForBoard();
       // INT-019 control points (evidence line, also asserted by automation
@@ -1257,9 +1259,10 @@ void AS08FlowGameMode::PresentDamageNumber(const FString& FighterId, int32 Damag
 
 void AS08FlowGameMode::PresentHit(const FString& FighterId, int32 Seq, int32 TintMs, int64 DueMs) {
   if (!BoardActor) return;
-  // Wave 5c-B: HitReact of a v2 figure; DE-018: the red hit tint from the same frame (450 ms, lethal 550).
+  // Wave 5c-B: HitReact of a v2 figure; Z-2 FX-19 (ВР-20): the white flash + cream rim from the contact frame
+  // (the red tint only with -S08HitTintLegacy); the tint= window of the staging trace stays 450 / 550.
   BoardActor->NotifyFighterAnimEvent(FighterId, S08HeroesV2::EEvent::Damaged, Seq);
-  BoardActor->PlayFighterHitTint(FighterId, TintMs / 1000.0f);
+  BoardActor->PlayFighterHitFx(FighterId, TintMs / 1000.0f, /*bDamage=*/true);
   PlayHitSound(FighterId, Seq, DueMs);  // DE-032 (SD-51 p. 2): the hit sound in the same (contact) frame
 }
 
@@ -7703,9 +7706,11 @@ void AS08FlowGameMode::UpdateHover() {
     if (const AS08FighterActor* Actor = Cast<AS08FighterActor>(Hit.GetActor())) Id = Actor->GetFighterId();
   }
   if (Id != ArtHud.HoveredFighterId) {
+    const FString Prev = ArtHud.HoveredFighterId;
     ArtHud.HoveredFighterId = Id;
     FS08Trace::Write(FString::Printf(TEXT("INPUT hover src=os screen=(%.0f,%.0f) fighter=%s"), X, Y,
                                      Id.IsEmpty() ? TEXT("none") : *Id));
+    S08FxHoverChanged(Id, Prev);  // Z-2 FX-06: the CUE-001 rim follows the hovered figure
   }
 }
 
@@ -8872,6 +8877,13 @@ void AS08FlowGameMode::RunRenderBench() {
         Finish(FString::Printf(TEXT("BENCH FAILED deck-panel %s"), *FPaths::GetCleanFilename(DeckListsPath)));
         return;
       }
+    }
+    // Z-2 FX (VS-6): -BenchFx=<mode> stages an FX look deterministically for the bench views - the FX-02 print
+    // placard, the hover / defense / hit channel states of FX-06/17/19 (S08FlowGameModeFx.cpp).
+    FString BenchFxSpec;
+    if (FParse::Value(Cmd, TEXT("BenchFx="), BenchFxSpec, /*bShouldStopOnSeparator=*/false) &&
+        !BenchFxSpec.TrimStartAndEnd().IsEmpty()) {
+      S08FxBenchStep(BenchFxSpec);
     }
     FS08Trace::Write(FString::Printf(
         TEXT("BENCH scene fixture=%s board=%dx%d fighters=%d viewer=%s hero=%s art=%d profile=%s views=%s warmup=%.0f settle=%.0f measure=%.0f fps=%.0f profileGpu=%d csv=%d"),

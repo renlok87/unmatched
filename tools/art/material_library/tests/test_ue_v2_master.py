@@ -130,8 +130,33 @@ class HitTint(unittest.TestCase):
         new = {k for k in self.g.nodes if k.startswith(("hit_", "p_hit", "cpd_hit", "base_hit", "em_hit"))}
         self.assertEqual(new, {"cpd_hit", "p_hitcol", "p_hitstr", "p_hitemi", "hit_a", "base_hit", "hit_k", "hit_c",
                                "hit_alpha", "hit_eai", "em_hit"})
-        self.assertEqual(len(self.g.nodes), 71 + len(new) + len(DISSOLVE_NODES))
+        # + the AN-32 Fix group (6 knobs), the Z-2 FX-05 EAI pair of the cue emissive and the review's edge / cover
+        # nodes (which replace rim_exp / rim_c) - the count was left at the v2.3 total by AN-32 and Z-2
+        self.assertEqual(len(self.g.nodes), 71 + len(new) + len(DISSOLVE_NODES) + len(AN32_FIX_NODES)
+                         + len(FX05_EAI_NODES) + len(FX05_EDGE_NODES) - 4)
 
+    def test_fx05_rim_edge_and_cover(self):
+        """Z-2 review fix 7: the rim is a step on 1 - N.V of the vertex normal and both cue channels cover the albedo
+        (base x (1 - max(rim, flash.a x FlashCover))); the old exponent lerp / rim_c are gone."""
+        self.assertTrue(FX05_EDGE_NODES <= set(self.g.nodes))
+        for gone in ("rim_exp", "rim_c", "rim", "em_sum", "fx_eai"):
+            self.assertNotIn(gone, self.g.nodes)
+        self.assertEqual(self.links_to("emissive", "A"), [["fx_inv", "", "emissive", "A"]])
+        self.assertEqual(self.links_to("fresnel", "Normal"), [["rim_nrm", "", "fresnel", "Normal"]])
+        self.assertEqual(self.links_to("base_final", "B"), [["fx_keep", "", "base_final", "B"]])
+        self.assertEqual(self.links_to("rim_m", "B"), [["rim_gate", "", "rim_m", "B"]])
+        self.assertEqual(self.links_to("rim_g4", "A"), [["cpd_rim", "", "rim_g4", "A"]])
+
+
+# AN-32 (ВР-16) Fix group knobs and the Z-2 FX-05 display-unit EAI of the cue emissive
+AN32_FIX_NODES = {"p_Fix" + k for k in ("ClassA", "GainA", "SpecA", "ClassB", "GainB", "SpecB")}
+FX05_EAI_NODES = set()  # the Z-2 EAI pair (fx_alpha, fx_eai) is replaced by the inverse-tone node below
+
+# Z-2 review fix 7 (FX-05): the rim edge mask and the albedo cover (replacing rim_exp / rim_c)
+FX05_EDGE_NODES = {"flash_rgb", "p_flashgain", "p_flashcover", "p_rimnarrow", "p_rimwide", "p_rimsoft", "rim_t",
+                   "rim_nrm", "rim_d", "rim_q", "rim_s", "rim_m", "flash_cov", "fx_cover", "fx_keep", "base_fade",
+                   "p_fxgs", "p_fxgp", "fx_inv", "p_rimnarrowi", "rim_inv", "rim_shift", "rim_t2", "rim_g4",
+                   "rim_gate"}
 
 # v2.3 (DE-011) nodes: CPD 13 / 14, the knobs, the Custom node, ash albedo, glow, three switches
 DISSOLVE_NODES = {"cpd_dis", "cpd_dstyle", "dis", "dis_ash", "base_dis", "dis_k", "dis_c", "dis_alpha", "dis_eai",

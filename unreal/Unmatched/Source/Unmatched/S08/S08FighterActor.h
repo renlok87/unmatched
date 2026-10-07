@@ -7,6 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "S08BoardModel.h"
 #include "S08HeroesV2.h"
+#include "Fx/S08FigureFxChannels.h"
 #include "S08HeroLight.h"
 #include "S08MoveAnim.h"
 #include "S08Team.h"
@@ -102,6 +103,22 @@ public:
   void PlayHitTint(float Seconds);
   /** Current CPD_HitTint value (0 when idle). */
   float GetHitTintValue() const { return HitTintValue; }
+  // ---- Z-2 FX-05/06/17/19: the flash / rim cue channels (Fx/S08FigureFxChannels, ВР-Z2R-01). Durations in ms,
+  // the card timing in the S08FigureFx presets; no-ops without a v2 figure; reduced motion inside the channels.
+  /** FX-19: the hit from this contact frame (flash 70 ms if bDamage, rim C+70..C+370); the red fill instead with
+   *  -S08HitTintLegacy or -S08FxLegacy. The tint= window (450 / 550) of the staging trace is unchanged. */
+  void PlayHitFx(float WindowSeconds, bool bDamage);
+  /** Z-2 bench only (-BenchFx): both channels written straight, no timers (ВР-Z2-12). */
+  void SetFxBenchChannels(float FlashA, float RimIntensity, float RimWidth);
+  void PlayFlash(float Ms);
+  void PlayRimPulse(const S08FigureFx::FRimPulse& Pulse);
+  /** RampInMs / RampOutMs < 0: the auto 20 % / 40 % of TotalMs; bHold stays at Peak until StopRim. */
+  void PlayRim(float TotalMs, float Peak, float Width, double RampInMs = -1.0, double RampOutMs = -1.0,
+               bool bHold = false);
+  void StopRim(double OutMs = S08FigureFx::HoverLeaveMs);
+  float GetFxFlashValue() const { return FxChannels.GetFlash(); }
+  float GetRimIntensity() const { return FxChannels.GetRim(); }
+  float GetRimWidth() const { return FxChannels.GetRimWidth(); }
   /** Asset name of a loaded v2 clip (AM_<Key>_<Clip>), empty without one. */
   FString GetHeroClipAssetName(S08HeroesV2::EClip Clip) const;
   /** The death (DeathSettle, still, dissolve) is running: the defeated figure is still visible. */
@@ -369,6 +386,8 @@ private:
   double HitTintStartSeconds = 0.0;
   float HitTintSeconds = 0.0f;
   float HitTintValue = 0.0f;
+  FS08FigureFxChannels FxChannels;  // Z-2: the flash / rim channels (Fx/S08FigureFxChannels)
+  bool BindFx();
   void TickHitTint();
   /** Loads and applies the v2 figure; false (nothing changed) when an asset is missing. */
   bool ApplyHeroV2(const S08HeroesV2::FHeroSpec& Spec, const FVector& CellCenter, USkeletalMesh*& OutMesh);

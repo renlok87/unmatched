@@ -15,6 +15,7 @@
 #include "NiagaraParameterStore.h"
 #include "NiagaraRendererProperties.h"
 #include "NiagaraScript.h"
+#include "NiagaraSpriteRendererProperties.h"
 #include "NiagaraSystem.h"
 #include "NiagaraTypes.h"
 #include "UObject/UnrealType.h"
@@ -244,8 +245,11 @@ FString US08EnvFxAuthoringLibrary::TuneNiagaraSystem(const FString& SystemPath, 
     Report->SetBoolField(TEXT("ok"), false);
     return FxJsonString(Report);
   };
-  if (!SystemPath.StartsWith(TEXT("/Game/EnvKit/"))) {
-    return Fail(TEXT("refused: only derived copies under /Game/EnvKit/ are tuned (the Fab pack folders stay pristine)"));
+  // FX-03 (VS-6 Z-2): the S08 FX systems are derived copies under /Game/S08/FX/ (own assets, ВР-FX01) - tuned
+  // by the same rules; the Fab pack folders stay pristine either way (the guard refuses everything else).
+  if (!SystemPath.StartsWith(TEXT("/Game/EnvKit/")) && !SystemPath.StartsWith(TEXT("/Game/S08/FX/"))) {
+    return Fail(TEXT("refused: only derived copies under /Game/EnvKit/ or /Game/S08/FX/ are tuned "
+                     "(the Fab pack folders stay pristine)"));
   }
   TSharedPtr<FJsonObject> Spec;
   const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(SpecJson);
@@ -265,8 +269,10 @@ FString US08EnvFxAuthoringLibrary::TuneNiagaraSystem(const FString& SystemPath, 
   Spec->TryGetBoolField(TEXT("disableComponentRenderers"), bNoComponents);
   const TSharedPtr<FJsonObject>* EmitterOps = nullptr;
   Spec->TryGetObjectField(TEXT("emitters"), EmitterOps);
+  const TSharedPtr<FJsonObject>* SpriteMaterials = nullptr;  // FX-03: "<handle or '*'>" -> MI path
+  Spec->TryGetObjectField(TEXT("spriteMaterials"), SpriteMaterials);
   TArray<TSharedPtr<FJsonValue>> EmitterChanges;
-  int32 LightsOff = 0, ComponentsOff = 0;
+  int32 LightsOff = 0, ComponentsOff = 0, MaterialsSet = 0;
   TArray<FNiagaraEmitterHandle>& Handles = System->GetEmitterHandles();
   for (int32 Index = 0; Index < Handles.Num(); ++Index) {
     FNiagaraEmitterHandle& H = Handles[Index];
@@ -315,12 +321,28 @@ FString US08EnvFxAuthoringLibrary::TuneNiagaraSystem(const FString& SystemPath, 
         Rp->Modify();
         Rp->SetIsEnabled(false);
         ++ComponentsOff;
+      } else if (SpriteMaterials && Rp->IsA<UNiagaraSpriteRendererProperties>()) {
+        // FX-03 (VS-6 Z-2): the print material of the S08 FX systems - "<emitter handle or '*'>" -> the MI path
+        const TSharedPtr<FJsonObject> M = SpriteMaterials->ToSharedRef();
+        FString MaterialName;
+        if (!M->TryGetStringField(Name, MaterialName)) M->TryGetStringField(TEXT("*"), MaterialName);
+        if (!MaterialName.IsEmpty()) {
+          if (UMaterialInterface* Material = LoadObject<UMaterialInterface>(nullptr, *MaterialName)) {
+            Rp->Modify();
+            Cast<UNiagaraSpriteRendererProperties>(Rp)->Material = Material;
+            ++MaterialsSet;
+          } else {
+            Errors.Add(MakeShared<FJsonValueString>(
+                FString::Printf(TEXT("spriteMaterials: %s not loaded"), *MaterialName)));
+          }
+        }
       }
     }
     EmitterChanges.Add(MakeShared<FJsonValueObject>(Change));
   }
   Report->SetArrayField(TEXT("emitters"), EmitterChanges);
   Report->SetNumberField(TEXT("lightRenderersDisabled"), LightsOff);
+  Report->SetNumberField(TEXT("spriteMaterialsSet"), MaterialsSet);
   Report->SetNumberField(TEXT("componentRenderersDisabled"), ComponentsOff);
 
   // rapid-iteration constants (module inputs): every store of every script holding a matching name

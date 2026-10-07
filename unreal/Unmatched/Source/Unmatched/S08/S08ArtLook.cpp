@@ -1,6 +1,7 @@
 #include "S08ArtLook.h"
 
 #include "S08ArtPreviewMedusa.h"
+#include "Fx/S08CueFx.h"
 #include "S08Diorama.h"
 #include "S08EnvLayout.h"
 #include "S08Facing.h"
@@ -109,11 +110,19 @@ FString TraceLine() {
   const FString HeroMat = FParse::Param(Cmd, S08HeroesV2::HeroMatFixLegacyFlagName)
                               ? FString::Printf(TEXT("legacy(-%s)"), S08HeroesV2::HeroMatFixLegacyFlagName)
                               : FString(TEXT("on"));
+  // VS-6 Z-2 (ВР-FX02): the combat FX base (systems, rim / flash writers) with its one rollback
+  const FString Fx = FParse::Param(Cmd, S08CueFx::FxLegacyFlagName)
+                         ? FString::Printf(TEXT("legacy(-%s)"), S08CueFx::FxLegacyFlagName)
+                         : FString(TEXT("on"));
+  // FX-19 (ВР-20): the white flash + cream rim of the hit, or the red fill of before
+  const FString HitFx = FParse::Param(Cmd, S08CueFx::HitTintLegacyFlagName)
+                            ? FString::Printf(TEXT("legacy(-%s)"), S08CueFx::HitTintLegacyFlagName)
+                            : FString(TEXT("flash"));
   return FString::Printf(
-      TEXT("ARTLOOK art=%d source=%s heroes=%s tray=%s env=%s review=%d legacyRender=%d markers=%d aliases=%s %s %s %s %s hudImpl=%s move=%s facing=%s baseDigit=%s heroMat=%s%s"),
+      TEXT("ARTLOOK art=%d source=%s heroes=%s tray=%s env=%s review=%d legacyRender=%d markers=%d aliases=%s %s %s %s %s hudImpl=%s move=%s facing=%s baseDigit=%s heroMat=%s fx=%s hitFx=%s%s"),
       bArt ? 1 : 0, Source, *Heroes, *Tray, *Env, ReviewTooling() ? 1 : 0, S08LegacyRender() ? 1 : 0, S08Markers() ? 1 : 0,
       Aliases.Num() ? *FString::Join(Aliases, TEXT(",")) : TEXT("-"), *HudLook, *Dpi, *CardMedia, *Chips, *HudImpl,
-      *MoveEase, *Facing, *BaseDigit, *HeroMat,
+      *MoveEase, *Facing, *BaseDigit, *HeroMat, *Fx, *HitFx,
       bArt ? TEXT("") : TEXT(" (grey board: no art profile, figures, tray or art HUD layer)"));
 }
 
