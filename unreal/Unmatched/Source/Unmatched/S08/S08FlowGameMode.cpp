@@ -7122,7 +7122,9 @@ void AS08FlowGameMode::RefreshHud() {
                        .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14)))]];
   } else {
     if (UmHudBlockOnSlate(TEXT("status"))) AddHeader(TEXT("OPPONENT'S TURN"), FLinearColor(1.0f, 0.8f, 0.6f, 1.0f));  // VS-2 HB-15
-    if (Flow.IsValid() && Flow->IsBotActing()) {
+    // VS-4 review (HB-49 Slate remnant): the UMG PANEL-OPP says «ИИ ДУМАЕТ» - the English line only on the Slate
+    // panels (-S08SlateHud[=panels]) or the gate layer (-S09Markers)
+    if (Flow.IsValid() && Flow->IsBotActing() && (UmHudBlockOnSlate(TEXT("panels")) || S08ArtLook::S08Markers())) {
       // S10/GD-039: the waiting indicator follows the AUTHORITATIVE turn
       // owner (applied snapshot), never a fixed timer.
       AddLine(TEXT("VS_AI: the server bot is acting - waiting for its move"));

@@ -237,7 +237,12 @@ void US08ArtPlateWidget::NativePreConstruct() {
 }
 
 void US08ArtPlateWidget::ApplyStyle() {
-  if (PlateBackground) PlateBackground->SetBrushColor(FS08ArtHudPlateStyle::Linear(Style.Background));
+  // VS-4 review (HB-46): with the H12 plate the host border stays transparent - the V2 panel paints and fades its own
+  // body. NativePreConstruct runs this after SetV2, and the legacy #161A28 body then showed as an empty panel while the
+  // V2 plate faded in / out (HB-49 frames pend-marm-720-150 s09-pending-MOVE, pv-sarp-720-100 s09-exit-banner-combat)
+  if (PlateBackground) {
+    PlateBackground->SetBrushColor(bV2 ? FLinearColor::Transparent : FS08ArtHudPlateStyle::Linear(Style.Background));
+  }
   if (Marker) Marker->SetColorAndOpacity(FS08ArtHudPlateStyle::Linear(Style.Marker));
   S08StyleText(NameText, Style.NameFont, Style.NameText);
   S08StyleText(TeamText, Style.TeamFont, Style.NameText);
@@ -278,6 +283,7 @@ void US08ArtPlateWidget::SetV2(bool bOn) {
     PlateBackground->SetPadding(FMargin(0.0f));
     Style.SizeSu = FVector2D(UmWorldLayer::PlateWSu, UmWorldLayer::PlateHSu);
   } else {
+    bV2 = false;  // before ApplyStyle: the legacy body colour comes back
     PlateBackground->SetContent(LegacyContent);
     Style.SizeSu = LegacySizeSu;
     ApplyStyle();

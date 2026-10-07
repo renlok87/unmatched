@@ -8,14 +8,16 @@
 //   Unmatched.S08.ArtHudUmg.PlateHoverOnly  the H12 plate 268 x 144 su: the RU name from the data (Медуза, Король Артур,
 //                                           Мерлин, Гарпия 1-3), the role from the data (hero / sidekick x ranged / melee),
 //                                           ВАШ / СОПЕРНИК, «ЦЕЛЬ» only as the target; the fade in over hover.ms and out
-//                                           over icon.leave.ms, then collapsed, reduced <= 100 ms; -S08SlateHud=plate the
-//                                           plate of before.
+//                                           over icon.leave.ms, then collapsed, reduced <= 100 ms; the host border paints no
+//                                           body after construct (VS-4 review, no empty panel while fading);
+//                                           -S08SlateHud=plate the plate of before.
 // Headless: node tools/s08/run-ue-tests.cjs "Unmatched.S08.ArtHudUmg.TagTokens+Unmatched.S08.ArtHudUmg.PlateHoverOnly" <log>
 #if WITH_AUTOMATION_TESTS
 
 #include "../S08ArtHudWidgets.h"
 #include "../S08ArtLook.h"
 #include "../S08BoardModel.h"
+#include "Blueprint/WidgetTree.h"
 #include "Components/Border.h"
 #include "Components/Image.h"
 #include "Components/SizeBox.h"
@@ -170,6 +172,13 @@ bool FUmWorldPlateHoverOnlyTest::RunTest(const FString&) {
   TestTrue(TEXT("SetupPlate switched to V2"), Plate->IsV2() && Plate->GetV2() != nullptr);
   UUmWorldPlate* V2 = Plate->GetV2();
   if (!V2) return false;
+  // VS-4 review (HB-46): building the Slate widget runs NativePreConstruct -> ApplyStyle after SetV2; the host border
+  // must stay transparent, else its legacy body is an empty panel while the V2 plate fades (HB-49 frames)
+  Plate->TakeWidget();
+  const UBorder* Host = Plate->WidgetTree ? Cast<UBorder>(Plate->WidgetTree->FindWidget(FName(TEXT("PlateBackground")))) : nullptr;
+  if (TestNotNull(TEXT("the host border PlateBackground"), Host)) {
+    TestEqual(TEXT("V2: the host border paints no body after construct (alpha 0)"), Host->GetBrushColor().A, 0.0f);
+  }
   TestEqual(TEXT("the placement takes 268 x 144 su"), Plate->GetPlateSizeSu(), FVector2D(268.0, 144.0));
   const bool bRu = UmCardMedia::PreferredLang() != TEXT("en");
   struct FCase {
@@ -234,6 +243,11 @@ bool FUmWorldPlateHoverOnlyTest::RunTest(const FString&) {
   UmWorldLayer::SetupPlate(*Old);
   TestFalse(TEXT("-S08SlateHud=plate: the legacy plate"), Old->IsV2());
   TestEqual(TEXT("-S08SlateHud=plate: the size of before (172 x 54)"), Old->GetPlateSizeSu(), FVector2D(172.0, 54.0));
+  Old->TakeWidget();
+  const UBorder* OldHost = Old->WidgetTree ? Cast<UBorder>(Old->WidgetTree->FindWidget(FName(TEXT("PlateBackground")))) : nullptr;
+  if (TestNotNull(TEXT("-S08SlateHud=plate: the host border"), OldHost)) {
+    TestTrue(TEXT("-S08SlateHud=plate: the body of before is painted"), OldHost->GetBrushColor().A > 0.0f);
+  }
   S08ArtLook::ResetSlateHudOverrideForTest();
   return true;
 }

@@ -43,7 +43,10 @@ bool FS09HudFactory::CardFromJson(const TSharedPtr<FJsonValue>& Value,
       for (const TSharedPtr<FJsonValue>& E : *Effects) {  // VS-3 HB-33: the printed sentences of the card
         const TSharedPtr<FJsonObject>* EO = nullptr;
         FString T;
-        if (E.IsValid() && E->TryGetObject(EO) && EO && (*EO)->TryGetStringField(TEXT("text"), T) && !T.IsEmpty()) {
+        // VS-4 review (SC-21): the parsed effects of one printed text each carry that whole text (Regroup: two
+        // effects, one sentence pair) - a text already taken is not appended again
+        if (E.IsValid() && E->TryGetObject(EO) && EO && (*EO)->TryGetStringField(TEXT("text"), T) && !T.IsEmpty() &&
+            !OutCard.EffectText.Contains(T, ESearchCase::CaseSensitive)) {
           OutCard.EffectText += (OutCard.EffectText.IsEmpty() ? TEXT("") : TEXT(" ")) + T;
         }
       }

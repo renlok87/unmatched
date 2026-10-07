@@ -183,6 +183,29 @@ bool FS09HudPrivacyLeakTest::RunTest(const FString&) {
   return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09HudEffectTextOnceTest,
+    "Unmatched.S09.HUD effect text: a printed text shared by several parsed effects is taken once (SC-21 review)",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS09HudEffectTextOnceTest::RunTest(const FString&) {
+  // Regroup on the wire: two parsed effects (draw 1; draw 2 on a win), each with the whole printed text
+  const FString Entry = TEXT(
+      "{\"id\":\"c-1\",\"cardId\":\"regroup\",\"name\":\"Regroup\",\"cardType\":\"UNIVERSAL\",\"isVisible\":true,"
+      "\"effects\":[{\"text\":\"Draw 1 card. If you won the combat, draw 2 cards instead.\"},"
+      "{\"text\":\"Draw 1 card. If you won the combat, draw 2 cards instead.\"},{\"text\":\"Then discard 1 card.\"}]}");
+  TSharedPtr<FJsonValue> Value;
+  FString Problem;
+  if (!FS08Contracts::TryParseJsonValue(Entry, Value, Problem)) {
+    AddError(Problem);
+    return true;
+  }
+  FS09CardView Card;
+  TestTrue("card decodes", FS09HudFactory::CardFromJson(Value, Card));
+  TestEqual("three parsed effects counted", Card.EffectCount, 3);
+  TestEqual("the shared text once, a different one appended",
+            Card.EffectText, FString(TEXT("Draw 1 card. If you won the combat, draw 2 cards instead. Then discard 1 card.")));
+  return true;
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS09HudFreshnessTest,
     "Unmatched.S09.HUD counter freshness: WS bodies carry no decks, stale counts are marked",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
