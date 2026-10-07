@@ -1237,11 +1237,47 @@
       "result_path": "art/imagegen/sc14-room-hero-codex/, sc15-room-board-codex/, sc16-room-deck-codex/, sc17-room-ready-codex/, sc18-room-countdown-codex/",
       "status": "ok",
       "note": "CX-30 fix1 (единственный корректирующий прогон серии; задание SC-14-series.fix1.codex.md); 2026-10-07 13:46–14:16 +05:00 (~30 мин); строка колоды без героя — только «ПРОСМОТР КОЛОДЫ» с why.room.no.hero, «ближний бой» / «дальний бой» без разрыва, плашка отсчёта (modal) в SC-18, модаль выхода по содержимому (640×148 su на L), оверлеи с x/y/w/h su и вложенными элементами по карточкам (UUmScreenInspect, UUmConfirmDialog, CountText); sc14_room_hero.py и sc17_room_ready.py скопированы побайтно; все кадры пересобраны; генераций 0; ревью Claude: accept по делегированию всей серии (ВР-VS4-SC14-01…16, ВР-VS4-SC15-01, ВР-VS4-SC16-01, ВР-VS4-SC17-01…03, ВР-VS4-SC18-01…02)"
+    },
+    {
+      "date": "2026-10-07T21:23:14+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle 5ea220ae)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "SC-19",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": null,
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/SC-19-series.codex.md",
+      "result_path": "-",
+      "status": "failed",
+      "note": "CX-31 запуск 0 (2026-10-07 21:21 +05:00): codex.exe exec отверг аргументы (текст задания без кавычек в Start-Process разбит на слова: unexpected argument), сессии Codex нет, файлов не изменено, трат нет; перезапуск тем же заданием в 21:22"
+    },
+    {
+      "date": "2026-10-07T21:37:54+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle 5ea220ae)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "SC-19",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a1172c-bca6-7412-bd07-0b1245494c80",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/SC-19-series.codex.md",
+      "result_path": "art/imagegen/sc19-loading-codex/, sc20-loading-error-codex/",
+      "status": "ok",
+      "note": "CX-31 прогон 1 (серия SC-19, SC-20 загрузка партии в одном чате; задания SC-19.codex.md, SC-20.codex.md); 2026-10-07 21:22–21:37 +05:00 (~15 мин); 2 пакета, 32 макета в scraped-data/derived, 16 оверлеев и 16 легенд в пакетах; данные — снимок стенда S09 (startGame 6PPWSS, adminHero, adminBoard; копии входов CX-30); генераций 0; ревью Claude: accept по делегированию без корректирующего прогона (ВР-VS5-SC19-01…08, ВР-VS5-SC20-01…03); кромки HB-08 < 3:1 — известное ограничение скинов"
     }
   ],
   "totals": {
     "syntx_spent": 6.0,
     "tripo_spent": 0,
-    "codex_packages": 62
+    "codex_packages": 64
   }
 }
