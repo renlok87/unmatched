@@ -65,3 +65,5 @@ INSPECT, PAUSE — VS-4 / VS-7); маршрут Esc в игровом режим
 Листы `tools/art/visual/sheet.py` (цвет / серый Rec.709 / дейтеранопия): `sheet-NN-*.png` — вне git, `scraped-data/derived/visual-evidence/SC-01/exit-vs3/` в worktree `C:/tmp/wt-visual` (индекс с sha256 — `scraped-data/derived/visual-evidence/VS3-exit-index.json`): на них сканы, рубашки и аватары нашего клиента (ВР-48, ВР-CP12, 02 §12; ревью VS-3, ВР-VS3-R01). В этой папке — `sheet-manifest.json` с sha256 каждого листа; в git из кадров выхода — только контактные листы [VS-3/contact](../VS-3/contact/).
 
 Кадры `-S08ScreenShots` живого клиента: `UI-SCR-GAME-own / -opp / -combat / -pending / -over.png` (Marmoreal и Sarpedon, 1080p 100 %); открыт кадр `combat` — экран GAME с блоками VS-2 / VS-3, модалей в партии шага нет.
+
+**Ревью VS-3 (2026-10-07, единый проход):** основа принята, по делегированию: модаль-образец «Покинуть партию» совпадает с принятым макетом CX-22 (640×360, «ОТМЕНА» / «ДА» 168×48), откаты экранов в `ARTLOOK hudImpl`; экраны на базе — VS-4 / VS-7.
