@@ -110,7 +110,12 @@ inline const TCHAR* const SlateHudFlagName = TEXT("S08SlateHud");
 inline const TCHAR* const SlateHudKeys[] = {
     TEXT("top"),   TEXT("status"),  TEXT("banner"), TEXT("panels"), TEXT("opphand"), TEXT("hand"),  TEXT("decks"),
     TEXT("deckpanel"), TEXT("actions"), TEXT("combat"), TEXT("pending"), TEXT("slot"), TEXT("log"), TEXT("toast"),
-    TEXT("sub"),   TEXT("tag"),     TEXT("plate"),  TEXT("damage"), TEXT("cursor"), TEXT("inspect")};
+    TEXT("sub"),   TEXT("tag"),     TEXT("plate"),  TEXT("damage"), TEXT("cursor"), TEXT("inspect"),
+    // VS-3 HB-33 (ВР-VS3-50): the combat centre alone (the UMG edges stay)
+    TEXT("combatcenter"),
+    // VS-3 SC-01 (ВР-SC04): the screens of the route and the modals (each keeps its Slate look until its own step)
+    TEXT("boot"), TEXT("login"), TEXT("lobby"), TEXT("room"), TEXT("loading"), TEXT("menubg"), TEXT("pause"),
+    TEXT("reconnect"), TEXT("gameover"), TEXT("aborted")};
 /** What -S08SlateHud asked for: nothing (UMG root, every block on the new path), everything, or a block list. */
 struct UNMATCHED_API FS08SlateHudBlocks {
   bool bAll = false;

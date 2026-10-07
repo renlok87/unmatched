@@ -67,6 +67,9 @@
   # Extra client arguments for BOTH clients, '+'-separated, as run-phase2-demo -ClientExtraArgs (run C G-LIVE,
   # 2026-10-05: Marmoreal frames need -ConceptPaste until ENV-U16, AGENTS.md "Board scenes and heroes"). Gates unchanged.
   [string]$ClientExtraArgs = '',
+  # VS-3 SC-01 (ВР-SC14): -S08ScreenShots on both clients - one evidence frame per new 'SHOT widget id=UI-SCR-* state=<s>'
+  # (<UI-ID>-<state>.png in the shot directory of each client)
+  [switch]$ScreenShots,
   # AU-S5 (docs/game-design/audio/07-production-log.md §9, opt-in): each client records its whole audio output from the
   # match start to the result + 8 s into <dir>/host.wav and <dir>/joiner.wav (-S08AudioRecord) for the loudness pass
   # (tools/audio/mix_check.py). Gates unchanged.
@@ -355,6 +358,7 @@ function Invoke-CombatDemo {
   if ($ArtPreviewHeroesV2) { $common += '-ArtPreviewHeroesV2' }
   if ($ArtPreviewDiorama) { $common += '-ArtPreviewDiorama' }
   foreach ($extra in @($ClientExtraArgs -split '\+' | Where-Object { $_ })) { $common += $extra }
+  if ($ScreenShots) { $common += '-S08ScreenShots' }  # VS-3 SC-01
   $HostPlan = if ($JoinerAttack) { 'attack+defend+ownresult' } else { 'attack' }
   if ($HostScheme) { $HostPlan += '+scheme' }
   $JoinPlan = if ($JoinerAttack) { 'attack+ranged+defend+resolve' } else { 'defend+resolve' }

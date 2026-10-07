@@ -29,6 +29,13 @@ their C++ bases (UUmHudAuthoringLibrary -> BuildDefaultTree of each class), in t
   /Game/S08/UI/Hud/WBP_UI_HUD_DECKPANEL  parent UmHudDeckPanel  parts Root, Panel, Body, Title, Tabs, TabOwn, TabOpp,
                                       CloseButton, Summary, Backs, FilterButton, Rows, Skeleton (VS-3 HB-28; the rows are
                                       pooled UUmDeckRow made at run time)
+  /Game/S08/UI/Hud/WBP_UI_HUD_COMBAT_EDGE  parent UmHudCombatEdge  parts Root, Card (WBP_UmCard), Ribbon, RoleIcon,
+                                      RoleText, TimerText, TimerBar, DefendButton, NoDefenseButton (WBP_UmButton), Stamp
+                                      (+ the slot, caption, team chip, warning parts) (VS-3 HB-30 / HB-31)
+  /Game/S08/UI/Hud/WBP_UI_HUD_COMBAT   parent UmHudCombatCenter  parts Root, Panel, ScoreText, OutcomeText, EffectLines
+                                      (Line0..2), MoreText (VS-3 HB-33)
+  /Game/S08/UI/Common/WBP_UmConfirmDialog  parent UmConfirmDialog  parts Veil, Frame, Body (UUmScreenBase) + Title,
+                                      Message, Confirm, Cancel (WBP_UmButton) (VS-3 SC-01)
 
 A widget tree is not reachable from Python, so the C++ library builds it (the same function the class uses without a
 WBP) and this script re-loads every asset, checks the parent class, writes the report (env UM_HUD_WBP_REPORT, default
@@ -65,6 +72,9 @@ ASSETS = {
     "/Game/S08/UI/Common/WBP_UmSpinner": "UmSpinner",
     "/Game/S08/UI/Hud/WBP_UI_HUD_DECKS": "UmHudDecks",
     "/Game/S08/UI/Hud/WBP_UI_HUD_DECKPANEL": "UmHudDeckPanel",
+    "/Game/S08/UI/Hud/WBP_UI_HUD_COMBAT_EDGE": "UmHudCombatEdge",
+    "/Game/S08/UI/Hud/WBP_UI_HUD_COMBAT": "UmHudCombatCenter",
+    "/Game/S08/UI/Common/WBP_UmConfirmDialog": "UmConfirmDialog",
 }
 
 

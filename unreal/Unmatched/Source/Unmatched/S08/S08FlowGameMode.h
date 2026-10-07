@@ -1231,6 +1231,18 @@ private:
   void OpenUmDeckDiscard(const TCHAR* Why);
   void HandleUmDeckRowInspect(const FString& CardId);
   bool UmHudCursorOverDeckPanel(float X, float Y) const;
+  // VS-3 HB-30...HB-33: the combat edges and centre (S08/UI/UmHudCombatBlocks.h; rollback -S08SlateHud=combat |
+  // combatcenter); fed every frame (the staging's clock, the 4 Hz timer runs in the edge)
+  void BuildUmCombat();
+  void RefreshUmCombat();
+  /** The UMG edges draw the combat (the Slate edge panels stay empty). */
+  bool UmCombatOnUmg() const;
+  /** The UMG centre draws the score and the outcome (the Slate outcome box stays empty). */
+  bool UmCombatCenterOnUmg() const;
+  /** The UMG edge draws the defense window now and no gate layer asks for the Slate block (-S09Markers). */
+  bool UmCombatOwnsDefenseWindow() const;
+  /** VS-3 SC-01 (ВР-SC14): -S08ScreenShots - one evidence frame per new UI-SCR-* id + state (<UI-ID>-<state>.png). */
+  void TickUmScreenShots();
   // VS-2 exit frames (opt-in -S08ExitShots): own / opponent turn start + 0.5 s and + 3 s
   void NoteUmExitShotsTurn(bool bOwn, bool bInitial, bool bGameOver);
   /** ВР-VS2-77: the late SHOT lines of the VS-2 blocks first shown in the shot frame. */

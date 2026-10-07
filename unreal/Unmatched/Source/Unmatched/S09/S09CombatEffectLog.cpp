@@ -122,6 +122,7 @@ TArray<FS09CombatEffectLine> S09CombatEffectLog::Lines(const FS09LastCombat& Log
     Line.bAttackerSide = Entry.Side != TEXT("DEFENDER");
     Line.CardName = Entry.CardName;
     Line.Text = EntryText(Entry);
+    Line.bPrintedText = !Entry.Text.IsEmpty();
     Line.Outcome = Entry.Outcome;
     LineOfEntry.Add(Entry.I, Out.Num());
     Out.Add(MoveTemp(Line));

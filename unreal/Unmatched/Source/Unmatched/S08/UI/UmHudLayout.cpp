@@ -123,10 +123,12 @@ FUmHudLayout FUmHudLayout::Compute(const FVector2D& InCanvasSu, float InPxPerSu,
     Set(EUmHudBlock::Center, UmLayoutBox(0.5f * (W - CenterW), 80.0f, CenterW, CenterH));
     Set(EUmHudBlock::Banner, UmLayoutBox(0.5f * (W - 420.0f), 144.0f, 420.0f, 64.0f));
     Set(EUmHudBlock::SourceSlot, UmLayoutBox(M, 84.0f, 190.0f, 264.0f));
-    // the card 230x319 and its role ribbon 230x28 under it (y 683)
-    Set(EUmHudBlock::CombatL, UmLayoutBox(M, 360.0f, 230.0f, 351.0f));
+    // the card 230x319 and its role ribbon 230x28 under it (y 683); VS-3 HB-30 / HB-31 (HB-29 delta 04, ВР-VS2-HB29-11):
+    // the own ribbon grows to 56 su with the timer row; the defender's buttons 230 x 48, one per row, x 32 - under the
+    // ribbon at 1080p (y 747 / 803), at the top left on the short canvas (y 112 / 168: PANEL-LOC starts at y 800 there)
+    Set(EUmHudBlock::CombatL, UmLayoutBox(M, 360.0f, 230.0f, 379.0f));
     Set(EUmHudBlock::CombatR, UmLayoutBox(W - M - 230.0f, 360.0f, 230.0f, 351.0f));
-    Set(EUmHudBlock::Defend, UmLayoutBox(M, 719.0f, 230.0f, 48.0f));
+    Set(EUmHudBlock::Defend, UmLayoutBox(32.0f, L.bTall ? 747.0f : 112.0f, 230.0f, 104.0f));
     const FBox2D PanelLoc = UmLayoutBox(M, H - M - 136.0f, 340.0f, 136.0f);
     Set(EUmHudBlock::PanelLoc, PanelLoc);
     Set(EUmHudBlock::PanelOpp, UmLayoutBox(W - M - 340.0f, M, 340.0f, 136.0f));
@@ -156,9 +158,11 @@ FUmHudLayout FUmHudLayout::Compute(const FVector2D& InCanvasSu, float InPxPerSu,
     // at y 112 / 144 it covers the top row of cells (FIELD starts at ~153 su at 720p 150 %, ~172 su at 1080p 150 %)
     Set(EUmHudBlock::Banner, UmLayoutBox(0.5f * (W - 420.0f), M + 48.0f + GapSu, 420.0f, 64.0f));
     Set(EUmHudBlock::SourceSlot, UmLayoutBox(M, 64.0f, 120.0f, 166.0f));
-    Set(EUmHudBlock::CombatL, UmLayoutBox(M, 240.0f, 150.0f, 232.0f));
-    Set(EUmHudBlock::CombatR, UmLayoutBox(W - M - 150.0f, 240.0f, 150.0f, 232.0f));
-    Set(EUmHudBlock::Defend, UmLayoutBox(M, 480.0f, 150.0f, 88.0f));  // two 40 su buttons, one per row
+    // VS-3 HB-30 / HB-31 (HB-29 delta 04): the ribbons wrap the role to two rows (40 su), the own one + the timer row
+    // (68 su); the defender's buttons 150 x 40 at the top left, one per row (y 112 / 160)
+    Set(EUmHudBlock::CombatL, UmLayoutBox(M, 240.0f, 150.0f, 280.0f));
+    Set(EUmHudBlock::CombatR, UmLayoutBox(W - M - 150.0f, 240.0f, 150.0f, 252.0f));
+    Set(EUmHudBlock::Defend, UmLayoutBox(32.0f, 112.0f, 150.0f, 88.0f));  // two 40 su buttons, one per row
     const FBox2D PanelLoc = UmLayoutBox(M, H - M - 96.0f, 240.0f, 96.0f);
     Set(EUmHudBlock::PanelLoc, PanelLoc);
     Set(EUmHudBlock::PanelOpp, UmLayoutBox(W - M - 240.0f, M, 240.0f, 96.0f));

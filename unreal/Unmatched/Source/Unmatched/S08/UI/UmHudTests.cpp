@@ -254,8 +254,10 @@ bool FUmHudRootLayoutTest::RunTest(const FString&) {
     RectIs(*this, L, EUmHudBlock::Status, 520, 24, 880, 48, W);
     RectIs(*this, L, EUmHudBlock::Banner, 750, 144, 420, 64, W);
     RectIs(*this, L, EUmHudBlock::SourceSlot, 24, 84, 190, 264, W);
-    RectIs(*this, L, EUmHudBlock::CombatL, 24, 360, 230, 351, W);
+    // VS-3 HB-30 / HB-31 (HB-29 delta 04): the own ribbon with the timer row (56 su), the buttons under it at x 32
+    RectIs(*this, L, EUmHudBlock::CombatL, 24, 360, 230, 379, W);
     RectIs(*this, L, EUmHudBlock::CombatR, 1666, 360, 230, 351, W);
+    RectIs(*this, L, EUmHudBlock::Defend, 32, 747, 230, 104, W);
     RectIs(*this, L, EUmHudBlock::Log, 24, 712, 300, 200, W);
     RectIs(*this, L, EUmHudBlock::PanelLoc, 24, 920, 340, 136, W);
     RectIs(*this, L, EUmHudBlock::PanelOpp, 1556, 24, 340, 136, W);
@@ -280,6 +282,7 @@ bool FUmHudRootLayoutTest::RunTest(const FString&) {
     TestFalse(TEXT("720p: the 720p column (not tall)"), L.bTall);
     RectIs(*this, L, EUmHudBlock::Status, 0.5f * (1706.667f - 720.0f), 24, 720, 48, W);
     RectIs(*this, L, EUmHudBlock::CombatR, 1452.67f, 360, 230, 351, W);
+    RectIs(*this, L, EUmHudBlock::Defend, 32, 112, 230, 104, W);  // HB-29: at the top left (PANEL-LOC from y 800)
     RectIs(*this, L, EUmHudBlock::Log, 24, 688, 300, 104, W);
     RectIs(*this, L, EUmHudBlock::PanelLoc, 24, 800, 340, 136, W);
     RectIs(*this, L, EUmHudBlock::PanelOpp, 1342.67f, 24, 340, 136, W);
@@ -295,8 +298,9 @@ bool FUmHudRootLayoutTest::RunTest(const FString&) {
     RectIs(*this, L, EUmHudBlock::PanelLoc, 16, 608, 240, 96, W);
     RectIs(*this, L, EUmHudBlock::PanelOpp, 1024, 16, 240, 96, W);
     RectIs(*this, L, EUmHudBlock::SourceSlot, 16, 64, 120, 166, W);
-    RectIs(*this, L, EUmHudBlock::CombatL, 16, 240, 150, 232, W);
-    RectIs(*this, L, EUmHudBlock::CombatR, 1114, 240, 150, 232, W);
+    RectIs(*this, L, EUmHudBlock::CombatL, 16, 240, 150, 280, W);  // HB-29: ribbon 40 + the timer row 28
+    RectIs(*this, L, EUmHudBlock::CombatR, 1114, 240, 150, 252, W);
+    RectIs(*this, L, EUmHudBlock::Defend, 32, 112, 150, 88, W);
     RectIs(*this, L, EUmHudBlock::Decks, 1128, 600, 136, 48, W);
     RectIs(*this, L, EUmHudBlock::Actions, 1048, 656, 216, 48, W);
     RectIs(*this, L, EUmHudBlock::DeckPanel, 964, 120, 300, 472, W);  // HB-26: PANEL-OPP bottom + 8
@@ -415,7 +419,8 @@ bool FUmHudRootFlagTest::RunTest(const FString&) {
   TestTrue(TEXT("world layer and screen keys known, one unknown kept"),
            World.Unknown.Num() == 1 && World.Unknown[0] == FName(TEXT("mystery")) && World.IsSlate(TEXT("mystery")));
   TestFalse(TEXT("-S08SlateHudX is another flag"), ParseSlateHud(TEXT("-S08SlateHudX")).bAll);
-  TestEqual(TEXT("20 known keys (04 §4.2 + screens)"), static_cast<int32>(UE_ARRAY_COUNT(SlateHudKeys)), 20);
+  // VS-3: + combatcenter (ВР-VS3-50) and the SC-01 screen keys boot ... aborted (ВР-SC04)
+  TestEqual(TEXT("31 known keys (04 §4.2 + combatcenter + the screens of ВР-SC04)"), static_cast<int32>(UE_ARRAY_COUNT(SlateHudKeys)), 31);
   SetSlateHudOverrideForTest(TEXT("hand,toast"));
   TestTrue(TEXT("override: ARTLOOK hudImpl=slate:hand,toast"), TraceLine().Contains(TEXT(" hudImpl=slate:hand,toast")));
   SetSlateHudOverrideForTest(TEXT("*"));

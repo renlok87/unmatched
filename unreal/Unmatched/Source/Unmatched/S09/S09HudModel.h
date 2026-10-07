@@ -36,6 +36,8 @@ struct UNMATCHED_API FS09CardView {
   // DE-018 (01 F-01): number of entries of the card's `effects` array - with Text the "has effect text" test of the
   // combat read hold (combat.readHoldMs 1000 only when a revealed card carries an effect).
   int32 EffectCount = 0;
+  // VS-3 HB-33: the printed text of the card's effects (effects[].text joined) - the centre's line of a cancelled card
+  FString EffectText;
   bool bHidden = false;  // server placeholder: no face anywhere (count only)
   bool bNew = false;     // drawn since the previous own-hand set (ACC-006)
   bool bVisible = false; // isVisible flag as delivered (own hand: false)

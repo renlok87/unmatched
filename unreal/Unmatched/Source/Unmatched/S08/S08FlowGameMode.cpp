@@ -1314,6 +1314,7 @@ void AS08FlowGameMode::StartCombatStage(const FS08Snapshot& Closing, const FS08S
                                               Combat.TargetFighterId);
   if (bOwnLog) In.Effects = S09CombatEffectLog::Lines(Log);
   In.EffectLines = In.Effects.Num();
+  In.bAttackCardCancelled = bOwnLog && Log.bAttackerCardCancelled;  // VS-3 HB-33: the centre's X line
   FS08Trace::Write(S09CombatEffectLog::TraceLine(Closing.SequenceNumber, bHasLog ? &Log : nullptr,
                                                  bOwnLog ? TEXT("log") : bHasLog ? TEXT("other") : TEXT("none"),
                                                  In.EffectLines));
@@ -1569,6 +1570,8 @@ void AS08FlowGameMode::BuildCombatStageHud() {
   CombatEdgeLeft->ClearChildren();
   CombatEdgeRight->ClearChildren();
   CombatOutcomeBox->ClearChildren();
+  RefreshUmCombat();  // VS-3 HB-30...HB-33: the UMG edges and centre (rollback -S08SlateHud=combat | combatcenter)
+  if (UmCombatOnUmg() && UmCombatCenterOnUmg()) return;
   const int64 Now = NowMs();
   if (!Hud.bValid || IsResultScreenShown() || !CombatStage.ShowsCards(Now)) return;
   const FS09CombatStageInput& In = CombatStage.GetInput();
@@ -1710,6 +1713,10 @@ void AS08FlowGameMode::BuildCombatStageHud() {
   };
   AddEffectLines(CombatEdgeLeft, true, AttackAccent);
   AddEffectLines(CombatEdgeRight, false, DefenseAccent);
+  if (UmCombatOnUmg()) {  // VS-3: -S08SlateHud=combatcenter keeps only the Slate outcome box
+    CombatEdgeLeft->ClearChildren();
+    CombatEdgeRight->ClearChildren();
+  }
   if (!CombatStage.ShowsOutcome(Now)) return;
   // F-01: the slam "A vs D" and the outcome label from the slam to the end of CUE-011 (~1.5 s).
   const FString Score = FString::Printf(TEXT("%s  vs  %s"),
@@ -6319,7 +6326,8 @@ void AS08FlowGameMode::RefreshHud() {
   // and a later draft (e.g. the next turn's attack draft) owns the marker frame.
   if (LastCombatResult.bValid && LastCombatResult.ShownAt >= 0.0f &&
       Elapsed - LastCombatResult.ShownAt < 20.0f &&
-      CommandUi.Mode == ES09CommandMode::None) {
+      CommandUi.Mode == ES09CommandMode::None &&
+      (S08ArtLook::S08Markers() || !UmCombatCenterOnUmg())) {  // VS-3 HB-33: the UMG centre says it (VS-2 open item 9)
     AddMarker(GS09ResultMarker);
     AddHeader(TEXT("COMBAT RESULT"), FLinearColor(0.25f, 1.0f, 0.5f, 1.0f));
     AddBigLine(LastCombatResult.OutcomeLine, FLinearColor(1.0f, 1.0f, 1.0f, 1.0f));
@@ -6529,7 +6537,7 @@ void AS08FlowGameMode::RefreshHud() {
                   FMargin(14, 8), FLinearColor::White,
                   SNew(STextBlock).Text(FText::FromString(TEXT("CANCEL (G/Esc)")))
                        .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14)))]];
-  } else if (CommandUi.Mode == ES09CommandMode::CombatDefense) {
+  } else if (CommandUi.Mode == ES09CommandMode::CombatDefense && !UmCombatOwnsDefenseWindow()) {  // VS-3 HB-30
     const double Left = CommandUi.Combat.bHasTimeoutAt
                             ? CommandUi.Combat.SecondsUntilDeadline() : -1.0;
     AddMarker(GS09DefenseMarker);

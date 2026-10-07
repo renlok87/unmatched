@@ -201,3 +201,26 @@ def test_check_trace_panels_hb18_21(tmp_path):
     log = tmp_path / "Unmatched.log"
     log.write_text("\n".join(ok) + "\n", encoding="utf-8")
     assert hc.main(["check-trace", str(log)]) == 0
+
+
+def test_check_trace_combat_privacy_hb30():
+    """VS-3 HB-30 / HB-33: the combat edges and the centre pass check-trace with the states of 04 §7.1; the opponent's
+    card face (fighter=opp face=1) only in state=reveal."""
+    spec04 = hc.SPEC04.read_text(encoding="utf-8")
+    ids = hc.ui_ids_from_02(SPEC02) | hc.ui_ids_from_02(spec04)
+    states = hc.ui_states_from_04(spec04)
+    edge = ("SHOT widget id=UI-HUD-COMBAT-EDGE impl=umg state=%s fighter=%s bbox=(1666,360,1896,711) geom=painted visible=1 "
+            "twin=0 source=x role=defense face=%s class=L card=230x319 ribbon=230x28 rows=1 timer=- timerState=off buttons=0 "
+            "defend=- stamp=0 leave=0 seq=10")
+    centre = ("SHOT widget id=UI-HUD-COMBAT impl=umg state=%s fighter=none bbox=(680,80,1240,232) geom=painted visible=1 "
+              "twin=0 source=x class=L h=152 lines=2 shown=2 more=0 cancelled=1 current=-1 ellipsis=0 score=3:2 outcome=wins seq=10")
+    ok = [edge % ("back", "opp", "0"), edge % ("chosen", "opp", "0"), edge % ("reveal", "opp", "1"),
+          edge % ("back", "own", "1"), edge % ("shield", "own", "0"), edge % ("nodefense", "opp", "0")]
+    ok += [centre % s for s in ("wait", "effects", "slam", "hit")]
+    ok += [centre.replace("visible=1", "visible=0") % "read"]
+    assert hc.check_widget_trace(ok, ids, states=states) == ([], 11)
+    bad = [edge % ("chosen", "opp", "1"), edge % ("back", "opp", "1")]
+    errors, _ = hc.check_widget_trace(bad, ids, states=states)
+    assert len([e for e in errors if "приватность" in e]) == 2
+    errors, _ = hc.check_widget_trace([edge % ("leave", "own", "0"), centre % "outcome"], ids, states=states)
+    assert len([e for e in errors if "04 §7.1" in e]) == 2

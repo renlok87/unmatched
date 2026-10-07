@@ -5,7 +5,10 @@
 #include "UmButton.h"
 #include "UmCardWidget.h"
 #include "UmConnectionBadge.h"
+#include "UmConfirmDialog.h"
 #include "UmHudBanner.h"
+#include "UmHudCombatCenter.h"
+#include "UmHudCombatEdge.h"
 #include "UmHudDeckPanel.h"
 #include "UmHudDecks.h"
 #include "UmHudHand.h"
@@ -82,6 +85,14 @@ FString UUmHudAuthoringLibrary::AuthorUmHudWidgetBlueprints(bool bOverwrite) {
       [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmHudDecks::BuildDefaultTree(Tree, Attach, Error); });
   One(UUmHudDeckPanel::WidgetBlueprintPath, UUmHudDeckPanel::StaticClass(),
       [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmHudDeckPanel::BuildDefaultTree(Tree, Attach, Error); });
+  // VS-3 HB-30...HB-33: the combat edge (nests WBP_UmCard and WBP_UmButton) and the combat centre
+  One(UUmHudCombatEdge::WidgetBlueprintPath, UUmHudCombatEdge::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmHudCombatEdge::BuildDefaultTree(Tree, Attach, Error); });
+  One(UUmHudCombatCenter::WidgetBlueprintPath, UUmHudCombatCenter::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmHudCombatCenter::BuildDefaultTree(Tree, Attach, Error); });
+  // VS-3 SC-01: the confirm dialog (nests WBP_UmButton); UUmScreenBase / UUmModalBase are abstract, without a WBP
+  One(UUmConfirmDialog::WidgetBlueprintPath, UUmConfirmDialog::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmConfirmDialog::BuildDefaultTree(Tree, Attach, Error); });
   Report->SetArrayField(TEXT("assets"), Assets);
   FString Out;
   const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&Out);

@@ -50,6 +50,7 @@ const FRow GRows[] = {
     {TEXT("why.scheme.none"), TEXT("Pick a scheme card first")},
     {TEXT("why.choice.required"), TEXT("This choice is mandatory")},
     {TEXT("why.deadline.passed"), TEXT("Time is up — the server resolves")},
+    {TEXT("why.defense.pick"), TEXT("Pick a defense card in your hand")},  // VS-3 HB-30 (ВР-VS3-51)
     // VS-1 HB-05: the screen reasons of visual/04-hud-spec.md §6.1
     {TEXT("why.login.fields"), TEXT("Enter your email and password")},
     {TEXT("why.code.length"), TEXT("Enter 6 characters")},

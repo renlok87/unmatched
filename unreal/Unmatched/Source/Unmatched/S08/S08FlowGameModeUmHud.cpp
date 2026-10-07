@@ -52,6 +52,12 @@
 //     the 300 ms skeleton). The chips open the panel (deck: «Ваша»; discard and D: «Только сброс» - the Slate discard
 //     browser merged into it); the panel's tabs switch the side, its rows open the inspector (the Slate one until H13,
 //     moved left of the panel while it is open, ВР-VS3-41).
+//   - VS-3 HB-30...HB-33 (S08/UI/UmHudCombatBlocks.h, UmHudCombatEdge.h, UmHudCombatCenter.h): the combat edges (own
+//     left, opponent right, ВР-H04) and the centre - built with the root (rollback -S08SlateHud=combat | combatcenter),
+//     fed by RefreshUmCombat every frame and on RefreshHud (combatInfo, the discard piles, the defender's draft, the
+//     staging); the defense window's deadline is anchored on the snapshot's server time (metadata.lastActionAt, HB-31).
+//     While the UMG edge draws the defense window the Slate command panel gives up that block (not under -S09Markers);
+//     the banner moves under a shown combat centre (ВР-VS3-56).
 #include "S08FlowGameMode.h"
 
 #include "S08AnimatedIconWidget.h"
@@ -62,21 +68,27 @@
 #include "S08TurnPortraitWidget.h"
 #include "UI/UmCardGallery.h"
 #include "UI/UmCardMedia.h"
+#include "UI/UmCombatGallery.h"
 #include "UI/UmCursor.h"
 #include "UI/UmDecksGallery.h"
 #include "UI/UmGameHud.h"
 #include "UI/UmHandGallery.h"
 #include "UI/UmHudGallery.h"
+#include "UI/UmHudBanner.h"
+#include "UI/UmHudCombatBlocks.h"
+#include "UI/UmScreenBase.h"
 #include "UI/UmHudDeckBlocks.h"
 #include "UI/UmHudHand.h"
 #include "UI/UmHudLayout.h"
 #include "UI/UmHudPanels.h"
 #include "UI/UmHudRoot.h"
 #include "UI/UmHudScale.h"
+#include "UI/UmHudStatusLine.h"
 #include "UI/UmHudTheme.h"
 #include "UI/UmHudTop.h"
 #include "UI/UmTopStrip.h"
 #include "Brushes/SlateRoundedBoxBrush.h"
+#include "Dom/JsonObject.h"
 #include "Engine/Engine.h"
 #include "Engine/GameViewportClient.h"
 #include "Engine/World.h"
@@ -140,6 +152,15 @@ struct FUmHudRuntime {
   // VS-3 HB-27 / HB-28: DECKS and the deck panel (UI/UmHudDeckBlocks.h), the side panel's shift left of the panel
   FUmDeckBlocks DeckBlocks;
   float SideShiftSu = 0.0f;
+  // VS-3 HB-30...HB-33: the combat blocks; the defense window deadline anchored on the snapshot's server time (HB-31)
+  FUmCombatBlocks Combat;
+  FString TimerKey;
+  // VS-3 SC-01: -S08ScreenShots (-1 not read yet / 0 off / 1 on) and the UI-SCR-* id-state keys already framed
+  int32 ScreenShots = -1;
+  TSet<FString> ScreenShotKeys;
+  double TimerDeadlineSec = 0.0;
+  float TimerWindowSec = 30.0f;
+  float BannerShiftSu = 0.0f;
 };
 
 namespace {
@@ -205,6 +226,7 @@ void AS08FlowGameMode::BuildUmHud() {
   BuildUmPanels();    // VS-2 HB-18...HB-21
   BuildUmHand();      // VS-3 HB-24 / HB-25
   BuildUmDecks();     // VS-3 HB-27 / HB-28
+  BuildUmCombat();    // VS-3 HB-30...HB-33
   RefreshUmHudLayout();
 }
 
@@ -370,6 +392,12 @@ void AS08FlowGameMode::UmHudDeckPanelLayering(float DeckAlpha) {
   }
   // deckpanel: what lies under the open deck panel at the right edge fades out with it (the side counters already
   // do): the right combat edge - a read-only panel never shows a block through it or under its short bottom edge
+  if (UmHud.IsValid() && !UmHudBlockOnSlate(TEXT("deckpanel"))) {
+    // VS-3 HB-30: the UMG right edge fades under the open deck panel the same way
+    if (UUmHudCombatEdge* Edge = UmHud->Combat.GetEdge(EUmEdgeSide::Opp)) {
+      if (!FMath::IsNearlyEqual(Edge->GetRenderOpacity(), 1.0f - DeckAlpha, 1.0e-3f)) Edge->SetRenderOpacity(1.0f - DeckAlpha);
+    }
+  }
   if (!CombatEdgeRight.IsValid() || UmHudBlockOnSlate(TEXT("deckpanel"))) return;
   CombatEdgeRight->SetRenderOpacity(1.0f - DeckAlpha);
   const EVisibility Want = DeckAlpha > 0.0f ? EVisibility::HitTestInvisible : EVisibility::Visible;
@@ -433,6 +461,7 @@ void AS08FlowGameMode::TickUmExitShots() {
 
 void AS08FlowGameMode::TickUmHud() {
   TickUmExitShots();  // VS-2 exit frames (-S08ExitShots)
+  TickUmScreenShots();  // VS-3 SC-01 (-S08ScreenShots)
   // VS-2 HB-12: Hand over an own figure or a lit cell (picked when the pointer moved), the busy loop while in flight
   if (UmHud.IsValid() && UmHudRoot && UmHudRoot->HasCursors()) {
     APlayerController* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
@@ -451,6 +480,7 @@ void AS08FlowGameMode::TickUmHud() {
   if (!UmHud.IsValid() || !UmHud->bLayout || !UmHud->Blocks.UmgRoot()) return;
   TickUmTopStrip();  // VS-2 HB-14...HB-16
   TickUmPanels();    // VS-2 HB-18...HB-21
+  RefreshUmCombat();  // VS-3 HB-30...HB-33: the staging's clock moves the edges and the centre
   FUmHudRuntime& R = *UmHud;
   // ВР-VS2-73: the Slate command panel (top left until ACTIONS / CENTER, VS-4) starts 8 su under TOP while TOP is shown
   if (const TSharedPtr<SWidget> Cmd = ArtHud.CommandPanel.Pin()) {
@@ -582,6 +612,12 @@ void AS08FlowGameMode::WriteUmHudShotLines() {
     TArray<FString> DeckLines;
     R.DeckBlocks.CollectShotLines(DeckLines);
     for (const FString& L : DeckLines) FS08Trace::Write(L);
+  }
+  // VS-3 HB-30...HB-33: UI-HUD-COMBAT-EDGE (own, opp) and UI-HUD-COMBAT (no card name, no text)
+  {
+    TArray<FString> CombatLines;
+    R.Combat.CollectShotLines(CombatLines);
+    for (const FString& L : CombatLines) FS08Trace::Write(L);
   }
   TArray<FString> PanelLines;  // VS-2 HB-18...HB-21: UI-HUD-PANEL-LOC, UI-HUD-PANEL-OPP, UI-HUD-OPP-HAND
   R.Panels.CollectShotLines(PanelLines, [this](UWidget* W) {
@@ -729,14 +765,18 @@ void AS08FlowGameMode::UmGalleryBegin(int32 SizePx) {
   const bool bHand = FParse::Value(Cmd, TEXT("S08IconGalleryHand="), HandBoard);
   FString DecksBoard;  // VS-3 HB-27 / HB-28 / HB-47 (UI/UmDecksGallery.h): -S08IconGalleryDecks=marmoreal|sarpedon
   const bool bDecks = FParse::Value(Cmd, TEXT("S08IconGalleryDecks="), DecksBoard);
-  if (!bSkins && !bButtons && !bTopStrip && !bPanels && !bCards && !bHand && !bDecks) return;
+  // VS-3 HB-30...HB-33 / SC-01 (UI/UmCombatGallery.h): -S08IconGalleryCombat=<board>, -S08IconGalleryConfirm=<board>
+  FString CombatBoard;
+  const bool bConfirm = FParse::Value(Cmd, TEXT("S08IconGalleryConfirm="), CombatBoard);
+  const bool bCombat = bConfirm || FParse::Value(Cmd, TEXT("S08IconGalleryCombat="), CombatBoard);
+  if (!bSkins && !bButtons && !bTopStrip && !bPanels && !bCards && !bHand && !bDecks && !bCombat) return;
   if (IconGallery) IconGallery->SetVisibility(ESlateVisibility::Collapsed);  // the sheet takes the screen
   // the canvas of the sheet: the applied HUD scale (BeginPlay may run before the first window apply - the sheet is
   // built again on every OnUiScaleChanged, which also covers a window or UI-scale change)
   const int32 PageIndex = FMath::Max(0, Page - 1);
   TWeakObjectPtr<AS08FlowGameMode> WeakThis(this);
   auto Build = [WeakThis, bSkins, bTopStrip, bPanels, PanelsPage, PageIndex, Variant, SizePx, bCards, CardsPage, bHand,
-                HandBoard, bDecks, DecksBoard]() {
+                HandBoard, bDecks, DecksBoard, bCombat, bConfirm, CombatBoard]() {
     AS08FlowGameMode* Self = WeakThis.Get();
     if (!Self || !Self->GetWorld()) return;
     FVector2D Viewport(1920.0, 1080.0);
@@ -744,6 +784,14 @@ void AS08FlowGameMode::UmGalleryBegin(int32 SizePx) {
     const FUmHudScaleState& Scale = UmHudScale::Current();
     const float PxPerSu = Scale.Window.X > 0 ? Scale.PxPerSu() : 1.0f;
     if (Self->UmGallery) Self->UmGallery->RemoveFromParent();
+    if (bCombat) {
+      UUmCombatGalleryWidget* Sheet = CreateWidget<UUmCombatGalleryWidget>(Self->GetWorld(), UUmCombatGalleryWidget::StaticClass());
+      if (!Sheet) return;
+      for (const FString& Line : Sheet->Build(CombatBoard, Viewport / PxPerSu, PxPerSu, bConfirm)) FS08Trace::Write(Line);
+      Sheet->AddToViewport(1001);
+      Self->UmGallery = Sheet;
+      return;
+    }
     if (bDecks) {
       UUmDecksGalleryWidget* Sheet = CreateWidget<UUmDecksGalleryWidget>(Self->GetWorld(), UUmDecksGalleryWidget::StaticClass());
       if (!Sheet) return;
@@ -815,6 +863,10 @@ void AS08FlowGameMode::UmGalleryAt(float TMs) {
   // VS-3 HB-27 / HB-28 / HB-47: the deck sheet - one state per second of the gallery clock
   if (UUmDecksGalleryWidget* DecksSheet = Cast<UUmDecksGalleryWidget>(UmGallery)) {
     for (const FString& Line : DecksSheet->SetClockMs(TMs)) FS08Trace::Write(Line);
+  }
+  // VS-3 HB-30...HB-33 / SC-01: the combat states (one per second) or the confirm modal
+  if (UUmCombatGalleryWidget* CombatSheet = Cast<UUmCombatGalleryWidget>(UmGallery)) {
+    for (const FString& Line : CombatSheet->SetClockMs(TMs)) FS08Trace::Write(Line);
   }
 }
 
@@ -1092,4 +1144,194 @@ bool AS08FlowGameMode::UmHudCursorOverDeckPanel(float X, float Y) const {
   const UUmHudDeckPanel* Panel = UmHud.IsValid() && UmHud->bLayout ? UmHud->DeckBlocks.GetPanel() : nullptr;
   const float Px = Panel && UmHud->Layout.PxPerSu > 0.0f ? UmHud->Layout.PxPerSu : 1.0f;
   return Panel && Panel->ContainsSu(FVector2D(X / Px, Y / Px));
+}
+
+// ------------------------------------------------------------------------------------------------ VS-3 HB-30...HB-33
+
+namespace {
+/** The committed card of a combat by its instance id in the viewer's projection (a hidden placeholder stays hidden). */
+FS09CardView UmCombatCard(const FS09HudModel& InHud, const FString& InstanceId) {
+  FS09CardView Out;
+  Out.bHidden = true;
+  if (InstanceId.IsEmpty()) return Out;
+  for (const FS09PlayerPanel* Panel : {InHud.ViewerPanel(), InHud.OpponentPanel()}) {
+    if (!Panel) continue;
+    for (const FS09CardView& Card : Panel->Discard) {
+      if (Card.InstanceId == InstanceId) return Card;
+    }
+  }
+  return Out;
+}
+}  // namespace
+
+void AS08FlowGameMode::BuildUmCombat() {
+  UUmGameHud* Game = UmHudRoot ? UmHudRoot->GetGameHud() : nullptr;
+  if (!UmHud.IsValid() || !Game) return;
+  TWeakObjectPtr<AS08FlowGameMode> WeakThis(this);
+  FUmCombatBlocks::FCallbacks C;
+  // «Защититься» = Enter, «Без защиты» = N: the same commands (the answer in the frame of the release, UI-INP-011)
+  C.OnDefend = [WeakThis](const FS09HudPressOutcome& O) {
+    if (AS08FlowGameMode* Self = WeakThis.Get()) {
+      Self->HandleHudPressOutcome(O, TFunction<FS09Reason()>(), [WeakThis]() {
+        if (AS08FlowGameMode* S = WeakThis.Get()) S->ConfirmCombat();
+      });
+    }
+  };
+  C.OnNoDefense = [WeakThis](const FS09HudPressOutcome& O) {
+    if (AS08FlowGameMode* Self = WeakThis.Get()) {
+      Self->HandleHudPressOutcome(O, TFunction<FS09Reason()>(), [WeakThis]() {
+        if (AS08FlowGameMode* S = WeakThis.Get()) S->NoDefenseCommand();
+      });
+    }
+  };
+  // 04 §2.7: the right button on a combat card opens the inspector (the Slate one until H13)
+  C.OnInspect = [WeakThis](const FS09CardView& Card) {
+    AS08FlowGameMode* Self = WeakThis.Get();
+    if (!Self) return;
+    Self->InspectCard(Card);
+    Self->InspectedHandIndex = -1;
+    Self->DiscardBrowserIndex = -1;
+    Self->RefreshHud();
+  };
+  ArtHud.PendingTrace.Append(UmHud->Combat.Build(*Game, UmHud->Blocks, HudPress, MoveTemp(C)));
+}
+
+bool AS08FlowGameMode::UmCombatOnUmg() const { return UmHud.IsValid() && UmHud->Combat.EdgesOnUmg(); }
+
+bool AS08FlowGameMode::UmCombatCenterOnUmg() const { return UmHud.IsValid() && UmHud->Combat.CenterOnUmg(); }
+
+bool AS08FlowGameMode::UmCombatOwnsDefenseWindow() const {
+  return UmCombatOnUmg() && UmHud->Combat.DrawsDefenseWindow() && !S08ArtLook::S08Markers();
+}
+
+void AS08FlowGameMode::RefreshUmCombat() {
+  if (!UmHud.IsValid() || !UmHud->bLayout || !UmCombatOnUmg()) return;
+  FUmHudRuntime& R = *UmHud;
+  FUmCombatInput In;
+  In.Layout = &R.Layout;
+  const bool bAborted = Flow.IsValid() && Flow->GetStage() == ES08Stage::Started && Flow->IsRoomAborted();
+  In.bLive = Hud.bValid && !Hud.bGameOver && !bAborted && !IsResultScreenShown();
+  In.ViewerId = ViewerIdNow();
+  In.bRu = UmCardMedia::PreferredLang() != TEXT("en");
+  In.NowMs = NowMs();
+  In.NowSec = FPlatformTime::Seconds();
+  In.SpeedMul = CombatSpeedMul();
+  In.Stage = &CombatStage;
+  const FS08CombatInfo& Combat = CommandUi.Combat;
+  In.bResolvePhase = Hud.Phase == TEXT("COMBAT_RESOLVE");
+  In.bOpen = Combat.bPresent && (Hud.Phase == TEXT("COMBAT") || In.bResolvePhase);
+  In.AppliedSeq = Hud.SequenceNumber;
+  In.Combat = Combat;
+  // the fighters of the combat shown: the staging's while it runs, else combatInfo's
+  const bool bStaged = CombatStage.IsActive();
+  const FString AttackerId = bStaged ? CombatStage.GetInput().AttackerId : Combat.AttackerId;
+  const FString TargetId = bStaged ? CombatStage.GetInput().TargetId : Combat.TargetFighterId;
+  auto Fighter = [this](const FString& Id, const FString& Fallback) {
+    FUmCombatFighter Out;
+    Out.Id = Id;
+    Out.Name = Fallback;
+    const FS08BoardFighter* F = Fighters.FindByPredicate([&Id](const FS08BoardFighter& X) { return X.Id == Id; });
+    if (!F) return Out;
+    Out.Name = F->Label;
+    Out.OwnerId = F->OwnerId;
+    Out.TeamSlot = BoardActor && BoardActor->TeamOfFighter(*F) == ES08TeamSlot::P2 ? 1 : 0;
+    Out.DeckSlug = UmDeckHeroSlug(Fighters, F->OwnerId);
+    return Out;
+  };
+  In.Attacker = Fighter(AttackerId, bStaged ? CombatStage.GetInput().AttackerLabel : FString());
+  In.Target = Fighter(TargetId, bStaged ? CombatStage.GetInput().TargetLabel : FString());
+  if (In.bOpen) {
+    In.AttackCard = UmCombatCard(Hud, Combat.bHasAttackerCard ? Combat.AttackerCardId : FString());
+    In.DefenseCard = UmCombatCard(Hud, Combat.bHasDefenderCard ? Combat.DefenderCardId : FString());
+  }
+  // the own defender in the defense window: the draft, the reasons and the server-anchored deadline (HB-31)
+  if (In.bOpen && !In.bResolvePhase && CommandUi.Mode == ES09CommandMode::CombatDefense) {
+    In.DraftDefenseId = CommandUi.DefenseCardId;
+    In.bHasLegalDefense = !Flow.IsValid() || CommandUi.HasLegalDefenseCard(Flow->GetAppliedSnapshot(), Fighters);
+    In.BusyWhy = HudBusyReason();
+    if (Combat.bHasTimeoutAt) {
+      const FString Key = FString::Printf(TEXT("%lld"), Combat.TimeoutAt.GetTicks());
+      if (Key != R.TimerKey) {
+        // the snapshot's server time (metadata.lastActionAt); the local clock only when the server sent none
+        R.TimerKey = Key;
+        FDateTime ServerAt;
+        FString At;
+        const TSharedPtr<FJsonObject> Meta = Flow.IsValid() && Flow->GetAppliedSnapshot().Metadata.IsValid()
+                                                 ? Flow->GetAppliedSnapshot().Metadata->AsObject()
+                                                 : nullptr;
+        const bool bServer = Meta.IsValid() && Meta->TryGetStringField(TEXT("lastActionAt"), At) && FDateTime::ParseIso8601(*At, ServerAt);
+        R.TimerWindowSec = Combat.bHasStartedAt ? static_cast<float>((Combat.TimeoutAt - Combat.StartedAt).GetTotalSeconds()) : 30.0f;
+        if (R.TimerWindowSec <= 0.0f) R.TimerWindowSec = 30.0f;
+        const double Raw = bServer ? (Combat.TimeoutAt - ServerAt).GetTotalSeconds() : Combat.SecondsUntilDeadline();
+        const double Left = FMath::Clamp(Raw, 0.0, static_cast<double>(R.TimerWindowSec));
+        R.TimerDeadlineSec = In.NowSec + Left;
+        FS08Trace::Write(FString::Printf(TEXT("HUD-TIMER anchor left=%.1f window=%.0f src=%s seq=%d"), Left, R.TimerWindowSec,
+                                         bServer ? TEXT("server") : TEXT("local"), Hud.SequenceNumber));
+      }
+      In.DeadlineSec = R.TimerDeadlineSec;
+      In.WindowSec = R.TimerWindowSec;
+    }
+  }
+  if (const UUmHudStatusLine* Status = R.TopStrip.GetStatus()) {
+    if (Status->IsShown()) In.StatusBottomSu = static_cast<float>(R.Layout.Rect(EUmHudBlock::Status).Min.Y) + Status->GetBodySizeSu().Y;
+  }
+  for (const FString& Line : R.Combat.Refresh(In)) {
+    FS08Trace::Write(Line);
+    // run I acceptance (AB-8): the auto client frames the first no-defense stamp once its 200 ms appear has landed
+    if (Line.StartsWith(TEXT("HUD-STAMP no-defense")) && bAutoS09 && !S09ShotDir.IsEmpty() && ShotStampAtElapsed < 0.0f) {
+      ShotStampAtElapsed = Elapsed + 0.25f;
+    }
+  }
+  // ВР-VS3-56: the turn banner never lies over the combat centre - it moves 8 su under the shown panel
+  if (UUmHudBanner* Banner = R.TopStrip.GetBanner()) {
+    const UUmHudCombatCenter* Center = R.Combat.GetCenter();
+    const FBox2D Panel = Center && UmGameHudSlots::ShownByProperty(Center) ? Center->PanelRectSu() : FBox2D(ForceInit);
+    const FBox2D BannerRect = R.Layout.Rect(EUmHudBlock::Banner);
+    float Shift = 0.0f;
+    if (Panel.bIsValid && BannerRect.bIsValid && Panel.Intersect(BannerRect)) {
+      Shift = static_cast<float>(Panel.Max.Y + 8.0 - BannerRect.Min.Y);
+    }
+    if (!FMath::IsNearlyEqual(Shift, R.BannerShiftSu, 0.5f)) {
+      R.BannerShiftSu = Shift;
+      Banner->SetRenderTranslation(FVector2D(0.0f, Shift));
+      FS08Trace::Write(FString::Printf(TEXT("HUD-BANNER shift=%.0f under=%s"), Shift, Shift > 0.0f ? TEXT("combat") : TEXT("-")));
+    }
+  }
+}
+
+// ------------------------------------------------------------------------------------------------ VS-3 SC-01
+
+void AS08FlowGameMode::TickUmScreenShots() {
+  // ВР-SC14 (evidence queue I-03): the first frame of every UI-SCR-* id + state of this run, <UI-ID>-<state>.png in the
+  // shot directory; the frame is the evidence queue's (it orders it after a shot in flight)
+  if (!UmHud.IsValid() || S09ShotDir.IsEmpty()) return;
+  FUmHudRuntime& R = *UmHud;
+  if (R.ScreenShots < 0) R.ScreenShots = FParse::Param(FCommandLine::Get(), TEXT("S08ScreenShots")) ? 1 : 0;
+  if (R.ScreenShots == 0) return;
+  TArray<TPair<FString, FString>> Shown;
+  // the GAME screen (UUmGameHud): the state as WriteUmHudShotLines names it
+  if (UmHudRoot && UmHudRoot->GetGameHud() && R.Blocks.UmgRoot() && Hud.bValid) {
+    const bool bCombat = CommandUi.Combat.bPresent || CombatStage.IsActive();
+    const bool bPending = CommandUi.Mode == ES09CommandMode::PendingChoice;
+    Shown.Add(TPair<FString, FString>(TEXT("UI-SCR-GAME"), Hud.bGameOver ? TEXT("over")
+                                                           : bCombat     ? TEXT("combat")
+                                                           : bPending    ? TEXT("pending")
+                                                           : Hud.bViewerTurn ? TEXT("own")
+                                                                             : TEXT("opp")));
+  }
+  // every screen / modal built on UUmScreenBase that is shown and fully faded in
+  for (const UUmScreenBase* S : UmScreens::LiveScreens()) {
+    if (S && S->IsShown() && S->GetAlpha() >= 1.0f && S->GetUiId().StartsWith(TEXT("UI-SCR-"))) {
+      Shown.Add(TPair<FString, FString>(S->GetUiId(), S->GetScreenState().ToString()));
+    }
+  }
+  for (const TPair<FString, FString>& P : Shown) {
+    const FString Key = P.Key + TEXT("|") + P.Value;
+    if (R.ScreenShotKeys.Contains(Key)) continue;
+    R.ScreenShotKeys.Add(Key);
+    const FString File = UmScreens::ShotFileName(P.Key, P.Value);
+    FS08Trace::Write(FString::Printf(TEXT("SCREENSHOT id=%s state=%s file=%s"), *P.Key, *P.Value, *File));
+    TakeEvidenceShot(S09ShotDir / File);
+    break;  // one request per frame; the next state waits for the next tick
+  }
 }

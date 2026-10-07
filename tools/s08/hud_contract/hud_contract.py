@@ -11,7 +11,9 @@
                                                                     монограммы при ключе из реестра; CP-12: у гарпии в
                                                                     панели номер n=1…3, ВР-72) и `CARD-ART` (VS-3 CP-15:
                                                                     scale ≤ 1,6; lang=fallback при ключе из реестра — ошибка,
-                                                                    кроме tex=legacy отката -S08CardArtLegacy)
+                                                                    кроме tex=legacy отката -S08CardArtLegacy); VS-3 HB-30:
+                                                                    UI-HUD-COMBAT-EDGE fighter=opp face=1 только в
+                                                                    state=reveal (приватность до раскрытия)
 
 Только stdlib. Код выхода: 0 — ошибок нет, 1 — есть ошибки.
 """
@@ -375,6 +377,9 @@ def check_widget_trace(lines, known_ids, width=1920, height=1080, registry=None,
             errors.append("строка %d: неизвестный UI-ID %s" % (n, f["id"]))
         if f.get("id") in states and "state" in f and not state_allowed(states[f["id"]], f["state"]):
             errors.append("строка %d: %s state=%s не из списка 04 §7.1" % (n, f["id"], f["state"]))
+        # VS-3 HB-30 (04 §2.7, 05 §3 VS-3 «приватность»): the opponent's combat card shows its face only from state=reveal
+        if f.get("id") == "UI-HUD-COMBAT-EDGE" and f.get("fighter") == "opp" and f.get("face") == "1" and f.get("state") != "reveal":
+            errors.append("строка %d: приватность — лицо карты соперника (face=1) до state=reveal (state=%s)" % (n, f.get("state")))
         if f.get("visible") == "0":
             continue
         if f.get("geom") != "painted":
