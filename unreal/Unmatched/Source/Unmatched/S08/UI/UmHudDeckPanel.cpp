@@ -492,7 +492,8 @@ void UUmHudDeckPanel::Relayout() {
     A.Label = UmText::Get(EUmTable::Hud, TEXT("hud.deckpanel.all"));
     A.HeightSu = FilterHSu;
     A.MinWidthSu = 1.0f;
-    A.PadXSu = FilterPadXSu;
+    // class S: the two labels fill the 276 su row - 4 su a side keeps a 10 su gap to the filter (ВР-VS4-61)
+    A.PadXSu = Frame.bClassS ? 4.0f : FilterPadXSu;
     AllButton->ApplyModel(A);
     // right-aligned by its own desired size (the button sizes itself to its label, like the filter)
     if (UCanvasPanelSlot* S = Cast<UCanvasPanelSlot>(AllButton->Slot)) {
