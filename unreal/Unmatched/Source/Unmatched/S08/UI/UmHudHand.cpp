@@ -1074,10 +1074,21 @@ FBox2D UUmHudHand::DrawnRectSu() const {
 }
 
 FBox2D UUmHudHand::PaintedRectSu() const {
-  // ВР-VS3-72: what the hand paints now - the row and caption plus every shown card as drawn (the hover preview 1.5
-  // about its bottom centre, the selected raise, the discard drop, a draw / leave flight, the lowering), clipped to the
-  // canvas. The SHOT bbox stays the row (the block's place); 'painted=' carries this for the pixel gates.
-  FBox2D Out = DrawnRectSu();
+  // ВР-VS3-72: the box of everything the hand paints now (PaintedCardRectsSu) - the SHOT line's painted= field; the
+  // SHOT bbox stays the row (the block's place)
+  TArray<FBox2D> Rects;
+  PaintedCardRectsSu(Rects);
+  FBox2D Out(ForceInit);
+  for (const FBox2D& R : Rects) Out += R;
+  return Out;
+}
+
+void UUmHudHand::PaintedCardRectsSu(TArray<FBox2D>& Out) const {
+  // ВР-VS3-72: the row + caption, then each shown card as painted now - the hover preview 1.5 about its bottom
+  // centre, the selected raise, the discard drop, a draw / leave flight, the lowering; clipped to the canvas. One rect
+  // per card: a flight stays its own rect (the pixel gates' masks), never a box over half the screen.
+  const FBox2D RowRect = DrawnRectSu();
+  if (RowRect.bIsValid) Out.Add(RowRect);
   const FVector2D Origin = Frame.SlotSu.bIsValid ? Frame.SlotSu.Min : FVector2D::ZeroVector;
   for (const TObjectPtr<UUmCardWidget>& W : Pool) {
     if (!W || W->GetVisibility() == ESlateVisibility::Collapsed || W->GetRenderOpacity() <= 0.0f) continue;
@@ -1092,9 +1103,8 @@ FBox2D UUmHudHand::PaintedRectSu() const {
     FBox2D R(FVector2D(Cx - 0.5 * Size.X * K, Bottom - Size.Y * K), FVector2D(Cx + 0.5 * Size.X * K, Bottom));
     R.Min = FVector2D(FMath::Max(R.Min.X, 0.0), FMath::Max(R.Min.Y, 0.0));
     R.Max = FVector2D(FMath::Min(R.Max.X, Frame.CanvasSu.X), FMath::Min(R.Max.Y, Frame.CanvasSu.Y));
-    if (R.Max.X > R.Min.X && R.Max.Y > R.Min.Y) Out += R;
+    if (R.Max.X > R.Min.X && R.Max.Y > R.Min.Y) Out.Add(R);
   }
-  return Out;
 }
 
 void UUmHudHand::CollectShotLines(TArray<FString>& Out) const {

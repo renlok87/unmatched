@@ -485,9 +485,24 @@ function Invoke-CombatDemo {
         if ($l -match 'SHOT (captured|late end) file=') { break }
         $m = [regex]::Match($l, 'SHOT widget id=(UI-HUD-HAND|UI-HUD-COMBAT-EDGE|UI-HUD-DECKS|UI-HUD-OPP-HAND|UI-HUD-DECKPANEL) impl=umg .*?bbox=\((-?\d+),(-?\d+),(-?\d+),(-?\d+)\) geom=painted visible=1')
         if ($m.Success) { $rects += ,@(([int]$m.Groups[2].Value - 2), ([int]$m.Groups[3].Value - 2), ([int]$m.Groups[4].Value + 2), ([int]$m.Groups[5].Value + 2)) }
-        # ВР-VS3-72: what the hand / a leaving combat card paints beyond its block rect (hover, raise, flights)
-        $p = [regex]::Match($l, '(SHOT widget id=UI-HUD-HAND |HUD-EDGE-PAINT ).*?painted=\((-?\d+),(-?\d+),(-?\d+),(-?\d+)\)')
-        if ($p.Success) { $rects += ,@(([int]$p.Groups[2].Value - 2), ([int]$p.Groups[3].Value - 2), ([int]$p.Groups[4].Value + 2), ([int]$p.Groups[5].Value + 2)) }
+        # ВР-VS3-72: a leaving combat card paints outside its edge's rect
+        $p = [regex]::Match($l, 'HUD-EDGE-PAINT .*?painted=\((-?\d+),(-?\d+),(-?\d+),(-?\d+)\)')
+        if ($p.Success) { $rects += ,@(([int]$p.Groups[1].Value - 2), ([int]$p.Groups[2].Value - 2), ([int]$p.Groups[3].Value + 2), ([int]$p.Groups[4].Value + 2)) }
+      }
+      # ВР-VS3-72: the late block of the same file (written in the captured frame) - the hand's row and each card as
+      # painted (hover, raise, draw / leave flights) and the combat edges, one rect each
+      $late = -1
+      for ($k = $at + 1; $k -lt [Math]::Min($lines.Length, $at + 4000); $k++) { if ($lines[$k] -match ('SHOT late begin file=' + [regex]::Escape($Leaf) + ' ')) { $late = $k; break } }
+      if ($late -ge 0) {
+        for ($k = $late + 1; $k -lt [Math]::Min($lines.Length, $late + 2000); $k++) {
+          $l = $lines[$k]
+          if ($l -match ('SHOT late end file=' + [regex]::Escape($Leaf))) { break }
+          if ($l -match 'HUD-PAINT-LATE .*?rects=(\S+)') {
+            foreach ($r in [regex]::Matches($Matches[1], '\((-?\d+),(-?\d+),(-?\d+),(-?\d+)\)')) {
+              $rects += ,@(([int]$r.Groups[1].Value - 2), ([int]$r.Groups[2].Value - 2), ([int]$r.Groups[3].Value + 2), ([int]$r.Groups[4].Value + 2))
+            }
+          }
+        }
       }
       return ,$rects
     }

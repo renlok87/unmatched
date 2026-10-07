@@ -475,6 +475,13 @@ bool FUmHandAnimateTest::RunTest(const FString&) {
   const FBox2D Hover = UmHudHand::HoverRect(H->RestRectSu(1).Min, F);
   TestTrue(FString::Printf(TEXT("painted top %.1f = the preview top %.1f (row top %.1f)"), Paint.Min.Y, Hover.Min.Y, Row.Min.Y),
            Paint.bIsValid && Near(Paint.Min.Y, Hover.Min.Y, 1.0) && Row.Min.Y > Hover.Min.Y + 50.0);
+  TArray<FBox2D> Rects;
+  H->PaintedCardRectsSu(Rects);
+  const bool bHoverRect = Rects.ContainsByPredicate([&Hover](const FBox2D& B) {
+    return Near(B.Min.X, Hover.Min.X, 1.0) && Near(B.Min.Y, Hover.Min.Y, 1.0) && Near(B.Max.X, Hover.Max.X, 1.0);
+  });
+  TestTrue(FString::Printf(TEXT("the late-block rects: the row first, one per card (%d), the preview among them"), Rects.Num()),
+           Rects.Num() == 6 && Near(Rects[0].Min.Y, Row.Min.Y, 0.5) && bHoverRect);
   return true;
 }
 

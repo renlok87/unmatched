@@ -431,8 +431,32 @@ void AS08FlowGameMode::UmHudDeckPanelLayering(float DeckAlpha) {
 
 void AS08FlowGameMode::WriteUmHudLateLines() {
   // ВР-VS2-77: inside 'SHOT late begin/end' of the file - the deferred blocks with the geometry painted this frame
-  if (!UmHud.IsValid() || UmHud->LateIds.Num() == 0) return;
+  if (!UmHud.IsValid()) return;
   FUmHudRuntime& R = *UmHud;
+  // ВР-VS3-72: what the hand and the combat edges paint in the captured frame (the card art the pixel gates mask; the
+  // early block is written at the request, a card can start a flight before the capture)
+  {
+    const float Px = R.Layout.PxPerSu > 0.0f ? R.Layout.PxPerSu : 1.0f;
+    auto Fmt = [Px](const FBox2D& B) {
+      return FString::Printf(TEXT("(%.0f,%.0f,%.0f,%.0f)"), B.Min.X * Px, B.Min.Y * Px, B.Max.X * Px, B.Max.Y * Px);
+    };
+    if (const UUmHudHand* Hand = R.Hand.Get()) {
+      TArray<FBox2D> Rects;
+      if (UmGameHudSlots::ShownByProperty(Hand)) Hand->PaintedCardRectsSu(Rects);
+      TArray<FString> Parts;
+      for (const FBox2D& B : Rects) Parts.Add(Fmt(B));
+      if (Parts.Num()) FS08Trace::Write(TEXT("HUD-PAINT-LATE id=UI-HUD-HAND rects=") + FString::Join(Parts, TEXT(";")));
+    }
+    for (const EUmEdgeSide Side : {EUmEdgeSide::Own, EUmEdgeSide::Opp}) {
+      const UUmHudCombatEdge* Edge = R.Combat.GetEdge(Side);
+      const FBox2D B = Edge && (Edge->IsLeaving() || UmGameHudSlots::ShownByProperty(Edge)) ? Edge->PaintedRectSu() : FBox2D(ForceInit);
+      if (B.bIsValid) {
+        FS08Trace::Write(FString::Printf(TEXT("HUD-PAINT-LATE id=UI-HUD-COMBAT-EDGE side=%s rects=%s"),
+                                         Side == EUmEdgeSide::Own ? TEXT("own") : TEXT("opp"), *Fmt(B)));
+      }
+    }
+  }
+  if (R.LateIds.Num() == 0) return;
   TArray<FString> Lines;
   auto RectOf = [this](UWidget* W) {
     FS08ScreenRect Rect;
