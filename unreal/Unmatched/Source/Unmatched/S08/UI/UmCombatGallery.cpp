@@ -127,6 +127,9 @@ TArray<FString> UUmCombatGalleryWidget::Build(const FString& Board, const FVecto
         S->SetOffsets(FMargin(0.0f));
       }
       Lines.Append(Blocks.Build(*Game, S08ArtLook::FS08SlateHudBlocks(), MakeShared<FS09HudPressArbiter>(), FUmCombatBlocks::FCallbacks()));
+      for (const EUmEdgeSide Side : {EUmEdgeSide::Own, EUmEdgeSide::Opp}) {
+        if (UUmHudCombatEdge* E = Blocks.GetEdge(Side)) E->SetSyncLoad(true);  // the sheet: no loading frame in a shot
+      }
       Game->ApplyLayout(Layout, TArray<FName>(), false);
     }
     // ---- the data: the S01 cards of run I and the HB-29 effect lines (facts.json) ----
@@ -245,9 +248,10 @@ FUmCombatInput UUmCombatGalleryWidget::BaseInput(bool bAttackerA) const {
 void UUmCombatGalleryWidget::ApplyState(int32 State, float TMs, TArray<FString>& Lines) {
   const bool bSarpedon = BoardNow == TEXT("sarpedon");
   // the blocks' clock: a small monotonic base per state (the icons keep it in float: FPlatformTime ms would lose the
-  // 200 ms of an appear), frozen 5 s after the state began for the shot - every flip, stamp and slam at rest
+  // 200 ms of an appear), frozen 400 ms after the state began for the shot - every stamp / sign appear (<= 200 ms) and
+  // the speed-0 flips and slam at rest; the timer keeps its state from the base to the freeze
   const double Base = 1.0e6 + 20000.0 * State;
-  const double Freeze = Base + 5000.0;
+  const double Freeze = Base + 400.0;
   for (const EUmEdgeSide Side : {EUmEdgeSide::Own, EUmEdgeSide::Opp}) {
     if (UUmHudCombatEdge* E = Blocks.GetEdge(Side)) E->SetClockOverrideMs(Base);
   }
@@ -273,7 +277,8 @@ void UUmCombatGalleryWidget::ApplyState(int32 State, float TMs, TArray<FString>&
       In.bResolvePhase = State == 3;  // defense-chosen: after CUE-009
       In.StatusBottomSu = static_cast<float>(Layout.Rect(EUmHudBlock::Status).Min.Y) + 48.0f;  // «Ждём защитника»
     } else {
-      In.DeadlineSec = In.NowSec + 5.0 + (State == 2 ? 10.0 : 30.0);  // run I: 30 s; the 10 s example (ВР-VS2-HB29-04)
+      // run I: «30 с»; the «10 с» example (ВР-VS2-HB29-04) - already in the warning at the base (its sign appears then)
+      In.DeadlineSec = In.NowSec + (State == 2 ? 9.9 : 30.4);
       In.WindowSec = 30.0f;
       In.DraftDefenseId = State == 3 ? TEXT("me::feint") : FString();
     }
