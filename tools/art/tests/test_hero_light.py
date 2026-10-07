@@ -137,15 +137,17 @@ class ShippedBlocks(unittest.TestCase):
             self.assertTrue(0.03 <= key["contactShadowLength"] <= 0.12, lid)
             self.assertTrue(12 <= rim["elevationDeg"] <= 22, lid)  # a low rim: a thin edge, not a wash over the tops
             self.assertTrue(135 <= abs(rim["azimuthDeg"]) <= 225, lid)  # behind the figure relative to the camera
-            self.assertTrue(0.6 <= rim["specularScale"] <= 0.8, lid)
+            self.assertTrue(0.6 <= rim["specularScale"] <= 1.0, lid)  # VS-5 P9c (ВР-VS5-18): Marmoreal rim 1.0
             self.assertLessEqual(rim["outerConeDeg"], key["outerConeDeg"], lid)  # a narrow rim cone
             self.assertIs(b.get("litPedestal", False), False, lid)  # no more cream pedestals
             # the key colour is a light tint chosen against the board's colour cast on the figures (gate D6): near-neutral
-            # #FFF0E0, the cool moon white #D8E2FF on Marmoreal (its pink garden throws warm light on the figures)
+            # #FFF0E0 (P9b Marmoreal: the cool moon white #D8E2FF against the 3D pink garden; VS-5 P9c under the painted
+            # backdrop, ВР-VS5-18: #FFF0E0 again - the cast is gone, the cool key only desaturated the bronze)
             kc = [int(key["colorSrgb"][i:i + 2], 16) for i in (1, 3, 5)]
             self.assertEqual(max(kc), 255, lid)
             self.assertGreaterEqual(min(kc), 0xC8, lid)
-            self.assertEqual(rim["colorSrgb"].upper(), "#A8C0FF", lid)
+            rc = [int(rim["colorSrgb"][i:i + 2], 16) for i in (1, 3, 5)]
+            self.assertTrue(rc[2] == 255 and rc[2] > rc[1] > rc[0], lid)  # a cool rim (#A8C0FF; Marmoreal P9c #C8D8FF)
             self.assertTrue(1.08 <= st["activeMul"] <= 1.2, lid)
             self.assertLessEqual(st["breathAmp"], 0.05, lid)
             self.assertEqual(st["defeatedMul"], 0.0, lid)

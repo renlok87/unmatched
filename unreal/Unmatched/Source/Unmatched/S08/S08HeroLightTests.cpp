@@ -309,10 +309,11 @@ bool FS08HeroLightShippedTest::RunTest(const FString&) {
                              H.Key.ContactShadowLength),
              H.Key.SpecularScale >= 0.3f && H.Key.SpecularScale <= 0.5f && H.Key.ContactShadowLength >= 0.03f &&
                  H.Key.ContactShadowLength <= 0.12f);
-    TestTrue(FString::Printf(TEXT("%s: rim low (%.0f deg in 12..22) behind the figure (azimuth %.0f), specular %.2f in 0.6..0.8"), Id,
+    // VS-5 AN-36 / EN-14 P9c (ВР-VS5-18): Marmoreal's rim at the full specular 1.0 (the lower rim lux keeps the edge, D4)
+    TestTrue(FString::Printf(TEXT("%s: rim low (%.0f deg in 12..22) behind the figure (azimuth %.0f), specular %.2f in 0.6..1.0"), Id,
                              H.Rim.ElevationDeg, H.Rim.AzimuthDeg, H.Rim.SpecularScale),
              H.Rim.ElevationDeg >= 12.0f && H.Rim.ElevationDeg <= 22.0f && FMath::Abs(H.Rim.AzimuthDeg) >= 135.0f &&
-                 FMath::Abs(H.Rim.AzimuthDeg) <= 225.0f && H.Rim.SpecularScale >= 0.6f && H.Rim.SpecularScale <= 0.8f);
+                 FMath::Abs(H.Rim.AzimuthDeg) <= 225.0f && H.Rim.SpecularScale >= 0.6f && H.Rim.SpecularScale <= 1.0f);
     TestTrue(FString::Printf(TEXT("%s: pedestal unlit"), Id), !H.bLitPedestal);
     // world placement: the camera sits at +Y (cameraAzimuthDeg 90), the moon key (-55, 30, 0) comes from yaw 210 (-X -Y):
     // the key stands on the -X (moon) side, at least as close to the moon's azimuth as to the camera's; the rim behind (-Y)
