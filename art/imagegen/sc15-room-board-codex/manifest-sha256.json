@@ -1,0 +1,635 @@
+{
+  "schema": "CX-30.manifest.v1",
+  "status": "предложено",
+  "inputs": {
+    "docs/game-design/visual/06-tasks/prompts/SC-14-series.codex.md": "be29ba3eb4b0ba15981fcffb3d53901240bd5c45033f1fa0af772b1d1a100ccf",
+    "docs/game-design/visual/06-tasks/prompts/SC-14-series.fix1.codex.md": "cea70a66704a6e57f745736f469347a8acb87392fa2c03a65c2755ab3c1a5237",
+    "docs/game-design/visual/06-tasks/prompts/SC-15.codex.md": "46c56d6e1bf402e58941fbd0e439dc7dbc087be399451eba624b88a74f49811e",
+    "docs/game-design/visual/04-hud-spec.md": "c1801f6d63590f53e3777b4909a6689ae8871645688e21cc714e12cb17065632",
+    "docs/game-design/visual/02-visual-design.md": "08ef14898eb654a35cbf3e39c6a6ef8b4c97f09df4f9b2234c3ab23278fa7e9b",
+    "docs/game-design/visual/07-prompt-templates.md": "ac5842e3acd4f5201f0439162e2da9c2bb97ff5d88ecb733438c2f847b20c18d",
+    "docs/game-design/visual/06-tasks/screens.csv": "25f73d3cf010006e6492f21c06c5bfd34f11ac0c185e54deee6bc5a93ec3b566",
+    "docs/game-design/05-content-matrix.csv": "97ab4ef0f3d7f6d5fffafec83a55ced43430dd2ff3abf2b6bb4e6ddabbec0431",
+    "docs/unreal/contracts/hud/st-screens.csv": "0e013fe77499846a7c034b39265267fcc4e4dbc9070a424427257cf17ff9678b",
+    "docs/unreal/contracts/hud/why-reasons.json": "42ebdea2fbf17409746a33e31b2ad49d10e5dfc2443cb07b7e9edd3f46f08ec8",
+    "docs/unreal/contracts/hud/hud-style-tokens.json": "ff043c7b10805a779c415f0f356d8ea4e0978a2a751222178314fb2ef6537ce3",
+    "AGENTS.md": "2f9852419617ff2e740266bbce5748808c782eb582dbbf9a92d8bfc04e22bc02",
+    "docs/game-design/decisions/2026-10-04-real-boards-only.md": "df7c586aa1d71567d5a432856399b19bbb544bc776fffb5ddb96cd5f2cd1c6c9",
+    "backend/prisma/seed.ts": "bb103d0423a36c7029d6a805dea6cb4ba4adbc2714f277708a71f6337d8d8131",
+    "backend/prisma/seed-ai.ts": "d8df11b7886ae671bcd0cf24dde27d7f051c059190abec116fe862e7f7da0240",
+    "docs/game-design/evidence/ENV-MAPS/p7-concept-paste-2026-10-01/marmoreal-concept-flag/bench-K1-1920x1080.png": "aeafe8f25aea665f6fb93a45273b4c35e71c2202f7e83f21aefdb5f33fbc9bca",
+    "C:/Program Files/Epic Games/UE_5.8/Engine/Content/Slate/Fonts/Roboto-Regular.ttf": "16466ef65064e6f3885a6d2806b8949ac1ac38b524dd0cf8fc96565eb4cc28e8",
+    "C:/Program Files/Epic Games/UE_5.8/Engine/Content/Slate/Fonts/Roboto-BoldCondensed.ttf": "2c9245c0246a9c745793c7eaa9cc1fc964a12570009031ea0223115bec6e9426",
+    "art/imagegen/hud-icons-v3/_tools/draw_icons.py": "30da74cc5482d53b0c9e84d6039bd4ca0bc642d0ed4e576b3b96b643f91d75f0",
+    "art/imagegen/sc01-screen-base-codex/README.md": "8a7d47b426457b4924505e9c261c06675aed6af3dbd5515020e967d5cda22b91",
+    "art/imagegen/sc01-screen-base-codex/manifest-sha256.json": "3e22f003f2c192949311e7b37d637a9198a201f4c1c79018f4608e6920d5f96d",
+    "art/imagegen/sc06-login-form-codex/_tools/sc06_login_form.py": "3f99ce907b61aba5d620e1e84fb7ad979fc4e3b06181e7e2133a94afdbefd352",
+    "art/imagegen/sc08-lobby-list-codex/_tools/sc08_lobby_list.py": "d46e766fa8535bfdfd5d0092aee80e4fa50fcb8c6a8c32357e6872ee5dee5e35",
+    "art/imagegen/sc09-lobby-create-codex/_tools/sc09_lobby_create.py": "16b1b6d20a166013bac16b74925d443ab648d56204f298da8fbfcec67f40b435",
+    "art/imagegen/hud-skins-v1-codex/README.md": "365ef50fd8021902979d8e24c62e67154196907500dee643368a20adca3140f1",
+    "art/imagegen/hud-skins-v1-codex/runtime-style.json": "8cd6b791c31472af6bb1a1f4ccf7420415425942cab408eb65cc88a8740fef15",
+    "art/imagegen/hud-skins-v1-codex/slice-margins.json": "6c13a566150867bf5da7564e613b67e80ea7196ffa4c28a3d61d130caeed9605",
+    "art/imagegen/portrait-crop-v1-codex/README.md": "78dcd88d1873f57640d969450b65c88d2b693f2419137930bfb3836a45f0ba82",
+    "art/imagegen/portrait-crop-v1-codex/portrait-crops.json": "8061720ddb433b27fdb5232dfaeed1b7ff1efc783c18a6656b06a3482c6fdb75",
+    "docs/game-design/evidence/S01/catalog-king-arthur.json": "070e50b3d12fe7e356fb9246a7ea8ce30bcfb7edf775334265322f421e51b2bc",
+    "docs/game-design/evidence/S01/catalog-medusa.json": "fce1967fd1292f8659d5ee6c4073e7bf5c77cf35eb065e0b151f9f7bdb10b739",
+    "scraped-data/api/heroes/king-arthur.json": "820e2c3fc1486a31e6da53f15e26413204258a5c0aa38e9e16faa906370f614e",
+    "scraped-data/api/heroes/medusa.json": "7842bdfdc73a256fe55cb6129914b65ae6e3ddbeab22c07c3c94fe8691791efc",
+    "scraped-data/images/maps/marmoreal.png": "c28ce0d71558654740d86bd6caf96f3e22bb166d328979e69da49522595dd372",
+    "scraped-data/images/maps/sarpedon.png": "4c5941fa4f71e37a21516b9e4ae9b551387bacb1bcbae91358a9320fe431b163",
+    "art/imagegen/sc01-screen-base-codex/_tools/build_package.py": "ca4f3df331bf0bdce64d69c41db44d5825621ab3fba58176cb9c038cb658c27a",
+    "art/imagegen/sc01-screen-base-codex/_tools/draw_icons_v3_snapshot.py": "30da74cc5482d53b0c9e84d6039bd4ca0bc642d0ed4e576b3b96b643f91d75f0",
+    "art/imagegen/sc01-screen-base-codex/_tools/fix1_audit.py": "3c15fa00364b2039f8f7a878f0e511e16579e6cd1c4557b3718e2c614b173367",
+    "art/imagegen/sc01-screen-base-codex/_tools/screen_mockup_base.py": "d970f88141a97adb6e1fd4e6dadacc21d194cb3caa6223aca4ee85706e41c98d",
+    "art/imagegen/sc01-screen-base-codex/_tools/source_audit.py": "37134ff2164f0a0463eacaa25aef44a4f85ae1c7b84920fa1102b445aab4a2c5",
+    "art/imagegen/sc01-screen-base-codex/_tools/verify_package.py": "1374d677d2815fc5afaa1394bfb748d52c7977cf84ceb47c53b40b40316a80cd",
+    "art/imagegen/hud-skins-v1-codex/vector/x1/T_Skin_BtnPrimary_Disabled.png": "4ce55399030613d38f66dcdf34b50cf95cde3184acae632e7b21201e7dcdfecf",
+    "art/imagegen/hud-skins-v1-codex/vector/x1/T_Skin_BtnPrimary_Focus.png": "e80f69730c80c8fad4c5c3a387974b8362f6817cbd9c908eb9c8e43237e58b1e",
+    "art/imagegen/hud-skins-v1-codex/vector/x1/T_Skin_BtnPrimary_Hover.png": "521361ecb4bfbeaa3fd80ee6431d52799c45b58ccca863b5a09f9bbbb3d8177b",
+    "art/imagegen/hud-skins-v1-codex/vector/x1/T_Skin_BtnPrimary_Normal.png": "b871641524b8d0913ac01146692d55a7f4949d26a4d18be0c20f1dd2de56ad98",
+    "art/imagegen/hud-skins-v1-codex/vector/x1/T_Skin_BtnPrimary_Pressed.png": "0c35f22fe5a2679220199cc842bfb4d39da71b48693ab7da12eb35b2ce69dca8",
+    "art/imagegen/hud-skins-v1-codex/vector/x1/T_Skin_Btn_Disabled.png": "4cbcd0be2ba0a9e7b6a5222024fe061cab9055576bb477aab0da8df1275c9514",
+    "art/imagegen/hud-skins-v1-codex/vector/x1/T_Skin_Btn_Focus.png": "e80f69730c80c8fad4c5c3a387974b8362f6817cbd9c908eb9c8e43237e58b1e",
+    "art/imagegen/hud-skins-v1-codex/vector/x1/T_Skin_Btn_Hover.png": "04f7e897967e34fce0dd2f7b0adb53baa56d8edae5a8a6703eb8ad80b3bb6a58",
+    "art/imagegen/hud-skins-v1-codex/vector/x1/T_Skin_Btn_Normal.png": "01ec00549dd15f04d6d8c57708bf7726cbf0709c66eb6fc0fab2f6fa2289262f",
+    "art/imagegen/hud-skins-v1-codex/vector/x1/T_Skin_Btn_Pressed.png": "c2f79e04806af5c41ff9618056a60326df37717e05ff148848fece7501c0b03f",
+    "art/imagegen/hud-skins-v1-codex/vector/x1/T_Skin_Btn_Selected.png": "23bdd80eb7309fbfdaeb3c63e1cb4ae13e7d8ea832618620ccc80c2965a750e8",
+    "art/imagegen/hud-skins-v1-codex/vector/x1/T_Skin_Capsule.png": "01ec00549dd15f04d6d8c57708bf7726cbf0709c66eb6fc0fab2f6fa2289262f",
+    "art/imagegen/hud-skins-v1-codex/vector/x1/T_Skin_Check_Off.png": "d3957a06348e8491f8ae62c3c781142224805f5de2d5f02d3fdae850920a7931",
+    "art/imagegen/hud-skins-v1-codex/vector/x1/T_Skin_Check_On.png": "eda1c3f04887ba25622bec31d6cfa7dbf22085151bdc313dc8bfb81fab1fb20a",
+    "art/imagegen/hud-skins-v1-codex/vector/x1/T_Skin_Chip.png": "01ec00549dd15f04d6d8c57708bf7726cbf0709c66eb6fc0fab2f6fa2289262f",
+    "art/imagegen/hud-skins-v1-codex/vector/x1/T_Skin_Input_Error.png": "382bccbd6dfcd0e3a3ead87d4c5488714e879296f2d1a373656cc8ca90df900b",
+    "art/imagegen/hud-skins-v1-codex/vector/x1/T_Skin_Input_Focus.png": "e80f69730c80c8fad4c5c3a387974b8362f6817cbd9c908eb9c8e43237e58b1e",
+    "art/imagegen/hud-skins-v1-codex/vector/x1/T_Skin_Input_Normal.png": "01ec00549dd15f04d6d8c57708bf7726cbf0709c66eb6fc0fab2f6fa2289262f",
+    "art/imagegen/hud-skins-v1-codex/vector/x1/T_Skin_KeyChip.png": "ec5ba74cb19d3dca2f706e3205176f3c7b7ae30aac642d0e8ceebe4a07cfb5aa",
+    "art/imagegen/hud-skins-v1-codex/vector/x1/T_Skin_Modal.png": "56b49421684d7a3cbb5fdc00e6e58af54bd4f2ba0ad7af0f5e7f5f4b32f35da3",
+    "art/imagegen/hud-skins-v1-codex/vector/x1/T_Skin_Panel.png": "a105f9b09fb86eb5c256ab2238f9a0658ebbc0b3ada014baed7151621a332a09",
+    "art/imagegen/hud-skins-v1-codex/vector/x1/T_Skin_PanelInset.png": "6d471b839732b70efd3525a8a46a24f5cda4eff096010b446014ed067c17c3b4",
+    "art/imagegen/hud-skins-v1-codex/vector/x1/T_Skin_ProgressFill.png": "9b635d80dba77e29657e7899a22fdbf0f020aa477c2981794ce59683c2cd5a59",
+    "art/imagegen/hud-skins-v1-codex/vector/x1/T_Skin_ProgressTrack.png": "084b5c1f3c8ffaf351364d1b5ec0e25f3a096ef7849b864258a3e1ee91fa1615",
+    "art/imagegen/hud-skins-v1-codex/vector/x1/T_Skin_SliderThumb.png": "4a9aaf35f565b420e125420483b7378457cfc356952d585dcb59a34d2376a98b",
+    "art/imagegen/hud-skins-v1-codex/vector/x1/T_Skin_SliderTrack.png": "084b5c1f3c8ffaf351364d1b5ec0e25f3a096ef7849b864258a3e1ee91fa1615",
+    "art/imagegen/hud-skins-v1-codex/vector/x1/T_Skin_Tag.png": "01ec00549dd15f04d6d8c57708bf7726cbf0709c66eb6fc0fab2f6fa2289262f",
+    "art/imagegen/hud-skins-v1-codex/vector/x1/T_Skin_Toast.png": "3672b68d14f6cc4fbcca6d1ea5f70702de8a304aed573e64498a818fbddc2432",
+    "art/imagegen/hud-skins-v1-codex/vector/x1/T_Skin_ToastWarning.png": "5a2fbc6dd9c3a305f08ce58ea1fbd07ec06bb187007f416a077770784fe94825",
+    "art/imagegen/hud-skins-v1-codex/vector/x2/T_Skin_BtnPrimary_Disabled.png": "521b6670c22574493b73f2edb8093a3551a0e69c71d70765ced1488f97d58bac",
+    "art/imagegen/hud-skins-v1-codex/vector/x2/T_Skin_BtnPrimary_Focus.png": "1ebd788ce2b5914a0f8b220ccdbab7b3301851b09519757ca83c877f1c596454",
+    "art/imagegen/hud-skins-v1-codex/vector/x2/T_Skin_BtnPrimary_Hover.png": "3e2e9391f5156325b634652fa989a80c6772e53fde0c342c555db77eaf3c78cd",
+    "art/imagegen/hud-skins-v1-codex/vector/x2/T_Skin_BtnPrimary_Normal.png": "a18cf6898b5194c7e27c05b3db13eb73deddfda24670294d499530c9799da601",
+    "art/imagegen/hud-skins-v1-codex/vector/x2/T_Skin_BtnPrimary_Pressed.png": "af103134ff9cbf60a6118c1c4eaab5047df652f8f6291b36b7a62977763aa030",
+    "art/imagegen/hud-skins-v1-codex/vector/x2/T_Skin_Btn_Disabled.png": "41e32946cfe5243c8f623fb9593db7a8690a4ba12c741759ec68e40112f36fe5",
+    "art/imagegen/hud-skins-v1-codex/vector/x2/T_Skin_Btn_Focus.png": "1ebd788ce2b5914a0f8b220ccdbab7b3301851b09519757ca83c877f1c596454",
+    "art/imagegen/hud-skins-v1-codex/vector/x2/T_Skin_Btn_Hover.png": "a9a425df3324e3369b475490764d4164dbaabd4fa25db2b09af961fc0fec4871",
+    "art/imagegen/hud-skins-v1-codex/vector/x2/T_Skin_Btn_Normal.png": "fa676e359bd892ae313b2c574f691eb4a9cde95fd295eb24a47e8d61b752e1b4",
+    "art/imagegen/hud-skins-v1-codex/vector/x2/T_Skin_Btn_Pressed.png": "df59f62093ba14683a8e32a762fbc69b6e4bfd0f41b6a6b4b0abcd5844f5d7d6",
+    "art/imagegen/hud-skins-v1-codex/vector/x2/T_Skin_Btn_Selected.png": "9602c9430dbd4aba1b114e66452167502a8f30ef6521aeedd45d9b0eb80fc3dc",
+    "art/imagegen/hud-skins-v1-codex/vector/x2/T_Skin_Capsule.png": "fa676e359bd892ae313b2c574f691eb4a9cde95fd295eb24a47e8d61b752e1b4",
+    "art/imagegen/hud-skins-v1-codex/vector/x2/T_Skin_Check_Off.png": "09df4158051d5f9f69112d71ad044312c0e31cf2f5ce6b5fffc472e1726b5889",
+    "art/imagegen/hud-skins-v1-codex/vector/x2/T_Skin_Check_On.png": "d34d55707caf3d6c550b26ca91cc1c5143ea8d8589d489cee0ac333ada337148",
+    "art/imagegen/hud-skins-v1-codex/vector/x2/T_Skin_Chip.png": "fa676e359bd892ae313b2c574f691eb4a9cde95fd295eb24a47e8d61b752e1b4",
+    "art/imagegen/hud-skins-v1-codex/vector/x2/T_Skin_Input_Error.png": "3060cad471a3c95461476e5c272a39b067afd408e5a7d59472176c4a087ff5de",
+    "art/imagegen/hud-skins-v1-codex/vector/x2/T_Skin_Input_Focus.png": "1ebd788ce2b5914a0f8b220ccdbab7b3301851b09519757ca83c877f1c596454",
+    "art/imagegen/hud-skins-v1-codex/vector/x2/T_Skin_Input_Normal.png": "fa676e359bd892ae313b2c574f691eb4a9cde95fd295eb24a47e8d61b752e1b4",
+    "art/imagegen/hud-skins-v1-codex/vector/x2/T_Skin_KeyChip.png": "531f3de789d90ee95b1125e4728ad966397f0fca50b42a920b0d07c0ac3cf7d1",
+    "art/imagegen/hud-skins-v1-codex/vector/x2/T_Skin_Modal.png": "75540142b5d011f152ef7aab4e8fd549997554227cc3f01b121818a56852f9b2",
+    "art/imagegen/hud-skins-v1-codex/vector/x2/T_Skin_Panel.png": "11fa648a49f66d6204e58501dde33be96283f59337934e5ad2002fe6c9e0ef36",
+    "art/imagegen/hud-skins-v1-codex/vector/x2/T_Skin_PanelInset.png": "4c4d706622b9dd04161921c8a608c2613406c2e347531630bc18866a5bcb889f",
+    "art/imagegen/hud-skins-v1-codex/vector/x2/T_Skin_ProgressFill.png": "768f2cec634102ec36d6f85457aa08032b2f41e64477dad9ae6734c7428a66ae",
+    "art/imagegen/hud-skins-v1-codex/vector/x2/T_Skin_ProgressTrack.png": "6b573b17fa1bfe2efa1244b595188ea377ea8bf7deee4c640103b16693b9e3bb",
+    "art/imagegen/hud-skins-v1-codex/vector/x2/T_Skin_SliderThumb.png": "1c3485629458faa78f8bc5b5582b8d3315108d210b4e120039297b59c53bbb69",
+    "art/imagegen/hud-skins-v1-codex/vector/x2/T_Skin_SliderTrack.png": "6b573b17fa1bfe2efa1244b595188ea377ea8bf7deee4c640103b16693b9e3bb",
+    "art/imagegen/hud-skins-v1-codex/vector/x2/T_Skin_Tag.png": "fa676e359bd892ae313b2c574f691eb4a9cde95fd295eb24a47e8d61b752e1b4",
+    "art/imagegen/hud-skins-v1-codex/vector/x2/T_Skin_Toast.png": "40a9f3a04f2e3318dd84fa2021a1ff5dc023e36c5b643159bbb82da22e08b71d",
+    "art/imagegen/hud-skins-v1-codex/vector/x2/T_Skin_ToastWarning.png": "b53063a756ecfbc7a7d1a15dbc412ec60795c5bee48813c603d333e0ee5a4505",
+    "art/imagegen/portrait-crop-v1-codex/vector/portrait-edge-120-x1.png": "cb7bdf95144005bb046f8f092319a01cf6d6f794648a86847fde3cd76b563e52",
+    "art/imagegen/portrait-crop-v1-codex/vector/portrait-edge-120-x2.png": "d8c8bd661432c43facdf2f8b4b98b06ed9f6730ee6ee084da1e428d7373d9f3e",
+    "art/imagegen/portrait-crop-v1-codex/vector/portrait-edge-160-x1.png": "8cfa41d2571f878abeeac73cc0352b0e7f9f6ec8c4635daff6558b051f32a157",
+    "art/imagegen/portrait-crop-v1-codex/vector/portrait-edge-160-x2.png": "59f640c7d9c294a2c04e09bd9dd201bf224baf9f935a2c60bbb5f527f0b294f4",
+    "art/imagegen/portrait-crop-v1-codex/vector/portrait-edge-32-x1.png": "89991e4b329bf7a76f3668db82002e9ff716c289d7ff33e66ea28c80951a2fc4",
+    "art/imagegen/portrait-crop-v1-codex/vector/portrait-edge-32-x2.png": "b939391b51e9bb660262c0e1802222f9e23098c812978a5594bcf83cd10cb4f7",
+    "art/imagegen/portrait-crop-v1-codex/vector/portrait-edge-40-x1.png": "57e3de086d9140e2517fa9af5828a48e7f869bde908ab91fa87bae7f0770a9d4",
+    "art/imagegen/portrait-crop-v1-codex/vector/portrait-edge-40-x2.png": "e5913ff7ee75fe985e7bf2117a399efd00ff51fc715d9873cb5b05a5d3ed7367",
+    "art/imagegen/portrait-crop-v1-codex/vector/portrait-edge-64-x1.png": "11e5f77b8c4bb4b63a7627eab1361bb1729e898aaf90f5c2e5aca7e5a8b36add",
+    "art/imagegen/portrait-crop-v1-codex/vector/portrait-edge-64-x2.png": "82b945ea7c6aff1476b094142df006c34735b848e5151d0434ad53cf514bc5da",
+    "art/imagegen/portrait-crop-v1-codex/vector/portrait-edge-80-x1.png": "632f544af774afae750a46e4d5d98848264609d933634fa470340bd4f975e864",
+    "art/imagegen/portrait-crop-v1-codex/vector/portrait-edge-80-x2.png": "64efd1d1226fae8d2cd1e190df79510bedae2cc24445096af7a0e1156481910d",
+    "art/imagegen/portrait-crop-v1-codex/vector/portrait-underlay-120-x1.png": "5dccc43cbf24b3f53ecc015ef75430fcd1ddbcc6bc250d7262a4667c4fdd13f9",
+    "art/imagegen/portrait-crop-v1-codex/vector/portrait-underlay-120-x2.png": "d27fc8759033885b583d7a23edc49c4e0e32ab46882575c7b21b0f7a5b532155",
+    "art/imagegen/portrait-crop-v1-codex/vector/portrait-underlay-160-x1.png": "c6bd810003e41c1420ac164e7ca2ebb2d6686698523209c8744587b76e85d4a9",
+    "art/imagegen/portrait-crop-v1-codex/vector/portrait-underlay-160-x2.png": "fa38db26fe0f518bc45001f13edfeaf755ee5463f720193f2c916855b43d410a",
+    "art/imagegen/portrait-crop-v1-codex/vector/portrait-underlay-32-x1.png": "522dc7114e5207498d07ed3afa59587b4c31bcaa911b36d856cbaa31cc899271",
+    "art/imagegen/portrait-crop-v1-codex/vector/portrait-underlay-32-x2.png": "5dbeab461903d5f8ce7ce523ac89ddecb50b6558fd77a8433212eb84f9bf7177",
+    "art/imagegen/portrait-crop-v1-codex/vector/portrait-underlay-40-x1.png": "81881a26c9a9fc3e429d0c0139a8b27f5838d1db53995c37f91888b59847fcbd",
+    "art/imagegen/portrait-crop-v1-codex/vector/portrait-underlay-40-x2.png": "d9d937266e05f77ba60cbce01ab7f553a8e3649d8d1e4ce641df1e8fb91c7aeb",
+    "art/imagegen/portrait-crop-v1-codex/vector/portrait-underlay-64-x1.png": "5dbeab461903d5f8ce7ce523ac89ddecb50b6558fd77a8433212eb84f9bf7177",
+    "art/imagegen/portrait-crop-v1-codex/vector/portrait-underlay-64-x2.png": "ed700ff248b5d0a28e8a445899711f4155e967fb70b50698bab1b98e42ccca00",
+    "art/imagegen/portrait-crop-v1-codex/vector/portrait-underlay-80-x1.png": "d9d937266e05f77ba60cbce01ab7f553a8e3649d8d1e4ce641df1e8fb91c7aeb",
+    "art/imagegen/portrait-crop-v1-codex/vector/portrait-underlay-80-x2.png": "c6bd810003e41c1420ac164e7ca2ebb2d6686698523209c8744587b76e85d4a9",
+    "scraped-data/derived/sc15-room-board-codex/inputs/all-boards.json": "bac238312a76f14a88161f3319d7eda10563d515a4b5653172565feeca4fa0c0",
+    "scraped-data/derived/sc15-room-board-codex/inputs/capture-log.json": "0e04314e51c90e072ee8fa62ad9edc8d60e549bf805ae25f7362b10a2fe14c10",
+    "scraped-data/derived/sc15-room-board-codex/inputs/heroes.json": "563dcd4d36c8eed47c0c908b2fc51d6b9cf31b556d7c774d8bdccbc5caf42e16",
+    "scraped-data/derived/sc15-room-board-codex/inputs/room-sarpedon.json": "9e7076e525a7552aae6f1a79be91ba44b6ad9c3aefe06a2c7cb5febcc3d83cb4",
+    "scraped-data/derived/sc15-room-board-codex/inputs/room-state.json": "bb81eb5ca06967abb5bc1df0912d6c6b65245bc7f9bbb5e6d98695443594ad02",
+    "scraped-data/derived/sc15-room-board-codex/inputs/room-vsai.json": "4885c434e2224c2274903a593236faeea64f8272b0c18395df167f25016d9c68",
+    "scraped-data/derived/ue-media-v1/avatars/king-arthur.png": "6e37a6e8b10e04e4cad250ff97086d7ae5bd94d893b95651ff9fb71995eb6a5a",
+    "scraped-data/derived/ue-media-v1/sidekicks/king-arthur-merlin.png": "b8a43adc4bd33102b19bb50de744e2042ebc02e8236b7c86d44515a550c5158a",
+    "scraped-data/derived/ue-media-v1/avatars/medusa.png": "631b33ee4101c8c7747e9cb774dcad2c4b091fc727b92f23957bef58b34dce03",
+    "scraped-data/derived/ue-media-v1/sidekicks/medusa-harpies.png": "a7c0925ae0e2d5933ef359969a01c56eabcda057077cd4a49596a70a0086418a",
+    "scraped-data/images/heroes/avatars/dgwIAej9v-Omrn0sSVs5i.webp": "a93e817db892e2fed4375e8757a47a39e9e253d3076547fed752757a978f743a",
+    "scraped-data/images/heroes/avatars/bI206lUtJUQru-FOD8A74.webp": "310b5bbcc0594f1441494e38d434e03849dc3518c349349f7d16ee3faccfe920",
+    "scraped-data/images/heroes/sidekicks/4Rl9Oq9N82zhatbTShnXn.webp": "9e08817bd7955c00ce079aaf7893d687114bcfec34103b91618b629634026cd9",
+    "scraped-data/images/heroes/sidekicks/G42WIKYZ1cmwACVwMggzM.webp": "1cfcad663bcd9e99df233bcd8b5c61c8fe97b354070a75542713929534ee5e62",
+    "art/imagegen/hud-icons-v3/sizes/ui-menu-18.png": "305f17244ecec4fab9f761149ef651724333d379621d2849124a67aeb319c3e1",
+    "art/imagegen/hud-icons-v3/sizes/ui-menu-24.png": "c67714507f4851297dd4c49a9911b72f55f0fc9a4e078233248e9470be2c236f",
+    "art/imagegen/hud-icons-v3/sizes/ui-menu-32.png": "f6d3f32489beaa2bc87ec18d4c0855a5588c2d26b461996b7b86d2342663456d",
+    "art/imagegen/hud-icons-v3/sizes/ui-menu-36.png": "0a4fa6c98928479372b480727163cac2abdd20180da117c38f1d1ec7226c38b5",
+    "art/imagegen/hud-icons-v3/sizes/ui-menu-48.png": "ca97a4d3d71f31886174564be9446e49f1781214d66baacd33ec69b00e4adac6",
+    "art/imagegen/hud-icons-v3/sizes/cursor-default-18.png": "b1c65339b46ea8a90726f01da663db8b89b0a1598f98a5c4f1a81c0c5db4761a",
+    "art/imagegen/hud-icons-v3/sizes/cursor-default-24.png": "0fa82f63f0bf7680330be7f30b11dcc3d2366661020c2b5d0fa0a86633a90ced",
+    "art/imagegen/hud-icons-v3/sizes/cursor-default-32.png": "4f7cda029e0b63040a9c8f97e4e81e88fea641841651dd005c6add6e056b5bb9",
+    "art/imagegen/hud-icons-v3/sizes/cursor-default-36.png": "58edc5dc556cbad77f596c3a54fdeb5e4ffb69060d6e7dcb0bdc024876e69ad0",
+    "art/imagegen/hud-icons-v3/sizes/cursor-default-48.png": "adb69186650f5ea0eb87801b54e297a1e6fc5a83ff439c78e4df4327a4019605",
+    "art/imagegen/hud-icons-v3/sizes/cursor-pointer-18.png": "2bce407d7ebe089579180ea86b5969daf698e3b94b633d0fb2aa9d5936e9f1ee",
+    "art/imagegen/hud-icons-v3/sizes/cursor-pointer-24.png": "cd0fa5eed05a6e5191e97ad4eb121bcb38b64d8f2073ec3222f6df3ea0129202",
+    "art/imagegen/hud-icons-v3/sizes/cursor-pointer-32.png": "9f3d9ee00d775566bc06521f3cfa61b72a49bc8afe1321323e99891c6e1af6a4",
+    "art/imagegen/hud-icons-v3/sizes/cursor-pointer-36.png": "44a443539cd9988f23e598c6f87901d97263a54991091fd91f02c0a97673c07b",
+    "art/imagegen/hud-icons-v3/sizes/cursor-pointer-48.png": "29669a6e3ef286fbe2a51c8a189c0cd7f13c9cde2ac2714daec98f418701040b",
+    "art/imagegen/sc14-room-hero-codex/_tools/sc14_room_hero.py": "d3db4d21d134ca19876513f51171ac4a5588f5e48621c7c837e0fafa5d455af9",
+    "art/imagegen/sc14-room-hero-codex/_tools/finalize_review.py": "d5a2a4e89ed33e11835b3cd1113a779482f32509f42a86de1535399148686be8",
+    "art/imagegen/sc14-room-hero-codex/manifest-sha256.json": "90fe3f7ea41ce82b9578bfce90c8f9fbec56af62da940679a9a4eef24181f684",
+    "backend/src/games/dto/create-game.dto.ts": "085bce9afc53577cce9383cedc92f600644f22127ca2e599ceb6732d63f994e4"
+  },
+  "hud_icons_v3": {
+    "file_count": 1499,
+    "tree_digest": "af8c359d6d3c24af4cb15b6ec693b48624938bd8cd54acc515ba7f7bfebe0923",
+    "algorithm": "sha256(sorted relative-path TAB sha256 LF)"
+  },
+  "files": {
+    "art/imagegen/sc15-room-board-codex/copy-provenance.json": "7eae6ae9d5112343f2c00ec86ca027442ed983e40688dc5745dd927c0d52648c",
+    "art/imagegen/sc15-room-board-codex/fix1-baseline.json": "ee7e90cf1a9f0c9877c906d5c866b26d6e848f9f5bd84335c40ddf081475ac75",
+    "art/imagegen/sc15-room-board-codex/generation-records.json": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+    "art/imagegen/sc15-room-board-codex/layout-geometry.json": "b1d6c5674410eb90f6df56641192a8c2cbf3d530b3c9802e2fb64f71d9275452",
+    "art/imagegen/sc15-room-board-codex/README.md": "7b304843c056d76b6f34ca5eaa50ac21cfba3e07525ec8df5e234bfae7e06e0d",
+    "art/imagegen/sc15-room-board-codex/source-hashes-before.json": "a8945f752f7398913117e1b45893a73486ddb4bbfd11ee90bc83631fb2da793e",
+    "art/imagegen/sc15-room-board-codex/verification.json": "1e6d46b85e072176ff2c865426a1a949d08619c5ff3d5d9e0790927f7b6c0443",
+    "art/imagegen/sc15-room-board-codex/visual-review.json": "fd9cf750c101dd8e9abfa0d96f078ee4010264049c7ce77e2ebecd38137c5467",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-1080p-100-gray.png": "bebca086e1e4f5079bad972cff113b5d27ce3725d73744add5db7c961d6b3cf5",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-1080p-100-legend-01-gray.png": "3dbcab36438696e760000028e8c6d30a9ad41b5f3420d8027fe701cc6d01f235",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-1080p-100-legend-01.png": "b22fa2d5f51739f0b13edf2b257c73fa412b481ec38ebcaec5d7dba652fd3d46",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-1080p-100-legend-02-gray.png": "48f53f74e3ef370962db23201c03a7583fb8402f3d5a055102a30195d2897c77",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-1080p-100-legend-02.png": "355cba59a715d1fce9a348c6d163e3ee22a567c468c67979e8726e026823d8f2",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-1080p-100-legend-03-gray.png": "350d1a185454f4767ccb96b8753421ee35a0ab3c09d8e9168ab389933f6c720e",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-1080p-100-legend-03.png": "ab8a104bd3c6ca147cae28afbdf1a2e539252bed6ef26c1fb9ca0c5e0ca029ab",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-1080p-100-legend.json": "e619de4dcce707b0e83547315da0088a4ad9d218d26883d4cd3cdf3e7e7dc0c4",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-1080p-100.png": "2692aed03126cf84559fe93d91a7c1b5301a6e2b334e5ee1db012a66e52601f0",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-1080p-150-gray.png": "548dde2c0a07a27a4f4c8d455e296c298263a9be3f33797d0a610b98c1c8367c",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-1080p-150-legend-01-gray.png": "f2ef6079847fc1a322eb6f5d902a33e2180288abe9d2abd0e5a7405dc81898ef",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-1080p-150-legend-01.png": "b8ee00403db82677ec63bb30bbce5018f3479dda2c1a0ebabea20ddcba1e889e",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-1080p-150-legend-02-gray.png": "726384bb393c02a11c8f61b1d37c8ce21f74686df2e92fec900bef6b86e97903",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-1080p-150-legend-02.png": "626925424941556a0d117c877a0c9108dfa8f7ff8da7bc91f9e00ff4f6136d86",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-1080p-150-legend-03-gray.png": "3037e37a23f131090839e87cf56c673b493f9987b1b97cd1d1db1fb4eafa86f3",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-1080p-150-legend-03.png": "62621bb9ed1dd6c130ba3b0524f3130dd7faac08a0bf1651074479068bef8e7f",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-1080p-150-legend-04-gray.png": "de6d8a8813b26675c8ac28544e368d6476b42a7027ead12391a7978cb5bbeb31",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-1080p-150-legend-04.png": "113f088956d1fdbbd848308aa21a7e7609703d6e99a2575832bf1ea73bcc62c9",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-1080p-150-legend.json": "3007af57d4b85302182c5bb25ef9384474ec1cdd293614c8a0ea6868999d2de6",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-1080p-150.png": "f7ac9796b166ee5e3cf016df69ac1be1e0dae7d650898d3a5808c29a63bef898",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-720p-100-gray.png": "85240a7ae67ddbfda8a2169ce45a42e3c9246154dfcac9054b8399338facb8ed",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-720p-100-legend-01-gray.png": "97c5a76db34ac34ad95d5bb7f493dbec4fdbefcc9eb9a7354975aec6588b5fd6",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-720p-100-legend-01.png": "91587ad49fa399bc711d8143333318de193194a5633810786f76fffe35367fa4",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-720p-100-legend-02-gray.png": "67c8f3d5dd649a546f9435b1c4a1010490ad29f8a20ab5f248f197e8c06387f0",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-720p-100-legend-02.png": "bbab1ce181684bfffd2bf77a8eebce78787cd4a905e77b992716f3fdae7136d5",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-720p-100-legend-03-gray.png": "f5a3645892789b15011d4d016f973c4b24a79c4167a24b3a8bf1fb7c33d91d86",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-720p-100-legend-03.png": "1c36716ce2d764f9e19ae190a4b54868fb3ca8c273833904f6b26dfb8bdf8072",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-720p-100-legend.json": "a001c5bfcd1b51a50567311e192f56ca44f0ee629cea0215389faea8668343bd",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-720p-100.png": "d431401c316768dfc9e02ca36fae261fa1c441f0d0de4ccad45f85d0eb733e0e",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-720p-150-gray.png": "84b34b75b8a6dcc1f07ae44e66d45cdf96074e1eefb305bd1abd6457347e2da9",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-720p-150-legend-01-gray.png": "8cf5a670d0b69c9e1419df7dbf755ee8652c39a27e6590ee825694e66eb5535f",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-720p-150-legend-01.png": "d775e0a80afabb56b3ac8fc563752446ad1c8e2138e5808be29926e5bfc3c2a3",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-720p-150-legend-02-gray.png": "7267e40397998fd142683e2d510618016ed29373968e5061f9a398e75ba95ff9",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-720p-150-legend-02.png": "6e66236516a4fd17c2fda0e8e6588a9d09636651574ebbb316a6081c4e45ae4b",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-720p-150-legend-03-gray.png": "c1d5f57b271a0569806ed02be3c945d7f595c336f119c31765e58acde0a30b63",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-720p-150-legend-03.png": "0d83cd719db0486150a1ed99fa5a2ff210a63561948f9e3ec51232172343c936",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-720p-150-legend-04-gray.png": "222c93baf7947e05bc399d90ce408a6bbdd87406d41ef0e7aec48e55acadb119",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-720p-150-legend-04.png": "fc34d731e628ee1c1b92b125e2ccfe81afe055c92ca8963b22046e29a76429d7",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-720p-150-legend-05-gray.png": "0cab2b9fe0e875adaf5b00aeea602c69d1668f6a36f2dfb578b96b54e371ee92",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-720p-150-legend-05.png": "b90fe7eb77a7136939a9bc52659782b0004494ce87bd5dde5f1722154b5131eb",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-720p-150-legend.json": "ef09296220c3b6e58e687f2b1b8dcdca37e78237ec0749bb975b4c4977762dca",
+    "art/imagegen/sc15-room-board-codex/comparison/SC-15-overlay-720p-150.png": "88e4f5cadcfc20ea25994e83aec7770dcfeea9d426f44ef0513ca5ae51a6d761",
+    "art/imagegen/sc15-room-board-codex/concepts/.keep": "9af7b87f5f471a2d5c00e6d60031bb7ce59268426ad485fb087aa79c620e3227",
+    "art/imagegen/sc15-room-board-codex/prompts/series.md": "8bb95eca7ec3c58a537fdb33b96cf26840ed09e4544c12cac0e7e366c2bc30e4",
+    "art/imagegen/sc15-room-board-codex/prompts/task.md": "7d6c192cc6df1f51dfa63f9daf34b16d2e805940ce8ec184e798f4dfc4b317ad",
+    "art/imagegen/sc15-room-board-codex/_tools/audit_palette.py": "f43c1631e77c9a34ee35b74b18c289b1e262445df4e40bac8e1e494ed03d1f1d",
+    "art/imagegen/sc15-room-board-codex/_tools/draw_icons_v3_snapshot.py": "30da74cc5482d53b0c9e84d6039bd4ca0bc642d0ed4e576b3b96b643f91d75f0",
+    "art/imagegen/sc15-room-board-codex/_tools/finalize_review.py": "d5a2a4e89ed33e11835b3cd1113a779482f32509f42a86de1535399148686be8",
+    "art/imagegen/sc15-room-board-codex/_tools/sc14_room_hero.py": "d3db4d21d134ca19876513f51171ac4a5588f5e48621c7c837e0fafa5d455af9",
+    "art/imagegen/sc15-room-board-codex/_tools/sc15_room_board.py": "d2209a40f239d06708c589eba849dc241dc253cc6e3c5d3e094287b7d5ea3091",
+    "art/imagegen/sc15-room-board-codex/_tools/screen_mockup_base.py": "d970f88141a97adb6e1fd4e6dadacc21d194cb3caa6223aca4ee85706e41c98d",
+    "scraped-data/derived/sc15-room-board-codex/comparison-1080p-100-gray.png": "fb72bbb28238e160e9400aadbd6ca505bc3520f1a01cd52f1d833ee723bf77c4",
+    "scraped-data/derived/sc15-room-board-codex/comparison-1080p-100.png": "47d6abb9325374777da45cf0175a9a56600f0fa433f042364b829e2470bc5be7",
+    "scraped-data/derived/sc15-room-board-codex/comparison-1080p-150-gray.png": "7db069c3cad88a17e5e313c3ec9a3e71c0d984c30cd38ec90b8ad09a4003bdc1",
+    "scraped-data/derived/sc15-room-board-codex/comparison-1080p-150.png": "78b9729218d28b59914bb0024d24a5655a5b18684528318e5468c9a79c6b346c",
+    "scraped-data/derived/sc15-room-board-codex/comparison-720p-100-gray.png": "171ce5d4750a6ff3452f653dd576d4b33b3cf3d2f31aa7336505934b6edfc099",
+    "scraped-data/derived/sc15-room-board-codex/comparison-720p-100.png": "03da2f727f8f884c67866f844f3700312d91b32981af3b035f802aac1c780cf3",
+    "scraped-data/derived/sc15-room-board-codex/comparison-720p-150-gray.png": "026308340ee4fc3a41d065b01fb280c84e5f8fdfc716b172d51a5d03e6486d98",
+    "scraped-data/derived/sc15-room-board-codex/comparison-720p-150.png": "6d5b482095f06eec6197ea6e612bcf201950ea0329379347985711801127fe34",
+    "scraped-data/derived/sc15-room-board-codex/fix1-legends-1080p-100-1-gray.png": "168110aa49cfa139819687a2cb90d9a0bf30e9a5d506b2f3250e90dfd5bf61bf",
+    "scraped-data/derived/sc15-room-board-codex/fix1-legends-1080p-100-1.png": "51b90e9021c2a09a3594a0fa561d5efb6f320d28e65666e3dd791c3d2dc0ca63",
+    "scraped-data/derived/sc15-room-board-codex/fix1-legends-1080p-150-1-gray.png": "3d438e050bc8eb4d171799e24dc886c4fafc4d70c8946260e640f8c7873c500d",
+    "scraped-data/derived/sc15-room-board-codex/fix1-legends-1080p-150-1.png": "c06053078a55d2bde59d60abc1f2547b433795898307d1790e5721b3fec4bfab",
+    "scraped-data/derived/sc15-room-board-codex/fix1-legends-720p-100-1-gray.png": "11bbf3c7d39937da852552c9679c56c3eb108c247b5b77da6bb34d2825c2748b",
+    "scraped-data/derived/sc15-room-board-codex/fix1-legends-720p-100-1.png": "442e5fc7800b70bbe9c94804b558d4c41325fd7ee5a035dd56d9ea7f389f59b2",
+    "scraped-data/derived/sc15-room-board-codex/fix1-legends-720p-150-1-gray.png": "daa009da634a656f040f06695d8b2bf75a44eab8481fb3111e0926e78329021c",
+    "scraped-data/derived/sc15-room-board-codex/fix1-legends-720p-150-1.png": "be0acafe79c168741d1210945e991af7ac13983136f7ecdba4514d9b5abf09fd",
+    "scraped-data/derived/sc15-room-board-codex/fix1-legends-720p-150-2-gray.png": "bf2e17105bdae37b8cdcfdfed1b240a9135e2259dd0a16f8a0afdc2ff45d393a",
+    "scraped-data/derived/sc15-room-board-codex/fix1-legends-720p-150-2.png": "b46944dae64482d487904e10e1b093b2eaab1d53661a4475f8690e5dcf0c07de",
+    "scraped-data/derived/sc15-room-board-codex/SC-15-board-marmoreal-1080p-100-gray.png": "083986e108c8d8c5527a24ba25287c4fb55a1fea5463aba981aa867140ef6ebd",
+    "scraped-data/derived/sc15-room-board-codex/SC-15-board-marmoreal-1080p-100.png": "4567f00094689351b72515f68ee5a2ba8326e7fb6f1d6b60223b4f5273a3c452",
+    "scraped-data/derived/sc15-room-board-codex/SC-15-board-marmoreal-1080p-150-gray.png": "5a1efcf0ef6a6903ffea93afac69f544f4b99eb673a1390b264bcc5e9ce15bc0",
+    "scraped-data/derived/sc15-room-board-codex/SC-15-board-marmoreal-1080p-150.png": "0460182320d26c602b1d7b4b0007a7f7b40a7b6a1b2b003e7ee86649a80360d1",
+    "scraped-data/derived/sc15-room-board-codex/SC-15-board-marmoreal-720p-100-gray.png": "c05b081599799c53342ca75315ed406e1a4c9340d0fd838ef87d0c1fdf6662a9",
+    "scraped-data/derived/sc15-room-board-codex/SC-15-board-marmoreal-720p-100.png": "3080def6311c34911986e730b61b168c8392059b43bfc672fdcec36956710ebb",
+    "scraped-data/derived/sc15-room-board-codex/SC-15-board-marmoreal-720p-150-gray.png": "427d41f06bf4b7de095405e2be8685e0a6eaa289c081865592d42037933d27eb",
+    "scraped-data/derived/sc15-room-board-codex/SC-15-board-marmoreal-720p-150.png": "6d097ba848446903f44fe042a9db0186051198a62a5d87ed7978303f8aea2db8",
+    "scraped-data/derived/sc15-room-board-codex/SC-15-board-sarpedon-1080p-100-gray.png": "d63bdb2764d6a4e9105b98604af1cd7d8f32d03a84577b30d9f26c523cf77122",
+    "scraped-data/derived/sc15-room-board-codex/SC-15-board-sarpedon-1080p-100.png": "c048e9d4d59e99d9ffd3fbee199cb81588a972ba85732d2649b535f85015f412",
+    "scraped-data/derived/sc15-room-board-codex/SC-15-board-sarpedon-1080p-150-gray.png": "f542b029022ff78c9e8f1471ce25e1007c1f05e4f2b295b365e3caa09b0a636a",
+    "scraped-data/derived/sc15-room-board-codex/SC-15-board-sarpedon-1080p-150.png": "d9f67c35b5feaa790dd800a552603f03716d38d261d057ba4f9c9b42d705415c",
+    "scraped-data/derived/sc15-room-board-codex/SC-15-board-sarpedon-720p-100-gray.png": "7aec111077b6d5750f3a8b25805d6529ebe7c1b790efc62ca772f5362a07cf7f",
+    "scraped-data/derived/sc15-room-board-codex/SC-15-board-sarpedon-720p-100.png": "9106b55afbf194f127a38a528bbfe85359e95661906765303d930e3035970065",
+    "scraped-data/derived/sc15-room-board-codex/SC-15-board-sarpedon-720p-150-gray.png": "05b20cf0df6f788c68eac5ab87c9fff5431f95d54b14559db647f4522be6aca4",
+    "scraped-data/derived/sc15-room-board-codex/SC-15-board-sarpedon-720p-150.png": "a3310eadf2cbb888d7e007db1446e63052f169a183d03eefea0178d717d08b3e",
+    "scraped-data/derived/sc15-room-board-codex/inputs/all-boards.json": "bac238312a76f14a88161f3319d7eda10563d515a4b5653172565feeca4fa0c0",
+    "scraped-data/derived/sc15-room-board-codex/inputs/capture-log.json": "0e04314e51c90e072ee8fa62ad9edc8d60e549bf805ae25f7362b10a2fe14c10",
+    "scraped-data/derived/sc15-room-board-codex/inputs/heroes.json": "563dcd4d36c8eed47c0c908b2fc51d6b9cf31b556d7c774d8bdccbc5caf42e16",
+    "scraped-data/derived/sc15-room-board-codex/inputs/room-sarpedon.json": "9e7076e525a7552aae6f1a79be91ba44b6ad9c3aefe06a2c7cb5febcc3d83cb4",
+    "scraped-data/derived/sc15-room-board-codex/inputs/room-state.json": "bb81eb5ca06967abb5bc1df0912d6c6b65245bc7f9bbb5e6d98695443594ad02",
+    "scraped-data/derived/sc15-room-board-codex/inputs/room-vsai.json": "4885c434e2224c2274903a593236faeea64f8272b0c18395df167f25016d9c68"
+  },
+  "facts": {
+    "strings": {
+      "screens.lobby.create.mode.1v1": {
+        "value": "1×1",
+        "source": "docs/unreal/contracts/hud/st-screens.csv:screens.lobby.create.mode.1v1:ru"
+      },
+      "screens.lobby.create.mode.ai": {
+        "value": "Против ИИ",
+        "source": "docs/unreal/contracts/hud/st-screens.csv:screens.lobby.create.mode.ai:ru"
+      },
+      "screens.room.title": {
+        "value": "Комната · код {code}",
+        "source": "docs/unreal/contracts/hud/st-screens.csv:screens.room.title:ru"
+      },
+      "screens.room.code.copy": {
+        "value": "Копировать",
+        "source": "docs/unreal/contracts/hud/st-screens.csv:screens.room.code.copy:ru"
+      },
+      "screens.room.slot.host": {
+        "value": "Хост",
+        "source": "docs/unreal/contracts/hud/st-screens.csv:screens.room.slot.host:ru"
+      },
+      "screens.room.slot.guest": {
+        "value": "Соперник",
+        "source": "docs/unreal/contracts/hud/st-screens.csv:screens.room.slot.guest:ru"
+      },
+      "screens.room.slot.waiting": {
+        "value": "Ждём игрока…",
+        "source": "docs/unreal/contracts/hud/st-screens.csv:screens.room.slot.waiting:ru"
+      },
+      "screens.room.slot.ai": {
+        "value": "ИИ-соперник",
+        "source": "docs/unreal/contracts/hud/st-screens.csv:screens.room.slot.ai:ru"
+      },
+      "screens.room.ready": {
+        "value": "Готов",
+        "source": "docs/unreal/contracts/hud/st-screens.csv:screens.room.ready:ru"
+      },
+      "screens.room.not.ready": {
+        "value": "Не готов",
+        "source": "docs/unreal/contracts/hud/st-screens.csv:screens.room.not.ready:ru"
+      },
+      "screens.room.hero.pick": {
+        "value": "Выбрать",
+        "source": "docs/unreal/contracts/hud/st-screens.csv:screens.room.hero.pick:ru"
+      },
+      "screens.room.hero.picked": {
+        "value": "Выбрано",
+        "source": "docs/unreal/contracts/hud/st-screens.csv:screens.room.hero.picked:ru"
+      },
+      "screens.room.board.title": {
+        "value": "Доска",
+        "source": "docs/unreal/contracts/hud/st-screens.csv:screens.room.board.title:ru"
+      },
+      "screens.room.deck.view": {
+        "value": "Просмотр колоды",
+        "source": "docs/unreal/contracts/hud/st-screens.csv:screens.room.deck.view:ru"
+      },
+      "screens.room.deck.count": {
+        "value": "Колода: {n} {n}|plural(one=карта,few=карты,many=карт,other=карты)",
+        "source": "docs/unreal/contracts/hud/st-screens.csv:screens.room.deck.count:ru"
+      },
+      "screens.room.start": {
+        "value": "Начать партию",
+        "source": "docs/unreal/contracts/hud/st-screens.csv:screens.room.start:ru"
+      },
+      "screens.room.leave": {
+        "value": "Выйти из комнаты",
+        "source": "docs/unreal/contracts/hud/st-screens.csv:screens.room.leave:ru"
+      },
+      "screens.room.status.waiting": {
+        "value": "Ждём готовности соперника…",
+        "source": "docs/unreal/contracts/hud/st-screens.csv:screens.room.status.waiting:ru"
+      },
+      "screens.room.status.all.ready": {
+        "value": "Все готовы",
+        "source": "docs/unreal/contracts/hud/st-screens.csv:screens.room.status.all.ready:ru"
+      },
+      "screens.room.countdown": {
+        "value": "Партия начинается…",
+        "source": "docs/unreal/contracts/hud/st-screens.csv:screens.room.countdown:ru"
+      },
+      "common.confirm.yes": {
+        "value": "Да",
+        "source": "docs/unreal/contracts/hud/st-screens.csv:common.confirm.yes:ru"
+      },
+      "common.confirm.cancel": {
+        "value": "Отмена",
+        "source": "docs/unreal/contracts/hud/st-screens.csv:common.confirm.cancel:ru"
+      },
+      "screens.room.hero.stats": {
+        "value": "HP {hp} · ход {move}",
+        "source": "SC-14-series.codex.md: proposed screens.room.hero.stats"
+      },
+      "screens.room.hero.melee": {
+        "value": "ближний бой",
+        "source": "SC-14-series.codex.md: proposed screens.room.hero.melee"
+      },
+      "screens.room.hero.ranged": {
+        "value": "дальний бой",
+        "source": "SC-14-series.codex.md: proposed screens.room.hero.ranged"
+      },
+      "screens.room.leave.confirm": {
+        "value": "Выйти из комнаты?",
+        "source": "SC-14-series.codex.md: proposed screens.room.leave.confirm"
+      },
+      "screens.room.slot.no.hero": {
+        "value": "Герой не выбран",
+        "source": "SC-14-series.codex.md: proposed screens.room.slot.no.hero"
+      },
+      "screens.room.slot.ai.hero": {
+        "value": "Герой ИИ — при старте",
+        "source": "SC-14-series.codex.md: proposed screens.room.slot.ai.hero"
+      },
+      "screens.lobby.create.mode": {
+        "value": "Режим",
+        "source": "SC-14-series.codex.md: proposed screens.lobby.create.mode"
+      },
+      "screens.room.countdown.number": {
+        "value": "{n}",
+        "source": "SC-14-series.codex.md: proposed screens.room.countdown.number"
+      }
+    },
+    "why": {
+      "why.room.started": {
+        "value": "Игра уже началась",
+        "source": "docs/unreal/contracts/hud/why-reasons.json:why.room.started:ru"
+      },
+      "why.room.full": {
+        "value": "Комната заполнена",
+        "source": "docs/unreal/contracts/hud/why-reasons.json:why.room.full:ru"
+      },
+      "why.hero.taken": {
+        "value": "Выбран соперником",
+        "source": "docs/unreal/contracts/hud/why-reasons.json:why.hero.taken:ru"
+      },
+      "why.room.not.ready": {
+        "value": "Соперник не готов",
+        "source": "docs/unreal/contracts/hud/why-reasons.json:why.room.not.ready:ru"
+      },
+      "why.room.no.hero": {
+        "value": "Выберите героя",
+        "source": "docs/unreal/contracts/hud/why-reasons.json:why.room.no.hero:ru"
+      },
+      "why.room.board.locked": {
+        "value": "Доску выбирают при создании комнаты",
+        "source": "docs/unreal/contracts/hud/why-reasons.json:why.room.board.locked:ru"
+      }
+    },
+    "heroes": {
+      "cmq7d7b1000njwi74a536w55r": {
+        "value": {
+          "id": "cmq7d7b1000njwi74a536w55r",
+          "name": "King Arthur",
+          "nameEn": "King Arthur",
+          "nameRu": "King Arthur",
+          "health": 18,
+          "fighterType": "HERO",
+          "movement": 2,
+          "ability": {
+            "type": "CUSTOM",
+            "effect": "When King Arthur attacks, you may BOOST that attack, Play the BOOST card, face down, along with your attack card.\nIf your opponent cancels the effects on your attack card, the BOOST is discarded without effect.",
+            "timing": "PASSIVE",
+            "description": "When King Arthur attacks, you may BOOST that attack, Play the BOOST card, face down, along with your attack card.\nIf your opponent cancels the effects on your attack card, the BOOST is discarded without effect."
+          },
+          "properties": {
+            "attackType": "melee",
+            "hasSidekick": true,
+            "sidekickCount": 1
+          },
+          "sidekicks": [
+            {
+              "name": "Merlin",
+              "health": "7",
+              "movement": "2",
+              "avatarUrl": "https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/sidekicks/4Rl9Oq9N82zhatbTShnXn.webp",
+              "attackType": "range"
+            }
+          ],
+          "deckCards": "[]",
+          "avatarUrl": "https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/avatars/dgwIAej9v-Omrn0sSVs5i.webp",
+          "avatar": "scraped-data/derived/ue-media-v1/avatars/king-arthur.png",
+          "sidekick_avatar": "scraped-data/derived/ue-media-v1/sidekicks/king-arthur-merlin.png"
+        },
+        "source": "scraped-data/derived/sc15-room-board-codex/inputs/heroes.json:adminHero.cmq7d7b1000njwi74a536w55r.answer.data.adminHero"
+      },
+      "cmq7d7b4000r8wi74tzd1jmxv": {
+        "value": {
+          "id": "cmq7d7b4000r8wi74tzd1jmxv",
+          "name": "Medusa",
+          "nameEn": "Medusa",
+          "nameRu": "Medusa",
+          "health": 16,
+          "fighterType": "HERO",
+          "movement": 3,
+          "ability": {
+            "type": "CUSTOM",
+            "effect": "At the start of your turn, you may deal 1 damage to an opposing fighter in Medusa's zone.",
+            "timing": "PASSIVE",
+            "description": "At the start of your turn, you may deal 1 damage to an opposing fighter in Medusa's zone."
+          },
+          "properties": {
+            "attackType": "range",
+            "hasSidekick": true,
+            "sidekickCount": 3
+          },
+          "sidekicks": [
+            {
+              "name": "Harpies",
+              "health": "1",
+              "movement": "3",
+              "avatarUrl": "https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/sidekicks/G42WIKYZ1cmwACVwMggzM.webp",
+              "attackType": "melee"
+            },
+            {
+              "name": "Harpies",
+              "health": "1",
+              "movement": "3",
+              "avatarUrl": "https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/sidekicks/G42WIKYZ1cmwACVwMggzM.webp",
+              "attackType": "melee"
+            },
+            {
+              "name": "Harpies",
+              "health": "1",
+              "movement": "3",
+              "avatarUrl": "https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/sidekicks/G42WIKYZ1cmwACVwMggzM.webp",
+              "attackType": "melee"
+            }
+          ],
+          "deckCards": "[]",
+          "avatarUrl": "https://yptpnirqgfmxphjvsdjz.supabase.co/storage/v1/object/public/heroes/avatars/bI206lUtJUQru-FOD8A74.webp",
+          "avatar": "scraped-data/derived/ue-media-v1/avatars/medusa.png",
+          "sidekick_avatar": "scraped-data/derived/ue-media-v1/sidekicks/medusa-harpies.png"
+        },
+        "source": "scraped-data/derived/sc15-room-board-codex/inputs/heroes.json:adminHero.cmq7d7b4000r8wi74tzd1jmxv.answer.data.adminHero"
+      }
+    },
+    "frames": {
+      "board-marmoreal": {
+        "value": {
+          "id": "cmuxt3nce000fnx01eq6ncjx9",
+          "code": "6PPWSS",
+          "status": "LOBBY",
+          "mode": "ONE_V_ONE",
+          "hostId": "cmq7d4b3z000ewi205ca0fphl",
+          "boardId": "c121b47f8d6eb28daccb76d05",
+          "createdAt": 1791359343086,
+          "players": [
+            {
+              "userId": "cmq7d4b3z000ewi205ca0fphl",
+              "username": "ProGamer",
+              "heroId": "cmq7d7b4000r8wi74tzd1jmxv",
+              "isReady": false,
+              "seatOrder": 0
+            },
+            {
+              "userId": "cmq7d4b7o000swi207uc9tebk",
+              "username": "Veteran",
+              "heroId": "cmq7d7b1000njwi74a536w55r",
+              "isReady": false,
+              "seatOrder": 1
+            }
+          ]
+        },
+        "viewer": "host",
+        "source": "scraped-data/derived/sc15-room-board-codex/inputs/room-state.json:steps.both_picked"
+      },
+      "board-sarpedon": {
+        "value": {
+          "id": "cmuxt3n8a0009nx015cyqvq5a",
+          "code": "PLN46F",
+          "status": "LOBBY",
+          "mode": "ONE_V_ONE",
+          "hostId": "cmq7d4b3z000ewi205ca0fphl",
+          "boardId": "c7fa64a26c29a0835f2383e63",
+          "createdAt": 1791359342939,
+          "players": [
+            {
+              "userId": "cmq7d4b3z000ewi205ca0fphl",
+              "username": "ProGamer",
+              "heroId": "cmq7d7b4000r8wi74tzd1jmxv",
+              "isReady": false,
+              "seatOrder": 0
+            },
+            {
+              "userId": "cmq7d4b7o000swi207uc9tebk",
+              "username": "Veteran",
+              "heroId": "cmq7d7b1000njwi74a536w55r",
+              "isReady": false,
+              "seatOrder": 1
+            }
+          ]
+        },
+        "viewer": "host",
+        "source": "scraped-data/derived/sc15-room-board-codex/inputs/room-sarpedon.json:steps.both_picked"
+      }
+    },
+    "deck": {
+      "total": 30,
+      "unique_medusa": 11,
+      "source": "docs/game-design/evidence/S01/catalog-medusa.json:hero.cards[].quantity and length",
+      "king_arthur_total": 30,
+      "king_arthur_source": "docs/game-design/evidence/S01/catalog-king-arthur.json"
+    },
+    "caption": {
+      "value": "фон-заглушка: в игре фигур нет (ВР-75)",
+      "source": "SC-14-series.codex.md:ВР-VS4-SC14-12"
+    },
+    "placeholder_AI": {
+      "username": "AI Bot",
+      "source": "backend/prisma/seed-ai.ts:24; GameService.setupAiOpponent; series ВР-VS4-SC17-01",
+      "hero": null,
+      "ready": true
+    },
+    "board_names": {
+      "value": [
+        {
+          "id": "c121b47f8d6eb28daccb76d05",
+          "name": "Marmoreal · original map",
+          "nameEn": "Marmoreal",
+          "nameRu": "Marmoreal",
+          "set": "battle-of-legends-volume-one"
+        },
+        {
+          "id": "c7fa64a26c29a0835f2383e63",
+          "name": "Sarpedon · original map",
+          "nameEn": "Sarpedon",
+          "nameRu": "Sarpedon",
+          "set": "battle-of-legends-volume-one"
+        }
+      ],
+      "source": "scraped-data/derived/sc15-room-board-codex/inputs/all-boards.json:adminBoard"
+    },
+    "ability_language_marker": {
+      "value": "EN",
+      "source": "series ВР-VS4-SC14-02 / 02 §3.4"
+    },
+    "copies": [
+      {
+        "source": "art/imagegen/sc01-screen-base-codex/_tools/screen_mockup_base.py",
+        "copy": "art/imagegen/sc15-room-board-codex/_tools/screen_mockup_base.py",
+        "sha256": "d970f88141a97adb6e1fd4e6dadacc21d194cb3caa6223aca4ee85706e41c98d",
+        "unchanged": true
+      },
+      {
+        "source": "art/imagegen/hud-icons-v3/_tools/draw_icons.py",
+        "copy": "art/imagegen/sc15-room-board-codex/_tools/draw_icons_v3_snapshot.py",
+        "sha256": "30da74cc5482d53b0c9e84d6039bd4ca0bc642d0ed4e576b3b96b643f91d75f0",
+        "unchanged": true
+      },
+      {
+        "source": "art/imagegen/sc14-room-hero-codex/_tools/sc14_room_hero.py",
+        "copy": "art/imagegen/sc15-room-board-codex/_tools/sc14_room_hero.py",
+        "sha256": "d3db4d21d134ca19876513f51171ac4a5588f5e48621c7c837e0fafa5d455af9",
+        "unchanged": true
+      },
+      {
+        "source": "art/imagegen/sc14-room-hero-codex/_tools/finalize_review.py",
+        "copy": "art/imagegen/sc15-room-board-codex/_tools/finalize_review.py",
+        "sha256": "d5a2a4e89ed33e11835b3cd1113a779482f32509f42a86de1535399148686be8",
+        "unchanged": true
+      }
+    ],
+    "post_render_audit_inputs": {
+      "art/imagegen/sc18-room-countdown-codex/_tools/audit_palette.py": "f43c1631e77c9a34ee35b74b18c289b1e262445df4e40bac8e1e494ed03d1f1d"
+    }
+  }
+}

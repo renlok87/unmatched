@@ -1201,11 +1201,47 @@
       "result_path": "art/imagegen/sc08-lobby-list-codex/, sc09-lobby-create-codex/, sc10-lobby-create-ai-codex/, sc11-lobby-code-codex/, sc12-lobby-empty-codex/, sc13-lobby-error-codex/",
       "status": "ok",
       "note": "CX-29 fix1 (единственный корректирующий прогон серии; задания SC-08…SC-13.fix1.codex.md); 2026-10-07 12:06-12:27 +05:00 (~21 мин); отступ содержимого строк ≥ 8 su (код с 16 su, кнопка/причина до правой кромки −8 su), оверлеи по состояниям с подписями у рамок и легендой x/y/w/h su, RecoverButton внутри CodeColumn (на S — только в легенде), README карточек переписаны, SC-10 интервалы заметки ИИ, SC-12 только глиф лампы state-hint_glyph 32 su; sc08_lobby_list.py d46e766f скопирован без изменений в SC-09…SC-13; manifest 1646/1654/1649/1662/1638/1638 сверены; генераций 0; ревью Claude: accept по делегированию всей серии (ВР-VS4-SC08-01…17, ВР-VS4-SC09-01…03, ВР-VS4-SC10-01, ВР-VS4-SC11-01…05, ВР-VS4-SC12-01…02, ВР-VS4-SC13-01)"
+    },
+    {
+      "date": "2026-10-07T13:36:26+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle 5ea220ae)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "SC-14",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a1155a-db6d-7680-a5ad-66689cae25ed",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/SC-14-series.codex.md",
+      "result_path": "art/imagegen/sc14-room-hero-codex/, sc15-room-board-codex/, sc16-room-deck-codex/, sc17-room-ready-codex/, sc18-room-countdown-codex/",
+      "status": "ok",
+      "note": "CX-30 прогон 1 (серия SC-14…SC-18 ROOM в одном чате; задания SC-14…SC-18.codex.md); 2026-10-07 12:53–13:36 +05:00 (~43 мин); 5 пакетов, 112 макетов и 40 листов сравнения в scraped-data/derived, 40 оверлеев в пакетах; данные — снимки стендов S09 и S10 (Claude, 07:49 UTC); генераций 0; ревью Claude: fix-needed — в SC-18 цифра и «Партия начинается…» без подложки поверх текста ROOM, в SC-17 leave пустая модаль 640×360 с одним заголовком, «Колода: 30 карт» без выбранного героя, перенос внутри «ближний бой», оверлеи без x/y и с неверным именем модали SC-16 (ВР-VS4-SC14-13…15, -SC17-03, -SC18-02)"
+    },
+    {
+      "date": "2026-10-07T14:16:31+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle 5ea220ae)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "SC-14",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a1158a-c21d-7db2-88b4-486c0dd6e3fe",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/SC-14-series.fix1.codex.md",
+      "result_path": "art/imagegen/sc14-room-hero-codex/, sc15-room-board-codex/, sc16-room-deck-codex/, sc17-room-ready-codex/, sc18-room-countdown-codex/",
+      "status": "ok",
+      "note": "CX-30 fix1 (единственный корректирующий прогон серии; задание SC-14-series.fix1.codex.md); 2026-10-07 13:46–14:16 +05:00 (~30 мин); строка колоды без героя — только «ПРОСМОТР КОЛОДЫ» с why.room.no.hero, «ближний бой» / «дальний бой» без разрыва, плашка отсчёта (modal) в SC-18, модаль выхода по содержимому (640×148 su на L), оверлеи с x/y/w/h su и вложенными элементами по карточкам (UUmScreenInspect, UUmConfirmDialog, CountText); sc14_room_hero.py и sc17_room_ready.py скопированы побайтно; все кадры пересобраны; генераций 0; ревью Claude: accept по делегированию всей серии (ВР-VS4-SC14-01…16, ВР-VS4-SC15-01, ВР-VS4-SC16-01, ВР-VS4-SC17-01…03, ВР-VS4-SC18-01…02)"
     }
   ],
   "totals": {
     "syntx_spent": 6.0,
     "tripo_spent": 0,
-    "codex_packages": 60
+    "codex_packages": 62
   }
 }
