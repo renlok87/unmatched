@@ -7,13 +7,15 @@ Run by tools/art/de010/de010.run_editor (or directly with -ExecutePythonScript):
 1. The effect types of ВР-25: /Game/S08/FX/EffectTypes/NET_UM_Combat (MaxSystemInstances 3, the star / motes /
    embers / arc / vortex) and NET_UM_Board (6, the dust / chevrons / the placard) - cull reaction Deactivate,
    the age significance handler (the newer instance wins). Created once, updated in place.
-2. NS_FX_PlacardStar under /Game/S08/FX/Systems/: the FX-02 test placard - a duplicate of the simplest EnvKit
-   CPU deterministic sprite system (NS_Env_FallsSpray, one emitter), re-tuned through
-   US08EnvFxAuthoringLibrary.TuneNiagaraSystem into a still, long-lived, single print sprite: the print
-   material MI_FX_PlacardStar on the sprite renderer, the noise / sparkle modules zeroed (ВР-Z2-08: the Tune
-   cannot delete a module of the donor, so the combat systems of FX-13+ will be built without them; here the
-   strengths are 0 and the picture is still), the seed = CRC32 of the name (FX-04), the effect type
-   NET_UM_Board, PoolPrimeSize 2.
+2. NS_FX_PlacardStar under /Game/S08/FX/Systems/: the FX-02 test placard - since the Z-2 review (ВР-Z2R-06) a
+   duplicate of the ENGINE template system /Niagara/DefaultAssets/Templates/Systems/DirectionalBurst (Unreal
+   Engine content: no third-party licence, no attribution), re-tuned through
+   US08EnvFxAuthoringLibrary.TuneNiagaraSystem into ONE still print sprite shown at once: the burst of 1 at t=0,
+   no velocity / gravity, the size-by-speed factors 1, a life far longer than any shot, the ribbon emitter off,
+   the print material MI_FX_PlacardStar on the sprite renderer, the seed = CRC32 of the name (FX-04), fixed
+   bounds, the effect type NET_UM_Board, PoolPrimeSize 2. The former donor (the EnvKit copy of SoftTofu's
+   NS_Env_FallsSpray, CC BY 4.0) spawned its first particle only after 4 s at sprite size 0 (the sparkle size
+   multiplier was zeroed) - the star of the Z-2 frames never drew.
 
 Idempotent: the system is re-duplicated from the pristine donor and re-tuned on every run. Report:
 C:/tmp/z2-fx/fx-systems.json (settings before / after, the tune report, the describe of the result).
@@ -28,7 +30,7 @@ AT = u.AssetToolsHelpers.get_asset_tools()
 TUNE = u.S08EnvFxAuthoringLibrary
 REPORT = r"C:/tmp/z2-fx/fx-systems.json"
 FX = "/Game/S08/FX"
-DONOR = "/Game/EnvKit/FX/NS_Env_FallsSpray"
+DONOR = "/Niagara/DefaultAssets/Templates/Systems/DirectionalBurst"
 PLACARD = FX + "/Systems/NS_FX_PlacardStar"
 MI_PLACARD = FX + "/Materials/MI_FX_PlacardStar"
 
@@ -59,32 +61,14 @@ def set_first(asset, names, value):
     return None
 
 
-def tune_effect_type_caps(et, cap, out_entry):
-    """ВР-FX17: the caps live in the per-platform SystemScalabilitySettings array (not flat properties).
-    Best effort through python: read the array struct, set the fields of its Settings list, write back."""
-    try:
-        arr = et.get_editor_property("SystemScalabilitySettings")
-        items = None
-        for attr in ("settings", "Settings"):
-            if hasattr(arr, attr):
-                items = getattr(arr, attr)
-                break
-        if items is None:
-            out_entry["scalabilityArray"] = "no settings list on the wrapper"
-            return
-        if len(items) == 0:
-            items.append(u.NiagaraSystemScalabilitySettings())
-        entry = items[0]
-        for name, value in (("bCullPerSystemMaxInstanceCount", True), ("MaxSystemInstances", cap),
-                            ("CullReaction", getattr(u.NiagaraCullReaction, "DEACTIVATE", None))):
-            try:
-                entry.set_editor_property(name, value)
-                out_entry[name] = True
-            except Exception:  # noqa: BLE001
-                out_entry[name + "_python"] = "ERR"
-        et.set_editor_property("SystemScalabilitySettings", arr)
-    except Exception as exc:  # noqa: BLE001
-        out_entry["scalabilityArray"] = str(exc)[:150]
+def tune_effect_type_caps(path, cap, out_entry):
+    """ВР-25 caps (Z-2 review fix 8; ВР-Z2-09 closed): the caps live in the per-platform SystemScalabilitySettings
+    array and the cull reaction on the type - not reachable from python, so the C++ editor library
+    US08FxAuthoringLibrary.SetEffectTypeCaps writes them (both instance counts = cap, CullReaction Deactivate)."""
+    report = json.loads(u.S08FxAuthoringLibrary.set_effect_type_caps(path, cap))
+    out_entry.update(report)
+    if not report.get("ok"):
+        raise RuntimeError("effect type caps of %s: %s" % (path, report))
 
 
 out = {"errors": []}
@@ -101,7 +85,7 @@ try:
         et = load(path)
         et.modify()
         entry = {"cap": cap}
-        tune_effect_type_caps(et, cap, entry)
+        tune_effect_type_caps(path, cap, entry)
         # the age significance handler (the newer instance wins); the class is not always python-exposed
         age_cls = getattr(u, "NiagaraSignificanceHandlerAge", None)
         if age_cls is not None:
@@ -113,12 +97,12 @@ try:
     out["placard"] = {"donor": DONOR}
     if EAL.does_asset_exist(PLACARD):
         if not EAL.delete_asset(PLACARD):
-            # a live reference keeps the package alive - tune the existing copy in place instead of duplicating
-            out["placard"]["note"] = "existing asset kept (delete refused); tuned in place"
+            # the system is rebuilt from the pristine template on every run - never tune a stale copy in place
+            raise RuntimeError("delete of %s refused (a live reference?)" % PLACARD)
     if EAL.does_asset_exist(PLACARD):
-        duplicate = load(PLACARD)
-    else:
-        duplicate = AT.duplicate_asset("NS_FX_PlacardStar", FX + "/Systems", load(DONOR))
+        # the editor kept the deleted package in memory: delete the .uasset on disk before the run instead
+        raise RuntimeError("%s still exists after the delete - remove its .uasset and rerun" % PLACARD)
+    duplicate = AT.duplicate_asset("NS_FX_PlacardStar", FX + "/Systems", load(DONOR))
     if duplicate is None:
         raise RuntimeError("duplicate %s -> %s failed" % (DONOR, PLACARD))
     seed = crc_seed("NS_FX_PlacardStar")
@@ -135,13 +119,26 @@ try:
     EAL.save_loaded_asset(duplicate, False)
     spec = {
         "simTarget": "cpu", "emitterDeterminism": True, "emitterSeedBase": seed,
-        "spriteMaterials": {"HangingParticulates": MI_PLACARD},
-        "user": {"SpawnRate": 0.25, "Lifetime Min": 20.0, "Lifetime Max": 20.0,
-                 "User. Size Min": 22.0, "User.Size Max": 22.0, "Sphere Radius": 0.5, "Drag": 0.0,
-                 "Noise Strength": 0.0, "Noise Frequency": 0.0, "ColorStrength_Sparkling": 0.0,
-                 "Size_Sparkling": 0.0, "Sparkling_Speed_Min": 0.0, "Sparkling_Speed_Max": 0.0},
+        "emitters": {"LocationBasedRibbon": {"enabled": False}},
+        "spriteMaterials": {"DirectionalBurst": MI_PLACARD},
+        "constants": [
+            {"match": "*SpawnBurst_Instantaneous.Spawn Count", "set": 1},
+            {"match": "*SpawnBurst_Instantaneous.Spawn Time", "set": 0},
+            {"match": "*InitializeParticle.Lifetime Min", "set": 100000.0},
+            {"match": "*InitializeParticle.Lifetime Max", "set": 100000.0},
+            {"match": "*InitializeParticle.Sprite Size Min", "set": [32.0, 32.0]},
+            {"match": "*InitializeParticle.Sprite Size Max", "set": [32.0, 32.0]},
+            {"match": "*ScaleSpriteSizeBySpeed.Min Scale Factor", "set": [1.0, 1.0]},
+            {"match": "*ScaleSpriteSizeBySpeed.Max Scale Factor", "set": [1.0, 1.0]},
+            {"match": "*RandomRangeFloat002.Minimum", "set": 0.0},
+            {"match": "*RandomRangeFloat002.Maximum", "set": 0.0},
+            {"match": "*GravityForce.Gravity", "set": [0.0, 0.0, 0.0]},
+            {"match": "*EmitterState.MaxDistance", "set": 1000000.0},
+        ],
     }
     tune = TUNE.tune_niagara_system(PLACARD, json.dumps(spec))
+    # FX-04 (the Z-2 review): bFixedBounds itself is not reachable from python (its name collides with FixedBounds)
+    out["placard"]["fixedBoundsOn"] = json.loads(u.S08FxAuthoringLibrary.set_system_fixed_bounds(PLACARD, 30.0))
     EAL.save_loaded_asset(load(PLACARD), False)
     out["tune"] = json.loads(tune)
     out["describe"] = json.loads(TUNE.describe_niagara_system(PLACARD))["describe"]
