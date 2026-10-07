@@ -18,6 +18,10 @@
 //   /Game/S08/UI/Common/WBP_UmSpinner    UUmSpinner       (VS-3 HB-47)
 //   /Game/S08/UI/Hud/WBP_UI_HUD_DECKS    UUmHudDecks      (VS-3 HB-27)
 //   /Game/S08/UI/Hud/WBP_UI_HUD_DECKPANEL  UUmHudDeckPanel (VS-3 HB-28)
+//   /Game/S08/UI/Hud/WBP_UI_HUD_LOG      UUmHudLog        (VS-4 HB-39)
+//   /Game/S08/UI/Common/WBP_UmToast      UUmToast         (VS-4 HB-40)
+//   /Game/S08/UI/Hud/WBP_UI_HUD_TOAST    UUmToastStack    (VS-4 HB-40)
+//   /Game/S08/UI/Hud/WBP_UI_HUD_SUB      UUmHudSubtitle   (VS-4 HB-41)
 // Called from UE Python: tools/s08/hud_contract/ue_author_um_hud.py (UnrealEditor-Cmd -run=pythonscript).
 #pragma once
 

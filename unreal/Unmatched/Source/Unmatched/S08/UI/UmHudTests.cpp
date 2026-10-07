@@ -184,7 +184,8 @@ bool FUmHudRootTreeTest::RunTest(const FString&) {
   TestTrue(TEXT("-S08SlateHud=hand: the hand slot stays collapsed"), Game->GetSlot(EUmGameSlot::Hand)->GetVisibility() == ESlateVisibility::Collapsed);
   const FUmHudLayout S = FUmHudLayout::Compute(FVector2D(1280.0, 720.0), 1.5f, nullptr);
   Game->ApplyLayout(S, {});
-  TestTrue(TEXT("class S: no LOG column (ВР-H07)"), Game->GetSlot(EUmGameSlot::Log)->GetVisibility() == ESlateVisibility::Collapsed);
+  // VS-4 HB-39: no LOG column in S - the slot is the list under TOP (16, 16 + 40 + 8, 360 x 320), opened from «Журнал»
+  SlotAt(EUmGameSlot::Log, 16.0f, 64.0f, 360.0f, 320.0f);
   TestTrue(TEXT("class S: the hand slot back"), Game->GetSlot(EUmGameSlot::Hand)->GetVisibility() == ESlateVisibility::HitTestInvisible);
   Game->ApplyLayout(S, {}, /*bAllSlate=*/true);
   TestTrue(TEXT("whole Slate: every slot collapsed"), Game->GetSlot(EUmGameSlot::Top)->GetVisibility() == ESlateVisibility::Collapsed);

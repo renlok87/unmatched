@@ -1256,6 +1256,28 @@ private:
   bool UmSlotOnUmg() const;
   /** Every frame from TickCardSlot: FS09SourceSlot -> UUmHudSourceSlot. */
   void TickUmSourceSlot();
+  // VS-4 HB-39...HB-41 (S08/UI/UmHudFeedBlocks.h; rollback -S08SlateHud=log | toast | sub): the log, the toasts, the
+  // subtitle - the hooks of the feed, the toast producers, the VO line, the board refusal
+  void BuildUmFeed();
+  void TickUmFeed();
+  /** A revealed trail's line (TickOpponentView, after FS09EventFeed took it). */
+  void UmHudLogTrail(const struct FS09LastMovement& Trail, const FString& CardName, const TArray<FString>& YourFighters);
+  /** ShowReason: the UMG toast of a keyed message (CUE-004 refusals, the skipped effect, ...). */
+  void UmHudToastReason(const FS09Reason& Reason, float Seconds);
+  /** RefreshUi: what the Slate toast line still shows - all of it with -S08SlateHud=toast, the non-keyed developer
+   *  strings under -S09Markers, nothing in the default view (the keyed ones are UMG toasts). */
+  FString UmHudSlateToast(const FString& Shown) const;
+  /** OfferVoLine: the UMG capsule shows the line (true: the Slate SubtitleBox stays collapsed). */
+  bool UmHudShowSubtitle(const FString& SpeakerName, const FString& Line, int64 DurationMs);
+  void UmHudHideSubtitle();
+  /** ApplyHandLimitHintVisibility: the hand-limit rule as a sticky warning toast (true: the Slate hint stays collapsed). */
+  bool UmHudSyncHandLimit();
+  /** A refused space (ShowIllegalCell): badge-refuse over it for 350 ms. */
+  void UmHudRefuseCell(int32 CellX, int32 CellY);
+  /** A refused HUD press (HandleHudPressOutcome): badge-refuse next to the button for 350 ms. */
+  void UmHudRefusePress(FName PressedId);
+  /** The open class S log list or a sticky toast's cross under the cursor (CursorOverHud). */
+  bool UmHudCursorOverFeed(float X, float Y) const;
   /** VS-3 SC-01 (ВР-SC14): -S08ScreenShots - one evidence frame per new UI-SCR-* id + state (<UI-ID>-<state>.png). */
   void TickUmScreenShots();
   // VS-2 exit frames (opt-in -S08ExitShots): own / opponent turn start + 0.5 s and + 3 s

@@ -42,6 +42,12 @@ their C++ bases (UUmHudAuthoringLibrary -> BuildDefaultTree of each class), in t
                                       (VS-4 HB-35; the number picker UUmNumberPicker is code-built inside it)
   /Game/S08/UI/Hud/WBP_UI_HUD_SLOT     parent UmHudSourceSlot  parts Root, Card (WBP_UmCard), Ribbon, RibbonEdge,
                                       RibbonIcon, RibbonText, BoostChip (BoostIcon, BoostText), HoldTrack, HoldFill (VS-4 HB-37)
+  /Game/S08/UI/Hud/WBP_UI_HUD_LOG      parent UmHudLog      parts Panel, Root, Title, Empty, Scroll, Lines (VS-4 HB-39; the
+                                      rows are pooled at run time)
+  /Game/S08/UI/Common/WBP_UmToast      parent UmToast       parts Box, Body, Row, SignBox, Icon, Text, CloseBox, CloseButton
+                                      (WBP_UmButton) (VS-4 HB-40)
+  /Game/S08/UI/Hud/WBP_UI_HUD_TOAST    parent UmToastStack  parts Canvas, Badge (VS-4 HB-40; the toasts are pooled WBP_UmToast)
+  /Game/S08/UI/Hud/WBP_UI_HUD_SUB      parent UmHudSubtitle parts Root, Capsule, Row, Speaker, Line (VS-4 HB-41)
 
 A widget tree is not reachable from Python, so the C++ library builds it (the same function the class uses without a
 WBP) and this script re-loads every asset, checks the parent class, writes the report (env UM_HUD_WBP_REPORT, default
@@ -83,6 +89,10 @@ ASSETS = {
     "/Game/S08/UI/Common/WBP_UmConfirmDialog": "UmConfirmDialog",
     "/Game/S08/UI/Hud/WBP_UI_HUD_PENDING": "UmHudPending",
     "/Game/S08/UI/Hud/WBP_UI_HUD_SLOT": "UmHudSourceSlot",
+    "/Game/S08/UI/Hud/WBP_UI_HUD_LOG": "UmHudLog",
+    "/Game/S08/UI/Common/WBP_UmToast": "UmToast",
+    "/Game/S08/UI/Hud/WBP_UI_HUD_TOAST": "UmToastStack",
+    "/Game/S08/UI/Hud/WBP_UI_HUD_SUB": "UmHudSubtitle",
 }
 
 

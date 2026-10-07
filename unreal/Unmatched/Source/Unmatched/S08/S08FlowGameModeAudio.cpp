@@ -319,6 +319,10 @@ void AS08FlowGameMode::OfferVoLine(const FString& Event, const FString& SpeakerK
       SubtitleText->SetText(FText::FromString(Shown));
       SubtitleBox->SetVisibility(EVisibility::HitTestInvisible);
       SubtitleUntilMs = NowMs() + LenMs + 500;
+      // VS-4 HB-41: the UMG capsule (UUmHudSubtitle) shows the line - the Slate box only on -S08SlateHud=sub
+      if (UmHudShowSubtitle(SpeakerKey == TEXT("HARPY") ? FString() : SpeakerName(SpeakerKey, bRu), Text, LenMs + 500)) {
+        SubtitleBox->SetVisibility(EVisibility::Collapsed);
+      }
       FS08Trace::Write(FString::Printf(TEXT("VO subtitle line=%s until=%lld"), *D.LineId,
                                        static_cast<long long>(SubtitleUntilMs)));
     }
@@ -739,6 +743,7 @@ void AS08FlowGameMode::StopMatchVoice(const TCHAR* Reason) {
     Music.SetVoActive(false, Now);
   }
   if (SubtitleBox.IsValid()) SubtitleBox->SetVisibility(EVisibility::Collapsed);
+  UmHudHideSubtitle();  // VS-4 HB-41
   SubtitleUntilMs = 0;
   FS08Trace::Write(FString::Printf(TEXT("VO stop reason=%s playing=%d dropped=%d t=%lld"), Reason, bWasPlaying ? 1 : 0,
                                    Dropped, static_cast<long long>(Now)));

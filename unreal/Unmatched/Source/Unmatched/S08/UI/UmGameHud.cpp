@@ -1,6 +1,8 @@
 // VS-2 HB-06: the GAME screen of the UMG HUD - see UmGameHud.h.
 #include "UmGameHud.h"
 
+#include "UmHudLog.h"
+
 #include "Blueprint/WidgetTree.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
@@ -80,10 +82,15 @@ FBox2D SlotRect(const FUmHudLayout& Layout, EUmGameSlot Slot) {
       R.Max.X = FMath::Max(R.Max.X, R.Min.X + 190.0);
       return R;
     }
-    case EUmGameSlot::Log: return Layout.Rect(EUmHudBlock::Log);
+    case EUmGameSlot::Log:
+      // VS-4 HB-39: class S has no column - the slot is the list under TOP (360 x 320, open from «Журнал», ВР-H07)
+      return Layout.bClassS ? UmHudLog::ListRectSu(Layout.Rect(EUmHudBlock::Top)) : Layout.Rect(EUmHudBlock::Log);
     case EUmGameSlot::Banner: return Layout.Rect(EUmHudBlock::Banner);
-    case EUmGameSlot::Toast: return Layout.Rect(EUmHudBlock::Toast);
-    case EUmGameSlot::Sub: return Layout.Rect(EUmHudBlock::Sub);
+    case EUmGameSlot::Toast:
+    case EUmGameSlot::Sub:
+      // VS-4 HB-40 / HB-41: the whole canvas - the stack and the capsule place themselves by the chain of 04 §2.12
+      // (their roots let every other pointer through)
+      return FBox2D(FVector2D::ZeroVector, Layout.CanvasSu);
     default: return FBox2D(ForceInit);
   }
 }

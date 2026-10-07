@@ -347,7 +347,8 @@ bool AS08FlowGameMode::CursorOverHud() const {
     if (HandLower.IsLowered()) Hand.Y0 -= 2.0f * FS09HandLower::LowerSu;
     if (Inside(Hand)) return true;
   }
-  return UmHudCursorOverHand(X, Y) || UmHudCursorOverDeckPanel(X, Y);  // VS-3 HB-24 / HB-28: the UMG hand, the open panel
+  // VS-3 HB-24 / HB-28: the UMG hand, the open panel; VS-4 HB-39 / HB-40: the open S log list, a sticky toast
+  return UmHudCursorOverHand(X, Y) || UmHudCursorOverDeckPanel(X, Y) || UmHudCursorOverFeed(X, Y);
 }
 
 void AS08FlowGameMode::TickCardSlot() {

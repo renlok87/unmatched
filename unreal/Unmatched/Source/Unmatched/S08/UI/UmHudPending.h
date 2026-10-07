@@ -29,7 +29,8 @@
 //   toast      a repeating optional trigger (FS09PendingPresenter::Toast): 560 x 48 su (720p 520, S 440) at the toast
 //              place of the stack rule (over the hand caption, or the top band when it would cross a figure - the owner
 //              computes it, ВР-H06): the source (bold) and «В прошлый раз: {choice}», key chips Enter, X, C; a click
-//              opens the full choice (as C). HB-40 moves it into UUmToastStack.
+//              opens the full choice (as C). VS-4 HB-36: a member of UUmToastStack (HB-40) - the stack places it among
+//              the toasts (the owner hands its rect over in FUmPendingFrame::ToastSu, bToastWaits while it has none).
 //   opp        the opponent's choice: grey compact (panel.bg 0.92 + panel.edge 1 su, text.secondary, no buttons) - the
 //              source card's name and «Соперник делает выбор» (why.wait.opponent.choice) unless STATUS already says it
 //              (one text once, ВР-VS2-HB34-12); width = text + 2 x 16, at least 320 su.
@@ -133,10 +134,13 @@ struct UNMATCHED_API FUmPendingFrame {
   float BandRightSu = 0.0f;
   /** The toast plate (the stack rule of the owner, ВР-H06); invalid = over the hand caption. */
   FBox2D ToastSu = FBox2D(ForceInit);
+  /** VS-4 HB-36 (ВР-VS4-27): the toast is a member of UUmToastStack - true while the stack has no place for it (not
+   *  placed yet, or a newer toast took the only room, 04 §2.12 step 4): the form waits hidden. */
+  bool bToastWaits = false;
   bool operator==(const FUmPendingFrame& O) const {
     return bClassS == O.bClassS && PxPerSu == O.PxPerSu && CanvasSu == O.CanvasSu && TopSu == O.TopSu &&
            ModalWidthSu == O.ModalWidthSu && ModalCapSu == O.ModalCapSu && BandLeftSu == O.BandLeftSu &&
-           BandRightSu == O.BandRightSu && ToastSu == O.ToastSu;
+           BandRightSu == O.BandRightSu && ToastSu == O.ToastSu && bToastWaits == O.bToastWaits;
   }
   bool operator!=(const FUmPendingFrame& O) const { return !(*this == O); }
 };

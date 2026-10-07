@@ -156,6 +156,8 @@ void AS08FlowGameMode::TickOpponentView() {
       const FS09FeedEntry& Entry = EventFeed.GetLines().Last();
       FS08Trace::Write(FString::Printf(TEXT("MS-LOG seq=%d moves=%d truncated=%d text=\"%s\""), Entry.Seq, Entry.Moves,
                                        Entry.bTruncated ? 1 : 0, *Entry.Text));
+      // VS-4 HB-39: the same line in the UMG log (the UI language, the turn, the team stripe)
+      UmHudLogTrail(Revealed, bSameTrail ? EffectTrailCard : FString(), bSameTrail ? EffectTrailYours : TArray<FString>());
       RefreshHud();
     }
     // Run D G-LIVE (MS-AT-30): the highlight + feed frame of the opponent move whose flight frame was scheduled
@@ -268,7 +270,8 @@ void AS08FlowGameMode::AddOpponentPanelLines() {
 }
 
 void AS08FlowGameMode::AddEventFeedLines() {
-  if (!HandBox.IsValid()) return;
+  // VS-4 HB-39: the UMG log (UUmHudLog) takes the lines - the three Slate lines only with -S08SlateHud=log
+  if (!HandBox.IsValid() || !UmHudBlockOnSlate(TEXT("log"))) return;
   for (const FS09FeedEntry& Entry : EventFeed.GetLines()) {
     // MS-E-106: at most two visual lines at 150 % - the line is cut to two moves + "and N more" and wraps; the full
     // list is the tooltip

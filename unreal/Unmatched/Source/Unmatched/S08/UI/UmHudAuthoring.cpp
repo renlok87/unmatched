@@ -12,12 +12,16 @@
 #include "UmHudDeckPanel.h"
 #include "UmHudDecks.h"
 #include "UmHudHand.h"
+#include "UmHudLog.h"
 #include "UmHudOppHand.h"
 #include "UmHudPending.h"
 #include "UmHudPlayerPanel.h"
 #include "UmHudSourceSlot.h"
 #include "UmHudStatusLine.h"
+#include "UmHudSubtitle.h"
 #include "UmHudTop.h"
+#include "UmToast.h"
+#include "UmToastStack.h"
 #include "UmCursor.h"
 #include "UmPortrait.h"
 #include "UmSpinner.h"
@@ -101,6 +105,16 @@ FString UUmHudAuthoringLibrary::AuthorUmHudWidgetBlueprints(bool bOverwrite) {
       [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmHudPending::BuildDefaultTree(Tree, Attach, Error); });
   One(UUmHudSourceSlot::WidgetBlueprintPath, UUmHudSourceSlot::StaticClass(),
       [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmHudSourceSlot::BuildDefaultTree(Tree, Attach, Error); });
+  // VS-4 HB-39...HB-41: the log, one toast (nests WBP_UmButton for its cross), the stack (its toasts are pooled
+  // WBP_UmToast made at run time) and the subtitle capsule
+  One(UUmHudLog::WidgetBlueprintPath, UUmHudLog::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmHudLog::BuildDefaultTree(Tree, Attach, Error); });
+  One(UUmToast::WidgetBlueprintPath, UUmToast::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmToast::BuildDefaultTree(Tree, Attach, Error); });
+  One(UUmToastStack::WidgetBlueprintPath, UUmToastStack::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmToastStack::BuildDefaultTree(Tree, Attach, Error); });
+  One(UUmHudSubtitle::WidgetBlueprintPath, UUmHudSubtitle::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmHudSubtitle::BuildDefaultTree(Tree, Attach, Error); });
   Report->SetArrayField(TEXT("assets"), Assets);
   FString Out;
   const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&Out);

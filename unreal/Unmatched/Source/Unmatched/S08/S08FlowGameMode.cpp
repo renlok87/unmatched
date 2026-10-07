@@ -1948,6 +1948,8 @@ void AS08FlowGameMode::HandleClick() {
     } else {
       Toast = TEXT("pending cell rejected: ") + Reason;
       BoardActor->ShowIllegalCell(CellX, CellY);
+      UmHudRefuseCell(CellX, CellY);  // VS-4 HB-40: badge-refuse + the why.* of the space as a UMG toast
+      UmHudToastReason(CommandUi.PendingCellReason(CellX, CellY, BoardModel, Fighters), 3.0f);
       IllegalUntil = Elapsed + 1.5f;
     }
     ToastUntil = Elapsed + 3.0f;
@@ -2036,6 +2038,7 @@ void AS08FlowGameMode::HandleClick() {
     }
     ToastUntil = Elapsed + 3.0f;
     BoardActor->ShowIllegalCell(CellX, CellY);
+    UmHudRefuseCell(CellX, CellY);  // VS-4 HB-40
     IllegalUntil = Elapsed + 1.5f;
     RefreshUi();
     return;
@@ -2103,6 +2106,7 @@ void AS08FlowGameMode::ApplyMoveInput(const FS09InputResult& Result) {
   }
   if (Result.IllegalCell.X >= 0 && BoardActor) {
     BoardActor->ShowIllegalCell(Result.IllegalCell.X, Result.IllegalCell.Y); // CUE-004 (B-13)
+    UmHudRefuseCell(Result.IllegalCell.X, Result.IllegalCell.Y);  // VS-4 HB-40: badge-refuse over the space
     IllegalUntil = Elapsed + 1.5f;
   }
   if (Result.bBeginManeuver && Flow.IsValid()) {
@@ -2414,6 +2418,7 @@ void AS08FlowGameMode::ShowReason(const FS09Reason& Reason, float Seconds) {
   // MS-AT-18: the toast by key - the trace proves no grid coordinates leak.
   FS08Trace::Write(FString::Printf(TEXT("TOAST why=%s text=\"%s\""), *Shown.Key.ToString(), *Toast));
   TracedToast = Toast;
+  UmHudToastReason(Shown, Seconds);  // VS-4 HB-40: the UMG toast (UUmToastStack)
   RefreshUi();
 }
 
@@ -2454,6 +2459,7 @@ void AS08FlowGameMode::HandleHudPressOutcome(const FS09HudPressOutcome& Outcome,
   }
   if (Traced.Result == ES09HudPressResult::Refused) {
     PlayUiSound(TEXT("CUE-004"), PressedId);
+    UmHudRefusePress(Traced.PressedId);  // VS-4 HB-40: badge-refuse next to the button (350 ms)
     ShowReason(Traced.Reason, 3.0f); // CUE-004
     RefreshHud();
   }
@@ -2486,6 +2492,7 @@ void AS08FlowGameMode::HandleRejection(const FS08Rejection& Rejection) {
   ShowReason(Reason, 4.0f);
   if (bCell && BoardActor && Reason.Key.ToString().StartsWith(TEXT("why.cell."))) {
     BoardActor->ShowIllegalCell(Rejection.Cell.X, Rejection.Cell.Y);
+    UmHudRefuseCell(Rejection.Cell.X, Rejection.Cell.Y);  // VS-4 HB-40
     IllegalUntil = Elapsed + 1.5f;
   }
   RefreshHud();
@@ -7121,7 +7128,8 @@ void AS08FlowGameMode::RefreshHud() {
 void AS08FlowGameMode::RefreshUi() {
   UpdateLegacyRootVisibility();
   // HB-02: the command echo and AUTO toasts only with -S09Markers; a toast without text is not drawn at all
-  const FString ShownToast = S08HudDebug::PlayerToast(Toast);
+  // VS-4 HB-40: the keyed toasts are UMG; the Slate line only on -S08SlateHud=toast (non-keyed ones under -S09Markers)
+  const FString ShownToast = UmHudSlateToast(S08HudDebug::PlayerToast(Toast));
   if (ToastHudLine.IsValid()) {
     ToastHudLine.Pin()->SetText(FText::FromString(ShownToast));
   }

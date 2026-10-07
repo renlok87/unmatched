@@ -16,8 +16,7 @@
 //                (FUmHudLayout::EdgeRoomSu) - UmHudWrapEdge;
 //       deckpanel the right combat edge fades out under the open deck panel like the side counters (nothing shows
 //                through or under it) - UmHudDeckPanelLayering;
-//       sub/toast the subtitle in a panel.bg capsule, stacked under the toasts over the hand, moving to the top strip
-//                when it would cross a figure, its tag or the plate (ВР-H06, 04 §2.12-§2.13) - TickUmHud.
+//       sub/toast (VS-4: replaced by the UMG blocks below; the Slate line / box show only on their rollback)
 //   - VS-2 HB-14...HB-16 (S08/UI/UmTopStrip.h): TOP + CONN, STATUS and the banner - built with the root, framed with
 //     the layout, ticked here (turn, link, banner alpha); STATUS takes the line of AddTurnStatusLine (rollback
 //     -S08SlateHud=top|status|banner).
@@ -65,12 +64,22 @@
 //     the fly from the hand's handed-off card or OPP-HAND). While the UMG choice is on, the Slate command panel draws no
 //     choice / discard / ability / wait block and only the buttons of the attack draft and the resolve window (ВР-VS4-02,
 //     not under -S09Markers); it moves right of a shown UMG slot (ВР-VS4-14).
+//   - VS-4 HB-39...HB-41 + the HB-36 trigger (S08/UI/UmHudFeedBlocks.h, UmHudLog.h, UmToastStack.h, UmHudSubtitle.h):
+//     LOG, TOAST and SUB - built with the root (rollback -S08SlateHud=log | toast | sub), placed every frame by TickUmFeed
+//     (the chain of 04 §2.12 over the figures, the spaces of the K1 camera, every drawn block). The producers hook in
+//     with one line each: TickOpponentView (UmHudLogTrail), ShowReason (UmHudToastReason), RefreshUi (UmHudSlateToast:
+//     the Slate line keeps only the rollback / the non-keyed developer strings under -S09Markers, ВР-VS4-26),
+//     HandleHudPressOutcome and the refused spaces (UmHudRefusePress / UmHudRefuseCell: badge-refuse 350 ms),
+//     ApplyHandLimitHintVisibility (UmHudSyncHandLimit: the sticky rule toast), OfferVoLine / the VO stop
+//     (UmHudShowSubtitle / UmHudHideSubtitle), CursorOverHud (UmHudCursorOverFeed); RefreshUmPending draws the trigger
+//     toast at the stack's rect (ВР-VS4-27).
 #include "S08FlowGameMode.h"
 
 #include "S08AnimatedIconWidget.h"
 #include "S08ArtHudStyle.h"
 #include "S08ArtLook.h"
 #include "S08BoardActor.h"
+#include "S08Team.h"
 #include "S08TraceLog.h"
 #include "S08TurnPortraitWidget.h"
 #include "UI/UmCardGallery.h"
@@ -78,6 +87,7 @@
 #include "UI/UmCombatGallery.h"
 #include "UI/UmCursor.h"
 #include "UI/UmDecksGallery.h"
+#include "UI/UmFeedGallery.h"
 #include "UI/UmGameHud.h"
 #include "UI/UmHandGallery.h"
 #include "UI/UmPendingGallery.h"
@@ -86,6 +96,7 @@
 #include "UI/UmHudCombatBlocks.h"
 #include "UI/UmScreenBase.h"
 #include "UI/UmHudDeckBlocks.h"
+#include "UI/UmHudFeedBlocks.h"
 #include "UI/UmHudHand.h"
 #include "UI/UmHudLayout.h"
 #include "UI/UmHudPanels.h"
@@ -97,7 +108,9 @@
 #include "UI/UmHudStatusLine.h"
 #include "UI/UmHudTheme.h"
 #include "UI/UmHudTop.h"
+#include "UI/UmText.h"
 #include "UI/UmTopStrip.h"
+#include "../S09/S09HudPress.h"
 #include "Brushes/SlateRoundedBoxBrush.h"
 #include "DynamicRHI.h"
 #include "RenderTimer.h"
@@ -130,14 +143,23 @@ struct FUmHudRuntime {
   float CamFov = 35.0f;
   FBox2D FieldPx = FBox2D(ForceInit);
   FString LastLayoutLine;
-  // the toast / subtitle stack
-  bool bSubStyled = false;
-  TSharedPtr<SBorder> SubCapsule;  // the capsule the subtitle text moved into (its size is the subtitle's size)
-  bool bStackTop = false;
-  FBox2D ToastRect = FBox2D(ForceInit);
-  FBox2D SubRect = FBox2D(ForceInit);
-  float SubYApplied = -1.0f;
-  FString LastStackLine;
+  // VS-4 HB-39...HB-41: the log, the toast stack, the subtitle (UI/UmHudFeedBlocks.h); the K1 rects of the board spaces
+  // (the toasts' obstacles, recomputed with the layout); the turn of each applied seq (the log's «Х{n}»: seq -> turn
+  // count, turn player); the reconnect watch of «Позиции обновлены»; the EN text of the last keyed toast (the Slate
+  // line keeps only the non-keyed ones under -S09Markers); the pending toast's last rect
+  FUmFeedBlocks Feed;
+  TArray<FBox2D> SpaceRectsSu;
+  struct FSeqTurn {
+    int32 Seq = 0;
+    int32 Turn = 0;
+    FString Player;
+  };
+  TArray<FSeqTurn> SeqTurns;
+  bool bStreamSeenReady = false;
+  bool bReconnecting = false;
+  int32 ReconnectSeq = 0;
+  FString KeyedToastEn;
+  FBox2D PendingToastRect = FBox2D(ForceInit);
   // the SD-26 lowering cap of the hand (traced on a change)
   float HandCapSu = -1.0f;
   // VS-2 HB-12: the board half of the software cursor (UmCursor.h)
@@ -275,6 +297,7 @@ void AS08FlowGameMode::BuildUmHud() {
   BuildUmDecks();     // VS-3 HB-27 / HB-28
   BuildUmCombat();    // VS-3 HB-30...HB-33
   BuildUmPending();   // VS-4 HB-35 / HB-37
+  BuildUmFeed();      // VS-4 HB-39...HB-41
   RefreshUmHudLayout();
 }
 
@@ -325,6 +348,12 @@ void AS08FlowGameMode::RefreshUmHudLayout() {
     View.ViewportPx = Viewport;
     R.FieldPx = UmHudField::CellsEnvelopePx(View, Centres, Radius);
     if (R.FieldPx.bIsValid) FieldSu = FBox2D(R.FieldPx.Min / PxPerSu, R.FieldPx.Max / PxPerSu);
+    // VS-4 HB-40: each space's rect (centre +- radius) - the toasts' and the subtitle's obstacles (04 §2.12)
+    R.SpaceRectsSu.Reset();
+    for (const FVector& C : Centres) {
+      const FBox2D B = UmHudField::CellsEnvelopePx(View, {C}, Radius);
+      if (B.bIsValid) R.SpaceRectsSu.Add(FBox2D(B.Min / PxPerSu, B.Max / PxPerSu));
+    }
   }
   R.Layout = FUmHudLayout::Compute(Viewport / PxPerSu, PxPerSu, FieldSu.bIsValid ? &FieldSu : nullptr);
   R.Layout.bEnglishChips = UmCardMedia::PreferredLang() == TEXT("en");  // VS-3 HB-27: the chip widths of the language
@@ -391,12 +420,9 @@ float AS08FlowGameMode::UmHudHandLowerCap(float OffsetSu) const {
 }
 
 FMargin AS08FlowGameMode::UmHudToastOffset() const {
-  // the old place: 150 su over the bottom edge (BuildHudWidgets)
-  const FMargin Legacy(0.0f, -150.0f, 0.0f, -150.0f);
-  if (!UmHud.IsValid() || !UmHud->bLayout || UmHudBlockOnSlate(TEXT("toast")) || !UmHud->ToastRect.bIsValid) return Legacy;
-  // anchors (0.5, 1), alignment (0.5, 1): the offset is the bottom centre relative to the canvas bottom centre
-  const float Bottom = static_cast<float>(UmHud->ToastRect.Max.Y - UmHud->Layout.CanvasSu.Y);
-  return FMargin(0.0f, Bottom, 0.0f, Bottom);
+  // the old place: 150 su over the bottom edge (BuildHudWidgets). VS-4 HB-40: the Slate line shows only on its rollback
+  // (-S08SlateHud=toast) and for the non-keyed developer strings under -S09Markers - at the old place, as before H2
+  return FMargin(0.0f, -150.0f, 0.0f, -150.0f);
 }
 
 void AS08FlowGameMode::UmHudDeckPanelLayering(float DeckAlpha) {
@@ -856,72 +882,18 @@ void AS08FlowGameMode::TickUmHud() {
     const float CmdOpacity = (CommandBox.IsValid() && CommandBox->NumSlots() == 0) ? 0.0f : 1.0f;
     if (!FMath::IsNearlyEqual(Cmd->GetRenderOpacity(), CmdOpacity)) Cmd->SetRenderOpacity(CmdOpacity);
   }
-  const float PxPerSu = HudPixelsPerUnit() > 0.0f ? HudPixelsPerUnit() : R.Layout.PxPerSu;
-  // ---- the top of the hand actually drawn (the Slate panel, its SD-26 offset included): the stack stays over it ----
-  float HandTopSu = -1.0f;
+  // VS-3 HB-24 (ВР-VS3-22): with the UMG hand the Slate panel holds only lines - transparent while it has none
   {
-    // VS-3 HB-24 (ВР-VS3-22): with the UMG hand the Slate panel holds only lines - transparent while it has none
     const TSharedPtr<SWidget> HandPanel = ArtHud.HandPanel.Pin();
-    const bool bUmHand = UmHandOnUmg();
-    if (bUmHand) {
-      const FBox2D Caption = R.Layout.Rect(EUmHudBlock::HandCaption);
-      if (Caption.bIsValid) HandTopSu = static_cast<float>(Caption.Min.Y);
-    }
-    const bool bEmpty = bUmHand && HandPanel.IsValid() && HandBox.IsValid() && HandBox->NumSlots() == 0 &&
+    const bool bEmpty = UmHandOnUmg() && HandPanel.IsValid() && HandBox.IsValid() && HandBox->NumSlots() == 0 &&
                         HandPanel->GetDesiredSize().Y <= 21.0f;
-    if (bUmHand && HandPanel.IsValid() && !FMath::IsNearlyEqual(HandPanel->GetRenderOpacity(), bEmpty ? 0.0f : 1.0f)) {
+    if (UmHandOnUmg() && HandPanel.IsValid() && !FMath::IsNearlyEqual(HandPanel->GetRenderOpacity(), bEmpty ? 0.0f : 1.0f)) {
       HandPanel->SetRenderOpacity(bEmpty ? 0.0f : 1.0f);
     }
-    FS08ScreenRect Panel;
-    if (!bEmpty && WidgetViewportRect(HandPanel, Panel) && !Panel.IsEmpty()) {
-      HandTopSu = HandTopSu >= 0.0f ? FMath::Min(HandTopSu, Panel.Y0 / PxPerSu) : Panel.Y0 / PxPerSu;
-    }
   }
-  // ---- the toast / subtitle stack (ВР-H06) ----
-  const bool bSub = SubtitleBox.IsValid() && SubtitleText.IsValid() && SubtitleBox->GetVisibility() != EVisibility::Collapsed &&
-                    !UmHudBlockOnSlate(TEXT("sub"));
-  const TSharedPtr<SBorder> ToastBorder = ToastHudBorder.Pin();
-  const bool bToast = ToastBorder.IsValid() && ToastBorder->GetVisibility() != EVisibility::Collapsed &&
-                      !UmHudBlockOnSlate(TEXT("toast"));
-  if (SubtitleBox.IsValid() && SubtitleText.IsValid() && !UmHudBlockOnSlate(TEXT("sub")) && !R.bSubStyled) {
-    // 04 §2.13 / 02 §3.5: no text on the scene without a panel - the line goes into a panel.bg capsule
-    const UUmHudTheme& Theme = UUmHudTheme::Get();
-    SubtitleBox->SetContent(SAssignNew(R.SubCapsule, SBorder)
-                                .BorderImage(Theme.SkinFor(TEXT("capsule"), R.Layout.PxPerSu))
-                                .Padding(FMargin(Theme.SpaceSu(TEXT("space.m")), Theme.SpaceSu(TEXT("tag.padding.x"))))
-                                .HAlign(HAlign_Center)[SubtitleText.ToSharedRef()]);
-    SubtitleText->SetShadowOffset(FVector2D::ZeroVector);
-    R.bSubStyled = true;
-  }
-  if (!bSub && !bToast) return;
-  TArray<FBox2D> Avoid;
-  for (const TPair<FString, FS08ScreenRect>& F : FigureScreenRects()) Avoid.Add(UmHudPxToSu(F.Value, PxPerSu));
-  for (const FS08ArtHudRuntime::FTagSlot& Tag : ArtHud.Tags) {
-    if (Tag.bShown && !Tag.Planned.IsEmpty()) Avoid.Add(UmHudPxToSu(Tag.Planned, PxPerSu));
-  }
-  if (ArtHud.bPlateVisible && !ArtHud.PlatePlanned.IsEmpty()) Avoid.Add(UmHudPxToSu(ArtHud.PlatePlanned, PxPerSu));
-  // the capsule, not the box: the box's own padding is the placement
-  const FVector2D SubSize = bSub ? (R.SubCapsule.IsValid() ? R.SubCapsule->GetDesiredSize() : SubtitleText->GetDesiredSize())
-                                 : FVector2D::ZeroVector;
-  const FVector2D ToastSize = bToast ? ToastBorder->GetDesiredSize() : FVector2D::ZeroVector;
-  bool bTop = false;
-  R.SubRect = R.Layout.StackRect(EUmHudBlock::Sub, ToastSize.X, ToastSize.Y, SubSize.X, SubSize.Y, Avoid, bTop, HandTopSu);
-  R.ToastRect = R.Layout.StackRect(EUmHudBlock::Toast, ToastSize.X, ToastSize.Y, SubSize.X, SubSize.Y, Avoid, bTop, HandTopSu);
-  R.bStackTop = bTop;
-  if (bSub && !FMath::IsNearlyEqual(static_cast<float>(R.SubRect.Min.Y), R.SubYApplied, 0.5f)) {
-    // only on a change: the box re-lays out, nothing per frame
-    R.SubYApplied = static_cast<float>(R.SubRect.Min.Y);
-    SubtitleBox->SetVAlign(VAlign_Top);
-    SubtitleBox->SetHAlign(HAlign_Center);
-    SubtitleBox->SetPadding(FMargin(0.0f, R.SubYApplied, 0.0f, 0.0f));
-  }
-  const FString Line = FString::Printf(TEXT("HUD-STACK place=%s sub=%d toast=%d subY=%.0f toastY=%.0f avoid=%d"),
-                                       bTop ? TEXT("top") : TEXT("bottom"), bSub ? 1 : 0, bToast ? 1 : 0,
-                                       bSub ? R.SubRect.Min.Y : -1.0, bToast ? R.ToastRect.Min.Y : -1.0, Avoid.Num());
-  if (Line != R.LastStackLine) {
-    R.LastStackLine = Line;
-    FS08Trace::Write(Line);
-  }
+  // VS-4 HB-39...HB-41: the log, the toast stack and the subtitle (the H2 Slate stack of the toast line and the subtitle
+  // box is gone: they show only on their rollback -S08SlateHud=toast | sub, 04 §5.1)
+  TickUmFeed();
 }
 
 void AS08FlowGameMode::WriteUmHudShotLines() {
@@ -953,7 +925,6 @@ void AS08FlowGameMode::WriteUmHudShotLines() {
       for (const FString& L : Lines) FS08Trace::Write(L);
     }
   }
-  if (!R.LastStackLine.IsEmpty()) FS08Trace::Write(R.LastStackLine);
   // VS-2 HB-14...HB-16: UI-HUD-TOP, UI-HUD-CONN, UI-HUD-STATUS, UI-HUD-BANNER (the drawn plate / chip / capsule)
   TArray<FString> StripLines;
   R.TopStrip.CollectShotLines(StripLines, [this](UWidget* W) {
@@ -985,6 +956,12 @@ void AS08FlowGameMode::WriteUmHudShotLines() {
     if (const UUmHudPending* P = R.Pending.Get()) P->CollectShotLines(PendingLines);
     if (const UUmHudSourceSlot* W = R.Slot.Get()) W->CollectShotLines(PendingLines);
     for (const FString& L : PendingLines) FS08Trace::Write(L);
+  }
+  // VS-4 HB-39...HB-41: UI-HUD-LOG, UI-HUD-TOAST, UI-HUD-SUB (counts and places only, no text)
+  {
+    TArray<FString> FeedLines;
+    R.Feed.CollectShotLines(FeedLines, R.Layout.PxPerSu);
+    for (const FString& L : FeedLines) FS08Trace::Write(L);
   }
   TArray<FString> PanelLines;  // VS-2 HB-18...HB-21: UI-HUD-PANEL-LOC, UI-HUD-PANEL-OPP, UI-HUD-OPP-HAND
   R.Panels.CollectShotLines(PanelLines, [this](UWidget* W) {
@@ -1111,10 +1088,15 @@ bool AS08FlowGameMode::ApplyUmHudStatus(const FS09TurnStatusInput& In) {
 }
 
 void AS08FlowGameMode::HandleUmTopPress(const TCHAR* What) {
-  // ВР-VS2-44: «≡» is Esc without a selection -> PAUSE (SC-24, step H16), «Журнал» the LOG list of class S (H11);
-  // until those screens exist the press is answered (CUE-003 in HandleHudPressOutcome) and traced
-  FS08Trace::Write(FString::Printf(TEXT("HUD-TOP press=%s target=%s pending=1"), What,
-                                   FCString::Strcmp(What, TEXT("menu")) == 0 ? TEXT("UI-SCR-PAUSE") : TEXT("UI-HUD-LOG")));
+  // ВР-VS2-44: «≡» is Esc without a selection -> PAUSE (SC-24, step H16; until that screen exists the press is answered,
+  // CUE-003 in HandleHudPressOutcome, and traced); «Журнал» toggles the LOG list of class S (VS-4 HB-39)
+  const bool bLog = FCString::Strcmp(What, TEXT("log")) == 0;
+  if (bLog && UmHud.IsValid() && UmHud->Feed.LogOnUmg()) {
+    UmHud->Feed.SetLogOpen(!UmHud->Feed.IsLogOpen());
+    FS08Trace::Write(FString::Printf(TEXT("HUD-TOP press=log target=UI-HUD-LOG open=%d"), UmHud->Feed.IsLogOpen() ? 1 : 0));
+    return;
+  }
+  FS08Trace::Write(FString::Printf(TEXT("HUD-TOP press=%s target=%s pending=1"), What, bLog ? TEXT("UI-HUD-LOG") : TEXT("UI-SCR-PAUSE")));
 }
 
 void AS08FlowGameMode::UmGalleryBegin(int32 SizePx) {
@@ -1138,14 +1120,16 @@ void AS08FlowGameMode::UmGalleryBegin(int32 SizePx) {
   const bool bCombat = bConfirm || FParse::Value(Cmd, TEXT("S08IconGalleryCombat="), CombatBoard);
   FString PendingBoard;  // VS-4 HB-35 / HB-37 (UI/UmPendingGallery.h): -S08IconGalleryPending=marmoreal|sarpedon
   const bool bPending = FParse::Value(Cmd, TEXT("S08IconGalleryPending="), PendingBoard);
-  if (!bSkins && !bButtons && !bTopStrip && !bPanels && !bCards && !bHand && !bDecks && !bCombat && !bPending) return;
+  FString FeedBoard;  // VS-4 HB-39...HB-41 (UI/UmFeedGallery.h): -S08IconGalleryFeed=marmoreal|sarpedon
+  const bool bFeed = FParse::Value(Cmd, TEXT("S08IconGalleryFeed="), FeedBoard);
+  if (!bSkins && !bButtons && !bTopStrip && !bPanels && !bCards && !bHand && !bDecks && !bCombat && !bPending && !bFeed) return;
   if (IconGallery) IconGallery->SetVisibility(ESlateVisibility::Collapsed);  // the sheet takes the screen
   // the canvas of the sheet: the applied HUD scale (BeginPlay may run before the first window apply - the sheet is
   // built again on every OnUiScaleChanged, which also covers a window or UI-scale change)
   const int32 PageIndex = FMath::Max(0, Page - 1);
   TWeakObjectPtr<AS08FlowGameMode> WeakThis(this);
   auto Build = [WeakThis, bSkins, bTopStrip, bPanels, PanelsPage, PageIndex, Variant, SizePx, bCards, CardsPage, bHand,
-                HandBoard, bDecks, DecksBoard, bCombat, bConfirm, CombatBoard, bPending, PendingBoard]() {
+                HandBoard, bDecks, DecksBoard, bCombat, bConfirm, CombatBoard, bPending, PendingBoard, bFeed, FeedBoard]() {
     AS08FlowGameMode* Self = WeakThis.Get();
     if (!Self || !Self->GetWorld()) return;
     FVector2D Viewport(1920.0, 1080.0);
@@ -1153,6 +1137,14 @@ void AS08FlowGameMode::UmGalleryBegin(int32 SizePx) {
     const FUmHudScaleState& Scale = UmHudScale::Current();
     const float PxPerSu = Scale.Window.X > 0 ? Scale.PxPerSu() : 1.0f;
     if (Self->UmGallery) Self->UmGallery->RemoveFromParent();
+    if (bFeed) {
+      UUmFeedGalleryWidget* Sheet = CreateWidget<UUmFeedGalleryWidget>(Self->GetWorld(), UUmFeedGalleryWidget::StaticClass());
+      if (!Sheet) return;
+      for (const FString& Line : Sheet->Build(FeedBoard, Viewport / PxPerSu, PxPerSu)) FS08Trace::Write(Line);
+      Sheet->AddToViewport(1001);
+      Self->UmGallery = Sheet;
+      return;
+    }
     if (bPending) {
       UUmPendingGalleryWidget* Sheet = CreateWidget<UUmPendingGalleryWidget>(Self->GetWorld(), UUmPendingGalleryWidget::StaticClass());
       if (!Sheet) return;
@@ -1246,6 +1238,9 @@ void AS08FlowGameMode::UmGalleryAt(float TMs) {
     for (const FString& Line : CombatSheet->SetClockMs(TMs)) FS08Trace::Write(Line);
   }
   // VS-4 HB-35 / HB-37: the choice and source-card states (one per second)
+  if (UUmFeedGalleryWidget* FeedSheet = Cast<UUmFeedGalleryWidget>(UmGallery)) {
+    for (const FString& Line : FeedSheet->SetClockMs(TMs)) FS08Trace::Write(Line);
+  }
   if (UUmPendingGalleryWidget* PendingSheet = Cast<UUmPendingGalleryWidget>(UmGallery)) {
     for (const FString& Line : PendingSheet->SetClockMs(TMs)) FS08Trace::Write(Line);
   }
@@ -1947,7 +1942,12 @@ void AS08FlowGameMode::RefreshUmPending() {
     if (R.Layout.HasRect(B)) Right = FMath::Min(Right, static_cast<float>(R.Layout.Rect(B).Min.X));
   }
   F.BandRightSu = Right - 8.0f;
-  if (M.View == EUmPendingView::Toast) {
+  if (M.View == EUmPendingView::Toast && R.Feed.ToastOnUmg()) {
+    // VS-4 HB-36 (ВР-VS4-27): a member of the toast stack - the stack's chain places it (TickUmFeed), it waits hidden
+    // until it has a place
+    F.ToastSu = R.Feed.PendingToastRect();
+    F.bToastWaits = !F.ToastSu.bIsValid;
+  } else if (M.View == EUmPendingView::Toast) {
     // ВР-H06: over the hand caption, or the top strip when it would cross a figure (the stack rule of the toasts)
     const float PxPerSu = HudPixelsPerUnit() > 0.0f ? HudPixelsPerUnit() : R.Layout.PxPerSu;
     TArray<FBox2D> Avoid;
@@ -2021,4 +2021,320 @@ void AS08FlowGameMode::TickUmSourceSlot() {
   W->ApplyModel(M);
   const FString Line = W->TakeChangeLine();
   if (!Line.IsEmpty()) FS08Trace::Write(Line);
+}
+
+// ------------------------------------------------------------------------------------------------ VS-4 HB-39...HB-41
+
+void AS08FlowGameMode::BuildUmFeed() {
+  UUmGameHud* Game = UmHudRoot ? UmHudRoot->GetGameHud() : nullptr;
+  if (!UmHud.IsValid() || !Game) return;
+  TWeakObjectPtr<AS08FlowGameMode> WeakThis(this);
+  FUmFeedBlocks::FCallbacks C;
+  // a sticky toast's cross answers in the frame of its release (UI-INP-011); the hand-limit rule closes through its
+  // owner (FS09HandLimitHint: close=click in the trace), any other sticky toast leaves
+  C.OnToastClose = [WeakThis](const FS09HudPressOutcome& O, FName Key) {
+    AS08FlowGameMode* Self = WeakThis.Get();
+    if (!Self) return;
+    Self->HandleHudPressOutcome(O, TFunction<FS09Reason()>(), [WeakThis, Key]() {
+      AS08FlowGameMode* S = WeakThis.Get();
+      if (!S) return;
+      if (Key == FName(TEXT("ms.hint.hand.limit"))) {
+        S->DismissHandLimitHint();
+      } else if (S->UmHud.IsValid()) {
+        S->UmHud->Feed.DismissToast(Key, static_cast<double>(S->NowMs()));
+      }
+    });
+  };
+  C.OnLogInspect = [WeakThis](const FString& CardId) {
+    if (AS08FlowGameMode* Self = WeakThis.Get()) Self->HandleUmDeckRowInspect(CardId);
+  };
+  ArtHud.PendingTrace.Append(UmHud->Feed.Build(*Game, UmHud->Blocks, HudPress, MoveTemp(C)));
+}
+
+void AS08FlowGameMode::TickUmFeed() {
+  if (!UmHud.IsValid() || !UmHud->bLayout) return;
+  FUmHudRuntime& R = *UmHud;
+  const double Now = static_cast<double>(NowMs());
+  const bool bAborted = Flow.IsValid() && Flow->GetStage() == ES08Stage::Started && Flow->IsRoomAborted();
+  const float PxPerSu = R.Layout.PxPerSu > 0.0f ? R.Layout.PxPerSu : 1.0f;
+  // the turn of each applied seq (the log's «Х{n}»: the turn the event happened in)
+  if (Hud.bValid && (R.SeqTurns.Num() == 0 || R.SeqTurns.Last().Seq != Hud.SequenceNumber)) {
+    FUmHudRuntime::FSeqTurn T;
+    T.Seq = Hud.SequenceNumber;
+    T.Turn = Hud.TurnCount;
+    const FS09PlayerPanel* TurnPanel = Hud.bViewerTurn ? Hud.ViewerPanel() : Hud.OpponentPanel();
+    T.Player = TurnPanel ? TurnPanel->PlayerId : FString();
+    R.SeqTurns.Add(T);
+    if (R.SeqTurns.Num() > 256) R.SeqTurns.RemoveAt(0, R.SeqTurns.Num() - 256);
+  }
+  // «Позиции обновлены (пропущено {n})» (04 §1.9, §2.12): the stream came back after a loss; n = the seqs the
+  // snapshot jumped over
+  const bool bStarted = Flow.IsValid() && Flow->GetStage() == ES08Stage::Started;
+  const bool bRecovering = bStarted && (Flow->IsAwaitingStateRecovery() || !Flow->IsStreamReady());
+  if (bStarted && !bRecovering && Hud.bValid) R.bStreamSeenReady = true;
+  if (bRecovering && R.bStreamSeenReady && !R.bReconnecting) {
+    R.bReconnecting = true;
+    R.ReconnectSeq = Hud.SequenceNumber;
+  } else if (!bRecovering && R.bReconnecting) {
+    R.bReconnecting = false;
+    const int32 Missed = FMath::Max(0, Hud.SequenceNumber - R.ReconnectSeq);
+    if (R.Feed.ToastOnUmg()) {
+      FUmToastSpec Spec;
+      Spec.Kind = EUmToastKind::Info;
+      FFormatNamedArguments Args;
+      Args.Add(TEXT("n"), FText::FromString(FString::FromInt(Missed)));
+      Spec.Text = UmText::Format(EUmTable::Hud, TEXT("hud.toast.reconnected"), Args);
+      Spec.Key = FName(TEXT("hud.toast.reconnected"));
+      Spec.HoldSec = 3.0f;
+      R.Feed.PushToast(Spec, Now);
+    }
+    FS08Trace::Write(FString::Printf(TEXT("TOAST hud=hud.toast.reconnected missed=%d seqBefore=%d seq=%d"), Missed, R.ReconnectSeq,
+                                     Hud.SequenceNumber));
+  }
+  // class S: the open list closes on a click outside it (not on «Журнал» itself - its press toggles) or Esc
+  if (R.Feed.IsLogOpen()) {
+    APlayerController* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
+    float MX = -1.0f, MY = -1.0f;
+    const bool bMouse = PC && PC->GetMousePosition(MX, MY);
+    const FVector2D P(MX / PxPerSu, MY / PxPerSu);
+    const bool bClick = PC && (PC->WasInputKeyJustPressed(EKeys::LeftMouseButton) || PC->WasInputKeyJustPressed(EKeys::RightMouseButton));
+    const bool bInside = bMouse && (R.Feed.LogListRectSu().IsInside(P) || R.Layout.Rect(EUmHudBlock::Top).IsInside(P));
+    if ((bClick && !bInside) || (PC && PC->WasInputKeyJustPressed(EKeys::Escape))) {
+      R.Feed.SetLogOpen(false);
+      FS08Trace::Write(TEXT("HUD-LOG list close=input"));
+    }
+  }
+  // ---- the input of the placement ----
+  FUmFeedInput In;
+  In.Layout = &R.Layout;
+  In.bLive = Hud.bValid && !Hud.bGameOver && !bAborted && !IsResultScreenShown();
+  In.NowMs = Now;
+  In.bReduced = MoveMotion.bReducedMotion;
+  In.bCombat = CommandUi.Combat.bPresent || CombatStage.IsActive();
+  const UUmHudBanner* Banner = R.TopStrip.GetBanner();
+  In.bBannerShown = Banner && Banner->GetAlpha() > 0.0f;
+  const UUmHudStatusLine* Status = R.TopStrip.GetStatus();
+  if (Status && Status->IsShown() && R.Layout.HasRect(EUmHudBlock::Status)) {
+    In.StatusBottomSu = static_cast<float>(R.Layout.Rect(EUmHudBlock::Status).Min.Y) + static_cast<float>(Status->GetBodySizeSu().Y);
+  }
+  for (const TPair<FString, FS08ScreenRect>& F : FigureScreenRects()) In.Figures.Add(UmHudPxToSu(F.Value, PxPerSu));
+  for (const FS08ArtHudRuntime::FTagSlot& Tag : ArtHud.Tags) {
+    if (Tag.bShown && !Tag.Planned.IsEmpty()) In.Figures.Add(UmHudPxToSu(Tag.Planned, PxPerSu));
+  }
+  if (ArtHud.bPlateVisible && !ArtHud.PlatePlanned.IsEmpty()) In.Figures.Add(UmHudPxToSu(ArtHud.PlatePlanned, PxPerSu));
+  In.Spaces = R.SpaceRectsSu;
+  // every drawn HUD block (04 §2.12): the persistent ones at their rects, the others as drawn now
+  auto Shown = [](const UWidget* W) { return UmGameHudSlots::ShownByProperty(W); };
+  if (Shown(R.TopStrip.GetTop())) In.Blocks.Add(R.Layout.Rect(EUmHudBlock::Top));
+  if (In.StatusBottomSu > 0.0f) {
+    const FBox2D& St = R.Layout.Rect(EUmHudBlock::Status);
+    const float W = static_cast<float>(Status->GetBodySizeSu().X);
+    const float X = static_cast<float>(St.GetCenter().X) - 0.5f * W;
+    In.Blocks.Add(FBox2D(FVector2D(X, St.Min.Y), FVector2D(X + W, In.StatusBottomSu)));
+  }
+  if (Shown(R.Panels.GetLoc())) In.Blocks.Add(R.Layout.Rect(EUmHudBlock::PanelLoc));
+  if (Shown(R.Panels.GetOpp())) In.Blocks.Add(R.Layout.Rect(EUmHudBlock::PanelOpp));
+  if (Shown(R.Panels.GetOppHand())) In.Blocks.Add(R.Layout.Rect(EUmHudBlock::OppHand));
+  if (R.Layout.HasRect(EUmHudBlock::Decks)) In.Blocks.Add(R.Layout.Rect(EUmHudBlock::Decks));
+  if (R.Layout.HasRect(EUmHudBlock::Actions)) In.Blocks.Add(R.Layout.Rect(EUmHudBlock::Actions));
+  if (const UUmHudLog* LogW = R.Feed.GetLog()) {
+    if (!R.Layout.bClassS && Shown(LogW)) In.Blocks.Add(R.Layout.Rect(EUmHudBlock::Log));
+  }
+  if (const UUmHudSourceSlot* SlotW = R.Slot.Get()) {
+    if (SlotW->GetPhase() != EUmSlotPhase::Hidden) In.Blocks.Add(SlotW->DrawnRectSu());
+  }
+  if (const UUmHudPending* P = R.Pending.Get()) {
+    if (Shown(P) && P->GetModel().View != EUmPendingView::Toast) In.Blocks.Add(P->PanelRectSu());
+    if (P->GetModel().View == EUmPendingView::Toast) {
+      const FUmPendingPlan& Plan = P->GetPlan();
+      const float H = Plan.Panel.bIsValid ? FMath::Max(48.0f, static_cast<float>(Plan.Panel.GetSize().Y)) : 48.0f;
+      In.PendingToastSu = FVector2D(UmHudPending::ToastWidthSu(R.Layout.bClassS, R.Layout.bTall), H);
+    }
+  }
+  if (const UUmHudCombatCenter* Centre = R.Combat.GetCenter()) {
+    if (Shown(Centre)) In.Blocks.Add(Centre->PanelRectSu());
+  }
+  for (const EUmEdgeSide Side : {EUmEdgeSide::Own, EUmEdgeSide::Opp}) {
+    const UUmHudCombatEdge* E = R.Combat.GetEdge(Side);
+    if (!Shown(E)) continue;
+    In.Blocks.Add(UmGameHudSlots::SlotRect(R.Layout, Side == EUmEdgeSide::Own ? EUmGameSlot::CombatEdgeL : EUmGameSlot::CombatEdgeR));
+  }
+  // the Slate panels that still draw (the command panel's buttons until ACTIONS, the hand panel's lines, the side panel)
+  for (const TWeakPtr<SWidget>& Weak : {ArtHud.CommandPanel, ArtHud.HandPanel, ArtHud.SidePanel}) {
+    const TSharedPtr<SWidget> W = Weak.Pin();
+    FS08ScreenRect Px;
+    if (W.IsValid() && W->GetVisibility().IsVisible() && W->GetRenderOpacity() > 0.0f && WidgetViewportRect(W, Px) && !Px.IsEmpty()) {
+      In.Blocks.Add(UmHudPxToSu(Px, PxPerSu));
+    }
+  }
+  // the hand: the cards as drawn now (the lowering included, not the hover preview), the caption plate
+  if (const UUmHudHand* Hand = R.Hand.Get()) {
+    const UmHudHand::FRow& Row = Hand->GetRow();
+    if (Shown(Hand) && Row.CardPos.Num() > 0) {
+      const float Lower = Hand->GetLowerNowSu();
+      FBox2D Cards(ForceInit);
+      for (const FVector2D& Pos : Row.CardPos) {
+        Cards += FBox2D(FVector2D(Pos.X, Pos.Y + Lower),
+                        FVector2D(Pos.X + Row.CardSize.X, FMath::Min(R.Layout.CanvasSu.Y, Pos.Y + Lower + Row.CardSize.Y)));
+      }
+      if (Cards.bIsValid) {
+        In.Blocks.Add(Cards);
+        In.CardsTopSu = static_cast<float>(Cards.Min.Y);
+      }
+      if (Hand->IsCaptionShown()) In.CaptionSu = Hand->CaptionRectSu();
+      In.bHandLowered = Lower > 0.5f;
+    }
+  }
+  for (const FString& Line : R.Feed.Refresh(In)) FS08Trace::Write(Line);
+  // HB-36: the pending trigger toast follows the stack's placement
+  const FBox2D PendingRect = R.Feed.PendingToastRect();
+  if (PendingRect.bIsValid != R.PendingToastRect.bIsValid || (PendingRect.bIsValid && !(PendingRect == R.PendingToastRect))) {
+    R.PendingToastRect = PendingRect;
+    RefreshUmPending();
+  }
+}
+
+void AS08FlowGameMode::UmHudLogTrail(const FS09LastMovement& Trail, const FString& CardName, const TArray<FString>& YourFighters) {
+  if (!UmHud.IsValid() || !UmHud->Feed.LogOnUmg()) return;
+  FUmHudRuntime& R = *UmHud;
+  const bool bRu = UmCardMedia::PreferredLang() != TEXT("en");
+  // a card of the public piles by its name: the UI language's title and its id (the click opens the inspector)
+  auto FindCard = [this](const FString& Name) -> const FS09CardView* {
+    if (Name.IsEmpty()) return nullptr;
+    for (const FS09PlayerPanel* Panel : {Hud.ViewerPanel(), Hud.OpponentPanel()}) {
+      if (!Panel) continue;
+      for (const FS09CardView& C : Panel->Discard) {
+        if (!C.bHidden && (C.Name == Name || C.NameRu == Name)) return &C;
+      }
+    }
+    return nullptr;
+  };
+  auto Title = [bRu](const FS09CardView* C, const FString& Fallback) {
+    return C && bRu && !C->NameRu.IsEmpty() ? C->NameRu : (C ? C->Name : Fallback);
+  };
+  FUmLogEntry E;
+  E.Seq = Trail.Seq;
+  // «Х{n}»: the turn of the acting player at the event's seq (a turn-ending snapshot may already name the next turn)
+  for (int32 I = R.SeqTurns.Num() - 1; I >= 0 && E.Turn == 0; --I) {
+    if (R.SeqTurns[I].Seq <= Trail.Seq && R.SeqTurns[I].Player == Trail.PlayerId) E.Turn = R.SeqTurns[I].Turn;
+  }
+  for (int32 I = R.SeqTurns.Num() - 1; I >= 0 && E.Turn == 0; --I) {
+    if (R.SeqTurns[I].Seq <= Trail.Seq) E.Turn = R.SeqTurns[I].Turn;
+  }
+  // the stripe: the acting player's team as the board draws it (absolute or -S08TeamColorMode relative)
+  const FString ViewerId = ViewerIdNow();
+  const FS08BoardFighter* Mover = Trail.Moves.Num() > 0 ? FindFighter(Trail.Moves[0].FighterId) : nullptr;
+  if (!Mover) Mover = Fighters.FindByPredicate([&Trail](const FS08BoardFighter& F) { return F.OwnerId == Trail.PlayerId; });
+  if (Mover && BoardActor) {
+    E.TeamSlot =
+        S08TeamLook(BoardActor->TeamOfFighter(*Mover), Mover->OwnerId == ViewerId, BoardActor->GetTeamColorMode()) == ES08TeamSlot::P2 ? 1 : 0;
+  }
+  const bool bEffect = Trail.Source == TEXT("EFFECT");
+  const FS09CardView* Card = FindCard(bEffect ? CardName : Trail.BoostName);
+  FS09LastMovement Shown = Trail;
+  if (Trail.bBoost) Shown.BoostName = Title(Card, Trail.BoostName);
+  const FString ShownCard = bEffect ? Title(Card, CardName) : CardName;
+  if (Card) E.CardId = Card->CardId;
+  UmHudLog::DescribeTrail(
+      Shown, ShownCard, YourFighters, [this](const FString& Id) { return PlayerHeroName(Id); },
+      [this](const FString& Id) -> FString {
+        const FS08BoardFighter* F = FindFighter(Id);
+        return F ? (F->Label.IsEmpty() ? F->Name : F->Label) : Id;
+      },
+      [this](const FIntPoint& Cell) { return BoardModel.CellLabel(Cell.X, Cell.Y); }, E.Text, E.Full);
+  R.Feed.PushLog(E, static_cast<double>(NowMs()));
+  FS08Trace::Write(FString::Printf(TEXT("HUD-LOG add seq=%d turn=%d team=%d card=%d total=%d"), E.Seq, E.Turn, E.TeamSlot,
+                                   E.CardId.IsEmpty() ? 0 : 1, R.Feed.GetLog() ? R.Feed.GetLog()->Num() : 0));
+}
+
+void AS08FlowGameMode::UmHudToastReason(const FS09Reason& Reason, float Seconds) {
+  if (!UmHud.IsValid() || !UmHud->Feed.ToastOnUmg() || !Reason.IsSet()) return;
+  FUmToastSpec Spec;
+  Spec.Kind = UmHudFeed::KindOfKey(Reason.Key);
+  Spec.Text = UmHudFeed::ReasonText(Reason);
+  Spec.HoldSec = Seconds;
+  Spec.Key = Reason.Key;
+  UmHud->KeyedToastEn = Reason.Text();
+  UmHud->Feed.PushToast(Spec, static_cast<double>(NowMs()));
+}
+
+FString AS08FlowGameMode::UmHudSlateToast(const FString& Shown) const {
+  if (UmHudBlockOnSlate(TEXT("toast")) || !UmHud->Feed.ToastOnUmg()) return Shown;  // the rollback: the old line
+  // the default view: the keyed toasts are UMG; the non-keyed developer strings stay in the gate layer only (ВР-VS4-26)
+  if (!S08ArtLook::S08Markers() || Shown == UmHud->KeyedToastEn) return FString();
+  return Shown;
+}
+
+bool AS08FlowGameMode::UmHudShowSubtitle(const FString& SpeakerName, const FString& Line, int64 DurationMs) {
+  if (!UmHud.IsValid() || !UmHud->Feed.SubOnUmg()) return false;
+  FUmSubtitleModel M;
+  M.Speaker = UmHudSubtitle::SpeakerText(SpeakerName);
+  M.Line = FText::FromString(Line);
+  M.StartMs = static_cast<double>(NowMs());
+  M.DurationMs = static_cast<double>(DurationMs);
+  UmHud->Feed.ShowSubtitle(M);
+  FS08Trace::Write(FString::Printf(TEXT("HUD-SUB show speaker=%d ms=%lld"), SpeakerName.IsEmpty() ? 0 : 1, static_cast<long long>(DurationMs)));
+  return true;
+}
+
+void AS08FlowGameMode::UmHudHideSubtitle() {
+  if (UmHud.IsValid()) UmHud->Feed.HideSubtitle();
+}
+
+bool AS08FlowGameMode::UmHudSyncHandLimit() {
+  if (!UmHud.IsValid() || !UmHud->Feed.ToastOnUmg()) return false;
+  const FName Key(TEXT("ms.hint.hand.limit"));
+  UUmToastStack* T = UmHud->Feed.GetToasts();
+  const double Now = static_cast<double>(NowMs());
+  if (HandLimitHint.IsVisible() && T && !T->Has(Key)) {
+    // DE-024: the rule toast, held until its cross, the end of the turn or GAME_OVER (FS09HandLimitHint)
+    FUmToastSpec Spec;
+    Spec.Kind = EUmToastKind::Warning;
+    FFormatNamedArguments Args;
+    Args.Add(TEXT("n"), FText::FromString(FString::FromInt(HandLimitHint.ShownLimit())));
+    Spec.Text = UmText::Format(EUmTable::Ms, Key.ToString(), Args);
+    Spec.Key = Key;
+    Spec.bSticky = true;
+    UmHud->Feed.PushToast(Spec, Now);
+  } else if (!HandLimitHint.IsVisible() && T && T->Has(Key)) {
+    UmHud->Feed.DismissToast(Key, Now);
+  }
+  return true;
+}
+
+void AS08FlowGameMode::UmHudRefuseCell(int32 CellX, int32 CellY) {
+  if (!UmHud.IsValid() || !UmHud->Feed.ToastOnUmg() || !UmHud->bLayout) return;
+  FVector2D Screen(0.0, 0.0);
+  if (!ProjectToViewport(BoardModel.CellToWorld(CellX, CellY), Screen)) return;
+  const float Px = UmHud->Layout.PxPerSu > 0.0f ? UmHud->Layout.PxPerSu : 1.0f;
+  // V-08: the badge over the refused space (350 ms, a transient mark that may cover the field)
+  UmHud->Feed.ShowBadge(Screen / Px, static_cast<double>(NowMs()));
+  FS08Trace::Write(FString::Printf(TEXT("HUD-REFUSE at=cell cell=%s"), *BoardModel.CellLabel(CellX, CellY)));
+}
+
+void AS08FlowGameMode::UmHudRefusePress(FName PressedId) {
+  if (!UmHud.IsValid() || !UmHud->Feed.ToastOnUmg() || !UmHud->bLayout) return;
+  const float Px = UmHud->Layout.PxPerSu > 0.0f ? UmHud->Layout.PxPerSu : 1.0f;
+  // next to the refused button: its top-right corner (a Slate button of the command panel), else the pointer over the
+  // UMG element (+16, -16 su)
+  FVector2D Centre(0.0, 0.0);
+  FS08ScreenRect Rect;
+  const TWeakPtr<SS09HudPress>* Weak = PressedId.IsNone() ? nullptr : HudPressWidgets.Find(PressedId);
+  const TSharedPtr<SS09HudPress> Press = Weak ? Weak->Pin() : nullptr;
+  if (Press.IsValid() && WidgetViewportRect(StaticCastSharedPtr<SWidget>(Press), Rect) && !Rect.IsEmpty()) {
+    Centre = FVector2D(Rect.X1, Rect.Y0) / Px;
+  } else {
+    APlayerController* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
+    float MX = 0.0f, MY = 0.0f;
+    if (!PC || !PC->GetMousePosition(MX, MY)) return;
+    Centre = FVector2D(MX, MY) / Px + FVector2D(16.0, -16.0);
+  }
+  UmHud->Feed.ShowBadge(Centre, static_cast<double>(NowMs()));
+  FS08Trace::Write(FString::Printf(TEXT("HUD-REFUSE at=press id=%s"), PressedId.IsNone() ? TEXT("-") : *PressedId.ToString()));
+}
+
+bool AS08FlowGameMode::UmHudCursorOverFeed(float X, float Y) const {
+  if (!UmHud.IsValid() || !UmHud->bLayout) return false;
+  const float Px = UmHud->Layout.PxPerSu > 0.0f ? UmHud->Layout.PxPerSu : 1.0f;
+  return UmHud->Feed.CoversPoint(FVector2D(X / Px, Y / Px));
 }

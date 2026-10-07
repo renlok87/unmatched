@@ -1051,7 +1051,7 @@ FBox2D UUmHudPending::PanelRectSu() const { return Model.View == EUmPendingView:
 void UUmHudPending::Relayout() {
   using namespace UmHudPending;
   const UUmHudTheme& Theme = UUmHudTheme::Get();
-  if (Model.View == EUmPendingView::Hidden || !bHasFrame) {
+  if (Model.View == EUmPendingView::Hidden || !bHasFrame || (Model.View == EUmPendingView::Toast && Frame.bToastWaits)) {
     SetVisibility(ESlateVisibility::Collapsed);
     PlanNow = FUmPendingPlan();
     return;

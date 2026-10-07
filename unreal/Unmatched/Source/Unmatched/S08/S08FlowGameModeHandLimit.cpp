@@ -105,8 +105,10 @@ void AS08FlowGameMode::DismissHandLimitHint() {
 }
 
 void AS08FlowGameMode::ApplyHandLimitHintVisibility() {
+  // VS-4 HB-40: the UMG stack shows the rule as a sticky warning toast - the Slate hint only on -S08SlateHud=toast
+  const bool bUmg = UmHudSyncHandLimit();
   if (!HandHintBox.IsValid()) return;
   // the box itself never takes a hit; the button inside takes clicks only over its own rectangle
-  const EVisibility Vis = HandLimitHint.IsVisible() ? EVisibility::SelfHitTestInvisible : EVisibility::Collapsed;
+  const EVisibility Vis = HandLimitHint.IsVisible() && !bUmg ? EVisibility::SelfHitTestInvisible : EVisibility::Collapsed;
   if (HandHintBox->GetVisibility() != Vis) HandHintBox->SetVisibility(Vis);
 }
