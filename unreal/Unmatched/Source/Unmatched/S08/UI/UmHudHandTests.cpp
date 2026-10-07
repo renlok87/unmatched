@@ -433,6 +433,44 @@ bool FUmHandInputTest::RunTest(const FString&) {
   return true;
 }
 
+// VS-3 frames step (ВР-VS3-69): the live client showed the CP-16 unplayable look stuck at the first step of its tween -
+// the owner steps the running card tweens (StepAnimating: NativeTick and the game mode), no other call in between.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmHandAnimateTest,
+    "Unmatched.S08.Hud.Hand.Animate the owner steps the running card tweens - unplayable 0.6 after 150 ms, the hover 1.5",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FUmHandAnimateTest::RunTest(const FString&) {
+  using namespace UmHandTest;
+  FWorld W(TEXT("UmHandAnimate"));
+  const FUmHandFrame F = Frame(Canvases[0], false);
+  UUmHudHand* H = Make(W.World, F);
+  if (!TestNotNull(TEXT("hand"), H)) return false;
+  const TArray<FS09CardView> Run = TestHand(5);
+  FUmHandModel M = Model(Run);
+  H->ApplyModel(M);
+  At(H, 500.0);
+  // the defense step: card 2 becomes unplayable at 500 ms; only StepAnimating runs afterwards
+  M.Cards[2].bPlayable = false;
+  H->ApplyModel(M);
+  UUmCardWidget* C2 = H->FindCard(Run[2].InstanceId);
+  if (!TestNotNull(TEXT("card 2"), C2)) return false;
+  H->SetClockOverrideMs(575.0);
+  H->StepAnimating();
+  TestTrue(FString::Printf(TEXT("75 ms: half way (%.3f)"), C2->GetDesaturation()), Near(C2->GetDesaturation(), 0.3, 0.02));
+  H->SetClockOverrideMs(700.0);
+  H->StepAnimating();
+  TestTrue(FString::Printf(TEXT("200 ms: the unplayable look 0.6 / 0.7 (%.3f / %.3f)"), C2->GetDesaturation(), C2->GetFaceOpacity()),
+           Near(C2->GetDesaturation(), 0.6) && Near(C2->GetFaceOpacity(), 0.7));
+  TestFalse(TEXT("the tween is over"), C2->IsAnimating());
+  // the hover: the preview scale 1.5 by StepAnimating alone
+  H->HoverAtSu(H->RestRectSu(1).GetCenter());
+  TestEqual(TEXT("hover card 1"), H->GetHoverIndex(), 1);
+  H->SetClockOverrideMs(900.0);
+  H->StepAnimating();
+  UUmCardWidget* C1 = H->FindCard(Run[1].InstanceId);
+  TestTrue(FString::Printf(TEXT("the preview 1.5 (%.3f)"), C1 ? C1->GetScale() : 0.0f), C1 && Near(C1->GetScale(), 1.5));
+  return true;
+}
+
 // ------------------------------------------------------------------------------------------------ HB-25
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmHandDiscardTest,

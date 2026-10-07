@@ -994,8 +994,30 @@ void UUmCardWidget::PlayFlash() {
 
 // ------------------------------------------------------------------------------------------------ the step
 
+double UUmCardWidget::AnimEndMs() const {
+  double End = -1.0;
+  for (const FTween* T : {&ScaleTween, &DesatTween, &ShiftTween, &FocusTween, &OffsetXTween, &OffsetYTween}) {
+    if (T->StartMs >= 0.0) End = FMath::Max(End, T->StartMs + T->DurMs);
+  }
+  auto Pop = [&End](double Start, double Ms) {
+    if (Start >= 0.0) End = FMath::Max(End, Start + Ms + 1.0);
+  };
+  Pop(NewStartMs, 180.0);
+  Pop(NewLeaveMs, 120.0);
+  Pop(ChipStartMs, 180.0);
+  Pop(ChipLeaveMs, 120.0);
+  Pop(DropStartMs, 180.0);
+  Pop(DropLeaveMs, 120.0);
+  Pop(FlashStartMs, UmCardWidget::FlashMs);
+  return End;
+}
+
 bool UUmCardWidget::IsAnimating() const {
   const double Now = NowMs();
+  // VS-3 frames step (ВР-VS3-69): a tween that ended between two frames still owes its end value - without this the
+  // live client kept the last in-flight step (the CP-16 unplayable look stuck at desaturation 0.13 after a 100+ ms
+  // frame, the attack-card raise at ~0.9)
+  if (LastStepMs < AnimEndMs()) return true;
   auto Within = [Now](double Start, double Ms) { return Start >= 0.0 && Now < Start + Ms + 1.0; };
   return ScaleTween.IsRunning(Now) || DesatTween.IsRunning(Now) || ShiftTween.IsRunning(Now) ||
          FocusTween.IsRunning(Now) || OffsetXTween.IsRunning(Now) || OffsetYTween.IsRunning(Now) || FlipStartMs >= 0.0 || Within(NewStartMs, 180.0) || Within(NewLeaveMs, 120.0) ||
@@ -1017,6 +1039,7 @@ void UUmCardWidget::ApplySpinner() {
 void UUmCardWidget::Step() {
   using namespace UmCardWidget;
   const double Now = NowMs();
+  LastStepMs = Now;  // ВР-VS3-69: IsAnimating owes one step past the end of every tween
   const bool bReduced = IsReduced();
   if (bLoading) ApplySpinner();
   // the flip (CP-18 / CP-20)

@@ -561,14 +561,16 @@ void AS08FlowGameMode::TickUmExitShotsVs3() {
   const auto Is = [](const UUmHudCombatEdge* E, EUmEdgeState S) { return E && E->GetModel().bShow && E->GetModel().State == S; };
   const bool bReveal = (Is(EOwn, EUmEdgeState::Reveal) || Is(EOpp, EUmEdgeState::Reveal)) && !Open(EOwn) && !Open(EOpp);
   const bool bWait = Center && UmGameHudSlots::ShownByProperty(Center) && Center->GetModel().State == EUmCenterState::Wait;
+  // the hand frames of set A show the turn, not a combat (ВР-VS3-70): no edge on screen for 3 and 7
+  const bool bCombatShown = (EOwn && EOwn->GetModel().bShow) || (EOpp && EOpp->GetModel().bShow);
   struct FCond {
     const TCHAR* Leaf;
     bool bNow;
     float HoldSec;
   };
   const FCond Conds[] = {
-      {TEXT("s09-exit-hand-n3.png"), HandN == 3 && HandState == TEXT("rest"), 0.8f},
-      {TEXT("s09-exit-hand-n7.png"), HandN == 7 && HandState == TEXT("rest"), 0.8f},
+      {TEXT("s09-exit-hand-n3.png"), HandN == 3 && HandState == TEXT("rest") && !bCombatShown, 0.8f},
+      {TEXT("s09-exit-hand-n7.png"), HandN == 7 && HandState == TEXT("rest") && !bCombatShown, 0.8f},
       {TEXT("s09-exit-hand-n9.png"), HandN == 9 && (HandState == TEXT("rest") || HandState == TEXT("discard")), 0.6f},
       {TEXT("s09-exit-defense-wait.png"), bWait, 0.8f},
       {TEXT("s09-exit-defense-warn.png"), Is(EOwn, EUmEdgeState::Shield) && EOwn->GetTimerState() == EUmTimerState::Warning, 0.6f},
@@ -746,6 +748,7 @@ void AS08FlowGameMode::TickUmHud() {
     UmHudRoot->TickCursors(HudBusyReason().IsSet(), FPlatformTime::Seconds());
   }
   if (!UmHud.IsValid() || !UmHud->bLayout || !UmHud->Blocks.UmgRoot()) return;
+  if (UUmHudHand* Hand = UmHud->Hand.Get()) Hand->StepAnimating();  // VS-3 (ВР-VS3-69): the card tweens of the hand
   TickUmTopStrip();  // VS-2 HB-14...HB-16
   TickUmPanels();    // VS-2 HB-18...HB-21
   RefreshUmCombat();  // VS-3 HB-30...HB-33: the staging's clock moves the edges and the centre

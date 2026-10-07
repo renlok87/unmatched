@@ -265,6 +265,8 @@ class UNMATCHED_API UUmHudHand : public UUserWidget {
   void SetSyncLoad(bool bOn);
   /** Steps the hand tweens and every card at the current clock (the tick does it while one runs). */
   void Step();
+  /** VS-3 (ВР-VS3-69): the hand's own tweens and the running card tweens - NativeTick and the game mode every frame. */
+  void StepAnimating();
 
   UPROPERTY(BlueprintReadOnly, Category = "Um HUD", meta = (BindWidget)) TObjectPtr<UCanvasPanel> Row;
   UPROPERTY(BlueprintReadOnly, Category = "Um HUD", meta = (BindWidget)) TObjectPtr<UTextBlock> CountText;

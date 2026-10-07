@@ -435,6 +435,9 @@ class UNMATCHED_API UUmCardWidget : public UUserWidget {
   double DropStartMs = -1.0;
   double DropLeaveMs = -1.0;
   double FlashStartMs = -1.0;
+  /** ВР-VS3-69: the clock of the last Step and the end of the latest tween / pop - one step past the end is owed. */
+  double LastStepMs = -1.0;
+  double AnimEndMs() const;
   double FlipStartMs = -1.0;
   float FlipDurMs = 0.0f;
   bool bFlipToFace = false;

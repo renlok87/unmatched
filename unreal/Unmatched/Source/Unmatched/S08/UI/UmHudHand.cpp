@@ -1001,8 +1001,21 @@ void UUmHudHand::Step() {
 
 void UUmHudHand::NativeTick(const FGeometry& MyGeometry, float InDeltaTime) {
   Super::NativeTick(MyGeometry, InDeltaTime);
-  // the hand's own tweens only; the cards step themselves (UUmCardWidget::NativeTick)
-  if (NeedsHandStep()) StepHand(NowMs());
+  StepAnimating();
+}
+
+void UUmHudHand::StepAnimating() {
+  // VS-3 frames step (ВР-VS3-69): the hand's own tweens and every card tween that runs. The live packaged client showed
+  // the CP-16 unplayable look stuck in flight (desaturation ~0.13 of 0.6 in a 1.3 s old defense window): a tween that
+  // ended between two frames never got its end value (UUmCardWidget::IsAnimating now owes that step). The owner steps
+  // the cards as well - the game mode calls this every frame (TickUmHud); a second step in one frame is the same value.
+  const double Now = NowMs();
+  if (NeedsHandStep()) StepHand(Now);
+  for (const TObjectPtr<UUmCardWidget>& W : Pool) {
+    if (!W || W->GetVisibility() == ESlateVisibility::Collapsed) continue;
+    if (ClockOverrideMs >= 0.0) W->SetClockOverrideMs(ClockOverrideMs);
+    if (W->IsAnimating()) W->Step();
+  }
 }
 
 // ------------------------------------------------------------------------------------------------ tests / sheet hooks
@@ -1093,9 +1106,9 @@ void UUmHudHand::CollectShotLines(TArray<FString>& Out) const {
     if (!W) continue;
     const FUmCardFit& F = W->GetFit();
     const float CardPx = W->GetPxPerSu();
-    Out.Add(FString::Printf(TEXT("HUD-HAND card=%d lang=%s show=%s su=%.0fx%.0f px=%.0fx%.0f scale=%.3f capped=%d state=%s"), I,
+    Out.Add(FString::Printf(TEXT("HUD-HAND card=%d lang=%s show=%s su=%.0fx%.0f px=%.0fx%.0f scale=%.3f capped=%d state=%s desat=%.2f"), I,
                             UmCardWidget::FaceName(W->GetFace()), UmCardWidget::ShowName(W->GetState().Show), F.CardSu.X,
                             F.CardSu.Y, F.ScanSu.X * CardPx * W->GetScale(), F.ScanSu.Y * CardPx * W->GetScale(),
-                            F.Scale * W->GetScale(), F.bCapped ? 1 : 0, *W->StateText()));
+                            F.Scale * W->GetScale(), F.bCapped ? 1 : 0, *W->StateText(), W->GetDesaturation()));
   }
 }
