@@ -112,6 +112,11 @@
       "id": "audio",
       "path": "docs/game-design/audio/00-AUDIO-BRIEF.md",
       "title": "Бриф звука игры (AU): опись, дизайн, реестр, сценарий реплик, план производства; журнал — 07-production-log.md"
+    },
+    {
+      "id": "visual-vs5",
+      "path": "docs/game-design/evidence/VISUAL/VS-5/README.md",
+      "title": "Визуальный чат, спринт VS-5 (ветка feat/visual-vs5): ENV-U16 — нарисованный Marmoreal, остатки HUD VS-4"
     }
   ],
   "tasks": [
@@ -2280,6 +2285,28 @@
       "note": "8f524d8b (+ 80e52060, f6b7529c): кромка водопада K1 206 → 20 px, тело ΔE 10,9 → 3,8; форт ΔE 11,6 → 5,9; корпус ΔE 5,5; G5 pass; K1 2,60 мс. Принято по делегированию (без личного просмотра пользователя), 2 итерации из 3, одна упаковка."
     },
     {
+      "id": "ENV-U16",
+      "title": "ENV-U16: нарисованный задник Marmoreal по умолчанию (VS-5 EN-06…EN-18), откат -NoConceptPaste; Sarpedon — lit3d путь 1",
+      "track": "art",
+      "source": "visual-vs5",
+      "status": "done",
+      "art_status": "технически импортировано",
+      "evidence": [
+        "docs/game-design/evidence/VISUAL/ENV-U16/README.md",
+        "docs/game-design/evidence/ENV-MAPS/env-u16-marmoreal-2026-10-08/bench/README.md",
+        "docs/game-design/evidence/GD-058/marmoreal-paste-2026-10-08/README.md",
+        "docs/game-design/evidence/VISUAL/EN-13/README.md",
+        "docs/art-pipeline/ENV-BACKDROP-RULES.md"
+      ],
+      "next": "Художественно не принято по листу EN-16 (по делегированию): G-READ кромки панелей HUD < 3 : 1 на средних тонах плиты (ВР-VS5-48, карточка HUD), лепестки почти не видны (EN-09), размах мерцания двух фонарей < 6 % (EN-08 п. 2), D1 света героев 0,93–0,97 (EN-14). Интеграция feat/visual-vs5 — safe-integrate.sh.",
+      "blocker": null,
+      "assets": [
+        "ASSET-ENV-CONCEPT-PASTE-001"
+      ],
+      "updated": "2026-10-08T03:00:00Z",
+      "note": "8ea9c6c9 (EN-13: default on), 7ca326ad (P9c), b68e21b4 (ветер 0,4); packaged b4938cab: K1 2,137 мс против P5c 2,483, K2×1,6 2,203, без fx −0,06…0,07, VRAM −153 МиБ, ACC-022 60,00 FPS p95 16,67 (ПК разработки, не D-07); H2 23,65; гейты HUD без -ConceptPaste PASS; решение пользователя 2026-10-04 «Нарисованный задник» исполнено."
+    },
+    {
       "id": "MOVE-SEL-M1",
       "title": "Подбор хода, веха M1: MS-T-01…07 и MS-T-14; живой манёвр «буст + 3 бойца» на Marmoreal",
       "track": "tech",
@@ -2756,6 +2783,14 @@
         "AU-S6",
         "AU-LISTEN",
         "AU-INBANK"
+      ]
+    },
+    {
+      "id": "ENV-U16",
+      "title": "Нарисованный задник Marmoreal (ENV-U16, визуальный чат VS-5): вклейка по умолчанию, анимации, свет героев P9c, цена, лист приёмки, эталон GD-058, правило будущих карт",
+      "status": "done",
+      "tasks": [
+        "ENV-U16"
       ]
     }
   ],

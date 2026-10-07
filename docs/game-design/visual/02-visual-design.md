@@ -821,8 +821,9 @@ DE, силуэт — первый канал (пять семейств), три
 
 - 3D-окружение P5c (дворец, 3D-сакуры, фонари на тумбах) и поднос T2b — только откат `-NoConceptPaste` (ВР-56). Флаг
   вписывается в AGENTS.md после ENV-U16.
-- **Разрыв на 2026-10-06:** по умолчанию Marmoreal всё ещё P5c (`conceptPaste.default "off"`). Кадры прогона I
-  сняты с `-ConceptPaste` — это сырая вклейка по флагу, не ENV-U16.
+- ~~Разрыв на 2026-10-06: по умолчанию Marmoreal всё ещё P5c.~~ Закрыт EN-13 (`8ea9c6c9`, VS-5): нарисованный задник —
+  вид по умолчанию (`conceptPaste.default "on"`), откат `-NoConceptPaste` в AGENTS.md. Приёмка — лист
+  `docs/game-design/evidence/VISUAL/ENV-U16/README.md` (EN-16); правило будущих карт — `docs/art-pipeline/ENV-BACKDROP-RULES.md`.
 
 ### 10.2 Sarpedon — lit3d, путь 1
 

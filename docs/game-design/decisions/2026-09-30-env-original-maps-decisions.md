@@ -265,3 +265,5 @@ Medusa (+3 Harpy) против King Arthur (+Merlin), Battle of Legends Vol. 1. 
 Открыто:
 - Переключить Marmoreal на нарисованный задник по умолчанию. Сейчас там 3D P5c из-за `0f2bdb9a`. Начинать только по
   слову пользователя.
+
+Исполнено (2026-10-08, визуальный чат, ветка `feat/visual-vs5`, по делегированию пользователя 2026-10-06 и его разрешению на Unreal 2026-10-05): нарисованный задник Marmoreal — вид по умолчанию с `8ea9c6c9` (EN-13), откат `-NoConceptPaste` в AGENTS.md (`55dad187`); цена, лист приёмки и эталон — `docs/game-design/evidence/ENV-MAPS/env-u16-marmoreal-2026-10-08/bench/`, `docs/game-design/evidence/VISUAL/ENV-U16/README.md`, `docs/game-design/evidence/GD-058/marmoreal-paste-2026-10-08/README.md`; правило будущих карт — `docs/art-pipeline/ENV-BACKDROP-RULES.md`. Художественно по листу EN-16 не принято (открытые пункты — в листе). Sarpedon не менялся (lit3d, путь 1).
