@@ -33,6 +33,7 @@
 #include "S08Team.h"
 #include "S08TraceLog.h"
 #include "S08TurnPortraitWidget.h"
+#include "UI/UmSlatePortraits.h"
 #include "Engine/Engine.h"
 #include "Engine/GameViewportClient.h"
 #include "Engine/World.h"
@@ -45,8 +46,8 @@
 
 namespace {
 /** Left / bottom gap of the portrait column and the gap between the two portraits (slate units). */
-constexpr float GPortraitEdgeSu = 24.0f;
-constexpr float GPortraitGapSu = 8.0f;
+constexpr float GPortraitEdgeSu = UmSlatePortraits::EdgeSu;
+constexpr float GPortraitGapSu = UmSlatePortraits::GapSu;
 /** The banner sits under the combat outcome slot (top centre, +24) - no combat is open at a turn start. */
 constexpr float GBannerTopSu = 132.0f;
 
@@ -66,31 +67,19 @@ void AS08FlowGameMode::BuildTurnHudWidgets(const TSharedRef<SConstraintCanvas>& 
     return;
   }
   TurnHudLook = FS08TurnHudLook::FromCommandLine(FCommandLine::Get());
-  const FS08ArtHudPlateStyle Chips;
+  TurnHudCanvas = Canvas;  // VS-3: BuildTurnPortraitFallback builds the column here if the UMG root fails
   // VS-2 HB-18 / HB-20: the UMG panels own the portraits (BuildUmPanels writes the HUD-TURN config line)
   const bool bUmgPanels = !S08ArtLook::SlateHudBlocks().IsSlate(FName(TEXT("panels")));
   if (!bUmgPanels) {
-    OpponentPortrait = US08TurnPortraitWidget::Create(World);  // VS-2 CP-08: WBP_UmPortrait when imported
-    OwnPortrait = US08TurnPortraitWidget::Create(World);
-    if (!OpponentPortrait || !OwnPortrait) {
+    UmSlatePortraits::FColumn Column;
+    if (!UmSlatePortraits::Build(World, Canvas, TurnHudLook, Column)) {
       OpponentPortrait = OwnPortrait = nullptr;
       ArtHud.PendingTrace.Add(TEXT("HUD-TURN config portraits=0 reason=create-failed"));
       return;
     }
-    OpponentPortrait->Setup(true, TurnHudLook, Chips.TeamChipColor(1));
-    OwnPortrait->Setup(false, TurnHudLook, Chips.TeamChipColor(0));
-    for (US08TurnPortraitWidget* Portrait : {OpponentPortrait.Get(), OwnPortrait.Get()}) {
-      Portrait->SetVisibility(ESlateVisibility::Collapsed);  // shown with the live match HUD (TickTurnHud)
-      Portrait->SetTrackerOpacity(Portrait->IsOpponent() ? 0.0f : 1.0f);
-    }
-    Canvas->AddSlot()
-        .Anchors(FAnchors(0.0f, 1.0f))
-        .Alignment(FVector2D(0.0f, 1.0f))
-        .Offset(FMargin(GPortraitEdgeSu, -GPortraitEdgeSu, 0.0f, 0.0f))
-        .AutoSize(true)
-        [SAssignNew(TurnPortraitColumn, SVerticalBox).Visibility(EVisibility::SelfHitTestInvisible) +
-         SVerticalBox::Slot().AutoHeight().Padding(0.0f, 0.0f, 0.0f, GPortraitGapSu)[OpponentPortrait->TakeWidget()] +
-         SVerticalBox::Slot().AutoHeight()[OwnPortrait->TakeWidget()]];
+    OpponentPortrait = Column.Opponent;
+    OwnPortrait = Column.Own;
+    TurnPortraitColumn = Column.Column;
   }
   // CUE-015: the banner of the own turn start (our decision, 01 F-07) - never a hit-test target
   Canvas->AddSlot()
@@ -111,6 +100,23 @@ void AS08FlowGameMode::BuildTurnHudWidgets(const TSharedRef<SConstraintCanvas>& 
                 .ShadowColorAndOpacity(FLinearColor(0.0f, 0.0f, 0.0f, 0.85f))]];
   if (bUmgPanels) return;
   ArtHud.PendingTrace.Add(FString::Printf(TEXT("HUD-TURN config portraits=1 %s ringIcon=%d banner=%d"),
+                                          *TurnHudLook.Describe(), OwnPortrait->HasRingIcon() ? 1 : 0,
+                                          FMath::RoundToInt(FS09TurnCue::BannerMs)));
+}
+
+void AS08FlowGameMode::BuildTurnPortraitFallback(const TCHAR* Reason) {
+  // VS-3 (VS-2 review): HUD-ROOT created=0 without -S08SlateHud - the panels never came, the old column takes over
+  const TSharedPtr<SConstraintCanvas> Canvas = TurnHudCanvas.Pin();
+  if (OwnPortrait || !Canvas.IsValid() || !UmSlatePortraits::Wanted(S08ArtLook::Enabled(), false, false)) return;
+  UmSlatePortraits::FColumn Column;
+  if (!UmSlatePortraits::Build(GetWorld(), Canvas.ToSharedRef(), TurnHudLook, Column)) {
+    ArtHud.PendingTrace.Add(FString::Printf(TEXT("HUD-TURN config portraits=0 reason=%s+create-failed"), Reason));
+    return;
+  }
+  OpponentPortrait = Column.Opponent;
+  OwnPortrait = Column.Own;
+  TurnPortraitColumn = Column.Column;
+  ArtHud.PendingTrace.Add(FString::Printf(TEXT("HUD-TURN config portraits=1 reason=%s %s ringIcon=%d banner=%d"), Reason,
                                           *TurnHudLook.Describe(), OwnPortrait->HasRingIcon() ? 1 : 0,
                                           FMath::RoundToInt(FS09TurnCue::BannerMs)));
 }

@@ -67,6 +67,9 @@
   # Extra client arguments for BOTH clients, '+'-separated, as run-phase2-demo -ClientExtraArgs (run C G-LIVE,
   # 2026-10-05: Marmoreal frames need -ConceptPaste until ENV-U16, AGENTS.md "Board scenes and heroes"). Gates unchanged.
   [string]$ClientExtraArgs = '',
+  # VS-3 SC-01 (ВР-SC14): -S08ScreenShots on both clients - one evidence frame per new 'SHOT widget id=UI-SCR-* state=<s>'
+  # (<UI-ID>-<state>.png in the shot directory of each client)
+  [switch]$ScreenShots,
   # AU-S5 (docs/game-design/audio/07-production-log.md §9, opt-in): each client records its whole audio output from the
   # match start to the result + 8 s into <dir>/host.wav and <dir>/joiner.wav (-S08AudioRecord) for the loudness pass
   # (tools/audio/mix_check.py). Gates unchanged.
@@ -355,6 +358,7 @@ function Invoke-CombatDemo {
   if ($ArtPreviewHeroesV2) { $common += '-ArtPreviewHeroesV2' }
   if ($ArtPreviewDiorama) { $common += '-ArtPreviewDiorama' }
   foreach ($extra in @($ClientExtraArgs -split '\+' | Where-Object { $_ })) { $common += $extra }
+  if ($ScreenShots) { $common += '-S08ScreenShots' }  # VS-3 SC-01
   $HostPlan = if ($JoinerAttack) { 'attack+defend+ownresult' } else { 'attack' }
   if ($HostScheme) { $HostPlan += '+scheme' }
   $JoinPlan = if ($JoinerAttack) { 'attack+ranged+defend+resolve' } else { 'defend+resolve' }
@@ -465,7 +469,45 @@ function Invoke-CombatDemo {
       @{ name = 'result';  r = 64;  g = 255; b = 128 },
       @{ name = 'reveal';  r = 124; g = 252; b = 0   }
     )
-    function Get-MarkerStats([string]$Path) {
+    # VS-3 (ВР-VS3-71): the UMG card blocks draw the real card scans (King Arthur's red, Medusa's green art), whose
+    # pixels fall into the marker hue tolerances (run 2026-10-07: 594 #FF4040-like samples in the joiner's hand). The
+    # frame-wide ABSENCE counts ('All') skip the rectangles those blocks traced for the shot (SHOT widget id=UI-HUD-HAND |
+    # -COMBAT-EDGE | -DECKS | -OPP-HAND | -DECKPANEL, visible=1, + 2 px); the PRESENCE counts ('Region') stay unmasked,
+    # and the gate markers are Slate blocks outside them. The masked area is reported with the stats.
+    function Get-CardArtRects([string]$TracePath, [string]$Leaf) {
+      $lines = [System.IO.File]::ReadAllLines($TracePath)
+      $at = -1
+      for ($k = 0; $k -lt $lines.Length; $k++) { if ($lines[$k] -match ('SHOT request file=' + [regex]::Escape($Leaf) + ' ')) { $at = $k; break } }
+      $rects = @()
+      if ($at -lt 0) { return ,$rects }
+      for ($k = $at - 1; $k -ge [Math]::Max(0, $at - 800); $k--) {
+        $l = $lines[$k]
+        if ($l -match 'SHOT (captured|late end) file=') { break }
+        $m = [regex]::Match($l, 'SHOT widget id=(UI-HUD-HAND|UI-HUD-COMBAT-EDGE|UI-HUD-DECKS|UI-HUD-OPP-HAND|UI-HUD-DECKPANEL) impl=umg .*?bbox=\((-?\d+),(-?\d+),(-?\d+),(-?\d+)\) geom=painted visible=1')
+        if ($m.Success) { $rects += ,@(([int]$m.Groups[2].Value - 2), ([int]$m.Groups[3].Value - 2), ([int]$m.Groups[4].Value + 2), ([int]$m.Groups[5].Value + 2)) }
+        # ВР-VS3-72: a leaving combat card paints outside its edge's rect
+        $p = [regex]::Match($l, 'HUD-EDGE-PAINT .*?painted=\((-?\d+),(-?\d+),(-?\d+),(-?\d+)\)')
+        if ($p.Success) { $rects += ,@(([int]$p.Groups[1].Value - 2), ([int]$p.Groups[2].Value - 2), ([int]$p.Groups[3].Value + 2), ([int]$p.Groups[4].Value + 2)) }
+      }
+      # ВР-VS3-72: the late block of the same file - the hand's row and each card as painted (hover, raise, draw / leave
+      # flights) and the combat edges, one rect each. It is written one tick after the captured frame: a card in flight
+      # has moved on by up to ~60 px (a 350-500 ms flight, ease-out), so the late rects are widened by 64 px.
+      $late = -1
+      for ($k = $at + 1; $k -lt [Math]::Min($lines.Length, $at + 4000); $k++) { if ($lines[$k] -match ('SHOT late begin file=' + [regex]::Escape($Leaf) + ' ')) { $late = $k; break } }
+      if ($late -ge 0) {
+        for ($k = $late + 1; $k -lt [Math]::Min($lines.Length, $late + 2000); $k++) {
+          $l = $lines[$k]
+          if ($l -match ('SHOT late end file=' + [regex]::Escape($Leaf))) { break }
+          if ($l -match 'HUD-PAINT-LATE .*?rects=(\S+)') {
+            foreach ($r in [regex]::Matches($Matches[1], '\((-?\d+),(-?\d+),(-?\d+),(-?\d+)\)')) {
+              $rects += ,@(([int]$r.Groups[1].Value - 64), ([int]$r.Groups[2].Value - 64), ([int]$r.Groups[3].Value + 64), ([int]$r.Groups[4].Value + 64))
+            }
+          }
+        }
+      }
+      return ,$rects
+    }
+    function Get-MarkerStats([string]$Path, [object[]]$Exclude = @()) {
       $bmp = [System.Drawing.Bitmap]::FromFile($Path)
       try {
         $w = $bmp.Width; $h = $bmp.Height
@@ -475,7 +517,16 @@ function Invoke-CombatDemo {
         $bytes = New-Object byte[] ($data.Stride * $data.Height)
         [System.Runtime.InteropServices.Marshal]::Copy($data.Scan0, $bytes, 0, $bytes.Length)
         $bmp.UnlockBits($data)
-        $stats = @{ w = $w; h = $h }
+        $mask = New-Object bool[] ($w * $h)
+        $masked = 0
+        foreach ($r in $Exclude) {
+          for ($my = [Math]::Max(0, $r[1]); $my -lt [Math]::Min($h, $r[3]); $my++) {
+            for ($mx = [Math]::Max(0, $r[0]); $mx -lt [Math]::Min($w, $r[2]); $mx++) {
+              if (-not $mask[$my * $w + $mx]) { $mask[$my * $w + $mx] = $true; $masked++ }
+            }
+          }
+        }
+        $stats = @{ w = $w; h = $h; maskedPx = $masked; maskRects = $Exclude.Count }
         foreach ($m in $Markers) {
           $stats[$m.name + 'Region'] = 0
           $stats[$m.name + 'All'] = 0
@@ -491,7 +542,7 @@ function Invoke-CombatDemo {
               if ([Math]::Abs($pR - $m.r) -le $tol -and
                   [Math]::Abs($pG - $m.g) -le $tol -and
                   [Math]::Abs($pB - $m.b) -le $tol) {
-                $stats[$m.name + 'All']++
+                if (-not $mask[$y * $w + $x]) { $stats[$m.name + 'All']++ }
                 if ($inRegion -and $x -lt $rx1) { $stats[$m.name + 'Region']++ }
                 break
               }
@@ -530,10 +581,13 @@ function Invoke-CombatDemo {
       }
       throw "unknown state: $State"
     }
-    $defenseStats = Get-MarkerStats (Join-Path $Script:Staging (Join-Path 'joiner' 's09-combat-defense-open.png'))
-    $resolveStats = Get-MarkerStats (Join-Path $Script:Staging (Join-Path 'joiner' 's09-combat-resolve-window.png'))
-    $joinResultStats = Get-MarkerStats (Join-Path $Script:Staging (Join-Path 'joiner' 's09-combat-result.png'))
-    $hostResultStats = Get-MarkerStats (Join-Path $Script:Staging (Join-Path 'host' 's09-combat-result.png'))
+    $defenseStats = Get-MarkerStats (Join-Path $Script:Staging (Join-Path 'joiner' 's09-combat-defense-open.png')) (Get-CardArtRects $joinTrace 's09-combat-defense-open.png')
+    $resolveStats = Get-MarkerStats (Join-Path $Script:Staging (Join-Path 'joiner' 's09-combat-resolve-window.png')) (Get-CardArtRects $joinTrace 's09-combat-resolve-window.png')
+    $joinResultStats = Get-MarkerStats (Join-Path $Script:Staging (Join-Path 'joiner' 's09-combat-result.png')) (Get-CardArtRects $joinTrace 's09-combat-result.png')
+    $hostResultStats = Get-MarkerStats (Join-Path $Script:Staging (Join-Path 'host' 's09-combat-result.png')) (Get-CardArtRects $hostTrace 's09-combat-result.png')
+    Write-Output ("card-art masks (VS-3): joiner defense {0} rects / {1} px, resolve {2} / {3}, result {4} / {5}; host result {6} / {7}" -f `
+      $defenseStats.maskRects, $defenseStats.maskedPx, $resolveStats.maskRects, $resolveStats.maskedPx,
+      $joinResultStats.maskRects, $joinResultStats.maskedPx, $hostResultStats.maskRects, $hostResultStats.maskedPx)
     foreach ($entry in @(@('joiner/defense', $defenseStats), @('joiner/resolve', $resolveStats),
                          @('joiner/result', $joinResultStats), @('host/result', $hostResultStats))) {
       Assert-Dimensions $entry[1] $entry[0]
@@ -764,7 +818,7 @@ function Invoke-CombatDemo {
         throw "reveal proof FAILED: trace shows the revealed shot was taken but the file is missing: $RevealShot"
       }
       if ($ShotMode -eq 'request' -and -not $PlayerView) {
-        $revealedStats = Get-MarkerStats $RevealShot
+        $revealedStats = Get-MarkerStats $RevealShot (Get-CardArtRects $joinTrace 's09-combat-resolve-revealed.png')  # VS-3 ВР-VS3-71
         Assert-Dimensions $revealedStats 'joiner/revealed'
         Write-Output ("reveal markers joiner: resolve(res={0}) reveal(rvl={1} def={2} rst={3})" -f `
           $revealedStats.resolveRegion, $revealedStats.revealRegion, $revealedStats.defenseAll, $revealedStats.resultAll)
@@ -917,6 +971,12 @@ function Invoke-CombatDemo {
         # own / opponent turn start + 0.5 s and + 3 s; published when written; not gated.
         foreach ($exitFrame in @(Get-ChildItem -LiteralPath (Join-Path $Script:Staging $side) -Filter 's09-exit-*.png' -ErrorAction SilentlyContinue | Sort-Object Name)) {
           $publishNames += (Join-Path $side $exitFrame.Name)
+        }
+        # VS-3 SC-01 (ВР-SC14, -ScreenShots): the UI-SCR-<id>-<state>.png frames of the client; published when written
+        if ($ScreenShots) {
+          foreach ($scrFrame in @(Get-ChildItem -LiteralPath (Join-Path $Script:Staging $side) -Filter 'UI-SCR-*.png' -ErrorAction SilentlyContinue | Sort-Object Name)) {
+            $publishNames += (Join-Path $side $scrFrame.Name)
+          }
         }
       }
     }

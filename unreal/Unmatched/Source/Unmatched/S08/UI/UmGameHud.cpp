@@ -50,10 +50,24 @@ FBox2D SlotRect(const FUmHudLayout& Layout, EUmGameSlot Slot) {
     case EUmGameSlot::Decks: return Layout.Rect(EUmHudBlock::Decks);
     case EUmGameSlot::DeckPanel: return Layout.Rect(EUmHudBlock::DeckPanel);
     case EUmGameSlot::Actions: return Layout.Rect(EUmHudBlock::Actions);
-    case EUmGameSlot::CombatCenter:
     case EUmGameSlot::Pending: return Layout.Rect(EUmHudBlock::Center);
-    case EUmGameSlot::CombatEdgeL: return Layout.Rect(EUmHudBlock::CombatL);
-    case EUmGameSlot::CombatEdgeR: return Layout.Rect(EUmHudBlock::CombatR);
+    case EUmGameSlot::CombatCenter: {
+      // VS-3 HB-33 (04 §2.7): the combat centre - centred, y 80 (S 64, 72 under a shown STATUS), 560 (S 480) x <= 160
+      const float W = Layout.bClassS ? 480.0f : 560.0f;
+      const float Y = Layout.bClassS ? 64.0f : 80.0f;
+      const float X = 0.5f * (static_cast<float>(Layout.CanvasSu.X) - W);
+      return FBox2D(FVector2D(X, Y), FVector2D(X + W, Y + 168.0f));
+    }
+    case EUmGameSlot::CombatEdgeL:
+    case EUmGameSlot::CombatEdgeR: {
+      // VS-3 HB-30: the edge column - the «Карта выбрана» plate 28 su over the card, the card, the ribbon; the left one
+      // also the defender's buttons (under the ribbon at 1080p, at the top left on the short canvas and in class S)
+      FBox2D R = Layout.Rect(Slot == EUmGameSlot::CombatEdgeL ? EUmHudBlock::CombatL : EUmHudBlock::CombatR);
+      if (!R.bIsValid) return R;
+      R.Min.Y -= 28.0;
+      if (Slot == EUmGameSlot::CombatEdgeL && Layout.Rect(EUmHudBlock::Defend).bIsValid) R += Layout.Rect(EUmHudBlock::Defend);
+      return R;
+    }
     case EUmGameSlot::SourceSlot: return Layout.Rect(EUmHudBlock::SourceSlot);
     case EUmGameSlot::Log: return Layout.Rect(EUmHudBlock::Log);
     case EUmGameSlot::Banner: return Layout.Rect(EUmHudBlock::Banner);

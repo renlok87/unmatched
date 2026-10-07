@@ -957,6 +957,9 @@ private:
   // banner (S09/S09TurnHud.h, S08/S08TurnPortraitWidget.h, S08FlowGameModeTurnHud.cpp) ----
   /** Builds the two portraits (bottom-left column: the opponent above, mine below) and the banner; art look only. */
   void BuildTurnHudWidgets(const TSharedRef<SConstraintCanvas>& Canvas);
+  /** VS-3 (VS-2 review): the UMG root failed without -S08SlateHud - the Slate portrait column after all (UmSlatePortraits.h). */
+  void BuildTurnPortraitFallback(const TCHAR* Reason);
+  TWeakPtr<SConstraintCanvas> TurnHudCanvas;
   /** An applied snapshot: the turn cue (ring, banner), the tracker's server marks and turn reset. */
   void FeedTurnHud(const FS08Snapshot& Snapshot);
   /** Every frame: names / HP / heart events from the HUD fighters, the tracker marks (local choice), the opponent
@@ -1206,6 +1209,8 @@ private:
   float UmHudHandLowerCap(float OffsetSu) const;
   FMargin UmHudToastOffset() const;
   void UmGalleryBegin(int32 SizePx);
+  /** VS-3: the gallery clock reaches the card sheets (-S08IconGalleryCards). */
+  void UmGalleryAt(float TMs);
   // VS-2 HB-14...HB-16: TOP + CONN, STATUS and the banner (S08/UI/UmHudTop, UmHudStatusLine, UmHudBanner)
   void BuildUmTopStrip();
   void TickUmTopStrip();
@@ -1217,11 +1222,55 @@ private:
   void TickUmPanels();
   /** The right edge of PANEL-LOC (su) for the hand obstacle; -1 when the panels are on the Slate path. */
   float UmHudPanelLocRightSu() const;
+  // VS-3 HB-24 / HB-25: HAND (S08/UI/UmHudHand.h; rollback -S08SlateHud=hand)
+  void BuildUmHand();
+  /** Feeds the UMG hand from the applied snapshot and the command state; false = the Slate chips draw the hand. */
+  bool RefreshUmHand();
+  bool UmHandOnUmg() const;
+  void HandleUmHandPress(const FS09HudPressOutcome& Outcome, const FString& InstanceId);
+  void HandleUmHandPlay(const FString& InstanceId);
+  void HandleUmHandInspect(const FString& InstanceId);
+  /** The pointer (viewport px) is over the UMG hand (its resting rows, raised): the SD-26 lowering waits. */
+  bool UmHudCursorOverHand(float X, float Y) const;
+  // VS-3 HB-27 / HB-28 / HB-47: DECKS and the deck panel (S08/UI/UmHudDeckBlocks.h, UmHudDecks.h, UmHudDeckPanel.h; rollback
+  // -S08SlateHud=decks|deckpanel)
+  void BuildUmDecks();
+  /** Feeds the chips and the visible panel (the applied snapshot, the deck lists, the side, the filter). */
+  void RefreshUmDecks();
+  /** The UMG panel's opacity and skeleton each frame; false = the Slate panel draws (TickDeckPanel goes on). */
+  bool TickUmDeckPanel(float Alpha);
+  bool UmDeckPanelOnUmg() const;
+  /** D and the discard chip: the panel on «Ваша» with «Только сброс» (the Slate discard browser merged into it). */
+  void OpenUmDeckDiscard(const TCHAR* Why);
+  void HandleUmDeckRowInspect(const FString& CardId);
+  bool UmHudCursorOverDeckPanel(float X, float Y) const;
+  // VS-3 HB-30...HB-33: the combat edges and centre (S08/UI/UmHudCombatBlocks.h; rollback -S08SlateHud=combat |
+  // combatcenter); fed every frame (the staging's clock, the 4 Hz timer runs in the edge)
+  void BuildUmCombat();
+  void RefreshUmCombat();
+  /** The UMG edges draw the combat (the Slate edge panels stay empty). */
+  bool UmCombatOnUmg() const;
+  /** The UMG centre draws the score and the outcome (the Slate outcome box stays empty). */
+  bool UmCombatCenterOnUmg() const;
+  /** The UMG edge draws the defense window now and no gate layer asks for the Slate block (-S09Markers). */
+  bool UmCombatOwnsDefenseWindow() const;
+  /** VS-3 SC-01 (ВР-SC14): -S08ScreenShots - one evidence frame per new UI-SCR-* id + state (<UI-ID>-<state>.png). */
+  void TickUmScreenShots();
   // VS-2 exit frames (opt-in -S08ExitShots): own / opponent turn start + 0.5 s and + 3 s
   void NoteUmExitShotsTurn(bool bOwn, bool bInitial, bool bGameOver);
   /** ВР-VS2-77: the late SHOT lines of the VS-2 blocks first shown in the shot frame. */
   void WriteUmHudLateLines();
   void TickUmExitShots();
+  // VS-3 exit frames (opt-in -S08ExitShots, 05 §3 VS-3 sets A and C): the hover, the hand of 3 / 7 / 9, the attack
+  // selected, the defense window on both clients, the reveal, the stamp; the auto attack / defense hold for their frames
+  bool UmExitShotsOn();
+  void TickUmExitShotsVs3();
+  bool HoldUmExitAttack();
+  void ResumeUmExitAttack();
+  bool HoldUmExitDefense();
+  // VS-3 HUD budget (opt-in -S08HudPerf, HUD-RULES П8, UI/UmHudPerf.h): the UMG root collapsed / shown in blocks
+  void TickUmHudPerf();
+  void FinishUmHudPerf(const TCHAR* Why);
   UPROPERTY()
   TObjectPtr<class UUmHudRoot> UmHudRoot;
   UPROPERTY()

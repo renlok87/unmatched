@@ -64,6 +64,12 @@ UNMATCHED_API const TCHAR* BlockName(EUmHudBlock Block);
 UNMATCHED_API FName FlagKey(EUmHudBlock Block);
 /** A block of the overlap gate (04 §1.6: CENTER, BANNER, TOAST, SUB, DECK PANEL are the exceptions). */
 UNMATCHED_API bool IsPersistent(EUmHudBlock Block);
+/** VS-3 HB-27 (HB-26 delta 04, ВР-VS2-HB26-09): the two chips inside DECKS, canvas su - class L: RU 156 / 124 su,
+ *  EN 144 / 136 su, 56 high, 8 su apart (the pair fills the 288 su of DECKS); class S: 64 x 48 each, 8 su apart.
+ *  Index 0 = the deck chip, 1 = the discard chip. */
+UNMATCHED_API FBox2D DeckChipRect(const FBox2D& Decks, bool bClassS, bool bEnglish, int32 Index);
+/** VS-2 HB-15: STATUS grows to two lines (78 su) - the height the deck panel gate keeps clear. */
+inline constexpr float StatusTwoLineSu = 78.0f;
 }  // namespace UmHudLayout
 
 struct UNMATCHED_API FUmHudLayout {
@@ -81,12 +87,21 @@ struct UNMATCHED_API FUmHudLayout {
   float HandVisibleSu = 0.0f;
   /** Persistent blocks x FIELD, px^2. */
   double OverlapFieldPx2 = 0.0;
+  /** VS-3 HB-28 (HB-26 D8, VS-2 open item 3): the DECK PANEL rect x the blocks shown with it (TOP, STATUS at two
+   *  lines, BANNER, PANEL-LOC, PANEL-OPP, LOG, DECKS, ACTIONS; class L also OPP-HAND), px^2 - 0 is the gate. The hand
+   *  is checked live (the panel's bottom keeps over the drawn hand, UUmHudDeckPanel). */
+  double DeckPanelBlocksPx2 = 0.0;
+  /** Class S: the read-only panel over OPP-HAND, CENTER and FIELD while it is open (04 §1.6 exception, ВР-VS2-HB26-13),
+   *  px^2 - measured, not gated. */
+  double DeckPanelTransientPx2 = 0.0;
+  /** VS-3 HB-27: the EN chip widths of DECKS (the UI language; the RU widths otherwise). */
+  bool bEnglishChips = false;
 
   /** CanvasSu = window / PxPerSu (fractional: 1137.78 x 640 at 1280x720 150 %); Field in su or null. */
   static FUmHudLayout Compute(const FVector2D& InCanvasSu, float InPxPerSu, const FBox2D* InFieldSu);
   const FBox2D& Rect(EUmHudBlock Block) const { return Rects[static_cast<int32>(Block)]; }
   bool HasRect(EUmHudBlock Block) const { return Rect(Block).bIsValid != 0; }
-  /** Where a drawn or discarded card flies (centre of the deck / discard chip, su). */
+  /** Where a drawn or discarded card flies (centre of the deck / discard chip, su; HB-27: the chips of DeckChipRect). */
   FVector2D DeckChipCentreSu() const;
   FVector2D DiscardChipCentreSu() const;
   /** "HUD-LAYOUT class=L canvas=1920x1080 scale=1.000 field=(410,255,1030,595) overlapField=0 ..." */

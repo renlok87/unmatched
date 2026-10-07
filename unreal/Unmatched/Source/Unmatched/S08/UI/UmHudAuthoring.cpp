@@ -3,14 +3,22 @@
 
 #include "../S08ArtHudAuthoring.h"
 #include "UmButton.h"
+#include "UmCardWidget.h"
 #include "UmConnectionBadge.h"
+#include "UmConfirmDialog.h"
 #include "UmHudBanner.h"
+#include "UmHudCombatCenter.h"
+#include "UmHudCombatEdge.h"
+#include "UmHudDeckPanel.h"
+#include "UmHudDecks.h"
+#include "UmHudHand.h"
 #include "UmHudOppHand.h"
 #include "UmHudPlayerPanel.h"
 #include "UmHudStatusLine.h"
 #include "UmHudTop.h"
 #include "UmCursor.h"
 #include "UmPortrait.h"
+#include "UmSpinner.h"
 #include "../S08TurnPortraitWidget.h"
 #include "UmGameHud.h"
 #include "UmHudRoot.h"
@@ -63,6 +71,28 @@ FString UUmHudAuthoringLibrary::AuthorUmHudWidgetBlueprints(bool bOverwrite) {
       });
   One(UUmHudOppHand::WidgetBlueprintPath, UUmHudOppHand::StaticClass(),
       [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmHudOppHand::BuildDefaultTree(Tree, Attach, Error); });
+  // VS-3 CP-15: the card of every display (hand, combat, slot, inspector, decks, OPP-HAND)
+  One(UUmCardWidget::WidgetBlueprintPath, UUmCardWidget::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmCardWidget::BuildDefaultTree(Tree, Attach, Error); });
+  // VS-3 HB-24 / HB-25: the hand (its cards are pooled WBP_UmCard instances made at run time)
+  One(UUmHudHand::WidgetBlueprintPath, UUmHudHand::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmHudHand::BuildDefaultTree(Tree, Attach, Error); });
+  // VS-3 HB-47: the spinner (screens and the HUD take it); HB-27 / HB-28: the chips (nest WBP_UmButton, WBP_UmCard) and
+  // the deck panel (WBP_UmButton; its rows and skeleton are made at run time)
+  One(UUmSpinner::WidgetBlueprintPath, UUmSpinner::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmSpinner::BuildDefaultTree(Tree, Attach, Error); });
+  One(UUmHudDecks::WidgetBlueprintPath, UUmHudDecks::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmHudDecks::BuildDefaultTree(Tree, Attach, Error); });
+  One(UUmHudDeckPanel::WidgetBlueprintPath, UUmHudDeckPanel::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmHudDeckPanel::BuildDefaultTree(Tree, Attach, Error); });
+  // VS-3 HB-30...HB-33: the combat edge (nests WBP_UmCard and WBP_UmButton) and the combat centre
+  One(UUmHudCombatEdge::WidgetBlueprintPath, UUmHudCombatEdge::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmHudCombatEdge::BuildDefaultTree(Tree, Attach, Error); });
+  One(UUmHudCombatCenter::WidgetBlueprintPath, UUmHudCombatCenter::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmHudCombatCenter::BuildDefaultTree(Tree, Attach, Error); });
+  // VS-3 SC-01: the confirm dialog (nests WBP_UmButton); UUmScreenBase / UUmModalBase are abstract, without a WBP
+  One(UUmConfirmDialog::WidgetBlueprintPath, UUmConfirmDialog::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmConfirmDialog::BuildDefaultTree(Tree, Attach, Error); });
   Report->SetArrayField(TEXT("assets"), Assets);
   FString Out;
   const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&Out);

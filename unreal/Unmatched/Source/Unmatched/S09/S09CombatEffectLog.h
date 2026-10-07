@@ -69,6 +69,7 @@ struct UNMATCHED_API FS09CombatEffectLine {
   FString CardName;
   FString Text;            // what the panel prints: the printed sentence (+ "-> option"), or kind and value
   FString Outcome;
+  bool bPrintedText = false;  // VS-3 HB-33: Text is the printed sentence (not the kind / value fallback)
 };
 
 namespace S09CombatEffectLog {

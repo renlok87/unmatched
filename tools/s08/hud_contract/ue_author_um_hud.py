@@ -18,6 +18,24 @@ their C++ bases (UUmHudAuthoringLibrary -> BuildDefaultTree of each class), in t
                                       StatusRow, PulseDot, StatusText, HpRow, HeartIcon, HpText, TrackerRow, SidekickRow
                                       (VS-2 HB-18); WBP_UI_HUD_PANEL_OPP the same, mirrored (HB-20)
   /Game/S08/UI/Hud/WBP_UI_HUD_OPP_HAND  parent UmHudOppHand  parts Panel, Column, Backs, Caption (VS-2 HB-21)
+  /Game/S08/UI/Common/WBP_UmCard       parent UmCardWidget  parts Box, Card, Layers, Underlay, Face, Frame, FlashLayer,
+                                      FocusRing, NewDot, BoostChip, BoostText (+ optional icons / fallback) (VS-3 CP-15)
+  /Game/S08/UI/Hud/WBP_UI_HUD_HAND     parent UmHudHand     parts Row, CountPlate, CountBox, CountText, WhyPlate, WhyBox,
+                                      WhyText, BoostRibbon, RibbonRow, RibbonIcon, RibbonText (VS-3 HB-24; the cards are
+                                      pooled WBP_UmCard instances made at run time)
+  /Game/S08/UI/Common/WBP_UmSpinner    parent UmSpinner     parts Box, Icon (VS-3 HB-47)
+  /Game/S08/UI/Hud/WBP_UI_HUD_DECKS    parent UmHudDecks    parts Row, DeckChip, DiscardChip (WBP_UmButton), DeckMini,
+                                      DiscardMini (WBP_UmCard), DeckCount, DiscardCount, DiscardIcon (VS-3 HB-27)
+  /Game/S08/UI/Hud/WBP_UI_HUD_DECKPANEL  parent UmHudDeckPanel  parts Root, Panel, Body, Title, Tabs, TabOwn, TabOpp,
+                                      CloseButton, Summary, Backs, FilterButton, Rows, Skeleton (VS-3 HB-28; the rows are
+                                      pooled UUmDeckRow made at run time)
+  /Game/S08/UI/Hud/WBP_UI_HUD_COMBAT_EDGE  parent UmHudCombatEdge  parts Root, Card (WBP_UmCard), Ribbon, RoleIcon,
+                                      RoleText, TimerText, TimerBar, DefendButton, NoDefenseButton (WBP_UmButton), Stamp
+                                      (+ the slot, caption, team chip, warning parts) (VS-3 HB-30 / HB-31)
+  /Game/S08/UI/Hud/WBP_UI_HUD_COMBAT   parent UmHudCombatCenter  parts Root, Panel, ScoreText, OutcomeText, EffectLines
+                                      (Line0..2), MoreText (VS-3 HB-33)
+  /Game/S08/UI/Common/WBP_UmConfirmDialog  parent UmConfirmDialog  parts Veil, Frame, Body (UUmScreenBase) + Title,
+                                      Message, Confirm, Cancel (WBP_UmButton) (VS-3 SC-01)
 
 A widget tree is not reachable from Python, so the C++ library builds it (the same function the class uses without a
 WBP) and this script re-loads every asset, checks the parent class, writes the report (env UM_HUD_WBP_REPORT, default
@@ -49,6 +67,14 @@ ASSETS = {
     "/Game/S08/UI/Hud/WBP_UI_HUD_PANEL_LOC": "UmHudPlayerPanel",
     "/Game/S08/UI/Hud/WBP_UI_HUD_PANEL_OPP": "UmHudPlayerPanel",
     "/Game/S08/UI/Hud/WBP_UI_HUD_OPP_HAND": "UmHudOppHand",
+    "/Game/S08/UI/Common/WBP_UmCard": "UmCardWidget",
+    "/Game/S08/UI/Hud/WBP_UI_HUD_HAND": "UmHudHand",
+    "/Game/S08/UI/Common/WBP_UmSpinner": "UmSpinner",
+    "/Game/S08/UI/Hud/WBP_UI_HUD_DECKS": "UmHudDecks",
+    "/Game/S08/UI/Hud/WBP_UI_HUD_DECKPANEL": "UmHudDeckPanel",
+    "/Game/S08/UI/Hud/WBP_UI_HUD_COMBAT_EDGE": "UmHudCombatEdge",
+    "/Game/S08/UI/Hud/WBP_UI_HUD_COMBAT": "UmHudCombatCenter",
+    "/Game/S08/UI/Common/WBP_UmConfirmDialog": "UmConfirmDialog",
 }
 
 

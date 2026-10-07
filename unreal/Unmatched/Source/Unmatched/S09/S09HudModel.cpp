@@ -38,7 +38,16 @@ bool FS09HudFactory::CardFromJson(const TSharedPtr<FJsonValue>& Value,
   ReadValue(TEXT("boostValue"), OutCard.BoostValue);
   {
     const TArray<TSharedPtr<FJsonValue>>* Effects = nullptr;
-    if (Card->TryGetArrayField(TEXT("effects"), Effects) && Effects) OutCard.EffectCount = Effects->Num();
+    if (Card->TryGetArrayField(TEXT("effects"), Effects) && Effects) {
+      OutCard.EffectCount = Effects->Num();
+      for (const TSharedPtr<FJsonValue>& E : *Effects) {  // VS-3 HB-33: the printed sentences of the card
+        const TSharedPtr<FJsonObject>* EO = nullptr;
+        FString T;
+        if (E.IsValid() && E->TryGetObject(EO) && EO && (*EO)->TryGetStringField(TEXT("text"), T) && !T.IsEmpty()) {
+          OutCard.EffectText += (OutCard.EffectText.IsEmpty() ? TEXT("") : TEXT(" ")) + T;
+        }
+      }
+    }
   }
   {
     const TSharedPtr<FJsonValue> Boost = Card->TryGetField(TEXT("boostValue"));

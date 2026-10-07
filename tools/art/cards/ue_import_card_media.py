@@ -32,8 +32,7 @@ Runs inside the editor (the editor must be CLOSED - the commandlet holds the pro
   UnrealEditor-Cmd.exe <repo>/unreal/Unmatched/Unmatched.uproject -run=pythonscript
       -script="<repo>/tools/art/cards/ue_import_card_media.py --all" -unattended -nosplash -nullrhi
   (arguments inside the -script quotes; env UM_CARD_MEDIA_ARGS="--cards medusa" works too)
-Modes: --portraits | --backs | --cards <heroSlug> | --frames | --all (default). --frames imports nothing yet: the card
-frame textures come with CP-13. Idempotent: a texture whose metadata tag CardMediaSourceSha256 equals the PNG sha256 and
+Modes: --portraits | --backs | --cards <heroSlug> | --frames | --all (default: the media, then the frames). Idempotent: a texture whose metadata tag CardMediaSourceSha256 equals the PNG sha256 and
 whose settings already match is not touched ("unchanged"); --force re-imports.
 Plain Python (no UE):
   python tools/art/cards/ue_import_card_media.py --write-registry   (registry from the CP-01 report)
@@ -41,6 +40,22 @@ Plain Python (no UE):
 Derived directory order: --derived, env UM_CARD_MEDIA_DERIVED, <repo>/scraped-data/derived/ue-media-v1 (if present), the
 main checkout's scraped-data/derived/ue-media-v1.
 Status: «технически импортировано» (original art as is; frame and display are accepted in CP-13 / CP-15).
+
+VS-3 CP-14 (--frames): the card frame of the accepted CP-13 package art/imagegen/card-frame-v1-codex (our art, in git):
+  vector/card-frame-<state>-{x1,x2}.png for idle, hover, selected, warning, flash, focus, mini-idle and the new dot ->
+  /Game/S08/UI/Skins/CardFrame/T_UmCardFrame_<state>_{x1,x2} (16 textures, git add -f, HUD-RULES П9): TC_EDITOR_ICON
+  (UserInterface2D), no mips, TEXTUREGROUP_UI, sRGB, bilinear, never stream (flat art with exact edges). The 9-slice
+  margins are the package's verification.json nine_slice_px of each file (corner = radius + edge + keyline + 1 px, <= 13
+  px at x1); they go into DA_UmHudTheme.CardFrames / CardFramesX2 under card.frame.idle / .hover / .selected / .warning /
+  .flash / .focus / .mini / .new (ВР-VS3-03: apart from the 29 token Skins; the new dot DrawAs Image), ImageSize = the x1
+  pixels in su; UUmHudTheme::CardFrameFor takes x2 at DPI x UI scale >= 2.0 (ВР-VS3-16). hud_theme_import.py calls bind_frames()
+  after it refills the theme. Report art/cards-v1/card-frame-import-report.json.
+
+VS-3 CP-03 / CP-04 (ВР-CP16): the report also lists the RU names of the 27 cards - the data (the backend content of the
+S01 capture and the reference DB snapshot art/cards-v1/card-names-db.json), the scrape (i18n.ru.title) and what the RU
+scan prints (reference only, never shipped) - with the discrepancies; the fix belongs to the admin (reference DB),
+never to the client. `python tools/art/cards/ue_import_card_media.py --write-names` refreshes that part of the report
+without the editor (tools/art/cards/card_deck_names.py).
 """
 
 from __future__ import annotations
@@ -61,6 +76,8 @@ except ImportError:  # pragma: no cover - plain Python
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[2]
+sys.path.insert(0, str(HERE))
+import card_deck_names as names  # noqa: E402  (VS-3 CP-03 / CP-04: the RU-name part of the report)
 MAIN_CHECKOUT = Path("C:/Users/ren/WebstormProjects/unmached/unmached")
 CONVERT_REPORT = REPO / "art/cards-v1/media-convert-report.json"
 REGISTRY = REPO / "unreal/Unmatched/Config/Cards/S08CardMedia.json"
@@ -86,6 +103,23 @@ KIND_ORDER = {"card": 0, "back": 1, "portrait": 2}
 SETTINGS_DOC = {"powerOfTwoMode": "PAD_TO_POWER_OF_TWO", "paddingColor": "#061623 a0", "mipGen": "TMGS_SIMPLE_AVERAGE",
                 "filter": "TF_TRILINEAR", "compression": "TC_BC7", "lodGroup": "TEXTUREGROUP_UI", "srgb": True,
                 "neverStream": True, "address": "TA_CLAMP"}
+FRAME_PACKAGE = REPO / "art/imagegen/card-frame-v1-codex"
+FRAME_DEST = "/Game/S08/UI/Skins/CardFrame"
+FRAME_REPORT = REPO / "art/cards-v1/card-frame-import-report.json"
+THEME = "/Game/S08/UI/Theme/DA_UmHudTheme"
+# CP-13 file state -> theme key, 9-slice (the new dot is an image of 8 su + keyline, never stretched)
+FRAME_STATES = {
+    "idle": ("card.frame.idle", True),
+    "hover": ("card.frame.hover", True),
+    "selected": ("card.frame.selected", True),
+    "warning": ("card.frame.warning", True),
+    "flash": ("card.frame.flash", True),
+    "focus": ("card.frame.focus", True),
+    "mini-idle": ("card.frame.mini", True),
+    "new-dot": ("card.frame.new", False),
+}
+FRAME_SETTINGS_DOC = {"compression": "TC_EDITOR_ICON (UserInterface2D)", "mipGen": "TMGS_NO_MIPMAPS",
+                      "lodGroup": "TEXTUREGROUP_UI", "srgb": True, "filter": "TF_BILINEAR", "neverStream": True}
 
 
 # ---------------------------------------------------------------------------------------------------- plain helpers
@@ -238,6 +272,59 @@ def verify_sources(items: list[dict], root: Path) -> list[str]:
     return errors
 
 
+def png_size(data: bytes) -> tuple[int, int]:
+    if data[:8] != b"\x89PNG\r\n\x1a\n" or data[12:16] != b"IHDR":
+        raise RuntimeError("not a PNG with an IHDR chunk")
+    return int.from_bytes(data[16:20], "big"), int.from_bytes(data[20:24], "big")
+
+
+def plan_frames(package: Path = FRAME_PACKAGE) -> list[dict]:
+    """CP-14: one entry per frame state - theme key, asset names, files, sha256, PNG sizes, 9-slice margins (px per file,
+    left top right bottom) from the package's verification.json."""
+    assets = json.loads((package / "verification.json").read_text(encoding="utf-8"))["assets"]
+    out = []
+    for state, (key, nine) in FRAME_STATES.items():
+        e = {"key": key, "state": state, "nineSlice": nine, "assets": {}, "files": {}, "sha256": {}, "sizes": {},
+             "margins": {}}
+        for scale in ("x1", "x2"):
+            rel = f"vector/card-frame-{state}-{scale}.png"
+            path = package / rel
+            data = path.read_bytes()
+            w, h = png_size(data)
+            v = assets.get(rel)
+            if v is None:
+                raise RuntimeError(f"verification.json: no entry for {rel}")
+            if [w, h] != list(v["size_px"]):
+                raise RuntimeError(f"{rel}: {w}x{h} differs from verification.json {v['size_px']}")
+            e["assets"][scale] = f"T_UmCardFrame_{state.replace('-', '_')}_{scale}"
+            e["files"][scale] = path.relative_to(REPO).as_posix() if path.is_relative_to(REPO) else str(path)
+            e["sha256"][scale] = hashlib.sha256(data).hexdigest()
+            e["sizes"][scale] = [w, h]
+            e["margins"][scale] = [int(m) for m in v["nine_slice_px"]]
+        out.append(e)
+    return out
+
+
+def check_frames(entries: list[dict]) -> list[str]:
+    """x2 = twice x1 (+-2 px), margins inside the image, the x1 corner <= 13 px (CP-14 budget), the 8 keys."""
+    errors = []
+    keys = sorted(e["key"] for e in entries)
+    if keys != sorted(k for k, _ in FRAME_STATES.values()):
+        errors.append(f"frame keys {keys}")
+    for e in entries:
+        (w1, h1), (w2, h2) = e["sizes"]["x1"], e["sizes"]["x2"]
+        if abs(w2 - 2 * w1) > 2 or abs(h2 - 2 * h1) > 2:
+            errors.append(f"{e['state']}: x2 {w2}x{h2} is not twice x1 {w1}x{h1}")
+        for scale in ("x1", "x2"):
+            l, t, r, b = e["margins"][scale]
+            w, h = e["sizes"][scale]
+            if e["nineSlice"] and (l + r >= w or t + b >= h or min(l, t, r, b) <= 0):
+                errors.append(f"{e['state']} {scale}: margins {e['margins'][scale]} do not fit {w}x{h}")
+        if e["nineSlice"] and max(e["margins"]["x1"]) > 13:
+            errors.append(f"{e['state']}: x1 corner {max(e['margins']['x1'])} px > 13")
+    return errors
+
+
 # ---------------------------------------------------------------------------------------------------- UE side
 def texture_settings() -> dict:
     tcs, mips, filt = u.TextureCompressionSettings, u.TextureMipGenSettings, u.TextureFilter
@@ -354,6 +441,96 @@ def entry_ok(d: dict, item: dict) -> list[str]:
     return bad
 
 
+def import_frames(entries: list[dict]) -> int:
+    """CP-14: the 16 frame textures, settings of the flat HUD art (as hud_skins_import.py)."""
+    tools = u.AssetToolsHelpers.get_asset_tools()
+    count = 0
+    for e in entries:
+        for scale in ("x1", "x2"):
+            name = e["assets"][scale]
+            task = u.AssetImportTask()
+            task.filename = str(REPO / e["files"][scale])
+            task.destination_path = FRAME_DEST
+            task.destination_name = name
+            task.automated = True
+            task.replace_existing = True
+            task.save = False
+            tools.import_asset_tasks([task])
+            asset = u.load_asset(f"{FRAME_DEST}/{name}")
+            if not asset or not isinstance(asset, u.Texture2D):
+                raise RuntimeError(f"{name}: not imported as Texture2D")
+            asset.set_editor_property("compression_settings", u.TextureCompressionSettings.TC_EDITOR_ICON)
+            asset.set_editor_property("mip_gen_settings", u.TextureMipGenSettings.TMGS_NO_MIPMAPS)
+            asset.set_editor_property("lod_group", u.TextureGroup.TEXTUREGROUP_UI)
+            asset.set_editor_property("srgb", True)
+            asset.set_editor_property("filter", u.TextureFilter.TF_BILINEAR)
+            asset.set_editor_property("never_stream", True)
+            u.EditorAssetLibrary.set_metadata_tag(asset, SHA_TAG, e["sha256"][scale])
+            if not u.EditorAssetLibrary.save_loaded_asset(asset, only_if_is_dirty=False):
+                raise RuntimeError(f"{name}: save failed")
+            count += 1
+    return count
+
+
+def bind_frames(theme, entries: list[dict] | None = None) -> int:
+    """Binds the imported frame textures into a loaded UUmHudTheme (no save); 0 before the first --frames import.
+    hud_theme_import.py calls it after the theme reset so a token re-import keeps the frames."""
+    import unreal as ue
+
+    entries = entries if entries is not None else plan_frames()
+    bound = 0
+    for e in entries:
+        tex = {s: ue.EditorAssetLibrary.load_asset(f"{FRAME_DEST}/{e['assets'][s]}") for s in ("x1", "x2")}
+        if not all(isinstance(t, ue.Texture2D) for t in tex.values()):
+            continue
+        size = {s: ue.Vector2D(*e["sizes"][s]) for s in ("x1", "x2")}
+        margin = {s: ue.Margin(*[float(v) for v in e["margins"][s]]) for s in ("x1", "x2")}
+        if not theme.import_card_frame(e["key"], tex["x1"], tex["x2"], size["x1"], size["x2"], margin["x1"],
+                                       margin["x2"], e["nineSlice"]):
+            raise RuntimeError(f"theme: card frame {e['key']} refused")
+        bound += 1
+    return bound
+
+
+def main_frames() -> int:
+    started = time.time()
+    entries = plan_frames()
+    errors = check_frames(entries)
+    if errors:
+        raise RuntimeError("; ".join(errors))
+    imported = import_frames(entries)
+    theme = u.EditorAssetLibrary.load_asset(THEME)
+    if theme is None or not isinstance(theme, u.UmHudTheme):
+        raise RuntimeError(f"{THEME}: missing - run tools/s08/hud_contract/hud_theme_import.py first")
+    bound = bind_frames(theme, entries)
+    if bound != len(entries):
+        raise RuntimeError(f"theme: {bound} of {len(entries)} card frames bound")
+    if not u.EditorAssetLibrary.save_loaded_asset(theme, only_if_is_dirty=False):
+        raise RuntimeError(f"{THEME}: save failed")
+    report = {
+        "schema": "unmatched.card-frame-import/1",
+        "tool": "tools/art/cards/ue_import_card_media.py --frames",
+        "card": "CP-14",
+        "package": "art/imagegen/card-frame-v1-codex (CP-13, accepted by delegation, ВР-VS2-CP-01...09)",
+        "status": "технически импортировано (рамка CP-13 в теме; вид — листы CP-14 / CP-15)",
+        "dest": FRAME_DEST,
+        "theme": THEME,
+        "themeMaps": "CardFrames / CardFramesX2 (ВР-VS3-03)",
+        "settings": FRAME_SETTINGS_DOC,
+        "x2FromPxPerSu": 2.0,
+        "count": imported,
+        "frames": [{"key": e["key"], "state": e["state"], "nineSlice": e["nineSlice"],
+                    "textures": [{"scale": s, "asset": f"{FRAME_DEST}/{e['assets'][s]}", "source": e["files"][s],
+                                  "sourceSha256": e["sha256"][s], "size": e["sizes"][s], "marginPx": e["margins"][s]}
+                                 for s in ("x1", "x2")]} for e in entries],
+    }
+    FRAME_REPORT.parent.mkdir(parents=True, exist_ok=True)
+    FRAME_REPORT.write_text(json.dumps(report, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
+    u.log(f"CARD-FRAME-IMPORT PASS textures={imported} frames={bound} dest={FRAME_DEST} theme={THEME} "
+          f"seconds={time.time() - started:.1f}")
+    return 0
+
+
 # ---------------------------------------------------------------------------------------------------- entry
 def parse_args(argv: list[str]):
     ap = argparse.ArgumentParser(description=__doc__.split("\n", 1)[0])
@@ -368,6 +545,8 @@ def parse_args(argv: list[str]):
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--check", action="store_true", help="plain Python: registry up to date and every PNG present")
     ap.add_argument("--write-registry", action="store_true", help="plain Python: write the registry only")
+    ap.add_argument("--write-names", action="store_true",
+                    help="plain Python: refresh the RU-name part of the import report (CP-03 / CP-04, ВР-CP16)")
     args = ap.parse_args(argv)
     if args.portraits:
         args.mode, args.hero = "portraits", None
@@ -396,8 +575,16 @@ def main(argv: list[str] | None = None) -> int:
         changed = write_registry(reg)
         print(f"CARD-MEDIA-REGISTRY {'written' if changed else 'unchanged'} entries={len(reg['entries'])} {REGISTRY}")
         return 0
+    if args.write_names:
+        report = json.loads(REPORT.read_text(encoding="utf-8")) if REPORT.is_file() else {}
+        report["ruNames"] = names.names_section()
+        REPORT.write_text(json.dumps(report, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
+        rn = report["ruNames"]
+        print(f"CARD-NAMES written cards={rn['count']} discrepancies={len(rn['discrepancies'])} {REPORT}")
+        return 0
     if args.check or u is None:
         errors = verify_sources(items, root)
+        errors += check_frames(plan_frames())
         if not REGISTRY.is_file() or REGISTRY.read_text(encoding="utf-8") != registry_text(reg):
             errors.append(f"{REGISTRY}: out of date (run --write-registry)")
         for e in errors:
@@ -405,6 +592,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"CARD-MEDIA-IMPORT check {'ok' if not errors else 'FAILED'} entries={len(items)} derived={root}")
         return 0 if not errors else 1
     # ---- inside UE
+    if args.mode == "frames":
+        return main_frames()
     selected = select(items, args.mode, args.hero)
     errors = verify_sources(selected, root)
     if errors:
@@ -462,6 +651,7 @@ def main(argv: list[str] | None = None) -> int:
         "resourceBytesBC7Total": total_bytes,
         "resourceNote": "computed: BC7 16 B per 4x4 block, full mip chain (the -nullrhi commandlet has no GPU resource)",
         "textures": textures,
+        "ruNames": names.names_section(),
     }
     text = json.dumps(report, ensure_ascii=False, indent=1) + "\n"
     old_text = report_path.read_text(encoding="utf-8") if report_path.is_file() else None
@@ -473,7 +663,10 @@ def main(argv: list[str] | None = None) -> int:
     u.log(f"CARD-MEDIA-IMPORT {'PASS' if report['allOk'] else 'FAIL'} mode={args.mode} textures={len(textures)} "
           f"imported={actions['imported']} reimported={actions['reimported']} unchanged={actions['unchanged']} "
           f"kept={actions['kept']} bytes={total_bytes} seconds={time.time() - started:.1f}")
-    return 0 if not failures else 1
+    if failures:
+        return 1
+    # VS-3 CP-14: --all ends with the frames
+    return main_frames() if args.mode == "all" else 0
 
 
 if __name__ == "__main__":

@@ -63,6 +63,9 @@ struct UNMATCHED_API FUmButtonModel {
   /** VS-2 HB-14 (CX-08): no body at rest - the button sits inside its block's plate (TOP «≡», «Журнал»); hover,
    *  pressed, disabled, selected and busy still draw their skin, focus its ring. Normal variant only. */
   bool bFlat = false;
+  /** VS-3 HB-28 (HB-26 delta: the deck panel tabs text + 12 su, the filter text + 16 su): the label's side padding (su);
+   *  0 = the variant default (space.m 16). */
+  float PadXSu = 0.0f;
 };
 
 namespace UmButton {

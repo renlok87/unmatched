@@ -267,7 +267,7 @@ void UUmButton::ApplyModel(const FUmButtonModel& InModel) {
                      Model.bSelected == InModel.bSelected && Model.bBusy == InModel.bBusy &&
                      Model.KeyHint.EqualTo(InModel.KeyHint) && Model.bFocused == InModel.bFocused &&
                      Model.HeightSu == InModel.HeightSu && Model.MinWidthSu == InModel.MinWidthSu &&
-                     Model.bFlat == InModel.bFlat;
+                     Model.bFlat == InModel.bFlat && Model.PadXSu == InModel.PadXSu;
   if (bSame) return;
   const bool bWasSelected = bHasModel && Model.bSelected;
   Model = InModel;
@@ -280,7 +280,8 @@ void UUmButton::ApplyModel(const FUmButtonModel& InModel) {
   }
   // an icon-only button (no label: the TOP squares) centres its glyph without the side padding
   const bool bIconOnly = Model.Label.IsEmpty() && !Model.IconName.IsNone();
-  if (Body) Body->SetPadding(bDisc || bIconOnly ? FMargin(0.0f) : FMargin(Theme.SpaceSu(TEXT("space.m")), 0.0f));
+  const float PadX = Model.PadXSu > 0.0f ? Model.PadXSu : Theme.SpaceSu(TEXT("space.m"));
+  if (Body) Body->SetPadding(bDisc || bIconOnly ? FMargin(0.0f) : FMargin(PadX, 0.0f));
   // the text: type.button caps (disc: type.tag caps under the disc); busy reads "Отправлено…" (V-10)
   if (Label) {
     const FText Text = Model.bBusy ? UmText::Get(EUmTable::Hud, TEXT("hud.btn.sent")) : Model.Label;

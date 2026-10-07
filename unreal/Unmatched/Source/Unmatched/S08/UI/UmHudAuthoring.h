@@ -13,6 +13,11 @@
 //   /Game/S08/UI/Hud/WBP_UI_HUD_PANEL_LOC  UUmHudPlayerPanel, own side (VS-2 HB-18)
 //   /Game/S08/UI/Hud/WBP_UI_HUD_PANEL_OPP  UUmHudPlayerPanel, the mirrored tree of the opponent (VS-2 HB-20)
 //   /Game/S08/UI/Hud/WBP_UI_HUD_OPP_HAND   UUmHudOppHand    (VS-2 HB-21)
+//   /Game/S08/UI/Common/WBP_UmCard       UUmCardWidget    (VS-3 CP-15)
+//   /Game/S08/UI/Hud/WBP_UI_HUD_HAND     UUmHudHand       (VS-3 HB-24)
+//   /Game/S08/UI/Common/WBP_UmSpinner    UUmSpinner       (VS-3 HB-47)
+//   /Game/S08/UI/Hud/WBP_UI_HUD_DECKS    UUmHudDecks      (VS-3 HB-27)
+//   /Game/S08/UI/Hud/WBP_UI_HUD_DECKPANEL  UUmHudDeckPanel (VS-3 HB-28)
 // Called from UE Python: tools/s08/hud_contract/ue_author_um_hud.py (UnrealEditor-Cmd -run=pythonscript).
 #pragma once
 

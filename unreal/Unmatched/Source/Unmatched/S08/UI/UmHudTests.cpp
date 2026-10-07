@@ -254,19 +254,27 @@ bool FUmHudRootLayoutTest::RunTest(const FString&) {
     RectIs(*this, L, EUmHudBlock::Status, 520, 24, 880, 48, W);
     RectIs(*this, L, EUmHudBlock::Banner, 750, 144, 420, 64, W);
     RectIs(*this, L, EUmHudBlock::SourceSlot, 24, 84, 190, 264, W);
-    RectIs(*this, L, EUmHudBlock::CombatL, 24, 360, 230, 351, W);
+    // VS-3 HB-30 / HB-31 (HB-29 delta 04): the own ribbon with the timer row (56 su), the buttons under it at x 32
+    RectIs(*this, L, EUmHudBlock::CombatL, 24, 360, 230, 379, W);
     RectIs(*this, L, EUmHudBlock::CombatR, 1666, 360, 230, 351, W);
+    RectIs(*this, L, EUmHudBlock::Defend, 32, 747, 230, 104, W);
     RectIs(*this, L, EUmHudBlock::Log, 24, 712, 300, 200, W);
     RectIs(*this, L, EUmHudBlock::PanelLoc, 24, 920, 340, 136, W);
     RectIs(*this, L, EUmHudBlock::PanelOpp, 1556, 24, 340, 136, W);
     RectIs(*this, L, EUmHudBlock::OppHand, 1596, 168, 300, 92, W);
     RectIs(*this, L, EUmHudBlock::Decks, 1608, 920, 288, 56, W);
-    RectIs(*this, L, EUmHudBlock::DeckPanel, 1516, 248, 380, 664, W);
+    // VS-3 HB-28 (HB-26 delta 04): the top under OPP-HAND + 8, the bottom over DECKS - 8
+    RectIs(*this, L, EUmHudBlock::DeckPanel, 1516, 268, 380, 644, W);
     RectIs(*this, L, EUmHudBlock::Actions, 1552, 984, 344, 72, W);
+    // VS-3 HB-27 (ВР-VS2-HB26-09): the RU chips 156 / 124 su, the EN chips 144 / 136 su
     const FVector2D Deck = L.DeckChipCentreSu();
     const FVector2D Discard = L.DiscardChipCentreSu();
-    TestTrue(TEXT("1080p: card flights end on the deck / discard chips"),
-             Near(Deck.X, 1680.0) && Near(Deck.Y, 948.0) && Near(Discard.X, 1824.0) && Near(Discard.Y, 948.0));
+    TestTrue(FString::Printf(TEXT("1080p: card flights end on the deck / discard chips (%.1f,%.1f) (%.1f,%.1f)"), Deck.X, Deck.Y,
+                             Discard.X, Discard.Y),
+             Near(Deck.X, 1686.0) && Near(Deck.Y, 948.0) && Near(Discard.X, 1834.0) && Near(Discard.Y, 948.0));
+    const FBox2D En1 = UmHudLayout::DeckChipRect(L.Rect(EUmHudBlock::Decks), false, true, 1);
+    TestTrue(TEXT("1080p: the EN discard chip 1760..1896"), Near(En1.Min.X, 1760.0) && Near(En1.Max.X, 1896.0));
+    TestEqual(TEXT("1080p: the deck panel covers no block shown with it"), L.DeckPanelBlocksPx2, 0.0);
   }
   {
     const FUmHudLayout L = FUmHudLayout::Compute(FVector2D(1280.0, 720.0) / 0.75f, 0.75f, nullptr);
@@ -274,11 +282,13 @@ bool FUmHudRootLayoutTest::RunTest(const FString&) {
     TestFalse(TEXT("720p: the 720p column (not tall)"), L.bTall);
     RectIs(*this, L, EUmHudBlock::Status, 0.5f * (1706.667f - 720.0f), 24, 720, 48, W);
     RectIs(*this, L, EUmHudBlock::CombatR, 1452.67f, 360, 230, 351, W);
+    RectIs(*this, L, EUmHudBlock::Defend, 32, 112, 230, 104, W);  // HB-29: at the top left (PANEL-LOC from y 800)
     RectIs(*this, L, EUmHudBlock::Log, 24, 688, 300, 104, W);
     RectIs(*this, L, EUmHudBlock::PanelLoc, 24, 800, 340, 136, W);
     RectIs(*this, L, EUmHudBlock::PanelOpp, 1342.67f, 24, 340, 136, W);
     RectIs(*this, L, EUmHudBlock::Decks, 1394.67f, 800, 288, 56, W);
-    RectIs(*this, L, EUmHudBlock::DeckPanel, 1342.67f, 248, 340, 544, W);
+    RectIs(*this, L, EUmHudBlock::DeckPanel, 1346.67f, 268, 336, 524, W);  // ВР-VS2-HB26-08: 336 su
+    TestEqual(TEXT("720p: the deck panel covers no block shown with it"), L.DeckPanelBlocksPx2, 0.0);
     RectIs(*this, L, EUmHudBlock::Actions, 1338.67f, 864, 344, 72, W);
   }
   {
@@ -288,11 +298,20 @@ bool FUmHudRootLayoutTest::RunTest(const FString&) {
     RectIs(*this, L, EUmHudBlock::PanelLoc, 16, 608, 240, 96, W);
     RectIs(*this, L, EUmHudBlock::PanelOpp, 1024, 16, 240, 96, W);
     RectIs(*this, L, EUmHudBlock::SourceSlot, 16, 64, 120, 166, W);
-    RectIs(*this, L, EUmHudBlock::CombatL, 16, 240, 150, 232, W);
-    RectIs(*this, L, EUmHudBlock::CombatR, 1114, 240, 150, 232, W);
+    RectIs(*this, L, EUmHudBlock::CombatL, 16, 240, 150, 280, W);  // HB-29: ribbon 40 + the timer row 28
+    RectIs(*this, L, EUmHudBlock::CombatR, 1114, 240, 150, 252, W);
+    RectIs(*this, L, EUmHudBlock::Defend, 32, 112, 150, 88, W);
     RectIs(*this, L, EUmHudBlock::Decks, 1128, 600, 136, 48, W);
     RectIs(*this, L, EUmHudBlock::Actions, 1048, 656, 216, 48, W);
-    RectIs(*this, L, EUmHudBlock::DeckPanel, 964, 168, 300, 424, W);
+    RectIs(*this, L, EUmHudBlock::DeckPanel, 964, 120, 300, 472, W);  // HB-26: PANEL-OPP bottom + 8
+    // VS-2 open item 3: STATUS (two lines, 78 su) and the panel never meet; OPP-HAND is the transient overlap
+    TestEqual(TEXT("S: the deck panel covers no block shown with it (STATUS two lines included)"), L.DeckPanelBlocksPx2, 0.0);
+    TestTrue(TEXT("S: the read-only panel over OPP-HAND is measured"), L.DeckPanelTransientPx2 > 0.0);
+    TestTrue(TEXT("S: the HUD-LAYOUT line carries the deck panel gate"),
+             L.TraceLine().Contains(TEXT("deckpanel=(964.0,120,300,472) deckpanelBlocks=0")));
+    const FUmHudLayout S720 = FUmHudLayout::Compute(FVector2D(1280.0 / 1.125, 640.0), 1.125f, nullptr);
+    RectIs(*this, S720, EUmHudBlock::DeckPanel, 821.78f, 120, 300, 392, TEXT("S 1138x640 su"));
+    TestEqual(TEXT("720p 150 %: STATUS at two lines stays over the deck panel header"), S720.DeckPanelBlocksPx2, 0.0);
     RectIs(*this, L, EUmHudBlock::Status, 340, 16, 600, 48, W);  // VS-2 HB-15: one-line capsule 48 su
     RectIs(*this, L, EUmHudBlock::Banner, 430, 72, 420, 64, W);  // VS-2 HB-16 (ВР-VS2-45): under STATUS
     TestFalse(TEXT("S: no LOG rect"), L.HasRect(EUmHudBlock::Log));
@@ -400,7 +419,8 @@ bool FUmHudRootFlagTest::RunTest(const FString&) {
   TestTrue(TEXT("world layer and screen keys known, one unknown kept"),
            World.Unknown.Num() == 1 && World.Unknown[0] == FName(TEXT("mystery")) && World.IsSlate(TEXT("mystery")));
   TestFalse(TEXT("-S08SlateHudX is another flag"), ParseSlateHud(TEXT("-S08SlateHudX")).bAll);
-  TestEqual(TEXT("20 known keys (04 §4.2 + screens)"), static_cast<int32>(UE_ARRAY_COUNT(SlateHudKeys)), 20);
+  // VS-3: + combatcenter (ВР-VS3-50) and the SC-01 screen keys boot ... aborted (ВР-SC04)
+  TestEqual(TEXT("31 known keys (04 §4.2 + combatcenter + the screens of ВР-SC04)"), static_cast<int32>(UE_ARRAY_COUNT(SlateHudKeys)), 31);
   SetSlateHudOverrideForTest(TEXT("hand,toast"));
   TestTrue(TEXT("override: ARTLOOK hudImpl=slate:hand,toast"), TraceLine().Contains(TEXT(" hudImpl=slate:hand,toast")));
   SetSlateHudOverrideForTest(TEXT("*"));

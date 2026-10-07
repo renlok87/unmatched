@@ -58,6 +58,7 @@ bool AS08FlowGameMode::IconGalleryBegin() {
   if (IconGallery && IconGalleryTimes.Num() > 0 && !IconGalleryShotDir.IsEmpty()) {
     IconGallery->SetClockOverrideMs(IconGalleryTimes[0]);
     GalleryPortraitsAt(IconGalleryTimes[0]);
+    UmGalleryAt(IconGalleryTimes[0]);  // VS-3 card sheets
   }
   if (APlayerController* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr) PC->bShowMouseCursor = true;
   FS08Trace::Write(FString::Printf(
@@ -139,7 +140,10 @@ void AS08FlowGameMode::IconGalleryTick(float DeltaSeconds) {
     return;
   }
   IconGallery->SetClockOverrideMs(T);
-  if (IconGalleryWait == 0) GalleryPortraitsAt(T);
+  if (IconGalleryWait == 0) {
+    GalleryPortraitsAt(T);
+    UmGalleryAt(T);  // VS-3 card sheets
+  }
   if (++IconGalleryWait < GalleryShotSettleFrames) return;
   IconGalleryWait = 0;
   const FString Name = FString::Printf(TEXT("icon-gallery-%s-%05d.png"),

@@ -197,11 +197,13 @@ void AS08FlowGameMode::RefreshDeckPanel() {
   // prefetch: the list is static for the match - one request, before the first open
   if (Flow.IsValid() && Flow->GetStage() == ES08Stage::Started && !bBenchDeckPanel) Flow->EnsureDeckLists();
   SyncDeckLists();
+  RefreshUmDecks();  // VS-3 HB-27 / HB-28: the UMG chips and the UMG panel (-S08SlateHud=decks|deckpanel: Slate)
   if (!DeckPanelBox.IsValid() || !DeckPanel.IsVisible(Now)) return;
   RebuildDeckPanelContent();
 }
 
 void AS08FlowGameMode::RebuildDeckPanelContent() {
+  if (UmDeckPanelOnUmg()) return;  // VS-3 HB-28: the UMG panel draws (RefreshUmDecks)
   const ES09DeckSide Side = DeckPanel.Side();
   const FS09PlayerPanel* Panel = Side == ES09DeckSide::Own ? Hud.ViewerPanel() : Hud.OpponentPanel();
   const FLinearColor Light = DeckSrgb(0xE6, 0xE8, 0xEE);
@@ -372,6 +374,11 @@ void AS08FlowGameMode::RebuildDeckPanelContent() {
 }
 
 void AS08FlowGameMode::TickDeckPanel() {
+  // VS-3 HB-28: the UMG panel takes the view's opacity and the skeleton timer; the Slate panel stays collapsed
+  if (TickUmDeckPanel(DeckPanel.Opacity(NowMs()))) {
+    UmHudDeckPanelLayering(DeckPanel.Opacity(NowMs()));
+    return;
+  }
   if (!DeckPanelBorder.IsValid()) return;
   const int64 Now = NowMs();
   const float Alpha = DeckPanel.Opacity(Now);

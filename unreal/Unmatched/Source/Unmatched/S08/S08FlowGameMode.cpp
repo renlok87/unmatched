@@ -1317,6 +1317,7 @@ void AS08FlowGameMode::StartCombatStage(const FS08Snapshot& Closing, const FS08S
                                               Combat.TargetFighterId);
   if (bOwnLog) In.Effects = S09CombatEffectLog::Lines(Log);
   In.EffectLines = In.Effects.Num();
+  In.bAttackCardCancelled = bOwnLog && Log.bAttackerCardCancelled;  // VS-3 HB-33: the centre's X line
   FS08Trace::Write(S09CombatEffectLog::TraceLine(Closing.SequenceNumber, bHasLog ? &Log : nullptr,
                                                  bOwnLog ? TEXT("log") : bHasLog ? TEXT("other") : TEXT("none"),
                                                  In.EffectLines));
@@ -1572,6 +1573,8 @@ void AS08FlowGameMode::BuildCombatStageHud() {
   CombatEdgeLeft->ClearChildren();
   CombatEdgeRight->ClearChildren();
   CombatOutcomeBox->ClearChildren();
+  RefreshUmCombat();  // VS-3 HB-30...HB-33: the UMG edges and centre (rollback -S08SlateHud=combat | combatcenter)
+  if (UmCombatOnUmg() && UmCombatCenterOnUmg()) return;
   const int64 Now = NowMs();
   if (!Hud.bValid || IsResultScreenShown() || !CombatStage.ShowsCards(Now)) return;
   const FS09CombatStageInput& In = CombatStage.GetInput();
@@ -1713,6 +1716,10 @@ void AS08FlowGameMode::BuildCombatStageHud() {
   };
   AddEffectLines(CombatEdgeLeft, true, AttackAccent);
   AddEffectLines(CombatEdgeRight, false, DefenseAccent);
+  if (UmCombatOnUmg()) {  // VS-3: -S08SlateHud=combatcenter keeps only the Slate outcome box
+    CombatEdgeLeft->ClearChildren();
+    CombatEdgeRight->ClearChildren();
+  }
   if (!CombatStage.ShowsOutcome(Now)) return;
   // F-01: the slam "A vs D" and the outcome label from the slam to the end of CUE-011 (~1.5 s).
   const FString Score = FString::Printf(TEXT("%s  vs  %s"),
@@ -3071,9 +3078,14 @@ void AS08FlowGameMode::HandleHudKeys() {
   } else if (PC->WasInputKeyJustPressed(EKeys::D)) {
     // GD-032: public discard browser toggle (read-only browsing - safe while
     // any draft is open; the panels box is separate from the command panel).
-    bDiscardBrowserOpen = !bDiscardBrowserOpen;
-    DiscardBrowserIndex = -1;
-    RefreshHud();
+    // VS-3 HB-28: the browser lives in the UMG deck panel - «Только сброс» (-S08SlateHud=deckpanel: the Slate one)
+    if (UmDeckPanelOnUmg()) {
+      OpenUmDeckDiscard(TEXT("key"));
+    } else {
+      bDiscardBrowserOpen = !bDiscardBrowserOpen;
+      DiscardBrowserIndex = -1;
+      RefreshHud();
+    }
   } else if (bDiscardBrowserOpen &&
              (PC->WasInputKeyJustPressed(EKeys::Left) ||
               PC->WasInputKeyJustPressed(EKeys::Right) ||
@@ -3568,6 +3580,7 @@ void AS08FlowGameMode::RunS09Auto() {
         TakeEvidenceShot(S09ShotDefensePath);
         return;
       }
+      if (HoldUmExitDefense()) return;  // VS-3 exit frame «окно защиты» (-S08ExitShots)
       // AU-S6 'slowdefense': the first defense holds until the last seconds of the server window
       if (HasPlan(TEXT("slowdefense")) && !bS09SlowDefenseDone && CommandUi.Combat.bHasTimeoutAt) {
         const double Left = CommandUi.Combat.SecondsUntilDeadline();
@@ -4027,6 +4040,7 @@ void AS08FlowGameMode::RunS09Auto() {
             FS08Trace::Write(FString::Printf(TEXT("S09AUTO attack ability boost not added (%s)"), *BoostWhy));
           }
         }
+        if (HoldUmExitAttack()) return;  // VS-3 exit frame «выбрана атака» (-S08ExitShots): ResumeUmExitAttack sends it
         if (!ConfirmCombat()) {
           // Gate closed between the pre-entry check and the confirm (e.g. the
           // stream died mid-pick): back out of the draft and retry later
@@ -4046,7 +4060,10 @@ void AS08FlowGameMode::RunS09Auto() {
       }
     }
   }
-  if (CommandUi.Mode == ES09CommandMode::AttackDraft) return;
+  if (CommandUi.Mode == ES09CommandMode::AttackDraft) {
+    ResumeUmExitAttack();  // VS-3 exit frames: the held draft goes once its frame is written
+    return;
+  }
   // scheme plan: one scheme card in the next own action phase. Prefer a
   // MULTI-STAGE scheme (Restless Spirits: the CHOOSE_SPACE stage1->stage2
   // pair the pending evidence needs) - purely a pick order among equally
@@ -5980,6 +5997,7 @@ void AS08FlowGameMode::RefreshHud() {
   HandBox->ClearChildren();
   PanelsBox->ClearChildren();
   CommandBox->ClearChildren();
+  const bool bUmHand = RefreshUmHand();  // VS-3 HB-24 / HB-25: the UMG hand (-S08SlateHud=hand keeps the chips below)
   BuildCombatStageHud();
   RefreshDeckPanel();  // DE-030: the auto-close on a new input demand, then the content while visible
 
@@ -6076,7 +6094,8 @@ void AS08FlowGameMode::RefreshHud() {
     // a candidate, the picked ones marked; the colours stay off the S09 state markers (#FF00FF, #00FFFF ...).
     const FS09DiscardPick DiscardPick = FS09DiscardPick::From(CommandUi);
     int32 Index = 0;
-    for (const FS09CardView& Card : Own->Cards) {
+    static const TArray<FS09CardView> NoChips;  // VS-3 HB-24: the UMG hand draws the cards
+    for (const FS09CardView& Card : (bUmHand ? NoChips : Own->Cards)) {
       const int32 I = Index++;
       FString Chip;
       if (Card.bHidden) {
@@ -6121,13 +6140,13 @@ void AS08FlowGameMode::RefreshHud() {
     AddYoursCalloutLine();  // DE-022 (03 §7 п. 3): "Your fighter X: Y effect" while the opponent's effect moves it
     AddEventFeedLines();  // MS-T-17 (03 §7): the three latest maneuver lines over the hand
     AddTurnStatusLine();  // DE-022 (02 SD-31): the "what to do now" line
-    HandBox->AddSlot().AutoHeight().Padding(0, 0, 0, 6)
+    if (!bUmHand) HandBox->AddSlot().AutoHeight().Padding(0, 0, 0, 6)
         [SNew(STextBlock)
              .Text(FText::FromString(FString::Printf(
                  TEXT("YOUR HAND  %d/%d   [1-9 inspect | boost/drop while a draft is open]"),
                  Own->HandCount, Own->HandMaxSize)))
              .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14))];
-    HandBox->AddSlot().AutoHeight()[Strip];
+    if (!bUmHand) HandBox->AddSlot().AutoHeight()[Strip];
   }
 
   // ---- counters + inspector (GD-032: opponent hand is a COUNT, never faces) ----
@@ -6162,7 +6181,8 @@ void AS08FlowGameMode::RefreshHud() {
   // so both are browsable; entries are FS09CardView straight from the model -
   // a face-down placeholder renders and inspects as faceless by construction
   // (selection is read-only: no draft, hand pick or server command changes). ----
-  PanelsBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
+  // VS-3 HB-27: the UMG chips of DECKS take these buttons; the Slate ones only with -S08SlateHud=decks
+  if (UmHudBlockOnSlate(TEXT("decks"))) PanelsBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
       [MakeHudPress(
            FName(TEXT("hud.discard.browse")),
            nullptr,
@@ -6180,7 +6200,7 @@ void AS08FlowGameMode::RefreshHud() {
                     bDiscardBrowserOpen ? TEXT("HIDE") : TEXT("BROWSE"))))
                 .Font(FCoreStyle::GetDefaultFontStyle("Bold", 12)))];
   // DE-030 (01 F-05; 02 §4.7): the deck side panel - the whole composition of my deck or the opponent's
-  {
+  if (UmHudBlockOnSlate(TEXT("decks"))) {
     auto DeckButton = [this](ES09DeckSide Side, const TCHAR* Id, const TCHAR* Label) -> TSharedRef<SWidget> {
       const bool bActive = DeckPanel.IsOpen() && DeckPanel.Side() == Side;
       const float G = bActive ? 0.32f : 0.20f;
@@ -6252,9 +6272,9 @@ void AS08FlowGameMode::RefreshHud() {
   // DE-026 (SD-26): while the hand is lowered for a board pick the hand-card preview is not drawn (it never covers
   // the field); the inspection itself stays and comes back with the hand
   if (bInspecting && !(bHandPreviewHidden && InspectedSource == 0)) {
-    static const TCHAR* SourceLabels[3] = {TEXT("hand"), TEXT("your discard"),
-                                           TEXT("opponent discard")};
-    const int32 Source = FMath::Clamp(InspectedSource, 0, 2);
+    static const TCHAR* SourceLabels[4] = {TEXT("hand"), TEXT("your discard"),
+                                           TEXT("opponent discard"), TEXT("deck")};  // VS-3 HB-28: 3 = a deck row
+    const int32 Source = FMath::Clamp(InspectedSource, 0, 3);
     TArray<FString> Lines;
     BuildInspectorLines(InspectedCard, Lines);
     TSharedRef<SVerticalBox> InspectorBox = SNew(SVerticalBox);
@@ -6314,7 +6334,8 @@ void AS08FlowGameMode::RefreshHud() {
   // and a later draft (e.g. the next turn's attack draft) owns the marker frame.
   if (LastCombatResult.bValid && LastCombatResult.ShownAt >= 0.0f &&
       Elapsed - LastCombatResult.ShownAt < 20.0f &&
-      CommandUi.Mode == ES09CommandMode::None) {
+      CommandUi.Mode == ES09CommandMode::None &&
+      (S08ArtLook::S08Markers() || !UmCombatCenterOnUmg())) {  // VS-3 HB-33: the UMG centre says it (VS-2 open item 9)
     AddMarker(GS09ResultMarker);
     AddHeader(TEXT("COMBAT RESULT"), FLinearColor(0.25f, 1.0f, 0.5f, 1.0f));
     AddBigLine(LastCombatResult.OutcomeLine, FLinearColor(1.0f, 1.0f, 1.0f, 1.0f));
@@ -6524,7 +6545,7 @@ void AS08FlowGameMode::RefreshHud() {
                   FMargin(14, 8), FLinearColor::White,
                   SNew(STextBlock).Text(FText::FromString(TEXT("CANCEL (G/Esc)")))
                        .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14)))]];
-  } else if (CommandUi.Mode == ES09CommandMode::CombatDefense) {
+  } else if (CommandUi.Mode == ES09CommandMode::CombatDefense && !UmCombatOwnsDefenseWindow()) {  // VS-3 HB-30
     const double Left = CommandUi.Combat.bHasTimeoutAt
                             ? CommandUi.Combat.SecondsUntilDeadline() : -1.0;
     AddMarker(GS09DefenseMarker);

@@ -70,6 +70,19 @@ class HudContractTests(unittest.TestCase):
         self.assertTrue(any("class=X" in e for e in errs))
         self.assertTrue(any("без поля field" in e for e in errs))
 
+    def test_layout_trace_deck_panel_gate(self):
+        # VS-3 HB-28: the deck panel never covers a block shown with it (STATUS two lines incl., VS-2 open item 3);
+        # the class S transient overlap is measured only
+        ids = hc.ui_ids_from_02(SPEC02)
+        good = ["HUD-LAYOUT class=S canvas=1138x640 scale=1.125 field=(223,153,690,361) overlapField=0 window=1280x720 "
+                "hand=268..898 handVisible=90 crossing=- deckpanel=(821.8,120,300,392) deckpanelBlocks=0 "
+                "deckpanelTransient=31500"]
+        self.assertEqual(hc.check_widget_trace(good, ids), ([], 0))
+        bad = ["HUD-LAYOUT class=S canvas=1138x640 scale=1.125 field=(223,153,690,361) overlapField=0 "
+               "deckpanel=(821.8,72,300,440) deckpanelBlocks=1490 deckpanelTransient=0"]
+        errs, _ = hc.check_widget_trace(bad, ids)
+        self.assertTrue(any("deckpanelBlocks=1490" in e for e in errs))
+
 
 if __name__ == "__main__":
     unittest.main()
@@ -109,6 +122,37 @@ def test_check_trace_portrait_sidekicks_cp10_12():
            % tex]
     errors, _ = hc.check_widget_trace(bad, set(), registry=reg)
     assert len(errors) == 2 and all("ВР-72" in e for e in errors)
+
+
+def test_check_trace_card_art_cp15():
+    """VS-3 CP-15 (ВР-CP10, ВР-CP04): CARD-ART lines - scale <= 1.6, no fallback face for a key the registry has (the
+    -S08CardArtLegacy rollback tex=legacy excepted), the back key, the fields."""
+    reg = hc.registry_card_keys()
+    assert {"king-arthur:excalibur", "medusa:gaze-of-stone", "back:king-arthur", "back:medusa"} <= reg
+    assert len([k for k in reg if not k.startswith("back:")]) == 27
+    tex = "tex=/Game/S08/UI/Cards/king_arthur/T_Card_king_arthur_excalibur_RU.T_Card_king_arthur_excalibur_RU"
+    ok = ["CARD-ART key=king-arthur:excalibur lang=ru %s show=hand su=150x208 px=142x197 scale=0.495 capped=0 "
+          "state=idle chip=0" % tex,
+          "UMGALLERY card p14.hover t=0 CARD-ART key=king-arthur:excalibur lang=ru %s show=inspector su=440x612 "
+          "px=889x1233 scale=1.600 capped=1 state=hover+selected chip=0" % tex,
+          "CARD-ART key=back:medusa lang=back tex=/Game/S08/UI/CardBacks/T_CardBack_medusa.T_CardBack_medusa "
+          "show=mini-48x67 su=48x67 px=44x61 scale=0.058 capped=0 state=back+boost chip=1",
+          "CARD-ART key=king-arthur:excalibur lang=fallback tex=legacy show=hand su=150x208 px=0x0 scale=0.000 "
+          "capped=0 state=idle chip=0",
+          "CARD-ART key=t-rex:bite lang=fallback tex=fallback show=hand su=150x208 px=0x0 scale=0.000 capped=0 "
+          "state=idle chip=0"]
+    errors, _ = hc.check_widget_trace(ok, set(), card_registry=reg)
+    assert errors == []
+    bad = ["CARD-ART key=king-arthur:excalibur lang=ru %s show=inspector su=460x640 px=905x1256 scale=1.750 capped=0 "
+           "state=idle chip=0" % tex,
+           "CARD-ART key=medusa:snipe lang=fallback tex=fallback show=hand su=150x208 px=0x0 scale=0.000 capped=0 "
+           "state=idle chip=0",
+           "CARD-ART key=medusa:snipe lang=de tex=x show=hand su=150x208 px=0x0 scale=0.000 capped=2 state=idle chip=0",
+           "CARD-ART key=medusa:snipe lang=ru"]
+    errors, _ = hc.check_widget_trace(bad, set(), card_registry=reg)
+    assert any("1.6" in e for e in errors) and any("ВР-CP10" in e for e in errors)
+    assert any("lang=de" in e for e in errors) and any("capped=2" in e for e in errors)
+    assert any("без поля scale" in e for e in errors)
 
 
 def test_check_trace_topstrip_hb14_16(tmp_path):
@@ -157,3 +201,26 @@ def test_check_trace_panels_hb18_21(tmp_path):
     log = tmp_path / "Unmatched.log"
     log.write_text("\n".join(ok) + "\n", encoding="utf-8")
     assert hc.main(["check-trace", str(log)]) == 0
+
+
+def test_check_trace_combat_privacy_hb30():
+    """VS-3 HB-30 / HB-33: the combat edges and the centre pass check-trace with the states of 04 §7.1; the opponent's
+    card face (fighter=opp face=1) only in state=reveal."""
+    spec04 = hc.SPEC04.read_text(encoding="utf-8")
+    ids = hc.ui_ids_from_02(SPEC02) | hc.ui_ids_from_02(spec04)
+    states = hc.ui_states_from_04(spec04)
+    edge = ("SHOT widget id=UI-HUD-COMBAT-EDGE impl=umg state=%s fighter=%s bbox=(1666,360,1896,711) geom=painted visible=1 "
+            "twin=0 source=x role=defense face=%s class=L card=230x319 ribbon=230x28 rows=1 timer=- timerState=off buttons=0 "
+            "defend=- stamp=0 leave=0 seq=10")
+    centre = ("SHOT widget id=UI-HUD-COMBAT impl=umg state=%s fighter=none bbox=(680,80,1240,232) geom=painted visible=1 "
+              "twin=0 source=x class=L h=152 lines=2 shown=2 more=0 cancelled=1 current=-1 ellipsis=0 score=3:2 outcome=wins seq=10")
+    ok = [edge % ("back", "opp", "0"), edge % ("chosen", "opp", "0"), edge % ("reveal", "opp", "1"),
+          edge % ("back", "own", "1"), edge % ("shield", "own", "0"), edge % ("nodefense", "opp", "0")]
+    ok += [centre % s for s in ("wait", "effects", "slam", "hit")]
+    ok += [centre.replace("visible=1", "visible=0") % "read"]
+    assert hc.check_widget_trace(ok, ids, states=states) == ([], 11)
+    bad = [edge % ("chosen", "opp", "1"), edge % ("back", "opp", "1")]
+    errors, _ = hc.check_widget_trace(bad, ids, states=states)
+    assert len([e for e in errors if "приватность" in e]) == 2
+    errors, _ = hc.check_widget_trace([edge % ("leave", "own", "0"), centre % "outcome"], ids, states=states)
+    assert len([e for e in errors if "04 §7.1" in e]) == 2

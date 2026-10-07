@@ -14,6 +14,8 @@ param(
   [switch]$PlayerView,
   [switch]$FullHd,
   [string]$ClientExtraArgs = '',
+  # VS-3 SC-01 (ВР-SC14): -S08ScreenShots - one evidence frame per new 'SHOT widget id=UI-SCR-* state=<s>'
+  [switch]$ScreenShots,
   # Fail fast when the one client is subscribed but no fresh
   # 'SNAPSHOT applied seq=' line appears for this many seconds (the server bot
   # drives the opponent seat, so a dead stream still means a stalled demo).
@@ -778,6 +780,7 @@ function Invoke-VsAiDemo {
     "-S08Auto", "-S08Create", "-S08Mode=VS_AI", "-S08HeroId=$heroId",
     "-S08Trace=$trace", "-S09Flow", "-S09Combat=attack+scheme",
     "-S09ShotDir=$shots", "-S08ExitAfter=$RunSeconds") + @($ClientExtraArgs -split '\+' | Where-Object { $_ })
+  if ($ScreenShots) { $clientArgs += '-S08ScreenShots' }  # VS-3 SC-01
 
   $proc = $null
   $Published = $false
