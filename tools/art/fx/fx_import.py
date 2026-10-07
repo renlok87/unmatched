@@ -251,15 +251,36 @@ def star_flipbook_png(path: Path, frames: int = 8, px: int = 128) -> dict:
     return {"frames": frames, "px": px, "w": px * frames, "h": px}
 
 
+def profile_grade_fit():
+    """The measured inverse-tone fit of the engine (conceptPaste.grade of the board profiles, identical on both
+    maps: VP-Z2-06 - a Niagara renderer material cannot take a runtime override, so the 4 PLACARD MIs bake it;
+    the 7 combat MIs stay neutral and take the runtime grade when their systems expose the user vectors)."""
+    profiles = json.loads((REPO / "unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json").read_text(
+        encoding="utf-8"))
+    for board in profiles.get("boards", []):
+        grade = (board.get("conceptPaste") or {}).get("grade") or {}
+        if "fitScale" in grade:
+            scale = grade["fitScale"]
+            powr = grade["fitPower"]
+            # the paste convention (S08ConceptPaste.cpp): GradeScale = fitScale, GradePow = 1 / fitPower
+            return {"GradeScale": [round(k, 6) for k in scale] + [0.0],
+                    "GradePow": [round(1.0 / k, 6) for k in powr] + [0.0]}
+    return None
+
+
 def mi_specs(tok: dict) -> list:
+    fit = profile_grade_fit()
     specs = []
     for asset, master, use_sdf, shape, body, edge, key in MI_PLAN:
+        vectors = {"ColorBody": linear_color(tok[body]), "ColorEdge": linear_color(tok[edge]),
+                   "ColorKeyline": linear_color(tok[key])}
+        if asset.startswith("MI_FX_Placard") and fit:
+            vectors.update(fit)
         specs.append({
             "asset": "%s/%s" % (MATERIALS, asset),
             "parent": "%s/M_FX_Print" % MATERIALS if not master else "%s/M_FX_Print_Overlay" % MATERIALS,
             "scalars": {"Opacity": 1.0, "SdfShape": float(shape), "EdgeWidth": 0.14, "KeylineWidth": 0.07},
-            "vectors": {"ColorBody": linear_color(tok[body]), "ColorEdge": linear_color(tok[edge]),
-                        "ColorKeyline": linear_color(tok[key])},
+            "vectors": vectors,
             "textures": {"Mask": "%s/Textures/T_FX_HitStar" % FX_ROOT},
             "switches": {"UseSdf": use_sdf},
             "tokens": {"body": body, "edge": edge, "keyline": key},
