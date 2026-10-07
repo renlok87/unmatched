@@ -1,0 +1,238 @@
+{
+ "schema": "unmatched.concept-paste.spec/1",
+ "map": "<map>",
+ "status": "TEMPLATE (EN-18, docs/art-pipeline/ENV-BACKDROP-RULES.md): copy to tools/art/concept_paste/<map>.paste.json, replace <map> / <Map> / <plate>, fill every null from the registration and the bake contract (cp_bake.py contract <map>); keys follow the final marmoreal.paste.json (ENV-U16)",
+ "coords": "C0 px (the concept frame of the game camera, 1920 x 1080; see marmoreal.paste.json)",
+ "plates": {
+  "dir": "scraped-data/derived/env-<map>-codex",
+  "dirNote": "relative to the checkout; concept and plates are gitignored (scraped-data/derived), sha256 in git",
+  "colour": {
+   "file": "<plate>-extended-2x.png",
+   "size": null,
+   "conceptRectPx": null,
+   "registration": "concept",
+   "sha256": "<sha256>",
+   "note": "the clean plate x2 (detail that becomes live removed, outpaint 20 % = rect B, x2 without AI upscale of the map)"
+  },
+  "colourFallback": {
+   "file": "<plate>-clean.png",
+   "size": null,
+   "conceptRectPx": null,
+   "sha256": "<sha256>",
+   "note": "the clean plate x1 (informational)"
+  },
+  "concept": {
+   "file": "scraped-data/derived/concepts/<map>/<map>-v1.png",
+   "size": null,
+   "conceptRectPx": null
+  },
+  "seaSky": null
+ },
+ "bake": {
+  "note": "PlateA over C0 [0, 1920] x [0, 1080], PlateB and Anim over rect B (-384, -216, 2304, 1296); sizes from the bake contract",
+  "colourTag": "concept",
+  "lanczosA": 3,
+  "chunkRows": 64,
+  "textures": {
+   "PlateA": {
+    "kind": "paste",
+    "size": null,
+    "rectC0": null
+   },
+   "PlateB": {
+    "kind": "paste",
+    "size": null,
+    "rectC0": null
+   },
+   "Anim": {
+    "kind": "anim",
+    "size": null,
+    "rectC0": null
+   }
+  }
+ },
+ "registration": {
+  "file": "registration.json (proto out dir)",
+  "model": "homography (registration.json of the proto run), identity for Marmoreal within 1.3 px"
+ },
+ "geometry": {
+  "groundZ": null,
+  "seaZ": null,
+  "skyCylinder": {
+   "centre": null,
+   "radius": null
+  },
+  "vertexStepPx": 8,
+  "heightZones": [
+   {
+    "id": "cherry-w",
+    "z": null,
+    "smoothPx": null,
+    "poly": null
+   }
+  ],
+  "planeZones": [
+   {
+    "id": "front-cliff",
+    "type": "slope",
+    "line0": {
+     "Y": null,
+     "z": null
+    },
+    "line1": {
+     "Y": null,
+     "z": null
+    },
+    "poly": null
+   },
+   {
+    "id": "colonnade",
+    "type": "vplane",
+    "basePx": null,
+    "poly": null
+   }
+  ],
+  "islandMatte": {
+   "featherPx": null,
+   "poly": null
+  },
+  "skyPoly": []
+ },
+ "cut": {
+  "underFrameUU": null,
+  "paintedFrameOuterUU": {
+   "far": null,
+   "east": null,
+   "west": null,
+   "near": null
+  },
+  "paintedFrameMeasured": "luma profiles across the registered concept frame on the ground plane (uu from the map edge per side)",
+  "paintedCornerUU": null
+ },
+ "overlays": [
+  {
+   "id": "lanterns",
+   "kind": "paint-overlay",
+   "file": "<plate>-lanterns-2x.png",
+   "size": null,
+   "conceptRectPx": null,
+   "blend": "alpha",
+   "sha256": "<sha256>",
+   "note": "the painted lights (lanterns, sconces) baked back over the clean plate: no 3D twins of painted details"
+  }
+ ],
+ "anim": {
+  "file": "<plate>-anim-2x.png",
+  "size": null,
+  "conceptRectPx": null,
+  "sha256": "<sha256>",
+  "channels": {
+   "R": "lantern-glow",
+   "G": "sakura-wind",
+   "B": "ground-mist",
+   "A": "petal-area (offline only)"
+  },
+  "note": "animation masks: R flicker, G wind, B ground mist, A petal area (offline only)"
+ },
+ "details": [
+  {
+   "id": "lantern-nw",
+   "kind": "paint-lantern",
+   "px": null,
+   "on": "ground",
+   "heightUU": null,
+   "radiusC0Px": null
+  },
+  {
+   "id": "sconce-door-w",
+   "kind": "paint-lantern",
+   "px": null,
+   "on": "colonnade",
+   "radiusC0Px": null,
+   "animated": true
+  }
+ ],
+ "layout": {
+  "note": "cp_layout.py: the painted surround replaces every base prop and fx; lights on the painted lantern details (<= 6 together with the profile); fx outside the field, reducedMotion off",
+  "variant": "concept",
+  "idPrefix": "",
+  "castShadow": false,
+  "fxRemoveBase": true,
+  "lights": [
+   {
+    "id": "lantern-nw",
+    "on": "lantern-nw",
+    "dz": null
+   }
+  ],
+  "fx": [
+   {
+    "id": "petals-sakura-w",
+    "system": "/Game/EnvKit/FX/NS_Env_CherryPetals",
+    "c0Px": null,
+    "planeZ": null,
+    "dz": null,
+    "towardC0UU": null,
+    "warmupS": 6.0,
+    "reducedMotion": "off",
+    "spawnRadiusUU": 50.0,
+    "wanderUU": 60.0,
+    "user": {
+     "SpawnRate": 4.0,
+     "Lifetime Min": 6.0,
+     "Lifetime Max": 9.0,
+     "Drag": 1.0,
+     "Minimum_Noise Strength": 4.0,
+     "Maximum_Noise Strength": 8.0,
+     "Sphere Radius": 50.0,
+     "Sprite Size Min": [
+      3.0,
+      3.0
+     ],
+     "Sprite Size Max": [
+      5.0,
+      5.0
+     ],
+     "Color": [
+      10.8,
+      3.5,
+      20.5
+     ],
+     "Gravity": [
+      -7.0,
+      0.0,
+      -16.0
+     ]
+    },
+    "note": "example: falling petals from the crowns"
+   },
+   {
+    "id": "fireflies-garden-w",
+    "system": "/Game/EnvKit/FX/NS_Env_FirefliesDot",
+    "c0Px": null,
+    "planeZ": null,
+    "dz": null,
+    "warmupS": 3.5,
+    "reducedMotion": "off",
+    "spawnRadiusUU": 22.0,
+    "wanderUU": 30.0,
+    "minLanternUU": 80.0,
+    "user": {
+     "SpawnRate": 3.0,
+     "Lifetime Min": 4.0,
+     "Lifetime Max": 6.0,
+     "Sphere Radius": 22.0,
+     "Uniform Sprite Size Min": 3.5,
+     "Uniform Sprite Size Max": 4.6,
+     "Noise Strength": 6.0,
+     "Color": [
+      3.55,
+      2.13,
+      0.3
+     ]
+    },
+    "note": "example: print-disc fireflies at the bushes"
+   }
+  ]
+ }
+}
