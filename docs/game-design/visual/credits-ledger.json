@@ -1165,11 +1165,47 @@
       "result_path": "art/imagegen/sc06-login-form-codex/, sc07-login-errors-codex/",
       "status": "ok",
       "note": "CX-28 fix1 (единственный корректирующий прогон серии; задания SC-06/07.fix1.codex.md); 2026-10-07 10:56-11:11 +05:00 (~15 мин); обзорная подпись облегает текст (~292 su), курсор «занято» — hotspot на нижней кромке кнопки в 70 % ширины; оверлеи с номерами, именами BindWidget, x/y/w/h su, якорями, ключами и элементами SC-07 по состояниям, 0 пересечений; вне подписи и курсора пиксели финалов прежние; sc06_login_form.py 3f99ce90 скопирован в SC-07 побайтно; manifest 135/189 совпали; пароль сида нигде; генераций 0; ревью Claude: accept по делегированию обоих (ВР-VS4-SC06-01…08, ВР-VS4-SC07-01…05)"
+    },
+    {
+      "date": "2026-10-07T11:58:24+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle 5ea220ae)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "SC-08",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a11515-c835-78f3-9928-6b205e76a796",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/SC-08-series.codex.md",
+      "result_path": "art/imagegen/sc08-lobby-list-codex/, sc09-lobby-create-codex/, sc10-lobby-create-ai-codex/, sc11-lobby-code-codex/, sc12-lobby-empty-codex/, sc13-lobby-error-codex/",
+      "status": "ok",
+      "note": "CX-29 прогон 1 (серия SC-08…SC-13 LOBBY в одном чате; задания SC-08…SC-13.codex.md); 2026-10-07 11:38-11:58 +05:00 (~20 мин); 6 пакетов, 104 макета в scraped-data/derived и 48 оверлеев; данные — снимки стенда S09 (Claude, 06:29-06:30 UTC); генераций 0; ревью Claude: fix-needed — строки списка без внутреннего отступа (текст и кнопка на кромке строки), оверлеи общие и без подписей у рамок, README-шаблоны, в SC-12 плашка state-hint с пустым полем числа (ВР-VS4-SC08-14…16, ВР-VS4-SC12-02)"
+    },
+    {
+      "date": "2026-10-07T12:27:25+05:00",
+      "service": "Codex",
+      "model": "codex-cli 0.160.1 (codex.exe exec, app bundle 5ea220ae)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "SC-08",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a1152f-4b3e-7561-b1cf-aeee6dda544f",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/SC-08-series.fix1.codex.md",
+      "result_path": "art/imagegen/sc08-lobby-list-codex/, sc09-lobby-create-codex/, sc10-lobby-create-ai-codex/, sc11-lobby-code-codex/, sc12-lobby-empty-codex/, sc13-lobby-error-codex/",
+      "status": "ok",
+      "note": "CX-29 fix1 (единственный корректирующий прогон серии; задания SC-08…SC-13.fix1.codex.md); 2026-10-07 12:06-12:27 +05:00 (~21 мин); отступ содержимого строк ≥ 8 su (код с 16 su, кнопка/причина до правой кромки −8 su), оверлеи по состояниям с подписями у рамок и легендой x/y/w/h su, RecoverButton внутри CodeColumn (на S — только в легенде), README карточек переписаны, SC-10 интервалы заметки ИИ, SC-12 только глиф лампы state-hint_glyph 32 su; sc08_lobby_list.py d46e766f скопирован без изменений в SC-09…SC-13; manifest 1646/1654/1649/1662/1638/1638 сверены; генераций 0; ревью Claude: accept по делегированию всей серии (ВР-VS4-SC08-01…17, ВР-VS4-SC09-01…03, ВР-VS4-SC10-01, ВР-VS4-SC11-01…05, ВР-VS4-SC12-01…02, ВР-VS4-SC13-01)"
     }
   ],
   "totals": {
     "syntx_spent": 6.0,
     "tripo_spent": 0,
-    "codex_packages": 58
+    "codex_packages": 60
   }
 }
