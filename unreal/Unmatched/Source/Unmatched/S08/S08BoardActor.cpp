@@ -476,6 +476,10 @@ void AS08BoardActor::PlayFighterHitTint(const FString& FighterId, float Seconds)
   if (AS08FighterActor* Actor = FindFighterActor(FighterId)) Actor->PlayHitTint(Seconds);
 }
 
+void AS08BoardActor::PlayFighterHitFx(const FString& FighterId, float WindowSeconds, bool bDamage) {
+  if (AS08FighterActor* Actor = FindFighterActor(FighterId)) Actor->PlayHitFx(WindowSeconds, bDamage);
+}
+
 int32 AS08BoardActor::PlayFighterMoves(const TArray<FS08MovePlan>& Plans, const FS08MoveAnimParams& Params,
                                        int64 NowMs) {
   const bool bLegacyFacing = S08Facing::LegacyRequested();

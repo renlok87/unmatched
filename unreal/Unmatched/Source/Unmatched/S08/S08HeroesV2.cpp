@@ -2,6 +2,7 @@
 
 #include "S08ArtPreviewMedusa.h"
 #include "S08BoardModel.h"
+#include "S08HudTokens.generated.h"
 #include "S08IconMotion.h"
 #include "Animation/AnimSequenceBase.h"
 #include "Components/PrimitiveComponent.h"
@@ -327,6 +328,44 @@ void SetDissolve(UPrimitiveComponent* Body, UPrimitiveComponent* Pedestal, float
     Body->SetCustomPrimitiveDataFloat(DissolveStyleCpdIndex, static_cast<float>(static_cast<uint8>(Style)));
   }
   if (Pedestal) Pedestal->SetCustomPrimitiveDataFloat(PedestalFadeCpdIndex, P);
+}
+
+FLinearColor FxFlashColor() {
+  // fx.flash #FAF8F2 of S08HudTokens.generated.h (FX-05; converted with FromSRGBColor only, AD-OPEN-39)
+  return FLinearColor::FromSRGBColor(S08HudTokens::Color_FxFlash);
+}
+
+void SetFxFlash(UPrimitiveComponent* Body, const FLinearColor& Rgb, float A) {
+  if (!Body) return;
+  // one CPD vector write (slots 5-8): rgb x a - the a slot alone is the intensity the graph multiplies by
+  Body->SetCustomPrimitiveDataVector4(FxFlashCpdIndex,
+                                      FVector4(Rgb.R * A, Rgb.G * A, Rgb.B * A, A));
+}
+
+void SetRim(UPrimitiveComponent* Body, float Intensity, float Width) {
+  if (!Body) return;
+  Body->SetCustomPrimitiveDataFloat(RimIntensityCpdIndex, FMath::Clamp(Intensity, 0.0f, 1.0f));
+  Body->SetCustomPrimitiveDataFloat(RimWidthCpdIndex, FMath::Clamp(Width, 0.0f, 1.0f));
+}
+
+float FxFlashValueAt(double T, double Ms) {
+  // FX-19 (BP-20): a = 1 hard for the whole window, 0 from the first tick past it (the "a -> 0 in one frame")
+  return T < 0.0 ? 0.0f : (T < FMath::Max(0.001, Ms) ? 1.0f : 0.0f);
+}
+
+float RimIntensityAt(double T, double TotalMs, double Peak, double RampInMs, double RampOutMs) {
+  if (T < 0.0 || TotalMs <= 0.0) return 0.0f;
+  const double In = RampInMs < 0.0 ? TotalMs * 0.2 : FMath::Min(RampInMs, TotalMs);
+  const double Out = RampOutMs < 0.0 ? TotalMs * 0.4 : FMath::Min(RampOutMs, TotalMs - In);
+  const double HoldEnd = FMath::Max(In, TotalMs - Out);
+  if (T >= TotalMs) return 0.0f;
+  if (T < In) {
+    const double X = In > 0.0 ? T / In : 1.0;                     // FX-06: ease-out 0 -> Peak
+    return static_cast<float>(Peak * (1.0 - (1.0 - X) * (1.0 - X)));
+  }
+  if (T < HoldEnd) return static_cast<float>(Peak);
+  const double K = Out > 0.0 ? (T - HoldEnd) / Out : 1.0;
+  return static_cast<float>(Peak * (1.0 - K));
 }
 
 }  // namespace S08HeroesV2

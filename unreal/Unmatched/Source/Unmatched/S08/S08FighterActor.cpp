@@ -5,6 +5,7 @@
 #include "S08ArtPreviewMedusa.h"
 #include "S08BoardActor.h"
 #include "S08Facing.h"
+#include "Fx/S08CueFx.h"
 #include "S08IconMotion.h"
 #include "S08Render.h"
 #include "S08TraceLog.h"
@@ -1164,6 +1165,38 @@ void AS08FighterActor::PlayHitTint(float Seconds) {
                                    FMath::RoundToInt(Seconds * 1000.0f)));
 }
 
+void AS08FighterActor::SetFxBenchChannels(float FlashA, float RimIntensity, float RimWidth) {
+  if (!bHeroV2Visual || !ArtBody) return;
+  S08HeroesV2::SetFxFlash(ArtBody, S08HeroesV2::FxFlashColor(), FlashA);
+  S08HeroesV2::SetRim(ArtBody, RimIntensity, RimWidth);
+  FS08Trace::Write(FString::Printf(TEXT("FX bench channels fighter=%s flash=%.2f rim=%.2f width=%.2f"),
+                                   *Fighter.Id, FlashA, RimIntensity, RimWidth));
+}
+
+void AS08FighterActor::PlayHitFx(float WindowSeconds, bool bDamage) {
+  // FX-19 (ВР-20): -S08HitTintLegacy is the look of before (the red fill, no flash, no rim)
+  const bool bLegacy = S08CueFx::HitTintLegacy();
+  if (bLegacy) {
+    PlayHitTint(WindowSeconds);
+    FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW hit-fx fighter=%s flash=0 rim=0 legacy=1"), *Fighter.Id));
+    return;
+  }
+  if (!bHeroV2Visual || !ArtBody || WindowSeconds <= 0.0f) return;
+  UWorld* World = GetWorld();
+  if (!World) return;
+  // ВР-FX06: the flash first (70 ms, never scaled by the combat speed); the rim follows from C+70 - hard start,
+  // held to C+270, out by C+370. Damage 0: the rim only (FX-23).
+  if (S08CueFx::FxEnabled()) {
+    if (bDamage) PlayFlash(0.07f);
+    World->GetTimerManager().ClearTimer(RimDelayTimer);
+    World->GetTimerManager().SetTimer(
+        RimDelayTimer, FTimerDelegate::CreateWeakLambda(this, [this] { PlayRim(0.3f, 1.0f, 0.35f, 0.0f, 0.1f); }),
+        0.07f, false);
+  }
+  FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW hit-fx fighter=%s flash=%d rim=%d legacy=0"), *Fighter.Id,
+                                   bDamage ? 70 : 0, 300));
+}
+
 void AS08FighterActor::TickHitTint() {
   UWorld* World = GetWorld();
   if (!World || !ArtBody) return;
@@ -1179,6 +1212,100 @@ void AS08FighterActor::TickHitTint() {
   HitTintValue = Value;
   ArtBody->SetCustomPrimitiveDataFloat(S08HeroesV2::HitTintCpdIndex, Value);
   if (T >= HitTintSeconds) World->GetTimerManager().ClearTimer(HitTintTimer);
+}
+
+void AS08FighterActor::PlayFlash(float Ms) {
+  if (!bHeroV2Visual || !ArtBody || Ms <= 0.0f) return;
+  UWorld* World = GetWorld();
+  if (!World) return;
+  // FX-19 (ВР-20): reduced motion plays no flash at all
+  if (S08IconMotion::IsReducedMotion()) {
+    World->GetTimerManager().ClearTimer(FxFlashTimer);
+    S08HeroesV2::SetFxFlash(ArtBody, S08HeroesV2::FxFlashColor(), 0.0f);
+    FxFlashValue = 0.0f;
+    return;
+  }
+  FxFlashStartSeconds = World->GetTimeSeconds();
+  FxFlashMs = Ms;
+  World->GetTimerManager().SetTimer(FxFlashTimer, this, &AS08FighterActor::TickFlash, 1.0f / 60.0f, true);
+  TickFlash();
+  FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW fig-fx fighter=%s ch=flash ms=%d peak=1.00"), *Fighter.Id,
+                                   FMath::RoundToInt(Ms)));
+}
+
+void AS08FighterActor::TickFlash() {
+  UWorld* World = GetWorld();
+  if (!World || !ArtBody) return;
+  const double T = (World->GetTimeSeconds() - FxFlashStartSeconds) * 1000.0;
+  FxFlashValue = S08HeroesV2::FxFlashValueAt(T, FxFlashMs);
+  S08HeroesV2::SetFxFlash(ArtBody, S08HeroesV2::FxFlashColor(), FxFlashValue);
+  if (T >= FxFlashMs) World->GetTimerManager().ClearTimer(FxFlashTimer);
+}
+
+void AS08FighterActor::PlayRim(float TotalMs, float Peak, float Width, double RampInMs, double RampOutMs,
+                               bool bHold) {
+  if (!bHeroV2Visual || !ArtBody || TotalMs <= 0.0f) return;
+  UWorld* World = GetWorld();
+  if (!World) return;
+  // FX-06 / FX-17 / FX-19: reduced motion shows the rim at 0.6 for 100 ms (mode keep)
+  if (S08IconMotion::IsReducedMotion()) {
+    TotalMs = 100.0;
+    Peak = 0.6f;
+    RampInMs = 0.0;
+    RampOutMs = 100.0;
+    bHold = false;
+  }
+  RimStartSeconds = World->GetTimeSeconds();
+  RimTotalMs = TotalMs;
+  RimPeak = Peak;
+  RimRampInMs = RampInMs;
+  RimRampOutMs = RampOutMs;
+  bRimHold = bHold;
+  RimOutMs = 120.0;
+  RimWidthValue = Width;
+  World->GetTimerManager().SetTimer(RimTimer, this, &AS08FighterActor::TickRim, 1.0f / 60.0f, true);
+  TickRim();
+  FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW fig-fx fighter=%s ch=rim ms=%d peak=%.2f width=%.2f hold=%d"),
+                                   *Fighter.Id, FMath::RoundToInt(TotalMs), Peak, Width, bHold ? 1 : 0));
+}
+
+void AS08FighterActor::StopRim(double OutMs) {
+  if (!bHeroV2Visual || !ArtBody || RimValue <= 0.0f) return;
+  UWorld* World = GetWorld();
+  if (!World) return;
+  // FX-06: the cursor left the figure - the held peak unwinds to 0 over OutMs from now
+  RimStartSeconds = World->GetTimeSeconds();
+  RimRampInMs = 0.0;
+  RimPeak = RimValue;
+  bRimHold = false;
+  if (S08IconMotion::IsReducedMotion()) {
+    RimValue = 0.0f;
+    S08HeroesV2::SetRim(ArtBody, 0.0f, RimWidthValue);
+    World->GetTimerManager().ClearTimer(RimTimer);
+    return;
+  }
+  World->GetTimerManager().SetTimer(RimTimer, this, &AS08FighterActor::TickRim, 1.0f / 60.0f, true);
+  RimTotalMs = OutMs;
+  RimRampOutMs = OutMs;
+  TickRim();
+  FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW fig-fx fighter=%s ch=rim ms=%d peak=%.2f leave=1"),
+                                   *Fighter.Id, FMath::RoundToInt(OutMs), RimPeak));
+}
+
+void AS08FighterActor::TickRim() {
+  UWorld* World = GetWorld();
+  if (!World || !ArtBody) return;
+  const double T = (World->GetTimeSeconds() - RimStartSeconds) * 1000.0;
+  if (bRimHold) {
+    // hover: the ease-out ramp, then the peak held until StopRim
+    RimValue = T < RimRampInMs ? S08HeroesV2::RimIntensityAt(T, RimTotalMs, RimPeak, RimRampInMs, RimTotalMs)
+                               : static_cast<float>(RimPeak);
+    S08HeroesV2::SetRim(ArtBody, RimValue, RimWidthValue);
+    return;
+  }
+  RimValue = S08HeroesV2::RimIntensityAt(T, RimTotalMs, RimPeak, RimRampInMs, RimRampOutMs);
+  S08HeroesV2::SetRim(ArtBody, RimValue, RimWidthValue);
+  if (T >= RimTotalMs) World->GetTimerManager().ClearTimer(RimTimer);
 }
 
 void AS08FighterActor::OnHeroClipFinished() {

@@ -157,6 +157,31 @@ UNMATCHED_API float ContactSeconds(const FHeroSpec& Spec, const UAnimSequenceBas
 constexpr int32 HitTintCpdIndex = 12;
 inline const TCHAR* const HitTintParamName = TEXT("CPD_HitTint");
 
+// ---- FX-05 (VS-6 Z-2; ВР-20 / ВР-23): the v1 cue channels of M_UM_Figure_v2 kept by the v2 graph
+// (um-masters.json custom_primitive_data): FxFlash slots 5-8 (rgb = flash colour, a = intensity; a = 0 = off,
+// exactly the unflashed figure) and the rim slots 9/10 (RimIntensity 0..1 x RimColor, 10 = fresnel exponent
+// lerp(8, 1, RimWidth)). RimColor defaults to fx.rim = card.cream since FX-05 (hero MIs never override it);
+// the pedestal M_UM_BaseMarker has neither channel. Driven by CUE-001/009 hover / defense (FX-06/17) and the
+// white flash of the hit (FX-19); rollback -S08FxLegacy / -S08HitTintLegacy stop the writers, 0 is neutral.
+constexpr int32 FxFlashCpdIndex = 5;
+constexpr int32 RimIntensityCpdIndex = 9;
+constexpr int32 RimWidthCpdIndex = 10;
+inline const TCHAR* const FxFlashParamName = TEXT("CPD_FxFlash");
+inline const TCHAR* const RimIntensityParamName = TEXT("CPD_RimIntensity");
+inline const TCHAR* const RimWidthParamName = TEXT("CPD_RimWidth");
+/** CPD_FxFlash rgb = the token fx.flash (S08HudTokens; FromSRGBColor only, AD-OPEN-39). */
+UNMATCHED_API FLinearColor FxFlashColor();
+/** Writes the flash channel (rgb x a); a = 0 is the neutral figure. */
+UNMATCHED_API void SetFxFlash(UPrimitiveComponent* Body, const FLinearColor& Rgb, float A);
+/** Writes the rim channels; intensity 0 (any width) is the neutral figure. */
+UNMATCHED_API void SetRim(UPrimitiveComponent* Body, float Intensity, float Width);
+/** FX-19 ВР-20: the flash holds a = 1 for the whole window and drops to 0 in one frame at Ms. */
+UNMATCHED_API float FxFlashValueAt(double T, double Ms);
+/** The rim pulse of FX-06/17/19: an ease-out ramp 0 -> Peak over RampInMs, the peak until Total - RampOutMs,
+ *  then down to 0 at TotalMs. RampInMs < 0 = 20% and RampOutMs < 0 = 40% of TotalMs (the defense pulse shape);
+ *  RampInMs = 0 is the hard start of the hit rim. */
+UNMATCHED_API float RimIntensityAt(double T, double TotalMs, double Peak, double RampInMs, double RampOutMs);
+
 // ---- DE-011 (W-27, 01 F-09): the death dissolve of the v2 figures (tools/art/de011/de011.py).
 // M_UM_Figure_v2 v2.3 has a static switch UseDissolve, off in every hero MI: the accepted figures stay Opaque and
 // compile the v2.2 graph unchanged. One dissolve MIC per body MI (/Game/UM/Materials/v2/Dissolve/MI_<Key>_<Stage>_

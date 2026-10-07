@@ -100,8 +100,30 @@ public:
   /** DE-018 (CUE-011): red hit tint (CPD_HitTint, M_UM_Figure_v2.2) for Seconds - full for the first 70 ms, then
    *  fading out; a no-op without a v2 figure. A new hit restarts it. */
   void PlayHitTint(float Seconds);
+  /** FX-19 (ВР-20): the hit look of the decided direction - the white flash (70 ms, unscaled) then the cream rim
+   *  C+70…C+370; the red fill returns only with -S08HitTintLegacy. bDamage = false (урон 0, FX-23): the rim only.
+   *  A no-op without a v2 figure; the `tint=` field of the staging trace keeps the 450 / 550 window. */
+  void PlayHitFx(float WindowSeconds, bool bDamage);
+  /** Z-2 bench only (-BenchFx): writes both channels straight - the exact values the bench shot must show (the
+   *  curves run in the unit tests and the live demo, never on this path). */
+  void SetFxBenchChannels(float FlashA, float RimIntensity, float RimWidth);
   /** Current CPD_HitTint value (0 when idle). */
   float GetHitTintValue() const { return HitTintValue; }
+  /** FX-05 / FX-19 (ВР-20): white flash of the figure (CPD_FxFlash, fx.flash) - a = 1 for the whole Ms, then 0
+   *  in one frame; a no-op without a v2 figure. Reduced motion: nothing plays. */
+  void PlayFlash(float Ms);
+  /** FX-05 / FX-06 / FX-17 / FX-19: cream rim of the figure (CPD_RimIntensity 9 / RimWidth 10, RimColor = fx.rim
+   *  in the master). The pulse: ease-out 0 -> Peak over RampInMs (< 0 = 20% of TotalMs; 0 = the hard hit start),
+   *  the peak until Total - RampOutMs (< 0 = 40%), then down to 0 at TotalMs. bHold: stay at Peak after the ramp
+   *  (hover) until StopRim. A new call restarts the channel. Reduced motion: Peak 0.6 for 100 ms, no flash. */
+  void PlayRim(float TotalMs, float Peak, float Width, double RampInMs = -1.0, double RampOutMs = -1.0,
+               bool bHold = false);
+  /** Ends a held rim (the hover left): Peak -> 0 over OutMs. */
+  void StopRim(double OutMs = 120.0);
+  /** Current channel values (0 = neutral) of the tests. */
+  float GetFxFlashValue() const { return FxFlashValue; }
+  float GetRimIntensity() const { return RimValue; }
+  float GetRimWidth() const { return RimWidthValue; }
   /** Asset name of a loaded v2 clip (AM_<Key>_<Clip>), empty without one. */
   FString GetHeroClipAssetName(S08HeroesV2::EClip Clip) const;
   /** The death (DeathSettle, still, dissolve) is running: the defeated figure is still visible. */
@@ -369,7 +391,25 @@ private:
   double HitTintStartSeconds = 0.0;
   float HitTintSeconds = 0.0f;
   float HitTintValue = 0.0f;
+  // ---- FX-05 (VS-6 Z-2): the FxFlash / Rim channel timers (the TickHitTint pattern, 60 Hz)
+  FTimerHandle FxFlashTimer;
+  double FxFlashStartSeconds = 0.0;
+  float FxFlashMs = 0.0f;
+  float FxFlashValue = 0.0f;
+  FTimerHandle RimTimer;
+  FTimerHandle RimDelayTimer;   // FX-19: the rim starts at C+70, one flash after the hit frame
+  double RimStartSeconds = 0.0;
+  double RimTotalMs = 0.0;
+  double RimPeak = 0.0;
+  double RimRampInMs = 0.0;
+  double RimRampOutMs = 0.0;
+  double RimOutMs = 120.0;     // the leave ramp of a held rim (FX-06)
+  bool bRimHold = false;
+  float RimValue = 0.0f;
+  float RimWidthValue = 0.0f;
   void TickHitTint();
+  void TickFlash();
+  void TickRim();
   /** Loads and applies the v2 figure; false (nothing changed) when an asset is missing. */
   bool ApplyHeroV2(const S08HeroesV2::FHeroSpec& Spec, const FVector& CellCenter, USkeletalMesh*& OutMesh);
   void PlayHeroClip(S08HeroesV2::EClip Clip, S08HeroesV2::EEvent Event, int32 Seq, float PlayRate = 1.0f);

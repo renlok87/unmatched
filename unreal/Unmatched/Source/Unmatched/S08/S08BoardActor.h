@@ -146,6 +146,10 @@ public:
   const US08ConceptPasteAnimComponent* GetConceptPasteAnim() const { return ConceptAnim; }
   /** True while the paste is on and its parts exist (the painted surround replaces tray / ground / props). */
   bool IsConceptPasteOn() const { return ConceptMode.bOn && ConceptRuntime.Status == TEXT("ok"); }
+  /** FX-03 (VS-6 Z-2): the paste spec of the active map-image profile - its measured grade fit (FitScale /
+   *  FitPower) feeds the inverse tone curve of M_FX_Print even when the paste itself is off (the fit is a
+   *  property of the engine tone curve, not of the painted layer). */
+  const FS08ConceptPasteSpec& GetConceptPasteSpec() const { return ActiveProfile.ConceptPaste; }
 
   // ---- ENV-MAPS P9 hero light (S08HeroLight.h, docs/art-pipeline/ENV-HERO-LIGHT.md) ----
   /** The "heroLight" block that lights the figures now: the active art profile's light profile block when enabled (grid and
@@ -252,6 +256,9 @@ public:
   int32 GetFighterContactMs(const FString& FighterId, FString& OutSource) const;
   /** DE-018 (CUE-011): the red hit tint of a v2 figure (CPD_HitTint) for Seconds from now. */
   void PlayFighterHitTint(const FString& FighterId, float Seconds);
+  /** FX-19 (ВР-20, Z-2): the hit look of the fighter - the white flash then the cream rim (PlayHitFx); the red
+   *  fill only with -S08HitTintLegacy. bDamage = false: the rim only (урон 0, FX-23). */
+  void PlayFighterHitFx(const FString& FighterId, float WindowSeconds, bool bDamage);
   /** MS-T-16 (CUE-007): starts the moves of one seq at NowMs (the snapshot frame) - one plan per fighter
    *  (FS08MoveAnim::BuildPlans); returns the number of figures that animate (a snapped plan lands at once). */
   int32 PlayFighterMoves(const TArray<FS08MovePlan>& Plans, const FS08MoveAnimParams& Params, int64 NowMs);

@@ -586,6 +586,87 @@ bool FS08HeroesV2HitTintTest::RunTest(const FString&) {
   return true;
 }
 
+// FX-05 (VS-6 Z-2, ВР-20 / ВР-23): the FxFlash / Rim cue channels. The v2 master keeps the v1 slots 5-8 (flash)
+// and 9/10 (rim), both neutral at 0; RimColor defaults to fx.rim = card.cream (not white) and no hero MI
+// overrides it. The curves are world-free: the flash holds 1 for its window then drops in one frame; the rim
+// pulse is the ease-out ramp / hold / down of FX-06 (hover), FX-17 (defense) and FX-19 (hit).
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08HeroesV2FxChannelsTest,
+    "Unmatched.S08.HeroesV2.FxChannels CPD 5-10 slots, neutral 0, cream RimColor, the flash / rim curves (FX-05)",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08HeroesV2FxChannelsTest::RunTest(const FString&) {
+  using namespace S08HeroesV2;
+  const UMaterial* Master = LoadObject<UMaterial>(nullptr, TEXT("/Game/UM/Materials/v2/M_UM_Figure_v2.M_UM_Figure_v2"));
+  TestNotNull("M_UM_Figure_v2 loads", Master);
+  if (Master) {
+#if WITH_EDITORONLY_DATA
+    int32 Flash = 0, RimI = 0, RimW = 0, RimColor = 0, FxFlashParam = 0;
+    FLinearColor RimDefault(0.0f, 0.0f, 0.0f, -1.0f);
+    for (const UMaterialExpression* Expr : Master->GetExpressions()) {
+      if (const UMaterialExpressionScalarParameter* P = Cast<UMaterialExpressionScalarParameter>(Expr)) {
+        if (P->ParameterName == FName(RimIntensityParamName)) {
+          ++RimI;
+          TestTrue("CPD_RimIntensity reads Custom Primitive Data", P->bUseCustomPrimitiveData);
+          TestEqual("CPD_RimIntensity slot", static_cast<int32>(P->PrimitiveDataIndex), RimIntensityCpdIndex);
+          TestEqual("CPD_RimIntensity default 0 (neutral)", P->DefaultValue, 0.0f);
+        } else if (P->ParameterName == FName(RimWidthParamName)) {
+          ++RimW;
+          TestEqual("CPD_RimWidth slot", static_cast<int32>(P->PrimitiveDataIndex), RimWidthCpdIndex);
+          TestEqual("CPD_RimWidth default 0 (neutral)", P->DefaultValue, 0.0f);
+        }
+      } else if (const UMaterialExpressionVectorParameter* V = Cast<UMaterialExpressionVectorParameter>(Expr)) {
+        if (V->ParameterName == FName(FxFlashParamName)) {
+          ++FxFlashParam;
+          TestTrue("CPD_FxFlash reads Custom Primitive Data", V->bUseCustomPrimitiveData);
+          TestEqual("CPD_FxFlash slot", static_cast<int32>(V->PrimitiveDataIndex), FxFlashCpdIndex);
+          TestEqual("CPD_FxFlash default 0 (neutral)", V->DefaultValue.A, 0.0f);
+        } else if (V->ParameterName == TEXT("RimColor")) {
+          ++RimColor;
+          RimDefault = V->DefaultValue;
+        }
+      }
+    }
+    TestEqual("one CPD_FxFlash parameter", FxFlashParam, 1);
+    TestEqual("one CPD_RimIntensity parameter", RimI, 1);
+    TestEqual("one CPD_RimWidth parameter", RimW, 1);
+    TestEqual("one RimColor parameter", RimColor, 1);
+    TestEqual("RimColor = fx.rim card.cream #F9EBDB (linear R)", RimDefault.R, 0.947f, 0.004f);
+    TestEqual("RimColor = fx.rim card.cream #F9EBDB (linear G)", RimDefault.G, 0.831f, 0.004f);
+    TestEqual("RimColor = fx.rim card.cream #F9EBDB (linear B)", RimDefault.B, 0.716f, 0.004f);
+#endif
+    TestEqual("FxFlashCpdIndex slot 5 (um-masters.json)", FxFlashCpdIndex, 5);
+    TestEqual("RimIntensityCpdIndex slot 9", RimIntensityCpdIndex, 9);
+    TestEqual("RimWidthCpdIndex slot 10", RimWidthCpdIndex, 10);
+  }
+  // the flash colour is the token fx.flash, not a literal: the sRGB round trip gives the hex back
+  const FColor Hex = FxFlashColor().ToFColor(true /*sRGB*/);
+  TestEqual("fx.flash R = 0xFA", Hex.R, 0xFA);
+  TestEqual("fx.flash G = 0xF8", Hex.G, 0xF8);
+  TestEqual("fx.flash B = 0xF2", Hex.B, 0xF2);
+  // the flash curve: 1 for the whole window, 0 from the first tick past it (FX-19: a -> 0 in one frame)
+  TestEqual("flash t=0", FxFlashValueAt(0.0, 70.0), 1.0f);
+  TestEqual("flash t=69", FxFlashValueAt(69.0, 70.0), 1.0f);
+  TestEqual("flash t=70 (one frame later)", FxFlashValueAt(70.0, 70.0), 0.0f);
+  TestEqual("flash t<0", FxFlashValueAt(-1.0, 70.0), 0.0f);
+  // the defense pulse (FX-17): 300 ms, peak 1, ramp-in 60 (ease-out), hold to 180, down to 0 at 300
+  TestEqual("defense t=30 (half the ramp, ease-out)", RimIntensityAt(30.0, 300.0, 1.0, 60.0, 120.0), 0.75f, 0.001f);
+  TestEqual("defense t=60 (the peak)", RimIntensityAt(60.0, 300.0, 1.0, 60.0, 120.0), 1.0f);
+  TestEqual("defense t=180 (still the peak)", RimIntensityAt(180.0, 300.0, 1.0, 60.0, 120.0), 1.0f);
+  TestEqual("defense t=240 (half the way out)", RimIntensityAt(240.0, 300.0, 1.0, 60.0, 120.0), 0.5f, 0.001f);
+  TestEqual("defense t=300 (off)", RimIntensityAt(300.0, 300.0, 1.0, 60.0, 120.0), 0.0f);
+  // the hit rim (FX-19): hard start (ramp-in 0), hold to 200, out by 300
+  TestEqual("hit rim t=0 (hard start)", RimIntensityAt(0.0, 300.0, 1.0, 0.0, 100.0), 1.0f);
+  TestEqual("hit rim t=199 (still 1)", RimIntensityAt(199.0, 300.0, 1.0, 0.0, 100.0), 1.0f);
+  TestEqual("hit rim t=250 (half out)", RimIntensityAt(250.0, 300.0, 1.0, 0.0, 100.0), 0.5f, 0.001f);
+  // the default pulse shape (auto ramps 20% / 40%) and the hover ramp of FX-06 (150 ms ease-out to 0.6; the hold
+  // afterwards is TickRim's held branch, not the curve)
+  TestEqual("auto pulse t=30 (mid auto ramp)", RimIntensityAt(30.0, 300.0, 1.0, -1.0, -1.0), 0.75f, 0.001f);
+  TestEqual("auto pulse t=100 (hold)", RimIntensityAt(100.0, 300.0, 1.0, -1.0, -1.0), 1.0f);
+  TestEqual("hover ramp t=75 (half, ease-out)", RimIntensityAt(75.0, 150.0, 0.6f, 150.0, 150.0), 0.45f, 0.001f);
+  TestEqual("hover ramp t=149 (the peak reached)", RimIntensityAt(149.0, 150.0, 0.6f, 150.0, 150.0), 0.59997f,
+            0.0001f);
+  return true;
+}
+
 // DE-011 (W-27, 01 F-09): the death dissolve. M_UM_Figure_v2 stays Opaque with the dissolve behind the static switch
 // UseDissolve (off by default, CPD 13 / 14 neutral at 0); every body MI has a Masked dissolve MIC that inherits it and
 // only switches the dissolve on; 500 / 400 ms; the fade is the default, the ash candidate only on request.
