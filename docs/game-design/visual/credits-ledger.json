@@ -1291,11 +1291,47 @@
       "result_path": "art/imagegen/sc31-reconnect-auto-codex/, sc32-reconnect-manual-codex/, sc33-reconnect-restore-codex/",
       "status": "ok",
       "note": "CX-33 прогон 1 (серия SC-31…SC-33 RECONNECT в одном чате; задания SC-31.codex.md, SC-32.codex.md, SC-33.codex.md); 2026-10-07 21:42–22:06 +05:00 (~24 мин); 3 пакета, 40 макетов в scraped-data/derived, 64 схемы в пакетах; данные — настоящий обрыв WS прогона E (seq 1 → 1, попытка 1 из 5, пропущено 0); тост и чип по HB-40/HB-14; генераций 0; ревью Claude: accept по делегированию без корректирующего прогона (ВР-VS5-SC31-01…06, ВР-VS5-SC32-01…03, ВР-VS5-SC33-01…04); кромки HB-08 < 3:1 — известное ограничение скинов"
+    },
+    {
+      "date": "2026-10-07T22:48:46+05:00",
+      "service": "Codex",
+      "model": "codex-cli (codex.exe exec, app bundle 5ea220ae)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "SC-24",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a11766-6382-7d71-9f3a-8a1c3ac7e3ff",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/SC-24-series.codex.md",
+      "result_path": "art/imagegen/sc24-pause-codex/, sc25-settings-sound-codex/, sc26-settings-language-codex/, sc27-settings-scale-codex/, sc28-settings-game-codex/, sc29-settings-hints-codex/, sc30-settings-graphics-codex/",
+      "status": "ok",
+      "note": "CX-32 прогон 1 (серия SC-24…SC-30 PAUSE и настройки в одном чате); 2026-10-07 22:25–22:48 +05:00 (~23 мин); 7 пакетов, 106 макетов в scraped-data/derived; данные — значения по умолчанию S08UserSettings.h, DEFENSE_TIMEOUT_SECONDS 30, render-reference; генераций 0; ревью Claude: fix-needed (схемы без меток легенды, скрытые ряды прокрутки поверх кнопок, типографика README)"
+    },
+    {
+      "date": "2026-10-07T23:10:11+05:00",
+      "service": "Codex",
+      "model": "codex-cli (codex.exe exec, app bundle 5ea220ae)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "SC-24",
+      "units": "исправление 7 пакетов, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a1177e-6a5a-76f0-af31-4db4f8532980",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/SC-24-series.fix1.codex.md",
+      "result_path": "art/imagegen/sc24…sc30-*-codex/ (comparison/, layout-geometry.json, verification.json, README.md)",
+      "status": "ok",
+      "note": "CX-32 fix1 (единственный корректирующий прогон SC-24…SC-30); 2026-10-07 22:52–23:10 +05:00 (~18 мин); метки R01… на схемах, обрезка по RowsPanel, типографика README; макеты не менялись (sha256 106 PNG сверены); генераций 0; ревью Claude: accept по делегированию (ВР-VS5-SC24-01…12, -SC25-01…02, -SC26-01…03, -SC27-01…02, -SC28-01, -SC29-01…02, -SC30-01); кромки HB-08 < 3:1 — известное ограничение скинов"
     }
   ],
   "totals": {
     "syntx_spent": 6.0,
     "tripo_spent": 0,
-    "codex_packages": 65
+    "codex_packages": 67
   }
 }
