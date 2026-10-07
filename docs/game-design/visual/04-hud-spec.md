@@ -808,6 +808,11 @@ y920┌PANEL-LOC┐       ▭▭▭▭▭▭▭ РУКА ▭▭▭▭▭▭▭  
 - UI-ACC-017 (ВР-H09): «Авто» (только первая партия профиля), «Вкл», «Выкл». Чип 20×20 `panel.bg.inset`, кромка
   `panel.edge`, буква `type.tag` в углу кнопки или справа от строки статуса: M, A, G, E, K, C, N, Enter, Esc.
   Трасса `HUD-KEYHINTS mode=auto|on|off shown=0|1`.
+- **Дельта VS-4** (H6, HB-43, `evidence/VISUAL/HB-43`, ВР-VS4-45, по делегированию): режим хранится в
+  `US08UserSettings::KeyHintsMode` (`auto|on|off`, по умолчанию `auto`; разовый `-S08KeyHints=`), «Авто» = чипы видны,
+  пока у профиля нет ни одной доигранной партии (`CompletedMatches`, +1 при открытии экрана результата; `-Bench` не
+  считает). Трасса — `HUD-KEYHINTS mode=… shown=0|1 completedMatches=<n>`. Чипы ACTIONS — M, A, G, E; чипы строки
+  статуса — со своим блоком.
 
 ### 2.12 TOASTS — `UI-HUD-TOAST`
 
@@ -940,9 +945,18 @@ y920┌PANEL-LOC┐       ▭▭▭▭▭▭▭ РУКА ▭▭▭▭▭▭▭  
 - **Ввод:** клик; клавиши M, A, G, E (те же команды, `BeginManeuverCommand`, `BeginAttackDraft`, `PlaySchemeCommand`,
   `EndTurnCommand`). Ответ в кадр отпускания: звук или CUE-004 (UI-INP-011).
 - **Данные:** `FS09HudModel::ActionsRemaining`, `bViewerTurn`, `ES09CommandMode`, `HudBusyReason`, `EndTurnReason`.
-- **Сейчас:** кнопки «BEGIN MANEUVER (M)», «END TURN (E)» в командной панели через `MakeHudPress`
-  (`S08FlowGameMode.cpp:6930-6966`). → `UUmHudActions` + 4 × `UUmButton` (вариант «диск»), `WBP_UI_HUD_ACTIONS`;
-  арбитр нажатий `FS09HudPressArbiter` переходит на UMG без изменений.
+- **Было:** кнопки «BEGIN MANEUVER (M)», «END TURN (E)» в командной панели через `MakeHudPress`
+  (`S08FlowGameMode.cpp:6930-6966`). **Сейчас** (VS-4 HB-43): `UUmHudActions` (`S08/UI/UmHudActions.h`) + 4 ×
+  `UUmButton` (вариант «диск», скины HB-08), `WBP_UI_HUD_ACTIONS`; арбитр нажатий `FS09HudPressArbiter` — те же id
+  нажатий, что у кнопок Slate (манёвр, атака, схема, конец хода; `UmHudActions::PressId`). Пара Slate — только с
+  `-S08SlateHud=actions` (и под гейтом `-S09Markers`).
+- **Дельта VS-4** (H6, HB-43, `evidence/VISUAL/HB-43`, ВР-VS4-40…-45, по делегированию): числа класса L — макета HB-42
+  (выше); запрос в пути (`HudBusyReason`) — весь ряд недоступен с `why.syncing` (без «Отправлено…» на дисках, ВР-VS4-40);
+  G / СХЕМА при открытом локальном черновике атаки закрывает его и открывает выбор схемы (ВР-VS4-41); в ход соперника
+  ряд — состояние «недоступна» (диск 0,4) у всех четырёх, без второго множителя на ряд (ВР-VS4-42); нет карты схемы в
+  руке — СХЕМА недоступна с `why.scheme.none` (ВР-VS4-43); подсказка недоступной кнопки и подпись класса S — после
+  300 мс наведения, при фокусе с клавиатуры — сразу (ВР-VS4-44). Трасса — `SHOT widget id=UI-HUD-ACTIONS … class=L|S
+  actions=<n> primary=0|1 keys=0|1 cells=<w,…> buttons=<state,…> tip=<key|->`.
 - **Строки:** `hud.action.maneuver`, `.attack`, `.scheme`, `.end_turn`; `hud.key.*`.
 - **Звук:** `UI-BTN-HOVER`, `UI-BTN-CLICK`, `UI-REJECT`.
 
@@ -966,6 +980,19 @@ y920┌PANEL-LOC┐       ▭▭▭▭▭▭▭ РУКА ▭▭▭▭▭▭▭  
   «H1» не читаются (HD-08). → те же классы, токены из темы, `type.tag` 14, `type.damage` 24, цифра гарпии; плашка
   только по наведению.
 - **Гейт:** существующие строки `SHOT widget id=plate.* | tag | damage | icon …`, `SHOT plate … overlapReachable=0`.
+- **Дельта VS-4** (H12, HB-45, HB-46, FX-38; `evidence/VISUAL/HB-45`, `HB-46`, `FX-38`; ВР-VS4-46…-48, -55…-58, по
+  делегированию):
+  - тег и плашка — содержимое прежних `US08ArtTagWidget` / `US08ArtPlateWidget` (`UUmWorldTag`, `UUmWorldPlate`,
+    `S08/UI/UmWorldLayer.h`), формат строк `SHOT widget` и место тега (W5b-R) не менялись; откат — `-S08SlateHud=tag`,
+    `-S08SlateHud=plate`;
+  - строки плашки — ключи макета HB-44: `hud.plate.role.hero_ranged|hero_melee|sidekick_ranged|sidekick_melee`,
+    `hud.plate.side.own|opponent`, `hud.plate.target`, `hud.plate.harpy_name` (ВР-VS4-46); имя — из
+    `Config/Cards/S08FighterNames.json`, гарпия — «Гарпия {n}» по `sidekicks[]` (ВР-VS4-47); «ЦЕЛЬ» — у цели боя и у цели
+    локального черновика атаки (ВР-VS4-48);
+  - **значки зон у клетки** (FX-38, ВР-32): при наведении на пространство справа от него до трёх значков зон IC-62…IC-69
+    (диск — `boards[].zoneIconSrgb` профиля доски, глиф — navy или card.glyph по контрасту), больше трёх — два и «+N»
+    (N — не показанные, ВР-VS4-55); размер — L6 (HI-12), при L6 20…23 px (K1 на 720p) — экспорт 24 px, ниже 20 px
+    значков нет (ВР-VS4-56); колонна не закрывает фигуры и теги (ВР-VS4-57); `UUmZoneBadges`, откат `-S08SlateHud=zone`.
 
 ## 3. Общие состояния
 
@@ -1276,6 +1303,7 @@ SHOT widget id=<UI-ID> impl=umg|slate state=<состояние> fighter=<id|non
 | `UI-HUD-SUB` | субтитры | `shown` |
 | `UI-SCR-BOOT` … `UI-SCR-ABORTED` | экраны §1 | по §1 |
 | `plate.*`, `tag`, `damage`, `icon` | мировой слой | как сейчас |
+| `zone` | значки зон у клетки (FX-38, VS-4) | `shown`, `hidden` (`space= keys= shown= more= px= tex= moved= overlap= hidden=off|nokeys|small|nocolor`) |
 
 Гейт G-WIDGET: `python tools/s08/hud_contract/hud_contract.py check-trace <Unmatched.log>` — у каждого видимого блока
 `geom=painted`, bbox внутри кадра, `overlapField=0` для постоянных блоков, состояние из списка.
