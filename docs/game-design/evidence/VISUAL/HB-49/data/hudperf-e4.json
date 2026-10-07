@@ -1,0 +1,191 @@
+{
+ "method": "-S08HudPerf (UI/UmHudPerf.h, the HB-49 meter): the UMG HUD root collapsed / shown in 90-frame blocks, 6 frames skipped after a switch; pair = a hidden block and the shown block after it; GT = GGameThreadTime, GPU = RHIGetGPUFrameCycles. ONE editor-build -game client (C:/tmp/wt-visual, UnmatchedEditor Development) against the server bot (VS_AI), 1920x1080 100 %, no frame cap (t.MaxFPS 0, FrameRateLimit 0), -RenderOffScreen; the medians of the pair differences. The packaged confirmation is the Frames step (one package per sprint).",
+ "budget": {
+  "gtP95": 0.5,
+  "gpu": 0.3
+ },
+ "hb49Packaged": {
+  "marmoreal": {
+   "dGtP95Med": 0.688,
+   "pairs": 29
+  },
+  "sarpedon": {
+   "dGtP95Med": 0.552,
+   "pairs": 24
+  }
+ },
+ "runs": [
+  {
+   "trace": "C:/tmp/visual/E4/runs/perf0-marm/client.trace.log",
+   "pairs": 26,
+   "fpsMedian": 190.0,
+   "all": {
+    "dGt95": 1.176,
+    "dGt50": 0.744,
+    "dGpu95": -0.005,
+    "n": 26
+   },
+   "calm": {
+    "dGt95": 1.221,
+    "dGt50": 0.744,
+    "dGpu95": -0.001,
+    "n": 18
+   },
+   "mode": "baseline (E3 code, no cache)",
+   "board": "marm"
+  },
+  {
+   "trace": "C:/tmp/visual/E4/runs/perf1-marm/client.trace.log",
+   "pairs": 38,
+   "fpsMedian": 206.4,
+   "all": {
+    "dGt95": 0.152,
+    "dGt50": 0.176,
+    "dGpu95": 0.014,
+    "n": 38
+   },
+   "calm": {
+    "dGt95": 0.124,
+    "dGt50": 0.166,
+    "dGpu95": 0.006,
+    "n": 28
+   },
+   "mode": "cache",
+   "board": "marm"
+  },
+  {
+   "trace": "C:/tmp/visual/E4/runs/perf2-marm/client.trace.log",
+   "pairs": 35,
+   "fpsMedian": 201.4,
+   "all": {
+    "dGt95": 0.051,
+    "dGt50": 0.135,
+    "dGpu95": 0.023,
+    "n": 35
+   },
+   "calm": {
+    "dGt95": 0.081,
+    "dGt50": 0.134,
+    "dGpu95": 0.02,
+    "n": 24
+   },
+   "mode": "cache, all E4 fixes",
+   "board": "marm"
+  },
+  {
+   "trace": "C:/tmp/visual/E4/runs/perf2-sarp/client.trace.log",
+   "pairs": 22,
+   "fpsMedian": 162.9,
+   "all": {
+    "dGt95": 0.614,
+    "dGt50": 0.228,
+    "dGpu95": -0.01,
+    "n": 22
+   },
+   "calm": {
+    "dGt95": 0.01,
+    "dGt50": 0.248,
+    "dGpu95": -0.044,
+    "n": 6
+   },
+   "mode": "cache, all E4 fixes",
+   "board": "sarp"
+  },
+  {
+   "trace": "C:/tmp/visual/E4/runs/perf3-sarp/client.trace.log",
+   "pairs": 24,
+   "fpsMedian": 172.0,
+   "all": {
+    "dGt95": 0.111,
+    "dGt50": 0.242,
+    "dGpu95": 0.019,
+    "n": 24
+   },
+   "calm": {
+    "dGt95": 0.377,
+    "dGt50": 0.237,
+    "dGpu95": -0.003,
+    "n": 15
+   },
+   "mode": "cache, all E4 fixes",
+   "board": "sarp"
+  },
+  {
+   "trace": "C:/tmp/visual/E4/runs/perfnc-sarp/client.trace.log",
+   "pairs": 24,
+   "fpsMedian": 169.2,
+   "all": {
+    "dGt95": 0.564,
+    "dGt50": 0.557,
+    "dGpu95": 0.007,
+    "n": 24
+   },
+   "calm": {
+    "dGt95": 0.584,
+    "dGt50": 0.547,
+    "dGpu95": 0.008,
+    "n": 17
+   },
+   "mode": "-S08HudNoCache (same build)",
+   "board": "sarp"
+  },
+  {
+   "trace": "C:/tmp/visual/E4/runs/perf4-sarp/client.trace.log",
+   "pairs": 24,
+   "fpsMedian": 163.2,
+   "all": {
+    "dGt95": 0.014,
+    "dGt50": 0.095,
+    "dGpu95": 0.015,
+    "n": 24
+   },
+   "calm": {
+    "dGt95": 0.014,
+    "dGt50": 0.057,
+    "dGpu95": 0.006,
+    "n": 14
+   },
+   "mode": "cache, all E4 fixes",
+   "board": "sarp"
+  }
+ ],
+ "pooled": {
+  "baseline-marm": {
+   "pairs": 26,
+   "dGtP95Med": 1.176,
+   "dGtP50Med": 0.744,
+   "dGpuP95Med": -0.005,
+   "calmPairs": 18,
+   "calmDGtP95Med": 1.221,
+   "calmDGtP50Med": 0.744
+  },
+  "cache-marm": {
+   "pairs": 73,
+   "dGtP95Med": 0.112,
+   "dGtP50Med": 0.163,
+   "dGpuP95Med": 0.017,
+   "calmPairs": 52,
+   "calmDGtP95Med": 0.111,
+   "calmDGtP50Med": 0.159
+  },
+  "cache-sarp": {
+   "pairs": 70,
+   "dGtP95Med": 0.099,
+   "dGtP50Med": 0.189,
+   "dGpuP95Med": 0.008,
+   "calmPairs": 35,
+   "calmDGtP95Med": 0.116,
+   "calmDGtP50Med": 0.125
+  },
+  "nocache-sarp": {
+   "pairs": 24,
+   "dGtP95Med": 0.564,
+   "dGtP50Med": 0.557,
+   "dGpuP95Med": 0.007,
+   "calmPairs": 17,
+   "calmDGtP95Med": 0.584,
+   "calmDGtP50Med": 0.547
+  }
+ },
+ "calmRule": "both blocks of the pair have GT p95 < 6 ms"
+}

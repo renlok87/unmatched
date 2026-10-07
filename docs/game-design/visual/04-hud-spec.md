@@ -501,6 +501,7 @@ y920┌PANEL-LOC┐       ▭▭▭▭▭▭▭ РУКА ▭▭▭▭▭▭▭  
 - **Сейчас:** номера хода и связи нет; есть отладочная строка `seq=… phase=…` в боковой панели → под `-S09Markers`.
 - **Строки:** `hud.top.menu`, `hud.top.turn` («Ход {n}»), `hud.conn.online`, `.syncing`, `.lost`, `hud.top.log`.
 - **Звук:** `UI-BTN-HOVER`, `UI-BTN-CLICK`; связь — `UI-NET-LOST` / `UI-NET-BACK`.
+- **Дельта VS-5 E4** (`evidence/VISUAL/HB-49` § VS-5 E4, по делегированию): начало партии (первая подписка потока) — CONN `syncing`, не `lost`; «готов» в лобби не запоминается (ВР-VS5-34). Slate-строка «RECONNECTING …» в виде по умолчанию не рисуется — связь показывает CONN.
 
 ### 2.2 PANEL-LOC — `UI-HUD-PANEL-LOC`
 
@@ -578,6 +579,7 @@ y920┌PANEL-LOC┐       ▭▭▭▭▭▭▭ РУКА ▭▭▭▭▭▭▭  
   `WBP_UI_HUD_BANNER`, `panel.bg` (ВР-61), 36 su.
 - **Строки:** `hud.banner.own_turn`.
 - **Звук:** `UI-TURN-CHIME` (один на старт хода, вместе с кольцом).
+- **Дельта VS-5 E4** (`evidence/VISUAL/HB-49` § VS-5 E4, по делегированию): баннер уходит на 8 su под открытый компакт / модаль PENDING так же, как под центр боя (ВР-VS5-43).
 
 ### 2.5 STATUS — `UI-HUD-STATUS` (строка «что делать сейчас» и глагол соперника)
 
@@ -699,6 +701,7 @@ y920┌PANEL-LOC┐       ▭▭▭▭▭▭▭ РУКА ▭▭▭▭▭▭▭  
   `.no.defense`, `.nodefense` («Нет защиты» под штампом, §3.8; VS-4), `.timer` («{n} с»), `.score` («{a} : {d}»), `.wins` («{fighter} побеждает»), `.holds`, `.effects.more`.
 - **Звук:** `CMB-ATTACK-DECLARE`, `CMB-DEFENSE-PLAYED`, `CMB-NO-DEFENSE`, `CRD-FLIP`, `CMB-EFFECT-LINE`, `CMB-SLAM`,
   удары `CMB-HIT-*`.
+- **Дельта VS-5 E4** (`evidence/VISUAL/HB-49` § VS-5 E4, по делегированию): окно разрешения (COMBAT_RESOLVE) — одна кнопка Primary «Завершить бой» (`hud.combat.resolve`, R / Enter) на месте «Защититься» своего края у любого участника; при ожидающем выборе — отказ `why.wait.opponent.choice` (ВР-VS5-33). Новый бой, открытый во время постановки прошлого, сразу берёт края (окно защиты и таймер UMG), постановка доигрывает на доске; трасса `HUD-COMBAT stage-yield` (ВР-VS5-35). Slate-кнопки черновика атаки и окна разрешения — только `-S09Markers` / `-S08SlateHud`.
 
 ### 2.8 PENDING и SLOT — `UI-HUD-PENDING`, `UI-HUD-SLOT`
 
@@ -756,6 +759,7 @@ y920┌PANEL-LOC┐       ▭▭▭▭▭▭▭ РУКА ▭▭▭▭▭▭▭  
 - **Дельта VS-4 V2** (HB-36, ВР-VS4-27): тост-триггер — член стопки `UUmToastStack`. Стопка ставит его цепочкой §2.12
   вместе с тостами, `UUmHudPending` рисует его в её прямоугольнике и ждёт скрытым, пока для него нет места.
 - **Звук:** `UI-PANEL-OPEN`, `UI-CONFIRM`, `CRD-SCHEME`, `UI-REJECT`.
+- **Дельта VS-5 E4** (`evidence/VISUAL/HB-49` § VS-5 E4, по делегированию): второй шаг MOVE / PLACE в STATUS — `ms.status.space` «Выберите клетку для {fighterName}» (ВР-VS5-36). Текстовая лицевая сторона в слоте: заголовок уменьшает тип (button → body → tag) до 3 строк внутри карты (ВР-VS5-40).
 
 ### 2.9 DECKS и панель колоды — `UI-HUD-DECKS`, `UI-HUD-DECKPANEL`
 
@@ -821,6 +825,7 @@ y920┌PANEL-LOC┐       ▭▭▭▭▭▭▭ РУКА ▭▭▭▭▭▭▭  
 - **Было:** три строки над рукой (`AddEventFeedLines`, `S08FlowGameModeOpponent.cpp`). **Сейчас** (VS-4 HB-39):
   `UUmHudLog` + `WBP_UI_HUD_LOG`; три строки Slate — откат `-S08SlateHud=log`.
 - **Строки:** `ms.log.*` (есть), `hud.log.title`, `hud.log.empty`, `hud.log.turn`.
+- **Дельта VS-5 E4** (`evidence/VISUAL/HB-49` § VS-5 E4, по делегированию): строка, которая не помещается, берёт короткую форму — только ходы, затем первый ход + «и ещё N»; «→» и клетка назначения видны всегда (ВР-VS5-37).
 
 ### 2.11 Подсказки клавиш (часть кнопок и строки статуса)
 
@@ -1012,6 +1017,7 @@ y920┌PANEL-LOC┐       ▭▭▭▭▭▭▭ РУКА ▭▭▭▭▭▭▭  
     (диск — `boards[].zoneIconSrgb` профиля доски, глиф — navy или card.glyph по контрасту), больше трёх — два и «+N»
     (N — не показанные, ВР-VS4-55); размер — L6 (HI-12), при L6 20…23 px (K1 на 720p) — экспорт 24 px, ниже 20 px
     значков нет (ВР-VS4-56); колонна не закрывает фигуры и теги (ВР-VS4-57); `UUmZoneBadges`, откат `-S08SlateHud=zone`.
+- **Дельта VS-5 E4** (`evidence/VISUAL/HB-49` § VS-5 E4, по делегированию): теги и плашка обходят нарисованные блоки UMG (жёсткие препятствия тегов, мягкие плашки; тосты не входят); плашка без «ЦЕЛЬ» — 268 × 110 su (ВР-VS5-38, -41).
 
 ## 3. Общие состояния
 
@@ -1134,6 +1140,7 @@ UUmHudRoot  (WBP_UmHudRoot, /Game/S08/UI/Root/)      — один на viewport,
 └─ UUmCursor               WBP_UmCursor
 Мировой слой (как сейчас, слой 0 канвы): US08ArtPlateWidget, US08ArtTagWidget, US08ArtDamageWidget, US08ArtIconWidget
 ```
+- **Дельта VS-5 E4** (`evidence/VISUAL/HB-49` § VS-5 E4, по делегированию): экран GAME лежит в `UInvalidationBox` (`GameCache`) внутри `Screens` — кэш отрисовки, prepass и сетки попаданий; откат `-S08HudNoCache`, трасса `HUD-ROOT … cache=1`; бюджет П8 — ΔGT p95 0,10–0,11 мс (ВР-VS5-30).
 
 ### 4.3 Классы, BindWidget, модели, трассы
 
