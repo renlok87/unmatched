@@ -354,6 +354,15 @@ def check_widget_trace(lines, known_ids, width=1920, height=1080, registry=None,
                 errors.append("строка %d: HUD-LAYOUT overlapField=%r" % (n, lay.get("overlapField")))
             if lay.get("class") not in ("L", "S"):
                 errors.append("строка %d: HUD-LAYOUT class=%s" % (n, lay.get("class")))
+            # VS-3 HB-28 (HB-26 D8, VS-2 open item 3): the deck panel covers no block shown with it (STATUS at two
+            # lines included); the class S overlap with OPP-HAND / FIELD is deckpanelTransient - measured, not gated
+            if "deckpanelBlocks" in lay:
+                try:
+                    if float(lay["deckpanelBlocks"]) > 0.0:
+                        errors.append("строка %d: HUD-LAYOUT deckpanelBlocks=%s (панель колоды закрывает блок)"
+                                      % (n, lay["deckpanelBlocks"]))
+                except ValueError:
+                    errors.append("строка %d: HUD-LAYOUT deckpanelBlocks=%r" % (n, lay["deckpanelBlocks"]))
             continue
         f = parse_shot_widget(line)
         if f is None:

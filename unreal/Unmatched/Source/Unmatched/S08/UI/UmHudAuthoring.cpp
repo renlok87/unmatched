@@ -6,6 +6,8 @@
 #include "UmCardWidget.h"
 #include "UmConnectionBadge.h"
 #include "UmHudBanner.h"
+#include "UmHudDeckPanel.h"
+#include "UmHudDecks.h"
 #include "UmHudHand.h"
 #include "UmHudOppHand.h"
 #include "UmHudPlayerPanel.h"
@@ -13,6 +15,7 @@
 #include "UmHudTop.h"
 #include "UmCursor.h"
 #include "UmPortrait.h"
+#include "UmSpinner.h"
 #include "../S08TurnPortraitWidget.h"
 #include "UmGameHud.h"
 #include "UmHudRoot.h"
@@ -71,6 +74,14 @@ FString UUmHudAuthoringLibrary::AuthorUmHudWidgetBlueprints(bool bOverwrite) {
   // VS-3 HB-24 / HB-25: the hand (its cards are pooled WBP_UmCard instances made at run time)
   One(UUmHudHand::WidgetBlueprintPath, UUmHudHand::StaticClass(),
       [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmHudHand::BuildDefaultTree(Tree, Attach, Error); });
+  // VS-3 HB-47: the spinner (screens and the HUD take it); HB-27 / HB-28: the chips (nest WBP_UmButton, WBP_UmCard) and
+  // the deck panel (WBP_UmButton; its rows and skeleton are made at run time)
+  One(UUmSpinner::WidgetBlueprintPath, UUmSpinner::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmSpinner::BuildDefaultTree(Tree, Attach, Error); });
+  One(UUmHudDecks::WidgetBlueprintPath, UUmHudDecks::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmHudDecks::BuildDefaultTree(Tree, Attach, Error); });
+  One(UUmHudDeckPanel::WidgetBlueprintPath, UUmHudDeckPanel::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmHudDeckPanel::BuildDefaultTree(Tree, Attach, Error); });
   Report->SetArrayField(TEXT("assets"), Assets);
   FString Out;
   const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&Out);

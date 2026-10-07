@@ -1219,6 +1219,18 @@ private:
   void HandleUmHandInspect(const FString& InstanceId);
   /** The pointer (viewport px) is over the UMG hand (its resting rows, raised): the SD-26 lowering waits. */
   bool UmHudCursorOverHand(float X, float Y) const;
+  // VS-3 HB-27 / HB-28 / HB-47: DECKS and the deck panel (S08/UI/UmHudDeckBlocks.h, UmHudDecks.h, UmHudDeckPanel.h; rollback
+  // -S08SlateHud=decks|deckpanel)
+  void BuildUmDecks();
+  /** Feeds the chips and the visible panel (the applied snapshot, the deck lists, the side, the filter). */
+  void RefreshUmDecks();
+  /** The UMG panel's opacity and skeleton each frame; false = the Slate panel draws (TickDeckPanel goes on). */
+  bool TickUmDeckPanel(float Alpha);
+  bool UmDeckPanelOnUmg() const;
+  /** D and the discard chip: the panel on «Ваша» with «Только сброс» (the Slate discard browser merged into it). */
+  void OpenUmDeckDiscard(const TCHAR* Why);
+  void HandleUmDeckRowInspect(const FString& CardId);
+  bool UmHudCursorOverDeckPanel(float X, float Y) const;
   // VS-2 exit frames (opt-in -S08ExitShots): own / opponent turn start + 0.5 s and + 3 s
   void NoteUmExitShotsTurn(bool bOwn, bool bInitial, bool bGameOver);
   /** ВР-VS2-77: the late SHOT lines of the VS-2 blocks first shown in the shot frame. */

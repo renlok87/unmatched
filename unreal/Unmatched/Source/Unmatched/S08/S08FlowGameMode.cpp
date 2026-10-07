@@ -3068,9 +3068,14 @@ void AS08FlowGameMode::HandleHudKeys() {
   } else if (PC->WasInputKeyJustPressed(EKeys::D)) {
     // GD-032: public discard browser toggle (read-only browsing - safe while
     // any draft is open; the panels box is separate from the command panel).
-    bDiscardBrowserOpen = !bDiscardBrowserOpen;
-    DiscardBrowserIndex = -1;
-    RefreshHud();
+    // VS-3 HB-28: the browser lives in the UMG deck panel - «Только сброс» (-S08SlateHud=deckpanel: the Slate one)
+    if (UmDeckPanelOnUmg()) {
+      OpenUmDeckDiscard(TEXT("key"));
+    } else {
+      bDiscardBrowserOpen = !bDiscardBrowserOpen;
+      DiscardBrowserIndex = -1;
+      RefreshHud();
+    }
   } else if (bDiscardBrowserOpen &&
              (PC->WasInputKeyJustPressed(EKeys::Left) ||
               PC->WasInputKeyJustPressed(EKeys::Right) ||
@@ -6161,7 +6166,8 @@ void AS08FlowGameMode::RefreshHud() {
   // so both are browsable; entries are FS09CardView straight from the model -
   // a face-down placeholder renders and inspects as faceless by construction
   // (selection is read-only: no draft, hand pick or server command changes). ----
-  PanelsBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
+  // VS-3 HB-27: the UMG chips of DECKS take these buttons; the Slate ones only with -S08SlateHud=decks
+  if (UmHudBlockOnSlate(TEXT("decks"))) PanelsBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
       [MakeHudPress(
            FName(TEXT("hud.discard.browse")),
            nullptr,
@@ -6179,7 +6185,7 @@ void AS08FlowGameMode::RefreshHud() {
                     bDiscardBrowserOpen ? TEXT("HIDE") : TEXT("BROWSE"))))
                 .Font(FCoreStyle::GetDefaultFontStyle("Bold", 12)))];
   // DE-030 (01 F-05; 02 §4.7): the deck side panel - the whole composition of my deck or the opponent's
-  {
+  if (UmHudBlockOnSlate(TEXT("decks"))) {
     auto DeckButton = [this](ES09DeckSide Side, const TCHAR* Id, const TCHAR* Label) -> TSharedRef<SWidget> {
       const bool bActive = DeckPanel.IsOpen() && DeckPanel.Side() == Side;
       const float G = bActive ? 0.32f : 0.20f;
@@ -6251,9 +6257,9 @@ void AS08FlowGameMode::RefreshHud() {
   // DE-026 (SD-26): while the hand is lowered for a board pick the hand-card preview is not drawn (it never covers
   // the field); the inspection itself stays and comes back with the hand
   if (bInspecting && !(bHandPreviewHidden && InspectedSource == 0)) {
-    static const TCHAR* SourceLabels[3] = {TEXT("hand"), TEXT("your discard"),
-                                           TEXT("opponent discard")};
-    const int32 Source = FMath::Clamp(InspectedSource, 0, 2);
+    static const TCHAR* SourceLabels[4] = {TEXT("hand"), TEXT("your discard"),
+                                           TEXT("opponent discard"), TEXT("deck")};  // VS-3 HB-28: 3 = a deck row
+    const int32 Source = FMath::Clamp(InspectedSource, 0, 3);
     TArray<FString> Lines;
     BuildInspectorLines(InspectedCard, Lines);
     TSharedRef<SVerticalBox> InspectorBox = SNew(SVerticalBox);

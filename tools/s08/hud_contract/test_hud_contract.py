@@ -70,6 +70,19 @@ class HudContractTests(unittest.TestCase):
         self.assertTrue(any("class=X" in e for e in errs))
         self.assertTrue(any("без поля field" in e for e in errs))
 
+    def test_layout_trace_deck_panel_gate(self):
+        # VS-3 HB-28: the deck panel never covers a block shown with it (STATUS two lines incl., VS-2 open item 3);
+        # the class S transient overlap is measured only
+        ids = hc.ui_ids_from_02(SPEC02)
+        good = ["HUD-LAYOUT class=S canvas=1138x640 scale=1.125 field=(223,153,690,361) overlapField=0 window=1280x720 "
+                "hand=268..898 handVisible=90 crossing=- deckpanel=(821.8,120,300,392) deckpanelBlocks=0 "
+                "deckpanelTransient=31500"]
+        self.assertEqual(hc.check_widget_trace(good, ids), ([], 0))
+        bad = ["HUD-LAYOUT class=S canvas=1138x640 scale=1.125 field=(223,153,690,361) overlapField=0 "
+               "deckpanel=(821.8,72,300,440) deckpanelBlocks=1490 deckpanelTransient=0"]
+        errs, _ = hc.check_widget_trace(bad, ids)
+        self.assertTrue(any("deckpanelBlocks=1490" in e for e in errs))
+
 
 if __name__ == "__main__":
     unittest.main()

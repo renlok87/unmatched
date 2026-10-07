@@ -46,6 +46,12 @@
 //     lowering; a card press is the old hand.<instance> action (HandleHandCardClick by the current position). The
 //     Slate hand panel keeps only its lines (the rule toast, the event feed, the callout) and sits over the UMG hand
 //     caption, transparent while empty (ВР-VS3-22).
+//   - VS-3 HB-27 / HB-47 / HB-28 (S08/UI/UmHudDecks.h, UmHudDeckPanel.h, UmSpinner.h): DECKS and the deck panel - built
+//     with the root (rollback -S08SlateHud=decks|deckpanel), fed by RefreshDeckPanel (RefreshUmDecks: the applied
+//     snapshot, the deck lists, the open side, the filter), faded by TickDeckPanel (TickUmDeckPanel: the view's opacity,
+//     the 300 ms skeleton). The chips open the panel (deck: «Ваша»; discard and D: «Только сброс» - the Slate discard
+//     browser merged into it); the panel's tabs switch the side, its rows open the inspector (the Slate one until H13,
+//     moved left of the panel while it is open, ВР-VS3-41).
 #include "S08FlowGameMode.h"
 
 #include "S08AnimatedIconWidget.h"
@@ -55,10 +61,13 @@
 #include "S08TraceLog.h"
 #include "S08TurnPortraitWidget.h"
 #include "UI/UmCardGallery.h"
+#include "UI/UmCardMedia.h"
 #include "UI/UmCursor.h"
+#include "UI/UmDecksGallery.h"
 #include "UI/UmGameHud.h"
 #include "UI/UmHandGallery.h"
 #include "UI/UmHudGallery.h"
+#include "UI/UmHudDeckBlocks.h"
 #include "UI/UmHudHand.h"
 #include "UI/UmHudLayout.h"
 #include "UI/UmHudPanels.h"
@@ -128,6 +137,9 @@ struct FUmHudRuntime {
   TWeakObjectPtr<UUmHudHand> Hand;
   FString HandHeroSlug;
   float SlateHandLiftSu = 0.0f;
+  // VS-3 HB-27 / HB-28: DECKS and the deck panel (UI/UmHudDeckBlocks.h), the side panel's shift left of the panel
+  FUmDeckBlocks DeckBlocks;
+  float SideShiftSu = 0.0f;
 };
 
 namespace {
@@ -192,6 +204,7 @@ void AS08FlowGameMode::BuildUmHud() {
   BuildUmTopStrip();  // VS-2 HB-14...HB-16: before the layout (the STATUS slot sizes to its block)
   BuildUmPanels();    // VS-2 HB-18...HB-21
   BuildUmHand();      // VS-3 HB-24 / HB-25
+  BuildUmDecks();     // VS-3 HB-27 / HB-28
   RefreshUmHudLayout();
 }
 
@@ -243,6 +256,7 @@ void AS08FlowGameMode::RefreshUmHudLayout() {
     if (R.FieldPx.bIsValid) FieldSu = FBox2D(R.FieldPx.Min / PxPerSu, R.FieldPx.Max / PxPerSu);
   }
   R.Layout = FUmHudLayout::Compute(Viewport / PxPerSu, PxPerSu, FieldSu.bIsValid ? &FieldSu : nullptr);
+  R.Layout.bEnglishChips = UmCardMedia::PreferredLang() == TEXT("en");  // VS-3 HB-27: the chip widths of the language
   R.bLayout = true;
   if (UmHudRoot) {
     if (UUmGameHud* Game = UmHudRoot->GetGameHud()) Game->ApplyLayout(R.Layout, R.Blocks.Blocks, R.Blocks.bAll);
@@ -259,6 +273,7 @@ void AS08FlowGameMode::RefreshUmHudLayout() {
                     OppHandRect.bIsValid ? static_cast<float>(OppHandRect.Max.X - OppHandRect.Min.X) : 0.0f);
   R.SlateHandLiftSu = R.Layout.HandVisibleSu + 22.0f + 8.0f;  // VS-3 HB-24 (ВР-VS3-22)
   if (UUmHudHand* Hand = R.Hand.Get()) Hand->SetFrame(FUmHandFrame::FromLayout(R.Layout, CombatSpeedMul()));
+  RefreshUmDecks();  // VS-3 HB-27 / HB-28: the chips and the panel take the new rects
   const FString Line = R.Layout.TraceLine(FIntPoint(FMath::RoundToInt(Viewport.X), FMath::RoundToInt(Viewport.Y)));
   if (Line != R.LastLayoutLine) {
     R.LastLayoutLine = Line;
@@ -313,6 +328,18 @@ FMargin AS08FlowGameMode::UmHudToastOffset() const {
 }
 
 void AS08FlowGameMode::UmHudDeckPanelLayering(float DeckAlpha) {
+  // VS-3 HB-28 (ВР-VS3-41): the Slate inspector (until H13) opens left of the UMG deck panel while that is drawn
+  if (UmHud.IsValid()) {
+    FUmHudRuntime& R = *UmHud;
+    const UUmHudDeckPanel* Panel = R.DeckBlocks.GetPanel();
+    const float Shift = Panel && DeckAlpha > 0.0f && bInspecting ? Panel->PanelRectSu().GetSize().X + 8.0f : 0.0f;
+    const TSharedPtr<SWidget> Side = ArtHud.SidePanel.Pin();
+    if (Side.IsValid() && !FMath::IsNearlyEqual(Shift, R.SideShiftSu, 0.5f)) {
+      R.SideShiftSu = Shift;
+      Side->SetRenderTransform(Shift > 0.0f ? TOptional<FSlateRenderTransform>(FSlateRenderTransform(FVector2f(-Shift, 0.0f)))
+                                            : TOptional<FSlateRenderTransform>());
+    }
+  }
   // ВР-VS2-71 / -72 (VS-2 exit frames): PANEL-OPP and OPP-HAND at the top right, the deck panel and the Slate side panel
   if (UmHud.IsValid() && UmHud->Panels.PanelsOnUmg()) {
     FUmHudRuntime& R = *UmHud;
@@ -327,9 +354,18 @@ void AS08FlowGameMode::UmHudDeckPanelLayering(float DeckAlpha) {
         R.bSideCollapsed = false;
       }
     }
-    const float Keep = 1.0f - (bSideOpen ? 1.0f : FMath::Clamp(DeckAlpha, 0.0f, 1.0f));
-    for (UWidget* W : {static_cast<UWidget*>(R.Panels.GetOpp()), static_cast<UWidget*>(R.Panels.GetOppHand())}) {
-      if (W && !FMath::IsNearlyEqual(W->GetRenderOpacity(), Keep, 1.0e-3f)) W->SetRenderOpacity(Keep);
+    // VS-3 HB-28 (ВР-VS3-42): the UMG deck panel covers no block in class L - PANEL-OPP and OPP-HAND stay; in class S
+    // it lies over OPP-HAND (04 §1.6 exception), which fades with it
+    const bool bUmDeck = R.DeckBlocks.PanelOnUmg();
+    const float Alpha = FMath::Clamp(DeckAlpha, 0.0f, 1.0f);
+    // the Slate side panel (inspector, browser) at the top right lies under them - unless it moved left of the deck panel
+    const float SideCover = bSideOpen && R.SideShiftSu <= 0.0f ? 1.0f : 0.0f;
+    const float KeepOpp = 1.0f - FMath::Max(SideCover, bUmDeck ? 0.0f : Alpha);
+    const float KeepHand = 1.0f - FMath::Max(SideCover, bUmDeck ? (R.Layout.bClassS ? Alpha : 0.0f) : Alpha);
+    UWidget* Fading[2] = {R.Panels.GetOpp(), R.Panels.GetOppHand()};
+    for (int32 I = 0; I < 2; ++I) {
+      const float Keep = I == 0 ? KeepOpp : KeepHand;
+      if (Fading[I] && !FMath::IsNearlyEqual(Fading[I]->GetRenderOpacity(), Keep, 1.0e-3f)) Fading[I]->SetRenderOpacity(Keep);
     }
   }
   // deckpanel: what lies under the open deck panel at the right edge fades out with it (the side counters already
@@ -541,6 +577,12 @@ void AS08FlowGameMode::WriteUmHudShotLines() {
     Hand->CollectShotLines(HandLines);
     for (const FString& L : HandLines) FS08Trace::Write(L);
   }
+  // VS-3 HB-27 / HB-28: UI-HUD-DECKS and UI-HUD-DECKPANEL (counts only)
+  {
+    TArray<FString> DeckLines;
+    R.DeckBlocks.CollectShotLines(DeckLines);
+    for (const FString& L : DeckLines) FS08Trace::Write(L);
+  }
   TArray<FString> PanelLines;  // VS-2 HB-18...HB-21: UI-HUD-PANEL-LOC, UI-HUD-PANEL-OPP, UI-HUD-OPP-HAND
   R.Panels.CollectShotLines(PanelLines, [this](UWidget* W) {
     FS08ScreenRect Rect;
@@ -685,14 +727,16 @@ void AS08FlowGameMode::UmGalleryBegin(int32 SizePx) {
   const bool bCards = FParse::Param(Cmd, TEXT("S08IconGalleryCards")) || FParse::Value(Cmd, TEXT("S08IconGalleryCards="), CardsPage);
   FString HandBoard;  // VS-3 HB-24 / HB-25 (UI/UmHandGallery.h): -S08IconGalleryHand=marmoreal|sarpedon
   const bool bHand = FParse::Value(Cmd, TEXT("S08IconGalleryHand="), HandBoard);
-  if (!bSkins && !bButtons && !bTopStrip && !bPanels && !bCards && !bHand) return;
+  FString DecksBoard;  // VS-3 HB-27 / HB-28 / HB-47 (UI/UmDecksGallery.h): -S08IconGalleryDecks=marmoreal|sarpedon
+  const bool bDecks = FParse::Value(Cmd, TEXT("S08IconGalleryDecks="), DecksBoard);
+  if (!bSkins && !bButtons && !bTopStrip && !bPanels && !bCards && !bHand && !bDecks) return;
   if (IconGallery) IconGallery->SetVisibility(ESlateVisibility::Collapsed);  // the sheet takes the screen
   // the canvas of the sheet: the applied HUD scale (BeginPlay may run before the first window apply - the sheet is
   // built again on every OnUiScaleChanged, which also covers a window or UI-scale change)
   const int32 PageIndex = FMath::Max(0, Page - 1);
   TWeakObjectPtr<AS08FlowGameMode> WeakThis(this);
   auto Build = [WeakThis, bSkins, bTopStrip, bPanels, PanelsPage, PageIndex, Variant, SizePx, bCards, CardsPage, bHand,
-                HandBoard]() {
+                HandBoard, bDecks, DecksBoard]() {
     AS08FlowGameMode* Self = WeakThis.Get();
     if (!Self || !Self->GetWorld()) return;
     FVector2D Viewport(1920.0, 1080.0);
@@ -700,6 +744,14 @@ void AS08FlowGameMode::UmGalleryBegin(int32 SizePx) {
     const FUmHudScaleState& Scale = UmHudScale::Current();
     const float PxPerSu = Scale.Window.X > 0 ? Scale.PxPerSu() : 1.0f;
     if (Self->UmGallery) Self->UmGallery->RemoveFromParent();
+    if (bDecks) {
+      UUmDecksGalleryWidget* Sheet = CreateWidget<UUmDecksGalleryWidget>(Self->GetWorld(), UUmDecksGalleryWidget::StaticClass());
+      if (!Sheet) return;
+      for (const FString& Line : Sheet->Build(DecksBoard, Viewport / PxPerSu, PxPerSu)) FS08Trace::Write(Line);
+      Sheet->AddToViewport(1001);
+      Self->UmGallery = Sheet;
+      return;
+    }
     if (bHand) {
       UUmHandGalleryWidget* Sheet = CreateWidget<UUmHandGalleryWidget>(Self->GetWorld(), UUmHandGalleryWidget::StaticClass());
       if (!Sheet) return;
@@ -759,6 +811,10 @@ void AS08FlowGameMode::UmGalleryAt(float TMs) {
   // VS-3 HB-24 / HB-25: the hand sheet - one state per second of the gallery clock
   if (UUmHandGalleryWidget* HandSheet = Cast<UUmHandGalleryWidget>(UmGallery)) {
     for (const FString& Line : HandSheet->SetClockMs(TMs)) FS08Trace::Write(Line);
+  }
+  // VS-3 HB-27 / HB-28 / HB-47: the deck sheet - one state per second of the gallery clock
+  if (UUmDecksGalleryWidget* DecksSheet = Cast<UUmDecksGalleryWidget>(UmGallery)) {
+    for (const FString& Line : DecksSheet->SetClockMs(TMs)) FS08Trace::Write(Line);
   }
 }
 
@@ -881,4 +937,159 @@ bool AS08FlowGameMode::UmHudCursorOverHand(float X, float Y) const {
   const float Px = UmHud->Layout.PxPerSu > 0.0f ? UmHud->Layout.PxPerSu : 1.0f;
   const float Top = (Row.CardTopSu - UmHudHand::CaptionSu) * Px;
   return X >= Row.LeftSu * Px && X <= Row.RightSu * Px && Y >= Top;
+}
+
+// ------------------------------------------------------------------------------------------------ VS-3 HB-27 / HB-28
+
+namespace {
+/** The hero slug of a player's hero fighter (the back of his deck, the scan key of his cards); '' when unknown. */
+FString UmDeckHeroSlug(const TArray<FS08BoardFighter>& InFighters, const FString& PlayerId) {
+  FString Slug;
+  for (const FS08BoardFighter& F : InFighters) {
+    if (F.OwnerId != PlayerId || F.HeroSlug.IsEmpty()) continue;
+    Slug = F.HeroSlug;
+    if (F.bIsHero) break;
+  }
+  return Slug;
+}
+}  // namespace
+
+void AS08FlowGameMode::BuildUmDecks() {
+  UUmGameHud* Game = UmHudRoot ? UmHudRoot->GetGameHud() : nullptr;
+  if (!UmHud.IsValid() || !Game) return;
+  TWeakObjectPtr<AS08FlowGameMode> WeakThis(this);
+  // every press answers in the frame of its release (UI-INP-011), then the game mode acts
+  auto Answer = [WeakThis](const FS09HudPressOutcome& Outcome, TFunction<void(AS08FlowGameMode&)> Act) {
+    if (AS08FlowGameMode* Self = WeakThis.Get()) {
+      Self->HandleHudPressOutcome(Outcome, TFunction<FS09Reason()>(), [WeakThis, Act]() {
+        if (AS08FlowGameMode* S = WeakThis.Get()) Act(*S);
+      });
+    }
+  };
+  FUmDeckBlocks::FCallbacks C;
+  // HB-27 p. 3: the deck chip - the panel on «Ваша»; the discard chip - the same with «Только сброс»
+  C.OnChip = [Answer](const FS09HudPressOutcome& O, bool bDiscard) {
+    Answer(O, [bDiscard](AS08FlowGameMode& S) {
+      if (bDiscard) {
+        S.OpenUmDeckDiscard(TEXT("chip"));
+      } else {
+        S.ToggleDeckPanel(ES09DeckSide::Own, TEXT("chip"));
+      }
+    });
+  };
+  // a tab switches the side; the selected tab stays (ToggleDeckPanel would close it)
+  C.Panel.OnTab = [Answer](const FS09HudPressOutcome& O, ES09DeckSide Side) {
+    Answer(O, [Side](AS08FlowGameMode& S) {
+      if (!S.DeckPanel.IsOpen() || S.DeckPanel.Side() != Side) S.ToggleDeckPanel(Side, TEXT("tab"));
+    });
+  };
+  C.Panel.OnClose = [Answer](const FS09HudPressOutcome& O) { Answer(O, [](AS08FlowGameMode& S) { S.CloseDeckPanel(TEXT("button")); }); };
+  C.Panel.OnFilter = [Answer](const FS09HudPressOutcome& O) {
+    Answer(O, [](AS08FlowGameMode& S) {
+      S.UmHud->DeckBlocks.SetFilter(!S.UmHud->DeckBlocks.GetFilter());
+      FS08Trace::Write(FString::Printf(TEXT("DECK panel filter discard=%d why=button"), S.UmHud->DeckBlocks.GetFilter() ? 1 : 0));
+      S.RefreshUmDecks();
+    });
+  };
+  C.Panel.OnRow = [Answer](const FS09HudPressOutcome& O, const FString& CardId) {
+    Answer(O, [CardId](AS08FlowGameMode& S) { S.HandleUmDeckRowInspect(CardId); });
+  };
+  C.Panel.OnRetry = [Answer](const FS09HudPressOutcome& O) {
+    Answer(O, [](AS08FlowGameMode& S) {
+      if (S.Flow.IsValid()) S.Flow->EnsureDeckLists(/*bRetryFailed=*/true);
+      S.RefreshHud();
+    });
+  };
+  ArtHud.PendingTrace.Append(UmHud->DeckBlocks.Build(*Game, UmHud->Blocks, HudPress, MoveTemp(C)));
+}
+
+bool AS08FlowGameMode::UmDeckPanelOnUmg() const { return UmHud.IsValid() && UmHud->DeckBlocks.PanelOnUmg(); }
+
+void AS08FlowGameMode::RefreshUmDecks() {
+  if (!UmHud.IsValid() || !UmHud->bLayout) return;
+  FUmHudRuntime& R = *UmHud;
+  FUmDeckBlocksInput In;
+  In.Layout = &R.Layout;
+  const bool bAborted = Flow.IsValid() && Flow->GetStage() == ES08Stage::Started && Flow->IsRoomAborted();
+  In.bLive = Hud.bValid && !Hud.bGameOver && !bAborted && !IsResultScreenShown();
+  In.bRu = UmCardMedia::PreferredLang() != TEXT("en");
+  In.Own = Hud.ViewerPanel();
+  In.Opp = Hud.OpponentPanel();
+  if (In.Own) {
+    In.OwnHero = PlayerHeroName(In.Own->PlayerId);
+    In.OwnSlug = UmDeckHeroSlug(Fighters, In.Own->PlayerId);
+  }
+  if (In.Opp) {
+    In.OppHero = PlayerHeroName(In.Opp->PlayerId);
+    In.OppSlug = UmDeckHeroSlug(Fighters, In.Opp->PlayerId);
+  }
+  In.Lists = &DeckLists;
+  const FS08FlowController::EDeckListsState State =
+      Flow.IsValid() ? Flow->GetDeckListsState() : FS08FlowController::EDeckListsState::None;
+  In.ListState = bBenchDeckPanel || State == FS08FlowController::EDeckListsState::Loaded ? EUmDeckListState::Loaded
+                 : State == FS08FlowController::EDeckListsState::Failed                ? EUmDeckListState::Failed
+                                                                                       : EUmDeckListState::Loading;
+  In.bPanelOpen = DeckPanel.IsOpen();
+  In.bPanelVisible = DeckPanel.IsVisible(NowMs());
+  In.Side = DeckPanel.Side();
+  In.Hand = R.Hand.Get();
+  const FString ModelLine = R.DeckBlocks.Refresh(In);
+  if (!ModelLine.IsEmpty() && ModelLine != DeckModelTraced) {
+    FS08Trace::Write(ModelLine);
+    DeckModelTraced = ModelLine;
+  }
+}
+
+bool AS08FlowGameMode::TickUmDeckPanel(float Alpha) {
+  if (!UmDeckPanelOnUmg()) return false;
+  // the Slate panel stays collapsed: the UMG panel draws
+  if (DeckPanelBorder.IsValid() && DeckPanelBorder->GetVisibility() != EVisibility::Collapsed) {
+    DeckPanelBorder->SetVisibility(EVisibility::Collapsed);
+  }
+  const FString Loader = UmHud->DeckBlocks.TickPanel(Alpha, DeckPanel.IsOpen(), static_cast<double>(NowMs()),
+                                                     S08IconMotion::IsReducedMotion(), [this]() { RefreshUmDecks(); });
+  if (!Loader.IsEmpty()) FS08Trace::Write(Loader);
+  return true;
+}
+
+void AS08FlowGameMode::OpenUmDeckDiscard(const TCHAR* Why) {
+  if (!UmDeckPanelOnUmg()) return;
+  FUmDeckBlocks& B = UmHud->DeckBlocks;
+  // D / the discard chip: «Ваша» with «Только сброс»; again on that view - closed
+  if (DeckPanel.IsOpen() && DeckPanel.Side() == ES09DeckSide::Own && B.GetFilter()) {
+    CloseDeckPanel(Why);
+    return;
+  }
+  if (DeckPanel.IsOpen()) {
+    if (DeckPanel.Side() != ES09DeckSide::Own) ToggleDeckPanel(ES09DeckSide::Own, Why);
+    B.SetFilter(true);
+  } else {
+    B.RequestFilterOnOpen();
+    ToggleDeckPanel(ES09DeckSide::Own, Why);
+  }
+  FS08Trace::Write(FString::Printf(TEXT("DECK panel filter discard=1 why=%s"), Why));
+  RefreshUmDecks();
+}
+
+void AS08FlowGameMode::HandleUmDeckRowInspect(const FString& CardId) {
+  // 04 §2.9: a row opens the inspector on the catalog card (the Slate inspector until H13, left of the panel)
+  const ES09DeckSide Side = DeckPanel.Side();
+  const FS09PlayerPanel* Data = Side == ES09DeckSide::Own ? Hud.ViewerPanel() : Hud.OpponentPanel();
+  const FS09DeckList* List = Data ? S09DeckPanel::FindList(DeckLists, Data->PlayerId) : nullptr;
+  if (!List) return;
+  const FS09DeckPanelModel Model = FS09DeckPanelModel::Build(Side, *Data, List);
+  const FS09DeckRow* Row = Model.Rows.FindByPredicate([&CardId](const FS09DeckRow& X) { return X.Card.CardId == CardId; });
+  if (!Row) return;
+  InspectCard(Row->AsCardView());
+  InspectedHandIndex = -1;
+  DiscardBrowserIndex = -1;
+  InspectedSource = 3;  // the deck panel
+  FS08Trace::Write(FString::Printf(TEXT("DECK panel row inspect side=%s"), S09DeckPanel::SideName(Side)));
+  RefreshHud();
+}
+
+bool AS08FlowGameMode::UmHudCursorOverDeckPanel(float X, float Y) const {
+  const UUmHudDeckPanel* Panel = UmHud.IsValid() && UmHud->bLayout ? UmHud->DeckBlocks.GetPanel() : nullptr;
+  const float Px = Panel && UmHud->Layout.PxPerSu > 0.0f ? UmHud->Layout.PxPerSu : 1.0f;
+  return Panel && Panel->ContainsSu(FVector2D(X / Px, Y / Px));
 }

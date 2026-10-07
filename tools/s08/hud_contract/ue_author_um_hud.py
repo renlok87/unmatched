@@ -23,6 +23,12 @@ their C++ bases (UUmHudAuthoringLibrary -> BuildDefaultTree of each class), in t
   /Game/S08/UI/Hud/WBP_UI_HUD_HAND     parent UmHudHand     parts Row, CountPlate, CountBox, CountText, WhyPlate, WhyBox,
                                       WhyText, BoostRibbon, RibbonRow, RibbonIcon, RibbonText (VS-3 HB-24; the cards are
                                       pooled WBP_UmCard instances made at run time)
+  /Game/S08/UI/Common/WBP_UmSpinner    parent UmSpinner     parts Box, Icon (VS-3 HB-47)
+  /Game/S08/UI/Hud/WBP_UI_HUD_DECKS    parent UmHudDecks    parts Row, DeckChip, DiscardChip (WBP_UmButton), DeckMini,
+                                      DiscardMini (WBP_UmCard), DeckCount, DiscardCount, DiscardIcon (VS-3 HB-27)
+  /Game/S08/UI/Hud/WBP_UI_HUD_DECKPANEL  parent UmHudDeckPanel  parts Root, Panel, Body, Title, Tabs, TabOwn, TabOpp,
+                                      CloseButton, Summary, Backs, FilterButton, Rows, Skeleton (VS-3 HB-28; the rows are
+                                      pooled UUmDeckRow made at run time)
 
 A widget tree is not reachable from Python, so the C++ library builds it (the same function the class uses without a
 WBP) and this script re-loads every asset, checks the parent class, writes the report (env UM_HUD_WBP_REPORT, default
@@ -56,6 +62,9 @@ ASSETS = {
     "/Game/S08/UI/Hud/WBP_UI_HUD_OPP_HAND": "UmHudOppHand",
     "/Game/S08/UI/Common/WBP_UmCard": "UmCardWidget",
     "/Game/S08/UI/Hud/WBP_UI_HUD_HAND": "UmHudHand",
+    "/Game/S08/UI/Common/WBP_UmSpinner": "UmSpinner",
+    "/Game/S08/UI/Hud/WBP_UI_HUD_DECKS": "UmHudDecks",
+    "/Game/S08/UI/Hud/WBP_UI_HUD_DECKPANEL": "UmHudDeckPanel",
 }
 
 

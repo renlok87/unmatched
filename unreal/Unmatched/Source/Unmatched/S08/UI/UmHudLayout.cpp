@@ -55,6 +55,17 @@ FName FlagKey(EUmHudBlock Block) {
   }
 }
 
+FBox2D DeckChipRect(const FBox2D& Decks, bool bClassS, bool bEnglish, int32 Index) {
+  if (!Decks.bIsValid) return FBox2D(ForceInit);
+  // HB-26 delta 04 (ВР-VS2-HB26-09): L RU 156 / 124, EN 144 / 136 su; S 64 / 64 su; the gap 8 su
+  const float W0 = bClassS ? 64.0f : (bEnglish ? 144.0f : 156.0f);
+  const float W1 = bClassS ? 64.0f : (bEnglish ? 136.0f : 124.0f);
+  const float H = bClassS ? 48.0f : 56.0f;
+  const float X = static_cast<float>(Decks.Min.X) + (Index == 0 ? 0.0f : W0 + GapSu);
+  const float Y = static_cast<float>(Decks.Min.Y);
+  return FBox2D(FVector2D(X, Y), FVector2D(X + (Index == 0 ? W0 : W1), Y + H));
+}
+
 bool IsPersistent(EUmHudBlock Block) {
   switch (Block) {
     case EUmHudBlock::Center:
@@ -127,8 +138,11 @@ FUmHudLayout FUmHudLayout::Compute(const FVector2D& InCanvasSu, float InPxPerSu,
     Set(EUmHudBlock::Decks, Decks);
     const float LogH = L.bTall ? 200.0f : 104.0f;
     Set(EUmHudBlock::Log, UmLayoutBox(M, PanelLoc.Min.Y - GapSu - LogH, 300.0f, LogH));
-    const float DeckW = L.bTall ? 380.0f : 340.0f;
-    Set(EUmHudBlock::DeckPanel, UmLayoutBox(W - M - DeckW, 248.0f, DeckW, Decks.Min.Y - GapSu - 248.0f));
+    // VS-3 HB-28 (HB-26 delta 04, ВР-VS2-HB26-05 / -08): the top under OPP-HAND (max(248, its bottom + 8) = 268) - the
+    // panel covers no block shown with it; 720p 336 su wide (340 touched the margins of the Sarpedon cells S15 / S27)
+    const float DeckW = L.bTall ? 380.0f : 336.0f;
+    const float DeckTop = FMath::Max(248.0f, static_cast<float>(L.Rect(EUmHudBlock::OppHand).Max.Y) + GapSu);
+    Set(EUmHudBlock::DeckPanel, UmLayoutBox(W - M - DeckW, DeckTop, DeckW, Decks.Min.Y - GapSu - DeckTop));
     L.HandLeftSu = PanelLoc.Max.X + HandGapLeftSu;
     L.HandRightSu = Actions.Min.X - HandGapRight;
   } else {
@@ -155,7 +169,10 @@ FUmHudLayout FUmHudLayout::Compute(const FVector2D& InCanvasSu, float InPxPerSu,
     const FBox2D Decks = UmLayoutBox(W - M - 136.0f, Actions.Min.Y - GapSu - 48.0f, 136.0f, 48.0f);
     Set(EUmHudBlock::Decks, Decks);
     // no LOG column in S: a pop-up list from TOP (ВР-H07)
-    Set(EUmHudBlock::DeckPanel, UmLayoutBox(W - M - 300.0f, 168.0f, 300.0f, Decks.Min.Y - GapSu - 168.0f));
+    // VS-3 HB-28 (HB-26 delta 04, ВР-VS2-HB26-05 / -13): the read-only panel from PANEL-OPP's bottom + 8 (120 su) - over
+    // OPP-HAND and the field edge while it is open (04 §1.6 exception), never over STATUS (VS-2 open item 3)
+    const float DeckTop = static_cast<float>(L.Rect(EUmHudBlock::PanelOpp).Max.Y) + GapSu;
+    Set(EUmHudBlock::DeckPanel, UmLayoutBox(W - M - 300.0f, DeckTop, 300.0f, Decks.Min.Y - GapSu - DeckTop));
     L.HandLeftSu = PanelLoc.Max.X + HandGapLeftSu;
     L.HandRightSu = Actions.Min.X - HandGapRight;
   }
@@ -183,6 +200,24 @@ FUmHudLayout FUmHudLayout::Compute(const FVector2D& InCanvasSu, float InPxPerSu,
     Set(EUmHudBlock::Toast, L.StackRect(EUmHudBlock::Toast, ToastW, ToastDefaultHSu, SubMaxWSu, SubDefaultHSu, None, bTop));
     Set(EUmHudBlock::Sub, L.StackRect(EUmHudBlock::Sub, ToastW, ToastDefaultHSu, SubMaxWSu, SubDefaultHSu, None, bTop));
   }
+  // VS-3 HB-28: the deck panel x the blocks shown with it (gate) and the class S transient overlaps (measured)
+  {
+    const FBox2D& Panel = L.Rect(EUmHudBlock::DeckPanel);
+    const double Px2 = L.PxPerSu * L.PxPerSu;
+    FBox2D Status = L.Rect(EUmHudBlock::Status);
+    if (Status.bIsValid) Status.Max.Y = FMath::Max(Status.Max.Y, Status.Min.Y + StatusTwoLineSu);
+    TArray<FBox2D> Shown = {L.Rect(EUmHudBlock::Top),      Status,
+                            L.Rect(EUmHudBlock::Banner),   L.Rect(EUmHudBlock::PanelLoc),
+                            L.Rect(EUmHudBlock::PanelOpp), L.Rect(EUmHudBlock::Log),
+                            L.Rect(EUmHudBlock::Decks),    L.Rect(EUmHudBlock::Actions)};
+    if (!L.bClassS) Shown.Add(L.Rect(EUmHudBlock::OppHand));
+    for (const FBox2D& B : Shown) L.DeckPanelBlocksPx2 += UmLayoutOverlap(Panel, B) * Px2;
+    if (L.bClassS) {
+      for (const FBox2D& B : {L.Rect(EUmHudBlock::OppHand), L.Rect(EUmHudBlock::Center), L.FieldSu}) {
+        L.DeckPanelTransientPx2 += UmLayoutOverlap(Panel, B) * Px2;
+      }
+    }
+  }
   // the gate: persistent blocks x FIELD (px^2)
   if (L.bHasField) {
     for (int32 I = 0; I < UmHudBlockCount; ++I) {
@@ -195,16 +230,14 @@ FUmHudLayout FUmHudLayout::Compute(const FVector2D& InCanvasSu, float InPxPerSu,
 }
 
 FVector2D FUmHudLayout::DeckChipCentreSu() const {
-  const FBox2D& D = Rect(EUmHudBlock::Decks);
-  if (!D.bIsValid) return FVector2D::ZeroVector;
-  // two chips side by side: the deck chip is the left half
-  return FVector2D(D.Min.X + 0.25 * (D.Max.X - D.Min.X), 0.5 * (D.Min.Y + D.Max.Y));
+  // VS-3 HB-27: the centre of the deck chip (the left one)
+  const FBox2D Chip = UmHudLayout::DeckChipRect(Rect(EUmHudBlock::Decks), bClassS, bEnglishChips, 0);
+  return Chip.bIsValid ? Chip.GetCenter() : FVector2D::ZeroVector;
 }
 
 FVector2D FUmHudLayout::DiscardChipCentreSu() const {
-  const FBox2D& D = Rect(EUmHudBlock::Decks);
-  if (!D.bIsValid) return FVector2D::ZeroVector;
-  return FVector2D(D.Min.X + 0.75 * (D.Max.X - D.Min.X), 0.5 * (D.Min.Y + D.Max.Y));
+  const FBox2D Chip = UmHudLayout::DeckChipRect(Rect(EUmHudBlock::Decks), bClassS, bEnglishChips, 1);
+  return Chip.bIsValid ? Chip.GetCenter() : FVector2D::ZeroVector;
 }
 
 FBox2D FUmHudLayout::StackRect(EUmHudBlock Which, float ToastWidthSu, float ToastHeightSu, float SubWidthSu,
@@ -255,11 +288,17 @@ FString FUmHudLayout::TraceLine(const FIntPoint& WindowPx) const {
       }
     }
   }
+  // VS-3 HB-28: the deck panel rect, its gate against the blocks shown with it, the class S transient overlap
+  const FBox2D& Deck = Rects[static_cast<int32>(EUmHudBlock::DeckPanel)];
+  const FString DeckField = Deck.bIsValid ? FString::Printf(TEXT("(%.1f,%.0f,%.0f,%.0f)"), Deck.Min.X, Deck.Min.Y,
+                                                            Deck.Max.X - Deck.Min.X, Deck.Max.Y - Deck.Min.Y)
+                                          : FString(TEXT("none"));
   return FString::Printf(
       TEXT("HUD-LAYOUT class=%s canvas=%.0fx%.0f scale=%.3f field=%s overlapField=%.0f window=%dx%d hand=%.0f..%.0f "
-           "handVisible=%.0f crossing=%s"),
+           "handVisible=%.0f crossing=%s deckpanel=%s deckpanelBlocks=%.0f deckpanelTransient=%.0f"),
       bClassS ? TEXT("S") : TEXT("L"), CanvasSu.X, CanvasSu.Y, PxPerSu, *Field, OverlapFieldPx2, WindowPx.X, WindowPx.Y,
-      HandLeftSu, HandRightSu, HandVisibleSu, Crossing.Num() ? *FString::Join(Crossing, TEXT(",")) : TEXT("-"));
+      HandLeftSu, HandRightSu, HandVisibleSu, Crossing.Num() ? *FString::Join(Crossing, TEXT(",")) : TEXT("-"), *DeckField,
+      DeckPanelBlocksPx2, DeckPanelTransientPx2);
 }
 
 namespace UmHudField {
