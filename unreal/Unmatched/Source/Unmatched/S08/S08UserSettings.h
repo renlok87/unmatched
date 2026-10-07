@@ -164,4 +164,29 @@ public:
   static bool ResolveRuleHints(bool bSaved, const TCHAR* CommandLine);
   /** The saved value with the flag of this process applied. */
   static bool RuleHintsNow();
+
+  /** VS-4 HB-43, UI-ACC-017 (04 §2.11, ВР-H09, ВР-HB07): the key chips of the HUD buttons and the status line -
+   *  auto (the first match of the profile only: CompletedMatches = 0) | on | off; auto by default. The PAUSE screen
+   *  (SC-24) only shows the switch; console: s08.Settings keyHints=auto|on|off. */
+  UPROPERTY(config)
+  FString KeyHintsMode = TEXT("auto");
+
+  /** VS-4 HB-43 (ВР-HB07): the matches of this profile that reached GAME_OVER (NoteMatchCompleted); «Авто» shows the
+   *  chips while it is 0. */
+  UPROPERTY(config)
+  int32 CompletedMatches = 0;
+
+  /** auto | on | off of a value (any case; an unknown value reads as auto). */
+  static FString NormalizeKeyHintsMode(const FString& Mode);
+  /** World-free rule: on -> shown, off -> hidden, auto -> shown while no match was completed. */
+  static bool KeyHintsShown(const FString& Mode, int32 InCompletedMatches);
+  /** UI-ACC-017 of this run: -S08KeyHints=auto|on|off wins over the saved mode; another value keeps it. */
+  static FString ResolveKeyHintsMode(const FString& Saved, const TCHAR* CommandLine);
+  /** The mode of this run (saved value + flag) and whether the chips show now. */
+  static FString KeyHintsModeNow();
+  static bool KeyHintsNow();
+  /** GAME_OVER of a match: CompletedMatches + 1, saved (no OnChanged broadcast: nothing else re-reads it). */
+  static void NoteMatchCompleted();
+  /** "keyHints=<mode> completedMatches=<n>" - kept out of Describe, whose exact text other tests pin. */
+  FString DescribeKeyHints() const;
 };

@@ -6,6 +6,7 @@
 #include "UmCardWidget.h"
 #include "UmConnectionBadge.h"
 #include "UmConfirmDialog.h"
+#include "UmHudActions.h"
 #include "UmHudBanner.h"
 #include "UmHudCombatCenter.h"
 #include "UmHudCombatEdge.h"
@@ -115,6 +116,9 @@ FString UUmHudAuthoringLibrary::AuthorUmHudWidgetBlueprints(bool bOverwrite) {
       [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmToastStack::BuildDefaultTree(Tree, Attach, Error); });
   One(UUmHudSubtitle::WidgetBlueprintPath, UUmHudSubtitle::StaticClass(),
       [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmHudSubtitle::BuildDefaultTree(Tree, Attach, Error); });
+  // VS-4 HB-43: ACTIONS (nests WBP_UmButton four times; the tooltip plate is part of its tree)
+  One(UUmHudActions::WidgetBlueprintPath, UUmHudActions::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmHudActions::BuildDefaultTree(Tree, Attach, Error); });
   Report->SetArrayField(TEXT("assets"), Assets);
   FString Out;
   const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&Out);

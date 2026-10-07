@@ -73,15 +73,23 @@
 //     ApplyHandLimitHintVisibility (UmHudSyncHandLimit: the sticky rule toast), OfferVoLine / the VO stop
 //     (UmHudShowSubtitle / UmHudHideSubtitle), CursorOverHud (UmHudCursorOverFeed); RefreshUmPending draws the trigger
 //     toast at the stack's rect (ВР-VS4-27).
+//   - VS-4 HB-43 (S08/UI/UmHudActions.h): ACTIONS - built with the root (rollback -S08SlateHud=actions: the Slate BEGIN
+//     MANEUVER / END TURN buttons; under -S09Markers the Slate buttons stay for the gates too), framed with the layout,
+//     fed by RefreshUmActions (RefreshHud and a per-frame key: the seq, the turn, the actions, the mode, a command in
+//     flight, the combat window); a cell press is the key's command (PressUmActionKey); UI-ACC-017 key hints
+//     (US08UserSettings::KeyHintsNow) also turn on the STATUS chips; the flag step 'hudendturn' presses the UMG cell.
 #include "S08FlowGameMode.h"
 
 #include "S08AnimatedIconWidget.h"
 #include "S08ArtHudStyle.h"
 #include "S08ArtLook.h"
 #include "S08BoardActor.h"
+#include "S08Contracts.h"
 #include "S08Team.h"
 #include "S08TraceLog.h"
 #include "S08TurnPortraitWidget.h"
+#include "S08UserSettings.h"
+#include "UI/UmActionsGallery.h"
 #include "UI/UmCardGallery.h"
 #include "UI/UmCardMedia.h"
 #include "UI/UmCombatGallery.h"
@@ -90,6 +98,7 @@
 #include "UI/UmFeedGallery.h"
 #include "UI/UmGameHud.h"
 #include "UI/UmHandGallery.h"
+#include "UI/UmHudActions.h"
 #include "UI/UmPendingGallery.h"
 #include "UI/UmHudGallery.h"
 #include "UI/UmHudBanner.h"
@@ -120,6 +129,8 @@
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
 #include "HAL/PlatformTime.h"
+#include "Input/Events.h"
+#include "InputCoreTypes.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
 #include "Widgets/Layout/SBorder.h"
@@ -230,6 +241,11 @@ struct FUmHudRuntime {
   uint32 SlotRevision = 0;
   FVector2D SlotFlyFrom = FVector2D::ZeroVector;
   float CommandShiftXSu = 0.0f;
+  // VS-4 HB-43: ACTIONS, its per-frame refresh key; UI-ACC-017 (-1 not traced yet / 0 / 1) and the mode last traced
+  TWeakObjectPtr<UUmHudActions> Actions;
+  FString ActionsTickKey;
+  int32 KeyHintsShown = -1;
+  FString KeyHintsMode;
 };
 
 namespace {
@@ -298,6 +314,7 @@ void AS08FlowGameMode::BuildUmHud() {
   BuildUmCombat();    // VS-3 HB-30...HB-33
   BuildUmPending();   // VS-4 HB-35 / HB-37
   BuildUmFeed();      // VS-4 HB-39...HB-41
+  BuildUmActions();   // VS-4 HB-43
   RefreshUmHudLayout();
 }
 
@@ -367,6 +384,7 @@ void AS08FlowGameMode::RefreshUmHudLayout() {
   StripFrame.PxPerSu = R.Layout.PxPerSu;
   const FBox2D StatusRect = R.Layout.Rect(EUmHudBlock::Status);
   StripFrame.StatusMaxWidthSu = StatusRect.bIsValid ? static_cast<float>(StatusRect.Max.X - StatusRect.Min.X) : 600.0f;
+  StripFrame.bKeyHints = UmKeyHintsNow();  // VS-4 HB-43: UI-ACC-017 (04 §2.11) - the STATUS chips with the ACTIONS ones
   R.TopStrip.SetFrame(StripFrame);
   const FBox2D OppHandRect = R.Layout.Rect(EUmHudBlock::OppHand);  // VS-2 HB-18...HB-21
   R.Panels.SetFrame(R.Layout.bClassS, R.Layout.PxPerSu,
@@ -375,6 +393,7 @@ void AS08FlowGameMode::RefreshUmHudLayout() {
   if (UUmHudHand* Hand = R.Hand.Get()) Hand->SetFrame(FUmHandFrame::FromLayout(R.Layout, CombatSpeedMul()));
   RefreshUmDecks();  // VS-3 HB-27 / HB-28: the chips and the panel take the new rects
   RefreshUmPending();  // VS-4 HB-35: the choice takes the new frame (the slot: its next TickCardSlot)
+  RefreshUmActions();  // VS-4 HB-43: the cells take the new rect and class
   const FString Line = R.Layout.TraceLine(FIntPoint(FMath::RoundToInt(Viewport.X), FMath::RoundToInt(Viewport.Y)));
   if (Line != R.LastLayoutLine) {
     R.LastLayoutLine = Line;
@@ -894,6 +913,17 @@ void AS08FlowGameMode::TickUmHud() {
   // VS-4 HB-39...HB-41: the log, the toast stack and the subtitle (the H2 Slate stack of the toast line and the subtitle
   // box is gone: they show only on their rollback -S08SlateHud=toast | sub, 04 §5.1)
   TickUmFeed();
+  // VS-4 HB-43: what changes the row between RefreshHud calls - a command in flight ends, the combat window, the result
+  if (R.Actions.IsValid()) {
+    const FString Key = FString::Printf(TEXT("%d|%d|%d|%d|%d|%d|%d|%d"), Hud.SequenceNumber, Hud.bViewerTurn ? 1 : 0,
+                                        Hud.ActionsRemaining, static_cast<int32>(CommandUi.Mode), HudBusyReason().IsSet() ? 1 : 0,
+                                        CommandUi.Combat.bPresent ? 1 : 0, CommandUi.bHasPendingChoice ? 1 : 0,
+                                        IsResultScreenShown() ? 1 : 0);
+    if (Key != R.ActionsTickKey) {
+      R.ActionsTickKey = Key;
+      RefreshUmActions();
+    }
+  }
 }
 
 void AS08FlowGameMode::WriteUmHudShotLines() {
@@ -956,6 +986,12 @@ void AS08FlowGameMode::WriteUmHudShotLines() {
     if (const UUmHudPending* P = R.Pending.Get()) P->CollectShotLines(PendingLines);
     if (const UUmHudSourceSlot* W = R.Slot.Get()) W->CollectShotLines(PendingLines);
     for (const FString& L : PendingLines) FS08Trace::Write(L);
+  }
+  // VS-4 HB-43: UI-HUD-ACTIONS (the cell states and reasons, no text)
+  if (const UUmHudActions* A = R.Actions.Get()) {
+    TArray<FString> ActionLines;
+    A->CollectShotLines(ActionLines);
+    for (const FString& L : ActionLines) FS08Trace::Write(L);
   }
   // VS-4 HB-39...HB-41: UI-HUD-LOG, UI-HUD-TOAST, UI-HUD-SUB (counts and places only, no text)
   {
@@ -1122,14 +1158,17 @@ void AS08FlowGameMode::UmGalleryBegin(int32 SizePx) {
   const bool bPending = FParse::Value(Cmd, TEXT("S08IconGalleryPending="), PendingBoard);
   FString FeedBoard;  // VS-4 HB-39...HB-41 (UI/UmFeedGallery.h): -S08IconGalleryFeed=marmoreal|sarpedon
   const bool bFeed = FParse::Value(Cmd, TEXT("S08IconGalleryFeed="), FeedBoard);
-  if (!bSkins && !bButtons && !bTopStrip && !bPanels && !bCards && !bHand && !bDecks && !bCombat && !bPending && !bFeed) return;
+  FString ActionsBoard;  // VS-4 HB-43 (UI/UmActionsGallery.h): -S08IconGalleryActions=marmoreal|sarpedon
+  const bool bActions = FParse::Value(Cmd, TEXT("S08IconGalleryActions="), ActionsBoard);
+  if (!bSkins && !bButtons && !bTopStrip && !bPanels && !bCards && !bHand && !bDecks && !bCombat && !bPending && !bFeed && !bActions) return;
   if (IconGallery) IconGallery->SetVisibility(ESlateVisibility::Collapsed);  // the sheet takes the screen
   // the canvas of the sheet: the applied HUD scale (BeginPlay may run before the first window apply - the sheet is
   // built again on every OnUiScaleChanged, which also covers a window or UI-scale change)
   const int32 PageIndex = FMath::Max(0, Page - 1);
   TWeakObjectPtr<AS08FlowGameMode> WeakThis(this);
   auto Build = [WeakThis, bSkins, bTopStrip, bPanels, PanelsPage, PageIndex, Variant, SizePx, bCards, CardsPage, bHand,
-                HandBoard, bDecks, DecksBoard, bCombat, bConfirm, CombatBoard, bPending, PendingBoard, bFeed, FeedBoard]() {
+                HandBoard, bDecks, DecksBoard, bCombat, bConfirm, CombatBoard, bPending, PendingBoard, bFeed, FeedBoard, bActions,
+                ActionsBoard]() {
     AS08FlowGameMode* Self = WeakThis.Get();
     if (!Self || !Self->GetWorld()) return;
     FVector2D Viewport(1920.0, 1080.0);
@@ -1137,6 +1176,14 @@ void AS08FlowGameMode::UmGalleryBegin(int32 SizePx) {
     const FUmHudScaleState& Scale = UmHudScale::Current();
     const float PxPerSu = Scale.Window.X > 0 ? Scale.PxPerSu() : 1.0f;
     if (Self->UmGallery) Self->UmGallery->RemoveFromParent();
+    if (bActions) {
+      UUmActionsGalleryWidget* Sheet = CreateWidget<UUmActionsGalleryWidget>(Self->GetWorld(), UUmActionsGalleryWidget::StaticClass());
+      if (!Sheet) return;
+      for (const FString& Line : Sheet->Build(ActionsBoard, Viewport / PxPerSu, PxPerSu)) FS08Trace::Write(Line);
+      Sheet->AddToViewport(1001);
+      Self->UmGallery = Sheet;
+      return;
+    }
     if (bFeed) {
       UUmFeedGalleryWidget* Sheet = CreateWidget<UUmFeedGalleryWidget>(Self->GetWorld(), UUmFeedGalleryWidget::StaticClass());
       if (!Sheet) return;
@@ -1243,6 +1290,10 @@ void AS08FlowGameMode::UmGalleryAt(float TMs) {
   }
   if (UUmPendingGalleryWidget* PendingSheet = Cast<UUmPendingGalleryWidget>(UmGallery)) {
     for (const FString& Line : PendingSheet->SetClockMs(TMs)) FS08Trace::Write(Line);
+  }
+  // VS-4 HB-43: the ACTIONS states (one per second)
+  if (UUmActionsGalleryWidget* ActionsSheet = Cast<UUmActionsGalleryWidget>(UmGallery)) {
+    for (const FString& Line : ActionsSheet->SetClockMs(TMs)) FS08Trace::Write(Line);
   }
 }
 
@@ -2337,4 +2388,144 @@ bool AS08FlowGameMode::UmHudCursorOverFeed(float X, float Y) const {
   if (!UmHud.IsValid() || !UmHud->bLayout) return false;
   const float Px = UmHud->Layout.PxPerSu > 0.0f ? UmHud->Layout.PxPerSu : 1.0f;
   return UmHud->Feed.CoversPoint(FVector2D(X / Px, Y / Px));
+}
+
+// ------------------------------------------------------------------------------------------------ VS-4 HB-43 ACTIONS
+
+void AS08FlowGameMode::BuildUmActions() {
+  UUmGameHud* Game = UmHudRoot ? UmHudRoot->GetGameHud() : nullptr;
+  if (!UmHud.IsValid() || !Game) return;
+  FUmHudRuntime& R = *UmHud;
+  if (R.Blocks.IsSlate(FName(TEXT("actions")))) {
+    ArtHud.PendingTrace.Add(TEXT("HUD-ACTIONS impl=slate reason=-S08SlateHud=actions"));
+    return;
+  }
+  UUmHudActions* W = CreateWidget<UUmHudActions>(GetWorld(), UUmHudActions::WidgetClass());
+  if (!W || !Game->SetBlock(EUmGameSlot::Actions, W)) {
+    ArtHud.PendingTrace.Add(TEXT("HUD-ACTIONS impl=umg created=0"));
+    return;
+  }
+  R.Actions = W;
+  TWeakObjectPtr<AS08FlowGameMode> WeakThis(this);
+  W->SetInput(HudPress, [WeakThis](const FS09HudPressOutcome& Outcome, EUmActionKey Key) {
+    AS08FlowGameMode* Self = WeakThis.Get();
+    if (!Self) return;
+    // DE-014 / UI-INP-011: the answer in the frame of the release - the key's command (DE-015), or CUE-004 with the
+    // cell's why.* (a disabled cell is Refused by UUmButton itself)
+    Self->HandleHudPressOutcome(Outcome, TFunction<FS09Reason()>(), [WeakThis, Key]() {
+      if (AS08FlowGameMode* S = WeakThis.Get()) S->PressUmActionKey(static_cast<int32>(Key));
+    });
+  });
+  FString Missing;
+  const bool bParts = W->HasAllParts(&Missing);
+  ArtHud.PendingTrace.Add(FString::Printf(TEXT("HUD-ACTIONS impl=umg created=1 source=%s parts=%d missing=%s"), *W->SourceName(),
+                                          bParts ? 1 : 0, Missing.IsEmpty() ? TEXT("-") : *Missing));
+}
+
+bool AS08FlowGameMode::UmActionsOnUmg() const { return UmHud.IsValid() && UmHud->Actions.IsValid(); }
+
+bool AS08FlowGameMode::UmKeyHintsNow() {
+  const bool bShown = US08UserSettings::KeyHintsNow();
+  if (UmHud.IsValid()) {
+    FUmHudRuntime& R = *UmHud;
+    const FString Mode = US08UserSettings::KeyHintsModeNow();
+    if (R.KeyHintsShown != (bShown ? 1 : 0) || R.KeyHintsMode != Mode) {
+      R.KeyHintsShown = bShown ? 1 : 0;
+      R.KeyHintsMode = Mode;
+      const US08UserSettings* Settings = US08UserSettings::Get();
+      const FString Line = FString::Printf(TEXT("HUD-KEYHINTS mode=%s shown=%d completedMatches=%d"), *Mode, bShown ? 1 : 0,
+                                           Settings ? Settings->CompletedMatches : 0);
+      if (FS08Trace::IsOpen()) {
+        FS08Trace::Write(Line);
+      } else {
+        ArtHud.PendingTrace.Add(Line);
+      }
+    }
+  }
+  return bShown;
+}
+
+void AS08FlowGameMode::RefreshUmActions() {
+  if (!UmHud.IsValid() || !UmHud->bLayout) return;
+  FUmHudRuntime& R = *UmHud;
+  UUmHudActions* W = R.Actions.Get();
+  if (!W) return;
+  FUmActionsFrame F;
+  F.bClassS = R.Layout.bClassS;
+  F.PxPerSu = R.Layout.PxPerSu;
+  F.RectSu = R.Layout.Rect(EUmHudBlock::Actions);
+  F.CanvasSu = R.Layout.CanvasSu;
+  F.MarginSu = R.Layout.MarginSu;
+  W->SetFrame(F);
+  FUmActionsInput In;
+  const bool bStarted = Flow.IsValid() && Flow->GetStage() == ES08Stage::Started;
+  const bool bAborted = bStarted && Flow->IsRoomAborted();
+  In.bShow = bStarted && Hud.bValid && !Hud.bGameOver && !bAborted && !IsResultScreenShown();
+  In.bViewerTurn = Hud.bViewerTurn;
+  In.ActionsRemaining = Hud.ActionsRemaining;
+  In.Mode = CommandUi.Mode;
+  if (bStarted) {
+    const FS08Snapshot& Snap = EffectiveSnapshot();
+    In.bManeuverPending = !FS08Contracts::PendingManeuverId(Snap).IsEmpty();
+    In.Busy = HudBusyReason();
+    FString Reason;
+    FS09Reason Key;
+    if (!CommandUi.CanBeginManeuver(Snap, Reason, Key)) In.BeginRefusal = Key;
+    In.EndTurn = In.Busy.IsSet() ? In.Busy : CommandUi.EndTurnReason(Snap);
+    In.bNoScheme = Hud.bViewerTurn && CommandUi.CountPlayableSchemes(Snap, Fighters) <= 0;
+  }
+  In.bCombat = CommandUi.Combat.bPresent;
+  In.bKeyHints = UmKeyHintsNow();
+  W->ApplyModel(UmHudActions::Decide(In));
+}
+
+void AS08FlowGameMode::PressUmActionKey(int32 Key) {
+  // DE-015: the cell and its key give one answer - the same commands as M / A / G / E in HandleHudKeys
+  switch (Key) {
+    case 0:
+      BeginManeuverCommand();
+      return;
+    case 1:
+      if (CommandUi.Mode == ES09CommandMode::AttackDraft) {
+        CancelDraft();  // A toggles the local draft closed
+      } else {
+        BeginAttackDraft();
+      }
+      return;
+    case 2:
+      // ВР-VS4-41 (HB-42 ВР-VS2-HB42-05 delta): the attack draft is local - СХЕМА switches the mode (nothing was sent)
+      if (CommandUi.Mode == ES09CommandMode::AttackDraft) {
+        CommandUi.Mode = ES09CommandMode::None;
+        CommandUi.AttackAttackerId.Reset();
+        CommandUi.AttackTargetId.Reset();
+        CommandUi.AttackCardId.Reset();
+        FS08Trace::Write(TEXT("ATTACK-DRAFT-CANCEL local why=scheme"));
+      }
+      PlaySchemeCommand();
+      return;
+    case 3:
+      EndTurnCommand();
+      return;
+    default:
+      return;
+  }
+}
+
+bool AS08FlowGameMode::PressUmEndTurnForFlag() {
+  // Run B G-LIVE (DE-014) on the UMG cell: a press and a release through UUmButton's own handlers (-> the arbiter ->
+  // HandleHudPressOutcome), at the centre of its painted geometry
+  UUmHudActions* W = UmHud.IsValid() ? UmHud->Actions.Get() : nullptr;
+  UUmButton* B = W ? W->EndTurn.Get() : nullptr;
+  if (!B) return false;
+  FGeometry Geometry = B->GetCachedGeometry();
+  const bool bPainted = Geometry.GetLocalSize().X > 0.0f && Geometry.GetLocalSize().Y > 0.0f;
+  if (!bPainted) Geometry = FGeometry::MakeRoot(FVector2D(86.0, 72.0), FSlateLayoutTransform());
+  const FVector2D At = Geometry.LocalToAbsolute(Geometry.GetLocalSize() * 0.5f);
+  const FPointerEvent Down(0, At, At, TSet<FKey>{EKeys::LeftMouseButton}, EKeys::LeftMouseButton, 0.0f, FModifierKeysState());
+  const FPointerEvent Up(0, At, At, TSet<FKey>(), EKeys::LeftMouseButton, 0.0f, FModifierKeysState());
+  FS08Trace::Write(FString::Printf(TEXT("INPUT hudpress src=flag id=hud.end.turn impl=umg at=(%.0f,%.0f) geom=%s"), At.X, At.Y,
+                                   bPainted ? TEXT("painted") : TEXT("synthetic")));
+  B->NativeOnMouseButtonDown(Geometry, Down);
+  B->NativeOnMouseButtonUp(Geometry, Up);
+  return true;
 }

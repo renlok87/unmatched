@@ -22,6 +22,7 @@
 //   /Game/S08/UI/Common/WBP_UmToast      UUmToast         (VS-4 HB-40)
 //   /Game/S08/UI/Hud/WBP_UI_HUD_TOAST    UUmToastStack    (VS-4 HB-40)
 //   /Game/S08/UI/Hud/WBP_UI_HUD_SUB      UUmHudSubtitle   (VS-4 HB-41)
+//   /Game/S08/UI/Hud/WBP_UI_HUD_ACTIONS  UUmHudActions    (VS-4 HB-43)
 // Called from UE Python: tools/s08/hud_contract/ue_author_um_hud.py (UnrealEditor-Cmd -run=pythonscript).
 #pragma once
 

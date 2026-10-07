@@ -56,6 +56,55 @@ void US08UserSettings::SetToDefaults() {
   bRuleHints = true;
   SetSavedAudio(FS08AudioSettings());
   UiScalePercent = 100;
+  KeyHintsMode = TEXT("auto");
+  CompletedMatches = 0;
+}
+
+FString US08UserSettings::NormalizeKeyHintsMode(const FString& Mode) {
+  const FString T = Mode.TrimStartAndEnd();
+  if (T.Equals(TEXT("on"), ESearchCase::IgnoreCase)) return TEXT("on");
+  if (T.Equals(TEXT("off"), ESearchCase::IgnoreCase)) return TEXT("off");
+  return TEXT("auto");
+}
+
+bool US08UserSettings::KeyHintsShown(const FString& Mode, int32 InCompletedMatches) {
+  const FString M = NormalizeKeyHintsMode(Mode);
+  if (M == TEXT("on")) return true;
+  if (M == TEXT("off")) return false;
+  return InCompletedMatches <= 0;  // ВР-HB07: «Авто» - the first match of the profile only
+}
+
+FString US08UserSettings::ResolveKeyHintsMode(const FString& Saved, const TCHAR* CommandLine) {
+  FString Value;
+  if (CommandLine && FParse::Value(CommandLine, TEXT("S08KeyHints="), Value)) {
+    const FString T = Value.TrimStartAndEnd();
+    if (T.Equals(TEXT("auto"), ESearchCase::IgnoreCase) || T.Equals(TEXT("on"), ESearchCase::IgnoreCase) ||
+        T.Equals(TEXT("off"), ESearchCase::IgnoreCase)) {
+      return NormalizeKeyHintsMode(T);
+    }
+  }
+  return NormalizeKeyHintsMode(Saved);
+}
+
+FString US08UserSettings::KeyHintsModeNow() {
+  const US08UserSettings* Settings = Get();
+  return ResolveKeyHintsMode(Settings ? Settings->KeyHintsMode : FString(TEXT("auto")), FCommandLine::Get());
+}
+
+bool US08UserSettings::KeyHintsNow() {
+  const US08UserSettings* Settings = Get();
+  return KeyHintsShown(KeyHintsModeNow(), Settings ? Settings->CompletedMatches : 0);
+}
+
+void US08UserSettings::NoteMatchCompleted() {
+  US08UserSettings* Settings = Get();
+  if (!Settings) return;
+  Settings->CompletedMatches = FMath::Max(0, Settings->CompletedMatches) + 1;
+  Settings->SaveConfig();
+}
+
+FString US08UserSettings::DescribeKeyHints() const {
+  return FString::Printf(TEXT("keyHints=%s completedMatches=%d"), *NormalizeKeyHintsMode(KeyHintsMode), FMath::Max(0, CompletedMatches));
 }
 
 int32 US08UserSettings::ClampUiScalePercent(int32 Percent) {
@@ -116,6 +165,17 @@ bool US08UserSettings::ApplySetting(const FString& Name, const FString& Value, F
       return false;
     }
     AnimSpeed = S08Motion::SpeedName(Speed);
+    return true;
+  }
+  if (Name.Equals(TEXT("keyHints"), ESearchCase::IgnoreCase)) {
+    // VS-4 HB-43 (UI-ACC-017): auto | on | off, nothing else
+    const FString T = Value.TrimStartAndEnd();
+    if (!T.Equals(TEXT("auto"), ESearchCase::IgnoreCase) && !T.Equals(TEXT("on"), ESearchCase::IgnoreCase) &&
+        !T.Equals(TEXT("off"), ESearchCase::IgnoreCase)) {
+      OutError = FString::Printf(TEXT("keyHints=%s: auto|on|off"), *Value);
+      return false;
+    }
+    KeyHintsMode = NormalizeKeyHintsMode(T);
     return true;
   }
   if (Name.Equals(TEXT("uiScale"), ESearchCase::IgnoreCase)) {
@@ -185,7 +245,7 @@ namespace {
 FAutoConsoleCommand GS08SettingsCommand(
     TEXT("s08.Settings"),
     TEXT("DE-025: s08.Settings [speed=none|fast|normal|slow] [reduced=0|1] [shake=0|1] [ruleHints=0|1] "
-         "[master=0-100] [masterMute=0|1] [ambience=0-100] [ambienceMute=0|1] [uiScale=75-150] - saves to "
+         "[master=0-100] [masterMute=0|1] [ambience=0-100] [ambienceMute=0|1] [uiScale=75-150] [keyHints=auto|on|off] - saves to "
          "GameUserSettings.ini and "
          "applies without a restart (the -S08AnimSpeed / -S08ReducedMotion / -S08RuleHints flags still win)"),
     FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& Args) {
@@ -210,8 +270,8 @@ FAutoConsoleCommand GS08SettingsCommand(
         }
         Settings->Save();
       }
-      UE_LOG(LogTemp, Display, TEXT("s08.Settings %s %s%s"), *Settings->Describe(), *Settings->DescribeUi(),
-             Args.Num() > 0 ? TEXT(" (saved)") : TEXT(""));
+      UE_LOG(LogTemp, Display, TEXT("s08.Settings %s %s %s%s"), *Settings->Describe(), *Settings->DescribeUi(),
+             *Settings->DescribeKeyHints(), Args.Num() > 0 ? TEXT(" (saved)") : TEXT(""));
     }));
 }  // namespace
 

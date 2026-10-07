@@ -3076,7 +3076,7 @@ void AS08FlowGameMode::HandleHudKeys() {
   } else if (PC->WasInputKeyJustPressed(EKeys::R)) {
     ResolveCombatCommand();
   } else if (PC->WasInputKeyJustPressed(EKeys::G)) {
-    PlaySchemeCommand();
+    PressUmActionKey(2);  // VS-4 HB-43 (ВР-VS4-41): PlaySchemeCommand; a local attack draft closes first
   } else if (PC->WasInputKeyJustPressed(EKeys::X)) {
     DeclinePendingChoiceCommand();
   } else if (PC->WasInputKeyJustPressed(EKeys::D)) {
@@ -6005,6 +6005,7 @@ void AS08FlowGameMode::RefreshHud() {
   CommandBox->ClearChildren();
   const bool bUmHand = RefreshUmHand();  // VS-3 HB-24 / HB-25: the UMG hand (-S08SlateHud=hand keeps the chips below)
   RefreshUmPending();  // VS-4 HB-35 / HB-36 forms: the UMG choice (-S08SlateHud=pending keeps the command panel blocks)
+  RefreshUmActions();  // VS-4 HB-43: the UMG action cells (-S08SlateHud=actions keeps the Slate buttons below)
   BuildCombatStageHud();
   RefreshDeckPanel();  // DE-030: the auto-close on a new input demand, then the content while visible
 
@@ -7083,6 +7084,8 @@ void AS08FlowGameMode::RefreshHud() {
       AddLine(FString::Printf(TEXT("actions left: %d   phase: %s"), FMath::Max(0, Hud.ActionsRemaining), *Hud.Phase));
       AddLine(TEXT("M begin maneuver  |  A attack draft  |  G scheme picker  |  E end turn"));
     }
+    // VS-4 HB-43: the UMG ACTIONS cells replace these; the Slate pair only on -S08SlateHud=actions or the gate layer
+    if (!UmActionsOnUmg() || S08ArtLook::S08Markers())
     CommandBox->AddSlot().AutoHeight().Padding(0, 6, 0, 0)
         [SNew(SHorizontalBox) +
          SHorizontalBox::Slot().AutoWidth().Padding(0, 0, 8, 0)
@@ -8490,6 +8493,7 @@ void AS08FlowGameMode::EmulateInputStep(ES08InputStep Step) {
       return;
     }
     case ES08InputStep::HudEndTurn: {
+      if (PressUmEndTurnForFlag()) return;  // VS-4 HB-43: the UMG cell (the Slate element on -S08SlateHud=actions)
       // Run B G-LIVE (DE-014): a press and a release on the live END TURN element through its own Slate handlers
       // (SS09HudPress -> arbiter -> HandleHudPressOutcome), at the centre of its painted geometry.
       const FName Id(TEXT("hud.end.turn"));

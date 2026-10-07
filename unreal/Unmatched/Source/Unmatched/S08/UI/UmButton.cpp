@@ -16,7 +16,10 @@
 #include "Components/OverlaySlot.h"
 #include "Components/SizeBox.h"
 #include "Components/TextBlock.h"
+#include "Fonts/FontMeasure.h"
+#include "Framework/Application/SlateApplication.h"
 #include "HAL/PlatformTime.h"
+#include "Rendering/SlateRenderer.h"
 #include "Input/Events.h"
 #include "InputCoreTypes.h"
 
@@ -54,7 +57,7 @@ EUmButtonState ResolveState(const FUmButtonModel& Model, bool bHovered, bool bPr
 }
 
 FName SkinKey(EUmButtonVariant Variant, EUmButtonState State) {
-  if (Variant == EUmButtonVariant::Disc) return NAME_None;
+  // VS-4 HB-43 (ВР-VS2-HB42-03): a disc is a normal cell - its look is the HB-08 skin of the state, like a Normal button
   const bool bPrimary = Variant == EUmButtonVariant::Primary;
   switch (State) {
     case EUmButtonState::Hover: return bPrimary ? FName(TEXT("btn.primary.hover")) : FName(TEXT("btn.hover"));
@@ -75,6 +78,30 @@ FName TextColorToken(EUmButtonVariant Variant, EUmButtonState State) {
   if (bOff) return FName(TEXT("text.secondary"));  // 02 §4.3: a colour, never the 0.4 opacity (3.4 : 1)
   if (State == EUmButtonState::Selected) return FName(TEXT("card.glyph"));
   return FName(TEXT("text.primary"));
+}
+
+FName SkinKeyFor(const FUmButtonModel& Model, EUmButtonState State) {
+  const bool bOff = State == EUmButtonState::Disabled || State == EUmButtonState::Busy;
+  if (Model.Variant == EUmButtonVariant::Disc && Model.bDiscPrimary && !bOff) return SkinKey(EUmButtonVariant::Primary, State);
+  return SkinKey(Model.Variant, State);
+}
+
+FName TextColorTokenFor(const FUmButtonModel& Model, EUmButtonState State) {
+  const bool bOff = State == EUmButtonState::Disabled || State == EUmButtonState::Busy;
+  if (Model.Variant == EUmButtonVariant::Disc && Model.bDiscPrimary && !bOff) return FName(TEXT("card.navy"));
+  return TextColorToken(Model.Variant, State);
+}
+
+float TagAscentSu(float PxPerSu) {
+  const float Scale = PxPerSu > 0.0f ? PxPerSu : 1.0f;
+  const FSlateFontInfo Font = UUmHudTheme::Get().Font(TEXT("type.tag"));
+  if (FSlateApplication::IsInitialized() && FSlateApplication::Get().GetRenderer()) {
+    const TSharedRef<FSlateFontMeasure> M = FSlateApplication::Get().GetRenderer()->GetFontMeasureService();
+    // the line's height minus its descender (GetBaseline is the negative descender) = the ascent
+    const float Ascent = static_cast<float>(M->GetMaxCharacterHeight(Font, Scale) + M->GetBaseline(Font, Scale)) / Scale;
+    if (Ascent > 1.0f) return Ascent;
+  }
+  return 14.0f * 1900.0f / 2048.0f;  // Roboto hhea ascender
 }
 
 FName DiscUnderlayToken(EUmButtonState State) {
@@ -267,7 +294,9 @@ void UUmButton::ApplyModel(const FUmButtonModel& InModel) {
                      Model.bSelected == InModel.bSelected && Model.bBusy == InModel.bBusy &&
                      Model.KeyHint.EqualTo(InModel.KeyHint) && Model.bFocused == InModel.bFocused &&
                      Model.HeightSu == InModel.HeightSu && Model.MinWidthSu == InModel.MinWidthSu &&
-                     Model.bFlat == InModel.bFlat && Model.PadXSu == InModel.PadXSu;
+                     Model.bFlat == InModel.bFlat && Model.PadXSu == InModel.PadXSu &&
+                     Model.bDiscPrimary == InModel.bDiscPrimary && Model.DiscSu == InModel.DiscSu &&
+                     Model.bOwnerTooltip == InModel.bOwnerTooltip;
   if (bSame) return;
   const bool bWasSelected = bHasModel && Model.bSelected;
   Model = InModel;
@@ -281,7 +310,16 @@ void UUmButton::ApplyModel(const FUmButtonModel& InModel) {
   // an icon-only button (no label: the TOP squares) centres its glyph without the side padding
   const bool bIconOnly = Model.Label.IsEmpty() && !Model.IconName.IsNone();
   const float PadX = Model.PadXSu > 0.0f ? Model.PadXSu : Theme.SpaceSu(TEXT("space.m"));
-  if (Body) Body->SetPadding(bDisc || bIconOnly ? FMargin(0.0f) : FMargin(PadX, 0.0f));
+  if (Body) {
+    Body->SetPadding(bDisc || bIconOnly ? FMargin(0.0f) : FMargin(PadX, 0.0f));
+    // VS-4 HB-43: a disc cell lays its parts out from the cell's top edge across its whole width (HB-42 A2)
+    Body->SetHorizontalAlignment(bDisc ? HAlign_Fill : HAlign_Center);
+    Body->SetVerticalAlignment(bDisc ? VAlign_Fill : VAlign_Center);
+  }
+  if (Content) {
+    Content->SetColumnFill(0, bDisc ? 1.0f : 0.0f);
+    Content->SetRowFill(1, bDisc ? 1.0f : 0.0f);
+  }
   // the text: type.button caps (disc: type.tag caps under the disc); busy reads "Отправлено…" (V-10)
   if (Label) {
     const FText Text = Model.bBusy ? UmText::Get(EUmTable::Hud, TEXT("hud.btn.sent")) : Model.Label;
@@ -295,17 +333,34 @@ void UUmButton::ApplyModel(const FUmButtonModel& InModel) {
   }
   // grid: disc = icon over its caption, the chip under; inline = icon, label, chip in a row
   const float Gap = Theme.SpaceSu(TEXT("tag.padding.x"));
-  UmBtnPlace(Icon, 0, 0, FMargin(0.0f));
-  UmBtnPlace(Label, bDisc ? 1 : 0, bDisc ? 0 : 1, bDisc ? FMargin(0.0f, Gap, 0.0f, 0.0f) : FMargin(Model.IconName.IsNone() ? 0.0f : Gap * 2.0f, 0.0f, 0.0f, 0.0f));
-  // the key chip (04 §2.11): right of the label; on a disc in the disc's top-right corner (the same grid cell)
+  const float DiscSu = Model.DiscSu > 0.0f ? Model.DiscSu : UmBtnDiscIconSu;
   if (bDisc) {
-    UmBtnPlace(KeyChip, 0, 0, FMargin(0.0f), HAlign_Right, VAlign_Top);
+    // VS-4 HB-43 (04 §2.14, ВР-VS2-HB42-12 / -13): the disc centred at y + 4; the caption box under it so that its
+    // baseline lies at y + 67 su (every caption of the row on one line); the chip 20 x 20 su 2 su from the cell's
+    // top-right corner, over the disc rim at most (ВР-VS2-HB42-08)
+    const float CaptionTop = UmButton::DiscCaptionBaselineSu - UmButton::TagAscentSu(UmHudScale::Current().PxPerSu());
+    UmBtnPlace(Icon, 0, 0, FMargin(0.0f, UmButton::DiscTopSu, 0.0f, 0.0f), HAlign_Center, VAlign_Top);
+    UmBtnPlace(Label, 1, 0, FMargin(0.0f, FMath::Max(0.0f, CaptionTop - UmButton::DiscTopSu - DiscSu), 0.0f, 0.0f), HAlign_Center,
+               VAlign_Top);
+    UmBtnPlace(KeyChip, 0, 0, FMargin(0.0f, UmButton::DiscChipInsetSu, UmButton::DiscChipInsetSu, 0.0f), HAlign_Right, VAlign_Top);
   } else {
+    UmBtnPlace(Icon, 0, 0, FMargin(0.0f));
+    UmBtnPlace(Label, 0, 1, FMargin(Model.IconName.IsNone() ? 0.0f : Gap * 2.0f, 0.0f, 0.0f, 0.0f));
     UmBtnPlace(KeyChip, 0, 2, FMargin(Gap * 2.0f, 0.0f, 0.0f, 0.0f));
+  }
+  if (KeyChip && KeyText) {
+    // the disc chip is a 20 x 20 su square (KeyChip HB-08), its letter centred; the inline chip hugs its text
+    const float LineSu = UmButton::TagAscentSu(UmHudScale::Current().PxPerSu()) * 2400.0f / 1900.0f;  // Roboto line / ascent
+    KeyChip->SetPadding(bDisc ? FMargin(0.0f, FMath::Max(0.0f, 0.5f * (UmButton::DiscChipSu - LineSu))) :
+                                FMargin(Theme.SpaceSu(TEXT("tag.padding.x")), Theme.SpaceSu(TEXT("tag.padding.y"))));
+    KeyText->SetMinDesiredWidth(bDisc ? UmButton::DiscChipSu : 0.0f);
+    KeyText->SetJustification(ETextJustify::Center);
+    // a WBP keeps no theme font (the composite font is not saved): set it at run time like the label's
+    KeyText->SetFont(Theme.Font(TEXT("type.tag")));
   }
   // the icon (HB-23: the side in su, the texture follows DPI x UI scale)
   if (Icon) {
-    const float IconSu = bDisc ? UmBtnDiscIconSu : UmBtnInlineIconSu;
+    const float IconSu = bDisc ? DiscSu : UmBtnInlineIconSu;
     if (Model.IconName.IsNone()) {
       Icon->SetVisibility(ESlateVisibility::Collapsed);
     } else {
@@ -334,18 +389,14 @@ void UUmButton::Restyle() {
   const bool bDisc = Model.Variant == EUmButtonVariant::Disc;
   const bool bOff = State == EUmButtonState::Disabled || State == EUmButtonState::Busy;
   if (Body) {
-    if (bDisc) {
-      const FName Token = UmButton::DiscUnderlayToken(State);
-      const FLinearColor Fill = Token.IsNone() ? FLinearColor::Transparent : Theme.Color(Token);
-      Body->SetBrush(FSlateRoundedBoxBrush(Fill, Theme.RadiusSu(TEXT("radius.l"))));
-    } else if (Model.bFlat && Model.Variant == EUmButtonVariant::Normal &&
+    if (Model.bFlat && Model.Variant == EUmButtonVariant::Normal &&
                (State == EUmButtonState::Normal || State == EUmButtonState::Focus)) {
       Body->SetBrush(FSlateNoResource());  // VS-2 HB-14: at rest the plate of the block shows through
-    } else if (const FSlateBrush* Skin = Theme.SkinFor(UmButton::SkinKey(Model.Variant, State), PxPerSu)) {
-      Body->SetBrush(*Skin);
+    } else if (const FSlateBrush* Skin = Theme.SkinFor(UmButton::SkinKeyFor(Model, State), PxPerSu)) {
+      Body->SetBrush(*Skin);  // VS-4 HB-43: a disc cell too (its HB-08 skin, ВР-VS2-HB42-03)
     }
   }
-  if (Label) Label->SetColorAndOpacity(FSlateColor(Theme.Color(UmButton::TextColorToken(Model.Variant, State))));
+  if (Label) Label->SetColorAndOpacity(FSlateColor(Theme.Color(UmButton::TextColorTokenFor(Model, State))));
   if (KeyText) KeyText->SetColorAndOpacity(FSlateColor(Theme.Color(bOff ? TEXT("text.secondary") : TEXT("text.primary"))));
   if (Icon) Icon->SetRenderOpacity(bOff ? Theme.Alpha(TEXT("state.disabled.opacity")) : 1.0f);
   // VS-2 HB-12 (04 §3.2): the pointer over a pressable button, "denied" over a disabled one (with its why.*); while a
@@ -354,7 +405,8 @@ void UUmButton::Restyle() {
   if (FocusRing) {
     const bool bRing = Model.bFocused;
     if (bRing) {
-      const FName RingKey = Model.Variant == EUmButtonVariant::Primary ? FName(TEXT("btn.primary.focus")) : FName(TEXT("btn.focus"));
+      const bool bPrimaryLook = Model.Variant == EUmButtonVariant::Primary || (Model.bDiscPrimary && !bOff);
+      const FName RingKey = bPrimaryLook ? FName(TEXT("btn.primary.focus")) : FName(TEXT("btn.focus"));
       if (const FSlateBrush* Skin = Theme.SkinFor(RingKey, PxPerSu)) FocusRing->SetBrush(*Skin);
     }
     FocusRing->SetVisibility(bRing ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
@@ -381,7 +433,7 @@ void UUmButton::Restyle() {
   }
   // why.*: only while hovered over a disabled / busy button, after 300 ms (Step)
   if (!bOff || !bHovered) {
-    if (bWhyShown) SetToolTipText(FText::GetEmpty());
+    if (bWhyShown && !Model.bOwnerTooltip) SetToolTipText(FText::GetEmpty());
     bWhyShown = false;
   }
   if (Old != State || AnimMs > 0.0) Step();
@@ -418,7 +470,7 @@ void UUmButton::Step() {
   const bool bOff = State == EUmButtonState::Disabled || State == EUmButtonState::Busy;
   if (bHovered && bOff && !bWhyShown && HoverSince >= 0.0 && T - HoverSince >= 0.3) {
     bWhyShown = true;
-    SetToolTipText(GetWhyText());
+    if (!Model.bOwnerTooltip) SetToolTipText(GetWhyText());  // VS-4 HB-43: ACTIONS draws its own HB-22 plate
   }
 }
 

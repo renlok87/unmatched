@@ -19,6 +19,7 @@
 #include "S08BoardActor.h"
 #include "S08Team.h"
 #include "S08TraceLog.h"
+#include "S08UserSettings.h"
 #include "../S09/S09TurnHud.h"
 #include "Brushes/SlateRoundedBoxBrush.h"
 #include "Dom/JsonObject.h"
@@ -260,6 +261,7 @@ void AS08FlowGameMode::TickResultScreen() {
   const bool bShown = IsResultScreenShown();
   if (bShown && !ResultView.IsOpen()) {
     ResultView.Open(Now);
+    if (!bBench) US08UserSettings::NoteMatchCompleted();  // VS-4 HB-43 (UI-ACC-017 «Авто»): one more finished match
     FS08Trace::Write(FString::Printf(TEXT("RESULT view mode=results t=%lld intro=%d fade=0 why=open"),
                                      static_cast<long long>(Now), FS09ResultView::IntroMs));
   } else if (!bShown && ResultView.IsOpen()) {

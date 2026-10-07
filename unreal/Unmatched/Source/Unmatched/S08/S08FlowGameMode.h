@@ -1278,6 +1278,20 @@ private:
   void UmHudRefusePress(FName PressedId);
   /** The open class S log list or a sticky toast's cross under the cursor (CursorOverHud). */
   bool UmHudCursorOverFeed(float X, float Y) const;
+  // VS-4 HB-43 (S08/UI/UmHudActions.h; rollback -S08SlateHud=actions): ACTIONS - the four disc buttons; a click is the
+  // key's command (DE-015: PressUmActionKey, the same path as M / A / G / E); UI-ACC-017 key hints (HUD-KEYHINTS)
+  void BuildUmActions();
+  /** Feeds UUmHudActions from the applied snapshot and the command state (RefreshHud and a cheap per-frame key). */
+  void RefreshUmActions();
+  bool UmActionsOnUmg() const;
+  /** The command of a key: 0 M (maneuver), 1 A (attack draft toggle), 2 G (scheme; closes a local attack draft first,
+   *  ВР-VS4-41), 3 E (end turn). The keys and the UMG cells call it. */
+  void PressUmActionKey(int32 Key);
+  /** Run B G-LIVE flag step 'hudendturn' on the UMG cell: a press and a release through UUmButton's handlers; false
+   *  without the UMG block (the Slate element then). */
+  bool PressUmEndTurnForFlag();
+  /** UI-ACC-017 of this run (US08UserSettings::KeyHintsNow), traced 'HUD-KEYHINTS mode= shown=' on a change. */
+  bool UmKeyHintsNow();
   /** VS-3 SC-01 (ВР-SC14): -S08ScreenShots - one evidence frame per new UI-SCR-* id + state (<UI-ID>-<state>.png). */
   void TickUmScreenShots();
   // VS-2 exit frames (opt-in -S08ExitShots): own / opponent turn start + 0.5 s and + 3 s

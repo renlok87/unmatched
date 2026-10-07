@@ -48,6 +48,8 @@ their C++ bases (UUmHudAuthoringLibrary -> BuildDefaultTree of each class), in t
                                       (WBP_UmButton) (VS-4 HB-40)
   /Game/S08/UI/Hud/WBP_UI_HUD_TOAST    parent UmToastStack  parts Canvas, Badge (VS-4 HB-40; the toasts are pooled WBP_UmToast)
   /Game/S08/UI/Hud/WBP_UI_HUD_SUB      parent UmHudSubtitle parts Root, Capsule, Row, Speaker, Line (VS-4 HB-41)
+  /Game/S08/UI/Hud/WBP_UI_HUD_ACTIONS  parent UmHudActions parts Row, Maneuver, Attack, Scheme, EndTurn (WBP_UmButton), Tip,
+                                      TipBox, TipHead, TipCaption, TipKey, TipKeyText, TipText (VS-4 HB-43)
 
 A widget tree is not reachable from Python, so the C++ library builds it (the same function the class uses without a
 WBP) and this script re-loads every asset, checks the parent class, writes the report (env UM_HUD_WBP_REPORT, default
@@ -93,6 +95,7 @@ ASSETS = {
     "/Game/S08/UI/Common/WBP_UmToast": "UmToast",
     "/Game/S08/UI/Hud/WBP_UI_HUD_TOAST": "UmToastStack",
     "/Game/S08/UI/Hud/WBP_UI_HUD_SUB": "UmHudSubtitle",
+    "/Game/S08/UI/Hud/WBP_UI_HUD_ACTIONS": "UmHudActions",
 }
 
 

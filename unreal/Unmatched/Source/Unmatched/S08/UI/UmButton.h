@@ -6,6 +6,10 @@
 //             Primary - body btn.primary.* (turn.flash.yellow), text card.navy; never selected; one per window;
 //             Disc    - the v3 pip 48 su (an action disc of ACTIONS, ВР-39) with its caption under it; the underlay is
 //                       panel.bg.hover / panel.bg.pressed / state.pending, the disc itself scales (STYLE-v3 №9).
+//                       VS-4 HB-43 (accepted mockup HB-42, ВР-VS2-HB42-03 / -12 / -13): the disc is a cell of its own with
+//                       the HB-08 skin of its state (Btn_Normal / _Hover / _Pressed / _Disabled / _Selected; bDiscPrimary:
+//                       BtnPrimary_* while enabled), the disc DiscSu (48 / 40) centred at y + 4, the caption on the row
+//                       baseline y + 67, the key chip 20 x 20 su 2 su from the cell's top-right corner.
 //   states    normal, hover, pressed, disabled (+ why.*), focus, selected; busy ("Отправлено…", hud.btn.sent).
 //             Skins come from DA_UmHudTheme.Skins (HB-10: the 9-slice PNG, before the import the ВР-HB06 brushes);
 //             disabled text is text.secondary, never an opacity (0.4 gives 3.4 : 1); selected text card.glyph.
@@ -66,16 +70,38 @@ struct UNMATCHED_API FUmButtonModel {
   /** VS-3 HB-28 (HB-26 delta: the deck panel tabs text + 12 su, the filter text + 16 su): the label's side padding (su);
    *  0 = the variant default (space.m 16). */
   float PadXSu = 0.0f;
+  /** VS-4 HB-43 (HB-42 ВР-VS2-HB42-03): a disc on the primary cell (BtnPrimary_* skins, caption card.navy) - only while
+   *  enabled; a disabled one is an ordinary Btn_Disabled cell, never BtnPrimary_Disabled. Disc variant only. */
+  bool bDiscPrimary = false;
+  /** VS-4 HB-43: the disc side (su); 0 = 48 (class L), 40 in class S (HB-42 A2). Disc variant only. */
+  float DiscSu = 0.0f;
+  /** VS-4 HB-43: the owner block draws the why tooltip (the HB-22 plate of HB-42 A7), the button sets none. */
+  bool bOwnerTooltip = false;
 };
 
 namespace UmButton {
 /** The state drawn for a model and the pointer (busy > disabled > pressed > selected > hover > focus > normal;
  *  a primary is never selected). */
 UNMATCHED_API EUmButtonState ResolveState(const FUmButtonModel& Model, bool bHovered, bool bPressed);
-/** Theme skin key of the body (btn.normal, btn.primary.hover, ...); NAME_None for a disc (a plain underlay). */
+/** Theme skin key of the body (btn.normal, btn.primary.hover, ...). VS-4 HB-43 (HB-42 ВР-VS2-HB42-03): a disc is its
+ *  own cell with the HB-08 skin of its state (Btn_Normal / _Hover / _Pressed / _Disabled / _Selected). */
 UNMATCHED_API FName SkinKey(EUmButtonVariant Variant, EUmButtonState State);
+/** The skin of a model in a state: a primary disc (bDiscPrimary) takes the BtnPrimary_* skins while enabled. */
+UNMATCHED_API FName SkinKeyFor(const FUmButtonModel& Model, EUmButtonState State);
 /** Theme colour token of the label. */
 UNMATCHED_API FName TextColorToken(EUmButtonVariant Variant, EUmButtonState State);
+/** The label colour of a model in a state: the caption of an enabled primary disc is card.navy. */
+UNMATCHED_API FName TextColorTokenFor(const FUmButtonModel& Model, EUmButtonState State);
+/** VS-4 HB-43 (04 §2.14, ВР-VS2-HB42-13): the disc caption's baseline from the cell top (su), every caption of the row
+ *  on one line; the caption box top = this - the type.tag ascent. */
+inline constexpr float DiscCaptionBaselineSu = 67.0f;
+/** The disc's top inset in its cell (su): y + 4 in both classes (HB-42 A2). */
+inline constexpr float DiscTopSu = 4.0f;
+/** The key chip of a disc cell: 20 x 20 su, 2 su from the cell's top and right edges (ВР-VS2-HB42-08). */
+inline constexpr float DiscChipSu = 20.0f;
+inline constexpr float DiscChipInsetSu = 2.0f;
+/** The type.tag ascent (su) at PxPerSu: the font measure when Slate runs, else Roboto's 1900 / 2048 of 14 su. */
+UNMATCHED_API float TagAscentSu(float PxPerSu);
 /** Theme colour token of a disc underlay (NAME_None = none). */
 UNMATCHED_API FName DiscUnderlayToken(EUmButtonState State);
 /** Target scale of the icon (disc / primary) and the body (primary pressed) - 1 with reduced motion. */
