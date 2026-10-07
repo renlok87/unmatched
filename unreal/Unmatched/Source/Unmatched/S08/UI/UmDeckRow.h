@@ -8,8 +8,11 @@
 //            (the cap top of the 20 su text 3 su under the row top, ВР-VS2-HB26-12).
 //   name     D4: 20 su while it fits its column (59 .. values - 7); else one step down to 16 su; if it still does not
 //            fit, it ends with «…» (the full name stays for the inspector). Nothing else is ever cut.
-//   marks    the second line at y 29: chips 18 su high (the Btn_Normal look: card.navy body, card.cream edge 0.45,
-//            radius 4), text type.tag 14 su, 4 su apart - own: «В руке n» (n > 0), «В сбросе n» (n > 0), «Осталось n»
+//   marks    the second line: chips (the Btn_Normal look: card.navy body, card.cream edge 0.45, radius 4), text type.tag
+//            14 su centred, 4 su apart - VS-4 (VS-3 item 11, ВР-VS4-59): the chip is as high as the line of type.tag
+//            (Slate's natural pitch, rounded up) + 1 su a side (>= 18 su) and sits 2 su over the row's bottom, so no
+//            label is cut on any canvas (class S 1080p / 720p 150 % cut the descenders) - own: «В руке n» (n > 0),
+//            «В сбросе n» (n > 0), «Осталось n»
 //            (always, 0 included); opponent: only «В сбросе n» (n > 0) - never the hand or what is left (F-05, D7).
 //   press    on the release through the arbiter (id hud.deck.row.<cardId>, DE-014): the inspector of the catalog card.
 #pragma once
@@ -72,7 +75,8 @@ inline constexpr float CapTopSu = 3.0f;      // the cap top of the 20 su text un
 inline constexpr float MarksYSu = 29.0f;
 inline constexpr float MarkHSu = 18.0f;
 inline constexpr float MarkPadXSu = 4.0f;
-inline constexpr float MarkPadYSu = 2.0f;
+inline constexpr float MarkPadYSu = 1.0f;     // VS-4 (VS-3 item 11): 1 su over and under the centred label
+inline constexpr float MarkBottomSu = 2.0f;   // the chips end 2 su over the row's bottom (the divider)
 inline constexpr float MarkGapSu = 4.0f;
 /** Roboto (hhea): ascender 1900 / 2048, cap height 1456 / 2048 - the baseline rule without Slate (a commandlet). */
 inline constexpr float AscentEm = 1900.0f / 2048.0f;
@@ -89,6 +93,12 @@ UNMATCHED_API FString ShownName(const FS09DeckListCard& Card, bool bRu);
 UNMATCHED_API float MeasureSu(const FString& Text, float SizeSu, FName Token = FName(TEXT("type.button")));
 /** The ascent (baseline below the text top) of SizeSu of Token (su). */
 UNMATCHED_API float AscentSu(float SizeSu, FName Token = FName(TEXT("type.button")));
+/** VS-4 (VS-3 item 11): the natural line of the mark label (type.tag 14 su; Slate's font measure, or the Roboto
+ *  ascender - descender estimate without Slate), the chip height (the line rounded up + 2 x MarkPadYSu, >= MarkHSu)
+ *  and the chips' top in the row (HeightSu - MarkBottomSu - chip). */
+UNMATCHED_API float MarkLineSu();
+UNMATCHED_API float MarkChipSu();
+UNMATCHED_API float MarksTopSu();
 /** D4: 20 su, else 16 su, else 16 su with «…». Measure(text, sizeSu) -> su. */
 UNMATCHED_API FUmNameFit FitName(const FString& Name, float ColumnSu, TFunctionRef<float(const FString&, float)> Measure);
 }  // namespace UmDeckRow

@@ -90,6 +90,20 @@ float AscentSu(float SizeSu, FName Token) {
   return AscentEm * SizeSu;
 }
 
+float MarkLineSu() {
+  if (UmRowSlate()) {
+    constexpr float K = 8.0f;  // the measure answers whole pixels: at 8x the rounding is 1/8 su
+    const float H = static_cast<float>(FSlateApplication::Get().GetRenderer()->GetFontMeasureService()->GetMaxCharacterHeight(
+        UmRowFont(14.0f, FName(TEXT("type.tag"))), K));
+    if (H > 0.0f) return H / K;
+  }
+  return (AscentEm + 500.0f / 2048.0f) * 14.0f;  // Roboto: ascender 1900 + descender 500 of 2048
+}
+
+float MarkChipSu() { return FMath::Max(MarkHSu, FMath::CeilToFloat(MarkLineSu()) + 2.0f * MarkPadYSu); }
+
+float MarksTopSu() { return HeightSu - MarkBottomSu - MarkChipSu(); }
+
 FUmNameFit FitName(const FString& Name, float ColumnSu, TFunctionRef<float(const FString&, float)> Measure) {
   FUmNameFit F;
   F.ColumnSu = ColumnSu;
@@ -183,8 +197,8 @@ bool UUmDeckRow::BuildDefaultTree(UWidgetTree& Tree, FS08AttachWidget Attach, FS
     }
     UBorder* Chip = Tree.ConstructWidget<UBorder>(UBorder::StaticClass(), FName(Name));
     if (const FSlateBrush* Skin = Theme.Skin(TEXT("btn.normal"))) Chip->SetBrush(*Skin);
-    Chip->SetPadding(FMargin(UmDeckRow::MarkPadXSu, UmDeckRow::MarkPadYSu, UmDeckRow::MarkPadXSu, 0.0f));
-    Chip->SetVerticalAlignment(VAlign_Top);
+    Chip->SetPadding(FMargin(UmDeckRow::MarkPadXSu, 0.0f));
+    Chip->SetVerticalAlignment(VAlign_Center);
     if (!Attach(Chip, MarkBox)) return Fail(Name);
     UTextBlock* Text = Tree.ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), FName(*(FString(Name) + TEXT("Text"))));
     Text->SetFont(Theme.Font(TEXT("type.tag")));
@@ -301,7 +315,9 @@ void UUmDeckRow::ApplyModel(const FUmDeckRowModel& InModel, float WidthSu) {
     NameText->SetText(FText::FromString(NameFit.Shown));
     Place(NameText, FVector2D(NameXSu, Baseline - AscentSu(NameFit.SizeSu)), FVector2D::ZeroVector);
   }
-  // the marks (D3 / D7): own - in hand (n > 0), in discard (n > 0), left (always); opponent - in discard (n > 0) only
+  // the marks (D3 / D7): own - in hand (n > 0), in discard (n > 0), left (always); opponent - in discard (n > 0) only;
+  // VS-4 (VS-3 item 11): the chip holds the whole label line, 2 su over the row's bottom
+  const float ChipH = MarkChipSu();
   const int32 Counts[3] = {Model.InHand, Model.InDiscard, Model.Left};
   const TCHAR* Keys[3] = {TEXT("hud.deckpanel.mark.hand"), TEXT("hud.deckpanel.mark.discard"), TEXT("hud.deckpanel.mark.left")};
   for (int32 I = 0; I < 3; ++I) {
@@ -313,7 +329,12 @@ void UUmDeckRow::ApplyModel(const FUmDeckRowModel& InModel, float WidthSu) {
       A.Add(TEXT("n"), FText::FromString(FString::FromInt(Counts[I])));
       Label->SetText(UmText::Format(EUmTable::Hud, Keys[I], A));
     }
+    if (Chip) {
+      Chip->SetPadding(FMargin(MarkPadXSu, 0.0f));
+      Chip->SetVerticalAlignment(VAlign_Center);
+    }
     if (UWidget* MarkBox = Chip ? Chip->GetParent() : nullptr) {
+      if (USizeBox* MarkSize = Cast<USizeBox>(MarkBox)) MarkSize->SetHeightOverride(ChipH);
       MarkBox->SetVisibility(bShow ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
     }
   }
@@ -321,7 +342,7 @@ void UUmDeckRow::ApplyModel(const FUmDeckRowModel& InModel, float WidthSu) {
     Marks->SetVisibility(ESlateVisibility::HitTestInvisible);
     if (UCanvasPanelSlot* S = Cast<UCanvasPanelSlot>(Marks->Slot)) {
       S->SetAutoSize(true);
-      S->SetPosition(FVector2D(CopiesXSu, MarksYSu));
+      S->SetPosition(FVector2D(CopiesXSu, MarksTopSu()));
     }
   }
   ApplyCell();
