@@ -364,7 +364,7 @@ y920┌PANEL-LOC┐       ▭▭▭▭▭▭▭ РУКА ▭▭▭▭▭▭▭  
 - **Строки:** `hud.inspect.close`, `.hidden`, `.copies`, `.type.attack|defense|versatile|scheme`, `.value`, `.boost`,
   `.lang.toggle`, `.art.missing`; режим колоды (SC-23) — `hud.inspect.deck.title` («Колода · {hero}»),
   `hud.inspect.copies.short` («×{n}»), `hud.inspect.back` («Назад»).
-- **Дельта VS-4 V4** (H13: SC-21, SC-22, SC-23, CP-22; `evidence/VISUAL/SC-21`, `SC-22`, `SC-23`, `CP-22`; ВР-VS4-60…-71,
+- **Дельта VS-4 V4** (H13: SC-21, SC-22, SC-23, CP-22; `evidence/VISUAL/SC-21`, `SC-22`, `SC-23`, `CP-22`; ВР-VS4-62…-73,
   по делегированию): `UUmScreenInspect : UUmModalBase` в `Modals` корня (WBP `/Game/S08/UI/Screens/WBP_UI_SCR_INSPECT`).
   Главной кнопки нет (ВР-VS3-SC21-06), «×» — глиф IC-54 32 su с подсказкой «Закрыть». Класс S: скан в слоте 400×555 —
   показ `classS-inspector` (ВР-VS4-62), кэп 1,6× сжимает рамку до скана по центру слота (ВР-VS3-SC21-07). Колонка

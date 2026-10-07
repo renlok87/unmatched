@@ -48,3 +48,20 @@ VS-3, шаг U3, 2026-10-07, ветка `feat/visual-vs3` (worktree `C:/tmp/wt-v
 Кадра скелета в партии нет: список `gameDeckLists` в живых прогонах приходит раньше 300 мс; прогон с задержкой через `drop-graphql-reply-proxy.cjs` не делался (открыто п. 5 VS-3). Трасса `HUD-LOADER` и тесты `Loader.*` — U3.
 
 **Ревью VS-3 (2026-10-07, единый проход):** не принято — кадра скелета панели колоды в живой партии нет (лист галереи — не кадр партии); код и тесты готовы. Прогон с задержкой `gameDeckLists` — [VS-3](../VS-3/README.md) п. 5, ВР-VS3-R04.
+
+## VS-4 V4: живой кадр скелета (п. 5 ревью VS-3, ВР-VS3-R04)
+
+Ответ `gameDeckLists` задержан на 40 с локальным прокси `tools/s10/delay-graphql-query-proxy.cjs` (остальные запросы и
+WS — без изменений); одна клиентская партия VS_AI (UnrealEditor `-game` worktree, основной бэкенд :3000, Sarpedon
+original, 1080p 100 %, 30 FPS, offscreen) с `-S08InspectShots -S08InspectShotsSkeleton=10`: панель колоды открывается
+сразу, пока список грузится (после автозакрытия на начале хода — снова), кадр — когда скелет нарисован, модали нет и с
+начала живого HUD прошло ≥ 10 с (текстуры поля успели подгрузиться). Трасса: `HUD-LOADER kind=skeleton shown=1
+where=deckpanel waitMs=…`, `INSPECTSHOT skeleton waited=5.27 file=s09-hb47-skeleton.png` (`C:/tmp/visual/vs4-v4/live/
+l4-sarp-1080-100-skel`).
+
+Кадр вне git (сканы руки, аватар): `scraped-data/derived/visual-evidence/HB-47/live/` —
+[`visual-evidence-index.json`](visual-evidence-index.json). Read: Ход 3, «Ваша колода · Medusa», вкладки, «В колоде 24 ·
+Сброс 1 · Рука 5», «ТОЛЬКО СБРОС», под ними 6 строк скелета `panel.bg.inset` с разделителями; доска Sarpedon lit3d,
+Medusa и три гарпии v2. Соперник — T. Rex (VS_AI берёт сильнейшего героя): его фигура — заглушка, не шесть фигур v2;
+кадр доказывает живой скелет, не G-LOOK. Первая попытка (без условия «≥ 10 с») поймала кадр на ходу 1 с размытыми
+текстурами поля; вторая — под открытой модалью INSPECT; обе не используются.
