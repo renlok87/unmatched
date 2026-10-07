@@ -60,6 +60,8 @@ def main() -> int:
         if describe.get("warmupTime"):
             problems.append(f"warmup {describe.get('warmupTime')} != 0")
         for index, emitter in enumerate(describe.get("emitters", [])):
+            if not emitter.get("enabled", True):
+                continue  # a disabled emitter never simulates (the template's ribbon of the placard star)
             if emitter.get("simTarget") != "cpu":
                 problems.append(f"{emitter.get('name')}: sim {emitter.get('simTarget')} != cpu")
             if not emitter.get("determinism"):
@@ -85,6 +87,18 @@ def main() -> int:
                 lifetime = value.get("value")
         allocation = round(rate * lifetime, 1) if isinstance(rate, (int, float)) and isinstance(
             lifetime, (int, float)) else None
+        if allocation is None:
+            # a burst system (the placard star since the Z-2 review: the engine DirectionalBurst template) - the
+            # burst counts of the enabled emitters (their EmitterUpdateScript constants)
+            enabled = {e.get("name") for e in describe.get("emitters", []) if e.get("enabled", True)}
+            bursts = 0
+            for script, constants in describe.get("constants", {}).items():
+                if not script.endswith("EmitterUpdateScript"):
+                    continue
+                for key, value in constants.items():
+                    if key.endswith("SpawnBurst_Instantaneous.Spawn Count") and key.split(".")[0] in enabled:
+                        bursts += int(value.get("value") or 0)
+            allocation = bursts or None
         entry["allocationEstimate"] = allocation
         budget = BUDGETS.get(name)
         entry["budget"] = budget

@@ -131,6 +131,8 @@ try:
         m.set_editor_property("use_material_attributes", bool(s["use_material_attributes"]))
         m.set_editor_property("tangent_space_normal", bool(s["tangent_space_normal"]))
         m.set_editor_property("disable_depth_test", bool(s.get("disable_depth_test", False)))
+        if s.get("translucency_pass"):
+            m.set_editor_property("translucency_pass", getattr(u.MaterialTranslucencyPass, s["translucency_pass"]))
         usages = {}
         for usage in s["usages"]:
             usages[usage] = bool(MEL.set_material_usage(m, getattr(u.MaterialUsage, usage)))
@@ -154,6 +156,7 @@ try:
         report["masters"].append({
             "master": spec["master"], "created": created, "usages": usages,
             "disable_depth_test": bool(m.get_editor_property("disable_depth_test")),
+            "translucency_pass": str(m.get_editor_property("translucency_pass")),
             "compile_errors": [str(e) for e in (errors or [])], "statistics": stats(m),
             "parameters": {"scalar": sorted(str(x) for x in MEL.get_scalar_parameter_names(m)),
                            "vector": sorted(str(x) for x in MEL.get_vector_parameter_names(m)),
@@ -177,7 +180,10 @@ try:
             MEL.set_material_instance_static_switch_parameter_value(mi, k, bool(v))
         MEL.update_material_instance(mi)
         EAL.save_loaded_asset(mi, False)
-        report["mis"][spec["asset"]] = {"created": mi_created, "tokens": spec.get("tokens", {})}
+        # the MI's own static permutation (UseSdf on = the SDF branch): the master's statistics compile only the
+        # default (flipbook) branch - the Z-2 review found an SDF compile error the master report could not show
+        report["mis"][spec["asset"]] = {"created": mi_created, "tokens": spec.get("tokens", {}),
+                                        "statistics": stats(mi)}
     report["ok"] = True
 except Exception:  # noqa: BLE001
     report["ok"] = False

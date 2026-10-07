@@ -29,6 +29,22 @@ S08HeroesV2::EClip ClipOfRole(const FString& Role) {
   return S08HeroesV2::EClip::None;
 }
 
+/** The grade of the profile's paste spec: the measured fit of the engine tone curve (the paste may be off - the
+ *  fit still holds); every FX material runs the same inverse curve as M_ConceptPaste. Read when needed (the Z-2
+ *  review: read once at the board-ready hook, before the board's rebuild, it was the neutral grade - the placard
+ *  MIDs then showed a third of the token's emissive, the peach "cream"). */
+void ApplyProfileGrade(const AS08BoardActor& Board, US08CueFxSpawnerComponent& Spawner) {
+  const FS08ConceptPasteSpec& Paste = Board.GetConceptPasteSpec();
+  if (Paste.Grade == ES08ConceptGrade::AcesInverse) {
+    const FVector& K = Paste.FitScale;
+    const FVector& P = Paste.FitPower;
+    Spawner.SetGrade(FLinearColor(K.X, K.Y, K.Z, 0.0f), FLinearColor(1.0f / P.X, 1.0f / P.Y, 1.0f / P.Z, 0.0f),
+                     TEXT("profile"));
+  } else {
+    Spawner.SetGrade(FLinearColor(1.0f, 1.0f, 1.0f, 0.0f), FLinearColor(1.0f, 1.0f, 1.0f, 0.0f), TEXT("neutral"));
+  }
+}
+
 }  // namespace
 
 void AS08FlowGameMode::S08FxBoardReady() {
@@ -38,18 +54,7 @@ void AS08FlowGameMode::S08FxBoardReady() {
   // the prewarm (load + pool prime + one invisible spawn) once per spawner (= per game mode): before the first
   // show, so the first frame of a system never pays the compile / pool price
   if (!CueFxSpawner->HasPrewarmed()) CueFxSpawner->Prewarm();
-  // the grade of the profile's paste spec: the measured fit of the engine tone curve (the paste may be off -
-  // the fit still holds); the placard / every FX material runs the same inverse curve as M_ConceptPaste
-  const FS08ConceptPasteSpec& Paste = BoardActor->GetConceptPasteSpec();
-  if (Paste.Grade == ES08ConceptGrade::AcesInverse) {
-    const FVector& K = Paste.FitScale;
-    const FVector& P = Paste.FitPower;
-    CueFxSpawner->SetGrade(FLinearColor(K.X, K.Y, K.Z, 0.0f),
-                           FLinearColor(1.0f / P.X, 1.0f / P.Y, 1.0f / P.Z, 0.0f), TEXT("profile"));
-  } else {
-    CueFxSpawner->SetGrade(FLinearColor(1.0f, 1.0f, 1.0f, 0.0f), FLinearColor(1.0f, 1.0f, 1.0f, 0.0f),
-                           TEXT("neutral"));
-  }
+  ApplyProfileGrade(*BoardActor, *CueFxSpawner);  // re-read where an FX is shown (the board may rebuild after)
   // ВР-FX16: the honest channel tokens of every `CUE fx` line
   CueDispatcher.AssetResolver = [this](const FString& CueId, const FString& Channel, const FString& Subject) {
     if (Channel == TEXT("vfx")) {
@@ -140,13 +145,14 @@ void AS08FlowGameMode::S08FxBenchStep(const FString& Spec) {
   };
   if (Mode == TEXT("placard")) {
     // the FX-02 placard: the Niagara star (frame 0 of the print flipbook) + three SDF quads, a row over the
-    // board centre; every component lives on this game mode, the bench tears down with it
+    // board centre; 96 uu each (the Z-2 review: at 32 uu the edge / keyline bands were sub-pixel on K1)
     const FVector Centre = BoardActor->GetActorLocation();
-    const float Spacing = 46.0f;
+    const float Spacing = 112.0f;
+    if (CueFxSpawner) ApplyProfileGrade(*BoardActor, *CueFxSpawner);  // the board is built now: the real profile
     if (CueFxSpawner) {
       UNiagaraComponent* Star = CueFxSpawner->SpawnSystem(
           TEXT("/Game/S08/FX/Systems/NS_FX_PlacardStar"),
-          FTransform(FRotator(0.0f, 90.0f, 0.0f), Centre + FVector(1.5f * Spacing, 0.0f, 22.0f)));
+          FTransform(FRotator(0.0f, 90.0f, 0.0f), Centre + FVector(2.0f * Spacing, 0.0f, 60.0f)));
       const bool bStarOk = Star && Star->IsRegistered();
       FS08Trace::Write(FString::Printf(TEXT("FX bench placard star=%s"), bStarOk ? TEXT("registered") : TEXT("failed")));
     }
@@ -162,11 +168,12 @@ void AS08FlowGameMode::S08FxBenchStep(const FString& Spec) {
       UStaticMeshComponent* Quad = NewObject<UStaticMeshComponent>(BoardActor);
       Quad->SetStaticMesh(Plane);
       Quad->SetMaterial(0, Mi);
-      Quad->SetWorldLocation(Centre + FVector((I - 1) * Spacing, 0.0f, 22.0f));
+      Quad->SetWorldLocation(Centre + FVector((I - 1) * Spacing, 0.0f, 60.0f));
       // the engine plane faces -Z (its normal down): flip it up and face the board camera (yaw 90)
       Quad->SetWorldRotation(FRotator(90.0f, 90.0f, 0.0f));
-      Quad->SetWorldScale3D(FVector(0.32f));  // 100 uu plane x 0.32 = 32 uu quad
+      Quad->SetWorldScale3D(FVector(0.96f));  // 100 uu plane x 0.96 = 96 uu quad
       Quad->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+      Quad->SetTranslucentSortPriority(S08CueFx::TranslucentSortPriority);
       Quad->RegisterComponentWithWorld(World);
       // the runtime grade of the active profile (the placard quads are not Niagara - a plain MID override)
       if (CueFxSpawner) {

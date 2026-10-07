@@ -126,8 +126,8 @@ try:
             {"match": "*SpawnBurst_Instantaneous.Spawn Time", "set": 0},
             {"match": "*InitializeParticle.Lifetime Min", "set": 100000.0},
             {"match": "*InitializeParticle.Lifetime Max", "set": 100000.0},
-            {"match": "*InitializeParticle.Sprite Size Min", "set": [32.0, 32.0]},
-            {"match": "*InitializeParticle.Sprite Size Max", "set": [32.0, 32.0]},
+            {"match": "*InitializeParticle.Sprite Size Min", "set": [96.0, 96.0]},
+            {"match": "*InitializeParticle.Sprite Size Max", "set": [96.0, 96.0]},
             {"match": "*ScaleSpriteSizeBySpeed.Min Scale Factor", "set": [1.0, 1.0]},
             {"match": "*ScaleSpriteSizeBySpeed.Max Scale Factor", "set": [1.0, 1.0]},
             {"match": "*RandomRangeFloat002.Minimum", "set": 0.0},
@@ -138,7 +138,12 @@ try:
     }
     tune = TUNE.tune_niagara_system(PLACARD, json.dumps(spec))
     # FX-04 (the Z-2 review): bFixedBounds itself is not reachable from python (its name collides with FixedBounds)
-    out["placard"]["fixedBoundsOn"] = json.loads(u.S08FxAuthoringLibrary.set_system_fixed_bounds(PLACARD, 30.0))
+    out["placard"]["fixedBoundsOn"] = json.loads(u.S08FxAuthoringLibrary.set_system_fixed_bounds(PLACARD, 60.0))
+    # FX-02: the print flipbook samples its frame through the renderer's SubUV grid (T_FX_HitStar: 8 x 1)
+    out["placard"]["subImage"] = json.loads(
+        u.S08FxAuthoringLibrary.set_sprite_sub_image(PLACARD, "DirectionalBurst", 8, 1))
+    if not out["placard"]["subImage"].get("ok"):
+        raise RuntimeError("SubImageSize: %s" % out["placard"]["subImage"])
     EAL.save_loaded_asset(load(PLACARD), False)
     out["tune"] = json.loads(tune)
     out["describe"] = json.loads(TUNE.describe_niagara_system(PLACARD))["describe"]

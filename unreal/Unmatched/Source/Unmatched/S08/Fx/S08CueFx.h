@@ -38,6 +38,10 @@ inline const TCHAR* const BoardEffectType = TEXT("/Game/S08/FX/EffectTypes/NET_U
 /** ВР-25: not more than three combat systems alive at once, six board systems. */
 constexpr int32 CombatMaxSystemInstances = 3;
 constexpr int32 BoardMaxSystemInstances = 6;
+/** The translucent sort priority of every FX of these cards (systems and print quads): after the board's
+ *  translucent layers (backdrop -10, move plates 10) - the Z-2 review found the placard diamond overdrawn by the
+ *  board's translucency when the distance sort put it first. */
+constexpr int32 TranslucentSortPriority = 20;
 
 /** One CUE's FX binding (the vfx block of its cue-table row). */
 struct FEntry {

@@ -23,4 +23,9 @@ public:
    *  cube of HalfExtent around the system origin. The caller saves the package. JSON report. */
   UFUNCTION(BlueprintCallable, Category = "S08|FX")
   static FString SetSystemFixedBounds(const FString& SystemPath, float HalfExtent);
+
+  /** FX-02: the SubUV grid of an emitter's sprite renderers (SubImageSize X x Y) - the print flipbook samples the
+   *  frame through TextureSampleParameterSubUV. The caller saves the package. JSON report. */
+  UFUNCTION(BlueprintCallable, Category = "S08|FX")
+  static FString SetSpriteSubImage(const FString& SystemPath, const FString& EmitterName, int32 X, int32 Y);
 };

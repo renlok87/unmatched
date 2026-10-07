@@ -4,6 +4,9 @@
 #include "Dom/JsonObject.h"
 #include "Misc/PackageName.h"
 #include "NiagaraEffectType.h"
+#include "NiagaraEmitter.h"
+#include "NiagaraEmitterHandle.h"
+#include "NiagaraSpriteRendererProperties.h"
 #include "NiagaraSystem.h"
 #include "Serialization/JsonSerializer.h"
 #include "Serialization/JsonWriter.h"
@@ -48,6 +51,49 @@ FString US08FxAuthoringLibrary::SetEffectTypeCaps(const FString& EffectTypePath,
   Report->SetStringField(TEXT("error"), TEXT("editor only"));
 #endif
   Report->SetBoolField(TEXT("ok"), bOk);
+  FString Out;
+  const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&Out);
+  FJsonSerializer::Serialize(Report, Writer);
+  return Out;
+}
+
+FString US08FxAuthoringLibrary::SetSpriteSubImage(const FString& SystemPath, const FString& EmitterName, int32 X,
+                                                 int32 Y) {
+  TSharedRef<FJsonObject> Report = MakeShared<FJsonObject>();
+  Report->SetStringField(TEXT("system"), SystemPath);
+  Report->SetStringField(TEXT("emitter"), EmitterName);
+  int32 Renderers = 0;
+#if WITH_EDITOR
+  int32 Dot = INDEX_NONE;
+  const FString ObjectPath = SystemPath.FindChar(TEXT('.'), Dot)
+      ? SystemPath : SystemPath + TEXT(".") + FPackageName::GetShortName(SystemPath);
+  UNiagaraSystem* System = SystemPath.StartsWith(TEXT("/Game/S08/FX/"))
+      ? LoadObject<UNiagaraSystem>(nullptr, *ObjectPath) : nullptr;
+  if (System) {
+    for (FNiagaraEmitterHandle& Handle : System->GetEmitterHandles()) {
+      if (Handle.GetName().ToString() != EmitterName) continue;
+      FVersionedNiagaraEmitterData* Data = Handle.GetEmitterData();
+      if (!Data) continue;
+      for (UNiagaraRendererProperties* R : Data->GetRenderers()) {
+        UNiagaraSpriteRendererProperties* Sprite = Cast<UNiagaraSpriteRendererProperties>(R);
+        if (!Sprite) continue;
+        Sprite->Modify();
+        Sprite->SubImageSize = FVector2D(X, Y);
+        FProperty* Prop = UNiagaraSpriteRendererProperties::StaticClass()->FindPropertyByName(TEXT("SubImageSize"));
+        FPropertyChangedEvent Event(Prop);
+        Sprite->PostEditChangeProperty(Event);
+        ++Renderers;
+      }
+    }
+    System->MarkPackageDirty();
+  } else {
+    Report->SetStringField(TEXT("error"), TEXT("not a /Game/S08/FX/ Niagara system"));
+  }
+#else
+  Report->SetStringField(TEXT("error"), TEXT("editor only"));
+#endif
+  Report->SetNumberField(TEXT("renderers"), Renderers);
+  Report->SetBoolField(TEXT("ok"), Renderers > 0);
   FString Out;
   const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&Out);
   FJsonSerializer::Serialize(Report, Writer);

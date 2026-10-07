@@ -63,59 +63,90 @@ MI_PLAN = [
     ("MI_FX_Vortex", "", False, -1, "fx.gold", "card.glyph", "mark.keyline"),
     ("MI_FX_Arc", "overlay", False, -1, "fx.gold", "card.glyph", "mark.keyline"),
     ("MI_FX_Chevron", "", True, 2, "fx.stone", "card.glyph", "mark.keyline"),
-    # the FX-02 test placard: the star flipbook + the three SDF shapes (readability: body card.cream on keyline)
+    # the FX-02 test placard: the star flipbook + the three SDF shapes. ВР-Z2R-07 (по делегированию, the Z-2 review):
+    # every placard body differs from its card.glyph edge by >= 20 grey levels (the card's readability rule) - the
+    # cream disk / chevron of Z-2 sat 12 levels under the white edge and the edge vanished; the outer keyline
+    # mark.keyline separates the shape from the board (body : keyline >= 3 : 1 for every light body)
     ("MI_FX_PlacardStar", "overlay", False, -1, "fx.impact", "card.glyph", "mark.keyline"),
-    ("MI_FX_PlacardDisk", "", True, 0, "card.cream", "card.glyph", "mark.keyline"),
+    ("MI_FX_PlacardDisk", "", True, 0, "fx.gold", "card.glyph", "mark.keyline"),
     ("MI_FX_PlacardDiamond", "", True, 1, "fx.heal", "card.glyph", "mark.keyline"),
-    ("MI_FX_PlacardChevron", "", True, 2, "fx.stone", "card.glyph", "mark.keyline"),
+    ("MI_FX_PlacardChevron", "", True, 2, "fx.dust", "card.glyph", "mark.keyline"),
 ]
+# the placard band widths (fractions of the shape radius): the edge and the keyline >= 1 px at 720p on K1 for the
+# 96 uu placard quads of -BenchFx=placard (the Z-2 32 uu quads with 0.14 / 0.07 gave a sub-pixel keyline)
+PLACARD_EDGE_WIDTH = 0.16
+PLACARD_KEYLINE_WIDTH = 0.08
 
 FLIPBOOK_HLSL = """// FX-02 print flipbook: the mask's R body / G edge / B keyline / A = max (ВР-FX03), straight alpha,
-// the hard 0.5 threshold smoothed 1 px, then the inverse tone curve of M_ConceptPaste (graph 3).
-float4 m = Texture2DSample(Mask, MaskSampler, UV);
+// the hard 0.5 threshold smoothed 1 px, then the inverse tone curve of M_ConceptPaste (graph 3). M is the SubUV
+// sample of the Niagara sprite (TextureSampleParameterSubUV "Mask", the renderer's SubImageSize, no frame blend).
+float4 m = M;
 float3 col = m.r * ColorBody.rgb + m.g * ColorEdge.rgb + m.b * ColorKeyline.rgb;
 float a = m.a * saturate(ParticleAlpha) * saturate(Opacity);
 float aw = fwidth(a) + 1e-4;
 a = smoothstep(0.5 - aw, 0.5 + aw, a);
-float3 t = saturate(col);
-float3 y = min(pow(t, GradePow.rgb), 0.98);
+// ВР-Z2R-09 (по делегированию): the inverse runs per AP1 channel - the engine's filmic curve works on AP1, so the
+// per-sRGB-channel inverse of the paste over-saturated the tokens (fx.gold read (255,199,100) instead of
+// (242,193,78), dE76 7.9); grey tokens are unchanged (the two matrices cancel on the grey axis)
+const float3x3 S2A = float3x3(0.613097, 0.339523, 0.047379, 0.070194, 0.916354, 0.013452, 0.020616, 0.109570, 0.869815);
+const float3x3 A2S = float3x3(1.704859, -0.621715, -0.083299, -0.130078, 1.140734, -0.010560, -0.023964, -0.128975, 1.153013);
+// ВР-Z2R-12 (по делегированию): the residual of the engine chain (gamut expansion, the film curve's desaturation)
+// measured on the placard (Sarpedon K1, 5 tokens fx.heal / fx.gold / fx.dust / fx.impact / card.glyph): the
+// display-linear map obs = A x target was fitted, its inverse pre-corrects the target here
+const float3x3 FIX = float3x3(0.9100, 0.2545, -0.1580, 0.0266, 0.9584, 0.0321, 0.0036, -0.0773, 1.0647);
+float3 tl = max(mul(S2A, saturate(mul(FIX, saturate(col)))), 0.0);
+float3 y = min(pow(tl, GradePow.rgb), 0.98);
 float3 qa = 2.51 - y * 2.43;
 float3 qb = 0.03 - y * 0.59;
 float3 qc = -y * 0.14;
 float3 x = (-qb + sqrt(max(qb * qb - 4.0 * qa * qc, 0.0))) / (2.0 * qa);
-return float4(x / 0.6 * GradeScale.rgb, a);"""
+return float4(max(mul(A2S, x / 0.6 * GradeScale.rgb), 0.0), a);"""
 
-SDF_HLSL = """// FX-02 print SDF shapes (0 disk, 1 diamond, 2 chevron): t = 0 at the shape centre / stroke centre line,
-// 1 at the shape edge; body inside, the edge band at the rim, the keyline ring just outside (fractions of the
-// radius), then the same inverse tone curve and the 0.5 alpha threshold as the flipbook branch.
+SDF_HLSL = """// FX-02 print SDF shapes (0 disk, 1 diamond, 2 chevron): t = 0 at the shape centre / the stroke centre line,
+// 1 at the shape edge. HARD bands (the Z-2 review: the overlapping triangle weights blended the tones and the
+// keyline ring of the disk / diamond fell outside the quad): body t < 1 - EdgeWidth, edge up to t = 1, keyline up
+// to t = 1 + KeylineWidth, each boundary anti-aliased over 1 px (fwidth); the shape is scaled so that its keyline
+// stays inside the quad. Then the same inverse tone curve and the 0.5 alpha threshold as the flipbook branch.
 float2 p = UV - 0.5;
-float t;
-if (SdfShape < 0.5) {
-  t = length(p) * 2.0;
-} else if (SdfShape < 1.5) {
-  t = (abs(p.x) + abs(p.y)) * 2.0;
-} else {
-  // chevron: the signed distance to the V centre line y = 0.25 - 0.9|x| (opening up), band-normalized
-  // ("line" is a modifier keyword in SM6 HLSL - the local is "vline")
-  float vline = p.y + 0.25 - 0.9 * abs(p.x);
-  t = abs(vline) * (1.0 / sqrt(1.0 + 0.81)) * 4.0;
-}
 float ew = max(EdgeWidth, 1e-3);
 float kw = max(KeylineWidth, 1e-3);
-float wb = 1.0 - saturate((t - (1.0 - 2.0 * ew)) / ew);
-float we = 1.0 - saturate(abs(t - (1.0 - ew)) / ew);
-float wk = 1.0 - saturate(abs(t - (1.0 + kw)) / kw);
-float3 col = wb * ColorBody.rgb + we * ColorEdge.rgb + wk * ColorKeyline.rgb;
-float a = max(max(wb, we), wk) * saturate(ParticleAlpha) * saturate(Opacity);
+float t;
+if (SdfShape < 0.5) {
+  t = length(p) * 2.0 * (1.0 + kw);
+} else if (SdfShape < 1.5) {
+  t = (abs(p.x) + abs(p.y)) * 2.0 * (1.0 + kw);
+} else {
+  // chevron: the distance to the V centre line y = 0.2 - 0.8|x| (opening up), half width hw, the arms capped at
+  // |x| = 0.3 ("line" is a modifier keyword in SM6 HLSL - the local is "vline")
+  float hw = 0.17 / (1.0 + kw);
+  float vline = p.y + 0.2 - 0.8 * abs(p.x);
+  t = max(abs(vline) * (1.0 / sqrt(1.64)) / hw, 1.0 + (abs(p.x) - 0.3) / hw);
+}
+float aa = max(fwidth(t), 1e-4);
+float inBody = 1.0 - smoothstep(1.0 - ew - aa, 1.0 - ew + aa, t);
+float inShape = 1.0 - smoothstep(1.0 - aa, 1.0 + aa, t);
+float inKey = 1.0 - smoothstep(1.0 + kw - aa, 1.0 + kw + aa, t);
+float3 col = inBody * ColorBody.rgb + (inShape - inBody) * ColorEdge.rgb + (inKey - inShape) * ColorKeyline.rgb;
+col /= max(inKey, 1e-4);
+float a = inKey * saturate(ParticleAlpha) * saturate(Opacity);
 float aw = fwidth(a) + 1e-4;
 a = smoothstep(0.5 - aw, 0.5 + aw, a);
-float3 tc = saturate(col);
-float3 y = min(pow(tc, GradePow.rgb), 0.98);
+// ВР-Z2R-09 (по делегированию): the inverse runs per AP1 channel - the engine's filmic curve works on AP1, so the
+// per-sRGB-channel inverse of the paste over-saturated the tokens (fx.gold read (255,199,100) instead of
+// (242,193,78), dE76 7.9); grey tokens are unchanged (the two matrices cancel on the grey axis)
+const float3x3 S2A = float3x3(0.613097, 0.339523, 0.047379, 0.070194, 0.916354, 0.013452, 0.020616, 0.109570, 0.869815);
+const float3x3 A2S = float3x3(1.704859, -0.621715, -0.083299, -0.130078, 1.140734, -0.010560, -0.023964, -0.128975, 1.153013);
+// ВР-Z2R-12 (по делегированию): the residual of the engine chain (gamut expansion, the film curve's desaturation)
+// measured on the placard (Sarpedon K1, 5 tokens fx.heal / fx.gold / fx.dust / fx.impact / card.glyph): the
+// display-linear map obs = A x target was fitted, its inverse pre-corrects the target here
+const float3x3 FIX = float3x3(0.9100, 0.2545, -0.1580, 0.0266, 0.9584, 0.0321, 0.0036, -0.0773, 1.0647);
+float3 tl = max(mul(S2A, saturate(mul(FIX, saturate(col)))), 0.0);
+float3 y = min(pow(tl, GradePow.rgb), 0.98);
 float3 qa = 2.51 - y * 2.43;
 float3 qb = 0.03 - y * 0.59;
 float3 qc = -y * 0.14;
 float3 x = (-qb + sqrt(max(qb * qb - 4.0 * qa * qc, 0.0))) / (2.0 * qa);
-return float4(x / 0.6 * GradeScale.rgb, a);"""
+return float4(max(mul(A2S, x / 0.6 * GradeScale.rgb), 0.0), a);"""
 
 
 def srgb_to_linear(channel: int) -> float:
@@ -162,9 +193,10 @@ def print_graph(tok: dict, star_texture: str) -> Graph:
     g = Graph()
     g.add("uv", "TextureCoordinate", {"coordinate_index": 0}, 0)
     g.add("vcol", "VertexColor", {}, 0)
-    g.add("mask", "TextureObjectParameter", {"parameter_name": "Mask", "texture": star_texture,
-                                             "sampler_type": "SAMPLERTYPE_MASKS", "group": "Print",
-                                             "sort_priority": 0}, 0)
+    # the SubUV sample of the Niagara sprite (the renderer's SubImageSize picks the frame; no frame blend - print)
+    g.add("mask", "TextureSampleParameterSubUV", {"parameter_name": "Mask", "texture": star_texture,
+                                                  "sampler_type": "SAMPLERTYPE_MASKS", "blend": False,
+                                                  "group": "Print", "sort_priority": 0}, 0)
     for nid, name, default, group, sort in (
             ("p_op", "Opacity", 1.0, "Print", 1),
             ("p_shape", "SdfShape", 0.0, "Print", 2),
@@ -188,7 +220,7 @@ def print_graph(tok: dict, star_texture: str) -> Graph:
     g.add("p_gpow", "VectorParameter", {"parameter_name": "GradePow",
                                         "default_value": {"r": 1.0, "g": 1.0, "b": 1.0, "a": 0.0},
                                         "group": "Grade", "sort_priority": 1}, 1)
-    flip_inputs = ["Mask", "UV", "ParticleAlpha", "Opacity", "ColorBody", "ColorEdge", "ColorKeyline",
+    flip_inputs = ["M", "ParticleAlpha", "Opacity", "ColorBody", "ColorEdge", "ColorKeyline",
                    "GradeScale", "GradePow"]
     g.add("flip", "Custom", {"code": FLIPBOOK_HLSL, "description": "UM_FX_Print_Flipbook",
                              "output_type": "CMOT_FLOAT4", "inputs": flip_inputs}, 2)
@@ -196,7 +228,7 @@ def print_graph(tok: dict, star_texture: str) -> Graph:
                   "ColorEdge", "ColorKeyline", "GradeScale", "GradePow"]
     g.add("sdf", "Custom", {"code": SDF_HLSL, "description": "UM_FX_Print_Sdf",
                             "output_type": "CMOT_FLOAT4", "inputs": sdf_inputs}, 2)
-    for inp, (src, out) in {"Mask": ("mask", ""), "UV": ("uv", ""), "ParticleAlpha": ("vcol", "A"),
+    for inp, (src, out) in {"M": ("mask", "RGBA"), "UV": ("uv", ""), "ParticleAlpha": ("vcol", "A"),
                             "Opacity": ("p_op", ""), "SdfShape": ("p_shape", ""), "EdgeWidth": ("p_edgew", ""),
                             "KeylineWidth": ("p_keyw", ""), "ColorBody": ("p_body", ""),
                             "ColorEdge": ("p_edge", ""), "ColorKeyline": ("p_key", ""),
@@ -207,8 +239,10 @@ def print_graph(tok: dict, star_texture: str) -> Graph:
                                               "group": "Print", "sort_priority": 8}, 3)
     g.link("flip", "", "sw_sdf", "False")
     g.link("sdf", "", "sw_sdf", "True")
-    g.add("rgb", "ComponentMask", {"r": True, "g": True, "b": True}, 4)
-    g.add("alp", "ComponentMask", {"a": True}, 4)
+    # every channel flag explicit (the Z-2 review: the "alp" mask kept the default R flag, so the Opacity pin read
+    # the RED emissive - dark keylines and the green diamond rendered see-through)
+    g.add("rgb", "ComponentMask", {"r": True, "g": True, "b": True, "a": False}, 4)
+    g.add("alp", "ComponentMask", {"r": False, "g": False, "b": False, "a": True}, 4)
     g.link("sw_sdf", "", "rgb", "")
     g.link("sw_sdf", "", "alp", "")
     g.attr("MP_EMISSIVE_COLOR", "rgb", "")
@@ -279,7 +313,9 @@ def mi_specs(tok: dict) -> list:
         specs.append({
             "asset": "%s/%s" % (MATERIALS, asset),
             "parent": "%s/M_FX_Print" % MATERIALS if not master else "%s/M_FX_Print_Overlay" % MATERIALS,
-            "scalars": {"Opacity": 1.0, "SdfShape": float(shape), "EdgeWidth": 0.14, "KeylineWidth": 0.07},
+            "scalars": {"Opacity": 1.0, "SdfShape": float(shape),
+                        "EdgeWidth": PLACARD_EDGE_WIDTH if asset.startswith("MI_FX_Placard") else 0.14,
+                        "KeylineWidth": PLACARD_KEYLINE_WIDTH if asset.startswith("MI_FX_Placard") else 0.07},
             "vectors": vectors,
             "textures": {"Mask": "%s/Textures/T_FX_HitStar" % FX_ROOT},
             "switches": {"UseSdf": use_sdf},
@@ -288,12 +324,35 @@ def mi_specs(tok: dict) -> list:
     return specs
 
 
+def grey(hexstr: str) -> float:
+    """Rec.709 luma of the sRGB-encoded colour, 0..255 (the "в сером" of the card)."""
+    h = hexstr.lstrip("#")
+    r, g, b = (int(h[i:i + 2], 16) for i in (0, 2, 4))
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+
+def contrast(a: str, b: str) -> float:
+    def lum(hexstr):
+        h = hexstr.lstrip("#")
+        c = [srgb_to_linear(int(h[i:i + 2], 16)) for i in (0, 2, 4)]
+        return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
+    hi, lo = sorted((lum(a), lum(b)), reverse=True)
+    return (hi + 0.05) / (lo + 0.05)
+
+
 def check(tok: dict) -> list:
     problems = []
     for asset, _, _, _, body, edge, key in MI_PLAN:
         for t in (body, edge, key):
             if t not in tok:
                 problems.append("%s: token %s missing" % (asset, t))
+        if problems or not asset.startswith("MI_FX_Placard"):
+            continue
+        # FX-02 readability (ВР-Z2R-07): body / edge >= 20 grey levels, body : keyline >= 3 : 1
+        if abs(grey(tok[body]) - grey(tok[edge])) < 20:
+            problems.append("%s: body %s / edge %s differ by < 20 grey levels" % (asset, body, edge))
+        if contrast(tok[body], tok[key]) < 3.0:
+            problems.append("%s: body %s : keyline %s < 3 : 1" % (asset, body, key))
     return problems
 
 
@@ -317,7 +376,8 @@ def main() -> int:
         masters.append({"master": "%s/%s" % (MATERIALS, name), "settings": {
             "blend_mode": "BLEND_TRANSLUCENT", "shading_model": "MSM_UNLIT", "two_sided": True,
             "use_material_attributes": False, "tangent_space_normal": False,
-            "usages": ["MATUSAGE_NIAGARA_SPRITES"], "disable_depth_test": overlay},
+            "usages": ["MATUSAGE_NIAGARA_SPRITES"], "disable_depth_test": overlay,
+            "translucency_pass": "MTP_AFTER_DOF"},
             "nodes": g.nodes, "links": g.links, "attrs": g.attrs, "instances": [],
             "signature": "%s-v%s-overlay%d" % (name, TOOL_VERSION, int(overlay))})
     res = de010.run_editor(REPO / "tools" / "art" / "fx" / "ue_fx_import_ue.py",
@@ -328,8 +388,10 @@ def main() -> int:
     de010.write(WORK / "fx-import.json", res)
     stats = {m["master"].rsplit("/", 1)[-1]: m.get("statistics", {}).get("num_pixel_shader_instructions")
              for m in res.get("masters", [])}
-    ok = not any(m.get("compile_errors") for m in res.get("masters", [])) and res.get("texture", {}).get("ok")
-    print(json.dumps({"ok": ok, "pixelInstructions": stats, "mis": sorted(res.get("mis", {})),
+    mi_ps = {k.rsplit("/", 1)[-1]: (v.get("statistics") or {}).get("num_pixel_shader_instructions")
+             for k, v in res.get("mis", {}).items()}
+    ok = not any(m.get("compile_errors") for m in res.get("masters", [])) and res.get("texture", {}).get("ok")         and all(isinstance(n, int) and n > 0 for n in mi_ps.values())
+    print(json.dumps({"ok": ok, "pixelInstructions": stats, "miPixelInstructions": mi_ps,
                       "errors": [e for m in res.get("masters", []) for e in m.get("compile_errors", [])][:5]},
                      indent=1))
     return 0 if ok else 1
