@@ -35,13 +35,9 @@ void AS08FlowGameMode::S08FxBoardReady() {
   if (!BoardActor || !GetWorld()) return;
   if (!CueFxSpawner) CueFxSpawner = NewObject<US08CueFxSpawnerComponent>(this);
   if (!CueFxSpawner->IsRegistered()) CueFxSpawner->RegisterComponent();
-  // the prewarm (load + pool prime + one invisible spawn) once per process: before the first show, so the
-  // first frame of a system never pays the compile / pool price
-  static bool bPrewarmed = false;
-  if (!bPrewarmed) {
-    bPrewarmed = true;
-    CueFxSpawner->Prewarm();
-  }
+  // the prewarm (load + pool prime + one invisible spawn) once per spawner (= per game mode): before the first
+  // show, so the first frame of a system never pays the compile / pool price
+  if (!CueFxSpawner->HasPrewarmed()) CueFxSpawner->Prewarm();
   // the grade of the profile's paste spec: the measured fit of the engine tone curve (the paste may be off -
   // the fit still holds); the placard / every FX material runs the same inverse curve as M_ConceptPaste
   const FS08ConceptPasteSpec& Paste = BoardActor->GetConceptPasteSpec();
@@ -82,16 +78,17 @@ void AS08FlowGameMode::S08FxBoardReady() {
 }
 
 void AS08FlowGameMode::S08FxHoverChanged(const FString& NewId, const FString& OldId) {
-  // FX-06: the rim follows the cursor's figure - in over 150 ms (ease-out to 0.6, width 0.2, held), out 120 ms;
-  // a fallen figure shows no rim; -S08FxLegacy writes nothing (the CUE row still traces).
+  // FX-06: the rim follows the cursor's figure - in over 150 ms (ease-out to 0.6, width 0.2, held), out 120 ms
+  // (S08FigureFx::HoverRim / HoverLeaveMs, milliseconds); a fallen figure shows no rim; -S08FxLegacy writes
+  // nothing (the CUE row still traces).
   auto Rim = [&](const FString& Id, bool bOn) {
     if (Id.IsEmpty() || !BoardActor || !S08CueFx::FxEnabled()) return;
     AS08FighterActor* Actor = BoardActor->FindFighterActor(Id);
     if (!Actor || Actor->IsInDeathHold()) return;
     if (bOn) {
-      Actor->PlayRim(0.15f, 0.6f, 0.2f, 0.15f, 0.12f, /*bHold=*/true);
+      Actor->PlayRimPulse(S08FigureFx::HoverRim);
     } else {
-      Actor->StopRim(0.12f);
+      Actor->StopRim(S08FigureFx::HoverLeaveMs);
     }
   };
   Rim(OldId, false);
@@ -102,11 +99,12 @@ void AS08FlowGameMode::S08FxHoverChanged(const FString& NewId, const FString& Ol
 }
 
 void AS08FlowGameMode::S08FxDefensePlayed(const FString& DefenderId) {
-  // FX-17 (ВР-23): the cream rim pulse of the defender - 0 -> 1 over 60 ms, held to 180, out by 300; the CUE
-  // row (mat=Rim, no vfx) has already traced above the call.
+  // FX-17 (ВР-23): the cream rim pulse of the defender from t0 = event + 150 ms (CUE-009 feedback_delay_ms) -
+  // 0 -> 1 over 60 ms, held to t0+180, 0 at t0+300 (S08FigureFx::DefenseRim); the CUE row (mat=Rim, no vfx) has
+  // already traced above the call.
   if (DefenderId.IsEmpty() || !BoardActor || !S08CueFx::FxEnabled()) return;
   if (AS08FighterActor* Actor = BoardActor->FindFighterActor(DefenderId)) {
-    if (!Actor->IsInDeathHold()) Actor->PlayRim(0.3f, 1.0f, 0.35f, 0.06f, 0.12f);
+    if (!Actor->IsInDeathHold()) Actor->PlayRimPulse(S08FigureFx::DefenseRim);
   }
 }
 
