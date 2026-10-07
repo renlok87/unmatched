@@ -21,10 +21,10 @@
 |---|---|---|---|
 | 1 | Мастер и рабочие размеры ×4 nearest | `accept-cursor-pointer.png`, `sheet-sizes.png` | да |
 | 2 | Цвет, серый Rec.709, дейтеранопия | `accept-cursor-pointer.png`, `sheet-01-cursor-pointer-24.png`, `sheet-02-cursor-pointer-32.png`, `sheet-03-cursor-pointer-48.png` | да |
-| 3 | Кадр K1 обеих настоящих досок, 1080p / 720p, 100 % / 150 % | — | нет: после носителя (курсоры HB-12 (UUmCursor, шаг H3)) |
+| 3 | Кадр K1 обеих настоящих досок, 1080p / 720p, 100 % / 150 % | лист галереи ACTIONS (`-S08IconGalleryActions`, HB-43), состояние hover — указатель над доступной ячейкой — вне git (кадр доски, ВР-VS4-01): `scraped-data/derived/visual-evidence/IC-59/` (k1-gallery-hover-*.png), [`visual-evidence-index.json`](visual-evidence-index.json) | галерея: да (VS-4 V3); packaged `-Bench`: шаг «Кадры» |
 | 4 | Контекст: panel.bg, card.cream, поле, соседи | `check-cursor.png`, `check-neighbours.png` | да |
 | 5 | Движение | курсоры вне контракта | — |
-| 6 | Трассы | — | после носителя |
+| 6 | Трассы | трассы галереи ACTIONS (`UI-HUD-ACTIONS … tip=`), `check-trace` PASS; строка курсора `HUD-CURSOR` — шаг «Кадры» | частично |
 | 7 | README | этот файл, `checks.json`, `accept.json`, `sheet-manifest.json` | да |
 
 ## Входы sheet.py
@@ -42,7 +42,7 @@
 - `check-neighbours.png`: в сером рука отличается от стрелки cursor-default и от стрелки с X cursor-unavailable при 24 / 32 / 48 px.
 - audit мастера: margin_px [96, 64, 128, 64], seam_px 0 (набор v3 — до 21).
 - sha1 принятых файлов набора (27 id, 3 варианта, маска, кандидат и 17 строк VR44 шага A2) в `manifest.json` не изменились: 1290 из 1290 те же, добавлено 99 (пять id шага A3).
-- Доска / задник / шесть фигур v2: кадров ещё нет — значок без носителя в UE.
+- VS-4 V3 (2026-10-07): лист галереи HB-43 открыт (Read: `k1-gallery-hover-colour.png`): рука-указатель 1 : 1 в горячей точке над доступной ячейкой МАНЁВР на 8 холстах, палец вверх, keyline держит курсор на тёмном диске и на светлой подписи. Доска — Marmoreal с нарисованным задником / Sarpedon lit3d, шесть фигур v2.
 
 ## Что не прошло или отложено
 

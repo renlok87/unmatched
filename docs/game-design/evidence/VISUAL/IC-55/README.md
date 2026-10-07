@@ -22,10 +22,10 @@
 |---|---|---|---|
 | 1 | Мастер и рабочие размеры ×4 nearest | `accept-ui-log.png`, `sheet-sizes.png` | да |
 | 2 | Цвет, серый Rec.709, дейтеранопия | `accept-ui-log.png`, `sheet-01-ui-log-24.png`, `sheet-02-ui-log-32.png`, `sheet-03-ui-log-48.png` | да |
-| 3 | Кадр K1 обеих настоящих досок, 1080p / 720p, 100 % / 150 % | — | нет: после носителя (блок TOP, класс S (UUmHudTop LogButton)) |
+| 3 | Кадр K1 обеих настоящих досок, 1080p / 720p, 100 % / 150 % | лист галереи TOP класса S (`-S08IconGalleryActions`, HB-43: 1080p 150 % и 720p 150 %, состояния own-2 и opp) — вне git (кадр доски, ВР-VS4-01): `scraped-data/derived/visual-evidence/IC-55/` (k1-gallery-top-s-*.png), [`visual-evidence-index.json`](visual-evidence-index.json) | галерея: да (VS-4 V3); packaged `-Bench`: шаг «Кадры» |
 | 4 | Контекст: panel.bg, card.cream, поле, соседи | `check-neighbours.png`, `check-discs.png` | да |
 | 5 | Движение | контракт `docs/unreal/contracts/hud/icon-motion.json` (эталон `icon-motion-golden.json`) | G-ICON — IC-70 |
-| 6 | Трассы | — | после носителя |
+| 6 | Трассы | лист ACTIONS не пишет строку TOP; `SHOT widget id=UI-HUD-TOP` — шаг «Кадры» | нет |
 | 7 | README | этот файл, `checks.json`, `accept.json`, `sheet-manifest.json` | да |
 
 ## Входы sheet.py
@@ -44,7 +44,7 @@
 - Строк при 16 / 18 / 21 / 24 / 32 / 48 px: 2 / 2 / 3 / 3 / 3 / 3 (`checks.json`); на 24 px маркер 2 px, зазоры 1 px.
 - audit мастера: margin_px [32, 32, 32, 32], seam_px 0 (набор v3 — до 21).
 - sha1 принятых файлов набора (27 id, 3 варианта, маска, кандидат и 17 строк VR44 шага A2) в `manifest.json` не изменились: 1290 из 1290 те же, добавлено 99 (пять id шага A3).
-- Доска / задник / шесть фигур v2: кадров ещё нет — значок без носителя в UE.
+- VS-4 V3 (2026-10-07): лист галереи HB-43 открыт (Read: `k1-gallery-top-s-colour.png`): диск «Журнал» справа в TOP класса S (1080p 150 %, 720p 150 %) на обеих досках, три строки с маркерами читаются; в ход соперника — тот же вид. Доска — Marmoreal с нарисованным задником / Sarpedon lit3d.
 
 ## Что не прошло или отложено
 

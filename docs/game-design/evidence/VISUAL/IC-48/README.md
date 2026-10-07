@@ -21,10 +21,10 @@
 |---|---|---|---|
 | 1 | Мастер и рабочие размеры ×4 nearest | `accept-card-drop.png`, `sheet-sizes.png` | да |
 | 2 | Цвет, серый Rec.709, дейтеранопия | `accept-card-drop.png`, `sheet-01-card-drop-24.png`, `sheet-02-card-drop-32.png`, `sheet-03-card-drop-48.png` | да |
-| 3 | Кадр K1 обеих настоящих досок, 1080p / 720p, 100 % / 150 % | — | нет: после носителя (блок HAND (сброс по лимиту: UUmCardWidget DropIcon, CP-15 / HB-24)) |
+| 3 | Кадр K1 обеих настоящих досок, 1080p / 720p, 100 % / 150 % | лист галереи HAND (`-S08IconGalleryHand`, состояние drop — сброс по лимиту) — вне git (кадр доски, ВР-VS4-01): `scraped-data/derived/visual-evidence/IC-48/` (k1-gallery-drop-*.png), [`visual-evidence-index.json`](visual-evidence-index.json) | галерея: да (VS-4 V3); packaged `-Bench`: шаг «Кадры» |
 | 4 | Контекст: panel.bg, card.cream, поле, соседи | `check-neighbours.png` | да |
 | 5 | Движение | контракт `docs/unreal/contracts/hud/icon-motion.json` (эталон `icon-motion-golden.json`) | G-ICON — IC-70 |
-| 6 | Трассы | — | после носителя |
+| 6 | Трассы | трассы галереи (`SHOT widget` носителя), `check-trace` PASS | да (галерея) |
 | 7 | README | этот файл, `checks.json`, `accept.json`, `sheet-manifest.json` | да |
 
 ## Входы sheet.py
@@ -42,7 +42,7 @@
 - Сканы карт руки — лист вне git `scraped-data/derived/visual-evidence/IC-48/check-scans.png` (ВР-CP12): Medusa (gaze-of-stone, dash) и King Arthur (excalibur, feint), значок 24 su на карте 150 × 208 su при 18 / 24 / 36 px, справа сверху, справа снизу и в центре, цвет и серый. На светлом (зелёный и красный арт) и на тёмном (navy-поле текста) скане значок отделён кремовой кромкой и keyline (keyline к крему 15,88 : 1); читается как «стрелка в стопку», а не «скачать» — лотка нет. Яркость скана под значком — `checks.json` → `scan_patch_luma`.
 - audit мастера: margin_px [32, 32, 32, 32], seam_px 6 (набор v3 — до 21).
 - sha1 принятых файлов набора (27 id, 3 варианта, маска, кандидат и 17 строк VR44 шага A2) в `manifest.json` не изменились: 1290 из 1290 те же, добавлено 99 (пять id шага A3).
-- Доска / задник / шесть фигур v2: кадров ещё нет — значок без носителя в UE.
+- VS-4 V3 (2026-10-07): лист галереи HAND открыт (Read: `k1-gallery-drop-colour.png`, вырезка 720p 100 % ×4): значок 16 px над двумя картами сброса при «Рука 9/7» на 8 холстах — стрелка вниз на стопку читается и на 720p; рядом скан карты (вне git). Доска — Marmoreal с нарисованным задником / Sarpedon lit3d, шесть фигур v2.
 
 ## Что не прошло или отложено
 
