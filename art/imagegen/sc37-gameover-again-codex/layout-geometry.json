@@ -1,0 +1,3534 @@
+{
+  "again-1080p-100": {
+    "canvas_px": [
+      1920,
+      1080
+    ],
+    "canvas_su": [
+      1920.0,
+      1080.0
+    ],
+    "dpi": 1.0,
+    "ui": 1.0,
+    "px_per_su": 1.0,
+    "class": "L",
+    "widgets": {
+      "ResultModal": {
+        "rect_su": [
+          580.0,
+          250.0,
+          760,
+          580
+        ],
+        "kind": "modal",
+        "alpha": 1,
+        "skin": "Modal"
+      },
+      "OutcomeText": {
+        "rect_su": [
+          878.0,
+          282.0,
+          164.0,
+          48
+        ],
+        "kind": "modal",
+        "text": "ПОБЕДА",
+        "role": "type.display",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.victory",
+          "column": "ru"
+        }
+      },
+      "HeadlineText": {
+        "rect_su": [
+          835.375,
+          346.0,
+          249.25,
+          28
+        ],
+        "kind": "modal",
+        "text": "MEDUSA ПОБЕЖДАЕТ",
+        "role": "type.title",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.wins",
+          "column": "ru"
+        }
+      },
+      "ReasonText": {
+        "rect_su": [
+          879.763671875,
+          390.0,
+          160.47265625,
+          16
+        ],
+        "kind": "modal",
+        "text": "T. Rex: HP достигли 0",
+        "role": "type.body",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.reason.hp",
+          "column": "ru"
+        }
+      },
+      "TurnText": {
+        "rect_su": [
+          918.375,
+          418.0,
+          83.25,
+          14
+        ],
+        "kind": "modal",
+        "text": "Ход 19 · 0:33",
+        "role": "type.caption",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.turn.time",
+          "column": "ru"
+        }
+      },
+      "VersusText": {
+        "rect_su": [
+          925.125,
+          508.0,
+          69.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "против",
+        "role": "type.heading",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.loading.versus",
+          "column": "ru"
+        }
+      },
+      "LeftPortrait": {
+        "rect_su": [
+          720.0,
+          460.0,
+          120,
+          120
+        ],
+        "kind": "modal",
+        "hero": "Medusa",
+        "source": "scraped-data/derived/ue-media-v1/avatars/medusa.png",
+        "crop": {
+          "cx": 0.44,
+          "cy": 0.29,
+          "d": 0.5
+        },
+        "look": "winner",
+        "team_ring": false,
+        "team_color": false
+      },
+      "LeftName": {
+        "rect_su": [
+          743.125,
+          592.0,
+          73.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "Medusa",
+        "role": "type.heading",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.winnerHero / hp.winner"
+        }
+      },
+      "LeftCaption": {
+        "rect_su": [
+          689.625,
+          620.0,
+          180.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "Вы · HP 14/16 · Победитель",
+        "hp": [
+          14,
+          16
+        ],
+        "role": "Вы",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.winnerHero / hp.winner"
+        }
+      },
+      "LeftCaption.RoleHP": {
+        "rect_su": [
+          689.625,
+          620.0,
+          101.5,
+          24
+        ],
+        "kind": "modal",
+        "text": "Вы · HP 14/16 · ",
+        "role": "type.caption",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.winnerHero / hp.winner"
+        }
+      },
+      "LeftCaption.Status": {
+        "rect_su": [
+          791.125,
+          620.0,
+          79.25,
+          24
+        ],
+        "kind": "modal",
+        "text": "Победитель",
+        "role": "type.caption",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.winner",
+          "column": "ru"
+        }
+      },
+      "RightPortrait": {
+        "rect_su": [
+          1080.0,
+          460.0,
+          120,
+          120
+        ],
+        "kind": "modal",
+        "hero": "T. Rex",
+        "source": "scraped-data/derived/sc37-gameover-again-codex/avatars/t-rex.png",
+        "crop": {
+          "cx": 0.56,
+          "cy": 0.33,
+          "d": 0.64
+        },
+        "look": "defeated",
+        "team_ring": false,
+        "team_color": false
+      },
+      "RightName": {
+        "rect_su": [
+          1110.64453125,
+          592.0,
+          58.7109375,
+          24
+        ],
+        "kind": "modal",
+        "text": "T. Rex",
+        "role": "type.heading",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.loserHero / hp.loser / opponent.username"
+        }
+      },
+      "RightCaption": {
+        "rect_su": [
+          1036.125,
+          620.0,
+          207.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "AI Bot · HP 0/27 · Повержен",
+        "hp": [
+          0,
+          27
+        ],
+        "role": "AI Bot",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.loserHero / hp.loser / opponent.username"
+        }
+      },
+      "RightCaption.RoleHP": {
+        "rect_su": [
+          1036.125,
+          620.0,
+          111.5,
+          24
+        ],
+        "kind": "modal",
+        "text": "AI Bot · HP 0/27 · ",
+        "role": "type.caption",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.loserHero / hp.loser / opponent.username"
+        }
+      },
+      "RightCaption.Status": {
+        "rect_su": [
+          1147.625,
+          620.0,
+          66.25,
+          24
+        ],
+        "kind": "modal",
+        "text": "Повержен",
+        "role": "type.caption",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.defeated",
+          "column": "ru"
+        }
+      },
+      "RightFallenIcon": {
+        "rect_su": [
+          1219.875,
+          620.0,
+          24,
+          24
+        ],
+        "kind": "modal",
+        "icon": "resource-hp-fallen",
+        "source": "art/imagegen/hud-icons-v3/sizes/resource-hp-fallen-24.png"
+      },
+      "ButtonRow": {
+        "rect_su": [
+          607.125,
+          750.0,
+          705.75,
+          48
+        ],
+        "kind": "modal",
+        "budget_su": 712,
+        "gap_su": 16,
+        "chips": true,
+        "fits_budget": true
+      },
+      "ViewBoardButton": {
+        "rect_su": [
+          607.125,
+          750.0,
+          252.25,
+          48
+        ],
+        "kind": "modal",
+        "primary": false,
+        "state": "normal",
+        "label_key": "screens.result.view.board",
+        "skin": "Btn_Normal"
+      },
+      "ViewBoardButton.Label": {
+        "rect_su": [
+          631.125,
+          750.0,
+          176.25,
+          48
+        ],
+        "kind": "modal",
+        "text": "ПОСМОТРЕТЬ ДОСКУ",
+        "role": "type.button",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.view.board",
+          "column": "ru"
+        }
+      },
+      "KeyChip_V": {
+        "rect_su": [
+          815.375,
+          764.0,
+          20,
+          20
+        ],
+        "kind": "modal",
+        "skin": "KeyChip"
+      },
+      "KeyChip_V.Label": {
+        "rect_su": [
+          815.375,
+          764.0,
+          20,
+          20
+        ],
+        "kind": "modal",
+        "text": "V",
+        "role": "type.tag",
+        "source": {
+          "file": "docs/game-design/visual/06-tasks/prompts/SC-34-series.codex.md",
+          "key": "ВР-VS5-SC34-05"
+        }
+      },
+      "AgainButton": {
+        "rect_su": [
+          875.375,
+          750.0,
+          253.5,
+          48
+        ],
+        "kind": "modal",
+        "primary": false,
+        "state": "normal",
+        "label_key": "screens.result.again",
+        "skin": "Btn_Normal"
+      },
+      "AgainButton.Label": {
+        "rect_su": [
+          940.625,
+          750.0,
+          123.0,
+          48
+        ],
+        "kind": "modal",
+        "text": "СЫГРАТЬ ЕЩЁ",
+        "role": "type.button",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.again",
+          "column": "ru"
+        }
+      },
+      "LobbyButton": {
+        "rect_su": [
+          1144.875,
+          750.0,
+          168,
+          48
+        ],
+        "kind": "modal",
+        "primary": true,
+        "state": "normal",
+        "label_key": "screens.result.lobby",
+        "skin": "BtnPrimary_Normal"
+      },
+      "LobbyButton.Label": {
+        "rect_su": [
+          1169.5,
+          750.0,
+          74.0,
+          48
+        ],
+        "kind": "modal",
+        "text": "В ЛОББИ",
+        "role": "type.button",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.lobby",
+          "column": "ru"
+        }
+      },
+      "KeyChip_Enter": {
+        "rect_su": [
+          1251.5,
+          764.0,
+          36.75,
+          20
+        ],
+        "kind": "modal",
+        "skin": "KeyChip"
+      },
+      "KeyChip_Enter.Label": {
+        "rect_su": [
+          1251.5,
+          764.0,
+          36.75,
+          20
+        ],
+        "kind": "modal",
+        "text": "Enter",
+        "role": "type.tag",
+        "source": {
+          "file": "docs/game-design/visual/06-tasks/prompts/SC-34-series.codex.md",
+          "key": "ВР-VS5-SC34-05"
+        }
+      }
+    }
+  },
+  "again-busy-1080p-100": {
+    "canvas_px": [
+      1920,
+      1080
+    ],
+    "canvas_su": [
+      1920.0,
+      1080.0
+    ],
+    "dpi": 1.0,
+    "ui": 1.0,
+    "px_per_su": 1.0,
+    "class": "L",
+    "widgets": {
+      "ResultModal": {
+        "rect_su": [
+          580.0,
+          250.0,
+          760,
+          580
+        ],
+        "kind": "modal",
+        "alpha": 1,
+        "skin": "Modal"
+      },
+      "OutcomeText": {
+        "rect_su": [
+          878.0,
+          282.0,
+          164.0,
+          48
+        ],
+        "kind": "modal",
+        "text": "ПОБЕДА",
+        "role": "type.display",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.victory",
+          "column": "ru"
+        }
+      },
+      "HeadlineText": {
+        "rect_su": [
+          835.375,
+          346.0,
+          249.25,
+          28
+        ],
+        "kind": "modal",
+        "text": "MEDUSA ПОБЕЖДАЕТ",
+        "role": "type.title",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.wins",
+          "column": "ru"
+        }
+      },
+      "ReasonText": {
+        "rect_su": [
+          879.763671875,
+          390.0,
+          160.47265625,
+          16
+        ],
+        "kind": "modal",
+        "text": "T. Rex: HP достигли 0",
+        "role": "type.body",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.reason.hp",
+          "column": "ru"
+        }
+      },
+      "TurnText": {
+        "rect_su": [
+          918.375,
+          418.0,
+          83.25,
+          14
+        ],
+        "kind": "modal",
+        "text": "Ход 19 · 0:33",
+        "role": "type.caption",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.turn.time",
+          "column": "ru"
+        }
+      },
+      "VersusText": {
+        "rect_su": [
+          925.125,
+          508.0,
+          69.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "против",
+        "role": "type.heading",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.loading.versus",
+          "column": "ru"
+        }
+      },
+      "LeftPortrait": {
+        "rect_su": [
+          720.0,
+          460.0,
+          120,
+          120
+        ],
+        "kind": "modal",
+        "hero": "Medusa",
+        "source": "scraped-data/derived/ue-media-v1/avatars/medusa.png",
+        "crop": {
+          "cx": 0.44,
+          "cy": 0.29,
+          "d": 0.5
+        },
+        "look": "winner",
+        "team_ring": false,
+        "team_color": false
+      },
+      "LeftName": {
+        "rect_su": [
+          743.125,
+          592.0,
+          73.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "Medusa",
+        "role": "type.heading",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.winnerHero / hp.winner"
+        }
+      },
+      "LeftCaption": {
+        "rect_su": [
+          689.625,
+          620.0,
+          180.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "Вы · HP 14/16 · Победитель",
+        "hp": [
+          14,
+          16
+        ],
+        "role": "Вы",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.winnerHero / hp.winner"
+        }
+      },
+      "LeftCaption.RoleHP": {
+        "rect_su": [
+          689.625,
+          620.0,
+          101.5,
+          24
+        ],
+        "kind": "modal",
+        "text": "Вы · HP 14/16 · ",
+        "role": "type.caption",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.winnerHero / hp.winner"
+        }
+      },
+      "LeftCaption.Status": {
+        "rect_su": [
+          791.125,
+          620.0,
+          79.25,
+          24
+        ],
+        "kind": "modal",
+        "text": "Победитель",
+        "role": "type.caption",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.winner",
+          "column": "ru"
+        }
+      },
+      "RightPortrait": {
+        "rect_su": [
+          1080.0,
+          460.0,
+          120,
+          120
+        ],
+        "kind": "modal",
+        "hero": "T. Rex",
+        "source": "scraped-data/derived/sc37-gameover-again-codex/avatars/t-rex.png",
+        "crop": {
+          "cx": 0.56,
+          "cy": 0.33,
+          "d": 0.64
+        },
+        "look": "defeated",
+        "team_ring": false,
+        "team_color": false
+      },
+      "RightName": {
+        "rect_su": [
+          1110.64453125,
+          592.0,
+          58.7109375,
+          24
+        ],
+        "kind": "modal",
+        "text": "T. Rex",
+        "role": "type.heading",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.loserHero / hp.loser / opponent.username"
+        }
+      },
+      "RightCaption": {
+        "rect_su": [
+          1036.125,
+          620.0,
+          207.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "AI Bot · HP 0/27 · Повержен",
+        "hp": [
+          0,
+          27
+        ],
+        "role": "AI Bot",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.loserHero / hp.loser / opponent.username"
+        }
+      },
+      "RightCaption.RoleHP": {
+        "rect_su": [
+          1036.125,
+          620.0,
+          111.5,
+          24
+        ],
+        "kind": "modal",
+        "text": "AI Bot · HP 0/27 · ",
+        "role": "type.caption",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.loserHero / hp.loser / opponent.username"
+        }
+      },
+      "RightCaption.Status": {
+        "rect_su": [
+          1147.625,
+          620.0,
+          66.25,
+          24
+        ],
+        "kind": "modal",
+        "text": "Повержен",
+        "role": "type.caption",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.defeated",
+          "column": "ru"
+        }
+      },
+      "RightFallenIcon": {
+        "rect_su": [
+          1219.875,
+          620.0,
+          24,
+          24
+        ],
+        "kind": "modal",
+        "icon": "resource-hp-fallen",
+        "source": "art/imagegen/hud-icons-v3/sizes/resource-hp-fallen-24.png"
+      },
+      "ButtonRow": {
+        "rect_su": [
+          607.125,
+          750.0,
+          705.75,
+          48
+        ],
+        "kind": "modal",
+        "budget_su": 712,
+        "gap_su": 16,
+        "chips": true,
+        "fits_budget": true
+      },
+      "ViewBoardButton": {
+        "rect_su": [
+          607.125,
+          750.0,
+          252.25,
+          48
+        ],
+        "kind": "modal",
+        "primary": false,
+        "state": "normal",
+        "label_key": "screens.result.view.board",
+        "skin": "Btn_Normal"
+      },
+      "ViewBoardButton.Label": {
+        "rect_su": [
+          631.125,
+          750.0,
+          176.25,
+          48
+        ],
+        "kind": "modal",
+        "text": "ПОСМОТРЕТЬ ДОСКУ",
+        "role": "type.button",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.view.board",
+          "column": "ru"
+        }
+      },
+      "KeyChip_V": {
+        "rect_su": [
+          815.375,
+          764.0,
+          20,
+          20
+        ],
+        "kind": "modal",
+        "skin": "KeyChip"
+      },
+      "KeyChip_V.Label": {
+        "rect_su": [
+          815.375,
+          764.0,
+          20,
+          20
+        ],
+        "kind": "modal",
+        "text": "V",
+        "role": "type.tag",
+        "source": {
+          "file": "docs/game-design/visual/06-tasks/prompts/SC-34-series.codex.md",
+          "key": "ВР-VS5-SC34-05"
+        }
+      },
+      "AgainButton": {
+        "rect_su": [
+          875.375,
+          750.0,
+          253.5,
+          48
+        ],
+        "kind": "modal",
+        "primary": false,
+        "state": "busy",
+        "label_key": "screens.result.again",
+        "skin": "Btn_Normal"
+      },
+      "AgainSpinner": {
+        "rect_su": [
+          899.375,
+          762.0,
+          24,
+          24
+        ],
+        "kind": "modal",
+        "icon": "loader-spinner",
+        "source": "art/imagegen/hud-icons-v3/sizes/loader-spinner-24.png"
+      },
+      "AgainButton.Label": {
+        "rect_su": [
+          931.375,
+          750.0,
+          173.5,
+          48
+        ],
+        "kind": "modal",
+        "text": "СОЗДАЁМ ПАРТИЮ…",
+        "role": "type.button",
+        "source": {
+          "file": "docs/game-design/visual/06-tasks/prompts/SC-34-series.codex.md",
+          "key": "screens.result.again.busy",
+          "column": "proposed RU"
+        }
+      },
+      "LobbyButton": {
+        "rect_su": [
+          1144.875,
+          750.0,
+          168,
+          48
+        ],
+        "kind": "modal",
+        "primary": true,
+        "state": "normal",
+        "label_key": "screens.result.lobby",
+        "skin": "BtnPrimary_Normal"
+      },
+      "LobbyButton.Label": {
+        "rect_su": [
+          1169.5,
+          750.0,
+          74.0,
+          48
+        ],
+        "kind": "modal",
+        "text": "В ЛОББИ",
+        "role": "type.button",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.lobby",
+          "column": "ru"
+        }
+      },
+      "KeyChip_Enter": {
+        "rect_su": [
+          1251.5,
+          764.0,
+          36.75,
+          20
+        ],
+        "kind": "modal",
+        "skin": "KeyChip"
+      },
+      "KeyChip_Enter.Label": {
+        "rect_su": [
+          1251.5,
+          764.0,
+          36.75,
+          20
+        ],
+        "kind": "modal",
+        "text": "Enter",
+        "role": "type.tag",
+        "source": {
+          "file": "docs/game-design/visual/06-tasks/prompts/SC-34-series.codex.md",
+          "key": "ВР-VS5-SC34-05"
+        }
+      }
+    }
+  },
+  "again-1080p-150": {
+    "canvas_px": [
+      1920,
+      1080
+    ],
+    "canvas_su": [
+      1280.0,
+      720.0
+    ],
+    "dpi": 1.0,
+    "ui": 1.5,
+    "px_per_su": 1.5,
+    "class": "S",
+    "widgets": {
+      "ResultModal": {
+        "rect_su": [
+          260.0,
+          80.0,
+          760,
+          560
+        ],
+        "kind": "modal",
+        "alpha": 1,
+        "skin": "Modal"
+      },
+      "OutcomeText": {
+        "rect_su": [
+          558.0,
+          112.0,
+          164.0,
+          48
+        ],
+        "kind": "modal",
+        "text": "ПОБЕДА",
+        "role": "type.display",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.victory",
+          "column": "ru"
+        }
+      },
+      "HeadlineText": {
+        "rect_su": [
+          515.375,
+          176.0,
+          249.25,
+          28
+        ],
+        "kind": "modal",
+        "text": "MEDUSA ПОБЕЖДАЕТ",
+        "role": "type.title",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.wins",
+          "column": "ru"
+        }
+      },
+      "ReasonText": {
+        "rect_su": [
+          559.763671875,
+          220.0,
+          160.47265625,
+          16
+        ],
+        "kind": "modal",
+        "text": "T. Rex: HP достигли 0",
+        "role": "type.body",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.reason.hp",
+          "column": "ru"
+        }
+      },
+      "TurnText": {
+        "rect_su": [
+          598.375,
+          248.0,
+          83.25,
+          14
+        ],
+        "kind": "modal",
+        "text": "Ход 19 · 0:33",
+        "role": "type.caption",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.turn.time",
+          "column": "ru"
+        }
+      },
+      "VersusText": {
+        "rect_su": [
+          605.125,
+          338.0,
+          69.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "против",
+        "role": "type.heading",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.loading.versus",
+          "column": "ru"
+        }
+      },
+      "LeftPortrait": {
+        "rect_su": [
+          420.0,
+          290.0,
+          120,
+          120
+        ],
+        "kind": "modal",
+        "hero": "Medusa",
+        "source": "scraped-data/derived/ue-media-v1/avatars/medusa.png",
+        "crop": {
+          "cx": 0.44,
+          "cy": 0.29,
+          "d": 0.5
+        },
+        "look": "winner",
+        "team_ring": false,
+        "team_color": false
+      },
+      "LeftName": {
+        "rect_su": [
+          443.125,
+          422.0,
+          73.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "Medusa",
+        "role": "type.heading",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.winnerHero / hp.winner"
+        }
+      },
+      "LeftCaption": {
+        "rect_su": [
+          389.625,
+          450.0,
+          180.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "Вы · HP 14/16 · Победитель",
+        "hp": [
+          14,
+          16
+        ],
+        "role": "Вы",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.winnerHero / hp.winner"
+        }
+      },
+      "LeftCaption.RoleHP": {
+        "rect_su": [
+          389.625,
+          450.0,
+          101.5,
+          24
+        ],
+        "kind": "modal",
+        "text": "Вы · HP 14/16 · ",
+        "role": "type.caption",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.winnerHero / hp.winner"
+        }
+      },
+      "LeftCaption.Status": {
+        "rect_su": [
+          491.125,
+          450.0,
+          79.25,
+          24
+        ],
+        "kind": "modal",
+        "text": "Победитель",
+        "role": "type.caption",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.winner",
+          "column": "ru"
+        }
+      },
+      "RightPortrait": {
+        "rect_su": [
+          740.0,
+          290.0,
+          120,
+          120
+        ],
+        "kind": "modal",
+        "hero": "T. Rex",
+        "source": "scraped-data/derived/sc37-gameover-again-codex/avatars/t-rex.png",
+        "crop": {
+          "cx": 0.56,
+          "cy": 0.33,
+          "d": 0.64
+        },
+        "look": "defeated",
+        "team_ring": false,
+        "team_color": false
+      },
+      "RightName": {
+        "rect_su": [
+          770.64453125,
+          422.0,
+          58.7109375,
+          24
+        ],
+        "kind": "modal",
+        "text": "T. Rex",
+        "role": "type.heading",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.loserHero / hp.loser / opponent.username"
+        }
+      },
+      "RightCaption": {
+        "rect_su": [
+          696.125,
+          450.0,
+          207.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "AI Bot · HP 0/27 · Повержен",
+        "hp": [
+          0,
+          27
+        ],
+        "role": "AI Bot",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.loserHero / hp.loser / opponent.username"
+        }
+      },
+      "RightCaption.RoleHP": {
+        "rect_su": [
+          696.125,
+          450.0,
+          111.5,
+          24
+        ],
+        "kind": "modal",
+        "text": "AI Bot · HP 0/27 · ",
+        "role": "type.caption",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.loserHero / hp.loser / opponent.username"
+        }
+      },
+      "RightCaption.Status": {
+        "rect_su": [
+          807.625,
+          450.0,
+          66.25,
+          24
+        ],
+        "kind": "modal",
+        "text": "Повержен",
+        "role": "type.caption",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.defeated",
+          "column": "ru"
+        }
+      },
+      "RightFallenIcon": {
+        "rect_su": [
+          879.875,
+          450.0,
+          24,
+          24
+        ],
+        "kind": "modal",
+        "icon": "resource-hp-fallen",
+        "source": "art/imagegen/hud-icons-v3/sizes/resource-hp-fallen-36.png"
+      },
+      "ButtonRow": {
+        "rect_su": [
+          287.125,
+          560.0,
+          705.75,
+          48
+        ],
+        "kind": "modal",
+        "budget_su": 712,
+        "gap_su": 16,
+        "chips": true,
+        "fits_budget": true
+      },
+      "ViewBoardButton": {
+        "rect_su": [
+          287.125,
+          560.0,
+          252.25,
+          48
+        ],
+        "kind": "modal",
+        "primary": false,
+        "state": "normal",
+        "label_key": "screens.result.view.board",
+        "skin": "Btn_Normal"
+      },
+      "ViewBoardButton.Label": {
+        "rect_su": [
+          311.125,
+          560.0,
+          176.25,
+          48
+        ],
+        "kind": "modal",
+        "text": "ПОСМОТРЕТЬ ДОСКУ",
+        "role": "type.button",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.view.board",
+          "column": "ru"
+        }
+      },
+      "KeyChip_V": {
+        "rect_su": [
+          495.375,
+          574.0,
+          20,
+          20
+        ],
+        "kind": "modal",
+        "skin": "KeyChip"
+      },
+      "KeyChip_V.Label": {
+        "rect_su": [
+          495.375,
+          574.0,
+          20,
+          20
+        ],
+        "kind": "modal",
+        "text": "V",
+        "role": "type.tag",
+        "source": {
+          "file": "docs/game-design/visual/06-tasks/prompts/SC-34-series.codex.md",
+          "key": "ВР-VS5-SC34-05"
+        }
+      },
+      "AgainButton": {
+        "rect_su": [
+          555.375,
+          560.0,
+          253.5,
+          48
+        ],
+        "kind": "modal",
+        "primary": false,
+        "state": "normal",
+        "label_key": "screens.result.again",
+        "skin": "Btn_Normal"
+      },
+      "AgainButton.Label": {
+        "rect_su": [
+          620.625,
+          560.0,
+          123.0,
+          48
+        ],
+        "kind": "modal",
+        "text": "СЫГРАТЬ ЕЩЁ",
+        "role": "type.button",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.again",
+          "column": "ru"
+        }
+      },
+      "LobbyButton": {
+        "rect_su": [
+          824.875,
+          560.0,
+          168,
+          48
+        ],
+        "kind": "modal",
+        "primary": true,
+        "state": "normal",
+        "label_key": "screens.result.lobby",
+        "skin": "BtnPrimary_Normal"
+      },
+      "LobbyButton.Label": {
+        "rect_su": [
+          849.5,
+          560.0,
+          74.0,
+          48
+        ],
+        "kind": "modal",
+        "text": "В ЛОББИ",
+        "role": "type.button",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.lobby",
+          "column": "ru"
+        }
+      },
+      "KeyChip_Enter": {
+        "rect_su": [
+          931.5,
+          574.0,
+          36.75,
+          20
+        ],
+        "kind": "modal",
+        "skin": "KeyChip"
+      },
+      "KeyChip_Enter.Label": {
+        "rect_su": [
+          931.5,
+          574.0,
+          36.75,
+          20
+        ],
+        "kind": "modal",
+        "text": "Enter",
+        "role": "type.tag",
+        "source": {
+          "file": "docs/game-design/visual/06-tasks/prompts/SC-34-series.codex.md",
+          "key": "ВР-VS5-SC34-05"
+        }
+      }
+    }
+  },
+  "again-busy-1080p-150": {
+    "canvas_px": [
+      1920,
+      1080
+    ],
+    "canvas_su": [
+      1280.0,
+      720.0
+    ],
+    "dpi": 1.0,
+    "ui": 1.5,
+    "px_per_su": 1.5,
+    "class": "S",
+    "widgets": {
+      "ResultModal": {
+        "rect_su": [
+          260.0,
+          80.0,
+          760,
+          560
+        ],
+        "kind": "modal",
+        "alpha": 1,
+        "skin": "Modal"
+      },
+      "OutcomeText": {
+        "rect_su": [
+          558.0,
+          112.0,
+          164.0,
+          48
+        ],
+        "kind": "modal",
+        "text": "ПОБЕДА",
+        "role": "type.display",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.victory",
+          "column": "ru"
+        }
+      },
+      "HeadlineText": {
+        "rect_su": [
+          515.375,
+          176.0,
+          249.25,
+          28
+        ],
+        "kind": "modal",
+        "text": "MEDUSA ПОБЕЖДАЕТ",
+        "role": "type.title",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.wins",
+          "column": "ru"
+        }
+      },
+      "ReasonText": {
+        "rect_su": [
+          559.763671875,
+          220.0,
+          160.47265625,
+          16
+        ],
+        "kind": "modal",
+        "text": "T. Rex: HP достигли 0",
+        "role": "type.body",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.reason.hp",
+          "column": "ru"
+        }
+      },
+      "TurnText": {
+        "rect_su": [
+          598.375,
+          248.0,
+          83.25,
+          14
+        ],
+        "kind": "modal",
+        "text": "Ход 19 · 0:33",
+        "role": "type.caption",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.turn.time",
+          "column": "ru"
+        }
+      },
+      "VersusText": {
+        "rect_su": [
+          605.125,
+          338.0,
+          69.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "против",
+        "role": "type.heading",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.loading.versus",
+          "column": "ru"
+        }
+      },
+      "LeftPortrait": {
+        "rect_su": [
+          420.0,
+          290.0,
+          120,
+          120
+        ],
+        "kind": "modal",
+        "hero": "Medusa",
+        "source": "scraped-data/derived/ue-media-v1/avatars/medusa.png",
+        "crop": {
+          "cx": 0.44,
+          "cy": 0.29,
+          "d": 0.5
+        },
+        "look": "winner",
+        "team_ring": false,
+        "team_color": false
+      },
+      "LeftName": {
+        "rect_su": [
+          443.125,
+          422.0,
+          73.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "Medusa",
+        "role": "type.heading",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.winnerHero / hp.winner"
+        }
+      },
+      "LeftCaption": {
+        "rect_su": [
+          389.625,
+          450.0,
+          180.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "Вы · HP 14/16 · Победитель",
+        "hp": [
+          14,
+          16
+        ],
+        "role": "Вы",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.winnerHero / hp.winner"
+        }
+      },
+      "LeftCaption.RoleHP": {
+        "rect_su": [
+          389.625,
+          450.0,
+          101.5,
+          24
+        ],
+        "kind": "modal",
+        "text": "Вы · HP 14/16 · ",
+        "role": "type.caption",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.winnerHero / hp.winner"
+        }
+      },
+      "LeftCaption.Status": {
+        "rect_su": [
+          491.125,
+          450.0,
+          79.25,
+          24
+        ],
+        "kind": "modal",
+        "text": "Победитель",
+        "role": "type.caption",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.winner",
+          "column": "ru"
+        }
+      },
+      "RightPortrait": {
+        "rect_su": [
+          740.0,
+          290.0,
+          120,
+          120
+        ],
+        "kind": "modal",
+        "hero": "T. Rex",
+        "source": "scraped-data/derived/sc37-gameover-again-codex/avatars/t-rex.png",
+        "crop": {
+          "cx": 0.56,
+          "cy": 0.33,
+          "d": 0.64
+        },
+        "look": "defeated",
+        "team_ring": false,
+        "team_color": false
+      },
+      "RightName": {
+        "rect_su": [
+          770.64453125,
+          422.0,
+          58.7109375,
+          24
+        ],
+        "kind": "modal",
+        "text": "T. Rex",
+        "role": "type.heading",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.loserHero / hp.loser / opponent.username"
+        }
+      },
+      "RightCaption": {
+        "rect_su": [
+          696.125,
+          450.0,
+          207.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "AI Bot · HP 0/27 · Повержен",
+        "hp": [
+          0,
+          27
+        ],
+        "role": "AI Bot",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.loserHero / hp.loser / opponent.username"
+        }
+      },
+      "RightCaption.RoleHP": {
+        "rect_su": [
+          696.125,
+          450.0,
+          111.5,
+          24
+        ],
+        "kind": "modal",
+        "text": "AI Bot · HP 0/27 · ",
+        "role": "type.caption",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.loserHero / hp.loser / opponent.username"
+        }
+      },
+      "RightCaption.Status": {
+        "rect_su": [
+          807.625,
+          450.0,
+          66.25,
+          24
+        ],
+        "kind": "modal",
+        "text": "Повержен",
+        "role": "type.caption",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.defeated",
+          "column": "ru"
+        }
+      },
+      "RightFallenIcon": {
+        "rect_su": [
+          879.875,
+          450.0,
+          24,
+          24
+        ],
+        "kind": "modal",
+        "icon": "resource-hp-fallen",
+        "source": "art/imagegen/hud-icons-v3/sizes/resource-hp-fallen-36.png"
+      },
+      "ButtonRow": {
+        "rect_su": [
+          287.125,
+          560.0,
+          705.75,
+          48
+        ],
+        "kind": "modal",
+        "budget_su": 712,
+        "gap_su": 16,
+        "chips": true,
+        "fits_budget": true
+      },
+      "ViewBoardButton": {
+        "rect_su": [
+          287.125,
+          560.0,
+          252.25,
+          48
+        ],
+        "kind": "modal",
+        "primary": false,
+        "state": "normal",
+        "label_key": "screens.result.view.board",
+        "skin": "Btn_Normal"
+      },
+      "ViewBoardButton.Label": {
+        "rect_su": [
+          311.125,
+          560.0,
+          176.25,
+          48
+        ],
+        "kind": "modal",
+        "text": "ПОСМОТРЕТЬ ДОСКУ",
+        "role": "type.button",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.view.board",
+          "column": "ru"
+        }
+      },
+      "KeyChip_V": {
+        "rect_su": [
+          495.375,
+          574.0,
+          20,
+          20
+        ],
+        "kind": "modal",
+        "skin": "KeyChip"
+      },
+      "KeyChip_V.Label": {
+        "rect_su": [
+          495.375,
+          574.0,
+          20,
+          20
+        ],
+        "kind": "modal",
+        "text": "V",
+        "role": "type.tag",
+        "source": {
+          "file": "docs/game-design/visual/06-tasks/prompts/SC-34-series.codex.md",
+          "key": "ВР-VS5-SC34-05"
+        }
+      },
+      "AgainButton": {
+        "rect_su": [
+          555.375,
+          560.0,
+          253.5,
+          48
+        ],
+        "kind": "modal",
+        "primary": false,
+        "state": "busy",
+        "label_key": "screens.result.again",
+        "skin": "Btn_Normal"
+      },
+      "AgainSpinner": {
+        "rect_su": [
+          579.375,
+          572.0,
+          24,
+          24
+        ],
+        "kind": "modal",
+        "icon": "loader-spinner",
+        "source": "art/imagegen/hud-icons-v3/sizes/loader-spinner-36.png"
+      },
+      "AgainButton.Label": {
+        "rect_su": [
+          611.375,
+          560.0,
+          173.5,
+          48
+        ],
+        "kind": "modal",
+        "text": "СОЗДАЁМ ПАРТИЮ…",
+        "role": "type.button",
+        "source": {
+          "file": "docs/game-design/visual/06-tasks/prompts/SC-34-series.codex.md",
+          "key": "screens.result.again.busy",
+          "column": "proposed RU"
+        }
+      },
+      "LobbyButton": {
+        "rect_su": [
+          824.875,
+          560.0,
+          168,
+          48
+        ],
+        "kind": "modal",
+        "primary": true,
+        "state": "normal",
+        "label_key": "screens.result.lobby",
+        "skin": "BtnPrimary_Normal"
+      },
+      "LobbyButton.Label": {
+        "rect_su": [
+          849.5,
+          560.0,
+          74.0,
+          48
+        ],
+        "kind": "modal",
+        "text": "В ЛОББИ",
+        "role": "type.button",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.lobby",
+          "column": "ru"
+        }
+      },
+      "KeyChip_Enter": {
+        "rect_su": [
+          931.5,
+          574.0,
+          36.75,
+          20
+        ],
+        "kind": "modal",
+        "skin": "KeyChip"
+      },
+      "KeyChip_Enter.Label": {
+        "rect_su": [
+          931.5,
+          574.0,
+          36.75,
+          20
+        ],
+        "kind": "modal",
+        "text": "Enter",
+        "role": "type.tag",
+        "source": {
+          "file": "docs/game-design/visual/06-tasks/prompts/SC-34-series.codex.md",
+          "key": "ВР-VS5-SC34-05"
+        }
+      }
+    }
+  },
+  "again-720p-100": {
+    "canvas_px": [
+      1280,
+      720
+    ],
+    "canvas_su": [
+      1706.6666666666667,
+      960.0
+    ],
+    "dpi": 0.75,
+    "ui": 1.0,
+    "px_per_su": 0.75,
+    "class": "L",
+    "widgets": {
+      "ResultModal": {
+        "rect_su": [
+          473.33333333333337,
+          190.0,
+          760,
+          580
+        ],
+        "kind": "modal",
+        "alpha": 1,
+        "skin": "Modal"
+      },
+      "OutcomeText": {
+        "rect_su": [
+          771.3333333333334,
+          222.0,
+          164.0,
+          48
+        ],
+        "kind": "modal",
+        "text": "ПОБЕДА",
+        "role": "type.display",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.victory",
+          "column": "ru"
+        }
+      },
+      "HeadlineText": {
+        "rect_su": [
+          728.7083333333334,
+          286.0,
+          249.25,
+          28
+        ],
+        "kind": "modal",
+        "text": "MEDUSA ПОБЕЖДАЕТ",
+        "role": "type.title",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.wins",
+          "column": "ru"
+        }
+      },
+      "ReasonText": {
+        "rect_su": [
+          773.0970052083334,
+          330.0,
+          160.47265625,
+          16
+        ],
+        "kind": "modal",
+        "text": "T. Rex: HP достигли 0",
+        "role": "type.body",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.reason.hp",
+          "column": "ru"
+        }
+      },
+      "TurnText": {
+        "rect_su": [
+          811.7083333333334,
+          358.0,
+          83.25,
+          14
+        ],
+        "kind": "modal",
+        "text": "Ход 19 · 0:33",
+        "role": "type.caption",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.turn.time",
+          "column": "ru"
+        }
+      },
+      "VersusText": {
+        "rect_su": [
+          818.4583333333334,
+          448.0,
+          69.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "против",
+        "role": "type.heading",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.loading.versus",
+          "column": "ru"
+        }
+      },
+      "LeftPortrait": {
+        "rect_su": [
+          613.3333333333334,
+          400.0,
+          120,
+          120
+        ],
+        "kind": "modal",
+        "hero": "Medusa",
+        "source": "scraped-data/derived/ue-media-v1/avatars/medusa.png",
+        "crop": {
+          "cx": 0.44,
+          "cy": 0.29,
+          "d": 0.5
+        },
+        "look": "winner",
+        "team_ring": false,
+        "team_color": false
+      },
+      "LeftName": {
+        "rect_su": [
+          636.4583333333334,
+          532.0,
+          73.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "Medusa",
+        "role": "type.heading",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.winnerHero / hp.winner"
+        }
+      },
+      "LeftCaption": {
+        "rect_su": [
+          582.9583333333334,
+          560.0,
+          180.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "Вы · HP 14/16 · Победитель",
+        "hp": [
+          14,
+          16
+        ],
+        "role": "Вы",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.winnerHero / hp.winner"
+        }
+      },
+      "LeftCaption.RoleHP": {
+        "rect_su": [
+          582.9583333333334,
+          560.0,
+          101.5,
+          24
+        ],
+        "kind": "modal",
+        "text": "Вы · HP 14/16 · ",
+        "role": "type.caption",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.winnerHero / hp.winner"
+        }
+      },
+      "LeftCaption.Status": {
+        "rect_su": [
+          684.4583333333334,
+          560.0,
+          79.25,
+          24
+        ],
+        "kind": "modal",
+        "text": "Победитель",
+        "role": "type.caption",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.winner",
+          "column": "ru"
+        }
+      },
+      "RightPortrait": {
+        "rect_su": [
+          973.3333333333335,
+          400.0,
+          120,
+          120
+        ],
+        "kind": "modal",
+        "hero": "T. Rex",
+        "source": "scraped-data/derived/sc37-gameover-again-codex/avatars/t-rex.png",
+        "crop": {
+          "cx": 0.56,
+          "cy": 0.33,
+          "d": 0.64
+        },
+        "look": "defeated",
+        "team_ring": false,
+        "team_color": false
+      },
+      "RightName": {
+        "rect_su": [
+          1003.9778645833335,
+          532.0,
+          58.7109375,
+          24
+        ],
+        "kind": "modal",
+        "text": "T. Rex",
+        "role": "type.heading",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.loserHero / hp.loser / opponent.username"
+        }
+      },
+      "RightCaption": {
+        "rect_su": [
+          929.4583333333335,
+          560.0,
+          207.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "AI Bot · HP 0/27 · Повержен",
+        "hp": [
+          0,
+          27
+        ],
+        "role": "AI Bot",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.loserHero / hp.loser / opponent.username"
+        }
+      },
+      "RightCaption.RoleHP": {
+        "rect_su": [
+          929.4583333333335,
+          560.0,
+          111.5,
+          24
+        ],
+        "kind": "modal",
+        "text": "AI Bot · HP 0/27 · ",
+        "role": "type.caption",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.loserHero / hp.loser / opponent.username"
+        }
+      },
+      "RightCaption.Status": {
+        "rect_su": [
+          1040.9583333333335,
+          560.0,
+          66.25,
+          24
+        ],
+        "kind": "modal",
+        "text": "Повержен",
+        "role": "type.caption",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.defeated",
+          "column": "ru"
+        }
+      },
+      "RightFallenIcon": {
+        "rect_su": [
+          1113.2083333333335,
+          560.0,
+          24,
+          24
+        ],
+        "kind": "modal",
+        "icon": "resource-hp-fallen",
+        "source": "art/imagegen/hud-icons-v3/sizes/resource-hp-fallen-18.png"
+      },
+      "ButtonRow": {
+        "rect_su": [
+          500.45833333333337,
+          690.0,
+          705.75,
+          48
+        ],
+        "kind": "modal",
+        "budget_su": 712,
+        "gap_su": 16,
+        "chips": true,
+        "fits_budget": true
+      },
+      "ViewBoardButton": {
+        "rect_su": [
+          500.45833333333337,
+          690.0,
+          252.25,
+          48
+        ],
+        "kind": "modal",
+        "primary": false,
+        "state": "normal",
+        "label_key": "screens.result.view.board",
+        "skin": "Btn_Normal"
+      },
+      "ViewBoardButton.Label": {
+        "rect_su": [
+          524.4583333333334,
+          690.0,
+          176.25,
+          48
+        ],
+        "kind": "modal",
+        "text": "ПОСМОТРЕТЬ ДОСКУ",
+        "role": "type.button",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.view.board",
+          "column": "ru"
+        }
+      },
+      "KeyChip_V": {
+        "rect_su": [
+          708.7083333333334,
+          704.0,
+          20,
+          20
+        ],
+        "kind": "modal",
+        "skin": "KeyChip"
+      },
+      "KeyChip_V.Label": {
+        "rect_su": [
+          708.7083333333334,
+          704.0,
+          20,
+          20
+        ],
+        "kind": "modal",
+        "text": "V",
+        "role": "type.tag",
+        "source": {
+          "file": "docs/game-design/visual/06-tasks/prompts/SC-34-series.codex.md",
+          "key": "ВР-VS5-SC34-05"
+        }
+      },
+      "AgainButton": {
+        "rect_su": [
+          768.7083333333334,
+          690.0,
+          253.5,
+          48
+        ],
+        "kind": "modal",
+        "primary": false,
+        "state": "normal",
+        "label_key": "screens.result.again",
+        "skin": "Btn_Normal"
+      },
+      "AgainButton.Label": {
+        "rect_su": [
+          833.9583333333334,
+          690.0,
+          123.0,
+          48
+        ],
+        "kind": "modal",
+        "text": "СЫГРАТЬ ЕЩЁ",
+        "role": "type.button",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.again",
+          "column": "ru"
+        }
+      },
+      "LobbyButton": {
+        "rect_su": [
+          1038.2083333333335,
+          690.0,
+          168,
+          48
+        ],
+        "kind": "modal",
+        "primary": true,
+        "state": "normal",
+        "label_key": "screens.result.lobby",
+        "skin": "BtnPrimary_Normal"
+      },
+      "LobbyButton.Label": {
+        "rect_su": [
+          1062.8333333333335,
+          690.0,
+          74.0,
+          48
+        ],
+        "kind": "modal",
+        "text": "В ЛОББИ",
+        "role": "type.button",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.lobby",
+          "column": "ru"
+        }
+      },
+      "KeyChip_Enter": {
+        "rect_su": [
+          1144.8333333333335,
+          704.0,
+          36.75,
+          20
+        ],
+        "kind": "modal",
+        "skin": "KeyChip"
+      },
+      "KeyChip_Enter.Label": {
+        "rect_su": [
+          1144.8333333333335,
+          704.0,
+          36.75,
+          20
+        ],
+        "kind": "modal",
+        "text": "Enter",
+        "role": "type.tag",
+        "source": {
+          "file": "docs/game-design/visual/06-tasks/prompts/SC-34-series.codex.md",
+          "key": "ВР-VS5-SC34-05"
+        }
+      }
+    }
+  },
+  "again-busy-720p-100": {
+    "canvas_px": [
+      1280,
+      720
+    ],
+    "canvas_su": [
+      1706.6666666666667,
+      960.0
+    ],
+    "dpi": 0.75,
+    "ui": 1.0,
+    "px_per_su": 0.75,
+    "class": "L",
+    "widgets": {
+      "ResultModal": {
+        "rect_su": [
+          473.33333333333337,
+          190.0,
+          760,
+          580
+        ],
+        "kind": "modal",
+        "alpha": 1,
+        "skin": "Modal"
+      },
+      "OutcomeText": {
+        "rect_su": [
+          771.3333333333334,
+          222.0,
+          164.0,
+          48
+        ],
+        "kind": "modal",
+        "text": "ПОБЕДА",
+        "role": "type.display",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.victory",
+          "column": "ru"
+        }
+      },
+      "HeadlineText": {
+        "rect_su": [
+          728.7083333333334,
+          286.0,
+          249.25,
+          28
+        ],
+        "kind": "modal",
+        "text": "MEDUSA ПОБЕЖДАЕТ",
+        "role": "type.title",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.wins",
+          "column": "ru"
+        }
+      },
+      "ReasonText": {
+        "rect_su": [
+          773.0970052083334,
+          330.0,
+          160.47265625,
+          16
+        ],
+        "kind": "modal",
+        "text": "T. Rex: HP достигли 0",
+        "role": "type.body",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.reason.hp",
+          "column": "ru"
+        }
+      },
+      "TurnText": {
+        "rect_su": [
+          811.7083333333334,
+          358.0,
+          83.25,
+          14
+        ],
+        "kind": "modal",
+        "text": "Ход 19 · 0:33",
+        "role": "type.caption",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.turn.time",
+          "column": "ru"
+        }
+      },
+      "VersusText": {
+        "rect_su": [
+          818.4583333333334,
+          448.0,
+          69.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "против",
+        "role": "type.heading",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.loading.versus",
+          "column": "ru"
+        }
+      },
+      "LeftPortrait": {
+        "rect_su": [
+          613.3333333333334,
+          400.0,
+          120,
+          120
+        ],
+        "kind": "modal",
+        "hero": "Medusa",
+        "source": "scraped-data/derived/ue-media-v1/avatars/medusa.png",
+        "crop": {
+          "cx": 0.44,
+          "cy": 0.29,
+          "d": 0.5
+        },
+        "look": "winner",
+        "team_ring": false,
+        "team_color": false
+      },
+      "LeftName": {
+        "rect_su": [
+          636.4583333333334,
+          532.0,
+          73.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "Medusa",
+        "role": "type.heading",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.winnerHero / hp.winner"
+        }
+      },
+      "LeftCaption": {
+        "rect_su": [
+          582.9583333333334,
+          560.0,
+          180.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "Вы · HP 14/16 · Победитель",
+        "hp": [
+          14,
+          16
+        ],
+        "role": "Вы",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.winnerHero / hp.winner"
+        }
+      },
+      "LeftCaption.RoleHP": {
+        "rect_su": [
+          582.9583333333334,
+          560.0,
+          101.5,
+          24
+        ],
+        "kind": "modal",
+        "text": "Вы · HP 14/16 · ",
+        "role": "type.caption",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.winnerHero / hp.winner"
+        }
+      },
+      "LeftCaption.Status": {
+        "rect_su": [
+          684.4583333333334,
+          560.0,
+          79.25,
+          24
+        ],
+        "kind": "modal",
+        "text": "Победитель",
+        "role": "type.caption",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.winner",
+          "column": "ru"
+        }
+      },
+      "RightPortrait": {
+        "rect_su": [
+          973.3333333333335,
+          400.0,
+          120,
+          120
+        ],
+        "kind": "modal",
+        "hero": "T. Rex",
+        "source": "scraped-data/derived/sc37-gameover-again-codex/avatars/t-rex.png",
+        "crop": {
+          "cx": 0.56,
+          "cy": 0.33,
+          "d": 0.64
+        },
+        "look": "defeated",
+        "team_ring": false,
+        "team_color": false
+      },
+      "RightName": {
+        "rect_su": [
+          1003.9778645833335,
+          532.0,
+          58.7109375,
+          24
+        ],
+        "kind": "modal",
+        "text": "T. Rex",
+        "role": "type.heading",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.loserHero / hp.loser / opponent.username"
+        }
+      },
+      "RightCaption": {
+        "rect_su": [
+          929.4583333333335,
+          560.0,
+          207.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "AI Bot · HP 0/27 · Повержен",
+        "hp": [
+          0,
+          27
+        ],
+        "role": "AI Bot",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.loserHero / hp.loser / opponent.username"
+        }
+      },
+      "RightCaption.RoleHP": {
+        "rect_su": [
+          929.4583333333335,
+          560.0,
+          111.5,
+          24
+        ],
+        "kind": "modal",
+        "text": "AI Bot · HP 0/27 · ",
+        "role": "type.caption",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.loserHero / hp.loser / opponent.username"
+        }
+      },
+      "RightCaption.Status": {
+        "rect_su": [
+          1040.9583333333335,
+          560.0,
+          66.25,
+          24
+        ],
+        "kind": "modal",
+        "text": "Повержен",
+        "role": "type.caption",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.defeated",
+          "column": "ru"
+        }
+      },
+      "RightFallenIcon": {
+        "rect_su": [
+          1113.2083333333335,
+          560.0,
+          24,
+          24
+        ],
+        "kind": "modal",
+        "icon": "resource-hp-fallen",
+        "source": "art/imagegen/hud-icons-v3/sizes/resource-hp-fallen-18.png"
+      },
+      "ButtonRow": {
+        "rect_su": [
+          500.45833333333337,
+          690.0,
+          705.75,
+          48
+        ],
+        "kind": "modal",
+        "budget_su": 712,
+        "gap_su": 16,
+        "chips": true,
+        "fits_budget": true
+      },
+      "ViewBoardButton": {
+        "rect_su": [
+          500.45833333333337,
+          690.0,
+          252.25,
+          48
+        ],
+        "kind": "modal",
+        "primary": false,
+        "state": "normal",
+        "label_key": "screens.result.view.board",
+        "skin": "Btn_Normal"
+      },
+      "ViewBoardButton.Label": {
+        "rect_su": [
+          524.4583333333334,
+          690.0,
+          176.25,
+          48
+        ],
+        "kind": "modal",
+        "text": "ПОСМОТРЕТЬ ДОСКУ",
+        "role": "type.button",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.view.board",
+          "column": "ru"
+        }
+      },
+      "KeyChip_V": {
+        "rect_su": [
+          708.7083333333334,
+          704.0,
+          20,
+          20
+        ],
+        "kind": "modal",
+        "skin": "KeyChip"
+      },
+      "KeyChip_V.Label": {
+        "rect_su": [
+          708.7083333333334,
+          704.0,
+          20,
+          20
+        ],
+        "kind": "modal",
+        "text": "V",
+        "role": "type.tag",
+        "source": {
+          "file": "docs/game-design/visual/06-tasks/prompts/SC-34-series.codex.md",
+          "key": "ВР-VS5-SC34-05"
+        }
+      },
+      "AgainButton": {
+        "rect_su": [
+          768.7083333333334,
+          690.0,
+          253.5,
+          48
+        ],
+        "kind": "modal",
+        "primary": false,
+        "state": "busy",
+        "label_key": "screens.result.again",
+        "skin": "Btn_Normal"
+      },
+      "AgainSpinner": {
+        "rect_su": [
+          792.7083333333334,
+          702.0,
+          24,
+          24
+        ],
+        "kind": "modal",
+        "icon": "loader-spinner",
+        "source": "art/imagegen/hud-icons-v3/sizes/loader-spinner-18.png"
+      },
+      "AgainButton.Label": {
+        "rect_su": [
+          824.7083333333334,
+          690.0,
+          173.5,
+          48
+        ],
+        "kind": "modal",
+        "text": "СОЗДАЁМ ПАРТИЮ…",
+        "role": "type.button",
+        "source": {
+          "file": "docs/game-design/visual/06-tasks/prompts/SC-34-series.codex.md",
+          "key": "screens.result.again.busy",
+          "column": "proposed RU"
+        }
+      },
+      "LobbyButton": {
+        "rect_su": [
+          1038.2083333333335,
+          690.0,
+          168,
+          48
+        ],
+        "kind": "modal",
+        "primary": true,
+        "state": "normal",
+        "label_key": "screens.result.lobby",
+        "skin": "BtnPrimary_Normal"
+      },
+      "LobbyButton.Label": {
+        "rect_su": [
+          1062.8333333333335,
+          690.0,
+          74.0,
+          48
+        ],
+        "kind": "modal",
+        "text": "В ЛОББИ",
+        "role": "type.button",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.lobby",
+          "column": "ru"
+        }
+      },
+      "KeyChip_Enter": {
+        "rect_su": [
+          1144.8333333333335,
+          704.0,
+          36.75,
+          20
+        ],
+        "kind": "modal",
+        "skin": "KeyChip"
+      },
+      "KeyChip_Enter.Label": {
+        "rect_su": [
+          1144.8333333333335,
+          704.0,
+          36.75,
+          20
+        ],
+        "kind": "modal",
+        "text": "Enter",
+        "role": "type.tag",
+        "source": {
+          "file": "docs/game-design/visual/06-tasks/prompts/SC-34-series.codex.md",
+          "key": "ВР-VS5-SC34-05"
+        }
+      }
+    }
+  },
+  "again-720p-150": {
+    "canvas_px": [
+      1280,
+      720
+    ],
+    "canvas_su": [
+      1137.7777777777778,
+      640.0
+    ],
+    "dpi": 0.75,
+    "ui": 1.5,
+    "px_per_su": 1.125,
+    "class": "S",
+    "widgets": {
+      "ResultModal": {
+        "rect_su": [
+          188.8888888888889,
+          40.0,
+          760,
+          560
+        ],
+        "kind": "modal",
+        "alpha": 1,
+        "skin": "Modal"
+      },
+      "OutcomeText": {
+        "rect_su": [
+          486.8888888888889,
+          72.0,
+          164.0,
+          48
+        ],
+        "kind": "modal",
+        "text": "ПОБЕДА",
+        "role": "type.display",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.victory",
+          "column": "ru"
+        }
+      },
+      "HeadlineText": {
+        "rect_su": [
+          444.2638888888889,
+          136.0,
+          249.25,
+          28
+        ],
+        "kind": "modal",
+        "text": "MEDUSA ПОБЕЖДАЕТ",
+        "role": "type.title",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.wins",
+          "column": "ru"
+        }
+      },
+      "ReasonText": {
+        "rect_su": [
+          488.6525607638889,
+          180.0,
+          160.47265625,
+          16
+        ],
+        "kind": "modal",
+        "text": "T. Rex: HP достигли 0",
+        "role": "type.body",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.reason.hp",
+          "column": "ru"
+        }
+      },
+      "TurnText": {
+        "rect_su": [
+          527.2638888888889,
+          208.0,
+          83.25,
+          14
+        ],
+        "kind": "modal",
+        "text": "Ход 19 · 0:33",
+        "role": "type.caption",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.turn.time",
+          "column": "ru"
+        }
+      },
+      "VersusText": {
+        "rect_su": [
+          534.0138888888889,
+          298.0,
+          69.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "против",
+        "role": "type.heading",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.loading.versus",
+          "column": "ru"
+        }
+      },
+      "LeftPortrait": {
+        "rect_su": [
+          348.8888888888889,
+          250.0,
+          120,
+          120
+        ],
+        "kind": "modal",
+        "hero": "Medusa",
+        "source": "scraped-data/derived/ue-media-v1/avatars/medusa.png",
+        "crop": {
+          "cx": 0.44,
+          "cy": 0.29,
+          "d": 0.5
+        },
+        "look": "winner",
+        "team_ring": false,
+        "team_color": false
+      },
+      "LeftName": {
+        "rect_su": [
+          372.0138888888889,
+          382.0,
+          73.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "Medusa",
+        "role": "type.heading",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.winnerHero / hp.winner"
+        }
+      },
+      "LeftCaption": {
+        "rect_su": [
+          318.5138888888889,
+          410.0,
+          180.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "Вы · HP 14/16 · Победитель",
+        "hp": [
+          14,
+          16
+        ],
+        "role": "Вы",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.winnerHero / hp.winner"
+        }
+      },
+      "LeftCaption.RoleHP": {
+        "rect_su": [
+          318.5138888888889,
+          410.0,
+          101.5,
+          24
+        ],
+        "kind": "modal",
+        "text": "Вы · HP 14/16 · ",
+        "role": "type.caption",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.winnerHero / hp.winner"
+        }
+      },
+      "LeftCaption.Status": {
+        "rect_su": [
+          420.0138888888889,
+          410.0,
+          79.25,
+          24
+        ],
+        "kind": "modal",
+        "text": "Победитель",
+        "role": "type.caption",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.winner",
+          "column": "ru"
+        }
+      },
+      "RightPortrait": {
+        "rect_su": [
+          668.8888888888889,
+          250.0,
+          120,
+          120
+        ],
+        "kind": "modal",
+        "hero": "T. Rex",
+        "source": "scraped-data/derived/sc37-gameover-again-codex/avatars/t-rex.png",
+        "crop": {
+          "cx": 0.56,
+          "cy": 0.33,
+          "d": 0.64
+        },
+        "look": "defeated",
+        "team_ring": false,
+        "team_color": false
+      },
+      "RightName": {
+        "rect_su": [
+          699.5334201388889,
+          382.0,
+          58.7109375,
+          24
+        ],
+        "kind": "modal",
+        "text": "T. Rex",
+        "role": "type.heading",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.loserHero / hp.loser / opponent.username"
+        }
+      },
+      "RightCaption": {
+        "rect_su": [
+          625.0138888888889,
+          410.0,
+          207.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "AI Bot · HP 0/27 · Повержен",
+        "hp": [
+          0,
+          27
+        ],
+        "role": "AI Bot",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.loserHero / hp.loser / opponent.username"
+        }
+      },
+      "RightCaption.RoleHP": {
+        "rect_su": [
+          625.0138888888889,
+          410.0,
+          111.5,
+          24
+        ],
+        "kind": "modal",
+        "text": "AI Bot · HP 0/27 · ",
+        "role": "type.caption",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.loserHero / hp.loser / opponent.username"
+        }
+      },
+      "RightCaption.Status": {
+        "rect_su": [
+          736.5138888888889,
+          410.0,
+          66.25,
+          24
+        ],
+        "kind": "modal",
+        "text": "Повержен",
+        "role": "type.caption",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.defeated",
+          "column": "ru"
+        }
+      },
+      "RightFallenIcon": {
+        "rect_su": [
+          808.7638888888889,
+          410.0,
+          24,
+          24
+        ],
+        "kind": "modal",
+        "icon": "resource-hp-fallen",
+        "source": "art/imagegen/hud-icons-v3/_tools/draw_icons.py"
+      },
+      "ButtonRow": {
+        "rect_su": [
+          216.0138888888889,
+          520.0,
+          705.75,
+          48
+        ],
+        "kind": "modal",
+        "budget_su": 712,
+        "gap_su": 16,
+        "chips": true,
+        "fits_budget": true
+      },
+      "ViewBoardButton": {
+        "rect_su": [
+          216.0138888888889,
+          520.0,
+          252.25,
+          48
+        ],
+        "kind": "modal",
+        "primary": false,
+        "state": "normal",
+        "label_key": "screens.result.view.board",
+        "skin": "Btn_Normal"
+      },
+      "ViewBoardButton.Label": {
+        "rect_su": [
+          240.0138888888889,
+          520.0,
+          176.25,
+          48
+        ],
+        "kind": "modal",
+        "text": "ПОСМОТРЕТЬ ДОСКУ",
+        "role": "type.button",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.view.board",
+          "column": "ru"
+        }
+      },
+      "KeyChip_V": {
+        "rect_su": [
+          424.2638888888889,
+          534.0,
+          20,
+          20
+        ],
+        "kind": "modal",
+        "skin": "KeyChip"
+      },
+      "KeyChip_V.Label": {
+        "rect_su": [
+          424.2638888888889,
+          534.0,
+          20,
+          20
+        ],
+        "kind": "modal",
+        "text": "V",
+        "role": "type.tag",
+        "source": {
+          "file": "docs/game-design/visual/06-tasks/prompts/SC-34-series.codex.md",
+          "key": "ВР-VS5-SC34-05"
+        }
+      },
+      "AgainButton": {
+        "rect_su": [
+          484.2638888888889,
+          520.0,
+          253.5,
+          48
+        ],
+        "kind": "modal",
+        "primary": false,
+        "state": "normal",
+        "label_key": "screens.result.again",
+        "skin": "Btn_Normal"
+      },
+      "AgainButton.Label": {
+        "rect_su": [
+          549.5138888888889,
+          520.0,
+          123.0,
+          48
+        ],
+        "kind": "modal",
+        "text": "СЫГРАТЬ ЕЩЁ",
+        "role": "type.button",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.again",
+          "column": "ru"
+        }
+      },
+      "LobbyButton": {
+        "rect_su": [
+          753.7638888888889,
+          520.0,
+          168,
+          48
+        ],
+        "kind": "modal",
+        "primary": true,
+        "state": "normal",
+        "label_key": "screens.result.lobby",
+        "skin": "BtnPrimary_Normal"
+      },
+      "LobbyButton.Label": {
+        "rect_su": [
+          778.3888888888889,
+          520.0,
+          74.0,
+          48
+        ],
+        "kind": "modal",
+        "text": "В ЛОББИ",
+        "role": "type.button",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.lobby",
+          "column": "ru"
+        }
+      },
+      "KeyChip_Enter": {
+        "rect_su": [
+          860.3888888888889,
+          534.0,
+          36.75,
+          20
+        ],
+        "kind": "modal",
+        "skin": "KeyChip"
+      },
+      "KeyChip_Enter.Label": {
+        "rect_su": [
+          860.3888888888889,
+          534.0,
+          36.75,
+          20
+        ],
+        "kind": "modal",
+        "text": "Enter",
+        "role": "type.tag",
+        "source": {
+          "file": "docs/game-design/visual/06-tasks/prompts/SC-34-series.codex.md",
+          "key": "ВР-VS5-SC34-05"
+        }
+      }
+    }
+  },
+  "again-busy-720p-150": {
+    "canvas_px": [
+      1280,
+      720
+    ],
+    "canvas_su": [
+      1137.7777777777778,
+      640.0
+    ],
+    "dpi": 0.75,
+    "ui": 1.5,
+    "px_per_su": 1.125,
+    "class": "S",
+    "widgets": {
+      "ResultModal": {
+        "rect_su": [
+          188.8888888888889,
+          40.0,
+          760,
+          560
+        ],
+        "kind": "modal",
+        "alpha": 1,
+        "skin": "Modal"
+      },
+      "OutcomeText": {
+        "rect_su": [
+          486.8888888888889,
+          72.0,
+          164.0,
+          48
+        ],
+        "kind": "modal",
+        "text": "ПОБЕДА",
+        "role": "type.display",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.victory",
+          "column": "ru"
+        }
+      },
+      "HeadlineText": {
+        "rect_su": [
+          444.2638888888889,
+          136.0,
+          249.25,
+          28
+        ],
+        "kind": "modal",
+        "text": "MEDUSA ПОБЕЖДАЕТ",
+        "role": "type.title",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.wins",
+          "column": "ru"
+        }
+      },
+      "ReasonText": {
+        "rect_su": [
+          488.6525607638889,
+          180.0,
+          160.47265625,
+          16
+        ],
+        "kind": "modal",
+        "text": "T. Rex: HP достигли 0",
+        "role": "type.body",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.reason.hp",
+          "column": "ru"
+        }
+      },
+      "TurnText": {
+        "rect_su": [
+          527.2638888888889,
+          208.0,
+          83.25,
+          14
+        ],
+        "kind": "modal",
+        "text": "Ход 19 · 0:33",
+        "role": "type.caption",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.turn.time",
+          "column": "ru"
+        }
+      },
+      "VersusText": {
+        "rect_su": [
+          534.0138888888889,
+          298.0,
+          69.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "против",
+        "role": "type.heading",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.loading.versus",
+          "column": "ru"
+        }
+      },
+      "LeftPortrait": {
+        "rect_su": [
+          348.8888888888889,
+          250.0,
+          120,
+          120
+        ],
+        "kind": "modal",
+        "hero": "Medusa",
+        "source": "scraped-data/derived/ue-media-v1/avatars/medusa.png",
+        "crop": {
+          "cx": 0.44,
+          "cy": 0.29,
+          "d": 0.5
+        },
+        "look": "winner",
+        "team_ring": false,
+        "team_color": false
+      },
+      "LeftName": {
+        "rect_su": [
+          372.0138888888889,
+          382.0,
+          73.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "Medusa",
+        "role": "type.heading",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.winnerHero / hp.winner"
+        }
+      },
+      "LeftCaption": {
+        "rect_su": [
+          318.5138888888889,
+          410.0,
+          180.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "Вы · HP 14/16 · Победитель",
+        "hp": [
+          14,
+          16
+        ],
+        "role": "Вы",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.winnerHero / hp.winner"
+        }
+      },
+      "LeftCaption.RoleHP": {
+        "rect_su": [
+          318.5138888888889,
+          410.0,
+          101.5,
+          24
+        ],
+        "kind": "modal",
+        "text": "Вы · HP 14/16 · ",
+        "role": "type.caption",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.winnerHero / hp.winner"
+        }
+      },
+      "LeftCaption.Status": {
+        "rect_su": [
+          420.0138888888889,
+          410.0,
+          79.25,
+          24
+        ],
+        "kind": "modal",
+        "text": "Победитель",
+        "role": "type.caption",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.winner",
+          "column": "ru"
+        }
+      },
+      "RightPortrait": {
+        "rect_su": [
+          668.8888888888889,
+          250.0,
+          120,
+          120
+        ],
+        "kind": "modal",
+        "hero": "T. Rex",
+        "source": "scraped-data/derived/sc37-gameover-again-codex/avatars/t-rex.png",
+        "crop": {
+          "cx": 0.56,
+          "cy": 0.33,
+          "d": 0.64
+        },
+        "look": "defeated",
+        "team_ring": false,
+        "team_color": false
+      },
+      "RightName": {
+        "rect_su": [
+          699.5334201388889,
+          382.0,
+          58.7109375,
+          24
+        ],
+        "kind": "modal",
+        "text": "T. Rex",
+        "role": "type.heading",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.loserHero / hp.loser / opponent.username"
+        }
+      },
+      "RightCaption": {
+        "rect_su": [
+          625.0138888888889,
+          410.0,
+          207.75,
+          24
+        ],
+        "kind": "modal",
+        "text": "AI Bot · HP 0/27 · Повержен",
+        "hp": [
+          0,
+          27
+        ],
+        "role": "AI Bot",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.loserHero / hp.loser / opponent.username"
+        }
+      },
+      "RightCaption.RoleHP": {
+        "rect_su": [
+          625.0138888888889,
+          410.0,
+          111.5,
+          24
+        ],
+        "kind": "modal",
+        "text": "AI Bot · HP 0/27 · ",
+        "role": "type.caption",
+        "source": {
+          "file": "scraped-data/derived/sc37-gameover-again-codex/inputs/vsai-result.json",
+          "key": "resultSummary.loserHero / hp.loser / opponent.username"
+        }
+      },
+      "RightCaption.Status": {
+        "rect_su": [
+          736.5138888888889,
+          410.0,
+          66.25,
+          24
+        ],
+        "kind": "modal",
+        "text": "Повержен",
+        "role": "type.caption",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.defeated",
+          "column": "ru"
+        }
+      },
+      "RightFallenIcon": {
+        "rect_su": [
+          808.7638888888889,
+          410.0,
+          24,
+          24
+        ],
+        "kind": "modal",
+        "icon": "resource-hp-fallen",
+        "source": "art/imagegen/hud-icons-v3/_tools/draw_icons.py"
+      },
+      "ButtonRow": {
+        "rect_su": [
+          216.0138888888889,
+          520.0,
+          705.75,
+          48
+        ],
+        "kind": "modal",
+        "budget_su": 712,
+        "gap_su": 16,
+        "chips": true,
+        "fits_budget": true
+      },
+      "ViewBoardButton": {
+        "rect_su": [
+          216.0138888888889,
+          520.0,
+          252.25,
+          48
+        ],
+        "kind": "modal",
+        "primary": false,
+        "state": "normal",
+        "label_key": "screens.result.view.board",
+        "skin": "Btn_Normal"
+      },
+      "ViewBoardButton.Label": {
+        "rect_su": [
+          240.0138888888889,
+          520.0,
+          176.25,
+          48
+        ],
+        "kind": "modal",
+        "text": "ПОСМОТРЕТЬ ДОСКУ",
+        "role": "type.button",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.view.board",
+          "column": "ru"
+        }
+      },
+      "KeyChip_V": {
+        "rect_su": [
+          424.2638888888889,
+          534.0,
+          20,
+          20
+        ],
+        "kind": "modal",
+        "skin": "KeyChip"
+      },
+      "KeyChip_V.Label": {
+        "rect_su": [
+          424.2638888888889,
+          534.0,
+          20,
+          20
+        ],
+        "kind": "modal",
+        "text": "V",
+        "role": "type.tag",
+        "source": {
+          "file": "docs/game-design/visual/06-tasks/prompts/SC-34-series.codex.md",
+          "key": "ВР-VS5-SC34-05"
+        }
+      },
+      "AgainButton": {
+        "rect_su": [
+          484.2638888888889,
+          520.0,
+          253.5,
+          48
+        ],
+        "kind": "modal",
+        "primary": false,
+        "state": "busy",
+        "label_key": "screens.result.again",
+        "skin": "Btn_Normal"
+      },
+      "AgainSpinner": {
+        "rect_su": [
+          508.2638888888889,
+          532.0,
+          24,
+          24
+        ],
+        "kind": "modal",
+        "icon": "loader-spinner",
+        "source": "art/imagegen/hud-icons-v3/_tools/draw_icons.py"
+      },
+      "AgainButton.Label": {
+        "rect_su": [
+          540.2638888888889,
+          520.0,
+          173.5,
+          48
+        ],
+        "kind": "modal",
+        "text": "СОЗДАЁМ ПАРТИЮ…",
+        "role": "type.button",
+        "source": {
+          "file": "docs/game-design/visual/06-tasks/prompts/SC-34-series.codex.md",
+          "key": "screens.result.again.busy",
+          "column": "proposed RU"
+        }
+      },
+      "LobbyButton": {
+        "rect_su": [
+          753.7638888888889,
+          520.0,
+          168,
+          48
+        ],
+        "kind": "modal",
+        "primary": true,
+        "state": "normal",
+        "label_key": "screens.result.lobby",
+        "skin": "BtnPrimary_Normal"
+      },
+      "LobbyButton.Label": {
+        "rect_su": [
+          778.3888888888889,
+          520.0,
+          74.0,
+          48
+        ],
+        "kind": "modal",
+        "text": "В ЛОББИ",
+        "role": "type.button",
+        "source": {
+          "file": "docs/unreal/contracts/hud/st-screens.csv",
+          "key": "screens.result.lobby",
+          "column": "ru"
+        }
+      },
+      "KeyChip_Enter": {
+        "rect_su": [
+          860.3888888888889,
+          534.0,
+          36.75,
+          20
+        ],
+        "kind": "modal",
+        "skin": "KeyChip"
+      },
+      "KeyChip_Enter.Label": {
+        "rect_su": [
+          860.3888888888889,
+          534.0,
+          36.75,
+          20
+        ],
+        "kind": "modal",
+        "text": "Enter",
+        "role": "type.tag",
+        "source": {
+          "file": "docs/game-design/visual/06-tasks/prompts/SC-34-series.codex.md",
+          "key": "ВР-VS5-SC34-05"
+        }
+      }
+    }
+  }
+}
