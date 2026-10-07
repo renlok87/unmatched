@@ -1,0 +1,187 @@
+{
+  "schema": "CX-34.series-audit/1",
+  "status": "предложено",
+  "package_integrity_passed": true,
+  "acceptance_all_passed": false,
+  "all_final_png_count": 144,
+  "mockup_png_count": 64,
+  "packages": [
+    {
+      "card": "SC-34",
+      "package": "art/imagegen/sc34-gameover-victory-codex",
+      "exports_checked": 32,
+      "mockup_png_count": 16,
+      "inputs_checked": 120,
+      "manifest_files_checked": 44,
+      "copies_byte_identical": true,
+      "inputs_unchanged": true,
+      "manifest_complete": true,
+      "visual_review_complete": true,
+      "rgba_dimensions_gray_luma_verified": true,
+      "persistent_overlap_px2": 0,
+      "failed_acceptance": {
+        "edges and icons >= 3:1": {
+          "criterion": "edges and icons >= 3:1",
+          "passed": false,
+          "measured": {
+            "boundary_min": 1.640026115368985,
+            "icon_min": 2.549459090715187
+          },
+          "expected": ">=3",
+          "note": "Actual boundary samples; red signs separately measured. Fixed source failures retained."
+        }
+      }
+    },
+    {
+      "card": "SC-35",
+      "package": "art/imagegen/sc35-gameover-defeat-codex",
+      "exports_checked": 24,
+      "mockup_png_count": 8,
+      "inputs_checked": 125,
+      "manifest_files_checked": 37,
+      "copies_byte_identical": true,
+      "inputs_unchanged": true,
+      "manifest_complete": true,
+      "visual_review_complete": true,
+      "rgba_dimensions_gray_luma_verified": true,
+      "persistent_overlap_px2": 0,
+      "failed_acceptance": {
+        "text contrast >= 4.5:1": {
+          "criterion": "text contrast >= 4.5:1",
+          "passed": false,
+          "measured": 3.2084745237025527,
+          "expected": ">=4.5",
+          "note": "Both color and Rec.709 gray; fixed state.error is not altered."
+        },
+        "edges and icons >= 3:1": {
+          "criterion": "edges and icons >= 3:1",
+          "passed": false,
+          "measured": {
+            "boundary_min": 1.6576924467424898,
+            "icon_min": 2.549459090715187
+          },
+          "expected": ">=3",
+          "note": "Actual boundary samples; red signs separately measured. Fixed source failures retained."
+        }
+      }
+    },
+    {
+      "card": "SC-36",
+      "package": "art/imagegen/sc36-gameover-board-codex",
+      "exports_checked": 24,
+      "mockup_png_count": 8,
+      "inputs_checked": 111,
+      "manifest_files_checked": 37,
+      "copies_byte_identical": true,
+      "inputs_unchanged": true,
+      "manifest_complete": true,
+      "visual_review_complete": true,
+      "rgba_dimensions_gray_luma_verified": true,
+      "persistent_overlap_px2": 0,
+      "failed_acceptance": {
+        "edges and icons >= 3:1": {
+          "criterion": "edges and icons >= 3:1",
+          "passed": false,
+          "measured": {
+            "boundary_min": 1.6812191439662745,
+            "icon_min": null
+          },
+          "expected": ">=3",
+          "note": "Actual boundary samples; red signs separately measured. Fixed source failures retained."
+        }
+      }
+    },
+    {
+      "card": "SC-37",
+      "package": "art/imagegen/sc37-gameover-again-codex",
+      "exports_checked": 32,
+      "mockup_png_count": 16,
+      "inputs_checked": 139,
+      "manifest_files_checked": 49,
+      "copies_byte_identical": true,
+      "inputs_unchanged": true,
+      "manifest_complete": true,
+      "visual_review_complete": true,
+      "rgba_dimensions_gray_luma_verified": true,
+      "persistent_overlap_px2": 0,
+      "failed_acceptance": {
+        "edges and icons >= 3:1": {
+          "criterion": "edges and icons >= 3:1",
+          "passed": false,
+          "measured": {
+            "boundary_min": 1.691363326693861,
+            "icon_min": 2.549459090715187
+          },
+          "expected": ">=3",
+          "note": "Actual boundary samples; red signs separately measured. Fixed source failures retained."
+        },
+        "ButtonRow fits modal minus 2x24 su": {
+          "criterion": "ButtonRow fits modal minus 2x24 su",
+          "passed": false,
+          "measured": [
+            {
+              "width": 705.75,
+              "budget": 712
+            },
+            {
+              "width": 705.75,
+              "budget": 712
+            },
+            {
+              "width": 661.75,
+              "budget": 632
+            },
+            {
+              "width": 661.75,
+              "budget": 632
+            },
+            {
+              "width": 705.75,
+              "budget": 712
+            },
+            {
+              "width": 705.75,
+              "budget": 712
+            },
+            {
+              "width": 661.75,
+              "budget": 632
+            },
+            {
+              "width": 661.75,
+              "budget": 632
+            }
+          ],
+          "expected": "all fit",
+          "note": ""
+        }
+      }
+    },
+    {
+      "card": "SC-38",
+      "package": "art/imagegen/sc38-aborted-codex",
+      "exports_checked": 32,
+      "mockup_png_count": 16,
+      "inputs_checked": 104,
+      "manifest_files_checked": 49,
+      "copies_byte_identical": true,
+      "inputs_unchanged": true,
+      "manifest_complete": true,
+      "visual_review_complete": true,
+      "rgba_dimensions_gray_luma_verified": true,
+      "persistent_overlap_px2": 0,
+      "failed_acceptance": {
+        "edges_and_icons_ge_3": {
+          "passed": false,
+          "measured": {
+            "minimum_edge": 1.6825869360907033,
+            "minimum_icon": 2.35766724202246
+          },
+          "expected": ">=3 in color and gray",
+          "note": "Accepted skins and icon signs are preserved; failing raster boundaries are reported without recoloring."
+        }
+      }
+    }
+  ],
+  "scope": "Writes only SC-38 report and SC-38 manifest; no Git, engine, network or MCP."
+}

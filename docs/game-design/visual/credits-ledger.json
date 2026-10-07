@@ -1327,11 +1327,47 @@
       "result_path": "art/imagegen/sc24…sc30-*-codex/ (comparison/, layout-geometry.json, verification.json, README.md)",
       "status": "ok",
       "note": "CX-32 fix1 (единственный корректирующий прогон SC-24…SC-30); 2026-10-07 22:52–23:10 +05:00 (~18 мин); метки R01… на схемах, обрезка по RowsPanel, типографика README; макеты не менялись (sha256 106 PNG сверены); генераций 0; ревью Claude: accept по делегированию (ВР-VS5-SC24-01…12, -SC25-01…02, -SC26-01…03, -SC27-01…02, -SC28-01, -SC29-01…02, -SC30-01); кромки HB-08 < 3:1 — известное ограничение скинов"
+    },
+    {
+      "date": "2026-10-07T23:59:16+05:00",
+      "service": "Codex",
+      "model": "codex-cli (codex.exe exec, app bundle 5ea220ae)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "SC-34",
+      "units": "пакет, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a11792-509b-7cb3-bb13-67e003351a81",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/SC-34-series.codex.md",
+      "result_path": "art/imagegen/sc34-gameover-victory-codex/, sc35-gameover-defeat-codex/, sc36-gameover-board-codex/, sc37-gameover-again-codex/, sc38-aborted-codex/",
+      "status": "ok",
+      "note": "CX-34 прогон 1 (серия SC-34…SC-38 GAMEOVER и ABORTED в одном чате); 2026-10-07 23:13–23:59 +05:00 (~46 мин); 5 пакетов, 64 макета в scraped-data/derived; данные — run I (Marmoreal host, Sarpedon joiner), run F vs-ai (T. Rex, AI Bot), строка ABORTED (Veteran, player_left) из эталонной БД READ ONLY; генераций 0; ревью Claude: fix-needed (схемы без номеров, ряд кнопок SC-37 класса S шире модали)"
+    },
+    {
+      "date": "2026-10-08T00:19:06+05:00",
+      "service": "Codex",
+      "model": "codex-cli (codex.exe exec, app bundle 5ea220ae)",
+      "template": "T-CODEX-LAYOUT",
+      "task_id": "SC-34",
+      "units": "исправление 5 пакетов, 0 генераций image_gen",
+      "quoted": null,
+      "cost": null,
+      "balance_before": null,
+      "balance_after": null,
+      "service_task_id": "01a117bd-aa21-7613-8627-187b2dd0ea93",
+      "seed": null,
+      "prompt_file": "docs/game-design/visual/06-tasks/prompts/SC-34-series.fix1.codex.md",
+      "result_path": "art/imagegen/sc34…sc38-*-codex/ (comparison/, SC-37 класс S, verification.json, README.md)",
+      "status": "ok",
+      "note": "CX-34 fix1 (единственный корректирующий прогон SC-34…SC-38); 2026-10-08 00:01–00:19 +05:00 (~18 мин); номера на схемах, схемы draw/busy, SC-37 класс S модаль 760×560 (ВР-VS5-SC37-06) с чипами V/Enter; изменены только 8 макетов SC-37 класса S; генераций 0; ревью Claude: accept по делегированию (ВР-VS5-SC34-01…09, -SC35-01…02, -SC36-01…03, -SC37-01…06, -SC38-01…04); кромки HB-08 < 3:1 — известное ограничение скинов"
     }
   ],
   "totals": {
     "syntx_spent": 6.0,
     "tripo_spent": 0,
-    "codex_packages": 67
+    "codex_packages": 69
   }
 }
