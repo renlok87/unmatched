@@ -7,13 +7,16 @@
 #include "../S08IconMotion.h"
 #include "Engine/GameViewportClient.h"
 #include "Blueprint/WidgetTree.h"
+#include "Components/InvalidationBox.h"
 #include "Components/NamedSlot.h"
 #include "Components/Overlay.h"
 #include "Components/OverlaySlot.h"
 #include "Components/WidgetSwitcher.h"
 #include "Components/WidgetSwitcherSlot.h"
 #include "Engine/World.h"
+#include "Misc/CommandLine.h"
 #include "Misc/PackageName.h"
+#include "Misc/Parse.h"
 
 const TCHAR* const UUmHudRoot::WidgetBlueprintPath = TEXT("/Game/S08/UI/Root/WBP_UmHudRoot");
 
@@ -108,14 +111,29 @@ UUmGameHud* UUmHudRoot::EnsureGameHud() {
   }
   GameHud = CreateWidget<UUmGameHud>(this, Class);
   if (!GameHud) return nullptr;
-  Screens->AddChild(GameHud);
-  if (UWidgetSwitcherSlot* SwitcherSlot = Cast<UWidgetSwitcherSlot>(GameHud->Slot)) {
+  // VS-5 E4 (HUD-RULES П8): the GAME screen in an invalidation box - every block changes only through UMG setters
+  // (text, opacity, transform, slot, visibility), which invalidate what they touch, so the rest of the screen is not
+  // painted, measured and hit-tested again each frame; the blocks that tick (tweens, timers) keep ticking
+  UWidget* ScreenChild = GameHud;
+  if (CacheWanted() && WidgetTree) {
+    GameCache = WidgetTree->ConstructWidget<UInvalidationBox>(UInvalidationBox::StaticClass(), FName(TEXT("GameCache")));
+    if (GameCache) {
+      GameCache->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+      GameCache->SetCanCache(true);
+      GameCache->SetContent(GameHud);
+      ScreenChild = GameCache;
+    }
+  }
+  Screens->AddChild(ScreenChild);
+  if (UWidgetSwitcherSlot* SwitcherSlot = Cast<UWidgetSwitcherSlot>(ScreenChild->Slot)) {
     SwitcherSlot->SetHorizontalAlignment(HAlign_Fill);
     SwitcherSlot->SetVerticalAlignment(VAlign_Fill);
   }
-  Screens->SetActiveWidget(GameHud);
+  Screens->SetActiveWidget(ScreenChild);
   return GameHud;
 }
+
+bool UUmHudRoot::CacheWanted() { return !FParse::Param(FCommandLine::Get(), TEXT("S08HudNoCache")); }
 
 bool UUmHudRoot::HasAllParts(FString* OutMissing) const {
   TArray<FString> Missing;

@@ -23,6 +23,7 @@
 #include "UmHudRoot.generated.h"
 
 class UCanvasPanel;
+class UInvalidationBox;
 class UNamedSlot;
 class UOverlay;
 class USizeBox;
@@ -43,8 +44,14 @@ class UNMATCHED_API UUmHudRoot : public UUserWidget {
   /** The WBP's generated class when the asset exists, else the native class (code default tree). OutSource: the WBP
    *  path or "code-default". */
   static UUmHudRoot* Create(UWorld* World, FString* OutSource = nullptr);
-  /** The GAME screen inside Screens (created on the first call from WBP_UI_SCR_GAME or the native class). */
+  /** The GAME screen inside Screens (created on the first call from WBP_UI_SCR_GAME or the native class). VS-5 E4 (HUD-RULES
+   *  П8, VS-4 «Открыто» п. 2): the screen sits in an invalidation box (UInvalidationBox, the Slate fast path) - its paint,
+   *  prepass and hit-test entries are cached and only the widgets that changed repaint; rollback -S08HudNoCache. */
   UUmGameHud* EnsureGameHud();
+  /** The cache box around GAME (null with -S08HudNoCache or before EnsureGameHud). */
+  UInvalidationBox* GetGameCache() const { return GameCache; }
+  /** False with -S08HudNoCache (the GAME screen straight in Screens, as before VS-5). */
+  static bool CacheWanted();
   UUmGameHud* GetGameHud() const { return GameHud; }
   /** Every BindWidget part bound (false = broken tree; OutMissing lists them). */
   bool HasAllParts(FString* OutMissing = nullptr) const;
@@ -74,6 +81,8 @@ class UNMATCHED_API UUmHudRoot : public UUserWidget {
  private:
   UPROPERTY()
   TObjectPtr<UUmGameHud> GameHud;
+  UPROPERTY()
+  TObjectPtr<UInvalidationBox> GameCache;
   UPROPERTY()
   TArray<TObjectPtr<UUmCursor>> Cursors;
   FString CursorSource;

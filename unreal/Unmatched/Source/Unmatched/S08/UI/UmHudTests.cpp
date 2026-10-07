@@ -32,6 +32,7 @@
 #include "UmGameHud.h"
 #include "UmHudLayout.h"
 #include "UmHudRoot.h"
+#include "Components/InvalidationBox.h"
 #include "UmHudTheme.h"
 #include "Components/CanvasPanelSlot.h"
 #include "Components/GridPanel.h"
@@ -157,7 +158,14 @@ bool FUmHudRootTreeTest::RunTest(const FString&) {
   TestTrue(TEXT("root takes no mouse"), Root->GetVisibility() == ESlateVisibility::SelfHitTestInvisible);
   UUmGameHud* Game = Root->EnsureGameHud();
   if (!TestNotNull(TEXT("GAME screen"), Game)) return false;
-  TestTrue(TEXT("GAME is the active screen"), Root->Screens && Root->Screens->GetActiveWidget() == Game);
+  // VS-5 E4: the active screen is the invalidation box holding GAME (the cache, rollback -S08HudNoCache)
+  UWidget* Active = Root->Screens ? Root->Screens->GetActiveWidget() : nullptr;
+  TestTrue(TEXT("GAME is the active screen (in its cache box)"),
+           Active == Game || (Active && Active == Root->GetGameCache() && Root->GetGameCache()->GetContent() == Game));
+  TestTrue(TEXT("the GAME cache box is on by default"), Root->GetGameCache() != nullptr && UUmHudRoot::CacheWanted());
+  if (UInvalidationBox* Cache = Root->GetGameCache()) {
+    TestTrue(TEXT("the cache box takes no mouse"), Cache->GetVisibility() == ESlateVisibility::SelfHitTestInvisible);
+  }
   TestTrue(TEXT("the same GAME screen on the second call"), Root->EnsureGameHud() == Game);
   TestTrue(FString::Printf(TEXT("GAME: Canvas + 18 slots bound (missing %s)"), *Missing), Game->HasAllParts(&Missing));
   TestEqual(TEXT("18 slots (04 §4.2)"), UmGameSlotCount, 18);
