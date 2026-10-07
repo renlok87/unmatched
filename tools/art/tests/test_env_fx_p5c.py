@@ -51,7 +51,30 @@ class FxSpecs(unittest.TestCase):
                           "NS_Env_ConceptFire",  # P7 concept paste fires (sarpedon.concept.layout.json)
                           # ENV-MAPS P9: the layered lit3d fire + the cascade mist (fx-plan.sarpedon.json)
                           "NS_Env_FireCore", "NS_Env_FireTongues", "NS_Env_FireSmoke", "NS_Env_FireEmbers",
-                          "NS_Env_FallsSpray"})
+                          "NS_Env_FallsSpray",
+                          # VS-5 EN-11: the print-disc fireflies of the painted Marmoreal (marmoreal.concept.layout.json)
+                          "NS_Env_FirefliesDot"})
+
+    def test_fireflies_dot_print_material(self):
+        """VS-5 EN-11: NS_Env_FirefliesDot draws the FX_MATERIALS print disc (M_FX_Print child, SDF disc, one token colour
+        in all three bands = no ring), carries the Z-2 board effect type, and leaves NS_Env_Fireflies untouched."""
+        dot = FX.spec_by_name("NS_Env_FirefliesDot")
+        self.assertEqual(dot["tune"]["spriteMaterials"], {"*": "/Game/EnvKit/FX/MI_EnvFx_FireflyDot"})
+        self.assertEqual(dot["effectType"], "/Game/S08/FX/EffectTypes/NET_UM_Board")
+        self.assertNotIn("spriteMaterials", FX.spec_by_name("NS_Env_Fireflies")["tune"])
+        self.assertNotIn("effectType", FX.spec_by_name("NS_Env_Fireflies"))
+        (mi,) = FX.material_specs()
+        self.assertEqual(mi["parent"], "/Game/S08/FX/Materials/M_FX_Print")
+        self.assertEqual(mi["hex"], "#F2C14E")
+        self.assertEqual(mi["switches"], {"UseSdf": True})
+        self.assertEqual(mi["scalars"]["SdfShape"], 0.0)
+        self.assertTrue(mi["vectors"]["ColorBody"] == mi["vectors"]["ColorEdge"] == mi["vectors"]["ColorKeyline"])
+        self.assertLessEqual(FX.estimate_particles("NS_Env_FirefliesDot"), 24.0)
+        bad = json.loads(json.dumps(dot))
+        bad["effectType"] = "/Game/Elsewhere/NET_X"
+        bad["tune"]["spriteMaterials"] = {"*": "/Game/FreeParticle_SoftTofu/Material/M_Glow"}
+        err, _ = FX.validate([bad], content=None)
+        self.assertTrue(any("effectType" in e for e in err) and any("spriteMaterials" in e for e in err), err)
 
     def test_targets_and_rules(self):
         for s in FX.FX_SPECS:

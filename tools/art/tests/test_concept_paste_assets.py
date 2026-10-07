@@ -379,7 +379,9 @@ class Overlays(unittest.TestCase):
         overlay = load(LAYOUTS / "marmoreal.concept.layout.json")
         merged = LY.merge(base, overlay)
         self.assertEqual(merged["props"], [])
-        self.assertEqual(merged["fx"], [])
+        # VS-5 E2: only the concept's own environment fx (EN-09 petals, EN-11 print-disc fireflies)
+        self.assertEqual(sorted(f["id"] for f in merged["fx"]), ["fireflies-garden-e", "fireflies-garden-w",
+                                                                 "petals-sakura-e", "petals-sakura-w"])
         self.assertEqual(overlay["conceptPaste"]["lights"]["mode"], "profile")
         paint = {d["id"]: d for d in overlay["conceptPaste"]["paintLanterns"]}
         self.assertEqual(set(paint), {"lantern-nw", "lantern-ne", "lantern-w", "lantern-e", "sconce-door-w",
@@ -399,6 +401,42 @@ class Overlays(unittest.TestCase):
         lamps = {lt["id"]: lt["loc"] for lt in base["lights"]}
         for lid, lamp in (("lantern-nw", "lamp-nw"), ("lantern-ne", "lamp-ne"), ("lantern-w", "lamp-w"), ("lantern-e", "lamp-e")):
             self.assertLess(math.dist(paint[lid]["world"][:2], lamps[lamp][:2]), 160.0, lid)
+
+    def test_marmoreal_concept_fx(self):
+        """VS-5 EN-09 / EN-11: the concept fx sit on the C0 ray of their painted pixel, off the frame rectangle (with the
+        spawn sphere and the wander), reducedMotion off, within the particle budgets of the cards, the petals drifting
+        outwards; the fireflies keep >= 80 uu from every painted lantern glass."""
+        overlay = load(LAYOUTS / "marmoreal.concept.layout.json")
+        spec = pp.load_spec("marmoreal")
+        fx = {f["id"]: f for f in overlay["fx"]["add"]}
+        cam = C.concept_cam()
+        lanterns = [np.array(p["world"], float) for p in overlay["conceptPaste"]["paintLanterns"]]
+        for fl in spec["layout"]["fx"]:
+            f = fx[fl["id"]]
+            # the spawn centre is on the C0 ray of the painted pixel (the fireflies: their ground point, dz below)
+            got, _ = cam.project((np.array(f["loc"], float) - [0.0, 0.0, fl.get("dz", 0.0)])[None, :])
+            self.assertLess(float(np.hypot(*(got[0] - np.array(fl["c0Px"])))), 0.1, fl["id"])
+            r = fl["spawnRadiusUU"] + fl["wanderUU"]
+            x, y = f["loc"][:2]
+            self.assertTrue(abs(x) - r > C.FRAME_HX or abs(y) - r > C.FRAME_HY, fl["id"])
+            self.assertEqual(f["reducedMotion"], "off")
+            self.assertTrue(f["system"].startswith("/Game/EnvKit/FX/"))
+            self.assertEqual(f["seed"], LY.seed_of(f["id"]))
+            u = f["user"]
+            parts = u["SpawnRate"] * (u["Lifetime Min"] + u["Lifetime Max"]) / 2.0
+            if f["id"].startswith("petals"):
+                self.assertLessEqual(u["SpawnRate"], 4.0)
+                self.assertLessEqual(parts, 40.0)
+                self.assertEqual(math.copysign(1.0, u["Gravity"][0]), math.copysign(1.0, x))  # outwards
+                self.assertTrue(12.0 <= -u["Gravity"][2] / u["Drag"] <= 20.0)  # terminal fall speed, uu/s
+                self.assertTrue(4.0 <= abs(u["Gravity"][0]) / u["Drag"] <= 10.0)  # drift, uu/s
+                self.assertEqual(f["system"], "/Game/EnvKit/FX/NS_Env_CherryPetals")
+            else:
+                self.assertLessEqual(parts, 24.0)
+                self.assertEqual(f["system"], "/Game/EnvKit/FX/NS_Env_FirefliesDot")
+                near = min(float(np.linalg.norm(np.array(f["loc"]) - P)) for P in lanterns) - fl["spawnRadiusUU"]
+                self.assertGreaterEqual(near, 80.0, fl["id"])
+        self.assertEqual(LY.validate("marmoreal", load(LAYOUTS / "marmoreal.layout.json"), overlay), [])
 
     def test_marmoreal_profile_block_matches_the_overlay_and_the_package(self):
         """The profile block (EN-06 / EN-07 start values; EN-08 / EN-10 / EN-12 tune them): 5 points on the paint-lantern
@@ -420,8 +458,15 @@ class Overlays(unittest.TestCase):
             self.assertLess(math.dist(s_["c0Px"], lan[s_["id"]]["centre_C0_px"]), 0.1, s_["id"])
             self.assertLessEqual(abs(s_["radiusPx"] - lan[s_["id"]]["radius_C0_px"]), 0.5, s_["id"])
         self.assertEqual(sum(1 for s_ in slots if s_.get("light") in ref), 4)
-        self.assertEqual(block["anim"]["mist"]["colorSrgb"], load(REPO / "art/imagegen/env-u16-marmoreal-codex/lanterns.json")
-                         ["median_plate_sRGB"]["mist"]["hex"])
+        # VS-5 EN-12 (ВР-VS5-15): the haze is the painted mist hue lifted to L* ~25 - the lanterns.json median itself
+        # (#0F1523) gave dL* 0 (a lerp towards the mask's own median); not bluer than the painted mist (B / R)
+        mist = block["anim"]["mist"]
+        med = load(REPO / "art/imagegen/env-u16-marmoreal-codex/lanterns.json")["median_plate_sRGB"]["mist"]["sRGB_u8"]
+        col = [int(mist["colorSrgb"][i:i + 2], 16) for i in (1, 3, 5)]
+        self.assertGreater(sum(col), sum(med))
+        self.assertLessEqual(col[2] / col[0], med[2] / med[0] + 1e-6)
+        self.assertTrue(0.12 <= mist["opacity"] <= 0.22)
+        self.assertTrue(0.0 < block["anim"]["wind"]["ampPx"] <= 4.0)  # the parser limit (EN-10: 0.5, ВР-VS5-14)
         self.assertEqual(len(block["lights"]) + LY.PROFILE_POINTS, LY.MAX_POINT_LIGHTS)
         man = load(B.derived_path("marmoreal"))
         self.assertEqual(man["materialContract"]["assets"]["anim.mask"], block["anim"]["mask"])

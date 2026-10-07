@@ -27,6 +27,10 @@ Modes (one file):
            'ENVFX-IMPORT-RESULT ok|failed' and <project>/Saved/EnvKit/ue-fx-import-report.json (or --report).
 ENV-MAPS P9 (F5 / F4): NS_Env_FireCore / _FireTongues / _FireSmoke / _FireEmbers (the layered brazier + fort fire) and
 NS_Env_FallsSpray (the cascade mist) are placed by tools/art/concept_scene/fx-plan.sarpedon.json; FX_PLAN_SYSTEMS lists them.
+VS-5 EN-11: NS_Env_FirefliesDot (the painted Marmoreal's fireflies, marmoreal.concept.layout.json) is a separate copy of
+the pack fireflies whose sprite renderer draws MI_EnvFx_FireflyDot (FX_MATERIALS: a child of the Z-2 print master
+/Game/S08/FX/Materials/M_FX_Print, SDF disc in turn.flash.yellow, built by build_materials before the systems) and carries
+the Z-2 effect type NET_UM_Board ("effectType", ВР-25); NS_Env_Fireflies (Sarpedon / the P5c rollback) is unchanged.
 Needs the UnmatchedEditor build with S08EnvFxAuthoring.cpp (Unmatched.Build.cs: Niagara). Licences: Stylish Fire VFX =
 Fab Standard (personal); Free Niagara Particles (SoftTofuVFX) = CC BY 4.0, attribution in docs/art-pipeline/CREDITS-fab.md.
 Statuses: proposed / measured / technically imported; artistic acceptance is the user's decision only.
@@ -263,7 +267,48 @@ FX_SPECS: list[dict] = [
                           "Drag": 6.0, "Color": [0.85, 0.95, 1.05]}},
         "estimate": {"kind": "user", "spawnRate": "SpawnRate", "lifetime": ("Lifetime Min", "Lifetime Max")},
     },
+    {
+        "name": "NS_Env_FirefliesDot",
+        "source": "/Game/FreeParticle_SoftTofu/Niagara/NS_Sparkling_Animate_2",
+        "pack": "FreeParticle_SoftTofu",
+        "licence": "CC BY 4.0 (SoftTofuVFX; attribution in CREDITS-fab.md)",
+        "role": "VS-5 EN-11 (ВР-EN.12): the fireflies of the painted Marmoreal backdrop - hard flat discs of "
+                "turn.flash.yellow without a halo (the print disc MI_EnvFx_FireflyDot replaces the pack's soft glow "
+                "sprite MI_Glow_Inst_8); a separate copy so NS_Env_Fireflies of the Sarpedon / P5c layouts stays as it is",
+        "system": {"determinism": True, "random_seed": 52031, "warmup_time": 0.0},
+        "effectType": "/Game/S08/FX/EffectTypes/NET_UM_Board",
+        "tune": {"simTarget": "cpu", "emitterDeterminism": True, "emitterSeedBase": 53100,
+                 "disableLightRenderers": True, "disableComponentRenderers": True, "constants": [],
+                 "spriteMaterials": {"*": "/Game/EnvKit/FX/MI_EnvFx_FireflyDot"},
+                 "user": {"SpawnRate": 3.0, "Sphere Radius": 22.0, "Uniform Sprite Size Min": 8.0,
+                          "Uniform Sprite Size Max": 14.0, "Lifetime Min": 4.0, "Lifetime Max": 6.0,
+                          "Noise Strength": 6.0, "Color": [3.55, 2.13, 0.3]}},
+        "estimate": {"kind": "user", "spawnRate": "SpawnRate", "lifetime": ("Lifetime Min", "Lifetime Max")},
+    },
 ]
+# VS-5 EN-11: the print disc of the fireflies - a child of the Z-2 print master M_FX_Print (ВР-19: flat, hard edge,
+# the inverse tone curve so the token shows as its hex), SDF disc, body = edge = keyline = turn.flash.yellow (no ring),
+# the conceptPaste.grade fit of the board profiles baked like the FX-02 placard MIs (fx_import.profile_grade_fit)
+FX_MATERIALS: list[dict] = [
+    {"asset": "/Game/EnvKit/FX/MI_EnvFx_FireflyDot", "parent": "/Game/S08/FX/Materials/M_FX_Print",
+     "token": "turn.flash.yellow", "switches": {"UseSdf": True},
+     "scalars": {"Opacity": 1.0, "SdfShape": 0.0, "EdgeWidth": 0.001, "KeylineWidth": 0.001}},
+]
+EFFECT_TYPE_ROOT = "/Game/S08/FX/EffectTypes/"
+
+
+def material_specs() -> list[dict]:
+    """FX_MATERIALS with the token colour (linear) and the grade fit resolved (plain Python: the --check shows them)."""
+    sys.path.insert(0, str(REPO / "tools" / "art" / "fx"))
+    import fx_import as FI  # noqa: E402 - the Z-2 print plan (tokens, linear colours, the profile grade fit)
+    tok = FI.tokens()
+    fit = FI.profile_grade_fit() or {}
+    out = []
+    for m in FX_MATERIALS:
+        col = FI.linear_color(tok[m["token"]])
+        vectors = {"ColorBody": col, "ColorEdge": col, "ColorKeyline": col, **fit}
+        out.append({**m, "hex": tok[m["token"]], "vectors": vectors})
+    return out
 # Not built (P5c scout): a waterfall mist - no fitting Niagara system in the AI-allowed packs (WaterMaterials foam /
 # splash are deprecated Cascade); Particles_Wind_Control_System fireflies / candle add PointLightComponents.
 
@@ -284,6 +329,8 @@ def target_path(spec: dict) -> str:
 def spec_sha256(spec: dict) -> str:
     body = {k: spec[k] for k in ("name", "source", "system", "tune")}
     body["toolVersion"] = TOOL_VERSION
+    if "effectType" in spec:  # VS-5 EN-11 (absent on the older systems: their sha stays the same)
+        body["effectType"] = spec["effectType"]
     return hashlib.sha256(json.dumps(body, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
 
 
@@ -348,6 +395,13 @@ def validate(specs: list[dict], content: Path | None = CONTENT) -> tuple[list[st
             err.append(f"{ctx} emitterDeterminism true + an integer emitterSeedBase are required")
         if t.get("disableLightRenderers") is not True or t.get("disableComponentRenderers") is not True:
             err.append(f"{ctx} Light and Component renderers must be disabled (no dynamic lights from VFX)")
+        mats = {m["asset"] for m in FX_MATERIALS}
+        for handle, mat in (t.get("spriteMaterials") or {}).items():
+            if mat not in mats:
+                err.append(f"{ctx} spriteMaterials {handle} -> {mat}: not an FX_MATERIALS asset (built by this tool)")
+        et = s.get("effectType")
+        if et is not None and (not isinstance(et, str) or not et.startswith(EFFECT_TYPE_ROOT)):
+            err.append(f"{ctx} effectType {et!r} not under {EFFECT_TYPE_ROOT} (the Z-2 effect types, ВР-25)")
         for i, r in enumerate(t.get("constants") or []):
             if not isinstance(r.get("match"), str) or not r["match"]:
                 err.append(f"{ctx} constants[{i}] without a match pattern")
@@ -407,11 +461,50 @@ def _verify(describe: dict) -> list[str]:
     return bad
 
 
+def build_materials(names: set) -> dict:
+    """VS-5 EN-11: the FX_MATERIALS MIs a selected system names (created once, updated in place, saved)."""
+    lib, mel = u.EditorAssetLibrary, u.MaterialEditingLibrary
+    out = {}
+    for m in material_specs():
+        if m["asset"] not in names:
+            continue
+        path, name = m["asset"].rsplit("/", 1)
+        created = False
+        if not lib.does_asset_exist(m["asset"]):
+            mi = u.AssetToolsHelpers.get_asset_tools().create_asset(
+                name, path, u.MaterialInstanceConstant, u.MaterialInstanceConstantFactoryNew())
+            created = True
+        mi = lib.load_asset(m["asset"])
+        if mi is None:
+            raise RuntimeError(f"cannot create {m['asset']}")
+        parent = lib.load_asset(m["parent"])
+        if parent is None:
+            raise RuntimeError(f"parent {m['parent']} missing (tools/art/fx/fx_import.py)")
+        mel.set_material_instance_parent(mi, parent)
+        for k, v in m["scalars"].items():
+            mel.set_material_instance_scalar_parameter_value(mi, k, float(v))
+        for k, v in m["vectors"].items():
+            mel.set_material_instance_vector_parameter_value(mi, k, u.LinearColor(*[float(x) for x in v]))
+        for k, v in m["switches"].items():
+            mel.set_material_instance_static_switch_parameter_value(mi, k, bool(v))
+        mel.update_material_instance(mi)
+        if not lib.save_loaded_asset(mi, False):
+            raise RuntimeError(f"save {m['asset']} failed")
+        out[m["asset"]] = {"created": created, "token": m["token"], "hex": m["hex"], "vectors": m["vectors"]}
+    return out
+
+
 def run_import(specs: list[dict], force: bool) -> tuple[dict, bool]:
     lib = u.EditorAssetLibrary
     if not hasattr(u, "S08EnvFxAuthoringLibrary"):
         return {"error": "US08EnvFxAuthoringLibrary missing: build UnmatchedEditor with S08EnvFxAuthoring.cpp"}, False
     out, ok = {}, True
+    want = {m for s in specs for m in (s["tune"].get("spriteMaterials") or {}).values()}
+    if want:
+        try:
+            out["_materials"] = build_materials(want)
+        except Exception as exc:  # noqa: BLE001
+            return {"_materials": {"error": f"{type(exc).__name__}: {exc}"}}, False
     for s in specs:
         dst, src, sha = target_path(s), s["source"], spec_sha256(s)
         entry: dict = {"source": src, "target": dst, "specSha256": sha}
@@ -436,6 +529,14 @@ def run_import(specs: list[dict], force: bool) -> tuple[dict, bool]:
             system = lib.load_asset(dst)
             for key, value in s["system"].items():
                 system.set_editor_property(key, value)
+            if s.get("effectType"):
+                # VS-5 EN-11: the Z-2 effect type (ВР-25); the env fx components run with scalability off
+                # (S08EnvLayout SpawnFx), so the type never culls them and they never take a combat fx slot
+                et = lib.load_asset(s["effectType"])
+                if et is None:
+                    raise RuntimeError(f"effect type {s['effectType']} missing (tools/art/fx/ue_fx_systems.py)")
+                system.set_editor_property("effect_type", et)
+                entry["effectType"] = s["effectType"]
             tune = json.loads(u.S08EnvFxAuthoringLibrary.tune_niagara_system(dst, json.dumps(s["tune"])))
             entry["tune"] = {k: tune.get(k) for k in ("ok", "compiled", "errors", "unmatchedRules", "emitters",
                                                       "lightRenderersDisabled", "componentRenderersDisabled",

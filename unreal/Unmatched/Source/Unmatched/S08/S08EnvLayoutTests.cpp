@@ -1590,6 +1590,28 @@ bool FS08EnvLayoutFxAssetsTest::RunTest(const FString&) {
     const FString File = S08EnvLayout::FileFor(S08EnvLayout::DefaultDir(), Key);
     if (!FPaths::FileExists(File) || !L.LoadFile(File, Errors)) continue;
     for (const FString& Path : L.UniqueFxSystemPaths()) Systems.Add(Path);
+    // VS-5 EN-09 / EN-11: the systems the variant overlays add (marmoreal.concept: petals, the print-disc fireflies)
+    TArray<FString> OverlayNames;
+    IFileManager::Get().FindFiles(OverlayNames,
+                                  *FPaths::Combine(S08EnvLayout::DefaultDir(), FString(Key) + TEXT(".*.layout.json")), true,
+                                  false);
+    for (const FString& Name : OverlayNames) {
+      const FString Variant = FPaths::GetBaseFilename(Name).LeftChop(7).RightChop(FCString::Strlen(Key) + 1);
+      FS08EnvLayout Merged = L;
+      if (S08EnvLayout::ApplyVariant(S08EnvLayout::DefaultDir(), Key, Variant, Merged).Status != TEXT("ok")) continue;
+      for (const FString& Path : Merged.UniqueFxSystemPaths()) Systems.Add(Path);
+      if (Variant != TEXT("concept") || FCString::Strcmp(Key, TEXT("marmoreal")) != 0) continue;
+      // the concept's own environment fx: not over the frame rectangle, not spawned with reduced motion (ВР-EN.4 / .6)
+      const FVector2D FrameHalf(469.67, 312.67);
+      for (const FS08EnvFx& F : Merged.Fx) {
+        const FVector At = F.Transform(nullptr).GetTranslation();
+        TestTrue(FString::Printf(TEXT("marmoreal.concept/%s: pivot %s outside the frame rectangle"), *F.Id, *At.ToString()),
+                 FMath::Abs(At.X) > FrameHalf.X || FMath::Abs(At.Y) > FrameHalf.Y);
+        TestTrue(FString::Printf(TEXT("marmoreal.concept/%s: reducedMotion off"), *F.Id), F.bReducedOff);
+        TestTrue(FString::Printf(TEXT("marmoreal.concept/%s: no anchor (the painted surround has no props)"), *F.Id),
+                 F.Anchor.IsEmpty());
+      }
+    }
   }
   int32 Checked = 0;
   for (const FString& Path : Systems) {

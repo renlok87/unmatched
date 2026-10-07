@@ -203,6 +203,26 @@ def build(map_key: str, base: dict, spec: dict, report: dict | None) -> tuple[di
         # VS-5 EN-07: every base fx goes (those anchored on a removed prop are dropped with it by MergeOverlay)
         fx_ops["remove"] = [f["id"] for f in base.get("fx", []) if f.get("anchor") not in removed]
         info["fxRemoved"] = list(fx_ops["remove"])
+    for fl in L.get("fx", []):
+        # VS-5 EN-09 / EN-11: the concept's own environment fx (petals under the painted crowns, fireflies at the
+        # painted bushes): the C0 ray through the painted pixel hits the plane z = planeZ (the heightZones crown
+        # plane / the ground), +dz (the height of the spawn box) and optionally towardC0UU along the same C0 ray
+        # towards the camera (in front of the relief sheet, the same C0 pixel); no anchor, a fixed seed
+        Q = pp.ray_z(C.concept_cam(), np.array(float(fl["c0Px"][0])), np.array(float(fl["c0Px"][1])),
+                     float(fl["planeZ"]))[0]
+        Q = Q + np.array([0.0, 0.0, float(fl.get("dz", 0.0))])
+        tow = float(fl.get("towardC0UU", 0.0))
+        if tow > 0.0:
+            ray = Q - C.concept_cam().pos
+            Q = Q - ray / np.linalg.norm(ray) * tow
+        entry = {"id": fl["id"], "system": fl["system"], "loc": [r2(Q[0]), r2(Q[1]), r2(Q[2])], "yawDeg": 0.0,
+                 "scale": float(fl.get("scale", 1.0)), "seed": seed_of(fl["id"]), "warmupS": float(fl["warmupS"])}
+        if fl.get("reducedMotion"):
+            entry["reducedMotion"] = fl["reducedMotion"]
+        if fl.get("user"):
+            entry["user"] = fl["user"]
+        add_fx.append(entry)
+        info.setdefault("conceptFx", []).append(fl["id"])
     if add_fx:
         fx_ops["add"] = add_fx
     if fx_ops:
@@ -311,6 +331,24 @@ def validate(map_key: str, base: dict, overlay: dict) -> list[str]:
             x, y = f["loc"][:2]
             if abs(x) < C.MAP_HX and abs(y) < C.MAP_HY:
                 err.append(f"fx {f['id']}: pivot on the painted map")
+    # VS-5 EN-09 / EN-11 (ВР-EN.6): the concept's own environment fx keep their spawn sphere off the frame rectangle
+    # and away from the painted lantern glass, and are not spawned with reduced motion (02 §10.1)
+    spec_fx = {fl["id"]: fl for fl in pp.load_spec(map_key).get("layout", {}).get("fx", [])} if map_key == "marmoreal" else {}
+    for f in overlay.get("fx", {}).get("add", []):
+        fl = spec_fx.get(f["id"])
+        if fl is None:
+            continue
+        r = float(fl.get("spawnRadiusUU", 0.0)) + float(fl.get("wanderUU", 0.0))
+        x, y = f["loc"][:2]
+        if abs(x) - r <= C.FRAME_HX and abs(y) - r <= C.FRAME_HY:
+            err.append(f"fx {f['id']}: spawn sphere (r {r:g}) reaches the frame rectangle")
+        if f.get("reducedMotion") != "off":
+            err.append(f"fx {f['id']}: concept environment fx must be reducedMotion off")
+        min_l = float(fl.get("minLanternUU", 0.0))
+        for pl in overlay.get("conceptPaste", {}).get("paintLanterns", []):
+            d = math.dist(f["loc"], pl["world"]) - float(fl.get("spawnRadiusUU", 0.0))
+            if min_l and d < min_l:
+                err.append(f"fx {f['id']}: {d:.1f} uu from the painted lantern {pl['id']} < {min_l:g}")
     if map_key == "sarpedon" and BUILD_REPORT.is_file():
         rep = load(BUILD_REPORT)
         ban = next((e for e in rep["exports"] if e["name"] == "SM_EnvCP_BannerCloth"), None)

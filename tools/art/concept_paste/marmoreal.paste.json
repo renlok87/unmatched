@@ -393,7 +393,7 @@
   }
  ],
  "layout": {
-  "note": "VS-5 EN-07 (cp_layout.py): the painted surround replaces every base prop and every base fx (the P5c fireflies too: EN-09 / EN-11 add the concept's own petals / fireflies); the paint-lantern details have no mesh - their world points (detail_positions, relief proxy) are the reference of conceptPaste.lights and conceptPaste.anim.lanterns",
+  "note": "VS-5 EN-07 (cp_layout.py): the painted surround replaces every base prop and every base fx (the P5c fireflies too: EN-09 / EN-11 add the concept's own petals / fireflies); the paint-lantern details have no mesh - their world points (detail_positions, relief proxy) are the reference of conceptPaste.lights and conceptPaste.anim.lanterns | VS-5 E2 (EN-09 / EN-11, cp_layout.py 'fx'): the concept's own environment fx - petals-sakura-w / -e (NS_Env_CherryPetals, the C0 centroid of the EN-04 petal-area mask per side on the crown plane z 160, moved towardC0UU in front of the relief sheet; drift outwards, the layout 'user' overrides keep the P5c system asset unchanged) and fireflies-garden-w / -e (NS_Env_FirefliesDot: the print disc of turn.flash.yellow, at the painted bushes beside the side plinths, ground z -3 + 40); every one reducedMotion off",
   "variant": "concept",
   "idPrefix": "",
   "castShadow": false,
@@ -423,6 +423,154 @@
     "id": "portal-glow",
     "on": "portal",
     "dz": 0.0
+   }
+  ],
+  "fx": [
+   {
+    "id": "petals-sakura-w",
+    "system": "/Game/EnvKit/FX/NS_Env_CherryPetals",
+    "c0Px": [
+     196.8,
+     359.9
+    ],
+    "planeZ": 160.0,
+    "dz": 0.0,
+    "towardC0UU": 100.0,
+    "warmupS": 6.0,
+    "reducedMotion": "off",
+    "spawnRadiusUU": 50.0,
+    "wanderUU": 60.0,
+    "user": {
+     "SpawnRate": 4.0,
+     "Lifetime Min": 6.0,
+     "Lifetime Max": 9.0,
+     "Drag": 1.0,
+     "Minimum_Noise Strength": 4.0,
+     "Maximum_Noise Strength": 8.0,
+     "Sphere Radius": 50.0,
+     "Sprite Size Min": [
+      3.0,
+      3.0
+     ],
+     "Sprite Size Max": [
+      5.0,
+      5.0
+     ],
+     "Color": [
+      10.8,
+      3.5,
+      20.5
+     ],
+     "Gravity": [
+      -7.0,
+      0.0,
+      -16.0
+     ]
+    },
+    "note": "EN-09: C0 centroid of marmoreal-mask-petals.png (EN-04, plate px -> C0) on the west side; drift -7 uu/s outwards and 16 uu/s down at terminal velocity (Gravity / Drag 1), lifetime 6-9 s, <= 4 / s -> ~30 particles"
+   },
+   {
+    "id": "petals-sakura-e",
+    "system": "/Game/EnvKit/FX/NS_Env_CherryPetals",
+    "c0Px": [
+     1723.2,
+     359.9
+    ],
+    "planeZ": 160.0,
+    "dz": 0.0,
+    "towardC0UU": 100.0,
+    "warmupS": 6.0,
+    "reducedMotion": "off",
+    "spawnRadiusUU": 50.0,
+    "wanderUU": 60.0,
+    "user": {
+     "SpawnRate": 4.0,
+     "Lifetime Min": 6.0,
+     "Lifetime Max": 9.0,
+     "Drag": 1.0,
+     "Minimum_Noise Strength": 4.0,
+     "Maximum_Noise Strength": 8.0,
+     "Sphere Radius": 50.0,
+     "Sprite Size Min": [
+      3.0,
+      3.0
+     ],
+     "Sprite Size Max": [
+      5.0,
+      5.0
+     ],
+     "Color": [
+      10.8,
+      3.5,
+      20.5
+     ],
+     "Gravity": [
+      7.0,
+      0.0,
+      -16.0
+     ]
+    },
+    "note": "EN-09: C0 centroid of marmoreal-mask-petals.png (EN-04, plate px -> C0) on the east side; drift +7 uu/s outwards and 16 uu/s down at terminal velocity (Gravity / Drag 1), lifetime 6-9 s, <= 4 / s -> ~30 particles"
+   },
+   {
+    "id": "fireflies-garden-w",
+    "system": "/Game/EnvKit/FX/NS_Env_FirefliesDot",
+    "c0Px": [
+     290.0,
+     670.0
+    ],
+    "planeZ": -3.0,
+    "dz": 40.0,
+    "warmupS": 3.5,
+    "reducedMotion": "off",
+    "spawnRadiusUU": 22.0,
+    "wanderUU": 30.0,
+    "minLanternUU": 80.0,
+    "user": {
+     "SpawnRate": 3.0,
+     "Lifetime Min": 4.0,
+     "Lifetime Max": 6.0,
+     "Sphere Radius": 22.0,
+     "Uniform Sprite Size Min": 3.5,
+     "Uniform Sprite Size Max": 4.6,
+     "Noise Strength": 6.0,
+     "Color": [
+      3.55,
+      2.13,
+      0.3
+     ]
+    },
+    "note": "EN-11: the painted bushes beside the west side plinth (card concept px ~(230, 540) moved down / inwards so the spawn sphere keeps >= 80 uu from the lantern glass); 3 / s x 4-6 s -> ~15 particles"
+   },
+   {
+    "id": "fireflies-garden-e",
+    "system": "/Game/EnvKit/FX/NS_Env_FirefliesDot",
+    "c0Px": [
+     1630.0,
+     670.0
+    ],
+    "planeZ": -3.0,
+    "dz": 40.0,
+    "warmupS": 3.5,
+    "reducedMotion": "off",
+    "spawnRadiusUU": 22.0,
+    "wanderUU": 30.0,
+    "minLanternUU": 80.0,
+    "user": {
+     "SpawnRate": 3.0,
+     "Lifetime Min": 4.0,
+     "Lifetime Max": 6.0,
+     "Sphere Radius": 22.0,
+     "Uniform Sprite Size Min": 3.5,
+     "Uniform Sprite Size Max": 4.6,
+     "Noise Strength": 6.0,
+     "Color": [
+      3.55,
+      2.13,
+      0.3
+     ]
+    },
+    "note": "EN-11: the painted bushes beside the east side plinth (card concept px ~(230, 540) moved down / inwards so the spawn sphere keeps >= 80 uu from the lantern glass); 3 / s x 4-6 s -> ~15 particles"
    }
   ]
  }
