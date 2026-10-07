@@ -2412,7 +2412,9 @@ void AS08FlowGameMode::TickUmFeed() {
   } else if (!bRecovering && R.bReconnecting) {
     R.bReconnecting = false;
     const int32 Missed = FMath::Max(0, Hud.SequenceNumber - R.ReconnectSeq);
-    if (R.Feed.ToastOnUmg()) {
+    // VS-4 HB-49: leaving the room while recovering (abort, result) is not a reconnect - no toast (it stuck in the lobby)
+    const bool bDue = UmHudFeed::ReconnectedToastDue(bStarted, Hud.bValid, bAborted);
+    if (R.Feed.ToastOnUmg() && bDue) {
       FUmToastSpec Spec;
       Spec.Kind = EUmToastKind::Info;
       FFormatNamedArguments Args;
@@ -2422,8 +2424,8 @@ void AS08FlowGameMode::TickUmFeed() {
       Spec.HoldSec = 3.0f;
       R.Feed.PushToast(Spec, Now);
     }
-    FS08Trace::Write(FString::Printf(TEXT("TOAST hud=hud.toast.reconnected missed=%d seqBefore=%d seq=%d"), Missed, R.ReconnectSeq,
-                                     Hud.SequenceNumber));
+    FS08Trace::Write(FString::Printf(TEXT("TOAST hud=hud.toast.reconnected missed=%d seqBefore=%d seq=%d shown=%d"), Missed,
+                                     R.ReconnectSeq, Hud.SequenceNumber, bDue ? 1 : 0));
   }
   // class S: the open list closes on a click outside it (not on «Журнал» itself - its press toggles) or Esc
   if (R.Feed.IsLogOpen()) {

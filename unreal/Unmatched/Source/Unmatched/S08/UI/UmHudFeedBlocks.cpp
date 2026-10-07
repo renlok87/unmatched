@@ -144,6 +144,7 @@ TArray<FString> FUmFeedBlocks::Refresh(const FUmFeedInput& In) {
     F.bTall = L.bTall;
     F.bReduced = In.bReduced;
     T->SetFrame(F);
+    T->SetLive(In.bLive);  // VS-4 HB-49: no toast survives into the lobby / result / interruption screen
     T->SetExternal(In.PendingToastSu.X > 0.0 && In.PendingToastSu.Y > 0.0, In.PendingToastSu, In.NowMs);
     bChanged |= T->Tick(In.NowMs, In.bBannerShown);
   }

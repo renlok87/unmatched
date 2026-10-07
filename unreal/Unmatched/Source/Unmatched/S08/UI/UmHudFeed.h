@@ -50,6 +50,9 @@ inline constexpr float BadgeSu = 24.0f;           // badge-refuse (IC-40), 350 m
 
 /** ВР-VS2-HB38-06: the look of a toast by the key of its string. */
 UNMATCHED_API EUmToastKind KindOfKey(FName Key);
+/** VS-4 HB-49 (the vsai-abort gate, 2026-10-07): «Позиции обновлены (пропущено n)» only when the stream came back
+ *  inside the still running match - leaving the room (abort, the result, the lobby) while recovering shows nothing. */
+UNMATCHED_API bool ReconnectedToastDue(bool bStillStarted, bool bHudValid, bool bAborted);
 UNMATCHED_API const TCHAR* KindName(EUmToastKind Kind);
 UNMATCHED_API const TCHAR* PlaceName(EUmFeedPlace Place);
 /** 04 §2.12: the cap of a toast's width - 560 (L, 1080p column), 520 (L, 720p column), 440 (class S). */

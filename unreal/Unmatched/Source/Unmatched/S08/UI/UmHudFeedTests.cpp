@@ -463,6 +463,36 @@ bool FUmHudToastStickyTest::RunTest(const FString&) {
   return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmHudToastOffMatchTest,
+    "Unmatched.S08.Hud.Toast.OffMatch no toast off the live match, the reconnect toast only inside the running match",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FUmHudToastOffMatchTest::RunTest(const FString&) {
+  using namespace UmFeedTest;
+  FWorld W(TEXT("UmHudToastOffMatch"));
+  if (!TestNotNull(TEXT("world"), W.World)) return false;
+  FRu Ru;
+  UUmToastStack* Stack = CreateWidget<UUmToastStack>(W.World, UUmToastStack::StaticClass());
+  if (!TestNotNull(TEXT("stack"), Stack)) return false;
+  Stack->SetMeasureForTest(&Est);
+  Stack->SetFrame(FUmToastFrame());
+  Stack->Push(Spec(EUmToastKind::Info, TEXT("hud.toast.reconnected"), TEXT("Позиции обновлены (пропущено 0)")), 0.0);
+  Stack->Tick(0.0, false);
+  Stack->SetLive(true);
+  TestFalse(TEXT("live: the toast stays"), Stack->IsEmpty());
+  Stack->SetLive(false);
+  TestTrue(TEXT("off the match (vsai-abort lobby, 2026-10-07): the stack is empty"), Stack->IsEmpty());
+  TestEqual(TEXT("nothing shown"), Stack->NumShown(), 0);
+  Stack->Push(Spec(EUmToastKind::Error, TEXT("why.not.your.turn"), TEXT("Сейчас не ваш ход")), 100.0);
+  Stack->SetLive(false);
+  TestTrue(TEXT("a push off the match is cleared too"), Stack->IsEmpty());
+  // the rule of the reconnect toast: the stream back inside the running match only
+  TestTrue(TEXT("back inside the match: shown"), UmHudFeed::ReconnectedToastDue(true, true, false));
+  TestFalse(TEXT("left the room while recovering: none"), UmHudFeed::ReconnectedToastDue(false, true, false));
+  TestFalse(TEXT("the room aborted: none"), UmHudFeed::ReconnectedToastDue(true, true, true));
+  TestFalse(TEXT("no HUD (lobby): none"), UmHudFeed::ReconnectedToastDue(true, false, false));
+  return true;
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmHudToastQueueTest,
     "Unmatched.S08.Hud.Toast.Queue at most 2, the same toast renews, the banner gate, holds, fades, the refusal badge",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)

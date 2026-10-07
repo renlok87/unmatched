@@ -4,6 +4,8 @@
 #include "UmText.h"
 
 namespace UmHudFeed {
+bool ReconnectedToastDue(bool bStillStarted, bool bHudValid, bool bAborted) { return bStillStarted && bHudValid && !bAborted; }
+
 EUmToastKind KindOfKey(FName Key) {
   const FString K = Key.ToString();
   if (K.StartsWith(TEXT("why."))) return EUmToastKind::Error;

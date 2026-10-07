@@ -136,6 +136,10 @@ void UUmToastStack::Clear() {
   if (Badge) Badge->SetVisibility(ESlateVisibility::Collapsed);
 }
 
+void UUmToastStack::SetLive(bool bLive) {
+  if (!bLive && !IsEmpty()) Clear();
+}
+
 bool UUmToastStack::Dismiss(FName Key, double NowMs) {
   bool bAny = false;
   for (int32 I = Entries.Num() - 1; I >= 0; --I) {

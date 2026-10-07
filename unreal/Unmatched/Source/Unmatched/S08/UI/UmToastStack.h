@@ -82,6 +82,10 @@ class UNMATCHED_API UUmToastStack : public UUserWidget {
   int32 Push(const FUmToastSpec& Spec, double NowMs);
   /** Every toast, the trigger and the badge gone at once (the review sheet between its states). */
   void Clear();
+  /** VS-4 HB-49: the toasts belong to the live match - off the match (lobby, result, interruption) the stack clears
+   *  (once, and again whenever something was pushed meanwhile). */
+  void SetLive(bool bLive);
+  bool IsEmpty() const { return Entries.Num() == 0 && !bExternal && BadgeUntilMs <= 0.0; }
   /** The toast of Key leaves (a sticky one closed by its owner: the click, the end of the turn, GAME_OVER). */
   bool Dismiss(FName Key, double NowMs);
   /** A toast of Key is on screen or waiting for the banner. */
