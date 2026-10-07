@@ -448,7 +448,9 @@ class Overlays(unittest.TestCase):
         for lt in block["lights"]:
             self.assertLess(math.dist(lt["loc"], ref[lt["id"]]), 1.0, lt["id"])
         self.assertIn("layoutLights", block["hide"])
-        self.assertEqual(block["default"], "off")  # EN-13 turns it on
+        # VS-5 EN-13 (ENV-U16): the painted backdrop is the default; -NoConceptPaste / -EnvLayoutVariant=p5c roll back
+        self.assertEqual((block["default"], block.get("mode", "paste"), block.get("offVariant")), ("on", "paste", "p5c"))
+        self.assertIn("baseFx", block["hide"])
         self.assertEqual(block["outside"], "clip")
         lan = {e["id"]: e for e in load(REPO / "art/imagegen/env-u16-marmoreal-codex/lanterns.json")["entries"]}
         slots = block["anim"]["lanterns"]

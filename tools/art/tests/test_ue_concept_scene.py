@@ -327,9 +327,9 @@ class ShippedProfile(unittest.TestCase):
 
     def test_marmoreal_untouched(self):
         marm = next(b for b in self.prof["boards"] if b["id"] == "marmoreal-original")["conceptPaste"]
-        self.assertEqual(marm["default"], "off")
+        # VS-5 EN-13: the painted paste is the default (mode paste); never lit3d (that is Sarpedon's kind)
+        self.assertEqual((marm["default"], marm.get("mode", "paste")), ("on", "paste"))
         self.assertNotIn("lit3d", marm)
-        self.assertNotIn("mode", marm)
 
     def test_real_manifest_when_present(self):
         """Track A's manifest (once written): the interface contract without file / git checks (those run in P8.3)."""

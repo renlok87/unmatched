@@ -510,8 +510,9 @@ def check() -> tuple[dict, list[str]]:
     if {x["id"] for x in lit.get("lights", [])} != {"fire-fort", "fire-brazier", "lantern-left", "lantern-bay", "lantern-deck-se"}:
         errors.append("sarpedon lit3d lights must be fire-fort, fire-brazier, lantern-left, lantern-bay, lantern-deck-se")
     marm = next(b for b in profiles["boards"] if b["id"] == "marmoreal-original")["conceptPaste"]
-    if "lit3d" in marm or marm.get("mode", "paste") != "paste" or marm.get("default") != "off":
-        errors.append("marmoreal-original: the accepted look - no lit3d, paste comparison off by default")
+    # VS-5 EN-13: Marmoreal's default is the painted paste (no lit3d); P5c = the offVariant rollback
+    if "lit3d" in marm or marm.get("mode", "paste") != "paste" or marm.get("default") != "on":
+        errors.append("marmoreal-original: the painted paste by default (EN-13), no lit3d")
     report["lit3d"] = {"variant": lit.get("variant"), "required": lit.get("required"), "lights": len(lit.get("lights", [])),
                        "casters": lit.get("casters"), "seaZUU": lit.get("seaZUU")}
     # the projection mirror = the paste's (same camera / rect -> the same C0 / concept px, uv = the plate B uv)

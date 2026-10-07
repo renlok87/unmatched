@@ -56,6 +56,9 @@
 
 #include "CoreMinimal.h"
 
+struct FS08ConceptPasteSpec;
+struct FS08ConceptPasteMode;
+
 namespace S08ArtLook {
 
 /** -S08GreyBoard: the rollback of the default art look (the grey board). */
@@ -153,5 +156,14 @@ UNMATCHED_API void ResetSlateHudOverrideForTest();
  *   applied heroes are counted by 'ARTPREVIEW heroMat board'; fx: the VS-6 Z-2 combat FX base (Niagara systems +
  *   the rim / flash writers, ВР-FX02); hitFx: the FX-19 ВР-20 white flash + cream rim (or the red fill rollback). */
 UNMATCHED_API FString TraceLine();
+
+/** VS-5 EN-13 (ENV-U16, ВР-EN.8, ВР-VS5-17): the surroundings of one map board - "paste(<reason>)" or "lit3d(<reason>)"
+ *  while its concept mode is on, otherwise "p5c(<reason>)" (the 3D P5c surroundings with the T2b tray; the reason is the
+ *  ResolveMode / fallback reason: flag-off, variant-off, missing-assets, ...; "no-block" for a profile without the block).
+ *  Marmoreal without flags: paste(default); with -NoConceptPaste: p5c(flag-off); Sarpedon: lit3d(default). */
+UNMATCHED_API FString BackdropField(const FS08ConceptPasteSpec& Spec, const FS08ConceptPasteMode& Mode);
+/** 'ARTLOOK board=<profile> backdrop=<field>': the run line above is written before the board profile is known, so the
+ *  board actor adds this line per map board build whose backdrop changed (ВР-VS5-17). */
+UNMATCHED_API FString BoardLine(const FString& ProfileId, const FString& Backdrop);
 
 }  // namespace S08ArtLook

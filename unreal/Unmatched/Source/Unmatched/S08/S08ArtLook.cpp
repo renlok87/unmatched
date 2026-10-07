@@ -1,6 +1,7 @@
 #include "S08ArtLook.h"
 
 #include "S08ArtPreviewMedusa.h"
+#include "S08ConceptPaste.h"
 #include "Fx/S08CueFx.h"
 #include "S08Diorama.h"
 #include "S08EnvLayout.h"
@@ -124,6 +125,16 @@ FString TraceLine() {
       Aliases.Num() ? *FString::Join(Aliases, TEXT(",")) : TEXT("-"), *HudLook, *Dpi, *CardMedia, *Chips, *HudImpl,
       *MoveEase, *Facing, *BaseDigit, *HeroMat, *Fx, *HitFx,
       bArt ? TEXT("") : TEXT(" (grey board: no art profile, figures, tray or art HUD layer)"));
+}
+
+FString BackdropField(const FS08ConceptPasteSpec& Spec, const FS08ConceptPasteMode& Mode) {
+  const FString Reason = !Spec.bSet ? FString(TEXT("no-block")) : Mode.Reason.IsEmpty() ? FString(TEXT("-")) : Mode.Reason;
+  const FString Kind = Spec.bSet && Mode.bOn ? FString(S08ConceptKindName(Mode.Kind)) : FString(TEXT("p5c"));
+  return FString::Printf(TEXT("%s(%s)"), *Kind, *Reason);
+}
+
+FString BoardLine(const FString& ProfileId, const FString& Backdrop) {
+  return FString::Printf(TEXT("ARTLOOK board=%s backdrop=%s"), ProfileId.IsEmpty() ? TEXT("-") : *ProfileId, *Backdrop);
 }
 
 FString FS08SlateHudBlocks::ImplField() const {

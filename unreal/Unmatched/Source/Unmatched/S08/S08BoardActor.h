@@ -147,6 +147,8 @@ public:
    *  last board (mode, reason), the parts (sheet, sea plane, sky segments, blobs), its point lights, and what it hid. */
   const FS08ConceptPasteRuntime& GetConceptPasteRuntime() const { return ConceptRuntime; }
   const FS08ConceptPasteMode& GetConceptPasteMode() const { return ConceptMode; }
+  /** VS-5 EN-13: the backdrop field of the last 'ARTLOOK board=' line (S08ArtLook::BackdropField; empty before a map board). */
+  const FString& GetArtLookBackdrop() const { return ArtLookBackdrop; }
   const TArray<TObjectPtr<UStaticMeshComponent>>& GetConceptPasteParts() const { return ConceptParts; }
   const TArray<TObjectPtr<UPointLightComponent>>& GetConceptPasteLights() const { return ConceptLights; }
   const US08ConceptPasteAnimComponent* GetConceptPasteAnim() const { return ConceptAnim; }
@@ -622,6 +624,9 @@ private:
   FS08ConceptPasteInputs ConceptInputs;
   FS08ConceptPasteMode ConceptMode;
   FS08ConceptPasteRuntime ConceptRuntime;
+  /** VS-5 EN-13: dedupe key (profile | backdrop) and value of the 'ARTLOOK board=' line. */
+  FString ArtLookBackdropKey;
+  FString ArtLookBackdrop;
   UPROPERTY()
   TObjectPtr<UMaterialInstanceDynamic> ContactShadowMid;
   bool bContactShadowTried = false;

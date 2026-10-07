@@ -4,15 +4,16 @@
 //   Parser     the "conceptPaste" block: every field, map-image only, the light budget with the profile, rejection table
 //   Mode       the decision table (-ConceptPaste / -NoConceptPaste / -EnvLayoutVariant / the block default / the gate),
 //              command-line parsing, the fallback after missing assets / overlay
-//   Shipped    S08ArtBoardProfiles.json: Sarpedon ON by default (P5c = -EnvLayoutVariant=p5c), Marmoreal present but
-//              OFF (accepted look unchanged), no grid profile has the block, budget 1 key + 6 points
+//   Shipped    S08ArtBoardProfiles.json: Sarpedon ON by default (P5c = -EnvLayoutVariant=p5c), Marmoreal ON by default
+//              since VS-5 EN-13 (the painted backdrop, kind paste; P5c = -NoConceptPaste / -EnvLayoutVariant=p5c), no grid
+//              profile has the block, budget 1 key + 6 points, the ARTLOOK backdrop field of both maps
 //   Geometry   sea plane + sky cylinder transforms, the shader mirror (cut under the frame, plate rectangles, feather,
 //              behind the camera), grade fallbacks, inverse ACES, flicker / sway
 //   EnvIds     what the board actor hides by: overlay-added / replaced ids (MergeOverlay), the spawned component ids
 //   ApplyFailure  P7c: Apply != ok with the assets loaded -> the full P5c look (base layout, backdrop, tray, fog)
 //   Actor      the board actor: nothing on grids or a refused map profile (no line), the shipped Sarpedon / Marmoreal
 //              once the map import ran (P8: the lit 3D island on or the traced P5c fallback; -EnvLayoutVariant=p5c;
-//              Marmoreal off)
+//              VS-5 EN-13: Marmoreal's paste on by default, -NoConceptPaste = P5c with the tray; the ARTLOOK backdrop)
 //   ENV-MAPS P8 (lit3d, docs/art-pipeline/ENV-P8-3D-UNDER-PAINT-TASK.md):
 //   PasteKind  -ConceptPaste=paste on the shipped Sarpedon: the P7 paste or the traced P5c fallback
 //   Lit3dScene ApplyLit3d (no sheet, lights in the budget, missing / failed), the lit3d hide list, ApplyScene (casters,
@@ -25,6 +26,7 @@
 //     -ExecCmds="Automation RunTests Unmatched.S08.ConceptPaste; Quit" -unattended -nosplash -nullrhi
 #if WITH_AUTOMATION_TESTS
 
+#include "S08ArtLook.h"
 #include "S08BoardActor.h"
 #include "S08BoardArt.h"
 #include "S08BoardModel.h"
@@ -620,7 +622,7 @@ bool FS08ConceptPasteModeTest::RunTest(const FString&) {
   const FS08ConceptPasteSpec NoBlock;
   const FCase Cases[] = {
       {TEXT("on by default"), &On, TEXT(""), true, true, TEXT("default"), true, TEXT("concept")},
-      {TEXT("off by default (Marmoreal: the command line decides the layout, as before)"), &Off, TEXT(""), true, false, TEXT("default"), false, TEXT("")},
+      {TEXT("off by default (a block without a default: the command line decides the layout)"), &Off, TEXT(""), true, false, TEXT("default"), false, TEXT("")},
       {TEXT("gate closed"), &On, TEXT(""), false, false, TEXT("gate"), false, TEXT("")},
       {TEXT("no block"), &NoBlock, TEXT("-ConceptPaste"), true, false, TEXT("no-block"), false, TEXT("")},
       {TEXT("-ConceptPaste=0"), &On, TEXT("-ConceptPaste=0"), true, false, TEXT("flag-off"), false, TEXT("")},
@@ -726,7 +728,7 @@ bool FS08ConceptPasteModeTest::RunTest(const FString&) {
 }
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08ConceptPasteShippedTest,
-    "Unmatched.S08.ConceptPaste.Shipped Sarpedon ON by default, Marmoreal present but OFF (ENV-U16 plate + anim), no grid block, 1 key + 6 points",
+    "Unmatched.S08.ConceptPaste.Shipped Sarpedon lit3d and Marmoreal paste ON by default (EN-13), P5c = -NoConceptPaste, no grid block, 1 key + 6 points",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FS08ConceptPasteShippedTest::RunTest(const FString&) {
   using namespace S08ConceptPasteTest;
@@ -868,7 +870,12 @@ bool FS08ConceptPasteShippedTest::RunTest(const FString&) {
   const FS08ConceptPasteSpec& M = Marmoreal->ConceptPaste;
   TestTrue("marmoreal: no lit3d (the accepted look, paste comparison only)", !M.Lit3d.bSet && M.DefaultKind == ES08ConceptKind::Paste);
   TestTrue("marmoreal: no material wind", M.WindProps.IsEmpty());
-  TestTrue("marmoreal: block present, OFF by default until EN-13", M.bSet && !M.bDefaultOn && M.Variant == TEXT("concept"));
+  // VS-5 EN-13 (ENV-U16, the user 2026-10-04: «Нарисованный задник»): ON by default, kind paste, P5c = the off variant
+  TestTrue("marmoreal: block ON by default (EN-13), mode paste, concept overlay, p5c = off",
+           M.bSet && M.bDefaultOn && M.DefaultKind == ES08ConceptKind::Paste && M.Variant == TEXT("concept") &&
+               M.OffVariant == TEXT("p5c"));
+  TestEqual("marmoreal: hide (the painted surround replaces tray, ground, P5c props / fx / lights, backdrop, fog)", M.Hide.Names(),
+            FString(TEXT("tray+ground+waterfalls+backdrop+fog+baseProps+baseFx+layoutLights")));
   // VS-5 E1 (EN-06 + EN-07): the painted backdrop - own lantern / door points instead of the P5c layout lights, no sea, the
   // outpainted x2 plate covers rect B (clip), the anim channels with 6 slots, 4 of them synced with the lantern points
   {
@@ -904,12 +911,29 @@ bool FS08ConceptPasteShippedTest::RunTest(const FString&) {
                                                                          SarPaste.Variant == TEXT("concept"));
   const FS08ConceptPasteMode SarOff = S08ConceptPaste::ResolveMode(S, Inputs(TEXT("-ConceptPaste=0")), true);
   TestTrue("sarpedon -ConceptPaste=0: off, the command line (no variant) = the base layout", !SarOff.bOn && !SarOff.bOverrideVariant);
-  TestTrue("marmoreal default: off, the env layout reads the command line exactly as before",
-           !MarMode.bOn && MarMode.Reason == TEXT("default") && !MarMode.bOverrideVariant);
+  TestTrue("marmoreal default: on, paste, the concept overlay (EN-13)",
+           MarMode.bOn && MarMode.Reason == TEXT("default") && MarMode.Kind == ES08ConceptKind::Paste && MarMode.bOverrideVariant &&
+               MarMode.Variant == TEXT("concept"));
   const FS08ConceptPasteMode P5c = S08ConceptPaste::ResolveMode(S, Inputs(TEXT("-EnvLayoutVariant=p5c")), true);
   TestTrue("sarpedon -EnvLayoutVariant=p5c: off, the base layout (P5c)", !P5c.bOn && P5c.bOverrideVariant && P5c.Variant.IsEmpty());
   const FS08ConceptPasteMode MarOn = S08ConceptPaste::ResolveMode(M, Inputs(TEXT("-ConceptPaste")), true);
-  TestTrue("marmoreal -ConceptPaste: on for the comparison", MarOn.bOn && MarOn.Variant == TEXT("concept"));
+  TestTrue("marmoreal -ConceptPaste: on (a no-op alias of the default now)", MarOn.bOn && MarOn.Variant == TEXT("concept"));
+  // the rollback (ВР-56): -NoConceptPaste = -ConceptPaste=0 = -EnvLayoutVariant=p5c -> off and the base layout (3D P5c + T2b)
+  const FS08ConceptPasteMode MarNo = S08ConceptPaste::ResolveMode(M, Inputs(TEXT("-NoConceptPaste")), true);
+  TestTrue("marmoreal -NoConceptPaste: off (flag-off), the command line (no variant) = the base layout",
+           !MarNo.bOn && MarNo.Reason == TEXT("flag-off") && !MarNo.bOverrideVariant);
+  const FS08ConceptPasteMode MarZero = S08ConceptPaste::ResolveMode(M, Inputs(TEXT("-ConceptPaste=0")), true);
+  TestTrue("marmoreal -ConceptPaste=0: the same rollback", !MarZero.bOn && MarZero.Reason == TEXT("flag-off"));
+  const FS08ConceptPasteMode MarP5c = S08ConceptPaste::ResolveMode(M, Inputs(TEXT("-EnvLayoutVariant=p5c")), true);
+  TestTrue("marmoreal -EnvLayoutVariant=p5c: off (variant-off), the base layout (ВР-EN.15)",
+           !MarP5c.bOn && MarP5c.Reason == TEXT("variant-off") && MarP5c.bOverrideVariant && MarP5c.Variant.IsEmpty());
+  // the ARTLOOK board line (ВР-EN.8 / ВР-VS5-17)
+  TestEqual("ARTLOOK marmoreal default", S08ArtLook::BackdropField(M, MarMode), FString(TEXT("paste(default)")));
+  TestEqual("ARTLOOK marmoreal -NoConceptPaste", S08ArtLook::BackdropField(M, MarNo), FString(TEXT("p5c(flag-off)")));
+  TestEqual("ARTLOOK marmoreal -EnvLayoutVariant=p5c", S08ArtLook::BackdropField(M, MarP5c), FString(TEXT("p5c(variant-off)")));
+  TestEqual("ARTLOOK sarpedon default", S08ArtLook::BackdropField(S, SarMode), FString(TEXT("lit3d(default)")));
+  TestEqual("ARTLOOK board line", S08ArtLook::BoardLine(Marmoreal->Id, S08ArtLook::BackdropField(M, MarMode)),
+            FString(TEXT("ARTLOOK board=marmoreal-original backdrop=paste(default)")));
   return true;
 }
 
@@ -1282,12 +1306,35 @@ bool FS08ConceptPasteActorTest::RunTest(const FString&) {
       TestTrue("env gate armed", A->EnsureEnvLayout(true));
       A->SetArtDataForTest(Shipped);
       A->SetRoomBoardId(MarId);
+      A->EnsureDioramaTray(true);
       TestTrue("rebuild Marmoreal", A->Rebuild(MarBoard));
-      TestTrue("marmoreal default: off (default)", !A->GetConceptPasteMode().bOn && A->GetConceptPasteMode().Reason == TEXT("default") &&
-                                                      !A->GetConceptPasteMode().bOverrideVariant);
-      NoPaste(A, TEXT("marmoreal default"));
-      TestTrue("marmoreal default: the fog of the light profile stays", A->GetAppliedRender().bFog);
-      TestFalse("marmoreal default: no backdrop hide", A->GetConceptPasteRuntime().bHidBackdrop);
+      // VS-5 EN-13: the painted backdrop is the default (out-of-git plates: tools/art/concept_paste, ENV-U16 E1 import)
+      const FS08ConceptPasteSpec& M = Marmoreal->ConceptPaste;
+      const bool bMarAssets = FPackageName::DoesPackageExist(M.MaterialPath) && FPackageName::DoesPackageExist(M.SheetMeshPath) &&
+                              FPackageName::DoesPackageExist(M.PlateBPath);
+      const bool bMarOverlay = FPaths::FileExists(S08EnvLayout::OverlayFileFor(S08EnvLayout::DefaultDir(), TEXT("marmoreal"), M.Variant));
+      if (bMarAssets && bMarOverlay) {
+        TestTrue(TEXT("marmoreal default: the paste is on (") + A->GetConceptPasteMode().Reason + TEXT(")"),
+                 A->IsConceptPasteOn() && A->GetConceptPasteMode().Reason == TEXT("default") &&
+                     A->GetConceptPasteMode().Kind == ES08ConceptKind::Paste);
+        TestEqual("marmoreal default: env variant = the concept overlay", A->GetEnvLayoutRuntime().Variant.Name, M.Variant);
+        TestEqual("marmoreal default: ARTLOOK backdrop", A->GetArtLookBackdrop(), FString(TEXT("paste(default)")));
+        TestTrue("marmoreal default: the sheet is there", A->GetConceptPasteRuntime().SheetParts > 0);
+        TestFalse("marmoreal default: the fog hidden", A->GetAppliedRender().bFog);
+        if (A->GetDioramaTray()) TestFalse("marmoreal default: the tray hidden", A->GetDioramaTray()->IsVisible());
+        int32 VisibleLayoutLights = 0;
+        for (const UPointLightComponent* L : A->GetEnvLights()) VisibleLayoutLights += L && L->IsVisible() ? 1 : 0;
+        TestEqual("marmoreal default: the P5c layout lights hidden", VisibleLayoutLights, 0);
+        const FS08LightProfile* Night = Shipped.LightFor(*Marmoreal);
+        TestTrue("marmoreal default: 1 key + <= 6 points", Night && Night->Points.Num() + A->GetConceptPasteLights().Num() <= 6);
+      } else {
+        AddWarning(FString::Printf(TEXT("marmoreal paste assets %s / concept overlay %s not there: the P5c fallback was checked"),
+                                   bMarAssets ? TEXT("ok") : TEXT("missing"), bMarOverlay ? TEXT("ok") : TEXT("missing")));
+        TestFalse("marmoreal fallback: off", A->IsConceptPasteOn());
+        NoPaste(A, TEXT("marmoreal fallback"));
+        TestTrue(TEXT("marmoreal fallback: ARTLOOK backdrop p5c(..): ") + A->GetArtLookBackdrop(),
+                 A->GetArtLookBackdrop().StartsWith(TEXT("p5c(")));
+      }
       A->Destroy();
     }
   }
@@ -1303,6 +1350,28 @@ bool FS08ConceptPasteActorTest::RunTest(const FString&) {
       TestTrue("-EnvLayoutVariant=p5c: off (variant-off)", !A->GetConceptPasteMode().bOn && A->GetConceptPasteMode().Reason == TEXT("variant-off"));
       TestTrue("-EnvLayoutVariant=p5c: the base layout, no overlay", A->GetEnvLayoutRuntime().Variant.Name.IsEmpty());
       NoPaste(A, TEXT("p5c"));
+      A->Destroy();
+    }
+  }
+  // VS-5 EN-13 rollback (ВР-56): -NoConceptPaste on Marmoreal = the 3D P5c surroundings with the T2b tray, the fog and the
+  // layout lights (own scope: the one above reset the overrides when it ended)
+  {
+    FScope NoPasteScope(TEXT("-NoConceptPaste"));
+    AS08BoardActor* A = W.Spawn();
+    if (TestNotNull("board actor (marmoreal -NoConceptPaste)", A)) {
+      A->EnsureDioramaTray(true);
+      TestTrue("env gate armed", A->EnsureEnvLayout(true));
+      A->SetArtDataForTest(Shipped);
+      A->SetRoomBoardId(MarId);
+      TestTrue("rebuild Marmoreal", A->Rebuild(MarBoard));
+      TestTrue("-NoConceptPaste: off (flag-off)", !A->GetConceptPasteMode().bOn && A->GetConceptPasteMode().Reason == TEXT("flag-off"));
+      TestTrue("-NoConceptPaste: the base layout (P5c), no overlay", A->GetEnvLayoutRuntime().Variant.Name.IsEmpty());
+      NoPaste(A, TEXT("marmoreal -NoConceptPaste"));
+      TestTrue("-NoConceptPaste: the fog of the light profile stays", A->GetAppliedRender().bFog);
+      TestFalse("-NoConceptPaste: no backdrop hide", A->GetConceptPasteRuntime().bHidBackdrop);
+      if (A->GetDioramaTray()) TestTrue("-NoConceptPaste: the T2b tray is visible", A->GetDioramaTray()->IsVisible());
+      TestTrue("-NoConceptPaste: the P5c props are there", A->GetEnvProps().Num() > 0);
+      TestEqual("-NoConceptPaste: ARTLOOK backdrop", A->GetArtLookBackdrop(), FString(TEXT("p5c(flag-off)")));
       A->Destroy();
     }
   }

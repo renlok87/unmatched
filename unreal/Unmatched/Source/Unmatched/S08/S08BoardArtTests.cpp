@@ -16,6 +16,7 @@
 #if WITH_AUTOMATION_TESTS
 
 #include "S08BoardActor.h"
+#include "S08ConceptPaste.h"
 #include "S08ArtHud.h"
 #include "S08MapBackdrop.h"
 #include "S08BoardArt.h"
@@ -2573,7 +2574,10 @@ bool FS08BoardArtFrameBackdropActorTest::RunTest(const FString&) {
       A->Destroy();
     }
   }
-  // 2) the shipped Marmoreal profile once the map import ran (out of git): kit + backdrop, then back to a grid
+  // 2) the shipped Marmoreal profile once the map import ran (out of git): kit + backdrop, then back to a grid. VS-5 EN-13:
+  // the painted backdrop is Marmoreal's default and hides this night backdrop; the P5c look it checks is the rollback
+  // -NoConceptPaste (reset below)
+  S08ConceptPaste::SetCommandLineOverrideForTest(TEXT("-NoConceptPaste"));
   FS08BoardArtData Shipped;
   TArray<FString> Errors;
   if (TestTrue("shipped data", LoadShipped(Shipped, Errors))) {
@@ -2666,6 +2670,7 @@ bool FS08BoardArtFrameBackdropActorTest::RunTest(const FString&) {
       }
     }
   }
+  S08ConceptPaste::ResetCommandLineOverrideForTest();
   GEngine->DestroyWorldContext(World);
   World->DestroyWorld(false);
   return true;

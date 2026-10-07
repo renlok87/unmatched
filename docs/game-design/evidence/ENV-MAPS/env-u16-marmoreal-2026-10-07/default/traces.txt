@@ -1,0 +1,16 @@
+# Marmoreal original, no flags (live tune editor -game, 2026-10-07)
+ARTLOOK board=marmoreal-original backdrop=paste(default)
+ARTPREVIEW concept-paste budget profile=marmoreal-original profilePoints=1 conceptLights=5 layoutLightsVisible=0 combinedPoints=6 combinedBudgetOk=1
+ARTPREVIEW concept-paste hide profile=marmoreal-original props=0 fx=0 layoutLights=5 ground=4 sea=0 waterfalls=0 fog=1 backdrop=1 overlayProps=0 overlayFx=4
+ARTPREVIEW concept-paste mode=on profile=marmoreal-original map=marmoreal reason=default default=on flag=- cmdVariant=- envVariant=concept:ok overlay=marmoreal.concept.layout.json overlaySha256=4d7b2de8a20e48e9bbb82f70735a2d4e29318767b0e17c084dfa30007e83b6f6 spec=tools/art/concept_paste/marmoreal.paste.json manifest=tools/art/concept_paste/manifest.marmoreal.json hide=tray+ground+waterfalls+backdrop+fog+baseProps+baseFx+layoutLights kind=paste
+ARTPREVIEW hero-light board profile=marmoreal-original light=marmoreal-night on=1 reason=profile fighters=6 litFigures=6 layers=2 lightsOn=12 budget=12/14 perFigure<=2 channel=1 frozen=1
+# Marmoreal original, -NoConceptPaste (the rollback)
+ARTLOOK board=marmoreal-original backdrop=p5c(flag-off)
+ARTPREVIEW concept-paste mode=off profile=marmoreal-original map=marmoreal reason=flag-off default=on flag=no cmdVariant=- envVariant=none:none cleared=0 restored=0
+ARTPREVIEW hero-light board profile=marmoreal-original light=marmoreal-night on=1 reason=profile fighters=6 litFigures=6 layers=2 lightsOn=12 budget=12/14 perFigure<=2 channel=1 frozen=1
+# Sarpedon original, no flags
+ARTLOOK board=sarpedon-original backdrop=lit3d(default)
+ARTPREVIEW concept-paste budget profile=sarpedon-original profilePoints=1 conceptLights=5 layoutLightsVisible=0 combinedPoints=6 combinedBudgetOk=1
+ARTPREVIEW concept-paste hide profile=sarpedon-original props=0 fx=0 layoutLights=5 ground=4 sea=0 waterfalls=4 fog=1 backdrop=0 overlayProps=88 overlayFx=19
+ARTPREVIEW concept-paste mode=on profile=sarpedon-original map=sarpedon reason=default default=on flag=- cmdVariant=- envVariant=scene:ok overlay=sarpedon.scene.layout.json overlaySha256=34742d7ddabf44a165379029dc370bb01c83500e254f5568073c1c768dfb3818 spec=tools/art/concept_paste/sarpedon.paste.json manifest=tools/art/concept_scene/manifest.sarpedon.json hide=tray+ground+waterfalls+backdrop+fog+baseProps+baseFx+layoutLights kind=lit3d
+ARTPREVIEW hero-light board profile=sarpedon-original light=sarpedon-night on=1 reason=profile fighters=6 litFigures=6 layers=2 lightsOn=12 budget=12/14 perFigure<=2 channel=1 frozen=1

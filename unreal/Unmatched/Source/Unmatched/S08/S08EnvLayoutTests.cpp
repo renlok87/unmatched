@@ -23,6 +23,7 @@
 #if WITH_AUTOMATION_TESTS
 
 #include "S08BoardActor.h"
+#include "S08ConceptPaste.h"
 #include "S08BoardArt.h"
 #include "S08BoardModel.h"
 #include "S08Contracts.h"
@@ -757,9 +758,12 @@ bool FS08EnvLayoutActorTest::RunTest(const FString&) {
       A->Destroy();
     }
   }
-  // 4) the shipped Marmoreal board once the map import, the kit import and the layout exist
+  // 4) the shipped Marmoreal board once the map import, the kit import and the layout exist. VS-5 EN-13: the painted
+  // backdrop is Marmoreal's default (its overlay removes the 64 P5c props); this case checks the base layout = the
+  // rollback -NoConceptPaste (reset below)
   {
     FGateScope Gate(true, false);
+    S08ConceptPaste::SetCommandLineOverrideForTest(TEXT("-NoConceptPaste"));
     FS08BoardArtData Shipped;
     TArray<FString> Errors;
     const FS08BoardArtProfile* Marm = nullptr;
@@ -892,6 +896,7 @@ bool FS08EnvLayoutActorTest::RunTest(const FString&) {
         A->Destroy();
       }
     }
+    S08ConceptPaste::ResetCommandLineOverrideForTest();
   }
   return true;
 }

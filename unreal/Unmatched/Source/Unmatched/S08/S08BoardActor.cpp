@@ -1114,6 +1114,16 @@ void AS08BoardActor::UpdateDioramaTray(const FS08BoardModel& Board) {
   UpdateBackdrop();
   // ENV-MAPS P7 (ENV-U15): the concept paste after the layout it hides parts of (a no-op on grid-only runs).
   UpdateConceptPaste();
+  // VS-5 EN-13 (ВР-VS5-17): the backdrop of this map board in its ARTLOOK board line (once per change; grids: none)
+  if (bArtActive && bMapImageActive) {
+    const FString Backdrop = S08ArtLook::BackdropField(ActiveProfile.ConceptPaste, ConceptMode);
+    const FString Key = ActiveProfile.Id + TEXT("|") + Backdrop;
+    if (ArtLookBackdropKey != Key) {
+      ArtLookBackdropKey = Key;
+      ArtLookBackdrop = Backdrop;
+      FS08Trace::Write(S08ArtLook::BoardLine(ActiveProfile.Id, Backdrop));
+    }
+  }
   // ENV-MAPS P8 gate G1: -ArtPreviewLightsOff - a bench frame without the engine's light (S08ConceptPaste::ApplyLightsOff)
   if (bArtActive && ConceptInputs.bLightsOff) {
     const FS08LightsOffStats Off = S08ConceptPaste::ApplyLightsOff(
@@ -2690,6 +2700,7 @@ void AS08BoardActor::ResetArtRuntimeForReload() {
   ClearArtLights();
   // trace dedupe keys: the rebuild writes the lines of a first build again (the live-tune shot copies them)
   HeroLightTraceKey.Reset();
+  ArtLookBackdropKey.Reset();
   ReadabilityFightersTraceKey.Reset();
   HeroesV2SummaryKey.Reset();
   bAllMedusaSummaryTraced = false;

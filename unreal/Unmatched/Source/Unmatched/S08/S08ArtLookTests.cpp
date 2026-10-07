@@ -10,6 +10,7 @@
 #include "S08ArtPreviewMedusa.h"
 #include "S08BoardActor.h"
 #include "S08BoardModel.h"
+#include "S08ConceptPaste.h"
 #include "Fx/S08CueFx.h"
 #include "S08Diorama.h"
 #include "S08EnvLayout.h"
@@ -124,6 +125,26 @@ bool FS08ArtLookDefaultTest::RunTest(const FString&) {
     // VS-6 Z-2: the FX base and the hit look are in the line (ВР-FX02 / ВР-20)
     TestTrue(FString::Printf(TEXT("default fx traced: %s"), *Line),
              Line.Contains(TEXT(" fx=on")) && Line.Contains(TEXT(" hitFx=flash")));
+  }
+  // VS-5 EN-13 (ВР-EN.8, ВР-VS5-17): the backdrop field of the per-board ARTLOOK line
+  {
+    FS08ConceptPasteSpec Block;
+    Block.bSet = true;
+    FS08ConceptPasteMode Mode;
+    Mode.bOn = true;
+    Mode.Reason = TEXT("default");
+    TestEqual("backdrop: paste on by default", S08ArtLook::BackdropField(Block, Mode), FString(TEXT("paste(default)")));
+    Mode.Kind = ES08ConceptKind::Lit3d;
+    TestEqual("backdrop: lit3d on by default", S08ArtLook::BackdropField(Block, Mode), FString(TEXT("lit3d(default)")));
+    Mode = FS08ConceptPasteMode();
+    Mode.Reason = TEXT("flag-off");
+    TestEqual("backdrop: the rollback", S08ArtLook::BackdropField(Block, Mode), FString(TEXT("p5c(flag-off)")));
+    Mode.Reason = TEXT("missing-assets");
+    TestEqual("backdrop: a fallback", S08ArtLook::BackdropField(Block, Mode), FString(TEXT("p5c(missing-assets)")));
+    TestEqual("backdrop: no block", S08ArtLook::BackdropField(FS08ConceptPasteSpec(), FS08ConceptPasteMode()),
+              FString(TEXT("p5c(no-block)")));
+    TestEqual("board line", S08ArtLook::BoardLine(TEXT("sarpedon-original"), TEXT("lit3d(default)")),
+              FString(TEXT("ARTLOOK board=sarpedon-original backdrop=lit3d(default)")));
   }
   // 2c) AN-21 (ВР-12): -S08MoveEaseLegacy rolls the ease back, -S08MoveEase stays a no-op alias of the default
   {
@@ -283,6 +304,8 @@ bool FS08ArtLookActorTest::RunTest(const FString&) {
       return false;
     }
     const bool bTray = S08ArtLook::Enabled() && Board->EnsureDioramaTray(true) && Board->GetDioramaTray() != nullptr;
+    // VS-5 EN-13: no map board built -> no 'ARTLOOK board=' line (grids and the grey board never write one)
+    TestTrue(FString::Printf(TEXT("%s: no ARTLOOK backdrop before a map board"), What), Board->GetArtLookBackdrop().IsEmpty());
     Board->Destroy();
     return bTray;
   };

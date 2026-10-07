@@ -557,8 +557,11 @@ def check() -> tuple[dict, list[str]]:
                 errors.append(f"{b['id']}: anim wind offset {w['ampPx']} x (1 + {w['gustAmp']}) > 4 C0 px")
     if blocks.get("sarpedon-original", {}).get("default") != "on":
         errors.append("sarpedon-original: conceptPaste must be ON by default (ENV-U15)")
-    if blocks.get("marmoreal-original", {}).get("default") != "off":
-        errors.append("marmoreal-original: conceptPaste must be present and OFF by default (accepted look)")
+    # VS-5 EN-13 (ENV-U16, the user 2026-10-04: «Нарисованный задник»): the painted backdrop is Marmoreal's default; the
+    # 3D P5c surroundings are the rollback (offVariant p5c = -NoConceptPaste / -EnvLayoutVariant=p5c)
+    marm = blocks.get("marmoreal-original", {})
+    if marm.get("default") != "on" or marm.get("mode", "paste") != "paste" or marm.get("offVariant") != "p5c":
+        errors.append("marmoreal-original: conceptPaste must be ON by default, mode paste, offVariant p5c (EN-13)")
     for b in profiles["boards"]:
         if b.get("surface") != "map-image" and "conceptPaste" in b:
             errors.append(f"{b['id']}: grid profile with conceptPaste")
