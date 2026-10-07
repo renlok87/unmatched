@@ -50,6 +50,7 @@ const TCHAR* ShowName(EUmCardShow Show) {
     case EUmCardShow::ClassSCombat: return TEXT("classS-combat");
     case EUmCardShow::MiniOpp: return TEXT("mini-48x67");
     case EUmCardShow::MiniChip: return TEXT("mini-32x45");
+    case EUmCardShow::ClassSInspector: return TEXT("classS-inspector");
   }
   return TEXT("hand");
 }
@@ -73,6 +74,7 @@ FVector2D ShowSize(EUmCardShow Show, bool bEnglishScan) {
     case EUmCardShow::Combat: return FVector2D(230.0, 319.0);
     case EUmCardShow::Slot: return FVector2D(190.0, 264.0);
     case EUmCardShow::Inspector: return bEnglishScan ? FVector2D(408.0, 566.0) : FVector2D(460.0, 640.0);
+    case EUmCardShow::ClassSInspector: return FVector2D(400.0, 555.0);
     case EUmCardShow::ClassSHand: return FVector2D(120.0, 166.0);
     case EUmCardShow::MiniOpp: return FVector2D(48.0, 67.0);
     case EUmCardShow::MiniChip: return FVector2D(32.0, 45.0);
@@ -191,6 +193,26 @@ float FlipScaleX(float TMs, float TotalMs) {
 
 float DefenseFlipDelayMs(float SpeedMul) {
   return static_cast<float>(FS09CombatTiming::DefenseFlipDelayMs) * FMath::Max(0.0f, SpeedMul);
+}
+
+float PlayedFlashMs(float SpeedScale, bool bReduced) {
+  if (SpeedScale <= 0.0f) return 0.0f;  // UI-ACC-013 «Нет»: the animations are instant - no flash
+  return bReduced ? FlashReducedMs : FlashMs * SpeedScale;
+}
+
+float FlashOpacity(float TMs, float DurMs) {
+  if (DurMs <= 0.0f || TMs < 0.0f || TMs >= DurMs) return 0.0f;
+  return 1.0f - TMs / DurMs;
+}
+
+FString FlashCueLine(int32 Seq, int64 TMs, bool bReduced) {
+  return FString::Printf(TEXT("CUE fx id=CUE-006 subject=card seq=%d t=%lld vfx=none sfx=none clip=none mat=none socket=- "
+                              "reduced=%d result=spawned"),
+                         Seq, TMs, bReduced ? 1 : 0);
+}
+
+FString FlashDoneLine(int32 Seq, int64 TMs, int64 Ms, const TCHAR* Cut) {
+  return FString::Printf(TEXT("CUE fx done id=CUE-006 subject=card seq=%d t=%lld ms=%lld cut=%s"), Seq, TMs, Ms, Cut);
 }
 
 FString TraceLine(const FString& Key, EUmCardFace Face, const FString& Tex, EUmCardShow Show, const FUmCardFit& F,
@@ -558,6 +580,15 @@ void UUmCardWidget::LoadFace(const FUmCardMediaEntry& Entry) {
   SrcPx = UmCardWidget::DrawnSrcPx(Entry);
   FaceUv = UmCardWidget::UvRect(Entry);
   const FSoftObjectPath Path(Entry.ObjectPath);
+  if (bHoldLoading) {
+    // the review sheet's «loading» (SC-21): the request is never made, the frame and the delayed spinner stay
+    FaceTexture = nullptr;
+    bLoading = true;
+    SpinnerDelay.End();
+    SpinnerDelay.Begin(NowMs());
+    LoadingPath = Path;
+    return;
+  }
   UTexture2D* Tex = Cast<UTexture2D>(Path.ResolveObject());
   if (!Tex && bSyncLoad) Tex = Cast<UTexture2D>(Path.TryLoad());
   if (Tex) {
@@ -989,9 +1020,14 @@ void UUmCardWidget::SetMarkedForDiscard(bool bOn) {
   Step();
 }
 
-void UUmCardWidget::PlayFlash() {
-  FlashStartMs = NowMs();
+void UUmCardWidget::PlayPlayedFlash(float SpeedScale) {
+  FlashDurMs = UmCardWidget::PlayedFlashMs(SpeedScale, IsReduced());
+  FlashStartMs = FlashDurMs > 0.0f ? NowMs() : -1.0;
   Step();
+}
+
+float UUmCardWidget::GetFlashOpacity() const {
+  return FlashStartMs >= 0.0 ? UmCardWidget::FlashOpacity(static_cast<float>(NowMs() - FlashStartMs), FlashDurMs) : 0.0f;
 }
 
 // ------------------------------------------------------------------------------------------------ the step
@@ -1010,7 +1046,7 @@ double UUmCardWidget::AnimEndMs() const {
   Pop(ChipLeaveMs, 120.0);
   Pop(DropStartMs, 180.0);
   Pop(DropLeaveMs, 120.0);
-  Pop(FlashStartMs, UmCardWidget::FlashMs);
+  Pop(FlashStartMs, FlashDurMs);
   return End;
 }
 
@@ -1024,7 +1060,7 @@ bool UUmCardWidget::IsAnimating() const {
   return ScaleTween.IsRunning(Now) || DesatTween.IsRunning(Now) || ShiftTween.IsRunning(Now) ||
          FocusTween.IsRunning(Now) || OffsetXTween.IsRunning(Now) || OffsetYTween.IsRunning(Now) || FlipStartMs >= 0.0 || Within(NewStartMs, 180.0) || Within(NewLeaveMs, 120.0) ||
          Within(ChipStartMs, 180.0) || Within(ChipLeaveMs, 120.0) || Within(DropStartMs, 180.0) ||
-         Within(DropLeaveMs, 120.0) || Within(FlashStartMs, UmCardWidget::FlashMs) || bLoading;
+         Within(DropLeaveMs, 120.0) || Within(FlashStartMs, FlashDurMs) || bLoading;
 }
 
 void UUmCardWidget::ApplySpinner() {
@@ -1112,12 +1148,12 @@ void UUmCardWidget::Step() {
     FocusRing->SetRenderOpacity(Op);
   }
   if (FlashLayer) {
-    // CUE-006: the flash edge over idle, transparent at 500 ms (reduced: held, then idle)
+    // CUE-006 (CP-21): the flash edge over idle, 1 -> 0 linear over FlashDurMs (500 x speed, reduced 100)
     float Op = 0.0f;
     if (FlashStartMs >= 0.0) {
       const float T = static_cast<float>(Now - FlashStartMs);
-      Op = T >= FlashMs ? 0.0f : (bReduced ? 1.0f : 1.0f - T / FlashMs);
-      if (T >= FlashMs) FlashStartMs = -1.0;
+      Op = FlashOpacity(T, FlashDurMs);
+      if (T >= FlashDurMs) FlashStartMs = -1.0;
     }
     FlashLayer->SetVisibility(Op > 0.0f && !IsMini(StateModel.Show) ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
     FlashLayer->SetRenderOpacity(Op);

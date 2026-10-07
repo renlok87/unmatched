@@ -1294,6 +1294,23 @@ private:
   bool UmKeyHintsNow();
   /** VS-4 FX-38 (S08/UI/UmZoneBadges.h; rollback -S08SlateHud=zone): the zone icons of the hovered space, every frame. */
   void TickUmZoneBadges();
+  // VS-4 V4 (H13) SC-21...SC-23 / CP-22: the UMG INSPECT modal (UI/UmScreenInspect.h; rollback -S08SlateHud=inspect)
+  void BuildUmInspect();
+  void TickUmInspect();
+  bool UmInspectOnUmg() const;
+  bool UmInspectShown() const;
+  /** The open modal owns the keys; a right click on the slot card and the key I open it. True = input consumed. */
+  bool UmInspectOwnsInput();
+  struct FUmInspectContext UmInspectContextNow() const;
+  void NoteUmInspectSource(uint8 Source);
+  void OpenUmInspectDeck(bool bOwnSide);
+  void HandleUmLogInspect(const FString& CardId);
+  // VS-4 CP-21: the G-CUE lines of the played-card flash (CUE-006 subject=card)
+  void UmNoteCardFlashes(const TArray<float>& Flashes, int32 Seq);
+  void TickUmCardFlashCue();
+  // VS-4 V4 evidence (opt-in -S08InspectShots): the H13 states and the HB-47 skeleton in a live match
+  void NoteUmInspectShotsTurn(bool bOwn, bool bInitial, bool bGameOver);
+  void TickUmInspectShots();
   /** VS-3 SC-01 (ВР-SC14): -S08ScreenShots - one evidence frame per new UI-SCR-* id + state (<UI-ID>-<state>.png). */
   void TickUmScreenShots();
   // VS-2 exit frames (opt-in -S08ExitShots): own / opponent turn start + 0.5 s and + 3 s

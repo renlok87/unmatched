@@ -21,6 +21,7 @@
 #include "UmHudStatusLine.h"
 #include "UmHudSubtitle.h"
 #include "UmHudTop.h"
+#include "UmScreenInspect.h"
 #include "UmToast.h"
 #include "UmToastStack.h"
 #include "UmCursor.h"
@@ -119,6 +120,9 @@ FString UUmHudAuthoringLibrary::AuthorUmHudWidgetBlueprints(bool bOverwrite) {
   // VS-4 HB-43: ACTIONS (nests WBP_UmButton four times; the tooltip plate is part of its tree)
   One(UUmHudActions::WidgetBlueprintPath, UUmHudActions::StaticClass(),
       [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmHudActions::BuildDefaultTree(Tree, Attach, Error); });
+  // VS-4 SC-21...SC-23 / CP-22: INSPECT (nests WBP_UmCard and WBP_UmButton; the grid cards are pooled at run time)
+  One(UUmScreenInspect::WidgetBlueprintPath, UUmScreenInspect::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmScreenInspect::BuildDefaultTree(Tree, Attach, Error); });
   Report->SetArrayField(TEXT("assets"), Assets);
   FString Out;
   const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&Out);

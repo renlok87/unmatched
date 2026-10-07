@@ -4,7 +4,8 @@
 //
 //   shows     hand 150x208, hover 225x312, combat 230x319, slot 190x264, inspector (RU 460x640, EN 408x566), deckgrid
 //             150x208, classS-hand 120x166, classS-combat 150x208, mini 48x67 (OPP-HAND) and 32x45 (DECKS chips) - su of
-//             02 §6.2 / ВР-70 / ВР-CP06 (the integer sizes are normative, ВР-VS2-CP-04).
+//             02 §6.2 / ВР-70 / ВР-CP06 (the integer sizes are normative, ВР-VS2-CP-04); VS-4 CP-22: classS-inspector
+//             400x555 (the class S scan slot of INSPECT, 04 §1.7) - the cap shrinks the frame to hug the scan (ВР-VS3-SC21-07).
 //   layers    bottom to top (ВР-VS2-CP-07): the card.navy underlay inside the keyline (inset 1 su, radius r - 1, drawn in
 //             code); the scan "contain" in the constant window (show - 2 x 4 su band, mini 2 su; never cropped, the gap
 //             up to 3 su is the underlay, ВР-VS2-CP-02) through M_UmCardFace (CP-14: Face, UVRect, Desaturation,
@@ -30,7 +31,9 @@
 //             has no number, ВР-CP11); CP-19 SetDiscardCandidate (card.frame.warning) and SetMarkedForDiscard (+16 su down
 //             in 150 ms, card-drop 24 su); CP-20 Flip (scaleX 1 -> 0 in 80 ms ease-in-quad, the face swaps, 0 -> 1 in
 //             80 ms ease-out-quad - x the combat speed; the defense card starts DefenseFlipDelayMs later, the owner calls);
-//             CUE-006 PlayFlash (fx.flash edge fading to idle in 500 ms). Reduced motion: opacity only, <= 100 ms; the
+//             CUE-006 PlayPlayedFlash (VS-4 CP-21: the fx.flash edge layer card.frame.flash over idle, opacity 1 -> 0
+//             linear in 500 ms x the UI-ACC-013 speed, reduced motion 100 ms; speed «Нет» = no flash). Reduced
+//             motion: opacity only, <= 100 ms; the
 //             hover scale without a tween; the flip a face cross-fade of 100 ms.
 //   frame     priority flash > warning > selected > hover > idle (mini displays: mini-idle only, ВР-VS2-CP-06).
 //   input     the press on the release through FS09HudPressArbiter (UI-INP-011): an unplayable card answers Refused with
@@ -85,6 +88,7 @@ enum class EUmCardShow : uint8 {
   ClassSCombat,  // 150 x 208
   MiniOpp,       // 48 x 67
   MiniChip,      // 32 x 45
+  ClassSInspector,  // 400 x 555 (VS-4 CP-22: INSPECT class S, 04 §1.7)
 };
 
 /** What the face shows now. */
@@ -147,6 +151,7 @@ inline constexpr float SpinnerSu = 32.0f;
 inline constexpr float BoostFlipMs = 150.0f;       // CP-18
 inline constexpr float RevealFlipMs = 160.0f;      // CP-20 (ВР-CP13)
 inline constexpr float FlashMs = 500.0f;           // CUE-006
+inline constexpr float FlashReducedMs = 100.0f;    // CP-21: reduced motion
 inline constexpr float FocusAppearMs = 100.0f;
 inline constexpr float ReducedMs = 100.0f;
 /** SetBoostChip: no chip / the chip without its number (the opponent's boost before the reveal, ВР-CP11). */
@@ -187,6 +192,14 @@ UNMATCHED_API float LeaveOpacity(float TMs);
 UNMATCHED_API float FlipScaleX(float TMs, float TotalMs);
 /** When the defense card starts its flip after the attack card's (FS09CombatTiming::DefenseFlipDelayMs x speed). */
 UNMATCHED_API float DefenseFlipDelayMs(float SpeedMul);
+/** VS-4 CP-21: the length of the CUE-006 flash - 500 ms x the UI-ACC-013 speed (0 «Нет»: no flash), reduced 100 ms. */
+UNMATCHED_API float PlayedFlashMs(float SpeedScale, bool bReduced);
+/** CP-21 keyframes: opacity 1 at 0 ms, 0 at DurMs, linear; 0 outside. */
+UNMATCHED_API float FlashOpacity(float TMs, float DurMs);
+/** The G-CUE lines of one played flash (cue_contract.py check-trace, CUE-DISPATCHER.md §5): the show at TMs and its
+ *  done at TMs + Ms. subject=card; the sound of the play is the audio's own `CUE sound` line (AU-S4), so sfx=none. */
+UNMATCHED_API FString FlashCueLine(int32 Seq, int64 TMs, bool bReduced);
+UNMATCHED_API FString FlashDoneLine(int32 Seq, int64 TMs, int64 Ms, const TCHAR* Cut = TEXT("0"));
 /** The CARD-ART line (ВР-CP10). */
 UNMATCHED_API FString TraceLine(const FString& Key, EUmCardFace Face, const FString& Tex, EUmCardShow Show,
                                 const FUmCardFit& Fit, float PxPerSu, const FString& State, bool bChip);
@@ -261,8 +274,14 @@ class UNMATCHED_API UUmCardWidget : public UUserWidget {
   /** The flip on the spot (scaleX, pivot centre): to the face (Face = the revealed card, set at the edge frame) or to
    *  the back. SpeedMul is the combat speed (0 = instant, 0.5 fast, 1, 1.5 slow). */
   void Flip(bool bToFace, float SpeedMul = 1.0f, const FS09CardView* Face = nullptr);
-  /** CUE-006: the fx.flash edge over idle, fading in 500 ms. */
-  void PlayFlash();
+  /** CUE-006: the fx.flash edge over idle, fading in 500 ms (= PlayPlayedFlash(1)). */
+  void PlayFlash() { PlayPlayedFlash(1.0f); }
+  /** VS-4 CP-21: the played-card flash - the card.frame.flash layer over idle, opacity 1 -> 0 linear over
+   *  UmCardWidget::PlayedFlashMs(SpeedScale, reduced); SpeedScale 0 (UI-ACC-013 «Нет») shows none. */
+  void PlayPlayedFlash(float SpeedScale);
+  /** The length of the running / last flash (ms) and its layer's opacity now. */
+  float GetFlashMs() const { return FlashDurMs; }
+  float GetFlashOpacity() const;
 
   // ---- trace ----
   FString ArtLine() const;
@@ -316,6 +335,9 @@ class UNMATCHED_API UUmCardWidget : public UUserWidget {
   void SetLegacyForTest(int32 InLegacy) { LegacyOverride = InLegacy; }
   /** Load the face synchronously (tests, the review sheet: no spinner frame). */
   void SetSyncLoad(bool bOn) { bSyncLoad = bOn; }
+  /** VS-4 SC-21 review sheet / tests: the next face load stays in its loading state (the frame and, after 300 ms of the
+   *  widget clock, the spinner) - the INSPECT «loading» frame without a slow disk. */
+  void SetHoldLoadingForSheet(bool bOn) { bHoldLoading = bOn; }
   /** Review sheet (CP-14 frame page): draw this card.frame.* key whatever the state (NAME_None = the state's). */
   void SetFrameOverrideForSheet(FName Key) {
     FrameOverride = Key;
@@ -438,6 +460,7 @@ class UNMATCHED_API UUmCardWidget : public UUserWidget {
   double DropStartMs = -1.0;
   double DropLeaveMs = -1.0;
   double FlashStartMs = -1.0;
+  float FlashDurMs = UmCardWidget::FlashMs;
   /** ВР-VS3-69: the clock of the last Step and the end of the latest tween / pop - one step past the end is owed. */
   double LastStepMs = -1.0;
   double AnimEndMs() const;
@@ -463,6 +486,7 @@ class UNMATCHED_API UUmCardWidget : public UUserWidget {
   int32 ReducedOverride = -1;
   int32 LegacyOverride = -1;
   bool bSyncLoad = false;
+  bool bHoldLoading = false;
   FDelegateHandle CultureHandle;
   TSharedPtr<FStreamableHandle> LoadHandle;
   TSharedPtr<FStreamableHandle> PreloadHandle;  // CP-20: the revealed face loads during the first half of the flip

@@ -348,7 +348,7 @@ bool AS08FlowGameMode::CursorOverHud() const {
     if (Inside(Hand)) return true;
   }
   // VS-3 HB-24 / HB-28: the UMG hand, the open panel; VS-4 HB-39 / HB-40: the open S log list, a sticky toast
-  return UmHudCursorOverHand(X, Y) || UmHudCursorOverDeckPanel(X, Y) || UmHudCursorOverFeed(X, Y);
+  return UmHudCursorOverHand(X, Y) || UmHudCursorOverDeckPanel(X, Y) || UmHudCursorOverFeed(X, Y) || UmInspectShown();  // VS-4 H13
 }
 
 void AS08FlowGameMode::TickCardSlot() {

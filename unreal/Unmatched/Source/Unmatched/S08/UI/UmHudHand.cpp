@@ -605,7 +605,8 @@ void UUmHudHand::ApplyModel(const FUmHandModel& InModel) {
     if (W) {
       W->SetVisibility(ESlateVisibility::HitTestInvisible);
       W->SetHover(false);
-      W->PlayFlash();
+      W->PlayPlayedFlash(Frame.SpeedMul);  // VS-4 CP-21: 500 ms x UI-ACC-013 speed, reduced 100, «Нет» none
+      if (W->GetFlashMs() > 0.0f) PlayedFlashes.Add(W->GetFlashMs());
       if (UCanvasPanelSlot* S = Cast<UCanvasPanelSlot>(W->Slot)) S->SetZOrder(ZLeaving);
       const bool bPlaced = PlacedNow.Contains(It.Key());
       if (!bPlaced && !bReduced && Frame.SpeedMul > 0.0f) {

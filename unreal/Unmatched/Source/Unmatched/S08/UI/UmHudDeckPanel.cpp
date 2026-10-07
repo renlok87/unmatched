@@ -233,6 +233,8 @@ bool UUmHudDeckPanel::BuildDefaultTree(UWidgetTree& Tree, FS08AttachWidget Attac
   BacksW->SetVisibility(ESlateVisibility::HitTestInvisible);
   if (!Attach(BacksW, BodyW)) return Fail(TEXT("Backs"));
   if (!Attach(Tree.ConstructWidget<UUmButton>(ButtonClass, FName(TEXT("FilterButton"))), BodyW)) return Fail(TEXT("FilterButton"));
+  // VS-4 SC-23: «Весь состав» on the filter row
+  if (!Attach(Tree.ConstructWidget<UUmButton>(ButtonClass, FName(TEXT("AllButton"))), BodyW)) return Fail(TEXT("AllButton"));
   UScrollBox* RowsW = Tree.ConstructWidget<UScrollBox>(UScrollBox::StaticClass(), FName(TEXT("Rows")));
   if (!Attach(RowsW, BodyW)) return Fail(TEXT("Rows"));
   UImage* TrackW = Tree.ConstructWidget<UImage>(UImage::StaticClass(), FName(TEXT("Track")));
@@ -285,6 +287,13 @@ bool UUmHudDeckPanel::Initialize() {
   Skeleton = UmDpFind<UUmSkeletonRows>(WidgetTree, TEXT("Skeleton"));
   ErrorText = UmDpFind<UTextBlock>(WidgetTree, TEXT("ErrorText"));
   RetryButton = UmDpFind<UUmButton>(WidgetTree, TEXT("RetryButton"));
+  AllButton = UmDpFind<UUmButton>(WidgetTree, TEXT("AllButton"));
+  if (!AllButton && Body) {
+    // VS-4 SC-23: a WBP authored before the step has no «Весь состав» - it is made here, like the pooled rows
+    AllButton = WidgetTree->ConstructWidget<UUmButton>(UmGameHudSlots::WbpOrNative(UUmButton::StaticClass(), UUmButton::WidgetBlueprintPath),
+                                                       FName(TEXT("AllButton")));
+    if (AllButton) Body->AddChild(AllButton);
+  }
   // a WBP keeps neither the theme fonts nor the code brushes: set at run time
   const UUmHudTheme& Theme = UUmHudTheme::Get();
   if (Panel) {
@@ -378,6 +387,9 @@ void UUmHudDeckPanel::SetInput(const TSharedPtr<FS09HudPressArbiter>& InArbiter,
   }));
   if (RetryButton) RetryButton->SetPress(FName(TEXT("hud.deck.retry")), Arbiter, Wire([](UUmHudDeckPanel& S, const FS09HudPressOutcome& O) {
     if (S.Input.OnRetry) S.Input.OnRetry(O);
+  }));
+  if (AllButton) AllButton->SetPress(FName(TEXT("hud.deck.all")), Arbiter, Wire([](UUmHudDeckPanel& S, const FS09HudPressOutcome& O) {
+    if (S.Input.OnAll) S.Input.OnAll(O, S.Model.Side);
   }));
 }
 
@@ -473,6 +485,23 @@ void UUmHudDeckPanel::Relayout() {
     F.bSelected = Model.bFilterDiscard;
     FilterButton->ApplyModel(F);
     UmDpPlace(FilterButton, FVector2D(0.0f, FilterY), FVector2D::ZeroVector, true);
+  }
+  // ---- VS-4 SC-23: «Весь состав» at the right of the filter row (the grid of the side; a loaded list only) ----
+  if (AllButton) {
+    FUmButtonModel A;
+    A.Label = UmText::Get(EUmTable::Hud, TEXT("hud.deckpanel.all"));
+    A.HeightSu = FilterHSu;
+    A.MinWidthSu = 1.0f;
+    A.PadXSu = FilterPadXSu;
+    AllButton->ApplyModel(A);
+    // right-aligned by its own desired size (the button sizes itself to its label, like the filter)
+    if (UCanvasPanelSlot* S = Cast<UCanvasPanelSlot>(AllButton->Slot)) {
+      S->SetAnchors(FAnchors(0.0f, 0.0f));
+      S->SetAlignment(FVector2D(1.0f, 0.0f));
+      S->SetAutoSize(true);
+      S->SetPosition(FVector2D(Iw, FilterY));
+    }
+    AllButton->SetVisibility(Model.List == EUmDeckListState::Loaded ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
   }
   // ---- the list viewport: whole rows only ----
   ViewportTopSu = FilterY + FilterHSu + GapSu;

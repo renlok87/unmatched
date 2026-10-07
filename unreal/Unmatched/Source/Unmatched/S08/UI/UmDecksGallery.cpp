@@ -59,6 +59,19 @@ FS09DeckList LoadList(const FString& HeroSlug, const FString& PlayerId) {
     C->TryGetStringField(TEXT("nameRu"), Card.NameRu);
     C->TryGetStringField(TEXT("cardType"), Card.CardType);
     C->TryGetStringField(TEXT("bannerName"), Card.BannerName);
+    // VS-4 SC-21 sheet: the printed text of the capture (textEn; the database has no RU text yet, ВР-VS3-SC21-01)
+    if (!C->TryGetStringField(TEXT("textEn"), Card.Text)) C->TryGetStringField(TEXT("text"), Card.Text);
+    // a parsed card has no textEn: its effects' printed texts, as the snapshot's EffectText joins them
+    const TArray<TSharedPtr<FJsonValue>>* Effects = nullptr;
+    if (Card.Text.IsEmpty() && C->TryGetArrayField(TEXT("effects"), Effects) && Effects) {
+      TArray<FString> Parts;
+      for (const TSharedPtr<FJsonValue>& E : *Effects) {
+        const TSharedPtr<FJsonObject> O = E.IsValid() ? E->AsObject() : nullptr;
+        FString T;
+        if (O.IsValid() && O->TryGetStringField(TEXT("text"), T) && !T.IsEmpty()) Parts.Add(T);
+      }
+      Card.Text = FString::Join(Parts, TEXT(" "));
+    }
     Card.AttackValue = IntOr(C, TEXT("attackValue"));
     Card.DefenseValue = IntOr(C, TEXT("defenseValue"));
     Card.BoostValue = IntOr(C, TEXT("boostValue"));

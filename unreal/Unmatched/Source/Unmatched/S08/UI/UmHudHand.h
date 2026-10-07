@@ -253,6 +253,9 @@ class UNMATCHED_API UUmHudHand : public UUserWidget {
   float GetLowerNowSu() const { return LowerNow; }
   int32 PoolSize() const { return Pool.Num(); }
   int32 CreatedCount() const { return Created; }
+  /** VS-4 CP-21: the played-card flashes started since the last call (their lengths, ms) - the game mode writes the
+   *  G-CUE lines of CUE-006 with the seq and the game clock. */
+  TArray<float> TakePlayedFlashes() { return MoveTemp(PlayedFlashes); }
   bool IsTooltipShown() const;
   FText GetTooltipText() const;
   /** VS-4 HB-37: the source-card slot takes over a card that leaves (or is about to leave) the hand - its own scheme
@@ -345,6 +348,7 @@ class UNMATCHED_API UUmHudHand : public UUserWidget {
   UPROPERTY(Transient) TArray<TObjectPtr<UUmCardWidget>> Pool;
   TArray<TObjectPtr<UUmCardWidget>> Free;
   int32 Created = 0;
+  TArray<float> PlayedFlashes;
   int32 ReducedOverride = -1;
   int32 LegacyOverride = -1;
   bool bSyncLoad = false;

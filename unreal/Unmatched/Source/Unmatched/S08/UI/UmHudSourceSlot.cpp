@@ -284,9 +284,12 @@ void UUmHudSourceSlot::ApplyModel(const FUmSlotModel& InModel) {
     bDrawn = true;
     SetVisibility(ESlateVisibility::HitTestInvisible);
     Layout();
+    if (InModel.Phase != EUmSlotPhase::Fly) FlashLanded();  // no flight (reduced motion, a join): it lands now
   } else if (bSameCard && bLive && InModel.Phase != EUmSlotPhase::Fade) {
     // the same card moves on: fly -> hold -> show
+    const bool bLanded = Drawn.Phase == EUmSlotPhase::Fly && InModel.Phase != EUmSlotPhase::Fly;
     Drawn.Phase = InModel.Phase;
+    if (bLanded) FlashLanded();
     Drawn.FlyT = InModel.FlyT;
     Drawn.HoldFrac = InModel.HoldFrac;
   }
@@ -300,6 +303,19 @@ void UUmHudSourceSlot::ApplyModel(const FUmSlotModel& InModel) {
     Drawn.HoldFrac = -1.0f;
   }
   ApplyMotion();
+}
+
+void UUmHudSourceSlot::FlashLanded() {
+  // VS-4 CP-21 (CUE-006): a played scheme lands in the slot - own (hand -> slot) and the opponent's (in the slot);
+  // a boost or a discard is not a play
+  if (!Card || Drawn.Ribbon != ES09SlotRibbon::Scheme || !Drawn.bFace) return;
+  Card->PlayPlayedFlash(Drawn.SpeedMul);
+  if (Card->GetFlashMs() > 0.0f) PlayedFlashes.Add(Card->GetFlashMs());
+}
+
+FBox2D UUmHudSourceSlot::CardRectSu() const {
+  if (!bDrawn || IsLeaving() || !Frame.CardSu.bIsValid || GetPhase() == EUmSlotPhase::Fly) return FBox2D(ForceInit);
+  return Frame.CardSu;
 }
 
 EUmSlotPhase UUmHudSourceSlot::GetPhase() const {

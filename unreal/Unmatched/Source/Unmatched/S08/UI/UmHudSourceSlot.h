@@ -66,6 +66,8 @@ struct UNMATCHED_API FUmSlotModel {
   float HoldFrac = -1.0f;
   /** The centre (canvas su) the card flies from. */
   FVector2D FlyFromSu = FVector2D::ZeroVector;
+  /** VS-4 CP-21: the UI-ACC-013 speed of the played flash (a scheme lands: CUE-006). */
+  float SpeedMul = 1.0f;
 };
 
 struct UNMATCHED_API FUmSlotFrame {
@@ -137,6 +139,11 @@ class UNMATCHED_API UUmHudSourceSlot : public UUserWidget {
   /** DrawnRectSu + the card in flight (canvas su). */
   FBox2D PaintedRectSu() const;
   FBox2D RibbonRectSu() const;
+  /** VS-4 SC-21: the card drawn at rest (canvas su) while shown and not leaving - the right click opens the inspector
+   *  on it (the widget is HitTestInvisible: the game mode tests the pointer). Invalid otherwise. */
+  FBox2D CardRectSu() const;
+  /** VS-4 CP-21: the played-card flashes started since the last call (ms each). */
+  TArray<float> TakePlayedFlashes() { return MoveTemp(PlayedFlashes); }
   int32 GetRibbonRows() const { return RibbonRows; }
   void CollectShotLines(TArray<FString>& Out) const;
   /** 'HUD-SLOT-UMG phase=<p> ...' when the drawn phase changed since the last call ('' otherwise). */
@@ -173,6 +180,8 @@ class UNMATCHED_API UUmHudSourceSlot : public UUserWidget {
   bool bCodeDefaultTree = false;
   /** The card being drawn (kept through the leave after the model has no card any more). */
   FUmSlotModel Drawn;
+  TArray<float> PlayedFlashes;
+  void FlashLanded();
   bool bDrawn = false;
   uint32 LaidRevision = 0;
   bool bLaidClassS = false;

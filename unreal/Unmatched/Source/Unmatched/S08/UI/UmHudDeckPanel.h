@@ -14,7 +14,9 @@
 //            CloseButton - the ui-close glyph 24 su in a 32 su square at the right (IC-54, «Закрыть» its tooltip,
 //            ВР-VS3-38); 8 su; Summary type.caption 14 su text.secondary «В колоде {deck} · Сброс {discard} · Рука
 //            {hand}» (20 su a line; «≈» before a stale count); the opponent: his hand as n backs 17 x 24 su, 21 su apart,
-//            4 su above and under; 4 su; FilterButton «Только сброс» (30 su; Btn_Selected while on); 8 su; the list.
+//            4 su above and under; 4 su; FilterButton «Только сброс» (30 su; Btn_Selected while on) and, right-aligned
+//            on the same row, AllButton «Весь состав» (VS-4 SC-23: the INSPECT deck grid of the side, catalogue order;
+//            only with a loaded list; created at run time when an older WBP lacks it); 8 su; the list.
 //   list     Rows (UScrollBox, pooled UUmDeckRow, 48 su each, width - 10 su): a whole number of rows (no row is cut by
 //            the viewport), a wheel notch scrolls one row; the scrollbar - a 4 su track panel.divider at the right, the
 //            thumb card.cream 0.45, radius 2 su, only when the list is longer. Rows sorted by type (attack, defense,
@@ -176,6 +178,8 @@ class UNMATCHED_API UUmHudDeckPanel : public UUserWidget {
     TFunction<void(const FS09HudPressOutcome&)> OnFilter;
     TFunction<void(const FS09HudPressOutcome&, const FString&)> OnRow;
     TFunction<void(const FS09HudPressOutcome&)> OnRetry;
+    /** VS-4 SC-23: «Весь состав» - the INSPECT deck grid of the shown side. */
+    TFunction<void(const FS09HudPressOutcome&, ES09DeckSide)> OnAll;
   };
   void SetInput(const TSharedPtr<FS09HudPressArbiter>& InArbiter, FInput InInput);
 
@@ -219,6 +223,7 @@ class UNMATCHED_API UUmHudDeckPanel : public UUserWidget {
   UPROPERTY(BlueprintReadOnly, Category = "Um HUD", meta = (BindWidgetOptional)) TObjectPtr<UUmSkeletonRows> Skeleton;
   UPROPERTY(BlueprintReadOnly, Category = "Um HUD", meta = (BindWidgetOptional)) TObjectPtr<UTextBlock> ErrorText;
   UPROPERTY(BlueprintReadOnly, Category = "Um HUD", meta = (BindWidgetOptional)) TObjectPtr<UUmButton> RetryButton;
+  UPROPERTY(BlueprintReadOnly, Category = "Um HUD", meta = (BindWidgetOptional)) TObjectPtr<UUmButton> AllButton;
 
  protected:
   virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;

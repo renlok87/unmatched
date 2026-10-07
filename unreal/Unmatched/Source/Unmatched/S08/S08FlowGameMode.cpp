@@ -5229,7 +5229,7 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
   TickResultScreen();  // DE-029: the modal opens with the gate; intro 500 ms, board crossfade 250 ms
   TickDeckPanel();     // DE-030: the deck side panel - open 80 ms, close 150 ms
   TickUmHud();         // VS-2 HB-06: the H2 layout fixes of the Slate blocks (toast / subtitle stack)
-  if (!TryCombatSkip() && !TryCardSlotSkip()) {
+  if (!UmInspectOwnsInput() && !TryCombatSkip() && !TryCardSlotSkip()) {  // VS-4 H13: the open INSPECT owns the input
     HandleClick();
     HandleHudKeys();
   }
@@ -6280,7 +6280,7 @@ void AS08FlowGameMode::RefreshHud() {
 
   // DE-026 (SD-26): while the hand is lowered for a board pick the hand-card preview is not drawn (it never covers
   // the field); the inspection itself stays and comes back with the hand
-  if (bInspecting && !(bHandPreviewHidden && InspectedSource == 0)) {
+  if (bInspecting && !(bHandPreviewHidden && InspectedSource == 0) && !UmInspectOnUmg()) {  // VS-4 H13: UMG INSPECT
     static const TCHAR* SourceLabels[4] = {TEXT("hand"), TEXT("your discard"),
                                            TEXT("opponent discard"), TEXT("deck")};  // VS-3 HB-28: 3 = a deck row
     const int32 Source = FMath::Clamp(InspectedSource, 0, 3);

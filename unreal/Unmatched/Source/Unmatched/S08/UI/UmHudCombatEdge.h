@@ -33,8 +33,8 @@
 //   leave    HB-32: after CUE-011 the edge fades its ribbon, plate and stamp in 150 ms (the card to 0.5) and the card flies
 //            200 ms to LeaveToSu (the own card to the own discard chip, the opponent's to PANEL-OPP, ВР-VS3-55), x the
 //            combat speed; reduced motion - opacity only, 100 ms.
-//   input    a right click on the card opens the inspector (the owner's OnInspect with the shown face; the opponent's
-//            back opens nothing).
+//   input    a right click on the card opens the inspector (the owner's OnInspect with the shown face; VS-4 SC-22: a back
+//            opens the hidden card - a placeholder without name or values, QA-005).
 //   rollback -S08SlateHud=combat (the Slate text panels at the edges, BuildCombatStageHud).
 // SHOT: 'SHOT widget id=UI-HUD-COMBAT-EDGE impl=umg state=back|shield|chosen|reveal|nodefense fighter=own|opp bbox=...
 //        geom=painted visible=1 twin=0 source=... role=attack|defense face=0|1 class=L|S card=<w>x<h> ribbon=<w>x<h>

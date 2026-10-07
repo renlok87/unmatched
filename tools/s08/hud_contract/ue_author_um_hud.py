@@ -50,6 +50,11 @@ their C++ bases (UUmHudAuthoringLibrary -> BuildDefaultTree of each class), in t
   /Game/S08/UI/Hud/WBP_UI_HUD_SUB      parent UmHudSubtitle parts Root, Capsule, Row, Speaker, Line (VS-4 HB-41)
   /Game/S08/UI/Hud/WBP_UI_HUD_ACTIONS  parent UmHudActions parts Row, Maneuver, Attack, Scheme, EndTurn (WBP_UmButton), Tip,
                                       TipBox, TipHead, TipCaption, TipKey, TipKeyText, TipText (VS-4 HB-43)
+  /Game/S08/UI/Screens/WBP_UI_SCR_INSPECT  parent UmScreenInspect  parts Veil, Frame, Body (UUmScreenBase) + Content, Card
+                                      (WBP_UmCard), Column (TitleText, TypeRow > TypeIcon, TypeText, ValueText, BoostText,
+                                      CopiesChip, BodyText > BodyLine, CopiesText, ArtMissingText), LangToggle, CloseButton,
+                                      BackButton (WBP_UmButton), DeckScroll > DeckGrid, Track, Thumb (VS-4 SC-21...SC-23,
+                                      CP-22; the grid cards are pooled WBP_UmCard instances made at run time)
 
 A widget tree is not reachable from Python, so the C++ library builds it (the same function the class uses without a
 WBP) and this script re-loads every asset, checks the parent class, writes the report (env UM_HUD_WBP_REPORT, default
@@ -96,6 +101,7 @@ ASSETS = {
     "/Game/S08/UI/Hud/WBP_UI_HUD_TOAST": "UmToastStack",
     "/Game/S08/UI/Hud/WBP_UI_HUD_SUB": "UmHudSubtitle",
     "/Game/S08/UI/Hud/WBP_UI_HUD_ACTIONS": "UmHudActions",
+    "/Game/S08/UI/Screens/WBP_UI_SCR_INSPECT": "UmScreenInspect",
 }
 
 

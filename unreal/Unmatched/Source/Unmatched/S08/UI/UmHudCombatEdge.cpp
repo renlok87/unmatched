@@ -298,7 +298,18 @@ bool UUmHudCombatEdge::Initialize() {
     TWeakObjectPtr<UUmHudCombatEdge> WeakThis(this);
     Card->SetOnInspect([WeakThis]() {
       UUmHudCombatEdge* Self = WeakThis.Get();
-      if (Self && Self->OnInspect && Self->Model.bFace && Self->bFaceShown) Self->OnInspect(Self->Model.Card);
+      if (!Self || !Self->OnInspect) return;
+      if (!(Self->Model.bFace && Self->bFaceShown) && Self->Side != EUmEdgeSide::Opp) return;  // the own back: nothing
+      if (Self->Model.bFace && Self->bFaceShown) {
+        Self->OnInspect(Self->Model.Card);
+        return;
+      }
+      // VS-4 SC-22 (QA-005): the back (the defense slot before the reveal, a hidden boost) opens the hidden card - a
+      // fresh placeholder, never the model's card: no name, no value leaves the edge before the reveal
+      FS09CardView Hidden;
+      Hidden.bHidden = true;
+      Hidden.CardId = TEXT("hidden");
+      Self->OnInspect(Hidden);
     });
   }
   if (Root) Root->SetVisibility(ESlateVisibility::SelfHitTestInvisible);

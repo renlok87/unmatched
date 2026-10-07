@@ -104,6 +104,8 @@
 #include "UI/UmHudBanner.h"
 #include "UI/UmHudCombatBlocks.h"
 #include "UI/UmScreenBase.h"
+#include "UI/UmScreenInspect.h"
+#include "UI/UmInspectGallery.h"
 #include "UI/UmHudDeckBlocks.h"
 #include "UI/UmHudFeedBlocks.h"
 #include "UI/UmHudHand.h"
@@ -123,6 +125,8 @@
 #include "UI/UmZoneBadges.h"
 #include "../S09/S09HudPress.h"
 #include "Brushes/SlateRoundedBoxBrush.h"
+#include "Components/Overlay.h"
+#include "Components/OverlaySlot.h"
 #include "DynamicRHI.h"
 #include "RenderTimer.h"
 #include "Dom/JsonObject.h"
@@ -253,6 +257,26 @@ struct FUmHudRuntime {
   FVector2D ZoneMouse = FVector2D(-1.0, -1.0);
   uint64 ZonePickFrame = 0;
   FIntPoint ZoneCell = FIntPoint(-1, -1);
+  // VS-4 V4 (H13) SC-21...SC-23 / CP-22: INSPECT in the root's Modals; the key of what it shows, the deck grid side, the
+  // source of the next open; CP-21: the CUE-006 show of the last flashed seq (G-CUE) and its done time (game clock)
+  TWeakObjectPtr<UUmScreenInspect> Inspect;
+  FString InspectKey;
+  bool bInspectDeck = false;
+  bool bInspectDeckOwn = true;
+  TOptional<EUmInspectSource> InspectSourceNext;
+  int32 FlashSeq = INDEX_NONE;
+  int64 FlashStartMs = -1;
+  int64 FlashDoneMs = -1;
+  // VS-4 V4 evidence (-S08InspectShots): -1 not read / 0 off / 1 on; the own turn it starts at, the next step; the HB-47
+  // skeleton frame (the deck panel opened while the lists load)
+  int32 InspectShots = -1;
+  float InspectTurnAt = -1.0f;
+  int32 InspectShotStep = 0;
+  float SkeletonOpenAt = -1.0f;
+  float SkeletonAfter = 0.8f;
+  float SkeletonFirstAt = -1.0f;
+  float SkeletonDoneAt = -1.0f;
+  bool bSkeletonShotDone = false;
 };
 
 namespace {
@@ -322,6 +346,7 @@ void AS08FlowGameMode::BuildUmHud() {
   BuildUmPending();   // VS-4 HB-35 / HB-37
   BuildUmFeed();      // VS-4 HB-39...HB-41
   BuildUmActions();   // VS-4 HB-43
+  BuildUmInspect();   // VS-4 V4 (H13): INSPECT in the root's Modals
   RefreshUmHudLayout();
 }
 
@@ -456,7 +481,7 @@ void AS08FlowGameMode::UmHudDeckPanelLayering(float DeckAlpha) {
   if (UmHud.IsValid()) {
     FUmHudRuntime& R = *UmHud;
     const UUmHudDeckPanel* Panel = R.DeckBlocks.GetPanel();
-    const float Shift = Panel && DeckAlpha > 0.0f && bInspecting ? Panel->PanelRectSu().GetSize().X + 8.0f : 0.0f;
+    const float Shift = Panel && DeckAlpha > 0.0f && bInspecting && !UmInspectOnUmg() ? Panel->PanelRectSu().GetSize().X + 8.0f : 0.0f;
     const TSharedPtr<SWidget> Side = ArtHud.SidePanel.Pin();
     if (Side.IsValid() && !FMath::IsNearlyEqual(Shift, R.SideShiftSu, 0.5f)) {
       R.SideShiftSu = Shift;
@@ -467,7 +492,7 @@ void AS08FlowGameMode::UmHudDeckPanelLayering(float DeckAlpha) {
   // ВР-VS2-71 / -72 (VS-2 exit frames): PANEL-OPP and OPP-HAND at the top right, the deck panel and the Slate side panel
   if (UmHud.IsValid() && UmHud->Panels.PanelsOnUmg()) {
     FUmHudRuntime& R = *UmHud;
-    const bool bSideOpen = bDiscardBrowserOpen || bInspecting;
+    const bool bSideOpen = bDiscardBrowserOpen || (bInspecting && !UmInspectOnUmg());  // VS-4 H13: the UMG modal
     // the gate layer (-S09Markers) keeps the side panel and its debug lines as they were
     if (const TSharedPtr<SWidget> Side = S08ArtLook::S08Markers() ? nullptr : ArtHud.SidePanel.Pin()) {
       if (!bSideOpen && Side->GetVisibility() != EVisibility::Collapsed) {
@@ -557,6 +582,7 @@ bool AS08FlowGameMode::UmExitShotsOn() {
 }
 
 void AS08FlowGameMode::NoteUmExitShotsTurn(bool bOwn, bool bInitial, bool bGameOver) {
+  NoteUmInspectShotsTurn(bOwn, bInitial, bGameOver);  // VS-4 V4 evidence (-S08InspectShots)
   if (bInitial || bGameOver || !UmExitShotsOn()) return;
   FUmHudRuntime& R = *UmHud;
   float& At = bOwn ? R.ExitOwnAt : R.ExitOppAt;
@@ -866,6 +892,8 @@ void AS08FlowGameMode::TickUmHud() {
     UmHudRoot->TickCursors(HudBusyReason().IsSet(), FPlatformTime::Seconds());
   }
   if (!UmHud.IsValid() || !UmHud->bLayout || !UmHud->Blocks.UmgRoot()) return;
+  TickUmInspect();      // VS-4 V4 (H13): INSPECT follows bInspecting / the deck grid
+  TickUmCardFlashCue();  // VS-4 CP-21: the done line of the CUE-006 show
   if (UUmHudHand* Hand = UmHud->Hand.Get()) Hand->StepAnimating();  // VS-3 (ВР-VS3-69): the card tweens of the hand
   TickUmTopStrip();  // VS-2 HB-14...HB-16
   TickUmPanels();    // VS-2 HB-18...HB-21
@@ -1001,6 +1029,12 @@ void AS08FlowGameMode::WriteUmHudShotLines() {
     Z->CollectShotLines(ZoneLines);
     for (const FString& L : ZoneLines) FS08Trace::Write(L);
   }
+  // VS-4 V4 (H13): UI-SCR-INSPECT + the CARD-ART lines of its cards (no name, no value, no text)
+  if (const UUmScreenInspect* S = R.Inspect.Get()) {
+    TArray<FString> InspectLines;
+    S->CollectShotLines(InspectLines);
+    for (const FString& L : InspectLines) FS08Trace::Write(L);
+  }
   // VS-4 HB-43: UI-HUD-ACTIONS (the cell states and reasons, no text)
   if (const UUmHudActions* A = R.Actions.Get()) {
     TArray<FString> ActionLines;
@@ -1076,7 +1110,11 @@ void AS08FlowGameMode::BuildUmPanels() {
         FS09CardView Hidden;  // 04 §2.3: the backs never open a face - the inspector says "Скрытая информация"
         Hidden.bHidden = true;
         Hidden.CardId = TEXT("hidden");
-        if (AS08FlowGameMode* Self = WeakThis.Get()) Self->InspectCard(Hidden);
+        if (AS08FlowGameMode* Self = WeakThis.Get()) {
+          Self->NoteUmInspectSource(static_cast<uint8>(EUmInspectSource::OppHand));
+          Self->InspectCard(Hidden);
+          Self->RefreshHud();
+        }
       }));
   if (!UmHud->Panels.PanelsOnUmg()) return;
   OwnPortrait = UmHud->Panels.GetLoc()->Portrait;
@@ -1176,8 +1214,10 @@ void AS08FlowGameMode::UmGalleryBegin(int32 SizePx) {
   const bool bActions = FParse::Value(Cmd, TEXT("S08IconGalleryActions="), ActionsBoard);
   FString WorldBoard;  // VS-4 HB-45 / HB-46 / FX-38 (UI/UmWorldGallery.h): -S08IconGalleryWorld=marmoreal|sarpedon
   const bool bWorld = FParse::Value(Cmd, TEXT("S08IconGalleryWorld="), WorldBoard);
+  FString InspectBoard;  // VS-4 V4 SC-21...SC-23 / CP-22 (UI/UmInspectGallery.h): -S08IconGalleryInspect=marmoreal|sarpedon
+  const bool bInspect = FParse::Value(Cmd, TEXT("S08IconGalleryInspect="), InspectBoard);
   if (!bSkins && !bButtons && !bTopStrip && !bPanels && !bCards && !bHand && !bDecks && !bCombat && !bPending && !bFeed && !bActions &&
-      !bWorld) {
+      !bWorld && !bInspect) {
     return;
   }
   if (IconGallery) IconGallery->SetVisibility(ESlateVisibility::Collapsed);  // the sheet takes the screen
@@ -1187,7 +1227,7 @@ void AS08FlowGameMode::UmGalleryBegin(int32 SizePx) {
   TWeakObjectPtr<AS08FlowGameMode> WeakThis(this);
   auto Build = [WeakThis, bSkins, bTopStrip, bPanels, PanelsPage, PageIndex, Variant, SizePx, bCards, CardsPage, bHand,
                 HandBoard, bDecks, DecksBoard, bCombat, bConfirm, CombatBoard, bPending, PendingBoard, bFeed, FeedBoard, bActions,
-                ActionsBoard, bWorld, WorldBoard]() {
+                ActionsBoard, bWorld, WorldBoard, bInspect, InspectBoard]() {
     AS08FlowGameMode* Self = WeakThis.Get();
     if (!Self || !Self->GetWorld()) return;
     FVector2D Viewport(1920.0, 1080.0);
@@ -1195,6 +1235,14 @@ void AS08FlowGameMode::UmGalleryBegin(int32 SizePx) {
     const FUmHudScaleState& Scale = UmHudScale::Current();
     const float PxPerSu = Scale.Window.X > 0 ? Scale.PxPerSu() : 1.0f;
     if (Self->UmGallery) Self->UmGallery->RemoveFromParent();
+    if (bInspect) {
+      UUmInspectGalleryWidget* Sheet = CreateWidget<UUmInspectGalleryWidget>(Self->GetWorld(), UUmInspectGalleryWidget::StaticClass());
+      if (!Sheet) return;
+      for (const FString& Line : Sheet->Build(InspectBoard, Viewport / PxPerSu, PxPerSu)) FS08Trace::Write(Line);
+      Sheet->AddToViewport(1001);
+      Self->UmGallery = Sheet;
+      return;
+    }
     if (bWorld) {
       UUmWorldGalleryWidget* Sheet = CreateWidget<UUmWorldGalleryWidget>(Self->GetWorld(), UUmWorldGalleryWidget::StaticClass());
       if (!Sheet) return;
@@ -1322,6 +1370,10 @@ void AS08FlowGameMode::UmGalleryAt(float TMs) {
   if (UUmActionsGalleryWidget* ActionsSheet = Cast<UUmActionsGalleryWidget>(UmGallery)) {
     for (const FString& Line : ActionsSheet->SetClockMs(TMs)) FS08Trace::Write(Line);
   }
+  // VS-4 V4: the INSPECT states (one per second)
+  if (UUmInspectGalleryWidget* InspectSheet = Cast<UUmInspectGalleryWidget>(UmGallery)) {
+    for (const FString& Line : InspectSheet->SetClockMs(TMs)) FS08Trace::Write(Line);
+  }
   // VS-4 HB-45 / HB-46 / FX-38: the world layer states (one per second)
   if (UUmWorldGalleryWidget* WorldSheet = Cast<UUmWorldGalleryWidget>(UmGallery)) {
     for (const FString& Line : WorldSheet->SetClockMs(TMs)) FS08Trace::Write(Line);
@@ -1390,6 +1442,7 @@ bool AS08FlowGameMode::RefreshUmHand() {
   const bool bAborted = Flow.IsValid() && Flow->GetStage() == ES08Stage::Started && Flow->IsRoomAborted();
   Model.bShow = Model.bShow && Hud.bValid && !Hud.bGameOver && !bAborted && Own != nullptr;
   R.Hand->ApplyModel(Model);
+  UmNoteCardFlashes(R.Hand->TakePlayedFlashes(), Hud.SequenceNumber);  // VS-4 CP-21: CUE-006 (G-CUE)
   return true;
 }
 
@@ -1430,7 +1483,8 @@ void AS08FlowGameMode::HandleUmHandInspect(const FString& InstanceId) {
   if (!Own) return;
   const int32 Index = Own->Cards.IndexOfByPredicate([&InstanceId](const FS09CardView& C) { return C.InstanceId == InstanceId; });
   if (Index == INDEX_NONE) return;
-  // 04 §2.6: the right button opens the inspector on the card (the Slate inspector until H13)
+  // 04 §2.6: the right button opens the inspector on the card (VS-4 H13: the UMG INSPECT)
+  NoteUmInspectSource(static_cast<uint8>(EUmInspectSource::Hand));
   InspectCard(Own->Cards[Index]);
   InspectedHandIndex = Index;
   DiscardBrowserIndex = -1;
@@ -1503,6 +1557,9 @@ void AS08FlowGameMode::BuildUmDecks() {
   };
   C.Panel.OnRow = [Answer](const FS09HudPressOutcome& O, const FString& CardId) {
     Answer(O, [CardId](AS08FlowGameMode& S) { S.HandleUmDeckRowInspect(CardId); });
+  };
+  C.Panel.OnAll = [Answer](const FS09HudPressOutcome& O, ES09DeckSide Side) {
+    Answer(O, [Side](AS08FlowGameMode& S) { S.OpenUmInspectDeck(Side == ES09DeckSide::Own); });  // VS-4 SC-23
   };
   C.Panel.OnRetry = [Answer](const FS09HudPressOutcome& O) {
     Answer(O, [](AS08FlowGameMode& S) {
@@ -1590,6 +1647,8 @@ void AS08FlowGameMode::HandleUmDeckRowInspect(const FString& CardId) {
   const FS09DeckPanelModel Model = FS09DeckPanelModel::Build(Side, *Data, List);
   const FS09DeckRow* Row = Model.Rows.FindByPredicate([&CardId](const FS09DeckRow& X) { return X.Card.CardId == CardId; });
   if (!Row) return;
+  NoteUmInspectSource(static_cast<uint8>(UmHud.IsValid() && UmHud->DeckBlocks.GetFilter() ? EUmInspectSource::Discard
+                                                                                         : EUmInspectSource::DeckRow));
   InspectCard(Row->AsCardView());
   InspectedHandIndex = -1;
   DiscardBrowserIndex = -1;
@@ -1642,10 +1701,11 @@ void AS08FlowGameMode::BuildUmCombat() {
       });
     }
   };
-  // 04 §2.7: the right button on a combat card opens the inspector (the Slate one until H13)
+  // 04 §2.7: the right button on a combat card opens the inspector (VS-4 H13: UMG INSPECT; a back - the hidden card)
   C.OnInspect = [WeakThis](const FS09CardView& Card) {
     AS08FlowGameMode* Self = WeakThis.Get();
     if (!Self) return;
+    Self->NoteUmInspectSource(static_cast<uint8>(EUmInspectSource::Combat));
     Self->InspectCard(Card);
     Self->InspectedHandIndex = -1;
     Self->DiscardBrowserIndex = -1;
@@ -1864,6 +1924,7 @@ void AS08FlowGameMode::BuildUmPending() {
       C.OnInspect = [WeakThis](const FS09CardView& Card) {
         AS08FlowGameMode* Self = WeakThis.Get();
         if (!Self || Card.bHidden) return;
+        Self->NoteUmInspectSource(static_cast<uint8>(EUmInspectSource::Pending));
         Self->InspectCard(Card);
         Self->InspectedHandIndex = -1;
         Self->DiscardBrowserIndex = -1;
@@ -2100,7 +2161,9 @@ void AS08FlowGameMode::TickUmSourceSlot() {
                                      From.Y, bHanded ? 1 : 0));
   }
   M.FlyFromSu = R.SlotFlyFrom;
+  M.SpeedMul = CombatSpeedMul();  // VS-4 CP-21: the played flash x UI-ACC-013
   W->ApplyModel(M);
+  UmNoteCardFlashes(W->TakePlayedFlashes(), C.Seq);
   const FString Line = W->TakeChangeLine();
   if (!Line.IsEmpty()) FS08Trace::Write(Line);
 }
@@ -2128,7 +2191,7 @@ void AS08FlowGameMode::BuildUmFeed() {
     });
   };
   C.OnLogInspect = [WeakThis](const FString& CardId) {
-    if (AS08FlowGameMode* Self = WeakThis.Get()) Self->HandleUmDeckRowInspect(CardId);
+    if (AS08FlowGameMode* Self = WeakThis.Get()) Self->HandleUmLogInspect(CardId);  // VS-4 H13: either deck list
   };
   ArtHud.PendingTrace.Append(UmHud->Feed.Build(*Game, UmHud->Blocks, HudPress, MoveTemp(C)));
 }
@@ -2625,4 +2688,297 @@ void AS08FlowGameMode::TickUmZoneBadges() {
     W->CollectShotLines(Lines);
     for (const FString& L : Lines) FS08Trace::Write(TEXT("HUD-ZONE ") + L.Mid(5));  // 'HUD-ZONE widget id=zone ...' on a change
   }
+}
+
+// ------------------------------------------------------------------------------------------------ VS-4 V4 (H13): INSPECT
+
+void AS08FlowGameMode::BuildUmInspect() {
+  if (!UmHud.IsValid() || !UmHudRoot || !UmHudRoot->Modals) return;
+  FUmHudRuntime& R = *UmHud;
+  if (R.Blocks.IsSlate(FName(TEXT("inspect")))) {
+    ArtHud.PendingTrace.Add(TEXT("HUD-INSPECT-UMG impl=slate reason=-S08SlateHud=inspect"));
+    return;
+  }
+  UUmScreenInspect* S = CreateWidget<UUmScreenInspect>(UmHudRoot, UUmScreenInspect::WidgetClass());
+  if (!S) {
+    ArtHud.PendingTrace.Add(TEXT("HUD-INSPECT-UMG impl=umg created=0 reason=create-failed"));
+    return;
+  }
+  if (UOverlaySlot* O = UmHudRoot->Modals->AddChildToOverlay(S)) {
+    O->SetHorizontalAlignment(HAlign_Fill);
+    O->SetVerticalAlignment(VAlign_Fill);
+  }
+  R.Inspect = S;
+  TWeakObjectPtr<AS08FlowGameMode> WeakThis(this);
+  UUmScreenInspect::FInput In;
+  In.OnClose = [WeakThis](const TCHAR* Why) {
+    AS08FlowGameMode* Self = WeakThis.Get();
+    if (!Self || !Self->UmHud.IsValid()) return;
+    // read-only: closing clears the inspect state, nothing is sent (UI-INP-006)
+    Self->bInspecting = false;
+    Self->InspectedHandIndex = -1;
+    Self->UmHud->bInspectDeck = false;
+    Self->UmHud->InspectKey.Reset();
+    FS08Trace::Write(FString::Printf(TEXT("INSPECT close why=%s"), Why));
+    Self->RefreshHud();
+  };
+  In.OnPage = [WeakThis](int32 DeckIndex) {
+    AS08FlowGameMode* Self = WeakThis.Get();
+    if (!Self) return;
+    // CRD-INSPECT-PAGE rides on a new inspected id (TickAudio); the deck model stays the grid's
+    Self->InspectedCard = FS09CardView();
+    Self->InspectedCard.InstanceId = DeckIndex >= 0 ? FString::Printf(TEXT("grid:%d"), DeckIndex) : FString(TEXT("grid"));
+    FS08Trace::Write(FString::Printf(TEXT("INSPECT page index=%d"), DeckIndex));
+  };
+  S->SetInput(HudPress, MoveTemp(In));
+  FString Missing;
+  ArtHud.PendingTrace.Add(FString::Printf(TEXT("HUD-INSPECT-UMG impl=umg created=1 source=%s parts=%d missing=%s"), *S->SourceName(),
+                                          S->HasAllParts(&Missing) ? 1 : 0, Missing.IsEmpty() ? TEXT("-") : *Missing));
+}
+
+bool AS08FlowGameMode::UmInspectOnUmg() const { return UmHud.IsValid() && UmHud->Inspect.IsValid(); }
+
+bool AS08FlowGameMode::UmInspectShown() const { return UmInspectOnUmg() && UmHud->Inspect->IsOpen(); }
+
+FUmInspectContext AS08FlowGameMode::UmInspectContextNow() const {
+  FUmInspectContext C;
+  C.Own = Hud.ViewerPanel();
+  C.Opp = Hud.OpponentPanel();
+  if (C.Own) {
+    C.OwnHero = PlayerHeroName(C.Own->PlayerId);
+    C.OwnSlug = UmDeckHeroSlug(Fighters, C.Own->PlayerId);
+  }
+  if (C.Opp) {
+    C.OppHero = PlayerHeroName(C.Opp->PlayerId);
+    C.OppSlug = UmDeckHeroSlug(Fighters, C.Opp->PlayerId);
+  }
+  C.Lists = &DeckLists;
+  return C;
+}
+
+void AS08FlowGameMode::NoteUmInspectSource(uint8 Source) {
+  if (UmHud.IsValid()) UmHud->InspectSourceNext = static_cast<EUmInspectSource>(Source);
+}
+
+void AS08FlowGameMode::OpenUmInspectDeck(bool bOwnSide) {
+  // SC-23: «Весь состав» of the deck panel - the grid of that side's deck list (catalogue order, F-05)
+  if (!UmInspectOnUmg()) return;
+  const FUmInspectModel M = UmInspect::FromDeck(bOwnSide, EUmInspectSource::DeckAll, UmInspectContextNow());
+  if (M.Mode != EUmInspectMode::Deck) {
+    FS08Trace::Write(TEXT("INSPECT deck refused why=no-list"));
+    return;
+  }
+  UmHud->bInspectDeck = true;
+  UmHud->bInspectDeckOwn = bOwnSide;
+  UmHud->InspectSourceNext = EUmInspectSource::DeckAll;
+  UmHud->InspectKey.Reset();
+  InspectedCard = FS09CardView();
+  InspectedCard.InstanceId = TEXT("grid");
+  InspectedHandIndex = -1;
+  bInspecting = true;
+  RefreshHud();
+}
+
+void AS08FlowGameMode::HandleUmLogInspect(const FString& CardId) {
+  // 04 §1.7: a log line opens its card - the catalogue card of whichever deck list has it (public, gameDeckLists)
+  for (const FS09DeckList& List : DeckLists) {
+    const FS09DeckListCard* C = List.Cards.FindByPredicate([&CardId](const FS09DeckListCard& X) { return X.CardId == CardId; });
+    if (!C) continue;
+    NoteUmInspectSource(static_cast<uint8>(EUmInspectSource::Log));
+    InspectCard(UmInspect::DeckCardView(*C));
+    InspectedHandIndex = -1;
+    DiscardBrowserIndex = -1;
+    InspectedSource = 3;
+    RefreshHud();
+    return;
+  }
+}
+
+void AS08FlowGameMode::TickUmInspect() {
+  if (!UmInspectOnUmg() || !UmHud->bLayout) return;
+  TickUmInspectShots();  // VS-4 V4 evidence (opt-in -S08InspectShots)
+  FUmHudRuntime& R = *UmHud;
+  UUmScreenInspect* S = R.Inspect.Get();
+  S->ApplyCanvas(R.Layout.CanvasSu, R.Layout.bClassS, R.Layout.PxPerSu);
+  // the live match only (the result screen takes the picture)
+  const bool bWant = bInspecting && Hud.bValid && !IsResultScreenShown();
+  if (!bWant) {
+    if (S->IsOpen()) S->Close(TEXT("owner"));
+    R.InspectKey.Reset();
+    return;
+  }
+  const FString Key = R.bInspectDeck ? FString::Printf(TEXT("deck:%d"), R.bInspectDeckOwn ? 1 : 0)
+                                     : FString::Printf(TEXT("card:%s|%s|%d"), *InspectedCard.InstanceId, *InspectedCard.CardId,
+                                                       InspectedCard.bHidden ? 1 : 0);
+  if (S->IsOpen() && Key == R.InspectKey) return;
+  const FUmInspectContext Ctx = UmInspectContextNow();
+  EUmInspectSource Source = R.InspectSourceNext.IsSet() ? R.InspectSourceNext.GetValue()
+                            : InspectedSource == 0      ? EUmInspectSource::Hand
+                            : InspectedSource == 3      ? EUmInspectSource::DeckRow
+                                                        : EUmInspectSource::Discard;
+  R.InspectSourceNext.Reset();
+  FUmInspectModel M = R.bInspectDeck ? UmInspect::FromDeck(R.bInspectDeckOwn, Source, Ctx) : UmInspect::FromCard(InspectedCard, Source, Ctx);
+  if (R.bInspectDeck && M.Mode != EUmInspectMode::Deck) {
+    bInspecting = false;
+    R.bInspectDeck = false;
+    return;
+  }
+  R.InspectKey = Key;
+  S->Open(M);
+  FS08Trace::Write(UmInspect::OpenLine(M));
+}
+
+bool AS08FlowGameMode::UmInspectOwnsInput() {
+  if (!UmInspectOnUmg() || !Flow.IsValid() || Flow->GetStage() != ES08Stage::Started) return false;
+  APlayerController* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
+  if (!PC) return false;
+  UUmScreenInspect* S = UmHud->Inspect.Get();
+  if (S->IsOpen()) {
+    // 04 §1: the input outside a modal is closed - its keys are the modal's, nothing reaches the board or a command
+    for (const FKey& K : {EKeys::Escape, EKeys::I, EKeys::Tab, EKeys::BackSpace}) {
+      if (PC->WasInputKeyJustPressed(K)) S->HandleKey(K);
+    }
+    return true;
+  }
+  if (IsResultScreenShown() || !Hud.bValid) return false;
+  // the slot card (HitTestInvisible: the field click passes through it) - a right click on it opens the inspector
+  float MX = 0.0f, MY = 0.0f;
+  const UUmHudSourceSlot* Slot = UmHud->Slot.Get();
+  if (Slot && PC->WasInputKeyJustPressed(EKeys::RightMouseButton) && PC->GetMousePosition(MX, MY)) {
+    const float Px = UmHud->Layout.PxPerSu > 0.0f ? UmHud->Layout.PxPerSu : 1.0f;
+    const FBox2D Rect = Slot->CardRectSu();
+    if (Rect.bIsValid && Rect.IsInside(FVector2D(MX / Px, MY / Px))) {
+      const FUmSlotModel& M = Slot->GetModel();
+      FS09CardView Card = M.Card;
+      if (!M.bFace) {
+        Card = FS09CardView();  // QA-005: a back in the slot opens the hidden card, nothing of its face
+        Card.bHidden = true;
+        Card.CardId = TEXT("hidden");
+      }
+      NoteUmInspectSource(static_cast<uint8>(EUmInspectSource::Slot));
+      InspectCard(Card);
+      InspectedHandIndex = -1;
+      DiscardBrowserIndex = -1;
+      RefreshHud();
+      return true;
+    }
+  }
+  // the key I: the selected card of the hand, else the hovered one (04 §1.7); nothing selected - the key does nothing
+  if (PC->WasInputKeyJustPressed(EKeys::I)) {
+    const FS09PlayerPanel* Own = Hud.ViewerPanel();
+    const UUmHudHand* Hand = UmHud->Hand.Get();
+    int32 Index = INDEX_NONE;
+    if (Hand) {
+      const TArray<FUmHandCardModel>& Cards = Hand->GetModel().Cards;
+      Index = Cards.IndexOfByPredicate([](const FUmHandCardModel& C) { return C.bSelected; });
+      if (Index == INDEX_NONE) Index = Hand->GetHoverIndex();
+    }
+    if (Own && Own->Cards.IsValidIndex(Index)) {
+      NoteUmInspectSource(static_cast<uint8>(EUmInspectSource::Key));
+      InspectCard(Own->Cards[Index]);
+      InspectedHandIndex = Index;
+      InspectedSource = 0;
+      RefreshHud();
+    } else {
+      FS08Trace::Write(TEXT("INSPECT key-i nothing-selected"));
+    }
+    return true;
+  }
+  return false;
+}
+
+void AS08FlowGameMode::UmNoteCardFlashes(const TArray<float>& Flashes, int32 Seq) {
+  // VS-4 CP-21 (G-CUE): one CUE-006 show per seq on the game clock; a new play cuts the running one (replace)
+  if (!UmHud.IsValid() || Flashes.Num() == 0) return;
+  FUmHudRuntime& R = *UmHud;
+  if (Seq == R.FlashSeq) return;
+  const int64 Now = NowMs();
+  if (R.FlashDoneMs >= 0) {
+    FS08Trace::Write(UmCardWidget::FlashDoneLine(R.FlashSeq, Now, Now - R.FlashStartMs, TEXT("replace")));
+  }
+  float Ms = 0.0f;
+  for (const float F : Flashes) Ms = FMath::Max(Ms, F);
+  R.FlashSeq = Seq;
+  R.FlashStartMs = Now;
+  R.FlashDoneMs = Now + static_cast<int64>(FMath::RoundToInt(Ms));
+  FS08Trace::Write(UmCardWidget::FlashCueLine(Seq, Now, S08IconMotion::IsReducedMotion()));
+}
+
+void AS08FlowGameMode::TickUmCardFlashCue() {
+  if (!UmHud.IsValid() || UmHud->FlashDoneMs < 0) return;
+  FUmHudRuntime& R = *UmHud;
+  const int64 Now = NowMs();
+  if (Now < R.FlashDoneMs) return;
+  FS08Trace::Write(UmCardWidget::FlashDoneLine(R.FlashSeq, Now, Now - R.FlashStartMs));
+  R.FlashDoneMs = -1;
+}
+
+void AS08FlowGameMode::NoteUmInspectShotsTurn(bool bOwn, bool bInitial, bool bGameOver) {
+  if (!UmHud.IsValid() || UmHud->InspectShots != 1 || !bOwn || bInitial || bGameOver || UmHud->InspectTurnAt >= 0.0f) return;
+  // the first non-initial own turn: the auto plan waits while the inspector shows its states
+  UmHud->InspectTurnAt = Elapsed;
+  S09SchemeQuietUntil = FMath::Max(S09SchemeQuietUntil, Elapsed + 7.5f);
+  FS08Trace::Write(FString::Printf(TEXT("INSPECTSHOT turn at=%.2f hold=7.5"), Elapsed));
+}
+
+void AS08FlowGameMode::TickUmInspectShots() {
+  // VS-4 V4 evidence (opt-in -S08InspectShots, with -S08ScreenShots and -S09ShotDir): the H13 states in a live match -
+  // the own hand card, the opponent's hidden hand, the own deck grid and a grid card, 1.4 s each from the first
+  // non-initial own turn + 1 s (TickUmScreenShots frames UI-SCR-INSPECT-own / -hidden / -deck); HB-47: while the deck
+  // lists still load (a slow reply, tools/s10/delay-graphql-query-proxy.cjs) the own deck panel opens and its skeleton
+  // is framed 0.8 s later (s09-hb47-skeleton.png)
+  FUmHudRuntime& R = *UmHud;
+  if (R.InspectShots < 0) {
+    R.InspectShots = FParse::Param(FCommandLine::Get(), TEXT("S08InspectShots")) ? 1 : 0;
+    // -S08InspectShotsSkeleton=<s>: the skeleton frame not before that long after the first live HUD frame (the board's
+    // textures stream in during the first seconds of a match); the panel open >= 0.4 s and its skeleton drawn
+    FParse::Value(FCommandLine::Get(), TEXT("S08InspectShotsSkeleton="), R.SkeletonAfter);
+    R.SkeletonAfter = FMath::Max(0.3f, R.SkeletonAfter);
+  }
+  if (R.InspectShots != 1 || !Flow.IsValid() || !Hud.bValid || IsResultScreenShown()) return;
+  if (R.SkeletonFirstAt < 0.0f) R.SkeletonFirstAt = Elapsed;
+  if (!R.bSkeletonShotDone && UmDeckPanelOnUmg()) {
+    const bool bLoading = Flow->GetDeckListsState() != FS08FlowController::EDeckListsState::Loaded;
+    if (bLoading && !DeckPanel.IsOpen()) {
+      // (again after an auto-close: the turn start closes the panel, 04 §2.9)
+      ToggleDeckPanel(ES09DeckSide::Own, TEXT("inspect-shots"));
+      R.SkeletonOpenAt = Elapsed;
+    } else if (bLoading && R.SkeletonOpenAt >= 0.0f && Elapsed - R.SkeletonOpenAt >= 0.4f && Elapsed - R.SkeletonFirstAt >= R.SkeletonAfter &&
+               R.DeckBlocks.GetPanel() && R.DeckBlocks.GetPanel()->IsSkeletonShown() && !UmInspectShown() && !S09ShotDir.IsEmpty()) {
+      FS08Trace::Write(FString::Printf(TEXT("INSPECTSHOT skeleton waited=%.2f file=s09-hb47-skeleton.png"), Elapsed - R.SkeletonOpenAt));
+      TakeEvidenceShot(S09ShotDir / TEXT("s09-hb47-skeleton.png"));
+      R.bSkeletonShotDone = true;
+      R.SkeletonDoneAt = Elapsed;
+    } else if (!bLoading) {
+      R.bSkeletonShotDone = true;  // the lists came first: no skeleton to frame
+      FS08Trace::Write(TEXT("INSPECTSHOT skeleton none (lists loaded)"));
+    }
+  }
+  if (R.InspectTurnAt < 0.0f || R.InspectShotStep > 4 || !R.bSkeletonShotDone) return;
+  // the inspector states after the skeleton frame (both own the screen)
+  const float T = Elapsed - FMath::Max(R.InspectTurnAt, R.SkeletonDoneAt);
+  if (T < 1.0f + 1.4f * R.InspectShotStep) return;
+  UUmScreenInspect* S = R.Inspect.Get();
+  const FS09PlayerPanel* Own = Hud.ViewerPanel();
+  const int32 Step = R.InspectShotStep++;
+  FS08Trace::Write(FString::Printf(TEXT("INSPECTSHOT step=%d t=%.2f"), Step, T));
+  if (Step == 0 && Own && Own->Cards.Num() > 0) {
+    NoteUmInspectSource(static_cast<uint8>(EUmInspectSource::Hand));
+    InspectCard(Own->Cards[0]);
+    InspectedHandIndex = 0;
+    InspectedSource = 0;
+  } else if (Step == 1) {
+    FS09CardView Hidden;  // the opponent's hand: the backs only
+    Hidden.bHidden = true;
+    Hidden.CardId = TEXT("hidden");
+    NoteUmInspectSource(static_cast<uint8>(EUmInspectSource::OppHand));
+    InspectCard(Hidden);
+  } else if (Step == 2) {
+    OpenUmInspectDeck(true);
+  } else if (Step == 3 && S && S->IsOpen()) {
+    S->OpenDeckCard(0);
+  } else if (Step == 4 && S) {
+    S->Close(TEXT("owner"));
+  }
+  RefreshHud();
 }
