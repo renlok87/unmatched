@@ -5,8 +5,9 @@ param(
   # VS-4 HB-48 (docs/game-design/visual/04-hud-spec.md s5.3): the rollback of the gate - the client gets -S09Markers and
   # the #FF00FF / #00FFFF marker pixel gates run as before. Without it (the default since HB-48) the three shots are
   # gated by their SHOT widget lines (tools/s09/HudShotGate.ps1): board-only - no UI-HUD block visible; maneuver draft
-  # - UI-HUD-ACTIONS state=mode=maneuver, no discard; discard - UI-HUD-HAND / UI-HUD-STATUS state=discard, no maneuver
-  # draft; the board-only control and both swapped pairs must fail.
+  # - the ACTIONS model in mode=maneuver (the backend-less probe keeps the ACTIONS row collapsed - no live match - so
+  # its model is read, visible=0|1) with the hand at rest, no discard; discard - UI-HUD-HAND / UI-HUD-STATUS
+  # state=discard and the LIMIT window, no maneuver draft; the board-only control and both swapped pairs must fail.
   [switch]$S09Markers
 )
 # Backend-less packaged HUD probe (GD-032/033 P1): hidden client renders
@@ -112,8 +113,8 @@ if (-not $S09Markers) {
   $look = Select-String -LiteralPath $Trace -Pattern 'ARTLOOK .* markers=(\d)' | Select-Object -Last 1
   if (-not $look -or $look.Matches[0].Groups[1].Value -ne '0') { throw "probe trace has no 'ARTLOOK ... markers=0' (debug layer on without -S09Markers?)" }
   $board = 's09-probe-board-only.png: deny UI-HUD-*'
-  $maneuver = 's09-probe-maneuver-draft.png: need UI-HUD-ACTIONS state=mode=maneuver; deny UI-HUD-HAND state=discard; deny UI-HUD-STATUS state=discard'
-  $discard = 's09-probe-discard-open.png: need UI-HUD-HAND state=discard; need UI-HUD-STATUS state=discard; deny UI-HUD-ACTIONS state=mode=maneuver'
+  $maneuver = 's09-probe-maneuver-draft.png: need UI-HUD-ACTIONS state=mode=maneuver visible=0|1; need UI-HUD-HAND state=rest|hover|selected; deny UI-HUD-HAND state=discard; deny UI-HUD-STATUS state=discard'
+  $discard = 's09-probe-discard-open.png: need UI-HUD-HAND state=discard; need UI-HUD-STATUS state=discard; need UI-HUD-PENDING kind=LIMIT; deny UI-HUD-ACTIONS state=mode=maneuver visible=0|1'
   foreach ($l in (Assert-HudShotGate -TracePath $Trace -Who probe -Privacy -Rules @($board, $maneuver, $discard))) { Write-Output $l }
   # negative controls: the board-only frame and both swapped pairs MUST fail
   $swap = @(

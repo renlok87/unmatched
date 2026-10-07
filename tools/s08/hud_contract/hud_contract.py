@@ -412,14 +412,16 @@ def parse_matcher(text):
 
 
 def matcher_hits(block, matcher, painted):
-    """Lines of the block that match: the id, every field, visible=1 (and geom=painted for a 'need')."""
+    """Lines of the block that match: the id, every field, visible=1 (and geom=painted for a 'need'). A matcher that
+    names 'visible' itself (e.g. visible=0|1) reads the block's model whether drawn or not - for a harness that shows
+    no live match (the backend-less probe keeps ACTIONS collapsed while its model follows the draft)."""
     want_id, fields = matcher
     hits = []
     for f in block:
         fid = f.get("id", "")
         if not (fid == want_id or (want_id.endswith("*") and fid.startswith(want_id[:-1]))):
             continue
-        if f.get("visible") != "1" or (painted and f.get("geom") != "painted"):
+        if "visible" not in fields and (f.get("visible") != "1" or (painted and f.get("geom") != "painted")):
             continue
         if all(f.get(k) in vals for k, vals in fields.items()):
             hits.append(f)

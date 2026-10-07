@@ -331,3 +331,16 @@ def test_check_shots_late_block_hb48():
     assert hc.check_shots(lines, [rule]) == ([("s09-pending-MOVE.png", [])], [])
     other = hc.parse_rule("s09-b.png: need UI-HUD-PENDING kind=MOVE")
     assert hc.check_shots(lines, [other])[0][0][1]
+
+
+def test_check_shots_model_state_hb48():
+    """VS-4 HB-48: a matcher naming 'visible' reads the block's model drawn or not (the backend-less probe keeps
+    ACTIONS collapsed); without it a hidden line never satisfies a need."""
+    lines = ["x SHOT widget id=UI-HUD-ACTIONS impl=umg state=mode=maneuver fighter=none bbox=(0,0,0,0) geom=unpainted visible=0 "
+             "twin=0 source=x", "x SHOT request file=s09-probe-maneuver-draft.png frame=1"]
+    hidden = hc.parse_rule("s09-probe-maneuver-draft.png: need UI-HUD-ACTIONS state=mode=maneuver")
+    model = hc.parse_rule("s09-probe-maneuver-draft.png: need UI-HUD-ACTIONS state=mode=maneuver visible=0|1")
+    assert hc.check_shots(lines, [hidden])[0][0][1]
+    assert hc.check_shots(lines, [model])[0][0][1] == []
+    deny = hc.parse_rule("s09-probe-maneuver-draft.png: deny UI-HUD-ACTIONS state=mode=maneuver visible=0|1")
+    assert hc.check_shots(lines, [deny])[0][0][1]

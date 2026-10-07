@@ -495,7 +495,9 @@ function Invoke-CombatDemo {
         if ($l -match 'SHOT (captured|late end) file=') { break }
         # VS-4: the source-card slot, the choice window and the inspector draw card scans too
         $m = [regex]::Match($l, 'SHOT widget id=(UI-HUD-HAND|UI-HUD-COMBAT-EDGE|UI-HUD-DECKS|UI-HUD-OPP-HAND|UI-HUD-DECKPANEL|UI-HUD-SLOT|UI-HUD-PENDING|UI-SCR-INSPECT) impl=umg .*?bbox=\((-?\d+),(-?\d+),(-?\d+),(-?\d+)\) geom=painted visible=1')
-        if ($m.Success) { $rects += ,@(([int]$m.Groups[2].Value - 2), ([int]$m.Groups[3].Value - 2), ([int]$m.Groups[4].Value + 2), ([int]$m.Groups[5].Value + 2)) }
+        # VS-4 (set H, -S08ReducedMotion / speed «Нет»): the hand snaps between rest and lowered in one tick and the
+        # captured paint can still show the row the trace already moved - a hand rect also covers 260 px above it
+        if ($m.Success) { $up = if ($m.Groups[1].Value -eq 'UI-HUD-HAND') { 260 } else { 2 }; $rects += ,@(([int]$m.Groups[2].Value - 2), ([int]$m.Groups[3].Value - $up), ([int]$m.Groups[4].Value + 2), ([int]$m.Groups[5].Value + 2)) }
         # ВР-VS3-72: a leaving combat card paints outside its edge's rect
         $p = [regex]::Match($l, 'HUD-EDGE-PAINT .*?painted=\((-?\d+),(-?\d+),(-?\d+),(-?\d+)\)')
         if ($p.Success) { $rects += ,@(([int]$p.Groups[1].Value - 2), ([int]$p.Groups[2].Value - 2), ([int]$p.Groups[3].Value + 2), ([int]$p.Groups[4].Value + 2)) }
@@ -509,9 +511,10 @@ function Invoke-CombatDemo {
         for ($k = $late + 1; $k -lt [Math]::Min($lines.Length, $late + 2000); $k++) {
           $l = $lines[$k]
           if ($l -match ('SHOT late end file=' + [regex]::Escape($Leaf))) { break }
-          if ($l -match 'HUD-PAINT-LATE .*?rects=(\S+)') {
-            foreach ($r in [regex]::Matches($Matches[1], '\((-?\d+),(-?\d+),(-?\d+),(-?\d+)\)')) {
-              $rects += ,@(([int]$r.Groups[1].Value - 64), ([int]$r.Groups[2].Value - 64), ([int]$r.Groups[3].Value + 64), ([int]$r.Groups[4].Value + 64))
+          if ($l -match 'HUD-PAINT-LATE id=(\S+) .*?rects=(\S+)') {
+            $upLate = if ($Matches[1] -eq 'UI-HUD-HAND') { 260 } else { 64 }  # VS-4 set H: the snapped hand (above)
+            foreach ($r in [regex]::Matches($Matches[2], '\((-?\d+),(-?\d+),(-?\d+),(-?\d+)\)')) {
+              $rects += ,@(([int]$r.Groups[1].Value - 64), ([int]$r.Groups[2].Value - $upLate), ([int]$r.Groups[3].Value + 64), ([int]$r.Groups[4].Value + 64))
             }
           }
         }

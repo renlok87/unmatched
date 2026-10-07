@@ -597,6 +597,15 @@ function Invoke-DuelDemo {
     $hostOutcome = $mH.Groups[1].Value
     $joinOutcome = $mJ.Groups[1].Value
     Write-Output "outcomes: host=$hostOutcome joiner=$joinOutcome"
+    if ($BoardId) {
+      # VS-4 HB-48 -BoardId: the host created the room on that board (client trace) and both clients show its profile
+      if (-not $hostText.Contains("CREATE boardId=$BoardId source=S08BoardId")) { throw "host trace has no 'CREATE boardId=$BoardId source=S08BoardId'" }
+      foreach ($t in @(@('host', $hostText), @('joiner', $joinText))) {
+        $prof = [regex]::Match($t[1], 'ARTPREVIEW board active profile=(\S+)')
+        if (-not $prof.Success) { throw "$($t[0]) trace has no 'ARTPREVIEW board active profile='" }
+        Write-Output "board: $($t[0]) profile=$($prof.Groups[1].Value) boardId=$BoardId"
+      }
+    }
     if (-not (($hostOutcome -eq 'VICTORY' -and $joinOutcome -eq 'DEFEAT') -or
               ($hostOutcome -eq 'DEFEAT' -and $joinOutcome -eq 'VICTORY'))) {
       throw "outcomes are not one VICTORY + one DEFEAT (host=$hostOutcome joiner=$joinOutcome) - the duel did not end in a decided win"
