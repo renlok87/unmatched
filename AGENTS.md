@@ -257,7 +257,7 @@ memory. A change that contradicts it needs the user's explicit word first.
   - Never hide finished art behind an opt-in review flag.
   - `-ArtPreview` gates review tooling only: shots, probes, focus zoom, input plans.
   - Rollback flags: `-S08GreyBoard`, `-S08HeroesLegacy`, `-S08DioramaLegacy`, `-S08IconLegacy` and
-    `-S08LegacyRender`.
+    `-S08LegacyRender`; `-NoConceptPaste` (Marmoreal: the 3D P5c surroundings and the T2b tray).
   - The client writes the look it used in the trace line `ARTLOOK …`.
 - **Look before you report.** Before reporting any live run, demo, package or acceptance, open the shot yourself
   (Read the PNG). Check against this section: the board is a real map, the backdrop is right for that map, and
@@ -268,7 +268,5 @@ memory. A change that contradicts it needs the user's explicit word first.
     to the camera. The old draft `wip/art012-facing-2026-10-04` is not used;
   - HUD name plates over the figures are ВР-07: no permanent name plates, the name only on hover or selection,
     harpies carry the digit 1–3.
-- **Known gap at 2026-10-04.** Since `0f2bdb9a`, Marmoreal shows the 3D P5c surroundings by default, which
-  violates the backdrop rule above. Fixing it (ENV-U16) belongs to the visual chat (`docs/game-design/visual/`),
-  which has the user's Unreal go-ahead of 2026-10-05 and works in a worktree. After the fix, 3D P5c with the T2b
-  tray is reachable only through the rollback flag `-NoConceptPaste` (ВР-56).
+- **ENV-U16 fixed (`8ea9c6c9`, EN-13).** Marmoreal shows the painted backdrop by default; the 3D P5c surroundings with
+  the T2b tray come back only with the rollback flag `-NoConceptPaste` (ВР-56).
