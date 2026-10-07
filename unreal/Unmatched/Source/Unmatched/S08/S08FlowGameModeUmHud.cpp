@@ -166,6 +166,8 @@ struct FUmHudRuntime {
   float ExitHoverAt = -1.0f;
   FString ExitHoverPath;
   bool bExitHoverDone = false;
+  float HoverTurnAt = -1.0f;  // the own turn the hover is tried in (-1 none), its delay after the turn start
+  float HoverDelay = 3.4f;
   TMap<FString, float> ExitSince;
   TSet<FString> ExitDone;
   float ExitAttackHoldAt = -1.0f;
@@ -483,6 +485,17 @@ void AS08FlowGameMode::NoteUmExitShotsTurn(bool bOwn, bool bInitial, bool bGameO
   if (bInitial || bGameOver || !UmExitShotsOn()) return;
   FUmHudRuntime& R = *UmHud;
   float& At = bOwn ? R.ExitOwnAt : R.ExitOppAt;
+  // VS-3 set A hover (ВР-VS3-73): tried at the first own turn + 3.4 s; a turn whose start still shows the last combat
+  // (or a choice) passes it on to the next own turn, which holds its auto plan 2.6 s for it
+  if (bOwn && !R.bExitHoverDone && R.ExitHoverAt < 0.0f) {
+    R.HoverTurnAt = Elapsed;
+    R.HoverDelay = At >= 0.0f ? 1.0f : 3.4f;
+    if (At >= 0.0f) {
+      S09SchemeQuietUntil = FMath::Max(S09SchemeQuietUntil, Elapsed + 2.6f);
+      FS08Trace::Write(FString::Printf(TEXT("EXITSHOT hover turn seq=%d at=%.2f hold=2.6"),
+                                       Flow.IsValid() ? Flow->GetAppliedSnapshot().SequenceNumber : -1, Elapsed));
+    }
+  }
   if (At >= 0.0f) return;  // only the first turn of each side
   At = Elapsed;
   // the own turn stays at rest past its + 3 s frame and the VS-3 hover frame (+ 3.4 s hover, + 3.9 s frame); the other
@@ -544,17 +557,23 @@ void AS08FlowGameMode::TickUmExitShotsVs3() {
       UmExitEdgeState(EOpp),
       Center && UmGameHudSlots::ShownByProperty(Center) ? UmHudCombatCenter::StateName(Center->GetModel().State) : TEXT("-"),
       Hud.bViewerTurn ? TEXT("own") : TEXT("opp"), Hud.SequenceNumber);
-  // ---- set A: the hover of the own exit turn (+ 3.4 s the middle card of the resting row, its frame + 0.5 s) ----
-  if (!R.bExitHoverDone && R.ExitOwnAt >= 0.0f && Hand) {
+  // ---- set A: the hover (ВР-VS3-73): an own turn + 3.4 s (the first) / + 1.0 s (a later one), the middle card of the
+  // resting row with no combat on screen, its frame + 0.5 s ----
+  const bool bEdgesShown = (EOwn && EOwn->GetModel().bShow) || (EOpp && EOpp->GetModel().bShow);
+  if (!R.bExitHoverDone && R.HoverTurnAt >= 0.0f && Hand) {
     if (R.ExitHoverAt < 0.0f) {
-      if (Elapsed >= R.ExitOwnAt + 3.4f) {
+      if (Elapsed >= R.HoverTurnAt + R.HoverDelay) {
         TArray<int32> Rows;
         for (int32 I = 0; I < Hand->GetModel().Cards.Num(); ++I) {
           if (Hand->RestRectSu(I).bIsValid) Rows.Add(I);
         }
-        if (Rows.Num() == 0 || HandState != TEXT("rest")) {
-          R.bExitHoverDone = true;
-          FS08Trace::Write(FString::Printf(TEXT("EXITSHOT hover skipped %s"), *States));
+        const bool bReady = Rows.Num() > 0 && HandState == TEXT("rest") && !bEdgesShown && Hud.bViewerTurn;
+        if (!bReady) {
+          // wait up to 1 s in this turn, then leave it to the next own turn
+          if (Elapsed >= R.HoverTurnAt + R.HoverDelay + 1.0f) {
+            R.HoverTurnAt = -1.0f;
+            FS08Trace::Write(FString::Printf(TEXT("EXITSHOT hover postponed %s"), *States));
+          }
         } else {
           // the pointer's path: a point in the middle card's strip of the resting row (HoverAtSu, 04 §2.6)
           const int32 Pick = Rows[Rows.Num() / 2];
@@ -586,7 +605,7 @@ void AS08FlowGameMode::TickUmExitShotsVs3() {
   const bool bReveal = (Is(EOwn, EUmEdgeState::Reveal) || Is(EOpp, EUmEdgeState::Reveal)) && !Open(EOwn) && !Open(EOpp);
   const bool bWait = Center && UmGameHudSlots::ShownByProperty(Center) && Center->GetModel().State == EUmCenterState::Wait;
   // the hand frames of set A show the turn, not a combat (ВР-VS3-70): no edge on screen for 3 and 7
-  const bool bCombatShown = (EOwn && EOwn->GetModel().bShow) || (EOpp && EOpp->GetModel().bShow);
+  const bool bCombatShown = bEdgesShown;
   struct FCond {
     const TCHAR* Leaf;
     bool bNow;
