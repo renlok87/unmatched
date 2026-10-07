@@ -98,3 +98,13 @@ CP-15…CP-20; 04 §2.6–§2.9, §1.7, §4.1–§4.3; 02 §6.1–§6.3. Зде�
   - Максимум scale при 1080p 100 %: рука 0,568, наведение 0,756, бой 0,888 (EN-бой 0,888, RU-бой 0,774) — ≤ 1,0.
   - Везде ≤ 1,6. `capped=1` только при 150 % и 1440p 150 % (12 строк инспектора).
   - Сводка — `C:/tmp/visual/VS3-U1/card-art-summary.json`.
+
+## Кадры выхода VS-3 (2026-10-07, упаковка `c9dac400`)
+
+Живая партия двух клиентов `run-combat-demo -PlayerView -S08ExitShots` без `-S09Markers`, по 30 FPS у клиента, на приёмочной упаковке шага (`BuildStamp` `c9dac400`, `sourceHash` `0eaad2a3…`). Доски — Marmoreal original (с `-ConceptPaste` до EN-13, пометка) и Sarpedon original (lit3d), шесть фигур v2 (`v2=6`), слоя отладки нет (`ARTLOOK markers=0`). Сводка шага, гейты и открытые пункты — [VS-3](../VS-3/README.md).
+
+Листы `tools/art/visual/sheet.py` (цвет / серый Rec.709 / дейтеранопия): `sheet-NN-*.png` — вне git, `scraped-data/derived/visual-evidence/CP-15/exit-vs3/` в worktree `C:/tmp/wt-visual` (индекс с sha256 — `scraped-data/derived/visual-evidence/VS3-exit-index.json`): на них сканы, рубашки и аватары нашего клиента (ВР-48, ВР-CP12, 02 §12; ревью VS-3, ВР-VS3-R01). В этой папке — `sheet-manifest.json` с sha256 каждого листа; в git из кадров выхода — только контактные листы [VS-3/contact](../VS-3/contact/).
+
+Открыто: показы руки L (1080p, scale 0,495) и S (класс S), карта боя 230×319 / 150×208, мини панели колоды, рубашки OPP-HAND; наибольший scale по трассам `HUD-HAND`: рука 1080p 0,742 (наведение), класс S 1,098, бой 0,58 — ≤ 1,6, при 1080p 100 % ≤ 1,0.
+
+**Вердикт: художественно принято, по делегированию (2026-10-07).**

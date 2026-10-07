@@ -37,3 +37,13 @@ VS-3, шаг U4, 2026-10-07, ветка `feat/visual-vs3` (worktree `C:/tmp/wt-v
 
 - Живые кадры окна защиты при > 10 с и ≤ 10 с (набор C, обе доски) и трасса `HUD-TIMER` живого клиента — шаг «Кадры».
 - `-S08SlateHud=combat` — прежняя Slate-строка; отдельного отката одного таймера нет (не требуется карточкой).
+
+## Кадры выхода VS-3 (2026-10-07, упаковка `c9dac400`)
+
+Живая партия двух клиентов `run-combat-demo -PlayerView -S08ExitShots` без `-S09Markers`, по 30 FPS у клиента, на приёмочной упаковке шага (`BuildStamp` `c9dac400`, `sourceHash` `0eaad2a3…`). Доски — Marmoreal original (с `-ConceptPaste` до EN-13, пометка) и Sarpedon original (lit3d), шесть фигур v2 (`v2=6`), слоя отладки нет (`ARTLOOK markers=0`). Сводка шага, гейты и открытые пункты — [VS-3](../VS-3/README.md).
+
+Листы `tools/art/visual/sheet.py` (цвет / серый Rec.709 / дейтеранопия): `sheet-NN-*.png` — вне git, `scraped-data/derived/visual-evidence/HB-31/exit-vs3/` в worktree `C:/tmp/wt-visual` (индекс с sha256 — `scraped-data/derived/visual-evidence/VS3-exit-index.json`): на них сканы, рубашки и аватары нашего клиента (ВР-48, ВР-CP12, 02 §12; ревью VS-3, ВР-VS3-R01). В этой папке — `sheet-manifest.json` с sha256 каждого листа; в git из кадров выхода — только контактные листы [VS-3/contact](../VS-3/contact/).
+
+Открыто: «29 с» с полной полосой и «10 с» с оранжевой кромкой `state.warning` и треугольником (прогоны `hoard`, защита ждёт дедлайна) на обеих досках, 1080p 100 / 150 %, 720p 100 / 150 %; в сером кромка светлее ленты, знак — форма.
+
+**Вердикт: художественно принято, по делегированию (2026-10-07).**

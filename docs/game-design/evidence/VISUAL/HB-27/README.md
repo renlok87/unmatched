@@ -53,3 +53,13 @@ VS-3, шаг U3, 2026-10-07, ветка `feat/visual-vs3` (worktree `C:/tmp/wt-v
 
 - Кадр набора E со stale в живой партии через `drop-graphql-reply-proxy.cjs` — шаг «Кадры».
 - Полёт карт боя к фишке сброса — HB-32 (H9); центр фишки уже в раскладке.
+
+## Кадры выхода VS-3 (2026-10-07, упаковка `c9dac400`)
+
+Живая партия двух клиентов `run-combat-demo -PlayerView -S08ExitShots` без `-S09Markers`, по 30 FPS у клиента, на приёмочной упаковке шага (`BuildStamp` `c9dac400`, `sourceHash` `0eaad2a3…`). Доски — Marmoreal original (с `-ConceptPaste` до EN-13, пометка) и Sarpedon original (lit3d), шесть фигур v2 (`v2=6`), слоя отладки нет (`ARTLOOK markers=0`). Сводка шага, гейты и открытые пункты — [VS-3](../VS-3/README.md).
+
+Листы `tools/art/visual/sheet.py` (цвет / серый Rec.709 / дейтеранопия): `sheet-NN-*.png` — вне git, `scraped-data/derived/visual-evidence/HB-27/exit-vs3/` в worktree `C:/tmp/wt-visual` (индекс с sha256 — `scraped-data/derived/visual-evidence/VS3-exit-index.json`): на них сканы, рубашки и аватары нашего клиента (ВР-48, ВР-CP12, 02 §12; ревью VS-3, ВР-VS3-R01). В этой папке — `sheet-manifest.json` с sha256 каждого листа; в git из кадров выхода — только контактные листы [VS-3/contact](../VS-3/contact/).
+
+Открыто: фишки «Колода n» / «Сброс n» при 1080p 100 % и 75 %, 720p 100 %, класс S (1080p 150 %, 720p 150 %: «≈25», «0» со значком resource-card); «≈» у устаревшего числа есть на живых кадрах (трасса `stale` 635 строк). Мини-карта сброса — верхняя карта.
+
+**Вердикт: художественно принято, по делегированию (2026-10-07).**

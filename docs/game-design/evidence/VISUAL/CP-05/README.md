@@ -41,3 +41,13 @@ OPP-HAND рисует ту же текстуру с VS-2 (HB-21).
 - В сером рубашки King Arthur и Medusa различимы по рисунку: корона и меч на чёрном против змей в круге.
 - Перекраски нет. Рамка — `card.frame.mini` у мини, `card.frame.idle` у остальных.
 - Трасса: `key=back:king-arthur lang=back`, scale от 0,037 (32×45) до 0,596 (инспектор).
+
+## Кадры выхода VS-3 (2026-10-07, упаковка `c9dac400`)
+
+Живая партия двух клиентов `run-combat-demo -PlayerView -S08ExitShots` без `-S09Markers`, по 30 FPS у клиента, на приёмочной упаковке шага (`BuildStamp` `c9dac400`, `sourceHash` `0eaad2a3…`). Доски — Marmoreal original (с `-ConceptPaste` до EN-13, пометка) и Sarpedon original (lit3d), шесть фигур v2 (`v2=6`), слоя отладки нет (`ARTLOOK markers=0`). Сводка шага, гейты и открытые пункты — [VS-3](../VS-3/README.md).
+
+Листы `tools/art/visual/sheet.py` (цвет / серый Rec.709 / дейтеранопия): `sheet-NN-*.png` — вне git, `scraped-data/derived/visual-evidence/CP-05/exit-vs3/` в worktree `C:/tmp/wt-visual` (индекс с sha256 — `scraped-data/derived/visual-evidence/VS3-exit-index.json`): на них сканы, рубашки и аватары нашего клиента (ВР-48, ВР-CP12, 02 §12; ревью VS-3, ВР-VS3-R01). В этой папке — `sheet-manifest.json` с sha256 каждого листа; в git из кадров выхода — только контактные листы [VS-3/contact](../VS-3/contact/).
+
+Открыто: рубашки King Arthur в OPP-HAND (48×67) и на краю боя 230×319 (закрытая карта атаки у защитника).
+
+Статус по правилу карточки — «технически импортировано»; кадры подтверждают.

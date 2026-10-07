@@ -49,3 +49,13 @@ VS-3, шаг U1, 2026-10-07, ветка `feat/visual-vs3`. Карточка — 
 - Подписи ячеек: слаг и «×копий» — 30 копий.
 - Трассы: 32 строки `CARD-ART lang=ru|en` на страницу, scale рука 0,495 (RU) / 0,568 (EN), наведение 0,756 / 0,868 —
   все ≤ 1,0 при 1080p 100 %; ошибок `check_card_art_line` — 0.
+
+## Кадры выхода VS-3 (2026-10-07, упаковка `c9dac400`)
+
+Живая партия двух клиентов `run-combat-demo -PlayerView -S08ExitShots` без `-S09Markers`, по 30 FPS у клиента, на приёмочной упаковке шага (`BuildStamp` `c9dac400`, `sourceHash` `0eaad2a3…`). Доски — Marmoreal original (с `-ConceptPaste` до EN-13, пометка) и Sarpedon original (lit3d), шесть фигур v2 (`v2=6`), слоя отладки нет (`ARTLOOK markers=0`). Сводка шага, гейты и открытые пункты — [VS-3](../VS-3/README.md).
+
+Листы `tools/art/visual/sheet.py` (цвет / серый Rec.709 / дейтеранопия): `sheet-NN-*.png` — вне git, `scraped-data/derived/visual-evidence/CP-03/exit-vs3/` в worktree `C:/tmp/wt-visual` (индекс с sha256 — `scraped-data/derived/visual-evidence/VS3-exit-index.json`): на них сканы, рубашки и аватары нашего клиента (ВР-48, ВР-CP12, 02 §12; ревью VS-3, ВР-VS3-R01). В этой папке — `sheet-manifest.json` с sha256 каждого листа; в git из кадров выхода — только контактные листы [VS-3/contact](../VS-3/contact/).
+
+Открыто: рука King Arthur — сканы RU (`lang=ru` у каждой карты руки в `HUD-HAND`), 150×208 su при 1080p (scale 0,495), обе доски.
+
+Статус по правилу карточки — «технически импортировано»; кадры подтверждают.

@@ -128,3 +128,13 @@ effects-long, nodefense Marmoreal 1080p 100 %, timer-warning 1080p 150 %, effect
 - «−N» над целью — мировой слой (HB-44 / HB-46, VS-4); в живой игре — нынешнее число урона W5b-R.
 - Ключ `hud.log.turn` (HB-38) — `hud_strings_build.py check` падает на нём до VS-4; строки этого шага собраны тем же
   `build` без этой проверки (ВР-VS3-67, SC-01).
+
+## Кадры выхода VS-3 (2026-10-07, упаковка `c9dac400`)
+
+Живая партия двух клиентов `run-combat-demo -PlayerView -S08ExitShots` без `-S09Markers`, по 30 FPS у клиента, на приёмочной упаковке шага (`BuildStamp` `c9dac400`, `sourceHash` `0eaad2a3…`). Доски — Marmoreal original (с `-ConceptPaste` до EN-13, пометка) и Sarpedon original (lit3d), шесть фигур v2 (`v2=6`), слоя отладки нет (`ARTLOOK markers=0`). Сводка шага, гейты и открытые пункты — [VS-3](../VS-3/README.md).
+
+Листы `tools/art/visual/sheet.py` (цвет / серый Rec.709 / дейтеранопия): `sheet-NN-*.png` — вне git, `scraped-data/derived/visual-evidence/HB-30/exit-vs3/` в worktree `C:/tmp/wt-visual` (индекс с sha256 — `scraped-data/derived/visual-evidence/VS3-exit-index.json`): на них сканы, рубашки и аватары нашего клиента (ВР-48, ВР-CP12, 02 §12; ревью VS-3, ВР-VS3-R01). В этой папке — `sheet-manifest.json` с sha256 каждого листа; в git из кадров выхода — только контактные листы [VS-3/contact](../VS-3/contact/).
+
+Открыто: окно защиты у защитника (слот «Карта не выбрана» со щитом, лента «ЗАЩИТА · …», таймер, «ЗАЩИТИТЬСЯ» серая до выбора, «БЕЗ ЗАЩИТЫ»), у атакующего — своя карта лицом, «Ждём защиту…», раскрытие обоих лиц, штамп X «нет защиты» — обе доски, 1080p 100 / 150 / 75 %, 720p 100 / 150 %. Трассы: `back`, `shield`, `chosen`, `reveal`, `nodefense` на обеих сторонах; приватность — 0 ошибок `check-trace`, в кадрах до раскрытия 0 пикселей раскрытия.
+
+**Вердикт: художественно принято, по делегированию (2026-10-07)**, с замечанием: в классе S (1080p 150 %) Slate-блок окна разрешения («COMBAT RESOLVE WINDOW … BOOST_CHOICE») закрывает верх своей карты боя (VS-4, открыто п. 3 VS-3).

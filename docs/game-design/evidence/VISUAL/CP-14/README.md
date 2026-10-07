@@ -62,3 +62,9 @@ VS-3, шаг U1, 2026-10-07, ветка `feat/visual-vs3`. Карточка — 
   x2 рисуется 1 : 1 или крупнее.
   - Кадры до и после: `C:/tmp/visual/VS3-U1/cmp-150-x2-vs-x1.png`; листы `frames-p12-1080-150` сняты уже после правки.
   - Проверено: тест `Card.Material`, `UUmHudTheme::CardFrameX2MinPxPerSu = 2.0`.
+
+## Кадры выхода VS-3 (2026-10-07, упаковка `c9dac400`)
+
+Живая партия двух клиентов `run-combat-demo -PlayerView -S08ExitShots` без `-S09Markers`, по 30 FPS у клиента, на приёмочной упаковке шага (`BuildStamp` `c9dac400`, `sourceHash` `0eaad2a3…`). Доски — Marmoreal original (с `-ConceptPaste` до EN-13, пометка) и Sarpedon original (lit3d), шесть фигур v2 (`v2=6`), слоя отладки нет (`ARTLOOK markers=0`). Сводка шага, гейты и открытые пункты — [VS-3](../VS-3/README.md).
+
+Отдельного листа нет: рамки CP-13 / CP-14 на живых кадрах — в листах HB-24, CP-15…CP-20 (рука, бой, наведение, кандидаты сброса).

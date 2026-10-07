@@ -1,0 +1,194 @@
+{
+ "method": "-S08HudPerf: UMG HUD root collapsed / shown in 90-frame blocks (hidden first, 6 frames skipped after a switch), pair = a hidden block and the shown block after it; GT = GGameThreadTime, GPU = RHIGetGPUFrameCycles; two clients at 30 FPS each (t.MaxFPS 30), 1080p 100 %, -RenderOffScreen, the hoard match (hands up to 9 scans, both combats)",
+ "budget": {
+  "gtP95": 0.5,
+  "gpu": 0.3
+ },
+ "runs": [
+  {
+   "run": "perf-marm-1080-100/combat-20261007-084242",
+   "client": "host",
+   "pairs": 14,
+   "dGtP95Med": -3.555,
+   "dGtP50Med": 0.318,
+   "dGpuP95Med": -0.075
+  },
+  {
+   "run": "perf-marm-1080-100/combat-20261007-084242",
+   "client": "joiner",
+   "pairs": 14,
+   "dGtP95Med": 0.227,
+   "dGtP50Med": 0.269,
+   "dGpuP95Med": 0.065
+  },
+  {
+   "run": "perf-marm-1080-100/combat-20261007-090022",
+   "client": "host",
+   "pairs": 14,
+   "dGtP95Med": 0.169,
+   "dGtP50Med": 0.307,
+   "dGpuP95Med": 0.595
+  },
+  {
+   "run": "perf-marm-1080-100/combat-20261007-090022",
+   "client": "joiner",
+   "pairs": 13,
+   "dGtP95Med": 0.36,
+   "dGtP50Med": 0.327,
+   "dGpuP95Med": 0.656
+  },
+  {
+   "run": "perf-marm-1080-100/combat-20261007-090514",
+   "client": "host",
+   "pairs": 14,
+   "dGtP95Med": 0.243,
+   "dGtP50Med": 0.308,
+   "dGpuP95Med": -0.218
+  },
+  {
+   "run": "perf-marm-1080-100/combat-20261007-090514",
+   "client": "joiner",
+   "pairs": 14,
+   "dGtP95Med": 0.434,
+   "dGtP50Med": 0.352,
+   "dGpuP95Med": -0.104
+  },
+  {
+   "run": "perf-marm-1080-100/combat-20261007-091007",
+   "client": "host",
+   "pairs": 14,
+   "dGtP95Med": 3.292,
+   "dGtP50Med": 0.269,
+   "dGpuP95Med": 0.253
+  },
+  {
+   "run": "perf-marm-1080-100/combat-20261007-091007",
+   "client": "joiner",
+   "pairs": 13,
+   "dGtP95Med": 0.569,
+   "dGtP50Med": 0.295,
+   "dGpuP95Med": 0.038
+  },
+  {
+   "run": "perf-sarp-1080-100/combat-20261007-084505",
+   "client": "host",
+   "pairs": 13,
+   "dGtP95Med": 0.502,
+   "dGtP50Med": 0.332,
+   "dGpuP95Med": -0.014
+  },
+  {
+   "run": "perf-sarp-1080-100/combat-20261007-084505",
+   "client": "joiner",
+   "pairs": 13,
+   "dGtP95Med": 0.319,
+   "dGtP50Med": 0.261,
+   "dGpuP95Med": 0.008
+  },
+  {
+   "run": "perf-sarp-1080-100/combat-20261007-090240",
+   "client": "host",
+   "pairs": 16,
+   "dGtP95Med": 0.398,
+   "dGtP50Med": 0.303,
+   "dGpuP95Med": 0.161
+  },
+  {
+   "run": "perf-sarp-1080-100/combat-20261007-090240",
+   "client": "joiner",
+   "pairs": 15,
+   "dGtP95Med": -0.805,
+   "dGtP50Med": 0.294,
+   "dGpuP95Med": -0.744
+  },
+  {
+   "run": "perf-sarp-1080-100/combat-20261007-090738",
+   "client": "host",
+   "pairs": 15,
+   "dGtP95Med": 0.599,
+   "dGtP50Med": 0.335,
+   "dGpuP95Med": 0.237
+  },
+  {
+   "run": "perf-sarp-1080-100/combat-20261007-090738",
+   "client": "joiner",
+   "pairs": 15,
+   "dGtP95Med": -0.741,
+   "dGtP50Med": 0.35,
+   "dGpuP95Med": 0.126
+  },
+  {
+   "run": "perf-sarp-1080-100/combat-20261007-091228",
+   "client": "host",
+   "pairs": 14,
+   "dGtP95Med": -1.519,
+   "dGtP50Med": 0.342,
+   "dGpuP95Med": 1.335
+  },
+  {
+   "run": "perf-sarp-1080-100/combat-20261007-091228",
+   "client": "joiner",
+   "pairs": 13,
+   "dGtP95Med": 0.359,
+   "dGtP50Med": 0.262,
+   "dGpuP95Med": -1.558
+  }
+ ],
+ "aggregate": {
+  "all": {
+   "dGtP95": {
+    "median": 0.335,
+    "p10": -9.386,
+    "p90": 12.545
+   },
+   "dGtP50": {
+    "median": 0.309,
+    "p10": 0.193,
+    "p90": 0.519
+   },
+   "dGpuP95": {
+    "median": 0.062,
+    "p10": -1.046,
+    "p90": 1.247
+   },
+   "dGpuP50": {
+    "median": -0.014,
+    "p10": -1.339,
+    "p90": 0.86
+   },
+   "pairs": 224,
+   "hiddenGtP50Med": 1.322,
+   "shownGtP50Med": 1.639,
+   "hiddenGpuP50Med": 2.804,
+   "shownGpuP50Med": 2.736
+  },
+  "calm": {
+   "dGtP95": {
+    "median": 0.375,
+    "p10": 0.037,
+    "p90": 0.838
+   },
+   "dGtP50": {
+    "median": 0.313,
+    "p10": 0.243,
+    "p90": 0.4
+   },
+   "dGpuP95": {
+    "median": 0.062,
+    "p10": -0.529,
+    "p90": 1.411
+   },
+   "dGpuP50": {
+    "median": 0.0,
+    "p10": -1.311,
+    "p90": 1.134
+   },
+   "pairs": 61,
+   "hiddenGtP50Med": 1.247,
+   "shownGtP50Med": 1.574,
+   "hiddenGpuP50Med": 2.711,
+   "shownGpuP50Med": 2.737
+  },
+  "calmRule": "both blocks of the pair have GT p95 < 6 ms (no network / evidence-frame / staging hitch in either)"
+ }
+}

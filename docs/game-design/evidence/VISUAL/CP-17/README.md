@@ -47,3 +47,13 @@ VS-3, шаг U1, 2026-10-07, ветка `feat/visual-vs3`. Карточка — 
 - В галерее наведённая карта ложится под соседнюю справа: порядок над соседями задаёт владелец HAND (CP-17 `do`).
   Это отметка для HB-24, не дефект виджета.
 - Reduced: масштаб сразу, без твина.
+
+## Кадры выхода VS-3 (2026-10-07, упаковка `c9dac400`)
+
+Живая партия двух клиентов `run-combat-demo -PlayerView -S08ExitShots` без `-S09Markers`, по 30 FPS у клиента, на приёмочной упаковке шага (`BuildStamp` `c9dac400`, `sourceHash` `0eaad2a3…`). Доски — Marmoreal original (с `-ConceptPaste` до EN-13, пометка) и Sarpedon original (lit3d), шесть фигур v2 (`v2=6`), слоя отладки нет (`ARTLOOK markers=0`). Сводка шага, гейты и открытые пункты — [VS-3](../VS-3/README.md).
+
+Листы `tools/art/visual/sheet.py` (цвет / серый Rec.709 / дейтеранопия): `sheet-NN-*.png` — вне git, `scraped-data/derived/visual-evidence/CP-17/exit-vs3/` в worktree `C:/tmp/wt-visual` (индекс с sha256 — `scraped-data/derived/visual-evidence/VS3-exit-index.json`): на них сканы, рубашки и аватары нашего клиента (ВР-48, ВР-CP12, 02 §12; ревью VS-3, ВР-VS3-R01). В этой папке — `sheet-manifest.json` с sha256 каждого листа; в git из кадров выхода — только контактные листы [VS-3/contact](../VS-3/contact/).
+
+Открыто: наведение 1,5 (225×312 su, низ 24 su над краем), выбранная карта атаки (подъём, кромка state.pending), обе доски, все холсты.
+
+**Вердикт: художественно принято, по делегированию (2026-10-07).**

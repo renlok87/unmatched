@@ -40,3 +40,9 @@ VS-3, шаг U3, 2026-10-07, ветка `feat/visual-vs3` (worktree `C:/tmp/wt-v
 
 - Полоса прогресса в BOOT / загрузке и скелет LOBBY — экраны VS-7.
 - Кадр скелета в партии при задержанном `gameDeckLists` (прокси) — шаг «Кадры».
+
+## Кадры выхода VS-3 (2026-10-07, упаковка `c9dac400`)
+
+Живая партия двух клиентов `run-combat-demo -PlayerView -S08ExitShots` без `-S09Markers`, по 30 FPS у клиента, на приёмочной упаковке шага (`BuildStamp` `c9dac400`, `sourceHash` `0eaad2a3…`). Доски — Marmoreal original (с `-ConceptPaste` до EN-13, пометка) и Sarpedon original (lit3d), шесть фигур v2 (`v2=6`), слоя отладки нет (`ARTLOOK markers=0`). Сводка шага, гейты и открытые пункты — [VS-3](../VS-3/README.md).
+
+Кадра скелета в партии нет: список `gameDeckLists` в живых прогонах приходит раньше 300 мс; прогон с задержкой через `drop-graphql-reply-proxy.cjs` не делался (открыто п. 5 VS-3). Трасса `HUD-LOADER` и тесты `Loader.*` — U3.

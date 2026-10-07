@@ -489,8 +489,9 @@ function Invoke-CombatDemo {
         $p = [regex]::Match($l, 'HUD-EDGE-PAINT .*?painted=\((-?\d+),(-?\d+),(-?\d+),(-?\d+)\)')
         if ($p.Success) { $rects += ,@(([int]$p.Groups[1].Value - 2), ([int]$p.Groups[2].Value - 2), ([int]$p.Groups[3].Value + 2), ([int]$p.Groups[4].Value + 2)) }
       }
-      # ВР-VS3-72: the late block of the same file (written in the captured frame) - the hand's row and each card as
-      # painted (hover, raise, draw / leave flights) and the combat edges, one rect each
+      # ВР-VS3-72: the late block of the same file - the hand's row and each card as painted (hover, raise, draw / leave
+      # flights) and the combat edges, one rect each. It is written one tick after the captured frame: a card in flight
+      # has moved on by up to ~60 px (a 350-500 ms flight, ease-out), so the late rects are widened by 64 px.
       $late = -1
       for ($k = $at + 1; $k -lt [Math]::Min($lines.Length, $at + 4000); $k++) { if ($lines[$k] -match ('SHOT late begin file=' + [regex]::Escape($Leaf) + ' ')) { $late = $k; break } }
       if ($late -ge 0) {
@@ -499,7 +500,7 @@ function Invoke-CombatDemo {
           if ($l -match ('SHOT late end file=' + [regex]::Escape($Leaf))) { break }
           if ($l -match 'HUD-PAINT-LATE .*?rects=(\S+)') {
             foreach ($r in [regex]::Matches($Matches[1], '\((-?\d+),(-?\d+),(-?\d+),(-?\d+)\)')) {
-              $rects += ,@(([int]$r.Groups[1].Value - 2), ([int]$r.Groups[2].Value - 2), ([int]$r.Groups[3].Value + 2), ([int]$r.Groups[4].Value + 2))
+              $rects += ,@(([int]$r.Groups[1].Value - 64), ([int]$r.Groups[2].Value - 64), ([int]$r.Groups[3].Value + 64), ([int]$r.Groups[4].Value + 64))
             }
           }
         }
