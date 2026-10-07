@@ -74,6 +74,34 @@ class RegistrationFile(unittest.TestCase):
             e = B.colour_registration(key, spec)  # raises on a crop / plate mismatch
             self.assertEqual(Path(e["plate"]).name, Path(spec["plates"]["colour"]["file"]).name)
 
+    def test_derived_plate_uses_the_concept_registration(self):
+        """VS-5 EN-07: Marmoreal's x2 plate keeps the concept framing pixel-placed at conceptRectPx -> the 'concept'
+        homography unchanged (registration.json not changed), the plate's own sha256, crop = conceptRectPx."""
+        spec = B.load_spec("marmoreal")
+        reg = B.load_registration()
+        e = B.colour_registration("marmoreal", spec, reg)
+        col = spec["plates"]["colour"]
+        self.assertEqual(e["H"], reg["maps"]["marmoreal"]["concept"]["H"])
+        self.assertEqual(e["derivedFrom"], "marmoreal-v1.png")
+        self.assertEqual(e["sha256"], col["sha256"])
+        x0, y0, w, h = col["conceptRectPx"]
+        self.assertEqual(e["crop"], [x0, y0, x0 + w, y0 + h])
+        self.assertEqual([x0, y0, w, h], [668, 376, 3344, 1882])  # EN-02 (+334, +188) x2 (EN-03)
+        bad = json.loads(json.dumps(spec))
+        bad["plates"]["colour"]["registration"] = "clean"
+        with self.assertRaises(RuntimeError):
+            B.colour_registration("marmoreal", bad, reg)
+        bad["plates"]["colour"]["registration"] = "concept"
+        del bad["plates"]["colour"]["sha256"]
+        with self.assertRaises(RuntimeError):
+            B.colour_registration("marmoreal", bad, reg)
+
+    def test_plates_dir_relative_falls_back_to_the_main_checkout(self):
+        spec = B.load_spec("marmoreal")
+        d = B.plates_dir(spec)
+        self.assertTrue(str(d).replace("\\", "/").endswith("scraped-data/derived/env-u16-marmoreal-codex"))
+        self.assertEqual(B.plates_dir({"plates": {"dir": "C:/x/y"}}), Path("C:/x/y"))
+
 
 class LanczosSampler(unittest.TestCase):
     def setUp(self):
@@ -166,7 +194,7 @@ class Manifests(unittest.TestCase):
                 self.assertEqual(o["size"], tex["size"])
                 self.assertEqual(o["rectC0"], tex["rectC0"])
                 self.assertEqual(o["file"], B.texture_file(spec, name))
-                self.assertEqual(o["channels"], "RGBA" if tex["kind"] == "paste" else "RGB")
+                self.assertEqual(o["channels"], "RGBA" if tex["kind"] in ("paste", "anim") else "RGB")
             self.assertEqual(man["materialContract"]["homography"], [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])
 
     def test_out_of_git_outputs_when_present(self):
@@ -344,13 +372,88 @@ class Overlays(unittest.TestCase):
         cam = C.concept_cam().pos
         self.assertGreater(float(np.dot(n, cam - np.array(DESIGN_WORLD["banner-ship"]))), 0)
 
-    def test_marmoreal_comparison_overlay(self):
+    def test_marmoreal_concept_overlay(self):
+        """VS-5 EN-07: the painted surround replaces every base prop and fx (EN-09 / EN-11 add the concept's own); the
+        painted lanterns are paint-lantern details (no mesh), the profile block carries their 5 points."""
         base = load(LAYOUTS / "marmoreal.layout.json")
         overlay = load(LAYOUTS / "marmoreal.concept.layout.json")
         merged = LY.merge(base, overlay)
         self.assertEqual(merged["props"], [])
-        self.assertEqual({f["id"] for f in merged["fx"]}, {"fireflies-garden-w", "fireflies-garden-e"})
-        self.assertEqual(overlay["conceptPaste"]["lights"]["mode"], "base")
+        self.assertEqual(merged["fx"], [])
+        self.assertEqual(overlay["conceptPaste"]["lights"]["mode"], "profile")
+        paint = {d["id"]: d for d in overlay["conceptPaste"]["paintLanterns"]}
+        self.assertEqual(set(paint), {"lantern-nw", "lantern-ne", "lantern-w", "lantern-e", "sconce-door-w",
+                                      "sconce-door-e", "portal"})
+        cam = C.concept_cam()
+        spec = pp.load_spec("marmoreal")
+        for d in spec["details"]:
+            P = np.array(paint[d["id"]]["world"], float)
+            got, _ = cam.project(P[None, :])
+            # on the C0 ray of the painted glass (0.05 px: the r2 rounding of the world point)
+            self.assertLess(float(np.hypot(*(got[0] - np.array(d["px"])))), 0.1, d["id"])
+            if d["on"] == "ground":
+                self.assertAlmostEqual(P[2], spec["geometry"]["groundZ"] + d["heightUU"], places=1)
+            x, y = P[:2]
+            self.assertFalse(abs(x) < C.MAP_HX and abs(y) < C.MAP_HY, d["id"])
+        # the lanterns stand where the P5c lamps stood, within a lamp-post spacing
+        lamps = {lt["id"]: lt["loc"] for lt in base["lights"]}
+        for lid, lamp in (("lantern-nw", "lamp-nw"), ("lantern-ne", "lamp-ne"), ("lantern-w", "lamp-w"), ("lantern-e", "lamp-e")):
+            self.assertLess(math.dist(paint[lid]["world"][:2], lamps[lamp][:2]), 160.0, lid)
+
+    def test_marmoreal_profile_block_matches_the_overlay_and_the_package(self):
+        """The profile block (EN-06 / EN-07 start values; EN-08 / EN-10 / EN-12 tune them): 5 points on the paint-lantern
+        world points, 6 anim slots on the lanterns.json glass centres, 4 synced, a 6-point budget with the moon-pool."""
+        boards = load(PROFILES)["boards"]
+        block = next(b for b in boards if b["id"] == "marmoreal-original")["conceptPaste"]
+        ref = {r["id"]: r["loc"] for r in load(LAYOUTS / "marmoreal.concept.layout.json")["conceptPaste"]["lights"]["reference"]}
+        self.assertEqual({lt["id"] for lt in block["lights"]}, set(ref))
+        for lt in block["lights"]:
+            self.assertLess(math.dist(lt["loc"], ref[lt["id"]]), 1.0, lt["id"])
+        self.assertIn("layoutLights", block["hide"])
+        self.assertEqual(block["default"], "off")  # EN-13 turns it on
+        self.assertEqual(block["outside"], "clip")
+        lan = {e["id"]: e for e in load(REPO / "art/imagegen/env-u16-marmoreal-codex/lanterns.json")["entries"]}
+        slots = block["anim"]["lanterns"]
+        self.assertEqual([s_["id"] for s_ in slots], ["lantern-nw", "lantern-ne", "lantern-w", "lantern-e", "sconce-door-w",
+                                                      "sconce-door-e"])
+        for s_ in slots:
+            self.assertLess(math.dist(s_["c0Px"], lan[s_["id"]]["centre_C0_px"]), 0.1, s_["id"])
+            self.assertLessEqual(abs(s_["radiusPx"] - lan[s_["id"]]["radius_C0_px"]), 0.5, s_["id"])
+        self.assertEqual(sum(1 for s_ in slots if s_.get("light") in ref), 4)
+        self.assertEqual(block["anim"]["mist"]["colorSrgb"], load(REPO / "art/imagegen/env-u16-marmoreal-codex/lanterns.json")
+                         ["median_plate_sRGB"]["mist"]["hex"])
+        self.assertEqual(len(block["lights"]) + LY.PROFILE_POINTS, LY.MAX_POINT_LIGHTS)
+        man = load(B.derived_path("marmoreal"))
+        self.assertEqual(man["materialContract"]["assets"]["anim.mask"], block["anim"]["mask"])
+        self.assertEqual(man["materialContract"]["outside"], block["outside"])
+        self.assertNotIn("Sea", man["outputs"])  # no sea layer on Marmoreal
+
+    def test_paint_overlay_and_anim_kind_on_synthetic_plates(self):
+        """cp_bake: a paint-overlay composites over the colour plate (straight alpha) before the resampling; the anim
+        kind resamples its plate through the same mapping (linear masks, no matte)."""
+        spec = json.loads(json.dumps(B.load_spec("marmoreal")))
+        sp = spec["plates"]["colour"]
+        h, w = sp["size"][1] // 8, sp["size"][0] // 8
+        for e in (sp, spec["anim"]):
+            e["size"] = [w, h]
+            e["conceptRectPx"] = [v / 8 for v in e["conceptRectPx"]]
+        colour = np.full((h, w, 3), 0.2, np.float32)
+        layer = np.zeros((h, w, 4), np.float32)
+        layer[..., :3] = 0.9
+        layer[: h // 2, :, 3] = 1.0
+        mixed = colour * (1 - layer[..., 3:4]) + layer[..., :3] * layer[..., 3:4]
+        self.assertAlmostEqual(float(mixed[0, 0, 0]), 0.9, places=6)
+        self.assertAlmostEqual(float(mixed[-1, 0, 0]), 0.2, places=6)
+        anim = np.zeros((h, w, 4), np.float32)
+        anim[..., 1] = 1.0  # G everywhere
+        tex = {"kind": "anim", "size": [192, 108], "rectC0": [-384, -216, 2304, 1296]}
+        img, st = B.bake_texture("marmoreal", spec, "Anim", tex, {"colour": mixed, "anim": anim}, np.eye(3), log=lambda *_: None)
+        self.assertEqual(img.shape, (108, 192, 4))
+        self.assertLess(float(np.abs(img[..., 1] - 1.0).max()), 1e-5)
+        self.assertEqual(float(img[..., 0].max()), 0.0)
+        self.assertEqual(st["coverage"]["G"], 1.0)
+        self.assertEqual(B.paint_overlays(B.load_spec("marmoreal"))[0]["id"], "lanterns")
+        self.assertEqual(B.paint_overlays(B.load_spec("sarpedon")), [])
 
     def test_light_reference_matches_the_profile_count(self):
         overlay = load(LAYOUTS / "sarpedon.concept.layout.json")

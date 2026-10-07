@@ -1,4 +1,5 @@
 #include "S08BoardActor.h"
+#include "S08ConceptPasteAnim.h"
 #include "S08ArtHudText.h"
 #include "S08ArtLook.h"
 #include "S08ArtPreviewMedusa.h"
@@ -1416,6 +1417,8 @@ void AS08BoardActor::UpdateConceptPaste() {
     Sways = Anim->Num() - Flickers;
     for (UStaticMeshComponent* Target : WindTargets) Anim->AddWind(Target);
     Winds = Anim->NumWinds();
+    // VS-5 EN-06: AnimTime of the paste sheet / sea MIDs (anim channels, flows) and the lantern slots' flicker
+    if (!bLit3d) S08ConceptPasteAnim::AttachMids(*Anim, Spec, ConceptRuntime);
     if (Anim->Num() > 0) {
       Anim->RegisterComponent();
       ConceptAnim = Anim;
@@ -1427,6 +1430,11 @@ void AS08BoardActor::UpdateConceptPaste() {
   FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW concept-paste anim profile=%s mode=%s flickers=%d sways=%d winds=%d/%d missingProps=%d"),
                                    *ActiveProfile.Id, FxOptions.bFreeze ? TEXT("frozen") : TEXT("live"), Flickers, Sways,
                                    Winds, WindTargets.Num(), MissingTargets));
+  if (!bLit3d && Spec.Anim.bSet) {
+    FS08Trace::Write(S08ConceptPasteAnim::TraceLine(
+        ActiveProfile.Id, Spec.Anim, Spec.Lights, ConceptAssets.AnimMask ? ConceptAssets.AnimMask->GetName() : FString(TEXT("missing")),
+        ConceptRuntime.bUseAnim, ConceptRuntime.AnimStatus, FxOptions.bFreeze, S08ConceptPasteAnim::FreezeReason(FxOptions)));
+  }
 }
 
 void AS08BoardActor::HideTrayForConceptPaste() {

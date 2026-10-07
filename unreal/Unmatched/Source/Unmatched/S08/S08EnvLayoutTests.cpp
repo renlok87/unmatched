@@ -1155,6 +1155,28 @@ bool FS08EnvLayoutFxParseTest::RunTest(const FString&) {
     TestTrue("fx scale", T.GetScale3D().Equals(FVector(0.5), 1e-6));
   }
   TestTrue("board-space transform", B.Transform(nullptr).GetTranslation().Equals(FVector(-650, 100, 40)));
+  // VS-5 EN-06 (ВР-EN.4): reducedMotion "off" | "freeze" (default freeze)
+  TestFalse("reducedMotion: freeze by default", A.bReducedOff || B.bReducedOff);
+  {
+    FS08EnvLayout Rm;
+    TArray<FString> E;
+    const FString Off = FxJson(TEXT("petals"), TestSystemPath, FVector(-600, 0, 10), TEXT(",\"reducedMotion\":\"off\""));
+    const FString Freeze = FxJson(TEXT("fire2"), TestSystemPath, FVector(-600, 50, 10), TEXT(",\"reducedMotion\":\"freeze\""));
+    if (TestTrue(TEXT("reducedMotion off / freeze parse: ") + FString::Join(E, TEXT(" | ")),
+                 Rm.ParseJson(LayoutJson(TEXT("marmoreal"), Board, {Camp}, {}, WithFx({Off, Freeze})), E)) &&
+        TestEqual("2 fx", Rm.Fx.Num(), 2)) {
+      TestTrue("petals: off under reduced motion", Rm.Fx[0].bReducedOff);
+      TestFalse("fire2: freeze", Rm.Fx[1].bReducedOff);
+    }
+    FS08EnvFxOptions O;
+    TestEqual("options: live by default", O.Reason(), FString(TEXT("live")));
+    O.bBench = O.bFreeze = true;
+    TestEqual("options: -Bench", O.Reason(), FString(TEXT("bench")));
+    O.bReduced = true;
+    TestEqual("options: reduced motion wins", O.Reason(), FString(TEXT("reduced")));
+    O.bSpawn = false;
+    TestEqual("options: -ArtPreviewNoFx", O.Reason(), FString(TEXT("no-fx")));
+  }
   // a layout without "fx" has none
   Errors.Reset();
   FS08EnvLayout NoFx;
@@ -1206,6 +1228,8 @@ bool FS08EnvLayoutFxParseTest::RunTest(const FString&) {
       {TEXT("17 user parameters"), One(SeventeenParams), TEXT("user parameters >")},
       {TEXT("user name with a slash"), One(TEXT(",\"user\":{\"a/b\":1}")), TEXT("invalid or duplicated")},
       {TEXT("user name twice (prefix)"), One(TEXT(",\"user\":{\"User.A\":1,\"A\":2}")), TEXT("invalid or duplicated")},
+      {TEXT("reducedMotion pause"), One(TEXT(",\"reducedMotion\":\"pause\"")), TEXT("reducedMotion must be")},
+      {TEXT("reducedMotion bool"), One(TEXT(",\"reducedMotion\":false")), TEXT("reducedMotion must be")},
   };
   {
     FS08EnvLayout Control;

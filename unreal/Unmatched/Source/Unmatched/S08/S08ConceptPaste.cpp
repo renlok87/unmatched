@@ -1,4 +1,5 @@
 #include "S08ConceptPaste.h"
+#include "S08ConceptPasteAnim.h"
 #include "S08EnvLayout.h"
 #include "S08Render.h"
 #include "S08TraceLog.h"
@@ -499,7 +500,7 @@ FVector2D FS08ConceptPasteSpec::CutHalf(const FVector2D& FrameHalf) const {
 TArray<FString> FS08ConceptPasteSpec::AssetPaths() const {
   TArray<FString> Out;
   for (const FString* P : {&MaterialPath, &SheetMeshPath, &PlateAPath, &PlateBPath, &SeaPlatePath, &MaskPath, &LutPath,
-                           &WaterMaskPath}) {
+                           &WaterMaskPath, &Anim.MaskPath}) {
     if (!P->IsEmpty()) Out.Add(*P);
   }
   Out.Append(Lit3d.Required);
@@ -508,8 +509,8 @@ TArray<FString> FS08ConceptPasteSpec::AssetPaths() const {
 
 TArray<UObject*> FS08ConceptPasteAssets::AllLoaded() const {
   TArray<UObject*> Out;
-  for (UObject* Asset : TArray<UObject*>{Material, Sheet, Plane, PlateA, PlateB, Sea, Mask, Lut, Water, ShadowMaterial,
-                                         SceneCollection}) {
+  for (UObject* Asset : TArray<UObject*>{Material, Sheet, Plane, PlateA, PlateB, Sea, Mask, Lut, Water, AnimMask,
+                                         AnimMaterial, Noise, ShadowMaterial, SceneCollection}) {
     if (Asset) Out.Add(Asset);
   }
   for (UObject* Asset : Scene) {
@@ -540,7 +541,7 @@ bool ParseJson(const FString& BoardId, const TSharedPtr<FJsonObject>& O, FS08Con
                        TEXT("mask"), TEXT("lut"), TEXT("waterMask"), TEXT("camera"), TEXT("homography"), TEXT("rectA"), TEXT("rectB"),
                        TEXT("featherPx"), TEXT("outside"), TEXT("cut"), TEXT("grade"), TEXT("sea"), TEXT("hide"),
                        TEXT("lights"), TEXT("anims"), TEXT("winds"), TEXT("shadowBlobs"), TEXT("flow"), TEXT("mode"),
-                       TEXT("lit3d")},
+                       TEXT("lit3d"), TEXT("anim")},
                    Unknown)) {
     Fail(FString::Printf(TEXT("%s is not a field"), *Unknown));
   }
@@ -700,6 +701,15 @@ bool ParseJson(const FString& BoardId, const TSharedPtr<FJsonObject>& O, FS08Con
   }
   CpParseHide(O, FString(), Out.Hide, Fail);
   CpParseLights(O, FString(), Out.Hide, Out.Lights, Fail);
+  if (O->HasField(TEXT("anim"))) {
+    // VS-5 EN-06: the painted-surround animation (S08ConceptPasteAnim.h); slots may name the lights parsed above
+    const TSharedPtr<FJsonObject>* Anim = nullptr;
+    if (!O->TryGetObjectField(TEXT("anim"), Anim) || !Anim || !Anim->IsValid()) {
+      Fail(TEXT("anim must be an object"));
+    } else {
+      S08ConceptPasteAnim::ParseJson(*Anim, Out.Lights, Out.Anim, Fail);
+    }
+  }
   CpParseAnims(O, FString(), Out.Anims, Fail);
   CpParseIdList(O, TEXT("winds"), FString(), S08ConceptPasteSpec::MaxWinds, false, Out.WindProps, Fail);
   if (O->HasField(TEXT("shadowBlobs"))) {
@@ -1234,6 +1244,12 @@ FS08ConceptPasteAssets LoadAssets(const FS08ConceptPasteSpec& Spec, ES08ConceptK
   A.Lut = Cast<UTexture>(Load(Spec.LutPath, UTexture::StaticClass()));
   A.Water = Cast<UTexture>(Load(Spec.WaterMaskPath, UTexture::StaticClass()));
   A.Plane = Cast<UStaticMesh>(Load(S08ConceptPasteSpec::PlaneMeshPath, UStaticMesh::StaticClass()));
+  if (Spec.Anim.bSet) {
+    // VS-5 EN-06: optional - without the mask or MI_ConceptPaste_Anim the sheet stays the static paste (UseAnim 0)
+    A.AnimMask = Cast<UTexture>(Load(Spec.Anim.MaskPath, UTexture::StaticClass()));
+    A.AnimMaterial = Cast<UMaterialInterface>(Load(S08ConceptPasteSpec::AnimMaterialPath, UMaterialInterface::StaticClass()));
+    if (Spec.Anim.Mist.bSet) A.Noise = Cast<UTexture>(Load(S08ConceptPasteSpec::NoiseTexturePath, UTexture::StaticClass()));
+  }
   if (Spec.ShadowBlobs.Num() > 0) {
     A.ShadowMaterial =
         Cast<UMaterialInterface>(Load(S08ConceptPasteSpec::ContactShadowMaterialPath, UMaterialInterface::StaticClass()));
@@ -1256,6 +1272,10 @@ void Clear(TArray<TObjectPtr<UStaticMeshComponent>>& Parts, TArray<TObjectPtr<UP
   Runtime.Lights = 0;
   Runtime.Blobs = 0;
   Runtime.Status = TEXT("off");
+  Runtime.SheetMid.Reset();
+  Runtime.SeaMid.Reset();
+  Runtime.bUseAnim = false;
+  Runtime.AnimStatus = TEXT("no-block");
 }
 
 void Apply(const FS08ConceptPasteSpec& Spec, const FS08ConceptPasteAssets& Assets, const FVector2D& FrameHalf,
@@ -1284,11 +1304,24 @@ void Apply(const FS08ConceptPasteSpec& Spec, const FS08ConceptPasteAssets& Asset
     return;
   }
   // the sheet: the depth mesh in board space (identity under the actor root, which sits at the world origin)
-  UMaterialInstanceDynamic* SheetMid = UMaterialInstanceDynamic::Create(Assets.Material, &Owner);
+  // VS-5 EN-06: with the "anim" block, its mask and MI_ConceptPaste_Anim (static switch UseAnim) the sheet animates
+  Runtime.AnimStatus = S08ConceptPasteAnim::Status(Spec.Anim, Assets.AnimMask != nullptr, Assets.AnimMaterial != nullptr);
+  Runtime.bUseAnim = Runtime.AnimStatus == TEXT("ok");
+  UMaterialInstanceDynamic* SheetMid =
+      UMaterialInstanceDynamic::Create(Runtime.bUseAnim ? Assets.AnimMaterial : Assets.Material, &Owner);
   FS08ConceptMaterialParams SheetParams =
       MaterialParams(Spec, FrameHalf, false, Assets.PlateA != nullptr, Grade, EmissiveScale, bCalib, bFreezeFlow);
   SheetParams.UseWater = Assets.Water ? 1.0f : 0.0f;
   CpSetParams(*SheetMid, SheetParams);
+  Runtime.SheetMid = SheetMid;
+  if (Runtime.bUseAnim) {
+    SheetMid->SetTextureParameterValue(FName(ParamAnimMask), Assets.AnimMask);
+    if (Assets.Noise) SheetMid->SetTextureParameterValue(FName(ParamMistNoise), Assets.Noise);
+    // the circles, the wind (amplitude 0 when frozen) and the mist once; AnimTime 0 and flicker 1 until the anim
+    // component of a live run writes them every tick (frozen runs keep these values)
+    S08ConceptPasteAnim::SetParams(*SheetMid, S08ConceptPasteAnim::Params(Spec.Anim, Spec.Lights, bFreezeFlow, 0.0), true);
+    S08ConceptPasteAnim::SetParams(*SheetMid, S08ConceptPasteAnim::Params(Spec.Anim, Spec.Lights, true, 0.0), false);
+  }
   if (Assets.Water) SheetMid->SetTextureParameterValue(FName(ParamWater), Assets.Water);
   SheetMid->SetTextureParameterValue(FName(ParamPlateA), Assets.PlateA ? Assets.PlateA : Assets.PlateB);
   SheetMid->SetTextureParameterValue(FName(ParamPlateB), Assets.PlateB);
@@ -1314,6 +1347,7 @@ void Apply(const FS08ConceptPasteSpec& Spec, const FS08ConceptPasteAssets& Asset
     FS08ConceptMaterialParams SeaParams = MaterialParams(Spec, FrameHalf, true, false, Grade, EmissiveScale, bCalib, bFreezeFlow);
     SeaParams.UseWater = Assets.Water ? 1.0f : 0.0f;
     CpSetParams(*SeaMid, SeaParams);
+    Runtime.SeaMid = SeaMid;
     if (Assets.Water) SeaMid->SetTextureParameterValue(FName(ParamWater), Assets.Water);
     UTexture* SeaTex = Assets.Sea ? Assets.Sea : Assets.PlateB;
     SeaMid->SetTextureParameterValue(FName(ParamPlateA), SeaTex);
@@ -1776,7 +1810,28 @@ void US08ConceptPasteAnimComponent::UpdateFlicker(UPointLightComponent* Light, c
   AddFlicker(Light, Spec);
 }
 
+void US08ConceptPasteAnimComponent::AddPasteMid(UMaterialInstanceDynamic* Mid, bool bAnim, const FS08ConceptPasteAnimSpec& Anim,
+                                                const TArray<FS08ConceptLight>& Lights) {
+  if (!Mid) return;
+  FPasteMid& P = PasteMids.AddDefaulted_GetRef();
+  P.Mid = Mid;
+  P.bAnim = bAnim;
+  if (bAnim) {
+    AnimSpec = Anim;
+    AnimLights = Lights;
+  }
+}
+
 void US08ConceptPasteAnimComponent::RestoreBase() {
+  for (const FPasteMid& P : PasteMids) {
+    UMaterialInstanceDynamic* Mid = P.Mid.Get();
+    if (!Mid) continue;
+    if (P.bAnim) {
+      S08ConceptPasteAnim::SetParams(*Mid, S08ConceptPasteAnim::Params(AnimSpec, AnimLights, true, 0.0), true);
+    } else {
+      Mid->SetScalarParameterValue(FName(S08ConceptPasteSpec::ParamAnimTime), 0.0f);
+    }
+  }
   for (const FWindParam& W : WindParams) {
     if (UMaterialInstanceDynamic* Mid = W.Mid.Get()) Mid->SetScalarParameterValue(W.Name, W.Base);
   }
@@ -1811,5 +1866,25 @@ void US08ConceptPasteAnimComponent::TickComponent(float DeltaTime, ELevelTick Ti
     const float Angle = FMath::DegreesToRadians(S08ConceptPaste::SwayAngleDeg(S.Spec, T));
     const FQuat Delta(S.Spec.bAxisY ? FVector::YAxisVector : FVector::XAxisVector, Angle);
     P->SetRelativeRotation(S.BaseRotation.Quaternion() * Delta);
+  }
+  // VS-5 EN-06: AnimTime of the paste MIDs and the lantern slots' flicker - a linked slot takes its light's current spec
+  // (Art Tuner may have changed it) and the same T as the light above: one value per frame for the paint and the light
+  if (PasteMids.Num() > 0) {
+    TArray<FS08ConceptLight> Live = AnimLights;
+    for (FS08ConceptLight& L : Live) {
+      for (const FFlicker& F : Flickers) {
+        if (F.Spec.Id == L.Id) L = F.Spec;
+      }
+    }
+    const FS08ConceptAnimParams Now = S08ConceptPasteAnim::Params(AnimSpec, Live, false, T);
+    for (const FPasteMid& P : PasteMids) {
+      UMaterialInstanceDynamic* Mid = P.Mid.Get();
+      if (!Mid) continue;
+      if (P.bAnim) {
+        S08ConceptPasteAnim::SetParams(*Mid, Now, false);
+      } else {
+        Mid->SetScalarParameterValue(FName(S08ConceptPasteSpec::ParamAnimTime), static_cast<float>(T));
+      }
+    }
   }
 }

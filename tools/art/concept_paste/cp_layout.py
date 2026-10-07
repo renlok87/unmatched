@@ -15,6 +15,13 @@ The concept-mode lights (design.json 4: 5 points at the true fire / lantern posi
 parser ignores unknown top-level keys) only names the spec / manifest / build report and lists the reference light
 points derived from the detail positions (cross-check for the profile values).
 
+VS-5 EN-07 (ENV-U16, Marmoreal): details of kind "paint-lantern" are painted lanterns / sconces / the door that stay in
+the plate (the EN-04 lantern layer baked into it): no mesh, no fx - only their world point (the C0 ray of the painted glass
+on the relief proxy: ground + heightUU or the colonnade flat) goes to the overlay's conceptPaste section ("paintLanterns")
+and to the light reference (conceptPaste.lights of the profile block and the anim.lanterns slots). "layout.fxRemoveBase":
+true removes every base fx (the ones anchored on a removed prop go with it anyway). The fx overlay field list includes
+"reducedMotion" (VS-5 EN-06).
+
 Deterministic: the same inputs give the same bytes; `--check` compares the committed files with a fresh generation
 and validates the merged layout (Python twin of MergeOverlay + the structural rules of S08EnvLayout ParseJson that
 matter here: unique ids, kit roots, scale / warmup ranges, fx anchors, pivots off the painted map, light budget).
@@ -111,10 +118,10 @@ def build(map_key: str, base: dict, spec: dict, report: dict | None) -> tuple[di
     by_id = {d["id"]: d for d in details}
     add_props, add_fx = [], []
     placed = {}
-    if details:
+    if details and any(d["kind"] != "paint-lantern" for d in details):
         if report is None:
             raise RuntimeError("the asset build report is needed for the detail meshes (cp_proxies.py build)")
-        lant = export_of(report, Path(L["lantern"]["mesh"]).name)
+        lant =export_of(report, Path(L["lantern"]["mesh"]).name)
         head_h = float(lant["boundsUeLocalUU"]["size"][2])
         glow = np.array(lant["glowOffsetUU"], float)
         # P7c: the overlay places the dark-iron copy (SM_EnvCP_Cannon, ue_import_concept_paste.py), measured on the kit mesh
@@ -123,9 +130,14 @@ def build(map_key: str, base: dict, spec: dict, report: dict | None) -> tuple[di
         ban = export_of(report, Path(L["banner"]["mesh"]).name)
         cloth_w = float(ban["clothWidthUU"])
         bar_top = float(ban["crossbarTopUU"])
+    if details:
         for d in details:
             P = np.array(d["world"], float)
             pid = pre + d["id"]
+            if d["kind"] == "paint-lantern":
+                # VS-5 EN-07: painted, no mesh: only the world point (lights / anim slots reference)
+                placed[d["id"]] = {"kind": "paint-lantern", "glowWorld": [r2(v) for v in P], "c0Px": d["px"]}
+                continue
             if d["kind"] == "lantern":
                 yaw = float(L["lantern"]["yawDeg"])
                 s = clamp(d["sizeUU"][1] * float(L["lantern"].get("sizeMul", 1.0)) / head_h, L["lantern"]["scaleRange"])
@@ -187,6 +199,10 @@ def build(map_key: str, base: dict, spec: dict, report: dict | None) -> tuple[di
     if ff:
         fx_ops["remove"] = [i for i in ff["remove"] if i in base_fx]
         fx_ops["replace"] = [{"id": i, "loc": [r2(v) for v in loc]} for i, loc in ff["replace"].items() if i in base_fx]
+    if L.get("fxRemoveBase"):
+        # VS-5 EN-07: every base fx goes (those anchored on a removed prop are dropped with it by MergeOverlay)
+        fx_ops["remove"] = [f["id"] for f in base.get("fx", []) if f.get("anchor") not in removed]
+        info["fxRemoved"] = list(fx_ops["remove"])
     if add_fx:
         fx_ops["add"] = add_fx
     if fx_ops:
@@ -209,6 +225,9 @@ def build(map_key: str, base: dict, spec: dict, report: dict | None) -> tuple[di
                                 "MergeOverlay refuses a top-level 'lights' - the base light budget stays protected"}
     else:
         cp["lights"] = {"mode": "base", "note": "the base layout's lights stay"}
+    paint = [{"id": k, "c0Px": v["c0Px"], "world": v["glowWorld"]} for k, v in placed.items() if v["kind"] == "paint-lantern"]
+    if paint:
+        cp["paintLanterns"] = paint
     overlay["conceptPaste"] = cp
     overlay["notes"] = (f"ENV-MAPS P7 concept mode (ENV-U15), variant '{L['variant']}', written by "
                         f"tools/art/concept_paste/cp_layout.py from {map_key}.paste.json + the P7 asset build report. "
@@ -225,7 +244,8 @@ def merge(base: dict, overlay: dict) -> dict:
             raise ValueError(f"overlay cannot change '{fixed}'")
     removed_props: list[str] = []
     for section, fields in (("props", ("mesh", "loc", "yawDeg", "scale", "castShadow")),
-                            ("fx", ("system", "anchor", "loc", "yawDeg", "scale", "seed", "warmupS", "enabled", "user"))):
+                            ("fx", ("system", "anchor", "loc", "yawDeg", "scale", "seed", "warmupS", "enabled", "user",
+                                    "reducedMotion"))):
         ops = overlay.get(section, {})
         items = out.get(section, [])
         dropped = []

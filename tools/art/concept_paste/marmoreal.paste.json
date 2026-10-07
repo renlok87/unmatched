@@ -1,57 +1,429 @@
 {
  "schema": "unmatched.concept-paste.spec/1",
  "map": "marmoreal",
- "status": "предложено; Marmoreal is artistically accepted (ENV-U15) - concept paste ONLY behind a flag / layout variant for comparison, default look unchanged. Minimal spec on the raw concept (no clean / outpainted plates yet: painted lamps stay painted, the far view K1x0.65 falls back to edge clamping).",
+ "status": "ENV-U16 (VS-5 EN-07, по делегированию): the accepted clean plate x2 of art/imagegen/env-u16-marmoreal-codex (EN-01 clean x1 -> EN-02 / SX-01 outpaint 20 % -> EN-03 x2 plan B Lanczos-3, no AI) with the EN-04 lantern layer baked into PlateA / PlateB and the EN-04 animation masks as T_Marmoreal_ConceptAnim. Decision ВР-EN.2 (the plate order): edit x1 -> outpaint 20 % -> x2 in two runs; the edit result is taken only inside the remove mask. Still behind -ConceptPaste until EN-13 (the profile default stays off).",
  "coords": "C0 px (see sarpedon.paste.json)",
  "plates": {
-  "dir": "C:/Users/ren/WebstormProjects/unmached/unmached/scraped-data/derived/concepts/env-v1",
-  "colour": {"file": "marmoreal-v1.png", "size": [1672, 941], "conceptRectPx": [0, 0, 1672, 941]},
+  "dir": "scraped-data/derived/env-u16-marmoreal-codex",
+  "dirNote": "relative to the checkout (cp_bake.plates_dir; the main checkout's copy is the fallback - gitignored); our concept, not a scan (ВР-PL10); sha256 = art/imagegen/env-u16-marmoreal-codex/manifest-sha256.json",
+  "colour": {
+   "file": "marmoreal-extended-2x.png",
+   "size": [
+    4680,
+    2634
+   ],
+   "conceptRectPx": [
+    668,
+    376,
+    3344,
+    1882
+   ],
+   "registration": "concept",
+   "sha256": "df4fd262190b882f2541be2f5a134b10e6bfc96e90e9b7b26939d9d8860c458f",
+   "note": "EN-03 (SX-02 plan B): the EN-02 / SX-01 clean plate (2340 x 1317, original area byte-identical to EN-01, field #808080) x2 by Lanczos-3; the concept framing sits pixel-placed at conceptRectPx, so the 'concept' registration of marmoreal-v1.png applies unchanged"
+  },
+  "colourFallback": {
+   "file": "marmoreal-clean.png",
+   "size": [
+    1672,
+    941
+   ],
+   "conceptRectPx": [
+    0,
+    0,
+    1672,
+    941
+   ],
+   "sha256": "7225b4d3ff7b639c649e1432b26bdf14c55cc2ed8621df5253dc1aaaa95ec40a",
+   "note": "EN-01 clean x1 (informational: the x2 plate is the bake input)"
+  },
+  "concept": {
+   "file": "C:/Users/ren/WebstormProjects/unmached/unmached/scraped-data/derived/concepts/env-v1/marmoreal-v1.png",
+   "size": [
+    1672,
+    941
+   ],
+   "conceptRectPx": [
+    0,
+    0,
+    1672,
+    941
+   ]
+  },
   "seaSky": null
  },
  "bake": {
-  "note": "P7 track A (cp_bake.py), flag / variant only (Marmoreal default unchanged): the raw concept (no clean plate, no outpaint) -> outside the concept frame a blurred edge clamp faded to a dark border tone fills (outsideFrame; K1x0.65: ~11 % of the frame)",
+  "note": "VS-5 EN-07 (cp_bake.py): PlateA 4096 x 2048 over C0 [0, 1920] x [0, 1080], PlateB 2048 x 1024 and Anim 2048 x 1024 (linear) over the outpainted rect B: the plate covers rect B, so no outsideFrame fill any more; no sea layer on Marmoreal",
   "colourTag": "concept",
   "lanczosA": 3,
   "chunkRows": 64,
-  "outsideFrame": {"fadePx": 160, "darkGain": 0.6, "blurTexels": 6,
-                   "note": "outside the concept frame (no outpaint): edge clamp blurred and faded to 0.6 x the median border colour over 160 C0 px - no streaks, no mirrored architecture"},
   "textures": {
-   "PlateA": {"kind": "paste", "size": [4096, 2048], "rectC0": [0, 0, 1920, 1080]},
-   "PlateB": {"kind": "paste", "size": [2048, 1024], "rectC0": [-384, -216, 2304, 1296]},
-   "Sea": {"kind": "sea", "size": [1024, 512], "rectC0": [-384, -216, 2304, 1296]}
+   "PlateA": {
+    "kind": "paste",
+    "size": [
+     4096,
+     2048
+    ],
+    "rectC0": [
+     0,
+     0,
+     1920,
+     1080
+    ]
+   },
+   "PlateB": {
+    "kind": "paste",
+    "size": [
+     2048,
+     1024
+    ],
+    "rectC0": [
+     -384,
+     -216,
+     2304,
+     1296
+    ]
+   },
+   "Anim": {
+    "kind": "anim",
+    "size": [
+     2048,
+     1024
+    ],
+    "rectC0": [
+     -384,
+     -216,
+     2304,
+     1296
+    ]
+   }
   }
  },
- "registration": {"file": "registration.json (proto out dir)", "model": "homography, identity within 1.3 px"},
+ "registration": {
+  "file": "registration.json (proto out dir)",
+  "model": "homography, identity within 1.3 px"
+ },
  "geometry": {
   "groundZ": -3.0,
   "seaZ": -300.0,
-  "skyCylinder": {"centre": [0.0, -45.0], "radius": 1900.0},
+  "skyCylinder": {
+   "centre": [
+    0.0,
+    -45.0
+   ],
+   "radius": 1900.0
+  },
   "vertexStepPx": 8,
   "heightZones": [
-   {"id": "cherry-w", "z": 160.0, "smoothPx": 20, "poly": [[0, 60], [200, 60], [260, 200], [250, 420], [200, 560], [0, 600]]},
-   {"id": "cherry-e", "z": 160.0, "smoothPx": 20, "poly": [[1640, 120], [1920, 120], [1920, 640], [1700, 600], [1640, 400]]}
+   {
+    "id": "cherry-w",
+    "z": 160.0,
+    "smoothPx": 20,
+    "poly": [
+     [
+      0,
+      60
+     ],
+     [
+      200,
+      60
+     ],
+     [
+      260,
+      200
+     ],
+     [
+      250,
+      420
+     ],
+     [
+      200,
+      560
+     ],
+     [
+      0,
+      600
+     ]
+    ]
+   },
+   {
+    "id": "cherry-e",
+    "z": 160.0,
+    "smoothPx": 20,
+    "poly": [
+     [
+      1640,
+      120
+     ],
+     [
+      1920,
+      120
+     ],
+     [
+      1920,
+      640
+     ],
+     [
+      1700,
+      600
+     ],
+     [
+      1640,
+      400
+     ]
+    ]
+   }
   ],
   "planeZones": [
-   {"id": "front-cliff", "type": "slope", "line0": {"Y": 342.0, "z": -3.0}, "line1": {"Y": 442.0, "z": -176.2},
-    "poly": [[60, 880], [1860, 880], [1920, 1080], [0, 1080]]},
-   {"id": "colonnade", "type": "vplane", "basePx": [[300, 195], [1500, 195]],
-    "poly": [[300, -216], [1500, -216], [1500, 196], [300, 196]]}
+   {
+    "id": "front-cliff",
+    "type": "slope",
+    "line0": {
+     "Y": 342.0,
+     "z": -3.0
+    },
+    "line1": {
+     "Y": 442.0,
+     "z": -176.2
+    },
+    "poly": [
+     [
+      60,
+      880
+     ],
+     [
+      1860,
+      880
+     ],
+     [
+      1920,
+      1080
+     ],
+     [
+      0,
+      1080
+     ]
+    ]
+   },
+   {
+    "id": "colonnade",
+    "type": "vplane",
+    "basePx": [
+     [
+      300,
+      195
+     ],
+     [
+      1500,
+      195
+     ]
+    ],
+    "poly": [
+     [
+      300,
+      -216
+     ],
+     [
+      1500,
+      -216
+     ],
+     [
+      1500,
+      196
+     ],
+     [
+      300,
+      196
+     ]
+    ]
+   }
   ],
-  "islandMatte": {"featherPx": 3, "poly": [[-384, -216], [2304, -216], [2304, 1296], [-384, 1296]]},
+  "islandMatte": {
+   "featherPx": 3,
+   "poly": [
+    [
+     -384,
+     -216
+    ],
+    [
+     2304,
+     -216
+    ],
+    [
+     2304,
+     1296
+    ],
+    [
+     -384,
+     1296
+    ]
+   ]
+  },
   "skyPoly": []
  },
  "cut": {
   "underFrameUU": 2.0,
-  "paintedFrameOuterUU": {"far": 38.0, "east": 62.0, "west": 58.0, "near": 52.0},
+  "paintedFrameOuterUU": {
+   "far": 38.0,
+   "east": 62.0,
+   "west": 58.0,
+   "near": 52.0
+  },
   "paintedFrameMeasured": "luma profiles across the registered marmoreal-v1 frame on the ground plane: far ~35-38, east ~60-65, west ~55-59, near ~50 uu from the map edge",
   "paintedCornerUU": 70.0
  },
- "details": [],
- "overlays": [],
+ "overlays": [
+  {
+   "id": "lanterns",
+   "kind": "paint-overlay",
+   "file": "marmoreal-lanterns-2x.png",
+   "size": [
+    4680,
+    2634
+   ],
+   "conceptRectPx": [
+    668,
+    376,
+    3344,
+    1882
+   ],
+   "blend": "alpha",
+   "sha256": "589d111bfda68c566d6959c7d2f96b95acfc5cd45bf246b10a485a4877601f03",
+   "note": "EN-04: RGB = lit-extended-2x, A = lantern-alpha (EN-01 lantern mask x2, feather 8 px): the painted lanterns, sconces and their pools back over the clean plate (ВР-55: no 3D lantern heads)"
+  }
+ ],
+ "anim": {
+  "file": "marmoreal-anim-2x.png",
+  "size": [
+   4680,
+   2634
+  ],
+  "conceptRectPx": [
+   668,
+   376,
+   3344,
+   1882
+  ],
+  "sha256": "7b3274f823d86f8e86e180f9dfb4d1c44d9ffe28901159d1beaa83275588ee39",
+  "channels": {
+   "R": "lantern-glow",
+   "G": "sakura-wind",
+   "B": "ground-mist",
+   "A": "petal-area (offline only)"
+  },
+  "note": "EN-04 fix1 (accepted): the source of T_Marmoreal_ConceptAnim (AnimMask of M_ConceptPaste, EN-06)"
+ },
+ "details": [
+  {
+   "id": "lantern-nw",
+   "kind": "paint-lantern",
+   "px": [
+    486.6,
+    105.2
+   ],
+   "on": "ground",
+   "heightUU": 100.0,
+   "radiusC0Px": 262.4
+  },
+  {
+   "id": "lantern-ne",
+   "kind": "paint-lantern",
+   "px": [
+    1430.6,
+    106.6
+   ],
+   "on": "ground",
+   "heightUU": 100.0,
+   "radiusC0Px": 271.3
+  },
+  {
+   "id": "lantern-w",
+   "kind": "paint-lantern",
+   "px": [
+    179.3,
+    579.2
+   ],
+   "on": "ground",
+   "heightUU": 100.0,
+   "radiusC0Px": 273.5
+  },
+  {
+   "id": "lantern-e",
+   "kind": "paint-lantern",
+   "px": [
+    1751.8,
+    581.2
+   ],
+   "on": "ground",
+   "heightUU": 100.0,
+   "radiusC0Px": 282.3
+  },
+  {
+   "id": "sconce-door-w",
+   "kind": "paint-lantern",
+   "px": [
+    904.9,
+    31.4
+   ],
+   "on": "colonnade",
+   "radiusC0Px": 69.6,
+   "animated": true
+  },
+  {
+   "id": "sconce-door-e",
+   "kind": "paint-lantern",
+   "px": [
+    1007.3,
+    32.2
+   ],
+   "on": "colonnade",
+   "radiusC0Px": 72.8,
+   "animated": true
+  },
+  {
+   "id": "portal",
+   "kind": "paint-lantern",
+   "px": [
+    955.4,
+    -0.5
+   ],
+   "on": "colonnade",
+   "radiusC0Px": 29.9,
+   "animated": false
+  }
+ ],
  "layout": {
-  "note": "P7 track A (cp_layout.py), comparison variant only (-EnvLayoutVariant=concept; the default Marmoreal look stays the P5c layout): the raw concept paints every prop (lamps, sakuras, balustrades, colonnade) -> all base props removed, the fx anchored on them go with them, the free fireflies stay; the base lights stay (no conceptPaste.lights)",
+  "note": "VS-5 EN-07 (cp_layout.py): the painted surround replaces every base prop and every base fx (the P5c fireflies too: EN-09 / EN-11 add the concept's own petals / fireflies); the paint-lantern details have no mesh - their world points (detail_positions, relief proxy) are the reference of conceptPaste.lights and conceptPaste.anim.lanterns",
   "variant": "concept",
   "idPrefix": "",
-  "castShadow": false
+  "castShadow": false,
+  "fxRemoveBase": true,
+  "lights": [
+   {
+    "id": "lantern-nw",
+    "on": "lantern-nw",
+    "dz": 0.0
+   },
+   {
+    "id": "lantern-ne",
+    "on": "lantern-ne",
+    "dz": 0.0
+   },
+   {
+    "id": "lantern-w",
+    "on": "lantern-w",
+    "dz": 0.0
+   },
+   {
+    "id": "lantern-e",
+    "on": "lantern-e",
+    "dz": 0.0
+   },
+   {
+    "id": "portal-glow",
+    "on": "portal",
+    "dz": 0.0
+   }
+  ]
  }
 }

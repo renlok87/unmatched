@@ -55,6 +55,20 @@
 // light at intensity 0, the fog hidden, env fx hidden, MPC Emissive 0 and the emissive scalars of the env props' slots
 // (EmissiveIntensity / EmissiveStrength / Fill) at 0, the lit3d sky cylinder hidden; the P7 paste sheet keeps its painted
 // light (the P7c reference of G1). Traced 'ARTPREVIEW lights-off ...'. Status: предложено.
+//
+// VS-5 EN-06 (ENV-U16, docs/game-design/visual/06-tasks/env.csv, ВР-55 / ВР-EN.4): the optional "anim" object of a paste
+// block animates the painted surround in the material of the sheet - no light, no Niagara, no Time node:
+//   "anim": {"mask": "/Game/EnvMaps/<Map>/ConceptPaste/T_<Map>_ConceptAnim" (RGBA over rect B, linear: R lantern glow,
+//            G crowns (wind), B ground mist, A petal area - offline only),
+//            "lanterns": [<= 8 {id, c0Px [x, y], radiusPx 4..320, light "<id of conceptPaste.lights>" | flicker {amp, hz}}],
+//            "wind": {ampPx 0..4, hz 0..2, gustHz 0..3, gustAmp 0..1, wavePx 50..2000} (ampPx x (1 + gustAmp) <= 4 C0 px),
+//            "mist": {opacity 0..0.4, panPxPerS [x, y] |..| <= 30, noisePx 32..1024, colorSrgb "#RRGGBB"}}
+// The sheet then takes MI_ConceptPaste_Anim (static switch UseAnim on, ue_concept_material.py): colour x lerp(1, flicker,
+// R) inside a lantern's circle (the flicker of its linked point light - FlickerScale, the same value in the same tick -
+// or its own amp / hz), the plate sampled at a UV moved by G x the wind wave, then lerp(colour, MistColor, B x opacity x
+// noise). AnimTime is the world time written by US08ConceptPasteAnimComponent in live runs; -Bench, -EnvFxFreeze and
+// reduced motion (FS08EnvFxOptions::bFreeze) keep AnimTime 0, every flicker 1 and the wind 0 (the mist stays, still).
+// No mask / no anim material -> UseAnim 0 (M_ConceptPaste, the static paste) and the anim line says why.
 #pragma once
 
 #include "CoreMinimal.h"
@@ -127,6 +141,22 @@ inline const TCHAR* const ParamFlowSea = TEXT("FlowSea");        // scalar 0|1: 
 inline const TCHAR* const ParamDevignette = TEXT("Devignette");  // scalar: the view's vignette intensity to undo (0 = off)
 inline const TCHAR* const ParamGradeScale = TEXT("GradeScale");  // vector: grade 2 per-channel emissive scale (1 / k)
 inline const TCHAR* const ParamGradePow = TEXT("GradePow");      // vector: grade 2 per-channel display power (1 / p)
+/** VS-5 EN-06: the animation channels (graph 4). AnimTime replaces the material Time node (flows too). */
+inline const TCHAR* const ParamAnimTime = TEXT("AnimTime");      // scalar: world time of live runs, 0 frozen
+inline const TCHAR* const ParamAnimMask = TEXT("AnimMask");      // texture: R lantern glow, G crowns, B mist (B space)
+inline const TCHAR* const ParamMistNoise = TEXT("MistNoise");    // texture: T_ConceptPaste_Noise (wrap)
+inline const TCHAR* const ParamWindParams = TEXT("WindParams");  // vector: (ampPx, hz, gustHz, gustAmp); amp 0 frozen
+inline const TCHAR* const ParamWindWavePx = TEXT("WindWavePx");  // scalar: wave length (C0 px)
+inline const TCHAR* const ParamMistColor = TEXT("MistColor");    // vector: linear colour of the mist
+inline const TCHAR* const ParamMistParams = TEXT("MistParams");  // vector: (opacity, panX, panY px / s, noisePx)
+/** Indexed parameters <Prefix><i>, i = 0..MaxAnimLanterns - 1: LanternC0_i (x, y C0 px, radius px, 0), LanternFlicker_i. */
+inline const TCHAR* const LanternC0Prefix = TEXT("LanternC0_");
+inline const TCHAR* const LanternFlickerPrefix = TEXT("LanternFlicker_");
+inline const TCHAR* const UseAnimSwitchName = TEXT("UseAnim");   // static switch of M_ConceptPaste (MI_ConceptPaste_Anim: on)
+inline const TCHAR* const AnimMaterialPath = TEXT("/Game/EnvMaps/ConceptPaste/MI_ConceptPaste_Anim");
+inline const TCHAR* const NoiseTexturePath = TEXT("/Game/EnvMaps/ConceptPaste/T_ConceptPaste_Noise");
+constexpr int32 MaxAnimLanterns = 8;
+constexpr float MaxWindOffsetPx = 4.0f;  // the hard limit of the wind UV offset (ampPx x (1 + gustAmp))
 constexpr int32 MaxFlows = 2;
 constexpr float FlowFeatherPx = 8.0f;  // the region edge feather of the shader
 constexpr int32 MaxLights = 6;
@@ -308,6 +338,42 @@ struct UNMATCHED_API FS08ConceptLit3dSpec {
   TArray<FS08ConceptMaterialOverride> MaterialOverrides;
 };
 
+/** VS-5 EN-06: one lantern slot of "anim.lanterns": the circle (C0 px) where the mask's R flickers. */
+struct UNMATCHED_API FS08ConceptAnimLantern {
+  FString Id;
+  FVector2D C0Px = FVector2D::ZeroVector;
+  float RadiusPx = 40.0f;
+  FString LightId;            // a conceptPaste.lights id: its FlickerScale (synced) - else the own pair below
+  float FlickerAmp = 0.0f;    // 0..0.5
+  float FlickerHz = 0.0f;     // 0..20
+};
+
+struct UNMATCHED_API FS08ConceptAnimWind {
+  bool bSet = false;
+  float AmpPx = 0.0f;
+  float Hz = 0.0f;
+  float GustHz = 0.0f;
+  float GustAmp = 0.0f;
+  float WavePx = 400.0f;
+};
+
+struct UNMATCHED_API FS08ConceptAnimMist {
+  bool bSet = false;
+  float Opacity = 0.0f;
+  FVector2D PanPxPerS = FVector2D::ZeroVector;
+  float NoisePx = 220.0f;
+  FColor Color = FColor::Black;  // sRGB bytes
+};
+
+/** VS-5 EN-06: the "anim" object of a paste block (see the file comment). */
+struct UNMATCHED_API FS08ConceptPasteAnimSpec {
+  bool bSet = false;
+  FString MaskPath;
+  TArray<FS08ConceptAnimLantern> Lanterns;
+  FS08ConceptAnimWind Wind;
+  FS08ConceptAnimMist Mist;
+};
+
 struct UNMATCHED_API FS08ConceptPasteSpec {
   bool bSet = false;
   bool bDefaultOn = false;                                         // "default": "on" | "off"
@@ -350,13 +416,15 @@ struct UNMATCHED_API FS08ConceptPasteSpec {
   TArray<FS08ConceptShadowBlob> ShadowBlobs;
   TArray<FS08ConceptFlow> Flows;  // <= MaxFlows
   FS08ConceptSeaFlow SeaFlow;
+  /** VS-5 EN-06: the painted-surround animation of the paste kind (absent: the static paste, bit for bit). */
+  FS08ConceptPasteAnimSpec Anim;
   /** ENV-MAPS P8: "mode" (the kind of the default / a bare -ConceptPaste) and the "lit3d" object. */
   ES08ConceptKind DefaultKind = ES08ConceptKind::Paste;
   FS08ConceptLit3dSpec Lit3d;
   /** Half extent of the cut: the frame's outer foot minus CutUnderFrameUU (467.67 x 310.67 on the shipped maps). */
   FVector2D CutHalf(const FVector2D& FrameHalf) const;
-  /** Asset packages in a stable order (material, sheet, plates, sea, mask, LUT, water; empty optional ones skipped),
-   *  then the lit3d required packages. */
+  /** Asset packages in a stable order (material, sheet, plates, sea, mask, LUT, water, anim mask; empty optional ones
+   *  skipped), then the lit3d required packages. */
   TArray<FString> AssetPaths() const;
   /** The per-kind parts of the block (paste: the top-level fields, lit3d: the "lit3d" object). */
   const FS08ConceptHide& HideFor(ES08ConceptKind Kind) const { return Kind == ES08ConceptKind::Lit3d ? Lit3d.Hide : Hide; }
@@ -448,6 +516,10 @@ struct UNMATCHED_API FS08ConceptPasteAssets {
   UTexture* Mask = nullptr;
   UTexture* Lut = nullptr;
   UTexture* Water = nullptr;
+  /** VS-5 EN-06 (only with an "anim" block): the mask, MI_ConceptPaste_Anim and the mist noise. */
+  UTexture* AnimMask = nullptr;
+  UMaterialInterface* AnimMaterial = nullptr;
+  UTexture* Noise = nullptr;
   UMaterialInterface* ShadowMaterial = nullptr;
   TArray<FString> Missing;    // every missing package (required or optional)
   /** P8: the kind these assets were loaded for; lit3d: the required packages (loaded), the MPC (optional) and whether
@@ -492,6 +564,12 @@ struct UNMATCHED_API FS08ConceptPasteRuntime {
   FString EmissiveScaleSource = TEXT("-");
   bool bCalib = false;
   bool bAnimFrozen = false;
+  /** VS-5 EN-06: the paste MIDs (sheet, sea layer) whose AnimTime the anim component writes, and whether the sheet runs
+   *  the anim channels (MI_ConceptPaste_Anim) - else why not (no-block | mask-missing | material-missing). */
+  TWeakObjectPtr<UMaterialInstanceDynamic> SheetMid;
+  TWeakObjectPtr<UMaterialInstanceDynamic> SeaMid;
+  bool bUseAnim = false;
+  FString AnimStatus = TEXT("no-block");
   int32 HiddenProps = 0, HiddenFx = 0, HiddenLights = 0, HiddenGround = 0, HiddenSea = 0, HiddenWaterfalls = 0;
   bool bHidTray = false, bHidFog = false, bHidBackdrop = false;
   /** Env / scene components this mode hid (made visible again by RestoreHides). */
@@ -660,10 +738,15 @@ public:
   void AddSway(USceneComponent* Prop, const FS08ConceptAnim& Spec);
   /** P7c: the material wind of a prop (a MID per slot with WindLive = 1; RestoreBase sets 0). */
   void AddWind(UStaticMeshComponent* Prop);
+  /** VS-5 EN-06: a paste MID whose AnimTime follows the world time (flows; bAnim: also LanternFlicker_i of Anim, the
+   *  linked lights' FlickerScale in the same tick). RestoreBase writes AnimTime 0 and flicker 1. */
+  void AddPasteMid(UMaterialInstanceDynamic* Mid, bool bAnim, const FS08ConceptPasteAnimSpec& Anim,
+                   const TArray<FS08ConceptLight>& Lights);
+  int32 NumPasteMids() const { return PasteMids.Num(); }
   /** Art Tuner: a new spec for the flicker of Light (its intensity already set to Spec.IntensityCd): the base and the
    *  noise follow at once; amp / hz 0 stops it, a light without a flicker yet starts one. */
   void UpdateFlicker(UPointLightComponent* Light, const FS08ConceptLight& Spec);
-  int32 Num() const { return Flickers.Num() + Sways.Num() + Winds.Num(); }
+  int32 Num() const { return Flickers.Num() + Sways.Num() + Winds.Num() + PasteMids.Num(); }
   int32 NumWinds() const { return Winds.Num(); }
   /** Back to the base intensity / rotation (before the component goes away). */
   void RestoreBase();
@@ -689,4 +772,11 @@ private:
   TArray<FSway> Sways;
   TArray<TWeakObjectPtr<UStaticMeshComponent>> Winds;
   TArray<FWindParam> WindParams;  // P8: pack wind scalars set to their pack value (RestoreBase puts Base back)
+  struct FPasteMid {
+    TWeakObjectPtr<UMaterialInstanceDynamic> Mid;
+    bool bAnim = false;
+  };
+  TArray<FPasteMid> PasteMids;
+  FS08ConceptPasteAnimSpec AnimSpec;
+  TArray<FS08ConceptLight> AnimLights;
 };

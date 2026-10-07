@@ -11,6 +11,8 @@ Targets (the asset names of S08ArtBoardProfiles.json conceptPaste and of EnvLayo
   /Game/EnvMaps/<Name>/ConceptPaste/T_<Name>_ConceptSea      sea layer RGB, sRGB, BC7, clamp
   /Game/EnvMaps/<Name>/ConceptPaste/T_<Name>_ConceptWater    (Sarpedon) flow masks R waterfall / G bay surf / B sea,
                                                              linear, TC_Masks, clamp
+  /Game/EnvMaps/<Name>/ConceptPaste/T_<Name>_ConceptAnim     (Marmoreal, VS-5 EN-07) the anim masks R lantern glow /
+                                                             G crowns / B mist / A petal area, linear, TC_Masks, mips, clamp
   /Game/EnvMaps/<Name>/ConceptPaste/SM_<Name>_ConceptSheet   the relief depth sheet (board space, pivot = map centre),
                                                              Nanite off, no collision; slot -> M_ConceptPaste when it
                                                              exists (tools/art/concept_paste/ue_concept_material.py)
@@ -150,7 +152,7 @@ CANNON_LOOK = {"vectors": {"RestAdjust": (0.0, 1.2, 0.0, 0.0)}, "scalars": {"Rou
 CANNON_TAG = "EnvMapsConceptCannon"
 CANNON_VERSION = "2"  # the mesh copy (unchanged since P7c)
 CANNON_MI_VERSION = "3"  # P10: the MI look alone
-LINEAR_KEYS = ("Water",)
+LINEAR_KEYS = ("Water", "Anim")  # VS-5 EN-07: T_<Name>_ConceptAnim = the AnimMask (linear masks)
 
 
 def sha256_file(path: Path) -> str:

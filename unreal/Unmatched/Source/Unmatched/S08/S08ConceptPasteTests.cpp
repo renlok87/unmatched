@@ -19,6 +19,8 @@
 //              giOff, the sea ring to -300, the falls stretched), idempotent, RestoreHides
 //   MaterialOverride  the env-layout prop "material" (every slot / per slot, rejections, overlay, spawn, missing kept)
 //   LightsOff  -ArtPreviewLightsOff (gate G1): the engine lights at 0, the fog hidden, the lit3d sky hidden
+//   VS-5 EN-06: Parser also covers the "anim" object (fields, limits, 9 slots refused); Anim (S08ConceptPasteAnimTests.cpp)
+//   the flicker in sync with the linked light, frozen in -Bench / reduced motion, no mask -> UseAnim 0
 //   UnrealEditor-Cmd.exe Unmatched.uproject
 //     -ExecCmds="Automation RunTests Unmatched.S08.ConceptPaste; Quit" -unattended -nosplash -nullrhi
 #if WITH_AUTOMATION_TESTS
@@ -92,6 +94,14 @@ const TCHAR* const ValidBlock = TEXT(
     "\"flow\":{\"regions\":[{\"id\":\"waterfall\",\"rectPx\":[640,885,361,411],\"velocityPx\":[0,28],\"ampPx\":1.5}],"
     "\"sea\":{\"velocityPx\":[7,2],\"ampPx\":1.2}}}");
 
+/** VS-5 EN-06: a valid "anim" object for ValidBlock (slot 0 synced with its light lantern-left, slot 1 its own pair). */
+const TCHAR* const ValidAnim = TEXT(
+    "{\"note\":\"t\",\"mask\":\"/Game/EnvMaps/NoSuchCp/ConceptPaste/T_NoSuchCp_ConceptAnim\","
+    "\"lanterns\":[{\"id\":\"lantern-left\",\"c0Px\":[301,393],\"radiusPx\":120,\"light\":\"lantern-left\"},"
+    "{\"id\":\"sconce-w\",\"c0Px\":[905,31.5],\"radiusPx\":70,\"flicker\":{\"amp\":0.06,\"hz\":6}}],"
+    "\"wind\":{\"ampPx\":1.2,\"hz\":0.25,\"gustHz\":0.6,\"gustAmp\":0.35,\"wavePx\":400},"
+    "\"mist\":{\"opacity\":0.18,\"panPxPerS\":[6,0],\"noisePx\":220,\"colorSrgb\":\"#0F1523\"}}");
+
 FString Doc(const FString& MapBlock, const FString& GridBlock = FString()) {
   const FString MapExtra = MapBlock.IsEmpty() ? FString() : TEXT("\"conceptPaste\":") + MapBlock + TEXT(",");
   const FString GridExtra = GridBlock.IsEmpty() ? FString() : TEXT("\"conceptPaste\":") + GridBlock + TEXT(",");
@@ -154,6 +164,11 @@ const TCHAR* const ValidLit3d = TEXT(
     "\"winds\":[\"banner-ship\",\"tree-*\"],\"casters\":[\"island\",\"ship*\",\"tree-*\"],\"giOff\":[\"island\"]}");
 
 FString Lit3dBlock() { return BlockWithOn(BlockWith(TEXT("lit3d"), ValidLit3d), TEXT("mode"), TEXT("\"lit3d\"")); }
+
+/** VS-5 EN-06: ValidBlock with ValidAnim, one of its fields replaced / added / removed. */
+FString AnimWith(const FString& Field, const FString& Value, bool bRemove = false) {
+  return BlockWith(TEXT("anim"), BlockWithOn(ValidAnim, Field, Value, bRemove));
+}
 
 /** Lit3dBlock with one field of its "lit3d" object replaced / added / removed. */
 FString Lit3dWith(const FString& Field, const FString& Value, bool bRemove = false) {
@@ -439,6 +454,43 @@ bool FS08ConceptPasteParserTest::RunTest(const FString&) {
     TestTrue("lit3d defaults: scene, sky on, sea kept, falls x1", Defaults.Variant == TEXT("scene") && Defaults.bSky && !Defaults.bSeaZ &&
                                                                   Defaults.WaterfallScaleZ == 1.0f && !Defaults.bSet);
   }
+  {
+    // VS-5 EN-06: the "anim" object
+    FS08BoardArtData Data;
+    TArray<FString> Errors;
+    if (TestTrue(TEXT("anim block parses: ") + FString::Join(Errors, TEXT(" | ")),
+                 Data.ParseJson(Doc(BlockWith(TEXT("anim"), ValidAnim)), Errors))) {
+      const FS08ConceptPasteSpec& S = Find(Data, TEXT("cpmap"))->ConceptPaste;
+      const FS08ConceptPasteAnimSpec& A = S.Anim;
+      TestTrue("anim: set, mask", A.bSet && A.MaskPath.EndsWith(TEXT("T_NoSuchCp_ConceptAnim")));
+      if (TestEqual("anim: 2 slots", A.Lanterns.Num(), 2)) {
+        TestTrue("slot 0: linked to its light", A.Lanterns[0].Id == TEXT("lantern-left") && A.Lanterns[0].LightId == TEXT("lantern-left") &&
+                                                    A.Lanterns[0].C0Px == FVector2D(301, 393) && A.Lanterns[0].RadiusPx == 120.0f);
+        TestTrue("slot 1: own pair", A.Lanterns[1].LightId.IsEmpty() && FMath::IsNearlyEqual(A.Lanterns[1].FlickerAmp, 0.06f) &&
+                                         A.Lanterns[1].FlickerHz == 6.0f && A.Lanterns[1].C0Px.Y == 31.5);
+      }
+      TestTrue("anim: wind", A.Wind.bSet && FMath::IsNearlyEqual(A.Wind.AmpPx, 1.2f) && A.Wind.Hz == 0.25f &&
+                                 FMath::IsNearlyEqual(A.Wind.GustHz, 0.6f) && FMath::IsNearlyEqual(A.Wind.GustAmp, 0.35f) &&
+                                 A.Wind.WavePx == 400.0f);
+      TestTrue("anim: mist", A.Mist.bSet && FMath::IsNearlyEqual(A.Mist.Opacity, 0.18f) && A.Mist.PanPxPerS == FVector2D(6, 0) &&
+                                 A.Mist.NoisePx == 220.0f && A.Mist.Color == FColor(0x0F, 0x15, 0x23));
+      TestEqual("asset list: the paste's 6 + the anim mask", S.AssetPaths().Num(), 7);
+    }
+    FS08BoardArtData Data2;
+    TArray<FString> Errors2;
+    if (TestTrue(TEXT("anim with the mask only parses: ") + FString::Join(Errors2, TEXT(" | ")),
+                 Data2.ParseJson(Doc(BlockWith(TEXT("anim"), TEXT("{\"mask\":\"/Game/EnvMaps/X/T_Anim\"}"))), Errors2))) {
+      const FS08ConceptPasteAnimSpec& A = Find(Data2, TEXT("cpmap"))->ConceptPaste.Anim;
+      TestTrue("mask only: no slots, no wind, no mist", A.bSet && A.Lanterns.IsEmpty() && !A.Wind.bSet && !A.Mist.bSet);
+    }
+    TestFalse("no anim object: not set", FS08ConceptPasteSpec().Anim.bSet);
+  }
+  FString NineSlots = TEXT("[");
+  for (int32 I = 0; I <= S08ConceptPasteSpec::MaxAnimLanterns; ++I) {
+    NineSlots += FString::Printf(TEXT("%s{\"id\":\"s%d\",\"c0Px\":[%d,10],\"radiusPx\":20,\"flicker\":{\"amp\":0.05,\"hz\":4}}"),
+                                 I ? TEXT(",") : TEXT(""), I, 100 * I);
+  }
+  NineSlots += TEXT("]");
   struct FCase {
     const TCHAR* Name;
     FString MapBlock;
@@ -515,6 +567,24 @@ bool FS08ConceptPasteParserTest::RunTest(const FString&) {
       {TEXT("lit3d caster pattern"), Lit3dWith(TEXT("casters"), TEXT("[\"is*land\"]")), FString(), TEXT("lit3d.casters[0] must be")},
       {TEXT("lit3d giOff duplicate"), Lit3dWith(TEXT("giOff"), TEXT("[\"a\",\"a\"]")), FString(), TEXT("lit3d.giOff[1] must be")},
       {TEXT("lit3d winds not a list"), Lit3dWith(TEXT("winds"), TEXT("\"tree-*\"")), FString(), TEXT("lit3d.winds must be")},
+      // VS-5 EN-06 anim
+      {TEXT("anim not an object"), BlockWith(TEXT("anim"), TEXT("[1]")), FString(), TEXT("anim must be an object")},
+      {TEXT("anim unknown field"), AnimWith(TEXT("sway"), TEXT("{}")), FString(), TEXT("anim.sway is not a field")},
+      {TEXT("anim no mask"), AnimWith(TEXT("mask"), FString(), true), FString(), TEXT("anim.mask")},
+      {TEXT("anim mask outside EnvMaps"), AnimWith(TEXT("mask"), TEXT("\"/Game/EnvKit/T_Anim\"")), FString(), TEXT("anim.mask '/Game/EnvKit/T_Anim'")},
+      {TEXT("anim 9 slots"), AnimWith(TEXT("lanterns"), NineSlots), FString(), TEXT("anim.lanterns must be an array of at most 8")},
+      {TEXT("anim slot light unknown"), AnimWith(TEXT("lanterns"), TEXT("[{\"id\":\"a\",\"c0Px\":[1,2],\"radiusPx\":20,\"light\":\"nosuch\"}]")), FString(), TEXT("anim.lanterns[0] needs")},
+      {TEXT("anim slot light and flicker"), AnimWith(TEXT("lanterns"), TEXT("[{\"id\":\"a\",\"c0Px\":[1,2],\"radiusPx\":20,\"light\":\"fire-fort\",\"flicker\":{\"amp\":0.1,\"hz\":4}}]")), FString(), TEXT("anim.lanterns[0] needs")},
+      {TEXT("anim slot neither"), AnimWith(TEXT("lanterns"), TEXT("[{\"id\":\"a\",\"c0Px\":[1,2],\"radiusPx\":20}]")), FString(), TEXT("anim.lanterns[0] needs")},
+      {TEXT("anim slot radius"), AnimWith(TEXT("lanterns"), TEXT("[{\"id\":\"a\",\"c0Px\":[1,2],\"radiusPx\":400,\"light\":\"fire-fort\"}]")), FString(), TEXT("anim.lanterns[0] needs")},
+      {TEXT("anim slot duplicate"), AnimWith(TEXT("lanterns"), TEXT("[{\"id\":\"a\",\"c0Px\":[1,2],\"radiusPx\":20,\"light\":\"fire-fort\"},{\"id\":\"a\",\"c0Px\":[1,2],\"radiusPx\":20,\"light\":\"fire-fort\"}]")), FString(), TEXT("anim.lanterns[1] needs")},
+      {TEXT("anim slot flicker amp"), AnimWith(TEXT("lanterns"), TEXT("[{\"id\":\"a\",\"c0Px\":[1,2],\"radiusPx\":20,\"flicker\":{\"amp\":0.8,\"hz\":4}}]")), FString(), TEXT("anim.lanterns[0] needs")},
+      {TEXT("anim wind amp"), AnimWith(TEXT("wind"), TEXT("{\"ampPx\":5,\"hz\":0.25,\"gustHz\":0.6,\"gustAmp\":0,\"wavePx\":400}")), FString(), TEXT("anim.wind needs")},
+      {TEXT("anim wind field"), AnimWith(TEXT("wind"), TEXT("{\"ampPx\":1,\"hz\":0.25,\"gustHz\":0.6,\"gustAmp\":0,\"wavePx\":400,\"dir\":1}")), FString(), TEXT("anim.wind needs")},
+      {TEXT("anim wind offset over 4 px"), AnimWith(TEXT("wind"), TEXT("{\"ampPx\":3,\"hz\":0.25,\"gustHz\":0.6,\"gustAmp\":0.5,\"wavePx\":400}")), FString(), TEXT("> 4 C0 px")},
+      {TEXT("anim mist opacity"), AnimWith(TEXT("mist"), TEXT("{\"opacity\":0.5,\"panPxPerS\":[6,0],\"noisePx\":220,\"colorSrgb\":\"#0F1523\"}")), FString(), TEXT("anim.mist needs")},
+      {TEXT("anim mist pan"), AnimWith(TEXT("mist"), TEXT("{\"opacity\":0.1,\"panPxPerS\":[40,0],\"noisePx\":220,\"colorSrgb\":\"#0F1523\"}")), FString(), TEXT("anim.mist needs")},
+      {TEXT("anim mist colour"), AnimWith(TEXT("mist"), TEXT("{\"opacity\":0.1,\"panPxPerS\":[6,0],\"noisePx\":220,\"colorSrgb\":\"blue\"}")), FString(), TEXT("anim.mist needs")},
   };
   for (const FCase& C : Cases) {
     FS08BoardArtData Data;
@@ -656,7 +726,7 @@ bool FS08ConceptPasteModeTest::RunTest(const FString&) {
 }
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08ConceptPasteShippedTest,
-    "Unmatched.S08.ConceptPaste.Shipped Sarpedon ON by default, Marmoreal present but OFF, no grid block, 1 key + 6 points",
+    "Unmatched.S08.ConceptPaste.Shipped Sarpedon ON by default, Marmoreal present but OFF (ENV-U16 plate + anim), no grid block, 1 key + 6 points",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FS08ConceptPasteShippedTest::RunTest(const FString&) {
   using namespace S08ConceptPasteTest;
@@ -798,10 +868,29 @@ bool FS08ConceptPasteShippedTest::RunTest(const FString&) {
   const FS08ConceptPasteSpec& M = Marmoreal->ConceptPaste;
   TestTrue("marmoreal: no lit3d (the accepted look, paste comparison only)", !M.Lit3d.bSet && M.DefaultKind == ES08ConceptKind::Paste);
   TestTrue("marmoreal: no material wind", M.WindProps.IsEmpty());
-  TestTrue("marmoreal: block present, OFF by default (the accepted look)", M.bSet && !M.bDefaultOn && M.Variant == TEXT("concept"));
-  TestTrue("marmoreal: no lights of its own, the layout lights stay, no sea", M.Lights.IsEmpty() && !M.Hide.bLayoutLights && !M.Sea.bSet);
-  TestTrue("marmoreal: rectified plates A + B, edge clamp", M.Homography.IsIdentity() && !M.PlateAPath.IsEmpty() &&
-                                                                M.RectB == FVector4(-384, -216, 2688, 1512) && M.bClampOutside);
+  TestTrue("marmoreal: block present, OFF by default until EN-13", M.bSet && !M.bDefaultOn && M.Variant == TEXT("concept"));
+  // VS-5 E1 (EN-06 + EN-07): the painted backdrop - own lantern / door points instead of the P5c layout lights, no sea, the
+  // outpainted x2 plate covers rect B (clip), the anim channels with 6 slots, 4 of them synced with the lantern points
+  {
+    const FS08LightProfile* MarNight = Data.LightFor(*Marmoreal);
+    TestTrue(FString::Printf(TEXT("marmoreal: 5 own points (4 lanterns + the door) + profile %d <= 6, layout lights hidden, no sea"),
+                             MarNight ? MarNight->Points.Num() : -1),
+             M.Lights.Num() == 5 && M.Hide.bLayoutLights && !M.Sea.bSet && MarNight &&
+                 MarNight->Points.Num() + M.Lights.Num() <= S08ConceptPasteSpec::CombinedPointBudget);
+    TestTrue("marmoreal: the four lanterns flicker, the door glow is steady (ВР-EN.3)",
+             M.Lights.FilterByPredicate([](const FS08ConceptLight& L) { return L.FlickerAmp > 0.0f; }).Num() == 4 &&
+                 M.Lights.ContainsByPredicate([](const FS08ConceptLight& L) { return L.Id == TEXT("portal-glow") && L.FlickerAmp == 0.0f; }));
+    for (const FS08ConceptLight& L : M.Lights) {
+      TestTrue(L.Id + TEXT(": outside the painted map"), FMath::Abs(L.Loc.X) > Marmoreal->Map.HalfUU().X ||
+                                                              FMath::Abs(L.Loc.Y) > Marmoreal->Map.HalfUU().Y);
+    }
+    TestTrue("marmoreal: anim block, 6 slots, 4 synced", M.Anim.bSet && M.Anim.Lanterns.Num() == 6 &&
+                                                         M.Anim.Lanterns.FilterByPredicate([](const FS08ConceptAnimLantern& A) {
+                                                           return !A.LightId.IsEmpty();
+                                                         }).Num() == 4);
+  }
+  TestTrue("marmoreal: rectified plates A + B over rect B, clipped outside (the plate covers rect B)",
+           M.Homography.IsIdentity() && !M.PlateAPath.IsEmpty() && M.RectB == FVector4(-384, -216, 2688, 1512) && !M.bClampOutside);
   // what the board actor decides without any flag
   const FS08ConceptPasteInputs NoFlags = Inputs(TEXT("Unmatched -game -ArtPreview -ArtPreviewDiorama"));
   const FS08ConceptPasteMode SarMode = S08ConceptPaste::ResolveMode(S, NoFlags, true);

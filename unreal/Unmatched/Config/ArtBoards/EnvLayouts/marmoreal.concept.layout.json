@@ -72,6 +72,12 @@
     ],
     "add": []
   },
+  "fx": {
+    "remove": [
+      "fireflies-garden-w",
+      "fireflies-garden-e"
+    ]
+  },
   "conceptPaste": {
     "spec": "tools/art/concept_paste/marmoreal.paste.json",
     "manifest": "tools/art/concept_paste/manifest.marmoreal.json",
@@ -82,9 +88,137 @@
       "profile backdrop"
     ],
     "lights": {
-      "mode": "base",
-      "note": "the base layout's lights stay"
-    }
+      "mode": "profile",
+      "reference": [
+        {
+          "id": "lantern-nw",
+          "loc": [
+            -448.5,
+            -435.0,
+            97.0
+          ]
+        },
+        {
+          "id": "lantern-ne",
+          "loc": [
+            445.7,
+            -433.2,
+            97.0
+          ]
+        },
+        {
+          "id": "lantern-w",
+          "loc": [
+            -659.7,
+            108.4,
+            97.0
+          ]
+        },
+        {
+          "id": "lantern-e",
+          "loc": [
+            668.8,
+            110.4,
+            97.0
+          ]
+        },
+        {
+          "id": "portal-glow",
+          "loc": [
+            -4.1,
+            -410.5,
+            260.7
+          ]
+        }
+      ],
+      "note": "informational: the profile block conceptPaste carries the lights (hide 'layoutLights'); MergeOverlay refuses a top-level 'lights' - the base light budget stays protected"
+    },
+    "paintLanterns": [
+      {
+        "id": "lantern-nw",
+        "c0Px": [
+          486.6,
+          105.2
+        ],
+        "world": [
+          -448.5,
+          -435.0,
+          97.0
+        ]
+      },
+      {
+        "id": "lantern-ne",
+        "c0Px": [
+          1430.6,
+          106.6
+        ],
+        "world": [
+          445.7,
+          -433.2,
+          97.0
+        ]
+      },
+      {
+        "id": "lantern-w",
+        "c0Px": [
+          179.3,
+          579.2
+        ],
+        "world": [
+          -659.7,
+          108.4,
+          97.0
+        ]
+      },
+      {
+        "id": "lantern-e",
+        "c0Px": [
+          1751.8,
+          581.2
+        ],
+        "world": [
+          668.8,
+          110.4,
+          97.0
+        ]
+      },
+      {
+        "id": "sconce-door-w",
+        "c0Px": [
+          904.9,
+          31.4
+        ],
+        "world": [
+          -50.1,
+          -410.5,
+          220.3
+        ]
+      },
+      {
+        "id": "sconce-door-e",
+        "c0Px": [
+          1007.3,
+          32.2
+        ],
+        "world": [
+          43.0,
+          -410.5,
+          219.3
+        ]
+      },
+      {
+        "id": "portal",
+        "c0Px": [
+          955.4,
+          -0.5
+        ],
+        "world": [
+          -4.1,
+          -410.5,
+          260.7
+        ]
+      }
+    ]
   },
   "notes": "ENV-MAPS P7 concept mode (ENV-U15), variant 'concept', written by tools/art/concept_paste/cp_layout.py from marmoreal.paste.json + the P7 asset build report. Status: предложено (CREATE stage, nothing rendered in UE yet)."
 }

@@ -2,6 +2,7 @@
 
 #include "S08Contracts.h"
 #include "S08Diorama.h"
+#include "S08IconMotion.h"
 #include "S08Render.h"
 #include "S08TraceLog.h"
 #include "Components/PointLightComponent.h"
@@ -299,6 +300,15 @@ bool EnvParseFx(const TSharedPtr<FJsonObject>& Obj, int32 Index, TSet<FString>& 
     }
   }
   if (!EnvOptionalBool(Obj, TEXT("enabled"), Out.bEnabled)) Errors.Add(Ctx + TEXT(": enabled is not a bool"));
+  if (Obj->HasField(TEXT("reducedMotion"))) {
+    // VS-5 EN-06 (ВР-EN.4): "off" = not spawned with reduced motion, "freeze" (default) = still after the warmup
+    FString Rm;
+    if (!Obj->TryGetStringField(TEXT("reducedMotion"), Rm) || (Rm != TEXT("off") && Rm != TEXT("freeze"))) {
+      Errors.Add(Ctx + TEXT(": reducedMotion must be \"off\" | \"freeze\""));
+    } else {
+      Out.bReducedOff = Rm == TEXT("off");
+    }
+  }
   if (Obj->HasField(TEXT("user"))) {
     const TSharedPtr<FJsonObject>* UserObj = nullptr;
     if (!Obj->TryGetObjectField(TEXT("user"), UserObj) || !UserObj || !UserObj->IsValid()) {
@@ -830,7 +840,7 @@ bool MergeOverlay(const FString& BaseText, const FString& OverlayText, const FSt
   }
   EnvOverlaySection(Base, Overlay, TEXT("fx"),
                     {TEXT("system"), TEXT("anchor"), TEXT("loc"), TEXT("yawDeg"), TEXT("scale"), TEXT("seed"),
-                     TEXT("warmupS"), TEXT("enabled"), TEXT("user")},
+                     TEXT("warmupS"), TEXT("enabled"), TEXT("user"), TEXT("reducedMotion")},
                     DroppedWithAnchor, R.FxRemoved, R.FxReplaced, R.FxAdded, RemovedFx, TouchedFx, R.Errors);
   if (R.Errors.Num() != Before) return false;
   FString MergedText;
@@ -1161,8 +1171,11 @@ FS08EnvFxOptions FS08EnvFxOptions::FromCommandLine() {
   O.bSpawn = !S08EnvLayout::FxOptOut();
   O.bBench = FParse::Param(Cmd, S08EnvLayoutSpec::BenchFlagName);
   // -Bench frames must be reproducible: freeze after the warmup unless -EnvFxLive; -EnvFxFreeze anywhere.
-  O.bFreeze = (O.bBench && !FParse::Param(Cmd, S08EnvLayoutSpec::FxLiveFlagName)) ||
-              FParse::Param(Cmd, S08EnvLayoutSpec::FxFreezeFlagName);
+  O.bFreezeFlag = FParse::Param(Cmd, S08EnvLayoutSpec::FxFreezeFlagName);
+  O.bFreeze = (O.bBench && !FParse::Param(Cmd, S08EnvLayoutSpec::FxLiveFlagName)) || O.bFreezeFlag;
+  // VS-5 EN-06 (ВР-EN.4): reduced motion stills the environment on both maps (fx, the paste animation, MPC_EnvScene Live)
+  O.bReduced = S08IconMotion::IsReducedMotion();
+  O.bFreeze |= O.bReduced;
   return O;
 }
 
@@ -1170,6 +1183,13 @@ FString FS08EnvFxOptions::Mode() const {
   if (!bSpawn) return TEXT("off");
   if (!bActivate) return TEXT("inactive");
   return bFreeze ? TEXT("frozen") : TEXT("live");
+}
+
+FString FS08EnvFxOptions::Reason() const {
+  if (!bSpawn) return TEXT("no-fx");
+  if (!bFreeze) return TEXT("live");  // e.g. a live-tune live shot overrides the freeze
+  if (bReduced) return TEXT("reduced");
+  return bFreezeFlag && !bBench ? TEXT("flag") : TEXT("bench");
 }
 
 namespace S08EnvLayoutPrivate {
@@ -1269,6 +1289,7 @@ FS08EnvFxStats SpawnFx(const FS08EnvLayout& Layout, AActor& Owner, USceneCompone
   FS08EnvFxStats S;
   S.LayoutFx = Layout.Fx.Num();
   S.Mode = Options.Mode();
+  S.Reason = Options.Reason();
   if (!Options.bSpawn) return S;
   USceneComponent* Attach = Parent ? Parent : Owner.GetRootComponent();
   TMap<FString, UNiagaraSystem*> Loaded;  // nullptr = tried, missing
@@ -1277,6 +1298,13 @@ FS08EnvFxStats SpawnFx(const FS08EnvLayout& Layout, AActor& Owner, USceneCompone
     if (!F.bEnabled) {
       ++S.SkippedDisabled;
       FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW envlayout fx skipped id=%s reason=disabled"), *F.Id));
+      continue;
+    }
+    if (Options.bReduced && F.bReducedOff) {
+      // VS-5 EN-06 (ВР-EN.4): petals / fireflies are not spawned with reduced motion
+      ++S.SkippedReduced;
+      FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW envlayout fx id=%s system=%s mode=off reason=reduced"), *F.Id,
+                                       *FPackageName::GetShortName(EnvPackageOf(F.System))));
       continue;
     }
     const FS08EnvProp* AnchorProp = nullptr;
@@ -1375,10 +1403,11 @@ FS08EnvFxStats SpawnFx(const FS08EnvLayout& Layout, AActor& Owner, USceneCompone
     const bool bDeterministic = Info.bDeterminism && Info.Gpu == 0;
     S.NonDeterministic += bDeterministic ? 0 : 1;
     FS08Trace::Write(FString::Printf(
-        TEXT("ARTPREVIEW envlayout fx id=%s system=%s anchor=%s at=%s yaw=%.1f scale=%.3f seed=%d warmup=%.2fs ticks=%d mode=%s particles=%d emitters=%d gpuEmitters=%d deterministic=%d nearBand=%d user=%s"),
+        TEXT("ARTPREVIEW envlayout fx id=%s system=%s anchor=%s at=%s yaw=%.1f scale=%.3f seed=%d warmup=%.2fs ticks=%d mode=%s particles=%d emitters=%d gpuEmitters=%d deterministic=%d nearBand=%d user=%s reason=%s"),
         *F.Id, *FPackageName::GetShortName(EnvPackageOf(F.System)), F.Anchor.IsEmpty() ? TEXT("-") : *F.Anchor,
         *EnvVec(At), T.Rotator().Yaw, F.Scale, Seed, F.WarmupS, Ticks, *S.Mode, Particles, Info.Emitters, Info.Gpu,
-        bDeterministic ? 1 : 0, bNearBand ? 1 : 0, UserTrace.Num() ? *FString::Join(UserTrace, TEXT("+")) : TEXT("-")));
+        bDeterministic ? 1 : 0, bNearBand ? 1 : 0, UserTrace.Num() ? *FString::Join(UserTrace, TEXT("+")) : TEXT("-"),
+        *S.Reason));
   }
   for (const TPair<FString, TArray<FString>>& Missing : MissingIds) {
     ++S.MissingSystems;
@@ -1406,10 +1435,11 @@ int32 ClearFx(TArray<TWeakObjectPtr<UNiagaraComponent>>& Fx) {
 
 FString FxSummaryLine(const FString& MapKey, const FS08EnvFxStats& S) {
   return FString::Printf(
-      TEXT("ARTPREVIEW envlayout fx map=%s fx=%d layoutFx=%d missingSystems=%d skippedMissing=%d skippedDisabled=%d skippedAnchor=%d skippedInsideMap=%d skippedLightRenderer=%d nearBand=%d gpuEmitters=%d nonDeterministic=%d particles=%d userSet=%d userMissing=%d mode=%s still=%d"),
+      TEXT("ARTPREVIEW envlayout fx map=%s fx=%d layoutFx=%d missingSystems=%d skippedMissing=%d skippedDisabled=%d skippedAnchor=%d skippedInsideMap=%d skippedLightRenderer=%d nearBand=%d gpuEmitters=%d nonDeterministic=%d particles=%d userSet=%d userMissing=%d mode=%s still=%d reducedOff=%d reason=%s"),
       MapKey.IsEmpty() ? TEXT("-") : *MapKey, S.Fx, S.LayoutFx, S.MissingSystems, S.SkippedMissing, S.SkippedDisabled,
       S.SkippedAnchor, S.SkippedInsideMap, S.SkippedLightRenderer, S.NearBand, S.GpuEmitters, S.NonDeterministic,
-      S.Particles, S.UserSet, S.UserMissing, S.Mode.IsEmpty() ? TEXT("-") : *S.Mode, S.Frozen);
+      S.Particles, S.UserSet, S.UserMissing, S.Mode.IsEmpty() ? TEXT("-") : *S.Mode, S.Frozen, S.SkippedReduced,
+      S.Reason.IsEmpty() ? TEXT("-") : *S.Reason);
 }
 
 int32 Clear(TArray<TObjectPtr<UStaticMeshComponent>>& Props, TArray<TObjectPtr<UPointLightComponent>>& Lights) {
@@ -1471,9 +1501,9 @@ void Update(const FS08EnvLayoutRequest& Request, AActor& Owner, USceneComponent*
     Variant.Name = VariantName;
     Variant.Status = TEXT("none");
   }
-  const FString Key = FString::Printf(TEXT("%s|%s|%s|%s|variant=%s:%s:%s|fx=%s"), *Request.MapKey, *Request.RoomBoardId,
+  const FString Key = FString::Printf(TEXT("%s|%s|%s|%s|variant=%s:%s:%s|fx=%s:%s"), *Request.MapKey, *Request.RoomBoardId,
                                       bOk ? *Layout.SourceSha256 : (bAbsent ? TEXT("absent") : TEXT("invalid")), *Dir,
-                                      *Variant.Name, *Variant.Status, *Variant.Sha256, *FxOptions.Mode());
+                                      *Variant.Name, *Variant.Status, *Variant.Sha256, *FxOptions.Mode(), *FxOptions.Reason());
   if (Runtime.bApplied && Runtime.Key == Key) {
     return;  // the same layout bytes on the same board again: the components (or the traced failure) stay as they are
   }

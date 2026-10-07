@@ -42,6 +42,10 @@
 //    CRC of the id), warmup = warmupS of simulation in fixed 1/30 s ticks at spawn (AdvanceSimulation), and in -Bench
 //    (or with -EnvFxFreeze) the systems are paused after the warmup (-EnvFxLive keeps them running in -Bench).
 //    Trace: 'ARTPREVIEW envlayout fx id=.. system=.. ...' per fx and 'ARTPREVIEW envlayout fx map=.. fx=N ...'.
+//    VS-5 EN-06 (ВР-EN.4): reduced motion (S08IconMotion::IsReducedMotion: -S08ReducedMotion, s08.ReducedMotion, the
+//    saved setting) freezes every fx after its warmup like -Bench; an fx with "reducedMotion": "off" does not spawn at
+//    all ('ARTPREVIEW envlayout fx id=.. mode=off reason=reduced'); "freeze" is the default. Every per-fx and summary
+//    line ends with reason=live|bench|flag|reduced|no-fx.
 //  * layout variants: -EnvLayoutVariant=<name> overlays <Dir>/<map>.<name>.layout.json (schema
 //    "unmatched.env-layout-overlay/1": props / fx {remove:[ids], replace:[{id, fields..}], add:[entries]}) on the base
 //    layout; the merged document is validated like a base layout. No flag = no overlay (the base, byte for byte); a
@@ -175,6 +179,9 @@ struct UNMATCHED_API FS08EnvFx {
   int32 Seed = 0;
   float WarmupS = S08EnvLayoutSpec::DefaultFxWarmupS;
   bool bEnabled = true;
+  /** VS-5 EN-06 (ВР-EN.4): "reducedMotion" "off" | "freeze" (default): with reduced motion (S08IconMotion::IsReducedMotion,
+   *  -S08ReducedMotion) an "off" fx does not spawn, a "freeze" one stops after its warmup like in -Bench. */
+  bool bReducedOff = false;
   TArray<FS08EnvFxParam> User;
   /** Seed, or a stable CRC of the id (the same on every run). */
   int32 EffectiveSeed() const;
@@ -266,11 +273,16 @@ struct UNMATCHED_API FS08EnvFxOptions {
   bool bActivate = true;  // false: components are created and configured but never simulated (automation)
   bool bFreeze = false;   // still after the warmup (-Bench unless -EnvFxLive, or -EnvFxFreeze): time dilation 0 (P7c)
   bool bBench = false;
+  /** VS-5 EN-06: reduced motion (S08IconMotion::IsReducedMotion) - bFreeze too, and fx with reducedMotion "off" skip. */
+  bool bReduced = false;
+  bool bFreezeFlag = false;  // -EnvFxFreeze given
   /** Automation only: systems by layout path instead of loading packages. */
   TMap<FString, UNiagaraSystem*> Preloaded;
   static FS08EnvFxOptions FromCommandLine();
   /** off | frozen | live | inactive */
   FString Mode() const;
+  /** Why: no-fx (-ArtPreviewNoFx) | reduced | bench | flag (-EnvFxFreeze) | live (the trace's reason=). */
+  FString Reason() const;
 };
 
 /** What one SpawnFx did (also the fx summary trace). */
@@ -290,6 +302,8 @@ struct UNMATCHED_API FS08EnvFxStats {
   int32 UserSet = 0;               // user parameters applied
   int32 UserMissing = 0;           // user parameters the system does not expose (or with the wrong arity)
   int32 Frozen = 0;                // ENV-MAPS P7c: fx frozen by time dilation 0 after the warmup (trace 'still=')
+  int32 SkippedReduced = 0;        // VS-5 EN-06: reducedMotion "off" fx not spawned under reduced motion
+  FString Reason;                  // FS08EnvFxOptions::Reason()
   FString Mode;
   TArray<FString> MissingPaths;
   /** ENV-MAPS P7: the id of every component SpawnFx appended, in the order of OutFx. */

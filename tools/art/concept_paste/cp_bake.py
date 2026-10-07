@@ -22,6 +22,16 @@ Textures per map (the <map>.paste.json "bake" block; T_<Name>_Concept<Key>.png, 
           the island matte, inside it the sea-sky plate matched by mean / std (disocclusion fill)
   Water   RGB  2048 x 1024 over the outpainted range (optional, Sarpedon): R painted waterfall, G painted bay surf,
           B open sea (1 - island) - masks for the flow / foam animation of the paste material (overlays of the spec)
+  Anim    RGBA 2048 x 1024 over the outpainted range (VS-5 EN-07, Marmoreal): the spec's "anim" plate (EN-04
+          marmoreal-anim-2x.png: R lantern glow, G crowns, B ground mist, A petal area) through the same C0 mapping,
+          linear (no sRGB) - the AnimMask of M_ConceptPaste's anim channels (S08ConceptPasteAnim.h)
+
+VS-5 EN-07 (ENV-U16): a colour plate may be DERIVED from the registered concept ("registration": "<tag>" on the colour
+entry, its own "sha256"): the plate holds the concept framing pixel-placed at conceptRectPx (EN-02 outpaint keeps the
+original area, EN-03 x2), so the tag's homography applies unchanged (registration.json stays as it is). "overlays" of kind
+"paint-overlay" ({file, size, conceptRectPx, sha256, blend "alpha"}: the EN-04 lantern layer) are composited over the
+colour plate (straight alpha, sRGB values) BEFORE the resampling, so PlateA / PlateB carry the painted lanterns.
+"plates.dir" may be relative to the checkout (then the main checkout's copy is the fallback: scraped-data is gitignored).
 
 Outputs go OUT of git (default <repo>/scraped-data/derived/concept-paste/<map>/, gitignored like the map surfaces);
 git holds this script, the parameters and manifest.<map>.json (input / output sha256, texel densities, statistics, the
@@ -87,9 +97,37 @@ def load_spec(map_key: str) -> dict:
     return pp.load_spec(map_key)
 
 
+def plates_dir(spec: dict) -> Path:
+    """plates.dir: absolute, or relative to this checkout (fallback: the main checkout - scraped-data is gitignored)."""
+    d = Path(spec["plates"]["dir"])
+    if d.is_absolute():
+        return d
+    local = REPO / d
+    return local if local.is_dir() else C.MAIN / d
+
+
 def plate_path(spec: dict, entry: dict) -> Path:
     p = Path(entry["file"])
-    return p if p.is_absolute() else Path(spec["plates"]["dir"]) / p
+    return p if p.is_absolute() else plates_dir(spec) / p
+
+
+def paint_overlays(spec: dict) -> list[dict]:
+    """VS-5 EN-07: the "paint-overlay" entries (composited over the colour plate before the resampling)."""
+    return [o for o in spec.get("overlays", []) if o.get("kind") == "paint-overlay"]
+
+
+def load_plate_rgba(path: Path, entry: dict, mode: str) -> np.ndarray:
+    """An auxiliary plate (overlay / anim) at the colour plate's geometry, as float 0..1; sha256 checked."""
+    got = C.sha256(path)
+    if entry.get("sha256") and got != entry["sha256"]:
+        raise RuntimeError(f"{path}: sha256 {got} differs from the spec ({entry['sha256']})")
+    img = Image.open(path)
+    if img.mode != mode:
+        raise RuntimeError(f"{path}: mode {img.mode}, expected {mode}")
+    arr = np.asarray(img).astype(np.float32) / 255.0
+    if tuple(arr.shape[1::-1]) != tuple(entry["size"]):
+        raise RuntimeError(f"{path}: size {arr.shape[1::-1]} != spec {entry['size']}")
+    return arr
 
 
 def reflect(x, period: float):
@@ -145,6 +183,19 @@ def colour_registration(map_key: str, spec: dict, reg: dict | None = None) -> di
     reg = reg or load_registration()
     tag = spec["bake"]["colourTag"]
     entry = reg["maps"][map_key][tag]
+    col = spec["plates"]["colour"]
+    if col.get("registration") is not None:
+        # VS-5 EN-07: a plate derived from the registered concept (the framing pixel-placed at conceptRectPx): the tag's
+        # homography, the plate's own sha256 (registration.json is not changed)
+        if col["registration"] != tag:
+            raise RuntimeError(f"{map_key}: colour registration {col['registration']!r} != bake.colourTag {tag!r}")
+        if entry.get("crop"):
+            raise RuntimeError(f"{map_key}: a derived plate needs a tag registered on the full concept framing")
+        if not col.get("sha256"):
+            raise RuntimeError(f"{map_key}: a derived colour plate needs its sha256 in the spec")
+        return dict(entry, plate=col["file"], sha256=col["sha256"], derivedFrom=entry["plate"],
+                    crop=[col["conceptRectPx"][0], col["conceptRectPx"][1], col["conceptRectPx"][0] + col["conceptRectPx"][2],
+                          col["conceptRectPx"][1] + col["conceptRectPx"][3]])
     if Path(entry["plate"]).name != Path(spec["plates"]["colour"]["file"]).name:
         raise RuntimeError(f"{map_key}: registration tag {tag} is for {entry['plate']}, the colour plate is "
                            f"{spec['plates']['colour']['file']}")
@@ -255,7 +306,9 @@ def bake_texture(map_key: str, spec: dict, name: str, tex: dict, plates: dict, H
     sy = (rh / C.H) * (rect[3] - rect[1]) / h
     island = island_matte(spec, rect, (w, h))
     chunk = int(spec["bake"].get("chunkRows", 64))
-    rgb = np.zeros((h, w, 3), np.float32)
+    # VS-5 EN-07: the anim texture samples the EN-04 masks (same geometry as the colour plate) through the same mapping
+    src, src_spec = (plates["anim"], spec["anim"]) if kind == "anim" else (plate, sp)
+    rgb = np.zeros((h, w, src.shape[2]), np.float32)
     under_all = np.zeros((h, w), bool)
     moved_n = 0
     t0 = time.time()
@@ -263,11 +316,11 @@ def bake_texture(map_key: str, spec: dict, name: str, tex: dict, plates: dict, H
         rows = slice(r0, min(h, r0 + chunk))
         FX, FY = texel_c0(rect, (w, h), rows)
         SX, SY, under, moved = sample_points(spec, cam, FX, FY)
-        PX, PY = pp.c0_to_plate(sp, H, SX, SY)
-        rgb[rows] = lanczos_sample(plate, PX, PY, sx, sy, a)
+        PX, PY = pp.c0_to_plate(src_spec, H, SX, SY)
+        rgb[rows] = lanczos_sample(src, PX, PY, sx, sy, a)
         under_all[rows] = under
         moved_n += int(moved.sum())
-    of = spec["bake"].get("outsideFrame")
+    of = spec["bake"].get("outsideFrame") if kind != "anim" else None
     if of:  # no outpaint (Marmoreal flag variant): fade the edge clamp outside the concept frame to a dark border tone
         FX, FY = texel_c0(rect, (w, h))
         dist = np.hypot(np.maximum(np.maximum(-FX, FX - C.W), 0), np.maximum(np.maximum(-FY, FY - C.H), 0))
@@ -283,6 +336,13 @@ def bake_texture(map_key: str, spec: dict, name: str, tex: dict, plates: dict, H
              "texelsPerC0Px": [round(w / (rect[2] - rect[0]), 4), round(h / (rect[3] - rect[1]), 4)],
              "bandResampledTexels": moved_n}
     log(f"    resampled in {time.time() - t0:.1f} s")
+    if kind == "anim":
+        # VS-5 EN-07: the EN-04 masks through the same C0 mapping (frame band, registration, Lanczos); never a matte -
+        # the masks are already 0 on the field + 2 % and the frame band (EN-04 protection)
+        out = rgb
+        stats["coverage"] = {ch: round(float((out[..., i] > 0.5).mean()), 4) for i, ch in enumerate("RGBA"[:out.shape[2]])}
+        stats["max"] = {ch: round(float(out[..., i].max()), 4) for i, ch in enumerate("RGBA"[:out.shape[2]])}
+        return out, stats
     if kind == "paste":
         alpha = island * (~under_all)
         out = np.dstack([rgb, alpha]).astype(np.float32)
@@ -366,6 +426,10 @@ def input_list(spec: dict) -> dict:
         e = spec["plates"].get(role)
         if e:
             out[role] = {"file": plate_path(spec, e).as_posix(), "size": e["size"]}
+    for o in paint_overlays(spec):  # VS-5 EN-07
+        out[f"overlay:{o['id']}"] = {"file": plate_path(spec, o).as_posix(), "size": o["size"]}
+    if spec.get("anim"):
+        out["anim"] = {"file": plate_path(spec, spec["anim"]).as_posix(), "size": spec["anim"]["size"]}
     return out
 
 
@@ -374,7 +438,7 @@ def generator_hashes() -> dict:
 
 
 UE_FOLDER = "/Game/EnvMaps/{name}/ConceptPaste"
-PROFILE_KEYS = {"PlateA": "plateA", "PlateB": "plateB", "Sea": "seaPlate", "Water": "waterMask"}
+PROFILE_KEYS = {"PlateA": "plateA", "PlateB": "plateB", "Sea": "seaPlate", "Water": "waterMask", "Anim": "anim.mask"}
 
 
 def material_contract(spec: dict) -> dict:
@@ -411,8 +475,14 @@ def check(map_key: str, out_root: Path, verbose: bool = True) -> dict:
     reg = colour_registration(map_key, spec)
     for role, e in input_list(spec).items():
         p = Path(e["file"])
-        want = reg["sha256"] if role == "colour" else (spec["plates"][role].get("sha256")
-                                                        or (man or {}).get("inputs", {}).get(role, {}).get("sha256"))
+        if role == "colour":
+            want = reg["sha256"]
+        elif role.startswith("overlay:"):
+            want = next(o for o in paint_overlays(spec) if f"overlay:{o['id']}" == role).get("sha256")
+        elif role == "anim":
+            want = spec["anim"].get("sha256")
+        else:
+            want = spec["plates"][role].get("sha256") or (man or {}).get("inputs", {}).get(role, {}).get("sha256")
         got = C.sha256(p) if p.is_file() else None
         ok = got is not None and (want is None or got == want)
         res["inputs"][role] = {"file": e["file"], "sha256": got, "expected": want, "ok": ok}
@@ -439,9 +509,12 @@ def check(map_key: str, out_root: Path, verbose: bool = True) -> dict:
 def bake_params(spec: dict) -> dict:
     """Everything of the spec that decides the texture bytes (hashed into the manifest)."""
     g = spec["geometry"]
-    return {"bake": spec["bake"], "plates": {k: spec["plates"].get(k) for k in ("colour", "seaSky")},
-            "cut": spec["cut"], "islandMatte": g["islandMatte"], "groundZ": g["groundZ"],
-            "overlays": [o for o in spec.get("overlays", []) if "pxRect" in o]}
+    out = {"bake": spec["bake"], "plates": {k: spec["plates"].get(k) for k in ("colour", "seaSky")},
+           "cut": spec["cut"], "islandMatte": g["islandMatte"], "groundZ": g["groundZ"],
+           "overlays": [o for o in spec.get("overlays", []) if "pxRect" in o or o.get("kind") == "paint-overlay"]}
+    if spec.get("anim"):  # VS-5 EN-07 (absent on Sarpedon: its parameter hash stays as it was)
+        out["anim"] = spec["anim"]
+    return out
 
 
 def bake(map_key: str, out_root: Path, force: bool = False, log=print) -> dict:
@@ -458,6 +531,28 @@ def bake(map_key: str, out_root: Path, force: bool = False, log=print) -> dict:
         raise RuntimeError(f"{cpath}: size {plates['colour'].shape[1::-1]} != spec {spec['plates']['colour']['size']}")
     inputs = {"colour": {"file": cpath.as_posix(), "sha256": got, "size": spec["plates"]["colour"]["size"],
                          "registrationTag": spec["bake"]["colourTag"]}}
+    if reg.get("derivedFrom"):
+        inputs["colour"]["derivedFrom"] = reg["derivedFrom"]
+    sp = spec["plates"]["colour"]
+    for ov in paint_overlays(spec):
+        # VS-5 EN-07: the painted lanterns back over the clean plate (straight alpha) before the resampling
+        if list(ov["size"]) != list(sp["size"]) or list(ov["conceptRectPx"]) != list(sp["conceptRectPx"]):
+            raise RuntimeError(f"overlay {ov['id']}: size / conceptRectPx differ from the colour plate")
+        if ov.get("blend", "alpha") != "alpha":
+            raise RuntimeError(f"overlay {ov['id']}: blend {ov.get('blend')!r} (only alpha)")
+        opath = plate_path(spec, ov)
+        layer = load_plate_rgba(opath, ov, "RGBA")
+        a_ = layer[..., 3:4]
+        plates["colour"] = (plates["colour"] * (1.0 - a_) + layer[..., :3] * a_).astype(np.float32)
+        inputs[f"overlay:{ov['id']}"] = {"file": opath.as_posix(), "sha256": C.sha256(opath), "size": ov["size"]}
+        del layer, a_
+    if spec.get("anim"):
+        an = spec["anim"]
+        if list(an["size"]) != list(sp["size"]) or list(an["conceptRectPx"]) != list(sp["conceptRectPx"]):
+            raise RuntimeError("anim: size / conceptRectPx differ from the colour plate")
+        apath = plate_path(spec, an)
+        plates["anim"] = load_plate_rgba(apath, an, "RGBA")
+        inputs["anim"] = {"file": apath.as_posix(), "sha256": C.sha256(apath), "size": an["size"]}
     ss = spec["plates"].get("seaSky")
     if ss:
         spath = plate_path(spec, ss)

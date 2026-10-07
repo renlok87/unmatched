@@ -86,7 +86,7 @@
     2688,
     1512
    ],
-   "seaPlate": [
+   "anim.mask": [
     -384,
     -216,
     2688,
@@ -96,27 +96,44 @@
   "assets": {
    "plateA": "/Game/EnvMaps/Marmoreal/ConceptPaste/T_Marmoreal_ConceptPlateA",
    "plateB": "/Game/EnvMaps/Marmoreal/ConceptPaste/T_Marmoreal_ConceptPlateB",
-   "seaPlate": "/Game/EnvMaps/Marmoreal/ConceptPaste/T_Marmoreal_ConceptSea"
+   "anim.mask": "/Game/EnvMaps/Marmoreal/ConceptPaste/T_Marmoreal_ConceptAnim"
   },
   "alpha": "plateA / plateB A = island matte (featherPx) x NOT under frame-002 (cut underFrameUU); opacity mask 0.5",
-  "outside": "clamp",
-  "outsideNote": "plate B carries its own blurred / faded edge fill outside the concept frame (outsideFrame); beyond its rect the edge clamp continues that dark tone"
+  "outside": "clip",
+  "outsideNote": "the outpainted plate B covers every game view (K1x0.65: 0 % beyond it)"
  },
  "generator": {
-  "tools/art/concept_paste/cp_bake.py": "afce54fe0a387510172eb4455bd4ce8ae3f0a3ed69924f666876379dc63a60d3",
+  "tools/art/concept_paste/cp_bake.py": "8eb6b1358c667afcb462315709e1d805554d2c9c8e5b82c09d48993b21606959",
   "tools/art/concept_paste/cp_common.py": "db342dc941f417a592a74b27e88c87d43ecf618902d5b6b39f58d30925609c72",
   "tools/art/concept_paste/paste_proto.py": "1fa552b83c8b578a8c5a1086f72086abc89aecfb2558fc829955975c8b01a748"
  },
- "paramsSha256": "5a29489b3fc6a230aad45861d2ba3a16e732d0af06354e5d22f00439cc0f492d",
+ "paramsSha256": "f933f677b25310bcb8f0bc1c44eaaa935fb4604e4e2f8c09fc1d97d3a3c2f68f",
  "inputs": {
   "colour": {
-   "file": "C:/Users/ren/WebstormProjects/unmached/unmached/scraped-data/derived/concepts/env-v1/marmoreal-v1.png",
-   "sha256": "8f098ef2980162a9fa48fdec6865618388e5e0486c73b71247dff5fccc72e662",
+   "file": "C:/Users/ren/WebstormProjects/unmached/unmached/scraped-data/derived/env-u16-marmoreal-codex/marmoreal-extended-2x.png",
+   "sha256": "df4fd262190b882f2541be2f5a134b10e6bfc96e90e9b7b26939d9d8860c458f",
    "size": [
-    1672,
-    941
+    4680,
+    2634
    ],
-   "registrationTag": "concept"
+   "registrationTag": "concept",
+   "derivedFrom": "marmoreal-v1.png"
+  },
+  "overlay:lanterns": {
+   "file": "C:/Users/ren/WebstormProjects/unmached/unmached/scraped-data/derived/env-u16-marmoreal-codex/marmoreal-lanterns-2x.png",
+   "sha256": "589d111bfda68c566d6959c7d2f96b95acfc5cd45bf246b10a485a4877601f03",
+   "size": [
+    4680,
+    2634
+   ]
+  },
+  "anim": {
+   "file": "C:/Users/ren/WebstormProjects/unmached/unmached/scraped-data/derived/env-u16-marmoreal-codex/marmoreal-anim-2x.png",
+   "sha256": "7b3274f823d86f8e86e180f9dfb4d1c44d9ffe28901159d1beaa83275588ee39",
+   "size": [
+    4680,
+    2634
+   ]
   }
  },
  "outputs": {
@@ -134,12 +151,12 @@
     1920,
     1080
    ],
-   "sha256": "dfaa19fb69b0428e6fc6554ac7f705fc3ed7cc0baa120d1131e7357e79405969",
-   "bytes": 12450723,
+   "sha256": "dfe732e9823a83f4bb6ee41f1109cc40505e4e4e67d227db427de0aec4357d04",
+   "bytes": 8961258,
    "meanSrgb": [
-    0.3227,
-    0.2701,
-    0.2977
+    0.3107,
+    0.2854,
+    0.3212
    ]
   },
   "PlateB": {
@@ -156,42 +173,42 @@
     2304,
     1296
    ],
-   "sha256": "cbfc4a8be1cd7155c0ccd118b1238e5cc9fb6a2cde822cc22ad3cef2bad1789b",
-   "bytes": 2631363,
+   "sha256": "bc7de887d5bb7d94e2dfa23bfaf38a9636639fa7777b88552fca30c61fdd5c85",
+   "bytes": 3167393,
    "meanSrgb": [
-    0.1959,
-    0.176,
-    0.21
+    0.2049,
+    0.2086,
+    0.2617
    ]
   },
-  "Sea": {
-   "file": "T_Marmoreal_ConceptSea.png",
-   "kind": "sea",
+  "Anim": {
+   "file": "T_Marmoreal_ConceptAnim.png",
+   "kind": "anim",
    "size": [
-    1024,
-    512
+    2048,
+    1024
    ],
-   "channels": "RGB",
+   "channels": "RGBA",
    "rectC0": [
     -384,
     -216,
     2304,
     1296
    ],
-   "sha256": "edf69aea6390776248719d891be14f6e0a6590ee0109e5cb9272e97f22d39938",
-   "bytes": 651549,
+   "sha256": "e1f6dbb7415c637f269055655352a0cf3a2e8fcd1c1e3b7e522360124b713a1b",
+   "bytes": 263970,
    "meanSrgb": [
-    0.1959,
-    0.176,
-    0.2101
+    0.0053,
+    0.0523,
+    0.0589
    ]
   }
  },
  "stats": {
   "PlateA": {
    "sourcePxPerTexel": [
-    0.4082,
-    0.4595
+    0.8164,
+    0.9189
    ],
    "texelsPerC0Px": [
     2.1333,
@@ -203,8 +220,8 @@
   },
   "PlateB": {
    "sourcePxPerTexel": [
-    1.143,
-    1.2865
+    2.2859,
+    2.573
    ],
    "texelsPerC0Px": [
     0.7619,
@@ -214,16 +231,28 @@
    "alphaCoverage": 0.8516,
    "underFrameTexels": 311180
   },
-  "Sea": {
+  "Anim": {
    "sourcePxPerTexel": [
     2.2859,
     2.573
    ],
    "texelsPerC0Px": [
-    0.381,
-    0.3386
+    0.7619,
+    0.6772
    ],
-   "bandResampledTexels": 66214
+   "bandResampledTexels": 264833,
+   "coverage": {
+    "R": 0.002,
+    "G": 0.0525,
+    "B": 0.0589,
+    "A": 0.0733
+   },
+   "max": {
+    "R": 1.0,
+    "G": 1.0,
+    "B": 1.0,
+    "A": 1.0
+   }
   }
  }
 }

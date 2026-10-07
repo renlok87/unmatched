@@ -22,6 +22,20 @@ depth sheet, the sea plane and the sky cylinder. One shared material does it per
                 in viewport UV, cell i -> channel i % 4 (grey, R, G, B), level (i / 4) % 64, emissive CalibMax x (level /
                 63)^3 - read back with --lut-from-calib to build the LUT.
   /Game/EnvMaps/ConceptPaste/T_ConceptPaste_InvTonemapLUT   (only with --import-lut <hdr>) the measured LUT
+
+VS-5 EN-06 (graph 4, docs/game-design/visual/06-tasks/env.csv EN-06, ВР-EN.4): no Time node any more - AnimTime is a scalar
+the board actor writes (US08ConceptPasteAnimComponent: world time in live runs, 0 in -Bench / -EnvFxFreeze / reduced
+motion), so the flows stand still on a paused or frozen frame too. The static switch UseAnim (default off: the graph-3
+paste, Sarpedon's sky unchanged) adds the animation channels of the "anim" block (S08ConceptPasteAnim.h):
+      lanterns colour x (1 + AnimMask.r x sum_i w_i (LanternFlicker_i - 1) / max(sum w, 1)), w_i = the soft disc (rim 20 %)
+               of LanternC0_i (x, y, radius in C0 px), i = 0..7 (a dynamic branch skips pixels with AnimMask.r <= 0.002)
+      wind     the plates are sampled at c + (dx, 0.35 dx), dx = AnimMask.g x WindParams.x x (sin(2 pi (WindParams.y t +
+               c.x / WindWavePx)) + WindParams.w x sin(2 pi (WindParams.z t + c.y / WindWavePx + 0.37)))
+      mist     lerp(colour, MistColor, AnimMask.b x MistParams.x x (0.4 + 0.6 MistNoise((c0 + MistParams.yz t) /
+               MistParams.w)))
+  /Game/EnvMaps/ConceptPaste/MI_ConceptPaste_Anim      the child with UseAnim on (the sheet of a block with "anim")
+  /Game/EnvMaps/ConceptPaste/T_ConceptPaste_Noise      256 x 256 tileable value noise (seed NOISE_SEED, 2 octaves), G8,
+                                                       linear, wrap - built here from a script-written .tga
 The parameter names are the contract of S08ConceptPasteSpec::Param* (--check compares them with the header) and the
 C++ mirror of the projection is S08ConceptPaste::ShaderSample (keep both in step with CONCEPT_HLSL).
 
@@ -36,7 +50,8 @@ Plain Python (no UE):
   python -B tools/art/concept_paste/ue_concept_material.py --lut-from-calib <frame.png> [--view K1] --out <dir>
       reads a -ConceptPasteCalib bench frame (1 key + profile, concept mode on) and writes lut-table.json +
       T_ConceptPaste_InvTonemapLUT.hdr (cells over the map field are skipped; never tuned by eye)
-Idempotent: the material is rebuilt only when its EnvMapsGraphVersion tag differs (or --force). A JSON report is printed
+Idempotent: the material / MI are rebuilt only when their EnvMapsGraphVersion tag differs, the noise texture only when its
+source sha256 differs (or --force). A JSON report is printed
 ('CONCEPT-MATERIAL-REPORT {...}') and written to <project>/Saved/EnvMaps/concept-material-report.json (or --report).
 Status: предложено (the look is measured in UE frames, not here).
 """
@@ -69,7 +84,16 @@ MATERIAL_PATH = f"{ROOT}/{MATERIAL_NAME}"
 LUT_NAME = "T_ConceptPaste_InvTonemapLUT"
 LUT_PATH = f"{ROOT}/{LUT_NAME}"
 GRAPH_TAG = "EnvMapsGraphVersion"
-GRAPH_VERSION = "3"
+GRAPH_VERSION = "4"
+ANIM_MI_NAME = "MI_ConceptPaste_Anim"
+ANIM_MI_PATH = f"{ROOT}/{ANIM_MI_NAME}"
+NOISE_NAME = "T_ConceptPaste_Noise"
+NOISE_PATH = f"{ROOT}/{NOISE_NAME}"
+NOISE_SIZE = 256
+NOISE_SEED = 20261007
+NOISE_OCTAVES = ((16, 1.0), (32, 0.5))  # (lattice cells per side, weight): tileable on the 256 texture
+USE_ANIM = "UseAnim"  # S08ConceptPasteSpec::UseAnimSwitchName
+MAX_ANIM_LANTERNS = 8  # S08ConceptPasteSpec::MaxAnimLanterns
 LUT_SHA_TAG = "EnvMapsSourceSha256"
 LUT_SIZE = 256
 CALIB_GRID = (32, 18)
@@ -78,7 +102,7 @@ CALIB_MAX = 16.0  # S08ConceptPasteSpec::DefaultCalibMax
 
 # texture object parameters (the Custom node samples them; the sampler type only matters for the editor's validation of
 # the default texture: plates are sRGB colour, the mask / LUT are bound at runtime by the board actor's MIDs)
-TEXTURES = ("PlateA", "PlateB", "Mask", "Lut", "Water")
+TEXTURES = ("PlateA", "PlateB", "Mask", "Lut", "Water", "AnimMask", "MistNoise")
 DEFAULT_TEXTURE = "/Engine/EngineResources/WhiteSquareTexture"
 VECTORS = {
     "CamPos": (0.0, 1557.046, 2223.692, 0.0), "CamRight": (1.0, 0.0, 0.0, 0.0),
@@ -89,16 +113,27 @@ VECTORS = {
     "FlowRect0": (0.0, 0.0, 0.0, 0.0), "FlowRect1": (0.0, 0.0, 0.0, 0.0),
     "FlowVel0": (0.0, 0.0, 0.0, 0.0), "FlowVel1": (0.0, 0.0, 0.0, 0.0),
     "GradeScale": (1.0, 1.0, 1.0, 0.0), "GradePow": (1.0, 1.0, 1.0, 0.0),
+    # graph 4 (VS-5 EN-06): the anim channels
+    "WindParams": (0.0, 0.0, 0.0, 0.0), "MistColor": (0.0, 0.0, 0.0, 0.0), "MistParams": (0.0, 0.0, 0.0, 220.0),
+    **{f"LanternC0_{i}": (0.0, 0.0, 0.0, 0.0) for i in range(MAX_ANIM_LANTERNS)},
 }
 SCALARS = {"UseA": 0.0, "FeatherPx": 24.0, "AlphaWeight": 1.0, "OutsideKeep": 0.0, "GradeMode": 2.0, "GainLinear": 1.0,
            "EmissiveScale": 1.0, "Calib": 0.0, "CalibMax": CALIB_MAX, "FlowMaxZ": 1.0e6, "UseWater": 0.0, "FlowSea": 0.0,
-           "Devignette": 0.0}
+           "Devignette": 0.0, "AnimTime": 0.0, "WindWavePx": 400.0,
+           **{f"LanternFlicker_{i}": 1.0 for i in range(MAX_ANIM_LANTERNS)}}
+INDEXED = tuple(f"LanternC0_{i}" for i in range(MAX_ANIM_LANTERNS)) + tuple(
+    f"LanternFlicker_{i}" for i in range(MAX_ANIM_LANTERNS))
 FLOW_FEATHER_PX = 8.0  # S08ConceptPasteSpec::FlowFeatherPx
 FLOW_NOISE_PX = 16.0   # value-noise cell of the flow offset (concept px)
-# Custom node pins in order (WP = absolute world position, VUV = viewport UV, Time = the material time, VSZ = view size)
-INPUTS = ("WP", "VUV", "Time", "VSZ") + TEXTURES + tuple(VECTORS) + tuple(SCALARS)
+# Custom node pins in order (WP = absolute world position, VUV = viewport UV, VSZ = view size, UseAnimS = the static
+# switch UseAnim as a constant 1 | 0: the compiler drops the anim code of the off permutation). No Time node (graph 4).
+INPUTS = ("WP", "VUV", "VSZ", "UseAnimS") + TEXTURES + tuple(VECTORS) + tuple(SCALARS)
 
-CONCEPT_HLSL = """// ENV-MAPS P7 M_ConceptPaste graph 1 (tools/art/concept_paste/ue_concept_material.py).
+_LANTERN_LINES = "\n".join(
+    f"    {{ float2 dl = c0 - LanternC0_{i}.xy; float w = saturate((LanternC0_{i}.z - length(dl)) / max(0.2 * LanternC0_{i}.z, 1e-3)); "
+    f"fs += w * (LanternFlicker_{i} - 1.0); ws += w; }}" for i in range(MAX_ANIM_LANTERNS))
+
+CONCEPT_HLSL = """// ENV-MAPS P7 M_ConceptPaste graph 4 (tools/art/concept_paste/ue_concept_material.py).
 // C++ mirror: S08ConceptPaste::ShaderSample (S08ConceptPaste.cpp) - keep both in step.
 float3 d = WP - CamPos.xyz;
 float z = dot(d, CamForward.xyz);
@@ -111,7 +146,8 @@ float hw = dot(HRow2.xyz, p);
 float2 c = float2(dot(HRow0.xyz, p), dot(HRow1.xyz, p)) / hw;
 float4 wm = Texture2DSample(Water, WaterSampler, saturate((c - RectB.xy) / RectB.zw));
 // painted-water flow (waterfall, bay surf, sea plane): a time-panned value-noise offset of the sample position inside
-// the feathered regions (FlowVel.z = amplitude px; 0 in frozen -Bench runs), never above FlowMaxZ (the sky segments)
+// the feathered regions (FlowVel.z = amplitude px; 0 in frozen -Bench runs), never above FlowMaxZ (the sky segments);
+// graph 4: the time is AnimTime, written by C++ (no material time node)
 float2 flow = float2(0.0, 0.0);
 [unroll] for (int k = 0; k < 2; ++k) {
   float4 R = (k == 0) ? FlowRect0 : FlowRect1;
@@ -120,7 +156,7 @@ float2 flow = float2(0.0, 0.0);
   float w = saturate(min(inR.x, inR.y) / 8.0) * step(0.5, R.z) * step(WP.z, FlowMaxZ);
   float mk = (k == 0) ? lerp(wm.r, wm.b, FlowSea) : wm.g;
   w *= lerp(1.0, mk, UseWater);
-  float2 q = (c - V.xy * Time) / 16.0;
+  float2 q = (c - V.xy * AnimTime) / 16.0;
   float2 qi = floor(q);
   float2 qf = frac(q);
   float2 qs = qf * qf * (3.0 - 2.0 * qf);
@@ -137,6 +173,24 @@ float2 flow = float2(0.0, 0.0);
   flow += w * V.z * (n * 2.0 - 1.0);
 }
 c += flow;
+// graph 4 (VS-5 EN-06): the anim channels of the static switch UseAnim (UseAnimS is a literal 1 | 0 of the permutation)
+float4 am = float4(0.0, 0.0, 0.0, 0.0);
+float lg = 1.0;
+if (UseAnimS > 0.5) {
+  am = Texture2DSample(AnimMask, AnimMaskSampler, saturate((c - RectB.xy) / RectB.zw));
+  // lanterns: R x the flicker of the slot whose soft disc (C0 px) holds the pixel
+  [branch] if (am.r > 0.002) {
+    float fs = 0.0;
+    float ws = 0.0;
+""" + _LANTERN_LINES + """
+    lg = 1.0 + am.r * fs / max(ws, 1.0);
+  }
+  // wind: G moves the sample position of the plates (C0 px, <= 4 px by the parser)
+  float wv = max(WindWavePx, 1.0);
+  float wx = am.g * WindParams.x * (sin(6.2831853 * (WindParams.y * AnimTime + c.x / wv)) +
+                                    WindParams.w * sin(6.2831853 * (WindParams.z * AnimTime + c.y / wv + 0.37)));
+  c += float2(wx, 0.35 * wx);
+}
 float2 uvA = (c - RectA.xy) / RectA.zw;
 float2 uvB = (c - RectB.xy) / RectB.zw;
 float2 inA = min(c - RectA.xy, RectA.xy + RectA.zw - c);
@@ -146,6 +200,12 @@ float4 a = Texture2DSample(PlateA, PlateASampler, saturate(uvA));
 float4 m = Texture2DSample(Mask, MaskSampler, saturate(uvB));
 float wA = UseA * saturate(min(inA.x, inA.y) / max(FeatherPx, 1e-3)) * m.g;
 float3 col = lerp(b.rgb, a.rgb, wA);
+if (UseAnimS > 0.5) {
+  // lanterns, then the ground mist: lerp(colour, MistColor, B x opacity x noise 0.4..1 panned in C0 px)
+  col *= lg;
+  float nz = 0.4 + 0.6 * Texture2DSample(MistNoise, MistNoiseSampler, (c0 + MistParams.yz * AnimTime) / max(MistParams.w, 1.0)).r;
+  col = lerp(col, MistColor.rgb, saturate(am.b * MistParams.x * nz));
+}
 float alpha = lerp(1.0, lerp(b.a, a.a, wA) * m.r, AlphaWeight);
 alpha *= lerp(OutsideKeep, 1.0, insideB);
 float cut = Cut.w * step(abs(WP.x), Cut.x) * step(abs(WP.y), Cut.y) * step(Cut.z, WP.z);
@@ -291,6 +351,46 @@ def calib_cell(cx: int, cy: int):
     return idx % 4, CALIB_MAX * (level / (CALIB_LEVELS - 1)) ** 3
 
 
+# ---------------------------------------------------------------------------------------------------- noise (graph 4)
+def noise_values(size: int = NOISE_SIZE, seed: int = NOISE_SEED, octaves=NOISE_OCTAVES) -> list[int]:
+    """Tileable value noise, row-major bytes 0..255 (deterministic: an LCG lattice per octave, smoothstep, wrap)."""
+    state = seed & 0xFFFFFFFF
+
+    def rnd() -> float:
+        nonlocal state
+        state = (1664525 * state + 1013904223) & 0xFFFFFFFF
+        return state / 4294967296.0
+
+    acc = [0.0] * (size * size)
+    total = sum(w for _, w in octaves)
+    for cells, weight in octaves:
+        lat = [[rnd() for _ in range(cells)] for _ in range(cells)]
+        step = size / cells
+        for y in range(size):
+            fy = y / step
+            iy = int(fy)
+            ty = fy - iy
+            ty = ty * ty * (3 - 2 * ty)
+            r0, r1 = lat[iy % cells], lat[(iy + 1) % cells]
+            for x in range(size):
+                fx = x / step
+                ix = int(fx)
+                tx = fx - ix
+                tx = tx * tx * (3 - 2 * tx)
+                a = r0[ix % cells] + (r0[(ix + 1) % cells] - r0[ix % cells]) * tx
+                b = r1[ix % cells] + (r1[(ix + 1) % cells] - r1[ix % cells]) * tx
+                acc[y * size + x] += weight * (a + (b - a) * ty)
+    lo, hi = min(acc), max(acc)
+    return [int(round((v - lo) / max(hi - lo, 1e-9) * 255.0)) for v in acc]
+
+
+def write_tga_gray(path: Path, values: list[int], size: int = NOISE_SIZE) -> None:
+    """Uncompressed 8-bit grayscale TGA (type 3), top-left origin."""
+    header = bytes([0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, size & 255, size >> 8, size & 255, size >> 8, 8, 0x20])
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(header + bytes(values))
+
+
 # ---------------------------------------------------------------------------------------------------- LUT
 def lut_from_samples(samples: list[tuple[int, float, float]]) -> list[list[float]]:
     """Inverse tonemap per channel from measured (channel 1..3 or 0 = grey, emissive, display sRGB 0..1) samples:
@@ -405,12 +505,20 @@ def check() -> tuple[dict, list[str]]:
     errors: list[str] = []
     report: dict = {}
     params = header_params()
-    want = set(TEXTURES) | set(VECTORS) | set(SCALARS)
+    want = (set(TEXTURES) | set(VECTORS) | set(SCALARS)) - set(INDEXED)
     got = set(params.values())
     if got != want:
         errors.append(f"parameter names differ from S08ConceptPaste.h: missing in header {sorted(want - got)}, "
                       f"missing here {sorted(got - want)}")
-    report["params"] = sorted(got)
+    report["params"] = sorted(got | set(INDEXED))
+    header = HEADER.read_text(encoding="utf-8")
+    for needle in ('LanternC0Prefix = TEXT("LanternC0_")', 'LanternFlickerPrefix = TEXT("LanternFlicker_")',
+                   f"MaxAnimLanterns = {MAX_ANIM_LANTERNS};", f'UseAnimSwitchName = TEXT("{USE_ANIM}")',
+                   f'AnimMaterialPath = TEXT("{ANIM_MI_PATH}")', f'NoiseTexturePath = TEXT("{NOISE_PATH}")'):
+        if needle not in header:
+            errors.append(f"S08ConceptPaste.h lacks {needle}")
+    if re.search(r"\bTime\b", CONCEPT_HLSL):
+        errors.append("graph 4 uses no Time node: the HLSL must read AnimTime only")
     profiles = json.loads(PROFILES.read_text(encoding="utf-8"))
     lights = profiles["lightProfiles"]
     blocks = {}
@@ -430,6 +538,23 @@ def check() -> tuple[dict, list[str]]:
             errors.append(f"{b['id']}: profile points + concept lights = {points} > 6")
         if cp.get("lights") and "layoutLights" not in cp.get("hide", []):
             errors.append(f"{b['id']}: concept lights without hiding the layout lights")
+        anim = cp.get("anim")
+        if anim is not None:  # VS-5 EN-06: the parser's limits (S08ConceptPasteAnim.cpp)
+            mask = anim.get("mask", "")
+            if not mask.startswith("/Game/EnvMaps/") or mask.startswith("/Game/EnvMaps/Data/") or "." in mask:
+                errors.append(f"{b['id']}: conceptPaste.anim.mask {mask} is not a cooked /Game/EnvMaps package path")
+            slots = anim.get("lanterns", [])
+            ids = {lt["id"] for lt in cp.get("lights", [])}
+            if len(slots) > MAX_ANIM_LANTERNS:
+                errors.append(f"{b['id']}: {len(slots)} anim lanterns > {MAX_ANIM_LANTERNS}")
+            for sl in slots:
+                if ("light" in sl) == ("flicker" in sl) or ("light" in sl and sl["light"] not in ids):
+                    errors.append(f"{b['id']}: anim lantern {sl.get('id')} needs exactly one of light (a light id) | flicker")
+                if not 4 <= float(sl.get("radiusPx", 0)) <= 320:
+                    errors.append(f"{b['id']}: anim lantern {sl.get('id')} radiusPx out of 4..320")
+            w = anim.get("wind")
+            if w and float(w["ampPx"]) * (1 + float(w["gustAmp"])) > 4.0 + 1e-6:
+                errors.append(f"{b['id']}: anim wind offset {w['ampPx']} x (1 + {w['gustAmp']}) > 4 C0 px")
     if blocks.get("sarpedon-original", {}).get("default") != "on":
         errors.append("sarpedon-original: conceptPaste must be ON by default (ENV-U15)")
     if blocks.get("marmoreal-original", {}).get("default") != "off":
@@ -438,7 +563,8 @@ def check() -> tuple[dict, list[str]]:
         if b.get("surface") != "map-image" and "conceptPaste" in b:
             errors.append(f"{b['id']}: grid profile with conceptPaste")
     report["blocks"] = {k: {"default": v.get("default"), "variant": v.get("variant"), "offVariant": v.get("offVariant"),
-                            "lights": len(v.get("lights", [])), "hide": v.get("hide", [])} for k, v in blocks.items()}
+                            "lights": len(v.get("lights", [])), "hide": v.get("hide", []),
+                            "animLanterns": len((v.get("anim") or {}).get("lanterns", []))} for k, v in blocks.items()}
     # the projection mirror: the C0 centre, the cut, and every P7a detail back on its design pixel
     sar = blocks.get("sarpedon-original")
     if sar:
@@ -536,8 +662,17 @@ def build_material(force: bool) -> dict:
     custom.set_editor_property("code", CONCEPT_HLSL)
     wp = _expr(material, u.MaterialExpressionWorldPosition, -1400, -600)
     _connect(wp, "", custom, "WP")
-    time_node = _expr(material, u.MaterialExpressionTime, -1400, -700)
-    _connect(time_node, "", custom, "Time")
+    # graph 4: the static switch UseAnim -> a literal 1 | 0 on the UseAnimS pin (no Time node: AnimTime is a parameter)
+    switch = _expr(material, u.MaterialExpressionStaticSwitchParameter, -1400, -760)
+    switch.set_editor_property("parameter_name", USE_ANIM)
+    switch.set_editor_property("default_value", False)
+    one = _expr(material, u.MaterialExpressionConstant, -1600, -800)
+    one.set_editor_property("r", 1.0)
+    zero = _expr(material, u.MaterialExpressionConstant, -1600, -720)
+    zero.set_editor_property("r", 0.0)
+    _connect(one, "", switch, "True")
+    _connect(zero, "", switch, "False")
+    _connect(switch, "", custom, "UseAnimS")
     screen = _expr(material, u.MaterialExpressionScreenPosition, -1400, -500)
     _connect(screen, "ViewportUV", custom, "VUV")
     view_size = _expr(material, u.MaterialExpressionViewSize, -1400, -800)
@@ -580,14 +715,93 @@ def build_material(force: bool) -> dict:
         raise RuntimeError(f"could not save {MATERIAL_PATH}")
     got = {"vector": sorted(str(n) for n in mel.get_vector_parameter_names(material)),
            "scalar": sorted(str(n) for n in mel.get_scalar_parameter_names(material)),
-           "texture": sorted(str(n) for n in mel.get_texture_parameter_names(material))}
+           "texture": sorted(str(n) for n in mel.get_texture_parameter_names(material)),
+           "staticSwitch": sorted(str(n) for n in mel.get_static_switch_parameter_names(material))}
     missing = [n for n in VECTORS if n not in got["vector"]] + [n for n in SCALARS if n not in got["scalar"]] + \
-              [n for n in TEXTURES if n not in got["texture"]]
+              [n for n in TEXTURES if n not in got["texture"]] + ([] if USE_ANIM in got["staticSwitch"] else [USE_ANIM])
     if missing:
         raise RuntimeError(f"{MATERIAL_PATH}: parameters missing after the build: {missing}")
     return {"action": action, "path": MATERIAL_PATH, "graphVersion": GRAPH_VERSION, "params": got,
             "expressions": int(mel.get_num_material_expressions(material)), "blend": "masked", "shading": "unlit",
-            "twoSided": True}
+            "twoSided": True, "stats": material_stats(material)}
+
+
+def material_stats(material) -> dict:
+    """Shader statistics of a material / instance (the editor's own numbers; empty when the API is not there)."""
+    try:
+        st = u.MaterialEditingLibrary.get_statistics(material)
+    except Exception as exc:  # noqa: BLE001 - informational
+        return {"error": str(exc)}
+    out = {}
+    for key in ("num_pixel_shader_instructions", "num_vertex_shader_instructions", "num_pixel_texture_samples",
+                "num_vertex_texture_samples", "num_uv_scalars", "num_interpolator_scalars"):
+        try:
+            out[key] = int(st.get_editor_property(key))
+        except Exception:  # noqa: BLE001
+            pass
+    return out
+
+
+def build_anim_instance(force: bool) -> dict:
+    """MI_ConceptPaste_Anim: the child of M_ConceptPaste with the static switch UseAnim on (VS-5 EN-06)."""
+    eal, mel = u.EditorAssetLibrary, u.MaterialEditingLibrary
+    parent = u.load_asset(MATERIAL_PATH)
+    if parent is None:
+        raise RuntimeError(f"{MATERIAL_PATH} missing: build it first")
+    mi = u.load_asset(ANIM_MI_PATH) if eal.does_asset_exist(ANIM_MI_PATH) else None
+    if mi is not None and not force and eal.get_metadata_tag(mi, GRAPH_TAG) == GRAPH_VERSION:
+        return {"action": "unchanged", "path": ANIM_MI_PATH, "graphVersion": GRAPH_VERSION, "stats": material_stats(mi)}
+    action = "rebuilt" if mi is not None else "created"
+    if mi is None:
+        mi = u.AssetToolsHelpers.get_asset_tools().create_asset(ANIM_MI_NAME, ROOT, u.MaterialInstanceConstant,
+                                                                 u.MaterialInstanceConstantFactoryNew())
+    if mi is None:
+        raise RuntimeError(f"could not create {ANIM_MI_PATH}")
+    mel.set_material_instance_parent(mi, parent)
+    # UE 5.8 MaterialEditingLibrary.cpp: SetMaterialInstanceStaticSwitchParameterValue always returns false - the getter
+    # below is the check
+    mel.set_material_instance_static_switch_parameter_value(mi, USE_ANIM, True)
+    mel.update_material_instance(mi)
+    eal.set_metadata_tag(mi, GRAPH_TAG, GRAPH_VERSION)
+    if not eal.save_loaded_asset(mi, False):
+        raise RuntimeError(f"could not save {ANIM_MI_PATH}")
+    if not mel.get_material_instance_static_switch_parameter_value(mi, USE_ANIM):
+        raise RuntimeError(f"{ANIM_MI_PATH}: the static switch {USE_ANIM} did not stick")
+    return {"action": action, "path": ANIM_MI_PATH, "graphVersion": GRAPH_VERSION, "useAnim": True,
+            "stats": material_stats(mi)}
+
+
+def build_noise(force: bool, saved: Path) -> dict:
+    """T_ConceptPaste_Noise from a script-written TGA (G8, linear, wrap, mips) - idempotent by the TGA sha256."""
+    import hashlib
+
+    eal = u.EditorAssetLibrary
+    tga = saved / f"{NOISE_NAME}.tga"
+    write_tga_gray(tga, noise_values())
+    sha = hashlib.sha256(tga.read_bytes()).hexdigest()
+    tex = u.load_asset(NOISE_PATH) if eal.does_asset_exist(NOISE_PATH) else None
+    if tex is not None and not force and eal.get_metadata_tag(tex, LUT_SHA_TAG) == sha:
+        return {"action": "unchanged", "path": NOISE_PATH, "sha256": sha}
+    task = u.AssetImportTask()
+    task.filename = str(tga)
+    task.destination_path = ROOT
+    task.destination_name = NOISE_NAME
+    task.automated = True
+    task.replace_existing = True
+    task.save = False
+    u.AssetToolsHelpers.get_asset_tools().import_asset_tasks([task])
+    tex = u.load_asset(NOISE_PATH)
+    if tex is None:
+        raise RuntimeError(f"import of {tga} did not produce {NOISE_PATH}")
+    for key, value in (("compression_settings", u.TextureCompressionSettings.TC_GRAYSCALE), ("srgb", False),
+                       ("mip_gen_settings", u.TextureMipGenSettings.TMGS_FROM_TEXTURE_GROUP),
+                       ("lod_group", u.TextureGroup.TEXTUREGROUP_WORLD), ("filter", u.TextureFilter.TF_BILINEAR),
+                       ("address_x", u.TextureAddress.TA_WRAP), ("address_y", u.TextureAddress.TA_WRAP)):
+        tex.set_editor_property(key, value)
+    eal.set_metadata_tag(tex, LUT_SHA_TAG, sha)
+    if not eal.save_loaded_asset(tex, False):
+        raise RuntimeError(f"could not save {NOISE_PATH}")
+    return {"action": "imported", "path": NOISE_PATH, "sha256": sha, "sizeX": int(tex.blueprint_get_size_x())}
 
 
 def import_lut(hdr: Path, force: bool) -> dict:
@@ -651,6 +865,13 @@ def main(argv: list[str] | None = None) -> int:
         except Exception as exc:  # reported; the commandlet logs the failure below
             report["build"] = {"action": "failed", "error": str(exc)}
             ok = False
+        for key, fn in (("animInstance", lambda: build_anim_instance(args.force or report["build"].get("action") != "unchanged")),
+                        ("noise", lambda: build_noise(args.force, Path(u.Paths.project_saved_dir()) / "EnvMaps"))):
+            try:
+                report[key] = fn()
+            except Exception as exc:
+                report[key] = {"action": "failed", "error": str(exc)}
+                ok = False
         if args.import_lut:
             try:
                 report["lut"] = import_lut(Path(args.import_lut), args.force)

@@ -26,10 +26,67 @@ class ConceptMaterialContract(unittest.TestCase):
         for name in m.TEXTURES + tuple(m.VECTORS) + tuple(m.SCALARS):
             self.assertIn(name, m.INPUTS)
             self.assertRegex(m.CONCEPT_HLSL, rf"\b{name}\b", name)
-        for pin in ("WP", "VUV", "Time"):
+        for pin in ("WP", "VUV", "VSZ", "UseAnimS"):
             self.assertIn(pin, m.INPUTS)
             self.assertRegex(m.CONCEPT_HLSL, rf"\b{pin}\b")
         self.assertEqual(len(set(m.INPUTS)), len(m.INPUTS))
+
+    def test_graph4_no_time_node_and_the_static_switch(self):
+        """VS-5 EN-06 (ВР-EN.4): the animation time is AnimTime from C++; UseAnim gates the anim channels."""
+        self.assertEqual(m.GRAPH_VERSION, "4")
+        self.assertNotIn("Time", m.INPUTS)
+        self.assertNotRegex(m.CONCEPT_HLSL, r"\bTime\b")
+        self.assertIn("V.xy * AnimTime", m.CONCEPT_HLSL)  # the flows read AnimTime too
+        self.assertEqual(m.SCALARS["AnimTime"], 0.0)
+        self.assertEqual(m.USE_ANIM, "UseAnim")
+        anim = m.CONCEPT_HLSL[m.CONCEPT_HLSL.index("if (UseAnimS > 0.5)"):]
+        for name in ("AnimMask", "MistNoise", "WindParams", "WindWavePx", "MistColor", "MistParams"):
+            self.assertIn(name, anim)
+        # every lantern slot is read, unused slots (radius 0) weigh 0, at most 8
+        for i in range(m.MAX_ANIM_LANTERNS):
+            self.assertIn(f"LanternC0_{i}.z", m.CONCEPT_HLSL)
+            self.assertEqual(m.SCALARS[f"LanternFlicker_{i}"], 1.0)
+            self.assertEqual(m.VECTORS[f"LanternC0_{i}"], (0.0, 0.0, 0.0, 0.0))
+        self.assertNotIn(f"LanternC0_{m.MAX_ANIM_LANTERNS}", m.CONCEPT_HLSL)
+        # the wind offset follows the card formula (y = 0.35 x)
+        self.assertIn("c += float2(wx, 0.35 * wx);", m.CONCEPT_HLSL)
+        self.assertIn("0.4 + 0.6 * Texture2DSample(MistNoise", m.CONCEPT_HLSL)
+
+    def test_noise_is_deterministic_tileable_and_spans_the_range(self):
+        a = m.noise_values(64, 7, ((4, 1.0), (8, 0.5)))
+        b = m.noise_values(64, 7, ((4, 1.0), (8, 0.5)))
+        self.assertEqual(a, b)
+        self.assertNotEqual(a, m.noise_values(64, 8, ((4, 1.0), (8, 0.5))))
+        self.assertEqual((min(a), max(a)), (0, 255))
+        rows = [a[y * 64:(y + 1) * 64] for y in range(64)]
+        # wrap: the step across the texture edge is like any neighbour step (no seam)
+        inner = max(abs(r[x + 1] - r[x]) for r in rows for x in range(63))
+        edge = max(abs(r[0] - r[63]) for r in rows)
+        self.assertLessEqual(edge, inner + 1)
+        inner_y = max(abs(rows[y + 1][x] - rows[y][x]) for y in range(63) for x in range(64))
+        self.assertLessEqual(max(abs(rows[0][x] - rows[63][x]) for x in range(64)), inner_y + 1)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "n.tga"
+            m.write_tga_gray(path, a, 64)
+            data = path.read_bytes()
+            self.assertEqual(len(data), 18 + 64 * 64)
+            self.assertEqual(data[2], 3)    # uncompressed grayscale
+            self.assertEqual(data[16], 8)   # 8 bit
+            self.assertEqual(data[17], 0x20)  # top-left origin
+
+    def test_shipped_marmoreal_anim_block(self):
+        """VS-5 E1 (EN-06 + EN-07): the Marmoreal paste block animates the painted surround; Sarpedon has no anim."""
+        profiles = json.loads(m.PROFILES.read_text(encoding="utf-8"))
+        boards = {b["id"]: b for b in profiles["boards"]}
+        mar = boards["marmoreal-original"]["conceptPaste"]
+        anim = mar["anim"]
+        self.assertEqual(anim["mask"], "/Game/EnvMaps/Marmoreal/ConceptPaste/T_Marmoreal_ConceptAnim")
+        light_ids = {lt["id"] for lt in mar["lights"]}
+        synced = [sl for sl in anim["lanterns"] if sl.get("light") in light_ids]
+        self.assertEqual(len(anim["lanterns"]), 6)
+        self.assertEqual(len(synced), 4)
+        self.assertLessEqual(float(anim["wind"]["ampPx"]) * (1 + float(anim["wind"]["gustAmp"])), 4.0)
+        self.assertNotIn("anim", boards["sarpedon-original"]["conceptPaste"])
 
     def test_hlsl_avoids_vector_conditions(self):
         # HLSL 2021 (DXC): no vector condition in ?: and no ||/&& on vectors - the shader uses step / lerp instead
