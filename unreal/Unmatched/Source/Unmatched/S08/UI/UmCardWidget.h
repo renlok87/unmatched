@@ -42,7 +42,8 @@
 //             (x 1.875, ВР-VS2-HB22-03); an unplayable card WITHOUT an exact why.* key (a type mismatch, ВР-VS3-19) shows
 //             no tooltip and its press goes on to the owner (the game logic answers); a double click goes to the owner
 //             (UI-INP-003) instead of a second press; the boost chip is 32 su when DPI x UI scale < 1 (IC-34 П-2) and can
-//             sit right-aligned over the top edge (the attack boost, ВР-VS2-HB22-11).
+//             sit right-aligned on the top-right corner of the drawn card (the attack boost, ВР-VS2-HB22-11; VS-4: 8 su
+//             on the frame like the centred chip, not 4 su over the edge - VS-3 item 12).
 //   pool      the owner keeps the widgets (04 §4.1): ApplyModel never rebuilds the tree, only brushes and parameters.
 //   rollback  -S08CardArtLegacy (ВР-CP08): the fallback face always, the card.navy plate with resource-card 24 su instead
 //             of the back (ARTLOOK cards=legacy(..)); blocks -S08SlateHud=hand,combat,slot,inspect keep the Slate path.
@@ -136,7 +137,7 @@ inline constexpr float HoverScale = 1.5f;          // 150 x 208 -> 225 x 312
 inline constexpr float HoverScaleClassS = 1.875f;  // 120 x 166 -> 225 x 311 (ВР-VS2-HB22-03: 225 x 312 on every canvas)
 inline constexpr float ChipSmallDpiSu = 32.0f;     // IC-34 П-2: >= 21 px on screen below 1 px per su (32 su recommended)
 inline constexpr float ChipOnFrameSu = 8.0f;       // the chip keeps 8 su on the frame (ВР-VS3-09)
-inline constexpr float ChipGapAboveSu = 4.0f;      // the right-aligned chip over the top edge (ВР-VS2-HB22-11)
+inline constexpr float ChipCornerInsetSu = 4.0f;   // VS-4 (VS-3 item 12): the right chip 4 su in from the right edge
 inline constexpr float DiscardShiftSu = 16.0f;
 inline constexpr float NewDotSu = 10.0f;           // 8 su card.glyph + 1 su keyline a side
 inline constexpr float NewDotCentreInsetSu = 10.0f;
@@ -235,7 +236,9 @@ class UNMATCHED_API UUmCardWidget : public UUserWidget {
   /** The boost chip: N >= 0 "+N", HiddenBoost = the chip without a number, NoBoostChip = none. Appears after a running
    *  flip (CP-18: 150 - 330 ms). */
   void SetBoostChip(int32 N);
-  /** HB-25 (ВР-VS2-HB22-11): the chip right-aligned 4 su over the top edge (the attack boost behind its attack card)
+  /** HB-25 (ВР-VS2-HB22-11): the chip right-aligned on the top-right corner of the drawn card - 8 su of it on the frame,
+   *  4 su in from the right edge (VS-4, VS-3 item 12: it floated 4 su over the edge) - the attack boost behind its
+   *  attack card)
    *  instead of the top centre. */
   void SetChipRightAbove(bool bOn);
   bool IsChipRightAbove() const { return bChipRightAbove; }

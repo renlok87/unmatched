@@ -36,6 +36,12 @@ their C++ bases (UUmHudAuthoringLibrary -> BuildDefaultTree of each class), in t
                                       (Line0..2), MoreText (VS-3 HB-33)
   /Game/S08/UI/Common/WBP_UmConfirmDialog  parent UmConfirmDialog  parts Veil, Frame, Body (UUmScreenBase) + Title,
                                       Message, Confirm, Cancel (WBP_UmButton) (VS-3 SC-01)
+  /Game/S08/UI/Hud/WBP_UI_HUD_PENDING  parent UmHudPending  parts Root, Panel, Edge, ExpandButton, Header (HeaderIcon,
+                                      SourceName, QueueChip), Hint, Body (scroll: BodyText, Options, Picker, Card0..3,
+                                      OrderChip0..3), Counter, Back/Stay/Decline/Confirm/Secondary/CollapseButton, KeyChip0..2
+                                      (VS-4 HB-35; the number picker UUmNumberPicker is code-built inside it)
+  /Game/S08/UI/Hud/WBP_UI_HUD_SLOT     parent UmHudSourceSlot  parts Root, Card (WBP_UmCard), Ribbon, RibbonEdge,
+                                      RibbonIcon, RibbonText, BoostChip (BoostIcon, BoostText), HoldTrack, HoldFill (VS-4 HB-37)
 
 A widget tree is not reachable from Python, so the C++ library builds it (the same function the class uses without a
 WBP) and this script re-loads every asset, checks the parent class, writes the report (env UM_HUD_WBP_REPORT, default
@@ -75,6 +81,8 @@ ASSETS = {
     "/Game/S08/UI/Hud/WBP_UI_HUD_COMBAT_EDGE": "UmHudCombatEdge",
     "/Game/S08/UI/Hud/WBP_UI_HUD_COMBAT": "UmHudCombatCenter",
     "/Game/S08/UI/Common/WBP_UmConfirmDialog": "UmConfirmDialog",
+    "/Game/S08/UI/Hud/WBP_UI_HUD_PENDING": "UmHudPending",
+    "/Game/S08/UI/Hud/WBP_UI_HUD_SLOT": "UmHudSourceSlot",
 }
 
 

@@ -475,16 +475,24 @@ void UUmHudCombatEdge::ApplyContent(const FUmCombatEdgeModel* Old) {
     }
   }
   const bool bShield = Model.State == EUmEdgeState::Shield;
+  // VS-4 (VS-3 item 13, 04 §3.8 «штамп X + текст «Нет защиты»»): the no-defense slot names itself under the stamp
+  const bool bNoDefenseText = Model.State == EUmEdgeState::NoDefense;
   UmEdgeShow(SlotGlyph, bShield);
-  UmEdgeShow(SlotText, bShield);
+  UmEdgeShow(SlotText, bShield || bNoDefenseText);
   if (bShield) {
     UmEdgeIcon(SlotGlyph, TEXT("action-defense"), SlotGlyphSu);
     UmEdgePlace(SlotGlyph, CardPos + FVector2D(0.5f * (CardWH.X - SlotGlyphSu), FMath::RoundToFloat(0.27f * CardWH.Y)),
                 FVector2D(SlotGlyphSu), 2);
     if (SlotText) {
       SlotText->SetText(UmText::Get(EUmTable::Hud, TEXT("hud.combat.slot.empty")));
+      SlotText->SetColorAndOpacity(FSlateColor(Theme.Color(TEXT("text.secondary"))));
       UmEdgePlace(SlotText, CardPos + FVector2D(12.0f, FMath::RoundToFloat(0.65f * CardWH.Y)), FVector2D(CardWH.X - 24.0f, 44.0f), 2);
     }
+  } else if (bNoDefenseText && SlotText) {
+    SlotText->SetText(UmText::Get(EUmTable::Hud, TEXT("hud.combat.nodefense")));
+    SlotText->SetColorAndOpacity(FSlateColor(Theme.Color(TEXT("text.primary"))));
+    UmEdgePlace(SlotText, CardPos + FVector2D(12.0f, FMath::RoundToFloat(0.5f * (CardWH.Y + SlotGlyphSu)) + 8.0f),
+                FVector2D(CardWH.X - 24.0f, 44.0f), 3);
   }
   // the stamp (AB-8): once per combat, appear 200 ms; -S08CrossLegacy: the text X
   const bool bNoDefense = Model.State == EUmEdgeState::NoDefense;
@@ -830,11 +838,13 @@ void UUmHudCombatEdge::CollectShotLines(TArray<FString>& Out) const {
   }
   const FString Extra = FString::Printf(
       TEXT("role=%s face=%d class=%s card=%.0fx%.0f ribbon=%.0fx%.0f rows=%d timer=%s timerState=%s buttons=%d defend=%s stamp=%d "
-           "leave=%d seq=%d"),
+           "stampText=%d leave=%d seq=%d"),
       Model.Role == EUmEdgeRole::Attack ? TEXT("attack") : TEXT("defense"), Model.bFace && bFaceShown ? 1 : 0,
       Frame.bClassS ? TEXT("S") : TEXT("L"), CardWH.X, CardWH.Y, Rib.Max.X - Rib.Min.X, Rib.Max.Y - Rib.Min.Y, TagRows,
       Model.bTimer ? *FString::FromInt(TimerSecondsNow) : TEXT("-"), TimerStateName(TimerNow), Model.bButtons ? 1 : 0, *Defend,
-      IsStampShown() ? 1 : 0, IsLeaving() ? 1 : 0, Model.Seq);
+      IsStampShown() ? 1 : 0,
+      Model.State == EUmEdgeState::NoDefense && SlotText && SlotText->GetVisibility() != ESlateVisibility::Collapsed ? 1 : 0,
+      IsLeaving() ? 1 : 0, Model.Seq);
   Out.Add(S08ArtHud::FormatWidgetLineEx(TEXT("UI-HUD-COMBAT-EDGE"), TEXT("umg"), StateName(Model.State),
                                         Side == EUmEdgeSide::Own ? FString(TEXT("own")) : FString(TEXT("opp")), Rect,
                                         bVisible && !Rect.IsEmpty(), bVisible, SourceName(), Extra));

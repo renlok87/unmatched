@@ -366,8 +366,12 @@ FS09TurnStatusInput AS08FlowGameMode::BuildTurnStatusInput() const {
       } else if (Move.bValid && Move.Prompt.IsSet()) {
         In.PendingPrompt = Move.Prompt;
       } else {
+        // VS-4 HB-35 (ВР-VS4-04, HB-34 P5): the choice named by its source card when the UMG block knows it
+        const FString Source = UmPendingSourceName();
         In.PendingPrompt = FS09Reason::Make(TEXT("ms.status.choice"))
-                               .Arg(TEXT("choice"), Pending.Text.IsEmpty() ? Pending.Type : Pending.Text.Left(80));
+                               .Arg(TEXT("choice"), !Source.IsEmpty()        ? Source
+                                                    : Pending.Text.IsEmpty() ? Pending.Type
+                                                                             : Pending.Text.Left(80));
       }
       break;
     }

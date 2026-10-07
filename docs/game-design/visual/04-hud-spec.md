@@ -681,7 +681,7 @@ y920┌PANEL-LOC┐       ▭▭▭▭▭▭▭ РУКА ▭▭▭▭▭▭▭  
   `WBP_UI_HUD_COMBAT`; карты — `UUmCardWidget` 230×319 (02 §6.2). Маркеры `#7CFC00`, `#FF4040`, `#40FF40` — под
   `-S09Markers`.
 - **Строки:** `hud.combat.role.attack`, `.role.defense`, `.slot.empty`, `.slot.chosen`, `.wait.defense`, `.defend`,
-  `.no.defense`, `.timer` («{n} с»), `.score` («{a} : {d}»), `.wins` («{fighter} побеждает»), `.holds`, `.effects.more`.
+  `.no.defense`, `.nodefense` («Нет защиты» под штампом, §3.8; VS-4), `.timer` («{n} с»), `.score` («{a} : {d}»), `.wins` («{fighter} побеждает»), `.holds`, `.effects.more`.
 - **Звук:** `CMB-ATTACK-DECLARE`, `CMB-DEFENSE-PLAYED`, `CMB-NO-DEFENSE`, `CRD-FLIP`, `CMB-EFFECT-LINE`, `CMB-SLAM`,
   удары `CMB-HIT-*`.
 
@@ -726,7 +726,18 @@ y920┌PANEL-LOC┐       ▭▭▭▭▭▭▭ РУКА ▭▭▭▭▭▭▭  
   командной панелью (`S08FlowGameModeCardSlot.cpp:74-157`), маркеры `#4080FF`, `#8040FF`, `#FF40B0`. →
   `UUmHudPending` + `UUmHudSourceSlot`, `WBP_UI_HUD_PENDING`, `WBP_UI_HUD_SLOT`.
 - **Строки:** `ms.pending.*`, `ms.choice.*`, `ms.btn.*` (есть), `hud.pending.queue` («ещё {k}»), `.after.combat`,
-  `.collapsed`, `hud.slot.scheme`, `.boost`, `.discard`, `hud.number.confirm`.
+  `.collapsed`, `.back` («Назад»), `.pick.count` («Выбрано {k}/{n}»), `.discard.count` («Сбросьте {n}: выбрано {h}/{n}»),
+  `hud.slot.scheme`, `.boost`, `.discard`, `.owner` («{slot} · {hero}»), `hud.number.confirm`, `hud.key.decline` («X»);
+  причина `why.pick.count` (VS-4, ВР-VS4-08, ВР-VS4-09).
+- **Дельта VS-4 (H10, макет HB-34, ВР-VS2-HB34-07…19; ВР-VS4-02…22 — `evidence/VISUAL/HB-35`, `HB-37`):** лента SLOT —
+  плашка под картой (зазор 4 su, 28 su, в S 40 su при двух строках; BOOST в S — 190 su), а не вымпел на рамке; глиф
+  IC-50 / IC-51 / IC-52 24 su (32 su при DPI × масштаб < 1); СХЕМА залита `card.type.scheme`, СБРОС — контур
+  `text.secondary` 2 su, BOOST — `card.navy` с «+N» внутри; удержание 1500 — полоса 4 su под лентой; уход — прозрачность
+  150 мс у каждой ленты. PENDING: модаль 640 (S 560) × по содержимому до cap, тело прокручивается, футер всегда виден;
+  компакт L 720 × ≥ 56 в две строки, S — одна строка (подсказка — в STATUS); серый компакт — по ширине текста, ≥ 320;
+  компакт и серый — под показанным центром боя + 8 su. Пока UMG-блок на месте, командная панель Slate не рисует выбор,
+  сброс, способность и ожидание соперника; у черновика атаки и окна разрешения остаются только её кнопки (до H6);
+  `-S09Markers` — прежняя панель для гейтов.
 - **Звук:** `UI-PANEL-OPEN`, `UI-CONFIRM`, `CRD-SCHEME`, `UI-REJECT`.
 
 ### 2.9 DECKS и панель колоды — `UI-HUD-DECKS`, `UI-HUD-DECKPANEL`

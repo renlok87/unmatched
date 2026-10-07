@@ -13,7 +13,8 @@
 //                        (hud.combat.slot.chosen) on its own 24 su plate 4 su above the card (HB-29 delta 04 SLOT-CAPTION);
 //              reveal    the face (the flip of HB-32 on the spot: UUmCardWidget::Flip, the defense card +120 ms);
 //              nodefense the empty frame and the v3 marker-x-stamp 64 su centred, «appear» 200 ms (AB-8; -S08CrossLegacy:
-//                        the text X in state.error).
+//                        the text X in state.error), «Нет защиты» under it (hud.combat.nodefense, type.body; VS-4 -
+//                        04 §3.8 «штамп X + текст», VS-3 item 13).
 //   ribbon   a panel under the card (4 su gap): the type disc 24 su (v3 action-attack / action-defense), «АТАКА · Merlin»
 //            / «ЗАЩИТА · Medusa» (hud.combat.role.*, type.tag 14 su, text.primary; wraps, never cut - the ribbon grows)
 //            and the team chip 24 su at its right end (P1 circle, P2 hexagon, team.p<n>.screen; ВР-78). L 230 x 28,

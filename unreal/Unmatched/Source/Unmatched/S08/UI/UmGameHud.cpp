@@ -50,7 +50,10 @@ FBox2D SlotRect(const FUmHudLayout& Layout, EUmGameSlot Slot) {
     case EUmGameSlot::Decks: return Layout.Rect(EUmHudBlock::Decks);
     case EUmGameSlot::DeckPanel: return Layout.Rect(EUmHudBlock::DeckPanel);
     case EUmGameSlot::Actions: return Layout.Rect(EUmHudBlock::Actions);
-    case EUmGameSlot::Pending: return Layout.Rect(EUmHudBlock::Center);
+    case EUmGameSlot::Pending:
+      // VS-4 HB-35: the whole canvas - the block places its forms itself (the modal at CENTER, the class S compact in the
+      // band SLOT ... PANEL-OPP, the toast over the hand caption); its root lets every other pointer through
+      return FBox2D(FVector2D::ZeroVector, Layout.CanvasSu);
     case EUmGameSlot::CombatCenter: {
       // VS-3 HB-33 (04 §2.7): the combat centre - centred, y 80 (S 64, 72 under a shown STATUS), 560 (S 480) x <= 160
       const float W = Layout.bClassS ? 480.0f : 560.0f;
@@ -68,7 +71,15 @@ FBox2D SlotRect(const FUmHudLayout& Layout, EUmGameSlot Slot) {
       if (Slot == EUmGameSlot::CombatEdgeL && Layout.Rect(EUmHudBlock::Defend).bIsValid) R += Layout.Rect(EUmHudBlock::Defend);
       return R;
     }
-    case EUmGameSlot::SourceSlot: return Layout.Rect(EUmHudBlock::SourceSlot);
+    case EUmGameSlot::SourceSlot: {
+      // VS-4 HB-37: the card and its ribbon under it (4 + up to 40 su, + the 2 + 4 su hold bar; the S BOOST ribbon is
+      // 190 su wide - HB-34 delta 04); the card flies in from outside it (painted beyond the slot, never hit-tested)
+      FBox2D R = Layout.Rect(EUmHudBlock::SourceSlot);
+      if (!R.bIsValid) return R;
+      R.Max.Y += 56.0;
+      R.Max.X = FMath::Max(R.Max.X, R.Min.X + 190.0);
+      return R;
+    }
     case EUmGameSlot::Log: return Layout.Rect(EUmHudBlock::Log);
     case EUmGameSlot::Banner: return Layout.Rect(EUmHudBlock::Banner);
     case EUmGameSlot::Toast: return Layout.Rect(EUmHudBlock::Toast);

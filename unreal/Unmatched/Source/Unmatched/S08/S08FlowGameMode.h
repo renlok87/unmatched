@@ -1241,6 +1241,21 @@ private:
   bool UmCombatCenterOnUmg() const;
   /** The UMG edge draws the defense window now and no gate layer asks for the Slate block (-S09Markers). */
   bool UmCombatOwnsDefenseWindow() const;
+  // VS-4 HB-35 / HB-37 (S08/UI/UmHudPending.h, UmHudSourceSlot.h; rollback -S08SlateHud=pending | slot): the deferred
+  // choice at CENTER and the source card at SLOT
+  void BuildUmPending();
+  /** Feeds UUmHudPending (RefreshHud and a cheap per-frame key: staging, slot hold, command in flight). */
+  void RefreshUmPending();
+  /** The UMG block draws the deferred choices: the Slate command panel gives up its pending / discard / ability / wait
+   *  blocks and the lines of the attack draft and the resolve window (not under -S09Markers, ВР-VS4-02). */
+  bool UmPendingOwnsCommandPanel() const;
+  /** Esc with an own choice open: «Назад» or why.choice.required (true = answered). */
+  bool UmPendingEscape();
+  /** The source of the open own head as the UI names it ('' unknown) - STATUS «Сделайте выбор: {choice}». */
+  FString UmPendingSourceName() const;
+  bool UmSlotOnUmg() const;
+  /** Every frame from TickCardSlot: FS09SourceSlot -> UUmHudSourceSlot. */
+  void TickUmSourceSlot();
   /** VS-3 SC-01 (ВР-SC14): -S08ScreenShots - one evidence frame per new UI-SCR-* id + state (<UI-ID>-<state>.png). */
   void TickUmScreenShots();
   // VS-2 exit frames (opt-in -S08ExitShots): own / opponent turn start + 0.5 s and + 3 s

@@ -706,7 +706,9 @@ void UUmCardWidget::ApplyLayout() {
   }
   ApplySpinner();
   // HB-25 (IC-34 П-2): the "+N" disc keeps >= 21 px on screen - 32 su below 1 px per su; 8 su of it on the frame
-  // (ВР-VS3-09) or right-aligned 4 su over the top edge (the attack boost, ВР-VS2-HB22-11)
+  // (ВР-VS3-09), centred or right-aligned (the attack boost, ВР-VS2-HB22-11) - VS-4 (VS-3 item 12): the right chip sits
+  // on the drawn card's top-right corner (Card is the drawn rect, the cap included), 4 su in from its right edge; 4 su
+  // over the edge it floated 20-25 px off the back at 720p 150 %
   const float Chip = ChipSuFor(Px);
   if (!FMath::IsNearlyEqual(Chip, ChipSuNow) || (BoostIcon && !FMath::IsNearlyEqual(BoostIcon->GetDisplaySizeSu(), Chip))) {
     ChipSuNow = Chip;
@@ -720,7 +722,7 @@ void UUmCardWidget::ApplyLayout() {
   if (BoostChip) {
     if (UOverlaySlot* S = Cast<UOverlaySlot>(BoostChip->Slot)) {
       S->SetHorizontalAlignment(bChipRightAbove ? HAlign_Right : HAlign_Center);
-      S->SetPadding(FMargin(0.0f, bChipRightAbove ? -(ChipSuNow + ChipGapAboveSu) : -(ChipSuNow - ChipOnFrameSu), 0.0f, 0.0f));
+      S->SetPadding(FMargin(0.0f, -(ChipSuNow - ChipOnFrameSu), bChipRightAbove ? ChipCornerInsetSu : 0.0f, 0.0f));
     }
   }
 }

@@ -3101,6 +3101,8 @@ void AS08FlowGameMode::HandleHudKeys() {
     } else if (CommandUi.Mode != ES09CommandMode::None) {
       ConfirmCombat();
     }
+  } else if (PC->WasInputKeyJustPressed(EKeys::Escape) && UmPendingEscape()) {
+    // VS-4 HB-35: the UMG choice answered Esc («Назад» or why.choice.required)
   } else if (PC->WasInputKeyJustPressed(EKeys::Escape)) {
     if (CommandUi.Mode == ES09CommandMode::ManeuverDraft ||
         CommandUi.Mode == ES09CommandMode::AttackDraft) {
@@ -5995,6 +5997,7 @@ void AS08FlowGameMode::RefreshHud() {
   PanelsBox->ClearChildren();
   CommandBox->ClearChildren();
   const bool bUmHand = RefreshUmHand();  // VS-3 HB-24 / HB-25: the UMG hand (-S08SlateHud=hand keeps the chips below)
+  RefreshUmPending();  // VS-4 HB-35 / HB-36 forms: the UMG choice (-S08SlateHud=pending keeps the command panel blocks)
   BuildCombatStageHud();
   RefreshDeckPanel();  // DE-030: the auto-close on a new input demand, then the content while visible
 
@@ -6302,24 +6305,31 @@ void AS08FlowGameMode::RefreshHud() {
   // targets >= 32px tall: P1 acceptance for 1280x720 readability. ----
   const bool bDraft = CommandUi.Mode == ES09CommandMode::ManeuverDraft;
   const bool bDiscard = CommandUi.Mode == ES09CommandMode::DiscardDraft;
+  // VS-4 HB-35 (ВР-VS4-02): with the UMG choice the panel keeps no line of the attack draft / the resolve window (only
+  // their buttons, until H6) and draws no choice, discard, ability or wait block; -S09Markers keeps it whole (gates)
+  const bool bUmPending = UmPendingOwnsCommandPanel();
+  bool bQuietLines = false;
   auto AddMarker = [this](const FLinearColor& Color) {
     if (!S08ArtLook::S08Markers()) return;  // HB-02 (VR-35): the pixel gate markers only with -S09Markers
     CommandBox->AddSlot().AutoHeight().Padding(0, 0, 0, 4)
         [SNew(SBox).WidthOverride(220).HeightOverride(14)
              [SNew(SColorBlock).Color(Color)]];
   };
-  auto AddHeader = [this](const FString& Text, const FLinearColor& Tint) {
+  auto AddHeader = [this, &bQuietLines](const FString& Text, const FLinearColor& Tint) {
+    if (bQuietLines) return;
     CommandBox->AddSlot().AutoHeight().Padding(0, 0, 0, 2)
         [SNew(STextBlock).Text(FText::FromString(Text))
              .Font(FCoreStyle::GetDefaultFontStyle("Bold", 16))
              .ColorAndOpacity(FSlateColor(Tint))];
   };
-  auto AddLine = [this](const FString& Text) {
+  auto AddLine = [this, &bQuietLines](const FString& Text) {
+    if (bQuietLines) return;
     CommandBox->AddSlot().AutoHeight()
         [SNew(STextBlock).Text(FText::FromString(Text))
              .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14))];
   };
-  auto AddBigLine = [this](const FString& Text, const FLinearColor& Tint) {
+  auto AddBigLine = [this, &bQuietLines](const FString& Text, const FLinearColor& Tint) {
+    if (bQuietLines) return;
     CommandBox->AddSlot().AutoHeight().Padding(0, 2)
         [SNew(STextBlock).Text(FText::FromString(Text))
              .Font(FCoreStyle::GetDefaultFontStyle("Bold", 14))
@@ -6367,6 +6377,10 @@ void AS08FlowGameMode::RefreshHud() {
                   FMargin(14, 8), FLinearColor::White,
                   SNew(STextBlock).Text(FText::FromString(TEXT("CLEAR DRAFT (Esc)")))
                        .Font(FCoreStyle::GetDefaultFontStyle("Regular", 14)))]];
+  } else if (bUmPending && (bDiscard || CommandUi.Mode == ES09CommandMode::PendingChoice ||
+                            (CommandUi.Mode == ES09CommandMode::AttackDraft && CommandUi.IsAttackAbilityPromptOpen()) ||
+                            (CommandUi.Mode == ES09CommandMode::None && CommandUi.bHasPendingChoice))) {
+    // VS-4 HB-35: UUmHudPending draws the hand-limit discard, the choice, King Arthur's BOOST and the opponent's choice
   } else if (bDiscard) {
     const int32 Need = CommandUi.PendingDiscard.Count;
     const int32 Have = CommandUi.DiscardSelection.Num();
@@ -6454,6 +6468,7 @@ void AS08FlowGameMode::RefreshHud() {
       return FString(TEXT("-"));
     };
     AddMarker(GS09AttackMarker);
+    bQuietLines = bUmPending;  // VS-4 (VS-3 item 3): only the buttons stay
     AddHeader(TEXT("ATTACK DRAFT - PICK ATTACKER, TARGET, CARD"),
               FLinearColor(1.0f, 0.6f, 0.2f, 1.0f));
     AddLine(FString::Printf(TEXT("attacker: %s   target: %s   card: %s"),
@@ -6597,6 +6612,7 @@ void AS08FlowGameMode::RefreshHud() {
     const double Left = CommandUi.Combat.bHasTimeoutAt
                             ? CommandUi.Combat.SecondsUntilDeadline() : -1.0;
     AddMarker(GS09ResolveMarker);
+    bQuietLines = bUmPending;  // VS-4 (VS-3 item 3): the window covered the own combat card in class S - only R stays
     AddHeader(TEXT("COMBAT RESOLVE WINDOW"), FLinearColor(0.4f, 1.0f, 0.4f, 1.0f));
     AddBigLine(FString::Printf(TEXT("server deadline: %s"),
                                Left > 0.0 ? *FString::Printf(TEXT("%.0fs left"), Left)

@@ -13,7 +13,9 @@
 #include "UmHudDecks.h"
 #include "UmHudHand.h"
 #include "UmHudOppHand.h"
+#include "UmHudPending.h"
 #include "UmHudPlayerPanel.h"
+#include "UmHudSourceSlot.h"
 #include "UmHudStatusLine.h"
 #include "UmHudTop.h"
 #include "UmCursor.h"
@@ -93,6 +95,12 @@ FString UUmHudAuthoringLibrary::AuthorUmHudWidgetBlueprints(bool bOverwrite) {
   // VS-3 SC-01: the confirm dialog (nests WBP_UmButton); UUmScreenBase / UUmModalBase are abstract, without a WBP
   One(UUmConfirmDialog::WidgetBlueprintPath, UUmConfirmDialog::StaticClass(),
       [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmConfirmDialog::BuildDefaultTree(Tree, Attach, Error); });
+  // VS-4 HB-35 / HB-37: the choice (nests WBP_UmButton, WBP_UmCard; its number picker is code-built) and the source
+  // card (nests WBP_UmCard)
+  One(UUmHudPending::WidgetBlueprintPath, UUmHudPending::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmHudPending::BuildDefaultTree(Tree, Attach, Error); });
+  One(UUmHudSourceSlot::WidgetBlueprintPath, UUmHudSourceSlot::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmHudSourceSlot::BuildDefaultTree(Tree, Attach, Error); });
   Report->SetArrayField(TEXT("assets"), Assets);
   FString Out;
   const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&Out);

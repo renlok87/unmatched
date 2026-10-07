@@ -374,7 +374,10 @@ void AS08FlowGameMode::TickCardSlot() {
     FS08Trace::Write(FString::Printf(TEXT("HUD-SLOT choice hidden=%d seq=%d mode=%d"), bHide ? 1 : 0,
                                      CardSlot.HeldSeq(), static_cast<int32>(CommandUi.Mode)));
   }
-  if (CardSlotBox.IsValid()) {
+  TickUmSourceSlot();  // VS-4 HB-37: the UMG slot (-S08SlateHud=slot keeps the Slate box below)
+  if (CardSlotBox.IsValid() && UmSlotOnUmg()) {
+    if (CardSlotBox->GetVisibility() != EVisibility::Collapsed) CardSlotBox->SetVisibility(EVisibility::Collapsed);
+  } else if (CardSlotBox.IsValid()) {
     if (CardSlot.GetRevision() != CardSlotBuiltRevision || CardSlot.HoldsEffect() != bCardSlotBuiltHolding) {
       RebuildCardSlotWidget();
     }

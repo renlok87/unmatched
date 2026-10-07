@@ -595,6 +595,13 @@ void UUmHudHand::ApplyModel(const FUmHandModel& InModel) {
   for (auto It = Live.CreateIterator(); It; ++It) {
     if (Ids.Contains(It.Key())) continue;
     UUmCardWidget* W = It.Value();
+    if (W && HandedOff.Remove(It.Key()) > 0) {
+      // VS-4 HB-37: the source-card slot flies this card itself (no flash, no second flight)
+      Release(W);
+      PlacedNow.Remove(It.Key());
+      It.RemoveCurrent();
+      continue;
+    }
     if (W) {
       W->SetVisibility(ESlateVisibility::HitTestInvisible);
       W->SetHover(false);
@@ -1107,9 +1114,38 @@ void UUmHudHand::PaintedCardRectsSu(TArray<FBox2D>& Out) const {
   }
 }
 
+bool UUmHudHand::HandOffCard(const FString& InstanceId, FBox2D& OutRectSu) {
+  OutRectSu = FBox2D(ForceInit);
+  auto RectOf = [this](const UUmCardWidget* W) {
+    const UCanvasPanelSlot* S = W ? Cast<UCanvasPanelSlot>(W->Slot) : nullptr;
+    if (!S) return FBox2D(ForceInit);
+    const FVector2D Origin = Frame.SlotSu.bIsValid ? FVector2D(Frame.SlotSu.Min) : FVector2D::ZeroVector;
+    const FVector2D Min = Origin + S->GetPosition() + W->GetOwnerOffset();
+    return FBox2D(Min, Min + S->GetSize());
+  };
+  // already leaving (the hand saw the scheme go before the slot showed it): drop its flight now
+  for (int32 I = Leaving.Num() - 1; I >= 0; --I) {
+    UUmCardWidget* W = Leaving[I].W.Get();
+    if (!W || W->GetCard().InstanceId != InstanceId) continue;
+    OutRectSu = RectOf(W);
+    Release(W);
+    Leaving.RemoveAt(I);
+    return OutRectSu.bIsValid;
+  }
+  // still in the row: it leaves with the next model without a flight of its own
+  if (UUmCardWidget* W = Live.FindRef(InstanceId)) {
+    OutRectSu = RectOf(W);
+    HandedOff.Add(InstanceId);
+    return OutRectSu.bIsValid;
+  }
+  return false;
+}
+
 void UUmHudHand::CollectShotLines(TArray<FString>& Out) const {
-  const bool bVisible = bHasModel && UmGameHudSlots::ShownByProperty(this);
   const FBox2D Su = DrawnRectSu();
+  // VS-4 (VS-3 open item 2): visible = shown AND a rect is drawn - the empty lowered hand writes visible=0, not
+  // 'geom=unpainted visible=1'
+  const bool bVisible = bHasModel && UmGameHudSlots::ShownByProperty(this) && Su.bIsValid && Su.GetArea() > 0.0;
   const float Px = Frame.PxPerSu > 0.0f ? Frame.PxPerSu : 1.0f;
   FS08ScreenRect Rect;
   if (Su.bIsValid) Rect = FS08ScreenRect(Su.Min.X * Px, Su.Min.Y * Px, Su.Max.X * Px, Su.Max.Y * Px);

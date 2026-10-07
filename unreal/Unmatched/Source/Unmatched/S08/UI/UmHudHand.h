@@ -255,6 +255,10 @@ class UNMATCHED_API UUmHudHand : public UUserWidget {
   int32 CreatedCount() const { return Created; }
   bool IsTooltipShown() const;
   FText GetTooltipText() const;
+  /** VS-4 HB-37: the source-card slot takes over a card that leaves (or is about to leave) the hand - its own scheme
+   *  flies from there into SLOT; the hand drops the card without its flash and flight. OutRectSu: where it is drawn
+   *  now (canvas su). False when the hand has no such card. */
+  bool HandOffCard(const FString& InstanceId, FBox2D& OutRectSu);
   /** The hover by a point of the canvas (su) - what the pointer moves do; tests call it directly. */
   void HoverAtSu(const FVector2D& CanvasSu);
   void SetHoverIndex(int32 Index);
@@ -335,6 +339,8 @@ class UNMATCHED_API UUmHudHand : public UUserWidget {
   // the placed boost cards (instance ids) of the last apply (a fresh placement flies)
   TSet<FString> PlacedNow;
   TArray<FLeaving> Leaving;
+  /** VS-4 HB-37: live cards the slot took over - released without a flight when they leave. */
+  TSet<FString> HandedOff;
   TMap<FString, TObjectPtr<UUmCardWidget>> Live;
   UPROPERTY(Transient) TArray<TObjectPtr<UUmCardWidget>> Pool;
   TArray<TObjectPtr<UUmCardWidget>> Free;

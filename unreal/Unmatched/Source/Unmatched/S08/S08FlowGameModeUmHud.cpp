@@ -58,6 +58,13 @@
 //     staging); the defense window's deadline is anchored on the snapshot's server time (metadata.lastActionAt, HB-31).
 //     While the UMG edge draws the defense window the Slate command panel gives up that block (not under -S09Markers);
 //     the banner moves under a shown combat centre (ВР-VS3-56).
+//   - VS-4 HB-35 / HB-37 (S08/UI/UmHudPending.h, UmHudSourceSlot.h): PENDING and SLOT - built with the root (rollback
+//     -S08SlateHud=pending | slot), the choice fed by RefreshHud (RefreshUmPending: the command state, the presenter, the
+//     snapshot's deck lists and piles for the source card) and by a cheap per-frame key (the staging, the slot hold, a
+//     command in flight, the combat centre); the slot every frame from TickCardSlot (TickUmSourceSlot: FS09SourceSlot,
+//     the fly from the hand's handed-off card or OPP-HAND). While the UMG choice is on, the Slate command panel draws no
+//     choice / discard / ability / wait block and only the buttons of the attack draft and the resolve window (ВР-VS4-02,
+//     not under -S09Markers); it moves right of a shown UMG slot (ВР-VS4-14).
 #include "S08FlowGameMode.h"
 
 #include "S08AnimatedIconWidget.h"
@@ -73,6 +80,7 @@
 #include "UI/UmDecksGallery.h"
 #include "UI/UmGameHud.h"
 #include "UI/UmHandGallery.h"
+#include "UI/UmPendingGallery.h"
 #include "UI/UmHudGallery.h"
 #include "UI/UmHudBanner.h"
 #include "UI/UmHudCombatBlocks.h"
@@ -81,9 +89,11 @@
 #include "UI/UmHudHand.h"
 #include "UI/UmHudLayout.h"
 #include "UI/UmHudPanels.h"
+#include "UI/UmHudPending.h"
 #include "UI/UmHudPerf.h"
 #include "UI/UmHudRoot.h"
 #include "UI/UmHudScale.h"
+#include "UI/UmHudSourceSlot.h"
 #include "UI/UmHudStatusLine.h"
 #include "UI/UmHudTheme.h"
 #include "UI/UmHudTop.h"
@@ -187,6 +197,17 @@ struct FUmHudRuntime {
   double TimerDeadlineSec = 0.0;
   float TimerWindowSec = 30.0f;
   float BannerShiftSu = 0.0f;
+  // VS-4 HB-35 / HB-37: the choice and the source card; the per-frame refresh key of the choice; the title of the open
+  // own head (STATUS «Сделайте выбор: {card}»); the slot's card revision and where it flies from; the command panel's
+  // shift right of the slot
+  TWeakObjectPtr<UUmHudPending> Pending;
+  TWeakObjectPtr<UUmHudSourceSlot> Slot;
+  FString PendingTickKey;
+  FString PendingHeadId;
+  FString PendingTitle;
+  uint32 SlotRevision = 0;
+  FVector2D SlotFlyFrom = FVector2D::ZeroVector;
+  float CommandShiftXSu = 0.0f;
 };
 
 namespace {
@@ -253,6 +274,7 @@ void AS08FlowGameMode::BuildUmHud() {
   BuildUmHand();      // VS-3 HB-24 / HB-25
   BuildUmDecks();     // VS-3 HB-27 / HB-28
   BuildUmCombat();    // VS-3 HB-30...HB-33
+  BuildUmPending();   // VS-4 HB-35 / HB-37
   RefreshUmHudLayout();
 }
 
@@ -323,6 +345,7 @@ void AS08FlowGameMode::RefreshUmHudLayout() {
   R.SlateHandLiftSu = R.Layout.HandVisibleSu + 22.0f + 8.0f;  // VS-3 HB-24 (ВР-VS3-22)
   if (UUmHudHand* Hand = R.Hand.Get()) Hand->SetFrame(FUmHandFrame::FromLayout(R.Layout, CombatSpeedMul()));
   RefreshUmDecks();  // VS-3 HB-27 / HB-28: the chips and the panel take the new rects
+  RefreshUmPending();  // VS-4 HB-35: the choice takes the new frame (the slot: its next TickCardSlot)
   const FString Line = R.Layout.TraceLine(FIntPoint(FMath::RoundToInt(Viewport.X), FMath::RoundToInt(Viewport.Y)));
   if (Line != R.LastLayoutLine) {
     R.LastLayoutLine = Line;
@@ -796,15 +819,38 @@ void AS08FlowGameMode::TickUmHud() {
   TickUmPanels();    // VS-2 HB-18...HB-21
   RefreshUmCombat();  // VS-3 HB-30...HB-33: the staging's clock moves the edges and the centre
   FUmHudRuntime& R = *UmHud;
+  // VS-4 HB-35: what changes the choice between snapshots - the staging ends, the slot's hold, a command in flight, the
+  // combat centre it sits under
+  if (R.Pending.IsValid()) {
+    const UUmHudCombatCenter* Centre = R.Combat.GetCenter();
+    const FBox2D CentreRect = Centre && UmGameHudSlots::ShownByProperty(Centre) ? Centre->PanelRectSu() : FBox2D(ForceInit);
+    const FString Key = FString::Printf(TEXT("%d|%d|%d|%d|%.0f"), CombatStage.IsActive() ? 1 : 0, CardSlot.HoldsEffect() ? 1 : 0,
+                                        HudBusyReason().IsSet() ? 1 : 0, static_cast<int32>(CommandUi.Mode),
+                                        CentreRect.bIsValid ? CentreRect.Max.Y : -1.0);
+    if (Key != R.PendingTickKey) {
+      R.PendingTickKey = Key;
+      RefreshUmPending();
+    }
+  }
   // ВР-VS2-73: the Slate command panel (top left until ACTIONS / CENTER, VS-4) starts 8 su under TOP while TOP is shown
   if (const TSharedPtr<SWidget> Cmd = ArtHud.CommandPanel.Pin()) {
     const UUmHudTop* TopW = R.TopStrip.GetTop();
     const float Shift = (TopW && TopW->IsVisible()) ? static_cast<float>(R.Layout.Rect(EUmHudBlock::Top).Max.Y) + 8.0f : 0.0f;
-    if (!FMath::IsNearlyEqual(Shift, R.CommandShiftSu, 0.5f)) {
+    // VS-4 (ВР-VS4-14): the panel (its remaining buttons) right of a shown UMG source card, never over it - the
+    // panel's left is the Slate canvas's 16 su
+    const UUmHudSourceSlot* SlotW = R.Slot.Get();
+    const FBox2D SlotRect = R.Layout.Rect(EUmHudBlock::SourceSlot);
+    const float ShiftX = SlotW && SlotW->GetPhase() != EUmSlotPhase::Hidden && SlotRect.bIsValid
+                             ? FMath::Max(0.0f, static_cast<float>(SlotRect.Max.X) + 8.0f - 16.0f)
+                             : 0.0f;
+    if (!FMath::IsNearlyEqual(Shift, R.CommandShiftSu, 0.5f) || !FMath::IsNearlyEqual(ShiftX, R.CommandShiftXSu, 0.5f)) {
       R.CommandShiftSu = Shift;
-      Cmd->SetRenderTransform(Shift > 0.0f ? TOptional<FSlateRenderTransform>(FSlateRenderTransform(FVector2f(0.0f, Shift)))
-                                           : TOptional<FSlateRenderTransform>());
-      FS08Trace::Write(FString::Printf(TEXT("HUD-CMD shift=%.0f top=%d"), Shift, Shift > 0.0f ? 1 : 0));
+      R.CommandShiftXSu = ShiftX;
+      Cmd->SetRenderTransform(Shift > 0.0f || ShiftX > 0.0f
+                                  ? TOptional<FSlateRenderTransform>(FSlateRenderTransform(FVector2f(ShiftX, Shift)))
+                                  : TOptional<FSlateRenderTransform>());
+      FS08Trace::Write(FString::Printf(TEXT("HUD-CMD shift=%.0f top=%d shiftX=%.0f slot=%d"), Shift, Shift > 0.0f ? 1 : 0, ShiftX,
+                                       ShiftX > 0.0f ? 1 : 0));
     }
     // ВР-VS2-75: an empty command panel (the opponent's turn without a choice) drew a 20 su navy square at the edge
     const float CmdOpacity = (CommandBox.IsValid() && CommandBox->NumSlots() == 0) ? 0.0f : 1.0f;
@@ -932,6 +978,13 @@ void AS08FlowGameMode::WriteUmHudShotLines() {
     TArray<FString> CombatLines;
     R.Combat.CollectShotLines(CombatLines);
     for (const FString& L : CombatLines) FS08Trace::Write(L);
+  }
+  // VS-4 HB-35 / HB-37: UI-HUD-PENDING and UI-HUD-SLOT (no card name, no text, no card id)
+  {
+    TArray<FString> PendingLines;
+    if (const UUmHudPending* P = R.Pending.Get()) P->CollectShotLines(PendingLines);
+    if (const UUmHudSourceSlot* W = R.Slot.Get()) W->CollectShotLines(PendingLines);
+    for (const FString& L : PendingLines) FS08Trace::Write(L);
   }
   TArray<FString> PanelLines;  // VS-2 HB-18...HB-21: UI-HUD-PANEL-LOC, UI-HUD-PANEL-OPP, UI-HUD-OPP-HAND
   R.Panels.CollectShotLines(PanelLines, [this](UWidget* W) {
@@ -1083,14 +1136,16 @@ void AS08FlowGameMode::UmGalleryBegin(int32 SizePx) {
   FString CombatBoard;
   const bool bConfirm = FParse::Value(Cmd, TEXT("S08IconGalleryConfirm="), CombatBoard);
   const bool bCombat = bConfirm || FParse::Value(Cmd, TEXT("S08IconGalleryCombat="), CombatBoard);
-  if (!bSkins && !bButtons && !bTopStrip && !bPanels && !bCards && !bHand && !bDecks && !bCombat) return;
+  FString PendingBoard;  // VS-4 HB-35 / HB-37 (UI/UmPendingGallery.h): -S08IconGalleryPending=marmoreal|sarpedon
+  const bool bPending = FParse::Value(Cmd, TEXT("S08IconGalleryPending="), PendingBoard);
+  if (!bSkins && !bButtons && !bTopStrip && !bPanels && !bCards && !bHand && !bDecks && !bCombat && !bPending) return;
   if (IconGallery) IconGallery->SetVisibility(ESlateVisibility::Collapsed);  // the sheet takes the screen
   // the canvas of the sheet: the applied HUD scale (BeginPlay may run before the first window apply - the sheet is
   // built again on every OnUiScaleChanged, which also covers a window or UI-scale change)
   const int32 PageIndex = FMath::Max(0, Page - 1);
   TWeakObjectPtr<AS08FlowGameMode> WeakThis(this);
   auto Build = [WeakThis, bSkins, bTopStrip, bPanels, PanelsPage, PageIndex, Variant, SizePx, bCards, CardsPage, bHand,
-                HandBoard, bDecks, DecksBoard, bCombat, bConfirm, CombatBoard]() {
+                HandBoard, bDecks, DecksBoard, bCombat, bConfirm, CombatBoard, bPending, PendingBoard]() {
     AS08FlowGameMode* Self = WeakThis.Get();
     if (!Self || !Self->GetWorld()) return;
     FVector2D Viewport(1920.0, 1080.0);
@@ -1098,6 +1153,14 @@ void AS08FlowGameMode::UmGalleryBegin(int32 SizePx) {
     const FUmHudScaleState& Scale = UmHudScale::Current();
     const float PxPerSu = Scale.Window.X > 0 ? Scale.PxPerSu() : 1.0f;
     if (Self->UmGallery) Self->UmGallery->RemoveFromParent();
+    if (bPending) {
+      UUmPendingGalleryWidget* Sheet = CreateWidget<UUmPendingGalleryWidget>(Self->GetWorld(), UUmPendingGalleryWidget::StaticClass());
+      if (!Sheet) return;
+      for (const FString& Line : Sheet->Build(PendingBoard, Viewport / PxPerSu, PxPerSu)) FS08Trace::Write(Line);
+      Sheet->AddToViewport(1001);
+      Self->UmGallery = Sheet;
+      return;
+    }
     if (bCombat) {
       UUmCombatGalleryWidget* Sheet = CreateWidget<UUmCombatGalleryWidget>(Self->GetWorld(), UUmCombatGalleryWidget::StaticClass());
       if (!Sheet) return;
@@ -1181,6 +1244,10 @@ void AS08FlowGameMode::UmGalleryAt(float TMs) {
   // VS-3 HB-30...HB-33 / SC-01: the combat states (one per second) or the confirm modal
   if (UUmCombatGalleryWidget* CombatSheet = Cast<UUmCombatGalleryWidget>(UmGallery)) {
     for (const FString& Line : CombatSheet->SetClockMs(TMs)) FS08Trace::Write(Line);
+  }
+  // VS-4 HB-35 / HB-37: the choice and source-card states (one per second)
+  if (UUmPendingGalleryWidget* PendingSheet = Cast<UUmPendingGalleryWidget>(UmGallery)) {
+    for (const FString& Line : PendingSheet->SetClockMs(TMs)) FS08Trace::Write(Line);
   }
 }
 
@@ -1648,4 +1715,310 @@ void AS08FlowGameMode::TickUmScreenShots() {
     TakeEvidenceShot(S09ShotDir / File);
     break;  // one request per frame; the next state waits for the next tick
   }
+}
+
+// ------------------------------------------------------------------------------------------------ VS-4 HB-35 / HB-37
+
+void AS08FlowGameMode::BuildUmPending() {
+  UUmGameHud* Game = UmHudRoot ? UmHudRoot->GetGameHud() : nullptr;
+  if (!UmHud.IsValid() || !Game) return;
+  FUmHudRuntime& R = *UmHud;
+  TWeakObjectPtr<AS08FlowGameMode> WeakThis(this);
+  // every press answers in the frame of its release (UI-INP-011), then the game mode acts
+  auto Answer = [WeakThis](const FS09HudPressOutcome& Outcome, TFunction<void(AS08FlowGameMode&)> Act) {
+    if (AS08FlowGameMode* Self = WeakThis.Get()) {
+      Self->HandleHudPressOutcome(Outcome, TFunction<FS09Reason()>(), [WeakThis, Act]() {
+        if (AS08FlowGameMode* S = WeakThis.Get()) Act(*S);
+      });
+    }
+  };
+  if (R.Blocks.IsSlate(FName(TEXT("pending")))) {
+    ArtHud.PendingTrace.Add(TEXT("HUD-PENDING-UMG impl=slate reason=-S08SlateHud=pending"));
+  } else {
+    UUmHudPending* P = CreateWidget<UUmHudPending>(Game, UUmHudPending::WidgetClass());
+    if (!P || !Game->SetBlock(EUmGameSlot::Pending, P)) {
+      ArtHud.PendingTrace.Add(TEXT("HUD-PENDING-UMG impl=umg created=0 reason=create-failed"));
+    } else {
+      R.Pending = P;
+      UUmHudPending::FCallbacks C;
+      // «Подтвердить» / «Атаковать с BOOST»: the same command as Enter (the hand-limit discard: its draft)
+      C.OnConfirm = [Answer](const FS09HudPressOutcome& O) {
+        Answer(O, [](AS08FlowGameMode& S) {
+          if (S.CommandUi.Mode == ES09CommandMode::DiscardDraft) {
+            S.ConfirmDraft();
+          } else {
+            S.ConfirmCombat();
+          }
+        });
+      };
+      C.OnSecondary = [Answer](const FS09HudPressOutcome& O) { Answer(O, [](AS08FlowGameMode& S) { S.AttackWithoutAbilityBoostCommand(); }); };
+      C.OnStay = [Answer](const FS09HudPressOutcome& O) { Answer(O, [](AS08FlowGameMode& S) { S.StayPendingInPlaceCommand(); }); };
+      C.OnDecline = [Answer](const FS09HudPressOutcome& O) { Answer(O, [](AS08FlowGameMode& S) { S.DeclinePendingChoiceCommand(); }); };
+      C.OnBack = [Answer](const FS09HudPressOutcome& O) { Answer(O, [](AS08FlowGameMode& S) { S.UmPendingEscape(); }); };
+      C.OnToggle = [Answer](const FS09HudPressOutcome& O) { Answer(O, [](AS08FlowGameMode& S) { S.TogglePendingCollapseCommand(); }); };
+      C.OnOption = [Answer](const FS09HudPressOutcome& O, int32 Index) {
+        Answer(O, [Index](AS08FlowGameMode& S) {
+          FString Reason;
+          const bool bOk = S.CommandUi.SelectPendingOption(Index, Reason);
+          FS08Trace::Write(FString::Printf(TEXT("HUD-PENDING option=%d ok=%d"), Index, bOk ? 1 : 0));
+          if (!bOk) {
+            S.Toast = TEXT("option rejected: ") + Reason;
+            S.ToastUntil = S.Elapsed + 3.0f;
+          }
+          S.RefreshHud();
+        });
+      };
+      C.OnCard = [Answer](const FS09HudPressOutcome& O, const FString& InstanceId) {
+        Answer(O, [InstanceId](AS08FlowGameMode& S) {
+          FString Reason;
+          const bool bOk = S.CommandUi.TogglePendingCard(InstanceId, S.EffectiveSnapshot(), Reason);
+          FS08Trace::Write(FString::Printf(TEXT("HUD-PENDING card toggle ok=%d picked=%d"), bOk ? 1 : 0, S.CommandUi.PendingCardIds.Num()));
+          if (!bOk) {
+            S.Toast = TEXT("pick rejected: ") + Reason;
+            S.ToastUntil = S.Elapsed + 3.0f;
+          }
+          S.RefreshHud();
+        });
+      };
+      // no MVP card asks for a number (ВР-HB11): a step is answered and traced only
+      C.OnStep = [Answer](const FS09HudPressOutcome& O, int32 Delta) {
+        Answer(O, [Delta](AS08FlowGameMode&) { FS08Trace::Write(FString::Printf(TEXT("HUD-PENDING number step=%d"), Delta)); });
+      };
+      C.OnInspect = [WeakThis](const FS09CardView& Card) {
+        AS08FlowGameMode* Self = WeakThis.Get();
+        if (!Self || Card.bHidden) return;
+        Self->InspectCard(Card);
+        Self->InspectedHandIndex = -1;
+        Self->DiscardBrowserIndex = -1;
+        Self->RefreshHud();
+      };
+      P->SetInput(HudPress, MoveTemp(C));
+      FString Missing;
+      ArtHud.PendingTrace.Add(FString::Printf(TEXT("HUD-PENDING-UMG impl=umg created=1 source=%s parts=%d missing=%s"),
+                                              *P->WidgetSourceName(), P->HasAllParts(&Missing) ? 1 : 0,
+                                              Missing.IsEmpty() ? TEXT("-") : *Missing));
+    }
+  }
+  if (R.Blocks.IsSlate(FName(TEXT("slot")))) {
+    ArtHud.PendingTrace.Add(TEXT("HUD-SLOT-UMG impl=slate reason=-S08SlateHud=slot"));
+    return;
+  }
+  UUmHudSourceSlot* W = CreateWidget<UUmHudSourceSlot>(Game, UUmHudSourceSlot::WidgetClass());
+  if (!W || !Game->SetBlock(EUmGameSlot::SourceSlot, W)) {
+    ArtHud.PendingTrace.Add(TEXT("HUD-SLOT-UMG impl=umg created=0 reason=create-failed"));
+    return;
+  }
+  R.Slot = W;
+  FString Missing;
+  ArtHud.PendingTrace.Add(FString::Printf(TEXT("HUD-SLOT-UMG impl=umg created=1 source=%s parts=%d missing=%s"), *W->SourceName(),
+                                          W->HasAllParts(&Missing) ? 1 : 0, Missing.IsEmpty() ? TEXT("-") : *Missing));
+}
+
+bool AS08FlowGameMode::UmPendingOwnsCommandPanel() const {
+  return UmHud.IsValid() && UmHud->Pending.IsValid() && !S08ArtLook::S08Markers();
+}
+
+bool AS08FlowGameMode::UmSlotOnUmg() const { return UmHud.IsValid() && UmHud->Slot.IsValid(); }
+
+FString AS08FlowGameMode::UmPendingSourceName() const {
+  if (!UmHud.IsValid() || !CommandUi.bHasPendingChoice || UmHud->PendingHeadId != CommandUi.PendingChoice.Id) return FString();
+  return UmHud->PendingTitle;
+}
+
+bool AS08FlowGameMode::UmPendingEscape() {
+  // 04 §2.8 / HB-35 p. 4: Esc - «Назад» when the open own choice has one, why.choice.required (CUE-004) when it is
+  // mandatory; an optional choice without a step back keeps the old Esc (the selection clears)
+  if (!UmHud.IsValid() || !UmHud->Pending.IsValid() || CommandUi.Mode != ES09CommandMode::PendingChoice ||
+      !CommandUi.bHasPendingChoice) {
+    return false;
+  }
+  const UUmHudPending* P = UmHud->Pending.Get();
+  if (P->GetModel().bBack) {
+    // CHOOSE_ONE: the picked option goes (the command did not leave: no busy state, ВР-VS4-07)
+    CommandUi.PendingOptionIndex = -1;
+    FS08Trace::Write(FString::Printf(TEXT("HUD-PENDING back id=%s"), *CommandUi.PendingChoice.Id));
+    RefreshHud();
+    return true;
+  }
+  if (!CommandUi.PendingChoice.bOptional) {
+    FS08Trace::Write(FString::Printf(TEXT("HUD-PENDING esc refused id=%s why=why.choice.required"), *CommandUi.PendingChoice.Id));
+    ShowReason(FS09Reason::Make(TEXT("why.choice.required")), 3.0f);
+    return true;
+  }
+  return false;
+}
+
+void AS08FlowGameMode::RefreshUmPending() {
+  if (!UmHud.IsValid() || !UmHud->bLayout) return;
+  FUmHudRuntime& R = *UmHud;
+  UUmHudPending* P = R.Pending.Get();
+  if (!P) return;
+  UmHudPending::FUmPendingInput In;
+  const bool bAborted = Flow.IsValid() && Flow->GetStage() == ES08Stage::Started && Flow->IsRoomAborted();
+  In.bLive = Flow.IsValid() && Hud.bValid && !Hud.bGameOver && !bAborted && !IsResultScreenShown();
+  In.ViewerId = ViewerIdNow();
+  In.Ui = &CommandUi;
+  In.Presenter = &PendingPresenter;
+  In.bCombatStaging = CombatStage.IsActive();
+  In.bHeldBySlot = CardSlot.HoldsEffect() &&
+                   (CommandUi.Mode == ES09CommandMode::PendingChoice || CommandUi.Mode == ES09CommandMode::DiscardDraft);
+  const UUmHudStatusLine* Status = R.TopStrip.GetStatus();
+  In.bStatusSaysOpp = Status && Status->IsShown() && !UmHudBlockOnSlate(TEXT("status"));
+  In.BusyWhy = HudBusyReason();
+  In.bRu = UmCardMedia::PreferredLang() != TEXT("en");
+  // the source card: the catalog cards of both deck lists (gameDeckLists, public), the own hand and both piles
+  for (const FS09DeckList& List : DeckLists) {
+    for (const FS09DeckListCard& Card : List.Cards) {
+      FS09CardView V;
+      V.CardId = Card.CardId;
+      V.Name = Card.Name;
+      V.NameRu = Card.NameRu;
+      V.CardType = Card.CardType;
+      V.Text = Card.Text;
+      V.BannerName = Card.BannerName;
+      In.Known.Add(V);
+    }
+  }
+  for (const FS09PlayerPanel* Panel : {Hud.ViewerPanel(), Hud.OpponentPanel()}) {
+    if (!Panel) continue;
+    In.HeroNames.Add(Panel->PlayerId, PlayerHeroName(Panel->PlayerId));
+    In.Known.Append(Panel->Cards);
+    In.Known.Append(Panel->Discard);
+  }
+  const FS08PendingEffect* Head = CommandUi.Mode == ES09CommandMode::PendingChoice && CommandUi.bHasPendingChoice
+                                      ? &CommandUi.PendingChoice
+                                      : (CommandUi.PendingQueue.Num() > 0 ? &CommandUi.PendingQueue[0] : nullptr);
+  if (Head) {
+    for (const FS09PlayerPanel* Panel : {Hud.ViewerPanel(), Hud.OpponentPanel()}) {
+      if (Panel && Panel->PlayerId == Head->PlayerId) In.OwnerDiscard = Panel->Discard;
+    }
+  }
+  if (const FS09PlayerPanel* Own = Hud.ViewerPanel()) In.OwnHeroSlug = UmDeckHeroSlug(Fighters, Own->PlayerId);
+  if (CommandUi.Mode == ES09CommandMode::PendingChoice && Flow.IsValid()) {
+    const FS08Snapshot& Snap = EffectiveSnapshot();
+    const FS09PendingMovePrompt Move = CommandUi.DescribePendingMovePlace(BoardModel, Fighters);
+    if (Move.bValid) {
+      In.MovePrompt = Move.Prompt;
+      In.bCanStay = Move.bCanStay;
+    }
+    TArray<FString> Pool;
+    int32 Need = 0;
+    if (CommandUi.PendingCardPickPlan(Snap, Pool, Need)) In.PickNeed = Need;
+    CommandUi.PendingRevealedCards(In.Revealed);
+    // the toast's «В прошлый раз: {choice}»: the fighter, else the space, else the option - as the UI names them
+    if (const FS09PendingVariant* Last = PendingPresenter.Remembered()) {
+      if (!Last->FighterId.IsEmpty()) {
+        if (const FS08BoardFighter* F = FindFighter(Last->FighterId)) In.RememberedChoice = F->Label.IsEmpty() ? F->Name : F->Label;
+      }
+      if (In.RememberedChoice.IsEmpty() && Last->bHasCell) In.RememberedChoice = BoardModel.CellLabel(Last->CellX, Last->CellY);
+      if (In.RememberedChoice.IsEmpty() && Last->OptionIndex >= 0) {
+        for (const FS08PendingOption& O : CommandUi.PendingChoice.Options) {
+          if (O.Index == Last->OptionIndex) In.RememberedChoice = O.Label;
+        }
+      }
+    }
+  }
+  const FUmPendingModel M = UmHudPending::Gather(In);
+  R.PendingHeadId = M.HeadId;
+  R.PendingTitle = M.Title;
+  // ---- the frame: CENTER, under a shown STATUS and a shown combat centre (ВР-VS4-06) ----
+  FUmPendingFrame F;
+  F.bClassS = R.Layout.bClassS;
+  F.PxPerSu = R.Layout.PxPerSu;
+  F.CanvasSu = R.Layout.CanvasSu;
+  const FBox2D Center = R.Layout.Rect(EUmHudBlock::Center);
+  float Top = Center.bIsValid ? static_cast<float>(Center.Min.Y) : (F.bClassS ? 64.0f : 80.0f);
+  if (Status && Status->IsShown()) {
+    Top = FMath::Max(Top, static_cast<float>(R.Layout.Rect(EUmHudBlock::Status).Min.Y) + static_cast<float>(Status->GetBodySizeSu().Y) + 8.0f);
+  }
+  if (const UUmHudCombatCenter* Centre = R.Combat.GetCenter()) {
+    if (UmGameHudSlots::ShownByProperty(Centre) && M.View != EUmPendingView::Modal) {
+      const FBox2D CR = Centre->PanelRectSu();
+      if (CR.bIsValid) Top = FMath::Max(Top, static_cast<float>(CR.Max.Y) + 8.0f);
+    }
+  }
+  F.TopSu = Top;
+  F.ModalWidthSu = F.bClassS ? 560.0f : 640.0f;
+  F.ModalCapSu = F.bClassS ? 360.0f : (R.Layout.bTall ? 420.0f : 380.0f);
+  const FBox2D SlotRect = R.Layout.Rect(EUmHudBlock::SourceSlot);
+  F.BandLeftSu = SlotRect.bIsValid ? static_cast<float>(SlotRect.Max.X) + 8.0f : 0.0f;
+  float Right = static_cast<float>(R.Layout.CanvasSu.X);
+  for (const EUmHudBlock B : {EUmHudBlock::PanelOpp, EUmHudBlock::OppHand}) {
+    if (R.Layout.HasRect(B)) Right = FMath::Min(Right, static_cast<float>(R.Layout.Rect(B).Min.X));
+  }
+  F.BandRightSu = Right - 8.0f;
+  if (M.View == EUmPendingView::Toast) {
+    // ВР-H06: over the hand caption, or the top strip when it would cross a figure (the stack rule of the toasts)
+    const float PxPerSu = HudPixelsPerUnit() > 0.0f ? HudPixelsPerUnit() : R.Layout.PxPerSu;
+    TArray<FBox2D> Avoid;
+    for (const TPair<FString, FS08ScreenRect>& Fig : FigureScreenRects()) Avoid.Add(UmHudPxToSu(Fig.Value, PxPerSu));
+    bool bTop = false;
+    const FBox2D Caption = R.Layout.Rect(EUmHudBlock::HandCaption);
+    F.ToastSu = R.Layout.StackRect(EUmHudBlock::Toast, UmHudPending::ToastWidthSu(F.bClassS, R.Layout.bTall), UmHudPending::ToastHSu,
+                                   0.0f, 0.0f, Avoid, bTop, Caption.bIsValid ? static_cast<float>(Caption.Min.Y) : -1.0f);
+  }
+  P->SetFrame(F);
+  P->ApplyModel(M);
+  const FString Line = P->TakeChangeLine();
+  if (!Line.IsEmpty() && FS08Trace::IsOpen()) FS08Trace::Write(FString::Printf(TEXT("%s seq=%d"), *Line, Hud.SequenceNumber));
+}
+
+void AS08FlowGameMode::TickUmSourceSlot() {
+  if (!UmSlotOnUmg() || !UmHud->bLayout) return;
+  FUmHudRuntime& R = *UmHud;
+  UUmHudSourceSlot* W = R.Slot.Get();
+  FUmSlotFrame Frame;
+  Frame.bClassS = R.Layout.bClassS;
+  Frame.PxPerSu = R.Layout.PxPerSu;
+  Frame.CardSu = R.Layout.Rect(EUmHudBlock::SourceSlot);
+  const FBox2D SlotRect = UmGameHudSlots::SlotRect(R.Layout, EUmGameSlot::SourceSlot);
+  Frame.OriginSu = SlotRect.bIsValid ? FVector2D(SlotRect.Min) : FVector2D(Frame.CardSu.Min);
+  W->SetFrame(Frame);
+  const int64 Now = NowMs();
+  const FS09SlotCard& C = CardSlot.GetCard();
+  FUmSlotModel M;
+  M.bShow = CardSlot.IsVisible() && Hud.bValid && !IsResultScreenShown();
+  M.Revision = CardSlot.GetRevision();
+  M.Seq = C.Seq;
+  M.Phase = UmHudSourceSlot::PhaseOf(CardSlot.GetState());
+  M.Card = C.Card;
+  M.bFace = !C.Card.bHidden && !C.Card.Name.IsEmpty();
+  M.HeroSlug = UmDeckHeroSlug(Fighters, C.OwnerId);
+  M.Ribbon = C.Ribbon;
+  M.bOpponent = C.bOpponent;
+  M.OwnerName = PlayerHeroName(C.OwnerId);
+  M.Boost = C.Ribbon == ES09SlotRibbon::Boosted && C.Card.bHasBoostValue ? C.Card.BoostValue : UmCardWidget::NoBoostChip;
+  M.FlyT = CardSlot.FlyT(Now);
+  if (CardSlot.HoldsEffect() && CardSlot.GetState() == ES09SlotState::Hold) {
+    const double Left = static_cast<double>(CardSlot.ReleaseAtMs() - Now);
+    M.HoldFrac = FMath::Clamp(1.0f - static_cast<float>(Left / FS09SourceSlot::OppSchemeHoldMs), 0.0f, 1.0f);
+  }
+  // a new card: where it flies from (ВР-VS4-12) - the own card from where the hand drew it (the hand drops its own
+  // flight), the opponent's from OPP-HAND
+  if (M.bShow && M.Revision != R.SlotRevision) {
+    R.SlotRevision = M.Revision;
+    FVector2D From = FVector2D::ZeroVector;
+    bool bHanded = false;
+    if (C.bOpponent) {
+      const FBox2D Opp = R.Layout.Rect(EUmHudBlock::OppHand);
+      if (Opp.bIsValid) From = Opp.GetCenter();
+    } else {
+      FBox2D Handed(ForceInit);
+      UUmHudHand* Hand = R.Hand.Get();
+      if (Hand && Hand->HandOffCard(C.Card.InstanceId, Handed)) {
+        From = Handed.GetCenter();
+        bHanded = true;
+      } else if (R.Layout.HasRect(EUmHudBlock::Hand)) {
+        From = R.Layout.Rect(EUmHudBlock::Hand).GetCenter();
+      }
+    }
+    R.SlotFlyFrom = From;
+    FS08Trace::Write(FString::Printf(TEXT("HUD-SLOT-UMG card seq=%d ribbon=%s owner=%s face=%d from=(%.0f,%.0f) handoff=%d"), C.Seq,
+                                     S09SlotRibbonName(C.Ribbon), C.bOpponent ? TEXT("opp") : TEXT("own"), M.bFace ? 1 : 0, From.X,
+                                     From.Y, bHanded ? 1 : 0));
+  }
+  M.FlyFromSu = R.SlotFlyFrom;
+  W->ApplyModel(M);
+  const FString Line = W->TakeChangeLine();
+  if (!Line.IsEmpty()) FS08Trace::Write(Line);
 }

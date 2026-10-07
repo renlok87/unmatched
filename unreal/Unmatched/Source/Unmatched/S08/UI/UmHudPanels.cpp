@@ -1,6 +1,7 @@
 // VS-2 HB-18...HB-21: the panels runtime - see UmHudPanels.h.
 #include "UmHudPanels.h"
 
+#include "../S08HeroesV2.h"
 #include "../S08TurnPortraitWidget.h"
 #include "UmGameHud.h"
 #include "UmPortrait.h"
@@ -9,11 +10,16 @@
 
 namespace UmHudPanel {
 int32 SidekickNumber(const FString& Label) {
-  FString Trimmed = Label.TrimStartAndEnd();
+  // Z-1 (ВР-07): one number rule for the HUD badge, the base digit, the tag and the audio key - a label that ends in a
+  // number after a name carries it, and the number is S08HeroesV2::HarpyNumber's (the last digit, 1..3); a label
+  // without one (Merlin) or of digits alone has no badge (0)
+  const FString Trimmed = Label.TrimStartAndEnd();
   int32 Digits = 0;
   while (Digits < Trimmed.Len() && FChar::IsDigit(Trimmed[Trimmed.Len() - 1 - Digits])) ++Digits;
   if (Digits == 0 || Digits == Trimmed.Len()) return 0;
-  return FCString::Atoi(*Trimmed.Right(Digits));
+  FS08BoardFighter Fighter;
+  Fighter.Label = Trimmed;
+  return S08HeroesV2::HarpyNumber(Fighter);
 }
 
 FName SidekickKey(const FString& HeroSlug, const FString& Label) {
