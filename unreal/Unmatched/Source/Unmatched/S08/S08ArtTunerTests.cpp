@@ -258,7 +258,8 @@ bool FS08ArtTunerRegistryTest::RunTest(const FString&) {
   TestEqual("two shipped boards", BoardIndex(TEXT("sarpedon-original")) >= 0 && BoardIndex(TEXT("marmoreal-original")) >= 0 &&
                                       BoardIndex(TEXT("cobble-city")) == INDEX_NONE, true);
   // the paste mode rows (registry-only additions): paste lights and tone on both maps. Since EN-07 (VS-5) the painted
-  // Marmoreal backdrop carries its own 5 lights (4 lanterns + portal glow), so the tuner offers them like Sarpedon's.
+  // Marmoreal backdrop carries its own 5 lights (4 lanterns + portal glow), so the tuner offers them like Sarpedon's;
+  // the portal glow has no flicker block, so its two flicker rows are not expanded: 4 x 5 + 3 = 23 rows.
   for (const FS08TunerGroup& G : Sarpedon) {
     if (G.Id == TEXT("pasteLights")) TestEqual("5 paste lights x 5 rows", G.Params.Num(), 25);
     if (G.Id == TEXT("pasteGrade")) TestEqual("paste tone: gain, devignette, emissive", G.Params.Num(), 3);
@@ -269,7 +270,7 @@ bool FS08ArtTunerRegistryTest::RunTest(const FString&) {
   TestTrue("marmoreal paste lights (EN-07)", Has(Marmoreal, TEXT("pasteLights")));
   for (const FS08TunerGroup& G : Marmoreal) {
     if (G.Id == TEXT("pasteLights")) {
-      TestEqual("marmoreal: 5 paste lights x 5 rows", G.Params.Num(), 25);
+      TestEqual("marmoreal: 4 lanterns x 5 rows + portal glow x 3 (no flicker)", G.Params.Num(), 23);
       TestTrue("marmoreal: label from the id", G.Params.Num() > 0 && G.Params[0].Label.StartsWith(TEXT("lantern-nw")));
     }
   }
