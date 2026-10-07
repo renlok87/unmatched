@@ -1292,6 +1292,8 @@ private:
   bool PressUmEndTurnForFlag();
   /** UI-ACC-017 of this run (US08UserSettings::KeyHintsNow), traced 'HUD-KEYHINTS mode= shown=' on a change. */
   bool UmKeyHintsNow();
+  /** VS-4 FX-38 (S08/UI/UmZoneBadges.h; rollback -S08SlateHud=zone): the zone icons of the hovered space, every frame. */
+  void TickUmZoneBadges();
   /** VS-3 SC-01 (ВР-SC14): -S08ScreenShots - one evidence frame per new UI-SCR-* id + state (<UI-ID>-<state>.png). */
   void TickUmScreenShots();
   // VS-2 exit frames (opt-in -S08ExitShots): own / opponent turn start + 0.5 s and + 3 s

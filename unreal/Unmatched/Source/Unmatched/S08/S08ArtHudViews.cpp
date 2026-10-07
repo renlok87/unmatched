@@ -220,9 +220,8 @@ public:
     if (Widget.IsValid()) Widget->SetTeamShapeBrushes(Circle, Hex);
   }
   void SetShown(bool bShown) override {
-    if (Widget.IsValid()) {
-      Widget->SetVisibility(bShown ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
-    }
+    // VS-4 HB-46: the H12 plate fades (appear 150 / leave 120 ms); the legacy plate shows / hides at once
+    if (Widget.IsValid()) Widget->SetShownAnimated(bShown);
   }
   void SetTwin(bool bInTwin) override {
     bTwin = bInTwin;

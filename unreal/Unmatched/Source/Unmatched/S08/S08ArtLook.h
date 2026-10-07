@@ -115,7 +115,9 @@ inline const TCHAR* const SlateHudKeys[] = {
     TEXT("combatcenter"),
     // VS-3 SC-01 (ВР-SC04): the screens of the route and the modals (each keeps its Slate look until its own step)
     TEXT("boot"), TEXT("login"), TEXT("lobby"), TEXT("room"), TEXT("loading"), TEXT("menubg"), TEXT("pause"),
-    TEXT("reconnect"), TEXT("gameover"), TEXT("aborted")};
+    TEXT("reconnect"), TEXT("gameover"), TEXT("aborted"),
+    // VS-4 FX-38 (VS-3 item 16, ВР-H15): the zone icons at a hovered space - no icons, as before FX-38
+    TEXT("zone")};
 /** What -S08SlateHud asked for: nothing (UMG root, every block on the new path), everything, or a block list. */
 struct UNMATCHED_API FS08SlateHudBlocks {
   bool bAll = false;

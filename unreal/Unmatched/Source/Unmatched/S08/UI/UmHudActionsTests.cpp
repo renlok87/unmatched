@@ -29,6 +29,8 @@
 #include "HAL/PlatformTime.h"
 #include "Input/Events.h"
 #include "InputCoreTypes.h"
+#include "Internationalization/Internationalization.h"
+#include "Internationalization/TextLocalizationManager.h"
 #include "Layout/Geometry.h"
 #include "Misc/AutomationTest.h"
 #include "UmButton.h"
@@ -39,6 +41,25 @@
 
 // Named namespace (not anonymous): unity builds merge test files.
 namespace UmActionsTest {
+/** The tooltip sizes below are measured on the EN strings: the test runs in "en" without the game localization preview
+ *  that an earlier test may have left on (restored at the end). */
+struct FEn {
+  FInternationalization::FCultureStateSnapshot Snapshot;
+  FEn() {
+    FInternationalization::Get().BackupCultureState(Snapshot);
+#if WITH_EDITOR  // the preview API exists only WITH_EDITOR (the game target trap)
+    FTextLocalizationManager::Get().DisableGameLocalizationPreview();
+    FTextLocalizationManager::Get().WaitForAsyncTasks();  // the preview reload ends before the culture switch
+#endif
+    FInternationalization::Get().SetCurrentLanguageAndLocale(TEXT("en"));
+    FTextLocalizationManager::Get().WaitForAsyncTasks();
+  }
+  ~FEn() {
+    FInternationalization::Get().RestoreCultureState(Snapshot);
+    FTextLocalizationManager::Get().WaitForAsyncTasks();
+  }
+};
+
 struct FWorld {
   UWorld* World = nullptr;
   explicit FWorld(const TCHAR* Name) {
@@ -126,6 +147,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FUmHudActionsStatesTest,
 bool FUmHudActionsStatesTest::RunTest(const FString&) {
   using namespace UmActionsTest;
   using K = EUmActionKey;
+  const FEn En;
   // ---- Decide (ВР-VS2-HB42-05) ----
   for (const int32 N : {2, 1}) {
     const FUmActionsModel M = UmHudActions::Decide(Own(N));

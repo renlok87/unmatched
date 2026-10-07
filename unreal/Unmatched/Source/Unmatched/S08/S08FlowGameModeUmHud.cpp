@@ -119,6 +119,8 @@
 #include "UI/UmHudTop.h"
 #include "UI/UmText.h"
 #include "UI/UmTopStrip.h"
+#include "UI/UmWorldGallery.h"
+#include "UI/UmZoneBadges.h"
 #include "../S09/S09HudPress.h"
 #include "Brushes/SlateRoundedBoxBrush.h"
 #include "DynamicRHI.h"
@@ -246,6 +248,11 @@ struct FUmHudRuntime {
   FString ActionsTickKey;
   int32 KeyHintsShown = -1;
   FString KeyHintsMode;
+  // VS-4 FX-38: the zone icons at the hovered space (a viewport widget of the board layer), the last pick
+  TWeakObjectPtr<UUmZoneBadges> Zones;
+  FVector2D ZoneMouse = FVector2D(-1.0, -1.0);
+  uint64 ZonePickFrame = 0;
+  FIntPoint ZoneCell = FIntPoint(-1, -1);
 };
 
 namespace {
@@ -914,6 +921,7 @@ void AS08FlowGameMode::TickUmHud() {
   // box is gone: they show only on their rollback -S08SlateHud=toast | sub, 04 §5.1)
   TickUmFeed();
   // VS-4 HB-43: what changes the row between RefreshHud calls - a command in flight ends, the combat window, the result
+  TickUmZoneBadges();  // VS-4 FX-38
   if (R.Actions.IsValid()) {
     const FString Key = FString::Printf(TEXT("%d|%d|%d|%d|%d|%d|%d|%d"), Hud.SequenceNumber, Hud.bViewerTurn ? 1 : 0,
                                         Hud.ActionsRemaining, static_cast<int32>(CommandUi.Mode), HudBusyReason().IsSet() ? 1 : 0,
@@ -986,6 +994,12 @@ void AS08FlowGameMode::WriteUmHudShotLines() {
     if (const UUmHudPending* P = R.Pending.Get()) P->CollectShotLines(PendingLines);
     if (const UUmHudSourceSlot* W = R.Slot.Get()) W->CollectShotLines(PendingLines);
     for (const FString& L : PendingLines) FS08Trace::Write(L);
+  }
+  // VS-4 FX-38: the zone icons of the hovered space (one 'SHOT widget id=zone' line, keys only)
+  if (const UUmZoneBadges* Z = R.Zones.Get()) {
+    TArray<FString> ZoneLines;
+    Z->CollectShotLines(ZoneLines);
+    for (const FString& L : ZoneLines) FS08Trace::Write(L);
   }
   // VS-4 HB-43: UI-HUD-ACTIONS (the cell states and reasons, no text)
   if (const UUmHudActions* A = R.Actions.Get()) {
@@ -1160,7 +1174,12 @@ void AS08FlowGameMode::UmGalleryBegin(int32 SizePx) {
   const bool bFeed = FParse::Value(Cmd, TEXT("S08IconGalleryFeed="), FeedBoard);
   FString ActionsBoard;  // VS-4 HB-43 (UI/UmActionsGallery.h): -S08IconGalleryActions=marmoreal|sarpedon
   const bool bActions = FParse::Value(Cmd, TEXT("S08IconGalleryActions="), ActionsBoard);
-  if (!bSkins && !bButtons && !bTopStrip && !bPanels && !bCards && !bHand && !bDecks && !bCombat && !bPending && !bFeed && !bActions) return;
+  FString WorldBoard;  // VS-4 HB-45 / HB-46 / FX-38 (UI/UmWorldGallery.h): -S08IconGalleryWorld=marmoreal|sarpedon
+  const bool bWorld = FParse::Value(Cmd, TEXT("S08IconGalleryWorld="), WorldBoard);
+  if (!bSkins && !bButtons && !bTopStrip && !bPanels && !bCards && !bHand && !bDecks && !bCombat && !bPending && !bFeed && !bActions &&
+      !bWorld) {
+    return;
+  }
   if (IconGallery) IconGallery->SetVisibility(ESlateVisibility::Collapsed);  // the sheet takes the screen
   // the canvas of the sheet: the applied HUD scale (BeginPlay may run before the first window apply - the sheet is
   // built again on every OnUiScaleChanged, which also covers a window or UI-scale change)
@@ -1168,7 +1187,7 @@ void AS08FlowGameMode::UmGalleryBegin(int32 SizePx) {
   TWeakObjectPtr<AS08FlowGameMode> WeakThis(this);
   auto Build = [WeakThis, bSkins, bTopStrip, bPanels, PanelsPage, PageIndex, Variant, SizePx, bCards, CardsPage, bHand,
                 HandBoard, bDecks, DecksBoard, bCombat, bConfirm, CombatBoard, bPending, PendingBoard, bFeed, FeedBoard, bActions,
-                ActionsBoard]() {
+                ActionsBoard, bWorld, WorldBoard]() {
     AS08FlowGameMode* Self = WeakThis.Get();
     if (!Self || !Self->GetWorld()) return;
     FVector2D Viewport(1920.0, 1080.0);
@@ -1176,6 +1195,14 @@ void AS08FlowGameMode::UmGalleryBegin(int32 SizePx) {
     const FUmHudScaleState& Scale = UmHudScale::Current();
     const float PxPerSu = Scale.Window.X > 0 ? Scale.PxPerSu() : 1.0f;
     if (Self->UmGallery) Self->UmGallery->RemoveFromParent();
+    if (bWorld) {
+      UUmWorldGalleryWidget* Sheet = CreateWidget<UUmWorldGalleryWidget>(Self->GetWorld(), UUmWorldGalleryWidget::StaticClass());
+      if (!Sheet) return;
+      for (const FString& Line : Sheet->Build(WorldBoard, Viewport / PxPerSu, PxPerSu)) FS08Trace::Write(Line);
+      Sheet->AddToViewport(1001);
+      Self->UmGallery = Sheet;
+      return;
+    }
     if (bActions) {
       UUmActionsGalleryWidget* Sheet = CreateWidget<UUmActionsGalleryWidget>(Self->GetWorld(), UUmActionsGalleryWidget::StaticClass());
       if (!Sheet) return;
@@ -1294,6 +1321,10 @@ void AS08FlowGameMode::UmGalleryAt(float TMs) {
   // VS-4 HB-43: the ACTIONS states (one per second)
   if (UUmActionsGalleryWidget* ActionsSheet = Cast<UUmActionsGalleryWidget>(UmGallery)) {
     for (const FString& Line : ActionsSheet->SetClockMs(TMs)) FS08Trace::Write(Line);
+  }
+  // VS-4 HB-45 / HB-46 / FX-38: the world layer states (one per second)
+  if (UUmWorldGalleryWidget* WorldSheet = Cast<UUmWorldGalleryWidget>(UmGallery)) {
+    for (const FString& Line : WorldSheet->SetClockMs(TMs)) FS08Trace::Write(Line);
   }
 }
 
@@ -2528,4 +2559,70 @@ bool AS08FlowGameMode::PressUmEndTurnForFlag() {
   B->NativeOnMouseButtonDown(Geometry, Down);
   B->NativeOnMouseButtonUp(Geometry, Up);
   return true;
+}
+
+// ------------------------------------------------------------------------------------------------ VS-4 FX-38 zone icons
+
+void AS08FlowGameMode::TickUmZoneBadges() {
+  if (!UmHud.IsValid() || !UmHud->Blocks.UmgRoot() || UmHud->Blocks.IsSlate(FName(TEXT("zone")))) return;
+  FUmHudRuntime& R = *UmHud;
+  APlayerController* PC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
+  if (!PC || !BoardActor || !BoardActor->IsArtActive()) return;
+  if (!R.Zones.IsValid()) {
+    UUmZoneBadges* W = CreateWidget<UUmZoneBadges>(GetWorld(), UUmZoneBadges::StaticClass());
+    if (!W) return;
+    W->AddToViewport(0);  // the board layer: under the UMG HUD root (layer 1)
+    R.Zones = W;
+    FS08Trace::Write(TEXT("HUD-ZONES created=1 layer=0 rollback=-S08SlateHud=zone"));
+  }
+  UUmZoneBadges* W = R.Zones.Get();
+  FUmZoneBadgeInput In;
+  float MX = -1.0f, MY = -1.0f;
+  const bool bMouse = PC->GetMousePosition(MX, MY);
+  // hidden: no live board, the result, a combat on screen, a modal over the field, the pointer over a HUD block
+  const bool bBlocked = !Hud.bValid || IsResultScreenShown() || CommandUi.Combat.bPresent || CombatStage.IsActive() || bInspecting ||
+                        DeckPanel.IsOpen() || !bMouse || CursorOverHud();
+  if (!bBlocked) {
+    // the pick only when the pointer moved or every few frames (a still pointer over a moving camera)
+    const FVector2D Mouse(MX, MY);
+    if (!Mouse.Equals(R.ZoneMouse, 0.5) || GFrameCounter >= R.ZonePickFrame + FUmBoardCursor::RepickFrames) {
+      R.ZoneMouse = Mouse;
+      R.ZonePickFrame = GFrameCounter;
+      FString FighterId;
+      R.ZoneCell = FIntPoint(-1, -1);
+      PickBoardUnderCursor(PC, R.ZoneCell, FighterId);
+    }
+    const FS08Cell* Cell = R.ZoneCell.X >= 0 ? BoardModel.CellAt(R.ZoneCell.X, R.ZoneCell.Y) : nullptr;
+    FVector2D Centre;
+    const FVector World = Cell ? BoardModel.CellToWorld(R.ZoneCell.X, R.ZoneCell.Y) : FVector::ZeroVector;
+    if (Cell && BoardModel.IsBoardSpace(R.ZoneCell.X, R.ZoneCell.Y) && ProjectToViewport(World, Centre)) {
+      const float RadiusUU = BoardModel.bHasTopology ? BoardModel.LayoutFrame.SpaceRadiusUU() : 0.5f * FS08BoardModel::CellSizeUU;
+      FVector2D Ex, Ey;
+      float RadiusPx = 0.0f;
+      if (ProjectToViewport(World + FVector(RadiusUU, 0.0f, 0.0f), Ex)) RadiusPx = FMath::Max(RadiusPx, static_cast<float>((Ex - Centre).Size()));
+      if (ProjectToViewport(World + FVector(0.0f, RadiusUU, 0.0f), Ey)) RadiusPx = FMath::Max(RadiusPx, static_cast<float>((Ey - Centre).Size()));
+      In.bShow = RadiusPx > 0.0f;
+      In.SpaceId = Cell->SpaceId.IsEmpty() ? BoardModel.CellLabel(R.ZoneCell.X, R.ZoneCell.Y) : Cell->SpaceId;
+      for (const FString& Z : Cell->Zones) In.Keys.Add(FName(*Z.ToLower()));
+      In.CentrePx = Centre;
+      In.RadiusPx = RadiusPx;
+      In.AnchorPx = RadiusUU > 0.0f ? RadiusPx * UmZoneBadges::AnchorUU / RadiusUU : RadiusPx;
+      for (const TPair<FString, FS08ScreenRect>& F : FigureScreenRects()) In.Avoid.Add(F.Value);
+      for (const FS08ArtHudRuntime::FTagSlot& T : ArtHud.Tags) {
+        if (!T.FighterId.IsEmpty() && !T.Planned.IsEmpty()) In.Avoid.Add(T.Planned);
+      }
+    }
+  }
+  FVector2D Viewport(1920.0, 1080.0);
+  if (GEngine && GEngine->GameViewport) GEngine->GameViewport->GetViewportSize(Viewport);
+  In.ViewportPx = Viewport;
+  In.DiscColor = [this](FName Key, FColor& Out) { return BoardActor && BoardActor->GetZoneIconSrgb(Key, Out); };
+  W->SetPxPerUnit(HudPixelsPerUnit());
+  const FString Before = W->GetSpaceId();
+  W->ApplyInput(In);
+  if (W->GetSpaceId() != Before) {
+    TArray<FString> Lines;
+    W->CollectShotLines(Lines);
+    for (const FString& L : Lines) FS08Trace::Write(TEXT("HUD-ZONE ") + L.Mid(5));  // 'HUD-ZONE widget id=zone ...' on a change
+  }
 }

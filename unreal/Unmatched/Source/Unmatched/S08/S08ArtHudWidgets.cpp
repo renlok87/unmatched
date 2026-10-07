@@ -1,4 +1,5 @@
 #include "S08ArtHudWidgets.h"
+#include "UI/UmWorldLayer.h"
 
 #include "Blueprint/WidgetTree.h"
 #include "Components/Border.h"
@@ -265,7 +266,48 @@ void US08ArtPlateWidget::SetTeamShapeBrushes(const FSlateBrush& Circle, const FS
   ApplyDynamic();
 }
 
+void US08ArtPlateWidget::SetV2(bool bOn) {
+  if (bOn == bV2 || !PlateBackground) return;
+  if (bOn) {
+    if (!V2Plate) V2Plate = CreateWidget<UUmWorldPlate>(this, UUmWorldPlate::StaticClass());
+    if (!V2Plate) return;
+    LegacyContent = PlateBackground->GetContent();
+    LegacySizeSu = Style.SizeSu;
+    PlateBackground->SetContent(V2Plate);
+    PlateBackground->SetBrushColor(FLinearColor::Transparent);  // the V2 panel paints its own body
+    PlateBackground->SetPadding(FMargin(0.0f));
+    Style.SizeSu = FVector2D(UmWorldLayer::PlateWSu, UmWorldLayer::PlateHSu);
+  } else {
+    PlateBackground->SetContent(LegacyContent);
+    Style.SizeSu = LegacySizeSu;
+    ApplyStyle();
+  }
+  bV2 = bOn;
+}
+
+void US08ArtPlateWidget::SetShownAnimated(bool bShown) {
+  if (bV2 && V2Plate) {
+    V2Plate->SetShownAnimated(this, bShown);
+  } else {
+    SetVisibility(bShown ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
+  }
+}
+
+void US08ArtPlateWidget::FinishFade() {
+  if (bV2 && V2Plate) V2Plate->FinishFade();
+}
+
 void US08ArtPlateWidget::ApplyTexts(const FS08PlateTexts& Texts) {
+  if (bV2 && V2Plate) {
+    FUmWorldPlateModel M;
+    M.Name = Texts.Name;
+    M.Role = Texts.Role;
+    M.Side = Texts.Side;
+    M.Hp = Texts.Hp;
+    M.TeamSlot = Texts.TeamSlot;
+    M.bTarget = Texts.bTarget;
+    V2Plate->ApplyModel(M);
+  }
   bOwn = Texts.bOwn;
   TeamSlot = Texts.TeamSlot;
   HpFraction = Texts.HpFraction;
@@ -296,6 +338,10 @@ bool US08ArtPlateWidget::HasAllParts(FString* OutMissing) const {
 
 void US08ArtPlateWidget::CollectParts(TArray<FS08WidgetPart>& Out) const {
   Out.Add({S08ArtHudIds::Plate, GetCachedWidget()});
+  if (bV2 && V2Plate) {
+    V2Plate->CollectParts(Out);  // VS-4 HB-46: the same part ids, no marker / bar (the H12 plate has none)
+    return;
+  }
   S08AddPart(Out, S08ArtHudIds::PlateMarker, Marker);
   S08AddPart(Out, S08ArtHudIds::PlateName, NameText);
   S08AddPart(Out, S08ArtHudIds::PlateTeam, TeamChip);
@@ -501,8 +547,32 @@ FSlateBrush US08ArtTagWidget::MakeBoardPlateBrush(const FS08ArtHudTagStyle& InSt
                                InStyle.BoardPlateOutlineSu);
 }
 
+int32 US08ArtTagWidget::HpFontSize() const { return bV2 && V2Tag ? V2Tag->HpFontSize() : Style.HpFont.Size; }
+
+void US08ArtTagWidget::SetV2(bool bOn) {
+  if (bOn == bV2 || !TagBackground) return;
+  if (bOn) {
+    if (!V2Tag) V2Tag = CreateWidget<UUmWorldTag>(this, UUmWorldTag::StaticClass());
+    if (!V2Tag) return;
+    LegacyContent = TagBackground->GetContent();
+    TagBackground->SetContent(V2Tag);
+  } else {
+    TagBackground->SetContent(LegacyContent);
+  }
+  bV2 = bOn;
+  bBoardPlateBrush = bBoardPlate;  // re-apply below
+  ApplyStyle();
+}
+
 void US08ArtTagWidget::ApplyBackground() {
   if (!TagBackground) return;
+  if (bV2) {
+    // VS-4 HB-45: the V2 capsule paints the tag (card.navy, ВР-61) - no flat #161A28 body, no board plate
+    TagBackground->SetBrush(FSlateNoResource());
+    TagBackground->SetPadding(FMargin(0.0f));
+    bBoardPlateBrush = false;
+    return;
+  }
   if (bBoardPlate) {
     // The fill / outline colours live in the brush; the border tint stays white so nothing multiplies them.
     TagBackground->SetBrush(MakeBoardPlateBrush(Style, TeamSlot));
@@ -530,6 +600,15 @@ void US08ArtTagWidget::SetTeamShapeBrushes(const FSlateBrush& Circle, const FSla
 }
 
 void US08ArtTagWidget::ApplyModel(const FS08TagTexts& Texts) {
+  HarpyDigit = Texts.HarpyDigit;
+  if (bV2 && V2Tag) {
+    FUmWorldTagModel M;
+    M.Hp = Texts.HpValue;
+    M.MaxHp = Texts.HpMax;
+    M.TeamSlot = Texts.TeamSlot;
+    M.Digit = Texts.HarpyDigit;
+    V2Tag->ApplyModel(M);
+  }
   TeamSlot = Texts.TeamSlot;
   HpFraction = FMath::Clamp(Texts.HpFraction, 0.0f, 1.0f);
   Mode = Texts.Mode;
@@ -555,6 +634,10 @@ bool US08ArtTagWidget::HasAllParts(FString* OutMissing) const {
 
 void US08ArtTagWidget::CollectParts(TArray<FS08WidgetPart>& Out) const {
   Out.Add({S08ArtHudIds::Tag, GetCachedWidget()});
+  if (bV2 && V2Tag) {
+    V2Tag->CollectParts(Out);  // VS-4 HB-45: hp, bar, chip - never a name (ВР-07)
+    return;
+  }
   if (Mode == ES08TagMode::Full) S08AddPart(Out, S08ArtHudIds::TagName, NameText);
   S08AddPart(Out, S08ArtHudIds::TagHp, HpText);
   S08AddPart(Out, S08ArtHudIds::TagBar, HpBar);

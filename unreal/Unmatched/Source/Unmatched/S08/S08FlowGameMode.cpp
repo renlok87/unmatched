@@ -2,6 +2,7 @@
 #include "S08BoardActor.h"
 #include "S08FighterActor.h"
 #include "S08ArtLook.h"
+#include "UI/UmWorldLayer.h"
 #include "S08Render.h"
 #include "S08ArtHudText.h"
 #include "S08ArtHudViews.h"
@@ -7420,6 +7421,7 @@ void AS08FlowGameMode::BuildArtHudWidgets(const TSharedRef<SConstraintCanvas>& C
       bCodeDefault = Tag->UsesCodeDefaultTree();
       ArtHudWidgets.Add(Tag);
       if (ArtHud.bChipBrushes) Tag->SetTeamShapeBrushes(ArtHud.ChipCircleBrush, ArtHud.ChipHexBrush);
+      UmWorldLayer::SetupTag(*Tag);  // VS-4 HB-45: the H12 tag (rollback -S08SlateHud=tag)
       Tag->SetVisibility(ESlateVisibility::Collapsed);
       FS08ArtHudRuntime::FTagSlot TagSlot;
       TagSlot.Widget = Tag;
@@ -7453,6 +7455,7 @@ void AS08FlowGameMode::BuildArtHudWidgets(const TSharedRef<SConstraintCanvas>& C
       WidgetLine(TEXT("plate"), PlateUse, Source, bParts, Missing, Plate->UsesCodeDefaultTree());
       if (bParts) {
         ArtHudWidgets.Add(Plate);
+        UmWorldLayer::SetupPlate(*Plate);  // VS-4 HB-46: the H12 plate (rollback -S08SlateHud=plate)
         AddPlate(S08MakeUmgPlateView(*Plate, Source), false);
         bUmgPlate = true;
       }
@@ -7861,9 +7864,10 @@ void AS08FlowGameMode::UpdatePlate(bool bActive) {
   const ES08TeamSlot PlateTeam = BoardActor ? BoardActor->TeamOfFighter(*Fighter) : ES08TeamSlot::P1;
   const ES08TeamSlot PlateLook =
       S08TeamLook(PlateTeam, bOwn, static_cast<ES08TeamColorMode>(ArtHud.TeamColorMode));
-  const FString ContentKey = FString::Printf(TEXT("%s|%s|%d|%d|%d|%s|%d"), *Fighter->Id, *Fighter->Label,
+  const bool bPlateTarget = Fighter->Id == TargetId || Fighter->Id == CommandUi.AttackTargetId;  // VS-4 HB-46 «ЦЕЛЬ»
+  const FString ContentKey = FString::Printf(TEXT("%s|%s|%d|%d|%d|%s|%d|%d"), *Fighter->Id, *Fighter->Label,
                                              Fighter->Health, Fighter->MaxHealth, bOwn ? 1 : 0, *PlateStatusLine,
-                                             static_cast<int32>(PlateLook));
+                                             static_cast<int32>(PlateLook), bPlateTarget ? 1 : 0);
   if (ContentKey != ArtHud.PlateContentKey) {
     ArtHud.PlateContentKey = ContentKey;
     // W4-C: the views show string-table text (S08ArtHudText); the trace
@@ -7871,6 +7875,7 @@ void AS08FlowGameMode::UpdatePlate(bool bActive) {
     FS08PlateTexts Texts =
         S08ArtHudText::PlateTexts(Fighter->Label, Fighter->Health, Fighter->MaxHealth, bOwn, Statuses);
     Texts.TeamSlot = PlateLook == ES08TeamSlot::P1 ? 0 : 1;
+    UmWorldLayer::FillPlateTexts(Texts, *Fighter, bOwn, bPlateTarget);  // VS-4 HB-46: name, role, side, «ЦЕЛЬ»
     for (const TSharedPtr<IS08ArtPlateView>& View : ArtHud.PlateViews) View->ApplyTexts(Texts);
     FS08Trace::Write(FString::Printf(
         TEXT("HUD plate content fighter=%s name=%s hp=%d/%d team=%s statuses=%s teamSlot=%s look=%s shape=%s chip=%s"),
@@ -8065,6 +8070,7 @@ void AS08FlowGameMode::UpdateBoardLabels(bool bActive, const FString& IconTarget
       Texts.HpFraction = F->MaxHealth > 0 ? static_cast<float>(F->Health) / F->MaxHealth : 0.0f;
       Texts.TeamSlot = Look == ES08TeamSlot::P1 ? 0 : 1;
       Texts.Mode = Mode;
+      UmWorldLayer::FillTagTexts(Texts, *F);  // VS-4 HB-45: «{hp}/{max}» numbers, the harpy digit
       T.Widget->ApplyModel(Texts);
       T.ContentKey = Key;
     }

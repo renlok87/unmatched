@@ -65,6 +65,15 @@ public:
   bool UsesCodeDefaultTree() const { return bCodeDefaultTree; }
   /** W5b-R: exact-size team shape textures (T_UI_TeamShape_Circle_12 / _Hex_12); tinted by the chip colour. */
   void SetTeamShapeBrushes(const FSlateBrush& Circle, const FSlateBrush& Hex);
+  /** VS-4 HB-46 (04 §2.15; UI/UmWorldLayer.h): the H12 plate (UUmWorldPlate, 268 x 144 su) as the content of
+   *  PlateBackground; false = the tree of before (the rollback -S08SlateHud=plate). The placement takes its size. */
+  void SetV2(bool bOn);
+  bool IsV2() const { return bV2; }
+  class UUmWorldPlate* GetV2() const { return V2Plate; }
+  /** V2: the hover fade (appear 150 / leave 120 ms) instead of the instant collapse. */
+  void SetShownAnimated(bool bShown);
+  /** V2: ends a running fade now (review sheets). */
+  void FinishFade();
 
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD")
   FS08ArtHudPlateStyle Style;
@@ -106,6 +115,10 @@ private:
   float HpFraction = 1.0f;
   FSlateBrush ShapeBrushes[2];
   bool bShapeBrushes = false;
+  bool bV2 = false;
+  FVector2D LegacySizeSu = FVector2D::ZeroVector;
+  UPROPERTY() TObjectPtr<class UUmWorldPlate> V2Plate;
+  UPROPERTY() TObjectPtr<UWidget> LegacyContent;
 };
 
 /** W5b-R D-1: tag mode of a fighter's screen tag. */
@@ -121,6 +134,10 @@ struct FS08TagTexts {
   float HpFraction = 0.0f;
   uint8 TeamSlot = 0;  // look slot: 0 = P1 circle, 1 = P2 hexagon
   ES08TagMode Mode = ES08TagMode::Compact;
+  // VS-4 HB-45 (the H12 tag, UI/UmWorldLayer.h): the numbers of «{hp}/{max}» and the harpy digit 1-3 (0 = none)
+  int32 HpValue = 0;
+  int32 HpMax = 0;
+  int32 HarpyDigit = 0;
 };
 
 /** W5b-R D-1 (proposal UI-HUD-TAG): screen tag of a fighter - team chip, name (full mode), HP mini bar + HP text on an
@@ -141,13 +158,20 @@ public:
   void CollectParts(TArray<FS08WidgetPart>& Out) const;
   bool UsesCodeDefaultTree() const { return bCodeDefaultTree; }
   int32 NameFontSize() const { return Style.NameFont.Size; }
-  int32 HpFontSize() const { return Style.HpFont.Size; }
+  /** The HP text size (legacy: the Style token; VS-4 HB-45 V2: type.tag 14 su). */
+  int32 HpFontSize() const;
   /** ENV-MAPS P4 (map-image boards with the profile flag "labelPlates"): the semi-opaque rounded board plate with
    *  the 1 su team-colour outline instead of the flat opaque background; false restores the flat background. */
   void SetBoardPlate(bool bPlate);
   bool IsBoardPlate() const { return bBoardPlate; }
   /** The background brush the board plate paints (fill, corner radius, team outline) for a team look slot. */
   static FSlateBrush MakeBoardPlateBrush(const FS08ArtHudTagStyle& InStyle, uint8 InTeamSlot);
+  /** VS-4 HB-45 (04 §2.15; UI/UmWorldLayer.h): the H12 tag (UUmWorldTag: capsule card.navy, chip 24 su, harpy digit,
+   *  type.tag 14, no name) as the content of TagBackground; false = the tree of before (the rollback -S08SlateHud=tag). */
+  void SetV2(bool bOn);
+  bool IsV2() const { return bV2; }
+  class UUmWorldTag* GetV2() const { return V2Tag; }
+  int32 GetHarpyDigit() const { return HarpyDigit; }
 
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD")
   FS08ArtHudTagStyle Style;
@@ -185,6 +209,10 @@ private:
   bool bShapeBrushes = false;
   bool bBoardPlate = false;
   bool bBoardPlateBrush = false;  // the background currently carries the board-plate brush
+  bool bV2 = false;
+  int32 HarpyDigit = 0;
+  UPROPERTY() TObjectPtr<class UUmWorldTag> V2Tag;
+  UPROPERTY() TObjectPtr<UWidget> LegacyContent;
 };
 
 /** W5b-R D-1 (proposal UI-HUD-DAMAGE): the "-N" damage number capsule. */

@@ -420,8 +420,8 @@ bool FUmHudRootFlagTest::RunTest(const FString&) {
   TestTrue(TEXT("world layer and screen keys known, one unknown kept"),
            World.Unknown.Num() == 1 && World.Unknown[0] == FName(TEXT("mystery")) && World.IsSlate(TEXT("mystery")));
   TestFalse(TEXT("-S08SlateHudX is another flag"), ParseSlateHud(TEXT("-S08SlateHudX")).bAll);
-  // VS-3: + combatcenter (ВР-VS3-50) and the SC-01 screen keys boot ... aborted (ВР-SC04)
-  TestEqual(TEXT("31 known keys (04 §4.2 + combatcenter + the screens of ВР-SC04)"), static_cast<int32>(UE_ARRAY_COUNT(SlateHudKeys)), 31);
+  // VS-3: + combatcenter (ВР-VS3-50) and the SC-01 screen keys boot ... aborted (ВР-SC04); VS-4 FX-38: + zone
+  TestEqual(TEXT("32 known keys (04 §4.2 + combatcenter + the screens of ВР-SC04 + zone)"), static_cast<int32>(UE_ARRAY_COUNT(SlateHudKeys)), 32);
   SetSlateHudOverrideForTest(TEXT("hand,toast"));
   TestTrue(TEXT("override: ARTLOOK hudImpl=slate:hand,toast"), TraceLine().Contains(TEXT(" hudImpl=slate:hand,toast")));
   SetSlateHudOverrideForTest(TEXT("*"));

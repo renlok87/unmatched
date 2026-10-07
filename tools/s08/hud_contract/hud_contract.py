@@ -234,7 +234,9 @@ def parse_shot_widget(line):
 # клиент пишет эти id.
 ART_HUD_IDS = {"plate", "plate.marker", "plate.name", "plate.team", "plate.hpbar", "plate.hpfill", "plate.hp",
                "plate.status", "plate.teamshape", "icon", "board.tag", "board.tag.name", "board.tag.hp",
-               "board.tag.bar", "board.tag.chip", "board.damage", "board.damage.text"}
+               "board.tag.bar", "board.tag.chip", "board.damage", "board.damage.text",
+               # VS-4 FX-38 (ВР-VS3-FX38-01): the zone icons at a hovered space, one line of its own
+               "zone"}
 
 
 def parse_layout(line):
