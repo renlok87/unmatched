@@ -485,6 +485,9 @@ function Invoke-CombatDemo {
         if ($l -match 'SHOT (captured|late end) file=') { break }
         $m = [regex]::Match($l, 'SHOT widget id=(UI-HUD-HAND|UI-HUD-COMBAT-EDGE|UI-HUD-DECKS|UI-HUD-OPP-HAND|UI-HUD-DECKPANEL) impl=umg .*?bbox=\((-?\d+),(-?\d+),(-?\d+),(-?\d+)\) geom=painted visible=1')
         if ($m.Success) { $rects += ,@(([int]$m.Groups[2].Value - 2), ([int]$m.Groups[3].Value - 2), ([int]$m.Groups[4].Value + 2), ([int]$m.Groups[5].Value + 2)) }
+        # ВР-VS3-72: what the hand / a leaving combat card paints beyond its block rect (hover, raise, flights)
+        $p = [regex]::Match($l, '(SHOT widget id=UI-HUD-HAND |HUD-EDGE-PAINT ).*?painted=\((-?\d+),(-?\d+),(-?\d+),(-?\d+)\)')
+        if ($p.Success) { $rects += ,@(([int]$p.Groups[2].Value - 2), ([int]$p.Groups[3].Value - 2), ([int]$p.Groups[4].Value + 2), ([int]$p.Groups[5].Value + 2)) }
       }
       return ,$rects
     }

@@ -1073,6 +1073,30 @@ FBox2D UUmHudHand::DrawnRectSu() const {
   return Out;
 }
 
+FBox2D UUmHudHand::PaintedRectSu() const {
+  // ВР-VS3-72: what the hand paints now - the row and caption plus every shown card as drawn (the hover preview 1.5
+  // about its bottom centre, the selected raise, the discard drop, a draw / leave flight, the lowering), clipped to the
+  // canvas. The SHOT bbox stays the row (the block's place); 'painted=' carries this for the pixel gates.
+  FBox2D Out = DrawnRectSu();
+  const FVector2D Origin = Frame.SlotSu.bIsValid ? Frame.SlotSu.Min : FVector2D::ZeroVector;
+  for (const TObjectPtr<UUmCardWidget>& W : Pool) {
+    if (!W || W->GetVisibility() == ESlateVisibility::Collapsed || W->GetRenderOpacity() <= 0.0f) continue;
+    const UCanvasPanelSlot* S = Cast<UCanvasPanelSlot>(W->Slot);
+    if (!S) continue;
+    const FVector2D P = S->GetPosition() + Origin + FVector2D(W->GetRenderTransform().Translation);
+    const FVector2D Size = S->GetSize();
+    const double K = FMath::Max(W->GetScale(), 0.0f);
+    const FVector2D Off = W->GetOwnerOffset() + FVector2D(0.0, W->GetShiftSu());
+    const double Cx = P.X + 0.5 * Size.X + Off.X;
+    const double Bottom = P.Y + Size.Y + Off.Y;
+    FBox2D R(FVector2D(Cx - 0.5 * Size.X * K, Bottom - Size.Y * K), FVector2D(Cx + 0.5 * Size.X * K, Bottom));
+    R.Min = FVector2D(FMath::Max(R.Min.X, 0.0), FMath::Max(R.Min.Y, 0.0));
+    R.Max = FVector2D(FMath::Min(R.Max.X, Frame.CanvasSu.X), FMath::Min(R.Max.Y, Frame.CanvasSu.Y));
+    if (R.Max.X > R.Min.X && R.Max.Y > R.Min.Y) Out += R;
+  }
+  return Out;
+}
+
 void UUmHudHand::CollectShotLines(TArray<FString>& Out) const {
   const bool bVisible = bHasModel && UmGameHudSlots::ShownByProperty(this);
   const FBox2D Su = DrawnRectSu();
@@ -1091,12 +1115,16 @@ void UUmHudHand::CollectShotLines(TArray<FString>& Out) const {
       Fallback += W->GetFace() == EUmCardFace::Fallback ? 1 : 0;
     }
   }
+  const FBox2D Paint = PaintedRectSu();
+  const FString Painted = Paint.bIsValid ? FString::Printf(TEXT("(%.0f,%.0f,%.0f,%.0f)"), Paint.Min.X * Px, Paint.Min.Y * Px,
+                                                           Paint.Max.X * Px, Paint.Max.Y * Px)
+                                         : FString(TEXT("-"));
   const FString Extra = FString::Printf(
       TEXT("n=%d max=%d mode=%s step=%.1f fan=%d below72=%d rowVisible=%.0f placed=%d selected=%d marked=%d hoverIdx=%d "
-           "scaleMax=%.3f fallback=%d pool=%d created=%d"),
+           "scaleMax=%.3f fallback=%d pool=%d created=%d painted=%s leaving=%d"),
       Model.RowCount(), Model.HandMaxSize, UmHudHand::ModeName(Model.Mode), RowNow.StepSu, RowNow.bFan ? 1 : 0,
       RowNow.bBelowMin ? 1 : 0, FMath::Max(0.0f, Frame.VisibleSu - LowerNow), bPlaced ? 1 : 0, Selected, Marked, HoverIndex,
-      ScaleMax, Fallback, Pool.Num(), Created);
+      ScaleMax, Fallback, Pool.Num(), Created, *Painted, Leaving.Num());
   Out.Add(S08ArtHud::FormatWidgetLineEx(TEXT("UI-HUD-HAND"), TEXT("umg"), *StateName(), FString(), Rect,
                                         bVisible && !Rect.IsEmpty(), bVisible, SourceName(), Extra));
   if (!bVisible) return;

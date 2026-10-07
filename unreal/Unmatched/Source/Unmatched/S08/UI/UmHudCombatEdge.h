@@ -200,6 +200,8 @@ class UNMATCHED_API UUmHudCombatEdge : public UUserWidget {
   void CollectShotLines(TArray<FString>& Out) const;
   /** The rect the edge draws now (canvas su): card + ribbon (+ caption, + buttons). */
   FBox2D DrawnRectSu() const;
+  /** ВР-VS3-72: DrawnRectSu + the HB-32 leave flight of the card (canvas su; trace 'HUD-EDGE-PAINT' while leaving). */
+  FBox2D PaintedRectSu() const;
   FBox2D RibbonRectSu() const;
   /** Trace lines since the last call (HUD-TIMER, HUD-STAMP). */
   TArray<FString> TakeTrace();

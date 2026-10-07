@@ -400,6 +400,20 @@ FBox2D UUmHudCombatEdge::DrawnRectSu() const {
   return R;
 }
 
+FBox2D UUmHudCombatEdge::PaintedRectSu() const {
+  // ВР-VS3-72: the edge as painted now - during the HB-32 leave the card flies (and shrinks) outside its rect
+  FBox2D Out = DrawnRectSu();
+  if (IsLeaving() && Frame.CardSu.bIsValid) {
+    Out += Frame.CardSu;
+    Out += RibbonRectSu();
+    const double K = Card ? FMath::Max(static_cast<double>(Card->GetRenderTransform().Scale.X), 0.0) : 1.0;
+    const FVector2D C = Frame.CardSu.GetCenter() + LeaveOffsetNow;
+    const FVector2D H = 0.5 * Frame.CardSu.GetSize() * K;
+    Out += FBox2D(C - H, C + H);
+  }
+  return Out;
+}
+
 void UUmHudCombatEdge::ApplyModel(const FUmCombatEdgeModel& InModel) {
   if (bHasModel && Model == InModel) return;
   const FUmCombatEdgeModel Old = Model;
@@ -792,9 +806,18 @@ bool UUmHudCombatEdge::IsStampShown() const {
 
 void UUmHudCombatEdge::CollectShotLines(TArray<FString>& Out) const {
   using namespace UmHudCombatEdge;
+  const float Px = Frame.PxPerSu > 0.0f ? Frame.PxPerSu : 1.0f;
+  // ВР-VS3-72: a leaving card is painted outside the edge's rect (and the SHOT line says visible=0): its painted rect
+  if (IsLeaving()) {
+    const FBox2D P = PaintedRectSu();
+    if (P.bIsValid) {
+      Out.Add(FString::Printf(TEXT("HUD-EDGE-PAINT side=%s painted=(%.0f,%.0f,%.0f,%.0f) leave=1"),
+                              Side == EUmEdgeSide::Own ? TEXT("own") : TEXT("opp"), P.Min.X * Px, P.Min.Y * Px, P.Max.X * Px,
+                              P.Max.Y * Px));
+    }
+  }
   if (!bHasModel || !Model.bShow || Model.State == EUmEdgeState::Hidden) return;
   const bool bVisible = UmGameHudSlots::ShownByProperty(this) && !IsLeaving();
-  const float Px = Frame.PxPerSu > 0.0f ? Frame.PxPerSu : 1.0f;
   FS08ScreenRect Rect;
   const FBox2D R = DrawnRectSu();
   if (R.bIsValid) Rect = FS08ScreenRect(R.Min.X * Px, R.Min.Y * Px, R.Max.X * Px, R.Max.Y * Px);

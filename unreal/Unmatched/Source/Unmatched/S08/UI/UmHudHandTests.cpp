@@ -468,6 +468,13 @@ bool FUmHandAnimateTest::RunTest(const FString&) {
   H->StepAnimating();
   UUmCardWidget* C1 = H->FindCard(Run[1].InstanceId);
   TestTrue(FString::Printf(TEXT("the preview 1.5 (%.3f)"), C1 ? C1->GetScale() : 0.0f), C1 && Near(C1->GetScale(), 1.5));
+  // ВР-VS3-72: the painted rect takes the raised preview (225 x 312, its bottom 24 su over the canvas bottom), the row
+  // rect does not
+  const FBox2D Row = H->DrawnRectSu();
+  const FBox2D Paint = H->PaintedRectSu();
+  const FBox2D Hover = UmHudHand::HoverRect(H->RestRectSu(1).Min, F);
+  TestTrue(FString::Printf(TEXT("painted top %.1f = the preview top %.1f (row top %.1f)"), Paint.Min.Y, Hover.Min.Y, Row.Min.Y),
+           Paint.bIsValid && Near(Paint.Min.Y, Hover.Min.Y, 1.0) && Row.Min.Y > Hover.Min.Y + 50.0);
   return true;
 }
 

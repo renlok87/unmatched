@@ -244,6 +244,8 @@ class UNMATCHED_API UUmHudHand : public UUserWidget {
   FBox2D RestRectSu(int32 I) const;
   /** Row + caption as drawn now (canvas su, the lowering included, clipped to the canvas). */
   FBox2D DrawnRectSu() const;
+  /** ВР-VS3-72: the row + caption + every shown card as painted now (hover preview, raise, flights; canvas su). */
+  FBox2D PaintedRectSu() const;
   FBox2D CaptionRectSu() const;
   bool IsCaptionShown() const;
   float GetLowerNowSu() const { return LowerNow; }
