@@ -279,7 +279,7 @@ def figure_v2_graph(spec: dict) -> Graph:
     binop(g, "rim_c", "Multiply", "p_rimcol", "fresnel", 9, "RGB", "")
     binop(g, "rim", "Multiply", "rim_c", "cpd_rim", 10)
     binop(g, "em_sum", "Add", "flash", "rim", 11)
-    # FX-05 (VS-6 Z-2, BP-Z2-11): the flash / rim emissive rides the display-unit EyeAdaptationInverse
+    # FX-05 (VS-6 Z-2, ВР-Z2-11): the flash / rim emissive rides the display-unit EyeAdaptationInverse
     # convention of the hit tint (the raw linear emissive lands ~0.55 through the fixed ACES exposure; the
     # EAI input is the DISPLAY value - fx.flash 0.95 reads on screen as the token, < the 1.5 card ceiling).
     # EAI(0) = 0, so the neutral figure compiles bit for bit as before.

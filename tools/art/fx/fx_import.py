@@ -253,7 +253,7 @@ def star_flipbook_png(path: Path, frames: int = 8, px: int = 128) -> dict:
 
 def profile_grade_fit():
     """The measured inverse-tone fit of the engine (conceptPaste.grade of the board profiles, identical on both
-    maps: VP-Z2-06 - a Niagara renderer material cannot take a runtime override, so the 4 PLACARD MIs bake it;
+    maps: ВР-Z2-06 - a Niagara renderer material cannot take a runtime override, so the 4 PLACARD MIs bake it;
     the 7 combat MIs stay neutral and take the runtime grade when their systems expose the user vectors)."""
     profiles = json.loads((REPO / "unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json").read_text(
         encoding="utf-8"))

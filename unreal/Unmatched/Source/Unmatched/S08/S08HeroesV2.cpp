@@ -349,7 +349,7 @@ void SetRim(UPrimitiveComponent* Body, float Intensity, float Width) {
 }
 
 float FxFlashValueAt(double T, double Ms) {
-  // FX-19 (BP-20): a = 1 hard for the whole window, 0 from the first tick past it (the "a -> 0 in one frame")
+  // FX-19 (ВР-20): a = 1 hard for the whole window, 0 from the first tick past it (the "a -> 0 in one frame")
   return T < 0.0 ? 0.0f : (T < FMath::Max(0.001, Ms) ? 1.0f : 0.0f);
 }
 
