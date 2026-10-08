@@ -363,6 +363,16 @@ def import_mesh(obj_path):
         a = u.load_asset(p)
         if a is not None and not isinstance(a, u.StaticMesh) and EAL.does_asset_exist(p.rsplit(".", 1)[0]):
             EAL.delete_asset(p.rsplit(".", 1)[0])
+    # FX-37 (ВР-VS6-48): Interchange builds Nanite by default - an FX print mesh stays a plain mesh (no Nanite shadow
+    # pass in every frame); tools/art/fx/ue_fx_mesh_flags.py checks / fixes an existing asset the same way
+    ns = mesh.get_editor_property("nanite_settings")
+    if ns.get_editor_property("enabled"):
+        ns.set_editor_property("enabled", False)
+        sub = u.get_editor_subsystem(u.StaticMeshEditorSubsystem)
+        if hasattr(sub, "set_nanite_settings"):
+            sub.set_nanite_settings(mesh, ns, True)
+        else:
+            mesh.set_editor_property("nanite_settings", ns)
     if not EAL.save_loaded_asset(mesh, False):
         raise RuntimeError("could not save the vortex mesh")
     return {"asset": mesh.get_path_name(), "imported": imported,
