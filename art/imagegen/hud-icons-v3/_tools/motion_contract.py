@@ -539,6 +539,19 @@ def zone_icon(key):
 
 
 ACCEPTED_VR44_ICONS.update({f"zone-{k}": zone_icon(k) for k in ZONE_NAMES})
+# VS-6 F2 (IC-49, ВР-67, по делегированию): «+» лечения рядом с «+N» в капсуле над фигурой — только при reduced motion
+# (02 §5.5): появление и уход — прозрачность за 100 мс (keyframes карточки), без масштаба; капсула 700 мс (CUE-012)
+ACCEPTED_VR44_ICONS["state-heal"] = {
+    "canvas_u": [32, 32], "layers": [layer("icon", "state-heal")],
+    "anims": {"appear": {"kind": "enter", "duration_ms": 100, "beat_ms": None, "tracks": [
+        {"target": "all", "prop": "opacity", "keys": [[0, 0.15, "linear"], [100, 1.0, "constant"]]}],
+        "reduced": {"duration_ms": 100, "tracks": [{"target": "all", "prop": "opacity", "keys": [[0, 0.0, "linear"], [100, 1.0, "constant"]]}]},
+        "note": "«+» лечения (IC-49): рядом с «+N» в капсуле card.navy при reduced motion, когда точек VFX нет (FX-24); opacity 0 → 1 за 100 мс"},
+        "leave": {"kind": "exit", "duration_ms": 100, "beat_ms": None, "tracks": [
+            {"target": "all", "prop": "opacity", "keys": [[0, None, "linear"], [100, 0.0, "constant"]]}],
+            "reduced": {"duration_ms": 100, "tracks": [{"target": "all", "prop": "opacity", "keys": [[0, None, "linear"], [100, 0.0, "constant"]]}]},
+            "note": "уход с капсулой: opacity тек. → 0 за 100 мс"}},
+    "demo": [["appear"], ["wait", 500], ["leave"]]}
 ICONS.update(ACCEPTED_VR44_ICONS)
 ACCEPTED_VR44 = list(ACCEPTED_VR44_ICONS)
 # IC-33 (02 §3.2 ВР-62, §5.3): экранные размеры текстур записи в UE — набор экспортов под DPI и масштаб UI вместо mip:
@@ -571,7 +584,8 @@ def contract():
         # 2026-10-06 (VS-2 A2): 13 записей `accepted_vr44` (IC-38…IC-56), вариант badge-order-p2, бейджи L6 с 16 / 21
         # 2026-10-06 (VS-2 A3): ещё 4 записи — action-end-turn, card-drop, marker-slot-discard, ui-log (формы Codex IC-36)
         # 2026-10-07 (VS-4 V3): 8 значков зон zone-<ключ> (IC-62…IC-69, формы Codex IC-37), слои tint zone / ink
-        "revision": "icon-motion-2026-10-07-vr44-zones",
+        # 2026-10-08 (VS-6 F2): state-heal (IC-49) — «+» лечения при reduced motion, appear / leave прозрачностью 100 мс
+        "revision": "icon-motion-2026-10-08-vr44-heal",
         "status": "предложено",
         "source": "docs/unreal/contracts/hud/ICON-MOTION-PLAN.md; art/imagegen/hud-icons-v3/STYLE-v3.md §7; генератор art/imagegen/hud-icons-v3/_tools/motion_contract.py",
         "units": {"t": "ms", "canvas": "u (32 u = сторона значка; плашки 64 × 32)", "tx/ty": "u", "rotate": "градусы по часовой",
@@ -591,7 +605,7 @@ def contract():
         "candidates": CANDIDATES,
         "candidates_note": "кандидаты DE-012 до арт-приёмки пользователя (кольцо цвета команды — AB-5 выбрал тёплое): только галерея -S08IconGallery, HUD их не использует",
         "accepted_vr44": ACCEPTED_VR44,
-        "accepted_vr44_note": "IC-33 (ВР-IC14): принятые после ревью строки значки набора VR44 (02 §5.5); кандидаты VR44 в контракт не входят; VS-2 A2 (2026-10-06): IC-38…IC-56 приняты по делегированию (листы docs/game-design/evidence/VISUAL/IC-NN/), курсоры IC-58…IC-61 — вне контракта (HB-12); VS-2 A3 (2026-10-06): IC-46, IC-48, IC-52, IC-55 — формы Codex IC-36 (вектор A), по делегированию; VS-4 V3 (2026-10-07): IC-62…IC-69 значки зон — формы Codex IC-37 (вариант A), по делегированию; tint zone — диск цветом профиля доски, tint ink — глиф card.navy / card.glyph по контрасту",
+        "accepted_vr44_note": "IC-33 (ВР-IC14): принятые после ревью строки значки набора VR44 (02 §5.5); кандидаты VR44 в контракт не входят; VS-2 A2 (2026-10-06): IC-38…IC-56 приняты по делегированию (листы docs/game-design/evidence/VISUAL/IC-NN/), курсоры IC-58…IC-61 — вне контракта (HB-12); VS-2 A3 (2026-10-06): IC-46, IC-48, IC-52, IC-55 — формы Codex IC-36 (вектор A), по делегированию; VS-4 V3 (2026-10-07): IC-62…IC-69 значки зон — формы Codex IC-37 (вариант A), по делегированию; VS-6 F2 (2026-10-08): IC-49 «+» лечения state-heal, по делегированию (ВР-VS6-20); tint zone — диск цветом профиля доски, tint ink — глиф card.navy / card.glyph по контрасту",
         "ue_sizes_note": "IC-33 (02 §3.2 ВР-62, §5.3): экранные размеры текстур записи в UE (T_IV3_<id>_<px>, без mip); 18 и 36 — значок 24 su при DPI 0,75 и при 150 %; варианты берут набор основного значка",
         "order": ORDER,
         "icons": {k: dict(ICONS[k], ue_sizes=list(UE_SIZES.get(k, UE_SIZES_DEFAULT))) for k in ORDER},

@@ -92,8 +92,9 @@ bool FS08IconMotionLoadTest::RunTest(const FString& Parameters) {
   // VS-2 A3: 4 more VR44 records with the Codex IC-36 forms (IC-46 end turn, IC-48 card drop, IC-52 slot discard ribbon,
   // IC-55 log glyph).
   // VS-4 V3: 8 zone icons (IC-62...IC-69, Codex IC-37 forms): body / disc / glyph, the disc tint "zone", the glyph "ink".
-  TestEqual(TEXT("53 icons in order"), Lib.Order.Num(), 53);
-  TestEqual(TEXT("53 icon definitions"), Lib.Icons.Num(), 53);
+  // VS-6 F2: + state-heal (IC-49, the «+» of a heal under reduced motion; appear / leave opacity 100 ms).
+  TestEqual(TEXT("54 icons in order"), Lib.Order.Num(), 54);
+  TestEqual(TEXT("54 icon definitions"), Lib.Icons.Num(), 54);
   for (const TCHAR* Zone : {TEXT("zone-gray"), TEXT("zone-green"), TEXT("zone-blue"), TEXT("zone-violet"), TEXT("zone-purple"),
                             TEXT("zone-red"), TEXT("zone-brown"), TEXT("zone-yellow")}) {
     const FS08IconMotionDef* Z = Lib.Find(FName(Zone));
@@ -769,7 +770,7 @@ bool FS08IconMotionGalleryIdsTest::RunTest(const FString& Parameters) {
       ++Listed;
     }
   }
-  TestEqual(TEXT("25 VR44 (VS-4 V3: + 8 zone icons) + 4 DE-012 + 1 candidate"), Listed, 30);
+  TestEqual(TEXT("26 VR44 (VS-4 V3: + 8 zone icons; VS-6 F2: + state-heal) + 4 DE-012 + 1 candidate"), Listed, 31);
   return true;
 }
 

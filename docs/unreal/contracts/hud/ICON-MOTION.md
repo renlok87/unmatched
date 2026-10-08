@@ -182,6 +182,8 @@
 | `zone-brown` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
 | `zone-yellow` | appear | enter | 180 | — | all.opacity; all.scale — значок зоны «yellow» (три точки, IC-69) у клетки при наведении (FX-38, ВР-32): «кладут на стол»; смена клетки — leave старой и appear новой в одном кадре | all.opacity 100 мс |
 | `zone-yellow` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
+| `state-heal` | appear | enter | 100 | — | all.opacity — «+» лечения (IC-49): рядом с «+N» в капсуле card.navy при reduced motion, когда точек VFX нет (FX-24); opacity 0 → 1 за 100 мс | all.opacity 100 мс |
+| `state-heal` | leave | exit | 100 | — | all.opacity — уход с капсулой: opacity тек. → 0 за 100 мс | all.opacity 100 мс |
 
 Варианты того же id играют анимации основного значка: `resource-hp-full-enemy` → `resource-hp-full`, `marker-status-p1` → `marker-status`, `marker-status-p2` → `marker-status`, `badge-order-p2` → `badge-order`.
 

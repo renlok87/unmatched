@@ -1508,6 +1508,31 @@ def draw_ui_close(ctx, sp: Spec):
     glyph(ctx, sp, 16.0, 16.0, lambda: g_x(ctx, sp, half=6.0, w=sp.W, col=C["white"]))
 
 
+HEAL_BAR_U = (16.0, 4.5)   # IC-49: длина и толщина планки «+», u
+
+
+def draw_state_heal(ctx, sp: Spec):
+    """«+» лечения (IC-49, ВР-67): голый глиф — две планки 16 × 4,5 u крестом, концы плоские, центр (16; 16); тело
+    fx.heal, keyline 1 u офсетом. Detail 0 (≤ 20 px): планки не тоньше 3 px. Края снэпнуты к пикселям, обе планки —
+    одной толщины в px, крест симметричен по пиксельной сетке (центр — середина центрального квадрата)."""
+    length, thick = HEAL_BAR_U
+    t_px = sp.px(thick, 3 if sp.detail == 0 else 1)
+    l_px = sp.px(length)
+    if (l_px - t_px) % 2:   # одинаковые плечи: длина и толщина одной чётности
+        l_px += 1
+    k = sp.k
+    c = math.floor(16.0 * k - t_px / 2.0 + 0.5)          # левый / верхний край центрального квадрата, px
+    a0 = c - (l_px - t_px) // 2                          # край планки, px
+    rects = ((a0 / k, c / k, l_px / k, t_px / k), (c / k, a0 / k, t_px / k, l_px / k))
+    kk = sp.K
+    for x, y, w, h in rects:
+        ctx.rectangle(x - kk, y - kk, w + 2 * kk, h + 2 * kk)
+    fill(ctx, C["keyline"])
+    for x, y, w, h in rects:
+        ctx.rectangle(x, y, w, h)
+    fill(ctx, C["heal"])
+
+
 def draw_ui_step(ctx, sp: Spec):
     """«▲» выбора числа (IC-56): треугольник вершиной вверх, основание 12 u, высота 7,5 u, центр масс (16; 16),
     скругление 0,75 u, keyline 1 u снаружи; белая маска; «▼» — поворот 180° в UMG. Основание без снэпа (ВР-VS2-17):
@@ -2014,6 +2039,8 @@ ACCEPTED_VR44: dict = {
     "marker-slot-discard": (draw_marker_slot, {"kind": "discard"}, False),
     # VS-4 V3: значки зон у клетки IC-62…IC-69 (формы Codex IC-37, вариант A; ВР-VS4-50, -51)
     **{f"zone-{k}": (draw_zone, {"key": k}, False) for k in ZONE_KEYS},
+    # VS-6 F2: «+» лечения IC-49 (ВР-67) — лист приёмки docs/game-design/evidence/VISUAL/IC-49/, ВР-VS6-20
+    "state-heal": (draw_state_heal, {}, False),
 }
 # варианты id набора VR44 (как marker-status-p2): та же геометрия, для листов, галереи и запасного вида без тона
 VARIANTS_VR44 = {
