@@ -71,6 +71,16 @@ their C++ bases (UUmHudAuthoringLibrary -> BuildDefaultTree of each class), in t
                                       BoardChips, CreateButton, CreateSpinner, CreateError, CodeTitle, CodeBox, CodeCells,
                                       CodeJoinButton, CodeErrorIcon, CodeError, RecoverButton (VS-7 SC-08...SC-13; the board
                                       tiles, the code cells and the pooled rows are made at run time)
+  /Game/S08/UI/Screens/WBP_UI_SCR_ROOM  parent UmScreenRoom  parts Veil, Frame, Body (UUmScreenBase) + Content > Header,
+                                      BoardBlock, DeckRow, BottomStrip (panels), TitleText, CopyButton, ModeLabel, ModeText,
+                                      MenuButton, Slot0 / Slot1 (UUmRoomSlot), HeroScroll > HeroGrid, BoardTitle, BoardCards,
+                                      BoardWhy, DeckCount, DeckButton, DeckWhy, LeaveButton, StatusText, ReadyButton,
+                                      StartButton, WhyText, CountVeil, CountPanel > CountText (VS-7 SC-14...SC-18; the hero
+                                      cards and the board cards are made at run time)
+  /Game/S08/UI/Screens/WBP_UI_SCR_LOADING  parent UmScreenLoading  parts Veil, Frame, Body (UUmScreenBase) + Content >
+                                      LoadingPanel, LeftCard, RightCard, LeftPortrait, RightPortrait, StageText, LeftName,
+                                      RightName, LeftNick, RightNick, VersusText, BoardText, Spinner (WBP_UmSpinner),
+                                      ErrorIcon, LobbyButton, RetryButton (VS-7 SC-19, SC-20)
 
 A widget tree is not reachable from Python, so the C++ library builds it (the same function the class uses without a
 WBP) and this script re-loads every asset, checks the parent class, writes the report (env UM_HUD_WBP_REPORT, default
@@ -121,6 +131,8 @@ ASSETS = {
     "/Game/S08/UI/Screens/WBP_UI_SCR_BOOT": "UmScreenBoot",
     "/Game/S08/UI/Screens/WBP_UI_SCR_LOGIN": "UmScreenLogin",
     "/Game/S08/UI/Screens/WBP_UI_SCR_LOBBY": "UmScreenLobby",
+    "/Game/S08/UI/Screens/WBP_UI_SCR_ROOM": "UmScreenRoom",
+    "/Game/S08/UI/Screens/WBP_UI_SCR_LOADING": "UmScreenLoading",
 }
 
 

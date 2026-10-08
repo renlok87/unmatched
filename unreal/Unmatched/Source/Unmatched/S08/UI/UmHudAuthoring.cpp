@@ -23,7 +23,9 @@
 #include "UmHudTop.h"
 #include "UmScreenBoot.h"
 #include "UmScreenInspect.h"
+#include "UmScreenLoading.h"
 #include "UmScreenLobby.h"
+#include "UmScreenRoom.h"
 #include "UmScreenLogin.h"
 #include "UmToast.h"
 #include "UmToastStack.h"
@@ -136,6 +138,11 @@ FString UUmHudAuthoringLibrary::AuthorUmHudWidgetBlueprints(bool bOverwrite) {
   // rows are code-built at run time)
   One(UUmScreenLobby::WidgetBlueprintPath, UUmScreenLobby::StaticClass(),
       [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmScreenLobby::BuildDefaultTree(Tree, Attach, Error); });
+  // VS-7 SC-14...SC-20: ROOM (the hero cards, slots and board cards are code-built at run time) and LOADING
+  One(UUmScreenRoom::WidgetBlueprintPath, UUmScreenRoom::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmScreenRoom::BuildDefaultTree(Tree, Attach, Error); });
+  One(UUmScreenLoading::WidgetBlueprintPath, UUmScreenLoading::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmScreenLoading::BuildDefaultTree(Tree, Attach, Error); });
   Report->SetArrayField(TEXT("assets"), Assets);
   FString Out;
   const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&Out);

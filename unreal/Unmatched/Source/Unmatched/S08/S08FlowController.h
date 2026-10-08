@@ -262,6 +262,23 @@ public:
   int32 GetAvailableAnswers() const { return AvailableAnswers; }
   /** joinGame(gameId) of a list row (the code lookup is not needed: the row carries the id). */
   void JoinRoomById(const FString& GameId);
+  // ---- VS-7 SC-14...SC-20: ROOM hero details / decks, the match loading (S08FlowControllerRoom.cpp) ----
+  struct FHeroSidekick { FString Name, AttackType; int32 Health = 0, Movement = 0, Count = 0; };
+  struct FHeroDetails { FString Id, Name, AttackType, Ability; int32 Health = 0, Movement = 0; TArray<FHeroSidekick> Sidekicks; };
+  struct FHeroDeckCard { FString CardId, Name, NameRu, CardType, BannerName; int32 Attack = -1, Defense = -1, Boost = -1, Count = 0; };
+  /** adminHero(id) (the admin :5480 data: HP, move, attack type, sidekicks, ability) / cardList(heroId) (the deck). */
+  void FetchHeroDetails(const FString& HeroId);
+  void FetchHeroDeck(const FString& HeroId);
+  EBootQuery GetHeroDetailsState(const FString& HeroId) const;
+  EBootQuery GetHeroDeckState(const FString& HeroId) const;
+  const FHeroDetails* FindHeroDetails(const FString& HeroId) const { return HeroDetails.Find(HeroId); }
+  const TArray<FHeroDeckCard>* FindHeroDeck(const FString& HeroId) const { return HeroDecks.Find(HeroId); }
+  /** SC-19 connect: gameSequence(gameId); SC-20 «Повторить»: gameSequence + gameState again, the stream reconnects now;
+   *  «В лобби»: the local room and stream go (stage Lobby) - the match stays IN_PROGRESS on the server. */
+  void FetchGameSequence();
+  EBootQuery GetGameSequenceState() const { return GameSequenceState; }
+  void RetryMatchLoad();
+  void DetachToLobby();
 
   ES08Stage GetStage() const { return Stage; }
   const FS08RoomState& GetRoom() const { return Room; }
@@ -866,6 +883,12 @@ private:
   TArray<FLobbyGame> AvailableGames;
   int32 AvailableAnswers = 0;
   int32 AvailableSerial = 0;
+  // VS-7 ROOM / loading (S08FlowControllerRoom.cpp)
+  TMap<FString, FHeroDetails> HeroDetails;
+  TMap<FString, EBootQuery> HeroDetailsStates;
+  TMap<FString, TArray<FHeroDeckCard>> HeroDecks;
+  TMap<FString, EBootQuery> HeroDeckStates;
+  EBootQuery GameSequenceState = EBootQuery::Idle;
 #if WITH_AUTOMATION_TESTS
   int32 TestHttpSendCount = 0; // real SendHttp calls (harness + network)
   TSharedPtr<FJsonObject> TestLastHttpVariables; // variables of the last SendHttp

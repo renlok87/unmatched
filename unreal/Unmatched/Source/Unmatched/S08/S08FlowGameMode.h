@@ -1454,6 +1454,23 @@ private:
   void TickUmLobby(bool bShowing);
   void HandleUmLobbyFlowError(const FS08GraphQLError& Error);
   TSharedPtr<struct FUmLobbyRuntime> UmLobby;
+  // VS-7 S3 (S08FlowGameModeUmRoom.cpp): ROOM SC-14...SC-18 and the match loading SC-19 / SC-20 in the root's Screens;
+  // rollback -S08SlateHud=room | loading
+  void BuildUmRoom();
+  /** The route: "room" (the stage Room; the countdown / «Партия начинается…» after the start), "loading" (Started until
+   *  the first snapshot's scene is up) or ""; never -S08Auto. Steps the countdown. */
+  FString UmRoomRoute();
+  class UUmScreenRoom* GetUmRoom() const;
+  class UUmScreenLoading* GetUmLoading() const;
+  bool UmRoomBusy() const;
+  void ApplyUmRoomCanvas(const FVector2D& CanvasSu, bool bClassS, float PxPerSu);
+  void TickUmRoom(bool bShowing);
+  void TickUmLoading(bool bShowing);
+  void TickUmRoomDrive();
+  void OpenUmRoomLeave();
+  void OpenUmRoomDeck();
+  void HandleUmRoomFlowError(const FS08GraphQLError& Error);
+  TSharedPtr<struct FUmRoomRuntime> UmRoomRt;
 
   FS08BoardModel BoardModel;
   TArray<FS08BoardFighter> Fighters;

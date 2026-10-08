@@ -27,6 +27,8 @@
 #include "UI/UmScreenBoot.h"
 #include "UI/UmScreenLobby.h"
 #include "UI/UmScreenLogin.h"
+#include "UI/UmScreenLoading.h"
+#include "UI/UmScreenRoom.h"
 #include "UI/UmSpinner.h"
 #include "Camera/CameraActor.h"
 #include "Camera/CameraComponent.h"
@@ -184,6 +186,7 @@ void AS08FlowGameMode::BuildUmFlowScreens() {
     });
   }
   BuildUmLobby();  // VS-7 S2: LOBBY SC-08...SC-13 (S08FlowGameModeUmLobby.cpp)
+  BuildUmRoom();   // VS-7 S3: ROOM SC-14...SC-18, LOADING SC-19 / SC-20 (S08FlowGameModeUmRoom.cpp)
   FString BootMissing, LoginMissing;
   FS08Trace::Write(FString::Printf(TEXT("HUD-SCREENS boot=%s login=%s bootParts=%d loginParts=%d missing=%s drive=%s"),
                                    R.Boot.IsValid() ? *R.Boot->SourceName() : TEXT("slate"),
@@ -212,6 +215,7 @@ bool AS08FlowGameMode::UmFlowScreensBusy() const {
   const FUmFlowScreensRuntime& R = *UmFlowScreens;
   if (R.Showing == TEXT("login") && R.Login.IsValid() && R.Login->IsBusy()) return true;
   if (R.Showing == TEXT("lobby") && GetUmLobby() && GetUmLobby()->IsBusy()) return true;
+  if (R.Showing == TEXT("room") && UmRoomBusy()) return true;
   return R.Showing == TEXT("boot") && (R.Model.bResuming || R.Model.bRetrying);
 }
 
@@ -424,6 +428,7 @@ void AS08FlowGameMode::TickUmFlowScreens() {
 
   // ---- which route screen shows
   FString Want;
+  const FString RoomRoute = UmRoomRoute();  // VS-7 S3: steps the countdown every frame
   // the session stage: no stored session (GD-038) - BOOT 1 s, then LOGIN; the evidence drive's 'hold' keeps it 6 s
   // (the textures of the first frames stream in - the frames see the finished scene)
   const double BootMs = UmFsHas(R.Drive, TEXT("hold")) ? 6000.0 : 1000.0;
@@ -438,6 +443,8 @@ void AS08FlowGameMode::TickUmFlowScreens() {
       Want = TEXT("boot");
     } else if (UmLobbyWanted(R.bPassDone)) {
       Want = TEXT("lobby");
+    } else if (!RoomRoute.IsEmpty()) {
+      Want = RoomRoute;  // "room" | "loading"
     }
     if (Want == TEXT("boot") && !R.Boot.IsValid()) Want.Reset();
     if (Want == TEXT("login") && !R.Login.IsValid()) Want.Reset();
@@ -451,10 +458,15 @@ void AS08FlowGameMode::TickUmFlowScreens() {
     if (L && Want != TEXT("login")) L->PlayHide();
     UUmScreenLobby* Lb = GetUmLobby();
     if (Lb && Want != TEXT("lobby")) Lb->PlayHide();
-    UWidget* Active = Want == TEXT("boot")    ? static_cast<UWidget*>(B)
-                      : Want == TEXT("login") ? static_cast<UWidget*>(L)
-                      : Want == TEXT("lobby") ? static_cast<UWidget*>(Lb)
-                                              : R.GameChild.Get();
+    UUmScreenRoom* Rm = GetUmRoom();
+    UUmScreenLoading* Ld = GetUmLoading();
+    if (Rm && Want != TEXT("room")) Rm->PlayHide();
+    UWidget* Active = Want == TEXT("boot")      ? static_cast<UWidget*>(B)
+                      : Want == TEXT("login")   ? static_cast<UWidget*>(L)
+                      : Want == TEXT("lobby")   ? static_cast<UWidget*>(Lb)
+                      : Want == TEXT("room")    ? static_cast<UWidget*>(Rm)
+                      : Want == TEXT("loading") ? static_cast<UWidget*>(Ld)
+                                                : R.GameChild.Get();
     if (UmHudRoot && UmHudRoot->Screens && Active) UmHudRoot->Screens->SetActiveWidget(Active);
     if (Want == TEXT("boot") && B) {
       B->PlayShow();
@@ -471,6 +483,8 @@ void AS08FlowGameMode::TickUmFlowScreens() {
       Lb->PlayShow();
       Lb->OnShown();
     }
+    if (Want == TEXT("room") && Rm) Rm->PlayShow();
+    if (Want == TEXT("loading") && Ld) Ld->PlayShow();
     FS08Trace::Write(FString::Printf(TEXT("HUD-SCREEN route=%s stage=%s"), Want.IsEmpty() ? TEXT("game") : *Want, UmFsStageName(Stage)));
     R.Showing = Want;
     UpdateLegacyRootVisibility();
@@ -485,8 +499,11 @@ void AS08FlowGameMode::TickUmFlowScreens() {
     if (R.Boot.IsValid()) R.Boot->ApplyCanvas(Canvas, Scale.bClassS, Scale.PxPerSu());
     if (R.Login.IsValid()) R.Login->ApplyCanvas(Canvas, Scale.bClassS, Scale.PxPerSu());
     if (GetUmLobby()) GetUmLobby()->ApplyCanvas(Canvas, Scale.bClassS, Scale.PxPerSu());
+    ApplyUmRoomCanvas(Canvas, Scale.bClassS, Scale.PxPerSu());
   }
   TickUmLobby(R.Showing == TEXT("lobby"));
+  TickUmRoom(R.Showing == TEXT("room"));
+  TickUmLoading(R.Showing == TEXT("loading"));
   if (R.Boot.IsValid() && R.Showing == TEXT("boot")) {
     R.Boot->ApplyModel(R.Model, Now);
     // SC-05 keys: Enter = return, Esc = lobby (the viewport keeps the keyboard on this screen)

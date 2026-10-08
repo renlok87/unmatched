@@ -14,6 +14,9 @@
 // VS-7 S2 (SC-08 skeleton / SC-13 error evidence, opt-in): S10_DELAY_FIELD=availableGames holds the LOBBY list query
 // (12 s > the client's 10 s timeout = the error state; the next poll or «Повторить» passes with S10_DELAY_COUNT=1);
 // S10_DELAY_FIELD=createGame holds the first create answer (the busy «Создаём…» with its spinner, SC-09).
+// VS-7 S3 (SC-20 loading error evidence, opt-in): S10_DELAY_FIELD=gameState holds the first match state read (> the
+// client's 10 s = «Не удаётся подключиться»); with S10_WS_REFUSE=1 the graphql-transport-ws upgrades are refused until a
+// further gameState request arrives (the client's «Повторить») - the stream cannot bring the snapshot around the hold.
 // Local-only; no request bodies, tokens, room codes or card data are logged (only field names and counts).
 const http = require('node:http');
 const net = require('node:net');
@@ -22,11 +25,14 @@ const listenPort = Number(process.env.S10_LISTEN_PORT || 3123);
 const targetPort = Number(process.env.S10_TARGET_PORT || 3000);
 const delayField = process.env.S10_DELAY_FIELD || 'gameDeckLists';
 const delayMs = Number(process.env.S10_DELAY_MS || 12000);
-const permitted = new Set(['gameDeckLists', 'heroList', 'availableGames']);
+const permitted = new Set(['gameDeckLists', 'heroList', 'availableGames', 'gameState']);
 const permittedMutations = new Set(['beginManeuver', 'maneuver', 'endTurn', 'login', 'createGame']);
 const delayCount = Number(process.env.S10_DELAY_COUNT || 1);
 const countSet = Object.prototype.hasOwnProperty.call(process.env, 'S10_DELAY_COUNT');
 const wsDropAtMs = Number(process.env.S10_WS_DROP_AT_MS || 0);
+const wsRefuse = process.env.S10_WS_REFUSE === '1';
+let fieldSeen = 0;
+let wsRefused = 0;
 if (!Number.isInteger(listenPort) || listenPort < 1024 || listenPort > 65535 ||
     !Number.isInteger(targetPort) || targetPort < 1024 || targetPort > 65535 ||
     !(permitted.has(delayField) || permittedMutations.has(delayField)) || listenPort === targetPort ||
@@ -78,6 +84,7 @@ const server = http.createServer((downstreamReq, downstreamRes) => {
     const body = Buffer.concat(chunks);
     const text = body.toString('utf8');
     const field = delayMutation ? mutationField(text) : queryField(text);
+    if (field === delayField) fieldSeen++;
     const upstreamReq = http.request({
       hostname: '127.0.0.1', port: targetPort,
       method: downstreamReq.method, path: downstreamReq.url,
@@ -110,6 +117,12 @@ const server = http.createServer((downstreamReq, downstreamRes) => {
 });
 
 server.on('upgrade', (request, downstream, head) => {
+  if (wsRefuse && fieldSeen <= delayCount) {
+    wsRefused++;
+    process.stdout.write(JSON.stringify({ event: 'ws_refused', n: wsRefused, fieldSeen }) + '\n');
+    downstream.destroy();
+    return;
+  }
   wsConnections++;
   const upstream = net.connect(targetPort, '127.0.0.1');
   const pair = { upstream, downstream };

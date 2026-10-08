@@ -1159,6 +1159,7 @@ void AS08FlowGameMode::TickUmHud() {
 
 void AS08FlowGameMode::WriteUmHudShotLines() {
   if (!UmHud.IsValid()) return;
+  if (UmFlowScreensCoverLegacy()) return;  // VS-7 S3: ROOM's countdown / LOADING cover the GAME screen - its blocks are not on screen
   FUmHudRuntime& R = *UmHud;
   FVector2D Viewport(0.0, 0.0);
   if (GEngine && GEngine->GameViewport) GEngine->GameViewport->GetViewportSize(Viewport);
@@ -2032,7 +2033,7 @@ void AS08FlowGameMode::TickUmScreenShots() {
   if (R.ScreenShots == 0) return;
   TArray<TPair<FString, FString>> Shown;
   // the GAME screen (UUmGameHud): the state as WriteUmHudShotLines names it
-  if (UmHudRoot && UmHudRoot->GetGameHud() && R.Blocks.UmgRoot() && Hud.bValid) {
+  if (UmHudRoot && UmHudRoot->GetGameHud() && R.Blocks.UmgRoot() && Hud.bValid && !UmFlowScreensCoverLegacy()) {  // VS-7 S3: not under ROOM / LOADING
     const bool bCombat = CommandUi.Combat.bPresent || CombatStage.IsActive();
     const bool bPending = CommandUi.Mode == ES09CommandMode::PendingChoice;
     Shown.Add(TPair<FString, FString>(TEXT("UI-SCR-GAME"), Hud.bGameOver ? TEXT("over")
