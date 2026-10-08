@@ -1,0 +1,39 @@
+{
+ "schema": "unmatched.visual-evidence-index/1",
+ "id": "SC-30",
+ "date": "2026-10-08",
+ "rule": "ВР-VS4-01: images with avatars / card scans / board art stay in scraped-data (gitignored); PAUSE lies over GAME (hand scans, portraits), ROOM (avatars) or LOBBY (map thumbnails)",
+ "root": "scraped-data/derived/visual-evidence (relative to the checkout; copies in the main checkout and C:/tmp/wt-visual)",
+ "source": "VS-7 S4: UnrealEditor -game (editor build, worktree C:/tmp/wt-visual), one client on the main backend :3000 (s4g: + the host tools/s08/screens/room_actor.cjs --play-after-ms over the API), -S08MenuDrive / -S08LobbyDrive / -S08RoomDrive / -S08PauseDrive, -S08ScreenShots; runs C:/tmp/visual/VS7/runs/<run>",
+ "status": "editor-build, not acceptance (the packaged set G with RENDER and the sheets belong to the Frames step)",
+ "files": [
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-30/pause-game-graphics-1080p-100-s4f.png",
+   "sha256": "9d42d26872bfca826b0877ece1457310f320be5561a161d589b2aebbefef4d81",
+   "bytes": 2524286,
+   "run": "s4f",
+   "shows": "graphics: «ВЫСОКОЕ» selected, «Масштаб экрана 100 % и лимит 60 кадров/с не меняются»"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-30/pause-game-graphics-gfx0-1080p-100-s4f.png",
+   "sha256": "702796273eb51597c908539e4c74b02152f467f06799b5ec8b89c94dc1066195",
+   "bytes": 2470816,
+   "run": "s4f",
+   "shows": "after «НИЗКОЕ»: RENDER tag=SETTINGS sg.view=0 (back to «ВЫСОКОЕ»: reference=1)"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-30/pause-game-graphics-ui150-720p-150-s4g.png",
+   "sha256": "3517dd2d4fe79649fa2a7be7f51344d3caf778998ad63bc5a871588fd9a9afcc",
+   "bytes": 774202,
+   "run": "s4g",
+   "shows": "class S"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-30/pause-lobby-graphics-en-1080p-100-s4e.png",
+   "sha256": "7aae435a922b732d1c910c6cb37c9ff754845ca53b84199fbca812939d917f44",
+   "bytes": 724262,
+   "run": "s4e",
+   "shows": "en"
+  }
+ ]
+}

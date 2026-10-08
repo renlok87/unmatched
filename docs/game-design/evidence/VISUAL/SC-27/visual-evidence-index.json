@@ -1,0 +1,46 @@
+{
+ "schema": "unmatched.visual-evidence-index/1",
+ "id": "SC-27",
+ "date": "2026-10-08",
+ "rule": "ВР-VS4-01: images with avatars / card scans / board art stay in scraped-data (gitignored); PAUSE lies over GAME (hand scans, portraits), ROOM (avatars) or LOBBY (map thumbnails)",
+ "root": "scraped-data/derived/visual-evidence (relative to the checkout; copies in the main checkout and C:/tmp/wt-visual)",
+ "source": "VS-7 S4: UnrealEditor -game (editor build, worktree C:/tmp/wt-visual), one client on the main backend :3000 (s4g: + the host tools/s08/screens/room_actor.cjs --play-after-ms over the API), -S08MenuDrive / -S08LobbyDrive / -S08RoomDrive / -S08PauseDrive, -S08ScreenShots; runs C:/tmp/visual/VS7/runs/<run>",
+ "status": "editor-build, not acceptance (the packaged set G with RENDER and the sheets belong to the Frames step)",
+ "files": [
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-27/pause-game-interface-1080p-100-s4f.png",
+   "sha256": "b0e6d970021eb0926f6814f5c44057a6960dd4c85ba24ef30d9156bb83f1640d",
+   "bytes": 2456339,
+   "run": "s4f",
+   "shows": "1080p 100 %: «100 %», note «75–150 %»"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-27/pause-game-interface-ui150-1080p-150-s4f.png",
+   "sha256": "6f0f20df57831dd1c104d688b26c14fd508f4519ea77a8d86462580edb4f0ef7",
+   "bytes": 1825976,
+   "run": "s4f",
+   "shows": "1080p 150 % after the slider release: canvas 1280x720, class S (HUD-LAYOUT overlapField=0)"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-27/pause-game-interface-ui75-1080p-75-s4f.png",
+   "sha256": "8e4d93ee1783599e99b4bd7eab795fc6ace8a31dcb93c287365763a55f2d1c58",
+   "bytes": 2720780,
+   "run": "s4f",
+   "shows": "1080p 75 %: canvas 2560x1440, class L"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-27/pause-game-interface-720p-100-s4g.png",
+   "sha256": "af92e369b0e1cdc93fbb24e14a0ee902027b56c1b3ae57c563542e04fbb0fe2b",
+   "bytes": 1093229,
+   "run": "s4g",
+   "shows": "720p 100 %: the slider starts at 100, note «100–150 %» (ВР-62)"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-27/pause-game-interface-ui150-720p-150-s4g.png",
+   "sha256": "fe6e7a21269554b1e59437b8bbabdecd4a8c40222571893deb4a8c2a6cc64bfa",
+   "bytes": 680820,
+   "run": "s4g",
+   "shows": "720p 150 %: canvas 1138x640, class S, every button visible"
+  }
+ ]
+}

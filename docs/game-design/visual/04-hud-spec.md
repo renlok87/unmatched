@@ -419,6 +419,7 @@ y920┌PANEL-LOC┐       ▭▭▭▭▭▭▭ РУКА ▭▭▭▭▭▭▭  
   `settings.*` (по строке на настройку и значение).
 - **Звук:** `UI-PANEL-OPEN`, `UI-PANEL-CLOSE`, `UI-SLIDER-TICK`, `UI-TOGGLE`, `UI-PAUSE-EXIT`; музыка приглушается.
 - **Гейт:** `SHOT widget id=UI-SCR-PAUSE state=<вкладка>`; на этой панели обязательна проверка 150 % при 720p.
+- **Дельта VS-7 S4** (`evidence/VISUAL/SC-24`…`SC-30`, по делегированию): контекст по маршруту — GAME, LOBBY (без «Покинуть»), ROOM («Выйти из комнаты» → диалог комнаты), над BOOT / LOGIN / загрузкой паузы нет (ВР-VS7-49); строка настройки = имя `s08.Settings` + значение → `ApplySetting` + `Save`, трасса `SETTINGS set <k>=<v> source=pause` (ВР-VS7-51); качество графики — общий уровень `GameUserSettings` с `ResolutionQuality` 100 и `Scalability::SetQualityLevels` без `ApplySettings` (лимит кадров и разрешение не трогаются, ВР-VS7-50); поле `Language` (ru по умолчанию), флаг `-S08Lang=ru|en|pseudo`, псевдолокаль +30 % строит `UmText` (ВР-VS7-45, -52); при прокрутке видны только целые ряды (ВР-VS7-54); длинный текст укорачивает дорожку ползунка, а не текст (ВР-VS7-46), расширяет колонку вкладок (ВР-VS7-47) или ставит подпись строки над контролом (ВР-VS7-48). Новые ключи: `settings.interface.scale.range`, `settings.interface.key_hints.note`, `settings.graphics.note`.
 
 ### 1.9 RECONNECT — `UI-SCR-RECONNECT`
 

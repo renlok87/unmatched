@@ -1,0 +1,53 @@
+{
+ "schema": "unmatched.visual-evidence-index/1",
+ "id": "SC-24",
+ "date": "2026-10-08",
+ "rule": "ВР-VS4-01: images with avatars / card scans / board art stay in scraped-data (gitignored); PAUSE lies over GAME (hand scans, portraits), ROOM (avatars) or LOBBY (map thumbnails)",
+ "root": "scraped-data/derived/visual-evidence (relative to the checkout; copies in the main checkout and C:/tmp/wt-visual)",
+ "source": "VS-7 S4: UnrealEditor -game (editor build, worktree C:/tmp/wt-visual), one client on the main backend :3000 (s4g: + the host tools/s08/screens/room_actor.cjs --play-after-ms over the API), -S08MenuDrive / -S08LobbyDrive / -S08RoomDrive / -S08PauseDrive, -S08ScreenShots; runs C:/tmp/visual/VS7/runs/<run>",
+ "status": "editor-build, not acceptance (the packaged set G with RENDER and the sheets belong to the Frames step)",
+ "files": [
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-24/pause-game-sound-1080p-100-s4f.png",
+   "sha256": "910c0d026d6facf919c4ddd8d26ea8a045ebfaa24fc021680203b3e6d7289734",
+   "bytes": 2281998,
+   "run": "s4f",
+   "shows": "game: Marmoreal original, VS_AI; «Пауза», «Партия продолжается», tab Звук, «ПОКИНУТЬ ПАРТИЮ» (X badge-refuse 24 su) + «ПРОДОЛЖИТЬ» the one primary; the frozen HUD under the 0.6 veil"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-24/pause-lobby-sound-1080p-100-s4f.png",
+   "sha256": "ab208157addf062f085baf77769c313397273ebf84da3323abefa682098d9e2a",
+   "bytes": 723688,
+   "run": "s4f",
+   "shows": "menu: from LOBBY (header «≡» path), no leave button, no running line"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-24/pause-game-confirm-1080p-100-s4f.png",
+   "sha256": "31b7945f699488a8048c12475830171f07a69215f4e488620637b08d5d4d2d69",
+   "bytes": 1647302,
+   "run": "s4f",
+   "shows": "confirm: «Покинуть партию» / «Партия прервётся для обоих игроков» over the modal (state=confirm)"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-24/pause-room-sound-720p-100-s4g.png",
+   "sha256": "672ac7e3b441b3b61d9b54c4306e9b27c22e2194f44a49faaff25e8082438e60",
+   "bytes": 534914,
+   "run": "s4g",
+   "shows": "ROOM (guest, Sarpedon room): «ВЫЙТИ ИЗ КОМНАТЫ» instead of «Покинуть партию»"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-24/pause-game-sound-720p-100-s4g.png",
+   "sha256": "89e2bf810e9087560ab9f019a7c164d0d60430f718ec80185c7366c1e496cdac",
+   "bytes": 975333,
+   "run": "s4g",
+   "shows": "game on Sarpedon original (1x1 guest) at 720p: the modal fits 864 su without scrolling; the host played two maneuvers (seq 1 -> 5) while this pause was open"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-24/pause-game-confirm-720p-100-s4g.png",
+   "sha256": "9a8c5d1433b0616f138026969c9412e72c9c8554788d8bcd5ace4709f3ffb377",
+   "bytes": 779540,
+   "run": "s4g",
+   "shows": "confirm at 720p, answered «ДА» -> UI-PAUSE-EXIT + leaveGame -> LOBBY"
+  }
+ ]
+}

@@ -1,0 +1,32 @@
+{
+ "schema": "unmatched.visual-evidence-index/1",
+ "id": "SC-28",
+ "date": "2026-10-08",
+ "rule": "ВР-VS4-01: images with avatars / card scans / board art stay in scraped-data (gitignored); PAUSE lies over GAME (hand scans, portraits), ROOM (avatars) or LOBBY (map thumbnails)",
+ "root": "scraped-data/derived/visual-evidence (relative to the checkout; copies in the main checkout and C:/tmp/wt-visual)",
+ "source": "VS-7 S4: UnrealEditor -game (editor build, worktree C:/tmp/wt-visual), one client on the main backend :3000 (s4g: + the host tools/s08/screens/room_actor.cjs --play-after-ms over the API), -S08MenuDrive / -S08LobbyDrive / -S08RoomDrive / -S08PauseDrive, -S08ScreenShots; runs C:/tmp/visual/VS7/runs/<run>",
+ "status": "editor-build, not acceptance (the packaged set G with RENDER and the sheets belong to the Frames step)",
+ "files": [
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-28/pause-game-game-1080p-100-s4f.png",
+   "sha256": "14856760dae5d56d5d09445cd9e189a59aa87a3338bc068ebce0913deb5939d2",
+   "bytes": 2526347,
+   "run": "s4f",
+   "shows": "game tab: «Скорость анимации» НЕТ / БЫСТРО / ОБЫЧНО (selected) / МЕДЛЕННО, «Сокращённые анимации» выкл, no shake row"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-28/pause-game-game-ui150-720p-150-s4g.png",
+   "sha256": "7e21d559f488bd481c52fe80f72163dcd321865ca819627f9d66274827d38717",
+   "bytes": 774158,
+   "run": "s4g",
+   "shows": "class S"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-28/pause-lobby-game-pseudo-ui150-720p-150-s4d.png",
+   "sha256": "abfda3c8e02f27445d2c13fd4523d052a26889298d7f10c2983ddba48ea5bfdc",
+   "bytes": 275610,
+   "run": "s4d",
+   "shows": "pseudo-locale: the chips wrap to a second line"
+  }
+ ]
+}

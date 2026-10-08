@@ -1,0 +1,39 @@
+{
+ "schema": "unmatched.visual-evidence-index/1",
+ "id": "SC-25",
+ "date": "2026-10-08",
+ "rule": "ВР-VS4-01: images with avatars / card scans / board art stay in scraped-data (gitignored); PAUSE lies over GAME (hand scans, portraits), ROOM (avatars) or LOBBY (map thumbnails)",
+ "root": "scraped-data/derived/visual-evidence (relative to the checkout; copies in the main checkout and C:/tmp/wt-visual)",
+ "source": "VS-7 S4: UnrealEditor -game (editor build, worktree C:/tmp/wt-visual), one client on the main backend :3000 (s4g: + the host tools/s08/screens/room_actor.cjs --play-after-ms over the API), -S08MenuDrive / -S08LobbyDrive / -S08RoomDrive / -S08PauseDrive, -S08ScreenShots; runs C:/tmp/visual/VS7/runs/<run>",
+ "status": "editor-build, not acceptance (the packaged set G with RENDER and the sheets belong to the Frames step)",
+ "files": [
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-25/pause-game-sound-1080p-100-s4f.png",
+   "sha256": "910c0d026d6facf919c4ddd8d26ea8a045ebfaa24fc021680203b3e6d7289734",
+   "bytes": 2281998,
+   "run": "s4f",
+   "shows": "sound: the S08UserSettings.h defaults 100 / 60 / 80 / 80 / 80 / 60, both mutes off, subtitles on, describe off"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-25/pause-game-sound-ui150-720p-150-s4g.png",
+   "sha256": "536749cff7926bd484829a2fdfcfbe3cae577cbc6ca8a04a57daea37845ab3de",
+   "bytes": 581474,
+   "run": "s4g",
+   "shows": "720p 150 % (canvas 1138x640, class S): the rows scroll (bar at the right), whole rows only, the footer stays"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-25/pause-game-sound-scrolled-ui150-720p-150-s4g.png",
+   "sha256": "4a20055dc54dbc4646d05ce01c9a87b4d884832d91e3672e82ffde53064bd202",
+   "bytes": 578139,
+   "run": "s4g",
+   "shows": "the same scrolled to the end (mouse wheel / drive)"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-25/pause-lobby-sound-scrolled-pseudo-ui150-720p-150-s4d.png",
+   "sha256": "cbae49dbbf5984c788f8ddaa05f1bf1d80dbfd9e2fb2c1c1804e84f5188661d5",
+   "bytes": 239176,
+   "run": "s4d",
+   "shows": "pseudo-locale +30 %, scrolled to the end"
+  }
+ ]
+}
