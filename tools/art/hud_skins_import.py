@@ -292,7 +292,11 @@ def main() -> None:
     errors = check_plan(entries)
     if errors:
         raise RuntimeError("; ".join(errors))
-    imported = import_textures(entries)
+    # VS-6 F4 (ВР-VS6-35): --only=Panel,Capsule,Toast re-imports just those skins' textures (the rest keep their assets
+    # byte for byte); every skin is still bound into the theme
+    only = next((a.split("=", 1)[1] for a in sys.argv[1:] if a.startswith("--only=")), "")
+    names = {f"T_Skin_{n.strip()}" for n in only.split(",") if n.strip()}
+    imported = import_textures([e for e in entries if not names or e["assets"]["x1"] in names])
     theme = u.EditorAssetLibrary.load_asset(THEME)
     if theme is None or not isinstance(theme, u.UmHudTheme):
         raise RuntimeError(f"{THEME}: missing - run tools/s08/hud_contract/hud_theme_import.py first")

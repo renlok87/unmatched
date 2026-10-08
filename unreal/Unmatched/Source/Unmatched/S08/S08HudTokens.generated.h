@@ -9,9 +9,9 @@
 namespace S08HudTokens {
 
 /** sha256 of hud-style-tokens.json (CRLF -> LF) this header was generated from. */
-inline constexpr const TCHAR* kTokensJsonSha256 = TEXT("176abf0e64e3d4d27cf8ab2da4ae13ed2d9726f772b105eba17fc97de0bae55f");
+inline constexpr const TCHAR* kTokensJsonSha256 = TEXT("1cf42f4966e9d2cf8e15e088c11892f0d960f4c7e48b19eb555a63675090d72f");
 
-// ---- colours (60) ----
+// ---- colours (61) ----
 inline constexpr FColor Color_AccentWarm = FColor(0xFF, 0xB4, 0x5C, 0xFF);  // accent.warm #FFB45C
 inline constexpr FColor Color_BoardChoice = FColor(0x4C, 0xD2, 0xDC, 0xFF);  // board.choice #4CD2DC
 inline constexpr FColor Color_BoardKeyline = FColor(0x11, 0x13, 0x17, 0xFF);  // board.keyline #111317
@@ -52,6 +52,7 @@ inline constexpr FColor Color_PanelBgInset = FColor(0x15, 0x23, 0x2E, 0xFF);  //
 inline constexpr FColor Color_PanelBgPressed = FColor(0x04, 0x0E, 0x17, 0xFF);  // panel.bg.pressed #040E17
 inline constexpr FColor Color_PanelDivider = FColor(0xF9, 0xEB, 0xDB, 0xFF);  // panel.divider #F9EBDB
 inline constexpr FColor Color_PanelEdge = FColor(0xF9, 0xEB, 0xDB, 0xFF);  // panel.edge #F9EBDB
+inline constexpr FColor Color_PanelEdgeScene = FColor(0xF9, 0xEB, 0xDB, 0xFF);  // panel.edge.scene #F9EBDB
 inline constexpr FColor Color_PanelVeil = FColor(0x06, 0x16, 0x23, 0xFF);  // panel.veil #061623
 inline constexpr FColor Color_StateError = FColor(0xD9, 0x48, 0x3F, 0xFF);  // state.error #D9483F
 inline constexpr FColor Color_StatePending = FColor(0x0D, 0x7A, 0x89, 0xFF);  // state.pending #0D7A89
@@ -73,10 +74,11 @@ inline constexpr FColor Color_ZonePurple = FColor(0x8A, 0x56, 0xC6, 0xFF);  // z
 inline constexpr FColor Color_ZoneRed = FColor(0xD9, 0x48, 0x3F, 0xFF);  // zone.red #D9483F
 inline constexpr FColor Color_ZoneYellow = FColor(0xE0, 0xB2, 0x3C, 0xFF);  // zone.yellow #E0B23C
 
-// ---- alpha (7): colour tokens with an alpha field + the opacity group ----
+// ---- alpha (8): colour tokens with an alpha field + the opacity group ----
 inline constexpr float Alpha_PanelBg = 0.92f;  // panel.bg
 inline constexpr float Alpha_PanelDivider = 0.16f;  // panel.divider
 inline constexpr float Alpha_PanelEdge = 0.45f;  // panel.edge
+inline constexpr float Alpha_PanelEdgeScene = 0.85f;  // panel.edge.scene
 inline constexpr float Alpha_PanelVeil = 0.6f;  // panel.veil
 inline constexpr float Alpha_RingSmoulder = 0.35f;  // ring.smoulder
 inline constexpr float Alpha_RingSmoulderS = 0.55f;  // ring.smoulder.s
@@ -200,6 +202,7 @@ inline constexpr FColorToken kColors[] = {
     {TEXT("panel.bg.pressed"), FColor(0x04, 0x0E, 0x17, 0xFF), 1.0f},
     {TEXT("panel.divider"), FColor(0xF9, 0xEB, 0xDB, 0xFF), 0.16f},
     {TEXT("panel.edge"), FColor(0xF9, 0xEB, 0xDB, 0xFF), 0.45f},
+    {TEXT("panel.edge.scene"), FColor(0xF9, 0xEB, 0xDB, 0xFF), 0.85f},
     {TEXT("panel.veil"), FColor(0x06, 0x16, 0x23, 0xFF), 0.6f},
     {TEXT("state.error"), FColor(0xD9, 0x48, 0x3F, 0xFF), 1.0f},
     {TEXT("state.pending"), FColor(0x0D, 0x7A, 0x89, 0xFF), 1.0f},
@@ -225,6 +228,7 @@ inline constexpr FScalarToken kAlphas[] = {
     {TEXT("panel.bg"), 0.92f},
     {TEXT("panel.divider"), 0.16f},
     {TEXT("panel.edge"), 0.45f},
+    {TEXT("panel.edge.scene"), 0.85f},
     {TEXT("panel.veil"), 0.6f},
     {TEXT("ring.smoulder"), 0.35f},
     {TEXT("ring.smoulder.s"), 0.55f},
@@ -296,7 +300,7 @@ inline constexpr FSkinToken kSkins[] = {
     {TEXT("btn.primary.normal"), FColor(0xF2, 0xC1, 0x4E, 0xFF), 1.0f, FColor(0x06, 0x16, 0x23, 0xFF), 1.0f, 1.0f, 4.0f, false},
     {TEXT("btn.primary.pressed"), FColor(0xD5, 0xAA, 0x45, 0xFF), 1.0f, FColor(0x06, 0x16, 0x23, 0xFF), 1.0f, 1.0f, 4.0f, false},
     {TEXT("btn.selected"), FColor(0x0D, 0x7A, 0x89, 0xFF), 1.0f, FColor(0xFA, 0xF8, 0xF2, 0xFF), 1.0f, 1.0f, 4.0f, false},
-    {TEXT("capsule"), FColor(0x06, 0x16, 0x23, 0xFF), 1.0f, FColor(0x00, 0x00, 0x00, 0xFF), 0.0f, 0.0f, 0.0f, true},
+    {TEXT("capsule"), FColor(0x06, 0x16, 0x23, 0xFF), 0.92f, FColor(0xF9, 0xEB, 0xDB, 0xFF), 0.85f, 1.0f, 0.0f, true},
     {TEXT("check.off"), FColor(0x15, 0x23, 0x2E, 0xFF), 1.0f, FColor(0xF9, 0xEB, 0xDB, 0xFF), 0.45f, 1.0f, 4.0f, false},
     {TEXT("check.on"), FColor(0x0D, 0x7A, 0x89, 0xFF), 1.0f, FColor(0xFA, 0xF8, 0xF2, 0xFF), 1.0f, 1.0f, 4.0f, false},
     {TEXT("chip"), FColor(0x15, 0x23, 0x2E, 0xFF), 1.0f, FColor(0xF9, 0xEB, 0xDB, 0xFF), 0.45f, 1.0f, 4.0f, false},
@@ -305,14 +309,14 @@ inline constexpr FSkinToken kSkins[] = {
     {TEXT("input.normal"), FColor(0x15, 0x23, 0x2E, 0xFF), 1.0f, FColor(0xF9, 0xEB, 0xDB, 0xFF), 0.45f, 1.0f, 4.0f, false},
     {TEXT("key.chip"), FColor(0x15, 0x23, 0x2E, 0xFF), 1.0f, FColor(0xF9, 0xEB, 0xDB, 0xFF), 0.45f, 1.0f, 4.0f, false},
     {TEXT("modal"), FColor(0x06, 0x16, 0x23, 0xFF), 1.0f, FColor(0xF9, 0xEB, 0xDB, 0xFF), 0.45f, 1.0f, 8.0f, false},
-    {TEXT("panel"), FColor(0x06, 0x16, 0x23, 0xFF), 0.92f, FColor(0xF9, 0xEB, 0xDB, 0xFF), 0.45f, 1.0f, 6.0f, false},
+    {TEXT("panel"), FColor(0x06, 0x16, 0x23, 0xFF), 0.92f, FColor(0xF9, 0xEB, 0xDB, 0xFF), 0.85f, 1.0f, 6.0f, false},
     {TEXT("panel.inset"), FColor(0x15, 0x23, 0x2E, 0xFF), 1.0f, FColor(0x00, 0x00, 0x00, 0xFF), 0.0f, 0.0f, 4.0f, false},
     {TEXT("progress.fill"), FColor(0xF9, 0xEB, 0xDB, 0xFF), 1.0f, FColor(0x00, 0x00, 0x00, 0xFF), 0.0f, 0.0f, 0.0f, true},
     {TEXT("progress.track"), FColor(0x15, 0x23, 0x2E, 0xFF), 1.0f, FColor(0xF9, 0xEB, 0xDB, 0xFF), 0.45f, 1.0f, 0.0f, true},
     {TEXT("slider.thumb"), FColor(0xF9, 0xEB, 0xDB, 0xFF), 1.0f, FColor(0x11, 0x13, 0x17, 0xFF), 1.0f, 1.0f, 0.0f, true},
     {TEXT("slider.track"), FColor(0x15, 0x23, 0x2E, 0xFF), 1.0f, FColor(0xF9, 0xEB, 0xDB, 0xFF), 0.45f, 1.0f, 0.0f, true},
     {TEXT("tag"), FColor(0x06, 0x16, 0x23, 0xFF), 1.0f, FColor(0x00, 0x00, 0x00, 0xFF), 0.0f, 0.0f, 0.0f, true},
-    {TEXT("toast"), FColor(0x06, 0x16, 0x23, 0xFF), 0.92f, FColor(0xF9, 0xEB, 0xDB, 0xFF), 0.45f, 1.0f, 0.0f, true},
+    {TEXT("toast"), FColor(0x06, 0x16, 0x23, 0xFF), 0.92f, FColor(0xF9, 0xEB, 0xDB, 0xFF), 0.85f, 1.0f, 0.0f, true},
     {TEXT("toast.warning"), FColor(0x06, 0x16, 0x23, 0xFF), 0.92f, FColor(0xE8, 0x81, 0x2C, 0xFF), 1.0f, 2.0f, 0.0f, true},
 };
 inline constexpr int32 kNumSkins = 29;
