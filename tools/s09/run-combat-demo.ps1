@@ -1024,6 +1024,11 @@ function Invoke-CombatDemo {
         foreach ($exitFrame in @(Get-ChildItem -LiteralPath (Join-Path $Script:Staging $side) -Filter 's09-exit-*.png' -ErrorAction SilentlyContinue | Sort-Object Name)) {
           $publishNames += (Join-Path $side $exitFrame.Name)
         }
+        # VS-6 F2 capture hook (-S08FxShots / -S08ExitShots, ВР-VS6-19): the frozen FX frames s09-fx<NN>-*.png (hit flash,
+        # star, defense rim, embers, vortex, arc, heal); published when written; not gated
+        foreach ($fxFrame in @(Get-ChildItem -LiteralPath (Join-Path $Script:Staging $side) -Filter 's09-fx*.png' -ErrorAction SilentlyContinue | Sort-Object Name)) {
+          $publishNames += (Join-Path $side $fxFrame.Name)
+        }
         # VS-3 SC-01 (ВР-SC14, -ScreenShots): the UI-SCR-<id>-<state>.png frames of the client; published when written
         if ($ScreenShots) {
           foreach ($scrFrame in @(Get-ChildItem -LiteralPath (Join-Path $Script:Staging $side) -Filter 'UI-SCR-*.png' -ErrorAction SilentlyContinue | Sort-Object Name)) {

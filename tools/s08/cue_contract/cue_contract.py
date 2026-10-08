@@ -1363,6 +1363,10 @@ ABILITY_MS = {"contact": 454, "contact_reduced": 100, "minus": 60, "hp": 80, "fa
               "tolerance": 17}
 
 
+HIT_DUE_RE = re.compile(r"CUE sound id=CUE-011 point=hit subject=(?P<subject>\S+) seq=(?P<seq>-?\d+) t=(?P<t>\d+) "
+                        r".*?\bdue=(?P<due>\d+)")
+
+
 def check_ability(lines, cue_starts=()):
     """A1 (VS-6 F3 FX-30, ВР-FX11): постановка взгляда Medusa `CUE ability …` — одна на seq, этапы start → contact →
     minus → hp → [fall] → end; contact = start + 454 (reduced motion + 100), «−N» +60, HP +80, падение +450 тогда и только
@@ -1387,6 +1391,11 @@ def check_ability(lines, cue_starts=()):
     shows = {}
     for inst in cue_starts:
         shows.setdefault(inst["key"], inst)
+    hit_due = {}  # (subject, seq) -> (t, due) of the CUE-011 hit sound (ВР-VS6-49)
+    for raw in lines:
+        m = HIT_DUE_RE.search(raw)
+        if m:
+            hit_due.setdefault((m.group("subject"), m.group("seq")), (int(m.group("t")), int(m.group("due"))))
     tol = ABILITY_MS["tolerance"]
     summary = {"ability_sets": 0, "ability_cut": 0}
     for seq in order:
@@ -1432,7 +1441,13 @@ def check_ability(lines, cue_starts=()):
             errors.append(("A1", "seq %s: CUE-014 героя %s не в кадр start" % (seq, st["fighter"])))
         if int(st["damage"]) > 0:
             s11 = shows.get(("CUE-011", st["target"], seq))
-            if s11 is None or s11["t"] != c["_t"]:
+            # VS-6 Frames (ВР-VS6-49): the stage line carries the due time of the contact, the CUE line the frame that
+            # showed it - a live client presents in the first tick at or after the due (30 FPS: up to a frame; a
+            # HighResShot capture hitch: longer). The contact frame is proven by the hit sound of that CUE-011 being
+            # dispatched for the contact (due = contact t) in the same tick (t = the CUE line's t).
+            due_ok = s11 is not None and s11["t"] >= c["_t"] and \
+                hit_due.get((st["target"], seq)) == (s11["t"], c["_t"])
+            if s11 is None or (s11["t"] != c["_t"] and not due_ok):
                 errors.append(("A1", "seq %s: CUE-011 цели %s не в кадр контакта" % (seq, st["target"])))
     return errors, summary
 

@@ -624,6 +624,19 @@ class AbilityStageTests(unittest.TestCase):
         self.assertEqual(self.codes(self.trace(lethal=1))[0], ["A1"])                           # lethal without a fall
         self.assertEqual(self.codes(self.trace(cue11=1460))[0], ["A1"])                         # CUE-011 off the contact
 
+    def test_live_tick_after_the_contact_due(self):
+        # VS-6 Frames (ВР-VS6-49): a live 30 FPS client shows CUE-011 in the first tick at or after the contact due; the
+        # hit sound of that CUE-011 carries due = contact t in the same tick - that is the contact frame
+        def with_sound(t, due):
+            lines = self.trace(cue11=t)
+            lines.insert(4, "CUE sound id=CUE-011 point=hit subject=f-1-sk0 seq=40 t=%d event_t=%d dt=0 class=SFX "
+                            "sound=SW_CMB_HIT_MAGIC_01 gain=0.80 result=played bank=CMB-HIT-MAGIC due=%d" % (t, t, due))
+            return [c for c in self.codes(lines)[0] if c == "A1"]
+        self.assertEqual(with_sound(1466, 1454), [])       # one 30 FPS tick late, dispatched for the contact
+        self.assertEqual(with_sound(1651, 1454), [])       # a capture hitch (HighResShot), still the contact's dispatch
+        self.assertEqual(with_sound(1466, 1440), ["A1"])   # dispatched for another due
+        self.assertEqual(with_sound(1440, 1454), ["A1"])   # before the contact
+
     def test_cli_min_ability(self):
         import tempfile
         with tempfile.NamedTemporaryFile("w", suffix=".log", delete=False, encoding="utf-8") as f:
