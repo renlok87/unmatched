@@ -625,7 +625,7 @@ void UUmScreenGameOver::CollectShotLines(TArray<FString>& Out) const {
   // the bbox of what shows: the strip on the board, the modal otherwise (04 §4.5)
   const FBox2D R = Model.bBoard ? StripRectSu() : ModalRectSu();
   const FS08ScreenRect Rect(R.Min.X * PxPerSu, R.Min.Y * PxPerSu, R.Max.X * PxPerSu, R.Max.Y * PxPerSu);
-  Out.Add(S08ArtHud::FormatWidgetLineEx(UiId, TEXT("umg"), *GetScreenState().ToString(), FString(), Rect, bVisible && !Rect.IsEmpty(),
+  Out.Add(S08ArtHud::FormatWidgetLineEx(UiId, TEXT("umg"), *ShotStateName(), FString(), Rect, bVisible && !Rect.IsEmpty(),
                                         bVisible, SourceName(),
                                         FString::Printf(TEXT("modal=%d class=%s alpha=%.2f%s"), Model.bBoard ? 0 : 1, bClassS ? TEXT("S") : TEXT("L"),
                                                         GetAlpha(), *ShotExtra())));

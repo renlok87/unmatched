@@ -72,6 +72,9 @@ class UNMATCHED_API UUmScreenBase : public UUserWidget {
   const FString& GetUiId() const { return UiId; }
   void SetScreenState(FName InState) { ScreenState = InState; }
   FName GetScreenState() const { return ScreenState; }
+  /** ВР-VS7-76: the state as the gate lines and evidence file names spell it - lower case (a packaged build names an
+   *  FName by its first spelling in the name table, "Board", "Connect"; the editor by ours). */
+  FString ShotStateName() const { return ScreenState.ToString().ToLower(); }
   virtual bool IsModal() const { return false; }
 
   /** The canvas (su), the class and px per su of the window: the frame centres, the margins follow the class. */

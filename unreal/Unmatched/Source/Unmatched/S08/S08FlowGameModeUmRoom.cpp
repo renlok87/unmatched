@@ -589,7 +589,7 @@ void AS08FlowGameMode::TickUmRoom(bool bShowing) {
     } else if (Insp && Insp->IsOpen()) {
       Sub = Insp->GetAlpha() >= 1.0f ? TEXT("deck") : TEXT("");
     } else if (M.Heroes.Num() > 0 && M.Heroes.ContainsByPredicate([](const FUmHeroCardModel& C) { return C.bDetails; })) {
-      Sub = FString(M.bHost ? TEXT("host-") : TEXT("guest-")) + Scr->GetScreenState().ToString();
+      Sub = FString(M.bHost ? TEXT("host-") : TEXT("guest-")) + Scr->ShotStateName();
       if (M.Heroes.ContainsByPredicate([](const FUmHeroCardModel& C) { return C.State == EUmHeroCardState::Taken; })) Sub += TEXT("-taken");
       if (M.bVsAi) Sub += TEXT("-ai");
       if (M.BoardId == UmLobby::SarpedonId) Sub += TEXT("-sarpedon");

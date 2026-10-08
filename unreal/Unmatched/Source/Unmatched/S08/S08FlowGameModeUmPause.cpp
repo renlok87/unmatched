@@ -381,7 +381,7 @@ void AS08FlowGameMode::TickUmPause(const FString& Route) {
     if (R.Shots == 1) {
       FString Sub;
       if (R.bOpen && P->GetAlpha() >= 1.0f) {
-        Sub = FString(UmPause::ContextName(R.Context)) + TEXT("-") + (bConfirm ? FString(TEXT("confirm")) : P->GetScreenState().ToString());
+        Sub = FString(UmPause::ContextName(R.Context)) + TEXT("-") + (bConfirm ? FString(TEXT("confirm")) : P->ShotStateName());
         if (bConfirm && Dlg->GetAlpha() < 1.0f) Sub.Reset();
         if (!Sub.IsEmpty()) {
           if (M.DefenseSeconds >= 0) Sub += TEXT("-defense");
