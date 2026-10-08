@@ -132,6 +132,7 @@
   `screens.boot.stage.boards`, `screens.boot.error.server`, `common.btn.retry`.
 - **Звук:** `UI-BOOT-LOGO` по готовности, затем `MUS-MENU`.
 - **Гейт:** `SHOT widget id=UI-SCR-BOOT state=loading|error`.
+- **Дельта VS-7 S1** (`evidence/VISUAL/SC-03`…`SC-05`, по делегированию): refresh-токен живёт только в памяти (GD-038), поэтому этап сессии на запуске ведёт в LOGIN через 1 с, а каталог (`heroList` → `boardList`) и проверка своей партии (`myGames(IN_PROGRESS)`) — второй проход BOOT после входа (ВР-VS7-01, -02); этап героев до ответа — `screens.boot.stage.heroes.wait` (1/3); пройденный этап держит подпись ≥ 400 мс (ВР-VS7-03); «Вернуться в партию» — путь гостя IN_PROGRESS (ВР-VS7-06). Трасса `SHOT … state=loading|error|resume stage= done=<n>/3 retrying= resuming= build=`.
 
 ### 1.2 LOGIN — `UI-SCR-LOGIN`
 
@@ -156,6 +157,7 @@
   `.error.server`.
 - **Звук:** `UI-LOGIN-OK`, `UI-LOGIN-ERR`, `UI-BTN-CLICK`.
 - **Гейт:** `SHOT widget id=UI-SCR-LOGIN state=empty|busy|error`.
+- **Дельта VS-7 S1** (`evidence/VISUAL/SC-06`, `SC-07`, по делегированию): состояние `input` (оба поля заполнены) в трассе; пароль в игре — всегда 8 точек фиксированной длины (ВР-VS7-05); ошибка по коду бэкенда: `UNAUTHENTICATED`, `BAD_USER_INPUT`, `BAD_REQUEST`, `FORBIDDEN` — учётные данные, остальное (нет ответа `PARSE`, 5xx, лимит) — сервер (ВР-VS7-09); `-S08Auto` не показывает форму (ВР-VS7-08).
 
 ### 1.3 LOBBY — `UI-SCR-LOBBY`
 
