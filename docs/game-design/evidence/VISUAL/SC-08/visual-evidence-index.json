@@ -1,0 +1,39 @@
+{
+ "schema": "unmatched.visual-evidence-index/1",
+ "id": "SC-08",
+ "date": "2026-10-08",
+ "rule": "ВР-VS4-01: images with card scans / backs / avatars / board art stay in scraped-data (gitignored); every LOBBY frame shows the two map thumbnails",
+ "root": "scraped-data/derived/visual-evidence (relative to the checkout; copies in the main checkout and C:/tmp/wt-visual)",
+ "source": "VS-7 S2: UnrealEditor -game (editor build, worktree C:/tmp/wt-visual), one client on the main backend :3000, -S08MenuDrive=hold+login -S08LobbyDrive=<plan> -S08ScreenShots; runs C:/tmp/visual/VS7/runs/<run>",
+ "status": "editor-build, not acceptance (the packaged set G with RENDER and the sheets belong to the Frames step)",
+ "files": [
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-08/loading-720p-150.png",
+   "sha256": "b38cf1683b5bc8da9f1b16a603e0a2f54ccff353dc8d842896dbf20366303584",
+   "bytes": 418018,
+   "run": "s2b",
+   "shows": "loading: three HB-47 skeleton rows while availableGames is held 12 s (class S, 720p 150 %)"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-08/list-1080p-100.png",
+   "sha256": "bd63c0e0838043f3f7bb28f92e05f87f40518cb5c76207a090ac71cfc1284f9d",
+   "bytes": 988718,
+   "run": "s2f",
+   "shows": "list: one live room of another client (Veteran, Sarpedon original), 1080p 100 %"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-08/list-720p-150.png",
+   "sha256": "972dbc230e091c3a829ecf73559ee540f7ee9071461dd01b6406fccc8e1dba43",
+   "bytes": 424218,
+   "run": "s2b",
+   "shows": "list: class S, 720p 150 %"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-08/list-720p-100.png",
+   "sha256": "1b6fbc7e6a25a3ea3b936dff00e6da97438cc6680c68bfa0a55f4f504a7e61ff",
+   "bytes": 464771,
+   "run": "s2c",
+   "shows": "list: 720p 100 % (canvas 1707 x 960 su)"
+  }
+ ]
+}

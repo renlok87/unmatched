@@ -1,0 +1,39 @@
+{
+ "schema": "unmatched.visual-evidence-index/1",
+ "id": "SC-11",
+ "date": "2026-10-08",
+ "rule": "ВР-VS4-01: images with card scans / backs / avatars / board art stay in scraped-data (gitignored); every LOBBY frame shows the two map thumbnails",
+ "root": "scraped-data/derived/visual-evidence (relative to the checkout; copies in the main checkout and C:/tmp/wt-visual)",
+ "source": "VS-7 S2: UnrealEditor -game (editor build, worktree C:/tmp/wt-visual), one client on the main backend :3000, -S08MenuDrive=hold+login -S08LobbyDrive=<plan> -S08ScreenShots; runs C:/tmp/visual/VS7/runs/<run>",
+ "status": "editor-build, not acceptance (the packaged set G with RENDER and the sheets belong to the Frames step)",
+ "files": [
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-11/code-partial-720p-100.png",
+   "sha256": "4e6447a96f402eb831a7e62ad48aef1efae6121fc034bdab1ef24adceacc161b",
+   "bytes": 466662,
+   "run": "s2c",
+   "shows": "code: four characters of the listed room's code, «Войти» disabled with «Введите 6 символов», «Создать» primary"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-11/code-full-720p-100.png",
+   "sha256": "a692fa0cbd0f90dcbbb7004a245ef2af82744ace1fba36435a4f78c27fa7e02e",
+   "bytes": 466296,
+   "run": "s2c",
+   "shows": "code-full: six characters, the code «Войти» primary with the keyboard ring, «Создать» normal"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-11/code-error-notfound-1080p-100.png",
+   "sha256": "eda72a6d8cc0c9b5790f1263ba79db29867212c5d399b12f8cbffe306b53501d",
+   "bytes": 988834,
+   "run": "s2a",
+   "shows": "code-error: a FINISHED room's real code -> «Игра не найдена», the code kept"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-11/code-partial-1080p-100.png",
+   "sha256": "26e11490e42a58813b476755bcceef7cf74f897897af80199821509851174737",
+   "bytes": 990996,
+   "run": "s2f",
+   "shows": "code: 1080p 100 %"
+  }
+ ]
+}

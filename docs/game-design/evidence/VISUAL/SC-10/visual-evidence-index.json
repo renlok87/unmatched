@@ -1,0 +1,25 @@
+{
+ "schema": "unmatched.visual-evidence-index/1",
+ "id": "SC-10",
+ "date": "2026-10-08",
+ "rule": "ВР-VS4-01: images with card scans / backs / avatars / board art stay in scraped-data (gitignored); every LOBBY frame shows the two map thumbnails",
+ "root": "scraped-data/derived/visual-evidence (relative to the checkout; copies in the main checkout and C:/tmp/wt-visual)",
+ "source": "VS-7 S2: UnrealEditor -game (editor build, worktree C:/tmp/wt-visual), one client on the main backend :3000, -S08MenuDrive=hold+login -S08LobbyDrive=<plan> -S08ScreenShots; runs C:/tmp/visual/VS7/runs/<run>",
+ "status": "editor-build, not acceptance (the packaged set G with RENDER and the sheets belong to the Frames step)",
+ "files": [
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-10/create-ai-1080p-100.png",
+   "sha256": "96a3635ad18794449bf47031fee4b43f245659958714f14b4b284bcd5bcb8dff",
+   "bytes": 987935,
+   "run": "s2d2",
+   "shows": "create-ai: «Против ИИ» selected, «Соперник — ИИ: AI Bot», Sarpedon selected"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-10/busy-ai-1080p-100.png",
+   "sha256": "bccb4238111d16745ca9bf94dc782a2dcb0d09f21edbe5b6006e759a38655d75",
+   "bytes": 990132,
+   "run": "s2d2",
+   "shows": "busy of the VS_AI create (the room went to ROOM: VS_AI on c7fa64a26c29a0835f2383e63, game(id))"
+  }
+ ]
+}

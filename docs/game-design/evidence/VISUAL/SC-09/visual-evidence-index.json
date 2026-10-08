@@ -1,0 +1,32 @@
+{
+ "schema": "unmatched.visual-evidence-index/1",
+ "id": "SC-09",
+ "date": "2026-10-08",
+ "rule": "ВР-VS4-01: images with card scans / backs / avatars / board art stay in scraped-data (gitignored); every LOBBY frame shows the two map thumbnails",
+ "root": "scraped-data/derived/visual-evidence (relative to the checkout; copies in the main checkout and C:/tmp/wt-visual)",
+ "source": "VS-7 S2: UnrealEditor -game (editor build, worktree C:/tmp/wt-visual), one client on the main backend :3000, -S08MenuDrive=hold+login -S08LobbyDrive=<plan> -S08ScreenShots; runs C:/tmp/visual/VS7/runs/<run>",
+ "status": "editor-build, not acceptance (the packaged set G with RENDER and the sheets belong to the Frames step)",
+ "files": [
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-09/create-marmoreal-1080p-100.png",
+   "sha256": "c0bb2185d3df041a4ba55a36e6c52dacd78943e192addbe569dee5ab29ee9ff8",
+   "bytes": 986290,
+   "run": "s2a",
+   "shows": "create: 1v1, Marmoreal original selected (the default), «Создать» primary"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-09/create-sarpedon-1080p-100.png",
+   "sha256": "01d927ff0eea310060201576e1f8f6f5ef4d2de90fcd81c8496d5adef4604fa2",
+   "bytes": 985372,
+   "run": "s2a",
+   "shows": "create: Sarpedon original selected"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-09/busy-1080p-100.png",
+   "sha256": "bccb4238111d16745ca9bf94dc782a2dcb0d09f21edbe5b6006e759a38655d75",
+   "bytes": 990132,
+   "run": "s2d2",
+   "shows": "busy: «Создаём…» with the 32 su spinner, createGame held 3 s; chips and tiles keep their state"
+  }
+ ]
+}

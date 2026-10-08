@@ -198,6 +198,7 @@
   `.create.mode.ai`, `.create.board`, `.create.submit`, `.code.title`, `.code.submit`, `.recover`.
 - **Звук:** `UI-BTN-CLICK`, `UI-TOGGLE`, `UI-ROOM-CREATE`, `UI-REJECT`; музыка `MUS-MENU`.
 - **Гейт:** `SHOT widget id=UI-SCR-LOBBY state=loading|list|empty|error`.
+- **Дельта VS-7 S2** (`evidence/VISUAL/SC-08`…`SC-13`, по делегированию): LOBBY открывается после второго прохода BOOT (стадия `Login`) и в стадии `Lobby`, не в `-S08Auto` (ВР-VS7-14); список — `availableGames(mode: ONE_V_ONE)` без своей комнаты (ВР-VS7-17), `createGame` сбрасывает кеш списка (ВР-VS7-15); клиент: `CreateRoom(Mode, BoardId)`, `JoinRoomById`, `FetchAvailableGames`; «Вернуться в мою партию» — своя партия IN_PROGRESS, как SC-05 (ВР-VS7-18); отказ входа: «заполнена» → `why.room.full` / «Комната заполнена», иначе `why.room.started` / «Игра не найдена» (ВР-VS7-16). Трасса `SHOT … state=loading|list|empty|error|create|code|code-error list= rows= unavailable= mode= board= busy= code=<n> codeError= recover= primary=` (без кода комнаты), `LOBBY create mode=<mode> board=<id>`.
 
 ### 1.4 ROOM — `UI-SCR-ROOM`
 
