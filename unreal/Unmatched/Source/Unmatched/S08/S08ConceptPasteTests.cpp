@@ -827,6 +827,13 @@ bool FS08ConceptPasteShippedTest::RunTest(const FString&) {
                  FVector2D(L.Loc.X, L.Loc.Y).Equals(FVector2D(-600.0, 139.9), 0.11));
         continue;
       }
+      // VS-8 E1 (by delegation): lantern-left in front of its lantern head (EN-21, VR-VS8-43: from behind its post, the
+      // painted glow on the post and the leaves), fire-fort 27 uu forward off the fort wall (EN-22, VR-VS8-45)
+      if (L.Id == TEXT("lantern-left") || L.Id == TEXT("fire-fort")) {
+        const FVector2D Want2 = L.Id == TEXT("lantern-left") ? FVector2D(-549.0, 30.0) : FVector2D(-492.3, -400.0);
+        TestTrue(L.Id + TEXT(": at its VS-8 E1 point (XY)"), FVector2D(L.Loc.X, L.Loc.Y).Equals(Want2, 0.11));
+        continue;
+      }
       for (const FDetail& D : Details) {
         if (L.Id == D.Id) {
           TestTrue(L.Id + TEXT(": on its design detail (XY)"),

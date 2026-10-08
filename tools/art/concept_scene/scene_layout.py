@@ -62,7 +62,8 @@ OVERLAY_SCHEMA = "unmatched.env-layout-overlay/1"
 SCENE_MESHES = ("Island", "Ship", "Fort", "Palisade", "Piles", "FrameBand", "Cascade", "CascadeFoam")
 FX_PLAN = HERE / "fx-plan.sarpedon.json"  # track B (F5 fires, F4 mist / spray); merged when present
 FX_PLAN_SCHEMA = "unmatched.concept-scene-fx/1"
-MATERIAL_RE = re.compile(r"^/Game/EnvMaps/Sarpedon/Scene/MI_EnvScene_(Proj_[A-Za-z]+|LanternHead)$")
+MATERIAL_RE = re.compile(r"^(/Game/EnvMaps/Sarpedon/Scene/MI_EnvScene_(Proj_[A-Za-z]+|LanternHead)"
+                         r"|/Game/EnvKit/ConceptPaste/MI_EnvCP_CannonIron_Port)$")  # VS-8 E1 EN-23: cannon-1
 SCENE_MESH_RE = re.compile(r"^/Game/EnvMaps/Sarpedon/Scene/SM_Env_S_[A-Za-z]+$")
 
 
@@ -295,6 +296,9 @@ def build(base: dict, meshes: dict):
     for j, px in enumerate(Rk["extraPx"]):
         Q = ground.hit_px(*px)
         s = rng.uniform(*Rk["wetScale"])
+        if f"rock-x{j}" in set(Rk.get("dropIds") or []):  # VS-8 E1 EN-24: not placed; the same rng draws (yaw)
+            rng.uniform(0, 360)
+            continue
         add.append({"id": f"rock-x{j}", "mesh": "/Game/EnvKit/Fab/Sarpedon/SM_EnvFab_RockWet",
                     "loc": [r2(Q[0]), r2(Q[1]), r2(Q[2] + 83.5 * s * Rk["wetBury"])],
                     "yawDeg": r2(rng.uniform(0, 360)), "scale": round(float(s), 3), "castShadow": True,
@@ -302,6 +306,7 @@ def build(base: dict, meshes: dict):
     # the painted boulders on the plateau (grey, low chroma blobs inside rocksPainted.zonesPx): a rock prop on each
     RP = Rk["painted"]
     n_painted = 0
+    drop = set(Rk.get("dropIds") or [])  # VS-8 E1 EN-24: the smooth pack stones at the W / N frame edges
     for j, (cx, cy, rpx) in enumerate(painted_rock_discs(RP)):
         try:
             Q = ground.hit_px(cx, cy + rpx * 0.5)
@@ -310,6 +315,9 @@ def build(base: dict, meshes: dict):
         depth = float((Q - cam.pos) @ cam.fwd)
         r_uu = rpx * depth / cam.f_px
         s = min(max(r_uu / RP["meshRadiusUU"], Rk["wetScale"][0]), RP["maxScale"])
+        if f"rock-p{j:02d}" in drop:  # not placed; the same rng draw (yaw) keeps the other stones as they were
+            rng.uniform(0, 360)
+            continue
         add.append({"id": f"rock-p{j:02d}", "mesh": "/Game/EnvKit/Fab/Sarpedon/SM_EnvFab_RockWet",
                     "loc": [r2(Q[0]), r2(Q[1]), r2(Q[2] + 83.5 * s * RP["bury"])],
                     "yawDeg": r2(rng.uniform(0, 360)), "scale": round(float(s), 3), "castShadow": True,
@@ -408,8 +416,11 @@ def build(base: dict, meshes: dict):
             d = np.array([math.cos(math.radians(yaw)), math.sin(math.radians(yaw)), 0.0])
             P = M + d * (out - reach * s)
         loc = P - rot_yaw(axis * s, yaw)
-        add.append({"id": cid, "mesh": "/Game/EnvKit/ConceptPaste/SM_EnvCP_Cannon", "loc": [r2(v) for v in loc],
-                    "yawDeg": yaw, "scale": round(s, 3), "castShadow": True})
+        cp = {"id": cid, "mesh": "/Game/EnvKit/ConceptPaste/SM_EnvCP_Cannon", "loc": [r2(v) for v in loc],
+              "yawDeg": yaw, "scale": round(s, 3), "castShadow": True}
+        if (D.get("cannonMaterials") or {}).get(cid):  # VS-8 E1 EN-23: cannon-1 on the lighter port iron
+            cp["material"] = D["cannonMaterials"][cid]
+        add.append(cp)
         placed[cid] = {"barrelWorld": [r2(v) for v in P], "scale": round(s, 3), "port": pt["centre"]}
     bd = det["banner-ship"]
     ray = cam.rays(np.array(float(bd["px"][0])), np.array(float(bd["px"][1])))

@@ -303,6 +303,10 @@ class ShippedProfile(unittest.TestCase):
         # P9 tune: the brazier point stands over track A's brazier bowl (overlay conceptScene.lights.reference
         # fire-brazier (-577.3, 139.9)), 23 uu further west so its 180 uu pool stays off the map cells
         paste["fire-brazier"] = [-600.0, 139.9, 90.0]
+        # VS-8 E1: lantern-left in front of its head (EN-21, ВР-VS8-43), fire-fort 27 uu forward off the fort wall
+        # (EN-22, ВР-VS8-45)
+        paste["lantern-left"] = [-549.0, 30.0, 190.0]
+        paste["fire-fort"] = [-492.3, -400.0, 45.0]
         for lt in self.lit["lights"]:
             self.assertIn(lt["id"], paste)
             self.assertLess(math.dist(lt["loc"][:2], paste[lt["id"]][:2]), 0.01, lt["id"])

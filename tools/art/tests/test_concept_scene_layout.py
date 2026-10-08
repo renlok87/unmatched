@@ -81,7 +81,9 @@ class SceneLayout(unittest.TestCase):
         ban = add["banner-ship"]
         self.assertTrue(ban["mesh"].endswith("SM_Env_S_Banner"))
         length = float(ban["scale"]) * CS.params()["banner"]["lengthUU"]
-        self.assertTrue(300.0 <= length <= 325.0, length)
+        # VS-8 E1 EN-20 (ВР-VS8-42): 460 uu (P9: 320)
+        self.assertAlmostEqual(length, CS.params()["layout"]["details"]["bannerLengthUU"], delta=1.0)
+        self.assertTrue(440.0 <= length <= 480.0, length)
         for p in trees + rocks + [x for x in add.values() if x["id"].startswith(("barrel-", "crate-", "coil-", "bush-"))]:
             self.assertRegex(p.get("material", ""), r"^/Game/EnvMaps/Sarpedon/Scene/MI_EnvScene_Proj_[A-Za-z]+$", p["id"])
         for p in trees:

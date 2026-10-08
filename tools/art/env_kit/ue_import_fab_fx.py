@@ -202,8 +202,9 @@ FX_SPECS: list[dict] = [
         "tune": {"simTarget": "cpu", "emitterDeterminism": True, "emitterSeedBase": 52500,
                  "disableLightRenderers": True, "disableComponentRenderers": True,
                  # P9 tune i1 (UE frames: the brazier read as a red blob - the core was hidden in the tongues):
-                 # k 0.22 -> 0.3, spawn 0.6 -> 0.8, colour (2.6, 1.9, 0.9) -> a hotter yellow-white (4.2, 3.2, 1.5)
-                 "constants": _fire_layer_rules(0.3, 0.8, color=(4.2, 3.2, 1.5)), "user": {}},
+                 # k 0.22 -> 0.3, spawn 0.6 -> 0.8, colour (2.6, 1.9, 0.9) -> a hotter yellow-white (4.2, 3.2, 1.5);
+                 # VS-8 E1 EN-22: a yellower core (4.6, 3.9, 1.4) - smaller in the layout (fx-plan scale x0.8)
+                 "constants": _fire_layer_rules(0.3, 0.8, color=(4.6, 3.9, 1.4)), "user": {}},
         "estimate": {"kind": "emitters", "emitters": _FIRE4_EMITTERS, "spawnMul": 0.8},
     },
     {
@@ -215,9 +216,15 @@ FX_SPECS: list[dict] = [
         "system": {"determinism": True, "random_seed": 52022, "warmup_time": 0.0},
         "tune": {"simTarget": "cpu", "emitterDeterminism": True, "emitterSeedBase": 52600,
                  "disableLightRenderers": True, "disableComponentRenderers": True,
-                 # P9 tune i1: colour x2.0 -> x1.4 (the orange tongues dominated the core)
-                 "constants": _fire_layer_rules(0.15, 0.5, color_mul=1.4), "user": {}},
-        "estimate": {"kind": "emitters", "emitters": _FIRE1_EMITTERS, "spawnMul": 0.5},
+                 # P9 tune i1: colour x2.0 -> x1.4 (the orange tongues dominated the core);
+                 # VS-8 E1 EN-22 (K1: a red-orange lump, not licks): the tongues rise x1.4 faster and live x1.25 longer
+                 # (taller, the sprite size and width unchanged)
+                 "constants": _fire_layer_rules(0.15, 0.5, color_mul=1.4, extra=[
+                     {"match": "*.AddVelocity.Velocity Speed Scale", "mul": 1.4},
+                     {"match": "*.InitializeParticle.Lifetime*", "mul": 1.25}]), "user": {}},
+        "estimate": {"kind": "emitters", "emitters": {k: {"spawnRate": v["spawnRate"],
+                                                          "lifetime": (v["lifetime"][0] * 1.25, v["lifetime"][1] * 1.25)}
+                                                      for k, v in _FIRE1_EMITTERS.items()}, "spawnMul": 0.5},
     },
     {
         "name": "NS_Env_FireSmoke",

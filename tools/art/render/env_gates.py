@@ -944,6 +944,67 @@ def streams(p, roi=STREAMS_ROI_SARPEDON_C0, hi=1.4, lo=0.8, min_width=10) -> dic
             "minWidth": min_width, "N": len(out), "streams": out}
 
 
+# VS-8 E1 EN-24: the pack stones (SM_EnvFab_RockWet) within ~100 uu of the W / N frame edges, measured on K2 x1.6
+STONE_IDS = ("rock-p00", "rock-p02", "rock-p04", "rock-p08", "rock-p09", "rock-p11",  # west
+             "rock-p01", "rock-p03", "rock-p05", "rock-p06", "rock-p07", "rock-p10", "rock-x4")  # north
+STONE_BOX = ((-137.13, -117.42, -83.51), (137.13, 136.7, 123.12))  # the pack bounds (fab-picks.json RockWet)
+STONE_BAND_UU = 120.0
+SCENE_LAYOUT = REPO / "unreal" / "Unmatched" / "Config" / "ArtBoards" / "EnvLayouts" / "sarpedon.scene.layout.json"
+
+
+def stone_hull(cam, p) -> list:
+    (x0, y0, z0), (x1, y1, z1) = STONE_BOX
+    s, a = float(p["scale"]), math.radians(float(p.get("yawDeg", 0.0)))
+    c, si = math.cos(a), math.sin(a)
+    pts = []
+    for x in (x0, x1):
+        for y in (y0, y1):
+            for z in (z0, z1):
+                X, Y = x * s, y * s
+                pts.append([p["loc"][0] + X * c - Y * si, p["loc"][1] + X * si + Y * c, p["loc"][2] + z * s])
+    return hull(cam.project(pts))
+
+
+def stones(p, without=None, layout=None, diff_thr=12.0, erode=2) -> dict:
+    """EN-24 metric on a K2 frame. Bands: 0..STONE_BAND_UU outside the W (x < -FRAME_HALF.x) and N (y < -FRAME_HALF.y)
+    frame edges at z 0, projected with the frame's camera. Stone pixels = the projected pack bounds of the STONE_IDS
+    props of the layout inside the bands, and (with --without, the same view with those stones removed) only the
+    pixels that differ by > diff_thr levels, eroded by `erode` px (no silhouette edge). Island = band pixels outside the
+    stone hulls dilated by 6 px. detail = mean |Laplacian(Y)| / mean Y (Y = Rec.709 luma of the sRGB values); pass =
+    no stone pixels, or detail ratio stone / island >= 0.8 and no stone pixel with Y >= 230."""
+    p = Path(p)
+    view = p.name[len("bench-"):-len("-1920x1080.png")]
+    cam = shots(p.parent)[view][1]
+    a = load(p)
+    hw = a.shape[1], a.shape[0]
+    fx, fy = FRAME_HALF
+    band = ms_poly_mask(hw, rect_poly(cam, -fx - STONE_BAND_UU, -fy - STONE_BAND_UU, -fx, fy))
+    band |= ms_poly_mask(hw, rect_poly(cam, -fx - STONE_BAND_UU, -fy - STONE_BAND_UU, fx, -fy))
+    L = json.loads(Path(layout or SCENE_LAYOUT).read_text(encoding="utf-8"))
+    props = [q for q in L["props"]["add"] if q["id"] in STONE_IDS]
+    hulls = np.zeros(a.shape[:2], bool)
+    for q in props:
+        hulls |= ms_poly_mask(hw, stone_hull(cam, q))
+    rock = hulls & band
+    if without:
+        rock &= np.abs(a - load(without)).max(-1) > diff_thr
+    if erode:
+        rock = ndimage.binary_erosion(rock, iterations=erode)
+    island = band & ~ndimage.binary_dilation(hulls, iterations=6)
+    Y = a @ W709
+    lap = np.abs(ndimage.laplace(Y))
+
+    def detail(m):
+        return round(float(lap[m].mean() / max(Y[m].mean(), 1e-6)), 4) if m.any() else None
+    dr, di = detail(rock), detail(island)
+    glint = int((Y[rock] >= 230).sum())
+    ratio = round(dr / di, 3) if dr is not None and di else None
+    return {"png": str(p), "without": str(without) if without else None, "stones": [q["id"] for q in props],
+            "stonePx": int(rock.sum()), "islandPx": int(island.sum()), "detailStone": dr, "detailIsland": di,
+            "ratio": ratio, "glintPx": glint,
+            "pass": bool(rock.sum() == 0 or (ratio is not None and ratio >= 0.8 and glint == 0))}
+
+
 def hsv_deg(a):
     """sRGB 0..255 -> (hue deg 0..360, saturation, value 0..1)."""
     rgb = a / 255.0
@@ -1157,6 +1218,10 @@ def main(argv=None) -> int:
     p.add_argument("png")
     p.add_argument("--roi", type=parse_box, action="append", help="default: fire-fort / fire-brazier from the trace")
     p.add_argument("--min-sat", type=float, default=0.0, help="also HSV saturation >= this (default 0: EN-05 mask)")
+    p = sub.add_parser("stones")
+    p.add_argument("png")
+    p.add_argument("--without", help="the same view with the STONE_IDS props removed (exact stone mask)")
+    p.add_argument("--layout", help="the scene layout the frame was taken with (default: the worktree file)")
     p = sub.add_parser("sheet")
     p.add_argument("png", nargs="+")
     p.add_argument("--out", required=True)
@@ -1179,6 +1244,8 @@ def main(argv=None) -> int:
     elif a.cmd == "fire":
         rois = {f"roi{i}": r for i, r in enumerate(a.roi)} if a.roi else fire_rois(a.png)
         res = {"png": a.png, "fires": {k: fire(a.png, r, a.min_sat) for k, r in rois.items()}}
+    elif a.cmd == "stones":
+        res = stones(a.png, a.without, a.layout)
     else:
         res = sheet([Path(x) for x in a.png], Path(a.out), a.crop, a.label)
     txt = json.dumps(res, indent=1, default=float, ensure_ascii=False)

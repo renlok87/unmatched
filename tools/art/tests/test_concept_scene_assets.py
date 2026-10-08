@@ -131,6 +131,8 @@ class Manifest(unittest.TestCase):
         used = {p["material"] for p in lay["props"]["add"] if "material" in p}
         # P8.3: the lanterns' lit3d glass (a child of the P7c lantern MI, ue_scene_material.mi_plan "lanternHead")
         used.discard("/Game/EnvMaps/Sarpedon/Scene/MI_EnvScene_LanternHead")
+        # VS-8 E1 EN-23: cannon-1's port iron (a child of MI_EnvCP_CannonIron, ue_import_concept_paste.py)
+        used.discard("/Game/EnvKit/ConceptPaste/MI_EnvCP_CannonIron_Port")
         listed = {v["mi"] for v in MAN["looks"]}
         for v in MAN["looks"]:
             self.assertEqual(v["mi"], f"/Game/EnvMaps/Sarpedon/Scene/MI_EnvScene_Proj_{v['name']}")

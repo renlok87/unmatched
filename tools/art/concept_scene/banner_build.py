@@ -35,7 +35,10 @@ def build(B: dict):
     rod_r, rod_over, rod_clear = float(B["rodRadiusUU"]), float(B["rodOverhangUU"]), float(B["rodClearUU"])
     rng = np.random.default_rng(int(B["seed"]))
     jit = rng.uniform(0.35, 1.0, size=nu + 1)
-    hang = np.array([0.0, 0.0, -1.0])
+    # VS-8 E1 EN-20 (hangTiltDeg): the hang turned in the cloth plane towards local -Y (the layout yaw maps it along
+    # the hull towards the C0 / K1 camera side), so the cloth reads straight down the C0 screen like the painted one
+    tilt = math.radians(float(B.get("hangTiltDeg", 0.0)))
+    hang = np.array([0.0, -math.sin(tilt), -math.cos(tilt)])
     nrm = np.array([1.0, 0.0, 0.0])  # cloth faces +X (yaw 90 in the layout turns it to the K1 camera)
     V, UVv = [], []
     grid = np.zeros((nv + 1, nu + 1), int)
@@ -103,7 +106,7 @@ def build(B: dict):
     top = zc + rod_r
     V = V - np.array([0.0, 0.0, top])  # pivot = rod top centre
     mesh = CS.Mesh(NAME, V, F, UV, np.zeros(len(F), int), np.ones(len(F), bool), ["MI_EnvCP_Banner"], (0.0, 0.0, 0.0))
-    info = {"clothWidthUU": W, "clothLengthUU": L, "rodTopToHemUU": round(float(-V[:, 2].min()), 3), "triangles": int(len(F)), "hang": [0.0, 0.0, -1.0],
+    info = {"clothWidthUU": W, "clothLengthUU": L, "rodTopToHemUU": round(float(-V[:, 2].min()), 3), "triangles": int(len(F)), "hang": [round(float(v), 4) for v in hang],
             "uv": "u across, v 0 at the rail .. 1 at the hem (UE V down); rod at Blender V 1.04..1.06 (M_EnvCP_Banner contract)"}
     return mesh, info
 

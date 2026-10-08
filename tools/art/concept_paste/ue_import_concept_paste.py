@@ -152,6 +152,11 @@ CANNON_LOOK = {"vectors": {"RestAdjust": (0.0, 1.2, 0.0, 0.0)}, "scalars": {"Rou
 CANNON_TAG = "EnvMapsConceptCannon"
 CANNON_VERSION = "2"  # the mesh copy (unchanged since P7c)
 CANNON_MI_VERSION = "3"  # P10: the MI look alone
+# VS-8 E1 EN-23 (ВР-VS8-44): cannon-1 stands in the shade of its gun port (C0 barrel dL* p90 4.2 < 12): a child of
+# MI_EnvCP_CannonIron for it alone (tools/art/concept_scene/scene-params layout.details.cannonMaterials), V x1.6
+CANNON_PORT_MI = DETAIL_FOLDER + "/MI_EnvCP_CannonIron_Port"
+CANNON_PORT_LOOK = {"vectors": {"RestAdjust": (0.0, round(1.2 * 1.6, 4), 0.0, 0.0)}, "scalars": {}}
+CANNON_PORT_VERSION = "1"
 LINEAR_KEYS = ("Water", "Anim")  # VS-5 EN-07: T_<Name>_ConceptAnim = the AnimMask (linear masks)
 
 
@@ -543,6 +548,32 @@ def ensure_cannon(force: bool) -> dict:
     return out
 
 
+def ensure_cannon_port(force: bool) -> dict:
+    """VS-8 E1 EN-23: MI_EnvCP_CannonIron_Port = MI_EnvCP_CannonIron + CANNON_PORT_LOOK (idempotent via a version tag)."""
+    eal, mel = u.EditorAssetLibrary, u.MaterialEditingLibrary
+    parent = u.load_asset(CANNON_MI) if eal.does_asset_exist(CANNON_MI) else None
+    if parent is None:
+        return {"action": "skipped", "error": f"{CANNON_MI} missing"}
+    mi = u.load_asset(CANNON_PORT_MI) if eal.does_asset_exist(CANNON_PORT_MI) else None
+    tag = CANNON_PORT_VERSION + ":" + CANNON_MI_VERSION
+    if mi is not None and not force and eal.get_metadata_tag(mi, CANNON_TAG) == tag:
+        return {"action": "unchanged"}
+    action = "updated" if mi is not None else "created"
+    if mi is None:
+        folder, name = CANNON_PORT_MI.rsplit("/", 1)
+        mi = u.AssetToolsHelpers.get_asset_tools().create_asset(name, folder, u.MaterialInstanceConstant,
+                                                                 u.MaterialInstanceConstantFactoryNew())
+    mel.set_material_instance_parent(mi, parent)
+    for k, v in CANNON_PORT_LOOK["vectors"].items():
+        mel.set_material_instance_vector_parameter_value(mi, k, u.LinearColor(*[float(x) for x in v]))
+    for k, v in CANNON_PORT_LOOK["scalars"].items():
+        mel.set_material_instance_scalar_parameter_value(mi, k, float(v))
+    eal.set_metadata_tag(mi, CANNON_TAG, tag)
+    if not eal.save_loaded_asset(mi, False):
+        raise RuntimeError(f"could not save {CANNON_PORT_MI}")
+    return {"action": action, "parent": CANNON_MI, **CANNON_PORT_LOOK}
+
+
 def ensure_detail_mis(force: bool) -> dict:
     """MI_EnvCP_* children of the kit MIs (DETAIL_MIS); idempotent via a version tag."""
     eal, mel = u.EditorAssetLibrary, u.MaterialEditingLibrary
@@ -589,6 +620,8 @@ def run_import(p: dict, force: bool) -> bool:
     try:
         p["cannon"] = ensure_cannon(force)
         ok = ok and p["cannon"].get("action") != "skipped"
+        p["cannon"]["port"] = ensure_cannon_port(force)
+        ok = ok and p["cannon"]["port"].get("action") != "skipped"
     except Exception as exc:
         p["cannon"] = {"action": "failed", "error": str(exc)}
         ok = False

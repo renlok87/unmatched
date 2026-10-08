@@ -120,12 +120,16 @@ class MaterialRoute(unittest.TestCase):
             card = item["vectors"]["FallCard"]
             self.assertEqual(card[3], 1.0)  # v authored top -> bottom in Blender (the FBX import flips V)
             # P9 tune: a wide sheet, or (manifest uvPerStream) one stream of the 4-stream ~ 300 uu cascade
-            self.assertGreaterEqual(card[0], 60.0)
+            # VS-8 E1 EN-19: one of the three painted streams (mean 58.3 uu)
+            self.assertGreaterEqual(card[0], 50.0)
             for k in item["vectors"]:
                 self.assertIn(k, SM.FALL_PARAMS["vectors"])
             self.assertEqual(item["vectors"]["FallLook"][3], 1.0)  # the Water Materials streaks
         foam, sheet = self.plan["MI_EnvScene_FallsFoam"], self.plan["MI_EnvScene_FallsSheet"]
-        self.assertGreater(foam["vectors"]["FallLook"][0], sheet["vectors"]["FallLook"][0])  # the foam is more opaque
+        # VS-8 E1 EN-19 (ВР-VS8-46): the stream body carries the white now (0.75 in the middle of a stream, fading to
+        # its edges); the foam pads stay at the P10 0.5 (torn, never the opaque strips of P9) - below the body
+        self.assertGreaterEqual(foam["vectors"]["FallLook"][0], 0.5)
+        self.assertLessEqual(sheet["vectors"]["FallLook"][0], 0.8)
         if (CONTENT / "EnvKit/Ground").is_dir():
             self.assertTrue((CONTENT / "EnvKit/Ground/MI_EnvWaterfall_Sarpedon.uasset").is_file())
 
@@ -270,7 +274,8 @@ class Lit3dProfile(unittest.TestCase):
     def test_brazier_flicker_reads(self):
         brazier = next(lt for lt in self.lit["lights"] if lt["id"] == "fire-brazier")
         self.assertEqual(brazier["radius"], 180)
-        self.assertEqual(brazier["flicker"]["amp"], 0.25)
+        # VS-8 E1 EN-22: 0.25 -> 0.5 (the G7 std of the pool over 20 live K1 frames 3.7 levels, card 2..8)
+        self.assertEqual(brazier["flicker"]["amp"], 0.5)
         # the pool must stay off the map cells: the brazier stands > radius from the painted map field
         half = (891.3333 / 2, 577.3333 / 2)
         x, y, z = brazier["loc"]

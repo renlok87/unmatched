@@ -16,6 +16,7 @@
 from __future__ import annotations
 
 import json
+import math
 import sys
 import unittest
 from pathlib import Path
@@ -162,7 +163,11 @@ class CascadeTests(unittest.TestCase):
         self.assertEqual(rep["meshDigest"], {CB.NAME: self.sheet.digest(), CB.FOAM: self.foam.digest()})
 
     def test_streams_tiers_and_uvs(self):
-        self.assertEqual(len(self.info["streams"]), 4)
+        # VS-8 E1 EN-19: the three painted streams (P9 / P10: four overlapping ones)
+        self.assertEqual(len(self.info["streams"]), len(self.allp["cascade"]["streams"]))
+        self.assertGreaterEqual(len(self.info["streams"]), 3)
+        xs = self.allp["cascade"]["streams"]
+        self.assertTrue(all(b[0] - a[1] >= 10.0 for a, b in zip(xs, xs[1:])), "rock gaps >= 10 uu between streams")
         self.assertEqual([t["tier"] for t in self.info["tiers"]], [1, 2, 3, 4])
         self.assertTrue(self.info["tiers"][-1]["sea"])
         zs = [t["landing"][2] for t in self.info["tiers"]]
@@ -172,7 +177,9 @@ class CascadeTests(unittest.TestCase):
         self.assertLessEqual(float(B[:, 2].max()), self.allp["frameBand"]["faceBottomZ"], "starts under the beam")
         self.assertTrue((self.sheet.UV >= -1e-9).all() and (self.sheet.UV <= 1 + 1e-9).all())
         rep = report("props", "cascade-build.json")
-        self.assertGreaterEqual(rep["c0Coverage"]["c0Frame"]["widthCoverage"], 0.8, "painted width coverage at C0")
+        # VS-8 E1 EN-19: the painted rocks between the three painted streams stay dry (their light columns cover
+        # 201 of the 360 px of the painted rect = 0.56); P9 / P10 covered the whole width (>= 0.8)
+        self.assertGreaterEqual(rep["c0Coverage"]["c0Frame"]["widthCoverage"], 0.55, "painted width coverage at C0")
 
     def test_clear_of_the_rock_towards_the_cameras(self):
         cam = CS.cam0()
@@ -271,7 +278,9 @@ class PropTests(unittest.TestCase):
         cloth = m.V[:, 2] < -5.0
         # straight down: the cloth's X spread is only the folds (no shear along the hang)
         self.assertLess(float(np.ptp(m.V[cloth, 0])), 12.0)
-        self.assertEqual(info["hang"], [0.0, 0.0, -1.0])
+        # VS-8 E1 EN-20: the hang turned hangTiltDeg in the cloth plane (towards local -Y), never out of it (X)
+        t = math.radians(float(self.allp["banner"].get("hangTiltDeg", 0.0)))
+        self.assertEqual(info["hang"], [0.0, round(-math.sin(t), 4), round(-math.cos(t), 4)])
 
 
 if __name__ == "__main__":
