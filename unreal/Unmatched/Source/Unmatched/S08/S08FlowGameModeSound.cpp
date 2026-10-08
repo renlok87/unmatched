@@ -90,6 +90,7 @@ void AS08FlowGameMode::PlayBoardUiSound(const FS09InputResult& Result, const FSt
 }
 
 void AS08FlowGameMode::ScheduleStepSounds(const TArray<FS08MovePlan>& Plans) {
+  S08FxMovePlans(Plans);  // VS-6 FX-13: the CUE-007 rows and the dust at every landing
   TArray<FString> Lines;
   const int64 Now = NowMs();
   for (const FS08MovePlan& Plan : Plans) {

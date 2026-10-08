@@ -503,9 +503,15 @@ struct UNMATCHED_API FS08MoveSelectionSpec {
   // "invalid" (V-08)
   FColor InvalidColor = FColor(0xD9, 0x48, 0x3F, 255);
   int32 InvalidMs = 350;
-  // "lastMove" (V-14 / V-15, MS-T-17)
+  // "lastMove" (V-14 / V-15, MS-T-17; VS-6 FX-14 / ВР-29: the dashed path held holdMs, appearing over inMs)
   float LastMoveAlpha = 0.6f;
   int32 LastMoveFadeMs = 300;
+  int32 LastMoveHoldMs = 1500;
+  int32 LastMoveInMs = 150;
+  int32 LastMoveDashPerEdge = 12;
+  float LastMoveWidthUU = 4.0f;
+  // "choice" (VS-6 FX-08, ВР-27 / ВР-76): V-17 / V-11 / V-12 in board.choice; the profile names the token
+  FColor ChoiceColor = FColor(0x4C, 0xD2, 0xDC, 255);
   // "candidate" (V-17, MS-R-75 - DE-017): a thin ring under an own fighter that may move, in the band of the
   // selection ring V-05 (SM_Marker_SelectionRing 17.8..20 uu), thinner than it and without the team ring; the radius
   // scales with the figure (sidekicks 0.78); z above the figure's pedestal top.

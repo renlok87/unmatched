@@ -15,6 +15,12 @@ other texture keeps its report entry, whose source must still match.
 Settings as the existing exact-size HUD icons (tools/art/art004_hud_icon_import.py): UserInterface2D (BGRA, no
 compression), no mipmaps, TEXTUREGROUP_UI, sRGB, bilinear, never stream. Idempotent (replace_existing).
 Report: art/imagegen/hud-icons-v3/ue-import-report.json (source sha256 per texture).
+
+IC-35 (VS-6 F1, ВР-IC15, по делегированию): ICONS_V3_WORLD=1 imports only the world fallback of the target token -
+masters/action-attack-token.png as is (1024, POT) -> T_IV3_action_attack_token_World with a mip chain,
+TEXTUREGROUP_World, sRGB, TF_Trilinear, never streamed, the compression of the mvp-v1 world sprite
+T_UI_Action_AttackConcept (read from that asset); its report entry carries its own "settings" and replaces the old one,
+every other entry stays.
 """
 
 from __future__ import annotations
@@ -76,7 +82,61 @@ def png_size(data: bytes) -> tuple[int, int, int]:
     return width, height, data[25]
 
 
+WORLD_SRC = ICONS / "masters/action-attack-token.png"
+WORLD_ASSET = "T_IV3_action_attack_token_World"
+WORLD_LEGACY = "/Game/ArtTests/ARTMarkers/Textures/T_UI_Action_AttackConcept"
+
+
+def import_world() -> None:
+    """IC-35: the POT 1024 world token with mips (S08FighterActor TargetIcon; -S08IconLegacy keeps the concept)."""
+    tools = u.AssetToolsHelpers.get_asset_tools()
+    data = WORLD_SRC.read_bytes()
+    width, height, color_type = png_size(data)
+    if (width, height) != (1024, 1024) or color_type != 6:
+        raise RuntimeError(f"{WORLD_SRC.name}: expected 1024 RGBA, got {width}x{height} type={color_type}")
+    legacy = u.load_asset(WORLD_LEGACY)
+    compression = legacy.get_editor_property("compression_settings") if legacy else u.TextureCompressionSettings.TC_DEFAULT
+    task = u.AssetImportTask()
+    task.filename = str(WORLD_SRC)
+    task.destination_path = DEST
+    task.destination_name = WORLD_ASSET
+    task.automated = True
+    task.replace_existing = True
+    task.save = False
+    tools.import_asset_tasks([task])
+    asset = u.load_asset(f"{DEST}/{WORLD_ASSET}")
+    if not asset or not isinstance(asset, u.Texture2D):
+        raise RuntimeError(f"{WORLD_ASSET}: not imported as Texture2D")
+    asset.set_editor_property("compression_settings", compression)
+    asset.set_editor_property("mip_gen_settings", u.TextureMipGenSettings.TMGS_FROM_TEXTURE_GROUP)
+    asset.set_editor_property("lod_group", u.TextureGroup.TEXTUREGROUP_WORLD)
+    asset.set_editor_property("srgb", True)
+    asset.set_editor_property("filter", u.TextureFilter.TF_TRILINEAR)
+    asset.set_editor_property("never_stream", True)
+    if not u.EditorAssetLibrary.save_loaded_asset(asset, only_if_is_dirty=False):
+        raise RuntimeError(f"{WORLD_ASSET}: save failed")
+    actual = (asset.blueprint_get_size_x(), asset.blueprint_get_size_y())
+    if actual != (width, height):
+        raise RuntimeError(f"{WORLD_ASSET}: imported as {actual}")
+    report = json.loads(REPORT.read_text(encoding="utf-8"))
+    entries = [t for t in report["textures"] if t["asset"] != f"{DEST}/{WORLD_ASSET}"]
+    entries.append({"asset": f"{DEST}/{WORLD_ASSET}", "source": WORLD_SRC.relative_to(ROOT).as_posix(),
+                    "sourceSha256": hashlib.sha256(data).hexdigest(), "size": [width, height],
+                    "settings": {"compression": str(compression).split(".")[-1].split(":")[0].strip("<> "),
+                                 "compressionFrom": WORLD_LEGACY.rsplit("/", 1)[-1],
+                                 "mipGen": "TMGS_FROM_TEXTURE_GROUP", "lodGroup": "TEXTUREGROUP_World",
+                                 "srgb": True, "filter": "TF_Trilinear", "neverStream": True,
+                                 "card": "IC-35 (ВР-IC15)"}})
+    report["textures"] = entries
+    report["count"] = len(entries)
+    REPORT.write_text(json.dumps(report, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
+    u.log(f"ICONS_V3_WORLD_PASS asset={DEST}/{WORLD_ASSET} compression={compression}")
+
+
 def main() -> None:
+    if os.environ.get("ICONS_V3_WORLD") == "1":
+        import_world()
+        return
     tools = u.AssetToolsHelpers.get_asset_tools()
     # ICONS_V3_ONLY=<id>,<id>: re-import only these icons (and their layers); every other texture keeps its report
     # entry, which must still match its source (a changed source that is not re-imported fails the run).

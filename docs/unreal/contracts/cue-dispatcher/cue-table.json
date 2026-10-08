@@ -84,8 +84,10 @@
    "material": null,
    "ui": null,
    "marker": {
-    "mesh": "SM_Marker_SelectionRing",
-    "asset_id": "ASSET-MARKERS-001"
+    "mesh": "/Engine/BasicShapes/Plane",
+    "material": "MI_FX_SelectionRing",
+    "asset_id": "ASSET-MARKERS-001",
+    "note": "FX-07 (VS-6 F1, ВР-FX12): кольцо V-05 board.choice шириной 2 × V-17 с кромкой board.keyline 1 uu (M_FX_FieldMark на плоскости); -S08ChoiceLegacy — SM_Marker_SelectionRing на M_S08_Solid"
    },
    "postprocess": null,
    "on_new_event": "replace",
@@ -130,7 +132,9 @@
    "material": null,
    "ui": null,
    "marker": {
-    "material": "M_UM_MovePlate"
+    "material": "M_UM_MovePlate",
+    "channel": "Pulse",
+    "note": "FX-09 (VS-6 F1): импульс подложки scale 1,06 → 1, заливка → V-10 за 250 мс (канал 6 доп. экземпляра ISM подложек); -S08MovePlatesLegacy — без импульса"
    },
    "postprocess": null,
    "on_new_event": "replace",
@@ -175,7 +179,8 @@
    "material": null,
    "ui": {
     "widget": "UI-ICON-ACTION",
-    "reason_keys": "why.* (02 §4.2)"
+    "reason_keys": "why.* (02 §4.2)",
+    "note": "FX-10 (VS-6 F1): штамп badge-refuse у клетки (UMG HB-40): scale 1,2 → 1 за 80 мс, держится до 230, гаснет к 350; clamp(0,3 × клетка; 24; 32) px; повтор < 300 мс не перезапускает; без красной заливки клетки"
    },
    "marker": null,
    "postprocess": null,
@@ -298,14 +303,13 @@
    "skippable": true,
    "vfx": {
     "system": "/Game/S08/FX/Board/NS_FX_Dust.NS_FX_Dust",
-    "status": "missing",
-    "missing_reason": "ассет не создан: FX-13",
+    "status": "present",
     "attach": "world",
     "socket": null,
     "sim": "cpu",
     "deterministic": true,
     "prewarm": true,
-    "note": "пыль на конечной клетке: 3–5 плоских дисков fx.dust, 300 мс от посадки (ВР-74); reduced motion и скорость «Нет» — без пыли",
+    "note": "пыль на конечной клетке: 3–5 плоских дисков fx.dust, 300 мс от посадки (ВР-74); reduced motion и скорость «Нет» — без пыли; FX-13 (VS-6 F1): NS_FX_Dust - one still board quad (M_FX_BoardPrint mode 0), 3–5 дисков по сиду клетки, 300 мс от кадра посадки; reduced motion / скорость «Нет» / snap — без пыли; -S08FxLegacy — нет",
     "fx_row": "FX-13"
    },
    "sfx": {
@@ -374,14 +378,13 @@
    "skippable": true,
    "vfx": {
     "system": "/Game/S08/FX/Board/NS_FX_AttackChevrons.NS_FX_AttackChevrons",
-    "status": "missing",
-    "missing_reason": "ассет не создан: FX-16",
+    "status": "present",
     "attach": "world",
     "socket": null,
     "sim": "cpu",
     "deterministic": true,
     "prewarm": true,
-    "note": "три шеврона; дуги цели board.target (FX-15); клипа нет — LungeAttack во вступлении CUE-011 (F-03)",
+    "note": "три шеврона; дуги цели board.target (FX-15); клипа нет — LungeAttack во вступлении CUE-011 (F-03); FX-16 (VS-6 F1): NS_FX_AttackChevrons - one board quad from the attacker to the target (M_FX_BoardPrint mode 1), три шеврона 30/50/70 %, t0 = событие + 150 мс, 600 мс × скорость; прерывание CUE-009/010/011/013 гасит их в кадр прерывания (ВР-VS6-09)",
     "fx_row": "FX-16"
    },
    "sfx": {

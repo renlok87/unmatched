@@ -44,6 +44,7 @@
 #include "S08MoveAnim.h"
 #include "S08ShotQueue.h"
 #include "S08TurnPortraitWidget.h"
+#include "Fx/S08FieldFx.h"
 #include "S08FlowGameMode.generated.h"
 
 struct FS08MoveDraftView;
@@ -1194,6 +1195,24 @@ private:
   /** Z-2: -BenchFx=<mode> - a deterministic FX state for the bench views (the FX-02 placard; the rim / flash
    *  channel frames of FX-06/17/19 written straight to CPD, the curves stay in the unit tests and the demo). */
   void S08FxBenchStep(const FString& Spec);
+  // ---- VS-6 F1 field FX (S08/Fx/S08FieldFx.h; the adapter in S08/Fx/S08FlowGameModeFx.cpp) ----
+  FS08FieldFxState FieldFx;
+  /** FX-07 / FX-09 / FX-10: the CUE-002 / CUE-003 / CUE-004 row of a board release (the sound's decision). */
+  void S08FxBoardInput(const FS09InputResult& Result, const FIntPoint& Cell, const FString& FighterId);
+  /** FX-09: an attack target picked by a click (CUE-003 + the pulse in board.target). */
+  void S08FxTargetConfirmed(const FString& TargetId);
+  /** FX-13: the CUE-007 rows and the dust at the landing of every plan of a seq. */
+  void S08FxMovePlans(const TArray<FS08MovePlan>& Plans);
+  /** FX-16: CUE-008 declared - the chevrons from event + 150 ms. */
+  void S08FxAttackDeclared(const FString& AttackerId, const FString& TargetId, int32 Seq);
+  /** FX-16: a `CUE fx done id=CUE-008 ... cut=interrupt` line cuts the live chevrons. */
+  void S08FxCueLines(const TArray<FString>& Lines);
+  /** The due CUE-007 feeds, the dust and the delayed chevrons (once per frame, after the combat staging). */
+  void S08FxTick();
+  /** -BenchFx field modes (select / target / choice / pending* / pulse / lastpath / dust / chevrons); false when the
+   *  mode is not one of them. Finish lands the accumulated plate view. */
+  bool S08FxBenchField(const FString& Mode, const TArray<FString>& Parts);
+  void S08FxBenchFieldFinish(bool bWarmupDone = false);
   // ---- VS-2 HB-06: the UMG HUD root, its layout / FIELD and the H2 layout fixes of the Slate blocks
   // (S08FlowGameModeUmHud.cpp; rollback -S08SlateHud[=<blocks>]) ----
   void BuildUmHud();

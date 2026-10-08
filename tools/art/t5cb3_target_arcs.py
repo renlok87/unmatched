@@ -358,9 +358,9 @@ def icon_row(shot, png: Path, trace: Path, out_json: Path) -> dict:
     if not ib["present"]:
         return {"present": False}
     n = int(round(ib["bbox"][2] - ib["bbox"][0]))
+    mask, token = T53.token_textures(n)  # IC-35: the v3 token masks (mvp-v1 only as the fallback)
     rc, doc = T53.run_qa(["icon", str(png), "--trace", str(trace), "--shot", png.name,
-                          "--mask-texture", str(T53.TOKEN_DIR / f"ui-action-attack-token-{n}-glyphmask.png"),
-                          "--token-texture", str(T53.TOKEN_DIR / f"ui-action-attack-token-{n}.png")], out_json)
+                          "--mask-texture", str(mask), "--token-texture", str(token)], out_json)
     v = (doc or {}).get("variants") or {}
     return {"present": True, "size": n, "exit": rc, "result": (doc or {}).get("result"),
             "edge": {vn: (v.get(vn) or {}).get("edge") for vn in ("color", "gray", "deuteranopia")},

@@ -950,6 +950,18 @@ bool S08ParseMoveSelection(const FString& Context, const TSharedPtr<FJsonObject>
     const TCHAR* B = TEXT("lastMove");
     Number(B, O, K, TEXT("alpha"), 0.05, 1.0, Spec.LastMoveAlpha);
     Int(B, O, K, TEXT("fadeMs"), 0, 5000, Spec.LastMoveFadeMs);
+    // VS-6 FX-14 (ВР-29): the dashed path - hold, appear, dashes per edge, body width
+    Int(B, O, K, TEXT("holdMs"), 0, 10000, Spec.LastMoveHoldMs);
+    Int(B, O, K, TEXT("inMs"), 0, 2000, Spec.LastMoveInMs);
+    Int(B, O, K, TEXT("dashPerEdge"), 2, 32, Spec.LastMoveDashPerEdge);
+    Number(B, O, K, TEXT("widthUU"), 1.0, 12.0, Spec.LastMoveWidthUU);
+  });
+  Block(TEXT("choice"), [&](const TSharedPtr<FJsonObject>& O, TSet<FString>& K) {
+    // VS-6 FX-08 (ВР-27): the colour of V-17 / V-11 / V-12; "token" names the HUD token it must equal (ВР-76,
+    // hud_contract.py validate compares the two)
+    const TCHAR* B = TEXT("choice");
+    Hex(B, O, K, TEXT("colorSrgb"), Spec.ChoiceColor);
+    K.Add(TEXT("token"));
   });
   Block(TEXT("candidate"), [&](const TSharedPtr<FJsonObject>& O, TSet<FString>& K) {
     const TCHAR* B = TEXT("candidate");
@@ -975,7 +987,7 @@ bool S08ParseMoveSelection(const FString& Context, const TSharedPtr<FJsonObject>
     Bool(B, O, K, TEXT("easeEnds"), Spec.bEaseEnds);
   });
   static const TSet<FString> Blocks = {TEXT("plate"), TEXT("boostTier"), TEXT("path"), TEXT("ghost"), TEXT("invalid"),
-                                       TEXT("lastMove"), TEXT("candidate"), TEXT("anim")};
+                                       TEXT("lastMove"), TEXT("candidate"), TEXT("anim"), TEXT("choice")};
   for (const TPair<FString, TSharedPtr<FJsonValue>>& Pair : Object->Values) {
     // "note*" fields carry the document's prose (the other blocks keep theirs the same way)
     if (!Blocks.Contains(Pair.Key) && !Pair.Key.StartsWith(TEXT("note"))) {

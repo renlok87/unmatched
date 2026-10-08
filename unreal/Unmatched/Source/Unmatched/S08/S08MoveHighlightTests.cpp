@@ -338,8 +338,12 @@ bool FS08MoveHLIsmStatesTest::RunTest(const FString&) {
   const int32 NumChannels = static_cast<int32>(EChannel::Count);
   const UInstancedStaticMeshComponent* Ism = HL->GetPlates();
   if (!TestNotNull("the plate ISM", Ism)) return false;
-  TestTrue(FString::Printf(TEXT("one ISM: %d x %d instances, %d custom floats"), NumChannels, Spaces, S08MovePlateSpec::NumCustomData),
-           Ism->GetInstanceCount() == NumChannels * Spaces && Ism->NumCustomDataFloats == S08MovePlateSpec::NumCustomData);
+  // VS-6 F1: + the FX-14 path quads / arrowheads and the FX-09 pulse after the per-space channels (same ISM)
+  const int32 Extra = S08MovePlateSpec::PathSlots + S08MovePlateSpec::ArrowSlots + S08MovePlateSpec::PulseSlots;
+  TestTrue(FString::Printf(TEXT("one ISM: %d x %d + %d instances, %d custom floats"), NumChannels, Spaces, Extra,
+                           S08MovePlateSpec::NumCustomData),
+           Ism->GetInstanceCount() == NumChannels * Spaces + Extra &&
+               Ism->NumCustomDataFloats == S08MovePlateSpec::NumCustomData);
   TestEqual("one material slot", Ism->GetNumMaterials(), 1);
   TestFalse("no shadow", Ism->CastShadow);
   int32 PlateIsms = 0;

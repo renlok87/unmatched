@@ -26,6 +26,7 @@
 #include "Components/SceneComponent.h"
 #include "S08BoardArt.h"
 #include "S08BoardModel.h"
+#include "TimerManager.h"
 #include "S08MoveHighlight.generated.h"
 
 class UInstancedStaticMeshComponent;
@@ -54,8 +55,9 @@ enum class ES08OutlineState : uint8 { None = 0, Threat, LastTo, LastFrom, Count 
 /** Glyph channel, by descending priority (Order / Step / Hint are screen badges of MS-T-10 / MS-T-22: the world glyph
  *  draws nothing for them). */
 enum class ES08GlyphState : uint8 { None = 0, Invalid, Conflict, Order, Step, Hint, Count };
-/** Custom data [5]: which colour the channel uses. */
-enum class ES08PlateColor : uint8 { Plate = 0, TeamP1, TeamP2, Error };
+/** Custom data [5]: which colour the channel uses. VS-6 FX-08 (ВР-27): Choice = board.choice for V-17 / V-11 / V-12
+ *  (-S08ChoiceLegacy: Plate); FX-09: Target = board.target for the confirm pulse of an attack target. */
+enum class ES08PlateColor : uint8 { Plate = 0, TeamP1, TeamP2, Error, Choice, Target };
 
 namespace S08PlateFlags {
 constexpr uint8 Hover = 1;
@@ -63,6 +65,7 @@ constexpr uint8 Sent = 2;
 constexpr uint8 Pulse = 4;
 constexpr uint8 Occupied = 8;   // a living fighter stands here: nothing of the plate at r <= occupiedClearUU
 constexpr uint8 LeaderPip = 16; // a hero's leader pip (+Y): the plate is cut +-pipCutDeg around it
+constexpr uint8 Leaving = 32;   // VS-6 FX-08: a V-17 ring of the previous view fading out (CandLeave)
 }  // namespace S08PlateFlags
 
 /** One board space with its state per channel (04 §4.5). */
@@ -102,9 +105,19 @@ struct UNMATCHED_API FS08GhostView {
   FString Label;
 };
 
+/** VS-6 FX-14 (ВР-29): the dashed path of the opponent's last move (V-14 / V-15) - the cells with the start (PLACE:
+ *  [from, to], a straight dash line) in the mover's team colour. */
+struct UNMATCHED_API FS08LastPathView {
+  TArray<FIntPoint> Cells;
+  bool bPlace = false;
+  ES08PlateColor Color = ES08PlateColor::TeamP1;
+};
+
 struct UNMATCHED_API FS08MoveDraftView {
   TArray<FS08PlateView> Plates;  // only spaces with a state; one record per space
   TArray<FS08PathView> Paths;
+  /** VS-6 FX-14: the last move as dashes + arrow (the MS-T-17 outlines only with -S08LastMoveLegacy). */
+  TArray<FS08LastPathView> LastPaths;
   TArray<FS08GhostView> Ghosts;
   TArray<FString> FadedFighters;
   FIntPoint Hover = FIntPoint(-1, -1);
@@ -113,7 +126,7 @@ struct UNMATCHED_API FS08MoveDraftView {
   FString Source = TEXT("none");
 
   const FS08PlateView* Find(int32 X, int32 Y) const;
-  bool IsEmpty() const { return Plates.Num() == 0 && Paths.Num() == 0 && Ghosts.Num() == 0; }
+  bool IsEmpty() const { return Plates.Num() == 0 && Paths.Num() == 0 && Ghosts.Num() == 0 && LastPaths.Num() == 0; }
 };
 
 /** Input of BuildDraftView: the draft as plain data (S09 FS09CommandUi::MoveDraftInput fills it). */
@@ -154,6 +167,9 @@ struct UNMATCHED_API FS08MoveDraftInput {
     TArray<FIntPoint> From;
     TArray<FIntPoint> Dots;
     TArray<FIntPoint> To;
+    /** VS-6 FX-14: every move's cells WITH the start (PLACE: [from, to]) and its kind. */
+    TArray<TArray<FIntPoint>> Paths;
+    TArray<bool> Places;
     ES08PlateColor Color = ES08PlateColor::TeamP1;
     bool IsSet() const { return From.Num() > 0 || To.Num() > 0; }
   };
@@ -237,6 +253,24 @@ inline const TCHAR* const ParamKeylineColor = TEXT("KeylineColor");
 inline const TCHAR* const ParamErrorColor = TEXT("ErrorColor");
 inline const TCHAR* const ParamTeamP1Color = TEXT("TeamP1Color");
 inline const TCHAR* const ParamTeamP2Color = TEXT("TeamP2Color");
+/** VS-6 FX-08 / FX-09 (graph version 4): board.choice and board.target. */
+inline const TCHAR* const ParamChoiceColor = TEXT("ChoiceColor");
+inline const TCHAR* const ParamTargetColor = TEXT("TargetColor");
+/** VS-6 FX-08: the fade of the V-17 rings in (CandFade) and of the leaving ones out (CandLeave); V-11 / V-12 in. */
+inline const TCHAR* const ParamCandFade = TEXT("CandFade");
+inline const TCHAR* const ParamCandLeave = TEXT("CandLeave");
+inline const TCHAR* const ParamPendFade = TEXT("PendFade");
+/** VS-6 extra instances after the per-space channels (channel slot 4 / 5 / 6 of the custom data): the FX-14 path
+ *  dashes (one quad per edge) and arrowheads, the FX-09 confirm pulse. */
+constexpr int32 PathSlots = 24;
+constexpr int32 ArrowSlots = 4;
+constexpr int32 PulseSlots = 1;
+constexpr float PathChannel = 4.0f;
+constexpr float ArrowChannel = 5.0f;
+constexpr float PulseChannel = 6.0f;
+/** FX-14 arrowhead: a 24 uu box, the tip 30 uu before the destination centre (outside the figure's base). */
+constexpr float ArrowBoxUU = 24.0f;
+constexpr float ArrowBackUU = 30.0f;
 /** Screen team colours of the outline (03 §4.2 V-14/V-15: #DAC576 / #5786A8). */
 inline const FColor TeamP1Screen = FColor(0xDA, 0xC5, 0x76, 255);
 inline const FColor TeamP2Screen = FColor(0x57, 0x86, 0xA8, 255);
@@ -275,6 +309,17 @@ public:
   void ClearView() { ApplyView(FS08MoveDraftView()); }
   /** MS-T-17: the MS-P-03 fade of the last-move outlines (0..1; one MID parameter, only when it changed). */
   void SetLastMoveFade(float Fade);
+  /** VS-6 FX-09: the CUE-003 confirm pulse on one space (scale 1.06 -> 1, fill 100 % -> V-10, 250 ms); bTarget
+   *  takes board.target (an attack target), else board.reach. No-op with -S08MovePlatesLegacy. */
+  void PlayConfirmPulse(int32 X, int32 Y, bool bTarget);
+  /** -BenchFx: the pulse pose at Ms, no timer. */
+  void SetPulseStatic(int32 X, int32 Y, bool bTarget, double Ms);
+  /** VS-6: without -S08MovePlates only the choice layer is drawn (V-17, the FX-14 path, the pulse). */
+  void SetChoiceOnly(bool bOnly) { bChoiceOnly = bOnly; AppliedHash = 0; }
+  bool IsChoiceOnly() const { return bChoiceOnly; }
+  /** Number of FX-14 dash quads / arrowheads drawn now. */
+  int32 GetLastPathQuads() const { return LastPathQuads; }
+  int32 GetLastPathArrows() const { return LastPathArrows; }
   float GetLastMoveFade() const { return LastMoveFade; }
 
   // ---- inspection (automation, traces) ----
@@ -300,6 +345,13 @@ public:
 
 private:
   void EnsurePlates();
+  void WriteExtra(int32 Slot, float Channel, const FTransform& T, bool bShow, const float (&Data)[S08MovePlateSpec::NumCustomData]);
+  int32 ExtraInstance(int32 Slot) const { return static_cast<int32>(S08MovePlateSpec::EChannel::Count) * SpaceCells.Num() + Slot; }
+  void WriteLastPaths(const TArray<FS08LastPathView>& Paths);
+  void WritePulse(double Ms);
+  void KickFx();
+  void TickFx();
+  double NowS() const;
   void WriteInstance(S08MovePlateSpec::EChannel Channel, int32 Instance, const float (&Data)[S08MovePlateSpec::NumCustomData],
                      bool bShow, float Z);
 
@@ -325,4 +377,21 @@ private:
   uint32 AppliedHash = 0;
   int32 BuildCount = 0;
   float LastMoveFade = 1.0f;
+  // ---- VS-6 FX-08 / FX-09 / FX-14 ----
+  bool bChoiceOnly = false;
+  TSet<int32> PrevCandidates;       // space indices of the V-17 rings of the last view
+  TSet<int32> PrevPending;          // V-11 / V-12 spaces of the last view
+  TArray<FS08PlateView> Leaving;    // the V-17 rings fading out (written with S08PlateFlags::Leaving)
+  TMap<int32, float> PrevCandidateScale;
+  FS08MoveDraftView LastInputView;  // re-applied when the leaving rings are gone
+  double CandFadeStartS = -1.0;     // the V-17 fade in / the leaving fade out / the V-11 fade in (world s)
+  double CandLeaveStartS = -1.0;
+  double PendFadeStartS = -1.0;
+  bool bPulseOn = false;
+  FIntPoint PulseCell = FIntPoint(-1, -1);
+  bool bPulseTarget = false;
+  double PulseStartS = 0.0;
+  int32 LastPathQuads = 0;
+  int32 LastPathArrows = 0;
+  FTimerHandle FxTimer;
 };

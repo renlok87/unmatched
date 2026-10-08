@@ -3,6 +3,7 @@
 #include "S08ArtPreviewMedusa.h"
 #include "S08ConceptPaste.h"
 #include "Fx/S08CueFx.h"
+#include "Fx/S08FieldFx.h"
 #include "S08Diorama.h"
 #include "S08EnvLayout.h"
 #include "S08Facing.h"
@@ -120,10 +121,10 @@ FString TraceLine() {
                             ? FString::Printf(TEXT("legacy(-%s)"), S08CueFx::HitTintLegacyFlagName)
                             : FString(TEXT("flash"));
   return FString::Printf(
-      TEXT("ARTLOOK art=%d source=%s heroes=%s tray=%s env=%s review=%d legacyRender=%d markers=%d aliases=%s %s %s %s %s hudImpl=%s move=%s facing=%s baseDigit=%s heroMat=%s fx=%s hitFx=%s%s"),
+      TEXT("ARTLOOK art=%d source=%s heroes=%s tray=%s env=%s review=%d legacyRender=%d markers=%d aliases=%s %s %s %s %s hudImpl=%s move=%s facing=%s baseDigit=%s heroMat=%s fx=%s hitFx=%s fieldFx=%s%s"),
       bArt ? 1 : 0, Source, *Heroes, *Tray, *Env, ReviewTooling() ? 1 : 0, S08LegacyRender() ? 1 : 0, S08Markers() ? 1 : 0,
       Aliases.Num() ? *FString::Join(Aliases, TEXT(",")) : TEXT("-"), *HudLook, *Dpi, *CardMedia, *Chips, *HudImpl,
-      *MoveEase, *Facing, *BaseDigit, *HeroMat, *Fx, *HitFx,
+      *MoveEase, *Facing, *BaseDigit, *HeroMat, *Fx, *HitFx, *S08FieldFx::ArtLookToken(),
       bArt ? TEXT("") : TEXT(" (grey board: no art profile, figures, tray or art HUD layer)"));
 }
 

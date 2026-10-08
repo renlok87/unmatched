@@ -102,8 +102,10 @@ class UNMATCHED_API UUmToastStack : public UUserWidget {
   void ApplyPlacement(const UmHudFeed::FStackResult& Result, const TArray<FUmToastMember>& InMembers, double NowMs);
   const UmHudFeed::FStackResult& GetPlacement() const { return Placed; }
 
-  /** badge-refuse 24 su centred on CentreSu (canvas su) for refuse.ms. */
-  void ShowBadge(const FVector2D& CentreSu, double NowMs);
+  /** badge-refuse 24 su centred on CentreSu (canvas su) for refuse.ms. VS-6 FX-10: SizeSu (> 0) sizes the stamp at
+   *  a space (clamp(0.3 x the space on screen, 24, 32) px); the stamp curve of S08FieldFx::RefuseStamp; a repeat within
+   *  300 ms does not restart it (returns false). -S08FxLegacy: the icon's own appear, every repeat restarts. */
+  bool ShowBadge(const FVector2D& CentreSu, double NowMs, float SizeSu = 0.0f);
   bool IsBadgeShown() const { return BadgeUntilMs > 0.0; }
   FBox2D BadgeRectSu() const;
 
@@ -163,6 +165,9 @@ class UNMATCHED_API UUmToastStack : public UUserWidget {
   FString PendingPlaceLine;
   // the badge
   double BadgeUntilMs = 0.0;
+  double BadgeShownMs = -1.0e9;
+  float BadgeSizeSu = 0.0f;
+  bool bBadgeStamp = false;
   FVector2D BadgeCentreSu = FVector2D::ZeroVector;
   bool bCodeDefaultTree = false;
 };

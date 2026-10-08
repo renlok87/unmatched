@@ -47,6 +47,28 @@ const TArray<FS08CueRow>& S08CueRows::Combat() {
     Hover.ReducedMaxMs = 0;
     Hover.SfxRetriggerMs = 150;
     Out.Add(Hover);
+    // VS-6 F1 (FX-07 / FX-09 / FX-10): the LOCAL board answers of a release - CUE-002 the own figure picked (the V-05
+    // ring), CUE-003 a space / target confirmed (the plate pulse of M_UM_MovePlate), CUE-004 refused (the
+    // badge-refuse stamp at the space). No seq, replace per cue, reduced shorten 100; the sound rows are the
+    // UI-SELECT / UI-CONFIRM / UI-REJECT banks of FS08CueSound (CUE-004: once in 300 ms).
+    auto Local = [](const TCHAR* Id, const TCHAR* Subject, int32 Ms, int32 SfxMax, int32 RetriggerMs) {
+      FS08CueRow Row = MakeRow(Id, Ms, false, ES08CueOnNew::Replace, true, {}, false, false, TEXT(""), SfxMax,
+                               TEXT(""), TEXT("none"));
+      Row.bServer = false;
+      Row.Subject = Subject;
+      Row.SfxRetriggerMs = RetriggerMs;
+      return Row;
+    };
+    Out.Add(Local(TEXT("CUE-002"), TEXT("fighter"), 250, 0, 0));
+    Out.Add(Local(TEXT("CUE-003"), TEXT("target"), 250, 0, 0));
+    Out.Add(Local(TEXT("CUE-004"), TEXT("cursor"), 350, 1, 300));
+    // VS-6 FX-13: CUE-007 the move (server, per subject jump_to_final, reduced snap): the caller passes the plan's
+    // duration (the 04 §6.3 schedule, FS08MoveCueSchedule); NS_FX_Dust lands at the end of the travel, in the world.
+    FS08CueRow Move = MakeRow(TEXT("CUE-007"), 0, false, ES08CueOnNew::JumpToFinal, false, {}, true, false, TEXT(""),
+                              1, TEXT(""), TEXT("none"));
+    Move.Reduced = ES08CueReduced::Snap;
+    Move.ReducedMaxMs = 0;
+    Out.Add(Move);
     // CUE-008 attack declared: target arcs + three chevrons ON THE GROUND (NS_FX_AttackChevrons, world, no socket), NO clip
     // (01 F-03); cut by the next combat cue.
     Out.Add(MakeRow(TEXT("CUE-008"), 600, true, ES08CueOnNew::Interrupt, false,

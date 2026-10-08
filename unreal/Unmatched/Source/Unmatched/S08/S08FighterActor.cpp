@@ -205,6 +205,14 @@ void AS08FighterActor::BeginPlay() {
       TargetIcon->SetSprite(AttackIcon);
       TargetIcon->SetRelativeScale3D(FVector(0.042f));
       bArtTargetIconLoaded = true;
+      // VS-6 IC-35 (ВР-IC15): the v3 token master (POT 1024, mips) as the world fallback at the same world width;
+      // -S08IconLegacy / -S08TargetArcLegacy keep the concept sprite
+      UTexture2D* V3 = S08FieldFx::TargetArcLegacy() || S08IconMotion::IconSizeLegacy(FCommandLine::Get()) ? nullptr
+          : LoadObject<UTexture2D>(nullptr, S08FieldFx::WorldTokenTexture, nullptr, LOAD_NoWarn);
+      if (V3 && V3->GetSizeX() > 0) {
+        TargetIcon->SetSprite(V3);
+        TargetIcon->SetRelativeScale3D(FVector(0.042f * FMath::Max(1, AttackIcon->GetSizeX()) / V3->GetSizeX()));
+      }
     }
     LoadTeamRingAssets();
   }
@@ -230,6 +238,7 @@ void AS08FighterActor::BeginPlay() {
     TargetMid->SetVectorParameterValue(TEXT("Tint"), FLinearColor(1.4f, 0.18f, 0.06f));
     TargetRing->SetMaterial(0, TargetMid);
   }
+  if (S08ArtLook::Enabled()) FieldMarks.Bind(this, Ring, TargetRing);  // VS-6 FX-07 / FX-15 (S08/Fx/S08FieldFx)
 }
 
 bool AS08FighterActor::LoadTeamRingAssets() {
@@ -487,6 +496,7 @@ void AS08FighterActor::ApplyFighter(const FS08BoardFighter& InFighter,
     Label->SetRelativeLocation(FVector(0, 0, Fighter.bIsHero ? 82.0f : 65.0f));
     HpLabel->SetRelativeLocation(FVector(0, 0, Fighter.bIsHero ? 66.0f : 52.0f));
   }
+  FieldMarks.SetFigureScale(Fighter.bIsHero ? 1.0f : 0.78f);  // VS-6 FX-07 / FX-15: after the ring / arc transforms
   // W5b-R D-3: the authored team ring replaces the grey disc of an art figure (the T5.2 disc top lay in the tile
   // plane z = 0 and z-fought with it: A/B in the live editor, act W5b-R). The disc keeps its query collision (click
   // volume of the grey path); only its rendering goes. Grey S08/S09 (no art figure) keep the blue/red disc.
@@ -1244,6 +1254,7 @@ void AS08FighterActor::BeginHeroDeath() {
   Ring->SetVisibility(false);
   TargetRing->SetVisibility(false);
   TargetIcon->SetVisibility(false);
+  FieldMarks.HideNow();  // VS-6 FX-15: the arcs go in the fall frame (F-09)
   NotifyHeroAnimEvent(EEvent::Defeated, -1);
   RefreshHeroLightState();  // ENV-MAPS P9: a defeated fighter's hero light goes (DefeatedMul) as the figure falls
   // DE-019 (01 F-09): DeathSettle -> still (hero 0.3 s, sidekick 0) -> dissolve (hero 0.5 s, sidekick 0.4 s; DE-011
@@ -1351,15 +1362,18 @@ void AS08FighterActor::OnDeathHoldFinished() {
 }
 
 void AS08FighterActor::SetScreenIconMode(bool bScreen) {
+  if (bBenchWorldIcon) bScreen = false;  // VS-6 IC-35 bench: the world token frame
   if (bScreenIconMode == bScreen) return;
   bScreenIconMode = bScreen;
   TargetIcon->SetVisibility(bIsCombatTarget && bArtTargetIconLoaded && !bScreenIconMode);
 }
 
-void AS08FighterActor::SetSelected(bool bSelected) {
+void AS08FighterActor::SetSelected(bool bSelected, bool bOtherSelected) {
   bIsSelected = bSelected && !bDeathHold;
   LastLabelRatio = -1.0f;
-  Ring->SetVisibility(bIsSelected || (bArtSelectionRingLoaded && bIsCombatAttacker));
+  // VS-6 FX-07: the appear / leave curve of V-05 (S08FieldFx); another figure selected - this ring goes at once
+  Ring->SetVisibility(FieldMarks.SetSelected(bIsSelected || (bArtSelectionRingLoaded && bIsCombatAttacker),
+                                             bOtherSelected));
   if (bIsSelected && bArtSelectionRingLoaded) {
     FS08Trace::Write(FString::Printf(
         TEXT("ARTPREVIEW selection ring shown fighter=%s mesh=%s"),
@@ -1374,8 +1388,8 @@ void AS08FighterActor::SetCombatMarkers(bool bAttacker, bool bTarget) {
   if (bIsCombatAttacker == bNewAttacker && bIsCombatTarget == bNewTarget) return;
   bIsCombatAttacker = bNewAttacker;
   bIsCombatTarget = bNewTarget;
-  Ring->SetVisibility(bIsSelected || bIsCombatAttacker);
-  TargetRing->SetVisibility(bIsCombatTarget);
+  Ring->SetVisibility(FieldMarks.SetSelected(bIsSelected || bIsCombatAttacker));  // VS-6 FX-07 curve
+  TargetRing->SetVisibility(FieldMarks.SetTarget(bIsCombatTarget));               // VS-6 FX-15 curve
   RefreshHeroLightState();
   TargetIcon->SetVisibility(bIsCombatTarget && bArtTargetIconLoaded && !bScreenIconMode);
   // icon=1 means "the target icon is bound to this fighter"; iconMode says

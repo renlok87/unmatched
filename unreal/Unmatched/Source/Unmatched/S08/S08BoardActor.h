@@ -323,6 +323,13 @@ public:
   // ---- MS-T-08 move plates (S08MoveHighlight.h) ----
   /** True when the plates draw the highlights: -S08MovePlates, M_UM_MovePlate loaded and a board built. */
   bool UsesMovePlates() const;
+  /** VS-6: without -S08MovePlates the same ISM draws only the choice layer (V-17, the FX-14 path, the FX-09 pulse). */
+  bool UsesChoiceLayer() const;
+  /** VS-6 FX-09: the CUE-003 confirm pulse on a space (no-op without the plate ISM / with -S08MovePlatesLegacy). */
+  void PlayConfirmPulse(int32 X, int32 Y, bool bTarget) {
+    if (MoveHighlight && MoveHighlight->IsReady()) MoveHighlight->PlayConfirmPulse(X, Y, bTarget);
+  }
+  US08MoveHighlightComponent* GetMoveHighlightMutable() const { return MoveHighlight; }
   /** Draws View on the plates (no-op without them). */
   void SetMoveDraftView(const FS08MoveDraftView& View);
   /** The game mode's view of the current selection (false = the plain reachable set). */

@@ -1,4 +1,7 @@
 #include "S08MoveHighlight.h"
+#include "Fx/S08FieldFx.h"
+#include "S08HudTokens.generated.h"
+#include "S08IconMotion.h"
 #include "S08Render.h"
 #include "S08Team.h"
 #include "S08TraceLog.h"
@@ -8,6 +11,8 @@
 #include "Materials/MaterialInterface.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
+#include "Engine/World.h"
+#include "GameFramework/Actor.h"
 
 namespace {
 TOptional<bool> GPlatesOverride;
@@ -198,7 +203,10 @@ FS08MoveDraftView BuildDraftView(const FS08BoardModel& Board, const TArray<FS08B
   }
   // V-14 / V-15 (MS-T-17): the last move - starts, path points, ends; a space that is both an end and a start (a chain
   // of moves, a return to the start) is an end (LastTo > LastFrom)
-  if (Input.LastMove.IsSet()) {
+  // VS-6 FX-14 (ВР-29): by default the last move is the dashed path + arrow (View.LastPaths below); the MS-T-17
+  // outlines and dots only with -S08LastMoveLegacy
+  const bool bLastPaths = Input.LastMove.IsSet() && !S08FieldFx::LastMoveLegacy();
+  if (Input.LastMove.IsSet() && !bLastPaths) {
     for (const FIntPoint& C : Input.LastMove.From) {
       if (FS08PlateView* P = At(C)) Raise(P->Outline, ES08OutlineState::LastFrom);
     }
@@ -218,6 +226,15 @@ FS08MoveDraftView BuildDraftView(const FS08BoardModel& Board, const TArray<FS08B
   if (FS08PlateView* P = At(Input.Hover)) P->Flags |= S08PlateFlags::Hover;
   FS08MoveDraftView View = Finish(Board, Fighters, Input.bLeaderPips, Spaces, Input.Source);
   View.Hover = Input.Hover;
+  if (bLastPaths) {
+    for (int32 I = 0; I < Input.LastMove.Paths.Num(); ++I) {
+      FS08LastPathView Path;
+      Path.Cells = Input.LastMove.Paths[I];
+      Path.bPlace = Input.LastMove.Places.IsValidIndex(I) && Input.LastMove.Places[I];
+      Path.Color = Input.LastMove.Color;
+      if (Path.Cells.Num() >= 2) View.LastPaths.Add(MoveTemp(Path));
+    }
+  }
   // the paths (drawn as a line by MS-T-09; the centre dots above already mark their spaces)
   for (const FS08MoveDraftInput::FMove& Move : Input.Moves) {
     FS08PathView Path;
@@ -274,6 +291,10 @@ uint32 ViewHash(const FS08MoveDraftView& View) {
     H = HashCombineFast(H, GetTypeHash(Path.FighterId));
     for (const FIntPoint& C : Path.Cells) H = HashCombineFast(H, GetTypeHash(C));
     H = HashCombineFast(H, (Path.bConflict ? 1u : 0u) | (Path.bNeedBoost ? 2u : 0u) | (Path.bSent ? 4u : 0u));
+  }
+  for (const FS08LastPathView& Path : View.LastPaths) {
+    for (const FIntPoint& C : Path.Cells) H = HashCombineFast(H, GetTypeHash(C));
+    H = HashCombineFast(H, (Path.bPlace ? 1u : 0u) | (static_cast<uint32>(Path.Color) << 1) | 0x80000000u);
   }
   H = HashCombineFast(H, GetTypeHash(View.Hover));
   return H;
@@ -408,6 +429,12 @@ void US08MoveHighlightComponent::ApplyStyle(const FS08MoveSelectionSpec& InStyle
   Mid->SetVectorParameterValue(ParamErrorColor, FLinearColor::FromSRGBColor(Style.InvalidColor));
   Mid->SetVectorParameterValue(ParamTeamP1Color, FLinearColor::FromSRGBColor(TeamP1Screen));
   Mid->SetVectorParameterValue(ParamTeamP2Color, FLinearColor::FromSRGBColor(TeamP2Screen));
+  // VS-6 FX-08 / FX-09: board.choice of the profile (= the token, ВР-76) and board.target of the pulse on a target
+  Mid->SetVectorParameterValue(ParamChoiceColor, FLinearColor::FromSRGBColor(Style.ChoiceColor));
+  Mid->SetVectorParameterValue(ParamTargetColor, FLinearColor::FromSRGBColor(S08HudTokens::Color_BoardTarget));
+  Mid->SetScalarParameterValue(ParamCandFade, 1.0f);
+  Mid->SetScalarParameterValue(ParamCandLeave, 1.0f);
+  Mid->SetScalarParameterValue(ParamPendFade, 1.0f);
 }
 
 void US08MoveHighlightComponent::BuildForBoard(const FS08BoardModel& InBoard, const FS08MoveSelectionSpec& InStyle) {
@@ -441,6 +468,9 @@ void US08MoveHighlightComponent::BuildForBoard(const FS08BoardModel& InBoard, co
     }
     WrittenZ[C].Init(-1e6f, SpaceCells.Num());
   }
+  // VS-6: the FX-14 dash quads and arrowheads and the FX-09 pulse after the per-space channels (drawn on top)
+  const int32 Extra = S08MovePlateSpec::PathSlots + S08MovePlateSpec::ArrowSlots + S08MovePlateSpec::PulseSlots;
+  for (int32 I = 0; I < Extra; ++I) Hidden.Add(FTransform(FRotator::ZeroRotator, FVector::ZeroVector, FVector::ZeroVector));
   Plates->AddInstances(Hidden, false);
   // the channel of every instance is written once here and never changes
   for (int32 C = 0; C < NumChannels; ++C) {
@@ -448,6 +478,17 @@ void US08MoveHighlightComponent::BuildForBoard(const FS08BoardModel& InBoard, co
       Plates->SetCustomDataValue(C * SpaceCells.Num() + I, S08MovePlateCpd::Channel, static_cast<float>(C), false);
     }
   }
+  for (int32 I = 0; I < Extra; ++I) {
+    const float Ch = I < S08MovePlateSpec::PathSlots ? S08MovePlateSpec::PathChannel
+                     : I < S08MovePlateSpec::PathSlots + S08MovePlateSpec::ArrowSlots ? S08MovePlateSpec::ArrowChannel
+                                                                                        : S08MovePlateSpec::PulseChannel;
+    Plates->SetCustomDataValue(ExtraInstance(I), S08MovePlateCpd::Channel, Ch, false);
+  }
+  PrevCandidates.Reset();
+  PrevPending.Reset();
+  PrevCandidateScale.Reset();
+  Leaving.Reset();
+  bPulseOn = false;
   Plates->MarkRenderStateDirty();
   AppliedHash = 0;
   ApplyStyle(InStyle);
@@ -483,9 +524,93 @@ void US08MoveHighlightComponent::SetLastMoveFade(float Fade) {
   if (PlateMid) PlateMid->SetScalarParameterValue(S08MovePlateSpec::ParamLastMoveFade, LastMoveFade);
 }
 
-int32 US08MoveHighlightComponent::ApplyView(const FS08MoveDraftView& View) {
+int32 US08MoveHighlightComponent::ApplyView(const FS08MoveDraftView& InView) {
   if (!Plates || SpaceCells.Num() == 0) return 0;
-  const uint32 Hash = S08MoveHighlight::ViewHash(View);
+  FS08MoveDraftView View = InView;
+  if (bChoiceOnly) {
+    // VS-6: without -S08MovePlates only the choice layer - the V-17 rings (DE-017), the FX-14 path, the pulse
+    TArray<FS08PlateView> Kept;
+    for (const FS08PlateView& P : View.Plates) {
+      if (P.Ring != ES08RingState::Candidate) continue;
+      FS08PlateView C = P;
+      C.Outline = ES08OutlineState::None;
+      C.bPathDot = false;
+      C.Glyph = ES08GlyphState::None;
+      C.Steps = C.Chip = C.Order = 0;
+      Kept.Add(C);
+    }
+    View.Plates = MoveTemp(Kept);
+    View.Paths.Reset();
+    View.Ghosts.Reset();
+  }
+  // VS-6 FX-08: V-17 fades in over 100 ms when the first ring appears (the maneuver start) and the rings of the
+  // previous view fade out over 100 ms in the frame of the fighter pick; V-11 / V-12 fade in over 150 ms
+  {
+    TSet<int32> NowCand, NowPend;
+    for (const FS08PlateView& P : View.Plates) {
+      const int32* Index = InstanceByCell.Find(FS08BoardModel::CellKey(P.X, P.Y));
+      if (!Index) continue;
+      if (P.Ring == ES08RingState::Candidate) NowCand.Add(*Index);
+      if (P.Ring == ES08RingState::PendingMove || P.Ring == ES08RingState::PendingPlace) NowPend.Add(*Index);
+    }
+    const double Now = NowS();
+    bool bKick = false;
+    if (NowCand.Num() > 0 && PrevCandidates.Num() == 0) {
+      CandFadeStartS = Now;
+      bKick = true;
+    }
+    if (NowPend.Num() > 0 && PrevPending.Num() == 0) {
+      PendFadeStartS = Now;
+      bKick = true;
+    }
+    if (!S08FieldFx::ChoiceLegacy()) {
+      for (const int32 I : PrevCandidates) {
+        if (NowCand.Contains(I) || !SpaceCells.IsValidIndex(I)) continue;
+        const FIntPoint Cell = SpaceCells[I];
+        const FS08PlateView* Now0 = View.Find(Cell.X, Cell.Y);
+        if (Now0 && Now0->Ring != ES08RingState::None) continue;
+        if (Leaving.ContainsByPredicate([&Cell](const FS08PlateView& L) { return L.X == Cell.X && L.Y == Cell.Y; })) {
+          continue;
+        }
+        FS08PlateView L;
+        L.X = Cell.X;
+        L.Y = Cell.Y;
+        L.Ring = ES08RingState::Candidate;
+        L.Flags = S08PlateFlags::Leaving;
+        const float* Scale = PrevCandidateScale.Find(I);
+        L.FigureScale = Scale ? *Scale : 1.0f;
+        Leaving.Add(L);
+        CandLeaveStartS = Now;
+        bKick = true;
+      }
+    }
+    PrevCandidates = NowCand;
+    PrevPending = NowPend;
+    PrevCandidateScale.Reset();
+    for (const FS08PlateView& P : View.Plates) {
+      if (P.Ring != ES08RingState::Candidate) continue;
+      if (const int32* Index = InstanceByCell.Find(FS08BoardModel::CellKey(P.X, P.Y))) {
+        PrevCandidateScale.Add(*Index, P.FigureScale);
+      }
+    }
+    for (const FS08PlateView& L : Leaving) {
+      FS08PlateView* Existing = nullptr;
+      for (FS08PlateView& P : View.Plates) {
+        if (P.X == L.X && P.Y == L.Y) Existing = &P;
+      }
+      if (!Existing) {
+        View.Plates.Add(L);
+      } else if (Existing->Ring == ES08RingState::None) {
+        Existing->Ring = ES08RingState::Candidate;
+        Existing->Flags |= S08PlateFlags::Leaving;
+        Existing->FigureScale = L.FigureScale;
+      }
+    }
+    LastInputView = InView;
+    if (bKick) KickFx();
+  }
+  uint32 Hash = S08MoveHighlight::ViewHash(View);
+  Hash = HashCombineFast(Hash, static_cast<uint32>(Leaving.Num()) | (bChoiceOnly ? 0x10000u : 0u));
   if (Hash == AppliedHash && AppliedHash != 0) return 0;
   using S08MovePlateSpec::EChannel;
   const int32 NumChannels = static_cast<int32>(EChannel::Count);
@@ -512,6 +637,12 @@ int32 US08MoveHighlightComponent::ApplyView(const FS08MoveDraftView& View) {
           case EChannel::Ring:
             State = static_cast<uint8>(P->Ring);
             if (P->Ring == ES08RingState::Conflict) Color = ES08PlateColor::Error;
+            // VS-6 FX-08 (ВР-27): «choose this» on the field is board.choice (-S08ChoiceLegacy: the plate colour)
+            if (!S08FieldFx::ChoiceLegacy() &&
+                (P->Ring == ES08RingState::Candidate || P->Ring == ES08RingState::PendingMove ||
+                 P->Ring == ES08RingState::PendingPlace)) {
+              Color = ES08PlateColor::Choice;
+            }
             // the ally mark exists on hover only (V-06); the fill draws nothing for the boost tier / ally / candidate
             bShow = P->Ring != ES08RingState::None &&
                        !(P->Ring == ES08RingState::AllyPass && !(P->Flags & S08PlateFlags::Hover));
@@ -563,6 +694,9 @@ int32 US08MoveHighlightComponent::ApplyView(const FS08MoveDraftView& View) {
       ++Updates;
     }
   }
+  // VS-6 FX-14: the dashed last path and its arrowheads (the extra instances)
+  WriteLastPaths(View.LastPaths);
+  ++Updates;
   if (Updates > 0) Plates->MarkRenderStateDirty();
   AppliedHash = Hash;
   if (Updates > 0) {
@@ -594,4 +728,191 @@ bool US08MoveHighlightComponent::IsInstanceVisible(S08MovePlateSpec::EChannel Ch
   Plates->GetInstanceTransform(Instance, T, false);
   return !T.GetScale3D().IsNearlyZero() && WrittenZ.IsValidIndex(C) && WrittenZ[C].IsValidIndex(Space) &&
          WrittenZ[C][Space] > -1e5f;
+}
+
+// ---------------------------------------------------------------------------------------------------- VS-6 field FX
+
+double US08MoveHighlightComponent::NowS() const {
+  const UWorld* World = GetWorld();
+  return World ? World->GetTimeSeconds() : 0.0;
+}
+
+void US08MoveHighlightComponent::WriteExtra(int32 Slot, float Channel, const FTransform& T, bool bShow,
+                                            const float (&Data)[S08MovePlateSpec::NumCustomData]) {
+  const int32 Instance = ExtraInstance(Slot);
+  if (!Plates || !Plates->IsValidInstance(Instance)) return;
+  for (int32 I = 0; I < S08MovePlateSpec::NumCustomData; ++I) {
+    Plates->SetCustomDataValue(Instance, I, I == S08MovePlateCpd::Channel ? Channel : (bShow ? Data[I] : 0.0f), false);
+  }
+  FTransform Out = T;
+  if (!bShow) Out.SetScale3D(FVector::ZeroVector);
+  Plates->UpdateInstanceTransform(Instance, Out, false, false, true);
+}
+
+void US08MoveHighlightComponent::WriteLastPaths(const TArray<FS08LastPathView>& Paths) {
+  using namespace S08MovePlateSpec;
+  // FX-14 (ВР-29): one quad per edge (12 dashes, the team colour, the board.keyline edge), an arrowhead before the
+  // destination along the last edge; PLACE is one straight edge from -> to. The alpha is LastMoveFade (the tracker).
+  const float Width = Style.LastMoveWidthUU;
+  const float HalfQuad = 0.5f * Width + Style.KeylineUU + 1.0f;
+  const float Z = Style.PathZ;
+  int32 Quad = 0, Arrow = 0;
+  for (const FS08LastPathView& Path : Paths) {
+    if (Path.Cells.Num() < 2) continue;
+    TArray<TPair<FIntPoint, FIntPoint>> Edges;
+    if (Path.bPlace) {
+      Edges.Add({Path.Cells[0], Path.Cells.Last()});
+    } else {
+      for (int32 I = 0; I + 1 < Path.Cells.Num(); ++I) Edges.Add({Path.Cells[I], Path.Cells[I + 1]});
+    }
+    FVector LastDir = FVector::ZeroVector;
+    FVector LastEnd = FVector::ZeroVector;
+    for (const TPair<FIntPoint, FIntPoint>& E : Edges) {
+      const FVector A = Board.CellToWorld(E.Key.X, E.Key.Y);
+      const FVector B = Board.CellToWorld(E.Value.X, E.Value.Y);
+      const FVector D = FVector(B.X - A.X, B.Y - A.Y, 0.0f);
+      const float L = D.Size();
+      if (L < 1.0f) continue;
+      LastDir = D / L;
+      LastEnd = B;
+      if (Quad >= PathSlots) continue;
+      float Data[NumCustomData] = {0, 0, 0, 0, 0, 0, 0};
+      Data[S08MovePlateCpd::State] = static_cast<float>(Style.LastMoveDashPerEdge);
+      Data[S08MovePlateCpd::Steps] = L;
+      Data[S08MovePlateCpd::Chip] = HalfQuad;
+      Data[S08MovePlateCpd::GlyphIndex] = Width;
+      Data[S08MovePlateCpd::Color] = static_cast<float>(Path.Color);
+      const FVector Mid = (A + B) * 0.5f + FVector(0.0f, 0.0f, Z);
+      const FRotator Yaw(0.0f, FMath::RadiansToDegrees(FMath::Atan2(D.Y, D.X)), 0.0f);
+      WriteExtra(Quad, PathChannel, FTransform(Yaw, Mid, FVector(L / 100.0f, 2.0f * HalfQuad / 100.0f, 1.0f)), true,
+                 Data);
+      ++Quad;
+    }
+    if (!LastDir.IsNearlyZero() && Arrow < ArrowSlots) {
+      float Data[NumCustomData] = {0, 0, 0, 0, 0, 0, 0};
+      Data[S08MovePlateCpd::Steps] = ArrowBoxUU;
+      Data[S08MovePlateCpd::Color] = static_cast<float>(Path.Color);
+      const FVector Centre = LastEnd - LastDir * (ArrowBackUU + 0.5f * ArrowBoxUU) + FVector(0.0f, 0.0f, Z + 0.05f);
+      const FRotator Yaw(0.0f, FMath::RadiansToDegrees(FMath::Atan2(LastDir.Y, LastDir.X)), 0.0f);
+      WriteExtra(PathSlots + Arrow, ArrowChannel, FTransform(Yaw, Centre, FVector(ArrowBoxUU / 100.0f)), true, Data);
+      ++Arrow;
+    }
+  }
+  const float Zero[NumCustomData] = {0, 0, 0, 0, 0, 0, 0};
+  for (int32 I = Quad; I < PathSlots; ++I) WriteExtra(I, PathChannel, FTransform::Identity, false, Zero);
+  for (int32 I = Arrow; I < ArrowSlots; ++I) WriteExtra(PathSlots + I, ArrowChannel, FTransform::Identity, false, Zero);
+  if (Quad != LastPathQuads || Arrow != LastPathArrows) {
+    FS08Trace::Write(FString::Printf(TEXT("MS-HL last-path paths=%d quads=%d arrows=%d dash=%d width=%.1f"),
+                                     Paths.Num(), Quad, Arrow, Style.LastMoveDashPerEdge, Width));
+  }
+  LastPathQuads = Quad;
+  LastPathArrows = Arrow;
+}
+
+void US08MoveHighlightComponent::WritePulse(double Ms) {
+  using namespace S08MovePlateSpec;
+  const int32 Slot = PathSlots + ArrowSlots;
+  const float Zero[NumCustomData] = {0, 0, 0, 0, 0, 0, 0};
+  const int32* Index = InstanceByCell.Find(FS08BoardModel::CellKey(PulseCell.X, PulseCell.Y));
+  if (!bPulseOn || !Index) {
+    WriteExtra(Slot, PulseChannel, FTransform::Identity, false, Zero);
+    if (Plates) Plates->MarkRenderStateDirty();
+    return;
+  }
+  const S08FieldFx::FPulsePose Pose = S08FieldFx::ConfirmPulse(Ms, S08IconMotion::IsReducedMotion());
+  float Data[NumCustomData] = {0, 0, 0, 0, 0, 0, 0};
+  Data[S08MovePlateCpd::State] = 1.0f;
+  Data[S08MovePlateCpd::Steps] = Pose.Fill;
+  Data[S08MovePlateCpd::Chip] = Pose.Dim;
+  Data[S08MovePlateCpd::Flags] = bPulseTarget ? S08PlateFlags::Occupied : 0;
+  Data[S08MovePlateCpd::Color] = static_cast<float>(bPulseTarget ? ES08PlateColor::Target : ES08PlateColor::Plate);
+  const float S = HalfUU * 2.0f / 100.0f * Pose.Scale;
+  const FVector At = Board.CellToWorld(PulseCell.X, PulseCell.Y) + FVector(0.0f, 0.0f, Style.ZRing + 0.1f);
+  WriteExtra(Slot, PulseChannel, FTransform(FRotator::ZeroRotator, At, FVector(S, S, 1.0f)), true, Data);
+  if (Plates) Plates->MarkRenderStateDirty();
+}
+
+void US08MoveHighlightComponent::PlayConfirmPulse(int32 X, int32 Y, bool bTarget) {
+  if (S08FieldFx::PulseLegacy() || !InstanceByCell.Contains(FS08BoardModel::CellKey(X, Y))) return;
+  bPulseOn = true;
+  PulseCell = FIntPoint(X, Y);
+  bPulseTarget = bTarget;
+  PulseStartS = NowS();
+  FS08Trace::Write(FString::Printf(TEXT("MS-HL pulse cell=%s kind=%s ms=%d reduced=%d"), *Board.CellLabel(X, Y),
+                                   bTarget ? TEXT("target") : TEXT("move"),
+                                   FMath::RoundToInt(S08FieldFx::ConfirmPulseMs),
+                                   S08IconMotion::IsReducedMotion() ? 1 : 0));
+  KickFx();
+}
+
+void US08MoveHighlightComponent::SetPulseStatic(int32 X, int32 Y, bool bTarget, double Ms) {
+  if (S08FieldFx::PulseLegacy() || !InstanceByCell.Contains(FS08BoardModel::CellKey(X, Y))) return;
+  bPulseOn = true;
+  PulseCell = FIntPoint(X, Y);
+  bPulseTarget = bTarget;
+  PulseStartS = -1.0e9;  // the bench: no timer, the pose at Ms
+  WritePulse(Ms);
+}
+
+void US08MoveHighlightComponent::KickFx() {
+  TickFx();
+  UWorld* World = GetWorld();
+  if (!World) return;
+  FTimerManager& Timers = World->GetTimerManager();
+  if (!Timers.IsTimerActive(FxTimer)) {
+    Timers.SetTimer(FxTimer, FTimerDelegate::CreateWeakLambda(this, [this] { TickFx(); }), 1.0f / 60.0f, true);
+  }
+}
+
+void US08MoveHighlightComponent::TickFx() {
+  using namespace S08MovePlateSpec;
+  const bool bReduced = S08IconMotion::IsReducedMotion();
+  const double Now = NowS();
+  bool bActive = false;
+  if (PlateMid) {
+    if (CandFadeStartS >= 0.0) {
+      const float F = S08FieldFx::FadeIn((Now - CandFadeStartS) * 1000.0, S08FieldFx::CandidateInMs, bReduced);
+      PlateMid->SetScalarParameterValue(ParamCandFade, F);
+      if (F >= 1.0f) {
+        CandFadeStartS = -1.0;
+      } else {
+        bActive = true;
+      }
+    }
+    if (PendFadeStartS >= 0.0) {
+      const float F = S08FieldFx::FadeIn((Now - PendFadeStartS) * 1000.0, S08FieldFx::PendingInMs, bReduced);
+      PlateMid->SetScalarParameterValue(ParamPendFade, F);
+      if (F >= 1.0f) {
+        PendFadeStartS = -1.0;
+      } else {
+        bActive = true;
+      }
+    }
+    if (CandLeaveStartS >= 0.0) {
+      const float F = S08FieldFx::FadeIn((Now - CandLeaveStartS) * 1000.0, S08FieldFx::CandidateOutMs, bReduced);
+      PlateMid->SetScalarParameterValue(ParamCandLeave, 1.0f - F);
+      if (F >= 1.0f) {
+        CandLeaveStartS = -1.0;
+        Leaving.Reset();
+        PlateMid->SetScalarParameterValue(ParamCandLeave, 1.0f);
+        AppliedHash = 0;
+        const FS08MoveDraftView Again = LastInputView;
+        ApplyView(Again);  // the leaving rings go: the view of the pick frame without them
+      } else {
+        bActive = true;
+      }
+    }
+  }
+  if (bPulseOn && PulseStartS > -1.0e8) {
+    const double Ms = (Now - PulseStartS) * 1000.0;
+    if (S08FieldFx::ConfirmPulse(Ms, bReduced).bDone) {
+      bPulseOn = false;  // the space keeps its own state (V-10 sent / V-04 destination) from the draft
+    } else {
+      bActive = true;
+    }
+    WritePulse(Ms);
+  }
+  if (!bActive) {
+    if (UWorld* World = GetWorld()) World->GetTimerManager().ClearTimer(FxTimer);
+  }
 }

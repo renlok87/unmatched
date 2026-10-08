@@ -57,12 +57,12 @@ TOOL_VERSION = "1"
 MI_PLAN = [
     # asset, master ("" = M_FX_Print, "overlay" = M_FX_Print_Overlay), use_sdf, sdf_shape, body, edge, keyline
     ("MI_FX_HitStar", "overlay", False, -1, "fx.impact", "card.glyph", "mark.keyline"),
-    ("MI_FX_Dust", "", False, -1, "fx.dust", "fx.dust.2", "mark.keyline"),
+    # VS-6 F1 (ВР-VS6-06): MI_FX_Dust and MI_FX_Chevron moved onto M_FX_BoardPrint - tools/art/fx/ue_fx_field.py owns
+    # them now (this script must not re-parent them back onto M_FX_Print)
     ("MI_FX_Heal", "", False, -1, "fx.heal", "card.glyph", "mark.keyline"),
     ("MI_FX_Ember", "", False, -1, "fx.ash", "fx.ash.p1", "mark.keyline"),
     ("MI_FX_Vortex", "", False, -1, "fx.gold", "card.glyph", "mark.keyline"),
     ("MI_FX_Arc", "overlay", False, -1, "fx.gold", "card.glyph", "mark.keyline"),
-    ("MI_FX_Chevron", "", True, 2, "fx.stone", "card.glyph", "mark.keyline"),
     # the FX-02 test placard: the star flipbook + the three SDF shapes. ВР-Z2R-07 (по делегированию, the Z-2 review):
     # every placard body differs from its card.glyph edge by >= 20 grey levels (the card's readability rule) - the
     # cream disk / chevron of Z-2 sat 12 levels under the white edge and the edge vanished; the outer keyline

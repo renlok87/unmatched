@@ -65,7 +65,8 @@ class TableTests(unittest.TestCase):
         self.assertEqual(row(TABLE, "CUE-006")["fallback"]["behaviour"], "рамка без вспышки")
         self.assertEqual((row(TABLE, "CUE-009")["material"]["cpd_param"], row(TABLE, "CUE-009")["material"]["cpd_indices"]),
                          ("Rim", [9, 10]))                                  # ВР-23
-        self.assertEqual(row(TABLE, "CUE-003")["marker"], {"material": "M_UM_MovePlate"})
+        self.assertEqual(row(TABLE, "CUE-003")["marker"]["material"], "M_UM_MovePlate")
+        self.assertEqual(row(TABLE, "CUE-003")["marker"]["channel"], "Pulse")   # VS-6 F1 FX-09
         want = {"CUE-007": ("NS_FX_Dust", "world", None, "FX-13"), "CUE-008": ("NS_FX_AttackChevrons", "world", None, "FX-16"),
                 "CUE-011": ("NS_FX_HitStar", "world", None, "FX-21"), "CUE-012": ("NS_FX_HealMotes", "socket", "Base", "FX-24"),
                 "CUE-013": ("NS_FX_AshEmbers", "world", None, "FX-26"), "CUE-014": (None, "socket", "Weapon", "FX-28")}
@@ -73,8 +74,13 @@ class TableTests(unittest.TestCase):
             v = row(TABLE, cid)["vfx"]
             self.assertEqual((cc.short_name(v["system"]) if v["system"] else None, v["attach"], v["socket"], v["fx_row"]),
                              (system, attach, socket, fx_row), cid)
-            self.assertEqual(v["status"], "missing", cid)                  # ассетов систем ещё нет в Content
-            self.assertIn(fx_row, v["missing_reason"], cid)
+            if cid in ("CUE-007", "CUE-008"):
+                # VS-6 F1: NS_FX_Dust (FX-13) and NS_FX_AttackChevrons (FX-16) exist in Content
+                self.assertEqual(v["status"], "present", cid)
+                self.assertNotIn("missing_reason", v, cid)
+            else:
+                self.assertEqual(v["status"], "missing", cid)              # ассетов систем ещё нет в Content
+                self.assertIn(fx_row, v["missing_reason"], cid)
         self.assertEqual(row(TABLE, "CUE-016")["postprocess"]["profile_delta"]["defeat"]["saturation_mul"], 0.8)
         self.assertEqual(row(TABLE, "CUE-017")["postprocess"]["fx_row"], "FX-35")
 
@@ -88,8 +94,8 @@ class TableTests(unittest.TestCase):
                 self.assertIn(c["vfx"]["fx_row"], tasks, c["id"])
         t = copy.deepcopy(TABLE); row(t, "CUE-007")["vfx"]["fx_row"] = "FX-99"
         self.assertTrue(any("FX-99" in e for e in cc.validate_table(t)))
-        t = copy.deepcopy(TABLE); row(t, "CUE-007")["vfx"]["missing_reason"] = "ассет не создан"
-        self.assertTrue(any("не называет строку FX-13" in e for e in cc.validate_table(t)))
+        t = copy.deepcopy(TABLE); row(t, "CUE-011")["vfx"]["missing_reason"] = "ассет не создан"
+        self.assertTrue(any("не называет строку FX-21" in e for e in cc.validate_table(t)))
         t = copy.deepcopy(TABLE); del row(t, "CUE-007")["vfx"]["fx_row"]
         self.assertTrue(any(e.startswith("schema") for e in cc.validate_table(t)))
 
@@ -339,6 +345,30 @@ class ModelAndGateTests(unittest.TestCase):
         errs, summary = cc.check_trace(fx["expect_trace"], TABLE)
         self.assertEqual(errs, [])
         self.assertEqual((summary["presented"], summary["unique_triples"], summary["duplicate"]), (1, 1, 1))
+
+    def test_vs6_field_cue_lines_pass_the_gate(self):
+        """VS-6 F1: the lines of the C++ rows CUE-002 / 003 / 004 (local) and CUE-007 (server, plan duration, snap) as
+        Unmatched.S08.FieldFx.Rows writes them pass G-CUE; a CUE-004 sound faster than 300 ms is G7 unless throttled."""
+        good = [
+            "CUE fx id=CUE-002 subject=f-0-hero seq=- t=0 vfx=none sfx=SW_UI_SELECT_01 clip=none mat=none socket=- reduced=0 result=spawned",
+            "CUE fx done id=CUE-002 subject=f-0-hero seq=- t=250 ms=250 cut=0",
+            "CUE fx id=CUE-003 subject=cell-2-0 seq=- t=400 vfx=none sfx=SW_UI_CONFIRM_01 clip=none mat=none socket=- reduced=0 result=spawned",
+            "CUE fx done id=CUE-003 subject=cell-2-0 seq=- t=650 ms=250 cut=0",
+            "CUE fx id=CUE-004 subject=cell-1-3 seq=- t=700 vfx=none sfx=SW_UI_REJECT_01 clip=none mat=none socket=- reduced=0 result=spawned",
+            "CUE fx done id=CUE-004 subject=cell-1-3 seq=- t=850 ms=150 cut=replace",
+            "CUE fx id=CUE-004 subject=cell-1-3 seq=- t=850 vfx=none sfx=throttled clip=none mat=none socket=- reduced=0 result=spawned",
+            "CUE fx done id=CUE-004 subject=cell-1-3 seq=- t=1200 ms=350 cut=0",
+            "CUE fx id=CUE-007 subject=f-0-sk0 seq=41 t=1300 vfx=NS_FX_Dust sfx=SW_BRD_STEP_01 clip=none mat=none socket=- reduced=0 result=spawned",
+            "CUE fx done id=CUE-007 subject=f-0-sk0 seq=41 t=1860 ms=560 cut=0",
+            "CUE settings reduced_motion=1 t=1900",
+            "CUE fx id=CUE-007 subject=f-0-sk0 seq=42 t=1900 vfx=NS_FX_Dust sfx=SW_BRD_STEP_01 clip=none mat=none socket=- reduced=1 result=spawned",
+            "CUE fx done id=CUE-007 subject=f-0-sk0 seq=42 t=1900 ms=0 cut=0",
+        ]
+        errs, summary = cc.check_trace(good, TABLE)
+        self.assertEqual([e for e in errs if e[0].startswith("G")], [])
+        self.assertEqual(summary["presented"], 6)
+        bad = [l.replace("sfx=throttled", "sfx=SW_UI_REJECT_01") for l in good]
+        self.assertIn("G7", {c for c, _ in cc.check_trace(bad, TABLE)[0]})
 
     def test_every_presented_line_has_all_fields(self):
         fx = cc.load_json(cc.FIXTURES / "reconnect-no-replay.json")

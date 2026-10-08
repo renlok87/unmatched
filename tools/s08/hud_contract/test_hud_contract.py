@@ -344,3 +344,17 @@ def test_check_shots_model_state_hb48():
     assert hc.check_shots(lines, [model])[0][0][1] == []
     deny = hc.parse_rule("s09-probe-maneuver-draft.png: deny UI-HUD-ACTIONS state=mode=maneuver visible=0|1")
     assert hc.check_shots(lines, [deny])[0][0][1]
+
+
+def test_board_profile_choice_vr76(tmp_path):
+    """VS-6 F1 FX-08 (ВР-76): the profile's board.choice / board.reach equal the tokens; a wrong hex is an error."""
+    import json
+    assert hc.board_profile_errors() == []
+    data = json.loads(hc.PROFILES.read_text(encoding="utf-8"))
+    data["boards"][0]["moveSelection"]["choice"]["colorSrgb"] = "#4CD2DD"
+    del data["boards"][1]["moveSelection"]["choice"]
+    bad = tmp_path / "profiles.json"
+    bad.write_text(json.dumps(data), encoding="utf-8")
+    errors = hc.board_profile_errors(bad)
+    assert any("choice.colorSrgb" in e for e in errors)
+    assert any("нет moveSelection.choice" in e for e in errors)

@@ -37,6 +37,18 @@ QA010 = T52.QA010
 PROFILES = T52.PROFILES
 TOKENS = REPO / "docs" / "unreal" / "contracts" / "hud" / "hud-style-tokens.json"
 TOKEN_DIR = REPO / "art" / "imagegen" / "mvp-v1" / "ui" / "actions" / "sized"
+# IC-35 (VS-6 F1, ВР-IC15): the analysis measures the v3 token - sizes/action-attack-token[-glyphmask]-<n>.png of
+# art/imagegen/hud-icons-v3 (24 / 32 / 48 and the other exports); the mvp-v1 pair only for a size v3 does not export
+TOKEN_DIR_V3 = REPO / "art" / "imagegen" / "hud-icons-v3" / "sizes"
+
+
+def token_textures(n: int) -> tuple[Path, Path]:
+    """(glyph mask, token) of the target token at n px: v3 first, mvp-v1 as the fallback (IC-35)."""
+    mask = TOKEN_DIR_V3 / f"action-attack-token-glyphmask-{n}.png"
+    token = TOKEN_DIR_V3 / f"action-attack-token-{n}.png"
+    if mask.is_file() and token.is_file():
+        return mask, token
+    return TOKEN_DIR / f"ui-action-attack-token-{n}-glyphmask.png", TOKEN_DIR / f"ui-action-attack-token-{n}.png"
 T52_EVIDENCE = REPO / "docs" / "game-design" / "evidence" / "ART-005" / "art3-live-3boards-2026-09-29"
 BOARDS = T52.BOARDS
 FIGHTER_NAMES = T52.FIGHTER_NAMES
@@ -1505,9 +1517,9 @@ def _cmd_analyze(a) -> int:
         entry = {"frame": L.rel(sh.png), "binding": ib}
         if ib["present"]:
             n = int(round(ib["bbox"][2] - ib["bbox"][0]))
+            mask, token = token_textures(n)
             rc, doc = run_qa(["icon", str(sh.png), "--trace", str(sh.trace_path), "--shot", sh.png.name,
-                              "--mask-texture", str(TOKEN_DIR / f"ui-action-attack-token-{n}-glyphmask.png"),
-                              "--token-texture", str(TOKEN_DIR / f"ui-action-attack-token-{n}.png")],
+                              "--mask-texture", str(mask), "--token-texture", str(token)],
                              out / f"icon-{tag}.json")
             entry.update(size=n, exit=rc, result=(doc or {}).get("result"), variants=(doc or {}).get("variants"),
                          guard=(doc or {}).get("guard"), status=(doc or {}).get("status"))
@@ -1536,9 +1548,9 @@ def _cmd_analyze(a) -> int:
                 stale.append({"frame": L.rel(png), "icon": "none (late: hidden)" if sh.block.icon_hidden_late else "none"})
                 continue
             n = int(round(ib["bbox"][2] - ib["bbox"][0]))
+            mask, token = token_textures(n)
             rc, doc = run_qa(["icon", str(png), "--trace", str(tp), "--shot", png.name,
-                              "--mask-texture", str(TOKEN_DIR / f"ui-action-attack-token-{n}-glyphmask.png"),
-                              "--token-texture", str(TOKEN_DIR / f"ui-action-attack-token-{n}.png")],
+                              "--mask-texture", str(mask), "--token-texture", str(token)],
                              out / "icon-presence" / f"{side}-{png.stem}.json")
             stale.append({"frame": L.rel(png), "icon": "traced", "guard": (doc or {}).get("guard")})
     summary["iconPresence"] = {"frames": len(stale),

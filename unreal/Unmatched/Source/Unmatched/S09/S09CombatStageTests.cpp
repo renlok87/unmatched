@@ -35,9 +35,33 @@ FString ContractDir() {
       FPaths::Combine(FPaths::ProjectDir(), TEXT("../../docs/unreal/contracts/cue-dispatcher")));
 }
 
-/** The fixtures' clip rule (cue_contract.fighter_clip): trace subject -> AM_<Key>_<Role>. */
+/** VS-6 F1: the short names of the vfx systems the table marks present (the reference dispatcher's rule). */
+TMap<FString, FString> TablePresentVfx() {
+  TMap<FString, FString> Out;
+  const TSharedPtr<FJsonObject> Table = LoadJson(ContractDir() / TEXT("cue-table.json"));
+  if (!Table.IsValid()) return Out;
+  for (const TSharedPtr<FJsonValue>& Value : Table->GetArrayField(TEXT("cues"))) {
+    const TSharedPtr<FJsonObject> Row = Value->AsObject();
+    const TSharedPtr<FJsonObject>* Vfx = nullptr;
+    FString Status, System, Left, Right;
+    if (Row.IsValid() && Row->TryGetObjectField(TEXT("vfx"), Vfx) && (*Vfx)->TryGetStringField(TEXT("status"), Status) &&
+        Status == TEXT("present") && (*Vfx)->TryGetStringField(TEXT("system"), System)) {
+      Out.Add(Row->GetStringField(TEXT("id")),
+              System.Split(TEXT("."), &Left, &Right, ESearchCase::CaseSensitive, ESearchDir::FromEnd) ? Right : System);
+    }
+  }
+  return Out;
+}
+
+/** The fixtures' clip rule (cue_contract.fighter_clip): trace subject -> AM_<Key>_<Role>; VS-6 F1: a vfx the table
+ *  marks present gives its system's short name. */
 void BindClips(FS08CueDispatcher& Cues) {
-  Cues.AssetResolver = [](const FString& CueId, const FString& Channel, const FString& Subject) -> FString {
+  const TMap<FString, FString> TableVfx = TablePresentVfx();
+  Cues.AssetResolver = [TableVfx](const FString& CueId, const FString& Channel, const FString& Subject) -> FString {
+    if (Channel == TEXT("vfx")) {
+      const FString* System = TableVfx.Find(CueId);
+      return System ? *System : FString(TEXT("missing"));
+    }
     if (Channel != TEXT("clip")) return TEXT("missing");
     const FS08CueRow* Row = S08CueRows::Find(S08CueRows::Combat(), CueId);
     FString Letters;

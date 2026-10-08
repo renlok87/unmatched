@@ -211,6 +211,42 @@ def literal_errors(src_dir=UI_SRC):
     return errors
 
 
+PROFILES = REPO / "unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json"
+REAL_MAPS = ("marmoreal-original", "sarpedon-original")
+
+
+def board_profile_errors(path=PROFILES, tokens=TOKENS):
+    """ВР-76 (VS-6 F1, FX-08): the field colours of the board profiles equal their tokens - moveSelection.choice.colorSrgb
+    = the token it names (board.choice by default) on the root and every board; on the two original maps the choice
+    block is present and moveSelection.plate.colorSrgb = board.reach (02 §2.7)."""
+    colors = load(tokens)["colors"]
+    profiles = load(path)
+    errors = []
+
+    def token_hex(name):
+        return codegen.resolve_color(colors, name)[0].upper()
+
+    blocks = [("root", profiles.get("moveSelection") or {})]
+    blocks += [(b.get("id"), b.get("moveSelection") or {}) for b in profiles.get("boards", [])]
+    for bid, ms in blocks:
+        choice = ms.get("choice")
+        if choice is not None:
+            token = choice.get("token", "board.choice")
+            if token not in colors:
+                errors.append("%s: moveSelection.choice.token %s - нет такого токена" % (bid, token))
+            elif str(choice.get("colorSrgb", "")).upper() != token_hex(token):
+                errors.append("%s: moveSelection.choice.colorSrgb %s != %s %s" % (bid, choice.get("colorSrgb"), token,
+                                                                                 token_hex(token)))
+        if bid in REAL_MAPS:
+            if choice is None:
+                errors.append("%s: нет moveSelection.choice (board.choice, ВР-27)" % bid)
+            plate = (ms.get("plate") or {}).get("colorSrgb")
+            if plate is not None and plate.upper() != token_hex("board.reach"):
+                errors.append("%s: moveSelection.plate.colorSrgb %s != board.reach %s" % (bid, plate,
+                                                                                         token_hex("board.reach")))
+    return errors
+
+
 def validate_why(why, spec02_text):
     errors = []
     keys = [r["key"] for r in why["reasons"]]
@@ -603,7 +639,7 @@ def main(argv=None):
     spec02 = SPEC02.read_text(encoding="utf-8")
     if a.cmd == "validate":
         errors = (validate_tokens(load(TOKENS)) + codegen.header_errors(TOKENS, HEADER) + theme_asset_errors()
-                  + literal_errors() + validate_why(load(WHY), spec02))
+                  + literal_errors() + validate_why(load(WHY), spec02) + board_profile_errors())
         for e in errors:
             print("ERROR", e)
         print("HUD_CONTRACT", "PASS" if not errors else "FAIL")

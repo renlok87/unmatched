@@ -70,7 +70,7 @@ class UNMATCHED_API FUmFeedBlocks {
   void PushLog(const FUmLogEntry& Entry, double NowMs);
   void PushToast(const FUmToastSpec& Spec, double NowMs);
   void DismissToast(FName Key, double NowMs);
-  void ShowBadge(const FVector2D& CentreSu, double NowMs);
+  bool ShowBadge(const FVector2D& CentreSu, double NowMs, float SizeSu = 0.0f);
   void ShowSubtitle(const FUmSubtitleModel& Model);
   void HideSubtitle();
   /** Class S: «Журнал» toggles the list; any other click / Esc / the combat closes it. */

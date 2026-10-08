@@ -52,7 +52,9 @@ ROOT = "/Game/S08/MoveSelection"
 MATERIAL_NAME = "M_UM_MovePlate"
 MATERIAL_PATH = f"{ROOT}/{MATERIAL_NAME}"
 GRAPH_TAG = "MoveSelectionGraphVersion"
-GRAPH_VERSION = "3"  # 2: LastMoveFade (MS-T-17); 3: Channel = per-instance custom data 6 (MS-AT-41, one ISM)
+GRAPH_VERSION = "4"  # 2: LastMoveFade (MS-T-17); 3: Channel = per-instance custom data 6 (MS-AT-41, one ISM);
+# 4 (VS-6 F1): ChoiceColor / TargetColor, CandFade / CandLeave / PendFade, the channels 4 (FX-14 path dashes), 5 (its
+# arrowhead) and 6 (FX-09 confirm pulse) of the extra instances
 # per-instance custom data floats (S08MovePlateSpec::NumCustomData) and the channel slot (S08MovePlateCpd::Channel)
 NUM_CUSTOM_DATA = 7
 CHANNEL_SLOT = 6
@@ -62,13 +64,15 @@ SCALARS = {
     "Shape": 0.0, "HalfUU": 44.0, "RingCenter": 36.0, "RingWidth": 3.5, "Keyline": 1.5,
     "OutlineInner": 39.6, "OutlineOuter": 41.0, "OccClear": 30.0, "PipCutDeg": 15.0, "FillAlpha": 0.18,
     "DashCount": 12.0, "DashDuty": 0.6, "CandRadius": 18.9, "CandWidth": 1.2, "CandAlpha": 0.7, "LastMoveAlpha": 0.6,
-    "LastMoveFade": 1.0,
+    "LastMoveFade": 1.0, "CandFade": 1.0, "CandLeave": 1.0, "PendFade": 1.0,
 }
 # vector parameters (linear; FLinearColor::FromSRGBColor of #F2E9D8, #111317, #D9483F, #DAC576, #5786A8)
 VECTORS = {
     "PlateColor": (0.8879, 0.8148, 0.6867), "KeylineColor": (0.0056, 0.0065, 0.0086),
     "ErrorColor": (0.6939, 0.0648, 0.0497), "TeamP1Color": (0.7011, 0.5583, 0.1812),
     "TeamP2Color": (0.0953, 0.2384, 0.3916),
+    # VS-6 FX-08 / FX-09: board.choice #4CD2DC, board.target #F9EBDB (the component writes them from the profile / tokens)
+    "ChoiceColor": (0.0723, 0.6445, 0.7157), "TargetColor": (0.9473, 0.8308, 0.7084),
 }
 EXPOSURE_PARAM = "ExposureCompensationAlpha"
 # Custom node inputs in this order (A, B, Channel = the interpolated per-instance data)
@@ -85,6 +89,9 @@ bool hover = fmod(flags, 2.0) >= 1.0;
 bool sent = fmod(floor(flags / 2.0), 2.0) >= 1.0;
 bool occ = fmod(floor(flags / 8.0), 2.0) >= 1.0;
 bool pip = fmod(floor(flags / 16.0), 2.0) >= 1.0;
+bool leaving = fmod(floor(flags / 32.0), 2.0) >= 1.0;  // VS-6 FX-08: a V-17 ring of the previous view fading out
+// VS-6 colour index: 0 plate, 1 P1, 2 P2, 3 error, 4 board.choice (V-17 / V-11 / V-12), 5 board.target (the pulse)
+float3 choiceOr = colIdx > 3.5 && colIdx < 4.5 ? ChoiceColor : PlateColor;
 float r = length(q);
 float rho = r;
 if (Shape > 0.5) {
@@ -127,11 +134,11 @@ if (Channel < 0.5) {
   if (st == 7.0 || st == 3.0 || st == 2.0) fa = FillAlpha;
   else if (st == 4.0) fa = FillAlpha * 0.7;
   else if (st == 5.0) { fa = 0.35; fc = KeylineColor; edge = kOut; }
-  else if (st == 9.0) fa = 0.10;
+  else if (st == 9.0) { fa = 0.10 * PendFade; fc = choiceOr; }
   col = fc;
   a = fa * saturate((edge - rho) / w + 0.5) * occM * cut;
 } else if (Channel < 1.5) {
-  float3 c1 = PlateColor;
+  float3 c1 = choiceOr;
   float ringM = 0.0;
   float keyM = 0.0;
   bool useOcc = true;
@@ -154,7 +161,7 @@ if (Channel < 0.5) {
       ringM = hb * dash12 * 0.6;
     }
   }
-  else if (st == 9.0 || st == 10.0) { ringM = bRing * dash6; keyM = bKey * dash6; }
+  else if (st == 9.0 || st == 10.0) { ringM = bRing * dash6 * PendFade; keyM = bKey * dash6 * PendFade; }
   else if (st == 11.0) {
     float sc = aux > 0.05 ? aux : 1.0;
     float cIn = CandRadius * sc - 0.5 * CandWidth * sc;
@@ -163,7 +170,7 @@ if (Channel < 0.5) {
     ringM = saturate((r - cIn) / w + 0.5) * saturate((cOut - r) / w + 0.5);
     keyM = saturate((r - (cIn - ck)) / w + 0.5) * saturate((cIn - r) / w + 0.5)
          + saturate((r - cOut) / w + 0.5) * saturate((cOut + ck - r) / w + 0.5);
-    float ca = hover ? 1.0 : CandAlpha;
+    float ca = (hover ? 1.0 : CandAlpha) * (leaving ? CandLeave : CandFade);
     ringM *= ca;
     keyM *= ca;
     useOcc = false;
@@ -191,6 +198,50 @@ if (Channel < 0.5) {
   }
   col = tc;
   a = m * cut;
+} else if (Channel > 3.5 && Channel < 4.5) {
+  // VS-6 FX-14 (ВР-29): one dashed edge of the last path - st dashes along the quad (A.w = its length uu, B.x = half
+  // the quad width, B.y = the body width), the team colour (colIdx), the board.keyline edge, x LastMoveFade
+  float L = max(aux, 1.0);
+  float hq = max(B.x, 1.0);
+  float hb = 0.5 * max(B.y, 0.5);
+  float along = (A.x / 100.0 + 0.5) * L;
+  float across = abs(A.y / 50.0) * hq;
+  float nd = max(st, 1.0);
+  float cell = L / nd;
+  float sd = frac(along / cell) * cell;
+  float dl = 0.55 * cell;
+  float dAl = (sd < dl) ? min(sd, dl - sd) : -min(sd - dl, cell - sd);
+  float dPath = min(dAl, hb - across);
+  float wq = max(max(fwidth(along), fwidth(across)), 0.02);
+  float body = saturate(dPath / wq + 0.5);
+  float keyP = saturate((dPath + Keyline) / wq + 0.5) - body;
+  float3 tc = colIdx > 1.5 ? TeamP2Color : TeamP1Color;
+  col = (body * tc + keyP * KeylineColor) / max(body + keyP, 0.0001);
+  a = saturate(body + keyP) * LastMoveFade;
+} else if (Channel > 4.5 && Channel < 5.5) {
+  // VS-6 FX-14: the arrowhead (A.w = its box uu) pointing +X of the instance = along the last edge
+  float hbx = 0.5 * max(aux, 1.0);
+  float2 pq = A.xy / 50.0 * hbx;
+  float h = 0.8 * hbx;
+  float bw = 0.75 * hbx;
+  float sideD = (bw * (h - pq.x) / (2.0 * h) - abs(pq.y)) * (2.0 * h) / sqrt(4.0 * h * h + bw * bw);
+  float dTri = min(pq.x + h, sideD);
+  float wq = max(length(fwidth(pq)), 0.02);
+  float body = saturate(dTri / wq + 0.5);
+  float keyP = saturate((dTri + Keyline) / wq + 0.5) - body;
+  float3 tc = colIdx > 1.5 ? TeamP2Color : TeamP1Color;
+  col = (body * tc + keyP * KeylineColor) / max(body + keyP, 0.0001);
+  a = saturate(body + keyP) * LastMoveFade;
+} else if (Channel > 5.5) {
+  // VS-6 FX-09: the CUE-003 confirm pulse - the V-04 double ring and a fill (A.w = 1 -> 0 over 250 ms, the instance
+  // scale 1.06 -> 1), brightness B.x 1 -> 0.7; board.reach (the plate colour) or board.target (colIdx 5)
+  float3 pc = (colIdx > 4.5 ? TargetColor : PlateColor) * max(B.x, 0.0);
+  float ringM = bRing + bInner;
+  float keyM = bKey + bInnerKey;
+  float fillM = saturate(aux) * saturate((ringIn - rho) / w + 0.5) * occM;
+  float sum = ringM + keyM;
+  col = (ringM * pc + keyM * KeylineColor + fillM * pc) / max(sum + fillM, 0.0001);
+  a = saturate(max(saturate(sum), fillM));
 } else {
   // glyph: X (V-08) and "!" (V-09: the bar towards the top of the K1 screen = -Y, the dot below)
   float wq = max(length(fwidth(q)), 0.02);

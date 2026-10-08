@@ -8,6 +8,7 @@
 #include "S08BoardModel.h"
 #include "S08HeroesV2.h"
 #include "Fx/S08FigureFxChannels.h"
+#include "Fx/S08FieldFx.h"
 #include "S08HeroLight.h"
 #include "S08MoveAnim.h"
 #include "S08Team.h"
@@ -63,7 +64,8 @@ public:
   const FS08BoardFighter& GetFighter() const { return Fighter; }
   const FString& GetFighterId() const { return Fighter.Id; }
 
-  void SetSelected(bool bSelected);
+  /** bOtherSelected (VS-6 FX-07): another figure takes the selection - this ring goes at once, no 150 ms leave. */
+  void SetSelected(bool bSelected, bool bOtherSelected = false);
   /** Art-preview combat focus. The target marker is a visual child of the
    *  fighter and never participates in the visibility hit test. */
   void SetCombatMarkers(bool bAttacker, bool bTarget);
@@ -387,6 +389,16 @@ private:
   float HitTintSeconds = 0.0f;
   float HitTintValue = 0.0f;
   FS08FigureFxChannels FxChannels;  // Z-2: the flash / rim channels (Fx/S08FigureFxChannels)
+  FS08FieldMarks FieldMarks;  // VS-6 FX-07 / FX-15: the V-05 ring and the target arcs (Fx/S08FieldFx)
+public:
+  /** VS-6 -BenchFx: the static pose of the V-05 ring / the arcs at Ms of their appear curve. */
+  void SetFieldMarksBench(bool bRing, double RingMs, bool bTarget, double TargetMs) {
+    FieldMarks.SetStatic(bRing, RingMs, bTarget, TargetMs);
+    bBenchWorldIcon = bTarget;  // IC-35: the bench shows the world token (no screen HUD token there)
+    SetScreenIconMode(false);
+  }
+  bool bBenchWorldIcon = false;
+private:
   bool BindFx();
   void TickHitTint();
   /** Loads and applies the v2 figure; false (nothing changed) when an asset is missing. */

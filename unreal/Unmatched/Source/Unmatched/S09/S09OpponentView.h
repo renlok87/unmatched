@@ -73,6 +73,10 @@ class UNMATCHED_API FS09LastMoveTracker {
 public:
   /** 03 §6 "Затухание подсветки последнего хода". */
   static constexpr double FadeMs = 300.0;
+  /** VS-6 FX-14 (ВР-29): the shown highlight fades by itself after HoldMs (0 = only the MS-P-03 exit rule, the
+   *  -S08LastMoveLegacy contour) and appears over InMs; the game mode sets both from moveSelection.lastMove. */
+  double HoldMs = 0.0;
+  double InMs = 0.0;
 
   /** An applied snapshot (Apply or a same-seq Merge): the exit rule against the previous one, then a trail of exactly
    *  this seq enters (Waiting). Returns the 'MS-LAST ...' trace lines. */
@@ -106,6 +110,8 @@ private:
   bool bAwaitAnimation = false;
   double RevealAtMs = 0.0;
   double FadeStartMs = 0.0;
+  double ShownAtMs = 0.0;
+  bool bReduced = false;
   bool bRestored = false;
   bool bRevealedUnconsumed = false;
   uint32 Revision = 0;

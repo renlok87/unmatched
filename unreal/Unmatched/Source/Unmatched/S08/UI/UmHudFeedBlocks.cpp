@@ -186,8 +186,9 @@ void FUmFeedBlocks::DismissToast(FName Key, double NowMs) {
   if (UUmToastStack* T = Toasts.Get()) T->Dismiss(Key, NowMs);
 }
 
-void FUmFeedBlocks::ShowBadge(const FVector2D& CentreSu, double NowMs) {
-  if (UUmToastStack* T = Toasts.Get()) T->ShowBadge(CentreSu, NowMs);
+bool FUmFeedBlocks::ShowBadge(const FVector2D& CentreSu, double NowMs, float SizeSu) {
+  if (UUmToastStack* T = Toasts.Get()) return T->ShowBadge(CentreSu, NowMs, SizeSu);
+  return false;
 }
 
 void FUmFeedBlocks::ShowSubtitle(const FUmSubtitleModel& Model) {

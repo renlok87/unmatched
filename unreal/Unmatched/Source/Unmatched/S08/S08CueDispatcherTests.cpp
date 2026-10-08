@@ -7,6 +7,7 @@
 #if WITH_AUTOMATION_TESTS
 
 #include "S08CueDispatcher.h"
+#include "S08FlowController.h"
 #include "Dom/JsonObject.h"
 #include "Dom/JsonValue.h"
 #include "Misc/AutomationTest.h"
@@ -53,8 +54,26 @@ FString FighterClip(const FString& Subject, const FString& Role) {
   return FString();
 }
 
+/** VS-6 F1: the vfx systems the table marks present (cue_contract ReferenceDispatcher: vfx.system when status present). */
+TMap<FString, FString> TablePresentVfx() {
+  TMap<FString, FString> Out;
+  const TSharedPtr<FJsonObject> Table = LoadJson(ContractDir() / TEXT("cue-table.json"));
+  if (!Table.IsValid()) return Out;
+  for (const TSharedPtr<FJsonValue>& Value : Table->GetArrayField(TEXT("cues"))) {
+    const TSharedPtr<FJsonObject> Row = Value->AsObject();
+    const TSharedPtr<FJsonObject>* Vfx = nullptr;
+    FString Status, System;
+    if (Row.IsValid() && Row->TryGetObjectField(TEXT("vfx"), Vfx) && (*Vfx)->TryGetStringField(TEXT("status"), Status) &&
+        Status == TEXT("present") && (*Vfx)->TryGetStringField(TEXT("system"), System)) {
+      Out.Add(Row->GetStringField(TEXT("id")), System);
+    }
+  }
+  return Out;
+}
+
 /** Asset tokens of a fixture: assets_present overrides (short names; assets_unloadable -> missing), else the
- *  rows' state - no vfx / sfx path anywhere (ART-010), the H2Anim clip of the subject. */
+ *  rows' state - a vfx system the table marks present (VS-6 F1), no sfx path (ART-010), the H2Anim clip of the
+ *  subject. */
 void BindFixtureAssets(FS08CueDispatcher& Cues, const TSharedPtr<FJsonObject>& Fixture) {
   TMap<FString, FString> Present;  // "<cue>|<channel>" -> path
   const TSharedPtr<FJsonObject>* Assets = nullptr;
@@ -73,10 +92,14 @@ void BindFixtureAssets(FS08CueDispatcher& Cues, const TSharedPtr<FJsonObject>& F
     for (const TSharedPtr<FJsonValue>& Value : *Bad) Unloadable.Add(Value->AsString());
   }
   const TArray<FS08CueRow> Rows = S08CueRows::Combat();
-  Cues.AssetResolver = [Present, Unloadable, Rows](const FString& CueId, const FString& Channel,
-                                                   const FString& Subject) -> FString {
+  const TMap<FString, FString> TableVfx = TablePresentVfx();
+  Cues.AssetResolver = [Present, Unloadable, Rows, TableVfx](const FString& CueId, const FString& Channel,
+                                                             const FString& Subject) -> FString {
     FString Path;
     if (const FString* Override = Present.Find(CueId + TEXT("|") + Channel)) Path = *Override;
+    if (Path.IsEmpty() && Channel == TEXT("vfx")) {
+      if (const FString* System = TableVfx.Find(CueId)) Path = *System;
+    }
     if (Path.IsEmpty() && Channel == TEXT("clip")) {
       const FS08CueRow* Row = S08CueRows::Find(Rows, CueId);
       const FString Clip = Row ? FighterClip(Subject, Row->ClipRole) : FString();
@@ -118,7 +141,8 @@ bool FS08CueDispatcherTableTest::RunTest(const FString&) {
       default: return TEXT("replace");
     }
   };
-  TestEqual("seven cue rows (CUE-001 + the six combat rows)", S08CueRows::Combat().Num(), 7);
+  // VS-6 F1: + CUE-002 / 003 / 004 (local board answers) and CUE-007 (the move)
+  TestEqual("eleven cue rows (CUE-001..004, CUE-007 + the six combat rows)", S08CueRows::Combat().Num(), 11);
   for (const FS08CueRow& Row : S08CueRows::Combat()) {
     const TSharedPtr<FJsonObject>* JsonPtr = ById.Find(Row.Id);
     TestTrue(Row.Id + TEXT(" in the table"), JsonPtr != nullptr);
@@ -127,7 +151,9 @@ bool FS08CueDispatcherTableTest::RunTest(const FString&) {
     const FString P = Row.Id + TEXT(" ");
     TestEqual(P + TEXT("source"), Row.bServer, J->GetStringField(TEXT("source")) == TEXT("server"));
     TestEqual(P + TEXT("subject"), Row.Subject, J->GetStringField(TEXT("subject")));
-    TestEqual(P + TEXT("duration_ms"), Row.DurationMs, static_cast<int32>(J->GetNumberField(TEXT("duration_ms"))));
+    double DurationJ = 0.0;  // CUE-007: null - the duration is the move schedule of the caller
+    J->TryGetNumberField(TEXT("duration_ms"), DurationJ);
+    TestEqual(P + TEXT("duration_ms"), Row.DurationMs, static_cast<int32>(DurationJ));
     TestEqual(P + TEXT("blocks_input"), Row.bBlocksInput, J->GetBoolField(TEXT("blocks_input")));
     TestEqual(P + TEXT("on_new_event"), FString(OnNewName(Row.OnNew)), J->GetStringField(TEXT("on_new_event")));
     TestEqual(P + TEXT("replace_scope"), Row.bReplaceScopeCue, J->GetStringField(TEXT("replace_scope")) == TEXT("cue"));
@@ -225,6 +251,32 @@ bool FS08CueDispatcherFixturesTest::RunTest(const FString&) {
         E->TryGetStringField(TEXT("subject"), Subject);
         bool bStaged = false;
         E->TryGetBoolField(TEXT("staged"), bStaged);
+        // VS-6 FX-13: CUE-007 lasts its move schedule (04 §6.3) - the seq's moves (seq_moves + order) or this one
+        // move; the game passes the plan's duration the same way (FS08MoveCueSchedule, cue_contract move_schedule)
+        if (E->GetStringField(TEXT("id")) == TEXT("CUE-007") && Duration < 0.0) {
+          TArray<FS08MoveCueInput> Moves;
+          const TArray<TSharedPtr<FJsonValue>>* SeqMoves = nullptr;
+          auto AddMove = [&Moves](const TSharedPtr<FJsonObject>& M, const TCHAR* KindField) {
+            FS08MoveCueInput In;
+            FString Kind;
+            M->TryGetStringField(KindField, Kind);
+            In.Kind = Kind == TEXT("place") ? ES08MoveKind::Place : ES08MoveKind::Move;
+            double Steps = 1.0;
+            M->TryGetNumberField(TEXT("steps"), Steps);
+            In.Steps = FMath::Max(1, static_cast<int32>(Steps));
+            Moves.Add(In);
+          };
+          if (E->TryGetArrayField(TEXT("seq_moves"), SeqMoves) && SeqMoves && SeqMoves->Num() > 0) {
+            for (const TSharedPtr<FJsonValue>& M : *SeqMoves) AddMove(M->AsObject(), TEXT("kind"));
+          } else {
+            AddMove(E, TEXT("move_kind"));
+          }
+          double Order = 0.0;
+          E->TryGetNumberField(TEXT("order"), Order);
+          const TArray<FS08MoveCueTiming> Timing = FS08MoveCueSchedule::Compute(Moves);
+          const int32 Index = FMath::Clamp(static_cast<int32>(Order), 0, Timing.Num() - 1);
+          Duration = Timing.IsValidIndex(Index) ? FMath::RoundToDouble(Timing[Index].DurationMs) : 0.0;
+        }
         Cues.Feed(E->GetStringField(TEXT("id")), Subject, static_cast<int32>(Seq), T, Lines, static_cast<int32>(Hold),
                   static_cast<int32>(Duration), bStaged);
       }

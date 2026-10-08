@@ -28,4 +28,12 @@ public:
    *  frame through TextureSampleParameterSubUV. The caller saves the package. JSON report. */
   UFUNCTION(BlueprintCallable, Category = "S08|FX")
   static FString SetSpriteSubImage(const FString& SystemPath, const FString& EmitterName, int32 X, int32 Y);
+
+  /** VS-6 F1 (FX-13 / FX-16, ВР-VS6-06): turns an emitter into a board quad carrier - local space (the component's
+   *  transform places, turns and stretches the quad), every sprite / ribbon renderer off, one mesh renderer with
+   *  MeshPath (the engine plane) and MaterialPath as its override material (M_FX_BoardPrint reads the particle's
+   *  relative time for the keyframes). Idempotent (an existing mesh renderer is reused). The caller saves. JSON. */
+  UFUNCTION(BlueprintCallable, Category = "S08|FX")
+  static FString MakeBoardQuadCarrier(const FString& SystemPath, const FString& EmitterName, const FString& MeshPath,
+                                      const FString& MaterialPath);
 };

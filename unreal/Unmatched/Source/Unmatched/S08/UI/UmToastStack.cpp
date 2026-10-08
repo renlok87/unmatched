@@ -5,6 +5,8 @@
 #include "UmHudTheme.h"
 #include "../S08AnimatedIconWidget.h"
 #include "../S08IconMotion.h"
+#include "../Fx/S08CueFx.h"
+#include "../Fx/S08FieldFx.h"
 #include "Blueprint/WidgetTree.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
@@ -275,6 +277,12 @@ bool UUmToastStack::Tick(double NowMs, bool bBannerShown) {
     BadgeUntilMs = 0.0;
     if (Badge) Badge->SetVisibility(ESlateVisibility::Collapsed);
   }
+  // VS-6 FX-10: the stamp curve (scale 1.2 -> 1 in 80 ms, hold, out 230 -> 350; reduced: opacity only)
+  if (BadgeUntilMs > 0.0 && bBadgeStamp && Badge) {
+    const S08FieldFx::FMarkPose P = S08FieldFx::RefuseStamp(NowMs - BadgeShownMs, Frame.bReduced);
+    Badge->SetRenderScale(FVector2D(P.Scale, P.Scale));
+    Badge->SetRenderOpacity(P.Opacity);
+  }
   ApplyAlphas(NowMs);
   return bChanged;
 }
@@ -353,28 +361,45 @@ FString UUmToastStack::TakePlaceLine() {
   return PendingPlaceLine;
 }
 
-void UUmToastStack::ShowBadge(const FVector2D& CentreSu, double NowMs) {
+bool UUmToastStack::ShowBadge(const FVector2D& CentreSu, double NowMs, float SizeSu) {
+  const bool bStamp = S08CueFx::FxEnabled();
+  // VS-6 FX-10: a repeat earlier than 300 ms keeps the shown stamp (no restart; the sound row throttles it too)
+  if (bStamp && BadgeUntilMs > 0.0 && NowMs - BadgeShownMs < S08FieldFx::RefuseRetriggerMs) return false;
+  const float Su = SizeSu > 0.0f && bStamp ? SizeSu : UmHudFeed::BadgeSu;
   BadgeCentreSu = CentreSu;
-  BadgeUntilMs = NowMs + UUmHudTheme::Get().Ms(TEXT("refuse.ms"));
-  if (!Badge) return;
-  if (Badge->GetIconId() != FName(TEXT("badge-refuse"))) {
-    const int32 Px = S08IconMotion::ExportSizePx(UmHudFeed::BadgeSu, Frame.PxPerSu > 0.0f ? Frame.PxPerSu : 1.0f);
-    if (Badge->SetIcon(FName(TEXT("badge-refuse")), UmHudFeed::BadgeSu, Px)) Badge->SetDisplaySizeSu(UmHudFeed::BadgeSu);
+  BadgeShownMs = NowMs;
+  BadgeSizeSu = Su;
+  bBadgeStamp = bStamp;
+  BadgeUntilMs = NowMs + (bStamp ? S08FieldFx::RefuseMs : UUmHudTheme::Get().Ms(TEXT("refuse.ms")));
+  if (!Badge) return true;
+  if (Badge->GetIconId() != FName(TEXT("badge-refuse")) || !FMath::IsNearlyEqual(Badge->GetDisplaySizeSu(), Su, 0.01f)) {
+    const int32 Px = S08IconMotion::ExportSizePx(Su, Frame.PxPerSu > 0.0f ? Frame.PxPerSu : 1.0f);
+    if (Badge->SetIcon(FName(TEXT("badge-refuse")), Su, Px)) Badge->SetDisplaySizeSu(Su);
   }
   if (UCanvasPanelSlot* S = Cast<UCanvasPanelSlot>(Badge->Slot)) {
-    S->SetPosition(CentreSu - FVector2D(0.5f * UmHudFeed::BadgeSu, 0.5f * UmHudFeed::BadgeSu));
+    S->SetSize(FVector2D(Su, Su));
+    S->SetPosition(CentreSu - FVector2D(0.5f * Su, 0.5f * Su));
   }
   Badge->SetVisibility(ESlateVisibility::HitTestInvisible);
-  if (Frame.bReduced) {
+  if (bStamp) {
+    // the stamp curve runs in Tick from the icon at rest (S08FieldFx::RefuseStamp)
+    Badge->ShowAtRest();
+    Badge->SetRenderTransformPivot(FVector2D(0.5f, 0.5f));
+    const S08FieldFx::FMarkPose P = S08FieldFx::RefuseStamp(0.0, Frame.bReduced);
+    Badge->SetRenderScale(FVector2D(P.Scale, P.Scale));
+    Badge->SetRenderOpacity(P.Opacity);
+  } else if (Frame.bReduced) {
     Badge->ShowAtRest();
   } else {
     Badge->PlayAnim(FName(TEXT("appear")));
   }
+  return true;
 }
 
 FBox2D UUmToastStack::BadgeRectSu() const {
   if (BadgeUntilMs <= 0.0) return FBox2D(ForceInit);
-  const FVector2D H(0.5f * UmHudFeed::BadgeSu, 0.5f * UmHudFeed::BadgeSu);
+  const float Su = BadgeSizeSu > 0.0f ? BadgeSizeSu : UmHudFeed::BadgeSu;
+  const FVector2D H(0.5f * Su, 0.5f * Su);
   return FBox2D(BadgeCentreSu - H, BadgeCentreSu + H);
 }
 

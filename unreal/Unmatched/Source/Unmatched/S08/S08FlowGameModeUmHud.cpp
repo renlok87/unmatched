@@ -2664,9 +2664,14 @@ void AS08FlowGameMode::UmHudRefuseCell(int32 CellX, int32 CellY) {
   FVector2D Screen(0.0, 0.0);
   if (!ProjectToViewport(BoardModel.CellToWorld(CellX, CellY), Screen)) return;
   const float Px = UmHud->Layout.PxPerSu > 0.0f ? UmHud->Layout.PxPerSu : 1.0f;
-  // V-08: the badge over the refused space (350 ms, a transient mark that may cover the field)
-  UmHud->Feed.ShowBadge(Screen / Px, static_cast<double>(NowMs()));
-  FS08Trace::Write(FString::Printf(TEXT("HUD-REFUSE at=cell cell=%s"), *BoardModel.CellLabel(CellX, CellY)));
+  // V-08: the badge over the refused space (350 ms, a transient mark that may cover the field); VS-6 FX-10: sized by
+  // the space on screen - clamp(0.3 x its diameter, 24, 32) px (S08FieldFx::RefuseBadgePx), a repeat < 300 ms keeps it
+  FVector2D Edge(0.0, 0.0);
+  const bool bEdge = ProjectToViewport(BoardModel.CellToWorld(CellX, CellY) + FVector(41.0f, 0.0f, 0.0f), Edge);
+  const float BadgePx = S08FieldFx::RefuseBadgePx(bEdge ? 2.0f * static_cast<float>((Edge - Screen).Size()) : 100.0f);
+  const bool bShown = UmHud->Feed.ShowBadge(Screen / Px, static_cast<double>(NowMs()), BadgePx / Px);
+  FS08Trace::Write(FString::Printf(TEXT("HUD-REFUSE at=cell cell=%s px=%.0f restart=%d"), *BoardModel.CellLabel(CellX, CellY),
+                                   BadgePx, bShown ? 1 : 0));
 }
 
 void AS08FlowGameMode::UmHudRefusePress(FName PressedId) {

@@ -630,6 +630,7 @@ void AS08FlowGameMode::TrackCombatResult(const FS08Snapshot& Snapshot,
       TArray<FString> Lines;
       if (!bPrevCombat && bHasPrevApplied && Snapshot.Phase == TEXT("COMBAT") && !Open.AttackerId.IsEmpty()) {
         CueDispatcher.Feed(TEXT("CUE-008"), Open.AttackerId, Snapshot.SequenceNumber, NowMs(), Lines);
+        S08FxAttackDeclared(Open.AttackerId, Open.TargetFighterId, Snapshot.SequenceNumber);  // VS-6 FX-16 chevrons
         AudioOnAttackDeclared(Open.AttackerId, Snapshot.SequenceNumber, Open.bHasAbilityBoostCardId);  // AU-S4/S5
       }
       if (bHasPrevApplied && PrevApplied.Phase == TEXT("COMBAT") && Snapshot.Phase == TEXT("COMBAT_RESOLVE") &&
@@ -1287,6 +1288,7 @@ void AS08FlowGameMode::RefreshMotionSettings() {
 
 void AS08FlowGameMode::WriteCueLines(const TArray<FString>& Lines) {
   for (const FString& Line : Lines) FS08Trace::Write(Line);
+  S08FxCueLines(Lines);  // VS-6 FX-16: an interrupting combat cue cuts the chevrons
 }
 
 void AS08FlowGameMode::StartCombatStage(const FS08Snapshot& Closing, const FS08Snapshot& Baseline,
@@ -1816,6 +1818,7 @@ void AS08FlowGameMode::HandleClick() {
                                            *Gated.Toast.Key.ToString()));
           NoteTurnBoardInput(Cell, HitFighterId, Gated);
           PlayBoardUiSound(Gated, HitFighterId);
+          S08FxBoardInput(Gated, Cell, HitFighterId);  // VS-6: the CUE row of the release (FX-10 refusal)
         }
         ApplyMoveInput(Gated);
       }
@@ -1837,6 +1840,7 @@ void AS08FlowGameMode::HandleClick() {
                                          Result.bHandled ? 1 : 0, static_cast<int32>(CommandUi.Mode)));
         NoteTurnBoardInput(Cell, HitFighterId, Result);
         PlayBoardUiSound(Result, HitFighterId);
+        S08FxBoardInput(Result, Cell, HitFighterId);  // VS-6 FX-07 / FX-09 / FX-10: CUE-002 / 003 / 004
       }
       ApplyMoveInput(Result);
     }
@@ -1896,6 +1900,7 @@ void AS08FlowGameMode::HandleClick() {
       }
       ToastUntil = Elapsed + 3.0f;
       RefreshHud();
+      if (bPicked && !bOwn) S08FxTargetConfirmed(Fighter.Id);  // VS-6 FX-09: CUE-003 + the pulse on the target
       if (bPicked) AfterAttackPick(ES09InputSource::Click); // DE-020 (SD-56): a complete draft goes at once
     }
     return;
@@ -5229,6 +5234,7 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
   // DE-018: the combat staging runs on the game clock; a click / Space / Enter during its holds is the skip and
   // is not handled a second time below (a HUD press keeps its own action).
   TickCombatStage();
+  S08FxTick();       // VS-6 F1: CUE-007 feeds + dust at the landing, the chevrons at event + 150 ms
   TickDeathStage();  // DE-019: death lines and the result gate (after the staging released this frame's fall)
   TickResultScreen();  // DE-029: the modal opens with the gate; intro 500 ms, board crossfade 250 ms
   TickDeckPanel();     // DE-030: the deck side panel - open 80 ms, close 150 ms
@@ -8922,10 +8928,12 @@ void AS08FlowGameMode::RunRenderBench() {
     case 1:  // warm-up (shader/PSO caches, Lumen surface cache and history)
       if (Elapsed < B.NextAt) return;
       FS08Trace::Write(FString::Printf(TEXT("BENCH warmup done elapsed=%.1f"), Elapsed));
+      S08FxBenchFieldFinish(true);  // VS-6 F1: the -BenchFx field state again (the board refreshed it) + the systems
       B.Step = B.bClipPose ? 7 : 2;  // AN-17: the pose stand applies its first pose before the first view
       return;
     case 2: {  // view setup
       BenchSetupView(View, B.HeroId);
+      S08FxBenchFieldFinish();  // VS-6 F1: the view setup reselects - the -BenchFx field state lands again
       B.StepStart = Elapsed;
       B.bSettleLogged = false;
       B.Step = 3;

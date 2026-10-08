@@ -14,6 +14,7 @@
 #include "../S08/S08BoardModel.h"
 #include "../S08/S08Contracts.h"
 #include "../S08/S08MoveHighlight.h"
+#include "../S08/Fx/S08FieldFx.h"
 #include "../S08/S08WhyText.h"
 #include "Dom/JsonObject.h"
 #include "Dom/JsonValue.h"
@@ -259,6 +260,21 @@ bool FS09MoveSelOpponentViewTest::RunTest(const FString&) {
   }
 
   // ---- V-14 / V-15 on the plates of a real board ----
+  // VS-6 FX-14 (ВР-29): by default the last move is the dashed path + arrow (FS08MoveDraftView::LastPaths)
+  {
+    S08FieldFx::SetLegacyOverrideForTest(0);
+    const FS08MoveDraftInput::FLastMove Last = S09OpponentView::LastMoveInput(Trail10, ES08PlateColor::TeamP2);
+    TestEqual(TEXT("FX-14: one path per move (start + cells)"), Last.Paths.Num(), Trail10.Moves.Num());
+    FS08MoveDraftInput Input;
+    Input.LastMove = Last;
+    const FS08MoveDraftView View = S08MoveHighlight::BuildDraftView(B.Board, B.Fighters, Input);
+    TestEqual(TEXT("FX-14: the dashed paths"), View.LastPaths.Num(), Trail10.Moves.Num());
+    const FIntPoint M31 = SpaceAt(B.Board, TEXT("M31"));
+    TestTrue(TEXT("FX-14: no MS-T-17 outline by default"),
+             !View.Find(M31.X, M31.Y) || View.Find(M31.X, M31.Y)->Outline == ES08OutlineState::None);
+  }
+  // the MS-T-17 contour stays the rollback (-S08LastMoveLegacy)
+  S08FieldFx::SetLegacyOverrideForTest(S08FieldFx::LastMove);
   {
     const FS08MoveDraftInput::FLastMove Last = S09OpponentView::LastMoveInput(Trail10, ES08PlateColor::TeamP2);
     FS08MoveDraftInput Input;
@@ -311,6 +327,7 @@ bool FS09MoveSelOpponentViewTest::RunTest(const FString&) {
                    return D;
                  }()).Revision);
   }
+  S08FieldFx::ResetLegacyOverrideForTest();
 
   // ---- MS-E-73: the edge arrow (viewport 1920x1080, margin 48) ----
   {

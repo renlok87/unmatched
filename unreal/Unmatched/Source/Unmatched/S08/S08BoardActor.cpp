@@ -1,4 +1,6 @@
 #include "S08BoardActor.h"
+#include "Fx/S08CueFx.h"
+#include "Fx/S08FieldFx.h"
 #include "S08ConceptPasteAnim.h"
 #include "S08ArtHudText.h"
 #include "S08ArtLook.h"
@@ -1902,7 +1904,7 @@ void AS08BoardActor::SetSelectedFighter(const FString& FighterId,
   SelectedFighterId = FighterId;
   ReachableCells = Reachable;
   for (AS08FighterActor* Actor : FighterActors) {
-    if (Actor) Actor->SetSelected(Actor->GetFighterId() == FighterId);
+    if (Actor) Actor->SetSelected(Actor->GetFighterId() == FighterId, !FighterId.IsEmpty());  // VS-6 FX-07 reselect
   }
   for (AActor* Tile : HighlightTiles) {
     if (Tile) Tile->Destroy();
@@ -1913,6 +1915,7 @@ void AS08BoardActor::SetSelectedFighter(const FString& FighterId,
     ApplyMovePlates(FighterId, ReachableCells);
     return;
   }
+  if (UsesChoiceLayer()) ApplyMovePlates(FighterId, ReachableCells);  // VS-6: V-17 / the FX-14 path without the plates
   if (FighterId.IsEmpty()) return;
 
   UMaterialInterface* Solid = S08GameLayerMaterial();  // W4-A game layer
@@ -2060,6 +2063,11 @@ bool AS08BoardActor::UsesMovePlates() const {
          MoveHighlight->GetSpaceCount() > 0;
 }
 
+bool AS08BoardActor::UsesChoiceLayer() const {
+  return !S08MoveHighlight::PlatesEnabled() && MoveHighlight && MoveHighlight->IsReady() &&
+         MoveHighlight->GetSpaceCount() > 0 && MoveHighlight->IsChoiceOnly();
+}
+
 FS08MoveSelectionSpec AS08BoardActor::ActiveMoveSelection() const {
   if (bArtActive) return ActiveProfile.MoveSelection;
   if (bArtDataLoaded) return ArtData.MoveSelection;
@@ -2067,13 +2075,16 @@ FS08MoveSelectionSpec AS08BoardActor::ActiveMoveSelection() const {
 }
 
 void AS08BoardActor::BuildMoveHighlight() {
-  if (!S08MoveHighlight::PlatesEnabled() || BoardModel.Width <= 0) return;
+  // VS-6: the plate ISM is also the choice layer without -S08MovePlates (V-17 of DE-017, FX-14, FX-09)
+  const bool bPlates = S08MoveHighlight::PlatesEnabled();
+  if ((!bPlates && !S08FieldFx::ChoiceLayerWanted()) || BoardModel.Width <= 0) return;
   if (!MoveHighlight) {
     MoveHighlight = NewObject<US08MoveHighlightComponent>(this, TEXT("MoveHighlight"));
     MoveHighlight->SetupAttachment(RootComponent);
     MoveHighlight->RegisterComponent();
     MoveHighlight->Initialize(PlaneMesh);
   }
+  MoveHighlight->SetChoiceOnly(!bPlates);
   MoveHighlight->BuildForBoard(BoardModel, ActiveMoveSelection());
 }
 
@@ -2096,15 +2107,18 @@ void AS08BoardActor::ApplyMovePlates(const FString& FighterId, const TSet<uint64
 }
 
 void AS08BoardActor::SetMoveDraftView(const FS08MoveDraftView& View) {
-  if (UsesMovePlates()) MoveHighlight->ApplyView(View);
+  if (UsesMovePlates() || UsesChoiceLayer()) MoveHighlight->ApplyView(View);
 }
 
 void AS08BoardActor::RefreshMoveDraftView() {
-  if (UsesMovePlates()) ApplyMovePlates(SelectedFighterId, ReachableCells);
+  if (UsesMovePlates() || UsesChoiceLayer()) ApplyMovePlates(SelectedFighterId, ReachableCells);
 }
 
 void AS08BoardActor::ShowIllegalCell(int32 X, int32 Y) {
   HideIllegalCell();
+  // VS-6 FX-10: the refusal is the badge-refuse stamp over the space (UMG, HB-40) - no red fill of the cell; the
+  // disc of before only with -S08FxLegacy
+  if (S08CueFx::FxEnabled()) return;
   UMaterialInterface* Solid = S08GameLayerMaterial();  // W4-A game layer
   IllegalCell = GetWorld()->SpawnActor<AActor>(AActor::StaticClass(),
                                                BoardModel.CellToWorld(X, Y),

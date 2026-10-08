@@ -112,6 +112,7 @@ const TCHAR* FS09LastMoveTracker::StateName(ES09LastMoveState InState) {
 TArray<FString> FS09LastMoveTracker::OnApplied(int32 Seq, const FS09LastMovement& InTrail, const FS09BoardStamp& Stamp,
                                                double NowMs, bool bReducedMotion) {
   TArray<FString> Lines;
+  bReduced = bReducedMotion;  // VS-6 FX-14: the hold fade of Tick follows the same setting
   // MS-P-03 - the one exit rule: the first applied seq > lastMovement.seq in which positions, the HP of any fighter or
   // currentTurnPlayerId changed. A beginManeuver (seq + 1, a card drawn) changes none of them (MS-E-103).
   const bool bActive = State == ES09LastMoveState::Waiting || State == ES09LastMoveState::Shown;
@@ -158,6 +159,7 @@ TArray<FString> FS09LastMoveTracker::Tick(double NowMs, bool bAnyFigureMoving) {
   if (State == ES09LastMoveState::Waiting &&
       (!bAwaitAnimation || !bAnyFigureMoving || NowMs >= RevealAtMs)) {
     State = ES09LastMoveState::Shown;
+    ShownAtMs = NowMs;  // VS-6 FX-14: the appear and the hold count from the reveal
     bRestored = !bAwaitAnimation;
     bRevealedUnconsumed = true;
     ++Revision;
@@ -171,6 +173,18 @@ TArray<FString> FS09LastMoveTracker::Tick(double NowMs, bool bAnyFigureMoving) {
                               From.Num() ? *FString::Join(From, TEXT(">")) : TEXT("-"),
                               To.Num() ? *FString::Join(To, TEXT(">")) : TEXT("-")));
   }
+  // VS-6 FX-14 (ВР-29): the path holds HoldMs after its reveal, then fades (reduced motion: off at once)
+  if (State == ES09LastMoveState::Shown && HoldMs > 0.0 && NowMs - ShownAtMs >= InMs + HoldMs) {
+    ++Revision;
+    if (bReduced) {
+      State = ES09LastMoveState::None;
+      Lines.Add(FString::Printf(TEXT("MS-LAST off seq=%d at=hold fade=0"), Trail.Seq));
+    } else {
+      State = ES09LastMoveState::Fading;
+      FadeStartMs = NowMs;
+      Lines.Add(FString::Printf(TEXT("MS-LAST fade seq=%d at=hold ms=%d"), Trail.Seq, FMath::RoundToInt(FadeMs)));
+    }
+  }
   if (State == ES09LastMoveState::Fading && NowMs - FadeStartMs >= FadeMs) {
     State = ES09LastMoveState::None;
     ++Revision;
@@ -181,7 +195,9 @@ TArray<FString> FS09LastMoveTracker::Tick(double NowMs, bool bAnyFigureMoving) {
 
 float FS09LastMoveTracker::Alpha(double NowMs) const {
   switch (State) {
-    case ES09LastMoveState::Shown: return 1.0f;
+    case ES09LastMoveState::Shown:
+      // VS-6 FX-14: the appear over InMs (0 = at once; reduced motion: at once)
+      return InMs > 0.0 && !bReduced ? FMath::Clamp(static_cast<float>((NowMs - ShownAtMs) / InMs), 0.0f, 1.0f) : 1.0f;
     case ES09LastMoveState::Fading:
       return FMath::Clamp(1.0f - static_cast<float>((NowMs - FadeStartMs) / FadeMs), 0.0f, 1.0f);
     default: return 0.0f;
@@ -197,8 +213,11 @@ bool FS09LastMoveTracker::ConsumeRevealed(FS09LastMovement& Out) {
 
 void FS09LastMoveTracker::Reset() {
   const uint32 Rev = Revision + 1;
+  const double Hold = HoldMs, In = InMs;  // VS-6 FX-14: the settings survive a reset
   *this = FS09LastMoveTracker();
   Revision = Rev;
+  HoldMs = Hold;
+  InMs = In;
 }
 
 // ---------------------------------------------------------------------------------------------------- feed
@@ -417,6 +436,12 @@ FS08MoveDraftInput::FLastMove LastMoveInput(const FS09LastMovement& Trail, ES08P
   for (const FS09LastMovement::FMove& Move : Trail.Moves) {
     Out.From.AddUnique(Move.From);
     Out.To.AddUnique(Move.Dest());
+    // VS-6 FX-14: every move's cells with the start (PLACE: from -> to) for the dashed path
+    TArray<FIntPoint> Cells;
+    Cells.Add(Move.From);
+    Cells.Append(Move.bPlace ? TArray<FIntPoint>{Move.Dest()} : Move.Path);
+    Out.Paths.Add(MoveTemp(Cells));
+    Out.Places.Add(Move.bPlace);
     if (Move.bPlace) continue;  // PLACE: a transfer without a path
     for (int32 I = 0; I + 1 < Move.Path.Num(); ++I) Out.Dots.AddUnique(Move.Path[I]);
   }
