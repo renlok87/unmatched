@@ -299,11 +299,14 @@ constexpr float RobotoDigitPerEm = 1477.0f / 2048.0f;
  *  ВР-VS8-01 (по делегированию, ВР-Z1R-09): at -60 / 0.48 R the disc reached the pedestal centre and the legs hid the
  *  top of the «2» / «3» («3» read as «5»). Now: disc 0.40 x the top diameter, its centre 0.58 R out, turned -25 deg
  *  (the front edge, clear of the talons), digit em 1.05 x the disc (cap 6.7 uu, ~10 px at K2x1.6); A/B of three
- *  geometries on Sarpedon K2x1.6 (C:/tmp/visual/VS8/A1/ab-c123.png), docs/game-design/evidence/VISUAL/AN-31/. */
+ *  geometries on Sarpedon K2x1.6 (C:/tmp/visual/VS8/A1/ab-c123.png), docs/game-design/evidence/VISUAL/AN-31/.
+ *  ВР-VC-02 (VC C1, CLOSEOUT item 5): at K2x2.5 Marmoreal a talon still touched the top left of the «2» - the centre
+ *  0.60 R (the disc's outer edge on the rim) and the digit em 0.95 x the disc (cap 6.0 uu, ~9-11 px at K2x1.6); A/B
+ *  of three variants on Marmoreal K1 / K2x1.6 / K2x2.5 (C:/tmp/visual/VC/C1/dig-*.png), docs/.../VISUAL/VC/. */
 constexpr float BaseDigitDiscOfTopDiameter = 0.40f;
-constexpr float BaseDigitCentreOfRadius = 0.58f;
+constexpr float BaseDigitCentreOfRadius = 0.60f;
 constexpr float BaseDigitSideTurnDeg = -25.0f;
-constexpr float BaseDigitEmOfDisc = 1.05f;
+constexpr float BaseDigitEmOfDisc = 0.95f;
 constexpr float BaseDigitDiscThicknessUU = 0.4f;  // the disc plate (the engine cylinder scaled flat)
 constexpr float BaseDigitDiscLiftUU = 0.1f;       // the plate's bottom above the pedestal top
 constexpr float BaseDigitTextLiftUU = 0.3f;       // the text above the plate's top

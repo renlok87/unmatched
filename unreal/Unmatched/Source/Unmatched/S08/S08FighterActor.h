@@ -206,6 +206,8 @@ public:
    *  ends), while an attack holds the target angle (AN-24 / AN-25) and for a dead figure (ВР-06: death never turns). */
   void ApplyRestFacing(const TCHAR* Src, bool bLegacy, const FVector& CameraPos, bool bHasEnemy,
                        const FVector& NearestEnemyPos, const FString& EnemyId);
+  /** VC C1 (ВР-VC-01): this figure's rest offset cap - S08Facing::RestMaxOffDeg of its v2 hero (Medusa 10, else 45). */
+  double RestCapDeg() const;
   /** AN-24 (ВР-06): the attacker turns to face TargetWorldPos over Ms (the remaining face window): the direction to
    *  the target clamped to +-90 deg from the camera axis (S08Facing::AttackYaw, ВР-AN02 - never the back), holding
    *  the angle through the following LungeAttack until the AN-25 return. NowMs = the game (CUE) clock of the event.

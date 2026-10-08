@@ -7,6 +7,7 @@
 #if WITH_AUTOMATION_TESTS
 
 #include "S08ArtLook.h"
+#include "S08Facing.h"
 #include "S08ArtPreviewMedusa.h"
 #include "S08BoardActor.h"
 #include "S08BoardModel.h"
@@ -159,6 +160,14 @@ bool FS08ArtLookDefaultTest::RunTest(const FString&) {
     FCommandLineScope Cmd(TEXT("-S08FacingLegacy"));
     TestTrue("facing legacy traced",
              S08ArtLook::TraceLine().Contains(TEXT(" facing=legacy(-S08FacingLegacy)")));
+  }
+  // 2d') VC C1 (ВР-VC-01): -S08FaceCapLegacy rolls Medusa's rest cap back to 45 (the facing itself stays v1)
+  {
+    FCommandLineScope Cmd(TEXT("-S08FaceCapLegacy"));
+    const FString Line = S08ArtLook::TraceLine();
+    TestTrue(FString::Printf(TEXT("face cap legacy traced: %s"), *Line),
+             Line.Contains(TEXT(" facing=v1 faceCap=legacy(-S08FaceCapLegacy)")));
+    TestEqual("face cap legacy: Medusa at 45", static_cast<int32>(S08Facing::RestMaxOffDeg(TEXT("Medusa"))), 45);
   }
   // 2e) AN-31 (ВР-07/72): -S08BaseDigitLegacy rolls the harpy base digit back (no disc, no number)
   {

@@ -601,7 +601,8 @@ void AS08FighterActor::ApplyRestFacing(const TCHAR* Src, bool bLegacy, const FVe
   // A spawn without a living enemy faces the camera axis (the card); later snapshots without one keep the angle.
   const double Want = !bHasEnemy && bSpawn
       ? Cam
-      : S08Facing::RestYaw(GetActorLocation(), CameraPos, bHasEnemy, NearestEnemyPos, FacingYawDeg);
+      : S08Facing::RestYaw(GetActorLocation(), CameraPos, bHasEnemy, NearestEnemyPos, FacingYawDeg,
+                           /*bApplyDeadBand=*/true, RestCapDeg());  // VC C1: the hero's cap (Medusa)
   DigitRestYawDeg = Want;
   bDigitRestYawSet = true;
   const double Change = FMath::Abs(FMath::FindDeltaAngleDegrees(FacingYawDeg, Want));
@@ -610,11 +611,15 @@ void AS08FighterActor::ApplyRestFacing(const TCHAR* Src, bool bLegacy, const FVe
     return;  // the dead band / no enemy kept the angle: no turn, no trace (F4)
   }
   FS08Trace::Write(FString::Printf(
-      TEXT("FACING fighter=%s src=%s from=%.0f rest=%.0f cam=%.0f off=%.0f enemy=%s"), *Fighter.Id,
+      TEXT("FACING fighter=%s src=%s from=%.0f rest=%.0f cam=%.0f off=%.0f enemy=%s cap=%.0f"), *Fighter.Id,
       bSpawn ? TEXT("spawn") : Src, FacingYawDeg, Want, Cam, FMath::Abs(FMath::FindDeltaAngleDegrees(Cam, Want)),
-      bHasEnemy ? *EnemyId : TEXT("none")));
+      bHasEnemy ? *EnemyId : TEXT("none"), RestCapDeg()));
   if (Change >= S08Facing::MinTurnDeg) StartFacingTurn(Want, S08Facing::ReturnMs);
   UpdateBaseDigit();  // the digit sits on the side away from the new rest offset
+}
+
+double AS08FighterActor::RestCapDeg() const {
+  return S08Facing::RestMaxOffDeg(bHeroV2Visual && HeroV2Spec ? HeroV2Spec->Key : nullptr);
 }
 
 void AS08FighterActor::StartFacingTurn(double WantYawDeg, double Ms) {

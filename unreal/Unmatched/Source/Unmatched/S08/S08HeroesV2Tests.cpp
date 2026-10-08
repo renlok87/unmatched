@@ -984,11 +984,11 @@ bool FS08HeroesV2BaseDigitPlacementTest::RunTest(const FString&) {
     const double AxisYaw = FMath::RadiansToDegrees(FMath::Atan2(Axis.Y, Axis.X));
     const FBaseDigitPlacement P = BaseDigitPlacement(C.Pedestal, TopZ, R, C.Camera, AxisYaw + C.RestOffDeg);
     const FString Tag = FString::Printf(TEXT("case %d"), I);
-    // Sizes (ВР-VS8-01): the disc 0.40 x the top diameter, the digit em 1.05 x the disc (cap 0.721 em).
+    // Sizes (ВР-VS8-01, ВР-VC-02): the disc 0.40 x the top diameter, the digit em 0.95 x the disc (cap 0.721 em).
     TestTrue(Tag + TEXT(": disc diameter = 0.40 x the top diameter"), FMath::IsNearlyEqual(P.DiscDiameterUU, 0.8f * R, 1e-3f));
-    TestTrue(Tag + TEXT(": cap = 1.05 x disc x the Roboto digit height"),
-             FMath::IsNearlyEqual(P.CapUU, 1.05f * 0.8f * R * RobotoDigitPerEm, 1e-3f));
-    TestTrue(Tag + TEXT(": the cap reads at K2x1.6 (>= 6.5 uu, ~10 px)"), P.CapUU >= 6.5f);
+    TestTrue(Tag + TEXT(": cap = 0.95 x disc x the Roboto digit height"),
+             FMath::IsNearlyEqual(P.CapUU, 0.95f * 0.8f * R * RobotoDigitPerEm, 1e-3f));
+    TestTrue(Tag + TEXT(": the cap reads at K2x1.6 (>= 6.0 uu, >= 9 px)"), P.CapUU >= 6.0f);
     // The disc stays clear of the pedestal centre (the legs): its inner edge >= 0.15 R out (ВР-Z1R-09).
     TestTrue(Tag + TEXT(": the disc clear of the centre"),
              FVector2D(P.DiscCenter - C.Pedestal).Size() - 0.5 * P.DiscDiameterUU >= 0.15 * R - 1e-3);

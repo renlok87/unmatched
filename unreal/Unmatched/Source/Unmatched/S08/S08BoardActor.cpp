@@ -595,7 +595,7 @@ double AS08BoardActor::RestYawFor(const AS08FighterActor* Me, const FVector& Wor
   const AS08FighterActor* Enemy = NearestEnemyFrom(Me, WorldPos);
   if (!Enemy) return S08Facing::YawToward(WorldPos, Cam);  // no living enemy: face the camera
   return S08Facing::RestYaw(WorldPos, Cam, true, Enemy->GetActorLocation(), /*CurrentYawDeg=*/0.0,
-                            /*bApplyDeadBand=*/false);
+                            /*bApplyDeadBand=*/false, Me ? Me->RestCapDeg() : S08Facing::MaxIdleOffDeg);
 }
 
 void AS08BoardActor::ApplyFighterRestFacing(AS08FighterActor* Actor, const TCHAR* Src) {

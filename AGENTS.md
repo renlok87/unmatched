@@ -288,8 +288,9 @@ names the look in use). Sources: `docs/game-design/visual/03-asset-registry.csv`
 - **Boards:** Marmoreal `-NoConceptPaste` (3D P5c surroundings + T2b tray instead of the painted backdrop); Sarpedon
   `-EnvLayoutVariant=p5c` or `-ConceptPaste=paste` (instead of lit3d path 1); `-NoHeroLight` (no hero light rig).
 - **Figures and animation:** `-S08HeroesLegacy` (grey blockouts + Medusa candidate), `-S08HeroMatFixLegacy` (ignore the
-  profile `heroMaterials` block), `-S08FacingLegacy` (no three-quarter idle / turn to target), `-S08MoveEaseLegacy`
-  (old step ease), `-S08BaseDigitLegacy` (old harpy digit placement), `-S08DissolveFade` (fade instead of ash death).
+  profile `heroMaterials` block), `-S08FacingLegacy` (no three-quarter idle / turn to target), `-S08FaceCapLegacy`
+  (Medusa's rest offset back to 45° instead of 10°, VC C1), `-S08MoveEaseLegacy` (old step ease),
+  `-S08BaseDigitLegacy` (old harpy digit placement), `-S08DissolveFade` (fade instead of ash death).
 - **Combat and field FX:** `-S08FxLegacy` (combat VFX off), `-S08FigureCueLegacy` (old rim cue), `-S08HitTintLegacy`
   (red hit fill), `-S08ChoiceLegacy`, `-S08MovePlatesLegacy`, `-S08LastMoveLegacy`, `-S08TargetArcLegacy` (field FX of
   FX-07…FX-15 back to the MS-T look).

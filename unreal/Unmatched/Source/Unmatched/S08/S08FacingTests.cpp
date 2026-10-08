@@ -18,6 +18,8 @@
 #include "Engine/World.h"
 #include "Math/RandomStream.h"
 #include "Misc/AutomationTest.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 
 namespace {
 bool Near(double A, double B, double Epsilon = 0.1) { return FMath::Abs(FMath::UnwindDegrees(A - B)) < Epsilon; }
@@ -73,6 +75,25 @@ bool FS08FacingRestTest::RunTest(const FString&) {
                              YawToward(Pos, Camera)),
              Off <= MaxIdleOffDeg + 0.001);
   }
+  // VC C1 (ВР-VC-01): the per-hero cap - Medusa's rest offset at most MedusaRestMaxOffDeg, every other hero 45; the
+  // cap never widens the table (clamped to 0..45). (A run started with -S08FaceCapLegacy / -S08FaceCapMedusa= skips.)
+  if (!FParse::Param(FCommandLine::Get(), FaceCapLegacyFlagName) &&
+      !FString(FCommandLine::Get()).Contains(FaceCapMedusaParamName)) {
+    TestEqual("MedusaRestMaxOffDeg 10", static_cast<int32>(MedusaRestMaxOffDeg), 10);
+    TestTrue("cap: Medusa", Near(RestMaxOffDeg(TEXT("Medusa")), MedusaRestMaxOffDeg));
+    TestTrue("cap: Medusa, any case", Near(RestMaxOffDeg(TEXT("medusa")), MedusaRestMaxOffDeg));
+    TestTrue("cap: Harpy 45", Near(RestMaxOffDeg(TEXT("Harpy")), MaxIdleOffDeg));
+    TestTrue("cap: King Arthur 45", Near(RestMaxOffDeg(TEXT("KingArthur")), MaxIdleOffDeg));
+    TestTrue("cap: no hero 45", Near(RestMaxOffDeg(nullptr), MaxIdleOffDeg));
+    TestEqual("ARTLOOK token", FaceCapLookField(), FString(TEXT("medusa10")));
+  }
+  TestTrue("capped 20: enemy behind -> axis + 20",
+           Near(RestYaw(Figure, Cam, true, FVector(-2000, -500, 0), 0.0, true, 20.0), 110.0));
+  TestTrue("capped 20: the other side -> axis - 20",
+           Near(RestYaw(Figure, Cam, true, FVector(2000, -500, 0), 0.0, true, 20.0), 70.0));
+  TestTrue("capped 20: an enemy 10 deg off follows it", Near(RestYaw(Figure, Cam, true, FVector(-174, 985, 0), 0.0, true, 20.0), 100.0));
+  TestTrue("a cap over 45 never widens the table",
+           Near(RestYaw(Figure, Cam, true, FVector(-2000, -500, 0), 0.0, true, 80.0), 135.0));
   return true;
 }
 
@@ -287,6 +308,9 @@ bool FS08FacingBoardTest::RunTest(const FString&) {
     const double Off = FMath::Abs(FMath::FindDeltaAngleDegrees(S08Facing::YawToward(Actor->GetActorLocation(), Cam),
                                                                Actor->GetFigureYawDeg()));
     TestTrue(FString::Printf(TEXT("%s: |off| %.1f <= 45 (never the back)"), *F.Id, Off), Off <= S08Facing::MaxIdleOffDeg + 0.01);
+    // VC C1: a v2 figure keeps its hero's cap (Medusa 10)
+    TestTrue(FString::Printf(TEXT("%s: |off| %.1f <= its cap %.0f"), *F.Id, Off, Actor->RestCapDeg()),
+             Off <= Actor->RestCapDeg() + 0.01);
   }
   // A second identical snapshot changes nothing (the dead band; no turn).
   Board->SyncFighters(Model, Roster, TEXT("host"));

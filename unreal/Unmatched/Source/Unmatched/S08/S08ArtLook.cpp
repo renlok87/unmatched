@@ -107,7 +107,7 @@ FString TraceLine() {
   // AN-23 (ВР-06): the rest facing rule (three-quarter to the camera) with its rollback
   const FString Facing = S08Facing::LegacyRequested()
                              ? FString::Printf(TEXT("legacy(-%s)"), S08Facing::LegacyFlagName)
-                             : FString(TEXT("v1"));
+                             : FString(TEXT("v1 faceCap=")) + S08Facing::FaceCapLookField();  // VC C1
   // AN-31 (ВР-07, ВР-72): the harpy number on the base with its rollback
   const FString BaseDigit = FParse::Param(Cmd, S08HeroesV2::BaseDigitLegacyFlagName)
                                 ? FString::Printf(TEXT("legacy(-%s)"), S08HeroesV2::BaseDigitLegacyFlagName)

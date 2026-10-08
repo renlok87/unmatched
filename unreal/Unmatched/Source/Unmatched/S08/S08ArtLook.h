@@ -146,7 +146,8 @@ UNMATCHED_API void ResetSlateHudOverrideForTest();
  *   review=0|1 legacyRender=0|1 markers=0|1 aliases=<-ArtPreviewHeroesV2,-ArtPreviewDiorama,-S08HeartGlow or ->
  *   hud=ring:<id>|legacy(..),glow:on|legacy(..),tracker:de|legacy(..),cross:on|legacy(..) dpi=project|legacy(..)
  *   portraits=avatar|legacy(..) cards=art|legacy(..) chips=v3|legacy(..) hudImpl=umg|slate[:<list>]
- *   move=ease80|legacy(-S08MoveEaseLegacy) facing=v1|legacy(-S08FacingLegacy) baseDigit=on|legacy(-S08BaseDigitLegacy)
+ *   move=ease80|legacy(-S08MoveEaseLegacy) facing=v1 faceCap=medusa10|legacy(-S08FaceCapLegacy)|legacy(-S08FacingLegacy)
+ *   baseDigit=on|legacy(-S08BaseDigitLegacy)
  *   heroMat=on|legacy(-S08HeroMatFixLegacy) fx=on|legacy(-S08FxLegacy) hitFx=flash|legacy(-S08HitTintLegacy)' -
  *   the effective look of this run (the hud field:
  *   FS08TurnHudLook::ArtLookField; dpi: UmHudScale::ArtLookField, HB-09; portraits / cards: CardMediaField, CP-02;
