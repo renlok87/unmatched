@@ -915,3 +915,22 @@ class SoundGateTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ReconnectStaleGateTests(unittest.TestCase):
+    """G3 (FX-36, VS-6 Frames ВР-VS6-50): after `CUE reconnect` a show of seq <= R is stale - until the match is left."""
+
+    def lines(self, leave):
+        out = ["CUE fx id=CUE-006 subject=card seq=40 t=1000 vfx=none sfx=none clip=none mat=none socket=- reduced=0 "
+               "result=spawned",
+               "CUE reconnect recovered_seq=43 t=2000"]
+        if leave:
+            out.append("2026.10.08-08.26.29 LEFT room=abc")
+        out.append("CUE fx id=CUE-006 subject=card seq=0 t=3000 vfx=none sfx=none clip=none mat=none socket=- reduced=0 "
+                   "result=spawned")
+        return out
+
+    def test_stale_until_the_room_is_left(self):
+        codes = lambda ls: sorted({c for c, _ in cc.check_trace(ls, TABLE)[0]})
+        self.assertIn("G3", codes(self.lines(leave=False)))
+        self.assertNotIn("G3", codes(self.lines(leave=True)))

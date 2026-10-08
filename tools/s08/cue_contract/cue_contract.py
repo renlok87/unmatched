@@ -617,6 +617,10 @@ def check_trace(lines, table):
     need = ("id", "subject", "seq", "t", "vfx", "sfx", "clip", "mat", "socket", "reduced", "result")
     stops = []
     for n, raw in enumerate(lines, 1):
+        if " LEFT room=" in raw or "STREAM torn down" in raw:
+            # VS-6 Frames (ВР-VS6-50): the match is left - the seqs of the next room start again, the spawner clears the
+            # reconnect (FX-36 ClearReconnect), so a lobby show of seq 0 is not stale
+            recovered = None
         p = parse_line(raw)
         if p is None:
             continue
