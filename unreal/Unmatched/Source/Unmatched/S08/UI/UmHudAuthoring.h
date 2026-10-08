@@ -23,6 +23,9 @@
 //   /Game/S08/UI/Hud/WBP_UI_HUD_TOAST    UUmToastStack    (VS-4 HB-40)
 //   /Game/S08/UI/Hud/WBP_UI_HUD_SUB      UUmHudSubtitle   (VS-4 HB-41)
 //   /Game/S08/UI/Hud/WBP_UI_HUD_ACTIONS  UUmHudActions    (VS-4 HB-43)
+//   /Game/S08/UI/Screens/WBP_UI_SCR_INSPECT  UUmScreenInspect (VS-4 SC-21...SC-23)
+//   /Game/S08/UI/Screens/WBP_UI_SCR_BOOT     UUmScreenBoot    (VS-7 SC-03...SC-05)
+//   /Game/S08/UI/Screens/WBP_UI_SCR_LOGIN    UUmScreenLogin   (VS-7 SC-06, SC-07)
 // Called from UE Python: tools/s08/hud_contract/ue_author_um_hud.py (UnrealEditor-Cmd -run=pythonscript).
 #pragma once
 

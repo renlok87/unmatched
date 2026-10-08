@@ -8,6 +8,9 @@
 // endTurn) - only its first S10_DELAY_COUNT replies (default 1) are held, so the client's command stays in flight past
 // its 3 s slow mark (CONN syncing); S10_WS_DROP_AT_MS=<ms> closes every open graphql-transport-ws connection once, that
 // long after the first one opened (the match stream drops: CONN lost until the client reconnects).
+// VS-7 S1 (SC-04 / SC-07 evidence, opt-in): S10_DELAY_FIELD may name the BOOT query heroList or the mutation login;
+// with S10_DELAY_COUNT set a query is held only for its first N replies too (the retry then passes). Two fields: chain
+// two proxies (S10_TARGET_PORT of the first = S10_LISTEN_PORT of the second).
 // Local-only; no request bodies, tokens, room codes or card data are logged (only field names and counts).
 const http = require('node:http');
 const net = require('node:net');
@@ -16,9 +19,10 @@ const listenPort = Number(process.env.S10_LISTEN_PORT || 3123);
 const targetPort = Number(process.env.S10_TARGET_PORT || 3000);
 const delayField = process.env.S10_DELAY_FIELD || 'gameDeckLists';
 const delayMs = Number(process.env.S10_DELAY_MS || 12000);
-const permitted = new Set(['gameDeckLists']);
-const permittedMutations = new Set(['beginManeuver', 'maneuver', 'endTurn']);
+const permitted = new Set(['gameDeckLists', 'heroList']);
+const permittedMutations = new Set(['beginManeuver', 'maneuver', 'endTurn', 'login']);
 const delayCount = Number(process.env.S10_DELAY_COUNT || 1);
+const countSet = Object.prototype.hasOwnProperty.call(process.env, 'S10_DELAY_COUNT');
 const wsDropAtMs = Number(process.env.S10_WS_DROP_AT_MS || 0);
 if (!Number.isInteger(listenPort) || listenPort < 1024 || listenPort > 65535 ||
     !Number.isInteger(targetPort) || targetPort < 1024 || targetPort > 65535 ||
@@ -85,7 +89,7 @@ const server = http.createServer((downstreamReq, downstreamRes) => {
           downstreamRes.writeHead(upstreamRes.statusCode || 502, upstreamRes.headers);
           downstreamRes.end(reply);
         };
-        if (field === delayField && (!delayMutation || delayed < delayCount)) {
+        if (field === delayField && ((!delayMutation && !countSet) || delayed < delayCount)) {
           delayed++;
           process.stdout.write(JSON.stringify({ event: 'reply_delayed', field, ms: delayMs, n: delayed }) + '\n');
           setTimeout(send, delayMs);

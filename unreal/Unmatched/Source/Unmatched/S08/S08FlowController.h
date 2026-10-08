@@ -239,6 +239,21 @@ public:
   const TArray<FS08HeroEntry>& GetHeroes() const { return Heroes; }
   void FetchHeroes();
 
+  // ---- VS-7 SC-03...SC-05: the BOOT pass after the login (S08FlowControllerBoot.cpp; no stage change) ----
+  enum class EBootQuery : uint8 { Idle, Loading, Done, Failed };
+  /** heroList answers that failed so far (BOOT shows its error banner on a new one). */
+  int32 GetHeroesFailures() const { return HeroesFailures; }
+  /** boardList (Board rows id -> name): the boards stage and the board name of the resume line. */
+  void FetchBoards();
+  EBootQuery GetBoardsState() const { return BoardsState; }
+  const TMap<FString, FString>& GetBoardNames() const { return BoardNames; }
+  /** myGames(status: IN_PROGRESS): the own live match after a restart; GetActiveGame().GameId empty = none. */
+  void FetchActiveGame();
+  EBootQuery GetActiveGameState() const { return ActiveGameState; }
+  const FS08RoomState& GetActiveGame() const { return ActiveGame; }
+  /** «Вернуться в партию»: the found match becomes the room and its stream attaches (the guest's IN_PROGRESS path). */
+  bool ResumeActiveGame();
+
   ES08Stage GetStage() const { return Stage; }
   const FS08RoomState& GetRoom() const { return Room; }
   const FString& GetUserId() const { return UserId; }
@@ -830,6 +845,13 @@ private:
   int32 RefreshStreak = 0;     // refreshes without a successful response in
                                // between; >= 2 means rotation is not taking
   int32 WsGeneration = 0;      // MakeWs() invocations (WS recreation proof)
+  // VS-7 BOOT pass (S08FlowControllerBoot.cpp)
+  int32 HeroesFailures = 0;
+  EBootQuery BoardsState = EBootQuery::Idle;
+  TMap<FString, FString> BoardNames;
+  EBootQuery ActiveGameState = EBootQuery::Idle;
+  FS08RoomState ActiveGame;
+  TSharedPtr<FJsonObject> ActiveGameRow;
 #if WITH_AUTOMATION_TESTS
   int32 TestHttpSendCount = 0; // real SendHttp calls (harness + network)
   TSharedPtr<FJsonObject> TestLastHttpVariables; // variables of the last SendHttp

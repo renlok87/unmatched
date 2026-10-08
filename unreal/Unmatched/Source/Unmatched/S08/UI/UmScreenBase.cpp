@@ -237,6 +237,6 @@ void UUmScreenBase::CollectShotLines(TArray<FString>& Out) const {
   const FS08ScreenRect Rect(R.Min.X * PxPerSu, R.Min.Y * PxPerSu, R.Max.X * PxPerSu, R.Max.Y * PxPerSu);
   Out.Add(S08ArtHud::FormatWidgetLineEx(UiId, TEXT("umg"), *ScreenState.ToString(), FString(), Rect, bVisible && !Rect.IsEmpty(),
                                         bVisible, SourceName(),
-                                        FString::Printf(TEXT("modal=%d class=%s alpha=%.2f"), IsModal() ? 1 : 0,
-                                                        bClassS ? TEXT("S") : TEXT("L"), AlphaNow)));
+                                        FString::Printf(TEXT("modal=%d class=%s alpha=%.2f%s"), IsModal() ? 1 : 0,
+                                                        bClassS ? TEXT("S") : TEXT("L"), AlphaNow, *ShotExtra())));
 }

@@ -1433,6 +1433,19 @@ private:
   UPROPERTY()
   TObjectPtr<UUserWidget> UmGallery;
   TSharedPtr<struct FUmHudRuntime> UmHud;
+  // VS-7 S1 (S08FlowGameModeUmScreens.cpp): the menu backdrop SC-02 (Marmoreal K1 without figures under BOOT...ROOM) and
+  // the BOOT / LOGIN screens SC-03...SC-07 in the root's Screens; rollback -S08SlateHud=menubg|boot|login
+  void BuildUmFlowScreens();
+  void TickUmFlowScreens();
+  /** A UMG route screen covers the legacy Slate flow panel (it hides; F10 still forces it). */
+  bool UmFlowScreensCoverLegacy() const;
+  /** A login / a resume in flight: the busy cursor (HB-12). */
+  bool UmFlowScreensBusy() const;
+  /** The first match snapshot: the menu's Marmoreal board when the match is on it (no second copy), else null (the
+   *  menu board goes, the match board spawns: Sarpedon swaps under the loading). */
+  AS08BoardActor* UmMenuBackdropHandOver(const FString& RoomBoardId);
+  void HandleUmFlowLoginError(const FS08GraphQLError& Error);
+  TSharedPtr<struct FUmFlowScreensRuntime> UmFlowScreens;
 
   FS08BoardModel BoardModel;
   TArray<FS08BoardFighter> Fighters;

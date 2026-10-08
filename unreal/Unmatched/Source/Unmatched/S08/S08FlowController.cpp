@@ -94,6 +94,7 @@ void FS08FlowController::FetchHeroes() {
                [this](bool bOk, const TArray<FS08GraphQLError>& Errors,
                       TSharedPtr<FJsonObject> Data, const FString&) {
                  if (!bOk) {
+                   ++HeroesFailures;  // VS-7 SC-04: the BOOT error banner
                    Trace(TEXT("HEROES failed: ") + (Errors.Num() ? Errors[0].Message : TEXT("?")));
                    return;
                  }

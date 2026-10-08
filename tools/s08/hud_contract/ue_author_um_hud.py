@@ -55,6 +55,15 @@ their C++ bases (UUmHudAuthoringLibrary -> BuildDefaultTree of each class), in t
                                       CopiesChip, BodyText > BodyLine, CopiesText, ArtMissingText), LangToggle, CloseButton,
                                       BackButton (WBP_UmButton), DeckScroll > DeckGrid, Track, Thumb (VS-4 SC-21...SC-23,
                                       CP-22; the grid cards are pooled WBP_UmCard instances made at run time)
+  /Game/S08/UI/Screens/WBP_UI_SCR_BOOT  parent UmScreenBoot  parts Veil, Frame, Body (UUmScreenBase) + Content > Wordmark,
+                                      Progress (UUmProgressBar), StageCapsule > StageText, BuildText, ErrorBanner > ErrorRow >
+                                      ErrorIcon, ErrorText, RetryButton (WBP_UmButton), WhyText; ResumeModal (UUmBootResume,
+                                      code tree: ResumeTitle, ResumeLine, LobbyButton, ResumeButton, ResumeSpinner, ResumeWhy)
+                                      (VS-7 SC-03...SC-05)
+  /Game/S08/UI/Screens/WBP_UI_SCR_LOGIN  parent UmScreenLogin  parts Veil, Frame, Body (UUmScreenBase) + Content > Title,
+                                      EmailLabel, EmailBox, PasswordLabel, PasswordBox (UEditableTextBox), PasswordMask,
+                                      RevealButton, SubmitButton (WBP_UmButton), SubmitSpinner (WBP_UmSpinner), ErrorIcon,
+                                      ErrorText, WhyText; LangRu, LangEn (WBP_UmButton) in Root (VS-7 SC-06, SC-07)
 
 A widget tree is not reachable from Python, so the C++ library builds it (the same function the class uses without a
 WBP) and this script re-loads every asset, checks the parent class, writes the report (env UM_HUD_WBP_REPORT, default
@@ -102,6 +111,8 @@ ASSETS = {
     "/Game/S08/UI/Hud/WBP_UI_HUD_SUB": "UmHudSubtitle",
     "/Game/S08/UI/Hud/WBP_UI_HUD_ACTIONS": "UmHudActions",
     "/Game/S08/UI/Screens/WBP_UI_SCR_INSPECT": "UmScreenInspect",
+    "/Game/S08/UI/Screens/WBP_UI_SCR_BOOT": "UmScreenBoot",
+    "/Game/S08/UI/Screens/WBP_UI_SCR_LOGIN": "UmScreenLogin",
 }
 
 

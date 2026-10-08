@@ -91,6 +91,8 @@ class UNMATCHED_API UUmScreenBase : public UUserWidget {
   void Step();
   /** The SHOT line of the gate (04 §4.5) while shown. */
   virtual void CollectShotLines(TArray<FString>& Out) const;
+  /** VS-7: the screen's own fields after the base ones (" key=value ..."; never a secret, a name or a code). */
+  virtual FString ShotExtra() const { return FString(); }
 
   // ---- tests ----
   void SetClockOverrideMs(double Ms) { ClockOverrideMs = Ms; }

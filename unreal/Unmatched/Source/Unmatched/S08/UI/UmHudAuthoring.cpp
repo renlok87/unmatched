@@ -21,7 +21,9 @@
 #include "UmHudStatusLine.h"
 #include "UmHudSubtitle.h"
 #include "UmHudTop.h"
+#include "UmScreenBoot.h"
 #include "UmScreenInspect.h"
+#include "UmScreenLogin.h"
 #include "UmToast.h"
 #include "UmToastStack.h"
 #include "UmCursor.h"
@@ -123,6 +125,12 @@ FString UUmHudAuthoringLibrary::AuthorUmHudWidgetBlueprints(bool bOverwrite) {
   // VS-4 SC-21...SC-23 / CP-22: INSPECT (nests WBP_UmCard and WBP_UmButton; the grid cards are pooled at run time)
   One(UUmScreenInspect::WidgetBlueprintPath, UUmScreenInspect::StaticClass(),
       [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmScreenInspect::BuildDefaultTree(Tree, Attach, Error); });
+  // VS-7 SC-03...SC-07: BOOT (nests WBP_UmButton, WBP_UmSpinner, the progress bar and the code-built resume modal) and
+  // LOGIN (nests WBP_UmButton, WBP_UmSpinner; its fields are UEditableTextBox)
+  One(UUmScreenBoot::WidgetBlueprintPath, UUmScreenBoot::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmScreenBoot::BuildDefaultTree(Tree, Attach, Error); });
+  One(UUmScreenLogin::WidgetBlueprintPath, UUmScreenLogin::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmScreenLogin::BuildDefaultTree(Tree, Attach, Error); });
   Report->SetArrayField(TEXT("assets"), Assets);
   FString Out;
   const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&Out);

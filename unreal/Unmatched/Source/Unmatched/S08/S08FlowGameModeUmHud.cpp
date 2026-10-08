@@ -1084,7 +1084,7 @@ void AS08FlowGameMode::TickUmHud() {
       PC->CurrentMouseCursor =
           UmHud->BoardCursor.Store(FVector2D(MX, MY), GFrameCounter, bOwn, Cell.X >= 0 && BoardActor->IsCellHighlighted(Cell));
     }
-    UmHudRoot->TickCursors(HudBusyReason().IsSet(), FPlatformTime::Seconds());
+    UmHudRoot->TickCursors(HudBusyReason().IsSet() || UmFlowScreensBusy(), FPlatformTime::Seconds());  // VS-7: login
   }
   if (!UmHud.IsValid() || !UmHud->bLayout || !UmHud->Blocks.UmgRoot()) return;
   TickUmInspect();      // VS-4 V4 (H13): INSPECT follows bInspecting / the deck grid

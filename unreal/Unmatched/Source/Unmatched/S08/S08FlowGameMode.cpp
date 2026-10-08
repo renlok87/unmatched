@@ -401,6 +401,7 @@ void AS08FlowGameMode::BeginPlay() {
   }
   UE_LOG(LogTemp, Display, TEXT("S08_FLOW_READY map=%s api=%s"), *GetWorld()->GetMapName(), *HttpUrl);
   TraceLines.Add(TEXT("BOOT"));
+  BuildUmFlowScreens();  // VS-7 S1: the menu backdrop SC-02 and BOOT / LOGIN SC-03...SC-07 (S08FlowGameModeUmScreens.cpp)
   if (bAuto) RunAutoDrive();
   RefreshUi();
 }
@@ -768,8 +769,12 @@ void AS08FlowGameMode::SyncBoardFromApplied() {
   if (!BoardActor) {
     FActorSpawnParameters Params;
     Params.Owner = this;
-    BoardActor = GetWorld()->SpawnActor<AS08BoardActor>(
-        AS08BoardActor::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator, Params);
+    // VS-7 SC-02: the menu's Marmoreal board becomes the match board (no second copy); another board spawns here
+    BoardActor = UmMenuBackdropHandOver(RoomBoardId);
+    if (!BoardActor) {
+      BoardActor = GetWorld()->SpawnActor<AS08BoardActor>(
+          AS08BoardActor::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator, Params);
+    }
     // ENV-MAPS live tune: the board actor's BeginPlay lines end here (the shots' bench.trace.log keeps them)
     if (LiveTune.IsValid() && LiveTune->BoardBootEnd < 0) LiveTune->BoardBootEnd = FS08Trace::JournalNum();
     if (BoardActor) {
@@ -5274,6 +5279,7 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
   TickResultScreen();  // DE-029: the modal opens with the gate; intro 500 ms, board crossfade 250 ms
   TickDeckPanel();     // DE-030: the deck side panel - open 80 ms, close 150 ms
   TickUmHud();         // VS-2 HB-06: the H2 layout fixes of the Slate blocks (toast / subtitle stack)
+  TickUmFlowScreens();  // VS-7 S1: the menu backdrop and the route screens BOOT / LOGIN
   if (!UmInspectOwnsInput() && !TryCombatSkip() && !TryCardSlotSkip()) {  // VS-4 H13: the open INSPECT owns the input
     HandleClick();
     HandleHudKeys();
@@ -5626,7 +5632,7 @@ void AS08FlowGameMode::UpdateLegacyRootVisibility() {
       bS09Probe || bBench || (Flow.IsValid() &&
                     (Flow->GetStage() == ES08Stage::Started ||
                      Flow->GetStage() == ES08Stage::Lobby));
-  const bool bVisible = !bGameplay || bDebugPanelForced;
+  const bool bVisible = (!bGameplay && !UmFlowScreensCoverLegacy()) || bDebugPanelForced;  // VS-7: a UMG route screen
   LegacyRoot->SetVisibility(bVisible ? EVisibility::Visible : EVisibility::Collapsed);
 }
 
