@@ -30,6 +30,9 @@
 //   /Game/S08/UI/Screens/WBP_UI_SCR_ROOM     UUmScreenRoom    (VS-7 SC-14...SC-18)
 //   /Game/S08/UI/Screens/WBP_UI_SCR_LOADING  UUmScreenLoading (VS-7 SC-19, SC-20)
 //   /Game/S08/UI/Screens/WBP_UI_SCR_PAUSE    UUmScreenPause   (VS-7 SC-24...SC-30)
+//   /Game/S08/UI/Screens/WBP_UI_SCR_RECONNECT  UUmReconnectOverlay (VS-7 SC-31...SC-33)
+//   /Game/S08/UI/Screens/WBP_UI_SCR_GAMEOVER   UUmScreenGameOver   (VS-7 SC-34...SC-37)
+//   /Game/S08/UI/Screens/WBP_UI_SCR_ABORTED    UUmScreenAborted    (VS-7 SC-38)
 // Called from UE Python: tools/s08/hud_contract/ue_author_um_hud.py (UnrealEditor-Cmd -run=pythonscript).
 #pragma once
 

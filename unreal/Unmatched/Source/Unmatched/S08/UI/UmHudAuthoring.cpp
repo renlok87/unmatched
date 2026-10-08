@@ -28,6 +28,9 @@
 #include "UmScreenRoom.h"
 #include "UmScreenLogin.h"
 #include "UmScreenPause.h"
+#include "UmReconnectOverlay.h"
+#include "UmScreenAborted.h"
+#include "UmScreenGameOver.h"
 #include "UmToast.h"
 #include "UmToastStack.h"
 #include "UmCursor.h"
@@ -147,6 +150,13 @@ FString UUmHudAuthoringLibrary::AuthorUmHudWidgetBlueprints(bool bOverwrite) {
   // VS-7 SC-24...SC-30: PAUSE and the settings (the setting rows are code-built at run time)
   One(UUmScreenPause::WidgetBlueprintPath, UUmScreenPause::StaticClass(),
       [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmScreenPause::BuildDefaultTree(Tree, Attach, Error); });
+  // VS-7 SC-31...SC-38: RECONNECT, GAMEOVER, ABORTED
+  One(UUmReconnectOverlay::WidgetBlueprintPath, UUmReconnectOverlay::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmReconnectOverlay::BuildDefaultTree(Tree, Attach, Error); });
+  One(UUmScreenGameOver::WidgetBlueprintPath, UUmScreenGameOver::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmScreenGameOver::BuildDefaultTree(Tree, Attach, Error); });
+  One(UUmScreenAborted::WidgetBlueprintPath, UUmScreenAborted::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmScreenAborted::BuildDefaultTree(Tree, Attach, Error); });
   Report->SetArrayField(TEXT("assets"), Assets);
   FString Out;
   const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&Out);

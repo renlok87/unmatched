@@ -3294,6 +3294,7 @@ void AS08FlowGameMode::ReturnToLobbyCommand() {
 }
 
 void AS08FlowGameMode::DriveS09ResultFlow() {
+  if (UmEndDriveOwnsResult()) return;  // VS-7 S5: -S08EndDrive drives the result screen (review tooling)
   // Bounded result-screen capture, one leaveGame, bounded lobby shot, then an
   // EARLY exit - the 10:37 run idled ~300s at a terminal state; once the
   // result/lobby evidence is complete there is nothing left to wait for.
@@ -5278,11 +5279,12 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
   S08FxTick();       // VS-6 F1: CUE-007 feeds + dust at the landing, the chevrons at event + 150 ms
   TickDeathStage();  // DE-019: death lines and the result gate (after the staging released this frame's fall)
   TickResultScreen();  // DE-029: the modal opens with the gate; intro 500 ms, board crossfade 250 ms
+  TickUmEndScreens();  // VS-7 S5: RECONNECT, GAMEOVER (the UMG face of the result modal), ABORTED
   TickDeckPanel();     // DE-030: the deck side panel - open 80 ms, close 150 ms
   TickUmHud();         // VS-2 HB-06: the H2 layout fixes of the Slate blocks (toast / subtitle stack)
   TickUmFlowScreens();  // VS-7 S1: the menu backdrop and the route screens BOOT / LOGIN
   // VS-4 H13 / VS-7 S4: the open INSPECT or PAUSE owns the input
-  if (!UmPauseOwnsInput() && !UmInspectOwnsInput() && !TryCombatSkip() && !TryCardSlotSkip()) {
+  if (!UmPauseOwnsInput() && !UmInspectOwnsInput() && !UmEndOwnsInput() && !TryCombatSkip() && !TryCardSlotSkip()) {
     HandleClick();
     HandleHudKeys();
   }
@@ -6094,6 +6096,7 @@ void AS08FlowGameMode::RefreshHud() {
   // the controller gates already block gameplay input, and the leave action
   // remains the only live exit. Rendered above every draft/waiting state. ----
   if (Flow.IsValid() && Flow->GetStage() == ES08Stage::Started && Flow->IsRoomAborted()) {
+    if (UmAbortedOnUmg()) return;  // VS-7 S5 SC-38: the UMG ABORTED modal says it (rollback -S08SlateHud=aborted)
     if (S08ArtLook::S08Markers()) {  // HB-02: the gate marker only with -S09Markers
       CommandBox->AddSlot().AutoHeight().Padding(0, 0, 0, 4)
           [SNew(SBox).WidthOverride(220).HeightOverride(14)[SNew(SColorBlock).Color(GS10InterruptMarker)]];

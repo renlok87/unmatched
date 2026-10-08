@@ -12,6 +12,9 @@ param(
   # Not a GD-039 acceptance run - the gate run keeps the markers. -FullHd: 1920x1080 instead of 1280x720.
   # -ClientExtraArgs: extra client arguments, '+'-separated (e.g. '-S08ExitShots+-S08UiScale=150+-S08BoardId=<id>').
   [switch]$PlayerView,
+  # VS-7 S5 (04 s5.3): the result screen is the UMG GAMEOVER - the gate is its 'SHOT widget id=UI-SCR-GAMEOVER' line in the
+  # trace (no -S09Markers on the client). -S09Markers: the rollback to the GD-036 pixel-marker gates of the Slate modal.
+  [switch]$S09Markers,
   [switch]$FullHd,
   [string]$ClientExtraArgs = '',
   # VS-3 SC-01 (ВР-SC14): -S08ScreenShots - one evidence frame per new 'SHOT widget id=UI-SCR-* state=<s>'
@@ -98,6 +101,21 @@ function Assert-ShotModeSupported([string]$Mode) {
 
 function Test-EarlyExit([double]$ElapsedSeconds, [int]$RunSeconds) {
   return ($ElapsedSeconds -lt $RunSeconds)
+}
+
+# VS-7 S5: the UMG GAMEOVER gate - one painted, visible 'SHOT widget id=UI-SCR-GAMEOVER' line with an outcome state after
+# the 'RESULT screen' line and before the accepted leave; the state matches the RESULT outcome. $null on success.
+function Test-GameOverWidget([string]$TraceText, [string]$Outcome) {
+  $screenAt = $TraceText.IndexOf(' RESULT screen ', [StringComparison]::Ordinal)
+  if ($screenAt -lt 0) { return "no 'RESULT screen' line (the result gate never opened)" }
+  $leftAt = $TraceText.IndexOf('LEFT room=', [StringComparison]::Ordinal)
+  $rx = [regex]'SHOT widget id=UI-SCR-GAMEOVER impl=umg state=(victory|defeat|draw|unknown) [^\r\n]*geom=painted visible=1'
+  $m = $rx.Match($TraceText, $screenAt)
+  if (-not $m.Success) { return "no painted 'SHOT widget id=UI-SCR-GAMEOVER' outcome line after the result gate" }
+  if ($leftAt -ge 0 -and $m.Index -gt $leftAt) { return 'the UI-SCR-GAMEOVER line comes after the accepted leave' }
+  $want = @{ VICTORY = 'victory'; DEFEAT = 'defeat'; DRAW = 'draw' }[$Outcome]
+  if ($want -and $m.Groups[1].Value -ne $want) { return "UI-SCR-GAMEOVER state=$($m.Groups[1].Value) but the RESULT outcome is $Outcome" }
+  return $null
 }
 
 # Ordered terminal tail: exactly one of each marker, in order.
@@ -504,6 +522,21 @@ function Invoke-S10SelfTests {
   $v = Test-StopCleanupVerdict 1 @('foreign child pid 9 left running')
   Assert-Cond ($v -match 'anomalies' -and $v -match 'foreign child pid 9') 'stop verdict: unverified FAILS even though another pid stopped (M2)' "got: $v"
 
+  # VS-7 S5: the UMG GAMEOVER gate (04 s5.3)
+  $go = "2026.10.08-15.19.39 RESULT screen seq=100 t=1 due=1`n2026.10.08-15.19.39 RESULT summary outcome=VICTORY`n" +
+        "2026.10.08-15.19.39 SHOT widget id=UI-SCR-GAMEOVER impl=umg state=victory fighter=none bbox=(605,250,1365,830) geom=painted visible=1 twin=0 source=x`n" +
+        "2026.10.08-15.19.46 LEFT room=r1`n"
+  Assert-Cond ($null -eq (Test-GameOverWidget $go 'VICTORY')) 'gameover widget: painted victory line after the gate accepts' ''
+  $e = Test-GameOverWidget $go 'DEFEAT'
+  Assert-Cond ($e -match 'but the RESULT outcome is DEFEAT') 'gameover widget: a state other than the RESULT outcome fails' "got: $e"
+  $e = Test-GameOverWidget ($go -replace 'geom=painted visible=1', 'geom=unpainted visible=0') 'VICTORY'
+  Assert-Cond ($e -match 'no painted') 'gameover widget: an unpainted line fails' "got: $e"
+  $e = Test-GameOverWidget ($go -replace 'RESULT screen', 'RESULT other') 'VICTORY'
+  Assert-Cond ($e -match "no 'RESULT screen'") 'gameover widget: no result gate fails' "got: $e"
+  $late = "2026.10.08-15.19.39 RESULT screen seq=100`n2026.10.08-15.19.40 LEFT room=r1`n2026.10.08-15.19.41 SHOT widget id=UI-SCR-GAMEOVER impl=umg state=victory fighter=none geom=painted visible=1`n"
+  $e = Test-GameOverWidget $late 'VICTORY'
+  Assert-Cond ($e -match 'after the accepted leave') 'gameover widget: a line after the leave fails' "got: $e"
+
   Write-Output ("self-tests complete: {0} failure(s)" -f $Script:SelfTestFailures)
 }
 
@@ -779,7 +812,7 @@ function Invoke-VsAiDemo {
     "-ForceAbandonSequences", "-S08Api=$Api", "-S09ShotMode=$ShotMode")
   # HB-01: the marker pixel gates below need the debug layer (04-hud-spec s5.3). VS-4 HB-48: they stay on -S09Markers
   # until the GAMEOVER screen moves to UMG (VS-7, screens.csv UI-SCR-GAMEOVER); then 'SHOT widget id=UI-SCR-GAMEOVER'.
-  if (-not $PlayerView) { $common += "-S09Markers" }
+  if ($S09Markers -and -not $PlayerView) { $common += "-S09Markers" }  # VS-7 S5: the UMG GAMEOVER gate otherwise
   if ($FullHd) { $common += '-ForceRes' }  # as run-combat-demo -FullHd: without it the hidden window stays 888x500
   $clientArgs = @("/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode") + $common + @(
     "-S08Auto", "-S08Create", "-S08Mode=VS_AI", "-S08HeroId=$heroId",
@@ -1069,8 +1102,12 @@ function Invoke-VsAiDemo {
     $lobbyShot = Assert-FreshShot (Join-Path $shots 's09-lobby-return.png') $clientStartUtc 'lobby-return'
     Write-Output ("result shot={0}B lobby shot={1}B" -f $resultShot.Length, $lobbyShot.Length)
 
-    if ($PlayerView) {
-      Write-Output 'PlayerView: result / lobby element-marker gates skipped (the client ran without -S09Markers); not a GD-039 acceptance run'
+    if (-not $S09Markers -or $PlayerView) {
+      # VS-7 S5 (04 s5.3): the UMG GAMEOVER screen - its SHOT widget line, the outcome cross-checked with the RESULT line
+      $mOutcome = [regex]::Match($traceText, ' RESULT seq=\d+ outcome=([A-Z]+)')
+      $gwErr = Test-GameOverWidget $traceText ($(if ($mOutcome.Success) { $mOutcome.Groups[1].Value } else { '' }))
+      if ($gwErr) { throw "GAMEOVER widget gate FAILED: $gwErr" }
+      Write-Output 'result screen: SHOT widget id=UI-SCR-GAMEOVER (painted, visible, the outcome of the RESULT line); lobby: LEFT room= in the tail (the pixel lobby gates need -S09Markers)'
     } elseif ($ShotMode -eq 'request') {
       # unreachable after the top-level guard, kept as defense in depth
       Add-Type -AssemblyName System.Drawing

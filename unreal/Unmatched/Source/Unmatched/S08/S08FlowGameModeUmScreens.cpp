@@ -208,7 +208,7 @@ void AS08FlowGameMode::HandleUmFlowLoginError(const FS08GraphQLError& Error) {
 }
 
 bool AS08FlowGameMode::UmFlowScreensCoverLegacy() const {
-  return UmFlowScreens.IsValid() && !UmFlowScreens->Showing.IsEmpty();
+  return UmFlowScreens.IsValid() && (!UmFlowScreens->Showing.IsEmpty() || UmEndHoldsRoute());  // VS-7 S5: the held route too
 }
 
 bool AS08FlowGameMode::UmFlowScreensBusy() const {
@@ -447,6 +447,7 @@ void AS08FlowGameMode::TickUmFlowScreens() {
     } else if (!RoomRoute.IsEmpty()) {
       Want = RoomRoute;  // "room" | "loading"
     }
+    if (UmEndHoldsRoute()) Want.Reset();  // VS-7 S5: «Сыграть ещё» / the expired session keep GAMEOVER / RECONNECT up
     if (Want == TEXT("boot") && !R.Boot.IsValid()) Want.Reset();
     if (Want == TEXT("login") && !R.Login.IsValid()) Want.Reset();
   }

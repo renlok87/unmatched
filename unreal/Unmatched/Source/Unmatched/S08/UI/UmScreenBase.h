@@ -84,6 +84,9 @@ class UNMATCHED_API UUmScreenBase : public UUserWidget {
 
   void PlayShow();
   void PlayHide();
+  /** VS-7 S5: the owner drives the opacity itself (GAMEOVER: the FS09ResultView intro / crossfade; RECONNECT: the 200 ms
+   *  exit) - no animation of its own; shown while A > 0 with ShownVis, collapsed at 0. */
+  void SetAlphaDirect(float A, ESlateVisibility ShownVis = ESlateVisibility::Visible);
   /** Shown (or appearing); false once hidden (or while it goes). */
   bool IsShown() const { return bShown; }
   float GetAlpha() const { return AlphaNow; }

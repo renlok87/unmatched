@@ -356,6 +356,8 @@ public:
   /** Test hook: simulate an abrupt transport loss of the live stream. */
   void DropWsForTest();
   bool IsStreamAttached() const { return Ws.IsValid(); }
+  /** VS-7 S5 SC-33: the transport is back (connection_ack) - the state may still be loading. */
+  bool IsStreamAcked() const { return Ws.IsValid() && Ws->IsAcked(); }
   /** GD-037/S10: true only while a live, READY state stream exists - the
    *  gameplay-command gate and the reconnect banner both key off this. An
    *  acked socket alone does not count (S10 review P1(3)), and neither does

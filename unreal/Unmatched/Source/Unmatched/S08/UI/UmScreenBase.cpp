@@ -204,6 +204,16 @@ void UUmScreenBase::PlayHide() {
   Step();
 }
 
+void UUmScreenBase::SetAlphaDirect(float A, ESlateVisibility ShownVis) {
+  AnimStartMs = -1.0;
+  AlphaNow = FMath::Clamp(A, 0.0f, 1.0f);
+  bShown = AlphaNow > 0.0f;
+  bAnimShow = bShown;
+  SetRenderOpacity(AlphaNow);
+  const ESlateVisibility Want = bShown ? ShownVis : ESlateVisibility::Collapsed;
+  if (GetVisibility() != Want) SetVisibility(Want);
+}
+
 void UUmScreenBase::Step() {
   if (AnimStartMs < 0.0) return;
   const float T = static_cast<float>(NowMs() - AnimStartMs);

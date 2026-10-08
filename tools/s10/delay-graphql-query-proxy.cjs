@@ -17,6 +17,8 @@
 // VS-7 S3 (SC-20 loading error evidence, opt-in): S10_DELAY_FIELD=gameState holds the first match state read (> the
 // client's 10 s = «Не удаётся подключиться»); with S10_WS_REFUSE=1 the graphql-transport-ws upgrades are refused until a
 // further gameState request arrives (the client's «Повторить») - the stream cannot bring the snapshot around the hold.
+// VS-7 S5 (SC-31...SC-33 evidence, opt-in): S10_WS_DOWN_MS=<ms> keeps refusing every graphql-transport-ws upgrade that
+// long after the S10_WS_DROP_AT_MS drop (the link stays down: RECONNECT auto -> manual after 5 x 10 s), then passes them.
 // Local-only; no request bodies, tokens, room codes or card data are logged (only field names and counts).
 const http = require('node:http');
 const net = require('node:net');
@@ -31,13 +33,16 @@ const delayCount = Number(process.env.S10_DELAY_COUNT || 1);
 const countSet = Object.prototype.hasOwnProperty.call(process.env, 'S10_DELAY_COUNT');
 const wsDropAtMs = Number(process.env.S10_WS_DROP_AT_MS || 0);
 const wsRefuse = process.env.S10_WS_REFUSE === '1';
+const wsDownMs = Number(process.env.S10_WS_DOWN_MS || 0);
+let wsDroppedAt = 0;
+let wsDownRefused = 0;
 let fieldSeen = 0;
 let wsRefused = 0;
 if (!Number.isInteger(listenPort) || listenPort < 1024 || listenPort > 65535 ||
     !Number.isInteger(targetPort) || targetPort < 1024 || targetPort > 65535 ||
     !(permitted.has(delayField) || permittedMutations.has(delayField)) || listenPort === targetPort ||
     !(delayMs >= 0 && delayMs <= 120000) || !(Number.isInteger(delayCount) && delayCount >= 1) ||
-    !(wsDropAtMs >= 0 && wsDropAtMs <= 3600000)) {
+    !(wsDropAtMs >= 0 && wsDropAtMs <= 3600000) || !(wsDownMs >= 0 && wsDownMs <= 600000)) {
   throw new Error('Set distinct local S10_LISTEN_PORT/S10_TARGET_PORT, a permitted S10_DELAY_FIELD, S10_DELAY_MS <= 120000, ' +
                   'S10_DELAY_COUNT >= 1 and S10_WS_DROP_AT_MS <= 3600000');
 }
@@ -117,6 +122,14 @@ const server = http.createServer((downstreamReq, downstreamRes) => {
 });
 
 server.on('upgrade', (request, downstream, head) => {
+  if (wsDownMs > 0 && wsDroppedAt > 0 && Date.now() - wsDroppedAt < wsDownMs) {
+    wsDownRefused++;
+    if (wsDownRefused === 1 || wsDownRefused % 10 === 0) {
+      process.stdout.write(JSON.stringify({ event: 'ws_down_refused', n: wsDownRefused, sinceDropMs: Date.now() - wsDroppedAt }) + '\n');
+    }
+    downstream.destroy();
+    return;
+  }
   if (wsRefuse && fieldSeen <= delayCount) {
     wsRefused++;
     process.stdout.write(JSON.stringify({ event: 'ws_refused', n: wsRefused, fieldSeen }) + '\n');
@@ -136,6 +149,7 @@ server.on('upgrade', (request, downstream, head) => {
         p.upstream.destroy();
       }
       wsPairs.clear();
+      wsDroppedAt = Date.now();
       process.stdout.write(JSON.stringify({ event: 'ws_dropped', atMs: wsDropAtMs, n: wsDropped }) + '\n');
     }, wsDropAtMs);
   }

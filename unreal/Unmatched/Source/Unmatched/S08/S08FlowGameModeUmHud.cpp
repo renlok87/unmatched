@@ -3204,3 +3204,6 @@ void AS08FlowGameMode::TickUmInspectShots() {
   }
   RefreshHud();
 }
+
+// VS-7 S5: the live layout for the end screens (the GAMEOVER strip x FIELD)
+const FUmHudLayout* AS08FlowGameMode::UmHudLayoutNow() const { return UmHud.IsValid() && UmHud->bLayout ? &UmHud->Layout : nullptr; }

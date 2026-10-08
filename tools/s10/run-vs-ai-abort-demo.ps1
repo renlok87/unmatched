@@ -12,6 +12,9 @@ param(
   [string]$ShotMode = "request",
   [string]$EnvFile = "",
   [string]$HeroName = "Medusa",
+  # VS-7 S5 (04 s5.3): the interruption screen is the UMG ABORTED modal - the gate is its 'SHOT widget id=UI-SCR-ABORTED'
+  # line in the trace (no -S09Markers on the client). -S09Markers: the rollback to the #FF6414 / #40C8FF pixel gates.
+  [switch]$S09Markers,
   # Run the offline synthetic self-tests (scoped client-stop identity checks,
   # static taskkill/Stop-Process guards) and exit. No client start, no API calls.
   [switch]$SelfTest
@@ -207,6 +210,17 @@ function Test-AbortProofTailOrder([string]$TraceText, [string]$RoomId) {
 # Pixel gate assembly over precomputed marker counts (pure, offline-testable):
 # returns $null when every required marker has at least $Min sampled pixels
 # and every forbidden marker is exactly absent, or the first violation.
+# VS-7 S5: the UMG ABORTED gate - a painted, visible 'SHOT widget id=UI-SCR-ABORTED ... state=shown' line before the
+# aborted-screen shot marker, and no GAMEOVER line anywhere (an interrupted match never shows a result). $null on success.
+function Test-AbortedWidget([string]$TraceText) {
+  $m = [regex]::Match($TraceText, 'SHOT widget id=UI-SCR-ABORTED impl=umg state=shown [^\r\n]*geom=painted visible=1')
+  if (-not $m.Success) { return "no painted 'SHOT widget id=UI-SCR-ABORTED state=shown' line" }
+  $shotAt = $TraceText.IndexOf('S10ABORTPROOF aborted-screen shot', [StringComparison]::Ordinal)
+  if ($shotAt -ge 0 -and $m.Index -gt $shotAt) { return 'the UI-SCR-ABORTED line comes after the aborted-screen shot' }
+  if ($TraceText.Contains('SHOT widget id=UI-SCR-GAMEOVER')) { return 'a UI-SCR-GAMEOVER line appeared in an interrupted match' }
+  return $null
+}
+
 function Test-MarkerGates($Stats, [string[]]$Require, [int]$Min, [string[]]$ForbidZero) {
   foreach ($name in @($Require)) {
     if (-not $Stats.Contains($name) -or [int]$Stats[$name] -lt $Min) {
@@ -508,6 +522,17 @@ function Invoke-AbortRunnerSelfTests {
   Assert-Cond ((Get-GameplayRegionBright $pngPath) -eq 0) 'bright region: a bright pixel outside the region is ignored' ''
   Remove-Item -LiteralPath $pngPath -Force
 
+  # VS-7 S5: the UMG ABORTED gate (04 s5.3)
+  $ab = "2026.10.08-15.24.16 SHOT widget id=UI-SCR-ABORTED impl=umg state=shown fighter=none bbox=(320,180,960,540) geom=painted visible=1 twin=0`n" +
+        "2026.10.08-15.24.18 S10ABORTPROOF aborted-screen shot (interruption panel painted)`n"
+  Assert-Cond ($null -eq (Test-AbortedWidget $ab)) 'aborted widget: painted shown line before the shot accepts' ''
+  $e = Test-AbortedWidget ($ab -replace 'visible=1', 'visible=0')
+  Assert-Cond ($e -match 'no painted') 'aborted widget: an invisible line fails' "got: $e"
+  $e = Test-AbortedWidget ($ab + "x SHOT widget id=UI-SCR-GAMEOVER impl=umg state=victory`n")
+  Assert-Cond ($e -match 'UI-SCR-GAMEOVER') 'aborted widget: a result screen in an interrupted match fails' "got: $e"
+  $e = Test-AbortedWidget ("2026 S10ABORTPROOF aborted-screen shot (interruption panel painted)`n" + $ab)
+  Assert-Cond ($e -match 'after the aborted-screen shot') 'aborted widget: the line after the shot fails' "got: $e"
+
   Write-Output ("self-tests complete: {0} failure(s)" -f $Script:SelfTestFailures)
 }
 
@@ -690,9 +715,10 @@ function Invoke-AbortDemo {
     "-ForceAbandonSequences", "-S08Api=$Api", "-S09ShotMode=$ShotMode",
     "-S08Auto", "-S08Create", "-S08Mode=VS_AI", "-S08HeroId=$heroId",
     "-S08Trace=$trace", "-S09Flow", "-S09Combat=attack+scheme",
-    "-S09ShotDir=$shots", "-S10AbortProof", "-S08ExitAfter=$RunSeconds",
-    "-S09Markers")  # HB-01: the #FF6414 / #FFD700 marker gates need the debug layer (04-hud-spec s5.3); VS-4 HB-48: kept
-                    # until the ABORTED screen moves to UMG (VS-7, UI-SCR-ABORTED), then 'SHOT widget id=UI-SCR-ABORTED'
+    "-S09ShotDir=$shots", "-S10AbortProof", "-S08ExitAfter=$RunSeconds")
+  # HB-01 / VS-4 HB-48: the #FF6414 / #FFD700 marker gates need the debug layer; VS-7 S5: only with the -S09Markers rollback,
+  # the default gate is the UMG ABORTED 'SHOT widget id=UI-SCR-ABORTED' line (04-hud-spec s5.3)
+  if ($S09Markers) { $clientArgs += "-S09Markers" }
 
   $proc = $null
   $Published = $false
@@ -938,6 +964,12 @@ function Invoke-AbortDemo {
     # Interruption screen: the #FF6414 panel marker present; the result/lobby
     # panels structurally absent (an interrupted match can never look like a
     # victory screen or a lobby).
+    if (-not $S09Markers) {
+      # VS-7 S5: the UMG ABORTED modal (its SHOT widget line) and no result screen; the pixel gates need -S09Markers
+      $awErr = Test-AbortedWidget $traceText
+      if ($awErr) { throw "ABORTED widget gate FAILED: $awErr" }
+      Write-Output 'aborted screen: SHOT widget id=UI-SCR-ABORTED state=shown (painted, visible) before the shot, no UI-SCR-GAMEOVER line'
+    } else {
     $ss = Get-ShotPixelStats $screenShot.FullName $shotMarkers
     if (-not (($ss.w -eq 1280 -and $ss.h -eq 720) -or ($ss.w -eq 1920 -and $ss.h -eq 1080))) {
       throw ("aborted-screen shot is {0}x{1} - NOT 1280x720/1920x1080" -f $ss.w, $ss.h)
@@ -955,6 +987,7 @@ function Invoke-AbortDemo {
       throw ("aborted-lobby shot has {0} bright gameplay-region pixels (lum>=120, x>=25%/y>=12.5%) - stale board/fighter/HUD rendering survived the stage transition" -f $bright)
     }
     Write-Output ("aborted-lobby shot: clean lobby panel (lobbypanel={0}), no duel/result/interruption markers, gameplay region bright pixels={1} (<=50)" -f $ls.lobbypanel, $bright)
+    }
 
     # ---- EXIT/CLEANUP gate: the CLIENT's own leaveGame is the single leave
     # (already verified in the ordered tail via 'LEFT room=<id>'); the runner

@@ -85,6 +85,14 @@ their C++ bases (UUmHudAuthoringLibrary -> BuildDefaultTree of each class), in t
                                       RunningText, DefenseText, HeaderDivider, Tabs > TabSound, TabInterface, TabGame,
                                       TabGraphics, Rows, ScrollTrack, ScrollThumb, FooterDivider, LeaveButton, LeaveWhy,
                                       ContinueButton (VS-7 SC-24...SC-30; the setting rows are made at run time)
+  /Game/S08/UI/Screens/WBP_UI_SCR_RECONNECT  parent UmReconnectOverlay  parts Veil, Frame, Body + Content > Icon, Spinner,
+                                      Title, Attempt, Missed, Running, Leave, Retry, ToLogin (VS-7 SC-31...SC-33)
+  /Game/S08/UI/Screens/WBP_UI_SCR_GAMEOVER  parent UmScreenGameOver  parts Veil, Frame, Body + Content > ResultModal,
+                                      OutcomeText, HeadlineText, ReasonText, TurnText, Left/RightPortrait, VersusText,
+                                      Left/RightName, Left/RightCaption, Left/RightVerdict, Left/RightHeart, ViewBoardButton,
+                                      AgainButton, LobbyButton, BoardStrip, StripText, ResultsButton, StripLobbyButton (SC-34...SC-37)
+  /Game/S08/UI/Screens/WBP_UI_SCR_ABORTED  parent UmScreenAborted  parts Veil, Frame, Body + Content > Icon, TitleText,
+                                      WhoText, TurnText, LobbyButton (VS-7 SC-38)
 
 A widget tree is not reachable from Python, so the C++ library builds it (the same function the class uses without a
 WBP) and this script re-loads every asset, checks the parent class, writes the report (env UM_HUD_WBP_REPORT, default
@@ -138,6 +146,9 @@ ASSETS = {
     "/Game/S08/UI/Screens/WBP_UI_SCR_ROOM": "UmScreenRoom",
     "/Game/S08/UI/Screens/WBP_UI_SCR_LOADING": "UmScreenLoading",
     "/Game/S08/UI/Screens/WBP_UI_SCR_PAUSE": "UmScreenPause",
+    "/Game/S08/UI/Screens/WBP_UI_SCR_RECONNECT": "UmReconnectOverlay",
+    "/Game/S08/UI/Screens/WBP_UI_SCR_GAMEOVER": "UmScreenGameOver",
+    "/Game/S08/UI/Screens/WBP_UI_SCR_ABORTED": "UmScreenAborted",
 }
 
 

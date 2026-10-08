@@ -267,9 +267,10 @@ void AS08FlowGameMode::TickResultScreen() {
   } else if (!bShown && ResultView.IsOpen()) {
     ResultView.Reset();
   }
+  const bool bUmGameOver = UmGameOverOnUmg();  // VS-7 S5: the UMG GAMEOVER shows the view (rollback -S08SlateHud=gameover)
   if (ResultOverlay.IsValid()) {
     const float Alpha = ResultView.ResultsAlpha(Now);
-    const EVisibility Vis = Alpha <= 0.0f ? EVisibility::Collapsed
+    const EVisibility Vis = (bUmGameOver || Alpha <= 0.0f) ? EVisibility::Collapsed
                             : ResultView.ResultsHitTestable() ? EVisibility::Visible
                                                               : EVisibility::HitTestInvisible;
     if (ResultOverlay->GetVisibility() != Vis) ResultOverlay->SetVisibility(Vis);
@@ -277,7 +278,7 @@ void AS08FlowGameMode::TickResultScreen() {
   }
   const float BarAlpha = ResultView.BoardBarAlpha(Now);
   if (ResultBoardBar.IsValid()) {
-    const EVisibility Vis = BarAlpha <= 0.0f ? EVisibility::Collapsed
+    const EVisibility Vis = (bUmGameOver || BarAlpha <= 0.0f) ? EVisibility::Collapsed
                             : ResultView.IsBoardView() ? EVisibility::Visible
                                                        : EVisibility::HitTestInvisible;
     if (ResultBoardBar->GetVisibility() != Vis) ResultBoardBar->SetVisibility(Vis);

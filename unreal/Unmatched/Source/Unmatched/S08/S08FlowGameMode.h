@@ -1483,6 +1483,20 @@ private:
   void TickUmPause(const FString& Route);
   void ApplyUmPauseSetting(FName Key, const FString& Value);
   TSharedPtr<struct FUmPauseRuntime> UmPauseRt;
+  // VS-7 S5 (S08FlowGameModeUmEnd.cpp): RECONNECT SC-31...SC-33 (the root's Reconnect slot), GAMEOVER SC-34...SC-37 and
+  // ABORTED SC-38 (Modals); rollback -S08SlateHud=reconnect | gameover | aborted
+  void TickUmEndScreens();
+  /** The RECONNECT overlay is up: no board click, Esc swallowed. */
+  bool UmEndOwnsInput() const;
+  bool UmGameOverOnUmg() const;
+  bool UmAbortedOnUmg() const;
+  /** «Сыграть ещё» runs, or the session expired in a match before «Ко входу»: no LOBBY / ROOM / LOGIN route yet. */
+  bool UmEndHoldsRoute() const;
+  /** -S08EndDrive (review tooling) drives the result screen: the -S09Flow result tail waits. */
+  bool UmEndDriveOwnsResult() const;
+  /** The live HUD layout (FIELD; null before the first layout). */
+  const struct FUmHudLayout* UmHudLayoutNow() const;
+  TSharedPtr<struct FUmEndRuntime> UmEndRt;
 
   FS08BoardModel BoardModel;
   TArray<FS08BoardFighter> Fighters;
