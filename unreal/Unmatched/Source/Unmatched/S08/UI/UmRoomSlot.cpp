@@ -63,7 +63,10 @@ bool UUmRoomSlot::Initialize() {
   Style(SidekickLine, TEXT("type.body"), TEXT("text.secondary"));
   // VS-7 Frames: a line longer than the slot (pseudo-locale +30 %, class S) ends in «…» inside the slot (04 §6)
   for (UTextBlock* T : {HeroLine.Get(), SidekickLine.Get(), ReadyText.Get()}) {
-    if (T) T->SetTextOverflowPolicy(ETextOverflowPolicy::Ellipsis);
+    if (T) {
+      T->SetTextOverflowPolicy(ETextOverflowPolicy::Ellipsis);
+      T->SetClipping(EWidgetClipping::ClipToBounds);  // the ellipsis needs the clip rect (as UmHudLog)
+    }
   }
   if (ReadyIcon) ReadyIcon->SetVisibility(ESlateVisibility::HitTestInvisible);
   Icon(ReadyIcon, TEXT("ui-check"), 24.0f);

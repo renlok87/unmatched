@@ -153,6 +153,7 @@ bool UUmScreenLoading::Initialize() {
     if (T) {
       T->SetJustification(ETextJustify::Center);
       T->SetTextOverflowPolicy(ETextOverflowPolicy::Ellipsis);  // VS-7 Frames: «против» +30 % ran over the cards
+      T->SetClipping(EWidgetClipping::ClipToBounds);             // the ellipsis needs the clip rect (as UmHudLog)
     }
   }
   if (Spinner) Spinner->SetSizeSu(48.0f);

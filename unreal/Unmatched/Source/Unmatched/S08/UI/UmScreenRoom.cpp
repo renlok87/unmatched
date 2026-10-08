@@ -239,7 +239,10 @@ bool UUmScreenRoom::Initialize() {
   Style(BoardTitle, TEXT("type.heading"), TEXT("text.primary"));
   Style(BoardWhy, TEXT("type.caption"), TEXT("text.secondary"));
   Style(DeckCount, TEXT("type.body"), TEXT("text.primary"));
-  if (DeckCount) DeckCount->SetTextOverflowPolicy(ETextOverflowPolicy::Ellipsis);  // VS-7 Frames: class S keeps it in the row
+  if (DeckCount) {  // VS-7 Frames: class S keeps it in the row (the ellipsis needs the clip rect, as UmHudLog)
+    DeckCount->SetTextOverflowPolicy(ETextOverflowPolicy::Ellipsis);
+    DeckCount->SetClipping(EWidgetClipping::ClipToBounds);
+  }
   Style(DeckWhy, TEXT("type.caption"), TEXT("text.secondary"));
   Style(StatusText, TEXT("type.body"), TEXT("text.primary"));
   Style(WhyText, TEXT("type.caption"), TEXT("text.secondary"));
