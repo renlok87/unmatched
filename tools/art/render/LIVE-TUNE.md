@@ -149,6 +149,7 @@ python tools/art/render/env_gates.py cannons <C0.png>
 python tools/art/render/env_gates.py streams <C0.png> [--roi 640,885,1000,1040]  # светлые полосы водопада
 python tools/art/render/env_gates.py fire <K1.png> [--roi x0,y0,x1,y1] [--min-sat 0]
 python tools/art/render/env_gates.py sheet <a.png> <b.png> --out <sheet.png> [--crop x0,y0,x1,y1] [--label ...]
+python tools/art/render/env_gates.py stones <K2x1p6.png> [--without <same view, stones removed>] [--layout <scene layout>]  # EN-24 (VS-8 E1)
 python -m pytest tools/art/tests/test_env_gates.py -q
 ```
 
