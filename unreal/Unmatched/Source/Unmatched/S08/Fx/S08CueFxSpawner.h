@@ -44,6 +44,18 @@ public:
   bool HasPrewarmed() const { return bPrewarmDone; }
   /** How many registry systems the prewarm loaded (the test's check). */
   int32 GetPrewarmedCount() const { return Prewarmed.Num(); }
+  /** VS-6 F4 FX-36 (D4, CUE-DISPATCHER §4): the link came back with the state of seq RecoveredSeq - every system this
+   *  spawner showed that is still active is deactivated (its particles die out, nothing new is emitted) and later
+   *  shows of seq <= RecoveredSeq are refused (IsStaleSeq). Traced "FX cut reason=reconnect recovered_seq=<R>
+   *  systems=<n>". Returns n. */
+  int32 CutAllForReconnect(int32 RecoveredSeq);
+  /** A show of Seq (>= 0) is stale after the reconnect: the adapters skip it (and trace the skip). */
+  bool IsStaleSeq(int32 Seq) const { return Seq >= 0 && Seq <= RecoveredSeq; }
+  int32 GetRecoveredSeq() const { return RecoveredSeq; }
+  /** A new match: the seqs start again (nothing is stale). */
+  void ClearReconnect() { RecoveredSeq = MIN_int32; }
+  /** Live (active) systems this spawner showed (the test's / the cut's count). */
+  int32 NumLiveSystems() const;
   /** The grade of the active profile (FX-02: the quads of the bench placard take it as a MID override). */
   const FLinearColor& GetGradeScale() const { return GradeScale; }
   const FLinearColor& GetGradePow() const { return GradePow; }
@@ -52,6 +64,10 @@ private:
   UPROPERTY(Transient)
   TArray<TObjectPtr<UNiagaraSystem>> Prewarmed;
   bool bPrewarmDone = false;
+  /** FX-36: the components of the shows (pooled AutoRelease: an inactive one may be reused - only active ones count). */
+  TArray<TWeakObjectPtr<UNiagaraComponent>> Live;
+  int32 RecoveredSeq = MIN_int32;
+  void Track(UNiagaraComponent* Component);
   FLinearColor GradeScale = FLinearColor(1.0f, 1.0f, 1.0f, 0.0f);
   FLinearColor GradePow = FLinearColor(1.0f, 1.0f, 1.0f, 0.0f);
 };

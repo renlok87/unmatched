@@ -860,11 +860,11 @@
    "postprocess": {
     "profile_delta": {
      "victory": {
-      "white_temp": 5900,
+      "white_temp": 7100,
       "vignette_add": 0.25
      },
      "defeat": {
-      "white_temp": 7300,
+      "white_temp": 5700,
       "saturation_mul": 0.8,
       "vignette_add": 0.25
      }
@@ -874,7 +874,7 @@
      "vignette": 0.4
     },
     "blend_ms": 500,
-    "note": "S08CuePostProcess (FX-34, ВР-24, ВР-FX08): UPostProcessComponent без границ, приоритет выше профиля доски; виньетка = базовая + 0,25; старт от `CUE death stage=gone` героя или `RESULT screen`; грейд держится до выхода из партии; откат -S08FxLegacy",
+    "note": "S08CuePostProcess (FX-34, ВР-24, ВР-FX08): APostProcessVolume без границ (ВР-VS6-41), приоритет 200 выше профиля доски (объём профиля держит только экспозицию — виньетку не задаёт, базовая 0,4 движковая; devignette 0,4 вклейки снимает ровно её); виньетка = базовая + 0,25; вес 0 → 1 за 500 мс ease-in-out (reduced motion 100 мс) от кадра `CUE death stage=gone` павшего героя, без смерти героя — от `RESULT screen`; свой исход каждого клиента; ничья, неизвестный вердикт, ABORTED — без грейда; грейд держится, пока применённая фаза GAME_OVER; трасса `FX grade outcome=…`; откат -S08FxLegacy; WhiteTemp в UE — опорная точка баланса белого (меньше — кадр холоднее), поэтому числа карточки 5900 / 7300 зеркалены: победа 7100 (теплее), поражение 5700 (холоднее) — ВР-VS6-44",
     "fx_row": "FX-34"
    },
    "on_new_event": "none",
@@ -923,7 +923,7 @@
    "marker": null,
    "postprocess": {
     "desaturation": 0.3,
-    "note": "насыщенность сцены × 0,7 за 1 кадр, держится до CUE-018 (FX-35, ВР-FX09); возврат за 300 мс внутри показа CUE-018 (FX-36); с грейдом CUE-016 — × 0,8 × 0,7",
+    "note": "насыщенность кадра −30 % (HSV S кадра K1; ColorSaturation движка 0,64, ВР-VS6-43) в кадр, когда значок CONN (HB-14) становится lost (поток партии не готов после готовности), держится до CUE-018 (FX-35, ВР-FX09); повторный разрыв — duplicate (D5), трасса `FX desat on` / `FX desat duplicate`; с грейдом CUE-016 — × 0,8 × 0,64; звук CUE-017 — через 1,5 с (AU-S6), кадр — сразу; откат -S08FxLegacy",
     "fx_row": "FX-35"
    },
    "on_new_event": "none",
@@ -970,7 +970,12 @@
     "element": "тост-резюме «позиции обновлены (пропущено N событий)»"
    },
    "marker": null,
-   "postprocess": null,
+   "postprocess": {
+    "restore_ms": 300,
+    "restore_curve": "linear",
+    "note": "FX-36 (ВР-FX09, ВР-VS5-SC33-02): вес набора disconnect 1 → 0 линейно за 300 мс внутри показа 800 мс (reduced motion 100 мс), без «вспышки возврата»; старт — кадр, когда поток снова готов и восстановление состояния не ждёт (карточка RECONNECT закрывается, тост «Позиции обновлены»); снимок, применённый во время разрыва, — восстановленное состояние: `CUE reconnect recovered_seq=R` пишется до его CUE (D4), FS08CueFxSpawner гасит активные системы (Deactivate) и не показывает VFX seq ≤ R; трасса `FX desat off … ms=300 recovered_seq=R`, `FX cut reason=reconnect`, `FX skip … reason=stale`",
+    "fx_row": "FX-36"
+   },
    "on_new_event": "replace",
    "replace_scope": "cue",
    "interrupted_by": [],

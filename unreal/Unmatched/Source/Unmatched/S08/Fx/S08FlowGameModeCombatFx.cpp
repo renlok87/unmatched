@@ -45,7 +45,7 @@ FCombatBench GCombatBench;
 void AS08FlowGameMode::S08FxHit(const FString& TargetId, int32 Seq, bool bStaged) {
   // FX-21 / FX-23 (ВР-21, ВР-FX05): every damage shows the star at C+70 - staged (the contact frame) or not (an ability,
   // exhaustion, a cascade); reduced motion and -S08FxLegacy show none; one star per target in a frame (CMB-HIT-MULTI)
-  if (TargetId.IsEmpty() || !BoardActor) return;
+  if (TargetId.IsEmpty() || !BoardActor || S08FxStale(Seq, TEXT("star"))) return;
   const bool bReduced = S08IconMotion::IsReducedMotion();
   const uint64* Frame = CombatFx.StarFrame.Find(TargetId);
   const bool bRepeat = Frame && *Frame == GFrameCounter;
@@ -78,7 +78,7 @@ void AS08FlowGameMode::S08FxHit(const FString& TargetId, int32 Seq, bool bStaged
 void AS08FlowGameMode::S08FxBlock(const FString& TargetId, int32 Seq) {
   // FX-23 (ВР-FX05): damage 0 - the cream rim 300 ms of the target (FX-17's pulse without its event delay), no flash,
   // no star: «обод = защита»
-  if (TargetId.IsEmpty() || !BoardActor || !S08CueFx::FxEnabled()) return;
+  if (TargetId.IsEmpty() || !BoardActor || !S08CueFx::FxEnabled() || S08FxStale(Seq, TEXT("block"))) return;
   AS08FighterActor* Actor = BoardActor->FindFighterActor(TargetId);
   if (!Actor || Actor->IsInDeathHold()) return;
   S08FigureFx::FRimPulse Pulse = S08FigureFx::DefenseRim;
@@ -90,7 +90,7 @@ void AS08FlowGameMode::S08FxBlock(const FString& TargetId, int32 Seq) {
 
 void AS08FlowGameMode::S08FxHealCue(const FString& FighterId, int32 Amount, int32 Seq) {
   // FX-25 (ВР-FX13): the snapshot frame + 200 ms; a staging of the same seq holds it to its end (S08FxCombatEnd)
-  if (FighterId.IsEmpty() || Amount <= 0) return;
+  if (FighterId.IsEmpty() || Amount <= 0 || S08FxStale(Seq, TEXT("heal"))) return;
   CombatFx.Heals.Add({FighterId, Amount, Seq, static_cast<double>(NowMs()) + S08CombatFx::HealDelayMs});
   FS08Trace::Write(FString::Printf(TEXT("FX heal plan fighter=%s amount=%d seq=%d staged=%d"), *FighterId, Amount, Seq,
                                    CombatStage.IsActive() && CombatStage.GetSeq() == Seq ? 1 : 0));
@@ -106,6 +106,7 @@ void AS08FlowGameMode::S08FxCombatEnd(int32 Seq) {
 
 void AS08FlowGameMode::S08FxShowNumber(US08ArtDamageWidget& Widget, const FString& FighterId, int32 Amount, int32 Seq) {
   // FX-22: the life of the board's number (900 x speed / 700 / reduced 450); the widget animates itself
+  if (S08FxStale(Seq, TEXT("number"))) return;  // VS-6 FX-36: a missed hit shows no "-N" after the reconnect
   const int32 Life = BoardActor ? BoardActor->GetDamageNumberLifeMs(FighterId) : 0;
   const bool bReduced = S08IconMotion::IsReducedMotion();
   Widget.ShowNumber(FighterId, Amount, Seq,

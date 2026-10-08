@@ -47,6 +47,7 @@
 #include "Fx/S08FieldFx.h"
 #include "Fx/S08CombatFx.h"
 #include "Fx/S08AbilityFx.h"
+#include "Fx/S08CuePostProcess.h"
 #include "../S09/S09AbilityStage.h"
 #include "S08FlowGameMode.generated.h"
 
@@ -1250,6 +1251,26 @@ private:
   void S08FxBenchAbilityFinish();
   /** -BenchFocusFighter=<id|KingArthur|Merlin|Medusa|Harpy>: the K2 views of the bench focus this fighter. */
   FString S08FxBenchFocus(const TCHAR* Cmd, const FString& HeroId) const;
+  // ---- VS-6 F4 outcome and link post process (S08/Fx/S08CuePostProcess.h; the adapter in
+  // S08/Fx/S08FlowGameModeOutcomeFx.cpp) ----
+  UPROPERTY()
+  TObjectPtr<class APostProcessVolume> CuePostFx;
+  FS08CuePostProcessState CuePostState;
+  FS08NetWatch NetWatch;
+  int32 S08FxStaleSeq = MIN_int32;       // FX-36: shows of seq <= this are the missed ones (the last reconnect's R)
+  bool bS08FxOutcomeNoneTraced = false;  // FX-34: the "outcome=none" line once per game over
+  /** FX-34 grade start, FX-35 / FX-36 link edges, the component's settings; once per frame (from S08FxTick). */
+  void S08FxOutcomeTick();
+  /** FX-36 (D4): a snapshot applied while the link is lost is the recovered state - the reconnect of its seq runs
+   *  before its cues (first line of HandleApplied). */
+  void S08FxNetOnApplied(int32 Seq, bool bApply);
+  /** D4 + FX-36: the dispatcher's reconnect, the stagings cut (cut=reconnect), the live systems deactivated, the queued
+   *  FX of seq <= R dropped. */
+  void S08FxReconnect(int32 RecoveredSeq, const TCHAR* Src);
+  /** A show of Seq after the reconnect (seq <= R): traced "FX skip what=<what> seq=<n> reason=stale" - true = skip. */
+  bool S08FxStale(int32 Seq, const TCHAR* What) const;
+  /** -BenchFx=outcome,<w>[,victory|defeat] / desat,<w>: frozen weights of the bench views. */
+  bool S08FxBenchOutcome(const FString& Mode, const TArray<FString>& Parts);
   // ---- VS-2 HB-06: the UMG HUD root, its layout / FIELD and the H2 layout fixes of the Slate blocks
   // (S08FlowGameModeUmHud.cpp; rollback -S08SlateHud[=<blocks>]) ----
   void BuildUmHud();

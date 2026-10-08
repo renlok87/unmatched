@@ -58,6 +58,7 @@ bool WeaponSocket(const AS08FighterActor& F, FVector& OutLocation, FVector& OutA
 void AS08FlowGameMode::S08FxAbilityCues(const TArray<FS08Cue>& Cues) {
   for (const FS08Cue& Cue : Cues) {
     if (Cue.Type != ES08CueType::AbilityTriggered) continue;
+    if (S08FxStale(Cue.SequenceNumber, TEXT("ability"))) continue;  // VS-6 FX-36: a missed gaze is not staged
     FS09AbilityStageInput In;
     In.Seq = Cue.SequenceNumber;
     In.HeroKey = Cue.HeroKey;

@@ -165,6 +165,7 @@ void AS08FlowGameMode::S08FxBenchStep(const FString& Spec) {
   }
   if (!CueFxSpawner) S08FxBoardReady();  // the bench builds no flow: the spawner (prewarm, grade) comes here
   // VS-6 F2: + star / heal; VS-6 F3: + ash / vortex / arc
+  if (S08FxBenchOutcome(Mode, Parts)) return;  // VS-6 F4: outcome / desat (no field marks)
   if (S08FxBenchField(Mode, Parts) || S08FxBenchCombat(Mode, Parts) || S08FxBenchAbility(Mode, Parts)) {
     S08FxBenchFieldFinish();
     return;
@@ -313,6 +314,7 @@ void AS08FlowGameMode::S08FxMovePlans(const TArray<FS08MovePlan>& Plans) {
   const double Now = static_cast<double>(NowMs());
   for (const FS08MovePlan& Plan : Plans) {
     if (!BoardActor || !BoardActor->FindFighterActor(Plan.FighterId)) continue;
+    if (S08FxStale(Plan.Seq, TEXT("move"))) continue;  // VS-6 FX-36: a missed move lands without CUE-007 / dust
     // a merge of the same seq schedules the same plans again: one CUE-007 row and one dust per (fighter, seq)
     const FString Key = FString::Printf(TEXT("%s|%d"), *Plan.FighterId, Plan.Seq);
     if (FieldFx.DustDone.Contains(Key) ||
@@ -337,7 +339,7 @@ void AS08FlowGameMode::S08FxMovePlans(const TArray<FS08MovePlan>& Plans) {
 }
 
 void AS08FlowGameMode::S08FxAttackDeclared(const FString& AttackerId, const FString& TargetId, int32 Seq) {
-  if (AttackerId.IsEmpty() || TargetId.IsEmpty()) return;
+  if (AttackerId.IsEmpty() || TargetId.IsEmpty() || S08FxStale(Seq, TEXT("chevrons"))) return;
   FS08FieldFxState::FPendingChevrons C;
   C.AttackerId = AttackerId;
   C.TargetId = TargetId;
@@ -386,6 +388,7 @@ bool ChevronTransform(const FVector& From, const FVector& To, FTransform& Out) {
 }  // namespace
 
 void AS08FlowGameMode::S08FxTick() {
+  S08FxOutcomeTick();  // VS-6 F4: the outcome grade and the link post process (FX-34..FX-36)
   S08FxCombatTick();  // VS-6 F2: the stars at C+70, the heals, the FX capture hook
   S08FxAbilityTick();  // VS-6 F3: the gaze staging, the embers of the dissolving figures
   if (FieldFx.Moves.Num() == 0 && FieldFx.Chevrons.Num() == 0) return;

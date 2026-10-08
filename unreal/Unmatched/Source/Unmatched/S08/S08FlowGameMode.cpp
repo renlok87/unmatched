@@ -496,6 +496,7 @@ void AS08FlowGameMode::HandleApplied(const FS08Snapshot& Snapshot, ES08SeqDecisi
   FS08Trace::Write(FString::Printf(TEXT("HANDLE_APPLIED #%d seq=%d decision=%d fightersValid=%d boardValid=%d"),
       AppliedCount, Snapshot.SequenceNumber, static_cast<int32>(Decision),
       Snapshot.Fighters.IsValid() ? 1 : 0, Snapshot.BoardState.IsValid() ? 1 : 0));
+  S08FxNetOnApplied(Snapshot.SequenceNumber, Decision == ES08SeqDecision::Apply);  // VS-6 FX-36: the recovered state (D4)
   TrackCombatResult(Snapshot, Decision);
   if (Decision == ES08SeqDecision::Apply && Flow.IsValid()) S08FxAbilityCues(Flow->GetApplyingCues());  // VS-6 FX-30
   // R-03: the state is applied at once; a staging that lags behind it catches up (after a new result replaced it)
@@ -729,7 +730,10 @@ void AS08FlowGameMode::TrackCombatResult(const FS08Snapshot& Snapshot,
                                    Snapshot.SequenceNumber, LastCombatResult.Damage, ResultRole));
   // DE-018: the result is applied; its presentation is the combat staging (a reconnect without the opening HP has
   // no known damage and no staging: the snapshot shows the final state, CUE on_reconnect = skip).
-  if (Damage >= 0 && Target) StartCombatStage(Snapshot, Baseline, PrevCombat, Damage, StageHpBefore);
+  // VS-6 FX-36 (D4): a combat that closed while the link was lost lands as the final state, no staging
+  if (Damage >= 0 && Target && !S08FxStale(Snapshot.SequenceNumber, TEXT("staging"))) {
+    StartCombatStage(Snapshot, Baseline, PrevCombat, Damage, StageHpBefore);
+  }
   // W5b-R: a combat whose damage CUE arrived before its combat state (reconnect / merged snapshots): take the combat
   // damage frame if the target's number is still alive and belongs to this combat (<= 2 snapshots before the result).
   if (BoardActor && BoardActor->IsArtActive() && ArtHud.bTagsEnabled && !bS09ShotDamageCombat &&

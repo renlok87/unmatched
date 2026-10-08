@@ -69,6 +69,7 @@ UNiagaraComponent* US08CueFxSpawnerComponent::Spawn(const FString& CueId, const 
     // the neutral plain inverse ACES of M_FX_Print's defaults (what the paste shows without a fit)
     Component->SetColorParameter(TEXT("GradeScale"), GradeScale);
     Component->SetColorParameter(TEXT("GradePow"), GradePow);
+    Track(Component);
   }
   return Component;
 }
@@ -88,8 +89,34 @@ UNiagaraComponent* US08CueFxSpawnerComponent::SpawnSystem(const FString& SystemP
     Component->SetTranslucentSortPriority(S08CueFx::TranslucentSortPriority);
     Component->SetColorParameter(TEXT("GradeScale"), GradeScale);
     Component->SetColorParameter(TEXT("GradePow"), GradePow);
+    Track(Component);
   }
   return Component;
+}
+
+void US08CueFxSpawnerComponent::Track(UNiagaraComponent* Component) {
+  // the finished / released ones go first (a pooled component comes back inactive)
+  Live.RemoveAll([](const TWeakObjectPtr<UNiagaraComponent>& C) { return !C.IsValid() || !C->IsActive(); });
+  Live.Add(Component);
+}
+
+int32 US08CueFxSpawnerComponent::NumLiveSystems() const {
+  int32 N = 0;
+  for (const TWeakObjectPtr<UNiagaraComponent>& C : Live) N += C.IsValid() && C->IsActive() ? 1 : 0;
+  return N;
+}
+
+int32 US08CueFxSpawnerComponent::CutAllForReconnect(int32 InRecoveredSeq) {
+  int32 N = 0;
+  for (const TWeakObjectPtr<UNiagaraComponent>& C : Live) {
+    if (!C.IsValid() || !C->IsActive()) continue;
+    C->Deactivate();  // CUE-018 (FX-36): the system fades out by its particles' life, no new emission
+    ++N;
+  }
+  Live.Reset();
+  RecoveredSeq = FMath::Max(RecoveredSeq, InRecoveredSeq);
+  FS08Trace::Write(FString::Printf(TEXT("FX cut reason=reconnect recovered_seq=%d systems=%d"), InRecoveredSeq, N));
+  return N;
 }
 
 void US08CueFxSpawnerComponent::SetGrade(const FLinearColor& Scale, const FLinearColor& Pow, const TCHAR* Source) {
