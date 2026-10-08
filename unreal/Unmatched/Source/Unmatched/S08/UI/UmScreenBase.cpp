@@ -245,7 +245,8 @@ void UUmScreenBase::CollectShotLines(TArray<FString>& Out) const {
   const bool bVisible = UmGameHudSlots::ShownByProperty(this) || GetVisibility() == ESlateVisibility::Visible;
   const FBox2D R = IsModal() ? FrameRectSu() : FBox2D(FVector2D::ZeroVector, CanvasSu);
   const FS08ScreenRect Rect(R.Min.X * PxPerSu, R.Min.Y * PxPerSu, R.Max.X * PxPerSu, R.Max.Y * PxPerSu);
-  Out.Add(S08ArtHud::FormatWidgetLineEx(UiId, TEXT("umg"), *ScreenState.ToString(), FString(), Rect, bVisible && !Rect.IsEmpty(),
+  // ToLower: a packaged build names an FName by its first spelling in the name table ("Board", "Connect"), the editor by ours
+  Out.Add(S08ArtHud::FormatWidgetLineEx(UiId, TEXT("umg"), *ScreenState.ToString().ToLower(), FString(), Rect, bVisible && !Rect.IsEmpty(),
                                         bVisible, SourceName(),
                                         FString::Printf(TEXT("modal=%d class=%s alpha=%.2f%s"), IsModal() ? 1 : 0,
                                                         bClassS ? TEXT("S") : TEXT("L"), AlphaNow, *ShotExtra())));

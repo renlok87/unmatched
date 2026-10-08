@@ -75,6 +75,7 @@ struct FUmFlowScreensRuntime {
   // evidence
   int32 Shots = -1;
   TSet<FString> ShotKeys;
+  FString LastShotKey;  // VS-7 Frames: the BOOT / LOGIN gate line once per change (04 §7.1 G-WIDGET)
   FString Drive;
   int32 DriveStep = 0;
   double DriveAtMs = -1.0;
@@ -514,6 +515,25 @@ void AS08FlowGameMode::TickUmFlowScreens() {
     if (PC && R.Model.bResume) {
       if (PC->WasInputKeyJustPressed(EKeys::Enter)) R.Boot->HandleKey(EKeys::Enter);
       if (PC->WasInputKeyJustPressed(EKeys::Escape)) R.Boot->HandleKey(EKeys::Escape);
+    }
+  }
+
+  // ---- the gate line (04 §4.5 / §7.1, VS-7 Frames): 'SHOT widget id=UI-SCR-BOOT|UI-SCR-LOGIN ...' once per change of the
+  // shown screen's state and its fields, at rest (as LOBBY, ВР-VS7-26)
+  {
+    const UUmScreenBase* Scr = R.Showing == TEXT("boot") ? static_cast<const UUmScreenBase*>(R.Boot.Get())
+                               : R.Showing == TEXT("login") ? static_cast<const UUmScreenBase*>(R.Login.Get())
+                                                            : nullptr;
+    if (Scr && Scr->GetAlpha() >= 1.0f && !R.bBgHidden) {
+      const FString Key = R.Showing + Scr->GetScreenState().ToString() + Scr->ShotExtra();
+      if (Key != R.LastShotKey) {
+        R.LastShotKey = Key;
+        TArray<FString> Lines;
+        Scr->CollectShotLines(Lines);
+        for (const FString& Line : Lines) FS08Trace::Write(Line);
+      }
+    } else if (!Scr) {
+      R.LastShotKey.Reset();
     }
   }
 

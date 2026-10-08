@@ -185,6 +185,9 @@ class UNMATCHED_API UUmButton : public UUserWidget {
  private:
   void Restyle();
   void Step();
+  /** VS-7 Frames: a label wider than the button (a long locale, the pseudo-locale +30 %, class S) steps its font down to
+   *  fit the width it got (to 70 % at most) - the text never runs past the body. */
+  void FitLabel(float WidthSu);
   void SetPressedVisual(bool bOn);
   bool IsReduced() const;
   double Now() const;
@@ -210,6 +213,8 @@ class UNMATCHED_API UUmButton : public UUserWidget {
   double AnimMs = 0.0;
   double PulseStart = -1.0;  // selected glyph pulse 1.1 -> 1.0
   float LabelOffsetSu = 0.0f;
+  float FitWidthSu = -1.0f;  // FitLabel: the width and the text it last fitted (-1: refit)
+  FString FitText;
   int32 ReducedOverride = -1;
   TFunction<double()> Clock;
   FName IconShown;

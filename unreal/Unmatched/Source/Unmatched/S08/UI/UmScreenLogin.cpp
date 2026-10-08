@@ -306,9 +306,15 @@ void UUmScreenLogin::Layout() {
   UmLgPlace(WhyText, FVector2D(P, UmLogin::ErrorYSu + (bIcon ? 26.0f : 4.0f)), FVector2D(W, 18.0f));
   // the chips: bottom right of the screen, the safe margin (canvas su in Root)
   const float M = GetSafeMarginSu();
-  const FVector2D EnPos(CanvasSu.X - M - UmLogin::ChipWSu, CanvasSu.Y - M - UmLogin::ChipHSu);
-  UmLgPlace(LangEn, EnPos, FVector2D(UmLogin::ChipWSu, UmLogin::ChipHSu));
-  UmLgPlace(LangRu, EnPos - FVector2D(UmLogin::ChipWSu + UmLogin::ChipGapSu, 0.0f), FVector2D(UmLogin::ChipWSu, UmLogin::ChipHSu));
+  // VS-7 Frames: each chip as wide as its label (+6 % for the glyph run at 1.125 px/su, padding 8 + 8), 48 su at least
+  auto ChipW = [](const TCHAR* Key) {
+    return FMath::Max(UmLogin::ChipWSu, FMath::CeilToFloat(1.06f * UmLgMeasureW(UmText::Get(EUmTable::Screens, Key).ToUpper(), TEXT("type.button")) + 18.0f));
+  };
+  const float EnW = ChipW(TEXT("screens.login.lang.en"));
+  const float RuW = ChipW(TEXT("screens.login.lang.ru"));
+  const FVector2D EnPos(CanvasSu.X - M - EnW, CanvasSu.Y - M - UmLogin::ChipHSu);
+  UmLgPlace(LangEn, EnPos, FVector2D(EnW, UmLogin::ChipHSu));
+  UmLgPlace(LangRu, EnPos - FVector2D(RuW + UmLogin::ChipGapSu, 0.0f), FVector2D(RuW, UmLogin::ChipHSu));
 }
 
 bool UUmScreenLogin::HasEmail() const { return EmailBox && !EmailBox->GetText().ToString().TrimStartAndEnd().IsEmpty(); }

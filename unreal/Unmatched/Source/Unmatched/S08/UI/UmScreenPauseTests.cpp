@@ -160,7 +160,8 @@ bool FUmScreensPauseModelTest::RunTest(const FString& Parameters) {
   TestEqual(TEXT("flag pseudo"), US08UserSettings::ResolveLanguage(TEXT("en"), TEXT("-S08Lang=pseudo")), FString(TEXT("pseudo")));
   TestEqual(TEXT("bad flag keeps the saved"), US08UserSettings::ResolveLanguage(TEXT("en"), TEXT("-S08Lang=xx")), FString(TEXT("en")));
   TestEqual(TEXT("unknown saved -> ru"), US08UserSettings::NormalizeLanguage(TEXT("fr")), FString(TEXT("ru")));
-  Probe->MarkAsGarbage();
+  // no MarkAsGarbage: in the full S08+S09+S10 run it raced an engine writer thread (MTAccessDetector ensure); the GC
+  // takes the transient probe
   return true;
 }
 

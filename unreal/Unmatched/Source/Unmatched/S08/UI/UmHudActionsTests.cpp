@@ -385,6 +385,7 @@ bool FUmHudActionsKeyHintsTest::RunTest(const FString&) {
     FString Error;
     TestTrue(TEXT("s08.Settings keyHints=on"), Probe->ApplySetting(TEXT("keyHints"), TEXT("on"), Error) && Probe->KeyHintsMode == TEXT("on"));
     TestFalse(TEXT("s08.Settings keyHints=2 refused"), Probe->ApplySetting(TEXT("keyHints"), TEXT("2"), Error));
+    Probe->CompletedMatches = 0;  // the probe reads the saved profile: a finished live match of this checkout counts there
     TestEqual(TEXT("DescribeKeyHints"), Probe->DescribeKeyHints(), FString(TEXT("keyHints=on completedMatches=0")));
   }
   // the chips: M A G E (hud.key.*) on the cells in class L, none on the cells in S (the tooltip carries it)

@@ -2049,7 +2049,7 @@ void AS08FlowGameMode::TickUmScreenShots() {
   // every screen / modal built on UUmScreenBase that is shown and fully faded in
   for (const UUmScreenBase* S : UmScreens::LiveScreens()) {
     if (S && S->IsShown() && S->GetAlpha() >= 1.0f && S->GetUiId().StartsWith(TEXT("UI-SCR-"))) {
-      Shown.Add(TPair<FString, FString>(S->GetUiId(), S->GetScreenState().ToString()));
+      Shown.Add(TPair<FString, FString>(S->GetUiId(), S->GetScreenState().ToString().ToLower()));  // packaged FName spelling
     }
   }
   for (const TPair<FString, FString>& P : Shown) {

@@ -478,6 +478,16 @@ void UUmScreenGameOver::Refresh() {
       bChips = false;
     }
   }
+  if (Row > MS.X - 48.0f) {
+    // VS-7 Frames: no chips and 8 su gaps still too wide (pseudo-locale +30 %) - the buttons share the modal's inner width;
+    // UUmButton steps its label down to fit (FitLabel)
+    const float Gaps = Gap * (Model.bVsAi ? 2.0f : 1.0f);
+    const float F = FMath::Max(0.1f, (MS.X - 48.0f - Gaps) / FMath::Max(1.0f, Row - Gaps));
+    WView *= F;
+    WAgain *= F;
+    WLobby *= F;
+    Row = MS.X - 48.0f;
+  }
   const float By = Y0 + (bClassS ? 480.0f : 500.0f);
   float Bx = Ax - 0.5f * Row;
   auto Btn = [](UUmButton* B, const FText& Label, EUmButtonVariant V, const FText& Key, bool bBusy, bool bEnabled, float H) {

@@ -326,6 +326,7 @@ void UUmButton::ApplyModel(const FUmButtonModel& InModel) {
     Label->SetText(Model.bBusy ? Text : Text.ToUpper());
     Label->SetFont(Theme.Font(bDisc ? TEXT("type.tag") : TEXT("type.button")));
     Label->SetVisibility(Text.IsEmpty() ? ESlateVisibility::Collapsed : ESlateVisibility::HitTestInvisible);
+    FitWidthSu = -1.0f;  // the font is the theme's again: FitLabel measures it on the next tick
   }
   if (KeyChip && KeyText) {
     KeyText->SetText(Model.KeyHint);
@@ -474,8 +475,37 @@ void UUmButton::Step() {
   }
 }
 
+void UUmButton::FitLabel(float WidthSu) {
+  if (!Label || !bHasModel || Model.Variant == EUmButtonVariant::Disc || WidthSu <= 1.0f) return;
+  const FString Text = Label->GetText().ToString();
+  if (FMath::Abs(WidthSu - FitWidthSu) < 0.5f && Text == FitText) return;
+  FitWidthSu = WidthSu;
+  FitText = Text;
+  if (Text.IsEmpty() || !FSlateApplication::IsInitialized() || !FSlateApplication::Get().GetRenderer()) return;
+  const UUmHudTheme& Theme = UUmHudTheme::Get();
+  FSlateFontInfo Font = Theme.Font(TEXT("type.button"));
+  const float Base = static_cast<float>(Font.Size);
+  // measured at the real px per su: a glyph run at 1.125 px/su (720p, class S) is wider than at 1.0
+  const float Scale = FMath::Max(0.1f, UmHudScale::Current().PxPerSu());
+  const TSharedRef<FSlateFontMeasure> M = FSlateApplication::Get().GetRenderer()->GetFontMeasureService();
+  const float TextW = static_cast<float>(M->Measure(Label->GetText(), Font, Scale).X) / Scale;
+  const float PadX = Model.PadXSu > 0.0f ? Model.PadXSu : Theme.SpaceSu(TEXT("space.m"));
+  const float Gap = Theme.SpaceSu(TEXT("tag.padding.x"));
+  float Extra = 2.0f * PadX + 2.0f;
+  if (Icon && !Model.IconName.IsNone() && Icon->GetVisibility() != ESlateVisibility::Collapsed) Extra += Icon->GetDesiredSize().X + 2.0f * Gap;
+  if (KeyChip && KeyChip->GetVisibility() != ESlateVisibility::Collapsed) Extra += KeyChip->GetDesiredSize().X + 2.0f * Gap;
+  const float Avail = WidthSu - Extra;
+  float Size = Base;
+  if (TextW > Avail && TextW > 0.0f && Avail > 0.0f) Size = FMath::Max(FMath::FloorToFloat(Base * Avail / TextW), FMath::CeilToFloat(0.7f * Base));
+  if (!FMath::IsNearlyEqual(static_cast<float>(Label->GetFont().Size), Size)) {
+    Font.Size = Size;
+    Label->SetFont(Font);
+  }
+}
+
 void UUmButton::NativeTick(const FGeometry& MyGeometry, float InDeltaTime) {
   Super::NativeTick(MyGeometry, InDeltaTime);
+  FitLabel(static_cast<float>(MyGeometry.GetLocalSize().X));
   const bool bOff = State == EUmButtonState::Disabled || State == EUmButtonState::Busy;
   if (AnimMs > 0.0 || PulseStart >= 0.0 || (bHovered && bOff && !bWhyShown)) Step();
 }

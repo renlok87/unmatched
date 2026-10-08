@@ -428,14 +428,23 @@ void UUmScreenLobby::Layout() {
   // ---- header: the nickname left, ≡ RU EN right (ВР-VS4-SC08-07)
   const FUmRectSu& Hd = L.Header;
   P(NicknameText, Hd.X + 16.0f, Hd.Y + 16.0f, 360.0f, 32.0f);
-  const float EnX = Hd.X + Hd.W - 16.0f - 48.0f;
-  P(LangEn, EnX, Hd.Y + 16.0f, 48.0f, 32.0f);
-  P(LangRu, EnX - 56.0f, Hd.Y + 16.0f, 48.0f, 32.0f);
-  P(MenuButton, EnX - 112.0f, Hd.Y + 12.0f, 40.0f, 40.0f);
+  // VS-7 Frames: the chips and «Обновить» as wide as their labels (+6 % for the glyph run at 1.125 px/su), the old
+  // widths at least - the pseudo-locale +30 % ran past them
+  auto FitW = [](const TCHAR* Key, float Pad, float MinW) {
+    return FMath::Max(MinW, FMath::CeilToFloat(1.06f * UmLbMeasureW(UmLbS(Key).ToUpper(), TEXT("type.button")) + Pad));
+  };
+  const float EnW = FitW(TEXT("screens.login.lang.en"), 26.0f, 48.0f);
+  const float RuW = FitW(TEXT("screens.login.lang.ru"), 26.0f, 48.0f);
+  const float EnX = Hd.X + Hd.W - 16.0f - EnW;
+  const float MenuX = EnX - 8.0f - RuW - 16.0f - 40.0f;
+  P(LangEn, EnX, Hd.Y + 16.0f, EnW, 32.0f);
+  P(LangRu, EnX - 8.0f - RuW, Hd.Y + 16.0f, RuW, 32.0f);
+  P(MenuButton, MenuX, Hd.Y + 12.0f, 40.0f, 40.0f);
   // ---- the list
   const FUmRectSu& Ls = L.List;
-  P(ListTitle, Ls.X + 16.0f, Ls.Y + 16.0f, Ls.W - 200.0f, 32.0f);
-  P(RefreshButton, Ls.X + Ls.W - 16.0f - 144.0f, Ls.Y + 16.0f, 144.0f, 40.0f);
+  const float RefW = FitW(TEXT("common.btn.refresh"), 34.0f, 144.0f);
+  P(ListTitle, Ls.X + 16.0f, Ls.Y + 16.0f, Ls.W - 56.0f - RefW, 32.0f);
+  P(RefreshButton, Ls.X + Ls.W - 16.0f - RefW, Ls.Y + 16.0f, RefW, 40.0f);
   const float RowsY = Ls.Y + UmLobby::RowsTopSu;
   const float RowsW = Ls.W - 32.0f;
   const float RowsH = Ls.H - UmLobby::RowsTopSu - 16.0f;
@@ -470,6 +479,17 @@ void UUmScreenLobby::Layout() {
     LabelY = Cr.Y + (bAi ? 84.0f : 72.0f);
     TilesY = LabelY + 28.0f;
     TilesH = 136.0f;
+    if (ModeX + ModeLabelW + 8.0f + Chip1W + 8.0f + ChipAiW > Cr.X + Cr.W - 16.0f) {
+      // VS-7 Frames: a long title (pseudo-locale +30 %) - the mode row goes under it, the tiles give up the height and
+      // «Создать» stays where it was
+      const float CreateYS = TilesY + TilesH + 12.0f;
+      ModeX = Cr.X + 16.0f;
+      ModeY = Cr.Y + 56.0f;
+      NoteY = Cr.Y + 96.0f;
+      LabelY = Cr.Y + (bAi ? 120.0f : 108.0f);
+      TilesY = LabelY + 28.0f;
+      TilesH = CreateYS - 12.0f - TilesY;
+    }
   }
   P(ModeLabel, ModeX, ModeY + 6.0f, ModeLabelW, 20.0f);
   P(ModeChip1v1, ModeX + ModeLabelW + 8.0f, ModeY, Chip1W, 32.0f);
@@ -517,7 +537,7 @@ void UUmScreenLobby::Layout() {
   if (!bClassS) {
     P(RecoverButton, Cd.X + Cd.W - 16.0f - RecW, Cd.Y + 124.0f, RecW, 40.0f);
   } else {
-    P(RecoverButton, EnX - 112.0f - 16.0f - RecW, Hd.Y + 12.0f, RecW, 40.0f);
+    P(RecoverButton, MenuX - 16.0f - RecW, Hd.Y + 12.0f, RecW, 40.0f);
   }
   LayoutRows();
 }

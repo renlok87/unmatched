@@ -150,7 +150,10 @@ bool UUmScreenLoading::Initialize() {
   Style(VersusText, TEXT("type.heading"), TEXT("text.secondary"));
   Style(BoardText, TEXT("type.heading"), TEXT("text.primary"));
   for (UTextBlock* T : {LeftName.Get(), RightName.Get(), LeftNick.Get(), RightNick.Get(), VersusText.Get(), BoardText.Get()}) {
-    if (T) T->SetJustification(ETextJustify::Center);
+    if (T) {
+      T->SetJustification(ETextJustify::Center);
+      T->SetTextOverflowPolicy(ETextOverflowPolicy::Ellipsis);  // VS-7 Frames: «против» +30 % ran over the cards
+    }
   }
   if (Spinner) Spinner->SetSizeSu(48.0f);
   Icon(ErrorIcon, TEXT("resource-connection-lost"), 48.0f);

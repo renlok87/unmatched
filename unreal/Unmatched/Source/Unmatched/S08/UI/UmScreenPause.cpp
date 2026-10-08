@@ -394,7 +394,9 @@ void UUmScreenPause::Refresh() {
     M.MinWidthSu = 168.0f;
     ContinueButton->ApplyModel(M);
   }
-  LeaveWSu = FMath::Max(168.0f, MeasureW(FText::FromString(LeaveLabel.ToString().ToUpper()), TEXT("type.button")) + 48.0f + 32.0f);
+  // + 16 su (VS-7 Frames): at 720p 150 % the glyph run is ~5 % wider than the measure at 1 px/su - «ПОКИНУТЬ ПАРТИЮ» ran
+  // past the body
+  LeaveWSu = FMath::Max(168.0f, MeasureW(FText::FromString(LeaveLabel.ToString().ToUpper()), TEXT("type.button")) + 48.0f + 32.0f + 16.0f);
   ContinueWSu = FMath::Max(168.0f, MeasureW(FText::FromString(S(TEXT("screens.pause.continue")).ToString().ToUpper()), TEXT("type.button")) + 48.0f);
   // the rows of the open tab
   const TArray<FUmSettingRowModel> Models = UmPause::Rows(Model, Tab);
