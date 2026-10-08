@@ -64,6 +64,13 @@ their C++ bases (UUmHudAuthoringLibrary -> BuildDefaultTree of each class), in t
                                       EmailLabel, EmailBox, PasswordLabel, PasswordBox (UEditableTextBox), PasswordMask,
                                       RevealButton, SubmitButton (WBP_UmButton), SubmitSpinner (WBP_UmSpinner), ErrorIcon,
                                       ErrorText, WhyText; LangRu, LangEn (WBP_UmButton) in Root (VS-7 SC-06, SC-07)
+  /Game/S08/UI/Screens/WBP_UI_SCR_LOBBY  parent UmScreenLobby  parts Veil, Frame, Body (UUmScreenBase) + Content > Header,
+                                      GameList, CreateColumn, CodeColumn (panels), NicknameText, MenuButton, LangRu, LangEn,
+                                      ListTitle, RefreshButton, Skeleton, RowsScroll > Rows, EmptyIcon/Text, ErrorIcon/Text,
+                                      RetryButton, CreateTitle, ModeLabel, ModeChip1v1, ModeChipAi, CreateNote, BoardLabel,
+                                      BoardChips, CreateButton, CreateSpinner, CreateError, CodeTitle, CodeBox, CodeCells,
+                                      CodeJoinButton, CodeErrorIcon, CodeError, RecoverButton (VS-7 SC-08...SC-13; the board
+                                      tiles, the code cells and the pooled rows are made at run time)
 
 A widget tree is not reachable from Python, so the C++ library builds it (the same function the class uses without a
 WBP) and this script re-loads every asset, checks the parent class, writes the report (env UM_HUD_WBP_REPORT, default
@@ -113,6 +120,7 @@ ASSETS = {
     "/Game/S08/UI/Screens/WBP_UI_SCR_INSPECT": "UmScreenInspect",
     "/Game/S08/UI/Screens/WBP_UI_SCR_BOOT": "UmScreenBoot",
     "/Game/S08/UI/Screens/WBP_UI_SCR_LOGIN": "UmScreenLogin",
+    "/Game/S08/UI/Screens/WBP_UI_SCR_LOBBY": "UmScreenLobby",
 }
 
 

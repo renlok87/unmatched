@@ -23,6 +23,7 @@
 #include "UmHudTop.h"
 #include "UmScreenBoot.h"
 #include "UmScreenInspect.h"
+#include "UmScreenLobby.h"
 #include "UmScreenLogin.h"
 #include "UmToast.h"
 #include "UmToastStack.h"
@@ -131,6 +132,10 @@ FString UUmHudAuthoringLibrary::AuthorUmHudWidgetBlueprints(bool bOverwrite) {
       [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmScreenBoot::BuildDefaultTree(Tree, Attach, Error); });
   One(UUmScreenLogin::WidgetBlueprintPath, UUmScreenLogin::StaticClass(),
       [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmScreenLogin::BuildDefaultTree(Tree, Attach, Error); });
+  // VS-7 SC-08...SC-13: LOBBY (nests WBP_UmButton, WBP_UmSpinner, the skeleton; the board tiles, the code cells and the
+  // rows are code-built at run time)
+  One(UUmScreenLobby::WidgetBlueprintPath, UUmScreenLobby::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmScreenLobby::BuildDefaultTree(Tree, Attach, Error); });
   Report->SetArrayField(TEXT("assets"), Assets);
   FString Out;
   const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&Out);

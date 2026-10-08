@@ -25,6 +25,7 @@
 #include "UI/UmHudScale.h"
 #include "UI/UmMenuBackdrop.h"
 #include "UI/UmScreenBoot.h"
+#include "UI/UmScreenLobby.h"
 #include "UI/UmScreenLogin.h"
 #include "UI/UmSpinner.h"
 #include "Camera/CameraActor.h"
@@ -182,6 +183,7 @@ void AS08FlowGameMode::BuildUmFlowScreens() {
       if (AS08FlowGameMode* Self = WeakThis.Get()) Self->HandleUmFlowLoginError(Error);
     });
   }
+  BuildUmLobby();  // VS-7 S2: LOBBY SC-08...SC-13 (S08FlowGameModeUmLobby.cpp)
   FString BootMissing, LoginMissing;
   FS08Trace::Write(FString::Printf(TEXT("HUD-SCREENS boot=%s login=%s bootParts=%d loginParts=%d missing=%s drive=%s"),
                                    R.Boot.IsValid() ? *R.Boot->SourceName() : TEXT("slate"),
@@ -209,6 +211,7 @@ bool AS08FlowGameMode::UmFlowScreensBusy() const {
   if (!UmFlowScreens.IsValid()) return false;
   const FUmFlowScreensRuntime& R = *UmFlowScreens;
   if (R.Showing == TEXT("login") && R.Login.IsValid() && R.Login->IsBusy()) return true;
+  if (R.Showing == TEXT("lobby") && GetUmLobby() && GetUmLobby()->IsBusy()) return true;
   return R.Showing == TEXT("boot") && (R.Model.bResuming || R.Model.bRetrying);
 }
 
@@ -433,6 +436,8 @@ void AS08FlowGameMode::TickUmFlowScreens() {
       Want = R.Login.IsValid() ? TEXT("login") : FString();
     } else if (Stage == ES08Stage::Login && !R.bPassDone) {
       Want = TEXT("boot");
+    } else if (UmLobbyWanted(R.bPassDone)) {
+      Want = TEXT("lobby");
     }
     if (Want == TEXT("boot") && !R.Boot.IsValid()) Want.Reset();
     if (Want == TEXT("login") && !R.Login.IsValid()) Want.Reset();
@@ -444,7 +449,12 @@ void AS08FlowGameMode::TickUmFlowScreens() {
     UUmScreenLogin* L = R.Login.Get();
     if (B && Want != TEXT("boot")) B->PlayHide();
     if (L && Want != TEXT("login")) L->PlayHide();
-    UWidget* Active = Want == TEXT("boot") ? static_cast<UWidget*>(B) : Want == TEXT("login") ? static_cast<UWidget*>(L) : R.GameChild.Get();
+    UUmScreenLobby* Lb = GetUmLobby();
+    if (Lb && Want != TEXT("lobby")) Lb->PlayHide();
+    UWidget* Active = Want == TEXT("boot")    ? static_cast<UWidget*>(B)
+                      : Want == TEXT("login") ? static_cast<UWidget*>(L)
+                      : Want == TEXT("lobby") ? static_cast<UWidget*>(Lb)
+                                              : R.GameChild.Get();
     if (UmHudRoot && UmHudRoot->Screens && Active) UmHudRoot->Screens->SetActiveWidget(Active);
     if (Want == TEXT("boot") && B) {
       B->PlayShow();
@@ -456,6 +466,10 @@ void AS08FlowGameMode::TickUmFlowScreens() {
     if (Want == TEXT("login") && L) {
       L->PlayShow();
       L->OnShown();
+    }
+    if (Want == TEXT("lobby") && Lb) {
+      Lb->PlayShow();
+      Lb->OnShown();
     }
     FS08Trace::Write(FString::Printf(TEXT("HUD-SCREEN route=%s stage=%s"), Want.IsEmpty() ? TEXT("game") : *Want, UmFsStageName(Stage)));
     R.Showing = Want;
@@ -470,7 +484,9 @@ void AS08FlowGameMode::TickUmFlowScreens() {
     const FVector2D Canvas(Scale.CanvasSu.X, Scale.CanvasSu.Y);
     if (R.Boot.IsValid()) R.Boot->ApplyCanvas(Canvas, Scale.bClassS, Scale.PxPerSu());
     if (R.Login.IsValid()) R.Login->ApplyCanvas(Canvas, Scale.bClassS, Scale.PxPerSu());
+    if (GetUmLobby()) GetUmLobby()->ApplyCanvas(Canvas, Scale.bClassS, Scale.PxPerSu());
   }
+  TickUmLobby(R.Showing == TEXT("lobby"));
   if (R.Boot.IsValid() && R.Showing == TEXT("boot")) {
     R.Boot->ApplyModel(R.Model, Now);
     // SC-05 keys: Enter = return, Esc = lobby (the viewport keeps the keyboard on this screen)

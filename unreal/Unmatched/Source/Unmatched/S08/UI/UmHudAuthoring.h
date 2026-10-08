@@ -26,6 +26,7 @@
 //   /Game/S08/UI/Screens/WBP_UI_SCR_INSPECT  UUmScreenInspect (VS-4 SC-21...SC-23)
 //   /Game/S08/UI/Screens/WBP_UI_SCR_BOOT     UUmScreenBoot    (VS-7 SC-03...SC-05)
 //   /Game/S08/UI/Screens/WBP_UI_SCR_LOGIN    UUmScreenLogin   (VS-7 SC-06, SC-07)
+//   /Game/S08/UI/Screens/WBP_UI_SCR_LOBBY    UUmScreenLobby   (VS-7 SC-08...SC-13)
 // Called from UE Python: tools/s08/hud_contract/ue_author_um_hud.py (UnrealEditor-Cmd -run=pythonscript).
 #pragma once
 

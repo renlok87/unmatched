@@ -6066,7 +6066,7 @@ void AS08FlowGameMode::RefreshHud() {
   // lobby must not look like an overlaid in-game diagnostic.
   if (!Hud.bValid) {
     if (Flow.IsValid() && Flow->GetStage() == ES08Stage::Lobby &&
-        !Flow->GetUserId().IsEmpty()) {
+        !Flow->GetUserId().IsEmpty() && !UmFlowScreensCoverLegacy()) {  // VS-7 S2: the UMG LOBBY replaces it
       BuildLobbyPanel();
     }
     return;

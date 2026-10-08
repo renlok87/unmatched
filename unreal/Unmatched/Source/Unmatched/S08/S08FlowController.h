@@ -253,6 +253,15 @@ public:
   const FS08RoomState& GetActiveGame() const { return ActiveGame; }
   /** «Вернуться в партию»: the found match becomes the room and its stream attaches (the guest's IN_PROGRESS path). */
   bool ResumeActiveGame();
+  // ---- VS-7 SC-08...SC-13: the LOBBY list (S08FlowControllerLobby.cpp; no stage change) ----
+  struct FLobbyGame { FString Id, Code, Status, Mode, HostId, BoardId; int32 Players = 0; TArray<FString> HeroIds; };
+  /** availableGames(mode: ONE_V_ONE) (ВР-VS4-SC08-01): the open rooms; a newer request supersedes an older answer. */
+  void FetchAvailableGames();
+  EBootQuery GetAvailableState() const { return AvailableState; }
+  const TArray<FLobbyGame>& GetAvailableGames() const { return AvailableGames; }
+  int32 GetAvailableAnswers() const { return AvailableAnswers; }
+  /** joinGame(gameId) of a list row (the code lookup is not needed: the row carries the id). */
+  void JoinRoomById(const FString& GameId);
 
   ES08Stage GetStage() const { return Stage; }
   const FS08RoomState& GetRoom() const { return Room; }
@@ -312,7 +321,7 @@ public:
   // ---- LOGIN -> LOBBY ----
   void EnterLobby(); // recovery: myGames(LOBBY) returns an existing room
   // ---- LOBBY ----
-  void CreateRoom(const FString& Mode);
+  void CreateRoom(const FString& Mode, const FString& InBoardId = FString());  // VS-7 SC-09: the board of the LOBBY
   void JoinRoomByCode(const FString& Code);
   // ---- ROOM ----
   void SelectHero(const FString& HeroId);
@@ -852,6 +861,11 @@ private:
   EBootQuery ActiveGameState = EBootQuery::Idle;
   FS08RoomState ActiveGame;
   TSharedPtr<FJsonObject> ActiveGameRow;
+  // VS-7 LOBBY (S08FlowControllerLobby.cpp)
+  EBootQuery AvailableState = EBootQuery::Idle;
+  TArray<FLobbyGame> AvailableGames;
+  int32 AvailableAnswers = 0;
+  int32 AvailableSerial = 0;
 #if WITH_AUTOMATION_TESTS
   int32 TestHttpSendCount = 0; // real SendHttp calls (harness + network)
   TSharedPtr<FJsonObject> TestLastHttpVariables; // variables of the last SendHttp

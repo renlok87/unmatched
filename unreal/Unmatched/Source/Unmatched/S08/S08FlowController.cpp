@@ -302,7 +302,7 @@ void FS08FlowController::EnterLobby() {
 SendHttp(MyGamesQuery, Variables, MoveTemp(OnDone));
 }
 
-void FS08FlowController::CreateRoom(const FString& Mode) {
+void FS08FlowController::CreateRoom(const FString& Mode, const FString& InBoardId) {
   if (!CanEnterRoomFlow(TEXT("CREATE"))) return;
   // S10/GD-039: createGame retries of ONE intent reuse its key (a lost answer
   // redelivers the SAME room); a create AFTER this key already resolved to a
@@ -324,9 +324,10 @@ void FS08FlowController::CreateRoom(const FString& Mode) {
   // The board of the new room, explicit (2026-10-04, real boards only): -S08BoardId=<Board row id> (any run), else
   // the art-review pair -ArtPreview -ArtPreviewBoardId=<id>; without either the backend picks its default board
   // (Marmoreal - original map).
-  FString BoardId;
-  const TCHAR* BoardSource = TEXT("S08BoardId");
-  if (!FParse::Value(FCommandLine::Get(), TEXT("S08BoardId="), BoardId) || BoardId.IsEmpty()) {
+  // VS-7 SC-09: the LOBBY passes the chosen board (one of the two real maps) - it wins over the flags
+  FString BoardId = InBoardId;
+  const TCHAR* BoardSource = InBoardId.IsEmpty() ? TEXT("S08BoardId") : TEXT("lobby");
+  if (InBoardId.IsEmpty() && (!FParse::Value(FCommandLine::Get(), TEXT("S08BoardId="), BoardId) || BoardId.IsEmpty())) {
     BoardId.Reset();
     BoardSource = TEXT("ArtPreviewBoardId");
     if (FParse::Param(FCommandLine::Get(), TEXT("ArtPreview"))) {

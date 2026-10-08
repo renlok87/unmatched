@@ -11,6 +11,9 @@
 // VS-7 S1 (SC-04 / SC-07 evidence, opt-in): S10_DELAY_FIELD may name the BOOT query heroList or the mutation login;
 // with S10_DELAY_COUNT set a query is held only for its first N replies too (the retry then passes). Two fields: chain
 // two proxies (S10_TARGET_PORT of the first = S10_LISTEN_PORT of the second).
+// VS-7 S2 (SC-08 skeleton / SC-13 error evidence, opt-in): S10_DELAY_FIELD=availableGames holds the LOBBY list query
+// (12 s > the client's 10 s timeout = the error state; the next poll or «Повторить» passes with S10_DELAY_COUNT=1);
+// S10_DELAY_FIELD=createGame holds the first create answer (the busy «Создаём…» with its spinner, SC-09).
 // Local-only; no request bodies, tokens, room codes or card data are logged (only field names and counts).
 const http = require('node:http');
 const net = require('node:net');
@@ -19,8 +22,8 @@ const listenPort = Number(process.env.S10_LISTEN_PORT || 3123);
 const targetPort = Number(process.env.S10_TARGET_PORT || 3000);
 const delayField = process.env.S10_DELAY_FIELD || 'gameDeckLists';
 const delayMs = Number(process.env.S10_DELAY_MS || 12000);
-const permitted = new Set(['gameDeckLists', 'heroList']);
-const permittedMutations = new Set(['beginManeuver', 'maneuver', 'endTurn', 'login']);
+const permitted = new Set(['gameDeckLists', 'heroList', 'availableGames']);
+const permittedMutations = new Set(['beginManeuver', 'maneuver', 'endTurn', 'login', 'createGame']);
 const delayCount = Number(process.env.S10_DELAY_COUNT || 1);
 const countSet = Object.prototype.hasOwnProperty.call(process.env, 'S10_DELAY_COUNT');
 const wsDropAtMs = Number(process.env.S10_WS_DROP_AT_MS || 0);

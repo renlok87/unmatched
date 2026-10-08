@@ -1446,6 +1446,14 @@ private:
   AS08BoardActor* UmMenuBackdropHandOver(const FString& RoomBoardId);
   void HandleUmFlowLoginError(const FS08GraphQLError& Error);
   TSharedPtr<struct FUmFlowScreensRuntime> UmFlowScreens;
+  // VS-7 S2 (S08FlowGameModeUmLobby.cpp): LOBBY SC-08...SC-13 in the root's Screens; rollback -S08SlateHud=lobby
+  void BuildUmLobby();
+  /** The route wants LOBBY: logged in without a room (the BOOT pass done) or back in the lobby; never -S08Auto. */
+  bool UmLobbyWanted(bool bPassDone) const;
+  class UUmScreenLobby* GetUmLobby() const;
+  void TickUmLobby(bool bShowing);
+  void HandleUmLobbyFlowError(const FS08GraphQLError& Error);
+  TSharedPtr<struct FUmLobbyRuntime> UmLobby;
 
   FS08BoardModel BoardModel;
   TArray<FS08BoardFighter> Fighters;

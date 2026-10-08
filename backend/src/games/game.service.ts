@@ -157,6 +157,8 @@ export class GameService {
 
     // Инвалидируем кеш списка игр
     await this.invalidateGamesListCache(userId);
+    // VS-7 SC-08: новая комната видна в availableGames со следующего опроса лобби (≤ 15 с), а не после 30 с кеша
+    await this.invalidateAvailableGamesCache();
 
     // Журналируем создание игры (state ещё нет — seq 0)
     await this.recordLobbyAction(game.id, userId, GameActionType.GAME_CREATED, 0, {
