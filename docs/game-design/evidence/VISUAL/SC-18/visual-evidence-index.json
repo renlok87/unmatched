@@ -1,0 +1,39 @@
+{
+ "schema": "unmatched.visual-evidence-index/1",
+ "id": "SC-18",
+ "date": "2026-10-08",
+ "rule": "ВР-VS4-01: images with avatars / card scans / board art stay in scraped-data (gitignored); ROOM and LOADING frames show hero avatars, map thumbnails or card scans",
+ "root": "scraped-data/derived/visual-evidence (relative to the checkout; copies in the main checkout and C:/tmp/wt-visual)",
+ "source": "VS-7 S3: UnrealEditor -game (editor build, worktree C:/tmp/wt-visual), one client on the main backend :3000 (+ the second player tools/s08/screens/room_actor.cjs over the API), -S08MenuDrive / -S08LobbyDrive / -S08RoomDrive, -S08ScreenShots; runs C:/tmp/visual/VS7/runs/<run>",
+ "status": "editor-build, not acceptance (the packaged set G with RENDER and the sheets belong to the Frames step)",
+ "files": [
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-18/room-countdown-3-1080p-100-s3g.png",
+   "sha256": "ad0e3e8afc97c1617cb05f0784c7cd719b6b7e72fc3684f9ae3ad5ffc4251337",
+   "bytes": 1154455,
+   "run": "s3g",
+   "shows": "host countdown «3» on the 0.8 veil"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-18/room-starting-1080p-100-s3g.png",
+   "sha256": "bf1eee42589d73c62c4331aaef6dc92a37abfa04f3440551d744de8e324a31c2",
+   "bytes": 1139915,
+   "run": "s3g",
+   "shows": "«Партия начинается…» after the host's 3-2-1"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-18/room-starting-720p-100-s3b2.png",
+   "sha256": "5782ebf3ae832e1e5c0802f5ab4525037b9d4f34897fd2733a3d4ab875671d7e",
+   "bytes": 360020,
+   "run": "s3b2",
+   "shows": "guest: only «Партия начинается…» (IN_PROGRESS by the room poll)"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-18/room-countdown-3-720p-150-s3f.png",
+   "sha256": "422a69eb8bfe9c239ddcae7720920efa8d2ac8ef22f2f2dbbf8711921f162541",
+   "bytes": 423265,
+   "run": "s3f",
+   "shows": "class S countdown"
+  }
+ ]
+}

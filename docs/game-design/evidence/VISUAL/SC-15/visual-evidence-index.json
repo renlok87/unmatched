@@ -1,0 +1,25 @@
+{
+ "schema": "unmatched.visual-evidence-index/1",
+ "id": "SC-15",
+ "date": "2026-10-08",
+ "rule": "ВР-VS4-01: images with avatars / card scans / board art stay in scraped-data (gitignored); ROOM and LOADING frames show hero avatars, map thumbnails or card scans",
+ "root": "scraped-data/derived/visual-evidence (relative to the checkout; copies in the main checkout and C:/tmp/wt-visual)",
+ "source": "VS-7 S3: UnrealEditor -game (editor build, worktree C:/tmp/wt-visual), one client on the main backend :3000 (+ the second player tools/s08/screens/room_actor.cjs over the API), -S08MenuDrive / -S08LobbyDrive / -S08RoomDrive, -S08ScreenShots; runs C:/tmp/visual/VS7/runs/<run>",
+ "status": "editor-build, not acceptance (the packaged set G with RENDER and the sheets belong to the Frames step)",
+ "files": [
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-15/room-host-picked-1080p-100-s3g.png",
+   "sha256": "577e61bb51c08834a57bee5a28f233a09dc1e9cdb32dcbfc57d0ce97a7469d44",
+   "bytes": 2036530,
+   "run": "s3g",
+   "shows": "room on Marmoreal original: its card marked (edge + IC-57 check), Sarpedon locked + why"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-15/room-guest-ready-taken-sarpedon-720p-100-s3b2.png",
+   "sha256": "ad5d5e80d42f4d43d6da93ef842d603fd033667b32639b4bb9535d3e8dce51e4",
+   "bytes": 974018,
+   "run": "s3b2",
+   "shows": "room on Sarpedon original (720p): Sarpedon marked, Marmoreal locked"
+  }
+ ]
+}

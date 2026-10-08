@@ -252,6 +252,7 @@
 - **Звук:** `UI-ROOM-JOIN`, `UI-ROOM-LEAVE`, `UI-ROOM-READY`, `UI-ROOM-COUNT`, `UI-ROOM-COUNT-GO`,
   `STG-SELECT-ARTHUR`, `STG-SELECT-MEDUSA`.
 - **Гейт:** `SHOT widget id=UI-SCR-ROOM state=waiting|picked|ready|countdown`.
+- **Дельта VS-7 S3** (`evidence/VISUAL/SC-14`…`SC-18`, по делегированию): сетка — герои ростера MVP из `heroList` (ВР-VS7-28); данные карточки — `adminHero(id)`, колода — `cardList(heroId)`, число карт = сумма `Card.count` (ВР-VS7-29); клиент: `FetchHeroDetails`, `FetchHeroDeck`; «Готов ✓» и чип доски — глиф IC-57 `ui-check` (ВР-VS7-27); отсчёт хоста — после ответа `startGame` (сервер не ждёт), «Партия начинается…» 1000 мс у хоста и гостя (ВР-VS7-30); не в `-S08Auto` (ВР-VS7-36). Трасса: блоки — отдельные строки `SHOT … state=board` / `state=deck` с `block=1` (ВР-VS7-40), `ROOM hero id= hp= move= attack=`, `ROOM board=<id>`, `ROOM countdown n= t=`.
 
 ### 1.5 Загрузка партии — `UI-SCR-LOADING` (новый ID)
 
@@ -266,6 +267,7 @@
 - **Строки:** `screens.loading.connect`, `.state`, `.board`, `.versus`, `.error`.
 - **Звук:** `STG-MATCH-START` в кадр смены на GAME.
 - **Гейт:** `SHOT widget id=UI-SCR-LOADING state=connect|state|board|error`.
+- **Дельта VS-7 S3** (`evidence/VISUAL/SC-19`, `SC-20`, по делегированию): этапы — `gameSequence` (новый запрос `FetchGameSequence`) → первый применённый снапшот → доска с фигурами, каждый ≥ 600 мс (ВР-VS7-31); вуаль непрозрачная, пока под экраном не доска комнаты (ВР-VS7-32); ошибка через 10 с от показа экрана (ВР-VS7-44); «Повторить» — `RetryMatchLoad` (`gameSequence` + `gameState`, поток сразу), «В лобби» — `DetachToLobby` без `leaveGame` (ВР-VS7-38); пока ROOM-отсчёт или LOADING закрывают GAME, блоки GAME не пишут `SHOT` (ВР-VS7-41).
 
 ### 1.6 GAME — `UI-SCR-GAME`
 

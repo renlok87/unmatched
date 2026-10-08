@@ -1,0 +1,46 @@
+{
+ "schema": "unmatched.visual-evidence-index/1",
+ "id": "SC-17",
+ "date": "2026-10-08",
+ "rule": "ВР-VS4-01: images with avatars / card scans / board art stay in scraped-data (gitignored); ROOM and LOADING frames show hero avatars, map thumbnails or card scans",
+ "root": "scraped-data/derived/visual-evidence (relative to the checkout; copies in the main checkout and C:/tmp/wt-visual)",
+ "source": "VS-7 S3: UnrealEditor -game (editor build, worktree C:/tmp/wt-visual), one client on the main backend :3000 (+ the second player tools/s08/screens/room_actor.cjs over the API), -S08MenuDrive / -S08LobbyDrive / -S08RoomDrive, -S08ScreenShots; runs C:/tmp/visual/VS7/runs/<run>",
+ "status": "editor-build, not acceptance (the packaged set G with RENDER and the sheets belong to the Frames step)",
+ "files": [
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-17/room-host-ready-taken-1080p-100-s3g.png",
+   "sha256": "2b2be615169f1f4cd0111b900406918e13de0555ad2764574e113cf8912274c2",
+   "bytes": 2056639,
+   "run": "s3g",
+   "shows": "ready (host): both «ГОТОВ ✓», «Все готовы», Start the one primary"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-17/room-guest-ready-taken-sarpedon-720p-100-s3b2.png",
+   "sha256": "ad5d5e80d42f4d43d6da93ef842d603fd033667b32639b4bb9535d3e8dce51e4",
+   "bytes": 974018,
+   "run": "s3b2",
+   "shows": "guest ready: the toggle on (no primary), no Start"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-17/room-host-ready-ai-1080p-100-s3h.png",
+   "sha256": "477130855e6f6e1903025c9c03e85acc695249ec79753c253f791c261725485f",
+   "bytes": 2036698,
+   "run": "s3h",
+   "shows": "VS_AI: slot 2 «ИИ-соперник · AI Bot», «Герой ИИ — при старте», Start after the own ready"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-17/room-leave-1080p-100-s3g.png",
+   "sha256": "81b1b9e2c7d46413a3b32fa7719478be793823390342875e1c55ea454e94cd86",
+   "bytes": 1281810,
+   "run": "s3g",
+   "shows": "leave: «Выйти из комнаты?» (SC-01 dialog), «ДА» the one primary"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-17/room-host-ready-ai-720p-150-s3c.png",
+   "sha256": "e526600982524ca3aecbce9eebcd15ff6ebbcec443f609be0099898dfdc9b2a7",
+   "bytes": 722587,
+   "run": "s3c",
+   "shows": "VS_AI class S (720p 150 %)"
+  }
+ ]
+}
