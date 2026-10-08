@@ -28,9 +28,12 @@ class UTexture2D;
 class US08ArtTagWidget;
 class US08ArtPlateWidget;
 class UUmZoneBadges;
+class US08ArtDamageWidget;
 
 namespace UmWorldGallery {
-inline constexpr int32 StateCount = 10;
+// VS-6 F2 (FX-22, IC-49): + 10 damage-medusa «−2» at 300 ms, 11 heal-arthur «+5» at 250 ms, 12 heal-reduced «+5» with the
+// state-heal «+» (reduced motion, 200 ms), 13 damage-stack «−2» then «−1» 300 ms later (the newer 28 su above)
+inline constexpr int32 StateCount = 14;
 UNMATCHED_API const TCHAR* StateName(int32 State);
 }  // namespace UmWorldGallery
 
@@ -51,6 +54,8 @@ class UNMATCHED_API UUmWorldGalleryWidget : public UUserWidget {
   UPROPERTY() TArray<TObjectPtr<US08ArtTagWidget>> Tags;
   UPROPERTY() TObjectPtr<US08ArtPlateWidget> Plate;
   UPROPERTY() TObjectPtr<UUmZoneBadges> Zones;
+  UPROPERTY() TObjectPtr<US08ArtDamageWidget> Damage;
+  double FakeNowS = 100.0;
   UPROPERTY() TObjectPtr<UTexture2D> BackgroundTexture;
   FString BoardNow;
   FVector2D CanvasPx = FVector2D(1920.0, 1080.0);

@@ -142,7 +142,8 @@ bool FS08CueDispatcherTableTest::RunTest(const FString&) {
     }
   };
   // VS-6 F1: + CUE-002 / 003 / 004 (local board answers) and CUE-007 (the move)
-  TestEqual("eleven cue rows (CUE-001..004, CUE-007 + the six combat rows)", S08CueRows::Combat().Num(), 11);
+  // VS-6 F2: + CUE-012 (the heal, FX-25)
+  TestEqual("twelve cue rows (CUE-001..004, CUE-007 + the seven combat rows)", S08CueRows::Combat().Num(), 12);
   for (const FS08CueRow& Row : S08CueRows::Combat()) {
     const TSharedPtr<FJsonObject>* JsonPtr = ById.Find(Row.Id);
     TestTrue(Row.Id + TEXT(" in the table"), JsonPtr != nullptr);

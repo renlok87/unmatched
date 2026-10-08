@@ -1,13 +1,16 @@
 // FX-05 / FX-06 / FX-17 / FX-19: see S08FigureFxChannels.h (ВР-Z2R-01: the channel code lives in S08/Fx).
 #include "S08FigureFxChannels.h"
 
+#include "Components/MeshComponent.h"
 #include "Components/PrimitiveComponent.h"
+#include "Materials/MaterialInterface.h"
 #include "Engine/World.h"
 #include "GameFramework/Actor.h"
 #include "TimerManager.h"
 #include "../S08HeroesV2.h"
 #include "../S08IconMotion.h"
 #include "../S08TraceLog.h"
+#include "S08CombatFx.h"
 
 void FS08FigureFxChannels::StartFlash(double NowS, double Ms, bool bReduced) {
   // FX-19 (ВР-20): reduced motion plays no flash at all
@@ -155,9 +158,24 @@ void FS08FigureFxChannels::PlayHit(bool bDamage) {
 }
 
 double FS08FigureFxChannels::Now() const {
+  if (HeldAtS >= 0.0) return HeldAtS;
   const AActor* O = Owner.Get();
   const UWorld* World = O ? O->GetWorld() : nullptr;
   return World ? World->GetTimeSeconds() : 0.0;
+}
+
+void FS08FigureFxChannels::Hold(bool bOn) {
+  if (bOn == IsHeld()) return;
+  if (bOn) {
+    HeldAtS = Now();
+    return;
+  }
+  const double At = HeldAtS;
+  HeldAtS = -1.0;
+  const double Shift = Now() - At;
+  FlashStartS += Shift;
+  RimStartS += Shift;
+  Kick();
 }
 
 void FS08FigureFxChannels::Kick() {
@@ -199,6 +217,25 @@ void FS08FigureFxChannels::Tick() {
 void FS08FigureFxChannels::Write() const {
   UPrimitiveComponent* B = Body.Get();
   if (!B) return;
-  S08HeroesV2::SetFxFlash(B, S08HeroesV2::FxFlashColor(), FlashValue);
-  S08HeroesV2::SetRim(B, RimValue, RimWidthValue);
+  if (S08CombatFx::FigureCueLegacy()) {
+    // -S08FigureCueLegacy: the Z-2 path - the flash and the fresnel rim inside M_UM_Figure_v2 (CPD 5-10)
+    S08HeroesV2::SetFxFlash(B, S08HeroesV2::FxFlashColor(), FlashValue);
+    S08HeroesV2::SetRim(B, RimValue, RimWidthValue);
+    return;
+  }
+  // VS-6 F2 (ВР-VS6-14, the Z-2 leftovers): the M_FX_FigureCue overlay draws the flash and the rim as a depth contour
+  // (no inner folds) from its own CPD 15-17; the opaque master keeps its CPD 5-10 at the neutral 0 (its Fix group and
+  // its shaders untouched), and a translucent overlay is not in the Lumen scene (the field keeps its light)
+  S08HeroesV2::SetFxFlash(B, S08HeroesV2::FxFlashColor(), 0.0f);
+  S08HeroesV2::SetRim(B, 0.0f, 0.0f);
+  B->SetCustomPrimitiveDataFloat(S08FigureFx::CueFlashCpdIndex, FlashValue);
+  B->SetCustomPrimitiveDataFloat(S08FigureFx::CueRimCpdIndex, RimValue);
+  B->SetCustomPrimitiveDataFloat(S08FigureFx::CueRimWidthCpdIndex, RimWidthValue);
+  if (UMeshComponent* Mesh = Cast<UMeshComponent>(B)) {
+    if (FlashValue > 0.0f || RimValue > 0.0f || Mesh->GetOverlayMaterial()) {
+      // set once at the first cue of the figure and kept (alpha 0 between the cues): no render-state rebuild per pulse
+      UMaterialInterface* Cue = LoadObject<UMaterialInterface>(nullptr, S08FigureFx::CueOverlayPath);
+      if (Cue && Mesh->GetOverlayMaterial() != Cue) Mesh->SetOverlayMaterial(Cue);
+    }
+  }
 }

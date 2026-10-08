@@ -45,6 +45,12 @@ inline constexpr double HoverLeaveMs = 120.0;
 /** Reduced motion (FX-17 / FX-19): the rim at 0.6 for 100 ms, no flash; the hover (keep) jumps to 0.6 and to 0. */
 inline constexpr float ReducedRimPeak = 0.6f;
 inline constexpr double ReducedRimMs = 100.0;
+/** VS-6 F2 (ВР-VS6-14): the figure cue overlay and its own custom primitive data (flash a, rim intensity, rim width) -
+ *  after the v1 layout 0-11 and the v2 slots 12-14 of M_UM_Figure_v2. */
+inline const TCHAR* const CueOverlayPath = TEXT("/Game/S08/FX/Materials/M_FX_FigureCue.M_FX_FigureCue");
+inline constexpr int32 CueFlashCpdIndex = 15;
+inline constexpr int32 CueRimCpdIndex = 16;
+inline constexpr int32 CueRimWidthCpdIndex = 17;
 
 }  // namespace S08FigureFx
 
@@ -84,6 +90,10 @@ struct UNMATCHED_API FS08FigureFxChannels {
   double Now() const;
   /** Clears the timer and writes the neutral 0 / 0. */
   void Reset();
+  /** VS-6 F2 (the FX capture hook, -S08FxShots): bOn freezes both channels at the world clock of now (the values stay on
+   *  screen for the evidence frame); off resumes them where they stopped (the starts move by the held time). */
+  void Hold(bool bOn);
+  bool IsHeld() const { return HeldAtS >= 0.0; }
 
 private:
   void Tick();
@@ -104,4 +114,5 @@ private:
   S08FigureFx::FRimPulse Rim;
   float RimValue = 0.0f;
   float RimWidthValue = 0.0f;
+  double HeldAtS = -1.0;
 };

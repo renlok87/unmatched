@@ -8,6 +8,7 @@
 // sound row's asset loads.
 #include "../S08FlowGameMode.h"
 
+#include "Misc/Parse.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "Sound/SoundBase.h"
@@ -121,6 +122,7 @@ void AS08FlowGameMode::S08FxDefensePlayed(const FString& DefenderId) {
   if (AS08FighterActor* Actor = BoardActor->FindFighterActor(DefenderId)) {
     if (!Actor->IsInDeathHold()) Actor->PlayRimPulse(S08FigureFx::DefenseRim);
   }
+  S08FxDefenseShot(DefenderId);  // VS-6 F2: the live frame of the pulse (the FX capture hook)
 }
 
 void AS08FlowGameMode::S08FxBenchStep(const FString& Spec) {
@@ -153,7 +155,7 @@ void AS08FlowGameMode::S08FxBenchStep(const FString& Spec) {
     return;
   }
   if (!CueFxSpawner) S08FxBoardReady();  // the bench builds no flow: the spawner (prewarm, grade) comes here
-  if (S08FxBenchField(Mode, Parts)) {
+  if (S08FxBenchField(Mode, Parts) || S08FxBenchCombat(Mode, Parts)) {  // VS-6 F2: + star / heal
     S08FxBenchFieldFinish();
     return;
   }
@@ -337,6 +339,12 @@ void AS08FlowGameMode::S08FxAttackDeclared(const FString& AttackerId, const FStr
 void AS08FlowGameMode::S08FxCueLines(const TArray<FString>& Lines) {
   // FX-16: CUE-009 / 010 / 011 / 013 interrupt CUE-008 (the dispatcher writes `cut=interrupt`): the chevrons go
   for (const FString& Line : Lines) {
+    // VS-6 F2 FX-23: a cut staging (replace / reconnect / catch-up) drops the stars of its seq not yet shown
+    if (Line.StartsWith(TEXT("CUE combat seq=")) && Line.Contains(TEXT(" stage=end ")) && !Line.Contains(TEXT(" cut=0"))) {
+      int32 CutSeq = -1;
+      FParse::Value(*Line, TEXT("seq="), CutSeq);
+      CombatFx.Stars.RemoveAll([CutSeq](const FS08CombatFxState::FPendingStar& S) { return S.Seq == CutSeq; });
+    }
     if (!Line.StartsWith(TEXT("CUE fx done id=CUE-008 ")) || !Line.Contains(TEXT(" cut=interrupt"))) continue;
     FieldFx.Chevrons.Reset();
     if (UNiagaraComponent* C = FieldFx.LiveChevrons.Get()) {
@@ -368,6 +376,7 @@ bool ChevronTransform(const FVector& From, const FVector& To, FTransform& Out) {
 }  // namespace
 
 void AS08FlowGameMode::S08FxTick() {
+  S08FxCombatTick();  // VS-6 F2: the stars at C+70, the heals, the FX capture hook
   if (FieldFx.Moves.Num() == 0 && FieldFx.Chevrons.Num() == 0) return;
   const double Now = static_cast<double>(NowMs());
   const bool bReduced = S08IconMotion::IsReducedMotion();
@@ -545,6 +554,7 @@ void AS08FlowGameMode::S08FxBenchFieldFinish(bool bWarmupDone) {
   if (US08MoveHighlightComponent* Hl = BoardActor->GetMoveHighlightMutable()) {
     for (const FFieldBench::FPulse& P : GFieldBench.Pulses) Hl->SetPulseStatic(P.Cell.X, P.Cell.Y, P.bTarget, P.Ms);
   }
+  if (bWarmupDone) S08FxBenchCombatFinish();  // VS-6 F2: the star / heal bench systems
   if (bWarmupDone && !GFieldBench.bSpawned && CueFxSpawner) {
     GFieldBench.bSpawned = true;
     ApplyProfileGrade(*BoardActor, *CueFxSpawner);

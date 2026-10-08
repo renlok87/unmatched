@@ -388,6 +388,11 @@ int32 AS08BoardActor::GetDamageNumberAmount(const FString& FighterId) const {
   return Info ? Info->X : 0;
 }
 
+int32 AS08BoardActor::GetDamageNumberLifeMs(const FString& FighterId) const {
+  const TWeakObjectPtr<AActor>* Number = DamageNumbers.Find(FighterId);
+  return Number && Number->IsValid() ? FMath::RoundToInt(Number->Get()->InitialLifeSpan * 1000.0f) : 0;
+}
+
 void AS08BoardActor::SetScreenIconMode(bool bScreen) {
   bScreenIconMode = bScreen;
   for (AS08FighterActor* Actor : FighterActors) {
@@ -426,11 +431,12 @@ void AS08BoardActor::SetCombatFocus(const FString& AttackerId,
 
 void AS08BoardActor::ShowDamageNumber(const FString& FighterId, int32 Damage,
                                      int32 SequenceNumber, float LifeSeconds) {
-  if (!bArtActive || Damage <= 0) return;
+  // VS-6 F2 FX-25: a negative Damage is a heal «+N» (its own dedupe key: a heal and a damage may share a seq)
+  if (!bArtActive || Damage == 0) return;
   const FS08BoardFighter* Target = Fighters.FindByPredicate(
       [&](const FS08BoardFighter& Fighter) { return Fighter.Id == FighterId; });
   if (!Target) return;
-  if (!DamageDedupe.Accept(FighterId, SequenceNumber)) {
+  if (!DamageDedupe.Accept(Damage < 0 ? FighterId + TEXT("#heal") : FighterId, SequenceNumber)) {
     FS08Trace::Write(FString::Printf(
         TEXT("ARTPREVIEW damage-number duplicate ignored fighter=%s amount=%d seq=%d"),
         *FighterId, Damage, SequenceNumber));
@@ -448,10 +454,10 @@ void AS08BoardActor::ShowDamageNumber(const FString& FighterId, int32 Damage,
   if (!Number) return;
   UTextRenderComponent* Text = NewObject<UTextRenderComponent>(Number, TEXT("DamageNumber"));
   Number->SetRootComponent(Text);
-  Text->SetText(S08ArtHudText::DamageNumber(Damage));
+  Text->SetText(Damage > 0 ? S08ArtHudText::DamageNumber(Damage) : FText::FromString(FString::Printf(TEXT("+%d"), -Damage)));
   Text->SetHorizontalAlignment(EHTA_Center);
   Text->SetWorldSize(25.0f);
-  Text->SetTextRenderColor(FColor(255, 224, 175));
+  Text->SetTextRenderColor(Damage > 0 ? FColor(255, 224, 175) : FColor(0x8C, 0xE6, 0x9A));  // damage.text / fx.heal
   Text->SetCollisionEnabled(ECollisionEnabled::NoCollision);
   S08ApplyGameLayerPrimitive(Text);
   Text->RegisterComponent();

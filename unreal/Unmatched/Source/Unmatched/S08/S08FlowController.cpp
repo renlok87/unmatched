@@ -1,4 +1,5 @@
 #include "S08FlowController.h"
+#include "Fx/S08CombatFx.h"
 #include "S08MoveAnim.h"
 #include "Algo/StableSort.h"
 #include "Dom/JsonObject.h"
@@ -1521,6 +1522,7 @@ void FS08FlowController::ComputeCues(int32 Seq, const TSharedPtr<FJsonValue>& Ol
   TArray<FS08Cue> MoveCues;
   TArray<int64> MoveKeys; // trail order first, then fighters[] order
   TArray<FS08Cue> DamageCues;
+  TArray<FS08Cue> HealCues;
   for (int32 NewIndex = 0; NewIndex < NewArray->Num(); ++NewIndex) {
     const TSharedPtr<FJsonValue>& NewValue = (*NewArray)[NewIndex];
     const TSharedPtr<FJsonObject>* NewFighter = nullptr;
@@ -1589,6 +1591,18 @@ void FS08FlowController::ComputeCues(int32 Seq, const TSharedPtr<FJsonValue>& Ol
       Cue.Damage = OldHealth - NewHealth;
       DamageCues.Add(MoveTemp(Cue));
     }
+    // VS-6 F2 FX-25 (ВР-FX13): a heal of a living fighter (a revive from 0 / defeated is no heal)
+    bool bOldDefeated = false, bNewDefeated = false;
+    (*OldFighter)->TryGetBoolField(TEXT("isDefeated"), bOldDefeated);
+    (*NewFighter)->TryGetBoolField(TEXT("isDefeated"), bNewDefeated);
+    if (const int32 Healed = S08CombatFx::HealAmount(OldHealth, NewHealth, !bOldDefeated, !bNewDefeated)) {
+      FS08Cue Cue;
+      Cue.Type = ES08CueType::FighterHealed;
+      Cue.SequenceNumber = Seq;
+      Cue.FighterId = Id;
+      Cue.Damage = Healed;
+      HealCues.Add(MoveTemp(Cue));
+    }
   }
   // OrderInSeq: the trail's moves[] order, then the untracked fighters; the
   // damage cues follow every move (MS-E-48: the cascade waits for the move).
@@ -1601,6 +1615,7 @@ void FS08FlowController::ComputeCues(int32 Seq, const TSharedPtr<FJsonValue>& Ol
     OutCues.Add(MoveTemp(Cue));
   }
   OutCues.Append(MoveTemp(DamageCues));
+  OutCues.Append(MoveTemp(HealCues));
 }
 
 void FS08FlowController::MoveCueTraceLines(const TArray<FS08Cue>& Cues, const FS08BoardModel& Board,

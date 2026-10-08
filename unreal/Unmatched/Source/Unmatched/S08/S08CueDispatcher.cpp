@@ -87,6 +87,11 @@ const TArray<FS08CueRow>& S08CueRows::Combat() {
     // the star does not follow the HitReact); 900 ms from contact; two hit sounds at most.
     Out.Add(MakeRow(TEXT("CUE-011"), 900, true, ES08CueOnNew::Replace, false, {}, true, false, TEXT(""), 2,
                     TEXT("HitReact"), TEXT("FxFlash")));
+    // VS-6 F2 FX-25 (ВР-FX13): CUE-012 heal - server, replace per subject, reduced shorten 100; NS_FX_HealMotes at the
+    // Base socket (FX-24), the «+N» of FX-22; in a combat it shows at the end of the staging with the combat's seq
+    // (staged, no D3), otherwise the snapshot frame + 200 ms; no clip, no material channel.
+    Out.Add(MakeRow(TEXT("CUE-012"), 700, false, ES08CueOnNew::Replace, false, {}, true, true, TEXT("Base"), 0,
+                    TEXT(""), TEXT("none")));
     // CUE-013 death: DeathSettle + the ash dissolve with team embers (NS_FX_AshEmbers, world; -S08DissolveFade = fade); a
     // new death of the same figure jumps to the final pose.
     Out.Add(MakeRow(TEXT("CUE-013"), 950, true, ES08CueOnNew::JumpToFinal, false, {}, true, false, TEXT(""), 0,

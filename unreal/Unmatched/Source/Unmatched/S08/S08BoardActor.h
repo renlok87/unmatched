@@ -237,6 +237,8 @@ public:
   /** Seq of the live damage number of a fighter (-1 when none). */
   int32 GetDamageNumberSeq(const FString& FighterId) const;
   int32 GetDamageNumberAmount(const FString& FighterId) const;
+  /** VS-6 F2 FX-22: the life of the live number (its actor's lifespan, ms; 0 when none). */
+  int32 GetDamageNumberLifeMs(const FString& FighterId) const;
 
   const FS08BoardModel& GetBoard() const { return BoardModel; }
   bool IsArtActive() const { return bArtActive; }

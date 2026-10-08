@@ -1,0 +1,80 @@
+{
+ "schema": "unmatched.cue-fixture/1",
+ "id": "heal-after-combat",
+ "kind": "scenario",
+ "description": "FX-25 (VS-6 F2, ВР-FX13): King Arthur (3 HP) атакует Medusa картой The Holy Grail; закрывший бой снимок seq 50 поднял HP Arthur до 8. Постановка: CUE-010 (без удержаний), CUE-011 Medusa из кадра контакта (staged), пока следующий ход уже объявил атаку (CUE-008 seq 51); лечение CUE-012 у Arthur показывается в конце постановки (stage=end = контакт + 900) с seq боя и staged — показ, не stale; повтор — duplicate; лечение со старым seq без постановки — stale.",
+ "covers": [
+  "FX-25 ВР-FX13",
+  "D3 staged",
+  "D2",
+  "CUE-012 vfx socket Base"
+ ],
+ "events": [
+  {
+   "t": 0,
+   "kind": "cue",
+   "id": "CUE-010",
+   "subject": "scene",
+   "seq": 50
+  },
+  {
+   "t": 1392,
+   "kind": "cue",
+   "id": "CUE-011",
+   "subject": "medusa",
+   "seq": 50,
+   "staged": true
+  },
+  {
+   "t": 1900,
+   "kind": "cue",
+   "id": "CUE-008",
+   "subject": "medusa",
+   "seq": 51
+  },
+  {
+   "t": 2292,
+   "kind": "cue",
+   "id": "CUE-012",
+   "subject": "arthur",
+   "seq": 50,
+   "staged": true
+  },
+  {
+   "t": 2300,
+   "kind": "cue",
+   "id": "CUE-012",
+   "subject": "arthur",
+   "seq": 50,
+   "staged": true
+  },
+  {
+   "t": 2310,
+   "kind": "cue",
+   "id": "CUE-012",
+   "subject": "merlin",
+   "seq": 49
+  }
+ ],
+ "expect_trace": [
+  "CUE fx id=CUE-010 subject=scene seq=50 t=0 vfx=none sfx=missing clip=none mat=none socket=- reduced=0 result=fallback",
+  "CUE fx done id=CUE-010 subject=scene seq=50 t=800 ms=800 cut=0",
+  "CUE fx id=CUE-011 subject=medusa seq=50 t=1392 vfx=NS_FX_HitStar sfx=missing clip=AM_Medusa_HitReact mat=FxFlash socket=- reduced=0 result=fallback",
+  "CUE fx id=CUE-008 subject=medusa seq=51 t=1900 vfx=NS_FX_AttackChevrons sfx=missing clip=none mat=none socket=- reduced=0 result=fallback",
+  "CUE fx done id=CUE-011 subject=medusa seq=50 t=2292 ms=900 cut=0",
+  "CUE fx id=CUE-012 subject=arthur seq=50 t=2292 vfx=NS_FX_HealMotes sfx=missing clip=none mat=none socket=Base reduced=0 result=fallback",
+  "CUE fx id=CUE-012 subject=arthur seq=50 t=2300 result=duplicate",
+  "CUE fx id=CUE-012 subject=merlin seq=49 t=2310 result=stale",
+  "CUE fx done id=CUE-008 subject=medusa seq=51 t=2500 ms=600 cut=0",
+  "CUE fx done id=CUE-012 subject=arthur seq=50 t=2992 ms=700 cut=0"
+ ],
+ "expect_summary": {
+  "presented": 4,
+  "spawned": 0,
+  "fallback": 4,
+  "duplicate": 1,
+  "stale": 1,
+  "done": 4,
+  "unique_triples": 4
+ }
+}

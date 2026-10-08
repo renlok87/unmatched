@@ -532,14 +532,13 @@
    "skippable": true,
    "vfx": {
     "system": "/Game/S08/FX/Combat/NS_FX_HitStar.NS_FX_HitStar",
-    "status": "missing",
-    "missing_reason": "ассет не создан: FX-21",
+    "status": "present",
     "attach": "world",
     "socket": null,
     "sim": "cpu",
     "deterministic": true,
     "prewarm": true,
-    "note": "звезда-всплеск fx.impact у точки контакта (FX-21): центр капсулы цели на 0,6 высоты фигуры, на 0,4 радиуса к атакующему; C+70…C+340; красная заливка — только -S08HitTintLegacy",
+    "note": "звезда-всплеск fx.impact у точки контакта (FX-21): центр капсулы цели на 0,6 высоты фигуры, на 0,4 радиуса к атакующему; C+70…C+340; красная заливка — только -S08HitTintLegacy; FX-21 (VS-6 F2): NS_FX_HitStar - один квад к камере (M_FX_FigurePrint mode 0, флипбук FX-20 4×2 по возрасту частицы), диаметр звезды 0,8 высоты фигуры, без теста глубины; спавн C+70 (FX-23); урон 0 / reduced motion / cut / -S08FxLegacy — без звезды",
     "fx_row": "FX-21"
    },
    "sfx": {
@@ -577,7 +576,7 @@
    },
    "ui": {
     "widget": "UI-HUD-BOARD",
-    "element": "цифра «−N» над фигурой (экранная, не TextRender): контакт +60 мс, 900 мс × скорость; HP — контакт +80 мс"
+    "element": "цифра «−N» над фигурой (экранная, не TextRender): контакт +60 мс, 900 мс × скорость; HP — контакт +80 мс; FX-22 (VS-6 F2): капсула card.navy с кромкой panel.edge, type.damage 24 su damage.text, «−{n}» hud.damage.minus; подъём 24 su, scale 0,8 → 1 за 80 мс, уход 150 мс; reduced — без подъёма 450 мс"
    },
    "marker": null,
    "postprocess": null,
@@ -608,14 +607,13 @@
    "skippable": true,
    "vfx": {
     "system": "/Game/S08/FX/Combat/NS_FX_HealMotes.NS_FX_HealMotes",
-    "status": "missing",
-    "missing_reason": "ассет не создан: FX-24",
+    "status": "present",
     "attach": "socket",
     "socket": "Base",
     "sim": "cpu",
     "deterministic": true,
     "prewarm": true,
-    "note": "3–5 точек fx.heal поднимаются от подставки, 600 мс; «+N» — экранный виджет (ВР-21, ВР-67)",
+    "note": "3–5 точек fx.heal поднимаются от подставки, 600 мс; «+N» — экранный виджет (ВР-21, ВР-67); FX-24 (VS-6 F2): NS_FX_HealMotes - один квад к камере у подставки (M_FX_FigurePrint mode 1): 4 диска fx.heal с кромкой mark.keyline, старт 0/60/120/180 мс, подъём на 0,8 высоты фигуры до 450 мс, 300–600 мс прозрачность → 0 и радиус 3 → 2 uu; reduced motion / -S08FxLegacy — без точек; FX-25: показ в конце постановки боя (stage=end) или кадр снимка + 200",
     "fx_row": "FX-24"
    },
    "sfx": {
@@ -634,7 +632,7 @@
    "material": null,
    "ui": {
     "widget": "UI-HUD-BOARD",
-    "element": "цифра над фигурой (экранная, не TextRender)"
+    "element": "цифра над фигурой (экранная, не TextRender); FX-22 (VS-6 F2): «+{n}» hud.damage.plus fx.heal в той же капсуле, 700 мс; reduced — + значок state-heal (IC-49)"
    },
    "marker": null,
    "postprocess": null,

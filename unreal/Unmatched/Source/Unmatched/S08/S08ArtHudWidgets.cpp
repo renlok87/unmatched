@@ -1,4 +1,5 @@
 #include "S08ArtHudWidgets.h"
+#include "UI/UmWorldDamage.h"
 #include "UI/UmWorldLayer.h"
 
 #include "Blueprint/WidgetTree.h"
@@ -699,6 +700,12 @@ void US08ArtDamageWidget::NativePreConstruct() {
 }
 
 void US08ArtDamageWidget::ApplyStyle() {
+  if (bV2 && DamageBackground) {
+    // VS-6 F2 FX-22: the V2 capsules paint the number (card.navy, ВР-61) - no #161A28 body around them
+    DamageBackground->SetBrush(FSlateNoResource());
+    DamageBackground->SetPadding(FMargin(0.0f));
+    return;
+  }
   if (DamageBackground) {
     DamageBackground->SetBrush(FSlateRoundedBoxBrush(FLinearColor::White, Style.CornerRadiusSu));
     DamageBackground->SetBrushColor(FS08ArtHudPlateStyle::Linear(Style.Background));
@@ -711,6 +718,37 @@ void US08ArtDamageWidget::ApplyAmount(const FText& Text) {
   if (DamageText) DamageText->SetText(Text);
 }
 
+int32 US08ArtDamageWidget::FontSize() const { return bV2 && V2Damage ? V2Damage->FontSize() : Style.Font.Size; }
+
+void US08ArtDamageWidget::SetV2(bool bOn) {
+  if (bOn == bV2 || !DamageBackground) return;
+  if (bOn) {
+    if (!V2Damage) V2Damage = CreateWidget<UUmWorldDamage>(this, UUmWorldDamage::StaticClass());
+    if (!V2Damage) return;
+    LegacyContent = DamageBackground->GetContent();
+    DamageBackground->SetContent(V2Damage);
+  } else {
+    DamageBackground->SetContent(LegacyContent);
+  }
+  bV2 = bOn;
+  ApplyStyle();
+}
+
+void US08ArtDamageWidget::ShowNumber(const FString& FighterId, int32 Amount, int32 Seq, int32 LifeMs, bool bReduced) {
+  if (bV2 && V2Damage) {
+    V2Damage->Push(FighterId, Amount, Seq, LifeMs, bReduced);
+    return;
+  }
+  if (Amount >= 0) {
+    ApplyAmount(S08ArtHudText::DamageNumber(Amount));
+    S08StyleText(DamageText, Style.Font, Style.Text);
+  } else {
+    // FX-25 under the rollback: «+N» in fx.heal on the old capsule
+    ApplyAmount(FText::FromString(FString::Printf(TEXT("+%d"), -Amount)));
+    if (DamageText) DamageText->SetColorAndOpacity(FSlateColor(FLinearColor::FromSRGBColor(FColor(0x8C, 0xE6, 0x9A))));
+  }
+}
+
 bool US08ArtDamageWidget::HasAllParts(FString* OutMissing) const {
   TArray<FString> Missing;
   if (!DamageBackground) Missing.Add(TEXT("DamageBackground"));
@@ -721,5 +759,9 @@ bool US08ArtDamageWidget::HasAllParts(FString* OutMissing) const {
 
 void US08ArtDamageWidget::CollectParts(TArray<FS08WidgetPart>& Out) const {
   Out.Add({S08ArtHudIds::Damage, GetCachedWidget()});
+  if (bV2 && V2Damage) {
+    V2Damage->CollectParts(Out);  // VS-6 F2 FX-22: the newest number's text
+    return;
+  }
   S08AddPart(Out, S08ArtHudIds::DamageText, DamageText);
 }

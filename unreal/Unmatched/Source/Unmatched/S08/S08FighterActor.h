@@ -82,6 +82,10 @@ public:
   /** Height of the visible figure above the cell plane (uu): the art sculpt,
    *  the blockout or the grey mannequin box. */
   float GetFigureHeightUU() const;
+  /** VS-6 F2 FX-21 (ВР-FX04): the radius of the figure's click capsule (the star's shift towards the attacker). */
+  float GetClickRadiusUU() const;
+  /** VS-6 F2: the FX capture hook - freezes / resumes the flash and rim channels (S08FigureFxChannels::Hold). */
+  void HoldFx(bool bOn);
   bool HasArtFigure() const { return bArtFigureVisible; }
   bool HasMedusaCandidate() const { return bMedusaVisual; }
   /** A skeletal art sculpt is shown: the isolated Medusa candidate or a -ArtPreviewHeroesV2 figure

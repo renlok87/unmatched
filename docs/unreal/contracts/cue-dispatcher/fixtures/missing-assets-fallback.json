@@ -2,7 +2,7 @@
  "schema": "unmatched.cue-fixture/1",
  "id": "missing-assets-fallback",
  "kind": "scenario",
- "description": "Таблица без VFX и звука (как сейчас): урон и смерть дают result=fallback, VFX/звук missing, клип — свой у фигуры (H2Anim, sequence_by_fighter); тестовый VFX, который не загрузился (assets_unloadable), тоже missing. Длительности и done сохраняются — состояние не ждёт эффекта.",
+ "description": "Таблица без VFX и звука (как сейчас): урон и смерть дают result=fallback, VFX/звук missing, клип — свой у фигуры (H2Anim, sequence_by_fighter); тестовый VFX, который не загрузился (assets_unloadable), тоже missing. Длительности и done сохраняются — состояние не ждёт эффекта. VS-6 F2: NS_FX_HitStar существует (FX-21) — фикстура объявляет его незагружаемым (assets_unloadable), CUE-011 остаётся vfx=missing.",
  "covers": [
   "17 §6.5",
   "07 fallback",
@@ -15,7 +15,8 @@
   }
  },
  "assets_unloadable": [
-  "/Game/FX/Test/NS_Test_Holy.NS_Test_Holy"
+  "/Game/FX/Test/NS_Test_Holy.NS_Test_Holy",
+  "/Game/S08/FX/Combat/NS_FX_HitStar.NS_FX_HitStar"
  ],
  "events": [
   {

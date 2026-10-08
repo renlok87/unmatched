@@ -29,7 +29,8 @@ class TableTests(unittest.TestCase):
         expected = sum(1 for c in TABLE["cues"] for ch in ("vfx", "sfx", "clip")
                        if c.get(ch) and c[ch]["status"] == "missing")
         self.assertEqual(len(miss), expected)
-        self.assertIn(("CUE-011", "vfx", row(TABLE, "CUE-011")["vfx"]["missing_reason"]), miss)
+        # VS-6 F2: NS_FX_HitStar / NS_FX_HealMotes exist (FX-21 / FX-24); CUE-013 still waits for FX-26
+        self.assertIn(("CUE-013", "vfx", row(TABLE, "CUE-013")["vfx"]["missing_reason"]), miss)
         # DE-003: клипы H2Anim есть у всех v2-фигур, в missing-report их нет; у объявления атаки клипа нет (F-03)
         self.assertFalse([m for m in miss if m[1] == "clip"])
         self.assertIsNone(row(TABLE, "CUE-008")["clip"])
@@ -74,8 +75,9 @@ class TableTests(unittest.TestCase):
             v = row(TABLE, cid)["vfx"]
             self.assertEqual((cc.short_name(v["system"]) if v["system"] else None, v["attach"], v["socket"], v["fx_row"]),
                              (system, attach, socket, fx_row), cid)
-            if cid in ("CUE-007", "CUE-008"):
-                # VS-6 F1: NS_FX_Dust (FX-13) and NS_FX_AttackChevrons (FX-16) exist in Content
+            if cid in ("CUE-007", "CUE-008", "CUE-011", "CUE-012"):
+                # VS-6 F1: NS_FX_Dust (FX-13) and NS_FX_AttackChevrons (FX-16) exist in Content; VS-6 F2: NS_FX_HitStar
+                # (FX-21) and NS_FX_HealMotes (FX-24)
                 self.assertEqual(v["status"], "present", cid)
                 self.assertNotIn("missing_reason", v, cid)
             else:
@@ -94,8 +96,8 @@ class TableTests(unittest.TestCase):
                 self.assertIn(c["vfx"]["fx_row"], tasks, c["id"])
         t = copy.deepcopy(TABLE); row(t, "CUE-007")["vfx"]["fx_row"] = "FX-99"
         self.assertTrue(any("FX-99" in e for e in cc.validate_table(t)))
-        t = copy.deepcopy(TABLE); row(t, "CUE-011")["vfx"]["missing_reason"] = "ассет не создан"
-        self.assertTrue(any("не называет строку FX-21" in e for e in cc.validate_table(t)))
+        t = copy.deepcopy(TABLE); row(t, "CUE-013")["vfx"]["missing_reason"] = "ассет не создан"
+        self.assertTrue(any("не называет строку FX-26" in e for e in cc.validate_table(t)))
         t = copy.deepcopy(TABLE); del row(t, "CUE-007")["vfx"]["fx_row"]
         self.assertTrue(any(e.startswith("schema") for e in cc.validate_table(t)))
 
@@ -117,11 +119,13 @@ class TableTests(unittest.TestCase):
     def test_fx01_planned_system_is_not_present(self):
         """Плановый путь системы при status missing не делает показ spawned; present — только существующий ассет."""
         d = cc.ReferenceDispatcher(TABLE)
-        self.assertEqual(d._asset("CUE-011", "vfx"), "missing")
-        self.assertEqual(cc.ReferenceDispatcher(TABLE, {"CUE-011": {"vfx": "/Game/T/NS_Test_Hit.NS_Test_Hit"}})._asset("CUE-011", "vfx"),
+        # VS-6 F2: CUE-011 / CUE-012 are present now - CUE-013 (FX-26) is the planned system of this check
+        self.assertEqual(d._asset("CUE-013", "vfx"), "missing")
+        self.assertEqual(d._asset("CUE-011", "vfx"), "NS_FX_HitStar")
+        self.assertEqual(cc.ReferenceDispatcher(TABLE, {"CUE-013": {"vfx": "/Game/T/NS_Test_Hit.NS_Test_Hit"}})._asset("CUE-013", "vfx"),
                          "NS_Test_Hit")
         if cc.CONTENT_DIR.is_dir():
-            t = copy.deepcopy(TABLE); v = row(t, "CUE-011")["vfx"]; v["status"] = "present"; del v["missing_reason"]
+            t = copy.deepcopy(TABLE); v = row(t, "CUE-013")["vfx"]; v["status"] = "present"; del v["missing_reason"]
             self.assertTrue(any("present, но нет ассета" in e for e in cc.validate_table(t)))
         t = copy.deepcopy(TABLE); row(t, "CUE-013")["clip"].update(status="missing", missing_reason="нет")
         self.assertTrue(any("путь задан" in e for e in cc.validate_table(t)))   # у клипа путь при missing — ошибка

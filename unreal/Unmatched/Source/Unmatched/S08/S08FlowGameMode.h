@@ -45,6 +45,7 @@
 #include "S08ShotQueue.h"
 #include "S08TurnPortraitWidget.h"
 #include "Fx/S08FieldFx.h"
+#include "Fx/S08CombatFx.h"
 #include "S08FlowGameMode.generated.h"
 
 struct FS08MoveDraftView;
@@ -1213,6 +1214,22 @@ private:
    *  mode is not one of them. Finish lands the accumulated plate view. */
   bool S08FxBenchField(const FString& Mode, const TArray<FString>& Parts);
   void S08FxBenchFieldFinish(bool bWarmupDone = false);
+  // ---- VS-6 F2 combat FX of a figure (S08/Fx/S08CombatFx.h; the adapter in S08/Fx/S08FlowGameModeCombatFx.cpp) ----
+  FS08CombatFxState CombatFx;
+  /** FX-21 / FX-23: a hit of TargetId (the contact frame or an unstaged hit's own frame) - the star at C+70. */
+  void S08FxHit(const FString& TargetId, int32 Seq, bool bStaged);
+  /** FX-23 (ВР-FX05): damage 0 - the cream rim of the target, no flash, no star. */
+  void S08FxBlock(const FString& TargetId, int32 Seq);
+  /** FX-25: a FighterHealed cue - shown at the snapshot + 200 ms, or at the end of the staging of its seq. */
+  void S08FxHealCue(const FString& FighterId, int32 Amount, int32 Seq);
+  void S08FxCombatEnd(int32 Seq);
+  /** FX-22: the number of the layout into the art HUD damage widget (life, reduced motion). */
+  void S08FxShowNumber(class US08ArtDamageWidget& Widget, const FString& FighterId, int32 Amount, int32 Seq);
+  void S08FxCombatTick();
+  bool S08FxBenchCombat(const FString& Mode, const TArray<FString>& Parts);
+  void S08FxBenchCombatFinish();
+  /** The FX capture hook of FX-17 (-S08FxShots / -S08ExitShots): the defense rim frame at its peak. */
+  void S08FxDefenseShot(const FString& DefenderId);
   // ---- VS-2 HB-06: the UMG HUD root, its layout / FIELD and the H2 layout fixes of the Slate blocks
   // (S08FlowGameModeUmHud.cpp; rollback -S08SlateHud[=<blocks>]) ----
   void BuildUmHud();

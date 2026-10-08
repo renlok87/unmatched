@@ -6,6 +6,7 @@
 #include "../S08ArtLook.h"
 #include "../S08BoardModel.h"
 #include "UmHudTheme.h"
+#include "UmWorldDamage.h"
 #include "UmWorldLayer.h"
 #include "UmZoneBadges.h"
 #include "Blueprint/WidgetTree.h"
@@ -27,7 +28,8 @@ namespace UmWorldGallery {
 const TCHAR* StateName(int32 State) {
   static const TCHAR* Names[StateCount] = {TEXT("tags-start"),   TEXT("tags-run-I"),   TEXT("hover-medusa"), TEXT("hover-harpy1"),
                                            TEXT("hover-arthur"), TEXT("hover-merlin"), TEXT("attack-medusa"), TEXT("zone-1"),
-                                           TEXT("zone-2"),       TEXT("zone-3")};
+                                           TEXT("zone-2"),       TEXT("zone-3"),       TEXT("damage-medusa"), TEXT("heal-arthur"),
+                                           TEXT("heal-reduced"), TEXT("damage-stack")};
   return State >= 0 && State < StateCount ? Names[State] : TEXT("?");
 }
 }  // namespace UmWorldGallery
@@ -251,6 +253,18 @@ TArray<FString> UUmWorldGalleryWidget::Build(const FString& Board, const FVector
       S->SetZOrder(20);
     }
   }
+  // VS-6 F2 FX-22: the real art HUD damage widget on its V2 look (rollback -S08SlateHud=damage), on a held clock
+  UClass* DamageClass = S08LoadArtHudWidgetClass(US08ArtDamageWidget::WidgetBlueprintPath, US08ArtDamageWidget::StaticClass());
+  Damage = CreateWidget<US08ArtDamageWidget>(this, DamageClass ? DamageClass : US08ArtDamageWidget::StaticClass());
+  if (Damage) {
+    Damage->SetV2(UmWorldDamage::DamageV2());
+    if (UUmWorldDamage* V2 = Damage->GetV2()) V2->SetClockForTest([this] { return FakeNowS; });
+    if (UCanvasPanelSlot* S = Root->AddChildToCanvas(Damage)) {
+      S->SetAutoSize(true);
+      S->SetZOrder(40);
+    }
+    Damage->SetVisibility(ESlateVisibility::Collapsed);
+  }
   Label = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), FName(TEXT("Label")));
   Label->SetFont(UUmHudTheme::Get().Font(TEXT("type.caption")));
   Label->SetColorAndOpacity(FSlateColor(UUmHudTheme::Get().Color(TEXT("text.primary"))));
@@ -324,13 +338,61 @@ void UUmWorldGalleryWidget::ApplyState(int32 State, TArray<FString>& Lines) {
       Plate->SetVisibility(ESlateVisibility::Collapsed);
     }
   }
+  // VS-6 F2 FX-22 / IC-49: the numbers over Medusa / King Arthur (above the figure box nearest its HB-44 tag)
+  if (Damage) {
+    const TCHAR* Who = State == 10 || State == 13 ? TEXT("medusa") : State == 11 || State == 12 ? TEXT("arthur") : nullptr;
+    const FBox2D* TagBox = Who ? Boxes.Find(FString::Printf(TEXT("tag.%s"), Who)) : nullptr;
+    if (Who && TagBox) {
+      FS08ScreenRect Fig;
+      double Best = TNumericLimits<double>::Max();
+      for (const FS08ScreenRect& R : UmWgFigureRects(BoardNow, CanvasPx)) {
+        const double D = FVector2D::DistSquared(FVector2D(R.Center().X, R.Y1), FVector2D(TagBox->GetCenter().X, TagBox->Min.Y));
+        if (D < Best) {
+          Best = D;
+          Fig = R;
+        }
+      }
+      FakeNowS = 100.0;
+      if (UUmWorldDamage* V2 = Damage->GetV2()) V2->Clear();
+      Damage->SetVisibility(ESlateVisibility::HitTestInvisible);
+      double ShowAt = 0.3;
+      if (State == 10) {
+        Damage->ShowNumber(Who, 2, 10, 900, false);
+      } else if (State == 11) {
+        Damage->ShowNumber(Who, -5, 11, 700, false);
+        ShowAt = 0.25;
+      } else if (State == 12) {
+        Damage->ShowNumber(Who, -5, 12, 450, true);
+        ShowAt = 0.2;
+      } else {
+        Damage->ShowNumber(Who, 2, 13, 900, false);
+        FakeNowS = 100.3;
+        Damage->ShowNumber(Who, 1, 14, 900, false);
+        ShowAt = 0.4;
+      }
+      FakeNowS = 100.0 + ShowAt;
+      if (UUmWorldDamage* V2 = Damage->GetV2()) V2->Step();
+      Damage->ForceLayoutPrepass();
+      const FVector2D Size = Damage->GetDesiredSize() * PxNow;
+      FS08ScreenRect At;
+      if (!UmWorldDamage::AboveFigure(Fig, Size, CanvasPx, {}, At)) {
+        At = FS08ScreenRect(Fig.Center().X - 0.5f * Size.X, Fig.Y0 - Size.Y, Fig.Center().X + 0.5f * Size.X, Fig.Y0);
+      }
+      if (UCanvasPanelSlot* S = Cast<UCanvasPanelSlot>(Damage->Slot)) S->SetPosition(FVector2D(At.X0, At.Y0) / PxNow);
+      Lines.Add(FString::Printf(TEXT("UMGALLERY world damage=%s state=%s box=(%.0f,%.0f,%.0f,%.0f) figure=(%.0f,%.0f,%.0f,%.0f) %s"), Who,
+                                *Name, At.X0, At.Y0, At.X1, At.Y1, Fig.X0, Fig.Y0, Fig.X1, Fig.Y1, *UmWorldDamage::LookField()));
+    } else {
+      Damage->SetVisibility(ESlateVisibility::Collapsed);
+    }
+  }
   // FX-38: the zone icons at a hovered space of one, two and three zones (-S08SlateHud=zone: none, as the client)
   if (Zones) {
     FUmZoneBadgeInput In;
     In.ViewportPx = CanvasPx;
     const bool bZoneRollback = S08ArtLook::SlateHudBlocks().IsSlate(FName(TEXT("zone")));
-    if (bZoneRollback && State >= 7) Lines.Add(TEXT("UMGALLERY world zone rollback=-S08SlateHud=zone"));
-    if (State >= 7 && !bZoneRollback) {
+    const bool bZoneState = State >= 7 && State <= 9;  // VS-6 F2: 10..13 are the number states
+    if (bZoneRollback && bZoneState) Lines.Add(TEXT("UMGALLERY world zone rollback=-S08SlateHud=zone"));
+    if (bZoneState && !bZoneRollback) {
       const bool bSar = BoardNow == TEXT("sarpedon");
       const TCHAR* Space = State == 7 ? (bSar ? TEXT("S01") : TEXT("M02")) : State == 8 ? (bSar ? TEXT("S21") : TEXT("M01"))
                                                                                          : (bSar ? TEXT("S25") : TEXT("M04"));

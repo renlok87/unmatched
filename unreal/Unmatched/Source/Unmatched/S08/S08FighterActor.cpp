@@ -1200,6 +1200,7 @@ void AS08FighterActor::PlayHitFx(float WindowSeconds, bool bDamage) {
 }
 
 void AS08FighterActor::PlayFlash(float Ms) { if (BindFx()) FxChannels.PlayFlash(Ms); }
+void AS08FighterActor::HoldFx(bool bOn) { if (BindFx()) FxChannels.Hold(bOn); }
 void AS08FighterActor::PlayRimPulse(const S08FigureFx::FRimPulse& Pulse) { if (BindFx()) FxChannels.PlayRim(Pulse); }
 void AS08FighterActor::PlayRim(float TotalMs, float Peak, float Width, double RampInMs, double RampOutMs, bool bHold) {
   PlayRimPulse(S08FigureFx::FRimPulse{TotalMs, Peak, Width, RampInMs, RampOutMs, bHold, 0.0});
@@ -1476,6 +1477,8 @@ bool AS08FighterActor::GetVisibleLabelBox(FBox& OutBox) const {
 float AS08FighterActor::GetFigureHeightUU() const {
   return FigureHeightUU;
 }
+
+float AS08FighterActor::GetClickRadiusUU() const { return ClickCapsule ? ClickCapsule->GetScaledCapsuleRadius() : 20.0f; }
 
 bool AS08FighterActor::IsBaseVisible() const { return Base && Base->IsVisible(); }
 

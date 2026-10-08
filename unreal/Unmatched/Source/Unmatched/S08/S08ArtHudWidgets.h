@@ -230,7 +230,14 @@ public:
   bool HasAllParts(FString* OutMissing = nullptr) const;
   void CollectParts(TArray<FS08WidgetPart>& Out) const;
   bool UsesCodeDefaultTree() const { return bCodeDefaultTree; }
-  int32 FontSize() const { return Style.Font.Size; }
+  int32 FontSize() const;
+  /** VS-6 F2 FX-22: the «−N» / «+N» capsules of UI/UmWorldDamage.h inside this widget (default; -S08SlateHud=damage
+   *  keeps the old tree). */
+  void SetV2(bool bOn);
+  class UUmWorldDamage* GetV2() const { return bV2 ? V2Damage : nullptr; }
+  /** The number of the layout (Amount > 0 damage, < 0 heal): the V2 capsules push it with its life, the old tree prints
+   *  «-N» / «+N» (fx.heal). */
+  void ShowNumber(const FString& FighterId, int32 Amount, int32 Seq, int32 LifeMs, bool bReduced);
 
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "S08 Art HUD")
   FS08ArtHudDamageStyle Style;
@@ -245,6 +252,9 @@ protected:
 
 private:
   bool bCodeDefaultTree = false;
+  bool bV2 = false;
+  UPROPERTY() TObjectPtr<class UUmWorldDamage> V2Damage;
+  UPROPERTY() TObjectPtr<UWidget> LegacyContent;
 };
 
 /** Desired size of a widget in slate units at layout scale 1 (SlatePrepass(1) on its Slate widget - also while it is

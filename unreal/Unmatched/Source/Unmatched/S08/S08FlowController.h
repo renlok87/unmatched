@@ -49,7 +49,9 @@ struct FS08HeroEntry {
 /** GD-031: presentation-layer cue derived from ONE authoritative state
  *  transition (a seq the store actually applied, not a same-seq merge).
  *  HTTP echo + WS event of the same seq produce exactly one cue set. */
-enum class ES08CueType : uint8 { FighterMoved, FighterDamaged };
+/** VS-6 F2 FX-25 (ВР-FX13): FighterHealed - the HP of a fighter alive before and after the transition grew (Damage
+ *  then carries the healed amount, HP after - HP before); after the damage cues of the seq. */
+enum class ES08CueType : uint8 { FighterMoved, FighterDamaged, FighterHealed };
 
 /** MS-T-15 (move-selection 04 §4.6): how a FighterMoved cue travels - Move
  *  step by step along Path, Place as one jump to the last cell (steps = 1). */

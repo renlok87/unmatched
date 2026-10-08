@@ -3,6 +3,7 @@
 #include "S08FighterActor.h"
 #include "S08ArtLook.h"
 #include "UI/UmWorldLayer.h"
+#include "UI/UmWorldDamage.h"
 #include "S08Render.h"
 #include "S08ArtHudText.h"
 #include "S08ArtHudViews.h"
@@ -1076,6 +1077,9 @@ void AS08FlowGameMode::HandleCues(const TArray<FS08Cue>& InCues) {
     if (Cue.Type == ES08CueType::FighterMoved) {
       Line = FString::Printf(TEXT("CUE move %s (%d,%d)->(%d,%d) seq=%d"), *Cue.FighterId,
                              Cue.FromX, Cue.FromY, Cue.ToX, Cue.ToY, Cue.SequenceNumber);
+    } else if (Cue.Type == ES08CueType::FighterHealed) {
+      Line = FString::Printf(TEXT("CUE heal %s +%d seq=%d"), *Cue.FighterId, Cue.Damage, Cue.SequenceNumber);
+      S08FxHealCue(Cue.FighterId, Cue.Damage, Cue.SequenceNumber);  // VS-6 F2 FX-25: CUE-012 (+200 or stage=end)
     } else {
       Line = FString::Printf(TEXT("CUE damage %s -%d seq=%d"), *Cue.FighterId, Cue.Damage,
                              Cue.SequenceNumber);
@@ -1231,6 +1235,8 @@ void AS08FlowGameMode::TryMoveSkip() {
 
 void AS08FlowGameMode::PresentDamageNumber(const FString& FighterId, int32 Damage, int32 Seq, float LifeSeconds) {
   if (!BoardActor) return;
+  // VS-6 F2 FX-22: reduced motion - 450 ms without the rise (04 §3.5)
+  LifeSeconds = S08CombatFx::NumberLifeMs(false, FMath::RoundToInt(LifeSeconds * 1000.0f), S08IconMotion::IsReducedMotion()) / 1000.0f;
   BoardActor->ShowDamageNumber(FighterId, Damage, Seq, LifeSeconds);
   if (BoardActor->IsArtActive() && !bS09ShotDamage && DamageShotAtElapsed < 0.0f && !S09ShotDir.IsEmpty()) {
     DamageShotAtElapsed = Elapsed + 0.2f;
@@ -1264,6 +1270,7 @@ void AS08FlowGameMode::PresentHit(const FString& FighterId, int32 Seq, int32 Tin
   // (the red tint only with -S08HitTintLegacy); the tint= window of the staging trace stays 450 / 550.
   BoardActor->NotifyFighterAnimEvent(FighterId, S08HeroesV2::EEvent::Damaged, Seq);
   BoardActor->PlayFighterHitFx(FighterId, TintMs / 1000.0f, /*bDamage=*/true);
+  S08FxHit(FighterId, Seq, DueMs >= 0);  // VS-6 F2 FX-21 / FX-23: the hit star at C+70 (the FX capture hook)
   PlayHitSound(FighterId, Seq, DueMs);  // DE-032 (SD-51 p. 2): the hit sound in the same (contact) frame
 }
 
@@ -1480,7 +1487,11 @@ void AS08FlowGameMode::RunCombatEvents(const TArray<FS09CombatStageEvent>& Event
         RefreshShownFighters(true);
         FallSeq = -1;
         break;
+      case ES09CombatEvent::Block:
+        S08FxBlock(In.TargetId, In.Seq);  // VS-6 F2 FX-23 (ВР-FX05): damage 0 - the cream rim of the target only
+        break;
       case ES09CombatEvent::End:
+        S08FxCombatEnd(In.Seq);  // VS-6 F2 FX-25 (ВР-FX13): the heal of this combat shows at its end
         RefreshShownFighters(true);
         bCombatOutcomeShown = false;
         RefreshHud();
@@ -7524,6 +7535,7 @@ void AS08FlowGameMode::BuildArtHudWidgets(const TSharedRef<SConstraintCanvas>& C
       ArtHudWidgets.Add(Damage);
       Damage->SetVisibility(ESlateVisibility::Collapsed);
       ArtHud.DamageWidget = Damage;
+      Damage->SetV2(UmWorldDamage::DamageV2());  // VS-6 F2 FX-22: the «−N» / «+N» capsules (rollback -S08SlateHud=damage)
       Canvas->AddSlot()
           .Anchors(FAnchors(0.0f, 0.0f))
           .Alignment(FVector2D(0.0f, 0.0f))
@@ -8193,7 +8205,7 @@ void AS08FlowGameMode::UpdateBoardLabels(bool bActive, const FString& IconTarget
   FS08ScreenRect DamageRect;
   FString DamageCandidate = TEXT("none");
   if (!DamageId.IsEmpty() && ArtHud.DamageWidget) {
-    ArtHud.DamageWidget->ApplyAmount(S08ArtHudText::DamageNumber(DamageAmount));
+    S08FxShowNumber(*ArtHud.DamageWidget, DamageId, DamageAmount, DamageSeq);  // VS-6 F2 FX-22 (Fx/S08FlowGameModeCombatFx.cpp)
     const FVector2D Desired = S08ArtHudPrepassSize(*ArtHud.DamageWidget);
     const int32 TagIndex = SlotOf(DamageId);
     FS08ScreenRect Anchor = TagIndex != INDEX_NONE ? ArtHud.Tags[TagIndex].Planned : FS08ScreenRect();
@@ -8220,10 +8232,15 @@ void AS08FlowGameMode::UpdateBoardLabels(bool bActive, const FString& IconTarget
       // t53 damage.binding: the number reads as the target's - its centre nearer the target figure than any other
       In.BindTarget = TargetFigure;
       In.BindOthers = OthersOf(DamageId);
-      const S08ArtHud::FLabelPlacementResult R = S08ArtHud::ChooseLabelRect(In);
-      DamageRect = R.Rect;
-      DamageCandidate = R.Candidate + FString::Printf(TEXT(" ring=%d hardPx2=%.0f softPx2=%.0f"), R.Ring, R.HardArea,
-                                                      R.SoftArea);
+      // VS-6 F2 FX-22: above the figure (FigureScreenRect), else the W5b-R chooser
+      if (ArtHud.DamageWidget->GetV2() && UmWorldDamage::AboveFigure(TargetFigure, In.Size, ViewportPx, Hard, DamageRect)) {
+        DamageCandidate = TEXT("above-figure");
+      } else {
+        const S08ArtHud::FLabelPlacementResult R = S08ArtHud::ChooseLabelRect(In);
+        DamageRect = R.Rect;
+        DamageCandidate = R.Candidate + FString::Printf(TEXT(" ring=%d hardPx2=%.0f softPx2=%.0f"), R.Ring, R.HardArea,
+                                                        R.SoftArea);
+      }
       if (!DamageRect.IsEmpty()) Hard.Add(DamageRect);
     }
   }
