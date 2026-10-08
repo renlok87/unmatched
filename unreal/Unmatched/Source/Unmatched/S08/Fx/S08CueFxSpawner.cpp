@@ -60,9 +60,9 @@ bool US08CueFxSpawnerComponent::Prewarm() {
       int32 N = 0;
       for (const TWeakObjectPtr<UNiagaraComponent>& C : Pass) {
         if (!C.IsValid()) continue;
-        C->DeactivateImmediate();
-        C->DestroyComponent();
+        C->DeactivateImmediate();  // completes the system: an auto-destroy component is destroyed right here
         ++N;
+        if (C.IsValid()) C->DestroyComponent();
       }
       FS08Trace::Write(FString::Printf(TEXT("FX prewarm pass ended components=%d"), N));
     }), 0.5f, false);
