@@ -1,0 +1,18 @@
+{
+ "schema": "unmatched.visual-evidence-index/1",
+ "id": "SC-31",
+ "date": "2026-10-08",
+ "rule": "ВР-VS4-01: frames with card scans / avatars / board art stay in scraped-data (gitignored); in git only JPEG crops without scans or avatars",
+ "root": "scraped-data/derived/visual-evidence (relative to the checkout; copies in the main checkout and C:/tmp/wt-visual)",
+ "source": "VS-7 S5: UnrealEditor -game (editor build, worktree C:/tmp/wt-visual), one client on the main backend :3000; s5c with the delay proxy (S10_WS_DROP_AT_MS 15000, S10_WS_DOWN_MS 52000) and room_actor.cjs as the host; s5e / s5g -Bench -BenchResult; -S08EndDrive review tooling; runs C:/tmp/visual/VS7/runs/<run>",
+ "status": "editor-build, not acceptance (the packaged set F with RENDER and the sheets belong to the Frames step)",
+ "files": [
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-31/reconnect-auto-720p-100-s5c.png",
+   "sha256": "e704fd98d8932242b83617a5aca34c47f37a8936b1fa08a7d75f224761634c5f",
+   "bytes": 963516,
+   "run": "s5c",
+   "shows": "auto: Sarpedon original 1x1 guest (King Arthur), the WS dropped by the proxy; «Соединение потеряно», «Переподключение… попытка 1 из 5», «Пропущено событий: 0», Running in two lines, «ВЫЙТИ В ЛОББИ» normal, no primary; the reconnecting icon; the frozen HUD (hand scans) under the 0.8 veil, the scene -30 % (CUE-017)"
+  }
+ ]
+}

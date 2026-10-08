@@ -1,0 +1,25 @@
+{
+ "schema": "unmatched.visual-evidence-index/1",
+ "id": "SC-33",
+ "date": "2026-10-08",
+ "rule": "ВР-VS4-01: frames with card scans / avatars / board art stay in scraped-data (gitignored); in git only JPEG crops without scans or avatars",
+ "root": "scraped-data/derived/visual-evidence (relative to the checkout; copies in the main checkout and C:/tmp/wt-visual)",
+ "source": "VS-7 S5: UnrealEditor -game (editor build, worktree C:/tmp/wt-visual), one client on the main backend :3000; s5c with the delay proxy (S10_WS_DROP_AT_MS 15000, S10_WS_DOWN_MS 52000) and room_actor.cjs as the host; s5e / s5g -Bench -BenchResult; -S08EndDrive review tooling; runs C:/tmp/visual/VS7/runs/<run>",
+ "status": "editor-build, not acceptance (the packaged set F with RENDER and the sheets belong to the Frames step)",
+ "files": [
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-33/reconnect-restoring-720p-100-s5c.png",
+   "sha256": "e3a8a2f820636faade09bf75a3dacdc7098733c214cdd16fe5b36a8b7f7bc83d",
+   "bytes": 1020174,
+   "run": "s5c",
+   "shows": "restoring after «Переподключить»: the spinner 32 su and «Загрузка состояния…», no buttons"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-33/reconnect-exit-toast-720p-100-s5c.png",
+   "sha256": "018e42a3964764be5cc2cabbaf59a8f47aca17bca40966a7e479a2071c9a03f9",
+   "bytes": 1824976,
+   "run": "s5c",
+   "shows": "exit: the card gone, the saturation back (CUE-018), the CONN chip online, the HB-40 toast «Позиции обновлены (пропущено 0)»"
+  }
+ ]
+}

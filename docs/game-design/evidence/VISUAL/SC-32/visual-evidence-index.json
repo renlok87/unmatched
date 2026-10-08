@@ -1,0 +1,18 @@
+{
+ "schema": "unmatched.visual-evidence-index/1",
+ "id": "SC-32",
+ "date": "2026-10-08",
+ "rule": "ВР-VS4-01: frames with card scans / avatars / board art stay in scraped-data (gitignored); in git only JPEG crops without scans or avatars",
+ "root": "scraped-data/derived/visual-evidence (relative to the checkout; copies in the main checkout and C:/tmp/wt-visual)",
+ "source": "VS-7 S5: UnrealEditor -game (editor build, worktree C:/tmp/wt-visual), one client on the main backend :3000; s5c with the delay proxy (S10_WS_DROP_AT_MS 15000, S10_WS_DOWN_MS 52000) and room_actor.cjs as the host; s5e / s5g -Bench -BenchResult; -S08EndDrive review tooling; runs C:/tmp/visual/VS7/runs/<run>",
+ "status": "editor-build, not acceptance (the packaged set F with RENDER and the sheets belong to the Frames step)",
+ "files": [
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-32/reconnect-manual-720p-100-s5c.png",
+   "sha256": "9f7ad1b331c84663f9ad273a9c9b9bc126ca775c6b2ed695cc7f87b4a8faee79",
+   "bytes": 976869,
+   "run": "s5c",
+   "shows": "manual after 50 s of loss: the X icon, no attempt line, «ВЫЙТИ В ЛОББИ» normal + «ПЕРЕПОДКЛЮЧИТЬ» the one primary"
+  }
+ ]
+}

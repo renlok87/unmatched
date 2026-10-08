@@ -1,0 +1,18 @@
+{
+ "schema": "unmatched.visual-evidence-index/1",
+ "id": "SC-35",
+ "date": "2026-10-08",
+ "rule": "ВР-VS4-01: frames with card scans / avatars / board art stay in scraped-data (gitignored); in git only JPEG crops without scans or avatars",
+ "root": "scraped-data/derived/visual-evidence (relative to the checkout; copies in the main checkout and C:/tmp/wt-visual)",
+ "source": "VS-7 S5: UnrealEditor -game (editor build, worktree C:/tmp/wt-visual), one client on the main backend :3000; s5c with the delay proxy (S10_WS_DROP_AT_MS 15000, S10_WS_DOWN_MS 52000) and room_actor.cjs as the host; s5e / s5g -Bench -BenchResult; -S08EndDrive review tooling; runs C:/tmp/visual/VS7/runs/<run>",
+ "status": "editor-build, not acceptance (the packaged set F with RENDER and the sheets belong to the Frames step)",
+ "files": [
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-35/gameover-defeat-720p-100-s5e.png",
+   "sha256": "4f44761ea122ccc769a860d15319b52dc0bcb1150d0a3e2e69ba0b61a0e9f032",
+   "bytes": 1013441,
+   "run": "s5e",
+   "shows": "defeat: -BenchResult=results -BenchResultLoser over the Sarpedon bench fixture (review tooling, fixture numbers: turn 1, no duration); «ПОРАЖЕНИЕ» state.error, «KING ARTHUR ПОБЕЖДАЕТ», the viewer Medusa at saturation 0 / 0.6 with the heart"
+  }
+ ]
+}

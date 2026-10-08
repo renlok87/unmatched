@@ -1,0 +1,25 @@
+{
+ "schema": "unmatched.visual-evidence-index/1",
+ "id": "SC-37",
+ "date": "2026-10-08",
+ "rule": "ВР-VS4-01: frames with card scans / avatars / board art stay in scraped-data (gitignored); in git only JPEG crops without scans or avatars",
+ "root": "scraped-data/derived/visual-evidence (relative to the checkout; copies in the main checkout and C:/tmp/wt-visual)",
+ "source": "VS-7 S5: UnrealEditor -game (editor build, worktree C:/tmp/wt-visual), one client on the main backend :3000; s5c with the delay proxy (S10_WS_DROP_AT_MS 15000, S10_WS_DOWN_MS 52000) and room_actor.cjs as the host; s5e / s5g -Bench -BenchResult; -S08EndDrive review tooling; runs C:/tmp/visual/VS7/runs/<run>",
+ "status": "editor-build, not acceptance (the packaged set F with RENDER and the sheets belong to the Frames step)",
+ "files": [
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-37/gameover-again-busy-720p-100-s5h.png",
+   "sha256": "56d7f1c20e95f4105756d8224aa8e39b833f9811734ed0c79bb776eb4500e746",
+   "bytes": 900297,
+   "run": "s5h",
+   "shows": "again.busy: Sarpedon VS_AI victory, «СОЗДАЁМ ПАРТИЮ…» with the spinner (normal body), the other buttons as they were; the backdrop is the menu scene after the leave"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-37/gameover-again-1080p-100-s5a.png",
+   "sha256": "cf536b8be2503ed39e0657172f0ccdc4470a55c970edee3d635e6765e25382b7",
+   "bytes": 2375270,
+   "run": "s5a",
+   "shows": "the press frame (state=again) of s5a, before the busy label fix (generic «Отправлено…» - fixed in s5h)"
+  }
+ ]
+}

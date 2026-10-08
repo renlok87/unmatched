@@ -440,6 +440,7 @@ y920┌PANEL-LOC┐       ▭▭▭▭▭▭▭ РУКА ▭▭▭▭▭▭▭  
   `hud.toast.reconnected`.
 - **Звук:** `UI-NET-LOST`, `UI-NET-BACK`.
 - **Гейт:** `SHOT widget id=UI-SCR-RECONNECT state=auto|manual|restoring`.
+- **Дельта VS-7 S5** (`evidence/VISUAL/SC-31`…`SC-33`, по делегированию): вход — край `FS08NetWatch::bLost` (тот же, что чип CONN и CUE-017); попытка n = 1 + время потери / 10 с, manual с 50 с, «Переподключить» — новый цикл + `RetryMatchLoad` (ВР-VS7-57); restoring — транспорт `acked`, состояние не сверено, или GD-037 дольше 300 мс (ВР-VS7-58); «Пропущено событий» во время обрыва — seq, применённые с потери (ВР-VS7-59); «Выйти в лобби» → «Партия останется на сервере.» → `DetachToLobby`, без `leaveGame` (ВР-VS7-56, ключ `screens.reconnect.leave.confirm`); expired — только если сессия умерла в партии, маршрут держит LOGIN до «Ко входу» (ВР-VS7-60); над GAMEOVER / ABORTED оверлея нет (ВР-VS7-61). Трасса `SHOT … state=auto|manual|restoring|expired attempt= missed= primary= card=<su>`, `RECONNECT state=… / exit ms=200`.
 
 ### 1.10 GAMEOVER — `UI-SCR-GAMEOVER`
 
@@ -471,6 +472,7 @@ y920┌PANEL-LOC┐       ▭▭▭▭▭▭▭ РУКА ▭▭▭▭▭▭▭  
   `.lobby`, `.again`.
 - **Звук:** `STG-WIN-<HERO>` / `STG-LOSE-<HERO>` (фолбэк `STG-WIN` / `STG-LOSE`) с появлением экрана.
 - **Гейт:** `SHOT widget id=UI-SCR-GAMEOVER state=victory|defeat|draw|board`.
+- **Дельта VS-7 S5** (`evidence/VISUAL/SC-34`…`SC-37`, по делегированию): появление 500 мс и кроссфейд 250 мс — часы `FS09ResultView` (ВР-VS7-62); чипы «Авто» — по партиям до этой (ВР-VS7-63); «Сыграть ещё» (VS_AI): `leaveGame` → `createGame(VS_AI, та же доска)` → `selectHero` → `toggleReady` → `startGame`, шаг ≤ 10 с, ошибка — тост `why.command.rejected`, маршрут не показывает LOBBY / ROOM до новой партии, ожидание — своя подпись со спиннером (ВР-VS7-64); новые состояния `board` (bbox полосы) и `again`, строка `HUD-LAYOUT … block=gameover.strip` (ВР-VS7-65); ключи `screens.result.board.turn`, `screens.result.again.busy`.
 
 ### 1.11 ABORTED — `UI-SCR-ABORTED` (новый ID)
 
@@ -483,6 +485,7 @@ y920┌PANEL-LOC┐       ▭▭▭▭▭▭▭ РУКА ▭▭▭▭▭▭▭  
 - **Строки:** `screens.aborted.title`, `.who`, `.turn`, `.lobby`.
 - **Звук:** `STG-ABORTED`.
 - **Гейт:** `SHOT widget id=UI-SCR-ABORTED state=shown`.
+- **Дельта VS-7 S5** (`evidence/VISUAL/SC-38`, по делегированию): имени вышедшего сервер не отдаёт — «Соперник покинул партию» (`screens.aborted.who.unknown`, ВР-SC13, ВР-VS7-66); «В лобби» / L / Enter — `ReturnToLobbyCommand` (ВР-VS7-67); трасса `SHOT … state=shown who=<named|unknown> turn=<n>`.
 
 ## 2. Блоки GAME
 
@@ -1266,6 +1269,10 @@ SHOT widget id=<UI-ID> impl=umg|slate state=<состояние> fighter=<id|non
 экран результата и лобби — по трассе `RESULT` и `UI-SCR-GAME state=over`, пока GAMEOVER и LOBBY на Slate.
 `run-vs-ai-demo`, `run-vs-ai-abort-demo` — с `-S09Markers` до UMG-экранов GAMEOVER / ABORTED (VS-7), `run-hud-demo` — без
 изменений. Лист — `docs/game-design/evidence/VISUAL/HB-48/`.
+Дельта VS-7 S5 (2026-10-08, по делегированию, ВР-VS7-68): `run-vs-ai-demo` — строка `SHOT widget id=UI-SCR-GAMEOVER` с
+состоянием исхода строки `RESULT` после `RESULT screen` и до `LEFT room=`; `run-vs-ai-abort-demo` — строка `SHOT widget
+id=UI-SCR-ABORTED state=shown` раньше снимка доказательства и ни одной строки GAMEOVER; ключ `-S09Markers` — откат на пиксели
+(пиксельные проверки лобби — только с ним). Листы — `docs/game-design/evidence/VISUAL/SC-34/`, `SC-38/`.
 
 ## 6. Локализация
 

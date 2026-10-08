@@ -1,0 +1,25 @@
+{
+ "schema": "unmatched.visual-evidence-index/1",
+ "id": "SC-36",
+ "date": "2026-10-08",
+ "rule": "ВР-VS4-01: frames with card scans / avatars / board art stay in scraped-data (gitignored); in git only JPEG crops without scans or avatars",
+ "root": "scraped-data/derived/visual-evidence (relative to the checkout; copies in the main checkout and C:/tmp/wt-visual)",
+ "source": "VS-7 S5: UnrealEditor -game (editor build, worktree C:/tmp/wt-visual), one client on the main backend :3000; s5c with the delay proxy (S10_WS_DROP_AT_MS 15000, S10_WS_DOWN_MS 52000) and room_actor.cjs as the host; s5e / s5g -Bench -BenchResult; -S08EndDrive review tooling; runs C:/tmp/visual/VS7/runs/<run>",
+ "status": "editor-build, not acceptance (the packaged set F with RENDER and the sheets belong to the Frames step)",
+ "files": [
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-36/gameover-board-1080p-100-s5a.png",
+   "sha256": "0e5bc6ed20f2092cc0b83afc558b945e828a75f731aa0fd9af7d14d0c3f22820",
+   "bytes": 3871133,
+   "run": "s5a",
+   "shows": "board: the modal and the veil gone (250 ms), the strip 520x56 «ХОД 19 · ПОБЕДА», «К ИТОГАМ» V, «В ЛОББИ» Enter; HUD-LAYOUT overlapField=0"
+  },
+  {
+   "path": "scraped-data/derived/visual-evidence/SC-36/gameover-board-720p-100-s5g.png",
+   "sha256": "2304c21093665415849ad0dcbad778a2bbf267641c52ea295ab19c735c6e3d3d",
+   "bytes": 1776119,
+   "run": "s5g",
+   "shows": "board on Sarpedon at 720p (bench, VS-6 leftover 8: the RU strip replaces «FINAL BOARD · VICTORY»); overlapField=0"
+  }
+ ]
+}
