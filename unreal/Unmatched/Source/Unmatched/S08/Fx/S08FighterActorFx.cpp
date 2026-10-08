@@ -13,7 +13,7 @@ bool AS08FighterActor::BenchDissolveAt(float Progress) {
   for (int32 Slot = 0; Slot < ArtBody->GetNumMaterials(); ++Slot) ArtBody->SetMaterial(Slot, Mic);
   ApplyHeroMaterialMids();  // AN-32: the fix rides the dissolve MIC too
   SetDissolve(ArtBody, ArtBase, FMath::Clamp(Progress, 0.0f, 1.0f), DissolveStyle());
-  // a figure gone (progress 1) shows nothing but its embers; the pedestal greys out with the progress like the death
-  SetActorHiddenInGame(Progress >= 1.0f);
+  // progress 1 clips every pixel of the body (the pedestal greys out with the progress like the death); the actor stays
+  // visible so the K2 bench view keeps its framing on the figure's cell
   return true;
 }
