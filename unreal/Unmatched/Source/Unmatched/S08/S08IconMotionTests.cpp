@@ -93,8 +93,9 @@ bool FS08IconMotionLoadTest::RunTest(const FString& Parameters) {
   // IC-55 log glyph).
   // VS-4 V3: 8 zone icons (IC-62...IC-69, Codex IC-37 forms): body / disc / glyph, the disc tint "zone", the glyph "ink".
   // VS-6 F2: + state-heal (IC-49, the «+» of a heal under reduced motion; appear / leave opacity 100 ms).
-  TestEqual(TEXT("54 icons in order"), Lib.Order.Num(), 54);
-  TestEqual(TEXT("54 icon definitions"), Lib.Icons.Num(), 54);
+  // VS-7 S3: + ui-check (IC-57, the «✓» of ready and of the room board; a static glyph).
+  TestEqual(TEXT("55 icons in order"), Lib.Order.Num(), 55);
+  TestEqual(TEXT("55 icon definitions"), Lib.Icons.Num(), 55);
   for (const TCHAR* Zone : {TEXT("zone-gray"), TEXT("zone-green"), TEXT("zone-blue"), TEXT("zone-violet"), TEXT("zone-purple"),
                             TEXT("zone-red"), TEXT("zone-brown"), TEXT("zone-yellow")}) {
     const FS08IconMotionDef* Z = Lib.Find(FName(Zone));
@@ -770,7 +771,7 @@ bool FS08IconMotionGalleryIdsTest::RunTest(const FString& Parameters) {
       ++Listed;
     }
   }
-  TestEqual(TEXT("26 VR44 (VS-4 V3: + 8 zone icons; VS-6 F2: + state-heal) + 4 DE-012 + 1 candidate"), Listed, 31);
+  TestEqual(TEXT("27 VR44 (VS-4 V3: + 8 zone icons; VS-6 F2: + state-heal; VS-7 S3: + ui-check) + 4 DE-012 + 1 candidate"), Listed, 32);
   return true;
 }
 

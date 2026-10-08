@@ -552,6 +552,9 @@ ACCEPTED_VR44_ICONS["state-heal"] = {
             "reduced": {"duration_ms": 100, "tracks": [{"target": "all", "prop": "opacity", "keys": [[0, None, "linear"], [100, 0.0, "constant"]]}]},
             "note": "уход с капсулой: opacity тек. → 0 за 100 мс"}},
     "demo": [["appear"], ["wait", 500], ["leave"]]}
+# VS-7 S3 (IC-57, ВР-IC10, по делегированию): «✓» готовности и выбора (ROOM «ГОТОВ ✓», доска комнаты); своего движения
+# нет — стандартные appear 180 / leave 120 для импорта и галереи, состояния даёт UUmButton
+ACCEPTED_VR44_ICONS["ui-check"] = static_icon("ui-check", "глиф «✓» готовности и выбора (IC-57): состояния даёт UUmButton")
 ICONS.update(ACCEPTED_VR44_ICONS)
 ACCEPTED_VR44 = list(ACCEPTED_VR44_ICONS)
 # IC-33 (02 §3.2 ВР-62, §5.3): экранные размеры текстур записи в UE — набор экспортов под DPI и масштаб UI вместо mip:
@@ -585,7 +588,8 @@ def contract():
         # 2026-10-06 (VS-2 A3): ещё 4 записи — action-end-turn, card-drop, marker-slot-discard, ui-log (формы Codex IC-36)
         # 2026-10-07 (VS-4 V3): 8 значков зон zone-<ключ> (IC-62…IC-69, формы Codex IC-37), слои tint zone / ink
         # 2026-10-08 (VS-6 F2): state-heal (IC-49) — «+» лечения при reduced motion, appear / leave прозрачностью 100 мс
-        "revision": "icon-motion-2026-10-08-vr44-heal",
+        # 2026-10-08 (VS-7 S3): ui-check (IC-57) — «✓» готовности и выбора, статичный значок
+        "revision": "icon-motion-2026-10-08-vr44-check",
         "status": "предложено",
         "source": "docs/unreal/contracts/hud/ICON-MOTION-PLAN.md; art/imagegen/hud-icons-v3/STYLE-v3.md §7; генератор art/imagegen/hud-icons-v3/_tools/motion_contract.py",
         "units": {"t": "ms", "canvas": "u (32 u = сторона значка; плашки 64 × 32)", "tx/ty": "u", "rotate": "градусы по часовой",
@@ -605,7 +609,7 @@ def contract():
         "candidates": CANDIDATES,
         "candidates_note": "кандидаты DE-012 до арт-приёмки пользователя (кольцо цвета команды — AB-5 выбрал тёплое): только галерея -S08IconGallery, HUD их не использует",
         "accepted_vr44": ACCEPTED_VR44,
-        "accepted_vr44_note": "IC-33 (ВР-IC14): принятые после ревью строки значки набора VR44 (02 §5.5); кандидаты VR44 в контракт не входят; VS-2 A2 (2026-10-06): IC-38…IC-56 приняты по делегированию (листы docs/game-design/evidence/VISUAL/IC-NN/), курсоры IC-58…IC-61 — вне контракта (HB-12); VS-2 A3 (2026-10-06): IC-46, IC-48, IC-52, IC-55 — формы Codex IC-36 (вектор A), по делегированию; VS-4 V3 (2026-10-07): IC-62…IC-69 значки зон — формы Codex IC-37 (вариант A), по делегированию; VS-6 F2 (2026-10-08): IC-49 «+» лечения state-heal, по делегированию (ВР-VS6-20); tint zone — диск цветом профиля доски, tint ink — глиф card.navy / card.glyph по контрасту",
+        "accepted_vr44_note": "IC-33 (ВР-IC14): принятые после ревью строки значки набора VR44 (02 §5.5); кандидаты VR44 в контракт не входят; VS-2 A2 (2026-10-06): IC-38…IC-56 приняты по делегированию (листы docs/game-design/evidence/VISUAL/IC-NN/), курсоры IC-58…IC-61 — вне контракта (HB-12); VS-2 A3 (2026-10-06): IC-46, IC-48, IC-52, IC-55 — формы Codex IC-36 (вектор A), по делегированию; VS-4 V3 (2026-10-07): IC-62…IC-69 значки зон — формы Codex IC-37 (вариант A), по делегированию; VS-6 F2 (2026-10-08): IC-49 «+» лечения state-heal, по делегированию (ВР-VS6-20); VS-7 S3 (2026-10-08): IC-57 «✓» ui-check, по делегированию; tint zone — диск цветом профиля доски, tint ink — глиф card.navy / card.glyph по контрасту",
         "ue_sizes_note": "IC-33 (02 §3.2 ВР-62, §5.3): экранные размеры текстур записи в UE (T_IV3_<id>_<px>, без mip); 18 и 36 — значок 24 su при DPI 0,75 и при 150 %; варианты берут набор основного значка",
         "order": ORDER,
         "icons": {k: dict(ICONS[k], ue_sizes=list(UE_SIZES.get(k, UE_SIZES_DEFAULT))) for k in ORDER},

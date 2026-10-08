@@ -1508,6 +1508,45 @@ def draw_ui_close(ctx, sp: Spec):
     glyph(ctx, sp, 16.0, 16.0, lambda: g_x(ctx, sp, half=6.0, w=sp.W, col=C["white"]))
 
 
+CHECK_PTS_U = ((-6.0, 0.5), (-2.0, 4.75), (7.0, -5.5))   # IC-57: ломаная «✓» от центра, u
+CHECK_W_U = 2.75                                         # IC-57: штрих, u
+
+
+def g_check(ctx, sp: Spec, col=None):
+    """«✓» (IC-57, ВР-IC10): ломаная CHECK_PTS_U штрихом CHECK_W_U (снэп к целым px), стык miter, концы плоские;
+    keyline 1 u офсетом — та же ломаная, продлённая на K по обоим концам, штрих W + 2 K."""
+    w = sp.pxu(CHECK_W_U)
+    pts = [(x, y) for x, y in CHECK_PTS_U]
+
+    def stroke(points, width, c):
+        ctx.set_line_join(cairo.LINE_JOIN_MITER)
+        ctx.set_miter_limit(10.0)
+        ctx.set_line_cap(cairo.LINE_CAP_BUTT)
+        ctx.set_line_width(width)
+        ctx.move_to(*points[0])
+        for p in points[1:]:
+            ctx.line_to(*p)
+        rgb(ctx, c)
+        ctx.stroke()
+
+    def extend(a, b, d):
+        """точка a, сдвинутая на d от b (продление конца отрезка b→a)."""
+        dx, dy = a[0] - b[0], a[1] - b[1]
+        n = math.hypot(dx, dy) or 1.0
+        return (a[0] + dx / n * d, a[1] + dy / n * d)
+
+    k = sp.K
+    outer = [extend(pts[0], pts[1], k), pts[1], extend(pts[2], pts[1], k)]
+    stroke(outer, w + 2 * k, C["keyline"])
+    stroke(pts, w, col or C["white"])
+
+
+def draw_ui_check(ctx, sp: Spec):
+    """«✓» готовности и выбора (IC-57): голый глиф, белая маска (UMG красит card.glyph, на главной — card.navy); не
+    зелёный и не в круге (И-3, И-10)."""
+    glyph(ctx, sp, 16.0, 16.0, lambda: g_check(ctx, sp, col=C["white"]))
+
+
 HEAL_BAR_U = (16.0, 4.5)   # IC-49: длина и толщина планки «+», u
 
 
@@ -2041,6 +2080,8 @@ ACCEPTED_VR44: dict = {
     **{f"zone-{k}": (draw_zone, {"key": k}, False) for k in ZONE_KEYS},
     # VS-6 F2: «+» лечения IC-49 (ВР-67) — лист приёмки docs/game-design/evidence/VISUAL/IC-49/, ВР-VS6-20
     "state-heal": (draw_state_heal, {}, False),
+    # VS-7 S3: «✓» готовности и выбора IC-57 (ВР-IC10) — лист приёмки docs/game-design/evidence/VISUAL/IC-57/
+    "ui-check": (draw_ui_check, {}, False),
 }
 # варианты id набора VR44 (как marker-status-p2): та же геометрия, для листов, галереи и запасного вида без тона
 VARIANTS_VR44 = {

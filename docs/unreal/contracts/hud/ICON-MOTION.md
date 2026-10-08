@@ -184,6 +184,8 @@
 | `zone-yellow` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
 | `state-heal` | appear | enter | 100 | — | all.opacity — «+» лечения (IC-49): рядом с «+N» в капсуле card.navy при reduced motion, когда точек VFX нет (FX-24); opacity 0 → 1 за 100 мс | all.opacity 100 мс |
 | `state-heal` | leave | exit | 100 | — | all.opacity — уход с капсулой: opacity тек. → 0 за 100 мс | all.opacity 100 мс |
+| `ui-check` | appear | enter | 180 | — | all.opacity; all.scale — «кладут на стол»: 0,80 → 1,04 → 1,00; кадр 0 не пустой (opacity 0,15); глиф «✓» готовности и выбора (IC-57): состояния даёт UUmButton | all.opacity 100 мс |
+| `ui-check` | leave | exit | 120 | — | all.opacity; all.scale — opacity → 0, scale → 0,92 | all.opacity 100 мс |
 
 Варианты того же id играют анимации основного значка: `resource-hp-full-enemy` → `resource-hp-full`, `marker-status-p1` → `marker-status`, `marker-status-p2` → `marker-status`, `badge-order-p2` → `badge-order`.
 
