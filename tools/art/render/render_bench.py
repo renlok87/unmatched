@@ -25,8 +25,10 @@ flags -ArtPreviewHeroesV2 -ArtPreviewDiorama (an older package still reads them)
   dx12-lumen-high-v2-fps60  the same capped at 60 FPS (-BenchFps=60): effective FPS of one client
   dx12-lumen-high-v2-nohero the v2 reference without the ENV-MAPS P9 hero light (-NoHeroLight): gate H5 (its cost)
   dx12-lumen-high-v2-dissolve-fade / -dissolve-ash  DE-019 G-COST (DE-011 FX): the v2 reference with every v2 figure
-                       frozen half way through the death dissolve (-BenchDissolve=0.5; ash adds -S08DissolveAsh) - six
-                       dissolving figures, a worst case (a live death dissolves one); compare with dx12-lumen-high-v2
+                       frozen half way through the death dissolve (-BenchDissolve=0.5) - six dissolving figures, a worst
+                       case (a live death dissolves one); compare with dx12-lumen-high-v2. Since ВР-13 (VS-6 F3, FX-27)
+                       the ash is the default: the fade variant passes the rollback -S08DissolveFade, the ash one the
+                       empty alias -S08DissolveAsh
   dx12-lumen-high-vsm  same + r.Shadow.Virtual.Enable 1 (VSM instead of the profile CSM)
   dx12-lumen-high-csmdefault  profile CSM block removed (engine default 40000 uu / 4 cascades)
   dx11-legacy          -dx11 -S08LegacyRender + profile rev 1 (Unitless points + point fill, no sky,
@@ -137,13 +139,14 @@ def _variant_args(name: str, out: Path) -> tuple[list[str], list[str], dict]:
                 {"heroesV2": True, "diorama": True, "heroLight": "off (-NoHeroLight)", "profiles": "pak rev 2"})
     if name in ("dx12-lumen-high-v2-dissolve-fade", "dx12-lumen-high-v2-dissolve-ash"):
         # DE-019 G-COST (DE-011 FX, review A04): the dissolve MIC (Masked) on all six v2 figures at progress 0.5 - the
-        # pass cost of the death dissolve, fade (the default) and the ash candidate (-S08DissolveAsh)
+        # pass cost of the death dissolve: the ash (the default since ВР-13, -S08DissolveAsh is its empty alias) and the
+        # fade rollback (-S08DissolveFade, FX-27)
         ash = name.endswith("-ash")
         args = ["-S08RenderPreset=High", "-ArtPreviewHeroesV2", "-ArtPreviewDiorama", "-BenchDissolve=0.5"]
-        if ash:
-            args.append("-S08DissolveAsh")
+        args.append("-S08DissolveAsh" if ash else "-S08DissolveFade")
         return (args, [], {"heroesV2": True, "diorama": True, "dissolve": "0.5 on six v2 figures (worst case)",
-                           "dissolveStyle": "ash (-S08DissolveAsh)" if ash else "fade", "profiles": "pak"})
+                           "dissolveStyle": "ash (default, -S08DissolveAsh alias)" if ash else "fade (-S08DissolveFade)",
+                           "profiles": "pak"})
     if name == "dx12-lumen-high-v2-moveplates":
         # MS-T-08 / MS-AT-41 (docs/game-design/move-selection 04 §7): the v2 reference plus the move-selection plates
         # over a -BenchMoveDraft scene (--move-draft, absolute; run_one adds it); compare with dx12-lumen-high-v2 on the

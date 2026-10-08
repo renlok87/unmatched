@@ -89,6 +89,18 @@ def fighter_clip(spec, subject):
     return None
 
 
+def hero_entry(by_hero, subject):
+    """VS-6 F3 FX-28: запись героя vfx.by_hero для субъекта трассы (arthur → KingArthur, medusa → Medusa) или None."""
+    s = re.sub(r"[^a-z]", "", (subject or "").lower())
+    if len(s) < 3 or not by_hero:
+        return None
+    for key, entry in by_hero.items():
+        k = key.lower()
+        if s == k or k.endswith(s) or s.startswith(k):
+            return entry
+    return None
+
+
 def _num(text):
     parts = text.strip().split()
     return int(parts[0]) if parts and parts[0].isdigit() else None
@@ -230,7 +242,7 @@ def validate_table(table, schema=None, csv07=CSV07, rig_contract=RIG_CONTRACT, c
             a = c.get(ch)
             if not a:
                 continue
-            path = a.get(key) or a.get("sequence_by_fighter")
+            path = a.get(key) or a.get("sequence_by_fighter") or a.get("by_hero")
             if a["status"] == "present" and not path:
                 errors.append("%s: %s.status present без пути %s" % (cid, ch, key))
             # FX-01: vfx.system при missing — плановый путь системы (ассет делает строка fx_row); у звука и клипа путь
@@ -238,8 +250,10 @@ def validate_table(table, schema=None, csv07=CSV07, rig_contract=RIG_CONTRACT, c
             if a["status"] == "missing" and path and ch != "vfx":
                 errors.append("%s: %s.status missing, но путь задан" % (cid, ch))
             if ch == "vfx" and a["status"] == "present" and path and content_dir and Path(content_dir).is_dir():
-                if not content_file(path, content_dir).is_file():
-                    errors.append("%s: vfx.status present, но нет ассета %s (FX-01: present только у существующего)" % (cid, path))
+                # VS-6 F3 FX-28: у строки с полем героя (by_hero) проверяется система каждого героя
+                for soft in ([a[key]] if a.get(key) else []) + [e["system"] for e in (a.get("by_hero") or {}).values()]:
+                    if not content_file(soft, content_dir).is_file():
+                        errors.append("%s: vfx.status present, но нет ассета %s (FX-01: present только у существующего)" % (cid, soft))
             if content_dir and Path(content_dir).is_dir():
                 for fighter, soft in (a.get("sequence_by_fighter") or {}).items():
                     if not content_file(soft, content_dir).is_file():
@@ -247,6 +261,13 @@ def validate_table(table, schema=None, csv07=CSV07, rig_contract=RIG_CONTRACT, c
         v = c.get("vfx")
         if v and v["attach"] == "socket" and v["socket"] not in sockets:
             errors.append("%s: сокет %s не из контракта рига (%s)" % (cid, v["socket"], sorted(sockets)))
+        for hero, entry in ((v or {}).get("by_hero") or {}).items():
+            if v["attach"] != "socket":
+                errors.append("%s: by_hero.%s при vfx.attach %s (поле героя — сокет)" % (cid, hero, v["attach"]))
+            if entry["socket"] not in sockets:
+                errors.append("%s: by_hero.%s сокет %s не из контракта рига" % (cid, hero, entry["socket"]))
+            if tasks and entry["fx_row"] not in tasks:
+                errors.append("%s: by_hero.%s fx_row %s нет в %s" % (cid, hero, entry["fx_row"], Path(vfx_tasks).name))
         if v and v["attach"] == "world" and v.get("socket"):
             errors.append("%s: vfx.attach world с сокетом %s" % (cid, v["socket"]))
         # FX-01: строка с vfx ссылается на строку vfx.csv, которая делает систему; причина missing называет её
@@ -315,6 +336,9 @@ class ReferenceDispatcher:
         # FX-01: vfx.system при status missing — плановый путь (ассета ещё нет), показ остаётся fallback
         planned = channel == "vfx" and spec.get("status") != "present"
         path = self.present.get(cid, {}).get(channel) or (spec.get(key) if channel != "sfx" and not planned else None)
+        if not path and channel == "vfx" and not planned:
+            hero = hero_entry(spec.get("by_hero"), subject)  # VS-6 F3 FX-28: система героя
+            path = hero["system"] if hero else None
         if not path and channel == "clip":
             path = fighter_clip(spec, subject)
         if not path or path in self.unloadable:
@@ -420,7 +444,7 @@ class ReferenceDispatcher:
             per_cue = row["replace_scope"] == "cue"
             self._cut(lambda i: i["id"] == cid and (per_cue or i["subject"] == subject), t, cut)
         dur, reduced = self._duration(row, event)
-        vfx, clip = self._asset(cid, "vfx"), self._asset(cid, "clip", subject)
+        vfx, clip = self._asset(cid, "vfx", subject), self._asset(cid, "clip", subject)
         sfx = self._asset(cid, "sfx")
         if sfx not in ("none", "missing"):
             conc = row["sfx"]["concurrency"]
@@ -442,6 +466,9 @@ class ReferenceDispatcher:
         mat = (row.get("material") or {}).get("cpd_param", "none")
         v = row.get("vfx")
         socket = v["socket"] if v and v["attach"] == "socket" else "-"
+        hero = hero_entry((v or {}).get("by_hero"), subject) if socket != "-" else None
+        if hero:
+            socket = hero["socket"]  # VS-6 F3 FX-28: сокет — поле героя
         result = "fallback" if "missing" in (vfx, sfx, clip) else "spawned"
         self.lines.append(head + " vfx=%s sfx=%s clip=%s mat=%s socket=%s reduced=%d result=%s"
                           % (vfx, sfx, clip, mat, socket, int(reduced), result))
@@ -702,6 +729,9 @@ def check_trace(lines, table):
     d_errors, d_summary = check_death(lines)
     errors.extend(d_errors)
     summary.update(d_summary)
+    a_errors, a_summary = check_ability(lines, starts)
+    errors.extend(a_errors)
+    summary.update(a_summary)
     s_errors, s_summary = check_sound(lines, table)
     errors.extend(s_errors)
     summary.update(s_summary)
@@ -1326,6 +1356,87 @@ def check_catchup(lines):
 DEATH_RE = re.compile(r"(CUE death\b.*)$")
 RESULT_SCREEN_RE = re.compile(r"(RESULT screen\b.*)$")
 DEATH_STAGES = ("fall", "mark", "dissolve", "gone")
+ABILITY_RE = re.compile(r"(CUE ability seq=.*)$")
+ABILITY_STAGES = ("start", "contact", "minus", "hp", "fall", "end")
+ABILITY_START_NEED = ("seq", "t", "hero", "fighter", "target", "damage", "lethal", "reduced")
+ABILITY_MS = {"contact": 454, "contact_reduced": 100, "minus": 60, "hp": 80, "fall": 450, "show": 800,
+              "tolerance": 17}
+
+
+def check_ability(lines, cue_starts=()):
+    """A1 (VS-6 F3 FX-30, ВР-FX11): постановка взгляда Medusa `CUE ability …` — одна на seq, этапы start → contact →
+    minus → hp → [fall] → end; contact = start + 454 (reduced motion + 100), «−N» +60, HP +80, падение +450 тогда и только
+    тогда, когда lethal=1 (±17 мс); CUE-014 героя (subject=fighter) показан в кадр start, CUE-011 цели — в кадр контакта;
+    конец не раньше HP (и падения). Прерванная (cut≠0) — только порядок. A2 — постановок меньше --min-ability."""
+    errors = []
+    by_seq, order = {}, []
+    for n, raw in enumerate(lines, 1):
+        m = ABILITY_RE.search(raw)
+        if not m:
+            continue
+        f = _fields(m.group(1), 2)
+        stage, t = f.get("stage"), _int_or_none(f.get("t"))
+        if f.get("seq") is None or stage not in ABILITY_STAGES or t is None:
+            errors.append(("A1", "строка %d: CUE ability без seq/stage/t или этап %s" % (n, stage)))
+            continue
+        f["_n"], f["_t"] = n, t
+        if f["seq"] not in by_seq:
+            by_seq[f["seq"]] = []
+            order.append(f["seq"])
+        by_seq[f["seq"]].append(f)
+    shows = {}
+    for inst in cue_starts:
+        shows.setdefault(inst["key"], inst)
+    tol = ABILITY_MS["tolerance"]
+    summary = {"ability_sets": 0, "ability_cut": 0}
+    for seq in order:
+        rows = by_seq[seq]
+        st = [r for r in rows if r["stage"] == "start"]
+        ends = [r for r in rows if r["stage"] == "end"]
+        if len(st) != 1 or len(ends) != 1:
+            errors.append(("A1", "seq %s: постановок взгляда %d, концов %d" % (seq, len(st), len(ends))))
+            continue
+        st, end = st[0], ends[0]
+        missing = [k for k in ABILITY_START_NEED if k not in st]
+        if missing:
+            errors.append(("A1", "seq %s: в start нет полей %s" % (seq, missing)))
+            continue
+        rank = -1
+        for r in rows:
+            k = ABILITY_STAGES.index(r["stage"])
+            if k < rank or r["_t"] < st["_t"]:
+                errors.append(("A1", "строка %d: этап %s не по порядку" % (r["_n"], r["stage"])))
+            rank = max(rank, k)
+        summary["ability_sets"] += 1
+        if end.get("cut", "0") != "0":
+            summary["ability_cut"] += 1
+            continue
+        one = {r["stage"]: r for r in rows}
+        reduced, lethal = st["reduced"] == "1", st["lethal"] == "1"
+        c = one.get("contact")
+        want_c = st["_t"] + (ABILITY_MS["contact_reduced"] if reduced else ABILITY_MS["contact"])
+        if not c or abs(c["_t"] - want_c) > tol:
+            errors.append(("A1", "seq %s: контакт t=%s ≠ start + %d" % (seq, c and c["_t"], want_c - st["_t"])))
+            continue
+        for name in ("minus", "hp"):
+            r = one.get(name)
+            if not r or abs(r["_t"] - c["_t"] - ABILITY_MS[name]) > tol:
+                errors.append(("A1", "seq %s: %s не через %d мс после контакта" % (seq, name, ABILITY_MS[name])))
+        fall = one.get("fall")
+        if lethal != (fall is not None) or (fall and abs(fall["_t"] - c["_t"] - ABILITY_MS["fall"]) > tol):
+            errors.append(("A1", "seq %s: падение %s при lethal=%s" % (seq, fall and fall["_t"], st["lethal"])))
+        if end["_t"] < c["_t"] + ABILITY_MS["hp"] or (lethal and end["_t"] < c["_t"] + ABILITY_MS["fall"]):
+            errors.append(("A1", "seq %s: конец t=%d раньше HP / падения" % (seq, end["_t"])))
+        s14 = shows.get(("CUE-014", st["fighter"], seq))
+        if s14 is None or s14["t"] != st["_t"]:
+            errors.append(("A1", "seq %s: CUE-014 героя %s не в кадр start" % (seq, st["fighter"])))
+        if int(st["damage"]) > 0:
+            s11 = shows.get(("CUE-011", st["target"], seq))
+            if s11 is None or s11["t"] != c["_t"]:
+                errors.append(("A1", "seq %s: CUE-011 цели %s не в кадр контакта" % (seq, st["target"])))
+    return errors, summary
+
+
 DEATH_FALL_NEED = ("fighter", "hero", "staged", "settle", "still", "dissolve", "style", "gone")
 RESULT_NEED = ("seq", "t", "due", "gameOver", "heroGone", "wait")
 DEATH_MS = {  # 01 F-09 при скорости ×1 (CUE-DISPATCHER.md §3.1): от кадра контакта
@@ -1541,6 +1652,8 @@ def main(argv=None):
                    help="C9: не меньше N строк эффекта в завершённых постановках боя (журнал сервера, R-02)")
     c.add_argument("--min-death", type=int, default=0,
                    help="DS6: не меньше N смертей `CUE death` (живая партия до GAME_OVER, DE-019/DE-031)")
+    c.add_argument("--min-ability", type=int, default=0,
+                   help="A2: не меньше N постановок взгляда Medusa `CUE ability` (живая партия, FX-30)")
     c.add_argument("--min-sound", type=int, default=0,
                    help="AU10: не меньше N строк `CUE sound` (живой прогон со звуком точек синхронизации, DE-032)")
     a = ap.parse_args(argv)
@@ -1573,6 +1686,8 @@ def main(argv=None):
         errors.append(("C9", "строк эффекта в боях %d < %d" % (summary["combat_effect_lines"], a.min_effect_lines)))
     if summary["death_sets"] < a.min_death:
         errors.append(("DS6", "смертей %d < %d" % (summary["death_sets"], a.min_death)))
+    if summary["ability_sets"] < a.min_ability:
+        errors.append(("A2", "постановок взгляда %d < %d" % (summary["ability_sets"], a.min_ability)))
     if summary["sounds"] < a.min_sound:
         errors.append(("AU10", "строк CUE sound %d < %d" % (summary["sounds"], a.min_sound)))
     for code, text in errors:

@@ -1,0 +1,63 @@
+{
+ "schema": "unmatched.cue-fixture/1",
+ "id": "ability-medusa-gaze",
+ "kind": "scenario",
+ "description": "FX-28 / FX-30 (VS-6 F3): снимок seq 40 разрешил pending ability-medusa-target-p0 Medusa (урон 1 Merlin). Постановка взгляда: CUE-014 на Medusa в кадр применения — система и сокет из поля героя (by_hero: NS_FX_MedusaVortex, socket=Root); CUE-011 Merlin из кадра контакта t0+454 (staged, со seq способности); тот же seq по второму каналу — duplicate; следующий ход (CUE-008 seq 41) не делает CUE-011 способности stale.",
+ "covers": [
+  "FX-28 поле героя",
+  "FX-30 ВР-FX11",
+  "D2",
+  "D3 staged",
+  "CUE-014 vfx socket Root"
+ ],
+ "events": [
+  {
+   "t": 0,
+   "kind": "cue",
+   "id": "CUE-014",
+   "subject": "medusa",
+   "seq": 40
+  },
+  {
+   "t": 16,
+   "kind": "cue",
+   "id": "CUE-014",
+   "subject": "medusa",
+   "seq": 40,
+   "channel": "ws"
+  },
+  {
+   "t": 300,
+   "kind": "cue",
+   "id": "CUE-008",
+   "subject": "arthur",
+   "seq": 41
+  },
+  {
+   "t": 454,
+   "kind": "cue",
+   "id": "CUE-011",
+   "subject": "merlin",
+   "seq": 40,
+   "staged": true
+  }
+ ],
+ "expect_trace": [
+  "CUE fx id=CUE-014 subject=medusa seq=40 t=0 vfx=NS_FX_MedusaVortex sfx=missing clip=none mat=none socket=Root reduced=0 result=fallback",
+  "CUE fx id=CUE-014 subject=medusa seq=40 t=16 result=duplicate",
+  "CUE fx id=CUE-008 subject=arthur seq=41 t=300 vfx=NS_FX_AttackChevrons sfx=missing clip=none mat=none socket=- reduced=0 result=fallback",
+  "CUE fx done id=CUE-008 subject=arthur seq=41 t=454 ms=154 cut=interrupt",
+  "CUE fx id=CUE-011 subject=merlin seq=40 t=454 vfx=NS_FX_HitStar sfx=missing clip=AM_Merlin_HitReact mat=FxFlash socket=- reduced=0 result=fallback",
+  "CUE fx done id=CUE-014 subject=medusa seq=40 t=800 ms=800 cut=0",
+  "CUE fx done id=CUE-011 subject=merlin seq=40 t=1354 ms=900 cut=0"
+ ],
+ "expect_summary": {
+  "presented": 3,
+  "spawned": 0,
+  "fallback": 3,
+  "duplicate": 1,
+  "stale": 0,
+  "done": 3,
+  "unique_triples": 3
+ }
+}

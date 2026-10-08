@@ -46,6 +46,8 @@
 #include "S08TurnPortraitWidget.h"
 #include "Fx/S08FieldFx.h"
 #include "Fx/S08CombatFx.h"
+#include "Fx/S08AbilityFx.h"
+#include "../S09/S09AbilityStage.h"
 #include "S08FlowGameMode.generated.h"
 
 struct FS08MoveDraftView;
@@ -1230,6 +1232,24 @@ private:
   void S08FxBenchCombatFinish();
   /** The FX capture hook of FX-17 (-S08FxShots / -S08ExitShots): the defense rim frame at its peak. */
   void S08FxDefenseShot(const FString& DefenderId);
+  // ---- VS-6 F3 death and ability FX (S08/Fx/S08AbilityFx.h, S09/S09AbilityStage.h; the adapter in
+  // S08/Fx/S08FlowGameModeAbilityFx.cpp) ----
+  FS08AbilityFxState AbilityFx;
+  /** FX-30: the staging of Medusa's gaze (its hold joins the combat hold in the fighter views). */
+  FS09AbilityStage AbilityStage;
+  /** FX-28 / FX-30: the AbilityTriggered cues of an applied seq start the gaze staging (before the damage cues). */
+  void S08FxAbilityCues(const TArray<FS08Cue>& Cues);
+  /** FX-30: the gaze staging owns this damage cue (presented at its contact, not at the snapshot). */
+  bool S08FxAbilityHoldsDamage(const FS08Cue& Cue) const;
+  /** FX-28 / FX-32: the combat staging's FlipAttack with Arthur's boost - CUE-014 and NS_FX_ArthurArc at Weapon. */
+  void S08FxAbilityOnCombatEvent(const FS09CombatStageEvent& Event);
+  /** The gaze staging, the embers of the dissolving figures (FX-26 / FX-27), the bench systems; once per frame. */
+  void S08FxAbilityTick();
+  void RunAbilityEvents(const TArray<FS09AbilityStageEvent>& Events);
+  bool S08FxBenchAbility(const FString& Mode, const TArray<FString>& Parts);
+  void S08FxBenchAbilityFinish();
+  /** -BenchFocusFighter=<id|KingArthur|Merlin|Medusa|Harpy>: the K2 views of the bench focus this fighter. */
+  FString S08FxBenchFocus(const TCHAR* Cmd, const FString& HeroId) const;
   // ---- VS-2 HB-06: the UMG HUD root, its layout / FIELD and the H2 layout fixes of the Slate blocks
   // (S08FlowGameModeUmHud.cpp; rollback -S08SlateHud[=<blocks>]) ----
   void BuildUmHud();

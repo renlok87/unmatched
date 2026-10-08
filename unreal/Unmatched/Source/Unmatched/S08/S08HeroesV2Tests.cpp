@@ -32,6 +32,8 @@
 #include "Materials/MaterialExpressionVectorParameter.h"
 #include "Misc/AutomationTest.h"
 #include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
+#include "S08IconMotion.h"
 #include "Misc/Paths.h"
 
 namespace S08HeroesV2Test {
@@ -464,7 +466,9 @@ bool FS08HeroesV2ActorTest::RunTest(const FString&) {
                   Spec->bHero ? 500 : 400);
         TestEqual(FString::Printf(TEXT("%s gone from the fall"), C.Name), FMath::RoundToInt(Plan.GoneSeconds() * 1000.0f),
                   Spec->bHero ? 1675 : 1275);
-        TestEqual(FString::Printf(TEXT("%s default style fade"), C.Name), Style, FString(TEXT("fade")));
+        // ВР-13 (AN-29 / FX-27): the ash death is the default; -S08DissolveFade / reduced motion keep the fade
+        TestEqual(FString::Printf(TEXT("%s default style"), C.Name), Style,
+                  FString(DissolveStyleName(DissolveStyle())));
       }
       const float DissolveStart = Plan.DissolveStartSeconds();
       Actor->AdvanceDeathForTest(DissolveStart - 0.01f);
@@ -671,7 +675,7 @@ bool FS08HeroesV2FxChannelsTest::RunTest(const FString&) {
 // UseDissolve (off by default, CPD 13 / 14 neutral at 0); every body MI has a Masked dissolve MIC that inherits it and
 // only switches the dissolve on; 500 / 400 ms; the fade is the default, the ash candidate only on request.
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08HeroesV2DissolveTest,
-    "Unmatched.S08.HeroesV2.Dissolve Masked dissolve MICs over the Opaque master, fade by default (DE-011)",
+    "Unmatched.S08.HeroesV2.Dissolve Masked dissolve MICs over the Opaque master, ash by default (DE-011, VR-13)",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FS08HeroesV2DissolveTest::RunTest(const FString&) {
   using namespace S08HeroesV2;
@@ -750,11 +754,11 @@ bool FS08HeroesV2DissolveTest::RunTest(const FString&) {
 #endif
     }
   }
-  // Style: the fade by default and under reduced motion; the ash candidate only on request.
-  TestTrue("default fade", DecideDissolveStyle(false, false) == EDissolveStyle::Fade);
+  // Style (ВР-13, AN-29): ash by default; the fade with -S08DissolveFade and under reduced motion.
+  TestTrue("default ash", DecideDissolveStyle(false, false) == EDissolveStyle::Ash);
   TestTrue("reduced motion fade", DecideDissolveStyle(false, true) == EDissolveStyle::Fade);
-  TestTrue("ash on request", DecideDissolveStyle(true, false) == EDissolveStyle::Ash);
-  TestTrue("reduced motion wins over the ash request", DecideDissolveStyle(true, true) == EDissolveStyle::Fade);
+  TestTrue("-S08DissolveFade fade", DecideDissolveStyle(true, false) == EDissolveStyle::Fade);
+  TestTrue("both fade", DecideDissolveStyle(true, true) == EDissolveStyle::Fade);
   TestEqual("style names", FString(DissolveStyleName(EDissolveStyle::Ash)), FString(TEXT("ash")));
   // One frame: progress clamped, style, pedestal CPD_Fade.
   USkeletalMeshComponent* BodyComp = NewObject<USkeletalMeshComponent>();
@@ -773,6 +777,31 @@ bool FS08HeroesV2DissolveTest::RunTest(const FString&) {
   SetDissolve(BodyComp, nullptr, 0.25f, EDissolveStyle::Fade);
   TestEqual("progress 0.25", BodyComp->GetCustomPrimitiveData().Data[DissolveCpdIndex], 0.25f);
   TestEqual("style fade = 0", BodyComp->GetCustomPrimitiveData().Data[DissolveStyleCpdIndex], 0.0f);
+  return true;
+}
+
+// AN-29 / FX-27 (ВР-13, VS-6 F3): the ash death is the default style, the fade its rollback (-S08DissolveFade) and the
+// reduced-motion look; -S08DissolveAsh stays an empty alias; the ARTLOOK field names the effective style.
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08HeroesV2DissolveStyleTest,
+    "Unmatched.S08.HeroesV2.DissolveStyle ash by default, -S08DissolveFade and reduced motion fade (VR-13, AN-29 / FX-27)",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08HeroesV2DissolveStyleTest::RunTest(const FString&) {
+  using namespace S08HeroesV2;
+  TestTrue("default ash", DecideDissolveStyle(/*bFadeFlag=*/false, /*bReducedMotion=*/false) == EDissolveStyle::Ash);
+  TestTrue("flag -> fade", DecideDissolveStyle(true, false) == EDissolveStyle::Fade);
+  TestTrue("reduced motion -> fade", DecideDissolveStyle(false, true) == EDissolveStyle::Fade);
+  TestEqual("the rollback flag", FString(DissolveFadeFlagName), FString(TEXT("S08DissolveFade")));
+  TestEqual("the empty alias", FString(DissolveAshFlagName), FString(TEXT("S08DissolveAsh")));
+  // this process: no -S08DissolveFade unless the runner passes it; the field follows the effective style
+  const bool bFlag = FParse::Param(FCommandLine::Get(), DissolveFadeFlagName);
+  const bool bReduced = S08IconMotion::IsReducedMotion();
+  TestEqual("effective style", FString(DissolveStyleName(DissolveStyle())),
+            FString(bFlag || bReduced ? TEXT("fade") : TEXT("ash")));
+  TestEqual("ARTLOOK death field", DeathLookField(),
+            FString(bFlag ? TEXT("death=legacy(-S08DissolveFade)") : bReduced ? TEXT("death=fade(reduced)") : TEXT("death=ash")));
+  // the Place move keeps the fade whatever the death style (04 §6.3)
+  TestTrue("names", FString(DissolveStyleName(EDissolveStyle::Fade)) == TEXT("fade") &&
+                        FString(DissolveStyleName(EDissolveStyle::Ash)) == TEXT("ash"));
   return true;
 }
 

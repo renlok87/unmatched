@@ -181,7 +181,14 @@ float ContactSeconds(const FHeroSpec& Spec, const UAnimSequenceBase* LungeAttack
 }
 
 EDissolveStyle DissolveStyle() {
-  return DecideDissolveStyle(FParse::Param(FCommandLine::Get(), DissolveAshFlagName), S08IconMotion::IsReducedMotion());
+  return DecideDissolveStyle(FParse::Param(FCommandLine::Get(), DissolveFadeFlagName), S08IconMotion::IsReducedMotion());
+}
+
+FString DeathLookField() {
+  if (FParse::Param(FCommandLine::Get(), DissolveFadeFlagName)) {
+    return FString::Printf(TEXT("death=legacy(-%s)"), DissolveFadeFlagName);
+  }
+  return S08IconMotion::IsReducedMotion() ? FString(TEXT("death=fade(reduced)")) : FString(TEXT("death=ash"));
 }
 
 const TCHAR* DissolveStyleName(EDissolveStyle Style) { return Style == EDissolveStyle::Ash ? TEXT("ash") : TEXT("fade"); }

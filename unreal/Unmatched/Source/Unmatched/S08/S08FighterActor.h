@@ -136,6 +136,11 @@ public:
   /** The dissolve runs (the body carries the dissolve MIC); its current progress 0..1. */
   bool IsDissolving() const { return bDissolving; }
   float GetDissolveProgress() const { return DissolveValue; }
+  /** VS-6 F3: the v2 body (the Weapon socket of FX-32), null without a v2 figure. */
+  USkeletalMeshComponent* GetArtBodyComponent() const { return bHeroV2Visual ? ArtBody.Get() : nullptr; }
+  /** VS-6 F3 -BenchFx=ash: this living v2 figure on its dissolve MIC frozen at Progress (style DissolveStyle());
+   *  false without the MIC (Fx/S08FighterActorFx.cpp). */
+  bool BenchDissolveAt(float Progress);
   /** Automation only (no ticking world): plays the death to SecondsSinceFall - the dissolve starts / ends as the
    *  timers would. */
   void AdvanceDeathForTest(float SecondsSinceFall);

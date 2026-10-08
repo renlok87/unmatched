@@ -5,6 +5,7 @@
 #include "Fx/S08CueFx.h"
 #include "Fx/S08FieldFx.h"
 #include "Fx/S08CombatFx.h"
+#include "Fx/S08AbilityFx.h"
 #include "UI/UmWorldDamage.h"
 #include "S08Diorama.h"
 #include "S08EnvLayout.h"
@@ -87,6 +88,8 @@ FString TraceLine() {
   if (FParse::Param(Cmd, TEXT("S08HeartGlow"))) Aliases.Add(TEXT("-S08HeartGlow"));  // run I: the glow is the default
   // AN-21 (ВР-12): -S08MoveEase is a no-op alias of the now-default move ease
   if (FParse::Param(Cmd, TEXT("S08MoveEase"))) Aliases.Add(TEXT("-S08MoveEase"));
+  // AN-29 (ВР-13): -S08DissolveAsh is a no-op alias of the now-default ash death
+  if (FParse::Param(Cmd, S08HeroesV2::DissolveAshFlagName)) Aliases.Add(FString(TEXT("-")) + S08HeroesV2::DissolveAshFlagName);
   // Run I (AB-5..AB-8): the turn HUD look of the portraits and the combat panel (S08TurnPortraitWidget.h)
   const FString HudLook = FS08TurnHudLook::ArtLookField(Cmd);
   // VS-1 HB-09: the DPI curve of this run (project ВР-62 or the -S08DpiLegacy rollback).
@@ -123,11 +126,12 @@ FString TraceLine() {
                             ? FString::Printf(TEXT("legacy(-%s)"), S08CueFx::HitTintLegacyFlagName)
                             : FString(TEXT("flash"));
   return FString::Printf(
-      TEXT("ARTLOOK art=%d source=%s heroes=%s tray=%s env=%s review=%d legacyRender=%d markers=%d aliases=%s %s %s %s %s hudImpl=%s move=%s facing=%s baseDigit=%s heroMat=%s fx=%s hitFx=%s fieldFx=%s %s %s%s"),
+      TEXT("ARTLOOK art=%d source=%s heroes=%s tray=%s env=%s review=%d legacyRender=%d markers=%d aliases=%s %s %s %s %s hudImpl=%s move=%s facing=%s baseDigit=%s heroMat=%s fx=%s hitFx=%s fieldFx=%s %s %s %s %s%s"),
       bArt ? 1 : 0, Source, *Heroes, *Tray, *Env, ReviewTooling() ? 1 : 0, S08LegacyRender() ? 1 : 0, S08Markers() ? 1 : 0,
       Aliases.Num() ? *FString::Join(Aliases, TEXT(",")) : TEXT("-"), *HudLook, *Dpi, *CardMedia, *Chips, *HudImpl,
       *MoveEase, *Facing, *BaseDigit, *HeroMat, *Fx, *HitFx, *S08FieldFx::ArtLookToken(),
       *S08CombatFx::LookField(), *UmWorldDamage::LookField(),  // VS-6 F2: combatFx= figureCue= damage=
+      *S08HeroesV2::DeathLookField(), *S08AbilityFx::LookField(),  // VS-6 F3: death= abilityFx=
       bArt ? TEXT("") : TEXT(" (grey board: no art profile, figures, tray or art HUD layer)"));
 }
 

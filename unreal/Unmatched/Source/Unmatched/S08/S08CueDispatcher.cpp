@@ -96,8 +96,9 @@ const TArray<FS08CueRow>& S08CueRows::Combat() {
     // new death of the same figure jumps to the final pose.
     Out.Add(MakeRow(TEXT("CUE-013"), 950, true, ES08CueOnNew::JumpToFinal, false, {}, true, false, TEXT(""), 0,
                     TEXT("DeathSettle"), TEXT("Fade")));
-    // CUE-014 hero ability (AFTER COMBAT steps): Weapon socket by default; the socket and system per hero are a field of
-    // the hero (FX-28: KingArthur Weapon NS_FX_ArthurArc, Medusa Root NS_FX_MedusaVortex - ВР-22).
+    // CUE-014 hero ability: Weapon socket by default; the socket and system per hero are a field of the hero (FX-28:
+    // KingArthur Weapon NS_FX_ArthurArc at the flip of his boosted attack, Medusa Root NS_FX_MedusaVortex at her gaze -
+    // ВР-22); SocketResolver names the hero's socket in the show line.
     Out.Add(MakeRow(TEXT("CUE-014"), 800, true, ES08CueOnNew::Replace, false, {}, true, true, TEXT("Weapon"), 0,
                     TEXT(""), TEXT("none")));
     return Out;
@@ -273,7 +274,11 @@ ES08CueResult FS08CueDispatcher::Feed(const FString& CueId, const FString& InSub
       }
     }
   }
-  const FString Socket = Row.bHasVfx && Row.bVfxSocket ? Row.Socket : FString(TEXT("-"));
+  FString Socket = Row.bHasVfx && Row.bVfxSocket ? Row.Socket : FString(TEXT("-"));
+  if (Row.bHasVfx && Row.bVfxSocket && SocketResolver) {
+    const FString HeroSocket = SocketResolver(Row.Id, Subject);  // FX-28: the hero's socket (CUE-014)
+    if (!HeroSocket.IsEmpty()) Socket = HeroSocket;
+  }
   // D10: a missing asset is a fallback show - the length and the done line stay.
   const bool bFallback = Vfx == TEXT("missing") || Sfx == TEXT("missing") || Clip == TEXT("missing");
   OutLines.Add(Head + FString::Printf(TEXT(" vfx=%s sfx=%s clip=%s mat=%s socket=%s reduced=%d result=%s"), *Vfx, *Sfx,

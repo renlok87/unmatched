@@ -78,6 +78,7 @@ struct UNMATCHED_API FS09CombatStageInput {
   float SpeedMul = 1.0f;        // 0 = "none" (instant animations), 0.5 fast, 1 normal, 1.5 slow (03 §5)
   FS09CombatReveal Reveal;      // the cards for the edge-of-field HUD layer (SD-48 p. 4)
   bool bAttackCardCancelled = false;  // VS-3 HB-33: metadata.lastCombat.attackerCardCancelled (the centre's X line)
+  bool bAbilityBoost = false;   // VS-6 F3 FX-28 (ВР-FX10): King Arthur attacks with a boost - CUE-014 at FlipAttack
 };
 
 // AU-S4: FlipAttack / FlipDefense (the reveal flips, the defense +120 ms), Effect (a fired effect line), Slam and

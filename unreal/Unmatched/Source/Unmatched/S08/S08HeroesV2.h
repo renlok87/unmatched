@@ -217,17 +217,23 @@ inline FDeathPlan MakeDeathPlan(const FHeroSpec& Spec, float SettleSeconds, bool
 /** Dissolve progress 0..1 at T seconds after the fall (0 before the dissolve, 1 once the figure is gone). */
 UNMATCHED_API float DissolveProgressAt(const FDeathPlan& Plan, float SecondsSinceFall);
 
-/** Fade = screen-space dither that TSR resolves into a smooth fade: the default and the reduced-motion style.
- *  Ash = the figure burns away from the feet up with a team-colour (C-11) glowing front: a candidate for the A/B
- *  sheet (DE-028) until the user accepts it, shown only with -S08DissolveAsh. */
+/** Fade = screen-space dither that TSR resolves into a smooth fade: the rollback (-S08DissolveFade), the reduced-motion
+ *  style and the Place move. Ash = the figure burns away from the feet up: a warm front (DissolveFrontColor =
+ *  accent.warm, M_UM_Figure_v2 v2.5) over team-colour ash, with the NS_FX_AshEmbers of FX-26 - the default death since
+ *  ВР-13 (AN-29 / FX-27, VS-6 F3, by delegation). */
 enum class EDissolveStyle : uint8 { Fade = 0, Ash = 1 };
+/** ВР-13: the rollback of the ash death to the fade of before (ARTLOOK death=legacy(-S08DissolveFade)). */
+inline const TCHAR* const DissolveFadeFlagName = TEXT("S08DissolveFade");
+/** -S08DissolveAsh: the flag of the A/B candidate before ВР-13, now an empty alias (the bench scripts pass it). */
 inline const TCHAR* const DissolveAshFlagName = TEXT("S08DissolveAsh");
-/** World-free rule: the ash candidate only on request and never under reduced motion. */
-constexpr EDissolveStyle DecideDissolveStyle(bool bAshFlag, bool bReducedMotion) {
-  return bAshFlag && !bReducedMotion ? EDissolveStyle::Ash : EDissolveStyle::Fade;
+/** World-free rule (ВР-13): ash by default; the fade with -S08DissolveFade or under reduced motion. */
+constexpr EDissolveStyle DecideDissolveStyle(bool bFadeFlag, bool bReducedMotion) {
+  return bFadeFlag || bReducedMotion ? EDissolveStyle::Fade : EDissolveStyle::Ash;
 }
-/** DecideDissolveStyle with -S08DissolveAsh from the command line and S08IconMotion::IsReducedMotion(). */
+/** DecideDissolveStyle with -S08DissolveFade from the command line and S08IconMotion::IsReducedMotion(). */
 UNMATCHED_API EDissolveStyle DissolveStyle();
+/** The ARTLOOK field: death=ash | death=legacy(-S08DissolveFade) | death=fade(reduced). */
+UNMATCHED_API FString DeathLookField();
 UNMATCHED_API const TCHAR* DissolveStyleName(EDissolveStyle Style);
 /** /Game/UM/Materials/v2/Dissolve/MI_<Key>_<Stage>_<Look>_Dissolve (the dissolve MIC of BodyMaterialPath). */
 UNMATCHED_API FString DissolveMaterialPath(const FHeroSpec& Spec, ES08TeamSlot Look);

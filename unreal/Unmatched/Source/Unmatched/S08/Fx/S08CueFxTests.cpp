@@ -62,7 +62,24 @@ bool FS08CueFxRegistryTest::RunTest(const FString&) {
     if (bSocket) ++TableSocket;
     const bool bPrewarm = (*Vfx)->GetBoolField(TEXT("prewarm"));
     const FString System = (*Vfx)->HasField(TEXT("system")) ? (*Vfx)->GetStringField(TEXT("system")) : FString();
-    if (System.IsEmpty()) continue;  // CUE-014: the hero's own system (FX-28) - checked by hero key below
+    // VS-6 F3 FX-28: the hero field (by_hero) of CUE-014 - each hero's system and socket are a registry entry
+    const TSharedPtr<FJsonObject>* ByHero = nullptr;
+    if ((*Vfx)->TryGetObjectField(TEXT("by_hero"), ByHero)) {
+      for (const auto& Hero : (*ByHero)->Values) {
+        const FString HeroKey(*Hero.Key);
+        const TSharedPtr<FJsonObject> H = Hero.Value->AsObject();
+        const FEntry* HE = Find(Id, HeroKey);
+        TestTrue(FString::Printf(TEXT("%s/%s has its own registry entry"), *Id, *HeroKey), HE && HE->HeroKey == HeroKey);
+        if (!HE || !H.IsValid()) continue;
+        FString HeroSystem = H->GetStringField(TEXT("system"));
+        int32 HeroDot = INDEX_NONE;
+        if (HeroSystem.FindChar(TEXT('.'), HeroDot)) HeroSystem.LeftInline(HeroDot);
+        TestEqual(FString::Printf(TEXT("%s/%s system"), *Id, *HeroKey), HE->System, HeroSystem);
+        TestEqual(FString::Printf(TEXT("%s/%s socket"), *Id, *HeroKey), HE->Socket, H->GetStringField(TEXT("socket")));
+        TestTrue(FString::Printf(TEXT("%s/%s attached to a socket"), *Id, *HeroKey), HE->bSocket);
+      }
+    }
+    if (System.IsEmpty()) continue;  // CUE-014: the hero's own system (FX-28) - checked by hero key above
     const FEntry* E = Find(Id);
     TestNotNull(FString::Printf(TEXT("%s has a registry entry"), *Id), E);
     if (!E) continue;

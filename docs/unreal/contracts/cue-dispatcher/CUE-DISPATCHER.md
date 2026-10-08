@@ -214,6 +214,22 @@ CUE combat seq=<n> stage=skip t=<ms> src=<click|space|enter|catchup>
 CUE combat seq=<n> stage=end t=<ms> total=<мс> skipped=<0|1> cut=<0|replace|reconnect|jump|catchup>
 ```
 
+Постановка взгляда Medusa (VS-6 F3 FX-30, ВР-FX11): `t0` — кадр применения снимка, разрешившего её pending
+`ability-medusa-target-p<n>` (тип `AbilityTriggered` в `ComputeCues`, FX-28); CUE-014 на Medusa в `t0` (сокет и система — поле
+героя `vfx.by_hero`, `socket=Root`), CUE-011 цели — staged из кадра контакта:
+
+```
+CUE ability seq=<n> stage=start t=<ms> hero=medusa fighter=<id> target=<id> damage=<n> lethal=<0|1> reduced=<0|1>
+CUE ability seq=<n> stage=contact t=<t0+454 | reduced t0+100> hero=medusa target=<id> tint=<450|550>
+CUE ability seq=<n> stage=minus t=<+60> hero=medusa target=<id> amount=<n>
+CUE ability seq=<n> stage=hp t=<+80> hero=medusa target=<id> from=<a> to=<b>
+CUE ability seq=<n> stage=fall t=<+450> hero=medusa target=<id>          (только летально)
+CUE ability seq=<n> stage=end t=<max(t0+800, contact+80, fall)> hero=medusa target=<id> cut=<0|replace>
+```
+
+Способность King Arthur (буст атаки, ВР-FX10) — CUE-014 атакующего в кадр `FlipAttack` постановки боя (`socket=Weapon`).
+Сервисные строки адаптера (`FX embers …`, `FX vortex …`, `FX arc …`, `FX ability plan …`) гейт не читает.
+
 Догоняние очереди показа (R-03, §3.1): конфиг — один раз при старте клиента, решение — рядом со своей строкой постановки (`skip src=catchup` при `hurry`, `end … cut=catchup` при `cut`) в том же `t`; `applied=0` — короткая версия опоздала (удержания уже кончились), постановка не изменилась:
 
 ```
@@ -280,6 +296,11 @@ CUE fx done id=CUE-011 subject=medusa seq=51 t=1200 ms=900 cut=0
 
 Смерть `CUE death …` и экран `RESULT screen …` (DE-019): DS1 — формат и поля `fall`, поля `RESULT screen`; DS2 — одна смерть на (seq, боец), у неё ровно одна `mark` и одна `gone`, ничего до `fall`; DS3 — этапы F-09 от падения: `mark` +650, `dissolve` = падение + `settle` + `still` (есть тогда и только тогда, когда `dissolve` > 0), `gone` = + `dissolve` и равно полю `gone`, `style=none` тогда и только тогда, когда `dissolve=0`, у v2-фигуры (`settle` > 0) план 875 / 300 у героя и 0 у помощника / 500 или 400 (0 — фолбэк без MIC); DS4 — `staged=1`: есть этап `fall` постановки того же seq и цели, падение смерти — не раньше и не позже 100 мс после него; DS5 — `due` по правилу выше (исчезновение героя из смертей после прошлого экрана; при `staging=<ms>` — конец постановки, он обязан быть позже обычного `due`), `heroGone` совпадает, экран не раньше `due` и не позже `due` + 100, `wait` = `t` − `gameOver`. DS6 — смертей меньше `--min-death N` (живая партия до GAME_OVER). Сводка: `death_sets`, `death_heroes`, `result_screens`, `hit_to_screen` (контакт постановки → экран, «≈ 3,1 с»).
 
+Взгляд Medusa `CUE ability …` (VS-6 F3 FX-30): A1 — одна постановка на seq, этапы start → contact → minus → hp → [fall] →
+end, контакт = start + 454 (reduced motion + 100), «−N» +60, HP +80, падение +450 тогда и только тогда, когда `lethal=1`
+(±17 мс), CUE-014 героя (`subject=fighter`) в кадр start, CUE-011 цели в кадр контакта, конец не раньше HP / падения;
+прерванная (`cut≠0`) — только порядок. A2 — постановок меньше `--min-ability N`. Сводка: `ability_sets`, `ability_cut`.
+
 Звук `CUE sound …` и громкости `CUE audio …` (DE-032, §3.2): AU1 — формат, точка и её CUE, `class` = `sound_class` таблицы, поля `CUE audio` и `CUE sound drop`; AU2 — звук в кадре события: `dt` = `t` − `event_t`, |`dt`| ≤ 17 мс; AU3 — перезвон только на свой ход (`turn=opp` — `silent reason=opponent`, `turn=own` — не silent, кроме `muted`), каждому `HUD-TURN … initial=0` (own/opp) — строка перезвона того же seq и наоборот; AU4 — `fallback` ⇔ `sound=missing`, `played` ⇔ имя ассета, `silent`/`throttled` ⇔ `none`, `silent` только с `reason`; AU5 — удар: один на (seq, цель), `due` = `t` этапа `contact` постановки своего seq, `t` − `due` ∈ [0, 100]; AU6 — шаг: `edge=k/n` без повторов и все n, если для seq нет `drop`; прыжок — ровно один `edge=snap`; `t` − `due` ∈ [0, 100]; AU7 — на каждый `RESULT screen` ровно один стинг с `event_t` = `t` экрана, стинга без экрана нет; AU8 — `CUE audio` до первого звука, `gain_master` = master/100 (0 при mute), `gain_ambience` = `gain_master` × ambience/100 (0 при mute), `gain` звука = `gain_ambience` у класса `Ambience`, иначе `gain_master`, при 0 — `silent reason=muted`; AU9 — `throttled` только внутри `retrigger_ms` прошлого звука этого CUE, звук внутри него — ошибка; AU10 — строк `CUE sound` меньше `--min-sound N`. Опоздание AU5/AU6 больше 100 мс в первом кадре после синхронного снимка доказательств (`SHOT captured` между строкой с `t` ≤ `due` + 100 и первой строкой с `t` после него; звук не позже 100 мс от неё) — не ошибка, а счётчик `sound_late_shot`: снимок 1920×1080 держит игровой поток ~250 мс, и фигура, и звук опаздывают вместе (G-LIVE прогона G). В трассе без `CUE audio` и `CUE sound` (клиент до DE-032) AU3/AU7 не сверяются. Сводка: `sounds`, `sound_points`, `sound_fallback`, `sound_played`, `sound_silent`, `sound_throttled`, `audio_lines`, `sound_dt_max`, `sound_late_shot`.
 
 Сводка гейта: `presented`, `spawned`, `fallback`, `duplicate`, `stale`, `done`, `unique_triples`, `ms_cue`, `ms_cue_sets`, `ms_cue_sources`, `combat_sets`, `combat_cut`, `combat_skipped`, `combat_totals`, `death_sets`, `death_heroes`, `result_screens`, `hit_to_screen`, поля звука (выше). Для ACC-012 в пакете доказательств записывается строка `CUE_TRACE PASS {…}`.
@@ -303,6 +324,8 @@ CUE fx done id=CUE-011 subject=medusa seq=51 t=1200 ms=900 cut=0
 | `combat-staging-lethal-skip` | DE-018: летальный удар по помощнику без текста, пропуск Space в паузе «счёт» (100 мс), заливка 550, `fall` +450, итог 2733 |
 | `combat-staging-defense-holds` | DE-018: урон 0 — выпад без HitReact, «−N» и CUE-011; пропуск кликом в чтении (380 мс), `hold=380` |
 | `combat-staging-effect-lines` | R-02: две сработавшие строки из журнала сервера — чтение 1000, строка 1 600, пропуск кликом во второй (280 мс), пауза не начиналась (0), CUE-010 `ms=2680 hold=1880`, итог 4480 (без пропуска 5100 ≈ 3,9 + 2 × 0,6 с) |
+| `ability-medusa-gaze` | FX-28 / FX-30: CUE-014 Medusa — система и сокет героя (`NS_FX_MedusaVortex`, `socket=Root`), повтор по WS — duplicate, CUE-011 цели staged после более нового seq |
+| `ability-arthur-boost` | FX-28 / FX-32: CUE-014 Arthur в кадр переворота (`NS_FX_ArthurArc`, `socket=Weapon`), reduced motion — 100 мс |
 | `neg-*` (5) | гейт ловит G2, G3, G4+G8, G5+G6; постановка боя — C2, C3, C5, C6 (`neg-combat-staging`) |
 
 **Перенос в C++ (DE-018).** `Unmatched.S08.CueDispatcher.Table` сверяет встроенные строки CUE-008…011, 013, 014 с `cue-table.json` поле за полем; `Unmatched.S08.CueDispatcher.Fixtures` прогоняет через `FS08CueDispatcher` каждый сценарий этих строк без блока `staging` (attack-interrupt, dedupe-http-ws, missing-assets-fallback, sfx-concurrency-stop-oldest) и сравнивает трассу побайтно; `Unmatched.S09.CombatStage.Fixtures` строит из блока `staging` ту же постановку через `FS09CombatStage` и сравнивает с `expect_trace` фикстур `combat-staging-*` побайтно. Фикстуры строк вне этого среза (наведение, перемещение, связь) переносятся с GD-044. Эталонная модель на Python — исполняемая спецификация, её вывод не заменяет C++-тест.
@@ -313,7 +336,7 @@ CUE fx done id=CUE-011 subject=medusa seq=51 t=1200 ms=900 cut=0
 - `FS08CuePlan { FName CueId; FString Subject; TOptional<int32> Seq; ES08CueResult Result; TSoftObjectPtr<UNiagaraSystem> Vfx; TSoftObjectPtr<USoundBase> Sfx; FName Socket; ES08ClipRole Clip; FName CpdParam; int32 DurationMs; bool bReduced; }`.
 - `FS08CueDispatcher::Feed(const FS08CueEvent&, TArray<FS08CuePlan>& Out, TArray<FString>& TraceLines)`; `OnReconnect(int32 RecoveredSeq)`; `SetReducedMotion(bool)`; `Tick(int64 NowMs)` для `done`.
 - UE-адаптер (`AS08FlowGameMode` или компонент презентации) исполняет план: `UNiagaraFunctionLibrary::SpawnSystemAttached` с пулом, `UGameplayStatics::PlaySound2D`/`SpawnSoundAttached` с Concurrency из таблицы, `SetCustomPrimitiveDataFloat`, драйвер анимации (`PlayOneShot(role)`), виджет. Решений о повторах адаптер не принимает.
-- Новые типы события в `ComputeCues`: `AttackDeclared`, `FighterDefeated`, `FighterHealed`, `AbilityTriggered`, `TurnChanged` (R2.4: скрытие фигуры при смерти задерживается до ≤ 950 мс, QA-101).
+- Новые типы события в `ComputeCues`: `AttackDeclared`, `FighterDefeated`, `FighterHealed` (сделано, FX-25), `AbilityTriggered` (сделано, FX-28: только Medusa — её pending; Arthur — флаг постановки боя), `TurnChanged` (R2.4: скрытие фигуры при смерти задерживается до ≤ 950 мс, QA-101).
 
 ## 9. Открытые вопросы
 

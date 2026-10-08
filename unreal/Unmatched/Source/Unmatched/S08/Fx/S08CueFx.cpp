@@ -55,8 +55,8 @@ void ResetOverrideForTest() {
 
 const TArray<FEntry>& Registry() {
   // The vfx blocks of cue-table.json (revision fx-p4-2026-10): paths, attach / socket, prewarm; the sprite
-  // budgets from the notes (dust 3-5 discs, 3 chevrons, one star, 3-5 motes, <= 40 embers, one arc / vortex).
-  // The systems are missing until FX-13..FX-32 (the tables' status: missing); CUE-014 is per hero (FX-28).
+  // budgets from the notes (dust 3-5 discs, 3 chevrons, one star, 3-5 motes, <= 40 embers, one arc, two vortex
+  // sprites). CUE-014 is per hero (FX-28: the hero key picks the system and the socket).
   static const TArray<FEntry> Rows = {
       Make(TEXT("CUE-007"), TEXT("/Game/S08/FX/Board/NS_FX_Dust"), BoardEffectType, false, TEXT(""), 5, true),
       Make(TEXT("CUE-008"), TEXT("/Game/S08/FX/Board/NS_FX_AttackChevrons"), BoardEffectType, false, TEXT(""), 3,
@@ -69,7 +69,7 @@ const TArray<FEntry>& Registry() {
       Make(TEXT("CUE-014"), TEXT("/Game/S08/FX/Combat/NS_FX_ArthurArc"), CombatEffectType, true, TEXT("Weapon"), 1,
            true, TEXT("KingArthur")),
       Make(TEXT("CUE-014"), TEXT("/Game/S08/FX/Combat/NS_FX_MedusaVortex"), CombatEffectType, true, TEXT("Root"),
-           20, true, TEXT("Medusa")),
+           2, true, TEXT("Medusa")),
   };
   return Rows;
 }

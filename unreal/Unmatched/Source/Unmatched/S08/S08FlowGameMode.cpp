@@ -497,6 +497,7 @@ void AS08FlowGameMode::HandleApplied(const FS08Snapshot& Snapshot, ES08SeqDecisi
       AppliedCount, Snapshot.SequenceNumber, static_cast<int32>(Decision),
       Snapshot.Fighters.IsValid() ? 1 : 0, Snapshot.BoardState.IsValid() ? 1 : 0));
   TrackCombatResult(Snapshot, Decision);
+  if (Decision == ES08SeqDecision::Apply && Flow.IsValid()) S08FxAbilityCues(Flow->GetApplyingCues());  // VS-6 FX-30
   // R-03: the state is applied at once; a staging that lags behind it catches up (after a new result replaced it)
   if (Decision == ES08SeqDecision::Apply) RunPresentationCatchup(&Snapshot);
   // DE-026 (01 F-10): the fighters as they stood before this snapshot - an opponent's scheme holds them until its
@@ -847,10 +848,12 @@ void AS08FlowGameMode::SyncBoardFromApplied() {
     // DE-018: the staged target keeps its HP (and, for a lethal blow, its figure) until the contact frame.
     ShownFighters = Fighters;
     CombatStage.GetHold().Apply(ShownFighters, /*bBoardView=*/false);
+    AbilityStage.GetHold().Apply(ShownFighters, /*bBoardView=*/false);  // VS-6 FX-30: the gaze target until contact
     ApplyCardSlotHold(ShownFighters);  // DE-026: the opponent's scheme waits 1500 ms before its effect
     {
       TArray<FS08BoardFighter> BoardView = Fighters;
       CombatStage.GetHold().Apply(BoardView, /*bBoardView=*/true);
+      AbilityStage.GetHold().Apply(BoardView, /*bBoardView=*/true);
       ApplyCardSlotHold(BoardView);
       BoardActor->SyncFighters(BoardModel, BoardView, ViewerId);
       NoteBoardDeaths(BoardView);
@@ -1077,6 +1080,10 @@ void AS08FlowGameMode::HandleCues(const TArray<FS08Cue>& InCues) {
     if (Cue.Type == ES08CueType::FighterMoved) {
       Line = FString::Printf(TEXT("CUE move %s (%d,%d)->(%d,%d) seq=%d"), *Cue.FighterId,
                              Cue.FromX, Cue.FromY, Cue.ToX, Cue.ToY, Cue.SequenceNumber);
+    } else if (Cue.Type == ES08CueType::AbilityTriggered) {
+      // VS-6 F3 FX-28: the gaze staging started at the apply (S08FxAbilityCues); its damage cue below waits for it
+      Line = FString::Printf(TEXT("CUE ability-cue hero=%s fighter=%s target=%s -%d seq=%d"), *Cue.HeroKey.ToLower(),
+                             *Cue.FighterId, *Cue.TargetId, Cue.Damage, Cue.SequenceNumber);
     } else if (Cue.Type == ES08CueType::FighterHealed) {
       Line = FString::Printf(TEXT("CUE heal %s +%d seq=%d"), *Cue.FighterId, Cue.Damage, Cue.SequenceNumber);
       S08FxHealCue(Cue.FighterId, Cue.Damage, Cue.SequenceNumber);  // VS-6 F2 FX-25: CUE-012 (+200 or stage=end)
@@ -1094,6 +1101,8 @@ void AS08FlowGameMode::HandleCues(const TArray<FS08Cue>& InCues) {
       const double* Arrive = Mover && Mover->IsMoving() ? ArriveMs.Find(Cue.FighterId) : nullptr;
       if (bStaged) {
         Line += TEXT(" staged=contact");
+      } else if (S08FxAbilityHoldsDamage(Cue)) {
+        Line += TEXT(" staged=ability");  // VS-6 F3 FX-30: shown at the gaze's contact (t0 + 454)
       } else if (BoardActor && Arrive && *Arrive > 0.0) {
         // MS-E-48 cascade: the hit plays when the moving target arrives (a skip makes it due at once).
         DeferredDamage.Add({Cue.FighterId, Cue.Damage, Cue.SequenceNumber,
@@ -1354,6 +1363,7 @@ void AS08FlowGameMode::StartCombatStage(const FS08Snapshot& Closing, const FS08S
   In.ContactMs = Contact >= 0 ? Contact : FS09CombatTiming::DefaultContactMs;
   In.ContactSource = Contact >= 0 ? Source : FString(TEXT("default"));
   In.SpeedMul = CombatSpeedMul();  // DE-025: UI-ACC-013 (saved value or -S08AnimSpeed)
+  In.bAbilityBoost = S08AbilityFx::IsArthurAbilityBoost(Attacker->Name, In.Reveal.Boosts.Num());  // VS-6 FX-28 ВР-FX10
   TickCombatStage();
   TArray<FString> Lines;
   TArray<FS09CombatStageEvent> Events;
@@ -1462,6 +1472,7 @@ void AS08FlowGameMode::RunCombatEvents(const TArray<FS09CombatStageEvent>& Event
   for (const FS09CombatStageEvent& Event : Events) {
     AudioOnCombatEvent(Event);  // AU-S4: flips, effect bells, slam, lunge whoosh, block, combat end
     FiguresOnCombatEvent(Event);  // AN-24 / AN-25 (ВР-06): face, the deferred snap, the no-clip return
+    S08FxAbilityOnCombatEvent(Event);  // VS-6 FX-28 / FX-32: Arthur's boost - CUE-014 + the arc at the flip
     switch (Event.Type) {
       case ES09CombatEvent::Lunge:
         // CUE-011 intro: the attacker's LungeAttack after the slam + the pause "score" (01 F-03). DE-025 (SD-49): at
@@ -1503,7 +1514,8 @@ void AS08FlowGameMode::RunCombatEvents(const TArray<FS09CombatStageEvent>& Event
 }
 
 const TArray<FS08BoardFighter>& AS08FlowGameMode::HudFighters() const {
-  return CombatStage.GetHold().IsSet() || CardSlot.HoldsEffect() ? ShownFighters : Fighters;
+  return CombatStage.GetHold().IsSet() || AbilityStage.GetHold().IsSet() || CardSlot.HoldsEffect() ? ShownFighters
+                                                                                                    : Fighters;
 }
 
 const FS08BoardFighter* AS08FlowGameMode::FindShownFighter(const FString& FighterId) const {
@@ -1515,10 +1527,12 @@ void AS08FlowGameMode::RefreshShownFighters(bool bSyncBoard) {
   const FS09CombatHold& Hold = CombatStage.GetHold();
   ShownFighters = Fighters;
   Hold.Apply(ShownFighters, /*bBoardView=*/false);
+  AbilityStage.GetHold().Apply(ShownFighters, /*bBoardView=*/false);  // VS-6 FX-30
   ApplyCardSlotHold(ShownFighters);  // DE-026
   if (!bSyncBoard || !BoardActor || Fighters.Num() == 0) return;
   TArray<FS08BoardFighter> BoardView = Fighters;
   Hold.Apply(BoardView, /*bBoardView=*/true);
+  AbilityStage.GetHold().Apply(BoardView, /*bBoardView=*/true);
   ApplyCardSlotHold(BoardView);
   BoardActor->SyncFighters(BoardModel, BoardView, Flow.IsValid() ? Flow->GetUserId() : FString());
   NoteBoardDeaths(BoardView);
@@ -1570,6 +1584,12 @@ void AS08FlowGameMode::TickDeathStage() {
       return F.Id == In.TargetId;
     });
     bHeroFallPending = Target && Target->bIsHero;
+  }
+  if (AbilityStage.IsActive() && AbilityStage.GetHold().bAliveHeld) {  // VS-6 FX-30: a lethal gaze on a hero
+    const FString& GazeTarget = AbilityStage.GetInput().TargetId;
+    const FS08BoardFighter* Target =
+        Fighters.FindByPredicate([&GazeTarget](const FS08BoardFighter& F) { return F.Id == GazeTarget; });
+    bHeroFallPending |= Target && Target->bIsHero;
   }
   // A death at the snapshot (staged=0) may land while an earlier combat is still staged: the screen waits for it.
   const int64 StagingEndMs = CombatStage.IsActive() ? CombatStage.GetEndMs() : -1;
@@ -8883,6 +8903,7 @@ void AS08FlowGameMode::RunRenderBench() {
     }
     // AN-17 (ВР-17): -BenchClipPose - the pose stand over Poses x Views (S08FlowGameModeFigures.cpp)
     B.bClipPose = BenchParseClipPoses(Cmd, B.Poses, B.HeroId, B.Views.Num());
+    B.HeroId = S08FxBenchFocus(Cmd, B.HeroId);  // VS-6 F3: -BenchFocusFighter= (the K2 views of the death / ability FX)
     // DE-028 (W-28): -BenchTurnHud=<ms> lays the two DE-023 turn portraits (the fixture's heroes, my turn) over the
     // scene with their clock frozen <ms> after my turn started - the A/B frames of the ring (-S08TurnRingIcon=<id>),
     // the tracker and the heart (-S08HeartGlow) on a real board. Review tooling only: the live HUD is not built here.

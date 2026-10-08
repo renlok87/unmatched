@@ -70,7 +70,9 @@ void AS08FlowGameMode::S08FxBoardReady() {
   CueDispatcher.AssetResolver = [this](const FString& CueId, const FString& Channel, const FString& Subject) {
     if (Channel == TEXT("vfx")) {
       if (!S08CueFx::FxEnabled()) return FString(TEXT("none"));
-      const FString HeroKey;  // CUE-014 is per hero (FX-28); until then the first entry answers
+      // FX-28: CUE-014 is per hero - the subject's look-dev key picks its system
+      const AS08FighterActor* Actor = BoardActor ? BoardActor->FindFighterActor(Subject) : nullptr;
+      const FString HeroKey = Actor && Actor->GetHeroV2Spec() ? FString(Actor->GetHeroV2Spec()->Key) : FString();
       const S08CueFx::FEntry* E = S08CueFx::Find(CueId, HeroKey);
       if (!E) return FString();
       if (E->System.IsEmpty()) return FString();  // missing until FX-28 names the hero's system
@@ -90,6 +92,13 @@ void AS08FlowGameMode::S08FxBoardReady() {
                                                               : FString();
     }
     return FString();
+  };
+  // FX-28: the socket of the hero's CUE-014 entry (Weapon / Root) in the show line
+  CueDispatcher.SocketResolver = [this](const FString& CueId, const FString& Subject) {
+    const AS08FighterActor* Actor = BoardActor ? BoardActor->FindFighterActor(Subject) : nullptr;
+    const FString HeroKey = Actor && Actor->GetHeroV2Spec() ? FString(Actor->GetHeroV2Spec()->Key) : FString();
+    const S08CueFx::FEntry* E = HeroKey.IsEmpty() ? nullptr : S08CueFx::Find(CueId, HeroKey);
+    return E && E->HeroKey == HeroKey && E->bSocket ? E->Socket : FString();
   };
 }
 
@@ -155,7 +164,8 @@ void AS08FlowGameMode::S08FxBenchStep(const FString& Spec) {
     return;
   }
   if (!CueFxSpawner) S08FxBoardReady();  // the bench builds no flow: the spawner (prewarm, grade) comes here
-  if (S08FxBenchField(Mode, Parts) || S08FxBenchCombat(Mode, Parts)) {  // VS-6 F2: + star / heal
+  // VS-6 F2: + star / heal; VS-6 F3: + ash / vortex / arc
+  if (S08FxBenchField(Mode, Parts) || S08FxBenchCombat(Mode, Parts) || S08FxBenchAbility(Mode, Parts)) {
     S08FxBenchFieldFinish();
     return;
   }
@@ -377,6 +387,7 @@ bool ChevronTransform(const FVector& From, const FVector& To, FTransform& Out) {
 
 void AS08FlowGameMode::S08FxTick() {
   S08FxCombatTick();  // VS-6 F2: the stars at C+70, the heals, the FX capture hook
+  S08FxAbilityTick();  // VS-6 F3: the gaze staging, the embers of the dissolving figures
   if (FieldFx.Moves.Num() == 0 && FieldFx.Chevrons.Num() == 0) return;
   const double Now = static_cast<double>(NowMs());
   const bool bReduced = S08IconMotion::IsReducedMotion();
@@ -555,6 +566,7 @@ void AS08FlowGameMode::S08FxBenchFieldFinish(bool bWarmupDone) {
     for (const FFieldBench::FPulse& P : GFieldBench.Pulses) Hl->SetPulseStatic(P.Cell.X, P.Cell.Y, P.bTarget, P.Ms);
   }
   if (bWarmupDone) S08FxBenchCombatFinish();  // VS-6 F2: the star / heal bench systems
+  if (bWarmupDone) S08FxBenchAbilityFinish();  // VS-6 F3: the ash / vortex / arc bench systems
   if (bWarmupDone && !GFieldBench.bSpawned && CueFxSpawner) {
     GFieldBench.bSpawned = true;
     ApplyProfileGrade(*BoardActor, *CueFxSpawner);

@@ -663,14 +663,13 @@
    "skippable": true,
    "vfx": {
     "system": "/Game/S08/FX/Combat/NS_FX_AshEmbers.NS_FX_AshEmbers",
-    "status": "missing",
-    "missing_reason": "ассет не создан: FX-26",
+    "status": "present",
     "attach": "world",
     "socket": null,
     "sim": "cpu",
     "deterministic": true,
     "prewarm": true,
-    "note": "пепел по умолчанию, откат -S08DissolveFade: угольки цвета команды ≤ 40, 600 мс от старта растворения (ВР-13)",
+    "note": "пепел по умолчанию (ВР-13); fade — откат -S08DissolveFade и reduced motion. FX-26 (VS-6 F3): NS_FX_AshEmbers — один квад к камере над растворяющейся фигурой (M_FX_AbilityPrintDepth mode 2): ≤ 40 ромбов-угольков (8 на 100 мс растворения: герой 40, помощник 32) на высоте фронта прогорания, цилиндр 0,35 H, тело team.p1.screen / team.p2.screen по виду фигуры, кромка accent.warm, обводка mark.keyline; 600 мс от старта растворения; FrontHeight / TeamScreenColor / DissolveMs — user-параметры, связанные с материалом; без угольков при fade, reduced motion, -S08FxLegacy и без MIC растворения",
     "fx_row": "FX-26"
    },
    "sfx": {
@@ -732,14 +731,25 @@
    "skippable": true,
    "vfx": {
     "system": null,
-    "status": "missing",
-    "missing_reason": "ассет не создан: FX-32 (NS_FX_ArthurArc), FX-30 (NS_FX_MedusaVortex); поле героя — FX-28",
+    "status": "present",
     "attach": "socket",
     "socket": "Weapon",
     "sim": "cpu",
     "deterministic": true,
     "prewarm": true,
-    "note": "сокет и система — поле героя (FX-28): KingArthur Weapon NS_FX_ArthurArc, Medusa Root NS_FX_MedusaVortex, луча нет (ВР-22); строка задаёт сокет по умолчанию Weapon",
+    "by_hero": {
+     "KingArthur": {
+      "system": "/Game/S08/FX/Combat/NS_FX_ArthurArc.NS_FX_ArthurArc",
+      "socket": "Weapon",
+      "fx_row": "FX-32"
+     },
+     "Medusa": {
+      "system": "/Game/S08/FX/Combat/NS_FX_MedusaVortex.NS_FX_MedusaVortex",
+      "socket": "Root",
+      "fx_row": "FX-30"
+     }
+    },
+    "note": "сокет и система — поле героя (FX-28, by_hero): KingArthur Weapon NS_FX_ArthurArc — в кадр переворота атаки с бустом (ВР-FX10), Medusa Root NS_FX_MedusaVortex — в кадр применения снимка, разрешившего её pending ability-medusa-target (постановка FS09AbilityStage: контакт t0+454, «−N» +60, HP +80), луча нет (ВР-22); строка задаёт сокет по умолчанию Weapon",
     "fx_row": "FX-28"
    },
    "sfx": {

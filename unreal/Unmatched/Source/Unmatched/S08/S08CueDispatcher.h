@@ -56,6 +56,9 @@ public:
   /** Channel token of a show: the short asset name, "missing" or "none". Channel is vfx / sfx / clip. Unset: the
    *  rows carry no asset path (ART-010 open), so every channel the row has is "missing" and the others "none". */
   TFunction<FString(const FString& CueId, const FString& Channel, const FString& Subject)> AssetResolver;
+  /** VS-6 F3 FX-28: the socket of a socket-attached show for this subject (CUE-014: the hero's field of the S08CueFx
+   *  registry - Weapon for King Arthur, Root for Medusa); "" or unset = the row's socket. */
+  TFunction<FString(const FString& CueId, const FString& Subject)> SocketResolver;
 
   /** D11: UI-ACC-006 on/off (`CUE settings reduced_motion=…`). */
   void SetReducedMotion(bool bReduced, int64 TMs, TArray<FString>& OutLines);

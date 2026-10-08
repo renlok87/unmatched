@@ -29,8 +29,9 @@ class TableTests(unittest.TestCase):
         expected = sum(1 for c in TABLE["cues"] for ch in ("vfx", "sfx", "clip")
                        if c.get(ch) and c[ch]["status"] == "missing")
         self.assertEqual(len(miss), expected)
-        # VS-6 F2: NS_FX_HitStar / NS_FX_HealMotes exist (FX-21 / FX-24); CUE-013 still waits for FX-26
-        self.assertIn(("CUE-013", "vfx", row(TABLE, "CUE-013")["vfx"]["missing_reason"]), miss)
+        # VS-6 F2: NS_FX_HitStar / NS_FX_HealMotes exist (FX-21 / FX-24); VS-6 F3: NS_FX_AshEmbers (FX-26) and the hero
+        # systems of CUE-014 (FX-30 / FX-32) - no vfx is missing any more
+        self.assertFalse([m for m in miss if m[1] == "vfx"])
         # DE-003: клипы H2Anim есть у всех v2-фигур, в missing-report их нет; у объявления атаки клипа нет (F-03)
         self.assertFalse([m for m in miss if m[1] == "clip"])
         self.assertIsNone(row(TABLE, "CUE-008")["clip"])
@@ -75,14 +76,14 @@ class TableTests(unittest.TestCase):
             v = row(TABLE, cid)["vfx"]
             self.assertEqual((cc.short_name(v["system"]) if v["system"] else None, v["attach"], v["socket"], v["fx_row"]),
                              (system, attach, socket, fx_row), cid)
-            if cid in ("CUE-007", "CUE-008", "CUE-011", "CUE-012"):
-                # VS-6 F1: NS_FX_Dust (FX-13) and NS_FX_AttackChevrons (FX-16) exist in Content; VS-6 F2: NS_FX_HitStar
-                # (FX-21) and NS_FX_HealMotes (FX-24)
-                self.assertEqual(v["status"], "present", cid)
-                self.assertNotIn("missing_reason", v, cid)
-            else:
-                self.assertEqual(v["status"], "missing", cid)              # ассетов систем ещё нет в Content
-                self.assertIn(fx_row, v["missing_reason"], cid)
+            # VS-6 F1: NS_FX_Dust (FX-13), NS_FX_AttackChevrons (FX-16); F2: NS_FX_HitStar (FX-21), NS_FX_HealMotes (FX-24);
+            # F3: NS_FX_AshEmbers (FX-26), the CUE-014 hero systems NS_FX_MedusaVortex (FX-30) / NS_FX_ArthurArc (FX-32)
+            self.assertEqual(v["status"], "present", cid)
+            self.assertNotIn("missing_reason", v, cid)
+        by_hero = row(TABLE, "CUE-014")["vfx"]["by_hero"]
+        self.assertEqual({k: (cc.short_name(e["system"]), e["socket"], e["fx_row"]) for k, e in by_hero.items()},
+                         {"KingArthur": ("NS_FX_ArthurArc", "Weapon", "FX-32"),
+                          "Medusa": ("NS_FX_MedusaVortex", "Root", "FX-30")})
         self.assertEqual(row(TABLE, "CUE-016")["postprocess"]["profile_delta"]["defeat"]["saturation_mul"], 0.8)
         self.assertEqual(row(TABLE, "CUE-017")["postprocess"]["fx_row"], "FX-35")
 
@@ -96,8 +97,10 @@ class TableTests(unittest.TestCase):
                 self.assertIn(c["vfx"]["fx_row"], tasks, c["id"])
         t = copy.deepcopy(TABLE); row(t, "CUE-007")["vfx"]["fx_row"] = "FX-99"
         self.assertTrue(any("FX-99" in e for e in cc.validate_table(t)))
-        t = copy.deepcopy(TABLE); row(t, "CUE-013")["vfx"]["missing_reason"] = "ассет не создан"
+        t = copy.deepcopy(TABLE); v = row(t, "CUE-013")["vfx"]; v["status"] = "missing"; v["missing_reason"] = "ассет не создан"
         self.assertTrue(any("не называет строку FX-26" in e for e in cc.validate_table(t)))
+        t = copy.deepcopy(TABLE); row(t, "CUE-014")["vfx"]["by_hero"]["Medusa"]["socket"] = "Tail"
+        self.assertTrue(any("by_hero.Medusa сокет Tail" in e for e in cc.validate_table(t)))
         t = copy.deepcopy(TABLE); del row(t, "CUE-007")["vfx"]["fx_row"]
         self.assertTrue(any(e.startswith("schema") for e in cc.validate_table(t)))
 
@@ -119,13 +122,19 @@ class TableTests(unittest.TestCase):
     def test_fx01_planned_system_is_not_present(self):
         """Плановый путь системы при status missing не делает показ spawned; present — только существующий ассет."""
         d = cc.ReferenceDispatcher(TABLE)
-        # VS-6 F2: CUE-011 / CUE-012 are present now - CUE-013 (FX-26) is the planned system of this check
-        self.assertEqual(d._asset("CUE-013", "vfx"), "missing")
+        # VS-6 F3: every system of the table exists; a planned one (status missing) still shows vfx=missing
+        t = copy.deepcopy(TABLE); v = row(t, "CUE-013")["vfx"]; v["status"] = "missing"; v["missing_reason"] = "FX-26"
+        self.assertEqual(cc.ReferenceDispatcher(t)._asset("CUE-013", "vfx"), "missing")
+        self.assertEqual(d._asset("CUE-013", "vfx"), "NS_FX_AshEmbers")
         self.assertEqual(d._asset("CUE-011", "vfx"), "NS_FX_HitStar")
+        # FX-28: the hero's system of CUE-014 by the trace subject; no hero - no system
+        self.assertEqual(d._asset("CUE-014", "vfx", "medusa"), "NS_FX_MedusaVortex")
+        self.assertEqual(d._asset("CUE-014", "vfx", "arthur"), "NS_FX_ArthurArc")
+        self.assertEqual(d._asset("CUE-014", "vfx", "merlin"), "missing")
         self.assertEqual(cc.ReferenceDispatcher(TABLE, {"CUE-013": {"vfx": "/Game/T/NS_Test_Hit.NS_Test_Hit"}})._asset("CUE-013", "vfx"),
                          "NS_Test_Hit")
         if cc.CONTENT_DIR.is_dir():
-            t = copy.deepcopy(TABLE); v = row(t, "CUE-013")["vfx"]; v["status"] = "present"; del v["missing_reason"]
+            t = copy.deepcopy(TABLE); row(t, "CUE-013")["vfx"]["system"] = "/Game/S08/FX/Combat/NS_FX_Nope.NS_FX_Nope"
             self.assertTrue(any("present, но нет ассета" in e for e in cc.validate_table(t)))
         t = copy.deepcopy(TABLE); row(t, "CUE-013")["clip"].update(status="missing", missing_reason="нет")
         self.assertTrue(any("путь задан" in e for e in cc.validate_table(t)))   # у клипа путь при missing — ошибка
@@ -571,6 +580,56 @@ class CatchupTests(unittest.TestCase):
         self.assertIn("C10", self.codes(self.hurried() + [
             "CATCHUP seq=41 latest=43 queued=2 lag=380 t=2000 action=hurry reason=combat applied=0"]))
         self.assertIn("C10", self.codes(["CATCHUP config queued=x lagMs=1500"]))
+
+
+class AbilityStageTests(unittest.TestCase):
+    """VS-6 F3 FX-30 (ВР-FX11): A1 - the staging of Medusa's gaze `CUE ability …`."""
+
+    def trace(self, contact=1454, minus=1514, hp=1534, fall=None, lethal=0, reduced=0, cue11=None, end=1800):
+        lines = ["CUE ability seq=40 stage=start t=1000 hero=medusa fighter=f-0-hero target=f-1-sk0 damage=1 "
+                 "lethal=%d reduced=%d" % (lethal, reduced),
+                 "CUE fx id=CUE-014 subject=f-0-hero seq=40 t=1000 vfx=NS_FX_MedusaVortex sfx=none clip=none mat=none "
+                 "socket=Root reduced=%d result=spawned" % reduced,
+                 "CUE ability seq=40 stage=contact t=%d hero=medusa target=f-1-sk0 tint=450" % contact,
+                 "CUE fx id=CUE-011 subject=f-1-sk0 seq=40 t=%d vfx=NS_FX_HitStar sfx=none clip=AM_Merlin_HitReact "
+                 "mat=FxFlash socket=- reduced=%d result=spawned" % (cue11 or contact, reduced),
+                 "CUE ability seq=40 stage=minus t=%d hero=medusa target=f-1-sk0 amount=1" % minus,
+                 "CUE ability seq=40 stage=hp t=%d hero=medusa target=f-1-sk0 from=6 to=5" % hp]
+        if fall is not None:
+            lines.append("CUE ability seq=40 stage=fall t=%d hero=medusa target=f-1-sk0" % fall)
+        show = 100 if reduced else 800
+        done = sorted([(1000 + show, "CUE fx done id=CUE-014 subject=f-0-hero seq=40 t=%d ms=%d cut=0" % (1000 + show, show)),
+                       (end, "CUE ability seq=40 stage=end t=%d hero=medusa target=f-1-sk0 cut=0" % end)])
+        lines += [x[1] for x in done]
+        w = 100 if reduced else 900
+        lines.append("CUE fx done id=CUE-011 subject=f-1-sk0 seq=40 t=%d ms=%d cut=0" % ((cue11 or contact) + w, w))
+        return lines
+
+    def codes(self, lines):
+        errors, summary = cc.check_trace(lines, TABLE)
+        return sorted({c for c, _ in errors}), summary
+
+    def test_good_gaze_passes(self):
+        codes, summary = self.codes(self.trace())
+        self.assertEqual(codes, [])
+        self.assertEqual(summary["ability_sets"], 1)
+
+    def test_lethal_and_reduced(self):
+        self.assertEqual(self.codes(self.trace(fall=1904, lethal=1, end=1904))[0], [])
+        self.assertEqual(self.codes(self.trace(contact=1100, minus=1160, hp=1180, reduced=1, end=1180))[0], [])
+
+    def test_timeline_is_checked(self):
+        self.assertEqual(self.codes(self.trace(contact=1500, minus=1560, hp=1580))[0], ["A1"])   # contact != t0 + 454
+        self.assertEqual(self.codes(self.trace(hp=1600))[0], ["A1"])                            # hp != contact + 80
+        self.assertEqual(self.codes(self.trace(lethal=1))[0], ["A1"])                           # lethal without a fall
+        self.assertEqual(self.codes(self.trace(cue11=1460))[0], ["A1"])                         # CUE-011 off the contact
+
+    def test_cli_min_ability(self):
+        import tempfile
+        with tempfile.NamedTemporaryFile("w", suffix=".log", delete=False, encoding="utf-8") as f:
+            f.write("\n".join(self.trace()) + "\n")
+        self.assertEqual(cc.main(["check-trace", f.name, "--min-ability", "1"]), 0)
+        self.assertEqual(cc.main(["check-trace", f.name, "--min-ability", "2"]), 1)
 
 
 class DeathStageTests(unittest.TestCase):

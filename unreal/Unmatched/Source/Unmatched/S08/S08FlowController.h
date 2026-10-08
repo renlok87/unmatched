@@ -51,7 +51,11 @@ struct FS08HeroEntry {
  *  HTTP echo + WS event of the same seq produce exactly one cue set. */
 /** VS-6 F2 FX-25 (ВР-FX13): FighterHealed - the HP of a fighter alive before and after the transition grew (Damage
  *  then carries the healed amount, HP after - HP before); after the damage cues of the seq. */
-enum class ES08CueType : uint8 { FighterMoved, FighterDamaged, FighterHealed };
+/** VS-6 F3 FX-28 (CUE-014): AbilityTriggered - Medusa's pending `ability-medusa-target-p<n>` (TARGET_FIGHTER) of the
+ *  previous applied state is gone from metadata.pendingEffects and one of its targets lost HP; FighterId = Medusa's
+ *  fighter, TargetId = the target, Damage = the HP it lost, HeroKey = Medusa. Before the damage cues of the seq. A
+ *  decline (no HP lost) or no pending gives none. */
+enum class ES08CueType : uint8 { FighterMoved, FighterDamaged, FighterHealed, AbilityTriggered };
 
 /** MS-T-15 (move-selection 04 §4.6): how a FighterMoved cue travels - Move
  *  step by step along Path, Place as one jump to the last cell (steps = 1). */
@@ -68,6 +72,10 @@ struct UNMATCHED_API FS08Cue {
   FString FighterId;
   int32 FromX = 0, FromY = 0, ToX = 0, ToY = 0; // move
   int32 Damage = 0;                             // health decrease
+  // ---- VS-6 F3 FX-28: AbilityTriggered only ----
+  FString TargetId;                             // the fighter the ability damaged
+  FString HeroKey;                              // S08HeroesV2 key of the hero (Medusa)
+  int32 TargetHpBefore = -1;                    // FromX / FromY carry the target's cell before the blow
   // ---- MS-T-15: FighterMoved only ----
   /** Cells WITH the start: Path[0] = from, Path.Last() = to. Place: [from, to]. */
   TArray<FIntPoint> Path;
@@ -196,6 +204,8 @@ public:
   /** Fires once per authoritative event (seq transition) - never for a
    *  same-seq merge, so HTTP+WS duplicates cannot double-fire cues. */
   FOnCues OnCues;
+  /** VS-6 F3 FX-30: the cues of the transition being applied - valid only inside OnApplied (empty otherwise). */
+  const TArray<FS08Cue>& GetApplyingCues() const { return ApplyingCues; }
   /** S10 review P1(5): fired when a DISPATCHED gameplay command was
    *  DEFINITIVELY rejected by the server (a 401-answered auth rejection or a
    *  GraphQL/4xx rejection - the command is provably NOT applied). NEVER
@@ -337,6 +347,11 @@ public:
   static void ComputeCues(int32 Seq, const TSharedPtr<FJsonValue>& OldFighters,
                           const TSharedPtr<FJsonValue>& NewFighters, const FS08BoardModel& Board,
                           const TSharedPtr<FJsonValue>& Metadata, TArray<FS08Cue>& OutCues);
+  /** VS-6 F3 FX-28: the same with the OLD (applied) metadata - its pendingEffects give the AbilityTriggered cues. */
+  static void ComputeCues(int32 Seq, const TSharedPtr<FJsonValue>& OldFighters,
+                          const TSharedPtr<FJsonValue>& NewFighters, const FS08BoardModel& Board,
+                          const TSharedPtr<FJsonValue>& Metadata, const TSharedPtr<FJsonValue>& OldMetadata,
+                          TArray<FS08Cue>& OutCues);
   /** MS-T-15 (04 §9) trace lines of the move cues of one seq, in
    *  OrderInSeq order, timed by FS08MoveCueSchedule (Normal speed):
    *  "MS-CUE move seq=<n> fighter=<id> order=<k> of=<n> kind=<move|place>
@@ -726,6 +741,7 @@ private:
   int32 MatchGeneration = 0;
   FS08Snapshot Applied;
   FS08SeqGuard SeqGuard;
+  TArray<FS08Cue> ApplyingCues;  // VS-6 F3: GetApplyingCues
   // GD-032: seq of the last body that carried decks/discardPiles (0 = never).
   int32 DecksSeq = 0;
   int32 DiscardPilesSeq = 0;

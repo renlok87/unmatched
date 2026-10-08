@@ -1,0 +1,77 @@
+{
+ "schema": "unmatched.cue-fixture/1",
+ "id": "ability-arthur-boost",
+ "kind": "scenario",
+ "description": "FX-28 / FX-32 (VS-6 F3, ВР-FX10): атака King Arthur с бустом способности — CUE-014 в кадр переворота атакующей карты (FlipAttack = начало CUE-010), система и сокет из поля героя (NS_FX_ArthurArc, socket=Weapon); CUE-011 Medusa из кадра контакта (staged). Затем reduced motion: CUE-014 следующей атаки с бустом сокращается до 100 мс. Атака без буста CUE-014 не даёт (правило адаптера, здесь его нет).",
+ "covers": [
+  "FX-28 поле героя",
+  "FX-32",
+  "D11",
+  "CUE-014 vfx socket Weapon"
+ ],
+ "events": [
+  {
+   "t": 0,
+   "kind": "cue",
+   "id": "CUE-010",
+   "subject": "scene",
+   "seq": 60
+  },
+  {
+   "t": 0,
+   "kind": "cue",
+   "id": "CUE-014",
+   "subject": "arthur",
+   "seq": 60
+  },
+  {
+   "t": 1392,
+   "kind": "cue",
+   "id": "CUE-011",
+   "subject": "medusa",
+   "seq": 60,
+   "staged": true
+  },
+  {
+   "t": 3000,
+   "kind": "settings",
+   "reduced_motion": true
+  },
+  {
+   "t": 3100,
+   "kind": "cue",
+   "id": "CUE-010",
+   "subject": "scene",
+   "seq": 62
+  },
+  {
+   "t": 3100,
+   "kind": "cue",
+   "id": "CUE-014",
+   "subject": "arthur",
+   "seq": 62
+  }
+ ],
+ "expect_trace": [
+  "CUE fx id=CUE-010 subject=scene seq=60 t=0 vfx=none sfx=missing clip=none mat=none socket=- reduced=0 result=fallback",
+  "CUE fx id=CUE-014 subject=arthur seq=60 t=0 vfx=NS_FX_ArthurArc sfx=missing clip=none mat=none socket=Weapon reduced=0 result=fallback",
+  "CUE fx done id=CUE-010 subject=scene seq=60 t=800 ms=800 cut=0",
+  "CUE fx done id=CUE-014 subject=arthur seq=60 t=800 ms=800 cut=0",
+  "CUE fx id=CUE-011 subject=medusa seq=60 t=1392 vfx=NS_FX_HitStar sfx=missing clip=AM_Medusa_HitReact mat=FxFlash socket=- reduced=0 result=fallback",
+  "CUE fx done id=CUE-011 subject=medusa seq=60 t=2292 ms=900 cut=0",
+  "CUE settings reduced_motion=1 t=3000",
+  "CUE fx id=CUE-010 subject=scene seq=62 t=3100 vfx=none sfx=missing clip=none mat=none socket=- reduced=1 result=fallback",
+  "CUE fx id=CUE-014 subject=arthur seq=62 t=3100 vfx=NS_FX_ArthurArc sfx=missing clip=none mat=none socket=Weapon reduced=1 result=fallback",
+  "CUE fx done id=CUE-010 subject=scene seq=62 t=3200 ms=100 cut=0",
+  "CUE fx done id=CUE-014 subject=arthur seq=62 t=3200 ms=100 cut=0"
+ ],
+ "expect_summary": {
+  "presented": 5,
+  "spawned": 0,
+  "fallback": 5,
+  "duplicate": 0,
+  "stale": 0,
+  "done": 5,
+  "unique_triples": 5
+ }
+}

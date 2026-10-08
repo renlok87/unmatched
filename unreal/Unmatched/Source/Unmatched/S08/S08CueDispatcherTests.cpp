@@ -71,6 +71,45 @@ TMap<FString, FString> TablePresentVfx() {
   return Out;
 }
 
+/** VS-6 F3 FX-28: cue_contract.hero_entry - the vfx.by_hero entry of a trace subject (arthur -> KingArthur). */
+struct FHeroVfx {
+  FString System;
+  FString Socket;
+};
+TMap<FString, TMap<FString, FHeroVfx>> TableHeroVfx() {
+  TMap<FString, TMap<FString, FHeroVfx>> Out;
+  const TSharedPtr<FJsonObject> Table = LoadJson(ContractDir() / TEXT("cue-table.json"));
+  if (!Table.IsValid()) return Out;
+  for (const TSharedPtr<FJsonValue>& Value : Table->GetArrayField(TEXT("cues"))) {
+    const TSharedPtr<FJsonObject> Row = Value->AsObject();
+    const TSharedPtr<FJsonObject>* Vfx = nullptr;
+    const TSharedPtr<FJsonObject>* ByHero = nullptr;
+    FString Status;
+    if (!Row.IsValid() || !Row->TryGetObjectField(TEXT("vfx"), Vfx) || !(*Vfx)->TryGetObjectField(TEXT("by_hero"), ByHero) ||
+        !(*Vfx)->TryGetStringField(TEXT("status"), Status) || Status != TEXT("present")) {
+      continue;
+    }
+    TMap<FString, FHeroVfx>& Heroes = Out.Add(Row->GetStringField(TEXT("id")));
+    for (const auto& Hero : (*ByHero)->Values) {
+      const TSharedPtr<FJsonObject> E = Hero.Value->AsObject();
+      if (E.IsValid()) Heroes.Add(FString(*Hero.Key), {E->GetStringField(TEXT("system")), E->GetStringField(TEXT("socket"))});
+    }
+  }
+  return Out;
+}
+const FHeroVfx* HeroEntry(const TMap<FString, FHeroVfx>& Heroes, const FString& Subject) {
+  FString Letters;
+  for (const TCHAR C : Subject.ToLower()) {
+    if (C >= TEXT('a') && C <= TEXT('z')) Letters.AppendChar(C);
+  }
+  if (Letters.Len() < 3) return nullptr;
+  for (const auto& Hero : Heroes) {
+    const FString K = Hero.Key.ToLower();
+    if (Letters == K || K.EndsWith(Letters) || Letters.StartsWith(K)) return &Hero.Value;
+  }
+  return nullptr;
+}
+
 /** Asset tokens of a fixture: assets_present overrides (short names; assets_unloadable -> missing), else the
  *  rows' state - a vfx system the table marks present (VS-6 F1), no sfx path (ART-010), the H2Anim clip of the
  *  subject. */
@@ -93,12 +132,18 @@ void BindFixtureAssets(FS08CueDispatcher& Cues, const TSharedPtr<FJsonObject>& F
   }
   const TArray<FS08CueRow> Rows = S08CueRows::Combat();
   const TMap<FString, FString> TableVfx = TablePresentVfx();
-  Cues.AssetResolver = [Present, Unloadable, Rows, TableVfx](const FString& CueId, const FString& Channel,
-                                                             const FString& Subject) -> FString {
+  const TMap<FString, TMap<FString, FHeroVfx>> HeroVfx = TableHeroVfx();
+  Cues.AssetResolver = [Present, Unloadable, Rows, TableVfx, HeroVfx](const FString& CueId, const FString& Channel,
+                                                                      const FString& Subject) -> FString {
     FString Path;
     if (const FString* Override = Present.Find(CueId + TEXT("|") + Channel)) Path = *Override;
     if (Path.IsEmpty() && Channel == TEXT("vfx")) {
       if (const FString* System = TableVfx.Find(CueId)) Path = *System;
+    }
+    if (Path.IsEmpty() && Channel == TEXT("vfx")) {  // VS-6 F3 FX-28: the hero's system (CUE-014)
+      const TMap<FString, FHeroVfx>* Heroes = HeroVfx.Find(CueId);
+      const FHeroVfx* Hero = Heroes ? HeroEntry(*Heroes, Subject) : nullptr;
+      if (Hero) Path = Hero->System;
     }
     if (Path.IsEmpty() && Channel == TEXT("clip")) {
       const FS08CueRow* Row = S08CueRows::Find(Rows, CueId);
@@ -107,6 +152,11 @@ void BindFixtureAssets(FS08CueDispatcher& Cues, const TSharedPtr<FJsonObject>& F
     }
     if (Path.IsEmpty() || Unloadable.Contains(Path)) return TEXT("missing");
     return ShortName(Path);
+  };
+  Cues.SocketResolver = [HeroVfx](const FString& CueId, const FString& Subject) -> FString {
+    const TMap<FString, FHeroVfx>* Heroes = HeroVfx.Find(CueId);
+    const FHeroVfx* Hero = Heroes ? HeroEntry(*Heroes, Subject) : nullptr;
+    return Hero ? Hero->Socket : FString();
   };
 }
 

@@ -1,5 +1,6 @@
 #include "S08FlowController.h"
 #include "Fx/S08CombatFx.h"
+#include "Fx/S08AbilityCues.h"
 #include "S08MoveAnim.h"
 #include "Algo/StableSort.h"
 #include "Dom/JsonObject.h"
@@ -1498,6 +1499,13 @@ const TCHAR* SourceName(ES08PathSource Source) {
 void FS08FlowController::ComputeCues(int32 Seq, const TSharedPtr<FJsonValue>& OldFighters,
                                      const TSharedPtr<FJsonValue>& NewFighters, const FS08BoardModel& Board,
                                      const TSharedPtr<FJsonValue>& Metadata, TArray<FS08Cue>& OutCues) {
+  ComputeCues(Seq, OldFighters, NewFighters, Board, Metadata, nullptr, OutCues);
+}
+
+void FS08FlowController::ComputeCues(int32 Seq, const TSharedPtr<FJsonValue>& OldFighters,
+                                     const TSharedPtr<FJsonValue>& NewFighters, const FS08BoardModel& Board,
+                                     const TSharedPtr<FJsonValue>& Metadata, const TSharedPtr<FJsonValue>& OldMetadata,
+                                     TArray<FS08Cue>& OutCues) {
   OutCues.Reset();
   if (!OldFighters.IsValid() || !NewFighters.IsValid()) return;
   const TArray<TSharedPtr<FJsonValue>>* OldArray = nullptr;
@@ -1614,6 +1622,7 @@ void FS08FlowController::ComputeCues(int32 Seq, const TSharedPtr<FJsonValue>& Ol
     Cue.OrderInSeq = Rank;
     OutCues.Add(MoveTemp(Cue));
   }
+  S08AbilityCues::Append(Seq, OldFighters, NewFighters, Metadata, OldMetadata, DamageCues, OutCues);  // VS-6 F3 FX-28
   OutCues.Append(MoveTemp(DamageCues));
   OutCues.Append(MoveTemp(HealCues));
 }
@@ -1674,7 +1683,7 @@ ES08SeqDecision FS08FlowController::ApplySnapshot(const FS08Snapshot& Snapshot) 
       FS08BoardModel CueBoard;
       CueBoard.Decode(Snapshot.BoardState.IsValid() ? Snapshot.BoardState : Applied.BoardState);
       ComputeCues(Snapshot.SequenceNumber, Applied.Fighters, Snapshot.Fighters, CueBoard, Snapshot.Metadata,
-                  Cues);
+                  Applied.Metadata, Cues);
       MoveCueTraceLines(Cues, CueBoard, MoveCueLines, bMoveMotionSet ? &MoveMotion : nullptr);
     } else if (SeqGuard.HasLocal) {
       Trace(FString::Printf(TEXT("SEQ %d gap from %d: cues suppressed"), Snapshot.SequenceNumber,
@@ -1798,7 +1807,11 @@ ES08SeqDecision FS08FlowController::ApplySnapshot(const FS08Snapshot& Snapshot) 
   // MS-E-90: the snapshot may settle the open maneuver command before its
   // HTTP answer - the gate opens before the render/HUD sees this state.
   ReleaseManeuverGateBySnapshot(Snapshot);
+  // VS-6 F3 FX-30: the cues of this transition are readable while OnApplied runs (an ability staging must hold its
+  // target before the board renders the new state; OnCues comes after the render)
+  ApplyingCues = Cues;
   OnApplied.Broadcast(Applied, Decision);
+  ApplyingCues.Reset();
   // MS-T-15 (04 §9): one MS-CUE line per move cue, at the cue's start.
   for (const FString& Line : MoveCueLines) Trace(Line);
   if (Cues.Num() > 0) OnCues.Broadcast(Cues);
