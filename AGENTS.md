@@ -277,3 +277,24 @@ memory. A change that contradicts it needs the user's explicit word first.
     harpies carry the digit 1–3.
 - **ENV-U16 fixed (`8ea9c6c9`, EN-13).** Marmoreal shows the painted backdrop by default; the 3D P5c surroundings with
   the T2b tray come back only with the rollback flag `-NoConceptPaste` (ВР-56).
+
+## Rollback flags (phase-3 closing, 2026-10-09)
+
+Accepted art is the default; each flag below only rolls one piece back (client command line; the trace line `ARTLOOK …`
+names the look in use). Sources: `docs/game-design/visual/03-asset-registry.csv` (column `rollback_flag`) and
+`docs/game-design/evidence/VISUAL/CLOSEOUT-2026-10-09.md`.
+- **Whole look / render:** `-S08GreyBoard` (all art off), `-S08LegacyRender` (pre-W4-A render), `-S08DioramaLegacy`
+  (no tray and no environment, v2 figures stay), `-S08DpiLegacy` (engine DPI curve), `-S08MixLegacy` (audio mix without limiter).
+- **Boards:** Marmoreal `-NoConceptPaste` (3D P5c surroundings + T2b tray instead of the painted backdrop); Sarpedon
+  `-EnvLayoutVariant=p5c` or `-ConceptPaste=paste` (instead of lit3d path 1); `-NoHeroLight` (no hero light rig).
+- **Figures and animation:** `-S08HeroesLegacy` (grey blockouts + Medusa candidate), `-S08HeroMatFixLegacy` (ignore the
+  profile `heroMaterials` block), `-S08FacingLegacy` (no three-quarter idle / turn to target), `-S08MoveEaseLegacy`
+  (old step ease), `-S08BaseDigitLegacy` (old harpy digit placement), `-S08DissolveFade` (fade instead of ash death).
+- **Combat and field FX:** `-S08FxLegacy` (combat VFX off), `-S08FigureCueLegacy` (old rim cue), `-S08HitTintLegacy`
+  (red hit fill), `-S08ChoiceLegacy`, `-S08MovePlatesLegacy`, `-S08LastMoveLegacy`, `-S08TargetArcLegacy` (field FX of
+  FX-07…FX-15 back to the MS-T look).
+- **HUD, icons, cards, screens:** `-S08SlateHud` (whole UMG HUD and screens back to Slate) or `-S08SlateHud=<block,…>`
+  (top, panels, hand, combat, slot, actions, log, toast, pending, cursor, boot, login, lobby, room, loading, pause,
+  reconnect, gameover, aborted, menubg, …); `-S08IconLegacy` (v3 icons → old set), `-S08TrackerLegacy`,
+  `-S08TurnRingLegacy`, `-S08HeartGlowLegacy`, `-S08CrossLegacy` (turn-portrait details), `-S08CardArtLegacy` (card
+  frames and art), `-S08PortraitLegacy` (monogram portraits), `-S09Markers` (debug markers and the old pixel gates).

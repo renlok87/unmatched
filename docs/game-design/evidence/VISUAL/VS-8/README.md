@@ -79,3 +79,56 @@ C++ не менялся. Решение ВР-VS8-08: ячейка K2×1,6 — о
 C++ — только тест `S08ConceptPasteTests.cpp` (точки двух огней), UnmatchedEditor и игровая цель — Succeeded;
 UE `ConceptPaste+EnvLayout+ArtTuner+HeroLight+LiveTune` 54 / 54.
 
+
+## Шаг Frames — упаковка, гейты, кадры выхода и закрытие фазы 3 (VS-8 / VS-9, 2026-10-09)
+
+`git merge fix/admin-panel` — «Already up to date» (`2778c007`). UnmatchedEditor и игровая цель — «Result: Succeeded»
+(обе актуальны после E1). **Одна упаковка** `package-client.ps1 -SkipBuild`: штамп `2233b140`, sourceHash `955727bc…`,
+кук «Success - 0 error(s), 0 warning(s)»; новых `Config/**.json` нет (ловушка makefile не сработала). Все прогоны ниже —
+на этом пакете (два клиента — по 30 FPS на процесс, `t.MaxFPS 30`). **Не влито.**
+
+| Карточка / гейт | Итог |
+|---|---|
+| EN-25 Sarpedon P10b | packaged `-Bench` K1 / Fitx1,45 / K2×1,6 (`RENDER reference=1`, открыты), `env_gates.py` crit / gates / streams / fire / cannons / stones, одна live-серия G7, `render_bench.py` один прогон (3 повтора): G8 **K1 2,59 / K2×1,6 2,52 мс — PASS**; G5 PASS; G6 6 из 6; В-1 / В-2 / В-4 PASS; **FAIL**: В-3 SSIM 0,4446, G4-SSIM 0,4879 (< 0,49 на 0,002); G7 знамени 3,8 % и света жаровни 1,85 в этой серии ниже порога. Контроль Marmoreal — разница только на фигурах (AN-31 / AN-33). [P10b, раздел EN-25](../../ENV-MAPS/p10b-sarpedon-2026-10-09/README.md), [лист](../ENV-SARPEDON-P10B/README.md), [дополнение GD-058](../../GD-058/sarpedon-p10b-2026-10-09/README.md) |
+| AN-18 из пакета | 8 packaged `-Bench` (02:24 → 03:02), 1200 `clippose` с `rootDeltaUU=0.00`, 540 `RENDER reference=1`, `heroes=v2 facing=v1` в 8 трассах; 16 листов AN-01…AN-16 заменены packaged-версиями (шапка «сборка: packaged»), 0 проблем. Поворот (ВР-06): спиной к камере нет ни в листах, ни в живых кадрах боя (Arthur вполоборота при выбранной атаке, Sarpedon) |
+| `run-combat-demo` Marmoreal / Sarpedon (1080p, player view, exit / screen shots) | **PASS** обе: SHOT widget HB-48 (окно защиты, закрытое окно до раскрытия, результат у краёв и в центре, privacy), FINISHED, `FIGHTERS synced n=6`, `RequireRenderReference` |
+| `run-duel-demo` Marmoreal / Sarpedon | **PASS** обе: HUD_SHOTS rules 2 privacy, строка сервера FINISHED, статистика и ELO, лобби по трассе |
+| `run-hud-probe` | **PASS** (rules 3, privacy, отрицательные контроли) |
+| `run-vs-ai-demo` Marmoreal / Sarpedon (`-S08BoardId`, 1080p) | **PASS** обе: VICTORY = winnerSeat сервера, `SHOT widget id=UI-SCR-GAMEOVER state=victory` и `state=board` нарисованы |
+| VS-7 (b) в пакете | `state=board` в нижнем регистре во всех packaged-трассах (combat, duel, vs-ai) — исправление ВР-VS8-06 подтверждено |
+| UE `Unmatched.S08+S09+S10` | **554 / 554** |
+| pytest `tools/art/tests`, `tools/art/map_surface`, `tools/s08/hud_contract`, `tools/s08/cue_contract` | **777 passed**, 3 skipped; `clip_review_sheet.py --check`, `live_tune.py --check` — без ошибок |
+| G-LOOK | Marmoreal `backdrop=paste(default)`, Sarpedon `backdrop=lit3d(default)`, `heroes=v2`, шесть фигур; `reference=0` только у строк PERF и у кадра после выхода в лобби (нет профиля доски) |
+
+**GD-058, полный раунд (ВР-59).** Открыты контактные листы по 6 живых кадров на доску (HUD своего хода, окно защиты,
+вспышка удара, звезда, след хода соперника, GAMEOVER) и packaged-кадры `-Bench` обеих досок. Настоящие карты, задник
+Marmoreal нарисованный, Sarpedon lit3d, HUD, VFX, экраны и шесть фигур v2 вместе — принято по делегированию (без личного
+просмотра пользователя). Кадры с картами и аватарами — вне git: `scraped-data/derived/visual-evidence/VS-8/gd058/` (217
+файлов, индекс [data/vs8-frames-evidence-index.json](data/vs8-frames-evidence-index.json)).
+
+**Закрытие фазы 3:** сверка реестра 03 (ниже), блок «Rollback flags» в [AGENTS.md](../../../../../AGENTS.md) (новый раздел,
+другие не менялись), итог — [CLOSEOUT-2026-10-09.md](../CLOSEOUT-2026-10-09.md).
+
+**Сверка реестра 03** (скрипт вне git `C:/tmp/visual/VS8/F/reconcile03.py`: путь UE есть в Content, карточки ссылок есть,
+файлы ссылок есть, статус не отстаёт от карточек). До: 12 путей UE без ассета, 6 файлов ссылок, 11 строк со статусом
+позади карточек. Исправлено: размеры `T_IV3_state_hint` / `threat` (в UE 18…64, не 48…128); `SM_LastMoveArrow` — меша нет,
+наконечник — слоты ISM плит `M_UM_MovePlate`; статусы `F_UM_RobotoBoldCondensed_Offline`, `M_UM_BaseDigit`,
+`PROC_Anim_FacingIdle` / `FaceTarget` / `FaceReturn`, `PROC_Anim_StepEase`, `M_FX_Print` → художественно принято;
+`NET_UM_Combat` / `Board`, `PROC_Vfx_RimHover`, `WBP_UmConfirmDialog` → технически импортировано; 16 `AM_*` → художественно
+принято (AN-18 из пакета); строкам окружения EN-19…EN-24 добавлены EN-25 и замер P10b (статус остаётся техническим).
+Осталось без правки (не расхождение): `T_Cursor_Busy_00…07` (запись диапазоном, ассеты есть), шаблон `MI_<Key>…_Dissolve`,
+`ART005*`, `WBP_UI_SCR_HISTORY` и макеты SC-39…SC-42 (пост-MVP, «предложено»); два файла масок Marmoreal вне git отсутствуют —
+«Открыто» п. 10 закрытия.
+
+| ВР | Решение (по делегированию) | Почему |
+|---|---|---|
+| ВР-VS8-61 | Одна упаковка `-SkipBuild` после сборки игровой цели; все гейты, листы и цена — на ней | правило «одна упаковка»; цели собраны и актуальны |
+| ВР-VS8-62 | G7 знамени и света жаровни ниже порога в одной packaged live-серии — записаны как есть, повторной серии нет | правило скорости 2026-10-08; editor-серия E1 давала 10,2 % и 3,66 (20 кадров) — разброс фазы ветра и мерцания |
+| ВР-VS8-63 | EN-24 / G4 0,4879 < 0,49 — FAIL записан, правок нет; Р-39 остаётся FAIL | разница 0,002 в шуме кадра; правило «без оптимизаций», хвост — итерация ENV |
+| ВР-VS8-64 | Контроль Marmoreal — сравнение с packaged GD-058 2026-10-08; допустима разница только на фигурах | правки шага меняли фигуры (AN-31, AN-33), но не окружение Marmoreal |
+| ВР-VS8-65 | GD-058 раунд = живые `run-combat-demo` 1080p обеих досок + VS_AI GAMEOVER + packaged `-Bench` K1 / K2; живые кадры вне git | ВР-59; ВР-VS4-01 (сканы карт и аватары не в git) |
+| ВР-VS8-66 | Строки окружения Sarpedon остаются «технически импортировано» | акт ENV по делегированию «художественно принято» не ставит (правило честной пометки) |
+| ВР-VS8-67 | Пятно у левого края Sarpedon (ВР-VS8-05) не правится в VS-9, вынесено в «Открыто» | правка меняет принятый вид lit3d и требует новой итерации с гейтами; правило скорости |
+
+Процессы: сессия live tune остановлена (`killed=false`, замок снят), все клиенты, прокси и тесты шага завершились сами;
+замка GPU нет, процессов worktree не осталось. Скрипты шага вне git — `C:/tmp/visual/VS8/F/`.

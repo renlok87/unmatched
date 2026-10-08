@@ -112,3 +112,36 @@ python tools/art/render/env_gates.py gates <final> --concept <concept> --g6-excl
 python tools/art/render/env_gates.py fire <final>/bench-K1-1920x1080.png --roi 345,40,400,160 --roi 128,580,200,692
 python tools/art/render/env_gates.py stones <K2 png> [--without <K2 png without the stones> --layout <layout>]
 ```
+
+## EN-25: одна упаковка, свежий packaged `-Bench`, гейты, цена (VS-8 Frames, 2026-10-09)
+
+Одна упаковка ветки `feat/visual-vs8` (штамп `2233b140`, `-SkipBuild` после сборки игровой цели, кук без ошибок; новых
+`Config/**.json` нет). Кадры — [sarpedon-packaged/](sarpedon-packaged/) (JPEG q90 из PNG прогона, PNG вне git:
+`C:/tmp/visual/VS8/F/en25/`), контроль Marmoreal — [marmoreal-control-packaged/](marmoreal-control-packaged/), цена —
+[bench/bench-summary.json](bench/bench-summary.json), замеры — `sarpedon-packaged/*-packaged.json`. Все кадры `RENDER
+reference=1`; открыты: K1, Fitx1,45, K2×1,6 Sarpedon и K1 Marmoreal; лист — [ENV-SARPEDON-P10B](../../VISUAL/ENV-SARPEDON-P10B/README.md).
+
+| Карточка / гейт | editor final (E1) | **packaged (EN-25)** | Итог |
+|---|---|---|---|
+| EN-19 кромка K1 / струи / ≥ 245 | 13 px / 3 / 0 % | **13 px / 3 (42, 89, 35 px) / 0 %** | PASS |
+| EN-19 тело водопада C0 (пятно P10) | — | ΔE76 **4,41**, dL* −0,71 | PASS |
+| EN-20 знамя: строки G6 / IoU | — / 0,32 | строки **1,115** (верх 340, низ 776; нарисованное 340–745) / IoU не перемерялся | IoU FAIL (E1) |
+| EN-21 G6 | 6 из 6 | **6 из 6** (bay 2,99, left 1,13, stern 0,90, rail 0,80, deck-n 0,90, deck-se 0,90) | PASS |
+| EN-22 огонь K1 (ROI ВР-VS8-47) | форт 113 / 2,06 / 2; жаровня 88 / 1,22 / 2 | форт **113 / 2,06 / 2**, красного 4 %; жаровня **86 / 1,19 / 1**, 0,5 % | форт PASS; жаровня на этом кадре ниже h/w 1,2 и 2 языков (фаза пламени) |
+| EN-23 SSIM корабля / пушки p90 / hull-red | 0,4431 / 22,6, 12,9, 15,9 / 5,53 | **0,4446** / **22,6, 13,0, 16,1** / **5,53**, борт ≥ 245 — 0 | SSIM FAIL; пушки и борт PASS |
+| EN-24 камни K2×1,6 | нет | **нет** (0 px, бликов 0) | PASS |
+| G4 SSIM ¼ / медиана ΔE пятен | 0,4891 / — | **0,4879** / 5,28 | SSIM < 0,49: FAIL на 0,002 (шум ≈ ±0,002); ΔE PASS |
+| G5 K1 | 105,0 / 25,05 / 0,137 / 36,4 | **105,3 / 25,14 / 0,137 / 36,5** | PASS |
+| G7 live (одна серия packaged) | водопад 26,7 %, знамя 10,2 %, свет жаровни 3,66 (20 кадров) | водопад **28,5 / 25,8 %**, огонь 17,8–23,7 %, кроны 12,5 / 8,5 %, знамя **3,8 %**, свет жаровни **1,85** (6 кадров) | водопад / огонь / кроны PASS; знамя и свет жаровни ниже порога в этой серии |
+| G8 `render_bench.py` v2, 3 повтора | — | K1 **2,59 мс** (шум 0,01), K1×0,65 2,56, K2×1,6 **2,52**, K2×2,5 2,44 | PASS (K1 ≤ 3,5, Δ к 2,60 −0,01; K2×1,6 ≤ 3,8) |
+
+Контроль Marmoreal: packaged K1 / K2×1,6 против packaged GD-058 2026-10-08 (`C:/tmp/visual/E5/exit/marm-bench-final`) —
+сырые 0,85 / 0,47, пикселей > 24 — 0,15 / 0,22 % (порог шума 0,5 / 0,05 %). Разница сосредоточена на фигурах (крылья и
+подставки гарпий — цифры AN-31; Arthur и Medusa — блок материалов AN-33 Marmoreal) и на мерцании левого фонаря; поле,
+задник-вклейка и рама не изменились — правки E1 Marmoreal не касаются.
+
+Цена записана одним измерением и в бюджете — оптимизаций нет (правило пользователя 2026-10-08). Дополнение к акту —
+[GD-058/sarpedon-p10b-2026-10-09](../../GD-058/sarpedon-p10b-2026-10-09/README.md) (принято по делегированию, без личного
+просмотра пользователя; FAIL остаются FAIL). Интеграция — после ветки VS-8 (`safe-integrate.sh`), в основной копии —
+пересборка UnmatchedEditor и `sync-staged-build.ps1 -From C:/tmp/wt-visual`; Content основной копии нужно переимпортировать,
+как сказано выше (4 коммандлета, для FX — сначала удалить два производных `.uasset`).
