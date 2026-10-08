@@ -1172,6 +1172,13 @@ bool FS08BoardArtData::ParseJson(const FString& Text, TArray<FString>& OutErrors
       if (!ParseRenderBlocks(Pair.Key, *Obj, Profile, OutErrors)) continue;
       // ENV-MAPS P9: a broken "heroLight" block drops the profile (a board pointing at it then fails the document)
       if (!S08HeroLight::Parse(Pair.Key, *Obj, Profile.HeroLight, OutErrors)) continue;
+      // VS-6 F4: "heroLightNoPaste" - the same schema, parsed through a one-field wrapper (its errors name the block)
+      const TSharedPtr<FJsonObject>* NoPaste = nullptr;
+      if ((*Obj)->TryGetObjectField(TEXT("heroLightNoPaste"), NoPaste) && NoPaste) {
+        const TSharedPtr<FJsonObject> Wrap = MakeShared<FJsonObject>();
+        Wrap->SetObjectField(TEXT("heroLight"), *NoPaste);
+        if (!S08HeroLight::Parse(Pair.Key + TEXT(" (heroLightNoPaste)"), Wrap, Profile.HeroLightNoPaste, OutErrors)) continue;
+      }
       // AN-32 (ВР-16): the "heroMaterials" block (a bad hero entry drops only itself; the error is reported)
       ParseHeroMaterials(Pair.Key, *Obj, Profile.HeroMaterials, OutErrors);
       FString Reason;

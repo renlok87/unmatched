@@ -234,6 +234,11 @@ public:
    *  world damage-number text (the damage actor stays: lifetime, dedupe, trace). */
   void SetScreenLabelMode(bool bScreen);
   bool IsScreenLabelMode() const { return bScreenLabelMode; }
+  /** VS-6 F4 (ВР-07, VS-5 review note 3): the world TextRender name / HP labels over the figures are review tooling -
+   *  off on an art board (the live game, -Bench, -ArtPreview frames) unless -S08WorldLabels; the grey slice keeps them. */
+  bool WorldNameLabelsOff() const;
+  /** VS-6 F4: the light profile's "heroLightNoPaste" rig applies (set, and the concept paste is not shown). */
+  bool HeroLightUsesNoPaste(const struct FS08LightProfile& Light) const;
   /** Seq of the live damage number of a fighter (-1 when none). */
   int32 GetDamageNumberSeq(const FString& FighterId) const;
   int32 GetDamageNumberAmount(const FString& FighterId) const;
@@ -517,6 +522,7 @@ private:
   FString TeamP1OwnerId;
   ES08TeamColorMode TeamColorMode = ES08TeamColorMode::Absolute;
   bool bScreenLabelMode = false;
+  bool bWorldLabelsTraced = false;
   FS08SeqDedupe DamageDedupe;
   FString LabelPlateFighterId;
   bool bScreenIconMode = false;

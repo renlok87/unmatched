@@ -332,6 +332,10 @@ struct UNMATCHED_API FS08LightProfile {
   /** ENV-MAPS P9 (docs/art-pipeline/ENV-HERO-LIGHT.md, S08HeroLight.h): the optional per-figure "heroLight" rig (lighting
    *  channel 1, figures only); a separate category outside the 1 key + <= 6 points budget below. */
   FS08HeroLightSpec HeroLight;
+  /** VS-6 F4 (ВР-VS6, VS-5 review note 1): the optional "heroLightNoPaste" - the hero light when the board's concept paste
+   *  is not shown (the -NoConceptPaste rollback, missing paste assets): Marmoreal keeps P9b there, P9c lives under the
+   *  painted backdrop. Same schema as "heroLight"; unset = "heroLight" everywhere. */
+  FS08HeroLightSpec HeroLightNoPaste;
   /** AN-32 (ВР-16): the "heroMaterials" block - hero key -> look ("P1" / "P2" / "*") -> the Fix values. */
   TMap<FString, TMap<FString, FS08HeroMaterialFix>> HeroMaterials;
   /** The fix of a hero for a look: the look's own entry, else "*", else the neutral default. */

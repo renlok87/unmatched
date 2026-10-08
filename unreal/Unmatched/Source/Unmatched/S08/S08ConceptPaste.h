@@ -604,6 +604,13 @@ struct UNMATCHED_API FS08LightsOffStats {
 };
 
 namespace S08ConceptPaste {
+/** VS-6 F4 (VS-5 review note 2: the conn-syncing frame at the match start showed the board field in coarse mip
+ *  blocks): textures that cover the whole frame - the map field (base colour, game mask) and the paste plates - get
+ *  their whole mip chain resident when the board builds: kept resident (bForceMiplevelsToBeResident, the pool never
+ *  drops them) and streamed in at once (IStreamingManager::StreamAllResources, <= 3 s, inside the match load) instead
+ *  of the streamer ramping the mips up over the first seconds. No-op without rendering (automation). Traced:
+ *    ARTPREVIEW texture-preload what=<map|paste> profile=<id> textures=<n> resident=<name>=<a>/<b>[,...] ms=<t> */
+UNMATCHED_API void PreloadTextures(std::initializer_list<UTexture*> Textures, const TCHAR* What, const FString& ProfileId);
 /** Parses the "conceptPaste" object of board BoardId; appends 'board <id>: conceptPaste.<field> ...' errors. */
 UNMATCHED_API bool ParseJson(const FString& BoardId, const TSharedPtr<FJsonObject>& Object, FS08ConceptPasteSpec& Out,
                              TArray<FString>& OutErrors);

@@ -429,7 +429,7 @@ class Overlays(unittest.TestCase):
                 self.assertLessEqual(parts, 40.0)
                 self.assertEqual(math.copysign(1.0, u["Gravity"][0]), math.copysign(1.0, x))  # outwards
                 self.assertTrue(12.0 <= -u["Gravity"][2] / u["Drag"] <= 20.0)  # terminal fall speed, uu/s
-                self.assertTrue(4.0 <= abs(u["Gravity"][0]) / u["Drag"] <= 10.0)  # drift, uu/s
+                self.assertTrue(1.0 <= abs(u["Gravity"][0]) / u["Drag"] <= 10.0)  # drift, uu/s (VS-6 F4 ВР-VS6-38: 2 over the bushes)
                 self.assertEqual(f["system"], "/Game/EnvKit/FX/NS_Env_CherryPetals")
             else:
                 self.assertLessEqual(parts, 24.0)

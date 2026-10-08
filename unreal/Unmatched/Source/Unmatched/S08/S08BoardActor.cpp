@@ -356,6 +356,17 @@ void AS08BoardActor::SetLabelPresentation(const FString& PlateFighterId) {
   }
 }
 
+bool AS08BoardActor::WorldNameLabelsOff() const {
+  static const bool bOptIn = FParse::Param(FCommandLine::Get(), TEXT("S08WorldLabels"));
+  const bool bOff = bArtActive && !bOptIn;
+  if (!bWorldLabelsTraced && bArtActive) {
+    const_cast<AS08BoardActor*>(this)->bWorldLabelsTraced = true;
+    FS08Trace::Write(FString::Printf(TEXT("ARTLOOK world-labels off=%d reason=%s"), bOff ? 1 : 0,
+                                     bOptIn ? TEXT("flag") : TEXT("vr07")));
+  }
+  return bOff;
+}
+
 ES08TeamSlot AS08BoardActor::TeamOfFighter(const FS08BoardFighter& Fighter) const {
   return S08TeamOf(Fighter.Id, Fighter.OwnerId, TeamP1OwnerId);
 }
@@ -364,7 +375,7 @@ void AS08BoardActor::SetScreenLabelMode(bool bScreen) {
   if (bScreenLabelMode == bScreen) return;
   bScreenLabelMode = bScreen;
   for (AS08FighterActor* Actor : FighterActors) {
-    if (Actor) Actor->SetWorldLabelsSuppressed(bScreen);
+    if (Actor) Actor->SetWorldLabelsSuppressed(bScreen || WorldNameLabelsOff());
   }
   for (const TPair<FString, TWeakObjectPtr<AActor>>& Entry : DamageNumbers) {
     if (!Entry.Value.IsValid()) continue;
@@ -1122,6 +1133,8 @@ void AS08BoardActor::UpdateDioramaTray(const FS08BoardModel& Board) {
   UpdateBackdrop();
   // ENV-MAPS P7 (ENV-U15): the concept paste after the layout it hides parts of (a no-op on grid-only runs).
   UpdateConceptPaste();
+  // VS-6 F4: the shown paste picks the hero-light variant (heroLightNoPaste) - re-rig the figures already on the board
+  if (FighterActors.Num() > 0) UpdateHeroLights();
   // VS-5 EN-13 (ВР-VS5-17): the backdrop of this map board in its ARTLOOK board line (once per change; grids: none)
   if (bArtActive && bMapImageActive) {
     const FString Backdrop = S08ArtLook::BackdropField(ActiveProfile.ConceptPaste, ConceptMode);
@@ -1842,7 +1855,7 @@ void AS08BoardActor::SyncFighters(const FS08BoardModel& Board,
     }
     if (Actor) {
       Actor->SetScreenIconMode(bScreenIconMode);
-      Actor->SetWorldLabelsSuppressed(bScreenLabelMode);
+      Actor->SetWorldLabelsSuppressed(bScreenLabelMode || WorldNameLabelsOff());
       const bool bOwn = Fighter.OwnerId == OwnOwnerId;
       const ES08TeamSlot Team = TeamOfFighter(Fighter);
       Actor->SetTeam(Team, S08TeamLook(Team, bOwn, TeamColorMode), TeamColorMode);
@@ -2218,6 +2231,7 @@ bool AS08BoardActor::LoadMapImageAssets(const FS08MapImageSpec& Spec) {
   Mid->GetTextureParameterValue(FHashedMaterialParameterInfo(S08MapSurfaceSpec::ParamGameMask), BoundMask);
   const UMaterial* Base = Mi->GetMaterial();
   MapPlaneMaterial = Mid;
+  S08ConceptPaste::PreloadTextures({Bc, Mask}, TEXT("map"), Spec.Name);  // VS-6 F4: the field at full mips from frame 1
   FS08Trace::Write(FString::Printf(
       TEXT("ARTPREVIEW map-image assets map=%s mi=%s material=%s bc=%s mask=%s boundBc=%d boundMask=%d sdf=%d id=%d"),
       *Spec.Name, *Mi->GetName(), Base ? *Base->GetName() : TEXT("-"), *Bc->GetName(), *Mask->GetName(),
@@ -2616,6 +2630,10 @@ bool HeroLightCommandLineOff(FString& OutReason) {
 }
 }  // namespace
 
+bool AS08BoardActor::HeroLightUsesNoPaste(const FS08LightProfile& Light) const {
+  return Light.HeroLightNoPaste.bSet && !IsConceptPasteOn();
+}
+
 const FS08HeroLightSpec* AS08BoardActor::GetActiveHeroLight() const {
   FString Unused;
   const bool bOptOut = HeroLightOptOutOverride.IsSet() ? HeroLightOptOutOverride.GetValue() : HeroLightCommandLineOff(Unused);
@@ -2624,7 +2642,10 @@ const FS08HeroLightSpec* AS08BoardActor::GetActiveHeroLight() const {
   if (bHeroLightOverride) {
     Spec = &HeroLightOverride;
   } else if (bArtActive) {
-    if (const FS08LightProfile* Light = ArtData.LightFor(ActiveProfile)) Spec = &Light->HeroLight;
+    if (const FS08LightProfile* Light = ArtData.LightFor(ActiveProfile)) {
+      // VS-6 F4: the rollback without the painted backdrop keeps its own rig (Marmoreal: P9b), else the profile's
+      Spec = HeroLightUsesNoPaste(*Light) ? &Light->HeroLightNoPaste : &Light->HeroLight;
+    }
   }
   return Spec && Spec->bSet && Spec->bEnabled && Spec->Layers() > 0 ? Spec : nullptr;
 }
@@ -2636,7 +2657,9 @@ void AS08BoardActor::UpdateHeroLights() {
   const FS08HeroLightSpec* Spec = GetActiveHeroLight();
   const FS08LightProfile* Light = bArtActive ? ArtData.LightFor(ActiveProfile) : nullptr;
   const TCHAR* Reason = bOptOut              ? *OffReason
-                        : Spec               ? (bHeroLightOverride ? TEXT("test-override") : TEXT("profile"))
+                        : Spec               ? (bHeroLightOverride ? TEXT("test-override")
+                                                : Light && HeroLightUsesNoPaste(*Light) ? TEXT("profile-nopaste")
+                                                                                         : TEXT("profile"))
                         : !bArtActive        ? TEXT("no-art")
                         : !Light             ? TEXT("no-light-profile")
                         : !Light->HeroLight.bSet ? TEXT("no-block")

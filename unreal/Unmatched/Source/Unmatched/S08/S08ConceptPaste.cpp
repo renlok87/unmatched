@@ -13,6 +13,9 @@
 #include "Engine/CollisionProfile.h"
 #include "Engine/StaticMesh.h"
 #include "Engine/Texture.h"
+#include "Engine/Texture2D.h"
+#include "ContentStreaming.h"
+#include "Misc/App.h"
 #include "Engine/World.h"
 #include "GameFramework/Actor.h"
 #include "Materials/MaterialInstance.h"
@@ -1202,6 +1205,29 @@ FString GroundKindOf(const FString& Name) {
 
 // ---- world -------------------------------------------------------------------------------------------------------
 
+void PreloadTextures(std::initializer_list<UTexture*> Textures, const TCHAR* What, const FString& ProfileId) {
+  if (!FApp::CanEverRender()) return;
+  TArray<UTexture2D*> Plates;
+  for (UTexture* T : Textures) {
+    if (UTexture2D* T2 = Cast<UTexture2D>(T)) Plates.AddUnique(T2);
+  }
+  if (Plates.Num() == 0) return;
+  const double T0 = FPlatformTime::Seconds();
+  for (UTexture2D* T2 : Plates) {
+    T2->bForceMiplevelsToBeResident = true;
+    T2->SetForceMipLevelsToBeResident(30.0f);
+  }
+  IStreamingManager::Get().StreamAllResources(3.0f);
+  FString Resident;
+  for (UTexture2D* T2 : Plates) {
+    Resident += FString::Printf(TEXT("%s%s=%d/%d"), Resident.IsEmpty() ? TEXT("") : TEXT(","), *T2->GetName(),
+                                T2->GetNumResidentMips(), T2->GetNumMips());
+  }
+  FS08Trace::Write(FString::Printf(TEXT("ARTPREVIEW texture-preload what=%s profile=%s textures=%d resident=%s ms=%d"),
+                                   What, *ProfileId, Plates.Num(), *Resident,
+                                   FMath::RoundToInt((FPlatformTime::Seconds() - T0) * 1000.0)));
+}
+
 FS08ConceptPasteAssets LoadAssets(const FS08ConceptPasteSpec& Spec, ES08ConceptKind Kind) {
   using namespace S08ConceptPastePrivate;
   FS08ConceptPasteAssets A;
@@ -1330,6 +1356,7 @@ void Apply(const FS08ConceptPasteSpec& Spec, const FS08ConceptPasteAssets& Asset
   UStaticMeshComponent* Sheet = CpNewPart(Owner, Root, TEXT("ConceptPasteSheet"), Assets.Sheet, SheetMid, FTransform::Identity);
   Parts.Add(Sheet);
   Runtime.SheetParts = 1;
+  PreloadTextures({Assets.PlateA, Assets.PlateB, Assets.AnimMask}, TEXT("paste"), Runtime.ProfileId);  // VS-6 F4
   const FBox SheetBox = Assets.Sheet->GetBoundingBox();
   int32 Triangles = -1;
   if (const FStaticMeshRenderData* Render = Assets.Sheet->GetRenderData()) {
