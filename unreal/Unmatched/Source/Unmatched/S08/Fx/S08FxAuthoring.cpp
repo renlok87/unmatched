@@ -12,6 +12,8 @@
 #include "Materials/MaterialInterface.h"
 #include "NiagaraSpriteRendererProperties.h"
 #include "NiagaraSystem.h"
+#include "NiagaraCommon.h"
+#include "NiagaraTypes.h"
 #include "Serialization/JsonSerializer.h"
 #include "Serialization/JsonWriter.h"
 
@@ -206,6 +208,112 @@ FString US08FxAuthoringLibrary::MakeBoardQuadCarrier(const FString& SystemPath, 
     Report->SetNumberField(TEXT("renderersDisabled"), Disabled);
     Report->SetStringField(TEXT("mesh"), Mesh->GetPathName());
     Report->SetStringField(TEXT("material"), Material->GetPathName());
+  }
+#else
+  Report->SetStringField(TEXT("error"), TEXT("editor only"));
+#endif
+  Report->SetBoolField(TEXT("ok"), bOk);
+  FString Out;
+  const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&Out);
+  FJsonSerializer::Serialize(Report, Writer);
+  return Out;
+}
+
+FString US08FxAuthoringLibrary::BindUserMaterialParameters(const FString& SystemPath, const FString& EmitterName,
+                                                           const FString& SpecJson) {
+  TSharedRef<FJsonObject> Report = MakeShared<FJsonObject>();
+  Report->SetStringField(TEXT("system"), SystemPath);
+  Report->SetStringField(TEXT("emitter"), EmitterName);
+  bool bOk = false;
+#if WITH_EDITOR
+  int32 Dot = INDEX_NONE;
+  const FString ObjectPath = SystemPath.FindChar(TEXT('.'), Dot)
+      ? SystemPath : SystemPath + TEXT(".") + FPackageName::GetShortName(SystemPath);
+  UNiagaraSystem* System = SystemPath.StartsWith(TEXT("/Game/S08/FX/"))
+      ? LoadObject<UNiagaraSystem>(nullptr, *ObjectPath) : nullptr;
+  TArray<TSharedPtr<FJsonValue>> Spec;
+  {
+    const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(SpecJson);
+    FJsonSerializer::Deserialize(Reader, Spec);
+  }
+  if (!System) {
+    Report->SetStringField(TEXT("error"), TEXT("not a /Game/S08/FX/ Niagara system"));
+  } else if (Spec.Num() == 0) {
+    Report->SetStringField(TEXT("error"), TEXT("empty spec"));
+  } else {
+    System->Modify();
+    FNiagaraUserRedirectionParameterStore& Store = System->GetExposedParameters();
+    TArray<TSharedPtr<FJsonValue>> Added;
+    TArray<FNiagaraMaterialAttributeBinding> Bindings;
+    for (const TSharedPtr<FJsonValue>& Value : Spec) {
+      const TSharedPtr<FJsonObject> P = Value.IsValid() ? Value->AsObject() : nullptr;
+      if (!P.IsValid()) continue;
+      const FString Name = P->GetStringField(TEXT("name"));
+      const bool bColor = P->GetStringField(TEXT("type")) == TEXT("color");
+      const FNiagaraTypeDefinition Type = bColor ? FNiagaraTypeDefinition::GetColorDef() : FNiagaraTypeDefinition::GetFloatDef();
+      const FName UserName(*(FString(TEXT("User.")) + Name));
+      FNiagaraVariable Var(Type, UserName);
+      // replace a parameter of the same name but another type; keep an existing one of the right type
+      for (const FNiagaraVariableWithOffset& Existing : Store.ReadParameterVariables()) {
+        if (Existing.GetName() == UserName && Existing.GetType() != Type) {
+          Store.RemoveParameter(Existing);
+          break;
+        }
+      }
+      if (Store.IndexOf(Var) == INDEX_NONE) Store.AddParameter(Var, true, true);
+      if (bColor) {
+        const TArray<TSharedPtr<FJsonValue>>* D = nullptr;
+        FLinearColor C(1.0f, 1.0f, 1.0f, 1.0f);
+        if (P->TryGetArrayField(TEXT("default"), D) && D->Num() >= 3) {
+          C = FLinearColor((*D)[0]->AsNumber(), (*D)[1]->AsNumber(), (*D)[2]->AsNumber(),
+                           D->Num() > 3 ? (*D)[3]->AsNumber() : 1.0f);
+        }
+        Store.SetParameterValue(C, Var, true);
+      } else {
+        double D = 0.0;
+        P->TryGetNumberField(TEXT("default"), D);
+        Store.SetParameterValue(static_cast<float>(D), Var, true);
+      }
+      FNiagaraMaterialAttributeBinding B;
+      B.MaterialParameterName = FName(*Name);
+      B.NiagaraVariable = FNiagaraVariableBase(Type, UserName);
+      Bindings.Add(B);
+      Added.Add(MakeShared<FJsonValueString>(UserName.ToString()));
+    }
+    int32 Renderers = 0;
+    for (FNiagaraEmitterHandle& Handle : System->GetEmitterHandles()) {
+      if (Handle.GetName().ToString() != EmitterName) continue;
+      FVersionedNiagaraEmitter Versioned = Handle.GetInstance();
+      FVersionedNiagaraEmitterData* Data = Handle.GetEmitterData();
+      if (!Versioned.Emitter || !Data) continue;
+      for (UNiagaraRendererProperties* R : Data->GetRenderers()) {
+        UNiagaraMeshRendererProperties* Mesh = Cast<UNiagaraMeshRendererProperties>(R);
+        if (!Mesh) continue;
+        Mesh->Modify();
+        for (const FNiagaraMaterialAttributeBinding& B : Bindings) {
+          Mesh->MaterialParameters.AttributeBindings.RemoveAll([&B](const FNiagaraMaterialAttributeBinding& E) {
+            return E.MaterialParameterName == B.MaterialParameterName;
+          });
+          FNiagaraMaterialAttributeBinding& NewB = Mesh->MaterialParameters.AttributeBindings.Add_GetRef(B);
+          NewB.CacheValues(Versioned.Emitter);
+        }
+        FPropertyChangedEvent Event(
+            UNiagaraMeshRendererProperties::StaticClass()->FindPropertyByName(TEXT("MaterialParameters")));
+        Mesh->PostEditChangeProperty(Event);
+        ++Renderers;
+      }
+    }
+    if (Renderers > 0) {
+      System->RequestCompile(false);
+      System->WaitForCompilationComplete();
+      System->MarkPackageDirty();
+      bOk = true;
+    } else {
+      Report->SetStringField(TEXT("error"), TEXT("no mesh renderer on the emitter"));
+    }
+    Report->SetNumberField(TEXT("renderers"), Renderers);
+    Report->SetArrayField(TEXT("userParameters"), Added);
+    Report->SetNumberField(TEXT("exposedParameters"), Store.Num());
   }
 #else
   Report->SetStringField(TEXT("error"), TEXT("editor only"));

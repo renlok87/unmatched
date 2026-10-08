@@ -169,13 +169,14 @@ def cmd_compare(a) -> None:
         m["after_ash_p100_vs_empty"]["pixels_gt8"] == 0,
         "ash_differs_from_fade": glow["pixels_gt8"] > 1000,
     }
-    EVIDENCE.mkdir(parents=True, exist_ok=True)
+    evidence = Path(a.evidence) if getattr(a, "evidence", None) else EVIDENCE
+    evidence.mkdir(parents=True, exist_ok=True)
     copies = {}
     for tag, fr in (("before", fb), ("after", fa)):
         for name in fr:
             if name.endswith("-b"):
                 continue
-            dst = EVIDENCE / ("%s-%s.jpg" % (tag, name))
+            dst = evidence / ("%s-%s.jpg" % (tag, name))
             Image.open(fr[name]).convert("RGB").save(dst, quality=92)
             copies["%s-%s" % (tag, name)] = dst.relative_to(REPO).as_posix()
     rep = {"schema": "unmatched.de011-evidence/1", "task": "DE-011 (W-27)", "tool": "tools/art/de011/de011.py",
@@ -190,7 +191,7 @@ def cmd_compare(a) -> None:
                    "as a stipple that TSR resolves in the game): a before/after check of the material at the "
                    "defaults and of the two dissolve styles, not K1-K3 and not artistic acceptance. The packaged K1 "
                    "and render_bench of the run are taken by the A04 acceptance agent."}
-    de010.write(EVIDENCE / "de011-report.json", rep)
+    de010.write(evidence / "de011-report.json", rep)
     print(json.dumps({"all_ok": rep["all_ok"], "checks": checks, "figure_pixels": px}, indent=1))
     if not rep["all_ok"]:
         raise SystemExit(1)
@@ -202,6 +203,8 @@ def main() -> int:
     ap.add_argument("--tag", choices=["before", "after"])
     ap.add_argument("--dissolve", action="store_true", help="capture: also the dissolve MICs (after apply)")
     ap.add_argument("--frames", default="C:/tmp/de011", help="lossless frames and editor logs (outside the repo)")
+    ap.add_argument("--evidence", default=None,
+                    help="compare: the report / JPEG folder (default the DE-011 evidence; AN-29 passes its own)")
     a = ap.parse_args()
     if a.command == "inspect":
         cmd_inspect(a)

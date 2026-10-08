@@ -159,8 +159,10 @@ FX05_EDGE_NODES = {"flash_rgb", "p_flashgain", "p_flashcover", "p_rimnarrow", "p
                    "rim_gate"}
 
 # v2.3 (DE-011) nodes: CPD 13 / 14, the knobs, the Custom node, ash albedo, glow, three switches
-DISSOLVE_NODES = {"cpd_dis", "cpd_dstyle", "dis", "dis_ash", "base_dis", "dis_k", "dis_c", "dis_alpha", "dis_eai",
-                  "em_dis", "sw_dis_base", "sw_dis_em", "sw_dis_mask"} | {"p_" + k[0] for k in vm.DISSOLVE_KNOBS}
+# v2.5 (VS-6 F3 AN-29): the warm front - the mask, the albedo cover, DissolveFrontColor through the inverse tone curve
+DISSOLVE_NODES = {"cpd_dis", "cpd_dstyle", "dis", "dis_ash", "base_ash", "base_dis", "dis_k", "dis_m", "dis_keep",
+                  "p_DissolveFrontColor", "dis_front", "dis_inv", "dis_zero", "dis_zero3", "em_dis", "sw_dis_base", "sw_dis_em",
+                  "sw_dis_mask"} | {"p_" + k[0] for k in vm.DISSOLVE_KNOBS}
 
 
 @unittest.skipUnless(HAVE_SPEC, "um-masters.json missing")
@@ -205,9 +207,28 @@ class Dissolve(unittest.TestCase):
 
     def test_switch_on_routing(self):
         self.assertEqual(self.links_to("sw_dis_mask", "True"), [["dis", "", "sw_dis_mask", "True"]])
-        self.assertEqual(self.links_to("base_dis", "A"), [["base_hit", "", "base_dis", "A"]])
-        self.assertEqual(self.links_to("base_dis", "Alpha"), [["dis", "Edge", "base_dis", "Alpha"]])
+        self.assertEqual(self.links_to("base_ash", "A"), [["base_hit", "", "base_ash", "A"]])
+        self.assertEqual(self.links_to("base_ash", "Alpha"), [["dis", "Edge", "base_ash", "Alpha"]])
+        self.assertEqual(self.links_to("base_dis", "A"), [["base_ash", "", "base_dis", "A"]])
+        self.assertEqual(self.links_to("base_dis", "B"), [["dis_keep", "", "base_dis", "B"]])
         self.assertEqual(self.links_to("em_dis", "A"), [["em_hit", "", "em_dis", "A"]])
+        self.assertEqual(self.links_to("em_dis", "B"), [["dis_inv", "", "em_dis", "B"]])
+
+    def test_v25_warm_front(self):
+        """AN-29 (ВР-13): the front shows accent.warm (#FFB45C, linear) through the FX-05 inverse tone curve."""
+        props = self.g.nodes["p_DissolveFrontColor"]["props"]
+        self.assertEqual(props["parameter_name"], "DissolveFrontColor")
+        self.assertEqual(props["group"], "Cue")
+        c = props["default_value"]
+        self.assertAlmostEqual(c["r"], 1.0, places=4)
+        self.assertAlmostEqual(c["g"], 0.456411, places=4)
+        self.assertAlmostEqual(c["b"], 0.107023, places=4)
+        self.assertEqual(self.links_to("dis_front", "A"), [["p_DissolveFrontColor", "RGB", "dis_front", "A"]])
+        self.assertEqual(self.links_to("dis_inv", "Flash"), [["dis_front", "", "dis_inv", "Flash"]])
+        self.assertEqual(self.g.nodes["dis_inv"]["props"]["code"], vm.FX_INV_TONE_HLSL)
+        # the team colour no longer drives the glow: TeamHue feeds only the ash albedo
+        self.assertEqual([l for l in self.g.links if l[0] == "dis" and l[1] == "TeamHue"],
+                         [["dis", "TeamHue", "dis_ash", "A"]])
         wired = {l[3]: l[0] for l in self.g.links if l[2] == "dis"}
         self.assertEqual(sorted(wired), sorted(vm.DISSOLVE_INPUTS))
         self.assertEqual(wired["Progress"], "cpd_dis")

@@ -60,9 +60,8 @@ MI_PLAN = [
     # them now (this script must not re-parent them back onto M_FX_Print / M_FX_Print_Overlay)
     # VS-6 F1 (ВР-VS6-06): MI_FX_Dust and MI_FX_Chevron moved onto M_FX_BoardPrint - tools/art/fx/ue_fx_field.py owns
     # them now (this script must not re-parent them back onto M_FX_Print)
-    ("MI_FX_Ember", "", False, -1, "fx.ash", "fx.ash.p1", "mark.keyline"),
-    ("MI_FX_Vortex", "", False, -1, "fx.gold", "card.glyph", "mark.keyline"),
-    ("MI_FX_Arc", "overlay", False, -1, "fx.gold", "card.glyph", "mark.keyline"),
+    # VS-6 F3 (ВР-VS6-22): MI_FX_Ember, MI_FX_Vortex and MI_FX_Arc moved onto M_FX_AbilityPrint(Depth) -
+    # tools/art/fx/ue_fx_ability.py owns them now (this script must not re-parent them back onto M_FX_Print)
     # the FX-02 test placard: the star flipbook + the three SDF shapes. ВР-Z2R-07 (по делегированию, the Z-2 review):
     # every placard body differs from its card.glyph edge by >= 20 grey levels (the card's readability rule) - the
     # cream disk / chevron of Z-2 sat 12 levels under the white edge and the edge vanished; the outer keyline

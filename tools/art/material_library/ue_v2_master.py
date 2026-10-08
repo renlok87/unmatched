@@ -18,6 +18,9 @@ Layout of the graph:
   "UM_V2_Dissolve" (ue/um_v2_dissolve.hlsl) on CPD 13 CPD_Dissolve (progress) / CPD 14 CPD_DissolveStyle (0 fade,
   1 ash) -> OpacityMask, ash albedo and a team-colour glow on the burning front; only the dissolve MICs (Masked
   override, /Game/UM/Materials/v2/Dissolve) turn it on
+  v2.5 (VS-6 F3 AN-29, ВР-13 / ВР-AN07): the burning front shows DissolveFrontColor = accent.warm (a display target
+  through the inverse tone curve of FX-05, mask = saturate(Edge x DissolveEdgeEmissive), covering the albedo there)
+  instead of the team colour; the ash albedo stays the team colour x DissolveAshValue
   everything -> MakeMaterialAttributes (ClearCoat pin = CustomData0 = Cloth, SubsurfaceColor = Fuzz Color)
 """
 from __future__ import annotations
@@ -100,8 +103,28 @@ DISSOLVE_KNOBS = [
     ("DissolveHeightBias", 0.45, "ash: 0 = noise only, 1 = from the feet up by height only"),
     ("DissolveHeightUU", 60.0, "ash: figure height in pre-skinned units (the tallest v2 bounds top is 60.06)"),
     ("DissolveAshValue", 0.25, "ash: albedo of the front = team hue x value"),
-    ("DissolveEdgeEmissive", 1.5, "ash: glow of the front = team hue x this (display units)"),
+    # v2.5 (AN-29): 1.5 -> 3.0 - the warm core covers the inner two thirds of the band (the first editor K2 frames: median
+    # of the band dE76 23 to #FFB45C, the soft outer half mixed the dark lit ash in)
+    ("DissolveEdgeEmissive", 3.0, "ash: the front mask gain - DissolveFrontColor shows where Edge x this >= 1 (v2.5)"),
 ]
+
+
+def _token_linear(name: str) -> list:
+    """A colour token of docs/unreal/contracts/hud/hud-style-tokens.json as linear rgba (FromSRGBColor, AD-OPEN-39)."""
+    tokens = json.loads((REPO / "docs/unreal/contracts/hud/hud-style-tokens.json").read_text(encoding="utf-8"))["colors"]
+    entry = tokens[name]
+    while "hex" not in entry and "alias" in entry:
+        entry = tokens[entry["alias"]]
+    h = entry["hex"].lstrip("#")
+
+    def lin(c: int) -> float:
+        v = c / 255.0
+        return v / 12.92 if v <= 0.04045 else ((v + 0.055) / 1.055) ** 2.4
+    return [round(lin(int(h[i:i + 2], 16)), 6) for i in (0, 2, 4)] + [1.0]
+
+
+# AN-29 (v2.5): the warm front of the ash death (02 §2.6 accent.warm, fx.ash), a display target
+DISSOLVE_FRONT_COLOR = _token_linear("accent.warm")
 
 
 class Graph:
@@ -402,17 +425,33 @@ def figure_v2_graph(spec: dict) -> Graph:
                             "HeightBias": ("p_DissolveHeightBias", ""), "HeightUU": ("p_DissolveHeightUU", "")}.items():
         g.link(src, out, "dis", inp)
     binop(g, "dis_ash", "Multiply", "dis", "p_DissolveAshValue", 13, "TeamHue", "")
-    g.add("base_dis", "LinearInterpolate", {}, 14)
-    g.link("base_hit", "", "base_dis", "A")
-    g.link("dis_ash", "", "base_dis", "B")
-    g.link("dis", "Edge", "base_dis", "Alpha")
+    g.add("base_ash", "LinearInterpolate", {}, 14)
+    g.link("base_hit", "", "base_ash", "A")
+    g.link("dis_ash", "", "base_ash", "B")
+    g.link("dis", "Edge", "base_ash", "Alpha")
+    # v2.5 (AN-29, ВР-13): the front mask m = saturate(Edge x DissolveEdgeEmissive) shows DissolveFrontColor (accent.warm)
+    # as a display target through the inverse tone curve (FX-05's fit) and covers the albedo there (base x (1 - m));
+    # the outer part of the band keeps the team-colour ash albedo. Edge 0 (progress 0 / the fade style) -> 0 in, 0 out.
     binop(g, "dis_k", "Multiply", "dis", "p_DissolveEdgeEmissive", 13, "Edge", "")
-    binop(g, "dis_c", "Multiply", "dis", "dis_k", 14, "TeamHue", "")
-    g.add("dis_alpha", "Constant", {"r": 1.0}, 14)
-    g.add("dis_eai", "EyeAdaptationInverse", {}, 15)
-    g.link("dis_c", "", "dis_eai", "LightValueInput")
-    g.link("dis_alpha", "", "dis_eai", "AlphaInput")
-    binop(g, "em_dis", "Add", "em_hit", "dis_eai", 16, "", "EyeAdaptationInverse")
+    g.add("dis_m", "Saturate", {}, 14)
+    g.link("dis_k", "", "dis_m", "")
+    g.add("dis_keep", "OneMinus", {}, 15)
+    g.link("dis_m", "", "dis_keep", "")
+    binop(g, "base_dis", "Multiply", "base_ash", "dis_keep", 15)
+    vector(g, "p_DissolveFrontColor", "DissolveFrontColor", DISSOLVE_FRONT_COLOR, "Cue", 5, sort=26)
+    binop(g, "dis_front", "Multiply", "p_DissolveFrontColor", "dis_m", 15, "RGB", "")
+    g.add("dis_inv", "Custom", {"code": FX_INV_TONE_HLSL, "description": "UM_V2_FrontInvTone",
+                                "output_type": "CMOT_FLOAT3", "inputs": ["Flash", "RimC", "RimM", "GS", "GP"]}, 16)
+    g.link("dis_front", "", "dis_inv", "Flash")
+    # the rim term of the shared inverse-tone body is off here: RimC a float3 zero (an array initializer of float3
+    # needs three components - a scalar constant failed to compile in the dissolve permutation), RimM 0
+    g.add("dis_zero3", "Constant3Vector", {"constant": rgba([0.0, 0.0, 0.0, 0.0])}, 15)
+    g.add("dis_zero", "Constant", {"r": 0.0}, 15)
+    g.link("dis_zero3", "", "dis_inv", "RimC")
+    g.link("dis_zero", "", "dis_inv", "RimM")
+    g.link("p_fxgs", "RGB", "dis_inv", "GS")
+    g.link("p_fxgp", "RGB", "dis_inv", "GP")
+    binop(g, "em_dis", "Add", "em_hit", "dis_inv", 17)
     for nid, on, off in (("sw_dis_base", ("base_dis", ""), ("base_hit", "")),
                          ("sw_dis_em", ("em_dis", ""), ("em_hit", "")),
                          ("sw_dis_mask", ("dis", ""), ("one", ""))):

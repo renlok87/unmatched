@@ -33,7 +33,7 @@ ROOT = "/Game/S08/FX"
 # the registry budgets of S08CueFx.cpp (CUE -> sprite budget); the placard is bench-only and carries its own
 BUDGETS = {
     "NS_FX_Dust": 5, "NS_FX_AttackChevrons": 3, "NS_FX_HitStar": 1, "NS_FX_HealMotes": 5, "NS_FX_AshEmbers": 40,
-    "NS_FX_ArthurArc": 1, "NS_FX_MedusaVortex": 20, "NS_FX_PlacardStar": 6,
+    "NS_FX_ArthurArc": 1, "NS_FX_MedusaVortex": 2, "NS_FX_PlacardStar": 6,
 }
 
 

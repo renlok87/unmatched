@@ -36,4 +36,13 @@ public:
   UFUNCTION(BlueprintCallable, Category = "S08|FX")
   static FString MakeBoardQuadCarrier(const FString& SystemPath, const FString& EmitterName, const FString& MeshPath,
                                       const FString& MaterialPath);
+
+  /** VS-6 F3 (FX-26 / FX-32, ВР-VS6-23): user parameters of a system bound to material parameters of an emitter's
+   *  mesh renderer (Niagara material parameter bindings: the renderer then draws through a MID that takes the user
+   *  value every frame, so C++ writes UNiagaraComponent::SetVariable*). SpecJson: [{"name": "FrontHeight", "type":
+   *  "float" | "color", "default": 0 | [r, g, b, a]}, ...]; the user parameter is User.<name>, the material parameter
+   *  <name>. Idempotent (existing parameters / bindings of the same name are replaced). The caller saves. JSON. */
+  UFUNCTION(BlueprintCallable, Category = "S08|FX")
+  static FString BindUserMaterialParameters(const FString& SystemPath, const FString& EmitterName,
+                                            const FString& SpecJson);
 };
