@@ -1,0 +1,2920 @@
+{
+ "schema": "vs6.fx37-cost/1",
+ "rule": "G-COST: mean dGPU fx-worst - base <= 1.0 ms per view and board (3 repeats, spread <= 0.1 ms); <= 3 combat systems; MS-AT-41 plates dDrawCalls <= 7",
+ "boards": {
+  "marm": {
+   "runs": {
+    "main-base": [
+     {
+      "run": "r1",
+      "exe": "ef7c9bebeeb5",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 2.13,
+        "gpuP95": 2.27,
+        "drawCalls": 239.0,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0461,
+         "GPU/LumenScreenProbeGather": 0.0059,
+         "GPU/LumenReflections": 0.1258,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1675,
+         "GPU/TranslucentLighting": 0.0144,
+         "GPU/FXSystemPreRender": 0.0015,
+         "GPU/FXSystemPostRenderOpaque": 0.0026,
+         "GPU/PostRenderOpsFX": 0.0021,
+         "GPU/Basepass": 0.1004,
+         "GPU/Prepass": 0.0462,
+         "GPU/Postprocessing": 0.121,
+         "GPU/ShadowDepths": 0.0472
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.2,
+        "gpuP95": 2.34,
+        "drawCalls": 264.12,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.068,
+         "GPU/LumenScreenProbeGather": 0.0059,
+         "GPU/LumenReflections": 0.1249,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1311,
+         "GPU/TranslucentLighting": 0.0142,
+         "GPU/FXSystemPreRender": 0.0015,
+         "GPU/FXSystemPostRenderOpaque": 0.0026,
+         "GPU/PostRenderOpsFX": 0.002,
+         "GPU/Basepass": 0.1013,
+         "GPU/Prepass": 0.0442,
+         "GPU/Postprocessing": 0.1214,
+         "GPU/ShadowDepths": 0.0511
+        }
+       }
+      }
+     },
+     {
+      "run": "r2",
+      "exe": "ef7c9bebeeb5",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 2.13,
+        "gpuP95": 2.27,
+        "drawCalls": 239.0,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0461,
+         "GPU/LumenScreenProbeGather": 0.0059,
+         "GPU/LumenReflections": 0.1255,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1664,
+         "GPU/TranslucentLighting": 0.0144,
+         "GPU/FXSystemPreRender": 0.0015,
+         "GPU/FXSystemPostRenderOpaque": 0.0026,
+         "GPU/PostRenderOpsFX": 0.002,
+         "GPU/Basepass": 0.1005,
+         "GPU/Prepass": 0.0463,
+         "GPU/Postprocessing": 0.1212,
+         "GPU/ShadowDepths": 0.0469
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.2,
+        "gpuP95": 2.33,
+        "drawCalls": 264.03,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0684,
+         "GPU/LumenScreenProbeGather": 0.0059,
+         "GPU/LumenReflections": 0.1243,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1339,
+         "GPU/TranslucentLighting": 0.0141,
+         "GPU/FXSystemPreRender": 0.0015,
+         "GPU/FXSystemPostRenderOpaque": 0.0026,
+         "GPU/PostRenderOpsFX": 0.002,
+         "GPU/Basepass": 0.1014,
+         "GPU/Prepass": 0.044,
+         "GPU/Postprocessing": 0.1214,
+         "GPU/ShadowDepths": 0.051
+        }
+       }
+      }
+     },
+     {
+      "run": "r3",
+      "exe": "ef7c9bebeeb5",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 2.14,
+        "gpuP95": 2.27,
+        "drawCalls": 239.0,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.046,
+         "GPU/LumenScreenProbeGather": 0.0059,
+         "GPU/LumenReflections": 0.1262,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1678,
+         "GPU/TranslucentLighting": 0.0145,
+         "GPU/FXSystemPreRender": 0.0015,
+         "GPU/FXSystemPostRenderOpaque": 0.0026,
+         "GPU/PostRenderOpsFX": 0.0021,
+         "GPU/Basepass": 0.1004,
+         "GPU/Prepass": 0.0462,
+         "GPU/Postprocessing": 0.1208,
+         "GPU/ShadowDepths": 0.0473
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.2,
+        "gpuP95": 2.33,
+        "drawCalls": 264.14,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0681,
+         "GPU/LumenScreenProbeGather": 0.0059,
+         "GPU/LumenReflections": 0.1253,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1327,
+         "GPU/TranslucentLighting": 0.0143,
+         "GPU/FXSystemPreRender": 0.0016,
+         "GPU/FXSystemPostRenderOpaque": 0.0026,
+         "GPU/PostRenderOpsFX": 0.0021,
+         "GPU/Basepass": 0.1012,
+         "GPU/Prepass": 0.0437,
+         "GPU/Postprocessing": 0.1213,
+         "GPU/ShadowDepths": 0.051
+        }
+       }
+      }
+     }
+    ],
+    "base": [
+     {
+      "run": "r1",
+      "exe": "4f5e2a7debfe",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 2.46,
+        "gpuP95": 2.61,
+        "drawCalls": 233.0,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0471,
+         "GPU/LumenScreenProbeGather": 0.0059,
+         "GPU/LumenReflections": 0.1273,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1024,
+         "GPU/TranslucentLighting": 0.031,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0029,
+         "GPU/PostRenderOpsFX": 0.0023,
+         "GPU/Basepass": 0.1042,
+         "GPU/Prepass": 0.0488,
+         "GPU/Postprocessing": 0.1194,
+         "GPU/ShadowDepths": 0.2771
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.51,
+        "gpuP95": 2.67,
+        "drawCalls": 268.27,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0687,
+         "GPU/LumenScreenProbeGather": 0.0059,
+         "GPU/LumenReflections": 0.1281,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1078,
+         "GPU/TranslucentLighting": 0.0196,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0027,
+         "GPU/PostRenderOpsFX": 0.0021,
+         "GPU/Basepass": 0.1024,
+         "GPU/Prepass": 0.0453,
+         "GPU/Postprocessing": 0.1196,
+         "GPU/ShadowDepths": 0.2796
+        }
+       }
+      }
+     },
+     {
+      "run": "r2",
+      "exe": "4f5e2a7debfe",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 2.47,
+        "gpuP95": 2.62,
+        "drawCalls": 233.0,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0466,
+         "GPU/LumenScreenProbeGather": 0.0058,
+         "GPU/LumenReflections": 0.1283,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.102,
+         "GPU/TranslucentLighting": 0.0321,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0029,
+         "GPU/PostRenderOpsFX": 0.0023,
+         "GPU/Basepass": 0.1044,
+         "GPU/Prepass": 0.0483,
+         "GPU/Postprocessing": 0.1203,
+         "GPU/ShadowDepths": 0.2773
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.51,
+        "gpuP95": 2.68,
+        "drawCalls": 268.31,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0683,
+         "GPU/LumenScreenProbeGather": 0.0058,
+         "GPU/LumenReflections": 0.1288,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1068,
+         "GPU/TranslucentLighting": 0.0191,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0027,
+         "GPU/PostRenderOpsFX": 0.0021,
+         "GPU/Basepass": 0.1025,
+         "GPU/Prepass": 0.045,
+         "GPU/Postprocessing": 0.1203,
+         "GPU/ShadowDepths": 0.2802
+        }
+       }
+      }
+     },
+     {
+      "run": "r3",
+      "exe": "4f5e2a7debfe",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 2.49,
+        "gpuP95": 2.65,
+        "drawCalls": 233.0,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0471,
+         "GPU/LumenScreenProbeGather": 0.0058,
+         "GPU/LumenReflections": 0.1277,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.105,
+         "GPU/TranslucentLighting": 0.0324,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0029,
+         "GPU/PostRenderOpsFX": 0.0022,
+         "GPU/Basepass": 0.1033,
+         "GPU/Prepass": 0.0478,
+         "GPU/Postprocessing": 0.1204,
+         "GPU/ShadowDepths": 0.2768
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.51,
+        "gpuP95": 2.67,
+        "drawCalls": 268.17,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0686,
+         "GPU/LumenScreenProbeGather": 0.0058,
+         "GPU/LumenReflections": 0.1283,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1063,
+         "GPU/TranslucentLighting": 0.0197,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0027,
+         "GPU/PostRenderOpsFX": 0.0021,
+         "GPU/Basepass": 0.1022,
+         "GPU/Prepass": 0.0451,
+         "GPU/Postprocessing": 0.1199,
+         "GPU/ShadowDepths": 0.2797
+        }
+       }
+      }
+     }
+    ],
+    "worst": [
+     {
+      "run": "r1",
+      "exe": "4f5e2a7debfe",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 2.49,
+        "gpuP95": 2.65,
+        "drawCalls": 243.0,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0467,
+         "GPU/LumenScreenProbeGather": 0.0059,
+         "GPU/LumenReflections": 0.1268,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1118,
+         "GPU/TranslucentLighting": 0.0321,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0029,
+         "GPU/PostRenderOpsFX": 0.0022,
+         "GPU/Basepass": 0.104,
+         "GPU/Prepass": 0.0478,
+         "GPU/Postprocessing": 0.1195,
+         "GPU/ShadowDepths": 0.2765
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.53,
+        "gpuP95": 2.69,
+        "drawCalls": 278.18,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0684,
+         "GPU/LumenScreenProbeGather": 0.0058,
+         "GPU/LumenReflections": 0.128,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1095,
+         "GPU/TranslucentLighting": 0.0208,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0028,
+         "GPU/PostRenderOpsFX": 0.0021,
+         "GPU/Basepass": 0.1026,
+         "GPU/Prepass": 0.0446,
+         "GPU/Postprocessing": 0.1195,
+         "GPU/ShadowDepths": 0.28
+        }
+       }
+      }
+     },
+     {
+      "run": "r2",
+      "exe": "4f5e2a7debfe",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 2.49,
+        "gpuP95": 2.64,
+        "drawCalls": 243.0,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0467,
+         "GPU/LumenScreenProbeGather": 0.0058,
+         "GPU/LumenReflections": 0.1261,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.111,
+         "GPU/TranslucentLighting": 0.0315,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0029,
+         "GPU/PostRenderOpsFX": 0.0022,
+         "GPU/Basepass": 0.1038,
+         "GPU/Prepass": 0.0479,
+         "GPU/Postprocessing": 0.1196,
+         "GPU/ShadowDepths": 0.2757
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.53,
+        "gpuP95": 2.7,
+        "drawCalls": 278.06,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0687,
+         "GPU/LumenScreenProbeGather": 0.0058,
+         "GPU/LumenReflections": 0.1277,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1101,
+         "GPU/TranslucentLighting": 0.0195,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0027,
+         "GPU/PostRenderOpsFX": 0.0021,
+         "GPU/Basepass": 0.1022,
+         "GPU/Prepass": 0.0446,
+         "GPU/Postprocessing": 0.1194,
+         "GPU/ShadowDepths": 0.2787
+        }
+       }
+      }
+     },
+     {
+      "run": "r3",
+      "exe": "4f5e2a7debfe",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 2.5,
+        "gpuP95": 2.64,
+        "drawCalls": 243.0,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0468,
+         "GPU/LumenScreenProbeGather": 0.0058,
+         "GPU/LumenReflections": 0.127,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1112,
+         "GPU/TranslucentLighting": 0.0325,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0029,
+         "GPU/PostRenderOpsFX": 0.0022,
+         "GPU/Basepass": 0.1038,
+         "GPU/Prepass": 0.048,
+         "GPU/Postprocessing": 0.1198,
+         "GPU/ShadowDepths": 0.2765
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.53,
+        "gpuP95": 2.69,
+        "drawCalls": 277.81,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0689,
+         "GPU/LumenScreenProbeGather": 0.0058,
+         "GPU/LumenReflections": 0.1285,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1088,
+         "GPU/TranslucentLighting": 0.0196,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0027,
+         "GPU/PostRenderOpsFX": 0.0021,
+         "GPU/Basepass": 0.1023,
+         "GPU/Prepass": 0.0449,
+         "GPU/Postprocessing": 0.1199,
+         "GPU/ShadowDepths": 0.2799
+        }
+       }
+      }
+     }
+    ],
+    "worst-legacy": [
+     {
+      "run": "r1",
+      "exe": "4f5e2a7debfe",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 2.47,
+        "gpuP95": 2.62,
+        "drawCalls": 233.0,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0467,
+         "GPU/LumenScreenProbeGather": 0.0059,
+         "GPU/LumenReflections": 0.1273,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1021,
+         "GPU/TranslucentLighting": 0.0315,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0029,
+         "GPU/PostRenderOpsFX": 0.0023,
+         "GPU/Basepass": 0.1042,
+         "GPU/Prepass": 0.0486,
+         "GPU/Postprocessing": 0.1199,
+         "GPU/ShadowDepths": 0.2772
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.52,
+        "gpuP95": 2.69,
+        "drawCalls": 268.33,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0686,
+         "GPU/LumenScreenProbeGather": 0.0058,
+         "GPU/LumenReflections": 0.1291,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1075,
+         "GPU/TranslucentLighting": 0.0209,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0027,
+         "GPU/PostRenderOpsFX": 0.0021,
+         "GPU/Basepass": 0.1022,
+         "GPU/Prepass": 0.0453,
+         "GPU/Postprocessing": 0.1199,
+         "GPU/ShadowDepths": 0.2803
+        }
+       }
+      }
+     }
+    ],
+    "grade": [
+     {
+      "run": "r1",
+      "exe": "4f5e2a7debfe",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 2.48,
+        "gpuP95": 2.64,
+        "drawCalls": 247.0,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0464,
+         "GPU/LumenScreenProbeGather": 0.0058,
+         "GPU/LumenReflections": 0.1268,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1034,
+         "GPU/TranslucentLighting": 0.0169,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0028,
+         "GPU/PostRenderOpsFX": 0.0022,
+         "GPU/Basepass": 0.1018,
+         "GPU/Prepass": 0.0482,
+         "GPU/Postprocessing": 0.1204,
+         "GPU/ShadowDepths": 0.275
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.53,
+        "gpuP95": 2.7,
+        "drawCalls": 295.72,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0681,
+         "GPU/LumenScreenProbeGather": 0.0058,
+         "GPU/LumenReflections": 0.1284,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1101,
+         "GPU/TranslucentLighting": 0.0193,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0028,
+         "GPU/PostRenderOpsFX": 0.0022,
+         "GPU/Basepass": 0.1019,
+         "GPU/Prepass": 0.0451,
+         "GPU/Postprocessing": 0.1204,
+         "GPU/ShadowDepths": 0.2788
+        }
+       }
+      }
+     },
+     {
+      "run": "r2",
+      "exe": "4f5e2a7debfe",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 2.52,
+        "gpuP95": 2.66,
+        "drawCalls": 247.0,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0466,
+         "GPU/LumenScreenProbeGather": 0.0059,
+         "GPU/LumenReflections": 0.1269,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1025,
+         "GPU/TranslucentLighting": 0.0174,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0029,
+         "GPU/PostRenderOpsFX": 0.0022,
+         "GPU/Basepass": 0.1025,
+         "GPU/Prepass": 0.0486,
+         "GPU/Postprocessing": 0.1207,
+         "GPU/ShadowDepths": 0.2779
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.57,
+        "gpuP95": 2.73,
+        "drawCalls": 296.33,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0685,
+         "GPU/LumenScreenProbeGather": 0.0058,
+         "GPU/LumenReflections": 0.1284,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1113,
+         "GPU/TranslucentLighting": 0.0199,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0028,
+         "GPU/PostRenderOpsFX": 0.0022,
+         "GPU/Basepass": 0.1027,
+         "GPU/Prepass": 0.0456,
+         "GPU/Postprocessing": 0.1214,
+         "GPU/ShadowDepths": 0.2804
+        }
+       }
+      }
+     }
+    ],
+    "grade-legacy": [
+     {
+      "run": "r1",
+      "exe": "4f5e2a7debfe",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 2.49,
+        "gpuP95": 2.63,
+        "drawCalls": 247.0,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0466,
+         "GPU/LumenScreenProbeGather": 0.0059,
+         "GPU/LumenReflections": 0.1264,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1028,
+         "GPU/TranslucentLighting": 0.0172,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0029,
+         "GPU/PostRenderOpsFX": 0.0022,
+         "GPU/Basepass": 0.1025,
+         "GPU/Prepass": 0.048,
+         "GPU/Postprocessing": 0.1202,
+         "GPU/ShadowDepths": 0.2768
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.53,
+        "gpuP95": 2.69,
+        "drawCalls": 296.17,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0687,
+         "GPU/LumenScreenProbeGather": 0.0058,
+         "GPU/LumenReflections": 0.128,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1094,
+         "GPU/TranslucentLighting": 0.0186,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0028,
+         "GPU/PostRenderOpsFX": 0.0022,
+         "GPU/Basepass": 0.1029,
+         "GPU/Prepass": 0.0452,
+         "GPU/Postprocessing": 0.1204,
+         "GPU/ShadowDepths": 0.2799
+        }
+       }
+      }
+     },
+     {
+      "run": "r2",
+      "exe": "4f5e2a7debfe",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 2.49,
+        "gpuP95": 2.65,
+        "drawCalls": 247.0,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0463,
+         "GPU/LumenScreenProbeGather": 0.0058,
+         "GPU/LumenReflections": 0.1274,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1045,
+         "GPU/TranslucentLighting": 0.0168,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0029,
+         "GPU/PostRenderOpsFX": 0.0022,
+         "GPU/Basepass": 0.1018,
+         "GPU/Prepass": 0.0479,
+         "GPU/Postprocessing": 0.1202,
+         "GPU/ShadowDepths": 0.2769
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.53,
+        "gpuP95": 2.7,
+        "drawCalls": 296.28,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0682,
+         "GPU/LumenScreenProbeGather": 0.0058,
+         "GPU/LumenReflections": 0.1285,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1102,
+         "GPU/TranslucentLighting": 0.02,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0028,
+         "GPU/PostRenderOpsFX": 0.0022,
+         "GPU/Basepass": 0.1024,
+         "GPU/Prepass": 0.0451,
+         "GPU/Postprocessing": 0.12,
+         "GPU/ShadowDepths": 0.2803
+        }
+       }
+      }
+     }
+    ],
+    "plates2": [
+     {
+      "run": "r1",
+      "exe": "4f5e2a7debfe",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 2.47,
+        "gpuP95": 2.62,
+        "drawCalls": 233.0,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0467,
+         "GPU/LumenScreenProbeGather": 0.0059,
+         "GPU/LumenReflections": 0.1273,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1024,
+         "GPU/TranslucentLighting": 0.0317,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0029,
+         "GPU/PostRenderOpsFX": 0.0022,
+         "GPU/Basepass": 0.1041,
+         "GPU/Prepass": 0.0486,
+         "GPU/Postprocessing": 0.12,
+         "GPU/ShadowDepths": 0.2776
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.5,
+        "gpuP95": 2.67,
+        "drawCalls": 233.57,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0686,
+         "GPU/LumenScreenProbeGather": 0.0059,
+         "GPU/LumenReflections": 0.128,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1117,
+         "GPU/TranslucentLighting": 0.0203,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0027,
+         "GPU/PostRenderOpsFX": 0.0021,
+         "GPU/Basepass": 0.0988,
+         "GPU/Prepass": 0.0421,
+         "GPU/Postprocessing": 0.1197,
+         "GPU/ShadowDepths": 0.2802
+        }
+       }
+      }
+     },
+     {
+      "run": "r2",
+      "exe": "4f5e2a7debfe",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 2.51,
+        "gpuP95": 2.68,
+        "drawCalls": 233.0,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0466,
+         "GPU/LumenScreenProbeGather": 0.0059,
+         "GPU/LumenReflections": 0.128,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1043,
+         "GPU/TranslucentLighting": 0.0327,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0029,
+         "GPU/PostRenderOpsFX": 0.0022,
+         "GPU/Basepass": 0.104,
+         "GPU/Prepass": 0.0485,
+         "GPU/Postprocessing": 0.1209,
+         "GPU/ShadowDepths": 0.2775
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.54,
+        "gpuP95": 2.71,
+        "drawCalls": 233.31,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0686,
+         "GPU/LumenScreenProbeGather": 0.0059,
+         "GPU/LumenReflections": 0.1283,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1108,
+         "GPU/TranslucentLighting": 0.0206,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0028,
+         "GPU/PostRenderOpsFX": 0.0021,
+         "GPU/Basepass": 0.0991,
+         "GPU/Prepass": 0.0422,
+         "GPU/Postprocessing": 0.1205,
+         "GPU/ShadowDepths": 0.2808
+        }
+       }
+      }
+     }
+    ]
+   },
+   "worstVsBase": {
+    "K1": {
+     "dGpuMs": 0.02,
+     "a": {
+      "mean": 2.4933,
+      "spread": 0.01,
+      "n": 3,
+      "vals": [
+       2.49,
+       2.49,
+       2.5
+      ]
+     },
+     "b": {
+      "mean": 2.4733,
+      "spread": 0.03,
+      "n": 3,
+      "vals": [
+       2.46,
+       2.47,
+       2.49
+      ]
+     },
+     "dDrawCalls": 10.0,
+     "dPassMs": {
+      "Translucency": 0.0082
+     }
+    },
+    "K2x1.6": {
+     "dGpuMs": 0.02,
+     "a": {
+      "mean": 2.53,
+      "spread": 0.0,
+      "n": 3,
+      "vals": [
+       2.53,
+       2.53,
+       2.53
+      ]
+     },
+     "b": {
+      "mean": 2.51,
+      "spread": 0.0,
+      "n": 3,
+      "vals": [
+       2.51,
+       2.51,
+       2.51
+      ]
+     },
+     "dDrawCalls": 9.77,
+     "dPassMs": {
+      "Translucency": 0.0025
+     }
+    }
+   },
+   "worstVsMainBase": {
+    "K1": {
+     "dGpuMs": 0.36,
+     "a": {
+      "mean": 2.4933,
+      "spread": 0.01,
+      "n": 3,
+      "vals": [
+       2.49,
+       2.49,
+       2.5
+      ]
+     },
+     "b": {
+      "mean": 2.1333,
+      "spread": 0.01,
+      "n": 3,
+      "vals": [
+       2.13,
+       2.13,
+       2.14
+      ]
+     },
+     "dDrawCalls": 4.0,
+     "dPassMs": {
+      "Translucency": -0.0559,
+      "TranslucentLighting": 0.0176,
+      "Basepass": 0.0034,
+      "ShadowDepths": 0.2291
+     }
+    },
+    "K2x1.6": {
+     "dGpuMs": 0.33,
+     "a": {
+      "mean": 2.53,
+      "spread": 0.0,
+      "n": 3,
+      "vals": [
+       2.53,
+       2.53,
+       2.53
+      ]
+     },
+     "b": {
+      "mean": 2.2,
+      "spread": 0.0,
+      "n": 3,
+      "vals": [
+       2.2,
+       2.2,
+       2.2
+      ]
+     },
+     "dDrawCalls": 13.92,
+     "dPassMs": {
+      "LumenReflections": 0.0032,
+      "Translucency": -0.0231,
+      "TranslucentLighting": 0.0058,
+      "ShadowDepths": 0.2285
+     }
+    }
+   },
+   "baseVsMainBase": {
+    "K1": {
+     "dGpuMs": 0.34,
+     "a": {
+      "mean": 2.4733,
+      "spread": 0.03,
+      "n": 3,
+      "vals": [
+       2.46,
+       2.47,
+       2.49
+      ]
+     },
+     "b": {
+      "mean": 2.1333,
+      "spread": 0.01,
+      "n": 3,
+      "vals": [
+       2.13,
+       2.13,
+       2.14
+      ]
+     },
+     "dDrawCalls": -6.0,
+     "dPassMs": {
+      "Translucency": -0.0641,
+      "TranslucentLighting": 0.0174,
+      "Basepass": 0.0035,
+      "Prepass": 0.0021,
+      "ShadowDepths": 0.2299
+     }
+    },
+    "K2x1.6": {
+     "dGpuMs": 0.31,
+     "a": {
+      "mean": 2.51,
+      "spread": 0.0,
+      "n": 3,
+      "vals": [
+       2.51,
+       2.51,
+       2.51
+      ]
+     },
+     "b": {
+      "mean": 2.2,
+      "spread": 0.0,
+      "n": 3,
+      "vals": [
+       2.2,
+       2.2,
+       2.2
+      ]
+     },
+     "dDrawCalls": 4.15,
+     "dPassMs": {
+      "LumenReflections": 0.0036,
+      "Translucency": -0.0256,
+      "TranslucentLighting": 0.0053,
+      "ShadowDepths": 0.2288
+     }
+    }
+   },
+   "worstLegacyVsBase": {
+    "K1": {
+     "dGpuMs": -0.0033,
+     "a": {
+      "mean": 2.47,
+      "spread": 0.0,
+      "n": 1,
+      "vals": [
+       2.47
+      ]
+     },
+     "b": {
+      "mean": 2.4733,
+      "spread": 0.03,
+      "n": 3,
+      "vals": [
+       2.46,
+       2.47,
+       2.49
+      ]
+     },
+     "dDrawCalls": 0.0,
+     "dPassMs": {}
+    },
+    "K2x1.6": {
+     "dGpuMs": 0.01,
+     "a": {
+      "mean": 2.52,
+      "spread": 0.0,
+      "n": 1,
+      "vals": [
+       2.52
+      ]
+     },
+     "b": {
+      "mean": 2.51,
+      "spread": 0.0,
+      "n": 3,
+      "vals": [
+       2.51,
+       2.51,
+       2.51
+      ]
+     },
+     "dDrawCalls": 0.08,
+     "dPassMs": {}
+    }
+   },
+   "gradeVsGradeLegacy": {
+    "K1": {
+     "dGpuMs": 0.01,
+     "a": {
+      "mean": 2.5,
+      "spread": 0.04,
+      "n": 2,
+      "vals": [
+       2.48,
+       2.52
+      ]
+     },
+     "b": {
+      "mean": 2.49,
+      "spread": 0.0,
+      "n": 2,
+      "vals": [
+       2.49,
+       2.49
+      ]
+     },
+     "dDrawCalls": 0.0,
+     "dPassMs": {}
+    }
+   },
+   "plates2VsBase": {
+    "K1": {
+     "dGpuMs": 0.0167,
+     "a": {
+      "mean": 2.49,
+      "spread": 0.04,
+      "n": 2,
+      "vals": [
+       2.47,
+       2.51
+      ]
+     },
+     "b": {
+      "mean": 2.4733,
+      "spread": 0.03,
+      "n": 3,
+      "vals": [
+       2.46,
+       2.47,
+       2.49
+      ]
+     },
+     "dDrawCalls": 0.0,
+     "dPassMs": {}
+    },
+    "K2x1.6": {
+     "dGpuMs": 0.01,
+     "a": {
+      "mean": 2.52,
+      "spread": 0.04,
+      "n": 2,
+      "vals": [
+       2.5,
+       2.54
+      ]
+     },
+     "b": {
+      "mean": 2.51,
+      "spread": 0.0,
+      "n": 3,
+      "vals": [
+       2.51,
+       2.51,
+       2.51
+      ]
+     },
+     "dDrawCalls": -34.81,
+     "dPassMs": {
+      "Translucency": 0.0043,
+      "Basepass": -0.0034,
+      "Prepass": -0.003
+     }
+    }
+   },
+   "each": {
+    "star": {
+     "K1": {
+      "dGpuMs": 0.0167,
+      "a": {
+       "mean": 2.49,
+       "spread": 0.0,
+       "n": 1,
+       "vals": [
+        2.49
+       ]
+      },
+      "b": {
+       "mean": 2.4733,
+       "spread": 0.03,
+       "n": 3,
+       "vals": [
+        2.46,
+        2.47,
+        2.49
+       ]
+      },
+      "dDrawCalls": 2.0,
+      "dPassMs": {}
+     },
+     "K2x1.6": {
+      "dGpuMs": 0.02,
+      "a": {
+       "mean": 2.53,
+       "spread": 0.0,
+       "n": 1,
+       "vals": [
+        2.53
+       ]
+      },
+      "b": {
+       "mean": 2.51,
+       "spread": 0.0,
+       "n": 3,
+       "vals": [
+        2.51,
+        2.51,
+        2.51
+       ]
+      },
+      "dDrawCalls": 1.96,
+      "dPassMs": {}
+     }
+    },
+    "heal": {
+     "K1": {
+      "dGpuMs": 0.0267,
+      "a": {
+       "mean": 2.5,
+       "spread": 0.0,
+       "n": 1,
+       "vals": [
+        2.5
+       ]
+      },
+      "b": {
+       "mean": 2.4733,
+       "spread": 0.03,
+       "n": 3,
+       "vals": [
+        2.46,
+        2.47,
+        2.49
+       ]
+      },
+      "dDrawCalls": 2.0,
+      "dPassMs": {}
+     },
+     "K2x1.6": {
+      "dGpuMs": 0.02,
+      "a": {
+       "mean": 2.53,
+       "spread": 0.0,
+       "n": 1,
+       "vals": [
+        2.53
+       ]
+      },
+      "b": {
+       "mean": 2.51,
+       "spread": 0.0,
+       "n": 3,
+       "vals": [
+        2.51,
+        2.51,
+        2.51
+       ]
+      },
+      "dDrawCalls": 2.08,
+      "dPassMs": {}
+     }
+    },
+    "ash": {
+     "K1": {
+      "dGpuMs": 0.0167,
+      "a": {
+       "mean": 2.49,
+       "spread": 0.0,
+       "n": 1,
+       "vals": [
+        2.49
+       ]
+      },
+      "b": {
+       "mean": 2.4733,
+       "spread": 0.03,
+       "n": 3,
+       "vals": [
+        2.46,
+        2.47,
+        2.49
+       ]
+      },
+      "dDrawCalls": 2.0,
+      "dPassMs": {
+       "Translucency": 0.0072
+      }
+     },
+     "K2x1.6": {
+      "dGpuMs": 0.02,
+      "a": {
+       "mean": 2.53,
+       "spread": 0.0,
+       "n": 1,
+       "vals": [
+        2.53
+       ]
+      },
+      "b": {
+       "mean": 2.51,
+       "spread": 0.0,
+       "n": 3,
+       "vals": [
+        2.51,
+        2.51,
+        2.51
+       ]
+      },
+      "dDrawCalls": 1.85,
+      "dPassMs": {}
+     }
+    },
+    "vortex": {
+     "K1": {
+      "dGpuMs": 0.0167,
+      "a": {
+       "mean": 2.49,
+       "spread": 0.0,
+       "n": 1,
+       "vals": [
+        2.49
+       ]
+      },
+      "b": {
+       "mean": 2.4733,
+       "spread": 0.03,
+       "n": 3,
+       "vals": [
+        2.46,
+        2.47,
+        2.49
+       ]
+      },
+      "dDrawCalls": 2.0,
+      "dPassMs": {}
+     },
+     "K2x1.6": {
+      "dGpuMs": 0.02,
+      "a": {
+       "mean": 2.53,
+       "spread": 0.0,
+       "n": 1,
+       "vals": [
+        2.53
+       ]
+      },
+      "b": {
+       "mean": 2.51,
+       "spread": 0.0,
+       "n": 3,
+       "vals": [
+        2.51,
+        2.51,
+        2.51
+       ]
+      },
+      "dDrawCalls": 2.1,
+      "dPassMs": {}
+     }
+    },
+    "arc": {
+     "K1": {
+      "dGpuMs": 0.0167,
+      "a": {
+       "mean": 2.49,
+       "spread": 0.0,
+       "n": 1,
+       "vals": [
+        2.49
+       ]
+      },
+      "b": {
+       "mean": 2.4733,
+       "spread": 0.03,
+       "n": 3,
+       "vals": [
+        2.46,
+        2.47,
+        2.49
+       ]
+      },
+      "dDrawCalls": 2.0,
+      "dPassMs": {}
+     },
+     "K2x1.6": {
+      "dGpuMs": 0.03,
+      "a": {
+       "mean": 2.54,
+       "spread": 0.0,
+       "n": 1,
+       "vals": [
+        2.54
+       ]
+      },
+      "b": {
+       "mean": 2.51,
+       "spread": 0.0,
+       "n": 3,
+       "vals": [
+        2.51,
+        2.51,
+        2.51
+       ]
+      },
+      "dDrawCalls": 1.44,
+      "dPassMs": {}
+     }
+    },
+    "dust": {
+     "K1": {
+      "dGpuMs": 0.0267,
+      "a": {
+       "mean": 2.5,
+       "spread": 0.0,
+       "n": 1,
+       "vals": [
+        2.5
+       ]
+      },
+      "b": {
+       "mean": 2.4733,
+       "spread": 0.03,
+       "n": 3,
+       "vals": [
+        2.46,
+        2.47,
+        2.49
+       ]
+      },
+      "dDrawCalls": 2.0,
+      "dPassMs": {}
+     },
+     "K2x1.6": {
+      "dGpuMs": 0.02,
+      "a": {
+       "mean": 2.53,
+       "spread": 0.0,
+       "n": 1,
+       "vals": [
+        2.53
+       ]
+      },
+      "b": {
+       "mean": 2.51,
+       "spread": 0.0,
+       "n": 3,
+       "vals": [
+        2.51,
+        2.51,
+        2.51
+       ]
+      },
+      "dDrawCalls": 2.04,
+      "dPassMs": {}
+     }
+    },
+    "chevrons": {
+     "K1": {
+      "dGpuMs": 0.0167,
+      "a": {
+       "mean": 2.49,
+       "spread": 0.0,
+       "n": 1,
+       "vals": [
+        2.49
+       ]
+      },
+      "b": {
+       "mean": 2.4733,
+       "spread": 0.03,
+       "n": 3,
+       "vals": [
+        2.46,
+        2.47,
+        2.49
+       ]
+      },
+      "dDrawCalls": 2.0,
+      "dPassMs": {}
+     },
+     "K2x1.6": {
+      "dGpuMs": 0.03,
+      "a": {
+       "mean": 2.54,
+       "spread": 0.0,
+       "n": 1,
+       "vals": [
+        2.54
+       ]
+      },
+      "b": {
+       "mean": 2.51,
+       "spread": 0.0,
+       "n": 3,
+       "vals": [
+        2.51,
+        2.51,
+        2.51
+       ]
+      },
+      "dDrawCalls": 1.85,
+      "dPassMs": {}
+     }
+    }
+   }
+  },
+  "sarp": {
+   "runs": {
+    "main-base": [
+     {
+      "run": "r1",
+      "exe": "ef7c9bebeeb5",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 2.61,
+        "gpuP95": 2.89,
+        "drawCalls": 489.77,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0755,
+         "GPU/LumenScreenProbeGather": 0.0167,
+         "GPU/LumenReflections": 0.1664,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1982,
+         "GPU/TranslucentLighting": 0.0154,
+         "GPU/FXSystemPreRender": 0.0016,
+         "GPU/FXSystemPostRenderOpaque": 0.0029,
+         "GPU/PostRenderOpsFX": 0.0023,
+         "GPU/Basepass": 0.1777,
+         "GPU/Prepass": 0.027,
+         "GPU/Postprocessing": 0.1213,
+         "GPU/ShadowDepths": 0.07
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.5,
+        "gpuP95": 2.64,
+        "drawCalls": 483.19,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.071,
+         "GPU/LumenScreenProbeGather": 0.0062,
+         "GPU/LumenReflections": 0.1378,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1001,
+         "GPU/TranslucentLighting": 0.0141,
+         "GPU/FXSystemPreRender": 0.0016,
+         "GPU/FXSystemPostRenderOpaque": 0.0027,
+         "GPU/PostRenderOpsFX": 0.0021,
+         "GPU/Basepass": 0.1785,
+         "GPU/Prepass": 0.0379,
+         "GPU/Postprocessing": 0.1206,
+         "GPU/ShadowDepths": 0.0769
+        }
+       }
+      }
+     },
+     {
+      "run": "r2",
+      "exe": "ef7c9bebeeb5",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 2.61,
+        "gpuP95": 2.89,
+        "drawCalls": 493.77,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0753,
+         "GPU/LumenScreenProbeGather": 0.0167,
+         "GPU/LumenReflections": 0.1662,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.2003,
+         "GPU/TranslucentLighting": 0.0152,
+         "GPU/FXSystemPreRender": 0.0016,
+         "GPU/FXSystemPostRenderOpaque": 0.0029,
+         "GPU/PostRenderOpsFX": 0.0022,
+         "GPU/Basepass": 0.177,
+         "GPU/Prepass": 0.0273,
+         "GPU/Postprocessing": 0.1227,
+         "GPU/ShadowDepths": 0.0697
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.5,
+        "gpuP95": 2.64,
+        "drawCalls": 487.1,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0709,
+         "GPU/LumenScreenProbeGather": 0.0061,
+         "GPU/LumenReflections": 0.1378,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.0999,
+         "GPU/TranslucentLighting": 0.0141,
+         "GPU/FXSystemPreRender": 0.0016,
+         "GPU/FXSystemPostRenderOpaque": 0.0027,
+         "GPU/PostRenderOpsFX": 0.0021,
+         "GPU/Basepass": 0.1781,
+         "GPU/Prepass": 0.0379,
+         "GPU/Postprocessing": 0.1213,
+         "GPU/ShadowDepths": 0.0763
+        }
+       }
+      }
+     },
+     {
+      "run": "r3",
+      "exe": "ef7c9bebeeb5",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 2.62,
+        "gpuP95": 2.89,
+        "drawCalls": 493.76,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0751,
+         "GPU/LumenScreenProbeGather": 0.0167,
+         "GPU/LumenReflections": 0.1664,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1978,
+         "GPU/TranslucentLighting": 0.0155,
+         "GPU/FXSystemPreRender": 0.0016,
+         "GPU/FXSystemPostRenderOpaque": 0.003,
+         "GPU/PostRenderOpsFX": 0.0023,
+         "GPU/Basepass": 0.1776,
+         "GPU/Prepass": 0.0272,
+         "GPU/Postprocessing": 0.1224,
+         "GPU/ShadowDepths": 0.0703
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.51,
+        "gpuP95": 2.65,
+        "drawCalls": 487.01,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0705,
+         "GPU/LumenScreenProbeGather": 0.0062,
+         "GPU/LumenReflections": 0.1376,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.0993,
+         "GPU/TranslucentLighting": 0.0145,
+         "GPU/FXSystemPreRender": 0.0015,
+         "GPU/FXSystemPostRenderOpaque": 0.0028,
+         "GPU/PostRenderOpsFX": 0.0021,
+         "GPU/Basepass": 0.1784,
+         "GPU/Prepass": 0.038,
+         "GPU/Postprocessing": 0.121,
+         "GPU/ShadowDepths": 0.0772
+        }
+       }
+      }
+     }
+    ],
+    "base": [
+     {
+      "run": "r1",
+      "exe": "4f5e2a7debfe",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 2.92,
+        "gpuP95": 3.2,
+        "drawCalls": 487.77,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0761,
+         "GPU/LumenScreenProbeGather": 0.0167,
+         "GPU/LumenReflections": 0.1799,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1581,
+         "GPU/TranslucentLighting": 0.0293,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.003,
+         "GPU/PostRenderOpsFX": 0.0023,
+         "GPU/Basepass": 0.1844,
+         "GPU/Prepass": 0.029,
+         "GPU/Postprocessing": 0.1481,
+         "GPU/ShadowDepths": 0.2958
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.87,
+        "gpuP95": 3.14,
+        "drawCalls": 475.84,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0704,
+         "GPU/LumenScreenProbeGather": 0.0061,
+         "GPU/LumenReflections": 0.1434,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1238,
+         "GPU/TranslucentLighting": 0.0401,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0029,
+         "GPU/PostRenderOpsFX": 0.0021,
+         "GPU/Basepass": 0.1791,
+         "GPU/Prepass": 0.0397,
+         "GPU/Postprocessing": 0.1304,
+         "GPU/ShadowDepths": 0.31
+        }
+       }
+      }
+     },
+     {
+      "run": "r2",
+      "exe": "4f5e2a7debfe",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 2.95,
+        "gpuP95": 3.2,
+        "drawCalls": 487.78,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0762,
+         "GPU/LumenScreenProbeGather": 0.0171,
+         "GPU/LumenReflections": 0.1814,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1587,
+         "GPU/TranslucentLighting": 0.0295,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0031,
+         "GPU/PostRenderOpsFX": 0.0023,
+         "GPU/Basepass": 0.1853,
+         "GPU/Prepass": 0.0287,
+         "GPU/Postprocessing": 0.1502,
+         "GPU/ShadowDepths": 0.2965
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.9,
+        "gpuP95": 3.14,
+        "drawCalls": 478.04,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0724,
+         "GPU/LumenScreenProbeGather": 0.0061,
+         "GPU/LumenReflections": 0.1438,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1229,
+         "GPU/TranslucentLighting": 0.0404,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0029,
+         "GPU/PostRenderOpsFX": 0.0022,
+         "GPU/Basepass": 0.1799,
+         "GPU/Prepass": 0.0399,
+         "GPU/Postprocessing": 0.1337,
+         "GPU/ShadowDepths": 0.3113
+        }
+       }
+      }
+     },
+     {
+      "run": "r3",
+      "exe": "4f5e2a7debfe",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 2.96,
+        "gpuP95": 3.2,
+        "drawCalls": 487.78,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0762,
+         "GPU/LumenScreenProbeGather": 0.0168,
+         "GPU/LumenReflections": 0.1815,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1593,
+         "GPU/TranslucentLighting": 0.0296,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.003,
+         "GPU/PostRenderOpsFX": 0.0024,
+         "GPU/Basepass": 0.1857,
+         "GPU/Prepass": 0.029,
+         "GPU/Postprocessing": 0.1497,
+         "GPU/ShadowDepths": 0.2981
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.91,
+        "gpuP95": 3.15,
+        "drawCalls": 475.91,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0698,
+         "GPU/LumenScreenProbeGather": 0.006,
+         "GPU/LumenReflections": 0.1442,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1245,
+         "GPU/TranslucentLighting": 0.0404,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0029,
+         "GPU/PostRenderOpsFX": 0.0022,
+         "GPU/Basepass": 0.1809,
+         "GPU/Prepass": 0.0401,
+         "GPU/Postprocessing": 0.1322,
+         "GPU/ShadowDepths": 0.3129
+        }
+       }
+      }
+     }
+    ],
+    "worst": [
+     {
+      "run": "r1",
+      "exe": "4f5e2a7debfe",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 2.94,
+        "gpuP95": 3.21,
+        "drawCalls": 497.77,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0761,
+         "GPU/LumenScreenProbeGather": 0.0171,
+         "GPU/LumenReflections": 0.181,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1545,
+         "GPU/TranslucentLighting": 0.0292,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.003,
+         "GPU/PostRenderOpsFX": 0.0024,
+         "GPU/Basepass": 0.184,
+         "GPU/Prepass": 0.0289,
+         "GPU/Postprocessing": 0.1447,
+         "GPU/ShadowDepths": 0.2971
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.93,
+        "gpuP95": 3.18,
+        "drawCalls": 485.82,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0692,
+         "GPU/LumenScreenProbeGather": 0.0062,
+         "GPU/LumenReflections": 0.1431,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1381,
+         "GPU/TranslucentLighting": 0.0404,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0029,
+         "GPU/PostRenderOpsFX": 0.0022,
+         "GPU/Basepass": 0.1808,
+         "GPU/Prepass": 0.0399,
+         "GPU/Postprocessing": 0.1471,
+         "GPU/ShadowDepths": 0.3102
+        }
+       }
+      }
+     },
+     {
+      "run": "r2",
+      "exe": "4f5e2a7debfe",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 2.95,
+        "gpuP95": 3.21,
+        "drawCalls": 497.78,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0761,
+         "GPU/LumenScreenProbeGather": 0.0168,
+         "GPU/LumenReflections": 0.1809,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1544,
+         "GPU/TranslucentLighting": 0.0295,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0031,
+         "GPU/PostRenderOpsFX": 0.0023,
+         "GPU/Basepass": 0.1847,
+         "GPU/Prepass": 0.0288,
+         "GPU/Postprocessing": 0.1476,
+         "GPU/ShadowDepths": 0.2967
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.94,
+        "gpuP95": 3.18,
+        "drawCalls": 488.1,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.072,
+         "GPU/LumenScreenProbeGather": 0.0062,
+         "GPU/LumenReflections": 0.1424,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1357,
+         "GPU/TranslucentLighting": 0.0403,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0029,
+         "GPU/PostRenderOpsFX": 0.0022,
+         "GPU/Basepass": 0.1807,
+         "GPU/Prepass": 0.0398,
+         "GPU/Postprocessing": 0.1448,
+         "GPU/ShadowDepths": 0.3098
+        }
+       }
+      }
+     },
+     {
+      "run": "r3",
+      "exe": "4f5e2a7debfe",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 2.96,
+        "gpuP95": 3.22,
+        "drawCalls": 497.77,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.076,
+         "GPU/LumenScreenProbeGather": 0.0167,
+         "GPU/LumenReflections": 0.1809,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1604,
+         "GPU/TranslucentLighting": 0.0297,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.003,
+         "GPU/PostRenderOpsFX": 0.0023,
+         "GPU/Basepass": 0.1847,
+         "GPU/Prepass": 0.0289,
+         "GPU/Postprocessing": 0.1478,
+         "GPU/ShadowDepths": 0.2957
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.94,
+        "gpuP95": 3.19,
+        "drawCalls": 485.87,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0693,
+         "GPU/LumenScreenProbeGather": 0.0062,
+         "GPU/LumenReflections": 0.1428,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1414,
+         "GPU/TranslucentLighting": 0.0404,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0028,
+         "GPU/PostRenderOpsFX": 0.0022,
+         "GPU/Basepass": 0.1809,
+         "GPU/Prepass": 0.04,
+         "GPU/Postprocessing": 0.1421,
+         "GPU/ShadowDepths": 0.3092
+        }
+       }
+      }
+     }
+    ],
+    "worst-legacy": [
+     {
+      "run": "r1",
+      "exe": "4f5e2a7debfe",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 2.95,
+        "gpuP95": 3.22,
+        "drawCalls": 487.76,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0763,
+         "GPU/LumenScreenProbeGather": 0.0168,
+         "GPU/LumenReflections": 0.1807,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1483,
+         "GPU/TranslucentLighting": 0.0295,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0031,
+         "GPU/PostRenderOpsFX": 0.0023,
+         "GPU/Basepass": 0.185,
+         "GPU/Prepass": 0.0287,
+         "GPU/Postprocessing": 0.1543,
+         "GPU/ShadowDepths": 0.2985
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.93,
+        "gpuP95": 3.16,
+        "drawCalls": 478.17,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0724,
+         "GPU/LumenScreenProbeGather": 0.0061,
+         "GPU/LumenReflections": 0.1429,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1224,
+         "GPU/TranslucentLighting": 0.0405,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0029,
+         "GPU/PostRenderOpsFX": 0.0022,
+         "GPU/Basepass": 0.1817,
+         "GPU/Prepass": 0.0401,
+         "GPU/Postprocessing": 0.1418,
+         "GPU/ShadowDepths": 0.3107
+        }
+       }
+      }
+     }
+    ],
+    "grade": [
+     {
+      "run": "r1",
+      "exe": "4f5e2a7debfe",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 3.03,
+        "gpuP95": 3.24,
+        "drawCalls": 501.78,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0761,
+         "GPU/LumenScreenProbeGather": 0.0167,
+         "GPU/LumenReflections": 0.1757,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1413,
+         "GPU/TranslucentLighting": 0.0195,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0031,
+         "GPU/PostRenderOpsFX": 0.0023,
+         "GPU/Basepass": 0.1589,
+         "GPU/Prepass": 0.0289,
+         "GPU/Postprocessing": 0.1937,
+         "GPU/ShadowDepths": 0.2997
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.92,
+        "gpuP95": 3.16,
+        "drawCalls": 491.12,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0718,
+         "GPU/LumenScreenProbeGather": 0.0061,
+         "GPU/LumenReflections": 0.1405,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1166,
+         "GPU/TranslucentLighting": 0.0197,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0028,
+         "GPU/PostRenderOpsFX": 0.0021,
+         "GPU/Basepass": 0.1786,
+         "GPU/Prepass": 0.0397,
+         "GPU/Postprocessing": 0.1366,
+         "GPU/ShadowDepths": 0.3085
+        }
+       }
+      }
+     },
+     {
+      "run": "r2",
+      "exe": "4f5e2a7debfe",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 3.01,
+        "gpuP95": 3.24,
+        "drawCalls": 501.78,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.076,
+         "GPU/LumenScreenProbeGather": 0.0168,
+         "GPU/LumenReflections": 0.1739,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1411,
+         "GPU/TranslucentLighting": 0.0178,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0032,
+         "GPU/PostRenderOpsFX": 0.0023,
+         "GPU/Basepass": 0.1586,
+         "GPU/Prepass": 0.0288,
+         "GPU/Postprocessing": 0.1892,
+         "GPU/ShadowDepths": 0.2993
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.94,
+        "gpuP95": 3.17,
+        "drawCalls": 486.96,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0679,
+         "GPU/LumenScreenProbeGather": 0.0061,
+         "GPU/LumenReflections": 0.141,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1154,
+         "GPU/TranslucentLighting": 0.019,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0028,
+         "GPU/PostRenderOpsFX": 0.0021,
+         "GPU/Basepass": 0.1759,
+         "GPU/Prepass": 0.0394,
+         "GPU/Postprocessing": 0.1518,
+         "GPU/ShadowDepths": 0.3076
+        }
+       }
+      }
+     }
+    ],
+    "grade-legacy": [
+     {
+      "run": "r1",
+      "exe": "4f5e2a7debfe",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 3.01,
+        "gpuP95": 3.24,
+        "drawCalls": 501.78,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0757,
+         "GPU/LumenScreenProbeGather": 0.0168,
+         "GPU/LumenReflections": 0.1749,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1426,
+         "GPU/TranslucentLighting": 0.0188,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0031,
+         "GPU/PostRenderOpsFX": 0.0023,
+         "GPU/Basepass": 0.1576,
+         "GPU/Prepass": 0.0287,
+         "GPU/Postprocessing": 0.1865,
+         "GPU/ShadowDepths": 0.3002
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.93,
+        "gpuP95": 3.17,
+        "drawCalls": 488.9,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0707,
+         "GPU/LumenScreenProbeGather": 0.006,
+         "GPU/LumenReflections": 0.1407,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1137,
+         "GPU/TranslucentLighting": 0.0194,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0028,
+         "GPU/PostRenderOpsFX": 0.0021,
+         "GPU/Basepass": 0.1792,
+         "GPU/Prepass": 0.0399,
+         "GPU/Postprocessing": 0.1404,
+         "GPU/ShadowDepths": 0.3098
+        }
+       }
+      }
+     },
+     {
+      "run": "r2",
+      "exe": "4f5e2a7debfe",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 3.0,
+        "gpuP95": 3.23,
+        "drawCalls": 501.8,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0761,
+         "GPU/LumenScreenProbeGather": 0.0166,
+         "GPU/LumenReflections": 0.1757,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1413,
+         "GPU/TranslucentLighting": 0.0193,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0031,
+         "GPU/PostRenderOpsFX": 0.0023,
+         "GPU/Basepass": 0.159,
+         "GPU/Prepass": 0.0288,
+         "GPU/Postprocessing": 0.1928,
+         "GPU/ShadowDepths": 0.2998
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.93,
+        "gpuP95": 3.17,
+        "drawCalls": 491.2,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.072,
+         "GPU/LumenScreenProbeGather": 0.0061,
+         "GPU/LumenReflections": 0.1405,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1145,
+         "GPU/TranslucentLighting": 0.0195,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0028,
+         "GPU/PostRenderOpsFX": 0.0021,
+         "GPU/Basepass": 0.1784,
+         "GPU/Prepass": 0.0398,
+         "GPU/Postprocessing": 0.1406,
+         "GPU/ShadowDepths": 0.3082
+        }
+       }
+      }
+     }
+    ],
+    "plates2": [
+     {
+      "run": "r1",
+      "exe": "4f5e2a7debfe",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 2.93,
+        "gpuP95": 3.19,
+        "drawCalls": 487.77,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0757,
+         "GPU/LumenScreenProbeGather": 0.017,
+         "GPU/LumenReflections": 0.1814,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1541,
+         "GPU/TranslucentLighting": 0.03,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0031,
+         "GPU/PostRenderOpsFX": 0.0023,
+         "GPU/Basepass": 0.1855,
+         "GPU/Prepass": 0.029,
+         "GPU/Postprocessing": 0.1425,
+         "GPU/ShadowDepths": 0.2975
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.84,
+        "gpuP95": 3.11,
+        "drawCalls": 399.8,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0705,
+         "GPU/LumenScreenProbeGather": 0.0061,
+         "GPU/LumenReflections": 0.144,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1238,
+         "GPU/TranslucentLighting": 0.0406,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0029,
+         "GPU/PostRenderOpsFX": 0.0022,
+         "GPU/Basepass": 0.1445,
+         "GPU/Prepass": 0.0278,
+         "GPU/Postprocessing": 0.126,
+         "GPU/ShadowDepths": 0.3121
+        }
+       }
+      }
+     },
+     {
+      "run": "r2",
+      "exe": "4f5e2a7debfe",
+      "done": true,
+      "reference": true,
+      "views": {
+       "K1": {
+        "gpuMs": 2.93,
+        "gpuP95": 3.19,
+        "drawCalls": 487.78,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0762,
+         "GPU/LumenScreenProbeGather": 0.0167,
+         "GPU/LumenReflections": 0.1813,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1543,
+         "GPU/TranslucentLighting": 0.0295,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0032,
+         "GPU/PostRenderOpsFX": 0.0023,
+         "GPU/Basepass": 0.1857,
+         "GPU/Prepass": 0.0289,
+         "GPU/Postprocessing": 0.146,
+         "GPU/ShadowDepths": 0.2976
+        }
+       },
+       "K2x1.6": {
+        "gpuMs": 2.86,
+        "gpuP95": 3.11,
+        "drawCalls": 399.85,
+        "passes": {
+         "GPU/LumenSceneUpdate": 0.0714,
+         "GPU/LumenScreenProbeGather": 0.0061,
+         "GPU/LumenReflections": 0.1444,
+         "GPU/UpdateLumenSceneBuffers": 0.0006,
+         "GPU/Translucency": 0.1223,
+         "GPU/TranslucentLighting": 0.0404,
+         "GPU/FXSystemPreRender": 0.0003,
+         "GPU/FXSystemPostRenderOpaque": 0.0029,
+         "GPU/PostRenderOpsFX": 0.0022,
+         "GPU/Basepass": 0.1432,
+         "GPU/Prepass": 0.0276,
+         "GPU/Postprocessing": 0.1276,
+         "GPU/ShadowDepths": 0.3123
+        }
+       }
+      }
+     }
+    ]
+   },
+   "worstVsBase": {
+    "K1": {
+     "dGpuMs": 0.0067,
+     "a": {
+      "mean": 2.95,
+      "spread": 0.02,
+      "n": 3,
+      "vals": [
+       2.94,
+       2.95,
+       2.96
+      ]
+     },
+     "b": {
+      "mean": 2.9433,
+      "spread": 0.04,
+      "n": 3,
+      "vals": [
+       2.92,
+       2.95,
+       2.96
+      ]
+     },
+     "dDrawCalls": 10.0,
+     "dPassMs": {
+      "Translucency": -0.0023,
+      "Postprocessing": -0.0026
+     }
+    },
+    "K2x1.6": {
+     "dGpuMs": 0.0434,
+     "a": {
+      "mean": 2.9367,
+      "spread": 0.01,
+      "n": 3,
+      "vals": [
+       2.93,
+       2.94,
+       2.94
+      ]
+     },
+     "b": {
+      "mean": 2.8933,
+      "spread": 0.04,
+      "n": 3,
+      "vals": [
+       2.87,
+       2.9,
+       2.91
+      ]
+     },
+     "dDrawCalls": 10.0,
+     "dPassMs": {
+      "Translucency": 0.0147,
+      "Postprocessing": 0.0126
+     }
+    }
+   },
+   "worstVsMainBase": {
+    "K1": {
+     "dGpuMs": 0.3367,
+     "a": {
+      "mean": 2.95,
+      "spread": 0.02,
+      "n": 3,
+      "vals": [
+       2.94,
+       2.95,
+       2.96
+      ]
+     },
+     "b": {
+      "mean": 2.6133,
+      "spread": 0.01,
+      "n": 3,
+      "vals": [
+       2.61,
+       2.61,
+       2.62
+      ]
+     },
+     "dDrawCalls": 5.34,
+     "dPassMs": {
+      "LumenReflections": 0.0146,
+      "Translucency": -0.0423,
+      "TranslucentLighting": 0.0141,
+      "Basepass": 0.007,
+      "Postprocessing": 0.0246,
+      "ShadowDepths": 0.2265
+     }
+    },
+    "K2x1.6": {
+     "dGpuMs": 0.4334,
+     "a": {
+      "mean": 2.9367,
+      "spread": 0.01,
+      "n": 3,
+      "vals": [
+       2.93,
+       2.94,
+       2.94
+      ]
+     },
+     "b": {
+      "mean": 2.5033,
+      "spread": 0.01,
+      "n": 3,
+      "vals": [
+       2.5,
+       2.5,
+       2.51
+      ]
+     },
+     "dDrawCalls": 0.83,
+     "dPassMs": {
+      "LumenReflections": 0.005,
+      "Translucency": 0.0386,
+      "TranslucentLighting": 0.0261,
+      "Basepass": 0.0025,
+      "Postprocessing": 0.0237,
+      "ShadowDepths": 0.2329
+     }
+    }
+   },
+   "baseVsMainBase": {
+    "K1": {
+     "dGpuMs": 0.33,
+     "a": {
+      "mean": 2.9433,
+      "spread": 0.04,
+      "n": 3,
+      "vals": [
+       2.92,
+       2.95,
+       2.96
+      ]
+     },
+     "b": {
+      "mean": 2.6133,
+      "spread": 0.01,
+      "n": 3,
+      "vals": [
+       2.61,
+       2.61,
+       2.62
+      ]
+     },
+     "dDrawCalls": -4.66,
+     "dPassMs": {
+      "LumenReflections": 0.0146,
+      "Translucency": -0.0401,
+      "TranslucentLighting": 0.0141,
+      "Basepass": 0.0077,
+      "Postprocessing": 0.0272,
+      "ShadowDepths": 0.2268
+     }
+    },
+    "K2x1.6": {
+     "dGpuMs": 0.39,
+     "a": {
+      "mean": 2.8933,
+      "spread": 0.04,
+      "n": 3,
+      "vals": [
+       2.87,
+       2.9,
+       2.91
+      ]
+     },
+     "b": {
+      "mean": 2.5033,
+      "spread": 0.01,
+      "n": 3,
+      "vals": [
+       2.5,
+       2.5,
+       2.51
+      ]
+     },
+     "dDrawCalls": -9.17,
+     "dPassMs": {
+      "LumenReflections": 0.0061,
+      "Translucency": 0.024,
+      "TranslucentLighting": 0.0261,
+      "Postprocessing": 0.0111,
+      "ShadowDepths": 0.2346
+     }
+    }
+   },
+   "worstLegacyVsBase": {
+    "K1": {
+     "dGpuMs": 0.0067,
+     "a": {
+      "mean": 2.95,
+      "spread": 0.0,
+      "n": 1,
+      "vals": [
+       2.95
+      ]
+     },
+     "b": {
+      "mean": 2.9433,
+      "spread": 0.04,
+      "n": 3,
+      "vals": [
+       2.92,
+       2.95,
+       2.96
+      ]
+     },
+     "dDrawCalls": -0.02,
+     "dPassMs": {
+      "Translucency": -0.0104,
+      "Postprocessing": 0.005
+     }
+    },
+    "K2x1.6": {
+     "dGpuMs": 0.0367,
+     "a": {
+      "mean": 2.93,
+      "spread": 0.0,
+      "n": 1,
+      "vals": [
+       2.93
+      ]
+     },
+     "b": {
+      "mean": 2.8933,
+      "spread": 0.04,
+      "n": 3,
+      "vals": [
+       2.87,
+       2.9,
+       2.91
+      ]
+     },
+     "dDrawCalls": 1.57,
+     "dPassMs": {
+      "Postprocessing": 0.0097
+     }
+    }
+   },
+   "gradeVsGradeLegacy": {
+    "K1": {
+     "dGpuMs": 0.015,
+     "a": {
+      "mean": 3.02,
+      "spread": 0.02,
+      "n": 2,
+      "vals": [
+       3.03,
+       3.01
+      ]
+     },
+     "b": {
+      "mean": 3.005,
+      "spread": 0.01,
+      "n": 2,
+      "vals": [
+       3.01,
+       3.0
+      ]
+     },
+     "dDrawCalls": -0.01,
+     "dPassMs": {}
+    }
+   },
+   "plates2VsBase": {
+    "K1": {
+     "dGpuMs": -0.0133,
+     "a": {
+      "mean": 2.93,
+      "spread": 0.0,
+      "n": 2,
+      "vals": [
+       2.93,
+       2.93
+      ]
+     },
+     "b": {
+      "mean": 2.9433,
+      "spread": 0.04,
+      "n": 3,
+      "vals": [
+       2.92,
+       2.95,
+       2.96
+      ]
+     },
+     "dDrawCalls": -0.0,
+     "dPassMs": {
+      "Translucency": -0.0045,
+      "Postprocessing": -0.0051
+     }
+    },
+    "K2x1.6": {
+     "dGpuMs": -0.0433,
+     "a": {
+      "mean": 2.85,
+      "spread": 0.02,
+      "n": 2,
+      "vals": [
+       2.84,
+       2.86
+      ]
+     },
+     "b": {
+      "mean": 2.8933,
+      "spread": 0.04,
+      "n": 3,
+      "vals": [
+       2.87,
+       2.9,
+       2.91
+      ]
+     },
+     "dDrawCalls": -76.77,
+     "dPassMs": {
+      "Basepass": -0.0361,
+      "Prepass": -0.0122,
+      "Postprocessing": -0.0053
+     }
+    }
+   },
+   "each": {
+    "star": {
+     "K1": {
+      "dGpuMs": -0.0033,
+      "a": {
+       "mean": 2.94,
+       "spread": 0.0,
+       "n": 1,
+       "vals": [
+        2.94
+       ]
+      },
+      "b": {
+       "mean": 2.9433,
+       "spread": 0.04,
+       "n": 3,
+       "vals": [
+        2.92,
+        2.95,
+        2.96
+       ]
+      },
+      "dDrawCalls": 2.0,
+      "dPassMs": {
+       "Translucency": -0.0056
+      }
+     },
+     "K2x1.6": {
+      "dGpuMs": 0.0167,
+      "a": {
+       "mean": 2.91,
+       "spread": 0.0,
+       "n": 1,
+       "vals": [
+        2.91
+       ]
+      },
+      "b": {
+       "mean": 2.8933,
+       "spread": 0.04,
+       "n": 3,
+       "vals": [
+        2.87,
+        2.9,
+        2.91
+       ]
+      },
+      "dDrawCalls": 3.54,
+      "dPassMs": {
+       "Postprocessing": 0.0031
+      }
+     }
+    },
+    "heal": {
+     "K1": {
+      "dGpuMs": 0.0267,
+      "a": {
+       "mean": 2.97,
+       "spread": 0.0,
+       "n": 1,
+       "vals": [
+        2.97
+       ]
+      },
+      "b": {
+       "mean": 2.9433,
+       "spread": 0.04,
+       "n": 3,
+       "vals": [
+        2.92,
+        2.95,
+        2.96
+       ]
+      },
+      "dDrawCalls": 2.0,
+      "dPassMs": {
+       "Translucency": -0.0035
+      }
+     },
+     "K2x1.6": {
+      "dGpuMs": 0.0367,
+      "a": {
+       "mean": 2.93,
+       "spread": 0.0,
+       "n": 1,
+       "vals": [
+        2.93
+       ]
+      },
+      "b": {
+       "mean": 2.8933,
+       "spread": 0.04,
+       "n": 3,
+       "vals": [
+        2.87,
+        2.9,
+        2.91
+       ]
+      },
+      "dDrawCalls": 3.52,
+      "dPassMs": {
+       "LumenSceneUpdate": 0.0023,
+       "Translucency": 0.0023
+      }
+     }
+    },
+    "ash": {
+     "K1": {
+      "dGpuMs": 0.0167,
+      "a": {
+       "mean": 2.96,
+       "spread": 0.0,
+       "n": 1,
+       "vals": [
+        2.96
+       ]
+      },
+      "b": {
+       "mean": 2.9433,
+       "spread": 0.04,
+       "n": 3,
+       "vals": [
+        2.92,
+        2.95,
+        2.96
+       ]
+      },
+      "dDrawCalls": 2.0,
+      "dPassMs": {
+       "Translucency": -0.0023,
+       "Postprocessing": -0.0033
+      }
+     },
+     "K2x1.6": {
+      "dGpuMs": 0.0367,
+      "a": {
+       "mean": 2.93,
+       "spread": 0.0,
+       "n": 1,
+       "vals": [
+        2.93
+       ]
+      },
+      "b": {
+       "mean": 2.8933,
+       "spread": 0.04,
+       "n": 3,
+       "vals": [
+        2.87,
+        2.9,
+        2.91
+       ]
+      },
+      "dDrawCalls": 3.64,
+      "dPassMs": {
+       "Translucency": 0.0111,
+       "Postprocessing": 0.0148
+      }
+     }
+    },
+    "vortex": {
+     "K1": {
+      "dGpuMs": 0.0067,
+      "a": {
+       "mean": 2.95,
+       "spread": 0.0,
+       "n": 1,
+       "vals": [
+        2.95
+       ]
+      },
+      "b": {
+       "mean": 2.9433,
+       "spread": 0.04,
+       "n": 3,
+       "vals": [
+        2.92,
+        2.95,
+        2.96
+       ]
+      },
+      "dDrawCalls": 2.0,
+      "dPassMs": {
+       "Translucency": -0.0031
+      }
+     },
+     "K2x1.6": {
+      "dGpuMs": 0.0267,
+      "a": {
+       "mean": 2.92,
+       "spread": 0.0,
+       "n": 1,
+       "vals": [
+        2.92
+       ]
+      },
+      "b": {
+       "mean": 2.8933,
+       "spread": 0.04,
+       "n": 3,
+       "vals": [
+        2.87,
+        2.9,
+        2.91
+       ]
+      },
+      "dDrawCalls": 3.51,
+      "dPassMs": {
+       "Postprocessing": 0.0039
+      }
+     }
+    },
+    "arc": {
+     "K1": {
+      "dGpuMs": 0.0067,
+      "a": {
+       "mean": 2.95,
+       "spread": 0.0,
+       "n": 1,
+       "vals": [
+        2.95
+       ]
+      },
+      "b": {
+       "mean": 2.9433,
+       "spread": 0.04,
+       "n": 3,
+       "vals": [
+        2.92,
+        2.95,
+        2.96
+       ]
+      },
+      "dDrawCalls": 1.99,
+      "dPassMs": {
+       "Translucency": -0.0021,
+       "Postprocessing": -0.0033
+      }
+     },
+     "K2x1.6": {
+      "dGpuMs": 0.0167,
+      "a": {
+       "mean": 2.91,
+       "spread": 0.0,
+       "n": 1,
+       "vals": [
+        2.91
+       ]
+      },
+      "b": {
+       "mean": 2.8933,
+       "spread": 0.04,
+       "n": 3,
+       "vals": [
+        2.87,
+        2.9,
+        2.91
+       ]
+      },
+      "dDrawCalls": 3.45,
+      "dPassMs": {}
+     }
+    },
+    "dust": {
+     "K1": {
+      "dGpuMs": 0.0167,
+      "a": {
+       "mean": 2.96,
+       "spread": 0.0,
+       "n": 1,
+       "vals": [
+        2.96
+       ]
+      },
+      "b": {
+       "mean": 2.9433,
+       "spread": 0.04,
+       "n": 3,
+       "vals": [
+        2.92,
+        2.95,
+        2.96
+       ]
+      },
+      "dDrawCalls": 2.0,
+      "dPassMs": {
+       "Translucency": -0.0048
+      }
+     },
+     "K2x1.6": {
+      "dGpuMs": 0.0267,
+      "a": {
+       "mean": 2.92,
+       "spread": 0.0,
+       "n": 1,
+       "vals": [
+        2.92
+       ]
+      },
+      "b": {
+       "mean": 2.8933,
+       "spread": 0.04,
+       "n": 3,
+       "vals": [
+        2.87,
+        2.9,
+        2.91
+       ]
+      },
+      "dDrawCalls": -0.77,
+      "dPassMs": {
+       "LumenSceneUpdate": -0.0041,
+       "Postprocessing": 0.0038
+      }
+     }
+    },
+    "chevrons": {
+     "K1": {
+      "dGpuMs": 0.0067,
+      "a": {
+       "mean": 2.95,
+       "spread": 0.0,
+       "n": 1,
+       "vals": [
+        2.95
+       ]
+      },
+      "b": {
+       "mean": 2.9433,
+       "spread": 0.04,
+       "n": 3,
+       "vals": [
+        2.92,
+        2.95,
+        2.96
+       ]
+      },
+      "dDrawCalls": 2.0,
+      "dPassMs": {
+       "Translucency": -0.0048
+      }
+     },
+     "K2x1.6": {
+      "dGpuMs": 0.0267,
+      "a": {
+       "mean": 2.92,
+       "spread": 0.0,
+       "n": 1,
+       "vals": [
+        2.92
+       ]
+      },
+      "b": {
+       "mean": 2.8933,
+       "spread": 0.04,
+       "n": 3,
+       "vals": [
+        2.87,
+        2.9,
+        2.91
+       ]
+      },
+      "dDrawCalls": 3.52,
+      "dPassMs": {
+       "LumenSceneUpdate": 0.0023,
+       "Postprocessing": 0.0057
+      }
+     }
+    }
+   }
+  }
+ }
+}

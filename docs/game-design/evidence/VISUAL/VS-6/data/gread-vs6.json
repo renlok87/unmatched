@@ -1,0 +1,388 @@
+{
+ "rule": "EN-16 G-READ on Marmoreal with the default painted backdrop (VS-5 E5): per painted HUD panel of every exit frame of\nthe pv-marm runs (1080p 100 %, 720p 150 %): (1) the panel.edge token (#F9EBDB a 0.45 over the panel.bg body #061623 a 0.92, blended in sRGB = the 02 §10.6\nmodel) against the median backdrop colour in a ring 3..15 px outside the panel bbox (other panels and the board field rect excluded) -> contrast\nto that median (>= 3:1); (2) text: p97 / p30 luminance inside the bbox (>= 4.5:1, approximation as HB-49).\nOutside git; writes gread-e5.json.",
+ "runs": {
+  "pv-marm-1080-100": {
+   "edge": {
+    "UI-HUD-TOP": [
+     6.87,
+     "joiner/s09-exit-reveal.png",
+     "#2B3E54"
+    ],
+    "UI-HUD-STATUS": [
+     4.74,
+     "joiner/s09-exit-attack-selected.png",
+     "#664E56"
+    ],
+    "UI-HUD-ACTIONS": [
+     10.92,
+     "joiner/s09-exit-conn-syncing.png",
+     "#181923"
+    ],
+    "UI-HUD-LOG": [
+     7.46,
+     "host/s09-exit-attack-selected.png",
+     "#373548"
+    ],
+    "UI-HUD-PANEL-LOC": [
+     10.3,
+     "joiner/s09-exit-opp-t3.0.png",
+     "#1B1F29"
+    ],
+    "UI-HUD-PANEL-OPP": [
+     10.39,
+     "host/s09-exit-hand-hover.png",
+     "#1E1D2A"
+    ],
+    "UI-HUD-OPP-HAND": [
+     5.25,
+     "host/s09-exit-nodefense.png",
+     "#614463"
+    ],
+    "UI-HUD-DECKS": [
+     6.46,
+     "joiner/s09-exit-conn-syncing.png",
+     "#473E45"
+    ],
+    "UI-HUD-SUB": [
+     1.18,
+     "joiner/s09-exit-hand-n7.png",
+     "#BCBEC8"
+    ],
+    "UI-HUD-PENDING": [
+     4.55,
+     "joiner/s09-exit-pending-collapsed.png",
+     "#67515B"
+    ],
+    "UI-HUD-TOAST": [
+     7.47,
+     "joiner/s09-exit-hand-n7.png",
+     "#3D3440"
+    ]
+   },
+   "sep": {
+    "UI-HUD-TOP": [
+     6.87,
+     6.87,
+     1.62,
+     "joiner/s09-exit-reveal.png",
+     "#2B3E54"
+    ],
+    "UI-HUD-STATUS": [
+     4.74,
+     4.74,
+     2.32,
+     "joiner/s09-exit-attack-selected.png",
+     "#664E56"
+    ],
+    "UI-HUD-ACTIONS": [
+     10.92,
+     10.92,
+     1.04,
+     "joiner/s09-exit-conn-syncing.png",
+     "#181923"
+    ],
+    "UI-HUD-LOG": [
+     7.46,
+     7.46,
+     1.5,
+     "host/s09-exit-attack-selected.png",
+     "#373548"
+    ],
+    "UI-HUD-PANEL-LOC": [
+     10.3,
+     10.3,
+     1.1,
+     "joiner/s09-exit-opp-t3.0.png",
+     "#1B1F29"
+    ],
+    "UI-HUD-PANEL-OPP": [
+     10.39,
+     10.39,
+     1.1,
+     "host/s09-exit-hand-hover.png",
+     "#1E1D2A"
+    ],
+    "UI-HUD-OPP-HAND": [
+     5.25,
+     5.25,
+     2.11,
+     "host/s09-exit-nodefense.png",
+     "#614463"
+    ],
+    "UI-HUD-DECKS": [
+     6.46,
+     6.46,
+     1.73,
+     "joiner/s09-exit-conn-syncing.png",
+     "#473E45"
+    ],
+    "UI-HUD-SUB": [
+     7.0,
+     7.0,
+     1.6,
+     "host/s09-exit-pending-collapsed.png",
+     "#373A50"
+    ],
+    "UI-HUD-PENDING": [
+     4.55,
+     4.55,
+     2.42,
+     "joiner/s09-exit-pending-collapsed.png",
+     "#67515B"
+    ],
+    "UI-HUD-TOAST": [
+     7.47,
+     7.47,
+     1.5,
+     "joiner/s09-exit-hand-n7.png",
+     "#3D3440"
+    ]
+   },
+   "shots": 30,
+   "edgeFail": [
+    "joiner/s09-exit-hand-n7.png UI-HUD-SUB 1.18"
+   ],
+   "sepFail": [],
+   "measured": {
+    "UI-HUD-TOP": [
+     6.84,
+     "host/s09-exit-attack-selected.png"
+    ],
+    "UI-HUD-STATUS": [
+     4.72,
+     "joiner/s09-exit-attack-selected.png"
+    ],
+    "UI-HUD-ACTIONS": [
+     1.51,
+     "joiner/s09-exit-conn-syncing.png"
+    ],
+    "UI-HUD-LOG": [
+     7.44,
+     "joiner/s09-exit-own-t0.5.png"
+    ],
+    "UI-HUD-PANEL-LOC": [
+     10.29,
+     "joiner/s09-exit-opp-t3.0.png"
+    ],
+    "UI-HUD-PANEL-OPP": [
+     10.38,
+     "host/s09-exit-hand-hover.png"
+    ],
+    "UI-HUD-OPP-HAND": [
+     5.23,
+     "host/s09-exit-nodefense.png"
+    ],
+    "UI-HUD-DECKS": [
+     2.3,
+     "joiner/s09-exit-conn-syncing.png"
+    ],
+    "UI-HUD-SUB": [
+     4.66,
+     "joiner/s09-exit-cursor-button.png"
+    ],
+    "UI-HUD-PENDING": [
+     1.43,
+     "joiner/s09-exit-pending-collapsed.png"
+    ],
+    "UI-HUD-TOAST": [
+     1.72,
+     "joiner/s09-exit-hand-n7.png"
+    ]
+   },
+   "textMedian": {
+    "UI-HUD-TOP": 14.88,
+    "UI-HUD-STATUS": 15.14,
+    "UI-HUD-LOG": 5.3,
+    "UI-HUD-OPP-HAND": 11.36,
+    "UI-HUD-DECKS": 15.67,
+    "UI-HUD-SUB": 15.17,
+    "UI-HUD-PENDING": 11.13
+   },
+   "textMin": {
+    "UI-HUD-TOP": 11.24,
+    "UI-HUD-STATUS": 10.92,
+    "UI-HUD-LOG": 3.41,
+    "UI-HUD-OPP-HAND": 11.1,
+    "UI-HUD-DECKS": 12.27,
+    "UI-HUD-SUB": 7.27,
+    "UI-HUD-PENDING": 3.52
+   }
+  },
+  "pv-marm-720-150": {
+   "edge": {
+    "UI-HUD-TOP": [
+     5.88,
+     "host/s09-exit-pending-collapsed.png",
+     "#38485A"
+    ],
+    "UI-HUD-STATUS": [
+     6.0,
+     "joiner/s09-exit-attack-selected.png",
+     "#56403F"
+    ],
+    "UI-HUD-ACTIONS": [
+     11.17,
+     "host/s09-exit-cursor-card.png",
+     "#17171B"
+    ],
+    "UI-HUD-PANEL-LOC": [
+     10.38,
+     "joiner/s09-exit-hand-hover.png",
+     "#1C1E28"
+    ],
+    "UI-HUD-PANEL-OPP": [
+     6.36,
+     "host/s09-exit-attack-selected.png",
+     "#4A3E48"
+    ],
+    "UI-HUD-OPP-HAND": [
+     5.19,
+     "joiner/s09-exit-cursor-card.png",
+     "#634462"
+    ],
+    "UI-HUD-DECKS": [
+     7.4,
+     "joiner/s09-exit-pending-collapsed.png",
+     "#3D3540"
+    ],
+    "UI-HUD-SUB": [
+     1.13,
+     "joiner/s09-exit-own-t0.5.png",
+     "#C0C2CC"
+    ],
+    "UI-HUD-PENDING": [
+     7.4,
+     "host/s09-exit-pending-collapsed.png",
+     "#3D3540"
+    ]
+   },
+   "sep": {
+    "UI-HUD-TOP": [
+     5.88,
+     5.88,
+     1.89,
+     "host/s09-exit-pending-collapsed.png",
+     "#38485A"
+    ],
+    "UI-HUD-STATUS": [
+     6.0,
+     6.0,
+     1.86,
+     "joiner/s09-exit-attack-selected.png",
+     "#56403F"
+    ],
+    "UI-HUD-ACTIONS": [
+     11.17,
+     11.17,
+     1.02,
+     "host/s09-exit-cursor-card.png",
+     "#17171B"
+    ],
+    "UI-HUD-PANEL-LOC": [
+     10.38,
+     10.38,
+     1.1,
+     "joiner/s09-exit-hand-hover.png",
+     "#1C1E28"
+    ],
+    "UI-HUD-PANEL-OPP": [
+     6.36,
+     6.36,
+     1.75,
+     "host/s09-exit-attack-selected.png",
+     "#4A3E48"
+    ],
+    "UI-HUD-OPP-HAND": [
+     5.19,
+     5.19,
+     2.13,
+     "joiner/s09-exit-cursor-card.png",
+     "#634462"
+    ],
+    "UI-HUD-DECKS": [
+     7.4,
+     7.4,
+     1.52,
+     "joiner/s09-exit-pending-collapsed.png",
+     "#3D3540"
+    ],
+    "UI-HUD-SUB": [
+     3.57,
+     3.57,
+     3.05,
+     "host/s09-exit-own-t3.0.png",
+     "#835E58"
+    ],
+    "UI-HUD-PENDING": [
+     7.4,
+     7.4,
+     1.52,
+     "host/s09-exit-pending-collapsed.png",
+     "#3D3540"
+    ]
+   },
+   "shots": 27,
+   "edgeFail": [
+    "host/s09-exit-hand-hover.png UI-HUD-SUB 2.29",
+    "joiner/s09-exit-hand-hover.png UI-HUD-SUB 2.34",
+    "joiner/s09-exit-own-t0.5.png UI-HUD-SUB 1.13",
+    "joiner/s09-exit-own-t3.0.png UI-HUD-SUB 2.34"
+   ],
+   "sepFail": [],
+   "measured": {
+    "UI-HUD-TOP": [
+     3.92,
+     "host/s09-exit-pending-collapsed.png"
+    ],
+    "UI-HUD-STATUS": [
+     3.64,
+     "host/s09-exit-attack-selected.png"
+    ],
+    "UI-HUD-ACTIONS": [
+     1.26,
+     "host/s09-exit-pending-collapsed.png"
+    ],
+    "UI-HUD-PANEL-LOC": [
+     6.36,
+     "joiner/s09-exit-hand-hover.png"
+    ],
+    "UI-HUD-PANEL-OPP": [
+     4.24,
+     "joiner/s09-exit-pending-collapsed.png"
+    ],
+    "UI-HUD-OPP-HAND": [
+     3.62,
+     "joiner/s09-exit-cursor-card.png"
+    ],
+    "UI-HUD-DECKS": [
+     1.81,
+     "joiner/s09-exit-own-t0.5.png"
+    ],
+    "UI-HUD-SUB": [
+     1.37,
+     "host/s09-exit-own-t0.5.png"
+    ],
+    "UI-HUD-PENDING": [
+     2.34,
+     "host/s09-exit-pending-collapsed.png"
+    ]
+   },
+   "textMedian": {
+    "UI-HUD-TOP": 15.39,
+    "UI-HUD-STATUS": 15.35,
+    "UI-HUD-OPP-HAND": 8.48,
+    "UI-HUD-DECKS": 12.0,
+    "UI-HUD-SUB": 15.48,
+    "UI-HUD-PENDING": 13.0
+   },
+   "textMin": {
+    "UI-HUD-TOP": 15.39,
+    "UI-HUD-STATUS": 8.38,
+    "UI-HUD-OPP-HAND": 7.74,
+    "UI-HUD-DECKS": 11.15,
+    "UI-HUD-SUB": 4.69,
+    "UI-HUD-PENDING": 12.51
+   }
+  }
+ }
+}
