@@ -362,6 +362,10 @@ MOVE_SELECTION_FIELDS = {
     ("ghost", "leavingFighterAlpha"): ("num", 0.05, 1.0, 0.5),
     ("invalid", "colorSrgb"): ("hex", None, None, "#D9483F"), ("invalid", "ms"): ("int", 50, 3000, 350),
     ("lastMove", "alpha"): ("num", 0.05, 1.0, 0.6), ("lastMove", "fadeMs"): ("int", 0, 5000, 300),
+    # VS-6 FX-14 (ВР-29) dashed path and FX-08 (ВР-27) choice colour (S08BoardArt.cpp; "token" names the HUD token)
+    ("lastMove", "holdMs"): ("int", 0, 10000, 1500), ("lastMove", "inMs"): ("int", 0, 2000, 150),
+    ("lastMove", "dashPerEdge"): ("int", 2, 32, 12), ("lastMove", "widthUU"): ("num", 1.0, 12.0, 4.0),
+    ("choice", "colorSrgb"): ("hex", None, None, "#4CD2DC"), ("choice", "token"): ("str", None, None, "board.choice"),
     ("candidate", "radiusUU"): ("num", 8.0, 30.0, 18.9), ("candidate", "widthUU"): ("num", 0.4, 4.0, 1.2),
     ("candidate", "alpha"): ("num", 0.1, 1.0, 0.7), ("candidate", "z"): ("num", 0.05, 5.0, 1.6),
     ("anim", "stepMs"): ("int", 40, 2000, 280), ("anim", "capFighterMs"): ("int", 100, 10000, 1400),
@@ -398,7 +402,7 @@ def merge_move_selection(ctx: str, block, base: dict) -> tuple[dict, list[str]]:
                 errs.append(f"{ctx}: moveSelection.{name}.{field} is not a known field")
                 continue
             kind, lo, hi, _ = spec
-            ok = (kind == "hex" and _hex(value)) or (kind == "bool" and isinstance(value, bool)) or                  (kind == "num" and _num(value) and lo <= value <= hi) or                  (kind == "int" and _num(value) and float(value).is_integer() and lo <= value <= hi)
+            ok = (kind == "hex" and _hex(value)) or (kind == "bool" and isinstance(value, bool)) or (kind == "str" and isinstance(value, str) and bool(value)) or                  (kind == "num" and _num(value) and lo <= value <= hi) or                  (kind == "int" and _num(value) and float(value).is_integer() and lo <= value <= hi)
             if not ok:
                 errs.append(f"{ctx}: moveSelection.{name}.{field} out of range / wrong type ({value!r})")
             else:
