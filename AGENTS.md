@@ -218,6 +218,13 @@ User request: «Конечно, делай и закрепи это в осно�
   - no `render_bench.py` cost run, unless the change adds lights, meshes, materials or FX;
   - UE tests only when C++ changed, otherwise pytest and the `--check` validators.
 - **Full mode** is everything above (review pass, all gates, cost bench). Use it for new systems or architecture changes, or when the user asks for an acceptance round.
+- **No cost optimizations within budget.** The user's words on 2026-10-08: «Больше не делай таких оптимизаций, мы
+  просрали целых три часа работы». The reason: a VS-6 fix of +0.33 ms GPU took about 1.5 h, three repackages and a self-made
+  crash, although the limit was 1 ms.
+  - Measure cost only where a card requires it, in one run. Within the threshold → write the number down and move on.
+  - Fix only a threshold breach (the card's limit or ACC-022 60 FPS), a crash, visibly broken output or a failed gate.
+  - Anything else found "wasteful" goes to the open items of the evidence README, not into the current task.
+  - No repackaging and no repeat benches for cost's sake.
 - **One package per change.** Package once in the worktree; `package-client.ps1` stamps the staged build with the commit.
   After `safe-integrate.sh --apply`, do two things in the main checkout:
   - rebuild UnmatchedEditor;
