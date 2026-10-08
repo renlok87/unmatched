@@ -300,11 +300,23 @@ float BaseDigitTurnDeg() {
   return Turn;
 }
 
+FBaseDigitGeometry BaseDigitReviewGeometry() {
+  FBaseDigitGeometry G;
+  G.TurnDeg = BaseDigitTurnDeg();
+  const TCHAR* Cmd = FCommandLine::Get();
+  if (FParse::Value(Cmd, TEXT("S08BaseDigitDisc="), G.DiscOfTopDiameter)) G.DiscOfTopDiameter = FMath::Clamp(G.DiscOfTopDiameter, 0.2f, 0.6f);
+  if (FParse::Value(Cmd, TEXT("S08BaseDigitEm="), G.EmOfDisc)) G.EmOfDisc = FMath::Clamp(G.EmOfDisc, 0.5f, 1.2f);
+  if (FParse::Value(Cmd, TEXT("S08BaseDigitCentre="), G.CentreOfRadius)) G.CentreOfRadius = FMath::Clamp(G.CentreOfRadius, 0.0f, 0.9f);
+  G.CentreOfRadius = FMath::Min(G.CentreOfRadius, 1.0f - G.DiscOfTopDiameter);  // the disc stays inside the top
+  return G;
+}
+
 FBaseDigitPlacement BaseDigitPlacement(const FVector& PedestalCenter, float TopZ, float TopRadiusUU,
-                                       const FVector& CameraPos, double RestYawDeg, float TurnDeg) {
+                                       const FVector& CameraPos, double RestYawDeg, const FBaseDigitGeometry& G) {
   FBaseDigitPlacement Out;
   const float R = FMath::Max(0.0f, TopRadiusUU);
-  Out.DiscDiameterUU = BaseDigitDiscOfTopDiameter * 2.0f * R;
+  const float TurnDeg = G.TurnDeg;
+  Out.DiscDiameterUU = G.DiscOfTopDiameter * 2.0f * R;
   // The camera axis (pedestal -> camera, XY) and the side away from the figure's rest offset.
   FVector Axis(CameraPos.X - PedestalCenter.X, CameraPos.Y - PedestalCenter.Y, 0.0);
   if (!Axis.Normalize()) Axis = FVector(0.0, 1.0, 0.0);
@@ -314,13 +326,13 @@ FBaseDigitPlacement BaseDigitPlacement(const FVector& PedestalCenter, float TopZ
   const double PlaceYaw = FMath::DegreesToRadians(AxisYaw + Out.Side * TurnDeg);
   const FVector Dir(FMath::Cos(PlaceYaw), FMath::Sin(PlaceYaw), 0.0);
   const FVector Centre2D(PedestalCenter.X, PedestalCenter.Y, 0.0);
-  const FVector OnTop = Centre2D + Dir * (BaseDigitCentreOfRadius * R);
+  const FVector OnTop = Centre2D + Dir * (G.CentreOfRadius * R);
   Out.DiscCenter = FVector(OnTop.X, OnTop.Y, TopZ + BaseDigitDiscLiftUU + 0.5f * BaseDigitDiscThicknessUU);
   const float Xy = Out.DiscDiameterUU / 100.0f;  // the engine cylinder: 100 uu across, 100 uu tall
   Out.DiscScale = FVector(Xy, Xy, BaseDigitDiscThicknessUU / 100.0f);
   // The digit: flat (its normal +Z), the glyph top away from the camera so it reads upright from the camera side,
   // centred on the disc, lifted clear of the plate's top (no z-fight).
-  const float Em = BaseDigitEmOfDisc * Out.DiscDiameterUU;
+  const float Em = G.EmOfDisc * Out.DiscDiameterUU;
   Out.TextWorldSizeUU = Em * RobotoCellPerEm;
   Out.CapUU = Em * RobotoDigitPerEm;
   Out.TextRotation = FRotationMatrix::MakeFromXZ(FVector::UpVector, -Axis).Rotator();

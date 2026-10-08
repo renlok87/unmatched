@@ -162,10 +162,10 @@ public:
   /** The digit components (never null; visibility is the state - see UpdateBaseDigit). */
   UStaticMeshComponent* GetBaseDigitDisc() const { return BaseDigitDisc; }
   UTextRenderComponent* GetBaseDigitText() const { return BaseDigitText; }
-  /** AN-31 (ВР-Z1R-03): the navy disc with the cream number flat on the pedestal's top face, on the camera side
-   *  turned 60 deg towards the figure's rest offset (S08HeroesV2::BaseDigitSideTurnDeg - the mirrored side of the
-   *  wing rule: the near wing covered the other one; clear of the talons); sizes from the pedestal mesh bounds
-   *  (disc 0.5 x the top-face diameter, centre at 0.48 R, digit em 0.9 x the disc, top of the glyph away from the
+  /** AN-31 (ВР-Z1R-03, ВР-VS8-01): the navy disc with the cream number flat on the pedestal's top face, on the camera
+   *  side turned 25 deg towards the figure's rest offset (S08HeroesV2::BaseDigitSideTurnDeg; the front edge, clear of
+   *  the legs and talons); sizes from the pedestal mesh bounds
+   *  (disc 0.40 x the top-face diameter, centre at 0.58 R, digit em 1.05 x the disc, top of the glyph away from the
    *  camera, unlit tokens); the components ride the actor, never the figure's rotation. Shown on living v2 harpies
    *  only - hidden with -S08BaseDigitLegacy, on other figures, for a whole Place transfer and from the death
    *  dissolve on; re-placed by every apply / rest facing / move end. Traced once per figure

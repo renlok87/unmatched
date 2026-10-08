@@ -984,27 +984,30 @@ bool FS08HeroesV2BaseDigitPlacementTest::RunTest(const FString&) {
     const double AxisYaw = FMath::RadiansToDegrees(FMath::Atan2(Axis.Y, Axis.X));
     const FBaseDigitPlacement P = BaseDigitPlacement(C.Pedestal, TopZ, R, C.Camera, AxisYaw + C.RestOffDeg);
     const FString Tag = FString::Printf(TEXT("case %d"), I);
-    // Sizes: the disc 0.5 x the top diameter (= R), the digit em 0.9 x the disc (cap 0.721 em).
-    TestTrue(Tag + TEXT(": disc diameter = 0.5 x the top diameter"), FMath::IsNearlyEqual(P.DiscDiameterUU, R, 1e-3f));
-    TestTrue(Tag + TEXT(": cap = 0.9 x disc x the Roboto digit height"),
-             FMath::IsNearlyEqual(P.CapUU, 0.9f * R * RobotoDigitPerEm, 1e-3f));
-    TestTrue(Tag + TEXT(": the cap reads at K2x1.6 (>= 7 uu)"), P.CapUU >= 7.0f);
+    // Sizes (ВР-VS8-01): the disc 0.40 x the top diameter, the digit em 1.05 x the disc (cap 0.721 em).
+    TestTrue(Tag + TEXT(": disc diameter = 0.40 x the top diameter"), FMath::IsNearlyEqual(P.DiscDiameterUU, 0.8f * R, 1e-3f));
+    TestTrue(Tag + TEXT(": cap = 1.05 x disc x the Roboto digit height"),
+             FMath::IsNearlyEqual(P.CapUU, 1.05f * 0.8f * R * RobotoDigitPerEm, 1e-3f));
+    TestTrue(Tag + TEXT(": the cap reads at K2x1.6 (>= 6.5 uu, ~10 px)"), P.CapUU >= 6.5f);
+    // The disc stays clear of the pedestal centre (the legs): its inner edge >= 0.15 R out (ВР-Z1R-09).
+    TestTrue(Tag + TEXT(": the disc clear of the centre"),
+             FVector2D(P.DiscCenter - C.Pedestal).Size() - 0.5 * P.DiscDiameterUU >= 0.15 * R - 1e-3);
     // The disc stays inside the pedestal top: centre distance + disc radius <= R.
     const double Reach = FVector2D(P.DiscCenter - C.Pedestal).Size() + 0.5 * P.DiscDiameterUU;
     TestTrue(FString::Printf(TEXT("%s: the disc inside the top (%.2f <= %.2f)"), *Tag, Reach, R), Reach <= R + 1e-3);
-    // On the camera side, 60 deg off the axis, on the side the signed turn names (ВР-Z1R-03: -60 = towards the rest
-    // offset - the mirrored side of the wing rule).
+    // On the camera side, |turn| deg off the axis, on the side the signed turn names (ВР-Z1R-03: negative = towards the
+    // rest offset - the mirrored side of the wing rule; ВР-VS8-01: -25).
     FVector Dir = P.DiscCenter - C.Pedestal;
     Dir.Z = 0.0;
     Dir.Normalize();
-    TestTrue(Tag + TEXT(": the disc on the camera side (60 deg off the axis)"),
-             FMath::IsNearlyEqual(FVector::DotProduct(Dir, Axis), 0.5, 1e-3));
+    TestTrue(Tag + TEXT(": the disc on the camera side (|turn| deg off the axis)"),
+             FMath::IsNearlyEqual(FVector::DotProduct(Dir, Axis), FMath::Cos(FMath::DegreesToRadians(BaseDigitSideTurnDeg)), 1e-3));
     const double DiscYawOff = FMath::FindDeltaAngleDegrees(AxisYaw, FMath::RadiansToDegrees(FMath::Atan2(Dir.Y, Dir.X)));
     const double WantOff = (C.RestOffDeg >= 0.0 ? -1.0 : 1.0) * BaseDigitSideTurnDeg;
     TestTrue(FString::Printf(TEXT("%s: the disc on the signed side (%.1f, want %.1f, rest offset %.1f)"), *Tag,
                              DiscYawOff, WantOff, C.RestOffDeg),
              FMath::IsNearlyEqual(DiscYawOff, WantOff, 0.1));
-    TestTrue(Tag + TEXT(": -60 = towards the rest offset"), C.RestOffDeg >= 0.0 ? DiscYawOff > 0.0 : DiscYawOff < 0.0);
+    TestTrue(Tag + TEXT(": negative turn = towards the rest offset"), C.RestOffDeg >= 0.0 ? DiscYawOff > 0.0 : DiscYawOff < 0.0);
     // The plate: flat, its bottom 0.1 above the top; the text 0.3 above the plate's top (no z-fight).
     TestTrue(Tag + TEXT(": plate bottom above the top"),
              P.DiscCenter.Z - 0.5 * BaseDigitDiscThicknessUU >= TopZ + 0.1 - 1e-3);

@@ -1028,9 +1028,10 @@ void AS08FighterActor::UpdateBaseDigit() {
   // ВР-Z1R-04: the view camera (the BoardCamera view target), not the camera manager's cached POV.
   const FVector CameraPos = AS08BoardActor::ViewCameraLocation(GetWorld());
   const double RestYaw = bDigitRestYawSet ? DigitRestYawDeg : static_cast<double>(FacingYawDeg);
-  const float TurnDeg = S08HeroesV2::BaseDigitTurnDeg();
+  const S08HeroesV2::FBaseDigitGeometry Geo = S08HeroesV2::BaseDigitReviewGeometry();
+  const float TurnDeg = Geo.TurnDeg;
   const S08HeroesV2::FBaseDigitPlacement P =
-      S08HeroesV2::BaseDigitPlacement(Centre, TopZ, RadiusUU, CameraPos, RestYaw, TurnDeg);
+      S08HeroesV2::BaseDigitPlacement(Centre, TopZ, RadiusUU, CameraPos, RestYaw, Geo);
   if (!BaseDigitMid) {
     if (UMaterialInterface* DiscMaterial = LoadObject<UMaterialInterface>(nullptr,
                                                                           *S08HeroesV2::BaseDigitMaterialPath())) {
@@ -1072,8 +1073,9 @@ void AS08FighterActor::UpdateBaseDigit() {
     BaseDigitTraceKey = TraceKey;
     FS08Trace::Write(FString::Printf(
         TEXT("ARTPREVIEW basedigit fighter=%s n=%d discUU=%.1f capUU=%.1f topRadiusUU=%.1f side=%d turn=%.0f ")
-            TEXT("drawable=%d font=%s"),
-        *Fighter.Id, Number, P.DiscDiameterUU, P.CapUU, RadiusUU, P.Side, TurnDeg, bBaseDigitDrawable ? 1 : 0,
+            TEXT("centre=%.2f drawable=%d font=%s"),
+        *Fighter.Id, Number, P.DiscDiameterUU, P.CapUU, RadiusUU, P.Side, TurnDeg, Geo.CentreOfRadius,
+        bBaseDigitDrawable ? 1 : 0,
         DigitFont ? *DigitFont->GetName() : TEXT("missing")));
   }
 }

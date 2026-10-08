@@ -295,11 +295,15 @@ constexpr float RobotoDigitPerEm = 1477.0f / 2048.0f;
  *  the camera axis turned 60 deg (the front side, clear of the talons), digit em 0.9 x the disc, centred, flat, the
  *  glyph top away from the camera. The turn is signed against the figure's rest offset: +60 = away from it, -60 = the
  *  mirrored side, towards it. ВР-Z1R-03's wing rule chose -60: at +60 the near wing covered > 25 % of the disc in
- *  the K2 crops (A/B C:/tmp/visual/Z-1/ab-turn*, 2026-10-07), at -60 all six digits read on both maps. */
-constexpr float BaseDigitDiscOfTopDiameter = 0.5f;
-constexpr float BaseDigitCentreOfRadius = 0.48f;
-constexpr float BaseDigitSideTurnDeg = -60.0f;
-constexpr float BaseDigitEmOfDisc = 0.9f;
+ *  the K2 crops (A/B C:/tmp/visual/Z-1/ab-turn*, 2026-10-07), at -60 all six digits read on both maps.
+ *  ВР-VS8-01 (по делегированию, ВР-Z1R-09): at -60 / 0.48 R the disc reached the pedestal centre and the legs hid the
+ *  top of the «2» / «3» («3» read as «5»). Now: disc 0.40 x the top diameter, its centre 0.58 R out, turned -25 deg
+ *  (the front edge, clear of the talons), digit em 1.05 x the disc (cap 6.7 uu, ~10 px at K2x1.6); A/B of three
+ *  geometries on Sarpedon K2x1.6 (C:/tmp/visual/VS8/A1/ab-c123.png), docs/game-design/evidence/VISUAL/AN-31/. */
+constexpr float BaseDigitDiscOfTopDiameter = 0.40f;
+constexpr float BaseDigitCentreOfRadius = 0.58f;
+constexpr float BaseDigitSideTurnDeg = -25.0f;
+constexpr float BaseDigitEmOfDisc = 1.05f;
 constexpr float BaseDigitDiscThicknessUU = 0.4f;  // the disc plate (the engine cylinder scaled flat)
 constexpr float BaseDigitDiscLiftUU = 0.1f;       // the plate's bottom above the pedestal top
 constexpr float BaseDigitTextLiftUU = 0.3f;       // the text above the plate's top
@@ -307,6 +311,15 @@ constexpr float BaseDigitTextLiftUU = 0.3f;       // the text above the plate's 
  *  the wing rule of ВР-Z1R-03, 0 = on the camera axis). */
 inline const TCHAR* const BaseDigitTurnParamName = TEXT("S08BaseDigitTurn=");
 UNMATCHED_API float BaseDigitTurnDeg();
+/** The geometry the placement uses: the constants above. VS-8 review A/B only (ВР-VS8-01): -S08BaseDigitDisc=,
+ *  -S08BaseDigitCentre=, -S08BaseDigitEm= override them (the disc kept inside the top: centre <= 1 - disc). */
+struct FBaseDigitGeometry {
+  float DiscOfTopDiameter = BaseDigitDiscOfTopDiameter;
+  float CentreOfRadius = BaseDigitCentreOfRadius;
+  float EmOfDisc = BaseDigitEmOfDisc;
+  float TurnDeg = BaseDigitSideTurnDeg;
+};
+UNMATCHED_API FBaseDigitGeometry BaseDigitReviewGeometry();
 /** Where the disc and the digit go - world-free (automation-tested). */
 struct FBaseDigitPlacement {
   FVector DiscCenter = FVector::ZeroVector;  // world
@@ -322,7 +335,7 @@ struct FBaseDigitPlacement {
  *  camera, RestYawDeg: the figure's rest facing (world yaw). */
 UNMATCHED_API FBaseDigitPlacement BaseDigitPlacement(const FVector& PedestalCenter, float TopZ, float TopRadiusUU,
                                                      const FVector& CameraPos, double RestYawDeg,
-                                                     float TurnDeg = BaseDigitSideTurnDeg);
+                                                     const FBaseDigitGeometry& Geometry = FBaseDigitGeometry());
 
 // ---- AN-32 (ВР-16): the heroMaterials Fix group of the map light profile ----
 /** Rollback: -S08HeroMatFixLegacy - the light profile's "heroMaterials" block is ignored (the plain hero MIs). */
