@@ -3,6 +3,7 @@
 #include "S08CueFxSpawner.h"
 
 #include "Engine/World.h"
+#include "TimerManager.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
@@ -10,12 +11,28 @@
 #include "S08CueFx.h"
 #include "../S08TraceLog.h"
 
+namespace {
+// VS-6 FX-37 (ВР-VS6-48): a cue effect is a print on the scene - it casts no shadow and stays out of Lumen / distance
+// fields (the vortex rings mesh of NS_FX_MedusaVortex put a Nanite shadow pass of ~0.25 ms into every frame).
+void SceneNeutral(UNiagaraComponent* C) {
+  if (!C) return;
+  C->SetCastShadow(false);
+  C->SetAffectDynamicIndirectLighting(false);
+  C->SetAffectDistanceFieldLighting(false);
+}
+}  // namespace
+
 bool US08CueFxSpawnerComponent::Prewarm() {
   UWorld* World = GetWorld();
   if (!World) return false;
   bPrewarmDone = true;
   const double T0 = FPlatformTime::Seconds();
   Prewarmed.Reset();
+  if (!S08CueFx::FxEnabled()) {
+    // -S08FxLegacy: nothing will show, so nothing is loaded or kept (FX-37: the rollback still primed 7 systems)
+    FS08Trace::Write(TEXT("FX prewarm systems=0 ms=0 reason=legacy"));
+    return true;
+  }
   TSet<FString> Distinct;
   for (const S08CueFx::FEntry& E : S08CueFx::Registry()) {
     if (E.System.IsEmpty() || !E.bPrewarm || Distinct.Contains(E.System)) continue;
@@ -29,9 +46,26 @@ bool US08CueFxSpawnerComponent::Prewarm() {
       if (UNiagaraComponentPool* Pool = Manager->GetComponentPool()) Pool->PrimePool(System, World);
     }
   }
-  // one invisible pass far below the board so the first real frame has the PSO of every renderer
+  // one invisible pass far below the board so the first real frame has the PSO of every renderer; the systems freeze
+  // their quads by age (no completion), so the pass is ended explicitly after 0.5 s (FX-37: they stayed alive)
+  TArray<TWeakObjectPtr<UNiagaraComponent>> Pass;
   for (const TObjectPtr<UNiagaraSystem>& System : Prewarmed) {
-    UNiagaraFunctionLibrary::SpawnSystemAtLocation(World, System, FVector(0.0f, 0.0f, -1000000.0f));
+    UNiagaraComponent* C = UNiagaraFunctionLibrary::SpawnSystemAtLocation(World, System, FVector(0.0f, 0.0f, -1000000.0f));
+    SceneNeutral(C);
+    if (C) Pass.Add(C);
+  }
+  if (Pass.Num() > 0) {
+    FTimerHandle Handle;
+    World->GetTimerManager().SetTimer(Handle, FTimerDelegate::CreateWeakLambda(this, [Pass]() {
+      int32 N = 0;
+      for (const TWeakObjectPtr<UNiagaraComponent>& C : Pass) {
+        if (!C.IsValid()) continue;
+        C->DeactivateImmediate();
+        C->DestroyComponent();
+        ++N;
+      }
+      FS08Trace::Write(FString::Printf(TEXT("FX prewarm pass ended components=%d"), N));
+    }), 0.5f, false);
   }
   const int32 Ms = FMath::RoundToInt((FPlatformTime::Seconds() - T0) * 1000.0);
   FS08Trace::Write(FString::Printf(TEXT("FX prewarm systems=%d ms=%d"), Prewarmed.Num(), Ms));
@@ -63,6 +97,7 @@ UNiagaraComponent* US08CueFxSpawnerComponent::Spawn(const FString& CueId, const 
   }
   if (Component) {
     Component->SetTranslucentSortPriority(S08CueFx::TranslucentSortPriority);
+    SceneNeutral(Component);
     // FX-04: the seed lives in the system asset (RandomSeed = CRC32 of the name, fx_audit.py); a "RandomSeed" user
     // parameter would do nothing on a system without one, so none is written here (the Z-2 review, fix 8).
     // ВР-Z2-06: GradeScale / GradePow land as user-vector overrides - a system that does not read them runs
@@ -87,6 +122,7 @@ UNiagaraComponent* US08CueFxSpawnerComponent::SpawnSystem(const FString& SystemP
       /*bAutoDestroy=*/true, /*bAutoActivate=*/true, ENCPoolMethod::AutoRelease);
   if (Component) {
     Component->SetTranslucentSortPriority(S08CueFx::TranslucentSortPriority);
+    SceneNeutral(Component);
     Component->SetColorParameter(TEXT("GradeScale"), GradeScale);
     Component->SetColorParameter(TEXT("GradePow"), GradePow);
     Track(Component);
