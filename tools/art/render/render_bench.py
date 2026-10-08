@@ -29,6 +29,12 @@ flags -ArtPreviewHeroesV2 -ArtPreviewDiorama (an older package still reads them)
                        case (a live death dissolves one); compare with dx12-lumen-high-v2. Since ВР-13 (VS-6 F3, FX-27)
                        the ash is the default: the fade variant passes the rollback -S08DissolveFade, the ash one the
                        empty alias -S08DissolveAsh
+  dx12-lumen-high-v2-fx-each-<sys> / -fx-worst / -fx-worst-legacy  FX-37 G-COST (ВР-25): the v2 reference with one
+                       combat / board VFX (star, heal, ash, vortex, arc, dust, chevrons, grade) or the worst set (<= 3
+                       combat systems + dust + chevrons, --fx-worst) staged by -BenchFx and frozen mid-life; the grade
+                       on the -BenchResult=board body (each-grade vs each-grade-legacy);
+                       -legacy adds the -S08FxLegacy rollback (control). Compare with dx12-lumen-high-v2; --exe runs
+                       another staged build (the fix/admin-panel copy) for the base
   dx12-lumen-high-vsm  same + r.Shadow.Virtual.Enable 1 (VSM instead of the profile CSM)
   dx12-lumen-high-csmdefault  profile CSM block removed (engine default 40000 uu / 4 cascades)
   dx11-legacy          -dx11 -S08LegacyRender + profile rev 1 (Unitless points + point fill, no sky,
@@ -153,6 +159,10 @@ def _variant_args(name: str, out: Path) -> tuple[list[str], list[str], dict]:
         # same --bench-fixture (GPU <= +0.30 ms MVP / +0.50 ms worst case, draw calls from the CSV column RHI/DrawCalls)
         return (["-S08RenderPreset=High", "-ArtPreviewHeroesV2", "-ArtPreviewDiorama", "-S08MovePlates"], [],
                 {"heroesV2": True, "diorama": True, "movePlates": True, "profiles": "pak"})
+    if name.startswith("dx12-lumen-high-v2-fx-"):
+        # FX-37: the v2 reference; run_one adds the -BenchFx set of the board (fx37_spec)
+        return (["-S08RenderPreset=High", "-ArtPreviewHeroesV2", "-ArtPreviewDiorama"], [],
+                {"heroesV2": True, "diorama": True, "profiles": "pak"})
     if name in ("dx12-lumen-high-v2", "dx12-lumen-high-v2-fps60"):
         # Wave 6 (GD-058 interim): the reference plus the 5c-B look-dev heroes (-ArtPreviewHeroesV2) and the
         # diorama tray (-ArtPreviewDiorama) on the same bench state; -fps60 caps the single client at
@@ -205,8 +215,71 @@ def _variant_args(name: str, out: Path) -> tuple[list[str], list[str], dict]:
     raise SystemExit(f"unknown variant {name!r}")
 
 
+# FX-37 (VS-6, G-COST ВР-25): the combat / board VFX staged by the client's -BenchFx steps (S08FlowGameMode*Fx.cpp), each
+# frozen at the middle of its life (CPU sim advanced in 1/60 s ticks, then paused - FX-04). The bench fixtures share the
+# fighter ids (f-0-* Medusa + 3 Harpies, f-1-hero King Arthur, f-1-sk0 Merlin); only the dust cell is per board.
+# "worst" (ВР-VS6-46): the three most expensive combat systems by the fx-each runs, under the NET_UM_Combat cap of 3,
+# composed as one game moment (Medusa's gaze lands on King Arthur and kills him: vortex + star + 40 embers with his
+# dissolve) + dust and chevrons (board) + the CUE-016 grade - CUE-DISPATCHER §9 p.4.
+FX37_SYSTEMS = {
+    "star": {"cue": "CUE-011", "step": "star,f-1-hero,135,f-0-hero"},          # C+70..+340: mid 135 ms after spawn
+    "heal": {"cue": "CUE-012", "step": "heal,f-1-sk0,300"},                     # 600 ms
+    "ash": {"cue": "CUE-013", "step": "ash,f-1-hero,300"},                      # hero: 40 embers, dissolve + embers
+    "vortex": {"cue": "CUE-014", "step": "vortex,f-0-hero,300"},                # Medusa, t0..t0+600
+    "arc": {"cue": "CUE-014", "step": "arc,f-1-hero,200"},                      # Arthur, 400 ms
+    "dust": {"cue": "CUE-007", "step": {"marmoreal": "dust,1,1,150", "sarpedon": "dust,8,2,150"}},  # 300 ms
+    "chevrons": {"cue": "CUE-008", "step": "chevrons,f-0-hero,f-1-hero,240"},  # t0+150.., 3 chevrons
+    # CUE-016 needs Hud.bGameOver (a -BenchFx outcome step alone is reset by "match-left"): the grade runs on the
+    # -BenchResult=board body (the viewer's victory) and is priced against the same body with -S08FxLegacy (ВР-VS6-47)
+    "grade": {"cue": "CUE-016", "args": ["-BenchResult=board"]},
+}
+FX37_COMBAT = ("star", "heal", "ash", "vortex", "arc")
+FX37_WORST = ("vortex", "star", "ash", "dust", "chevrons")
+
+
+def fx37_board(bench_fixture: str) -> str:
+    return "sarpedon" if "sarpedon" in (bench_fixture or "").lower() else "marmoreal"
+
+
+def fx37_spec(variant: str, bench_fixture: str, worst: tuple[str, ...] = FX37_WORST) -> tuple[list[str], dict] | None:
+    """(-BenchFx client args, notes) of an FX-37 variant, None for any other variant."""
+    pre = "dx12-lumen-high-v2-fx-"
+    if not variant.startswith(pre):
+        return None
+    rest = variant[len(pre):]
+    legacy = rest.endswith("-legacy")
+    if legacy:
+        rest = rest[:-len("-legacy")]
+    if rest == "worst":
+        names = list(worst)
+        if "grade" in names:
+            raise SystemExit("grade is priced as fx-each-grade(-legacy) on the -BenchResult=board body (ВР-VS6-47)")
+    elif rest.startswith("each-") and rest[5:] in FX37_SYSTEMS:
+        names = [rest[5:]]
+    else:
+        raise SystemExit(f"unknown FX-37 variant {variant!r} (fx-each-<{'|'.join(FX37_SYSTEMS)}>, fx-worst[-legacy])")
+    combat = [n for n in names if n in FX37_COMBAT]
+    if len(combat) > 3:
+        raise SystemExit(f"{variant}: {len(combat)} combat systems > the NET_UM_Combat cap 3 (ВР-25)")
+    board = fx37_board(bench_fixture)
+    steps, args = [], []
+    for n in names:
+        s = FX37_SYSTEMS[n].get("step")
+        if s:
+            steps.append(s[board] if isinstance(s, dict) else s)
+        args += FX37_SYSTEMS[n].get("args", [])
+    if steps:
+        args.insert(0, "-BenchFx=" + ";".join(steps))
+    if legacy:
+        args.append("-S08FxLegacy")
+    return args, {"fx37": {"systems": names, "cues": [FX37_SYSTEMS[n]["cue"] for n in names], "combat": len(combat),
+                           "board": board, "benchFx": ";".join(steps), "legacy": legacy}}
+
+
 VARIANTS = ["dx12-lumen-high", "dx12-lumen-high-v2", "dx12-lumen-high-v2-fps60", "dx12-lumen-high-v2-nohero",
             "dx12-lumen-high-v2-moveplates", "dx12-lumen-high-v2-dissolve-fade", "dx12-lumen-high-v2-dissolve-ash",
+            "dx12-lumen-high-v2-fx-each-<star|heal|ash|vortex|arc|dust|chevrons|grade>", "dx12-lumen-high-v2-fx-worst",
+            "dx12-lumen-high-v2-fx-worst-legacy",
             "dx12-lumen-high-vsm",
             "dx12-lumen-high-csmdefault", "dx11-legacy",
             "dx12sm5-legacy", "dx12-medium", "dx12-low", "dx12-sm5-fallback", "dx11-fallback", "sky-<k>"]
@@ -449,6 +522,11 @@ def run_one(variant: str, rdir: Path, a) -> dict:
         md = Path(a.move_draft).resolve()
         cmd.append(f"-BenchMoveDraft={md}")
         notes = {**notes, "moveDraft": rel(md)}
+    fx = fx37_spec(variant, a.bench_fixture,
+                   tuple(x for x in (getattr(a, "fx_worst", "") or "").split(",") if x) or FX37_WORST)
+    if fx:
+        cmd.extend(fx[0])
+        notes = {**notes, **fx[1]}
     if a.bench_fixture:
         # ENV-MAPS: the same scene on another board (S08BenchMarmoreal/Sarpedon.json); a relative path is read
         # by the packaged client from its pak (cwd Binaries/Win64, e.g. ../../../Unmatched/Config/Bench/<file>)
@@ -461,7 +539,9 @@ def run_one(variant: str, rdir: Path, a) -> dict:
         cmd.extend(extra)
         notes = {**notes, "clientArgs": extra}
     cmd.append("-ExecCmds=" + ", ".join(["DisableAllScreenMessages"] + execs))
-    before = set(STAGED_CSV.glob("*.csv")) if STAGED_CSV.is_dir() else set()
+    # the profiler CSVs land next to the exe that ran (--exe of another staged build, e.g. the fix/admin-panel copy)
+    staged_csv = Path(a.exe).parent / "Unmatched" / "Saved" / "Profiling" / "CSV"
+    before = set(staged_csv.glob("*.csv")) if staged_csv.is_dir() else set()
     started = time.time()
     rec = {"schema": "unmatched.w4a-render-bench-run/1", "variant": variant, "notes": notes,
            "startedLocal": dt.datetime.now().astimezone().isoformat(timespec="seconds"),
@@ -484,7 +564,7 @@ def run_one(variant: str, rdir: Path, a) -> dict:
         sampler.kill()
     rec["exitCode"] = p.returncode
     rec["durationS"] = round(time.time() - started, 1)
-    csvs = sorted(set(STAGED_CSV.glob("*.csv")) - before) if STAGED_CSV.is_dir() else []
+    csvs = sorted(set(staged_csv.glob("*.csv")) - before) if staged_csv.is_dir() else []
     rec["csv"] = []
     for i, c in enumerate(csvs):
         dst = rdir / f"csv-{i}-{c.name.replace('(', '-').replace(')', '')}"
@@ -723,6 +803,8 @@ def main(argv=None) -> int:
     r.add_argument("--move-draft", default="",
                    help="MS-T-08: -BenchMoveDraft scene for the *-moveplates variant (tools/s08/fixtures/move-draft/"
                         "<board>-<scene>.json; its benchFixture must match --bench-fixture)")
+    r.add_argument("--fx-worst", default="",
+                   help="FX-37: comma list of systems for *-fx-worst (default " + ",".join(FX37_WORST) + "; <= 3 combat)")
     r.add_argument("--name", default="", help="output directory name under --out (default: the variant)")
     r.add_argument("--client-args", default="",
                    help="extra client flags, '+'-separated (e.g. -NoConceptPaste+-BenchTurnHud=400), recorded in notes")
