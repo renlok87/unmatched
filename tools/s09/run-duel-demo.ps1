@@ -18,7 +18,10 @@ param(
   # gated by the trace (RESULT summary + 'RESULT view mode=results' before the shot) and its SHOT widget lines
   # (UI-SCR-GAME state=over, no gameplay block of the HUD visible), the lobby shot by SHOT widget (no UI-HUD block
   # visible) - the GAMEOVER and LOBBY screens are still Slate until VS-7 (screens.csv) - plus the privacy rules over both
-  # traces; the bright gameplay-region gate of the lobby shot stays in both modes.
+  # traces. VS-7 Frames (ВР-VS7-68, ВР-VS7-77): since SC-02 the menu backdrop (the Marmoreal K1 scene without figures)
+  # lies behind the lobby, so the bright gameplay-region pixel gate of the lobby shot runs with -S09Markers only; the
+  # default gate reads the trace instead - after 'LEFT room=' the menu backdrop is back with 'fighters=0' (no stale
+  # board / fighter of the match survived the lobby return).
   [switch]$S09Markers,
   # VS-4 HB-48 (opt-in): the board row of the room (-S08BoardId on the host, verified on the game row; empty = the
   # backend default board, Marmoreal original) and extra client arguments for BOTH clients, '+'-separated.
@@ -791,11 +794,24 @@ function Invoke-DuelDemo {
             throw ("{0} lobby shot still shows an in-duel marker: {1}={2}" -f $pair[0], $duel, $s[$duel + 'All'])
           }
         }
-        $bright = Get-GameplayRegionBright $pair[1]
-        if ($bright -gt 50) {
-          throw ("{0} lobby shot has {1} bright gameplay-region pixels (lum>=120, x>=25%/y>=12.5%) - stale board/fighter/HUD rendering survived the lobby return (visual gate)" -f $pair[0], $bright)
+        if ($S09Markers) {
+          $bright = Get-GameplayRegionBright $pair[1]
+          if ($bright -gt 50) {
+            throw ("{0} lobby shot has {1} bright gameplay-region pixels (lum>=120, x>=25%/y>=12.5%) - stale board/fighter/HUD rendering survived the lobby return (visual gate)" -f $pair[0], $bright)
+          }
+          Write-Output ("{0} lobby shot: clean lobby panel (lobbypanel={1}), no in-duel markers, gameplay region bright pixels={2} (<=50)" -f $pair[0], $s.lobbypanelAll, $bright)
+        } else {
+          # VS-7 (ВР-VS7-77): the menu backdrop rebuilt without figures after the leave (SCREEN-BG, UI/UmMenuBackdrop.h)
+          $seatTrace = if ($pair[0] -eq 'host') { $hostTrace } else { $joinTrace }
+          $tail = (Get-Content -LiteralPath $seatTrace -Raw) -split "`n"
+          $leftAt = -1
+          for ($li = 0; $li -lt $tail.Count; $li++) { if ($tail[$li] -match 'LEFT room=') { $leftAt = $li } }
+          $bg = @(if ($leftAt -ge 0) { $tail[$leftAt..($tail.Count - 1)] | Where-Object { $_ -match 'SCREEN-BG .*fighters=0 .*stage=Lobby state=menu' } })
+          if ($bg.Count -eq 0) {
+            throw ("{0} lobby return: no 'SCREEN-BG ... fighters=0 ... stage=Lobby state=menu' after LEFT room= - the match board / fighters may have survived the lobby return" -f $pair[0])
+          }
+          Write-Output ("{0} lobby shot: SHOT widget gate above; the menu backdrop is back without figures after the leave ({1})" -f $pair[0], ($bg[0].Trim() -replace '^\S+ ', ''))
         }
-        Write-Output ("{0} lobby shot: clean lobby panel (lobbypanel={1}), no in-duel markers, gameplay region bright pixels={2} (<=50)" -f $pair[0], $s.lobbypanelAll, $bright)
       }
     } else {
       Write-Output "WARN ShotMode=$ShotMode - pixel state gates skipped"
