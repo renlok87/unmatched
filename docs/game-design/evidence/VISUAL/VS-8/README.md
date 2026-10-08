@@ -47,3 +47,11 @@ GAMEOVER, суффиксы файлов PAUSE (`…-game-<state>`) и ROOM (`hos
 - G-LOOK: Marmoreal original (`backdrop=paste(default)`), Sarpedon original (`backdrop=lit3d(default)`), шесть фигур v2,
   `ARTLOOK … baseDigit=on heroMat=on`; кадры открыты в цвете и сером.
 - Процессы: сессии live tune остановлены (`killed=false`, замок GPU снят), посторонних процессов worktree нет.
+
+## Шаг A2 — AN-18, листы 16 клипов (2026-10-09)
+
+Лист и прогоны — [AN-18](../AN-18/README.md); 16 листов AN-01…AN-16 (цвет / серый / дейтеранопия, `frames.json`,
+README с вердиктом по каждому WARN). Новый скрипт `tools/art/anim/clip_review_sheet.py` (`run` / `sheet` / `--check`).
+8 editor-запусков `-BenchClipPose`, 1200 строк `clippose` — `rootDeltaUU=0.00`; UE `MoveAnim` + `HeroesV2` 24 / 24 PASS;
+C++ не менялся. Решение ВР-VS8-08: ячейка K2×1,6 — окно 640×360 1:1 у фигуры вместо ужатого кадра.
+Кадры поворота (разворот / возврат) — живые листы AN-24 / AN-25; спиной к камере нет ни в одном из 16 листов.
