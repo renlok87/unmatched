@@ -443,6 +443,13 @@ FACE_ROI_CALIBRATION = {
         # the verifier's box: face plus the throat below the chin -> (924, 462)-(956, 490) at K2 5x
         "faceNeckRoi": {"centre": (-4.25, 8.9), "half": (3.4, 3.0), "what": "face plus the throat below the chin"},
     },
+    # AN-33 (VS-8, 2026-10-08): the look-dev v2 Medusa. In the ВР-06 rest pose (three-quarter to the camera, head turned
+    # to the enemy) the K2 camera sees the hair, not the face; the box takes the visible skin under the head (throat and
+    # chest) - the skin the class-13 Fix of AN-33 brightens. Placed on K2x2.5 frames of both maps (contact sheet in
+    # docs/game-design/evidence/VISUAL/AN-33/).
+    "SK_Medusa_H2LD": {
+        "faceNeckRoi": {"centre": (0.8, -6.4), "half": (3.0, 4.0), "what": "throat and chest under the head (the face looks away in the rest pose)"},
+    },
 }
 
 
