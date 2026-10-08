@@ -130,7 +130,9 @@ void AS08FlowGameMode::BuildUmLobby() {
     FS08Trace::Write(FString::Printf(TEXT("LOBBY recover game=%s"), *Self->Flow->GetActiveGame().GameId));
     if (!Self->Flow->ResumeActiveGame()) FS08Trace::Write(TEXT("LOBBY recover refused"));
   };
-  In.OnMenu = []() { FS08Trace::Write(TEXT("LOBBY menu (the PAUSE / settings screen is its own VS-7 step)")); };
+  In.OnMenu = [WeakThis]() {  // VS-7 S4 SC-24: PAUSE from the header
+    if (AS08FlowGameMode* Self = WeakThis.Get(); !Self || !Self->OpenUmPause(TEXT("menu"))) FS08Trace::Write(TEXT("LOBBY menu (no PAUSE)"));
+  };
   L->SetInput(HudPress, MoveTemp(In));
   R.Screen = L;
   if (Flow.IsValid()) {

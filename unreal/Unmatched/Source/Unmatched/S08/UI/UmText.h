@@ -32,4 +32,12 @@ FText Format(EUmTable Table, const FString& Key, const FFormatNamedArguments& Ar
 bool SetUiLanguage(const FString& Culture);
 /** Keys of a table in its asset (empty when the asset is missing). */
 TArray<FString> Keys(EUmTable Table);
+/** VS-7 SC-26 (04 §6.2, §7.2 set I; ВР-VS5-SC26-03): -S08Lang=pseudo - every table text becomes "[" + text + "~" x k + "]"
+ *  with k = ceil(0.3 x length) (+30 % or more), over the RU texts; data names never pass here. A check flag, read once
+ *  from the command line (the first Get), never saved. */
+bool IsPseudo();
+/** The pseudo form of one string (tests). */
+FString Pseudo(const FString& Text);
+/** Tests: switch the pseudo-locale and drop the text caches. */
+void SetPseudoForTest(bool bOn);
 }  // namespace UmText

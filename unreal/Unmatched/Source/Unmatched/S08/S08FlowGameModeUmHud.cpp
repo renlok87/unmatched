@@ -1381,6 +1381,10 @@ void AS08FlowGameMode::HandleUmTopPress(const TCHAR* What) {
     FS08Trace::Write(FString::Printf(TEXT("HUD-TOP press=log target=UI-HUD-LOG open=%d"), UmHud->Feed.IsLogOpen() ? 1 : 0));
     return;
   }
+  if (!bLog && OpenUmPause(TEXT("top"))) {  // VS-7 S4 SC-24
+    FS08Trace::Write(TEXT("HUD-TOP press=menu target=UI-SCR-PAUSE"));
+    return;
+  }
   FS08Trace::Write(FString::Printf(TEXT("HUD-TOP press=%s target=%s pending=1"), What, bLog ? TEXT("UI-HUD-LOG") : TEXT("UI-SCR-PAUSE")));
 }
 

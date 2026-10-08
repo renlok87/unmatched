@@ -27,6 +27,7 @@
 #include "UmScreenLobby.h"
 #include "UmScreenRoom.h"
 #include "UmScreenLogin.h"
+#include "UmScreenPause.h"
 #include "UmToast.h"
 #include "UmToastStack.h"
 #include "UmCursor.h"
@@ -143,6 +144,9 @@ FString UUmHudAuthoringLibrary::AuthorUmHudWidgetBlueprints(bool bOverwrite) {
       [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmScreenRoom::BuildDefaultTree(Tree, Attach, Error); });
   One(UUmScreenLoading::WidgetBlueprintPath, UUmScreenLoading::StaticClass(),
       [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmScreenLoading::BuildDefaultTree(Tree, Attach, Error); });
+  // VS-7 SC-24...SC-30: PAUSE and the settings (the setting rows are code-built at run time)
+  One(UUmScreenPause::WidgetBlueprintPath, UUmScreenPause::StaticClass(),
+      [](UWidgetTree& Tree, FS08AttachWidget Attach, FString* Error) { return UUmScreenPause::BuildDefaultTree(Tree, Attach, Error); });
   Report->SetArrayField(TEXT("assets"), Assets);
   FString Out;
   const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&Out);

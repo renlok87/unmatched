@@ -3,6 +3,7 @@
 
 #include "../S08AnimatedIconWidget.h"
 #include "../S08IconMotion.h"
+#include "../S08UserSettings.h"
 #include "UmButton.h"
 #include "UmGameHud.h"
 #include "UmHudScale.h"
@@ -434,6 +435,10 @@ void UUmScreenLogin::SimulatePress(FName Id) {
 void UUmScreenLogin::SetLanguage(const TCHAR* Culture) {
   if (Input.OnSound) Input.OnSound(FName(TEXT("UI-TOGGLE")));
   UmText::SetUiLanguage(Culture);
+  if (US08UserSettings* Settings = US08UserSettings::Get()) {  // VS-7 SC-26 (UI-ACC-010): the choice is kept
+    Settings->Language = US08UserSettings::NormalizeLanguage(Culture);
+    Settings->SaveConfig();
+  }
   // the table texts re-resolve; the fixed ones are set again in the new language
   if (Title) Title->SetText(UmText::Get(EUmTable::Screens, TEXT("screens.login.title")));
   if (EmailLabel) EmailLabel->SetText(UmText::Get(EUmTable::Screens, TEXT("screens.login.email")));

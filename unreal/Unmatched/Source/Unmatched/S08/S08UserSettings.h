@@ -189,4 +189,17 @@ public:
   static void NoteMatchCompleted();
   /** "keyHints=<mode> completedMatches=<n>" - kept out of Describe, whose exact text other tests pin. */
   FString DescribeKeyHints() const;
+
+  /** VS-7 SC-26, UI-ACC-010 (04 §1.8 «Интерфейс» → «Язык»): the UI language ru | en, ru by default; the PAUSE screen and
+   *  the LOGIN chips set it (console s08.Settings language=ru|en). -S08Lang=ru|en|pseudo wins for the run (pseudo = the
+   *  RU texts with the +30 % pseudo-locale, UmText::IsPseudo; a check flag, never saved). */
+  UPROPERTY(config)
+  FString Language = TEXT("ru");
+
+  /** ru | en of a value (any case; an unknown value reads as ru). */
+  static FString NormalizeLanguage(const FString& InLanguage);
+  /** The language of this run: -S08Lang=ru|en|pseudo, else the saved one (normalized). */
+  static FString ResolveLanguage(const FString& Saved, const TCHAR* CommandLine);
+  /** "language=<ru|en>" - kept out of Describe, whose exact text other tests pin. */
+  FString DescribeLanguage() const;
 };

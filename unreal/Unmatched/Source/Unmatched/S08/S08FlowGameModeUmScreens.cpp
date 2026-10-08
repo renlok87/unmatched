@@ -187,6 +187,7 @@ void AS08FlowGameMode::BuildUmFlowScreens() {
   }
   BuildUmLobby();  // VS-7 S2: LOBBY SC-08...SC-13 (S08FlowGameModeUmLobby.cpp)
   BuildUmRoom();   // VS-7 S3: ROOM SC-14...SC-18, LOADING SC-19 / SC-20 (S08FlowGameModeUmRoom.cpp)
+  BuildUmPause();  // VS-7 S4: PAUSE and the settings SC-24...SC-30 (S08FlowGameModeUmPause.cpp)
   FString BootMissing, LoginMissing;
   FS08Trace::Write(FString::Printf(TEXT("HUD-SCREENS boot=%s login=%s bootParts=%d loginParts=%d missing=%s drive=%s"),
                                    R.Boot.IsValid() ? *R.Boot->SourceName() : TEXT("slate"),
@@ -501,6 +502,7 @@ void AS08FlowGameMode::TickUmFlowScreens() {
     if (GetUmLobby()) GetUmLobby()->ApplyCanvas(Canvas, Scale.bClassS, Scale.PxPerSu());
     ApplyUmRoomCanvas(Canvas, Scale.bClassS, Scale.PxPerSu());
   }
+  TickUmPause(R.Showing);  // VS-7 S4: before the route screens (their own modals answer Esc first next frame)
   TickUmLobby(R.Showing == TEXT("lobby"));
   TickUmRoom(R.Showing == TEXT("room"));
   TickUmLoading(R.Showing == TEXT("loading"));

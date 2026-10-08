@@ -179,7 +179,9 @@ void AS08FlowGameMode::BuildUmRoom() {
       FPlatformApplicationMisc::ClipboardCopy(*Self->Flow->GetRoom().Code);
       FS08Trace::Write(TEXT("ROOM code copied"));  // never the code itself
     };
-    In.OnMenu = []() { FS08Trace::Write(TEXT("ROOM menu (the PAUSE / settings screen is its own VS-7 step)")); };
+    In.OnMenu = [WeakThis]() {  // VS-7 S4 SC-24: PAUSE from the header
+    if (AS08FlowGameMode* Self = WeakThis.Get(); !Self || !Self->OpenUmPause(TEXT("menu"))) FS08Trace::Write(TEXT("ROOM menu (no PAUSE)"));
+  };
     Room->SetInput(HudPress, MoveTemp(In));
     R.Room = Room;
     // the deck modal and the leave dialog of this screen (Modals: over the screens)

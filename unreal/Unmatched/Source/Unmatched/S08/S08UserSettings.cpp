@@ -58,6 +58,7 @@ void US08UserSettings::SetToDefaults() {
   UiScalePercent = 100;
   KeyHintsMode = TEXT("auto");
   CompletedMatches = 0;
+  Language = TEXT("ru");
 }
 
 FString US08UserSettings::NormalizeKeyHintsMode(const FString& Mode) {
@@ -106,6 +107,22 @@ void US08UserSettings::NoteMatchCompleted() {
 FString US08UserSettings::DescribeKeyHints() const {
   return FString::Printf(TEXT("keyHints=%s completedMatches=%d"), *NormalizeKeyHintsMode(KeyHintsMode), FMath::Max(0, CompletedMatches));
 }
+
+FString US08UserSettings::NormalizeLanguage(const FString& InLanguage) {
+  return InLanguage.TrimStartAndEnd().Equals(TEXT("en"), ESearchCase::IgnoreCase) ? FString(TEXT("en")) : FString(TEXT("ru"));
+}
+
+FString US08UserSettings::ResolveLanguage(const FString& Saved, const TCHAR* CommandLine) {
+  FString Value;
+  if (CommandLine && FParse::Value(CommandLine, TEXT("S08Lang="), Value)) {
+    const FString T = Value.TrimStartAndEnd();
+    if (T.Equals(TEXT("pseudo"), ESearchCase::IgnoreCase)) return TEXT("pseudo");
+    if (T.Equals(TEXT("ru"), ESearchCase::IgnoreCase) || T.Equals(TEXT("en"), ESearchCase::IgnoreCase)) return NormalizeLanguage(T);
+  }
+  return NormalizeLanguage(Saved);
+}
+
+FString US08UserSettings::DescribeLanguage() const { return FString::Printf(TEXT("language=%s"), *NormalizeLanguage(Language)); }
 
 int32 US08UserSettings::ClampUiScalePercent(int32 Percent) {
   // HB-09 (UI-ACC-001): 75..150 in steps of 5.
@@ -178,6 +195,16 @@ bool US08UserSettings::ApplySetting(const FString& Name, const FString& Value, F
     KeyHintsMode = NormalizeKeyHintsMode(T);
     return true;
   }
+  if (Name.Equals(TEXT("language"), ESearchCase::IgnoreCase)) {
+    // VS-7 SC-26 (UI-ACC-010): ru | en, nothing else (pseudo is a run flag only)
+    const FString T = Value.TrimStartAndEnd();
+    if (!T.Equals(TEXT("ru"), ESearchCase::IgnoreCase) && !T.Equals(TEXT("en"), ESearchCase::IgnoreCase)) {
+      OutError = FString::Printf(TEXT("language=%s: ru|en"), *Value);
+      return false;
+    }
+    Language = NormalizeLanguage(T);
+    return true;
+  }
   if (Name.Equals(TEXT("uiScale"), ESearchCase::IgnoreCase)) {
     // HB-09 (UI-ACC-001): 75-150 in steps of 5, nothing else.
     const FString T = Value.TrimStartAndEnd();
@@ -245,7 +272,7 @@ namespace {
 FAutoConsoleCommand GS08SettingsCommand(
     TEXT("s08.Settings"),
     TEXT("DE-025: s08.Settings [speed=none|fast|normal|slow] [reduced=0|1] [shake=0|1] [ruleHints=0|1] "
-         "[master=0-100] [masterMute=0|1] [ambience=0-100] [ambienceMute=0|1] [uiScale=75-150] [keyHints=auto|on|off] - saves to "
+         "[master=0-100] [masterMute=0|1] [ambience=0-100] [ambienceMute=0|1] [uiScale=75-150] [keyHints=auto|on|off] [language=ru|en] - saves to "
          "GameUserSettings.ini and "
          "applies without a restart (the -S08AnimSpeed / -S08ReducedMotion / -S08RuleHints flags still win)"),
     FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& Args) {
@@ -271,7 +298,7 @@ FAutoConsoleCommand GS08SettingsCommand(
         Settings->Save();
       }
       UE_LOG(LogTemp, Display, TEXT("s08.Settings %s %s %s%s"), *Settings->Describe(), *Settings->DescribeUi(),
-             *Settings->DescribeKeyHints(), Args.Num() > 0 ? TEXT(" (saved)") : TEXT(""));
+             *(Settings->DescribeKeyHints() + TEXT(" ") + Settings->DescribeLanguage()), Args.Num() > 0 ? TEXT(" (saved)") : TEXT(""));
     }));
 }  // namespace
 

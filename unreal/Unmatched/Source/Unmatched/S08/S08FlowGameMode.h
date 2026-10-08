@@ -1471,6 +1471,18 @@ private:
   void OpenUmRoomDeck();
   void HandleUmRoomFlowError(const FS08GraphQLError& Error);
   TSharedPtr<struct FUmRoomRuntime> UmRoomRt;
+  // VS-7 S4 (S08FlowGameModeUmPause.cpp): PAUSE and the settings SC-24...SC-30 in the root's Modals; rollback -S08SlateHud=pause
+  void BuildUmPause();
+  /** PAUSE over the current route (GAME / LOBBY / ROOM); false without the UMG PAUSE or on another route. */
+  bool OpenUmPause(const TCHAR* Why);
+  void CloseUmPause(const TCHAR* Why);
+  bool UmPauseShown() const;
+  /** The open PAUSE owns the keyboard and the board (and the Esc that closed it this frame). */
+  bool UmPauseOwnsInput();
+  /** Every frame from TickUmFlowScreens (Route = the shown route screen, "" = GAME): Esc, the model, the gate, the frames. */
+  void TickUmPause(const FString& Route);
+  void ApplyUmPauseSetting(FName Key, const FString& Value);
+  TSharedPtr<struct FUmPauseRuntime> UmPauseRt;
 
   FS08BoardModel BoardModel;
   TArray<FS08BoardFighter> Fighters;

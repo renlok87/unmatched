@@ -9,6 +9,9 @@
 //   node room_actor.cjs --api ... --role host --code-file <path> [--hero Medusa] [--board <id>]
 //        creates a ONE_V_ONE room on --board (Marmoreal original by default), picks --hero, writes the code to
 //        --code-file, waits for a guest with a hero who is ready, toggles ready, starts the match, waits 60 s, leaves.
+//        VS-7 S4: --play-after-ms <ms> plays the host's own turns after the start (two maneuvers without a move, then
+//        endTurn) for --play-turns <n> turns (default 1), each step one {step: 'play', seq} line - the match goes on
+//        while the UE guest has PAUSE open (SC-24: «партия на сервере не стоит»).
 //   node room_actor.cjs --api ... --role cleanup
 //        leaves the account's own LOBBY / IN_PROGRESS rooms of earlier runs.
 // Every step prints one JSON line {t, step, ...counts}.
@@ -86,6 +89,7 @@ async function main() {
     await sleep(Number(args['start-after-ms'] || 3000));
     room = (await gql(`mutation St($g: String!) { startGame(gameId: $g) { ${ROOM} } }`, { g: room.id })).startGame;
     log('started', { status: room.status });
+    if (args['play-after-ms']) await play(room.id, me);
     await sleep(Number(args['stay-ms'] || 60000));
   } else {
     const seen = new Set((await gql('query A { availableGames(mode: "ONE_V_ONE", limit: 50) { id } }')).availableGames.map((g) => g.id));
@@ -123,6 +127,45 @@ async function main() {
     log('left');
   } catch (e) {
     log('leave-failed', { error: String(e.message).slice(0, 80) });
+  }
+}
+
+// VS-7 S4: the host's own turns over the API (no UE): maneuver x2 without a move, then endTurn
+async function play(gameId, me) {
+  await sleep(Number(args['play-after-ms']));
+  const turns = Number(args['play-turns'] || 1);
+  let done = 0;
+  for (let i = 0; i < 240 && done < turns; i++) {
+    let st;
+    try {
+      st = JSON.parse((await gql('query GS($g: String!) { gameState(gameId: $g) { state } }', { g: gameId })).gameState.state);
+    } catch (e) {
+      log('play-state-failed', { error: String(e.message).slice(0, 80) });
+      await sleep(1000);
+      continue;
+    }
+    if (st.currentTurnPlayerId !== me || !String(st.phase || '').startsWith('ACTION')) {
+      await sleep(1000);
+      continue;
+    }
+    try {
+      if ((st.metadata?.actionsRemaining ?? 0) > 0) {
+        const begin = await gql('mutation B($input: BeginManeuverDto!) { beginManeuver(input: $input) { state } }',
+          { input: { gameId, expectedSequenceNumber: st.sequenceNumber } });
+        const after = JSON.parse(begin.beginManeuver.state);
+        const m = await gql('mutation M($input: ManeuverDto!) { maneuver(input: $input) { sequenceNumber } }',
+          { input: { gameId, maneuverId: after.metadata.pendingManeuver?.id, moves: [], boostCardId: null } });
+        log('play', { action: 'maneuver', seq: m.maneuver.sequenceNumber });
+      } else {
+        await gql('mutation E($g: String!) { endTurn(gameId: $g) { id } }', { g: gameId });
+        done++;
+        log('play', { action: 'endTurn', seq: st.sequenceNumber });
+      }
+    } catch (e) {
+      log('play-failed', { error: String(e.message).slice(0, 80) });
+      await sleep(1000);
+    }
+    await sleep(1500);
   }
 }
 

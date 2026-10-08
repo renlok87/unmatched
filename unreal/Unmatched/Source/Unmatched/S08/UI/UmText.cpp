@@ -4,6 +4,8 @@
 #include "Internationalization/StringTable.h"
 #include "Internationalization/StringTableCore.h"
 #include "Internationalization/StringTableRegistry.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogUmText, Log, All);
 
@@ -38,7 +40,37 @@ TMap<FString, FText>& Cache(EUmTable Table) {
   static TMap<FString, FText> Caches[NumTables];
   return Caches[Index(Table)];
 }
+
+/** -1 not read yet, 0 off, 1 on (VS-7 SC-26: -S08Lang=pseudo). */
+int32& PseudoState() {
+  static int32 State = -1;
+  return State;
+}
+
+void ClearCaches() {
+  for (int32 I = 0; I < NumTables; ++I) Cache(static_cast<EUmTable>(I)).Reset();
+}
 }  // namespace
+
+bool IsPseudo() {
+  int32& State = PseudoState();
+  if (State < 0) {
+    FString Lang;
+    State = FParse::Value(FCommandLine::Get(), TEXT("S08Lang="), Lang) && Lang.TrimStartAndEnd().Equals(TEXT("pseudo"), ESearchCase::IgnoreCase) ? 1 : 0;
+  }
+  return State == 1;
+}
+
+FString Pseudo(const FString& Text) {
+  // ВР-VS5-SC26-03 in the engine (ВР-VS7-45): "~" is about as wide as an average letter of Roboto, the brackets add the rest
+  const int32 K = FMath::Max(1, FMath::CeilToInt(0.3f * Text.Len()));
+  return TEXT("[") + Text + FString::ChrN(K, TEXT('~')) + TEXT("]");
+}
+
+void SetPseudoForTest(bool bOn) {
+  PseudoState() = bOn ? 1 : 0;
+  ClearCaches();
+}
 
 FName TableId(EUmTable Table) { return FName(GPaths[Index(Table)]); }
 
@@ -67,7 +99,8 @@ FText Get(EUmTable Table, const FString& Key) {
     Texts.Add(Key, Missing);
     return Missing;
   }
-  const FText Text = FText::FromStringTable(TableId(Table), Key);
+  FText Text = FText::FromStringTable(TableId(Table), Key);
+  if (IsPseudo()) Text = FText::AsCultureInvariant(Pseudo(Text.ToString()));  // a check flag: frozen at the start culture
   Texts.Add(Key, Text);
   return Text;
 }

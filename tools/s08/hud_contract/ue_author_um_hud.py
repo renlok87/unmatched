@@ -81,6 +81,10 @@ their C++ bases (UUmHudAuthoringLibrary -> BuildDefaultTree of each class), in t
                                       LoadingPanel, LeftCard, RightCard, LeftPortrait, RightPortrait, StageText, LeftName,
                                       RightName, LeftNick, RightNick, VersusText, BoardText, Spinner (WBP_UmSpinner),
                                       ErrorIcon, LobbyButton, RetryButton (VS-7 SC-19, SC-20)
+  /Game/S08/UI/Screens/WBP_UI_SCR_PAUSE  parent UmScreenPause  parts Veil, Frame, Body (UUmScreenBase) + Content > TitleText,
+                                      RunningText, DefenseText, HeaderDivider, Tabs > TabSound, TabInterface, TabGame,
+                                      TabGraphics, Rows, ScrollTrack, ScrollThumb, FooterDivider, LeaveButton, LeaveWhy,
+                                      ContinueButton (VS-7 SC-24...SC-30; the setting rows are made at run time)
 
 A widget tree is not reachable from Python, so the C++ library builds it (the same function the class uses without a
 WBP) and this script re-loads every asset, checks the parent class, writes the report (env UM_HUD_WBP_REPORT, default
@@ -133,6 +137,7 @@ ASSETS = {
     "/Game/S08/UI/Screens/WBP_UI_SCR_LOBBY": "UmScreenLobby",
     "/Game/S08/UI/Screens/WBP_UI_SCR_ROOM": "UmScreenRoom",
     "/Game/S08/UI/Screens/WBP_UI_SCR_LOADING": "UmScreenLoading",
+    "/Game/S08/UI/Screens/WBP_UI_SCR_PAUSE": "UmScreenPause",
 }
 
 

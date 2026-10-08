@@ -2146,7 +2146,8 @@ void AS08FlowGameMode::ApplyMoveInput(const FS09InputResult& Result) {
     bInspecting = false;
     InspectedHandIndex = -1;
   }
-  if (Result.bPauseUnavailable) FS08Trace::Write(TEXT("INPUT esc pause.unavailable (no pause screen yet, MS-E-99)"));
+  // VS-7 S4 SC-24: Esc with nothing to close opens PAUSE (rollback -S08SlateHud=pause: the old trace line)
+  if (Result.bPauseUnavailable && !OpenUmPause(TEXT("esc"))) FS08Trace::Write(TEXT("INPUT esc pause.unavailable (no pause screen yet, MS-E-99)"));
   if (Result.Toast.IsSet()) ShowReason(Result.Toast, Result.ToastSeconds);
   if (MoveInput.bExhaustionOpen && Result.Toast.Key == FName(TEXT("ms.begin.exhaustion"))) {
     // MS-S-04 until the panel (MS-T-11): the two answers in the prompt itself.
@@ -5280,7 +5281,8 @@ void AS08FlowGameMode::Tick(float DeltaSeconds) {
   TickDeckPanel();     // DE-030: the deck side panel - open 80 ms, close 150 ms
   TickUmHud();         // VS-2 HB-06: the H2 layout fixes of the Slate blocks (toast / subtitle stack)
   TickUmFlowScreens();  // VS-7 S1: the menu backdrop and the route screens BOOT / LOGIN
-  if (!UmInspectOwnsInput() && !TryCombatSkip() && !TryCardSlotSkip()) {  // VS-4 H13: the open INSPECT owns the input
+  // VS-4 H13 / VS-7 S4: the open INSPECT or PAUSE owns the input
+  if (!UmPauseOwnsInput() && !UmInspectOwnsInput() && !TryCombatSkip() && !TryCardSlotSkip()) {
     HandleClick();
     HandleHudKeys();
   }
