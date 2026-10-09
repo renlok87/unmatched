@@ -272,6 +272,10 @@ bool UUmScreenGameOver::Initialize() {
   Style(LeftVerdict, TEXT("type.caption"), TEXT("turn.flash.yellow"));
   Style(RightVerdict, TEXT("type.caption"), TEXT("turn.flash.yellow"));
   Style(StripText, TEXT("type.button"), TEXT("text.primary"));
+  if (StripText) {  // VC C4 (ВР-VC-23): the strip text stops before the buttons with «…» (pseudo-locale +30 %)
+    StripText->SetTextOverflowPolicy(ETextOverflowPolicy::Ellipsis);
+    StripText->SetClipping(EWidgetClipping::ClipToBounds);
+  }
   for (UTextBlock* T : {OutcomeText.Get(), HeadlineText.Get(), ReasonText.Get(), TurnText.Get(), VersusText.Get(), LeftName.Get(),
                         RightName.Get()}) {
     if (T) T->SetJustification(ETextJustify::Center);
@@ -534,7 +538,9 @@ void UUmScreenGameOver::Refresh() {
     if (8.0f + TextW + 8.0f + WRes + 8.0f + WSLobby + 8.0f <= StripWSu || !bStripChips) break;
     bStripChips = false;  // the chips go first, never the type
   }
-  Place(StripText, FVector2D(SR.Min.X + 8.0f, SR.Min.Y + 0.5f * (StripHSu - 26.0f)), FVector2D(TextW, 26.0f));
+  // VC C4 (ВР-VC-23): never under «К ИТОГАМ» - the text gets what the two buttons leave, the rest is «…»
+  const float TextRoom = FMath::Max(40.0f, StripWSu - 8.0f - 8.0f - WRes - 8.0f - WSLobby - 8.0f);
+  Place(StripText, FVector2D(SR.Min.X + 8.0f, SR.Min.Y + 0.5f * (StripHSu - 26.0f)), FVector2D(FMath::Min(TextW, TextRoom), 26.0f));
   Btn(ResultsButton, LResults, EUmButtonVariant::Normal, bStripChips ? KeyV : FText::GetEmpty(), false, !Model.bLobbyBusy, 40.0f);
   Btn(StripLobbyButton, LLobby, EUmButtonVariant::Primary, bStripChips ? KeyEnter : FText::GetEmpty(), Model.bLobbyBusy, true, 40.0f);
   Place(StripLobbyButton, FVector2D(SR.Max.X - 8.0f - WSLobby, SR.Min.Y + 8.0f), FVector2D(WSLobby, 40.0f));

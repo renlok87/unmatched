@@ -291,7 +291,20 @@ void UUmScreenLoading::Layout() {
 void UUmScreenLoading::Refresh() {
   const bool bError = Stage == EUmLoadingStage::Error;
   if (StageText) StageText->SetText(UmRoomUi::S(UmLoading::StageKey(Stage)));
-  if (VersusText) VersusText->SetText(UmRoomUi::S(TEXT("screens.loading.versus")));
+  if (VersusText) {
+    // VC C4 (ВР-VC-23): «против» lives in the 96 su gap between the cards. A wider word (pseudo-locale +30 %) steps its
+    // font down to fit (not below 70 %, as UUmButton::FitLabel); still wider - left-justified, so the ellipsis shows
+    // (a centred run was clipped on both sides without «…»).
+    const FText Vs = UmRoomUi::S(TEXT("screens.loading.versus"));
+    VersusText->SetText(Vs);
+    FSlateFontInfo Font = UUmHudTheme::Get().Font(TEXT("type.heading"));
+    const float Base = static_cast<float>(Font.Size);
+    const float TextW = MeasureW(Vs, TEXT("type.heading"));
+    const float Avail = 96.0f - 4.0f;
+    if (TextW > Avail && Base > 0.0f) Font.Size = FMath::Max(FMath::FloorToFloat(Base * Avail / TextW), FMath::CeilToFloat(0.7f * Base));
+    VersusText->SetFont(Font);
+    VersusText->SetJustification(Base > 0.0f && TextW * Font.Size / Base > Avail ? ETextJustify::Left : ETextJustify::Center);
+  }
   Vis(Spinner, !bError);
   Vis(ErrorIcon, bError);
   if (Spinner) Spinner->SetWaiting(!bError && IsShown(), FPlatformTime::Seconds() * 1000.0, TEXT("loading"));

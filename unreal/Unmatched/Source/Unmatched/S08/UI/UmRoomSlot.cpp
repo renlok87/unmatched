@@ -41,6 +41,10 @@ bool UUmRoomSlot::Initialize() {
     HostChip = Border(TEXT("HostChip"));
     HostText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), FName(TEXT("HostText")));
     HostChip->SetContent(HostText);
+    // VC C4 (ВР-VC-23): a chip narrower than its label (pseudo-locale +30 %) ends with «…» inside its frame
+    HostChip->SetClipping(EWidgetClipping::ClipToBounds);
+    HostText->SetTextOverflowPolicy(ETextOverflowPolicy::Ellipsis);
+    HostText->SetClipping(EWidgetClipping::ClipToBounds);
     ReadyBox = Border(TEXT("ReadyBox"));
     ReadyIcon = WidgetTree->ConstructWidget<US08AnimatedIconWidget>(US08AnimatedIconWidget::StaticClass(), FName(TEXT("ReadyIcon")));
     Canvas->AddChild(ReadyIcon);
@@ -158,9 +162,12 @@ void UUmRoomSlot::Apply(const FUmRoomSlotModel& InModel, const FVector2D& InSize
   const float RowStep = bClassS ? 30.0f : 36.0f;
   float Y = bClassS ? 10.0f : 18.0f;
   if (bAi) {
-    // «ИИ-соперник» chip first, then «AI Bot» (ВР-VS4-SC14-05)
-    Place(HostChip, FVector2D(Tx, Y + 4.0f), FVector2D(ChipW, 24.0f));
-    Place(NameText, FVector2D(Tx + ChipW + 8.0f, Y), FVector2D(FMath::Max(40.0f, Tw - ChipW - 8.0f), 30.0f));
+    // «ИИ-соперник» chip first, then «AI Bot» (ВР-VS4-SC14-05). VC C4 (ВР-VC-23): the name is never cut
+    // (ВР-VS4-SC14-11) - when both do not fit (pseudo-locale), the chip gives way down to 48 su and ends with «…».
+    const float NameW = MeasureW(NameText ? NameText->GetText() : FText(), TEXT("type.heading")) + 4.0f;
+    const float ChipUse = FMath::Clamp(Tw - NameW - 8.0f, 48.0f, ChipW);
+    Place(HostChip, FVector2D(Tx, Y + 4.0f), FVector2D(ChipUse, 24.0f));
+    Place(NameText, FVector2D(Tx + ChipUse + 8.0f, Y), FVector2D(FMath::Max(40.0f, Tw - ChipUse - 8.0f), 30.0f));
   } else {
     const float NameW = MeasureW(NameText ? NameText->GetText() : FText(), TEXT("type.heading")) + 4.0f;
     Place(NameText, FVector2D(Tx, Y), FVector2D(FMath::Max(40.0f, FMath::Min(NameW, Tw)), 30.0f));
