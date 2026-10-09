@@ -122,6 +122,15 @@ void FS08FigureFxChannels::Bind(AActor* InOwner, UPrimitiveComponent* InBody, co
   Owner = InOwner;
   Body = InBody;
   TraceId = InTraceId;
+  // VC C3 (ВР-VC-18): the cue overlay goes on at the bind (CPD 15-17 at 0 = invisible), not at the figure's first cue -
+  // set at the first cue, its pipeline compiled (PSO precache) during that cue, and the first pulse of a figure that had
+  // no cue before (the enemy defender's FX-17 rim on the attacker's client) was not drawn at all. Kept, as before.
+  if (!S08CombatFx::FigureCueLegacy()) {
+    if (UMeshComponent* Mesh = Cast<UMeshComponent>(InBody)) {
+      UMaterialInterface* Cue = LoadObject<UMaterialInterface>(nullptr, S08FigureFx::CueOverlayPath);
+      if (Cue && Mesh->GetOverlayMaterial() != Cue) Mesh->SetOverlayMaterial(Cue);
+    }
+  }
 }
 
 void FS08FigureFxChannels::PlayFlash(double Ms) {

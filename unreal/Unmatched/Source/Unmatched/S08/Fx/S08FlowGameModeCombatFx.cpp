@@ -7,6 +7,7 @@
 #include "Camera/PlayerCameraManager.h"
 #include "GameFramework/PlayerController.h"
 #include "NiagaraComponent.h"
+#include "NiagaraSystemInstanceController.h"
 #include "../S08ArtHudWidgets.h"
 #include "../S08BoardActor.h"
 #include "../S08FighterActor.h"
@@ -59,15 +60,19 @@ void AS08FlowGameMode::S08FxHit(const FString& TargetId, int32 Seq, bool bStaged
                                    FMath::RoundToInt(S08CombatFx::StarDelayMs), Skip ? TEXT(" skip=") : TEXT(""),
                                    Skip ? Skip : TEXT("")));
   if (bStaged && S08CombatFx::FxShotsRequested() && !S09ShotDir.IsEmpty()) {
-    // the capture hook: the 1st staged hit holds its flash (C+20), the 2nd its star frame 4 (C+137, the rim on)
+    // the capture hook: a staged hit holds the flash (C+20) while it is not taken, a later one its star frame 4 (C+137,
+    // the rim on); a skipped late frame frees its leaf for the next hit (ВР-VC-12)
     ++CombatFx.StagedHits;
-    const TCHAR* Leaf = CombatFx.StagedHits == 1 ? TEXT("s09-fx19-flash-c20.png")
-                        : CombatFx.StagedHits == 2 && !Skip ? TEXT("s09-fx21-star-c137.png")
-                                                            : nullptr;
+    const bool bFlash = !CombatFx.ShotsTaken.Contains(TEXT("s09-fx19-flash-c20.png"));
+    const TCHAR* Leaf = bFlash ? TEXT("s09-fx19-flash-c20.png") : !Skip ? TEXT("s09-fx21-star-c137.png") : nullptr;
     if (Leaf && !CombatFx.ShotsTaken.Contains(Leaf)) {
       CombatFx.ShotsTaken.Add(Leaf);
-      const double Dt = CombatFx.StagedHits == 1 ? S08CombatFx::ShotFlashMs : S08CombatFx::ShotStarMs;
+      const double Dt = bFlash ? S08CombatFx::ShotFlashMs : S08CombatFx::ShotStarMs;
       CombatFx.Shots.Add({Leaf, TargetId, static_cast<double>(NowMs()) + Dt});
+      if (bFlash && !bReduced && S08CueFx::FxEnabled()) {  // ВР-VC-12: the flash on (a = 1) by the figure clock
+        CombatFx.Shots.Last().Channel = 1;
+        CombatFx.Shots.Last().ChannelMin = 0.99f;
+      }
     }
   }
   if (Skip) return;
@@ -118,6 +123,11 @@ void AS08FlowGameMode::S08FxCombatTick() {
   UWorld* World = GetWorld();
   const double Now = static_cast<double>(NowMs());
   const bool bReduced = S08IconMotion::IsReducedMotion();
+  if (GFrameCounter != CombatFx.TickFrame) {  // ВР-VC-12: the clock of the previous frame (S08FxCombatEnd ticks twice)
+    CombatFx.PrevTickMs = CombatFx.TickMs;
+    CombatFx.TickMs = Now;
+    CombatFx.TickFrame = GFrameCounter;
+  }
   // ---- FX-21: the due stars
   for (int32 I = 0; I < CombatFx.Stars.Num();) {
     const FS08CombatFxState::FPendingStar S = CombatFx.Stars[I];
@@ -137,6 +147,12 @@ void AS08FlowGameMode::S08FxCombatTick() {
     UNiagaraComponent* C =
         CueFxSpawner->Spawn(TEXT("CUE-011"), S08CombatFx::CameraQuad(P, FxCameraLocation(World, BoardCamera), Side));
     if (C) CombatFx.LiveSystems.Add(C);
+    for (FS08CombatFxState::FShot& Shot : CombatFx.Shots) {  // ВР-VC-12: the star frame waits for the star's age
+      if (C && Shot.Leaf == TEXT("s09-fx21-star-c137.png") && Shot.FighterId == S.TargetId && !Shot.System.IsValid()) {
+        Shot.System = C;
+        Shot.AgeS = static_cast<float>((S08CombatFx::ShotStarMs - S08CombatFx::StarDelayMs) / 1000.0);
+      }
+    }
     FS08Trace::Write(FString::Printf(TEXT("FX star fighter=%s seq=%d at=(%.0f,%.0f,%.0f) side=%.0f diameter=%.0f result=%s"),
                                      *S.TargetId, S.Seq, P.X, P.Y, P.Z, Side, S08CombatFx::StarDiameterRel * H,
                                      C ? TEXT("spawned") : TEXT("missing")));
@@ -190,6 +206,7 @@ void AS08FlowGameMode::S08FxCombatTick() {
     }
   };
   if (!CombatFx.Holding.Leaf.IsEmpty()) {
+    Pause(true);  // ВР-VC-12: a system spawned during the hold (the star at C+70) holds too
     const bool bDone = GFrameCounter >= CombatFx.HoldFrame + 3 && !IsEvidenceCaptureBusy() && EvidenceShotQueue.Num() == 0;
     const bool bTimeout = FPlatformTime::Seconds() - CombatFx.HoldSinceS > 3.0;
     if (bDone || bTimeout) {
@@ -202,8 +219,29 @@ void AS08FlowGameMode::S08FxCombatTick() {
     }
     return;
   }
-  for (int32 I = 0; I < CombatFx.Shots.Num(); ++I) {
-    if (Now < CombatFx.Shots[I].AtMs) continue;
+  for (int32 I = 0; I < CombatFx.Shots.Num();) {
+    const FS08CombatFxState::FShot& Shot = CombatFx.Shots[I];
+    const UNiagaraComponent* Sys = Shot.System.Get();
+    const bool bAge = Sys && Sys->IsActive() && Sys->GetSystemInstanceController().IsValid();
+    const float Age = bAge ? Sys->GetSystemInstanceController()->GetAge() : -1.0f;
+    const float FrameS = (World ? World->GetDeltaSeconds() : 1.0f / 30.0f) * (Sys ? FMath::Max(Sys->GetCustomTimeDilation(), 1.0f) : 1.0f);
+    const AS08FighterActor* ChFighter = Shot.Channel ? BoardActor->FindFighterActor(Shot.FighterId) : nullptr;
+    const float Ch = !ChFighter ? -1.0f : Shot.Channel == 1 ? ChFighter->GetFxFlashValue() : ChFighter->GetRimIntensity();
+    const S08CombatFx::EShotDecision D = S08CombatFx::ShotDecision(Now, Shot.AtMs, CombatFx.PrevTickMs, Age,
+                                                                   bAge ? Shot.AgeS : -1.0f, FrameS, Ch, Shot.ChannelMin);
+    if (D == S08CombatFx::EShotDecision::Wait) {
+      ++I;
+      continue;
+    }
+    if (D == S08CombatFx::EShotDecision::Skip) {
+      FS08Trace::Write(FString::Printf(TEXT("FXSHOT skip %s late=%d age=%.3f target=%.3f ch=%.2f"), *Shot.Leaf,
+                                       FMath::RoundToInt(Now - Shot.AtMs), Age, bAge ? Shot.AgeS : -1.0f, Ch));
+      CombatFx.ShotsTaken.Remove(Shot.Leaf);
+      CombatFx.Shots.RemoveAt(I);
+      continue;
+    }
+    FS08Trace::Write(FString::Printf(TEXT("FXSHOT due %s late=%d age=%.3f target=%.3f ch=%.2f"), *Shot.Leaf,
+                                     FMath::RoundToInt(Now - Shot.AtMs), Age, bAge ? Shot.AgeS : -1.0f, Ch));
     CombatFx.Holding = CombatFx.Shots[I];
     CombatFx.Shots.RemoveAt(I);
     AS08FighterActor* F = BoardActor->FindFighterActor(CombatFx.Holding.FighterId);
@@ -225,6 +263,9 @@ void AS08FlowGameMode::S08FxDefenseShot(const FString& DefenderId) {
   if (CombatFx.ShotsTaken.Contains(Leaf)) return;
   CombatFx.ShotsTaken.Add(Leaf);
   CombatFx.Shots.Add({Leaf, DefenderId, static_cast<double>(NowMs()) + S08CombatFx::ShotDefenseMs});
+  CombatFx.Shots.Last().Channel = 2;  // ВР-VC-12: the rim at its peak by the figure's own clock (reduced: 0.6)
+  CombatFx.Shots.Last().ChannelMin =
+      0.99f * (S08IconMotion::IsReducedMotion() ? S08FigureFx::ReducedRimPeak : S08FigureFx::DefenseRim.Peak);
 }
 
 bool AS08FlowGameMode::S08FxBenchCombat(const FString& Mode, const TArray<FString>& Parts) {
@@ -250,6 +291,11 @@ void AS08FlowGameMode::S08FxBenchCombatFinish() {
   for (const FCombatBench::FSpawn& S : GCombatBench.Spawns) {
     const AS08FighterActor* F = BoardActor->FindFighterActor(S.FighterId);
     if (!F) continue;
+    if (S08IconMotion::IsReducedMotion()) {  // ВР-VC-15: no star, no motes under reduced motion (as live)
+      FS08Trace::Write(FString::Printf(TEXT("FX bench spawn cue=%s fighter=%s ms=%.0f result=skip reason=reduced"),
+                                       *S.Cue, *S.FighterId, S.Ms));
+      continue;
+    }
     const float H = F->GetFigureHeightUU();
     FTransform Xf;
     if (S.Cue == TEXT("CUE-011")) {

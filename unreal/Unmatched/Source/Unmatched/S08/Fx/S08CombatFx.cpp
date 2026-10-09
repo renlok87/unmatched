@@ -74,6 +74,27 @@ bool FxShotsRequested() {
   return FParse::Param(FCommandLine::Get(), TEXT("S08FxShots")) || FParse::Param(FCommandLine::Get(), TEXT("S08ExitShots"));
 }
 
+EShotDecision ShotDecision(double NowMs, double AtMs, double PrevTickMs, float AgeS, float TargetAgeS, float FrameS,
+                           float Channel, float ChannelMin) {
+  if (ChannelMin >= 0.0f && Channel >= 0.0f) {
+    if (NowMs < AtMs) return EShotDecision::Wait;
+    if (Channel >= ChannelMin) return EShotDecision::Take;
+    return NowMs - AtMs > ShotAgeWaitMaxMs ? EShotDecision::Skip : EShotDecision::Wait;
+  }
+  if (TargetAgeS >= 0.0f && AgeS >= 0.0f) {
+    if (AgeS < TargetAgeS) return NowMs - AtMs > ShotAgeWaitMaxMs ? EShotDecision::Take : EShotDecision::Wait;
+    const float Tolerance = FMath::Clamp(1.5f * FrameS, 0.034f, 0.1f);
+    return AgeS - TargetAgeS > Tolerance ? EShotDecision::Skip : EShotDecision::Take;
+  }
+  if (NowMs < AtMs) return EShotDecision::Wait;
+  return PrevTickMs >= 0.0 && AtMs <= PrevTickMs ? EShotDecision::Skip : EShotDecision::Take;
+}
+
+bool BenchSkipsUnderReducedMotion(const FString& Mode) {
+  return Mode == TEXT("star") || Mode == TEXT("heal") || Mode == TEXT("vortex") || Mode == TEXT("arc") ||
+         Mode == TEXT("dust");
+}
+
 FString LookField() {
   return FString::Printf(TEXT("combatFx=%s figureCue=%s"),
                          S08CueFx::FxEnabled() ? TEXT("on") : TEXT("legacy(-S08FxLegacy)"),

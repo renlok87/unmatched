@@ -114,6 +114,12 @@ struct UNMATCHED_API FS08CombatFxState {
     FString Leaf;       // s09-fx19-flash.png ...
     FString FighterId;  // whose channels hold
     double AtMs = 0.0;  // game clock
+    // ВР-VC-12: the effect's own clock - the frame waits for this system's age (paused while another frame holds)
+    TWeakObjectPtr<UNiagaraComponent> System;
+    float AgeS = -1.0f;
+    // ВР-VC-12: or the figure's own channel - 1 flash / 2 rim - must reach ChannelMin (the flash / the rim peak)
+    uint8 Channel = 0;
+    float ChannelMin = -1.0f;
   };
   TArray<FShot> Shots;            // planned
   TSet<FString> ShotsTaken;       // leaves planned or taken (one each)
@@ -121,6 +127,9 @@ struct UNMATCHED_API FS08CombatFxState {
   FShot Holding;                  // the shot in flight (Leaf empty = none)
   uint64 HoldFrame = 0;
   double HoldSinceS = 0.0;
+  uint64 TickFrame = 0;           // ВР-VC-12: the game clock of the previous frame's tick (a shot due by then is late)
+  double TickMs = -1.0;
+  double PrevTickMs = -1.0;
   void Reset() { *this = FS08CombatFxState(); }
 };
 
@@ -133,4 +142,19 @@ inline constexpr double ShotFlashMs = 20.0;
 inline constexpr double ShotStarMs = 137.0;
 inline constexpr double ShotDefenseMs = 270.0;
 inline constexpr double ShotHealMs = 200.0;
+/** ВР-VC-12 (ВР-VS6-56): what the hook does with a planned frame this tick. A frame bound to its system (AgeS >= 0,
+ *  the system alive) waits for the system's own age - TargetAgeS - (an earlier held frame pauses every live system, so
+ *  the age stops with it) and is skipped when the age overshot it by more than a frame (1.5 x FrameS, 34..100 ms); it
+ *  is taken anyway ShotAgeWaitMaxMs after its clock moment. A frame on a figure channel (ChannelMin >= 0: the flash
+ *  a = 1, the defence rim at its peak - the channel runs on the actor's world clock, which a screenshot hitch puts
+ *  behind the game clock) waits from its clock moment until the channel reaches ChannelMin, and is skipped
+ *  ShotAgeWaitMaxMs later. A frame on the game clock alone is skipped when it was due already at the previous frame's
+ *  tick (it waited behind another held frame). A skipped leaf is planned again by the next event of its kind. */
+enum class EShotDecision : uint8 { Wait, Take, Skip };
+inline constexpr double ShotAgeWaitMaxMs = 500.0;
+UNMATCHED_API EShotDecision ShotDecision(double NowMs, double AtMs, double PrevTickMs, float AgeS, float TargetAgeS,
+                                         float FrameS, float Channel = -1.0f, float ChannelMin = -1.0f);
+/** ВР-VC-15: the -BenchFx stager honours reduced motion as the live game does - star, heal motes, vortex, arc and dust
+ *  are not spawned (the chevrons run to their end state, S08FieldFx::BenchChevronMs; ash follows DissolveStyle). */
+UNMATCHED_API bool BenchSkipsUnderReducedMotion(const FString& Mode);
 }  // namespace S08CombatFx

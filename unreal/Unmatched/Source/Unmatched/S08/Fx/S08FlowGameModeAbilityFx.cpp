@@ -113,7 +113,8 @@ void AS08FlowGameMode::RunAbilityEvents(const TArray<FS09AbilityStageEvent>& Eve
                                          C ? TEXT("spawned") : (S08CueFx::FxEnabled() ? TEXT("missing") : TEXT("legacy"))));
         if (S08CombatFx::FxShotsRequested() && !S09ShotDir.IsEmpty() && !CombatFx.ShotsTaken.Contains(TEXT("s09-fx30-vortex-t300.png"))) {
           CombatFx.ShotsTaken.Add(TEXT("s09-fx30-vortex-t300.png"));
-          CombatFx.Shots.Add({TEXT("s09-fx30-vortex-t300.png"), In.FighterId, static_cast<double>(Event.AtMs) + 300.0});
+          CombatFx.Shots.Add({TEXT("s09-fx30-vortex-t300.png"), In.FighterId, static_cast<double>(Event.AtMs) + 300.0, C,
+                              C ? 0.3f : -1.0f});  // ВР-VC-12: by the vortex's own age
         }
         break;
       }
@@ -183,7 +184,7 @@ void AS08FlowGameMode::S08FxAbilityOnCombatEvent(const FS09CombatStageEvent& Eve
       !CombatFx.ShotsTaken.Contains(TEXT("s09-fx32-arc-f133.png"))) {
     CombatFx.ShotsTaken.Add(TEXT("s09-fx32-arc-f133.png"));
     CombatFx.Shots.Add({TEXT("s09-fx32-arc-f133.png"), In.AttackerId,
-                        static_cast<double>(Event.AtMs) + 133.0 * FMath::Max(In.SpeedMul, 0.01f)});
+                        static_cast<double>(Event.AtMs) + 133.0 * FMath::Max(In.SpeedMul, 0.01f), C, 0.133f});
   }
 }
 
@@ -237,7 +238,7 @@ void AS08FlowGameMode::S08FxAbilityTick() {
       if (C && S08CombatFx::FxShotsRequested() && !S09ShotDir.IsEmpty() &&
           !CombatFx.ShotsTaken.Contains(TEXT("s09-fx26-embers-d300.png"))) {
         CombatFx.ShotsTaken.Add(TEXT("s09-fx26-embers-d300.png"));
-        CombatFx.Shots.Add({TEXT("s09-fx26-embers-d300.png"), F.Id, static_cast<double>(NowMs()) + 300.0});
+        CombatFx.Shots.Add({TEXT("s09-fx26-embers-d300.png"), F.Id, static_cast<double>(NowMs()) + 300.0, C, 0.3f});
       }
     }
     if (const TWeakObjectPtr<UNiagaraComponent>* C = AbilityFx.Embers.Find(F.Id)) {
@@ -281,6 +282,11 @@ void AS08FlowGameMode::S08FxBenchAbilityFinish() {
     const float H = F->GetFigureHeightUU();
     UNiagaraComponent* C = nullptr;
     FString Extra;
+    if (S08IconMotion::IsReducedMotion() && S08CombatFx::BenchSkipsUnderReducedMotion(S.Mode)) {
+      FS08Trace::Write(FString::Printf(TEXT("FX bench spawn mode=%s fighter=%s ms=%.0f result=skip reason=reduced"),
+                                       *S.Mode, *S.FighterId, S.Ms));  // ВР-VC-15: no vortex, no arc (as live)
+      continue;
+    }
     if (S.Mode == TEXT("ash")) {
       const S08HeroesV2::FHeroSpec* Spec = F->GetHeroV2Spec();
       const float DissolveS = Spec ? S08HeroesV2::DissolveSeconds(*Spec) : 0.5f;

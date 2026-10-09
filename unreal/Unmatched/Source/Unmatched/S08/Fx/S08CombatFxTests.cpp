@@ -3,6 +3,8 @@
 //   Unmatched.S08.CombatFx.Number   - FX-22 keyframes: 0.8 -> 1 in 80 ms, 24 su rise, last 150 ms fade, reduced 450
 //   Unmatched.S08.CombatFx.Heal     - FX-25 (ВР-FX13): HealAmount + ComputeCues FighterHealed (no revive, after damage)
 //   Unmatched.S08.CombatFx.Hold     - the capture hook: a held channel keeps its value and resumes where it stopped
+//   Unmatched.S08.CombatFx.ShotQueue - VC C3 ВР-VC-12: a frame due behind another held one is skipped (clock) or waits
+//                                     for its system's age; the bench stager's reduced-motion skips (ВР-VC-15)
 #include "S08CombatFx.h"
 #include "S08FigureFxChannels.h"
 #include "../S08FlowController.h"
@@ -119,6 +121,40 @@ bool FS08CombatFxHoldTest::RunTest(const FString&) {
   Ch.Advance(C + 0.020);
   TestEqual("flash at C+20", Ch.GetFlash(), 1.0f);
   TestFalse("not held by default", Ch.IsHeld());
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08CombatFxShotQueueTest, "Unmatched.S08.CombatFx.ShotQueue",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08CombatFxShotQueueTest::RunTest(const FString&) {
+  using namespace S08CombatFx;
+  const float F = 1.0f / 30.0f;
+  // the clock rule: the first tick at / after the moment takes it; a frame that was due at the previous tick is late
+  TestTrue("clock: not yet", ShotDecision(1000.0, 1020.0, 990.0, -1.0f, -1.0f, F) == EShotDecision::Wait);
+  TestTrue("clock: first tick after the moment", ShotDecision(1023.0, 1020.0, 990.0, -1.0f, -1.0f, F) == EShotDecision::Take);
+  TestTrue("clock: no previous tick", ShotDecision(1023.0, 1020.0, -1.0, -1.0f, -1.0f, F) == EShotDecision::Take);
+  // ВР-VS6-56: the gaze flash C+20 planned while the vortex frame held - due long before the release tick
+  TestTrue("clock: late behind a held frame", ShotDecision(1250.0, 1020.0, 1210.0, -1.0f, -1.0f, F) == EShotDecision::Skip);
+  // the age rule: the arc f133 waits for the arc's own age (a hitch on the spawn frame lags the simulation)
+  TestTrue("age: the clock passed, the age not", ShotDecision(1200.0, 1133.0, 1166.0, 0.05f, 0.133f, F) == EShotDecision::Wait);
+  TestTrue("age: reached within a frame", ShotDecision(1240.0, 1133.0, 1206.0, 0.150f, 0.133f, F) == EShotDecision::Take);
+  TestTrue("age: overshot by more than a frame", ShotDecision(1400.0, 1133.0, 1366.0, 0.30f, 0.133f, F) == EShotDecision::Skip);
+  TestTrue("age: a paused system waits through a hold", ShotDecision(1500.0, 1133.0, 1466.0, 0.10f, 0.133f, F) == EShotDecision::Wait);
+  TestTrue("age: taken anyway 500 ms after its moment",
+           ShotDecision(1133.0 + ShotAgeWaitMaxMs + 1.0, 1133.0, 1600.0, 0.10f, 0.133f, F) == EShotDecision::Take);
+  TestTrue("age: the tolerance grows with a long frame", ShotDecision(1300.0, 1133.0, 1200.0, 0.20f, 0.133f, 0.06f) == EShotDecision::Take);
+  // the channel rule: the defence rim frame waits for the rim's peak on the figure's clock (a screenshot hitch lags it)
+  TestTrue("channel: before the clock moment", ShotDecision(1000.0, 1270.0, 990.0, -1.0f, -1.0f, F, 1.0f, 0.99f) == EShotDecision::Wait);
+  TestTrue("channel: the clock passed, the rim still rising", ShotDecision(1300.0, 1270.0, 1280.0, -1.0f, -1.0f, F, 0.4f, 0.99f) == EShotDecision::Wait);
+  TestTrue("channel: the rim at its peak", ShotDecision(1360.0, 1270.0, 1330.0, -1.0f, -1.0f, F, 1.0f, 0.99f) == EShotDecision::Take);
+  TestTrue("channel: never reached in 500 ms", ShotDecision(1800.0, 1270.0, 1760.0, -1.0f, -1.0f, F, 0.0f, 0.99f) == EShotDecision::Skip);
+  TestTrue("channel: no fighter -> the clock rule", ShotDecision(1300.0, 1270.0, 1260.0, -1.0f, -1.0f, F, -1.0f, 0.99f) == EShotDecision::Take);
+  // ВР-VC-15: the bench stager under reduced motion spawns what the live game spawns
+  for (const TCHAR* M : {TEXT("star"), TEXT("heal"), TEXT("vortex"), TEXT("arc"), TEXT("dust")}) {
+    TestTrue(FString::Printf(TEXT("reduced skips %s"), M), BenchSkipsUnderReducedMotion(M));
+  }
+  TestFalse("reduced keeps the chevrons", BenchSkipsUnderReducedMotion(TEXT("chevrons")));
+  TestFalse("reduced: ash follows the dissolve style", BenchSkipsUnderReducedMotion(TEXT("ash")));
   return true;
 }
 
