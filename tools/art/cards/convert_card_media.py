@@ -65,6 +65,10 @@ SCHEMA = "unmatched.card-media-convert/1"
 HERO_API = "http://127.0.0.1:3000/graphql"
 # MVP heroes (02 §6.4 / §6.5): heroSlug -> name in the scrape / the DB.
 HEROES = {"king-arthur": "King Arthur", "medusa": "Medusa"}
+# VC C4 (ВР-VC-20, CLOSEOUT п. 8): heroes the client shows only as a portrait - the server bot of VS_AI (T. Rex, the
+# strongest hero the bot picks). Avatar only: no cards, no back, and a sidekick record without a name or an avatar
+# (the bot's "Unknown" of the backend data) is skipped, its circle stays the monogram.
+PORTRAIT_ONLY_HEROES = {"t-rex": "T. Rex"}
 # The card's pinned MVP hero media (scraped-data/images/heroes/<sub>/<file>): sha256, size, mode.
 EXPECTED_HERO_MEDIA = {
     "avatars/dgwIAej9v-Omrn0sSVs5i.webp": ("a93e817db892e2fed4375e8757a47a39e9e253d3076547fed752757a978f743a", (800, 800)),
@@ -73,6 +77,8 @@ EXPECTED_HERO_MEDIA = {
     "sidekicks/G42WIKYZ1cmwACVwMggzM.webp": ("1cfcad663bcd9e99df233bcd8b5c61c8fe97b354070a75542713929534ee5e62", (128, 128)),
     "card-covers/WWzu16BEFGsEdu5NsMbMI.png": ("c061ee8848390e9be86a49d963904bc8bff6bafb3dbfc70c40420af08801fda7", (768, 1051)),
     "card-covers/ROSMO3sRi6Jh1o7S_riGI.png": ("9b380cf4be7e2e4e0e319bc47b9f2aa4c0c72dc3aac587c0112f909440ca1b44", (768, 1051)),
+    # VC C4: T. Rex avatar (Hero.avatarUrl of the backend = the scrape's fetchedHero.avatar)
+    "avatars/9z9iaYFxdQpstwDftty0r.webp": ("7cec7e403457010944a3ddb9f6e016fface3aa8092da48aaaaeb9dd83ebf9900", (768, 768)),
 }
 SCAN_SIZE = {"ru": (287, 398), "en": (250, 349)}  # 02 §6.1 / ВР-51
 KEY_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*:[a-z0-9]+(?:-[a-z0-9]+)*$")
@@ -216,6 +222,22 @@ def hero_items(root: Path) -> tuple[list[dict], dict]:
                 raise ConvertError(f"{key}: {rel} is not the pinned MVP file (EXPECTED_HERO_MEDIA) - scrape changed?")
             items.append({"key": key, "kind": kind, "hero": hero, "src": root / "images" / "heroes" / rel,
                           "srcRel": f"scraped-data/images/heroes/{rel}", "sha256": exp[0], "size": exp[1], "out": out})
+    for hero, name in PORTRAIT_ONLY_HEROES.items():
+        jpath = root / "api" / "heroes" / f"{hero}.json"
+        if not jpath.is_file():
+            raise ConvertError(f"{hero}: hero JSON missing ({scrape_rel(jpath, root)})")
+        fh = decode_devalue(json.loads(jpath.read_text(encoding="utf-8")), f"{hero}.json")["fetchedHero"]
+        if fh.get("name") != name:
+            raise ConvertError(f"{hero}: fetchedHero.name is {fh.get('name')!r}, expected {name!r}")
+        rel = f"avatars/{url_basename(fh.get('avatar'), f'{hero}.avatar')}"
+        scrape[hero] = {"name": name, "avatar": fh.get("avatar"), "cardBackImage": fh.get("cardBackImage"),
+                        "characterCardImage": fh.get("characterCardImage")}
+        exp = EXPECTED_HERO_MEDIA.get(rel)
+        if exp is None:
+            raise ConvertError(f"portrait:{hero}: {rel} is not the pinned file (EXPECTED_HERO_MEDIA) - scrape changed?")
+        items.append({"key": f"portrait:{hero}", "kind": "avatar", "hero": hero, "src": root / "images" / "heroes" / rel,
+                      "srcRel": f"scraped-data/images/heroes/{rel}", "sha256": exp[0], "size": exp[1],
+                      "out": Path("avatars") / f"{hero}.png"})
     return items, scrape
 
 

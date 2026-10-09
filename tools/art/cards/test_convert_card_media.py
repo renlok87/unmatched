@@ -34,12 +34,12 @@ def converted(tmp_path_factory):
 
 def test_sixty_files_all_pixel_equal(converted):
     out, report, res = converted
-    assert res["count"] == 60
-    assert res["counts"] == {"avatar": 2, "back": 2, "card": 54, "sidekick": 2}
+    assert res["count"] == 61
+    assert res["counts"] == {"avatar": 3, "back": 2, "card": 54, "sidekick": 2}
     assert res["allPixelEqual"] is True
     assert all(e["pixelEqual"] and e["maxAbsDelta"] == 0 for e in res["files"])
     assert res["registry"]["cards"] == 27
-    assert json.loads(report.read_text(encoding="utf-8"))["count"] == 60
+    assert json.loads(report.read_text(encoding="utf-8"))["count"] == 61
 
 
 def test_card_sources_match_the_registry(converted):
@@ -67,7 +67,7 @@ def test_sizes_and_names(converted):
     dash = next(e for e in en if e["key"] == "medusa:dash.en")
     assert dash["in"]["format"] == "webp"
     sizes = {e["out"]["path"]: e["size"] for e in res["files"] if e["kind"] != "card"}
-    assert sizes == {"avatars/king-arthur.png": [800, 800], "avatars/medusa.png": [402, 402],
+    assert sizes == {"avatars/king-arthur.png": [800, 800], "avatars/medusa.png": [402, 402], "avatars/t-rex.png": [768, 768],
                      "sidekicks/king-arthur-merlin.png": [128, 128], "sidekicks/medusa-harpies.png": [128, 128],
                      "backs/king-arthur.png": [768, 1051], "backs/medusa.png": [768, 1051]}
     assert len(list((out / "cards" / "medusa").glob("*.png"))) == 22
@@ -87,7 +87,7 @@ def test_rerun_is_a_noop(converted):
     before = report.read_bytes()
     mtimes = {p: p.stat().st_mtime_ns for p in out.rglob("*.png")}
     res = C.run(SCRAPED, out, report, db=False)
-    assert res["_run"]["actions"] == {"written": 0, "unchanged": 60}
+    assert res["_run"]["actions"] == {"written": 0, "unchanged": 61}
     assert report.read_bytes() == before
     assert {p: p.stat().st_mtime_ns for p in out.rglob("*.png")} == mtimes
 
@@ -96,7 +96,7 @@ def _copy_scrape(dst: Path) -> None:
     reg = json.loads(C.REGISTRY.read_text(encoding="utf-8"))
     rels = [c[lang]["path"] for c in reg["cards"] for lang in ("ru", "en")]
     rels += [f"scraped-data/images/heroes/{r}" for r in C.EXPECTED_HERO_MEDIA]
-    rels += [f"scraped-data/api/heroes/{h}.json" for h in C.HEROES]
+    rels += [f"scraped-data/api/heroes/{h}.json" for h in (*C.HEROES, *C.PORTRAIT_ONLY_HEROES)]
     for rel in rels:
         src = C.scrape_path(SCRAPED, rel)
         tgt = C.scrape_path(dst, rel)

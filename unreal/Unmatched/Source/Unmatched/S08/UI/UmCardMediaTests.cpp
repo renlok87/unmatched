@@ -76,7 +76,8 @@ bool FUmCardMediaRegistryTest::RunTest(const FString&) {
   }
   TestEqual(TEXT("54 card entries (27 keys x RU / EN)"), Cards, 54);
   TestEqual(TEXT("2 backs"), Backs, 2);
-  TestEqual(TEXT("4 portraits"), Portraits, 4);
+  TestEqual(TEXT("5 portraits (4 MVP + the VS_AI bot T. Rex, VC C4)"), Portraits, 5);
+  TestNotNull(TEXT("portrait:t-rex (VC C4, ВР-VC-20)"), UmCardMedia::FindPortrait(TEXT("t-rex"), FString()));
 
   UmCardMedia::ResetForTest();
   for (const TCHAR* Key : MvpCards) {

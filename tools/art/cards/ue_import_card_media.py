@@ -93,11 +93,15 @@ PAD_COLOR = (0x06, 0x16, 0x23, 0)  # card.navy #061623, alpha 0
 # side; the accepted CP-07 crops (portrait-crops.json, CP-09...CP-12) replace them.
 CROPS = REPO / "art/imagegen/portrait-crop-v1-codex/portrait-crops.json"
 CROPS_SOURCE = "CP-07 B (portrait-crop-v1, accepted by delegation 165c3be7)"
+# VC C4 (ВР-VC-20): CP-07 crops of portraits outside the MVP pair (the VS_AI bot T. Rex), same rule, own record
+CROPS_EXTRA = REPO / "art/cards-v1/portrait-crops-extra.json"
+CROPS_EXTRA_SOURCE = "CP-07 B rule (tools/art/cards/portrait_crop_extra.py, VC C4 ВР-VC-20, by delegation)"
 DISC_START = {
     "portrait:king-arthur": [0.49, 0.43, 0.60],
     "portrait:medusa": [0.44, 0.33, 0.56],
     "portrait:king-arthur:merlin": [0.50, 0.50, 0.75],
     "portrait:medusa:harpies": [0.50, 0.50, 0.75],
+    "portrait:t-rex": [0.52, 0.40, 0.78],  # VC C4: the start of tools/art/cards/portrait_crop_extra.py
 }
 KIND_ORDER = {"card": 0, "back": 1, "portrait": 2}
 SETTINGS_DOC = {"powerOfTwoMode": "PAD_TO_POWER_OF_TWO", "paddingColor": "#061623 a0", "mipGen": "TMGS_SIMPLE_AVERAGE",
@@ -198,7 +202,11 @@ def load_crops(path: Path = CROPS) -> dict:
 
 
 def build_registry(items: list[dict], crops: dict | None = None) -> dict:
-    crops = load_crops() if crops is None else crops
+    extra = {}
+    if crops is None:
+        crops = load_crops()
+        extra = {k: v for k, v in load_crops(CROPS_EXTRA).items() if k not in crops}
+        crops = {**crops, **extra}
     entries = []
     for i in items:
         e = {"key": i["key"], "kind": i["kind"]}
@@ -210,7 +218,7 @@ def build_registry(items: list[dict], crops: dict | None = None) -> dict:
         if i["kind"] == "portrait":
             if i["key"] in crops:
                 e["disc"] = crops[i["key"]]
-                e["discSource"] = CROPS_SOURCE
+                e["discSource"] = CROPS_EXTRA_SOURCE if i["key"] in extra else CROPS_SOURCE
             else:
                 e["disc"] = DISC_START[i["key"]]
                 e["discSource"] = "ВР-CP01 (start; CP-07 replaces after review)"

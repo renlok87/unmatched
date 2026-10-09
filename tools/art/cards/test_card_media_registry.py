@@ -23,8 +23,8 @@ MVP_CARDS = json.loads((M.REPO / "art/imagegen/mvp-v1/reused-cardart.json").read
 
 def test_schema_and_counts():
     assert REG["schema"] == M.REGISTRY_SCHEMA == "unmatched.s08-card-media/1"
-    assert REG["counts"] == {"card": 54, "back": 2, "portrait": 4}
-    assert len(ENTRIES) == 60
+    assert REG["counts"] == {"card": 54, "back": 2, "portrait": 5}
+    assert len(ENTRIES) == 61
     ids = [(e["key"], e.get("lang", "")) for e in ENTRIES]
     assert len(set(ids)) == len(ids)
     for e in ENTRIES:
@@ -73,7 +73,11 @@ def test_backs_and_portraits():
     assert ports["portrait:medusa"]["disc"] == [0.44, 0.29, 0.5]
     assert ports["portrait:king-arthur:merlin"]["disc"] == [0.5, 0.48, 0.69]
     assert ports["portrait:medusa:harpies"]["disc"] == [0.5, 0.48, 0.69]
-    assert all(p["discSource"] == M.CROPS_SOURCE for p in ports.values())
+    assert all(p["discSource"] == M.CROPS_SOURCE for k, p in ports.items() if k != "portrait:t-rex")
+    # VC C4 (ВР-VC-20): the VS_AI bot T. Rex - the CP-07 B rule, its own record
+    assert ports["portrait:t-rex"]["disc"] == [0.52, 0.36, 0.72]
+    assert ports["portrait:t-rex"]["discSource"] == M.CROPS_EXTRA_SOURCE
+    assert ports["portrait:t-rex"]["object"] == "/Game/S08/UI/Portraits/T_Portrait_t_rex.T_Portrait_t_rex"
 
 
 def test_discs_are_the_cp07_crops():
@@ -119,8 +123,8 @@ def test_registry_matches_the_cp01_report():
 
 def test_modes_select():
     items = M.plan_from_convert_report()
-    assert len(M.select(items, "all", None)) == 60
-    assert len(M.select(items, "portraits", None)) == 4
+    assert len(M.select(items, "all", None)) == 61
+    assert len(M.select(items, "portraits", None)) == 5
     assert len(M.select(items, "backs", None)) == 2
     assert len(M.select(items, "cards", "medusa")) == 22
     assert len(M.select(items, "cards", "king-arthur")) == 32
@@ -141,7 +145,7 @@ def test_missing_png_names_the_key(tmp_path):
 @pytest.mark.skipif(not M.REPORT.is_file(), reason="UE import not run in this checkout")
 def test_ue_import_report_acceptance():
     rep = json.loads(M.REPORT.read_text(encoding="utf-8"))
-    assert rep["count"] == 60 and rep["allOk"] is True
+    assert rep["count"] == 61 and rep["allOk"] is True
     by = {(t["key"], t.get("lang", "")): t for t in rep["textures"]}
     for e in ENTRIES:
         t = by[(e["key"], e.get("lang", ""))]
