@@ -387,6 +387,9 @@ void AS08FlowGameMode::TickUmEndScreens() {
       R.bExpiredSeen = true;
       R.bExpiredInMatch = R.LastStage == ES08Stage::Started || R.bWasLost;
       R.bExpiredAck = false;
+      // VC Frames (ВР-VC-35): the stage became Failed a frame earlier and showed the legacy Slate flow panel (the
+      // operator form and the trace log) behind the expired card - the held route covers it from this frame on
+      UpdateLegacyRootVisibility();
     } else if (!Flow->IsSessionExpired()) {
       R.bExpiredSeen = R.bExpiredInMatch = false;
     }
