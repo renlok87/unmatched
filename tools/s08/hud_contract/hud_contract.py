@@ -568,7 +568,8 @@ def check_widget_trace(lines, known_ids, width=1920, height=1080, registry=None,
     сравнительный Slate-двойник или скрытая иконка в поздней строке W5b-R) может быть unpainted. states (04 §7.1,
     ui_states_from_04): у блока из таблицы состояние должно быть из её списка. VC C4 (ВР-VC-19): строка `plate*` в
     кадре, где табличка поставлена меньше 2 кадров назад (plate_settling), не ошибка, а `settling` (счёт в stats);
-    если табличка в трассе ни разу не нарисована, а такие строки есть, - ошибка."""
+    если табличка в трассе ни разу не нарисована, а такие строки есть, - ошибка. VC Frames (ВР-VC-34): «нарисована» —
+    и строка виджета `plate*` geom=painted, и собственная строка таблички `SHOT plate … geom=painted`."""
     states = states or {}
     errors, seen = [], 0
     plates, settling, plate_painted = {}, 0, 0
@@ -612,6 +613,10 @@ def check_widget_trace(lines, known_ids, width=1920, height=1080, registry=None,
         if pm:
             p = dict(w.split("=", 1) for w in pm.group(1).split() if "=" in w)
             plates[p.get("fighter")] = p
+            # VC Frames (ВР-VC-34): the plate's own `SHOT plate … geom=painted` line proves it was drawn (packaged
+            # clients write the `SHOT widget id=plate` line in the request frame with stable=0, before the layout)
+            if p.get("geom") == "painted":
+                plate_painted += 1
             continue
         if "SHOT late end" in line:
             plates = {}

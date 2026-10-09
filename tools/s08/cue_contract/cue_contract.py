@@ -670,7 +670,13 @@ def check_trace(lines, table):
             row = rows[cid]
             rm = row["reduced_motion"]
             if inst["reduced"] and rm["mode"] == "shorten" and anim > rm["max_ms"]:
-                errors.append(("G4", "строка %d: сокращённая анимация %d мс > %d" % (n, anim, rm["max_ms"])))
+                # VC Frames (ВР-VC-33): the `done` line comes in the first frame after a capture stall `SHOT hitch` -
+                # the stall inside [show, done] is subtracted (less one 17 мс frame), counted as g4_hitch
+                c = _hitch_corrected(hitches, inst["t"], t) if hitches else None
+                if c is not None and c - hold <= rm["max_ms"]:
+                    summary["g4_hitch"] = summary.get("g4_hitch", 0) + 1
+                else:
+                    errors.append(("G4", "строка %d: сокращённая анимация %d мс > %d" % (n, anim, rm["max_ms"])))
             if inst["reduced"] and rm["mode"] == "snap" and anim != 0:
                 errors.append(("G4", "строка %d: snap длится %d мс" % (n, anim)))
             if row["blocks_input"] and anim > MAX_BLOCKING_MS and row["on_new_event"] != "none":
@@ -1537,6 +1543,7 @@ def check_death(lines):
     screens = []
     combat_fall = {}
     combat_contact = {}
+    hitches = _hitch_windows(lines)
     for n, raw in enumerate(lines, 1):
         line = raw.rstrip("\r\n")
         cf = parse_combat(line)
@@ -1627,7 +1634,13 @@ def check_death(lines):
             if cft is None:
                 errors.append(("DS4", "%s/%s: staged=1 без этапа fall постановки" % (seq, fighter)))
             elif not 0 <= ft - cft <= DEATH_MS["frame_tolerance"]:
-                errors.append(("DS4", "%s/%s: падение через %d мс после этапа fall постановки" % (seq, fighter, ft - cft)))
+                # VC Frames (ВР-VC-33): a capture stall `SHOT hitch` between the staging's fall and the death's fall
+                # frame is subtracted (less one 17 мс frame), counted as ds4_hitch
+                c = _hitch_corrected(hitches, cft, ft) if hitches and ft > cft else None
+                if c is not None and 0 <= c <= DEATH_MS["frame_tolerance"]:
+                    summary["ds4_hitch"] = summary.get("ds4_hitch", 0) + 1
+                else:
+                    errors.append(("DS4", "%s/%s: падение через %d мс после этапа fall постановки" % (seq, fighter, ft - cft)))
         if hero:
             summary["death_heroes"] += 1
             hero_gone.append((ft, gone_t, seq, fall["staged"] == "1"))

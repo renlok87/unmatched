@@ -115,6 +115,20 @@ class HudContractTests(unittest.TestCase):
         hand = ["SHOT widget id=UI-HUD-HAND state=own bbox=(0,0,0,0) geom=unpainted visible=1 stable=0"]
         self.assertTrue(any("geom=unpainted" in e for e in hc.check_widget_trace(hand, hc.ui_ids_from_02(SPEC02))[0]))
 
+    def test_plate_painted_by_its_own_line(self):
+        # VC Frames (ВР-VC-34): the packaged client writes the widget line in the request frame (stable=0) - the plate's
+        # own `SHOT plate … geom=painted stableFrames>=2` line of a later cycle proves the plate was drawn
+        w = ("SHOT widget id=plate impl=umg state=own fighter=f-0-hero bbox=(0,0,0,0) geom=unpainted visible=1 twin=0 "
+             "source=/Game/S08/UI/ArtHud/WBP_S08ArtPlate frame=10 stable=0")
+        own = ("SHOT plate fighter=f-0-hero bbox=(197,420,465,530) overlapReachable=0 placement=left gap=6 "
+               "anchor=(1,1,2,2) planned=(197,420,465,530) geom=painted stableFrames=3")
+        stats = {}
+        self.assertEqual(hc.check_widget_trace([own, "SHOT late end", w], set(), stats=stats)[0], [])
+        self.assertEqual(stats, {"plate_settling": 1, "plate_painted": 1})
+        # an unpainted own line does not count
+        self.assertTrue(any("ни разу не нарисована" in e
+                            for e in hc.check_widget_trace([own.replace("geom=painted", "geom=unpainted"), w], set())[0]))
+
 
 if __name__ == "__main__":
     unittest.main()

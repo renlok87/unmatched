@@ -1,0 +1,391 @@
+{
+ "note": "VC Frames (feat/visual-close, not integrated). Numbers only; concept-derived values are the gate outputs (ENV-U3).",
+ "packages": {
+  "p1": {
+   "commit": "3e641bbb",
+   "used": "scenario check sc-marm .. lost-marm, moved to runs-p1 (heal probe fired on ability damage: deduplicated «+N»)"
+  },
+  "p2": {
+   "commit": "8827118d",
+   "sourceHash": "1bca0e5a",
+   "used": "every run below"
+  },
+  "p3": {
+   "commit": "044cc788",
+   "sourceHash": "1f235461",
+   "used": "scr-rc-expired rerun (ВР-VC-35)"
+  }
+ },
+ "runs": [
+  "2026-10-09T08:08:05 sc-marm try=0 exit=0 116s",
+  "2026-10-09T08:10:27 sc-sarp try=0 exit=0 142s",
+  "2026-10-09T08:11:55 rm-marm try=0 exit=1 88s",
+  "2026-10-09T08:14:04 lost-marm try=0 exit=0 129s",
+  "2026-10-09T08:14:52 scr-boot-err try=0 exit=0 47s",
+  "2026-10-09T08:15:15 scr-login-server try=0 exit=0 24s",
+  "2026-10-09T08:15:40 scr-boot-resume try=0 exit=0 25s",
+  "2026-10-09T08:17:31 scr-lobby-err try=0 exit=0 111s",
+  "2026-10-09T08:19:03 scr-vsai-marm try=0 exit=0 92s",
+  "2026-10-09T08:20:09 scr-rc-expired try=0 exit=0 66s",
+  "2026-10-09T08:21:38 bench-draw-marm try=0 exit=0 89s",
+  "2026-10-09T08:23:07 bench-draw-sarp try=0 exit=0 89s",
+  "2026-10-09T08:24:11 scr-boot-resume try=0 exit=0 28s",
+  "2026-10-09T08:26:24 rm-marm try=0 exit=0 132s",
+  "2026-10-09T08:28:18 pv-marm try=0 exit=0 114s",
+  "2026-10-09T08:30:40 pv-sarp try=0 exit=0 142s",
+  "2026-10-09T08:32:29 duel-marm try=0 exit=0 110s",
+  "2026-10-09T08:34:36 duel-sarp try=0 exit=0 127s",
+  "2026-10-09T08:34:52 probe try=0 exit=0 16s",
+  "2026-10-09T08:36:11 vsai-marm try=0 exit=0 78s",
+  "2026-10-09T08:37:27 vsai-sarp try=0 exit=0 76s",
+  "2026-10-09T08:38:17 vsai-abort try=0 exit=0 51s",
+  "2026-10-09T09:04:58 arc-sarp try=0 exit=0 96s",
+  "2026-10-09T09:17:25 scr-rc-expired try=0 exit=0 69s"
+ ],
+ "gwidget_gcue": {
+  "duel-marm/duel-20261009-083041/duel-client-host.trace.log": {
+   "gwidget": "PASS",
+   "plate_settling": 1,
+   "gcue": "PASS",
+   "sound_late_hitch": 1
+  },
+  "duel-marm/duel-20261009-083041/duel-client-joiner.trace.log": {
+   "gwidget": "PASS",
+   "plate_settling": 1,
+   "gcue": "PASS",
+   "sound_late_hitch": 1
+  },
+  "duel-sarp/duel-20261009-083231/duel-client-host.trace.log": {
+   "gwidget": "PASS",
+   "plate_settling": 1,
+   "gcue": "PASS",
+   "sound_late_hitch": 1
+  },
+  "duel-sarp/duel-20261009-083231/duel-client-joiner.trace.log": {
+   "gwidget": "PASS",
+   "plate_settling": 1,
+   "gcue": "PASS",
+   "sound_late_hitch": 1
+  },
+  "lost-marm/combat-20261009-081158/combat-client-host.trace.log": {
+   "gwidget": "PASS",
+   "plate_settling": 1,
+   "gcue": "PASS",
+   "sound_late_hitch": 1
+  },
+  "lost-marm/combat-20261009-081158/combat-client-joiner.trace.log": {
+   "gwidget": "PASS",
+   "plate_settling": 1,
+   "gcue": "PASS",
+   "sound_late_hitch": 1
+  },
+  "pv-marm/combat-20261009-082625/combat-client-host.trace.log": {
+   "gwidget": "PASS",
+   "plate_settling": 1,
+   "gcue": "PASS",
+   "sound_late_hitch": 1
+  },
+  "pv-marm/combat-20261009-082625/combat-client-joiner.trace.log": {
+   "gwidget": "PASS",
+   "plate_settling": 1,
+   "gcue": "PASS",
+   "sound_late_hitch": 1
+  },
+  "pv-sarp/combat-20261009-082819/combat-client-host.trace.log": {
+   "gwidget": "PASS",
+   "plate_settling": 1,
+   "gcue": "PASS",
+   "sound_late_hitch": 1
+  },
+  "pv-sarp/combat-20261009-082819/combat-client-joiner.trace.log": {
+   "gwidget": "FAIL",
+   "plate_settling": 2,
+   "gcue": "PASS",
+   "sound_late_hitch": 1
+  },
+  "rm-marm/combat-20261009-082413/combat-client-host.trace.log": {
+   "gwidget": "FAIL",
+   "plate_settling": 1,
+   "gcue": "FAIL",
+   "sound_late_hitch": 1
+  },
+  "rm-marm/combat-20261009-082413/combat-client-joiner.trace.log": {
+   "gwidget": "PASS",
+   "plate_settling": 1,
+   "gcue": "PASS",
+   "sound_late_hitch": 1
+  },
+  "sc-marm/combat-20261009-080612/combat-client-host.trace.log": {
+   "gwidget": "PASS",
+   "plate_settling": 1,
+   "gcue": "PASS",
+   "sound_late_hitch": 1
+  },
+  "sc-marm/combat-20261009-080612/combat-client-joiner.trace.log": {
+   "gwidget": "FAIL",
+   "plate_settling": 2,
+   "gcue": "PASS",
+   "sound_late_hitch": 1
+  },
+  "sc-sarp/combat-20261009-080808/combat-client-host.trace.log": {
+   "gwidget": "FAIL",
+   "plate_settling": 1,
+   "gcue": "PASS",
+   "sound_late_hitch": 1
+  },
+  "sc-sarp/combat-20261009-080808/combat-client-joiner.trace.log": {
+   "gwidget": "PASS",
+   "plate_settling": 1,
+   "gcue": "PASS",
+   "sound_late_hitch": 1
+  },
+  "scr-boot-err/client.trace.log": {
+   "gwidget": "PASS",
+   "plate_settling": 1,
+   "gcue": "PASS",
+   "sound_late_hitch": 1
+  },
+  "scr-boot-resume/client.trace.log": {
+   "gwidget": "PASS",
+   "plate_settling": 1,
+   "gcue": "PASS",
+   "sound_late_hitch": 1
+  },
+  "scr-lobby-err/client.trace.log": {
+   "gwidget": "PASS",
+   "plate_settling": 1,
+   "gcue": "PASS",
+   "sound_late_hitch": 1
+  },
+  "scr-login-server/client.trace.log": {
+   "gwidget": "PASS",
+   "plate_settling": 1,
+   "gcue": "PASS",
+   "sound_late_hitch": 1
+  },
+  "scr-rc-expired/client.trace.log": {
+   "gwidget": "PASS",
+   "plate_settling": 1,
+   "gcue": "PASS",
+   "sound_late_hitch": 1
+  },
+  "scr-vsai-marm/client.trace.log": {
+   "gwidget": "PASS",
+   "plate_settling": 1,
+   "gcue": "PASS",
+   "sound_late_hitch": 1
+  },
+  "vsai-abort/vsai-abort-20261009-083728/vsai-abort-client.trace.log": {
+   "gwidget": "PASS",
+   "plate_settling": 1,
+   "gcue": "PASS",
+   "sound_late_hitch": 1
+  },
+  "vsai-marm/vsai-20261009-083454/vsai-client.trace.log": {
+   "gwidget": "PASS",
+   "plate_settling": 1,
+   "gcue": "PASS",
+   "sound_late_hitch": 1
+  },
+  "vsai-sarp/vsai-20261009-083612/vsai-client.trace.log": {
+   "gwidget": "PASS",
+   "plate_settling": 1,
+   "gcue": "PASS",
+   "sound_late_hitch": 1
+  }
+ },
+ "sarpedonBenchPkg": {
+  "views": "K1 / Fitx1.45 / K2x1.6 / K2x2.5, RENDER reference=1 (8 lines), backdrop=lit3d(default)",
+  "G2": {
+   "frame-south-K1": 1.033,
+   "frame-east-K1": 0.656,
+   "frame-west-K1": 0.559,
+   "frame-north-K1": 0.901,
+   "frame-west-K2x1p6": 0.503,
+   "frame-north-K2x1p6": 0.831,
+   "frame-south-Fitx1p45": 1.03,
+   "frame-east-Fitx1p45": 0.639,
+   "frame-west-Fitx1p45": 0.552,
+   "frame-north-Fitx1p45": 0.905,
+   "medusaK2x1p6": 0.843
+  },
+  "G4ssimQuarter": 0.4908,
+  "G4ssimQuarterRerun": 0.4906,
+  "G5K1": {
+   "mapY": 105.2,
+   "surroundY": 40.1,
+   "surround/map": 0.381,
+   "warm": 0.137,
+   "ringDL50": 36.7
+  },
+  "G5zones": {
+   "view": "K1",
+   "map": "sarpedon",
+   "pair": "blue-purple",
+   "dE76": 25.076
+  },
+  "G6": {
+   "lantern-bay": 2.988,
+   "lantern-left": 1.129,
+   "lantern-stern": 0.902,
+   "lantern-rail": 0.807,
+   "lantern-deck-n": 0.899,
+   "lantern-deck-se": 0.893
+  },
+  "V1edgeK1px": 13,
+  "V1fallsBodyDE76": 4.41,
+  "V2fortDE76": 5.31,
+  "F1ssimShipPoly": 0.4447,
+  "V4hullRedDE76": 5.53,
+  "V4hullWallPx245": 0,
+  "V3cannonsP90": {
+   "cannon-1": 22.5,
+   "cannon-2": 13.0,
+   "cannon-3": 16.1
+  },
+  "brazierDefaultRoi": {
+   "roi": [
+    97,
+    577,
+    225,
+    715
+   ],
+   "minSat": 0.0,
+   "flamePx": 4601,
+   "bboxPx": [
+    108,
+    606,
+    217,
+    714
+   ],
+   "height": 109,
+   "width": 110,
+   "hOverW": 0.991,
+   "tongues": 2,
+   "redShare": 0.005,
+   "prominenceMinPx": 10.9
+  },
+  "brazierC2Box": {
+   "roi": [
+    128,
+    577,
+    200,
+    692
+   ],
+   "height": 86,
+   "width": 72,
+   "hOverW": 1.194,
+   "tongues": 1,
+   "c2EditorSameBox": {
+    "height": 87,
+    "hOverW": 1.208,
+    "tongues": 2
+   }
+  }
+ },
+ "sarpedonLivePkgG7": {
+  "pairs": {
+   "Fitx1p45-vs-Fitx1p450": {
+    "foliage": 6.34,
+    "sea-NE": 1.74,
+    "waterfall": 23.51,
+    "fire-fort": 26.15,
+    "fire-brazier": 25.43,
+    "banner-rect": 8.08,
+    "banner-cloth": 6.47,
+    "foliage-crowns": 14.85
+   },
+   "K1-vs-K1x1p0": {
+    "foliage": 1.57,
+    "sea-NE": 0.0,
+    "waterfall": 24.2,
+    "fire-fort": 12.13,
+    "fire-brazier": 43.08,
+    "foliage-crowns": 3.53
+   }
+  },
+  "brazierLightStd": 1.847,
+  "brazierMeanLuma": [
+   66.16,
+   68.714,
+   62.827,
+   67.382,
+   66.212,
+   64.962
+  ],
+  "frameGapFrames": 363,
+  "flickerInTrace": "fire-brazier flicker=0.50@1.4Hz (= editor C2)"
+ },
+ "marmorealD6Pkg": {
+  "gatesPkg": {
+   "K1": {
+    "D1": "FAIL",
+    "D2": "PASS",
+    "D3": "PASS",
+    "D4gain": "FAIL",
+    "D4edge": "FAIL",
+    "H2": "PASS"
+   },
+   "K2x1p6": {
+    "D1": "FAIL",
+    "D2": "PASS",
+    "D3": "PASS",
+    "H2": "PASS"
+   },
+   "K2x2p5": {
+    "D1": "PASS",
+    "D2": "PASS",
+    "D3": "PASS",
+    "H2": "PASS",
+    "D6:medusa": "PASS",
+    "D6:harpy-a": "PASS",
+    "D6:harpy-b": "PASS",
+    "D6:harpy-c": "PASS"
+   }
+  },
+  "gatesC1Editor": {
+   "K1": {
+    "D1": "FAIL",
+    "D2": "PASS",
+    "D3": "PASS",
+    "D4gain": "FAIL",
+    "D4edge": "PASS",
+    "H2": "PASS"
+   },
+   "K2x1p6": {
+    "D1": "FAIL",
+    "D2": "PASS",
+    "D3": "PASS",
+    "H2": "PASS"
+   },
+   "K2x2p5": {
+    "D1": "FAIL",
+    "D2": "PASS",
+    "D3": "PASS",
+    "H2": "PASS",
+    "D6:medusa": "PASS",
+    "D6:harpy-a": "PASS",
+    "D6:harpy-b": "PASS",
+    "D6:harpy-c": "PASS"
+   }
+  },
+  "D1pkg": {
+   "K1": 0.9979,
+   "K2x1p6": 0.9598,
+   "K2x2p5": 1.0173
+  },
+  "D1C1": {
+   "K1": 0.9951,
+   "K2x1p6": 0.9771,
+   "K2x2p5": 0.9772
+  },
+  "noteD4": "D4 compares on vs off: the packaged on-frame is measured against the C1 editor off-frame, so D4 is not read here; D6 needs the on-frame only (references + masks)",
+  "masks": "C1 off / mask runs (C:/tmp/visual/VC/C1/runs/marmoreal-off, -maskbody, -maskfig)"
+ },
+ "faceCapTrace": "FACING fighter=f-0-hero ... off=10 cap=10 on both boards; harpies cap=45",
+ "ueTests": {
+  "full": "555 / 556 on 8827118d (Unmatched.S08.Hud.Screens.Pause.Tree: engine MTAccessDetector data-race ensure, as in C3)",
+  "screensRerun": "25 / 25 on 044cc788 (Unmatched.S08.Hud.Screens)"
+ },
+ "pytest": "814 passed, 3 skipped (tools/art/tests, tools/art/map_surface, tools/s08/hud_contract, tools/s08/cue_contract, tools/art/cards); contracts after ВР-VC-33 / -34: 152 passed; cue_contract validate-table 18, run-fixtures 22 / 0"
+}

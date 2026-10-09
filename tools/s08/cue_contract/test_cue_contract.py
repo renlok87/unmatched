@@ -923,6 +923,35 @@ class SoundGateTests(unittest.TestCase):
         self.assertEqual(self.codes([AUDIO_START, hitch2, step]), set())
         self.assertIn("AU6", self.codes([AUDIO_START, step]))
 
+    def test_reduced_and_death_with_capture_hitch(self):
+        # VC Frames (ВР-VC-33): rm-marm host - CUE-006 under reduced motion `done` 311 мс after its show, all of it but
+        # 48 мс a capture stall (SHOT hitch 263 мс) -> no G4 (g4_hitch); sc-marm host - a staged death's fall 231 мс after
+        # the staging's fall, inside one stall -> no DS4 (ds4_hitch). Without the hitch both stay errors.
+        rows = cc.rows_by_id(TABLE)
+        cue = next(r for r in rows.values() if r["reduced_motion"]["mode"] == "shorten" and not r["blocks_input"])
+        cid, mx = cue["id"], cue["reduced_motion"]["max_ms"]
+        shown = ("CUE fx id=%s subject=card seq=25 t=62558 vfx=- sfx=- clip=- mat=- socket=- reduced=1 result=spawned"
+                 % cid)
+        done = "CUE fx done id=%s subject=card seq=25 t=62869 ms=311 cut=0" % cid
+        hitch = "SHOT hitch file=s09-combat-result.png t0=62606 t1=62869 ms=263"
+        errs, summary = cc.check_trace([shown, hitch, done], TABLE)
+        self.assertEqual([e for e in errs if e[0] == "G4"], [])
+        self.assertEqual(summary.get("g4_hitch"), 1)
+        errs, _ = cc.check_trace([shown, done], TABLE)
+        self.assertTrue(any(e[0] == "G4" for e in errs), (cid, mx))
+        fall_c = "CUE combat seq=19 stage=fall t=66564 target=f-0-sk0"
+        fall_d = ("CUE death seq=19 stage=fall t=66795 fighter=f-0-sk0 hero=0 staged=1 settle=875 still=0 dissolve=400 "
+                  "style=ash gone=68070")
+        mark = "CUE death seq=19 stage=mark t=67445 fighter=f-0-sk0 heart=crossed"
+        dis = "CUE death seq=19 stage=dissolve t=67670 fighter=f-0-sk0 ms=400 style=ash"
+        gone = "CUE death seq=19 stage=gone t=68070 fighter=f-0-sk0"
+        hitch2 = "SHOT hitch file=s09-exit-cursor-button.png t0=66549 t1=66795 ms=246"
+        d_errs, d_sum = cc.check_death([hitch2, fall_c, fall_d, mark, dis, gone])
+        self.assertEqual([e for e in d_errs if e[0] == "DS4"], [])
+        self.assertEqual(d_sum.get("ds4_hitch"), 1)
+        d_errs, _ = cc.check_death([fall_c, fall_d, mark, dis, gone])
+        self.assertTrue(any(e[0] == "DS4" for e in d_errs))
+
     def test_result_sting_with_the_screen(self):
         screen = "RESULT screen seq=50 t=9000 due=9000 gameOver=9000 heroGone=- wait=0"
         self.assertIn("AU7", self.codes([AUDIO_START, screen]))

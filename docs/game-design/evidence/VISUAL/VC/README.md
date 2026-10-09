@@ -396,3 +396,159 @@ VS-7, после — editor-build, 720p 150 %): «AI Bot» кончался на
   `scraped-data/derived/ue-media-v1/avatars/t-rex.png` (или повторить `convert_card_media.py` и импорт `--portraits`).
 - Цена не мерилась (правило 2026-10-08): новых систем нет; строка `SHOT hitch` — одна на снимок.
 - Клиенты editor-build, коммандлет и UBT завершились сами; лишних процессов нет. Новых флагов отката нет.
+
+## Frames — пакет, живые сценарии, состояния экранов, подтверждение C1…C4, гейты (CLOSEOUT п. 6, 7 + приёмка C1…C4)
+
+`git merge fix/admin-panel` — «Already up to date» (`5f18c526` уже в ветке). Коммиты шага: `3e641bbb` (review-хуки
+сценариев, PauseDrive / EndDrive / бенч ничьей, прокси S10, `run-combat-demo.ps1`), `8827118d` (хук лечения только на
+постановке боя), `044cc788` (карточка «Сессия истекла» без старого Slate-пульта), документы и гейт-инструменты —
+следующий коммит. Скрипты прогонов вне git — `C:/tmp/visual/VC/F/` (`run-vc.ps1`, `run-list.ps1`, `summary.txt`).
+Перед упаковкой хуки проверены двумя editor-build прогонами (`editor/chk-*`), найденное исправлено до пакета 1.
+
+**Три упаковки вместо одной (ВР-VC-37)**, каждая исправляла найденное прогоном (правило «собрать все проблемы прогона»):
+
+| Пакет | Что на нём | Почему следующий |
+|---|---|---|
+| `3e641bbb` | сценарии sc / rm / lost обеих досок (`runs-p1`) | хук лечения срабатывал на уроне способности (взгляд Medusa): «+N» того же seq отбрасывался дедупликацией чисел, кадр `s09-fx25` пропускался |
+| **`8827118d`** (sourceHash `1bca0e5a…`) | **все прогоны и гейты ниже**, бенчи C1 / C2 | кадр «Сессия истекла» показал за карточкой старый Slate-пульт оператора и лог трассы |
+| `044cc788` (`1f235461…`) | повтор только `scr-rc-expired` (ВР-VC-35) | — |
+
+Каждый пакет — `package-client.ps1 -SkipBuild` после сборки игровой цели, кук «Success - 0 error(s), 0 warning(s)»; новых /
+переименованных `Config/**.json` нет (ловушка makefile не сработала). Два клиента — по 30 FPS на процесс (`t.MaxFPS 30`).
+G-LOOK по всем packaged-трассам: `ARTLOOK board=marmoreal-original backdrop=paste(default)` (52 строки),
+`sarpedon-original backdrop=lit3d(default)` (9), `heroes=v2`, `FIGHTERS synced n=6`.
+
+### Решения
+
+| № | Решение | Почему |
+|---|---|---|
+| ВР-VC-27 | Токен плана S09 `refuse` (только с `-ArtPreview`): раз за партию в своём черновике манёвра выбирается герой и нажимается ближайшая к нему пустая клетка вне его досягаемости — настоящим вводом (`MoveInput` press + release → CUE-004, штамп FX-10, тост why.*); кадр `s09-fx10-refuse.png` через 80 мс, черновик ждёт файл ≤ 12 с, дальше ход как раньше | отказ хода в автопрогонах не случается (автопилот выбирает только законные клетки) |
+| ВР-VC-28 | Токен `sidekickfirst`: помощники ближнего боя идут к врагу первыми и атакуют первыми; герой не подходит и не атакует до первой атаки помощника (не дольше 10 своих ходов); кадр `s09-an24-harpy-lunge.png` — выпад гарпии +100 мс (`-S08ExitShots`); `run-combat-demo.ps1` публикует `s09-an24*.png` | план демо берёт «первую законную пару» — атака гарпии не выпадала ни в одном прогоне фазы 3 |
+| ВР-VC-29 | `-ArtPreviewHealProbe` (только с `-ArtPreview`): первый **поставленный боевой** урон живому King Arthur отвечается одним лечением того же размера по пути FX-25 (CUE-012 в конце постановки, точки, «+N», «+» IC-49 под reduced motion, кадр хука). Сервер не трогается: HP в HUD — серверное. Лечение только на постановке боя: урон способности делит seq с «−N» того же кадра, и «+N» отбрасывался (пакет 1) | в колодах демо лечит только The Holy Grail — Arthur защищается ею и кончает бой с HP ≤ 4; за ~90 с демо так не бывает |
+| ВР-VC-30 | Истечение сессии в партии — прокси `S10_EXPIRE_AFTER_DROP=1`: после обрыва WS каждый GraphQL-запрос получает `UNAUTHENTICATED` (и refreshTokens), WS отвергается; `-S08EndDrive=expired` ждёт карточку | GD-038 expired раньше был только в тесте |
+| ВР-VC-31 | `run-combat-demo.ps1 -ClientExtraArgs` режется только перед `-` | значение флага может нести свой список через `+` (`-S08PauseDrive=indefense+open`) |
+| ВР-VC-32 | PAUSE defense / syncing: `-S08PauseDrive` получил `indefense` (открытое окно защиты) и `insyncing` (команда в полёте ≥ 800 мс); для syncing прокси держит ответ первого `beginManeuver` каждого клиента 5 с и **кадры WS** того же окна (`S10_HOLD_WS_WITH_DELAY=1`) | снапшот по WS снимал «в полёте» раньше ответа HTTP (`MS-NET gate released by snapshot`) — без удержания потока syncing длился < 300 мс |
+| ВР-VC-33 | G-CUE: G4 (сокращённая анимация под reduced motion) и DS4 (падение в кадр этапа fall) вычитают остановку кадра съёмки `SHOT hitch` внутри окна (без одного кадра 17 мс), счётчики `g4_hitch` / `ds4_hitch` | как ВР-VC-21 для AU5 / AU6: `done` CUE-006 и падение гарпии пришли в первом кадре после остановки 246–263 мс |
+| ВР-VC-34 | G-WIDGET: «табличка нарисована» — и строка виджета `plate*` geom=painted, и собственная строка `SHOT plate … geom=painted` | packaged-клиент пишет строку виджета в кадре запроса (stable=0) раньше раскладки; табличка при этом нарисована (`stableFrames=3…4`) |
+| ВР-VC-35 | При истечении сессии в партии видимость старого Slate-пульта пересчитывается в тот же кадр, когда маршрут удержан | стадия Failed на кадр раньше показывала за карточкой форму оператора и лог трассы (с кодом комнаты) |
+| ВР-VC-36 | GAMEOVER «ничья» — бенч `-BenchResultDraw` (тело взаимного уничтожения: без winnerId, оба героя HP 0, никто не жив) обеих досок | настоящая ничья в демо-партии недостижима (VS-7 ВР-VS7-79 — то же для поражения) |
+| ВР-VC-37 | Три упаковки | каждая исправляла найденное прогоном (хук лечения, пульт за expired) |
+| ВР-VC-38 | Свет жаровни G7 в packaged-серии 1,85 < 2 записан, повторной серии нет; G6 мерится с исключением грани ящика (как EN-21) | правило скорости 2026-10-08; editor C2 3,00 / 3,39 — причина не только фаза (см. ниже) |
+| ВР-VC-39 | Оставшиеся отказы полной проверки G-WIDGET (`board.damage` unpainted над гибнущей фигурой; табличка, показанная только в 1–2 кадрах снапшота) — замечание HUD, не правились | есть в трассах VS-6 (8 трасс, h / pv / rb); гейты самих демо (HB-48 SHOT widget) — PASS |
+| ВР-VC-40 | rm-marm: `done` CUE-006 через 110 мс под reduced motion (кадр 30 FPS после плановых ≤ 100) — записан, порог не ослаблен | одна строка, квантование тика |
+
+### Живые сценарии (CLOSEOUT п. 6, VS-6 «Открыто» п. 4 и 9) — закрыто
+
+Пакет `8827118d`, 1080p, оба клиента, Marmoreal и Sarpedon original. Прогоны `sc-marm`, `sc-sarp` (`run-combat-demo`,
+host `attack+defend+ownresult+scheme+sidekickfirst+refuse`, joiner `attack+ranged+defend+resolve+refuse`,
+`-ArtPreviewHealProbe`, PauseDrive, прокси удержания), `rm-marm` (то же лечение под `-S08ReducedMotion`), `lost-marm`
+(прокси: обрыв WS на 55 с, переподключение отвергается 12 с). Гейт HB-48 каждого прогона — PASS. Кропы ×4 (цвет | серый,
+только поле — без сканов карт): [AN-24 Marmoreal](F/an24-harpy-lunge-marmoreal-x4.jpg),
+[AN-24 Sarpedon](F/an24-harpy-lunge-sarpedon-x4.jpg), [FX-10 Marmoreal](F/fx10-refuse-marmoreal-x4.jpg),
+[FX-10 Sarpedon](F/fx10-refuse-sarpedon-x4.jpg), [FX-25 Marmoreal](F/fx25-heal-marmoreal-x4.jpg),
+[FX-25 Sarpedon](F/fx25-heal-sarpedon-x4.jpg), [IC-49](F/ic49-heal-reduced-marmoreal-x4.jpg),
+[FX-35](F/fx35-lost-marmoreal-x4.jpg). Полные кадры (HUD со сканами) — вне git, индекс
+[F/data/vc-f-evidence-index.json](F/data/vc-f-evidence-index.json).
+
+| Сценарий | Что в трассе и кадре | Итог |
+|---|---|---|
+| AN-24 атака гарпии с разворотом | Marmoreal: Harpies 2 → Merlin, `FACING f-0-sk1 src=attack from=50 yaw=5 clamped=1 ms=120`, возврат `attack-return … rest=50 ms=150`; Sarpedon: Harpies 3 → King Arthur (`f-0-sk2`, то же); кадр выпада +100 мс снят на обоих клиентах обеих досок (`FXSHOT due … late=18…31`); «3 : 0 Harpies 3 побеждает». Спиной к камере — нет | **закрыто** |
+| FX-10 штамп отказа | `refuse probe … why=why.cell.unreachable / why.cell.no.path`, `HUD-REFUSE at=cell … px=32`, CUE-004; штамп `badge-refuse` у клетки + тост «Не хватает шагов: нужно 7, есть 6» на обоих клиентах обеих досок | **закрыто** (отказ — review-хук ВР-VC-27 через настоящий ввод) |
+| FX-25 лечение «+N» с точками | `FX heal fighter=f-1-hero amount=10 afterCombat=1 motes=spawned`, кадр хука `late=0…1`; «+10» над King Arthur на обеих досках | **закрыто с замечанием**: событие лечения подставлено хуком в конце настоящего боя (ВР-VC-29), сервер не лечил |
+| IC-49 «+» под reduced motion | `amount=2 … motes=reduced`, «+ +2» над HP-биркой Arthur, точек нет | **закрыто с замечанием** (то же) |
+| FX-35 lost на Marmoreal | оба клиента: `HUD-CONN state=lost` → `FX desat on sat=0.64` → кадр `s09-exit-conn-lost` (+0,13 с, RECONNECT auto ещё проявляется) → `FX desat off ms=300 recovered_seq=61` | **закрыто** (VS-6 п. 9) |
+
+### Состояния экранов в пакете (CLOSEOUT п. 7, VS-7 «Открыто» п. 3) — закрыто
+
+Один packaged-клиент (`run-vc.ps1 scr-*`), 1080p, Marmoreal; второй игрок — `room_actor.cjs` или бот VS_AI. Кадры,
+открытые все; в git — JPEG без сканов карт и аватаров:
+
+| Состояние | Как снято | Кадр |
+|---|---|---|
+| BOOT error / retrying (SC-04) | прокси держит первый `heroList` 13 с → баннер через 10 с → «Повторить» | [error](F/sc04-boot-error-1080p-pkg.jpg), [retrying](F/sc04-boot-retrying-1080p-pkg.jpg) |
+| BOOT resume (SC-05) | живая партия VS_AI аккаунта создана после очистки комнат (`vsai.cjs`), вход → модаль «Партия идёт · Ваш герой: Medusa · соперник: T. Rex · Sarpedon · original map» → «В лобби»; партия потом прервана (`ABORTED`) | [resume](F/sc05-boot-resume-1080p-pkg.jpg) |
+| LOGIN busy / error credentials / error server (SC-07) | неверный пароль + прокси `login` 3 с; `-S08Api` на закрытый порт | [busy](F/sc07-login-busy-1080p-pkg.jpg), [credentials](F/sc07-login-error-credentials-1080p-pkg.jpg), [server](F/sc07-login-error-server-1080p-pkg.jpg) |
+| LOBBY error (SC-13) | прокси держит `availableGames` 12 с (> 10 с клиента) | [список](F/sc13-lobby-error-list-1080p-pkg.jpg) |
+| PAUSE confirm — `UUmConfirmDialog` (SC-24, SC-01) | VS_AI: «Покинуть партию» → диалог «Партия прервётся для обоих игроков» → «Отмена» | [диалог](F/sc24-pause-confirm-dialog-1080p-pkg.jpg) |
+| PAUSE defense / syncing (SC-24) | `sc-*`: `indefense+open` → «До конца окна защиты 30 с»; `insyncing+open` → «Покинуть» недоступна, «Синхронизация…» | [defense](F/sc24-pause-defense-1080p-pkg.jpg), [syncing](F/sc24-pause-syncing-1080p-pkg.jpg) |
+| RECONNECT expired (SC-32) | прокси: обрыв WS на 15 с и `UNAUTHENTICATED` дальше → «Сессия истекла — войдите снова», одна главная «Ко входу». На пакете 2 за карточкой был виден старый Slate-пульт (форма, лог трассы с кодом комнаты) — исправлено ВР-VC-35, снято заново на пакете 3 | [expired](F/sc32-reconnect-expired-1080p-pkg.jpg); кадр до правки — вне git |
+| GAMEOVER again / again-busy (SC-37) | VS_AI: «Сыграть ещё» → «Создаём партию…» со спиннером, «В лобби» главная | [кнопки](F/sc37-gameover-again-busy-buttons-1080p-pkg.jpg) |
+| GAMEOVER draw (SC-34) | бенч `-BenchResultDraw` обеих досок (ВР-VC-36): «ВЗАИМНОЕ УНИЧТОЖЕНИЕ», оба портрета серые «Повержен», без «Сыграть ещё» | [Marmoreal](F/sc34-gameover-draw-title-marmoreal.jpg), [Sarpedon](F/sc34-gameover-draw-title-sarpedon.jpg) (полоса заголовка; портреты — вне git) |
+
+Не снято: BOOT resuming (ответ снапшота быстрее 300 мс спиннера) — как в VS-7, без нового инструмента.
+
+### Подтверждение C1…C4 в пакете
+
+**C2 Sarpedon** — свежий packaged `-Bench` K1 / Fitx1,45 / K2×1,6 / K2×2,5 (`live_tune.py bench --packaged`, `RENDER
+reference=1` на 8 строках), `env_gates.py` gates / crit / fire, одна packaged live-серия G7 (`shot --live --clock free`,
+кадр каждые 363 кадра); [K1](F/bench-pkg-K1-sarpedon.jpg) открыт: остров lit3d, у левого края тёмные скалы, шесть фигур v2.
+
+| Пункт | Пакет | Итог |
+|---|---|---|
+| Белое пятно у левого края K1 (C2 a) | левый край — тёмная мокрая скала, кромка K1 13 px | подтверждено |
+| G4-SSIM ≥ 0,49 (C2 b) | 0,4908 (повтор бенча 0,4906) | подтверждено |
+| SSIM корабля (C2 b) | 0,4447 < 0,45 | остаётся FAIL (ВР-VC-10) |
+| Знамя G7 (C2 c) | packaged live: 8,08 / 6,47 % (≥ 5 %) | подтверждено |
+| Свет жаровни G7 (C2 d) | std 1,85 < 2 (яркость 62,8…68,7); в трассе `flicker=0.50@1.4Hz` = editor C2 | **не подтверждено** (ВР-VC-38): editor 3,00 / 3,39, пакет — то же 1,85, что VS-8 до правки; фаза ряда не объясняет совпадение — нужен взгляд ENV на мерцание в пакете |
+| Пламя жаровни (C2 d) | рамка C2 [128, 577, 200, 692]: 86 px / h/w 1,194 / 1 язык (editor C2 87 / 1,208 / 2) | замечание остаётся: в пакете h/w ниже 1,2 на 0,006 |
+| G2 тень под передним краем (C2 e) | юг 1,033 | остаётся открытым (ВР-VC-11) |
+| G5 / G6 / кромка / водопад / форт / борт | G5 K1 105,2 / ΔE зон 25,08; G6 6 из 6 (bay 2,99 … deck-se 0,89 с исключением грани ящика); В-1 13 px, тело водопада ΔE 4,41, форт 5,31, hull-red 5,53, ≥ 245 — 0 | PASS |
+
+**C1 фигуры** — packaged `-Bench` K1 / K2×1,6 / K2×2,5 обеих досок; [лицо Medusa: пакет против editor C1](F/c1-medusa-face-pkg-vs-editor.jpg),
+[цифры гарпий K2×2,5](F/c1-harpy-digits-K2x2p5-pkg-vs-editor.jpg) — в пакете то же, что в editor: на K2×2,5 глаза, нос и
+рот читаются в сером, «2» открыта сверху. Трасса `FACING f-0-hero … off=10 cap=10` (гарпии `cap=45`) на обеих досках.
+D6 Marmoreal по маскам и «off» C1 + packaged «on»: **4 из 4** (Medusa, harpy-a/b/c); D1 0,998 / 0,960 / 1,017 (C1 —
+0,995 / 0,977 / 0,977, артефакт метрики, ВР-VC-04). D4 здесь не читается (сравнивает packaged «on» с editor «off»).
+[Marmoreal K1 пакета](F/bench-pkg-K1-marmoreal.jpg): нарисованный задник, шесть фигур v2.
+
+**C3 VFX** — на packaged-трассах `sc-*`, `pv-*`, `arc-sarp`: кадры хука по собственным часам эффекта — вспышка
+`late=13…14` (`ch=1.00`), звезда `age=0.100`, вихрь `age=0.300…0.325`, дуга FX-32 `age=0.133` (прогон `arc-sarp` с
+`abilityboost` у Arthur); угасание шевронов `fade=80` (20 строк), старый след `old-fade start/end ms=100` (6 / 6);
+кадр обода защиты FX-17 — 12 кадров на обоих клиентах. Подтверждено.
+
+**C4 гейт-инструменты** — G-WIDGET / G-CUE по 25 packaged-трассам ([data/vc-f-gates.json](F/data/vc-f-gates.json)):
+`plate_settling` считается (6–12 на трассу), `sound_late_hitch` вычитается, `DEMO_EXIT=0` у всех прошедших обёрток.
+Найдено ещё и закрыто в инструментах: G4 / DS4 на остановке съёмки (ВР-VC-33), табличка «нарисована» по собственной строке
+(ВР-VC-34). После них: G-CUE — PASS на всех трассах гейтов (одна строка rm-marm — ВР-VC-40); G-WIDGET — FAIL у 4 трасс
+сценариев / pv по ВР-VC-39 (замечание HUD).
+
+### Гейты (пакет `8827118d`)
+
+| Гейт | Итог |
+|---|---|
+| `run-combat-demo` Marmoreal / Sarpedon (pv, 1080p, exit / screen shots) | **PASS** обе (HB-48: окно защиты, закрытое окно до раскрытия, результат у краёв и в центре, privacy) |
+| `run-duel-demo` Marmoreal / Sarpedon | **PASS** обе (HUD_SHOTS rules 2 privacy, лобби по трассе) |
+| `run-hud-probe` | **PASS** (rules 3) — один прогон: пробник без бэкенда и доски (ВР-VS7-78) |
+| `run-vs-ai-demo` Marmoreal / Sarpedon | **PASS** обе (VICTORY = winnerSeat, `UI-SCR-GAMEOVER` нарисован) |
+| `run-vs-ai-abort-demo` | **PASS** — один прогон: у скрипта нет параметра доски (Marmoreal по умолчанию) |
+| Сценарии sc / rm / lost / arc (HB-48 демо) | **PASS**; rm-marm с первой попытки упал на `RequireRenderReference` (кадр BOOT до профиля доски), повтор — PASS |
+| G-CUE (C4 + ВР-VC-33) | PASS на всех трассах гейтов (pv, duel, vsai, abort, scr-*); rm-marm host — одна строка G4 110 мс (ВР-VC-40) |
+| G-WIDGET (`check-trace` полностью) | PASS у 21 из 25; FAIL: pv-sarp joiner и sc-marm joiner (табличка показана только в 1–2 кадрах снапшота), rm-marm host и sc-sarp host (`board.damage` unpainted над гибнущей гарпией / под reduced) — ВР-VC-39 |
+| UE `Unmatched.S08+S09+S10` | **555 / 556** на `8827118d`: `Screens.Pause.Tree` — ensure движка MTAccessDetector (гонка данных при асинхронной загрузке, как в C3); группа `Unmatched.S08.Hud.Screens` на финальном `044cc788` — **25 / 25** |
+| pytest `tools/art/tests`, `tools/art/map_surface`, `tools/s08/hud_contract`, `tools/s08/cue_contract`, `tools/art/cards` | **814 passed**, 3 skipped; контракты после ВР-VC-33 / -34 — 152 passed (новые `test_reduced_and_death_with_capture_hitch`, `test_plate_painted_by_its_own_line`); `cue_contract` validate-table 18, run-fixtures 22 / 0 |
+
+Цена не мерилась (правило 2026-10-08): новых систем нет — хуки только с `-ArtPreview`, бенч ничьей — review-режим.
+Новых флагов отката нет (хуки не в обычной игре).
+
+### Процессы и вливание
+
+Клиенты, прокси и `room_actor.cjs` останавливались своими скриптами (по тегу `-VCTag=` / `--vctag=` и пути staged-exe);
+сессия live tune — `quit=true killed=false lockReleased=true`; UBT, UAT и автотесты завершились сами; замок GPU снят.
+При вливании в основную копию: пересобрать UnmatchedEditor и скопировать staged-сборку `sync-staged-build.ps1 -From
+C:/tmp/wt-visual` (штамп `044cc788`); вне git — коммандлеты C2 и портрет T. Rex C4 (см. разделы C2, C4).
+
+## Итог VC
+
+| CLOSEOUT п. | Итог | Где |
+|---|---|---|
+| 2 Sarpedon: SSIM корабля, G4, IoU знамени, G2 | G4 ≥ 0,49 закрыт (пакет 0,4908); SSIM корабля 0,4447, IoU знамени 0,32, G2 юг 1,03 — **остаются открытыми** (ENV: новая геометрия / маска знамени / полоса контактной тени) | C2, Frames |
+| 3 белое пятно K1 | **закрыто** (C2, подтверждено в пакете) | C2 |
+| 4 G7 знамени и жаровни, пламя | знамя **закрыто** (пакет 8,1 / 6,5 %); пламя — **закрыто с замечанием** (пакет h/w 1,19); свет жаровни — **остаётся открытым** (пакет 1,85, ВР-VC-38) | C2, Frames |
+| 5 Medusa лицо K2, гарпии D6, D1 | **закрыто с замечаниями** (C1; в пакете то же, D6 4 / 4) | C1, Frames |
+| 6 живые сценарии | AN-24, FX-10, FX-35 **закрыто**; FX-25 / IC-49 **закрыто с замечанием** (событие лечения — хук) | Frames |
+| 7 состояния экранов в пакете | **закрыто** (draw — бенчем; resuming не снят) + исправлен пульт за expired (ВР-VC-35) | Frames |
+| 8 G-WIDGET `plate*`, T. Rex | **закрыто с замечанием** (C4 + ВР-VC-34; остаток ВР-VC-39 — HUD) | C4, Frames |
+| 9 G-CUE AU5 / AU6 | **закрыто** (C4; в пакете + G4 / DS4, ВР-VC-33) | C4, Frames |
+| 10 маски Marmoreal | **закрыто записью** (ВР-VC-24) | C4 |
+| 11 SC-39…SC-43 | остаётся: после MVP (ВР-VC-25) | C4 |
+| 12, 13 D-07 / ACC-022, личный просмотр | остаются за пользователем (ВР-VC-26) | C4 |
