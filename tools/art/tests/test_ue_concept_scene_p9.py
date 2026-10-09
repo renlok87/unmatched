@@ -276,6 +276,9 @@ class Lit3dProfile(unittest.TestCase):
         self.assertEqual(brazier["radius"], 180)
         # VS-8 E1 EN-22: 0.25 -> 0.5 (the G7 std of the pool over 20 live K1 frames 3.7 levels, card 2..8)
         self.assertEqual(brazier["flicker"]["amp"], 0.5)
+        # VC C2 (ВР-VC-06): 1.6 -> 1.37 Hz - the G7 live series (a K1 frame every ~6.3 s) aliased both flicker terms of
+        # 1.6 Hz to nearly the same phase (10.08 / 23.9 cycles); 1.37 Hz keeps the rhythm and decorrelates them
+        self.assertEqual(brazier["flicker"]["hz"], 1.37)
         # the pool must stay off the map cells: the brazier stands > radius from the painted map field
         half = (891.3333 / 2, 577.3333 / 2)
         x, y, z = brazier["loc"]

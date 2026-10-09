@@ -157,6 +157,21 @@ class P9Placements(unittest.TestCase):
         d = self.wall.sdz(np.array(b["loc"], float))[1]
         self.assertAlmostEqual(d, -self.allp["layout"]["details"]["bannerOutUU"], delta=0.05)
 
+    def test_w_foot_gap_closed(self):
+        """VC C2 (ВР-VC-05): K1 showed the pale sea ring through a gap between the W cliff foot and rock-foot-w1 at the
+        left screen edge; a third wet outcrop at the sea level (rock-foot-w0) closes it. It stays on the sea plane, W of
+        w1, off the tray and outside the sea ring's inner hole edge (X -740), with the wet look and no shadow."""
+        add = {p["id"]: p for p in LAY["props"]["add"]}
+        w0, w1 = add["rock-foot-w0"], add["rock-foot-w1"]
+        self.assertEqual(w0["loc"][2], -300.0)
+        self.assertLess(w0["loc"][0], -740.0)
+        self.assertLess(w0["loc"][0], w1["loc"][0])
+        self.assertLess(abs(w0["loc"][1] - w1["loc"][1]), 60.0)
+        self.assertFalse(w0["castShadow"])
+        self.assertTrue(w0["material"].endswith("MI_EnvScene_Proj_RockWet"))
+        ids = [r["id"] for r in CS.params()["layout"]["footRocks"]]
+        self.assertEqual(ids[:3], ["rock-foot-w1", "rock-foot-w2", "rock-foot-w0"])
+
     def test_fx_plan_merge(self):
         import tempfile
         anchors = LAY["conceptScene"]["fxAnchors"]
