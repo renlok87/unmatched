@@ -736,3 +736,8 @@ Invoke-PendingDemo
 if ($Script:CleanupFailure) {
   throw "scoped cleanup did not verify ABORTED for this run's game: $($Script:CleanupFailure)"
 }
+
+# VC C4 (VR-VC-22): an explicit exit code. Without it a caller's $LASTEXITCODE after '& <this script>' is the last
+# native command inside (e.g. a negative-control gate that must return 1) - the wrappers printed DEMO_EXIT=1 on a
+# passing run. A failure above throws (non-zero); reaching this line means the run passed.
+exit 0

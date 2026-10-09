@@ -215,3 +215,8 @@ if (Test-StateImage $maneuver 'discard') { throw "swapped image (maneuver as dis
 Write-Output 'negative controls ok: board-only and both swapped pairs fail the state gates'
 
 Write-Output "PROBE PASS (staging kept for inspection): $Dir"
+
+# VC C4 (VR-VC-22): an explicit exit code. Without it a caller's $LASTEXITCODE after '& <this script>' is the last
+# native command inside (e.g. a negative-control gate that must return 1) - the wrappers printed DEMO_EXIT=1 on a
+# passing run. A failure above throws (non-zero); reaching this line means the run passed.
+exit 0

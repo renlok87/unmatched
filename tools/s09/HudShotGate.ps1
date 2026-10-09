@@ -27,6 +27,7 @@ function Invoke-HudShotGate {
   try {
     $null = & $python.Source @argv 2>&1
     $code = $LASTEXITCODE
+    $global:LASTEXITCODE = 0  # VC C4 (VR-VC-22): the result is in $code; a negative control's 1 must not leak out
   } finally {
     $env:PYTHONIOENCODING = $oldEnc
   }
