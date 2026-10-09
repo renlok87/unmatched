@@ -90,16 +90,20 @@ DETAIL_MIS = {
     # P7c: the painted banner (concept at C0: cloth median sRGB (57, 13, 13), sigil lines up to (178, 113, 71)). Tuned in
     # UE frames at C0 (t3: Fill 0.7 + ClothA 0.32 read (117, 52, 47) - the key / lantern light dominates the lit cloth):
     # albedo ~ the painted scene value / the measured irradiance (~2), a small emissive fill
+    # VC C2 (ВР-VC-07 by delegation): Wind (amp uu, Hz, phase / v, side ratio) 3.0 / 0.35 / 5 / 0.35 -> 3.6 / 0.40 / 5 / 0.55:
+    # the G7 live pair (~6.3 s apart) caught the 0.35 Hz sway near the same phase (banner-cloth 3.6-4.2 % < 5 in four
+    # editor series, 3.8 % packaged); 0.40 Hz + a wider sideways sway -> 9.0 %. The sigil stays (a larger, higher star
+    # read closer to the painted one by eye but lowered the ship-polygon SSIM cells under it: 0.277 / 0.130 -> 0.232 / 0.108)
     DETAIL_FOLDER + "/MI_EnvCP_Banner": (
         DETAIL_FOLDER + "/M_EnvCP_Banner",
         {"WindLive": 0.0, "Fill": 0.1, "SigilBoost": 2.0, "Aspect": 4.0, "Roughness": 0.85},
         {"ClothA": (0.15, 0.033, 0.032, 1.0), "ClothB": (0.07, 0.014, 0.014, 1.0), "Sigil": (0.42, 0.19, 0.11, 1.0),
          "Rod": (0.05, 0.034, 0.024, 1.0), "SigilC": (0.5, 0.5, 0.46, 0.024),
-         "Wind": (3.0, 0.35, 5.0, 0.35)},
+         "Wind": (3.6, 0.4, 5.0, 0.55)},
     ),
 }
 DETAIL_MI_TAG = "EnvMapsConceptDetailMi"
-DETAIL_MI_VERSION = "6"
+DETAIL_MI_VERSION = "7"
 # P7c: M_EnvCP_Banner (built here, idempotent by its graph tag) - the HLSL of its two Custom nodes
 BANNER_MATERIAL = DETAIL_FOLDER + "/M_EnvCP_Banner"
 BANNER_GRAPH_TAG = "EnvMapsGraphVersion"
