@@ -24,7 +24,10 @@ Poses: the 7 poses of anim/rig_deform_probe.py (same bones, world axes, angles),
                K2 perspective frames (seams.k2_frames), rendered on the FBX read-back -> work/seams_raw/*.png
                (compose.py builds preview/probe-culled-*.jpg). Labelled "blender Workbench" — editor frames.
 Reads work/sk_authored.blend, work/probe-fbx-authored.blend, work/rig/body_vertex_{part,cap}.npy,
-reports/close-report.json; writes reports/seams-report.json."""
+reports/close-report.json; writes reports/seams-report.json.
+
+Without a weapon part (profile.has_weapon false, D-1) the "bow" entry of objs/labels is None: no weapon surface, rays
+or frames; the figure is body + base. With a weapon (either side) the code path and its numbers are unchanged."""
 
 import json
 import math
@@ -38,6 +41,7 @@ from mathutils.bvhtree import BVHTree
 from mathutils.kdtree import KDTree
 
 from . import bl_util as U
+from . import profile as PR
 from . import raycam
 
 TESTS = [("head_turn", "head", "Z", 35), ("spine_bend_fwd", "spine", "X", 25), ("arm_l_raise", "arm_upper.L", "Y", -45),
@@ -76,6 +80,11 @@ def evaluated(obj):
     co = np.array([obj.matrix_world @ v.co for v in me.vertices])
     ev.to_mesh_clear()
     return co
+
+
+def evaluated_or_none(obj):
+    """evaluated() of an optional mesh (the weapon of a character without one is None)."""
+    return None if obj is None else evaluated(obj)
 
 
 def cap_names(run_dir, names):
@@ -131,7 +140,8 @@ def junction_metric(arm, body, vpart, ppart, polys, radius, pairs_cfg):
 
 
 def loop_metric(arm, objs, labels, cfg, names_by_label, cap_name_of):
-    """objs: {"body": obj, "bow": obj, "base": obj}; labels: {"body": (vpart, vcap, fcap), "bow": part, "base": part}."""
+    """objs: {"body": obj, "bow": obj | None, "base": obj}; labels: {"body": (vpart, vcap, fcap), "bow": part | None,
+    "base": part}."""
     body, bow, base = objs["body"], objs["bow"], objs["base"]
     vpart, vcap, fcap = labels["body"]
     bm = bmesh.new()
@@ -145,12 +155,12 @@ def loop_metric(arm, objs, labels, cfg, names_by_label, cap_name_of):
     bm.free()
     reset_pose(arm)
     rest = evaluated(body)
-    rest_bow = evaluated(bow)
+    rest_bow = evaluated_or_none(bow)
     base_co = U.coords(base.data)
     body_polys = [list(p.vertices) for p in body.data.polygons]
     ppart = np.array([vpart[p[0]] for p in body_polys])
     real = np.array([fcap[i] == 0 for i in range(len(body_polys))])
-    bow_polys = [list(p.vertices) for p in bow.data.polygons]
+    bow_polys = [list(p.vertices) for p in bow.data.polygons] if bow is not None else None
     base_polys = [list(p.vertices) for p in base.data.polygons]
     part_ids = sorted(set(ppart.tolist()))
 
@@ -159,7 +169,8 @@ def loop_metric(arm, objs, labels, cfg, names_by_label, cap_name_of):
         for p in part_ids:
             idx = np.nonzero((ppart == p) & real)[0]
             s[p] = BVHTree.FromPolygons([Vector(c) for c in co], [body_polys[i] for i in idx])
-        s[labels["bow"]] = BVHTree.FromPolygons([Vector(c) for c in co_bow], bow_polys)
+        if bow is not None:
+            s[labels["bow"]] = BVHTree.FromPolygons([Vector(c) for c in co_bow], bow_polys)
         s[labels["base"]] = BVHTree.FromPolygons([Vector(c) for c in base_co], base_polys)
         return s
 
@@ -202,7 +213,7 @@ def loop_metric(arm, objs, labels, cfg, names_by_label, cap_name_of):
                      "_vi": vi, "_d0": best[1], "_w": wv / wv.sum(), "poses": {}})
     for name, _b, _a, _d in TESTS:
         pose(arm, name)
-        co, co_bow = evaluated(body), evaluated(bow)
+        co, co_bow = evaluated(body), evaluated_or_none(bow)
         s = surfaces(co, co_bow)
         for r in rows:
             d = np.array([s[r["cover_label"]].find_nearest(Vector(p))[3] for p in co[r["_vi"]]])
@@ -225,14 +236,15 @@ def ray_scene(objs, labels, co_body, co_bow):
     for i, p in enumerate(body.data.polygons):
         polys.append([co_body[v] for v in p.vertices])
         labs.append(int(vpart[p.vertices[0]]) * 1000 + int(fcap[i]))
-    for p in bow.data.polygons:
-        polys.append([co_bow[v] for v in p.vertices])
-        labs.append(labels["bow"] * 1000)
+    if bow is not None:
+        for p in bow.data.polygons:
+            polys.append([co_bow[v] for v in p.vertices])
+            labs.append(labels["bow"] * 1000)
     bco = U.coords(base.data)
     for p in base.data.polygons:
         polys.append([bco[v] for v in p.vertices])
         labs.append(labels["base"] * 1000)
-    pts = np.vstack([co_body, co_bow, bco])
+    pts = np.vstack([co_body, co_bow, bco] if bow is not None else [co_body, bco])
     return raycam.build(polys, labs), pts
 
 
@@ -247,7 +259,7 @@ def see_through(arm, objs, labels, rcfg, names_by_label):
     extent = None
     for name in ["rest"] + [t[0] for t in TESTS]:
         pose(arm, name)
-        (bvh, lab), pts = ray_scene(objs, labels, evaluated(objs["body"]), evaluated(objs["bow"]))
+        (bvh, lab), pts = ray_scene(objs, labels, evaluated(objs["body"]), evaluated_or_none(objs["bow"]))
         if extent is None:  # one grid (origin, size) for every pose: the rest bounds + margin, so pixel phases match
             lo, hi = pts.min(0) - float(rcfg.get("margin_m", 0.1)), pts.max(0) + float(rcfg.get("margin_m", 0.1))
             extent = np.array([[x, y, z] for x in (lo[0], hi[0]) for y in (lo[1], hi[1]) for z in (lo[2], hi[2])])
@@ -304,6 +316,8 @@ def workbench_frames(scene, arm, objs, bc_path, fcfg, k2cfg, raw):
     tex.image = img
     mat.node_tree.nodes.active = tex
     for o in objs.values():
+        if o is None:  # no weapon mesh
+            continue
         o.data.materials.clear()
         o.data.materials.append(mat)
     cam_data = bpy.data.cameras.new("seams_cam")
@@ -351,14 +365,15 @@ def run(params, profile):
     cfg = dict(DEFAULTS, **profile.get("seams", {}))
     names = sorted(profile["parts"], key=U.part_key)
     names_by_label = {U.part_key(n): n for n in names}
-    bow_label = U.part_key(next(n for n in names if profile["parts"][n]["mesh"] == "weapon"))
+    weapon = PR.has_weapon(profile)
+    bow_label = U.part_key(next(n for n in names if profile["parts"][n]["mesh"] == "weapon")) if weapon else None
     base_label = U.part_key(next(n for n in names if profile["parts"][n]["mesh"] == "base"))
     cap_name_of = cap_names(run_dir, names)
     meshes = profile["meshes"]
     # ---------------- authored .blend
     bpy.ops.wm.open_mainfile(filepath=str(run_dir / "work" / "sk_authored.blend"))
     arm = bpy.data.objects[rig["armature_object"]]
-    objs = {"body": bpy.data.objects[meshes["body"]], "bow": bpy.data.objects[meshes["weapon"]],
+    objs = {"body": bpy.data.objects[meshes["body"]], "bow": bpy.data.objects[meshes["weapon"]] if weapon else None,
             "base": bpy.data.objects[meshes["base"]]}
     vpart = np.load(run_dir / "work" / "rig" / "body_vertex_part.npy")
     vcap_path = run_dir / "work" / "rig" / "body_vertex_cap.npy"
@@ -387,7 +402,7 @@ def run(params, profile):
     scene = bpy.context.scene
     arm_f = next(o for o in scene.objects if o.type == "ARMATURE")
     body_f = next(o for o in scene.objects if o.type == "MESH" and o.name.startswith(meshes["body"]))
-    bow_f = next(o for o in scene.objects if o.type == "MESH" and o.name.startswith(meshes["weapon"]))
+    bow_f = next(o for o in scene.objects if o.type == "MESH" and o.name.startswith(meshes["weapon"])) if weapon else None
     base_f = dst.objects[0]
     kd = KDTree(len(authored_centres))
     for i, c in enumerate(authored_centres):

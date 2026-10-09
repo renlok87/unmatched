@@ -1,0 +1,141 @@
+{
+  "schema": "unmatched.acceptance-tone/1",
+  "rule": {
+    "main_share_min": 0.1,
+    "y_ratio_ok": [
+      0.8,
+      1.25
+    ],
+    "hue_abs_max_deg": 15.0,
+    "y_ratio_loo": "основной класс: экспозиция по остальным классам (без проверяемого, floor и legacy_bake), k_loo / k_класса; у якорного класса нормировки y_ratio = 1 по построению, его яркость проверяет только y_ratio_loo",
+    "family": "same | changed: обе медианы хроматические (sat >= 0.15) и |dHue| > 30 deg, либо переход нейтральный <-> хроматический с |dSat| >= 0.20 — смена семейства (S); светлота и насыщенность внутри семейства — тон (T)",
+    "cap": "1.0 — основной класс вне допуска; 1.5 — только второстепенные; 2.0 — все в допуске; status floor (ld-maps-report grade.median_floor_applied) T не снижает"
+  },
+  "framing": "default",
+  "exposure_k_concept_over_ld": 0.8382,
+  "exposure": {
+    "class": "linen",
+    "mode": "anchor_class",
+    "note": "экспозиция концепт/кадр Blender — по платью (самая большая зона, TeamColor): отношения тонов остальных классов к платью как в концепте; взвешенное среднее по всем классам (0,72) тянут камень/кожа/дерево, которые в концепте в 2 раза темнее, — оно осветлило бы кожу на 40 %"
+  },
+  "anchor_class": "linen",
+  "classes": [
+    {
+      "class": "gold_antique",
+      "pixels_ld": 232446,
+      "y_ratio": 0.988,
+      "d_hue_deg": 1.0,
+      "d_sat": 0.006,
+      "share": 0.1443,
+      "role": "main",
+      "anchor": false,
+      "family": "same",
+      "y_ratio_loo": 0.99,
+      "status": "ok"
+    },
+    {
+      "class": "leather_smooth",
+      "pixels_ld": 85717,
+      "y_ratio": 1.041,
+      "d_hue_deg": -2.3,
+      "d_sat": -0.033,
+      "share": 0.0532,
+      "role": "secondary",
+      "anchor": false,
+      "family": "same",
+      "y_ratio_loo": null,
+      "status": "floor"
+    },
+    {
+      "class": "leather_worn",
+      "pixels_ld": 23980,
+      "y_ratio": 1.203,
+      "d_hue_deg": -1.7,
+      "d_sat": -0.068,
+      "share": 0.0149,
+      "role": "secondary",
+      "anchor": false,
+      "family": "same",
+      "y_ratio_loo": null,
+      "status": "ok"
+    },
+    {
+      "class": "legacy_bake",
+      "pixels_ld": 116785,
+      "y_ratio": 1.072,
+      "d_hue_deg": 0.0,
+      "d_sat": -0.04,
+      "share": 0.0725,
+      "role": "secondary",
+      "anchor": false,
+      "family": "same",
+      "y_ratio_loo": null,
+      "status": "ok"
+    },
+    {
+      "class": "linen",
+      "pixels_ld": 576731,
+      "y_ratio": 1.0,
+      "d_hue_deg": 0.0,
+      "d_sat": -0.014,
+      "share": 0.358,
+      "role": "main",
+      "anchor": true,
+      "family": "same",
+      "y_ratio_loo": 1.01,
+      "status": "ok"
+    },
+    {
+      "class": "skin",
+      "pixels_ld": 175109,
+      "y_ratio": 0.965,
+      "d_hue_deg": -0.8,
+      "d_sat": -0.017,
+      "share": 0.1087,
+      "role": "main",
+      "anchor": false,
+      "family": "same",
+      "y_ratio_loo": 0.963,
+      "status": "ok"
+    },
+    {
+      "class": "stone_base",
+      "pixels_ld": 356286,
+      "y_ratio": 1.582,
+      "d_hue_deg": -2.8,
+      "d_sat": -0.012,
+      "share": 0.2212,
+      "role": "main",
+      "anchor": false,
+      "family": "same",
+      "y_ratio_loo": 1.589,
+      "status": "floor"
+    },
+    {
+      "class": "wood",
+      "pixels_ld": 43759,
+      "y_ratio": 1.466,
+      "d_hue_deg": -3.8,
+      "d_sat": -0.114,
+      "share": 0.0272,
+      "role": "secondary",
+      "anchor": false,
+      "family": "same",
+      "y_ratio_loo": null,
+      "status": "floor"
+    }
+  ],
+  "t_cap": 2.0,
+  "out_of_tolerance": [],
+  "floor_limited": [
+    "leather_smooth",
+    "stone_base",
+    "wood"
+  ],
+  "family_changed_main": [],
+  "warnings": [],
+  "sources": {
+    "measure_report": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/reports/measure-report.json",
+    "maps_report": "art/pipeline-candidates/ASSET-MEDUSA-001/20260929-h2-lookdev/reports/ld-maps-report.json"
+  }
+}

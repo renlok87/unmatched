@@ -12,7 +12,9 @@ Islands: polygons connected through shared (vertex, UV0) corners. The export is 
 determinism pins), then read-back checks against the H2.1 FBX read back in the same process: bones and parents,
 triangles, positions and UV0 of every loop identical, face +X, UV layer order [UVMap, UV1_m], UV1 density.
 
-ld_preview: the same studio light, AgX and orthographic cameras as st_preview (concept framing), materials:
+ld_preview: the same studio light, AgX and orthographic cameras as st_preview (concept framing, framing.py: look-dev
+`frame`, a new character {"checks_report": <checks-report.json of its concept set>, "side": SIDE_VIEW}; without it the
+Medusa H2 canon 1021 x 1540), materials:
   H21   st_preview.pbr_material with the H2.1 4K textures (what M_UM_Figure v1 shows today),
   LD    Principled driven by MatID + LUT (the hero DDS written as EXR for Blender, 16 x 16, rows of build_ue_inputs.py): roughness = LUT typical,
         metallic = LUT, Specular IOR Level = specular x (1 - clothAmount) for Cloth classes (the UE Cloth lobe replaces
@@ -29,6 +31,8 @@ import numpy as np
 from mathutils import Matrix, Vector
 
 from . import bl_util as U
+from . import framing as FR
+from . import profile as PR
 
 
 def load_ld(params):
@@ -161,12 +165,14 @@ def run_fbx(params, profile, ld):
     src_run = repo / ld["source"]["run"]
     rig, meshes = profile["rig"], profile["meshes"]
     scene = U.reset()
-    names = (rig["armature_object"], meshes["body"], meshes["weapon"], meshes["base"])
+    names = (rig["armature_object"],) + PR.figure_mesh_names(profile)  # no weapon mesh without a weapon part (D-1)
     objs = append_figure(src_run / ld["source"]["files"]["sk_authored"], names)
     for o in objs:
         scene.collection.objects.link(o)
     arm = bpy.data.objects[rig["armature_object"]]
-    body, weapon, base = (bpy.data.objects[meshes[k]] for k in ("body", "weapon", "base"))
+    figure = tuple(bpy.data.objects[meshes[k]] for k in PR.figure_roles(profile))  # (body[, weapon], base)
+    skinned = figure[:-1]
+    body, base = figure[0], figure[-1]
     # the atlas image: the H2LD BC (the FBX stores the file name only, path_mode STRIP)
     for mat in bpy.data.materials:
         if mat.use_nodes:
@@ -174,8 +180,8 @@ def run_fbx(params, profile, ld):
                 if n.type == "TEX_IMAGE" and n.image is not None:
                     n.image.filepath = str(run_dir / "textures" / ("%s_BC.png" % ld["prefix"]))
                     n.image.name = "%s_BC.png" % ld["prefix"]
-    uv1 = {o.name: add_uv1(o, ld["uv1"]["layer_name"]) for o in (body, weapon, base)}
-    pre = {o.name: measure.mesh_summary(o) for o in (body, weapon, base)}
+    uv1 = {o.name: add_uv1(o, ld["uv1"]["layer_name"]) for o in figure}
+    pre = {o.name: measure.mesh_summary(o) for o in figure}
     # face polygons (as the rig stage: head part, not a cap, in the face box, facing -Y)
     vpart = np.load(src_run / "work" / "rig" / "body_vertex_part.npy")
     fcap = np.load(src_run / "work" / "rig" / "body_face_cap.npy")
@@ -189,10 +195,10 @@ def run_fbx(params, profile, ld):
     data_scale = float(preset["temporary_data_scale"])
     if bpy.data.filepath:
         raise RuntimeError("bpy.data.filepath must stay empty before the FBX export (deterministic bytes)")
-    core.transform_for_fbx(scene, arm, (body, weapon, base), Matrix.Scale(data_scale, 4) @ rot)
+    core.transform_for_fbx(scene, arm, figure, Matrix.Scale(data_scale, 4) @ rot)
     sk_fbx = run_dir / "export" / ld["exports"]["skeletal_fbx"]
     base_fbx = run_dir / "export" / ld["exports"]["base_fbx"]
-    core.export_pair(scene, arm, (body, weapon), base, preset, sk_fbx, base_fbx)
+    core.export_pair(scene, arm, skinned, base, preset, sk_fbx, base_fbx)
     bone_names = [b[0] for b in rig["bones"]]
     # read back: new FBX and the H2.1 FBX
     sets = {}
@@ -254,7 +260,7 @@ def run_fbx(params, profile, ld):
            "roundtrip": {"ld": {"skeletal": ld_m[0], "base": ld_m[1]}},
            "ue_import_notes": ["UV1_m — второй UV-канал (индекс 1): при импорте SM подставки выключить Generate Lightmap UVs "
                                "или DstLightmapIndex >= 2, иначе UE перезапишет UV1 картой освещения",
-                               "материальный слот тот же (M_Medusa_H2_Atlas), назначается MI v2"],
+                               "материальный слот тот же (%s), назначается MI v2" % profile["materials"]["atlas"]],
            "checks": dict(checks), "failed": checks.failed(), "passed": not checks.failed(), "status": "измерено",
            "claims": {"art_accepted": False, "game_ready": False}}
     U.write_json(run_dir / "reports" / "ld-fbx-report.json", rep)
@@ -418,7 +424,7 @@ def run_preview(params, profile, ld):
     P.area_light(scene, "key", (-1.5, -2.0, 2.0), 250, 1.5)
     P.area_light(scene, "fill", (2.0, -1.5, 1.0), 90, 2.0)
     P.area_light(scene, "rim", (0.5, 2.5, 2.2), 160, 1.5)
-    names = (profile["rig"]["armature_object"], profile["meshes"]["body"], profile["meshes"]["weapon"], profile["meshes"]["base"])
+    names = (profile["rig"]["armature_object"],) + PR.figure_mesh_names(profile)  # body[, weapon], base (D-1)
     objs = append_figure(src_run / ld["source"]["files"]["sk_authored"], names)
     for o in objs:
         scene.collection.objects.link(o)
@@ -476,22 +482,20 @@ def run_preview(params, profile, ld):
         bpy.ops.render.render(write_still=True)
         shots.append({"name": name, "set": tag, "px": list(res), "view_transform": scene.view_settings.view_transform})
 
-    W, H = 1021, 1540
-    top, bottom, base_x = 0.02, 0.968, 0.45
-    height_m = float(profile["scale"]["figure_top_m"]) / (bottom - top)
-    cam_data.type = "ORTHO"
-    cam_data.ortho_scale = height_m
-    cam_data.sensor_fit = "VERTICAL"
-    zc = float(profile["scale"]["figure_top_m"]) - (0.5 - top) * height_m
-    shift = (0.5 - base_x) * height_m * W / H
-    views = {"front": (Vector((shift, -3.0, zc)), (0, -1, 0)), "side": (Vector((3.0, shift, zc)), (1, 0, 0)),
-             "back": (Vector((-shift, 3.0, zc)), (0, 1, 0))}
-    for vn, (loc, d) in views.items():
-        cam.location = loc
-        cam.rotation_euler = (-Vector(d)).to_track_quat("-Z", "Y").to_euler()
-        render("class-%s" % vn, "class", (W, H), class_pass=True)
+    # concept framing (framing.py): look-dev `frame` (a new character: {"checks_report": <its checks-report.json>,
+    # "side": SIDE_VIEW}); without it the Medusa H2 canon 1021 x 1540, which run_measure refuses for a concept of
+    # another aspect (the class pass must lie over the concept pixel for pixel)
+    ocams, side, frame_source = FR.cameras(ld.get("frame"), profile["scale"]["figure_top_m"], params["repo_root"])
+    for vn in FR.VIEWS:
+        oc = ocams[vn]
+        cam_data.type = "ORTHO"
+        cam_data.ortho_scale = oc["ortho_scale"]
+        cam_data.sensor_fit = "VERTICAL"
+        cam.location = Vector(oc["loc"])
+        cam.rotation_euler = (-Vector(oc["dir"])).to_track_quat("-Z", "Y").to_euler()
+        render("class-%s" % vn, "class", tuple(oc["px"]), class_pass=True)
         for tag in ("h21", "ld"):
-            render("beauty-%s-%s" % (vn, tag), tag, (W, H))
+            render("beauty-%s-%s" % (vn, tag), tag, tuple(oc["px"]))
     closeups = {c["name"]: c for c in pcfg["closeups"]}
     for name in lcfg.get("closeups", []):
         c = closeups[name]
@@ -501,9 +505,14 @@ def run_preview(params, profile, ld):
         P.look_at(cam, c["target_m"], c["dir"], 2.0)
         for tag in ("h21", "ld"):
             render("closeup-%s-%s" % (name, tag), tag, (900, 900))
-    U.write_json(run_dir / "reports" / "ld-preview-report.json",
-                 {"stage": "ld_preview", "device": device, "samples": lcfg["samples"], "label": lcfg["label"],
-                  "lut_exr_read_by_blender": lut_check, "shots": shots, "backface_culling": cull, "status": "измерено"})
+    rep = {"stage": "ld_preview", "device": device, "samples": lcfg["samples"], "label": lcfg["label"],
+           "lut_exr_read_by_blender": lut_check, "shots": shots, "backface_culling": cull, "status": "измерено"}
+    if ld.get("frame") is not None:  # new characters (the Medusa report keeps its bytes)
+        rep["ortho_frame"] = {"source": frame_source, "side": side,
+                              "views": {v: {"px": c["px"], "ortho_height_m": U.r(c["ortho_scale"], 5),
+                                            "top": c["frame"]["top"], "bottom": c["frame"]["bottom"],
+                                            "base_centre_x_share": c["frame"]["base_x"]} for v, c in ocams.items()}}
+    U.write_json(run_dir / "reports" / "ld-preview-report.json", rep)
     if lut_check["max_abs_diff_vs_json"] > 2e-3:
         raise RuntimeError("LUT EXR read by Blender differs from the JSON: %s" % lut_check)
 

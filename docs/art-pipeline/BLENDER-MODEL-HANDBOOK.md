@@ -318,10 +318,17 @@ front; нет лишних конечностей и голов. Риск: се�
 
 Пропустить целиком, если исходники уже оплачены и лежат в `source-spec` (0 кредитов).
 
-1. Реестр: запись в `docs/art-pipeline/asset-registry.json`, `python tools/tripo-pipeline/validate_registry.py` →
-   `RESULT PASS`.
-2. Сухой пакет входов: `$T prepare-generation --run-dir <run> --dry-run --service tripo-studio --mode multi-view
-   --model-label "H3.1" --view front=<png> --view left=<png> --view back=<png>`. Код 3 = дубль → остановка.
+1. Реестр: запись в `docs/art-pipeline/asset-registry.json`, `python tools/tripo-pipeline/validate_registry.py`
+   до и после правки → новых ошибок нет (базовая линия 2026-10-09: `RESULT: FAIL (1 errors)` на чужой
+   `sharedDependencies[UM-MASTERS]` sha256 `art/um-materials/um-masters.json` — не чинить, PASS без неё недостижим).
+2. Сухой пакет входов в CLI run `<run>` (обычно `<date>-h2-tripo/generation-request/`). Сначала `init`, иначе
+   `prepare-generation` на новом каталоге завершается кодом 2 «run is not initialised» (`tripo_pipeline.py:530-531`):
+   `$T init --run-dir <run> --asset-id <ASSET-ID> --primary-source tripo-pending --primary-role h2-parts-glb`
+   (источника ещё нет; прецедент — `ASSET-TABLE-BASE-001/20260928-table-base-tripo-h31/generation-request/`; у пропа
+   роль `source-glb`), затем `$T prepare-generation --run-dir <run> --dry-run --service tripo-studio --mode multi-view
+   --model-label "H3.1" --view front=<png> --view left=<png> --view back=<png>`. Код 3 = дубль → остановка. Код 3
+   ловит дубль только среди источников **этого** run (`tripo_pipeline.py:3796-3805`), поэтому до клика сверить
+   sha256 входов со всеми `<ASSET-ID>/source-specs/*.json`.
    Черновая модель для концептов (3.1, шаг 1) — отдельная дешёвая операция (single-image или multi-view без 8K и без
    «по частям»); её GLB и списание тоже записываются в журнал кредитов.
 3. Настройки **героя** (H2/H3): «Приватный», multi-view (не batch), H3.1;
@@ -330,11 +337,15 @@ front; нет лишних конечностей и голов. Риск: се�
    - «по частям» Balance, ultra mesh 2M, triangles, без текстуры (60 кредитов);
    - затем текстура 8K с «убрать освещение» (30), затем PBR (5).
 4. Настройки **пропса**: multi-view, H3.1, текстура 2K, PBR, Triangle, 8K и «по частям» выключены.
-5. После каждой операции — баланс и строка истории в `evidence/<asset>-<дата>/tripo-run.json` и в журнал кредитов
-   (`tools/art/syntx_video_refs/ledger_append.py`).
+5. После каждой операции — баланс и строка истории в `evidence/<asset>-<дата>/tripo-run.json` и строка в единый
+   журнал визуала `docs/game-design/visual/credits-ledger.json` через `python tools/art/visual/ledger.py add`
+   (`docs/game-design/visual/07-prompt-templates.md` §4.1, ВР-PR06; нужна карточка `--task` в
+   `docs/game-design/visual/06-tasks/`, команда и поля — `.agents/skills/3d-model-pipeline/references/tripo3d-stages.md`).
+   `tools/art/syntx_video_refs/ledger_append.py` пишет только старый журнал s3-baseline — в него не писать.
 6. Загрузка GLB: Chrome оставляет `C:/Users/ren/Downloads/<guid>.tmp`. Проверить длину из заголовка GLB = размер файла,
    пройти все чанки; скопировать в `art/pipeline-candidates/<ASSET-ID>/<date>-h2-tripo/source/` как
-   `<asset>-tripo-<task8>-parts<N>.glb` и `<asset>-tripo-<task8>-tex8k-pbr.glb`. Свой Save-диалог закрыть до передачи
+   `<key>-h2-tripo-<task8>-parts<N>.glb` и `<key>-h2-tripo-<task8>-tex8k-pbr.glb` (`<key>` — slug героя, как
+   `medusa-h2-tripo-40c4d1cd-parts17.glb`; у поколения H3 — `-h3-`). Свой Save-диалог закрыть до передачи
    браузера. Одна загрузка за раз.
 7. Вернуть настройки Studio (они сохраняются на аккаунт) и закрыть вкладку.
 
@@ -392,7 +403,7 @@ Medusa» без проверки, что это верно для нового �
 | `exports` | `fbx_preset blender/_tools/presets/UM_FBX_v1.json`, `skeletal_fbx SK_<Hero>_H2.fbx`, `base_fbx SM_<Hero>_H2_Base.fbx` | — |
 | `meshes`, `materials` | какие части → body/weapon/base; один слот | — |
 | `axes` | `blender_front -Y`, `expected_ue_front +X`, сторона оружия | — |
-| `preview` | `concepts` (пути концепта), камеры K2 | — |
+| `preview` | `concepts` (пути концепта), камеры K2 (`k2`), `closeups` / `pose_closeups` / `channel_views` под геометрию нового героя (`pose_closeups` — позы `st_seams.pose`, можно `[]`), `frame` = `{"checks_report": "<папка видов>/checks-report.json", "side": "<SIDE_VIEW>"}` (h2-bake 0.6.1, `h2_bake/framing.py`: орто-кадры по кадрированию своего концепта) | **удалить** `previous_candidate` (прежний кандидат W4-B Medusa: иначе в `compare-*.jpg` рядом с новым героем встанет Medusa) и `baseline` (sha256 текстур H2 Medusa до H2.1 — `preview` упадёт на `sha256 mismatch`). Оба ключа необязательны с 0.6.1; без `frame` — канон Medusa 1021 × 1540 |
 
 Оружие: если Tripo не смоделировал рукоять внутри кулака (Arthur) или древко (Merlin), нужен мост-цилиндр или сборка из
 частей (`split-from-part` / `parts` в CLI-пути). В генерическом `h2_bake` такого режима нет — если оружие героя без
@@ -445,13 +456,22 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
 ```
 
 - Look-dev читает готовый H2-прогон только по sha256 и даёт: MatID, LUT, EdgeMask, UV1_m, тона под концепт,
-  `SK_<Hero>_H2LD.fbx`. Образцы: `medusa-h2-lookdev.json`, отчёты `*-lookdev-v2.md`.
+  `SK_<Hero>_H2LD.fbx`. Образцы: `medusa-h2-lookdev.json`, отчёты `*-lookdev-v2.md`. Новый герой ставит в look-dev
+  профиль `frame` (как `preview.frame` H2-профиля, 4.2): `ld_measure` берёт пиксели концепта под масками прохода ID и
+  отказывает концепту, аспект которого отличается от кадра больше чем на 1 %.
 - Классы MatID — только существующие (`material-library/README.md`). Нужен новый класс (как маховые перья Harpy) —
   остановка, это решение.
 - TeamAccent пишет только новые файлы (`textures/<prefix>_TeamAccent_{2K,4K}.png`, `reports/ld-team-*.json`).
   Проверить по отчёту: покрытие 5–12 %, ≤ 20 % на часть, 0 на металле, коже, камне, дереве, когтях.
-- Тона под концепт — предсказание; решение по материалу принимается только по съёмке в UE (4.6, `ue_h5cb1.py review`),
-  не по прогнозу `lookdev_r2.py forecast`.
+- Компоненты `team_accent` (h2-bake 0.6.1) — каждый необязателен, нужен хотя бы один: `hem` — полоса ткани
+  `cloth_class` шириной `width_m` вдоль кромки класса `band_class` ниже `band_z_max_m` (платье Medusa: linen у
+  gold_antique); `ribbon` — ремень/перевязь класса `class` выше `z_min_m`. Костюм без каймы (латы, простая туника) —
+  без `hem`, акцент на поясе, перевязи, лямке колчана или подкладке плаща; тогда `cloth_class` и `trim_class`
+  верхнего уровня называют основную ткань (проверка `dress_parts`) и отделку (контраст `ta_report`). Классы акцента —
+  только с `teamDyeAllowed`. Пустой компонент пропускается (`skipped` в отчёте), достаточность решает
+  `area_share_range`; пустой акцент целиком — `ta_maps` падает, классы выбрать заново.
+- Тона под концепт — предсказание; решение по материалу принимается только по съёмке в UE (4.6,
+  `ue_hero_lookdev.py review`), не по прогнозу `lookdev_r2.py forecast`.
 
 ### 4.5 Анимации H2Anim
 
@@ -466,7 +486,8 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
    ```bash
    python tools/tripo-pipeline/anim/h2anim_run.py art/pipeline-candidates/<ASSET>/build-profiles/<hero>-h2anim.json
    ```
-   Внутри: `clip_author.py` → `validate_clip.py --skeleton=UM_HUMANOID_17_v2 --character=<Hero>` →
+   Внутри: `clip_author.py` → `validate_clip.py --skeleton=UM_HUMANOID_17_v2 --character=<character>` (поле
+   `character` spec — ключ `rig-contract.json`, например `Arthur`, а не `KingArthur`; `h2anim_run.py:89`) →
    `clip_contact_check.py` → листы поз (`clip_pose_probe.py`, `overlay_bones.py`).
 3. PASS-условия:
    - validate: имя арматуры, кости по стороне, лицо +X, fps 24, длительность N/24 ± 0,05 с, in place (≤ 0,5 % роста),
@@ -510,11 +531,19 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
    `h2anim_ue.py measure <spec>`: кадр 0 = ref pose (0, 0 uu), кость 0 неподвижна, масштаб 1,0.
 6. Кадры для глаз (редакторные, **не приёмка**): `h2anim_ue.py frames <spec> --clips=Idle` (по клипу за вызов),
    крупный план атаки `--clips=LungeAttack --frames=3,4,5 --closeup`, лист `h2anim_ue.py sheet <spec>`.
-   Look-dev съёмка: `python tools/art/material_library/ue_h5cb1.py review --hero <hero> --tag b3.N` (EV100 2,05 и 1,3;
-   зоны против концепта: яркость ± 15 %, тон ± 12°, насыщенность ± 0,10).
+   Look-dev съёмка: `python tools/art/material_library/ue_hero_lookdev.py review --config <review-config.json> --out
+   <dir> --tag <tag>` (образец конфига — `ASSET-MEDUSA-001/20260930-h2ld-ldc-ue/review-config.json`; допуски зон против
+   концепта — блок `tolerance` конфига: яркость ± 15 %, тон ± 12°, насыщенность ± 0,10). Блокировку `ue_lock`
+   команда берёт сама (`ue_hero_lookdev.py:335`) — в `ue_lock.py` не оборачивать, иначе ждёт сама себя.
+   `ue_h5cb1.py review --hero` принимает только четырёх зашитых героев (`ue_h5cb1.py:655`), новый герой через него
+   не проходит.
 7. Снимок после с `--compare <evidence>/snapshot-before.json`: `protected_unchanged: true`, добавлены только свои ассеты.
 
-### 4.7 Подключение в игру S08 (только если задача это включает)
+### 4.7 Подключение в игру S08 (обязательно для героя и помощника)
+
+Без подключения игра молча показывает старую фигуру, а приёмка героя идёт по кадрам в игре (скилл
+`.agents/skills/3d-model-pipeline`, этап 7; решение скилла по делегированию пользователя 2026-10-06). Пропс в S08
+не подключается.
 
 Новый или переименованный герой требует трёх правок, иначе игра молча откатится на старую фигуру
 (`S08FighterActor.cpp:521-547`: нет меша, скелета, подставки, MI или Idle → fallback):
@@ -522,7 +551,8 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
 1. Строка в таблице `Specs()` `unreal/Unmatched/Source/Unmatched/S08/S08HeroesV2.cpp`: имя бойца с сервера, ключ,
    стадия, бюджет высоты, диапазон, измеренный верх фигуры, верх bounds, длина Idle.
 2. Три строки `+DirectoriesToAlwaysCook` в `unreal/Unmatched/Config/DefaultGame.ini` (`<Key>/<Stage>`, `<Key>/Rig`,
-   `<Key>/H2Anim`): `LoadObject` — мягкая ссылка, кукер иначе выбросит ассеты. Проверять по `UnrealPak -List` пака.
+   `<Key>/H2Anim`): `LoadObject` — мягкая ссылка, кукер иначе выбросит ассеты. Проверять по `UnrealPak <…>.utoc
+   -List`: ассеты лежат в IoStore, листинг `.pak` даёт 0 строк даже при успешном куке (проверено 2026-10-09).
 3. `.uasset` в git только `git add -f` поимённо (Content игнорируется).
 
 Сборка: `Build.bat` возвращает 0 даже при ошибке компиляции — искать `Result: Failed` в логе (UTF-16). Никогда
@@ -711,7 +741,8 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
       всеми checks, клипы импортированы и измерены, сокеты ± 0,05 uu, редакторные кадры с пометкой «EDITOR frame … not
       K1/K2 acceptance».
 - [ ] `base_seethrough.py`: `with_figure` ≤ 0,1 uu².
-- [ ] Реестр обновлён, `validate_registry.py` → PASS; `DIRECTORY-MAP.md` — если появились новые каталоги.
+- [ ] Реестр обновлён, `validate_registry.py` до и после правки — новых ошибок нет (базовая ошибка UM-MASTERS, 3.2
+      п.1); `DIRECTORY-MAP.md` — если появились новые каталоги.
 - [ ] Свои процессы (Blender headless, скрипты) остановлены по PID; редактор и живой Blender в исходном состоянии.
 
 **Пропс:**
@@ -788,6 +819,7 @@ python tools/tripo-pipeline/blender/h2_bake/run_h2_bake.py --mode teamaccent \
 | `17 §7` (2026-09-25) | «пресет и оси не подтверждены» | подтверждены ART-001 |
 | Сокет `Weapon` Harpy | кисть (rig-contract) | `foot.R` (профиль) — расхождение открыто |
 | CLI-версия | 0.6.0 в PIPELINE.md | 0.8.0 (`skeletal-adopt`, `ue.target_skeleton` описаны в `king-arthur-h2-ue-import.md`) |
+| Синхронизация со скиллом `3d-model-pipeline` (2026-10-09, по проверкам раунда 1) | 3.2: `prepare-generation` без `init`, журнал `ledger_append.py`, имена `<asset>-tripo-<task8>-…glb`, `validate_registry` → PASS; 4.5: `--character=<Hero>`; 4.6 п.6: `ue_h5cb1.py review`; 4.7: «только если задача включает», `UnrealPak -List` по `.pak`; 8: PASS реестра | 3.2: `init --primary-source tripo-pending` до `prepare-generation`, `tools/art/visual/ledger.py add` в `docs/game-design/visual/credits-ledger.json`, `<key>-h2-tripo-<task8>-…glb`, «новых ошибок нет» против базовой линии; 4.5: ключ `character` из spec; 4.6 п.6: `ue_hero_lookdev.py review --config`; 4.7: обязательно для героя и помощника, листинг `.utoc`; 8: то же правило реестра |
 
 ---
 

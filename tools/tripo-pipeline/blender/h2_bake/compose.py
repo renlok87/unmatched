@@ -1,6 +1,8 @@
 """Preview sheets (plain Python + Pillow): side-by-side frames for the report, JPEG q92 (PIPELINE.md frame format).
 
-  compare-{front,side,back}.jpg   concept H2 | Tripo high-poly | H2 game model | previous candidate (ortho, blender)
+  compare-{front,side,back}.jpg   concept H2 | Tripo high-poly | H2 game model | previous candidate (ortho, blender);
+                                  the previous-candidate tiles only with profile preview.previous_candidate (optional,
+                                  a new character has none: 0.6.1)
   closeups-hp-vs-h2.jpg           close-ups, high-poly (left) vs game model (right) per pair
   compare-k2-5x.jpg, compare-k2-1p6.jpg   game camera K2: previous candidate | H2 (crop around the figure, 1:1 px;
                                   the 1.6x crop is also shown x3 nearest-neighbour)
@@ -139,6 +141,26 @@ def h21_sheets(raw, out, repo, profile, tag):
     return written
 
 
+def hp_label(run_dir, profile, repo):
+    """Label of the Tripo high-poly tile: the task id (first 8 characters) of the profile's source spec and the
+    triangle count of the parts GLB from reports/prepare-report.json (Medusa: «high-poly Tripo 40c4d1cd (1,86M tris,
+    8K/PBR)», as before 0.6.1). Missing pieces fall back to «?»."""
+    task = "?"
+    spec_rel = profile.get("sources", {}).get("source_spec")
+    if spec_rel and (Path(repo) / spec_rel).is_file():
+        spec = json.loads((Path(repo) / spec_rel).read_text(encoding="utf-8"))
+        task = (spec.get("task_id") or spec.get("source_id") or "?")[:8]
+    tris = "?"
+    prep = Path(run_dir) / "reports" / "prepare-report.json"
+    if prep.is_file():
+        parts = json.loads(prep.read_text(encoding="utf-8")).get("parts", {})
+        n = sum(v["triangles"][0] if isinstance(v.get("triangles"), list) else int(v.get("triangles", 0))
+                for v in parts.values())
+        if n:
+            tris = ("%.2fM" % (n / 1e6)).replace(".", ",")
+    return "high-poly Tripo %s (%s tris, 8K/PBR)" % (task, tris)
+
+
 def run(run_dir, profile, repo):
     run_dir, repo = Path(run_dir), Path(repo)
     raw = run_dir / "work" / "preview_raw"
@@ -150,21 +172,26 @@ def run(run_dir, profile, repo):
     written = {}
     rig = json.loads((run_dir / "reports" / "rig-report.json").read_text(encoding="utf-8"))
     tris = sum(v["triangles"] for k, v in rig["meshes_pre_export"].items() if k != profile["meshes"]["base"])
-    prev_run = repo / profile["preview"]["previous_candidate"]["run"]
-    prev_tris = "?"
-    prev_build = prev_run / "reports" / "build-report.json"
-    if prev_build.exists():
-        pb = json.loads(prev_build.read_text(encoding="utf-8"))
-        prev_tris = "%.1fk" % (sum(v["triangles"] for k, v in pb.get("meshes_pre_export_m", {}).items() if "Base" not in k) / 1000.0)
+    prev = profile["preview"].get("previous_candidate")  # optional: a new character has no earlier candidate
+    prev_name = (prev or {}).get("label", "прежний кандидат W4-B")
+    if prev:
+        prev_run = repo / prev["run"]
+        prev_tris = "?"
+        prev_build = prev_run / "reports" / "build-report.json"
+        if prev_build.exists():
+            pb = json.loads(prev_build.read_text(encoding="utf-8"))
+            prev_tris = "%.1fk" % (sum(v["triangles"] for k, v in pb.get("meshes_pre_export_m", {}).items() if "Base" not in k) / 1000.0)
+        prev_label = "%s (%s tris, 2K)" % (prev_name, prev_tris)
     h21 = bool(profile["textures"].get("materials"))
     h2_label = "%s игровая модель (%.1fk tris, атлас 4K)" % ("H2.1" if h21 else "H2", tris / 1000.0)
-    prev_label = "прежний кандидат W4-B (%s tris, 2K)" % prev_tris
     concepts = profile["preview"]["concepts"]
+    hp_text = hp_label(run_dir, profile, repo)
     for view, cview in (("front", "front"), ("side", "side"), ("back", "back")):
         tiles = [label(Image.open(repo / concepts[cview]).convert("RGB"), "концепт H2 (imagegen): %s" % cview),
-                 label(flat(raw / ("ortho-%s-hp.png" % view)), "high-poly Tripo 40c4d1cd (1,86M tris, 8K/PBR) — %s" % tag, 18),
-                 label(flat(raw / ("ortho-%s-h2.png" % view)), "%s — %s" % (h2_label, tag), 18),
-                 label(flat(raw / ("ortho-%s-prev.png" % view)), "%s — %s" % (prev_label, tag), 18)]
+                 label(flat(raw / ("ortho-%s-hp.png" % view)), "%s — %s" % (hp_text, tag), 18),
+                 label(flat(raw / ("ortho-%s-h2.png" % view)), "%s — %s" % (h2_label, tag), 18)]
+        if prev:
+            tiles.append(label(flat(raw / ("ortho-%s-prev.png" % view)), "%s — %s" % (prev_label, tag), 18))
         name = "compare-%s.jpg" % view
         written[name] = save_jpeg(row(tiles, 1100), out / name, max_w=3000)
     pairs = []
@@ -178,9 +205,10 @@ def run(run_dir, profile, repo):
         grid.paste(p, ((i % 2) * pairs[0].width, 50 + (i // 2) * 600))
     label(grid, "крупные планы, ортокамера — %s" % tag, 30)
     written["closeups-hp-vs-h2.jpg"] = save_jpeg(grid, out / "closeups-hp-vs-h2.jpg", max_w=2400)
+    k2_sets = ((("prev", prev_name),) if prev else ()) + (("h2", "H2 игровая модель"),)
     for key, crop_px, zoom in (("k2-5x", 640, 1), ("k2-1p6", 220, 3)):
         tiles = []
-        for t, name in (("prev", "прежний кандидат W4-B"), ("h2", "H2 игровая модель")):
+        for t, name in k2_sets:
             im = flat(raw / ("%s-%s.png" % (key, t)))
             cx, cy = im.width // 2, im.height // 2
             c = im.crop((cx - crop_px // 2, cy - crop_px // 2, cx + crop_px // 2, cy + crop_px // 2))
@@ -190,7 +218,7 @@ def run(run_dir, profile, repo):
         sheet = row(tiles, tiles[0].height)
         label(sheet, "игровая камера K2 (%s) — %s" % (key, tag), 22)
         written["compare-%s.jpg" % key] = save_jpeg(sheet, out / ("compare-%s.jpg" % key), max_w=2400)
-        full = row([label(flat(raw / ("%s-%s.png" % (key, t))), "%s %s — %s" % (key, t, tag), 22) for t in ("prev", "h2")], 1080)
+        full = row([label(flat(raw / ("%s-%s.png" % (key, t))), "%s %s — %s" % (key, t, tag), 22) for t, _n in k2_sets], 1080)
         written["frame-%s.jpg" % key] = save_jpeg(full, out / ("frame-%s.jpg" % key), max_w=2400)
     for sheet in sorted((run_dir / "work" / "deform").glob("*-sheet.png")):
         name = "deform-%s.jpg" % sheet.stem.replace("-sheet", "")

@@ -6,7 +6,7 @@ writes <dir>/cmd-<seq>.json and waits for <dir>/done-<seq>.json. No sockets. One
 C:/tmp/unmatched-gpu.lock (owner=LIVE-TUNE pid=<client pid> map=<map>) from start to stop.
 
   python tools/art/render/live_tune.py start --map sarpedon|marmoreal [--packaged] [--profiles <json>]
-                                             [--env-dir <dir>] [--warmup 60] [--extra=-NoHeroLight ...]
+                                             [--env-dir <dir>] [--warmup 60] [--fixture <file>] [--extra=-NoHeroLight ...]
   python tools/art/render/live_tune.py reload [--profiles <json>] [--env-dir <dir>]
   python tools/art/render/live_tune.py shot  --views K1+K2x1.6+K2x2.5 --out <dir> [--tag t] [--settle 6] [--measure 0]
                                              [--post 0] [--live] [--clock bench|free] [--append]
@@ -14,8 +14,16 @@ C:/tmp/unmatched-gpu.lock (owner=LIVE-TUNE pid=<client pid> map=<map>) from star
   python tools/art/render/live_tune.py state
   python tools/art/render/live_tune.py stop
   python tools/art/render/live_tune.py bench --map sarpedon --views K1+K2x1.6+K2x2.5 --out <dir> [--packaged]  (fresh -Bench)
+                                             [--fixture <file>] [--dry-run]
   python tools/art/render/live_tune.py compare --a <run dir> --b <run dir> [--views K1+K2x1.6]   (fidelity numbers)
   python tools/art/render/live_tune.py --check                                     (self-test, fake client, no UE)
+
+--fixture (new character on the bench, .agents/skills/3d-model-pipeline/references/new-character-registration.md D-2):
+S08Bench<Map>-<Key>.json from tools/art/render/env_bench_fixtures.cts --variant <Key> (the new hero on f-1-hero, the new
+sidekick on f-1-sk0); its benchBoardId must be the --map board. Default: the map's canonical fixture, as before. The K2
+views centre the viewer's hero (Medusa, seat 0): add --extra=-BenchFocusFighter=f-1-hero for K2 frames of the new hero.
+-BenchFixture= in --extra is refused (the client reads the first one, which is ours). --packaged reads a fixture the staged
+build lists in Manifest_UFSFiles_Win64.txt from the pak, any other one as the loose worktree file (no repackaging).
 
 Reload covers S08ArtBoardProfiles.json (light profile, fog, grade, exposure, hero light, conceptPaste incl. lit3d lights /
 winds / hide, readability, backdrop, ...) and Config/ArtBoards/EnvLayouts/*.layout.json (props, lights, fx, ground,
@@ -44,6 +52,11 @@ PROFILES = REPO / "unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json"
 ENV_DIR = REPO / "unreal/Unmatched/Config/ArtBoards/EnvLayouts"
 # the original maps only (2026-10-04, docs/game-design/decisions/2026-10-04-real-boards-only.md: Cobble 5x6 is gone)
 FIXTURES = {"sarpedon": "S08BenchSarpedon.json", "marmoreal": "S08BenchMarmoreal.json"}
+BENCH_DIR = REPO / "unreal/Unmatched/Config/Bench"
+# the packaged client's cwd is Binaries/Win64: this relative path is read from the pak (RuntimeDependencies UFS)
+PAK_BENCH = "../../../Unmatched/Config/Bench/"
+# what the staged build carries in its pak (written by the staging step of package-client.ps1)
+STAGED_UFS_MANIFEST = STAGED_EXE.parent / "Manifest_UFSFiles_Win64.txt"
 GPU_LOCK = Path(os.environ.get("UNMATCHED_GPU_LOCK", "C:/tmp/unmatched-gpu.lock"))
 ROOT = Path(os.environ.get("LIVE_TUNE_ROOT", "C:/tmp/live-tune"))
 POINTER = "session.json"
@@ -195,27 +208,87 @@ def load_session(root: Path = ROOT) -> dict:
     return json.loads(p.read_text(encoding="utf-8"))
 
 
-def bench_args(mode: str, map_key: str, out: Path, views: str, bench: dict, extra: list[str]) -> list[str]:
+def bench_args(mode: str, map_key: str, out: Path, views: str, bench: dict, extra: list[str],
+               fixture: str | None = None) -> list[str]:
     """A fresh -Bench run with the reference runners' arguments (p9b run_ed.py / run_pkg.py): the fidelity reference."""
-    args = client_args(mode, map_key, out, 0.0, bench, None, None, extra)
+    args = client_args(mode, map_key, out, 0.0, bench, None, None, extra, fixture=fixture)
     args = [x for x in args if not x.startswith(("-ArtLiveTune=", "-ArtLiveTuneWarmup=", "-BenchOut=", "-BenchViews=", "-S08Trace="))]
     i = args.index("-BenchNoProfileGPU")
     return args[:i] + [f"-BenchOut={out}", f"-BenchViews={views}", f"-S08Trace={out / 'bench.trace.log'}"] + args[i:]
 
 
+def staged_ufs_files(manifest: Path | None = None) -> set[str]:
+    """The UFS (pak) paths of the staged build, e.g. 'Unmatched/Config/Bench/S08BenchMarmoreal.json'; empty without one."""
+    try:
+        text = (manifest or STAGED_UFS_MANIFEST).read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return set()
+    return {line.split("\t", 1)[0].strip().replace("\\", "/") for line in text.splitlines() if line.strip()}
+
+
+def resolve_fixture(mode: str, map_key: str, fixture: str | None = None, manifest: Path | None = None) -> tuple[str, dict]:
+    """The -BenchFixture value and where the client reads it from.
+
+    Default (fixture None): the map's canonical FIXTURES file, exactly as before (packaged: the pak copy; editor: the
+    worktree file). --fixture <file> (new-character-registration.md D-2: S08Bench<Map>-<Key>.json of
+    env_bench_fixtures.cts --variant): a name in Config/Bench or any path; its benchBoardId must be the --map board.
+    Editor: the absolute worktree path. Packaged: the pak copy when the staged build lists it in its
+    Manifest_UFSFiles (a RuntimeDependencies line in Unmatched.Build.cs + a package), else the loose absolute worktree
+    file - the Development packaged client reads loose non-asset files (FPakPlatformFile falls back to the disk; the
+    same way as -BenchMoveDraft=<abs json>), so a new variant needs no repackaging."""
+    if fixture is None:
+        name = FIXTURES[map_key]
+        if mode == "packaged":
+            return PAK_BENCH + name, {"fixture": str(BENCH_DIR / name), "source": "pak", "default": True}
+        return str(REPO / "unreal/Unmatched/Config/Bench" / name), {"fixture": str(BENCH_DIR / name), "source": "worktree",
+                                                                     "default": True}
+    p = Path(fixture)
+    if not p.is_absolute():
+        p = BENCH_DIR / fixture if (BENCH_DIR / fixture).is_file() else Path.cwd() / fixture
+    p = p.resolve()
+    if not p.is_file():
+        raise LiveTuneError(f"--fixture {fixture}: no such file (a name in {BENCH_DIR} or a path)", 2)
+    if any(ch.isspace() for ch in str(p)):
+        # FParse::Value stops at the first space of -BenchFixture=<path> (list2cmdline quotes the whole token)
+        raise LiveTuneError(f"--fixture {p}: a path with spaces does not reach the client; use Config/Bench or a path without spaces", 2)
+    try:
+        doc = json.loads(p.read_text(encoding="utf-8"))
+        want = json.loads((BENCH_DIR / FIXTURES[map_key]).read_text(encoding="utf-8")).get("benchBoardId")
+    except (OSError, json.JSONDecodeError) as e:
+        raise LiveTuneError(f"--fixture {fixture}: {e}", 2) from e
+    if not isinstance(doc, dict) or doc.get("benchBoardId") != want:
+        raise LiveTuneError(f"--fixture {p.name}: benchBoardId {doc.get('benchBoardId') if isinstance(doc, dict) else None} "
+                            f"is not the {map_key} board {want} (pick the variant file of that map)", 2)
+    info = {"fixture": str(p), "default": False}
+    variant = doc.get("benchVariant")
+    if isinstance(variant, dict):
+        info["variant"] = variant.get("key")
+    if mode != "packaged":
+        info["source"] = "worktree"
+        return str(p), info
+    in_bench = p.parent == BENCH_DIR.resolve()
+    if in_bench and f"Unmatched/Config/Bench/{p.name}" in staged_ufs_files(manifest):
+        info["source"] = "pak"
+        return PAK_BENCH + p.name, info
+    info["source"] = "loose"
+    return p.as_posix(), info
+
+
 def client_args(mode: str, map_key: str, session_dir: Path, warmup: float, bench: dict, profiles: str | None,
-                env_dir: str | None, extra: list[str], art_view: bool = False) -> list[str]:
-    fixture = FIXTURES[map_key]
+                env_dir: str | None, extra: list[str], art_view: bool = False, fixture: str | None = None) -> list[str]:
+    # the client reads the FIRST -BenchFixture= (FParse::Value): one in --extra would be shadowed by ours
+    if any(str(x).startswith("-BenchFixture=") for x in extra):
+        raise LiveTuneError("-BenchFixture= in --extra is ignored by the client (ours comes first): use --fixture <file>", 2)
+    fixture_value, _ = resolve_fixture(mode, map_key, fixture)
     # art_view (Art Tuner, docs/art-pipeline/ART-TUNER-PLAN.md): -ArtView=<map> instead of -Bench - the same fixture scene
     # without the -Bench freeze (Niagara, flicker, wind and the hero breath run live), the free camera keys work
     common = ["/Game/S08/S08Arena?game=/Script/Unmatched.S08FlowGameMode", "-windowed", "-resx=1920", "-resy=1080", "-ForceRes",
               "-RenderOffScreen", "-nosplash", "-unattended", "-NoSound", "-ArtPreview", "-ArtPreviewDiorama",
               "-ArtPreviewHeroesV2", f"-ArtView={map_key}" if art_view else "-Bench"]
     if mode == "packaged":
-        args = [str(STAGED_EXE)] + common + [f"-BenchFixture=../../../Unmatched/Config/Bench/{fixture}"]
+        args = [str(STAGED_EXE)] + common + [f"-BenchFixture={fixture_value}"]
     else:
-        args = [str(UE_EDITOR), str(UPROJECT), common[0], "-game"] + common[1:] + [
-            f"-BenchFixture={REPO / 'unreal/Unmatched/Config/Bench' / fixture}"]
+        args = [str(UE_EDITOR), str(UPROJECT), common[0], "-game"] + common[1:] + [f"-BenchFixture={fixture_value}"]
     args += [f"-ArtLiveTune={session_dir}", f"-ArtLiveTuneWarmup={warmup:g}", f"-BenchOut={session_dir}", "-BenchViews=K1",
              f"-BenchWarmup={bench['warmup']:g}", f"-BenchSettle={bench['settle']:g}", f"-BenchMeasure={bench['measure']:g}",
              "-BenchNoProfileGPU", "-BenchFps=60", "-S08RenderPreset=High", f"-S08Trace={session_dir / 'session.trace.log'}",
@@ -262,6 +335,7 @@ def cmd_start(a: argparse.Namespace) -> int:
         v = getattr(a, f"bench_{k}")
         if v is not None:
             bench[k] = v
+    _, fixture_info = resolve_fixture(mode, a.map, getattr(a, "fixture", None))  # a bad --fixture: no session dir
     session_dir = (Path(a.session) if a.session else root / f"{a.map}-{time.strftime('%Y%m%d-%H%M%S')}").resolve()
     session_dir.mkdir(parents=True, exist_ok=True)
     warmup = a.warmup if a.warmup is not None else bench["warmup"]
@@ -274,7 +348,7 @@ def cmd_start(a: argparse.Namespace) -> int:
     if getattr(a, "tuner_file", None):
         extra.append(f"-ArtTunerFile={Path(a.tuner_file).resolve().as_posix()}")
     args = client_args(mode, a.map, session_dir, warmup, bench, a.profiles, a.env_dir, extra,
-                       art_view=getattr(a, "art_view", False))
+                       art_view=getattr(a, "art_view", False), fixture=getattr(a, "fixture", None))
     lock = Path(a.lock) if a.lock else GPU_LOCK
     lock_acquire(lock, f"live-tune {a.map} starting", timeout=a.lock_timeout)
     t0 = time.time()
@@ -289,7 +363,7 @@ def cmd_start(a: argparse.Namespace) -> int:
     session = {"pid": proc.pid, "dir": str(session_dir).replace("\\", "/"), "map": a.map, "mode": mode, "lock": str(lock),
                "started": time.strftime("%Y-%m-%dT%H:%M:%S"), "bench": bench, "warmup": warmup,
                "reloadProfiles": reload_profiles, "reloadEnvDir": reload_env, "marker": f"-ArtLiveTune={session_dir}",
-               "cmdline": subprocess.list2cmdline(args)}
+               "fixture": fixture_info, "cmdline": subprocess.list2cmdline(args)}
     (session_dir / "cmdline.txt").write_text(session["cmdline"] + "\n", encoding="utf-8")
     write_atomic(p, json.dumps(session, indent=2))
     try:
@@ -303,7 +377,7 @@ def cmd_start(a: argparse.Namespace) -> int:
     session["readySeconds"] = round(time.time() - t0, 1)
     write_atomic(p, json.dumps(session, indent=2))
     print(json.dumps({"ok": True, "pid": proc.pid, "dir": session["dir"], "map": a.map, "mode": mode,
-                      "readySeconds": session["readySeconds"], "profile": (ready.get("board") or {}).get("profile"),
+                      "fixture": fixture_info, "readySeconds": session["readySeconds"], "profile": (ready.get("board") or {}).get("profile"),
                       "profilesSha256": (ready.get("profiles") or {}).get("sha256"),
                       "renderReference": ready.get("renderReference")}, indent=2))
     return 0
@@ -516,8 +590,15 @@ def cmd_bench(a):
         if v is not None:
             bench[k] = v
     out = Path(a.out).resolve()
+    fixture = getattr(a, "fixture", None)
+    args = bench_args(mode, a.map, out, a.views, bench, a.extra or [], fixture=fixture)
+    _, fixture_info = resolve_fixture(mode, a.map, fixture)
+    if getattr(a, "dry_run", False):
+        # no launch, no GPU lock, no out folder: the command line and where the fixture is read from
+        print(json.dumps({"ok": True, "dryRun": True, "map": a.map, "mode": mode, "fixture": fixture_info,
+                          "out": str(out), "args": args}, indent=2))
+        return 0
     out.mkdir(parents=True, exist_ok=True)
-    args = bench_args(mode, a.map, out, a.views, bench, a.extra or [])
     (out / "cmdline.txt").write_text(subprocess.list2cmdline(args) + "\n", encoding="utf-8")
     lock = Path(a.lock) if a.lock else GPU_LOCK
     lock_acquire(lock, f"live-tune bench {a.map} {out.name}", timeout=a.lock_timeout)
@@ -536,7 +617,8 @@ def cmd_bench(a):
         lock_release(lock)
     secs = round(time.time() - t0, 1)
     (out / "exit.txt").write_text(f"exit={p.returncode} seconds={secs:.0f}\n", encoding="utf-8")
-    print(json.dumps({"ok": p.returncode == 0, "exit": p.returncode, "seconds": secs, "out": str(out)}, indent=2))
+    print(json.dumps({"ok": p.returncode == 0, "exit": p.returncode, "seconds": secs, "out": str(out), "fixture": fixture_info},
+                     indent=2))
     return 0 if p.returncode == 0 else 1
 
 
@@ -780,6 +862,47 @@ def self_check() -> list[str]:
     pk = client_args("packaged", "marmoreal", Path("C:/tmp/lt/y"), 60, BENCH["packaged"], None, None, [])
     if "-game" in pk or not any(x.startswith("-BenchMeasure=3") for x in pk) or "Unmatched.exe" not in pk[0]:
         fails.append(f"packaged args {pk[:3]}")
+    fails += fixture_self_check()
+    return fails
+
+
+def fixture_self_check() -> list[str]:
+    """--fixture (D-2): the default is the old -BenchFixture, a variant resolves by mode / staged manifest, a fixture of
+    the other board and -BenchFixture= in --extra are usage errors (exit 2)."""
+    fails: list[str] = []
+    if resolve_fixture("packaged", "sarpedon")[0] != "../../../Unmatched/Config/Bench/S08BenchSarpedon.json":
+        fails.append("default packaged fixture")
+    if resolve_fixture("editor", "marmoreal")[0] != str(REPO / "unreal/Unmatched/Config/Bench/S08BenchMarmoreal.json"):
+        fails.append("default editor fixture")
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        base = json.loads((BENCH_DIR / FIXTURES["marmoreal"]).read_text(encoding="utf-8"))
+        var = root / "S08BenchMarmoreal-SelfTest.json"
+        var.write_text(json.dumps({**base, "benchVariant": {"key": "SelfTest"}}), encoding="utf-8")
+        manifest = root / "Manifest_UFSFiles_Win64.txt"
+        manifest.write_text("Unmatched/Config/Bench/S08BenchSarpedon.json\t2026-10-06T03:03:04.521Z\n", encoding="utf-8")
+        v, info = resolve_fixture("editor", "marmoreal", str(var), manifest)
+        if v != str(var.resolve()) or info.get("variant") != "SelfTest" or info.get("source") != "worktree":
+            fails.append(f"editor variant {v} {info}")
+        v, info = resolve_fixture("packaged", "marmoreal", str(var), manifest)
+        if v != var.resolve().as_posix() or info.get("source") != "loose":
+            fails.append(f"packaged loose variant {v} {info}")
+        v, info = resolve_fixture("packaged", "sarpedon", "S08BenchSarpedon.json", manifest)
+        if v != PAK_BENCH + "S08BenchSarpedon.json" or info.get("source") != "pak":
+            fails.append(f"packaged staged fixture {v} {info}")
+        for call in (lambda: resolve_fixture("editor", "sarpedon", str(var)),
+                     lambda: resolve_fixture("editor", "marmoreal", str(root / "missing.json")),
+                     lambda: client_args("editor", "marmoreal", root, 0, BENCH["editor"], None, None,
+                                         [f"-BenchFixture={var}"])):
+            try:
+                call()
+                fails.append("fixture usage error not raised")
+            except LiveTuneError as e:
+                if e.code != 2:
+                    fails.append(f"fixture usage code {e.code}")
+        bn = bench_args("packaged", "marmoreal", root / "b", "K1", BENCH["packaged"], [], fixture=str(var))
+        if [x for x in bn if x.startswith("-BenchFixture=")] != [f"-BenchFixture={var.resolve().as_posix()}"]:
+            fails.append(f"bench args fixture {[x for x in bn if 'Fixture' in x]}")
     return fails
 
 
@@ -797,6 +920,8 @@ def main(argv: list[str] | None = None) -> int:
     st = sub.add_parser("start")
     st.add_argument("--map", required=True, choices=sorted(FIXTURES))
     st.add_argument("--packaged", action="store_true")
+    st.add_argument("--fixture", help="-BenchFixture: a file in Config/Bench or a path, its benchBoardId = --map's board "
+                                      "(default: the map's canonical fixture); see the bench --fixture help")
     st.add_argument("--profiles", help="-ArtBoardProfiles at start (override); --packaged reloads read the worktree file by default")
     st.add_argument("--env-dir", help="-ArtEnvLayouts at start")
     st.add_argument("--session", help="protocol folder (default <root>/<map>-<time>)")
@@ -866,6 +991,11 @@ def main(argv: list[str] | None = None) -> int:
     bp.add_argument("--views", required=True)
     bp.add_argument("--out", required=True)
     bp.add_argument("--packaged", action="store_true")
+    bp.add_argument("--fixture", help="-BenchFixture: a file in Config/Bench (e.g. S08BenchMarmoreal-<Key>.json of "
+                                      "env_bench_fixtures.cts --variant) or a path; its benchBoardId must be --map's board. "
+                                      "Default: the map's canonical fixture (unchanged). --packaged reads it from the pak when "
+                                      "the staged build lists it, else the loose worktree file (no repackaging)")
+    bp.add_argument("--dry-run", action="store_true", help="print the command line and the fixture source; no launch, no lock")
     bp.add_argument("--bench-warmup", type=float)
     bp.add_argument("--bench-settle", type=float)
     bp.add_argument("--bench-measure", type=float)

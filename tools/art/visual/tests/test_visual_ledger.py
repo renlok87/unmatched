@@ -170,3 +170,75 @@ def test_preflight(root, capsys):
     assert run(root, "check", "--balance", "100", "--next-cost", "3", "--today", "2026-10-29") == 1
     out = capsys.readouterr().out
     assert "stop balance" in out and "cap 12" in out and "visual cap 54" in out and "window closed" in out
+
+
+TRIPO_TERMS = ["terms", "--service", "Tripo", "--model", "Tripo Studio H3.1", "--url",
+               "https://example.invalid/tripo-terms", "--checked", "2026-10-09"]
+
+
+def tripo_add(spent_before, cost, sid):
+    """A Tripo spend row on the fixture card EN-03 (check needs only an existing card and a template id)."""
+    return ["add", "--task", "EN-03", "--template", "T-SYNTX-UPSCALE", "--service", "Tripo",
+            "--model", "Tripo Studio H3.1", "--units", "1 multiview", "--quoted", str(cost),
+            "--before", str(spent_before), "--after", str(spent_before - cost), "--service-task-id", sid,
+            "--date", "2026-10-09T10:00:00+05:00"]
+
+
+def test_tripo_preflight_ok_and_ignores_syntx_limits(root, capsys):
+    run(root, *TRIPO_TERMS)
+    # 95 > the SYNTX visual cap 54 and the SYNTX per-run caps: a Tripo pre-flight must not apply them
+    assert run(root, "check", "--service", "tripo", "--next-cost", "95", "--today", "2026-10-09") == 0
+    out = capsys.readouterr().out
+    assert "ERROR" not in out and "WARN" not in out and "pre-flight: spent" not in out
+    assert "remainder 3000 of 3000 until 2026-10-28, after the run 2905" in out
+    # with a fresh balance that covers the price, and a model covered by the terms row
+    assert run(root, "check", "--service", "Tripo", "--next-cost", "95", "--balance", "4000",
+               "--model", "Tripo Studio H3.1", "--today", "2026-10-09") == 0
+    capsys.readouterr()
+    # a fresh balance below the ВР-04 remainder but above the price: allowed, with a warning
+    assert run(root, "check", "--service", "tripo", "--next-cost", "95", "--balance", "100",
+               "--today", "2026-10-09") == 0
+    assert "the balance is the real bound" in capsys.readouterr().out
+
+
+def test_tripo_preflight_limit_balance_window_terms(root, capsys):
+    assert run(root, "check", "--service", "tripo", "--next-cost", "10", "--today", "2026-10-09") == 1
+    assert "no providerTerms row for Tripo" in capsys.readouterr().out          # ВР-05 before the first spend
+    run(root, *TRIPO_TERMS)
+    assert run(root, "check", "--service", "tripo", "--next-cost", "3001", "--today", "2026-10-09") == 1
+    assert "> 3000 credits" in capsys.readouterr().out                           # ВР-04 limit
+    assert run(root, "check", "--service", "tripo", "--next-cost", "95", "--balance", "50",
+               "--today", "2026-10-09") == 1
+    assert "balance 50 < price 95" in capsys.readouterr().out                    # no purchases
+    assert run(root, "check", "--service", "tripo", "--next-cost", "95", "--today", "2026-10-29") == 1
+    assert "window closed" in capsys.readouterr().out
+    assert run(root, "check", "--service", "tripo", "--next-cost", "95", "--model", "Other 3D",
+               "--today", "2026-10-09") == 1
+    assert "Tripo 'Other 3D'" in capsys.readouterr().out
+
+
+def test_tripo_preflight_counts_recorded_tripo_spend(root, capsys):
+    run(root, *TRIPO_TERMS)
+    assert run(root, *tripo_add(5000, 2950, "tripo-1")) == 0
+    capsys.readouterr()
+    assert run(root, "check", "--service", "tripo", "--next-cost", "50", "--today", "2026-10-09") == 0
+    assert "remainder 50 of 3000 until 2026-10-28, after the run 0" in capsys.readouterr().out
+    assert run(root, "check", "--service", "tripo", "--next-cost", "51", "--today", "2026-10-09") == 1
+    assert "spent 2950 + 51 > 3000" in capsys.readouterr().out
+    # the SYNTX pre-flight is unaffected by the Tripo spend
+    assert run(root, "check", "--balance", "173.771", "--next-cost", "12", "--next-kind", "upscale",
+               "--today", "2026-10-07") == 0
+
+
+def test_check_service_argument_errors(root, capsys):
+    assert run(root, "check", "--service", "tripo") == 2                        # needs --next-cost
+    assert run(root, "check", "--service", "tripo", "--next-cost", "5", "--next-kind", "image") == 2
+    assert run(root, "check", "--service", "codex", "--next-cost", "5") == 2
+    assert run(root, "check", "--model", "Tripo Studio H3.1", "--balance", "100", "--next-cost", "3") == 2
+    assert run(root, "check", "--service", "syntx", "--next-cost", "3") == 2    # SYNTX still needs both
+    err = capsys.readouterr().err
+    assert "needs --next-cost" in err and "--next-kind is a SYNTX" in err and "Codex is a subscription" in err
+    assert "only by the Tripo pre-flight" in err and "both --balance and --next-cost" in err
+    # explicit --service syntx is the old default
+    assert run(root, "check", "--service", "SYNTX", "--balance", "100", "--next-cost", "55") == 1
+    assert "visual cap 54 (ВР-PL10)" in capsys.readouterr().out

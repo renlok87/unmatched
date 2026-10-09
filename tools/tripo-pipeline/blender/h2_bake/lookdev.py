@@ -585,6 +585,26 @@ def debug_sheet(run_dir, lab, presets):
 
 
 # ------------------------------------------------------------------ measure (concept vs renders)
+CONCEPT_ASPECT_TOL = 0.01  # concept vs class pass: |aspect ratio - 1| (Medusa side 1022 x 1539 vs 1021 x 1540: 0.0016)
+
+
+def concept_on_class_pass(concept_path, W, H):
+    """The concept resized to the class pass (W x H). Refuses a concept whose aspect differs from the class pass by more
+    than CONCEPT_ASPECT_TOL: the resize would squash it and the class masks would sample the wrong concept regions
+    (a 3:4 concept on the default 1021 x 1540 frame: about 12 %). Fix: look-dev profile `frame` (framing.py), for a new
+    character {"checks_report": <checks-report.json of its concept set>, "side": SIDE_VIEW}.
+    -> (array H x W x 3, info)."""
+    im = Image.open(concept_path).convert("RGB")
+    rel = abs((im.width / im.height) / (W / H) - 1.0)
+    info = {"concept_px": [im.width, im.height], "class_pass_px": [W, H], "aspect_rel_diff": round(rel, 4)}
+    if rel > CONCEPT_ASPECT_TOL:
+        raise ValueError("ld_measure: concept %s is %dx%d, the class pass %dx%d (aspect differs by %.1f %% > %.0f %%): the "
+                         "ortho frame is not the concept's; set the look-dev profile `frame` (framing.py, e.g. "
+                         "{\"checks_report\": <checks-report.json>, \"side\": \"left\"}) and rerun ld_preview"
+                         % (concept_path, im.width, im.height, W, H, rel * 100, CONCEPT_ASPECT_TOL * 100))
+    return np.asarray(im.resize((W, H), Image.BILINEAR)), info
+
+
 def decode_class_pass(img, presets):
     """Class-ID pass (emission of MatID, Standard view) -> class index per pixel (-1 background)."""
     rgb = np.asarray(img.convert("RGBA")).astype(np.float32)
@@ -644,10 +664,11 @@ def run_measure(run_dir, ld, repo):
     maps_rep = json.loads((run_dir / "reports" / "ld-maps-report.json").read_text(encoding="utf-8"))
     views = {}
     pooled = {}
+    framing = {}
     for view, concept_rel in ld["concepts"].items():
         cls = decode_class_pass(Image.open(raw / ("class-%s.png" % view)), presets)
         W, H = cls.shape[1], cls.shape[0]
-        concept = np.asarray(Image.open(repo / concept_rel).convert("RGB").resize((W, H), Image.BILINEAR))
+        concept, framing[view] = concept_on_class_pass(repo / concept_rel, W, H)
         sets = {"concept": concept}
         for tag in ("h21", "ld"):
             sets[tag] = np.asarray(Image.open(raw / ("beauty-%s-%s.png" % (view, tag))).convert("RGB"))
@@ -736,6 +757,10 @@ def run_measure(run_dir, ld, repo):
               "Y_ratio_concept_over_ld_per_class": {c: round(float(np.exp(x)), 3) for c, x in zip(lib_k, lr)},
               "label": "blender (Cycles, AgX), студийный свет — не игровой; концепт — imagegen (свой свет)",
               "gates": gates, "views": views, "zones": zones, "gain_suggestion": suggest, "status": "измерено"}
+    if ld.get("frame") is not None:  # new characters (the Medusa report keeps its bytes)
+        report["framing"] = {"frame": ld["frame"], "views": framing,
+                             "note": "орто-кадры по кадрированию концепта (framing.py); tone.json приёмки годится как "
+                                     "потолок T только при такой рамке"}
     (run_dir / "reports" / "measure-report.json").write_text(json.dumps(report, indent=2, sort_keys=True, ensure_ascii=False) + "\n",
                                                              encoding="utf-8")
     return report
@@ -752,21 +777,22 @@ def run_compose(run_dir, ld, repo):
     made = {}
     presets = ue_inputs(repo).load_presets()
     for view, concept_rel in ld["concepts"].items():
-        tiles = [(Image.open(repo / concept_rel).convert("RGB").resize((1021, 1540), Image.BILINEAR), "концепт: %s" % view),
+        cls = decode_class_pass(Image.open(raw / ("class-%s.png" % view)), presets)
+        W, H = cls.shape[1], cls.shape[0]  # the ortho frame of ld_preview (Medusa: 1021 x 1540)
+        tiles = [(Image.open(repo / concept_rel).convert("RGB").resize((W, H), Image.BILINEAR), "концепт: %s" % view),
                  (Image.open(raw / ("beauty-%s-h21.png" % view)).convert("RGB"), "H2.1 (как в UE сейчас по текстурам)"),
                  (Image.open(raw / ("beauty-%s-ld.png" % view)).convert("RGB"), "H2LD: MatID+LUT (приближение v2)")]
-        cls = decode_class_pass(Image.open(raw / ("class-%s.png" % view)), presets)
         rgb = np.full(cls.shape + (3,), 30, np.uint8)
         for c, col in CLASS_COLOURS.items():
             rgb[cls == c] = col
         base = np.asarray(tiles[0][0]).astype(np.float32)
         ov = np.where((cls >= 0)[..., None], base * 0.45 + rgb * 0.55, base * 0.6).astype(np.uint8)
         tiles.append((Image.fromarray(ov), "зоны MatID поверх концепта"))
-        sheet = Image.new("RGB", (1021 * len(tiles), 1540 + 34), (40, 42, 46))
+        sheet = Image.new("RGB", (W * len(tiles), H + 34), (40, 42, 46))
         d = ImageDraw.Draw(sheet)
         for i, (im, label) in enumerate(tiles):
-            sheet.paste(im, (1021 * i, 34))
-            d.text((8 + 1021 * i, 5), label, fill=(235, 235, 235), font=f)
+            sheet.paste(im, (W * i, 34))
+            d.text((8 + W * i, 5), label, fill=(235, 235, 235), font=f)
         path = out / ("compare-ld-%s.jpg" % view)
         sheet.save(path, format="JPEG", quality=92)
         made[path.name] = sha256(path)

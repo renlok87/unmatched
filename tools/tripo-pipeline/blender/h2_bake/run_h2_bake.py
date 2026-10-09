@@ -99,7 +99,8 @@ def probes(exe, profile, run_dir):
     fbx_blend = work / "probe-fbx-authored.blend"
     blender(exe, HERE / "fbx_authored.py", [sk, fbx_blend], run_dir / "logs" / "probe-fbx-authored.log")
     results = {}
-    for src, label in ((work / "sk_authored.blend", "medusa-h2-blend"), (fbx_blend, "medusa-h2-fbx")):
+    key = load_local("profile").content_key(profile)  # ASSET-MEDUSA-001 -> medusa (labels medusa-h2-blend / -fbx as before)
+    for src, label in ((work / "sk_authored.blend", "%s-h2-blend" % key), (fbx_blend, "%s-h2-fbx" % key)):
         blender(exe, anim / "rig_deform_probe.py", [src, deform, label], run_dir / "logs" / ("probe-%s.log" % label))
         subprocess.run([sys.executable, str(anim / "overlay_bones.py"), str(deform), label], check=True,
                        stdout=subprocess.DEVNULL)

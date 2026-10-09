@@ -44,4 +44,4 @@ Stages (driver: run_h2_bake.py; Blender stages run headless: blender -b --factor
 Statuses: every number is "измерено" at most; budgets are "предложено"; nothing here is art-accepted.
 """
 
-VERSION = "h2-bake/0.5.0"  # 0.5.0: --mode teamaccent (lookdev_accent.py, st_team.py); 0.4.0: --mode lookdev; the h2 stages are unchanged
+VERSION = "h2-bake/0.6.1"  # 0.6.1: preview.previous_candidate / preview.baseline optional, concept framing from preview.frame / look-dev frame (framing.py), TeamAccent hem / ribbon optional (new characters; Medusa outputs unchanged); 0.6.0: weapon side / no weapon from the profile and rig contract (D-1; Medusa outputs unchanged); 0.5.0: --mode teamaccent (lookdev_accent.py, st_team.py); 0.4.0: --mode lookdev; the h2 stages are unchanged

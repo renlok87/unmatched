@@ -10,6 +10,7 @@
       --result art/imagegen/hud-icons-vr44-codex/
   python tools/art/visual/ledger.py terms --service SYNTX --model "Magnific Precision v2" --url URL [--checked DATE]
   python tools/art/visual/ledger.py check [--balance B --next-cost X --next-kind image|video|upscale]
+  python tools/art/visual/ledger.py check --service tripo --next-cost N [--balance B] [--model M]
 
 Rules (07 4.1-4.3, 05 5.1-5.3): a row right after every spend, before the next one; no spend without a task card;
 balance_before is always a fresh get-balance (a gap to the previous balance_after is somebody else's spend, e.g. the
@@ -21,7 +22,11 @@ write.
 check verifies totals against the rows and the limits: ВР-04 (SYNTX <= 300 tokens until 2026-10-28, stop when the
 balance before a run is below 20, Tripo <= 3000 credits, no purchases), ВР-PL10 (visual SYNTX cap 54 without a new
 decision), ВР-PR04 (one run: image 8, video 10, upscale 12), ВР-05 (providerTerms row before the first spend of a
-model). With --balance/--next-cost it is the pre-flight check before a SYNTX run. Exit code 1 on any error.
+model). With --balance/--next-cost it is the pre-flight check before a SYNTX run (default, or --service syntx).
+With --service tripo --next-cost N [--balance B] it is the pre-flight before a Tripo operation instead: the ВР-04 Tripo
+remainder (limits.tripo.credits minus the Tripo rows) against N, the window limits.tripo.until, the fresh Tripo
+balance (when given) against N (no purchases, ВР-04) and a Tripo providerTerms row (ВР-05; for --model when given).
+The SYNTX limits are not applied to a Tripo pre-flight. Exit code 1 on any error.
 """
 from __future__ import annotations
 
@@ -185,7 +190,9 @@ def _date_part(iso: str) -> str:
 
 def check_ledger(data: dict, cards: dict | None, templates_md: str | None,
                  preflight: dict | None = None) -> tuple[list[str], list[str]]:
-    """(errors, warnings) of the whole ledger, plus the pre-flight of the next SYNTX run when given."""
+    """(errors, warnings) of the whole ledger, plus the pre-flight of the next run when given.
+
+    preflight["service"] is "SYNTX" (default) or "Tripo"; a Tripo pre-flight never applies the SYNTX limits."""
     errors: list[str] = []
     warnings: list[str] = []
     lim = limits_of(data)
@@ -271,7 +278,11 @@ def check_ledger(data: dict, cards: dict | None, templates_md: str | None,
     if totals["tripo_spent"] > 0:
         warnings.append(f"Tripo spent {totals['tripo_spent']}: the roster after MVP is out of scope (ВР-18)")
 
-    if preflight:
+    if preflight and preflight.get("service") == "Tripo":
+        errors_tr, warnings_tr = _tripo_preflight(preflight, lim, totals["tripo_spent"], terms)
+        errors += errors_tr
+        warnings += warnings_tr
+    elif preflight:
         b, x, kind = preflight["balance"], preflight["next_cost"], preflight.get("next_kind")
         today = preflight.get("today") or dt.date.today().isoformat()
         if b < lim["stop_balance"]:
@@ -291,6 +302,36 @@ def check_ledger(data: dict, cards: dict | None, templates_md: str | None,
             errors.append(f"pre-flight: spent {sx_window} + {x} > {lim['syntx_tokens']} (ВР-04)")
         if today > lim["syntx_until"]:
             errors.append(f"pre-flight: today {today} is after {lim['syntx_until']} (ВР-04 window closed)")
+    return errors, warnings
+
+
+def _tripo_preflight(pre: dict, lim: dict, spent: float, terms: list[dict]) -> tuple[list[str], list[str]]:
+    """Pre-flight of the next Tripo operation: ВР-04 remainder, window, fresh balance, ВР-05 terms."""
+    errors: list[str] = []
+    warnings: list[str] = []
+    x, b, model = pre["next_cost"], pre.get("balance"), pre.get("model")
+    today = pre.get("today") or dt.date.today().isoformat()
+    credits, until = lim["tripo_credits"], lim["tripo_until"]
+    remaining = round(credits - spent, 3)
+    if x < 0:
+        errors.append(f"pre-flight Tripo: price {x} is negative")
+    if spent + x > credits + EPS:
+        errors.append(f"pre-flight Tripo: spent {spent} + {x} > {credits} credits, remainder {remaining} "
+                      "(ВР-04): stop, no purchases")
+    if b is not None:
+        if b < x:
+            errors.append(f"pre-flight Tripo: balance {b} < price {x}: do not run, no purchases (ВР-04)")
+        elif b < remaining:
+            warnings.append(f"pre-flight Tripo: balance {b} is below the ВР-04 remainder {remaining}; "
+                            "the balance is the real bound")
+    if today > until:
+        errors.append(f"pre-flight Tripo: today {today} is after {until} (ВР-04 window closed)")
+    tripo_terms = [t for t in terms if t.get("service") == "Tripo"]
+    if not tripo_terms:
+        errors.append("pre-flight Tripo: no providerTerms row for Tripo: write `ledger.py terms --service Tripo "
+                      "--model ... --url ...` before the first spend (ВР-05)")
+    elif model and not terms_cover(terms, "Tripo", model):
+        errors.append(f"pre-flight Tripo: no providerTerms row for Tripo {model!r} (ВР-05: before the first spend)")
     return errors, warnings
 
 
@@ -417,18 +458,37 @@ def cmd_check(a, root: Path) -> int:
     cards = load_cards(root)
     md = (root / TEMPLATES_REL).read_text(encoding="utf-8") if (root / TEMPLATES_REL).is_file() else None
     pre = None
-    given = [v is not None for v in (a.balance, a.next_cost)]
-    if any(given) and not all(given):
-        raise VisualError("pre-flight needs both --balance and --next-cost")
-    if all(given):
-        pre = {"balance": _num(a.balance), "next_cost": _num(a.next_cost), "next_kind": a.next_kind,
+    svc = SERVICES.get((a.service or "syntx").strip().lower())
+    if svc not in ("SYNTX", "Tripo"):
+        raise VisualError("check --service must be SYNTX or Tripo (Codex is a subscription: no pre-flight)")
+    if svc == "Tripo":
+        if a.next_cost is None:
+            raise VisualError("Tripo pre-flight needs --next-cost (price of the next Tripo operation or chain)")
+        if a.next_kind:
+            raise VisualError("--next-kind is a SYNTX run kind (ВР-PR04); it does not apply to Tripo")
+        pre = {"service": "Tripo", "next_cost": _num(a.next_cost),
+               "balance": _num(a.balance) if a.balance is not None else None, "model": a.model,
                "today": a.today}
+    else:
+        if a.model:
+            raise VisualError("--model is used only by the Tripo pre-flight (--service tripo)")
+        given = [v is not None for v in (a.balance, a.next_cost)]
+        if any(given) and not all(given):
+            raise VisualError("pre-flight needs both --balance and --next-cost")
+        if all(given):
+            pre = {"service": "SYNTX", "balance": _num(a.balance), "next_cost": _num(a.next_cost),
+                   "next_kind": a.next_kind, "today": a.today}
     errors, warnings = check_ledger(data, cards, md, pre)
     t = compute_totals(data.get("entries") or [])
     lim = limits_of(data)
     print(f"ledger: {len(data.get('entries') or [])} rows; syntx_spent={t['syntx_spent']} of visual cap "
           f"{lim['visual_cap']} (ВР-PL10) and {lim['syntx_tokens']} until {lim['syntx_until']} (ВР-04); "
           f"tripo_spent={t['tripo_spent']} of {lim['tripo_credits']}; codex_packages={t['codex_packages']}")
+    if pre and pre["service"] == "Tripo":
+        rem = round(lim["tripo_credits"] - t["tripo_spent"], 3)
+        print(f"ledger: Tripo pre-flight: price {pre['next_cost']}; ВР-04 remainder {rem} of {lim['tripo_credits']} "
+              f"until {lim['tripo_until']}, after the run {round(rem - pre['next_cost'], 3)}"
+              + (f"; fresh balance {pre['balance']}" if pre["balance"] is not None else ""))
     for w in warnings:
         print(f"WARN  {w}")
     for e in errors:
@@ -470,9 +530,11 @@ def main(argv: list[str] | None = None) -> int:
     te.add_argument("--ledger-model", help="model string as written in the rows, if it differs")
 
     ch = sub.add_parser("check", help="verify totals and limits; with --balance/--next-cost also the next run")
-    ch.add_argument("--balance", help="fresh get-balance before the next run")
+    ch.add_argument("--service", help="pre-flight service: SYNTX (default) or Tripo")
+    ch.add_argument("--balance", help="fresh balance before the next run (SYNTX: required; Tripo: optional)")
     ch.add_argument("--next-cost", help="quoted price of the next run (or the planned chain)")
-    ch.add_argument("--next-kind", choices=("image", "video", "upscale"))
+    ch.add_argument("--next-kind", choices=("image", "video", "upscale"), help="SYNTX run kind (ВР-PR04)")
+    ch.add_argument("--model", help="Tripo pre-flight: model, checked against providerTerms (ВР-05)")
     ch.add_argument("--today", help=argparse.SUPPRESS)
 
     a = ap.parse_args(argv)

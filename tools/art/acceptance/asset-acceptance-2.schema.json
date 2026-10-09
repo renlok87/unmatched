@@ -1,0 +1,207 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "unmatched.asset-acceptance/2",
+  "title": "Карточка приёмки ассета: концепт-лист (этап 1), модель H2LD (этап 4), клип (этап 6)",
+  "description": "Один файл схемы на три вида карточек (поле kind). Детерминированные правила вердикта, пересчёт score и сверки между полями проверяет tools/art/acceptance/validate_card.py; схема задаёт только форму. Баллы 0-2 с шагом 0,5; score = round(sum / (2 x n_applicable) x 10, 1).",
+  "type": "object",
+  "required": [
+    "schema", "kind", "asset_id", "cycle", "date", "accepted_object", "frames", "reports", "gates", "scores",
+    "score", "verdict", "rework_fix_list", "acceptor", "executor_session_id", "decided_by", "status_note"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "enum": ["unmatched.asset-acceptance/2", "unmatched.concept-acceptance/1", "unmatched.anim-acceptance/1"]
+    },
+    "kind": { "enum": ["concept", "model", "anim"] },
+    "asset_id": { "type": "string", "pattern": "^ASSET-[A-Z0-9]+(-[A-Z0-9]+)*-[0-9]{3}$" },
+    "clip": {
+      "description": "только kind=anim: имя клипа D-11 (Idle, LungeAttack, HitReact, DeathSettle)",
+      "type": "string", "pattern": "^[A-Z][A-Za-z0-9]+$"
+    },
+    "cycle": { "type": "string", "pattern": "^r[1-9]$" },
+    "date": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+    "previous_card": {
+      "description": "card.json предыдущего цикла (путь от корня репо); null у r1",
+      "anyOf": [{ "$ref": "#/$defs/repo_path" }, { "type": "null" }]
+    },
+    "accepted_object": {
+      "description": "что принимается: файлы от корня репо + sha256 (модель: SK_<Key>_H2LD.fbx, SM_<Key>_H2LD_Base.fbx, текстуры 2K)",
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "required": ["path", "sha256"], "additionalProperties": false,
+        "properties": {
+          "path": { "$ref": "#/$defs/repo_path" },
+          "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        }
+      }
+    },
+    "frames": {
+      "type": "object", "required": ["dir", "files"], "additionalProperties": false,
+      "properties": {
+        "dir": { "$ref": "#/$defs/repo_path" },
+        "files": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[A-Za-z0-9._-]+\\.(jpg|png|json)$" }
+        }
+      }
+    },
+    "reports": { "type": "array", "items": { "$ref": "#/$defs/repo_path" } },
+    "gates": {
+      "type": "object", "minProperties": 1,
+      "additionalProperties": { "$ref": "#/$defs/gate" }
+    },
+    "scores": { "type": "object" },
+    "score": { "type": "number", "minimum": 0, "maximum": 10 },
+    "verdict": { "enum": ["pass", "rework_blender", "return_to_stage_1", "return_to_stage_2", "escalate_user"] },
+    "verdict_reason": {
+      "description": "обязательно при verdict != pass: почему выбран этот маршрут (при выборе из двух — почему именно он)",
+      "type": "string", "minLength": 10
+    },
+    "rework_fix_list": {
+      "type": "array",
+      "items": {
+        "type": "object", "required": ["item", "frame", "fix", "tool"], "additionalProperties": false,
+        "properties": {
+          "item": {
+            "description": "измерение (S/F/T/D, S/C/Q/P, R/C/D/L) с баллом < 2 или id гейта со статусом FAIL",
+            "type": "string", "pattern": "^([SFTDCQPRL]|G-[A-Z]+)$"
+          },
+          "frame": { "type": "string", "minLength": 1 },
+          "fix": { "type": "string", "minLength": 5 },
+          "tool": { "type": "string", "minLength": 3 }
+        }
+      }
+    },
+    "known_issues": {
+      "description": "необязательные замечания, не меняющие вердикт (при pass — то, что видно, но в допуске; тон классов status floor; справочные числа отчётов). Машиночитаемо: следующая доработка или UE-съёмка этапа 7 берут их отсюда",
+      "type": "array",
+      "items": {
+        "type": "object", "required": ["item", "frame", "note"], "additionalProperties": false,
+        "properties": {
+          "item": { "type": "string", "pattern": "^([SFTDCQPRL]|G-[A-Z]+)$" },
+          "frame": { "type": "string", "minLength": 1 },
+          "note": { "type": "string", "minLength": 5 }
+        }
+      }
+    },
+    "acceptor": {
+      "type": "object", "required": ["profile", "session_id"], "additionalProperties": false,
+      "properties": {
+        "profile": { "enum": ["Opus xhigh", "Sol 6.1 xhigh"] },
+        "session_id": { "type": "string", "minLength": 3 }
+      }
+    },
+    "executor_session_id": { "type": "string", "minLength": 3 },
+    "decided_by": { "type": "string", "minLength": 3 },
+    "status_note": { "type": "string" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "kind": { "const": "model" } }, "required": ["kind"] },
+      "then": {
+        "properties": {
+          "schema": { "const": "unmatched.asset-acceptance/2" },
+          "cycle": { "enum": ["r1", "r2", "r3"] },
+          "gates": {
+            "required": ["G-TOPO", "G-UV", "G-TEX", "G-RIG", "G-NAMES"],
+            "propertyNames": { "enum": ["G-TOPO", "G-UV", "G-TEX", "G-RIG", "G-NAMES"] }
+          },
+          "scores": {
+            "required": ["S", "F", "T", "D"], "additionalProperties": false,
+            "properties": {
+              "S": { "$ref": "#/$defs/dim" }, "F": { "$ref": "#/$defs/dim" }, "T": { "$ref": "#/$defs/dim" },
+              "D": { "$ref": "#/$defs/dim_nullable" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "kind": { "const": "concept" } }, "required": ["kind"] },
+      "then": {
+        "properties": {
+          "schema": { "const": "unmatched.concept-acceptance/1" },
+          "cycle": { "enum": ["r1", "r2", "r3", "r4"] },
+          "gates": { "required": ["G-CHECKS"], "propertyNames": { "enum": ["G-CHECKS"] } },
+          "scores": {
+            "required": ["S", "C", "Q", "P"], "additionalProperties": false,
+            "properties": {
+              "S": { "$ref": "#/$defs/dim" }, "C": { "$ref": "#/$defs/dim" }, "Q": { "$ref": "#/$defs/dim" },
+              "P": { "$ref": "#/$defs/dim" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "kind": { "const": "anim" } }, "required": ["kind"] },
+      "then": {
+        "required": ["clip"],
+        "properties": {
+          "schema": { "const": "unmatched.anim-acceptance/1" },
+          "cycle": { "enum": ["r1", "r2", "r3"] },
+          "gates": {
+            "required": ["G-VALIDATE", "G-CONTACT", "G-MANIFEST"],
+            "propertyNames": { "enum": ["G-VALIDATE", "G-CONTACT", "G-MANIFEST"] }
+          },
+          "scores": {
+            "required": ["R", "C", "D", "L"], "additionalProperties": false,
+            "properties": {
+              "R": { "$ref": "#/$defs/dim" }, "C": { "$ref": "#/$defs/dim" }, "D": { "$ref": "#/$defs/dim" },
+              "L": { "$ref": "#/$defs/dim" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "verdict": { "enum": ["rework_blender", "return_to_stage_1", "return_to_stage_2", "escalate_user"] } }, "required": ["verdict"] },
+      "then": { "required": ["verdict_reason"] }
+    },
+    {
+      "if": { "properties": { "verdict": { "const": "rework_blender" } }, "required": ["verdict"] },
+      "then": { "properties": { "rework_fix_list": { "minItems": 1 } } }
+    },
+    {
+      "if": { "properties": { "verdict": { "const": "pass" } }, "required": ["verdict"] },
+      "then": { "properties": { "status_note": { "minLength": 10 } } }
+    }
+  ],
+  "$defs": {
+    "repo_path": {
+      "description": "путь от корня репозитория, прямые слэши, без буквы диска, без ведущего / и без ..",
+      "type": "string", "minLength": 1,
+      "pattern": "^(?![A-Za-z]:)(?!/)(?!.*\\\\)(?!(.*/)?\\.\\.(/|$)).+$"
+    },
+    "gate": {
+      "type": "object", "required": ["status", "source"], "additionalProperties": false,
+      "properties": {
+        "status": { "enum": ["PASS", "FAIL", "n/a"] },
+        "source": { "type": "string", "minLength": 3, "description": "отчёт (путь от корня) или команда, давшая статус" },
+        "note": { "type": "string" },
+        "source_defect": {
+          "description": "только при FAIL у модели: true, если дефект в исходнике Tripo (нет части, фантом) — маршрут return_to_stage_2",
+          "type": "boolean"
+        }
+      }
+    },
+    "dim": {
+      "type": "object", "required": ["value", "rationale", "frames"], "additionalProperties": false,
+      "properties": {
+        "value": { "type": "number", "minimum": 0, "maximum": 2, "multipleOf": 0.5 },
+        "rationale": { "type": "string", "minLength": 5 },
+        "frames": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "dim_nullable": {
+      "description": "D у пропа без рига: value null, frames пустой, rationale — почему n/a",
+      "type": "object", "required": ["value", "rationale", "frames"], "additionalProperties": false,
+      "properties": {
+        "value": { "type": ["number", "null"], "minimum": 0, "maximum": 2, "multipleOf": 0.5 },
+        "rationale": { "type": "string", "minLength": 5 },
+        "frames": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    }
+  }
+}

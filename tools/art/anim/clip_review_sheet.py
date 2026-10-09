@@ -1,11 +1,16 @@
 """AN-18 (ВР-17): acceptance sheets of the 16 D-11 clips from -BenchClipPose (AN-17) frames.
 
 Commands
-  run    8 bench launches (2 maps x 4 characters) through tools/art/render/live_tune.py bench. The first launch of a map
-         (KingArthur) shoots K1 + K2x1.6 over the 35 AN-17 poses; the other three shoot K2x1.6 only, over the poses of
-         their own character (K1 does not depend on the focus fighter, it is taken from the first launch).
+  run    one bench launch per map x character through tools/art/render/live_tune.py bench. The first launch of a map
+         (the first key of --heroes, KingArthur by default) shoots K1 + K2x1.6 over the AN-17 pose union; the others
+         shoot K2x1.6 only, over the poses of their own character (K1 does not depend on the focus fighter, it is taken
+         from the first launch). --fixture FILE (one map) or --fixture marmoreal=FILE,sarpedon=FILE passes a bench
+         fixture variant (a new character on the scene, skill reference new-character-registration.md D-2) on to
+         live_tune.py bench --fixture.
            python tools/art/anim/clip_review_sheet.py run [--packaged] [--maps marmoreal,sarpedon] [--heroes ...]
-  sheet  for every card AN-01...AN-16: rows = the key frames of the clip (column keyframes of the card; Idle - the
+               [--fixture ...]
+  sheet  for every clip card of HEROES (AN-01...AN-16 for the four MVP characters, plus the registered new ones):
+         rows = the key frames of the clip (column keyframes of the card; Idle - the
          quarters of the loop), columns = Marmoreal K1 (figure crop by figrect + 25 %), Marmoreal K2x1.6, Sarpedon K1
          (crop), Sarpedon K2x1.6; colour / gray Rec.709 / deuteranopia (Machado 2009, 1.0) JPEGs <= 2 MB, frames.json.
            python tools/art/anim/clip_review_sheet.py sheet [--frames C:/tmp/visual/AN-18] [--out docs/.../VISUAL]
@@ -25,6 +30,7 @@ import sys
 import tempfile
 import time
 from pathlib import Path
+from typing import NamedTuple
 
 import numpy as np
 from PIL import Image, ImageDraw
@@ -43,12 +49,29 @@ MAPS = {"marmoreal": ("Marmoreal original", "c121b47f8d6eb28daccb76d05"),
 FPS = 24
 FRAME_MS = 1000.0 / FPS
 CLIPS = ("Idle", "LungeAttack", "HitReact", "DeathSettle")
-# hero key (-BenchClipPoseFighter) -> manifest character, manifest id prefix, Idle length (s) that names it in the trace
-HEROES = {"KingArthur": ("Arthur", "ARTH", 2.5), "Merlin": ("Merlin", "MER", 3.0),
-          "Medusa": ("Medusa", "MED", 56.0 / 24.0), "Harpy": ("Harpy", "HAR", 2.0)}
-CARDS = {f"AN-{4 * h + c + 1:02d}": (hero, clip) for h, hero in enumerate(HEROES) for c, clip in enumerate(CLIPS)}
+
+
+class Hero(NamedTuple):
+    character: str  # manifest / rig-contract character (clip-manifest.json "character")
+    prefix: str  # manifest clip id prefix: <prefix>-<Clip>
+    idle_s: float  # Idle length (s): fallback key of a trace fighter, used only while unique among HEROES
+    cards: tuple[str, ...]  # the anim.csv clip cards, explicit, in CLIPS order (Idle, LungeAttack, HitReact, DeathSettle)
+
+
+# hero key (= -BenchClipPoseFighter, = the frames folder <frames>/<map>/<Key>) -> its record.
+# Registering a new character is ONE record here plus its 4 clip cards in docs/game-design/visual/06-tasks/anim.csv
+# (the next free AN numbers; title "<Name> — <state> (<Clip>), клип D-11"; columns timing and keyframes):
+#   "<Key>": Hero("<Character>", "<PRE>", <IdleSeconds>, ("AN-<idle>", "AN-<lunge>", "AN-<hit>", "AN-<death>")),
+HEROES = {
+    "KingArthur": Hero("Arthur", "ARTH", 2.5, ("AN-01", "AN-02", "AN-03", "AN-04")),
+    "Merlin": Hero("Merlin", "MER", 3.0, ("AN-05", "AN-06", "AN-07", "AN-08")),
+    "Medusa": Hero("Medusa", "MED", 56.0 / 24.0, ("AN-09", "AN-10", "AN-11", "AN-12")),
+    "Harpy": Hero("Harpy", "HAR", 2.0, ("AN-13", "AN-14", "AN-15", "AN-16")),
+}
+IDLE_EPS = 0.01
 IDLE_Q = (0, 25, 50, 75)
-# the AN-17 pose union of the four build profiles (card AN-17, column keyframes)
+# the AN-17 pose union of the four build profiles (card AN-17, column keyframes); the K1 launch adds the card frames
+# of every registered character (union_tokens(cards)), so a new character's poses outside it are shot too
 UNION = {"LungeAttack": (0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14), "HitReact": (0, 2, 4, 5, 7, 8, 10),
          "DeathSettle": (0, 3, 6, 7, 8, 9, 12, 13, 16, 17, 21)}
 VIEW_K1, VIEW_K2 = "K1", "K2x1.6"
@@ -63,11 +86,55 @@ RE_CLIPPOSE = re.compile(r"ARTPREVIEW clippose fighter=(\S+) clip=(\S+) frame=(\
 RE_FIGRECT = re.compile(r"ARTPREVIEW figrect fighter=(\S+) view=(\S+) x=(-?[\d.]+) y=(-?[\d.]+) w=([\d.]+) h=([\d.]+)")
 RE_SHOT = re.compile(r"BENCH shot view=(\S+) saved=(\d) path=(.+)$")
 RE_FOCUS = re.compile(r"BENCH clip-pose poses=\d+ views=\d+ fighter=(\S+)")
+RE_FIXTURE = re.compile(r"-BenchFixture=(\S+)")
 RE_SHOTNAME = re.compile(r"bench-(.+?)-(Idle|LungeAttack|HitReact|DeathSettle)-(f\d+|q\d+)-1920x1080\.png$")
 
 
 class SheetError(Exception):
     pass
+
+
+# ---- the character registry -------------------------------------------------------------------------------------------
+
+def clip_cards() -> dict[str, tuple[str, str]]:
+    """card id -> (hero key, clip), from the explicit cards of HEROES (read at call time)."""
+    out: dict[str, tuple[str, str]] = {}
+    for key, hero in HEROES.items():
+        if len(hero.cards) != len(CLIPS):
+            raise SheetError(f"HEROES[{key}]: {len(hero.cards)} cards, want {len(CLIPS)} ({', '.join(CLIPS)})")
+        for cid, clip in zip(hero.cards, CLIPS):
+            if cid in out:
+                raise SheetError(f"card {cid} registered twice: {out[cid][0]} and {key}")
+            out[cid] = (key, clip)
+    return out
+
+
+def registry_errors(cards: dict) -> list[str]:
+    """Every registered card exists in 06-tasks/*.csv and its title names its clip, e.g. '(LungeAttack)'."""
+    try:
+        reg = clip_cards()
+    except SheetError as e:
+        return [str(e)]
+    errs = []
+    for cid, (key, clip) in reg.items():
+        card = cards.get(cid)
+        if card is None:
+            errs.append(f"{key} {clip}: card {cid} not in docs/game-design/visual/06-tasks/*.csv")
+        elif f"({clip})" not in card.get("title", ""):
+            errs.append(f"{key} {clip}: card {cid} is {card.get('title', '')!r}, not a {clip} clip card")
+    return errs
+
+
+def check_registry(cards: dict) -> None:
+    errs = registry_errors(cards)
+    if errs:
+        raise SheetError("HEROES registry: " + "; ".join(errs))
+
+
+def unique_idle_keys() -> dict[str, float]:
+    """Hero key -> Idle length, for the keys whose Idle length no other registered character shares (+-IDLE_EPS)."""
+    return {k: h.idle_s for k, h in HEROES.items()
+            if not any(o != k and abs(h.idle_s - oh.idle_s) < IDLE_EPS for o, oh in HEROES.items())}
 
 
 # ---- the pose lists ---------------------------------------------------------------------------------------------------
@@ -94,32 +161,69 @@ def pose_arg(tokens: dict[str, list[str]]) -> str:
     return ";".join(parts)
 
 
-def union_tokens() -> dict[str, list[str]]:
+def union_tokens(cards: dict | None = None) -> dict[str, list[str]]:
+    """The K1 pose list: the AN-17 union, plus (given the cards) the card frames of every registered character."""
+    frames = {c: set(fr) for c, fr in UNION.items()}
+    if cards is not None:
+        for cid, (_, clip) in clip_cards().items():
+            if clip != "Idle" and cid in cards:
+                frames[clip] |= {int(t[1:]) for t in card_keyframes(cards[cid], clip)}
     out = {"Idle": [f"q{q}" for q in IDLE_Q]}
-    out.update({c: [f"f{n:02d}" for n in fr] for c, fr in UNION.items()})
+    out.update({c: [f"f{n:02d}" for n in sorted(fr)] for c, fr in frames.items()})
     return out
 
 
 def hero_tokens(cards: dict, hero: str) -> dict[str, list[str]]:
-    return {clip: card_keyframes(cards[cid], clip) for cid, (h, clip) in CARDS.items() if h == hero}
+    return {clip: card_keyframes(cards[cid], clip) for cid, (h, clip) in clip_cards().items() if h == hero}
+
+
+def parse_fixtures(spec: str, maps: list[str]) -> dict[str, str]:
+    """--fixture: 'FILE' (exactly one map) or 'marmoreal=FILE,sarpedon=FILE' -> {map: file}."""
+    if not spec:
+        return {}
+    if "=" not in spec:
+        if len(maps) != 1:
+            raise SheetError("--fixture FILE needs exactly one --maps entry; else --fixture marmoreal=A,sarpedon=B")
+        return {maps[0]: spec}
+    out = {}
+    for part in (p for p in spec.split(",") if p):
+        m, _, f = part.partition("=")
+        if m not in MAPS or not f:
+            raise SheetError(f"--fixture entry {part!r}: want <{'|'.join(MAPS)}>=<file>")
+        out[m] = f
+    return out
+
+
+def live_tune_has_fixture() -> bool:
+    r = subprocess.run([sys.executable, str(LIVE_TUNE), "bench", "--help"], capture_output=True, text=True,
+                       cwd=str(REPO))
+    return "--fixture" in r.stdout
 
 
 # ---- run --------------------------------------------------------------------------------------------------------------
 
 def cmd_run(a) -> int:
     cards = load_cards(REPO)
+    check_registry(cards)
     maps = [m for m in a.maps.split(",") if m]
     heroes = [h for h in a.heroes.split(",") if h]
-    for hero in heroes:  # every card pose must be in the union K1 run (K1 cells of all four characters)
+    unknown = [m for m in maps if m not in MAPS] + [h for h in heroes if h not in HEROES]
+    if unknown or not heroes:
+        raise SheetError(f"unknown map / hero {unknown or '(none)'}; maps {', '.join(MAPS)}, heroes {', '.join(HEROES)}")
+    fixtures = parse_fixtures(getattr(a, "fixture", "") or "", maps)
+    if fixtures and not live_tune_has_fixture():
+        raise SheetError("live_tune.py bench has no --fixture yet (new-character-registration.md D-2)")
+    union = union_tokens(cards)
+    for hero in heroes:  # every card pose must be in the union K1 run (K1 cells of all the characters)
         for clip, toks in hero_tokens(cards, hero).items():
-            if clip != "Idle" and not set(toks) <= set(union_tokens()[clip]):
-                raise SheetError(f"{hero} {clip}: card frames {toks} outside the AN-17 union")
+            if clip != "Idle" and not set(toks) <= set(union[clip]):
+                raise SheetError(f"{hero} {clip}: card frames {toks} outside the K1 union")
     results = []
     for map_key in maps:
         for hero in heroes:
-            first = hero == "KingArthur"
+            first = hero == heroes[0]  # K1 comes from the first launch of the map, whatever character it focuses
             views = f"{VIEW_K1}+{VIEW_K2}" if first else VIEW_K2
-            poses = pose_arg(union_tokens() if first else hero_tokens(cards, hero))
+            poses = pose_arg(union if first else hero_tokens(cards, hero))
             out = Path(a.frames) / map_key / hero
             if (out / "exit.txt").exists() and "exit=0" in (out / "exit.txt").read_text() and not a.force:
                 print(f"skip {out} (done)")
@@ -129,6 +233,8 @@ def cmd_run(a) -> int:
                    f"--extra=-BenchClipPose={poses}", f"--extra=-BenchClipPoseFighter={hero}"]
             if a.packaged:
                 cmd.append("--packaged")
+            if map_key in fixtures:
+                cmd.append(f"--fixture={fixtures[map_key]}")
             t0 = time.time()
             print(f"[{time.strftime('%H:%M:%S')}] {map_key} {hero} views={views}", flush=True)
             r = subprocess.run(cmd, cwd=str(REPO))
@@ -139,9 +245,16 @@ def cmd_run(a) -> int:
 
 # ---- trace parsing ----------------------------------------------------------------------------------------------------
 
-def parse_run(run: Path) -> dict:
+def parse_run(run: Path, key: str | None = None) -> dict:
     """bench.trace.log of one launch -> shots {file name: {view, clip, token, figrects, clipposes, render}}, artlook,
-    focus fighter, fighter -> hero (by the Idle length of its clippose line), board / backdrop lines."""
+    focus fighter, fighter -> hero, board / backdrop lines, the bench fixture of the launch.
+
+    fighter -> hero: the focus fighter of the launch ('BENCH clip-pose ... fighter=<id>'; the engine resolves
+    -BenchClipPoseFighter=<Key> through Specs()) is the character of the launch folder <frames>/<map>/<Key> (key; by
+    default the folder name when it is a HEROES key). Any other fighter gets a key by the Idle length of its clippose
+    line only when that length is unique among HEROES (unique_idle_keys) and the key is not the launch's own."""
+    if key is None and run.name in HEROES:
+        key = run.name
     trace = run / "bench.trace.log"
     if not trace.is_file():
         raise SheetError(f"{trace} missing")
@@ -180,14 +293,30 @@ def parse_run(run: Path) -> dict:
                                     "clipposes": list(poses), "render": render}
             rects = []
     heroes: dict[str, str] = {}
+    if focus and key:
+        heroes[focus] = key
+    unique = unique_idle_keys()
     for s in shots.values():
         for p in s["clipposes"]:
-            if p["clip"] == "Idle":
-                for key, (_, _, idle_len) in HEROES.items():
-                    if abs(p["len"] - idle_len) < 0.01:
-                        heroes[p["fighter"]] = key
+            if p["clip"] == "Idle" and p["fighter"] not in heroes:
+                for k, idle_len in unique.items():
+                    if k != key and abs(p["len"] - idle_len) < IDLE_EPS:
+                        heroes[p["fighter"]] = k
+    cmdline = (run / "cmdline.txt").read_text(encoding="utf-8").strip() if (run / "cmdline.txt").exists() else ""
+    fx = RE_FIXTURE.search(cmdline)
     return {"run": str(run), "shots": shots, "artlook": artlook, "focus": focus, "heroes": heroes, "scene": scene,
-            "cmdline": (run / "cmdline.txt").read_text(encoding="utf-8").strip() if (run / "cmdline.txt").exists() else ""}
+            "key": key, "cmdline": cmdline, "fixture": Path(fx.group(1)).name if fx else ""}
+
+
+def has_k1(run: dict | None) -> bool:
+    return bool(run) and any(s["view"] == VIEW_K1 for s in run["shots"].values())
+
+
+def k1_run_for(map_runs: dict[str, dict], hero: str) -> dict | None:
+    """The K1 launch of a card: the character's own launch if it shot K1, else the first registered one that did."""
+    if has_k1(map_runs.get(hero)):
+        return map_runs[hero]
+    return next((map_runs[k] for k in HEROES if has_k1(map_runs.get(k))), None)
 
 
 def hero_fighter(runs: list[dict], hero: str) -> str:
@@ -310,6 +439,8 @@ def cmd_sheet(a) -> int:
     cards = load_cards(REPO)
     manifest = {c["id"]: c for c in json.loads(MANIFEST.read_text(encoding="utf-8"))["clips"]
                 if c.get("role") == "production"}
+    check_registry(cards)
+    reg = clip_cards()
     frames_root = Path(a.frames)
     runs: dict[str, dict[str, dict]] = {}
     for map_key in MAPS:
@@ -317,15 +448,19 @@ def cmd_sheet(a) -> int:
         for hero in HEROES:
             d = frames_root / map_key / hero
             if (d / "bench.trace.log").exists():
-                runs[map_key][hero] = parse_run(d)
+                runs[map_key][hero] = parse_run(d, hero)
     stamp = build_stamp([r for m in runs.values() for r in m.values()])
-    only = set(a.cards.split(",")) if a.cards else set(CARDS)
+    only = {c for c in a.cards.split(",") if c} if a.cards else set(reg)
+    if only - set(reg):
+        raise SheetError(f"--cards {sorted(only - set(reg))} are not clip cards of HEROES ({', '.join(reg)})")
     summary = {"cards": {}, "problems": []}
-    for cid, (hero, clip) in CARDS.items():
+    for cid, (hero, clip) in reg.items():
         if cid not in only:
             continue
         card = cards[cid]
-        char, prefix, _ = HEROES[hero]
+        char, prefix = HEROES[hero].character, HEROES[hero].prefix
+        if f"{prefix}-{clip}" not in manifest:
+            raise SheetError(f"{cid}: no production clip {prefix}-{clip} in {MANIFEST.name}")
         mf = manifest[f"{prefix}-{clip}"]
         clip_len = float(mf["duration_s"]["measured"])
         n_frames = round(clip_len * FPS)
@@ -338,9 +473,13 @@ def cmd_sheet(a) -> int:
         rows = [{"token": t, "cells": {}} for t in tokens]
         for map_key, (map_name, board) in MAPS.items():
             mr = runs.get(map_key, {})
-            k1_run, k2_run = mr.get("KingArthur"), mr.get(hero)
+            k1_run, k2_run = k1_run_for(mr, hero), mr.get(hero)
             all_runs = [r for r in (k1_run, k2_run) if r]
             fighter = hero_fighter(all_runs, hero) if all_runs else ""
+            if k1_run and k2_run and k1_run is not k2_run and k1_run["fixture"] != k2_run["fixture"]:
+                problems.append(f"{map_key} K1 from the {k1_run['key']} launch (fixture {k1_run['fixture'] or '?'}), K2 "
+                                f"from fixture {k2_run['fixture'] or '?'}: {fighter} may be another figure in K1; shoot "
+                                f"K1 in the {hero} launch (run --heroes {hero},... --fixture ...)")
             short = map_name.split()[0]
             c1, c2 = f"{short} K1", f"{short} K2×1,6"
             cols += [c1, c2]
@@ -438,18 +577,25 @@ def cmd_sheet(a) -> int:
 
 # ---- self-test --------------------------------------------------------------------------------------------------------
 
-def _synthetic(root: Path) -> None:
-    """Fake launches: 1920x1080 frames with a coloured block per figure; traces in the bench format."""
-    fighters = {"f-1-hero": ("KingArthur", 2.5, (900, 500)), "f-1-sk0": ("Merlin", 3.0, (1100, 520)),
-                "f-0-hero": ("Medusa", 56 / 24, (700, 480)), "f-0-sk0": ("Harpy", 2.0, (500, 600))}
+SYNTH_FIGHTERS = {"f-1-hero": ("KingArthur", 2.5, (900, 500)), "f-1-sk0": ("Merlin", 3.0, (1100, 520)),
+                  "f-0-hero": ("Medusa", 56 / 24, (700, 480)), "f-0-sk0": ("Harpy", 2.0, (500, 600))}
+
+
+def _synthetic(root: Path, fighters: dict | None = None, heroes: list[str] | None = None, fixture: str = "",
+               toks: dict | None = None) -> None:
+    """Fake launches: 1920x1080 frames with a coloured block per figure; traces in the bench format. fighters: id ->
+    (hero key, Idle length, (x, y)); heroes: the launches in run order (the first one also shoots K1); fixture: the
+    -BenchFixture file name written to cmdline.txt; toks: the K1 pose list (default the AN-17 union)."""
+    fighters = fighters or SYNTH_FIGHTERS
+    heroes = heroes or list(HEROES)
+    toks = toks or union_tokens()
     lens = {"LungeAttack": 0.583, "HitReact": 0.417, "DeathSettle": 0.875}
     for map_key in MAPS:
-        for hero in HEROES:
+        for hero in heroes:
             run = root / map_key / hero
             run.mkdir(parents=True, exist_ok=True)
-            first = hero == "KingArthur"
+            first = hero == heroes[0]
             views = [VIEW_K1, VIEW_K2] if first else [VIEW_K2]
-            toks = union_tokens()
             focus = next(f for f, v in fighters.items() if v[0] == hero)
             lines = ["2026.10.08-00.00.00 ARTLOOK art=1 source=default heroes=v2",
                      f"2026.10.08-00.00.00 BENCH clip-pose poses=35 views={len(views)} fighter={focus}",
@@ -474,20 +620,28 @@ def _synthetic(root: Path) -> None:
                         img.save(run / name)
                         lines.append(f"2026.10.08-00.00.03 BENCH shot view={v} saved=1 path={run}/{name}")
             (run / "bench.trace.log").write_text("\n".join(lines) + "\n", encoding="utf-8")
-            (run / "cmdline.txt").write_text("UnrealEditor.exe -game\n", encoding="utf-8")
+            fx = f" -BenchFixture=C:/x/Config/Bench/{fixture}" if fixture else ""
+            (run / "cmdline.txt").write_text(f"UnrealEditor.exe -game{fx}\n", encoding="utf-8")
 
 
 def cmd_check(_a) -> int:
     fails = []
     cards = load_cards(REPO)
+    fails += [f"registry: {e}" for e in registry_errors(cards)]
+    # the explicit card map keeps the MVP numbers AN-01..AN-16 (4 per character in CLIPS order)
+    mvp = {f"AN-{4 * h + c + 1:02d}": (k, clip) for h, k in enumerate(("KingArthur", "Merlin", "Medusa", "Harpy"))
+           for c, clip in enumerate(CLIPS)}
+    reg = clip_cards()
+    if {c: v for c, v in reg.items() if c in mvp} != mvp:
+        fails.append("card map of the four MVP characters != AN-01..AN-16")
     # poses: the card rows give the expected key frames and every one is in the AN-17 union
     expect = {"AN-02": ["f00", "f02", "f04", "f07", "f09", "f12", "f14"], "AN-06": ["f00", "f03", "f06", "f08", "f10",
               "f12", "f14"], "AN-16": ["f00", "f03", "f08", "f13", "f17", "f21"], "AN-01": ["q0", "q25", "q50", "q75"]}
     for cid, want in expect.items():
-        got = card_keyframes(cards[cid], CARDS[cid][1])
+        got = card_keyframes(cards[cid], reg[cid][1])
         if got != want:
             fails.append(f"keyframes {cid}: {got} != {want}")
-    for cid, (hero, clip) in CARDS.items():
+    for cid, (hero, clip) in mvp.items():  # the MVP K1 pose list stays the AN-17 union (a new character may extend it)
         if clip != "Idle" and not set(card_keyframes(cards[cid], clip)) <= set(union_tokens()[clip]):
             fails.append(f"{cid}: frames outside the union")
     if contact_frame(cards["AN-02"]) != 7 or contact_frame(cards["AN-06"]) != 8:
@@ -549,10 +703,12 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--settle", type=float, default=3.0)
     r.add_argument("--measure", type=float, default=1.0)
     r.add_argument("--force", action="store_true", help="re-run launches that already finished")
+    r.add_argument("--fixture", default="", help="bench fixture variant: FILE (one map) or marmoreal=FILE,sarpedon=FILE "
+                                                  "(Config/Bench file, passed to live_tune.py bench --fixture)")
     s = sub.add_parser("sheet")
     s.add_argument("--frames", default=str(FRAMES_DEFAULT))
     s.add_argument("--out", default=str(OUT_DEFAULT))
-    s.add_argument("--cards", default="", help="comma list, default AN-01..AN-16")
+    s.add_argument("--cards", default="", help="comma list, default every clip card of HEROES (AN-01..AN-16 + new)")
     a = ap.parse_args(argv)
     try:
         if a.check:

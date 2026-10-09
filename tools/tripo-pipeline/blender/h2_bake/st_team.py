@@ -28,6 +28,7 @@ import numpy as np
 from mathutils import Vector
 
 from . import bl_util as U
+from . import profile as PR
 from . import st_lookdev as SL
 
 
@@ -50,7 +51,7 @@ def run(params, profile):
     maps = json.loads((run_dir / "reports" / "ld-team-accent-report.json").read_text(encoding="utf-8"))
     rcfg, cc, cal_cfg = ta["render"], ta["cobble"]["light"], ta["cobble"]["exposure_calibration"]
     scene = U.reset()
-    names = (profile["rig"]["armature_object"], profile["meshes"]["body"], profile["meshes"]["weapon"], profile["meshes"]["base"])
+    names = (profile["rig"]["armature_object"],) + PR.figure_mesh_names(profile)  # body[, weapon], base (D-1)
     objs = SL.append_figure(src_run / ld["source"]["files"]["sk_authored"], names)
     for o in objs:
         scene.collection.objects.link(o)

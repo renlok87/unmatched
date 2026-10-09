@@ -2,17 +2,20 @@
   H2  the game model (work/sk_authored.blend) with the baked 4K PBR set (BC sRGB, N OpenGL, ORM: G roughness,
       B metallic; AO is not fed to Principled — Cycles computes its own occlusion),
   HP  the Tripo high-poly with its own 8K/PBR maps (reference: what the bake had to transfer),
-  PREV the current game candidate (profile preview.previous_candidate, UM_FBX_v1 FBX turned back to the authored
-      frame) with its 2K atlas.
-Shots: orthographic front/side/back framed exactly like the H2 concepts (1021 x 1540, base centred at x 45 %,
-snakes at y 2 %, base bottom at y 96.8 % — prompts.md), close-ups (profile preview.closeups), and the game camera K2
+  PREV the current game candidate (OPTIONAL profile preview.previous_candidate, UM_FBX_v1 FBX turned back to the
+      authored frame) with its 2K atlas. A new character has no earlier candidate: without the key the PREV set is not
+      rendered and compose drops its tiles (h2-bake/0.6.1).
+Shots: orthographic front/side/back framed like the concepts (framing.py: without preview.frame the Medusa H2 canon
+1021 x 1540, base centred at x 45 %, snakes at y 2 %, base bottom at y 96.8 % — prompts.md; a new character sets
+preview.frame = {"checks_report": <checks-report.json of its concept set>, "side": SIDE_VIEW}), close-ups (profile
+preview.closeups), and the game camera K2
 (FOV 35 deg horizontal, pitch -55 deg, distances of the P1.7 control scene, 1920 x 1080, game scale) with a
 silhouette pass (alpha) for the K2 pixel measurements. Raw PNGs go to work/preview_raw; the driver composes the
 side-by-side sheets (compose.py).
 preview.backface_culling (verify 2026-09-29): the H2 and previous-candidate materials pass back faces through
 (Geometry.Backfacing -> Transparent BSDF), like UE one-sided materials, so an opening shows as see-through in the
 frames too; the Tripo high-poly keeps its own two-sided glTF material (reference).
-preview.baseline (H2.1, 2026-09-29): a second texture set of the SAME game model (the H2 textures before the material
+preview.baseline (H2.1, 2026-09-29; optional, Medusa only): a second texture set of the SAME game model (the H2 textures before the material
 pass, a local copy pinned by sha256 in the profile) is rendered with the same code, light and cameras as set BASE
 (ortho front/side/back, close-ups, K2), so the compose stage can put concept | H2 | H2.1 side by side.
 preview.pose_closeups: Cycles close-ups in a probe pose (st_seams.pose, e.g. arm_r_raise: the fist lifted off the
@@ -30,6 +33,8 @@ import numpy as np
 from mathutils import Matrix, Vector
 
 from . import bl_util as U
+from . import framing as FR
+from . import profile as PR
 
 RAW = "preview_raw"
 
@@ -151,8 +156,8 @@ def run(params, profile):
     cols = {}
     # ---- H2 game model
     with bpy.data.libraries.load(str(run_dir / "work" / "sk_authored.blend"), link=False) as (src, dst):
-        dst.objects = [n for n in src.objects if n in (profile["rig"]["armature_object"], profile["meshes"]["body"],
-                                                       profile["meshes"]["weapon"], profile["meshes"]["base"])]
+        # figure meshes of the profile: body (+ weapon when a part is the weapon, D-1) + base
+        dst.objects = [n for n in src.objects if n in (profile["rig"]["armature_object"],) + PR.figure_mesh_names(profile)]
     prefix = profile["textures"]["prefix"]
     tdir = run_dir / "textures"
     cull = bool(pcfg.get("backface_culling", False))
@@ -186,24 +191,26 @@ def run(params, profile):
     with bpy.data.libraries.load(str(run_dir / "work" / "hp.blend"), link=False) as (src, dst2):
         dst2.objects = [n for n in src.objects if n.startswith("HPT_")]
     cols["HP"] = collection(scene, "HP", dst2.objects)
-    # ---- previous candidate
-    prev = pcfg["previous_candidate"]
-    pr = repo / prev["run"]
-    before = set(bpy.data.objects)
-    bpy.ops.import_scene.fbx(filepath=str(pr / prev["skeletal_fbx"]))
-    bpy.ops.import_scene.fbx(filepath=str(pr / prev["base_fbx"]))
-    new = [o for o in bpy.data.objects if o not in before]
-    inv = Matrix.Rotation(math.radians(-90.0), 4, "Z")
-    for o in new:
-        if o.parent is None:
-            o.matrix_world = inv @ o.matrix_world
-    prev_mat = pbr_material("PREVIEW_PREV", pr / prev["textures"]["BC"], pr / prev["textures"]["N_OpenGL"],
-                            pr / prev["textures"]["ORM"], cull)
-    for o in new:
-        if o.type == "MESH":
-            for slot in o.material_slots:
-                slot.material = prev_mat
-    cols["PREV"] = collection(scene, "PREV", new)
+    # ---- previous candidate (optional: a new character has none)
+    prev = pcfg.get("previous_candidate")
+    if prev:
+        pr = repo / prev["run"]
+        before = set(bpy.data.objects)
+        bpy.ops.import_scene.fbx(filepath=str(pr / prev["skeletal_fbx"]))
+        bpy.ops.import_scene.fbx(filepath=str(pr / prev["base_fbx"]))
+        new = [o for o in bpy.data.objects if o not in before]
+        inv = Matrix.Rotation(math.radians(-90.0), 4, "Z")
+        for o in new:
+            if o.parent is None:
+                o.matrix_world = inv @ o.matrix_world
+        prev_mat = pbr_material("PREVIEW_PREV", pr / prev["textures"]["BC"], pr / prev["textures"]["N_OpenGL"],
+                                pr / prev["textures"]["ORM"], cull)
+        for o in new:
+            if o.type == "MESH":
+                for slot in o.material_slots:
+                    slot.material = prev_mat
+        cols["PREV"] = collection(scene, "PREV", new)
+    prev_tags = ("PREV",) if prev else ()
     bpy.context.view_layer.update()
     cam_data = bpy.data.cameras.new("preview_cam")
     cam = bpy.data.objects.new("preview_cam", cam_data)
@@ -229,22 +236,22 @@ def run(params, profile):
         shots.append({"name": name, "sets": label, "px": list(res)})
         return raw / (name + ".png")
 
-    # ---- orthographic views framed like the concepts
-    W, H = 1021, 1540
-    top, bottom, base_x = 0.02, 0.968, 0.45
-    height_m = float(profile["scale"]["figure_top_m"]) / (bottom - top)
-    cam_data.type = "ORTHO"
-    cam_data.ortho_scale = height_m
-    cam_data.sensor_fit = "VERTICAL"
-    zc = float(profile["scale"]["figure_top_m"]) - (0.5 - top) * height_m
-    shift = (0.5 - base_x) * height_m * W / H
-    views = {"front": (Vector((shift, -3.0, zc)), (0, -1, 0)), "side": (Vector((3.0, shift, zc)), (1, 0, 0)),
-             "back": (Vector((-shift, 3.0, zc)), (0, 1, 0))}
-    for vn, (loc, d) in views.items():
-        cam.location = loc
-        cam.rotation_euler = (-Vector(d)).to_track_quat("-Z", "Y").to_euler()
-        for tag in ("H2", "HP", "PREV") + (("BASE",) if base else ()):
-            render("ortho-%s-%s" % (vn, tag.lower()), {tag}, (W, H))
+    # ---- orthographic views framed like the concepts (framing.py; without preview.frame = the Medusa H2 canon)
+    ocams, side, frame_source = FR.cameras(pcfg.get("frame"), profile["scale"]["figure_top_m"], repo)
+
+    def ortho(vn):
+        oc = ocams[vn]
+        cam_data.type = "ORTHO"
+        cam_data.ortho_scale = oc["ortho_scale"]
+        cam_data.sensor_fit = "VERTICAL"
+        cam.location = Vector(oc["loc"])
+        cam.rotation_euler = (-Vector(oc["dir"])).to_track_quat("-Z", "Y").to_euler()
+        return tuple(oc["px"])
+
+    for vn in FR.VIEWS:
+        px = ortho(vn)
+        for tag in ("H2", "HP") + prev_tags + (("BASE",) if base else ()):
+            render("ortho-%s-%s" % (vn, tag.lower()), {tag}, px)
     # ---- close-ups (orthographic)
     for c in pcfg["closeups"]:
         cam_data.type = "ORTHO"
@@ -265,7 +272,7 @@ def run(params, profile):
     for key, dist_uu in k2["distances_uu"].items():
         target = Vector((0.0, 0.0, float(k2["focus_z_m"])))
         look_at(cam, target, (0.0, -math.cos(pitch), math.sin(pitch)), float(dist_uu) / 100.0)
-        for tag in ("H2", "PREV") + (("BASE",) if base else ()):
+        for tag in ("H2",) + prev_tags + (("BASE",) if base else ()):
             p = render("%s-%s" % (key, tag.lower()), {tag}, tuple(k2["resolution"]), transparent=True)
             img = bpy.data.images.load(str(p))
             a = U.image_to_array(img)[..., 3]
@@ -315,12 +322,7 @@ def run(params, profile):
         if base:
             orm_src["BASE"] = run_dir / base["textures_dir"] / ("%s_ORM.png" % base["prefix"])
         for cv in pcfg["channel_views"]:
-            loc, d = views[cv["view"]]
-            cam_data.type = "ORTHO"
-            cam_data.sensor_fit = "VERTICAL"
-            cam_data.ortho_scale = height_m
-            cam.location = loc
-            cam.rotation_euler = (-Vector(d)).to_track_quat("-Z", "Y").to_euler()
+            W, H = ortho(cv["view"])
             for tag, path in orm_src.items():
                 key = "CH_%s_%s" % (cv["name"], tag)
                 mats[key] = ao_material("PREVIEW_" + key, path, cv["channel"])
@@ -334,12 +336,22 @@ def run(params, profile):
         scene.view_settings.view_transform = view
         use_material("H2")
     lo, hi = U.bounds(h2_meshes)
+    fc = ocams["front"]
+    ortho_frame = {"px": fc["px"], "ortho_height_m": U.r(fc["ortho_scale"], 5), "centre_z_m": U.r(fc["centre_z_m"], 5),
+                   "base_centre_x_share": fc["frame"]["base_x"]}
+    if pcfg.get("frame") is not None:  # new characters: every view and its source (the Medusa report keeps its bytes)
+        ortho_frame.update({"source": frame_source, "side": side,
+                            "views": {v: {"px": c["px"], "ortho_height_m": U.r(c["ortho_scale"], 5),
+                                          "centre_z_m": U.r(c["centre_z_m"], 5), "top": c["frame"]["top"],
+                                          "bottom": c["frame"]["bottom"], "base_centre_x_share": c["frame"]["base_x"]}
+                                      for v, c in ocams.items()}})
     report = {"stage": "preview", "device": device, "samples": pcfg["samples"], "denoise": True, "view_transform": "AgX",
-              "label": pcfg["label"], "backface_culling_game_models": cull, "ortho_frame": {"px": [W, H], "ortho_height_m": U.r(height_m, 5), "centre_z_m": U.r(zc, 5),
-                                                    "base_centre_x_share": base_x},
+              "label": pcfg["label"], "backface_culling_game_models": cull, "ortho_frame": ortho_frame,
               "k2": {"fov_deg_horizontal": k2["fov_deg_horizontal"], "pitch_deg": k2["pitch_deg"],
                      "distances_uu": k2["distances_uu"], "focus_z_m": k2["focus_z_m"], "silhouettes": k2m},
               "h2_bounds_m": [U.rv(lo, 5), U.rv(hi, 5)], "shots": shots, "status": "измерено",
               "baseline": baseline_report, "pose_closeups": pose_shots, "channel_views": channel_shots,
               "note": "Blender Cycles frames (studio light, AgX) — редакторные кадры, не игровой свет и не приёмка"}
+    if not prev:  # the Medusa report keeps its bytes
+        report["previous_candidate"] = None
     U.write_json(run_dir / "reports" / "preview-report.json", report)

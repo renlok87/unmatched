@@ -20,6 +20,11 @@ and writes new files next to it (or into another --run-dir for the determinism c
              TeamDyeGain of the MI by the team-accent.md rule. Emulated render sets (the dye of um_v2_core.hlsl on
              the look-dev BC: dyed = lerp(bc, Team x Y(bc) x gain, TeamAccent x teamDyeAllowed(class))) for P1 / P2
              and an ID texture (R MatID, G accent, B 255) for the measurements of the frames.
+             team_accent.hem and team_accent.ribbon are each optional (0.6.1, at least one): a costume without a trim
+             band (armour, plain tunic) or without a strap keeps the other component; an empty component is skipped
+             and named in the report ("skipped"), the area share check decides. Without hem: team_accent.cloth_class
+             (default ribbon.class) and team_accent.trim_class (default none) name the dress / trim of the ta_report
+             contrast (Medusa: linen / gold_antique from hem).
   ta_render  (st_team.py, Blender) Cobble light of the board, exposure calibrated to the W4-A anchor (K1 board ROI
              p50 = 131.2), K2 5x front / back (+ 1.6x), sets ld | ld_p1 | ld_p2 + ID pass.
   ta_report  (this module) screen share of the accent, CIELAB contrast accent / dress next to it and P1 / P2, the dress
@@ -178,6 +183,12 @@ def ribbon_mask(lab, pid, pos, cfg, cidx):
     disk = np.hypot(yy, xx) <= rr
     opened = ndimage.binary_opening(cand, structure=disk)
     ys, xs = np.nonzero(opened)
+    if len(ys) == 0:  # no strap of that class above z_min survives the opening: no ribbon component (0.6.1)
+        return np.zeros(lab.shape, bool), {
+            "candidate_texels_4k": int(cand.sum()), "opened_texels_4k": 0, "components_3d": 0, "kept_components": [],
+            "ribbon_texels_4k": 0, "dropped_leather_above_z_texels_4k": int(cand.sum()),
+            "skipped": "no %s texels of parts %s above z %s m survive the UV opening (r %d px)"
+                       % (cfg["class"], cfg["parts"], cfg["z_min_m"], rr)}
     p = pos[ys, xs].astype(np.float64)
     vox = float(cfg["voxel_m"])
     q = np.floor((p - p.min(0)) / vox).astype(np.int64)
@@ -212,6 +223,15 @@ def hem_strip(lab, pid, pos, nrm, cfg, cidx):
     gold = parts & (lab == cidx[cfg["band_class"]])
     band = gold & (pos[..., 2] < float(cfg["band_z_max_m"])) & ~in_boxes(pos, cfg.get("band_exclude_boxes", []))
     cloth = parts & (lab == cidx[cfg["cloth_class"]])
+    if not band.any() or not cloth.any():  # no trim band (or no cloth) in the hem parts: no hem component (0.6.1)
+        info = {"band_texels_4k": int(band.sum()), "gold_texels_of_parts_4k": int(gold.sum()),
+                "band_excluded_texels_4k (belt, sash panel)": int((gold & ~band).sum()),
+                "cloth_texels_4k": int(cloth.sum()), "cloth_with_agreeing_band_within_search": 0,
+                "width_m": float(cfg["width_m"]), "feather_m": float(cfg["feather_m"]),
+                "skipped": "no %s texels of parts %s%s" % (
+                    cfg["band_class"] if not band.any() else cfg["cloth_class"], cfg["parts"],
+                    " below z %s m" % cfg["band_z_max_m"] if not band.any() else "")}
+        return np.zeros(lab.shape, np.float64), band, info
     tree = cKDTree(pos[band].astype(np.float64))
     bn = nrm[band]
     d, j = tree.query(pos[cloth].astype(np.float64), k=1, distance_upper_bound=float(cfg["search_max_m"]))
@@ -229,15 +249,40 @@ def hem_strip(lab, pid, pos, nrm, cfg, cidx):
     return strip, band, info
 
 
+def accent_classes(tcfg):
+    """(cloth_class, trim_class) of the TeamAccent profile: the cloth that carries the accent next to the trim (hem
+    strip: hem.cloth_class / hem.band_class) and the trim it borders. Without a hem: team_accent.cloth_class (default:
+    the ribbon class) and team_accent.trim_class (default: none). Medusa: linen / gold_antique."""
+    hem = tcfg.get("hem")
+    if not hem and not tcfg.get("ribbon"):
+        raise ValueError("team_accent: needs at least one of hem, ribbon (team-accent.md: an accent of 5-12 %)")
+    cloth = hem["cloth_class"] if hem else tcfg.get("cloth_class", tcfg["ribbon"]["class"])
+    trim = hem["band_class"] if hem else tcfg.get("trim_class")
+    return cloth, trim
+
+
 def team_accent(lab, pid, pos, cov, area, nrm, tcfg, cidx):
-    strip, band, strip_info = hem_strip(lab, pid, pos, nrm, tcfg["hem"], cidx)
-    ribbon, ribbon_info = ribbon_mask(lab, pid, pos, tcfg["ribbon"], cidx)
+    """hem and ribbon are both optional (0.6.1; at least one): a figure without a trim band or without a strap gets the
+    other component only, a component whose texel set is empty is skipped and named in the report; the area share check
+    of ta_maps decides whether the accent is enough."""
+    accent_classes(tcfg)
+    if tcfg.get("hem"):
+        strip, band, strip_info = hem_strip(lab, pid, pos, nrm, tcfg["hem"], cidx)
+    else:
+        strip, band = np.zeros(lab.shape, np.float64), np.zeros(lab.shape, bool)
+        strip_info = {"skipped": "no team_accent.hem in the profile"}
+    if tcfg.get("ribbon"):
+        ribbon, ribbon_info = ribbon_mask(lab, pid, pos, tcfg["ribbon"], cidx)
+    else:
+        ribbon, ribbon_info = np.zeros(lab.shape, bool), {"skipped": "no team_accent.ribbon in the profile"}
     raw = np.maximum(strip, ribbon.astype(np.float64)) * cov
     sig = float(tcfg["blur_sigma_px"])
     num = ndimage.gaussian_filter(raw, sig)
     den = ndimage.gaussian_filter(cov.astype(np.float64), sig)
     soft = np.where(cov, num / np.maximum(den, 1e-9), 0.0)
-    allowed = (np.isin(pid, tcfg["hem"]["parts"]) & (lab == cidx[tcfg["hem"]["cloth_class"]])) | ribbon
+    allowed = ribbon.copy()
+    if tcfg.get("hem"):
+        allowed |= np.isin(pid, tcfg["hem"]["parts"]) & (lab == cidx[tcfg["hem"]["cloth_class"]])
     acc = np.clip(soft * allowed, 0.0, 1.0)
     _d, (iy, ix) = ndimage.distance_transform_edt(~cov, return_indices=True)
     acc = acc[iy, ix]  # atlas gutter: value of the nearest covered texel
@@ -276,6 +321,10 @@ def run_maps(run_dir, ta, repo):
     check(checks, "team_accent_area_share", lo <= info["share_3d_total"] <= hi,
           {k: info[k] for k in ("share_3d_total", "share_3d_hem", "share_3d_ribbon")}, [lo, hi],
           "share of the figure's 3D surface (all parts but the base)")
+    if not (cov & (acc >= 0.5)).any():  # both components skipped or empty: nothing to dye, no TeamDyeGain
+        raise RuntimeError("ta_maps: empty TeamAccent (hem: %s; ribbon: %s) - choose cloth_class / band_class / ribbon.class "
+                           "of this costume (HANDBOOK §4.4, team-accent.md)"
+                           % (info["hem"].get("skipped", "0 texels >= 0.5"), info["ribbon"].get("skipped", "0 texels")))
     # ---- zero outside the dyeable accent zones (core texels = class interior, eroded 2 px), 8 bit
     acc8 = to8(acc)
     never = tcfg["never_classes"]
@@ -305,11 +354,12 @@ def run_maps(run_dir, ta, repo):
            "accent_classes": sorted({byidx[int(x)]["id"] for x in np.unique(lab[cov & (acc > 0)])})},
           "0: the accent only on classes with teamDyeAllowed (linen, leather_smooth)")
     # ---- the dress keeps the concept colour: share of the dress cloth core texels with accent >= 0.5, per part
-    dress = tcfg["dress_parts"]
+    dress = tcfg.get("dress_parts", {})
+    cloth_cls, _trim_cls = accent_classes(tcfg)
     per = {}
     for name, part in dress.items():
-        m = (pid == int(part)) & (lab == cidx[tcfg["hem"]["cloth_class"]]) & ndimage.binary_erosion(
-            lab == cidx[tcfg["hem"]["cloth_class"]], iterations=2)
+        m = (pid == int(part)) & (lab == cidx[cloth_cls]) & ndimage.binary_erosion(
+            lab == cidx[cloth_cls], iterations=2)
         per[name] = {"part": int(part), "core_texels_4k": int(m.sum()),
                      "accent_ge_0_5_share": r(float((acc[m] >= 0.5).mean()) if m.any() else 1.0),
                      "accent_ge_0_5_share_3d": r(float((area * (acc >= 0.5))[m].sum() / max(area[m].sum(), 1e-12)))}
@@ -450,11 +500,12 @@ def img8(path):
     return np.asarray(Image.open(path).convert("RGB"))
 
 
-def view_metrics(rdir, view, cidx, near_px):
+def view_metrics(rdir, view, cidx, near_px, cloth_class="linen", trim_class="gold_antique"):
+    """cloth_class / trim_class: accent_classes() of the profile (Medusa: linen / gold_antique; no trim: None)."""
     cls, acc, fig = decode_id(rdir / "id" / (view + ".png"))
     body = fig & (cls != cidx["stone_base"])
-    linen = (cls == cidx["linen"]) & ~acc
-    gold = cls == cidx["gold_antique"]
+    linen = (cls == cidx[cloth_class]) & ~acc
+    gold = (cls == cidx[trim_class]) if trim_class else np.zeros(cls.shape, bool)
     acc_e = ndimage.binary_erosion(acc, iterations=1)
     if acc_e.sum() < 20:  # K2 1.6x: the strip is 1-2 px wide, erosion leaves nothing -> the accent pixels themselves
         acc_e = acc
@@ -594,7 +645,8 @@ def run_report(run_dir, ta, repo):
     gain = maps["team_dye_gain"]["TeamDyeGain"]
     checks = {}
     views = ta["render"]["views"]
-    per = {v: view_metrics(rdir, v, cidx, int(ta["render"]["near_px"])) for v in views}
+    cloth_cls, trim_cls = accent_classes(ta["team_accent"])
+    per = {v: view_metrics(rdir, v, cidx, int(ta["render"]["near_px"]), cloth_cls, trim_cls) for v in views}
     rd = ta["render"]["readability"]
     k2 = [v for v in views if v.startswith("k2_5x")]
     de_min = min(per[v][s]["delta_e_accent_vs_dress"] for v in views for s in ("ld_p1", "ld_p2") if s in per[v])

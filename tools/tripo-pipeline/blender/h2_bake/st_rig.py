@@ -8,6 +8,11 @@ the meshes (measured by weight continuity at the junctions and by the probe pose
 neck axis above z0..z1 (snakes, diadem) rigid on head. Dress/cloak: hips, spine above the waist, towards the hem
 up to leg_max on the thigh of its side.
 
+Weapon side and presence (D-1): the weapon bone comes from profile.weapon_bone (rig.weapon_bone, else the rig contract
+characters.<rig.character>.weapon_bone, else rig.bones): weapon.L under hand.L (Medusa: check names and values of the
+report unchanged), weapon.R under hand.R (the side check flips its sign), none (no weapon part: body + base only, the
+read-back must carry no weapon bone at all, the side check is skipped).
+
 Junctions (profile rig.junctions, verify 2026-09-29): where a part meets a neighbour that moves with other bones
 (dress collar <-> neck: the collar rim of the dress is spine, the neck rim of the head part is up to ~1.0 head at the
 back, where the snake coils are rigid head — the collar opened 6.6–8.9 mm at head_turn 35°), the vertices of `part`
@@ -29,6 +34,7 @@ from mathutils import Matrix, Vector
 from mathutils.kdtree import KDTree
 
 from . import bl_util as U
+from . import profile as PR
 
 
 def smoothstep(t):
@@ -231,6 +237,7 @@ def run(params, profile):
     run_dir = Path(params["run_dir"])
     repo = Path(params["repo_root"])
     rig = profile["rig"]
+    wbone = PR.weapon_bone(profile, PR.load_contract(repo))  # weapon.L | weapon.R | None
     names = sorted(profile["parts"], key=U.part_key)
     # objects are appended into a factory scene (bpy.data.filepath stays ""): the FBX writer stores the path of the
     # open .blend (ApplicationNativeFile), which made the FBX bytes depend on the run directory (measured)
@@ -270,7 +277,7 @@ def run(params, profile):
         attr.data.foreach_set("value", [U.part_key(n)] * len(lp[n].data.polygons))
     meshes = profile["meshes"]
     body_parts = [lp[n] for n in names if profile["parts"][n]["mesh"] == "body"]
-    weapon_part = [lp[n] for n in names if profile["parts"][n]["mesh"] == "weapon"][0]
+    weapon_part = next((lp[n] for n in names if profile["parts"][n]["mesh"] == "weapon"), None)
     base_part = [lp[n] for n in names if profile["parts"][n]["mesh"] == "base"][0]
     bpy.ops.object.select_all(action="DESELECT")
     for o in body_parts:
@@ -281,11 +288,14 @@ def run(params, profile):
     body = active
     body.name = meshes["body"]
     body.data.name = meshes["body"]
-    weapon_part.name = meshes["weapon"]
-    weapon_part.data.name = meshes["weapon"]
+    if weapon_part is not None:
+        weapon_part.name = meshes["weapon"]
+        weapon_part.data.name = meshes["weapon"]
     base_part.name = meshes["base"]
     base_part.data.name = meshes["base"]
-    for obj in (body, weapon_part):
+    skinned = (body, weapon_part) if weapon_part is not None else (body,)
+    figure = skinned + (base_part,)
+    for obj in skinned:
         obj.parent = arm
         obj.modifiers.new("Armature", "ARMATURE").object = arm
     # part labels -> report, then drop (keeps the FBX free of custom data)
@@ -305,7 +315,7 @@ def run(params, profile):
     np.save(run_dir / "work" / "rig" / "body_vertex_part.npy", vert_part)
     np.save(run_dir / "work" / "rig" / "body_vertex_cap.npy", vert_cap)
     np.save(run_dir / "work" / "rig" / "body_face_cap.npy", caps)
-    for obj in (body, weapon_part, base_part):
+    for obj in figure:
         obj.data.attributes.remove(obj.data.attributes["h2_part"])
         if obj.data.attributes.get("h2_cap") is not None:
             obj.data.attributes.remove(obj.data.attributes["h2_cap"])  # keeps the FBX free of custom data
@@ -313,12 +323,14 @@ def run(params, profile):
     face_polys = [p.index for p in body.data.polygons
                   if labels[p.index] == 1 and caps[p.index] == 0 and face_box and all(face_box[0][k] <= p.center[k] <= face_box[1][k] for k in range(3))
                   and p.normal.y < -0.3]
-    pre = {o.name: measure.mesh_summary(o) for o in (body, weapon_part, base_part)}
-    wsum = {"body": measure.weight_summary(body, bone_names), "weapon": measure.weight_summary(weapon_part, bone_names)}
-    lo_sk, hi_sk = measure.world_bounds([body, weapon_part])
+    pre = {o.name: measure.mesh_summary(o) for o in figure}
+    wsum = {"body": measure.weight_summary(body, bone_names)}
+    if weapon_part is not None:
+        wsum["weapon"] = measure.weight_summary(weapon_part, bone_names)
+    lo_sk, hi_sk = measure.world_bounds(list(skinned))
     lo_b, hi_b = measure.world_bounds([base_part])
     face_normal = measure.facing(body, face_polys)
-    bow_c = measure.centroid(weapon_part)
+    bow_c = measure.centroid(weapon_part) if weapon_part is not None else None
     # sockets (Blender bone space, UE bone-space prediction)
     sockets = []
     for s in profile["sockets"]:
@@ -344,10 +356,10 @@ def run(params, profile):
     preset = core.load_preset(preset_path)
     rot = core.export_rotation(preset)
     data_scale = float(preset["temporary_data_scale"])
-    core.transform_for_fbx(scene, arm, (body, weapon_part, base_part), Matrix.Scale(data_scale, 4) @ rot)
+    core.transform_for_fbx(scene, arm, figure, Matrix.Scale(data_scale, 4) @ rot)
     sk_fbx = run_dir / "export" / profile["exports"]["skeletal_fbx"]
     base_fbx = run_dir / "export" / profile["exports"]["base_fbx"]
-    core.export_pair(scene, arm, (body, weapon_part), base_part, preset, sk_fbx, base_fbx)
+    core.export_pair(scene, arm, skinned, base_part, preset, sk_fbx, base_fbx)
     # ---- read back: export frame, then the authored frame
     rt = bpy.data.scenes.new("h2_rt")
     core.import_fbx_into(rt, sk_fbx)
@@ -358,16 +370,18 @@ def run(params, profile):
     arms_rt = [o for o in rt.objects if o.type == "ARMATURE"]
     rt_body = rt_meshes.get(meshes["body"])
     front_export = rot.to_3x3() @ Vector((0.0, -1.0, 0.0))
-    bow_export = rot.to_3x3() @ Vector((1.0, 0.0, 0.0))
+    side_sign = PR.weapon_side_sign(wbone)  # +1 weapon.L (authored +X), -1 weapon.R, None without a weapon bone
+    bow_export = rot.to_3x3() @ Vector((side_sign, 0.0, 0.0)) if side_sign is not None else None
     face_rt = measure.facing(rt_body, face_polys) if rt_body and len(rt_body.data.polygons) == len(body.data.polygons) else None
     lo_rt, hi_rt = measure.world_bounds([o for o in rt.objects if o.type == "MESH"])
     lo_rtb, hi_rtb = measure.world_bounds([o for o in rtb.objects if o.type == "MESH"])
-    bow_rt = measure.centroid(rt_meshes[meshes["weapon"]]) if meshes["weapon"] in rt_meshes else None
+    bow_rt = (measure.centroid(rt_meshes[meshes["weapon"]])
+              if weapon_part is not None and meshes["weapon"] in rt_meshes else None)
     inv = rot.inverted()
     core.to_authored_frame(rt, inv)
     core.to_authored_frame(rtb, inv)
     back_lo, back_hi = measure.world_bounds([o for o in rt.objects if o.type == "MESH"])
-    exp_tris = {o.name: pre[o.name]["triangles"] for o in (body, weapon_part, base_part)}
+    exp_tris = {o.name: pre[o.name]["triangles"] for o in figure}
     rt_tris = {n: e["triangles"] for n, e in list(rt_meas["meshes"].items()) + list(rtb_meas["meshes"].items())}
     exp_bones = {b[0]: b[1] for b in rig["bones"]}
     rt_bones = {n: v["parent"] for n, v in rt_meas["bones"].items()}
@@ -378,20 +392,23 @@ def run(params, profile):
     checks("armature_object_is_bone0_name", [re.sub(r"\.\d{3}$", "", a.name) for a in arms_rt] == [rig["armature_object"]],
            [a.name for a in arms_rt], [rig["armature_object"]])
     checks("bones_and_parents_as_profile", rt_bones == exp_bones, len(rt_bones), len(exp_bones))
-    checks("weapon_bone_by_side_v2", "weapon.L" in rt_bones and "weapon" not in rt_bones and rt_bones.get("weapon.L") == "hand.L",
-           rt_bones.get("weapon.L"), "hand.L")
+    checks("weapon_bone_by_side_v2", *PR.weapon_bone_verdict(rt_bones, wbone))
     checks("triangles_round_trip", rt_tris == exp_tris, rt_tris, exp_tris)
     checks("material_slots", all(len(e["material_slots"]) == 1 for e in list(rt_meas["meshes"].values()) + list(rtb_meas["meshes"].values())),
            {n: e["material_slots"] for n, e in list(rt_meas["meshes"].items()) + list(rtb_meas["meshes"].items())}, "1 per mesh (<= 2 total)")
     checks("uv0_present_in_unit_square", all(e["uv_layers"] and e["uv0_in_unit_square"] for e in list(rt_meas["meshes"].values()) + list(rtb_meas["meshes"].values())),
            {n: e["uv_layers"] for n, e in list(rt_meas["meshes"].items()) + list(rtb_meas["meshes"].items())}, "UV0 in [0,1]")
     checks("max_influences", (wrt.get("max_influences") or 99) <= int(rig["max_influences"]), wrt.get("max_influences"), "<= %d" % rig["max_influences"])
-    checks("no_unweighted_vertices", wrt.get("unweighted_vertices") == 0 and (rt_meas["meshes"].get(meshes["weapon"], {}).get("weights") or {}).get("unweighted_vertices") == 0,
+    weapon_unweighted_ok = weapon_part is None or (
+        (rt_meas["meshes"].get(meshes["weapon"], {}).get("weights") or {}).get("unweighted_vertices") == 0)
+    checks("no_unweighted_vertices", wrt.get("unweighted_vertices") == 0 and weapon_unweighted_ok,
            wrt.get("unweighted_vertices"), 0)
     checks("export_frame_face_points_along_rotated_front", face_rt is not None and Vector(face_rt).dot(front_export) > 0.5,
            {"face_normal": face_rt, "rotated_front": U.rv(front_export, 3)}, "dot > 0.5 (UE +X)")
-    checks("export_frame_bow_on_rotated_left", bow_rt is not None and Vector(bow_rt).dot(bow_export) > 0,
-           {"bow_centroid_cm": bow_rt, "rotated_bow_side": U.rv(bow_export, 3)}, "bow on +Y of the export frame (UE -Y)")
+    side_check = PR.weapon_side_check(wbone)
+    if weapon_part is not None and side_check is not None:  # without a weapon mesh or bone: no side to check
+        checks(side_check[0], bow_rt is not None and Vector(bow_rt).dot(bow_export) > 0,
+               {"bow_centroid_cm": bow_rt, "rotated_bow_side": U.rv(bow_export, 3)}, side_check[1])
     checks("authored_bounds_after_inverse_rotation",
            all(abs(a - b) < 5e-4 for a, b in zip(list(back_lo) + list(back_hi), list(lo_sk) + list(hi_sk))),
            {"min_cm": cm(back_lo), "max_cm": cm(back_hi)}, {"min_cm": cm(lo_sk), "max_cm": cm(hi_sk)})
