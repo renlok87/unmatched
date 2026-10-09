@@ -40,6 +40,7 @@ void AS08FlowGameMode::FiguresOnCombatEvent(const FS09CombatStageEvent& Event) {
     }
     case ES09CombatEvent::Lunge:
       Attacker->CommitFaceTarget(Event.AtMs);
+      S08An24LungeShot(In.AttackerId, Event.AtMs);  // VC Frames ВР-VC-28: the live harpy attack frame (review shots)
       return;
     case ES09CombatEvent::End:
       // AN-25: the return follows the end of the LungeAttack clip; an attacker that played none (speed "none", a

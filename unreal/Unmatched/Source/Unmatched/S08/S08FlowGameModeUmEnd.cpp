@@ -17,7 +17,7 @@
 //              LOBBY / ROOM screens until the new match starts, then LOADING; a failed step: why.command.rejected.
 //   aborted    the room row ABORTED in the live match; «В лобби» / L / Enter = ReturnToLobbyCommand.
 //   evidence   review tooling -S08EndDrive=<step+step..>: result (wait for the results at rest), board, results, again,
-//              newmatch (wait until «Сыграть ещё» started the new match), manual (wait for the manual state), retry, live
+//              newmatch (wait until «Сыграть ещё» started the new match), manual (wait for the manual state), expired, retry, live
 //              (wait until the overlay is gone), aborted (wait for ABORTED), lobby (the shown screen's «В лобби»), inlobby,
 //              wait<ms>, shot-<name> (one frame <name>.png in -S09ShotDir), exit. With it the -S09Flow result tail waits.
 //   trace      'RECONNECT state=<s> attempt=<n> missed=<n> lost=<ms>' on a change, 'RECONNECT exit ms=200',
@@ -207,6 +207,8 @@ static void UmEnTickDrive(AS08FlowGameMode& GM, FUmEndRuntime& R, double Now, ES
     bDone = R.Again == EUmAgainStep::Idle && Stage == ES08Stage::Started && Now - R.StepAtMs > 500.0;
   } else if (S == TEXT("manual")) {
     bDone = Rc && Rc->IsShown() && Rc->GetModel().State == EUmReconnectState::Manual;
+  } else if (S == TEXT("expired")) {  // VC Frames: wait for the expired card (the S10 proxy's expiry, ВР-VC-30)
+    bDone = Rc && Rc->IsShown() && Rc->GetModel().State == EUmReconnectState::Expired;
   } else if (S == TEXT("retry")) {
     if (UUmReconnectOverlay* W = R.Reconnect.Get()) W->SimulatePress(FName(TEXT("screens.reconnect.retry")));
   } else if (S == TEXT("live")) {

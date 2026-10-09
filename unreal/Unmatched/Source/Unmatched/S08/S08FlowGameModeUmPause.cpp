@@ -16,7 +16,8 @@
 //   language  at the start: -S08Lang=ru|en|pseudo, else the saved language unless the run passes -culture= (the set-I
 //             scripts) - 'SETTINGS language=<l> culture=<c> pseudo=<0|1> source=<flag|saved|culture>'.
 //   evidence  review tooling: -S08PauseDrive=<step+step..>: open, close, wait<N>, inlobby / inroom / ingame (wait for that
-//             route), tab-<sound|interface|game|graphics>, scroll, top, <key>.<value> (a row through its own input path:
+//             route), indefense / insyncing (VC: wait for the open defense window / a command in flight 800 ms),
+//             tab-<sound|interface|game|graphics>, scroll, top, <key>.<value> (a row through its own input path:
 //             master.50, masterMute.1, language.en, uiScale.150, keyHints.off, speed.none, reduced.1, graphics.0, ...),
 //             leave, leaveno, leaveyes, exit. With -S08ScreenShots and -S09ShotDir one frame per sub-state
 //             UI-SCR-PAUSE-<context>-<tab|confirm>[-defense][-syncing][-scrolled][-<lang>][-ui<n>][-gfx<n>].png after 300 ms.
@@ -430,6 +431,22 @@ void AS08FlowGameMode::TickUmPause(const FString& Route) {
       return;
     }
     if (Wait(1500.0)) Next();
+    return;
+  }
+  if (S == TEXT("indefense")) {
+    // VC Frames (review tooling): wait in the match for the open defense window (the model's game.defense) - the next
+    // step 'open' then frames PAUSE over it
+    const FS08CombatInfo& Combat = CommandUi.Combat;
+    if (bInGame && Combat.bPresent && Hud.Phase == TEXT("COMBAT") && Combat.bHasTimeoutAt && !Combat.bRevealed) Next();
+    return;
+  }
+  if (S == TEXT("insyncing")) {
+    // VC Frames: a command in flight for 800 ms (a slow one - a quick scheme answer would be gone before the frame)
+    if (!bInGame || !HudBusyReason().IsSet()) {
+      R.StepAtMs = -1.0;
+      return;
+    }
+    if (Wait(800.0)) Next();
     return;
   }
   if (S == TEXT("open")) {

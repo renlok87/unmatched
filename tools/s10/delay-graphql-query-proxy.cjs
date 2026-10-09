@@ -19,6 +19,12 @@
 // further gameState request arrives (the client's «Повторить») - the stream cannot bring the snapshot around the hold.
 // VS-7 S5 (SC-31...SC-33 evidence, opt-in): S10_WS_DOWN_MS=<ms> keeps refusing every graphql-transport-ws upgrade that
 // long after the S10_WS_DROP_AT_MS drop (the link stays down: RECONNECT auto -> manual after 5 x 10 s), then passes them.
+// VC Frames (SC-32 expired evidence, opt-in): S10_EXPIRE_AFTER_DROP=1 - once the S10_WS_DROP_AT_MS drop happened, every
+// GraphQL request is answered locally with an UNAUTHENTICATED error (the token refresh too) and the WS upgrades are refused:
+// the client's session expires in the match (RECONNECT expired, GD-038). The backend itself is never told anything.
+// VC Frames (SC-24 syncing evidence, opt-in): S10_HOLD_WS_WITH_DELAY=1 - while a delayed reply is held, the server->client
+// frames of every open graphql-transport-ws connection are held too (then flushed in order): the stream cannot settle the
+// command before its HTTP answer (MS-NET «gate released by snapshot»), so the command stays in flight (PAUSE syncing).
 // Local-only; no request bodies, tokens, room codes or card data are logged (only field names and counts).
 const http = require('node:http');
 const net = require('node:net');
@@ -34,6 +40,20 @@ const countSet = Object.prototype.hasOwnProperty.call(process.env, 'S10_DELAY_CO
 const wsDropAtMs = Number(process.env.S10_WS_DROP_AT_MS || 0);
 const wsRefuse = process.env.S10_WS_REFUSE === '1';
 const wsDownMs = Number(process.env.S10_WS_DOWN_MS || 0);
+const expireAfterDrop = process.env.S10_EXPIRE_AFTER_DROP === '1';
+const holdWsWithDelay = process.env.S10_HOLD_WS_WITH_DELAY === '1';
+let wsHoldUntil = 0;
+const wsHeld = [];
+let wsHoldTimer = null;
+let wsHeldFrames = 0;
+function flushWsHeld() {
+  wsHoldTimer = null;
+  while (wsHeld.length) {
+    const { downstream, chunk } = wsHeld.shift();
+    if (!downstream.destroyed) downstream.write(chunk);
+  }
+}
+let expiredAnswers = 0;
 let wsDroppedAt = 0;
 let wsDownRefused = 0;
 let fieldSeen = 0;
@@ -90,6 +110,22 @@ const server = http.createServer((downstreamReq, downstreamRes) => {
     const text = body.toString('utf8');
     const field = delayMutation ? mutationField(text) : queryField(text);
     if (field === delayField) fieldSeen++;
+    // the stream frames of the command go out while its HTTP answer is still upstream: hold them from the request on
+    if (holdWsWithDelay && field === delayField && ((!delayMutation && !countSet) || delayed < delayCount)) {
+      wsHoldUntil = Math.max(wsHoldUntil, Date.now() + delayMs + 250);
+      process.stdout.write(JSON.stringify({ event: 'ws_hold', field, ms: delayMs + 250 }) + '\n');
+    }
+    if (expireAfterDrop && wsDroppedAt > 0) {
+      expiredAnswers++;
+      if (expiredAnswers === 1 || expiredAnswers % 10 === 0) {
+        process.stdout.write(JSON.stringify({ event: 'expired_answer', n: expiredAnswers, field: field || mutationField(text) }) + '\n');
+      }
+      const reply = Buffer.from(JSON.stringify({ data: null, errors: [{ message: 'session expired (S10 proxy)',
+                                                                         extensions: { code: 'UNAUTHENTICATED' } }] }));
+      downstreamRes.writeHead(200, { 'content-type': 'application/json', 'content-length': reply.length });
+      downstreamRes.end(reply);
+      return;
+    }
     const upstreamReq = http.request({
       hostname: '127.0.0.1', port: targetPort,
       method: downstreamReq.method, path: downstreamReq.url,
@@ -122,7 +158,7 @@ const server = http.createServer((downstreamReq, downstreamRes) => {
 });
 
 server.on('upgrade', (request, downstream, head) => {
-  if (wsDownMs > 0 && wsDroppedAt > 0 && Date.now() - wsDroppedAt < wsDownMs) {
+  if ((expireAfterDrop && wsDroppedAt > 0) || (wsDownMs > 0 && wsDroppedAt > 0 && Date.now() - wsDroppedAt < wsDownMs)) {
     wsDownRefused++;
     if (wsDownRefused === 1 || wsDownRefused % 10 === 0) {
       process.stdout.write(JSON.stringify({ event: 'ws_down_refused', n: wsDownRefused, sinceDropMs: Date.now() - wsDroppedAt }) + '\n');
@@ -163,7 +199,21 @@ server.on('upgrade', (request, downstream, head) => {
     upstream.write(header + '\r\n');
     if (head.length) upstream.write(head);
     downstream.pipe(upstream);
-    upstream.pipe(downstream);
+    if (!holdWsWithDelay) {
+      upstream.pipe(downstream);
+    } else {
+      upstream.on('data', (chunk) => {
+        const wait = wsHoldUntil - Date.now();
+        if (wait > 0 || wsHeld.length) {
+          wsHeld.push({ downstream, chunk });
+          wsHeldFrames++;
+          if (!wsHoldTimer) wsHoldTimer = setTimeout(flushWsHeld, Math.max(wait, 0));
+        } else if (!downstream.destroyed) {
+          downstream.write(chunk);
+        }
+      });
+      upstream.on('end', () => downstream.end());
+    }
   });
   upstream.on('error', () => downstream.destroy());
   downstream.on('error', () => upstream.destroy());
@@ -177,7 +227,7 @@ server.listen(listenPort, '127.0.0.1', () => {
 
 function finish() {
   if (wsDropTimer) clearTimeout(wsDropTimer);
-  process.stdout.write(JSON.stringify({ event: 'summary', delayed, wsConnections, wsDropped }) + '\n');
+  process.stdout.write(JSON.stringify({ event: 'summary', delayed, wsConnections, wsDropped, expiredAnswers, wsHeldFrames }) + '\n');
   server.close(() => process.exit(0));
 }
 process.on('SIGINT', finish);

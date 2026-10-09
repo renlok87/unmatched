@@ -348,6 +348,11 @@ void AS08FlowGameMode::BeginPlay() {
   //             the server window (UI-TIMER-WARN / UI-TIMER-TICK)
   //   storms    (opt-in, AU-S6) the scheme pick prefers Command the Storms (it
   //             moves the opposing fighters: BRD-PUSH)
+  //   sidekickfirst (opt-in, VC Frames ВР-VC-28) the melee sidekicks approach
+  //             first and attack first; the hero holds until the first sidekick
+  //             attack (the live harpy attack of AN-24)
+  //   refuse    (opt-in, VC Frames ВР-VC-27, -ArtPreview only) one refused space
+  //             click per match in the own maneuver draft (the FX-10 frame)
   {
     FString Plan;
     FParse::Value(FCommandLine::Get(), TEXT("S09Combat="), Plan);
@@ -1125,6 +1130,7 @@ void AS08FlowGameMode::HandleCues(const TArray<FS08Cue>& InCues) {
       if (!bStaged && BoardActor && CommandUi.Combat.bPresent && CommandUi.Combat.TargetFighterId == Cue.FighterId) {
         bCombatDamageShownEarly = true;  // the closing staging must not show it a second time
       }
+      S08HealProbeOnDamage(Cue.FighterId, Cue.Damage, Cue.SequenceNumber);  // VC Frames ВР-VC-29 (-ArtPreviewHealProbe)
     }
     TraceLines.Add(Line);
     FS08Trace::Write(Line);
@@ -4021,6 +4027,20 @@ void AS08FlowGameMode::RunS09Auto() {
           return Boosts(A) && !Boosts(B);
         });
       }
+      const bool bSidekickFirst = HasPlan(TEXT("sidekickfirst"));
+      if (bSidekickFirst && S09HoldHeroForSidekicks()) {  // ВР-VC-28: the hero waits for the first sidekick attack
+        Picks.RemoveAll([this](const FS09CommandUi::FAutoAttackPick& P) {
+          const FS08BoardFighter* F = FindFighter(P.AttackerId);
+          return !F || F->bIsHero;
+        });
+      }
+      if (bSidekickFirst) {  // VC Frames ВР-VC-28 (AN-24 live): the sidekick attackers (the harpies) go first
+        Picks.StableSort([this](const FS09CommandUi::FAutoAttackPick& A, const FS09CommandUi::FAutoAttackPick& B) {
+          const FS08BoardFighter* FA = FindFighter(A.AttackerId);
+          const FS08BoardFighter* FB = FindFighter(B.AttackerId);
+          return FA && FB && !FA->bIsHero && FB->bIsHero;
+        });
+      }
       for (const FS09CommandUi::FAutoAttackPick& Pick : Picks) {
         const FS08BoardFighter* Candidate = Fighters.FindByPredicate(
             [&Pick](const FS08BoardFighter& F) { return F.Id == Pick.AttackerId; });
@@ -4065,7 +4085,9 @@ void AS08FlowGameMode::RunS09Auto() {
       // 'ranged' plan token: a zone-only (ranged) attack is the proof itself
       // and is never parked for a may-boost card.
       const bool bRangedProofPick = bPreferRanged && bChosenZoneTarget && Chosen;
-      if (!bChoseMayBoost && !bRangedProofPick && !bAbilityBoostPlan && !bS09ShotResolveRevealed && OwnTurnIndex < 8 &&
+      const FS08BoardFighter* ChosenAttacker = FindFighter(CommandUi.AttackAttackerId);
+      const bool bSidekickProofPick = bSidekickFirst && Chosen && ChosenAttacker && !ChosenAttacker->bIsHero;
+      if (!bChoseMayBoost && !bRangedProofPick && !bSidekickProofPick && !bAbilityBoostPlan && !bS09ShotResolveRevealed && OwnTurnIndex < 8 &&
           Elapsed < 150.0f) {
         // The GD-033 reveal proof needs a may-boost attack (the server pauses
         // after THAT reveal). While no such card is in hand, close the draft
@@ -4087,6 +4109,7 @@ void AS08FlowGameMode::RunS09Auto() {
         FS08Trace::Write(FString::Printf(
             TEXT("S09AUTO attack (attacker=%s target-set card-set)"),
             *CommandUi.AttackAttackerId));
+        if (bSidekickProofPick) bS09SidekickAttacked = true;  // ВР-VC-28
         // AU-S6 'abilityboost': answer the ability prompt with the first boost card (the manual path asks the player)
         if (bAbilityBoostPlan && CommandUi.AttackAbilityAvailable(Snap, Fighters)) {
           CommandUi.OpenAttackAbilityPrompt();
@@ -4262,7 +4285,11 @@ void AS08FlowGameMode::RunS09Auto() {
         if (!Entry.bIsHero && !Sidekick) Sidekick = &Entry;
       }
       if (!Hero) return;
-      if (HasPlan(TEXT("attack"))) {
+      if (HasPlan(TEXT("refuse")) && S09RefuseProbeStep(*Hero)) return;  // VC Frames ВР-VC-27 (review hook, FX-10)
+      if (HasPlan(TEXT("sidekickfirst"))) S09SidekickApproach();  // VC Frames ВР-VC-28: the harpies take their spaces first
+      if (HasPlan(TEXT("sidekickfirst")) && S09HoldHeroForSidekicks()) {
+        FS08Trace::Write(TEXT("S09AUTO approach: hero holds for the sidekicks (sidekickfirst)"));
+      } else if (HasPlan(TEXT("attack"))) {
         // Multi-step approach (stage 3 T5.2): the legal destination within the
         // hero's movement that is closest (terrain distance) to the NEAREST
         // living enemy - allies are pass-through, so a hero boxed in by its
@@ -4330,7 +4357,7 @@ void AS08FlowGameMode::RunS09Auto() {
         }
       }
       const bool bMultiFighter = !bAutoS09Boost && OwnTurnIndex == 2 && ActionsDone == 1 && Sidekick &&
-                                 Sidekick->Id != RangedMovedId;
+                                 Sidekick->Id != RangedMovedId && !HasPlan(TEXT("sidekickfirst"));
       if (bMultiFighter) {
         StepOneCell(CommandUi, Snap, BoardModel, Fighters, Sidekick->Id);
         FS08Trace::Write(FString::Printf(TEXT("S09AUTO multi-fighter moves=%d"),

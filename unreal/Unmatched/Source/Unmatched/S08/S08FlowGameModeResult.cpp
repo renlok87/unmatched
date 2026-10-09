@@ -308,8 +308,12 @@ void AS08FlowGameMode::BenchResultBegin(const FS08Snapshot& Fixture, bool bBoard
       if (P.IsValid() && P->GetStringField(TEXT("userId")) != BenchViewerId) OtherId = P->GetStringField(TEXT("userId"));
     }
   }
-  const FString WinnerId = bViewerLoses ? OtherId : BenchViewerId;
+  // VC Frames (SC-34 draw, review tooling): -BenchResultDraw - the mutual-destruction body (no winnerId, both heroes at
+  // HP 0, nobody alive: FS09HudModel's draw), the frame of GAMEOVER draw a demo match never reaches
+  const bool bDraw = FParse::Param(FCommandLine::Get(), TEXT("BenchResultDraw"));
+  const FString WinnerId = bDraw ? FString() : bViewerLoses ? OtherId : BenchViewerId;
   const FString LoserId = bViewerLoses ? BenchViewerId : OtherId;
+  auto Loses = [bDraw, &LoserId](const FString& Id) { return bDraw || Id == LoserId; };
   auto MapEntries = [](const TSharedPtr<FJsonValue>& Array, TFunctionRef<void(const TSharedRef<FJsonObject>&)> Edit) {
     const TArray<TSharedPtr<FJsonValue>>* Entries = nullptr;
     if (!Array.IsValid() || !Array->TryGetArray(Entries) || !Entries) return Array;
@@ -328,15 +332,19 @@ void AS08FlowGameMode::BenchResultBegin(const FS08Snapshot& Fixture, bool bBoard
   const TSharedRef<FJsonObject> Meta = S.Metadata.IsValid() && S.Metadata->AsObject().IsValid()
                                            ? MakeShared<FJsonObject>(*S.Metadata->AsObject())
                                            : MakeShared<FJsonObject>();
-  Meta->SetStringField(TEXT("winnerId"), WinnerId);
+  if (bDraw) {
+    Meta->RemoveField(TEXT("winnerId"));
+  } else {
+    Meta->SetStringField(TEXT("winnerId"), WinnerId);
+  }
   S.Metadata = MakeShared<FJsonValueObject>(Meta);
-  S.Fighters = MapEntries(S.Fighters, [&LoserId](const TSharedRef<FJsonObject>& F) {
-    if (F->GetStringField(TEXT("ownerId")) == LoserId && F->GetStringField(TEXT("type")) == TEXT("HERO")) {
+  S.Fighters = MapEntries(S.Fighters, [&Loses](const TSharedRef<FJsonObject>& F) {
+    if (Loses(F->GetStringField(TEXT("ownerId"))) && F->GetStringField(TEXT("type")) == TEXT("HERO")) {
       F->SetNumberField(TEXT("health"), 0);
     }
   });
-  S.Players = MapEntries(S.Players, [&LoserId](const TSharedRef<FJsonObject>& P) {
-    if (P->GetStringField(TEXT("userId")) == LoserId) {
+  S.Players = MapEntries(S.Players, [&Loses](const TSharedRef<FJsonObject>& P) {
+    if (Loses(P->GetStringField(TEXT("userId")))) {
       P->SetBoolField(TEXT("isAlive"), false);
       P->SetNumberField(TEXT("health"), 0);
     }
@@ -356,8 +364,8 @@ void AS08FlowGameMode::BenchResultBegin(const FS08Snapshot& Fixture, bool bBoard
   RefreshHud();
   TickResultScreen();
   if (bBoard) ToggleResultBoard(TEXT("bench"));
-  FS08Trace::Write(FString::Printf(TEXT("BENCH result mode=%s viewerWins=%d valid=%d shown=%d"),
-                                   bBoard ? TEXT("board") : TEXT("results"), bViewerLoses ? 0 : 1, Hud.bValid ? 1 : 0,
+  FS08Trace::Write(FString::Printf(TEXT("BENCH result mode=%s viewerWins=%d draw=%d valid=%d shown=%d"),
+                                   bBoard ? TEXT("board") : TEXT("results"), bViewerLoses || bDraw ? 0 : 1, bDraw ? 1 : 0, Hud.bValid ? 1 : 0,
                                    IsResultScreenShown() ? 1 : 0));
 }
 

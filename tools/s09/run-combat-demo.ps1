@@ -65,6 +65,7 @@
   # (S09 plan token 'scheme'), so the joiner sees an opponent scheme in the source-card slot. Gates unchanged.
   [switch]$HostScheme,
   # Extra client arguments for BOTH clients, '+'-separated, as run-phase2-demo -ClientExtraArgs (run C G-LIVE,
+  # VC Frames ВР-VC-31: split only before a '-', so a value may carry its own '+' list: -S08PauseDrive=indefense+open
   # since EN-13 the painted Marmoreal backdrop is the default; -NoConceptPaste rolls it back, AGENTS.md "Board scenes and heroes"). Gates unchanged.
   [string]$ClientExtraArgs = '',
   # VS-3 SC-01 (ВР-SC14): -S08ScreenShots on both clients - one evidence frame per new 'SHOT widget id=UI-SCR-* state=<s>'
@@ -367,7 +368,7 @@ function Invoke-CombatDemo {
   if ($ClientPerf) { $common += '-S08Perf' }
   if ($ArtPreviewHeroesV2) { $common += '-ArtPreviewHeroesV2' }
   if ($ArtPreviewDiorama) { $common += '-ArtPreviewDiorama' }
-  foreach ($extra in @($ClientExtraArgs -split '\+' | Where-Object { $_ })) { $common += $extra }
+  foreach ($extra in @($ClientExtraArgs -split '\+(?=-)' | Where-Object { $_ })) { $common += $extra }
   if ($ScreenShots) { $common += '-S08ScreenShots' }  # VS-3 SC-01
   $HostPlan = if ($JoinerAttack) { 'attack+defend+ownresult' } else { 'attack' }
   if ($HostScheme) { $HostPlan += '+scheme' }
@@ -1028,6 +1029,10 @@ function Invoke-CombatDemo {
         # star, defense rim, embers, vortex, arc, heal); published when written; not gated
         foreach ($fxFrame in @(Get-ChildItem -LiteralPath (Join-Path $Script:Staging $side) -Filter 's09-fx*.png' -ErrorAction SilentlyContinue | Sort-Object Name)) {
           $publishNames += (Join-Path $side $fxFrame.Name)
+        }
+        # VC Frames (ВР-VC-28): the live harpy attack frame s09-an24-harpy-lunge.png (review hook); published when written
+        foreach ($anFrame in @(Get-ChildItem -LiteralPath (Join-Path $Script:Staging $side) -Filter 's09-an24*.png' -ErrorAction SilentlyContinue | Sort-Object Name)) {
+          $publishNames += (Join-Path $side $anFrame.Name)
         }
         # VS-3 SC-01 (ВР-SC14, -ScreenShots): the UI-SCR-<id>-<state>.png frames of the client; published when written
         if ($ScreenShots) {

@@ -764,6 +764,13 @@ private:
   bool bS09ShotHud = false;
   bool bS09ShotDiscard = false;
   bool bS09ShotDraft = false;  // live shot with the FIRST maneuver draft open
+  // VC Frames review hooks (-ArtPreview only; ВР-VC-27..29): the 'refuse' plan token clicks one refused space per match
+  // through the real move input (FX-10 stamp frame); -ArtPreviewHealProbe stages one heal of King Arthur (FX-25)
+  bool bS09RefuseDone = false;
+  float S09RefuseShotAt = -1.0f;
+  FString S09RefuseShotPath;
+  bool bS09HealProbeDone = false;
+  bool bS09SidekickAttacked = false;  // 'sidekickfirst': the first sidekick attack was sent (the hero then plays as before)
   FString S09ShotDiscardPath; // UI capture writes a few frames late: hold the
                               // discard confirm until this file exists.
   FString S09ShotDraftPath;   // same hold for the first maneuver draft shot
@@ -909,6 +916,23 @@ private:
   /** AN-24 / AN-25 (ВР-06): the figure side of one combat staging event - Face turns the attacker to the target,
    *  Lunge commits a deferred snap (reduced motion / speed "none"), End returns an attacker that played no clip. */
   void FiguresOnCombatEvent(const FS09CombatStageEvent& Event);
+  // ---- VC Frames review hooks (S08FlowGameModeReviewHooks.cpp; -ArtPreview only, never the normal game) ----
+  /** True with -ArtPreview (the review flag gates every hook below). */
+  static bool ReviewHooksOn();
+  /** 'refuse' plan token (ВР-VC-27): once per match, in the own maneuver draft, the hero is selected and one empty space
+   *  outside its tiers is clicked through the real move input (CUE-004, FX-10 stamp), framed 80 ms later
+   *  (s09-fx10-refuse.png). True while the draft must wait (the frame not written yet). */
+  bool S09RefuseProbeStep(const FS08BoardFighter& Hero);
+  /** 'sidekickfirst' plan token (ВР-VC-28): every own living melee sidekick approaches the nearest enemy too. */
+  void S09SidekickApproach();
+  /** 'sidekickfirst': until the first sidekick attack (and for at most 10 own turns) the hero neither approaches nor
+   *  attacks while an own living melee sidekick is on the board - the harpies lead (the match still ends: it lets go). */
+  bool S09HoldHeroForSidekicks() const;
+  /** -ArtPreviewHealProbe (ВР-VC-29): the first damage of a living King Arthur hero is answered by one staged heal of the
+   *  same amount (the FX-25 path: CUE-012, motes, «+N», the s09-fx25-heal.png hook frame). */
+  void S08HealProbeOnDamage(const FString& FighterId, int32 Damage, int32 Seq);
+  /** AN-24 frame (ВР-VC-28): a harpy's lunge is framed 100 ms in (s09-an24-harpy-lunge.png). */
+  void S08An24LungeShot(const FString& AttackerId, int64 LungeAtMs);
   /** F4: hands the game clock (NowMs) to a freshly spawned board actor for the FACING traces. */
   void FiguresAttachBoard();
   /** Space under the cursor of the plates (MS-T-09 drives it live; the bench fixture's "hover" now). */
