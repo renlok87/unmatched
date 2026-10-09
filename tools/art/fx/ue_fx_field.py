@@ -330,7 +330,7 @@ def crc_seed(name):
     return zlib.crc32(name.encode("utf-8")) & 0x7FFFFFFF
 
 
-def system(name, lifetime, material):
+def system(name, lifetime, material, user=None):
     path = BOARD + "/" + name
     if not EAL.does_directory_exist(BOARD):
         EAL.make_directory(BOARD)
@@ -376,11 +376,16 @@ def system(name, lifetime, material):
     carrier = json.loads(AUTH.make_board_quad_carrier(path, "DirectionalBurst", PLANE, material))
     if not carrier.get("ok"):
         raise RuntimeError("quad carrier %s: %s" % (name, carrier))
+    # VC C3 (ВР-VC-13): the chevrons' User.Opacity -> M_FX_BoardPrint Opacity (the 80 ms cut fade of the C++ adapter);
+    # tools/art/fx/ue_fx_chevron_opacity.py applies the same binding alone
+    bind = json.loads(AUTH.bind_user_material_parameters(path, "DirectionalBurst", json.dumps(user))) if user else None
+    if user and not bind.get("ok"):
+        raise RuntimeError("bind %s: %s" % (name, bind))
     bounds = json.loads(AUTH.set_system_fixed_bounds(path, 120.0))
     EAL.save_loaded_asset(load(path), False)
     describe = json.loads(TUNE.describe_niagara_system(path)).get("describe", {})
     return {"path": path, "action": action, "seed": seed, "lifetime": lifetime, "tune": tune, "carrier": carrier,
-            "bounds": bounds,
+            "bounds": bounds, "bind": bind,
             "emitters": describe.get("emitters")}
 
 
@@ -420,7 +425,8 @@ try:
     # ---- 3. the two board systems
     out["systems"] = {
         "NS_FX_Dust": system("NS_FX_Dust", 0.3, MAT + "/MI_FX_Dust"),
-        "NS_FX_AttackChevrons": system("NS_FX_AttackChevrons", 0.6, MAT + "/MI_FX_Chevron"),
+        "NS_FX_AttackChevrons": system("NS_FX_AttackChevrons", 0.6, MAT + "/MI_FX_Chevron",
+                                       user=[{"name": "Opacity", "type": "float", "default": 1.0}]),
     }
     out["ok"] = True
 except Exception:  # noqa: BLE001

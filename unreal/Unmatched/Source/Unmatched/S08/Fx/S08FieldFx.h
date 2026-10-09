@@ -167,6 +167,12 @@ inline constexpr float ChevronZ = 1.0f;
 UNMATCHED_API FMarkPose ChevronAt(int32 Index, double Ms);
 /** The chevron's width across the attack (uu): >= 0.35 of the cell radius, for neighbours >= 0.2 (the card). */
 UNMATCHED_API float ChevronWidthUU(float LengthUU, float CellRadiusUU);
+/** VC C3 (ВР-VC-13, the card's «прерывание (гаснут за 80 мс)»): the user parameter of NS_FX_AttackChevrons bound to
+ *  M_FX_BoardPrint's Opacity (tools/art/fx/ue_fx_field.py); the cut writes 1 -> 0 over ChevronCutMs, then deactivates. */
+inline const TCHAR* const ChevronOpacityParam = TEXT("Opacity");
+UNMATCHED_API float ChevronCutOpacity(double MsSinceCut);
+/** ВР-VC-15: the -BenchFx age of the chevrons at <ms>: reduced motion runs them x6 (as live), held before the fade. */
+UNMATCHED_API double BenchChevronMs(double Ms, bool bReduced);
 
 }  // namespace S08FieldFx
 
@@ -242,5 +248,7 @@ struct UNMATCHED_API FS08FieldFxState {
   TWeakObjectPtr<UNiagaraComponent> LiveChevrons;
   FString LiveChevronsAttacker;
   int32 LiveChevronsSeq = -1;
+  TWeakObjectPtr<UNiagaraComponent> CutChevrons;  // VC C3: the interrupted chevrons in their 80 ms fade
+  double CutAtMs = 0.0;
   void Reset() { *this = FS08FieldFxState(); }
 };

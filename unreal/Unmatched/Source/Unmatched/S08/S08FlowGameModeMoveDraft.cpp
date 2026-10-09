@@ -68,6 +68,7 @@ void AS08FlowGameMode::SyncMovePlates() {
   Key = HashCombineFast(Key, GetTypeHash(MoveHoverCell));
   // MS-T-17: the last move enters, shows and goes out without a draft operation
   Key = HashCombineFast(Key, LastMoveTracker.GetRevision());
+  Key = HashCombineFast(Key, OldPathFade.GetRevision());  // VC C3 FX-14: the replaced path's fade starts / ends
   if (Key == MovePlatesKey) return;
   MovePlatesKey = Key;
   BoardActor->RefreshMoveDraftView();

@@ -45,6 +45,7 @@
 #include "S08ShotQueue.h"
 #include "S08TurnPortraitWidget.h"
 #include "Fx/S08FieldFx.h"
+#include "Fx/S08LastPathFade.h"
 #include "Fx/S08CombatFx.h"
 #include "Fx/S08AbilityFx.h"
 #include "Fx/S08CuePostProcess.h"
@@ -1201,6 +1202,7 @@ private:
   void S08FxBenchStep(const FString& Spec);
   // ---- VS-6 F1 field FX (S08/Fx/S08FieldFx.h; the adapter in S08/Fx/S08FlowGameModeFx.cpp) ----
   FS08FieldFxState FieldFx;
+  FS08OldPathFade OldPathFade;  // VC C3 FX-14: the replaced last path fades 100 ms (ВР-VC-14)
   /** FX-07 / FX-09 / FX-10: the CUE-002 / CUE-003 / CUE-004 row of a board release (the sound's decision). */
   void S08FxBoardInput(const FS09InputResult& Result, const FIntPoint& Cell, const FString& FighterId);
   /** FX-09: an attack target picked by a click (CUE-003 + the pulse in board.target). */

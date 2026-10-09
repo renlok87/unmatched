@@ -36,8 +36,10 @@ struct FRimPulse {
 inline constexpr double HitFlashMs = 70.0;
 /** FX-19: the rim from C+70 - hard start, 1.0 x 0.35, held to C+270, 0 at C+370. */
 inline constexpr FRimPulse HitRim{300.0, 1.0f, 0.35f, 0.0, 100.0, false, 70.0};
-/** FX-17 (ВР-23): t0 = event + 150 (CUE-009 feedback_delay_ms); 0 -> 1.0 over 60, held to +180, 0 at +300. */
-inline constexpr FRimPulse DefenseRim{300.0, 1.0f, 0.35f, 60.0, 120.0, false, 150.0};
+/** FX-17 (ВР-23): t0 = event + 150 (CUE-009 feedback_delay_ms); 0 -> 1.0 over 60, held to +180, 0 at +300. VC C3
+ *  (ВР-VC-16): width 0.6 (was 0.35, the hit rim's) - a ~20 % wider cream contour, the shape reads on dark fields
+ *  (ВР-21); 0.75 adds < 1 % more band (the band already spans the thin parts) and floods the figure at K2. */
+inline constexpr FRimPulse DefenseRim{300.0, 1.0f, 0.6f, 60.0, 120.0, false, 150.0};
 /** FX-06: the hover rim, ease-out 0 -> 0.6 over 150 ms (width 0.2), held while the cursor stays. */
 inline constexpr FRimPulse HoverRim{150.0, 0.6f, 0.2f, 150.0, 0.0, true, 0.0};
 /** FX-06: the cursor left - the held rim goes to 0 over 120 ms (motion.icon.leave.ms). */

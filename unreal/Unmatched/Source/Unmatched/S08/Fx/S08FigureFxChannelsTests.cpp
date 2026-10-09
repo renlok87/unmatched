@@ -73,6 +73,7 @@ bool FS08FigureFxChannelTimingTest::RunTest(const FString&) {
     TestEqual("defense t0+30: ease-out 0.75", Ch.GetRim(), 0.75f, 0.001f);
     Ch.Advance(E + 0.150 + 0.060);
     TestEqual("defense t0+60: peak 1", Ch.GetRim(), 1.0f);
+    TestEqual("VC C3 ВР-VC-16: defense width 0.6 (wider than the hit rim)", Ch.GetRimWidth(), 0.6f);
     Ch.Advance(E + 0.150 + 0.180);
     TestEqual("defense t0+180: still 1", Ch.GetRim(), 1.0f);
     Ch.Advance(E + 0.150 + 0.240);

@@ -66,6 +66,7 @@ void AS08FlowGameMode::S08FxBoardReady() {
   LastMoveTracker.HoldMs = S08FieldFx::LastMoveLegacy() ? 0.0 : static_cast<double>(MoveSel.LastMoveHoldMs);
   LastMoveTracker.InMs = S08FieldFx::LastMoveLegacy() ? 0.0 : static_cast<double>(MoveSel.LastMoveInMs);
   FieldFx.Reset();
+  OldPathFade.Reset();  // VC C3 FX-14
   // ВР-FX16: the honest channel tokens of every `CUE fx` line
   CueDispatcher.AssetResolver = [this](const FString& CueId, const FString& Channel, const FString& Subject) {
     if (Channel == TEXT("vfx")) {
@@ -139,7 +140,8 @@ void AS08FlowGameMode::S08FxBenchStep(const FString& Spec) {
   //   placard      the FX-02 test placard: NS_FX_PlacardStar (the flipbook print) + the three SDF quads
   //                (disk / diamond / chevron) in a row over the board centre
   //   hover[,<id>] the FX-06 hold state: rim 0.6 x width 0.2 + the CUE-001 line (src=flag, like INPUT select)
-  //   rim[,<id>]   the FX-17 / FX-19 peak state: rim 1.0 x width 0.35 (t0+60..C+270)
+  //   rim[,<id>[,<width>]]  the FX-19 peak state: rim 1.0 x width 0.35 (C+70..C+270)
+  //   defense[,<id>] the FX-17 peak state: rim DefenseRim.Peak x DefenseRim.Width (t0+60..t0+180, ВР-VC-16)
   //   rimout[,<id>] the way out (C+300): rim 0.5 x width 0.35
   //   flash[,<id>] the FX-19 flash frame (C+0..C+35): FxFlash a = 1, no rim
   //   hit[,<id>]   flash 1 + rim 1 (the composite frame for the grey / deuteranopia rows)
@@ -232,7 +234,14 @@ void AS08FlowGameMode::S08FxBenchStep(const FString& Spec) {
     FS08Trace::Write(FString::Printf(TEXT("INPUT hover src=flag fighter=%s"), *Id));
     return;
   }
-  if (Mode == TEXT("rim")) { Rim(Id, 1.0f, 0.35f); return; }
+  if (Mode == TEXT("rim")) {
+    Rim(Id, 1.0f, Parts.IsValidIndex(2) ? FCString::Atof(*Parts[2]) : 0.35f);
+    return;
+  }
+  if (Mode == TEXT("defense")) {
+    Rim(Id, S08FigureFx::DefenseRim.Peak, S08FigureFx::DefenseRim.Width);
+    return;
+  }
   if (Mode == TEXT("rimout")) { Rim(Id, 0.5f, 0.35f); return; }
   if (Mode == TEXT("flash")) { Flash(Id, 1.0f); return; }
   if (Mode == TEXT("hit")) {
@@ -263,6 +272,7 @@ struct FFieldBench {
     FString Cue;
     FTransform Xf;
     double Ms = 0.0;
+    float Opacity = 1.0f;  // VC C3: the chevrons' cut fade (ВР-VC-13)
   };
   TArray<FSpawn> Spawns;
   bool bSpawned = false;
@@ -361,10 +371,13 @@ void AS08FlowGameMode::S08FxCueLines(const TArray<FString>& Lines) {
     FieldFx.Chevrons.Reset();
     if (UNiagaraComponent* C = FieldFx.LiveChevrons.Get()) {
       if (C->IsActive()) {
-        // ВР-VS6-09: the carrier has no per-instance fade parameter - the cut is the frame of the interrupt
-        C->DeactivateImmediate();
-        FS08Trace::Write(FString::Printf(TEXT("FX cut id=CUE-008 subject=%s seq=%d vfx=NS_FX_AttackChevrons cut=interrupt"),
-                                         *FieldFx.LiveChevronsAttacker, FieldFx.LiveChevronsSeq));
+        // VC C3 (ВР-VC-13, was ВР-VS6-09): the bound Opacity parameter fades the chevrons over 80 ms, then they go
+        if (UNiagaraComponent* Prev = FieldFx.CutChevrons.Get()) Prev->DeactivateImmediate();
+        FieldFx.CutChevrons = C;
+        FieldFx.CutAtMs = static_cast<double>(NowMs());
+        FS08Trace::Write(FString::Printf(TEXT("FX cut id=CUE-008 subject=%s seq=%d vfx=NS_FX_AttackChevrons cut=interrupt fade=%d"),
+                                         *FieldFx.LiveChevronsAttacker, FieldFx.LiveChevronsSeq,
+                                         FMath::RoundToInt(S08FieldFx::ChevronCutMs)));
       }
     }
     FieldFx.LiveChevrons = nullptr;
@@ -391,6 +404,14 @@ void AS08FlowGameMode::S08FxTick() {
   S08FxOutcomeTick();  // VS-6 F4: the outcome grade and the link post process (FX-34..FX-36)
   S08FxCombatTick();  // VS-6 F2: the stars at C+70, the heals, the FX capture hook
   S08FxAbilityTick();  // VS-6 F3: the gaze staging, the embers of the dissolving figures
+  if (UNiagaraComponent* Cut = FieldFx.CutChevrons.Get()) {  // VC C3 (ВР-VC-13): the 80 ms fade of a cut
+    const float Op = S08FieldFx::ChevronCutOpacity(static_cast<double>(NowMs()) - FieldFx.CutAtMs);
+    Cut->SetFloatParameter(S08FieldFx::ChevronOpacityParam, Op);
+    if (Op <= 0.0f || !Cut->IsActive()) {
+      Cut->DeactivateImmediate();
+      FieldFx.CutChevrons = nullptr;
+    }
+  }
   if (FieldFx.Moves.Num() == 0 && FieldFx.Chevrons.Num() == 0) return;
   const double Now = static_cast<double>(NowMs());
   const bool bReduced = S08IconMotion::IsReducedMotion();
@@ -458,7 +479,7 @@ bool AS08FlowGameMode::S08FxBenchField(const FString& Mode, const TArray<FString
   //   pulse,<x>,<y>,<ms>[,target]  FX-09 the confirm pulse at <ms>
   //   lastpath,<id>,<x0>,<y0>,<x1>,<y1>...[,place]  FX-14 the dashed path of <id>'s move (its team colour)
   //   dust,<x>,<y>,<ms>        FX-13 NS_FX_Dust frozen at <ms>
-  //   chevrons,<a>,<t>,<ms>    FX-16 NS_FX_AttackChevrons frozen at <ms> after t0
+  //   chevrons,<a>,<t>,<ms>[,<cut ms>]  FX-16 NS_FX_AttackChevrons frozen at <ms> after t0 [<cut ms> into the 80 ms cut]
   auto Num = [&Parts](int32 I, double Default) {
     return Parts.IsValidIndex(I) && Parts[I].IsNumeric() ? FCString::Atod(*Parts[I]) : Default;
   };
@@ -530,6 +551,7 @@ bool AS08FlowGameMode::S08FxBenchField(const FString& Mode, const TArray<FString
     ApplyProfileGrade(*BoardActor, *CueFxSpawner);
     FTransform Xf;
     double Ms = 0.0;
+    float Opacity = 1.0f;
     FString Cue;
     if (Mode == TEXT("dust")) {
       if (Parts.Num() < 4) return false;
@@ -541,11 +563,12 @@ bool AS08FlowGameMode::S08FxBenchField(const FString& Mode, const TArray<FString
       const AS08FighterActor* A = Parts.IsValidIndex(1) ? BoardActor->FindFighterActor(Parts[1]) : nullptr;
       const AS08FighterActor* T = Parts.IsValidIndex(2) ? BoardActor->FindFighterActor(Parts[2]) : nullptr;
       if (!A || !T || !ChevronTransform(A->GetActorLocation(), T->GetActorLocation(), Xf)) return false;
-      Ms = Num(3, 0.0);
+      Ms = S08FieldFx::BenchChevronMs(Num(3, 0.0), S08IconMotion::IsReducedMotion());  // ВР-VC-15
       Cue = TEXT("CUE-008");
+      Opacity = Parts.IsValidIndex(4) ? S08FieldFx::ChevronCutOpacity(Num(4, 0.0)) : 1.0f;  // [,<ms since a cut>]
     }
     // spawned at the end of the warm-up (S08FxBenchFieldFinish(true)): the prewarm instances are gone by then
-    GFieldBench.Spawns.Add({Cue, Xf, Ms});
+    GFieldBench.Spawns.Add({Cue, Xf, Ms, Opacity});
     FS08Trace::Write(FString::Printf(TEXT("FX bench %s ms=%.0f queued"), *Mode, Ms));
     return true;
   }
@@ -574,7 +597,12 @@ void AS08FlowGameMode::S08FxBenchFieldFinish(bool bWarmupDone) {
     GFieldBench.bSpawned = true;
     ApplyProfileGrade(*BoardActor, *CueFxSpawner);
     for (const FFieldBench::FSpawn& S : GFieldBench.Spawns) {
+      if (S.Cue == TEXT("CUE-007") && S08IconMotion::IsReducedMotion()) {  // ВР-VC-15: no dust (as live)
+        FS08Trace::Write(FString::Printf(TEXT("FX bench spawn cue=%s ms=%.0f result=skip reason=reduced"), *S.Cue, S.Ms));
+        continue;
+      }
       UNiagaraComponent* Comp = CueFxSpawner->Spawn(S.Cue, S.Xf);
+      if (Comp && S.Opacity < 1.0f) Comp->SetFloatParameter(S08FieldFx::ChevronOpacityParam, S.Opacity);
       if (Comp) {
         // frozen at <ms>: the CPU simulation advanced in 1/60 s ticks, then paused (deterministic, FX-04)
         const int32 Ticks = FMath::Max(1, FMath::RoundToInt(S.Ms / (1000.0 / 60.0)));

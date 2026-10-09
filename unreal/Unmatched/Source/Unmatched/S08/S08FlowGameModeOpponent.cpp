@@ -134,7 +134,18 @@ void AS08FlowGameMode::TickOpponentView() {
   if (!CardSlot.HoldsEffect()) {
     for (const FString& Line : LastMoveTracker.Tick(Now, bMoving)) FS08Trace::Write(Line);
   }
-  if (BoardActor) BoardActor->SetLastMoveFade(LastMoveTracker.IsDrawn() ? LastMoveTracker.Alpha(Now) : 1.0f);
+  // VC C3 FX-14 (ВР-VC-14): a replaced path fades 100 ms while the new one waits for its move (not under the rollback)
+  const bool bLastDrawn = LastMoveTracker.IsDrawn();
+  if (!S08FieldFx::LastMoveLegacy()) {
+    const FS08MoveDraftInput::FLastMove LastIn = bLastDrawn ? LastMovePlateInput() : FS08MoveDraftInput::FLastMove();
+    const FString OldLine = OldPathFade.Observe(bLastDrawn, LastMoveTracker.GetTrail().Seq, bLastDrawn ? &LastIn : nullptr,
+                                                bLastDrawn ? LastMoveTracker.Alpha(Now) : 0.0f, Now);
+    if (!OldLine.IsEmpty()) FS08Trace::Write(OldLine);
+  }
+  if (BoardActor) {
+    BoardActor->SetLastMoveFade(bLastDrawn ? LastMoveTracker.Alpha(Now)
+                                           : OldPathFade.IsFading() ? OldPathFade.Alpha(Now) : 1.0f);
+  }
 
   // the feed line of a maneuver comes with its highlight (03 §7 "После": MS-P-03 + the line); DE-022: an EFFECT
   // trail writes its effect line (or "Your fighter X: Y effect") the same way
@@ -218,7 +229,10 @@ void AS08FlowGameMode::TickOpponentView() {
 }
 
 FS08MoveDraftInput::FLastMove AS08FlowGameMode::LastMovePlateInput() const {
-  if (!LastMoveTracker.IsDrawn()) return FS08MoveDraftInput::FLastMove();
+  if (!LastMoveTracker.IsDrawn()) {  // VC C3 FX-14: the replaced path in its 100 ms fade (ВР-VC-14)
+    const FS08MoveDraftInput::FLastMove* Old = OldPathFade.Shown(false, LastMoveTracker.GetTrail().Seq);
+    return Old ? *Old : FS08MoveDraftInput::FLastMove();
+  }
   const FS09LastMovement& Trail = LastMoveTracker.GetTrail();
   // V-14 / V-15 take the mover's team colour as the board draws that team (absolute or -S08TeamColorMode relative)
   const FString ViewerId = bBench ? BenchViewerId : (Flow.IsValid() ? Flow->GetUserId() : FString());

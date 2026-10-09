@@ -189,6 +189,12 @@ FMarkPose ChevronAt(int32 Index, double Ms) {
   return P;
 }
 
+float ChevronCutOpacity(double MsSinceCut) {
+  return MsSinceCut <= 0.0 ? 1.0f : Clamp01(1.0 - MsSinceCut / ChevronCutMs);
+}
+
+double BenchChevronMs(double Ms, bool bReduced) { return bReduced ? FMath::Min(Ms * 6.0, 470.0) : Ms; }
+
 float ChevronWidthUU(float LengthUU, float CellRadiusUU) {
   // neighbours (closer than 2.5 cell radii): >= 0.2 R; a far attack >= 0.35 R; never wider than 0.6 R
   const float Floor = (LengthUU < 2.5f * CellRadiusUU ? 0.2f : 0.35f) * CellRadiusUU;

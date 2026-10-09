@@ -5,9 +5,12 @@
 //                                   rollback -S08LastMoveLegacy keeps the outlines; the tracker holds 1500 ms
 //   Unmatched.S08.FieldFx.Rows      CUE-002 / 003 / 004 / 007 rows of the dispatcher: local / server, durations, the
 //                                   300 ms throttle of the refusal sound, the CUE-007 snap with reduced motion
+//   Unmatched.S08.FieldFx.Fades     VC C3: the 80 ms chevron cut (ВР-VC-13), the bench chevron age under reduced
+//                                   motion (ВР-VC-15), the 100 ms fade of a replaced last path (ВР-VC-14)
 #if WITH_AUTOMATION_TESTS
 
 #include "S08FieldFx.h"
+#include "S08LastPathFade.h"
 #include "../S08CueDispatcher.h"
 #include "../S08MoveHighlight.h"
 #include "../../S09/S09OpponentView.h"
@@ -177,6 +180,55 @@ bool FS08FieldFxRowsTest::RunTest(const FString&) {
   Cues.Feed(TEXT("CUE-007"), TEXT("f-0-sk0"), 42, 1600, Lines, 0, 560, true);
   TestEqual("CUE-007 reduced = snap", Lines.Last(),
             FString(TEXT("CUE fx done id=CUE-007 subject=f-0-sk0 seq=42 t=1600 ms=0 cut=0")));
+  return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FS08FieldFxFadesTest, "Unmatched.S08.FieldFx.Fades",
+                                 EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FS08FieldFxFadesTest::RunTest(const FString&) {
+  using namespace S08FieldFx;
+  // FX-16 «прерывание (гаснут за 80 мс)»
+  TestEqual("cut 0 ms: 1", ChevronCutOpacity(0.0), 1.0f);
+  TestEqual("cut 40 ms: 0.5", ChevronCutOpacity(40.0), 0.5f, 0.001f);
+  TestEqual("cut 80 ms: 0", ChevronCutOpacity(80.0), 0.0f);
+  TestEqual("cut 200 ms: 0", ChevronCutOpacity(200.0), 0.0f);
+  TestEqual("bench chevrons normal: as given", BenchChevronMs(240.0, false), 240.0);
+  TestEqual("bench chevrons reduced: x6", BenchChevronMs(40.0, true), 240.0);
+  TestEqual("bench chevrons reduced: all three held before the fade", BenchChevronMs(240.0, true), 470.0);
+  // FX-14 «новый ход до угасания (старый гаснет за 100 мс)»
+  FS08MoveDraftInput::FLastMove A;
+  A.From.Add(FIntPoint(1, 1));
+  A.To.Add(FIntPoint(2, 1));
+  A.Paths.Add({FIntPoint(1, 1), FIntPoint(2, 1)});
+  A.Places.Add(false);
+  FS08OldPathFade Fade;
+  TestTrue("drawn: nothing to say", Fade.Observe(true, 10, &A, 1.0f, 1000.0).IsEmpty());
+  TestTrue("drawn: the tracker draws", Fade.Shown(true, 10) == nullptr);
+  // the tracker replaced seq 10 by seq 12 (Waiting): before the tick observes it, the plates keep the old path
+  const FS08MoveDraftInput::FLastMove* Pending = Fade.Shown(false, 12);
+  TestTrue("replace seen before the tick: the old path stays", Pending && Pending->To.Num() == 1);
+  const FString Start = Fade.Observe(false, 12, nullptr, 0.0f, 1020.0);
+  TestTrue("fade starts", Start.StartsWith(TEXT("MS-LAST old-fade start seq=10 by=12")));
+  TestTrue("fading", Fade.IsFading());
+  TestEqual("old alpha at +50: 0.5", Fade.Alpha(1070.0), 0.5f, 0.001f);
+  TestTrue("the fading path is drawn", Fade.Shown(false, 12) != nullptr);
+  const uint32 Rev = Fade.GetRevision();
+  const FString End = Fade.Observe(false, 12, nullptr, 0.0f, 1120.0);
+  TestTrue("fade ends at +100", End.StartsWith(TEXT("MS-LAST old-fade end seq=10")));
+  TestTrue("revision moved", Fade.GetRevision() != Rev);
+  TestTrue("after the fade: nothing", Fade.Shown(false, 12) == nullptr);
+  // a fade from a fading tracker (alpha 0.4) starts at 0.4; the new path revealed ends the fade at once
+  FS08OldPathFade F2;
+  F2.Observe(true, 20, &A, 0.4f, 0.0);
+  F2.Observe(false, 21, nullptr, 0.0f, 10.0);
+  TestEqual("from the tracker's alpha", F2.Alpha(10.0), 0.4f, 0.001f);
+  TestTrue("revealed new path ends it", F2.Observe(true, 21, &A, 0.0f, 40.0).Contains(TEXT("reason=shown")));
+  TestFalse("not fading", F2.IsFading());
+  // the tracker's own end (same seq goes to none): no extra fade
+  FS08OldPathFade F3;
+  F3.Observe(true, 30, &A, 0.2f, 0.0);
+  TestTrue("same seq off: no old fade", F3.Observe(false, 30, nullptr, 0.0f, 10.0).IsEmpty());
+  TestFalse("same seq off: not fading", F3.IsFading());
   return true;
 }
 
