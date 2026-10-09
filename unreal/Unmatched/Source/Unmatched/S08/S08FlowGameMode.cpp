@@ -1130,7 +1130,7 @@ void AS08FlowGameMode::HandleCues(const TArray<FS08Cue>& InCues) {
       if (!bStaged && BoardActor && CommandUi.Combat.bPresent && CommandUi.Combat.TargetFighterId == Cue.FighterId) {
         bCombatDamageShownEarly = true;  // the closing staging must not show it a second time
       }
-      S08HealProbeOnDamage(Cue.FighterId, Cue.Damage, Cue.SequenceNumber);  // VC Frames ВР-VC-29 (-ArtPreviewHealProbe)
+      if (bStaged) S08HealProbeOnDamage(Cue.FighterId, Cue.Damage, Cue.SequenceNumber);  // VC Frames ВР-VC-29 (staged combat)
     }
     TraceLines.Add(Line);
     FS08Trace::Write(Line);

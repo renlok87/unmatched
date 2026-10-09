@@ -12,8 +12,10 @@
 //                  (at most 10 own turns) the hero neither approaches nor attacks - the live harpy attack (AN-24);
 //                  a harpy's lunge is framed 100 ms in (s09-an24-harpy-lunge.png, with -S08ExitShots / -S08FxShots).
 //   -ArtPreviewHealProbe (ВР-VC-29) the decks of the demo heal only by The Holy Grail (King Arthur defends with it and
-//                  ends the combat at <= 4 health - not within a demo match): the first damage of a living King Arthur
-//                  hero is answered by ONE staged heal of the same amount through the FX-25 path (CUE-012 at the end of
+//                  ends the combat at <= 4 health - not within a demo match): the first STAGED combat damage of a living
+//                  King Arthur hero (the Grail's own moment - an ability's damage shares its seq with the «−N» of the
+//                  same frame, which keeps the «+N» out) is answered by ONE staged heal of the same amount through the
+//                  FX-25 path (CUE-012 at the end of
 //                  the staging, the motes, «+N» / the IC-49 «+» under reduced motion, the s09-fx25-heal.png hook
 //                  frame). The server state is untouched: the HP of the HUD stays the server's.
 #include "S08FlowGameMode.h"

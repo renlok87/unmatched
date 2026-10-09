@@ -928,7 +928,7 @@ private:
   /** 'sidekickfirst': until the first sidekick attack (and for at most 10 own turns) the hero neither approaches nor
    *  attacks while an own living melee sidekick is on the board - the harpies lead (the match still ends: it lets go). */
   bool S09HoldHeroForSidekicks() const;
-  /** -ArtPreviewHealProbe (ВР-VC-29): the first damage of a living King Arthur hero is answered by one staged heal of the
+  /** -ArtPreviewHealProbe (ВР-VC-29): the first staged combat damage of a living King Arthur hero is answered by one heal of the
    *  same amount (the FX-25 path: CUE-012, motes, «+N», the s09-fx25-heal.png hook frame). */
   void S08HealProbeOnDamage(const FString& FighterId, int32 Damage, int32 Seq);
   /** AN-24 frame (ВР-VC-28): a harpy's lunge is framed 100 ms in (s09-an24-harpy-lunge.png). */
