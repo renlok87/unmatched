@@ -605,7 +605,9 @@ def check_ms_cue(lines, table):
 def check_trace(lines, table):
     """Ошибки гейта (код: текст) и сводка. Коды: G1 формат, G2 один показ на тройку, G3 нет старого после
     реконнекта, G4 done и длительности, G5 блокировка ввода, G6 одновременность звука, G7 частота звука,
-    G8 fallback, G9 время монотонно; M1..M4 — трассы `MS-CUE move` (check_ms_cue)."""
+    G8 fallback, G9 время монотонно; M1..M4 — трассы `MS-CUE move` (check_ms_cue). VC C4 (ВР-VC-21): G9 не ошибка, если
+    обе отметки лежат в одном окне остановки съёмки `SHOT hitch` (строка `done` несёт плановое время конца, а кадр после
+    остановки уже записал показ со своим временем) — счётчик `g9_hitch`; без `SHOT hitch` правило прежнее."""
     rows = rows_by_id(table)
     errors = []
     presented = {}
@@ -614,6 +616,9 @@ def check_trace(lines, table):
     recovered = None
     last_t = None
     summary = {"presented": 0, "spawned": 0, "fallback": 0, "duplicate": 0, "stale": 0, "done": 0, "unique_triples": 0}
+    hitches = _hitch_windows(lines)
+    if hitches:
+        summary["g9_hitch"] = 0
     need = ("id", "subject", "seq", "t", "vfx", "sfx", "clip", "mat", "socket", "reduced", "result")
     stops = []
     for n, raw in enumerate(lines, 1):
@@ -630,7 +635,10 @@ def check_trace(lines, table):
             errors.append(("G1", "строка %d: нет t" % n))
             continue
         if last_t is not None and t < last_t:
-            errors.append(("G9", "строка %d: время %d < %d" % (n, t, last_t)))
+            if any(t0 <= t and last_t <= t1 for t0, t1 in hitches):
+                summary["g9_hitch"] += 1
+            else:
+                errors.append(("G9", "строка %d: время %d < %d" % (n, t, last_t)))
         last_t = t
         if kind == "CUE reconnect":
             recovered = int(f["recovered_seq"])
@@ -763,6 +771,31 @@ SOUND_MS = {  # CUE-DISPATCHER.md §3.2: звук против кадра соб
 SOUND_CLOCK_RE = re.compile(r"\b(?:CUE (?:combat|sound|audio|death)|RESULT screen)\b.*?\bt=(-?\d+)")
 # AU-S6: the late-shot queue of run I ends a capture with `SHOT late end` - it stalls the frame the same way
 SHOT_CAPTURED_RE = re.compile(r"\bSHOT (?:captured|late end)\b")
+# VC C4 (ВР-VC-21): the client marks the stall of each capture on the game clock - `SHOT hitch file=<f> t0=<capture
+# frame> t1=<next frame> ms=<t1 - t0>`; with these lines AU5 / AU6 subtract the stall instead of guessing the window.
+SHOT_HITCH_RE = re.compile(r"\bSHOT hitch file=(\S+) t0=(-?\d+) t1=(-?\d+)")
+
+
+def _hitch_windows(lines):
+    out = []
+    for raw in lines:
+        m = SHOT_HITCH_RE.search(raw)
+        if m:
+            out.append((int(m.group(2)), int(m.group(3))))
+    return out
+
+
+def _hitch_corrected(windows, due, t):
+    """t − due minus the capture stall inside [due, t]: the overlap of each `SHOT hitch` window with [due, t], less one
+    frame of the dispatcher (SOUND_MS frame, 17 мс - the frame the sound would take anyway). None when no window
+    touches [due, t] (the sound is late on its own)."""
+    stall, hit = 0, False
+    for t0, t1 in windows:
+        overlap = min(t, t1) - max(due, t0)
+        if overlap > 0:
+            hit = True
+            stall += max(0, overlap - SOUND_MS["frame"])
+    return (t - due - stall) if hit else None
 
 
 def _shot_stall(windows, due, t):
@@ -795,7 +828,9 @@ def check_sound(lines, table):
     (Ambience — gain_ambience, иначе gain_master), silent reason=muted ⇔ gain 0;
     AU9 частота: throttled только внутри retrigger_ms прошлого звука этого CUE, иначе звук играет.
     Опоздание AU5/AU6 больше допуска в первом кадре после снимка доказательств (`SHOT captured`) — не ошибка,
-    а счётчик `sound_late_shot` (_shot_stall).
+    а счётчик `sound_late_shot` (_shot_stall). VC C4 (ВР-VC-21): если трасса несёт `SHOT hitch` (клиент отмечает
+    остановку кадра съёмки на игровых часах), допуск сверяется с t − due за вычетом остановки (_hitch_corrected,
+    счётчик `sound_late_hitch`), а старое окно _shot_stall не применяется; прогон без съёмки — правило без изменений.
     В трассе без `CUE audio` и `CUE sound` (клиент без DE-032) сверки AU3/AU7 с `HUD-TURN` и экраном не делаются."""
     rows = rows_by_id(table)
     errors = []
@@ -812,6 +847,21 @@ def check_sound(lines, table):
     summary = {"sounds": 0, "sound_points": {p: 0 for p in SOUND_POINTS}, "sound_fallback": 0, "sound_played": 0,
                "sound_silent": 0, "sound_throttled": 0, "audio_lines": 0, "sound_dt_max": 0, "sound_late_shot": 0}
     shot_windows = []  # (t до снимка, t первой и второй строки со временем после снимка)
+    hitches = _hitch_windows(lines)
+    summary["sound_late_hitch"] = 0
+
+    def late_ok(due, t):
+        """True - the late sound is excused by a capture (counted); False - AU5 / AU6."""
+        if hitches:
+            c = _hitch_corrected(hitches, due, t)
+            if c is not None and 0 <= c <= SOUND_MS["frame_tolerance"]:
+                summary["sound_late_hitch"] += 1
+                return True
+            return False
+        if _shot_stall(shot_windows, due, t):
+            summary["sound_late_shot"] += 1
+            return True
+        return False
     clock_t = None
     shot_from = None
     shot_first = None
@@ -954,15 +1004,15 @@ def check_sound(lines, table):
             # due — только у удара постановки (кадр контакта); удар без постановки (каскад, способность) — в свой кадр
             if due is not None and f["seq"] in contact and due != contact[f["seq"]]:
                 errors.append(("AU5", "строка %d: due=%s ≠ кадр контакта %d" % (n, f.get("due"), contact[f["seq"]])))
-            if due is not None and t - due > SOUND_MS["frame_tolerance"] and _shot_stall(shot_windows, due, t):
-                summary["sound_late_shot"] += 1
+            if due is not None and t - due > SOUND_MS["frame_tolerance"] and late_ok(due, t):
+                pass
             elif due is not None and not 0 <= t - due <= SOUND_MS["frame_tolerance"]:
                 errors.append(("AU5", "строка %d: удар через %d мс после контакта" % (n, t - due)))
         elif point == "step":
             edge = f.get("edge", "")
             st = steps.setdefault(key, {"n": None, "edges": [], "snap": 0, "line": n})
-            if due is not None and t - due > SOUND_MS["frame_tolerance"] and _shot_stall(shot_windows, due, t):
-                summary["sound_late_shot"] += 1
+            if due is not None and t - due > SOUND_MS["frame_tolerance"] and late_ok(due, t):
+                pass
             elif due is None or not 0 <= t - due <= SOUND_MS["frame_tolerance"]:
                 errors.append(("AU6", "строка %d: шаг без due или через %s мс после начала ребра" % (
                     n, "-" if due is None else t - due)))

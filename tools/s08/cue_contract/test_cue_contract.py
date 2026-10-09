@@ -295,6 +295,21 @@ class MsCueGateTests(unittest.TestCase):
         self.assertEqual(self.codes([ms_line(6, "a", 0, 1, "move", 2, "trail", 0, round(slow["ms"]), 0, extra=" speed=slow")]), [])
         self.assertEqual(self.codes([ms_line(7, "a", 0, 1, "move", 2, "trail", 0, 0, 1, extra=" reduced=1")]), [])
 
+    def test_g9_inside_capture_hitch(self):
+        # VC C4 (ВР-VC-21): VC C4 pv-marm joiner - a `done` with its planned end (60629) after a show of the frame that
+        # follows a 270 мс capture stall (60632): excused only inside the `SHOT hitch` window
+        show = ("CUE fx id=CUE-006 subject=card seq=41 t=60632 vfx=none sfx=none clip=none mat=none socket=- reduced=0 "
+                "result=spawned")
+        done = "CUE fx done id=CUE-014 subject=f-0-hero seq=38 t=60629 ms=800 cut=0"
+        hitch = "SHOT hitch file=s09-no-defense-stamp.png t0=60362 t1=60632 ms=270"
+        g9 = lambda lines: [c for c, _ in cc.check_trace(lines, TABLE)[0] if c == "G9"]
+        self.assertEqual(g9([show, done]), ["G9"])
+        errs, summary = cc.check_trace([hitch, show, done], TABLE)
+        self.assertEqual([c for c, _ in errs if c == "G9"], [])
+        self.assertEqual(summary["g9_hitch"], 1)
+        # a regression outside the window still fails
+        self.assertEqual(g9(["SHOT hitch file=a.png t0=1000 t1=1200 ms=200", show, done]), ["G9"])
+
     def test_format_errors(self):
         self.assertEqual(self.codes([GOOD[0].replace(" steps=1", ""), GOOD[1]]), ["M1", "M2"])
         self.assertEqual(self.codes([GOOD[3].replace("source=straight", "source=guess")]), ["M1"])
@@ -878,6 +893,35 @@ class SoundGateTests(unittest.TestCase):
         # still AU6 without a shot, or with the sound later than the first frame after it
         self.assertIn("AU6", self.codes([AUDIO_START, prev, same_frame, stalled]))
         self.assertIn("AU6", self.codes([AUDIO_START, prev, late_end, same_frame, stalled, much_later]))
+
+    def test_capture_hitch_is_subtracted(self):
+        # VC C4 (ВР-VC-21, CLOSEOUT п. 9): VS-8 pv-marm host - contact t=31014 scheduled before the capture frame's
+        # stall, the hit sounds in the next frame (t=31236, 222 мс). The client's `SHOT hitch` window is subtracted
+        # (less one 17 мс frame): 222 - (222 - 17) = 17 мс -> no AU5, counted as sound_late_hitch.
+        shot = "SHOT captured file=s09-exit-opp-t3.0.png frame=833 px=1920x1080 sha256=x order=BGRA saved=1"
+        contact = "CUE combat seq=6 stage=contact t=31014 offset=333 window=900 src=notify"
+        hitch = "SHOT hitch file=s09-exit-opp-t3.0.png t0=30990 t1=31236 ms=246"
+        hit = snd("CUE-011", "hit", 31236, seq="6", subject="f-1-hero", extra="due=31014")
+        errs, summary = cc.check_sound([AUDIO_START, shot, contact, hitch, hit], TABLE)
+        self.assertEqual(errs, [])
+        self.assertEqual(summary["sound_late_hitch"], 1)
+        self.assertEqual(summary["sound_late_shot"], 0)
+        # the old guess window alone does not excuse it (scheduled clock values after the capture)
+        minus = "CUE combat seq=6 stage=minus t=31074 amount=1 life=900"
+        self.assertIn("AU5", self.codes([AUDIO_START, shot, contact, minus, hit]))
+        self.assertEqual(self.codes([AUDIO_START, shot, contact, minus, hitch, hit]), set())
+        # a sound late beyond the stall still fails: 400 мс with a 100 мс hitch inside [due, t]
+        short = "SHOT hitch file=a.png t0=31000 t1=31100 ms=100"
+        late = snd("CUE-011", "hit", 31414, seq="6", subject="f-1-hero", extra="due=31014")
+        self.assertIn("AU5", self.codes([AUDIO_START, contact, short, late]))
+        # a hitch outside [due, t] does not help; with hitch lines the old window is not used
+        far = "SHOT hitch file=b.png t0=20000 t1=20250 ms=250"
+        self.assertIn("AU5", self.codes([AUDIO_START, shot, contact, far, hit]))
+        # steps the same way; a run without capture (no hitch lines) keeps the rule
+        step = snd("CUE-007", "step", 24834, seq="7", subject="sk0", extra="edge=1/1 due=24680")
+        hitch2 = "SHOT hitch file=c.png t0=24660 t1=24834 ms=174"
+        self.assertEqual(self.codes([AUDIO_START, hitch2, step]), set())
+        self.assertIn("AU6", self.codes([AUDIO_START, step]))
 
     def test_result_sting_with_the_screen(self):
         screen = "RESULT screen seq=50 t=9000 due=9000 gameOver=9000 heroGone=- wait=0"

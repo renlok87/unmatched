@@ -525,6 +525,10 @@ struct FS08ArtHudRuntime {
   TArray<FLateShot> LateShots;
   FString PendingCapturePath;         // FScreenshotRequest path; the OnScreenshotCaptured delegate saves it
   uint64 PendingCaptureRequestFrame = 0;
+  // VC C4 (ВР-VC-21, CLOSEOUT п. 9): the capture frame's game clock; the next tick writes `SHOT hitch file= t0= t1=
+  // ms=` - the stall the readback + PNG save put between the two frames, which G-CUE AU5 / AU6 subtract.
+  FString CaptureHitchFile;
+  int64 CaptureHitchT0Ms = -1;
   // Combat damage frame (host evidence of the first combat's damage number).
   FString AwaitCombatDamageTarget;
   float AwaitCombatDamageUntil = -1.0f;

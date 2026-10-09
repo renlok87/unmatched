@@ -5106,6 +5106,12 @@ void AS08FlowGameMode::CaptureEvidenceShot(const FString& BasePath) {
 void AS08FlowGameMode::Tick(float DeltaSeconds) {
   Super::Tick(DeltaSeconds);
   Elapsed += DeltaSeconds;
+  if (ArtHud.CaptureHitchT0Ms >= 0) {  // VC C4 (ВР-VC-21): the frame after a capture - its stall, game clock
+    FS08Trace::Write(FString::Printf(TEXT("SHOT hitch file=%s t0=%lld t1=%lld ms=%lld"), *ArtHud.CaptureHitchFile,
+                                     static_cast<long long>(ArtHud.CaptureHitchT0Ms), static_cast<long long>(NowMs()),
+                                     static_cast<long long>(NowMs() - ArtHud.CaptureHitchT0Ms)));
+    ArtHud.CaptureHitchT0Ms = -1;
+  }
   DrainEvidenceShotQueue(); // I-03: a queued evidence shot goes out before this frame asks for new ones
   if (bIconGallery) {
     IconGalleryTick(DeltaSeconds);
@@ -8503,6 +8509,8 @@ void AS08FlowGameMode::HandleScreenshotCaptured(int32 Width, int32 Height, const
   const FString Path = ArtHud.PendingCapturePath;
   const uint64 RequestFrame = ArtHud.PendingCaptureRequestFrame;
   ArtHud.PendingCapturePath.Reset();
+  if (ArtHud.CaptureHitchT0Ms < 0) ArtHud.CaptureHitchT0Ms = NowMs();  // VC C4: the next tick writes SHOT hitch
+  ArtHud.CaptureHitchFile = Path.IsEmpty() ? FString(TEXT("-")) : FPaths::GetCleanFilename(Path);
   const FString Sha = S08Sha256Hex(reinterpret_cast<const uint8*>(Colors.GetData()),
                                    static_cast<int64>(Colors.Num()) * static_cast<int64>(sizeof(FColor)));
   bool bSaved = false;
@@ -8737,8 +8745,11 @@ void AS08FlowGameMode::WriteArtHudWidgetLines(const FString& Prefix, bool bLate)
   // twin=1 is the compare-mode Slate twin (render opacity 0, same slot
   // geometry): "bbox UMG = Slate +-1 px" compares the two on the SAME frame.
   // A part is "painted" once its view has kept its place for 2 frames.
+  // VC C4 (ВР-VC-19): StableFrames >= 0 adds "stable=<n>" to the late line - a plate placed less than 2 frames ago
+  // is not laid out in the captured frame yet, and G-WIDGET counts it as settling, not as a failure.
   auto Emit = [this, &Prefix, bLate](const FS08WidgetPart& Part, const TCHAR* Impl, const TCHAR* State,
-                                     const FString& Fighter, bool bStable, bool bTwin, const FString& Source) {
+                                     const FString& Fighter, bool bStable, bool bTwin, const FString& Source,
+                                     int32 StableFrames) {
     FS08ScreenRect Rect;
     if (!bLate) {
       const bool bPainted = bStable && WidgetViewportRect(Part.Widget, Rect) && !Rect.IsEmpty();
@@ -8750,7 +8761,8 @@ void AS08FlowGameMode::WriteArtHudWidgetLines(const FString& Prefix, bool bLate)
     const bool bPainted = bVisible && bStable && WidgetViewportRect(Part.Widget, Rect) && !Rect.IsEmpty();
     FS08Trace::Write(Prefix + S08ArtHud::FormatWidgetLineEx(
         Part.Id, Impl, State, Fighter, Rect, bPainted, bVisible, Source,
-        FString::Printf(TEXT("frame=%llu"), static_cast<unsigned long long>(GFrameCounter))));
+        FString::Printf(TEXT("frame=%llu"), static_cast<unsigned long long>(GFrameCounter)) +
+            (StableFrames >= 0 ? FString::Printf(TEXT(" stable=%d"), StableFrames) : FString())));
   };
   const bool bAlternate = static_cast<ES08ArtHudImpl>(ArtHud.Impl) == ES08ArtHudImpl::Alternate;
   if (ArtHud.bPlateVisible) {
@@ -8763,7 +8775,7 @@ void AS08FlowGameMode::WriteArtHudWidgetLines(const FString& Prefix, bool bLate)
       View->CollectParts(Parts);
       for (const FS08WidgetPart& Part : Parts) {
         Emit(Part, View->ImplName(), bOwn ? TEXT("own") : TEXT("enemy"), ArtHud.PlateFighterId,
-             ArtHud.PlateStableFrames >= 2, View->bTwin, View->Source());
+             ArtHud.PlateStableFrames >= 2, View->bTwin, View->Source(), ArtHud.PlateStableFrames);
       }
     }
   }
@@ -8775,7 +8787,7 @@ void AS08FlowGameMode::WriteArtHudWidgetLines(const FString& Prefix, bool bLate)
       View->CollectParts(Parts);
       for (const FS08WidgetPart& Part : Parts) {
         Emit(Part, View->ImplName(), ArtHud.IconSource.IsEmpty() ? TEXT("none") : *ArtHud.IconSource,
-             ArtHud.IconFighterId, true, View->bTwin, View->Source());
+             ArtHud.IconFighterId, true, View->bTwin, View->Source(), -1);
       }
     }
   }

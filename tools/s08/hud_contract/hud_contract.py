@@ -536,12 +536,42 @@ def check_shots(lines, rules, privacy=False):
     return results, priv
 
 
-def check_widget_trace(lines, known_ids, width=1920, height=1080, registry=None, states=None, card_registry=None):
+# VC C4 (ВР-VC-19, CLOSEOUT п. 8): `SHOT plate fighter=<id> ... geom=<g> stableFrames=<n>` - the plate's own line of
+# the shot cycle (written before `SHOT request`); a cycle ends at `SHOT late end`.
+PLATE_LINE_RE = re.compile(r"SHOT plate (fighter=.*)$")
+
+
+def plate_settling(f, plates):
+    """A visible unpainted `plate*` line is "settling" when this shot cycle's `SHOT plate` line of the same fighter says
+    the plate was placed less than 2 frames ago (stableFrames < 2, geom=unpainted), or the line carries its own
+    `stable=<n>` < 2: the snapshot frame of `-S09Flow` switched the hover in the requesting frame, the plate's geometry
+    is not laid out yet and cannot be measured on the capture. Without either, or with >= 2, the line stays an error."""
+    if not str(f.get("id", "")).startswith("plate"):
+        return False
+    if "stable" in f:  # the late line's own count (VC C4 client): the plate may be shown after `SHOT request`
+        try:
+            return int(f["stable"]) < 2
+        except ValueError:
+            return False
+    p = plates.get(f.get("fighter"))
+    if p is None or p.get("geom") == "painted":
+        return False
+    try:
+        return int(p.get("stableFrames", "")) < 2
+    except ValueError:
+        return False
+
+
+def check_widget_trace(lines, known_ids, width=1920, height=1080, registry=None, states=None, card_registry=None,
+                       stats=None):
     """Правило 3: гейт по трассе геометрии виджета, не по пикселям. Невидимая часть (visible=0, например
     сравнительный Slate-двойник или скрытая иконка в поздней строке W5b-R) может быть unpainted. states (04 §7.1,
-    ui_states_from_04): у блока из таблицы состояние должно быть из её списка."""
+    ui_states_from_04): у блока из таблицы состояние должно быть из её списка. VC C4 (ВР-VC-19): строка `plate*` в
+    кадре, где табличка поставлена меньше 2 кадров назад (plate_settling), не ошибка, а `settling` (счёт в stats);
+    если табличка в трассе ни разу не нарисована, а такие строки есть, - ошибка."""
     states = states or {}
     errors, seen = [], 0
+    plates, settling, plate_painted = {}, 0, 0
     ids = set(known_ids) | ART_HUD_IDS
     registry = registry_portrait_keys() if registry is None else registry
     cards = registry_card_keys() if card_registry is None else card_registry
@@ -578,6 +608,14 @@ def check_widget_trace(lines, known_ids, width=1920, height=1080, registry=None,
                 except ValueError:
                     errors.append("строка %d: HUD-LAYOUT deckpanelBlocks=%r" % (n, lay["deckpanelBlocks"]))
             continue
+        pm = PLATE_LINE_RE.search(line.rstrip("\r\n"))
+        if pm:
+            p = dict(w.split("=", 1) for w in pm.group(1).split() if "=" in w)
+            plates[p.get("fighter")] = p
+            continue
+        if "SHOT late end" in line:
+            plates = {}
+            continue
         f = parse_shot_widget(line)
         if f is None:
             continue
@@ -592,6 +630,11 @@ def check_widget_trace(lines, known_ids, width=1920, height=1080, registry=None,
         errors += ["строка %d: %s" % (n, e) for e in privacy_line_errors(f)]
         if f.get("visible") == "0":
             continue
+        if f.get("geom") == "painted" and str(f.get("id", "")).startswith("plate"):
+            plate_painted += 1
+        if f.get("geom") != "painted" and plate_settling(f, plates):
+            settling += 1
+            continue
         if f.get("geom") != "painted":
             errors.append("строка %d: geom=%s (нужна нарисованная геометрия)" % (n, f.get("geom")))
         try:
@@ -600,6 +643,11 @@ def check_widget_trace(lines, known_ids, width=1920, height=1080, registry=None,
                 errors.append("строка %d: bbox %s вне кадра %dx%d" % (n, f["bbox"], width, height))
         except ValueError:
             errors.append("строка %d: bbox %r" % (n, f.get("bbox")))
+    if settling and not plate_painted:
+        errors.append("табличка plate ни разу не нарисована (%d строк settling, painted 0)" % settling)
+    if stats is not None:
+        stats["plate_settling"] = settling
+        stats["plate_painted"] = plate_painted
     return errors, seen
 
 
@@ -652,11 +700,13 @@ def main(argv=None):
         return 0
     lines = Path(a.log).read_text(encoding="utf-8", errors="replace").splitlines()
     spec04 = SPEC04.read_text(encoding="utf-8") if SPEC04.exists() else ""
+    stats = {}
     errors, seen = check_widget_trace(lines, ui_ids_from_02(spec02) | ui_ids_from_02(spec04), a.width, a.height,
-                                      states=ui_states_from_04(spec04))
+                                      states=ui_states_from_04(spec04), stats=stats)
     for e in errors:
         print("GATE", e)
-    print("HUD_TRACE", "PASS" if not errors and seen else "FAIL", "widget_lines", seen)
+    print("HUD_TRACE", "PASS" if not errors and seen else "FAIL", "widget_lines", seen,
+          "plate_settling", stats.get("plate_settling", 0))
     return 0 if not errors and seen else 1
 
 

@@ -83,6 +83,38 @@ class HudContractTests(unittest.TestCase):
         errs, _ = hc.check_widget_trace(bad, ids)
         self.assertTrue(any("deckpanelBlocks=1490" in e for e in errs))
 
+    def test_plate_settling_in_snapshot_frames(self):
+        # VC C4 (ВР-VC-19, CLOSEOUT п. 8): a plate placed less than 2 frames ago is "settling", not a failure; a plate
+        # that has kept its place and is still unpainted, or one that is never painted, stays an error
+        w = ("SHOT widget id=plate%s impl=umg state=own fighter=f-0-hero bbox=%s geom=%s visible=1 twin=0 "
+             "source=/Game/S08/UI/ArtHud/WBP_S08ArtPlate frame=10%s")
+        plate = ("SHOT plate fighter=f-0-hero bbox=(0,0,0,0) overlapReachable=0 placement=left gap=6 "
+                 "anchor=(1,1,2,2) planned=(1,1,2,2) geom=unpainted stableFrames=%d")
+        painted = w % ("", "(197,420,465,530)", "painted", "")
+        # cycle line says stableFrames=0 -> settling; the painted line elsewhere keeps the trace honest
+        stats = {}
+        good = [plate % 0, "SHOT request file=a.png", w % ("", "(0,0,0,0)", "unpainted", ""),
+                w % (".name", "(0,0,0,0)", "unpainted", ""), "SHOT late end file=a.png", painted]
+        self.assertEqual(hc.check_widget_trace(good, set(), stats=stats), ([], 3))
+        self.assertEqual(stats, {"plate_settling": 2, "plate_painted": 1})
+        # the late line's own stable=<n> (plate shown after the request: no cycle line)
+        good2 = ["SHOT request file=b.png", w % ("", "(0,0,0,0)", "unpainted", " stable=0"), painted]
+        self.assertEqual(hc.check_widget_trace(good2, set())[0], [])
+        # stable >= 2 and still unpainted -> real failure
+        bad = [plate % 5, w % ("", "(0,0,0,0)", "unpainted", ""), "SHOT late end",
+               w % ("", "(0,0,0,0)", "unpainted", " stable=3"), painted]
+        errs, _ = hc.check_widget_trace(bad, set())
+        self.assertEqual(sum("geom=unpainted" in e for e in errs), 2)
+        # the cycle line does not carry over past `SHOT late end`; no info -> error
+        stale = [plate % 0, "SHOT late end", w % ("", "(0,0,0,0)", "unpainted", ""), painted]
+        self.assertTrue(any("geom=unpainted" in e for e in hc.check_widget_trace(stale, set())[0]))
+        # settling everywhere, never painted -> error
+        never = [w % ("", "(0,0,0,0)", "unpainted", " stable=0")]
+        self.assertTrue(any("ни разу не нарисована" in e for e in hc.check_widget_trace(never, set())[0]))
+        # other ids are not exempt
+        hand = ["SHOT widget id=UI-HUD-HAND state=own bbox=(0,0,0,0) geom=unpainted visible=1 stable=0"]
+        self.assertTrue(any("geom=unpainted" in e for e in hc.check_widget_trace(hand, hc.ui_ids_from_02(SPEC02))[0]))
+
 
 if __name__ == "__main__":
     unittest.main()
