@@ -111,6 +111,11 @@ description: Сквозной пайплайн новой 3D-фигуры Unmatc
 **Этап 0 — заявка.**
 1. `ANATOMY` по §3 (`non-humanoid` — стоп). `ASSET_DIR`, `asset-card.yaml` по §7.2 (не заданное пользователем — дефолт
    §7.1 с `decided_by`), `.gitignore` ассета (`references/intake-and-evidence.md` §3).
+   `ANATOMY` решается **для каждой фигуры** по её описанию (БД `Hero`, карты), а не дефолтом пачки: пакетная заявка
+   2026-10-13 записала `humanoid` всем, и пять не-гуманоидов (Ant Queen, Blob, Tarantula, T. Rex, Raptors) и три
+   крылатых (Jersey Devil, Mothman, Wingnut) нашлись только перед Tripo. Крылья плюс отдельные руки — стоп §5 п.5.
+   `.gitignore` — гейт этапа 0: `git check-ignore -v <ASSET_DIR>/<YYYYMMDD>-draft-tripo/source/x.glb` печатает правило
+   ассета (без него сырые GLB по 45–79 МБ попадают в коммит).
 2. Запись в `docs/art-pipeline/asset-registry.json`: `status` «предложено», `stage` `planned`; `contentKey` = `CONTENT_KEY`,
    только если ключ есть в `docs/game-design/05-content-matrix.csv`, иначе `null`; `manifest06Row` — `null` без строки в
    `06-asset-manifest.csv`. Запись — по шаблону `references/intake-and-evidence.md` §1.
@@ -141,8 +146,10 @@ description: Сквозной пайплайн новой 3D-фигуры Unmatc
      Критерий 1: `tabs_context_mcp` возвращает подключённый браузер и список вкладок. Критерий 2: в своей новой
      вкладке (`tabs_create_mcp`) `navigate` на `https://studio.tripo3d.ai/`, затем `get_page_text` или скриншот —
      открыта Studio под учётной записью пользователя и виден баланс кредитов (записать число в `NOTES`). Чужие
-     вкладки не трогать. Расширение не подключено или экран входа — гейт §5 п.2 (вход и пароль агент не вводит);
-     тогда шаги 1b и 2 идут по чек-листу пользователю (`references/tripo3d-stages.md` §8).
+     вкладки не трогать. Расширение не подключено, но Studio открыта и залогинена в Chrome пользователя — клики через
+     Windows-MCP в этой вкладке (`references/tripo3d-stages.md` §2, вторая строка; пилот 2026-10-13). Экран входа или
+     нет ни того ни другого — гейт §5 п.2 (вход и пароль агент не вводит); тогда шаги 1b и 2 идут по чек-листу
+     пользователю (`references/tripo3d-stages.md` §8).
 5. Кредиты Tripo (`references/tripo3d-stages.md` §1): один раз на журнал — строка условий
    `python tools/art/visual/ledger.py terms --service Tripo --model "Tripo Studio H3.1" --url https://www.tripo3d.ai/terms`
    (без неё предпроверка Tripo даёт ERROR, ВР-05); затем

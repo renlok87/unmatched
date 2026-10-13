@@ -30,3 +30,19 @@ Black Panther, Black Widow, Blackbeard, Bloody Mary, Bruce Lee, Buffy); they are
 | F9 | 2 | Studio route works end to end through Windows-MCP clicks in the user's Chrome: 3 heroes × (60 + 30 + 5) = 95 each, no failed generation. Facts the skill does not state: (a) after a parts generation the task opens at `/workspace/segmentation/<uuid>`, texture at `/texture-edit/<uuid>`, PBR at `/texture-pbr/<uuid>`; (b) the texture form preloads the task's own views and keeps «Удалить освещение» and 8K from the last run; (c) texture and PBR run on the same tile, the newest tile stays the newest *task*; (d) after PBR the «Создать PBR 5» button becomes active again — a second click spends again; (e) the export file name is Studio's caption («ancient warrior 3d model.glb»), not the task; (f) a new hero's generation can start while the previous hero's texture runs (Studio queues it); (g) times: generate ≈ 2 min, texture 8K ≈ 3–4 min, PBR ≈ 1 min. | tripo3d-stages §5.1/§6: URL pattern, preloaded texture form, «do not press PBR twice», rename on move, pipelining heroes |
 | F10 | 2 | Tripo writes `accessor.min[1] = 2.2e-308` (DBL_MIN) for POSITION, so accessor min/max cannot give part boxes; part roles for the stage-3 profile were derived from the vertex buffer (`C:/tmp/concept-wave/post_h2.py`). Thin weapons come split: Achilles spear = 2 parts, Angel sword = 2 parts (blade+guard, grip). | tripo3d-stages §6 step 9: part roles from the vertex buffer; profile `parts` must accept a weapon made of several Tripo parts |
 | F11 | 2 | §6 step 5 asks for `studio_settings_before` before *each* operation; with the form already on H2 settings from the previous hero this is one record per hero. §6 step 11 «return settings» contradicts pipelining several heroes: the form is left on H2 settings until the last hero of the batch. | tripo3d-stages §6 steps 5, 11: per batch, not per operation |
+
+## Applied to the skill (stages 0–2, 2026-10-13)
+
+| Finding | Where |
+|---|---|
+| F1, F2 | `SKILL.md` §6 stage 0 п.1 (ANATOMY per figure; `.gitignore` gate with `git check-ignore`) |
+| F3, F4 | `references/tripo3d-stages.md` §5.2 п.5а (uuid via the newest tile), п.7 (report skeleton before `register-source`) |
+| F5 | `references/tripo3d-stages.md` §1 (ledger limit = `limits.tripo.credits`, cap lifted by the user) |
+| F6 | `references/acceptance-and-blender.md` §8.5 п.6 (null-strings, `item` pattern) |
+| F7, F8 | `references/concept-sheet.md` §13.2 (licensed route, Codex first at 1c, facing check, claim queue) |
+| F9 | `references/tripo3d-stages.md` §5.1 (Studio URLs, preloaded texture form, PBR button, rename, pipelining, timings); §2 + `SKILL.md` stage 0 п.4 (Windows-MCP route) |
+| F10 | `references/tripo3d-stages.md` §6 step 9 (part boxes from the vertex buffer, glTF axes) |
+| F11 | `references/tripo3d-stages.md` §6 steps 5, 11 (per hero / per batch) |
+
+Not yet in tools (prototypes in `C:/tmp/concept-wave/`): facing gate in `check_concept_views.py`
+(`side_mirror_check.py`), null-string cleaning (`finish_second.py`), stage-2 post steps (`post_h2.py`).

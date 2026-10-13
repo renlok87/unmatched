@@ -986,6 +986,18 @@ frames как {dir, files} с именами без пути). Верни тол
 
 Пункты 11, 12, 14, 16, 18 — в SKILL.md (этап 0, §7.2) и `new-character-registration.md` §1.
 
+### 13.2 Ростер из БД и пилот (2026-10-13)
+
+Волны 1a по таблице `Hero` (84 фигуры) и пилот 1c → этап 2 (Achilles, Angel, Ancient Leshen). Полный список
+находок — `docs/art-pipeline/evidence/skill-pilot-2026-10-13/NOTES.md`.
+
+| № | Замечание | Решение |
+|---|---|---|
+| 20 | Лицензионные персонажи (Marvel, The Witcher): Codex image_gen, SYNTX (Seedream, Nano Banana) и Gemini на 1a отказывают (`moderation_blocked`); обходные формулировки промпта — не путь | 1a — сервис по подписке пользователя, который такие фигуры рисует (unstability.ai, Recraft v4, промпт из карточки: `DESCRIPTION_EN`, `ANCHORS_EN`, палитра), фон приводится к ровному тёмно-серому (`C:/tmp/concept-wave/rebg.py`, сырой кадр — `design/<key>-front-raw.png`), `verification.json` с `design_source`. Recraft не берёт эталон качества картинкой → Q/P ниже 8,0 → `escalate_user` (§10); решение пользователя — `evidence/acceptance-concept/<run>/user-decision.json` и запись в `docs/game-design/decisions/` (прецедент `2026-10-13-licensed-concepts-user-accepted.md`). Фигуру, которую не рисует ни один сервис (Alice), — фронт от пользователя |
+| 21 | 1c для лицензионного персонажа: Codex рисует виды поверх орто черновика, хотя отдельные вызовы дают `moderation_blocked` (Ancient Leshen: лист 8,1/8,1, пара pass) | 1c сначала обычным заданием Codex; unstability — только если Codex отказал во всём виде после ретраев |
+| 22 | Зеркальный side (лицом не в ту сторону) автопроверки не ловят: в `check_concept_views.py` нет проверки ракурса | приёмщик сверяет side с `ortho_<SIDE_VIEW>` глазами (8.1, 11); запускающий до приёмки — IoU силуэта side с `ortho_<SIDE_VIEW>` и с его зеркалом (прототип `C:/tmp/concept-wave/side_mirror_check.py`; пилот: прямое 0,60–0,87, зеркало 0,41–0,45). Зеркало выше прямого на 0,03 — брак вида, на этап 2 не идёт (`tripo3d-stages.md` §5.5) |
+| 23 | Пакетный запуск: несколько полос `codex exec` по одному файлу-очереди; без захвата задания две полосы берут одно | claim-файл `logs/<id>.claim` (CreateNew) перед запуском задания (`C:/tmp/concept-wave/run-claim-loop.ps1`, волны 1a/1c 2026-10-13); полосы закрываются флагом-файлом остановки |
+
 ## 14. Источники
 
 Репозиторий: HANDBOOK §1, §2.6, §2.9, §2.10, §3.1, §3.2, §4.2; `docs/game-design/visual/07-prompt-templates.md` §0.2,
