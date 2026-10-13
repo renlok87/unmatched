@@ -1,0 +1,2836 @@
+{
+  "checks": {
+    "fbx_polygons_matched_to_authored": {
+      "expected": "< 0.1 mm (nearest polygon centre)",
+      "measured": 0.00012,
+      "passed": true
+    },
+    "no_see_through_holes_in_probe_poses": {
+      "expected": "no 8-connected blob of new back-face pixels (pose and not rest, same view) larger than 8 px (1.5 mm pitch, 17 views), .blend and FBX; the sum of new back-face pixels is reported (rim-edge grazing rays leave scattered single pixels)",
+      "measured": {
+        "largest_new_blob_px": {
+          "blend": 3,
+          "fbx": 3
+        },
+        "new_backface_px_sum_of_views": {
+          "blend": 22,
+          "fbx": 16
+        }
+      },
+      "passed": true
+    },
+    "open_loops_do_not_open_in_probe_poses": {
+      "expected": "every rim loop not closed by a cap opens (> 1.5 mm) on <= 0.05 of its perimeter",
+      "measured": "none",
+      "passed": true
+    }
+  },
+  "frames": {
+    "label": "blender Workbench, FBX read-back, BC 2K, backface culling; пурпур внутри силуэта = сквозная дыра",
+    "raw_dir": "<run>/work/seams_raw",
+    "shots": [
+      "fist_front-rest-view",
+      "fist_front-arm_r_raise-view",
+      "armhole_r-rest-view",
+      "armhole_r-arm_r_raise-view",
+      "armhole_l-rest-view",
+      "armhole_l-arm_l_raise-view",
+      "collar_back-rest-view",
+      "collar_back-head_turn-view",
+      "collar_front-rest-view",
+      "collar_front-head_turn-view",
+      "thigh_r-rest-view",
+      "thigh_r-thigh_r_flex-view",
+      "thigh_l-rest-view",
+      "thigh_l-thigh_l_flex-view",
+      "sole_r-rest-view",
+      "sole_r-thigh_r_flex-view",
+      "forearm_l-rest-view",
+      "forearm_l-forearm_l_bend-view",
+      "spine_side-rest-view",
+      "spine_side-spine_bend_fwd-view",
+      "k2-rest",
+      "k2-arm_r_raise",
+      "k2-arm_l_raise",
+      "k2-head_turn",
+      "k2-thigh_r_flex",
+      "k2-thigh_l_flex",
+      "k2-spine_bend_fwd"
+    ]
+  },
+  "junction_vertices": {
+    "tripo_part_12|tripo_part_13": 120,
+    "tripo_part_13|tripo_part_7": 0,
+    "tripo_part_2|tripo_part_10": 61,
+    "tripo_part_2|tripo_part_3": 90,
+    "tripo_part_2|tripo_part_9": 98,
+    "tripo_part_3|tripo_part_8": 61,
+    "tripo_part_3|tripo_part_9": 63,
+    "tripo_part_4|tripo_part_0": 117,
+    "tripo_part_4|tripo_part_9": 116,
+    "tripo_part_5|tripo_part_0": 263,
+    "tripo_part_5|tripo_part_11": 65,
+    "tripo_part_6|tripo_part_0": 231,
+    "tripo_part_6|tripo_part_12": 51,
+    "tripo_part_9|tripo_part_0": 312
+  },
+  "loops": {
+    "closed_by_cap": 10,
+    "count": 24,
+    "open": 14,
+    "rows": [
+      {
+        "centre_cm": [
+          0.42,
+          0.08,
+          36.72
+        ],
+        "closed_by_cap": null,
+        "covered_by": "tripo_part_9",
+        "median_to_cover_mm": 7.882,
+        "part": "tripo_part_0",
+        "perimeter_cm": 94.14,
+        "poses": {
+          "arm_l_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "arm_r_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "forearm_l_bend": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "head_turn": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "spine_bend_fwd": {
+            "max_mm": 0.01,
+            "open_share": 0.0
+          },
+          "thigh_l_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_r_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          }
+        },
+        "worst": {
+          "max_mm": 0.01,
+          "open_share": 0.0,
+          "pose": "spine_bend_fwd"
+        }
+      },
+      {
+        "centre_cm": [
+          5.2,
+          2.71,
+          42.62
+        ],
+        "closed_by_cap": "armhole_l",
+        "covered_by": "tripo_part_5",
+        "median_to_cover_mm": 0.092,
+        "part": "tripo_part_0",
+        "perimeter_cm": 19.26,
+        "poses": {
+          "arm_l_raise": {
+            "max_mm": 34.76,
+            "open_share": 0.6913
+          },
+          "arm_r_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "forearm_l_bend": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "head_turn": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "spine_bend_fwd": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_l_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_r_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          }
+        },
+        "worst": {
+          "max_mm": 34.76,
+          "open_share": 0.6913,
+          "pose": "arm_l_raise"
+        }
+      },
+      {
+        "centre_cm": [
+          -5.74,
+          0.63,
+          42.88
+        ],
+        "closed_by_cap": "armhole_r",
+        "covered_by": "tripo_part_6",
+        "median_to_cover_mm": 0.091,
+        "part": "tripo_part_0",
+        "perimeter_cm": 18.49,
+        "poses": {
+          "arm_l_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "arm_r_raise": {
+            "max_mm": 31.17,
+            "open_share": 0.5822
+          },
+          "forearm_l_bend": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "head_turn": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "spine_bend_fwd": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_l_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_r_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          }
+        },
+        "worst": {
+          "max_mm": 31.17,
+          "open_share": 0.5822,
+          "pose": "arm_r_raise"
+        }
+      },
+      {
+        "centre_cm": [
+          -7.86,
+          -3.32,
+          5.89
+        ],
+        "closed_by_cap": "sole_r_1",
+        "covered_by": "tripo_part_1",
+        "median_to_cover_mm": 1.041,
+        "part": "tripo_part_10",
+        "perimeter_cm": 17.8,
+        "poses": {
+          "arm_l_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "arm_r_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "forearm_l_bend": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "head_turn": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "spine_bend_fwd": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_l_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_r_flex": {
+            "max_mm": 94.49,
+            "open_share": 1.0
+          }
+        },
+        "worst": {
+          "max_mm": 94.49,
+          "open_share": 1.0,
+          "pose": "thigh_r_flex"
+        }
+      },
+      {
+        "centre_cm": [
+          -6.59,
+          0.52,
+          8.21
+        ],
+        "closed_by_cap": null,
+        "covered_by": "tripo_part_2",
+        "median_to_cover_mm": 0.12,
+        "part": "tripo_part_10",
+        "perimeter_cm": 14.03,
+        "poses": {
+          "arm_l_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "arm_r_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "forearm_l_bend": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "head_turn": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "spine_bend_fwd": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_l_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_r_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          }
+        },
+        "worst": {
+          "max_mm": 0.0,
+          "open_share": 0.0,
+          "pose": "head_turn"
+        }
+      },
+      {
+        "centre_cm": [
+          -6.44,
+          1.77,
+          5.88
+        ],
+        "closed_by_cap": "sole_r_2",
+        "covered_by": "tripo_part_1",
+        "median_to_cover_mm": 0.929,
+        "part": "tripo_part_10",
+        "perimeter_cm": 12.39,
+        "poses": {
+          "arm_l_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "arm_r_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "forearm_l_bend": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "head_turn": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "spine_bend_fwd": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_l_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_r_flex": {
+            "max_mm": 42.84,
+            "open_share": 1.0
+          }
+        },
+        "worst": {
+          "max_mm": 42.84,
+          "open_share": 1.0,
+          "pose": "thigh_r_flex"
+        }
+      },
+      {
+        "centre_cm": [
+          10.45,
+          2.75,
+          31.58
+        ],
+        "closed_by_cap": null,
+        "covered_by": "tripo_part_5",
+        "median_to_cover_mm": 0.096,
+        "part": "tripo_part_11",
+        "perimeter_cm": 9.47,
+        "poses": {
+          "arm_l_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "arm_r_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "forearm_l_bend": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "head_turn": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "spine_bend_fwd": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_l_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_r_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          }
+        },
+        "worst": {
+          "max_mm": 0.0,
+          "open_share": 0.0,
+          "pose": "head_turn"
+        }
+      },
+      {
+        "centre_cm": [
+          -11.79,
+          -5.9,
+          33.0
+        ],
+        "closed_by_cap": null,
+        "covered_by": "tripo_part_13",
+        "median_to_cover_mm": 0.075,
+        "part": "tripo_part_12",
+        "perimeter_cm": 8.96,
+        "poses": {
+          "arm_l_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "arm_r_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "forearm_l_bend": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "head_turn": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "spine_bend_fwd": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_l_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_r_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          }
+        },
+        "worst": {
+          "max_mm": 0.0,
+          "open_share": 0.0,
+          "pose": "head_turn"
+        }
+      },
+      {
+        "centre_cm": [
+          -11.42,
+          -3.53,
+          34.57
+        ],
+        "closed_by_cap": null,
+        "covered_by": "tripo_part_6",
+        "median_to_cover_mm": 0.092,
+        "part": "tripo_part_12",
+        "perimeter_cm": 8.51,
+        "poses": {
+          "arm_l_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "arm_r_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "forearm_l_bend": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "head_turn": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "spine_bend_fwd": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_l_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_r_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          }
+        },
+        "worst": {
+          "max_mm": 0.0,
+          "open_share": 0.0,
+          "pose": "head_turn"
+        }
+      },
+      {
+        "centre_cm": [
+          -12.43,
+          -6.59,
+          35.04
+        ],
+        "closed_by_cap": null,
+        "covered_by": "tripo_part_7",
+        "median_to_cover_mm": 0.013,
+        "part": "tripo_part_12",
+        "perimeter_cm": 5.92,
+        "poses": {
+          "arm_l_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "arm_r_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "forearm_l_bend": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "head_turn": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "spine_bend_fwd": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_l_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_r_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          }
+        },
+        "worst": {
+          "max_mm": 0.0,
+          "open_share": 0.0,
+          "pose": "head_turn"
+        }
+      },
+      {
+        "centre_cm": [
+          -11.78,
+          -5.91,
+          33.04
+        ],
+        "closed_by_cap": null,
+        "covered_by": "tripo_part_12",
+        "median_to_cover_mm": 0.058,
+        "part": "tripo_part_13",
+        "perimeter_cm": 8.77,
+        "poses": {
+          "arm_l_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "arm_r_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "forearm_l_bend": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "head_turn": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "spine_bend_fwd": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_l_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_r_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          }
+        },
+        "worst": {
+          "max_mm": 0.0,
+          "open_share": 0.0,
+          "pose": "head_turn"
+        }
+      },
+      {
+        "centre_cm": [
+          -2.24,
+          0.16,
+          30.86
+        ],
+        "closed_by_cap": "trouser_top_r",
+        "covered_by": "tripo_part_0",
+        "median_to_cover_mm": 3.932,
+        "part": "tripo_part_2",
+        "perimeter_cm": 32.49,
+        "poses": {
+          "arm_l_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "arm_r_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "forearm_l_bend": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "head_turn": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "spine_bend_fwd": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_l_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_r_flex": {
+            "max_mm": 11.24,
+            "open_share": 0.3586
+          }
+        },
+        "worst": {
+          "max_mm": 11.24,
+          "open_share": 0.3586,
+          "pose": "thigh_r_flex"
+        }
+      },
+      {
+        "centre_cm": [
+          -6.55,
+          0.6,
+          8.19
+        ],
+        "closed_by_cap": null,
+        "covered_by": "tripo_part_10",
+        "median_to_cover_mm": 0.114,
+        "part": "tripo_part_2",
+        "perimeter_cm": 13.84,
+        "poses": {
+          "arm_l_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "arm_r_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "forearm_l_bend": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "head_turn": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "spine_bend_fwd": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_l_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_r_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          }
+        },
+        "worst": {
+          "max_mm": 0.0,
+          "open_share": 0.0,
+          "pose": "head_turn"
+        }
+      },
+      {
+        "centre_cm": [
+          2.95,
+          -0.19,
+          29.35
+        ],
+        "closed_by_cap": "trouser_top_l",
+        "covered_by": "tripo_part_0",
+        "median_to_cover_mm": 0.224,
+        "part": "tripo_part_3",
+        "perimeter_cm": 40.69,
+        "poses": {
+          "arm_l_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "arm_r_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "forearm_l_bend": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "head_turn": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "spine_bend_fwd": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_l_flex": {
+            "max_mm": 27.87,
+            "open_share": 0.547
+          },
+          "thigh_r_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          }
+        },
+        "worst": {
+          "max_mm": 27.87,
+          "open_share": 0.547,
+          "pose": "thigh_l_flex"
+        }
+      },
+      {
+        "centre_cm": [
+          6.8,
+          0.34,
+          8.32
+        ],
+        "closed_by_cap": null,
+        "covered_by": "tripo_part_8",
+        "median_to_cover_mm": 0.084,
+        "part": "tripo_part_3",
+        "perimeter_cm": 13.77,
+        "poses": {
+          "arm_l_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "arm_r_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "forearm_l_bend": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "head_turn": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "spine_bend_fwd": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_l_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_r_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          }
+        },
+        "worst": {
+          "max_mm": 0.0,
+          "open_share": 0.0,
+          "pose": "head_turn"
+        }
+      },
+      {
+        "centre_cm": [
+          0.08,
+          0.55,
+          47.27
+        ],
+        "closed_by_cap": null,
+        "covered_by": "tripo_part_9",
+        "median_to_cover_mm": 0.26,
+        "part": "tripo_part_4",
+        "perimeter_cm": 29.09,
+        "poses": {
+          "arm_l_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "arm_r_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "forearm_l_bend": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "head_turn": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "spine_bend_fwd": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_l_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_r_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          }
+        },
+        "worst": {
+          "max_mm": 0.0,
+          "open_share": 0.0,
+          "pose": "head_turn"
+        }
+      },
+      {
+        "centre_cm": [
+          5.22,
+          2.76,
+          42.72
+        ],
+        "closed_by_cap": "shoulder_top_l",
+        "covered_by": "tripo_part_0",
+        "median_to_cover_mm": 0.089,
+        "part": "tripo_part_5",
+        "perimeter_cm": 19.25,
+        "poses": {
+          "arm_l_raise": {
+            "max_mm": 37.06,
+            "open_share": 0.6853
+          },
+          "arm_r_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "forearm_l_bend": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "head_turn": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "spine_bend_fwd": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_l_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_r_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          }
+        },
+        "worst": {
+          "max_mm": 37.06,
+          "open_share": 0.6853,
+          "pose": "arm_l_raise"
+        }
+      },
+      {
+        "centre_cm": [
+          10.52,
+          2.76,
+          31.59
+        ],
+        "closed_by_cap": null,
+        "covered_by": "tripo_part_11",
+        "median_to_cover_mm": 0.073,
+        "part": "tripo_part_5",
+        "perimeter_cm": 9.25,
+        "poses": {
+          "arm_l_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "arm_r_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "forearm_l_bend": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "head_turn": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "spine_bend_fwd": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_l_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_r_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          }
+        },
+        "worst": {
+          "max_mm": 0.0,
+          "open_share": 0.0,
+          "pose": "head_turn"
+        }
+      },
+      {
+        "centre_cm": [
+          -5.74,
+          0.74,
+          42.87
+        ],
+        "closed_by_cap": "shoulder_top_r",
+        "covered_by": "tripo_part_0",
+        "median_to_cover_mm": 0.088,
+        "part": "tripo_part_6",
+        "perimeter_cm": 18.61,
+        "poses": {
+          "arm_l_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "arm_r_raise": {
+            "max_mm": 32.17,
+            "open_share": 0.5925
+          },
+          "forearm_l_bend": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "head_turn": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "spine_bend_fwd": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_l_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_r_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          }
+        },
+        "worst": {
+          "max_mm": 32.17,
+          "open_share": 0.5925,
+          "pose": "arm_r_raise"
+        }
+      },
+      {
+        "centre_cm": [
+          -11.46,
+          -3.49,
+          34.53
+        ],
+        "closed_by_cap": null,
+        "covered_by": "tripo_part_12",
+        "median_to_cover_mm": 0.087,
+        "part": "tripo_part_6",
+        "perimeter_cm": 8.45,
+        "poses": {
+          "arm_l_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "arm_r_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "forearm_l_bend": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "head_turn": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "spine_bend_fwd": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_l_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_r_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          }
+        },
+        "worst": {
+          "max_mm": 0.0,
+          "open_share": 0.0,
+          "pose": "head_turn"
+        }
+      },
+      {
+        "centre_cm": [
+          7.87,
+          -2.96,
+          5.85
+        ],
+        "closed_by_cap": "sole_l_1",
+        "covered_by": "tripo_part_1",
+        "median_to_cover_mm": 0.975,
+        "part": "tripo_part_8",
+        "perimeter_cm": 16.77,
+        "poses": {
+          "arm_l_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "arm_r_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "forearm_l_bend": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "head_turn": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "spine_bend_fwd": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_l_flex": {
+            "max_mm": 95.46,
+            "open_share": 1.0
+          },
+          "thigh_r_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          }
+        },
+        "worst": {
+          "max_mm": 95.46,
+          "open_share": 1.0,
+          "pose": "thigh_l_flex"
+        }
+      },
+      {
+        "centre_cm": [
+          6.8,
+          0.39,
+          8.3
+        ],
+        "closed_by_cap": null,
+        "covered_by": "tripo_part_3",
+        "median_to_cover_mm": 0.108,
+        "part": "tripo_part_8",
+        "perimeter_cm": 13.86,
+        "poses": {
+          "arm_l_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "arm_r_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "forearm_l_bend": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "head_turn": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "spine_bend_fwd": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_l_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_r_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          }
+        },
+        "worst": {
+          "max_mm": 0.0,
+          "open_share": 0.0,
+          "pose": "head_turn"
+        }
+      },
+      {
+        "centre_cm": [
+          6.5,
+          1.65,
+          5.85
+        ],
+        "closed_by_cap": "sole_l_2",
+        "covered_by": "tripo_part_1",
+        "median_to_cover_mm": 0.942,
+        "part": "tripo_part_8",
+        "perimeter_cm": 10.84,
+        "poses": {
+          "arm_l_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "arm_r_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "forearm_l_bend": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "head_turn": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "spine_bend_fwd": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_l_flex": {
+            "max_mm": 42.7,
+            "open_share": 1.0
+          },
+          "thigh_r_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          }
+        },
+        "worst": {
+          "max_mm": 42.7,
+          "open_share": 1.0,
+          "pose": "thigh_l_flex"
+        }
+      },
+      {
+        "centre_cm": [
+          -0.26,
+          -1.54,
+          39.41
+        ],
+        "closed_by_cap": null,
+        "covered_by": "tripo_part_0",
+        "median_to_cover_mm": 0.277,
+        "part": "tripo_part_9",
+        "perimeter_cm": 74.46,
+        "poses": {
+          "arm_l_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "arm_r_raise": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "forearm_l_bend": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "head_turn": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "spine_bend_fwd": {
+            "max_mm": 0.06,
+            "open_share": 0.0
+          },
+          "thigh_l_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          },
+          "thigh_r_flex": {
+            "max_mm": 0.0,
+            "open_share": 0.0
+          }
+        },
+        "worst": {
+          "max_mm": 0.06,
+          "open_share": 0.0,
+          "pose": "spine_bend_fwd"
+        }
+      }
+    ],
+    "threshold_mm": 1.5
+  },
+  "note": "junction opening = distance to the posed neighbour surface minus the rest distance; loops: rim loops of real (non-cap) faces; see-through = first ray hit on a back face (UE one-sided); figure height 0.55 m",
+  "pairs": [
+    [
+      "tripo_part_6",
+      "tripo_part_12"
+    ],
+    [
+      "tripo_part_5",
+      "tripo_part_11"
+    ],
+    [
+      "tripo_part_2",
+      "tripo_part_10"
+    ],
+    [
+      "tripo_part_3",
+      "tripo_part_8"
+    ],
+    [
+      "tripo_part_6",
+      "tripo_part_0"
+    ],
+    [
+      "tripo_part_5",
+      "tripo_part_0"
+    ],
+    [
+      "tripo_part_4",
+      "tripo_part_0"
+    ],
+    [
+      "tripo_part_4",
+      "tripo_part_9"
+    ],
+    [
+      "tripo_part_9",
+      "tripo_part_0"
+    ],
+    [
+      "tripo_part_2",
+      "tripo_part_9"
+    ],
+    [
+      "tripo_part_3",
+      "tripo_part_9"
+    ],
+    [
+      "tripo_part_2",
+      "tripo_part_3"
+    ],
+    [
+      "tripo_part_12",
+      "tripo_part_13"
+    ],
+    [
+      "tripo_part_13",
+      "tripo_part_7"
+    ]
+  ],
+  "passed": true,
+  "poses": {
+    "arm_l_raise": {
+      "tripo_part_12|tripo_part_13": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 120
+      },
+      "tripo_part_2|tripo_part_10": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 61
+      },
+      "tripo_part_2|tripo_part_3": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 90
+      },
+      "tripo_part_2|tripo_part_9": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 98
+      },
+      "tripo_part_3|tripo_part_8": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 61
+      },
+      "tripo_part_3|tripo_part_9": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 63
+      },
+      "tripo_part_4|tripo_part_0": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 117
+      },
+      "tripo_part_4|tripo_part_9": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 116
+      },
+      "tripo_part_5|tripo_part_0": {
+        "max_mm": 36.597,
+        "p95_mm": 35.807,
+        "vertices": 263
+      },
+      "tripo_part_5|tripo_part_11": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 65
+      },
+      "tripo_part_6|tripo_part_0": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 231
+      },
+      "tripo_part_6|tripo_part_12": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 51
+      },
+      "tripo_part_9|tripo_part_0": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 312
+      }
+    },
+    "arm_r_raise": {
+      "tripo_part_12|tripo_part_13": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 120
+      },
+      "tripo_part_2|tripo_part_10": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 61
+      },
+      "tripo_part_2|tripo_part_3": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 90
+      },
+      "tripo_part_2|tripo_part_9": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 98
+      },
+      "tripo_part_3|tripo_part_8": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 61
+      },
+      "tripo_part_3|tripo_part_9": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 63
+      },
+      "tripo_part_4|tripo_part_0": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 117
+      },
+      "tripo_part_4|tripo_part_9": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 116
+      },
+      "tripo_part_5|tripo_part_0": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 263
+      },
+      "tripo_part_5|tripo_part_11": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 65
+      },
+      "tripo_part_6|tripo_part_0": {
+        "max_mm": 31.428,
+        "p95_mm": 30.109,
+        "vertices": 231
+      },
+      "tripo_part_6|tripo_part_12": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 51
+      },
+      "tripo_part_9|tripo_part_0": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 312
+      }
+    },
+    "forearm_l_bend": {
+      "tripo_part_12|tripo_part_13": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 120
+      },
+      "tripo_part_2|tripo_part_10": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 61
+      },
+      "tripo_part_2|tripo_part_3": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 90
+      },
+      "tripo_part_2|tripo_part_9": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 98
+      },
+      "tripo_part_3|tripo_part_8": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 61
+      },
+      "tripo_part_3|tripo_part_9": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 63
+      },
+      "tripo_part_4|tripo_part_0": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 117
+      },
+      "tripo_part_4|tripo_part_9": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 116
+      },
+      "tripo_part_5|tripo_part_0": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 263
+      },
+      "tripo_part_5|tripo_part_11": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 65
+      },
+      "tripo_part_6|tripo_part_0": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 231
+      },
+      "tripo_part_6|tripo_part_12": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 51
+      },
+      "tripo_part_9|tripo_part_0": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 312
+      }
+    },
+    "head_turn": {
+      "tripo_part_12|tripo_part_13": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 120
+      },
+      "tripo_part_2|tripo_part_10": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 61
+      },
+      "tripo_part_2|tripo_part_3": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 90
+      },
+      "tripo_part_2|tripo_part_9": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 98
+      },
+      "tripo_part_3|tripo_part_8": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 61
+      },
+      "tripo_part_3|tripo_part_9": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 63
+      },
+      "tripo_part_4|tripo_part_0": {
+        "max_mm": 0.111,
+        "p95_mm": 0.034,
+        "vertices": 117
+      },
+      "tripo_part_4|tripo_part_9": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 116
+      },
+      "tripo_part_5|tripo_part_0": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 263
+      },
+      "tripo_part_5|tripo_part_11": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 65
+      },
+      "tripo_part_6|tripo_part_0": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 231
+      },
+      "tripo_part_6|tripo_part_12": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 51
+      },
+      "tripo_part_9|tripo_part_0": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 312
+      }
+    },
+    "spine_bend_fwd": {
+      "tripo_part_12|tripo_part_13": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 120
+      },
+      "tripo_part_2|tripo_part_10": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 61
+      },
+      "tripo_part_2|tripo_part_3": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 90
+      },
+      "tripo_part_2|tripo_part_9": {
+        "max_mm": 0.023,
+        "p95_mm": 0.0,
+        "vertices": 98
+      },
+      "tripo_part_3|tripo_part_8": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 61
+      },
+      "tripo_part_3|tripo_part_9": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 63
+      },
+      "tripo_part_4|tripo_part_0": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 117
+      },
+      "tripo_part_4|tripo_part_9": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 116
+      },
+      "tripo_part_5|tripo_part_0": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 263
+      },
+      "tripo_part_5|tripo_part_11": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 65
+      },
+      "tripo_part_6|tripo_part_0": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 231
+      },
+      "tripo_part_6|tripo_part_12": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 51
+      },
+      "tripo_part_9|tripo_part_0": {
+        "max_mm": 0.064,
+        "p95_mm": 0.001,
+        "vertices": 312
+      }
+    },
+    "thigh_l_flex": {
+      "tripo_part_12|tripo_part_13": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 120
+      },
+      "tripo_part_2|tripo_part_10": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 61
+      },
+      "tripo_part_2|tripo_part_3": {
+        "max_mm": 5.96,
+        "p95_mm": 5.077,
+        "vertices": 90
+      },
+      "tripo_part_2|tripo_part_9": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 98
+      },
+      "tripo_part_3|tripo_part_8": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 61
+      },
+      "tripo_part_3|tripo_part_9": {
+        "max_mm": 1.368,
+        "p95_mm": 1.242,
+        "vertices": 63
+      },
+      "tripo_part_4|tripo_part_0": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 117
+      },
+      "tripo_part_4|tripo_part_9": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 116
+      },
+      "tripo_part_5|tripo_part_0": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 263
+      },
+      "tripo_part_5|tripo_part_11": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 65
+      },
+      "tripo_part_6|tripo_part_0": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 231
+      },
+      "tripo_part_6|tripo_part_12": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 51
+      },
+      "tripo_part_9|tripo_part_0": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 312
+      }
+    },
+    "thigh_r_flex": {
+      "tripo_part_12|tripo_part_13": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 120
+      },
+      "tripo_part_2|tripo_part_10": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 61
+      },
+      "tripo_part_2|tripo_part_3": {
+        "max_mm": 5.055,
+        "p95_mm": 4.56,
+        "vertices": 90
+      },
+      "tripo_part_2|tripo_part_9": {
+        "max_mm": 0.828,
+        "p95_mm": 0.469,
+        "vertices": 98
+      },
+      "tripo_part_3|tripo_part_8": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 61
+      },
+      "tripo_part_3|tripo_part_9": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 63
+      },
+      "tripo_part_4|tripo_part_0": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 117
+      },
+      "tripo_part_4|tripo_part_9": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 116
+      },
+      "tripo_part_5|tripo_part_0": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 263
+      },
+      "tripo_part_5|tripo_part_11": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 65
+      },
+      "tripo_part_6|tripo_part_0": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 231
+      },
+      "tripo_part_6|tripo_part_12": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 51
+      },
+      "tripo_part_9|tripo_part_0": {
+        "max_mm": 0.0,
+        "p95_mm": 0.0,
+        "vertices": 312
+      }
+    }
+  },
+  "radius_m": 0.001,
+  "see_through": {
+    "blend": {
+      "pitch_m": 0.0015,
+      "poses": {
+        "arm_l_raise": {
+          "backface_px": 77,
+          "largest_new_blob_px": 2,
+          "largest_new_blob_view": "back_l",
+          "new_vs_rest_by_part": {
+            "tripo_part_0": 4,
+            "tripo_part_1": 5,
+            "tripo_part_5": -2
+          },
+          "new_vs_rest_by_view": {
+            "back": 0,
+            "back_hi": 0,
+            "back_l": 3,
+            "back_lo": -1,
+            "back_r": 1,
+            "front": -1,
+            "front_hi": 2,
+            "front_l": 0,
+            "front_lo": 0,
+            "front_r": 1,
+            "k2": 0,
+            "left": 1,
+            "left_hi": 1,
+            "left_lo": 0,
+            "right": 0,
+            "right_hi": 0,
+            "right_lo": 0
+          },
+          "new_vs_rest_px": 7,
+          "per_part": {
+            "tripo_part_0": 22,
+            "tripo_part_1": 16,
+            "tripo_part_10": 2,
+            "tripo_part_12": 2,
+            "tripo_part_13": 1,
+            "tripo_part_2": 7,
+            "tripo_part_3": 5,
+            "tripo_part_4": 2,
+            "tripo_part_5": 1,
+            "tripo_part_7": 1,
+            "tripo_part_8": 14,
+            "tripo_part_9": 4
+          },
+          "per_view": {
+            "back": 2,
+            "back_hi": 1,
+            "back_l": 7,
+            "back_lo": 3,
+            "back_r": 5,
+            "front": 9,
+            "front_hi": 5,
+            "front_l": 10,
+            "front_lo": 4,
+            "front_r": 9,
+            "k2": 5,
+            "left": 5,
+            "left_hi": 1,
+            "left_lo": 3,
+            "right": 5,
+            "right_hi": 1,
+            "right_lo": 2
+          }
+        },
+        "arm_r_raise": {
+          "backface_px": 73,
+          "largest_new_blob_px": 1,
+          "largest_new_blob_view": "front_l",
+          "new_vs_rest_by_part": {
+            "tripo_part_1": 1,
+            "tripo_part_12": 2,
+            "tripo_part_6": 1,
+            "tripo_part_7": -1
+          },
+          "new_vs_rest_by_view": {
+            "back": 1,
+            "back_hi": 0,
+            "back_l": 0,
+            "back_lo": 0,
+            "back_r": 1,
+            "front": -2,
+            "front_hi": 0,
+            "front_l": 2,
+            "front_lo": 0,
+            "front_r": 0,
+            "k2": 1,
+            "left": 0,
+            "left_hi": 1,
+            "left_lo": 0,
+            "right": -1,
+            "right_hi": 1,
+            "right_lo": -1
+          },
+          "new_vs_rest_px": 3,
+          "per_part": {
+            "tripo_part_0": 18,
+            "tripo_part_1": 12,
+            "tripo_part_10": 2,
+            "tripo_part_12": 4,
+            "tripo_part_13": 1,
+            "tripo_part_2": 7,
+            "tripo_part_3": 5,
+            "tripo_part_4": 2,
+            "tripo_part_5": 3,
+            "tripo_part_6": 1,
+            "tripo_part_8": 14,
+            "tripo_part_9": 4
+          },
+          "per_view": {
+            "back": 3,
+            "back_hi": 1,
+            "back_l": 4,
+            "back_lo": 4,
+            "back_r": 5,
+            "front": 8,
+            "front_hi": 3,
+            "front_l": 12,
+            "front_lo": 4,
+            "front_r": 8,
+            "k2": 6,
+            "left": 4,
+            "left_hi": 1,
+            "left_lo": 3,
+            "right": 4,
+            "right_hi": 2,
+            "right_lo": 1
+          }
+        },
+        "forearm_l_bend": {
+          "backface_px": 68,
+          "largest_new_blob_px": 1,
+          "largest_new_blob_view": "front_l",
+          "new_vs_rest_by_part": {
+            "tripo_part_0": -1,
+            "tripo_part_1": 1,
+            "tripo_part_3": 1,
+            "tripo_part_5": -3
+          },
+          "new_vs_rest_by_view": {
+            "back": 0,
+            "back_hi": 0,
+            "back_l": -1,
+            "back_lo": -1,
+            "back_r": 1,
+            "front": -1,
+            "front_hi": 2,
+            "front_l": -1,
+            "front_lo": 0,
+            "front_r": 0,
+            "k2": 0,
+            "left": 0,
+            "left_hi": 0,
+            "left_lo": -1,
+            "right": 0,
+            "right_hi": 0,
+            "right_lo": 0
+          },
+          "new_vs_rest_px": -2,
+          "per_part": {
+            "tripo_part_0": 17,
+            "tripo_part_1": 12,
+            "tripo_part_10": 2,
+            "tripo_part_12": 2,
+            "tripo_part_13": 1,
+            "tripo_part_2": 7,
+            "tripo_part_3": 6,
+            "tripo_part_4": 2,
+            "tripo_part_7": 1,
+            "tripo_part_8": 14,
+            "tripo_part_9": 4
+          },
+          "per_view": {
+            "back": 2,
+            "back_hi": 1,
+            "back_l": 3,
+            "back_lo": 3,
+            "back_r": 5,
+            "front": 9,
+            "front_hi": 5,
+            "front_l": 9,
+            "front_lo": 4,
+            "front_r": 8,
+            "k2": 5,
+            "left": 4,
+            "left_hi": 0,
+            "left_lo": 2,
+            "right": 5,
+            "right_hi": 1,
+            "right_lo": 2
+          }
+        },
+        "head_turn": {
+          "backface_px": 88,
+          "largest_new_blob_px": 3,
+          "largest_new_blob_view": "back_lo",
+          "new_vs_rest_by_part": {
+            "tripo_part_4": 18
+          },
+          "new_vs_rest_by_view": {
+            "back": 4,
+            "back_hi": 2,
+            "back_l": 3,
+            "back_lo": 5,
+            "back_r": 2,
+            "front": 0,
+            "front_hi": -1,
+            "front_l": 0,
+            "front_lo": 0,
+            "front_r": 1,
+            "k2": 0,
+            "left": 0,
+            "left_hi": 0,
+            "left_lo": 0,
+            "right": 1,
+            "right_hi": 0,
+            "right_lo": 1
+          },
+          "new_vs_rest_px": 18,
+          "per_part": {
+            "tripo_part_0": 18,
+            "tripo_part_1": 11,
+            "tripo_part_10": 2,
+            "tripo_part_12": 2,
+            "tripo_part_13": 1,
+            "tripo_part_2": 7,
+            "tripo_part_3": 5,
+            "tripo_part_4": 20,
+            "tripo_part_5": 3,
+            "tripo_part_7": 1,
+            "tripo_part_8": 14,
+            "tripo_part_9": 4
+          },
+          "per_view": {
+            "back": 6,
+            "back_hi": 3,
+            "back_l": 7,
+            "back_lo": 9,
+            "back_r": 6,
+            "front": 10,
+            "front_hi": 2,
+            "front_l": 10,
+            "front_lo": 4,
+            "front_r": 9,
+            "k2": 5,
+            "left": 4,
+            "left_hi": 0,
+            "left_lo": 3,
+            "right": 6,
+            "right_hi": 1,
+            "right_lo": 3
+          }
+        },
+        "rest": {
+          "backface_px": 70,
+          "per_part": {
+            "tripo_part_0": 18,
+            "tripo_part_1": 11,
+            "tripo_part_10": 2,
+            "tripo_part_12": 2,
+            "tripo_part_13": 1,
+            "tripo_part_2": 7,
+            "tripo_part_3": 5,
+            "tripo_part_4": 2,
+            "tripo_part_5": 3,
+            "tripo_part_7": 1,
+            "tripo_part_8": 14,
+            "tripo_part_9": 4
+          },
+          "per_view": {
+            "back": 2,
+            "back_hi": 1,
+            "back_l": 4,
+            "back_lo": 4,
+            "back_r": 4,
+            "front": 10,
+            "front_hi": 3,
+            "front_l": 10,
+            "front_lo": 4,
+            "front_r": 8,
+            "k2": 5,
+            "left": 4,
+            "left_hi": 0,
+            "left_lo": 3,
+            "right": 5,
+            "right_hi": 1,
+            "right_lo": 2
+          }
+        },
+        "spine_bend_fwd": {
+          "backface_px": 61,
+          "largest_new_blob_px": 1,
+          "largest_new_blob_view": "front",
+          "new_vs_rest_by_part": {
+            "tripo_part_0": -5,
+            "tripo_part_1": 3,
+            "tripo_part_12": -1,
+            "tripo_part_13": -1,
+            "tripo_part_4": -1,
+            "tripo_part_5": -1,
+            "tripo_part_6": 1,
+            "tripo_part_7": -1,
+            "tripo_part_9": -3
+          },
+          "new_vs_rest_by_view": {
+            "back": 1,
+            "back_hi": -1,
+            "back_l": 1,
+            "back_lo": 0,
+            "back_r": 2,
+            "front": -3,
+            "front_hi": 1,
+            "front_l": -2,
+            "front_lo": -1,
+            "front_r": 1,
+            "k2": -3,
+            "left": 0,
+            "left_hi": 0,
+            "left_lo": -1,
+            "right": -1,
+            "right_hi": -1,
+            "right_lo": -2
+          },
+          "new_vs_rest_px": -9,
+          "per_part": {
+            "tripo_part_0": 13,
+            "tripo_part_1": 14,
+            "tripo_part_10": 2,
+            "tripo_part_12": 1,
+            "tripo_part_2": 7,
+            "tripo_part_3": 5,
+            "tripo_part_4": 1,
+            "tripo_part_5": 2,
+            "tripo_part_6": 1,
+            "tripo_part_8": 14,
+            "tripo_part_9": 1
+          },
+          "per_view": {
+            "back": 3,
+            "back_hi": 0,
+            "back_l": 5,
+            "back_lo": 4,
+            "back_r": 6,
+            "front": 7,
+            "front_hi": 4,
+            "front_l": 8,
+            "front_lo": 3,
+            "front_r": 9,
+            "k2": 2,
+            "left": 4,
+            "left_hi": 0,
+            "left_lo": 2,
+            "right": 4,
+            "right_hi": 0,
+            "right_lo": 0
+          }
+        },
+        "thigh_l_flex": {
+          "backface_px": 92,
+          "largest_new_blob_px": 2,
+          "largest_new_blob_view": "front_l",
+          "new_vs_rest_by_part": {
+            "tripo_part_0": -3,
+            "tripo_part_1": 1,
+            "tripo_part_10": 1,
+            "tripo_part_3": 21,
+            "tripo_part_8": 2
+          },
+          "new_vs_rest_by_view": {
+            "back": -1,
+            "back_hi": 0,
+            "back_l": -2,
+            "back_lo": -3,
+            "back_r": -2,
+            "front": 1,
+            "front_hi": 2,
+            "front_l": 5,
+            "front_lo": 6,
+            "front_r": 3,
+            "k2": 1,
+            "left": 5,
+            "left_hi": 5,
+            "left_lo": 1,
+            "right": 0,
+            "right_hi": 0,
+            "right_lo": 1
+          },
+          "new_vs_rest_px": 22,
+          "per_part": {
+            "tripo_part_0": 15,
+            "tripo_part_1": 12,
+            "tripo_part_10": 3,
+            "tripo_part_12": 2,
+            "tripo_part_13": 1,
+            "tripo_part_2": 7,
+            "tripo_part_3": 26,
+            "tripo_part_4": 2,
+            "tripo_part_5": 3,
+            "tripo_part_7": 1,
+            "tripo_part_8": 16,
+            "tripo_part_9": 4
+          },
+          "per_view": {
+            "back": 1,
+            "back_hi": 1,
+            "back_l": 2,
+            "back_lo": 1,
+            "back_r": 2,
+            "front": 11,
+            "front_hi": 5,
+            "front_l": 15,
+            "front_lo": 10,
+            "front_r": 11,
+            "k2": 6,
+            "left": 9,
+            "left_hi": 5,
+            "left_lo": 4,
+            "right": 5,
+            "right_hi": 1,
+            "right_lo": 3
+          }
+        },
+        "thigh_r_flex": {
+          "backface_px": 82,
+          "largest_new_blob_px": 3,
+          "largest_new_blob_view": "front_lo",
+          "new_vs_rest_by_part": {
+            "tripo_part_0": 11,
+            "tripo_part_1": 1,
+            "tripo_part_10": 1,
+            "tripo_part_2": -3,
+            "tripo_part_8": 2
+          },
+          "new_vs_rest_by_view": {
+            "back": 0,
+            "back_hi": 3,
+            "back_l": 1,
+            "back_lo": 0,
+            "back_r": -1,
+            "front": -3,
+            "front_hi": 0,
+            "front_l": -1,
+            "front_lo": 7,
+            "front_r": 1,
+            "k2": 0,
+            "left": 1,
+            "left_hi": 1,
+            "left_lo": 1,
+            "right": -1,
+            "right_hi": 3,
+            "right_lo": 0
+          },
+          "new_vs_rest_px": 12,
+          "per_part": {
+            "tripo_part_0": 29,
+            "tripo_part_1": 12,
+            "tripo_part_10": 3,
+            "tripo_part_12": 2,
+            "tripo_part_13": 1,
+            "tripo_part_2": 4,
+            "tripo_part_3": 5,
+            "tripo_part_4": 2,
+            "tripo_part_5": 3,
+            "tripo_part_7": 1,
+            "tripo_part_8": 16,
+            "tripo_part_9": 4
+          },
+          "per_view": {
+            "back": 2,
+            "back_hi": 4,
+            "back_l": 5,
+            "back_lo": 4,
+            "back_r": 3,
+            "front": 7,
+            "front_hi": 3,
+            "front_l": 9,
+            "front_lo": 11,
+            "front_r": 9,
+            "k2": 5,
+            "left": 5,
+            "left_hi": 1,
+            "left_lo": 4,
+            "right": 4,
+            "right_hi": 4,
+            "right_lo": 2
+          }
+        }
+      },
+      "views": [
+        "front",
+        "front_l",
+        "left",
+        "back_l",
+        "back",
+        "back_r",
+        "right",
+        "front_r",
+        "front_hi",
+        "left_hi",
+        "back_hi",
+        "right_hi",
+        "k2",
+        "front_lo",
+        "left_lo",
+        "back_lo",
+        "right_lo"
+      ]
+    },
+    "fbx": {
+      "pitch_m": 0.0015,
+      "poses": {
+        "arm_l_raise": {
+          "backface_px": 78,
+          "largest_new_blob_px": 1,
+          "largest_new_blob_view": "front_l",
+          "new_vs_rest_by_part": {
+            "tripo_part_0": 1,
+            "tripo_part_1": 4,
+            "tripo_part_10": -1,
+            "tripo_part_5": -1
+          },
+          "new_vs_rest_by_view": {
+            "back": 0,
+            "back_hi": 0,
+            "back_l": 0,
+            "back_lo": -1,
+            "back_r": 2,
+            "front": -2,
+            "front_hi": 2,
+            "front_l": 1,
+            "front_lo": 0,
+            "front_r": 0,
+            "k2": -2,
+            "left": 2,
+            "left_hi": 1,
+            "left_lo": 0,
+            "right": 0,
+            "right_hi": 0,
+            "right_lo": 0
+          },
+          "new_vs_rest_px": 3,
+          "per_part": {
+            "tripo_part_0": 21,
+            "tripo_part_1": 16,
+            "tripo_part_10": 1,
+            "tripo_part_12": 2,
+            "tripo_part_13": 1,
+            "tripo_part_2": 7,
+            "tripo_part_3": 7,
+            "tripo_part_4": 2,
+            "tripo_part_5": 2,
+            "tripo_part_7": 1,
+            "tripo_part_8": 14,
+            "tripo_part_9": 4
+          },
+          "per_view": {
+            "back": 2,
+            "back_hi": 1,
+            "back_l": 3,
+            "back_lo": 3,
+            "back_r": 6,
+            "front": 10,
+            "front_hi": 7,
+            "front_l": 12,
+            "front_lo": 4,
+            "front_r": 7,
+            "k2": 4,
+            "left": 6,
+            "left_hi": 1,
+            "left_lo": 3,
+            "right": 6,
+            "right_hi": 1,
+            "right_lo": 2
+          }
+        },
+        "arm_r_raise": {
+          "backface_px": 72,
+          "largest_new_blob_px": 1,
+          "largest_new_blob_view": "front_l",
+          "new_vs_rest_by_part": {
+            "tripo_part_0": -2,
+            "tripo_part_1": -2,
+            "tripo_part_10": -1,
+            "tripo_part_12": 2,
+            "tripo_part_6": 1,
+            "tripo_part_7": -1
+          },
+          "new_vs_rest_by_view": {
+            "back": 0,
+            "back_hi": 0,
+            "back_l": 1,
+            "back_lo": 0,
+            "back_r": 1,
+            "front": -3,
+            "front_hi": 0,
+            "front_l": 1,
+            "front_lo": 0,
+            "front_r": -1,
+            "k2": -1,
+            "left": 0,
+            "left_hi": 1,
+            "left_lo": 0,
+            "right": -2,
+            "right_hi": 1,
+            "right_lo": -1
+          },
+          "new_vs_rest_px": -3,
+          "per_part": {
+            "tripo_part_0": 18,
+            "tripo_part_1": 10,
+            "tripo_part_10": 1,
+            "tripo_part_12": 4,
+            "tripo_part_13": 1,
+            "tripo_part_2": 7,
+            "tripo_part_3": 7,
+            "tripo_part_4": 2,
+            "tripo_part_5": 3,
+            "tripo_part_6": 1,
+            "tripo_part_8": 14,
+            "tripo_part_9": 4
+          },
+          "per_view": {
+            "back": 2,
+            "back_hi": 1,
+            "back_l": 4,
+            "back_lo": 4,
+            "back_r": 5,
+            "front": 9,
+            "front_hi": 5,
+            "front_l": 12,
+            "front_lo": 4,
+            "front_r": 6,
+            "k2": 5,
+            "left": 4,
+            "left_hi": 1,
+            "left_lo": 3,
+            "right": 4,
+            "right_hi": 2,
+            "right_lo": 1
+          }
+        },
+        "forearm_l_bend": {
+          "backface_px": 71,
+          "largest_new_blob_px": 1,
+          "largest_new_blob_view": "front_l",
+          "new_vs_rest_by_part": {
+            "tripo_part_1": -1,
+            "tripo_part_5": -3
+          },
+          "new_vs_rest_by_view": {
+            "back": 0,
+            "back_hi": 0,
+            "back_l": 0,
+            "back_lo": -1,
+            "back_r": 1,
+            "front": -1,
+            "front_hi": 1,
+            "front_l": -2,
+            "front_lo": 0,
+            "front_r": 0,
+            "k2": 0,
+            "left": 0,
+            "left_hi": 0,
+            "left_lo": -1,
+            "right": -1,
+            "right_hi": 0,
+            "right_lo": 0
+          },
+          "new_vs_rest_px": -4,
+          "per_part": {
+            "tripo_part_0": 20,
+            "tripo_part_1": 11,
+            "tripo_part_10": 2,
+            "tripo_part_12": 2,
+            "tripo_part_13": 1,
+            "tripo_part_2": 7,
+            "tripo_part_3": 7,
+            "tripo_part_4": 2,
+            "tripo_part_7": 1,
+            "tripo_part_8": 14,
+            "tripo_part_9": 4
+          },
+          "per_view": {
+            "back": 2,
+            "back_hi": 1,
+            "back_l": 3,
+            "back_lo": 3,
+            "back_r": 5,
+            "front": 11,
+            "front_hi": 6,
+            "front_l": 9,
+            "front_lo": 4,
+            "front_r": 7,
+            "k2": 6,
+            "left": 4,
+            "left_hi": 0,
+            "left_lo": 2,
+            "right": 5,
+            "right_hi": 1,
+            "right_lo": 2
+          }
+        },
+        "head_turn": {
+          "backface_px": 91,
+          "largest_new_blob_px": 3,
+          "largest_new_blob_view": "back_lo",
+          "new_vs_rest_by_part": {
+            "tripo_part_0": -2,
+            "tripo_part_4": 18
+          },
+          "new_vs_rest_by_view": {
+            "back": 4,
+            "back_hi": 2,
+            "back_l": 3,
+            "back_lo": 5,
+            "back_r": 2,
+            "front": -1,
+            "front_hi": -1,
+            "front_l": 0,
+            "front_lo": 0,
+            "front_r": 1,
+            "k2": -1,
+            "left": 0,
+            "left_hi": 0,
+            "left_lo": 0,
+            "right": 1,
+            "right_hi": 0,
+            "right_lo": 1
+          },
+          "new_vs_rest_px": 16,
+          "per_part": {
+            "tripo_part_0": 18,
+            "tripo_part_1": 12,
+            "tripo_part_10": 2,
+            "tripo_part_12": 2,
+            "tripo_part_13": 1,
+            "tripo_part_2": 7,
+            "tripo_part_3": 7,
+            "tripo_part_4": 20,
+            "tripo_part_5": 3,
+            "tripo_part_7": 1,
+            "tripo_part_8": 14,
+            "tripo_part_9": 4
+          },
+          "per_view": {
+            "back": 6,
+            "back_hi": 3,
+            "back_l": 6,
+            "back_lo": 9,
+            "back_r": 6,
+            "front": 11,
+            "front_hi": 4,
+            "front_l": 11,
+            "front_lo": 4,
+            "front_r": 8,
+            "k2": 5,
+            "left": 4,
+            "left_hi": 0,
+            "left_lo": 3,
+            "right": 7,
+            "right_hi": 1,
+            "right_lo": 3
+          }
+        },
+        "rest": {
+          "backface_px": 75,
+          "per_part": {
+            "tripo_part_0": 20,
+            "tripo_part_1": 12,
+            "tripo_part_10": 2,
+            "tripo_part_12": 2,
+            "tripo_part_13": 1,
+            "tripo_part_2": 7,
+            "tripo_part_3": 7,
+            "tripo_part_4": 2,
+            "tripo_part_5": 3,
+            "tripo_part_7": 1,
+            "tripo_part_8": 14,
+            "tripo_part_9": 4
+          },
+          "per_view": {
+            "back": 2,
+            "back_hi": 1,
+            "back_l": 3,
+            "back_lo": 4,
+            "back_r": 4,
+            "front": 12,
+            "front_hi": 5,
+            "front_l": 11,
+            "front_lo": 4,
+            "front_r": 7,
+            "k2": 6,
+            "left": 4,
+            "left_hi": 0,
+            "left_lo": 3,
+            "right": 6,
+            "right_hi": 1,
+            "right_lo": 2
+          }
+        },
+        "spine_bend_fwd": {
+          "backface_px": 61,
+          "largest_new_blob_px": 1,
+          "largest_new_blob_view": "front",
+          "new_vs_rest_by_part": {
+            "tripo_part_0": -6,
+            "tripo_part_10": -1,
+            "tripo_part_12": -1,
+            "tripo_part_13": -1,
+            "tripo_part_4": -1,
+            "tripo_part_5": -1,
+            "tripo_part_6": 1,
+            "tripo_part_7": -1,
+            "tripo_part_9": -3
+          },
+          "new_vs_rest_by_view": {
+            "back": 0,
+            "back_hi": -1,
+            "back_l": 2,
+            "back_lo": 0,
+            "back_r": 2,
+            "front": -4,
+            "front_hi": 1,
+            "front_l": -3,
+            "front_lo": -1,
+            "front_r": 1,
+            "k2": -5,
+            "left": 0,
+            "left_hi": 0,
+            "left_lo": -1,
+            "right": -2,
+            "right_hi": -1,
+            "right_lo": -2
+          },
+          "new_vs_rest_px": -14,
+          "per_part": {
+            "tripo_part_0": 14,
+            "tripo_part_1": 12,
+            "tripo_part_10": 1,
+            "tripo_part_12": 1,
+            "tripo_part_2": 7,
+            "tripo_part_3": 7,
+            "tripo_part_4": 1,
+            "tripo_part_5": 2,
+            "tripo_part_6": 1,
+            "tripo_part_8": 14,
+            "tripo_part_9": 1
+          },
+          "per_view": {
+            "back": 2,
+            "back_hi": 0,
+            "back_l": 5,
+            "back_lo": 4,
+            "back_r": 6,
+            "front": 8,
+            "front_hi": 6,
+            "front_l": 8,
+            "front_lo": 3,
+            "front_r": 8,
+            "k2": 1,
+            "left": 4,
+            "left_hi": 0,
+            "left_lo": 2,
+            "right": 4,
+            "right_hi": 0,
+            "right_lo": 0
+          }
+        },
+        "thigh_l_flex": {
+          "backface_px": 90,
+          "largest_new_blob_px": 2,
+          "largest_new_blob_view": "front_l",
+          "new_vs_rest_by_part": {
+            "tripo_part_0": -2,
+            "tripo_part_1": -4,
+            "tripo_part_10": 1,
+            "tripo_part_3": 18,
+            "tripo_part_8": 2
+          },
+          "new_vs_rest_by_view": {
+            "back": -2,
+            "back_hi": 0,
+            "back_l": -2,
+            "back_lo": -3,
+            "back_r": -2,
+            "front": 1,
+            "front_hi": 1,
+            "front_l": 4,
+            "front_lo": 6,
+            "front_r": 3,
+            "k2": 2,
+            "left": 4,
+            "left_hi": 2,
+            "left_lo": 1,
+            "right": -1,
+            "right_hi": 0,
+            "right_lo": 1
+          },
+          "new_vs_rest_px": 15,
+          "per_part": {
+            "tripo_part_0": 18,
+            "tripo_part_1": 8,
+            "tripo_part_10": 3,
+            "tripo_part_12": 2,
+            "tripo_part_13": 1,
+            "tripo_part_2": 7,
+            "tripo_part_3": 25,
+            "tripo_part_4": 2,
+            "tripo_part_5": 3,
+            "tripo_part_7": 1,
+            "tripo_part_8": 16,
+            "tripo_part_9": 4
+          },
+          "per_view": {
+            "back": 0,
+            "back_hi": 1,
+            "back_l": 1,
+            "back_lo": 1,
+            "back_r": 2,
+            "front": 13,
+            "front_hi": 6,
+            "front_l": 15,
+            "front_lo": 10,
+            "front_r": 10,
+            "k2": 8,
+            "left": 8,
+            "left_hi": 2,
+            "left_lo": 4,
+            "right": 5,
+            "right_hi": 1,
+            "right_lo": 3
+          }
+        },
+        "thigh_r_flex": {
+          "backface_px": 84,
+          "largest_new_blob_px": 3,
+          "largest_new_blob_view": "front_lo",
+          "new_vs_rest_by_part": {
+            "tripo_part_0": 11,
+            "tripo_part_1": -2,
+            "tripo_part_10": 1,
+            "tripo_part_2": -3,
+            "tripo_part_8": 2
+          },
+          "new_vs_rest_by_view": {
+            "back": 0,
+            "back_hi": 3,
+            "back_l": 2,
+            "back_lo": 0,
+            "back_r": -1,
+            "front": -3,
+            "front_hi": 0,
+            "front_l": -4,
+            "front_lo": 7,
+            "front_r": 1,
+            "k2": 0,
+            "left": 1,
+            "left_hi": 1,
+            "left_lo": 1,
+            "right": -2,
+            "right_hi": 3,
+            "right_lo": 0
+          },
+          "new_vs_rest_px": 9,
+          "per_part": {
+            "tripo_part_0": 31,
+            "tripo_part_1": 10,
+            "tripo_part_10": 3,
+            "tripo_part_12": 2,
+            "tripo_part_13": 1,
+            "tripo_part_2": 4,
+            "tripo_part_3": 7,
+            "tripo_part_4": 2,
+            "tripo_part_5": 3,
+            "tripo_part_7": 1,
+            "tripo_part_8": 16,
+            "tripo_part_9": 4
+          },
+          "per_view": {
+            "back": 2,
+            "back_hi": 4,
+            "back_l": 5,
+            "back_lo": 4,
+            "back_r": 3,
+            "front": 9,
+            "front_hi": 5,
+            "front_l": 7,
+            "front_lo": 11,
+            "front_r": 8,
+            "k2": 6,
+            "left": 5,
+            "left_hi": 1,
+            "left_lo": 4,
+            "right": 4,
+            "right_hi": 4,
+            "right_lo": 2
+          }
+        }
+      },
+      "views": [
+        "front",
+        "front_l",
+        "left",
+        "back_l",
+        "back",
+        "back_r",
+        "right",
+        "front_r",
+        "front_hi",
+        "left_hi",
+        "back_hi",
+        "right_hi",
+        "k2",
+        "front_lo",
+        "left_lo",
+        "back_lo",
+        "right_lo"
+      ]
+    }
+  },
+  "stage": "seams",
+  "status": "измерено",
+  "worst_by_pair": {
+    "tripo_part_12|tripo_part_13": {
+      "max_mm": 0.0,
+      "p95_mm": 0.0,
+      "pose": "head_turn"
+    },
+    "tripo_part_2|tripo_part_10": {
+      "max_mm": 0.0,
+      "p95_mm": 0.0,
+      "pose": "head_turn"
+    },
+    "tripo_part_2|tripo_part_3": {
+      "max_mm": 5.96,
+      "p95_mm": 5.077,
+      "pose": "thigh_l_flex"
+    },
+    "tripo_part_2|tripo_part_9": {
+      "max_mm": 0.828,
+      "p95_mm": 0.469,
+      "pose": "thigh_r_flex"
+    },
+    "tripo_part_3|tripo_part_8": {
+      "max_mm": 0.0,
+      "p95_mm": 0.0,
+      "pose": "head_turn"
+    },
+    "tripo_part_3|tripo_part_9": {
+      "max_mm": 1.368,
+      "p95_mm": 1.242,
+      "pose": "thigh_l_flex"
+    },
+    "tripo_part_4|tripo_part_0": {
+      "max_mm": 0.111,
+      "p95_mm": 0.034,
+      "pose": "head_turn"
+    },
+    "tripo_part_4|tripo_part_9": {
+      "max_mm": 0.0,
+      "p95_mm": 0.0,
+      "pose": "head_turn"
+    },
+    "tripo_part_5|tripo_part_0": {
+      "max_mm": 36.597,
+      "p95_mm": 35.807,
+      "pose": "arm_l_raise"
+    },
+    "tripo_part_5|tripo_part_11": {
+      "max_mm": 0.0,
+      "p95_mm": 0.0,
+      "pose": "head_turn"
+    },
+    "tripo_part_6|tripo_part_0": {
+      "max_mm": 31.428,
+      "p95_mm": 30.109,
+      "pose": "arm_r_raise"
+    },
+    "tripo_part_6|tripo_part_12": {
+      "max_mm": 0.0,
+      "p95_mm": 0.0,
+      "pose": "head_turn"
+    },
+    "tripo_part_9|tripo_part_0": {
+      "max_mm": 0.064,
+      "p95_mm": 0.001,
+      "pose": "spine_bend_fwd"
+    }
+  }
+}

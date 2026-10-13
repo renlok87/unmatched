@@ -1,0 +1,284 @@
+{
+ "schema": "unmatched.h2-lookdev-profile/1",
+ "profile_id": "angel-h2-lookdev/1",
+ "asset_id": "ASSET-ANGEL-001",
+ "status": "предложено",
+ "status_note": "Look-dev этапа 3 (пилот 3d-model-pipeline 2026-10-13): игровая модель H2 Angel без изменений геометрии и рига + библиотека материалов v1: MatID, LUT героя, UV1 в метрах, маска рёбер, подгонка тонов классов к концепту. Образец — medusa-h2-lookdev.json. Не художественная приёмка.",
+ "source": {
+  "profile": "art/pipeline-candidates/ASSET-ANGEL-001/build-profiles/angel-h2-bake-h2.json",
+  "run": "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-bake",
+  "prefix": "T_Angel_H2",
+  "files": {
+   "BC": "textures/T_Angel_H2_BC.png",
+   "ORM": "textures/T_Angel_H2_ORM.png",
+   "TeamMask": "textures/T_Angel_H2_TeamMask.png",
+   "N": "textures/T_Angel_H2_N.png",
+   "N_OpenGL": "textures/T_Angel_H2_N_OpenGL.png",
+   "2K_N": "textures/T_Angel_H2_2K_N.png",
+   "2K_N_OpenGL": "textures/T_Angel_H2_2K_N_OpenGL.png",
+   "baseline_BC": "textures/T_Angel_H2_BC.png",
+   "baseline_ORM": "textures/T_Angel_H2_ORM.png",
+   "part_ids": "work/uv/part_ids.npy",
+   "metal_mask": "work/uv/metal_mask.npy",
+   "position": "work/uv/position.npy",
+   "island_ids": "work/uv/island_ids.npy",
+   "sk_authored": "work/sk_authored.blend",
+   "skeletal_fbx": "export/SK_Angel_H2.fbx",
+   "base_fbx": "export/SM_Angel_H2_Base.fbx"
+  },
+  "sha256": {
+   "BC": "2ae91aaf84aab546a6ae6523b7ab91a3350878858bf64a09f101ba0e4558becb",
+   "ORM": "c96a1ff9d8ac70c1b7d1a4e4e118c424006dcac0898355c6f37a27b77eb4613a",
+   "TeamMask": "a615141e6315e39f026ed14ba4b799b149afe7184023a41e3af7792f3253d779",
+   "N": "2b0ceecdef62b3c4616c8f5ab57e69231868277b39e76f599121f02fb689cc82",
+   "N_OpenGL": "07cb461214d4989d164179cdc95788e0afc82190324e3665c86e6b1a37869ba0",
+   "2K_N": "80da03e4b36ad23a24d3bea583d155ed0cc1792cb3e35965c81bb6373a32f5e8",
+   "2K_N_OpenGL": "f048e0a2a4abf51efbefddefd45dd1fefdc848d1ee8ab2ec908c72d29303b6c2",
+   "baseline_BC": "2ae91aaf84aab546a6ae6523b7ab91a3350878858bf64a09f101ba0e4558becb",
+   "baseline_ORM": "c96a1ff9d8ac70c1b7d1a4e4e118c424006dcac0898355c6f37a27b77eb4613a",
+   "part_ids": "1d9a027fca31e83bea452b20afa0d1a9782230d63ef9e79e540afb55fe935bb3",
+   "metal_mask": "edc6498c5560f2d426fdf63834a7b946999fa5e95368ae16f9434f7074104c96",
+   "position": "50509c3cbe8c025d58b742d6560ddaf2e6c7c0424dcdece1f4e1d79835ca6ac4",
+   "island_ids": "86a5ed111b129b3ec17172a4073b94ec876d69ec84e5bd7ca6d1f366f3a60d5c",
+   "sk_authored": "d05b2054698674937b3d8994a7b6e166bebd3a4938edb23b416a6ac4a415f439",
+   "skeletal_fbx": "cf22e78fc03730499299d2fa125195fbbdd395cd6fd7cd577bd906e89f11d7f5",
+   "base_fbx": "a8271a93d3c2b54aae6387776be7dcb62a69e3e3e320b92543a7deb402f416e2"
+  },
+  "baseline_note": "baseline_BC/ORM = текстуры H2 этого же прогона: у нового героя нет прогона «до H2.1» (lookdev.py читает baseline всегда; reclass_from_baseline пуст)"
+ },
+ "prefix": "T_Angel_H2LD",
+ "lut_name": "T_UM_MatLUT_Angel",
+ "lut_hero": "Angel",
+ "gutter_px": 16,
+ "exports": {
+  "skeletal_fbx": "SK_Angel_H2LD.fbx",
+  "base_fbx": "SM_Angel_H2LD_Base.fbx"
+ },
+ "uv1": {
+  "layer_name": "UV1_m",
+  "method": "как Medusa: на остров UV0 — (UV0 − центр bbox острова) × s, s = √(площадь 3D / площадь UV0)",
+  "density_tolerance": 0.02
+ },
+ "team_dye_classes": [
+  "leather_smooth"
+ ],
+ "team_dye_note": "TeamMask.R (устаревшая маска W4-B: кожа пальто по HSV стадии textures) остаётся только на классе пальто; цвет команды героя — TeamAccent (профиль angel-h2-lookdev-teamaccent.json)",
+ "classes": {
+  "note": "классы библиотеки v1: пальто, рукава и брюки — leather_smooth (чёрная блестящая кожа концепта, roughness Tripo p50 0,40); рубашка — silk (тёмно-серая с блеском); ботинки и обмотка рукояти — leather_worn; кисти и лицо — skin; волосы, брови, глаза — legacy_bake; клинок, гарда и навершие — metal_forged (маска металла H2; не steel_polished, как у Arthur: шероховатость 0,12–0,25 давала в студийном кадре почти чёрный клинок, а клинок концепта — светло-серая матовая сталь; metal_forged 0,39–0,56 ближе к проходу металла H2 0,32–0,45); подставка — stone_base",
+  "part_default": {
+   "0": "leather_smooth",
+   "1": "stone_base",
+   "2": "leather_smooth",
+   "3": "leather_smooth",
+   "4": "legacy_bake",
+   "5": "leather_smooth",
+   "6": "leather_smooth",
+   "7": "metal_forged",
+   "8": "leather_worn",
+   "9": "silk",
+   "10": "leather_worn",
+   "11": "skin",
+   "12": "skin",
+   "13": "leather_worn"
+  },
+  "rules": [
+   {
+    "name": "skin_by_colour",
+    "parts": [
+     4
+    ],
+    "hsv": {
+     "v_min": 0.42,
+     "s_max": 0.5,
+     "hue_deg": [
+      5,
+      40
+     ]
+    },
+    "class": "skin",
+    "note": "лицо, шея, вырез груди (часть головы): замер BC H2 — лицо v p50 0,72, h 21°, вырез груди v 0,72, s 0,30; волосы v p50 0,18 (правило берёт 2,6 % текселей волос — светлые блики прядей), брови и глаза тёмные — остаются legacy_bake"
+   },
+   {
+    "name": "steel",
+    "metal_min": 0.5,
+    "class": "metal_forged",
+    "note": "маска металла H2 (клинок, гарда — tripo_part_7; навершие — tripo_part_13)"
+   }
+  ],
+  "min_component_px": 48,
+  "protect_classes": [
+   "metal_forged"
+  ],
+  "reclass_from_baseline": []
+ },
+ "edge": {
+  "curvature_per_m": [
+   150,
+   600
+  ],
+  "smooth_px": 3
+ },
+ "grade": {
+  "blur_px": 2,
+  "median_floor": 1.2,
+  "gains": {
+   "skin": {
+    "rgb": [
+     1.127,
+     0.968,
+     0.822
+    ],
+    "iter1": [
+     1.127,
+     0.968,
+     0.822
+    ],
+    "note": "ld_measure прохода 1 (C:/tmp/angel-ld-scout, якорь — кожа): кожа концепта теплее (h 24,9°, s 0,27 против 22,2°, 0,15)"
+   },
+   "leather_smooth": {
+    "rgb": [
+     0.52,
+     0.522,
+     0.522
+    ],
+    "iter1": [
+     0.52,
+     0.522,
+     0.522
+    ],
+    "note": "предложение ld_measure; медиана BC пальто 0,0267 уже у пола класса (1,2 × 0,02) — пол median_floor поднимет обратно: кожа пальто концепта темнее пола альбедо, остальное делает свет"
+   },
+   "leather_worn": {
+    "rgb": [
+     0.305,
+     0.346,
+     0.356
+    ],
+    "iter1": [
+     0.305,
+     0.346,
+     0.356
+    ],
+    "note": "предложение ld_measure (тоже у пола)"
+   },
+   "legacy_bake": {
+    "rgb": [
+     0.551,
+     0.513,
+     0.484
+    ],
+    "iter1": [
+     0.551,
+     0.513,
+     0.484
+    ],
+    "note": "волосы концепта темнее (Y 0,021 против 0,038)"
+   },
+   "stone_base": {
+    "rgb": [
+     0.551,
+     0.535,
+     0.52
+    ],
+    "iter1": [
+     0.551,
+     0.535,
+     0.52
+    ],
+    "note": "предложение ld_measure"
+   },
+   "silk": {
+    "rgb": [
+     0.6,
+     0.6,
+     0.6
+    ],
+    "iter1": [
+     0.6,
+     0.6,
+     0.6
+    ],
+    "note": "предложение ld_measure 0,33 опустило бы рубашку на пол класса, как пальто (контраст рубашка/пальто концепта 2,06 пропал бы); 0,6 — медиана Y 0,033, выше пола"
+   }
+  },
+  "gains_note": "iter1 = проход 1 (C:/tmp/angel-ld-scout, measure-report.json): рендер Blender, студийный свет; тона — предсказание, решение по материалу — по съёмке UE (HANDBOOK §4.4)"
+ },
+ "lut_overrides": {},
+ "concepts": {
+  "front": "art/imagegen/concept-angel-codex/angel-front.png",
+  "side": "art/imagegen/concept-angel-codex/angel-side.png",
+  "back": "art/imagegen/concept-angel-codex/angel-back.png"
+ },
+ "measure": {
+  "erode_px": 4,
+  "min_px": 200,
+  "metal_max_channel": 0.92,
+  "exposure": {
+   "mode": "anchor_class",
+   "class": "skin",
+   "note": "экспозиция концепт/кадр Blender — по коже (лицо и кисти: средний тон, однозначный цвет); самая большая зона (чёрная кожа пальто) почти у пола альбедо — отношение по ней шумит"
+  },
+  "concept_gates": {
+   "note": "цветовые ворота пикселей концепта (HSV, sRGB) по зонам Angel: чёрная кожа пальто и брюк (низкая насыщенность), тёмно-серая рубашка, светлая кожа лица и кистей, сталь клинка (серая), тёмные ботинки и коричневая обмотка, подставка",
+   "leather_smooth": {
+    "mask_px": -4,
+    "s_max": 0.3,
+    "v_max": 0.42
+   },
+   "silk": {
+    "mask_px": -4,
+    "s_max": 0.3,
+    "v_min": 0.08,
+    "v_max": 0.5
+   },
+   "skin": {
+    "mask_px": -2,
+    "hue_deg": [
+     [
+      10,
+      40
+     ]
+    ],
+    "s_min": 0.12,
+    "s_max": 0.55,
+    "v_min": 0.4
+   },
+   "metal_forged": {
+    "mask_px": 2,
+    "s_max": 0.2,
+    "v_min": 0.3
+   },
+   "leather_worn": {
+    "mask_px": 2,
+    "v_max": 0.45
+   },
+   "stone_base": {
+    "mask_px": -4,
+    "s_max": 0.35,
+    "v_max": 0.5
+   },
+   "legacy_bake": {
+    "mask_px": -2,
+    "v_max": 0.45,
+    "render_gate": true,
+    "note": "волосы, брови, глаза: ворота с обеих сторон"
+   }
+  }
+ },
+ "preview": {
+  "samples": 64,
+  "closeups": [
+   "face_front",
+   "hair",
+   "hand_r_grip",
+   "sword_upper",
+   "boot_l",
+   "coat_back"
+  ],
+  "label": "blender (Cycles, AgX), студийный свет как в H2 — не игровой; H2LD: MatID + LUT в узлах Principled (specular, sheen, roughness класса) — приближение M_UM_Figure v2 без тайлов деталей"
+ },
+ "frame": {
+  "checks_report": "art/imagegen/concept-angel-codex/checks-report.json",
+  "side": "left"
+ }
+}

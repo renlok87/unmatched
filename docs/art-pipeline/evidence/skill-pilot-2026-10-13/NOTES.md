@@ -45,6 +45,15 @@ Black Panther, Black Widow, Blackbeard, Bloody Mary, Bruce Lee, Buffy); they are
 | F24 | 3 | TeamAccent profile has no top-level `frame`; determinism: `textures-report` differs by GPU N noise, HANDBOOK says reports are identical | HANDBOOK §4.3: which files are compared, noise tolerance |
 | F25 | 3 | `rig` writes `export/*.fbx` before its checks — a failed stage leaves valid-looking FBX | tool: write to staging, publish on PASS |
 | F26 | 3 | Shield 100 % on `arm_lower.L` (no bone) passed all probes | decision П3-2; HANDBOOK §2.6 pattern |
+| F27 | 3 | TeamAccent selectors have no «band N cm from a rim» or «lining = inner face of a closed shell»; an all-leather costume (Angel: 0.73 % area, K2 5× 0.39 % / 0.03 %) cannot pass `team_accent_visible_k2_5x_front_and_back` | decision П3-4a for the pilot; tool: lining/offset-band selectors in `lookdev_accent.py` |
+| F28 | 3 | Scale reference = highest vertex of any non-base part, weapon included: Angel's raised sword put the head at 0.541 m; fixed by `figure_top_m` 0.55904 | HANDBOOK §4.2 `scale`: say it, or an opt-in key that excludes the weapon |
+| F29 | 3 | Medusa pattern has `textures.team_mask.base_band.part` = `tripo_part_2` — for Angel that is a trouser leg | HANDBOOK §4.2 retune list |
+| F30 | 3 | uv: charts passing the 512 px test still overlapped 7 px at 4K (`raster_overlap_px`); report does not name the islands | HANDBOOK §4.3: smaller `chart_area_cm2` for sleeves/blades; tool: name overlapping islands |
+| F31 | 3 | Trousers split into two Tripo parts: the tops open in flex poses (blob 249 px); contact caps fixed it, a weight junction folded the thigh. seams-report gives no blob location | HANDBOOK §4.2 closure: caps, not junctions, for split trousers; tool: blob centroid in metres |
+| F32 | 3 | `ta_report` writes `passed: false` but the driver continues to `ta_manifest` (unlike `ta_maps`) | tool: non-zero exit; SKILL: read `ld-team-report.json` |
+| F33 | 3 | `--compare-with` writes the determinism report into the repro run, not the production run | HANDBOOK §4.3: rerun `--stages manifest --compare-with <repro>` on the production run |
+| F34 | 3 | Blade class: Arthur's `steel_polished` rendered Angel's matte blade near-black (`metal_forged` used); `ld_measure` gains push a dark costume onto the class floor (shirt merged with coat) | HANDBOOK §4.4 / material library: class by the concept's finish; keep contrast between classes |
+| F35 | 3 | Angel's coat came as a closed shell (no back faces); the loop inventory of `close` tells single sheet from shell | П3-3: check the inventory before the cloth-shell key |
 
 ## Applied to the skill (stages 0–2, 2026-10-13)
 

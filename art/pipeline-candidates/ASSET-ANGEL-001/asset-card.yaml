@@ -20,8 +20,56 @@ PALETTE:
 QUALITY_REFERENCE:
   - art/imagegen/hero-quality-v1/reference/medusa-quality-reference.png
 ASSET_DIR: art/pipeline-candidates/ASSET-ANGEL-001
-decided_by: delegated (ВР-реестр 2026-10-06)
+decided_by:
+  "*": "delegated (ВР-реестр 2026-10-06)"
+  CHARACTER: "delegated (П3-5, 2026-10-13-pilot-stage3-delegated-decisions.md): PascalCase ключа контента"
+  FIGHTER_NAME: "delegated (П3-5): имя героя в scraped-data/api/heroes/angel.json"
+  FIGHTER_NAME_RU: "delegated (П3-5)"
+  HERO_SLUG: "delegated (П3-5): файл scraped-data/api/heroes/angel.json"
+  WEAPON_BONE: "rig-contract.json v2-2026-10-13 characters.Angel"
+  FIGURE_HEIGHT_M: "delegated (П3-5): 0.55 как Medusa/Arthur; пропорции концепта (взрослый мужчина, меч до макушки) этому не противоречат"
+  FIGURE_HEIGHT_RANGE_M: "delegated (SKILL.md §7.1): ближайший по роли и оружию — Arthur (меч, ближний бой)"
+  IDLE_SECONDS: "delegated (SKILL.md §7.1): как Arthur"
+  LUNGE_CONTACT_FRAME: "delegated (SKILL.md §7.1): меч Arthur 7"
+  UE_NAMES: "delegated (П3-5): из KEY и поколения H2"
+  CLIP_PREFIX: "delegated (П3-5)"
+  AUDIO_KEY: "delegated (П3-5)"
+  HIT_TYPE: "delegated (SKILL.md §7.1): меч → BLADE"
 NOTES: ростер после MVP вне объёма ВР-18 — запуск по запросу пользователя 2026-10-13 (волна 1a).
+# --- поля этапа 3 (П3-5, дописаны исполнителем этапа 3 2026-10-13) ---
+CHARACTER: "Angel"
+FIGHTER_NAME: "Angel"
+FIGHTER_NAME_RU: "Ангел"
+HERO_SLUG: "angel"
+OWNER_HERO_SLUG: null
+WEAPON_BONE: "weapon.R"
+WEAPON_SOCKET_BONE: null
+FIGURE_HEIGHT_M: 0.55
+FIGURE_HEIGHT_RANGE_M: [0.52, 0.56]
+IDLE_SECONDS: 2.5
+LUNGE_CONTACT_FRAME: 7
+UE_NAMES:
+  stage: "H2LD"
+  skeletal_mesh: "SK_Angel_H2LD"
+  base: "SM_Angel_H2LD_Base"
+  materials:
+    - "MI_Angel_H2LD"
+    - "MI_Angel_H2LD_Base"
+    - "MI_Angel_H2LD_P1"
+    - "MI_Angel_H2LD_P2"
+    - "MI_Angel_H2LD_Base_P1"
+    - "MI_Angel_H2LD_Base_P2"
+  dissolve: "/Game/UM/Materials/v2/Dissolve/MI_Angel_H2LD_{P1,P2}_Dissolve"
+  skeleton: "/Game/PipelineCandidates/Angel/Rig/SK_Angel_Skeleton"
+  clips: "/Game/PipelineCandidates/Angel/H2Anim/AM_Angel_{Idle,LungeAttack,HitReact,DeathSettle}"
+  textures:
+    - "T_Angel_H2LD_{BC,N,ORM,MatID,TeamAccent}"
+    - "T_Angel_H2LD_Edge (или _EdgeMask)"
+    - "T_UM_MatLUT_Angel"
+  prop_name: null
+CLIP_PREFIX: "ANG"
+AUDIO_KEY: "ANGEL"
+HIT_TYPE: "BLADE"
 POLY_BUDGET: {figure_tris_max: 45000, base_tris_max: 2500}
 CREDITS:
   ledger: "docs/game-design/visual/credits-ledger.json"
