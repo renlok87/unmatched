@@ -320,8 +320,9 @@ def run(params, profile):
         if obj.data.attributes.get("h2_cap") is not None:
             obj.data.attributes.remove(obj.data.attributes["h2_cap"])  # keeps the FBX free of custom data
     face_box = next((d["box_m"] for d in profile["retopo"].get("dense_regions", []) if d["name"] == "face"), None)
+    face_key = PR.face_part_key(profile)  # part of dense_regions "face" (Medusa: 1)
     face_polys = [p.index for p in body.data.polygons
-                  if labels[p.index] == 1 and caps[p.index] == 0 and face_box and all(face_box[0][k] <= p.center[k] <= face_box[1][k] for k in range(3))
+                  if labels[p.index] == face_key and caps[p.index] == 0 and face_box and all(face_box[0][k] <= p.center[k] <= face_box[1][k] for k in range(3))
                   and p.normal.y < -0.3]
     pre = {o.name: measure.mesh_summary(o) for o in figure}
     wsum = {"body": measure.weight_summary(body, bone_names)}

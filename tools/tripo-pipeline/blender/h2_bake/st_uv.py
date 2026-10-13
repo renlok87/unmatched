@@ -28,6 +28,7 @@ from mathutils.kdtree import KDTree
 
 from . import bl_util as U
 from . import charts
+from . import profile as PR
 
 CAP_ATTR = "h2_cap"
 
@@ -572,6 +573,7 @@ def run(params, profile):
     bpy.data.images.remove(prev)
     bpy.ops.wm.save_as_mainfile(filepath=str(run_dir / "work" / "lp_uv.blend"), compress=False)
     min_gap = int(cfg["min_gap_px"])
+    ref_part = PR.uv_density_reference_part(profile)  # uv.density_reference_part, default tripo_part_0 (Medusa's dress)
     checks = {
         "uv_inside_0_1": {"passed": bool(uv_min.min() >= 0.0 and uv_max.max() <= 1.0),
                           "measured": [U.rv(uv_min, 6), U.rv(uv_max, 6)], "expected": "[0, 1]"},
@@ -583,8 +585,9 @@ def run(params, profile):
         "no_folded_uv_triangles": {"passed": all(c["folded_triangles"] == 0 for c in chart_stats.values()),
                                    "measured": {n: c["folded_triangles"] for n, c in chart_stats.items()}, "expected": 0},
         "priority_face_denser_than_body": {
-            "passed": (region_density.get("face") or 0) >= 1.5 * (per_part["tripo_part_0"]["texel_density_px_per_cm_4k"] or 1e9),
-            "measured": {"face": region_density.get("face"), "dress": per_part["tripo_part_0"]["texel_density_px_per_cm_4k"]},
+            "passed": (region_density.get("face") or 0) >= 1.5 * (per_part[ref_part]["texel_density_px_per_cm_4k"] or 1e9),
+            "measured": {"face": region_density.get("face"), "dress": per_part[ref_part]["texel_density_px_per_cm_4k"],
+                         "reference_part": ref_part},
             "expected": "face >= 1.5 x dress"},
     }
     report = {"stage": "uv", "atlas_px": size, "pack": {"margin_method": "FRACTION", "margin": cfg["pack_margin_fraction"],

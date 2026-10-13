@@ -93,6 +93,23 @@ def has_weapon(p):
     return any(cfg.get("mesh") == "weapon" for cfg in p["parts"].values())
 
 
+def face_part_key(p):
+    """Integer N of the tripo_part_N that carries the face: the `part` of retopo.dense_regions `face`.
+
+    The rig and look-dev stages measure the face normal on this part. Medusa's face is tripo_part_1, which was
+    hard-coded until the Achilles pilot (2026-10-13: Achilles' part 1 is the base, the head is part 5). A profile
+    without a face region keeps the old value 1."""
+    face = next((d for d in p["retopo"].get("dense_regions", []) if d.get("name") == "face"), None)
+    m = re.search(r"tripo_part_(\d+)", (face or {}).get("part") or "")
+    return int(m.group(1)) if m else 1
+
+
+def uv_density_reference_part(p):
+    """The body part the face texel density is compared with (check priority_face_denser_than_body of the uv stage):
+    optional `uv.density_reference_part`, default tripo_part_0 (Medusa's dress, the old hard-coded value)."""
+    return p.get("uv", {}).get("density_reference_part", "tripo_part_0")
+
+
 def figure_roles(p):
     """Mesh roles of the figure in build order: ("body", "weapon", "base") or ("body", "base")."""
     return tuple(r for r in ROLES if r != "weapon" or has_weapon(p))

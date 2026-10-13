@@ -186,8 +186,9 @@ def run_fbx(params, profile, ld):
     vpart = np.load(src_run / "work" / "rig" / "body_vertex_part.npy")
     fcap = np.load(src_run / "work" / "rig" / "body_face_cap.npy")
     face_box = next((d["box_m"] for d in profile["retopo"].get("dense_regions", []) if d["name"] == "face"), None)
+    face_key = PR.face_part_key(profile)  # part of dense_regions "face" (Medusa: 1)
     face_polys = [p.index for p in body.data.polygons
-                  if vpart[p.vertices[0]] == 1 and fcap[p.index] == 0 and face_box
+                  if vpart[p.vertices[0]] == face_key and fcap[p.index] == 0 and face_box
                   and all(face_box[0][k] <= p.center[k] <= face_box[1][k] for k in range(3)) and p.normal.y < -0.3]
     preset_path = repo / profile["exports"]["fbx_preset"]
     preset = core.load_preset(preset_path)

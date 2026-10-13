@@ -66,6 +66,23 @@ def test_default_frame_is_the_old_medusa_arithmetic():
         assert cams[v]["loc"] == old[v][0] and cams[v]["dir"] == old[v][1]
 
 
+def test_face_part_and_uv_reference_follow_the_profile():
+    """Achilles pilot 2026-10-13: the face part comes from dense_regions "face" (Achilles: head = part 5, part 1 = base),
+    the uv density reference from uv.density_reference_part; Medusa keeps the old hard-coded 1 and tripo_part_0."""
+    medusa = PR.load(MEDUSA)
+    assert PR.face_part_key(medusa) == 1
+    assert PR.uv_density_reference_part(medusa) == "tripo_part_0"
+    hero = copy.deepcopy(medusa)
+    for region in hero["retopo"]["dense_regions"]:
+        if region["name"] == "face":
+            region["part"] = "tripo_part_5"
+    hero["uv"]["density_reference_part"] = "tripo_part_7"
+    assert PR.face_part_key(hero) == 5
+    assert PR.uv_density_reference_part(hero) == "tripo_part_7"
+    hero["retopo"]["dense_regions"] = []
+    assert PR.face_part_key(hero) == 1
+
+
 def test_frame_from_checks_report_3x4(tmp_path):
     sizes = {"front": (1152, 1536), "side": (1152, 1536), "back": (1152, 1536)}
     masks = {"front": {"top_pct": 4.0, "bottom_pct": 93.0, "base_center_x_pct": 50.0},
