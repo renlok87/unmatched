@@ -1,0 +1,135 @@
+{
+  "schema": "unmatched.anim-acceptance/1",
+  "kind": "anim",
+  "asset_id": "ASSET-ANGEL-001",
+  "clip": "Idle",
+  "cycle": "r1",
+  "date": "2026-10-14",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim/export/AM_Angel_Idle.fbx",
+      "sha256": "28ff7a6eb418717233e1bac973b30787bc703d59e7feff5e10dafc0f4c16d1c0"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-ANGEL-001/build-profiles/angel-h2anim.json",
+      "sha256": "b7ab2708b2722733a2a17b973d454b44f706b2ce96353f4440b01cd18b93b293"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-ANGEL-001/evidence/acceptance-anim/20261014-r1/Idle/frames",
+    "files": [
+      "Angel-Idle-blender-sheet.jpg",
+      "Angel-Idle-f00-front-ue-editor.jpg",
+      "Angel-Idle-f00-q34-ue-editor.jpg",
+      "Angel-Idle-f15-front-ue-editor.jpg",
+      "Angel-Idle-f15-q34-ue-editor.jpg",
+      "Angel-Idle-f30-front-ue-editor.jpg",
+      "Angel-Idle-f30-q34-ue-editor.jpg",
+      "Angel-Idle-f45-front-ue-editor.jpg",
+      "Angel-Idle-f45-q34-ue-editor.jpg",
+      "Angel-H2Anim-ue-sheet.jpg"
+    ]
+  },
+  "reports": [
+    "docs/art-pipeline/animation-library/validation-h2anim/AM_Angel_Idle.validation.json",
+    "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim/reports/contact-Idle.json",
+    "docs/art-pipeline/animation-library/clip-manifest.json",
+    "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim/reports/ue-import-clips.json",
+    "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim/reports/ue-measure-clips.json"
+  ],
+  "gates": {
+    "G-VALIDATE": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/validation-h2anim/AM_Angel_Idle.validation.json",
+      "note": "AM_Angel_Idle.validation.json#result = pass; AM_Angel_Idle.validation.json#fails = []; AM_Angel_Idle.validation.json#clip_sha256 = 28ff7a6eb418717233e1bac973b30787bc703d59e7feff5e10dafc0f4c16d1c0",
+      "source_defect": null
+    },
+    "G-CONTACT": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim/reports/contact-Idle.json",
+      "note": "contact-Idle.json#result = pass; contact-Idle.json#fails = []",
+      "source_defect": null
+    },
+    "G-MANIFEST": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/clip-manifest.json",
+      "note": "clip-manifest.json#clips[id=ANG-Idle].status = technically_imported; clip-manifest.json#clips[id=ANG-Idle].validation.result = pass; contact-Idle.json#result = pass; clip-manifest.json#clips[id=ANG-Idle].source.files[0].sha256 = 28ff7a6eb418717233e1bac973b30787bc703d59e7feff5e10dafc0f4c16d1c0; ue-import-clips.json#fbx_sha256.AM_Angel_Idle = 28ff7a6eb418717233e1bac973b30787bc703d59e7feff5e10dafc0f4c16d1c0; ue-import-clips.json#clips[name=AM_Angel_Idle].imported_object_paths[0] = /Game/PipelineCandidates/Angel/H2Anim/AM_Angel_Idle.AM_Angel_Idle",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "R": {
+      "value": 1,
+      "rationale": "Angel-Idle-f00/f15/f30/f45-front-ue-editor.jpg и соответствующие q34: спокойная готовность, небольшой поворот головы и покачивание вертикального меча читаются; спиной к камере герой не становится. Однако положение груди и плеч меняется настолько мало, что отдельные вдох и выдох не читаются, ритм корпуса остаётся плоским. Это якорь 1,0, а не ясное живое дыхание. Малая амплитуда таза учитывает почти прямые ноги и скиненное пальто; присед не требуется.",
+      "frames": [
+        "Angel-Idle-f00-front-ue-editor.jpg",
+        "Angel-Idle-f15-front-ue-editor.jpg",
+        "Angel-Idle-f30-front-ue-editor.jpg",
+        "Angel-Idle-f45-front-ue-editor.jpg",
+        "Angel-Idle-f00-q34-ue-editor.jpg",
+        "Angel-Idle-f15-q34-ue-editor.jpg",
+        "Angel-Idle-f30-q34-ue-editor.jpg",
+        "Angel-Idle-f45-q34-ue-editor.jpg"
+      ]
+    },
+    "C": {
+      "value": 2,
+      "rationale": "Angel-Idle-blender-sheet.jpg, к.0/15/30/45 front/left/q34: ботинки сохраняют опору на верх подставки, подол не проваливается при переносе веса. На отдельных UE-кадрах тех же фаз подошвы остаются на одинаковых местах относительно поля, отрыва стоп не видно; меч отделён от корпуса. Отсутствие подставки на диагностическом UE-носителе учтено.",
+      "frames": [
+        "Angel-Idle-blender-sheet.jpg",
+        "Angel-Idle-f00-front-ue-editor.jpg",
+        "Angel-Idle-f15-q34-ue-editor.jpg",
+        "Angel-Idle-f30-front-ue-editor.jpg",
+        "Angel-Idle-f45-q34-ue-editor.jpg"
+      ]
+    },
+    "D": {
+      "value": 2,
+      "rationale": "Angel-Idle-f30-front-ue-editor.jpg и Angel-Idle-f30-q34-ue-editor.jpg: при максимальном отклонении свободной руки оболочка плеча, локтя и пальто цела, хват меча сохраняется. На к.15 и к.45 при переносе веса нет видимой дыры, разрыва или нового резкого залома; крышка верхнего контакта левого бедра не открывается. Гранёность пальто присутствует уже в rest. Ограничения весов подола и почти прямых ног учитываются как предел модели.",
+      "frames": [
+        "Angel-Idle-f00-q34-ue-editor.jpg",
+        "Angel-Idle-f15-front-ue-editor.jpg",
+        "Angel-Idle-f30-front-ue-editor.jpg",
+        "Angel-Idle-f30-q34-ue-editor.jpg",
+        "Angel-Idle-f45-front-ue-editor.jpg",
+        "Angel-Idle-f45-q34-ue-editor.jpg"
+      ]
+    },
+    "L": {
+      "value": 2,
+      "rationale": "Angel-Idle-blender-sheet.jpg и строка Idle в Angel-H2Anim-ue-sheet.jpg: фазы к.0/15/30/45 образуют согласованное малое покачивание головы, меча и корпуса вокруг rest; опора и общий силуэт сохраняются, скачка между показанными фазами не видно. Оценка относится к представленным фазам: отдельная пара кадров к.60/0 в комплект не включена.",
+      "frames": [
+        "Angel-Idle-blender-sheet.jpg",
+        "Angel-H2Anim-ue-sheet.jpg",
+        "Angel-Idle-f00-q34-ue-editor.jpg",
+        "Angel-Idle-f15-q34-ue-editor.jpg",
+        "Angel-Idle-f30-q34-ue-editor.jpg",
+        "Angel-Idle-f45-q34-ue-editor.jpg"
+      ]
+    }
+  },
+  "score": 8.8,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "R",
+      "frame": "Angel-Idle-f15-front-ue-editor.jpg",
+      "note": "Дыхание груди и плеч отдельно не читается даже на крупном диагностическом кадре; это уже учтено в R = 1,0. На игровом листе K1/K2 проверить, сохраняется ли ощущение живой фигуры при уменьшении."
+    },
+    {
+      "item": "L",
+      "frame": "Angel-H2Anim-ue-sheet.jpg",
+      "note": "Строка Idle показывает только к.0/15/30/45. Непосредственный переход к.60/0 визуально не представлен; при подключении на этапе 7 проверить петлю в воспроизведении."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a136f9-cc8f-7e40-b5d6-ac5272815150"
+  },
+  "executor_session_id": "claude-code:e8429502-d3da-4eca-a8a6-748a200f3ed6/agent:stage6-angel",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

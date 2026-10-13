@@ -1,0 +1,774 @@
+{
+  "bake": {
+    "normalised": {
+      "checks": {
+        "lookdev_reports_all_checks_passed": {
+          "ld_fbx": {
+            "bone_heads_tails_as_h21": true,
+            "bones_and_parents_as_h21": true,
+            "export_frame_face_points_along_rotated_front_ue_plus_x": true,
+            "positions_and_uv0_per_loop_as_h21": true,
+            "triangles_as_h21": true,
+            "uv1_metres_density_readback": true,
+            "uv_layers_order": true
+          },
+          "ld_maps": {
+            "dielectric_bc_in_class_luminance_range": true,
+            "lut_dds_read_back": true,
+            "lut_metal_f0_plausible": true,
+            "matid_decodes_to_labels_4k": true,
+            "matid_values_valid": true,
+            "orm_metallic_binary_per_class_4k": true,
+            "team_mask_only_on_cloth_classes": true
+          },
+          "passed": true
+        },
+        "normal_is_the_h21_directx_map": {
+          "copied_from": "T_Angel_H2_2K_N.png",
+          "h21_sha256": "80da03e4b36ad23a24d3bea583d155ed0cc1792cb3e35965c81bb6373a32f5e8",
+          "passed": true,
+          "sha256": "80da03e4b36ad23a24d3bea583d155ed0cc1792cb3e35965c81bb6373a32f5e8"
+        },
+        "run_manifest_lists_the_adopted_bytes": {
+          "files": {
+            "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/export/SK_Angel_H2LD.fbx": true,
+            "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/export/SM_Angel_H2LD_Base.fbx": true,
+            "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/textures/T_Angel_H2LD_2K_BC.png": true,
+            "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/textures/T_Angel_H2LD_2K_Edge.png": true,
+            "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/textures/T_Angel_H2LD_2K_MatID.png": true,
+            "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/textures/T_Angel_H2LD_2K_N.png": true,
+            "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/textures/T_Angel_H2LD_2K_ORM.png": true,
+            "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/textures/T_Angel_H2LD_2K_TeamMask.png": true
+          },
+          "lookdev_profile_sha256": "f0ceeb3fbbfe0ccf22cfa18a56dfe329391ec6fb5840d59877de96a7b5636492",
+          "manifest_profile": {
+            "path": "art/pipeline-candidates/ASSET-ANGEL-001/build-profiles/angel-h2-lookdev.json",
+            "profile_id": "angel-h2-lookdev/1",
+            "sha256": "f0ceeb3fbbfe0ccf22cfa18a56dfe329391ec6fb5840d59877de96a7b5636492"
+          },
+          "passed": true
+        },
+        "source_rig_report_is_the_pinned_h21": {
+          "passed": true,
+          "pinned_h21_skeletal_fbx": "cf22e78fc03730499299d2fa125195fbbdd395cd6fd7cd577bd906e89f11d7f5",
+          "rig_passed": true,
+          "rig_report_fbx": "cf22e78fc03730499299d2fa125195fbbdd395cd6fd7cd577bd906e89f11d7f5",
+          "rig_skeleton": "UM_HUMANOID_17_v2"
+        }
+      },
+      "format": "h2-lookdev/1",
+      "lookdev_profile_sha256": "f0ceeb3fbbfe0ccf22cfa18a56dfe329391ec6fb5840d59877de96a7b5636492",
+      "normaliser": "skeletal_adopt_formats.h2_lookdev",
+      "note": "read-back bounds of ld_fbx are in the export frame; they go back to the authored frame (rotation 90 deg about Z); sockets and the figure top are those of the H2.1 rig report (same geometry and rig)",
+      "sources": {
+        "ld_fbx_report": "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/reports/ld-fbx-report.json",
+        "ld_maps_report": "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/reports/ld-maps-report.json",
+        "lookdev_profile": "art/pipeline-candidates/ASSET-ANGEL-001/build-profiles/angel-h2-lookdev.json",
+        "run_manifest": "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/reports/run-manifest.json",
+        "source_rig_report": "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/../20261013-h2-bake/reports/rig-report.json",
+        "source_textures_report": "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/../20261013-h2-bake/reports/textures-report.json"
+      }
+    },
+    "profile": "art/pipeline-candidates/ASSET-ANGEL-001/build-profiles/angel-h2-lookdev.json",
+    "profile_id": "angel-h2-lookdev/1",
+    "report_format": "h2-lookdev/1"
+  },
+  "checks": {
+    "bake_export_face_plus_x": {
+      "expected": true,
+      "measured": true,
+      "note": "the bake measured the face ahead of the body along +X in the export frame (UE front +X)",
+      "passed": true
+    },
+    "bake_report_passed": {
+      "expected": true,
+      "measured": true,
+      "note": "the bake's own checks (art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/reports/ld-fbx-report.json) all passed",
+      "passed": true
+    },
+    "bake_reports_are_of_the_named_profile": {
+      "expected": "angel-h2-lookdev/1",
+      "measured": {
+        "build_report": "angel-h2-lookdev/1",
+        "textures_report": "angel-h2-lookdev/1"
+      },
+      "passed": true
+    },
+    "fbx_bytes_match_bake_report": {
+      "measured": {
+        "base": {
+          "file": "8f7d70bb54bfca4536e12f1a3c1a31402f91e951321936e7cb00be59d7e59a7e",
+          "report": "8f7d70bb54bfca4536e12f1a3c1a31402f91e951321936e7cb00be59d7e59a7e",
+          "same_path": true
+        },
+        "skeletal": {
+          "file": "0bacddf1e1231df4c89b4b81523b40bddff6a634bb0a6c200b4e4d799e048c94",
+          "report": "0bacddf1e1231df4c89b4b81523b40bddff6a634bb0a6c200b4e4d799e048c94",
+          "same_path": true
+        }
+      },
+      "passed": true
+    },
+    "fbx_export_settings_equal_preset": {
+      "expected": "UM_FBX_v1",
+      "measured": {
+        "differences": {},
+        "documented_deviations": {
+          "bake_anim": "off: the candidate FBX carries no clips",
+          "path_mode": "STRIP instead of AUTO: bare texture names; textures reach UE from the atlas stage, not through the FBX"
+        },
+        "preset": "UM_FBX_v1",
+        "undocumented": []
+      },
+      "passed": true
+    },
+    "library_inputs_pinned_by_profile": {
+      "measured": {
+        "LUT": {
+          "file": "55757ca71f293f90fbdd897da1cf02996740380fe40d6cef645cf88bdfdf0561",
+          "profile": "55757ca71f293f90fbdd897da1cf02996740380fe40d6cef645cf88bdfdf0561",
+          "sha256_ok": true
+        },
+        "TeamAccent": {
+          "file": "7cba44c8ce6947cfbfd1fcfcab89a247dd9abff887d928556d515784388a9c86",
+          "profile": "7cba44c8ce6947cfbfd1fcfcab89a247dd9abff887d928556d515784388a9c86",
+          "sha256_ok": true
+        }
+      },
+      "note": "inputs outside the bake atlas (e.g. the hero MatLUT of M_UM_Figure_v2): the bytes are the ones the profile pins (candidate.library_inputs.*.sha256)",
+      "passed": true
+    },
+    "material_slots_as_profile": {
+      "expected": {
+        "base": 1,
+        "skeletal": 1
+      },
+      "measured": {
+        "base": [
+          "M_Angel_H2_Atlas"
+        ],
+        "skeletal_unique": [
+          "M_Angel_H2_Atlas"
+        ]
+      },
+      "passed": true
+    },
+    "roundtrip_scale_1": {
+      "expected": [
+        1,
+        1,
+        1
+      ],
+      "measured": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "passed": true
+    },
+    "skeleton_contract": {
+      "expected": {
+        "armature_object": "SKEL_UM_Humanoid",
+        "bones": 17,
+        "skeleton": "UM_HUMANOID_17_v2"
+      },
+      "measured": {
+        "armature_object": "SKEL_UM_Humanoid",
+        "armature_objects": [
+          "SKEL_UM_Humanoid"
+        ],
+        "bones": 17,
+        "bones_equal_profile": true,
+        "skeleton": "UM_HUMANOID_17_v2"
+      },
+      "note": "names and parents of every bone (Blender names; UE turns '.' into '_')",
+      "passed": true
+    },
+    "sockets_have_bake_predictions": {
+      "measured": {
+        "Head": [
+          0.0,
+          -4.722,
+          0.528
+        ]
+      },
+      "note": "a profile socket without location_uu takes the bake's UE bone-space prediction (location_uu_for_ue)",
+      "passed": true
+    },
+    "texture_bytes_match_textures_report": {
+      "measured": {
+        "BC": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "Edge": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "MatID": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "N": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "ORM": {
+          "same_path": true,
+          "sha256_ok": true
+        },
+        "TeamMask": {
+          "same_path": true,
+          "sha256_ok": true
+        }
+      },
+      "passed": true
+    },
+    "texture_conventions_as_ue_expects": {
+      "expected": {
+        "BC": "sRGB",
+        "Edge": "linear",
+        "MatID": "index * 16 + 8",
+        "N": "DirectX",
+        "ORM": "R = AO, G = roughness, B = metallic",
+        "TeamMask": "linear"
+      },
+      "measured": {
+        "BC": "sRGB 8-bit (ld_maps: baked BC graded per class towards the concept)",
+        "Edge": "linear R8 edge mask (EdgeMaskTexture of M_UM_Figure_v2)",
+        "MatID": "linear R8 MatID: index * 16 + 8 (decode floor(v * 255 / 16)), no mips",
+        "N": "DirectX (byte copy of the H2.1 map T_Angel_H2_2K_N.png)",
+        "ORM": "linear: R = AO, G = roughness, B = metallic (metallic binary per class)",
+        "TeamMask": "linear: R = cloth (TeamColor) in the cloth classes only, G = base band"
+      },
+      "note": "N DirectX (UE TC_Normalmap, no green flip), ORM R AO / G roughness / B metallic linear, TeamMask linear",
+      "passed": true
+    },
+    "textures_are_the_runtime_tier": {
+      "expected": {
+        "px": [
+          2048,
+          2048
+        ],
+        "tier": "runtime_2k"
+      },
+      "measured": {
+        "BC": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "Edge": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "MatID": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "N": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "ORM": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        },
+        "TeamMask": {
+          "png_px": [
+            2048,
+            2048
+          ],
+          "tier": "runtime_2k"
+        }
+      },
+      "note": "only the committed runtime maps reach UE; the local 4K masters are never imported",
+      "passed": true
+    },
+    "triangles_as_profile": {
+      "expected": {
+        "SK_Angel_H2_Body": 36089,
+        "SK_Angel_H2_Sword": 2499,
+        "SM_Angel_H2_Base": 1524
+      },
+      "measured": {
+        "SK_Angel_H2_Body": 36089,
+        "SK_Angel_H2_Sword": 2499,
+        "SM_Angel_H2_Base": 1524
+      },
+      "passed": true
+    }
+  },
+  "fbx_preset": {
+    "path": "blender/_tools/presets/UM_FBX_v1.json",
+    "sha256": "d6166938c5d73185d607135b18af1d2ab7a154e0ea7cc8cd02fa9f86802d6bb9"
+  },
+  "inputs": {
+    "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev-teamaccent-b/textures/T_Angel_H2LD_TeamAccent_2K.png": "7cba44c8ce6947cfbfd1fcfcab89a247dd9abff887d928556d515784388a9c86",
+    "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/../20261013-h2-bake/reports/rig-report.json": "78ee50aaa030047c5b94a846b29584cd9fa8200bc80a2bf8f4d1f7b95673a23a",
+    "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/../20261013-h2-bake/reports/textures-report.json": "51b95be83ea555d008a798a707f9889e3fdfef2fc5f75767754c37ac9764180f",
+    "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/export/SK_Angel_H2LD.fbx": "0bacddf1e1231df4c89b4b81523b40bddff6a634bb0a6c200b4e4d799e048c94",
+    "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/export/SM_Angel_H2LD_Base.fbx": "8f7d70bb54bfca4536e12f1a3c1a31402f91e951321936e7cb00be59d7e59a7e",
+    "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/reports/ld-fbx-report.json": "7b1520ad5720b7b231f176584af61e7b52a40c94cddb2d29d023f1eb777a3c33",
+    "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/reports/ld-maps-report.json": "fba2b155d21cf74072920bf32205c14de023c67fcdbcf30b1a9ff140e4e2df86",
+    "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/reports/run-manifest.json": "2a42cca2b2005728076e2ef91de8db032f1f87c2913755210f992e91cee4b0f0",
+    "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/textures/T_Angel_H2LD_2K_BC.png": "7bdf0094662a44b4f7344be96b16cd7ce3f9f33c514734ee6021486532aae89a",
+    "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/textures/T_Angel_H2LD_2K_Edge.png": "37d97307a433a61ca916ea059bb89fe8a4c84f2ed67915ff56b5c237ee8e4871",
+    "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/textures/T_Angel_H2LD_2K_MatID.png": "725f1531e01dd5e25eac8b56b71aba0e4d17beb13ba3110973d3ca97298ec221",
+    "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/textures/T_Angel_H2LD_2K_N.png": "80da03e4b36ad23a24d3bea583d155ed0cc1792cb3e35965c81bb6373a32f5e8",
+    "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/textures/T_Angel_H2LD_2K_ORM.png": "4dccb5b18f7722e6492b4cbd3333fdb67716f5d4d5d337e9b2d66ee104acfb95",
+    "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/textures/T_Angel_H2LD_2K_TeamMask.png": "568401977390c64a1564273ab671f05d5c930f1fc1d4794b9bef0f16140037d5",
+    "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2ld-ldc-ue/lut/T_UM_MatLUT_Angel_UE_r2.dds": "55757ca71f293f90fbdd897da1cf02996740380fe40d6cef645cf88bdfdf0561",
+    "art/pipeline-candidates/ASSET-ANGEL-001/build-profiles/angel-h2-lookdev.json": "f0ceeb3fbbfe0ccf22cfa18a56dfe329391ec6fb5840d59877de96a7b5636492"
+  },
+  "keys": {
+    "fbx:base": "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/export/SM_Angel_H2LD_Base.fbx",
+    "fbx:skeletal": "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/export/SK_Angel_H2LD.fbx",
+    "profile:bake": "art/pipeline-candidates/ASSET-ANGEL-001/build-profiles/angel-h2-lookdev.json",
+    "report:build": "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/reports/ld-fbx-report.json",
+    "report:run_manifest": "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/reports/run-manifest.json",
+    "report:source_rig_report": "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/../20261013-h2-bake/reports/rig-report.json",
+    "report:source_textures_report": "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/../20261013-h2-bake/reports/textures-report.json",
+    "report:textures": "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/reports/ld-maps-report.json",
+    "texture:BC": "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/textures/T_Angel_H2LD_2K_BC.png",
+    "texture:Edge": "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/textures/T_Angel_H2LD_2K_Edge.png",
+    "texture:LUT": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2ld-ldc-ue/lut/T_UM_MatLUT_Angel_UE_r2.dds",
+    "texture:MatID": "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/textures/T_Angel_H2LD_2K_MatID.png",
+    "texture:N": "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/textures/T_Angel_H2LD_2K_N.png",
+    "texture:ORM": "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/textures/T_Angel_H2LD_2K_ORM.png",
+    "texture:TeamAccent": "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev-teamaccent-b/textures/T_Angel_H2LD_TeamAccent_2K.png",
+    "texture:TeamMask": "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/textures/T_Angel_H2LD_2K_TeamMask.png"
+  },
+  "kind": "skeletal-adopt",
+  "logic": "adopt-skeletal/1",
+  "note": "the candidate is built outside this tool (h2-lookdev/1, profile angel-h2-lookdev/1); adopt copies nothing and re-hashes it; views.build / views.atlas are what ue-import reads",
+  "passed": true,
+  "profile": {
+    "id": "angel-h2ld-lookdev-ue-import/2",
+    "path": "art/pipeline-candidates/ASSET-ANGEL-001/build-profiles/angel-h2ld-lookdev-ue-import-r2.json",
+    "sha256": "a8dd6e6de285b8a499938fb2466c3d5d0d14d7d268a46dd21f088862eba87306"
+  },
+  "stage": "adopt",
+  "status": "measured",
+  "views": {
+    "atlas": {
+      "files": {
+        "BC": {
+          "file": "T_Angel_H2LD_2K_BC.png"
+        },
+        "Edge": {
+          "file": "T_Angel_H2LD_2K_Edge.png"
+        },
+        "MatID": {
+          "file": "T_Angel_H2LD_2K_MatID.png"
+        },
+        "N": {
+          "file": "T_Angel_H2LD_2K_N.png"
+        },
+        "ORM": {
+          "file": "T_Angel_H2LD_2K_ORM.png"
+        },
+        "TeamMask": {
+          "file": "T_Angel_H2LD_2K_TeamMask.png"
+        }
+      },
+      "size": 2048
+    },
+    "build": {
+      "checks": {
+        "roundtrip_material_slots": {
+          "measured": {
+            "per_mesh": {
+              "SK_Angel_H2_Body": [
+                "M_Angel_H2_Atlas"
+              ],
+              "SK_Angel_H2_Sword": [
+                "M_Angel_H2_Atlas"
+              ]
+            },
+            "skeletal_unique": [
+              "M_Angel_H2_Atlas"
+            ]
+          }
+        }
+      },
+      "expected_ue_bounds_uu_at_import_scale_1": {
+        "base_blender_axes": {
+          "max": [
+            15.002,
+            14.999,
+            6.0
+          ],
+          "min": [
+            -14.999,
+            -14.997,
+            -0.001
+          ]
+        },
+        "base_ue_predicted": {
+          "max": [
+            14.997,
+            14.999,
+            6.0
+          ],
+          "min": [
+            -14.999,
+            -15.002,
+            -0.001
+          ]
+        },
+        "export_rotation_z_degrees": 90.0,
+        "note": "union of the bake's round-trip bounds (authored frame, front -Y, cm); export frame rotated about Z by the preset; UE = export frame (x, -y, z) (ART-001)",
+        "skeletal_blender_axes": {
+          "max": [
+            13.658,
+            7.042,
+            55.909
+          ],
+          "min": [
+            -16.704,
+            -10.906,
+            5.752
+          ]
+        },
+        "skeletal_export_frame": {
+          "max": [
+            10.906,
+            13.658,
+            55.909
+          ],
+          "min": [
+            -7.042,
+            -16.704,
+            5.752
+          ]
+        },
+        "skeletal_ue_predicted": {
+          "max": [
+            10.906,
+            16.704,
+            55.909
+          ],
+          "min": [
+            -7.042,
+            -13.658,
+            5.752
+          ]
+        }
+      },
+      "exports": {
+        "base": "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/export/SM_Angel_H2LD_Base.fbx",
+        "skeletal": "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/export/SK_Angel_H2LD.fbx"
+      },
+      "figure": {
+        "figure_height_m": 0.55,
+        "figure_top_m": 0.55,
+        "skeletal_top_m": 0.55909,
+        "top_part": "tripo_part_4"
+      },
+      "meshes_pre_export_m": {
+        "SK_Angel_H2_Body": {
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 1,
+          "triangles": 36089
+        },
+        "SK_Angel_H2_Sword": {
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 0,
+          "triangles": 2499
+        },
+        "SM_Angel_H2_Base": {
+          "near_degenerate_area_cm2_below": 0.0001,
+          "near_degenerate_triangles": 0,
+          "triangles": 1524
+        }
+      },
+      "roundtrip": {
+        "skeletal": {
+          "bones": {
+            "arm_lower.L": {
+              "head_m": [
+                -0.042,
+                0.071,
+                0.375
+              ],
+              "parent": "arm_upper.L",
+              "tail_m": [
+                -0.026,
+                0.106,
+                0.308
+              ]
+            },
+            "arm_lower.R": {
+              "head_m": [
+                -0.01,
+                -0.098,
+                0.362
+              ],
+              "parent": "arm_upper.R",
+              "tail_m": [
+                0.038,
+                -0.112,
+                0.34
+              ]
+            },
+            "arm_upper.L": {
+              "head_m": [
+                -0.02,
+                0.06,
+                0.44
+              ],
+              "parent": "spine",
+              "tail_m": [
+                -0.042,
+                0.071,
+                0.375
+              ]
+            },
+            "arm_upper.R": {
+              "head_m": [
+                -0.006,
+                -0.062,
+                0.44
+              ],
+              "parent": "spine",
+              "tail_m": [
+                -0.01,
+                -0.098,
+                0.362
+              ]
+            },
+            "foot.L": {
+              "head_m": [
+                -0.008,
+                0.064,
+                0.087
+              ],
+              "parent": "leg_lower.L",
+              "tail_m": [
+                0.09483,
+                0.0842,
+                0.04477
+              ]
+            },
+            "foot.R": {
+              "head_m": [
+                -0.008,
+                -0.066,
+                0.087
+              ],
+              "parent": "leg_lower.R",
+              "tail_m": [
+                0.09569,
+                -0.08266,
+                0.04441
+              ]
+            },
+            "hand.L": {
+              "head_m": [
+                -0.026,
+                0.106,
+                0.308
+              ],
+              "parent": "arm_lower.L",
+              "tail_m": [
+                0.00051,
+                0.11547,
+                0.23604
+              ]
+            },
+            "hand.R": {
+              "head_m": [
+                0.038,
+                -0.112,
+                0.34
+              ],
+              "parent": "arm_lower.R",
+              "tail_m": [
+                0.06154,
+                -0.12009,
+                0.33485
+              ]
+            },
+            "head": {
+              "head_m": [
+                -0.003,
+                -0.0,
+                0.458
+              ],
+              "parent": "spine",
+              "tail_m": [
+                0.00098,
+                0.0,
+                0.56676
+              ]
+            },
+            "hips": {
+              "head_m": [
+                -0.005,
+                -0.0,
+                0.3
+              ],
+              "parent": "root",
+              "tail_m": [
+                -0.005,
+                -0.0,
+                0.33741
+              ]
+            },
+            "leg_lower.L": {
+              "head_m": [
+                0.003,
+                0.046,
+                0.198
+              ],
+              "parent": "leg_upper.L",
+              "tail_m": [
+                -0.008,
+                0.064,
+                0.087
+              ]
+            },
+            "leg_lower.R": {
+              "head_m": [
+                0.003,
+                -0.046,
+                0.198
+              ],
+              "parent": "leg_upper.R",
+              "tail_m": [
+                -0.008,
+                -0.066,
+                0.087
+              ]
+            },
+            "leg_upper.L": {
+              "head_m": [
+                0.003,
+                0.03,
+                0.302
+              ],
+              "parent": "hips",
+              "tail_m": [
+                0.003,
+                0.046,
+                0.198
+              ]
+            },
+            "leg_upper.R": {
+              "head_m": [
+                0.003,
+                -0.03,
+                0.302
+              ],
+              "parent": "hips",
+              "tail_m": [
+                0.003,
+                -0.046,
+                0.198
+              ]
+            },
+            "root": {
+              "head_m": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "parent": null,
+              "tail_m": [
+                0.0,
+                0.0,
+                0.30004
+              ]
+            },
+            "spine": {
+              "head_m": [
+                -0.005,
+                -0.0,
+                0.35
+              ],
+              "parent": "hips",
+              "tail_m": [
+                -0.005,
+                -0.0,
+                0.45884
+              ]
+            },
+            "weapon.R": {
+              "head_m": [
+                0.061,
+                -0.121,
+                0.334
+              ],
+              "parent": "hand.R",
+              "tail_m": [
+                0.06561,
+                -0.12561,
+                0.35857
+              ]
+            }
+          },
+          "meshes": {
+            "SK_Angel_H2_Body": {
+              "triangles": 36089,
+              "vertices": 20339
+            },
+            "SK_Angel_H2_Sword": {
+              "triangles": 2499,
+              "vertices": 1289
+            }
+          }
+        }
+      },
+      "sockets": [
+        {
+          "bone": "weapon.R",
+          "location_uu_for_ue": [
+            0,
+            0,
+            0
+          ],
+          "name": "Weapon",
+          "offset_blender_bone_local_uu": null,
+          "status": null,
+          "target_ue_component_uu": [
+            6.1,
+            12.1,
+            33.4
+          ]
+        },
+        {
+          "bone": "head",
+          "location_uu_for_ue": [
+            0.0,
+            -4.722,
+            0.528
+          ],
+          "name": "Head",
+          "offset_blender_bone_local_uu": null,
+          "status": null,
+          "target_ue_component_uu": [
+            0.4,
+            -0.0,
+            50.5
+          ]
+        }
+      ],
+      "source": "normalised by skeletal_adopt.py from art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/reports/ld-fbx-report.json (format h2-lookdev/1)"
+    }
+  }
+}

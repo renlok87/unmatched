@@ -1,0 +1,67 @@
+{
+ "asset_id": "ASSET-ANGEL-001",
+ "classes": {
+  "leather_smooth": {
+   "bc": [
+    0.0296,
+    0.0262,
+    0.0262
+   ],
+   "ymedClassHero": 0.02727,
+   "specular": 0.2,
+   "roughTypical": 0.58,
+   "roughLo": 0.5,
+   "roughHi": 0.66
+  },
+  "leather_worn": {
+   "bc": [
+    0.0296,
+    0.0262,
+    0.0262
+   ],
+   "ymedClassHero": 0.02724,
+   "specular": 0.2,
+   "roughTypical": 0.55
+  },
+  "metal_forged": {
+   "ymedClassHero": 0.50403
+  },
+  "silk": {
+   "bc": [
+    0.0382,
+    0.0331,
+    0.0369
+   ],
+   "ymedClassHero": 0.03383,
+   "sheenIntensity": 0.06,
+   "specular": 0.25
+  },
+  "skin": {
+   "bc": [
+    0.5271,
+    0.2918,
+    0.1812
+   ],
+   "ymedClassHero": 0.33421
+  },
+  "stone_base": {
+   "bc": [
+    0.0307,
+    0.0262,
+    0.0262
+   ],
+   "ymedClassHero": 0.02695
+  }
+ },
+ "generator": "tools/tripo-pipeline/blender/h2_bake/lookdev.py (ld_maps)",
+ "hero": "Angel",
+ "rebuild": "python tools/art/material_library/build_ue_inputs.py --skip-arrays --hero Angel --overrides <this file>",
+ "schema": "unmatched.um-v2-hero-overrides/1",
+ "why": {
+  "bc": "тон класса после подгонки к концепту (ld_measure); у металла — F0 героя",
+  "ymedClassHero": "медиана яркости BC героя в классе (README §4)"
+ },
+ "note_ue_r2": "UE look-dev r2 (2026-10-14, stage 7a pilot, by delegation): r1 frames (20261014-h2ld-ldc-ue/review/r1, measure-r1.json, exposure anchored on skin) put the dark classes 2-3.4x brighter than the concept (leather_smooth 2.97, silk 3.35, leather_worn 2.15) while the albedo ratio leather/skin already equals the concept's (0.08 vs 0.073): the excess is specular/sheen on near-black albedo. r2 lowers specular 0.5 -> 0.3 on both leathers and widens the leather_smooth lobe (rough 0.37 -> 0.5, as Medusa r3 0.58), and cuts the silk sheen 0.5 -> 0.15 (specular 0.35); bc / ymedClassHero of the look-dev run unchanged",
+ "derived_from": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2ld-ldc-ue/lut/T_UM_MatLUT_Angel_UE_r2.overrides.json",
+ "note_ue_r3": "UE look-dev r3 (2026-10-14): r2 measure (skin anchor) leather_smooth 1.72 / 1.22, leather_worn 1.65 / 1.16, silk 1.78 / 1.30 (board / reading exposure) - same direction once more: leather specular 0.3 -> 0.2, leather_smooth roughness 0.5 -> 0.58 (Medusa r3 values), leather_worn roughness 0.47 -> 0.55, silk sheen 0.15 -> 0.06 and specular 0.35 -> 0.25; metal_forged left as is (blade 1.5x the painted concept: readability of the blade at K2, the Blender look-dev chose metal_forged against a black blade)"
+}

@@ -1,0 +1,129 @@
+{
+  "schema": "unmatched.anim-acceptance/1",
+  "kind": "anim",
+  "asset_id": "ASSET-ANGEL-001",
+  "clip": "HitReact",
+  "cycle": "r1",
+  "date": "2026-10-14",
+  "previous_card": null,
+  "accepted_object": [
+    {
+      "path": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim/export/AM_Angel_HitReact.fbx",
+      "sha256": "6a66844d1cb7dd07873a9a4e0219f2c761aed4040ffebcc7117809669e46c7a0"
+    },
+    {
+      "path": "art/pipeline-candidates/ASSET-ANGEL-001/build-profiles/angel-h2anim.json",
+      "sha256": "b7ab2708b2722733a2a17b973d454b44f706b2ce96353f4440b01cd18b93b293"
+    }
+  ],
+  "frames": {
+    "dir": "art/pipeline-candidates/ASSET-ANGEL-001/evidence/acceptance-anim/20261014-r1/HitReact/frames",
+    "files": [
+      "Angel-HitReact-blender-sheet.jpg",
+      "Angel-HitReact-f00-front-ue-editor.jpg",
+      "Angel-HitReact-f00-q34-ue-editor.jpg",
+      "Angel-HitReact-f02-front-ue-editor.jpg",
+      "Angel-HitReact-f02-q34-ue-editor.jpg",
+      "Angel-HitReact-f04-front-ue-editor.jpg",
+      "Angel-HitReact-f04-q34-ue-editor.jpg",
+      "Angel-HitReact-f07-front-ue-editor.jpg",
+      "Angel-HitReact-f07-q34-ue-editor.jpg",
+      "Angel-HitReact-f10-front-ue-editor.jpg",
+      "Angel-HitReact-f10-q34-ue-editor.jpg",
+      "Angel-H2Anim-ue-sheet.jpg"
+    ]
+  },
+  "reports": [
+    "docs/art-pipeline/animation-library/validation-h2anim/AM_Angel_HitReact.validation.json",
+    "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim/reports/contact-HitReact.json",
+    "docs/art-pipeline/animation-library/clip-manifest.json",
+    "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim/reports/ue-import-clips.json",
+    "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim/reports/ue-measure-clips.json"
+  ],
+  "gates": {
+    "G-VALIDATE": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/validation-h2anim/AM_Angel_HitReact.validation.json",
+      "note": "AM_Angel_HitReact.validation.json#result = pass; AM_Angel_HitReact.validation.json#clip_sha256 = 6a66844d1cb7dd07873a9a4e0219f2c761aed4040ffebcc7117809669e46c7a0",
+      "source_defect": null
+    },
+    "G-CONTACT": {
+      "status": "PASS",
+      "source": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim/reports/contact-HitReact.json",
+      "note": "contact-HitReact.json#result = pass; contact-HitReact.json#fails = []",
+      "source_defect": null
+    },
+    "G-MANIFEST": {
+      "status": "PASS",
+      "source": "docs/art-pipeline/animation-library/clip-manifest.json",
+      "note": "clip-manifest.json#clips[18].id = ANG-HitReact; clip-manifest.json#clips[18].status = technically_imported; clip-manifest.json#clips[18].validation.result = pass; contact-HitReact.json#result = pass; clip-manifest.json#clips[18].source.files[0].sha256 = 6a66844d1cb7dd07873a9a4e0219f2c761aed4040ffebcc7117809669e46c7a0; ue-import-clips.json#fbx_sha256.AM_Angel_HitReact = 6a66844d1cb7dd07873a9a4e0219f2c761aed4040ffebcc7117809669e46c7a0; ue-import-clips.json#clips[2].imported_object_paths[0] = /Game/PipelineCandidates/Angel/H2Anim/AM_Angel_HitReact.AM_Angel_HitReact",
+      "source_defect": null
+    }
+  },
+  "scores": {
+    "R": {
+      "value": 1.5,
+      "rationale": "f00 → f02–f04 → f07–f10: отдача головы и корпуса, отклонение меча и возврат читаются с front и q34; лицо остаётся открытым, меч удерживается правой рукой. Мелкий огрех ритма: руки уже раскрыты на f02, на f04 отдельный последующий акцент слабый; левая кисть выходит вперёд и наружу вместо заявленного отлёта назад.",
+      "frames": [
+        "Angel-HitReact-blender-sheet.jpg",
+        "Angel-HitReact-f02-front-ue-editor.jpg",
+        "Angel-HitReact-f02-q34-ue-editor.jpg",
+        "Angel-HitReact-f04-q34-ue-editor.jpg",
+        "Angel-H2Anim-ue-sheet.jpg"
+      ]
+    },
+    "C": {
+      "value": 2,
+      "rationale": "На Blender-листе в видах left и q34 f02–f04 корпус и голова отклоняются назад от фронтального удара; это видно и на UE q34. Во всех пяти позах стопы сохраняют место и опору, подол не проваливается и не цепляет подставку. Почти прямые ноги и отсутствие приседа учтены как заданное ограничение пальто.",
+      "frames": [
+        "Angel-HitReact-blender-sheet.jpg",
+        "Angel-HitReact-f00-q34-ue-editor.jpg",
+        "Angel-HitReact-f02-q34-ue-editor.jpg",
+        "Angel-HitReact-f04-q34-ue-editor.jpg",
+        "Angel-HitReact-f10-q34-ue-editor.jpg"
+      ]
+    },
+    "D": {
+      "value": 2,
+      "rationale": "На крупных UE-кадрах f02 и f04 с front и q34 оболочка шеи, плеч, локтей и пальто цела; хват меча сохраняется, разрывов, дыр и заметного нового залома нет. Верхняя крышка контакта левого бедра не открывается. Ограниченный ход таза и отсутствие подъёма бедра соответствуют известным пределам скина.",
+      "frames": [
+        "Angel-HitReact-f02-front-ue-editor.jpg",
+        "Angel-HitReact-f02-q34-ue-editor.jpg",
+        "Angel-HitReact-f04-front-ue-editor.jpg",
+        "Angel-HitReact-f04-q34-ue-editor.jpg"
+      ]
+    },
+    "L": {
+      "value": 2,
+      "rationale": "Последовательность f04 → f07 → f10 показывает уменьшение отдачи и мягкое оседание: на f07 корпус и голова почти в rest, остаётся небольшой остаточный наклон меча; на f10 поза совпадает с f00 в обоих видах. Видимого скачка в финале нет.",
+      "frames": [
+        "Angel-HitReact-blender-sheet.jpg",
+        "Angel-HitReact-f00-front-ue-editor.jpg",
+        "Angel-HitReact-f00-q34-ue-editor.jpg",
+        "Angel-HitReact-f04-q34-ue-editor.jpg",
+        "Angel-HitReact-f07-front-ue-editor.jpg",
+        "Angel-HitReact-f07-q34-ue-editor.jpg",
+        "Angel-HitReact-f10-front-ue-editor.jpg",
+        "Angel-HitReact-f10-q34-ue-editor.jpg"
+      ]
+    }
+  },
+  "score": 9.4,
+  "verdict": "pass",
+  "verdict_reason": null,
+  "rework_fix_list": [],
+  "known_issues": [
+    {
+      "item": "R",
+      "frame": "Angel-HitReact-f02-q34-ue-editor.jpg",
+      "note": "Левая кисть на f02–f04 выходит вперёд и наружу; заявленный отлёт назад не выделен. Замечание учтено в R = 1,5; на игровом листе K1/K2 этапа 7 проверить читаемость отдачи корпуса при этом жесте."
+    }
+  ],
+  "acceptor": {
+    "profile": "Sol 6.1 xhigh",
+    "session_id": "codex:01a136f9-cc95-75c2-98fe-0342a170b7b7"
+  },
+  "executor_session_id": "claude-code:e8429502-d3da-4eca-a8a6-748a200f3ed6/agent:stage6-angel",
+  "decided_by": "delegated (ВР-реестр 2026-10-06)",
+  "status_note": "художественно принято, по делегированию (docs/game-design/decisions/2026-10-06-visual-delegated-decisions.md)"
+}

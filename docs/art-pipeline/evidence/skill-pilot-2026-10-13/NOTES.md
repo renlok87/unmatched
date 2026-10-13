@@ -101,6 +101,22 @@ Black Panther, Black Widow, Blackbeard, Bloody Mary, Bruce Lee, Buffy); they are
 | F80 | 7 | UE import check `figure_height_as_profile` took the figure top from the whole skeletal mesh (Angel's sword tip 55.909 uu vs head 55.000) — false FAIL for any raised weapon or antlers | **fixed** `cd3ee7fe`: optional `candidate.figure_top_part` in the import profile |
 | F81 | 7 | `h2anim_ue.py frames` read the removed `lightProfiles.cobble-probe` (ND-5, 2026-10-04) → KeyError; stage-6 UE frames impossible for every new hero | **fixed** `22c19667`: `--light-pinned <review report>` |
 | F82 | — | The Codex desktop app runs `git diff` every few seconds on the main checkout and twice left a stale `.git/index.lock` (00:12, 01:06), blocking commits | orchestration: check lock age + live git processes before removing; consider closing the app's diff view during runs |
+| F83 | 5 | A ragged base underside from the Tripo source is not fixable by `retopo`/`dense_regions` (QEM keeps the hanging bumps; 5.6 mm sag, 33 % of silhouette columns > 1 mm) | tool: opt-in base-bottom flatten in h2_bake (default off, Medusa determinism); acceptor's `tool` column should point to §9.3 «исходник Tripo: форма» |
+| F84 | 5 | `dense_regions` = one box per part (`st_retopo.py:224`); faces on the box border do not count — results land 9–13 % below target | HANDBOOK §4.2: overshoot the target or allow several regions |
+| F85 | 5 | Uniform tone gain has diminishing returns (AgX + clipping: 1.626/2.0/2.2 → 0.775/0.827/0.856), saturation drifts toward the family border; linear `gain_suggestion` ignores this; `tone.json` moves more than the visible EEVEE frames | HANDBOOK §4.4: iterate with the tone one-liner, not a single linear step |
+| F86 | 5 | Determinism tolerances in HANDBOOK §4.3 cover bake only — nothing for render-derived look-dev/TeamAccent reports | HANDBOOK §4.3: list render-derived reports as allowed to differ |
+| F87 | 5 | `work/timings.json` is overwritten when stages run one by one; Python stages have no `logs/<stage>.log` with a marker | tool: append timings; marker rule for Python stages |
+| F88 | 5 | seams blob sensitive to tiny bounds shifts (antler tip +0.2 mm → unchanged trunk blob 1–2 → 8 px, at the threshold) | tool: grid anchored to rest bounds snapped, or blob threshold with hysteresis |
+| F89 | 5 | Figure budget nearly spent (44 438 / 45 000) before choosing retopo values for a faceting fix | §9.3: check the budget headroom in `rig-report` first |
+| F90 | 7 | `ue_hero_lookdev` default debug decode reads silk (class 11) as metal_forged (class 3): silk measured 0 px until a `debug_calibration` block; hair (legacy_bake) undetectable on the black backdrop | ue-import-package §3.2: `debug_calibration` |
+| F91 | 7 | `um_masters build` fails on drift predating the run (RimColor in `M_UM_Figure`/`M_UM_BaseMarker` vs plan since FX-05 b425f06d); «repeat changes nothing» (§4.1) is false | decision needed: `--force` rebuild in a 7b window |
+| F92 | 7 | MI creation in ue-import leaves `M_UM_Figure_v2` dirty (as for Medusa/Merlin/Harpy); must be discarded with `reload_packages` before closing the editor | ue-import-package §4: say so |
+| F93 | 7 | Black leather / dark silk with library specular 0.5 and sheen 0.5 render 2–3× too bright in UE (Blender does not show it); Angel needed 3 LUT iterations (specular 0.2, sheen 0.06, leather roughness up) | HANDBOOK §4.4: dark-leather defaults (specular 0.2–0.3, sheen ≤ 0.1, roughness 0.55–0.6) |
+| F94 | 7 | 7a evidence location (`$E` under docs/art-pipeline/evidence) conflicts with the 7a write scope; the asset's own evidence folder was used | ue-import-package §1: one place |
+| F95 | 6/7 | Stage-6 validators miss the weapon rotating 60–90° inside a fixed fist (aim keys): Angel LungeAttack D=0 veto at clip acceptance | animation-vfx-sfx §6.3: weapon-to-hand rotation check + grip close-up on the Blender sheets |
+| F96 | 7 | `h2anim_ue frames` shoots the grey carrier mesh without the base — acceptors notice | default `--base`; prompt template line |
+| F97 | 7 | Acceptance frame copies 1920 px q88 (12.7 MB) vs HANDBOOK 1200 px q92 rule | tool/HANDBOOK: one rule |
+| F98 | 7 | UE look-dev side frame is shot from the opposite side to the concept's side view (concept faces left; UE side shows the right side) — side-by-side comparison misleads | review-config: side from `SIDE_VIEW` |
 
 ## Applied to the skill (stages 0–2, 2026-10-13)
 

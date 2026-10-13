@@ -1,0 +1,1747 @@
+{
+ "anti_aliasing_method": 4,
+ "assets": {
+  "base": "/Game/PipelineCandidates/Angel/H2LD/Meshes/SM_Angel_H2LD_Base",
+  "base_instance": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_Base",
+  "extra:MI_Angel_H2LD_DebugClass": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_DebugClass",
+  "extra:MI_Angel_H2LD_Neutral": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_Neutral",
+  "figure_instance": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD",
+  "skeletal": "/Game/PipelineCandidates/Angel/H2LD/Meshes/SK_Angel_H2LD",
+  "team:base:P1": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_Base_P1",
+  "team:base:P2": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_Base_P2",
+  "team:figure:P1": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_P1",
+  "team:figure:P2": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_P2",
+  "texture:BC": "/Game/PipelineCandidates/Angel/H2LD/Textures/T_Angel_H2LD_BC",
+  "texture:Edge": "/Game/PipelineCandidates/Angel/H2LD/Textures/T_Angel_H2LD_Edge",
+  "texture:LUT": "/Game/PipelineCandidates/Angel/H2LD/Textures/T_UM_MatLUT_Angel",
+  "texture:MatID": "/Game/PipelineCandidates/Angel/H2LD/Textures/T_Angel_H2LD_MatID",
+  "texture:N": "/Game/PipelineCandidates/Angel/H2LD/Textures/T_Angel_H2LD_N",
+  "texture:ORM": "/Game/PipelineCandidates/Angel/H2LD/Textures/T_Angel_H2LD_ORM",
+  "texture:TeamAccent": "/Game/PipelineCandidates/Angel/H2LD/Textures/T_Angel_H2LD_TeamAccent"
+ },
+ "cell": [
+  0.0,
+  50.0,
+  0.0
+ ],
+ "cleanup": {
+  "destroyed": [
+   "LDue figure - temporary",
+   "LDue base - temporary",
+   "LDue sky - temporary",
+   "LDue camera - temporary"
+  ],
+  "op": "cleanup"
+ },
+ "config": {
+  "anchor_zone": "skin",
+  "base_mi": {
+   "P1": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_Base_P1",
+   "P2": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_Base_P2",
+   "debug": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_Base",
+   "neutral": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_Base"
+  },
+  "concept": {
+   "back": "art/imagegen/concept-angel-codex/angel-back.png",
+   "front": "art/imagegen/concept-angel-codex/angel-front.png",
+   "side": "art/imagegen/concept-angel-codex/angel-side.png"
+  },
+  "concept_zones": "art/pipeline-candidates/ASSET-ANGEL-001/20261013-h2-lookdev/reports/measure-report.json",
+  "hero": "Angel",
+  "key_zones": [
+   "skin",
+   "silk"
+  ],
+  "light_profile_pinned": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/review/b3.2/review-b3.2.json",
+  "light_profile_pinned_note": "lightProfiles.cobble-probe left S08ArtBoardProfiles.json on 2026-10-04 (ND-5, ea09b99c); the light data recorded by the Harpy b3.2 capture = the last cobble-probe (rev 5: key 4.5 lux (-55, 30, 0), sky 11.2, EV100 2.05), byte-equal to ea09b99c^ lightProfiles.cobble-probe. Look-dev scene only (L_P17ControlScene), not an in-game board",
+  "min_px": 150,
+  "never_dye_zones": [
+   "metal_forged",
+   "skin",
+   "legacy_bake",
+   "silk"
+  ],
+  "note": "3d-model-pipeline stage 7a (pilot 2026-10-14): Angel H2LD on the canonical skeleton, M_UM_Figure_v2.1 UseTeamAccent, teams P1/P2 of the active C-11 palette, LUT iteration 0 (look-dev run as is). Frames: P1.7 Cobble control level, light profile cobble-probe, High, SP 100; neutral / P1 / P2 / DebugClass / plate, reading exposure -0.75 EV. Editor frames (diagnostic), not K1/K2 acceptance. Exposure anchor = skin (as the Blender ld_measure: the black leather coat is near the albedo floor); hue is not checked below concept saturation 0.1 (almost every Angel zone is near-grey).",
+  "reading_bias_ev": -0.75,
+  "render_gates": {
+   "legacy_bake": {
+    "v_max": 0.45
+   }
+  },
+  "render_regions": {
+   "legacy_bake": {
+    "y": [
+     0.0,
+     0.2
+    ]
+   }
+  },
+  "restore_level": "/Game/S08/S08Arena",
+  "run_dir": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2ld-ue-import",
+  "side_camera": "-X",
+  "teams": [
+   "P1",
+   "P2"
+  ],
+  "tolerance": {
+   "hue_deg": 12.0,
+   "hue_min_sat": 0.1,
+   "luma_ratio": 0.15,
+   "sat": 0.1
+  },
+  "tolerance_zones": [
+   "leather_smooth",
+   "silk",
+   "skin",
+   "leather_worn",
+   "metal_forged"
+  ],
+  "variants": {
+   "P1": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_P1",
+   "P2": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_P2",
+   "debug": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_DebugClass",
+   "neutral": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_Neutral"
+  },
+  "verify": {
+   "clips_folder": "/Game/PipelineCandidates/Angel/H2Anim",
+   "clips_reference": "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2anim/reports/ue-measure-clips.json",
+   "default_mi_key": "team:figure:P1",
+   "expect": {
+    "base_uv_channels": 2,
+    "bone_names": [
+     "SKEL_UM_Humanoid",
+     "root",
+     "hips",
+     "spine",
+     "head",
+     "arm_upper_L",
+     "arm_lower_L",
+     "hand_L",
+     "arm_upper_R",
+     "arm_lower_R",
+     "hand_R",
+     "weapon_R",
+     "leg_upper_L",
+     "leg_lower_L",
+     "foot_L",
+     "leg_upper_R",
+     "leg_lower_R",
+     "foot_R"
+    ],
+    "bones": 18,
+    "clips": 4,
+    "triangles": 38588
+   },
+   "folder": "/Game/PipelineCandidates/Angel/H2LD",
+   "height_uu": 55.9091,
+   "hero_root": "/Game/PipelineCandidates/Angel",
+   "instances": {
+    "extra:MI_Angel_H2LD_DebugClass": {
+     "parent": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD",
+     "scalars": {
+      "DebugView": 1.0
+     }
+    },
+    "extra:MI_Angel_H2LD_Neutral": {
+     "parent": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD",
+     "scalars": {
+      "TeamDye": 0.0
+     },
+     "vectors": {
+      "TeamColor": [
+       1.0,
+       1.0,
+       1.0,
+       1.0
+      ]
+     }
+    },
+    "figure_instance": {
+     "parent": "/Game/UM/Materials/v2/M_UM_Figure_v2",
+     "scalars": {
+      "TeamDye": 1.0,
+      "TeamDyeCeiling": 10.3164,
+      "TeamDyeGain": 22.567
+     },
+     "switches": {
+      "UseTeamAccent": true,
+      "UseUV1Metres": true
+     },
+     "textures": {
+      "EdgeMaskTexture": "/Game/PipelineCandidates/Angel/H2LD/Textures/T_Angel_H2LD_Edge",
+      "MatIDTexture": "/Game/PipelineCandidates/Angel/H2LD/Textures/T_Angel_H2LD_MatID",
+      "MatLUT": "/Game/PipelineCandidates/Angel/H2LD/Textures/T_UM_MatLUT_Angel",
+      "TeamAccentTexture": "/Game/PipelineCandidates/Angel/H2LD/Textures/T_Angel_H2LD_TeamAccent",
+      "TeamMaskTexture": "/Game/UM/Materials/Textures/T_UM_Mask_Black"
+     }
+    },
+    "team:base:P1": {
+     "parent": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_Base",
+     "vectors": {
+      "TeamColor": [
+       0.807,
+       0.5271,
+       0.1441,
+       1.0
+      ]
+     }
+    },
+    "team:base:P2": {
+     "parent": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_Base",
+     "vectors": {
+      "TeamColor": [
+       0.1022,
+       0.2122,
+       0.3467,
+       1.0
+      ]
+     }
+    },
+    "team:figure:P1": {
+     "parent": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD",
+     "switches": {
+      "UseTeamAccent": true
+     },
+     "vectors": {
+      "TeamColor": [
+       0.807,
+       0.5271,
+       0.1441,
+       1.0
+      ]
+     }
+    },
+    "team:figure:P2": {
+     "parent": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD",
+     "switches": {
+      "UseTeamAccent": true
+     },
+     "vectors": {
+      "TeamColor": [
+       0.1022,
+       0.2122,
+       0.3467,
+       1.0
+      ]
+     }
+    }
+   },
+   "skeleton": "/Game/PipelineCandidates/Angel/Rig/SK_Angel_Skeleton",
+   "textures": {
+    "BC": {
+     "compression_settings": "TC_DEFAULT",
+     "srgb": "True"
+    },
+    "Edge": {
+     "compression_settings": "TC_GRAYSCALE",
+     "srgb": "False"
+    },
+    "LUT": {
+     "compression_settings": "TC_HDR",
+     "filter": "TF_NEAREST",
+     "mip_gen_settings": "TMGS_NO_MIPMAPS",
+     "never_stream": "True",
+     "size": [
+      16,
+      16
+     ],
+     "srgb": "False"
+    },
+    "MatID": {
+     "compression_settings": "TC_GRAYSCALE",
+     "filter": "TF_NEAREST",
+     "mip_gen_settings": "TMGS_NO_MIPMAPS",
+     "never_stream": "True",
+     "srgb": "False"
+    },
+    "N": {
+     "compression_settings": "TC_NORMALMAP",
+     "srgb": "False"
+    },
+    "ORM": {
+     "compression_settings": "TC_MASKS",
+     "srgb": "False"
+    },
+    "TeamAccent": {
+     "compression_settings": "TC_GRAYSCALE",
+     "mip_gen_settings": "TMGS_FROM_TEXTURE_GROUP",
+     "size": [
+      2048,
+      2048
+     ],
+     "srgb": "False"
+    }
+   }
+  },
+  "zones": [
+   "leather_smooth",
+   "silk",
+   "skin",
+   "leather_worn",
+   "metal_forged",
+   "legacy_bake"
+  ]
+ },
+ "console": [
+  "sg.ViewDistanceQuality 2",
+  "sg.AntiAliasingQuality 2",
+  "sg.ShadowQuality 2",
+  "sg.GlobalIlluminationQuality 2",
+  "sg.ReflectionQuality 2",
+  "sg.PostProcessQuality 2",
+  "sg.TextureQuality 2",
+  "sg.EffectsQuality 2",
+  "sg.FoliageQuality 2",
+  "sg.ShadingQuality 2",
+  "ShowFlag.Grid 0",
+  "ShowFlag.BillboardSprites 0",
+  "ShowFlag.Volumes 0",
+  "ShowFlag.Bloom 0",
+  "ShowFlag.Bloom 2",
+  "sg.ViewDistanceQuality 3",
+  "sg.AntiAliasingQuality 3",
+  "sg.ShadowQuality 3",
+  "sg.GlobalIlluminationQuality 3",
+  "sg.ReflectionQuality 3",
+  "sg.PostProcessQuality 3",
+  "sg.TextureQuality 3",
+  "sg.EffectsQuality 3",
+  "sg.FoliageQuality 3",
+  "sg.ShadingQuality 3",
+  "ShowFlag.Grid 2",
+  "ShowFlag.BillboardSprites 2",
+  "ShowFlag.Volumes 2",
+  "ShowFlag.Bloom 2"
+ ],
+ "editor_lock": {
+  "owner": "ASSET-ANGEL-001-s7a",
+  "stale_taken": null,
+  "stamp": "ASSET-ANGEL-001-s7a 2026-10-13T20:14:18+00:00 ue_hero_lookdev review Angel r1",
+  "step": "ue_hero_lookdev review Angel r1",
+  "waited_s": 0.0
+ },
+ "exposure_reading": {
+  "exposure": {
+   "auto_exposure_bias": -0.75,
+   "label": "P17 exposure EV100 1.3 - fixed",
+   "max_brightness": 2.462290048599243,
+   "method": "<AutoExposureMethod.AEM_HISTOGRAM: 0>",
+   "min_brightness": 2.462290048599243
+  },
+  "op": "exposure"
+ },
+ "exposure_restored": {
+  "exposure": {
+   "auto_exposure_bias": 0.0,
+   "label": "P17 exposure EV100 1.3 - fixed",
+   "max_brightness": 2.462290048599243,
+   "method": "<AutoExposureMethod.AEM_HISTOGRAM: 0>",
+   "min_brightness": 2.462290048599243
+  },
+  "op": "exposure"
+ },
+ "finished_at": "2026-10-13T20:18:47+00:00",
+ "frames": {
+  "back-debug": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "angel-r1-back-debug.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_DebugClass",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3966,
+    0.3782,
+    0.3712
+   ],
+   "sha256": "8d02ce3e136f787338b9872d2abdd7779bc21e315442dfd9ba24f9c0ff01b14a",
+   "subject": "Angel (/Game/PipelineCandidates/Angel/H2LD/Meshes/SK_Angel_H2LD)",
+   "variant": "debug",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "back-neutral": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "angel-r1-back-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4077,
+    0.4136,
+    0.4134
+   ],
+   "sha256": "c3d4f78985e7ef67b2d2d9ef6a1a1ce7a6871476d7cd00b1f5dd462397e56661",
+   "subject": "Angel (/Game/PipelineCandidates/Angel/H2LD/Meshes/SK_Angel_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "back-p1": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "angel-r1-back-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4295,
+    0.4139,
+    0.4083
+   ],
+   "sha256": "fef80d5c10540beea1daaf98a035d4464b771444ae47cfbe85eae5e18d92d4ed",
+   "subject": "Angel (/Game/PipelineCandidates/Angel/H2LD/Meshes/SK_Angel_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "back-p2": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "angel-r1-back-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4424,
+    0.4198,
+    0.4192
+   ],
+   "sha256": "28bb25351555b959a6565e45ba1ce5fa67ca785a410067e1ff28aa32f2fd624e",
+   "subject": "Angel (/Game/PipelineCandidates/Angel/H2LD/Meshes/SK_Angel_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "back-plate": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "angel-r1-back-plate.png",
+   "fov": 35.0,
+   "material": null,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3963,
+    0.3692,
+    0.3807
+   ],
+   "sha256": "7dd80779a7ecd3d853a21226c7e7feb3e566e6e9441cd5baa9e3abe9abaae9d4",
+   "subject": "Angel (/Game/PipelineCandidates/Angel/H2LD/Meshes/SK_Angel_H2LD)",
+   "variant": "plate",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "back-reading": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "angel-r1-back-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3476,
+    0.3478,
+    0.3416
+   ],
+   "sha256": "25ecf67d2c72f631b64612d5798a87f6be4b97be232c48e03f17a48a4fec88e9",
+   "subject": "Angel (/Game/PipelineCandidates/Angel/H2LD/Meshes/SK_Angel_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     0.0,
+     -150.0,
+     29.0
+    ],
+    "kind": "back, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "back",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "front-debug": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "angel-r1-front-debug.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_DebugClass",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4278,
+    0.3923,
+    0.4001
+   ],
+   "sha256": "d44511a3fb420c08fa2afc8822010f75851fbcd2f754a5972cc1d9cd40e44283",
+   "subject": "Angel (/Game/PipelineCandidates/Angel/H2LD/Meshes/SK_Angel_H2LD)",
+   "variant": "debug",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "front-neutral": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "angel-r1-front-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4208,
+    0.4389,
+    0.4413
+   ],
+   "sha256": "6c07d3282a70de44a90bc9b1b83d9663ccba22e8e349d1b9a2065b01791c6c24",
+   "subject": "Angel (/Game/PipelineCandidates/Angel/H2LD/Meshes/SK_Angel_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "front-p1": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "angel-r1-front-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5038,
+    0.4487,
+    0.455
+   ],
+   "sha256": "eab9f8d6230f03d641d47a5468b670b3a229df865f3f94e7ba1f0e048240d64e",
+   "subject": "Angel (/Game/PipelineCandidates/Angel/H2LD/Meshes/SK_Angel_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "front-p2": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "angel-r1-front-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4928,
+    0.4525,
+    0.4544
+   ],
+   "sha256": "fc1e540e542c5b3686e53482641f93e6a9810d91d7a775adf015295c077a660a",
+   "subject": "Angel (/Game/PipelineCandidates/Angel/H2LD/Meshes/SK_Angel_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "front-plate": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "angel-r1-front-plate.png",
+   "fov": 35.0,
+   "material": null,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.4163,
+    0.4066,
+    0.4063
+   ],
+   "sha256": "5c6a9194c79c139848911c2c821e3ead213399df6ef50f6146d5a077d4202cd2",
+   "subject": "Angel (/Game/PipelineCandidates/Angel/H2LD/Meshes/SK_Angel_H2LD)",
+   "variant": "plate",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "front-reading": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "angel-r1-front-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3883,
+    0.3781,
+    0.3752
+   ],
+   "sha256": "d42667356bfee7525b535ba945b238e788be414e5a3cdad6b0d322075c3346a9",
+   "subject": "Angel (/Game/PipelineCandidates/Angel/H2LD/Meshes/SK_Angel_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     0.0,
+     250.0,
+     29.0
+    ],
+    "kind": "front, FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "front",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "k2-1p6-neutral": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "angel-r1-k2-1p6-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5419,
+    0.5347,
+    0.5254
+   ],
+   "sha256": "500dd265264811309d6a57f16dad3c400eef460aaf2c8100adc4b3ec5a60a5de",
+   "subject": "Angel (/Game/PipelineCandidates/Angel/H2LD/Meshes/SK_Angel_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "kind": "game camera K2 1.6x (1207 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "k2-1p6-p1": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "angel-r1-k2-1p6-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.55,
+    0.5269,
+    0.5222
+   ],
+   "sha256": "4e82a190153e7a4595dbbff1a9e7a926d9c92b4e7d592d0daff93f9be51e16e5",
+   "subject": "Angel (/Game/PipelineCandidates/Angel/H2LD/Meshes/SK_Angel_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "kind": "game camera K2 1.6x (1207 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "k2-1p6-p2": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "angel-r1-k2-1p6-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5569,
+    0.5417,
+    0.5267
+   ],
+   "sha256": "c2ec12e9c51f70d1a175f0d43ae04da7cb340ae23e19c6abdae9e38ab9da8d3d",
+   "subject": "Angel (/Game/PipelineCandidates/Angel/H2LD/Meshes/SK_Angel_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     742.3067586757126,
+     1016.7165174568131
+    ],
+    "kind": "game camera K2 1.6x (1207 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-1p6",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "k2-5x-neutral": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "angel-r1-k2-5x-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.7109,
+    0.6929,
+    0.6815
+   ],
+   "sha256": "d6b13e67f9119d904a0b1311f1b8833e5c84c130922c5e041341829333f3eb58",
+   "subject": "Angel (/Game/PipelineCandidates/Angel/H2LD/Meshes/SK_Angel_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "k2-5x-p1": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "angel-r1-k2-5x-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.7115,
+    0.695,
+    0.6981
+   ],
+   "sha256": "dfcb0e7ba6dffe83ee5ebe7f180df6ef0b858b4206f123272beb3adf5f0cdd00",
+   "subject": "Angel (/Game/PipelineCandidates/Angel/H2LD/Meshes/SK_Angel_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "k2-5x-p2": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "angel-r1-k2-5x-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.7105,
+    0.6846,
+    0.6875
+   ],
+   "sha256": "b89367a27a31e4864fcbc3ff40d150dc87a499a2d145891f89faf358ad2c65c8",
+   "subject": "Angel (/Game/PipelineCandidates/Angel/H2LD/Meshes/SK_Angel_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "k2-5x-reading": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "angel-r1-k2-5x-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.5488,
+    0.526,
+    0.5227
+   ],
+   "sha256": "c319dd2fb6b5d236e13930c302881077c015984e5df74d758c73873a393dddb6",
+   "subject": "Angel (/Game/PipelineCandidates/Angel/H2LD/Meshes/SK_Angel_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     0.0,
+     271.4005044315038,
+     344.19268909555086
+    ],
+    "kind": "game camera K2 5x (386 uu, pitch -55)",
+    "rot": [
+     -55.0,
+     -90.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "k2-5x",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "side-debug": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "angel-r1-side-debug.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_DebugClass",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3432,
+    0.3273,
+    0.3313
+   ],
+   "sha256": "efeaff223f85fb6984f24a6a4ac5097000246d0e43ccf676fd84f87bd71af36a",
+   "subject": "Angel (/Game/PipelineCandidates/Angel/H2LD/Meshes/SK_Angel_H2LD)",
+   "variant": "debug",
+   "view": {
+    "eye": [
+     -200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the right as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "side-neutral": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "angel-r1-side-neutral.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3677,
+    0.3523,
+    0.3538
+   ],
+   "sha256": "6a40ab08df6c1d47423d73b6133b459d62e473d89e59a439dfd12f54c3380ff0",
+   "subject": "Angel (/Game/PipelineCandidates/Angel/H2LD/Meshes/SK_Angel_H2LD)",
+   "variant": "neutral",
+   "view": {
+    "eye": [
+     -200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the right as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "side-p1": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "angel-r1-side-p1.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_P1",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.38,
+    0.3607,
+    0.3641
+   ],
+   "sha256": "4c66ea31431f2f4a51e227acc6f54af4007f99538481f0d6c871a21f6ce9cb17",
+   "subject": "Angel (/Game/PipelineCandidates/Angel/H2LD/Meshes/SK_Angel_H2LD)",
+   "variant": "P1",
+   "view": {
+    "eye": [
+     -200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the right as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "side-p2": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "angel-r1-side-p2.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_P2",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3918,
+    0.3652,
+    0.3671
+   ],
+   "sha256": "49c09f88b092b020c9d517e83113a0196c3962258f07607fc973c14a60b5b1c5",
+   "subject": "Angel (/Game/PipelineCandidates/Angel/H2LD/Meshes/SK_Angel_H2LD)",
+   "variant": "P2",
+   "view": {
+    "eye": [
+     -200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the right as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "side-plate": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "file": "angel-r1-side-plate.png",
+   "fov": 35.0,
+   "material": null,
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.332,
+    0.293,
+    0.3184
+   ],
+   "sha256": "1716da3b2a02710f39443943ab2e2188128ca06387dd4f04fa6162428a686826",
+   "subject": "Angel (/Game/PipelineCandidates/Angel/H2LD/Meshes/SK_Angel_H2LD)",
+   "variant": "plate",
+   "view": {
+    "eye": [
+     -200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the right as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  },
+  "side-reading": {
+   "crop_px": [
+    0,
+    36,
+    2033,
+    1180
+   ],
+   "exposure": "EV100 1.3 fixed + bias -0.75 (reading frame)",
+   "file": "angel-r1-side-reading.png",
+   "fov": 35.0,
+   "material": "/Game/PipelineCandidates/Angel/H2LD/Materials/MI_Angel_H2LD_Neutral",
+   "output_px": [
+    1920,
+    1080
+   ],
+   "settle_mean_abs_diff": [
+    0.3061,
+    0.308,
+    0.3099
+   ],
+   "sha256": "a818b523fd6c348ff574098e3554aa3905be87078464a988d8153d1d893afde8",
+   "subject": "Angel (/Game/PipelineCandidates/Angel/H2LD/Meshes/SK_Angel_H2LD)",
+   "variant": "reading",
+   "view": {
+    "eye": [
+     -200.0,
+     50.0,
+     29.0
+    ],
+    "kind": "side (weapon side, face to the right as the concept), FOV 35, 200 uu",
+    "rot": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "yaw": 90.0
+   },
+   "view_name": "side",
+   "viewport_px": [
+    2033,
+    1216
+   ]
+  }
+ },
+ "gi_reflections": {
+  "r.DynamicGlobalIlluminationMethod": 1,
+  "r.ReflectionMethod": 1
+ },
+ "key_rotation_pitch_yaw_roll": [
+  -55.0,
+  30.0,
+  0.0
+ ],
+ "kind": "EDITOR review frames (live UnrealEditor via MCP): not packaged, no HUD, no RENDER fingerprint, not K1/K2 acceptance",
+ "light_profile": {
+  "data": {
+   "directional": {
+    "castShadows": true,
+    "intensity": 4.5,
+    "name": "key",
+    "posUU": [
+     -350,
+     -150,
+     600
+    ],
+    "rotation": [
+     -55,
+     30,
+     0
+    ],
+    "shadow": {
+     "cascades": 2,
+     "contactShadowLength": 0.0,
+     "distanceUU": 3000
+    }
+   },
+   "exposure": {
+    "bias": 0.0,
+    "ev100": 2.05,
+    "maxBrightness": 4.14106,
+    "method": "histogram-fixed",
+    "minBrightness": 4.14106
+   },
+   "points": [
+    {
+     "intensity": 85,
+     "name": "warm",
+     "posUU": [
+      260,
+      -300,
+      250
+     ],
+     "radiusUU": 450,
+     "role": "warm"
+    }
+   ],
+   "sky": {
+    "calibration": "W4-A bench: K1 board ROI median luma of the packaged DX12 + Lumen frame matched to the P17 editor K1 (131.2): sky 8 -> 112.1, 12 -> 139.4, 16 -> 159.5; 11.2 = x1.4 (K2 5x cobble corner 105.2 in P17 matched at x1.5)",
+    "colorLinear": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "cubemap": "/Game/S08/Render/TC_S08_AmbientDome",
+    "intensity": 11.2,
+    "lowerHemisphereIsBlack": false,
+    "replaces": "point fill 700 cd at (0,-100,550), radius 1800 (pre-W4)",
+    "source": "cubemap"
+   },
+   "source": "ART-005 editor probe reproduced for the opt-in Cobble review (S08BoardActor before T3.2); measured candidate, not a lighting norm",
+   "units": {
+    "directional": "lux",
+    "point": "candelas"
+   }
+  },
+  "source": "art/pipeline-candidates/ASSET-HARPY-001/20260929-h3ld-ue/review/b3.2/review-b3.2.json light_profile.data (pinned: cobble-probe removed from unreal/Unmatched/Config/ArtBoards/S08ArtBoardProfiles.json by ND-5, 2026-10-04)"
+ },
+ "original_level": "/Game/S08/S08Arena",
+ "restored_level": "/Game/S08/S08Arena",
+ "restored_level_dirty": false,
+ "review_level": "/Game/ArtTests/P17ControlScene/L_P17ControlScene",
+ "review_level_dirty_after_reload": false,
+ "run_assets_dirty": {
+  "base": false,
+  "base_instance": false,
+  "extra:MI_Angel_H2LD_DebugClass": false,
+  "extra:MI_Angel_H2LD_Neutral": false,
+  "figure_instance": false,
+  "skeletal": false,
+  "team:base:P1": false,
+  "team:base:P2": false,
+  "team:figure:P1": false,
+  "team:figure:P2": false,
+  "texture:BC": false,
+  "texture:Edge": false,
+  "texture:LUT": false,
+  "texture:MatID": false,
+  "texture:N": false,
+  "texture:ORM": false,
+  "texture:TeamAccent": false
+ },
+ "scalability_after": {
+  "sg.AntiAliasingQuality": 3,
+  "sg.EffectsQuality": 3,
+  "sg.FoliageQuality": 3,
+  "sg.GlobalIlluminationQuality": 3,
+  "sg.PostProcessQuality": 3,
+  "sg.ReflectionQuality": 3,
+  "sg.ShadingQuality": 3,
+  "sg.ShadowQuality": 3,
+  "sg.TextureQuality": 3,
+  "sg.ViewDistanceQuality": 3
+ },
+ "scalability_before": {
+  "sg.AntiAliasingQuality": 3,
+  "sg.EffectsQuality": 3,
+  "sg.FoliageQuality": 3,
+  "sg.GlobalIlluminationQuality": 3,
+  "sg.PostProcessQuality": 3,
+  "sg.ReflectionQuality": 3,
+  "sg.ShadingQuality": 3,
+  "sg.ShadowQuality": 3,
+  "sg.TextureQuality": 3,
+  "sg.ViewDistanceQuality": 3
+ },
+ "scalability_during": {
+  "sg.AntiAliasingQuality": 2,
+  "sg.EffectsQuality": 2,
+  "sg.FoliageQuality": 2,
+  "sg.GlobalIlluminationQuality": 2,
+  "sg.PostProcessQuality": 2,
+  "sg.ReflectionQuality": 2,
+  "sg.ShadingQuality": 2,
+  "sg.ShadowQuality": 2,
+  "sg.TextureQuality": 2,
+  "sg.ViewDistanceQuality": 2
+ },
+ "schema": "unmatched.um-v2-hero-lookdev/1",
+ "screen_percentage": {
+  "r.Editor.Viewport.ScreenPercentage": 100,
+  "r.ScreenPercentage": 100
+ },
+ "setup": {
+  "hidden_review_actors": [
+   "P17 arthur base",
+   "P17 arthur figure",
+   "P17 barrel",
+   "P17 harpy1 base",
+   "P17 harpy1 figure",
+   "P17 harpy2 base",
+   "P17 harpy2 figure",
+   "P17 harpy3 base",
+   "P17 harpy3 figure",
+   "P17 medusa base",
+   "P17 medusa figure",
+   "P17 merlin base",
+   "P17 merlin figure"
+  ],
+  "level": "/Game/ArtTests/P17ControlScene/L_P17ControlScene",
+  "lights_after": [
+   {
+    "cast_shadows": true,
+    "class": "DirectionalLight",
+    "dynamic_shadow_cascades": 2,
+    "dynamic_shadow_distance_movable_light": 3000.0,
+    "hidden_in_editor": false,
+    "intensity": 4.5,
+    "label": "ART005 cool scene key - proposed",
+    "location": [
+     -350.0,
+     -150.0,
+     600.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     -55.0,
+     30.0,
+     -0.0
+    ]
+   },
+   {
+    "attenuation_radius": 1800.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": true,
+    "intensity": 0.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 neutral readability fill - review only",
+    "location": [
+     0.0,
+     100.0,
+     500.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "attenuation_radius": 450.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 85.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 warm lantern accent - proposed",
+    "location": [
+     260.0,
+     -300.0,
+     250.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "cast_shadows": true,
+    "class": "SkyLight",
+    "cubemap": "/Game/S08/Render/TC_S08_AmbientDome",
+    "hidden_in_editor": false,
+    "intensity": 11.2,
+    "label": "LDue sky - temporary",
+    "location": [
+     0.0,
+     0.0,
+     300.0
+    ],
+    "lower_hemisphere_is_black": false,
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "real_time_capture": false,
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "source_type": "<SkyLightSourceType.SLS_SPECIFIED_CUBEMAP: 1>"
+   }
+  ],
+  "lights_before": [
+   {
+    "cast_shadows": true,
+    "class": "DirectionalLight",
+    "dynamic_shadow_cascades": 4,
+    "dynamic_shadow_distance_movable_light": 40000.0,
+    "hidden_in_editor": false,
+    "intensity": 4.5,
+    "label": "ART005 cool scene key - proposed",
+    "location": [
+     -350.0,
+     -150.0,
+     600.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     -55.0,
+     30.0,
+     -0.0
+    ]
+   },
+   {
+    "attenuation_radius": 1800.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 700.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 neutral readability fill - review only",
+    "location": [
+     0.0,
+     100.0,
+     500.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "attenuation_radius": 450.0,
+    "cast_shadows": false,
+    "class": "PointLight",
+    "hidden_in_editor": false,
+    "intensity": 85.0,
+    "intensity_units": "<LightUnits.CANDELAS: 1>",
+    "label": "ART005 warm lantern accent - proposed",
+    "location": [
+     260.0,
+     -300.0,
+     250.0
+    ],
+    "mobility": "<ComponentMobility.MOVABLE: 2>",
+    "rotation_pitch_yaw_roll": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   }
+  ],
+  "op": "setup"
+ },
+ "started_at": "2026-10-13T20:14:18+00:00",
+ "tag": "r1",
+ "tool": "tools/art/material_library/ue_hero_lookdev.py",
+ "warmup_mean_abs_diff": [
+  0.6158,
+  0.4904,
+  0.4948,
+  0.4978,
+  0.4922,
+  0.4898,
+  0.4881,
+  0.4678,
+  0.4952,
+  0.498,
+  0.4677,
+  0.4757,
+  0.4944,
+  0.4901,
+  0.4934,
+  0.4874,
+  0.4942,
+  0.4984,
+  0.4951,
+  0.4956,
+  0.492,
+  0.4705,
+  0.4619,
+  0.4844,
+  0.4865,
+  0.4956,
+  0.5005,
+  0.4772,
+  0.4928,
+  0.4667,
+  0.4781,
+  0.4961,
+  0.4937,
+  0.495,
+  0.4955,
+  0.4913,
+  0.4906,
+  0.4912,
+  0.4906
+ ]
+}

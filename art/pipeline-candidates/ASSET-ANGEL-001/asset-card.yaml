@@ -89,3 +89,23 @@ STAGE6:
   vfx: "CUE-011 звезда и вспышка — работают сразу (вспышка через MI героя на M_UM_Figure_v2, этап 7); CUE-012 — сразу; CUE-013 пепел — MIC растворения de011 (этап 7); CUE-014 способность — нет, фолбэк «иконка способности в HUD без VFX и звука»; полевые FX — сразу"
   sfx: "HIT_TYPE BLADE — готовые банки CMB-HIT-BLADE и CMB-LUNGE-BLADE (03-sound-registry.csv); смерть — DTH-TEMPLATE (банка DTH-ANGEL нет); новых аудиофайлов нет; CharacterKey ANGEL и HitType BLADE в S08AudioBank.cpp — правка C++ этапа 7 (Р7-5); прослушивание пользователем не проводилось, принято по делегированию"
   acceptance: "карточки kind anim не писались: G-MANIFEST требует UE-импорт (решение оркестратора 2026-10-14); промпты приёмщика — evidence/acceptance-anim-prompts/"
+# --- этап 7a (исполнитель этапа 7a 2026-10-14; свой редактор, закрыт по PID при 0 dirty) ---
+STAGE7A:
+  editor: "свой UnrealEditor PID 43332 (-UeSession=angel-stage7 -ModelContextProtocolPort=8123 StartServer 8123 -unattended -nosplash, без -LiveCoding), закрыт taskkill без /F при 0 dirty-пакетов; лог C:/tmp/ASSET-ANGEL-001-stage7/editor.log"
+  import_profiles: ["build-profiles/angel-h2ld-lookdev-ue-import.json", "build-profiles/angel-h2ld-lookdev-ue-import-r2.json", "build-profiles/angel-h2ld-lookdev-ue-import-r3.json"]
+  import_run_live: "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2ld-ue-import-r3"
+  import_runs_history: "20261014-h2ld-ue-import (LUT i0) и -r2 (LUT r2): их ассеты удалены скриптом §4.4 перед следующим импортом"
+  review: "art/pipeline-candidates/ASSET-ANGEL-001/20261014-h2ld-ldc-ue (review-config.json, review/r1..r3, verify v1..v4, lut/r2, lut/r3)"
+  evidence_7a: "art/pipeline-candidates/ASSET-ANGEL-001/evidence/stage7a-20261014 (um-masters, снимки до/после)"
+  clip_acceptance_r1: "evidence/acceptance-anim/20261014-r1: Idle pass 8.8, HitReact pass 9.4, LungeAttack rework_blender 5.6 (вето D), DeathSettle rework_blender 7.5"
+decided_by_stage7a:
+  editor_flags: "delegated: -unattended против модальных диалогов на столе пользователя, без -LiveCoding — мьютекс LC не блокирует сборки других чекаутов"
+  evidence_dir: "delegated: 7a-evidence в evidence/stage7a-20261014 ассета, а не docs/art-pipeline/evidence/angel-20261014 (вне объёма записи 7a); README этапа — в 7b"
+  um_masters: "не пересобирались с --force: build отказал по чужому дрейфу RimColor DefaultValue (M_UM_Figure и M_UM_BaseMarker 1,1,1 против кремового плана FX-05 b425f06d); ue-import проверка um_masters_current PASS"
+  figure_top: "оркестратор 2026-10-14: candidate.figure_top_part tripo_part_4 (макушка 55.000 uu; остриё меча 55.909 uu — верх bounds)"
+  team_dye: "LDV-13 по ld-team-accent-report /1b: TeamDyeGain 22.567, TeamDyeCeiling 10.3164; маска TeamAccent из 20261013-h2-lookdev-teamaccent-b (П3-4a)"
+  review_config: "side_camera -X (лицо вправо на виде side); key_zones и anchor_zone — skin (как экспозиция ld_measure); hue_min_sat 0.1; legacy_bake: гейт v_max 0.45 и область y 0..0.2; debug_calibration по кадрам r1 (иначе рубашка silk декодировалась как metal_forged); light_profile_pinned — отчёт Harpy b3.2 (cobble-probe rev 5, удалён ND-5); verify.height_uu 55.9091 (верх bounds)"
+  lut_iterations: "лёгкий режим, 3 итерации: r1 (LUT look-dev) тёмные классы в 2-3.4 раза ярче концепта по коже (блик/sheen на почти чёрном альбедо); r2 specular кожи 0.3, roughness leather_smooth 0.5, sheen silk 0.15; r3 specular кожи 0.2, roughness 0.58/0.55, sheen 0.06, specular silk 0.25 — на экспозиции чтения leather_smooth 0.90, leather_worn 0.85, silk 0.89, skin 1.00 (в допуске), на экспозиции доски 1.2-1.3 (вердикт board light); metal_forged 1.5-1.7 не трогался (читаемость клинка)"
+  dirty_master: "M_UM_Figure_v2 помечается dirty при создании MI ue-import (как у Medusa/Merlin/Harpy); не сохранялся — reload_packages ASSUME_POSITIVE, затем 0 dirty"
+  acceptance_prompts: "добавлена строка о меше-носителе SK_Angel (серый, без подставки) и закреплённом свете; 4 приёмщика Sol 6.1 xhigh параллельно"
+  fighter_names: "S08FighterNames angel: hero Angel/Ангел, sidekick Faith/Фейт (помощник из scraped-data angel.json; русское имя — транслитерация по делегированию)"
