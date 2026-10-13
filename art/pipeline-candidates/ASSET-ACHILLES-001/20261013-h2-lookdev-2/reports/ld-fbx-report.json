@@ -1,0 +1,686 @@
+{
+  "checks": {
+    "bone_heads_tails_as_h21": {
+      "expected": "equal (5 decimals, export frame)",
+      "measured": "equal",
+      "passed": true
+    },
+    "bones_and_parents_as_h21": {
+      "expected": 17,
+      "measured": 17,
+      "passed": true
+    },
+    "export_frame_face_points_along_rotated_front_ue_plus_x": {
+      "expected": "dot > 0.5, front = +X",
+      "measured": {
+        "face_normal": [
+          0.6676,
+          -0.0056,
+          -0.0241
+        ],
+        "face_polygons": 1075,
+        "rotated_front": [
+          1.0,
+          -0.0,
+          0.0
+        ]
+      },
+      "passed": true
+    },
+    "positions_and_uv0_per_loop_as_h21": {
+      "expected": "<= 1e-6 m / 1e-7 UV",
+      "measured": {
+        "SK_Achilles_H2_Body": {
+          "max_abs_position_diff": 0.0,
+          "max_abs_uv0_diff": 0.0
+        },
+        "SK_Achilles_H2_Spear": {
+          "max_abs_position_diff": 0.0,
+          "max_abs_uv0_diff": 0.0
+        },
+        "SM_Achilles_H2_Base": {
+          "max_abs_position_diff": 0.0,
+          "max_abs_uv0_diff": 0.0
+        }
+      },
+      "passed": true
+    },
+    "triangles_as_h21": {
+      "expected": {
+        "SK_Achilles_H2_Body": 43506,
+        "SK_Achilles_H2_Spear": 1200,
+        "SM_Achilles_H2_Base": 1348
+      },
+      "measured": {
+        "SK_Achilles_H2_Body": 43506,
+        "SK_Achilles_H2_Spear": 1200,
+        "SM_Achilles_H2_Base": 1348
+      },
+      "passed": true
+    },
+    "uv1_metres_density_readback": {
+      "expected": "area(UV1) / area3D = 1 +- 0.02 (p1..p99 of islands)",
+      "measured": {
+        "SK_Achilles_H2_Body": {
+          "islands": 856,
+          "ratio_p1_p50_p99": [
+            0.99997,
+            1.0,
+            1.00002
+          ]
+        },
+        "SK_Achilles_H2_Spear": {
+          "islands": 197,
+          "ratio_p1_p50_p99": [
+            0.99991,
+            1.0,
+            1.00008
+          ]
+        },
+        "SM_Achilles_H2_Base": {
+          "islands": 17,
+          "ratio_p1_p50_p99": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        }
+      },
+      "passed": true
+    },
+    "uv_layers_order": {
+      "expected": [
+        "UVMap",
+        "UV1_m"
+      ],
+      "measured": {
+        "SK_Achilles_H2_Body": [
+          "UVMap",
+          "UV1_m"
+        ],
+        "SK_Achilles_H2_Spear": [
+          "UVMap",
+          "UV1_m"
+        ],
+        "SM_Achilles_H2_Base": [
+          "UVMap",
+          "UV1_m"
+        ]
+      },
+      "passed": true
+    }
+  },
+  "claims": {
+    "art_accepted": false,
+    "game_ready": false
+  },
+  "exports": {
+    "base_fbx": {
+      "bytes": 82236,
+      "path": "art/pipeline-candidates/ASSET-ACHILLES-001/20261013-h2-lookdev-2/export/SM_Achilles_H2LD_Base.fbx",
+      "sha256": "0014d3e2573561897b8ac926942fba343cc890c227fe959bb1b3bce83a9c2031"
+    },
+    "settings": {
+      "add_leaf_bones": false,
+      "apply_scale_options": "FBX_SCALE_UNITS",
+      "apply_unit_scale": true,
+      "axis_forward": "-Y",
+      "axis_up": "Z",
+      "bake_anim": false,
+      "bone_rotation": "EditBone.transform(roll=True): rest pose rotated rigidly",
+      "colors_type": "SRGB",
+      "creation_time_pinned": "2000-01-01T00:00:00",
+      "data_scale": 100.0,
+      "deviations_from_preset": {
+        "bake_anim": "off: the candidate FBX carries no clips",
+        "path_mode": "STRIP instead of AUTO: bare texture names; textures reach UE from the atlas stage, not through the FBX"
+      },
+      "embed_textures": false,
+      "export_space_rotation_z_degrees": 90.0,
+      "mesh_smooth_type": "FACE",
+      "path_mode": "STRIP",
+      "preset": {
+        "name": "UM_FBX_v1",
+        "path": "blender/_tools/presets/UM_FBX_v1.json",
+        "sha256": "d6166938c5d73185d607135b18af1d2ab7a154e0ea7cc8cd02fa9f86802d6bb9",
+        "version": "1.0.0"
+      },
+      "primary_bone_axis": "Y",
+      "secondary_bone_axis": "X",
+      "unit_scale_factor_after_patch": 1.0,
+      "use_triangles": true
+    },
+    "skeletal_fbx": {
+      "bytes": 2181676,
+      "path": "art/pipeline-candidates/ASSET-ACHILLES-001/20261013-h2-lookdev-2/export/SK_Achilles_H2LD.fbx",
+      "sha256": "c12b967f20e118a210c6f10dc38fe283c943f75f24a95afc8901396c2d34f319"
+    }
+  },
+  "failed": [],
+  "meshes_pre_export": {
+    "SK_Achilles_H2_Body": {
+      "color_attributes": [],
+      "has_custom_normals": true,
+      "material_slots": [
+        "M_Achilles_H2_Atlas"
+      ],
+      "near_degenerate_area_cm2_below": 0.0001,
+      "near_degenerate_triangles": 1,
+      "polygons": 43506,
+      "triangles": 43506,
+      "uv0_in_unit_square": true,
+      "uv_layers": [
+        "UVMap",
+        "UV1_m"
+      ],
+      "vertices": 24125
+    },
+    "SK_Achilles_H2_Spear": {
+      "color_attributes": [],
+      "has_custom_normals": true,
+      "material_slots": [
+        "M_Achilles_H2_Atlas"
+      ],
+      "near_degenerate_area_cm2_below": 0.0001,
+      "near_degenerate_triangles": 1,
+      "polygons": 1200,
+      "triangles": 1200,
+      "uv0_in_unit_square": true,
+      "uv_layers": [
+        "UVMap",
+        "UV1_m"
+      ],
+      "vertices": 599
+    },
+    "SM_Achilles_H2_Base": {
+      "color_attributes": [],
+      "has_custom_normals": true,
+      "material_slots": [
+        "M_Achilles_H2_Atlas"
+      ],
+      "near_degenerate_area_cm2_below": 0.0001,
+      "near_degenerate_triangles": 0,
+      "polygons": 1348,
+      "triangles": 1348,
+      "uv0_in_unit_square": true,
+      "uv_layers": [
+        "UVMap",
+        "UV1_m"
+      ],
+      "vertices": 792
+    }
+  },
+  "passed": true,
+  "roundtrip": {
+    "ld": {
+      "base": {
+        "armature_objects": [],
+        "armatures": 0,
+        "bones": {},
+        "meshes": {
+          "SM_Achilles_H2_Base": {
+            "bounds_m": {
+              "max": [
+                0.14971,
+                0.14999,
+                0.05805
+              ],
+              "min": [
+                -0.14997,
+                -0.14971,
+                3e-05
+              ]
+            },
+            "color_attributes": [],
+            "has_custom_normals": true,
+            "material_slots": [
+              "M_Achilles_H2_Atlas"
+            ],
+            "near_degenerate_area_cm2_below": 0.0001,
+            "near_degenerate_triangles": 0,
+            "polygons": 1348,
+            "triangles": 1348,
+            "uv0_in_unit_square": true,
+            "uv_layers": [
+              "UVMap",
+              "UV1_m"
+            ],
+            "vertices": 792,
+            "weights": null
+          }
+        }
+      },
+      "skeletal": {
+        "armature_objects": [
+          "SKEL_UM_Humanoid"
+        ],
+        "armatures": 1,
+        "bones": {
+          "arm_lower.L": {
+            "head_m": [
+              -0.012,
+              0.074,
+              0.345
+            ],
+            "parent": "arm_upper.L",
+            "tail_m": [
+              0.015,
+              0.098,
+              0.299
+            ]
+          },
+          "arm_lower.R": {
+            "head_m": [
+              -0.012,
+              -0.07,
+              0.342
+            ],
+            "parent": "arm_upper.R",
+            "tail_m": [
+              0.046,
+              -0.095,
+              0.336
+            ]
+          },
+          "arm_upper.L": {
+            "head_m": [
+              -0.005,
+              0.059,
+              0.391
+            ],
+            "parent": "spine",
+            "tail_m": [
+              -0.012,
+              0.074,
+              0.345
+            ]
+          },
+          "arm_upper.R": {
+            "head_m": [
+              -0.005,
+              -0.049,
+              0.394
+            ],
+            "parent": "spine",
+            "tail_m": [
+              -0.012,
+              -0.07,
+              0.342
+            ]
+          },
+          "foot.L": {
+            "head_m": [
+              -0.014,
+              0.062,
+              0.086
+            ],
+            "parent": "leg_lower.L",
+            "tail_m": [
+              0.06679,
+              0.07781,
+              0.04736
+            ]
+          },
+          "foot.R": {
+            "head_m": [
+              -0.014,
+              -0.053,
+              0.086
+            ],
+            "parent": "leg_lower.R",
+            "tail_m": [
+              0.06673,
+              -0.06879,
+              0.04739
+            ]
+          },
+          "hand.L": {
+            "head_m": [
+              0.015,
+              0.098,
+              0.299
+            ],
+            "parent": "arm_lower.L",
+            "tail_m": [
+              0.04446,
+              0.1032,
+              0.24874
+            ]
+          },
+          "hand.R": {
+            "head_m": [
+              0.046,
+              -0.095,
+              0.336
+            ],
+            "parent": "arm_lower.R",
+            "tail_m": [
+              0.07154,
+              -0.09682,
+              0.33691
+            ]
+          },
+          "head": {
+            "head_m": [
+              -0.012,
+              0.004,
+              0.422
+            ],
+            "parent": "spine",
+            "tail_m": [
+              -0.00959,
+              0.004,
+              0.53411
+            ]
+          },
+          "hips": {
+            "head_m": [
+              -0.006,
+              0.004,
+              0.25
+            ],
+            "parent": "root",
+            "tail_m": [
+              -0.006,
+              0.004,
+              0.2884
+            ]
+          },
+          "leg_lower.L": {
+            "head_m": [
+              -0.009,
+              0.05,
+              0.176
+            ],
+            "parent": "leg_upper.L",
+            "tail_m": [
+              -0.014,
+              0.062,
+              0.086
+            ]
+          },
+          "leg_lower.R": {
+            "head_m": [
+              -0.008,
+              -0.042,
+              0.176
+            ],
+            "parent": "leg_upper.R",
+            "tail_m": [
+              -0.014,
+              -0.053,
+              0.086
+            ]
+          },
+          "leg_upper.L": {
+            "head_m": [
+              -0.005,
+              0.036,
+              0.252
+            ],
+            "parent": "hips",
+            "tail_m": [
+              -0.009,
+              0.05,
+              0.176
+            ]
+          },
+          "leg_upper.R": {
+            "head_m": [
+              -0.004,
+              -0.029,
+              0.252
+            ],
+            "parent": "hips",
+            "tail_m": [
+              -0.008,
+              -0.042,
+              0.176
+            ]
+          },
+          "root": {
+            "head_m": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "parent": null,
+            "tail_m": [
+              0.0,
+              0.0,
+              0.2501
+            ]
+          },
+          "spine": {
+            "head_m": [
+              -0.006,
+              0.004,
+              0.3
+            ],
+            "parent": "hips",
+            "tail_m": [
+              -0.006,
+              0.004,
+              0.41213
+            ]
+          },
+          "weapon.R": {
+            "head_m": [
+              0.0716,
+              -0.0952,
+              0.337
+            ],
+            "parent": "hand.R",
+            "tail_m": [
+              0.07191,
+              -0.09587,
+              0.36261
+            ]
+          }
+        },
+        "meshes": {
+          "SK_Achilles_H2_Body": {
+            "bounds_m": {
+              "max": [
+                0.09642,
+                0.15098,
+                0.54993
+              ],
+              "min": [
+                -0.08258,
+                -0.11583,
+                0.05674
+              ]
+            },
+            "color_attributes": [],
+            "has_custom_normals": true,
+            "material_slots": [
+              "M_Achilles_H2_Atlas"
+            ],
+            "near_degenerate_area_cm2_below": 0.0001,
+            "near_degenerate_triangles": 1,
+            "polygons": 43506,
+            "triangles": 43506,
+            "uv0_in_unit_square": true,
+            "uv_layers": [
+              "UVMap",
+              "UV1_m"
+            ],
+            "vertices": 24125,
+            "weights": {
+              "bones_used": {
+                "arm_lower.L": 2268,
+                "arm_lower.R": 717,
+                "arm_upper.L": 547,
+                "arm_upper.R": 521,
+                "foot.L": 1746,
+                "foot.R": 836,
+                "hand.L": 880,
+                "hand.R": 478,
+                "head": 4212,
+                "hips": 5344,
+                "leg_lower.L": 1351,
+                "leg_lower.R": 1191,
+                "leg_upper.L": 1879,
+                "leg_upper.R": 1972,
+                "spine": 6443,
+                "weapon.R": 440
+              },
+              "max_influences": 3,
+              "not_normalised_vertices": 0,
+              "unweighted_vertices": 0,
+              "vertices": 24125,
+              "weight_share": {
+                "arm_lower.L": 0.0841,
+                "arm_lower.R": 0.0252,
+                "arm_upper.L": 0.0173,
+                "arm_upper.R": 0.0179,
+                "foot.L": 0.0645,
+                "foot.R": 0.029,
+                "hand.L": 0.0317,
+                "hand.R": 0.0167,
+                "head": 0.1675,
+                "hips": 0.1616,
+                "leg_lower.L": 0.0435,
+                "leg_lower.R": 0.0409,
+                "leg_upper.L": 0.025,
+                "leg_upper.R": 0.0273,
+                "spine": 0.2298,
+                "weapon.R": 0.0182
+              }
+            }
+          },
+          "SK_Achilles_H2_Spear": {
+            "bounds_m": {
+              "max": [
+                0.08072,
+                -0.08977,
+                0.53745
+              ],
+              "min": [
+                0.06552,
+                -0.1126,
+                0.34851
+              ]
+            },
+            "color_attributes": [],
+            "has_custom_normals": true,
+            "material_slots": [
+              "M_Achilles_H2_Atlas"
+            ],
+            "near_degenerate_area_cm2_below": 0.0001,
+            "near_degenerate_triangles": 1,
+            "polygons": 1200,
+            "triangles": 1200,
+            "uv0_in_unit_square": true,
+            "uv_layers": [
+              "UVMap",
+              "UV1_m"
+            ],
+            "vertices": 599,
+            "weights": {
+              "bones_used": {
+                "weapon.R": 599
+              },
+              "max_influences": 1,
+              "not_normalised_vertices": 0,
+              "unweighted_vertices": 0,
+              "vertices": 599,
+              "weight_share": {
+                "weapon.R": 1.0
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "stage": "ld_fbx",
+  "status": "измерено",
+  "ue_import_notes": [
+    "UV1_m — второй UV-канал (индекс 1): при импорте SM подставки выключить Generate Lightmap UVs или DstLightmapIndex >= 2, иначе UE перезапишет UV1 картой освещения",
+    "материальный слот тот же (M_Achilles_H2_Atlas), назначается MI v2"
+  ],
+  "uv1": {
+    "density_tolerance": 0.02,
+    "layer_name": "UV1_m",
+    "method": "как Medusa",
+    "per_mesh": {
+      "SK_Achilles_H2_Body": {
+        "density_ratio_min_max": [
+          1.0,
+          1.0
+        ],
+        "half_float_step_at_abs_max_mm": 0.061,
+        "islands": 856,
+        "metres_per_uv_unit_p5_p50_p95": [
+          0.49917,
+          0.99834,
+          0.99928
+        ],
+        "uv1_abs_max_m": 0.1019,
+        "uv1_extent": [
+          [
+            -0.1019,
+            -0.1019
+          ],
+          [
+            0.1019,
+            0.1019
+          ]
+        ],
+        "zero_area_islands": 0
+      },
+      "SK_Achilles_H2_Spear": {
+        "density_ratio_min_max": [
+          1.0,
+          1.0
+        ],
+        "half_float_step_at_abs_max_mm": 0.0305,
+        "islands": 197,
+        "metres_per_uv_unit_p5_p50_p95": [
+          0.66554,
+          0.66556,
+          0.66559
+        ],
+        "uv1_abs_max_m": 0.0368,
+        "uv1_extent": [
+          [
+            -0.034,
+            -0.0368
+          ],
+          [
+            0.034,
+            0.0368
+          ]
+        ],
+        "zero_area_islands": 0
+      },
+      "SM_Achilles_H2_Base": {
+        "density_ratio_min_max": [
+          1.0,
+          1.0
+        ],
+        "half_float_step_at_abs_max_mm": 0.1221,
+        "islands": 17,
+        "metres_per_uv_unit_p5_p50_p95": [
+          2.21853,
+          2.21854,
+          2.21854
+        ],
+        "uv1_abs_max_m": 0.1394,
+        "uv1_extent": [
+          [
+            -0.1394,
+            -0.137
+          ],
+          [
+            0.1394,
+            0.137
+          ]
+        ],
+        "zero_area_islands": 0
+      }
+    }
+  }
+}

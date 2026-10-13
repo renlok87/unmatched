@@ -81,6 +81,15 @@ Black Panther, Black Widow, Blackbeard, Bloody Mary, Bruce Lee, Buffy); they are
 | F60 | 3 | `compose.py` crashes on empty `preview.closeups`; TeamAccent manifest refuses a profile outside the repo | tool fixes |
 | F61 | 3 | Caps on saddle-shaped shoulder openings fail hidden-at-rest (216 px); junction weights work | HANDBOOK closure table: junction weights as the alternative |
 | F62 | 3 | Preview transparency bounce limit turns stacked culled layers black (false artefact in `roots_base` close-up) | tool: raise the bounce limit |
+| F63 | 3 | F14 premise was wrong: Achilles' cloak is a thick shell with a hole cut on the inside (fixed by a 92 cm contact cap); the kilt is the real single sheet | HANDBOOK §4.2 closure: probe part thickness with a ray before choosing cap vs shell |
+| F64 | 3 | П3-3 implemented: opt-in `rig.cloth_shell {parts, offset_mm}` (inner copy 0.3 mm, reversed winding, same UV, copied weights, bridged rim) in the rig stage; Medusa rig FBX byte-identical; 35 tests | **tool** `st_rig.add_cloth_shell`, `profile.cloth_shell`; HANDBOOK §4.2 to document |
+| F65 | 3 | Swung weapon leaves the seams ray grid (rest bounds + margin): false 37 px blob; `seams.raycast.margin_m` 0.2 (also F55) | tool: posed bounds |
+| F66 | 3 | `lookdev.py` `clean_labels` depends on class order and leaves orphan specks (accent leaked into a bronze core) | tool: iterate until stable |
+| F67 | 3 | `lookdev_accent.py` ribbon takes one class (sandals 4.3 % could not be added); default opening 8/5000 erases thin straps | tool: several ribbons; document r 3 / 1000 |
+| F68 | 3 | `ta_report` front-and-back visibility and the 90 % dress check do not fit caped, armoured heroes | decision П3-4b |
+| F69 | 3 | seams counts a flipped real face lying 0.1 mm over the part's own cap as a hole | tool: pass when a same-part cap is within ε behind |
+| F70 | 3 | Triangle budget: targets + caps + 2× shelled parts must stay ≤ 45k (Achilles 44 706) | HANDBOOK §4.2 retopo |
+| F71 | 3 | Bronze: full tone correction gives pale brass, half gives darker bronze (0.73); leather stuck at the class floor (1.75× too bright); H2LD bronze reads coppery and glossy vs the concept's matte gold | HANDBOOK §4.4: damp metal gains (the concept's metal is paint, not PBR); UE capture decides |
 
 ## Applied to the skill (stages 0–2, 2026-10-13)
 

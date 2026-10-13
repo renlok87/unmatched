@@ -21,6 +21,19 @@ within band_m of its rim loop on `with` blend their weights towards the rule of 
 the cloth band follows the neighbour (the collar hugs the neck). Contact caps (h2_cap faces from the close stage) are
 weighted like any vertex of their part.
 
+Cloth shell (optional profile rig.cloth_shell = {"parts": [...], "offset_mm": x}, decision П3-3 of the Achilles pilot
+2026-10-13, docs/game-design/decisions/2026-10-13-pilot-stage3-delegated-decisions.md): hero materials are one-sided
+opaque, so a single-sheet cloth part (Achilles' kilt) shows its inside as a see-through hole when a pose opens it. After
+the weights and the continuity report, every listed part gets an inner copy of its real (non-cap) faces: same UV0 (the
+same texels: added after uv/bake, so it takes no atlas space and is not baked), reversed winding (normals inward),
+vertex groups copied from the source vertex (it deforms exactly with the sheet), every vertex moved by offset_mm against
+its source vertex normal (area-weighted normal of the real faces); every rim edge of the sheet (one real face) gets a
+bridge (two triangles: the figure stays all-triangles) to its copy, so the shell is closed and manifold along the rim
+(UV of the rim edge on both sides: the rim colour; no coincident faces — a rim kept in place left coplanar duplicates that the seams ray test hit at random). The
+shelled part has no rim loops left: the seams loop gate no longer lists them, the see-through test judges the shell.
+Every later stage (export, probes, seams, preview, look-dev, TeamAccent) reads the shelled mesh. Without the key nothing
+runs: the profiles written before it (Medusa, Arthur, Merlin, Harpy) give byte-identical FBX (tests/test_cloth_shell.py).
+
 Export: candidate_build.core (read only) — UM_FBX_v1 rotation +90 deg about Z with EditBone.transform(roll=True),
 data x100, FBX_SCALE_UNITS, Triangulate, UnitScaleFactor patched to 1.0, determinism pins; path_mode STRIP."""
 
@@ -186,6 +199,60 @@ def weight_part(obj, rule, arm, rig, cache, junctions=()):
     return per_vertex
 
 
+def add_cloth_shell(obj, offset_m, cap_attr="h2_cap"):
+    """Inner copy of the real faces of obj + bridge quads along its rim (module docstring, "Cloth shell")."""
+    import bmesh
+
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    bm.normal_update()
+    bm.verts.ensure_lookup_table()
+    cap = bm.faces.layers.int.get(cap_attr)
+    deform = bm.verts.layers.deform.active
+    uv_layers = list(bm.loops.layers.uv.values())
+    real = [f for f in bm.faces if cap is None or f[cap] == 0]
+    real_set = set(real)
+    used = sorted({v.index for f in real for v in f.verts})
+    rim_loops = []  # (loop of the real face along each rim edge: its vertex -> next vertex is the face winding)
+    for e in bm.edges:
+        lf = [f for f in e.link_faces if f in real_set]
+        if len(lf) == 1:
+            rim_loops.append(next(l for l in lf[0].loops if l.edge == e))
+    normal = {}
+    for i in used:  # area-weighted normal of the real faces around the vertex (caps excluded)
+        n = Vector((0.0, 0.0, 0.0))
+        for f in bm.verts[i].link_faces:
+            if f in real_set:
+                n += f.normal * f.calc_area()
+        normal[i] = n.normalized() if n.length > 0 else n
+    new = {}
+    for i, v in [(i, bm.verts[i]) for i in used]:  # source verts before verts.new() invalidates the lookup table
+        nv = bm.verts.new(v.co - normal[i] * offset_m)
+        if deform is not None:
+            for g, w in v[deform].items():
+                nv[deform][g] = w
+        new[i] = nv
+
+    def copy_uv(nf, src_loops):
+        for nl, sl in zip(nf.loops, src_loops):
+            for layer in uv_layers:
+                nl[layer].uv = sl[layer].uv
+
+    for f in real:
+        nf = bm.faces.new([new[v.index] for v in reversed(f.verts)], f)  # example f: face attributes (h2_cap 0, smooth)
+        copy_uv(nf, list(reversed(f.loops)))
+    for l in rim_loops:  # bridge quad (b, a, a', b'): (b, a) against the rim face, (a', b') against the reversed copy;
+        a, b = l.vert, l.link_loop_next.vert  # two triangles: the figure stays all-triangles (FBX read-back face count)
+        nb = l.link_loop_next
+        copy_uv(bm.faces.new([b, a, new[a.index]], l.face), [nb, l, l])  # the rim colour on both sides (zero UV area)
+        copy_uv(bm.faces.new([b, new[a.index], new[b.index]], l.face), [nb, l, nb])
+    bm.to_mesh(obj.data)
+    bm.free()
+    obj.data.update()
+    return {"faces": len(real), "vertices": len(used), "rim_edges_bridged": len(rim_loops),
+            "offset_mm": U.r(offset_m * 1000.0, 4)}
+
+
 def continuity(parts_obj, weights, names, radius):
     """For vertices of part A within `radius` of a vertex of part B: L1 distance of their weight vectors."""
     kds = {}
@@ -269,6 +336,9 @@ def run(params, profile):
             continue
         weights[n] = weight_part(lp[n], rig["weights"][n], arm, rig, cache, junctions.get(n, ()))
     cont = continuity(lp, weights, sorted(weights, key=U.part_key), float(rig.get("continuity_radius_m", 0.0015)))
+    shell_cfg = PR.cloth_shell(profile)  # None for every profile without rig.cloth_shell: old path, no report key
+    shells = ({n: add_cloth_shell(lp[n], float(shell_cfg["offset_mm"]) / 1000.0) for n in shell_cfg["parts"]}
+              if shell_cfg else None)
     mat = atlas_material(profile, run_dir)
     for n in names:
         lp[n].data.materials.clear()
@@ -430,6 +500,9 @@ def run(params, profile):
               "roundtrip": {"skeletal": rt_meas, "base": rtb_meas, "bounds_export_frame_cm": bounds_export_cm},
               "checks": dict(checks), "failed": checks.failed(), "passed": not checks.failed(), "status": "измерено",
               "claims": {"art_accepted": False, "game_ready": False, "budgets_declared": False}}
+    if shells is not None:
+        report["cloth_shell"] = {"parts": shells, "note": "decision П3-3: inner copy offset against the normal, reversed "
+                                                          "winding, same UV0, weights copied, rim bridged (closed shell)"}
     U.write_json(run_dir / "reports" / "rig-report.json", report)
     if checks.failed():
         raise RuntimeError("rig checks failed: %s" % checks.failed())

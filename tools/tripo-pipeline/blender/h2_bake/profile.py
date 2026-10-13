@@ -84,6 +84,39 @@ def validate(p):
     side_bones = [b for b in bones if b in WEAPON_BONES]
     if len(side_bones) > 1:
         problems.append("rig.bones: at most one weapon bone (found %s)" % side_bones)
+    problems.extend(cloth_shell_problems(p))
+    return problems
+
+
+# ------------------------------------------------------------------ cloth shell (decision П3-3, Achilles pilot 2026-10-13)
+CLOTH_SHELL_MAX_OFFSET_MM = 1.0  # "offset inward by a fraction of a millimetre" (decision П3-3)
+
+
+def cloth_shell(p):
+    """Optional `rig.cloth_shell` = {"parts": [tripo_part_N, ...], "offset_mm": float}: the listed single-sheet cloth parts
+    become a thin closed shell in the rig stage (st_rig.add_cloth_shell). None when the key is absent — every profile
+    written before the key (Medusa, Arthur, Merlin, Harpy) takes the old code path unchanged."""
+    return p.get("rig", {}).get("cloth_shell")
+
+
+def cloth_shell_problems(p):
+    cfg = cloth_shell(p)
+    if cfg is None:
+        return []
+    problems = []
+    parts = cfg.get("parts") if isinstance(cfg, dict) else None
+    if not parts or not isinstance(parts, list):
+        return ["rig.cloth_shell.parts must be a non-empty list of parts"]
+    for name in parts:
+        if name not in p["parts"]:
+            problems.append("rig.cloth_shell: unknown part %s" % name)
+        elif p["parts"][name].get("mesh") == "base":
+            problems.append("rig.cloth_shell: %s is the base (not skinned)" % name)
+    if len(set(parts)) != len(parts):
+        problems.append("rig.cloth_shell.parts: duplicates")
+    off = cfg.get("offset_mm")
+    if not isinstance(off, (int, float)) or isinstance(off, bool) or not 0 < off <= CLOTH_SHELL_MAX_OFFSET_MM:
+        problems.append("rig.cloth_shell.offset_mm must be in (0, %s] mm (got %r)" % (CLOTH_SHELL_MAX_OFFSET_MM, off))
     return problems
 
 

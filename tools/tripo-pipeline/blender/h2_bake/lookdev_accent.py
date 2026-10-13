@@ -531,7 +531,8 @@ def view_metrics(rdir, view, cidx, near_px, cloth_class="linen", trim_class="gol
     for s in ("ld_p1", "ld_p2"):
         dd = np.linalg.norm(L[s] - L["ld"], axis=-1)
         e["dress_unchanged_" + s] = {"median_delta_e": r(np.median(dd[lin_e]), 2) if lin_e.any() else None,
-                                     "share_delta_e_lt_3": r((dd[lin_e] < 3).mean()) if lin_e.any() else None}
+                                     "share_delta_e_lt_3": r((dd[lin_e] < 3).mean()) if lin_e.any() else None,
+                                     "dress_px": int(lin_e.sum())}
         ge = ndimage.binary_erosion(gold, iterations=1)
         e["gold_unchanged_" + s] = {"median_delta_e": r(np.median(dd[ge]), 2) if ge.any() else None,
                                     "share_delta_e_lt_3": r((dd[ge] < 3).mean()) if ge.any() else None}
@@ -658,10 +659,18 @@ def run_report(run_dir, ta, repo):
     sh = {v: per[v]["screen_share_of_figure"] for v in k2}
     check(checks, "team_accent_visible_k2_5x_front_and_back", all(x >= rd["screen_share_min"] for x in sh.values()), sh,
           ">= %s of the figure pixels (without the base) on K2 5x front and back" % rd["screen_share_min"])
-    dr_ = {v: {s: per[v]["dress_unchanged_" + s]["share_delta_e_lt_3"] for s in ("ld_p1", "ld_p2")} for v in views}
+    # a view that shows fewer than dress_min_px dress pixels (default 100) is "not measured", not a failure: Achilles'
+    # kilt is hidden by the cloak from the back and shows 2 px at K2 1.6x front (pilot 2026-10-13). Medusa's dress is
+    # large in every view, so her result does not change.
+    min_px = int(rd.get("dress_min_px", 100))
+    dr_ = {v: {s: per[v]["dress_unchanged_" + s]["share_delta_e_lt_3"] for s in ("ld_p1", "ld_p2")} for v in views
+           if per[v]["dress_unchanged_ld_p1"].get("dress_px", min_px) >= min_px}
+    not_measured = [v for v in views if v not in dr_]
     check(checks, "dress_outside_accent_unchanged_by_dye",
-          all(x is not None and x >= rd["dress_unchanged_share_min"] for d in dr_.values() for x in d.values()), dr_,
-          ">= %s of the dress pixels outside the accent change by dE < 3 with P1 / P2" % rd["dress_unchanged_share_min"],
+          bool(dr_) and all(x is not None and x >= rd["dress_unchanged_share_min"] for d in dr_.values() for x in d.values()),
+          {"measured": dr_, "not_measured_below_px": {"min_px": min_px, "views": not_measured}},
+          ">= %s of the dress pixels outside the accent change by dE < 3 with P1 / P2 (views with >= %d dress px)"
+          % (rd["dress_unchanged_share_min"], min_px),
           "the dress stays in the concept colour; the rest is the anti-aliased rim of the accent and the dyed bounce light")
     gd = {v: {s: per[v]["gold_unchanged_" + s]["median_delta_e"] for s in ("ld_p1", "ld_p2")} for v in views}
     check(checks, "gold_unchanged_by_dye", all(x is not None and x <= rd["gold_median_delta_e_max"] for d in gd.values() for x in d.values()),
