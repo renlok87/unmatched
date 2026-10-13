@@ -117,6 +117,11 @@ Black Panther, Black Widow, Blackbeard, Bloody Mary, Bruce Lee, Buffy); they are
 | F96 | 7 | `h2anim_ue frames` shoots the grey carrier mesh without the base — acceptors notice | default `--base`; prompt template line |
 | F97 | 7 | Acceptance frame copies 1920 px q88 (12.7 MB) vs HANDBOOK 1200 px q92 rule | tool/HANDBOOK: one rule |
 | F98 | 7 | UE look-dev side frame is shot from the opposite side to the concept's side view (concept faces left; UE side shows the right side) — side-by-side comparison misleads | review-config: side from `SIDE_VIEW` |
+| F99 | 4 r2 | §8.2 template has no slot for the previous fix list and per-item closure; executor's claimed status conflicts with §1 п.3 (executor reports not shown) — passed as one line «claim proves nothing» | §8.2: `{{PREV_FIX_LIST}}` + rule «r1 п.N: закрыт / не закрыт» in F/T rationale |
+| F100 | 4 r2 | Executor said «claws closed» (dihedral p90 49→37°), the acceptor still saw facets on close-ups: numeric closure ≠ visual closure | §9: executor closes an item only on the acceptor's frame type |
+| F101 | 4 | grep of events for «Failed to create unified exec process» false-positives (the rubric text contains it) | §8.4: parse `command_execution` items with `status: failed` |
+| F102 | 4 | Full schema types `verdict_reason` as string and `source_defect` as boolean → a Workflow acceptor with the full schema cannot emit null → the `"null"` strings of F6 | §8.3: give the Workflow acceptor the strict *output* schema (nullable), as now done (`model-second-acceptor` workflow) |
+| F103 | 6 | `clip_manifest.py` H2ANIM pins one spec per hero; a clip rework (new spec/run) must edit the registration line, or G-MANIFEST fails (validation sha ≠ registered run) | tool: spec override / history-aware lookup; animation-vfx-sfx §10: rework moves the registration |
 
 ## Applied to the skill (stages 0–2, 2026-10-13)
 
