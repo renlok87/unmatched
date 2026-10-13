@@ -635,6 +635,85 @@ export interface LookdevSheet {
   file: FileRef;
 }
 
+export interface ConceptCandidateView {
+  file: FileRef;
+  /** design-front-g1 / front-g2 … (from the file name) */
+  label: string;
+  view?: string;
+  generation?: number;
+  /** from checks/<view>-g<N>/checks-report.json */
+  verdict?: string;
+  pass?: number;
+  warn?: number;
+  fail?: number;
+  report?: FileRef;
+  /** generation-records.json: selected */
+  selected?: boolean;
+}
+
+export interface ConceptChecksView {
+  report: FileRef;
+  verdict?: string;
+  pass: number;
+  warn: number;
+  fail: number;
+  /** FAIL/WARN checks (up to 12) */
+  problems: { id: string; result: string }[];
+  error?: string;
+}
+
+export interface ConceptVerificationView {
+  file: FileRef;
+  sourceUnchanged?: boolean;
+  outsideFolder: string[];
+  /** verification.json limit_reached: views that ran out of generations with a failed checklist item */
+  limitReached: { view: string; failedItems: string[] }[];
+  checklistFailed: number;
+  error?: string;
+}
+
+export interface AcceptanceCardView {
+  file: FileRef;
+  /** concept | model | anim … (card.kind) */
+  kind?: string;
+  /** acceptance-concept / acceptance / acceptance-anim … (folder under evidence/) */
+  group: string;
+  /** <YYYYMMDD>-front-r1 */
+  folder: string;
+  cycle?: string;
+  verdict?: string;
+  /** sum / (2 x n) x 10 rounded to 0.1, as validate_card.py computes it */
+  score?: number;
+  scores: { dim: string; value: number | null }[];
+  failedGates: string[];
+  decidedBy?: string;
+  note?: string;
+}
+
+/** Stage 1 package art/imagegen/concept-<key>-codex/ of a new figure (3d-model-pipeline). */
+export interface ConceptPackageView {
+  dir: string;
+  assetId?: string;
+  contentKey?: string;
+  designFront?: FileRef;
+  candidates: ConceptCandidateView[];
+  designChecks?: ConceptChecksView;
+  /** stage 1c: <key>-front/side/back.png */
+  views: FileRef[];
+  sheet?: FileRef;
+  sheetChecks?: ConceptChecksView;
+  verification?: ConceptVerificationView;
+  readme?: FileRef;
+  /** README line with «Статус» */
+  readmeStatus?: string;
+  prompts?: FileRef;
+  generationRecords: number;
+  palette?: { name: string; hex: string }[];
+  /** derived stage: старт | 1a | 1a-приёмка | 1c | 1c-приёмка */
+  stage: string;
+  warnings: string[];
+}
+
 export interface LookdevHeroView {
   /** folder name under art/imagegen/hero-quality-v1/ (medusa, king-arthur…) */
   key: string;
@@ -649,6 +728,10 @@ export interface LookdevHeroView {
   blenderSheets: LookdevSheet[];
   /** sheets from docs/art-pipeline/evidence/<…hero…>/ */
   evidenceSheets: FileRef[];
+  /** new-figure concept package (stage 1 of 3d-model-pipeline), when art/imagegen/concept-<key>-codex/ exists */
+  conceptPackage?: ConceptPackageView;
+  /** acceptance cards of the asset (evidence/acceptance-concept, acceptance, acceptance-anim), newest first */
+  acceptance: AcceptanceCardView[];
 }
 
 export interface LookdevOverview {

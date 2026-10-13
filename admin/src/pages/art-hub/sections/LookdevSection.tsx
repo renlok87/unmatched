@@ -3,6 +3,7 @@ import { Alert, Button, Card, Col, Collapse, Empty, Row, Space, Tag, Typography 
 import type { LookdevHeroView, LookdevOverview, LookdevSheet } from '../../../../art-hub/types';
 import { DocList } from '../components/DocList';
 import { FileActions, Gallery, useArtHubUi } from '../components/common';
+import { AcceptanceCards, ConceptPackage } from './ConceptPackage';
 
 const { Text } = Typography;
 
@@ -53,6 +54,18 @@ export const HeroLookdev: React.FC<{ hero: LookdevHeroView; showTitle?: boolean 
         ) : undefined
       }
     >
+      {hero.conceptPackage ? (
+        <div style={{ marginBottom: 12 }}>
+          <ConceptPackage pkg={hero.conceptPackage} />
+        </div>
+      ) : null}
+      {hero.acceptance.length ? (
+        <div style={{ marginBottom: 12 }}>
+          <AcceptanceCards cards={hero.acceptance} />
+        </div>
+      ) : null}
+      {hero.conceptPackage && !hero.concepts.length && !hero.docs.length && !hero.ueSheets.length && !hero.blenderSheets.length && !hero.evidenceSheets.length ? null : (
+        <>
       <Row gutter={[16, 16]}>
         <Col xs={24} xl={10}>
           <Space direction="vertical" size={8} style={{ width: '100%' }}>
@@ -100,6 +113,8 @@ export const HeroLookdev: React.FC<{ hero: LookdevHeroView; showTitle?: boolean 
           ]}
         />
       ) : null}
+        </>
+      )}
     </Card>
   );
 };

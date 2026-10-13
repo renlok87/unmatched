@@ -21,6 +21,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { FileCache, kindFromPath, mdTitle, stripMd, type WalkEntry } from './fs-utils';
 import type {
+  AcceptanceCardView,
+  ConceptCandidateView,
+  ConceptChecksView,
+  ConceptPackageView,
+  ConceptVerificationView,
   DecisionView,
   DocView,
   FileRef,
@@ -346,6 +351,193 @@ export function buildMaterials(h: OverviewHelpers): MaterialLibraryView {
   return view;
 }
 
+// ---------------------------------------------------------------- concept packages (3d-model-pipeline, stage 1)
+
+const CONCEPT_PKG_RE = /^art\/imagegen\/concept-([a-z0-9][a-z0-9-]*)-codex\/(.+)$/;
+const ASSET_CARD_RE = /^art\/pipeline-candidates\/([^/]+)\/asset-card\.yaml$/;
+const ACCEPTANCE_RE = /^art\/pipeline-candidates\/([^/]+)\/evidence\/(acceptance[^/]*)\/(.+)\/card\.json$/;
+const kebab = (s: string) => s.trim().toLowerCase().replace(/_/g, '-');
+
+function yamlScalar(text: string, field: string): string | undefined {
+  const m = new RegExp(`^${field}:[ \\t]*(.+?)[ \\t]*$`, 'm').exec(text);
+  return m?.[1]?.replace(/^["']|["']$/g, '').trim() || undefined;
+}
+
+function checksView(h: OverviewHelpers, rel: string, role: string): ConceptChecksView {
+  const report = h.makeRef(rel, { role });
+  const j = h.readJson(rel);
+  if (!j) return { report, pass: 0, warn: 0, fail: 0, problems: [], error: 'отчёт не разобран (возможно, ещё пишется)' };
+  const sum = asObj(j.summary);
+  const problems = asArr(j.checks)
+    .map(asObj)
+    .filter((c) => asStr(c.result) && asStr(c.result) !== 'PASS')
+    .slice(0, 12)
+    .map((c) => ({ id: asStr(c.id) ?? '?', result: asStr(c.result)! }));
+  return { report, verdict: asStr(j.verdict), pass: asNum(sum.PASS) ?? 0, warn: asNum(sum.WARN) ?? 0, fail: asNum(sum.FAIL) ?? 0, problems };
+}
+
+function verificationView(h: OverviewHelpers, rel: string): ConceptVerificationView {
+  const file = h.makeRef(rel, { role: 'verification.json' });
+  const j = h.readJson(rel);
+  if (!j) return { file, outsideFolder: [], limitReached: [], checklistFailed: 0, error: 'не разобран (возможно, ещё пишется)' };
+  const limitReached = asArr(j.limit_reached).map((x) => {
+    const o = asObj(x);
+    return { view: asStr(o.view) ?? asStr(x) ?? '?', failedItems: strList(o.failed_items) };
+  });
+  return {
+    file,
+    sourceUnchanged: typeof j.source_unchanged === 'boolean' ? j.source_unchanged : undefined,
+    outsideFolder: strList(j.outside_folder),
+    limitReached,
+    checklistFailed: asArr(j.checklist).filter((c) => asObj(c).passed === false).length,
+  };
+}
+
+/** Acceptance cards of every asset: art/pipeline-candidates/<ASSET>/evidence/acceptance*(slash)<folder>/card.json, newest folder first. */
+export function buildAcceptanceCards(h: OverviewHelpers): Map<string, AcceptanceCardView[]> {
+  const out = new Map<string, AcceptanceCardView[]>();
+  for (const f of h.watched) {
+    const m = ACCEPTANCE_RE.exec(f.rel);
+    if (!m) continue;
+    const j = h.readJson(f.rel);
+    if (!j) h.warnings.push(`${f.rel}: карточка приёмки не разобрана (возможно, ещё пишется)`);
+    const scores = asObj(j?.scores);
+    const dims = Object.keys(scores).map((dim) => ({ dim, value: asNum(asObj(scores[dim]).value) ?? null }));
+    const nums = dims.map((d) => d.value).filter((v): v is number => v !== null);
+    const gates = asObj(j?.gates);
+    const card: AcceptanceCardView = {
+      file: h.makeRef(f.rel, { role: `приёмка ${m[2]}/${m[3]}` }),
+      kind: asStr(j?.kind),
+      group: m[2]!,
+      folder: m[3]!,
+      cycle: asStr(j?.cycle),
+      verdict: asStr(j?.verdict),
+      score: nums.length ? Math.round((nums.reduce((a, b) => a + b, 0) / (2 * nums.length)) * 100) / 10 : undefined,
+      scores: dims,
+      failedGates: Object.keys(gates).filter((g) => asObj(gates[g]).status === 'FAIL'),
+      decidedBy: asStr(j?.decided_by),
+      note: cut(asStr(j?.status_note), 240),
+    };
+    out.set(m[1]!, [...(out.get(m[1]!) ?? []), card]);
+  }
+  for (const list of out.values()) list.sort((a, b) => b.folder.localeCompare(a.folder) || a.group.localeCompare(b.group));
+  return out;
+}
+
+/**
+ * Stage-1 packages art/imagegen/concept-<key>-codex/, mapped to hero keys by CONTENT_KEY of
+ * art/pipeline-candidates/<ASSET>/asset-card.yaml (key = heroSlug(ASSET)); a package without a card keeps its folder key.
+ * Missing or half-written files never throw: they become warnings of the package.
+ */
+export function buildConceptPackages(h: OverviewHelpers, acceptance: Map<string, AcceptanceCardView[]>): Map<string, ConceptPackageView> {
+  const cards = new Map<string, { assetId: string; contentKey: string }>(); // package stem → card
+  for (const f of h.watched) {
+    const m = ASSET_CARD_RE.exec(f.rel);
+    if (!m) continue;
+    const text = h.cache.readText(abs(h, f.rel));
+    const ck = text ? yamlScalar(text, 'CONTENT_KEY') : undefined;
+    if (ck) cards.set(kebab(ck), { assetId: yamlScalar(text!, 'ASSET_ID') ?? m[1]!, contentKey: ck });
+  }
+  const byStem = new Map<string, WalkEntry[]>();
+  for (const f of h.watched) {
+    const m = CONCEPT_PKG_RE.exec(f.rel);
+    if (m) byStem.set(m[1]!, [...(byStem.get(m[1]!) ?? []), f]);
+  }
+  const mtimes = new Map(h.watched.map((f) => [f.rel, f.mtimeMs]));
+  const result = new Map<string, ConceptPackageView>();
+  for (const [stem, files] of byStem) {
+    const dir = `art/imagegen/concept-${stem}-codex`;
+    const rels = files.map((f) => f.rel);
+    const has = (rel: string) => mtimes.has(`${dir}/${rel}`);
+    const card = cards.get(stem);
+    const warnings: string[] = [];
+    const key = card ? heroSlug(card.assetId) : stem;
+
+    // generation records: «selected» flag per saved file
+    const selected = new Set<string>();
+    let records = 0;
+    if (has('generation-records.json')) {
+      const raw = h.cache.readJson(abs(h, `${dir}/generation-records.json`)).value;
+      if (Array.isArray(raw)) {
+        records = raw.length;
+        for (const r of raw) if (asObj(r).selected === true && asStr(asObj(r).saved_path)) selected.add(asStr(asObj(r).saved_path)!.replace(/\\/g, '/'));
+      } else warnings.push('generation-records.json не разобран (возможно, ещё пишется)');
+    }
+    const candidates: ConceptCandidateView[] = files
+      .filter((f) => f.rel.startsWith(`${dir}/concepts/`) && kindFromPath(f.rel) === 'image')
+      .sort((a, b) => a.rel.localeCompare(b.rel, undefined, { numeric: true }))
+      .map((f) => {
+        const stemName = path.posix.basename(f.rel).replace(/\.[^.]+$/, '');
+        const lm = /-((design-)?(front|side|back)-g(\d+))$/.exec(stemName);
+        const label = lm?.[1] ?? stemName;
+        const c: ConceptCandidateView = {
+          file: h.makeRef(f.rel, { role: label }),
+          label,
+          view: lm ? `${lm[2] ?? ''}${lm[3]}` : undefined,
+          generation: lm ? Number(lm[4]) : undefined,
+          selected: selected.has(f.rel) || undefined,
+        };
+        const rep = `${dir}/checks/${label}/checks-report.json`;
+        if (mtimes.has(rep)) {
+          const cv = checksView(h, rep, `проверка ${label}`);
+          if (cv.error) warnings.push(`checks/${label}: ${cv.error}`);
+          else Object.assign(c, { verdict: cv.verdict, pass: cv.pass, warn: cv.warn, fail: cv.fail });
+          c.report = cv.report;
+        }
+        return c;
+      });
+
+    const designFrontRel = rels.find((r) => r.startsWith(`${dir}/design/`) && /-front\.(png|jpe?g|webp)$/i.test(r));
+    const views = ['front', 'side', 'back']
+      .map((v) => rels.find((r) => new RegExp(`^${dir}/[^/]+-${v}\\.(png|jpe?g|webp)$`, 'i').test(r)))
+      .filter((r): r is string => !!r)
+      .map((r) => h.makeRef(r, { role: `1c · ${path.posix.basename(r)}` }));
+    const sheetRel = rels.find((r) => r.startsWith(`${dir}/sheet-`) && /\.(png|jpe?g|webp)$/i.test(r));
+    const readmeText = has('README.md') ? h.cache.readText(abs(h, `${dir}/README.md`)) : undefined;
+    const statusLine = readmeText?.split(/\r?\n/).find((l) => /статус/i.test(l));
+    let palette: { name: string; hex: string }[] | undefined;
+    if (has('palette.json')) {
+      const pj = h.readJson(`${dir}/palette.json`);
+      if (pj) {
+        palette = [...asArr(pj.main), pj.accent]
+          .map(asObj)
+          .map((c) => ({ name: asStr(c.name) ?? '', hex: asStr(c.hex) ?? '' }))
+          .filter((c) => /^#[0-9a-f]{3,8}$/i.test(c.hex));
+      }
+    }
+    const cardsOfAsset = card ? (acceptance.get(card.assetId) ?? []) : [];
+    const accepted1c = cardsOfAsset.some((c) => /sheet/i.test(c.folder));
+    const accepted1a = cardsOfAsset.some((c) => /front/i.test(c.folder));
+    const stage = sheetRel || views.length ? (accepted1c ? '1c-приёмка' : '1c') : designFrontRel ? (accepted1a ? '1a-приёмка' : '1a') : 'старт';
+
+    const pkg: ConceptPackageView = {
+      dir,
+      assetId: card?.assetId,
+      contentKey: card?.contentKey ?? stem,
+      designFront: designFrontRel ? h.makeRef(designFrontRel, { role: 'дизайн 1a (выбранный)' }) : undefined,
+      candidates,
+      designChecks: has('design/checks-report.json') ? checksView(h, `${dir}/design/checks-report.json`, 'проверка выбранного дизайна 1a') : undefined,
+      views,
+      sheet: sheetRel ? h.makeRef(sheetRel, { role: 'лист видов 1c' }) : undefined,
+      sheetChecks: has('checks-report.json') ? checksView(h, `${dir}/checks-report.json`, 'проверка набора 1c') : undefined,
+      verification: has('verification.json') ? verificationView(h, `${dir}/verification.json`) : undefined,
+      readme: has('README.md') ? h.makeRef(`${dir}/README.md`, { role: 'README пакета' }) : undefined,
+      readmeStatus: cut(statusLine?.replace(/[*_`#]/g, '').trim(), 200),
+      prompts: has('prompts.md') ? h.makeRef(`${dir}/prompts.md`, { role: 'промпты' }) : undefined,
+      generationRecords: records,
+      palette,
+      stage,
+      warnings,
+    };
+    if (pkg.designChecks?.error) warnings.push(`design/checks-report.json: ${pkg.designChecks.error}`);
+    if (pkg.sheetChecks?.error) warnings.push(`checks-report.json: ${pkg.sheetChecks.error}`);
+    if (pkg.verification?.error) warnings.push(`verification.json: ${pkg.verification.error}`);
+    if (!card) warnings.push('нет asset-card.yaml с таким CONTENT_KEY — пакет привязан по имени папки');
+    result.set(key, pkg);
+  }
+  return result;
+}
+
 // ---------------------------------------------------------------- look-dev + concepts
 
 /** ASSET-KING-ARTHUR-001 → king-arthur */
@@ -360,6 +552,8 @@ export function buildLookdev(h: OverviewHelpers, pages: { id: string; shortName:
   const conceptRoot = OVERVIEW_SOURCES.conceptRoot;
   const conceptFiles = h.watched.filter((f) => f.rel.startsWith(`${conceptRoot}/`));
   const conceptDirs = new Set(conceptFiles.map((f) => f.rel.slice(conceptRoot.length + 1).split('/')[0]!).filter((d) => d && d !== 'reference'));
+  const acceptance = buildAcceptanceCards(h);
+  const packages = buildConceptPackages(h, acceptance);
   const view: LookdevOverview = {
     conceptRoot,
     references: conceptFiles
@@ -370,6 +564,8 @@ export function buildLookdev(h: OverviewHelpers, pages: { id: string; shortName:
   const keys = new Map<string, { name: string; pageId?: string }>();
   for (const p of pages) keys.set(heroSlug(p.id), { name: p.shortName, pageId: p.id });
   for (const d of conceptDirs) if (!keys.has(d)) keys.set(d, { name: d });
+  for (const k of packages.keys()) if (!keys.has(k)) keys.set(k, { name: k });
+  const assetIdOfKey = (k: string) => pages.find((p) => heroSlug(p.id) === k)?.id ?? packages.get(k)?.assetId ?? `ASSET-${k.toUpperCase()}-001`;
 
   const ueSheets = new Map<string, LookdevSheet[]>();
   const blenderSheets = new Map<string, LookdevSheet[]>();
@@ -417,8 +613,10 @@ export function buildLookdev(h: OverviewHelpers, pages: { id: string; shortName:
       ueSheets: (ueSheets.get(key) ?? []).sort(newestFirst),
       blenderSheets: (blenderSheets.get(key) ?? []).sort(newestFirst),
       evidenceSheets,
+      conceptPackage: packages.get(key),
+      acceptance: acceptance.get(assetIdOfKey(key)) ?? [],
     };
-    const empty = !concepts.length && !docs.length && !hero.ueSheets.length && !hero.blenderSheets.length && !evidenceSheets.length;
+    const empty = !concepts.length && !hero.conceptPackage && !hero.acceptance.length && !docs.length && !hero.ueSheets.length && !hero.blenderSheets.length && !evidenceSheets.length;
     if (!empty) view.heroes.push(hero);
   }
   return view;
